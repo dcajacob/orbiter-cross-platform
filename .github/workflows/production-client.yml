@@ -5,6 +5,10 @@ on:
     branches: ['codex/production-**']
     paths:
       - 'OVP/OGLClient/**'
+      - 'Src/Orbiter/**'
+      - 'Orbitersdk/**'
+      - 'Tests/Production/*source.py'
+      - 'Tests/Production/phase3-extraction.lock.json'
       - 'Tests/Production/Client/**'
       - '.github/workflows/production-client.yml'
   workflow_dispatch:
@@ -21,7 +25,7 @@ jobs:
   client:
     name: Real Windows client ${{ matrix.configuration }} x64
     runs-on: windows-2022
-    timeout-minutes: 40
+    timeout-minutes: 60
     strategy:
       fail-fast: false
       matrix:
@@ -58,17 +62,8 @@ jobs:
         id: runtime-cache
         with:
           path: out/runtime-archive/windows-test-runtime.zip
-          key: production-client-sdk-06d8989823c59e651061d409425c19ec71360bfa-${{ matrix.configuration }}-${{ env.VCToolsVersion }}
-      - uses: actions/download-artifact@v8
-        id: original-runtime
-        if: steps.runtime-cache.outputs.cache-hit != 'true' && matrix.configuration == 'Debug'
-        continue-on-error: true
-        with:
-          name: production-runtime-${{ matrix.configuration }}-x64
-          run-id: 41192125192
-          github-token: ${{ github.token }}
-          path: out/runtime-archive
-      - name: Check whether the frozen-source application needs rebuilding
+          key: production-client-sdk-${{ github.sha }}-${{ matrix.configuration }}-${{ env.VCToolsVersion }}
+      - name: Check whether this exact source revision needs rebuilding
         id: rebuild
         shell: pwsh
         run: |
@@ -77,16 +72,11 @@ jobs:
           } else {
             'needed=true' >> $env:GITHUB_OUTPUT
           }
-      - uses: actions/checkout@v7
-        if: steps.rebuild.outputs.needed == 'true'
-        with:
-          ref: 06d8989823c59e651061d409425c19ec71360bfa
-          path: out/runtime-source
-      - name: Rebuild and test the original application and SDK when no retained runtime exists
+      - name: Rebuild and test the current production application and SDK
         if: steps.rebuild.outputs.needed == 'true'
         shell: pwsh
         run: |
-          cmake -S out/runtime-source -B out/runtime-rebuild -G Ninja -DCMAKE_BUILD_TYPE=${{ matrix.configuration }} -DCMAKE_C_COMPILER=cl -DCMAKE_CXX_COMPILER=cl -DORBITER_BUILD_D3D9CLIENT=ON -DORBITER_BUILD_XRSOUND=OFF -DORBITER_MAKE_DOC=OFF -DORBITER_MAKE_TESTS=ON -DORBITER_PORTABLE_REFERENCE_CAPTURE=ON -DORBITER_PRODUCTION_REFERENCE_CAPTURE=ON "-DDXSDK_DIR:PATH=$env:DXSDK_DIR" 2>&1 | Tee-Object runtime-configure.log
+          cmake -S . -B out/runtime-rebuild -G Ninja -DCMAKE_BUILD_TYPE=${{ matrix.configuration }} -DCMAKE_C_COMPILER=cl -DCMAKE_CXX_COMPILER=cl -DORBITER_BUILD_D3D9CLIENT=ON -DORBITER_BUILD_XRSOUND=OFF -DORBITER_MAKE_DOC=OFF -DORBITER_MAKE_TESTS=ON -DORBITER_PORTABLE_REFERENCE_CAPTURE=ON -DORBITER_PRODUCTION_REFERENCE_CAPTURE=ON "-DDXSDK_DIR:PATH=$env:DXSDK_DIR" 2>&1 | Tee-Object runtime-configure.log
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           cmake --build out/runtime-rebuild --parallel 2 2>&1 | Tee-Object runtime-build.log
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
@@ -94,17 +84,13 @@ jobs:
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           python Tests/Production/build_metadata.py --build out/runtime-rebuild
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-          $taskRoot=$pwd.Path
-          Push-Location "$taskRoot/out/runtime-source"
-          try {
-            python "$taskRoot/Tests/Production/package_test_runtime.py" --build "$taskRoot/out/runtime-rebuild" --output "$taskRoot/out/runtime-archive/windows-test-runtime.zip"
-            if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-          } finally { Pop-Location }
+          python Tests/Production/package_test_runtime.py --build out/runtime-rebuild --output out/runtime-archive/windows-test-runtime.zip
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
       - name: Unpack and verify the same-build Windows application and SDK
         shell: pwsh
         run: |
           Expand-Archive out/runtime-archive/windows-test-runtime.zip out/production-app
-          python Tests/Production/verify_test_runtime.py --runtime out/production-app --source 06d8989823c59e651061d409425c19ec71360bfa
+          python Tests/Production/verify_test_runtime.py --runtime out/production-app --source ${{ github.sha }}
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
       - name: Build the separately linked Windows GraphicsClient module
         shell: pwsh
@@ -185,6 +171,7 @@ jobs:
           python3 -B Tests/Production/Client/compare_client.py
           --debug out/client-artifacts/real-client-Debug/out/client-execution/scene
           --release out/client-artifacts/real-client-Release/out/client-execution/scene
+          --frozen Tests/Production/ClientReference
           --report out/client-comparison.json
       - uses: actions/upload-artifact@v7
         if: always()

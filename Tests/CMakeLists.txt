@@ -1,4 +1,5 @@
 Include(FetchContent)
+add_subdirectory(Production/Boundary)
 
 # Test-only control/observation plugin; never installed as a stock module.
 option(ORBITER_PRODUCTION_REFERENCE_CAPTURE "Build production Windows reference driver" OFF)

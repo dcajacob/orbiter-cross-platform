@@ -2,6 +2,8 @@
 // Licensed under the MIT License
 
 #include "Mesh.h"
+#include "Production/MeshReader.h"
+#include "Production/MeshNormals.h"
 #include <stdio.h>
 #include "D3dmath.h"
 #include "Orbiter.h"
@@ -644,63 +646,8 @@ void Mesh::TexScale (D3DVALUE su, D3DVALUE sv)
 
 void Mesh::CalcNormals (DWORD grp, bool missingonly)
 {
-	const float eps = 1e-8f;
-	int i, nv = Grp[grp].nVtx, nt = Grp[grp].nIdx/3;
-	WORD *idx = Grp[grp].Idx;
-	NTVERTEX *vtx = Grp[grp].Vtx;
-	bool *calcNml = new bool[nv];
-	if (missingonly) {
-		for (i = 0; i < nv; i++) {
-			if (vtx[i].nx*vtx[i].nx + vtx[i].ny*vtx[i].ny + vtx[i].nz*vtx[i].nz > 0.1f) {
-				calcNml[i] = false; // flag for "leave normal alone"
-			} else {
-				calcNml[i] = true;
-				vtx[i].nx = vtx[i].ny = vtx[i].nz = 0.0f;
-			}
-		}
-	} else {
-		for (i = 0; i < nv; i++) {
-			calcNml[i] = true;
-			vtx[i].nx = vtx[i].ny = vtx[i].nz = 0.0f;
-		}
-	}
-	for (i = 0; i < nt; i++) {
-		DWORD i0 = idx[i*3], i1 = idx[i*3+1], i2 = idx[i*3+2];
-		if (!calcNml[i0] && !calcNml[i1] && !calcNml[i2])
-			continue; // nothing to do for this triangle
-		D3DVECTOR V01 = { vtx[i1].x - vtx[i0].x, vtx[i1].y - vtx[i0].y, vtx[i1].z - vtx[i0].z };
-		D3DVECTOR V02 = { vtx[i2].x - vtx[i0].x, vtx[i2].y - vtx[i0].y, vtx[i2].z - vtx[i0].z };
-		D3DVECTOR V12 = { vtx[i2].x - vtx[i1].x, vtx[i2].y - vtx[i1].y, vtx[i2].z - vtx[i1].z };
-		D3DVECTOR nm = D3DMath_CrossProduct (V01, V02);
-		D3DVALUE len = D3DMath_Length (nm);
-
-		if (len >= eps) {
-			nm.x /= len, nm.y /= len, nm.z /= len;
-			D3DVALUE d01 = D3DMath_Length(V01);
-			D3DVALUE d02 = D3DMath_Length(V02);
-			D3DVALUE d12 = D3DMath_Length(V12);
-			if (calcNml[i0]) {
-				D3DVALUE a0 = acos((d01 * d01 + d02 * d02 - d12 * d12) / (2.0f * d01 * d02));
-				vtx[i0].nx += nm.x * a0, vtx[i0].ny += nm.y * a0, vtx[i0].nz += nm.z * a0;
-			}
-			if (calcNml[i1]) {
-				D3DVALUE a1 = acos((d01 * d01 + d12 * d12 - d02 * d02) / (2.0f * d01 * d12));
-				vtx[i1].nx += nm.x * a1, vtx[i1].ny += nm.y * a1, vtx[i1].nz += nm.z * a1;
-			}
-			if (calcNml[i2]) {
-				D3DVALUE a2 = acos((d02 * d02 + d12 * d12 - d01 * d01) / (2.0f * d02 * d12));
-				vtx[i2].nx += nm.x * a2, vtx[i2].ny += nm.y * a2, vtx[i2].nz += nm.z * a2;
-			}
-		}
-	}
-	for (i = 0; i < nv; i++)
-		if (calcNml[i]) {
-			D3DVECTOR nm = { vtx[i].nx, vtx[i].ny, vtx[i].nz };
-			D3DVALUE len = D3DMath_Length(nm);
-			vtx[i].nx /= len, vtx[i].ny /= len, vtx[i].nz /= len;
-		}
-	delete []calcNml;
-	calcNml = NULL;
+	orbiter::production::CalculateMeshNormals(Grp[grp].Vtx, Grp[grp].Idx,
+		Grp[grp].nVtx, Grp[grp].nIdx/3, missingonly);
 }
 
 void Mesh::CalcTexCoords (DWORD grp)
@@ -813,181 +760,39 @@ void Mesh::RenderGroup (LPDIRECT3DDEVICE7 dev, DWORD grp, bool setstate) const
 {
 }
 
+// Windows resource adapter for the shared production parser. The public SDK
+// and its material/group representations remain unchanged.
+class WindowsMeshSink {
+public:
+	using Vertex = NTVERTEX;
+	using Index = WORD;
+	using Material = D3DMATERIAL7;
+	explicit WindowsMeshSink(Mesh& value) : mesh(value) {}
+	void Clear() { mesh.Clear(); }
+	void AddGroup(Vertex* vertices, int nv, Index* indices, int ni,
+		DWORD material, DWORD texture, WORD bias)
+	{ mesh.AddGroup(vertices, nv, indices, ni, material, texture, bias); }
+	void SetGroupFlags(int group, WORD flags, DWORD user)
+	{ mesh.Grp[group].Flags = flags; mesh.Grp[group].UsrFlag = user; }
+	void CalcNormals(int group, bool missingOnly) { mesh.CalcNormals(group, missingOnly); }
+	void StaticGroup(int group) { mesh.MakeGroupVertexBuffer(group); }
+	void AddMaterial(Material& material) { mesh.AddMaterial(material); }
+	void ReleaseTextures() { mesh.ReleaseTextures(); }
+	void CreateTextures(int count) { mesh.Tex = new SURFHANDLE[mesh.nTex = count](); }
+	void LoadTexture(int index, const char* name, DWORD flags)
+	{
+		if (g_pOrbiter->GetGraphicsClient())
+			mesh.Tex[index] = g_pOrbiter->GetGraphicsClient()->clbkLoadTexture(name, flags);
+	}
+	void Setup() { mesh.Setup(); }
+private:
+	Mesh& mesh;
+};
+
 istream &operator>> (istream &is, Mesh &mesh)
 {
-	char cbuf[256];
-	int i, j, g, ngrp, nvtx, ntri, nidx, nmtrl, mtrl_idx, ntex, tex_idx, flag, res;
-	DWORD uflag;
-	WORD zbias;
-	D3DMATERIAL7 mtrl;
-	bool term, staticmesh = false;
-
-	mesh.Clear();
-
-	if (!is.getline (cbuf, 256)) return is;
-	if (strcmp (cbuf, "MSHX1")) return is;
-
-	for (;;) {
-		if (!is.getline (cbuf, 256)) return is;
-		if (!_strnicmp (cbuf, "GROUPS", 6)) {
-			if (sscanf (cbuf+6, "%d", &ngrp) != 1) return is;
-			break;
-		} else if (!_strnicmp (cbuf, "STATICMESH", 10)) {
-			staticmesh = true;
-		}
-	}
-
-	for (g = 0, term = false; g < ngrp && !term; g++) {
-
-		// set defaults
-		NTVERTEX *vtx;
-		WORD *idx;
-		mtrl_idx = SPEC_INHERIT;
-		tex_idx  = SPEC_INHERIT;
-		zbias    = 0;
-		flag     = (staticmesh ? 0x04 : 0);
-		uflag    = 0;
-		bool bnormal = true, calcnml = false;
-		bool flipidx = false;
-		nvtx = ntri = 0;
-
-		for (;;) {
-			if (!is.getline (cbuf, 256)) { term = true; break; }
-			if (!_strnicmp (cbuf, "MATERIAL", 8)) {       // read material index
-				sscanf (cbuf+8, "%d", &mtrl_idx);
-				mtrl_idx--;
-			} else if (!_strnicmp (cbuf, "TEXTURE", 7)) { // read texture index
-				sscanf (cbuf+7, "%d", &tex_idx);
-				tex_idx--;
-			} else if (!_strnicmp (cbuf, "ZBIAS", 5)) {   // read z-bias
-				sscanf (cbuf+5, "%hu", &zbias);
-			} else if (!_strnicmp (cbuf, "TEXWRAP", 7)) { // read wrap flags
-				char uvstr[10] = "";
-				sscanf (cbuf+7, "%9s", uvstr);
-				if (uvstr[0] == 'U' || uvstr[1] == 'U') flag |= 0x01;
-				if (uvstr[0] == 'V' || uvstr[1] == 'V') flag |= 0x02;
-			} else if (!_strnicmp (cbuf, "NONORMAL", 8)) {
-				bnormal = false; calcnml = true;
-			} else if (!_strnicmp (cbuf, "FLAG", 4)) {
-				sscanf (cbuf+4, "%lx", &uflag);
-			} else if (!_strnicmp (cbuf, "FLIP", 4)) {
-				flipidx = true;
-			} else if (!_strnicmp (cbuf, "LABEL", 5)) {
-				// ignore group labels here
-			} else if (!_strnicmp (cbuf, "STATIC", 6)) {
-				flag |= 0x04;
-			} else if (!_strnicmp (cbuf, "DYNAMIC", 7)) {
-				flag ^= 0x04;
-			} else if (!_strnicmp (cbuf, "GEOM", 4)) {    // read geometry
-				if (sscanf (cbuf+4, "%d%d", &nvtx, &ntri) != 2) break; // parse error - skip group
-				nidx = ntri*3;
-				vtx = new NTVERTEX[nvtx]; TRACENEW
-				ZeroMemory (vtx, sizeof (NTVERTEX)*nvtx);
-				for (i = 0; i < nvtx; i++) {
-					NTVERTEX &v = vtx[i];
-					if (!is.getline (cbuf, 256)) {
-						delete []vtx;
-						vtx = NULL;
-						nvtx = 0;
-						break;
-					}
-					if (bnormal) {
-						j = sscanf (cbuf, "%f%f%f%f%f%f%f%f",
-							&v.x, &v.y, &v.z, &v.nx, &v.ny, &v.nz, &v.tu, &v.tv);
-						if (j < 6) {
-							calcnml = true;
-							// sscanf wrote UV coords into normal fields - relocate them
-							v.tu = v.nx;
-							v.tv = v.ny;
-							// Zero the normal so CalcNormals() will recalculate this vertex
-							v.nx = 0.0f;
-							v.ny = 0.0f;
-							v.nz = 0.0f;
-						}
-					} else {
-						j = sscanf (cbuf, "%f%f%f%f%f",
-							&v.x, &v.y, &v.z, &v.tu, &v.tv);
-					}
-				}
-				idx = new WORD[nidx]; TRACENEW
-				ZeroMemory (idx, sizeof (WORD)*nidx);
-				for (i = j = 0; i < ntri; i++) {
-					if (!is.getline (cbuf, 256)) {
-						delete []vtx;
-						vtx = NULL;
-						delete []idx;
-						idx = NULL;
-						nvtx = nidx = 0;
-						break;
-					}
-					sscanf (cbuf, "%hd%hd%hd", idx+j, idx+j+1, idx+j+2);
-					j += 3;
-				}
-				if (flipidx)
-					for (i = 0; i < ntri; i++) {
-						WORD tmp = idx[i*3+1]; idx[i*3+1] = idx[i*3+2]; idx[i*3+2] = tmp;
-					}
-
-				break;
-			}
-		}
-		if (nvtx && nidx) {
-			mesh.AddGroup (vtx, nvtx, idx, nidx, mtrl_idx, tex_idx, zbias);
-			mesh.Grp[g].Flags = flag;
-			mesh.Grp[g].UsrFlag = uflag;
-			if (calcnml) mesh.CalcNormals (g, true);
-			if (flag & 0x04) mesh.MakeGroupVertexBuffer (g);
-		}
-	}
-
-	// read material list
-	if (is.getline (cbuf, 256) && !strncmp (cbuf, "MATERIALS", 9) && (sscanf (cbuf+9, "%d", &nmtrl) == 1)) {
-		Str256 *matname = new Str256[nmtrl]; TRACENEW
-		Str256 mnm;
-		for (i = 0; i < nmtrl; i++) {
-			is.getline (cbuf, 256);
-			sscanf (cbuf, "%s", matname[i]);
-		}
-		for (i = 0; i < nmtrl; i++) {
-			ZeroMemory (&mtrl, sizeof (D3DMATERIAL7));
-			is.getline (cbuf, 256);
-			sscanf (cbuf+8, "%255s", mnm);
-			is.getline (cbuf, 256);
-			sscanf (cbuf, "%f%f%f%f", &mtrl.diffuse.r, &mtrl.diffuse.g, &mtrl.diffuse.b, &mtrl.diffuse.a);
-			is.getline (cbuf, 256);
-			sscanf (cbuf, "%f%f%f%f", &mtrl.ambient.r, &mtrl.ambient.g, &mtrl.ambient.b, &mtrl.ambient.a);
-			is.getline (cbuf, 256);
-			res = sscanf (cbuf, "%f%f%f%f%f", &mtrl.specular.r, &mtrl.specular.g, &mtrl.specular.b, &mtrl.specular.a, &mtrl.power);
-			if (res < 5) mtrl.power = 0.0;
-			is.getline (cbuf, 256);
-			sscanf (cbuf, "%f%f%f%f", &mtrl.emissive.r, &mtrl.emissive.g, &mtrl.emissive.b, &mtrl.emissive.a);
-			mesh.AddMaterial (mtrl);
-		}
-		delete []matname;
-		matname = NULL;
-	}
-
-	// read texture list
-	mesh.ReleaseTextures ();
-	if (is.getline (cbuf, 256) && !strncmp (cbuf, "TEXTURES", 8) && (sscanf (cbuf+8, "%d", &ntex) == 1)) {
-		mesh.Tex = new SURFHANDLE[mesh.nTex = ntex]; TRACENEW
-		Str256 texname, flagstr;
-		for (i = 0; i < ntex; i++) {
-			is.getline (cbuf, 256);
-			flagstr[0] = '\0';
-			sscanf (cbuf, "%255s%255s", texname, flagstr);
-			mesh.Tex[i] = 0;
-			if (texname[0] != '0' || texname[1] != '\0') {
-				bool uncompress = (toupper(flagstr[0]) == 'D');
-				if (g_pOrbiter->GetGraphicsClient())
-					mesh.Tex[i] = g_pOrbiter->GetGraphicsClient()->clbkLoadTexture (texname, 8 | (uncompress ? 2:0));
-			}
-		}
-	}
-
-	mesh.Setup();
-	is.clear();
-	return is;
+	WindowsMeshSink sink(mesh);
+	return orbiter::production::ReadMesh(is, sink);
 }
 
 ostream &operator<< (ostream &os, const Mesh &mesh)

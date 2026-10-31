@@ -5,6 +5,7 @@
 set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -SAFESEH:NO")
 FetchContent_MakeAvailable(imgui)
 FetchContent_MakeAvailable(implot)
+add_subdirectory(Production)
 
 # Sources for all Orbiter executable targets
 set(common_src
@@ -25,6 +26,7 @@ set(common_src
 	Mesh.cpp
 	Nav.cpp
 	Orbiter.cpp
+	Production/WindowsSession.cpp
 	PlaybackEd.cpp
 	Psys.cpp
 	Script.cpp
@@ -168,7 +170,7 @@ set_target_properties(Orbiter
 
 target_include_directories(Orbiter PUBLIC ${Orbiter_includes} ${TRACY_CLIENT_INCLUDE} ${imgui_SOURCE_DIR}/ ${imgui_SOURCE_DIR}/backends ${implot_SOURCE_DIR}/)
 
-target_link_libraries(Orbiter ${Orbiter_common_libs} ${Orbiter_libs} ${TRACY_CLIENT})
+target_link_libraries(Orbiter ${Orbiter_common_libs} ${Orbiter_libs} ${TRACY_CLIENT} orbiter_production_boundary)
 
 add_dependencies(Orbiter ${Orbiter_depends})
 

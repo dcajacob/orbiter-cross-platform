@@ -16,6 +16,11 @@ OBSERVED = {'Src/Orbiter/Orbiter.cpp','Src/Orbiter/Vessel.cpp','Src/Orbiter/Stat
 
 
 def verify():
+    extraction = Path(__file__).with_name('phase3-extraction.lock.json')
+    if extraction.exists():
+        from extraction_source import verify as verify_extraction
+        verify_extraction()
+        return
     changed = subprocess.check_output(['git','-C',str(ROOT),'diff','--name-only',BASE,'--','Src','Orbitersdk','Extern','CMakeLists.txt']).decode().splitlines()
     for name in changed:
         if name not in OBSERVED:

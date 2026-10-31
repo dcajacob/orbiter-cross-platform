@@ -6,6 +6,8 @@ import json
 import math
 from pathlib import Path
 import sys
+import struct
+import zlib
 
 sys.dont_write_bytecode=True
 HERE=Path(__file__).resolve().parent
@@ -66,9 +68,33 @@ def projected_landmarks(directory):
     return result
 
 
-def run(left,right):
+def reference_pixels(path):
+    """Decode our preserved, unfiltered RGBA PNG without imaging dependencies."""
+    content=path.read_bytes();require(content[:8]==b'\x89PNG\r\n\x1a\n','invalid frozen PNG')
+    offset=8;compressed=bytearray()
+    while offset<len(content):
+        size=struct.unpack('>I',content[offset:offset+4])[0]
+        kind=content[offset+4:offset+8];data=content[offset+8:offset+8+size]
+        require(zlib.crc32(kind+data)==struct.unpack('>I',content[offset+8+size:offset+12+size])[0], 'frozen PNG CRC differs')
+        if kind==b'IHDR':require(struct.unpack('>IIBBBBB',data)==(1280,720,8,6,0,0,0),'unexpected frozen PNG format')
+        if kind==b'IDAT':compressed.extend(data)
+        offset+=size+12
+    scan=zlib.decompress(compressed);stride=1280*4+1
+    require(len(scan)==720*stride and all(scan[y*stride]==0 for y in range(720)),'unexpected frozen PNG filters')
+    return b''.join(scan[y*stride+1:(y+1)*stride] for y in reversed(range(720)))
+
+
+def run(left,right,frozen=None):
     a=json.loads((left/'client-report.json').read_text());b=json.loads((right/'client-report.json').read_text())
-    require(a['provenance']==b['provenance'],'client source/application/data provenance differs')
+    if frozen:
+        # Extraction must change the application source. Only the explicitly
+        # accepted, hash-verified historical reference may cross that boundary.
+        from frozen_client import verify
+        verify(frozen)
+        require(left.resolve().parent==frozen.resolve(),'not the accepted canonical reference')
+        require(a['provenance']['data_profiles_sha256']==b['provenance']['data_profiles_sha256'], 'frozen data profiles differ')
+    else:
+        require(a['provenance']==b['provenance'],'client source/application/data provenance differs')
     require(a['renderer']==b['renderer'],'actual software renderer or window dimensions differ')
     require(a['asset_sha256']==b['asset_sha256'],'actual stock asset content differs')
     case=next(c for c in json.loads((HERE.parent/'behavior-cases.json').read_text())['cases'] if c['id']=='callbacks')
@@ -79,19 +105,25 @@ def run(left,right):
     p,q=projected_landmarks(left),projected_landmarks(right)
     error=max(math.dist(p[name],q[name]) for name in p)
     require(error<=1.,'projected engine landmarks differ by more than one pixel')
-    ssim=image_ssim((left/'scene.rgba').read_bytes(),(right/'scene.rgba').read_bytes(),1280,720)
+    pixels=reference_pixels(frozen/'scene.png') if frozen else (left/'scene.rgba').read_bytes()
+    ssim=image_ssim(pixels,(right/'scene.rgba').read_bytes(),1280,720)
     require(math.isfinite(ssim) and ssim>=.98,'full real-client image SSIM is below 0.98')
     return dict(status='passed',numerical=numerical,maximum_projected_landmark_error_px=error,
                 landmarks_px=p,ssim=ssim,ssim_method='RGB 11x11 Gaussian sigma 1.5; population covariance; valid crop; no masks',
-                provenance=a['provenance'])
+                reference_provenance=a['provenance'],candidate_provenance=b['provenance'])
 
 
 if __name__=='__main__':
     parser=argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--debug',type=Path,required=True);parser.add_argument('--release',type=Path,required=True)
+    parser.add_argument('--frozen',type=Path,help='Additionally compare both builds to the accepted pre-extraction client')
     parser.add_argument('--report',type=Path,required=True);args=parser.parse_args()
     report=dict(status='pending')
-    try:report=run(args.debug,args.release)
+    try:
+        report=run(args.debug,args.release)
+        if args.frozen:
+            report['frozen_debug']=run(args.frozen/'Debug',args.debug,args.frozen)
+            report['frozen_release']=run(args.frozen/'Release',args.release,args.frozen)
     except Exception as error:
         report.update(status='failed',error=str(error));raise
     finally:

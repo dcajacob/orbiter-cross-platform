@@ -34,6 +34,7 @@
 #include "Vessel.h"
 #include "resource.h"
 #include "Orbiter.h"
+#include "Production/WindowsSession.h"
 #include "Launchpad.h"
 #include "MenuInfoBar.h"
 #include "Dialogs.h"
@@ -1803,52 +1804,8 @@ bool Orbiter::BeginTimeStep (bool running)
 
 void Orbiter::EndTimeStep (bool running)
 {
-	if (running) {
-// ORBITER_PRODUCTION_OBSERVATION_BEGIN
-#ifdef ORBITER_PRODUCTION_OBSERVATION
-OrbiterTestObserve("world.finalise.before", "", td.SimT0, td.MJD0, 1);
-#endif
-// ORBITER_PRODUCTION_OBSERVATION_END
-		if (g_psys) g_psys->FinaliseUpdate ();
-// ORBITER_PRODUCTION_OBSERVATION_BEGIN
-#ifdef ORBITER_PRODUCTION_OBSERVATION
-OrbiterTestObserve("world.finalise.after", "", td.SimT0, td.MJD0, 1);
-#endif
-// ORBITER_PRODUCTION_OBSERVATION_END
-		//ModulePostStep();
-	}
-
-	// Copy frame times from T1 to T0
-// ORBITER_PRODUCTION_OBSERVATION_BEGIN
-#ifdef ORBITER_PRODUCTION_OBSERVATION
-OrbiterTestObserve("time.end.before", "", td.SimT0, td.MJD0, running ? 1 : 0);
-#endif
-// ORBITER_PRODUCTION_OBSERVATION_END
-	td.EndStep (running);
-// ORBITER_PRODUCTION_OBSERVATION_BEGIN
-#ifdef ORBITER_PRODUCTION_OBSERVATION
-OrbiterTestObserve("time.end.after", "", td.SimT0, td.MJD0, running ? 1 : 0);
-#endif
-// ORBITER_PRODUCTION_OBSERVATION_END
-	if (running && physicsTrace.IsOpen()) WritePhysicsTrace(false);
-
-	// Update panels
-	if (g_camera) g_camera->Update ();                           // camera
-	if (g_pane) g_pane->Update (td.SimT1, td.SysT1);
-
-	// Update visual states
-	if (gclient) gclient->clbkUpdate (bRunning);
-	g_bForceUpdate = false;                        // clear flag
-// ORBITER_PRODUCTION_OBSERVATION_BEGIN
-#ifdef ORBITER_PRODUCTION_OBSERVATION
-OrbiterTestObserve("app.frame.end", "", td.SimT0, td.MJD0, running ? 1 : 0);
-#endif
-// ORBITER_PRODUCTION_OBSERVATION_END
-
-	// check for termination of demo mode
-	if (SessionLimitReached())
-		if (hRenderWnd) PostMessage(hRenderWnd, WM_CLOSE, 0, 0);
-		else CloseSession();
+	orbiter::production::WindowsSessionServices services(*this);
+	orbiter::production::Session::EndTimeStep(services, td, running, bRunning, g_bForceUpdate);
 }
 
 void Orbiter::WritePhysicsTrace(bool initial)
@@ -2022,36 +1979,8 @@ void Orbiter::ModulePostStep ()
 //-----------------------------------------------------------------------------
 VOID Orbiter::UpdateWorld ()
 {
-// ORBITER_PRODUCTION_OBSERVATION_BEGIN
-#ifdef ORBITER_PRODUCTION_OBSERVATION
-OrbiterTestObserve("world.update.before", "", td.SimT0, td.MJD0, bRunning ? 1 : 0);
-#endif
-// ORBITER_PRODUCTION_OBSERVATION_END
-	// module pre-timestep callbacks
-	if (bRunning) ModulePreStep ();
-
-	// update world
-	g_bStateUpdate = true;
-	if (bRunning && td.SimDT) {
-		if (bPlayback) FRecorder_Play();
-		g_psys->Update (g_bForceUpdate);           // logical objects
-	}
-	if (pDlgMgr) pDlgMgr->UpdateDialogs(); // SHOULD BE DONE BY GRAPHICS CLIENT!
-
-	// module post-timestep callbacks
-	if (bRunning) ModulePostStep ();
-
-	g_bStateUpdate = false;
-
-	if (!KillVessels())  // kill any vessels marked for deletion
-		if (hRenderWnd) DestroyWindow (hRenderWnd);
-
-// ORBITER_PRODUCTION_OBSERVATION_BEGIN
-#ifdef ORBITER_PRODUCTION_OBSERVATION
-OrbiterTestObserve("world.update.after", "", td.SimT0, td.MJD0, bRunning ? 1 : 0);
-#endif
-// ORBITER_PRODUCTION_OBSERVATION_END
-	//g_texmanager->OutputInfo();
+	orbiter::production::WindowsSessionServices services(*this);
+	orbiter::production::Session::UpdateWorld(services, td, bRunning, bPlayback, g_bStateUpdate, g_bForceUpdate);
 }
 
 const char *Orbiter::KeyState() const

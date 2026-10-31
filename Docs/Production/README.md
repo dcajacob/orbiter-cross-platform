@@ -88,7 +88,7 @@ NRLMSISE C package; its author notice is retained.
 | 0 | Honest POC labeling, scope and inventories | Source inventory implemented; no production runtime claim |
 | 1 | Production Windows references and hosted WGL | Accepted: original orbit/propulsion, 14 repeated behavior cases, Debug/Release comparison, hosted WGL and data/resource locks |
 | 2 | Real Windows OpenGL client | Hosted Debug/Release execution passed; actual Sol/ISS/ShuttlePB, deterministic images/states, normal teardown. [Evidence and commands](WindowsClient.md) |
-| 3 | Production engine/platform boundary | Not started; Windows reference/ABI/lifecycle regression gates after every extraction |
+| 3 | Production engine/platform boundary | In progress: shared production frame ordering, CPU mesh reader and indexed resource service. [Scope and remaining gates](EngineBoundary.md). Linux production world build is still required. |
 | 4 | Native real world/external client | Not started; SPICE and actual ISS then native ShuttlePB; cross-platform state/scene parity |
 | 5 | Usable flight and interaction | Not started; propulsion, fuel, all RCS axes, autopilot, docking, contact, persistence |
 | 6 | Cockpit and Delta-glider | Not started; real DG/DG-S 2D/VC, HUD/MFDs, animations and controls |

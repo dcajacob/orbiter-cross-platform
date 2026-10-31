@@ -1,6 +1,7 @@
 cmake_minimum_required(VERSION 3.19)
 project(OrbiterPortableCore LANGUAGES CXX)
 enable_testing()
+add_subdirectory(../Production/Boundary production-boundary-tests)
 if(NOT TARGET orbiter_portable_core)
     add_subdirectory(../../Portable portable)
 endif()

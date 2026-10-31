@@ -61,6 +61,7 @@ typedef struct {
 // Class Mesh
 
 class Mesh {
+	friend class WindowsMeshSink;
 public:
 	Mesh ();
 	// Create an empty mesh

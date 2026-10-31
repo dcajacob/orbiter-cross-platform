@@ -20,11 +20,13 @@ jobs:
   behavior:
     name: Production behavior ${{ matrix.configuration }} x64
     runs-on: windows-2022
-    timeout-minutes: 40
+    timeout-minutes: 60
     strategy:
       fail-fast: false
       matrix:
         configuration: [Debug, Release]
+    env:
+      DXSDK_DIR: '${{ github.workspace }}\DXSDK'
     steps:
       - uses: actions/checkout@v7
         with:
@@ -33,17 +35,32 @@ jobs:
         with:
           vsversion: '17.0'
           arch: x64
-      - uses: actions/download-artifact@v8
+      - uses: actions/cache@v6
+        id: dxsdk
         with:
-          name: production-runtime-${{ matrix.configuration }}-x64
-          run-id: 41192125192
-          github-token: ${{ github.token }}
-          path: out/runtime-archive
-      - name: Verify the exact source-built application and SDK
+          path: '${{ github.workspace }}\DXSDK'
+          key: dxsdk_jun10
+      - name: Prepare existing SDK dependency
+        if: steps.dxsdk.outputs.cache-hit != 'true'
+        shell: cmd
+        run: |
+          curl --fail -L https://download.microsoft.com/download/a/e/7/ae743f1f-632b-4809-87a9-aa1bb3458e31/DXSDK_Jun10.exe -o DXSDK_Jun10.exe
+          if errorlevel 1 exit /b 1
+          7z x DXSDK_Jun10.exe DXSDK/Include DXSDK/Lib
+          if errorlevel 1 exit /b 1
+      - name: Build and test the current application and same-build SDK
         shell: pwsh
         run: |
-          Expand-Archive out/runtime-archive/windows-test-runtime.zip out/production-app
-          python Tests/Production/verify_test_runtime.py --runtime out/production-app --source 06d8989823c59e651061d409425c19ec71360bfa
+          cmake -S . -B out/production-app -G Ninja -DCMAKE_BUILD_TYPE=${{ matrix.configuration }} -DCMAKE_C_COMPILER=cl -DCMAKE_CXX_COMPILER=cl -DORBITER_BUILD_D3D9CLIENT=ON -DORBITER_BUILD_XRSOUND=OFF -DORBITER_MAKE_DOC=OFF -DORBITER_MAKE_TESTS=ON -DORBITER_PORTABLE_REFERENCE_CAPTURE=ON -DORBITER_PRODUCTION_REFERENCE_CAPTURE=ON "-DDXSDK_DIR:PATH=$env:DXSDK_DIR"
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          cmake --build out/production-app --parallel 2
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          ctest --test-dir out/production-app --output-on-failure
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          python Tests/Production/package_test_runtime.py --build out/production-app --output out/windows-test-runtime.zip
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          python -c "import json,zipfile; from pathlib import Path; z=zipfile.ZipFile('out/windows-test-runtime.zip'); Path('out/production-app/test-runtime.json').write_bytes(z.read('test-runtime.json'))"
+          python Tests/Production/verify_test_runtime.py --runtime out/production-app --source ${{ github.sha }}
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
       - name: Compile the current controls/observation driver against that build
         shell: pwsh
