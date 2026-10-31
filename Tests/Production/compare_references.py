@@ -64,6 +64,14 @@ def main():
         b = json.loads((args.candidate/'production-reference.json').read_text())
         for key in ('source_commit','production_source_commit','data_lock_sha256'):
             require(a[key] == b[key], 'production input provenance differs: '+key)
+        a_inputs = args.reference.parent/'production-app/build-inputs.json'
+        b_inputs = args.candidate.parent/'production-app/build-inputs.json'
+        require(a_inputs.is_file() and b_inputs.is_file(), 'actual toolchain/dependency metadata missing')
+        ai, bi = json.loads(a_inputs.read_text()), json.loads(b_inputs.read_text())
+        require(ai['dependencies'] == bi['dependencies'], 'compiled dependency revisions differ')
+        for key in ('VCToolsVersion','WindowsSDKVersion'):
+            require(ai['environment'][key] and ai['environment'][key] == bi['environment'][key],
+                    'compiler/SDK versions differ or are missing: '+key)
         require(a['status'].startswith('repeatable-candidate') and b['status'].startswith('repeatable-candidate'),
                 'production candidates must pass repeat checks first')
         for name in ('orbit','controls'):

@@ -1,0 +1,500 @@
+{
+  "schema": 1,
+  "donor_commit": "ad96494482e6101afebf1c635e4e1f542623b51d",
+  "source": "https://github.com/TheGondos/orbiter",
+  "import_status": "not imported; selective renderer adaptation only",
+  "files": {
+    "OVP/OGLClient/CMakeLists.txt": {
+      "git_blob": "01617c95d91e3091d513571eb4460451847018a4",
+      "sha256": "f1fa1930a69dba841fa4f764d4191512d6b6929f751ecea5a8a9f6b21d815449"
+    },
+    "OVP/OGLClient/CSphereMgr.cpp": {
+      "git_blob": "cc938d2cfa5f9d1961e1f2baa361959eb368e1b5",
+      "sha256": "1464978823d1c0af1d1371be4543c6b6b1b5cdd76133a7246cbd7e336b7e6979"
+    },
+    "OVP/OGLClient/CSphereMgr.h": {
+      "git_blob": "dfc76bcf18d5b63692a4767ca2ae6554a0cf1a89",
+      "sha256": "04721bfa421177f8adde7497ec58f6c9d6d52d8fcecd7c0ff3227ea10f3a961c"
+    },
+    "OVP/OGLClient/CelSphere.cpp": {
+      "git_blob": "8185f8ebcae4c470ba7dcd77fac074db83054833",
+      "sha256": "407aeb85bd4ee028022916b72a04ad3a1c1842b1d3e5d8c9bd250080b3c07cca"
+    },
+    "OVP/OGLClient/CelSphere.h": {
+      "git_blob": "a4d4685f681b4e81f4feb6e6893f03ac8ad7f7bf",
+      "sha256": "4424be03b6428ba8344db1a414e26faa861598a7e61917bc064efaec12e6a5f4"
+    },
+    "OVP/OGLClient/CloudMgr.cpp": {
+      "git_blob": "2b25b3fc7375c4340c010985474477155f2a955b",
+      "sha256": "8918e522d151bd7d90a27c7c8986dbbe406950d02d2be71a5ce87d60de942fc2"
+    },
+    "OVP/OGLClient/CloudMgr.h": {
+      "git_blob": "5a7e549cd0a9553c1d3484821565d619ade71bec",
+      "sha256": "5873707775bfd1352614bf9030eba3aabfb50503fa9c777355281635ce13658f"
+    },
+    "OVP/OGLClient/HazeMgr.cpp": {
+      "git_blob": "27fa3ae2d5fa10ceb8e30b49f9b7f31991bc155c",
+      "sha256": "1a2c5e48629dacf5cdc5c35bd2bca5c00cbf65b53fe673ece0458ea5276be129"
+    },
+    "OVP/OGLClient/HazeMgr.h": {
+      "git_blob": "3da6a4e8772d04ecf43281328805dcc2dd9523d9",
+      "sha256": "c0294c85103b9a7766d9fb875136a753abb2cc0b924747db18e643bdb356e684"
+    },
+    "OVP/OGLClient/Light.cpp": {
+      "git_blob": "9ac4aad7eda8d99755ac67142060070794a1dd5d",
+      "sha256": "47891b8f455595219332b4f4cabe4f927260409070abaeb422e970ac924758fb"
+    },
+    "OVP/OGLClient/Light.h": {
+      "git_blob": "e6187be1310d9744aca64dd96286be1be5b55c19",
+      "sha256": "cf706289c2f4cfd85158488fa3cace03d73e968c1e96bc13124b9d46a40e6098"
+    },
+    "OVP/OGLClient/MeshManager.cpp": {
+      "git_blob": "4208d0fd6376c477cc1f37b3aee4044391ed8eb4",
+      "sha256": "3b4a7b43ebfd412ae687f2bb6a74f65cfa19be6f3b824cdde807b700aa884e12"
+    },
+    "OVP/OGLClient/MeshManager.h": {
+      "git_blob": "4ac544eb6c80497fdfbf7b6463e7687aaf332bc8",
+      "sha256": "a4c04d9632b9ffcd9a3b5e38924318b045fda5f0cdab3cbd9a3fa322008671fe"
+    },
+    "OVP/OGLClient/OGLCamera.cpp": {
+      "git_blob": "ae7535ce4facd7b4c9da9affdc5e270397d08783",
+      "sha256": "3fabd50e839cb458953a134b912cf175760d180bda8d5ee1ad386034f8cdffe2"
+    },
+    "OVP/OGLClient/OGLCamera.h": {
+      "git_blob": "6e98b099da2762ba9c86bed677ecf2751a92c6d9",
+      "sha256": "46796e1f80aa25a7bb78845c3d0753a8e8f5935c720b384a8f15dde0bca6a114"
+    },
+    "OVP/OGLClient/OGLClient.cpp": {
+      "git_blob": "14015c5ea1dc8dbd06d7b13054876b61270f4e96",
+      "sha256": "40cd01defd6d6f4ca3b42f7380d9365b6211ba7d2bc6e5673d7c089de2bd425c"
+    },
+    "OVP/OGLClient/OGLClient.h": {
+      "git_blob": "2449f3c07776bbff7129f364cc86f7c7f38c0d40",
+      "sha256": "168ed9d18f549886b8732c1847a60efe306c843bcdeb01efa1751b4ed0627cfa"
+    },
+    "OVP/OGLClient/OGLMesh.cpp": {
+      "git_blob": "a4612f26cedeb524e5976ddb77648afaa4495c20",
+      "sha256": "2915d56aaae324f54c48226f3bcb43da3f2cc33123da733d240c06f25445d56d"
+    },
+    "OVP/OGLClient/OGLMesh.h": {
+      "git_blob": "9e7c90951b293db63e0e35a131183916c600e13b",
+      "sha256": "cf499bf7508fff456731b8d2b0bc20c4621208534901a333e963c0710d5be434"
+    },
+    "OVP/OGLClient/OGLPad.cpp": {
+      "git_blob": "47fecf7ae46f4d45b3d9c1a6ee4eb1ddc5f6db0f",
+      "sha256": "53adef8f6f9e439edd5434321e9ec395806fcbb17de4bdaf9f34e1802877b039"
+    },
+    "OVP/OGLClient/OGLPad.h": {
+      "git_blob": "39a3dedd32e96ff4dd089f523fc597653dbd7c13",
+      "sha256": "134e0136071521a292d29f06587b10cf4b44214e686539a4c55c5cf14f0cf883"
+    },
+    "OVP/OGLClient/Particle.cpp": {
+      "git_blob": "b0bcf336b20f7e136b33a7ebad8ca4824f75b80e",
+      "sha256": "913dd47242df2cb655a0b1ad28cf22d2db73873682403e01fa27c21cd880fd03"
+    },
+    "OVP/OGLClient/Particle.h": {
+      "git_blob": "53325987e99a4d18941c7f393d1d8755728ba68c",
+      "sha256": "17b9593202664d7972c1743183cfcedff788c8cca98c21f64b2477045a3e7d7c"
+    },
+    "OVP/OGLClient/Renderer.cpp": {
+      "git_blob": "b00f4e26c1fb63a3accc053f1bd33609da0e344b",
+      "sha256": "e9ed6671155222187b56899905633bafcff56edabb67ac0bc0837fdb7adb2cea"
+    },
+    "OVP/OGLClient/Renderer.h": {
+      "git_blob": "3c5b0c08619e0fff7516deded7428825ad3a3688",
+      "sha256": "032b6173d34e2d733feee41845f7857a6719c6ccc72ad45891389a72e1984982"
+    },
+    "OVP/OGLClient/RingMgr.cpp": {
+      "git_blob": "0ed686f6ee463d3a272a74a671a58af58d08a1a4",
+      "sha256": "b974e7aac1abc1f3033e2be3f0cbe8333c6c5f85b314184bae1a2994346f1707"
+    },
+    "OVP/OGLClient/RingMgr.h": {
+      "git_blob": "f48a07798c851cb7ea189e0c55ba1104f52d7fd2",
+      "sha256": "103282b94e9974d3ca4894071fba613f8538a553d92901d193a5499a3762dbc8"
+    },
+    "OVP/OGLClient/Scene.cpp": {
+      "git_blob": "300c9b045b0128b46822e9c579c5a81769fe0ee9",
+      "sha256": "bd75ece1b4268743f357f1b95e4d5aed8c3354242a2ce3a38f2985de8ca82da8"
+    },
+    "OVP/OGLClient/Scene.h": {
+      "git_blob": "faeabd654fbe998540a81348a2f2958e2065422b",
+      "sha256": "dc8bc3d0b94c546ec21c20b098fc46d16c7f58b324496bf1707ce5ce7ed2e344"
+    },
+    "OVP/OGLClient/Shader.cpp": {
+      "git_blob": "6ffd8f2d43dd584b8432ce30473647082f837ba3",
+      "sha256": "92384dbf504f27eead24e7c2746734177be8e9a7681c42353a87decd038f6b70"
+    },
+    "OVP/OGLClient/Shader.h": {
+      "git_blob": "42876d9502b71444624709b86345552eb0c24867",
+      "sha256": "e41f4f606c903c324b6a073d9df23f6549e146b20ba40b609e33f87f3e7f4e92"
+    },
+    "OVP/OGLClient/Shadinclude.hpp": {
+      "git_blob": "1c46b06da951564e1c615af4da13ec36fec06f00",
+      "sha256": "a9d1ff9286a2ebb13cddeff6e9702550e375c03bb205367c79782b8f78b0abed"
+    },
+    "OVP/OGLClient/SurfMgr.cpp": {
+      "git_blob": "2081e4609d5023233631c8eca3a42e7c403d1b4e",
+      "sha256": "a0f02e27ff3e126fc36fadeb2ef1fb6d1ec41ae53779b72eea7001e5bd96ea65"
+    },
+    "OVP/OGLClient/SurfMgr.h": {
+      "git_blob": "2f82aff071e24a8b42e393a408fdba586edbf2c5",
+      "sha256": "5098c1f303c5345ab30b0f364fc80d851198568ef98430b041bc8d22743c86c3"
+    },
+    "OVP/OGLClient/Texture.cpp": {
+      "git_blob": "01ec253d05eb37860691d03f8718979b26419a03",
+      "sha256": "5b826ac4a4184dc43c5dedd16d07f303d1da7a9bedb19a29b6aa23ba79b0d9f5"
+    },
+    "OVP/OGLClient/Texture.h": {
+      "git_blob": "a47ea2fd4ea52c843c13867a450002d643324b9e",
+      "sha256": "ffada2a4299ebbd1b8d16d8a62c68b43abda4ce639384bd2e27966615c7a4d1b"
+    },
+    "OVP/OGLClient/TileMgr.cpp": {
+      "git_blob": "6b39715acf463851122fed68e20606e65f73d61d",
+      "sha256": "2f7043b278e0dd309134c2f34e3329356ac70b24518ddf6adc56115bb51aae7e"
+    },
+    "OVP/OGLClient/TileMgr.h": {
+      "git_blob": "efed20ec7212cfa86aefa7475dde289fb1eb9790",
+      "sha256": "20f94be18f2a0ded2f21e0ef45b5c4f9dcb49ee1ab515ff1fe6934a7e44b74b6"
+    },
+    "OVP/OGLClient/VBase.cpp": {
+      "git_blob": "9986eb00c38b2bb9654a01772b9fd3576b89f460",
+      "sha256": "1864528d3510867aefbda9415c39b44eb69c5021c48d971f15dd128317757b59"
+    },
+    "OVP/OGLClient/VBase.h": {
+      "git_blob": "20ca41a2c3cded4ad3741f54b53b9c238ac46f01",
+      "sha256": "4ea3abeade6391a291b9e91226f514d8bf009d282125e738d1bfde21e384a0b2"
+    },
+    "OVP/OGLClient/VObject.cpp": {
+      "git_blob": "9e713bda1fec7ab2717032d09f80d1c32ba9383f",
+      "sha256": "461a5cd87af1f9834052e12e830ec2a113c02e6c0f5dc98c56c8c22af9419d89"
+    },
+    "OVP/OGLClient/VObject.h": {
+      "git_blob": "232fd6878d9e17dbc45fa37036286d59f6823135",
+      "sha256": "4b574476b0e120afece02a11f46fac8fa8829278cf215bb4ee1f88667d70b0fa"
+    },
+    "OVP/OGLClient/VPlanet.cpp": {
+      "git_blob": "7409d1be75963585ca758900beac57f9a14bb76d",
+      "sha256": "f83e7e88b7a9e3a8e45d6ee29be2e660c9c17ac73fc38a35a5115e1c888ea448"
+    },
+    "OVP/OGLClient/VPlanet.h": {
+      "git_blob": "62e11c7e1eda3ad11848733864ec7c59489eb47f",
+      "sha256": "95cd8a17ef477e30a684f3d7170bbfd5e6d4fd8ce23b606b47b339577357e4e1"
+    },
+    "OVP/OGLClient/VStar.cpp": {
+      "git_blob": "499895eb5877f52026fdef23718cca446029eea7",
+      "sha256": "824a292685d235ef027e435944e94001238e9908cf775bdceca7c87f24c825d2"
+    },
+    "OVP/OGLClient/VStar.h": {
+      "git_blob": "cebc64319555a7a7d037843b6813e42032e28a26",
+      "sha256": "9e8f13594070fd7fa7e9723da39b5ac9f84347be59fbaaf0b9ac9a84326fa6ce"
+    },
+    "OVP/OGLClient/VVessel.cpp": {
+      "git_blob": "a3ab4bf86cfbc9563268cb423f77b02cd495be02",
+      "sha256": "e234de96369ccad0a6de8f30fb483e15035dba0e554386debbfae4d781413666"
+    },
+    "OVP/OGLClient/VVessel.h": {
+      "git_blob": "49ac554bccb14ad30b5c4683200360e16c17a44c",
+      "sha256": "c0d513729571a292ea40d82c6770df7689083f071f3bd71133e65ca6b6970b82"
+    },
+    "OVP/OGLClient/VertexBuffer.cpp": {
+      "git_blob": "4d83645962af4a9e7860293f1566e83437c68c58",
+      "sha256": "acd72cabd82ed2067097835965be4f95550e5c5dd7493122bc35115b0c4d27ea"
+    },
+    "OVP/OGLClient/VertexBuffer.h": {
+      "git_blob": "1da31f77190be1aa5f9b08c70ac6d135c964082a",
+      "sha256": "22293e34e7a0d79f42e50092eb17175c859d814fff8e29260d71e2645ea061fd"
+    },
+    "OVP/OGLClient/cloudmgr2.cpp": {
+      "git_blob": "71e5dc12631945165e0ad2a05db470174d28cf14",
+      "sha256": "58df50c68f0a34b59ff0a9b1c3a06b3a3f604637b5d75e55f528f682805177bd"
+    },
+    "OVP/OGLClient/cloudmgr2.h": {
+      "git_blob": "59e091aff9a97c05c1c07ccbe7bbfe942ae6459c",
+      "sha256": "d319d8bf8a64de60b4856c478abe00054fb083b5941c1ac5226f8f0e849fa75c"
+    },
+    "OVP/OGLClient/glad.c": {
+      "git_blob": "c3b3eff221f4a8abd721748f84222476abab4cd2",
+      "sha256": "8a46b783fc95a57b735908d33ace1368a151a984e2a1e15f00a5731f258b1908"
+    },
+    "OVP/OGLClient/glad.h": {
+      "git_blob": "b049482d3757ed3053a3e07c1741e702d210949b",
+      "sha256": "6c0647496ff06c59d3e4505b711a4701e77bd318cad85fdac5ce52e27354c4ef"
+    },
+    "OVP/OGLClient/glsc2ext.h": {
+      "git_blob": "e7dd8d25526dae17ad060a7f2708a5e42d13f07d",
+      "sha256": "33ca46fa65927519c12622f8648d65fd0c7eba095a31cb778b6d8b521a2bfcf2"
+    },
+    "OVP/OGLClient/imgui_impl_opengl3.cpp": {
+      "git_blob": "484a6ef89f63086e08e8fcd0da6c62e251ba835d",
+      "sha256": "d150853395b1d55e80212ead75617a6b6247e5f089ea78bd7275bfa1082d7325"
+    },
+    "OVP/OGLClient/imgui_impl_opengl3.h": {
+      "git_blob": "4521553fe98c4d9f311065980184787225f13028",
+      "sha256": "6dbab51a1cba3f89a0f43a59e1db43eeae1476df45f222cef4720dfc7fb9ee1f"
+    },
+    "OVP/OGLClient/imgui_impl_opengl3_loader.h": {
+      "git_blob": "e24760df751b2d82c0636506b0a1a4f4e4b30ffe",
+      "sha256": "c3d9648123b2b0abf76cf60a0c8232aa8f5db8e7f366dabe714ac8ccb6207db9"
+    },
+    "OVP/OGLClient/khrplatform.h": {
+      "git_blob": "01646449caedc958effc3b450360aefd260671ab",
+      "sha256": "7b1e01aaa7ad8f6fc34b5c7bdf79ebf5189bb09e2c4d2e79fc5d350623d11e83"
+    },
+    "OVP/OGLClient/qtree.h": {
+      "git_blob": "d14c3291dc13f153be7b26064bd6afa78c11d84e",
+      "sha256": "218d61d593ee7ed3315fba36ce1303b5f7db35fcda76694bac5ad40e98d7d0df"
+    },
+    "OVP/OGLClient/shaders/Cloud.fs": {
+      "git_blob": "d62adf317a882af56eece9f35aa76aae0626ff32",
+      "sha256": "5874aea8f7b711f56252a60cd27f3c8a3ec3415b2a2dc23e41ac8b4a0010bcd7"
+    },
+    "OVP/OGLClient/shaders/Cloud.vs": {
+      "git_blob": "6762fafa3496ef8d635603a3db0240f6c99a08cd",
+      "sha256": "6470f4783ca24483151bf235e1e733d98ef7a07612c6f836664b84b704b69cc3"
+    },
+    "OVP/OGLClient/shaders/Common.inc": {
+      "git_blob": "26d0a2ab45b85968c6dd95c7070b0ef556db2acc",
+      "sha256": "776da0e6cf268cbbcc53fddcf6cc30827b8b6e4857c7fc4a933aa5bc6a4eb87d"
+    },
+    "OVP/OGLClient/shaders/Constellations.fs": {
+      "git_blob": "77c0e98d9bd6a5e2564716709605b0bf40e83147",
+      "sha256": "b145bbe448da218685d05876e2065172852f2186f2c517ddf003e0ca6f9749ec"
+    },
+    "OVP/OGLClient/shaders/Constellations.vs": {
+      "git_blob": "8e83a5dead7377a6d96776b302006befbf89c61d",
+      "sha256": "ef32b3423d96a89d698b5ad5010d6556f8070d1d96479848468aece7daa7c4f2"
+    },
+    "OVP/OGLClient/shaders/Ecliptic.fs": {
+      "git_blob": "25147bf2c13601c10cff15797acf0c0b83b81f3a",
+      "sha256": "2bee1610bb8d6bca3a660c2c6f5c3ccecfa2b510f00485607a1139de9d8daf02"
+    },
+    "OVP/OGLClient/shaders/Ecliptic.vs": {
+      "git_blob": "8e83a5dead7377a6d96776b302006befbf89c61d",
+      "sha256": "ef32b3423d96a89d698b5ad5010d6556f8070d1d96479848468aece7daa7c4f2"
+    },
+    "OVP/OGLClient/shaders/Exhaust.fs": {
+      "git_blob": "644e4d30e09133b381466cfc20fc2eee7ba4b367",
+      "sha256": "8f6ef313f8982223f71e98d4a4a99b76af5a55a99eb8f107c94f81df99518502"
+    },
+    "OVP/OGLClient/shaders/Exhaust.vs": {
+      "git_blob": "c175736508db0960f1ed8308c1ce12b00e02eced",
+      "sha256": "eaee1518679e9f15f9d7202838c708005df7a4584a3b275d1fa5cbef24009963"
+    },
+    "OVP/OGLClient/shaders/GroundShadow.fs": {
+      "git_blob": "4fff82ca236c64bba4d368ff1c14f34813635a4b",
+      "sha256": "a50f72d2a396091d2588da8e7a4981929f1ad075fb6e16095f5ba1f78fc97fef"
+    },
+    "OVP/OGLClient/shaders/GroundShadow.vs": {
+      "git_blob": "768656436ca6a80315677a39d228acb0e8ffdbe0",
+      "sha256": "bfcd8550abd66e85f1b9109b4d068099deb55a1d184f142ceabaa090095dd9e9"
+    },
+    "OVP/OGLClient/shaders/Haze.fs": {
+      "git_blob": "69d9fcc8a3889f0aa3e53ea4864b7d52d8030279",
+      "sha256": "34726a076a241e48fa8b5ac7015972dc37d6f064bb2b759cc3311250739b1a42"
+    },
+    "OVP/OGLClient/shaders/Haze.vs": {
+      "git_blob": "b537e6ec8135e97c04107636c01f1316406f4013",
+      "sha256": "e5abd881117d5d74041b2056c764ae3959a7a98bb2eb8d504e1d7df19319777a"
+    },
+    "OVP/OGLClient/shaders/LogDepth.inc": {
+      "git_blob": "f1f7473463e49a36fb18cd707e4cbcd37e2b2239",
+      "sha256": "6e0ef47f1b7c728af4b7a7e5058751d1eedc308db45a97f1a7c2217330bbd57a"
+    },
+    "OVP/OGLClient/shaders/Mesh.fs": {
+      "git_blob": "5b5e0a5f4e634fc6a314fc7d29a461948b161749",
+      "sha256": "63e2d3f151a245ad1f3732ed53ed5f9d81ff2b3b8a51809a368461b3b8f23771"
+    },
+    "OVP/OGLClient/shaders/Mesh.vs": {
+      "git_blob": "604ddbf1940e17f49ea3ad2368ad00363d8f85ed",
+      "sha256": "fb4ff9b05db70c642210200097a48e4dab9efb3da9633a2e4614ed10fe9c4a86"
+    },
+    "OVP/OGLClient/shaders/MeshUnlit.fs": {
+      "git_blob": "9756ac4e0641b5edb71bc712bae333ab4479bc2b",
+      "sha256": "33e032377ba7f6809136a55bcd5ced25ce8cf3a15439b202e73320573603efb9"
+    },
+    "OVP/OGLClient/shaders/MeshUnlit.vs": {
+      "git_blob": "f5b80e5ba930f384fef048f6ebb732296ff828f4",
+      "sha256": "f930830addb8ad5c464242dbe400c63c76da4a8fb293912303740b07a5fc9231"
+    },
+    "OVP/OGLClient/shaders/Overlay.fs": {
+      "git_blob": "47aaddb8dd5d12970b06560e5f671e1bb83d9b46",
+      "sha256": "a9f1ecc6035b14a1452ff0dde55ace71ff796c939761301edbeeef2684f5dca8"
+    },
+    "OVP/OGLClient/shaders/Overlay.vs": {
+      "git_blob": "7af80971b8f0679500404534c86d9ff751b20363",
+      "sha256": "0d03e1187c776f3a96554860aa9c08d67d31660e921190552fecc0236ee50a5b"
+    },
+    "OVP/OGLClient/shaders/Particle.fs": {
+      "git_blob": "7a790f33295f12ce0d28a8c2c887adb857cca035",
+      "sha256": "2918148444f1c4e2b0ca964d6a1a24aedea39eaaeb344db6e476a37bf588a00d"
+    },
+    "OVP/OGLClient/shaders/Particle.vs": {
+      "git_blob": "9ee8ab076db89a8159b0428f4dd04ac851b12c67",
+      "sha256": "d12420ab47da3ecaa8b9d884a8c8ad32ccc0e23271c3383490bfc35e62c7c05d"
+    },
+    "OVP/OGLClient/shaders/Ring.fs": {
+      "git_blob": "ea3b0a6078d2004e9f46918066b43cd7cc570277",
+      "sha256": "f5b9ae806a203dc788e55d7f7fb2d58e5a59ba3da4c8d4810204da4381643e27"
+    },
+    "OVP/OGLClient/shaders/Ring.vs": {
+      "git_blob": "efc292372b1ca19a78ca45a486687123caf56c06",
+      "sha256": "534b403554f7e61b04b653087ad6e867fc9d6877da487e1b3c3cd75654bb7ee3"
+    },
+    "OVP/OGLClient/shaders/Spot.fs": {
+      "git_blob": "71db1df5b0f69ae9fa67d62618c49d2cfe4783d4",
+      "sha256": "c2400d994047d444cebd9198ccc238b3de8c0562b70032ec29ad0590b3af4ca3"
+    },
+    "OVP/OGLClient/shaders/Spot.vs": {
+      "git_blob": "303ad038c367b5243d8d0f1995d6e1cd94601383",
+      "sha256": "36d338adeaf77d9667fc8d570b60fa2e5630a9969771942830ec345dc455319d"
+    },
+    "OVP/OGLClient/shaders/Stars.fs": {
+      "git_blob": "94c000ce0d6f90b97c29ac474ad147241d34cdc6",
+      "sha256": "61089b8caca5315124d8d967f1614fb1ad90651e67abb54bd53c80a073b63082"
+    },
+    "OVP/OGLClient/shaders/Stars.vs": {
+      "git_blob": "632ff3db53b72b7c45af9113fc5e5e449007cf41",
+      "sha256": "0af1b6b3af055d711288ac25c2d464715a505b737fed7b5f8722b37a63762ec4"
+    },
+    "OVP/OGLClient/shaders/Tile.fs": {
+      "git_blob": "5f991fa718de4c1a31981079b45f0cf066b1b702",
+      "sha256": "a2f5ded6a061863bce7dc1b422f8dfb7ffd2f67f3d10f4abcdb60a1f8a0a389b"
+    },
+    "OVP/OGLClient/shaders/Tile.vs": {
+      "git_blob": "7f2f85b7b44e13096d1bab24181d0888088da5d0",
+      "sha256": "f1c5ddf112ac3a9220acc2c70fef5d740398257048dd89ea957922674536b965"
+    },
+    "OVP/OGLClient/shaders/Types.inc": {
+      "git_blob": "fc9ea01b99db0c4c53b8576564ef52e229985627",
+      "sha256": "e18e21714ce439f8c42b8919ebd522466aada5c6901fa8118a1f8c1308825ebd"
+    },
+    "OVP/OGLClient/shaders/Uniforms.inc": {
+      "git_blob": "339fa93c4c726e29392159e22ad326ea06c111ea",
+      "sha256": "4559802d85e756b1c184a8e05ed6234a7f9883bfe2d536eb464a18fee25341bf"
+    },
+    "OVP/OGLClient/shaders/Untextured.fs": {
+      "git_blob": "9a62ece32473ab93d1d82f14ae7da58bd4bf1bea",
+      "sha256": "335e17b51c739cfdd9198fac5819b72201e1e6236f4224b40ad7e28238f09b82"
+    },
+    "OVP/OGLClient/shaders/Untextured.vs": {
+      "git_blob": "08487d593f4c5315fe2391ecee096bccc5402525",
+      "sha256": "76755025e3714511cb76a94d74dfebb5aae078ffb236079004714b19e3031f40"
+    },
+    "OVP/OGLClient/shaders/VesselShadow.fs": {
+      "git_blob": "4fff82ca236c64bba4d368ff1c14f34813635a4b",
+      "sha256": "a50f72d2a396091d2588da8e7a4981929f1ad075fb6e16095f5ba1f78fc97fef"
+    },
+    "OVP/OGLClient/shaders/VesselShadow.vs": {
+      "git_blob": "98c3b8ee74588f13e05d7507ae77bc38981aec6b",
+      "sha256": "20be68e64b224ddf2f8a579207e312f992c6c9a26fe0dca6260df8a448603682"
+    },
+    "OVP/OGLClient/spherepatch.cpp": {
+      "git_blob": "a0e8e69f03ad14fa8cca95d45062cd16dae062ad",
+      "sha256": "7c8b8ff38752301f880155afdd3d15ee47458930d40a6e55a09832332b50936f"
+    },
+    "OVP/OGLClient/spherepatch.h": {
+      "git_blob": "fe4afa43770f79e7b476b685b53cfd196f916626",
+      "sha256": "74e81c7adf5980d0c0e1ee15d630d8b93ed57ebbef3ff31678646b0c3acf106f"
+    },
+    "OVP/OGLClient/surfmgr2.cpp": {
+      "git_blob": "a79b87ecfcd4d1085c5796aad2975d95bb140649",
+      "sha256": "de1503af49157dc7a3a2acb218df02177914c070dcb6ec2120e78b5a860edfc8"
+    },
+    "OVP/OGLClient/surfmgr2.h": {
+      "git_blob": "e2daae9022ebce523984fc663a5936060139ac4a",
+      "sha256": "2d092197503b2f604febd2e470ab041241182efb6d09944166217b66f0a3911d"
+    },
+    "OVP/OGLClient/tilelabel.cpp": {
+      "git_blob": "7c7e8cb39133615b09fce3c418e969bcd9364a05",
+      "sha256": "2a753402dfdba6f51db6081b2ddf64c9596d8ddb79b8e5628fa91bebe320e11f"
+    },
+    "OVP/OGLClient/tilelabel.h": {
+      "git_blob": "ddd7ba88ab86a0d9070d2a1ae3f41e7f7cf1f886",
+      "sha256": "67353d0b2dfe15f6e1babc14f983c5b8126f8d71289228539ce5d0242ebf407d"
+    },
+    "OVP/OGLClient/tilemgr2.cpp": {
+      "git_blob": "f34488cb9bf3d9c3006835bf0f5f4fa62457ac24",
+      "sha256": "7e7325ca1a4c933f39b124c9ac8f7107866e78c6d49cd9058cccd3504729a0a9"
+    },
+    "OVP/OGLClient/tilemgr2.h": {
+      "git_blob": "ecd10aaa277289b0ad566629146c9274d4d9da01",
+      "sha256": "46382b40f9bd65002d0095cdd8bf07a6377dbeff4b26013fc882ebf28b036dbe"
+    },
+    "OVP/OGLClient/tilemgr2_imp.hpp": {
+      "git_blob": "81e43bb16e54840f764caf2b2ade23e4234f7762",
+      "sha256": "23bf89fe1c21efa9481f641a96adca28032e38587473ba1d15bc4e7dce1f9aef"
+    },
+    "OVP/OGLClient/ztreemgr.cpp": {
+      "git_blob": "40278f3a0e9d16d07874d5849610d5c3203aca5c",
+      "sha256": "5a6dfacd0e5ae203a9931eac6bbcbcd02eb7328bf465b10d626c78f605c966b7"
+    },
+    "OVP/OGLClient/ztreemgr.h": {
+      "git_blob": "e9fd94c4bd2be47e29a49de736f3356cbc4dbe79",
+      "sha256": "5fe77732d822ff752fd45fbb6222a1a4c44a5be755e766146338e6db13be509e"
+    }
+  },
+  "submodules": [
+    {
+      "path": "OVP/OGLClient/SOIL2",
+      "repository": "https://github.com/TheGondos/SOIL2.git",
+      "commit": "013be27c69909301e35a87b4f6d4ce0f29d51fb5",
+      "license_review": "pending; gitlink content must be fetched and audited before import"
+    },
+    {
+      "path": "Extern/libnsbmp",
+      "repository": "https://github.com/TheGondos/libnsbmp.git",
+      "commit": "97842c873fe0907536cdb30e59bc27ba27eacb6e",
+      "license_review": "pending; gitlink content must be fetched and audited before import"
+    },
+    {
+      "path": "OVP/OGLClient/nanovg",
+      "repository": "https://github.com/TheGondos/nanovg.git",
+      "commit": "441b93b79a7ae2a52af943c0614fc9da8bdbc23e",
+      "license_review": "pending; gitlink content must be fetched and audited before import"
+    }
+  ],
+  "additional_dependencies": [
+    "OpenGL/WGL/GLFW",
+    "Freetype",
+    "Fontconfig portability or explicit native font service",
+    "GLM renderer-private conversions",
+    "current Orbiter ImGui contract; donor backend must be updated"
+  ],
+  "forbidden_imports": [
+    "Orbiter numerical types and formulas",
+    "Windows SDK class layouts and virtual ordering",
+    "donor core application/platform replacement"
+  ],
+  "known_defects": [
+    {
+      "file": "OVP/OGLClient/OGLClient.cpp",
+      "callback": "clbkLoadSurface",
+      "problem": "unconditional process exit"
+    },
+    {
+      "file": "OVP/OGLClient/OGLClient.cpp",
+      "callback": "clbkMeshMaterial",
+      "problem": "unconditional process exit"
+    },
+    {
+      "file": "OVP/OGLClient/OGLClient.cpp",
+      "callback": "clbkSetMeshMaterial",
+      "problem": "unsafe copy across distinct material layouts"
+    },
+    {
+      "file": "OVP/OGLClient/OGLPad.cpp",
+      "callback": "TextW",
+      "problem": "unconditional process abort"
+    },
+    {
+      "file": "OVP/OGLClient/Texture.cpp",
+      "callback": "ReadTextureFromMemory",
+      "problem": "abort on DDS decoding failure instead of explicit error"
+    },
+    {
+      "file": "OVP/OGLClient/OGLClient.cpp",
+      "callback": "clbkCreateSurface",
+      "problem": "template and NOALPHA semantics incomplete"
+    }
+  ]
+}

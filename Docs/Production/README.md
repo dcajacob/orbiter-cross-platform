@@ -27,6 +27,12 @@ application changes. Preserve Windows SDK layouts, exports and virtual ordering.
 Use a Windows `GraphicsClient`/Win32/WGL adapter and a separate Linux module/GLFW
 adapter over one rendering implementation. Renderer types stay private.
 
+[The donor inventory](../../Tests/Production/renderer-donor.lock.json) pins file
+hashes and the SOIL2/NanoVG/libnsbmp gitlink commits separately. Those dependencies
+are not contained in a parent Git archive; their source/license audits remain
+required before import. The old ImGui/OpenGL backend also needs adaptation to
+the current production ImGui API.
+
 Linux x86-64, Ubuntu 24.04 minimum, stock modules rebuilt from source with the
 same native SDK/toolchain, and SPICE with matching kernels define the release.
 Unmodified Windows DLLs, proprietary hardware integrations, Windows auxiliary
@@ -51,7 +57,8 @@ may satisfy a production acceptance case.
 | Lua, tutorials, playback, editor, audio | Unsupported | Bundled modules/scripts and portable views over existing logic |
 | Installation and assets | POC fixture bundle only | Relocatable runtime, native SDK, verified/offline/resumable separate asset installer |
 
-[Graphics callback inventory](graphics-capabilities.csv) explicitly records
+[Graphics callback inventory](graphics-capabilities.csv) and
+[Sketchpad method inventory](sketchpad-capabilities.csv) explicitly record
 unsupported native callbacks and known donor defects. `clbkLoadSurface` and
 `clbkMeshMaterial` terminate the donor process; TextW aborts; surface flags and
 material layout copying need repair. Call coverage must establish which optional
@@ -71,7 +78,7 @@ files. A complete redistributable stock-data license manifest is still required.
 | Phase | Delivery | Status / exit condition |
 | --- | --- | --- |
 | 0 | Honest POC labeling, scope and inventories | Source inventory implemented; no production runtime claim |
-| 1 | Production Windows references and hosted WGL | Bootstrap implemented; runtime evidence and production references required |
+| 1 | Production Windows references and hosted WGL | Hosted WGL Debug/Release passed; production references and complete data/license locks still required |
 | 2 | Real Windows OpenGL client | Not started; normal registration/lifecycle, actual Sol ISS/ShuttlePB meshes/assets and scene manifest |
 | 3 | Production engine/platform boundary | Not started; Windows reference/ABI/lifecycle regression gates after every extraction |
 | 4 | Native real world/external client | Not started; SPICE and actual ISS then native ShuttlePB; cross-platform state/scene parity |
@@ -99,6 +106,9 @@ python Tests/Production/mesa_runtime.py stage --cache out/mesa-cache --destinati
 python Tests/Production/mesa_runtime.py probe --executable out/wgl/orbiter-wgl-probe.exe --output out/wgl-evidence
 ```
 
+[Accepted hosted WGL evidence](../../Tests/Production/Verification/README.md) records
+actual Debug/Release execution, driver paths/hashes and preserved raw artifacts.
+
 The [dedicated workflow](../../.github/workflows/production-bootstrap.yml)
 executes Debug and Release on hosted Windows 2022. The MSVC-built probe creates a
 visible Win32 window and a WGL 3.3 core context, compiles/links shaders, renders a
@@ -119,6 +129,40 @@ If packaged Mesa cannot load, investigate the recorded dependency failure and
 prepare a pinned Mesa/LLVM source build. If the hosted runner cannot create a
 usable Windows window environment, the gate is blocked. Linux rendering,
 compilation or an offscreen-only context cannot satisfy it.
+
+## Production reference candidates
+
+The test-only `ProductionReferenceDriver` is built with
+`ORBITER_PRODUCTION_REFERENCE_CAPTURE=ON` in the existing Windows application.
+It requires actual stock ISS/ShuttlePB objects and a source-built ShuttlePB
+module, observes Sun/Earth/Moon/ISS/PB, and optionally commands main engine,
+linear RCS and pitch RCS on declared ticks. It records original module pre/post
+notifications and controls; this is not yet full vessel callback instrumentation.
+
+`capture_reference.py` requires all production implementation/dependency files
+under `Src`, `Orbitersdk`, `Extern` and root CMake to match the frozen revision.
+Only the test driver/build wiring is added. Each orbit and controlled case runs
+twice for 6,000 recorded seconds. The driver observes finalized S0 at the start of
+PreStep, before control application; PostStep precedes finalization and is never
+sampled. A 6,001st application frame permits observation of finalized tick 6,000.
+The existing finalization observer also records the PB quaternion trace. No
+propagation formula, world update or public SDK change is needed.
+
+The separate official [stock data lock](../../Tests/Production/stock-data.lock.json)
+pins the matching upstream release package by GitHub's published SHA256 and
+463 extracted file hashes. `prepare_data.py` stages only data, never release
+binaries/modules/configuration over the source build. Offline verification is
+available with `--verify-only`. This test provisioner is not the final resumable
+asset installer. The upstream `latest` asset URL can disappear or be replaced;
+a different hash fails explicitly. Durable versioned release storage and complete
+stock-data redistribution/license review remain unresolved release inputs.
+
+Candidate output directories must not exist before capture. Successful repeated
+runs and cross-configuration checks make them eligible for explicit acceptance;
+no script writes or refreshes an accepted reference automatically. Atmosphere,
+contact/docking, autopilot, time controls, object lifetime and persistence
+reference cases remain pending. Phase 1 is not declared complete merely because
+orbit/propulsion candidates or the WGL probe pass.
 
 ## Production references and acceptance contracts
 

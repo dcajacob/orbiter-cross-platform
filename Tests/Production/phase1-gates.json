@@ -1,0 +1,73 @@
+{
+  "schema": 1,
+  "phase_status": "in-progress",
+  "windows_wgl": {
+    "status": "passed",
+    "run_id": 41185963598,
+    "configurations": [
+      "Debug",
+      "Release"
+    ],
+    "evidence": "Verification/README.md"
+  },
+  "production_source": "38b7c627878ea893390675616897071f8bb8e90f",
+  "cases": [
+    {
+      "id": "sol-orbit",
+      "status": "candidate-capture-in-progress",
+      "required_before": "world/ephemeris extraction"
+    },
+    {
+      "id": "main-rcs-fuel",
+      "status": "candidate-capture-in-progress",
+      "required_before": "propulsion extraction"
+    },
+    {
+      "id": "all-rcs-axes-autopilot",
+      "status": "pending",
+      "required_before": "control logic extraction"
+    },
+    {
+      "id": "atmospheric-flight",
+      "status": "pending",
+      "required_before": "atmosphere extraction"
+    },
+    {
+      "id": "landed-ground-contact",
+      "status": "pending",
+      "required_before": "terrain/contact extraction"
+    },
+    {
+      "id": "docking-attachments",
+      "status": "pending",
+      "required_before": "docking/attachment extraction"
+    },
+    {
+      "id": "pause-warp-resume",
+      "status": "pending",
+      "required_before": "session clock extraction"
+    },
+    {
+      "id": "creation-deletion-focus",
+      "status": "pending",
+      "required_before": "session lifetime extraction"
+    },
+    {
+      "id": "save-reload",
+      "status": "pending",
+      "required_before": "persistence extraction"
+    },
+    {
+      "id": "vessel-animations",
+      "status": "pending",
+      "required_before": "mesh/animation extraction"
+    },
+    {
+      "id": "vessel-callback-order",
+      "status": "pending",
+      "required_before": "production lifecycle extraction"
+    }
+  ],
+  "data_storage": "upstream digest-pinned package; durable versioned mirror and redistribution review pending",
+  "automatic_reference_refresh": false
+}

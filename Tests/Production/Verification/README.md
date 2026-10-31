@@ -1,0 +1,30 @@
+# Production bootstrap evidence
+
+Accepted **Windows window/WGL bootstrap**, not an Orbiter graphics-client run:
+[run 41185963598](https://github.com/dcajacob/orbiter-cross-platform/actions/runs/41185963598),
+source `92f33c72f9a5b598cd25eacd87bb83c920ad969c`.
+
+Both MSVC x64 Debug and Release execute the real Win32/WGL probe successfully.
+Each performs three window/context create/render/present/resize/shutdown cycles,
+compiles GLSL, renders/readbacks a texture-backed FBO and checks every pixel.
+The loaded-driver audit passes with application-local Mesa 26.2.6,
+`llvmpipe (LLVM 23.1.4, 256 bits)`, OpenGL 4.6 core. The actual compiler is
+MSVC 19.44.35229. Full runner/build metadata, DLL paths/hashes, license files,
+console logs and raw RGBA readbacks are preserved in the original artifacts.
+
+| Artifact | SHA256 of original ZIP |
+| --- | --- |
+| [Debug](Evidence/41185963598-production-wgl-Debug-x64.zip) | `66278ef6b48aebdfefd7a237f48ad7763459f61ac74e6d1c154774c5e3b92706` |
+| [Release](Evidence/41185963598-production-wgl-Release-x64.zip) | `3bfe682d1867e1c5aa0e352130afe1a31b871651b135e78600d87ac69d2e3ebf` |
+
+Downloaded bytes were checked against GitHub's recorded artifact digests. These
+small evidence archives remain in Git beyond hosted retention; no Mesa binaries
+or stock data package are committed. The complete runtime package/license lock
+is recorded separately.
+
+Production orbit/propulsion captures remain **candidates** until repeated runs
+and cross-configuration checks pass and their evidence is frozen explicitly.
+Atmosphere/contact/docking/autopilot, pause/warp, object/focus lifetime,
+persistence and vessel callback references are still required before extracting
+their respective production subsystems. No fixture capture here establishes
+stock corpus or graphical client acceptance.

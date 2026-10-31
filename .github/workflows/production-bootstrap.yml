@@ -141,6 +141,8 @@ jobs:
           python Tests/Portable/verify_windows_application.py
           --source . --orbiter out/production-app/Orbiter.exe
           --output out/original-verification --configuration ${{ matrix.configuration }}
+      - name: Record actual build tools, SDK, dependency commits and binaries
+        run: python Tests/Production/build_metadata.py --build out/production-app
       - uses: actions/cache@v6
         with:
           path: out/data-cache/Orbiter-x64.zip
@@ -163,6 +165,7 @@ jobs:
           path: |
             out/production-app/*.log
             out/production-app/*.txt
+            out/production-app/build-inputs.json
             out/production-app/Testing/Temporary/*.log
             out/original-verification/**/trace.csv
             out/original-verification/**/*.json

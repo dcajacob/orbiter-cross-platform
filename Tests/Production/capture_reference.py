@@ -49,17 +49,29 @@ def validate(directory, controls):
         states = list(csv.DictReader(stream))
     require(len(states) == 601*5, 'missing production object samples')
     masses = []
+    maximum_spin = 0.0
     for i, row in enumerate(states):
         step = i//5*10
         require(int(row['step']) == step and float(row['seconds']) == step, 'wrong observation time')
         require(row['object'] == ('Sun','Earth','Moon','ISS','PB')[i%5], 'wrong production object order')
         require(abs(float(row['mjd'])-EPOCH-step/86400) <= LIMITS['mjd_days'], 'wrong production epoch')
         require(all(math.isfinite(float(v)) for k,v in row.items() if k != 'object'), 'nonfinite object state')
+        matrix = [[float(row[f'm{r}{c}']) for c in range(1,4)] for r in range(1,4)]
+        require(all(abs(sum(matrix[r][k]*matrix[c][k] for k in range(3))-(1 if r == c else 0)) <= 1e-12
+                    for r in range(3) for c in range(3)), 'invalid production rotation matrix')
         if row['object'] == 'PB':
             masses.append((float(row['mass']), float(row['fuel'])))
+            maximum_spin = max(maximum_spin, norm(float(row[k]) for k in ('wx','wy','wz')))
     require(masses[0][1] > 0, 'source-built ShuttlePB propellant missing')
     if controls:
         require(masses[-1][1] < masses[0][1], 'scheduled engines did not consume propellant')
+        # Independent bookkeeping from the stock PB thrust/ISP and tick schedule:
+        # main: 30000*.5*60/50000; right: 2*200*.25*20/50000;
+        # pitch-up: 4*200*.1*5/50000. No propagation is reproduced here.
+        expected_fuel = masses[0][1] - 18.048
+        require(abs(masses[-1][1]-expected_fuel) <= max(1e-8, abs(expected_fuel)*1e-8),
+                'stock ShuttlePB propellant accounting exceeds the declared budget')
+        require(maximum_spin > 1e-8, 'scheduled pitch RCS did not rotate the production vessel')
     else:
         require(masses[-1] == masses[0], 'unpowered reference lost propellant or mass')
     events = list(csv.DictReader((directory/'production-events.csv').open(newline='')))
@@ -119,7 +131,9 @@ def run(executable, data, directory, controls):
     argv = [str(directory/executable.name), '--scenariox=Reference', '--fixedstep=1',
             '--maxframes=6001', '--physics-trace=trace.csv', '--trace-vessel=PB', '--trace-primary=Earth']
     (directory/'invocation.json').write_text(json.dumps(dict(argv=argv, observed_steps=6000,
-        application_frames=6001, sampling='PreStep S0 before control; existing finalized PhysicsTrace'), indent=2)+'\n')
+        application_frames=6001, sampling='PreStep S0 before control; existing finalized PhysicsTrace',
+        input_sha256={p.relative_to(directory).as_posix():digest(p) for parent in ('Config','Meshes','Scenarios')
+                      for p in (directory/parent).rglob('*') if p.is_file()}), indent=2)+'\n')
     with (directory/'console.txt').open('w') as console:
         subprocess.run(argv, cwd=directory, stdout=console, stderr=subprocess.STDOUT, check=True, timeout=240)
     return validate(directory, controls)
@@ -135,6 +149,9 @@ def main():
     require(sys.platform == 'win32', 'production reference capture requires native Windows')
     require(not git('status','--porcelain','--untracked-files=no').strip(), 'capture requires committed sources')
     lock = json.loads(Path(__file__).with_name('production-source.lock.json').read_text())
+    require(not git('diff','--name-only',lock['source_commit'],'--','Src','Orbitersdk','Extern','CMakeLists.txt',
+                    'Config','Meshes','Textures','Textures2','GravityModels','Kernels','Scenarios','Script').strip(),
+            'production implementation/dependencies changed before reference capture')
     for path in lock['source_sha256']:
         original = git('show', lock['source_commit']+':'+path).replace(b'\r\n',b'\n')
         require((ROOT/path).read_bytes().replace(b'\r\n',b'\n') == original,
