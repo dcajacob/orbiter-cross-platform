@@ -1,0 +1,236 @@
+Start testing: Oct 31 00:37 MDT
+----------------------------------------------------------
+1/8 Testing: Vecmat.Portability
+1/8 Test: Vecmat.Portability
+Command: "/tmp/orbiter-bootstrap-debug/vecmat_portability"
+Directory: /tmp/orbiter-bootstrap-debug
+"Vecmat.Portability" start time: Oct 31 00:37 MDT
+Output:
+----------------------------------------------------------
+PASS: 3x3/4x4 QR solves, default arguments, singular flags, vector normalization, identity transform
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"Vecmat.Portability" end time: Oct 31 00:37 MDT
+"Vecmat.Portability" time elapsed: 00:00:00
+----------------------------------------------------------
+
+2/8 Testing: Elements.Portability
+2/8 Test: Elements.Portability
+Command: "/tmp/orbiter-bootstrap-debug/elements_portability"
+Directory: /tmp/orbiter-bootstrap-debug
+"Elements.Portability" start time: Oct 31 00:37 MDT
+Output:
+----------------------------------------------------------
+PASS: circular/eccentric/inclined/hyperbolic elements, round trips, explicit epochs and stepping
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"Elements.Portability" end time: Oct 31 00:37 MDT
+"Elements.Portability" time elapsed: 00:00:00
+----------------------------------------------------------
+
+3/8 Testing: Collision.Portability
+3/8 Test: Collision.Portability
+Command: "/tmp/orbiter-bootstrap-debug/collision_portability"
+Directory: /tmp/orbiter-bootstrap-debug
+"Collision.Portability" start time: Oct 31 00:37 MDT
+Output:
+----------------------------------------------------------
+===============================================================================
+All tests passed (132610 assertions in 15 test cases)
+
+<end of output>
+Test time =   0.25 sec
+----------------------------------------------------------
+Test Passed.
+"Collision.Portability" end time: Oct 31 00:37 MDT
+"Collision.Portability" time elapsed: 00:00:00
+----------------------------------------------------------
+
+4/8 Testing: Vector.Layout
+4/8 Test: Vector.Layout
+Command: "/tmp/orbiter-bootstrap-debug/vector_layout"
+Directory: /tmp/orbiter-bootstrap-debug
+"Vector.Layout" start time: Oct 31 00:37 MDT
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"Vector.Layout" end time: Oct 31 00:37 MDT
+"Vector.Layout" time elapsed: 00:00:00
+----------------------------------------------------------
+
+5/8 Testing: PhysicsTrace.IO
+5/8 Test: PhysicsTrace.IO
+Command: "/tmp/orbiter-bootstrap-debug/physics_trace_test" "/tmp/orbiter-bootstrap-debug"
+Directory: /tmp/orbiter-bootstrap-debug
+"PhysicsTrace.IO" start time: Oct 31 00:37 MDT
+Output:
+----------------------------------------------------------
+PASS: trace precision, locale, flush, nonfinite and I/O failures
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"PhysicsTrace.IO" end time: Oct 31 00:37 MDT
+"PhysicsTrace.IO" time elapsed: 00:00:00
+----------------------------------------------------------
+
+6/8 Testing: Headless.ReferenceParity
+6/8 Test: Headless.ReferenceParity
+Command: "/usr/bin/python3" "-B" "/home/dan/GIT/orbiter-cross-platform/Tests/Portable/test_headless.py" "--binary" "/tmp/orbiter-bootstrap-debug/orbiter-headless" "--source" "/home/dan/GIT/orbiter-cross-platform/Tests/Portable" "--output" "/tmp/orbiter-bootstrap-debug/traces" "--suite" "parity"
+Directory: /tmp/orbiter-bootstrap-debug
+"Headless.ReferenceParity" start time: Oct 31 00:37 MDT
+Output:
+----------------------------------------------------------
+test_frozen_reference_and_repeats (__main__.Parity.test_frozen_reference_and_repeats) ... ok
+
+----------------------------------------------------------------------
+Ran 1 test in 0.250s
+
+OK
+{
+  "binary": "/tmp/orbiter-bootstrap-debug/orbiter-headless",
+  "reference_commit": "1009ee2251931ec9e120047dc41d936c216b9ed0",
+  "cases": {
+    "orbit": {
+      "analytical": {
+        "position_m": 1.4143184329290157e-06,
+        "velocity_m_s": 1.5482178103083438e-09,
+        "orientation_rad": 0.0,
+        "angular_velocity_rad_s": 0.0,
+        "energy_relative": 3.774758283725532e-15,
+        "momentum_relative": 1.887379141862766e-15
+      },
+      "reference": {
+        "position_m": 1.1175870895385742e-07,
+        "velocity_m_s": 8.866990313695243e-11,
+        "orientation_rad": 0.0,
+        "angular_velocity_rad_s": 0.0,
+        "mjd_days": 0.0
+      }
+    },
+    "orbit-half": {
+      "analytical": {
+        "position_m": 1.1808439414391757e-07,
+        "velocity_m_s": 7.676480107332897e-11,
+        "orientation_rad": 0.0,
+        "angular_velocity_rad_s": 0.0,
+        "energy_relative": 6.439293542825908e-15,
+        "momentum_relative": 3.1086244689504383e-15
+      },
+      "reference": {
+        "position_m": 1.2013700229374393e-07,
+        "velocity_m_s": 8.228791220075452e-11,
+        "orientation_rad": 0.0,
+        "angular_velocity_rad_s": 0.0,
+        "mjd_days": 0.0
+      }
+    },
+    "spin": {
+      "analytical": {
+        "position_m": 1.4143184329290157e-06,
+        "velocity_m_s": 1.5482178103083438e-09,
+        "orientation_rad": 4.999946986498749e-10,
+        "angular_velocity_rad_s": 0.0,
+        "energy_relative": 3.774758283725532e-15,
+        "momentum_relative": 1.887379141862766e-15
+      },
+      "reference": {
+        "position_m": 1.1175870895385742e-07,
+        "velocity_m_s": 8.866990313695243e-11,
+        "orientation_rad": 0.0,
+        "angular_velocity_rad_s": 0.0,
+        "mjd_days": 0.0
+      }
+    }
+  },
+  "convergence": {
+    "coarse": {
+      "position_m": 1.4143184329290157e-06,
+      "velocity_m_s": 1.5482178103083438e-09,
+      "orientation_rad": 0.0,
+      "angular_velocity_rad_s": 0.0,
+      "energy_relative": 3.774758283725532e-15,
+      "momentum_relative": 1.887379141862766e-15
+    },
+    "half_step": {
+      "position_m": 1.1808439414391757e-07,
+      "velocity_m_s": 7.676480107332897e-11,
+      "orientation_rad": 0.0,
+      "angular_velocity_rad_s": 0.0,
+      "energy_relative": 6.439293542825908e-15,
+      "momentum_relative": 3.1086244689504383e-15
+    }
+  }
+}
+<end of output>
+Test time =   0.30 sec
+----------------------------------------------------------
+Test Passed.
+"Headless.ReferenceParity" end time: Oct 31 00:37 MDT
+"Headless.ReferenceParity" time elapsed: 00:00:00
+----------------------------------------------------------
+
+7/8 Testing: Headless.Errors
+7/8 Test: Headless.Errors
+Command: "/usr/bin/python3" "-B" "/home/dan/GIT/orbiter-cross-platform/Tests/Portable/test_headless.py" "--binary" "/tmp/orbiter-bootstrap-debug/orbiter-headless" "--source" "/home/dan/GIT/orbiter-cross-platform/Tests/Portable" "--output" "/tmp/orbiter-bootstrap-debug/traces" "--suite" "errors"
+Directory: /tmp/orbiter-bootstrap-debug
+"Headless.Errors" start time: Oct 31 00:37 MDT
+Output:
+----------------------------------------------------------
+test_case_insensitive_fields_and_comments (__main__.Errors.test_case_insensitive_fields_and_comments) ... ok
+test_duplicate_fields (__main__.Errors.test_duplicate_fields) ... ok
+test_final_partial_sampling_interval (__main__.Errors.test_final_partial_sampling_interval) ... ok
+test_help (__main__.Errors.test_help) ... ok
+test_input_overwrite_protection (__main__.Errors.test_input_overwrite_protection) ... ok
+test_invalid_arguments (__main__.Errors.test_invalid_arguments) ... ok
+test_invalid_step_length (__main__.Errors.test_invalid_step_length) ... ok
+test_invalid_steps (__main__.Errors.test_invalid_steps) ... ok
+test_missing_assets (__main__.Errors.test_missing_assets) ... ok
+test_nonfinite_and_malformed_inputs (__main__.Errors.test_nonfinite_and_malformed_inputs) ... ok
+test_surface_contact_rejected (__main__.Errors.test_surface_contact_rejected) ... ok
+test_trace_io_failures (__main__.Errors.test_trace_io_failures) ... ok
+test_unsupported_force_and_propagator (__main__.Errors.test_unsupported_force_and_propagator) ... ok
+test_unsupported_scenario_fields (__main__.Errors.test_unsupported_scenario_fields) ... ok
+test_unsupported_vessel_module_and_thrusters (__main__.Errors.test_unsupported_vessel_module_and_thrusters) ... ok
+test_windows_line_endings (__main__.Errors.test_windows_line_endings) ... ok
+
+----------------------------------------------------------------------
+Ran 16 tests in 0.123s
+
+OK
+<end of output>
+Test time =   0.19 sec
+----------------------------------------------------------
+Test Passed.
+"Headless.Errors" end time: Oct 31 00:37 MDT
+"Headless.Errors" time elapsed: 00:00:00
+----------------------------------------------------------
+
+8/8 Testing: PhysicsTrace.Validation
+8/8 Test: PhysicsTrace.Validation
+Command: "/usr/bin/python3" "/home/dan/GIT/orbiter-cross-platform/Tests/Portable/test_trace_tools.py"
+Directory: /tmp/orbiter-bootstrap-debug
+"PhysicsTrace.Validation" start time: Oct 31 00:37 MDT
+Output:
+----------------------------------------------------------
+.................
+----------------------------------------------------------------------
+Ran 17 tests in 0.177s
+
+OK
+<end of output>
+Test time =   0.23 sec
+----------------------------------------------------------
+Test Passed.
+"PhysicsTrace.Validation" end time: Oct 31 00:37 MDT
+"PhysicsTrace.Validation" time elapsed: 00:00:00
+----------------------------------------------------------
+
+End testing: Oct 31 00:37 MDT
