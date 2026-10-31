@@ -31,10 +31,11 @@ velocity, rotation, angular velocity, MJD, mass and fuel differences are zero.
 The original Debug/Release artifacts and comparison ZIPs are retained in Evidence,
 with individual ZIP/member digests in the accepted reference provenance.
 
-Atmosphere/contact/docking/autopilot, pause/warp, object/focus lifetime,
-persistence and vessel callback references are still required before extracting
-their respective production subsystems. No fixture capture here establishes
-stock corpus or graphical client acceptance.
+The broader subsystem references are now [accepted separately](../BehaviorReference/README.md)
+from hosted run 41193020450: fourteen cases, two identical runs per configuration,
+and passing Debug/Release comparison. Their original ZIPs and hashes are frozen
+independently. No fixture capture here establishes stock corpus or graphical
+client acceptance.
 
 The first production attempt,
 [run 41186215473](https://github.com/dcajacob/orbiter-cross-platform/actions/runs/41186215473),
@@ -65,8 +66,9 @@ Standard planetary archives are locked separately from the orbital fixture data.
 The publisher's Orbiter2016.zip SHA256 is
 `bdbf747dd930ced34a3cca34b69dc7e2d9733e0b9498ee8d6224090cf008dc30`;
 28 selected archive file hashes matched an existing compatible Orbiter-2024 data
-directory locally. This input-resource result does not establish renderer or
-terrain/contact acceptance, and does not change the frozen orbit data profile.
+directory locally. The initial input-resource result did not establish renderer or terrain/contact
+acceptance. The later behavioral references use these real archives for terrain/
+contact; the original orbital data profile remains unchanged.
 
 Final immutable-reference verification also passed in
 [run 41189526342](https://github.com/dcajacob/orbiter-cross-platform/actions/runs/41189526342),

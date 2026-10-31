@@ -63,7 +63,7 @@ unsupported native callbacks and known donor defects. `clbkLoadSurface` and
 `clbkMeshMaterial` terminate the donor process; TextW aborts; surface flags and
 material layout copying need repair. Call coverage must establish which optional
 callbacks the pinned stock corpus actually requires. Silent no-op success is
-not an implementation. No donor code has yet been imported.
+not an implementation. No donor code has yet been imported into the application.
 
 Other dependencies: DirectX June 2010 and Windows SDK/MSVC for preserved Windows
 builds; Lua and LuaFileSystem/Penlight; atmosphere modules; miniaudio/XRSound;
@@ -71,15 +71,20 @@ mesh/texture/gravity data; renderer dependencies including GLAD, SOIL2, NanoVG,
 libnsbmp and fonts. License closure must accompany selective renderer import.
 Core MIT and D3D9 LGPL components retain their existing licenses. The pinned Mesa
 runtime lock lists package licenses and staging preserves the distributed license
-files. A complete redistributable stock-data license manifest is still required.
+files. The [dependency lock](../../Tests/Production/dependencies.lock.json) and
+[input notices](../../Tests/Production/Licenses/INPUTS.md) record the current
+source/runtime/data terms. The audited versioned input bundle excludes the
+publication-restricted Architext font; its default UI dependency must be resolved
+before the installed release. No new SPDX license is asserted for the historical
+NRLMSISE C package; its author notice is retained.
 
 ## Ordered delivery gates
 
 | Phase | Delivery | Status / exit condition |
 | --- | --- | --- |
 | 0 | Honest POC labeling, scope and inventories | Source inventory implemented; no production runtime claim |
-| 1 | Production Windows references and hosted WGL | Hosted WGL, frozen orbit/propulsion references and native SPICE data audit passed; broader subsystem references and complete data/license locks remain |
-| 2 | Real Windows OpenGL client | Not started; normal registration/lifecycle, actual Sol ISS/ShuttlePB meshes/assets and scene manifest |
+| 1 | Production Windows references and hosted WGL | Accepted: original orbit/propulsion, 14 repeated behavior cases, Debug/Release comparison, hosted WGL and data/resource locks |
+| 2 | Real Windows OpenGL client | In preparation; normal registration/lifecycle, actual Sol ISS/ShuttlePB meshes/assets and scene manifest |
 | 3 | Production engine/platform boundary | Not started; Windows reference/ABI/lifecycle regression gates after every extraction |
 | 4 | Native real world/external client | Not started; SPICE and actual ISS then native ShuttlePB; cross-platform state/scene parity |
 | 5 | Usable flight and interaction | Not started; propulsion, fuel, all RCS axes, autopilot, docking, contact, persistence |
@@ -136,8 +141,9 @@ The test-only `ProductionReferenceDriver` is built with
 `ORBITER_PRODUCTION_REFERENCE_CAPTURE=ON` in the existing Windows application.
 It requires actual stock ISS/ShuttlePB objects and a source-built ShuttlePB
 module, observes Sun/Earth/Moon/ISS/PB, and optionally commands main engine,
-linear RCS and pitch RCS on declared ticks. It records original module pre/post
-notifications and controls; this is not yet full vessel callback instrumentation.
+linear RCS and pitch RCS on declared ticks. It records original module pre/post notifications and controls. The separate
+`ProductionBehaviorDriver` now observes real vessel callback boundaries and
+finalized application states; it does not replace production implementations.
 
 `capture_reference.py` requires all production implementation/dependency files
 under `Src`, `Orbitersdk`, `Extern` and root CMake to match the frozen revision.
@@ -279,3 +285,37 @@ Large packages/binaries belong in versioned release storage with hashes, not
 repeated Git commits. Preserve accepted logs, traces, representative images,
 reports and manifests beyond CI artifact expiry. Publish the native SDK/toolchain
 compatibility policy and supported module list with the eventual release.
+
+## Accepted behavioral references and the real-client gate
+
+Phase 1 is accepted from [hosted run 41193020450](https://github.com/dcajacob/orbiter-cross-platform/actions/runs/41193020450).
+[Fourteen behavioral references](../../Tests/Production/BehaviorReference/README.md)
+cover all RCS groups, original autopilots, atmosphere, real terrain/contact,
+docking/attachments, clock controls, vessel lifetime/focus, DG-S animation and
+stock save/reload. Every run repeats identically within its build. Debug/Release
+state comparisons pass without tolerance changes. Actual automatic docking to
+ISS occurs at tick 250. Saved states are observed only after finalization.
+
+The original two-body and production orbit/propulsion goldens remain untouched.
+`observation_source.py` verifies that removing explicitly marked test-only blocks
+recovers every original production source byte. Internal observation exports are
+compiled only by the test option; the public Windows SDK remains unchanged.
+
+```sh
+python3 -B Tests/Production/observation_source.py
+python3 -B Tests/Production/frozen_reference.py
+python3 -B Tests/Production/frozen_behavior.py
+```
+
+[Versioned audited inputs](https://github.com/dcajacob/orbiter-cross-platform/releases/tag/production-inputs-v2)
+retain original data bytes, notices and hashes outside Git. The 2016 ZIP parts
+reconstruct the intact original archive. Current stock data is a filtered bundle
+with the restricted font excluded, not a mirror of the complete executable ZIP.
+The [storage lock](../../Tests/Production/input-storage.lock.json) identifies the
+actual published assets. Original frozen input-profile hashes remain unchanged.
+
+The next gate is a real separately built `GraphicsClient` plugin inside current
+Windows Orbiter, using Win32/WGL and actual Sol, ISS and ShuttlePB objects,
+meshes, materials, textures and camera/visual callbacks. A working WGL probe or
+POC viewer cannot satisfy it. The renderer's source/dependency adaptation and
+resource callbacks must pass that gate before production engine extraction.

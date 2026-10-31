@@ -69,6 +69,10 @@ jobs:
           python Tests/Production/behavior_suite.py --orbiter out/production-app/Orbiter.exe
           --data out/production-data --planets out/standard-planets --output out/production-behavior
           --configuration ${{ matrix.configuration }}
+      - name: Verify unchanged accepted behavioral references
+        run: >-
+          python Tests/Production/frozen_behavior.py --candidate out/production-behavior
+          --configuration ${{ matrix.configuration }}
       - uses: actions/upload-artifact@v7
         if: always()
         with:

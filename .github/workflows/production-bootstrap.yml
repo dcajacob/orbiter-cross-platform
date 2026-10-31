@@ -36,6 +36,7 @@ jobs:
         run: |
           python3 -B Tests/Production/inventory.py --verify
           python3 -B Tests/Production/frozen_reference.py
+          python3 -B Tests/Production/frozen_behavior.py
 
   windows-wgl:
     name: Windows WGL ${{ matrix.configuration }} x64
@@ -196,6 +197,10 @@ jobs:
         run: >-
           python Tests/Production/behavior_suite.py --orbiter out/production-app/Orbiter.exe
           --data out/production-data --planets out/standard-planets --output out/production-behavior
+          --configuration ${{ matrix.configuration }}
+      - name: Compare behavior against the explicitly frozen production references
+        run: >-
+          python Tests/Production/frozen_behavior.py --candidate out/production-behavior
           --configuration ${{ matrix.configuration }}
       - name: Archive references and build metadata, including failures
         if: always()

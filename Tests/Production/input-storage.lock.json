@@ -1,0 +1,70 @@
+{
+  "schema": 1,
+  "repository": "dcajacob/orbiter-cross-platform",
+  "tag": "production-inputs-v2",
+  "manifest_url": "https://github.com/dcajacob/orbiter-cross-platform/releases/download/production-inputs-v2/inputs.json",
+  "manifest_sha256": "7a545aeda90d0c60bc9d4e905cc2a34ab28381725fcfbc8681f3a915cd1de27d",
+  "manifest": {
+    "schema": 1,
+    "tag": "production-inputs-v2",
+    "scope": "Windows production references and renderer integration",
+    "packages": {
+      "Orbiter-x64.zip": {
+        "source": "https://github.com/orbitersim/orbiter/releases/download/latest/Orbiter-x64.zip",
+        "sha256": "3aca69d57ee6a4c611569c0c065164ea4968012c8133548ae3acdc10d814d06f",
+        "bytes": 1749597759,
+        "parts": [],
+        "notices": [
+          {
+            "name": "Orbiter-x64.zip-readme.txt",
+            "sha256": "a2925690c88da68162cce7669b07529eb1117669dc7735f659a82884b4aebffc",
+            "archive_member": "readme.txt"
+          },
+          {
+            "name": "Orbiter-x64.zip-LICENSE",
+            "sha256": "ffba1fe66f6c59cc8e01c014a4454901d1b6b3669b5e205bf54a2f57974bab7d",
+            "archive_member": "LICENSE"
+          }
+        ],
+        "distribution": "filtered data only; no executables or Architext font",
+        "excluded": [
+          "Fonts/architext.regular.ttf"
+        ],
+        "mirrored_archive": {
+          "name": "production-stock-data-v1.zip",
+          "bytes": 1517315321,
+          "sha256": "b70a4065ceda469e4b0f35d3d8935138483873fdb8d8eb2dd6b99829f8ce0cb3"
+        }
+      },
+      "Orbiter2016.zip": {
+        "source": "https://cdn.orbithangar.com/orbiter/Orbiter2016.zip",
+        "sha256": "bdbf747dd930ced34a3cca34b69dc7e2d9733e0b9498ee8d6224090cf008dc30",
+        "bytes": 2600557251,
+        "parts": [
+          {
+            "name": "Orbiter2016.zip.part01",
+            "bytes": 1500000000,
+            "sha256": "c9e8721f6db6b1403556f0aa2446955d812c5ceaf84630b3c35c14105bb06824"
+          },
+          {
+            "name": "Orbiter2016.zip.part02",
+            "bytes": 1100557251,
+            "sha256": "426a0e999bb31b3e2fa9a6e61c801edb8a371fa3efa49f334babff61e2ab2d30"
+          }
+        ],
+        "notices": [
+          {
+            "name": "Orbiter2016.zip-readme.txt",
+            "sha256": "f21a16f786818c8cac29a5655b840c06414b8df6a19263d8bba0206c9a661909",
+            "archive_member": "readme.txt"
+          },
+          {
+            "name": "Orbiter2016.zip-Orbiter.pdf",
+            "sha256": "c90098d6fa879fd229c24957e46d547e300c8a0fdbbb462c90255a7add90340b",
+            "archive_member": "Doc/Orbiter.pdf"
+          }
+        ]
+      }
+    }
+  }
+}

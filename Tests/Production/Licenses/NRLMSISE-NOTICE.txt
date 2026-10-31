@@ -1,0 +1,15 @@
+NRLMSISE-00 C implementation: Dominik Brodowski.
+Original model: Mike Picone, Alan Hedin and Doug Drob.
+The bundled source identifies release 20020503 with fixes from 20041227.
+Authorship headers remain in the original files; no new SPDX license is asserted.
+
+Author-maintained documentation:
+https://git.linta.de/~brodo/nrlmsise-00.git/tree/DOCUMENTATION
+Blob dfdf5dd60e83d39bebbc60788d7d59bd7ae38de4, section 1, inspected 2026-10-31:
+
+This package is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. Please inform the
+maintainer of the C release (Dominik Brodowski - mail@brodo.de) of
+any patches and bug-fixes you implement for NRLMSISE-00 so that this C
+package can be updated with these improvements.

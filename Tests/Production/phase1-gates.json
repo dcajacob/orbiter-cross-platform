@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "phase_status": "in-progress",
+  "phase_status": "accepted",
   "windows_wgl": {
     "status": "passed",
     "run_id": 41185963598,
@@ -8,7 +8,8 @@
       "Debug",
       "Release"
     ],
-    "evidence": "Verification/README.md"
+    "evidence": "Verification/README.md",
+    "current_verified_run_id": 41192125192
   },
   "production_source": "38b7c627878ea893390675616897071f8bb8e90f",
   "cases": [
@@ -24,51 +25,51 @@
     },
     {
       "id": "all-rcs-axes-autopilot",
-      "status": "pending",
+      "status": "accepted",
       "required_before": "control logic extraction"
     },
     {
       "id": "atmospheric-flight",
-      "status": "pending",
+      "status": "accepted",
       "required_before": "atmosphere extraction"
     },
     {
       "id": "landed-ground-contact",
-      "status": "pending",
+      "status": "accepted",
       "required_before": "terrain/contact extraction"
     },
     {
       "id": "docking-attachments",
-      "status": "pending",
+      "status": "accepted",
       "required_before": "docking/attachment extraction"
     },
     {
       "id": "pause-warp-resume",
-      "status": "pending",
+      "status": "accepted",
       "required_before": "session clock extraction"
     },
     {
       "id": "creation-deletion-focus",
-      "status": "pending",
+      "status": "accepted",
       "required_before": "session lifetime extraction"
     },
     {
       "id": "save-reload",
-      "status": "pending",
+      "status": "accepted",
       "required_before": "persistence extraction"
     },
     {
       "id": "vessel-animations",
-      "status": "pending",
+      "status": "accepted",
       "required_before": "mesh/animation extraction"
     },
     {
       "id": "vessel-callback-order",
-      "status": "pending",
+      "status": "accepted",
       "required_before": "production lifecycle extraction"
     }
   ],
-  "data_storage": "upstream digest-pinned package; durable versioned mirror and redistribution review pending",
+  "data_storage": "Audited production-inputs-v2 release; hashes/notices in input-storage.lock.json. Architext excluded, original upstream profile unchanged.",
   "automatic_reference_refresh": false,
   "production_reference": {
     "run_id": 41187217665,
@@ -94,5 +95,16 @@
     "tested_source": "e7d1fdec1f301bd960886b5177e4f10da8c5a005",
     "frozen_reference_unchanged": true,
     "all_32_trace_state_event_identity_files_byte_identical_to_accepted_evidence": true
-  }
+  },
+  "behavior_reference": {
+    "status": "accepted",
+    "run_id": 41193020450,
+    "driver_source": "684bd5b27005feecfa9effe796bd216f85e3392f",
+    "application_source": "06d8989823c59e651061d409425c19ec71360bfa",
+    "cases": 14,
+    "repeat": "all CSV numerical/event traces byte-identical within each build",
+    "provenance": "BehaviorReference/provenance.json",
+    "hosted_debug_release_comparison": "passed without tolerance changes"
+  },
+  "license_inventory": "dependencies.lock.json and Licenses/INPUTS.md; Architext default-font publication restriction must be resolved before packaged release; original NRLMSISE author disclaimer retained without asserting a new SPDX license."
 }
