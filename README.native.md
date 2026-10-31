@@ -1,12 +1,15 @@
-# Native graphical client milestone
+# Native graphical portability POC
 
-`orbiter-native` is a separate graphics client of the verified portable Orbiter
-core. It owns the window, OpenGL renderer, camera, input and wall-clock scheduler.
+`orbiter-native` is a portability proof of concept built around the restricted
+portable `SimulationSession`. It is not the production Orbiter application or a
+production `GraphicsClient` plugin. See [the production release gates](Docs/Production/README.md).
+
+The POC is a separate graphics frontend of the verified portable fixture core. It owns the window, OpenGL renderer, camera, input and wall-clock scheduler.
 It runs in the same process as the core and reads copied state snapshots. It is
 an internal portable client, not an implementation of the Windows GraphicsClient
 plugin ABI. `orbiter-headless` retains no graphics dependency.
 
-**Milestone complete (2026-10-31).** All eight jobs passed in
+**POC validation complete (2026-10-31); production integration is not complete.** All eight jobs passed in
 [hosted run 41181892596](https://github.com/dcajacob/orbiter-cross-platform/actions/runs/41181892596),
 testing source `53782b1bd0da3fb7b18e636a200f34d5270330e5`. Linux Debug/Release
 pass 10/10 suites including actual software-rendered graphics; Windows

@@ -1,0 +1,74 @@
+name: Production Bootstrap
+
+on:
+  push:
+    branches: ['codex/production-**']
+  pull_request:
+    paths:
+      - 'Tests/Production/**'
+      - 'Docs/Production/**'
+      - '.github/workflows/production-bootstrap.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  inventory:
+    name: Frozen production inventory
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - name: Verify stock corpus and frozen production source
+        run: python3 Tests/Production/inventory.py --verify
+
+  windows-wgl:
+    name: Windows WGL ${{ matrix.configuration }} x64
+    runs-on: windows-2022
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        configuration: [Debug, Release]
+    steps:
+      - uses: actions/checkout@v7
+      - uses: ilammy/msvc-dev-cmd@v1
+        with:
+          vsversion: '17.0'
+          arch: x64
+      - name: Configure and record toolchain
+        shell: pwsh
+        run: |
+          cmake -S Tests/Production -B out/wgl -G Ninja -DCMAKE_BUILD_TYPE=${{ matrix.configuration }} 2>&1 | Tee-Object configure.log
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          cmd /c "cl 2>&1 & exit /b 0" | Out-File out/wgl/compiler.txt
+          Get-ComputerInfo -Property WindowsProductName,WindowsVersion,OsBuildNumber | Out-File out/wgl/windows.txt
+          git rev-parse HEAD | Out-File out/wgl/source.txt
+      - name: Build MSVC Windows window and WGL probe
+        shell: pwsh
+        run: |
+          cmake --build out/wgl --parallel 2 2>&1 | Tee-Object out/wgl/build.log
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - uses: actions/cache@v6
+        with:
+          path: out/mesa-cache/*.pkg.tar.zst
+          key: mesa-ucrt64-${{ hashFiles('Tests/Production/mesa-ucrt64.lock.json') }}
+      - name: Stage verified application-local Mesa runtime and licenses
+        run: python Tests/Production/mesa_runtime.py stage --cache out/mesa-cache --destination out/wgl
+      - name: Execute real Windows WGL and audit loaded DLLs
+        run: python Tests/Production/mesa_runtime.py probe --executable out/wgl/orbiter-wgl-probe.exe --output out/wgl-evidence
+      - name: Preserve graphics bootstrap evidence, including failures
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: production-wgl-${{ matrix.configuration }}-x64
+          retention-days: 30
+          path: |
+            configure.log
+            out/wgl/*.log
+            out/wgl/*.txt
+            out/wgl/*.json
+            out/wgl/licenses/**
+            out/wgl-evidence/**
