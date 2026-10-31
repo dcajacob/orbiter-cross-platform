@@ -80,6 +80,9 @@ def validate(directory,configuration):
     info=json.loads((directory/'renderer-info.json').read_text());require('llvmpipe' in info['renderer'],'real application did not load software Mesa')
     summary=json.loads((directory/'scene-summary.json').read_text())
     require(summary['frames']==50 and summary['mesh_draw_calls']>0 and summary['indices']>0,'real scene geometry was not drawn')
+    lifecycle=json.loads((directory/'graphics-lifecycle.json').read_text())
+    require(lifecycle['rendered_frames']>=50 and lifecycle['successful_presents']>=50 and lifecycle['context_deleted'],
+            'real window presentation or OpenGL cleanup did not complete')
     scene=rows(directory/'scene.csv');vessels=[r for r in scene if r['type']=='vessel']
     require({'PB','ISS'}<={r['object'] for r in vessels},'real stock vessel visuals/meshes missing')
     require(all(int(r['groups'])>0 and int(r['materials'])>0 and int(r['textures'])>0 for r in vessels),'stock mesh/material/texture content missing')
@@ -110,7 +113,7 @@ def validate(directory,configuration):
         require(p.is_file(),'actual vessel mesh file missing');assets[p.relative_to(directory).as_posix()]=digest(p)
     raw=(directory/'scene.rgba').read_bytes();png(directory/'scene.png',raw,1280,720)
     require(len(set(raw[::4]))>16,'scene readback is a blank or trivial image')
-    report=dict(status='passed real Windows production scene',renderer=info,geometry=summary,
+    report=dict(status='passed real Windows production scene',renderer=info,geometry=summary,lifecycle=lifecycle,
                 objects=scene,asset_sha256=assets,loaded_modules=modules,
                 simulation_comparison=numerical_reference(directory,configuration),image_sha256=digest(directory/'scene.png'))
     (directory/'client-report.json').write_text(json.dumps(report,indent=2)+'\n');return report

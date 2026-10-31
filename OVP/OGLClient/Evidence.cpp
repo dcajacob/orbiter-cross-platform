@@ -14,7 +14,7 @@
 namespace Evidence {
 namespace {
 bool enabled=false;
-unsigned frames=0,draws=0;
+unsigned frames=0,draws=0,presents=0;
 uint64_t indices=0;
 std::ofstream events,assets;
 std::set<std::string> seen;
@@ -22,7 +22,7 @@ std::string name(OBJHANDLE h) { char value[256]{};oapiGetObjectName(h,value,size
 std::ofstream output(const char *path) { std::ofstream f(path,std::ios::binary);f.imbue(std::locale::classic());f<<std::setprecision(17);if(!f)throw std::runtime_error("cannot write graphics evidence");return f; }
 }
 void Begin() {
-    enabled=std::filesystem::is_regular_file("ogl-evidence.enabled");frames=draws=0;indices=0;seen.clear();
+    enabled=std::filesystem::is_regular_file("ogl-evidence.enabled");frames=draws=presents=0;indices=0;seen.clear();
     if(!enabled)return;
     events=output("visual-events.csv");events<<"frame,event,object,type\n";
     assets=output("loaded-assets.txt");
@@ -31,6 +31,14 @@ void Begin() {
         <<",\"renderer\":"<<std::quoted(reinterpret_cast<const char *>(glGetString(GL_RENDERER)))
         <<",\"version\":"<<std::quoted(reinterpret_cast<const char *>(glGetString(GL_VERSION)))<<"}\n";
 
+}
+void Presented() { if(enabled)++presents; }
+void End(bool contextDeleted) {
+    if(!enabled)return;
+    auto lifecycle=output("graphics-lifecycle.json");
+    lifecycle<<"{\"rendered_frames\":"<<frames<<",\"successful_presents\":"<<presents
+             <<",\"context_deleted\":"<<(contextDeleted?"true":"false")<<"}\n";
+    events.close();assets.close();enabled=false;
 }
 void Visual(const char *event,OBJHANDLE object) {
     if(enabled){events<<frames<<','<<event<<','<<name(object)<<','<<oapiGetObjectType(object)<<'\n';events.flush();}

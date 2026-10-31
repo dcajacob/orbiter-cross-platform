@@ -80,11 +80,18 @@ void OGLClient::clbkDestroyRenderWindow(bool fastclose) {
     }
     mTextureManager.reset();Renderer::GlobalExit();
     GraphicsClient::clbkDestroyRenderWindow(fastclose);
-    if(mContext){wglMakeCurrent(nullptr,nullptr);wglDeleteContext(mContext);mContext=nullptr;}
+    bool contextDeleted=true;
+    if(mContext){wglMakeCurrent(nullptr,nullptr);contextDeleted=wglDeleteContext(mContext)!=FALSE;mContext=nullptr;}
+    Evidence::End(contextDeleted);
     if(mDC){ReleaseDC(hRenderWnd,mDC);mDC=nullptr;}
     hRenderWnd=nullptr;
 }
-bool OGLClient::clbkDisplayFrame() { return mDC && SwapBuffers(mDC); }
+bool OGLClient::clbkDisplayFrame() {
+    bool success=mDC && SwapBuffers(mDC);
+    if(success)Evidence::Presented();
+    else oapiWriteLog(const_cast<char *>("OpenGL frame presentation failed"));
+    return success;
+}
 LRESULT OGLClient::RenderWndProc(HWND window,UINT message,WPARAM wp,LPARAM lp) {
     if(message==WM_SIZE && mContext && LOWORD(lp) && HIWORD(lp)) clbkSetViewportSize(LOWORD(lp),HIWORD(lp));
     return GraphicsClient::RenderWndProc(window,message,wp,lp);

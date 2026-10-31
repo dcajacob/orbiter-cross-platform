@@ -140,7 +140,7 @@ private:
 	OGLParticleStream **pstream; // list of particle streams
 	int                nstream; // number of streams
 
-	OGLLight *light;          // only one for now
+	OGLLight *light=nullptr;          // only one for now
 	VECTOR3 bg_rgba;          // ambient background colour
 	bool locallight;           // enable local light sources
 	bool surfLabelsActive;     // v.2 surface labels activated?

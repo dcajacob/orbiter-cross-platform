@@ -7,4 +7,6 @@ void Visual(const char *event,OBJHANDLE object);
 void Draw(unsigned vertices,unsigned indices);
 void Asset(const char *path);
 void Frame();
+void Presented();
+void End(bool contextDeleted);
 }
