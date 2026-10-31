@@ -1808,6 +1808,11 @@ void Orbiter::EndTimeStep (bool running)
 	orbiter::production::Session::EndTimeStep(services, td, running, bRunning, g_bForceUpdate);
 }
 
+void Orbiter::UpdateSessionVisuals(bool running)
+{
+	if (gclient) gclient->clbkUpdate(running);
+}
+
 void Orbiter::WritePhysicsTrace(bool initial)
 {
 	const auto &cfg = pConfig->CfgCmdlinePrm;

@@ -360,6 +360,7 @@ protected:
     HRESULT DeleteDeviceObjects ();
 
 private:
+	void UpdateSessionVisuals(bool running);
 	void WritePhysicsTrace(bool initial);
 	orbiter::PhysicsTrace physicsTrace;
 	std::size_t physicsTraceStep = 0;

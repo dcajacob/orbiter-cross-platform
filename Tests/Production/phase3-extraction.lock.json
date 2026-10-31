@@ -23,11 +23,11 @@
       "original_sha256_lf": "fb4c1f4a5bec410ff05d635cd547bd6b2067ed5d26faba315248e2ae2abd3284"
     },
     "Src/Orbiter/Orbiter.cpp": {
-      "sha256_lf": "e5c4c8dfa703f17ed92f04a62e8124870ef67839a86e061679999f3ff3c74207",
+      "sha256_lf": "ed0baaa45f322706043dab18f37b049b801ee1670ccbcd1fb0004222150e5724",
       "original_sha256_lf": "d9bcee218c141dc3896d599a3e25323f84d1259bc2aa209e752eb8c03ea4b298"
     },
     "Src/Orbiter/Orbiter.h": {
-      "sha256_lf": "85f68c88d674775647ba24c1d8774c97d2f8f5ef3b51aa740acea5df582f6949",
+      "sha256_lf": "3bf6bdc45279ba6e3d23061a0b402d17bbf0e0b3022276ca96c5bb48593f993b",
       "original_sha256_lf": "32db52be7f0355c383d7ae8f4fd033170e3c13c272bd11a4c0be9453d25dd297"
     },
     "Src/Orbiter/Production/CMakeLists.txt": {
@@ -71,7 +71,7 @@
       "original_sha256_lf": null
     },
     "Src/Orbiter/Production/WindowsSession.cpp": {
-      "sha256_lf": "18cdae411ed3cdab89bf9d8ec17fdda34afed9abbb4528a90352510c55cce7e7",
+      "sha256_lf": "51c49d988cb8118d04b55bd6a3efbd80171b2f93135a729b6a0ff264ec8994db",
       "original_sha256_lf": null
     },
     "Src/Orbiter/Production/WindowsSession.h": {

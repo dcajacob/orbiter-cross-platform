@@ -51,7 +51,7 @@ void WindowsSessionServices::UpdatePanels(double simulationTime, double systemTi
 }
 void WindowsSessionServices::UpdateVisuals(bool running)
 {
-    if (app.gclient) app.gclient->clbkUpdate(running);
+    app.UpdateSessionVisuals(running);
 }
 void WindowsSessionServices::CheckSessionLimit()
 {
