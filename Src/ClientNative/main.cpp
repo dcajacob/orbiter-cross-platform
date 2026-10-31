@@ -98,6 +98,7 @@ struct App {
     Controller &controller;
     Camera camera;
     GLFWwindow *window;
+    FrameClock clock;
     bool dragging = false;
     double x = 0, y = 0;
     std::exception_ptr error;
@@ -116,18 +117,22 @@ struct App {
         if (name == "pause") {
             arity(0);
             controller.Pause(true);
+            clock.Restart();
         } else if (name == "resume") {
             arity(0);
             controller.Pause(false);
+            clock.Restart();
         } else if (name == "toggle") {
             arity(0);
             controller.Pause(!controller.Paused());
+            clock.Restart();
         } else if (name == "step") {
             arity(0);
             controller.SingleStep();
         } else if (name == "reset") {
             arity(0);
             controller.Reset();
+            clock.Restart();
         } else if (name == "camera") {
             arity(0);
             camera.overview = !camera.overview;
@@ -354,7 +359,6 @@ int main(int argc, char **argv) {
                                          : platform == GLFW_PLATFORM_WAYLAND ? "wayland"
                                                                              : "win32";
         std::cout << "Native backend: " << platformName << "\nOpenGL: " << renderer.Driver() << '\n';
-        auto previous = std::chrono::steady_clock::now();
         std::size_t frames = 0, nextEvent = 0;
         int width = 0, height = 0;
         do {
@@ -365,9 +369,7 @@ int main(int argc, char **argv) {
                 app.Command(events[nextEvent].name, events[nextEvent].args);
                 ++nextEvent;
             }
-            auto now = std::chrono::steady_clock::now();
-            auto elapsed = std::chrono::duration_cast<std::chrono::nanoseconds>(now - previous);
-            previous = now;
+            const auto elapsed = app.clock.Elapsed(std::chrono::steady_clock::now());
             controller.Advance(smoke ? std::chrono::seconds(100) : elapsed, smoke ? 100 : 8);
             glfwGetFramebufferSize(window.get(), &width, &height);
             if (width > 0 && height > 0) {

@@ -24,6 +24,18 @@ int main(int argc, char **argv) {
     try {
         require(argc == 2, "scenario argument required");
         const std::filesystem::path path = argv[1];
+        FrameClock clock;
+        const std::chrono::steady_clock::time_point start{};
+        require(clock.Elapsed(start).count() == 0, "first frame accrued wall time");
+        require(clock.Elapsed(start + std::chrono::seconds(1)) == std::chrono::seconds(1),
+                "normal wall clock interval");
+        clock.Restart();
+        require(clock.Elapsed(start + std::chrono::hours(1)).count() == 0,
+                "resume/reset counted a paused OS stall");
+        require(clock.Elapsed(start + std::chrono::hours(1) + std::chrono::seconds(1)) ==
+                    std::chrono::seconds(1),
+                "restarted clock lost new elapsed time");
+
         auto core = portable::SimulationSession::Load(path, 1);
         std::vector<PhysicsTraceSample> expected{core.ReadState()};
         for (int i = 0; i < 6000; ++i) {
