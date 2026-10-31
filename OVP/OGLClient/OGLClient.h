@@ -763,7 +763,7 @@ public:
 	 *   \ref oapi::Font::Font
 	 * \sa clbkReleaseFont, oapi::Font
 	 */
-	virtual Font *CreateFont (int height, bool prop, const char *face, oapi::FontStyle style = FONT_NORMAL, int orientation = 0, bool antialiased = true) const;
+	virtual Font *CreateFont (int height, bool prop, const char *face, FontStyle style = FONT_NORMAL, int orientation = 0, bool antialiased = true) const;
 
 	/**
 	 * \brief De-allocate a font resource.

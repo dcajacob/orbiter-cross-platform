@@ -21,6 +21,9 @@
 #include "SOIL2.h"
 #include <sys/stat.h>
 #include "Renderer.h"
+#include "Evidence.h"
+#include <filesystem>
+#include <vector>
 extern "C" {
 #include "libnsbmp.h"
 }
@@ -244,63 +247,24 @@ bool TextureManager::ReadTextureFromMemory (const uint8_t *buf, uint32_t nbuf, O
 
 bool TextureManager::LoadTexture (const char *fname, OGLTexture **ppdds, uint32_t flags)
 {
-    if(!strcasecmp(&fname[strlen(fname) - 4],".bmp")) {
-        std::string bmpPath = oapiGetFilePath(fname);
-        GLuint tid = loadBMPTexture(bmpPath.c_str());
-
-        if(tid != 0) {
-            *ppdds = new OGLTexture;
-            (*ppdds)->m_TexId = tid;
-            (*ppdds)->m_RefCnt = 1;
-            (*ppdds)->m_InCache = false;
-            (*ppdds)->m_FBO = 0;
-            (*ppdds)->InitSize();
-            return true;
-        }
-    }
-
-
-    unsigned int SOILFlags = SOIL_FLAG_MIPMAPS | SOIL_FLAG_TEXTURE_REPEATS;
-
-    if(flags & 4) {
-        SOILFlags = SOIL_FLAG_TEXTURE_REPEATS;
-    }
-
-    if(!(flags & 2)) {
-        //SOILFlags |= SOIL_FLAG_DDS_LOAD_DIRECT;
-        //SOIL_LOAD_RGBA SOIL_LOAD_AUTO
-    }
-
-	char cpath[256];
-	*ppdds = 0;
-    GLuint tid = SOIL_load_OGL_texture(fname, SOIL_LOAD_AUTO, SOIL_CREATE_NEW_ID, SOILFlags, 0);
-    if(tid == 0) {
-        if (g_client->TexturePath(fname, cpath)) {
-            tid = SOIL_load_OGL_texture(cpath, SOIL_LOAD_AUTO, SOIL_CREATE_NEW_ID, SOILFlags, 0);
-        } else {
-            g_client->PlanetTexturePath(fname, cpath);
-            tid = SOIL_load_OGL_texture(cpath, SOIL_LOAD_AUTO, SOIL_CREATE_NEW_ID, SOILFlags, 0);
-        }
-    }
-    if(tid != 0) {
-        *ppdds = new OGLTexture;
-        (*ppdds)->m_TexId = tid;
-        (*ppdds)->m_RefCnt = 1;
-        (*ppdds)->m_InCache = false;
-        (*ppdds)->m_FBO = 0;
-        (*ppdds)->InitSize();
-
-        // look for normal map
-        char buf[260];
-        strcpy(buf, fname);
-        strcpy(&buf[strlen(fname) - 4], "_norm.dds");
-        if (g_client->TexturePath(buf, cpath)) {
-            (*ppdds)->m_NormTexId = SOIL_load_OGL_texture(cpath, SOIL_LOAD_AUTO, SOIL_CREATE_NEW_ID, SOILFlags | SOIL_FLAG_DDS_LOAD_DIRECT, 0);
-            if((*ppdds)->m_NormTexId) {
-//                (*ppdds)->m_TexId = (*ppdds)->m_NormTexId;
-                printf("Normal map found for %s\n", fname);
-            }
-        }
+    if (!fname || !ppdds) return false;
+    *ppdds=nullptr;
+    std::vector<std::string> paths{fname};char path[1024]{};
+    if(g_client->TexturePath(fname,path))paths.emplace_back(path);
+    if(g_client->PlanetTexturePath(fname,path))paths.emplace_back(path);
+    unsigned options=SOIL_FLAG_TEXTURE_REPEATS;
+    if(!(flags & 4))options|=SOIL_FLAG_MIPMAPS;
+    if(!(flags & 2))options|=SOIL_FLAG_DDS_LOAD_DIRECT;
+    for(const auto &candidate:paths) {
+        FILE *file=fopen(candidate.c_str(),"rb");if(!file)continue;
+        unsigned char signature[4]{};size_t count=fread(signature,1,4,file);fclose(file);
+        // Stock BMP content may carry a .dds suffix. Trust bytes, not extension.
+        GLuint id=count>=2 && signature[0]=='B' && signature[1]=='M'
+          ? loadBMPTexture(candidate.c_str())
+          : SOIL_load_OGL_texture(candidate.c_str(),SOIL_LOAD_AUTO,SOIL_CREATE_NEW_ID,options,0);
+        if(!id)return false;
+        auto texture=new OGLTexture;texture->m_TexId=id;texture->m_RefCnt=1;texture->m_InCache=false;
+        texture->m_file=candidate;texture->InitSize();*ppdds=texture;Evidence::Asset(candidate.c_str());
         return true;
     }
     return false;
@@ -383,7 +347,7 @@ int TextureManager::LoadTextures (const char *fname, OGLTexture **ppdds, uint32_
     for(int i=0; i<ntex;i++) {
         ppdds[i] = new OGLTexture;
         ppdds[i]->m_InCache = false;
-        ppdds[i]->m_RefCnt = 0;
+        ppdds[i]->m_RefCnt = 1;
         ppdds[i]->m_TexId = tmp[i];
         ppdds[i]->m_FBO = 0;
         ppdds[i]->InitSize();
@@ -437,6 +401,7 @@ void TextureManager::AddToRepository (const char *fname, OGLTexture *pdds)
 {
 	TexRec *texrec = new TexRec;
 	texrec->tex = pdds;
+    pdds->m_InCache=true;
 	strncpy (texrec->fname, fname, 64);
 	texrec->id = MakeTexId (fname);
 	texrec->next = firstTex; // add to beginning of list
@@ -451,7 +416,7 @@ void TextureManager::ClearRepository ()
 	while (firstTex) {
 		TexRec *tmp = firstTex;
 		firstTex = firstTex->next;
-		if (tmp->tex) tmp->tex->Release();
+		if (tmp->tex) { tmp->tex->m_InCache=false;tmp->tex->Release(); }
 		delete tmp;
 	}
 }
@@ -921,7 +886,7 @@ exit:
 OGLTexture *TextureManager::CreateTextureFromTexId(GLuint texId, int width, int height) {
     OGLTexture *tex = new OGLTexture;
     tex->m_RefCnt = 1;
-    tex->m_InCache = true;
+    tex->m_InCache = false;
     tex->m_Width = width;
     tex->m_Height = height;
     tex->m_TexId = texId;
@@ -934,7 +899,7 @@ OGLTexture *TextureManager::GetTextureForRendering(int w, int h, int attrib)
 {
     OGLTexture *tex = new OGLTexture;
     tex->m_RefCnt = 1;
-    tex->m_InCache = true;
+    tex->m_InCache = false;
     tex->m_Width = w;
     tex->m_Height = h;
     GLint oldFB;
@@ -1072,6 +1037,7 @@ OGLTexture::OGLTexture() {
     m_FBO = 0;
     m_RBO = 0;
     m_NormTexId = 0;
+    m_TexId=0;m_RefCnt=1;m_InCache=false;m_Width=m_Height=0;
 }
 
 bool OGLTexture::Release()

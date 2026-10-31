@@ -4,6 +4,7 @@
 #include "glad.h"
 #include "OGLClient.h"
 #include "Scene.h"
+#include "Evidence.h"
 #include "OGLCamera.h"
 #include "Renderer.h"
 #include "TileMgr.h"
@@ -49,6 +50,7 @@ HWND OGLClient::clbkCreateRenderWindow() {
         mContext=create(mDC,nullptr,attrs);require(mContext!=nullptr,"WGL 3.3 core context failed");
         wglMakeCurrent(nullptr,nullptr);wglDeleteContext(bootstrap);
         require(wglMakeCurrent(mDC,mContext)&&gladLoadGL(),"OpenGL entry point loading failed");
+        Evidence::Begin();
         Renderer::GlobalInit(m_width,m_height);
         mTextureManager=std::make_unique<TextureManager>();
         mMeshManager=std::make_unique<OGLMeshManager>();

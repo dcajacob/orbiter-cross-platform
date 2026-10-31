@@ -17,6 +17,7 @@
 
 #include "glad.h"
 #include "OGLMesh.h"
+#include "Evidence.h"
 #include "OGLClient.h"
 #include "Scene.h"
 #include "OGLCamera.h"
@@ -554,6 +555,7 @@ void OGLMesh::RenderGroup (GROUPREC *grp)
 	if (grp->nVtx && grp->nIdx) {
         grp->VBA->Bind();
         glDrawElements(GL_TRIANGLES, grp->IBO->GetCount(), GL_UNSIGNED_SHORT, 0);
+        Evidence::Draw(grp->nVtx,grp->IBO->GetCount());
 	    Renderer::CheckError("glDrawElements");
         grp->VBA->UnBind();
 	}

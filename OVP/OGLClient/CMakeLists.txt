@@ -33,7 +33,7 @@ foreach(name glm freetype soil2 nanovg libnsbmp imgui zlib)
 endforeach()
 FetchContent_MakeAvailable(glm freetype soil2 nanovg libnsbmp imgui zlib)
 add_library(OGLClient SHARED
-  WindowsAdapter.cpp OGLClient.cpp Shader.cpp CelSphere.cpp Renderer.cpp VertexBuffer.cpp Scene.cpp Light.cpp
+  WindowsAdapter.cpp Evidence.cpp OGLClient.cpp Shader.cpp CelSphere.cpp Renderer.cpp VertexBuffer.cpp Scene.cpp Light.cpp
   OGLCamera.cpp OGLMesh.cpp MeshManager.cpp VObject.cpp VVessel.cpp Texture.cpp VPlanet.cpp VStar.cpp ztreemgr.cpp
   TileMgr.cpp SurfMgr.cpp RingMgr.cpp HazeMgr.cpp CloudMgr.cpp tilemgr2.cpp surfmgr2.cpp tilelabel.cpp
   VBase.cpp cloudmgr2.cpp Particle.cpp CSphereMgr.cpp spherepatch.cpp OGLPad.cpp glad.c
@@ -44,10 +44,11 @@ add_library(OGLClient SHARED
   "${imgui_SOURCE_DIR}/backends/imgui_impl_opengl3.cpp")
 target_compile_features(OGLClient PRIVATE cxx_std_17)
 target_compile_definitions(OGLClient PRIVATE NVG_NO_STB=1 FONS_USE_FREETYPE=1 NOMINMAX WIN32_LEAN_AND_MEAN _CRT_SECURE_NO_WARNINGS)
+target_compile_definitions(OGLClient PRIVATE "IMGUI_USER_CONFIG=\"${CMAKE_CURRENT_SOURCE_DIR}/../../Extern/imgui/imconfig.h\"")
 target_include_directories(OGLClient PRIVATE
   "${ORBITER_TEST_RUNTIME}/Orbitersdk/include" "${DXSDK_DIR}/Include"
   "${soil2_SOURCE_DIR}/incs" "${soil2_SOURCE_DIR}/srcs" "${nanovg_SOURCE_DIR}/src"
-  "${libnsbmp_SOURCE_DIR}/include" "${imgui_SOURCE_DIR}/backends" "${zlib_SOURCE_DIR}" "${zlib_BINARY_DIR}")
+  "${libnsbmp_SOURCE_DIR}/include" "${imgui_SOURCE_DIR}" "${imgui_SOURCE_DIR}/backends" "${zlib_SOURCE_DIR}" "${zlib_BINARY_DIR}")
 target_link_libraries(OGLClient PRIVATE glm::glm freetype zlibstatic opengl32 gdi32 user32
   "${ORBITER_TEST_RUNTIME}/Orbitersdk/lib/Orbiter.lib"
   "${ORBITER_TEST_RUNTIME}/Orbitersdk/lib/Orbitersdk.lib")

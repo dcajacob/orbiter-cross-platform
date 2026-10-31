@@ -19,6 +19,7 @@
 // ==============================================================
 
 #include "Scene.h"
+#include "Evidence.h"
 #include "OGLCamera.h"
 #include "OGLMesh.h"
 #include "VPlanet.h"
@@ -193,6 +194,7 @@ void Scene::DelVisualRec (VOBJREC *pv)
 	else          vobjLast = pv->prev;
 
 	// delete the visual, its children and the entry itself
+	Evidence::Visual("unregister",pv->vobj->GetObject());
 	g_client->UnregisterVisObject (pv->vobj->GetObject());
 	delete pv->vobj;
 	delete pv;
@@ -204,6 +206,7 @@ Scene::VOBJREC *Scene::AddVisualRec (OBJHANDLE hObj)
 	VOBJREC *pv = new VOBJREC;
 	pv->vobj = vObject::Create (hObj, this);
 	g_client->RegisterVisObject (hObj, (VISHANDLE)pv->vobj);
+	Evidence::Visual("register",hObj);
 
 	// link entry to end of list
 	pv->prev = vobjLast;

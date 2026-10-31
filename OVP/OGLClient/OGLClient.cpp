@@ -25,6 +25,7 @@
 #include "OGLCamera.h"
 #include "stb_image_write.h"
 #include "Renderer.h"
+#include "Evidence.h"
 #include "MaterialConversion.h"
 
 // ==============================================================
@@ -457,6 +458,7 @@ void OGLClient::clbkRenderScene ()
 //	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 //	CheckError("glClear");
 	mScene->Render();
+    Evidence::Frame();
 }
 
 /**
@@ -519,10 +521,7 @@ SURFHANDLE OGLClient::LoadTexture (const char *fname, int flags)
  */
 void OGLClient::clbkReleaseTexture (SURFHANDLE hTex)
 {
-	// We ignore the request for texture deallocation at this point,
-	// and leave it to the texture manager to perform cleanup operations.
-	// But it would be a good idea to decrement a reference count at
-	// this point.
+    if(hTex) static_cast<OGLTexture *>(hTex)->Release();
 }
 
 /**
@@ -985,6 +984,7 @@ SURFHANDLE OGLClient::CreateTexture (int w, int h)
  */
 bool OGLClient::clbkReleaseSurface (SURFHANDLE surf)
 {
+	if(!surf)return false;
 	((OGLTexture *)surf)->Release();
     return true;
 }
