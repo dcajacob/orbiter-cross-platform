@@ -9,6 +9,11 @@
 
 namespace orbiter { namespace portable {
 
+struct SimulationSnapshot {
+    PhysicsTraceSample vessel; // Finalized primary-relative state, SI units.
+    double primaryRadius;     // Primary is fixed at the snapshot origin.
+};
+
 // Internal fixed-primary, single unpowered-vessel session. Owns its time and
 // state; file streams close during Load and no platform services are required.
 class SimulationSession {
@@ -16,6 +21,7 @@ public:
     static SimulationSession Load(const std::filesystem::path &scenario, double fixedStep);
     void Step();
     PhysicsTraceSample ReadState() const;
+    SimulationSnapshot ReadSnapshot() const { return {ReadState(), primaryRadius}; }
     bool IsInputFile(const std::filesystem::path &path) const;
 
 private:

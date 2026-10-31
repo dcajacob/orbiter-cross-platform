@@ -1,0 +1,36 @@
+cmake_minimum_required(VERSION 3.19)
+if(CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
+    project(OrbiterNative LANGUAGES C CXX)
+    include(CTest)
+    set(ORBITER_PORTABLE_STANDALONE ON)
+endif()
+
+option(ORBITER_BUILD_VIEWER "Build the separate native OpenGL graphics client" OFF)
+set(ORBITER_REPOSITORY_ROOT "${CMAKE_CURRENT_LIST_DIR}/..")
+add_library(orbiter_portable_core STATIC
+    ../Src/Orbiter/Vecmat.cpp ../Src/Orbiter/Element.cpp
+    ../Src/Orbiter/TimeData.cpp ../Src/Orbiter/ConfigFile.cpp
+    ../Src/Orbiter/Portable/SimulationSession.cpp)
+target_include_directories(orbiter_portable_core PUBLIC
+    ../Src/Orbiter ../Src/Orbiter/Portable ../Orbitersdk/include)
+target_compile_features(orbiter_portable_core PUBLIC cxx_std_17)
+add_library(orbiter::core ALIAS orbiter_portable_core)
+add_executable(orbiter-headless ../Src/Orbiter/Portable/main.cpp)
+target_link_libraries(orbiter-headless PRIVATE orbiter::core)
+install(TARGETS orbiter-headless RUNTIME DESTINATION bin)
+install(FILES ../README.native.md DESTINATION share/orbiter)
+install(FILES ../LICENSE DESTINATION share/licenses/orbiter-native RENAME Orbiter.txt)
+install(DIRECTORY ../Tests/Portable/Fixtures/ DESTINATION share/orbiter/TwoBody)
+
+add_library(orbiter_client_state STATIC
+    ../Src/ClientNative/Controller.cpp ../Src/ClientNative/View.cpp)
+target_link_libraries(orbiter_client_state PUBLIC orbiter::core)
+target_include_directories(orbiter_client_state PUBLIC ../Src/ClientNative)
+
+if(ORBITER_BUILD_VIEWER)
+    enable_language(C)
+    add_subdirectory(../Src/ClientNative native-client)
+endif()
+if(ORBITER_PORTABLE_STANDALONE AND BUILD_TESTING)
+    add_subdirectory(../Tests/Portable tests)
+endif()

@@ -1,13 +1,9 @@
 cmake_minimum_required(VERSION 3.19)
 project(OrbiterPortableCore LANGUAGES CXX)
 enable_testing()
-add_library(orbiter_portable_core STATIC ../../Src/Orbiter/Vecmat.cpp
-    ../../Src/Orbiter/Element.cpp ../../Src/Orbiter/TimeData.cpp
-    ../../Src/Orbiter/ConfigFile.cpp ../../Src/Orbiter/Portable/SimulationSession.cpp)
-target_include_directories(orbiter_portable_core PUBLIC ../../Src/Orbiter ../../Orbitersdk/include)
-target_compile_features(orbiter_portable_core PUBLIC cxx_std_17)
-add_executable(orbiter-headless ../../Src/Orbiter/Portable/main.cpp)
-target_link_libraries(orbiter-headless PRIVATE orbiter_portable_core)
+if(NOT TARGET orbiter_portable_core)
+    add_subdirectory(../../Portable portable)
+endif()
 add_executable(vecmat_portability Vecmat.Portability.cpp)
 target_link_libraries(vecmat_portability PRIVATE orbiter_portable_core)
 add_test(NAME Vecmat.Portability COMMAND vecmat_portability)
@@ -63,3 +59,21 @@ add_test(NAME Headless.Errors COMMAND "${Python3_EXECUTABLE}" -B
 add_test(NAME PhysicsTrace.Validation
     COMMAND "${Python3_EXECUTABLE}" "${CMAKE_CURRENT_SOURCE_DIR}/test_trace_tools.py")
 set_tests_properties(PhysicsTrace.IO PhysicsTrace.Validation Headless.Errors Headless.ReferenceParity PROPERTIES TIMEOUT 30)
+
+add_executable(client_state_test ClientState.Test.cpp)
+target_link_libraries(client_state_test PRIVATE orbiter_client_state)
+add_test(NAME Client.State COMMAND client_state_test "${CMAKE_CURRENT_SOURCE_DIR}/Fixtures/TwoBody.scn")
+set_tests_properties(Client.State PROPERTIES TIMEOUT 30)
+
+option(ORBITER_GRAPHICS_TESTS "Run OpenGL smoke tests (requires a display/context)" OFF)
+if(ORBITER_GRAPHICS_TESTS)
+    if(NOT TARGET orbiter-native)
+        message(FATAL_ERROR "ORBITER_GRAPHICS_TESTS requires ORBITER_BUILD_VIEWER")
+    endif()
+    add_test(NAME Client.Graphics COMMAND "${Python3_EXECUTABLE}" -B
+        "${CMAKE_CURRENT_SOURCE_DIR}/test_native_client.py"
+        --binary $<TARGET_FILE:orbiter-native> --headless $<TARGET_FILE:orbiter-headless>
+        --fixture "${CMAKE_CURRENT_SOURCE_DIR}/Fixtures" --reference "${CMAKE_CURRENT_SOURCE_DIR}/Reference"
+        --output "${CMAKE_CURRENT_BINARY_DIR}/graphics" --backend x11)
+    set_tests_properties(Client.Graphics PROPERTIES TIMEOUT 180)
+endif()

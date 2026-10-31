@@ -6,6 +6,17 @@ cmake_minimum_required(VERSION 3.19)
 # Set the project name
 project (Orbiter VERSION 21.7.24)
 
+option(ORBITER_PORTABLE_ONLY "Build native portable components without Windows application services" OFF)
+if(ORBITER_PORTABLE_ONLY)
+    include(CTest)
+    add_subdirectory(Portable)
+    if(BUILD_TESTING)
+        add_subdirectory(Tests/Portable)
+    endif()
+    return()
+endif()
+
+
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED OFF)
 set(CMAKE_CXX_EXTENSIONS OFF)

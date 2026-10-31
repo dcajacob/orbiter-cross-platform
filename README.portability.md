@@ -1,5 +1,8 @@
 # Cross-platform Orbiter engine bootstrap
 
+The next implementation adds a [separate native graphical client](README.native.md).
+Its local Linux hardware/software checks pass; hosted acceptance is pending.
+
 **Milestone complete (2026-10-31): native headless Windows/Linux parity is
 verified.** The command-line runner advances the supported unpowered vessel for
 6,000 one-second steps and emits 601 finalized-state samples. All eight jobs in
