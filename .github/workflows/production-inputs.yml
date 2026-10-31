@@ -1,0 +1,49 @@
+name: Preserve Production Inputs
+
+on:
+  push:
+    branches: ['codex/production-**']
+    paths:
+      - '.github/workflows/production-inputs.yml'
+      - 'Tests/Production/input_release.py'
+      - 'Tests/Production/Licenses/INPUTS.md'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: production-inputs-v1
+  cancel-in-progress: false
+
+jobs:
+  preserve:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    env:
+      GH_TOKEN: ${{ github.token }}
+      GH_REPO: ${{ github.repository }}
+    steps:
+      - uses: actions/checkout@v7
+      - name: Prepare verified original packages and their notices
+        run: python3 -B Tests/Production/input_release.py --cache out/input-cache --output out/input-release
+      - name: Preserve versioned inputs without replacing an existing release
+        shell: bash
+        run: |
+          if gh release view production-inputs-v1 >/dev/null 2>&1; then
+            mkdir out/previous
+            gh release download production-inputs-v1 --pattern inputs.json --dir out/previous
+            cmp out/input-release/inputs.json out/previous/inputs.json
+          else
+            gh release create production-inputs-v1 out/input-release/* --target "$GITHUB_SHA" \
+              --title 'Production verification inputs v1' --prerelease \
+              --notes-file Tests/Production/Licenses/INPUTS.md
+          fi
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: production-input-manifest
+          path: |
+            out/input-release/inputs.json
+            out/input-release/*.json
+            out/input-release/*.md
