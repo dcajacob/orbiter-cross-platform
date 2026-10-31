@@ -1,7 +1,7 @@
 # Cross-platform Orbiter engine bootstrap
 
-**Current status (2026-10-30): native Debug/Release portable tests pass; Windows
-reference capture tooling and CI are prepared locally.** No native scenario
+**Current status (2026-10-31): portable tests pass on hosted Windows and Linux
+in Debug and Release; original Windows reference capture is running.** No native scenario
 runner or Windows reference has been produced yet. Physics extraction remains
 gated on a validated pre-refactor Windows capture. See
 [the portable milestone instructions](Tests/Portable/README.md) for commands,
@@ -306,3 +306,37 @@ before those changes. The authorized public publishing destination is now
 https://github.com/dcajacob/orbiter-cross-platform; official upstream is retained
 separately. Windows reference execution remains pending publication of this
 prepared code. No physics extraction or upstream integration has occurred.
+
+## Public hosting and hosted bootstrap verification (2026-10-31)
+
+Published https://github.com/dcajacob/orbiter-cross-platform with full upstream
+ancestry retained. `main` and `portability/native-core-bootstrap` initially point
+to `c2ce0f61db2cbac58e7281a87787c3faa2eaf365`; implementation commit
+`07936328` contains the prepared portable tests and original-app observer.
+The new repository's empty setup history was joined without force-pushing or
+changing upstream history. `origin` uses the user's authenticated GitHub SSH
+connection; `upstream` still identifies official Orbiter.
+
+Hosted run: https://github.com/dcajacob/orbiter-cross-platform/actions/runs/41175171274
+
+All four portable jobs passed: Ubuntu 24.04/GCC and Windows 2022/MSVC, x64 Debug
+and Release, **5/5 CTest targets per job**. Automatic Catch2 download was exercised
+successfully. The Windows Release collision suite reports **132535 assertions
+in 15 test cases**; assertion counts can differ from Linux because some checks
+depend on generated geometry. All cases pass on both platforms.
+
+The original Windows Debug/Release application builds and reference-capture
+jobs exposed an existing build dependency: LuaInterpreter unconditionally
+includes the D3D9Client-generated `gcCoreAPI.h`. The reference workflow now retains
+the upstream D3D9Client build setting; isolated reference runtimes do not load a
+graphics client. The application/reference jobs must be rerun with that setting.
+No reference has been frozen and no
+physics extraction has started. The original numerical-source hash check passes
+for all 13 recorded source files.
+
+With explicit user approval, the inherited **Nightly** and **Artifact Cleanup**
+workflows were disabled through repository settings. Their source files remain
+unchanged; validation artifacts retain the dedicated workflow's 14-day policy.
+The temporary manual history-import workflow was removed after GitHub's
+restricted job token could not publish inherited workflow files. Publication
+completed directly over SSH instead; no publishing automation remains installed.

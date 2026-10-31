@@ -4,7 +4,9 @@ Goal: run one unpowered vessel for 6,000 fixed one-second steps on native Linux
 and Windows, using shared original Orbiter propagation code, and compare 601
 samples against a frozen pre-refactor Windows reference.
 
-**Current stage: pre-refactor reference preparation.** The native scenario
+**Current stage: pre-refactor Windows reference capture.** Hosted portable tests
+pass on x64 Linux/GCC and Windows/MSVC in Debug and Release (five CTest targets
+per job). The native scenario
 runner and physics extraction are intentionally gated on a validated Windows
 reference. There is no frozen reference or native runner yet. Local tests of the
 trace tools use explicitly synthetic analytical inputs; these are never engine
@@ -34,8 +36,9 @@ The dedicated **Portable Core and Windows Reference** workflow builds the
 portable tests with GCC/Linux and MSVC/Windows, x64 Debug and Release. Its manual
 `capture_windows_reference` input additionally builds the original Windows
 application and existing tests, then captures reference candidates on Windows.
-Existing application workflows are unchanged. No workflow has been run remotely
-as part of this local implementation.
+Existing application workflow sources are unchanged. The initial hosted run is
+[41175171274](https://github.com/dcajacob/orbiter-cross-platform/actions/runs/41175171274),
+executing source commit `c2ce0f61db2cbac58e7281a87787c3faa2eaf365`.
 
 The capture job requires a clean committed checkout and verifies the numerical
 source files against upstream commit
@@ -49,7 +52,7 @@ For a Windows development environment with the normal upstream prerequisites:
 ```powershell
 cmake -S . -B out/reference-app -G Ninja -DCMAKE_BUILD_TYPE=Release `
   -DCMAKE_C_COMPILER=cl -DCMAKE_CXX_COMPILER=cl `
-  -DORBITER_BUILD_D3D9CLIENT=OFF -DORBITER_BUILD_XRSOUND=OFF `
+  -DORBITER_BUILD_D3D9CLIENT=ON -DORBITER_BUILD_XRSOUND=OFF `
   -DORBITER_MAKE_DOC=OFF -DORBITER_MAKE_TESTS=ON `
   -DORBITER_PORTABLE_REFERENCE_CAPTURE=ON "-DDXSDK_DIR:PATH=$env:DXSDK_DIR"
 cmake --build out/reference-app --parallel 2
@@ -60,8 +63,12 @@ python Tests/Portable/capture_windows_reference.py `
   --output out/reference-release-candidate --configuration Release
 ```
 
-Repeat from a separate Debug build and output directory. The workflow captures
-the build logs automatically. Hosted runs use the authorized public destination,
+Repeat from a separate Debug build and output directory. Build D3D9Client with
+the original application because LuaInterpreter
+unconditionally includes its generated `gcCoreAPI.h`. This is a build-time
+requirement of the existing Windows test graph; reference runtimes do not load
+a graphics-client plugin, and the native runner will not link graphics code.
+The workflow captures build logs automatically. Hosted runs use the authorized public destination,
 https://github.com/dcajacob/orbiter-cross-platform. The `upstream` remote retains
 official Orbiter; `origin` identifies this portability project.
 
