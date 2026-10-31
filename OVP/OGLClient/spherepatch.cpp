@@ -46,7 +46,6 @@ VBMESH::~VBMESH ()
 	if (nv) delete []vtx;
 	if (bbvtx) delete []bbvtx;
 	if (ni) delete []idx;
-	if (ib) delete ib;
 }
 
 void VBMESH::MapVertices ()

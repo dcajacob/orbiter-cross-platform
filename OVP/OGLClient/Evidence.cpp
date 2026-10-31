@@ -113,6 +113,9 @@ void Frame() {
                 struct OwnedMesh { MESHHANDLE value=nullptr;~OwnedMesh(){if(value)oapiDeleteMesh(value);} } owned;
                 auto mesh=v->GetMeshTemplate(j);const char *meshName=v->GetMeshName(j);
                 if(mesh && !meshName)meshName=g_client->GetMeshManager()->GetMeshName(mesh);
+                // Config-driven preloads bypass clbkStoreMeshPersistent, but the
+                // current engine retains their parser-assigned filename.
+                if(mesh && !meshName)meshName=oapiGetMeshFilename(mesh);
                 bool preloaded=mesh!=nullptr;
                 if(!mesh)mesh=owned.value=v->CopyMeshFromTemplate(j);
                 if(!mesh || !meshName)throw std::runtime_error("stock mesh identity is unavailable for "+name(h));

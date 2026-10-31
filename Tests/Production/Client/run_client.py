@@ -149,7 +149,7 @@ def main():
         (directory/'ogl-evidence.enabled').write_text('Stock Sol/ISS/ShuttlePB integration evidence\n')
         require((directory/'Modules/Plugin/OGLClient.dll').is_file(),'separately built OpenGL client missing')
         mesa_files(args.mesa.resolve(),directory)
-    provenance=dict(renderer_source=git('rev-parse','HEAD'),
+    provenance=dict(renderer_source=git('rev-parse','HEAD').decode().strip(),
                     application_source=json.loads((args.orbiter.parent/'test-runtime.json').read_text())['source_commit'],
                     data_profiles_sha256={name:digest(HERE.parent/name) for name in ('stock-data.lock.json','standard-planets.lock.json','mesa-ucrt64.lock.json')})
     reports=[];summary=dict(status='pending',config=args.configuration,provenance=provenance)
