@@ -11,6 +11,9 @@ on:
       - 'Tests/Production/SpiceCoverage.cpp'
       - 'Tests/Production/audit_spice.py'
       - '.github/workflows/production-data.yml'
+      - '.github/workflows/production-inputs.yml'
+      - 'Tests/Production/input_release.py'
+      - 'Tests/Production/Licenses/**'
   pull_request:
     paths:
       - 'Tests/Production/**'

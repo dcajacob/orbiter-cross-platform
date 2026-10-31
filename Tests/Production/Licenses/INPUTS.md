@@ -1,7 +1,8 @@
 # Preserved production inputs
 
 These packages are independent of this repository's MIT-licensed source.
-They are archived unchanged for this project's non-commercial verification.
+The 2016 package is archived unchanged for non-commercial verification. The
+current package is filtered to the audited data members, with notices retained.
 No package executable is used in place of the source-built application.
 
 * `Orbiter2016.zip`: publisher Martin Schweiger, Orbiter 2016 core ZIP edition.
@@ -16,11 +17,17 @@ No package executable is used in place of the source-built application.
   concatenate numbered parts in order and verify the complete SHA256 before
   extraction. This does not change any archive member. The tests take only the
   28 locked standard planet archives; they never take 2016 binaries/ephemerides.
-* `Orbiter-x64.zip`: the pinned orbitersim/orbiter package listed in
-  `stock-data.lock.json`. Its original MIT `LICENSE` and readme are included
-  separately and remain in the intact package. Third-party component notices
-  remain in that archive and the corresponding source. Do not infer that the
-  separate 2016 package has the same license.
+* `production-stock-data-v1.zip`: a deterministic, filtered data bundle from
+  the pinned `Orbiter-x64.zip` in `stock-data.lock.json`. All included member
+  bytes are unchanged. It excludes executables and **Architext**, whose FFC
+  license restricts publication without the author's permission. This bundle
+  must not be described as the complete original ZIP. It includes the original
+  MIT notice and readme and the font-specific notices for Cousine, Roboto,
+  Lekton and Font Awesome. The original complete-package hash and upstream
+  URL remain in the manifest for the already frozen references. The restricted
+  font is obtainable only through the original upstream distribution; we do
+  not publish it here. Future installed application packaging must resolve
+  that default font dependency before release.
 * SPICE: NASA/JPL/NAIF and the teams that produced the source data are credited.
   The Orbiter kernel is preserved without modification. The SPICE library is
   part of the Orbiter application, not offered here as a standalone toolkit

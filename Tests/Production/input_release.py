@@ -3,7 +3,8 @@
 
 The 2016 ZIP exceeds GitHub's per-asset limit. Its byte ranges are stored as
 parts; concatenating them recovers the exact original publisher archive.
-No DLL, kernel, asset, notice, or original ZIP member is edited.
+The current package is filtered to the consumed data with permitted redistribution;
+its restricted Architext font and executables are not mirrored.
 """
 import argparse
 import hashlib
@@ -35,7 +36,29 @@ def main():
             partial.replace(archive)
         require(archive.stat().st_size==lock['bytes'] and digest(archive)==lock['sha256'],'cached package differs from lock')
         record=dict(source=lock['url'],sha256=lock['sha256'],bytes=lock['bytes'],parts=[],notices=[])
-        if archive.stat().st_size<2**31:
+        if archive_name=='Orbiter-x64.zip':
+            # The upstream package contains Architext under a separate FFC license.
+            # Do not mirror that package or publish the font independently.
+            name='production-stock-data-v1.zip'
+            with zipfile.ZipFile(archive) as source,zipfile.ZipFile(args.output/name,'w',compression=zipfile.ZIP_DEFLATED,compresslevel=6) as target:
+                for member in lock['data_files']:
+                    if member=='Fonts/architext.regular.ttf':continue
+                    data=source.read(member)
+                    require(hashlib.sha256(data).hexdigest()==lock['data_files'][member]['sha256'],'data member differs from profile')
+                    info=zipfile.ZipInfo(member,(2026,10,31,0,0,0));info.compress_type=zipfile.ZIP_DEFLATED
+                    target.writestr(info,data)
+                for member in ('LICENSE','readme.txt'):
+                    info=zipfile.ZipInfo(member,(2026,10,31,0,0,0));info.compress_type=zipfile.ZIP_DEFLATED
+                    target.writestr(info,source.read(member))
+                for notice in ('Lekton - SIL License.txt','License-FA.txt'):
+                    info=zipfile.ZipInfo('Licenses/'+notice,(2026,10,31,0,0,0));info.compress_type=zipfile.ZIP_DEFLATED
+                    target.writestr(info,(HERE.parents[1]/'Extern/imgui'/notice).read_bytes())
+                for notice in ('Cousine-LICENSE.txt','Roboto-LICENSE.txt'):
+                    info=zipfile.ZipInfo('Licenses/'+notice,(2026,10,31,0,0,0));info.compress_type=zipfile.ZIP_DEFLATED
+                    target.writestr(info,(HERE/'Licenses'/notice).read_bytes())
+            record.update(distribution='filtered data only; no executables or Architext font',excluded=['Fonts/architext.regular.ttf'],
+                          mirrored_archive=dict(name=name,bytes=(args.output/name).stat().st_size,sha256=digest(args.output/name)))
+        elif archive.stat().st_size<2**31:
             shutil.copy2(archive,args.output/archive_name)
             record['parts'].append(dict(name=archive_name,bytes=lock['bytes'],sha256=lock['sha256']))
         else:
