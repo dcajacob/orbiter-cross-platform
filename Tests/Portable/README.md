@@ -1,5 +1,9 @@
 # Portable core and headless parity milestone
 
+A [separate native graphical client](../../README.native.md) now builds on this
+completed headless boundary. Its [acceptance evidence](ClientVerification/README.md)
+preserves the same frozen physics reference and numerical budgets.
+
 Goal: run one unpowered vessel for 6,000 fixed one-second steps on native Linux
 and Windows, using shared original Orbiter propagation code, and compare 601
 samples against a frozen pre-refactor Windows reference.

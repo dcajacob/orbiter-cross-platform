@@ -6,10 +6,28 @@ It runs in the same process as the core and reads copied state snapshots. It is
 an internal portable client, not an implementation of the Windows GraphicsClient
 plugin ABI. `orbiter-headless` retains no graphics dependency.
 
-Current validation: local Linux Debug and Release pass 10/10 suites, including
-the existing frozen-reference parity checks. Native Wayland hardware rendering
-on Intel/Mesa and X11 software rendering pass the graphical integration suite.
-Hosted Windows/Linux and existing Windows application checks are pending.
+**Milestone complete (2026-10-31).** All eight jobs passed in
+[hosted run 41181892596](https://github.com/dcajacob/orbiter-cross-platform/actions/runs/41181892596),
+testing source `53782b1bd0da3fb7b18e636a200f34d5270330e5`. Linux Debug/Release
+pass 10/10 suites including actual software-rendered graphics; Windows
+Debug/Release compile the client and pass 9/9 display-independent suites.
+Both full Windows application builds pass their existing Lua/collision suites
+and frozen-reference verification. Both cross-build comparison jobs pass.
+
+Local Debug/Release also pass 10/10 suites. Native Wayland and X11/XWayland
+hardware rendering pass on the laptop's Intel/Mesa GPU. The installed client
+passes normal real-time operation and all scripted controls. GUI CSVs match
+headless CSVs byte-for-byte; native numerical samples agree exactly across the
+four builds. The original Windows reference and acceptance budgets are unchanged.
+The downloaded Linux release bundle was extracted and run independently of the
+checkout, producing the same complete trace.
+
+[Complete evidence, screenshots, reports and bundles](Tests/Portable/ClientVerification/README.md)
+are preserved beyond GitHub's artifact retention period. Windows graphical
+runtime has not been exercised; its coverage is compilation/controller/numerical
+checks plus the existing Windows application's full tests.
+
+![Native orbit overview](Tests/Portable/ClientVerification/Overview.png)
 
 ## Build and run
 
@@ -111,7 +129,7 @@ LIBGL_ALWAYS_SOFTWARE=1 xvfb-run -a \
 The nine display-independent suites include all original parity checks plus
 controller/camera tests. They compare every one of 6,000 finalized states at
 30/60/144 Hz and irregular frame schedules, and verify pause, single-step,
-reset, retained catch-up, immutable display reads, coordinate handedness and
+reset, retained catch-up, clock restart after an hour-long OS stall, immutable display reads, coordinate handedness and
 small camera-relative offsets at planetary distances. The tenth suite runs the
 real renderer: repeated overview, scripted controls/reset/follow, and free spin.
 It compares CSV bytes with headless execution, checks the immutable Windows

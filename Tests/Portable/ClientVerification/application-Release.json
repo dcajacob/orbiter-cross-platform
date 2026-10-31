@@ -1,0 +1,78 @@
+{
+  "status": "passed",
+  "commit": "53782b1bd0da3fb7b18e636a200f34d5270330e5",
+  "configuration": "Release",
+  "binary_sha256": "a883c52963b2990f8ab10e8f7ca3eb95bf9482ae610b215bae09048f8024a82e",
+  "reference_commit": "1009ee2251931ec9e120047dc41d936c216b9ed0",
+  "cases": {
+    "orbit": {
+      "analytical": {
+        "position_m": 1.3123027900649334e-06,
+        "velocity_m_s": 1.4881277718371488e-09,
+        "orientation_rad": 0.0,
+        "angular_velocity_rad_s": 0.0,
+        "energy_relative": 6.8833827526759706e-15,
+        "momentum_relative": 3.4416913763379853e-15
+      },
+      "reference": {
+        "position_m": 0.0,
+        "velocity_m_s": 0.0,
+        "orientation_rad": 0.0,
+        "angular_velocity_rad_s": 0.0,
+        "mjd_days": 0.0
+      }
+    },
+    "orbit-half": {
+      "analytical": {
+        "position_m": 1.2411773373862428e-07,
+        "velocity_m_s": 9.757059838841204e-11,
+        "orientation_rad": 0.0,
+        "angular_velocity_rad_s": 0.0,
+        "energy_relative": 5.218048215738236e-15,
+        "momentum_relative": 2.4424906541753444e-15
+      },
+      "reference": {
+        "position_m": 0.0,
+        "velocity_m_s": 0.0,
+        "orientation_rad": 0.0,
+        "angular_velocity_rad_s": 0.0,
+        "mjd_days": 0.0
+      }
+    },
+    "spin": {
+      "analytical": {
+        "position_m": 1.3123027900649334e-06,
+        "velocity_m_s": 1.4881277718371488e-09,
+        "orientation_rad": 4.999946986498749e-10,
+        "angular_velocity_rad_s": 0.0,
+        "energy_relative": 6.8833827526759706e-15,
+        "momentum_relative": 3.4416913763379853e-15
+      },
+      "reference": {
+        "position_m": 0.0,
+        "velocity_m_s": 0.0,
+        "orientation_rad": 0.0,
+        "angular_velocity_rad_s": 0.0,
+        "mjd_days": 0.0
+      }
+    }
+  },
+  "convergence": {
+    "coarse": {
+      "position_m": 1.3123027900649334e-06,
+      "velocity_m_s": 1.4881277718371488e-09,
+      "orientation_rad": 0.0,
+      "angular_velocity_rad_s": 0.0,
+      "energy_relative": 6.8833827526759706e-15,
+      "momentum_relative": 3.4416913763379853e-15
+    },
+    "half_step": {
+      "position_m": 1.2411773373862428e-07,
+      "velocity_m_s": 9.757059838841204e-11,
+      "orientation_rad": 0.0,
+      "angular_velocity_rad_s": 0.0,
+      "energy_relative": 5.218048215738236e-15,
+      "momentum_relative": 2.4424906541753444e-15
+    }
+  }
+}

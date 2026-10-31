@@ -1,0 +1,295 @@
+{
+  "source_commit": "53782b1bd0da3fb7b18e636a200f34d5270330e5",
+  "local_date": "2026-10-31",
+  "compiler": "GCC 15.2.0",
+  "cmake": "4.2.3",
+  "builds": {
+    "Debug": "10/10 passed",
+    "Release": "10/10 passed"
+  },
+  "installed_binary_sha256": "501aaa0d07ebd487c606e330f676a34e809edd79334a14c69c72eae231d1bd02",
+  "backends": {
+    "wayland": {
+      "overview": {
+        "runtime": {
+          "status": "passed",
+          "backend": "wayland",
+          "driver": "Intel / Mesa Intel(R) Graphics (PTL) / 4.6 (Core Profile) Mesa 26.0.8-1ubuntu0.3",
+          "steps": 6000,
+          "frames": 60,
+          "script_events": 0,
+          "width": 1280,
+          "height": 800,
+          "gl_error": 0
+        },
+        "comparison": {
+          "position_m": 1.1175870895385742e-07,
+          "velocity_m_s": 8.866990313695243e-11,
+          "orientation_rad": 0.0,
+          "angular_velocity_rad_s": 0.0,
+          "mjd_days": 0.0
+        },
+        "analytical": {
+          "position_m": 1.4143184329290157e-06,
+          "velocity_m_s": 1.5482178103083438e-09,
+          "orientation_rad": 0.0,
+          "angular_velocity_rad_s": 0.0,
+          "energy_relative": 3.774758283725532e-15,
+          "momentum_relative": 1.887379141862766e-15
+        },
+        "image": {
+          "width": 1280,
+          "height": 800,
+          "primary_pixels": 210884,
+          "vessel_gold_pixels": 106,
+          "vessel_white_pixels": 36,
+          "png_sha256": "93e4fbc5ab1f124caa0d4b4f55531672ca1659e7cc21cb7e331bcc154dda1f7e"
+        },
+        "console": "Native backend: wayland\nOpenGL: Intel / Mesa Intel(R) Graphics (PTL) / 4.6 (Core Profile) Mesa 26.0.8-1ubuntu0.3\nCompleted 6000 fixed steps in 60 rendered frames.\n"
+      },
+      "overview-repeat": {
+        "runtime": {
+          "status": "passed",
+          "backend": "wayland",
+          "driver": "Intel / Mesa Intel(R) Graphics (PTL) / 4.6 (Core Profile) Mesa 26.0.8-1ubuntu0.3",
+          "steps": 6000,
+          "frames": 60,
+          "script_events": 0,
+          "width": 1280,
+          "height": 800,
+          "gl_error": 0
+        },
+        "comparison": {
+          "position_m": 1.1175870895385742e-07,
+          "velocity_m_s": 8.866990313695243e-11,
+          "orientation_rad": 0.0,
+          "angular_velocity_rad_s": 0.0,
+          "mjd_days": 0.0
+        },
+        "analytical": {
+          "position_m": 1.4143184329290157e-06,
+          "velocity_m_s": 1.5482178103083438e-09,
+          "orientation_rad": 0.0,
+          "angular_velocity_rad_s": 0.0,
+          "energy_relative": 3.774758283725532e-15,
+          "momentum_relative": 1.887379141862766e-15
+        },
+        "image": {
+          "width": 1280,
+          "height": 800,
+          "primary_pixels": 210884,
+          "vessel_gold_pixels": 106,
+          "vessel_white_pixels": 36,
+          "png_sha256": "93e4fbc5ab1f124caa0d4b4f55531672ca1659e7cc21cb7e331bcc154dda1f7e"
+        },
+        "console": "Native backend: wayland\nOpenGL: Intel / Mesa Intel(R) Graphics (PTL) / 4.6 (Core Profile) Mesa 26.0.8-1ubuntu0.3\nCompleted 6000 fixed steps in 60 rendered frames.\n"
+      },
+      "controls-follow": {
+        "runtime": {
+          "status": "passed",
+          "backend": "wayland",
+          "driver": "Intel / Mesa Intel(R) Graphics (PTL) / 4.6 (Core Profile) Mesa 26.0.8-1ubuntu0.3",
+          "steps": 6000,
+          "frames": 67,
+          "script_events": 8,
+          "width": 960,
+          "height": 600,
+          "gl_error": 0
+        },
+        "comparison": {
+          "position_m": 1.1175870895385742e-07,
+          "velocity_m_s": 8.866990313695243e-11,
+          "orientation_rad": 0.0,
+          "angular_velocity_rad_s": 0.0,
+          "mjd_days": 0.0
+        },
+        "analytical": {
+          "position_m": 1.4143184329290157e-06,
+          "velocity_m_s": 1.5482178103083438e-09,
+          "orientation_rad": 0.0,
+          "angular_velocity_rad_s": 0.0,
+          "energy_relative": 3.774758283725532e-15,
+          "momentum_relative": 1.887379141862766e-15
+        },
+        "image": {
+          "width": 960,
+          "height": 600,
+          "primary_pixels": 189440,
+          "vessel_gold_pixels": 4498,
+          "vessel_white_pixels": 1840,
+          "png_sha256": "f26ccfe8390f392ee462f259d37e3fdd7b36c9cd295da155e5a237ec654a1c88"
+        },
+        "console": "Native backend: wayland\nOpenGL: Intel / Mesa Intel(R) Graphics (PTL) / 4.6 (Core Profile) Mesa 26.0.8-1ubuntu0.3\nCompleted 6000 fixed steps in 67 rendered frames.\n"
+      },
+      "spin": {
+        "comparison": {
+          "position_m": 1.1175870895385742e-07,
+          "velocity_m_s": 8.866990313695243e-11,
+          "orientation_rad": 0.0,
+          "angular_velocity_rad_s": 0.0,
+          "mjd_days": 0.0
+        },
+        "analytical": {
+          "position_m": 1.4143184329290157e-06,
+          "velocity_m_s": 1.5482178103083438e-09,
+          "orientation_rad": 4.999946986498749e-10,
+          "angular_velocity_rad_s": 0.0,
+          "energy_relative": 3.774758283725532e-15,
+          "momentum_relative": 1.887379141862766e-15
+        },
+        "image": {
+          "width": 1280,
+          "height": 800,
+          "primary_pixels": 338530,
+          "vessel_gold_pixels": 13333,
+          "vessel_white_pixels": 2953,
+          "png_sha256": "5efd35b35c2b5e88c68ad363966646dd9ce0b65602f56500e929779c61a3ff53"
+        }
+      }
+    },
+    "x11": {
+      "overview": {
+        "runtime": {
+          "status": "passed",
+          "backend": "x11",
+          "driver": "Intel / Mesa Intel(R) Graphics (PTL) / 4.6 (Core Profile) Mesa 26.0.8-1ubuntu0.3",
+          "steps": 6000,
+          "frames": 60,
+          "script_events": 0,
+          "width": 1280,
+          "height": 800,
+          "gl_error": 0
+        },
+        "comparison": {
+          "position_m": 1.1175870895385742e-07,
+          "velocity_m_s": 8.866990313695243e-11,
+          "orientation_rad": 0.0,
+          "angular_velocity_rad_s": 0.0,
+          "mjd_days": 0.0
+        },
+        "analytical": {
+          "position_m": 1.4143184329290157e-06,
+          "velocity_m_s": 1.5482178103083438e-09,
+          "orientation_rad": 0.0,
+          "angular_velocity_rad_s": 0.0,
+          "energy_relative": 3.774758283725532e-15,
+          "momentum_relative": 1.887379141862766e-15
+        },
+        "image": {
+          "width": 1280,
+          "height": 800,
+          "primary_pixels": 210884,
+          "vessel_gold_pixels": 106,
+          "vessel_white_pixels": 36,
+          "png_sha256": "93e4fbc5ab1f124caa0d4b4f55531672ca1659e7cc21cb7e331bcc154dda1f7e"
+        },
+        "console": "Native backend: x11\nOpenGL: Intel / Mesa Intel(R) Graphics (PTL) / 4.6 (Core Profile) Mesa 26.0.8-1ubuntu0.3\nCompleted 6000 fixed steps in 60 rendered frames.\n"
+      },
+      "overview-repeat": {
+        "runtime": {
+          "status": "passed",
+          "backend": "x11",
+          "driver": "Intel / Mesa Intel(R) Graphics (PTL) / 4.6 (Core Profile) Mesa 26.0.8-1ubuntu0.3",
+          "steps": 6000,
+          "frames": 60,
+          "script_events": 0,
+          "width": 1280,
+          "height": 800,
+          "gl_error": 0
+        },
+        "comparison": {
+          "position_m": 1.1175870895385742e-07,
+          "velocity_m_s": 8.866990313695243e-11,
+          "orientation_rad": 0.0,
+          "angular_velocity_rad_s": 0.0,
+          "mjd_days": 0.0
+        },
+        "analytical": {
+          "position_m": 1.4143184329290157e-06,
+          "velocity_m_s": 1.5482178103083438e-09,
+          "orientation_rad": 0.0,
+          "angular_velocity_rad_s": 0.0,
+          "energy_relative": 3.774758283725532e-15,
+          "momentum_relative": 1.887379141862766e-15
+        },
+        "image": {
+          "width": 1280,
+          "height": 800,
+          "primary_pixels": 210884,
+          "vessel_gold_pixels": 106,
+          "vessel_white_pixels": 36,
+          "png_sha256": "93e4fbc5ab1f124caa0d4b4f55531672ca1659e7cc21cb7e331bcc154dda1f7e"
+        },
+        "console": "Native backend: x11\nOpenGL: Intel / Mesa Intel(R) Graphics (PTL) / 4.6 (Core Profile) Mesa 26.0.8-1ubuntu0.3\nCompleted 6000 fixed steps in 60 rendered frames.\n"
+      },
+      "controls-follow": {
+        "runtime": {
+          "status": "passed",
+          "backend": "x11",
+          "driver": "Intel / Mesa Intel(R) Graphics (PTL) / 4.6 (Core Profile) Mesa 26.0.8-1ubuntu0.3",
+          "steps": 6000,
+          "frames": 67,
+          "script_events": 8,
+          "width": 960,
+          "height": 600,
+          "gl_error": 0
+        },
+        "comparison": {
+          "position_m": 1.1175870895385742e-07,
+          "velocity_m_s": 8.866990313695243e-11,
+          "orientation_rad": 0.0,
+          "angular_velocity_rad_s": 0.0,
+          "mjd_days": 0.0
+        },
+        "analytical": {
+          "position_m": 1.4143184329290157e-06,
+          "velocity_m_s": 1.5482178103083438e-09,
+          "orientation_rad": 0.0,
+          "angular_velocity_rad_s": 0.0,
+          "energy_relative": 3.774758283725532e-15,
+          "momentum_relative": 1.887379141862766e-15
+        },
+        "image": {
+          "width": 960,
+          "height": 600,
+          "primary_pixels": 189440,
+          "vessel_gold_pixels": 4498,
+          "vessel_white_pixels": 1840,
+          "png_sha256": "f26ccfe8390f392ee462f259d37e3fdd7b36c9cd295da155e5a237ec654a1c88"
+        },
+        "console": "Native backend: x11\nOpenGL: Intel / Mesa Intel(R) Graphics (PTL) / 4.6 (Core Profile) Mesa 26.0.8-1ubuntu0.3\nCompleted 6000 fixed steps in 67 rendered frames.\n"
+      },
+      "spin": {
+        "comparison": {
+          "position_m": 1.1175870895385742e-07,
+          "velocity_m_s": 8.866990313695243e-11,
+          "orientation_rad": 0.0,
+          "angular_velocity_rad_s": 0.0,
+          "mjd_days": 0.0
+        },
+        "analytical": {
+          "position_m": 1.4143184329290157e-06,
+          "velocity_m_s": 1.5482178103083438e-09,
+          "orientation_rad": 4.999946986498749e-10,
+          "angular_velocity_rad_s": 0.0,
+          "energy_relative": 3.774758283725532e-15,
+          "momentum_relative": 1.887379141862766e-15
+        },
+        "image": {
+          "width": 1280,
+          "height": 800,
+          "primary_pixels": 338530,
+          "vessel_gold_pixels": 13333,
+          "vessel_white_pixels": 2953,
+          "png_sha256": "5efd35b35c2b5e88c68ad363966646dd9ce0b65602f56500e929779c61a3ff53"
+        }
+      }
+    }
+  },
+  "evidence_archive": {
+    "path": "Evidence/local-linux.zip",
+    "sha256": "b339ceaa8dd62b2e7dbe94a6b432eb0227ae686e69325164300ff6226b442f68"
+  },
+  "headless_only": "viewer disabled, no display or graphics dependency; 6000-step CSV identical",
+  "real_time": "3 one-second steps; finalized CSV identical to headless"
+}

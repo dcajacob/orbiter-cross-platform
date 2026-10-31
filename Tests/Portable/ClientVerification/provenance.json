@@ -1,0 +1,937 @@
+{
+  "status": "accepted",
+  "accepted_date": "2026-10-31",
+  "run_id": 41181892596,
+  "run_url": "https://github.com/dcajacob/orbiter-cross-platform/actions/runs/41181892596",
+  "tested_commit": "53782b1bd0da3fb7b18e636a200f34d5270330e5",
+  "original_reference_acceptance_commit": "874d6caa",
+  "scope": "Separate native graphics client using the unchanged fixed-primary Orbiter simulation core",
+  "jobs": [
+    {
+      "id": 124480825704,
+      "name": "Portable ubuntu-24.04 Release x64",
+      "status": "completed",
+      "conclusion": "success",
+      "run_id": 41181892596,
+      "logs_url": null,
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 1
+        },
+        {
+          "name": "Run actions/checkout@v7",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 2
+        },
+        {
+          "name": "Set up MSVC x64",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 3
+        },
+        {
+          "name": "Install Linux graphics build and software-rendering dependencies",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 4
+        },
+        {
+          "name": "Configure",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 5
+        },
+        {
+          "name": "Build",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 6
+        },
+        {
+          "name": "Test",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 7
+        },
+        {
+          "name": "Install standalone bundle",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 8
+        },
+        {
+          "name": "Check installed Linux executable outside the checkout",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 9
+        },
+        {
+          "name": "Package standalone bundle with executable permissions",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 10
+        },
+        {
+          "name": "Save native client bundle",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 11
+        },
+        {
+          "name": "Save build and test evidence",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 12
+        },
+        {
+          "name": "Post Run actions/checkout@v7",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 24
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 25
+        }
+      ]
+    },
+    {
+      "id": 124480825820,
+      "name": "Portable windows-2022 Debug x64",
+      "status": "completed",
+      "conclusion": "success",
+      "run_id": 41181892596,
+      "logs_url": null,
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 1
+        },
+        {
+          "name": "Run actions/checkout@v7",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 2
+        },
+        {
+          "name": "Set up MSVC x64",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 3
+        },
+        {
+          "name": "Install Linux graphics build and software-rendering dependencies",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 4
+        },
+        {
+          "name": "Configure",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 5
+        },
+        {
+          "name": "Build",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 6
+        },
+        {
+          "name": "Test",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 7
+        },
+        {
+          "name": "Install standalone bundle",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 8
+        },
+        {
+          "name": "Check installed Linux executable outside the checkout",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 9
+        },
+        {
+          "name": "Package standalone bundle with executable permissions",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 10
+        },
+        {
+          "name": "Save native client bundle",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 11
+        },
+        {
+          "name": "Save build and test evidence",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 12
+        },
+        {
+          "name": "Post Run actions/checkout@v7",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 24
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 25
+        }
+      ]
+    },
+    {
+      "id": 124480825846,
+      "name": "Portable ubuntu-24.04 Debug x64",
+      "status": "completed",
+      "conclusion": "success",
+      "run_id": 41181892596,
+      "logs_url": null,
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 1
+        },
+        {
+          "name": "Run actions/checkout@v7",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 2
+        },
+        {
+          "name": "Set up MSVC x64",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 3
+        },
+        {
+          "name": "Install Linux graphics build and software-rendering dependencies",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 4
+        },
+        {
+          "name": "Configure",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 5
+        },
+        {
+          "name": "Build",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 6
+        },
+        {
+          "name": "Test",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 7
+        },
+        {
+          "name": "Install standalone bundle",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 8
+        },
+        {
+          "name": "Check installed Linux executable outside the checkout",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 9
+        },
+        {
+          "name": "Package standalone bundle with executable permissions",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 10
+        },
+        {
+          "name": "Save native client bundle",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 11
+        },
+        {
+          "name": "Save build and test evidence",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 12
+        },
+        {
+          "name": "Post Run actions/checkout@v7",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 24
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 25
+        }
+      ]
+    },
+    {
+      "id": 124480825851,
+      "name": "Portable windows-2022 Release x64",
+      "status": "completed",
+      "conclusion": "success",
+      "run_id": 41181892596,
+      "logs_url": null,
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 1
+        },
+        {
+          "name": "Run actions/checkout@v7",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 2
+        },
+        {
+          "name": "Set up MSVC x64",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 3
+        },
+        {
+          "name": "Install Linux graphics build and software-rendering dependencies",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 4
+        },
+        {
+          "name": "Configure",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 5
+        },
+        {
+          "name": "Build",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 6
+        },
+        {
+          "name": "Test",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 7
+        },
+        {
+          "name": "Install standalone bundle",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 8
+        },
+        {
+          "name": "Check installed Linux executable outside the checkout",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 9
+        },
+        {
+          "name": "Package standalone bundle with executable permissions",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 10
+        },
+        {
+          "name": "Save native client bundle",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 11
+        },
+        {
+          "name": "Save build and test evidence",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 12
+        },
+        {
+          "name": "Post Run actions/checkout@v7",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 24
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 25
+        }
+      ]
+    },
+    {
+      "id": 124481123471,
+      "name": "Windows application Debug frozen-reference verification",
+      "status": "completed",
+      "conclusion": "success",
+      "run_id": 41181892596,
+      "logs_url": null,
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 1
+        },
+        {
+          "name": "Run actions/checkout@v7",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 2
+        },
+        {
+          "name": "Run ilammy/msvc-dev-cmd@v1",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 3
+        },
+        {
+          "name": "Cache DirectX SDK",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 4
+        },
+        {
+          "name": "Download existing Windows build dependency",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 5
+        },
+        {
+          "name": "Record compiler and build environment",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 6
+        },
+        {
+          "name": "Configure Windows application",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 7
+        },
+        {
+          "name": "Build Windows application and existing tests",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 8
+        },
+        {
+          "name": "Run existing application tests",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 9
+        },
+        {
+          "name": "Verify application against immutable original traces",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 10
+        },
+        {
+          "name": "Save application traces and build evidence, including failures",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 11
+        },
+        {
+          "name": "Post Cache DirectX SDK",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 21
+        },
+        {
+          "name": "Post Run actions/checkout@v7",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 22
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 23
+        }
+      ]
+    },
+    {
+      "id": 124481123500,
+      "name": "Compare native Windows/Linux Debug/Release traces",
+      "status": "completed",
+      "conclusion": "success",
+      "run_id": 41181892596,
+      "logs_url": null,
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 1
+        },
+        {
+          "name": "Run actions/checkout@v7",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 2
+        },
+        {
+          "name": "Run actions/download-artifact@v8",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 3
+        },
+        {
+          "name": "Verify cross-platform parity with frozen original engine",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 4
+        },
+        {
+          "name": "Save cross-platform comparison",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 5
+        },
+        {
+          "name": "Post Run actions/checkout@v7",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 10
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 11
+        }
+      ]
+    },
+    {
+      "id": 124481123542,
+      "name": "Windows application Release frozen-reference verification",
+      "status": "completed",
+      "conclusion": "success",
+      "run_id": 41181892596,
+      "logs_url": null,
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 1
+        },
+        {
+          "name": "Run actions/checkout@v7",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 2
+        },
+        {
+          "name": "Run ilammy/msvc-dev-cmd@v1",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 3
+        },
+        {
+          "name": "Cache DirectX SDK",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 4
+        },
+        {
+          "name": "Download existing Windows build dependency",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 5
+        },
+        {
+          "name": "Record compiler and build environment",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 6
+        },
+        {
+          "name": "Configure Windows application",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 7
+        },
+        {
+          "name": "Build Windows application and existing tests",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 8
+        },
+        {
+          "name": "Run existing application tests",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 9
+        },
+        {
+          "name": "Verify application against immutable original traces",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 10
+        },
+        {
+          "name": "Save application traces and build evidence, including failures",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 11
+        },
+        {
+          "name": "Post Cache DirectX SDK",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 21
+        },
+        {
+          "name": "Post Run actions/checkout@v7",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 22
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 23
+        }
+      ]
+    },
+    {
+      "id": 124482394915,
+      "name": "Compare Windows application Debug and Release traces",
+      "status": "completed",
+      "conclusion": "success",
+      "run_id": 41181892596,
+      "logs_url": null,
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 1
+        },
+        {
+          "name": "Run actions/checkout@v7",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 2
+        },
+        {
+          "name": "Run actions/download-artifact@v8",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 3
+        },
+        {
+          "name": "Run actions/download-artifact@v8",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 4
+        },
+        {
+          "name": "Compare orbit and free-spin traces",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 5
+        },
+        {
+          "name": "Save comparison report",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 6
+        },
+        {
+          "name": "Post Run actions/checkout@v7",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 12
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 13
+        }
+      ]
+    }
+  ],
+  "artifacts": [
+    {
+      "id": 13035726053,
+      "name": "native-parity-comparison",
+      "size_in_bytes": 683,
+      "url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/actions/artifacts/13035726053",
+      "archive_download_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/actions/artifacts/13035726053/zip",
+      "expired": false,
+      "created_at": "2026-10-31T07:48:04Z",
+      "expires_at": "2026-11-14T07:48:03Z",
+      "updated_at": "2026-10-31T07:48:04Z",
+      "digest": "sha256:78b1c5a5d995b76753d343061f281771737d1b1dcb4c8c69edd4f266f6061efc",
+      "workflow_run": {
+        "id": 41181892596,
+        "repository_id": 1440551273,
+        "head_repository_id": 1440551273,
+        "head_branch": "codex/native-graphics-client",
+        "head_sha": "53782b1bd0da3fb7b18e636a200f34d5270330e5"
+      }
+    },
+    {
+      "id": 13035551981,
+      "name": "orbiter-native-windows-2022-Debug-x64",
+      "size_in_bytes": 514346,
+      "url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/actions/artifacts/13035551981",
+      "archive_download_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/actions/artifacts/13035551981/zip",
+      "expired": false,
+      "created_at": "2026-10-31T07:47:38Z",
+      "expires_at": "2026-11-14T07:47:37Z",
+      "updated_at": "2026-10-31T07:47:38Z",
+      "digest": "sha256:e29656575ae7a418126b9449e3f3e2e09e23b0895b9360658d83c3f5059b7098",
+      "workflow_run": {
+        "id": 41181892596,
+        "repository_id": 1440551273,
+        "head_repository_id": 1440551273,
+        "head_branch": "codex/native-graphics-client",
+        "head_sha": "53782b1bd0da3fb7b18e636a200f34d5270330e5"
+      }
+    },
+    {
+      "id": 13035482801,
+      "name": "windows-application-comparison",
+      "size_in_bytes": 738,
+      "url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/actions/artifacts/13035482801",
+      "archive_download_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/actions/artifacts/13035482801/zip",
+      "expired": false,
+      "created_at": "2026-10-31T07:54:45Z",
+      "expires_at": "2026-11-14T07:54:44Z",
+      "updated_at": "2026-10-31T07:54:45Z",
+      "digest": "sha256:c7aa7aefc7fabff520dc87eb7c9836c0f2b3e10838c5f8b4d03c63079da63383",
+      "workflow_run": {
+        "id": 41181892596,
+        "repository_id": 1440551273,
+        "head_repository_id": 1440551273,
+        "head_branch": "codex/native-graphics-client",
+        "head_sha": "53782b1bd0da3fb7b18e636a200f34d5270330e5"
+      }
+    },
+    {
+      "id": 13035347313,
+      "name": "portable-windows-2022-Debug-x64",
+      "size_in_bytes": 222184,
+      "url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/actions/artifacts/13035347313",
+      "archive_download_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/actions/artifacts/13035347313/zip",
+      "expired": false,
+      "created_at": "2026-10-31T07:47:39Z",
+      "expires_at": "2026-11-14T07:47:38Z",
+      "updated_at": "2026-10-31T07:47:39Z",
+      "digest": "sha256:abfd920465c8be324b2278dbdab1cf8fd035af78c5f35f16c59075592449f97a",
+      "workflow_run": {
+        "id": 41181892596,
+        "repository_id": 1440551273,
+        "head_repository_id": 1440551273,
+        "head_branch": "codex/native-graphics-client",
+        "head_sha": "53782b1bd0da3fb7b18e636a200f34d5270330e5"
+      }
+    },
+    {
+      "id": 13035313085,
+      "name": "windows-application-Debug-x64",
+      "size_in_bytes": 280644,
+      "url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/actions/artifacts/13035313085",
+      "archive_download_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/actions/artifacts/13035313085/zip",
+      "expired": false,
+      "created_at": "2026-10-31T07:53:12Z",
+      "expires_at": "2026-11-14T07:53:12Z",
+      "updated_at": "2026-10-31T07:53:12Z",
+      "digest": "sha256:0af993f48a15eb721c12e0644ac35e0b22cfcdb23f65821ba9fff399b9220c4f",
+      "workflow_run": {
+        "id": 41181892596,
+        "repository_id": 1440551273,
+        "head_repository_id": 1440551273,
+        "head_branch": "codex/native-graphics-client",
+        "head_sha": "53782b1bd0da3fb7b18e636a200f34d5270330e5"
+      }
+    },
+    {
+      "id": 13035268234,
+      "name": "windows-application-Release-x64",
+      "size_in_bytes": 280411,
+      "url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/actions/artifacts/13035268234",
+      "archive_download_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/actions/artifacts/13035268234/zip",
+      "expired": false,
+      "created_at": "2026-10-31T07:54:21Z",
+      "expires_at": "2026-11-14T07:54:20Z",
+      "updated_at": "2026-10-31T07:54:21Z",
+      "digest": "sha256:26144bc2780afe85375bbb407e40f0e2273d252180fe2385e24270f2e2b75ada",
+      "workflow_run": {
+        "id": 41181892596,
+        "repository_id": 1440551273,
+        "head_repository_id": 1440551273,
+        "head_branch": "codex/native-graphics-client",
+        "head_sha": "53782b1bd0da3fb7b18e636a200f34d5270330e5"
+      }
+    },
+    {
+      "id": 13035152736,
+      "name": "portable-ubuntu-24.04-Debug-x64",
+      "size_in_bytes": 580193,
+      "url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/actions/artifacts/13035152736",
+      "archive_download_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/actions/artifacts/13035152736/zip",
+      "expired": false,
+      "created_at": "2026-10-31T07:47:28Z",
+      "expires_at": "2026-11-14T07:47:27Z",
+      "updated_at": "2026-10-31T07:47:28Z",
+      "digest": "sha256:1e0b38d99bb12ee2be8873d82db4063597f09708b4ff26ab88f84dc36ddc484a",
+      "workflow_run": {
+        "id": 41181892596,
+        "repository_id": 1440551273,
+        "head_repository_id": 1440551273,
+        "head_branch": "codex/native-graphics-client",
+        "head_sha": "53782b1bd0da3fb7b18e636a200f34d5270330e5"
+      }
+    },
+    {
+      "id": 13035078084,
+      "name": "orbiter-native-ubuntu-24.04-Debug-x64",
+      "size_in_bytes": 1686156,
+      "url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/actions/artifacts/13035078084",
+      "archive_download_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/actions/artifacts/13035078084/zip",
+      "expired": false,
+      "created_at": "2026-10-31T07:47:26Z",
+      "expires_at": "2026-11-14T07:47:25Z",
+      "updated_at": "2026-10-31T07:47:26Z",
+      "digest": "sha256:0189798c5eaead25a10f15ba0dc10d3910aba461f9e44f534255cbbe4fddeb2c",
+      "workflow_run": {
+        "id": 41181892596,
+        "repository_id": 1440551273,
+        "head_repository_id": 1440551273,
+        "head_branch": "codex/native-graphics-client",
+        "head_sha": "53782b1bd0da3fb7b18e636a200f34d5270330e5"
+      }
+    },
+    {
+      "id": 13035047445,
+      "name": "portable-windows-2022-Release-x64",
+      "size_in_bytes": 222169,
+      "url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/actions/artifacts/13035047445",
+      "archive_download_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/actions/artifacts/13035047445/zip",
+      "expired": false,
+      "created_at": "2026-10-31T07:47:21Z",
+      "expires_at": "2026-11-14T07:47:20Z",
+      "updated_at": "2026-10-31T07:47:21Z",
+      "digest": "sha256:1bfabd203d7f0a957b7be91908a9863e11d2fa88116984e0d9b05042915f3f70",
+      "workflow_run": {
+        "id": 41181892596,
+        "repository_id": 1440551273,
+        "head_repository_id": 1440551273,
+        "head_branch": "codex/native-graphics-client",
+        "head_sha": "53782b1bd0da3fb7b18e636a200f34d5270330e5"
+      }
+    },
+    {
+      "id": 13035012859,
+      "name": "portable-ubuntu-24.04-Release-x64",
+      "size_in_bytes": 580199,
+      "url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/actions/artifacts/13035012859",
+      "archive_download_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/actions/artifacts/13035012859/zip",
+      "expired": false,
+      "created_at": "2026-10-31T07:47:05Z",
+      "expires_at": "2026-11-14T07:47:04Z",
+      "updated_at": "2026-10-31T07:47:05Z",
+      "digest": "sha256:905096a13f67f62d59212124de31a00e7dd03d371fa257fc556a6349c9de5280",
+      "workflow_run": {
+        "id": 41181892596,
+        "repository_id": 1440551273,
+        "head_repository_id": 1440551273,
+        "head_branch": "codex/native-graphics-client",
+        "head_sha": "53782b1bd0da3fb7b18e636a200f34d5270330e5"
+      }
+    },
+    {
+      "id": 13034758394,
+      "name": "orbiter-native-ubuntu-24.04-Release-x64",
+      "size_in_bytes": 344128,
+      "url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/actions/artifacts/13034758394",
+      "archive_download_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/actions/artifacts/13034758394/zip",
+      "expired": false,
+      "created_at": "2026-10-31T07:47:04Z",
+      "expires_at": "2026-11-14T07:47:03Z",
+      "updated_at": "2026-10-31T07:47:04Z",
+      "digest": "sha256:3363e9a32fa9105f35b2c146661df083d23b170f1b2209a82a0d2341dfce62e3",
+      "workflow_run": {
+        "id": 41181892596,
+        "repository_id": 1440551273,
+        "head_repository_id": 1440551273,
+        "head_branch": "codex/native-graphics-client",
+        "head_sha": "53782b1bd0da3fb7b18e636a200f34d5270330e5"
+      }
+    },
+    {
+      "id": 13034693548,
+      "name": "orbiter-native-windows-2022-Release-x64",
+      "size_in_bytes": 230959,
+      "url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/actions/artifacts/13034693548",
+      "archive_download_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/actions/artifacts/13034693548/zip",
+      "expired": false,
+      "created_at": "2026-10-31T07:47:20Z",
+      "expires_at": "2026-11-14T07:47:19Z",
+      "updated_at": "2026-10-31T07:47:20Z",
+      "digest": "sha256:8b90e03c9a22c549cf9f923a03ce05cda09430030766e983a91a8804ff124db4",
+      "workflow_run": {
+        "id": 41181892596,
+        "repository_id": 1440551273,
+        "head_repository_id": 1440551273,
+        "head_branch": "codex/native-graphics-client",
+        "head_sha": "53782b1bd0da3fb7b18e636a200f34d5270330e5"
+      }
+    }
+  ],
+  "workflow_job_logs": {
+    "path": "Evidence/workflow-job-logs.zip",
+    "sha256": "f6a6121dac174f031a1f251933f187c4a4861532ca5ec63e7b0b314cd3d2bd3a",
+    "format": "UTF-8 decoded GitHub job logs with LF line endings",
+    "jobs": 8
+  },
+  "downloaded_release_bundle_check": {
+    "status": "passed",
+    "platform": "Linux x64",
+    "mode": "Extracted hosted tar bundle outside checkout; executed 6000 rendered fixed steps; CSV identical to local headless",
+    "runtime": {
+      "status": "passed",
+      "backend": "x11",
+      "driver": "Mesa / llvmpipe (LLVM 21.1.8, 256 bits) / 4.5 (Core Profile) Mesa 26.0.8-1ubuntu0.3",
+      "steps": 6000,
+      "frames": 60,
+      "script_events": 0,
+      "width": 1280,
+      "height": 800,
+      "gl_error": 0
+    }
+  }
+}

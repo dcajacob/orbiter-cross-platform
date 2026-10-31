@@ -1,7 +1,11 @@
 # Cross-platform Orbiter engine bootstrap
 
-The next implementation adds a [separate native graphical client](README.native.md).
-Its local Linux hardware/software checks pass; hosted acceptance is pending.
+The [separate native graphical client](README.native.md) milestone is complete.
+[Hosted acceptance](https://github.com/dcajacob/orbiter-cross-platform/actions/runs/41181892596)
+passes Linux graphics tests, Windows frontend builds, and both existing Windows
+application builds/tests/reference checks. Native Wayland and X11/XWayland hardware
+runs pass locally. Build/run commands and installable bundles are documented in
+`README.native.md`; the earlier headless milestone and its evidence remain intact.
 
 **Milestone complete (2026-10-31): native headless Windows/Linux parity is
 verified.** The command-line runner advances the supported unpowered vessel for
