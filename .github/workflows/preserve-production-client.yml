@@ -14,7 +14,7 @@ permissions:
   actions: read
 
 concurrency:
-  group: accepted-windows-client-v1
+  group: accepted-windows-client-v2
   cancel-in-progress: false
 
 jobs:
@@ -27,18 +27,26 @@ jobs:
       GH_REPO: ${{ github.repository }}
     steps:
       - uses: actions/checkout@v7
+      - name: Verify canonical evidence bytes before publication
+        run: python3 -B Tests/Production/frozen_client.py
+      - name: Withdraw the superseded archive index
+        run: |
+          if gh release view production-windows-client-v1 >/dev/null 2>&1; then
+            release_id=$(gh api "repos/$GH_REPO/releases/tags/production-windows-client-v1" --jq .id)
+            gh api --method PATCH "repos/$GH_REPO/releases/$release_id" -F draft=true --silent
+          fi
       - name: Check and download explicitly accepted original evidence
         run: python3 -B Tests/Production/preserve_client.py --output out/client-preserved
       - name: Preserve the accepted component and evidence without replacing a release
         run: |
-          if gh release view production-windows-client-v1 >/dev/null 2>&1; then
+          if gh release view production-windows-client-v2 >/dev/null 2>&1; then
             mkdir out/previous
-            gh release download production-windows-client-v1 --pattern provenance.json --dir out/previous
+            gh release download production-windows-client-v2 --pattern provenance.json --dir out/previous
             cmp out/client-preserved/provenance.json out/previous/provenance.json
           else
-            gh release create production-windows-client-v1 out/client-preserved/* \
+            gh release create production-windows-client-v2 out/client-preserved/* \
               --target "$GITHUB_SHA" --prerelease \
-              --title 'Real Windows OpenGL client integration v1' \
+              --title 'Real Windows OpenGL client integration v2' \
               --notes-file Tests/Production/ClientReference/README.md
           fi
       - uses: actions/upload-artifact@v7

@@ -8,3 +8,6 @@ Tests/Production/*.json text eol=lf
 
 # Preserve the legacy mixed newline bytes around observation-only test hooks.
 Src/Orbiter/Vessel.cpp -text whitespace=cr-at-eol
+
+# Accepted client evidence retains the exact original Windows artifact bytes.
+Tests/Production/ClientReference/** -text whitespace=cr-at-eol

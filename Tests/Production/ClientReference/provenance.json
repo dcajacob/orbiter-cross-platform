@@ -397,7 +397,7 @@
         "out/production-app/Modules/OGLClient/VesselShadow.fs": "364b5d72032cf871b4bf6df7d0276b0f0892e2650a04a595a5ab75703d425da0",
         "out/production-app/Modules/OGLClient/VesselShadow.vs": "48bb3fb2e6f9d53a60d11959b4d0a579dee64d6b8f5b83f2effba64ee9c2c943"
       },
-      "release_url": "https://github.com/dcajacob/orbiter-cross-platform/releases/download/production-windows-client-v1/real-client-Debug.zip"
+      "release_url": "https://github.com/dcajacob/orbiter-cross-platform/releases/download/production-windows-client-v2/real-client-Debug.zip"
     },
     "Release": {
       "id": 13041683817,
@@ -626,7 +626,7 @@
         "out/production-app/Modules/OGLClient/VesselShadow.fs": "364b5d72032cf871b4bf6df7d0276b0f0892e2650a04a595a5ab75703d425da0",
         "out/production-app/Modules/OGLClient/VesselShadow.vs": "48bb3fb2e6f9d53a60d11959b4d0a579dee64d6b8f5b83f2effba64ee9c2c943"
       },
-      "release_url": "https://github.com/dcajacob/orbiter-cross-platform/releases/download/production-windows-client-v1/real-client-Release.zip"
+      "release_url": "https://github.com/dcajacob/orbiter-cross-platform/releases/download/production-windows-client-v2/real-client-Release.zip"
     },
     "comparison": {
       "id": 13041454597,
@@ -635,9 +635,9 @@
       "members_sha256": {
         "client-comparison.json": "7703f7588569223cb75c0480d64e0662b1ef9622dfd0f13fe927118eb3ee03ff"
       },
-      "release_url": "https://github.com/dcajacob/orbiter-cross-platform/releases/download/production-windows-client-v1/real-client-comparison.zip"
+      "release_url": "https://github.com/dcajacob/orbiter-cross-platform/releases/download/production-windows-client-v2/real-client-comparison.zip"
     }
   },
-  "release": "https://github.com/dcajacob/orbiter-cross-platform/releases/tag/production-windows-client-v1",
+  "release": "https://github.com/dcajacob/orbiter-cross-platform/releases/tag/production-windows-client-v2",
   "runtime_reproduction": "Debug uses the verified retained source-06d8989 runtime; Release was freshly rebuilt from the same pinned source, tested, dependency-audited and repackaged before the real client ran."
 }

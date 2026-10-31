@@ -28,7 +28,7 @@ separately. The public Windows SDK and production numerical code are unchanged.
 `provenance.json` locks these canonical reference files and original CI artifact
 ZIPs, their complete member hashes, source revisions, data profiles and budgets.
 The original artifacts, compiled renderer/shaders/notices, complete logs and
-representative capture are preserved in [versioned release storage](https://github.com/dcajacob/orbiter-cross-platform/releases/tag/production-windows-client-v1).
+representative capture are preserved in [versioned release storage](https://github.com/dcajacob/orbiter-cross-platform/releases/tag/production-windows-client-v2).
 The release contains an experimental Windows component and engineering evidence;
 installation and the stock-playable native Linux release are later milestones.
 
