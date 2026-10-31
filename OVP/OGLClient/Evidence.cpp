@@ -59,7 +59,8 @@ void Frame() {
                      <<oapiMeshGroupCount(mesh)<<','<<oapiMeshMaterialCount(mesh)<<','<<oapiMeshTextureCount(mesh)<<','<<p.x<<','<<p.y<<','<<p.z<<'\n';
                 for(DWORD k=1;k<=oapiMeshTextureCount(mesh);++k) {
                     auto texture=static_cast<OGLTexture *>(oapiGetTextureHandle(mesh,k));
-                    if(texture)Asset(texture->m_file.c_str());
+                    if(!texture || texture->m_file.empty())throw std::runtime_error("required stock vessel texture failed to load");
+                    Asset(texture->m_file.c_str());
                 }
             }
         } else scene<<name(h)<<",celestial,,,,,,,,"<<p.x<<','<<p.y<<','<<p.z<<'\n';

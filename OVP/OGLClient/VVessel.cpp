@@ -74,18 +74,18 @@ void vVessel::clbkEvent (visevent msg, visevent_data content)
 {
 	switch (msg) {
 	case EVENT_VESSEL_INSMESH:
-		InsertMesh (content.meshidx);
+		InsertMesh (UINT(content));
 		break;
 	case EVENT_VESSEL_DELMESH:
-		DelMesh (content.meshidx);
+		DelMesh (UINT(content));
 		break;
 	case EVENT_VESSEL_MESHVISMODE:
-		if (content.meshidx < nmesh) {
-			meshlist[content.meshidx].vismode = vessel->GetMeshVisibilityMode(content.meshidx);
+		if (UINT(content) < nmesh) {
+			meshlist[UINT(content)].vismode = vessel->GetMeshVisibilityMode(UINT(content));
 		}
 		break;
 	case EVENT_VESSEL_MESHOFS: {
-		int idx = content.meshidx;
+		int idx = UINT(content);
 		if (idx < nmesh) {
 			VECTOR3 ofs;
 			vessel->GetMeshOffset (idx, ofs);
@@ -109,28 +109,28 @@ void vVessel::clbkEvent (visevent msg, visevent_data content)
 		} break;
 	}
 	case EVENT_VESSEL_MODMESHGROUP:
-		//MessageBeep (-1);
-		break;
+        // The legacy notification does not carry a device-mesh identity.
+        // Reload original engine templates instead of ignoring the edit.
+        LoadMeshes();InitAnimations();UpdateAnimations();
+        break;
 	case EVENT_VESSEL_RESETANIM:
-		printf("unimplemented EVENT_VESSEL_RESETANIM %d\n", content.animidx);
-		assert(false);
+		LoadMeshes();InitAnimations();UpdateAnimations();
 		break;
 
 	case EVENT_VESSEL_CLEARANIM:
-		printf("unimplemented EVENT_VESSEL_CLEARANIM %d\n", content.animidx);
-		assert(false);
+		LoadMeshes();InitAnimations();UpdateAnimations();
 		break;
 
 	case EVENT_VESSEL_DELANIM:
-		printf("unimplemented EVENT_VESSEL_DELANIM %d\n", content.animidx);
-		assert(false);
+		LoadMeshes();InitAnimations();UpdateAnimations();
 		break;
 
 	case EVENT_VESSEL_NEWANIM:
 		{
 		ANIMATION *anim;
 		unsigned int nanim = vessel->GetAnimPtr (&anim);
-		prevAnimState.push_back(anim[content.animidx].defstate);
+		prevAnimState.resize(std::max(prevAnimState.size(),size_t(content)+1));
+        prevAnimState[UINT(content)]=anim[UINT(content)].defstate;
 		break;
 		}
 	}
@@ -264,6 +264,7 @@ void vVessel::ClearMeshes ()
 
 void vVessel::DelMesh (UINT idx)
 {
+    if(idx==UINT(-1)){ClearMeshes();return;}
 	if (idx >= nmesh) return;
 	if (!meshlist[idx].mesh) return;
 	delete meshlist[idx].mesh;
