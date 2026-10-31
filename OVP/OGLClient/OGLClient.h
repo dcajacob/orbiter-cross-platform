@@ -585,7 +585,6 @@ public:
 	 */
 	virtual bool clbkReleaseSurface (SURFHANDLE surf) override;
 	virtual bool clbkUpdateSurface (SURFHANDLE surf, int x, int y, int w, int h, const unsigned char* data);
-	virtual bool clbkSetSurfaceParam (SURFHANDLE surf, int param, int val);
 
 	/**
 	 * \brief Return the width and height of a surface

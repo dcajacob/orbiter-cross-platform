@@ -609,7 +609,7 @@ TileLoader::TileLoader ()
 	bRunThread = true;
 	nqueue = queue_in = queue_out = 0;
 	load_frequency = 10;//g_client->Cfg()->PlanetLoadFrequency;
-	hLoadThread = std::thread (Load_ThreadProc, this);
+
 }
 
 // -----------------------------------------------------------------------
@@ -617,7 +617,6 @@ TileLoader::TileLoader ()
 TileLoader::~TileLoader ()
 {
 	bRunThread = false;
-	hLoadThread.join();
 /*
 	if (WaitForSingleObject (hLoadThread, 1000) == WAIT_TIMEOUT) {
 		TerminateThread (hLoadThread, 0);
@@ -631,39 +630,11 @@ TileLoader::~TileLoader ()
 
 bool TileLoader::LoadTileAsync (Tile *tile)
 {
-	// Note: the queue should probably be sorted according to tile level
-
-	int i, j;
-
-	// Check if request is already present
-	for (i = 0; i < nqueue; i++) {
-		j = (i+queue_out) % MAXQUEUE2;
-		if (queue[j].tile == tile)
-			return false;
-	}
-
-	if (nqueue == MAXQUEUE2) { // queue full
-		int maxlvl, maxlvl_idx = 0;
-		for (i = 1, maxlvl = queue[0].tile->lvl; i < nqueue; i++)
-			if (queue[i].tile->lvl > maxlvl)
-				maxlvl = queue[i].tile->lvl, maxlvl_idx = i;
-		if (maxlvl > tile->lvl) { // replace the highest level queued tile (load from lowest to highest)
-			queue[maxlvl_idx].tile->state = Tile::Invalid;
-			queue[maxlvl_idx].tile = tile;
-			tile->state = Tile::InQueue;
-		} else {
-			tile->state = Tile::Invalid;
-		}
-		return false;
-	}
-
-	// add tile to load queue
-	QUEUEDESC *qd = queue+queue_in;
-	qd->tile = tile;
-	tile->state = Tile::InQueue;
-	nqueue++;
-	queue_in = (queue_in+1) % MAXQUEUE2;
-	return true;
+    if(!tile)return false;
+    tile->state=Tile::Loading;
+    tile->Load();
+    tile->state=Tile::Inactive;
+    return true;
 }
 
 // -----------------------------------------------------------------------
@@ -718,40 +689,7 @@ int WINAPI TileLoader::Load_ThreadProc (void *data)
 }
 #endif
 // -----------------------------------------------------------------------
-#include <unistd.h>
-int TileLoader::Load_ThreadProc (TileLoader *loader)
-{
-	const int tile_packet_size = 8; // max number of tiles to process from queue
-	//int idle = 1000/loader->load_frequency;
-	Tile *tile[tile_packet_size];
-	int nload, i;
-return 0;
-sleep(6000);
-	while (bRunThread) {
-		WaitForMutex ();
-		for (nload = 0; nqueue > 0 && nload < tile_packet_size; nload++) {
-			tile[nload] = queue[queue_out].tile;
-			tile[nload]->state = Tile::Loading; // lock tile and its ancestor tree
-			queue_out = (queue_out+1) % MAXQUEUE2; // remove from queue
-			nqueue--;
-		}
-		ReleaseMutex ();
-
-		if (nload) {
-			for (i = 0; i < nload; i++) {
-				tile[i]->Load(); // load/create the tile
-			}
-
-			WaitForMutex ();
-			for (i = 0; i < nload; i++)
-				tile[i]->state = Tile::Inactive; // unlock tile
-			ReleaseMutex ();
-		} else {
-			sleep (1);
-		}
-	}
-	return 0;
-}
+// All GPU uploads run synchronously on the context-owning render thread.
 
 // =======================================================================
 // =======================================================================

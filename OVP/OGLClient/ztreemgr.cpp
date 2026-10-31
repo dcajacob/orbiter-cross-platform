@@ -183,7 +183,11 @@ int ZTreeMgr::ReadData(int idx, uint8_t **outp)
 	if (!esize) // node doesn't have data, but has descendants with data
 		return 0;
 
-	if (fseek(treef, toc[idx].pos+dofs, SEEK_SET))
+	#ifdef _WIN32
+    if (_fseeki64(treef, toc[idx].pos+dofs, SEEK_SET))
+#else
+    if (fseeko(treef, toc[idx].pos+dofs, SEEK_SET))
+#endif
 		return 0;
 
 	int zsize = NodeSizeDeflated(idx);

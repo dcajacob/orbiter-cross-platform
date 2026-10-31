@@ -202,7 +202,7 @@ def persistence_round_trip(saved,reloaded):
     return result
 
 
-def stage(executable,data,planets,directory,case,reload):
+def stage(executable,data,planets,directory,case,reload,before_launch=None):
     directory.mkdir()
     for p in executable.parent.iterdir():
         if p.is_file() and p.suffix.lower() in ('.dll','.exe'):shutil.copy2(p,directory/p.name)
@@ -235,6 +235,7 @@ def stage(executable,data,planets,directory,case,reload):
     text+='\nVesselCollision = FALSE\nBaseCollision = TRUE\nUnlimitedFuel = FALSE\n'
     (directory/'Orbiter.cfg').write_text(text,encoding='ascii')
     (directory/'behavior-case.txt').write_text(f'{case["id"]} {case["frames"]} {case["fixed_step"]:.17g} {case["epoch"]:.17g}\n',encoding='ascii')
+    if before_launch:before_launch(directory)
     argv=[str(directory/executable.name),'--scenariox=Behavior',f'--fixedstep={case["fixed_step"]:.17g}',f'--maxframes={case["frames"]}']
     (directory/'invocation.json').write_text(json.dumps(dict(argv=argv,case=case,
         input_sha256={p.relative_to(directory).as_posix():digest(p) for name in ('Config','Meshes','Scenarios')

@@ -647,7 +647,7 @@ bool OGLClient::SetMeshTexture (DEVMESHHANDLE hMesh, int texidx, SURFHANDLE tex)
 int OGLClient::SetMeshMaterial (DEVMESHHANDLE hMesh, int matidx, const MATERIAL *mat)
 {
     if (!hMesh || !mat) return 3;
-    auto mesh=static_cast<OGLMesh *>(hMesh);
+    auto mesh=reinterpret_cast<OGLMesh *>(hMesh);
     if (matidx < 0 || matidx >= mesh->MaterialCount()) return 4;
     *mesh->GetMaterial(matidx) = ToRendererMaterial(*mat);
     return 0;
@@ -665,7 +665,7 @@ int OGLClient::SetMeshMaterial (DEVMESHHANDLE hMesh, int matidx, const MATERIAL 
 int OGLClient::MeshMaterial (DEVMESHHANDLE hMesh, int matidx, MATERIAL *mat)
 {
     if (!hMesh || !mat) return 3;
-    auto mesh=static_cast<OGLMesh *>(hMesh);
+    auto mesh=reinterpret_cast<OGLMesh *>(hMesh);
     if (matidx < 0 || matidx >= mesh->MaterialCount()) return 4;
     *mat = ToSdkMaterial(*mesh->GetMaterial(matidx));
     return 0;
@@ -1496,27 +1496,7 @@ bool OGLClient::ScaleBlt (SURFHANDLE tgt, int tgtx, int tgty, int tgtw, int tgth
 	return true;
 }
 
-bool OGLClient::clbkSetSurfaceParam (SURFHANDLE surf, int param, int val) {
-	OGLTexture *tex = (OGLTexture *)surf;
-	glBindTexture(GL_TEXTURE_2D, tex->m_TexId);
-	switch(param) {
-		case SURFPARAM_FILTERING:
-			switch(val) {
-				case SURFPARAM_FILTERING_NEAREST:
-					glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-					break;
-				case SURFPARAM_FILTERING_LINEAR:
-					glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-					break;
-			}
-			break;
-		default:
-			assert(false);
-			break;
-	}
-	glBindTexture(GL_TEXTURE_2D, 0);
-	return true;
-}
+
 
 /**
  * \brief Copy one surface into an area of another one.

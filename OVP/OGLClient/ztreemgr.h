@@ -126,3 +126,5 @@ private:
 };
 
 #endif // !__ZTREEMGR_H
+
+static_assert(sizeof(TreeNode)==32,"planet archive node layout must remain 32 bytes");

@@ -170,10 +170,8 @@ private:
 	
 	static bool bRunThread;
 	static int nqueue, queue_in, queue_out;
-	std::thread hLoadThread;
 	static std::mutex hLoadMutex;
 	static std::condition_variable hCV;
-	static int Load_ThreadProc (TileLoader *);
 	int load_frequency;
 };
 

@@ -231,11 +231,9 @@ public:
 private:
 	bool DeleteTile (TILEDESC *tile);
 
-	static uint32_t LoadTile_ThreadProc (TileBuffer *);
 	// the thread function loading tile textures on demand
 
 	bool bLoadMip;  // load mipmaps for tiles if available
-	std::thread hLoadThread;
 	static bool bRunThread;
 	static int nqueue, queue_in, queue_out;
 	uint32_t nbuf;     // buffer size;

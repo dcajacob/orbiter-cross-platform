@@ -69,7 +69,7 @@ bool TileLabel::Read()
 		std::ifstream ifs(texpath);
 		if (ifs.good()) {
 			ifs >> typestr >> lat >> lng >> altstr;
-			if (!strcasecmp(altstr, "nan")) alt = std::numeric_limits<double>::quiet_NaN();
+			if (!_stricmp(altstr, "nan")) alt = std::numeric_limits<double>::quiet_NaN();
 			else alt = std::atof(altstr);
 			ifs.getline(name, 256);
 			while(ifs.good()) {
@@ -95,7 +95,7 @@ bool TileLabel::Read()
 				strcpy(label[nlabel]->label, lb);
 				nlabel++;
 				ifs >> typestr >> lat >> lng >> altstr;
-				if (!strcasecmp(altstr, "nan")) alt = std::numeric_limits<double>::quiet_NaN();
+				if (!_stricmp(altstr, "nan")) alt = std::numeric_limits<double>::quiet_NaN();
 				else alt = std::atof(altstr);
 				ifs.getline(name, 256);
 			}
@@ -108,7 +108,7 @@ bool TileLabel::Read()
 			{
 				std::istringstream iss((char*)buf);
 				iss >> typestr >> lat >> lng >> altstr;
-				if (!strcasecmp(altstr, "nan")) alt = std::numeric_limits<double>::quiet_NaN();
+				if (!_stricmp(altstr, "nan")) alt = std::numeric_limits<double>::quiet_NaN();
 				else alt = std::atof(altstr);
 				iss.getline(name, 256);
 				while (iss.good()) {
@@ -135,7 +135,7 @@ bool TileLabel::Read()
 					nlabel++;
 					if (iss.tellg() >= ndata) break;
 					iss >> typestr >> lat >> lng >> altstr;
-					if (!strcasecmp(altstr, "nan")) alt = std::numeric_limits<double>::quiet_NaN();
+					if (!_stricmp(altstr, "nan")) alt = std::numeric_limits<double>::quiet_NaN();
 					else alt = std::atof(altstr);
 					iss.getline(name, 256);
 				}

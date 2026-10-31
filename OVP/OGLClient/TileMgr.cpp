@@ -1034,7 +1034,7 @@ TileBuffer::TileBuffer ()
 	bLoadMip = true;
 	bRunThread = true;
 	nqueue = queue_in = queue_out = 0;
-	hLoadThread = std::thread(LoadTile_ThreadProc, this);
+
 }
 
 // =======================================================================
@@ -1042,7 +1042,6 @@ TileBuffer::TileBuffer ()
 TileBuffer::~TileBuffer()
 {
 	bRunThread = false;
-	hLoadThread.join();
 	if (nbuf) {
 		for (uint32_t i = 0; i < nbuf; i++)
 			if (buf[i]) {
@@ -1152,103 +1151,35 @@ void ClearVertexBuffers (TILEDESC *td)
 
 // =======================================================================
 
-bool TileBuffer::LoadTileAsync (const char *name, TILEDESC *tile)
+bool TileBuffer::LoadTileAsync (const char *name, TILEDESC *td)
 {
-	bool ok = true;
-
-	if (nqueue == MAXQUEUE)
-		ok = false; // queue full
-	else {
-		for (int i = 0; i < nqueue; i++) {
-			int j = (i+queue_out) % MAXQUEUE;
-			if (loadqueue[j].td == tile)
-			{ ok = false; break; }// request already present
-		}
-	}
-
-	if (ok) {
-		QUEUEDESC *qd = loadqueue+queue_in;
-		qd->name = name;
-		qd->td = tile;
-
-		nqueue++;
-		queue_in = (queue_in+1) % MAXQUEUE;
-	}
-	return ok;
+    if(!name || !td)return false;
+    const long tileSize=32896;
+    OGLTexture *texture=nullptr,*mask=nullptr;
+    uint32_t index=td->tex.idx;
+    if(index!=NOTILE) {
+        long offset=(td->flag&0x40 ? long(index)*tileSize : long(index));
+        std::string file=std::string(name)+"_tile.tex";
+        if(!g_client->GetTexMgr()->LoadTexture(file.c_str(),offset,&texture,bLoadMip?0:4))return false;
+    }
+    if(((td->flag&3)==3)||(td->flag&4)) {
+        index=td->ltex.idx;
+        if(index!=uint32_t(-1)) {
+            long offset=(td->flag&0x40 ? long(index)*tileSize : long(index));
+            std::string file=std::string(name)+"_tile_lmask.tex";
+            if(!g_client->GetTexMgr()->LoadTexture(file.c_str(),offset,&mask)) {
+                if(texture)texture->Release();return false;
+            }
+        }
+    }
+    td->tex.obj=texture;td->ltex.obj=mask;
+    if(texture) { if(td->vtx){delete td->vtx;td->vtx=nullptr;}ClearVertexBuffers(td); }
+    td->flag&=0x3f;
+    return true;
 }
 
 // =======================================================================
-#include <unistd.h>
-uint32_t TileBuffer::LoadTile_ThreadProc (TileBuffer *tb)
-{
-	static const long TILESIZE = 32896; // default texture size for old-style texture files
-	bool load;
-	static QUEUEDESC qd;
-	static int nloaded = 0; // temporary
-	uint32_t flag = (tb->bLoadMip ? 0:4);
-	//uint32_t idle = 1000/g_client->Cfg()->PlanetLoadFrequency;
-	char fname[256];
-return 0;
-	while (bRunThread) {
-//		Sleep (idle);
-		usleep(1000000);
-		hQueueMutex.lock();
-		if (load = (nqueue > 0)) {
-			memcpy (&qd, loadqueue+queue_out, sizeof(QUEUEDESC));
-		}
-		hQueueMutex.unlock();
-
-		if (load) {
-			TILEDESC *td = qd.td;
-			OGLTexture *tex, *mask = 0;
-			uint32_t tidx, midx;
-			long ofs;
-
-//			if ((td->flag & 0x80) == 0)
-//				MessageBeep (-1);
-
-			tidx = td->tex.idx;
-			if (tidx == NOTILE)
-				tex = NULL; // "no texture" flag
-			else {
-				ofs = (td->flag & 0x40 ? (long)tidx * TILESIZE : (long)tidx);
-				strcpy (fname, qd.name);
-				strcat (fname, "_tile.tex");
-				if (!g_client->GetTexMgr()->LoadTexture (fname, ofs, &tex, flag))
-					tex = NULL;
-			}
-			// Load the specular mask and/or light texture
-			if (((td->flag & 3) == 3) || (td->flag & 4)) {
-				midx = td->ltex.idx;
-				if (midx == (uint32_t)-1)
-					mask = NULL; // "no mask" flag
-				else {
-					ofs = (td->flag & 0x40 ? (long)midx * TILESIZE : (long)midx);
-					strcpy (fname, qd.name);
-					strcat (fname, "_tile_lmask.tex");
-					if (!g_client->GetTexMgr()->LoadTexture (fname, ofs, &mask))
-						mask = NULL;
-				}
-			}
-			// apply loaded components
-			hQueueMutex.lock();
-			td->tex.obj  = tex;
-			td->ltex.obj = mask;
-			if (tex) {
-				if (td->vtx) {
-					delete td->vtx;
-					td->vtx = 0;
-				}
-				ClearVertexBuffers (td); // invalidate child vertex buffers
-			}
-			td->flag &= 0x3F; // mark as loaded
-			nqueue--;
-			queue_out = (queue_out+1) % MAXQUEUE;
-			hQueueMutex.unlock();
-		}
-	}
-	return 0;
-}
+// No background thread owns or uploads OpenGL resources.
 
 // =======================================================================
 

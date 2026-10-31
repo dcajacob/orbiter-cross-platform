@@ -30,14 +30,7 @@ void Begin() {
     info<<"{\"vendor\":"<<std::quoted(reinterpret_cast<const char *>(glGetString(GL_VENDOR)))
         <<",\"renderer\":"<<std::quoted(reinterpret_cast<const char *>(glGetString(GL_RENDERER)))
         <<",\"version\":"<<std::quoted(reinterpret_cast<const char *>(glGetString(GL_VERSION)))<<"}\n";
-    auto modules=output("renderer-modules.txt");
-    HANDLE snapshot=CreateToolhelp32Snapshot(TH32CS_SNAPMODULE|TH32CS_SNAPMODULE32,GetCurrentProcessId());
-    if(snapshot==INVALID_HANDLE_VALUE)throw std::runtime_error("cannot inspect actual graphics DLL paths");
-    MODULEENTRY32W module{};module.dwSize=sizeof(module);
-    if(Module32FirstW(snapshot,&module))do {
-        modules<<std::filesystem::path(module.szExePath).generic_u8string()<<'\n';
-    }while(Module32NextW(snapshot,&module));
-    CloseHandle(snapshot);
+
 }
 void Visual(const char *event,OBJHANDLE object) {
     if(enabled){events<<frames<<','<<event<<','<<name(object)<<','<<oapiGetObjectType(object)<<'\n';events.flush();}
@@ -71,6 +64,14 @@ void Frame() {
             }
         } else scene<<name(h)<<",celestial,,,,,,,,"<<p.x<<','<<p.y<<','<<p.z<<'\n';
     }
+    auto modules=output("renderer-modules.txt");
+    HANDLE snapshot=CreateToolhelp32Snapshot(TH32CS_SNAPMODULE|TH32CS_SNAPMODULE32,GetCurrentProcessId());
+    if(snapshot==INVALID_HANDLE_VALUE)throw std::runtime_error("cannot inspect actual graphics DLL paths");
+    MODULEENTRY32W module{};module.dwSize=sizeof(module);
+    if(Module32FirstW(snapshot,&module))do {
+        modules<<std::filesystem::path(module.szExePath).generic_u8string()<<'\n';
+    }while(Module32NextW(snapshot,&module));
+    CloseHandle(snapshot);
     auto camera=output("camera.csv");VECTOR3 p{},d{};MATRIX3 r{};
     oapiCameraGlobalPos(&p);oapiCameraGlobalDir(&d);oapiCameraRotationMatrix(&r);
     camera<<"px,py,pz,dx,dy,dz,aperture,m11,m12,m13,m21,m22,m23,m31,m32,m33\n"

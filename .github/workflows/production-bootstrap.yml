@@ -4,6 +4,9 @@ on:
   push:
     branches: ['codex/production-**']
     paths-ignore:
+      - 'OVP/OGLClient/**'
+      - 'Tests/Production/Client/**'
+      - '.github/workflows/production-client.yml'
       - 'Docs/**'
       - 'README*'
       - 'Tests/Production/Verification/**'

@@ -71,13 +71,51 @@ jobs:
         run: |
           cmake -S OVP/OGLClient -B out/opengl-client -G Ninja -DCMAKE_BUILD_TYPE=${{ matrix.configuration }} -DCMAKE_POLICY_VERSION_MINIMUM=3.5 -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DORBITER_TEST_RUNTIME="$pwd/out/production-app" "-DDXSDK_DIR=$env:DXSDK_DIR" 2>&1 | Tee-Object client-configure.log
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-          cmake --build out/opengl-client --target OGLClient --parallel 2 2>&1 | Tee-Object client-build.log
+          cmake --build out/opengl-client --target OGLClient --parallel 2 -- -k0 2>&1 | Tee-Object client-build.log
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - name: Build the accepted production observation driver against the same SDK
+        shell: pwsh
+        run: |
+          cmake -S Tests/Production/BehaviorBuild -B out/driver -G Ninja -DCMAKE_BUILD_TYPE=${{ matrix.configuration }} -DORBITER_TEST_RUNTIME="$pwd/out/production-app"
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          cmake --build out/driver --parallel 2
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - uses: actions/cache@v6
+        with:
+          path: out/data-cache/Orbiter-x64.zip
+          key: production-data-${{ hashFiles('Tests/Production/stock-data.lock.json') }}
+      - uses: actions/cache@v6
+        with:
+          path: out/planet-cache/Orbiter2016.zip
+          key: production-standard-planets-${{ hashFiles('Tests/Production/standard-planets.lock.json') }}
+      - name: Prepare verified real Solar System and planet resources
+        run: |
+          python Tests/Production/prepare_data.py --archive out/data-cache/Orbiter-x64.zip --destination out/production-data
+          python Tests/Production/prepare_data.py --lock Tests/Production/standard-planets.lock.json --archive out/planet-cache/Orbiter2016.zip --destination out/standard-planets
+      - uses: actions/cache@v6
+        with:
+          path: out/mesa-cache/*.pkg.tar.zst
+          key: mesa-ucrt64-${{ hashFiles('Tests/Production/mesa-ucrt64.lock.json') }}
+      - name: Stage the pinned application-local software OpenGL driver
+        run: python Tests/Production/mesa_runtime.py stage --cache out/mesa-cache --destination out/mesa-runtime
+      - name: Execute real Windows Orbiter with Sol, ISS and source-built ShuttlePB
+        run: >-
+          python Tests/Production/Client/run_client.py --orbiter out/production-app/Orbiter.exe
+          --data out/production-data --planets out/standard-planets --mesa out/mesa-runtime
+          --configuration ${{ matrix.configuration }} --output out/client-execution
       - uses: actions/upload-artifact@v7
         if: always()
         with:
           name: real-client-${{ matrix.configuration }}
           path: |
+            out/client-execution/**/*.csv
+            out/client-execution/**/*.json
+            out/client-execution/**/*.png
+            out/client-execution/**/*.rgba
+            out/client-execution/**/*.txt
+            out/client-execution/**/*.log
+            out/client-execution/**/*.scn
+            out/client-execution/**/Orbiter.cfg
             client-configure.log
             client-build.log
             out/opengl-client/CMakeCache.txt
