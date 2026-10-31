@@ -42,6 +42,7 @@
 
 #include "Orbiter.h"
 #include "Rigidbody.h"
+#include "PhysicsCore.h"
 #include "Element.h"
 #include "Log.h"
 #include <stdio.h>
@@ -179,36 +180,11 @@ void RigidBody::RK2_LinAng (double h, int nsub, int isub)
 
 void RigidBody::RK4_LinAng (double h, int nsub, int isub)
 {
-	double h05 = h*0.5;
-	double hi6 = h/6.0;
-
-	Vector tau, acc1, aacc1, acc2, aacc2, acc3, aacc3;
-	StateVectors sa, sb, sc;
-	sa.pos.Set (s1->pos+s1->vel*h05);
-	sa.vel.Set (s1->vel+acc*h05);
-	sa.SetRot (s1->Q.Rot(s1->omega*h05));
-	sa.omega.Set (s1->omega+arot*h05);
-	GetIntermediateMoments (acc1, tau, sa, (isub+0.5)/nsub, h);
-	aacc1.Set (EulerInv_full (tau, sa.omega));
-
-	sb.pos.Set (s1->pos+sa.vel*h05);
-	sb.vel.Set (s1->vel+acc1*h05);
-	sb.SetRot (s1->Q.Rot(sa.omega*h05));
-	sb.omega.Set (s1->omega+aacc1*h05);
-	GetIntermediateMoments (acc2, tau, sb, (isub+0.5)/nsub, h);
-	aacc2.Set (EulerInv_full (tau, sb.omega));
-
-	sc.pos.Set (s1->pos+sb.vel*h);
-	sc.vel.Set (s1->vel+acc2*h);
-	sc.SetRot (s1->Q.Rot(sb.omega*h));
-	sc.omega.Set (s1->omega+aacc2*h);
-	GetIntermediateMoments (acc3, tau, sc, (isub+1.0)/nsub, h);
-	aacc3.Set (EulerInv_full (tau, sc.omega));
-
-	rvel_add += (acc +(acc1+acc2)*2.0+acc3)*hi6;
-	rpos_add += (s1->vel+(sa.vel+sb.vel)*2.0+sc.vel)*hi6;
-	s1->Q.Rotate ((s1->omega+(sa.omega+sb.omega)*2.0+sc.omega)*hi6);
-	s1->omega += (arot+(aacc1+aacc2)*2.0+aacc3)*hi6;
+    orbiter::physics::AdvanceRK4(*s1, acc, arot, rvel_add, rpos_add, h, nsub, isub,
+        [this](Vector &a, Vector &tau, const StateVectors &state, double fraction, double dt) {
+            GetIntermediateMoments(a, tau, state, fraction, dt);
+        },
+        [this](const Vector &tau, const Vector &omega) { return EulerInv_full(tau, omega); });
 }
 
 // ---------------------------------------------------------------------------

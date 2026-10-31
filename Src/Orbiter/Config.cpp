@@ -291,30 +291,6 @@ const char *BoolStr (bool cond)
 	return (cond ? Tstr : Fstr);
 }
 
-char *trim_string (char *cbuf)
-{
-	char *c;
-
-	// strip comments starting with ';'
-	for (c = cbuf; *c; c++) {
-		if (*c == ';') {
-			*c = '\0';
-			break;
-		}
-	}
-	// strip trailing white space
-	for (--c; c >= cbuf; c--) {
-		if (*c == ' ' || *c == '\t') *c = '\0';
-		else break;
-	}
-	// skip leading white space
-	for (c = cbuf; *c; c++)
-		if (*c != ' ' && *c != '\t') return c;
-
-	// should never get here
-	return c;
-}
-
 char *readline (istream &is)
 {
 	const int inc = 256;
@@ -339,37 +315,6 @@ char *readline (istream &is)
 		is.clear();
 	}
 	return 0; // never gets here
-}
-
-bool GetItemString (istream &is, const char *label, char *val)
-{
-	char cbuf[512], *cl, *cv;
-	int i;
-
-	is.clear();
-	is.seekg (0, ios::beg);
-
-	while (is.getline (cbuf, 512)) {
-		cl = trim_string(cbuf);
-		if (!_stricmp(cl, "END_PARSE")) return false;
-		
-		for (i = 0; cl[i] && cl[i] != '='; i++);
-		cv = (cl[i] ? cl+(i+1) : cl+i);
-		for (cl[i--] = '\0'; i >= 0 && (cl[i] == ' ' || cl[i] == '\t'); i--)
-			cl[i] = '\0';
-		if (!_stricmp (cl, label)) {
-			while (*cv == ' ' || *cv == '\t') cv++;
-			if (*cv) {
-				strcpy (val, cv);
-				return true;
-			} else {
-				return false;
-			}
-		}
-	}
-
-	is.clear();
-	return false;
 }
 
 bool GetItemReal (istream &is, const char *label, double &val)

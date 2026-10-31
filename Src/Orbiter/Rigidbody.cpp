@@ -15,6 +15,7 @@
 
 #include "Orbiter.h"
 #include "Rigidbody.h"
+#include "PhysicsCore.h"
 #include "Celbody.h"
 #include "Psys.h"
 #include "Element.h"
@@ -253,22 +254,14 @@ void RigidBody::Update (bool force)
 				rpos_add = rpos_add0, rvel_add = rvel_add0;
 				for (i = 0; i < nPropSubsteps; i++) {
 					((*this).*(PropMode[PropLevel].propagator)) (dt, nPropSubsteps, i);
-					s1->pos = rpos_base + rpos_add;
-					s1->vel = rvel_base + rvel_add;
-					s1->R.Set (s1->Q);
+					orbiter::physics::FinalizeStage(*s1, rpos_base, rvel_base, rpos_add, rvel_add);
 					GetIntermediateMoments (acc, tau, *s1, (i+1.0)/nPropSubsteps, dt);
 					arot.Set (EulerInv_full (tau, s1->omega));
 				}
 			} while (!ValidateStateUpdate (s1));
 			//s1->R.Set (s1->Q);
 
-			if (updcount++ == 1000) { // flush increments
-				rpos_base += rpos_add;
-				rpos_add.Set (0,0,0);
-				rvel_base += rvel_add;
-				rvel_add.Set (0,0,0);
-				updcount = 0;
-			}
+			orbiter::physics::FlushIncrements(rpos_base, rvel_base, rpos_add, rvel_add, updcount);
 			el_valid = bOrbitStabilised = false;
 
 		}
@@ -474,10 +467,7 @@ Vector RigidBody::EulerInv_full (const Vector &tau, const Vector &omega) const
 	// for angular acceleration domega/dt, given torque tau, angular
 	// velocity omega and inertia tensor I (assumed to be diagonal).
 
-	return Vector (
-		(tau.x - (pmi.y-pmi.z)*omega.y*omega.z) / pmi.x,
-		(tau.y - (pmi.z-pmi.x)*omega.z*omega.x) / pmi.y,
-		(tau.z - (pmi.x-pmi.y)*omega.x*omega.y) / pmi.z);
+	return orbiter::physics::EulerAcceleration(pmi, tau, omega);
 }
 
 // =======================================================================

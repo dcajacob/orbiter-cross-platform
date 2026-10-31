@@ -10,6 +10,7 @@
 
 #include "Config.h"
 #include "Psys.h"
+#include "PhysicsCore.h"
 #include "TimeData.h"
 #include "Element.h"
 #include "Vessel.h"
@@ -670,8 +671,7 @@ Vector SingleGacc (const Vector &rpos, const CelestialBody *body)
 	// Calculate gravitational acceleration at a position r from a single source
 	// rpos: relative position of 'body' wrt. r (global coords)
 
-	double d  = rpos.length();
-	return rpos * (Ggrav * body->Mass() / (d*d*d)) + SingleGacc_perturbation (rpos, body);
+	return orbiter::physics::PointMassAcceleration(rpos, body->Mass()) + SingleGacc_perturbation (rpos, body);
 }
 
 Vector PlanetarySystem::Gacc (const Vector &gpos, const Body *exclude, const GFieldData *gfd) const

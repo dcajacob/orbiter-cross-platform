@@ -13,6 +13,7 @@ set(common_src
 	Camera.cpp
 	cmdline.cpp
 	Config.cpp
+	ConfigFile.cpp
 	console_ng.cpp
 	Element.cpp
 	ElementApplication.cpp
