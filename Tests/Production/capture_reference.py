@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """Capture new production Windows candidates; never replace accepted references.
 
-The application and all simulation-facing sources must still match the frozen
-pre-extraction revision. Only the separately built SDK test driver is new.
+Initial capture requires the frozen pre-extraction production sources. With
+--reference, verify current code against immutable evidence without refreshing it.
 """
 import argparse
 import csv
@@ -145,17 +145,23 @@ def main():
     parser.add_argument('--data', type=Path, required=True)
     parser.add_argument('--output', type=Path, required=True)
     parser.add_argument('--configuration', choices=['Debug','Release'], required=True)
+    parser.add_argument('--reference', type=Path,
+                        help='verify a current application against accepted evidence; never create a new baseline')
     args = parser.parse_args()
     require(sys.platform == 'win32', 'production reference capture requires native Windows')
     require(not git('status','--porcelain','--untracked-files=no').strip(), 'capture requires committed sources')
     lock = json.loads(Path(__file__).with_name('production-source.lock.json').read_text())
-    require(not git('diff','--name-only',lock['source_commit'],'--','Src','Orbitersdk','Extern','CMakeLists.txt',
-                    'Config','Meshes','Textures','Textures2','GravityModels','Kernels','Scenarios','Script').strip(),
-            'production implementation/dependencies changed before reference capture')
-    for path in lock['source_sha256']:
-        original = git('show', lock['source_commit']+':'+path).replace(b'\r\n',b'\n')
-        require((ROOT/path).read_bytes().replace(b'\r\n',b'\n') == original,
-                'production source changed before reference capture: '+path)
+    if args.reference:
+        from frozen_reference import load_reference
+        load_reference(args.reference)
+    else:
+        require(not git('diff','--name-only',lock['source_commit'],'--','Src','Orbitersdk','Extern','CMakeLists.txt',
+                        'Config','Meshes','Textures','Textures2','GravityModels','Kernels','Scenarios','Script').strip(),
+                'production implementation/dependencies changed before reference capture')
+        for path in lock['source_sha256']:
+            original = git('show', lock['source_commit']+':'+path).replace(b'\r\n',b'\n')
+            require((ROOT/path).read_bytes().replace(b'\r\n',b'\n') == original,
+                    'production source changed before reference capture: '+path)
     executable, data, output = args.orbiter.resolve(), args.data.resolve(), args.output.resolve()
     data_lock = json.loads(Path(__file__).with_name('stock-data.lock.json').read_text())
     for name, expected in data_lock['data_files'].items():
@@ -181,6 +187,10 @@ def main():
                 require((output/name/trace).read_bytes() == (output/(name+'-repeat')/trace).read_bytes(),
                         'production repeat is not byte-identical: '+name+'/'+trace)
         report['status'] = 'repeatable-candidate; cross-configuration acceptance pending'
+        if args.reference:
+            from frozen_reference import compare_capture
+            report['frozen_reference'] = compare_capture(args.reference,output)
+            report['status'] = 'repeatable-candidate; frozen-reference verification passed'
     except Exception as error:
         report.update(status='failed', error=str(error))
         raise

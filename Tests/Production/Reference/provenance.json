@@ -1,0 +1,102 @@
+{
+  "schema": 1,
+  "status": "accepted",
+  "scope": "initial production Sol orbit and ShuttlePB main/linear-RCS/pitch-RCS references only",
+  "capture_commit": "e70041fa2991d1bfefe66575ced1e32c92898f82",
+  "production_source_commit": "38b7c627878ea893390675616897071f8bb8e90f",
+  "run_id": 41187217665,
+  "run_url": "https://github.com/dcajacob/orbiter-cross-platform/actions/runs/41187217665",
+  "data_lock_sha256": "155fb89d22d58af113da6ff662904d74f82bbbbb7b9deb5e654b7c7141e27620",
+  "fixture_source_sha256": {
+    "Orbiter.cfg": "eed4bb294b9f868822399439ee625ee8108e07e6bf8019217daef16e92e5ddde",
+    "Sol-ISS-ShuttlePB.scn": "bcd836d4f80d5c85cf71e132830a23b5ab47607a9a5c00f498b19bf645459783"
+  },
+  "cases": [
+    "orbit",
+    "controls"
+  ],
+  "recorded_steps": 6000,
+  "fixed_step_seconds": 1,
+  "samples": 601,
+  "observed_objects": [
+    "Sun",
+    "Earth",
+    "Moon",
+    "ISS",
+    "PB"
+  ],
+  "vessel_only_fields": [
+    "wx",
+    "wy",
+    "wz",
+    "fuel",
+    "ground"
+  ],
+  "budgets": {
+    "position_m": 0.01,
+    "velocity_m_s": 1e-05,
+    "orientation_rad": 1e-08,
+    "angular_velocity_rad_s": 1e-10,
+    "mjd_days": 1e-10,
+    "mass_relative": 1e-08,
+    "mass_absolute_kg": 1e-08
+  },
+  "artifacts": {
+    "Debug": {
+      "path": "../Verification/Evidence/41187217665-production-reference-Debug-x64.zip",
+      "sha256": "b83461ad3a26f2097b4b6a06e2498f07b7d2fce8554c624127eab2cbd69f7824",
+      "members_sha256": {
+        "production-reference/controls/production-events.csv": "cfe7b02dc0d258222de1d17c1e5c45390a8c1980db2c752b5e4a93e7e255abc6",
+        "production-reference/controls/production-objects.txt": "1d6938e9ef5f08d9e991201c735d4f967d646cb9d1bb2ed78e262ea0a626015e",
+        "production-reference/controls/production-state.csv": "9b598c64c9787b517f11d5366667a73de31614767fd8f3b791806cad73b80998",
+        "production-reference/controls/trace.csv": "9cc531be2e5cb354ff1474a9f1acf5debefb87ea75dc60e17084cee43097b656",
+        "production-reference/controls-repeat/production-events.csv": "cfe7b02dc0d258222de1d17c1e5c45390a8c1980db2c752b5e4a93e7e255abc6",
+        "production-reference/controls-repeat/production-objects.txt": "1d6938e9ef5f08d9e991201c735d4f967d646cb9d1bb2ed78e262ea0a626015e",
+        "production-reference/controls-repeat/production-state.csv": "9b598c64c9787b517f11d5366667a73de31614767fd8f3b791806cad73b80998",
+        "production-reference/controls-repeat/trace.csv": "9cc531be2e5cb354ff1474a9f1acf5debefb87ea75dc60e17084cee43097b656",
+        "production-reference/orbit/production-objects.txt": "1d6938e9ef5f08d9e991201c735d4f967d646cb9d1bb2ed78e262ea0a626015e",
+        "production-reference/orbit/production-events.csv": "3aac688cc97d76a5a79c6a8fc1f140885debc8174f402ca9a49670ed7510638f",
+        "production-reference/orbit/production-state.csv": "f9030e4a65e08a423a29025ed64ed3244cf9e3dda34ed259f8a5037986f69e97",
+        "production-reference/orbit/trace.csv": "d0276784181e7c5e4d40e96f411477ca705cf3b58f8aee0d86b1214adbc2fed6",
+        "production-reference/orbit-repeat/production-objects.txt": "1d6938e9ef5f08d9e991201c735d4f967d646cb9d1bb2ed78e262ea0a626015e",
+        "production-reference/orbit-repeat/production-events.csv": "3aac688cc97d76a5a79c6a8fc1f140885debc8174f402ca9a49670ed7510638f",
+        "production-reference/orbit-repeat/production-state.csv": "f9030e4a65e08a423a29025ed64ed3244cf9e3dda34ed259f8a5037986f69e97",
+        "production-reference/orbit-repeat/trace.csv": "d0276784181e7c5e4d40e96f411477ca705cf3b58f8aee0d86b1214adbc2fed6"
+      }
+    },
+    "Release": {
+      "path": "../Verification/Evidence/41187217665-production-reference-Release-x64.zip",
+      "sha256": "e21d86c80f05db4951d29d090439ebf1f9c3fd5c4f32a848d06c6568fd549f78",
+      "members_sha256": {
+        "production-reference/controls/production-events.csv": "cfe7b02dc0d258222de1d17c1e5c45390a8c1980db2c752b5e4a93e7e255abc6",
+        "production-reference/controls/production-objects.txt": "1d6938e9ef5f08d9e991201c735d4f967d646cb9d1bb2ed78e262ea0a626015e",
+        "production-reference/controls/production-state.csv": "9b598c64c9787b517f11d5366667a73de31614767fd8f3b791806cad73b80998",
+        "production-reference/controls/trace.csv": "9cc531be2e5cb354ff1474a9f1acf5debefb87ea75dc60e17084cee43097b656",
+        "production-reference/controls-repeat/production-events.csv": "cfe7b02dc0d258222de1d17c1e5c45390a8c1980db2c752b5e4a93e7e255abc6",
+        "production-reference/controls-repeat/production-objects.txt": "1d6938e9ef5f08d9e991201c735d4f967d646cb9d1bb2ed78e262ea0a626015e",
+        "production-reference/controls-repeat/production-state.csv": "9b598c64c9787b517f11d5366667a73de31614767fd8f3b791806cad73b80998",
+        "production-reference/controls-repeat/trace.csv": "9cc531be2e5cb354ff1474a9f1acf5debefb87ea75dc60e17084cee43097b656",
+        "production-reference/orbit/production-events.csv": "3aac688cc97d76a5a79c6a8fc1f140885debc8174f402ca9a49670ed7510638f",
+        "production-reference/orbit/production-objects.txt": "1d6938e9ef5f08d9e991201c735d4f967d646cb9d1bb2ed78e262ea0a626015e",
+        "production-reference/orbit/production-state.csv": "f9030e4a65e08a423a29025ed64ed3244cf9e3dda34ed259f8a5037986f69e97",
+        "production-reference/orbit/trace.csv": "d0276784181e7c5e4d40e96f411477ca705cf3b58f8aee0d86b1214adbc2fed6",
+        "production-reference/orbit-repeat/production-events.csv": "3aac688cc97d76a5a79c6a8fc1f140885debc8174f402ca9a49670ed7510638f",
+        "production-reference/orbit-repeat/production-objects.txt": "1d6938e9ef5f08d9e991201c735d4f967d646cb9d1bb2ed78e262ea0a626015e",
+        "production-reference/orbit-repeat/production-state.csv": "f9030e4a65e08a423a29025ed64ed3244cf9e3dda34ed259f8a5037986f69e97",
+        "production-reference/orbit-repeat/trace.csv": "d0276784181e7c5e4d40e96f411477ca705cf3b58f8aee0d86b1214adbc2fed6"
+      }
+    }
+  },
+  "automatic_refresh": false,
+  "not_covered": [
+    "planetary terrain/contact",
+    "docking/attachments",
+    "atmospheric flight",
+    "all RCS axes/autopilot",
+    "pause/warp",
+    "creation/deletion/focus",
+    "save/reload comparisons",
+    "vessel callback ordering",
+    "graphics, panels, HUD and MFDs"
+  ]
+}

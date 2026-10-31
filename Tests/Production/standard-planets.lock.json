@@ -1,0 +1,135 @@
+{
+  "schema": 1,
+  "source": "https://www.orbiter-forum.com/resources/orbiter-2016-core-zip-edition.5425/",
+  "publisher": "Martin Schweiger (martins)",
+  "url": "https://cdn.orbithangar.com/orbiter/Orbiter2016.zip",
+  "bytes": 2600557251,
+  "sha256": "bdbf747dd930ced34a3cca34b69dc7e2d9733e0b9498ee8d6224090cf008dc30",
+  "scope": "standard planetary archive data only; no binary or ephemeris substitution",
+  "license_status": "publisher notices retained; durable redistribution mirror not approved",
+  "data_files": {
+    "Textures/Callisto/Archive/Surf.tree": {
+      "sha256": "db96241ae8f152f022252af9d416986265ea62d06b0869b731cd6d3afca15e71",
+      "bytes": 13888583
+    },
+    "Textures/Deimos/Archive/Elev.tree": {
+      "sha256": "8efbc3fc07d16e467a6be8895bbcce81788b829208d1d5e348bc3b3bfec3cbd1",
+      "bytes": 229956
+    },
+    "Textures/Deimos/Archive/Surf.tree": {
+      "sha256": "f54b39e393237e8cb350f247a4591502e113a0739fb91fc231daf9eeb1aa3567",
+      "bytes": 3404101
+    },
+    "Textures/Dione/Archive/Surf.tree": {
+      "sha256": "ef090091fbebe5056346e0c723dab3ad6ff8189158693f1ab3febf86ce61c575",
+      "bytes": 16394125
+    },
+    "Textures/Earth/Archive/Cloud.tree": {
+      "sha256": "69a0c1e3159e144f60c322b9d388548b55f927a80f03fb7a9005f983cf9a9169",
+      "bytes": 308580500
+    },
+    "Textures/Earth/Archive/Elev.tree": {
+      "sha256": "597c1c08e97e6e62bba4e9a924960c896fc6d57f6e522e136b8f8146abb7432f",
+      "bytes": 270146919
+    },
+    "Textures/Earth/Archive/Elev_mod.tree": {
+      "sha256": "2d50f845b5e2307d22c1d98d3162ec5841992fae355d4607ce6f71337f522897",
+      "bytes": 513676
+    },
+    "Textures/Earth/Archive/Mask.tree": {
+      "sha256": "ec067c9dac77f20dc5698cd2a32c0b6cef951fffd3f24a2265ec8cca759edc39",
+      "bytes": 78999897
+    },
+    "Textures/Earth/Archive/Surf.tree": {
+      "sha256": "bc84f6d2dd7391a97d5700e9e0613a1ea713d926964daf018ad92f4041f6c587",
+      "bytes": 514909645
+    },
+    "Textures/Enceladus/Archive/Surf.tree": {
+      "sha256": "92c39516644ceb53e1535111a42f05dc5f2da96c7ae7171c5fdfaf6b898e8f46",
+      "bytes": 17716804
+    },
+    "Textures/Europa/Archive/Surf.tree": {
+      "sha256": "8eeb7dfd5a60b8e58265c4ea2cb86443c2bb7c872a5fed5a9c856f8e73850d7d",
+      "bytes": 13091981
+    },
+    "Textures/Ganymede/Archive/Surf.tree": {
+      "sha256": "66f60ed96470e8c2c6d88121903bcfba7cd4c0564f98b19a3900214b3e737d81",
+      "bytes": 14367124
+    },
+    "Textures/Iapetus/Archive/Surf.tree": {
+      "sha256": "9a379f61e166b35aa1fc073ca965338b772723f1c43568fc621210d286be6323",
+      "bytes": 12551472
+    },
+    "Textures/Io/Archive/Elev.tree": {
+      "sha256": "51548f10495b78703bbbd8cfff0b494d0b6d76d36fe6e57b758c5d5ed9d52383",
+      "bytes": 9854902
+    },
+    "Textures/Io/Archive/Surf.tree": {
+      "sha256": "610b00c3df03369e4dd62497aaa8b20d5682d675564f7c8354d1b5c305a853bd",
+      "bytes": 13212819
+    },
+    "Textures/Jupiter/Archive/Cloud.tree": {
+      "sha256": "7aca955761cb6e2a16c1cd04183a18fe14d668b41535519debb865e1d5bf56c6",
+      "bytes": 8844612
+    },
+    "Textures/Jupiter/Archive/Surf.tree": {
+      "sha256": "7701df836c3ff25618486bab1318a4600bb7beae5012b610d4130c95d809cf99",
+      "bytes": 3251577
+    },
+    "Textures/Mars/Archive/Elev.tree": {
+      "sha256": "f8f17cd8b58e1d81135de9565bd56ac945bcf3122d174eb21fd46e87096723ed",
+      "bytes": 285120725
+    },
+    "Textures/Mars/Archive/Surf.tree": {
+      "sha256": "b3da509f8b09ab98c00580f8ae0a22da3a0f072829dacb81a90879e3f395ea7a",
+      "bytes": 316720185
+    },
+    "Textures/Mimas/Archive/Surf.tree": {
+      "sha256": "e0d222992759d4a5723e4ffdcd3ea9061b3332c7348d113a8f33d077ffc23f7d",
+      "bytes": 4274178
+    },
+    "Textures/Moon/Archive/Elev.tree": {
+      "sha256": "dd57a09d47b60964cdb4fbc5917684cdf9926fe7a8229e6b9e89a12873059744",
+      "bytes": 272443927
+    },
+    "Textures/Moon/Archive/Surf.tree": {
+      "sha256": "0ed3d152d5bddbeda3a9b019c7fc8bf98400e934085d4b829a87429f1e44a798",
+      "bytes": 256358063
+    },
+    "Textures/Phobos/Archive/Elev.tree": {
+      "sha256": "25e8e9bc5892f20f98f1f1e8fe63a859d178f1babe28d597c90a51d4982a5c20",
+      "bytes": 875609
+    },
+    "Textures/Phobos/Archive/Surf.tree": {
+      "sha256": "70d7513170ffa854d87a61e85dfb135c8a7f89d72c01f1c2765382776b876481",
+      "bytes": 15231123
+    },
+    "Textures/Rhea/Archive/Surf.tree": {
+      "sha256": "3d152d87def66ef5f992bbc48374ed329e1d80a47beee87fe24688af8f60425b",
+      "bytes": 17211241
+    },
+    "Textures/Tethys/Archive/Surf.tree": {
+      "sha256": "1f78fce8d34771c911d7a909c7ab73d5169682f2593ded4b546fc0da42a373e7",
+      "bytes": 16718641
+    },
+    "Textures/Vesta/Archive/Elev.tree": {
+      "sha256": "945dd3f8818bd352a0de1e1f50cf5d5552e887bac227349cce2921d80d0940e2",
+      "bytes": 1139065
+    },
+    "Textures/Vesta/Archive/Surf.tree": {
+      "sha256": "6ffe09a19f933e839ddb07d3476af78b160d623525c729b716f7201656a335d7",
+      "bytes": 14923677
+    }
+  },
+  "profile": "standard-planetary-archives-2016",
+  "required_files": [
+    "Textures/Earth/Archive/Surf.tree",
+    "Textures/Earth/Archive/Elev.tree",
+    "Textures/Earth/Archive/Cloud.tree",
+    "Textures/Moon/Archive/Surf.tree",
+    "Textures/Moon/Archive/Elev.tree",
+    "Textures/Mars/Archive/Surf.tree",
+    "Textures/Mars/Archive/Elev.tree"
+  ],
+  "capture_method": "Downloaded through the publisher resource Go to download link in Chrome, 2026-10-31; SHA256 and all selected ZIP CRCs recorded before use."
+}

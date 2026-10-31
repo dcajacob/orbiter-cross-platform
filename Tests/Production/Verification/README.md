@@ -22,8 +22,15 @@ small evidence archives remain in Git beyond hosted retention; no Mesa binaries
 or stock data package are committed. The complete runtime package/license lock
 is recorded separately.
 
-Production orbit/propulsion captures remain **candidates** until repeated runs
-and cross-configuration checks pass and their evidence is frozen explicitly.
+Production orbit/propulsion references are now [accepted and frozen](../Reference/README.md)
+from [run 41187217665](https://github.com/dcajacob/orbiter-cross-platform/actions/runs/41187217665),
+source `e70041fa2991d1bfefe66575ced1e32c92898f82`. Both Debug/Release original
+application builds and existing tests pass, including original two-body parity.
+Both production cases repeat byte-identically; cross-configuration position,
+velocity, rotation, angular velocity, MJD, mass and fuel differences are zero.
+The original Debug/Release artifacts and comparison ZIPs are retained in Evidence,
+with individual ZIP/member digests in the accepted reference provenance.
+
 Atmosphere/contact/docking/autopilot, pause/warp, object/focus lifetime,
 persistence and vessel callback references are still required before extracting
 their respective production subsystems. No fixture capture here establishes
@@ -42,3 +49,21 @@ are retained in `Evidence/41186215473-production-reference-*-x64.zip`, with
 GitHub digests `904b62eb06fd03d3da0aaaf776313163c23353fff80897e694fc11afebcbbdc7`
 (Debug) and `5a70b8c16a8edc458fb1bc3815ea776db00c680ab8601d93b72e2e501f5e4864`
 (Release).
+
+Native SPICE data coverage passed separately in
+[run 41187217756](https://github.com/dcajacob/orbiter-cross-platform/actions/runs/41187217756).
+Ubuntu 24.04/GCC 13.3 and local GCC 15.2/CSPICE N0067 pass 11,481 queries covering
+41 Sol bodies and barycentres across 129 distinct epochs, plus rejection of an
+unsupported epoch. The output SHA256 is identical between the two Linux builds.
+This directly exercises the pinned CSPICE kernels; it is not production Orbiter
+execution or full scenario initialization. The original
+[coverage artifact](Evidence/41187217756-native-spice-data-coverage.zip) has SHA256
+`43a0c4c2b4ff6d82585e3db3f435ced43ccaad3955b3b73e064b66ec390efec0`.
+[LocalSpiceCoverage.json](LocalSpiceCoverage.json) retains the separate local result.
+
+Standard planetary archives are locked separately from the orbital fixture data.
+The publisher's Orbiter2016.zip SHA256 is
+`bdbf747dd930ced34a3cca34b69dc7e2d9733e0b9498ee8d6224090cf008dc30`;
+28 selected archive file hashes matched an existing compatible Orbiter-2024 data
+directory locally. This input-resource result does not establish renderer or
+terrain/contact acceptance, and does not change the frozen orbit data profile.

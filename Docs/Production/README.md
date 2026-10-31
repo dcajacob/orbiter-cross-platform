@@ -78,7 +78,7 @@ files. A complete redistributable stock-data license manifest is still required.
 | Phase | Delivery | Status / exit condition |
 | --- | --- | --- |
 | 0 | Honest POC labeling, scope and inventories | Source inventory implemented; no production runtime claim |
-| 1 | Production Windows references and hosted WGL | Hosted WGL Debug/Release passed; production references and complete data/license locks still required |
+| 1 | Production Windows references and hosted WGL | Hosted WGL, frozen orbit/propulsion references and native SPICE data audit passed; broader subsystem references and complete data/license locks remain |
 | 2 | Real Windows OpenGL client | Not started; normal registration/lifecycle, actual Sol ISS/ShuttlePB meshes/assets and scene manifest |
 | 3 | Production engine/platform boundary | Not started; Windows reference/ABI/lifecycle regression gates after every extraction |
 | 4 | Native real world/external client | Not started; SPICE and actual ISS then native ShuttlePB; cross-platform state/scene parity |
@@ -130,7 +130,7 @@ prepare a pinned Mesa/LLVM source build. If the hosted runner cannot create a
 usable Windows window environment, the gate is blocked. Linux rendering,
 compilation or an offscreen-only context cannot satisfy it.
 
-## Production reference candidates
+## Production Windows references
 
 The test-only `ProductionReferenceDriver` is built with
 `ORBITER_PRODUCTION_REFERENCE_CAPTURE=ON` in the existing Windows application.
@@ -166,9 +166,12 @@ asset installer. The upstream `latest` asset URL can disappear or be replaced;
 a different hash fails explicitly. Durable versioned release storage and complete
 stock-data redistribution/license review remain unresolved release inputs.
 
-Candidate output directories must not exist before capture. Successful repeated
-runs and cross-configuration checks make them eligible for explicit acceptance;
-no script writes or refreshes an accepted reference automatically. Atmosphere,
+Candidate output directories must not exist before capture. Initial orbit and
+propulsion references are now [explicitly accepted and frozen](../../Tests/Production/Reference/README.md)
+from hosted source `e70041fa`: repeats are byte-identical, Debug/Release errors are
+zero and independent fuel accounting passes. Normal CI verifies the current
+application against that evidence using `--reference`; no script writes or
+refreshes an accepted reference automatically. Atmosphere,
 contact/docking, autopilot, time controls, object lifetime and persistence
 reference cases remain pending. Phase 1 is not declared complete merely because
 orbit/propulsion candidates or the WGL probe pass.
@@ -197,7 +200,34 @@ The audit records them and uses the explicitly supplied coverage epoch, without
 editing the files. A production replay of these scenarios must record/control
 the application's default clock before world creation. Local GCC 15.2/CSPICE
 N0067 passes 11,481 queries across 129 epochs, including MJD 61344.5, and the
-out-of-coverage negative case. This is a local result until hosted data CI passes.
+out-of-coverage negative case. [Hosted Ubuntu 24.04/GCC 13.3](https://github.com/dcajacob/orbiter-cross-platform/actions/runs/41187217756)
+passes the same audit, with byte-identical query output. Original evidence and
+the separate local report are preserved in `Tests/Production/Verification`.
+
+### Standard planet data, separate from SPICE
+
+The pinned nightly release ZIP contains no Earth tile tree. Its orbital fixture
+references must not be treated as terrain or graphical acceptance. The publisher's
+[Orbiter 2016 core ZIP](https://www.orbiter-forum.com/resources/orbiter-2016-core-zip-edition.5425/)
+contains the standard planet archives, which the current source supports. The
+separate `standard-planets.lock.json` pins the publisher archive and 28 `.tree`
+file hashes, including Earth/Moon/Mars surface and elevation and Earth clouds.
+Only planet archive data is selected; the production SPICE model/kernels and
+source-built modules/configuration remain authoritative.
+
+An existing compatible directory was verified locally without modification:
+
+```sh
+python3 -B Tests/Production/prepare_data.py \
+  --lock Tests/Production/standard-planets.lock.json \
+  --destination /path/to/existing/Orbiter-2024 --verify-only
+```
+
+For an isolated extraction, supply the verified publisher ZIP with `--archive`
+and a separate `--destination`. These planet archives were not part of the frozen
+orbit fixture's input profile. Further production terrain/scene references must
+record the combined profile explicitly. Durable package storage, complete license
+review and the final resumable asset installer remain outstanding.
 
 ## Production references and acceptance contracts
 

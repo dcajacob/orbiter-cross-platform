@@ -14,12 +14,12 @@
   "cases": [
     {
       "id": "sol-orbit",
-      "status": "candidate-capture-in-progress",
+      "status": "accepted",
       "required_before": "world/ephemeris extraction"
     },
     {
       "id": "main-rcs-fuel",
-      "status": "candidate-capture-in-progress",
+      "status": "accepted",
       "required_before": "propulsion extraction"
     },
     {
@@ -69,5 +69,23 @@
     }
   ],
   "data_storage": "upstream digest-pinned package; durable versioned mirror and redistribution review pending",
-  "automatic_reference_refresh": false
+  "automatic_reference_refresh": false,
+  "production_reference": {
+    "run_id": 41187217665,
+    "capture_commit": "e70041fa2991d1bfefe66575ced1e32c92898f82",
+    "provenance": "Reference/provenance.json",
+    "max_debug_release_error": 0
+  },
+  "spice_data_coverage": {
+    "status": "passed-hosted-and-local",
+    "run_id": 41187217756,
+    "bodies": 41,
+    "queries": 11481,
+    "epochs": 129
+  },
+  "standard_planet_archives": {
+    "status": "28 archives verified against publisher ZIP in existing compatible directory",
+    "lock": "standard-planets.lock.json",
+    "orbital_reference_uses_this_profile": false
+  }
 }

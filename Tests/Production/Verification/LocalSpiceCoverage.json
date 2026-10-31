@@ -1,0 +1,29 @@
+{
+  "status": "passed",
+  "scope": "direct CSPICE data coverage; not a production Orbiter execution",
+  "source_commit": "38b7c627878ea893390675616897071f8bb8e90f",
+  "bodies": 41,
+  "stock_scenarios": 157,
+  "unique_epochs": 129,
+  "queries": 11481,
+  "executable_sha256": "fac81494e4c15a41e6d35a1d0a048f17d9f6bc33aff92ab59396c531ed49eba6",
+  "default_coverage_mjd": 61344.5,
+  "wall_clock_scenarios": [
+    "Scenarios/Challenges/Challenge 2 - Lunar transfer.scn",
+    "Scenarios/Challenges/Challenge 3 - Advanced lunar transfer.scn",
+    "Scenarios/Challenges/Challenge 4 - Entry and landing.scn",
+    "Scenarios/Demo/Today.scn",
+    "Scenarios/The Solar System/Ephemerides/Earth-Moon system.scn",
+    "Scenarios/The Solar System/Ephemerides/Jovian satellites.scn",
+    "Scenarios/The Solar System/Today.scn"
+  ],
+  "query_sha256": "f05e970fff786690c3b46f7867401206cc527087a99082980f67ff5c29e3b3c0",
+  "states_sha256": "ce73e6607ce12401f74442053f8a63600d12ded9503ab307345f4e066974404a",
+  "toolkit": "CSPICE CSPICE_N0067; 11481 coverage queries passed",
+  "invalid_epoch_rejected": true,
+  "kernel_sha256": {
+    "Kernels/naif0012.tls": "678e32bdb5a744117a467cd9601cd6b373f0e9bc9bbde1371d5eee39600a039b",
+    "Kernels/orbiter.bsp": "f98bd1a789fca05e0a1148db6d4b6d20ff7146896864bb04e4aac9c190371f83",
+    "Kernels/pck00011.tpc": "3dff7b1dbeceaa01f25467767d3fa25816051c85d162d1edf04acb310ee28bb1"
+  }
+}

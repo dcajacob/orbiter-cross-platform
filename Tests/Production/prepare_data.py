@@ -50,7 +50,8 @@ def main():
         path = args.destination / name
         require(path.is_file() and path.stat().st_size == entry['bytes'] and digest(path) == entry['sha256'],
                 'missing or incompatible production data: ' + name)
-    require((args.destination/'Kernels/orbiter.bsp').is_file(), 'SPICE orbiter.bsp is required')
+    for name in lock.get('required_files', ['Kernels/orbiter.bsp']):
+        require((args.destination/name).is_file(), 'required data file is missing: '+name)
     print(f"Verified {len(lock['data_files'])} production data files; package {lock['sha256']}")
 
 
