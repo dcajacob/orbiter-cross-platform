@@ -1,3 +1,8 @@
+// ORBITER_PRODUCTION_OBSERVATION_BEGIN
+#ifdef ORBITER_PRODUCTION_OBSERVATION
+#include "ApplicationObservation.h"
+#endif
+// ORBITER_PRODUCTION_OBSERVATION_END
 // Copyright (c) Martin Schweiger
 // Licensed under the MIT License
 
@@ -269,7 +274,19 @@ void Vessel::SetClassCaps (ifstream &classf)
 {
 	// Query module for caps
 	if (modIntf.v->Version() >= 1)      // VESSEL2 interface
+// ORBITER_PRODUCTION_OBSERVATION_BEGIN
+#ifdef ORBITER_PRODUCTION_OBSERVATION
+{
+    OrbiterTestObserve("vessel.setcaps.before", Name(), td.SimT0, td.MJD0, 1);
+#endif
+// ORBITER_PRODUCTION_OBSERVATION_END
 		((VESSEL2*)modIntf.v)->clbkSetClassCaps ((FILEHANDLE)&classf);
+// ORBITER_PRODUCTION_OBSERVATION_BEGIN
+#ifdef ORBITER_PRODUCTION_OBSERVATION
+    OrbiterTestObserve("vessel.setcaps.after", Name(), td.SimT0, td.MJD0, 1);
+}
+#endif
+// ORBITER_PRODUCTION_OBSERVATION_END
 
 	// Read specs from class or vessel cfg file
 	ReadGenericCaps (classf);
@@ -795,7 +812,19 @@ void Vessel::ModulePostCreation ()
 {
 	// now let the module do its post-creation stuff
 	if (modIntf.v->Version() >= 1)
+// ORBITER_PRODUCTION_OBSERVATION_BEGIN
+#ifdef ORBITER_PRODUCTION_OBSERVATION
+{
+    OrbiterTestObserve("vessel.postcreation.before", Name(), td.SimT0, td.MJD0, 1);
+#endif
+// ORBITER_PRODUCTION_OBSERVATION_END
 		((VESSEL2*)modIntf.v)->clbkPostCreation ();
+// ORBITER_PRODUCTION_OBSERVATION_BEGIN
+#ifdef ORBITER_PRODUCTION_OBSERVATION
+    OrbiterTestObserve("vessel.postcreation.after", Name(), td.SimT0, td.MJD0, 1);
+}
+#endif
+// ORBITER_PRODUCTION_OBSERVATION_END
 	m_hullCachePValid = false;
 	RefreshCollisionOverlapState();
 }
@@ -2692,7 +2721,19 @@ void Vessel::RegisterDocking (DWORD did, Vessel *mate, DWORD matedid)
 		dock[did]->pending = 0;
 		dock[did]->status = 0;
 		if (modIntf.v->Version() >= 1)
+// ORBITER_PRODUCTION_OBSERVATION_BEGIN
+#ifdef ORBITER_PRODUCTION_OBSERVATION
+{
+    OrbiterTestObserve("vessel.dock.before", Name(), td.SimT0, td.MJD0, 1);
+#endif
+// ORBITER_PRODUCTION_OBSERVATION_END
 			((VESSEL2*)modIntf.v)->clbkDockEvent (did, (OBJHANDLE)mate);
+// ORBITER_PRODUCTION_OBSERVATION_BEGIN
+#ifdef ORBITER_PRODUCTION_OBSERVATION
+    OrbiterTestObserve("vessel.dock.after", Name(), td.SimT0, td.MJD0, 1);
+}
+#endif
+// ORBITER_PRODUCTION_OBSERVATION_END
 	}
 }
 
@@ -2703,7 +2744,19 @@ void Vessel::UnregisterDocking (DWORD did)
 	if (dock[did]->mate) {
 		dock[did]->mate = 0;
 		if (modIntf.v->Version() >= 1)
+// ORBITER_PRODUCTION_OBSERVATION_BEGIN
+#ifdef ORBITER_PRODUCTION_OBSERVATION
+{
+    OrbiterTestObserve("vessel.undock.before", Name(), td.SimT0, td.MJD0, 1);
+#endif
+// ORBITER_PRODUCTION_OBSERVATION_END
 			((VESSEL2*)modIntf.v)->clbkDockEvent (did, 0);
+// ORBITER_PRODUCTION_OBSERVATION_BEGIN
+#ifdef ORBITER_PRODUCTION_OBSERVATION
+    OrbiterTestObserve("vessel.undock.after", Name(), td.SimT0, td.MJD0, 1);
+}
+#endif
+// ORBITER_PRODUCTION_OBSERVATION_END
 		undock_t = td.SimT0;
 	}
 }
@@ -6754,7 +6807,19 @@ void Vessel::Update (bool force)
 	// module interface calls
 	if (hVis && animcount) {
 		if (modIntf.v->Version() >= 1)
+// ORBITER_PRODUCTION_OBSERVATION_BEGIN
+#ifdef ORBITER_PRODUCTION_OBSERVATION
+{
+    OrbiterTestObserve("vessel.animate.before", Name(), td.SimT1, td.MJD1, 1);
+#endif
+// ORBITER_PRODUCTION_OBSERVATION_END
 			((VESSEL2*)modIntf.v)->clbkAnimate (td.SimT1);
+// ORBITER_PRODUCTION_OBSERVATION_BEGIN
+#ifdef ORBITER_PRODUCTION_OBSERVATION
+    OrbiterTestObserve("vessel.animate.after", Name(), td.SimT1, td.MJD1, 1);
+}
+#endif
+// ORBITER_PRODUCTION_OBSERVATION_END
 	}
 
 	Flin.Set (Flin_add);    // store current linear force
@@ -6986,13 +7051,37 @@ void Vessel::Timejump (double dt, int mode)
 void Vessel::ModulePreStep (double t, double dt, double mjd)
 {
 	if (modIntf.v->Version() >= 1)
+// ORBITER_PRODUCTION_OBSERVATION_BEGIN
+#ifdef ORBITER_PRODUCTION_OBSERVATION
+{
+    OrbiterTestObserve("vessel.pre.before", Name(), t, mjd, 1);
+#endif
+// ORBITER_PRODUCTION_OBSERVATION_END
 		((VESSEL2*)modIntf.v)->clbkPreStep (t, dt, mjd);
+// ORBITER_PRODUCTION_OBSERVATION_BEGIN
+#ifdef ORBITER_PRODUCTION_OBSERVATION
+    OrbiterTestObserve("vessel.pre.after", Name(), t, mjd, 1);
+}
+#endif
+// ORBITER_PRODUCTION_OBSERVATION_END
 }
 
 void Vessel::ModulePostStep (double t, double dt, double mjd)
 {
 	if (modIntf.v->Version() >= 1)
+// ORBITER_PRODUCTION_OBSERVATION_BEGIN
+#ifdef ORBITER_PRODUCTION_OBSERVATION
+{
+    OrbiterTestObserve("vessel.post.before", Name(), t, mjd, 1);
+#endif
+// ORBITER_PRODUCTION_OBSERVATION_END
 		((VESSEL2*)modIntf.v)->clbkPostStep (t, dt, mjd);
+// ORBITER_PRODUCTION_OBSERVATION_BEGIN
+#ifdef ORBITER_PRODUCTION_OBSERVATION
+    OrbiterTestObserve("vessel.post.after", Name(), t, mjd, 1);
+}
+#endif
+// ORBITER_PRODUCTION_OBSERVATION_END
 }
 
 void Vessel::ModuleSignalRCSmode (int mode)
@@ -7894,7 +7983,19 @@ bool Vessel::Read (ifstream &scn)
 
 	void *vsptr = (void*)&vs;
 	if (modIntf.v->Version() >= 1) {
+// ORBITER_PRODUCTION_OBSERVATION_BEGIN
+#ifdef ORBITER_PRODUCTION_OBSERVATION
+{
+    OrbiterTestObserve("vessel.load.before", Name(), td.SimT0, td.MJD0, 1);
+#endif
+// ORBITER_PRODUCTION_OBSERVATION_END
 		((VESSEL2*)modIntf.v)->clbkLoadStateEx ((FILEHANDLE)&scn, vsptr);
+// ORBITER_PRODUCTION_OBSERVATION_BEGIN
+#ifdef ORBITER_PRODUCTION_OBSERVATION
+    OrbiterTestObserve("vessel.load.after", Name(), td.SimT0, td.MJD0, 1);
+}
+#endif
+// ORBITER_PRODUCTION_OBSERVATION_END
 		res = true;
 	} else {
 		res = ParseScenarioEx (scn, vsptr);
@@ -7965,7 +8066,19 @@ void Vessel::Write (ostream &scn) const
 	scn << endl;
 
 	if (modIntf.v->Version() >= 1)
+// ORBITER_PRODUCTION_OBSERVATION_BEGIN
+#ifdef ORBITER_PRODUCTION_OBSERVATION
+{
+    OrbiterTestObserve("vessel.save.before", Name(), td.SimT0, td.MJD0, 1);
+#endif
+// ORBITER_PRODUCTION_OBSERVATION_END
 		((VESSEL2*)modIntf.v)->clbkSaveState ((FILEHANDLE)&scn);
+// ORBITER_PRODUCTION_OBSERVATION_BEGIN
+#ifdef ORBITER_PRODUCTION_OBSERVATION
+    OrbiterTestObserve("vessel.save.after", Name(), td.SimT0, td.MJD0, 1);
+}
+#endif
+// ORBITER_PRODUCTION_OBSERVATION_END
 	else
 		WriteDefault (scn);
 

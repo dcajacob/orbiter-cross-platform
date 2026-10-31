@@ -1,3 +1,8 @@
+// ORBITER_PRODUCTION_OBSERVATION_BEGIN
+#ifdef ORBITER_PRODUCTION_OBSERVATION
+#include "ApplicationObservation.h"
+#endif
+// ORBITER_PRODUCTION_OBSERVATION_END
 // Copyright (c) Martin Schweiger
 // Licensed under the MIT License
 
@@ -54,6 +59,11 @@ bool State::Read (const char *fname)
 	double t;
 	mjd0 = MJD (time (NULL)); // default to current system time
 	mjd0 += UTC_CT_diff*day;  // map from UTC to CT (or TDB) time scales
+// ORBITER_PRODUCTION_OBSERVATION_BEGIN
+#ifdef ORBITER_PRODUCTION_OBSERVATION
+mjd0 = OrbiterTestDefaultMjd(mjd0);
+#endif
+// ORBITER_PRODUCTION_OBSERVATION_END
 	mjd = mjd0;
 	solsys.clear();           // no scenario solsys by default
 	context.clear();          // no scenario context by default

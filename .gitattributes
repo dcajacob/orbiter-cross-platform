@@ -5,3 +5,6 @@ Tests/Portable/Reference/*.csv text eol=lf
 
 # Production provenance hashes must identify the same lock bytes on both hosts.
 Tests/Production/*.json text eol=lf
+
+# Preserve the legacy mixed newline bytes around observation-only test hooks.
+Src/Orbiter/Vessel.cpp -text

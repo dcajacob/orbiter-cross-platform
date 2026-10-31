@@ -1,3 +1,8 @@
+// ORBITER_PRODUCTION_OBSERVATION_BEGIN
+#ifdef ORBITER_PRODUCTION_OBSERVATION
+#include "ApplicationObservation.h"
+#endif
+// ORBITER_PRODUCTION_OBSERVATION_END
 // Copyright (c) Martin Schweiger
 // Licensed under the MIT License
 
@@ -1799,12 +1804,32 @@ bool Orbiter::BeginTimeStep (bool running)
 void Orbiter::EndTimeStep (bool running)
 {
 	if (running) {
+// ORBITER_PRODUCTION_OBSERVATION_BEGIN
+#ifdef ORBITER_PRODUCTION_OBSERVATION
+OrbiterTestObserve("world.finalise.before", "", td.SimT0, td.MJD0, 1);
+#endif
+// ORBITER_PRODUCTION_OBSERVATION_END
 		if (g_psys) g_psys->FinaliseUpdate ();
+// ORBITER_PRODUCTION_OBSERVATION_BEGIN
+#ifdef ORBITER_PRODUCTION_OBSERVATION
+OrbiterTestObserve("world.finalise.after", "", td.SimT0, td.MJD0, 1);
+#endif
+// ORBITER_PRODUCTION_OBSERVATION_END
 		//ModulePostStep();
 	}
 
 	// Copy frame times from T1 to T0
+// ORBITER_PRODUCTION_OBSERVATION_BEGIN
+#ifdef ORBITER_PRODUCTION_OBSERVATION
+OrbiterTestObserve("time.end.before", "", td.SimT0, td.MJD0, running ? 1 : 0);
+#endif
+// ORBITER_PRODUCTION_OBSERVATION_END
 	td.EndStep (running);
+// ORBITER_PRODUCTION_OBSERVATION_BEGIN
+#ifdef ORBITER_PRODUCTION_OBSERVATION
+OrbiterTestObserve("time.end.after", "", td.SimT0, td.MJD0, running ? 1 : 0);
+#endif
+// ORBITER_PRODUCTION_OBSERVATION_END
 	if (running && physicsTrace.IsOpen()) WritePhysicsTrace(false);
 
 	// Update panels
@@ -1814,6 +1839,11 @@ void Orbiter::EndTimeStep (bool running)
 	// Update visual states
 	if (gclient) gclient->clbkUpdate (bRunning);
 	g_bForceUpdate = false;                        // clear flag
+// ORBITER_PRODUCTION_OBSERVATION_BEGIN
+#ifdef ORBITER_PRODUCTION_OBSERVATION
+OrbiterTestObserve("app.frame.end", "", td.SimT0, td.MJD0, running ? 1 : 0);
+#endif
+// ORBITER_PRODUCTION_OBSERVATION_END
 
 	// check for termination of demo mode
 	if (SessionLimitReached())
@@ -1992,6 +2022,11 @@ void Orbiter::ModulePostStep ()
 //-----------------------------------------------------------------------------
 VOID Orbiter::UpdateWorld ()
 {
+// ORBITER_PRODUCTION_OBSERVATION_BEGIN
+#ifdef ORBITER_PRODUCTION_OBSERVATION
+OrbiterTestObserve("world.update.before", "", td.SimT0, td.MJD0, bRunning ? 1 : 0);
+#endif
+// ORBITER_PRODUCTION_OBSERVATION_END
 	// module pre-timestep callbacks
 	if (bRunning) ModulePreStep ();
 
@@ -2011,6 +2046,11 @@ VOID Orbiter::UpdateWorld ()
 	if (!KillVessels())  // kill any vessels marked for deletion
 		if (hRenderWnd) DestroyWindow (hRenderWnd);
 
+// ORBITER_PRODUCTION_OBSERVATION_BEGIN
+#ifdef ORBITER_PRODUCTION_OBSERVATION
+OrbiterTestObserve("world.update.after", "", td.SimT0, td.MJD0, bRunning ? 1 : 0);
+#endif
+// ORBITER_PRODUCTION_OBSERVATION_END
 	//g_texmanager->OutputInfo();
 }
 

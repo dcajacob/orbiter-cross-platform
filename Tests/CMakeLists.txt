@@ -3,11 +3,20 @@ Include(FetchContent)
 # Test-only control/observation plugin; never installed as a stock module.
 option(ORBITER_PRODUCTION_REFERENCE_CAPTURE "Build production Windows reference driver" OFF)
 if(WIN32 AND ORBITER_PRODUCTION_REFERENCE_CAPTURE)
+    target_sources(${OrbiterTgt} PRIVATE Production/ApplicationObservation.cpp)
+    target_include_directories(${OrbiterTgt} PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/Production")
+    target_compile_definitions(${OrbiterTgt} PRIVATE ORBITER_PRODUCTION_OBSERVATION=1)
     add_library(ProductionReferenceDriver SHARED Production/ReferenceDriver.cpp)
     target_include_directories(ProductionReferenceDriver PRIVATE ${ORBITER_SOURCE_SDK_INCLUDE_DIR})
     target_link_libraries(ProductionReferenceDriver PRIVATE ${ORBITER_LIB} ${ORBITER_SDK_LIB})
     add_dependencies(ProductionReferenceDriver ${OrbiterTgt} Orbitersdk)
     set_target_properties(ProductionReferenceDriver PROPERTIES
+        RUNTIME_OUTPUT_DIRECTORY "${ORBITER_BINARY_ROOT_DIR}/Modules/Plugin")
+    add_library(ProductionBehaviorDriver SHARED Production/BehaviorDriver.cpp)
+    target_include_directories(ProductionBehaviorDriver PRIVATE ${ORBITER_SOURCE_SDK_INCLUDE_DIR})
+    target_link_libraries(ProductionBehaviorDriver PRIVATE ${ORBITER_LIB} ${ORBITER_SDK_LIB})
+    add_dependencies(ProductionBehaviorDriver ${OrbiterTgt} Orbitersdk)
+    set_target_properties(ProductionBehaviorDriver PROPERTIES
         RUNTIME_OUTPUT_DIRECTORY "${ORBITER_BINARY_ROOT_DIR}/Modules/Plugin")
 endif()
 
