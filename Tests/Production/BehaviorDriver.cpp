@@ -127,10 +127,6 @@ public:
                 if (tick == 10) key(v,OAPI_KEY_G);
                 if (tick == 20) key(v,OAPI_KEY_K);
             }
-            if (id == "dg_persistence" && tick == 40) {
-                require(oapiSaveScenario("BehaviorSnapshot","Windows production persistence checkpoint"),"save checkpoint failed");
-                event("input.save",nameOf(target),"BehaviorSnapshot");
-            }
         });
     }
     void clbkPostStep(double, double, double) override { guarded([&] { event("module.post","",""); }); }
@@ -155,6 +151,12 @@ public:
             if (started && std::string(phase) == "app.frame.end") {
                 ++frame;
                 if (running) { ++tick; snapshot(); }
+                if (id == "dg_persistence" && running && tick == 40) {
+                    // Save only after state finalization and EndStep, so the
+                    // stock serializer's MJD1 and its state vectors agree.
+                    require(oapiSaveScenario("BehaviorSnapshot","Windows production persistence checkpoint"),"save checkpoint failed");
+                    event("input.save",nameOf(target),"BehaviorSnapshot");
+                }
                 if (id == "clock") {
                     if (running && tick == 60 && !pauseRequested) { pauseRequested=true; oapiSetPause(true); event("input.pause","","1"); }
                     if (!running && ++pausedFrames == 3) { oapiSetPause(false); event("input.pause","","0"); }

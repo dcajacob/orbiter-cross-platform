@@ -128,5 +128,15 @@
     "contact_velocity_m_s": 0.1,
     "contact_rotation_rad": 0.001,
     "contact_event_tick": 1
+  },
+  "serialization_precision": {
+    "source": "Src/Orbiter/Vessel.cpp and Src/Vessel/Common/Instrument.cpp, unchanged stock serializer",
+    "position_decimals_m": 3,
+    "velocity_decimals_m_s": 4,
+    "attitude_decimals_degrees": 3,
+    "animation_decimals": 4,
+    "position_global_subtraction_floor_m": 0.0001,
+    "fixed_checkpoint_tick": 40,
+    "checkpoint_phase": "app.frame.end after FinaliseUpdate and EndStep"
   }
 }

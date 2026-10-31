@@ -172,6 +172,36 @@ def compare(reference,candidate,case):
     return maxima
 
 
+def persistence_round_trip(saved,reloaded):
+    """Measure the stock Windows format's documented decimal quantization."""
+    before={r['object']:r for r in rows(saved/'behavior-state.csv') if r['tick']=='40'}
+    after={r['object']:r for r in rows(reloaded/'behavior-state.csv') if r['tick']=='0'}
+    require(before.keys()==after.keys(),'stock reload changed vessel identities')
+    result={}
+    for name,a in before.items():
+        b=after[name]
+        vector=lambda row,keys:[float(row[k]) for k in keys]
+        p=distance(vector(a,('rx','ry','rz')),vector(b,('rx','ry','rz')))
+        v=distance(vector(a,('vx','vy','vz')),vector(b,('vx','vy','vz')))
+        q=quaternion_angle(quaternion(a),quaternion(b))
+        # Vessel::Write: RPOS .3 m, RVEL .4 m/s, AROT .3 degrees.
+        # Position allowance includes global-coordinate double subtraction.
+        require(p<=math.sqrt(3)*.0005+.0001,'reload exceeds stock position serialization precision')
+        require(v<=math.sqrt(3)*.00005+1e-8,'reload exceeds stock velocity serialization precision')
+        require(q<=math.sqrt(3)*math.radians(.0005)+1e-8,'reload exceeds stock attitude serialization precision')
+        require(abs(float(a['mjd'])-float(b['mjd']))<=1e-10,'finalized checkpoint epoch changed on reload')
+        require(a['class']==b['class'] and a['dock']==b['dock'],'stock module/docking identity lost on reload')
+        result[name]=dict(position_m=p,velocity_m_s=v,rotation_rad=q)
+    a={(r['object'],r['index']):float(r['state']) for r in rows(saved/'behavior-animations.csv') if r['tick']=='40'}
+    b={(r['object'],r['index']):float(r['state']) for r in rows(reloaded/'behavior-animations.csv') if r['tick']=='0'}
+    require(a.keys()==b.keys(),'stock animation identities lost on reload')
+    require(all(abs(value-b[key])<=.00005+1e-12 for key,value in a.items()),'stock .4-decimal animation state lost on reload')
+    text=(saved/'Scenarios/BehaviorSnapshot.scn').read_text()
+    require(all(token in text for token in ('GEAR ','NOSECONE ','PSNGR 2 3 4','TANKCONFIG 1')),
+            'DG-specific persistence fields missing from stock serializer')
+    return result
+
+
 def stage(executable,data,planets,directory,case,reload):
     directory.mkdir()
     for p in executable.parent.iterdir():
@@ -254,6 +284,7 @@ def main():
                 repeated=stage(executable,args.data.resolve(),args.planets.resolve(),output/(name+'-repeat'),case,reload)
                 report['cases'][name]=dict(first=first,repeat=repeated,comparison=compare(output/name,output/(name+'-repeat'),case))
                 for filename in FILES:require((output/name/filename).read_bytes()==(output/(name+'-repeat')/filename).read_bytes(),'behavior repeat is not byte-identical: '+name+'/'+filename)
+                if name=='dg_reload':report['stock_serialization_round_trip']=persistence_round_trip(output/'dg_persistence',output/name)
             except Exception as error:
                 report['cases'][name]=dict(status='failed',error=str(error));failures.append(name)
                 print(name+': '+str(error),flush=True)
