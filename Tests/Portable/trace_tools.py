@@ -7,7 +7,7 @@ import math
 from pathlib import Path
 
 FIELDS = "step sim_seconds mjd rx ry rz vx vy vz qx qy qz qw wx wy wz".split()
-# Same historical constant as Astro.h; do not substitute a newer physical value.
+# Same historical constant as AstroMath.h; do not substitute a newer physical value.
 G = 6.67259e-11
 MASS = 5.972e24
 MU = G * MASS

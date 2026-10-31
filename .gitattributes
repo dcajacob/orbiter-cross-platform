@@ -1,1 +1,4 @@
 * text=auto
+
+# Frozen trace hashes describe exact LF bytes on every platform.
+Tests/Portable/Reference/*.csv text eol=lf
