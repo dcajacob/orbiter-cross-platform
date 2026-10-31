@@ -1,0 +1,48 @@
+name: Preserve Accepted Windows Client Evidence
+
+on:
+  push:
+    branches: ['codex/production-**']
+    paths:
+      - '.github/workflows/preserve-production-client.yml'
+      - 'Tests/Production/ClientReference/provenance.json'
+      - 'Tests/Production/preserve_client.py'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  actions: read
+
+concurrency:
+  group: accepted-windows-client-v1
+  cancel-in-progress: false
+
+jobs:
+  preserve:
+    if: github.repository == 'dcajacob/orbiter-cross-platform'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    env:
+      GH_TOKEN: ${{ github.token }}
+      GH_REPO: ${{ github.repository }}
+    steps:
+      - uses: actions/checkout@v7
+      - name: Check and download explicitly accepted original evidence
+        run: python3 -B Tests/Production/preserve_client.py --output out/client-preserved
+      - name: Preserve the accepted component and evidence without replacing a release
+        run: |
+          if gh release view production-windows-client-v1 >/dev/null 2>&1; then
+            mkdir out/previous
+            gh release download production-windows-client-v1 --pattern provenance.json --dir out/previous
+            cmp out/client-preserved/provenance.json out/previous/provenance.json
+          else
+            gh release create production-windows-client-v1 out/client-preserved/* \
+              --target "$GITHUB_SHA" --prerelease \
+              --title 'Real Windows OpenGL client integration v1' \
+              --notes-file Tests/Production/ClientReference/README.md
+          fi
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: preserved-client-evidence-index
+          path: out/client-preserved/files.json

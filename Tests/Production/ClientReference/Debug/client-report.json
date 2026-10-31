@@ -1,0 +1,1426 @@
+{
+  "status": "passed real Windows production scene",
+  "provenance": {
+    "renderer_source": "21f92f44f3afd0c3ca8a704edd4ef2ce8e10c6a0",
+    "application_source": "06d8989823c59e651061d409425c19ec71360bfa",
+    "data_profiles_sha256": {
+      "stock-data.lock.json": "155fb89d22d58af113da6ff662904d74f82bbbbb7b9deb5e654b7c7141e27620",
+      "standard-planets.lock.json": "de0366be8f138b11135e5f675cc44ae0d4cf9a8b11fe0f71772ad617237185c4",
+      "mesa-ucrt64.lock.json": "16d52920c82eab9db41f46bd0511ce87260ed1a6c95a05361cd0248b01516a6c"
+    }
+  },
+  "executable_sha256": "9f90574b6cfdf3fbcb8d5fd29a8f67558d5db53f762b1f1c17f7d050884e6412",
+  "client_sha256": "2c686da3c40bc06776b6b5a10613594a99acd2a4d8f78b4f42afe644a4b07174",
+  "renderer": {
+    "vendor": "Mesa",
+    "renderer": "llvmpipe (LLVM 23.1.4, 256 bits)",
+    "version": "4.6 (Core Profile) Mesa 26.2.6",
+    "client_width": 1280,
+    "client_height": 720
+  },
+  "geometry": {
+    "frames": 50,
+    "simulation_seconds": 12.5,
+    "mesh_draw_calls": 484,
+    "indices": 660483,
+    "width": 1280,
+    "height": 720
+  },
+  "lifecycle": {
+    "rendered_frames": 60,
+    "successful_presents": 60,
+    "context_deleted": true
+  },
+  "objects": [
+    {
+      "object": "Sun",
+      "type": "celestial",
+      "class": "",
+      "mesh": "",
+      "index": "",
+      "name": "",
+      "groups": "",
+      "materials": "",
+      "textures": "",
+      "px": "-603806769.90550673",
+      "py": "21198275.383646708",
+      "pz": "-774297228.29462659"
+    },
+    {
+      "object": "Mercury",
+      "type": "celestial",
+      "class": "",
+      "mesh": "",
+      "index": "",
+      "name": "",
+      "groups": "",
+      "materials": "",
+      "textures": "",
+      "px": "-25859532385.917458",
+      "py": "-2954567753.6813374",
+      "pz": "-65577467491.490883"
+    },
+    {
+      "object": "Venus",
+      "type": "celestial",
+      "class": "",
+      "mesh": "",
+      "index": "",
+      "name": "",
+      "groups": "",
+      "materials": "",
+      "textures": "",
+      "px": "-103909802557.93288",
+      "py": "6385533993.1990023",
+      "pz": "28605035283.705296"
+    },
+    {
+      "object": "Earth",
+      "type": "celestial",
+      "class": "",
+      "mesh": "",
+      "index": "",
+      "name": "",
+      "groups": "",
+      "materials": "",
+      "textures": "",
+      "px": "-148527234043.63922",
+      "py": "20927073.287146986",
+      "pz": "14878470784.41378"
+    },
+    {
+      "object": "Moon",
+      "type": "celestial",
+      "class": "",
+      "mesh": "",
+      "index": "",
+      "name": "",
+      "groups": "",
+      "materials": "",
+      "textures": "",
+      "px": "-148739096981.37378",
+      "py": "45405753.037017003",
+      "pz": "14557322948.178478"
+    },
+    {
+      "object": "Mars",
+      "type": "celestial",
+      "class": "",
+      "mesh": "",
+      "index": "",
+      "name": "",
+      "groups": "",
+      "materials": "",
+      "textures": "",
+      "px": "-193855617229.54822",
+      "py": "1889848043.096436",
+      "pz": "-138325536411.73053"
+    },
+    {
+      "object": "Phobos",
+      "type": "celestial",
+      "class": "",
+      "mesh": "",
+      "index": "",
+      "name": "",
+      "groups": "",
+      "materials": "",
+      "textures": "",
+      "px": "-193850262148.5603",
+      "py": "1887748963.2637811",
+      "pz": "-138317972394.88696"
+    },
+    {
+      "object": "Deimos",
+      "type": "celestial",
+      "class": "",
+      "mesh": "",
+      "index": "",
+      "name": "",
+      "groups": "",
+      "materials": "",
+      "textures": "",
+      "px": "-193851737816.43234",
+      "py": "1886402427.2061455",
+      "pz": "-138348405902.73593"
+    },
+    {
+      "object": "Vesta",
+      "type": "celestial",
+      "class": "",
+      "mesh": "",
+      "index": "",
+      "name": "",
+      "groups": "",
+      "materials": "",
+      "textures": "",
+      "px": "357506235858.04175",
+      "py": "-44114214140.529068",
+      "pz": "20194579845.993477"
+    },
+    {
+      "object": "Ceres",
+      "type": "celestial",
+      "class": "",
+      "mesh": "",
+      "index": "",
+      "name": "",
+      "groups": "",
+      "materials": "",
+      "textures": "",
+      "px": "-51855579223.322014",
+      "py": "-3465396514.996666",
+      "pz": "-419642009526.60754"
+    },
+    {
+      "object": "Jupiter",
+      "type": "celestial",
+      "class": "",
+      "mesh": "",
+      "index": "",
+      "name": "",
+      "groups": "",
+      "materials": "",
+      "textures": "",
+      "px": "189132964628.94952",
+      "py": "-7274348575.3303633",
+      "pz": "733298245715.88831"
+    },
+    {
+      "object": "Io",
+      "type": "celestial",
+      "class": "",
+      "mesh": "",
+      "index": "",
+      "name": "",
+      "groups": "",
+      "materials": "",
+      "textures": "",
+      "px": "188842562519.60046",
+      "py": "-7289412986.6181326",
+      "pz": "732990837993.10535"
+    },
+    {
+      "object": "Europa",
+      "type": "celestial",
+      "class": "",
+      "mesh": "",
+      "index": "",
+      "name": "",
+      "groups": "",
+      "materials": "",
+      "textures": "",
+      "px": "189743679838.87085",
+      "py": "-7274405562.8013487",
+      "pz": "733024723357.59729"
+    },
+    {
+      "object": "Ganymede",
+      "type": "celestial",
+      "class": "",
+      "mesh": "",
+      "index": "",
+      "name": "",
+      "groups": "",
+      "materials": "",
+      "textures": "",
+      "px": "189653405681.28806",
+      "py": "-7303074680.8384447",
+      "pz": "732364486020.58667"
+    },
+    {
+      "object": "Callisto",
+      "type": "celestial",
+      "class": "",
+      "mesh": "",
+      "index": "",
+      "name": "",
+      "groups": "",
+      "materials": "",
+      "textures": "",
+      "px": "187282346235.86786",
+      "py": "-7285588030.7588196",
+      "pz": "733711962277.84863"
+    },
+    {
+      "object": "Amalthea",
+      "type": "celestial",
+      "class": "",
+      "mesh": "",
+      "index": "",
+      "name": "",
+      "groups": "",
+      "materials": "",
+      "textures": "",
+      "px": "189030247626.71783",
+      "py": "-7271293352.5300999",
+      "pz": "733446963457.93652"
+    },
+    {
+      "object": "Himalia",
+      "type": "celestial",
+      "class": "",
+      "mesh": "",
+      "index": "",
+      "name": "",
+      "groups": "",
+      "materials": "",
+      "textures": "",
+      "px": "198082079495.55515",
+      "py": "-11745761882.071981",
+      "pz": "734272446111.66418"
+    },
+    {
+      "object": "Saturn",
+      "type": "celestial",
+      "class": "",
+      "mesh": "",
+      "index": "",
+      "name": "",
+      "groups": "",
+      "materials": "",
+      "textures": "",
+      "px": "644511981883.60132",
+      "py": "-46481665062.154099",
+      "pz": "1197393455354.1699"
+    },
+    {
+      "object": "Mimas",
+      "type": "celestial",
+      "class": "",
+      "mesh": "",
+      "index": "",
+      "name": "",
+      "groups": "",
+      "materials": "",
+      "textures": "",
+      "px": "644385003286.90881",
+      "py": "-46407926861.042664",
+      "pz": "1197276451332.5618"
+    },
+    {
+      "object": "Enceladus",
+      "type": "celestial",
+      "class": "",
+      "mesh": "",
+      "index": "",
+      "name": "",
+      "groups": "",
+      "materials": "",
+      "textures": "",
+      "px": "644278679503.25879",
+      "py": "-46443646778.642342",
+      "pz": "1197363917150.3535"
+    },
+    {
+      "object": "Tethys",
+      "type": "celestial",
+      "class": "",
+      "mesh": "",
+      "index": "",
+      "name": "",
+      "groups": "",
+      "materials": "",
+      "textures": "",
+      "px": "644748827414.81702",
+      "py": "-46417029035.178566",
+      "pz": "1197230403647.563"
+    },
+    {
+      "object": "Dione",
+      "type": "celestial",
+      "class": "",
+      "mesh": "",
+      "index": "",
+      "name": "",
+      "groups": "",
+      "materials": "",
+      "textures": "",
+      "px": "644798628236.00439",
+      "py": "-46390568982.793915",
+      "pz": "1197166162144.9197"
+    },
+    {
+      "object": "Rhea",
+      "type": "celestial",
+      "class": "",
+      "mesh": "",
+      "index": "",
+      "name": "",
+      "groups": "",
+      "materials": "",
+      "textures": "",
+      "px": "643999603481.8053",
+      "py": "-46494602566.099236",
+      "pz": "1197518637963.4558"
+    },
+    {
+      "object": "Titan",
+      "type": "celestial",
+      "class": "",
+      "mesh": "",
+      "index": "",
+      "name": "",
+      "groups": "",
+      "materials": "",
+      "textures": "",
+      "px": "645199553550.2804",
+      "py": "-46089755100.835564",
+      "pz": "1196503021840.3857"
+    },
+    {
+      "object": "Hyperion",
+      "type": "celestial",
+      "class": "",
+      "mesh": "",
+      "index": "",
+      "name": "",
+      "groups": "",
+      "materials": "",
+      "textures": "",
+      "px": "644151478211.23071",
+      "py": "-45826863058.878052",
+      "pz": "1196165103611.5281"
+    },
+    {
+      "object": "Iapetus",
+      "type": "celestial",
+      "class": "",
+      "mesh": "",
+      "index": "",
+      "name": "",
+      "groups": "",
+      "materials": "",
+      "textures": "",
+      "px": "646785937769.00891",
+      "py": "-47511125331.737724",
+      "pz": "1199817905505.825"
+    },
+    {
+      "object": "Phoebe",
+      "type": "celestial",
+      "class": "",
+      "mesh": "",
+      "index": "",
+      "name": "",
+      "groups": "",
+      "materials": "",
+      "textures": "",
+      "px": "648364868963.82983",
+      "py": "-47072118585.548866",
+      "pz": "1187029158343.8022"
+    },
+    {
+      "object": "Uranus",
+      "type": "celestial",
+      "class": "",
+      "mesh": "",
+      "index": "",
+      "name": "",
+      "groups": "",
+      "materials": "",
+      "textures": "",
+      "px": "2325796770582.394",
+      "py": "-37094466991.776497",
+      "pz": "-1873249908447.4019"
+    },
+    {
+      "object": "Miranda",
+      "type": "celestial",
+      "class": "",
+      "mesh": "",
+      "index": "",
+      "name": "",
+      "groups": "",
+      "materials": "",
+      "textures": "",
+      "px": "2325774749406.8271",
+      "py": "-37221086623.673859",
+      "pz": "-1873267270880.3875"
+    },
+    {
+      "object": "Ariel",
+      "type": "celestial",
+      "class": "",
+      "mesh": "",
+      "index": "",
+      "name": "",
+      "groups": "",
+      "materials": "",
+      "textures": "",
+      "px": "2325895472345.7725",
+      "py": "-36931122423.89962",
+      "pz": "-1873248869953.7839"
+    },
+    {
+      "object": "Umbriel",
+      "type": "celestial",
+      "class": "",
+      "mesh": "",
+      "index": "",
+      "name": "",
+      "groups": "",
+      "materials": "",
+      "textures": "",
+      "px": "2325986441277.3037",
+      "py": "-36907229527.922241",
+      "pz": "-1873265662204.731"
+    },
+    {
+      "object": "Titania",
+      "type": "celestial",
+      "class": "",
+      "mesh": "",
+      "index": "",
+      "name": "",
+      "groups": "",
+      "materials": "",
+      "textures": "",
+      "px": "2325427167723.7222",
+      "py": "-36888565867.628273",
+      "pz": "-1873139828377.3066"
+    },
+    {
+      "object": "Oberon",
+      "type": "celestial",
+      "class": "",
+      "mesh": "",
+      "index": "",
+      "name": "",
+      "groups": "",
+      "materials": "",
+      "textures": "",
+      "px": "2326366835752.2397",
+      "py": "-37087909138.770424",
+      "pz": "-1873372709703.9656"
+    },
+    {
+      "object": "Neptune",
+      "type": "celestial",
+      "class": "",
+      "mesh": "",
+      "index": "",
+      "name": "",
+      "groups": "",
+      "materials": "",
+      "textures": "",
+      "px": "2680661024969.4272",
+      "py": "12754956053.918163",
+      "pz": "-3619338285716.5352"
+    },
+    {
+      "object": "Triton",
+      "type": "celestial",
+      "class": "",
+      "mesh": "",
+      "index": "",
+      "name": "",
+      "groups": "",
+      "materials": "",
+      "textures": "",
+      "px": "2680817863024.9277",
+      "py": "12484740780.111279",
+      "pz": "-3619506425300.3633"
+    },
+    {
+      "object": "Proteus",
+      "type": "celestial",
+      "class": "",
+      "mesh": "",
+      "index": "",
+      "name": "",
+      "groups": "",
+      "materials": "",
+      "textures": "",
+      "px": "2680755746355.3262",
+      "py": "12740951828.620794",
+      "pz": "-3619270002936.9902"
+    },
+    {
+      "object": "Nereid",
+      "type": "celestial",
+      "class": "",
+      "mesh": "",
+      "index": "",
+      "name": "",
+      "groups": "",
+      "materials": "",
+      "textures": "",
+      "px": "2678609293333.1538",
+      "py": "13069335228.279907",
+      "pz": "-3612916281980.6099"
+    },
+    {
+      "object": "Pluto",
+      "type": "celestial",
+      "class": "",
+      "mesh": "",
+      "index": "",
+      "name": "",
+      "groups": "",
+      "materials": "",
+      "textures": "",
+      "px": "-1278146237899.0776",
+      "py": "827691571965.58704",
+      "pz": "-4279924401954.0845"
+    },
+    {
+      "object": "Charon",
+      "type": "celestial",
+      "class": "",
+      "mesh": "",
+      "index": "",
+      "name": "",
+      "groups": "",
+      "materials": "",
+      "textures": "",
+      "px": "-1278134423519.5105",
+      "py": "827695310665.52063",
+      "pz": "-4279909225884.6694"
+    },
+    {
+      "object": "Nix",
+      "type": "celestial",
+      "class": "",
+      "mesh": "",
+      "index": "",
+      "name": "",
+      "groups": "",
+      "materials": "",
+      "textures": "",
+      "px": "-1278168230301.9819",
+      "py": "827671986678.53503",
+      "pz": "-4279960541430.5122"
+    },
+    {
+      "object": "Hydra",
+      "type": "celestial",
+      "class": "",
+      "mesh": "",
+      "index": "",
+      "name": "",
+      "groups": "",
+      "materials": "",
+      "textures": "",
+      "px": "-1278183704696.8074",
+      "py": "827742836262.68457",
+      "pz": "-4279933508349.626"
+    },
+    {
+      "object": "ISS",
+      "type": "vessel",
+      "class": "ProjectAlpha_ISS",
+      "mesh": "template",
+      "index": "0",
+      "name": "ISS\\ProjectAlpha_ISS",
+      "groups": "42",
+      "materials": "36",
+      "textures": "36",
+      "px": "-148520463722.86615",
+      "py": "20927073.287140876",
+      "pz": "14878566687.456879"
+    },
+    {
+      "object": "PB",
+      "type": "vessel",
+      "class": "ShuttlePB",
+      "mesh": "on-demand",
+      "index": "0",
+      "name": "ShuttlePB",
+      "groups": "7",
+      "materials": "2",
+      "textures": "2",
+      "px": "-148520463622.8461",
+      "py": "20927073.287142511",
+      "pz": "14878566687.45702"
+    }
+  ],
+  "object_draws": [
+    {
+      "object": "ISS",
+      "mesh_draw_calls": "378"
+    },
+    {
+      "object": "PB",
+      "mesh_draw_calls": "56"
+    }
+  ],
+  "planet_tiles": [
+    {
+      "object": "Earth",
+      "textured_draw_calls": "466",
+      "indices": "11452416"
+    },
+    {
+      "object": "Moon",
+      "textured_draw_calls": "92",
+      "indices": "2225664"
+    }
+  ],
+  "archive_reads": [
+    {
+      "path": ".\\Textures\\Callisto",
+      "layer": "0",
+      "inflated_bytes": "434816"
+    },
+    {
+      "path": ".\\Textures\\Deimos",
+      "layer": "0",
+      "inflated_bytes": "434816"
+    },
+    {
+      "path": ".\\Textures\\Deimos",
+      "layer": "2",
+      "inflated_bytes": "268524"
+    },
+    {
+      "path": ".\\Textures\\Dione",
+      "layer": "0",
+      "inflated_bytes": "434816"
+    },
+    {
+      "path": ".\\Textures\\Earth",
+      "layer": "0",
+      "inflated_bytes": "9225216"
+    },
+    {
+      "path": ".\\Textures\\Earth",
+      "layer": "1",
+      "inflated_bytes": "9225216"
+    },
+    {
+      "path": ".\\Textures\\Earth",
+      "layer": "2",
+      "inflated_bytes": "1476882"
+    },
+    {
+      "path": ".\\Textures\\Earth",
+      "layer": "3",
+      "inflated_bytes": "402786"
+    },
+    {
+      "path": ".\\Textures\\Earth",
+      "layer": "5",
+      "inflated_bytes": "13458048"
+    },
+    {
+      "path": ".\\Textures\\Enceladus",
+      "layer": "0",
+      "inflated_bytes": "434816"
+    },
+    {
+      "path": ".\\Textures\\Europa",
+      "layer": "0",
+      "inflated_bytes": "434816"
+    },
+    {
+      "path": ".\\Textures\\Ganymede",
+      "layer": "0",
+      "inflated_bytes": "434816"
+    },
+    {
+      "path": ".\\Textures\\Iapetus",
+      "layer": "0",
+      "inflated_bytes": "434816"
+    },
+    {
+      "path": ".\\Textures\\Io",
+      "layer": "0",
+      "inflated_bytes": "434816"
+    },
+    {
+      "path": ".\\Textures\\Jupiter",
+      "layer": "0",
+      "inflated_bytes": "434816"
+    },
+    {
+      "path": ".\\Textures\\Jupiter",
+      "layer": "5",
+      "inflated_bytes": "868992"
+    },
+    {
+      "path": ".\\Textures\\Mars",
+      "layer": "0",
+      "inflated_bytes": "434816"
+    },
+    {
+      "path": ".\\Textures\\Mimas",
+      "layer": "0",
+      "inflated_bytes": "434816"
+    },
+    {
+      "path": ".\\Textures\\Moon",
+      "layer": "0",
+      "inflated_bytes": "434816"
+    },
+    {
+      "path": ".\\Textures\\Phobos",
+      "layer": "0",
+      "inflated_bytes": "434816"
+    },
+    {
+      "path": ".\\Textures\\Phobos",
+      "layer": "2",
+      "inflated_bytes": "268524"
+    },
+    {
+      "path": ".\\Textures\\Rhea",
+      "layer": "0",
+      "inflated_bytes": "434816"
+    },
+    {
+      "path": ".\\Textures\\Tethys",
+      "layer": "0",
+      "inflated_bytes": "434816"
+    },
+    {
+      "path": ".\\Textures\\Vesta",
+      "layer": "0",
+      "inflated_bytes": "434816"
+    },
+    {
+      "path": ".\\Textures\\Vesta",
+      "layer": "2",
+      "inflated_bytes": "268524"
+    }
+  ],
+  "asset_sha256": {
+    ".\\Textures\\Horizon.dds": "0a21a1e772af68a1fa830ca602b8404a2149b097946eeb5be653ea685b968478",
+    ".\\Textures\\Ball.dds": "5200c104de83a2d5ed9736fda4558987bd3485ad2a1bea3a4313142320bd1bb2",
+    ".\\Textures\\Ball2.dds": "0d21c3b97f057d0e850c2cb9b63add84e774fd41d6211d036f0c7953dd6d6b8c",
+    ".\\Textures\\Ball3.dds": "47af4bb9c27c753526943671ea994132ad9e06664d8e914b2120f8dab9a68bdd",
+    ".\\Textures\\star.dds": "1ee82731c782f997d4af0677702b10e374cdfb91befdd0afb91b0106281863a8",
+    ".\\Textures\\Contrail1.dds": "7eca7765043259cc92bce9b1273546bedd1c08b04fae582438cb2c3b72b859e0",
+    ".\\Textures\\Exhaust.dds": "31f30dc4b9079d73e7b9017dc10604954a57053be4aeb38465a92edb656a8d1b",
+    ".\\Textures\\Fcd01.dds": "2d92dcd3d00a160ef954cdfde95fe821ea30eeaa53156e6fc044748f38989eef",
+    ".\\Textures\\Fcd01_n.dds": "4506ea609c5f30ff6709a19e2d9de55cad027664896fa009d720c9a78f0621b9",
+    ".\\Textures\\Fcd02.dds": "6d3f145140fb9f291e43226c69bf492596244d6bec4ed976ab3ec926e38c5384",
+    ".\\Textures\\Fcd02_n.dds": "bffca8b83bee2c89bb39aed9e17baf1676a4b438195bf5a711e15eb2433df833",
+    ".\\Textures\\Fcd03.dds": "7a4f861be9928f53985350b285fd632ed1343042bc3cc3fb3f17316877538c5b",
+    ".\\Textures\\Fcd03_n.dds": "c4baacee79f58df5dcd2ba861850f6baf67a726b96d0759d5426234670b1055d",
+    ".\\Textures\\Fcd04.dds": "5df07243af0b97635d47de8d6154192fa78a548ce4eb759b5cc89e0546206247",
+    ".\\Textures\\Fcd04_n.dds": "798c27cca34cd7db20a841791e3548e5bca6fe110dabf7e5a7e1007a825969cc",
+    ".\\Textures\\Fcd05.dds": "174c98526eefea42c5df6e88c0a1e7b29976edf6a248546987079d2b7814fdf7",
+    ".\\Textures\\Fcd05_n.dds": "a2e89147ee711a10cc45b12ebd5d64afe880ce1bac175c7cddc876ee5b33a8f1",
+    ".\\Textures\\Fcd06.dds": "9c8f863018022823cc9e1533a6fce8e4ff350dd39394114faa0d6ade607ff4c2",
+    ".\\Textures\\Fcd06_n.dds": "cecdc4143c622076476aede3b6f4e42a67471d135715021afd42a868f2302f06",
+    ".\\Textures\\Fcd07.dds": "230d79a1a6ae7358a3a2b0c6dd618a71c7a2024199577c728a0db82f2535d5fb",
+    ".\\Textures\\Fcd08.dds": "ad8f4c93fc41ea0ea52595ae6549406cc2f0a937aa7bb6387b1375dc649f54e6",
+    ".\\Textures\\Fcd09.dds": "45161710c88912e4106adc3777b93ea019e8f9a2d33e6354bd598ac2823657d3",
+    ".\\Textures\\Fcd10.dds": "a53f644e985c01e943b921be8460e5ce74bbcdacdc1054cc8f9c657a5ca36546",
+    ".\\Textures\\Fcd11.dds": "c5ad8a9382a8cd735045d0619228dd4743943eb0e88d5ecd4234082c1eeeb8aa",
+    ".\\Textures\\Fcd11_n.dds": "93c5badfd76391d5d2dd5ef1fcbbb0557b689d22aabd4f69409bf05f611f1680",
+    ".\\Textures\\Fcd12.dds": "1abde7be47c5f0bc046068aba0867c145b5f378e52c436a53b5ff971b835786d",
+    ".\\Textures\\Fcd12_n.dds": "c8b5cc6e68d0ed266e9f65f0e63c69d4084c08e95a5304ec65446f4f272d0c76",
+    ".\\Textures\\Fcd13.dds": "53b36ee000c85994dadbd4746ff6103d2cc18b573b4155d258cec7a1f410eb18",
+    ".\\Textures\\Fcd13_n.dds": "2dfe25c7c62a45c0b869dae33aab0a8c4bcc47569c4fd776f72d293127c3e621",
+    ".\\Textures\\Fcd14.dds": "c2b46863491c2e2406c79a79dbdedf44303f4c86c6b2277d926d8c87f85b010e",
+    ".\\Textures\\Fcd15.dds": "e72dfb06e22c046ca7ae909742d13e1215660c75296ca0b1f4363b46b74dff76",
+    ".\\Textures\\Roof01.dds": "dee1b95434dd9070635e3c49643eb38008a28f5b8a3dbd333babe7f4e250b7a1",
+    ".\\Textures\\Roof02.dds": "7c20f8ffdfd0419e3c179aee7aa833b3ad158028c6ed1e010831e1a34dc5adb7",
+    ".\\Textures\\Wall01.dds": "c1680f9c7c3762d539bb9c8ebf71ff04a05d9e55413a0ad68bbe68536131355b",
+    ".\\Textures\\Door01.dds": "86f4bc75d5403e17dd2c27751f5b2027ac91e8c11145de1744eda832dff70df5",
+    ".\\Textures\\Lpad01.dds": "03acc4dba9984e940cd2a0a729066ca4d82806f223ab852d91962a5b06d343b5",
+    ".\\Textures\\Lpad01_n.dds": "ebcf12611e5a4fdd76610cbf89b1e9b09d82943ee1dc75fddcf599cd113e1f14",
+    ".\\Textures\\Lpad02.dds": "6d48481fb4474b075f5baab6119514444c52e29134cc326a2915b12364597acd",
+    ".\\Textures\\Lpad02_n.dds": "279c0316773fac45edb67266257b3cb813f6eca0c5b3719f5bd24b5d768843b7",
+    ".\\Textures\\Lpad02a.dds": "1abc18aaddb9cda1abc0ce741024ba3fa4d098d1cca3960b96261fb052ca7306",
+    ".\\Textures\\Lpad02a_n.dds": "bcd2b922cd537594ec59bc260d92b80c166a6345f69c5e1ecc6654c8d0fc4227",
+    ".\\Textures\\Taxiway1.dds": "ba6a2faefa65ef89f96c3e046ce4075d3a03483f6e5a0ef79d8bb94c9549baa2",
+    ".\\Textures\\Taxiway1_n.dds": "502c183b5be9dc4f0453089bc4d6a5cd95e370f7c86cc090efffc2536c8af5d0",
+    ".\\Textures\\Taxiway2.dds": "c201f013323b8ea603134cf8612a741b7374bc70fce82f2803f39fe4658b403a",
+    ".\\Textures\\Taxiway2_n.dds": "fcc6778872cfa4e60ed465f331e66f3a3f209c6885e32d13fa8173fe66fb260c",
+    ".\\Textures\\Monorail.dds": "bb94ef896426c4a01001b2956bd56a9c3f52d352d7398eb2c724f605c64c4e8d",
+    ".\\Textures\\Monorail_n.dds": "f5a27c544204dd3674abddf1c9c30acf4ced7113784eac772e8259b002f397a3",
+    ".\\Textures\\Hangrail.dds": "a884560ab8acfec91d118f66599035e33451e6d04a8e2d793decc115eae09b7e",
+    ".\\Textures\\Hangrail_n.dds": "2bf4f7376ed2fa354cce47a84f87c8180e0711d4b9a1ac9c9b35f0f3ee508844",
+    ".\\Textures\\Solpanel.dds": "01e43c3eb9aba68066d6c357216aa4b53e079243cc9dc70c32119e1721a888a0",
+    ".\\Textures\\Runway2.dds": "83290881856525e9387a23c7d3ac81339b83ad3535918b65b269be59053e24eb",
+    ".\\Textures\\Cape17.dds": "f0f81b819e5f2cb504baab54028c2cde5359ad11f803df43fec92d331c3dae8f",
+    ".\\Textures\\Cape18.dds": "b87d30517ede46ce8e8b1cebf65efa5a949d261e86ef5087023488c7eed2be79",
+    ".\\Textures\\Cape19.dds": "5c164e86bd84020cc95d9e23fb85fecba51f66205e227b1bbc8e2b4bed6b44a2",
+    ".\\Textures\\Cape20.dds": "b7a2f29704e86487aab0791d5a1648f413a13c8695671c5adef048b937adeb65",
+    ".\\Textures\\Cape22.dds": "78b349b8e2dcbbd91cc8e9e3096948be08ed95c9e72c11716aab5e7e4072112e",
+    ".\\Textures\\Cape23.dds": "03899b26afff684dbe49c6cec2460fa3bc52042998561853f83e659d0267a46e",
+    ".\\Textures\\Cape23_n.dds": "03899b26afff684dbe49c6cec2460fa3bc52042998561853f83e659d0267a46e",
+    ".\\Textures\\Concrete1.dds": "8d645f65e1e04111e5f11b5703132117c85d6fb3048f30e85b89affa97af4b9b",
+    ".\\Textures\\MenuInfoBar/ship.png": "b4685d54649e014c3cba0ab5b60d94a5248ad591a4ff76b0b7e153f10e14ceb7",
+    ".\\Textures\\MenuInfoBar/camera.png": "6a3c789068ae7f7f9fb1b81deb5dcd03a3991ee6d3c6cea071ef1ae609e25199",
+    ".\\Textures\\MenuInfoBar/speed.png": "4b2f430ea2f27f5152f91ad1e58c46fd72ddd76e6c3e900dc7af3c6395c9ad83",
+    ".\\Textures\\MenuInfoBar/pause.png": "bf6d3fd049b891b78b8a036fe5af78084e48e16b703cc0387231de1b18fc34b0",
+    ".\\Textures\\MenuInfoBar/function.png": "fa6c32f0d6d847d4b63da147180a21529daf086ddba1d89a86133d86e83e709b",
+    ".\\Textures\\MenuInfoBar/info.png": "3bc593e7b117d25407b0f32f593292cfb838b37d5e7d76f3c48845a3a69c1548",
+    ".\\Textures\\MenuInfoBar/options.png": "1232753c8e5b7ace85b5c093c0de9698d29fbafa07dd92763df3e80c5b2d8ecc",
+    ".\\Textures\\MenuInfoBar/map.png": "f0073c77fc916dbd127dc4fa679d6889804be94953b4c6849d062d59cf1598da",
+    ".\\Textures\\MenuInfoBar/record.png": "114bc90f00dee68ba791c72c76a64c12ce175f324d52d278b02dd85341cf93fc",
+    ".\\Textures\\MenuInfoBar/help.png": "8a84af8f4e2692166874d5360ba4a42794627d8e54cce017b0f382b849a6197d",
+    ".\\Textures\\MenuInfoBar/save.png": "a1645b0fc1cef10274e2b7785f9356021ff5df649b34cc9898a62f68e00c635b",
+    ".\\Textures\\MenuInfoBar/exit.png": "269f21a72650d19c37a407caf3e610896a2ded08a7e0fbabb09105b6ba342df6",
+    ".\\Textures\\transp.dds": "c14a3b28173ffd16a0948e602b1fcc283ab54a37f0082c8aa559453f92713ee6",
+    ".\\Textures\\VAB_TL1.dds": "77085260e1e281e1618da5d03187a4fcddfae253eda97a6c47a7b67e7fa77b57",
+    ".\\Textures\\VAB_FR01.dds": "07407088c1424e30ac79d795a25b775e21127ecbfa7be48eb1fd763df1a59392",
+    ".\\Textures\\VAB_TL2.dds": "52ec2661f5c6da9d183017dfae88adb92a2eaad0647f63f7e6863175f04479eb",
+    ".\\Textures\\VAB_FR02.dds": "a5d281e4f0ac22180506a84782cbb6ecf0d5ae31b0723e786358522c4396a07d",
+    ".\\Textures\\VAB_BK01.dds": "a617d36daad67f11c47b67314623661bcabfc4bb1caef143f26036d4343c1c36",
+    ".\\Textures\\LCC_WNDS.dds": "6401c529847c956e6559e17cd928211277f4af96fbb771a91914f703faacf4eb",
+    ".\\Textures\\LCC_DRS.dds": "bab09fe7fa2958a1d53c7329439c08949f89ca189e8711637097f09974a7a70b",
+    ".\\Textures\\KSC\\KLC39B.dds": "185696f45d4f77d8cdf61f1a5a23704ee5cc8fee30382c4f53f99a833716559b",
+    ".\\Textures\\generic\\concrete1.dds": "d7f3d04d289e7517a8580137ab998f65a81c2948ed758182960c51969861cd03",
+    ".\\Textures\\generic\\stripes.dds": "948ca9b7708e035ccc3b05e2fb5721d241b1c43498f7694572f6dc3698959335",
+    ".\\Textures\\generic\\concrete2a.dds": "35d72a42c27ddc8ad53a743c7748c88f99324739b20bfc362604cca8c83abee7",
+    ".\\Textures\\generic\\concrete3.dds": "32654e718c044795b981b5d162468f005e58f1008aa09fd3e382081dc89a9e93",
+    ".\\Textures\\generic\\tiles1.dds": "ed85522e937a3b07799f44ff5a45bf5f5cca945f9c5e112413dbd8075af7a286",
+    ".\\Textures\\KSC\\MLP.dds": "af3dc2f2b9dcce4fda59732cbff110f8affda4fef704ecc9a8125e83cf6cc7d6",
+    ".\\Textures\\generic\\metal_plates1.dds": "41de3ba5c506424aa3e2ec306c2765e39895f65821b74c8405996474544d5a90",
+    ".\\Textures\\generic\\railings1.dds": "6aef547c5a60025bbc8a8e60056f3fe67d5aa4546f5534f942490565a7f1827f",
+    ".\\Textures\\KSC\\RSS39B.dds": "efe41c5f1e09580345b7666e72e9ade0ff95daf5c4f2ec8039bb1d117e96793a",
+    ".\\Textures\\ISS\\iss_dc.dds": "974cefd8f6fba3a7665a0881c6e93ccf5ffeb108bec9381d031a3ca7c5f8244d",
+    ".\\Textures\\ISS\\iss_dcs.dds": "90ea1346b6e5f69ac6efe4dad02b54d7b14250508da0ac6a95dd3a2128a20075",
+    ".\\Textures\\ISS\\d_ring.dds": "3c43dce0df794e9e3549b0ad8b3ae9f638a6e9e033cb690d4e16933a4f1e9e07",
+    ".\\Textures\\ISS\\isspanel.dds": "032360afb0a6fa1680729ca5d1dc3c5bd1dbca53e00bbd5fc4cdf57615c27449",
+    ".\\Textures\\ISS\\issmod.dds": "ecd6a00321bbb6dd036ddd37bd7104253c1c278a890cadf09d330804d4a290ad",
+    ".\\Textures\\ISS\\isscover.dds": "4001f4acb672c9a450da9e2ff9d9e8fe58b860c51b76ad27cef78b8f3fdce113",
+    ".\\Textures\\ISS\\issb.dds": "89fee556a38e6296d462da00cc6f0ea3b79d8ff700d9710962319fb7681e5bb5",
+    ".\\Textures\\ISS\\issp2.dds": "2eea6f88e44ca5082ed7e87279d434b79b14a032dae4bd5a28bdcb6fdf3436da",
+    ".\\Textures\\ISS\\issdot.dds": "09de465e3dbc1353b8599c8aa985f02dce6b454ce78fa18278fc7fe50cdda43c",
+    ".\\Textures\\ISS\\issb3.dds": "505597fde44106e994b390a2d00b1ddb8becec01c978f5cc981af2b3b03d263d",
+    ".\\Textures\\ISS\\isszmod.dds": "ce81fe3069335d776409a3a88606fa0fa52beef4f0b6e76442c941e338a2b05a",
+    ".\\Textures\\ISS\\issb2.dds": "6763c5b947ddb3e79df919bf4fe36c9e6462572956d157e2fe60c65a2b31fec6",
+    ".\\Textures\\ISS\\isssolar.dds": "e78421eac34b45c074dd2fea8be5790ef0b302f6e4968c386f5cfe73dd08be29",
+    ".\\Textures\\ISS\\issb4.dds": "d6986fde3088547d1cc12bf997ba8c6b46164ea0aed91e8e208c71235c0ffbd9",
+    ".\\Textures\\ISS\\issku.dds": "f3e4cb688d330a33750cbb48b658e984ee29be5df6dc4afadcacaee88fd17e58",
+    ".\\Textures\\ISS\\issku1.dds": "9022c7833d02d732c2f47db699ef0a428815fd9c7ce55aa9f72f27db63afb16f",
+    ".\\Textures\\ISS\\issdish.dds": "81b2778dc12f91b7db2b2e5aa3d6a3e70f0c8e73052fadef155608362e539146",
+    ".\\Textures\\ISS\\issku2.dds": "aa4af36fadcf283772b73084c9e411d7aa82507c7249e072c402e731b2f53ae6",
+    ".\\Textures\\ISS\\issbso.dds": "f26053a6e47a2d5fd2c81677d91271c28058b74f39734b862123897f9cb416fd",
+    ".\\Textures\\ISS\\issbso2.dds": "58d159f22803cae126f2eebf0fa4dabc26f08c288431698109f2a506a7df8ddb",
+    ".\\Textures\\ISS\\issmb.dds": "25f5983279bf268a03a4df7f16659cc25441db46022c9ef18121b3dc57cc0ed6",
+    ".\\Textures\\ISS\\issusaf.dds": "18148b8f0a3d048b6b6769cce37333f47c2fcf97e7822acf2a775e008bf2e675",
+    ".\\Textures\\ISS\\nasda.dds": "a5481d21c600b073e6cb217ff157604876fc89cbbed40229d63b20e6fda2120e",
+    ".\\Textures\\ISS\\issrad.dds": "4e4a793001bb541cd109c24cbaa7e2258ddcc1981611e8ce7fbf20867bf08bf0",
+    ".\\Textures\\ISS\\issesa.dds": "fc6672fdfc1101c61ff19c462aa2e4865fa4ff70310ec087337fba35f52d8c2d",
+    ".\\Textures\\ISS\\issbs.dds": "be7ff8d49265cffd91c00b2fb5a7861fcd285a372e6a67941b05b953c75d3f25",
+    ".\\Textures\\ISS\\isscup.dds": "f94e18a19c96645958c539fe16b83c737bfe6ef76cdb448a8dcca1665dcabb1a",
+    ".\\Textures\\ISS\\metalcon.dds": "47659c89fba56a0310312d42b4f49cfab2ba015b77385dfc2a00f0720b44c5fc",
+    ".\\Textures\\ISS\\issins.dds": "b5bd2a1c9d26d2d66f77b34c979fd4386cee82a5053b3ca59eda98aad4702505",
+    ".\\Textures\\ISS\\questcov.dds": "7ff5d7e77693c930babed0a56e177633b91254891f7f8b8d7be753733088b2e6",
+    ".\\Textures\\ISS\\graple.dds": "70b170b10ed73ab08334e492970bbb1f9c0cebec6e65275d6fd7c7939835ae44",
+    ".\\Textures\\ISS\\isscov2.dds": "50843a5bbac9c1c59a481689315589eabff234e2dde7816cd51f5784ebff255e",
+    ".\\Textures\\ISS\\isshand.dds": "8b948acfab68e42267dad3ab77120d0f64d7e6af3aafff6ea86765efe5825da5",
+    ".\\Textures\\ISS\\iss_un.dds": "1ace6ae933be9eda77ad79ceb47808d516a693ad37bfea79d588b2cc5cd7b454",
+    ".\\Textures\\ISS\\issred.dds": "41e2848d571cf6a780c7681bcee39eb3f7fb2513a5959ec476e655cad57e3a9f",
+    ".\\Textures\\ISS\\issusa.dds": "9cc10df0620ff24095970d15062ea54459555e2978e14dd1f99bc07bacbf2437",
+    ".\\Textures\\Cockpit\\Glasspit.dds": "48bafa4e69de37e7699a7cd6e99e0df486bba5783e58537d20e415d0a65fc498",
+    ".\\Textures\\cloud1.dds": "59260d9b649df7424780965fdd70d559723701dab747228703b066c231ec8aef",
+    ".\\Textures\\Earth/Archive/Surf.tree": "bc84f6d2dd7391a97d5700e9e0613a1ea713d926964daf018ad92f4041f6c587",
+    ".\\Textures\\Earth/Archive/Mask.tree": "ec067c9dac77f20dc5698cd2a32c0b6cef951fffd3f24a2265ec8cca759edc39",
+    ".\\Textures\\Earth/Archive/Elev.tree": "597c1c08e97e6e62bba4e9a924960c896fc6d57f6e522e136b8f8146abb7432f",
+    ".\\Textures\\Earth/Archive/Elev_mod.tree": "2d50f845b5e2307d22c1d98d3162ec5841992fae355d4607ce6f71337f522897",
+    ".\\Textures\\Earth/Archive/Cloud.tree": "69a0c1e3159e144f60c322b9d388548b55f927a80f03fb7a9005f983cf9a9169",
+    ".\\Textures\\Moon/Archive/Surf.tree": "0ed3d152d5bddbeda3a9b019c7fc8bf98400e934085d4b829a87429f1e44a798",
+    ".\\Textures\\Moon/Archive/Elev.tree": "dd57a09d47b60964cdb4fbc5917684cdf9926fe7a8229e6b9e89a12873059744",
+    ".\\Textures\\Mars/Archive/Surf.tree": "b3da509f8b09ab98c00580f8ae0a22da3a0f072829dacb81a90879e3f395ea7a",
+    ".\\Textures\\Mars/Archive/Elev.tree": "f8f17cd8b58e1d81135de9565bd56ac945bcf3122d174eb21fd46e87096723ed",
+    ".\\Textures\\Phobos/Archive/Surf.tree": "70d7513170ffa854d87a61e85dfb135c8a7f89d72c01f1c2765382776b876481",
+    ".\\Textures\\Phobos/Archive/Elev.tree": "25e8e9bc5892f20f98f1f1e8fe63a859d178f1babe28d597c90a51d4982a5c20",
+    ".\\Textures\\Deimos/Archive/Surf.tree": "f54b39e393237e8cb350f247a4591502e113a0739fb91fc231daf9eeb1aa3567",
+    ".\\Textures\\Deimos/Archive/Elev.tree": "8efbc3fc07d16e467a6be8895bbcce81788b829208d1d5e348bc3b3bfec3cbd1",
+    ".\\Textures\\Vesta/Archive/Surf.tree": "6ffe09a19f933e839ddb07d3476af78b160d623525c729b716f7201656a335d7",
+    ".\\Textures\\Vesta/Archive/Elev.tree": "945dd3f8818bd352a0de1e1f50cf5d5552e887bac227349cce2921d80d0940e2",
+    ".\\Textures\\Jupiter/Archive/Surf.tree": "7701df836c3ff25618486bab1318a4600bb7beae5012b610d4130c95d809cf99",
+    ".\\Textures\\Jupiter/Archive/Cloud.tree": "7aca955761cb6e2a16c1cd04183a18fe14d668b41535519debb865e1d5bf56c6",
+    ".\\Textures\\Io/Archive/Surf.tree": "610b00c3df03369e4dd62497aaa8b20d5682d675564f7c8354d1b5c305a853bd",
+    ".\\Textures\\Io/Archive/Elev.tree": "51548f10495b78703bbbd8cfff0b494d0b6d76d36fe6e57b758c5d5ed9d52383",
+    ".\\Textures\\Europa/Archive/Surf.tree": "8eeb7dfd5a60b8e58265c4ea2cb86443c2bb7c872a5fed5a9c856f8e73850d7d",
+    ".\\Textures\\Ganymede/Archive/Surf.tree": "66f60ed96470e8c2c6d88121903bcfba7cd4c0564f98b19a3900214b3e737d81",
+    ".\\Textures\\Callisto/Archive/Surf.tree": "db96241ae8f152f022252af9d416986265ea62d06b0869b731cd6d3afca15e71",
+    ".\\Textures\\Mimas/Archive/Surf.tree": "e0d222992759d4a5723e4ffdcd3ea9061b3332c7348d113a8f33d077ffc23f7d",
+    ".\\Textures\\Enceladus/Archive/Surf.tree": "92c39516644ceb53e1535111a42f05dc5f2da96c7ae7171c5fdfaf6b898e8f46",
+    ".\\Textures\\Tethys/Archive/Surf.tree": "1f78fce8d34771c911d7a909c7ab73d5169682f2593ded4b546fc0da42a373e7",
+    ".\\Textures\\Dione/Archive/Surf.tree": "ef090091fbebe5056346e0c723dab3ad6ff8189158693f1ab3febf86ce61c575",
+    ".\\Textures\\Rhea/Archive/Surf.tree": "3d152d87def66ef5f992bbc48374ed329e1d80a47beee87fe24688af8f60425b",
+    ".\\Textures\\Iapetus/Archive/Surf.tree": "9a379f61e166b35aa1fc073ca965338b772723f1c43568fc621210d286be6323",
+    ".\\Textures\\shuttlepb.dds": "53e4a723ac600bb8d46d37f3fbbc7a3ed822a7ac3922cf15e050e7efe83a1c1f",
+    ".\\Textures\\shuttlepbwing.dds": "e52e863b2f0d823f07601944042ff571973429974a0c336d6e2da0b970546eed",
+    "Meshes/ISS/ProjectAlpha_ISS.msh": "534d4aaa3f9425630b1170843d068e1914b12917bb65f509209f25b1f960b240",
+    "Meshes/ShuttlePB.msh": "cce2f46082ef5bb753c25b13cac83297efcaf762d0b794a3f878204e517c1a2b"
+  },
+  "loaded_modules": [
+    {
+      "path": "C:\\Windows\\System32\\ntdll.dll",
+      "sha256": "bcfe8a70a371a7d2fbcb429ab0a9e170aeebe4d73ae08d03a2da8fedec2efc78"
+    },
+    {
+      "path": "C:\\Windows\\System32\\kernel32.dll",
+      "sha256": "7ea46088dbc167b5463049417ff9ca3dcba2751f5f74ed7291a6c7992a3aa8f4"
+    },
+    {
+      "path": "C:\\Windows\\System32\\KernelBase.dll",
+      "sha256": "fc8b5960dab02749b4fdcaa61710ac477518ed9b21391a5754a47316c88268d9"
+    },
+    {
+      "path": "C:\\Windows\\System32\\apphelp.dll",
+      "sha256": "7038b581ddeac5cdf59fa8d1e3ad49cb31b18652b1c6c1534ffe111ec7cc186e"
+    },
+    {
+      "path": "C:\\Windows\\System32\\user32.dll",
+      "sha256": "355ab86c3ce68a093a2d85fbdd40e13dd2813dd63c6b278e543ac0f450aaf968"
+    },
+    {
+      "path": "C:\\Windows\\System32\\winmm.dll",
+      "sha256": "c945ea3d731a1363058197ea2d3223f7dc1a96625e00ad8a0005168eb8b12c57"
+    },
+    {
+      "path": "C:\\Windows\\System32\\win32u.dll",
+      "sha256": "7b63f8fdb6c459d4871c4fea30eee6db50dab49802da0c038576775f3b2e2c93"
+    },
+    {
+      "path": "C:\\Windows\\WinSxS\\amd64_microsoft.windows.common-controls_6595b64144ccf1df_6.0.20348.5756_none_9477ce29eef08e7a\\comctl32.dll",
+      "sha256": "7ac190a4060134e1751b95ccae6050c991912633f08f1ed806731f069ee3bd7f"
+    },
+    {
+      "path": "C:\\Windows\\System32\\msvcrt.dll",
+      "sha256": "dde047f12a6b954773284e058631d9939ed1ef1d0f853d4343c320774129ab6e"
+    },
+    {
+      "path": "C:\\Windows\\System32\\uxtheme.dll",
+      "sha256": "6d58a44bf56cfbec39e30432a530844c75b275aa4666c0f17ddd3ecfdd24f13b"
+    },
+    {
+      "path": "C:\\Windows\\System32\\gdi32.dll",
+      "sha256": "7df03a110b456cacf2bd0365f758ae2ef9b7d532dcd64682d5e79ff5c223f987"
+    },
+    {
+      "path": "C:\\Windows\\System32\\combase.dll",
+      "sha256": "fa9ac17e41a9cb780caf4dc97525f6dd0b1065aeeba737fd7186a4b45502fdc8"
+    },
+    {
+      "path": "C:\\Windows\\System32\\gdi32full.dll",
+      "sha256": "f2aabf1963dc4a897b922facc8989566175d4542a35fd85e8993fd862752dda5"
+    },
+    {
+      "path": "C:\\Windows\\System32\\version.dll",
+      "sha256": "554de4c9c64cba19bb3437ede1d3688f3d020285a182161658779b8b34614306"
+    },
+    {
+      "path": "C:\\Windows\\System32\\msvcp_win.dll",
+      "sha256": "fe301645d9dfa975793a3f9fdb7494accb912e6325adf72dc0caee354957b8cb"
+    },
+    {
+      "path": "C:\\Windows\\System32\\ucrtbase.dll",
+      "sha256": "d06d0a421398fb663c6c49586e09774143460fdb1dce489aa9844846b9398555"
+    },
+    {
+      "path": "C:\\Windows\\System32\\rpcrt4.dll",
+      "sha256": "d6e8ea7dec469973d6a0f4537c642791fd458d2a2548990859c3e9fa6a1db769"
+    },
+    {
+      "path": "C:\\Windows\\System32\\shell32.dll",
+      "sha256": "93f60a620a12eb5abeb762714da39a36b7d90ff8fd9cb47f70c9cf721c486b9c"
+    },
+    {
+      "path": "D:\\a\\orbiter-cross-platform\\orbiter-cross-platform\\out\\client-execution\\scene\\zlibd1.dll",
+      "sha256": "8eaf063245bfb39425114919f92c47bfd946651099fd12c6e23956fd5aa6f4e6"
+    },
+    {
+      "path": "C:\\Windows\\System32\\ole32.dll",
+      "sha256": "db56db677a1cca70e426f9a5a23768ed37ed9139f30d794ccb0de31bbf874b02"
+    },
+    {
+      "path": "C:\\Windows\\System32\\oleaut32.dll",
+      "sha256": "05791934870e13ee64ba6feb47faa87acd7bd727425c4538556e1a309f0705e2"
+    },
+    {
+      "path": "C:\\Windows\\System32\\advapi32.dll",
+      "sha256": "e72b541ebf533c613db81ed5b59d2ab92a539a9f8034d4074e7690e922d9fdfa"
+    },
+    {
+      "path": "C:\\Windows\\System32\\sechost.dll",
+      "sha256": "ffce6ae1a915bd6fe4be02fbcb6730be841b4d38fe632021dd13e5c8e3fc926e"
+    },
+    {
+      "path": "C:\\Windows\\System32\\bcrypt.dll",
+      "sha256": "0e326cfcb99600eedaa8ce4282f76b6b4c239b17726a8e55a821b0e875142e5b"
+    },
+    {
+      "path": "C:\\Windows\\System32\\imm32.dll",
+      "sha256": "32600c90650a6ddfe6f8cb6b81db37e592ecf35410ecbc62bd1bd40c04c1ed96"
+    },
+    {
+      "path": "C:\\Windows\\System32\\dinput8.dll",
+      "sha256": "4bcd80fd1a82e390a12a53ed97a40bf8304f111c064f5206718170494d241198"
+    },
+    {
+      "path": "C:\\Windows\\System32\\vcruntime140d.dll",
+      "sha256": "098a800e8d227b2c683274789b93671a668d76fe0bb7817e4921ee473db4c17e"
+    },
+    {
+      "path": "C:\\Windows\\System32\\ucrtbased.dll",
+      "sha256": "3bd8c11641a5e98d1edff2cb36c9b5f021b94bd05929b8295380786c5458ba46"
+    },
+    {
+      "path": "C:\\Windows\\System32\\msvcp140d.dll",
+      "sha256": "342e5c13fd61f6130f61d85c00a7dfb10289ea7e89740f43efdabe4db16333a5"
+    },
+    {
+      "path": "C:\\Windows\\System32\\dwmapi.dll",
+      "sha256": "5d5f7c5cd2b5da4744a7ff325726cc007616db258a093505813b9747e8ee9832"
+    },
+    {
+      "path": "C:\\Windows\\System32\\vcruntime140_1d.dll",
+      "sha256": "c734d0a16d683592286de2e05c1ebcc3e819f6edfd501d026ce25aee0a733eba"
+    },
+    {
+      "path": "C:\\Windows\\System32\\InputHost.dll",
+      "sha256": "13d055f2764ac1a805f7259ac8796ef5b65523ab2e09f5706a93b933ebe09085"
+    },
+    {
+      "path": "C:\\Windows\\System32\\CoreMessaging.dll",
+      "sha256": "80c8790c1f97669b9aeef7ea8b464e46ca5bb5821f63121bcbdaebf6c921c7d4"
+    },
+    {
+      "path": "C:\\Windows\\System32\\bcryptprimitives.dll",
+      "sha256": "d1367e86521a6688172bc12776c5a404d0f2e9b11e0f97f3c98240970e0a2b8e"
+    },
+    {
+      "path": "C:\\Windows\\System32\\riched20.dll",
+      "sha256": "a23a362cf9818e555f3540cd4e77f184813a854c711ce31d5dc60c99231998af"
+    },
+    {
+      "path": "C:\\Windows\\System32\\usp10.dll",
+      "sha256": "fe9c2552bae166e361217820cc10fb89e560ede2b917beafc5b1ad1e1aa90cda"
+    },
+    {
+      "path": "C:\\Windows\\System32\\msls31.dll",
+      "sha256": "f92fc2019c3df281a19304fc0f9761fcae0cdb7eb89348b565c1d3bc357641e7"
+    },
+    {
+      "path": "C:\\Windows\\System32\\hid.dll",
+      "sha256": "f375690891498241d7e3e039ec449d6c4e3a6ddf7eba81e3c83d21c8d8a6c330"
+    },
+    {
+      "path": "C:\\Windows\\System32\\setupapi.dll",
+      "sha256": "cd8a952b7cde92511b62dc3c777c7c28ee002e6d782b5b0249523c9ddee90e7c"
+    },
+    {
+      "path": "C:\\Windows\\System32\\cfgmgr32.dll",
+      "sha256": "7142f200a0a26bfd18e91898a193f7c6621af258c298ac30e55af2ede0aafcb2"
+    },
+    {
+      "path": "C:\\Windows\\System32\\devobj.dll",
+      "sha256": "e24f400f87cc50c18ba88459a093582ca3a4a8af3a7c3da679f82e5fc760ea5e"
+    },
+    {
+      "path": "C:\\Windows\\System32\\ntmarta.dll",
+      "sha256": "8f94617486245777a605a809548f11eed6a50b6118ce9d340d167fc1adf48008"
+    },
+    {
+      "path": "C:\\Windows\\System32\\wintrust.dll",
+      "sha256": "aa63aed162e37513f64ede83f5bda778ee7a32db6007f0fd40e60859cff1af5a"
+    },
+    {
+      "path": "C:\\Windows\\System32\\crypt32.dll",
+      "sha256": "3444b65e68739bc0ba4d78353e73c861ec3cb9210af508dc61fa27cdb5c6ec33"
+    },
+    {
+      "path": "C:\\Windows\\System32\\msasn1.dll",
+      "sha256": "278d01f1eedc12420b5d2483ba379e568bd9b96d1456f802e43837fd6b10b9af"
+    },
+    {
+      "path": "C:\\Windows\\System32\\kernel.appcore.dll",
+      "sha256": "2dc22b4427bd7d73ebbe8f065c6be888c2b4c8557bb4e28f557232058803c6bf"
+    },
+    {
+      "path": "C:\\Windows\\System32\\msctf.dll",
+      "sha256": "4e9df2f4794d0a903addd7f4c70647c3447e532f3abc59ff6965b7c8ea990b38"
+    },
+    {
+      "path": "C:\\Windows\\System32\\shlwapi.dll",
+      "sha256": "04b82fdbdf4888cfbe152d7a865c30bd150ce96e487d0547b25f1791c42a82cc"
+    },
+    {
+      "path": "C:\\Windows\\System32\\clbcatq.dll",
+      "sha256": "4e97aa1b1b3565da51d28baa1b2667b2eb7f6c5ebcc0bdd21621ac498c2ba5e9"
+    },
+    {
+      "path": "C:\\Windows\\System32\\ieframe.dll",
+      "sha256": "88b1f6a091f7913db40e12a81ece7a462d38051a0c217ef043c9ae67b2e1e10f"
+    },
+    {
+      "path": "C:\\Windows\\System32\\userenv.dll",
+      "sha256": "3d2980aa5d1b6ea4e28f0da80b49a263ef75b440de25db553c2c515fdba76bb2"
+    },
+    {
+      "path": "C:\\Windows\\System32\\iertutil.dll",
+      "sha256": "15257fc0103f1b76ddd60994f8ced59e6d692c82056cf357ba9848e02257bb4d"
+    },
+    {
+      "path": "C:\\Windows\\System32\\netapi32.dll",
+      "sha256": "d30d837d4f4d3ef8c84d5986cdfad2e30fb9dafa8c0ffdc104060dbb0deb5627"
+    },
+    {
+      "path": "C:\\Windows\\System32\\winhttp.dll",
+      "sha256": "34f933ad2cdcbe39f708a7b6c388b4550fa08d727046a8678831a44566bf1a53"
+    },
+    {
+      "path": "C:\\Windows\\System32\\srvcli.dll",
+      "sha256": "45f418da037f66366f0061174a2c53fcde1afc6af27304de22fd5d766cba5c5c"
+    },
+    {
+      "path": "C:\\Windows\\System32\\netutils.dll",
+      "sha256": "08aea53537f5af445531bce2993e7fa9baaf2a0229929282125ad9578b3c69ac"
+    },
+    {
+      "path": "C:\\Windows\\System32\\wkscli.dll",
+      "sha256": "035045f0920c6d5b6e257568b4fcf027e5b174356428781da611b7479c3c2cf0"
+    },
+    {
+      "path": "C:\\Windows\\System32\\SHCore.dll",
+      "sha256": "edca6b92e514601e494a542e7d1737be2396a76a855541ff09f8bb586158a3c6"
+    },
+    {
+      "path": "C:\\Windows\\System32\\DataExchange.dll",
+      "sha256": "0872972a59a86eb22167b081c4b44f63ff14d3ca6112d9d18ce899ac461c95e4"
+    },
+    {
+      "path": "C:\\Windows\\System32\\twinapi.appcore.dll",
+      "sha256": "e9d26fe6a99896678c1ca1002c9c258350ac85dc324b0fe480effb3af9ec40d1"
+    },
+    {
+      "path": "C:\\Windows\\System32\\TextInputFramework.dll",
+      "sha256": "8439a6b8050167e8ad4e88c9681ab94cd4a706fb7c24af4699d512bca7424303"
+    },
+    {
+      "path": "C:\\Windows\\System32\\CoreUIComponents.dll",
+      "sha256": "5831725d13bf1818a0d50b1b0dd99fc3e3ea12e39115cfe73781c1a35e01725a"
+    },
+    {
+      "path": "C:\\Windows\\System32\\TextShaping.dll",
+      "sha256": "037bfab482ae75b35bd5fcb90fe4e5e0fdda330beb360d13f629ebd94f2d734c"
+    },
+    {
+      "path": "C:\\Windows\\System32\\propsys.dll",
+      "sha256": "787194eee8a2aba0aa94875f38594030fb728d6f7c578784ba0732b3c212ea65"
+    },
+    {
+      "path": "C:\\Windows\\System32\\msIso.dll",
+      "sha256": "4bdada30c4ba7cd49b604ee05d76aac7f7aa5590797c4077b7d21f9274dbf666"
+    },
+    {
+      "path": "C:\\Windows\\System32\\windows.storage.dll",
+      "sha256": "df188b48a8d4e16131d5625457e7caf5e62a7da659e2acd569cc008a283b7b67"
+    },
+    {
+      "path": "C:\\Windows\\System32\\urlmon.dll",
+      "sha256": "62af9deb4e4c07ec19aff24699949b0e820e1b1dbfdb1147b6570b6256cffc40"
+    },
+    {
+      "path": "C:\\Windows\\System32\\mshtml.dll",
+      "sha256": "c800b43ae805e337abd0adaa26435d7a24c24cbd82ea9d4a872a6b296bc2a52f"
+    },
+    {
+      "path": "C:\\Windows\\System32\\DiagnosticDataSettings.dll",
+      "sha256": "f81b68dabba6bc26b67e6e35d5de86315b8723eb6b5f245643fe098e1dc48c5f"
+    },
+    {
+      "path": "C:\\Windows\\System32\\powrprof.dll",
+      "sha256": "eb4dd0ed5200b26fa57cc814efad7422ae312947fa201eb6896fad16e70584ad"
+    },
+    {
+      "path": "C:\\Windows\\System32\\sspicli.dll",
+      "sha256": "5e2afdeb2e98f008cb8a2247c0c1ae05958991e3b9df7a90b20d1d6654c14aa3"
+    },
+    {
+      "path": "C:\\Windows\\System32\\umpdc.dll",
+      "sha256": "a38cbbaa28317396eb32cf349dfd0a2ef5fa93592ab7593030b25ef598280fbe"
+    },
+    {
+      "path": "C:\\Windows\\System32\\srpapi.dll",
+      "sha256": "c7c173de7b0f9ad80a040e0be1690f58aa29f8d9f8ef766bab9f61eca2318102"
+    },
+    {
+      "path": "C:\\Windows\\System32\\msimtf.dll",
+      "sha256": "5c9d67d99ae73007982f31aa5cc57661db44d257a8cf3729777391a2f44180f7"
+    },
+    {
+      "path": "C:\\Windows\\System32\\dxgi.dll",
+      "sha256": "ad264211a3db3b77003fb9cec90d0116fca819a5050105d8d3707025c2dc6c95"
+    },
+    {
+      "path": "C:\\Windows\\System32\\directxdatabasehelper.dll",
+      "sha256": "27982edd319e935c669be2b2a560131a30e36f6fed4d8de966e8a2cd3df76c77"
+    },
+    {
+      "path": "C:\\Windows\\System32\\secur32.dll",
+      "sha256": "5c85e124d77f04f5b98e053e20b5a3f21ac574a6ca770eefde16771f5b4c2e0f"
+    },
+    {
+      "path": "C:\\Windows\\System32\\mlang.dll",
+      "sha256": "b2de30ec133049fe1a19133f39666fd42f5485ccbced132d2e81476324440356"
+    },
+    {
+      "path": "C:\\Windows\\System32\\wininet.dll",
+      "sha256": "74e26191bbb8b7907f40effffd7d23b5450e60d595634916b7f42f01d95119f9"
+    },
+    {
+      "path": "C:\\Windows\\System32\\profapi.dll",
+      "sha256": "b98ec53281793a6f1c4d00c0a367bcc38240dfead52100d8efb007c1ce9af73e"
+    },
+    {
+      "path": "C:\\Windows\\System32\\UIAutomationCore.dll",
+      "sha256": "2b1ea113ebe23c8fda36926f912891a85cab28632cafe5d255905bf66cb149c8"
+    },
+    {
+      "path": "C:\\Windows\\System32\\wldp.dll",
+      "sha256": "b40e30fe7de233159ed0154938fd1d0e272d79c6e27e192e9eb7c13bf1becab9"
+    },
+    {
+      "path": "C:\\Windows\\System32\\d2d1.dll",
+      "sha256": "0293a98da467ffc8d60c8d5e2d2543978f930c48b25f503cd068860d598d2abf"
+    },
+    {
+      "path": "C:\\Windows\\System32\\DWrite.dll",
+      "sha256": "0ea23e0cb1d9090cf9849e92dd1ffa0f986702739eff1fad07d2a1961e7f75f3"
+    },
+    {
+      "path": "C:\\Windows\\System32\\d3d11.dll",
+      "sha256": "a0080d0391378d0057ca91271296931358e01b71e0b784957a1e84a4520e6f45"
+    },
+    {
+      "path": "C:\\Windows\\System32\\d3d10warp.dll",
+      "sha256": "94d57b2b1a50bb921fb86e0cca1dad488ada6ba88dccedd3dd02c0dc7717ddb3"
+    },
+    {
+      "path": "C:\\Windows\\System32\\DXCore.dll",
+      "sha256": "9a1c899d2f2e717164bd974d6117937abf52f5d5e4e39bcf8bd5d92187e513df"
+    },
+    {
+      "path": "D:\\a\\orbiter-cross-platform\\orbiter-cross-platform\\out\\client-execution\\scene\\Modules\\Plugin\\ProductionBehaviorDriver.dll",
+      "sha256": "1d84e016873e903d373485bdd4e4e860be59cdb5c1b0dde3e99f1f4f6b6b78dd"
+    },
+    {
+      "path": "D:\\a\\orbiter-cross-platform\\orbiter-cross-platform\\out\\client-execution\\scene\\Modules\\Plugin\\OGLClient.dll",
+      "sha256": "2c686da3c40bc06776b6b5a10613594a99acd2a4d8f78b4f42afe644a4b07174"
+    },
+    {
+      "path": "C:\\Windows\\System32\\dbghelp.dll",
+      "sha256": "ee437eaccfe4543ce2ba1dbc4e9b8225c88b48a6b359a4ea4b3553228902874e"
+    },
+    {
+      "path": "D:\\a\\orbiter-cross-platform\\orbiter-cross-platform\\out\\client-execution\\scene\\opengl32.dll",
+      "sha256": "99ab3abd160387c62715e37cb33b2544a2bed3083f83dc415db616378018b857"
+    },
+    {
+      "path": "D:\\a\\orbiter-cross-platform\\orbiter-cross-platform\\out\\client-execution\\scene\\libgallium_wgl.dll",
+      "sha256": "4c13e1f6fc9dcea4286096960be4446c0dc202454c90d74a9b964cee96a38e6e"
+    },
+    {
+      "path": "D:\\a\\orbiter-cross-platform\\orbiter-cross-platform\\out\\client-execution\\scene\\libwinpthread-1.dll",
+      "sha256": "ee4f503512b09d7e2668518c41d6c176755a354523ae15aa4d36220c9cb31791"
+    },
+    {
+      "path": "D:\\a\\orbiter-cross-platform\\orbiter-cross-platform\\out\\client-execution\\scene\\libsystre-0.dll",
+      "sha256": "f933efd15c898dd2040e21f15801e3c7dc186f5b2cee353c9747afc9e5b54000"
+    },
+    {
+      "path": "D:\\a\\orbiter-cross-platform\\orbiter-cross-platform\\out\\client-execution\\scene\\libSPIRV-Tools.dll",
+      "sha256": "1f7de3a18d76fa6ffa27ce54cf6f532d44a819075bc162f5814c0e5dc427e224"
+    },
+    {
+      "path": "D:\\a\\orbiter-cross-platform\\orbiter-cross-platform\\out\\client-execution\\scene\\zlib1.dll",
+      "sha256": "8ae7aeb0467763a1e271cd831ca8e2f7fd101602adb9923100ea26c6be2a559b"
+    },
+    {
+      "path": "D:\\a\\orbiter-cross-platform\\orbiter-cross-platform\\out\\client-execution\\scene\\libtre-5.dll",
+      "sha256": "1014afb8649e6eba839748cc0ad5dc542249df831ee483f7a93e465e223f7bae"
+    },
+    {
+      "path": "D:\\a\\orbiter-cross-platform\\orbiter-cross-platform\\out\\client-execution\\scene\\libstdc++-6.dll",
+      "sha256": "4e4822dc4aaa99383f581dae7ab9464ae89346c5ca742f7efbcdebe20b0fe7b5"
+    },
+    {
+      "path": "D:\\a\\orbiter-cross-platform\\orbiter-cross-platform\\out\\client-execution\\scene\\libintl-8.dll",
+      "sha256": "0e5a178731e6be6d115442a6ade3df7f03265cd1fc4338f8b6f86a8001cbf582"
+    },
+    {
+      "path": "D:\\a\\orbiter-cross-platform\\orbiter-cross-platform\\out\\client-execution\\scene\\libgcc_s_seh-1.dll",
+      "sha256": "791ebf66e99c7c1b4ed3666468cec45a0172b4c8942ac6c84c3e9cab3e1b5270"
+    },
+    {
+      "path": "D:\\a\\orbiter-cross-platform\\orbiter-cross-platform\\out\\client-execution\\scene\\libiconv-2.dll",
+      "sha256": "94ec68fb8d342b6c91b6b48a8d95092819cdcd006a7166e0b68062f946afd08a"
+    },
+    {
+      "path": "D:\\a\\orbiter-cross-platform\\orbiter-cross-platform\\out\\client-execution\\scene\\libLLVM-23.dll",
+      "sha256": "eb3062e9f6b96932332e3cce1b6ad9e39332e70e4dd21e8770b44204a88e8d4a"
+    },
+    {
+      "path": "C:\\Windows\\System32\\ws2_32.dll",
+      "sha256": "51b6bf808e617f9532459305bc958da43e5b4ce3c1b32ce3cabf7c37fb307ea4"
+    },
+    {
+      "path": "D:\\a\\orbiter-cross-platform\\orbiter-cross-platform\\out\\client-execution\\scene\\libffi-8.dll",
+      "sha256": "f96cf79b75f33a10023d001673b564538023395c94b3c58e1db53114976a7c25"
+    },
+    {
+      "path": "D:\\a\\orbiter-cross-platform\\orbiter-cross-platform\\out\\client-execution\\scene\\libxml2-16.dll",
+      "sha256": "2c971559c9bedb5459b35043de25886c9b36fc07536b6d84dfb84d938c46d5a4"
+    },
+    {
+      "path": "D:\\a\\orbiter-cross-platform\\orbiter-cross-platform\\out\\client-execution\\scene\\libzstd.dll",
+      "sha256": "48368ab0ca622d0ec12f41ce85d91f22866bf5da92c77a69a06483564c93816c"
+    },
+    {
+      "path": "C:\\Windows\\System32\\cryptbase.dll",
+      "sha256": "b9516fef35ed70bf118c36974a5b85c5bd54ad492fbb5e1fa9bbfe88f792d963"
+    },
+    {
+      "path": "C:\\Windows\\System32\\WindowsCodecs.dll",
+      "sha256": "ce32240082d038a86a25c0df44eef0789df0ce7d9cbc1f9166ea5f30c758e8e8"
+    },
+    {
+      "path": "D:\\a\\orbiter-cross-platform\\orbiter-cross-platform\\out\\client-execution\\scene\\Modules\\Startup\\AtlantisConfig.dll",
+      "sha256": "cbb742b35160d760ad9e6e31e8f800107c5aa2ac58dcc42c78382e18a686684a"
+    },
+    {
+      "path": "D:\\a\\orbiter-cross-platform\\orbiter-cross-platform\\out\\client-execution\\scene\\Modules\\Startup\\AtmConfig.dll",
+      "sha256": "a0cda11158674757e95663bfeb079d7b2d9aecd14174c05c259fdd54e664f110"
+    },
+    {
+      "path": "D:\\a\\orbiter-cross-platform\\orbiter-cross-platform\\out\\client-execution\\scene\\Modules\\Startup\\DGConfigurator.dll",
+      "sha256": "47c64700d7267e6e96a15c03cb60671d699ec891a088f6a1b5af7705279dcaa1"
+    },
+    {
+      "path": "C:\\Windows\\System32\\psapi.dll",
+      "sha256": "498c0e47fbdf4aaea28b327974b9a481d6186cde83c11b487d7cda8c7482890e"
+    },
+    {
+      "path": "C:\\Windows\\System32\\XInput1_4.dll",
+      "sha256": "5da68631ee635e4a0e87d39ce9c3a932a7ab60d1a303d355ecd2390a5bd0d99a"
+    },
+    {
+      "path": "D:\\a\\orbiter-cross-platform\\orbiter-cross-platform\\out\\client-execution\\scene\\Modules\\Celbody\\spice.dll",
+      "sha256": "15a244d1c23494e71687c137387d1426c594b787491157163bff50d62d3aa94d"
+    },
+    {
+      "path": "D:\\a\\orbiter-cross-platform\\orbiter-cross-platform\\out\\client-execution\\scene\\Modules\\Celbody\\Earth\\Atmosphere\\EarthAtmJ71G.dll",
+      "sha256": "ad02048ea6cbbf557c6c1602f7b1ffde59ebf1cef328c2d4ff09383ddcae0092"
+    },
+    {
+      "path": "D:\\a\\orbiter-cross-platform\\orbiter-cross-platform\\out\\client-execution\\scene\\Modules\\Celbody\\Mars\\Atmosphere\\MarsAtm2006.dll",
+      "sha256": "48934fa5a3e4c5ed75ef8ac36f09edc7cb839d742d194e1fe014008cfdff2555"
+    },
+    {
+      "path": "D:\\a\\orbiter-cross-platform\\orbiter-cross-platform\\out\\client-execution\\scene\\Modules\\ShuttlePB.dll",
+      "sha256": "17b3ee466de0b473ccb26a4058b66fa78ef9348caa680ebb5faf70ed0bd70c80"
+    }
+  ],
+  "simulation_comparison": {
+    "position_m": 0.0,
+    "velocity_m_s": 0.0,
+    "rotation_rad": 0.0,
+    "angular_velocity_rad_s": 0.0,
+    "mjd_days": 0.0
+  },
+  "image_sha256": "cf713ff6c8dbe9cd2dbf83f5a9b92a9040d6142fcf5f895031c35cf6ee8dc6e4"
+}

@@ -64,8 +64,9 @@ unsupported native callbacks and known donor defects. `clbkLoadSurface` and
 material layout copying need repair. Call coverage must establish which optional
 callbacks the pinned stock corpus actually requires. Silent no-op success is
 not an implementation. The isolated renderer source is now selectively imported; its current-SDK
-Windows integration remains in validation. The donor SDK/core/math changes are
-excluded. No real-client execution is claimed until the scene gate passes.
+Windows external-view integration now passes hosted execution. The donor
+SDK/core/math changes are excluded. [The real-client evidence](WindowsClient.md)
+records its tested scope; native Linux capabilities in the table remain separate.
 
 Other dependencies: DirectX June 2010 and Windows SDK/MSVC for preserved Windows
 builds; Lua and LuaFileSystem/Penlight; atmosphere modules; miniaudio/XRSound;
@@ -86,7 +87,7 @@ NRLMSISE C package; its author notice is retained.
 | --- | --- | --- |
 | 0 | Honest POC labeling, scope and inventories | Source inventory implemented; no production runtime claim |
 | 1 | Production Windows references and hosted WGL | Accepted: original orbit/propulsion, 14 repeated behavior cases, Debug/Release comparison, hosted WGL and data/resource locks |
-| 2 | Real Windows OpenGL client | In preparation; normal registration/lifecycle, actual Sol ISS/ShuttlePB meshes/assets and scene manifest |
+| 2 | Real Windows OpenGL client | Hosted Debug/Release execution passed; actual Sol/ISS/ShuttlePB, deterministic images/states, normal teardown. [Evidence and commands](WindowsClient.md) |
 | 3 | Production engine/platform boundary | Not started; Windows reference/ABI/lifecycle regression gates after every extraction |
 | 4 | Native real world/external client | Not started; SPICE and actual ISS then native ShuttlePB; cross-platform state/scene parity |
 | 5 | Usable flight and interaction | Not started; propulsion, fuel, all RCS axes, autopilot, docking, contact, persistence |
@@ -318,8 +319,8 @@ with the restricted font excluded, not a mirror of the complete executable ZIP.
 The [storage lock](../../Tests/Production/input-storage.lock.json) identifies the
 actual published assets. Original frozen input-profile hashes remain unchanged.
 
-The next gate is a real separately built `GraphicsClient` plugin inside current
-Windows Orbiter, using Win32/WGL and actual Sol, ISS and ShuttlePB objects,
-meshes, materials, textures and camera/visual callbacks. A working WGL probe or
-POC viewer cannot satisfy it. The renderer's source/dependency adaptation and
-resource callbacks must pass that gate before production engine extraction.
+The real separately built Windows `GraphicsClient` now executes with Win32/WGL
+and actual Sol, ISS and ShuttlePB objects, meshes, materials, textures and
+camera/visual callbacks. [The client milestone](WindowsClient.md) records the
+passing scope, reproducible commands and remaining gates. Production engine
+extraction for Linux is next; the restricted POC session remains regression coverage.

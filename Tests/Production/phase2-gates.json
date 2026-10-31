@@ -1,0 +1,23 @@
+{
+  "schema": 1,
+  "phase_status": "accepted-windows-external-view",
+  "run_id": 41198786277,
+  "renderer_source": "21f92f44f3afd0c3ca8a704edd4ef2ce8e10c6a0",
+  "application_source": "06d8989823c59e651061d409425c19ec71360bfa",
+  "provenance": "ClientReference/provenance.json",
+  "configurations": [
+    "Debug",
+    "Release"
+  ],
+  "gate": {
+    "real_production_objects": "Sol, config-driven ProjectAlpha_ISS, source-built ShuttlePB",
+    "repeat": "two fresh processes/configuration; identical state/event traces and images",
+    "original_numerical_budgets": "unchanged; all measured errors zero",
+    "hosted_configuration_comparison": "zero state/landmark errors; SSIM 1.0",
+    "source_reproduction": "Release application/SDK freshly rebuilt from pinned source; existing tests passed",
+    "actual_driver_and_assets": "loaded paths/hashes, real meshes/textures, Earth tile/archive use audited",
+    "lifecycle": "60 successful renders/presents and normal visual/context teardown"
+  },
+  "remaining": "Native production engine, native client adapter, cockpit/stock corpus/full flight, repeated sessions in one process, packaging and hardware acceptance remain later phases",
+  "automatic_reference_refresh": false
+}
