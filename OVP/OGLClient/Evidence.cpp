@@ -16,6 +16,7 @@
 namespace Evidence {
 namespace {
 bool enabled=false,captured=false;
+PVOID faultHandler=nullptr;
 unsigned frames=0,draws=0,presents=0;
 uint64_t indices=0;
 std::ofstream events,assets;
@@ -56,7 +57,7 @@ void Begin() {
     if(!enabled)return;
     captured=false;
     setvbuf(stdout,nullptr,_IONBF,0);
-    AddVectoredExceptionHandler(1,fault);
+    faultHandler=AddVectoredExceptionHandler(1,fault);
     if(glDebugMessageCallback){glEnable(GL_DEBUG_OUTPUT);glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);glDebugMessageCallback(debugMessage,nullptr);}
     events=output("visual-events.csv");events<<"frame,event,object,type\n";
     assets=output("loaded-assets.txt");
@@ -72,6 +73,7 @@ void End(bool contextDeleted) {
     auto lifecycle=output("graphics-lifecycle.json");
     lifecycle<<"{\"rendered_frames\":"<<frames<<",\"successful_presents\":"<<presents
              <<",\"context_deleted\":"<<(contextDeleted?"true":"false")<<"}\n";
+    if(faultHandler){RemoveVectoredExceptionHandler(faultHandler);faultHandler=nullptr;}
     events.close();assets.close();enabled=false;
 }
 void Visual(const char *event,OBJHANDLE object) {

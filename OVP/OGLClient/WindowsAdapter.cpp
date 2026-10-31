@@ -97,10 +97,20 @@ LRESULT OGLClient::RenderWndProc(HWND window,UINT message,WPARAM wp,LPARAM lp) {
     if(message==WM_SIZE && mContext && LOWORD(lp) && HIWORD(lp)) clbkSetViewportSize(LOWORD(lp),HIWORD(lp));
     return GraphicsClient::RenderWndProc(window,message,wp,lp);
 }
-void OGLClient::clbkImGuiInit() { require(ImGui_ImplOpenGL3_Init("#version 330 core"),"ImGui OpenGL initialization failed"); }
+void OGLClient::clbkImGuiInit() {
+    // The production Win32 platform backend owns the main window. Additional
+    // WGL window/context callbacks are not part of this external-view gate.
+    ImGui::GetIO().ConfigFlags &= ~ImGuiConfigFlags_ViewportsEnable;
+    oapiWriteLog(const_cast<char *>("OGLClient: dialogs use the main window; floating WGL platform windows are unsupported"));
+    require(ImGui_ImplOpenGL3_Init("#version 330 core"),"ImGui OpenGL initialization failed");
+}
 void OGLClient::clbkImGuiShutdown() { ImGui_ImplOpenGL3_Shutdown(); }
 void OGLClient::clbkImGuiNewFrame() { ImGui_ImplOpenGL3_NewFrame(); }
-void OGLClient::clbkImGuiRenderDrawData() { ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData()); }
+void OGLClient::clbkImGuiRenderDrawData() {
+    ImGui::Render();
+    auto data=ImGui::GetDrawData();require(data!=nullptr,"ImGui frame finalization failed");
+    ImGui_ImplOpenGL3_RenderDrawData(data);
+}
 uint64_t OGLClient::clbkImGuiSurfaceTexture(SURFHANDLE surface) { return surface?static_cast<OGLTexture *>(surface)->m_TexId:0; }
 SURFHANDLE OGLClient::clbkLoadSurface(const char *name,DWORD flags,bool path) {
     // Direct paths are accepted by the texture reader before Orbiter search paths.
