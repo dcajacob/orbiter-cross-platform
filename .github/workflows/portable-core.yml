@@ -1,0 +1,187 @@
+name: Portable Core and Windows Reference
+
+on:
+  push:
+    branches: ['portability/**', 'codex/**']
+  pull_request:
+    paths:
+      - 'Src/Orbiter/**'
+      - 'Orbitersdk/include/**'
+      - 'Tests/**'
+      - '.github/workflows/portable-core.yml'
+  workflow_dispatch:
+    inputs:
+      capture_windows_reference:
+        description: 'Build the original Windows app and capture candidate physics references'
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+jobs:
+  portable:
+    name: Portable ${{ matrix.os }} ${{ matrix.configuration }} x64
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-24.04, windows-2022]
+        configuration: [Debug, Release]
+    steps:
+      - uses: actions/checkout@v7
+      - name: Set up MSVC x64
+        if: runner.os == 'Windows'
+        uses: ilammy/msvc-dev-cmd@v1
+        with:
+          vsversion: '17.0'
+          arch: x64
+      - name: Configure
+        shell: bash
+        run: |
+          set -o pipefail
+          cmake -S Tests/Portable -B out/portable -G Ninja \
+            -DCMAKE_CXX_COMPILER=${{ matrix.os == 'windows-2022' && 'cl' || 'g++' }} \
+            -DCMAKE_BUILD_TYPE=${{ matrix.configuration }} \
+            -DORBITER_PORTABLE_COLLISION_TESTS=ON 2>&1 | tee configure.log
+      - name: Build
+        shell: bash
+        run: |
+          set -o pipefail
+          cmake --build out/portable --parallel 2 2>&1 | tee build.log
+      - name: Test
+        shell: bash
+        run: |
+          set -o pipefail
+          ctest --test-dir out/portable --output-on-failure 2>&1 | tee ctest.log
+      - name: Save build and test evidence
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: portable-${{ matrix.os }}-${{ matrix.configuration }}-x64
+          retention-days: 14
+          path: |
+            configure.log
+            build.log
+            ctest.log
+            out/portable/CMakeCache.txt
+            out/portable/Testing/Temporary/*.log
+
+  windows-reference:
+    name: Original Windows ${{ matrix.configuration }} reference candidate
+    if: github.event_name == 'workflow_dispatch' && inputs.capture_windows_reference
+    needs: portable
+    runs-on: windows-2022
+    timeout-minutes: 90
+    strategy:
+      fail-fast: false
+      matrix:
+        configuration: [Debug, Release]
+    env:
+      DXSDK_DIR: '${{ github.workspace }}\DXSDK'
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - uses: ilammy/msvc-dev-cmd@v1
+        with:
+          vsversion: '17.0'
+          arch: x64
+      - name: Cache DirectX SDK
+        id: dxsdk
+        uses: actions/cache@v6
+        with:
+          path: '${{ github.workspace }}\DXSDK'
+          key: dxsdk_jun10
+      - name: Download existing Windows build dependency
+        if: steps.dxsdk.outputs.cache-hit != 'true'
+        shell: cmd
+        run: |
+          curl --fail -L https://download.microsoft.com/download/a/e/7/ae743f1f-632b-4809-87a9-aa1bb3458e31/DXSDK_Jun10.exe -o DXSDK_Jun10.exe
+          if errorlevel 1 exit /b 1
+          7z x DXSDK_Jun10.exe DXSDK/Include DXSDK/Lib
+          if errorlevel 1 exit /b 1
+          del DXSDK_Jun10.exe
+      - name: Record compiler and build environment
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force out/reference-app | Out-Null
+          cmd /c "cl 2>&1 & exit /b 0" | Set-Content out/reference-app/compiler.txt
+          Get-Item Env:CL,Env:_CL_,Env:VSCMD_VER,Env:VCToolsVersion -ErrorAction SilentlyContinue |
+            Out-String | Set-Content out/reference-app/build-metadata.txt
+          exit 0
+      - name: Configure original application
+        shell: pwsh
+        run: |
+          cmake -S . -B out/reference-app -G Ninja `
+            -DCMAKE_BUILD_TYPE=${{ matrix.configuration }} `
+            -DCMAKE_C_COMPILER=cl -DCMAKE_CXX_COMPILER=cl `
+            -DORBITER_BUILD_D3D9CLIENT=OFF -DORBITER_BUILD_XRSOUND=OFF `
+            -DORBITER_MAKE_DOC=OFF -DORBITER_MAKE_TESTS=ON `
+            -DORBITER_PORTABLE_REFERENCE_CAPTURE=ON `
+            "-DDXSDK_DIR:PATH=$env:DXSDK_DIR" 2>&1 | Tee-Object out/reference-app/configure.log
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - name: Build original application and existing tests
+        shell: pwsh
+        run: |
+          cmake --build out/reference-app --parallel 2 2>&1 | Tee-Object out/reference-app/build.log
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - name: Run existing application tests
+        shell: pwsh
+        run: |
+          ctest --test-dir out/reference-app --output-on-failure 2>&1 | Tee-Object out/reference-app/ctest.log
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - name: Capture and validate candidate reference
+        shell: pwsh
+        run: |
+          python Tests/Portable/capture_windows_reference.py `
+            --source . --orbiter out/reference-app/Orbiter.exe `
+            --output out/reference-capture --configuration ${{ matrix.configuration }}
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - name: Save candidate traces and provenance, including failures
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: windows-reference-${{ matrix.configuration }}-x64
+          retention-days: 14
+          path: |
+            out/reference-app/*.log
+            out/reference-app/*.txt
+            out/reference-app/Testing/Temporary/*.log
+            out/reference-capture/**/*.csv
+            out/reference-capture/**/*.json
+            out/reference-capture/**/*.log
+            out/reference-capture/**/*.txt
+            out/reference-capture/**/*.cfg
+            out/reference-capture/**/*.scn
+
+  compare-windows:
+    name: Compare Windows Debug and Release candidates
+    needs: windows-reference
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/download-artifact@v8
+        with:
+          name: windows-reference-Debug-x64
+          path: out/debug
+      - uses: actions/download-artifact@v8
+        with:
+          name: windows-reference-Release-x64
+          path: out/release
+      - name: Compare orbit and free-spin traces
+        shell: bash
+        run: |
+          set -o pipefail
+          python3 Tests/Portable/trace_tools.py out/debug/reference-capture/orbit/trace.csv \
+            --reference out/release/reference-capture/orbit/trace.csv | tee orbit-comparison.json
+          python3 Tests/Portable/trace_tools.py out/debug/reference-capture/spin/trace.csv \
+            --reference out/release/reference-capture/spin/trace.csv --spin 0.0001 | tee spin-comparison.json
+      - name: Save comparison report
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: windows-reference-comparison
+          retention-days: 14
+          path: '*-comparison.json'

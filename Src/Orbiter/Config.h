@@ -291,6 +291,9 @@ struct CFG_CMDLINEPRM {
 	double MaxSimTime;          // Max session runtime (sim time). 0 = unlimited
 	std::string LaunchScenario; // if not empty, start scenario instantly without opening Launchpad
 	std::list<std::string> LoadPlugins; // list of plugins to load
+	std::string PhysicsTracePath; // optional observation-only state trace
+	std::string PhysicsTraceVessel;
+	std::string PhysicsTracePrimary;
 };
 
 // =============================================================

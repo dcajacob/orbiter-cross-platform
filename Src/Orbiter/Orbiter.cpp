@@ -837,6 +837,8 @@ HWND Orbiter::CreateRenderWindow (Config *pCfg, const char *scenario)
 		LOGOUT ("Finished initialising panels");
 	}
 
+	WritePhysicsTrace(true);
+
 	if (pCfg->CfgLogicPrm.bStartPaused) {
 		BeginTimeStep (true);
 		UpdateWorld(); // otherwise it doesn't get initialised during pause
@@ -877,6 +879,12 @@ void Orbiter::PreCloseSession()
 void Orbiter::CloseSession ()
 {
 	DWORD i;
+	try {
+		physicsTrace.Close();
+	} catch (const std::exception &error) {
+		LOGOUT_ERR("Physics trace: %s", error.what());
+		exit(1);
+	}
 
 	bSession = false;
 
@@ -1797,6 +1805,7 @@ void Orbiter::EndTimeStep (bool running)
 
 	// Copy frame times from T1 to T0
 	td.EndStep (running);
+	if (running && physicsTrace.IsOpen()) WritePhysicsTrace(false);
 
 	// Update panels
 	if (g_camera) g_camera->Update ();                           // camera
@@ -1810,6 +1819,35 @@ void Orbiter::EndTimeStep (bool running)
 	if (SessionLimitReached())
 		if (hRenderWnd) PostMessage(hRenderWnd, WM_CLOSE, 0, 0);
 		else CloseSession();
+}
+
+void Orbiter::WritePhysicsTrace(bool initial)
+{
+	const auto &cfg = pConfig->CfgCmdlinePrm;
+	if (cfg.PhysicsTracePath.empty()) return;
+	try {
+		if (initial) {
+			if (cfg.PhysicsTraceVessel.empty() || cfg.PhysicsTracePrimary.empty())
+				throw std::runtime_error("--physics-trace requires --trace-vessel and --trace-primary");
+			physicsTraceStep = 0;
+			physicsTrace.Open(cfg.PhysicsTracePath);
+		} else if (++physicsTraceStep % 10 != 0) {
+			return;
+		}
+		const Vessel *vessel = g_psys->GetVessel(cfg.PhysicsTraceVessel.c_str());
+		const CelestialBody *primary = g_psys->GetGravObj(cfg.PhysicsTracePrimary.c_str());
+		if (!vessel || !primary)
+			throw std::runtime_error("physics trace vessel or primary not found");
+		const Vector r = vessel->GPos() - primary->GPos();
+		const Vector v = vessel->GVel() - primary->GVel();
+		const Quaternion &q = vessel->GQ();
+		const Vector &w = vessel->AngularVelocity();
+		physicsTrace.Write({physicsTraceStep, td.SimT0, td.MJD0,
+			{r.x, r.y, r.z}, {v.x, v.y, v.z}, {q.qvx, q.qvy, q.qvz, q.qs}, {w.x, w.y, w.z}});
+	} catch (const std::exception &error) {
+		LOGOUT_ERR("Physics trace: %s", error.what());
+		exit(1);
+	}
 }
 
 bool Orbiter::SessionLimitReached() const

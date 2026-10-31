@@ -175,7 +175,10 @@ std::vector<::CommandLine::Key>& orbiter::CommandLine::KeyList() const
 		{ KEY_MAXSYSTIME, "maxsystime", 'T', true},
 		{ KEY_MAXSIMTIME, "maxsimtime", 't', true},
 		{ KEY_FRAMECOUNT, "maxframes", '_', true},
-		{ KEY_PLUGIN, "plugin", 'p', true}
+		{ KEY_PLUGIN, "plugin", 'p', true},
+		{ KEY_PHYSICSTRACE, "physics-trace", '\0', true},
+		{ KEY_TRACEVESSEL, "trace-vessel", '\0', true},
+		{ KEY_TRACEPRIMARY, "trace-primary", '\0', true}
 	};
 	return keyList;
 }
@@ -230,6 +233,19 @@ void orbiter::CommandLine::ApplyOption(const Key* key, const std::string& value)
 	case KEY_PLUGIN:
 		cfg.LoadPlugins.push_back(value);
 		break;
+	case KEY_PHYSICSTRACE:
+		if (value.empty()) {
+			std::cerr << "--physics-trace requires a file path\n";
+			exit(1);
+		}
+		cfg.PhysicsTracePath = value;
+		break;
+	case KEY_TRACEVESSEL:
+		cfg.PhysicsTraceVessel = value;
+		break;
+	case KEY_TRACEPRIMARY:
+		cfg.PhysicsTracePrimary = value;
+		break;
 	}
 }
 
@@ -254,6 +270,9 @@ void orbiter::CommandLine::PrintHelpAndExit() const
 	std::cout << "  --maxsimtime=<t>, -t <t>: Terminate session at simulation time <t>\n";
 	std::cout << "  --maxframes=<f>: Terminate session after <f> time frames\n";
 	std::cout << "  --plugin=<pg>, -p <pg>: Load plugin <pg> (from Modules\\Plugin\\<pg>.dll)\n";
+	std::cout << "  --physics-trace=<csv>: Write initial and every tenth finalized state\n";
+	std::cout << "  --trace-vessel=<name>: Vessel to observe (required with --physics-trace)\n";
+	std::cout << "  --trace-primary=<name>: Reference body (required with --physics-trace)\n";
 	std::cout << std::endl;
 
 	exit(0);

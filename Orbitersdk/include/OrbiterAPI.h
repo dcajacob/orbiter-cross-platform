@@ -23,6 +23,7 @@
 #define _CRT_SECURE_NO_DEPRECATE 
 #endif
 #endif
+#include "OrbiterVector.h"
 #include <fstream>
 #include <windows.h>
 #include <float.h>
@@ -235,13 +236,7 @@ typedef enum { ROOT, CONFIG, SCENARIOS, TEXTURES, TEXTURES2, MESHES, MODULES } P
  */
 // ===========================================================================
 //@{
-/**
- * \brief 3-element vector
- */
-typedef union {
-	double data[3];               ///< array data interface
-	struct { double x, y, z; };   ///< named data interface
-} VECTOR3;
+// VECTOR3 is shared with portable core components.
 
 /**
  * \brief 4-element vector

@@ -23,7 +23,7 @@
 #include <cstddef>
 #include <vector>
 #include "Vecmat.h"
-#include "OrbiterAPI.h"
+#include "OrbiterVector.h"
 
 namespace CollisionCore {
 

@@ -1,5 +1,17 @@
 Include(FetchContent)
 
+# Only for pre-refactor Windows reference capture. Not part of the SDK or app
+# installation, and never needed by the future native headless runner.
+option(ORBITER_PORTABLE_REFERENCE_CAPTURE "Build stationary-primary reference fixture" OFF)
+if(WIN32 AND ORBITER_PORTABLE_REFERENCE_CAPTURE)
+    add_library(PortableFixedPrimary SHARED Portable/Windows/FixedPrimary.cpp)
+    target_include_directories(PortableFixedPrimary PRIVATE ${ORBITER_SOURCE_SDK_INCLUDE_DIR})
+    target_link_libraries(PortableFixedPrimary PRIVATE ${ORBITER_LIB} ${ORBITER_SDK_LIB})
+    add_dependencies(PortableFixedPrimary ${OrbiterTgt} Orbitersdk)
+    set_target_properties(PortableFixedPrimary PROPERTIES
+        RUNTIME_OUTPUT_DIRECTORY "${ORBITER_BINARY_ROOT_DIR}/Modules/Celbody")
+endif()
+
 FetchContent_Declare(
   Catch2
   GIT_REPOSITORY https://github.com/catchorg/Catch2.git

@@ -12,6 +12,7 @@
 #include <commctrl.h>
 #include "Mesh.h"
 #include "TimeData.h"
+#include "PhysicsTrace.h"
 #include <chrono>
 
 class DInput;
@@ -357,6 +358,9 @@ protected:
     HRESULT DeleteDeviceObjects ();
 
 private:
+	void WritePhysicsTrace(bool initial);
+	orbiter::PhysicsTrace physicsTrace;
+	std::size_t physicsTraceStep = 0;
 	Config         *pConfig;
 	State          *pState;
 	orbiter::LaunchpadDialog *m_pLaunchpad;

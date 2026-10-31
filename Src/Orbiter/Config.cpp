@@ -252,7 +252,10 @@ CFG_CMDLINEPRM CfgCmdlinePrm_default = {
 	0.0,                // Max sys time (0 = unlimited)
 	0.0,                // Max sim time (0 = unlimited)
 	std::string(),      // launch scenario (empty: open Launchpad dialog)
-	std::list<std::string>() // list of plugins to load
+	std::list<std::string>(), // list of plugins to load
+	std::string(),      // physics trace path (disabled by default)
+	std::string(),      // traced vessel name
+	std::string()       // trace reference primary name
 };
 
 CFG_WINDOWPOS CfgWindowPos_default = {
