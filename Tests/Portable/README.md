@@ -4,18 +4,36 @@ Goal: run one unpowered vessel for 6,000 fixed one-second steps on native Linux
 and Windows, using shared original Orbiter propagation code, and compare 601
 samples against a frozen pre-refactor Windows reference.
 
-**Current stage: native runner implemented; hosted final validation pending.**
-The original Windows prerequisite passed in
+**Milestone complete (2026-10-31).** All eight jobs passed in
+[hosted acceptance run 41177834521](https://github.com/dcajacob/orbiter-cross-platform/actions/runs/41177834521),
+testing commit `6f79da173ee016fa693966026d68bcf22831bb12`.
+The four native Linux/GCC and Windows/MSVC x64 Debug/Release builds each passed
+all eight CTest targets. Both full Windows application builds passed their
+existing Lua/collision suites and frozen-reference verification. Native
+cross-platform comparison and application Debug/Release comparison passed.
+
+The original Windows prerequisite passed before extraction in
 [run 41175652054](https://github.com/dcajacob/orbiter-cross-platform/actions/runs/41175652054).
-Original traces and complete capture evidence are frozen in [Reference](Reference/README.md).
-Orbital-element extraction passed hosted GCC/MSVC Debug/Release tests in
-[run 41176660506](https://github.com/dcajacob/orbiter-cross-platform/actions/runs/41176660506).
-Local Linux Debug and Release pass all eight suites, including actual engine
-parity, repeatability, convergence, free spin and rejected-input checks.
-The milestone remains incomplete until the final hosted matrix and Windows
-application verification pass.
+Original traces and capture evidence remain frozen in [Reference](Reference/README.md).
+Final reports, provenance, all eight CI artifacts and complete job logs are
+preserved in [Verification](Verification/README.md), beyond hosted retention.
+
+All parsed numerical samples agree exactly across the four native builds.
+Their maximum error against the original Windows orbit/spin reference is
+`1.1175870895385742e-7 m` in position and `8.866990313695243e-11 m/s` in velocity;
+orientation, angular velocity and MJD differences are zero. Half-step position
+error against its frozen reference is `1.2013700229374393e-7 m`.
+Both refactored Windows applications reproduce all three original traces
+numerically exactly. No tolerance was widened and no reference was regenerated.
 
 ## Local verification
+
+Local Linux GCC 15.2/CMake 4.2.3 Debug and Release each pass all eight suites.
+These local results are separate from the hosted acceptance matrix above.
+Local orbit analytical position error is `1.4143184329290157e-6 m`; half-step
+error falls to `1.1808439414391757e-7 m`. Energy/angular-momentum relative drift
+stays below `7e-15`; free-spin angular error is below `5.1e-10 rad`.
+
 
 Requires a C++17 compiler, CMake >=3.19, Python >=3.8, and the existing upstream
 Catch2 dependency when collision tests are enabled. Catch2 is pinned to
@@ -223,8 +241,8 @@ was reviewed and committed in `874d6caa`. Its source commit remains
 permitted. Reference SHA256 checks run before native and application parity tests.
 The checked-in original evidence archives outlive hosted artifact expiration.
 
-Final acceptance requires all four native x64 GCC/MSVC Debug/Release jobs,
+The completed acceptance gate required all four native x64 GCC/MSVC Debug/Release jobs,
 comparison of every sampled state across platforms and with the frozen original,
 and both full Windows application builds/existing tests/reference verifications.
-Local Linux results alone do not satisfy this gate. Broader scenario compatibility
+Local Linux results alone would not satisfy this gate. Broader scenario compatibility
 and a native graphical Linux application remain later milestones.

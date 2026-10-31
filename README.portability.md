@@ -1,11 +1,19 @@
 # Cross-platform Orbiter engine bootstrap
 
-**Current status (2026-10-31): the native `orbiter-headless` runner and shared
-numerical core are implemented. Local Linux Debug/Release pass eight suites;
-final hosted Windows/Linux and current Windows application checks are pending.**
-The pre-refactor Windows reference was captured, validated and frozen before
-extraction. See [the portable milestone instructions](Tests/Portable/README.md)
-for build/run commands, supported inputs, trace contracts and acceptance budgets.
+**Milestone complete (2026-10-31): native headless Windows/Linux parity is
+verified.** The command-line runner advances the supported unpowered vessel for
+6,000 one-second steps and emits 601 finalized-state samples. All eight jobs in
+[the hosted acceptance run](https://github.com/dcajacob/orbiter-cross-platform/actions/runs/41177834521)
+passed: native GCC/MSVC x64 Debug/Release, both full Windows application builds
+and existing tests, and both comparison jobs. The frozen pre-refactor reference
+is unchanged. The native builds agree numerically exactly with each other and
+within 0.12 micrometres of the original Windows reference across the tested cases.
+
+See [the portable milestone instructions](Tests/Portable/README.md) for build/run
+commands, supported inputs, trace contracts and results. Complete accepted CI
+evidence is preserved in [Verification](Tests/Portable/Verification/README.md).
+Graphics, general scenario support, atmosphere, terrain, collisions, Lua,
+vessel modules and Solar System ephemerides remain outside this native milestone.
 Earlier milestone notes below retain the installation/build history.
 
 Local project on `dan-xps16`: `/home/dan/GIT/orbiter-cross-platform`.
@@ -362,3 +370,26 @@ below `7e-15`. No acceptance budget was changed. Artifact SHA256 digests and
 source/fixture content were checked locally before freezing the reference.
 The Windows baseline prerequisite is now satisfied; shared-core extraction and
 the native headless runner may proceed.
+
+## Native headless milestone accepted (2026-10-31)
+
+Implementation stages are preserved as reviewable commits: original-reference
+acceptance `874d6caa`, explicit orbital calculations `3e1d0c8e`, shared propagation
+`59c1a2d7`, runner/parity checks `f4f3fce2`, exact reference checkout bytes
+`6b05f1cb`, and explicit application-service includes `6f79da17`.
+
+Final hosted run:
+https://github.com/dcajacob/orbiter-cross-platform/actions/runs/41177834521
+Tested source: `6f79da173ee016fa693966026d68bcf22831bb12`.
+Each native build passed 8/8 suites; each full application passed 2/2 existing
+suites plus orbit/repeat/half-step/spin verification. All parsed native samples
+agree exactly across platforms and build modes. Both current Windows application
+builds reproduce the frozen original samples numerically exactly. Full reports,
+compiler settings, effective inputs, traces, build/test logs and complete CI job
+logs are checked in under `Tests/Portable/Verification` with SHA256 digests.
+
+Local Linux Debug/Release also passed 8/8 suites. These are recorded separately
+from hosted results. The runner links only the native C++ runtime and standard
+system libraries; it runs without a display server, Wine, graphics or visual assets.
+The public SDK and `VECTOR3` layout are preserved. The full native graphical
+application and broader physics/scenario compatibility remain future work.
