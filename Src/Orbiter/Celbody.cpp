@@ -10,6 +10,7 @@
 
 #define OAPI_IMPLEMENTATION
 
+#include "Astro.h"
 #include "Orbiter.h"
 #include "Element.h"
 #include "Celbody.h"

@@ -1,6 +1,7 @@
 // Copyright (c) Martin Schweiger
 // Licensed under the MIT License
 
+#include "Astro.h"
 #include "MfdMap_old.h"
 #include "Pane.h"
 #include "Psys.h"

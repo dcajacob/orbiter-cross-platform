@@ -1,6 +1,7 @@
 // Copyright (c) Martin Schweiger
 // Licensed under the MIT License
 
+#include "Astro.h"
 #include "MfdAlign.h"
 #include "Pane.h"
 #include "Planet.h"

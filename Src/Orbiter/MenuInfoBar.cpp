@@ -1,6 +1,7 @@
 // Copyright (c) Martin Schweiger
 // Licensed under the MIT License
 #define IMGUI_DEFINE_MATH_OPERATORS
+#include "Astro.h"
 #include "OrbiterAPI.h"
 #include "imgui.h"
 #include "imgui_internal.h"

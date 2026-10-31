@@ -1,6 +1,7 @@
 // Copyright (c) Martin Schweiger
 // Licensed under the MIT License
 
+#include "Astro.h"
 #include "MfdSurface.h"
 #include "Orbiter.h"
 #include "Pane.h"

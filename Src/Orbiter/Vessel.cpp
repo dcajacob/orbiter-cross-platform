@@ -20,6 +20,7 @@
 
 #define OAPI_IMPLEMENTATION
 
+#include "Astro.h"
 #include "Orbiter.h"
 #include "Vessel.h"
 #include "Supervessel.h"

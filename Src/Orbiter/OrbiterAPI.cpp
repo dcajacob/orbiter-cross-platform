@@ -4,6 +4,7 @@
 #define STRICT 1
 #define OAPI_IMPLEMENTATION
 
+#include "Astro.h"
 #include "Orbiter.h"
 #include "Launchpad.h"
 #include "Psys.h"

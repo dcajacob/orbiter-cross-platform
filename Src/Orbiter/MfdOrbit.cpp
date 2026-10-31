@@ -1,6 +1,7 @@
 // Copyright (c) Martin Schweiger
 // Licensed under the MIT License
 
+#include "Astro.h"
 #include "MfdOrbit.h"
 #include "Pane.h"
 #include "Celbody.h"

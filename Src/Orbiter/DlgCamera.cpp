@@ -1,3 +1,4 @@
+#include "Astro.h"
 #include "DlgCamera.h"
 #include "OrbiterAPI.h"
 #include "Orbiter.h"

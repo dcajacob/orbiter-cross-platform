@@ -3,6 +3,7 @@
 
 // Implementation of class PlanetarySystem
 
+#include "Astro.h"
 #include <fstream>
 #include <stdio.h>
 #include <string.h>

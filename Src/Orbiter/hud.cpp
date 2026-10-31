@@ -3,6 +3,7 @@
 
 #define OAPI_IMPLEMENTATION
 
+#include "Astro.h"
 #include "hud.h"
 #include "Pane.h"
 #include "VCockpit.h"

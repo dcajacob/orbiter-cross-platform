@@ -1,6 +1,7 @@
 // Copyright (c) Martin Schweiger
 // Licensed under the MIT License
 
+#include "Astro.h"
 #include "console_ng.h"
 #include "Orbiter.h"
 #include "DlgMgr.h"
