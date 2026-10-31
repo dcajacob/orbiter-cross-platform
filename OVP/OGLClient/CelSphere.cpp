@@ -138,7 +138,7 @@ void OGLCelestialSphere::CreateEcliptic()
 
 	m_eclVAO = std::make_unique<VertexArray>();
 	m_eclVAO->Bind();
-	m_eclVBO = std::make_unique<VertexBuffer>((void *)vbuf, necl * sizeof(VERTEX_XYZ));
+	m_eclVBO = std::make_unique<VertexBuffer>(vbuf.data(), necl * sizeof(VERTEX_XYZ));
 	glVertexAttribPointer(
 	0,                  // attribute 0. No particular reason for 0, but must match the layout in the shader.
 	3,                  // size

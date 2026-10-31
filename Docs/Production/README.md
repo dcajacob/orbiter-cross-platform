@@ -63,7 +63,9 @@ unsupported native callbacks and known donor defects. `clbkLoadSurface` and
 `clbkMeshMaterial` terminate the donor process; TextW aborts; surface flags and
 material layout copying need repair. Call coverage must establish which optional
 callbacks the pinned stock corpus actually requires. Silent no-op success is
-not an implementation. No donor code has yet been imported into the application.
+not an implementation. The isolated renderer source is now selectively imported; its current-SDK
+Windows integration remains in validation. The donor SDK/core/math changes are
+excluded. No real-client execution is claimed until the scene gate passes.
 
 Other dependencies: DirectX June 2010 and Windows SDK/MSVC for preserved Windows
 builds; Lua and LuaFileSystem/Penlight; atmosphere modules; miniaudio/XRSound;

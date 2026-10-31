@@ -6,6 +6,7 @@
 #include "ztreemgr.h"
 #include "zlib.h"
 #include <cstring>
+#include "Evidence.h"
 // =======================================================================
 // File header for compressed tree files
 
@@ -127,6 +128,7 @@ bool ZTreeMgr::OpenArchive()
 	char fname[256];
 	sprintf (fname, "%s/Archive/%s.tree", path, name[layer]);
 	treef = fopen(fname, "rb");
+    if(treef)Evidence::Asset(fname);
 	if (!treef) {
 		return false;
 	}

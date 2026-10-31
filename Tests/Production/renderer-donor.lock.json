@@ -2,7 +2,7 @@
   "schema": 1,
   "donor_commit": "ad96494482e6101afebf1c635e4e1f542623b51d",
   "source": "https://github.com/TheGondos/orbiter",
-  "import_status": "not imported; selective renderer adaptation only",
+  "import_status": "selective OVP/OGLClient renderer source imported; current Windows SDK adaptation and real-scene validation in progress; donor SDK/core/math changes excluded",
   "files": {
     "OVP/OGLClient/CMakeLists.txt": {
       "git_blob": "01617c95d91e3091d513571eb4460451847018a4",
