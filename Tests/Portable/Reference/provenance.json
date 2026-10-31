@@ -1,0 +1,230 @@
+{
+  "status": "accepted",
+  "accepted_date": "2026-10-31",
+  "capture_commit": "1009ee2251931ec9e120047dc41d936c216b9ed0",
+  "workflow_run": "https://github.com/dcajacob/orbiter-cross-platform/actions/runs/41175652054",
+  "traces": {
+    "Orbit.csv": "283d0af5a36f0a44209f7861844fbbf98dc77702b87ad94d8948c5866b1457b5",
+    "Spin.csv": "b0db7472555091b696354bdf81e7ba462e578976da749c3f091daa27a28953cf",
+    "Orbit.HalfStep.csv": "01eb0421a785bc0d3838e6d1d154232884deb5f128033ad5d0997f6fc8d98c5f"
+  },
+  "artifacts": [
+    {
+      "name": "windows-reference-comparison.zip",
+      "id": 13033835270,
+      "sha256": "bc6ab45692c5813eb084b9007937b278cb6c72b7605a3171db29bb60bdcec890"
+    },
+    {
+      "name": "windows-reference-Debug-x64.zip",
+      "id": 13032812231,
+      "sha256": "1cf961144ef263021d8cfe9845df9176f384422ea031b1ae27db17ae20d0eb87"
+    },
+    {
+      "name": "windows-reference-Release-x64.zip",
+      "id": 13032508860,
+      "sha256": "d373bef59e1aa7b93d830249fb59d13c85bcecee8dcc35f34cc22e98a5749ea8"
+    }
+  ],
+  "original_capture": {
+    "Release": {
+      "commit": "1009ee2251931ec9e120047dc41d936c216b9ed0",
+      "upstream_physics_commit": "8e6ae437901417eef56f08b8f969ff92df83db5e",
+      "physics_sha256": {
+        "Src/Orbiter/Body.cpp": "53c4868c3e5fe0707e3872c8adde1cf55d4cf3ad826ee365de2e63913a2b8a78",
+        "Src/Orbiter/BodyIntegrator.cpp": "e02f1f9144c2453950b9f22b90874467045faa9ef87b1730c79aa952886d69ba",
+        "Src/Orbiter/Rigidbody.cpp": "9f07c86a9d0dc4dc224857b3f82cc38d3c2c21f14fb4c241f00f2d0e27a13662",
+        "Src/Orbiter/Element.cpp": "b4e4fc89f1dc39601e14c3993c7c79335c68c7741a854cfdb01ef78ec7de30f8",
+        "Src/Orbiter/Astro.h": "f9930079d7ccd66a14faaea106752ae6ab78239ec8eca1831495ec40a2a6626a",
+        "Src/Orbiter/Psys.cpp": "d3901fdc2c3de2bbc248d55e3bc5220f004ad6711a37bbc0eaf2e2fde4232e99",
+        "Src/Orbiter/Celbody.cpp": "57859874d2ae6bfbfb782bb1c30d7dba904a312717be4dbabbee293528e4e579",
+        "Src/Orbiter/Star.cpp": "4b4ec34ce37219aee3f36cd3465275bfdab88d367f54db455c3be7c6429f2ccb",
+        "Src/Orbiter/Vessel.cpp": "e9d22895b6fab1f672034d5bf5d60e7d2c38c35767a90cb29af8abd49ce2c130",
+        "Src/Orbiter/Vesselbase.cpp": "15c12c015a576f64ee85169d1494ba457bf9b2b113d1309f11f9934580d19f4f",
+        "Src/Orbiter/Vesselstatus.cpp": "84f095eebe670b5c0be71ee1937bbf61677d2aa7004b124e308fad9d467636d9",
+        "Src/Orbiter/TimeData.cpp": "298376ebdffee64647baa0eeaa9ec8c8060ce8726b8aa51fc0be7c66cb3364b4",
+        "Src/Orbiter/Vecmat.cpp": "a60686af25ca9266c2ec143fe5da863c69a2bddcd1698667209e2dd9e60c0d4f"
+      },
+      "configuration": "Release",
+      "platform": "win32",
+      "executable_sha256": "ea71724f0dd7ca9cd8d69a2ea39fac215e4e4f9cccce14844f9a19a501c34caa",
+      "python": "3.12.10 (tags/v3.12.10:0cc8128, Apr  8 2025, 12:21:36) [MSC v.1943 64 bit (AMD64)]",
+      "fixed_primary_provider_sha256": "82c9075184d1215fef8372ebd807e3869f60da30e0f024729e9d52f2ae1c4e5c",
+      "github_run_id": "41175652054",
+      "github_repository": "dcajacob/orbiter-cross-platform",
+      "status": "candidate_passed_requires_review",
+      "fixture_sha256": {
+        "Orbiter.cfg": "c0655e2d68b61406d7e66c39565e4629ce96ee4db55ed9ea6ff2293f139a4cc0",
+        "TwoBody.scn": "926bc2a57dbc72f18f212c8e1405022f2f617a5076bf1e0a362e703ae701597d",
+        "Config/PortableTwoBody.cfg": "3e7d779fc9a300dc44f950f8604b2c4ade34990806b9f46729974d7005837d36",
+        "Config/Primary.cfg": "d58b9c40cde38c8b1ead592e8d66d03206430d8554878b1d1718fc0cd8b4751b",
+        "Config/Vessels/PortableProbe.cfg": "8c78fb216a27dc7883089a09ce9432f037c7350790010dfbab97ad0908b8ab57"
+      },
+      "results": {
+        "orbit": {
+          "position_m": 1.3123027900649334e-06,
+          "velocity_m_s": 1.4881277718371488e-09,
+          "orientation_rad": 0.0,
+          "angular_velocity_rad_s": 0.0,
+          "energy_relative": 6.8833827526759706e-15,
+          "momentum_relative": 3.4416913763379853e-15
+        },
+        "repeat": {
+          "position_m": 1.3123027900649334e-06,
+          "velocity_m_s": 1.4881277718371488e-09,
+          "orientation_rad": 0.0,
+          "angular_velocity_rad_s": 0.0,
+          "energy_relative": 6.8833827526759706e-15,
+          "momentum_relative": 3.4416913763379853e-15
+        },
+        "half_step": {
+          "position_m": 1.2411773373862428e-07,
+          "velocity_m_s": 9.757059838841204e-11,
+          "orientation_rad": 0.0,
+          "angular_velocity_rad_s": 0.0,
+          "energy_relative": 5.218048215738236e-15,
+          "momentum_relative": 2.4424906541753444e-15
+        },
+        "convergence": {
+          "coarse": {
+            "position_m": 1.3123027900649334e-06,
+            "velocity_m_s": 1.4881277718371488e-09,
+            "orientation_rad": 0.0,
+            "angular_velocity_rad_s": 0.0,
+            "energy_relative": 6.8833827526759706e-15,
+            "momentum_relative": 3.4416913763379853e-15
+          },
+          "half_step": {
+            "position_m": 1.2411773373862428e-07,
+            "velocity_m_s": 9.757059838841204e-11,
+            "orientation_rad": 0.0,
+            "angular_velocity_rad_s": 0.0,
+            "energy_relative": 5.218048215738236e-15,
+            "momentum_relative": 2.4424906541753444e-15
+          }
+        },
+        "spin": {
+          "position_m": 1.3123027900649334e-06,
+          "velocity_m_s": 1.4881277718371488e-09,
+          "orientation_rad": 4.999946986498749e-10,
+          "angular_velocity_rad_s": 0.0,
+          "energy_relative": 6.8833827526759706e-15,
+          "momentum_relative": 3.4416913763379853e-15
+        },
+        "repeat_comparison": {
+          "position_m": 0.0,
+          "velocity_m_s": 0.0,
+          "orientation_rad": 0.0,
+          "angular_velocity_rad_s": 0.0,
+          "mjd_days": 0.0
+        },
+        "spin_repeat_comparison": {
+          "position_m": 0.0,
+          "velocity_m_s": 0.0,
+          "orientation_rad": 0.0,
+          "angular_velocity_rad_s": 0.0,
+          "mjd_days": 0.0
+        }
+      }
+    },
+    "Debug": {
+      "commit": "1009ee2251931ec9e120047dc41d936c216b9ed0",
+      "upstream_physics_commit": "8e6ae437901417eef56f08b8f969ff92df83db5e",
+      "physics_sha256": {
+        "Src/Orbiter/Body.cpp": "53c4868c3e5fe0707e3872c8adde1cf55d4cf3ad826ee365de2e63913a2b8a78",
+        "Src/Orbiter/BodyIntegrator.cpp": "e02f1f9144c2453950b9f22b90874467045faa9ef87b1730c79aa952886d69ba",
+        "Src/Orbiter/Rigidbody.cpp": "9f07c86a9d0dc4dc224857b3f82cc38d3c2c21f14fb4c241f00f2d0e27a13662",
+        "Src/Orbiter/Element.cpp": "b4e4fc89f1dc39601e14c3993c7c79335c68c7741a854cfdb01ef78ec7de30f8",
+        "Src/Orbiter/Astro.h": "f9930079d7ccd66a14faaea106752ae6ab78239ec8eca1831495ec40a2a6626a",
+        "Src/Orbiter/Psys.cpp": "d3901fdc2c3de2bbc248d55e3bc5220f004ad6711a37bbc0eaf2e2fde4232e99",
+        "Src/Orbiter/Celbody.cpp": "57859874d2ae6bfbfb782bb1c30d7dba904a312717be4dbabbee293528e4e579",
+        "Src/Orbiter/Star.cpp": "4b4ec34ce37219aee3f36cd3465275bfdab88d367f54db455c3be7c6429f2ccb",
+        "Src/Orbiter/Vessel.cpp": "e9d22895b6fab1f672034d5bf5d60e7d2c38c35767a90cb29af8abd49ce2c130",
+        "Src/Orbiter/Vesselbase.cpp": "15c12c015a576f64ee85169d1494ba457bf9b2b113d1309f11f9934580d19f4f",
+        "Src/Orbiter/Vesselstatus.cpp": "84f095eebe670b5c0be71ee1937bbf61677d2aa7004b124e308fad9d467636d9",
+        "Src/Orbiter/TimeData.cpp": "298376ebdffee64647baa0eeaa9ec8c8060ce8726b8aa51fc0be7c66cb3364b4",
+        "Src/Orbiter/Vecmat.cpp": "a60686af25ca9266c2ec143fe5da863c69a2bddcd1698667209e2dd9e60c0d4f"
+      },
+      "configuration": "Debug",
+      "platform": "win32",
+      "executable_sha256": "a2a98911db737728a5190874efab98fdbb10b5a65ef15397f0facb0247347954",
+      "python": "3.12.10 (tags/v3.12.10:0cc8128, Apr  8 2025, 12:21:36) [MSC v.1943 64 bit (AMD64)]",
+      "fixed_primary_provider_sha256": "89b1efda554541f171d85591558a445e77a1f920b2cb7b5e7d6b060b552cf1a7",
+      "github_run_id": "41175652054",
+      "github_repository": "dcajacob/orbiter-cross-platform",
+      "status": "candidate_passed_requires_review",
+      "fixture_sha256": {
+        "Orbiter.cfg": "c0655e2d68b61406d7e66c39565e4629ce96ee4db55ed9ea6ff2293f139a4cc0",
+        "TwoBody.scn": "926bc2a57dbc72f18f212c8e1405022f2f617a5076bf1e0a362e703ae701597d",
+        "Config/PortableTwoBody.cfg": "3e7d779fc9a300dc44f950f8604b2c4ade34990806b9f46729974d7005837d36",
+        "Config/Primary.cfg": "d58b9c40cde38c8b1ead592e8d66d03206430d8554878b1d1718fc0cd8b4751b",
+        "Config/Vessels/PortableProbe.cfg": "8c78fb216a27dc7883089a09ce9432f037c7350790010dfbab97ad0908b8ab57"
+      },
+      "results": {
+        "orbit": {
+          "position_m": 1.3123027900649334e-06,
+          "velocity_m_s": 1.4881277718371488e-09,
+          "orientation_rad": 0.0,
+          "angular_velocity_rad_s": 0.0,
+          "energy_relative": 6.8833827526759706e-15,
+          "momentum_relative": 3.4416913763379853e-15
+        },
+        "repeat": {
+          "position_m": 1.3123027900649334e-06,
+          "velocity_m_s": 1.4881277718371488e-09,
+          "orientation_rad": 0.0,
+          "angular_velocity_rad_s": 0.0,
+          "energy_relative": 6.8833827526759706e-15,
+          "momentum_relative": 3.4416913763379853e-15
+        },
+        "half_step": {
+          "position_m": 1.2411773373862428e-07,
+          "velocity_m_s": 9.757059838841204e-11,
+          "orientation_rad": 0.0,
+          "angular_velocity_rad_s": 0.0,
+          "energy_relative": 5.218048215738236e-15,
+          "momentum_relative": 2.4424906541753444e-15
+        },
+        "convergence": {
+          "coarse": {
+            "position_m": 1.3123027900649334e-06,
+            "velocity_m_s": 1.4881277718371488e-09,
+            "orientation_rad": 0.0,
+            "angular_velocity_rad_s": 0.0,
+            "energy_relative": 6.8833827526759706e-15,
+            "momentum_relative": 3.4416913763379853e-15
+          },
+          "half_step": {
+            "position_m": 1.2411773373862428e-07,
+            "velocity_m_s": 9.757059838841204e-11,
+            "orientation_rad": 0.0,
+            "angular_velocity_rad_s": 0.0,
+            "energy_relative": 5.218048215738236e-15,
+            "momentum_relative": 2.4424906541753444e-15
+          }
+        },
+        "spin": {
+          "position_m": 1.3123027900649334e-06,
+          "velocity_m_s": 1.4881277718371488e-09,
+          "orientation_rad": 4.999946986498749e-10,
+          "angular_velocity_rad_s": 0.0,
+          "energy_relative": 6.8833827526759706e-15,
+          "momentum_relative": 3.4416913763379853e-15
+        },
+        "repeat_comparison": {
+          "position_m": 0.0,
+          "velocity_m_s": 0.0,
+          "orientation_rad": 0.0,
+          "angular_velocity_rad_s": 0.0,
+          "mjd_days": 0.0
+        },
+        "spin_repeat_comparison": {
+          "position_m": 0.0,
+          "velocity_m_s": 0.0,
+          "orientation_rad": 0.0,
+          "angular_velocity_rad_s": 0.0,
+          "mjd_days": 0.0
+        }
+      }
+    }
+  }
+}

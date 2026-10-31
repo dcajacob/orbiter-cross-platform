@@ -1,9 +1,9 @@
 # Cross-platform Orbiter engine bootstrap
 
-**Current status (2026-10-31): portable tests pass on hosted Windows and Linux
-in Debug and Release; original Windows reference capture is running.** No native scenario
-runner or Windows reference has been produced yet. Physics extraction remains
-gated on a validated pre-refactor Windows capture. See
+**Current status (2026-10-31): hosted portable tests and original Windows
+Debug/Release application/reference checks pass. The Windows reference is
+reviewed and frozen.** The native scenario runner and physics extraction are
+the next implementation stage. See
 [the portable milestone instructions](Tests/Portable/README.md) for commands,
 trace contracts, acceptance budgets and the remaining implementation sequence.
 Earlier milestone notes below retain the installation/build history.
@@ -340,3 +340,25 @@ unchanged; validation artifacts retain the dedicated workflow's 14-day policy.
 The temporary manual history-import workflow was removed after GitHub's
 restricted job token could not publish inherited workflow files. Publication
 completed directly over SSH instead; no publishing automation remains installed.
+
+## Original Windows reference accepted (2026-10-31)
+
+Corrected hosted run:
+https://github.com/dcajacob/orbiter-cross-platform/actions/runs/41175652054
+Capture source commit: `1009ee2251931ec9e120047dc41d936c216b9ed0`.
+All seven jobs passed: four portable builds, two full Windows application builds
+with existing tests and reference capture, and Debug/Release trace comparison.
+
+Reviewed and frozen under `Tests/Portable/Reference`: orbit, free-spin and
+half-step traces, provenance and complete build/capture evidence archives.
+Default traces have 601 samples; the half-step trace has 1201 samples over the
+same 6000-second duration. Debug and Release samples agree numerically exactly,
+and same-executable repeats agree byte-for-byte.
+
+Maximum circular-orbit position error is `1.3123027900649334e-6 m`; half-step
+position error falls to `1.2411773373862428e-7 m`. Free-spin angular error is
+`4.999946986498749e-10 rad`; energy and angular-momentum relative errors stay
+below `7e-15`. No acceptance budget was changed. Artifact SHA256 digests and
+source/fixture content were checked locally before freezing the reference.
+The Windows baseline prerequisite is now satisfied; shared-core extraction and
+the native headless runner may proceed.

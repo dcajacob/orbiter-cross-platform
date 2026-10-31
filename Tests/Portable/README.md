@@ -4,11 +4,13 @@ Goal: run one unpowered vessel for 6,000 fixed one-second steps on native Linux
 and Windows, using shared original Orbiter propagation code, and compare 601
 samples against a frozen pre-refactor Windows reference.
 
-**Current stage: pre-refactor Windows reference capture.** Hosted portable tests
+**Current stage: Windows reference accepted; portable engine extraction next.** Hosted portable tests
 pass on x64 Linux/GCC and Windows/MSVC in Debug and Release (five CTest targets
 per job). The native scenario
-runner and physics extraction are intentionally gated on a validated Windows
-reference. There is no frozen reference or native runner yet. Local tests of the
+runner and physics extraction required a validated Windows reference; that gate
+passed in [run 41175652054](https://github.com/dcajacob/orbiter-cross-platform/actions/runs/41175652054).
+The frozen engine traces and provenance are in [Reference](Reference/README.md).
+There is no native runner yet. Local tests of the
 trace tools use explicitly synthetic analytical inputs; these are never engine
 traces or evidence of cross-platform simulation parity.
 
@@ -153,9 +155,10 @@ also agree. Review the original-app test results, source/configuration hashes,
 analytical budgets, repeatability and convergence before committing the accepted
 orbit/free-spin CSVs and provenance under `Tests/Portable/Reference`. Preserve
 the capture commit and record the acceptance commit. No automatic baseline
-refresh is permitted. There are deliberately no reference CSVs in this checkout.
+refresh is permitted. The reviewed original Windows CSVs are now frozen under
+`Reference`, from capture source commit `1009ee2251931ec9e120047dc41d936c216b9ed0`.
 
-Only after that gate passes:
+With that gate now satisfied:
 
 1. Separate orbital-element time/configuration inputs, retaining Windows
    adapters; cover circular, eccentric, inclined and hyperbolic trajectories,
