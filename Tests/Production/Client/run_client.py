@@ -15,7 +15,7 @@ import zlib
 
 HERE=Path(__file__).resolve().parent
 sys.path.insert(0,str(HERE.parent))
-from behavior_suite import stage,rows
+from behavior_suite import stage,rows,git
 from mesa_runtime import digest,require
 from frozen_behavior import load_reference
 from compare_references import quaternion
@@ -76,10 +76,13 @@ def numerical_reference(directory,configuration):
     return maxima
 
 
-def validate(directory,configuration):
+def validate(directory,configuration,provenance):
     info=json.loads((directory/'renderer-info.json').read_text());require('llvmpipe' in info['renderer'],'real application did not load software Mesa')
+    require(info['client_width']==1280 and info['client_height']==720,'real window client area differs from the test viewport')
+    errors=directory/'graphics-errors.txt'
+    require(not errors.exists() or not errors.read_text().strip(),'OpenGL reported errors during actual client execution')
     summary=json.loads((directory/'scene-summary.json').read_text())
-    require(summary['frames']==50 and summary['mesh_draw_calls']>0 and summary['indices']>0,'real scene geometry was not drawn')
+    require(summary['simulation_seconds']==12.5 and summary['frames']>0 and summary['mesh_draw_calls']>0 and summary['indices']>0,'real scene geometry was not drawn')
     lifecycle=json.loads((directory/'graphics-lifecycle.json').read_text())
     require(lifecycle['rendered_frames']>=50 and lifecycle['successful_presents']>=50 and lifecycle['context_deleted'],
             'real window presentation or OpenGL cleanup did not complete')
@@ -123,7 +126,8 @@ def validate(directory,configuration):
         require(p.is_file(),'actual vessel mesh file missing');assets[p.relative_to(directory).as_posix()]=digest(p)
     raw=(directory/'scene.rgba').read_bytes();png(directory/'scene.png',raw,1280,720)
     require(len(set(raw[::4]))>16,'scene readback is a blank or trivial image')
-    report=dict(status='passed real Windows production scene',renderer=info,geometry=summary,lifecycle=lifecycle,
+    report=dict(status='passed real Windows production scene',provenance=provenance,
+                executable_sha256=digest(directory/'Orbiter.exe'),client_sha256=digest(directory/'Modules/Plugin/OGLClient.dll'),renderer=info,geometry=summary,lifecycle=lifecycle,
                 objects=scene,object_draws=object_draws,planet_tiles=planet_tiles,archive_reads=archive_reads,asset_sha256=assets,loaded_modules=modules,
                 simulation_comparison=numerical_reference(directory,configuration),image_sha256=digest(directory/'scene.png'))
     (directory/'client-report.json').write_text(json.dumps(report,indent=2)+'\n');return report
@@ -145,15 +149,24 @@ def main():
         (directory/'ogl-evidence.enabled').write_text('Stock Sol/ISS/ShuttlePB integration evidence\n')
         require((directory/'Modules/Plugin/OGLClient.dll').is_file(),'separately built OpenGL client missing')
         mesa_files(args.mesa.resolve(),directory)
-    reports=[]
-    for name in ('scene','scene-repeat'):
-        directory=args.output.resolve()/name
-        stage(args.orbiter.resolve(),args.data.resolve(),args.planets.resolve(),directory,case,None,before_launch=configure)
-        reports.append(validate(directory,args.configuration))
-    for name in ('behavior-state.csv','behavior-propellant.csv','behavior-animations.csv'):
-        require((args.output/'scene'/name).read_bytes()==(args.output/'scene-repeat'/name).read_bytes(),'rendered production state repeat differs')
-    require(reports[0]['image_sha256']==reports[1]['image_sha256'],'fixed-camera real scene did not repeat identically')
-    (args.output/'client-summary.json').write_text(json.dumps(dict(status='passed',config=args.configuration,repeated_image_sha256=reports[0]['image_sha256']),indent=2)+'\n')
+    provenance=dict(renderer_source=git('rev-parse','HEAD'),
+                    application_source=json.loads((args.orbiter.parent/'test-runtime.json').read_text())['source_commit'],
+                    data_profiles_sha256={name:digest(HERE.parent/name) for name in ('stock-data.lock.json','standard-planets.lock.json','mesa-ucrt64.lock.json')})
+    reports=[];summary=dict(status='pending',config=args.configuration,provenance=provenance)
+    try:
+        for name in ('scene','scene-repeat'):
+            directory=args.output.resolve()/name
+            stage(args.orbiter.resolve(),args.data.resolve(),args.planets.resolve(),directory,case,None,before_launch=configure)
+            reports.append(validate(directory,args.configuration,provenance))
+        for name in ('behavior-state.csv','behavior-events.csv','behavior-propellant.csv','behavior-animations.csv'):
+            require((args.output/'scene'/name).read_bytes()==(args.output/'scene-repeat'/name).read_bytes(),'rendered production repeat differs: '+name)
+        require(reports[0]['image_sha256']==reports[1]['image_sha256'],'fixed-camera real scene did not repeat identically')
+        summary.update(status='passed',repeated_image_sha256=reports[0]['image_sha256'])
+    except Exception as error:
+        summary.update(status='failed',error=str(error),completed_runs=len(reports))
+        raise
+    finally:
+        (args.output/'client-summary.json').write_text(json.dumps(summary,indent=2)+'\n')
     print('Real Windows Orbiter/OpenGL Sol + ISS + ShuttlePB scene, DLL audit, repeat and frozen numerical comparison passed')
 
 

@@ -36,6 +36,7 @@ HWND OGLClient::clbkCreateRenderWindow() {
     try {
         auto video=GetVideoData();video->fullscreen=false;video->winw=1280;video->winh=720;
         hRenderWnd=GraphicsClient::clbkCreateRenderWindow();require(hRenderWnd!=nullptr,"OpenGL render window creation failed");
+        SetWindowLongPtr(hRenderWnd,GWLP_USERDATA,reinterpret_cast<LONG_PTR>(this));
         SetWindowLongPtr(hRenderWnd,GWL_STYLE,WS_OVERLAPPEDWINDOW|WS_VISIBLE);
         RECT rect{0,0,int(m_width),int(m_height)};AdjustWindowRect(&rect,WS_OVERLAPPEDWINDOW,FALSE);
         SetWindowPos(hRenderWnd,nullptr,0,0,rect.right-rect.left,rect.bottom-rect.top,SWP_NOMOVE|SWP_NOZORDER|SWP_FRAMECHANGED);
@@ -102,6 +103,15 @@ bool OGLClient::clbkDisplayFrame() {
     return success;
 }
 LRESULT OGLClient::RenderWndProc(HWND window,UINT message,WPARAM wp,LPARAM lp) {
+    if(message==WM_GETMINMAXINFO) {
+        auto result=GraphicsClient::RenderWndProc(window,message,wp,lp);
+        auto limits=reinterpret_cast<MINMAXINFO *>(lp);
+        // Hosted desktops may be smaller than the required test viewport.
+        // Allow an ordinary window to extend beyond that desktop's bounds.
+        limits->ptMaxTrackSize.x=std::max(LONG(1400),limits->ptMaxTrackSize.x);
+        limits->ptMaxTrackSize.y=std::max(LONG(900),limits->ptMaxTrackSize.y);
+        return result;
+    }
     if(message==WM_SIZE && mContext && LOWORD(lp) && HIWORD(lp)) clbkSetViewportSize(LOWORD(lp),HIWORD(lp));
     return GraphicsClient::RenderWndProc(window,message,wp,lp);
 }

@@ -1,9 +1,11 @@
 #include "glad.h"
 #include "Evidence.h"
 #include "OGLClient.h"
+#include "MeshManager.h"
 #include <tlhelp32.h>
 #include <dbghelp.h>
 #include <cstdio>
+#include <cmath>
 #include <filesystem>
 #include <fstream>
 #include <iomanip>
@@ -63,10 +65,12 @@ void Begin() {
     if(glDebugMessageCallback){glEnable(GL_DEBUG_OUTPUT);glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);glDebugMessageCallback(debugMessage,nullptr);}
     events=output("visual-events.csv");events<<"frame,event,object,type\n";
     assets=output("loaded-assets.txt");
+    RECT client{};GetClientRect(g_client->GetRenderWindow(),&client);
     auto info=output("renderer-info.json");
     info<<"{\"vendor\":"<<std::quoted(reinterpret_cast<const char *>(glGetString(GL_VENDOR)))
         <<",\"renderer\":"<<std::quoted(reinterpret_cast<const char *>(glGetString(GL_RENDERER)))
-        <<",\"version\":"<<std::quoted(reinterpret_cast<const char *>(glGetString(GL_VERSION)))<<"}\n";
+        <<",\"version\":"<<std::quoted(reinterpret_cast<const char *>(glGetString(GL_VERSION)))
+        <<",\"client_width\":"<<client.right<<",\"client_height\":"<<client.bottom<<"}\n";
 
 }
 void Presented() { if(enabled)++presents; }
@@ -90,7 +94,8 @@ void PlanetTile(OBJHANDLE object,unsigned count) {
 void ArchiveRead(const char *path,int layer,unsigned bytes) { if(enabled && bytes)archiveReads[{path,layer}]+=bytes; }
 void Rendered() { if(enabled)++frames; }
 void Frame() {
-    if(!enabled || captured || frames!=50)return;
+    if(!enabled || captured || !frames || oapiGetSimTime()<12.5)return;
+    if(std::abs(oapiGetSimTime()-12.5)>1e-12)throw std::runtime_error("missing finalized tick-50 render for graphics evidence");
     captured=true;
     GLint viewport[4]{};glGetIntegerv(GL_VIEWPORT,viewport);
     if(viewport[2]!=1280 || viewport[3]!=720)throw std::runtime_error("unexpected real-client evidence viewport: "+std::to_string(viewport[2])+"x"+std::to_string(viewport[3]));
@@ -105,8 +110,13 @@ void Frame() {
         if(oapiGetObjectType(h)==OBJTP_VESSEL) {
             VESSEL *v=oapiGetVesselInterface(h);
             for(UINT j=0;j<v->GetMeshCount();++j) {
-                auto mesh=v->GetMeshTemplate(j);
-                scene<<name(h)<<",vessel,"<<v->GetClassName()<<",template,"<<j<<','<<v->GetMeshName(j)<<','
+                struct OwnedMesh { MESHHANDLE value=nullptr;~OwnedMesh(){if(value)oapiDeleteMesh(value);} } owned;
+                auto mesh=v->GetMeshTemplate(j);const char *meshName=v->GetMeshName(j);
+                if(mesh && !meshName)meshName=g_client->GetMeshManager()->GetMeshName(mesh);
+                bool preloaded=mesh!=nullptr;
+                if(!mesh)mesh=owned.value=v->CopyMeshFromTemplate(j);
+                if(!mesh || !meshName)throw std::runtime_error("stock mesh identity is unavailable for "+name(h));
+                scene<<name(h)<<",vessel,"<<v->GetClassName()<<','<<(preloaded?"template":"on-demand")<<','<<j<<','<<meshName<<','
                      <<oapiMeshGroupCount(mesh)<<','<<oapiMeshMaterialCount(mesh)<<','<<oapiMeshTextureCount(mesh)<<','<<p.x<<','<<p.y<<','<<p.z<<'\n';
                 for(DWORD k=1;k<=oapiMeshTextureCount(mesh);++k) {
                     auto texture=static_cast<OGLTexture *>(oapiGetTextureHandle(mesh,k));
@@ -129,7 +139,7 @@ void Frame() {
     camera<<"px,py,pz,dx,dy,dz,aperture,m11,m12,m13,m21,m22,m23,m31,m32,m33\n"
           <<p.x<<','<<p.y<<','<<p.z<<','<<d.x<<','<<d.y<<','<<d.z<<','<<oapiCameraAperture();
     for(double value:r.data)camera<<','<<value;camera<<'\n';
-    auto summary=output("scene-summary.json");summary<<"{\"frames\":"<<frames<<",\"mesh_draw_calls\":"<<draws<<",\"indices\":"<<indices<<",\"width\":1280,\"height\":720}\n";
+    auto summary=output("scene-summary.json");summary<<"{\"frames\":"<<frames<<",\"simulation_seconds\":"<<oapiGetSimTime()<<",\"mesh_draw_calls\":"<<draws<<",\"indices\":"<<indices<<",\"width\":1280,\"height\":720}\n";
     auto objects=output("object-draws.csv");objects<<"object,mesh_draw_calls\n";
     for(auto &entry:objectDraws)objects<<entry.first<<','<<entry.second<<'\n';
     auto planets=output("planet-tiles.csv");planets<<"object,textured_draw_calls,indices\n";

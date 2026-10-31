@@ -31,6 +31,7 @@ OGLMeshManager::~OGLMeshManager ()
 
 void OGLMeshManager::Flush ()
 {
+    names.clear();
 	int i;
 	for (i = 0; i < nmlist; i++)
 		delete mlist[i].mesh;
@@ -40,8 +41,9 @@ void OGLMeshManager::Flush ()
 	}
 }
 
-void OGLMeshManager::StoreMesh (MESHHANDLE hMesh)
+void OGLMeshManager::StoreMesh (MESHHANDLE hMesh,const char *filename)
 {
+    if(filename)names[hMesh]=filename;
 	if (GetMesh (hMesh)) return; // mesh already stored
 
 	if (nmlist == nmlistbuf) { // need to allocate buffer
@@ -64,4 +66,8 @@ const OGLMesh *OGLMeshManager::GetMesh (MESHHANDLE hMesh)
 		if (mlist[i].hMesh == hMesh) return mlist[i].mesh;
 
 	return NULL;
+}
+
+const char *OGLMeshManager::GetMeshName(MESHHANDLE mesh) const {
+    auto entry=names.find(mesh);return entry==names.end()?nullptr:entry->second.c_str();
 }

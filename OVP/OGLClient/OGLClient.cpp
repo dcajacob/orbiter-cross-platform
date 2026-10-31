@@ -1192,7 +1192,7 @@ bool OGLClient::clbkSplashLoadMsg (const char *msg, int line)
  */
 void OGLClient::clbkStoreMeshPersistent (MESHHANDLE hMesh, const char *fname)
 {
-	mMeshManager->StoreMesh (hMesh);
+	mMeshManager->StoreMesh (hMesh,fname);
 }
 
 /**

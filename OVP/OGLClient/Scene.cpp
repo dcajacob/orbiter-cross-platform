@@ -111,10 +111,9 @@ void Scene::Initialise ()
 	light = new OGLLight (hSun, OGLLight::Directional, this, 0);
 	light->light.enabled = 1;	
 
-	glEnable(GL_DEPTH_TEST);
-	glDisable(GL_BLEND);
-    glFrontFace(GL_CW);
-    glEnable(GL_CULL_FACE);
+    // Use the state cache consistently. A raw glDisable(GL_BLEND) here left
+    // the cache claiming blending was enabled, making cloud alpha opaque.
+    Renderer::Sync();
 
     // Set miscellaneous renderstates
 	/*

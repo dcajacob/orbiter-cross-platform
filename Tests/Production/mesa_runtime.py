@@ -8,7 +8,7 @@ import argparse
 import hashlib
 import json
 import os
-from pathlib import Path
+from pathlib import Path,PurePosixPath
 import shutil
 import subprocess
 import sys
@@ -49,7 +49,19 @@ def stage(lock_path, cache, destination):
             shutil.rmtree(directory)
         directory.mkdir()
         # Windows bsdtar and GNU tar with zstd both understand .pkg.tar.zst.
-        subprocess.run(['tar', '-xf', str(archive.resolve()), '-C', str(directory.resolve())], check=True)
+        members=subprocess.check_output(['tar','-tf',str(archive.resolve())],text=True,encoding='utf-8').splitlines()
+        selected=[]
+        for member in members:
+            if member.endswith('/'):continue
+            relative=PurePosixPath(member)
+            if ((relative.parts[:2]==('ucrt64','bin') and relative.suffix.lower()=='.dll') or
+                    relative.parts[:3]==('ucrt64','share','licenses')):
+                require(not relative.is_absolute() and '..' not in relative.parts,'invalid runtime archive path')
+                selected.append(member)
+        # Do not expand unused headers, static archives and development tools.
+        # The complete pinned package is still hashed before extraction.
+        if selected:
+            subprocess.run(['tar','-xf',str(archive.resolve()),'-C',str(directory.resolve()),*selected],check=True)
         for source in sorted(directory.rglob('*')):
             if not source.is_file():
                 continue
