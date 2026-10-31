@@ -14,10 +14,11 @@
 // background (stars, constellations, grids, labels, etc.)
 // ==============================================================
 
-#ifndef __CELSPHERE_H
-#define __CELSPHERE_H
+#ifndef ORBITER_OGL_CELSPHERE_H
+#define ORBITER_OGL_CELSPHERE_H
 
 #include "OGLClient.h"
+#include "CelSphereAPI.h"
 //#include "Baseobj.h"
 #include <stdint.h>
 #include "Shader.h"
@@ -30,7 +31,7 @@ class OGLCamera;
  * Loads star and constellation information from data bases and uses them to
  * celestial sphere background.
  */
-class OGLCelestialSphere {
+class OGLCelestialSphere : public oapi::CelestialSphere {
 public:
 	OGLCelestialSphere ();
 	~OGLCelestialSphere ();
@@ -40,9 +41,10 @@ public:
 	void RenderEcliptic (OGLCamera *c);
 	void Show();
 protected:
-	void LoadConstellationLines ();
-	void LoadStars ();
+	void LoadGpuConstellationLines ();
+	void LoadGpuStars ();
 	void CreateEcliptic ();
+	bool EclDir2WindowPos(const VECTOR3 &dir, int &x, int &y) const override;
 	// Load constellation line data from file
 
 private:
@@ -67,4 +69,4 @@ private:
 	int lvlid[256];       // star brightness hash table
 };
 
-#endif // !__CELSPHERE_H
+#endif // !ORBITER_OGL_CELSPHERE_H

@@ -21,6 +21,7 @@
 #include <algorithm>
 #include "OGLCamera.h"
 #include "Renderer.h"
+#include "Scene.h"
 
 #define NSEG 64 // number of segments in celestial grid lines
 
@@ -34,14 +35,14 @@ const float sphere_r = 1e4f; // the actual render distance for the celestial sph
 	                 		 // but it must be within the fustrum limits - check this
 	                		 // in case the near and far planes are dynamically changed!
 
-OGLCelestialSphere::OGLCelestialSphere ()
+OGLCelestialSphere::OGLCelestialSphere () : oapi::CelestialSphere(g_client)
 {
 	m_constellationsShader = Renderer::GetShader("Constellations");
 	m_starsShader = Renderer::GetShader("Stars");
 	m_eclShader = Renderer::GetShader("Ecliptic");
 
-	LoadStars ();
-	LoadConstellationLines ();
+	LoadGpuStars ();
+	LoadGpuConstellationLines ();
 	CreateEcliptic ();
 }
 
@@ -53,10 +54,9 @@ OGLCelestialSphere::~OGLCelestialSphere ()
 
 // ==============================================================
 
-void OGLCelestialSphere::LoadStars ()
+void OGLCelestialSphere::LoadGpuStars ()
 {
-    oapi::CelestialSphere database(g_client);
-    const auto stars=database.LoadStars();
+    const auto stars=oapi::CelestialSphere::LoadStars();
     struct Vertex { float x,y,z,mag; };
     std::vector<Vertex> vertices;vertices.reserve(stars.size());
     int previous=256,index=0;
@@ -73,10 +73,9 @@ void OGLCelestialSphere::LoadStars ()
     glVertexAttribPointer(0,4,GL_FLOAT,GL_FALSE,0,nullptr);glEnableVertexAttribArray(0);m_starsVAO->UnBind();
 }
 
-void OGLCelestialSphere::LoadConstellationLines ()
+void OGLCelestialSphere::LoadGpuConstellationLines ()
 {
-    oapi::CelestialSphere database(g_client);
-    const auto lines=database.LoadConstellationLines();
+    const auto lines=oapi::CelestialSphere::LoadConstellationLines();
     ncline=lines.size()/2;
     VERTEX_XYZ *cnstvtx=new VERTEX_XYZ[lines.size()];
     for(size_t i=0;i<lines.size();++i)cnstvtx[i]={float(lines[i].x*sphere_r),float(lines[i].y*sphere_r),float(lines[i].z*sphere_r)};
@@ -163,4 +162,8 @@ void OGLCelestialSphere::RenderEcliptic(OGLCamera *c)
 	Renderer::CheckError("glDrawArrays");
 	m_eclVAO->UnBind();
 	Renderer::Unbind(m_eclShader);
+}
+
+bool OGLCelestialSphere::EclDir2WindowPos(const VECTOR3 &dir,int &x,int &y) const {
+    return g_client->GetScene()->GetCamera()->Direction2Viewport(dir,x,y);
 }

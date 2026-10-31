@@ -108,36 +108,12 @@ void OGLCamera::Update ()
 	}
 }
 
-static bool Vector3Matrix4Multiply (glm::fvec3 *res, const glm::fvec3 *v, const glm::fmat4 &mat)
-{
-    float x = v->x* mat[0][0] + v->y*mat[1][0] + v->z* mat[2][0] + mat[3][0];
-    float y = v->x* mat[0][1] + v->y*mat[1][1] + v->z* mat[2][1] + mat[3][1];
-    float z = v->x* mat[0][2] + v->y*mat[1][2] + v->z* mat[2][2] + mat[3][2];
-    float w = v->x* mat[0][3] + v->y*mat[1][3] + v->z* mat[2][3] + mat[3][3];
-
-    if (fabs (w) < 1e-5f) return false;
-
-    res->x = x/w;
-    res->y = y/w;
-    res->z = z/w;
-    return true;
-}
-
 bool OGLCamera::Direction2Viewport(const VECTOR3 &dir, int &x, int &y)
 {
-	glm::vec3 homog;
-	glm::vec3 idir = {-dir.x, -dir.y, -dir.z};
-	if(!Vector3Matrix4Multiply (&homog, &idir, mViewProj))
-		return false;
-
-	if (homog.x >= -1.0f && homog.y <= 1.0f && homog.z >= 0.0) {
-		if (std::hypot(homog.x, homog.y) < 1e-6) {
-			x = width/2, y = height/2;
-		} else {
-			x = (int)(width*0.5f*(1.0f+homog.x));
-			y = (int)(height*0.5f*(1.0f-homog.y));
-		}
-		return true;
-	} else
-		return false;
+    // Directions have no translation. Orbiter +Z forward is reflected in mView.
+    auto clip=mViewProj*glm::vec4(float(dir.x),float(dir.y),float(dir.z),0.0f);
+    if(clip.w<=0)return false;
+    auto ndc=glm::vec3(clip)/clip.w;
+    if(ndc.x < -1 || ndc.x > 1 || ndc.y < -1 || ndc.y > 1)return false;
+    x=int(width*0.5f*(1+ndc.x));y=int(height*0.5f*(1-ndc.y));return true;
 }
