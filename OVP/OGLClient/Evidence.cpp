@@ -2,6 +2,8 @@
 #include "Evidence.h"
 #include "OGLClient.h"
 #include <tlhelp32.h>
+#include <dbghelp.h>
+#include <cstdio>
 #include <filesystem>
 #include <fstream>
 #include <iomanip>
@@ -22,11 +24,40 @@ std::map<std::string,unsigned> objectDraws;
 std::string currentObject;
 std::string name(OBJHANDLE h) { char value[256]{};oapiGetObjectName(h,value,sizeof(value));return value; }
 std::ofstream output(const char *path) { std::ofstream f(path,std::ios::binary);f.imbue(std::locale::classic());f<<std::setprecision(17);if(!f)throw std::runtime_error("cannot write graphics evidence");return f; }
+LONG CALLBACK fault(EXCEPTION_POINTERS *exception) {
+    if(exception->ExceptionRecord->ExceptionCode!=EXCEPTION_ACCESS_VIOLATION)return EXCEPTION_CONTINUE_SEARCH;
+    FILE *log=fopen("graphics-fault.txt","w");if(!log)return EXCEPTION_CONTINUE_SEARCH;
+    HANDLE process=GetCurrentProcess();SymSetOptions(SYMOPT_LOAD_LINES|SYMOPT_UNDNAME);SymInitialize(process,nullptr,TRUE);
+    CONTEXT context=*exception->ContextRecord;STACKFRAME64 frame{};
+    frame.AddrPC.Offset=context.Rip;frame.AddrStack.Offset=context.Rsp;frame.AddrFrame.Offset=context.Rbp;
+    frame.AddrPC.Mode=frame.AddrStack.Mode=frame.AddrFrame.Mode=AddrModeFlat;
+    for(int i=0;i<40 && frame.AddrPC.Offset;++i) {
+        DWORD64 address=frame.AddrPC.Offset,offset=0;
+        char buffer[sizeof(SYMBOL_INFO)+MAX_SYM_NAME]{};auto symbol=reinterpret_cast<SYMBOL_INFO *>(buffer);
+        symbol->SizeOfStruct=sizeof(SYMBOL_INFO);symbol->MaxNameLen=MAX_SYM_NAME;
+        IMAGEHLP_LINE64 line{};line.SizeOfStruct=sizeof(line);DWORD displacement=0;
+        MEMORY_BASIC_INFORMATION region{};VirtualQuery(reinterpret_cast<void *>(address),&region,sizeof(region));
+        char module[MAX_PATH]{};GetModuleFileNameA(reinterpret_cast<HMODULE>(region.AllocationBase),module,MAX_PATH);
+        fprintf(log,"%s+0x%llx",module,address-reinterpret_cast<uint64_t>(region.AllocationBase));
+        if(SymFromAddr(process,address,&offset,symbol))fprintf(log," %s+0x%llx",symbol->Name,offset);
+        if(SymGetLineFromAddr64(process,address,&displacement,&line))fprintf(log," %s:%lu",line.FileName,line.LineNumber);
+        fprintf(log,"\n");fflush(log);
+        if(!StackWalk64(IMAGE_FILE_MACHINE_AMD64,process,GetCurrentThread(),&frame,&context,nullptr,SymFunctionTableAccess64,SymGetModuleBase64,nullptr))break;
+    }
+    fclose(log);return EXCEPTION_CONTINUE_SEARCH;
+}
+void APIENTRY debugMessage(GLenum,GLenum type,GLuint,GLenum,GLsizei,const GLchar *message,const void *) {
+    if(type!=GL_DEBUG_TYPE_ERROR)return;
+    FILE *log=fopen("graphics-errors.txt","a");if(log){fprintf(log,"%s\n",message);fclose(log);}
+}
 }
 void Begin() {
     enabled=std::filesystem::is_regular_file("ogl-evidence.enabled");frames=draws=presents=0;indices=0;seen.clear();objectDraws.clear();currentObject.clear();
     if(!enabled)return;
     captured=false;
+    setvbuf(stdout,nullptr,_IONBF,0);
+    AddVectoredExceptionHandler(1,fault);
+    if(glDebugMessageCallback){glEnable(GL_DEBUG_OUTPUT);glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);glDebugMessageCallback(debugMessage,nullptr);}
     events=output("visual-events.csv");events<<"frame,event,object,type\n";
     assets=output("loaded-assets.txt");
     auto info=output("renderer-info.json");

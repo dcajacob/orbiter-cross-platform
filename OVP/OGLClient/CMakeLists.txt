@@ -43,6 +43,8 @@ add_library(OGLClient SHARED
   "${libnsbmp_SOURCE_DIR}/src/libnsbmp.c"
   "${imgui_SOURCE_DIR}/backends/imgui_impl_opengl3.cpp")
 target_compile_features(OGLClient PRIVATE cxx_std_17)
+target_compile_options(OGLClient PRIVATE /Zi)
+target_link_options(OGLClient PRIVATE /DEBUG)
 target_compile_options(OGLClient PRIVATE "$<$<COMPILE_LANGUAGE:C>:/FIstdint.h>")
 target_compile_definitions(OGLClient PRIVATE NVG_NO_STB=1 FONS_USE_FREETYPE=1 NOMINMAX WIN32_LEAN_AND_MEAN _CRT_SECURE_NO_WARNINGS)
 target_compile_definitions(OGLClient PRIVATE "IMGUI_USER_CONFIG=\"${CMAKE_CURRENT_SOURCE_DIR}/../../Extern/imgui/imconfig.h\"")
@@ -50,10 +52,11 @@ target_include_directories(OGLClient PRIVATE
   "${ORBITER_TEST_RUNTIME}/Orbitersdk/include" "${DXSDK_DIR}/Include"
   "${soil2_SOURCE_DIR}/incs" "${soil2_SOURCE_DIR}/srcs" "${nanovg_SOURCE_DIR}/src"
   "${libnsbmp_SOURCE_DIR}/include" "${imgui_SOURCE_DIR}" "${imgui_SOURCE_DIR}/backends" "${zlib_SOURCE_DIR}" "${zlib_BINARY_DIR}")
-target_link_libraries(OGLClient PRIVATE glm::glm freetype zlibstatic opengl32 gdi32 user32
+target_link_libraries(OGLClient PRIVATE glm::glm freetype zlibstatic opengl32 gdi32 user32 dbghelp
   "${ORBITER_TEST_RUNTIME}/Orbitersdk/lib/Orbiter.lib"
   "${ORBITER_TEST_RUNTIME}/Orbitersdk/lib/Orbitersdk.lib")
-set_target_properties(OGLClient PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${ORBITER_TEST_RUNTIME}/Modules/Plugin")
+set_target_properties(OGLClient PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${ORBITER_TEST_RUNTIME}/Modules/Plugin"
+  PDB_OUTPUT_DIRECTORY "${ORBITER_TEST_RUNTIME}/Modules/Plugin")
 file(GLOB shaders CONFIGURE_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/shaders/*")
 add_custom_command(TARGET OGLClient POST_BUILD
   COMMAND ${CMAKE_COMMAND} -E make_directory "${ORBITER_TEST_RUNTIME}/Modules/OGLClient"

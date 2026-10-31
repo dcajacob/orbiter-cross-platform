@@ -121,4 +121,5 @@ jobs:
             out/opengl-client/CMakeCache.txt
             out/opengl-client/compile_commands.json
             out/production-app/Modules/Plugin/OGLClient.dll
+            out/production-app/Modules/Plugin/OGLClient.pdb
             out/production-app/Modules/OGLClient/**
