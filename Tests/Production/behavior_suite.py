@@ -83,6 +83,9 @@ def validate(directory,case):
         used={row['detail'].split(':')[0] for row in events if row['phase']=='input.rcs'}
         require(set(map(str,range(12)))<=used,'not all production RCS groups exercised')
         require(float(own[-1]['fuel'])<float(own[0]['fuel']),'RCS groups consumed no fuel')
+        for group in range(12):
+            require(float(own[group*40+8]['fuel'])<float(own[group*40]['fuel']),
+                    'RCS group consumed no propellant: '+str(group))
         require(max(distance([float(r[k]) for k in ('wx','wy','wz')],[0,0,0]) for r in own)>1e-8,'RCS caused no rotation')
     elif identifier=='autopilot':
         require(phases.count('input.navmode')==5 and any(int(r['navmask']) for r in own),'original autopilot modes not active')
@@ -176,6 +179,16 @@ def stage(executable,data,planets,directory,case,reload):
     for name in ('Config','Modules','Meshes','Images','Script','Textures','Textures2'):
         source=executable.parent/name
         if source.is_dir():shutil.copytree(source,directory/name,copy_function=link_or_copy)
+    # The production build tree puts all atmosphere DLLs in one folder when
+    # CELBODY is unset. Reproduce their existing CMake install destinations.
+    # These are the verified source-built binaries, never downloaded DLLs.
+    for body,modules in {'Earth':('EarthAtm2006','EarthAtmJ71G','EarthAtmNRLMSISE00'),
+                         'Mars':('MarsAtm2006',),'Venus':('VenusAtm2006',)}.items():
+        for module in modules:
+            target=directory/'Modules/Celbody'/body/'Atmosphere'/(module+'.dll')
+            source=directory/'Modules/Celbody/Atmosphere'/(module+'.dll')
+            require(source.is_file(),'required source-built atmosphere module missing: '+module)
+            target.parent.mkdir(parents=True,exist_ok=True);shutil.copy2(source,target)
     for name in ('Kernels','Textures','Textures2','GravityModels','Fonts'):
         require((data/name).is_dir(),'required production data directory missing: '+name)
         shutil.copytree(data/name,directory/name,dirs_exist_ok=True,copy_function=link_or_copy)
@@ -199,6 +212,8 @@ def stage(executable,data,planets,directory,case,reload):
         data_profiles={name:digest(Path(__file__).with_name(name)) for name in ('stock-data.lock.json','standard-planets.lock.json')}),indent=2)+'\n')
     with (directory/'console.txt').open('w') as console:
         subprocess.run(argv,cwd=directory,stdout=console,stderr=subprocess.STDOUT,check=True,timeout=240)
+    require('Could not find a module' not in (directory/'Orbiter.log').read_text(errors='replace'),
+            'required production module failed to load; fallback is prohibited')
     return validate(directory,case)
 
 

@@ -156,6 +156,20 @@ jobs:
           --output out/original-verification --configuration ${{ matrix.configuration }}
       - name: Record actual build tools, SDK, dependency commits and binaries
         run: python Tests/Production/build_metadata.py --build out/production-app
+      - name: Package source-built application for isolated client and driver iteration
+        if: always()
+        shell: pwsh
+        run: |
+          if (Test-Path out/production-app/Orbiter.exe) {
+            python Tests/Production/package_test_runtime.py --build out/production-app --output out/windows-test-runtime.zip
+          }
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: production-runtime-${{ matrix.configuration }}-x64
+          retention-days: 30
+          compression-level: 0
+          path: out/windows-test-runtime.zip
       - uses: actions/cache@v6
         with:
           path: out/data-cache/Orbiter-x64.zip
@@ -183,20 +197,6 @@ jobs:
           python Tests/Production/behavior_suite.py --orbiter out/production-app/Orbiter.exe
           --data out/production-data --planets out/standard-planets --output out/production-behavior
           --configuration ${{ matrix.configuration }}
-      - name: Package source-built application for isolated client and driver iteration
-        if: always()
-        shell: pwsh
-        run: |
-          if (Test-Path out/production-app/Orbiter.exe) {
-            python Tests/Production/package_test_runtime.py --build out/production-app --output out/windows-test-runtime.zip
-          }
-      - uses: actions/upload-artifact@v7
-        if: always()
-        with:
-          name: production-runtime-${{ matrix.configuration }}-x64
-          retention-days: 30
-          compression-level: 0
-          path: out/windows-test-runtime.zip
       - name: Archive references and build metadata, including failures
         if: always()
         uses: actions/upload-artifact@v7

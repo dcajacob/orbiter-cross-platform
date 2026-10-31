@@ -89,7 +89,10 @@ public:
                 const THGROUP_TYPE groups[] = {THGROUP_ATT_PITCHUP,THGROUP_ATT_PITCHDOWN,THGROUP_ATT_YAWLEFT,
                     THGROUP_ATT_YAWRIGHT,THGROUP_ATT_BANKLEFT,THGROUP_ATT_BANKRIGHT,THGROUP_ATT_UP,THGROUP_ATT_DOWN,
                     THGROUP_ATT_LEFT,THGROUP_ATT_RIGHT,THGROUP_ATT_FORWARD,THGROUP_ATT_BACK};
-                for (unsigned i=0;i<12;++i) v->SetThrusterGroupLevel(groups[i], tick/40 == i && tick%40 < 8 ? .2 : 0);
+                // Groups share physical thrusters. Clear them before applying
+                // the selected group so a later zero cannot erase its command.
+                for (auto group:groups) v->SetThrusterGroupLevel(group,0);
+                if (tick/40 < 12 && tick%40 < 8) v->SetThrusterGroupLevel(groups[tick/40],.2);
                 event("input.rcs",nameOf(target),std::to_string(tick/40)+":"+std::to_string(tick%40 < 8 ? .2 : 0));
             } else if (id == "autopilot") {
                 const int modes[] = {NAVMODE_KILLROT,NAVMODE_PROGRADE,NAVMODE_RETROGRADE,NAVMODE_NORMAL,NAVMODE_ANTINORMAL};
