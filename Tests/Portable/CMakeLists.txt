@@ -2,9 +2,12 @@ cmake_minimum_required(VERSION 3.19)
 project(OrbiterPortableCore LANGUAGES CXX)
 enable_testing()
 add_library(orbiter_portable_core STATIC ../../Src/Orbiter/Vecmat.cpp
-    ../../Src/Orbiter/Element.cpp ../../Src/Orbiter/TimeData.cpp)
+    ../../Src/Orbiter/Element.cpp ../../Src/Orbiter/TimeData.cpp
+    ../../Src/Orbiter/ConfigFile.cpp ../../Src/Orbiter/Portable/SimulationSession.cpp)
 target_include_directories(orbiter_portable_core PUBLIC ../../Src/Orbiter ../../Orbitersdk/include)
 target_compile_features(orbiter_portable_core PUBLIC cxx_std_17)
+add_executable(orbiter-headless ../../Src/Orbiter/Portable/main.cpp)
+target_link_libraries(orbiter-headless PRIVATE orbiter_portable_core)
 add_executable(vecmat_portability Vecmat.Portability.cpp)
 target_link_libraries(vecmat_portability PRIVATE orbiter_portable_core)
 add_test(NAME Vecmat.Portability COMMAND vecmat_portability)
@@ -51,6 +54,12 @@ target_compile_features(physics_trace_test PRIVATE cxx_std_17)
 add_test(NAME PhysicsTrace.IO COMMAND physics_trace_test "${CMAKE_CURRENT_BINARY_DIR}")
 
 find_package(Python3 3.8 REQUIRED COMPONENTS Interpreter)
+add_test(NAME Headless.ReferenceParity COMMAND "${Python3_EXECUTABLE}" -B
+    "${CMAKE_CURRENT_SOURCE_DIR}/test_headless.py" --binary $<TARGET_FILE:orbiter-headless>
+    --source "${CMAKE_CURRENT_SOURCE_DIR}" --output "${CMAKE_CURRENT_BINARY_DIR}/traces" --suite parity)
+add_test(NAME Headless.Errors COMMAND "${Python3_EXECUTABLE}" -B
+    "${CMAKE_CURRENT_SOURCE_DIR}/test_headless.py" --binary $<TARGET_FILE:orbiter-headless>
+    --source "${CMAKE_CURRENT_SOURCE_DIR}" --output "${CMAKE_CURRENT_BINARY_DIR}/traces" --suite errors)
 add_test(NAME PhysicsTrace.Validation
     COMMAND "${Python3_EXECUTABLE}" "${CMAKE_CURRENT_SOURCE_DIR}/test_trace_tools.py")
-set_tests_properties(PhysicsTrace.IO PhysicsTrace.Validation PROPERTIES TIMEOUT 30)
+set_tests_properties(PhysicsTrace.IO PhysicsTrace.Validation Headless.Errors Headless.ReferenceParity PROPERTIES TIMEOUT 30)

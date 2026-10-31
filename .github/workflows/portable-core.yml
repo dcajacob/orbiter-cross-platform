@@ -11,10 +11,10 @@ on:
       - '.github/workflows/portable-core.yml'
   workflow_dispatch:
     inputs:
-      capture_windows_reference:
-        description: 'Build the original Windows app and capture candidate physics references'
+      verify_windows_application:
+        description: 'Build the existing Windows app and verify its traces against the frozen original reference'
         type: boolean
-        default: false
+        default: true
 
 permissions:
   contents: read
@@ -67,10 +67,12 @@ jobs:
             ctest.log
             out/portable/CMakeCache.txt
             out/portable/Testing/Temporary/*.log
+            out/portable/traces/*.csv
+            out/portable/traces/*.json
 
-  windows-reference:
-    name: Original Windows ${{ matrix.configuration }} reference candidate
-    if: github.event_name == 'workflow_dispatch' && inputs.capture_windows_reference
+  windows-application:
+    name: Windows application ${{ matrix.configuration }} frozen-reference verification
+    if: github.event_name == 'workflow_dispatch' && inputs.verify_windows_application
     needs: portable
     runs-on: windows-2022
     timeout-minutes: 90
@@ -111,7 +113,7 @@ jobs:
           Get-Item Env:CL,Env:_CL_,Env:VSCMD_VER,Env:VCToolsVersion -ErrorAction SilentlyContinue |
             Out-String | Set-Content out/reference-app/build-metadata.txt
           exit 0
-      - name: Configure original application
+      - name: Configure Windows application
         shell: pwsh
         run: |
           cmake -S . -B out/reference-app -G Ninja `
@@ -122,7 +124,7 @@ jobs:
             -DORBITER_PORTABLE_REFERENCE_CAPTURE=ON `
             "-DDXSDK_DIR:PATH=$env:DXSDK_DIR" 2>&1 | Tee-Object out/reference-app/configure.log
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-      - name: Build original application and existing tests
+      - name: Build Windows application and existing tests
         shell: pwsh
         run: |
           cmake --build out/reference-app --parallel 2 2>&1 | Tee-Object out/reference-app/build.log
@@ -132,18 +134,18 @@ jobs:
         run: |
           ctest --test-dir out/reference-app --output-on-failure 2>&1 | Tee-Object out/reference-app/ctest.log
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-      - name: Capture and validate candidate reference
+      - name: Verify application against immutable original traces
         shell: pwsh
         run: |
-          python Tests/Portable/capture_windows_reference.py `
+          python Tests/Portable/verify_windows_application.py `
             --source . --orbiter out/reference-app/Orbiter.exe `
             --output out/reference-capture --configuration ${{ matrix.configuration }}
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-      - name: Save candidate traces and provenance, including failures
+      - name: Save application traces and build evidence, including failures
         if: always()
         uses: actions/upload-artifact@v7
         with:
-          name: windows-reference-${{ matrix.configuration }}-x64
+          name: windows-application-${{ matrix.configuration }}-x64
           retention-days: 14
           path: |
             out/reference-app/*.log
@@ -157,18 +159,18 @@ jobs:
             out/reference-capture/**/*.scn
 
   compare-windows:
-    name: Compare Windows Debug and Release candidates
-    needs: windows-reference
+    name: Compare Windows application Debug and Release traces
+    needs: windows-application
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v7
       - uses: actions/download-artifact@v8
         with:
-          name: windows-reference-Debug-x64
+          name: windows-application-Debug-x64
           path: out/debug
       - uses: actions/download-artifact@v8
         with:
-          name: windows-reference-Release-x64
+          name: windows-application-Release-x64
           path: out/release
       - name: Compare orbit and free-spin traces
         shell: bash
@@ -182,6 +184,29 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v7
         with:
-          name: windows-reference-comparison
+          name: windows-application-comparison
           retention-days: 14
           path: '*-comparison.json'
+
+  compare-native:
+    name: Compare native Windows/Linux Debug/Release traces
+    needs: portable
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/download-artifact@v8
+        with:
+          pattern: portable-*
+          path: out/native-artifacts
+      - name: Verify cross-platform parity with frozen original engine
+        run: >-
+          python3 -B Tests/Portable/compare_native_traces.py
+          --artifacts out/native-artifacts --reference Tests/Portable/Reference
+          --report native-parity.json
+      - name: Save cross-platform comparison
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: native-parity-comparison
+          retention-days: 14
+          path: native-parity.json

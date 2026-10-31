@@ -1,11 +1,11 @@
 # Cross-platform Orbiter engine bootstrap
 
-**Current status (2026-10-31): hosted portable tests and original Windows
-Debug/Release application/reference checks pass. The Windows reference is
-reviewed and frozen.** The native scenario runner and physics extraction are
-the next implementation stage. See
-[the portable milestone instructions](Tests/Portable/README.md) for commands,
-trace contracts, acceptance budgets and the remaining implementation sequence.
+**Current status (2026-10-31): the native `orbiter-headless` runner and shared
+numerical core are implemented. Local Linux Debug/Release pass eight suites;
+final hosted Windows/Linux and current Windows application checks are pending.**
+The pre-refactor Windows reference was captured, validated and frozen before
+extraction. See [the portable milestone instructions](Tests/Portable/README.md)
+for build/run commands, supported inputs, trace contracts and acceptance budgets.
 Earlier milestone notes below retain the installation/build history.
 
 Local project on `dan-xps16`: `/home/dan/GIT/orbiter-cross-platform`.
@@ -22,7 +22,7 @@ binary installation is separate and untouched.
 
 Goal: preserve Orbiter physics, vessel and scenario behavior while separating
 simulation, platform services, and graphics/UI. Linux and Windows should share
-one engine. No native scenario runner exists as a result of this bootstrap.
+one engine. The first native runner now covers the fixed-primary milestone.
 
 ## First achieved milestone
 

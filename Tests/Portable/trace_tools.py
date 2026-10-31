@@ -47,7 +47,10 @@ def quaternion_angle(a, b):
 
 def load_trace(path, *, dt=1.0, steps=6000):
     require(math.isfinite(dt) and dt > 0, "dt must be finite and positive")
-    require(steps > 0 and steps % 10 == 0, "steps must be a positive multiple of 10")
+    require(steps > 0, "steps must be positive")
+    expected_steps = list(range(0, steps + 1, 10))
+    if expected_steps[-1] != steps:
+        expected_steps.append(steps)
     with Path(path).open(newline="", encoding="ascii") as stream:
         reader = csv.DictReader(stream)
         require(reader.fieldnames == FIELDS, "unexpected trace header")
@@ -57,14 +60,15 @@ def load_trace(path, *, dt=1.0, steps=6000):
             step = int(row["step"])
             values = [float(row[key]) for key in FIELDS[1:]]
             require(all(math.isfinite(x) for x in values), f"nonfinite row {index}")
-            require(step == index * 10, f"missing, duplicate or reordered step at row {index}")
+            require(index < len(expected_steps) and step == expected_steps[index],
+                    f"missing, duplicate or reordered step at row {index}")
             require(values[0] == step * dt, f"incorrect elapsed time at step {step}")
             require(abs(values[1] - (EPOCH + step * dt / 86400)) <= LIMITS["mjd_days"],
                     f"incorrect MJD at step {step}")
             require(abs(norm(values[8:12]) - 1) <= 1e-12,
                     f"non-unit quaternion at step {step}")
             rows.append((step, *values))
-        require(len(rows) == steps // 10 + 1, "incorrect trace sample count")
+        require(len(rows) == len(expected_steps), "incorrect trace sample count")
     return rows
 
 
