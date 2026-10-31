@@ -15,6 +15,7 @@ set(common_src
 	Config.cpp
 	console_ng.cpp
 	Element.cpp
+	ElementApplication.cpp
 	elevmgr.cpp
 	Help.cpp
 	Input.cpp

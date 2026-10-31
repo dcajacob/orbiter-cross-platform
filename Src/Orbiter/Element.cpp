@@ -1,21 +1,16 @@
 // Copyright (c) Martin Schweiger
 // Licensed under the MIT License
 
-#include "Orbiter.h"
 #include "Element.h"
-#include "Config.h"
-#include <fstream>
-#include <windows.h>
-#include <stdio.h>
+#include "OrbiterScalar.h"
+#include <algorithm>
+#include <cmath>
 
 using namespace std;
 
-// =======================================================================
-// Externals
-
-extern Orbiter *g_pOrbiter;
-extern TimeData td;
-extern char DBG_MSG[256];
+namespace {
+inline double posangle(double angle) { return orbiter::math::PositiveAngle(angle, Pi2); }
+}
 
 static const double E_CIRCLE_LIMIT = 1e-8;
 static const double I_NOINC_LIMIT  = 1e-8;
@@ -23,7 +18,7 @@ static const double I_NOINC_LIMIT  = 1e-8;
 // =======================================================================
 // class Elements
 
-Elements::Elements ()
+Elements::Elements (double reference_mjd)
 {
 	a         = 1.0;
 	e         = 0.0;
@@ -32,12 +27,12 @@ Elements::Elements ()
 	omegab    = 0.0;
 	L         = 0.0;
 	mjd_epoch = Jepoch2MJD (2000.0); // default
-	t_epoch   = (mjd_epoch-td.MJD_ref)*86400.0;
+	t_epoch   = (mjd_epoch-reference_mjd)*86400.0;
 	priv_ma0  = 1e10;
 }
 
 Elements::Elements (double _a, double _e, double _i,
-	double _theta, double _omegab, double _L, double _mjd_epoch)
+	double _theta, double _omegab, double _L, double _mjd_epoch, double reference_mjd)
 {
 	a         = _a;
 	e         = _e;
@@ -46,33 +41,19 @@ Elements::Elements (double _a, double _e, double _i,
 	omegab    = _omegab;
 	L         = _L;
 	mjd_epoch = _mjd_epoch;
-	t_epoch   = (mjd_epoch-td.MJD_ref)*86400.0;
+	t_epoch   = (mjd_epoch-reference_mjd)*86400.0;
 	priv_ma0  = 1e10;
 }
 
-Elements::Elements (const Elements &el)
+Elements::Elements (const Elements &el, double reference_mjd)
 {
-	Set (el);
+	Set (el, reference_mjd);
 	priv_ma0  = 1e10;
 }
 
-Elements::Elements (char *fname)
-{
-	double epoch;
-	ifstream ifs (g_pOrbiter->ConfigPath (fname));
-	if (!GetItemReal (ifs, "Epoch", epoch))           epoch  = 2000.0;
-	mjd_epoch = Jepoch2MJD (epoch);
-	t_epoch   = (mjd_epoch-td.MJD_ref)*86400.0;
-	if (!GetItemReal (ifs, "SemiMajorAxis", a))       a      = 1.0;
-	if (!GetItemReal (ifs, "Eccentricity", e))        e      = 0.0;
-	if (!GetItemReal (ifs, "Inclination", i))         i      = 0.0;
-	if (!GetItemReal (ifs, "LongAscNode", theta))     theta  = 0.0;
-	if (!GetItemReal (ifs, "LongPerihelion", omegab)) omegab = 0.0;
-	if (!GetItemReal (ifs, "MeanLongitude", L))       L      = 0.0;
-}
 
 void Elements::Set (double _a, double _e, double _i,
-	double _theta, double _omegab, double _L, double _mjd_epoch)
+	double _theta, double _omegab, double _L, double _mjd_epoch, double reference_mjd)
 {
 	a         = _a;
 	e         = _e;
@@ -81,10 +62,10 @@ void Elements::Set (double _a, double _e, double _i,
 	omegab    = _omegab;
 	L         = _L;
 	mjd_epoch = _mjd_epoch;
-	t_epoch   = (mjd_epoch-td.MJD_ref)*86400.0;
+	t_epoch   = (mjd_epoch-reference_mjd)*86400.0;
 }
 
-void Elements::Set (const Elements &el)
+void Elements::Set (const Elements &el, double reference_mjd)
 {
 	a         = el.a;
 	e         = el.e;
@@ -93,7 +74,7 @@ void Elements::Set (const Elements &el)
 	omegab    = el.omegab;
 	L         = el.L;
 	mjd_epoch = el.mjd_epoch;
-	Setup (el.priv_m, el.priv_M, el.mjd_epoch);
+	Setup (el.priv_m, el.priv_M, el.mjd_epoch, reference_mjd);
 }
 
 void Elements::SetMasses (double m, double M)
@@ -103,7 +84,7 @@ void Elements::SetMasses (double m, double M)
 	priv_mu = Ggrav * (priv_M+priv_m);
 }
 
-void Elements::Setup (double m, double M, double mjd)
+void Elements::Setup (double m, double M, double mjd, double reference_mjd)
 {
 	// register masses
 	SetMasses (m, M);
@@ -130,7 +111,7 @@ void Elements::Setup (double m, double M, double mjd)
 	L += (mjd-mjd_epoch)*86400.0*priv_n;
 	//if ((L = fmod (L, Pi2)) < 0.0) L += Pi2;
 	mjd_epoch  = mjd;                         // reference epoch (mjd format)
-	t_epoch    = (mjd_epoch-td.MJD_ref)*86400.0; // reference epoch (simt format)
+	t_epoch    = (mjd_epoch-reference_mjd)*86400.0; // reference epoch (simt format)
 	priv_tau   = t_epoch - (L-omegab)/priv_n; // perihel time (as offset from mjd_epoch)
 	priv_omega = omegab-theta;                // argument of periapsis
 
@@ -144,7 +125,7 @@ void Elements::Setup (double m, double M, double mjd)
 }
 
 void Elements::Reset (double _a, double _e, double _i,
-	double _theta, double _omegab, double _L, double _mjd_epoch)
+	double _theta, double _omegab, double _L, double _mjd_epoch, double reference_mjd)
 {
 	// set primary elements
 	a         = _a;
@@ -154,7 +135,7 @@ void Elements::Reset (double _a, double _e, double _i,
 	omegab    = _omegab;
 	L         = _L;
 	mjd_epoch = _mjd_epoch;
-	Setup (priv_m, priv_M, mjd_epoch);
+	Setup (priv_m, priv_M, mjd_epoch, reference_mjd);
 }
 
 double Elements::TrueAnomaly_from_EccAnomaly (double ea) const
@@ -330,14 +311,14 @@ double Elements::Spd_TA(double ta) const
 	return hypot(vx, vz);
 }
 
-void Elements::Update (Vector &pos, Vector &vel)
+void Elements::Update (Vector &pos, Vector &vel, double simulation_time)
 {
 	double sinto, costo, vx, vz, thetav;
 
 	if (e < E_CIRCLE_LIMIT) { // circular orbit
-		priv_ma = priv_ea = priv_tra = priv_n * fmod (td.SimT1-priv_tau, priv_T);
+		priv_ma = priv_ea = priv_tra = priv_n * fmod (simulation_time-priv_tau, priv_T);
 	} else {
-		priv_ma = MeanAnomaly (td.SimT1);
+		priv_ma = MeanAnomaly (simulation_time);
 		if (e < 1.0) priv_ma = posangle(priv_ma);
 		// for periodic orbits, normalise mean anomaly to [0,pi]
 		priv_ea = EccAnomaly (priv_ma);

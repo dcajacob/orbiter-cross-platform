@@ -140,7 +140,7 @@ class TraceValidation(unittest.TestCase):
         primary = (fixture / "Config/Primary.cfg").read_text()
         mass = float(next(line.split("=")[1] for line in primary.splitlines() if line.startswith("Mass")))
         self.assertEqual(mass, trace.MASS)
-        astro = (fixture.parents[2] / "Src/Orbiter/Astro.h").read_text()
+        astro = (fixture.parents[2] / "Src/Orbiter/AstroMath.h").read_text()
         self.assertIn("Ggrav = 6.67259e-11", astro)
 
     def test_reference_staging_preserves_installation(self):

@@ -24,6 +24,7 @@
 #endif
 #endif
 #include "OrbiterVector.h"
+#include "OrbiterScalar.h"
 #include <fstream>
 #include <windows.h>
 #include <float.h>
@@ -97,8 +98,7 @@ inline double normangle (double angle)
  */
 inline double posangle (double angle)
 {
-	double a = fmod (angle, PI2);
-	return (a >= 0.0 ? a : a+PI2);
+	return orbiter::math::PositiveAngle(angle, PI2);
 }
 
 /**

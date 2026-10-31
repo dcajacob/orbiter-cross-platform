@@ -8,7 +8,8 @@
 #define __ASTRO_H
 
 #include <time.h>
-#include "vecmat.h"
+#include "Vecmat.h"
+#include "AstroMath.h"
 #include "OrbiterAPI.h"
 
 const double iAU = 1.0/AU;
@@ -20,27 +21,14 @@ const double parsec = AU/tan(1.0/3600.0*_RAD_);
 const double iparsec = 1.0/parsec;
 // inverse of parsec
 
-const double Ggrav = 6.67259e-11;
-// gravitational constant [m^3 kg^-1 s^-2]
-
-const double MJD2000 = 51544.5;
-// MJD date for epoch J2000
-
 inline double E_grav (double M, double d2)
 { return Ggrav * M / d2; }
 // magnitude of gravitation field strength caused by mass M at distance d,
 // where d2 = d*d
 
-const double day = (1.0/86400.0);
-// Julian days/second
-
 const double UTC_CT_diff = 66.184;
 // Current difference between UTC (Coordinated Universal Time) and CT (Coordinate Time)
 // This may change in the future if additional leap seconds are added to UTC.
-
-inline double Day (double sec)
-{ return sec * day; }
-// Convert a time interval from seconds to days
 
 inline double JD (time_t t)
 { return 2440587.5 + (double)t * day; }
@@ -51,14 +39,6 @@ inline double MJD (time_t t)
 { return 40587.0 + (double)t * day; }
 // Return Modified Julian Date (MJD) for time "t" as returned
 // by the "time" function (seconds since 00:00 January 1970 UTC)
-
-inline double Jepoch2MJD (double J)
-{ return (J-2000.0)*365.25 + MJD2000; }
-// Convert a Julian epoch J into a Modified Julian Date
-
-inline double MJD2Jepoch (double mjd)
-{ return 2000.0 + (mjd-MJD2000)/365.25; }
-// Convert a Modified Julian Date mjd to a Julian epoch
 
 inline double JC2MJD (double jc)
 { return jc*36525.0+MJD2000; }

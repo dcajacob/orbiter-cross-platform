@@ -7,7 +7,7 @@
 #define __ELEMENT_H
 
 #include "Vecmat.h"
-#include "Astro.h"
+#include "AstroMath.h"
 
 // =======================================================================
 // class Elements
@@ -26,6 +26,20 @@ public:
 
 	Elements (char *fname);
 	// construct from file
+
+	// Explicit-time entry points used by the portable engine. Legacy overloads
+	// remain application adapters; no object layout or numerical formula changes.
+	explicit Elements (double reference_mjd);
+	Elements (double _a, double _e, double _i, double _theta,
+		double _omegab, double _L, double _mjd_epoch, double reference_mjd);
+	Elements (const Elements &el, double reference_mjd);
+	void Set (double _a, double _e, double _i, double _theta,
+		double _omegab, double _L, double _mjd_epoch, double reference_mjd);
+	void Set (const Elements &el, double reference_mjd);
+	void Setup (double m, double M, double mjd, double reference_mjd);
+	void Reset (double _a, double _e, double _i, double _theta,
+		double _omegab, double _L, double _mjd_epoch, double reference_mjd);
+	void Update (Vector &pos, Vector &vel, double simulation_time);
 
 	void Set (double _a, double _e, double _i,
 		double _theta, double _omegab, double _L, double _mjd_epoch);

@@ -1,5 +1,7 @@
 #include "TimeData.h"
-#include "Astro.h"
+#include "AstroMath.h"
+#include <algorithm>
+#include <cmath>
 
 using std::min;
 using std::max;

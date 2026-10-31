@@ -1,10 +1,16 @@
 cmake_minimum_required(VERSION 3.19)
 project(OrbiterPortableCore LANGUAGES CXX)
 enable_testing()
-add_executable(vecmat_portability Vecmat.Portability.cpp ../../Src/Orbiter/Vecmat.cpp)
-target_include_directories(vecmat_portability PRIVATE ../../Src/Orbiter)
-target_compile_features(vecmat_portability PRIVATE cxx_std_17)
+add_library(orbiter_portable_core STATIC ../../Src/Orbiter/Vecmat.cpp
+    ../../Src/Orbiter/Element.cpp ../../Src/Orbiter/TimeData.cpp)
+target_include_directories(orbiter_portable_core PUBLIC ../../Src/Orbiter ../../Orbitersdk/include)
+target_compile_features(orbiter_portable_core PUBLIC cxx_std_17)
+add_executable(vecmat_portability Vecmat.Portability.cpp)
+target_link_libraries(vecmat_portability PRIVATE orbiter_portable_core)
 add_test(NAME Vecmat.Portability COMMAND vecmat_portability)
+add_executable(elements_portability Elements.Portability.cpp)
+target_link_libraries(elements_portability PRIVATE orbiter_portable_core)
+add_test(NAME Elements.Portability COMMAND elements_portability)
 
 # Reuse the upstream suite and its pinned test dependency, without the Windows app.
 option(ORBITER_PORTABLE_COLLISION_TESTS "Build existing collision regression suite" OFF)
@@ -25,11 +31,11 @@ if(ORBITER_PORTABLE_COLLISION_TESTS)
         target_compile_options(Catch2 PRIVATE -include cstdint)
     endif()
     add_executable(collision_portability ../Collision.CollisionCore.cpp
-        ../../Src/Orbiter/CollisionCore.cpp ../../Src/Orbiter/Vecmat.cpp)
+        ../../Src/Orbiter/CollisionCore.cpp)
     target_include_directories(collision_portability PRIVATE
         ../../Src/Orbiter ../../Orbitersdk/include)
     target_compile_features(collision_portability PRIVATE cxx_std_17)
-    target_link_libraries(collision_portability PRIVATE Catch2::Catch2WithMain)
+    target_link_libraries(collision_portability PRIVATE Catch2::Catch2WithMain orbiter_portable_core)
     add_test(NAME Collision.Portability COMMAND collision_portability)
     set_tests_properties(Collision.Portability PROPERTIES TIMEOUT 30)
 endif()
