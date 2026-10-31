@@ -25,7 +25,9 @@ def scenario(fixture):
     iss = 'ISS:ProjectAlpha_ISS\n  STATUS Orbiting Earth\n  RPOS 6771000 0 0\n  RVEL 0 0 7672.5\n  AROT 0 0 0\n  VROT 0 0 0\nEND\n'
     focus = 'PB'
     if fixture == 'approach':
-        pb = pb.replace('6771100 0 0','6771000.08 -4.8 22').replace('0 0 7672.5','0 0 7672.3').replace('AROT 0 0 0','AROT -90 0 0')
+        # Orbiter's +90 degree X convention maps PB's +Y approach to -Z,
+        # opposite ISS port 0. Port origins start 5 m apart, closing at .2 m/s.
+        pb = pb.replace('6771100 0 0','6771000.08 -4.8 22').replace('0 0 7672.5','0 0 7672.3').replace('AROT 0 0 0','AROT 90 0 0')
     if fixture == 'docked':
         pb += '  DOCKINFO 0:0,ISS\n'
     if fixture in ('ground','dg_orbit'):
@@ -209,6 +211,7 @@ def main():
     args=parser.parse_args()
     require(sys.platform=='win32' or args.compare is not None,'production behavioral capture requires native Windows')
     manifest=json.loads(Path(__file__).with_name('behavior-cases.json').read_text())
+    require(not args.case or set(args.case)<={case['id'] for case in manifest['cases']},'unknown production behavior case')
     cases=[case for case in manifest['cases'] if not args.case or case['id'] in args.case]
     if args.compare:
         report={case['id']:compare(args.compare/case['id'],args.output/case['id'],case) for case in cases}
@@ -225,6 +228,8 @@ def main():
     require((executable.parent/'Modules/Plugin/ProductionBehaviorDriver.dll').is_file(),'source-built production behavior driver missing')
     report=dict(status='candidate',source_commit=git('rev-parse','HEAD').decode().strip(),configuration=args.configuration,
                 binary_sha256=digest(executable),case_manifest_sha256=digest(Path(__file__).with_name('behavior-cases.json')),cases={})
+    runtime=executable.parent/'test-runtime.json'
+    report['application_source_commit']=json.loads(runtime.read_text())['source_commit'] if runtime.exists() else report['source_commit']
     failures=[]
     try:
         for case in cases:

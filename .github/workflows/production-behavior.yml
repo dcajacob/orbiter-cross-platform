@@ -1,0 +1,103 @@
+name: Production Behavior Iteration
+
+on:
+  push:
+    branches: ['codex/production-**']
+    paths:
+      - '.github/workflows/production-behavior.yml'
+      - 'Tests/Production/BehaviorBuild/**'
+      - 'Tests/Production/BehaviorDriver.cpp'
+      - 'Tests/Production/behavior_suite.py'
+      - 'Tests/Production/behavior-cases.json'
+      - 'Tests/Production/verify_test_runtime.py'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  behavior:
+    name: Production behavior ${{ matrix.configuration }} x64
+    runs-on: windows-2022
+    timeout-minutes: 40
+    strategy:
+      fail-fast: false
+      matrix:
+        configuration: [Debug, Release]
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - uses: ilammy/msvc-dev-cmd@v1
+        with:
+          vsversion: '17.0'
+          arch: x64
+      - uses: actions/download-artifact@v8
+        with:
+          name: production-runtime-${{ matrix.configuration }}-x64
+          run-id: 41192125192
+          github-token: ${{ github.token }}
+          path: out/runtime-archive
+      - name: Verify the exact source-built application and SDK
+        shell: pwsh
+        run: |
+          Expand-Archive out/runtime-archive/windows-test-runtime.zip out/production-app
+          python Tests/Production/verify_test_runtime.py --runtime out/production-app --source 06d8989823c59e651061d409425c19ec71360bfa
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - name: Compile the current controls/observation driver against that build
+        shell: pwsh
+        run: |
+          cmake -S Tests/Production/BehaviorBuild -B out/driver -G Ninja -DCMAKE_BUILD_TYPE=${{ matrix.configuration }} -DORBITER_TEST_RUNTIME="$pwd/out/production-app"
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          cmake --build out/driver --parallel 2
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - uses: actions/cache@v6
+        with:
+          path: out/data-cache/Orbiter-x64.zip
+          key: production-data-${{ hashFiles('Tests/Production/stock-data.lock.json') }}
+      - uses: actions/cache@v6
+        with:
+          path: out/planet-cache/Orbiter2016.zip
+          key: production-standard-planets-${{ hashFiles('Tests/Production/standard-planets.lock.json') }}
+      - name: Prepare locked physics and terrain data
+        run: |
+          python Tests/Production/prepare_data.py --archive out/data-cache/Orbiter-x64.zip --destination out/production-data
+          python Tests/Production/prepare_data.py --lock Tests/Production/standard-planets.lock.json --archive out/planet-cache/Orbiter2016.zip --destination out/standard-planets
+      - name: Execute all repeated production behavior cases
+        run: >-
+          python Tests/Production/behavior_suite.py --orbiter out/production-app/Orbiter.exe
+          --data out/production-data --planets out/standard-planets --output out/production-behavior
+          --configuration ${{ matrix.configuration }}
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: behavior-${{ matrix.configuration }}
+          path: |
+            out/production-app/test-runtime.json
+            out/production-behavior/**/*.csv
+            out/production-behavior/**/*.json
+            out/production-behavior/**/*.txt
+            out/production-behavior/**/*.log
+            out/production-behavior/**/*.scn
+            out/production-behavior/**/Orbiter.cfg
+  compare:
+    needs: behavior
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/download-artifact@v8
+        with:
+          name: behavior-Debug
+          path: out/debug
+      - uses: actions/download-artifact@v8
+        with:
+          name: behavior-Release
+          path: out/release
+      - name: Compare production behavior in both configurations
+        run: python3 -B Tests/Production/behavior_suite.py --compare out/debug/production-behavior --output out/release/production-behavior
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: behavior-comparison
+          path: out/release/production-behavior/cross-configuration.json

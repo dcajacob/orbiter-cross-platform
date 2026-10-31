@@ -67,6 +67,10 @@ public:
                 const double radius=length(status.rpos);
                 status.rpos*=1+(id == "atmosphere" ? 1500.0 : 8.0)/radius;
                 MATRIX3 r{};v->GetRotationMatrix(r);
+                // The landed VESSELSTATUS2 encodes a planet-local attitude and
+                // altitude in vrot.x. Free flight requires global attitude and
+                // actual angular velocity; use the production SDK conversion.
+                v->GetGlobalOrientation(status.arot);v->GetAngularVel(status.vrot);
                 if (id == "atmosphere") status.rvel+=mul(r,_V(0,0,200));
                 else status.rvel-=status.rpos*(.5/length(status.rpos));
                 status.status=0;status.flag=0;v->DefSetStateEx(&status);

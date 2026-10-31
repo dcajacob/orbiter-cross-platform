@@ -1,0 +1,71 @@
+{
+  "schema": 1,
+  "capture_source": "e70041fa2991d1bfefe66575ced1e32c92898f82",
+  "dependencies": {
+    "Catch2": {
+      "repository": "https://github.com/catchorg/Catch2",
+      "commit": "b9853b4b356b83bb580c746c3a1f11101f9af54f",
+      "license": "BSL-1.0",
+      "notice": "Tests/Production/Licenses/Catch2-LICENSE.txt",
+      "notice_sha256": "c9bff75738922193e67fa726fa225535870d2aa1059f91452c411736284ad566"
+    },
+    "imgui": {
+      "repository": "https://github.com/ocornut/imgui",
+      "commit": "3912b3d9a9c1b3f17431aebafd86d2f40ee6e59c",
+      "license": "MIT",
+      "notice": "Tests/Production/Licenses/imgui-LICENSE.txt",
+      "notice_sha256": "c80c5789748d955c4a650562baa0d750494e2c7128c2ca66aaebe2e3c4e198bf"
+    },
+    "implot": {
+      "repository": "https://github.com/epezent/implot",
+      "commit": "3da8bd34299965d3b0ab124df743fe3e076fa222",
+      "license": "MIT",
+      "notice": "Tests/Production/Licenses/implot-LICENSE",
+      "notice_sha256": "38bd30c2111fe7e3d8fb86d8607491239659eff1df1b1004b9a8349e20a91967"
+    },
+    "lua": {
+      "repository": "https://github.com/lua/lua",
+      "commit": "69ea087dff1daba25a2000dfb8f1883c17545b7a",
+      "license": "MIT",
+      "notice": "Tests/Production/Licenses/lua-lua.h",
+      "notice_sha256": "696acaf1d9999f6f839a65bb9a6c02875d4f19b55cac223e832b328305886de4"
+    },
+    "tracy": {
+      "repository": "https://github.com/wolfpld/tracy",
+      "commit": "c556831ddc6fe26d2fce01c14c97205a9dad46d5",
+      "license": "BSD-3-Clause",
+      "notice": "Tests/Production/Licenses/tracy-LICENSE",
+      "notice_sha256": "16f7df4828bd89c880c17dd2f45e834b754b6d5e8c9a9ee886af1be4b89475ca"
+    },
+    "zlib": {
+      "repository": "https://github.com/madler/zlib",
+      "commit": "cacf7f1d4e3d44d871b605da3b647f07d718623f",
+      "license": "Zlib",
+      "notice": "Tests/Production/Licenses/zlib-README",
+      "notice_sha256": "7960b6b1cc63e619abb77acaea5427159605afee8c8b362664f4effc7d7f7d15"
+    }
+  },
+  "toolchain": {
+    "platform": "windows-2022 x64",
+    "compiler": "MSVC 19.44",
+    "VCToolsVersion": "14.44.35207",
+    "WindowsSDKVersion": "10.0.26100.0",
+    "floating_point": "/fp:precise, no fast-math",
+    "configurations": [
+      "Debug",
+      "Release"
+    ]
+  },
+  "embedded": {
+    "source_revision": "38b7c627878ea893390675616897071f8bb8e90f",
+    "components": {
+      "Orbiter and SDK": "MIT (LICENSE)",
+      "LuaFileSystem": "MIT (Extern/luafilesystem/LICENSE)",
+      "Penlight": "MIT (Extern/Penlight/LICENSE.md)",
+      "LDoc": "MIT (Extern/ldoc/COPYRIGHT)",
+      "CSPICE": "Caltech/NASA disclaimer and NAIF redistribution rules; linked within Orbiter; source headers retained",
+      "NRLMSISE-00": "Existing bundled C release 20020503 with fixes 20041227; authorship headers retained; upstream author documentation carries a warranty disclaimer and asks for patches to be shared; see https://git.linta.de/~brodo/nrlmsise-00.git/tree/DOCUMENTATION. No SPDX license asserted for the bundled historical source.",
+      "Fonts": "SIL OFL, Apache-2.0, Font Awesome license; Architext FFC publication restriction, excluded from data mirror"
+    }
+  }
+}

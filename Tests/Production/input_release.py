@@ -40,14 +40,17 @@ def main():
             # The upstream package contains Architext under a separate FFC license.
             # Do not mirror that package or publish the font independently.
             name='production-stock-data-v1.zip'
-            with zipfile.ZipFile(archive) as source,zipfile.ZipFile(args.output/name,'w',compression=zipfile.ZIP_DEFLATED,compresslevel=6) as target:
+            with zipfile.ZipFile(archive) as source,zipfile.ZipFile(args.output/name,'w',compression=zipfile.ZIP_DEFLATED,compresslevel=1) as target:
                 for member in lock['data_files']:
                     if member=='Fonts/architext.regular.ttf':continue
-                    data=source.read(member)
-                    require(hashlib.sha256(data).hexdigest()==lock['data_files'][member]['sha256'],'data member differs from profile')
                     info=zipfile.ZipInfo(member,(2026,10,31,0,0,0));info.compress_type=zipfile.ZIP_DEFLATED
-                    target.writestr(info,data)
+                    checksum=hashlib.sha256()
+                    with source.open(member) as incoming,target.open(info,'w',force_zip64=True) as outgoing:
+                        for data in iter(lambda:incoming.read(8*1024*1024),b''):
+                            checksum.update(data);outgoing.write(data)
+                    require(checksum.hexdigest()==lock['data_files'][member]['sha256'],'data member differs from profile')
                 for member in ('LICENSE','readme.txt'):
+                    if member in lock['data_files']:continue
                     info=zipfile.ZipInfo(member,(2026,10,31,0,0,0));info.compress_type=zipfile.ZIP_DEFLATED
                     target.writestr(info,source.read(member))
                 for notice in ('Lekton - SIL License.txt','License-FA.txt'):

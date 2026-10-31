@@ -42,6 +42,10 @@ def main():
                   environment={key:os.environ.get(key) for key in
                     ('VCToolsVersion','WindowsSDKVersion','VSCMD_VER','CL','_CL_','LINK','CXXFLAGS','CFLAGS','ImageOS','ImageVersion')},
                   cmake_cache=cache)
+    lock = json.loads(Path(__file__).with_name('dependencies.lock.json').read_text())
+    for name, entry in lock['dependencies'].items():
+        if dependencies.get(name.lower()+'-src', {}).get('commit') != entry['commit']:
+            raise ValueError('production dependency differs from locked reference: '+name)
     (build/'build-inputs.json').write_text(json.dumps(record,indent=2)+'\n')
     print(f"Recorded {len(tools)} build tools, {len(dependencies)} source dependencies and {len(binaries)} binaries")
 

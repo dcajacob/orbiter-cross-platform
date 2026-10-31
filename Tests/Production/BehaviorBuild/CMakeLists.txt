@@ -1,0 +1,20 @@
+cmake_minimum_required(VERSION 3.24)
+project(ProductionBehaviorDriverIteration LANGUAGES CXX)
+if(NOT WIN32 OR NOT MSVC)
+  message(FATAL_ERROR "Production behavior iteration requires native Windows MSVC")
+endif()
+set(ORBITER_TEST_RUNTIME "" CACHE PATH "Verified source-built application and SDK")
+get_filename_component(ORBITER_TEST_RUNTIME "${ORBITER_TEST_RUNTIME}" ABSOLUTE)
+foreach(name Orbiter.exe Orbitersdk/lib/Orbiter.lib Orbitersdk/lib/Orbitersdk.lib test-runtime.json)
+  if(NOT EXISTS "${ORBITER_TEST_RUNTIME}/${name}")
+    message(FATAL_ERROR "Incomplete source-built runtime: ${name}")
+  endif()
+endforeach()
+add_library(ProductionBehaviorDriver SHARED ../BehaviorDriver.cpp)
+target_compile_features(ProductionBehaviorDriver PRIVATE cxx_std_17)
+target_include_directories(ProductionBehaviorDriver PRIVATE "${ORBITER_TEST_RUNTIME}/Orbitersdk/include")
+target_link_libraries(ProductionBehaviorDriver PRIVATE
+  "${ORBITER_TEST_RUNTIME}/Orbitersdk/lib/Orbiter.lib"
+  "${ORBITER_TEST_RUNTIME}/Orbitersdk/lib/Orbitersdk.lib")
+set_target_properties(ProductionBehaviorDriver PROPERTIES
+  RUNTIME_OUTPUT_DIRECTORY "${ORBITER_TEST_RUNTIME}/Modules/Plugin")
