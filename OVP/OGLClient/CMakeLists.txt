@@ -71,3 +71,16 @@ foreach(notice "${glm_SOURCE_DIR}/copying.txt" "${freetype_SOURCE_DIR}/docs/FTL.
   get_filename_component(component "${parent}" NAME)
   configure_file("${notice}" "${ORBITER_TEST_RUNTIME}/Modules/OGLClient/Licenses/${component}-${name}" COPYONLY)
 endforeach()
+# Carry the original license-bearing source headers as well as standalone
+# licenses; embedded notices must accompany the separately linked module.
+configure_file("${CMAKE_CURRENT_SOURCE_DIR}/../../LICENSE"
+  "${ORBITER_TEST_RUNTIME}/Modules/OGLClient/Licenses/Orbiter-MIT.txt" COPYONLY)
+configure_file("${CMAKE_CURRENT_SOURCE_DIR}/ATTRIBUTION.md"
+  "${ORBITER_TEST_RUNTIME}/Modules/OGLClient/ATTRIBUTION.md" COPYONLY)
+foreach(notice
+  "${soil2_SOURCE_DIR}/incs/stb_image.h" "${soil2_SOURCE_DIR}/incs/stb_image_write.h"
+  "${nanovg_SOURCE_DIR}/src/fontstash.h" "${zlib_SOURCE_DIR}/zlib.h"
+  "${CMAKE_CURRENT_SOURCE_DIR}/Shadinclude.hpp" "${CMAKE_CURRENT_SOURCE_DIR}/OGLPad.cpp")
+  get_filename_component(name "${notice}" NAME)
+  configure_file("${notice}" "${ORBITER_TEST_RUNTIME}/Modules/OGLClient/Licenses/${name}" COPYONLY)
+endforeach()

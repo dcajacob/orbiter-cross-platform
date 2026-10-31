@@ -28,8 +28,10 @@ Dependencies are pinned by source-archive SHA256 in `dependencies.lock.json`:
   engine's SDK configuration and same-build static library are used.
 * zlib: same source revision as the production application, zlib license;
   linked privately/static into this renderer for planetary archive decoding.
-* Generated GLAD loader: original notices in generated source/header; Khronos
-  registry and loader attribution retained.
+* Generated GLAD loader: the donor-generated 0.1.24a0 files are preserved.
+  GLAD publishes generated output under Public Domain/WTFPL/CC0 terms; see
+  [the upstream licensing statement](https://github.com/Dav1dde/glad#license).
+  The generator itself is not bundled.
 * Shader include helper: Tahar Meijs, MIT notice retained in `Shadinclude.hpp`.
 * Sketchpad implementation: Matthew Reid attribution and MIT notice retained
   in `OGLPad.cpp/.h`, alongside Orbiter/Gondos contributions.
@@ -38,3 +40,7 @@ Downloaded source/license trees are build dependencies, not replacements for
 stock vessel modules or planet data. The compiled client carries dependency
 notices beside its shaders. Program/data licensing is recorded separately in
 `Tests/Production/Licenses/INPUTS.md`.
+
+This software uses FreeType. Portions of this software are copyright © 2024
+The FreeType Project (www.freetype.org). All rights reserved. See the bundled
+FreeType License and the original dependency notices in `Licenses/`.
