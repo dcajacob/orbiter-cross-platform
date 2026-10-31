@@ -2,3 +2,6 @@
 
 # Frozen trace hashes describe exact LF bytes on every platform.
 Tests/Portable/Reference/*.csv text eol=lf
+
+# Production provenance hashes must identify the same lock bytes on both hosts.
+Tests/Production/*.json text eol=lf

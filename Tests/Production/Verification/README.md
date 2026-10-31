@@ -28,3 +28,17 @@ Atmosphere/contact/docking/autopilot, pause/warp, object/focus lifetime,
 persistence and vessel callback references are still required before extracting
 their respective production subsystems. No fixture capture here establishes
 stock corpus or graphical client acceptance.
+
+The first production attempt,
+[run 41186215473](https://github.com/dcajacob/orbiter-cross-platform/actions/runs/41186215473),
+is **failed, not accepted**: the harness looked for `CurrentState.scn` instead of
+Orbiter's `(Current state).scn`. Both builds and existing tests passed; the first
+6,000-second Sol/ISS/ShuttlePB capture completed. Local inspection with the
+corrected validator confirms 601 samples for each of five real objects, 30,006
+driver/control events, actual ISS/PB meshes and exact Debug/Release agreement
+for this first orbit case. Repeats and controlled cases were not run, so these
+outputs cannot be accepted as a reference. The two original failure artifacts
+are retained in `Evidence/41186215473-production-reference-*-x64.zip`, with
+GitHub digests `904b62eb06fd03d3da0aaaf776313163c23353fff80897e694fc11afebcbbdc7`
+(Debug) and `5a70b8c16a8edc458fb1bc3815ea776db00c680ab8601d93b72e2e501f5e4864`
+(Release).

@@ -92,7 +92,7 @@ def validate(directory, controls):
             'actual SPICE/ShuttlePB initialization evidence is missing')
     require('Couldn\'t load kernel' not in log and 'outside loaded kernel' not in log,
             'SPICE data/coverage error')
-    require((directory/'Scenarios/CurrentState.scn').is_file(), 'production save-at-exit missing')
+    require((directory/'Scenarios/(Current state).scn').is_file(), 'production save-at-exit missing')
     return dict(samples=601, objects=5, callbacks=len(events), initial_mass_kg=masses[0][0],
                 final_mass_kg=masses[-1][0], initial_fuel_kg=masses[0][1], final_fuel_kg=masses[-1][1]), physics
 
