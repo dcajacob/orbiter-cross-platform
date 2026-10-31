@@ -1,0 +1,86 @@
+name: Production Windows OpenGL Client
+
+on:
+  push:
+    branches: ['codex/production-**']
+    paths:
+      - 'OVP/OGLClient/**'
+      - 'Tests/Production/Client/**'
+      - '.github/workflows/production-client.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: production-client-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  client:
+    name: Real Windows client ${{ matrix.configuration }} x64
+    runs-on: windows-2022
+    timeout-minutes: 40
+    strategy:
+      fail-fast: false
+      matrix:
+        configuration: [Debug, Release]
+    env:
+      DXSDK_DIR: '${{ github.workspace }}\DXSDK'
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - uses: ilammy/msvc-dev-cmd@v1
+        with:
+          vsversion: '17.0'
+          arch: x64
+      - name: Verify Phase 1 is accepted and all frozen evidence remains intact
+        run: |
+          python Tests/Production/frozen_reference.py
+          python Tests/Production/frozen_behavior.py
+          python Tests/Production/observation_source.py
+      - uses: actions/download-artifact@v8
+        with:
+          name: production-runtime-${{ matrix.configuration }}-x64
+          run-id: 41192125192
+          github-token: ${{ github.token }}
+          path: out/runtime-archive
+      - name: Unpack and verify the same-build Windows application and SDK
+        shell: pwsh
+        run: |
+          Expand-Archive out/runtime-archive/windows-test-runtime.zip out/production-app
+          python Tests/Production/verify_test_runtime.py --runtime out/production-app --source 06d8989823c59e651061d409425c19ec71360bfa
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - uses: actions/cache@v6
+        id: dxsdk
+        with:
+          path: '${{ github.workspace }}\DXSDK'
+          key: dxsdk_jun10
+      - name: Prepare existing SDK header dependency
+        if: steps.dxsdk.outputs.cache-hit != 'true'
+        shell: cmd
+        run: |
+          curl --fail -L https://download.microsoft.com/download/a/e/7/ae743f1f-632b-4809-87a9-aa1bb3458e31/DXSDK_Jun10.exe -o DXSDK_Jun10.exe
+          if errorlevel 1 exit /b 1
+          7z x DXSDK_Jun10.exe DXSDK/Include DXSDK/Lib
+          if errorlevel 1 exit /b 1
+      - name: Build the separately linked Windows GraphicsClient module
+        shell: pwsh
+        run: |
+          cmake -S OVP/OGLClient -B out/opengl-client -G Ninja -DCMAKE_BUILD_TYPE=${{ matrix.configuration }} -DCMAKE_POLICY_VERSION_MINIMUM=3.5 -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DORBITER_TEST_RUNTIME="$pwd/out/production-app" "-DDXSDK_DIR=$env:DXSDK_DIR" 2>&1 | Tee-Object client-configure.log
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          cmake --build out/opengl-client --target OGLClient --parallel 2 2>&1 | Tee-Object client-build.log
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: real-client-${{ matrix.configuration }}
+          path: |
+            client-configure.log
+            client-build.log
+            out/opengl-client/CMakeCache.txt
+            out/opengl-client/compile_commands.json
+            out/production-app/Modules/Plugin/OGLClient.dll
+            out/production-app/Modules/OGLClient/**
