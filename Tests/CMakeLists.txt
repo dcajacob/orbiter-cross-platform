@@ -1,5 +1,16 @@
 Include(FetchContent)
 
+# Test-only control/observation plugin; never installed as a stock module.
+option(ORBITER_PRODUCTION_REFERENCE_CAPTURE "Build production Windows reference driver" OFF)
+if(WIN32 AND ORBITER_PRODUCTION_REFERENCE_CAPTURE)
+    add_library(ProductionReferenceDriver SHARED Production/ReferenceDriver.cpp)
+    target_include_directories(ProductionReferenceDriver PRIVATE ${ORBITER_SOURCE_SDK_INCLUDE_DIR})
+    target_link_libraries(ProductionReferenceDriver PRIVATE ${ORBITER_LIB} ${ORBITER_SDK_LIB})
+    add_dependencies(ProductionReferenceDriver ${OrbiterTgt} Orbitersdk)
+    set_target_properties(ProductionReferenceDriver PROPERTIES
+        RUNTIME_OUTPUT_DIRECTORY "${ORBITER_BINARY_ROOT_DIR}/Modules/Plugin")
+endif()
+
 # Only for pre-refactor Windows reference capture. Not part of the SDK or app
 # installation, and never needed by the future native headless runner.
 option(ORBITER_PORTABLE_REFERENCE_CAPTURE "Build stationary-primary reference fixture" OFF)

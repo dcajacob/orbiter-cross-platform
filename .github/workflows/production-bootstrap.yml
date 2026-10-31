@@ -72,3 +72,129 @@ jobs:
             out/wgl/*.json
             out/wgl/licenses/**
             out/wgl-evidence/**
+
+  windows-production:
+    name: Windows production reference ${{ matrix.configuration }} x64
+    needs: [inventory, windows-wgl]
+    runs-on: windows-2022
+    timeout-minutes: 60
+    strategy:
+      fail-fast: false
+      matrix:
+        configuration: [Debug, Release]
+    env:
+      DXSDK_DIR: '${{ github.workspace }}\DXSDK'
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - uses: ilammy/msvc-dev-cmd@v1
+        with:
+          vsversion: '17.0'
+          arch: x64
+      - name: Cache DirectX SDK
+        id: dxsdk
+        uses: actions/cache@v6
+        with:
+          path: '${{ github.workspace }}\DXSDK'
+          key: dxsdk_jun10
+      - name: Download existing Windows build dependency
+        if: steps.dxsdk.outputs.cache-hit != 'true'
+        shell: cmd
+        run: |
+          curl --fail -L https://download.microsoft.com/download/a/e/7/ae743f1f-632b-4809-87a9-aa1bb3458e31/DXSDK_Jun10.exe -o DXSDK_Jun10.exe
+          if errorlevel 1 exit /b 1
+          7z x DXSDK_Jun10.exe DXSDK/Include DXSDK/Lib
+          if errorlevel 1 exit /b 1
+          del DXSDK_Jun10.exe
+      - name: Record compiler and build environment
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force out/production-app | Out-Null
+          cmd /c "cl 2>&1 & exit /b 0" | Set-Content out/production-app/compiler.txt
+          Get-Item Env:CL,Env:_CL_,Env:VSCMD_VER,Env:VCToolsVersion -ErrorAction SilentlyContinue |
+            Out-String | Set-Content out/production-app/build-metadata.txt
+          exit 0
+      - name: Configure Windows application
+        shell: pwsh
+        run: |
+          cmake -S . -B out/production-app -G Ninja `
+            -DCMAKE_BUILD_TYPE=${{ matrix.configuration }} `
+            -DCMAKE_C_COMPILER=cl -DCMAKE_CXX_COMPILER=cl `
+            -DORBITER_BUILD_D3D9CLIENT=ON -DORBITER_BUILD_XRSOUND=OFF `
+            -DORBITER_MAKE_DOC=OFF -DORBITER_MAKE_TESTS=ON `
+            -DORBITER_PORTABLE_REFERENCE_CAPTURE=ON -DORBITER_PRODUCTION_REFERENCE_CAPTURE=ON `
+            "-DDXSDK_DIR:PATH=$env:DXSDK_DIR" 2>&1 | Tee-Object out/production-app/configure.log
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - name: Build Windows application and existing tests
+        shell: pwsh
+        run: |
+          cmake --build out/production-app --parallel 2 2>&1 | Tee-Object out/production-app/build.log
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - name: Run existing application tests
+        shell: pwsh
+        run: |
+          ctest --test-dir out/production-app --output-on-failure 2>&1 | Tee-Object out/production-app/ctest.log
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - name: Verify existing frozen two-body reference
+        run: >-
+          python Tests/Portable/verify_windows_application.py
+          --source . --orbiter out/production-app/Orbiter.exe
+          --output out/original-verification --configuration ${{ matrix.configuration }}
+      - uses: actions/cache@v6
+        with:
+          path: out/data-cache/Orbiter-x64.zip
+          key: production-data-${{ hashFiles('Tests/Production/stock-data.lock.json') }}
+      - name: Prepare and verify pinned SPICE and stock data
+        run: >-
+          python Tests/Production/prepare_data.py --archive out/data-cache/Orbiter-x64.zip
+          --destination out/production-data
+      - name: Capture repeated original production orbit and propulsion candidates
+        run: >-
+          python Tests/Production/capture_reference.py
+          --orbiter out/production-app/Orbiter.exe --data out/production-data
+          --output out/production-reference --configuration ${{ matrix.configuration }}
+      - name: Archive references and build metadata, including failures
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: production-reference-${{ matrix.configuration }}-x64
+          retention-days: 30
+          path: |
+            out/production-app/*.log
+            out/production-app/*.txt
+            out/production-app/Testing/Temporary/*.log
+            out/original-verification/**/trace.csv
+            out/original-verification/**/*.json
+            out/production-reference/**/*.csv
+            out/production-reference/**/*.json
+            out/production-reference/**/*.txt
+            out/production-reference/**/*.log
+            out/production-reference/**/*.scn
+            out/production-reference/**/Orbiter.cfg
+
+  compare-production:
+    name: Production Debug/Release numerical and lifecycle comparison
+    needs: windows-production
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/download-artifact@v8
+        with:
+          name: production-reference-Debug-x64
+          path: out/debug
+      - uses: actions/download-artifact@v8
+        with:
+          name: production-reference-Release-x64
+          path: out/release
+      - name: Compare all objects and controlled quantities without changing budgets
+        run: >-
+          python3 -B Tests/Production/compare_references.py
+          --reference out/debug/production-reference
+          --candidate out/release/production-reference --report production-comparison.json
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: production-reference-comparison
+          retention-days: 30
+          path: production-comparison.json

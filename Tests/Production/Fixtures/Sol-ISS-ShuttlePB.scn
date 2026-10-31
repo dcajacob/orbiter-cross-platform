@@ -1,0 +1,40 @@
+BEGIN_DESC
+Reduced production reference. Real Sol/SPICE, stock ISS and source-built ShuttlePB.
+This fixture is not a replacement for the unchanged stock scenario corpus.
+END_DESC
+
+BEGIN_ENVIRONMENT
+  System Sol
+  Date MJD 51982.5
+END_ENVIRONMENT
+
+BEGIN_FOCUS
+  Ship PB
+END_FOCUS
+
+BEGIN_CAMERA
+  TARGET PB
+  MODE Extern
+  POS 4 0 0
+  TRACKMODE TargetRelative
+  FOV 50
+END_CAMERA
+
+BEGIN_SHIPS
+ISS:ProjectAlpha_ISS
+  STATUS Orbiting Earth
+  RPOS 6771000 0 0
+  RVEL 0 0 7672.5
+  AROT 0 0 0
+  VROT 0 0 0
+END
+PB:ShuttlePB
+  STATUS Orbiting Earth
+  RPOS 6771100 0 0
+  RVEL 0 0 7672.5
+  AROT 0 0 0
+  VROT 0 0 0
+  PRPLEVEL 0:1
+  THLEVEL 0:0
+END
+END_SHIPS
