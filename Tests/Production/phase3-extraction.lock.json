@@ -11,7 +11,7 @@
   ],
   "files": {
     "Src/ClientNative/CMakeLists.txt": {
-      "sha256_lf": "253b3930f6955260b48d515ac755ad891a10b8c1a02c90cea2cdabdbd9be89d9",
+      "sha256_lf": "5ef35a807b235d37e9babc956db3b04b225f42929777af3e193809c21fa2a6b7",
       "original_sha256_lf": "d3d119bb989d226f32498a710e8b77fa89b0d4cc9c05581a3a7a039777d95152"
     },
     "Src/Orbiter/Base.h": {
@@ -67,7 +67,7 @@
       "original_sha256_lf": null
     },
     "Src/Orbiter/Production/CMakeLists.txt": {
-      "sha256_lf": "01e7ec04785a21dce12e42694e658a4389578302677d7273fbf02a71c39f0bba",
+      "sha256_lf": "6285d40830e56219a4faee47808bea0febf6383df027f1b22b91b428f5705691",
       "original_sha256_lf": null
     },
     "Src/Orbiter/Production/Export.h": {
