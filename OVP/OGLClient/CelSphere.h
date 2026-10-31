@@ -8,7 +8,7 @@
 
 // ==============================================================
 // CelSphere.h
-// Class CelestialSphere (interface)
+// Class OGLCelestialSphere (interface)
 //
 // This class is responsible for rendering the celestial sphere
 // background (stars, constellations, grids, labels, etc.)
@@ -30,10 +30,10 @@ class OGLCamera;
  * Loads star and constellation information from data bases and uses them to
  * celestial sphere background.
  */
-class CelestialSphere {
+class OGLCelestialSphere {
 public:
-	CelestialSphere ();
-	~CelestialSphere ();
+	OGLCelestialSphere ();
+	~OGLCelestialSphere ();
 
 	void RenderConstellations (VECTOR3 &col, OGLCamera *c);
 	void RenderStars (OGLCamera *c, VECTOR3 &bgcol);

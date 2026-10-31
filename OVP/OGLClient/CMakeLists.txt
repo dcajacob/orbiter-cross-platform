@@ -43,6 +43,7 @@ add_library(OGLClient SHARED
   "${libnsbmp_SOURCE_DIR}/src/libnsbmp.c"
   "${imgui_SOURCE_DIR}/backends/imgui_impl_opengl3.cpp")
 target_compile_features(OGLClient PRIVATE cxx_std_17)
+target_compile_options(OGLClient PRIVATE "$<$<COMPILE_LANGUAGE:C>:/FIstdint.h>")
 target_compile_definitions(OGLClient PRIVATE NVG_NO_STB=1 FONS_USE_FREETYPE=1 NOMINMAX WIN32_LEAN_AND_MEAN _CRT_SECURE_NO_WARNINGS)
 target_compile_definitions(OGLClient PRIVATE "IMGUI_USER_CONFIG=\"${CMAKE_CURRENT_SOURCE_DIR}/../../Extern/imgui/imconfig.h\"")
 target_include_directories(OGLClient PRIVATE

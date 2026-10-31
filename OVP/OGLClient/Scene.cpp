@@ -70,7 +70,7 @@ Scene::Scene (int w, int h)
 //	zclearflag = D3DCLEAR_ZBUFFER;
 //	if (stencilDepth) zclearflag |= D3DCLEAR_STENCIL;
 	cam = new OGLCamera (w, h);
-	csphere = new CelestialSphere ();
+	csphere = new OGLCelestialSphere ();
 	vobjFirst = vobjLast = NULL;
 	nstream = 0;
 	iVCheck = 0;
@@ -416,6 +416,7 @@ void Scene::Render ()
 
 	// planetarium mode flags
 	int plnmode = *(int*)g_client->GetConfigParam (CFGPRM_PLANETARIUMFLAG);
+    int markermode=*(int*)g_client->GetConfigParam(CFGPRM_SURFMARKERFLAG);
 
 	// render celestial sphere (without z-buffer)
 	//dev->SetTransform (D3DTRANSFORMSTATE_WORLD, &ident);
@@ -441,9 +442,9 @@ void Scene::Render ()
 		// render ecliptic grid
 		if (plnmode & PLN_EGRID) {
 			auto tmp = _V(0,0,0.4)*linebrt;
-			//csphere->RenderGrid (dev, tmp, !(plnmode & PLN_ECL));
+			//csphere->RenderGrid (dev, tmp, !(plnmode & PLN_EGRID));
 		}
-		if (plnmode & PLN_ECL) {
+		if (plnmode & PLN_EGRID) {
 			auto tmp = _V(0,0,0.8)*linebrt;
 			//csphere->RenderGreatCircle (dev, tmp);
 		}
@@ -480,7 +481,8 @@ void Scene::Render ()
 			const GraphicsClient::LABELLIST *list;
 			int n, nlist;
 			oapi::Sketchpad *skp= NULL;
-			nlist = g_client->GetCelestialMarkers (&list);
+			const auto &catalogue=g_client->GetCelestialMarkers();
+            list=catalogue.data();nlist=int(catalogue.size());
 			for (n = 0; n < nlist; n++) {
 				if (list[n].active) {
 					if(!skp) skp = oapiGetSketchpad(nullptr);
@@ -491,9 +493,9 @@ void Scene::Render ()
 					int col = list[n].colour;
 					skp->SetPen (hLabelPen[col]);
 					skp->SetTextColor (labelCol[col]);
-					const GraphicsClient::LABELSPEC *ls = list[n].list;
-					for (i = 0; i < list[n].length; i++) {
-						RenderDirectionMarker (skp, ls[i].pos, ls[i].label[0], ls[i].label[1], list[n].shape, size);
+					const GraphicsClient::LABELSPEC *ls = list[n].marker.data();
+					for (i = 0; i < list[n].marker.size(); i++) {
+						RenderDirectionMarker (skp, ls[i].pos, ls[i].label[0].c_str(), ls[i].label[1].c_str(), list[n].shape, size);
 					}
 				}
 			}
@@ -532,8 +534,8 @@ void Scene::Render ()
 		OBJHANDLE hObj = plist[i].vo->Object();
 		plist[i].vo->Render ();
 		
-		if (plnmode & PLN_ENABLE) {
-			if (plnmode & PLN_CMARK) {
+		if (markermode & MKR_ENABLE) {
+			if (markermode & MKR_CMARK) {
 				VECTOR3 pp;
 				char name[256];
 				oapiGetObjectName (hObj, name, 256);
@@ -541,9 +543,9 @@ void Scene::Render ()
 				RenderObjectMarker (0, pp, name, 0, 0, viewH/80);
 			}
 			
-			if ((plnmode & PLN_SURFMARK) && (oapiGetObjectType (hObj) == OBJTP_PLANET)) {
+			if ((markermode & MKR_SURFMARK) && (oapiGetObjectType (hObj) == OBJTP_PLANET)) {
 				int label_format = *(int*)oapiGetObjectParam(hObj, OBJPRM_PLANET_LABELENGINE);
-				if (label_format < 2 && (plnmode & PLN_LMARK)) { // user-defined planetary surface labels
+				if (label_format < 2 && (markermode & MKR_LMARK)) { // user-defined planetary surface labels
 					double rad = oapiGetSize (hObj);
 					double apprad = rad/(plist[i].dist * cam->GetTanAp());
 					const GraphicsClient::LABELLIST *list;
@@ -568,12 +570,12 @@ void Scene::Render ()
 							int col = list[n].colour;
 							skp->SetPen (hLabelPen[col]);
 							skp->SetTextColor (labelCol[col]);
-							const GraphicsClient::LABELSPEC *ls = list[n].list;
+							const GraphicsClient::LABELSPEC *ls = list[n].marker.data();
 							VECTOR3 sp;
-							for (j = 0; j < list[n].length; j++) {
+							for (j = 0; j < list[n].marker.size(); j++) {
 								if (dotp (ls[j].pos, cpos-ls[j].pos) >= 0.0) { // surface point visible?
 									sp = mul (prot, ls[j].pos) + ppos;
-									RenderObjectMarker (skp, sp, ls[j].label[0], ls[j].label[1], list[n].shape, size);
+									RenderObjectMarker (skp, sp, ls[j].label[0].c_str(), ls[j].label[1].c_str(), list[n].shape, size);
 								}
 							}
 						}
@@ -585,7 +587,7 @@ void Scene::Render ()
 	}
 
 	// render new-style surface markers
-	if ((plnmode & PLN_ENABLE) && (plnmode & PLN_LMARK)) {
+	if ((plnmode & PLN_ENABLE) && (markermode & MKR_LMARK)) {
 		oapi::Sketchpad *skp = 0;
 		int fontidx = -1;
 		for (i = 0; i < np; i++) {
@@ -626,7 +628,7 @@ void Scene::Render ()
 			pv->vobj->Render ();
 			if (hObj == hFocus) vFocus = (vVessel*)pv->vobj; // remember focus visual
 			
-			if ((plnmode & (PLN_ENABLE|PLN_VMARK)) == (PLN_ENABLE|PLN_VMARK)) {
+			if ((markermode & (MKR_ENABLE|MKR_VMARK)) == (MKR_ENABLE|MKR_VMARK)) {
 				VECTOR3 gpos;
 				char name[256];
 				oapiGetGlobalPos (hObj, &gpos);

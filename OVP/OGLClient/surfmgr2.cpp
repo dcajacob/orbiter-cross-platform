@@ -166,8 +166,8 @@ void SurfTile::Load ()
 		mesh = CreateMesh_quadpatch (res, res, elev, mgr->ElevRes(), 0.0, &texrange, shift_origin, &vtxshift, mgr->GetPlanet()->prm.tilebb_excess);
 	}
 
-	static const int label_enable = PLN_ENABLE | PLN_LMARK;
-	int plnmode = *(int*)g_client->GetConfigParam (CFGPRM_PLANETARIUMFLAG);
+	static const int label_enable = MKR_ENABLE | MKR_LMARK;
+	int plnmode = *(int*)g_client->GetConfigParam (CFGPRM_SURFMARKERFLAG);
 	if ((plnmode & label_enable) == label_enable)
 		CreateLabels();
 }

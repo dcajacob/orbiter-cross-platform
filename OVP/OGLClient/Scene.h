@@ -133,7 +133,7 @@ private:
 	int viewW, viewH;        // render viewport size
 	int stencilDepth;        // stencil buffer bit depth
 	OGLCamera *cam;               // camera object
-	CelestialSphere *csphere;  // celestial sphere background
+	OGLCelestialSphere *csphere;  // celestial sphere background
 	int iVCheck;             // index of last object checked for visibility
 //	uint32_t zclearflag;          // z and stencil buffer clear flag
 

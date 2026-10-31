@@ -41,7 +41,7 @@ vBase::vBase (OBJHANDLE _hObj, const Scene *scene): vObject (_hObj, scene)
 
 	// load meshes for generic structures
 	MESHHANDLE *sbs, *sas;
-	int nsbs, nsas;
+	DWORD nsbs, nsas;
 	g_client->GetBaseStructures (_hObj, &sbs, &nsbs, &sas, &nsas);
 	if (nstructure_bs = nsbs) {
 		structure_bs = new OGLMesh*[nsbs];
@@ -96,7 +96,8 @@ void vBase::SetupShadowMeshes ()
 	nshmesh = 0;
 
 	// Get mesh geometries for all base structures
-	int i, j, k, m, nmesh, ngrp, nssh;
+	int i, j, k, m, nmesh, ngrp;
+    DWORD nssh;
 	MESHHANDLE *ssh;
 	double *ecorr;
 	g_client->GetBaseShadowGeometry (hObj, &ssh, &ecorr, &nssh);
