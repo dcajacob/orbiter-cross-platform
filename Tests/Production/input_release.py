@@ -26,7 +26,7 @@ def main():
     parser.add_argument('--output',type=Path,required=True)
     args=parser.parse_args()
     args.cache.mkdir(parents=True,exist_ok=True);args.output.mkdir(parents=True,exist_ok=False)
-    result=dict(schema=1,tag='production-inputs-v1',scope='Windows production references and renderer integration',packages={})
+    result=dict(schema=1,tag='production-inputs-v2',scope='Windows production references and renderer integration',packages={})
     for lock_name,archive_name in (('stock-data.lock.json','Orbiter-x64.zip'),('standard-planets.lock.json','Orbiter2016.zip')):
         lock=json.loads((HERE/lock_name).read_text());archive=args.cache/archive_name
         if not archive.exists():

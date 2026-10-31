@@ -13,7 +13,7 @@ permissions:
   contents: write
 
 concurrency:
-  group: production-inputs-v1
+  group: production-inputs-v2
   cancel-in-progress: false
 
 jobs:
@@ -25,18 +25,24 @@ jobs:
       GH_REPO: ${{ github.repository }}
     steps:
       - uses: actions/checkout@v7
+      - name: Withdraw superseded whole-package candidate
+        run: |
+          if gh release view production-inputs-v1 >/dev/null 2>&1; then
+            release_id=$(gh api "repos/$GH_REPO/releases/tags/production-inputs-v1" --jq .id)
+            gh api --method PATCH "repos/$GH_REPO/releases/$release_id" -F draft=true --silent
+          fi
       - name: Prepare verified original packages and their notices
         run: python3 -B Tests/Production/input_release.py --cache out/input-cache --output out/input-release
       - name: Preserve versioned inputs without replacing an existing release
         shell: bash
         run: |
-          if gh release view production-inputs-v1 >/dev/null 2>&1; then
+          if gh release view production-inputs-v2 >/dev/null 2>&1; then
             mkdir out/previous
-            gh release download production-inputs-v1 --pattern inputs.json --dir out/previous
+            gh release download production-inputs-v2 --pattern inputs.json --dir out/previous
             cmp out/input-release/inputs.json out/previous/inputs.json
           else
-            gh release create production-inputs-v1 out/input-release/* --target "$GITHUB_SHA" \
-              --title 'Production verification inputs v1' --prerelease \
+            gh release create production-inputs-v2 out/input-release/* --target "$GITHUB_SHA" \
+              --title 'Audited production verification inputs v2' --prerelease \
               --notes-file Tests/Production/Licenses/INPUTS.md
           fi
       - uses: actions/upload-artifact@v7
