@@ -9,15 +9,16 @@
 #ifndef __BODY_H
 #define __BODY_H
 
-#include "OrbiterAPI.h"
-#include "Config.h"
+#include "Vecmat.h"
+#include "Production/BodyServices.h"
+#include <string>
 
 class Elements;
 class CelestialBody;
 class Body;
 class VObject;
 
-class Body {
+class ORBITER_PRODUCTION_API Body {
 	friend class PlanetarySystem;
 
 public:
@@ -28,14 +29,14 @@ public:
 
 	virtual ~Body () {}
 
-	virtual int Type() const { return OBJTP_GENERIC; }
+	virtual int Type() const { return orbiter::production::GenericBodyType; }
 
 	inline const char *Name() const { return name.c_str(); }
 	inline const char* FileName() const { return filename.c_str(); }
 
-	virtual const void *GetParam (DWORD paramtype) const { return 0; }
+	virtual const void *GetParam (orbiter::production::BodyParameter paramtype) const { return 0; }
 
-	void BroadcastVisMsg (DWORD msg, DWORD_PTR content);
+	void BroadcastVisMsg (orbiter::production::BodyParameter msg, orbiter::production::BodyContent content);
 	// send a message to all existing visuals
 
 	inline double Size() const { return size; }
@@ -130,7 +131,7 @@ public:
 	// Clean up device objects before the D3DDevice is destroyed
 	// Default action: Calls DestroyDeviceObjects() for all children
 
-	virtual void RegisterVisual(VISHANDLE vis) { hVis = vis; }
+	virtual void RegisterVisual(orbiter::production::BodyVisual vis) { hVis = vis; }
 	// Called by a graphics client to notify the body of visual
 	// creation.
 
@@ -138,10 +139,10 @@ public:
 	// Called by a graphics client to notify the body of visual
 	// destruction.
 
-	inline VISHANDLE GetVishandle() const { return hVis; }
+	inline orbiter::production::BodyVisual GetVishandle() const { return hVis; }
 	// return handle for object's visual (or NULL if doesn't exist)
 
-	inline const VISHANDLE *GetVishandlePtr() const { return &hVis; }
+	inline const orbiter::production::BodyVisual *GetVishandlePtr() const { return &hVis; }
 
 	StateVectors* s0 { nullptr };    // body state at time t0
 	StateVectors* s1 { nullptr };    // new body state at time t0+dt during update phase
@@ -171,7 +172,7 @@ protected:
 
 	Vector acc;          // current acceleration vector
 
-	VISHANDLE hVis { nullptr };      // visual identifier passed to messages (NULL=no visual)
+	orbiter::production::BodyVisual hVis { nullptr };      // visual identifier passed to messages (NULL=no visual)
 
 	const CelestialBody* cbody { nullptr }; // orbit reference body
 

@@ -16,5 +16,6 @@ add_executable(orbiter-native main.cpp Renderer.cpp)
 target_link_libraries(orbiter-native PRIVATE orbiter_client_state glfw)
 target_compile_definitions(orbiter-native PRIVATE GLFW_INCLUDE_NONE)
 install(TARGETS orbiter-native RUNTIME DESTINATION bin)
+set_target_properties(orbiter-native PROPERTIES INSTALL_RPATH "$ORIGIN/../lib")
 
 install(FILES "${glfw_SOURCE_DIR}/LICENSE.md" DESTINATION share/licenses/orbiter-native RENAME GLFW.txt)

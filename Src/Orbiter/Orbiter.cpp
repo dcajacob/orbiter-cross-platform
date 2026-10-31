@@ -35,6 +35,7 @@
 #include "resource.h"
 #include "Orbiter.h"
 #include "Production/WindowsSession.h"
+#include "Production/WindowsBodyServices.h"
 #include "Launchpad.h"
 #include "MenuInfoBar.h"
 #include "Dialogs.h"
@@ -291,6 +292,7 @@ VOID DestroyWorld ()
 //-----------------------------------------------------------------------------
 Orbiter::Orbiter ()
 {
+	orbiter::production::BindBodyServices(&orbiter::production::GetWindowsBodyServices());
 	// override base class defaults
     //m_bAppUseZBuffer  = TRUE;
     //m_fnConfirmDevice = ConfirmDevice;
@@ -368,6 +370,7 @@ Orbiter::Orbiter ()
 Orbiter::~Orbiter ()
 {
 	CloseApp ();
+	orbiter::production::BindBodyServices(nullptr);
 }
 
 //-----------------------------------------------------------------------------
@@ -1811,6 +1814,11 @@ void Orbiter::EndTimeStep (bool running)
 void Orbiter::UpdateSessionVisuals(bool running)
 {
 	if (gclient) gclient->clbkUpdate(running);
+}
+
+void Orbiter::SendBodyVisualEvent(Body *body, VISHANDLE visual, DWORD message, DWORD_PTR content)
+{
+	if (gclient) gclient->clbkVisEvent((OBJHANDLE)body, visual, message, content);
 }
 
 void Orbiter::WritePhysicsTrace(bool initial)

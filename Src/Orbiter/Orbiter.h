@@ -147,6 +147,7 @@ public:
 
 	void NotifyObjectJump (const Body *obj, const Vector &shift);
 	void NotifyObjectSize (const Body *obj);
+	void SendBodyVisualEvent(Body *body, VISHANDLE visual, DWORD message, DWORD_PTR content);
 
 	void SetWarpFactor (double warp, bool force = false, double delay = 0.0);
 	// Set time acceleration factor

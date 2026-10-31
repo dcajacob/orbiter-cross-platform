@@ -70,3 +70,22 @@ bool GetItemString (istream &is, const char *label, char *val)
 	return false;
 }
 
+
+bool GetItemReal (istream &is, const char *label, double &val)
+{
+	char g_cbuf[1024];
+	if (!GetItemString (is, label, g_cbuf)) return false;
+	return (sscanf (g_cbuf, "%lf", &val) == 1);
+}
+
+
+bool GetItemVector (istream &is, const char *label, Vector &val)
+{
+	char g_cbuf[1024];
+	double x, y, z;
+	if (!GetItemString (is, label, g_cbuf)) return false;
+	if (sscanf (g_cbuf, "%lf%lf%lf", &x, &y, &z) != 3) return false;
+	val.Set (x,y,z);
+	return true;
+}
+

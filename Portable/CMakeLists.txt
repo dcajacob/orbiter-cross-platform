@@ -7,16 +7,20 @@ endif()
 
 option(ORBITER_BUILD_VIEWER "Build the separate native OpenGL graphics client" OFF)
 set(ORBITER_REPOSITORY_ROOT "${CMAKE_CURRENT_LIST_DIR}/..")
+if(NOT TARGET orbiter_production_boundary)
+    add_subdirectory(../Src/Orbiter/Production production-boundary)
+endif()
 add_library(orbiter_portable_core STATIC
-    ../Src/Orbiter/Vecmat.cpp ../Src/Orbiter/Element.cpp
-    ../Src/Orbiter/TimeData.cpp ../Src/Orbiter/ConfigFile.cpp
+    ../Src/Orbiter/Element.cpp
     ../Src/Orbiter/Portable/SimulationSession.cpp)
+target_link_libraries(orbiter_portable_core PUBLIC orbiter_production_boundary)
 target_include_directories(orbiter_portable_core PUBLIC
     ../Src/Orbiter ../Src/Orbiter/Portable ../Orbitersdk/include)
 target_compile_features(orbiter_portable_core PUBLIC cxx_std_17)
 add_library(orbiter::core ALIAS orbiter_portable_core)
 add_executable(orbiter-headless ../Src/Orbiter/Portable/main.cpp)
 target_link_libraries(orbiter-headless PRIVATE orbiter::core)
+set_target_properties(orbiter-headless PROPERTIES INSTALL_RPATH "$ORIGIN/../lib")
 install(TARGETS orbiter-headless RUNTIME DESTINATION bin)
 install(FILES ../README.native.md DESTINATION share/orbiter)
 install(FILES ../LICENSE DESTINATION share/licenses/orbiter-native RENAME Orbiter.txt)

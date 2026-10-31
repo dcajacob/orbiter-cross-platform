@@ -14,7 +14,6 @@ set(common_src
 	Camera.cpp
 	cmdline.cpp
 	Config.cpp
-	ConfigFile.cpp
 	console_ng.cpp
 	Element.cpp
 	ElementApplication.cpp
@@ -27,15 +26,14 @@ set(common_src
 	Nav.cpp
 	Orbiter.cpp
 	Production/WindowsSession.cpp
+	Production/WindowsBodyServices.cpp
 	PlaybackEd.cpp
 	Psys.cpp
 	Script.cpp
 	Shadow.cpp
 	State.cpp
-	Vecmat.cpp
 	VectorMap.cpp
     ConsoleManager.cpp
-	TimeData.cpp
 # Launchpad
 	Launchpad.cpp
 	LpadTab.cpp
@@ -64,7 +62,6 @@ set(common_src
 	Select.cpp
 	OptionsPages.cpp
 # Body classes
-	Body.cpp
 	BodyIntegrator.cpp
 	PinesGrav.cpp
 	Celbody.cpp

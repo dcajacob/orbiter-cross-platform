@@ -17,6 +17,7 @@
 #define __RIGIDBODY_H
 
 #include "Body.h"
+#include "Config.h"
 
 class RigidBody;
 

@@ -3,39 +3,21 @@
 
 // Implementation of class Body
 
-#define OAPI_IMPLEMENTATION
-
-#include <string.h>
-#include <fstream>
-#include "Orbiter.h"
-#include "Config.h"
-#include "Psys.h"
 #include "Body.h"
-#include "Element.h"
-#include "Log.h"
-#include <stdio.h>
-#include <string>
+#include "ConfigFile.h"
+#include <fstream>
+#include <string.h>
 
 using namespace std;
-using namespace oapi;
-
-// =======================================================================
-// Externals
-
-extern Orbiter *g_pOrbiter;
-extern TimeData td;
-extern Camera *g_camera;        // observer camera
-extern PlanetarySystem *g_psys; // pointer to planetary system
-extern char DBG_MSG[256];
+using orbiter::production::GetBodyServices;
 
 // =======================================================================
 // class Body
 
 Body::Body ()
 {
-	extern bool g_bStateUpdate;
 	s0 = sv;
-	s1 = (g_bStateUpdate ? sv + 1 : sv);
+	s1 = (GetBodyServices().IsUpdating() ? sv + 1 : sv);
 	updcount = irand(100); // spread update times
 	s0->R = IMatrix();       // align body with its parent's orientation
 }
@@ -50,12 +32,13 @@ Body::Body (double _mass, double _size)
 Body::Body(char* fname)
 	: Body()
 {
-	char *cpath = g_pOrbiter->ConfigPath (fname);
+	const auto path = GetBodyServices().ConfigPath(fname);
+	const auto pathString = path.string();
+	const char *cpath = pathString.c_str();
 
-	//g_pOrbiter->OutputLoadStatus (fname, 0);
-	g_pOrbiter->OutputLoadStatus (cpath, 1);
+	GetBodyServices().LoadStatus(cpath, 1);
 
-	ifstream ifs (cpath);
+	ifstream ifs (path);
 	if (!ifs) return;
 	
 	filename = cpath;
@@ -86,7 +69,7 @@ void Body::SetName (char *_name)
 void Body::SetSize (double newsize)
 {
 	size = newsize;
-	g_pOrbiter->NotifyObjectSize (this);
+	GetBodyServices().SizeChanged(this);
 }
 
 void Body::RPlace (const Vector &rpos, const Vector &rvel)
@@ -100,7 +83,9 @@ void Body::RPlace (const Vector &rpos, const Vector &rvel)
 
 void Body::SetRPos (const Vector &p)
 {
-	dCHECK(s1 != s0, "Update state not available")
+#if defined(_DEBUG) || !defined(NDEBUG)
+	GetBodyServices().CheckUpdateState(s1 != s0);
+#endif
 	rpos_base = s1->pos = p;
 	rpos_add.Set (0,0,0);
 }
@@ -118,14 +103,18 @@ void Body::FlushRPos ()
 
 void Body::SetRVel (const Vector &v)
 {
-	dCHECK(s1 != s0, "Update state not available")
+#if defined(_DEBUG) || !defined(NDEBUG)
+	GetBodyServices().CheckUpdateState(s1 != s0);
+#endif
 	rvel_base = s1->vel = v;
 	rvel_add.Set (0,0,0);
 }
 
 void Body::AddRVel (const Vector &dv)
 {
-	dCHECK(s1 != s0, "Update state not available")
+#if defined(_DEBUG) || !defined(NDEBUG)
+	GetBodyServices().CheckUpdateState(s1 != s0);
+#endif
 	rvel_base += dv;
 	s1->vel = rvel_base + rvel_add;
 }
@@ -152,12 +141,9 @@ bool Body::SurfpointVisible (double lng, double lat, const Vector &gcam) const
 	return (dotp (sp-GPos(), gcam-sp) >= 0.0);
 }
 
-void Body::BroadcastVisMsg (DWORD msg, DWORD_PTR content)
+void Body::BroadcastVisMsg (orbiter::production::BodyParameter msg, orbiter::production::BodyContent content)
 {
-	oapi::GraphicsClient *gc;
-	if (hVis && (gc = g_pOrbiter->GetGraphicsClient())) {
-		gc->clbkVisEvent ((OBJHANDLE)this, hVis, msg, content);
-	}
+	if (hVis) GetBodyServices().VisualEvent(this, hVis, msg, content);
 }
 
 void Body::BeginStateUpdate ()

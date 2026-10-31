@@ -317,12 +317,6 @@ char *readline (istream &is)
 	return 0; // never gets here
 }
 
-bool GetItemReal (istream &is, const char *label, double &val)
-{
-	if (!GetItemString (is, label, g_cbuf)) return false;
-	return (sscanf (g_cbuf, "%lf", &val) == 1);
-}
-
 bool GetItemInt (istream &is, const char *label, int &val)
 {
 	if (!GetItemString (is, label, g_cbuf)) return false;
@@ -347,15 +341,6 @@ bool GetItemBool (istream &is, const char *label, bool &val)
 	if (!_strnicmp (g_cbuf, "true", 4)) { val = true; return true; }
 	else if (!_strnicmp (g_cbuf, "false", 5)) { val = false; return true; }
 	return false;
-}
-
-bool GetItemVector (istream &is, const char *label, Vector &val)
-{
-	double x, y, z;
-	if (!GetItemString (is, label, g_cbuf)) return false;
-	if (sscanf (g_cbuf, "%lf%lf%lf", &x, &y, &z) != 3) return false;
-	val.Set (x,y,z);
-	return true;
 }
 
 bool GetItemVECTOR (istream &is, const char *label, VECTOR3 &val)

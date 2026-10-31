@@ -8,6 +8,7 @@
 #define __BASE_H
 
 #include "Body.h"
+#include "Config.h"
 #include "Nav.h"
 
 class Planet;

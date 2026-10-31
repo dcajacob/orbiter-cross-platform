@@ -12,6 +12,18 @@ vessel, camera, pane and graphics implementations. Live running/playback/update
 flags retain their original callback semantics. Input, frame timing policy and
 rendering remain at their existing positions in the application loop.
 
+The next component is the original `Body` class, compiled into the same shared
+library on Windows and Linux. Its state buffers, coordinate transforms and
+finalization methods retain the production implementations. Configuration path,
+load-status, size notification, visual notification and debug-assert policies
+are explicit `BodyServices`. Windows binds those services to the existing
+application; an unbound native world fails. SDK-facing Windows integer/handle
+types are checked for exact type identity in the adapter. `Vecmat`, `TimeData`
+and configuration primitives now have one compiled implementation per process
+in this library, including the unchanged POC regressions that consume them.
+Numeric configuration readers use call-local scratch storage in place of the
+application configuration file's global buffer.
+
 The original MSHX1 reader and angle-weighted normal calculations now have shared
 implementations without Windows or Direct3D headers. The Windows sink retains
 the existing internal mesh and SDK representations and performs real renderer
@@ -43,6 +55,8 @@ generation, resource lookup and explicit failure paths. The pinned empty
 `Meshes/Hyperion.msh` placeholder is required to fail; no geometry is substituted.
 These tests also run in the existing Linux GCC / Windows MSVC Debug/Release
 matrix and in the full Windows application build.
+The production Body test also checks configuration initialization, creation
+during an update, publication of finalized state and actual service routing.
 
 Extraction changes are declared explicitly in
 `Tests/Production/phase3-extraction.lock.json`. The audit first proves that the
@@ -59,7 +73,7 @@ callback, object/asset, camera and image evidence. Numerical, one-pixel and SSIM
 budgets are unchanged. Neither inherited disabled workflow is modified.
 
 Remaining Phase 3 work includes production world/session ownership and teardown,
-configuration/scenario/resource integration, body/vessel/camera platform service
-separation, instrumentation dependencies and the source-built native SDK/module
+configuration/scenario/resource integration, platform service separation for
+`RigidBody`, `Vessel` and `Camera`, instrumentation dependencies and the source-built native SDK/module
 boundary. A shared coordinator and CPU asset reader do not satisfy the Phase 3
 exit gate that Linux builds the production engine and its authoritative objects.

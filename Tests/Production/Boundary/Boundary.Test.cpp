@@ -3,6 +3,7 @@
 #include "Production/ResourceResolver.h"
 #include "Production/MeshData.h"
 #include "TimeData.h"
+#include "Body.h"
 #include <cmath>
 #include <filesystem>
 #include <fstream>
@@ -178,6 +179,66 @@ void meshTests(const fs::path& root)
     std::cout << "Read " << count << " original stock meshes through the shared production parser\n";
 }
 
+void bodyTests(const fs::path& temporary)
+{
+    BindBodyServices(nullptr);
+    rejects([] { Body unbound; });
+    struct Environment final : BodyServices {
+        ResourceResolver resources;
+        bool updating = false;
+        int sizeChanges = 0, visualEvents = 0, statuses = 0;
+        explicit Environment(const fs::path& root) : resources(root) {}
+        bool IsUpdating() const override { return updating; }
+        fs::path ConfigPath(const char* name) override { return resources.Resolve(std::string(name)+".cfg"); }
+        void LoadStatus(const char*, int line) override { require(line == 1, "Wrong load-status order"); ++statuses; }
+        void SizeChanged(Body*) override { ++sizeChanges; }
+        void VisualEvent(Body*, BodyVisual visual, BodyParameter message, BodyContent content) override
+        {
+            require(visual == this && message == 7 && content == 9, "Visual notification identity changed");
+            ++visualEvents;
+        }
+        void CheckUpdateState(bool valid) override { require(valid, "Body update state is unavailable"); }
+    };
+    const auto root = temporary/"body-fixture";
+    fs::create_directories(root);
+    std::ofstream(root/"Body.cfg") << "Name = ActualBody\r\nMass = 5.972e24\r\nSize = 6371000\r\n"
+        "AlbedoRGB = 0.2 0.3 0.4\r\nInitPos = 1 2 3\r\nInitVel = 4 5 6\r\n";
+    Environment environment(root);
+    struct Binding {
+        BodyServices* previous;
+        explicit Binding(BodyServices* services) : previous(BindBodyServices(services)) {}
+        ~Binding() { BindBodyServices(previous); }
+    } binding(&environment);
+    char name[] = "BODY";
+    Body body(name);
+    require(std::string(body.Name()) == "ActualBody" && body.Mass() == 5.972e24 && body.Size() == 6371000,
+        "Production Body configuration changed");
+    require(body.GPos().x == 1 && body.GVel().z == 6 && body.s0 == body.s1, "Body initial state changed");
+    require(environment.statuses == 1, "Production config load was not observed");
+    const auto* original = body.s0;
+    body.BeginStateUpdate();
+    require(body.s0 == original && body.s1 != original, "Body published unfinished state");
+    body.RPlace(Vector(7,8,9), Vector(10,11,12));
+    body.s1->R = IMatrix();
+    require(body.GPos().x == 1, "Body changed its current state before finalization");
+    body.EndStateUpdate();
+    require(body.s0 == body.s1 && body.GPos().x == 7 && body.GVel().z == 12, "Body finalization order changed");
+    Vector global;
+    body.LocalToGlobal(Vector(1,2,3), global);
+    require(global.x == 8 && global.y == 10 && global.z == 12, "Production frame transform changed");
+    body.SetSize(4); require(environment.sizeChanges == 1, "Size notification missing");
+    body.BroadcastVisMsg(7,9); require(environment.visualEvents == 0, "Unregistered visual received event");
+    body.RegisterVisual(&environment); body.BroadcastVisMsg(7,9);
+    require(environment.visualEvents == 1, "Registered visual notification missing");
+    body.UnregisterVisual();
+    environment.updating = true;
+    Body createdDuringUpdate(1,2);
+    require(createdDuringUpdate.s0 != createdDuringUpdate.s1, "Creation during a state update changed");
+    char missing[] = "missing";
+    rejects([&] { Body absent(missing); });
+    fs::remove_all(root);
+}
+
 int main(int argc, char** argv)
 {
     try {
@@ -186,6 +247,7 @@ int main(int argc, char** argv)
         if (suite == "session") sessionTests();
         else if (suite == "resources" && argc == 3) resourceTests(argv[2]);
         else if (suite == "meshes" && argc == 3) meshTests(argv[2]);
+        else if (suite == "bodies" && argc == 3) bodyTests(argv[2]);
         else throw std::runtime_error("Invalid test selection");
         return 0;
     } catch (const std::exception& error) { std::cerr << error.what() << '\n'; return 1; }
