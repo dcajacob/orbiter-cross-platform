@@ -1,0 +1,132 @@
+{
+  "schema": 1,
+  "description": "Pre-extraction production SDK-driven references; no replacement physics or vessel modules",
+  "cases": [
+    {
+      "id": "rcs",
+      "frames": 500,
+      "fixed_step": 0.25,
+      "fixture": "orbit",
+      "budgets": "orbital",
+      "epoch": 51982.5
+    },
+    {
+      "id": "autopilot",
+      "frames": 420,
+      "fixed_step": 0.25,
+      "fixture": "orbit",
+      "budgets": "orbital",
+      "epoch": 51982.5
+    },
+    {
+      "id": "atmosphere",
+      "frames": 300,
+      "fixed_step": 0.1,
+      "fixture": "ground",
+      "budgets": "contact",
+      "epoch": 51982.5
+    },
+    {
+      "id": "landed",
+      "frames": 150,
+      "fixed_step": 0.1,
+      "fixture": "ground",
+      "budgets": "contact",
+      "epoch": 51982.5
+    },
+    {
+      "id": "contact",
+      "frames": 300,
+      "fixed_step": 0.05,
+      "fixture": "ground",
+      "budgets": "contact",
+      "epoch": 51982.5
+    },
+    {
+      "id": "docked",
+      "frames": 100,
+      "fixed_step": 0.1,
+      "fixture": "docked",
+      "budgets": "contact",
+      "epoch": 51982.5
+    },
+    {
+      "id": "dock_approach",
+      "frames": 400,
+      "fixed_step": 0.1,
+      "fixture": "approach",
+      "budgets": "contact",
+      "epoch": 51982.5
+    },
+    {
+      "id": "attachments",
+      "frames": 80,
+      "fixed_step": 0.25,
+      "fixture": "orbit",
+      "budgets": "orbital",
+      "epoch": 51982.5
+    },
+    {
+      "id": "clock",
+      "frames": 150,
+      "fixed_step": 0.25,
+      "fixture": "orbit",
+      "budgets": "orbital",
+      "epoch": 51982.5
+    },
+    {
+      "id": "lifetime",
+      "frames": 80,
+      "fixed_step": 0.25,
+      "fixture": "orbit",
+      "budgets": "orbital",
+      "epoch": 51982.5
+    },
+    {
+      "id": "dg_animations",
+      "frames": 180,
+      "fixed_step": 0.1,
+      "fixture": "dg_orbit",
+      "budgets": "orbital",
+      "epoch": 51982.5
+    },
+    {
+      "id": "dg_persistence",
+      "frames": 100,
+      "fixed_step": 0.1,
+      "fixture": "dg_orbit",
+      "budgets": "orbital",
+      "epoch": 51982.5
+    },
+    {
+      "id": "dg_reload",
+      "frames": 40,
+      "fixed_step": 0.1,
+      "fixture": "reload",
+      "budgets": "orbital",
+      "epoch": 51982.5
+    },
+    {
+      "id": "callbacks",
+      "frames": 60,
+      "fixed_step": 0.25,
+      "fixture": "orbit",
+      "budgets": "orbital",
+      "epoch": 51982.5
+    }
+  ],
+  "repeat": "byte-identical state, propellant, animation, and event files required",
+  "budgets": {
+    "position_m": 0.01,
+    "velocity_m_s": 1e-05,
+    "rotation_rad": 1e-08,
+    "angular_velocity_rad_s": 1e-10,
+    "mjd_days": 1e-10,
+    "mass_relative": 1e-08,
+    "mass_absolute_kg": 1e-08,
+    "contact_position_m": 1,
+    "contact_velocity_m_s": 0.1,
+    "contact_rotation_rad": 0.001,
+    "contact_event_tick": 1
+  }
+}

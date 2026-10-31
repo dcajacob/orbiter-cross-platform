@@ -6,7 +6,7 @@
   "bytes": 2600557251,
   "sha256": "bdbf747dd930ced34a3cca34b69dc7e2d9733e0b9498ee8d6224090cf008dc30",
   "scope": "standard planetary archive data only; no binary or ephemeris substitution",
-  "license_status": "publisher notices retained; durable redistribution mirror not approved",
+  "license_status": "Orbiter Freeware License, manual page 143; original package and notices must be preserved; noncommercial distribution only",
   "data_files": {
     "Textures/Callisto/Archive/Surf.tree": {
       "sha256": "db96241ae8f152f022252af9d416986265ea62d06b0869b731cd6d3afca15e71",
@@ -123,13 +123,8 @@
   },
   "profile": "standard-planetary-archives-2016",
   "required_files": [
-    "Textures/Earth/Archive/Surf.tree",
     "Textures/Earth/Archive/Elev.tree",
-    "Textures/Earth/Archive/Cloud.tree",
-    "Textures/Moon/Archive/Surf.tree",
-    "Textures/Moon/Archive/Elev.tree",
-    "Textures/Mars/Archive/Surf.tree",
-    "Textures/Mars/Archive/Elev.tree"
+    "Textures/Earth/Archive/Surf.tree"
   ],
   "capture_method": "Downloaded through the publisher resource Go to download link in Chrome, 2026-10-31; SHA256 and all selected ZIP CRCs recorded before use."
 }

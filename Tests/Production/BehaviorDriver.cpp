@@ -42,7 +42,7 @@ public:
         open(events,"behavior-events.csv"); open(states,"behavior-state.csv");
         open(propellant,"behavior-propellant.csv"); open(animations,"behavior-animations.csv");
         events << "frame,tick,seconds,mjd,phase,object,detail\n";
-        states << "tick,frame,seconds,mjd,object,class,rx,ry,rz,vx,vy,vz,m11,m12,m13,m21,m22,m23,m31,m32,m33,wx,wy,wz,mass,fuel,altitude_agl,altitude_mean,airspeed,density,dynamic_pressure,lift,drag,ground,dock,focus,navmask\n";
+        states << "tick,frame,seconds,mjd,object,class,rx,ry,rz,vx,vy,vz,m11,m12,m13,m21,m22,m23,m31,m32,m33,wx,wy,wz,mass,fuel,altitude_agl,altitude_mean,airspeed,density,dynamic_pressure,lift,drag,ground,dock,focus,navmask,attached\n";
         propellant << "tick,object,index,mass,capacity\n";
         animations << "tick,object,index,state\n";
         setter = reinterpret_cast<SetObserver>(GetProcAddress(GetModuleHandleW(nullptr),"OrbiterTestSetObserver"));
@@ -205,7 +205,12 @@ private:
             for (double value:values) { require(std::isfinite(value),"nonfinite production behavior state");states << ',' << value; }
             unsigned navmask=0;for (int mode=1;mode<=7;++mode) if(v->GetNavmodeState(mode)) navmask|=1u<<mode;
             states << ',' << int(v->GroundContact()) << ',' << nameOf(v->DockCount() ? v->GetDockStatus(v->GetDockHandle(0)) : nullptr)
-                   << ',' << nameOf(oapiGetFocusObject()) << ',' << navmask << '\n';
+                   << ',' << nameOf(oapiGetFocusObject()) << ',' << navmask << ',';
+            for (bool parent : {false,true}) for (DWORD i=0;i<v->AttachmentCount(parent);++i) {
+                OBJHANDLE attached=v->GetAttachmentStatus(v->GetAttachmentHandle(parent,i));
+                if (attached) states << nameOf(attached) << ';';
+            }
+            states << '\n';
             for (DWORD i=0;i<v->GetPropellantCount();++i) {
                 auto h=v->GetPropellantHandleByIndex(i);
                 propellant << tick << ',' << v->GetName() << ',' << i << ',' << v->GetPropellantMass(h) << ',' << v->GetPropellantMaxMass(h) << '\n';

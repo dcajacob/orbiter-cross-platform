@@ -167,6 +167,33 @@ jobs:
           --orbiter out/production-app/Orbiter.exe --data out/production-data
           --output out/production-reference --configuration ${{ matrix.configuration }}
           --reference Tests/Production/Reference
+      - uses: actions/cache@v6
+        with:
+          path: out/planet-cache/Orbiter2016.zip
+          key: production-standard-planets-${{ hashFiles('Tests/Production/standard-planets.lock.json') }}
+      - name: Prepare digest-verified publisher standard planetary archives
+        run: >-
+          python Tests/Production/prepare_data.py --lock Tests/Production/standard-planets.lock.json
+          --archive out/planet-cache/Orbiter2016.zip --destination out/standard-planets
+      - name: Capture repeated production behavior before extraction
+        run: >-
+          python Tests/Production/behavior_suite.py --orbiter out/production-app/Orbiter.exe
+          --data out/production-data --planets out/standard-planets --output out/production-behavior
+          --configuration ${{ matrix.configuration }}
+      - name: Package source-built application for isolated client and driver iteration
+        if: always()
+        shell: pwsh
+        run: |
+          if (Test-Path out/production-app/Orbiter.exe) {
+            python Tests/Production/package_test_runtime.py --build out/production-app --output out/windows-test-runtime.zip
+          }
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: production-runtime-${{ matrix.configuration }}-x64
+          retention-days: 30
+          compression-level: 0
+          path: out/windows-test-runtime.zip
       - name: Archive references and build metadata, including failures
         if: always()
         uses: actions/upload-artifact@v7
@@ -174,6 +201,12 @@ jobs:
           name: production-reference-${{ matrix.configuration }}-x64
           retention-days: 30
           path: |
+            out/production-behavior/**/*.csv
+            out/production-behavior/**/*.json
+            out/production-behavior/**/*.txt
+            out/production-behavior/**/*.log
+            out/production-behavior/**/*.scn
+            out/production-behavior/**/Orbiter.cfg
             out/production-app/*.log
             out/production-app/*.txt
             out/production-app/build-inputs.json
@@ -206,9 +239,15 @@ jobs:
           python3 -B Tests/Production/compare_references.py
           --reference out/debug/production-reference
           --candidate out/release/production-reference --report production-comparison.json
+      - name: Compare behavioral production references in Debug and Release
+        run: >-
+          python3 -B Tests/Production/behavior_suite.py --compare out/debug/production-behavior
+          --output out/release/production-behavior
       - uses: actions/upload-artifact@v7
         if: always()
         with:
           name: production-reference-comparison
           retention-days: 30
-          path: production-comparison.json
+          path: |
+            production-comparison.json
+            out/release/production-behavior/cross-configuration.json
