@@ -87,5 +87,12 @@
     "status": "28 archives verified against publisher ZIP in existing compatible directory",
     "lock": "standard-planets.lock.json",
     "orbital_reference_uses_this_profile": false
+  },
+  "current_verification": {
+    "status": "passed",
+    "run_id": 41189526342,
+    "tested_source": "e7d1fdec1f301bd960886b5177e4f10da8c5a005",
+    "frozen_reference_unchanged": true,
+    "all_32_trace_state_event_identity_files_byte_identical_to_accepted_evidence": true
   }
 }

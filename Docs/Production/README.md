@@ -176,6 +176,12 @@ contact/docking, autopilot, time controls, object lifetime and persistence
 reference cases remain pending. Phase 1 is not declared complete merely because
 orbit/propulsion candidates or the WGL probe pass.
 
+[The final verification run](https://github.com/dcajacob/orbiter-cross-platform/actions/runs/41189526342)
+passes this immutable-reference path in both Windows configurations. Current
+trace, state, event and identity files are byte-identical to the accepted evidence.
+The portable Linux/Windows matrix and native SPICE data audit pass on the same
+tested code. Preserved reports distinguish accepted capture from later verification.
+
 ### Independent SPICE data coverage
 
 ```sh

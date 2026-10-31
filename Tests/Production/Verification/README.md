@@ -67,3 +67,22 @@ The publisher's Orbiter2016.zip SHA256 is
 28 selected archive file hashes matched an existing compatible Orbiter-2024 data
 directory locally. This input-resource result does not establish renderer or
 terrain/contact acceptance, and does not change the frozen orbit data profile.
+
+Final immutable-reference verification also passed in
+[run 41189526342](https://github.com/dcajacob/orbiter-cross-platform/actions/runs/41189526342),
+testing `e7d1fdec`. Both current Windows configurations match the accepted baseline
+and each other's outputs. All 32 current trace/state/event/identity files are
+byte-identical to their accepted counterparts. The
+[verification evidence](Evidence/41189526342-verification.zip) preserves all six
+production job logs and current build/SDK/dependency metadata, invocations,
+saved scenarios and verification/comparison reports. Its manifest records the
+original GitHub artifact hashes and explicit references to the already preserved
+identical files, avoiding duplicate numerical traces in Git.
+Verification evidence ZIP SHA256:
+`f2280180a740bfd659d3cd07d05798e1fa8488ba899a9c34735a82151f610741`.
+
+The existing [portable matrix](https://github.com/dcajacob/orbiter-cross-platform/actions/runs/41189526198)
+and [native data audit](https://github.com/dcajacob/orbiter-cross-platform/actions/runs/41189526236)
+also pass on the same tested source. Locally, the nine display-independent
+portable suites, standard-data offline verification, frozen archive integrity,
+budget-tampering rejection and numerical comparator negative checks pass.
