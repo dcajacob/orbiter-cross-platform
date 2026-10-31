@@ -3,6 +3,14 @@ name: Production Bootstrap
 on:
   push:
     branches: ['codex/production-**']
+    paths-ignore:
+      - 'Docs/**'
+      - 'README*'
+      - 'Tests/Production/Verification/**'
+      - 'Tests/Production/SpiceAudit/**'
+      - 'Tests/Production/SpiceCoverage.cpp'
+      - 'Tests/Production/audit_spice.py'
+      - '.github/workflows/production-data.yml'
   pull_request:
     paths:
       - 'Tests/Production/**'

@@ -37,7 +37,8 @@ def states(reference, candidate):
         errors = dict(position_m=distance(values(ref,('x','y','z')),values(got,('x','y','z'))),
                       velocity_m_s=distance(values(ref,('vx','vy','vz')),values(got,('vx','vy','vz'))),
                       orientation_rad=quaternion_angle(quaternion(ref),quaternion(got)),
-                      angular_velocity_rad_s=distance(values(ref,('wx','wy','wz')),values(got,('wx','wy','wz'))),
+                      angular_velocity_rad_s=distance(values(ref,('wx','wy','wz')),values(got,('wx','wy','wz')))
+                        if ref['object'] in ('ISS','PB') else 0.0,
                       mjd_days=abs(float(ref['mjd'])-float(got['mjd'])))
         require(all(math.isfinite(x) for x in errors.values()), 'nonfinite production comparison')
         for key, error in errors.items():

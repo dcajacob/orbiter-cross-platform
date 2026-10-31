@@ -169,6 +169,7 @@ def main():
     report = dict(status='candidate', source_commit=git('rev-parse','HEAD').decode().strip(),
                   production_source_commit=lock['source_commit'], configuration=args.configuration,
                   executable_sha256=digest(executable), data_lock_sha256=digest(Path(__file__).with_name('stock-data.lock.json')),
+                  vessel_only_fields=dict(objects=['ISS','PB'], fields=['wx','wy','wz','fuel','ground']),
                   module_sha256={p.relative_to(executable.parent).as_posix():digest(p) for p in
                                  (executable.parent/'Modules').rglob('*.dll')}, cases={})
     try:

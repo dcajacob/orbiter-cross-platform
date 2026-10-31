@@ -148,6 +148,15 @@ sampled. A 6,001st application frame permits observation of finalized tick 6,000
 The existing finalization observer also records the PB quaternion trace. No
 propagation formula, world update or public SDK change is needed.
 
+`trace.csv` retains the existing primary-relative vessel trace contract. In
+`production-state.csv`, positions/velocities use Orbiter's global ecliptic axes
+in m and m/s; rotation matrices map local axes into those global axes. Mass/fuel
+are kg. `wx/wy/wz` are body-frame rad/s for ISS/PB; fuel and ground contact also
+apply only to vessels. Those slots are inapplicable zeros in celestial-body rows,
+not measurements of a planet's spin. The report declares this field coverage.
+MJD and simulation seconds follow the original application clock. Matrix rows
+are orthonormality-checked, and vessel rotation comparisons are sign independent.
+
 The separate official [stock data lock](../../Tests/Production/stock-data.lock.json)
 pins the matching upstream release package by GitHub's published SHA256 and
 463 extracted file hashes. `prepare_data.py` stages only data, never release
@@ -163,6 +172,32 @@ no script writes or refreshes an accepted reference automatically. Atmosphere,
 contact/docking, autopilot, time controls, object lifetime and persistence
 reference cases remain pending. Phase 1 is not declared complete merely because
 orbit/propulsion candidates or the WGL probe pass.
+
+### Independent SPICE data coverage
+
+```sh
+cmake -S Tests/Production/SpiceAudit -B out/spice-audit -DCMAKE_BUILD_TYPE=Release
+cmake --build out/spice-audit
+python3 -B Tests/Production/audit_spice.py \
+  --executable out/spice-audit/orbiter-spice-data-audit --data /path/to/verified-data \
+  --default-mjd 61344.5 --report out/spice-audit/coverage.json
+```
+
+This native audit links the existing pinned CSPICE library and directly queries
+all 41 stock Sol bodies plus their barycentres at the distinct stock scenario
+epochs. It validates the actual TLS/PCK/BSP hashes and requires an invalid epoch
+to produce a clear coverage failure. The query output is SI metres and m/s in
+ECLIPJ2000 axes. It does not run Orbiter's world, interpolation or graphics and
+cannot replace production references. The separate data CI uses Ubuntu 24.04.
+
+Seven unchanged scenarios have no valid numeric Date field and therefore default
+to the wall clock in production `State::Read`: the three lunar-transfer/entry
+challenges, both Today scenarios and the two Earth-Moon/Jovian ephemerides views.
+The audit records them and uses the explicitly supplied coverage epoch, without
+editing the files. A production replay of these scenarios must record/control
+the application's default clock before world creation. Local GCC 15.2/CSPICE
+N0067 passes 11,481 queries across 129 epochs, including MJD 61344.5, and the
+out-of-coverage negative case. This is a local result until hosted data CI passes.
 
 ## Production references and acceptance contracts
 

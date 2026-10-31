@@ -1,0 +1,56 @@
+name: Production SPICE Data
+
+on:
+  push:
+    branches: ['codex/production-**']
+    paths:
+      - 'Tests/Production/SpiceAudit/**'
+      - 'Tests/Production/SpiceCoverage.cpp'
+      - 'Tests/Production/audit_spice.py'
+      - 'Tests/Production/prepare_data.py'
+      - 'Tests/Production/stock-data.lock.json'
+      - 'Tests/Production/inventory.py'
+      - 'Tests/Production/production-source.lock.json'
+      - 'Src/Celbody/SPICE/cspice/**'
+      - '.github/workflows/production-data.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  data-coverage:
+    name: Native CSPICE stock-data coverage
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - name: Build the native data audit with the pinned production CSPICE library
+        run: |
+          cmake -S Tests/Production/SpiceAudit -B out/spice-audit -DCMAKE_BUILD_TYPE=Release
+          cmake --build out/spice-audit --parallel 2
+          c++ --version > out/spice-audit/compiler.txt
+          sha256sum Src/Celbody/SPICE/cspice/linux_x64/lib/cspice.a > out/spice-audit/library-sha256.txt
+      - uses: actions/cache@v6
+        with:
+          path: out/data-cache/Orbiter-x64.zip
+          key: production-data-${{ hashFiles('Tests/Production/stock-data.lock.json') }}
+      - name: Verify and prepare the frozen official data
+        run: >-
+          python3 -B Tests/Production/prepare_data.py --archive out/data-cache/Orbiter-x64.zip
+          --destination out/production-data
+      - name: Audit fixed epochs and an explicit coverage epoch for wall-clock scenarios
+        run: >-
+          python3 -B Tests/Production/audit_spice.py
+          --executable out/spice-audit/orbiter-spice-data-audit --data out/production-data
+          --default-mjd 61344.5 --report out/spice-audit/coverage.json
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: native-spice-data-coverage
+          retention-days: 30
+          path: |
+            out/spice-audit/*.json
+            out/spice-audit/*.txt

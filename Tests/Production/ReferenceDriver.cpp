@@ -92,6 +92,8 @@ private:
         oapiGetGlobalPos(handle, &position); oapiGetGlobalVel(handle, &velocity);
         oapiGetRotationMatrix(handle, &rotation);
         VESSEL *vessel = oapiGetVesselByName(const_cast<char *>(name)) ? oapiGetVesselInterface(handle) : nullptr;
+        // wx/wy/wz and fuel/ground apply to vessels only. Celbody rows observe
+        // position, velocity, rotation and mass; their other slots are inapplicable.
         if (vessel) vessel->GetAngularVel(omega);
         const double values[] = {position.x, position.y, position.z, velocity.x, velocity.y, velocity.z,
             rotation.m11, rotation.m12, rotation.m13, rotation.m21, rotation.m22, rotation.m23,
