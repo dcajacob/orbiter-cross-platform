@@ -90,19 +90,26 @@ def validate(directory,configuration):
     object_draws=rows(directory/'object-draws.csv')
     require({'PB','ISS'}<={r['object'] for r in object_draws if int(r['mesh_draw_calls'])>0},
             'actual stock vessel geometry was not submitted to OpenGL')
+    planet_tiles=rows(directory/'planet-tiles.csv');archive_reads=rows(directory/'archive-reads.csv')
+    require(any(r['object']=='Earth' and int(r['textured_draw_calls'])>0 for r in planet_tiles),
+            'actual Earth surface tiles were not drawn')
+    require(any('earth' in r['path'].casefold() and r['layer']=='0' and int(r['inflated_bytes'])>0 for r in archive_reads),
+            'real Earth surface archive data was not consumed')
     events=rows(directory/'visual-events.csv')
     require({'PB','ISS','Earth'}<={r['object'] for r in events if r['event']=='register'},'normal engine visual registration missing')
     require({'PB','ISS','Earth'}<={r['object'] for r in events if r['event']=='unregister'},'normal visual teardown missing')
     bindings=json.loads((directory/'mesa-bindings.json').read_text());modules=[]
+    expected_files={name.casefold():entry for name,entry in bindings['runtime']['files'].items()}
+    effective_bindings={name.casefold():entry for name,entry in bindings['bindings'].items()}
     system=Path(os.environ['SystemRoot']).resolve();names=set()
     for line in (directory/'renderer-modules.txt').read_text().splitlines():
         path=Path(line).resolve();names.add(path.name.casefold())
         if path.suffix.lower()!='.dll':continue
         require(directory.resolve() in path.parents or system in path.parents,'unrecorded external runtime DLL: '+str(path))
         entry=dict(path=str(path),sha256=digest(path));modules.append(entry)
-        expected=bindings['runtime']['files'].get(path.name)
+        expected=expected_files.get(path.name.casefold())
         if expected:
-            checksum=bindings['bindings'].get(path.name,{}).get('effective_sha256',expected['sha256'])
+            checksum=effective_bindings.get(path.name.casefold(),{}).get('effective_sha256',expected['sha256'])
             require(path.parent==directory.resolve() and entry['sha256']==checksum,'actual loaded Mesa binding differs: '+path.name)
     require({'opengl32.dll','libgallium_wgl.dll','oglclient.dll','shuttlepb.dll'}<=names,'required actual client/vessel/driver DLL was not loaded')
     assets={}
@@ -117,7 +124,7 @@ def validate(directory,configuration):
     raw=(directory/'scene.rgba').read_bytes();png(directory/'scene.png',raw,1280,720)
     require(len(set(raw[::4]))>16,'scene readback is a blank or trivial image')
     report=dict(status='passed real Windows production scene',renderer=info,geometry=summary,lifecycle=lifecycle,
-                objects=scene,object_draws=object_draws,asset_sha256=assets,loaded_modules=modules,
+                objects=scene,object_draws=object_draws,planet_tiles=planet_tiles,archive_reads=archive_reads,asset_sha256=assets,loaded_modules=modules,
                 simulation_comparison=numerical_reference(directory,configuration),image_sha256=digest(directory/'scene.png'))
     (directory/'client-report.json').write_text(json.dumps(report,indent=2)+'\n');return report
 

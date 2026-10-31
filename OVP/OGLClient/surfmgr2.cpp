@@ -20,6 +20,7 @@
 #include "OGLCamera.h"
 #include "Scene.h"
 #include "Renderer.h"
+#include "Evidence.h"
 #include <cstring>
 
 // =======================================================================
@@ -572,6 +573,7 @@ void SurfTile::Render ()
 	Renderer::PushLights();
 
 	glDrawElements(GL_TRIANGLES, mesh->IBO->GetCount(), GL_UNSIGNED_SHORT, 0);
+    Evidence::PlanetTile(mgr->Cbody(),mesh->IBO->GetCount());
 	Renderer::CheckError("SurfTile::Render glDrawElements");
 	mesh->VAO->UnBind();
 	Renderer::Unbind(tileShader);

@@ -135,6 +135,7 @@ void GlobalInit(int w, int h) {
     current_viewport[2] = w;
     current_viewport[3] = h;
     current_shader = 0;
+    glViewport(0,0,w,h);
 }
 
 void GlobalExit() {
@@ -206,6 +207,7 @@ void SetViewPort(int w, int h)
     assert(lastFBParams.size() == 0);
     current_viewport[2] = w;
     current_viewport[3] = h;
+    glViewport(current_viewport[0],current_viewport[1],w,h);
 }
 
 void PopRenderTarget() {

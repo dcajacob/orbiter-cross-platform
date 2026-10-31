@@ -23,6 +23,8 @@
 #include "imgui.h"
 #include "imgui_impl_opengl3.h"
 #include <stdexcept>
+#include <fstream>
+#include <cstdlib>
 #include <vector>
 
 namespace {
@@ -87,7 +89,13 @@ void OGLClient::clbkDestroyRenderWindow(bool fastclose) {
 }
 bool OGLClient::clbkDisplayFrame() {
     // Read back the complete application frame, after Output2DData and ImGui.
-    Evidence::Frame();
+    try { Evidence::Frame(); }
+    catch(const std::exception &error) {
+        oapiWriteLog(const_cast<char *>(error.what()));
+        std::ofstream failure("graphics-failure.txt");failure<<error.what()<<'\n';failure.close();
+        // Evidence capture is test-only; its failure must remain a nonzero run.
+        std::exit(EXIT_FAILURE);
+    }
     bool success=mDC && SwapBuffers(mDC);
     if(success)Evidence::Presented();
     else oapiWriteLog(const_cast<char *>("OpenGL frame presentation failed"));

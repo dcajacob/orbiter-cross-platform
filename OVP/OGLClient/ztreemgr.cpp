@@ -205,6 +205,7 @@ int ZTreeMgr::ReadData(int idx, uint8_t **outp)
 		delete []ebuf;
 		ebuf = 0;
 	}
+    if(ndata>0)Evidence::ArchiveRead(path,int(layer),unsigned(ndata));
 	*outp = ebuf;
 	return ndata;
 }

@@ -23,6 +23,8 @@ std::ofstream events,assets;
 std::set<std::string> seen;
 std::map<std::string,unsigned> objectDraws;
 std::string currentObject;
+std::map<std::string,std::pair<unsigned,uint64_t>> planetTiles;
+std::map<std::pair<std::string,int>,uint64_t> archiveReads;
 std::string name(OBJHANDLE h) { char value[256]{};oapiGetObjectName(h,value,sizeof(value));return value; }
 std::ofstream output(const char *path) { std::ofstream f(path,std::ios::binary);f.imbue(std::locale::classic());f<<std::setprecision(17);if(!f)throw std::runtime_error("cannot write graphics evidence");return f; }
 LONG CALLBACK fault(EXCEPTION_POINTERS *exception) {
@@ -53,7 +55,7 @@ void APIENTRY debugMessage(GLenum,GLenum type,GLuint,GLenum,GLsizei,const GLchar
 }
 }
 void Begin() {
-    enabled=std::filesystem::is_regular_file("ogl-evidence.enabled");frames=draws=presents=0;indices=0;seen.clear();objectDraws.clear();currentObject.clear();
+    enabled=std::filesystem::is_regular_file("ogl-evidence.enabled");frames=draws=presents=0;indices=0;seen.clear();objectDraws.clear();currentObject.clear();planetTiles.clear();archiveReads.clear();
     if(!enabled)return;
     captured=false;
     setvbuf(stdout,nullptr,_IONBF,0);
@@ -82,12 +84,16 @@ void Visual(const char *event,OBJHANDLE object) {
 void Asset(const char *path) { if(enabled && path && seen.insert(path).second){assets<<path<<'\n';assets.flush();} }
 void Object(OBJHANDLE object) { if(enabled)currentObject=object?name(object):std::string(); }
 void Draw(unsigned vertices,unsigned count) { if(enabled){++draws;indices+=count;if(!currentObject.empty())++objectDraws[currentObject];} }
+void PlanetTile(OBJHANDLE object,unsigned count) {
+    if(enabled){auto &tile=planetTiles[name(object)];++tile.first;tile.second+=count;}
+}
+void ArchiveRead(const char *path,int layer,unsigned bytes) { if(enabled && bytes)archiveReads[{path,layer}]+=bytes; }
 void Rendered() { if(enabled)++frames; }
 void Frame() {
     if(!enabled || captured || frames!=50)return;
     captured=true;
     GLint viewport[4]{};glGetIntegerv(GL_VIEWPORT,viewport);
-    if(viewport[2]!=1280 || viewport[3]!=720)throw std::runtime_error("unexpected real-client evidence viewport");
+    if(viewport[2]!=1280 || viewport[3]!=720)throw std::runtime_error("unexpected real-client evidence viewport: "+std::to_string(viewport[2])+"x"+std::to_string(viewport[3]));
     std::vector<unsigned char> pixels(size_t(viewport[2])*viewport[3]*4);
     glBindFramebuffer(GL_FRAMEBUFFER,0);glReadBuffer(GL_BACK);glPixelStorei(GL_PACK_ALIGNMENT,1);
     glReadPixels(0,0,viewport[2],viewport[3],GL_RGBA,GL_UNSIGNED_BYTE,pixels.data());
@@ -126,6 +132,10 @@ void Frame() {
     auto summary=output("scene-summary.json");summary<<"{\"frames\":"<<frames<<",\"mesh_draw_calls\":"<<draws<<",\"indices\":"<<indices<<",\"width\":1280,\"height\":720}\n";
     auto objects=output("object-draws.csv");objects<<"object,mesh_draw_calls\n";
     for(auto &entry:objectDraws)objects<<entry.first<<','<<entry.second<<'\n';
+    auto planets=output("planet-tiles.csv");planets<<"object,textured_draw_calls,indices\n";
+    for(auto &entry:planetTiles)planets<<entry.first<<','<<entry.second.first<<','<<entry.second.second<<'\n';
+    auto archives=output("archive-reads.csv");archives<<"path,layer,inflated_bytes\n";
+    for(auto &entry:archiveReads)archives<<entry.first.first<<','<<entry.first.second<<','<<entry.second<<'\n';
     events.flush();assets.flush();
 }
 }
