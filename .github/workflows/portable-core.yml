@@ -6,6 +6,9 @@ on:
   pull_request:
     paths:
       - 'Src/Orbiter/**'
+      - 'Src/ClientNative/**'
+      - 'Portable/**'
+      - 'CMakeLists.txt'
       - 'Orbitersdk/include/**'
       - 'Tests/**'
       - '.github/workflows/portable-core.yml'
@@ -37,6 +40,11 @@ jobs:
         with:
           vsversion: '17.0'
           arch: x64
+      - name: Install Linux graphics build and software-rendering dependencies
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libwayland-dev libxkbcommon-dev xorg-dev xvfb libgl1-mesa-dri
       - name: Configure
         shell: bash
         run: |
@@ -44,7 +52,8 @@ jobs:
           cmake -S Tests/Portable -B out/portable -G Ninja \
             -DCMAKE_CXX_COMPILER=${{ matrix.os == 'windows-2022' && 'cl' || 'g++' }} \
             -DCMAKE_BUILD_TYPE=${{ matrix.configuration }} \
-            -DORBITER_PORTABLE_COLLISION_TESTS=ON 2>&1 | tee configure.log
+            -DORBITER_PORTABLE_COLLISION_TESTS=ON -DORBITER_BUILD_VIEWER=ON \
+            -DORBITER_GRAPHICS_TESTS=${{ runner.os == 'Linux' && 'ON' || 'OFF' }} 2>&1 | tee configure.log
       - name: Build
         shell: bash
         run: |
@@ -54,7 +63,38 @@ jobs:
         shell: bash
         run: |
           set -o pipefail
-          ctest --test-dir out/portable --output-on-failure 2>&1 | tee ctest.log
+          if [ "$RUNNER_OS" = "Linux" ]; then
+            LIBGL_ALWAYS_SOFTWARE=1 xvfb-run -a -s "-screen 0 1280x800x24" \
+              ctest --test-dir out/portable --output-on-failure 2>&1 | tee ctest.log
+          else
+            ctest --test-dir out/portable --output-on-failure 2>&1 | tee ctest.log
+          fi
+      - name: Install standalone bundle
+        shell: bash
+        run: cmake --install out/portable --prefix out/install
+      - name: Check installed Linux executable outside the checkout
+        if: runner.os == 'Linux'
+        shell: bash
+        run: |
+          set -o pipefail
+          install_root="$PWD/out/install"
+          cd "$RUNNER_TEMP"
+          LIBGL_ALWAYS_SOFTWARE=1 xvfb-run -a "$install_root/bin/orbiter-native" \
+            --scenario "$install_root/share/orbiter/TwoBody/TwoBody.scn" \
+            --smoke-test --hidden --backend x11 --trace "$install_root/installed.csv" \
+            --report "$install_root/installed.json"
+      - name: Package standalone bundle with executable permissions
+        shell: bash
+        run: |
+          bundle_archive="$PWD/out/orbiter-native-${{ matrix.os }}-${{ matrix.configuration }}-x64.tar.gz"
+          cd out/install
+          cmake -E tar czf "$bundle_archive" --format=gnutar .
+      - name: Save native client bundle
+        uses: actions/upload-artifact@v7
+        with:
+          name: orbiter-native-${{ matrix.os }}-${{ matrix.configuration }}-x64
+          retention-days: 14
+          path: out/orbiter-native-*.tar.gz
       - name: Save build and test evidence
         if: always()
         uses: actions/upload-artifact@v7
@@ -69,6 +109,8 @@ jobs:
             out/portable/Testing/Temporary/*.log
             out/portable/traces/*.csv
             out/portable/traces/*.json
+            out/portable/graphics/**
+            out/install/installed.*
 
   windows-application:
     name: Windows application ${{ matrix.configuration }} frozen-reference verification
