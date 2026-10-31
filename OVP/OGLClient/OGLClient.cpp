@@ -458,7 +458,7 @@ void OGLClient::clbkRenderScene ()
 //	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 //	CheckError("glClear");
 	mScene->Render();
-    Evidence::Frame();
+    Evidence::Rendered();
 }
 
 /**

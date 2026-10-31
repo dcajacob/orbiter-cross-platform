@@ -61,7 +61,7 @@ vec3 lumaBasedReinhardToneMapping(vec3 color)
 	//const float gamma=2.2;
 	float luma = dot(color, vec3(0.2126, 0.7152, 0.0722));
 	float toneMappedLuma = 1.3 * luma / (1. + luma);
-	color *= toneMappedLuma / luma;
+	color *= (luma > 0.0 ? toneMappedLuma / luma : 0.0);
 	//color = pow(color, vec3(1. / gamma));
 	return color;
 }

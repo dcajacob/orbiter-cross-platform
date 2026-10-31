@@ -625,7 +625,9 @@ void Scene::Render ()
 		if (!pv->vobj->IsActive()) continue;
 		OBJHANDLE hObj = pv->vobj->Object();
 		if (oapiGetObjectType (hObj) == OBJTP_VESSEL) {
-			pv->vobj->Render ();
+			Evidence::Object(hObj);
+            pv->vobj->Render ();
+            Evidence::Object(nullptr);
 			if (hObj == hFocus) vFocus = (vVessel*)pv->vobj; // remember focus visual
 			
 			if ((markermode & (MKR_ENABLE|MKR_VMARK)) == (MKR_ENABLE|MKR_VMARK)) {

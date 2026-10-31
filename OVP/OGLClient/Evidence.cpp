@@ -1,4 +1,3 @@
-#define ORBITER_MODULE
 #include "glad.h"
 #include "Evidence.h"
 #include "OGLClient.h"
@@ -8,22 +7,26 @@
 #include <iomanip>
 #include <locale>
 #include <set>
+#include <map>
 #include <stdexcept>
 #include <vector>
 
 namespace Evidence {
 namespace {
-bool enabled=false;
+bool enabled=false,captured=false;
 unsigned frames=0,draws=0,presents=0;
 uint64_t indices=0;
 std::ofstream events,assets;
 std::set<std::string> seen;
+std::map<std::string,unsigned> objectDraws;
+std::string currentObject;
 std::string name(OBJHANDLE h) { char value[256]{};oapiGetObjectName(h,value,sizeof(value));return value; }
 std::ofstream output(const char *path) { std::ofstream f(path,std::ios::binary);f.imbue(std::locale::classic());f<<std::setprecision(17);if(!f)throw std::runtime_error("cannot write graphics evidence");return f; }
 }
 void Begin() {
-    enabled=std::filesystem::is_regular_file("ogl-evidence.enabled");frames=draws=presents=0;indices=0;seen.clear();
+    enabled=std::filesystem::is_regular_file("ogl-evidence.enabled");frames=draws=presents=0;indices=0;seen.clear();objectDraws.clear();currentObject.clear();
     if(!enabled)return;
+    captured=false;
     events=output("visual-events.csv");events<<"frame,event,object,type\n";
     assets=output("loaded-assets.txt");
     auto info=output("renderer-info.json");
@@ -44,11 +47,12 @@ void Visual(const char *event,OBJHANDLE object) {
     if(enabled){events<<frames<<','<<event<<','<<name(object)<<','<<oapiGetObjectType(object)<<'\n';events.flush();}
 }
 void Asset(const char *path) { if(enabled && path && seen.insert(path).second){assets<<path<<'\n';assets.flush();} }
-void Draw(unsigned vertices,unsigned count) { if(enabled){++draws;indices+=count;} }
+void Object(OBJHANDLE object) { if(enabled)currentObject=object?name(object):std::string(); }
+void Draw(unsigned vertices,unsigned count) { if(enabled){++draws;indices+=count;if(!currentObject.empty())++objectDraws[currentObject];} }
+void Rendered() { if(enabled)++frames; }
 void Frame() {
-    if(!enabled)return;
-    ++frames;
-    if(frames!=50)return;
+    if(!enabled || captured || frames!=50)return;
+    captured=true;
     GLint viewport[4]{};glGetIntegerv(GL_VIEWPORT,viewport);
     if(viewport[2]!=1280 || viewport[3]!=720)throw std::runtime_error("unexpected real-client evidence viewport");
     std::vector<unsigned char> pixels(size_t(viewport[2])*viewport[3]*4);
@@ -87,6 +91,8 @@ void Frame() {
           <<p.x<<','<<p.y<<','<<p.z<<','<<d.x<<','<<d.y<<','<<d.z<<','<<oapiCameraAperture();
     for(double value:r.data)camera<<','<<value;camera<<'\n';
     auto summary=output("scene-summary.json");summary<<"{\"frames\":"<<frames<<",\"mesh_draw_calls\":"<<draws<<",\"indices\":"<<indices<<",\"width\":1280,\"height\":720}\n";
+    auto objects=output("object-draws.csv");objects<<"object,mesh_draw_calls\n";
+    for(auto &entry:objectDraws)objects<<entry.first<<','<<entry.second<<'\n';
     events.flush();assets.flush();
 }
 }

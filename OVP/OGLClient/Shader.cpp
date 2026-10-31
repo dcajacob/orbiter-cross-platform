@@ -104,6 +104,8 @@ Shader::Shader(const std::string& vertexFile, const std::string& fragmentFile)
 
     glDetachShader(ShaderID, vertexShader);
     glDetachShader(ShaderID, fragmentShader);
+    glDeleteShader(vertexShader);
+    glDeleteShader(fragmentShader);
 }
 
 Shader::~Shader()

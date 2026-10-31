@@ -87,6 +87,9 @@ def validate(directory,configuration):
     require({'PB','ISS'}<={r['object'] for r in vessels},'real stock vessel visuals/meshes missing')
     require(all(int(r['groups'])>0 and int(r['materials'])>0 and int(r['textures'])>0 for r in vessels),'stock mesh/material/texture content missing')
     require({'Sun','Earth','Moon'}<={r['object'] for r in scene},'production Sol object graph missing')
+    object_draws=rows(directory/'object-draws.csv')
+    require({'PB','ISS'}<={r['object'] for r in object_draws if int(r['mesh_draw_calls'])>0},
+            'actual stock vessel geometry was not submitted to OpenGL')
     events=rows(directory/'visual-events.csv')
     require({'PB','ISS','Earth'}<={r['object'] for r in events if r['event']=='register'},'normal engine visual registration missing')
     require({'PB','ISS','Earth'}<={r['object'] for r in events if r['event']=='unregister'},'normal visual teardown missing')
@@ -114,7 +117,7 @@ def validate(directory,configuration):
     raw=(directory/'scene.rgba').read_bytes();png(directory/'scene.png',raw,1280,720)
     require(len(set(raw[::4]))>16,'scene readback is a blank or trivial image')
     report=dict(status='passed real Windows production scene',renderer=info,geometry=summary,lifecycle=lifecycle,
-                objects=scene,asset_sha256=assets,loaded_modules=modules,
+                objects=scene,object_draws=object_draws,asset_sha256=assets,loaded_modules=modules,
                 simulation_comparison=numerical_reference(directory,configuration),image_sha256=digest(directory/'scene.png'))
     (directory/'client-report.json').write_text(json.dumps(report,indent=2)+'\n');return report
 

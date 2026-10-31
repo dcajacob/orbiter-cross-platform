@@ -171,18 +171,20 @@ pins the matching upstream release package by GitHub's published SHA256 and
 binaries/modules/configuration over the source build. Offline verification is
 available with `--verify-only`. This test provisioner is not the final resumable
 asset installer. The upstream `latest` asset URL can disappear or be replaced;
-a different hash fails explicitly. Durable versioned release storage and complete
-stock-data redistribution/license review remain unresolved release inputs.
+a different hash fails explicitly. The audited versioned mirror described below
+preserves these consumed data bytes and excludes the restricted Architext font.
+The final asset installer and packaged font policy remain later release work.
 
 Candidate output directories must not exist before capture. Initial orbit and
 propulsion references are now [explicitly accepted and frozen](../../Tests/Production/Reference/README.md)
 from hosted source `e70041fa`: repeats are byte-identical, Debug/Release errors are
 zero and independent fuel accounting passes. Normal CI verifies the current
 application against that evidence using `--reference`; no script writes or
-refreshes an accepted reference automatically. Atmosphere,
-contact/docking, autopilot, time controls, object lifetime and persistence
-reference cases remain pending. Phase 1 is not declared complete merely because
-orbit/propulsion candidates or the WGL probe pass.
+refreshes an accepted reference automatically. These initial references did not
+load the atmosphere modules at their install locations and do not validate
+atmospheric behavior. The separately frozen fourteen-case behavior suite below
+loads those source-built modules explicitly and completes the remaining Phase 1
+coverage, including contact/docking, autopilot, clocks, lifetime and persistence.
 
 [The final verification run](https://github.com/dcajacob/orbiter-cross-platform/actions/runs/41189526342)
 passes this immutable-reference path in both Windows configurations. Current

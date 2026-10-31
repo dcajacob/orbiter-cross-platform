@@ -1,6 +1,5 @@
 // Copyright (c) Orbiter contributors. Licensed under the MIT License.
 // Win32/WGL ownership and the unchanged Windows GraphicsClient interface.
-#define ORBITER_MODULE
 #include "glad.h"
 #include "OGLClient.h"
 #include "Scene.h"
@@ -87,6 +86,8 @@ void OGLClient::clbkDestroyRenderWindow(bool fastclose) {
     hRenderWnd=nullptr;
 }
 bool OGLClient::clbkDisplayFrame() {
+    // Read back the complete application frame, after Output2DData and ImGui.
+    Evidence::Frame();
     bool success=mDC && SwapBuffers(mDC);
     if(success)Evidence::Presented();
     else oapiWriteLog(const_cast<char *>("OpenGL frame presentation failed"));
