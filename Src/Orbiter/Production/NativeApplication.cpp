@@ -78,7 +78,7 @@ struct Runtime final:BodyServices,RigidBodyServices,SurfaceServices,NavigationSe
             else if(command.action=="nav") {if(value<1 || value>7 || value!=int(value))throw std::runtime_error("Invalid autopilot mode");v->ActivateNavmode(int(value));}
             else if(command.action=="navreset") {for(int mode=1;mode<=7;++mode)v->DeactivateNavmode(mode);}
             else if(command.action=="warp") SetWarpFactor(value);
-            else if(command.action=="pause") {if(value!=0 && value!=1)throw std::runtime_error("Invalid pause command");running=value==0;}
+            else if(command.action=="pause") {if(value!=0 && value!=1)throw std::runtime_error("Invalid pause command");running=value==0;render.paused=!running;}
             else if(command.action=="undock") {if(value<0 || value>=v->DockCount() || std::floor(value)!=value)throw std::runtime_error("Invalid docking port");if(!v->Undock(int(value)))throw std::runtime_error("Replay undocking failed");}
             else if(command.action=="save") Save();
             else if(command.action.rfind("rcs",0)==0) {
@@ -111,7 +111,7 @@ struct Runtime final:BodyServices,RigidBodyServices,SurfaceServices,NavigationSe
             auto code=UInt32(event.code);
             auto& keymap=controls.keymap;
             if(event.down) {
-                if(code==OAPI_KEY_SPACE || keymap.IsLogicalKey(code,snapshot.keys.data(),OAPI_LKEY_Pause)) {running=!running;continue;}
+                if(code==OAPI_KEY_SPACE || keymap.IsLogicalKey(code,snapshot.keys.data(),OAPI_LKEY_Pause)) {running=!running;render.paused=!running;continue;}
                 if(keymap.IsLogicalKey(code,snapshot.keys.data(),OAPI_LKEY_Quicksave)) {savePending=true;continue;}
                 if(code==OAPI_KEY_F5 && !KEYMOD_CONTROL(snapshot.keys.data())) {reloadPending=true;continue;}
                 if(code==OAPI_KEY_F6 && !KEYMOD_CONTROL(snapshot.keys.data())) {stepOnce=true;continue;}
@@ -361,7 +361,7 @@ struct Runtime final:BodyServices,RigidBodyServices,SurfaceServices,NavigationSe
         Session::UpdateWorld(*this,time,running,playback,updating,force);
         Session::EndTimeStep(*this,time,running,active,force);
         if(!wasRunning)running=false;
-        input.throttle=-1;Commands("after");if(savePending){Save();savePending=false;}++inputTick;
+        input.throttle=-1;Commands("after");render.paused=!running;if(savePending){Save();savePending=false;}++inputTick;
     }
 };
 }
@@ -402,7 +402,7 @@ int main(int argc,char** argv) {
             application.savePath=save;application.Initialize(absolute("--config"),scenario,output,capture);
             if(arguments.count("--keymap") && (!std::filesystem::is_regular_file(absolute("--keymap")) || !application.controls.keymap.Read(absolute("--keymap").string().c_str())))throw std::runtime_error("Cannot load explicit flight keymap");
             if(arguments.count("--replay"))application.replay.Load(absolute("--replay"));
-            application.time.SetFixedStep(fixed);application.running=startRunning;
+            application.time.SetFixedStep(fixed);application.running=startRunning;application.render.paused=!application.running;
             std::cout<<"Production ShuttlePB flight. Space/Ctrl-P: pause. T/R: warp. Ctrl-S: save. F5: reload. F6: step. Escape: close.\n";
             FlightClock clock(fixed);auto previous=std::chrono::steady_clock::now();
             int presented=0;bool reload=false;
@@ -428,7 +428,7 @@ int main(int argc,char** argv) {
                 }
                 if(application.reloadPending) {if(!std::filesystem::is_regular_file(save)){std::cerr<<"No saved scenario exists: "<<save<<'\n';application.reloadPending=false;}else{scenario=save;reload=true;break;}}
                 if(input.width>0 && input.height>0) {
-                    application.render.graphics->Status(application.Status());application.render.graphics->Render();if(!application.render.graphics->Present())throw std::runtime_error("Native frame presentation failed");++presented;
+                    application.render.paused=!application.running;application.render.graphics->Status(application.Status());application.render.graphics->Render();if(!application.render.graphics->Present())throw std::runtime_error("Native frame presentation failed");++presented;
                 } else std::this_thread::sleep_for(std::chrono::milliseconds(10));
             }
             if((ticks || frames) && !application.replay.Empty())throw std::runtime_error("Unconsumed flight replay commands");
