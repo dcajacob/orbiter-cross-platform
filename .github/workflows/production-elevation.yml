@@ -1,0 +1,93 @@
+name: Original Production Windows Terrain
+on:
+  push:
+    branches: ['codex/production-**']
+    paths: ['Tests/Production/Elevation/**', '.github/workflows/production-elevation.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  observe:
+    name: Original terrain Windows ${{ matrix.configuration }} x64
+    runs-on: windows-2022
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        configuration: [Debug, Release]
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - uses: ilammy/msvc-dev-cmd@v1
+        with:
+          vsversion: '17.0'
+          arch: x64
+      - uses: actions/download-artifact@v8
+        with:
+          name: production-runtime-${{ matrix.configuration }}-x64
+          run-id: 41286856235
+          github-token: ${{ github.token }}
+          path: out/runtime-package
+      - name: Unpack original production application and SDK
+        run: python -m zipfile -e out/runtime-package/windows-test-runtime.zip out/runtime
+      - name: Compile read-only observer against that exact SDK
+        shell: pwsh
+        run: |
+          cmake -S Tests/Production/Elevation -B out/elevation-observer -G Ninja -DCMAKE_BUILD_TYPE=${{ matrix.configuration }} "-DORBITER_TEST_RUNTIME:PATH=$pwd/out/runtime" 2>&1 | Tee-Object terrain-configure.log
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          cmake --build out/elevation-observer --parallel 2 2>&1 | Tee-Object terrain-build.log
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          cmd /c "cl 2>&1 & exit /b 0" | Out-File terrain-compiler.txt
+      - uses: actions/cache@v6
+        with:
+          path: out/data-cache/Orbiter-x64.zip
+          key: production-data-${{ hashFiles('Tests/Production/stock-data.lock.json') }}
+      - uses: actions/cache@v6
+        with:
+          path: out/planet-cache/Orbiter2016.zip
+          key: production-standard-planets-${{ hashFiles('Tests/Production/standard-planets.lock.json') }}
+      - name: Verify original production and planet data
+        shell: pwsh
+        run: |
+          python Tests/Production/prepare_data.py --archive out/data-cache/Orbiter-x64.zip --destination out/data
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          python Tests/Production/prepare_data.py --lock Tests/Production/standard-planets.lock.json --archive out/planet-cache/Orbiter2016.zip --destination out/planets
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - name: Observe real terrain height and normals through original production API
+        run: >-
+          python Tests/Production/Elevation/capture.py --runtime out/runtime --data out/data
+          --planets out/planets --output out/elevation-observation --configuration ${{ matrix.configuration }}
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: original-terrain-${{ matrix.configuration }}-x64
+          retention-days: 90
+          path: |
+            terrain-*.log
+            terrain-compiler.txt
+            out/elevation-observation/*.json
+            out/elevation-observation/*.csv
+            out/elevation-observation/**/Orbiter.log
+            out/elevation-observation/**/console.txt
+  compare:
+    name: Original terrain Debug/Release comparison
+    needs: observe
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/download-artifact@v8
+        with:
+          pattern: original-terrain-*-x64
+          path: out/evidence
+      - run: >-
+          python3 -B Tests/Production/Elevation/compare_windows.py
+          --debug out/evidence/original-terrain-Debug-x64/out/elevation-observation
+          --release out/evidence/original-terrain-Release-x64/out/elevation-observation
+          --report terrain-original-comparison.json
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: original-terrain-comparison
+          path: terrain-original-comparison.json

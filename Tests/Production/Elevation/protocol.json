@@ -1,0 +1,30 @@
+{
+  "schema": 1,
+  "automatic_refresh": false,
+  "runtime_source": "2e8bbbf24f5cf53e3e6dadd33fe8ef000748b3cc",
+  "scope": "Original production elevation queries; real Sol/Earth/Moon/Mars archives, linear/cubic interpolation, external/local cache, heights/normals/levels. Not a renderer or native-world gate.",
+  "budgets": {
+    "elevation_m": 1e-06,
+    "normal_components": 1e-10
+  },
+  "samples_per_mode": 2040,
+  "modes": [
+    1,
+    2
+  ],
+  "inputs_sha256_lf": {
+    "Tests/Production/Elevation/Observe.cpp": "ab4f124a8432347d12af000ea26330bebbad15711c2c58d20be1ccf316393a1c",
+    "Tests/Production/Elevation/CMakeLists.txt": "be2a5eac18dbdebcff601d5e5d2cb3f7a121d6290c577e95c0e3c8a1f615e8f0",
+    "Tests/Production/Elevation/points.csv": "5bbc2a77a2cfaf855c5153dea7286439b813fdb9c726e4c57595012287b826aa",
+    "Tests/Production/Fixtures/Orbiter.cfg": "eed4bb294b9f868822399439ee625ee8108e07e6bf8019217daef16e92e5ddde",
+    "Tests/Production/Fixtures/Sol-ISS-ShuttlePB.scn": "bcd836d4f80d5c85cf71e132830a23b5ab47607a9a5c00f498b19bf645459783",
+    "Tests/Production/stock-data.lock.json": "155fb89d22d58af113da6ff662904d74f82bbbbb7b9deb5e654b7c7141e27620",
+    "Tests/Production/standard-planets.lock.json": "de0366be8f138b11135e5f675cc44ae0d4cf9a8b11fe0f71772ad617237185c4"
+  },
+  "production_source_sha256_lf": {
+    "Src/Orbiter/elevmgr.cpp": "52193a03ba2e41269b8a4458fd2391d5b9f427b090b777cd053b250259443bd0",
+    "Src/Orbiter/elevmgr.h": "de3ab89582be051228e5c26e6ce3d4dfffc6f44d9ac0b80e3b346604b3c5f6df",
+    "Src/Orbiter/Planet.cpp": "5636b25669596ea2523175f6ebbf016e0659ec4e6f752a8e8f5ef8c6fdcac926",
+    "Src/Orbiter/OrbiterAPI.cpp": "61acb3ba908226079c6faa72ff75a6eee83fa991fe8a3184286a71116f2a2d2e"
+  }
+}
