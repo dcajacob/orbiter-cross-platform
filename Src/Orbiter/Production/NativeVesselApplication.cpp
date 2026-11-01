@@ -4,6 +4,7 @@
 #include "Vessel.h"
 #include "Config.h"
 #include "NativeGraphics.h"
+#include "FlightControls.h"
 #include "NativeParticle.h"
 #include "RigidBodyServices.h"
 #include "GeometryConversions.h"
@@ -23,7 +24,7 @@ int Vessel::ConsumeBufferedKey(oapi::UInt32 key,bool down,char* state)
         if(result) return result;
     }
     if(!down) return 0;
-    unavailable("default buffered flight keys");
+    return GetFlightControls().DefaultBuffered(*this,key,down,state);
 }
 void Vessel::DrawHUD(HUD*,oapi::Sketchpad*) {unavailable("HUD drawing");}
 void Vessel::RenderHUD(HUD*,int,HUDPAINTSPEC*,SURFHANDLE) {unavailable("HUD rendering");}

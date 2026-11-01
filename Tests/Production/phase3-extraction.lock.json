@@ -2,7 +2,7 @@
   "schema": 1,
   "production_source": "38b7c627878ea893390675616897071f8bb8e90f",
   "observed_source": "684bd5b27005feecfa9effe796bd216f85e3392f",
-  "scope": "Shared production Body, RigidBody, CelestialBody, Star, Planet, Base, BaseObject, actual PlanetarySystem loading/lifecycle through explicit real-vessel adapters, VesselBase surface/contact calculations, original propagators, actual Pines nonspherical gravity, CPU Mesh/MeshManager, fixed-width planetary archives, scenario environment/focus metadata production Config settings, frame ordering and authoritative world object ownership; platform services, indexed resources and an internal native module bootstrap and actual native SPICE/atmosphere interfaces; verbatim SDK mesh/celestial/visual value records and constants with original Windows declaration/layout checks. Full production world/module SDK extraction remains incomplete. Original production Vessel, SDK vessel delegates, lights, recorder and source-built ShuttlePB now execute through explicit native services; headless numerical components only, camera/rendering application integration remains pending. Actual native production Camera, shared Session/WorldOwner external-view host, checked native graphics contract and original celestial-sphere/drawing algorithms. The separate OpenGL module is verified on the real laptop; general application/cockpit/input/Lua/module integration remains incomplete.",
+  "scope": "Original production world/body/rigid-body propagation, celestial/planet/base/vessel dynamics, CPU mesh and terrain archives, explicit platform services, indexed resources and checked source-built SPICE/atmosphere/ShuttlePB modules. Original Camera and Session/WorldOwner ordering, native external graphics contract and shared drawing/celestial-sphere algorithms. Native flight host with fixed real-time ticks, original key mapping and immediate/buffered/joystick directional controls, stock docking and serialization. Windows SDK types/layouts/exports are preserved. General application modules, cockpit/instrumentation, Lua and full stock compatibility remain incomplete. Numerical/image references and budgets remain immutable; runtime gates are separate from source conservation.",
   "required_runtime_gates": [
     "frozen two-body reference",
     "frozen production orbit/propulsion",
@@ -343,7 +343,7 @@
       "original_sha256_lf": null
     },
     "Src/Orbiter/Production/CMakeLists.txt": {
-      "sha256_lf": "82c2e799c1524d4160f4d48e5cb135bedffb2e49fb1ce93da6fe4791f81e2b9e",
+      "sha256_lf": "d5dd08301fe1d0c4b551ae8842a213bff3ec3a802a7ac4456cc15a2b1a977399",
       "original_sha256_lf": null
     },
     "Src/Orbiter/Production/CameraServices.cpp": {
@@ -432,7 +432,7 @@
     },
     "Src/Orbiter/Production/NativeApplication.cpp": {
       "original_sha256_lf": null,
-      "sha256_lf": "ae877943608e81d66aaa14f0456e890ad246401f6e7868ace894a74f67ad5c06"
+      "sha256_lf": "a236b5e13cfbca50ca25e79c4f03e2036699ac1f32437c2eabe70bebb475494f"
     },
     "Src/Orbiter/Production/NativeBuild.h.in": {
       "sha256_lf": "46385229425b50b4edfe7eb877c5c4278e718f50e276130f0354a6d51cb70511",
@@ -476,7 +476,7 @@
     },
     "Src/Orbiter/Production/NativeGraphics.h": {
       "original_sha256_lf": null,
-      "sha256_lf": "80dc605897aef53d32946f291876285d098c0b98d4a77a4c2e5efc4852b6b26b"
+      "sha256_lf": "e38570857f3b7ae34e7ca00bf29f597ec266aaef02634ed97a25bc9e4c19508c"
     },
     "Src/Orbiter/Production/NativeModule.cpp": {
       "sha256_lf": "d90fc24038e5acf5c20329c08ac433c94fb4603811e7a1fc9aaf38eedb59e82a",
@@ -504,7 +504,7 @@
     },
     "Src/Orbiter/Production/NativeVesselApplication.cpp": {
       "original_sha256_lf": null,
-      "sha256_lf": "be2f7b0e7827bf7ae51f5d1d63b29c2ec2648aa7465425d1b6950152fbe546ad"
+      "sha256_lf": "07bdcfee774257d062c697a0195757fb49cc808ef3cb3a34d0fe689157d052ad"
     },
     "Src/Orbiter/Production/NativeVesselFactory.h": {
       "original_sha256_lf": null,
@@ -520,7 +520,7 @@
     },
     "Src/Orbiter/Production/NativeVessels.cmake": {
       "original_sha256_lf": null,
-      "sha256_lf": "9fe191f049ea2e3f0a59539cf41bfbb00f181eaff93e494ea03b5b04d9bad22e"
+      "sha256_lf": "06b656c2ccd06d2c5900ed54e6237fb0e4db1f123f487066d9249e07ae4dcc86"
     },
     "Src/Orbiter/Production/NativeWorldVesselServices.cpp": {
       "original_sha256_lf": null,
@@ -913,6 +913,38 @@
     "Src/Vessel/ShuttlePB/ShuttlePB.cpp": {
       "original_sha256_lf": "126cc5aa4e2f6ca96c478660fb47b4a4e23f1daa5f28911fff7a95cf25c3cf7a",
       "sha256_lf": "c46bc345a45e28446833ee951eb4e8f1dd856a336b84104816e47317df00ff23"
+    },
+    "Src/Orbiter/Keymap.cpp": {
+      "original_sha256_lf": "41a0833a1dbe7a362adaf7f138311f1d8da27f2a23cb60e41aafe1e833cb6778",
+      "sha256_lf": "4948fbf5f906a2444783330664e10f7d575d376c3bd59441a051842f51affa0d"
+    },
+    "Src/Orbiter/Keymap.h": {
+      "original_sha256_lf": "e6f3de65b94458e8b451d04fcfdcf025e5edce9c2f08daf35c23dd3009b27e7b",
+      "sha256_lf": "cbda8212866ae7ea4968eb78bc114e1e0f96971d011fa73fed3d43f5f0c8bc8e"
+    },
+    "Src/Orbiter/Production/FlightClock.h": {
+      "original_sha256_lf": null,
+      "sha256_lf": "b68a5e69f9fee3856a638ff64a52519542efd40c0235ee3c7a826c697ddd8b67"
+    },
+    "Src/Orbiter/Production/FlightControls.cpp": {
+      "original_sha256_lf": null,
+      "sha256_lf": "813b3d83fe45ad22fe1011cc2b9c053e36c3da527e2113cc503695b5749e5423"
+    },
+    "Src/Orbiter/Production/FlightControls.h": {
+      "original_sha256_lf": null,
+      "sha256_lf": "35e00988591a12a30e9394f2cf273aee56e3a41d7de60fe90db1c7cd5851e6c8"
+    },
+    "Src/Orbiter/Production/FlightInput.h": {
+      "original_sha256_lf": null,
+      "sha256_lf": "c510ff9f9d9a8c6ace158467ce5cd35f84c760d5d2f01cc8f2ea43700889a570"
+    },
+    "Src/Orbiter/Production/FlightKeys.h": {
+      "original_sha256_lf": null,
+      "sha256_lf": "56bbd6196954cf558cee707f33511257c81db237683cd4179886951254ad4e83"
+    },
+    "Src/Orbiter/Production/FlightReplay.h": {
+      "original_sha256_lf": null,
+      "sha256_lf": "e7fb0dcf7869b540628e4435fe6a2ed5006bcb4b3359d6d4f9421df9f41ab3a2"
     }
   }
 }

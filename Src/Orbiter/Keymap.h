@@ -8,8 +8,13 @@
 #ifndef __KEYMAP_H
 #define __KEYMAP_H
 
+#ifdef _WIN32
 #include "windows.h"
 #include "Orbitersdk.h"
+#else
+#include "Production/FlightKeys.h"
+#endif
+#include "Production/CoreTypes.h"
 
 // key modifier list
 #define KMOD_LSHIFT 0x0100
@@ -38,18 +43,18 @@ public:
 	bool IsLogicalKey (char *kstate, int lfunc) const;
 	// return true if logical function lfunc is selected by key state kstate
 
-	bool IsLogicalKey (DWORD &key, char *kstate, int lfunc, bool clearkey = true) const;
+	bool IsLogicalKey (orbiter::production::UInt32 &key, char *kstate, int lfunc, bool clearkey = true) const;
 	// return true if logical function lfunc is selected by key and kstate
 	// (kstate only used for modifier keys)
 	// if clearkey == true then key is set to 0 on return, if a match is found
 
 private:
-	bool IsMatchingModifier (char *kstate, WORD key) const;
+	bool IsMatchingModifier (char *kstate, orbiter::production::UInt16 key) const;
 
-	bool ScanStr (char *cbuf, WORD &key) const;
-	char *PrintStr (char *cbuf, WORD &key) const;
+	bool ScanStr (char *cbuf, orbiter::production::UInt16 &key) const;
+	char *PrintStr (char *cbuf, orbiter::production::UInt16 &key) const;
 
-	WORD func[LKEY_COUNT];
+	orbiter::production::UInt16 func[LKEY_COUNT];
 	// list of logical function keys
 	// LOBYTE: key id; HIBYTE: modifier (see modifier list)
 };

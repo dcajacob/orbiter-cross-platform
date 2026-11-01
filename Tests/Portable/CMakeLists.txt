@@ -92,3 +92,8 @@ if(ORBITER_GRAPHICS_TESTS)
         --output "${CMAKE_CURRENT_BINARY_DIR}/graphics" --backend x11)
     set_tests_properties(Client.Graphics PROPERTIES TIMEOUT 180)
 endif()
+
+add_executable(production_flight_clock ../Production/Flight/ClockTest.cpp)
+target_include_directories(production_flight_clock PRIVATE ../../Src/Orbiter)
+target_compile_features(production_flight_clock PRIVATE cxx_std_17)
+add_test(NAME Production.FlightClock COMMAND production_flight_clock)

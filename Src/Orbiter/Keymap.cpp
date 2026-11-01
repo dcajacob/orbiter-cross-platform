@@ -4,13 +4,16 @@
 #include "Keymap.h"
 #include "Config.h"
 #include <fstream>
+#include "Production/Text.h"
+#include <cstdint>
+#include <cstring>
 
 #define NKEY 95
 
 using namespace std;
 
 struct {
-	BYTE id;
+	std::uint8_t id;
 	const char *name;
 } keyname[NKEY] = {
 	{OAPI_KEY_ESCAPE,     "ESC"},         // 0x01: Escape
@@ -111,7 +114,7 @@ struct {
 };
 
 struct {
-	WORD defkey;
+	orbiter::production::UInt16 defkey;
 	const char *itemstr;
 } lkeyspec[LKEY_COUNT] = {
 	{OAPI_KEY_LEFT     | KMOD_ALT,                 "CockpitCamRotateLeft"},
@@ -228,7 +231,7 @@ Keymap::Keymap ()
 
 void Keymap::SetDefault ()
 {
-	for (WORD i = 0; i < LKEY_COUNT; i++)
+	for (orbiter::production::UInt16 i = 0; i < LKEY_COUNT; i++)
 		func[i] = lkeyspec[i].defkey;
 }
 
@@ -262,7 +265,7 @@ bool Keymap::IsLogicalKey (char *kstate, int lfunc) const
 	return IsMatchingModifier (kstate, func[lfunc]);
 }
 
-bool Keymap::IsLogicalKey (DWORD &key, char *kstate, int lfunc, bool clearkey) const
+bool Keymap::IsLogicalKey (orbiter::production::UInt32 &key, char *kstate, int lfunc, bool clearkey) const
 {
 	// check key
 	if ((func[lfunc] & 0x00FFu) != key) return false;
@@ -275,9 +278,9 @@ bool Keymap::IsLogicalKey (DWORD &key, char *kstate, int lfunc, bool clearkey) c
 	}
 }
 
-bool Keymap::IsMatchingModifier (char *kstate, WORD key) const
+bool Keymap::IsMatchingModifier (char *kstate, orbiter::production::UInt16 key) const
 {
-	WORD kmod;
+	orbiter::production::UInt16 kmod;
 	if (kmod = (key & KMOD_CTRL)) {
 		if (kmod == KMOD_CTRL) {
 			if (!KEYMOD_CONTROL(kstate))  return false;
@@ -317,34 +320,34 @@ bool Keymap::IsMatchingModifier (char *kstate, WORD key) const
 	return true;
 }
 
-bool Keymap::ScanStr (char *cbuf, WORD &key) const
+bool Keymap::ScanStr (char *cbuf, orbiter::production::UInt16 &key) const
 {
 	int i;
 	char *tok = strtok (cbuf, " ");
 	if (!tok) return false;
 	for (i = 0; i < NKEY; i++)
-		if (!_stricmp (tok, keyname[i].name)) break;
+		if (!orbiter::production::CompareText (tok, keyname[i].name)) break;
 	if (i == NKEY) return false; // key not found
 	key = keyname[i].id;
 	for (;;) {
 		tok = strtok (NULL, " ");
 		if (!tok) break;
-		if      (!_stricmp (tok, "LSHIFT")) key |= KMOD_LSHIFT;
-		else if (!_stricmp (tok, "RSHIFT")) key |= KMOD_RSHIFT;
-		else if (!_stricmp (tok, "SHIFT"))  key |= KMOD_SHIFT;
-		else if (!_stricmp (tok, "LCTRL"))  key |= KMOD_LCTRL;
-		else if (!_stricmp (tok, "RCTRL"))  key |= KMOD_RCTRL;
-		else if (!_stricmp (tok, "CTRL"))   key |= KMOD_CTRL;
-		else if (!_stricmp (tok, "LALT"))   key |= KMOD_LALT;
-		else if (!_stricmp (tok, "RALT"))   key |= KMOD_RALT;
-		else if (!_stricmp (tok, "ALT"))    key |= KMOD_ALT;
+		if      (!orbiter::production::CompareText (tok, "LSHIFT")) key |= KMOD_LSHIFT;
+		else if (!orbiter::production::CompareText (tok, "RSHIFT")) key |= KMOD_RSHIFT;
+		else if (!orbiter::production::CompareText (tok, "SHIFT"))  key |= KMOD_SHIFT;
+		else if (!orbiter::production::CompareText (tok, "LCTRL"))  key |= KMOD_LCTRL;
+		else if (!orbiter::production::CompareText (tok, "RCTRL"))  key |= KMOD_RCTRL;
+		else if (!orbiter::production::CompareText (tok, "CTRL"))   key |= KMOD_CTRL;
+		else if (!orbiter::production::CompareText (tok, "LALT"))   key |= KMOD_LALT;
+		else if (!orbiter::production::CompareText (tok, "RALT"))   key |= KMOD_RALT;
+		else if (!orbiter::production::CompareText (tok, "ALT"))    key |= KMOD_ALT;
 	}
 	return true;
 }
 
-char *Keymap::PrintStr (char *cbuf, WORD &key) const
+char *Keymap::PrintStr (char *cbuf, orbiter::production::UInt16 &key) const
 {
-	WORD i, kmod, kbase = key & 0x00ff;
+	orbiter::production::UInt16 i, kmod, kbase = key & 0x00ff;
 
 	for (i = 0; i < NKEY; i++)
 		if (keyname[i].id == kbase) break;

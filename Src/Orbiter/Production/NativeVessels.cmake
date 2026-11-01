@@ -4,7 +4,7 @@ if(WIN32)
     message(FATAL_ERROR "Native vessel host currently requires Linux; Windows retains the original application adapters")
 endif()
 add_library(orbiter_production_vessels SHARED
-    NativeRenderApi.cpp NativeParticle.cpp ../CelSphereAPI.cpp ../DrawAPI.cpp ../Camera.cpp ../CameraControl.cpp NativeCameraProjection.cpp ../Vessel.cpp ../VesselSdk.cpp ../Vesselstatus.cpp ../SuperVessel.cpp
+    FlightControls.cpp ../Keymap.cpp NativeRenderApi.cpp NativeParticle.cpp ../CelSphereAPI.cpp ../DrawAPI.cpp ../Camera.cpp ../CameraControl.cpp NativeCameraProjection.cpp ../Vessel.cpp ../VesselSdk.cpp ../Vesselstatus.cpp ../SuperVessel.cpp
     ../VesselLights.cpp ../LightEmitter.cpp ../VesselFlightMath.cpp ../VesselRecorder.cpp ../CollisionCore.cpp
     NativeCockpitUnavailable.cpp NativeVesselApplication.cpp NativeVesselModule.cpp NativeWorldVesselServices.cpp)
 target_link_libraries(orbiter_production_vessels PUBLIC orbiter_production_boundary)

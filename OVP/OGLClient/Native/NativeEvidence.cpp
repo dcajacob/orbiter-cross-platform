@@ -53,7 +53,7 @@ void PlanetTile(OBJHANDLE object,unsigned count) {
 void ArchiveRead(const char *path,int layer,unsigned bytes) { if(enabled && bytes)archiveReads[{path,layer}]+=bytes; }
 void Rendered() { if(enabled)++frames; }
 void Frame() {
-    if(!enabled || captured || frames<50 || oapiGetSimTime()<GetNativeRenderContext().captureTime)return;
+    if(!enabled || GetNativeRenderContext().captureTime<0 || captured || frames<50 || oapiGetSimTime()<GetNativeRenderContext().captureTime)return;
     if(std::abs(oapiGetSimTime()-GetNativeRenderContext().captureTime)>1e-12)throw std::runtime_error("missing finalized tick-50 render for graphics evidence");
     captured=true;
     GLint viewport[4]{};glGetIntegerv(GL_VIEWPORT,viewport);

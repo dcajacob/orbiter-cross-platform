@@ -5,13 +5,14 @@
 #include "NativeRenderApi.h"
 #include "ResourceResolver.h"
 #include "SceneLabels.h"
+#include "FlightInput.h"
 #include <vector>
 class Config;class Camera;class PlanetarySystem;class MeshManager;class TimeData;class Vessel;
 namespace oapi {class ParticleStream;}
 namespace orbiter::production {
 // Internal same-build native renderer contract. No window handles, GPU classes
 // or renderer math enter production numerical objects or the Windows SDK.
-struct RenderInput {bool close=false;int width=0,height=0;double yaw=0,pitch=0,zoom=0;};
+struct RenderInput {FlightInput flight;bool close=false;int width=0,height=0;double yaw=0,pitch=0,zoom=0;};
 class ORBITER_PRODUCTION_API NativeGraphics {
 public:
     virtual ~NativeGraphics()=default;
@@ -29,6 +30,7 @@ public:
     virtual void Open()=0;
     virtual RenderInput Poll()=0;
     virtual void Resize(int,int)=0;
+    virtual void Status(const std::string&)=0;
     virtual void PostCreation()=0;
     virtual void Render()=0;
     virtual bool Present()=0;
@@ -55,6 +57,7 @@ struct NativeRenderContext {
     Vessel* focus=nullptr;TimeData* time=nullptr;MeshManager* meshes=nullptr;
     const ResourceResolver *textures=nullptr,*highTextures=nullptr,*planetTextures=nullptr,*meshFiles=nullptr,*programFiles=nullptr;
     NativeGraphics* graphics=nullptr;bool paused=true,showGrapple=false;
+    int joystickThrottleAxis=-1,joystickTwistAxis=2;
     std::filesystem::path evidence;double captureTime=0;
 };
 ORBITER_PRODUCTION_API NativeRenderContext* BindNativeRenderContext(NativeRenderContext*);

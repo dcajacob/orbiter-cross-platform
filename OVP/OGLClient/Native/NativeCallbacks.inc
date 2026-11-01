@@ -2,6 +2,7 @@
 void Open() override;
 RenderInput Poll() override;
 void Resize(int,int) override;
+void Status(const std::string&) override;
 void PostCreation() override {clbkPostCreation();}
 void Render() override {clbkClearFrame();clbkRenderScene();}
 bool Present() override {return clbkDisplayFrame();}
