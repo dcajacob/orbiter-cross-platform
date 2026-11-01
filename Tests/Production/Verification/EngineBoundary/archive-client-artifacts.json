@@ -1,0 +1,1829 @@
+{
+  "schema": 1,
+  "source": "2e8bbbf24f5cf53e3e6dadd33fe8ef000748b3cc",
+  "run_id": 41286856189,
+  "artifacts": [
+    {
+      "configuration": "Debug",
+      "artifact_id": 13076235618,
+      "original_sha256": "288604ebbe4c7f353049f7fe90cc486c3ff1b7cb1d7a60193abdc23fc5a7576d",
+      "filtered_file": "archive-client-debug.zip",
+      "members": [
+        {
+          "path": "out/client-execution/scene/archive-reads.csv",
+          "sha256": "b767c97cb12da4a0316f7c3c537828f1738d156a76789fa59aae6ec0513727ee"
+        },
+        {
+          "path": "out/client-execution/client-summary.json",
+          "sha256": "fda39a51b024971fe94f1cd5df2814b4d4b0e6133d0f64aaebbe3ae98b5b398d"
+        },
+        {
+          "path": "out/client-execution/scene/behavior-animations.csv",
+          "sha256": "06175d177e56b7a77ed689dc6a6d74c13c52c3dba83f931a00ecb8a1cd2a24cc"
+        },
+        {
+          "path": "out/client-execution/scene/behavior-case.txt",
+          "sha256": "fbfbf33477553394248c162f91ad3facdc722e3aebd45aa7e675a63e6624ff4f"
+        },
+        {
+          "path": "out/client-execution/scene/behavior-events.csv",
+          "sha256": "901edd9f5919d531036d28d3be1d7b17e40043c1cba4c9acabf8b4149dad881c"
+        },
+        {
+          "path": "out/client-execution/scene/behavior-propellant.csv",
+          "sha256": "843cce83fc462e5582c6dd991f0a4adb16719fd539b8e007df10b97736a82023"
+        },
+        {
+          "path": "out/client-execution/scene/behavior-state.csv",
+          "sha256": "c6dcb52250179fe6153438677548dc8620994106b3e6c9bab8f1bc389c121abf"
+        },
+        {
+          "path": "out/client-execution/scene/camera.csv",
+          "sha256": "8e8faac932836de5c29516ace2769118099a3696d80d7b93b4e75aad17cbd0b0"
+        },
+        {
+          "path": "out/client-execution/scene/client-report.json",
+          "sha256": "3bd636dce425ddda306645720993a3c1d199453c8d0c50e0b09a1ee09dab0422"
+        },
+        {
+          "path": "out/client-execution/scene/console.txt",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "out/client-execution/scene/graphics-lifecycle.json",
+          "sha256": "df7514880a865666d7ff653c5f63158753beffc1be13e4fda55ad112cca2d37b"
+        },
+        {
+          "path": "out/client-execution/scene/GravityModels/Notes on Gravity Models.txt",
+          "sha256": "9fdf442ce97e8dcbd988718d50c80b3af332ab711b98090558ddaf173cf6ee99"
+        },
+        {
+          "path": "out/client-execution/scene/invocation.json",
+          "sha256": "dd975f1ab2c7ef260a2c52515b9111239d1983a85d429008d5ee4df8093d0798"
+        },
+        {
+          "path": "out/client-execution/scene/Kernels/orbiter.log",
+          "sha256": "98c86d3279d6596b0fe5332c2dfdab65e2fd0716410df8b14ce01d514bda861a"
+        },
+        {
+          "path": "out/client-execution/scene/Kernels/spk_sources.txt",
+          "sha256": "578e9dcec183e497401918e54b0e353f0e3c097f0d245fb19bc4a1447e97a191"
+        },
+        {
+          "path": "out/client-execution/scene/licenses/spirv-llvm-translator/LICENSE.TXT",
+          "sha256": "e3bc36440fc927c62d5cc24efeefe225a14d4e34ffeb0c92e430625cce9ee444"
+        },
+        {
+          "path": "out/client-execution/scene/loaded-assets.txt",
+          "sha256": "42b33ab8c3823afb735fe08bc197f0ccc79608962ecdbed2c70616a5649cb13b"
+        },
+        {
+          "path": "out/client-execution/scene/mesa-bindings.json",
+          "sha256": "3f1e71c46b542cd8683de4f40b67db3115961cac5035315cc01b7c57cc43e9ea"
+        },
+        {
+          "path": "out/client-execution/scene/Modules/D3D9Client/GKernel.txt",
+          "sha256": "997d1a9bba583331a857a41dc338954877ce57d413f4d3e3a65bb9b5eb4f6052"
+        },
+        {
+          "path": "out/client-execution/scene/Modules/OGLClient/dependencies.lock.json",
+          "sha256": "80d217de95a4a31f06b6df0f0f0f1544242c493a3382997690beac9c9f0800ce"
+        },
+        {
+          "path": "out/client-execution/scene/Modules/OGLClient/Licenses/docs-FTL.TXT",
+          "sha256": "08c135755dd589039470f1fdbb400daaabaaa50d0b366d19cebff4d22986baa1"
+        },
+        {
+          "path": "out/client-execution/scene/Modules/OGLClient/Licenses/glm-src-copying.txt",
+          "sha256": "62d2d642c7d054d4fb4c9b42faad617d6c88fcd91e317f8035aa9f277cc159c3"
+        },
+        {
+          "path": "out/client-execution/scene/Modules/OGLClient/Licenses/imgui-src-LICENSE.txt",
+          "sha256": "c80c5789748d955c4a650562baa0d750494e2c7128c2ca66aaebe2e3c4e198bf"
+        },
+        {
+          "path": "out/client-execution/scene/Modules/OGLClient/Licenses/nanovg-src-LICENSE.txt",
+          "sha256": "45185a6680ed83863bef33e1055f9fd76374df4b81c957802c19a286c982dfd2"
+        },
+        {
+          "path": "out/client-execution/scene/Modules/OGLClient/Licenses/Orbiter-MIT.txt",
+          "sha256": "ffba1fe66f6c59cc8e01c014a4454901d1b6b3669b5e205bf54a2f57974bab7d"
+        },
+        {
+          "path": "out/client-execution/scene/object-draws.csv",
+          "sha256": "0674b66275b44ee2adda67635fbaa74c75f7daf5308fa92e1de250539010b9aa"
+        },
+        {
+          "path": "out/client-execution/scene/Orbiter.cfg",
+          "sha256": "8eaf31ea0dc97f16e945a207bebc0fe5c25358e7101a299bd824cf31fa4a5635"
+        },
+        {
+          "path": "out/client-execution/scene/Orbiter.log",
+          "sha256": "ab0f05e59da45611309e9e97235f774307e7dae198eb5eb19da55df3c2a3566d"
+        },
+        {
+          "path": "out/client-execution/scene/planet-tiles.csv",
+          "sha256": "b4fd0ca3f0a0859fbd837f9fba01b2ecf0b7ac98f879f26766b6f3f047c178fc"
+        },
+        {
+          "path": "out/client-execution/scene/renderer-info.json",
+          "sha256": "b1035deb8d14e84f2dc01124f453dc06daec1eb0cebb1ef44bb81217e5cd0fb5"
+        },
+        {
+          "path": "out/client-execution/scene/renderer-modules.txt",
+          "sha256": "61e2f03825870ba51c260202e1d257009e86b79b4ef507ca29ca37961d6f5bcc"
+        },
+        {
+          "path": "out/client-execution/scene/Scenarios/(Current state).scn",
+          "sha256": "fba3abcb14bffb8ef79654b069ed8bfd2d8c2b44604c9102ce202801e358a0f0"
+        },
+        {
+          "path": "out/client-execution/scene/Scenarios/Behavior.scn",
+          "sha256": "1864379c939eff6d3c2d546d101915c4015164ec14673142f9de2c982803ce7e"
+        },
+        {
+          "path": "out/client-execution/scene/scene-summary.json",
+          "sha256": "e96eed18d42fa7086797d6be4dbae4b0fa316e928d1dfa3f017088a25d8f7b2b"
+        },
+        {
+          "path": "out/client-execution/scene/scene.csv",
+          "sha256": "8f7f996b275ca958ca643569ab873d6a1a383cee9949a596fc405deab8ee6dab"
+        },
+        {
+          "path": "out/client-execution/scene/scene.png",
+          "sha256": "cf713ff6c8dbe9cd2dbf83f5a9b92a9040d6142fcf5f895031c35cf6ee8dc6e4",
+          "storage": {
+            "kind": "existing_file",
+            "source": "Tests/Production/ClientReference/scene.png"
+          }
+        },
+        {
+          "path": "out/client-execution/scene/scene.rgba",
+          "sha256": "4cad399e74c3f1c4de0714c50ace5305cd47cff6dd6b6a3de85cb7ea7a2f41a7",
+          "storage": {
+            "kind": "lossless_decode",
+            "source": "Tests/Production/ClientReference/scene.png"
+          }
+        },
+        {
+          "path": "out/client-execution/scene/Textures/D3D9/Icons18.png",
+          "sha256": "e66e9c71845dff7b1e32e91a78e93dc792cff3a77fe07bdf5946fbaa6e580c14"
+        },
+        {
+          "path": "out/client-execution/scene/Textures/D3D9/Icons28.png",
+          "sha256": "7e68e596e3b64c72ac78da57da7a4a656dc4c3636d4813414830497013852376"
+        },
+        {
+          "path": "out/client-execution/scene/Textures/D3D9/Icons36.png",
+          "sha256": "24ce58341234fd8ee61fd2d27083f045827baad401e249daaacf6817fd25007e"
+        },
+        {
+          "path": "out/client-execution/scene/Textures/D3D9/SubTitle18.png",
+          "sha256": "28035da13aad92846e3d699fb60e0e273bf0c9bb52f69ee499afac4361ae8648"
+        },
+        {
+          "path": "out/client-execution/scene/Textures/D3D9/SubTitle28.png",
+          "sha256": "0a6af5fce2a6a5d06d735cc2f2e7412daa6c95fe89eb77fd81ce553d1c6906d6"
+        },
+        {
+          "path": "out/client-execution/scene/Textures/D3D9/SubTitle36.png",
+          "sha256": "7acc911953a23429e52ad04bbc48afbebe6c57557cf636c64fddd79cca764205"
+        },
+        {
+          "path": "out/client-execution/scene/Textures/D3D9/SubTitle56.png",
+          "sha256": "5e4ea9ff5a45ceddde4d0aa504ff8ad4ff690c1942c35bdb82d0b679be11d5c8"
+        },
+        {
+          "path": "out/client-execution/scene/Textures/MenuInfoBar/camera.png",
+          "sha256": "6a3c789068ae7f7f9fb1b81deb5dcd03a3991ee6d3c6cea071ef1ae609e25199"
+        },
+        {
+          "path": "out/client-execution/scene/Textures/MenuInfoBar/Default/camera.png",
+          "sha256": "c0fc302940cca2c45650169338eeae456731c946cfe121dc13d81e0e587f1fdd"
+        },
+        {
+          "path": "out/client-execution/scene/Textures/MenuInfoBar/Default/exit.png",
+          "sha256": "607f8b4dd673bb8bfbf72c1164fa6ea96d99874cd2f464f39559fbd36e083523"
+        },
+        {
+          "path": "out/client-execution/scene/Textures/MenuInfoBar/Default/ExtMFD.png",
+          "sha256": "a2ad181a19de0d4eb076018fe5790184a6f652b0848a755a0e8feb262be9e63b"
+        },
+        {
+          "path": "out/client-execution/scene/Textures/MenuInfoBar/Default/function.png",
+          "sha256": "da97434a068a75cfce18b87964726ff9d2c4d264fcb22c26fc13f685880acc23"
+        },
+        {
+          "path": "out/client-execution/scene/Textures/MenuInfoBar/Default/help.png",
+          "sha256": "7cd575686fe0ad8f823e7bf3d5dd3ac124ee233bade130aa6fad33740ba2230f"
+        },
+        {
+          "path": "out/client-execution/scene/Textures/MenuInfoBar/Default/info.png",
+          "sha256": "1a3dcc9d9f8d3471ca61b61fd0378bcff73b8a463160084b0dd0d8dfbfbd1acf"
+        },
+        {
+          "path": "out/client-execution/scene/Textures/MenuInfoBar/Default/LuaConsole.png",
+          "sha256": "087a4d03b129ddd5a21c30eaf04e262836a8f65d0236edafefb97993f3ed5884"
+        },
+        {
+          "path": "out/client-execution/scene/Textures/MenuInfoBar/Default/map.png",
+          "sha256": "f2e9172fcbf9b47b08e6b518d00e8f057ed43e6c4ac6bf0e874cff27fd1a5015"
+        },
+        {
+          "path": "out/client-execution/scene/Textures/MenuInfoBar/Default/options.png",
+          "sha256": "b0b9286a992f12b0457681816ea7606b0afaef2d346bf67c4ada8f5af633fcde"
+        },
+        {
+          "path": "out/client-execution/scene/Textures/MenuInfoBar/Default/record.png",
+          "sha256": "d5ac72f4d477125f32d7016820e2f9083d44092f09da548e8ba434d5cada3f4b"
+        },
+        {
+          "path": "out/client-execution/scene/Textures/MenuInfoBar/Default/pause.png",
+          "sha256": "6d164e079c27e3918f33104c4de69037b5ba58628a32f29f5c8115b405d2f63f"
+        },
+        {
+          "path": "out/client-execution/scene/Textures/MenuInfoBar/Default/save.png",
+          "sha256": "a42bcb179cb4e36db3b63e411adbd3ba6f805dfe3821a4eacbabf4f988b3a3b4"
+        },
+        {
+          "path": "out/client-execution/scene/Textures/MenuInfoBar/Default/ship.png",
+          "sha256": "286d6362c2776aab63aa80d29e8f86e7dc83642a76ecb1ddd17115f980ec98fd"
+        },
+        {
+          "path": "out/client-execution/scene/Textures/MenuInfoBar/Default/speed.png",
+          "sha256": "e64dd672b77edd06aab57475a8ac6bc7082eed22daac2cb59eb13d0edef7f597"
+        },
+        {
+          "path": "out/client-execution/scene/Textures/MenuInfoBar/exit.png",
+          "sha256": "269f21a72650d19c37a407caf3e610896a2ded08a7e0fbabb09105b6ba342df6"
+        },
+        {
+          "path": "out/client-execution/scene/Textures/MenuInfoBar/ExtMFD.png",
+          "sha256": "651fb3f2e672d2e3f2e70540ba6501c09ef8faeac0b8be0af8cdf390c8986552"
+        },
+        {
+          "path": "out/client-execution/scene/Textures/MenuInfoBar/FlightData.png",
+          "sha256": "d79386f486f4bed7c788c9babe52857abd22fb24758e38505377215e26015543"
+        },
+        {
+          "path": "out/client-execution/scene/Textures/MenuInfoBar/function.png",
+          "sha256": "fa6c32f0d6d847d4b63da147180a21529daf086ddba1d89a86133d86e83e709b"
+        },
+        {
+          "path": "out/client-execution/scene/Textures/MenuInfoBar/help.png",
+          "sha256": "8a84af8f4e2692166874d5360ba4a42794627d8e54cce017b0f382b849a6197d"
+        },
+        {
+          "path": "out/client-execution/scene/Textures/MenuInfoBar/info.png",
+          "sha256": "3bc593e7b117d25407b0f32f593292cfb838b37d5e7d76f3c48845a3a69c1548"
+        },
+        {
+          "path": "out/client-execution/scene/Textures/MenuInfoBar/LuaConsole.png",
+          "sha256": "65c5f0b1ace6a0d103f6e5933e3ae949d0f9b9fcb9adeef3ed47f31c66733080"
+        },
+        {
+          "path": "out/client-execution/scene/Textures/MenuInfoBar/map.png",
+          "sha256": "f0073c77fc916dbd127dc4fa679d6889804be94953b4c6849d062d59cf1598da"
+        },
+        {
+          "path": "out/client-execution/scene/Textures/MenuInfoBar/Notes.png",
+          "sha256": "3b17e14fdd58084aa6f4ae341053d38fcbe3312c8632698f70f3c233bfc6eaa3"
+        },
+        {
+          "path": "out/client-execution/scene/Textures/MenuInfoBar/options.png",
+          "sha256": "1232753c8e5b7ace85b5c093c0de9698d29fbafa07dd92763df3e80c5b2d8ecc"
+        },
+        {
+          "path": "out/client-execution/scene/Textures/MenuInfoBar/Rcontrol.png",
+          "sha256": "d62cd21b1ae8ae4e48a1d5d99d885ac590724751ba7dda53b40eb64aa9c64102"
+        },
+        {
+          "path": "out/client-execution/scene/Textures/MenuInfoBar/pause.png",
+          "sha256": "bf6d3fd049b891b78b8a036fe5af78084e48e16b703cc0387231de1b18fc34b0"
+        },
+        {
+          "path": "out/client-execution/scene/Textures/MenuInfoBar/record.png",
+          "sha256": "114bc90f00dee68ba791c72c76a64c12ce175f324d52d278b02dd85341cf93fc"
+        },
+        {
+          "path": "out/client-execution/scene/Textures/MenuInfoBar/save.png",
+          "sha256": "a1645b0fc1cef10274e2b7785f9356021ff5df649b34cc9898a62f68e00c635b"
+        },
+        {
+          "path": "out/client-execution/scene/Textures/MenuInfoBar/ScnEdit.png",
+          "sha256": "a7cd8450f340e029c39de1bb29b7c2e7e598acfcad08b756c1d8c3400671bde7"
+        },
+        {
+          "path": "out/client-execution/scene/Textures/MenuInfoBar/ship.png",
+          "sha256": "b4685d54649e014c3cba0ab5b60d94a5248ad591a4ff76b0b7e153f10e14ceb7"
+        },
+        {
+          "path": "out/client-execution/scene/Textures2/Atlantis/switchdown.png",
+          "sha256": "e32af5574c509aaadf11279bef5c841f0365aa875ed949ca4021b354dc5cf632"
+        },
+        {
+          "path": "out/client-execution/scene/Textures/MenuInfoBar/speed.png",
+          "sha256": "4b2f430ea2f27f5152f91ad1e58c46fd72ddd76e6c3e900dc7af3c6395c9ad83"
+        },
+        {
+          "path": "out/client-execution/scene/Textures2/Atlantis/switchmid.png",
+          "sha256": "b7baea1026a4f24aa371391c4fa94cd67e178b161e6313221b412ed031402042"
+        },
+        {
+          "path": "out/client-execution/scene/Textures2/Atlantis/switchup.png",
+          "sha256": "f45a5ffb545f89c8c31b7bb6c590e46d09cfa3a82473699dd6930f97df1964b6"
+        },
+        {
+          "path": "out/client-execution/scene/visual-events.csv",
+          "sha256": "1116c2dff517ee95cb98dbe407b64dccbe079e4f73e912b365a4098d98baf4bc"
+        },
+        {
+          "path": "out/client-execution/scene-repeat/archive-reads.csv",
+          "sha256": "b767c97cb12da4a0316f7c3c537828f1738d156a76789fa59aae6ec0513727ee"
+        },
+        {
+          "path": "out/client-execution/scene-repeat/behavior-animations.csv",
+          "sha256": "06175d177e56b7a77ed689dc6a6d74c13c52c3dba83f931a00ecb8a1cd2a24cc"
+        },
+        {
+          "path": "out/client-execution/scene-repeat/behavior-case.txt",
+          "sha256": "fbfbf33477553394248c162f91ad3facdc722e3aebd45aa7e675a63e6624ff4f"
+        },
+        {
+          "path": "out/client-execution/scene-repeat/behavior-events.csv",
+          "sha256": "901edd9f5919d531036d28d3be1d7b17e40043c1cba4c9acabf8b4149dad881c"
+        },
+        {
+          "path": "out/client-execution/scene-repeat/behavior-propellant.csv",
+          "sha256": "843cce83fc462e5582c6dd991f0a4adb16719fd539b8e007df10b97736a82023"
+        },
+        {
+          "path": "out/client-execution/scene-repeat/behavior-state.csv",
+          "sha256": "c6dcb52250179fe6153438677548dc8620994106b3e6c9bab8f1bc389c121abf"
+        },
+        {
+          "path": "out/client-execution/scene-repeat/camera.csv",
+          "sha256": "8e8faac932836de5c29516ace2769118099a3696d80d7b93b4e75aad17cbd0b0"
+        },
+        {
+          "path": "out/client-execution/scene-repeat/client-report.json",
+          "sha256": "28f355a6e7c83e710a09b6bdc4c6776fe4342ae6aac6c901969658b870d44c4f"
+        },
+        {
+          "path": "out/client-execution/scene-repeat/console.txt",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "out/client-execution/scene-repeat/graphics-lifecycle.json",
+          "sha256": "df7514880a865666d7ff653c5f63158753beffc1be13e4fda55ad112cca2d37b"
+        },
+        {
+          "path": "out/client-execution/scene-repeat/GravityModels/Notes on Gravity Models.txt",
+          "sha256": "9fdf442ce97e8dcbd988718d50c80b3af332ab711b98090558ddaf173cf6ee99"
+        },
+        {
+          "path": "out/client-execution/scene-repeat/invocation.json",
+          "sha256": "d58cb84d905b13db2afcb1f4bfe59957bfeca4ef8a978c5ea3d6a5c777ee1e3d"
+        },
+        {
+          "path": "out/client-execution/scene-repeat/Kernels/orbiter.log",
+          "sha256": "98c86d3279d6596b0fe5332c2dfdab65e2fd0716410df8b14ce01d514bda861a"
+        },
+        {
+          "path": "out/client-execution/scene-repeat/Kernels/spk_sources.txt",
+          "sha256": "578e9dcec183e497401918e54b0e353f0e3c097f0d245fb19bc4a1447e97a191"
+        },
+        {
+          "path": "out/client-execution/scene-repeat/licenses/spirv-llvm-translator/LICENSE.TXT",
+          "sha256": "e3bc36440fc927c62d5cc24efeefe225a14d4e34ffeb0c92e430625cce9ee444"
+        },
+        {
+          "path": "out/client-execution/scene-repeat/loaded-assets.txt",
+          "sha256": "42b33ab8c3823afb735fe08bc197f0ccc79608962ecdbed2c70616a5649cb13b"
+        },
+        {
+          "path": "out/client-execution/scene-repeat/mesa-bindings.json",
+          "sha256": "3f1e71c46b542cd8683de4f40b67db3115961cac5035315cc01b7c57cc43e9ea"
+        },
+        {
+          "path": "out/client-execution/scene-repeat/Modules/D3D9Client/GKernel.txt",
+          "sha256": "997d1a9bba583331a857a41dc338954877ce57d413f4d3e3a65bb9b5eb4f6052"
+        },
+        {
+          "path": "out/client-execution/scene-repeat/Modules/OGLClient/dependencies.lock.json",
+          "sha256": "80d217de95a4a31f06b6df0f0f0f1544242c493a3382997690beac9c9f0800ce"
+        },
+        {
+          "path": "out/client-execution/scene-repeat/Modules/OGLClient/Licenses/docs-FTL.TXT",
+          "sha256": "08c135755dd589039470f1fdbb400daaabaaa50d0b366d19cebff4d22986baa1"
+        },
+        {
+          "path": "out/client-execution/scene-repeat/Modules/OGLClient/Licenses/glm-src-copying.txt",
+          "sha256": "62d2d642c7d054d4fb4c9b42faad617d6c88fcd91e317f8035aa9f277cc159c3"
+        },
+        {
+          "path": "out/client-execution/scene-repeat/Modules/OGLClient/Licenses/imgui-src-LICENSE.txt",
+          "sha256": "c80c5789748d955c4a650562baa0d750494e2c7128c2ca66aaebe2e3c4e198bf"
+        },
+        {
+          "path": "out/client-execution/scene-repeat/Modules/OGLClient/Licenses/nanovg-src-LICENSE.txt",
+          "sha256": "45185a6680ed83863bef33e1055f9fd76374df4b81c957802c19a286c982dfd2"
+        },
+        {
+          "path": "out/client-execution/scene-repeat/Modules/OGLClient/Licenses/Orbiter-MIT.txt",
+          "sha256": "ffba1fe66f6c59cc8e01c014a4454901d1b6b3669b5e205bf54a2f57974bab7d"
+        },
+        {
+          "path": "out/client-execution/scene-repeat/object-draws.csv",
+          "sha256": "0674b66275b44ee2adda67635fbaa74c75f7daf5308fa92e1de250539010b9aa"
+        },
+        {
+          "path": "out/client-execution/scene-repeat/Orbiter.log",
+          "sha256": "c266e9c9d08d6d75506b1fa040df410314bfe9a4fbb636a705f8c6cda23a8c75"
+        },
+        {
+          "path": "out/client-execution/scene-repeat/Orbiter.cfg",
+          "sha256": "8eaf31ea0dc97f16e945a207bebc0fe5c25358e7101a299bd824cf31fa4a5635"
+        },
+        {
+          "path": "out/client-execution/scene-repeat/planet-tiles.csv",
+          "sha256": "b4fd0ca3f0a0859fbd837f9fba01b2ecf0b7ac98f879f26766b6f3f047c178fc"
+        },
+        {
+          "path": "out/client-execution/scene-repeat/renderer-info.json",
+          "sha256": "b1035deb8d14e84f2dc01124f453dc06daec1eb0cebb1ef44bb81217e5cd0fb5"
+        },
+        {
+          "path": "out/client-execution/scene-repeat/Scenarios/(Current state).scn",
+          "sha256": "fba3abcb14bffb8ef79654b069ed8bfd2d8c2b44604c9102ce202801e358a0f0"
+        },
+        {
+          "path": "out/client-execution/scene-repeat/renderer-modules.txt",
+          "sha256": "433a7ab044a48f6bddd3e88ed03a2acf2337e660748e00f2e733edea8565e5fe"
+        },
+        {
+          "path": "out/client-execution/scene-repeat/Scenarios/Behavior.scn",
+          "sha256": "1864379c939eff6d3c2d546d101915c4015164ec14673142f9de2c982803ce7e"
+        },
+        {
+          "path": "out/client-execution/scene-repeat/scene-summary.json",
+          "sha256": "e96eed18d42fa7086797d6be4dbae4b0fa316e928d1dfa3f017088a25d8f7b2b"
+        },
+        {
+          "path": "out/client-execution/scene-repeat/scene.csv",
+          "sha256": "8f7f996b275ca958ca643569ab873d6a1a383cee9949a596fc405deab8ee6dab"
+        },
+        {
+          "path": "out/client-execution/scene-repeat/scene.rgba",
+          "sha256": "4cad399e74c3f1c4de0714c50ace5305cd47cff6dd6b6a3de85cb7ea7a2f41a7",
+          "storage": {
+            "kind": "lossless_decode",
+            "source": "Tests/Production/ClientReference/scene.png"
+          }
+        },
+        {
+          "path": "out/client-execution/scene-repeat/scene.png",
+          "sha256": "cf713ff6c8dbe9cd2dbf83f5a9b92a9040d6142fcf5f895031c35cf6ee8dc6e4",
+          "storage": {
+            "kind": "existing_file",
+            "source": "Tests/Production/ClientReference/scene.png"
+          }
+        },
+        {
+          "path": "out/client-execution/scene-repeat/Textures/D3D9/Icons18.png",
+          "sha256": "e66e9c71845dff7b1e32e91a78e93dc792cff3a77fe07bdf5946fbaa6e580c14"
+        },
+        {
+          "path": "out/client-execution/scene-repeat/Textures/D3D9/Icons28.png",
+          "sha256": "7e68e596e3b64c72ac78da57da7a4a656dc4c3636d4813414830497013852376"
+        },
+        {
+          "path": "out/client-execution/scene-repeat/Textures/D3D9/Icons36.png",
+          "sha256": "24ce58341234fd8ee61fd2d27083f045827baad401e249daaacf6817fd25007e"
+        },
+        {
+          "path": "out/client-execution/scene-repeat/Textures/D3D9/SubTitle18.png",
+          "sha256": "28035da13aad92846e3d699fb60e0e273bf0c9bb52f69ee499afac4361ae8648"
+        },
+        {
+          "path": "out/client-execution/scene-repeat/Textures/D3D9/SubTitle28.png",
+          "sha256": "0a6af5fce2a6a5d06d735cc2f2e7412daa6c95fe89eb77fd81ce553d1c6906d6"
+        },
+        {
+          "path": "out/client-execution/scene-repeat/Textures/D3D9/SubTitle36.png",
+          "sha256": "7acc911953a23429e52ad04bbc48afbebe6c57557cf636c64fddd79cca764205"
+        },
+        {
+          "path": "out/client-execution/scene-repeat/Textures/MenuInfoBar/camera.png",
+          "sha256": "6a3c789068ae7f7f9fb1b81deb5dcd03a3991ee6d3c6cea071ef1ae609e25199"
+        },
+        {
+          "path": "out/client-execution/scene-repeat/Textures/D3D9/SubTitle56.png",
+          "sha256": "5e4ea9ff5a45ceddde4d0aa504ff8ad4ff690c1942c35bdb82d0b679be11d5c8"
+        },
+        {
+          "path": "out/client-execution/scene-repeat/Textures/MenuInfoBar/Default/camera.png",
+          "sha256": "c0fc302940cca2c45650169338eeae456731c946cfe121dc13d81e0e587f1fdd"
+        },
+        {
+          "path": "out/client-execution/scene-repeat/Textures/MenuInfoBar/Default/exit.png",
+          "sha256": "607f8b4dd673bb8bfbf72c1164fa6ea96d99874cd2f464f39559fbd36e083523"
+        },
+        {
+          "path": "out/client-execution/scene-repeat/Textures/MenuInfoBar/Default/ExtMFD.png",
+          "sha256": "a2ad181a19de0d4eb076018fe5790184a6f652b0848a755a0e8feb262be9e63b"
+        },
+        {
+          "path": "out/client-execution/scene-repeat/Textures/MenuInfoBar/Default/function.png",
+          "sha256": "da97434a068a75cfce18b87964726ff9d2c4d264fcb22c26fc13f685880acc23"
+        },
+        {
+          "path": "out/client-execution/scene-repeat/Textures/MenuInfoBar/Default/help.png",
+          "sha256": "7cd575686fe0ad8f823e7bf3d5dd3ac124ee233bade130aa6fad33740ba2230f"
+        },
+        {
+          "path": "out/client-execution/scene-repeat/Textures/MenuInfoBar/Default/info.png",
+          "sha256": "1a3dcc9d9f8d3471ca61b61fd0378bcff73b8a463160084b0dd0d8dfbfbd1acf"
+        },
+        {
+          "path": "out/client-execution/scene-repeat/Textures/MenuInfoBar/Default/LuaConsole.png",
+          "sha256": "087a4d03b129ddd5a21c30eaf04e262836a8f65d0236edafefb97993f3ed5884"
+        },
+        {
+          "path": "out/client-execution/scene-repeat/Textures/MenuInfoBar/Default/map.png",
+          "sha256": "f2e9172fcbf9b47b08e6b518d00e8f057ed43e6c4ac6bf0e874cff27fd1a5015"
+        },
+        {
+          "path": "out/client-execution/scene-repeat/Textures/MenuInfoBar/Default/options.png",
+          "sha256": "b0b9286a992f12b0457681816ea7606b0afaef2d346bf67c4ada8f5af633fcde"
+        },
+        {
+          "path": "out/client-execution/scene-repeat/Textures/MenuInfoBar/Default/pause.png",
+          "sha256": "6d164e079c27e3918f33104c4de69037b5ba58628a32f29f5c8115b405d2f63f"
+        },
+        {
+          "path": "out/client-execution/scene-repeat/Textures/MenuInfoBar/Default/save.png",
+          "sha256": "a42bcb179cb4e36db3b63e411adbd3ba6f805dfe3821a4eacbabf4f988b3a3b4"
+        },
+        {
+          "path": "out/client-execution/scene-repeat/Textures/MenuInfoBar/Default/record.png",
+          "sha256": "d5ac72f4d477125f32d7016820e2f9083d44092f09da548e8ba434d5cada3f4b"
+        },
+        {
+          "path": "out/client-execution/scene-repeat/Textures/MenuInfoBar/Default/ship.png",
+          "sha256": "286d6362c2776aab63aa80d29e8f86e7dc83642a76ecb1ddd17115f980ec98fd"
+        },
+        {
+          "path": "out/client-execution/scene-repeat/Textures/MenuInfoBar/Default/speed.png",
+          "sha256": "e64dd672b77edd06aab57475a8ac6bc7082eed22daac2cb59eb13d0edef7f597"
+        },
+        {
+          "path": "out/client-execution/scene-repeat/Textures/MenuInfoBar/exit.png",
+          "sha256": "269f21a72650d19c37a407caf3e610896a2ded08a7e0fbabb09105b6ba342df6"
+        },
+        {
+          "path": "out/client-execution/scene-repeat/Textures/MenuInfoBar/ExtMFD.png",
+          "sha256": "651fb3f2e672d2e3f2e70540ba6501c09ef8faeac0b8be0af8cdf390c8986552"
+        },
+        {
+          "path": "out/client-execution/scene-repeat/Textures/MenuInfoBar/FlightData.png",
+          "sha256": "d79386f486f4bed7c788c9babe52857abd22fb24758e38505377215e26015543"
+        },
+        {
+          "path": "out/client-execution/scene-repeat/Textures/MenuInfoBar/function.png",
+          "sha256": "fa6c32f0d6d847d4b63da147180a21529daf086ddba1d89a86133d86e83e709b"
+        },
+        {
+          "path": "out/client-execution/scene-repeat/Textures/MenuInfoBar/help.png",
+          "sha256": "8a84af8f4e2692166874d5360ba4a42794627d8e54cce017b0f382b849a6197d"
+        },
+        {
+          "path": "out/client-execution/scene-repeat/Textures/MenuInfoBar/info.png",
+          "sha256": "3bc593e7b117d25407b0f32f593292cfb838b37d5e7d76f3c48845a3a69c1548"
+        },
+        {
+          "path": "out/client-execution/scene-repeat/Textures/MenuInfoBar/LuaConsole.png",
+          "sha256": "65c5f0b1ace6a0d103f6e5933e3ae949d0f9b9fcb9adeef3ed47f31c66733080"
+        },
+        {
+          "path": "out/client-execution/scene-repeat/Textures/MenuInfoBar/Notes.png",
+          "sha256": "3b17e14fdd58084aa6f4ae341053d38fcbe3312c8632698f70f3c233bfc6eaa3"
+        },
+        {
+          "path": "out/client-execution/scene-repeat/Textures/MenuInfoBar/map.png",
+          "sha256": "f0073c77fc916dbd127dc4fa679d6889804be94953b4c6849d062d59cf1598da"
+        },
+        {
+          "path": "out/client-execution/scene-repeat/Textures/MenuInfoBar/options.png",
+          "sha256": "1232753c8e5b7ace85b5c093c0de9698d29fbafa07dd92763df3e80c5b2d8ecc"
+        },
+        {
+          "path": "out/client-execution/scene-repeat/Textures/MenuInfoBar/pause.png",
+          "sha256": "bf6d3fd049b891b78b8a036fe5af78084e48e16b703cc0387231de1b18fc34b0"
+        },
+        {
+          "path": "out/client-execution/scene-repeat/Textures/MenuInfoBar/Rcontrol.png",
+          "sha256": "d62cd21b1ae8ae4e48a1d5d99d885ac590724751ba7dda53b40eb64aa9c64102"
+        },
+        {
+          "path": "out/client-execution/scene-repeat/Textures/MenuInfoBar/record.png",
+          "sha256": "114bc90f00dee68ba791c72c76a64c12ce175f324d52d278b02dd85341cf93fc"
+        },
+        {
+          "path": "out/client-execution/scene-repeat/Textures/MenuInfoBar/save.png",
+          "sha256": "a1645b0fc1cef10274e2b7785f9356021ff5df649b34cc9898a62f68e00c635b"
+        },
+        {
+          "path": "out/client-execution/scene-repeat/Textures/MenuInfoBar/ScnEdit.png",
+          "sha256": "a7cd8450f340e029c39de1bb29b7c2e7e598acfcad08b756c1d8c3400671bde7"
+        },
+        {
+          "path": "out/client-execution/scene-repeat/Textures/MenuInfoBar/ship.png",
+          "sha256": "b4685d54649e014c3cba0ab5b60d94a5248ad591a4ff76b0b7e153f10e14ceb7"
+        },
+        {
+          "path": "out/client-execution/scene-repeat/Textures/MenuInfoBar/speed.png",
+          "sha256": "4b2f430ea2f27f5152f91ad1e58c46fd72ddd76e6c3e900dc7af3c6395c9ad83"
+        },
+        {
+          "path": "out/client-execution/scene-repeat/Textures2/Atlantis/switchdown.png",
+          "sha256": "e32af5574c509aaadf11279bef5c841f0365aa875ed949ca4021b354dc5cf632"
+        },
+        {
+          "path": "out/client-execution/scene-repeat/Textures2/Atlantis/switchmid.png",
+          "sha256": "b7baea1026a4f24aa371391c4fa94cd67e178b161e6313221b412ed031402042"
+        },
+        {
+          "path": "out/client-execution/scene-repeat/Textures2/Atlantis/switchup.png",
+          "sha256": "f45a5ffb545f89c8c31b7bb6c590e46d09cfa3a82473699dd6930f97df1964b6"
+        },
+        {
+          "path": "out/client-execution/scene-repeat/visual-events.csv",
+          "sha256": "1116c2dff517ee95cb98dbe407b64dccbe079e4f73e912b365a4098d98baf4bc"
+        },
+        {
+          "path": "runtime-configure.log",
+          "sha256": "3c1bc8c81950514c3608039eb81ab518702606025136614b3cbd83349c229033"
+        },
+        {
+          "path": "runtime-build.log",
+          "sha256": "c3af3716d7773da681f511c352c84b5765e816d0f896839275584e918af886ec"
+        },
+        {
+          "path": "runtime-ctest.log",
+          "sha256": "807e9319525dee5b883f3161b2a87fef1355b4e18abfe5f06a380353c559500a"
+        },
+        {
+          "path": "out/runtime-rebuild/build-inputs.json",
+          "sha256": "7da5c0bdfc2fae38cd23131c79bbf997246043dafff68bed68fc7036cb3eff2a"
+        },
+        {
+          "path": "out/runtime-rebuild/CMakeCache.txt",
+          "sha256": "1f8e194e9699dae444c2a35e303744c968fd50bf53732d4b3a7b913d80a01d9e"
+        },
+        {
+          "path": "client-configure.log",
+          "sha256": "5f4023e2c328ab1b0a289fbd1ffc29cc78670db48c20183d002f42eed4e8187b"
+        },
+        {
+          "path": "client-build.log",
+          "sha256": "dccbf79105dcfef3cb2ba3a6d080f54886fa27fb3012c2bd04504d3b8057388b"
+        },
+        {
+          "path": "out/opengl-client/CMakeCache.txt",
+          "sha256": "d2a1d7d36bd3692c0e8166f33ddda7f4fbd6c233e4fd6a5d588efa870f44dce8"
+        },
+        {
+          "path": "out/opengl-client/compile_commands.json",
+          "sha256": "785929442742686695cbd5b9276e21322b463834b059d220b0e7210ec556a4a8"
+        },
+        {
+          "path": "out/production-app/Modules/OGLClient/dependencies.lock.json",
+          "sha256": "80d217de95a4a31f06b6df0f0f0f1544242c493a3382997690beac9c9f0800ce"
+        },
+        {
+          "path": "out/production-app/Modules/OGLClient/Licenses/docs-FTL.TXT",
+          "sha256": "08c135755dd589039470f1fdbb400daaabaaa50d0b366d19cebff4d22986baa1"
+        },
+        {
+          "path": "out/production-app/Modules/OGLClient/Licenses/fontstash.h",
+          "sha256": "785f7fa2521b47a5d1b8ebc6ed7e6f5d2c5f6c8fad0080b4605e2d63cacb46e0"
+        },
+        {
+          "path": "out/production-app/Modules/OGLClient/Licenses/glm-src-copying.txt",
+          "sha256": "62d2d642c7d054d4fb4c9b42faad617d6c88fcd91e317f8035aa9f277cc159c3"
+        },
+        {
+          "path": "out/production-app/Modules/OGLClient/Licenses/imgui-src-LICENSE.txt",
+          "sha256": "c80c5789748d955c4a650562baa0d750494e2c7128c2ca66aaebe2e3c4e198bf"
+        },
+        {
+          "path": "out/production-app/Modules/OGLClient/Licenses/libnsbmp-src-COPYING",
+          "sha256": "bec1a28e7f95e0b2acc624bf9e6d8556451f454ea6a213f8c1bc0fe792c61ead"
+        },
+        {
+          "path": "out/production-app/Modules/OGLClient/Licenses/nanovg-src-LICENSE.txt",
+          "sha256": "45185a6680ed83863bef33e1055f9fd76374df4b81c957802c19a286c982dfd2"
+        },
+        {
+          "path": "out/production-app/Modules/OGLClient/Licenses/OGLPad.cpp",
+          "sha256": "49e2cd1a80cfea02e0db1d31916906059306ff908760e116cb32ec7bafc09008"
+        },
+        {
+          "path": "out/production-app/Modules/OGLClient/Licenses/Orbiter-MIT.txt",
+          "sha256": "ffba1fe66f6c59cc8e01c014a4454901d1b6b3669b5e205bf54a2f57974bab7d"
+        },
+        {
+          "path": "out/production-app/Modules/OGLClient/Licenses/Shadinclude.hpp",
+          "sha256": "4869d2bf086276f8a14b2a5944cb1e34cb248ac7d793b587f68509e99afb5023"
+        },
+        {
+          "path": "out/production-app/Modules/OGLClient/Licenses/soil2-src-README.md",
+          "sha256": "11528c4876b9d4020cb481db340930821b2dc7158fd6dd2a8d8921a9965372a8"
+        },
+        {
+          "path": "out/production-app/Modules/OGLClient/Licenses/stb_image.h",
+          "sha256": "4ef7dee427053e3090b188021eab75fc227644c39caad6e81259e7f0053b55b7"
+        },
+        {
+          "path": "out/production-app/Modules/OGLClient/Licenses/stb_image_write.h",
+          "sha256": "cbd5f0ad7a9cf4468affb36354a1d2338034f2c12473cf1a8e32053cb6914a05"
+        },
+        {
+          "path": "out/production-app/Modules/OGLClient/Licenses/zlib.h",
+          "sha256": "4ddc82b4af931ab55f44d977bde81bfbc4151b5dcdccc03142831a301b5ec3c8"
+        }
+      ],
+      "excluded": [
+        {
+          "path": "out/production-app/Modules/Plugin/OGLClient.dll",
+          "sha256": "aae99ebe2b2d322c65df9a6b43caa9f86d2eb66c1a36ff9d74748666b536f43f"
+        },
+        {
+          "path": "out/production-app/Modules/Plugin/OGLClient.pdb",
+          "sha256": "9e2039b52bb69b5a7a8931ffda0839ad01e6a8c0793d8161e056898b65590807"
+        },
+        {
+          "path": "out/production-app/Modules/OGLClient/ATTRIBUTION.md",
+          "sha256": "79b7b3cc419d310489e541194d97b08666bdc4b6383b27b5652904d2a8abd5bd"
+        },
+        {
+          "path": "out/production-app/Modules/OGLClient/Cloud.fs",
+          "sha256": "eb25528320861565948b38b7c2ebd47297e66d486896306a33b60009aceade2f"
+        },
+        {
+          "path": "out/production-app/Modules/OGLClient/Cloud.vs",
+          "sha256": "30901d7f63100b634cf3d2ef98747a8b17be8f682b5eeb0e99131906387b5697"
+        },
+        {
+          "path": "out/production-app/Modules/OGLClient/Common.inc",
+          "sha256": "4e40e70a70c9f1a08e569adfc44097899e37d81c199ce1879b5b3d81083db2ec"
+        },
+        {
+          "path": "out/production-app/Modules/OGLClient/Constellations.fs",
+          "sha256": "2ba545184b330f5fb721179c4ccae61502b43a6bb8a50a368c17ad1246508db9"
+        },
+        {
+          "path": "out/production-app/Modules/OGLClient/Constellations.vs",
+          "sha256": "0ba5e9d65ea610d99cde8f6e388684a1c7064c7730e16f26cf0772e216e2724b"
+        },
+        {
+          "path": "out/production-app/Modules/OGLClient/Ecliptic.fs",
+          "sha256": "4a93a93e3186fe19b0240644d83e458037dbfb1820b7aa332ddfcdf9fbd1028e"
+        },
+        {
+          "path": "out/production-app/Modules/OGLClient/Ecliptic.vs",
+          "sha256": "0ba5e9d65ea610d99cde8f6e388684a1c7064c7730e16f26cf0772e216e2724b"
+        },
+        {
+          "path": "out/production-app/Modules/OGLClient/Exhaust.fs",
+          "sha256": "26f78db654a4c6d4b34807d9e6fb7eb7595ebe3e12fa34abb7f5f9a9aa62d029"
+        },
+        {
+          "path": "out/production-app/Modules/OGLClient/Exhaust.vs",
+          "sha256": "317ceafe9613196b863d436205ffb8c725ba572d0eff989628a6579faf44df71"
+        },
+        {
+          "path": "out/production-app/Modules/OGLClient/GroundShadow.fs",
+          "sha256": "364b5d72032cf871b4bf6df7d0276b0f0892e2650a04a595a5ab75703d425da0"
+        },
+        {
+          "path": "out/production-app/Modules/OGLClient/GroundShadow.vs",
+          "sha256": "792c53dbc53f93d8a1df42726856224fee297c2ee2b3de4cddf3f897034d544c"
+        },
+        {
+          "path": "out/production-app/Modules/OGLClient/Haze.fs",
+          "sha256": "20ce2c36ec348c39d51238a8a1ff4e280c7657693d7ce2af3f65ead7c2a86160"
+        },
+        {
+          "path": "out/production-app/Modules/OGLClient/Haze.vs",
+          "sha256": "7d8d6b0d92506aaaaebd807365e60614721c8367112d9b92bc0e73c06868b64a"
+        },
+        {
+          "path": "out/production-app/Modules/OGLClient/LogDepth.inc",
+          "sha256": "fa35ccf810e1bf17c0542764c495dabbb497c085e20ca175fb3f5d1cf9c6726c"
+        },
+        {
+          "path": "out/production-app/Modules/OGLClient/Mesh.fs",
+          "sha256": "b35400a6f0d4c17c5cf22bd54aa79262fa7ac15c00a974205ac92a06e81750bc"
+        },
+        {
+          "path": "out/production-app/Modules/OGLClient/Mesh.vs",
+          "sha256": "930a4e26e6f2c2934c660eb79d815ce2fb0a017179e338f055e80efe1d92ff34"
+        },
+        {
+          "path": "out/production-app/Modules/OGLClient/MeshUnlit.fs",
+          "sha256": "ca9e0b2501cebad726eaede37bc156e4d82ae1fba368a1a0ff4725bbfb34c00a"
+        },
+        {
+          "path": "out/production-app/Modules/OGLClient/MeshUnlit.vs",
+          "sha256": "48c518f1bf4fe73eeeb96eb9f318c1583e450f67af1866cd53d87cc697120ce0"
+        },
+        {
+          "path": "out/production-app/Modules/OGLClient/Overlay.fs",
+          "sha256": "7ecf7b1307f78531cf93ef028655b55dd3f5d3d419f37ec56e36159b4726983f"
+        },
+        {
+          "path": "out/production-app/Modules/OGLClient/Overlay.vs",
+          "sha256": "2a1446e6009dbbd220fa909d3373d784f11a14d3b13fd11c695bd1532d86aac7"
+        },
+        {
+          "path": "out/production-app/Modules/OGLClient/Particle.fs",
+          "sha256": "558e6cc9f62cf66fd66a0b71a79a1a933d3c45913d5b3bedf620108ad8b8be09"
+        },
+        {
+          "path": "out/production-app/Modules/OGLClient/Particle.vs",
+          "sha256": "47a39c1c5930841da760e8fa007d1131be315ad4fd09220aede97e333aa68231"
+        },
+        {
+          "path": "out/production-app/Modules/OGLClient/Ring.fs",
+          "sha256": "62fe7dc50a7f8e77f8d149509ca1291f6fb7e84a88ce919283495af813664339"
+        },
+        {
+          "path": "out/production-app/Modules/OGLClient/Ring.vs",
+          "sha256": "b7c6a413002b01dc55ab439a1965459561cc98a1d86e306a944a251f9ee7f691"
+        },
+        {
+          "path": "out/production-app/Modules/OGLClient/Spot.fs",
+          "sha256": "38bcc949bb6a654ce32c148bc84044dc26f5c324ea9bd060205a11e51ddf6f0b"
+        },
+        {
+          "path": "out/production-app/Modules/OGLClient/Spot.vs",
+          "sha256": "112753669d70c08aea27c81df931fc5b1ad0628a607ad856ec7018e8a2f9c273"
+        },
+        {
+          "path": "out/production-app/Modules/OGLClient/Stars.fs",
+          "sha256": "bc037a5f7706ec5b895a8e8a3d6b22c6e45086ca9b4f9f4d87af89df821d21a5"
+        },
+        {
+          "path": "out/production-app/Modules/OGLClient/Stars.vs",
+          "sha256": "8d5130ebdf69840ccc7b7c0e22d90ef00382ca00103bac348408ccd50a423b7d"
+        },
+        {
+          "path": "out/production-app/Modules/OGLClient/Tile.fs",
+          "sha256": "d8145397bb4c13244dbbc150b51a1a462e8b42502dc7754154a7a6300782e958"
+        },
+        {
+          "path": "out/production-app/Modules/OGLClient/Tile.vs",
+          "sha256": "e0aecdff8d53a8fab078e6fe2ffcf78ce670e522debba7750261d2801e1c0c8e"
+        },
+        {
+          "path": "out/production-app/Modules/OGLClient/Types.inc",
+          "sha256": "a6f30552abb4ae13348a0e99f2f265150d45d41373c3c3603544ca877faba068"
+        },
+        {
+          "path": "out/production-app/Modules/OGLClient/Uniforms.inc",
+          "sha256": "2f4cb227de081cabfdcd45655987efe9235b9d2a169d65d7583ec50cba5d8c89"
+        },
+        {
+          "path": "out/production-app/Modules/OGLClient/Untextured.fs",
+          "sha256": "11485b9057e7c1f08005858decfa3a772a738454c81e2b7e5957560e93afec9b"
+        },
+        {
+          "path": "out/production-app/Modules/OGLClient/Untextured.vs",
+          "sha256": "cc02e7e9a410bdf5e3f4d45fca12267ca511d065b42c3032b1d3e8c0028a1acc"
+        },
+        {
+          "path": "out/production-app/Modules/OGLClient/VesselShadow.fs",
+          "sha256": "364b5d72032cf871b4bf6df7d0276b0f0892e2650a04a595a5ab75703d425da0"
+        },
+        {
+          "path": "out/production-app/Modules/OGLClient/VesselShadow.vs",
+          "sha256": "48bb3fb2e6f9d53a60d11959b4d0a579dee64d6b8f5b83f2effba64ee9c2c943"
+        }
+      ],
+      "filtered_sha256": "fd37420badc4ba35137b15b43d3c9bc3e0ded7b5a86baddb68c47d3dcba99166"
+    },
+    {
+      "configuration": "Release",
+      "artifact_id": 13076021487,
+      "original_sha256": "fc81dea88b0d3b056a3f6e1131500f165438671959b1a29c90d5ca6fc00af3be",
+      "filtered_file": "archive-client-release.zip",
+      "members": [
+        {
+          "path": "out/client-execution/client-summary.json",
+          "sha256": "cd14c67a64522d42789c135d08d1cea0deec14c256b3f40a669c9ce81f752b28"
+        },
+        {
+          "path": "out/client-execution/scene/behavior-animations.csv",
+          "sha256": "06175d177e56b7a77ed689dc6a6d74c13c52c3dba83f931a00ecb8a1cd2a24cc"
+        },
+        {
+          "path": "out/client-execution/scene/archive-reads.csv",
+          "sha256": "b767c97cb12da4a0316f7c3c537828f1738d156a76789fa59aae6ec0513727ee"
+        },
+        {
+          "path": "out/client-execution/scene/behavior-case.txt",
+          "sha256": "fbfbf33477553394248c162f91ad3facdc722e3aebd45aa7e675a63e6624ff4f"
+        },
+        {
+          "path": "out/client-execution/scene/behavior-events.csv",
+          "sha256": "901edd9f5919d531036d28d3be1d7b17e40043c1cba4c9acabf8b4149dad881c"
+        },
+        {
+          "path": "out/client-execution/scene/behavior-state.csv",
+          "sha256": "c6dcb52250179fe6153438677548dc8620994106b3e6c9bab8f1bc389c121abf"
+        },
+        {
+          "path": "out/client-execution/scene/camera.csv",
+          "sha256": "8e8faac932836de5c29516ace2769118099a3696d80d7b93b4e75aad17cbd0b0"
+        },
+        {
+          "path": "out/client-execution/scene/behavior-propellant.csv",
+          "sha256": "843cce83fc462e5582c6dd991f0a4adb16719fd539b8e007df10b97736a82023"
+        },
+        {
+          "path": "out/client-execution/scene/client-report.json",
+          "sha256": "a170e334044898f1731a50bc9689e8ba104d342bb49a5afd6c2a0762a4a0c3ee"
+        },
+        {
+          "path": "out/client-execution/scene/console.txt",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "out/client-execution/scene/graphics-lifecycle.json",
+          "sha256": "df7514880a865666d7ff653c5f63158753beffc1be13e4fda55ad112cca2d37b"
+        },
+        {
+          "path": "out/client-execution/scene/GravityModels/Notes on Gravity Models.txt",
+          "sha256": "9fdf442ce97e8dcbd988718d50c80b3af332ab711b98090558ddaf173cf6ee99"
+        },
+        {
+          "path": "out/client-execution/scene/invocation.json",
+          "sha256": "dd975f1ab2c7ef260a2c52515b9111239d1983a85d429008d5ee4df8093d0798"
+        },
+        {
+          "path": "out/client-execution/scene/Kernels/orbiter.log",
+          "sha256": "98c86d3279d6596b0fe5332c2dfdab65e2fd0716410df8b14ce01d514bda861a"
+        },
+        {
+          "path": "out/client-execution/scene/Kernels/spk_sources.txt",
+          "sha256": "578e9dcec183e497401918e54b0e353f0e3c097f0d245fb19bc4a1447e97a191"
+        },
+        {
+          "path": "out/client-execution/scene/loaded-assets.txt",
+          "sha256": "42b33ab8c3823afb735fe08bc197f0ccc79608962ecdbed2c70616a5649cb13b"
+        },
+        {
+          "path": "out/client-execution/scene/licenses/spirv-llvm-translator/LICENSE.TXT",
+          "sha256": "e3bc36440fc927c62d5cc24efeefe225a14d4e34ffeb0c92e430625cce9ee444"
+        },
+        {
+          "path": "out/client-execution/scene/mesa-bindings.json",
+          "sha256": "c58c4ab6dce5cf9b7f4a04dd37a54f72c53ef5de869c13c5eb224496625eaa7a"
+        },
+        {
+          "path": "out/client-execution/scene/Modules/D3D9Client/GKernel.txt",
+          "sha256": "997d1a9bba583331a857a41dc338954877ce57d413f4d3e3a65bb9b5eb4f6052"
+        },
+        {
+          "path": "out/client-execution/scene/Modules/OGLClient/Licenses/docs-FTL.TXT",
+          "sha256": "08c135755dd589039470f1fdbb400daaabaaa50d0b366d19cebff4d22986baa1"
+        },
+        {
+          "path": "out/client-execution/scene/Modules/OGLClient/dependencies.lock.json",
+          "sha256": "80d217de95a4a31f06b6df0f0f0f1544242c493a3382997690beac9c9f0800ce"
+        },
+        {
+          "path": "out/client-execution/scene/Modules/OGLClient/Licenses/glm-src-copying.txt",
+          "sha256": "62d2d642c7d054d4fb4c9b42faad617d6c88fcd91e317f8035aa9f277cc159c3"
+        },
+        {
+          "path": "out/client-execution/scene/Modules/OGLClient/Licenses/imgui-src-LICENSE.txt",
+          "sha256": "c80c5789748d955c4a650562baa0d750494e2c7128c2ca66aaebe2e3c4e198bf"
+        },
+        {
+          "path": "out/client-execution/scene/Modules/OGLClient/Licenses/Orbiter-MIT.txt",
+          "sha256": "ffba1fe66f6c59cc8e01c014a4454901d1b6b3669b5e205bf54a2f57974bab7d"
+        },
+        {
+          "path": "out/client-execution/scene/Modules/OGLClient/Licenses/nanovg-src-LICENSE.txt",
+          "sha256": "45185a6680ed83863bef33e1055f9fd76374df4b81c957802c19a286c982dfd2"
+        },
+        {
+          "path": "out/client-execution/scene/object-draws.csv",
+          "sha256": "0674b66275b44ee2adda67635fbaa74c75f7daf5308fa92e1de250539010b9aa"
+        },
+        {
+          "path": "out/client-execution/scene/Orbiter.cfg",
+          "sha256": "8eaf31ea0dc97f16e945a207bebc0fe5c25358e7101a299bd824cf31fa4a5635"
+        },
+        {
+          "path": "out/client-execution/scene/planet-tiles.csv",
+          "sha256": "b4fd0ca3f0a0859fbd837f9fba01b2ecf0b7ac98f879f26766b6f3f047c178fc"
+        },
+        {
+          "path": "out/client-execution/scene/Orbiter.log",
+          "sha256": "30cdc93a6418a01e2d5a7172d2364f38411150eff4b4a86b37ce5be4bec615a1"
+        },
+        {
+          "path": "out/client-execution/scene/renderer-info.json",
+          "sha256": "b1035deb8d14e84f2dc01124f453dc06daec1eb0cebb1ef44bb81217e5cd0fb5"
+        },
+        {
+          "path": "out/client-execution/scene/renderer-modules.txt",
+          "sha256": "019b2225ea562cf771cd28bb6927d1d09356bec6c1975919ef9180adfd9a4644"
+        },
+        {
+          "path": "out/client-execution/scene/Scenarios/(Current state).scn",
+          "sha256": "fba3abcb14bffb8ef79654b069ed8bfd2d8c2b44604c9102ce202801e358a0f0"
+        },
+        {
+          "path": "out/client-execution/scene/Scenarios/Behavior.scn",
+          "sha256": "1864379c939eff6d3c2d546d101915c4015164ec14673142f9de2c982803ce7e"
+        },
+        {
+          "path": "out/client-execution/scene/scene-summary.json",
+          "sha256": "e96eed18d42fa7086797d6be4dbae4b0fa316e928d1dfa3f017088a25d8f7b2b"
+        },
+        {
+          "path": "out/client-execution/scene/scene.csv",
+          "sha256": "8f7f996b275ca958ca643569ab873d6a1a383cee9949a596fc405deab8ee6dab"
+        },
+        {
+          "path": "out/client-execution/scene/scene.rgba",
+          "sha256": "4cad399e74c3f1c4de0714c50ace5305cd47cff6dd6b6a3de85cb7ea7a2f41a7",
+          "storage": {
+            "kind": "lossless_decode",
+            "source": "Tests/Production/ClientReference/scene.png"
+          }
+        },
+        {
+          "path": "out/client-execution/scene/scene.png",
+          "sha256": "cf713ff6c8dbe9cd2dbf83f5a9b92a9040d6142fcf5f895031c35cf6ee8dc6e4",
+          "storage": {
+            "kind": "existing_file",
+            "source": "Tests/Production/ClientReference/scene.png"
+          }
+        },
+        {
+          "path": "out/client-execution/scene/Textures/D3D9/Icons18.png",
+          "sha256": "e66e9c71845dff7b1e32e91a78e93dc792cff3a77fe07bdf5946fbaa6e580c14"
+        },
+        {
+          "path": "out/client-execution/scene/Textures/D3D9/Icons28.png",
+          "sha256": "7e68e596e3b64c72ac78da57da7a4a656dc4c3636d4813414830497013852376"
+        },
+        {
+          "path": "out/client-execution/scene/Textures/D3D9/Icons36.png",
+          "sha256": "24ce58341234fd8ee61fd2d27083f045827baad401e249daaacf6817fd25007e"
+        },
+        {
+          "path": "out/client-execution/scene/Textures/D3D9/SubTitle28.png",
+          "sha256": "0a6af5fce2a6a5d06d735cc2f2e7412daa6c95fe89eb77fd81ce553d1c6906d6"
+        },
+        {
+          "path": "out/client-execution/scene/Textures/D3D9/SubTitle18.png",
+          "sha256": "28035da13aad92846e3d699fb60e0e273bf0c9bb52f69ee499afac4361ae8648"
+        },
+        {
+          "path": "out/client-execution/scene/Textures/D3D9/SubTitle36.png",
+          "sha256": "7acc911953a23429e52ad04bbc48afbebe6c57557cf636c64fddd79cca764205"
+        },
+        {
+          "path": "out/client-execution/scene/Textures/D3D9/SubTitle56.png",
+          "sha256": "5e4ea9ff5a45ceddde4d0aa504ff8ad4ff690c1942c35bdb82d0b679be11d5c8"
+        },
+        {
+          "path": "out/client-execution/scene/Textures/MenuInfoBar/Default/camera.png",
+          "sha256": "c0fc302940cca2c45650169338eeae456731c946cfe121dc13d81e0e587f1fdd"
+        },
+        {
+          "path": "out/client-execution/scene/Textures/MenuInfoBar/camera.png",
+          "sha256": "6a3c789068ae7f7f9fb1b81deb5dcd03a3991ee6d3c6cea071ef1ae609e25199"
+        },
+        {
+          "path": "out/client-execution/scene/Textures/MenuInfoBar/Default/exit.png",
+          "sha256": "607f8b4dd673bb8bfbf72c1164fa6ea96d99874cd2f464f39559fbd36e083523"
+        },
+        {
+          "path": "out/client-execution/scene/Textures/MenuInfoBar/Default/ExtMFD.png",
+          "sha256": "a2ad181a19de0d4eb076018fe5790184a6f652b0848a755a0e8feb262be9e63b"
+        },
+        {
+          "path": "out/client-execution/scene/Textures/MenuInfoBar/Default/function.png",
+          "sha256": "da97434a068a75cfce18b87964726ff9d2c4d264fcb22c26fc13f685880acc23"
+        },
+        {
+          "path": "out/client-execution/scene/Textures/MenuInfoBar/Default/help.png",
+          "sha256": "7cd575686fe0ad8f823e7bf3d5dd3ac124ee233bade130aa6fad33740ba2230f"
+        },
+        {
+          "path": "out/client-execution/scene/Textures/MenuInfoBar/Default/info.png",
+          "sha256": "1a3dcc9d9f8d3471ca61b61fd0378bcff73b8a463160084b0dd0d8dfbfbd1acf"
+        },
+        {
+          "path": "out/client-execution/scene/Textures/MenuInfoBar/Default/LuaConsole.png",
+          "sha256": "087a4d03b129ddd5a21c30eaf04e262836a8f65d0236edafefb97993f3ed5884"
+        },
+        {
+          "path": "out/client-execution/scene/Textures/MenuInfoBar/Default/map.png",
+          "sha256": "f2e9172fcbf9b47b08e6b518d00e8f057ed43e6c4ac6bf0e874cff27fd1a5015"
+        },
+        {
+          "path": "out/client-execution/scene/Textures/MenuInfoBar/Default/pause.png",
+          "sha256": "6d164e079c27e3918f33104c4de69037b5ba58628a32f29f5c8115b405d2f63f"
+        },
+        {
+          "path": "out/client-execution/scene/Textures/MenuInfoBar/Default/record.png",
+          "sha256": "d5ac72f4d477125f32d7016820e2f9083d44092f09da548e8ba434d5cada3f4b"
+        },
+        {
+          "path": "out/client-execution/scene/Textures/MenuInfoBar/Default/options.png",
+          "sha256": "b0b9286a992f12b0457681816ea7606b0afaef2d346bf67c4ada8f5af633fcde"
+        },
+        {
+          "path": "out/client-execution/scene/Textures/MenuInfoBar/Default/save.png",
+          "sha256": "a42bcb179cb4e36db3b63e411adbd3ba6f805dfe3821a4eacbabf4f988b3a3b4"
+        },
+        {
+          "path": "out/client-execution/scene/Textures/MenuInfoBar/Default/ship.png",
+          "sha256": "286d6362c2776aab63aa80d29e8f86e7dc83642a76ecb1ddd17115f980ec98fd"
+        },
+        {
+          "path": "out/client-execution/scene/Textures/MenuInfoBar/Default/speed.png",
+          "sha256": "e64dd672b77edd06aab57475a8ac6bc7082eed22daac2cb59eb13d0edef7f597"
+        },
+        {
+          "path": "out/client-execution/scene/Textures/MenuInfoBar/exit.png",
+          "sha256": "269f21a72650d19c37a407caf3e610896a2ded08a7e0fbabb09105b6ba342df6"
+        },
+        {
+          "path": "out/client-execution/scene/Textures/MenuInfoBar/ExtMFD.png",
+          "sha256": "651fb3f2e672d2e3f2e70540ba6501c09ef8faeac0b8be0af8cdf390c8986552"
+        },
+        {
+          "path": "out/client-execution/scene/Textures/MenuInfoBar/function.png",
+          "sha256": "fa6c32f0d6d847d4b63da147180a21529daf086ddba1d89a86133d86e83e709b"
+        },
+        {
+          "path": "out/client-execution/scene/Textures/MenuInfoBar/FlightData.png",
+          "sha256": "d79386f486f4bed7c788c9babe52857abd22fb24758e38505377215e26015543"
+        },
+        {
+          "path": "out/client-execution/scene/Textures/MenuInfoBar/help.png",
+          "sha256": "8a84af8f4e2692166874d5360ba4a42794627d8e54cce017b0f382b849a6197d"
+        },
+        {
+          "path": "out/client-execution/scene/Textures/MenuInfoBar/info.png",
+          "sha256": "3bc593e7b117d25407b0f32f593292cfb838b37d5e7d76f3c48845a3a69c1548"
+        },
+        {
+          "path": "out/client-execution/scene/Textures/MenuInfoBar/LuaConsole.png",
+          "sha256": "65c5f0b1ace6a0d103f6e5933e3ae949d0f9b9fcb9adeef3ed47f31c66733080"
+        },
+        {
+          "path": "out/client-execution/scene/Textures/MenuInfoBar/map.png",
+          "sha256": "f0073c77fc916dbd127dc4fa679d6889804be94953b4c6849d062d59cf1598da"
+        },
+        {
+          "path": "out/client-execution/scene/Textures/MenuInfoBar/Notes.png",
+          "sha256": "3b17e14fdd58084aa6f4ae341053d38fcbe3312c8632698f70f3c233bfc6eaa3"
+        },
+        {
+          "path": "out/client-execution/scene/Textures/MenuInfoBar/options.png",
+          "sha256": "1232753c8e5b7ace85b5c093c0de9698d29fbafa07dd92763df3e80c5b2d8ecc"
+        },
+        {
+          "path": "out/client-execution/scene/Textures/MenuInfoBar/pause.png",
+          "sha256": "bf6d3fd049b891b78b8a036fe5af78084e48e16b703cc0387231de1b18fc34b0"
+        },
+        {
+          "path": "out/client-execution/scene/Textures/MenuInfoBar/record.png",
+          "sha256": "114bc90f00dee68ba791c72c76a64c12ce175f324d52d278b02dd85341cf93fc"
+        },
+        {
+          "path": "out/client-execution/scene/Textures/MenuInfoBar/Rcontrol.png",
+          "sha256": "d62cd21b1ae8ae4e48a1d5d99d885ac590724751ba7dda53b40eb64aa9c64102"
+        },
+        {
+          "path": "out/client-execution/scene/Textures/MenuInfoBar/save.png",
+          "sha256": "a1645b0fc1cef10274e2b7785f9356021ff5df649b34cc9898a62f68e00c635b"
+        },
+        {
+          "path": "out/client-execution/scene/Textures/MenuInfoBar/ScnEdit.png",
+          "sha256": "a7cd8450f340e029c39de1bb29b7c2e7e598acfcad08b756c1d8c3400671bde7"
+        },
+        {
+          "path": "out/client-execution/scene/Textures/MenuInfoBar/ship.png",
+          "sha256": "b4685d54649e014c3cba0ab5b60d94a5248ad591a4ff76b0b7e153f10e14ceb7"
+        },
+        {
+          "path": "out/client-execution/scene/Textures/MenuInfoBar/speed.png",
+          "sha256": "4b2f430ea2f27f5152f91ad1e58c46fd72ddd76e6c3e900dc7af3c6395c9ad83"
+        },
+        {
+          "path": "out/client-execution/scene/Textures2/Atlantis/switchdown.png",
+          "sha256": "e32af5574c509aaadf11279bef5c841f0365aa875ed949ca4021b354dc5cf632"
+        },
+        {
+          "path": "out/client-execution/scene/Textures2/Atlantis/switchmid.png",
+          "sha256": "b7baea1026a4f24aa371391c4fa94cd67e178b161e6313221b412ed031402042"
+        },
+        {
+          "path": "out/client-execution/scene/Textures2/Atlantis/switchup.png",
+          "sha256": "f45a5ffb545f89c8c31b7bb6c590e46d09cfa3a82473699dd6930f97df1964b6"
+        },
+        {
+          "path": "out/client-execution/scene/visual-events.csv",
+          "sha256": "1116c2dff517ee95cb98dbe407b64dccbe079e4f73e912b365a4098d98baf4bc"
+        },
+        {
+          "path": "out/client-execution/scene-repeat/archive-reads.csv",
+          "sha256": "b767c97cb12da4a0316f7c3c537828f1738d156a76789fa59aae6ec0513727ee"
+        },
+        {
+          "path": "out/client-execution/scene-repeat/behavior-animations.csv",
+          "sha256": "06175d177e56b7a77ed689dc6a6d74c13c52c3dba83f931a00ecb8a1cd2a24cc"
+        },
+        {
+          "path": "out/client-execution/scene-repeat/behavior-case.txt",
+          "sha256": "fbfbf33477553394248c162f91ad3facdc722e3aebd45aa7e675a63e6624ff4f"
+        },
+        {
+          "path": "out/client-execution/scene-repeat/behavior-events.csv",
+          "sha256": "901edd9f5919d531036d28d3be1d7b17e40043c1cba4c9acabf8b4149dad881c"
+        },
+        {
+          "path": "out/client-execution/scene-repeat/behavior-propellant.csv",
+          "sha256": "843cce83fc462e5582c6dd991f0a4adb16719fd539b8e007df10b97736a82023"
+        },
+        {
+          "path": "out/client-execution/scene-repeat/behavior-state.csv",
+          "sha256": "c6dcb52250179fe6153438677548dc8620994106b3e6c9bab8f1bc389c121abf"
+        },
+        {
+          "path": "out/client-execution/scene-repeat/camera.csv",
+          "sha256": "8e8faac932836de5c29516ace2769118099a3696d80d7b93b4e75aad17cbd0b0"
+        },
+        {
+          "path": "out/client-execution/scene-repeat/client-report.json",
+          "sha256": "4d769d1bb284846a6983b36dfa51bfbe4e043671613066cb1911acc13f60b523"
+        },
+        {
+          "path": "out/client-execution/scene-repeat/console.txt",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "out/client-execution/scene-repeat/graphics-lifecycle.json",
+          "sha256": "df7514880a865666d7ff653c5f63158753beffc1be13e4fda55ad112cca2d37b"
+        },
+        {
+          "path": "out/client-execution/scene-repeat/GravityModels/Notes on Gravity Models.txt",
+          "sha256": "9fdf442ce97e8dcbd988718d50c80b3af332ab711b98090558ddaf173cf6ee99"
+        },
+        {
+          "path": "out/client-execution/scene-repeat/invocation.json",
+          "sha256": "d58cb84d905b13db2afcb1f4bfe59957bfeca4ef8a978c5ea3d6a5c777ee1e3d"
+        },
+        {
+          "path": "out/client-execution/scene-repeat/Kernels/orbiter.log",
+          "sha256": "98c86d3279d6596b0fe5332c2dfdab65e2fd0716410df8b14ce01d514bda861a"
+        },
+        {
+          "path": "out/client-execution/scene-repeat/Kernels/spk_sources.txt",
+          "sha256": "578e9dcec183e497401918e54b0e353f0e3c097f0d245fb19bc4a1447e97a191"
+        },
+        {
+          "path": "out/client-execution/scene-repeat/licenses/spirv-llvm-translator/LICENSE.TXT",
+          "sha256": "e3bc36440fc927c62d5cc24efeefe225a14d4e34ffeb0c92e430625cce9ee444"
+        },
+        {
+          "path": "out/client-execution/scene-repeat/loaded-assets.txt",
+          "sha256": "42b33ab8c3823afb735fe08bc197f0ccc79608962ecdbed2c70616a5649cb13b"
+        },
+        {
+          "path": "out/client-execution/scene-repeat/mesa-bindings.json",
+          "sha256": "c58c4ab6dce5cf9b7f4a04dd37a54f72c53ef5de869c13c5eb224496625eaa7a"
+        },
+        {
+          "path": "out/client-execution/scene-repeat/Modules/D3D9Client/GKernel.txt",
+          "sha256": "997d1a9bba583331a857a41dc338954877ce57d413f4d3e3a65bb9b5eb4f6052"
+        },
+        {
+          "path": "out/client-execution/scene-repeat/Modules/OGLClient/dependencies.lock.json",
+          "sha256": "80d217de95a4a31f06b6df0f0f0f1544242c493a3382997690beac9c9f0800ce"
+        },
+        {
+          "path": "out/client-execution/scene-repeat/Modules/OGLClient/Licenses/glm-src-copying.txt",
+          "sha256": "62d2d642c7d054d4fb4c9b42faad617d6c88fcd91e317f8035aa9f277cc159c3"
+        },
+        {
+          "path": "out/client-execution/scene-repeat/Modules/OGLClient/Licenses/imgui-src-LICENSE.txt",
+          "sha256": "c80c5789748d955c4a650562baa0d750494e2c7128c2ca66aaebe2e3c4e198bf"
+        },
+        {
+          "path": "out/client-execution/scene-repeat/Modules/OGLClient/Licenses/nanovg-src-LICENSE.txt",
+          "sha256": "45185a6680ed83863bef33e1055f9fd76374df4b81c957802c19a286c982dfd2"
+        },
+        {
+          "path": "out/client-execution/scene-repeat/object-draws.csv",
+          "sha256": "0674b66275b44ee2adda67635fbaa74c75f7daf5308fa92e1de250539010b9aa"
+        },
+        {
+          "path": "out/client-execution/scene-repeat/Orbiter.cfg",
+          "sha256": "8eaf31ea0dc97f16e945a207bebc0fe5c25358e7101a299bd824cf31fa4a5635"
+        },
+        {
+          "path": "out/client-execution/scene-repeat/Modules/OGLClient/Licenses/Orbiter-MIT.txt",
+          "sha256": "ffba1fe66f6c59cc8e01c014a4454901d1b6b3669b5e205bf54a2f57974bab7d"
+        },
+        {
+          "path": "out/client-execution/scene-repeat/Modules/OGLClient/Licenses/docs-FTL.TXT",
+          "sha256": "08c135755dd589039470f1fdbb400daaabaaa50d0b366d19cebff4d22986baa1"
+        },
+        {
+          "path": "out/client-execution/scene-repeat/Orbiter.log",
+          "sha256": "7909bd15c93558418c6d7383f09234586297d6269d1f3e6c6caa63f55c47a6ae"
+        },
+        {
+          "path": "out/client-execution/scene-repeat/planet-tiles.csv",
+          "sha256": "b4fd0ca3f0a0859fbd837f9fba01b2ecf0b7ac98f879f26766b6f3f047c178fc"
+        },
+        {
+          "path": "out/client-execution/scene-repeat/renderer-info.json",
+          "sha256": "b1035deb8d14e84f2dc01124f453dc06daec1eb0cebb1ef44bb81217e5cd0fb5"
+        },
+        {
+          "path": "out/client-execution/scene-repeat/renderer-modules.txt",
+          "sha256": "6a1bb79650e40499bea3cb1e4fb92146a8ad651e40d58681edd3725321eb9697"
+        },
+        {
+          "path": "out/client-execution/scene-repeat/Scenarios/(Current state).scn",
+          "sha256": "fba3abcb14bffb8ef79654b069ed8bfd2d8c2b44604c9102ce202801e358a0f0"
+        },
+        {
+          "path": "out/client-execution/scene-repeat/Scenarios/Behavior.scn",
+          "sha256": "1864379c939eff6d3c2d546d101915c4015164ec14673142f9de2c982803ce7e"
+        },
+        {
+          "path": "out/client-execution/scene-repeat/scene-summary.json",
+          "sha256": "e96eed18d42fa7086797d6be4dbae4b0fa316e928d1dfa3f017088a25d8f7b2b"
+        },
+        {
+          "path": "out/client-execution/scene-repeat/scene.csv",
+          "sha256": "8f7f996b275ca958ca643569ab873d6a1a383cee9949a596fc405deab8ee6dab"
+        },
+        {
+          "path": "out/client-execution/scene-repeat/scene.png",
+          "sha256": "cf713ff6c8dbe9cd2dbf83f5a9b92a9040d6142fcf5f895031c35cf6ee8dc6e4",
+          "storage": {
+            "kind": "existing_file",
+            "source": "Tests/Production/ClientReference/scene.png"
+          }
+        },
+        {
+          "path": "out/client-execution/scene-repeat/scene.rgba",
+          "sha256": "4cad399e74c3f1c4de0714c50ace5305cd47cff6dd6b6a3de85cb7ea7a2f41a7",
+          "storage": {
+            "kind": "lossless_decode",
+            "source": "Tests/Production/ClientReference/scene.png"
+          }
+        },
+        {
+          "path": "out/client-execution/scene-repeat/Textures/D3D9/Icons18.png",
+          "sha256": "e66e9c71845dff7b1e32e91a78e93dc792cff3a77fe07bdf5946fbaa6e580c14"
+        },
+        {
+          "path": "out/client-execution/scene-repeat/Textures/D3D9/Icons28.png",
+          "sha256": "7e68e596e3b64c72ac78da57da7a4a656dc4c3636d4813414830497013852376"
+        },
+        {
+          "path": "out/client-execution/scene-repeat/Textures/D3D9/Icons36.png",
+          "sha256": "24ce58341234fd8ee61fd2d27083f045827baad401e249daaacf6817fd25007e"
+        },
+        {
+          "path": "out/client-execution/scene-repeat/Textures/D3D9/SubTitle28.png",
+          "sha256": "0a6af5fce2a6a5d06d735cc2f2e7412daa6c95fe89eb77fd81ce553d1c6906d6"
+        },
+        {
+          "path": "out/client-execution/scene-repeat/Textures/D3D9/SubTitle18.png",
+          "sha256": "28035da13aad92846e3d699fb60e0e273bf0c9bb52f69ee499afac4361ae8648"
+        },
+        {
+          "path": "out/client-execution/scene-repeat/Textures/D3D9/SubTitle36.png",
+          "sha256": "7acc911953a23429e52ad04bbc48afbebe6c57557cf636c64fddd79cca764205"
+        },
+        {
+          "path": "out/client-execution/scene-repeat/Textures/D3D9/SubTitle56.png",
+          "sha256": "5e4ea9ff5a45ceddde4d0aa504ff8ad4ff690c1942c35bdb82d0b679be11d5c8"
+        },
+        {
+          "path": "out/client-execution/scene-repeat/Textures/MenuInfoBar/camera.png",
+          "sha256": "6a3c789068ae7f7f9fb1b81deb5dcd03a3991ee6d3c6cea071ef1ae609e25199"
+        },
+        {
+          "path": "out/client-execution/scene-repeat/Textures/MenuInfoBar/Default/camera.png",
+          "sha256": "c0fc302940cca2c45650169338eeae456731c946cfe121dc13d81e0e587f1fdd"
+        },
+        {
+          "path": "out/client-execution/scene-repeat/Textures/MenuInfoBar/Default/exit.png",
+          "sha256": "607f8b4dd673bb8bfbf72c1164fa6ea96d99874cd2f464f39559fbd36e083523"
+        },
+        {
+          "path": "out/client-execution/scene-repeat/Textures/MenuInfoBar/Default/ExtMFD.png",
+          "sha256": "a2ad181a19de0d4eb076018fe5790184a6f652b0848a755a0e8feb262be9e63b"
+        },
+        {
+          "path": "out/client-execution/scene-repeat/Textures/MenuInfoBar/Default/function.png",
+          "sha256": "da97434a068a75cfce18b87964726ff9d2c4d264fcb22c26fc13f685880acc23"
+        },
+        {
+          "path": "out/client-execution/scene-repeat/Textures/MenuInfoBar/Default/help.png",
+          "sha256": "7cd575686fe0ad8f823e7bf3d5dd3ac124ee233bade130aa6fad33740ba2230f"
+        },
+        {
+          "path": "out/client-execution/scene-repeat/Textures/MenuInfoBar/Default/info.png",
+          "sha256": "1a3dcc9d9f8d3471ca61b61fd0378bcff73b8a463160084b0dd0d8dfbfbd1acf"
+        },
+        {
+          "path": "out/client-execution/scene-repeat/Textures/MenuInfoBar/Default/LuaConsole.png",
+          "sha256": "087a4d03b129ddd5a21c30eaf04e262836a8f65d0236edafefb97993f3ed5884"
+        },
+        {
+          "path": "out/client-execution/scene-repeat/Textures/MenuInfoBar/Default/map.png",
+          "sha256": "f2e9172fcbf9b47b08e6b518d00e8f057ed43e6c4ac6bf0e874cff27fd1a5015"
+        },
+        {
+          "path": "out/client-execution/scene-repeat/Textures/MenuInfoBar/Default/options.png",
+          "sha256": "b0b9286a992f12b0457681816ea7606b0afaef2d346bf67c4ada8f5af633fcde"
+        },
+        {
+          "path": "out/client-execution/scene-repeat/Textures/MenuInfoBar/Default/pause.png",
+          "sha256": "6d164e079c27e3918f33104c4de69037b5ba58628a32f29f5c8115b405d2f63f"
+        },
+        {
+          "path": "out/client-execution/scene-repeat/Textures/MenuInfoBar/Default/record.png",
+          "sha256": "d5ac72f4d477125f32d7016820e2f9083d44092f09da548e8ba434d5cada3f4b"
+        },
+        {
+          "path": "out/client-execution/scene-repeat/Textures/MenuInfoBar/Default/ship.png",
+          "sha256": "286d6362c2776aab63aa80d29e8f86e7dc83642a76ecb1ddd17115f980ec98fd"
+        },
+        {
+          "path": "out/client-execution/scene-repeat/Textures/MenuInfoBar/Default/speed.png",
+          "sha256": "e64dd672b77edd06aab57475a8ac6bc7082eed22daac2cb59eb13d0edef7f597"
+        },
+        {
+          "path": "out/client-execution/scene-repeat/Textures/MenuInfoBar/Default/save.png",
+          "sha256": "a42bcb179cb4e36db3b63e411adbd3ba6f805dfe3821a4eacbabf4f988b3a3b4"
+        },
+        {
+          "path": "out/client-execution/scene-repeat/Textures/MenuInfoBar/exit.png",
+          "sha256": "269f21a72650d19c37a407caf3e610896a2ded08a7e0fbabb09105b6ba342df6"
+        },
+        {
+          "path": "out/client-execution/scene-repeat/Textures/MenuInfoBar/ExtMFD.png",
+          "sha256": "651fb3f2e672d2e3f2e70540ba6501c09ef8faeac0b8be0af8cdf390c8986552"
+        },
+        {
+          "path": "out/client-execution/scene-repeat/Textures/MenuInfoBar/FlightData.png",
+          "sha256": "d79386f486f4bed7c788c9babe52857abd22fb24758e38505377215e26015543"
+        },
+        {
+          "path": "out/client-execution/scene-repeat/Textures/MenuInfoBar/function.png",
+          "sha256": "fa6c32f0d6d847d4b63da147180a21529daf086ddba1d89a86133d86e83e709b"
+        },
+        {
+          "path": "out/client-execution/scene-repeat/Textures/MenuInfoBar/help.png",
+          "sha256": "8a84af8f4e2692166874d5360ba4a42794627d8e54cce017b0f382b849a6197d"
+        },
+        {
+          "path": "out/client-execution/scene-repeat/Textures/MenuInfoBar/info.png",
+          "sha256": "3bc593e7b117d25407b0f32f593292cfb838b37d5e7d76f3c48845a3a69c1548"
+        },
+        {
+          "path": "out/client-execution/scene-repeat/Textures/MenuInfoBar/LuaConsole.png",
+          "sha256": "65c5f0b1ace6a0d103f6e5933e3ae949d0f9b9fcb9adeef3ed47f31c66733080"
+        },
+        {
+          "path": "out/client-execution/scene-repeat/Textures/MenuInfoBar/map.png",
+          "sha256": "f0073c77fc916dbd127dc4fa679d6889804be94953b4c6849d062d59cf1598da"
+        },
+        {
+          "path": "out/client-execution/scene-repeat/Textures/MenuInfoBar/Notes.png",
+          "sha256": "3b17e14fdd58084aa6f4ae341053d38fcbe3312c8632698f70f3c233bfc6eaa3"
+        },
+        {
+          "path": "out/client-execution/scene-repeat/Textures/MenuInfoBar/options.png",
+          "sha256": "1232753c8e5b7ace85b5c093c0de9698d29fbafa07dd92763df3e80c5b2d8ecc"
+        },
+        {
+          "path": "out/client-execution/scene-repeat/Textures/MenuInfoBar/pause.png",
+          "sha256": "bf6d3fd049b891b78b8a036fe5af78084e48e16b703cc0387231de1b18fc34b0"
+        },
+        {
+          "path": "out/client-execution/scene-repeat/Textures/MenuInfoBar/Rcontrol.png",
+          "sha256": "d62cd21b1ae8ae4e48a1d5d99d885ac590724751ba7dda53b40eb64aa9c64102"
+        },
+        {
+          "path": "out/client-execution/scene-repeat/Textures/MenuInfoBar/record.png",
+          "sha256": "114bc90f00dee68ba791c72c76a64c12ce175f324d52d278b02dd85341cf93fc"
+        },
+        {
+          "path": "out/client-execution/scene-repeat/Textures/MenuInfoBar/save.png",
+          "sha256": "a1645b0fc1cef10274e2b7785f9356021ff5df649b34cc9898a62f68e00c635b"
+        },
+        {
+          "path": "out/client-execution/scene-repeat/Textures/MenuInfoBar/ScnEdit.png",
+          "sha256": "a7cd8450f340e029c39de1bb29b7c2e7e598acfcad08b756c1d8c3400671bde7"
+        },
+        {
+          "path": "out/client-execution/scene-repeat/Textures/MenuInfoBar/ship.png",
+          "sha256": "b4685d54649e014c3cba0ab5b60d94a5248ad591a4ff76b0b7e153f10e14ceb7"
+        },
+        {
+          "path": "out/client-execution/scene-repeat/Textures/MenuInfoBar/speed.png",
+          "sha256": "4b2f430ea2f27f5152f91ad1e58c46fd72ddd76e6c3e900dc7af3c6395c9ad83"
+        },
+        {
+          "path": "out/client-execution/scene-repeat/Textures2/Atlantis/switchdown.png",
+          "sha256": "e32af5574c509aaadf11279bef5c841f0365aa875ed949ca4021b354dc5cf632"
+        },
+        {
+          "path": "out/client-execution/scene-repeat/Textures2/Atlantis/switchmid.png",
+          "sha256": "b7baea1026a4f24aa371391c4fa94cd67e178b161e6313221b412ed031402042"
+        },
+        {
+          "path": "out/client-execution/scene-repeat/Textures2/Atlantis/switchup.png",
+          "sha256": "f45a5ffb545f89c8c31b7bb6c590e46d09cfa3a82473699dd6930f97df1964b6"
+        },
+        {
+          "path": "out/client-execution/scene-repeat/visual-events.csv",
+          "sha256": "1116c2dff517ee95cb98dbe407b64dccbe079e4f73e912b365a4098d98baf4bc"
+        },
+        {
+          "path": "runtime-configure.log",
+          "sha256": "5f7aae4976faccb8af32f760e908a5a151dee2cd9a873ac4f0584ac8e380cf92"
+        },
+        {
+          "path": "runtime-build.log",
+          "sha256": "cc86ba7b2fe8d6e81ba64e8eb8e1a0c621892424c11eec18260c5556abb2f404"
+        },
+        {
+          "path": "runtime-ctest.log",
+          "sha256": "f6cc021cb044aca5c1f1e6bda50faa12aa062df88cfda02ae9188b02d14e0dcb"
+        },
+        {
+          "path": "out/runtime-rebuild/build-inputs.json",
+          "sha256": "e70c52a469c5e4aa32433d45458b13783c99d34db6473aa1a35d50757e829869"
+        },
+        {
+          "path": "out/runtime-rebuild/CMakeCache.txt",
+          "sha256": "0b24fb86b1057be9cf1de998f9ee7b254a5c0f73b729a9a84d2a55920537be25"
+        },
+        {
+          "path": "client-configure.log",
+          "sha256": "f1d257ea17b4eaf67358d66cac4399680fdbdbd8607b8b6058db008a29d88cf6"
+        },
+        {
+          "path": "client-build.log",
+          "sha256": "d759b80ce53abffa22e7100589e1908aa517a5d83d4ca98aaa2b2449b04e0743"
+        },
+        {
+          "path": "out/opengl-client/CMakeCache.txt",
+          "sha256": "c640bb0355195e84969b6d7bd7c0836f0ce856ca7ab712b2b8dc3516678d794c"
+        },
+        {
+          "path": "out/opengl-client/compile_commands.json",
+          "sha256": "4504bb2684d0b7834b31c446daa2f989ad369f1e04339c775d697e7a3a1e825e"
+        },
+        {
+          "path": "out/production-app/Modules/OGLClient/dependencies.lock.json",
+          "sha256": "80d217de95a4a31f06b6df0f0f0f1544242c493a3382997690beac9c9f0800ce"
+        },
+        {
+          "path": "out/production-app/Modules/OGLClient/Licenses/docs-FTL.TXT",
+          "sha256": "08c135755dd589039470f1fdbb400daaabaaa50d0b366d19cebff4d22986baa1"
+        },
+        {
+          "path": "out/production-app/Modules/OGLClient/Licenses/fontstash.h",
+          "sha256": "785f7fa2521b47a5d1b8ebc6ed7e6f5d2c5f6c8fad0080b4605e2d63cacb46e0"
+        },
+        {
+          "path": "out/production-app/Modules/OGLClient/Licenses/imgui-src-LICENSE.txt",
+          "sha256": "c80c5789748d955c4a650562baa0d750494e2c7128c2ca66aaebe2e3c4e198bf"
+        },
+        {
+          "path": "out/production-app/Modules/OGLClient/Licenses/glm-src-copying.txt",
+          "sha256": "62d2d642c7d054d4fb4c9b42faad617d6c88fcd91e317f8035aa9f277cc159c3"
+        },
+        {
+          "path": "out/production-app/Modules/OGLClient/Licenses/libnsbmp-src-COPYING",
+          "sha256": "bec1a28e7f95e0b2acc624bf9e6d8556451f454ea6a213f8c1bc0fe792c61ead"
+        },
+        {
+          "path": "out/production-app/Modules/OGLClient/Licenses/nanovg-src-LICENSE.txt",
+          "sha256": "45185a6680ed83863bef33e1055f9fd76374df4b81c957802c19a286c982dfd2"
+        },
+        {
+          "path": "out/production-app/Modules/OGLClient/Licenses/OGLPad.cpp",
+          "sha256": "49e2cd1a80cfea02e0db1d31916906059306ff908760e116cb32ec7bafc09008"
+        },
+        {
+          "path": "out/production-app/Modules/OGLClient/Licenses/Orbiter-MIT.txt",
+          "sha256": "ffba1fe66f6c59cc8e01c014a4454901d1b6b3669b5e205bf54a2f57974bab7d"
+        },
+        {
+          "path": "out/production-app/Modules/OGLClient/Licenses/Shadinclude.hpp",
+          "sha256": "4869d2bf086276f8a14b2a5944cb1e34cb248ac7d793b587f68509e99afb5023"
+        },
+        {
+          "path": "out/production-app/Modules/OGLClient/Licenses/soil2-src-README.md",
+          "sha256": "11528c4876b9d4020cb481db340930821b2dc7158fd6dd2a8d8921a9965372a8"
+        },
+        {
+          "path": "out/production-app/Modules/OGLClient/Licenses/stb_image.h",
+          "sha256": "4ef7dee427053e3090b188021eab75fc227644c39caad6e81259e7f0053b55b7"
+        },
+        {
+          "path": "out/production-app/Modules/OGLClient/Licenses/stb_image_write.h",
+          "sha256": "cbd5f0ad7a9cf4468affb36354a1d2338034f2c12473cf1a8e32053cb6914a05"
+        },
+        {
+          "path": "out/production-app/Modules/OGLClient/Licenses/zlib.h",
+          "sha256": "4ddc82b4af931ab55f44d977bde81bfbc4151b5dcdccc03142831a301b5ec3c8"
+        }
+      ],
+      "excluded": [
+        {
+          "path": "out/production-app/Modules/Plugin/OGLClient.dll",
+          "sha256": "d7fbc9b7ac4de4abe41f788d8d6f563900aa0b896992311f8cd6f1efc54bb765"
+        },
+        {
+          "path": "out/production-app/Modules/Plugin/OGLClient.pdb",
+          "sha256": "a1b86f67b279944710560024e7c7f47f7558d0cf48d0be44261f07c3d729fec1"
+        },
+        {
+          "path": "out/production-app/Modules/OGLClient/ATTRIBUTION.md",
+          "sha256": "79b7b3cc419d310489e541194d97b08666bdc4b6383b27b5652904d2a8abd5bd"
+        },
+        {
+          "path": "out/production-app/Modules/OGLClient/Cloud.fs",
+          "sha256": "eb25528320861565948b38b7c2ebd47297e66d486896306a33b60009aceade2f"
+        },
+        {
+          "path": "out/production-app/Modules/OGLClient/Cloud.vs",
+          "sha256": "30901d7f63100b634cf3d2ef98747a8b17be8f682b5eeb0e99131906387b5697"
+        },
+        {
+          "path": "out/production-app/Modules/OGLClient/Common.inc",
+          "sha256": "4e40e70a70c9f1a08e569adfc44097899e37d81c199ce1879b5b3d81083db2ec"
+        },
+        {
+          "path": "out/production-app/Modules/OGLClient/Constellations.fs",
+          "sha256": "2ba545184b330f5fb721179c4ccae61502b43a6bb8a50a368c17ad1246508db9"
+        },
+        {
+          "path": "out/production-app/Modules/OGLClient/Constellations.vs",
+          "sha256": "0ba5e9d65ea610d99cde8f6e388684a1c7064c7730e16f26cf0772e216e2724b"
+        },
+        {
+          "path": "out/production-app/Modules/OGLClient/Ecliptic.fs",
+          "sha256": "4a93a93e3186fe19b0240644d83e458037dbfb1820b7aa332ddfcdf9fbd1028e"
+        },
+        {
+          "path": "out/production-app/Modules/OGLClient/Ecliptic.vs",
+          "sha256": "0ba5e9d65ea610d99cde8f6e388684a1c7064c7730e16f26cf0772e216e2724b"
+        },
+        {
+          "path": "out/production-app/Modules/OGLClient/Exhaust.vs",
+          "sha256": "317ceafe9613196b863d436205ffb8c725ba572d0eff989628a6579faf44df71"
+        },
+        {
+          "path": "out/production-app/Modules/OGLClient/Exhaust.fs",
+          "sha256": "26f78db654a4c6d4b34807d9e6fb7eb7595ebe3e12fa34abb7f5f9a9aa62d029"
+        },
+        {
+          "path": "out/production-app/Modules/OGLClient/GroundShadow.fs",
+          "sha256": "364b5d72032cf871b4bf6df7d0276b0f0892e2650a04a595a5ab75703d425da0"
+        },
+        {
+          "path": "out/production-app/Modules/OGLClient/GroundShadow.vs",
+          "sha256": "792c53dbc53f93d8a1df42726856224fee297c2ee2b3de4cddf3f897034d544c"
+        },
+        {
+          "path": "out/production-app/Modules/OGLClient/Haze.fs",
+          "sha256": "20ce2c36ec348c39d51238a8a1ff4e280c7657693d7ce2af3f65ead7c2a86160"
+        },
+        {
+          "path": "out/production-app/Modules/OGLClient/Haze.vs",
+          "sha256": "7d8d6b0d92506aaaaebd807365e60614721c8367112d9b92bc0e73c06868b64a"
+        },
+        {
+          "path": "out/production-app/Modules/OGLClient/LogDepth.inc",
+          "sha256": "fa35ccf810e1bf17c0542764c495dabbb497c085e20ca175fb3f5d1cf9c6726c"
+        },
+        {
+          "path": "out/production-app/Modules/OGLClient/Mesh.fs",
+          "sha256": "b35400a6f0d4c17c5cf22bd54aa79262fa7ac15c00a974205ac92a06e81750bc"
+        },
+        {
+          "path": "out/production-app/Modules/OGLClient/Mesh.vs",
+          "sha256": "930a4e26e6f2c2934c660eb79d815ce2fb0a017179e338f055e80efe1d92ff34"
+        },
+        {
+          "path": "out/production-app/Modules/OGLClient/MeshUnlit.fs",
+          "sha256": "ca9e0b2501cebad726eaede37bc156e4d82ae1fba368a1a0ff4725bbfb34c00a"
+        },
+        {
+          "path": "out/production-app/Modules/OGLClient/MeshUnlit.vs",
+          "sha256": "48c518f1bf4fe73eeeb96eb9f318c1583e450f67af1866cd53d87cc697120ce0"
+        },
+        {
+          "path": "out/production-app/Modules/OGLClient/Overlay.fs",
+          "sha256": "7ecf7b1307f78531cf93ef028655b55dd3f5d3d419f37ec56e36159b4726983f"
+        },
+        {
+          "path": "out/production-app/Modules/OGLClient/Overlay.vs",
+          "sha256": "2a1446e6009dbbd220fa909d3373d784f11a14d3b13fd11c695bd1532d86aac7"
+        },
+        {
+          "path": "out/production-app/Modules/OGLClient/Particle.fs",
+          "sha256": "558e6cc9f62cf66fd66a0b71a79a1a933d3c45913d5b3bedf620108ad8b8be09"
+        },
+        {
+          "path": "out/production-app/Modules/OGLClient/Particle.vs",
+          "sha256": "47a39c1c5930841da760e8fa007d1131be315ad4fd09220aede97e333aa68231"
+        },
+        {
+          "path": "out/production-app/Modules/OGLClient/Ring.fs",
+          "sha256": "62fe7dc50a7f8e77f8d149509ca1291f6fb7e84a88ce919283495af813664339"
+        },
+        {
+          "path": "out/production-app/Modules/OGLClient/Ring.vs",
+          "sha256": "b7c6a413002b01dc55ab439a1965459561cc98a1d86e306a944a251f9ee7f691"
+        },
+        {
+          "path": "out/production-app/Modules/OGLClient/Spot.fs",
+          "sha256": "38bcc949bb6a654ce32c148bc84044dc26f5c324ea9bd060205a11e51ddf6f0b"
+        },
+        {
+          "path": "out/production-app/Modules/OGLClient/Spot.vs",
+          "sha256": "112753669d70c08aea27c81df931fc5b1ad0628a607ad856ec7018e8a2f9c273"
+        },
+        {
+          "path": "out/production-app/Modules/OGLClient/Stars.fs",
+          "sha256": "bc037a5f7706ec5b895a8e8a3d6b22c6e45086ca9b4f9f4d87af89df821d21a5"
+        },
+        {
+          "path": "out/production-app/Modules/OGLClient/Stars.vs",
+          "sha256": "8d5130ebdf69840ccc7b7c0e22d90ef00382ca00103bac348408ccd50a423b7d"
+        },
+        {
+          "path": "out/production-app/Modules/OGLClient/Tile.fs",
+          "sha256": "d8145397bb4c13244dbbc150b51a1a462e8b42502dc7754154a7a6300782e958"
+        },
+        {
+          "path": "out/production-app/Modules/OGLClient/Tile.vs",
+          "sha256": "e0aecdff8d53a8fab078e6fe2ffcf78ce670e522debba7750261d2801e1c0c8e"
+        },
+        {
+          "path": "out/production-app/Modules/OGLClient/Types.inc",
+          "sha256": "a6f30552abb4ae13348a0e99f2f265150d45d41373c3c3603544ca877faba068"
+        },
+        {
+          "path": "out/production-app/Modules/OGLClient/Uniforms.inc",
+          "sha256": "2f4cb227de081cabfdcd45655987efe9235b9d2a169d65d7583ec50cba5d8c89"
+        },
+        {
+          "path": "out/production-app/Modules/OGLClient/Untextured.fs",
+          "sha256": "11485b9057e7c1f08005858decfa3a772a738454c81e2b7e5957560e93afec9b"
+        },
+        {
+          "path": "out/production-app/Modules/OGLClient/Untextured.vs",
+          "sha256": "cc02e7e9a410bdf5e3f4d45fca12267ca511d065b42c3032b1d3e8c0028a1acc"
+        },
+        {
+          "path": "out/production-app/Modules/OGLClient/VesselShadow.fs",
+          "sha256": "364b5d72032cf871b4bf6df7d0276b0f0892e2650a04a595a5ab75703d425da0"
+        },
+        {
+          "path": "out/production-app/Modules/OGLClient/VesselShadow.vs",
+          "sha256": "48bb3fb2e6f9d53a60d11959b4d0a579dee64d6b8f5b83f2effba64ee9c2c943"
+        }
+      ],
+      "filtered_sha256": "75ae40620540471575bb642be10a772dbf3a8824b8abc63283c07191085a88eb"
+    }
+  ]
+}

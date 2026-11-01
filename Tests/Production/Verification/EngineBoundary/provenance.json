@@ -227,6 +227,35 @@
         "preserved_report": "star-native-parity.json",
         "report_sha256": "462d96051f6cdfd25853cb61da4667939c63d6a29991d4c1a77012e2a946daa6"
       }
+    },
+    {
+      "component": "planetary-archives",
+      "source": "2e8bbbf24f5cf53e3e6dadd33fe8ef000748b3cc",
+      "runs": {
+        "production": 41286856235,
+        "client": 41286856189,
+        "portable": 41286856075
+      },
+      "status": "passed",
+      "original_comparison_zip_sha256": "2dbfbe2ff0f828066cbb2c525237ba6680a6f4d533b26611360ab9a4e1003f63",
+      "preserved_report": "archive-client-comparison.json",
+      "report_sha256": "0fdea912e29c8d16273274c08000e5355410d51a5ec59c18cdb23d92fa9e2561",
+      "native_comparison": {
+        "original_zip_sha256": "e6652fa84d77ed4c02db8cc5018c22ef555b46bde527a1281c04e7c558ddf2d5",
+        "preserved_report": "archive-native-parity.json",
+        "report_sha256": "462d96051f6cdfd25853cb61da4667939c63d6a29991d4c1a77012e2a946daa6"
+      },
+      "archive_reference": "Tests/Production/Archives/Reference/provenance.json",
+      "hosted_archive_evidence": "archive-hosted-artifacts.json",
+      "client_evidence": "archive-client-artifacts.json",
+      "local_evidence": "archive-local-linux.json",
+      "supplemental_reports": [
+        {
+          "file": "archive-platform-parity.json",
+          "sha256": "76ffd6b3fd65e4158cbf6de7662d5808f35ad0219ba55dcdcd447e9c8bbb8f47",
+          "original_zip_sha256": "4079d36f1289ed22ab58a2c3d29e61dd6f006ff832bd39e792d984b1ba064cdb"
+        }
+      ]
     }
   ]
 }

@@ -1,0 +1,57 @@
+{
+  "schema": 1,
+  "engine_source": "2e8bbbf24f5cf53e3e6dadd33fe8ef000748b3cc",
+  "scope": "Local Linux only; not hosted Windows or native world acceptance",
+  "checks": {
+    "debug_suite": {
+      "passed": 23,
+      "failed": 0
+    },
+    "release_suite": {
+      "passed": 24,
+      "failed": 0
+    },
+    "sanitizers": {
+      "passed": 14,
+      "failed": 0,
+      "options": "ASAN_OPTIONS=detect_leaks=1 UBSAN_OPTIONS=halt_on_error=1"
+    },
+    "archive_failures": {
+      "cases": 70
+    },
+    "full_archive_reference": {
+      "configurations": [
+        "Debug",
+        "Release"
+      ],
+      "archives": 30,
+      "queries_per_run": 1200,
+      "repeats": 2,
+      "comparison": "exact"
+    },
+    "installed_runner": {
+      "steps": 6000,
+      "working_directory": "/tmp",
+      "rpath": "installed shared production core; native OS zlib"
+    }
+  },
+  "evidence": {
+    "file": "archive-local-linux.zip",
+    "sha256": "10bb2536c311d6009767f70823d53c73253251cf29f4174bfa11af47505c7053",
+    "members_sha256": {
+      "out/archive-debug-build.log": "4c65a3e73518b5a52acaf214bd9f6afd68a6157c25c4cc1eb152e51b2f6aa7f6",
+      "out/archive-debug-ctest.log": "c05587ffdebd180e2ee4d1abd5415de75d69c1eab6ec9d5e1b53b38fca59114d",
+      "out/archive-release-build.log": "67c14bec6affa89642c5764f2e09a1fbdbeddfdce57f2c7625c49529dba36fec",
+      "out/archive-release-ctest.log": "2ded1976294090ed0e5c4295a8c610fd9b531d021262c13ede1ae2350009ce6a",
+      "out/archive-sanitized-build.log": "8b0c0ec3adeff2219f22213a3811a68b2ac30ad890369fb1ee0f48561db7d8ad",
+      "out/archive-sanitized-ctest.log": "824a91e903c95d4e557b083634f0091cf5df0a969b5fe7b74300fbfd525a4bec",
+      "out/archive-full-debug/comparison.json": "4b0a4d4f1da7084e19e04ab5eb0a66e84b0956e9a5374ade8673140a055eda06",
+      "out/archive-full-release/comparison.json": "e34129251a12bb879478306a542eefaf47cc4f08138646d36023e165a22d14ba"
+    }
+  },
+  "preparation_failure": {
+    "scope": "strict UBSan diagnostic excerpt; original complete failing local log was superseded by final verification",
+    "message": "Mesh.cpp:399:9: runtime error: null pointer passed as argument 2, which is declared to never be null",
+    "resolution": "Guard the existing zero-material copy; final full strict sanitizer suite passes"
+  }
+}

@@ -22,8 +22,8 @@ and Linux GCC / Windows MSVC x64 Debug/Release portable checks.
 | Native module loader/bootstrap and actual shared Body fixture | `15867de9` | [41280064395](https://github.com/dcajacob/orbiter-cross-platform/actions/runs/41280064395) | [41280064421](https://github.com/dcajacob/orbiter-cross-platform/actions/runs/41280064421) | [41280064405](https://github.com/dcajacob/orbiter-cross-platform/actions/runs/41280064405) |
 | Original Pines gravity and portable model loading | `c73d1477` | [41282440355](https://github.com/dcajacob/orbiter-cross-platform/actions/runs/41282440355) | [41282440315](https://github.com/dcajacob/orbiter-cross-platform/actions/runs/41282440315) | [41282440466](https://github.com/dcajacob/orbiter-cross-platform/actions/runs/41282440466) |
 | Production CelestialBody and Windows module adapters | `c2813bf8` | [41284623399](https://github.com/dcajacob/orbiter-cross-platform/actions/runs/41284623399) | [41284623366](https://github.com/dcajacob/orbiter-cross-platform/actions/runs/41284623366) | [41284623362](https://github.com/dcajacob/orbiter-cross-platform/actions/runs/41284623362) |
-
 | Production Star initialization and updates | `c7ce278c` | [41285673276](https://github.com/dcajacob/orbiter-cross-platform/actions/runs/41285673276) | [41285673352](https://github.com/dcajacob/orbiter-cross-platform/actions/runs/41285673352) | [41285673267](https://github.com/dcajacob/orbiter-cross-platform/actions/runs/41285673267) |
+| Shared planetary archive records, seeking and decoding | `2e8bbbf2` | [41286856235](https://github.com/dcajacob/orbiter-cross-platform/actions/runs/41286856235) | [41286856189](https://github.com/dcajacob/orbiter-cross-platform/actions/runs/41286856189) | [41286856075](https://github.com/dcajacob/orbiter-cross-platform/actions/runs/41286856075) |
 
 The preserved `*-client-comparison.json` reports show zero numerical and
 projected-landmark differences and SSIM 1.0 both between configurations and
@@ -107,3 +107,22 @@ rotation, barycentre, interpolation, ephemeris/fallback-order and failure-cleanu
 fixtures. Those callbacks are unit fixtures, not native stock SPICE modules.
 The SDK audit conserves constants, atmospheric data, object/ephemeris flags and
 all original Windows class declarations and implementations.
+
+The separate `archive-local-linux.json` and ZIP preserve 23 Debug, 24 Release
+and 14 strict sanitizer checks plus both full local archive comparisons. The
+seventy reader failure/resource cases pass. Strict UBSan found the legacy
+zero-material null copy; guarding that empty copy removes the diagnostic.
+These records are local results, not hosted Windows or native-world acceptance.
+
+The archive extraction passes all hosted gates. `archive-platform-parity.json`
+and four original ZIPs under `ArchiveEvidence/` preserve exact original-Windows
+agreement for 28 stock archives plus record and 64-bit sparse fixtures. Every
+build performs 1,200 queries twice and independently checks decoded bytes.
+`archive-hosted-artifacts.json` identifies original artifact/member hashes and
+clean source identity. The two filtered `archive-client-*.zip` files preserve
+current scene traces, real driver audits, same-build application/SDK metadata,
+licenses and build/test logs. `archive-client-artifacts.json` records original
+ZIP hashes and excluded binary hashes. Byte-identical PNG/RGBA images are
+deduplicated against the untouched frozen scene with a lossless reconstruction
+recipe. Both client configurations have zero state/landmark error and SSIM 1.0.
+This still does not establish native elevation/contact or a production world.

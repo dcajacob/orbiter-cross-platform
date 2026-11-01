@@ -112,7 +112,71 @@ def verify():
         data = local(BASE, log['file']).read_bytes()
         check(data, log['sha256_gzip'], log['file'])
         check(gzip.decompress(data), log['sha256_decoded_lf_utf8'], 'decoded setup failure log')
-    print('Verified', len(ledger['hosted']), 'component reports, four native archives, and both Windows client archives; references were only read')
+    archive_local = BASE/'archive-local-linux.json'
+    if archive_local.exists():
+        report = json.loads(archive_local.read_text())
+        require(re.fullmatch('[0-9a-f]{40}', report['engine_source']), 'invalid local archive source')
+        for name in ('debug_suite', 'release_suite', 'sanitizers'):
+            require(report['checks'][name]['failed'] == 0 and report['checks'][name]['passed'] > 0,
+                    'local archive checks did not pass')
+        artifact = report['evidence']
+        path = local(BASE, artifact['file'])
+        check(path.read_bytes(), artifact['sha256'], path.name)
+        with zipfile.ZipFile(path) as archive:
+            require(archive.testzip() is None and set(archive.namelist()) == set(artifact['members_sha256']),
+                    'local archive log evidence differs')
+            for name, checksum in artifact['members_sha256'].items():
+                check(archive.read(name), checksum, name)
+    archive_clients = BASE/'archive-client-artifacts.json'
+    if archive_clients.exists():
+        clients = json.loads(archive_clients.read_text())
+        require(len(clients['artifacts']) == 2, 'expected both archive-extraction Windows client builds')
+        for artifact in clients['artifacts']:
+            path = local(BASE, artifact['filtered_file'])
+            check(path.read_bytes(), artifact['filtered_sha256'], path.name)
+            expected = set()
+            with zipfile.ZipFile(path) as archive:
+                require(archive.testzip() is None, 'archive client evidence ZIP is corrupt')
+                for member in artifact['members']:
+                    if 'storage' in member:
+                        storage = member['storage']
+                        source = local(ROOT, storage['source'])
+                        require(storage['kind'] in ('existing_file', 'lossless_decode'), 'unknown image deduplication')
+                        data = source.read_bytes() if storage['kind'] == 'existing_file' else reference_pixels(source)
+                    else:
+                        expected.add(member['path'])
+                        data = archive.read(member['path'])
+                    check(data, member['sha256'], member['path'])
+                require(set(archive.namelist()) == expected, 'unmanifested archive client evidence')
+    hosted_archives = BASE/'archive-hosted-artifacts.json'
+    if hosted_archives.exists():
+        record = json.loads(hosted_archives.read_text())
+        original_root = ROOT/'Tests/Production/Archives/Reference'
+        original = json.loads((original_root/'provenance.json').read_text())
+        first = original['evidence'][0]
+        path = local(original_root, first['file'])
+        check(path.read_bytes(), first['sha256'], path.name)
+        with zipfile.ZipFile(path) as archive:
+            golden = json.loads(archive.read(first['capture_member']))
+        builds = set()
+        require(len(record['artifacts']) == 4, 'expected four shared archive builds')
+        for artifact in record['artifacts']:
+            path = local(BASE, artifact['file'])
+            check(path.read_bytes(), artifact['sha256'], path.name)
+            with zipfile.ZipFile(path) as archive:
+                require(archive.testzip() is None and set(archive.namelist()) == set(artifact['members_sha256']),
+                        'shared archive evidence differs')
+                for name, checksum in artifact['members_sha256'].items():
+                    check(archive.read(name), checksum, name)
+                candidate = json.loads(archive.read(artifact['capture_member']))
+            require(candidate['status'] == 'passed' and candidate['source'] == record['source'] and
+                    candidate['working_tree_dirty'] is False and
+                    candidate['protocol_sha256'] == original['protocol_sha256'] and
+                    candidate['observations'] == golden['observations'], 'shared archive differs from original Windows')
+            builds.add((candidate['host'].split('-')[0], candidate['configuration']))
+        require(builds == {(host, config) for host in ('Linux', 'Windows') for config in ('Debug', 'Release')},
+                'shared archive platform/configuration coverage differs')
+    print('Verified', len(ledger['hosted']), 'component reports and preserved native/client/archive evidence; references were only read')
 
 
 if __name__ == '__main__':

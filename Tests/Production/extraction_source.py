@@ -97,6 +97,17 @@ def verify():
         if canonical.rstrip(b'\n')!=original.split(b'protected:',1)[1].rstrip(b'\n'):
             raise ValueError('celestial numerical state layout changed beyond portable scalar/module handle spelling')
     mesh_records=ROOT/'Orbitersdk/include/OrbiterMeshData.h'
+    if 'Src/Orbiter/ZTreeMgr.cpp' in declared:
+        original=git('show',CAPTURE+':Src/Orbiter/ZTreeMgr.cpp').replace(b'\r\n',b'\n')
+        actual=(ROOT/'Src/Orbiter/ZTreeMgr.cpp').read_bytes().replace(b'\r\n',b'\n')
+        original=original[original.index(b'DWORD ZTreeMgr::Idx'):original.index(b'DWORD ZTreeMgr::ReadData')]
+        original=original[original.index(b'if (lvl <= 4)'):]
+        actual=actual[actual.index(b'std::uint32_t ZTreeMgr::Idx'):actual.index(b'std::uint32_t ZTreeMgr::ReadData')]
+        actual=actual[actual.index(b'if (lvl<=4)'):].replace(b'std::uint32_t',b'DWORD').replace(b'UINT32_MAX',b'(DWORD)-1')
+        def mapping_tokens(source):
+            return re.sub(rb'\s+',b'',re.sub(rb'//[^\n]*',b'',source))
+        if mapping_tokens(original)!=mapping_tokens(actual):
+            raise ValueError('production quadtree mapping changed beyond scalar spelling/whitespace and bounds checks')
     if 'Src/Orbiter/Star.cpp' in declared:
         original=git('show',CAPTURE+':Src/Orbiter/Star.cpp').replace(b'\r\n',b'\n')
         actual=(ROOT/'Src/Orbiter/Star.cpp').read_bytes().replace(b'\r\n',b'\n')

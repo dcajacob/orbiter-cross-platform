@@ -49,7 +49,7 @@ may satisfy a production acceptance case.
 | SPICE Solar System | Unsupported | Current `Src/Celbody/SPICE`, CSPICE, `orbiter.bsp`, TLS/PCK and coverage verification |
 | Native module ABI | Internal loader/bootstrap with SDK-build and toolchain checks; stock module APIs unavailable | Source-built vessels, celbodies, atmospheres, plugins; version/toolchain check |
 | Real stock meshes/materials/animations | Production CPU `Mesh`/`MeshManager`; world/animation integration unavailable | Existing CPU mesh data separated from D3D resources; actual group identities |
-| Planet tiles and elevation | Unsupported | Portable fixed-width archives, 64-bit offsets; engine contact queries independent of visibility |
+| Planet tiles and elevation | Shared engine archive reader; native elevation/world integration unavailable | Portable fixed-width archives, 64-bit offsets; engine contact queries independent of visibility |
 | Resource resolution | Indexed service; production world integration pending | Indexed Windows-separator/case-insensitive resolver with ambiguous alias errors |
 | Texture loading | Unsupported in production | Signature-based DDS DXT1/3/5 and uncompressed formats; BMP in `.dds` files |
 | Propulsion, RCS, atmosphere, docking, contacts | Unsupported in native application | Preserve original systems; production references before extraction |
@@ -327,6 +327,7 @@ and actual Sol, ISS and ShuttlePB objects, meshes, materials, textures and
 camera/visual callbacks. [The client milestone](WindowsClient.md) records the
 passing scope, reproducible commands and remaining gates. [Production engine
 extraction](EngineBoundary.md) is in progress: the actual `Body`, `RigidBody`,
-propagators and CPU mesh objects build in a shared Windows/Linux library.
+propagators, celestial-body/star calculations, CPU mesh objects and planetary
+archive reader build in a shared Windows/Linux library.
 The world, native module SDK and full session still need extraction; the
 restricted POC session remains regression coverage.
