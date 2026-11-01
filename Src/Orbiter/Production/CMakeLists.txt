@@ -26,7 +26,7 @@ else()
     set(_archive_zlib ZLIB::ZLIB)
 endif()
 add_library(orbiter_production_boundary SHARED
-    Random.cpp VesselCoreSupport.cpp VesselServices.cpp WorldVesselServices.cpp SurfaceNavigation.cpp SurfaceServices.cpp SurfaceNames.cpp Session.cpp WorldOwner.cpp NativeModule.cpp NativeCelestialApi.cpp NativeCelestialServices.cpp NavigationServices.cpp ElevationServices.cpp NativeElevationServices.cpp ResourceResolver.cpp MeshData.cpp MeshServices.cpp BodyServices.cpp RigidBodyServices.cpp CelestialServices.cpp ScenarioColor.cpp
+    Random.cpp CameraServices.cpp VesselCoreSupport.cpp VesselServices.cpp WorldVesselServices.cpp SurfaceNavigation.cpp SurfaceServices.cpp SurfaceNames.cpp Session.cpp WorldOwner.cpp NativeModule.cpp NativeCelestialApi.cpp NativeCelestialServices.cpp NavigationServices.cpp ElevationServices.cpp NativeElevationServices.cpp ResourceResolver.cpp MeshData.cpp MeshServices.cpp BodyServices.cpp RigidBodyServices.cpp CelestialServices.cpp ScenarioColor.cpp
     ../Body.cpp ../Rigidbody.cpp ../BodyIntegrator.cpp ../Element.cpp
     ../Vecmat.cpp ../TimeData.cpp ../Config.cpp ../ConfigFile.cpp ../Mesh.cpp ../State.cpp
     ../Psys.cpp ../Vesselbase.cpp ../Planet.cpp ../Base.cpp ../Baseobj.cpp ../Shadow.cpp ../elevmgr.cpp ../elevmgrFile.cpp ../Nav.cpp ../PsysGravity.cpp ../PinesGrav.cpp ../PinesGravFile.cpp ../Celbody.cpp ../CelbodyFile.cpp ../ElementFile.cpp ../Star.cpp ../ZTreeMgr.cpp)
@@ -62,7 +62,7 @@ if(ORBITER_BUILD_NATIVE_VESSELS)
         ../Vessel.cpp ../VesselSdk.cpp ../Vesselstatus.cpp ../SuperVessel.cpp
         ../VesselLights.cpp ../LightEmitter.cpp ../VesselFlightMath.cpp ../VesselRecorder.cpp ../CollisionCore.cpp
         NativeCockpitUnavailable.cpp NativeVesselApplication.cpp NativeVesselModule.cpp NativeWorldVesselServices.cpp
-        NativeVessels.cmake ../../Vessel/ShuttlePB/ShuttlePB.cpp ../../Vessel/ShuttlePB/NativeShuttlePBFactory.inc)
+        NativeApplication.cpp NativeRenderApi.cpp NativeParticle.cpp ../CelSphereAPI.cpp ../DrawAPI.cpp ../Camera.cpp ../CameraControl.cpp NativeCameraProjection.cpp NativeVessels.cmake ../../Vessel/ShuttlePB/ShuttlePB.cpp ../../Vessel/ShuttlePB/NativeShuttlePBFactory.inc)
 endif()
 set(_native_input "${ORBITER_NATIVE_BUILD_TOKEN}|${CMAKE_CXX_COMPILER_ID}|${CMAKE_CXX_COMPILER_VERSION}|${CMAKE_SYSTEM_NAME}|${CMAKE_SYSTEM_PROCESSOR}|${CMAKE_SIZEOF_VOID_P}|${CMAKE_CXX_FLAGS}|${CMAKE_CXX_FLAGS_DEBUG}|${CMAKE_CXX_FLAGS_RELEASE}|${CMAKE_MSVC_RUNTIME_LIBRARY}")
 foreach(_native_source IN LISTS _native_sources)

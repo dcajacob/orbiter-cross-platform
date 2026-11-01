@@ -37,7 +37,7 @@ OGLLight::OGLLight (OBJHANDLE _hObj, LTYPE _ltype, const Scene *scene, int _idx)
 	light.dcvDiffuse.g = light.dcvSpecular.g = 1.0f;
 	light.dcvDiffuse.b = light.dcvSpecular.b = 1.0f;
 
-	light.dvAttenuation0 = 1.0f; 
+	light.dvAttenuation0 = 1.0f;
     //light.dvRange = D3DLIGHT_RANGE_MAX;
 
 	Renderer::LightEnable(idx, true);

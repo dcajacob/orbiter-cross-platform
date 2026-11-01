@@ -5,20 +5,32 @@
 #define OAPI_IMPLEMENTATION
 
 #include "CelSphereAPI.h"
+#ifdef _WIN32
 #include "Orbiter.h"
 #include "Psys.h"
+#else
+#include "Production/NativeGraphics.h"
+#include "PsysCore.h"
+#include <cstdio>
+#define LOGOUT(...) do {std::fprintf(stderr,__VA_ARGS__);std::fputc('\n',stderr);} while(false)
+#define LOGOUT_WARN(...) LOGOUT(__VA_ARGS__)
+#endif
 #include "Mesh.h"
+#ifdef _WIN32
 #include "Log.h"
+#endif
 
 using std::min;
 using std::max;
 
+#ifdef _WIN32
 extern Orbiter* g_pOrbiter;
 extern PlanetarySystem* g_psys;
+#endif
 
 // ==============================================================
 
-oapi::CelestialSphere::CelestialSphere(oapi::GraphicsClient* gc)
+oapi::CelestialSphere::CelestialSphere(oapi::SphereClient* gc)
 	: m_gc(gc)
 {
 	gc->clbkGetViewportSize(&m_viewW, &m_viewH);
@@ -32,7 +44,11 @@ oapi::CelestialSphere::CelestialSphere(oapi::GraphicsClient* gc)
 	m_skyBrt = 0.0;
 	m_meshGridLabel = 0;
 
+	#ifdef _WIN32
 	m_dataDir = std::string(g_pOrbiter->Cfg()->CfgDirPrm.ConfigDir) + std::string("CSphere\\Data\\");
+#else
+	m_dataDir = orbiter::production::GetNativeRenderContext().programFiles->ResolveDirectory("Config/CSphere/Data").string()+"/";
+#endif
 	LoadConstellationLabels();
 }
 
@@ -103,18 +119,18 @@ void oapi::CelestialSphere::RenderConstellationLabels(oapi::Sketchpad** ppSkp, b
 void oapi::CelestialSphere::RenderCelestialMarkers(oapi::Sketchpad** ppSkp)
 {
 	oapi::Font* font = m_markerFont;
-	const std::vector<oapi::GraphicsClient::LABELLIST>& markerLists = m_gc->GetCelestialMarkers();
+	const std::vector<oapi::SphereClient::LABELLIST>& markerLists = m_gc->GetCelestialMarkers();
 	for (auto it = markerLists.begin(); it != markerLists.end(); it++) {
 		if ((*it).active) {
 			int size = (int)(m_viewH / 80.0 * (*it).size + 0.5);
 			int colidx = (*it).colour;
-			DWORD col = TextColorAdjusted(MarkerColorFloat(colidx));
+			oapi::UInt32 col = TextColorAdjusted(MarkerColorFloat(colidx));
 			oapi::Pen* markerPen;
 			if (m_textBlendAdditive)
 				markerPen = MarkerPen(colidx);
 			else
 				markerPen = m_gc->clbkCreatePen(1, 0, col);
-			const std::vector<oapi::GraphicsClient::LABELSPEC>& ls = (*it).marker;
+			const std::vector<oapi::SphereClient::LABELSPEC>& ls = (*it).marker;
 			EnsureMarkerDrawingContext(ppSkp, font, col, markerPen);
 			font = nullptr; // need to set it only once
 			for (auto mkr = ls.begin(); mkr != ls.end(); mkr++) {
@@ -135,22 +151,22 @@ oapi::Font* oapi::CelestialSphere::MarkerFont() const
 
 // --------------------------------------------------------------
 
-oapi::Pen* oapi::CelestialSphere::MarkerPen(DWORD idx) const
+oapi::Pen* oapi::CelestialSphere::MarkerPen(oapi::UInt32 idx) const
 {
 	return (idx < 7 ? m_markerPen[idx] : 0);
 }
 
 // --------------------------------------------------------------
 
-COLORREF oapi::CelestialSphere::MarkerColor(DWORD idx) const
+oapi::UInt32 oapi::CelestialSphere::MarkerColor(oapi::UInt32 idx) const
 {
-	static COLORREF col[7] = { 0x00FFFF, 0xFFFF00, 0x4040FF, 0xFF00FF, 0x40FF40, 0xFF8080, 0xFFFFFF };
+	static oapi::UInt32 col[7] = { 0x00FFFF, 0xFFFF00, 0x4040FF, 0xFF00FF, 0x40FF40, 0xFF8080, 0xFFFFFF };
 	return (idx < 7 ? col[idx] : 0xFFFFFF);
 }
 
 // --------------------------------------------------------------
 
-oapi::FVECTOR4 oapi::CelestialSphere::MarkerColorFloat(DWORD idx) const
+oapi::FVECTOR4 oapi::CelestialSphere::MarkerColorFloat(oapi::UInt32 idx) const
 {
 	static oapi::FVECTOR4 col[7] = {
 		FVECTOR4(1.0f, 1.0f, 0.0f, 0.0f), FVECTOR4(0.0f, 1.0f, 1.0f, 0.0f), FVECTOR4(1.0f, 0.25f, 0.25f, 0.0f),
@@ -169,7 +185,7 @@ const std::vector<oapi::CelestialSphere::StarDataRec> oapi::CelestialSphere::Loa
 		float lng;
 		float lat;
 		float mag;
-		WORD specidx;
+		oapi::UInt16 specidx;
 	};
 #pragma pack(pop)
 
@@ -375,9 +391,9 @@ const std::vector<VECTOR3> oapi::CelestialSphere::EclipticLineData2RenderData(co
 
 // --------------------------------------------------------------
 
-const std::vector<oapi::GraphicsClient::ConstLabelRec> oapi::CelestialSphere::LoadConstellationLabelData() const
+const std::vector<oapi::SphereClient::ConstLabelRec> oapi::CelestialSphere::LoadConstellationLabelData() const
 {
-	std::vector<GraphicsClient::ConstLabelRec> rec;
+	std::vector<SphereClient::ConstLabelRec> rec;
 
 	std::string fname = m_dataDir + std::string("const_labels.bin");
 	FILE* f = fopen(fname.c_str(), "rb");
@@ -387,7 +403,7 @@ const std::vector<oapi::GraphicsClient::ConstLabelRec> oapi::CelestialSphere::Lo
 		int nfull = 256;
 		char* full = new char[nfull];
 		int labelLen;
-		GraphicsClient::ConstLabelRec r;
+		SphereClient::ConstLabelRec r;
 		while (fread(pos, sizeof(double), 2, f) == 2) {
 			r.lngCnt = pos[0];
 			r.latCnt = pos[1];
@@ -418,9 +434,9 @@ const std::vector<oapi::GraphicsClient::ConstLabelRec> oapi::CelestialSphere::Lo
 
 // --------------------------------------------------------------
 
-const std::vector<oapi::GraphicsClient::LABELSPEC> oapi::CelestialSphere::ConstellationLabelData2RenderData(const std::vector<GraphicsClient::ConstLabelRec>& clabelRec) const
+const std::vector<oapi::SphereClient::LABELSPEC> oapi::CelestialSphere::ConstellationLabelData2RenderData(const std::vector<SphereClient::ConstLabelRec>& clabelRec) const
 {
-	std::vector<GraphicsClient::LABELSPEC> renderRec;
+	std::vector<SphereClient::LABELSPEC> renderRec;
 	renderRec.resize(clabelRec.size());
 	for (int i = 0; i < clabelRec.size(); i++) {
 		renderRec[i].label[0] = clabelRec[i].fullLabel;
@@ -499,7 +515,7 @@ void oapi::CelestialSphere::RenderMarker(oapi::Sketchpad* pSkp, const VECTOR3& r
 
 // --------------------------------------------------------------
 
-void oapi::CelestialSphere::EnsureMarkerDrawingContext(oapi::Sketchpad** ppSkp, oapi::Font* font, COLORREF textcol, oapi::Pen* pen)
+void oapi::CelestialSphere::EnsureMarkerDrawingContext(oapi::Sketchpad** ppSkp, oapi::Font* font, oapi::UInt32 textcol, oapi::Pen* pen)
 {
 	if (!*ppSkp) {
 		*ppSkp = m_gc->clbkGetSketchpad(0);
@@ -622,12 +638,12 @@ oapi::FVECTOR4 oapi::CelestialSphere::ColorAdjusted(const FVECTOR4& baseCol) con
 	return baseCol * colAdjust; // fade against a bright background
 }
 
-DWORD oapi::CelestialSphere::MarkerColorAdjusted(const FVECTOR4& baseCol) const
+oapi::UInt32 oapi::CelestialSphere::MarkerColorAdjusted(const FVECTOR4& baseCol) const
 {
 	return ColorAdjusted(baseCol).dword_argb();
 }
 
-DWORD oapi::CelestialSphere::TextColorAdjusted(const FVECTOR4& baseCol) const
+oapi::UInt32 oapi::CelestialSphere::TextColorAdjusted(const FVECTOR4& baseCol) const
 {
 	FVECTOR4 textCol = ColorAdjusted(baseCol);
 	if (!m_textBlendAdditive) { // explicitly add background colour
@@ -647,10 +663,10 @@ const MESHHANDLE oapi::CelestialSphere::GridLabelMesh()
 		const double ticksize_v = ticksize_h * 0.371;
 
 		// create the azimuth tick labels
-		DWORD navtx = 24 * 4;
-		DWORD naidx = 24 * 6;
+		oapi::UInt32 navtx = 24 * 4;
+		oapi::UInt32 naidx = 24 * 6;
 		NTVERTEX* avtx = new NTVERTEX[navtx];
-		WORD* aidx = new WORD[naidx];
+		oapi::UInt16* aidx = new oapi::UInt16[naidx];
 		for (int i = 0; i < 24; i++) {
 			int vofs = i * 4;
 			NTVERTEX* v0 = avtx + vofs;
@@ -665,7 +681,7 @@ const MESHHANDLE oapi::CelestialSphere::GridLabelMesh()
 			v0[2].y = v0[3].y = dy + (v0[0].y = v0[1].y = 0.001);
 			v0[1].tu = v0[3].tu = 0.1 + (v0[0].tu = v0[2].tu = 0.001);
 			v0[0].tv = v0[1].tv = 0.0371 + (v0[2].tv = v0[3].tv = 0.001 + i * 0.0371);
-			WORD* i0 = aidx + (i * 6);
+			oapi::UInt16* i0 = aidx + (i * 6);
 			i0[0] = vofs;
 			i0[1] = vofs + 2;
 			i0[2] = vofs + 1;
@@ -676,10 +692,10 @@ const MESHHANDLE oapi::CelestialSphere::GridLabelMesh()
 		mesh->AddGroup(avtx, navtx, aidx, naidx);
 
 		// create elevation tick labels
-		DWORD nevtx = 11 * 4;
-		DWORD neidx = 11 * 6;
+		oapi::UInt32 nevtx = 11 * 4;
+		oapi::UInt32 neidx = 11 * 6;
 		NTVERTEX* evtx = new NTVERTEX[nevtx];
-		WORD* eidx = new WORD[neidx];
+		oapi::UInt16* eidx = new oapi::UInt16[neidx];
 		for (int i = 1; i <= 11; i++) {
 			int vofs = (i - 1) * 4;
 			NTVERTEX* v0 = evtx + vofs;
@@ -694,7 +710,7 @@ const MESHHANDLE oapi::CelestialSphere::GridLabelMesh()
 			v0[0].z = v0[2].z = dz + (v0[1].z = v0[3].z = 0.001);
 			v0[1].tu = v0[3].tu = 0.0957 + (v0[0].tu = v0[2].tu = 0.308);
 			v0[0].tv = v0[1].tv = 0.0371 + (v0[2].tv = v0[3].tv = 0.001 + i * 0.0371);
-			WORD* i0 = eidx + ((i - 1) * 6);
+			oapi::UInt16* i0 = eidx + ((i - 1) * 6);
 			i0[0] = vofs;
 			i0[1] = vofs + 2;
 			i0[2] = vofs + 1;

@@ -7,13 +7,17 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 */
 
 #include "glad.h"
+#include "RendererFiles.h"
 #include "OGLPad.h"
 #include "OGLClient.h"
 #include "Scene.h"
 #include "OGLCamera.h"
 #include <cstring>
-#include <windows.h>
+
 #include <cwchar>
+#ifdef _WIN32
+#include <windows.h>
+#endif
 #include <vector>
 #include "Renderer.h"
 #include <map>
@@ -23,11 +27,11 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
 static std::map<std::string,std::string> fontCache;
 
-static NVGcolor nvgCol(DWORD col)
+static NVGcolor nvgCol(oapi::UInt32 col)
 {
    	unsigned char* c = reinterpret_cast<unsigned char*>(&col);
 
-	NVGcolor color;    
+	NVGcolor color;
     color.r = c[0]/255.0;
 	color.g = c[1]/255.0;
 	color.b = c[2]/255.0;
@@ -60,7 +64,7 @@ static NVGalign toNvgAlign(oapi::Sketchpad::TAlign_vertical tav)
 		case oapi::Sketchpad::BOTTOM:
 			return NVGalign::NVG_ALIGN_BOTTOM;
 	}
-    return NVGalign::NVG_ALIGN_BASELINE; 
+    return NVGalign::NVG_ALIGN_BASELINE;
 }
 
 NVGcontext *OGLPad::s_nvg_normal;
@@ -100,7 +104,7 @@ OGLPad::OGLPad (SURFHANDLE s, bool antialiased):oapi::Sketchpad(s)
 //	m_TextAlign = NVGalign::NVG_ALIGN_BOTTOM|NVGalign::NVG_ALIGN_LEFT;
 //	m_TextAlign = NVGalign::NVG_ALIGN_BASELINE|NVGalign::NVG_ALIGN_LEFT;
 	m_tex = (OGLTexture *)s;
-	
+
 	if(s)
 	{
 		Renderer::PushRenderTarget(m_tex);
@@ -176,7 +180,7 @@ void OGLPad::SetTextAlign (TAlign_horizontal tah, TAlign_vertical tav)
 	m_TextAlign = (NVGalign)(toNvgAlign(tah) | toNvgAlign(tav));
 }
 
-DWORD OGLPad::SetTextColor (DWORD col)
+oapi::UInt32 OGLPad::SetTextColor (oapi::UInt32 col)
 {
 	uint32_t oldColor = textColorNative;
     textColorNative = col;
@@ -184,7 +188,7 @@ DWORD OGLPad::SetTextColor (DWORD col)
 	return oldColor;
 }
 
-DWORD OGLPad::SetBackgroundColor (DWORD col)
+oapi::UInt32 OGLPad::SetBackgroundColor (oapi::UInt32 col)
 {
 	uint32_t oldColor = bgColorNative;
     bgColorNative = col;
@@ -197,7 +201,7 @@ void OGLPad::SetBackgroundMode (BkgMode mode)
 	m_TextBackgroundMode = mode;
 }
 
-DWORD OGLPad::GetCharSize ()
+oapi::UInt32 OGLPad::GetCharSize ()
 {
 	//int height;
 	if (cfont) {
@@ -222,7 +226,7 @@ DWORD OGLPad::GetCharSize ()
 	}
 }
 
-DWORD OGLPad::GetTextWidth (const char *str, int len)
+oapi::UInt32 OGLPad::GetTextWidth (const char *str, int len)
 {
 	if (len == 0) {
 		len = strlen(str);
@@ -286,11 +290,25 @@ bool OGLPad::TextW (int x, int y, wchar_t *str, int len)
 {
     if (!str || len < 0) return false;
     if (!len) return true;
+#ifdef _WIN32
     int bytes=WideCharToMultiByte(CP_UTF8,WC_ERR_INVALID_CHARS,str,len,nullptr,0,nullptr,nullptr);
     if (!bytes) return false;
     std::string utf8(bytes,'\0');
     if (WideCharToMultiByte(CP_UTF8,WC_ERR_INVALID_CHARS,str,len,utf8.data(),bytes,nullptr,nullptr)!=bytes) return false;
     return Text(x,y,utf8.data(),bytes);
+#else
+    // Linux wchar_t is UTF-32. Encode explicitly, independent of the process locale.
+    std::string utf8;
+    for(int i=0;i<len;++i) {
+        const uint32_t cp=static_cast<uint32_t>(str[i]);
+        if(cp>0x10ffff || (cp>=0xd800 && cp<=0xdfff)) return false;
+        if(cp<0x80) utf8.push_back(char(cp));
+        else if(cp<0x800) {utf8.push_back(char(0xc0|(cp>>6)));utf8.push_back(char(0x80|(cp&0x3f)));}
+        else if(cp<0x10000) {utf8.push_back(char(0xe0|(cp>>12)));utf8.push_back(char(0x80|((cp>>6)&0x3f)));utf8.push_back(char(0x80|(cp&0x3f)));}
+        else {utf8.push_back(char(0xf0|(cp>>18)));utf8.push_back(char(0x80|((cp>>12)&0x3f)));utf8.push_back(char(0x80|((cp>>6)&0x3f)));utf8.push_back(char(0x80|(cp&0x3f)));}
+    }
+    return Text(x,y,utf8.data(),int(utf8.size()));
+#endif
 }
 
 
@@ -301,7 +319,7 @@ bool OGLPad::TextW (int x, int y, wchar_t *str, int len)
  * \param y y-coordinate of point [pixel]
  * \param col pixel colour (format: 0xBBGGRR)
  */
-void OGLPad::Pixel (int x, int y, DWORD col)
+void OGLPad::Pixel (int x, int y, oapi::UInt32 col)
 {
     nvgBeginPath(s_nvg);
     nvgRect(s_nvg, x + m_xOrigin, y + m_yOrigin, 0.1, 0.1);
@@ -414,6 +432,7 @@ OGLFont::OGLFont (int height, bool prop, const char *face, FontStyle style, int 
     // Font names/styles remain recorded by the surface contract tests.
     m_fontfile = prop ? "Fonts/Roboto-Medium.ttf" : "Fonts/Cousine-Regular.ttf";
     if (style & FONT_BOLD) m_fontfile="Fonts/Lekton-Bold.ttf";
+    m_fontfile=RendererFilePath(m_fontfile);
 
 }
 

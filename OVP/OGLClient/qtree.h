@@ -8,7 +8,7 @@ template<typename T>
 class QuadTreeNode {
 public:
 	QuadTreeNode (QuadTreeNode<T> *_parent = 0, T *_entry = 0);
-	
+
 	~QuadTreeNode ();
 	// Deleting a node
 

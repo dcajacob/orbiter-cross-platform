@@ -202,7 +202,7 @@ void PopBool(int num) {
         }
     }
 }
-void SetViewPort(int w, int h) 
+void SetViewPort(int w, int h)
 {
     assert(lastFBParams.size() == 0);
     current_viewport[2] = w;

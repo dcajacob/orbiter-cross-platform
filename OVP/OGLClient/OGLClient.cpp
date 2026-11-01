@@ -39,6 +39,7 @@ constexpr int splashSize = 21;
 
 // ==============================================================
 // Initialise module
+#ifdef _WIN32
 DLLCLBK void InitModule (HINSTANCE hDLL)
 {
 
@@ -63,7 +64,9 @@ DLLCLBK void ExitModule (HINSTANCE hDLL)
 
 }
 
-OGLClient::OGLClient (HINSTANCE hInstance):GraphicsClient(hInstance)
+#endif
+
+OGLClient::OGLClient (RendererModuleContext hInstance):RendererHost(hInstance)
 {
 }
 
@@ -88,7 +91,7 @@ OGLClient::~OGLClient ()
  */
 bool OGLClient::clbkInitialise()
 {
-    if (!GraphicsClient::clbkInitialise ()) return false;
+    if (!RendererHost::clbkInitialise ()) return false;
     return true;
 }
 
@@ -323,7 +326,7 @@ void OGLClient::clbkRender2DPanel (SURFHANDLE *hSurf, MESHHANDLE hMesh, MATRIX3 
 		Renderer::CheckError("clbkRender2DPanel glVertexAttribPointer");
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 		Renderer::CheckError("clbkRender2DPanel glBindBuffer");
-		
+
 		glEnableVertexAttribArray(0);
 		Renderer::CheckError("clbkRender2DPanel glEnableVertexAttribArray0");
 
@@ -457,7 +460,12 @@ void OGLClient::clbkRenderScene ()
 //	CheckError("glClearColor");
 //	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 //	CheckError("glClear");
+#ifdef _WIN32
 	mScene->Render();
+#else
+    // Explicit external-view capability: cockpit overlays are a later delivery.
+    mScene->Render(false);
+#endif
     Evidence::Rendered();
 }
 
@@ -836,7 +844,7 @@ Font *OGLClient::CreateFont (int height, bool prop, const char *face, FontStyle 
 
 /**
  * \brief Create a surface for texturing, as a blitting source, etc.
- * 
+ *
  * Surfaces are used for offscreen bitmap and texture manipulation,
  * blitting and rendering.
  * Derived classes should create a device-specific surface, and
@@ -868,12 +876,12 @@ SURFHANDLE OGLClient::CreateSurfaceEx (int w, int h, int attrib)
 	ddsd.ddpfPixelFormat.dwSize = sizeof (DDPIXELFORMAT);
     ddsd.dwWidth  = w;
 	ddsd.dwHeight = h;
-    ddsd.dwFlags = DDSD_CAPS | DDSD_HEIGHT | DDSD_WIDTH; 
+    ddsd.dwFlags = DDSD_CAPS | DDSD_HEIGHT | DDSD_WIDTH;
 	if (attrib & OAPISURFACE_TEXTURE)
 		ddsd.ddsCaps.dwCaps |= DDSCAPS_TEXTURE;
 	else
 		ddsd.ddsCaps.dwCaps |= DDSCAPS_OFFSCREENPLAIN;
-	if (attrib & OAPISURFACE_SYSMEM || (attrib & OAPISURFACE_GDI || attrib & OAPISURFACE_SKETCHPAD) && !(attrib & OAPISURFACE_TEXTURE)) 
+	if (attrib & OAPISURFACE_SYSMEM || (attrib & OAPISURFACE_GDI || attrib & OAPISURFACE_SKETCHPAD) && !(attrib & OAPISURFACE_TEXTURE))
 		ddsd.ddsCaps.dwCaps |= DDSCAPS_SYSTEMMEMORY;
 	else
 		ddsd.ddsCaps.dwCaps |= DDSCAPS_VIDEOMEMORY;
@@ -914,7 +922,7 @@ SURFHANDLE OGLClient::CreateSurface (int w, int h, SURFHANDLE hTemplate)
 	DDSURFACEDESC2 ddsd;
     ZeroMemory (&ddsd, sizeof(ddsd));
 	ddsd.dwSize = sizeof(ddsd);
-    ddsd.dwFlags = DDSD_CAPS | DDSD_HEIGHT | DDSD_WIDTH; 
+    ddsd.dwFlags = DDSD_CAPS | DDSD_HEIGHT | DDSD_WIDTH;
     ddsd.ddsCaps.dwCaps = DDSCAPS_OFFSCREENPLAIN;
     ddsd.dwWidth  = w;
 	ddsd.dwHeight = h;
@@ -928,7 +936,7 @@ SURFHANDLE OGLClient::CreateSurface (int w, int h, SURFHANDLE hTemplate)
 		LOGOUT_DDERR (hr);
 		return NULL;
 	}
-    
+
 	return (SURFHANDLE)surf;
     */
 }
@@ -1095,7 +1103,7 @@ oapi::Sketchpad *OGLClient::GetSketchpad (SURFHANDLE surf, bool antialiased)
  */
 void OGLClient::clbkCloseSession (bool fastclose)
 {
-	GraphicsClient::clbkCloseSession (fastclose);
+	RendererHost::clbkCloseSession (fastclose);
 
 	mScene.reset();
 }
@@ -1120,7 +1128,7 @@ bool OGLClient::clbkClearFrame ()
 	Renderer::CheckError("glClear");
 	return true;
 }
- 
+
 
 
 
@@ -1325,7 +1333,7 @@ bool OGLClient::FillSurface (SURFHANDLE surf, int tgtx, int tgty, int w, int h, 
 	glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 0, NULL);
 	Renderer::CheckError("glVertexAttribPointer");
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
-	
+
 	glEnableVertexAttribArray(0);
 	glBindVertexArray(0);
 
@@ -1710,7 +1718,7 @@ bool OGLClient::Blt (SURFHANDLE tgt, int tgtx, int tgty, SURFHANDLE src, int src
 		glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 0, NULL);
 		Renderer::CheckError("OGLPad::Text glVertexAttribPointer");
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
-		
+
 		glEnableVertexAttribArray(0);
 		glBindVertexArray(0);
 
@@ -1804,7 +1812,7 @@ bool OGLClient::Blt (SURFHANDLE tgt, int tgtx, int tgty, SURFHANDLE src, int src
 		glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 0, NULL);
 		Renderer::CheckError("OGLPad::Text glVertexAttribPointer");
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
-		
+
 //	CheckError("OGLPad::Text glBindBuffer0");
 		glEnableVertexAttribArray(0);
 	//CheckError("OGLPad::Text glEnableVertexAttribArray0");

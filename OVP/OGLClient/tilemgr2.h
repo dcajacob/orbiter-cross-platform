@@ -122,7 +122,7 @@ protected:
 	VECTOR3 Centre () const;
 	// Returns the direction of the tile centre from the planet centre in local planet coordinates
 
-	VBMESH_TS *CreateMesh_quadpatch (int grdlat, int grdlng, int16_t *elev=0, double elev_scale = 1.0, double globelev=0.0, 
+	VBMESH_TS *CreateMesh_quadpatch (int grdlat, int grdlng, int16_t *elev=0, double elev_scale = 1.0, double globelev=0.0,
 		const TEXCRDRANGE2 *range=0, bool shift_origin=false, VECTOR3 *shift=0, double bb_excess=0.0);
 	// Creates a quadrilateral patch mesh
 
@@ -167,7 +167,7 @@ private:
 	static struct QUEUEDESC {
 		Tile *tile;
 	} queue[MAXQUEUE2];
-	
+
 	static bool bRunThread;
 	static int nqueue, queue_in, queue_out;
 	static std::mutex hLoadMutex;
@@ -211,7 +211,7 @@ public:
 		glm::vec4 fogColor;
 		float fogDensity;
 	} prm;
-	
+
 	glm::mat4 wtrans;
 
 	TileManager2Base (const vPlanet *vplanet, int _maxres, int _gridres);

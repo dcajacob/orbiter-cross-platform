@@ -119,7 +119,7 @@ vPlanet::vPlanet (OBJHANDLE _hObj, const Scene *scene): vObject (_hObj, scene)
 	} else {
 		ringmgr = 0;
 	}
-	
+
 	memcpy (&fog, oapiGetObjectParam (_hObj, OBJPRM_PLANET_FOGPARAM), sizeof (FogParam));
 	prm.bFogEnabled = (fog.dens_0 > 0);
 
@@ -503,7 +503,7 @@ void vPlanet::RenderSphere (const RenderPrm &prm)
 		Renderer::PopBool();
 		Renderer::CheckError("RenderSphere");
 	} else {
-		//mercury, venus, saturn, titan, hyperion, uranus, miranda, ariel, umbriel, titan, oberon, neptune, triton, proteus, nereide 
+		//mercury, venus, saturn, titan, hyperion, uranus, miranda, ariel, umbriel, titan, oberon, neptune, triton, proteus, nereide
 		surfmgr->Render (mWorld, 1.0, patchres, 0.0, prm.bFog); // surface
 		Renderer::CheckError("RenderSphere");
 	}
@@ -519,7 +519,7 @@ void vPlanet::RenderSphere (const RenderPrm &prm)
 	if (nbase) {
 		RenderBaseSurfaces ();                     // base surfaces
 		Renderer::CheckError("RenderSphere");
-		RenderBaseShadows (shadowalpha);         // base 
+		RenderBaseShadows (shadowalpha);         // base
 		Renderer::CheckError("RenderSphere");
 	}
 /*

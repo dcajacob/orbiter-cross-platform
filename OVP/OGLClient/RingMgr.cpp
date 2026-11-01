@@ -73,9 +73,9 @@ bool RingManager::Render (OGLCamera *c, glm::mat4 &mWorld, bool front)
 	MATRIX3 grot;
 	glm::vec3 q(mWorld[0][0], mWorld[1][0], mWorld[2][0]);
 	float scale = glm::length(q);
-	
+
 	oapiGetRotationMatrix(vp->Object(), &grot);
-	
+
 	VECTOR3 gdir; oapiCameraGlobalDir(&gdir);
 
 	VECTOR3 yaxis =  mul(grot, _V(0,1,0));
@@ -131,7 +131,7 @@ bool RingManager::Render (OGLCamera *c, glm::mat4 &mWorld, bool front)
 	ringShader->SetVec4("u_Material.emissive", defmat.emissive);
 
 	glBindTexture(GL_TEXTURE_2D, tex[tres]->m_TexId);
-    
+
 	Renderer::PushBool(Renderer::BLEND, true);
 
 	mesh[rres]->RenderGroup (mesh[rres]->GetGroup(0));

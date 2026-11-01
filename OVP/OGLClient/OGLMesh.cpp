@@ -608,7 +608,7 @@ void OGLMesh::Render (OGLCamera *c, glm::fmat4 &model)
 			for (j = g-1; j >= 0; j--)
 				if ((mi = Grp[j]->MtrlIdx) != SPEC_INHERIT) break;
 
-		
+
 		if (mi != SPEC_INHERIT && (!g || mi != pmi)) {
 			mat = (mi != SPEC_DEFAULT ? Mtrl+mi : &defmat);
 
@@ -621,7 +621,7 @@ void OGLMesh::Render (OGLCamera *c, glm::fmat4 &model)
 				}
 			}*/
 			pmi = mi;
-		} 
+		}
 
 		meshShader->SetVec4("u_Material.ambient", mat->ambient);
 		meshShader->SetVec4("u_Material.diffuse", mat->diffuse);
@@ -738,7 +738,7 @@ void OGLMesh::Render (OGLCamera *c, glm::fmat4 &model)
 	if (!lighting) Renderer::EnableLighting(true);
 /*
 	for (n = 0; n < MAXTEX; n++) {
-		if (texstage[n]) 
+		if (texstage[n])
 			dev->SetTextureStageState (n+1, D3DTSS_COLOROP, D3DTOP_DISABLE);
 	}
 	if (bModulateMatAlpha)

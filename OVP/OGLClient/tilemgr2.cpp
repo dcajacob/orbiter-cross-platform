@@ -189,7 +189,7 @@ VBMESH_TS *Tile::CreateMesh_quadpatch (int grdlat, int grdlng, int16_t *elev, do
 	VECTOR3 ez = crossp (ey, ex);
 	MATRIX3 R = {ex.x, ex.y, ex.z,  ey.x, ey.y, ey.z,  ez.x, ez.y, ez.z};
 	VECTOR3 pref = {radius*clat0*0.5*(clng1+clng0), radius*slat0, radius*clat0*0.5*(slng1+slng0)}; // origin
-	VECTOR3 tpmin = {0,0,0}, tpmax = {0,0,0}; 
+	VECTOR3 tpmin = {0,0,0}, tpmax = {0,0,0};
 
 	// patch translation vector
 	if (shift_origin) {
@@ -433,7 +433,7 @@ VBMESH_TS *Tile::CreateMesh_hemisphere (int grd, int16_t *elev, double globelev)
             *idx++ = (uint16_t)( (y+1)*x2 + (x+0) );
             *idx++ = (uint16_t)( (y+0)*x2 + (x+1) );
             *idx++ = (uint16_t)( (y+1)*x2 + (x+1) );
-            *idx++ = (uint16_t)( (y+1)*x2 + (x+0) ); 
+            *idx++ = (uint16_t)( (y+1)*x2 + (x+0) );
 			nidx += 6;
         }
     }
@@ -456,7 +456,7 @@ VBMESH_TS *Tile::CreateMesh_hemisphere (int grd, int16_t *elev, double globelev)
     nvtx++;
 	uint16_t wSouthVtx = nvtx;
 
-	
+
 	eradius = radius + globelev;
 	if (elev) {
 		double mn = 0.0;

@@ -1,0 +1,78 @@
+// Licensed under the MIT License
+#ifndef ORBITER_PRODUCTION_NATIVE_GRAPHICS_H
+#define ORBITER_PRODUCTION_NATIVE_GRAPHICS_H
+#include "Export.h"
+#include "NativeRenderApi.h"
+#include "ResourceResolver.h"
+#include "SceneLabels.h"
+#include <vector>
+class Config;class Camera;class PlanetarySystem;class MeshManager;class TimeData;class Vessel;
+namespace oapi {class ParticleStream;}
+namespace orbiter::production {
+// Internal same-build native renderer contract. No window handles, GPU classes
+// or renderer math enter production numerical objects or the Windows SDK.
+struct RenderInput {bool close=false;int width=0,height=0;double yaw=0,pitch=0,zoom=0;};
+class ORBITER_PRODUCTION_API NativeGraphics {
+public:
+    virtual ~NativeGraphics()=default;
+    using LABELSPEC=SceneLabel;using LABELLIST=SceneLabelList;using LABELTYPE=SceneLabelType;
+    struct ConstLabelRec {std::string fullLabel,abbrLabel;float lngCnt,latCnt;};
+    virtual const void* GetConfigParam(oapi::UInt32) const=0;
+    virtual const std::vector<LABELLIST>& GetCelestialMarkers() const=0;
+    virtual void clbkGetViewportSize(oapi::UInt32*,oapi::UInt32*) const=0;
+    oapi::Font* clbkCreateFont(int height,bool prop,const char* face,FontStyle style=FONT_NORMAL,int orientation=0) {return CreateFontResource(height,prop,face,style,orientation);}
+    oapi::Pen* clbkCreatePen(int style,int width,oapi::UInt32 color) {return CreatePenResource(style,width,color);}
+    void clbkReleaseFont(oapi::Font* font) {ReleaseFontResource(font);}
+    void clbkReleasePen(oapi::Pen* pen) {ReleasePenResource(pen);}
+    oapi::Sketchpad* clbkGetSketchpad(SURFHANDLE surface) {return AcquireSketchpad(surface);}
+
+    virtual void Open()=0;
+    virtual RenderInput Poll()=0;
+    virtual void Resize(int,int)=0;
+    virtual void PostCreation()=0;
+    virtual void Render()=0;
+    virtual bool Present()=0;
+    virtual void CloseSession()=0;
+    virtual void Close()=0;
+    virtual SURFHANDLE LoadTextureResource(const char*,oapi::UInt32)=0;
+    virtual bool ReleaseTextureResource(SURFHANDLE)=0;
+    virtual void StoreMesh(MESHHANDLE,const char*)=0;
+    virtual void VisualEvent(OBJHANDLE,VISHANDLE,oapi::UInt32,std::uintptr_t)=0;
+    virtual oapi::Font* CreateFontResource(int,bool,const char*,FontStyle,int)=0;
+    virtual void ReleaseFontResource(oapi::Font*)=0;
+    virtual oapi::Pen* CreatePenResource(int,int,oapi::UInt32)=0;
+    virtual void ReleasePenResource(oapi::Pen*)=0;
+    virtual oapi::Sketchpad* AcquireSketchpad(SURFHANDLE)=0;
+    virtual void ReleaseSketchpadResource(oapi::Sketchpad*)=0;
+    virtual SURFHANDLE CreateSurfaceResource(int,int)=0;
+    virtual int MeshGroup(DEVMESHHANDLE,oapi::UInt32,GROUPREQUESTSPEC*)=0;
+    virtual oapi::ParticleStream* Exhaust(PARTICLESTREAMSPEC*,OBJHANDLE,const double*,const VECTOR3*,const VECTOR3*)=0;
+    virtual oapi::ParticleStream* Exhaust(PARTICLESTREAMSPEC*,OBJHANDLE,const double*,const VECTOR3&,const VECTOR3&)=0;
+    virtual oapi::ParticleStream* Reentry(PARTICLESTREAMSPEC*,OBJHANDLE)=0;
+};
+struct NativeRenderContext {
+    Config* configuration=nullptr;PlanetarySystem* world=nullptr;Camera* camera=nullptr;
+    Vessel* focus=nullptr;TimeData* time=nullptr;MeshManager* meshes=nullptr;
+    const ResourceResolver *textures=nullptr,*highTextures=nullptr,*planetTextures=nullptr,*meshFiles=nullptr,*programFiles=nullptr;
+    NativeGraphics* graphics=nullptr;bool paused=true,showGrapple=false;
+    std::filesystem::path evidence;double captureTime=0;
+};
+ORBITER_PRODUCTION_API NativeRenderContext* BindNativeRenderContext(NativeRenderContext*);
+ORBITER_PRODUCTION_API NativeRenderContext& GetNativeRenderContext();
+ORBITER_PRODUCTION_API const void* RenderConfig(oapi::UInt32);
+ORBITER_PRODUCTION_API bool RenderTexturePath(const char*,char*,bool planet);
+ORBITER_PRODUCTION_API void RenderRegisterVisual(OBJHANDLE,VISHANDLE);
+ORBITER_PRODUCTION_API void RenderUnregisterVisual(OBJHANDLE);
+ORBITER_PRODUCTION_API oapi::UInt32 RenderBaseTiles(OBJHANDLE,const SurftileSpec**);
+ORBITER_PRODUCTION_API void RenderBaseStructures(OBJHANDLE,MESHHANDLE**,oapi::UInt32*,MESHHANDLE**,oapi::UInt32*);
+ORBITER_PRODUCTION_API void RenderBaseShadows(OBJHANDLE,MESHHANDLE**,double**,oapi::UInt32*);
+ORBITER_PRODUCTION_API bool RenderElevationGrid(ELEVHANDLE,int,int,int,int,int,int,std::int16_t*,float*,double*);
+ORBITER_PRODUCTION_API bool RenderElevationGrid(ELEVHANDLE,int,int,int,int,int,int,std::int16_t*,std::int16_t*,double*);
+ORBITER_PRODUCTION_API const std::vector<SceneLabelList>& RenderCelestialMarkers();
+ORBITER_PRODUCTION_API oapi::UInt32 RenderSurfaceMarkers(OBJHANDLE,const SceneLabelList**);
+ORBITER_PRODUCTION_API oapi::UInt32 RenderSurfaceLegend(OBJHANDLE,const SceneLabelType**);
+ORBITER_PRODUCTION_API void RenderDetachParticle(OBJHANDLE,oapi::ParticleStream*);
+ORBITER_PRODUCTION_API bool RenderHasCelestialModule(OBJHANDLE);
+ORBITER_PRODUCTION_API OBJHANDLE RenderCelestialParent(OBJHANDLE);
+}
+#endif

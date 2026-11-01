@@ -63,7 +63,7 @@ public:
 	void Update ();
 	// Update camera position, visuals, etc.
 
-	void Render ();
+	void Render (bool cockpitOverlay=true);
 	// Render the scene
 
 	/**
@@ -169,7 +169,7 @@ private:
 	// Add an entry for object hObj in the list of visuals
 
 	// GDI resources
-	static COLORREF labelCol[6];
+	static oapi::UInt32 labelCol[6];
 	oapi::Pen *hLabelPen[6];
 	oapi::Font *hLabelFont[1];
 	int labelSize[1];

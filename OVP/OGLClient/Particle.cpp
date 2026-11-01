@@ -58,7 +58,7 @@ static PARTICLESTREAMSPEC DefaultParticleStreamSpec = {
 OGLTexture *OGLParticleStream::deftex = nullptr;
 bool OGLParticleStream::bShadows = false;
 
-OGLParticleStream::OGLParticleStream (GraphicsClient *_gc, PARTICLESTREAMSPEC *pss): ParticleStream (_gc, pss)
+OGLParticleStream::OGLParticleStream (RendererHost *_gc, PARTICLESTREAMSPEC *pss): ParticleStream (_gc, pss)
 {
 	cam_ref = *g_client->GetScene()->GetCamera()->GetGPos();
 
@@ -663,7 +663,7 @@ void OGLParticleStream::RenderEmissive (OGLCamera *c)
 
 // =======================================================================
 
-ExhaustStream::ExhaustStream (oapi::GraphicsClient *_gc, OBJHANDLE hV,
+ExhaustStream::ExhaustStream (RendererHost *_gc, OBJHANDLE hV,
 	const double *srclevel, const VECTOR3 *thref, const VECTOR3 *thdir,
 	PARTICLESTREAMSPEC *pss)
 : OGLParticleStream (_gc, pss)
@@ -672,7 +672,7 @@ ExhaustStream::ExhaustStream (oapi::GraphicsClient *_gc, OBJHANDLE hV,
 	hPlanet = 0;
 }
 
-ExhaustStream::ExhaustStream (oapi::GraphicsClient *_gc, OBJHANDLE hV,
+ExhaustStream::ExhaustStream (RendererHost *_gc, OBJHANDLE hV,
 	const double *srclevel, const VECTOR3 &ref, const VECTOR3 &_dir,
 	PARTICLESTREAMSPEC *pss)
 : OGLParticleStream (_gc, pss)
@@ -803,7 +803,7 @@ void ExhaustStream::RenderGroundShadow (LPDIRECT3DDEVICE7 dev, LPDIRECTDRAWSURFA
 	ParticleSpec *p;
 	double rad, r, lng, lat;
 	float *u, *v, alpha;
-	int n, j, i0; 
+	int n, j, i0;
 	VECTOR3 sd, hn;
 
 	NTVERTEX *vtx;
@@ -880,7 +880,7 @@ void ExhaustStream::RenderGroundShadow (LPDIRECT3DDEVICE7 dev, LPDIRECTDRAWSURFA
 */
 // =======================================================================
 
-ReentryStream::ReentryStream (oapi::GraphicsClient *_gc, OBJHANDLE hV, PARTICLESTREAMSPEC *pss)
+ReentryStream::ReentryStream (RendererHost *_gc, OBJHANDLE hV, PARTICLESTREAMSPEC *pss)
 : OGLParticleStream (_gc, pss)
 {
 	llevel = 1.0;
@@ -893,7 +893,7 @@ void ReentryStream::SetMaterial (glm::vec4 &col)
 	// should be heating-dependent
 	col.r = 1.0f;
 	col.g = 0.8f;
-	col.b = 0.6f; 
+	col.b = 0.6f;
 }
 
 void ReentryStream::Update ()

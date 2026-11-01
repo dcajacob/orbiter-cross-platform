@@ -108,8 +108,8 @@ protected:
 	//        bit 1 set: decompress, even if format is supported by device
 	//        bit 2 set: don't load mipmaps, even if supported by device
 /*
-	bool BltToUncompressedSurface (DDSURFACEDESC2 ddsd, 
-		DDPIXELFORMAT ddpf, OGLTexture * pddsDXT, 
+	bool BltToUncompressedSurface (DDSURFACEDESC2 ddsd,
+		DDPIXELFORMAT ddpf, OGLTexture * pddsDXT,
 	    OGLTexture ** ppddsNewSurface);*/
 	// Creates an uncompressed surface and copies the DXT
 	// surface into it

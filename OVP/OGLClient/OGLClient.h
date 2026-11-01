@@ -2,10 +2,10 @@
 #define __OGLCLIENT_H
 
 #include "glad.h"
-#include "GraphicsAPI.h"
+#include "RendererSdk.h"
 #include <glm/glm.hpp>
-using visevent = DWORD;
-using visevent_data = DWORD_PTR;
+using visevent = oapi::UInt32;
+using visevent_data = std::uintptr_t;
 #include <stdio.h>
 #include "MeshManager.h"
 #include "Texture.h"
@@ -19,15 +19,20 @@ struct OGLMaterial {
     glm::vec4 specular;
     glm::vec4 emissive;
     float specular_power;
-}; 
+};
 
+struct GLFWwindow;
 using namespace oapi;
 
 class Scene;
 class OGLMeshManager;
-class OGLClient: public oapi::GraphicsClient {
+class OGLClient: public RendererHost {
+#ifdef _WIN32
 	friend class ::Orbiter; ///< Orbiter private class
 	friend class ::Scene;
+#else
+	friend class Scene;
+#endif
 
 	std::unique_ptr<Scene> mScene;
 	std::unique_ptr<OGLMeshManager> mMeshManager;
@@ -35,7 +40,11 @@ class OGLClient: public oapi::GraphicsClient {
 	Shader *mOverlayShader;
 	Shader *mUntexturedShader;
 public:
+#ifdef _WIN32
 #include "WindowsCallbacks.inc"
+#else
+#include "Native/NativeCallbacks.inc"
+#endif
 	struct RenderContext {
 		bool normalizeNormals;
 		uint32_t ambient;
@@ -61,7 +70,7 @@ public:
 	 * with the Orbiter core via the oapiRegisterGraphicsClient function.
 	 * \param hInstance module instance handle (as passed to InitModule)
 	 */
-	OGLClient (HINSTANCE hInstance);
+	OGLClient (RendererModuleContext hInstance);
 
 	/**
 	 * \brief Destroy the graphics object.
@@ -251,7 +260,7 @@ public:
 	 *   object for which the message was created.
 	 * \sa RegisterVisObject, UnregisterVisObject, visevent
 	 */
-	virtual int clbkVisEvent (OBJHANDLE hObj, VISHANDLE vis, visevent msg, visevent_data context) override;
+	virtual int clbkVisEvent (OBJHANDLE hObj, VISHANDLE vis, visevent msg, visevent_data context) ORBITER_RENDER_OVERRIDE;
 
 	/**
 	 * \brief Return a mesh handle for a visual, defined by its index
@@ -308,14 +317,14 @@ public:
 	 * \param hVessel object handle of new vessel
 	 * \note Calls Scene::NewVessel() to check for visual
 	 */
-	void clbkNewVessel (OBJHANDLE hVessel) override;
+	void clbkNewVessel (OBJHANDLE hVessel) ORBITER_RENDER_OVERRIDE;
 
 	/**
 	 * \brief React to vessel destruction
 	 * \param hVessel object handle of vessel to be destroyed
 	 * \note Calls Scene::DeleteVessel() to remove the visual
 	 */
-	void clbkDeleteVessel (OBJHANDLE hVessel) override;
+	void clbkDeleteVessel (OBJHANDLE hVessel) ORBITER_RENDER_OVERRIDE;
 
 	// ==================================================================
 	/// \name Particle stream methods
@@ -391,7 +400,9 @@ public:
 	/**
 	 * \brief Returns the handle of the main render window.
 	 */
+#ifdef _WIN32
 	HWND GetRenderWindow () const { return hRenderWnd; }
+#endif
 
 	/**
 	 * \brief Render window message handler
@@ -409,7 +420,7 @@ public:
 	 *   messages, and passes everything else to the Orbiter core message
 	 *   handler.
 	 */
-	//virtual LRESULT RenderWndProc (HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+	//virtual LRESULT RenderWndProc (HWND hWnd, oapi::UInt uMsg, WPARAM wParam, LPARAM lParam);
 
 	/**
 	 * \brief Fullscreen mode flag
@@ -505,7 +516,7 @@ public:
 
 	/**
 	 * \brief Create a surface for texturing, as a blitting source, etc.
-	 * 
+	 *
 	 * Surfaces are used for offscreen bitmap and texture manipulation,
 	 * blitting and rendering.
 	 * Derived classes should create a device-specific surface, and
@@ -583,7 +594,7 @@ public:
 	 *   surface reference counter and release the surface if required.
 	 * \sa CreateSurface, clbkIncrSurfaceRef
 	 */
-	virtual bool clbkReleaseSurface (SURFHANDLE surf) override;
+	virtual bool clbkReleaseSurface (SURFHANDLE surf) ORBITER_RENDER_OVERRIDE;
 	virtual bool clbkUpdateSurface (SURFHANDLE surf, int x, int y, int w, int h, const unsigned char* data);
 
 	/**
@@ -837,7 +848,9 @@ protected:
 	 * \note Derived classes should perform any required per-session
 	 *   initialisation of the 3D render environment here.
 	 */
-	virtual HWND clbkCreateRenderWindow () override;
+#ifdef _WIN32
+	virtual HWND clbkCreateRenderWindow () ORBITER_RENDER_OVERRIDE;
+#endif
  	virtual void clbkMakeContextCurrent(bool);
 
 	/**
@@ -920,8 +933,10 @@ protected:
 	 *   panel, HUD, etc.)
 	 */
 	virtual void clbkRenderScene ();
+#ifdef _WIN32
 	virtual void clbkImGuiNewFrame ();
 	virtual void clbkImGuiRenderDrawData ();
+#endif
 
 	/**
 	 * \brief Display a scene on screen after rendering it.
@@ -934,7 +949,7 @@ protected:
 	 *   if no operation was performed.
 	 * \default None, returns false.
 	 */
-	virtual bool clbkDisplayFrame () override;
+	virtual bool clbkDisplayFrame () ORBITER_RENDER_OVERRIDE;
 	virtual bool clbkClearFrame ();
 
 	/**
@@ -1012,7 +1027,7 @@ protected:
 	 *   LoadResource, LockResource, SizeofResource)
 	 * \sa ReadImageFromFile, WriteImageDataToFile
 	 */
-//	HBITMAP ReadImageFromMemory (uint8_t *pBuf, int nBuf, UINT w, UINT h);
+//	HBITMAP ReadImageFromMemory (uint8_t *pBuf, int nBuf, oapi::UInt w, oapi::UInt h);
 
 	/**
 	 * \brief Read an image from a file into a bitmap
@@ -1023,7 +1038,7 @@ protected:
 	 * \note This function can read different image formats (bmp, jpg, png, tif)
 	 * \sa ReadImageFromMemory, WriteImageDataToFile
 	 */
-//	HBITMAP ReadImageFromFile (const char *fname, UINT w=0, UINT h=0);
+//	HBITMAP ReadImageFromFile (const char *fname, oapi::UInt w=0, oapi::UInt h=0);
 
 	// ==================================================================
 	/// \name Marker and label-related methods
@@ -1063,11 +1078,16 @@ private:
 	 */
 	//HWND InitRenderWnd (HWND hWnd);
 
+#ifdef _WIN32
 	HWND hRenderWnd;        // render window handle
 
 	uint32_t m_width=1280, m_height=720;
 	HDC mDC=nullptr;
 	HGLRC mContext=nullptr;
+#else
+	uint32_t m_width=1280,m_height=720;
+	GLFWwindow* nativeWindow=nullptr;
+#endif
 	bool mResources=false;
 
 	// Splash screen
@@ -1107,13 +1127,13 @@ public:
 	/**
 	 * \brief Creates a visual for object hObj.
 	 * \param hObj object handle
-	 * \sa oapi::GraphicsClient::RegisterVisObject
+	 * \sa RendererHost::RegisterVisObject
 	 */
 	VisObject (OBJHANDLE hObj);
 
 	/**
 	 * \brief Destroys the visual.
-	 * \sa oapi::GraphicsClient::UnregisterVisObject
+	 * \sa RendererHost::UnregisterVisObject
 	 */
 	virtual ~VisObject ();
 

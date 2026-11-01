@@ -121,7 +121,7 @@ CSphereManager::~CSphereManager ()
 	for (i = 0; i < maxidx; i++) {
 		if (tiledesc[i].vtx) delete tiledesc[i].vtx;
 	}
-	delete []tiledesc;	
+	delete []tiledesc;
 }
 
 // =======================================================================
@@ -281,7 +281,7 @@ void CSphereManager::Render (int level, int bglvl)
 		}
 		for (ilat = nlat-1; ilat >= 0; ilat--) {
 			for (ilng = 0; ilng < nlng[ilat]; ilng++) {
-				ProcessTile (startlvl, hemisp, ilat, nlat, ilng, nlng[ilat], td+idx, 
+				ProcessTile (startlvl, hemisp, ilat, nlat, ilng, nlng[ilat], td+idx,
 					range, td[idx].tex.obj, td[idx].ltex.obj, td[idx].flag,
 					range, td[idx].tex.obj, td[idx].ltex.obj, td[idx].flag);
 				idx++;
@@ -438,4 +438,3 @@ bool CSphereManager::TileInView (int lvl, int ilat, glm::mat4 &wm)
 	}
 	return bbvis;
 }
-

@@ -11,10 +11,20 @@
 #ifndef __CELSPHERE_H
 #define __CELSPHERE_H
 
+#ifdef _WIN32
 #include "GraphicsAPI.h"
+#else
+#include "Production/NativeGraphics.h"
+#define OAPIFUNC __attribute__((visibility("default")))
+#endif
 #include <array>
 
 namespace oapi {
+#ifdef _WIN32
+using SphereClient=GraphicsClient;
+#else
+using SphereClient=orbiter::production::NativeGraphics;
+#endif
 
 	/**
 	 * \class CelestialSphere
@@ -29,7 +39,7 @@ namespace oapi {
 	 */
 	class OAPIFUNC CelestialSphere {
 	public:
-		CelestialSphere(GraphicsClient* gc);
+		CelestialSphere(SphereClient* gc);
 
 		virtual ~CelestialSphere();
 
@@ -46,7 +56,7 @@ namespace oapi {
 			double lng;   ///< ecliptic longitude (J2000) [rad]
 			double lat;   ///< ecliptic latitude (J2000) [rad]
 			double mag;   ///< apparent magnitude
-			WORD specidx; ///< spectral class index (0-69)
+			oapi::UInt16 specidx; ///< spectral class index (0-69)
 		};
 
 		/**
@@ -92,11 +102,11 @@ namespace oapi {
 		virtual void RenderCelestialMarkers(oapi::Sketchpad** ppSkp);
 
 		virtual oapi::Font* MarkerFont() const;
-		virtual oapi::Pen* MarkerPen(DWORD idx) const;
-		virtual COLORREF MarkerColor(DWORD idx) const;
-		virtual oapi::FVECTOR4 MarkerColorFloat(DWORD idx) const;
+		virtual oapi::Pen* MarkerPen(oapi::UInt32 idx) const;
+		virtual oapi::UInt32 MarkerColor(oapi::UInt32 idx) const;
+		virtual oapi::FVECTOR4 MarkerColorFloat(oapi::UInt32 idx) const;
 
-		virtual void EnsureMarkerDrawingContext(oapi::Sketchpad** ppSkp, oapi::Font* font = 0, COLORREF textcol = 0, oapi::Pen* pen = 0);
+		virtual void EnsureMarkerDrawingContext(oapi::Sketchpad** ppSkp, oapi::Font* font = 0, oapi::UInt32 textcol = 0, oapi::Pen* pen = 0);
 
 	protected:
 		/**
@@ -128,7 +138,7 @@ namespace oapi {
 		 */
 		virtual void LoadConstellationLabels();
 
-		const std::vector<oapi::GraphicsClient::LABELSPEC>& ConstellationLabels() const
+		const std::vector<oapi::SphereClient::LABELSPEC>& ConstellationLabels() const
 		{ return m_cLabel; }
 
 		/**
@@ -170,15 +180,15 @@ namespace oapi {
 		double ElevationScaleRotation(const MATRIX3& R) const;
 
 		FVECTOR4 ColorAdjusted(const FVECTOR4& baseCol) const;
-		DWORD MarkerColorAdjusted(const FVECTOR4& baseCol) const;
-		DWORD TextColorAdjusted(const FVECTOR4& baseCol) const;
+		oapi::UInt32 MarkerColorAdjusted(const FVECTOR4& baseCol) const;
+		oapi::UInt32 TextColorAdjusted(const FVECTOR4& baseCol) const;
 
 		/**
 		 * \brief Returns the mesh for rendering tick labels for grids.
 		 */
 		const MESHHANDLE GridLabelMesh();
 
-		GraphicsClient* m_gc;
+		SphereClient* m_gc;
 
 		bool m_textBlendAdditive;
 
@@ -246,9 +256,9 @@ namespace oapi {
 		 */
 		const std::vector<VECTOR3> EclipticLineData2RenderData(const std::vector<LineDataRec>& lineDataRec) const;
 
-		std::vector<oapi::GraphicsClient::LABELSPEC> m_cLabel; ///< list of constellation labels
+		std::vector<oapi::SphereClient::LABELSPEC> m_cLabel; ///< list of constellation labels
 
-		DWORD m_viewW, m_viewH;          ///< viewport dimensions
+		oapi::UInt32 m_viewW, m_viewH;          ///< viewport dimensions
 		oapi::Font* m_cLabelFont;        ///< font for constellation labels
 		oapi::Font* m_markerFont;        ///< font for celestial sphere markers
 		oapi::Pen* m_markerPen[7];       ///< pens for celestial sphere markers
@@ -258,12 +268,15 @@ namespace oapi {
 		MESHHANDLE m_meshGridLabel;      ///< mesh for grid tick labels
 
 	protected:
-		const std::vector<GraphicsClient::ConstLabelRec> LoadConstellationLabelData() const;
+		const std::vector<SphereClient::ConstLabelRec> LoadConstellationLabelData() const;
 
-		const std::vector<GraphicsClient::LABELSPEC> ConstellationLabelData2RenderData(const std::vector<GraphicsClient::ConstLabelRec>& clabelRec) const;
+		const std::vector<SphereClient::LABELSPEC> ConstellationLabelData2RenderData(const std::vector<SphereClient::ConstLabelRec>& clabelRec) const;
 
 		std::array<int, 256> ComputeStarBrightnessCutoff(const std::vector<oapi::CelestialSphere::StarRenderRec>& starRenderRec) const;
 	};
 
 }
+#ifndef _WIN32
+#undef OAPIFUNC
+#endif
 #endif // !__CELSPHERE_H

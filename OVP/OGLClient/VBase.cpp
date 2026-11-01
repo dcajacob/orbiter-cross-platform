@@ -41,7 +41,7 @@ vBase::vBase (OBJHANDLE _hObj, const Scene *scene): vObject (_hObj, scene)
 
 	// load meshes for generic structures
 	MESHHANDLE *sbs, *sas;
-	DWORD nsbs, nsas;
+	oapi::UInt32 nsbs, nsas;
 	g_client->GetBaseStructures (_hObj, &sbs, &nsbs, &sas, &nsas);
 	if (nstructure_bs = nsbs) {
 		structure_bs = new OGLMesh*[nsbs];
@@ -97,7 +97,7 @@ void vBase::SetupShadowMeshes ()
 
 	// Get mesh geometries for all base structures
 	int i, j, k, m, nmesh, ngrp;
-    DWORD nssh;
+    oapi::UInt32 nssh;
 	MESHHANDLE *ssh;
 	double *ecorr;
 	g_client->GetBaseShadowGeometry (hObj, &ssh, &ecorr, &nssh);
@@ -289,7 +289,7 @@ bool vBase::RenderStructures ()
 
 	if (bLocalLight) // modify lighting
 		Renderer::SetLight (&localLight);
-	
+
 	// render generic objects above shadows
 	for (int i = 0; i < nstructure_as; i++)
 		structure_as[i]->Render (scn->GetCamera(), mWorld);
@@ -484,4 +484,3 @@ bool vBase::ModLighting (OGLLight *light, double &nextcheck)
 	nextcheck = std::max (1.0, 50.0*(sqrt(fabs(phi-PI05)))); // next test
 	return lightmod;
 }
-

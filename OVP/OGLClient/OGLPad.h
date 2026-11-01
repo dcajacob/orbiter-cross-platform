@@ -6,7 +6,7 @@ The above copyright notice and this permission notice shall be included in all c
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-#include "GraphicsAPI.h"
+#include "RendererSdk.h"
 //#include "stb_truetype.h"
 #include <string>
 #include "Texture.h"
@@ -39,11 +39,11 @@ public:
 	oapi::Pen *SetPen (oapi::Pen *pen);
 	oapi::Brush *SetBrush (oapi::Brush *brush);
 	void SetTextAlign (TAlign_horizontal tah=LEFT, TAlign_vertical tav=TOP);
-	DWORD SetTextColor (DWORD col);
-	DWORD SetBackgroundColor (DWORD col);
+	oapi::UInt32 SetTextColor (oapi::UInt32 col);
+	oapi::UInt32 SetBackgroundColor (oapi::UInt32 col);
 	void SetBackgroundMode (BkgMode mode);
-	DWORD GetCharSize ();
-	DWORD GetTextWidth (const char *str, int len = 0);
+	oapi::UInt32 GetCharSize ();
+	oapi::UInt32 GetTextWidth (const char *str, int len = 0);
 	void SetOrigin (int x, int y);
 	void GetOrigin (int *x, int *y) const;
 	bool Text (int x, int y, const char *str, int len);
@@ -51,7 +51,7 @@ public:
 
 	//bool TextBox (int x1, int y1, int x2, int y2, const char *str, int len);
 
-	void Pixel (int x, int y, DWORD col);
+	void Pixel (int x, int y, oapi::UInt32 col);
 	void MoveTo (int x, int y);
 	void LineTo (int x, int y);
 	void Line (int x0, int y0, int x1, int y1);
@@ -116,7 +116,7 @@ public:
 // ======================================================================
 class OGLCLIENTEXPORT OGLPen: public oapi::Pen {
 public:
-	OGLPen (int style, int width, DWORD col):oapi::Pen(style, width, col) { m_Style = style; m_Width = width; m_Color = col;}
+	OGLPen (int style, int width, oapi::UInt32 col):oapi::Pen(style, width, col) { m_Style = style; m_Width = width; m_Color = col;}
 	~OGLPen () {}
 
 	int m_Style;
@@ -129,7 +129,7 @@ public:
 // ======================================================================
 class OGLCLIENTEXPORT OGLBrush: public oapi::Brush {
 public:
-	OGLBrush (DWORD col):oapi::Brush(col) { m_Color = col; }
+	OGLBrush (oapi::UInt32 col):oapi::Brush(col) { m_Color = col; }
 	~OGLBrush () {}
 
 	uint32_t m_Color;

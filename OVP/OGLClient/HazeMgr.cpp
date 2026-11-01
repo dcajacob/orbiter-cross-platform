@@ -133,7 +133,7 @@ void HazeManager::Render (OGLCamera *c, glm::mat4 &wmat, bool dual)
 	double sinv = sin(visrad);
 	h1 = (float)id, h2 = h1 + (float)(hralt*id);
 	r1 = (float)sinv, r2 = (1.0f+hralt)*r1;
-	
+
 	if (!dual) { // pull lower horizon edge below surface to avoid problems with elevations < 0
 		h1 *= vp->prm.horizon_minrad;
 		r1 *= vp->prm.horizon_minrad;
@@ -184,8 +184,8 @@ void HazeManager::Render (OGLCamera *c, glm::mat4 &wmat, bool dual)
 	Renderer::PushBool(Renderer::BLEND, true);
 
 //	dev->SetRenderState (D3DRENDERSTATE_LIGHTING, FALSE);
-	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);	
-	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);  
+	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
 	HVERTEX *v = (HVERTEX *)VBO->Map();
 
@@ -233,7 +233,7 @@ void HazeManager::Render (OGLCamera *c, glm::mat4 &wmat, bool dual)
 
 	if (dual) {
 		h2 = h1;
-		r2 = hscale * r1*r1; 
+		r2 = hscale * r1*r1;
 		HVERTEX *v = (HVERTEX *)VBO->Map();
 		for (i = j = 0; i < HORIZON_NSEG; i++) {
 			j++;

@@ -11,7 +11,12 @@
 #ifndef __CAMAPI_H
 #define __CAMAPI_H
 
+#ifdef _WIN32
 #include "Orbitersdk.h"
+#else
+#include "NativeVesselAPI.h"
+#define OAPIFUNC __attribute__((visibility("default")))
+#endif
 
 #define CAMDATA_X              0x01
 #define CAMDATA_Y              0x02
@@ -36,13 +41,13 @@
 
 class OAPIFUNC ExternalCameraControl {
 public:
-	ExternalCameraControl (DWORD dmode, DWORD cmode);
+	ExternalCameraControl (oapi::UInt32 dmode, oapi::UInt32 cmode);
 
-	void SetDataMode (DWORD mode);
-	DWORD GetDataMode () const;
+	void SetDataMode (oapi::UInt32 mode);
+	oapi::UInt32 GetDataMode () const;
 
-	void SetCameraMode (DWORD mode);
-	DWORD GetCameraMode () const;
+	void SetCameraMode (oapi::UInt32 mode);
+	oapi::UInt32 GetCameraMode () const;
 
 	struct CamData { // position data
 		double x, y, z;
@@ -74,8 +79,8 @@ public:
 	// must be provided by implementations
 
 protected:
-	DWORD datamode;
-	DWORD cameramode;
+	oapi::UInt32 datamode;
+	oapi::UInt32 cameramode;
 	VCMode vcmode;
 	TrackMode trkmode;
 };
@@ -86,4 +91,7 @@ protected:
 OAPIFUNC bool oapiRegisterExternalCameraControl (ExternalCameraControl *ecc);
 OAPIFUNC bool oapiUnregisterExternalCameraControl ();
 
+#ifndef _WIN32
+#undef OAPIFUNC
+#endif
 #endif // !__CAMAPI_H

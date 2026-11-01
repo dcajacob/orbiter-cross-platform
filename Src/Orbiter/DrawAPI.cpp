@@ -71,7 +71,7 @@ bool Sketchpad::TextBox (int x1, int y1, int x2, int y2, const char *str, int le
 
 	int w0 = x2-x1, w;
 
-	DWORD h = GetCharSize() & 0xFFFF;
+	oapi::UInt32 h = GetCharSize() & 0xFFFF;
 
 	const char *p0 = str, *p, *pp;
 	for (p0 = str, pp = str, p = str; *p0; *p && p < str+len) {

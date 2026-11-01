@@ -2,9 +2,12 @@
 // Licensed under the MIT License
 
 #include "tilelabel.h"
+#include "RendererFiles.h"
+#include "Production/Text.h"
 #include "OGLCamera.h"
 #include <limits>
 #include <sstream>
+#include <fstream>
 #include "Scene.h"
 #include "surfmgr2.h"
 #include <cstring>
@@ -66,10 +69,10 @@ bool TileLabel::Read()
 		sprintf (path, "%s/Label/%02d/%06d/%06d.lab", tile->mgr->CbodyName(), lvl+4, ilat, ilng);
 		g_client->PlanetTexturePath(path, texpath);
 
-		std::ifstream ifs(texpath);
+		std::ifstream ifs(RendererFilePath(texpath));
 		if (ifs.good()) {
 			ifs >> typestr >> lat >> lng >> altstr;
-			if (!_stricmp(altstr, "nan")) alt = std::numeric_limits<double>::quiet_NaN();
+			if (!orbiter::production::CompareText(altstr, "nan")) alt = std::numeric_limits<double>::quiet_NaN();
 			else alt = std::atof(altstr);
 			ifs.getline(name, 256);
 			while(ifs.good()) {
@@ -95,7 +98,7 @@ bool TileLabel::Read()
 				strcpy(label[nlabel]->label, lb);
 				nlabel++;
 				ifs >> typestr >> lat >> lng >> altstr;
-				if (!_stricmp(altstr, "nan")) alt = std::numeric_limits<double>::quiet_NaN();
+				if (!orbiter::production::CompareText(altstr, "nan")) alt = std::numeric_limits<double>::quiet_NaN();
 				else alt = std::atof(altstr);
 				ifs.getline(name, 256);
 			}
@@ -108,7 +111,7 @@ bool TileLabel::Read()
 			{
 				std::istringstream iss((char*)buf);
 				iss >> typestr >> lat >> lng >> altstr;
-				if (!_stricmp(altstr, "nan")) alt = std::numeric_limits<double>::quiet_NaN();
+				if (!orbiter::production::CompareText(altstr, "nan")) alt = std::numeric_limits<double>::quiet_NaN();
 				else alt = std::atof(altstr);
 				iss.getline(name, 256);
 				while (iss.good()) {
@@ -135,7 +138,7 @@ bool TileLabel::Read()
 					nlabel++;
 					if (iss.tellg() >= ndata) break;
 					iss >> typestr >> lat >> lng >> altstr;
-					if (!_stricmp(altstr, "nan")) alt = std::numeric_limits<double>::quiet_NaN();
+					if (!orbiter::production::CompareText(altstr, "nan")) alt = std::numeric_limits<double>::quiet_NaN();
 					else alt = std::atof(altstr);
 					iss.getline(name, 256);
 				}
@@ -205,10 +208,10 @@ void TileLabel::Render(oapi::Sketchpad *skp, oapi::Font **labelfont, int *fontid
 
 	const int symscale[4] = {5, 6, 8, 10};
 	int i;
-	COLORREF col, pcol = 0;
+	oapi::UInt32 col, pcol = 0;
 	char symbol;
 	int x, y, nl, scale;
-	const oapi::GraphicsClient::LABELTYPE *lspec;
+	const RendererHost::LABELTYPE *lspec;
 	VECTOR3 sp, dir;
 	bool active = false;
 	const OBJHANDLE &hPlanet = tile->mgr->Cbody();

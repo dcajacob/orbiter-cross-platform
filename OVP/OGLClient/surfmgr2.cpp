@@ -1,3 +1,4 @@
+#include "RendererFiles.h"
 // Copyright (c) Martin Schweiger
 // Licensed under the MIT License
 
@@ -190,7 +191,7 @@ int16_t *SurfTile::ReadElevationFile (const char *name, int lvl, int ilat, int i
 	if (mgr->Cprm().tileLoadFlags & 0x0001) { // try loading from individual tile file
 		sprintf (path, "%s/Elev/%02d/%06d/%06d.elv", name, lvl, ilat, ilng);
 		g_client->PlanetTexturePath(path, texpath);
-		if ((f = fopen(texpath, "rb"))) {
+		if ((f = RendererOpenFile(texpath, "rb"))) {
 			e = new int16_t[ndat];
 			// read the elevation file header
 			size_t ret = fread (&hdr, sizeof(ELEVFILEHEADER), 1, f);
@@ -283,7 +284,7 @@ int16_t *SurfTile::ReadElevationFile (const char *name, int lvl, int ilat, int i
 		if (mgr->Cprm().tileLoadFlags & 0x0001) { // try loading from individual tile file
 			sprintf (path, "%s/Elev_mod/%02d/%06d/%06d.elv", name, lvl, ilat, ilng);
 			g_client->PlanetTexturePath(path, texpath);
-			if ((f = fopen(texpath, "rb"))) {
+			if ((f = RendererOpenFile(texpath, "rb"))) {
 				size_t ret = fread (&hdr, sizeof(ELEVFILEHEADER), 1, f);
 				if(ret != 1) {
 					printf("Error reading elevation file\n");
@@ -482,7 +483,7 @@ double SurfTile::GetMeanElevation (const int16_t *elev) const
 		}
 		elev += TILE_ELEVSTRIDE;
 	}
-	return melev / ((res+1)*(res+1));	
+	return melev / ((res+1)*(res+1));
 }
 
 // -----------------------------------------------------------------------
@@ -840,7 +841,7 @@ void SurfTile::FixCorner (const SurfTile *nbr)
 
 		int16_t corner_elev = elev[TILE_ELEVSTRIDE+1 + (ilat & 1 ? 0 : TILE_ELEVSTRIDE*res) + (ilng & 1 ? res : 0)];
 		int16_t nbr_corner_elev = nbr_elev[TILE_ELEVSTRIDE+1 + (ilat & 1 ? TILE_ELEVSTRIDE*res : 0) + (ilng & 1 ? 0 : res)];
-	
+
 		double rad = mgr->CbodySize();
 		double radfac = (rad+nbr_corner_elev)/(rad+corner_elev);
 		mesh->vtx[vtx_idx].x = (float)(vtx_store.x*radfac + vtxshift.x*(radfac-1.0));

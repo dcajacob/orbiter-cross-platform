@@ -54,7 +54,7 @@ struct TAVERTEX {
 
 class OGLParticleStream: public oapi::ParticleStream {
 public:
-	OGLParticleStream (oapi::GraphicsClient *_gc, PARTICLESTREAMSPEC *pss = 0);
+	OGLParticleStream (RendererHost *_gc, PARTICLESTREAMSPEC *pss = 0);
 	virtual ~OGLParticleStream();
 
 	static void GlobalInit ();
@@ -135,10 +135,10 @@ protected:
 
 class ExhaustStream: public OGLParticleStream {
 public:
-	ExhaustStream (oapi::GraphicsClient *_gc, OBJHANDLE hV,
+	ExhaustStream (RendererHost *_gc, OBJHANDLE hV,
 		const double *srclevel, const VECTOR3 *thref, const VECTOR3 *thdir,
 		PARTICLESTREAMSPEC *pss = 0);
-	ExhaustStream (oapi::GraphicsClient *_gc, OBJHANDLE hV,
+	ExhaustStream (RendererHost *_gc, OBJHANDLE hV,
 		const double *srclevel, const VECTOR3 &ref, const VECTOR3 &_dir,
 		PARTICLESTREAMSPEC *pss = 0);
 	//void RenderGroundShadow (LPDIRECT3DDEVICE7 dev, LPDIRECTDRAWSURFACE7 &prevtex);
@@ -150,7 +150,7 @@ private:
 
 class ReentryStream: public OGLParticleStream {
 public:
-	ReentryStream (oapi::GraphicsClient *_gc, OBJHANDLE hV,
+	ReentryStream (RendererHost *_gc, OBJHANDLE hV,
 		PARTICLESTREAMSPEC *pss = 0);
 	void Update ();
 

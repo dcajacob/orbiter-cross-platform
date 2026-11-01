@@ -1,3 +1,4 @@
+#include "RendererFiles.h"
 // Copyright (c) Martin Schweiger
 // Licensed under the MIT License
 
@@ -127,7 +128,7 @@ bool ZTreeMgr::OpenArchive()
 	const char *name[6] = { "Surf", "Mask", "Elev", "Elev_mod", "Label", "Cloud" };
 	char fname[256];
 	sprintf (fname, "%s/Archive/%s.tree", path, name[layer]);
-	treef = fopen(fname, "rb");
+	treef = RendererOpenFile(fname, "rb");
     if(treef)Evidence::Asset(fname);
 	if (!treef) {
 		return false;
@@ -193,7 +194,7 @@ int ZTreeMgr::ReadData(int idx, uint8_t **outp)
 		return 0;
 
 	int zsize = NodeSizeDeflated(idx);
-	uint8_t *zbuf = new uint8_t[zsize];	
+	uint8_t *zbuf = new uint8_t[zsize];
 	fread(zbuf, 1, zsize, treef);
 
 	uint8_t *ebuf = new uint8_t[esize];
@@ -219,7 +220,7 @@ int ZTreeMgr::Inflate(const uint8_t *inp, int ninp, uint8_t *outp, int noutp)
 		return 0;
 	}
 	return ndata;
-	
+
 }
 
 // -----------------------------------------------------------------------

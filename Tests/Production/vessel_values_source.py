@@ -72,6 +72,9 @@ def record_ranges(source):
 
 def restore_api(actual):
     source=original()
+    if (ROOT/'Orbitersdk/include/OrbiterCameraData.h').exists():
+        from camera_source import restore_api as restore_camera
+        actual=restore_camera(actual)
     # Use original offsets only to locate immutable extraction blocks; restore
     # each exact replacement once, in the already-extracted API's text.
     blocks=ranges(source)

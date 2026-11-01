@@ -19,7 +19,7 @@ void VertexBuffer::Update(void *data, int size) {
     Renderer::CheckError("VertexBuffer::glBufferSubData");
 }
 
-VertexBuffer::~VertexBuffer() 
+VertexBuffer::~VertexBuffer()
 {
     glDeleteBuffers(1, &VBID);
     Renderer::CheckError("~VertexBuffer::glDeleteBuffers");
@@ -57,7 +57,7 @@ IndexBuffer::IndexBuffer(index_type* indices, uint32_t c)
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, count * sizeof(index_type), indices, GL_STATIC_DRAW);
     Renderer::CheckError("IndexBuffer::IndexBuffer()");
 }
-IndexBuffer::~IndexBuffer() 
+IndexBuffer::~IndexBuffer()
 {
     glDeleteBuffers(1, &IBID);
 }
@@ -90,7 +90,7 @@ VertexArray::VertexArray()
     glGenVertexArrays(1, &VAID);
     Renderer::CheckError("VertexArray::VertexArray : glGenVertexArrays");
 }
-VertexArray::~VertexArray() 
+VertexArray::~VertexArray()
 {
     glDeleteVertexArrays(1, &VAID);
     Renderer::CheckError("VertexArray::~VertexArray : glDeleteVertexArrays");

@@ -35,6 +35,7 @@ struct VESSELPARAM;
 #define ORBITER_NATIVE_OWNS_OAPIFUNC
 #endif
 #include "OrbiterLightData.h"
+#include "OrbiterCameraData.h"
 #include "VesselAPI.h"
 OAPIFUNC double oapiGetInducedDrag(double cl,double aspect,double efficiency);
 OAPIFUNC double oapiGetWaveDrag(double mach,double m1,double m2,double m3,double maximum);

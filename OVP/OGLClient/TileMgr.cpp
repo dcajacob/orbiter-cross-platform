@@ -1,3 +1,4 @@
+#include "RendererFiles.h"
 // Copyright (c) Martin Schweiger
 // Licensed under the MIT License
 
@@ -103,7 +104,7 @@ bool TileManager::LoadPatchData ()
 	strcpy (fname, objname);
 	strcat (fname, "_lmask.bin");
 
-	if (!(bGlobalSpecular || bGlobalLights) || !g_client->TexturePath (fname, cpath) || !(binf = fopen (cpath, "rb"))) {
+	if (!(bGlobalSpecular || bGlobalLights) || !g_client->TexturePath (fname, cpath) || !(binf = RendererOpenFile (cpath, "rb"))) {
 
 		for (i = 0; i < patchidx[maxbaselvl]; i++)
 			tiledesc[i].flag = 1;
@@ -163,8 +164,8 @@ bool TileManager::LoadTileData ()
 	char fname[256], cpath[256];
 	strcpy (fname, objname);
 	strcat (fname, "_tile.bin");
-	
-	if (!g_client->TexturePath (fname, cpath) || !(file = fopen (cpath, "rb")))
+
+	if (!g_client->TexturePath (fname, cpath) || !(file = RendererOpenFile (cpath, "rb")))
 		return false; // TOC file not found
 
 	// read file header
@@ -892,7 +893,7 @@ void TileManager::GlobalInit ()
 
 
 	// create the vertex buffer for tile bounding box checks
-//	static D3DVERTEXBUFFERDESC bbvbd = 
+//	static D3DVERTEXBUFFERDESC bbvbd =
 //	{ sizeof(D3DVERTEXBUFFERDESC), D3DVBCAPS_SYSTEMMEMORY, D3DFVF_XYZRHW, 8 };
 //	d3d->CreateVertexBuffer (&bbvbd, &bbtarget, 0);
 
@@ -1189,4 +1190,3 @@ int TileBuffer::queue_in = 0;
 int TileBuffer::queue_out = 0;
 std::mutex TileBuffer::hQueueMutex;
 struct TileBuffer::QUEUEDESC TileBuffer::loadqueue[MAXQUEUE] = {0};
-

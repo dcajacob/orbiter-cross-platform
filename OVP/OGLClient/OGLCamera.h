@@ -23,7 +23,7 @@
 #ifndef __OGLCAMERA_H
 #define __OGLCAMERA_H
 
-#include "OrbiterAPI.h"
+#include "RendererSdk.h"
 #include "OGLClient.h"
 #include <glm/glm.hpp>
 

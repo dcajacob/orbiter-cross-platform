@@ -69,6 +69,7 @@ Scene::Scene (int w, int h)
 	stencilDepth = 8;
 //	zclearflag = D3DCLEAR_ZBUFFER;
 //	if (stencilDepth) zclearflag |= D3DCLEAR_STENCIL;
+	light = nullptr; // Also permit clean teardown before PostCreation or after an initialization error.
 	cam = new OGLCamera (w, h);
 	csphere = new OGLCelestialSphere ();
 	vobjFirst = vobjLast = NULL;
@@ -109,7 +110,7 @@ void Scene::Initialise ()
 {
 	OBJHANDLE hSun = oapiGetGbodyByIndex(0); // generalise later
 	light = new OGLLight (hSun, OGLLight::Directional, this, 0);
-	light->light.enabled = 1;	
+	light->light.enabled = 1;
 
     // Use the state cache consistently. A raw glDisable(GL_BLEND) here left
     // the cache claiming blending was enabled, making cloud alpha opaque.
@@ -128,7 +129,7 @@ void Scene::Initialise ()
 	dev->SetRenderState (D3DRENDERSTATE_NORMALIZENORMALS, FALSE);
 	dev->SetRenderState (D3DRENDERSTATE_ZBIAS, 0);
 	dev->SetRenderState (D3DRENDERSTATE_WRAP0, 0);
-	dev->SetRenderState (D3DRENDERSTATE_AMBIENT, *(DWORD*)gc->GetConfigParam (CFGPRM_AMBIENTLEVEL) * 0x01010101);
+	dev->SetRenderState (D3DRENDERSTATE_AMBIENT, *(oapi::UInt32*)gc->GetConfigParam (CFGPRM_AMBIENTLEVEL) * 0x01010101);
 
 	// Set texture renderstates
     dev->SetTextureStageState (0, D3DTSS_COLORARG1, D3DTA_TEXTURE);
@@ -202,10 +203,19 @@ void Scene::DelVisualRec (VOBJREC *pv)
 Scene::VOBJREC *Scene::AddVisualRec (OBJHANDLE hObj)
 {
 	// create the visual and entry
-	VOBJREC *pv = new VOBJREC;
-	pv->vobj = vObject::Create (hObj, this);
-	g_client->RegisterVisObject (hObj, (VISHANDLE)pv->vobj);
-	Evidence::Visual("register",hObj);
+    auto entry=std::make_unique<VOBJREC>();
+    auto visual=std::unique_ptr<vObject>(vObject::Create(hObj,this));
+    entry->vobj=visual.get();
+    try {
+        g_client->RegisterVisObject(hObj,(VISHANDLE)visual.get());
+        Evidence::Visual("register",hObj);
+    } catch(...) {
+        // A module can fail after the engine has stored the visual handle.
+        // Undo that registration before releasing its not-yet-linked visual.
+        g_client->UnregisterVisObject(hObj);
+        throw;
+    }
+    VOBJREC* pv=entry.release();visual.release();
 
 	// link entry to end of list
 	pv->prev = vobjLast;
@@ -268,7 +278,7 @@ void Scene::AddLocalLight (const LightEmitter *le, const vObject *vo, int idx)
 						(float)(col_a.a*intens)};
 	if (lght.light.dltType != OGLLight::Directional) {
 		const VECTOR3 pos = le->GetPosition();
-		glm::vec3 p = { (float)pos.x, (float)pos.y, (float)pos.z }; 
+		glm::vec3 p = { (float)pos.x, (float)pos.y, (float)pos.z };
 		Vector3Matrix4Multiply (&lght.light.dvPosition, &p, vo->MWorld());
 	}
 	if (lght.light.dltType != OGLLight::Point) {
@@ -339,7 +349,7 @@ VECTOR3 Scene::SkyColour ()
 	return col;
 }
 
-void Scene::Render ()
+void Scene::Render (bool cockpitOverlay)
 {
 	int i, j;
 	int n;
@@ -365,7 +375,7 @@ void Scene::Render ()
 
 	Renderer::SetLight(light);
 	int nlight = 1;
-	
+
 	if (locallight) {
 		int j, k;
 		for (pv = vobjFirst; pv; pv = pv->next) {
@@ -431,7 +441,7 @@ void Scene::Render ()
 	// planetarium mode (celestial sphere elements)
 	if (plnmode & PLN_ENABLE) {
 		/*
-		DWORD dstblend;
+		oapi::UInt32 dstblend;
 		dev->GetRenderState (D3DRENDERSTATE_DESTBLEND, &dstblend);
 		dev->SetRenderState (D3DRENDERSTATE_DESTBLEND, D3DBLEND_ONE);
 		dev->SetRenderState (D3DRENDERSTATE_ALPHABLENDENABLE, TRUE);
@@ -477,7 +487,7 @@ void Scene::Render ()
 		dev->SetRenderState (D3DRENDERSTATE_ALPHABLENDENABLE, FALSE);
 */
 		if (plnmode & PLN_CCMARK) {
-			const GraphicsClient::LABELLIST *list;
+			const RendererHost::LABELLIST *list;
 			int n, nlist;
 			oapi::Sketchpad *skp= NULL;
 			const auto &catalogue=g_client->GetCelestialMarkers();
@@ -492,7 +502,7 @@ void Scene::Render ()
 					int col = list[n].colour;
 					skp->SetPen (hLabelPen[col]);
 					skp->SetTextColor (labelCol[col]);
-					const GraphicsClient::LABELSPEC *ls = list[n].marker.data();
+					const RendererHost::LABELSPEC *ls = list[n].marker.data();
 					for (i = 0; i < list[n].marker.size(); i++) {
 						RenderDirectionMarker (skp, ls[i].pos, ls[i].label[0].c_str(), ls[i].label[1].c_str(), list[n].shape, size);
 					}
@@ -532,7 +542,7 @@ void Scene::Render ()
 	for (i = 0; i < np; i++) {
 		OBJHANDLE hObj = plist[i].vo->Object();
 		plist[i].vo->Render ();
-		
+
 		if (markermode & MKR_ENABLE) {
 			if (markermode & MKR_CMARK) {
 				VECTOR3 pp;
@@ -541,13 +551,13 @@ void Scene::Render ()
 				oapiGetGlobalPos (hObj, &pp);
 				RenderObjectMarker (0, pp, name, 0, 0, viewH/80);
 			}
-			
+
 			if ((markermode & MKR_SURFMARK) && (oapiGetObjectType (hObj) == OBJTP_PLANET)) {
 				int label_format = *(int*)oapiGetObjectParam(hObj, OBJPRM_PLANET_LABELENGINE);
 				if (label_format < 2 && (markermode & MKR_LMARK)) { // user-defined planetary surface labels
 					double rad = oapiGetSize (hObj);
 					double apprad = rad/(plist[i].dist * cam->GetTanAp());
-					const GraphicsClient::LABELLIST *list;
+					const RendererHost::LABELLIST *list;
 					int n, nlist;
 					oapi::Sketchpad *skp= NULL;
 					MATRIX3 prot;
@@ -569,7 +579,7 @@ void Scene::Render ()
 							int col = list[n].colour;
 							skp->SetPen (hLabelPen[col]);
 							skp->SetTextColor (labelCol[col]);
-							const GraphicsClient::LABELSPEC *ls = list[n].marker.data();
+							const RendererHost::LABELSPEC *ls = list[n].marker.data();
 							VECTOR3 sp;
 							for (j = 0; j < list[n].marker.size(); j++) {
 								if (dotp (ls[j].pos, cpos-ls[j].pos) >= 0.0) { // surface point visible?
@@ -628,7 +638,7 @@ void Scene::Render ()
             pv->vobj->Render ();
             Evidence::Object(nullptr);
 			if (hObj == hFocus) vFocus = (vVessel*)pv->vobj; // remember focus visual
-			
+
 			if ((markermode & (MKR_ENABLE|MKR_VMARK)) == (MKR_ENABLE|MKR_VMARK)) {
 				VECTOR3 gpos;
 				char name[256];
@@ -682,7 +692,7 @@ void Scene::Render ()
 	// render the internal parts of the focus object in a separate render pass
 	if (oapiCameraInternal() && vFocus) {
 		// switch cockpit lights on, external-only lights off
-		
+
 		if (locallight) {
 			for (i = 1; i < nlight; i++) {
 				switch (lightlist[i].plight->GetVisibility()) {
@@ -705,7 +715,7 @@ void Scene::Render ()
 			Renderer::LightEnable (i, false);
 
 	// render 2D panel and HUD
-	g_client->Render2DOverlay();
+	if(cockpitOverlay) g_client->Render2DOverlay();
 
 	//dev->EndScene();
 }
@@ -746,7 +756,7 @@ void Scene::RenderVesselShadows (OBJHANDLE hPlanet, float depth) const
 	// render particle shadows
 	/*
 	LPDIRECTDRAWSURFACE7 tex = 0;
-	for (DWORD j = 0; j < nstream; j++) {
+	for (oapi::UInt32 j = 0; j < nstream; j++) {
 		pstream[j]->RenderGroundShadow (dev, tex);
 	}
 */
@@ -773,7 +783,7 @@ void Scene::RenderDirectionMarker (oapi::Sketchpad *skp, const VECTOR3 &rdir, co
 {
 	bool local_skp = (skp == nullptr);
 	int x, y;
-	
+
 	if(cam->Direction2Viewport(rdir, x, y)) {
 		if (local_skp) skp = GetLabelSkp (mode);
 
@@ -898,4 +908,4 @@ int distcomp (const void *arg1, const void *arg2)
 	return (d1 > d2 ? -1 : d1 < d2 ? 1 : 0);
 }
 
-COLORREF Scene::labelCol[6] = {0x00FFFF, 0xFFFF00, 0x4040FF, 0xFF00FF, 0x40FF40, 0xFF8080};
+oapi::UInt32 Scene::labelCol[6] = {0x00FFFF, 0xFFFF00, 0x4040FF, 0xFF00FF, 0x40FF40, 0xFF8080};

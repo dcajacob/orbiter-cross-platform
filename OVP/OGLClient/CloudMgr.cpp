@@ -128,7 +128,7 @@ void CloudManager::RenderTile (int lvl, int hemisp, int ilat, int nlat, int ilng
 		printf("tumin=%f tumax=%f tvmin=%f tvmax=%f\n",range.tumin,range.tumax,range.tvmin,range.tvmax);
 		exit(-1);
 	}
-	
+
 	Renderer::Bind(tileShader);
 	OGLCamera *c = g_client->GetScene()->GetCamera();
 	auto *vpm = c->GetViewProjectionMatrix();
@@ -183,7 +183,7 @@ void CloudManager::RenderTile (int lvl, int hemisp, int ilat, int nlat, int ilng
 		vb = mesh.vb; // use vertex buffer directly
 	} else {
 		if (!tile->vtx) {
-			D3DVERTEXBUFFERDESC vbd = 
+			D3DVERTEXBUFFERDESC vbd =
 				{ sizeof(D3DVERTEXBUFFERDESC), vbMemCaps | D3DVBCAPS_WRITEONLY, FVF_2TEX, mesh.nv };
 			gc->GetDirect3D7()->CreateVertexBuffer (&vbd, &tile->vtx, 0);
 			ApplyPatchTextureCoordinates (mesh, tile->vtx, range);

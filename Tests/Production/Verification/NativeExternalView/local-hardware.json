@@ -1,0 +1,48 @@
+{
+  "status": "local hardware passed; hosted candidate validation separate",
+  "host": "Linux-7.0.0-42-generic-x86_64-with-glibc2.43",
+  "configuration": "Debug",
+  "observed_git_head": "cbcafe04503abc57234e3d1fda74bc799d42132e",
+  "working_tree_dirty": true,
+  "scope": "Real Sol/SPICE, production world/camera/session, actual ISS and source-built ShuttlePB, shared stock OpenGL scene. Cockpit, flight input, Lua and stock-playable release gates remain open.",
+  "renderer": {
+    "vendor": "Intel",
+    "renderer": "Mesa Intel(R) Graphics (PTL)",
+    "version": "4.6 (Core Profile) Mesa 26.0.8-1ubuntu0.3",
+    "client_width": 1280,
+    "client_height": 720
+  },
+  "states": {
+    "maxima": {
+      "position_m": 0.0,
+      "velocity_m_s": 0.0,
+      "rotation_rad": 0.0,
+      "angular_velocity_rad_s": 0.0,
+      "mjd_days": 0.0,
+      "mass_fraction": 0.0
+    },
+    "budgets": {
+      "position_m": 0.01,
+      "velocity_m_s": 1e-05,
+      "rotation_rad": 1e-08,
+      "angular_velocity_rad_s": 1e-10,
+      "mjd_days": 1e-10,
+      "mass_fraction": 1.0
+    },
+    "samples": 305
+  },
+  "landmark_errors_px": {
+    "Earth": 0.0,
+    "ISS": 0.0,
+    "PB": 0.0
+  },
+  "ssim": 0.9862598209696377,
+  "ssim_minimum": 0.98,
+  "masks": [],
+  "repeats_identical": true,
+  "captured_image_sha256": "710cbbc87353e5e917df6e8fd9bff1c612d946554c01a1e0c48410a46d672746",
+  "final_candidate_identical_image_and_numerical_traces": true,
+  "missing_required_module_rejected": true,
+  "portable_tests_passed": 29,
+  "details": "Local raw traces/manifests/modules/asset hashes remain under out/native-production-scene-verified; hosted workflow archives equivalent full evidence. Immutable Windows references are unchanged."
+}

@@ -1,3 +1,4 @@
+#include "RendererFiles.h"
 // Copyright (c) Martin Schweiger
 // Licensed under the MIT License
 
@@ -38,7 +39,7 @@ static unsigned char *load_file(const char *path, size_t *data_size)
         size_t size;
         size_t n;
 
-        fd = fopen(path, "rb");
+        fd = RendererOpenFile(path, "rb");
         if (!fd) {
                 perror(path);
                 exit(EXIT_FAILURE);
@@ -255,8 +256,9 @@ bool TextureManager::LoadTexture (const char *fname, OGLTexture **ppdds, uint32_
     unsigned options=SOIL_FLAG_TEXTURE_REPEATS;
     if(!(flags & 4))options|=SOIL_FLAG_MIPMAPS;
     if(!(flags & 2))options|=SOIL_FLAG_DDS_LOAD_DIRECT;
-    for(const auto &candidate:paths) {
-        FILE *file=fopen(candidate.c_str(),"rb");if(!file)continue;
+    for(const auto &probe:paths) {
+        std::string candidate;if(!RendererResolveFilePath(probe,candidate))continue;
+        FILE *file=RendererOpenFile(candidate.c_str(),"rb");if(!file)continue;
         unsigned char signature[4]{};size_t count=fread(signature,1,4,file);fclose(file);
         // Stock BMP content may carry a .dds suffix. Trust bytes, not extension.
         GLuint id=count>=2 && signature[0]=='B' && signature[1]=='M'
@@ -317,7 +319,7 @@ int TextureManager::LoadTextures (const char *fname, OGLTexture **ppdds, uint32_
 
     GLuint *tmp = new GLuint[n];
 
-	if ((ftex = fopen(cpath, "rb"))) {
+	if ((ftex = RendererOpenFile(cpath, "rb"))) {
 		fclose(ftex);
 
         ntex = SOIL_direct_load_DDS_blob(
@@ -328,7 +330,7 @@ int TextureManager::LoadTextures (const char *fname, OGLTexture **ppdds, uint32_
             //SOIL_FLAG_DDS_LOAD_DIRECT);
 
 	} else if (g_client->TexturePath(fname, cpath)) {
-		ftex = fopen(cpath, "rb");
+		ftex = RendererOpenFile(cpath, "rb");
 		if (ftex) {
 			fclose(ftex);
 
@@ -468,17 +470,17 @@ GLuint texture_loadDDS(const uint8_t *buf, uint32_t nbuf) {
     assert(false);
   // lay out variables to be used
 	const unsigned char* header;
-	
+
 	unsigned int width;
 	unsigned int height;
 	unsigned int mipMapCount;
-	
+
 	unsigned int blockSize;
 	unsigned int format;
-	
+
 	unsigned int w;
 	unsigned int h;
-	
+
 	const unsigned char* buffer = 0;
     unsigned int offset = 0;
     unsigned int size = 0;
@@ -486,19 +488,19 @@ GLuint texture_loadDDS(const uint8_t *buf, uint32_t nbuf) {
 
 
 	GLuint tid = 0;
-	
+
 	long file_size = nbuf;
-	
+
   // allocate new unsigned char space with 4 (file code) + 124 (header size) bytes
   // read in 128 bytes from the file
 	header = buf;
-  
+
   // compare the `DDS ` signature
 	if(memcmp(header, "DDS ", 4) != 0) {
         printf("texture_loadDDS: DDS header not found\n");
 		goto exit;
     }
-	
+
   // extract height, width, and amount of mipmaps - yes it is stored height then width
 	height = (header[12]) | (header[13] << 8) | (header[14] << 16) | (header[15] << 24);
 	width = (header[16]) | (header[17] << 8) | (header[18] << 16) | (header[19] << 24);
@@ -506,7 +508,7 @@ GLuint texture_loadDDS(const uint8_t *buf, uint32_t nbuf) {
     if(mipMapCount > 0)
         mipmaps = true;
 	else
-        mipMapCount = 1;        
+        mipMapCount = 1;
     // figure out what format to use for what fourCC file type it is
     // block size is about physical chunk storage of compressed data in file (important)
 	if(header[84] == 'D') {
@@ -527,11 +529,11 @@ GLuint texture_loadDDS(const uint8_t *buf, uint32_t nbuf) {
 				// unsupported, else will error
 				// as it adds sizeof(struct DDS_HEADER_DXT10) between pixels
 				// so, buffer = malloc((file_size - 128) - sizeof(struct DDS_HEADER_DXT10));
-			default: 
+			default:
                 printf("texture_loadDDS: unsupported compression\n");
                 goto exit;
 		}
-        
+
         // allocate new unsigned char space with file_size - (file_code + header_size) magnitude
         // read rest of file
         buffer = buf + 128;
@@ -539,7 +541,7 @@ GLuint texture_loadDDS(const uint8_t *buf, uint32_t nbuf) {
         // prepare new incomplete texture
         glGenTextures(1, &tid);
         Renderer::CheckError("glGenTextures");
-        
+
         // bind the texture
         // make it complete by specifying all needed parameters and ensuring all mipmaps are filled
         glBindTexture(GL_TEXTURE_2D, tid);
@@ -557,11 +559,11 @@ GLuint texture_loadDDS(const uint8_t *buf, uint32_t nbuf) {
         Renderer::CheckError("glTexParameteri");
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
         Renderer::CheckError("glTexParameteri");
-        
+
         // prepare some variables
         w = width;
         h = height;
-        
+
         // loop through sending block at a time with the magic formula
         // upload to opengl properly, note the offset transverses the pointer
         // assumes each mipmap is 1/2 the size of the previous mipmap
@@ -590,7 +592,7 @@ GLuint texture_loadDDS(const uint8_t *buf, uint32_t nbuf) {
         Renderer::CheckError("glGenTextures");
         if(tid == 0)
             goto exit;
-        
+
         // bind the texture
         // make it complete by specifying all needed parameters and ensuring all mipmaps are filled
         glBindTexture(GL_TEXTURE_2D, tid);
@@ -608,11 +610,11 @@ GLuint texture_loadDDS(const uint8_t *buf, uint32_t nbuf) {
         Renderer::CheckError("glTexParameteri");
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
         Renderer::CheckError("glTexParameteri");
-        
+
         // prepare some variables
         w = width;
         h = height;
-        
+
         int pixelSize = 2;
         GLint internalformat = GL_RGBA4;
         GLenum format;
@@ -637,7 +639,7 @@ GLuint texture_loadDDS(const uint8_t *buf, uint32_t nbuf) {
             h /= 2;
         }
 
-        
+
 
     }
     // discard any odd mipmaps, ensure a complete texture
@@ -647,7 +649,7 @@ GLuint texture_loadDDS(const uint8_t *buf, uint32_t nbuf) {
     // unbind
     glBindTexture(GL_TEXTURE_2D, 0);
     Renderer::CheckError("glBindTexture");
-	
+
   // easy macro to get out quick and uniform (minus like 15 lines of bulk)
 exit:
 	return tid;
@@ -660,13 +662,13 @@ bool TextureManager::ReadDDSSurfaceFromMemory (const uint8_t *buf, uint32_t nbuf
 		*ppddsDXT = new OGLTexture;
 		size_t xxx = nbuf;
 		unsigned int SOIL_flags = SOIL_FLAG_MIPMAPS;
-        
+
         GLuint texid;
 
 		if(flags & 2) texid = SOIL_load_OGL_texture_from_memory(buf, &xxx,	0, 0, 0);
         else texid = texture_loadDDS(buf, nbuf);
 
-// flags can be any of SOIL_FLAG_POWER_OF_TWO | SOIL_FLAG_MIPMAPS | SOIL_FLAG_TEXTURE_REPEATS 
+// flags can be any of SOIL_FLAG_POWER_OF_TWO | SOIL_FLAG_MIPMAPS | SOIL_FLAG_TEXTURE_REPEATS
 // | SOIL_FLAG_MULTIPLY_ALPHA | SOIL_FLAG_INVERT_Y | SOIL_FLAG_COMPRESS_TO_DXT | SOIL_FLAG_DDS_LOAD_DIRECT
 
 
@@ -687,7 +689,7 @@ bool TextureManager::ReadDDSSurfaceFromMemory (const uint8_t *buf, uint32_t nbuf
 		(*ppddsDXT)->m_InCache = false;
 		(*ppddsDXT)->m_FBO = 0;
 		(*ppddsDXT)->InitSize();
-		
+
 		return true;
 	#if 0
   // lay out variables to be used
@@ -697,13 +699,13 @@ bool TextureManager::ReadDDSSurfaceFromMemory (const uint8_t *buf, uint32_t nbuf
 	unsigned int width;
 	unsigned int height;
 	unsigned int mipMapCount;
-	
+
 	unsigned int blockSize;
 	unsigned int format;
-	
+
 	unsigned int w;
 	unsigned int h;
-	
+
     unsigned int offset = 0;
     unsigned int size = 0;
     bool mipmaps = false;
@@ -711,14 +713,14 @@ bool TextureManager::ReadDDSSurfaceFromMemory (const uint8_t *buf, uint32_t nbuf
 
   // allocate new unsigned char space with 4 (file code) + 124 (header size) bytes
   // read in 128 bytes from the file
-  
+
   // compare the `DDS ` signature
 	if(memcmp(header, "DDS ", 4) != 0) {
         printf("DDS header not found\n");
 		res = false;
 		goto exit;
     }
-	
+
   // extract height, width, and amount of mipmaps - yes it is stored height then width
 	height = (header[12]) | (header[13] << 8) | (header[14] << 16) | (header[15] << 24);
 	width = (header[16]) | (header[17] << 8) | (header[18] << 16) | (header[19] << 24);
@@ -726,7 +728,7 @@ bool TextureManager::ReadDDSSurfaceFromMemory (const uint8_t *buf, uint32_t nbuf
     if(mipMapCount > 0)
         mipmaps = true;
 	else
-        mipMapCount = 1;        
+        mipMapCount = 1;
     // figure out what format to use for what fourCC file type it is
     // block size is about physical chunk storage of compressed data in file (important)
 	if(header[84] == 'D') {
@@ -747,12 +749,12 @@ bool TextureManager::ReadDDSSurfaceFromMemory (const uint8_t *buf, uint32_t nbuf
 				// unsupported, else will error
 				// as it adds sizeof(struct DDS_HEADER_DXT10) between pixels
 				// so, buffer = malloc((file_size - 128) - sizeof(struct DDS_HEADER_DXT10));
-			default: 
+			default:
                 printf("unsupported DDS compression\n");
 				res = false;
                 goto exit;
 		}
-        
+
 		*ppddsDXT = new OGLTexture;
 		(*ppddsDXT)->m_RefCnt = 1;
 		(*ppddsDXT)->m_InCache = false;
@@ -763,7 +765,7 @@ bool TextureManager::ReadDDSSurfaceFromMemory (const uint8_t *buf, uint32_t nbuf
         // prepare new incomplete texture
         glGenTextures(1, &(*ppddsDXT)->m_TexId);
         CheckError("glGenTextures");
-        
+
         // bind the texture
         // make it complete by specifying all needed parameters and ensuring all mipmaps are filled
         glBindTexture(GL_TEXTURE_2D, (*ppddsDXT)->m_TexId);
@@ -781,11 +783,11 @@ bool TextureManager::ReadDDSSurfaceFromMemory (const uint8_t *buf, uint32_t nbuf
         CheckError("glTexParameteri");
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
         CheckError("glTexParameteri");
-        
+
         // prepare some variables
         w = width;
         h = height;
-        
+
         // loop through sending block at a time with the magic formula
         // upload to opengl properly, note the offset transverses the pointer
         // assumes each mipmap is 1/2 the size of the previous mipmap
@@ -820,7 +822,7 @@ bool TextureManager::ReadDDSSurfaceFromMemory (const uint8_t *buf, uint32_t nbuf
         CheckError("glGenTextures");
         if((*ppddsDXT)->m_TexId == 0)
             goto exit;
-        
+
         // bind the texture
         // make it complete by specifying all needed parameters and ensuring all mipmaps are filled
         glBindTexture(GL_TEXTURE_2D, (*ppddsDXT)->m_TexId);
@@ -838,11 +840,11 @@ bool TextureManager::ReadDDSSurfaceFromMemory (const uint8_t *buf, uint32_t nbuf
         CheckError("glTexParameteri");
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
         CheckError("glTexParameteri");
-        
+
         // prepare some variables
         w = width;
         h = height;
-        
+
         int pixelSize = 2;
         GLint internalformat = GL_RGBA4;
         GLenum format;
@@ -876,7 +878,7 @@ bool TextureManager::ReadDDSSurfaceFromMemory (const uint8_t *buf, uint32_t nbuf
     // unbind
     glBindTexture(GL_TEXTURE_2D, 0);
     CheckError("glBindTexture");
-	
+
   // easy macro to get out quick and uniform (minus like 15 lines of bulk)
 exit:
 	return res;
@@ -964,12 +966,12 @@ OGLTexture *TextureManager::GetTextureForRendering(int w, int h, int attrib)
 
 // =======================================================================
 // BltToUncompressedSurface()
-// Creates an uncompressed surface and blits the compressed surface to 
+// Creates an uncompressed surface and blits the compressed surface to
 // it using the specified pixel format.
 // =======================================================================
 /*
-bool TextureManager::BltToUncompressedSurface (DDSURFACEDESC2 ddsd, 
-    DDPIXELFORMAT ddpf, LPDIRECTDRAWSURFACE7 pddsDXT, 
+bool TextureManager::BltToUncompressedSurface (DDSURFACEDESC2 ddsd,
+    DDPIXELFORMAT ddpf, LPDIRECTDRAWSURFACE7 pddsDXT,
     LPDIRECTDRAWSURFACE7* ppddsNewSurface)
 {
 	HRESULT hr;
@@ -1002,7 +1004,7 @@ bool TextureManager::BltToUncompressedSurface (DDSURFACEDESC2 ddsd,
 
         if (FAILED (pddsDXT->GetAttachedSurface (&ddsd.ddsCaps, &pddsDXTAttached)))
             return S_OK; // Failure here means were done with the mipmap chain
-        pddsDXT = pddsDXTAttached;  
+        pddsDXT = pddsDXTAttached;
 
         // Get next surface in the new surface's mipmap chain
         if (FAILED (pddsNew->GetAttachedSurface (&ddsd.ddsCaps, &pddsNewAttached)))
@@ -1019,7 +1021,7 @@ bool TextureManager::BltToUncompressedSurface (DDSURFACEDESC2 ddsd,
 
 // =======================================================================
 // GetNumberOfBits()
-// xReturns the number of bits set in a DWORD mask
+// xReturns the number of bits set in a oapi::UInt32 mask
 // =======================================================================
 
 uint16_t GetNumberOfBits (uint32_t dwMask)

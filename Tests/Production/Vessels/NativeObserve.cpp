@@ -6,6 +6,8 @@
 #include "Production/NativeWorldVesselServices.h"
 #include "Production/NativeVesselModule.h"
 #include "State.h"
+#include "Camera.h"
+#include "Production/CameraServices.h"
 #include "../StockControlSchedules.h"
 using namespace production_component_test;
 namespace {
@@ -47,11 +49,24 @@ struct VesselHost final:VesselServices {
     void PlaybackNote(char*) override {throw std::runtime_error("No playback in vessel reference");}
     void EndPlayback() override {throw std::runtime_error("No playback in vessel reference");}
 };
+struct CameraHost final:CameraServices {
+    VesselEnvironment& environment;Vessel* focus=nullptr;Camera* camera=nullptr;
+    explicit CameraHost(VesselEnvironment& env):environment(env) {}
+    Vessel* Focus() const override {return focus;}
+    Config& Configuration() const override {return environment.settings;}
+    void SetFocus(Vessel*) override {throw std::runtime_error("Focus change outside camera component fixture");}
+    void SetFOV(double value) override {camera->SetAperture(value);}
+    bool SetPanelMode(int) override {throw std::runtime_error("No cockpit in camera component fixture");}
+    void SelectPanel(int) override {throw std::runtime_error("No panel in camera component fixture");}
+    void SelectVC(int) override {throw std::runtime_error("No VC in camera component fixture");}
+    std::filesystem::path ScenarioPath(const char* name) const override {return name;}
+};
+
 }
 int main(int argc,char** argv)
 {
     try {
-        if(argc!=10) throw std::runtime_error("Expected config, celestial data, modules, textures, meshes, master config, scenario, trace and orbit/controls mode");
+        if(argc!=10 && argc!=11) throw std::runtime_error("Expected config, celestial data, modules, textures, meshes, master config, scenario, trace and orbit/controls mode");
         const std::string mode=argv[9];
         const bool controls=mode=="controls",behavior=mode=="rcs" || mode=="autopilot" || mode=="callbacks";
         if(!controls && !behavior && mode!="orbit") throw std::runtime_error("Unknown reference control mode");
@@ -91,7 +106,7 @@ int main(int argc,char** argv)
             char name[]="Sol";
             auto status=[](const char* text,int,void*) {std::clog<<text<<'\n';};
             PlanetarySystem world(name,&environment.settings,status,nullptr);environment.system=&world;
-            world.InitState(argv[7]);world.PostCreation();
+            world.InitState(argv[7]);
             if(world.nGrav()!=41 || world.nVessel()!=2) throw std::runtime_error("Incomplete stock Sol/vessel graph");
             auto* pb=world.GetVessel("PB",true);auto* iss=world.GetVessel("ISS",true);
             if(!pb || !iss || pb->GetModuleInterface()->Version()!=2 || iss->GetModuleInterface()->Version()!=0)
@@ -108,7 +123,18 @@ int main(int argc,char** argv)
             }
             auto* focus=world.GetVessel(metadata.Focus(),true);
             if(!focus) throw std::runtime_error("Missing scenario focus vessel");
-            focus->FocusChanged(true,focus,nullptr);
+            focus->FocusChanged(true,focus,nullptr);world.PostCreation();
+            CameraHost cameraHost(environment);cameraHost.focus=focus;
+            BindCameraServices(&cameraHost);
+            Camera camera;cameraHost.camera=&camera;
+            camera.ResizeViewport(1280,720);camera.InitState(argv[7],focus);camera.Update();
+            if(argc==11) {
+                std::ofstream record(argv[10]);record.imbue(std::locale::classic());record.exceptions(std::ios::badbit|std::ios::failbit);
+                const auto& p=*camera.GPosPtr();const auto direction=camera.Direction();const auto& r=camera.GRot();
+                record<<std::setprecision(17)<<"px,py,pz,dx,dy,dz,aperture,m11,m12,m13,m21,m22,m23,m31,m32,m33\n"
+                    <<p.x<<','<<p.y<<','<<p.z<<','<<direction.x<<','<<direction.y<<','<<direction.z<<','<<camera.Aperture()
+                    <<','<<r.m11<<','<<r.m12<<','<<r.m13<<','<<r.m21<<','<<r.m22<<','<<r.m23<<','<<r.m31<<','<<r.m32<<','<<r.m33<<'\n';
+            }
             auto behaviorSample=[&](int tick) {
                 const auto* earth=world.GetGravObj("Earth",true);
                 for(auto* vessel:{iss,pb}) {
@@ -160,7 +186,7 @@ int main(int argc,char** argv)
             }
             std::cout<<"Actual native production Sol, ISS and ShuttlePB: "<<frames<<" finalized steps; no camera/renderer\n";
         }
-        environment.system=nullptr;host.meshes.Flush();output.close();
+        BindCameraServices(nullptr);environment.system=nullptr;host.meshes.Flush();output.close();
         BindNativeVesselModuleResources(nullptr);BindVesselServices(nullptr);BindWorldVesselServices(nullptr);
         BindElevationServices(nullptr);BindMeshServices({});return 0;
     } catch(const std::exception& error) {std::cerr<<error.what()<<'\n';return 1;}

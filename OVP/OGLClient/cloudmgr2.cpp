@@ -120,7 +120,7 @@ void CloudTile::Render ()
 	cloudShader->SetVec3("u_SunDir", sundir);
 	*/
 	cloudShader->SetFloat("u_ShadowPass", bCloudShadowPass?1.0:0.0);
-	
+
 	glBindTexture(GL_TEXTURE_2D,  tex->m_TexId);
 
 	mesh->VAO->Bind();
@@ -227,7 +227,7 @@ void TileManager2<CloudTile>::RenderFlatCloudShadows (MATRIX4 &dwmat, const vPla
 	bCloudShadowPass = true;
 	//D3DMATERIAL7 pmat;
 	//static D3DMATERIAL7 cloudmat = {{0,0,0,1},{0,0,0,1},{0,0,0,0},{0,0,0,0},0};
-	
+
 	float alpha = (float)rprm.shadowalpha;
 	if (alpha < 0.01f) return; // don't render cloud shadows for this planet
 	//cloudmat.diffuse.a = cloudmat.ambient.a = alpha;
@@ -237,7 +237,7 @@ void TileManager2<CloudTile>::RenderFlatCloudShadows (MATRIX4 &dwmat, const vPla
 
 	//Dev()->SetRenderState (D3DRENDERSTATE_ALPHABLENDENABLE, TRUE);
 	//Dev()->SetTextureStageState (0, D3DTSS_ALPHAOP, D3DTOP_MODULATE);
-	
+
 	OGLCamera *camera = g_client->GetScene()->GetCamera();
 
 	// build a transformation matrix for frustum testing

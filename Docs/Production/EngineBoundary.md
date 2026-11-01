@@ -334,8 +334,9 @@ Debug/Release against each other and both against the accepted Phase 2 state,
 callback, object/asset, camera and image evidence. Numerical, one-pixel and SSIM
 budgets are unchanged. Neither inherited disabled workflow is modified.
 
-Remaining Phase 3 work includes full session/platform lifetime extraction,
-configuration/scenario/resource integration, platform service separation for
-`PlanetarySystem`, `Planet`, `Vessel` and `Camera`, instrumentation dependencies and the source-built native SDK/module
-boundary. These shared components do not yet satisfy the Phase 3
-exit gate that Linux builds the production engine and its authoritative objects.
+The [native production external view](NativeExternalView.md) now runs the actual
+world, Vessel, source-built ShuttlePB, Camera and shared Session/WorldOwner,
+connected to the separately built production OpenGL renderer. General application
+lifetime, instrumentation, flight input, remaining stock SDK/modules, in-process
+repeated sessions and full scenario compatibility remain open. This narrow view
+is not the full stock-release gate.

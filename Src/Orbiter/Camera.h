@@ -15,7 +15,11 @@
 #ifndef __CAMERA_H
 #define __CAMERA_H
 
+#ifdef _WIN32
 #include <d3d.h>
+#else
+#include "NativeVesselAPI.h"
+#endif
 #include <fstream>
 #include "Vecmat.h"
 #include "elevmgr.h"
@@ -55,7 +59,7 @@ class Camera {
 public:
 	Camera (double _nearplane = 1.0, double _farplane = 1e8);
 	// Create a camera with given y-aperture [rad] and viewing fustrum limits
-	
+
 	~Camera();
 
 	void SetCMode (const CameraMode *cm);
@@ -177,7 +181,7 @@ public:
 
 	void Drag (const Vector &gshift);
 	// Displace camera by 'gshift' (global coords) from its
-	// 'natural' position. The camera will automatically 
+	// 'natural' position. The camera will automatically
 	// gradually move back (external camera mode only)
 
 	void GroundObserverShift (double dx, double dz, double dh);
@@ -245,26 +249,28 @@ public:
 	{
 		lng = go->Lng(), lat = go->Lat(), alt = go->Alt();
 	}
-	bool ProcessMouse (UINT event, DWORD state, DWORD x, DWORD y, const char *kstate);
+#ifdef _WIN32
+	bool ProcessMouse (UINT event, oapi::UInt32 state, oapi::UInt32 x, oapi::UInt32 y, const char *kstate);
 	void UpdateMouse ();
+#endif
 
 	void ClearPresets ();
 	// clear list of preset modes
 
-	DWORD nPreset() const { return npreset; }
+	oapi::UInt32 nPreset() const { return npreset; }
 	// number of preset modes
 
-	DWORD AddPreset (CameraMode *mode = 0);
+	oapi::UInt32 AddPreset (CameraMode *mode = 0);
 	// add entry to list (if mode==0, add current active camera mode)
 	// return value is index of mode in the list
 
-	bool DelPreset (DWORD idx);
+	bool DelPreset (oapi::UInt32 idx);
 	// removes a preset mode from the list
 
-	void RecallPreset (DWORD idx);
+	void RecallPreset (oapi::UInt32 idx);
 	// set camera mode to a preset mode from the list
 
-	CameraMode *GetPreset (DWORD idx);
+	CameraMode *GetPreset (oapi::UInt32 idx);
 	// retrieve a camera mode from the preset list
 
 	void Update ();
@@ -280,7 +286,9 @@ public:
 	MATRIX4 ViewMatrix() const;
 	// Return view matrix in full resolution
 
+#ifdef _WIN32
 	D3DMATRIX *D3D_ProjViewMatrix ();
+#endif
 	// Return product ProjectionMatrix * ViewMatrix
 
 	void ViewportToGlobalDir (double sx, double sy, Vector &gdir) const;
@@ -320,22 +328,29 @@ private:
 	// alt is used to determine required resolution level
 	// TODO: This should really be a method of Planet
 
+#ifdef _WIN32
 	void UpdateProjectionMatrix ();
+#endif
 	// recalculate proj_mat
 
 	void StoreVCParams();
 	bool RecallVCParams();
 
-	DWORD UpdateExternalControl (ExternalCameraControl *ecc);
+	oapi::UInt32 UpdateExternalControl (ExternalCameraControl *ecc);
 	// update camera from an external control source
 
 	ExtCamMode extmode;    // external camara mode
 	IntCamMode intmode;    // internal camera mode
 	CamAction action;      // current camera auto-action
-	DWORD ExtCtrlMode;     // if camera is externally controlled, this contains bitflags for data types
+	oapi::UInt32 ExtCtrlMode;     // if camera is externally controlled, this contains bitflags for data types
 	                       // (see CAMDATA_xxx constants in CamAPI.h)
 
-	POINT pm;              // last cursor position
+#ifdef _WIN32
+	POINT pm;
+#else
+	struct {int x,y;} pm;
+#endif
+	//              // last cursor position
 	double mmoveT;         // time of last mouse move
 
 	Vector gpos;           // current camera pos in global coords
@@ -441,16 +456,18 @@ private:
 	} *go;
 
 	CameraMode** preset;           // list of preset camera modes
-	DWORD npreset;                 // list length
+	oapi::UInt32 npreset;                 // list length
 
 	// mouse parameters
 	bool mbdown[2];         // mouse buttons down?
 	int mx, my;             // mouse position
 
+#ifdef _WIN32
 	D3DMATRIX view_mat;     // D3D view matrix for current camera state
 	D3DMATRIX proj_mat;     // D3D projection matrix for current camera state
 	D3DMATRIX pv_mat;       // projection * view matrix
 	bool pv_mat_valid;      // flag for validity of pv_mat
+#endif
 
 	mutable std::vector<ElevationTile> etile;
 

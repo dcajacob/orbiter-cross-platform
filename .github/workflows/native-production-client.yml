@@ -1,0 +1,80 @@
+name: Native Production OpenGL External View
+on:
+  push:
+    branches: ['codex/production-**']
+    paths: ['Src/Orbiter/**', 'Src/Celbody/**', 'Src/Vessel/ShuttlePB/**', 'OVP/OGLClient/**', 'Orbitersdk/**', 'Tests/Production/**', '.github/workflows/native-production-client.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  native:
+    name: Real native client Ubuntu 24.04 ${{ matrix.configuration }} x64
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    strategy:
+      fail-fast: false
+      matrix:
+        configuration: [Debug, Release]
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - name: Install native build and software OpenGL window dependencies
+        run: >-
+          sudo apt-get update && sudo apt-get install -y zlib1g-dev libgl1-mesa-dev
+          libxrandr-dev libxinerama-dev libxcursor-dev libxi-dev xvfb mesa-utils
+      - name: Build actual production engine and source-built stock/celestial modules
+        shell: bash
+        run: |
+          set -euo pipefail
+          cmake -S Src/Orbiter/Production -B out/native-engine -G Ninja -DCMAKE_BUILD_TYPE=${{ matrix.configuration }} -DBUILD_TESTING=OFF -DORBITER_BUILD_NATIVE_CELESTIAL_MODULES=ON -DORBITER_BUILD_NATIVE_VESSELS=ON 2>&1 | tee native-engine-configure.log
+          cmake --build out/native-engine --parallel 2 2>&1 | tee native-engine-build.log
+      - uses: actions/cache@v6
+        with:
+          path: out/ogl-dependencies
+          key: native-production-ogl-${{ hashFiles('OVP/OGLClient/dependencies.lock.json', 'Src/ClientNative/CMakeLists.txt') }}
+      - run: python3 -B Tests/Production/NativeScene/dependencies.py --cache out/ogl-dependencies
+      - name: Build separate shared production OpenGL renderer
+        shell: bash
+        run: |
+          set -euo pipefail
+          cmake -S OVP/OGLClient/Native -B out/native-renderer -G Ninja -DCMAKE_BUILD_TYPE=${{ matrix.configuration }} -DORBITER_ENGINE_BUILD="$PWD/out/native-engine" -DORBITER_RENDERER_DEPENDENCIES="$PWD/out/ogl-dependencies" -DGLFW_BUILD_WAYLAND=OFF 2>&1 | tee native-renderer-configure.log
+          cmake --build out/native-renderer --parallel 2 2>&1 | tee native-renderer-build.log
+          python3 -B Tests/Production/NativeScene/module_exports.py out/native-engine/NativeModules/Graphics/OGLClient.so
+      - uses: actions/cache@v6
+        with:
+          path: out/data-cache/production-stock-data-v1.zip
+          key: production-native-data-${{ hashFiles('Tests/Production/input-storage.lock.json') }}
+      - uses: actions/cache@v6
+        with:
+          path: out/planet-cache/Orbiter2016.zip
+          key: production-standard-planets-${{ hashFiles('Tests/Production/standard-planets.lock.json') }}
+      - name: Verify original data and planetary archives
+        run: |
+          python3 -B Tests/Production/prepare_native_data.py --archive out/data-cache/production-stock-data-v1.zip --destination out/data --group all
+          python3 -B Tests/Production/prepare_data.py --lock Tests/Production/standard-planets.lock.json --archive out/planet-cache/Orbiter2016.zip --destination out/planets
+          python3 -B Tests/Production/NativeScene/prepare.py --data out/data --planets out/planets --destination out/scene-resources
+      - name: Run real software-rendered native application twice against frozen Windows
+        shell: bash
+        run: |
+          set -euo pipefail
+          xvfb-run -a -s '-screen 0 1920x1080x24' env LIBGL_ALWAYS_SOFTWARE=1 GALLIUM_DRIVER=llvmpipe python3 -B Tests/Production/NativeScene/verify.py --executable out/native-engine/orbiter-production --assets out/scene-resources --data out/data --modules out/native-engine/NativeModules --planets out/planets --configuration ${{ matrix.configuration }} --output out/native-scene-evidence 2>&1 | tee native-scene-verification.log
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          report=json.loads(Path('out/native-scene-evidence/native-scene-report.json').read_text())
+          assert all('llvmpipe' in run['renderer']['renderer'].lower() for run in report['runs']), 'Actual software renderer was not loaded'
+          PY
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: native-production-client-${{ matrix.configuration }}-x64
+          retention-days: 90
+          path: |
+            native-*.log
+            out/native-engine/CMakeCache.txt
+            out/native-renderer/CMakeCache.txt
+            out/native-engine/native-sdk/OrbiterNativeBuild.h
+            out/native-scene-evidence/**
+            out/scene-resources/resources.json
+            out/native-engine/NativeModules/Graphics/Licenses/**

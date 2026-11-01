@@ -25,8 +25,8 @@
 #ifndef __VOBJECT_H
 #define __VOBJECT_H
 
-#include "OrbiterAPI.h"
-#include "GraphicsAPI.h"
+#include "RendererSdk.h"
+#include "RendererSdk.h"
 #include "Scene.h"
 #include "OGLClient.h"
 #include <glm/glm.hpp>
@@ -111,7 +111,7 @@ public:
 	 * \return Mesh handle
 	 * \note Currently only vessel visuals return anything here.
 	 */
-	virtual MESHHANDLE GetMesh (UINT idx) { return NULL; }
+	virtual MESHHANDLE GetMesh (oapi::UInt idx) { return NULL; }
 
 	/**
 	 * \brief Returns distance from camera

@@ -48,7 +48,7 @@ void vObject::GlobalInit ()
 		g_client->GetTexMgr()->LoadTexture (fname[i], blobtex+i, 0);
 	}
 	spotShader = Renderer::GetShader("Spot");
-	
+
 	struct TVERTEX {
 		float x;     ///< vertex x position
 		float y;     ///< vertex y position

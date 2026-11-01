@@ -12,6 +12,9 @@ set(common_src
 # General source files
 	Astro.cpp
 	Camera.cpp
+	CameraApplication.cpp
+	CameraControl.cpp
+	Production/WindowsCameraServices.cpp
 	cmdline.cpp
 	console_ng.cpp
 	ElementApplication.cpp

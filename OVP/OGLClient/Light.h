@@ -16,7 +16,7 @@
 #ifndef __LIGHT_H
 #define __LIGHT_H
 
-#include "Orbitersdk.h"
+#include "RendererSdk.h"
 #include <glm/glm.hpp>
 
 #define MAX_LIGHTS 8

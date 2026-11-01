@@ -1,40 +1,35 @@
 // Copyright (c) Martin Schweiger
 // Licensed under the MIT License
-
-#define STRICT 1
 #define OAPI_IMPLEMENTATION
-
-#include <stdio.h>
-#include <iomanip>
-
-#include "resource.h"
-#include "D3dmath.h"
 #include "Camera.h"
 #include "Config.h"
 #include "Body.h"
+#include "Base.h"
 #include "Planet.h"
 #include "Vessel.h"
-#include "Psys.h"
-#include "Pane.h"
-#include "Dialogs.h"
-#include "DlgMgr.h"
-#include "Orbiter.h"
-#include "Orbitersdk.h"
-#include "Util.h"
-#include "Log.h"
-#include "OrbiterAPI.h"
+#include "PsysCore.h"
+#include "Production/CameraServices.h"
+#include "Production/RigidBodyServices.h"
+#include "Production/GeometryConversions.h"
+#include "Production/Text.h"
+#include <cstdio>
+#include <cstring>
+#include <iomanip>
+#ifdef _WIN32
+#include "D3dmath.h"
 #include "Vobject.h"
-#include <zmouse.h>
-
+#include "Log.h"
+#else
+#include "NativeVesselAPI.h"
+#endif
 using namespace std;
-
-extern Orbiter *g_pOrbiter;
-extern TimeData td;
-extern PlanetarySystem *g_psys;
-extern Pane *g_pane;
-extern Vessel *g_focusobj;
-extern char DBG_MSG[256];
-
+using namespace orbiter::production;
+// Original SDK signed-angle normalization, with the same expression/order.
+static double NormalizeCameraAngle(double angle)
+{
+    double a = fmod (angle, PI2);
+    return (a >= PI ? a-PI2 : a < -PI ? a+PI2 : a);
+}
 static Vector nullvec;
 static bool brot = false;
 const double dragT = 3.0;
@@ -62,11 +57,17 @@ Camera::Camera (double _nearplane, double _farplane)
 	planet_proxy = 0;
 	npreset = 0;
 	external_view = true;//false;
+	#ifdef _WIN32
 	pv_mat_valid = false;
+#endif
 	has_tref = false;
 	movehead = false;
 	ExtCtrlMode = 0;
+	#ifdef _WIN32
 	GetCursorPos (&pm);
+#else
+	pm = {};
+#endif
 	mmoveT = -1000.0;
 	ap_int = ap_ext = RAD*25.0;
 	ap = &ap_ext;
@@ -76,7 +77,9 @@ Camera::Camera (double _nearplane, double _farplane)
 	aspect = 1.0; // arbitrary default - reset with ResizeViewport
 	w05 = h05 = 100;
 	mbdown[0] = mbdown[1] = false;
+	#ifdef _WIN32
 	VMAT_identity (view_mat);
+#endif
 	SetFrustumLimits (nearplane, farplane);
 	ECC = 0;
 	etile.resize(8);
@@ -90,81 +93,9 @@ Camera::~Camera ()
 	ClearPresets();
 }
 
-bool Camera::ProcessMouse (UINT event, DWORD state, DWORD x, DWORD y, const char *kstate)
-{
-	if (event != WM_MOUSEWHEEL)
-		mx = (int)x, my = (int)y;
 
-	switch (event) {
-	case WM_LBUTTONDOWN:
-		mbdown[0] = true;
-		return true;
-	case WM_RBUTTONDOWN:
-		mbdown[1] = true;
-		g_pOrbiter->InitRotationMode();
-		return true;
-	case WM_LBUTTONUP:
-		if (mbdown[0]) {
-			mbdown[0] = false;
-			return true;
-		}
-		break;
-	case WM_RBUTTONUP:
-		if (mbdown[1]) {
-			mbdown[1] = false;
-			g_pOrbiter->ExitRotationMode();
-			return true;
-		}
-		break;
-	case WM_MOUSEWHEEL:
-		if (KEYMOD_CONTROL(kstate)) {
-		}
-		else {
-			short zDelta = (short)HIWORD(state);
-			if (external_view)
-				ShiftDist(-zDelta*0.001);
-			else
-				g_pOrbiter->IncFOV(zDelta*(-2.0 / 120.0*RAD));
-		} return true;
-		break;
-	}
-	return false;
-}
 
-void Camera::UpdateMouse ()
-{
-	POINT pt;
-	GetCursorPos (&pt);
-	if (pt.x != pm.x || pt.y != pm.y) {
-		pm.x = pt.x, pm.y = pt.y;
-		mmoveT = td.SysT0;
-	}
 
-	if (mbdown[1]) {
-		int dx, dy, x0, y0;
-		x0 = pt.x, y0 = pt.y;
-		if (!g_pOrbiter->IsFullscreen())
-			ScreenToClient (g_pOrbiter->GetRenderWnd(), &pt);
-		dx = pt.x - mx;
-		dy = pt.y - my;
-		SetCursorPos (x0-dx, y0-dy);
-		if (!(dx || dy)) return;
-
-		if (external_view) {
-			if (extmode == CAMERA_GROUNDOBSERVER) {
-				if (go->LockedOnTarget()) {
-					GroundObserverShift (dx*go->PanSpeed() * -0.005, dy*go->PanSpeed() * -0.005, 0.0);
-				} else
-					GroundObserverTilt (dx * -0.005, dy * -0.005);
-			} else {
-				if (dx) ShiftPhi (dx * -0.005);
-				if (dy) ShiftTheta (dy * -0.005);
-			}
-		} else {
-			Rotate (dx * -0.001, dy * -0.001);
-		}
-	}
-}
 
 void Camera::SetViewInternal ()
 {
@@ -173,7 +104,7 @@ void Camera::SetViewInternal ()
 		ap = &ap_int;
 		double a = ap_int;
 		ap_int = 0.0; // force update
-		g_pOrbiter->SetFOV(a);
+		GetCameraServices().SetFOV(a);
 	}
 }
 
@@ -184,7 +115,7 @@ void Camera::SetViewExternal ()
 		ap = &ap_ext;
 		double a = ap_ext;
 		ap_ext = 0.0; // force update
-		g_pOrbiter->SetFOV(a);
+		GetCameraServices().SetFOV(a);
 	}
 }
 
@@ -232,8 +163,8 @@ void Camera::SetCMode (const CameraMode *cm)
 		if (!tgt) tgt = target;
 		Attach (tgt, ext ? 1:0);
 	}
-	if (tgt && !ext && tgt != g_focusobj)
-		g_pOrbiter->SetFocusObject ((Vessel*)tgt);
+	if (tgt && !ext && tgt != GetCameraServices().Focus())
+		GetCameraServices().SetFocus ((Vessel*)tgt);
 
 	switch (cm->GetMode()) {
 	case CameraMode::CM_COCKPIT: {
@@ -241,18 +172,18 @@ void Camera::SetCMode (const CameraMode *cm)
 		int pos = cmc->GetPosition();
 		switch (cmc->GetCockpitMode()) {
 		case CameraMode_Cockpit::CM_GENERIC:
-			g_pane->SetPanelMode(1);
+			GetCameraServices().SetPanelMode(1);
 			break;
 		case CameraMode_Cockpit::CM_PANEL2D:
-			if (g_pane->SetPanelMode(2))
-				if (pos >= 0) g_pane->SelectPanel(pos);
+			if (GetCameraServices().SetPanelMode(2))
+				if (pos >= 0) GetCameraServices().SelectPanel(pos);
 			break;
 		case CameraMode_Cockpit::CM_VC:
-			if (g_pane->SetPanelMode(3)) {
-				if (pos >= 0) g_pane->SelectVC(pos);
+			if (GetCameraServices().SetPanelMode(3)) {
+				if (pos >= 0) GetCameraServices().SelectVC(pos);
 				int lean = cmc->GetLeaning();
 				if (lean >= 0 && lean < 4) {
-					g_focusobj->LeanCamera (lean, cmc->GetLeaningSmooth());
+					GetCameraServices().Focus()->LeanCamera (lean, cmc->GetLeaningSmooth());
 				}
 			}
 			break;
@@ -294,7 +225,7 @@ void Camera::SetCMode (const CameraMode *cm)
 	}
 
 	double newap = cm->GetFOV()*0.5*RAD;
-	if (newap && fabs(newap - *ap) > 1e-6) g_pOrbiter->SetFOV (newap);
+	if (newap && fabs(newap - *ap) > 1e-6) GetCameraServices().SetFOV (newap);
 }
 
 CameraMode *Camera::GetCMode () const
@@ -304,45 +235,45 @@ CameraMode *Camera::GetCMode () const
 	if (external_view) {
 		switch (extmode) {
 		case CAMERA_TARGETRELATIVE: {
-			cm = new CameraMode_Track; TRACENEW
+			cm = new CameraMode_Track; GetRigidBodyServices().TraceAllocation(__FILE__,__LINE__);
 			CameraMode_Track *cmt = (CameraMode_Track*)cm;
 			cmt->SetTrackMode (CameraMode_Track::TM_RELATIVE);
 			cmt->SetPosition (rdist, ephi, etheta);
 			} break;
 		case CAMERA_ABSDIRECTION: {
-			cm = new CameraMode_Track; TRACENEW
+			cm = new CameraMode_Track; GetRigidBodyServices().TraceAllocation(__FILE__,__LINE__);
 			CameraMode_Track *cmt = (CameraMode_Track*)cm;
 			cmt->SetTrackMode (CameraMode_Track::TM_ABSDIR);
 			cmt->SetPosition (rdist, ephi, etheta);
 			} break;
 		case CAMERA_GLOBALFRAME: {
-			cm = new CameraMode_Track; TRACENEW
+			cm = new CameraMode_Track; GetRigidBodyServices().TraceAllocation(__FILE__,__LINE__);
 			CameraMode_Track *cmt = (CameraMode_Track*)cm;
 			cmt->SetTrackMode (CameraMode_Track::TM_GLOBAL);
 			cmt->SetPosition (rdist, ephi, etheta);
 			} break;
 		case CAMERA_TARGETTOOBJECT: {
-			cm = new CameraMode_Track; TRACENEW
+			cm = new CameraMode_Track; GetRigidBodyServices().TraceAllocation(__FILE__,__LINE__);
 			CameraMode_Track *cmt = (CameraMode_Track*)cm;
 			cmt->SetTrackMode (CameraMode_Track::TM_TARGETTOREF, (OBJHANDLE)dirref);
 			cmt->SetPosition (rdist, ephi, etheta);
 			} break;
 		case CAMERA_TARGETFROMOBJECT: {
-			cm = new CameraMode_Track; TRACENEW
+			cm = new CameraMode_Track; GetRigidBodyServices().TraceAllocation(__FILE__,__LINE__);
 			CameraMode_Track *cmt = (CameraMode_Track*)cm;
 			cmt->SetTrackMode (CameraMode_Track::TM_TARGETFROMREF, (OBJHANDLE)dirref);
 			cmt->SetPosition (rdist, ephi, etheta);
 			} break;
 		case CAMERA_GROUNDOBSERVER: {
-			cm = new CameraMode_Ground; TRACENEW
+			cm = new CameraMode_Ground; GetRigidBodyServices().TraceAllocation(__FILE__,__LINE__);
 			CameraMode_Ground *cmg = (CameraMode_Ground*)cm;
 			cmg->SetPosition (go->Lng(), go->Lat(), go->Alt(), (OBJHANDLE)go->RefBody());
 			if (!go->LockedOnTarget()) cmg->SetOrientation (go->Phi(), go->Tht());
 			} break;
-		default: cm = new CameraMode_Cockpit; TRACENEW
+		default: cm = new CameraMode_Cockpit; GetRigidBodyServices().TraceAllocation(__FILE__,__LINE__);
 		}
 	} else {
-		cm = new CameraMode_Cockpit; TRACENEW
+		cm = new CameraMode_Cockpit; GetRigidBodyServices().TraceAllocation(__FILE__,__LINE__);
 	}
 	cm->SetTarget (target);
 	cm->SetFOV (2*DEG * *ap);
@@ -407,21 +338,7 @@ void Camera::Attach (Body *_target, int mode)
 	has_tref = false;
 }
 
-bool Camera::Direction2Viewport(const Vector &dir, int &x, int &y)
-{
-	D3DVECTOR homog;
-	D3DMath_VectorMatrixMultiply (homog, D3DMath_Vector(dir.x, dir.y, dir.z), *D3D_ProjViewMatrix());
-	if (homog.x >= -1.0f && homog.y <= 1.0f && homog.z <= 1.0f) {
-		if (std::hypot(homog.x, homog.y) < 1e-6) {
-			x = (int)w05, y = (int)h05;
-		} else {
-			x = (int)(w05*(1.0f+homog.x));
-			y = (int)(h05*(1.0f-homog.y));
-		}
-		return true;
-	} else
-		return false;
-}
+
 
 double Camera::Distance () const
 {
@@ -546,7 +463,7 @@ void Camera::Drag (const Vector &gshift)
 {
 	if (external_view) {
 		tref.Set (has_tref ? tref+gshift: gshift);
-		tref_t0  = td.SysT1;
+		tref_t0  = GetRigidBodyServices().Time().SysT1;
 		tref_d0  = tref.length();
 		tref_r0  = rpos.length();
 		tref_r1  = (has_tref && rshift ? tref_r1/tref_r0*rdist : rdist)*target->Size();
@@ -568,7 +485,9 @@ double Camera::SetAperture (double _ap, bool limit_range, bool force)
 			else if (*ap > ap_limit_hi) *ap = ap_limit_hi;
 		}
 		tan_ap = tan (*ap);
-		UpdateProjectionMatrix ();
+	#ifdef _WIN32
+	UpdateProjectionMatrix ();
+#endif
 	}
 	return *ap;
 }
@@ -578,7 +497,9 @@ void Camera::SetFrustumLimits (double _nearplane, double _farplane)
 	nearplane = (float)_nearplane;
 	farplane  = (float)_farplane;
 	homog_zlimit = farplane / (farplane-nearplane);
+#ifdef _WIN32
 	UpdateProjectionMatrix ();
+#endif
 }
 
 void Camera::ViewportToGlobalDir (double sx, double sy, Vector &gdir) const
@@ -622,8 +543,8 @@ void Camera::SetCockpitDir (double ph, double th)
 {
 	// ph and th are polar and azimuth angles relative to default direction
 	if (!external_view) {
-		cphi   = normangle (ph);
-		ctheta = normangle (th);
+		cphi   = NormalizeCameraAngle (ph);
+		ctheta = NormalizeCameraAngle (th);
 		double sinph = sin(cphi),   cosph = cos(cphi);
 		double sinth = sin(ctheta), costh = cos(ctheta);
 		rrot.Set (cosph,  sinph*sinth, -sinph*costh,
@@ -692,8 +613,8 @@ void Camera::SetRelPos (double r, double ph, double th)
 	// ph is polar angle from pos z-axis
 
 	rdist  = r;
-	ephi   = normangle (ph);
-	etheta = normangle (th);
+	ephi   = NormalizeCameraAngle (ph);
+	etheta = NormalizeCameraAngle (th);
 
 	double sinph = sin(ephi), cosph = cos(ephi);
 	double sinth = sin(etheta), costh = cos(etheta);
@@ -772,7 +693,7 @@ void Camera::SetGroundMode (ExtCamMode mode, const CelestialBody *ref, double ln
 void Camera::SetGroundObserver_PanSpeed (double speed)
 {
 	if (go->SetPanSpeed(max(0.1, min(1e10, speed))))
-		g_pOrbiter->Cfg()->CfgCameraPrm.Panspeed = go->PanSpeed();
+		GetCameraServices().Configuration().CfgCameraPrm.Panspeed = go->PanSpeed();
 }
 
 void Camera::SetGroundObserver_TargetLock (bool lock)
@@ -791,7 +712,7 @@ void Camera::SetGroundObserver_TargetLock (bool lock)
 void Camera::SetGroundObserver_TerrainLimit (double altlimit)
 {
 	if (go->SetTerrainLimit(altlimit))
-		g_pOrbiter->Cfg()->CfgCameraPrm.TerrainLimit = altlimit;
+		GetCameraServices().Configuration().CfgCameraPrm.TerrainLimit = altlimit;
 }
 
 void Camera::GroundObserverShift (double dx, double dz, double dh)
@@ -810,13 +731,15 @@ void Camera::ResizeViewport (int w, int h)
 	w05 = 0.5*w;
 	h05 = 0.5*h;
 	aspect = h05/w05;
+#ifdef _WIN32
 	UpdateProjectionMatrix ();
+#endif
 }
 
-DWORD Camera::UpdateExternalControl (ExternalCameraControl *ecc)
+oapi::UInt32 Camera::UpdateExternalControl (ExternalCameraControl *ecc)
 {
-	DWORD dmode = 0;
-	DWORD cmode = ECC->GetCameraMode();
+	oapi::UInt32 dmode = 0;
+	oapi::UInt32 cmode = ECC->GetCameraMode();
 
 	// camera control via external module
 	if (external_view) {
@@ -825,7 +748,7 @@ DWORD Camera::UpdateExternalControl (ExternalCameraControl *ecc)
 				ExternalCameraControl::CamData data;
 				if (ECC->clbkPoll (&data)) {
 					go->TiltTo(data.yaw, data.pitch);
-				}	
+				}
 			}
 		} else { // track mode
 			if (cmode & CAMMODE_TRACK) {
@@ -833,7 +756,7 @@ DWORD Camera::UpdateExternalControl (ExternalCameraControl *ecc)
 				if (ECC->clbkPoll (&data)) {
 					const ExternalCameraControl::TrackMode *trkmode = ECC->GetTrackMode();
 					double vel, datax, datay;
-					double dt = td.SysDT*trkmode->speed;
+					double dt = GetRigidBodyServices().Time().SysDT*trkmode->speed;
 					double dz = trkmode->deadzone;
 					if (trkmode->trackrotation) {
 						if (trkmode->rotationdata == ExternalCameraControl::TrackMode::BYPOSITION) {
@@ -854,7 +777,7 @@ DWORD Camera::UpdateExternalControl (ExternalCameraControl *ecc)
 			}
 		}
 	} else { // cockpit camera
-		DWORD extctrl = 0;
+		oapi::UInt32 extctrl = 0;
 		const ExternalCameraControl::VCMode *vcmode = 0;
 		bool dorot = true, dopos = false;
 		double rotscale = 1.0;
@@ -871,10 +794,10 @@ DWORD Camera::UpdateExternalControl (ExternalCameraControl *ecc)
 				rotscale = vcmode->rotationrange/PI;
 				posrange = vcmode->positionrange;
 				if (frozen) {
-					if (td.SysT0-mmoveT > vcmode->freeze_t)
+					if (GetRigidBodyServices().Time().SysT0-mmoveT > vcmode->freeze_t)
 						frozen = false, dragrot = dorot, dragpos = dopos, action = CAMERA_RECENTER;
 				} else {
-					if (vcmode->freezeonmouse && td.SysT0-mmoveT < vcmode->freeze_t)
+					if (vcmode->freezeonmouse && GetRigidBodyServices().Time().SysT0-mmoveT < vcmode->freeze_t)
 						frozen = true;
 					else if (dragrot && action == CAMERA_NORMAL)
 						dragrot = false;
@@ -915,7 +838,7 @@ DWORD Camera::UpdateExternalControl (ExternalCameraControl *ecc)
 					if (dragpos) {
 						Vector D0(pr-rpos);
 						double d0 = D0.length();
-						double d = td.SysDT*1.0;
+						double d = GetRigidBodyServices().Time().SysDT*1.0;
 						if (d > d0) dragpos = false;
 						else pr = rpos + D0*(d/d0);
 					}
@@ -930,8 +853,8 @@ DWORD Camera::UpdateExternalControl (ExternalCameraControl *ecc)
 
 void Camera::Update ()
 {
-	double dt = td.SysDT;
-	double t1 = td.SysT1;
+	double dt = GetRigidBodyServices().Time().SysDT;
+	double t1 = GetRigidBodyServices().Time().SysT1;
 
 	// NOTE: Camera is updated after world state has been updated, but before state S1
 	// is copied back to state S0
@@ -941,14 +864,16 @@ void Camera::Update ()
 
 	// get a list of current visuals
 	double dist, calt, dist_proxy = 1e100;
+	int i;
+#ifdef _WIN32
 	VObject **vobj, *vo;
 	const Body *bd;
-	int i, nobj;
+	int nobj;
 	nobj = 0; vobj = 0;
 	for (i = 0; i < nobj; i++) {
 		bd = (vo = vobj[i])->GetBody();
-		if (!external_view && bd == (Body*)g_focusobj &&
-			!g_focusobj->HasExtpassMeshes()) continue;
+		if (!external_view && bd == (Body*)GetCameraServices().Focus() &&
+			!GetCameraServices().Focus()->HasExtpassMeshes()) continue;
 		dist = vo->CDist() - bd->ClipRadius();
 		if (bd->Type() == OBJTP_PLANET) {
 			if (dist < 50e3) {
@@ -964,10 +889,12 @@ void Camera::Update ()
 		if (dist < dist_proxy) dist_proxy = dist;
 	}
 
+#endif
+
 	// find the largest apparent planet
 	double ralt_proxy = 1e100;
-	for (i = 0; i < g_psys->nPlanet(); i++) {
-		Planet *planet = g_psys->GetPlanet(i);
+	for (i = 0; i < GetRigidBodyServices().World()->nPlanet(); i++) {
+		Planet *planet = GetRigidBodyServices().World()->GetPlanet(i);
 		dist = gpos.dist (planet->GPos());
 		double alt = dist - planet->Size();
 		double ralt = alt/planet->Size();
@@ -1050,7 +977,7 @@ void Camera::Update ()
 
 		switch (action) {
 		case CAMERA_NORMAL:
-			if (!mbdown[1] && !brot && !IsCockpitDefaultDir() && (fabs (normangle (cphi)) < catchangle) && (fabs (normangle (ctheta)) < catchangle))
+			if (!mbdown[1] && !brot && !IsCockpitDefaultDir() && (fabs (NormalizeCameraAngle (cphi)) < catchangle) && (fabs (NormalizeCameraAngle (ctheta)) < catchangle))
 				ResetCockpitDir();
 			break;
 		case CAMERA_RECENTER:
@@ -1058,8 +985,8 @@ void Camera::Update ()
 			action = CAMERA_RECENTER_CONT;
 			// fall through
 		case CAMERA_RECENTER_CONT: {
-			double a = normangle (cntr_phi-cphi);
-			double b = normangle (cntr_tht-ctheta);
+			double a = NormalizeCameraAngle (cntr_phi-cphi);
+			double b = NormalizeCameraAngle (cntr_tht-ctheta);
 			double fa = fabs(a), fb = fabs(b), f = fa+fb;
 			if (f < 0.001 || (f < 0.01 && f > pf)) {
 				SetCockpitDir (cntr_phi, cntr_tht);
@@ -1075,8 +1002,8 @@ void Camera::Update ()
 					else          dtht = max (max (max (-vmax, vtht-amax*dt), b*dfac) * dt, b);
 					dphi = dtht*a/b;
 				}
-				vphi = dphi*td.iSysDT;
-				vtht = dtht*td.iSysDT;
+				vphi = dphi*GetRigidBodyServices().Time().iSysDT;
+				vtht = dtht*GetRigidBodyServices().Time().iSysDT;
 				pf = fa+fb;
 			}
 			} break;
@@ -1086,17 +1013,17 @@ void Camera::Update ()
 
 		if (dphi || dtht) {
 			double dp_left, dp_right, dt_up, dt_down;
-			g_focusobj->CamRange (dp_left, dp_right, dt_up, dt_down);
+			GetCameraServices().Focus()->CamRange (dp_left, dp_right, dt_up, dt_down);
 			const double phirange = 0.8*Pi;   // make panel-dependent!
 			const double thtrange = 0.8*Pi05; // make panel-dependent!
 
-			vp = dphi*td.iSysDT;
-			vt = dtht*td.iSysDT;
+			vp = dphi*GetRigidBodyServices().Time().iSysDT;
+			vt = dtht*GetRigidBodyServices().Time().iSysDT;
 
-			double p = normangle (cphi);
+			double p = NormalizeCameraAngle (cphi);
 			if (vp > 0) vp = min (vp,  (dp_left-p)*dfac);
 			else        vp = max (vp, (-dp_right-p)*dfac);
-			double t = normangle (ctheta);
+			double t = NormalizeCameraAngle (ctheta);
 			if (vt > 0) vt = min (vt,  (dt_up-t)*dfac);
 			else        vt = max (vt, (-dt_down-t)*dfac);
 			dphi = dtht = 0.0;
@@ -1105,8 +1032,8 @@ void Camera::Update ()
 			vp = vt = 0.0;
 		}
 		if (rot_smooth) {
-			if (fabs (vp-vphi)*td.iSysDT > amax) vp = (vp > vphi ? amax:-amax)*dt + vphi;
-			if (fabs (vt-vtht)*td.iSysDT > amax) vt = (vt > vtht ? amax:-amax)*dt + vtht;
+			if (fabs (vp-vphi)*GetRigidBodyServices().Time().iSysDT > amax) vp = (vp > vphi ? amax:-amax)*dt + vphi;
+			if (fabs (vt-vtht)*GetRigidBodyServices().Time().iSysDT > amax) vt = (vt > vtht ? amax:-amax)*dt + vtht;
 		}
 		if (vp || vt) {
 			SetCockpitDir (cphi + vp*dt, ctheta + vt*dt);
@@ -1182,8 +1109,12 @@ void Camera::Update ()
 	//    rotation from world to view coordinates
 	// 2. rotations in logical interface are counterclockwise, but clockwise
 	//    in D3D
+	#ifdef _WIN32
 	SetD3DRotation (view_mat, grot);
+#endif
+	#ifdef _WIN32
 	pv_mat_valid = false;
+#endif
 
 	//UpdateMouse ();
 
@@ -1207,31 +1138,9 @@ MATRIX4 Camera::ViewMatrix() const
 	return mat;
 }
 
-D3DMATRIX *Camera::D3D_ProjViewMatrix ()
-{
-	if (!pv_mat_valid) {
-		D3DMath_MatrixMultiply (pv_mat, proj_mat, view_mat);
-		pv_mat_valid = true;
-	}
-	return &pv_mat;
-}
 
-void Camera::UpdateProjectionMatrix ()
-{
-	ZeroMemory (&proj_mat, sizeof (D3DMATRIX));
-	proj_mat._11 = (FLOAT)(aspect / tan_ap);
-	proj_mat._22 = (FLOAT)(1.0    / tan_ap);
-	if (farplane >= 1e20) {
-		proj_mat._33 = 1.0f;
-		proj_mat._43 = -nearplane;
-	} else {
-		proj_mat._43 = (proj_mat._33 = farplane / (farplane-nearplane)) * (-nearplane);
-	}
-	proj_mat._34 = 1.0f;
 
-	// register new projection matrix with device
-    //pDev->SetTransform (D3DTRANSFORMSTATE_PROJECTION, &proj_mat);
-}
+
 
 const Base* Camera::ProxyBase(const Planet* planet) const
 {
@@ -1240,8 +1149,8 @@ const Base* Camera::ProxyBase(const Planet* planet) const
 
 	if (!planet) { // loop over all bases in the system
 
-		for (int i = 0; i < g_psys->nPlanet(); i++) {
-			Planet* planet = g_psys->GetPlanet(i);
+		for (int i = 0; i < GetRigidBodyServices().World()->nPlanet(); i++) {
+			Planet* planet = GetRigidBodyServices().World()->GetPlanet(i);
 			if (planet->nBase()) {
 				const Base* base = ProxyBase(planet);
 				double dst2 = gpos.dist2(base->GPos());
@@ -1277,7 +1186,7 @@ void Camera::InitState (const char *scn, Body *default_target)
 
 	// read state from scenario file
 	if (scn) {
-		ifstream ifs (g_pOrbiter->ScnPath(scn));
+		ifstream ifs (GetCameraServices().ScenarioPath(scn));
 		if (ifs) Read (ifs);
 	}
 	Body *newtgt = target; target = NULL;
@@ -1293,8 +1202,8 @@ void Camera::BodyDeleted(const Body* body)
 	// celestial bodies cannot be deleted from a running simulation, so we don't check for this
 
 	if (body == target) {
-		if (body != g_focusobj)
-			Attach(g_focusobj, 1);
+		if (body != GetCameraServices().Focus())
+			Attach(GetCameraServices().Focus(), 1);
 		else {
 			// a focus object must always exist, so this is not allowed to happen
 			exit(1);
@@ -1312,7 +1221,7 @@ void Camera::BodyDeleted(const Body* body)
 void Camera::ClearPresets ()
 {
 	if (npreset) {
-		for (DWORD i = 0; i < npreset; i++)
+		for (oapi::UInt32 i = 0; i < npreset; i++)
 			delete preset[i];
 		delete []preset;
 		preset = NULL;
@@ -1320,10 +1229,10 @@ void Camera::ClearPresets ()
 	}
 }
 
-DWORD Camera::AddPreset (CameraMode *mode)
+oapi::UInt32 Camera::AddPreset (CameraMode *mode)
 {
 	if (!mode) mode = GetCMode();
-	CameraMode **tmp = new CameraMode*[npreset+1]; TRACENEW
+	CameraMode **tmp = new CameraMode*[npreset+1]; GetRigidBodyServices().TraceAllocation(__FILE__,__LINE__);
 	if (npreset) {
 		memcpy (tmp, preset, npreset*sizeof(CameraMode*));
 		delete []preset;
@@ -1333,13 +1242,13 @@ DWORD Camera::AddPreset (CameraMode *mode)
 	return npreset++;
 }
 
-bool Camera::DelPreset (DWORD idx)
+bool Camera::DelPreset (oapi::UInt32 idx)
 {
-	DWORD i, j;
+	oapi::UInt32 i, j;
 	if (idx >= npreset) return false;
 	CameraMode **tmp = 0;
 	if (npreset > 1) {
-		tmp = new CameraMode*[npreset-1]; TRACENEW
+		tmp = new CameraMode*[npreset-1]; GetRigidBodyServices().TraceAllocation(__FILE__,__LINE__);
 		for (i = j = 0; i < npreset; i++)
 			if (i != idx) tmp[j++] = preset[i];
 	}
@@ -1349,13 +1258,13 @@ bool Camera::DelPreset (DWORD idx)
 	return true;
 }
 
-void Camera::RecallPreset (DWORD idx)
+void Camera::RecallPreset (oapi::UInt32 idx)
 {
 	if (idx >= npreset) return; // out of range
 	SetCMode (preset[idx]);
 }
 
-CameraMode *Camera::GetPreset (DWORD idx)
+CameraMode *Camera::GetPreset (oapi::UInt32 idx)
 {
 	if (idx >= npreset) return 0;
 	return preset[idx];
@@ -1373,39 +1282,39 @@ bool Camera::Read (ifstream &ifs)
 	for (;;) {
 		if (!ifs.getline (cbuf, 256)) break;
 		pc = trim_string (cbuf);
-		if (!_strnicmp (pc, "END_CAMERA", 10)) break;
+		if (!ComparePrefix (pc, "END_CAMERA", 10)) break;
 
 		go->ParseLine(pc);  // offer the line to the ground observer
 
-		if (!_strnicmp (pc, "TARGET", 6)) {
+		if (!ComparePrefix (pc, "TARGET", 6)) {
 			pc = trim_string (pc+6);
-			if (!(tg = g_psys->GetObj (pc, true)))
-				tg = g_psys->GetBase (pc, true);
-		} else if (!_strnicmp (pc, "MODE", 4)) {
+			if (!(tg = GetRigidBodyServices().World()->GetObj (pc, true)))
+				tg = GetRigidBodyServices().World()->GetBase (pc, true);
+		} else if (!ComparePrefix (pc, "MODE", 4)) {
 			pc = trim_string (pc+4);
-			if (!_strnicmp (pc, "Extern", 6)) external_view = true;
+			if (!ComparePrefix (pc, "Extern", 6)) external_view = true;
 			else                             external_view = false;
-		} else if (!_strnicmp (pc, "POS", 3)) {
+		} else if (!ComparePrefix (pc, "POS", 3)) {
 			n = sscanf (pc+3, "%lf%lf%lf", &rd, &ph, &th);
 			ph *= RAD, th *= RAD;
-		} else if (!_strnicmp (pc, "FOV", 3)) {
+		} else if (!ComparePrefix (pc, "FOV", 3)) {
 			double a;
 			n = sscanf (pc+3, "%lf", &a);
 			if (a < 10.0) a = 10.0;
 			else if (a > 160.0) a = 160.0;
 			a *= RAD*0.5;
 			ap_int = ap_ext = a;
-		} else if (!_strnicmp (pc, "TRACKMODE", 9)) {
+		} else if (!ComparePrefix (pc, "TRACKMODE", 9)) {
 			n = sscanf (pc+9, "%s", ctrackmode);
 			if (n) {
 				// need to do it like this because in rare cases, the track target name can contain spaces ("Cape Canaveral")
 				strncpy(cdirref, pc + 11 + strlen(ctrackmode), 63);
 			}
-		} else if (!_strnicmp (pc, "BEGIN_PRESET", 12)) {
+		} else if (!ComparePrefix (pc, "BEGIN_PRESET", 12)) {
 			for (;;) {
 				if (!ifs.getline (cbuf, 256)) break;
 				pc = trim_string (cbuf);
-				if (!_strnicmp (pc, "END_PRESET", 10)) break;
+				if (!ComparePrefix (pc, "END_PRESET", 10)) break;
 				AddPreset (CameraMode::Create (pc));
 			}
 		}
@@ -1413,16 +1322,16 @@ bool Camera::Read (ifstream &ifs)
 	if (tg && external_view) target = tg;
 	if (external_view) {
 		rdist = rd, ephi = ph, etheta = th;
-		if (!_stricmp(ctrackmode, "AbsoluteDirection"))
+		if (!CompareText(ctrackmode, "AbsoluteDirection"))
 			extmode = CAMERA_ABSDIRECTION;
-		else if (!_stricmp(ctrackmode, "GlobalFrame"))
+		else if (!CompareText(ctrackmode, "GlobalFrame"))
 			extmode = CAMERA_GLOBALFRAME;
-		else if (!_stricmp(ctrackmode, "TargetTo") && (dirref = g_psys->GetObj(cdirref, true)))
+		else if (!CompareText(ctrackmode, "TargetTo") && (dirref = GetRigidBodyServices().World()->GetObj(cdirref, true)))
 			extmode = CAMERA_TARGETTOOBJECT;
-		else if (!_stricmp(ctrackmode, "TargetFrom")) {
-			if ((dirref = g_psys->GetObj(cdirref, true)) || (dirref = g_psys->GetBase(cdirref, true)))
+		else if (!CompareText(ctrackmode, "TargetFrom")) {
+			if ((dirref = GetRigidBodyServices().World()->GetObj(cdirref, true)) || (dirref = GetRigidBodyServices().World()->GetBase(cdirref, true)))
 				extmode = CAMERA_TARGETFROMOBJECT;
-		} else if (!_stricmp(ctrackmode, "Ground")) {
+		} else if (!CompareText(ctrackmode, "Ground")) {
 			if (go->RefBody())
 				extmode = CAMERA_GROUNDOBSERVER;
 		} else
@@ -1469,7 +1378,7 @@ void Camera::Write (std::ostream &os) const
 	if (npreset) {
 		char cbuf[256] = "    ";
 		os << "  BEGIN_PRESET" << endl;
-		for (DWORD i = 0; i < npreset; i++) {
+		for (oapi::UInt32 i = 0; i < npreset; i++) {
 			preset[i]->Store (cbuf+4);
 			os << cbuf << endl;
 		}
@@ -1510,12 +1419,12 @@ Camera::GroundObserver::GroundObserver(Camera *camera)
 	alt = alt0 = 100.0;
 	elev = 0.0;
 	rad = 0.0;
-	terrain_limit = g_pOrbiter->Cfg()->CfgCameraPrm.TerrainLimit;
+	terrain_limit = GetCameraServices().Configuration().CfgCameraPrm.TerrainLimit;
 	phi = tht = 0.0;
 	R0 = IMatrix();
 	R1 = IMatrix();
 	lock_dir = Vector(1, 0, 0);
-	panspeed = g_pOrbiter->Cfg()->CfgCameraPrm.Panspeed;
+	panspeed = GetCameraServices().Configuration().CfgCameraPrm.Panspeed;
 	tgtlock = false;
 
 	refbody_prev = 0;
@@ -1676,20 +1585,20 @@ bool Camera::GroundObserver::ParseLine(const char *line)
 	char cmode[64], cref[64];
 	int n;
 
-	if (!_strnicmp(line, "TRACKMODE", 9)) {
+	if (!ComparePrefix(line, "TRACKMODE", 9)) {
 		n = sscanf(line + 9, "%s%s", cmode, cref);
-		if (n == 2 && !_stricmp(cmode, "Ground")) {
-			refbody = (CelestialBody*)g_psys->GetObj(cref, true);
+		if (n == 2 && !CompareText(cmode, "Ground")) {
+			refbody = (CelestialBody*)GetRigidBodyServices().World()->GetObj(cref, true);
 			tgtlock = true; // default until GROUNDDIRECTION is parsed
 			return true;
 		}
-	} else if (!_strnicmp(line, "GROUNDLOCATION", 14)) {
+	} else if (!ComparePrefix(line, "GROUNDLOCATION", 14)) {
 		double deg_lng, deg_lat, _alt;
 		n = sscanf(line + 14, "%lf%lf%lf", &deg_lng, &deg_lat, &_alt);
 		if (n == 3)
 			MoveTo(deg_lng * RAD, deg_lat * RAD, _alt);
 		return true;
-	} else if (!_strnicmp(line, "GROUNDDIRECTION", 15)) {
+	} else if (!ComparePrefix(line, "GROUNDDIRECTION", 15)) {
 		double deg_phi, deg_tht;
 		n = sscanf(line + 15, "%lf%lf", &deg_phi, &deg_tht);
 		if (n == 2) {
@@ -1741,17 +1650,17 @@ CameraMode *CameraMode::Create (char *str)
 
 	if (!(pc = strtok (str, ":"))) return 0;
 	tc = trim_string (pc);
-	if (!_stricmp (tc, "Cockpit")) {
-		cm = new CameraMode_Cockpit; TRACENEW
-	} else if (!_stricmp (tc, "Track")) {
-		cm = new CameraMode_Track; TRACENEW
-	} else if (!_stricmp (tc, "Ground")) {
-		cm = new CameraMode_Ground; TRACENEW
+	if (!CompareText (tc, "Cockpit")) {
+		cm = new CameraMode_Cockpit; GetRigidBodyServices().TraceAllocation(__FILE__,__LINE__);
+	} else if (!CompareText (tc, "Track")) {
+		cm = new CameraMode_Track; GetRigidBodyServices().TraceAllocation(__FILE__,__LINE__);
+	} else if (!CompareText (tc, "Ground")) {
+		cm = new CameraMode_Ground; GetRigidBodyServices().TraceAllocation(__FILE__,__LINE__);
 	} else {
-		cm = new CameraMode_Cockpit; TRACENEW
+		cm = new CameraMode_Cockpit; GetRigidBodyServices().TraceAllocation(__FILE__,__LINE__);
 	}
-	
-	if (!(pc = strtok (NULL, ":")) || !(cm->target = (OBJHANDLE)g_psys->GetObj (trim_string (pc), true))) {
+
+	if (!(pc = strtok (NULL, ":")) || !(cm->target = (OBJHANDLE)GetRigidBodyServices().World()->GetObj (trim_string (pc), true))) {
 		delete cm;
 		return 0;
 	}
@@ -1779,15 +1688,15 @@ void CameraMode_Cockpit::Init (char *str)
 {
 	if (!str || str[0] == '\0') return;
 
-	if (!strnicmp(str, "generic", 7)) {
+	if (!ComparePrefix(str, "generic", 7)) {
 		cmode = CM_GENERIC;
 		str += 7;
-	} else if (!strnicmp(str, "panel2d", 7)) {
+	} else if (!ComparePrefix(str, "panel2d", 7)) {
 		cmode = CM_PANEL2D;
 		str += 7;
 		if (str[0] == ':' && sscanf(++str, "%d", &pos))
 			while (*str != ' ' && *str != '\0') str++;
-	} else if (!strnicmp(str, "vc", 2)) {
+	} else if (!ComparePrefix(str, "vc", 2)) {
 		cmode = CM_VC;
 		str += 2;
 		if (str[0] == ':' && sscanf(++str, "%d", &pos)) {
@@ -1801,11 +1710,11 @@ void CameraMode_Cockpit::Init (char *str)
 				}
 			}
 		}
-	} else if (!strnicmp(str, "current", 7)) {
+	} else if (!ComparePrefix(str, "current", 7)) {
 		cmode = CM_CURRENT;
 		str += 7;
 	}
-	
+
 }
 
 void CameraMode_Cockpit::GetDescr (char *str, int len)
@@ -1833,20 +1742,20 @@ void CameraMode_Track::Init (char *str)
 {
 	char tm[64], rf[256];
 	sscanf (str, "%s%lf%lf%lf%s", tm, &reldist, &phi, &theta, rf);
-	if (!_stricmp (tm, "RELATIVE"))
+	if (!CompareText (tm, "RELATIVE"))
 		tmode = TM_RELATIVE;
-	else if (!_stricmp (tm, "ABSDIR"))
+	else if (!CompareText (tm, "ABSDIR"))
 		tmode = TM_ABSDIR;
-	else if (!_stricmp (tm, "GLOBAL"))
+	else if (!CompareText (tm, "GLOBAL"))
 		tmode = TM_GLOBAL;
-	else if (!_stricmp (tm, "TARGETTOREF")) {
+	else if (!CompareText (tm, "TARGETTOREF")) {
 		tmode = TM_TARGETTOREF;
-		Body *r = g_psys->GetObj (rf, true);
+		Body *r = GetRigidBodyServices().World()->GetObj (rf, true);
 		if (r) ref = (OBJHANDLE)r;
 		else tmode = TM_CURRENT;
-	} else if (!_stricmp (tm, "TARGETFROMREF")) {
+	} else if (!CompareText (tm, "TARGETFROMREF")) {
 		tmode = TM_TARGETFROMREF;
-		Body *r = g_psys->GetObj (rf, true);
+		Body *r = GetRigidBodyServices().World()->GetObj (rf, true);
 		if (r) ref = (OBJHANDLE)r;
 		else tmode = TM_CURRENT;
 	}
@@ -1855,7 +1764,7 @@ void CameraMode_Track::Init (char *str)
 void CameraMode_Track::Store (char *str)
 {
 	static const char *tmstr[6] = {"CURRENT","RELATIVE", "ABSDIR", "GLOBAL", "TARGETTOREF", "TARGETFROMREF"};
-	sprintf (str, "Track:%s%:%0.2f:%s %0.3f %0.3f %0.3f", 
+	sprintf (str, "Track:%s%:%0.2f:%s %0.3f %0.3f %0.3f",
 		target ? ((Body*)target)->Name() : "-", fov,
 		tmstr[tmode], reldist, phi, theta);
 	if (tmode == TM_TARGETTOREF || tmode == TM_TARGETFROMREF) {
@@ -1914,7 +1823,7 @@ void CameraMode_Ground::Init (char *str)
 	lng *= RAD, lat *= RAD;
 	alt_above_ground = (toupper(alt_mode) != 'M');
 	tgtlock = (i < 7);
-	ref = (OBJHANDLE)g_psys->GetObj (rf, true);
+	ref = (OBJHANDLE)GetRigidBodyServices().World()->GetObj (rf, true);
 }
 
 void CameraMode_Ground::Store (char *str)

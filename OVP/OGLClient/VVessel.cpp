@@ -74,18 +74,18 @@ void vVessel::clbkEvent (visevent msg, visevent_data content)
 {
 	switch (msg) {
 	case EVENT_VESSEL_INSMESH:
-		InsertMesh (UINT(content));
+		InsertMesh (oapi::UInt(content));
 		break;
 	case EVENT_VESSEL_DELMESH:
-		DelMesh (UINT(content));
+		DelMesh (oapi::UInt(content));
 		break;
 	case EVENT_VESSEL_MESHVISMODE:
-		if (UINT(content) < nmesh) {
-			meshlist[UINT(content)].vismode = vessel->GetMeshVisibilityMode(UINT(content));
+		if (oapi::UInt(content) < nmesh) {
+			meshlist[oapi::UInt(content)].vismode = vessel->GetMeshVisibilityMode(oapi::UInt(content));
 		}
 		break;
 	case EVENT_VESSEL_MESHOFS: {
-		int idx = UINT(content);
+		int idx = oapi::UInt(content);
 		if (idx < nmesh) {
 			VECTOR3 ofs;
 			vessel->GetMeshOffset (idx, ofs);
@@ -130,13 +130,13 @@ void vVessel::clbkEvent (visevent msg, visevent_data content)
 		ANIMATION *anim;
 		unsigned int nanim = vessel->GetAnimPtr (&anim);
 		prevAnimState.resize(std::max(prevAnimState.size(),size_t(content)+1));
-        prevAnimState[UINT(content)]=anim[UINT(content)].defstate;
+        prevAnimState[oapi::UInt(content)]=anim[oapi::UInt(content)].defstate;
 		break;
 		}
 	}
 }
 
-MESHHANDLE vVessel::GetMesh (UINT idx)
+MESHHANDLE vVessel::GetMesh (oapi::UInt idx)
 {
 	return (idx < nmesh ? meshlist[idx].mesh : NULL);
 }
@@ -160,7 +160,7 @@ void vVessel::LoadMeshes ()
 	MESHHANDLE hMesh;
 	const OGLMesh *mesh;
 	VECTOR3 ofs;
-	UINT idx;
+	oapi::UInt idx;
 	OGLMeshManager *mmgr = g_client->GetMeshManager();
 
 	nmesh = vessel->GetMeshCount();
@@ -194,9 +194,9 @@ void vVessel::LoadMeshes ()
 	}
 }
 
-void vVessel::InsertMesh (UINT idx)
+void vVessel::InsertMesh (oapi::UInt idx)
 {
-	UINT i;
+	oapi::UInt i;
 
 	if (idx >= nmesh) { // append a new entry to the list
 		MESHREC *tmp = new MESHREC[idx+1];
@@ -253,7 +253,7 @@ void vVessel::InsertMesh (UINT idx)
 void vVessel::ClearMeshes ()
 {
 	if (nmesh) {
-		for (UINT i = 0; i < nmesh; i++) {
+		for (oapi::UInt i = 0; i < nmesh; i++) {
 			if (meshlist[i].mesh) delete meshlist[i].mesh;
 			if (meshlist[i].trans) delete meshlist[i].trans;
 		}
@@ -262,9 +262,9 @@ void vVessel::ClearMeshes ()
 	}
 }
 
-void vVessel::DelMesh (UINT idx)
+void vVessel::DelMesh (oapi::UInt idx)
 {
-    if(idx==UINT(-1)){ClearMeshes();return;}
+    if(idx==oapi::UInt(-1)){ClearMeshes();return;}
 	if (idx >= nmesh) return;
 	if (!meshlist[idx].mesh) return;
 	delete meshlist[idx].mesh;
@@ -289,13 +289,13 @@ void vVessel::ClearAnimations ()
 	prevAnimState.clear();
 }
 
-void vVessel::UpdateAnimations (UINT mshidx)
+void vVessel::UpdateAnimations (oapi::UInt mshidx)
 {
 	ANIMATION *anim;
 	unsigned int nanim = vessel->GetAnimPtr (&anim);
 
 	double newstate;
-	for (UINT i = 0; i < nanim; i++) {
+	for (oapi::UInt i = 0; i < nanim; i++) {
 		if (!anim[i].ncomp) continue;
 		if (prevAnimState[i] != (newstate = anim[i].state)) {
 			Animate (i, newstate, mshidx);
@@ -314,7 +314,7 @@ bool vVessel::Render ()
 bool vVessel::Render (bool internalpass)
 {
 	if (!active) return false;
-	UINT i, mfd;
+	oapi::UInt i, mfd;
 
 	bool bCockpit = (oapiCameraInternal() && hObj == oapiGetFocusObject());
 	// render cockpit view
@@ -669,7 +669,7 @@ void vVessel::RenderGroundShadow (OBJHANDLE hPlanet, float depth)
 	mProj[3][2] =        (float)(sdvs.z*nr0);
 	mProj[3][3] = 1;
 	mProjWorld = mWorld * mProj;
-	
+
 	bool isProjWorld = false;
 
 	// modify depth of shadows at dawn/dusk
@@ -701,7 +701,7 @@ void vVessel::RenderGroundShadow (OBJHANDLE hPlanet, float depth)
 		for (int j = 0; j < mesh->GroupCount(); j++) {
 			OGLMesh::GROUPREC *grp = mesh->GetGroup(j);
 			if (grp->UsrFlag & 1) continue; // "no shadow" flag
-			mesh->RenderGroup (grp);	
+			mesh->RenderGroup (grp);
 		}
 	}
 
@@ -747,9 +747,7 @@ bool vVessel::ModLighting (OGLLight *light)
 	// we only test the closest celestial body for shadowing
 	OBJHANDLE hP = vessel->GetSurfaceRef();
 	OBJHANDLE hS = oapiGetGbodyByIndex(0); // the central star
-	CELBODY *cb = oapiGetCelbodyInterface(hP);
-	if(!cb) return false;
-	CELBODY2 *cb2 = (cb->Version() >= 2 ? (CELBODY2*)cb : NULL);
+	if(!RendererHasCelestialModule(hP)) return false;
 	vessel->GetGlobalPos(GV);
 	oapiGetGlobalPos (hS, &GS);
 	S = GS-GV; // sun's position from vessel
@@ -776,7 +774,7 @@ bool vVessel::ModLighting (OGLLight *light)
 			if (atm) {  // case 1: planet has atmosphere
 				double alt = p-psize;                // vessel altitude
 				double altlimit = *(double*)oapiGetObjectParam (hP, OBJPRM_PLANET_ATTENUATIONALT);
-				double ap1 = ap * (altlimit+psize)/psize; 
+				double ap1 = ap * (altlimit+psize)/psize;
 				if (alt < altlimit) {
 					static const double delta0 = RAD*100.0;
 					// This is the angular separation between planet centre and star below which
@@ -863,13 +861,12 @@ bool vVessel::ModLighting (OGLLight *light)
 				}
 			}
 		}
-		if (!cb2 || (oapiGetObjectType (hP = cb2->GetParent()) != OBJTP_PLANET))
+		if ((hP = RendererCelestialParent(hP)) == nullptr || oapiGetObjectType(hP) != OBJTP_PLANET)
 			break;
 			// if this is a moon, also check the parent planet
 			// warning: currently this only works for moons defined via
 			// CELBODY2 interface
-		cb = oapiGetCelbodyInterface(hP);
-		cb2 = (cb->Version() >= 2 ? (CELBODY2*)cb : NULL);
+
 	}
 
 	if (lightmod) {
@@ -895,7 +892,7 @@ bool vVessel::ModLighting (OGLLight *light)
 	return lightmod;
 }
 
-void vVessel::Animate (UINT an, double state, UINT mshidx)
+void vVessel::Animate (oapi::UInt an, double state, oapi::UInt mshidx)
 {
 	double s0, s1, ds;
 	unsigned int i, ii;

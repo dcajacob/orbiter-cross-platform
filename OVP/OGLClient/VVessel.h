@@ -115,7 +115,7 @@ protected:
 	 * Synchronises the visual animation states with the logical
 	 * animation states of the vessel object.
 	 * \param mshidx mesh index
-	 * \note If mshidx == (UINT)-1 (default), all meshes are updated.
+	 * \note If mshidx == (oapi::UInt)-1 (default), all meshes are updated.
 	 */
 	void UpdateAnimations (unsigned int mshidx = (unsigned int)-1);
 
@@ -138,7 +138,7 @@ private:
 		glm::fmat4 *trans; // mesh transformation matrix (rel. to vessel frame)
 		uint16_t vismode;
 	} *meshlist;          // list of associated meshes
-	UINT nmesh;           // number of meshes
+	oapi::UInt nmesh;           // number of meshes
 
 	std::vector<double> prevAnimState;  // list of visual animation states
 	static OGLTexture *defexhausttex; // default exhaust texture

@@ -39,6 +39,12 @@ def verify():
     if ledger['observed_source'] != CAPTURE or ledger['production_source'] != BASE:
         raise ValueError('extraction baseline identity changed')
     declared = ledger['files']
+    if 'Src/Orbiter/Production/CameraServices.h' in declared:
+        from camera_source import verify as verify_camera
+        verify_camera()
+    if 'Src/Orbiter/Production/NativeGraphics.h' in declared:
+        from graphics_source import verify as verify_graphics
+        verify_graphics()
     if 'Src/Orbiter/Production/VesselServices.h' in declared:
         from vessel_source import verify as verify_vessel_source
         verify_vessel_source()
@@ -181,6 +187,10 @@ def verify():
         if 'Orbitersdk/include/OrbiterVesselData.h' in declared:
             from vessel_values_source import ranges as vessel_value_ranges
             ranges.extend(vessel_value_ranges(original))
+        if 'Orbitersdk/include/OrbiterCameraData.h' in declared:
+            from camera_source import sdk_blocks
+            a,b,c,d=sdk_blocks(original.decode('cp1252'))
+            ranges.extend(((a,b,b'#include "OrbiterCameraData.h"\n\n'),(c,d,b'')))
         if 'Orbitersdk/include/OrbiterVectorMath.h' in declared:
             start=original.index(b'/**\n * \\brief 4-element vector\n */')
             end=original.index(b'//@}',start)

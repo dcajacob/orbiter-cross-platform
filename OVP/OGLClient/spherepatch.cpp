@@ -117,7 +117,7 @@ void CreateSphere (VBMESH &mesh, uint32_t nrings, bool hemisphere, int which_hal
             *idx++ = (uint16_t)( (y+1)*x2 + (x+0) );
             *idx++ = (uint16_t)( (y+0)*x2 + (x+1) );
             *idx++ = (uint16_t)( (y+1)*x2 + (x+1) );
-            *idx++ = (uint16_t)( (y+1)*x2 + (x+0) ); 
+            *idx++ = (uint16_t)( (y+1)*x2 + (x+0) );
 			nidx += 6;
         }
     }
@@ -256,7 +256,7 @@ void CreateSpherePatch (VBMESH &mesh, int nlng, int nlat, int ilat, int res, int
 	VECTOR3 ez = crossp (ey, ex);
 	MATRIX3 R = {ex.x, ex.y, ex.z,  ey.x, ey.y, ey.z,  ez.x, ez.y, ez.z};
 	VECTOR3 pref = {0.5*(clat0*clng1 + clat0*clng0), slat0, 0.5*(clat0*slng1 + clat0*slng0)}; // origin
-	VECTOR3 tpmin, tpmax; 
+	VECTOR3 tpmin, tpmax;
 
 	float dx, dy;
 	if (shift_origin) {
@@ -396,7 +396,7 @@ void CreateSpherePatch (VBMESH &mesh, int nlng, int nlat, int ilat, int res, int
 	Renderer::CheckError("glEnableVertexAttribArray3");
 
 	mesh.ib->Bind();
-	mesh.va->UnBind();	
+	mesh.va->UnBind();
 /*
 	// set bounding box
 	mesh.bb = new VertexBuffer(nullptr, 8 * sizeof(VERTEX_XYZ));
@@ -453,4 +453,3 @@ void DestroyVBMesh (VBMESH &mesh)
 	}
 	mesh.ni  = 0;
 }
-

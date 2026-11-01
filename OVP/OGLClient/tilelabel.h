@@ -37,7 +37,7 @@ private:
 	TLABEL **label;        // the list read from file
 	int nrenderlabel, nrenderbuf;
 	TLABEL **renderlabel;  // the list to be rendered, extracted from an ancestor label list
-	bool makeRenderList;   // flag for 
+	bool makeRenderList;   // flag for
 };
 
 #endif // !__TILELABEL_H

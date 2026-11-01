@@ -19,7 +19,14 @@
 #ifndef __DRAWAPI_H
 #define __DRAWAPI_H
 
+#ifdef _WIN32
 #include "OrbiterAPI.h"
+#else
+#include "NativeGraphicsData.h"
+#define OAPIFUNC __attribute__((visibility("default")))
+#endif
+#include "OrbiterSdkDrawingTypes.h"
+#include "OrbiterValueTypes.h"
 #include <assert.h>
 #include <xmmintrin.h>
 
@@ -39,13 +46,13 @@ namespace oapi {
 
 	/**
 	 * \brief Integer-valued 2-D vector type.
-	 * \note This structure is designed to be compatible with the Windows POINT type.
+	 * \note This structure is designed to be compatible with the Windows oapi::SdkPoint type.
 	 */
 	union IVECTOR2 {
-		long data[2];  ///< vector data array
+		oapi::SdkCoordinate data[2];  ///< vector data array
 		struct {
-			long x;    ///< vector x coordinate
-			long y;    ///< vector y coordinate
+			oapi::SdkCoordinate x;    ///< vector x coordinate
+			oapi::SdkCoordinate y;    ///< vector y coordinate
 		};
 	};
 
@@ -54,7 +61,7 @@ namespace oapi {
 		* \brief 32-bit floating point 2D vector type.
 		* \note This structure is compatible with the D3DXVECTOR2 type.
 		*/
-	typedef struct FVECTOR2 
+	typedef struct FVECTOR2
 	{
 		FVECTOR2()
 		{
@@ -84,7 +91,7 @@ namespace oapi {
 			y = float(_y);
 		}
 
-		FVECTOR2(DWORD _x, DWORD _y)
+		FVECTOR2(oapi::UInt32 _x, oapi::UInt32 _y)
 		{
 			x = float(_x);
 			y = float(_y);
@@ -96,13 +103,13 @@ namespace oapi {
 			y = float(_y);
 		}
 
-		FVECTOR2(const POINT& p)
+		FVECTOR2(const oapi::SdkPoint& p)
 		{
 			x = float(p.x);
 			y = float(p.y);
 		}
 
-		FVECTOR2(const POINT* p)
+		FVECTOR2(const oapi::SdkPoint* p)
 		{
 			x = float(p->x);
 			y = float(p->y);
@@ -351,7 +358,7 @@ namespace oapi {
 #endif
 		struct { float x, y, z; };
 		struct { float r, g, b; };
-		FVECTOR2 xy; 
+		FVECTOR2 xy;
 	} FVECTOR3;
 
 
@@ -359,14 +366,14 @@ namespace oapi {
 	* \brief 32-bit floating point 4D vector type.
 	* \note This structure is compatible with the D3DXVECTOR4 type.
 	*/
-	typedef union __declspec(align(16)) FVECTOR4
+	typedef union alignas(16) FVECTOR4
 	{
-		DWORD dword_abgr() const
+		oapi::UInt32 dword_abgr() const
 		{
-			DWORD dr = DWORD((std::max)(0.0f, r) * 255.0f + 0.5f);
-			DWORD dg = DWORD((std::max)(0.0f, g) * 255.0f + 0.5f);
-			DWORD db = DWORD((std::max)(0.0f, b) * 255.0f + 0.5f);
-			DWORD da = DWORD((std::max)(0.0f, a) * 255.0f + 0.5f);
+			oapi::UInt32 dr = oapi::UInt32((std::max)(0.0f, r) * 255.0f + 0.5f);
+			oapi::UInt32 dg = oapi::UInt32((std::max)(0.0f, g) * 255.0f + 0.5f);
+			oapi::UInt32 db = oapi::UInt32((std::max)(0.0f, b) * 255.0f + 0.5f);
+			oapi::UInt32 da = oapi::UInt32((std::max)(0.0f, a) * 255.0f + 0.5f);
 			if (dr > 0xFF) dr = 0xFF;
 			if (dg > 0xFF) dg = 0xFF;
 			if (db > 0xFF) db = 0xFF;
@@ -374,12 +381,12 @@ namespace oapi {
 			return (da << 24) | (db << 16) | (dg << 8) | dr;
 		}
 
-		DWORD dword_argb() const
+		oapi::UInt32 dword_argb() const
 		{
-			DWORD dr = DWORD((std::max)(0.0f, r) * 255.0f + 0.5f);
-			DWORD dg = DWORD((std::max)(0.0f, g) * 255.0f + 0.5f);
-			DWORD db = DWORD((std::max)(0.0f, b) * 255.0f + 0.5f);
-			DWORD da = DWORD((std::max)(0.0f, a) * 255.0f + 0.5f);
+			oapi::UInt32 dr = oapi::UInt32((std::max)(0.0f, r) * 255.0f + 0.5f);
+			oapi::UInt32 dg = oapi::UInt32((std::max)(0.0f, g) * 255.0f + 0.5f);
+			oapi::UInt32 db = oapi::UInt32((std::max)(0.0f, b) * 255.0f + 0.5f);
+			oapi::UInt32 da = oapi::UInt32((std::max)(0.0f, a) * 255.0f + 0.5f);
 			if (dr > 0xFF) dr = 0xFF;
 			if (dg > 0xFF) dg = 0xFF;
 			if (db > 0xFF) db = 0xFF;
@@ -416,12 +423,12 @@ namespace oapi {
 			a = c.a;
 		}
 
-		FVECTOR4(DWORD abgr)
+		FVECTOR4(oapi::UInt32 abgr)
 		{
-			DWORD dr = (abgr & 0xFF); abgr >>= 8;
-			DWORD dg = (abgr & 0xFF); abgr >>= 8;
-			DWORD db = (abgr & 0xFF); abgr >>= 8;
-			DWORD da = (abgr & 0xFF);
+			oapi::UInt32 dr = (abgr & 0xFF); abgr >>= 8;
+			oapi::UInt32 dg = (abgr & 0xFF); abgr >>= 8;
+			oapi::UInt32 db = (abgr & 0xFF); abgr >>= 8;
+			oapi::UInt32 da = (abgr & 0xFF);
 			//if (da == 0) da = 255;
 			float q = 3.92156862e-3f;
 			r = float(dr) * q;
@@ -608,7 +615,7 @@ namespace oapi {
 	* \brief Float-valued 4x4 matrix.
 	* \note This structure is compatible with the D3DXMATRIX.
 	*/
-	typedef union __declspec(align(16)) FMATRIX4
+	typedef union alignas(16) FMATRIX4
 	{
 		FMATRIX4() {
 			m11 = m12 = m13, m14 = m21 = m22 = m23 = m24 = m31 = m32 = m33 = m34 = m41 = m42 = m43 = m44 = 0;
@@ -665,7 +672,11 @@ namespace oapi {
 		}
 
 		float data[16];
+#ifdef _WIN32
 		struct { FVECTOR4 _x, _y, _z, _p; };
+#else
+		FVECTOR4 rows[4]; // native SDK names rows explicitly; same 64-byte overlay
+#endif
 		struct { float m11, m12, m13, m14, m21, m22, m23, m24, m31, m32, m33, m34, m41, m42, m43, m44; };
 	} FMATRIX4;
 
@@ -871,7 +882,7 @@ public:
  *   typeface, slant, weight, etc. Fonts can be selected into a Sketchpad
  *   and then apply to all subsequent Text calls.
  */
-class OAPIFUNC Font : public DrawingTool 
+class OAPIFUNC Font : public DrawingTool
 {
 protected:
 	/**
@@ -909,7 +920,7 @@ public:
 	 * \return GDI font handle
 	 * \note Non-GDI clients should not overload this method.
 	 */
-	virtual HFONT GetGDIFont () const { return 0; }
+	virtual oapi::SdkFont GetGDIFont () const { return 0; }
 };
 
 
@@ -928,7 +939,7 @@ protected:
 	 * \param width line width [pixel]
 	 * \param col line colour (format: 0xBBGGRR)
 	 */
-	Pen (int style, int width, DWORD col) {}
+	Pen (int style, int width, oapi::UInt32 col) {}
 
 public:
 	/**
@@ -951,7 +962,7 @@ protected:
 	 * \brief Brush constructor.
 	 * \param col brush colour (format: 0xBBGGRR)
 	 */
-	Brush (DWORD col) {};
+	Brush (oapi::UInt32 col) {};
 
 public:
 	/**
@@ -975,7 +986,7 @@ public:
  * derived graphics clients. An example for a DrawingObject implementation
  * is via the Windows GDI (graphics device interface).
  */
-class OAPIFUNC Sketchpad 
+class OAPIFUNC Sketchpad
 {
 public:
 
@@ -985,7 +996,7 @@ public:
 	};
 
 	enum BlendState {
-		ALPHABLEND = 0x1,				///< AlphaBlend source.color to destination.color, will retain destination alpha unchanged (if exists). 
+		ALPHABLEND = 0x1,				///< AlphaBlend source.color to destination.color, will retain destination alpha unchanged (if exists).
 		COPY = 0x2,						///< Copy source color and alpha to destination
 		COPY_ALPHA = 0x3,				///< Copy source.alpha to destination.alpha, will retain destination color unchanged
 		COPY_COLOR = 0x4,				///< Copy source.color to destination.color, will retain destination alpha unchanged
@@ -995,8 +1006,8 @@ public:
 	};
 
 	enum RenderParam {
-		PRM_GAMMA = 1,			///< Enable/Setup Gamma correction	
-		PRM_NOISE = 2			///< Enable/Setup Noise generation	
+		PRM_GAMMA = 1,			///< Enable/Setup Gamma correction
+		PRM_NOISE = 2			///< Enable/Setup Noise generation
 	};
 
 	enum MeshFlags {
@@ -1007,8 +1018,8 @@ public:
 
 
 	typedef struct {
-		RECT intr;
-		RECT outr;
+		oapi::SdkRectangle intr;
+		oapi::SdkRectangle outr;
 	} skpRegion;
 
 	/**
@@ -1083,7 +1094,7 @@ public:
 	 * \return Previous colour setting.
 	 * \default None, returns 0.
 	 */
-	virtual DWORD SetTextColor(DWORD col) { assert(false); return 0; }
+	virtual oapi::UInt32 SetTextColor(oapi::UInt32 col) { assert(false); return 0; }
 
 	/**
 	 * \brief Set the background colour for text output.
@@ -1094,7 +1105,7 @@ public:
 	 *   is set to BK_OPAQUE.
 	 * \sa SetBackgroundMode
 	 */
-	virtual DWORD SetBackgroundColor (DWORD col) { assert(false); return 0; }
+	virtual oapi::UInt32 SetBackgroundColor (oapi::UInt32 col) { assert(false); return 0; }
 
 	/**
 	 * \brief Background modes for text output.
@@ -1132,7 +1143,7 @@ public:
 	 * \note For proportional fonts, the width value should be an approximate average
 	 *   character width.
 	 */
-	virtual DWORD GetCharSize () { assert(false); return 0; }
+	virtual oapi::UInt32 GetCharSize () { assert(false); return 0; }
 
 	/**
 	 * \brief Return the width of a text string in the currently selected font.
@@ -1144,7 +1155,7 @@ public:
 	 * \note If the user provides a Windows-1252 encoded string, an heuristic is used
 	 *   that *may* provide the expected result
 	 */
-	virtual DWORD GetTextWidth (const char *str, int len = 0) { assert(false); return 0; }
+	virtual oapi::UInt32 GetTextWidth (const char *str, int len = 0) { assert(false); return 0; }
 
 	/**
 	 * \brief Set the position in the surface bitmap which is mapped to the
@@ -1214,7 +1225,7 @@ public:
 	 * \param y y-coordinate of point [pixel]
 	 * \param col pixel colour (format: 0xBBGGRR)
 	 */
-	virtual void Pixel (int x, int y, DWORD col) { assert(false); }
+	virtual void Pixel (int x, int y, oapi::UInt32 col) { assert(false); }
 
 	/**
 	 * \brief Move the drawing reference to a new point.
@@ -1286,7 +1297,7 @@ public:
 	 * \param pt list of vertex points
 	 * \param npt number of points in the list
 	 * \default None.
-	 * \note Implementations should draw the outline of the 
+	 * \note Implementations should draw the outline of the
 	 *   polygon with the current pen, and fill it with the
 	 *   current brush.
 	 * \note The polygon should be closed, i.e. the last point
@@ -1350,7 +1361,7 @@ public:
 	 * \brief Obsolete function. Will return NULL.
 	 * \return NULL
 	 */
-	virtual HDC GetDC() { return NULL; }
+	virtual oapi::SdkDrawContext GetDC() { return NULL; }
 
 	/**
 	 * \brief Draw a text string using WCHAR.
@@ -1366,7 +1377,7 @@ public:
 	* \brief [DX9] Get a render surface size in pixels
 	* \param size Pointer to SIZE structure receiving the size
 	*/
-	virtual void GetRenderSurfaceSize(LPSIZE size) { assert(false); }
+	virtual void GetRenderSurfaceSize(oapi::SdkSizePtr size) { assert(false); }
 
 	/**
 	* \brief [DX9] Setup a quick pen, removes any other pen from use. Set to zero to disable a pen from use.
@@ -1374,13 +1385,13 @@ public:
 	* \param width Pen width in pixels
 	* \param style 0 = Disabled, 1 = Solid, 2 = Dashed
 	*/
-	virtual void QuickPen(DWORD color, float width = 1.0f, DWORD style = 1) { assert(false); }
+	virtual void QuickPen(oapi::UInt32 color, float width = 1.0f, oapi::UInt32 style = 1) { assert(false); }
 
 	/**
 	* \brief [DX9] Setup a quick brush, removes any other brush from use. Set to zero to disable a brush from use.
 	* \param color Brush color in 0xAABBGGRR
 	*/
-	virtual void QuickBrush(DWORD color) { assert(false); }
+	virtual void QuickBrush(oapi::UInt32 color) { assert(false); }
 
 	/**
 	* \brief [DX9] Set up a global line width scale factor
@@ -1437,7 +1448,7 @@ public:
 	* \brief [DX9] Set up a screen space clip rectangle. Usefull when need to draw in a smaller sub section of the render target.
 	* \param pClip A pointer to clipping rectangle, Set to NULL to disable clipping.
 	*/
-	virtual void ClipRect(const LPRECT pClip = NULL) { assert(false); }
+	virtual void ClipRect(const oapi::SdkRectanglePtr pClip = NULL) { assert(false); }
 
 	/**
 	* \brief [DX9] Set up a world space clip cone to clip pixels within it. Does not work with orthographic projection.
@@ -1465,8 +1476,8 @@ public:
 	 * \return \e true on success, \e false on failure.
 	 * \default None, returns false.
 	 */
-	virtual bool TextW(int x, int y, const LPWSTR str, int len) { return false; }
-	
+	virtual bool TextW(int x, int y, const oapi::SdkWideText str, int len) { return false; }
+
 	/**
 	* \brief [DX9] Draws a mesh group or entire mesh in the render target.
 	* \param hMesh Pointer to mesh containing the geometry.
@@ -1480,8 +1491,8 @@ public:
 	* \note Final color = Texture Color * Material Color, only diffure material is in use.
 	* \note To draw the entire mesh at once, use MeshFlags::RENDER_ALL flag.
 	*/
-	virtual int DrawMeshGroup(const MESHHANDLE hMesh, DWORD grp, MeshFlags flags = MeshFlags::SMOOTH_SHADE, const SURFHANDLE hTex = NULL) { assert(false); return -2; }
-	
+	virtual int DrawMeshGroup(const MESHHANDLE hMesh, oapi::UInt32 grp, MeshFlags flags = MeshFlags::SMOOTH_SHADE, const SURFHANDLE hTex = NULL) { assert(false); return -2; }
+
 	/**
 	* \brief [DX9] Copy 'Blit' a rectangle
 	* \param hSrc Source surface handle
@@ -1490,7 +1501,7 @@ public:
 	* \param ty Target y-coordinate
 	* \note Can alpha-blend and mirror by a use of negative width/height in source rectangle
 	*/
-	virtual void CopyRect(const SURFHANDLE hSrc, const LPRECT src, int tx, int ty) { assert(false); }
+	virtual void CopyRect(const SURFHANDLE hSrc, const oapi::SdkRectanglePtr src, int tx, int ty) { assert(false); }
 
 	/**
 	* \brief [DX9] Copy 'Blit' a rectangle
@@ -1499,7 +1510,7 @@ public:
 	* \param tgt Target rectangle, (or NULL for whole surface)
 	* \note Can alpha-blend and mirror by a use of negative width/height in source rectangle
 	*/
-	virtual void StretchRect(const SURFHANDLE hSrc, const LPRECT src = NULL, const LPRECT tgt = NULL) { assert(false); }
+	virtual void StretchRect(const SURFHANDLE hSrc, const oapi::SdkRectanglePtr src = NULL, const oapi::SdkRectanglePtr tgt = NULL) { assert(false); }
 
 	/**
 	* \brief [DX9] Copy 'Blit' a rectangle with rotation and scaling
@@ -1513,7 +1524,7 @@ public:
 	* \note Does not change or effect in SetWorldTransform()
 	* \note Can alpha-blend, should be able to mirror via negative scale factor.
 	*/
-	virtual void RotateRect(const SURFHANDLE hSrc, const LPRECT src, int cx, int cy, float angle = 0.0f, float sw = 1.0f, float sh = 1.0f) { assert(false); }
+	virtual void RotateRect(const SURFHANDLE hSrc, const oapi::SdkRectanglePtr src, int cx, int cy, float angle = 0.0f, float sw = 1.0f, float sh = 1.0f) { assert(false); }
 
 	/**
 	* \brief [DX9] Copy 'Blit' a rectangle using a color-key stored in a source surface.
@@ -1524,7 +1535,7 @@ public:
 	* \note ColorKey() does not work properly with SetWorldTransform() due to color interpolation
 	* \note Can mirror by a use of negative width/height in source rectangle
 	*/
-	virtual void ColorKey(const SURFHANDLE hSrc, const LPRECT src, int tx, int ty) { assert(false); }
+	virtual void ColorKey(const SURFHANDLE hSrc, const oapi::SdkRectanglePtr src, int tx, int ty) { assert(false); }
 
 	/**
 	* \brief [DX9] Write a line of text using text scaling and rotation
@@ -1545,7 +1556,7 @@ public:
 	* \param flags (reserved for later use, set to zero for now)
 	* \sa gcCreatePoly, gcDeletePoly
 	*/
-	virtual void DrawPoly(const HPOLY hPoly, DWORD flags = 0) { assert(false); }
+	virtual void DrawPoly(const HPOLY hPoly, oapi::UInt32 flags = 0) { assert(false); }
 
 	/**
 	* \brief [DX9] Draw a list of independent lines. 0-1, 2-3, 4-5,...
@@ -1646,7 +1657,7 @@ public:
 	* \param c2 Right or Bottom color
 	* \param bVertical Direction of the gradient.
 	*/
-	virtual void GradientFillRect(const LPRECT tgt, DWORD c1, DWORD c2, bool bVertical = false) { assert(false); }
+	virtual void GradientFillRect(const oapi::SdkRectanglePtr tgt, oapi::UInt32 c1, oapi::UInt32 c2, bool bVertical = false) { assert(false); }
 
 	virtual int GetVersion() { return 1; }
 
@@ -1655,12 +1666,12 @@ public:
 	* \param color Fill color
 	* \param tgt a Rect specifying the bounds, NULL for entire surface
 	*/
-	virtual void ColorFill(DWORD color, const LPRECT tgt) { assert(false); }
+	virtual void ColorFill(oapi::UInt32 color, const oapi::SdkRectanglePtr tgt) { assert(false); }
 
 	/**
-	* \brief [DX9] Drawing function designed for drawing GUI elements. Buttons, Windows, Boxes, etc..  
+	* \brief [DX9] Drawing function designed for drawing GUI elements. Buttons, Windows, Boxes, etc..
 	*/
-	virtual void StretchRegion(const skpRegion* rgn, const SURFHANDLE hSrc, const LPRECT out) { assert(false); }
+	virtual void StretchRegion(const skpRegion* rgn, const SURFHANDLE hSrc, const oapi::SdkRectanglePtr out) { assert(false); }
 
 	/**
 	* \brief [DX9] Copy 'Blit' a tetragon
@@ -1668,8 +1679,8 @@ public:
 	* \param sr Source rectangle, (or NULL for whole surface)
 	* \param pt Pointer to an array of 4 FVECTOR2 target points forming shape of the tetragon.
 	*/
-	virtual void CopyTetragon(const SURFHANDLE hSrc, const LPRECT sr, const FVECTOR2 pt[4]) { assert(false); }
-	virtual void FillTetragon(DWORD color, const FVECTOR2 pt[4]) { assert(false); }
+	virtual void CopyTetragon(const SURFHANDLE hSrc, const oapi::SdkRectanglePtr sr, const FVECTOR2 pt[4]) { assert(false); }
+	virtual void FillTetragon(oapi::UInt32 color, const FVECTOR2 pt[4]) { assert(false); }
 
 	/**
 	* \brief [DX9] Enable and Disable color compatibility mode where Pen/Brush Alpha value 0x00 is translated to 0xFF
@@ -1683,7 +1694,7 @@ public:
 	* \param bColor if true, fills the background with 'color'
 	* \param bDepth if true, clears the depth buffer (if exists)
 	*/
-	virtual void Clear(DWORD color = 0, bool bColor = true, bool bDepth = true) { assert(false); }
+	virtual void Clear(oapi::UInt32 color = 0, bool bColor = true, bool bDepth = true) { assert(false); }
 
 	/**
 	* \brief [DX9] Set near/far clip distances
@@ -1697,7 +1708,7 @@ public:
 	* \param wpos Camera centric location in ECL frame.
 	* \param scl Drawing scale factor.
 	* \param bFixed If 'true' drawing will retain a constant size recardless of camera distance. (One drawing unit is aprox. one pixel)
-	* \param index Direction of drawing stace x-axis in ecliptic frame. If 'NULL' drawing is orientated with screen (i.e. display) 
+	* \param index Direction of drawing stace x-axis in ecliptic frame. If 'NULL' drawing is orientated with screen (i.e. display)
 	* \Note Only works in perspective projection
 	*/
 	virtual void SetWorldBillboard(const FVECTOR3& wpos, float scl = 1.0f, bool bFixed = true, const FVECTOR3 *index = NULL) { assert(false); }
@@ -1707,4 +1718,7 @@ private:
 
 } // namespace oapi
 
+#ifndef _WIN32
+#undef OAPIFUNC
+#endif
 #endif // !__DRAWAPI_H

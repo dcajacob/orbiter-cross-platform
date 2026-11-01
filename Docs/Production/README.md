@@ -5,6 +5,11 @@ POC using the restricted `SimulationSession` and procedural geometry. Its
 [accepted evidence](../../Tests/Portable/ClientVerification/README.md) remains
 valid for that scope. It does not count as production engine/client integration.
 
+The [native production external view](NativeExternalView.md) now runs actual
+Sol, ISS and source-built ShuttlePB with the shared OpenGL renderer on the laptop.
+Its local state/camera/landmark checks and full-image SSIM pass the frozen Windows
+budgets. It is separate from the POC and remains narrower than the stock release.
+
 ## Frozen scope and starting point
 
 The release uses the existing `PlanetarySystem`, `Body`, `RigidBody`, `Vessel`,
@@ -45,28 +50,28 @@ may satisfy a production acceptance case.
 | --- | --- | --- |
 | Vecmat, elements, two-body RK4 | Verified restricted fixtures | Preserve frozen references unchanged |
 | Window/input/procedural view | POC only | Native production window, input and real graphics client |
-| Production world and session | Shared frame ordering and actual celestial `PlanetarySystem`, `Body`/`RigidBody`/`CelestialBody`/`Star`/`Planet`/`Base`/`VesselBase`; native vessels/camera/full session unavailable | Existing lifecycle, shared engine library and platform services |
-| SPICE Solar System | Actual native celestial modules; hosted Windows/Linux Debug/Release direct-callback parity passes, full world integration pending | Current `Src/Celbody/SPICE`, CSPICE, `orbiter.bsp`, TLS/PCK and coverage verification |
-| Native module ABI | Internal loader/bootstrap and actual celestial/atmosphere APIs with SDK-build and toolchain checks; native vessel SDK unavailable | Source-built vessels, celbodies, atmospheres, plugins; version/toolchain check |
-| Real stock meshes/materials/animations | Production CPU `Mesh`/`MeshManager`; world/animation integration unavailable | Existing CPU mesh data separated from D3D resources; actual group identities |
+| Production world and session | Shared frame ordering and actual celestial `PlanetarySystem`, `Body`/`RigidBody`/`CelestialBody`/`Star`/`Planet`/`Base`/`VesselBase`; actual native Vessel/Camera/Session external view added; general application integration pending | Existing lifecycle, shared engine library and platform services |
+| SPICE Solar System | Actual native celestial modules; hosted Windows/Linux Debug/Release direct-callback parity passes, actual native Sol world/external-view integration added | Current `Src/Celbody/SPICE`, CSPICE, `orbiter.bsp`, TLS/PCK and coverage verification |
+| Native module ABI | Internal loader/bootstrap and actual celestial/atmosphere APIs with SDK-build and toolchain checks; checked source-built ShuttlePB/native vessel SDK added | Source-built vessels, celbodies, atmospheres, plugins; version/toolchain check |
+| Real stock meshes/materials/animations | Production CPU `Mesh`/`MeshManager`; actual stock external meshes/materials/animations integrated for ISS/PB | Existing CPU mesh data separated from D3D resources; actual group identities |
 | Planet tiles and elevation | Shared archive reader and actual elevation manager; frozen Windows/Linux direct-query parity passes; native planet/base component verification added | Portable fixed-width archives, 64-bit offsets; engine contact queries independent of visibility |
-| Resource resolution | Indexed service; production world integration pending | Indexed Windows-separator/case-insensitive resolver with ambiguous alias errors |
-| Texture loading | Unsupported in production | Signature-based DDS DXT1/3/5 and uncompressed formats; BMP in `.dds` files |
-| Propulsion, RCS, atmosphere, docking, contacts | Unsupported in native application | Preserve original systems; production references before extraction |
+| Resource resolution | Indexed resolver integrated with native production configuration/meshes/textures | Indexed Windows-separator/case-insensitive resolver with ambiguous alias errors |
+| Texture loading | Shared real OpenGL decoder exercised with stock external assets | Signature-based DDS DXT1/3/5 and uncompressed formats; BMP in `.dds` files |
+| Propulsion, RCS, atmosphere, docking, contacts | Original native Vessel and atmosphere; component RCS/autopilot and rendered orbit states pass; interactive flight/contact cases pending | Preserve original systems; production references before extraction |
 | HUD/MFD/2D panels/VC/Sketchpad | Unsupported | Original instruments, redraws, surfaces, fonts/TextW, picking and interaction |
 | Lua, tutorials, playback, editor, audio | Unsupported | Bundled modules/scripts and portable views over existing logic |
 | Installation and assets | POC fixture bundle only | Relocatable runtime, native SDK, verified/offline/resumable separate asset installer |
 
 [Graphics callback inventory](graphics-capabilities.csv) and
 [Sketchpad method inventory](sketchpad-capabilities.csv) explicitly record
-unsupported native callbacks and known donor defects. `clbkLoadSurface` and
-`clbkMeshMaterial` terminate the donor process; TextW aborts; surface flags and
-material layout copying need repair. Call coverage must establish which optional
-callbacks the pinned stock corpus actually requires. Silent no-op success is
-not an implementation. The isolated renderer source is now selectively imported; its current-SDK
-Windows external-view integration now passes hosted execution. The donor
-SDK/core/math changes are excluded. [The real-client evidence](WindowsClient.md)
-records its tested scope; native Linux capabilities in the table remain separate.
+native delivery status and the original donor defects. The inherited fatal surface,
+material and TextW implementations were repaired for the real Windows client;
+the shared renderer now also runs natively. Current native coverage is the narrow
+external view. Instrumentation, panel/VC redraws, advanced Sketchpad calls and
+full stock call coverage still require their own gates. Silent no-op success is
+not an implementation. The donor SDK/core/math changes are excluded.
+[Windows evidence](WindowsClient.md) and [native evidence](NativeExternalView.md)
+record their separate tested scopes.
 
 Other dependencies: DirectX June 2010 and Windows SDK/MSVC for preserved Windows
 builds; Lua and LuaFileSystem/Penlight; atmosphere modules; miniaudio/XRSound;

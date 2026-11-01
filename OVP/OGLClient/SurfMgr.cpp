@@ -153,7 +153,7 @@ if (range.tumin != 0 || range.tumax != 1) {
 		vb = mesh.vb; // use vertex buffer directly
 	} else {
 		if (!tile->vtx) {
-			D3DVERTEXBUFFERDESC vbd = 
+			D3DVERTEXBUFFERDESC vbd =
 				{ sizeof(D3DVERTEXBUFFERDESC), vbMemCaps | D3DVBCAPS_WRITEONLY, FVF_2TEX, mesh.nv };
 			gc->GetDirect3D7()->CreateVertexBuffer (&vbd, &tile->vtx, 0);
 			ApplyPatchTextureCoordinates (mesh, tile->vtx, range);
