@@ -8,7 +8,9 @@ valid for that scope. It does not count as production engine/client integration.
 The [native production external view](NativeExternalView.md) now runs actual
 Sol, ISS and source-built ShuttlePB with the shared OpenGL renderer on the laptop.
 Its local state/camera/landmark checks and full-image SSIM pass the frozen Windows
-budgets. It is separate from the POC and remains narrower than the stock release.
+budgets. The [native orbital flight host](NativeFlight.md) adds keyboard/joystick
+control paths, independent timing and original docking/persistence. These remain
+narrower deliveries than the stock release.
 
 ## Frozen scope and starting point
 
@@ -49,7 +51,7 @@ may satisfy a production acceptance case.
 | Capability | Current native implementation | Release requirement / dependency |
 | --- | --- | --- |
 | Vecmat, elements, two-body RK4 | Verified restricted fixtures | Preserve frozen references unchanged |
-| Native window and input | Production external view with camera orbit/zoom; flight-device input pending. Procedural viewer remains a separate POC | Native production window, flight input and real graphics client |
+| Native window and input | Production orbital flight host with camera, keyboard and raw joystick control paths; controller hardware acceptance pending. Procedural viewer remains a separate POC | Native production window, flight input and real graphics client |
 | Production world and session | Shared frame ordering and actual celestial `PlanetarySystem`, `Body`/`RigidBody`/`CelestialBody`/`Star`/`Planet`/`Base`/`VesselBase`; actual native Vessel/Camera/Session external view added; general application integration pending | Existing lifecycle, shared engine library and platform services |
 | SPICE Solar System | Actual native celestial modules; hosted Windows/Linux Debug/Release direct-callback parity passes, actual native Sol world/external-view integration added | Current `Src/Celbody/SPICE`, CSPICE, `orbiter.bsp`, TLS/PCK and coverage verification |
 | Native module ABI | Internal loader/bootstrap and actual celestial/atmosphere APIs with SDK-build and toolchain checks; checked source-built ShuttlePB/native vessel SDK added | Source-built vessels, celbodies, atmospheres, plugins; version/toolchain check |
@@ -95,7 +97,7 @@ NRLMSISE C package; its author notice is retained.
 | 2 | Real Windows OpenGL client | Hosted Debug/Release execution passed; actual Sol/ISS/ShuttlePB, deterministic images/states, normal teardown. [Evidence and commands](WindowsClient.md) |
 | 3 | Production engine/platform boundary | Native shared production world, original Vessel/Camera/Session and checked source-built modules now build and run. General application, instrumentation and module coverage remain in progress. [Scope and remaining gates](EngineBoundary.md) |
 | 4 | Native real world/external client | Narrow Sol/ISS/ShuttlePB external view runs on laptop Wayland and hosted Ubuntu 24.04 Debug/Release. Current Windows application/client and frozen state/image/landmark checks pass. General compatibility, repeated in-process sessions and remaining hardware gates are still open. [Evidence](NativeExternalView.md) |
-| 5 | Usable flight and interaction | Not started; propulsion, fuel, all RCS axes, autopilot, docking, contact, persistence |
+| 5 | Usable flight and interaction | Orbital ShuttlePB flight implemented: original propulsion/RCS/autopilot, independent timing, docking and stock persistence have local Windows parity. Native keyboard/window interaction passes. General vessel coverage, atmospheric/contact flights and hardware controller acceptance remain open. [Evidence](NativeFlight.md) |
 | 6 | Cockpit and Delta-glider | Not started; real DG/DG-S 2D/VC, HUD/MFDs, animations and controls |
 | 7 | Practical stock experience | Not started; remaining modules, Lua, audio, scenarios, settings and input configuration |
 | 8 | Packages and release acceptance | Not started; clean install outside checkout, data installer, SDK, all automated and hardware gates |

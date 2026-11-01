@@ -7,12 +7,15 @@ stock asset, graphics-plugin, cockpit or playable Orbiter support.
 
 The [production release work](Docs/Production/README.md) now has separate scope,
 capabilities and gates. The real Windows OpenGL client passes its production
-scene gate. Current work spans production engine extraction and the first native
-external view. Shared production classes and native SPICE/atmosphere modules pass their
+scene gate. The [native orbital flight host](Docs/Production/NativeFlight.md) now
+provides real ShuttlePB controls, independent timing, docking and stock save/reload.
+Hosted Linux Debug/Release flight, keyboard and twenty-session checks pass, as do
+current Windows application/SDK/client and frozen-reference checks. Shared production classes and native SPICE/atmosphere modules pass their
 component checks. The actual native Sol world now loads the original ISS vessel
 and a source-built ShuttlePB through the checked native SDK. The [native production external view](Docs/Production/NativeExternalView.md) now
 renders actual ISS/ShuttlePB and textured Earth on the laptop. Its fixed-camera
-local image passes the existing Windows budget; full stock play remains pending.
+local image passes the existing Windows budget; cockpit instruments, broader
+stock compatibility and release packaging remain pending.
 
 **Milestone complete (2026-10-31): native headless Windows/Linux parity is
 verified.** The command-line runner advances the supported unpowered vessel for

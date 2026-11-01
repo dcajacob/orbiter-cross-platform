@@ -12,6 +12,10 @@ This is a narrow external-view delivery, not the stock-playable release. The old
 procedural replacement vessel, replayed trace, Windows DLL, or Wine supplies this
 production view.
 
+The [native orbital flight host](NativeFlight.md) now extends this accepted
+external-view boundary with controls, timing and persistence. The results below
+preserve the earlier external-view reference scope and launcher.
+
 ## Local evidence and controls
 
 On the current Ubuntu 26.04 laptop, GCC Debug, Mesa Intel Graphics (PTL), OpenGL
@@ -73,11 +77,11 @@ Tests/Production/NativeScene/run-local.sh
 ```
 
 Right-drag orbits the original camera, the wheel zooms, and Escape closes the
-window. Preview starts paused. `--run` advances the production simulation with a
-fixed step per frame for this engineering host. Keyboard/joystick flight input,
-cockpit/HUD/MFD operation, Lua, playback, sound, general scenario compatibility,
-20 sessions in one application process, X11 laptop validation and release
-packaging remain open. Empty cockpit redraw notifications are retained as
+window. This earlier preview starts paused and uses one fixed step per frame
+with `--run`. The newer flight launcher provides independent real-time stepping,
+controls, twenty full-session checks and X11 laptop validation. Cockpit/HUD/MFD
+operation, Lua, normal recording/playback, sound, general scenario compatibility
+and release packaging remain open. Empty cockpit redraw notifications are retained as
 pending flags; no panel or virtual-cockpit areas are registered in this view.
 Requests for unsupported cockpit operations fail explicitly.
 
