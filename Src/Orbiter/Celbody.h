@@ -9,8 +9,12 @@
 #ifndef __CELBODY_H
 #define __CELBODY_H
 
-#include "RigidBody.h"
-#include "OrbiterAPI.h"
+#include "Rigidbody.h"
+#include "OrbiterCelestialData.h"
+#include "Production/CoreTypes.h"
+#include "Production/CelestialServices.h"
+class CELBODY;
+class CELBODY2;
 #include "PinesGrav.h"
 
 // Module interface methods - OBSOLETE
@@ -23,7 +27,8 @@ typedef void   (*OPLANET_AtmPrm)(double alt, ATMPARAM *prm);
 // Class CelestialBody
 // =======================================================================
 
-class CelestialBody: public RigidBody {
+class ORBITER_PRODUCTION_API CelestialBody: public RigidBody {
+friend class orbiter::production::WindowsCelestialServices;
 friend class CELBODY;
 friend class CELBODY2;
 
@@ -48,8 +53,8 @@ public:
 
 	inline const CelestialBody *Primary() const { return cbody; }
 
-	inline DWORD nSecondary() const { return nsecondary; }
-	inline const CelestialBody *Secondary (DWORD i) const { return secondary[i]; }
+	inline orbiter::production::UInt32 nSecondary() const { return nsecondary; }
+	inline const CelestialBody *Secondary (orbiter::production::UInt32 i) const { return secondary[i]; }
 
 	inline double RotT() const { return rot_T; }
 	// rotation period
@@ -115,8 +120,8 @@ public:
 	const Vector &Barycentre () const { return bpos; }
 	// Returns position of barycentre (planet + secondaries)
 
-	inline DWORD nJcoeff() const { return njcoeff; }
-	inline double Jcoeff (DWORD i) const { return jcoeff[i]; }
+	inline orbiter::production::UInt32 nJcoeff() const { return njcoeff; }
+	inline double Jcoeff (orbiter::production::UInt32 i) const { return jcoeff[i]; }
 	// returns number of coefficients and individual coefficients for planet
 	// shape description for nonspherical gravity calculation. Note that the
 	// first coefficient Jcoeff(0) is J2
@@ -136,7 +141,7 @@ protected:
 	double rotation;      // current rotation angle
 	double rotation_off;  // rotation offset due to precession
 
-	DWORD nsecondary;
+	orbiter::production::UInt32 nsecondary;
 	CelestialBody **secondary;
 	// List of secondary bodies (i.e. planets for a central star, or moons for a planet)
 
@@ -197,7 +202,7 @@ protected:
 	} modIntf;
 
 private:
-	HINSTANCE hMod;          // module handle, if available
+	void* hMod;          // module handle, if available
 	
 	double eps_ref;          // precession reference axis: obliquity against ecliptic normal
 	double lan_ref;          // precession reference axis: longitude of ascending node in ecliptic
@@ -219,7 +224,7 @@ private:
 	Vector R_axis;           // rotation axis direction (north pole) in global coords
 
 	double *jcoeff;          // coefficients Jn of the harmonic expansion of planet ellipsoid shape, starting with J2 (jcoeff[0]=J2, jcoeff[1]=J3, etc.)
-	DWORD njcoeff;           // number of coefficients in the jcoeff list
+	orbiter::production::UInt32 njcoeff;           // number of coefficients in the jcoeff list
 
 	PinesGravProp pinesgrav; // coefficients and methods for calculating non-spherical gravity vectors using Pines Algorithm
 	bool usePinesGravity;    // use Pines Algorithm if true, if false use the older jcoeff method

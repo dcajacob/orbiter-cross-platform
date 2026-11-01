@@ -8,21 +8,14 @@
 // precession" in "Orbiter Technical Reference"
 // =======================================================================
 
-#define OAPI_IMPLEMENTATION
-
-#include "Astro.h"
-#include "Orbiter.h"
+#include "AstroMath.h"
 #include "Element.h"
 #include "Celbody.h"
-#include "Log.h"
-#include "Orbitersdk.h"
-#include "PinesGrav.h"
-
+#include "Production/RigidBodyServices.h"
+#include "OrbiterScalar.h"
+#include <cstring>
 using namespace std;
-
-extern Orbiter *g_pOrbiter;
-extern TimeData td;
-extern char DBG_MSG[256];
+using namespace orbiter::production;
 
 void Pol2Crt (double *pol, double *crt, bool dopos, bool dovel);
 void InterpretEphemeris (double *data, int flg, Vector *pos, Vector *vel, Vector *bpos, Vector *bvel);
@@ -34,125 +27,9 @@ CelestialBody::CelestialBody (double _mass, double _size)
 : RigidBody (_mass, _size, Vector (1,1,1)), pinesgrav(NULL)
 {
 	DefaultParam();
-	el = new Elements; TRACENEW
+	el = new Elements(CelestialClock().MJD_ref); GetRigidBodyServices().TraceAllocation(__FILE__,__LINE__);
 	ClearModule();
 	usePinesGravity = false;
-}
-
-CelestialBody::CelestialBody (char *fname)
-: RigidBody (fname), pinesgrav(this)
-{
-	char cbuf[256];
-	int gravcoeff = 0;
-	usePinesGravity = false;
-
-	DefaultParam ();
-	ClearModule ();
-
-	ifstream ifs (g_pOrbiter->ConfigPath (fname));
-	if (!ifs) {
-		LOGOUT_ERR_FILENOTFOUND_MSG(g_pOrbiter->ConfigPath (fname), "while initialising celestial body");
-		g_pOrbiter->TerminateOnError();
-	}
-
-	if (GetItemString (ifs, "Module", cbuf))
-		RegisterModule (cbuf);
-
-	GetItemReal (ifs, "SidRotPeriod", rot_T);
-	GetItemReal (ifs, "SidRotOffset", Dphi);
-	GetItemReal (ifs, "Obliquity", eps_rel);
-	GetItemReal (ifs, "LAN", Lrel0);
-	GetItemReal (ifs, "LAN_MJD", mjd_rel);
-	GetItemReal (ifs, "PrecessionPeriod", prec_T);
-
-	// precession parameters
-	GetItemReal (ifs, "PrecessionObliquity", eps_ref);
-	GetItemReal (ifs, "PrecessionLAN", lan_ref);
-
-	if (GetItemString(ifs, "GravModelPath", cbuf) && GetItemInt(ifs, "GravCoeffCutoff", gravcoeff)) {
-		char gravModelFileName[512];
-		sprintf(gravModelFileName, "GravityModels\\%s",cbuf);
-		int maxGravityTerms = 0;
-		int	actualLoadedTerms = 0;
-		int readResult = 0;
-		readResult = pinesgrav.readGravModel(gravModelFileName, gravcoeff, actualLoadedTerms, maxGravityTerms);
-		if (readResult == 0) {
-			char logbuff[512];
-			sprintf(logbuff, "GRAVITY MODEL: %s LOADED, Terms %d/%d", gravModelFileName, actualLoadedTerms, maxGravityTerms);
-			LOGOUT(logbuff);
-		}
-		else if (readResult == 1) {
-			char logbuff[512];
-			sprintf(logbuff, "GRAVITY MODEL ERROR: COEFFICIENT FILE %s NOT FOUND", gravModelFileName);
-			LOGOUT(logbuff);
-		}
-		else if (readResult == 2) {
-			char logbuff[512];
-			sprintf(logbuff, "GRAVITY MODEL ERROR: COULD NOT ALLOCATE SPACE FOR GRAVITY MODEL %s", gravModelFileName);
-			LOGOUT(logbuff);
-		}
-		else if (readResult == 3) {
-			char logbuff[512];
-			sprintf(logbuff, "GRAVITY MODEL ERROR: BAD HEADDER LINE FORMAT %s", gravModelFileName);
-			LOGOUT(logbuff);
-		}
-		else if (readResult == 4) {
-			char logbuff[512];
-			sprintf(logbuff, "GRAVITY MODEL ERROR: BAD COEFFICIENT LINE FORMAT %s", gravModelFileName);
-			LOGOUT(logbuff);
-		}
-
-		if (readResult == 0) {
-			usePinesGravity = true;
-		}
-	}
-
-	if (GetItemString (ifs, "JCoeff", cbuf)) {
-		char *str;
-		str = strtok (cbuf, " \t");
-		while (str) {
-			double *tmp = new double[njcoeff+1]; TRACENEW
-			if (njcoeff) {
-				memcpy (tmp, jcoeff, njcoeff*sizeof(double));
-				delete []jcoeff;
-			}
-			jcoeff = tmp;
-			sscanf (str, "%lf", jcoeff + njcoeff++);
-			str = strtok (NULL, " \t");
-		}
-	}
-
-	if (GetItemBool (ifs, "HasElements", bInitFromElements) && bInitFromElements) {
-		if (GetItemString (ifs, "ElReference", cbuf) &&
-			!_stricmp (cbuf, "ParentEquator"))
-			elframe = ELFRAME_PARENTEQU;
-		el = new Elements (fname); TRACENEW
-	}
-
-	double prec;
-	if (modIntf.oplanetSetPrecision && GetItemReal (ifs, "ErrorLimit", prec))
-		modIntf.oplanetSetPrecision (prec); // old-style initialisation - OBSOLETE
-
-	GetItemBool (ifs, "EllipticOrbit", bFixedElements);
-	bDynamicPosVel = !bFixedElements;
-
-	if (module) {
-		module->clbkInit ((FILEHANDLE)&ifs);
-		if (module->bEphemeris()) { // ephemerides calculated by module
-			bDynamicPosVel = false;
-			bFixedElements = false;
-		}
-	}
-	if (modIntf.oplanetEphemeris) { // old module interface
-		bDynamicPosVel = false;
-		bFixedElements = false;
-	}
-
-	if (!el) { el = new Elements; TRACENEW }
-
-	Dphi += (td.MJD0 - el->MJDepoch()) * (86400.0/rot_T)*Pi2; // merge rotation at t=0 into offset
-	Dphi += Lrel0*cos(eps_rel); // merge precession state into offset
-	Dphi = fmod (Dphi, Pi2);
 }
 
 CelestialBody::~CelestialBody ()
@@ -180,13 +57,16 @@ void CelestialBody::DefaultParam ()
 	rot_T             = 1e100; // no planet rotation
 	Dphi              = 0.0;
 	njcoeff           = 0;     // shape for gravity calculations: spherical by default
+	jcoeff            = nullptr;
 	cbody             = 0;     // no parent body
 	nsecondary        = 0;     // no child bodies
+	secondary         = nullptr;
 	el                = 0;     // elements undefined
 	elframe           = ELFRAME_ECLIPTIC; // reference frame for elements
 	bInitFromElements = false;
 	hMod              = 0;
 	module            = 0;
+	memset(&modIntf, 0, sizeof(modIntf));
 	bFixedElements = false;
 }
 
@@ -223,7 +103,7 @@ void CelestialBody::Attach (CelestialBody *_parent)
 	if (cbody = _parent) {
 		_parent->AddSecondary (this);
 		// we add ourselves to the parent's list of secondaries
-		el->Setup (mass, cbody->Mass(), td.MJD_ref);
+		el->Setup (mass, cbody->Mass(), CelestialClock().MJD_ref, CelestialClock().MJD_ref);
 
 		int flg = ExternPosition ();
 		if (flg) {
@@ -232,11 +112,11 @@ void CelestialBody::Attach (CelestialBody *_parent)
 			if (!(flg & EPHEM_BARYPOS)) bpos = s0->pos;
 			if (!(flg & EPHEM_BARYVEL)) bvel = s0->vel;
 		} else if (bInitFromElements) {
-			el->PosVel (s0->pos, s0->vel, td.SimT0);
+			el->PosVel (s0->pos, s0->vel, CelestialClock().SimT0);
 			if (elframe == ELFRAME_PARENTEQU) {         // convert to ecliptic frame
 				s0->pos.Set (mul (cbody->R_ecl, s0->pos));  // rotate radius vector by planet's obliquity
 				s0->vel.Set (mul (cbody->R_ecl, s0->vel));  // rotate velocity vector by planet's obliquity
-				el->Calculate (s0->pos, s0->vel, td.SimT0); // update elements with modified state vectors
+				el->Calculate (s0->pos, s0->vel, CelestialClock().SimT0); // update elements with modified state vectors
 			}
 			bpos = s0->pos;
 			bvel = s0->vel;
@@ -258,8 +138,8 @@ void CelestialBody::Attach (CelestialBody *_parent)
 
 void CelestialBody::AddSecondary (CelestialBody *sec)
 {
-	CelestialBody **tmp = new CelestialBody*[nsecondary+1]; TRACENEW
-	memcpy (tmp, secondary, nsecondary*sizeof(CelestialBody*));
+	CelestialBody **tmp = new CelestialBody*[nsecondary+1]; GetRigidBodyServices().TraceAllocation(__FILE__,__LINE__);
+	if (nsecondary) memcpy (tmp, secondary, nsecondary*sizeof(CelestialBody*));
 	if (nsecondary) delete []secondary;
 	secondary = tmp;
 	secondary[nsecondary++] = sec;
@@ -268,8 +148,8 @@ void CelestialBody::AddSecondary (CelestialBody *sec)
 const Elements *CelestialBody::Els () const
 {
 	if (!bFixedElements) {
-		if (cbody) el->Calculate (s0->pos-cbody->GPos(), s0->vel-cbody->GVel(), td.SimT0);
-		else       el->Calculate (s0->pos, s0->vel, td.SimT0);
+		if (cbody) el->Calculate (s0->pos-cbody->GPos(), s0->vel-cbody->GVel(), CelestialClock().SimT0);
+		else       el->Calculate (s0->pos, s0->vel, CelestialClock().SimT0);
 	}
 	return el;
 }
@@ -280,7 +160,7 @@ Vector CelestialBody::Barycentre2Pos (const Vector &bary) const
 	else {
 		Vector b2;
 		double m, mtot = mass;
-		for (DWORD i = 0; i < nsecondary; i++) {
+		for (UInt32 i = 0; i < nsecondary; i++) {
 			mtot += (m = secondary[i]->Mass());
 			b2 += secondary[i]->GPos() * m;
 		}
@@ -292,7 +172,7 @@ Vector CelestialBody::Pos2Barycentre (const Vector &pos) const
 {
 	double m, mtot = mass;
 	Vector b(pos*mass);
-	for (DWORD i = 0; i < nsecondary; i++) {
+	for (UInt32 i = 0; i < nsecondary; i++) {
 		mtot += (m = secondary[i]->Mass());
 		b += secondary[i]->GPos() * m;
 	}
@@ -307,7 +187,7 @@ int CelestialBody::RelTrueAndBaryState()
 	// Return value: 0 if state is calculated with respect to parent true state,
 	// or EPHEM_PARENTBARY if calculated with respect to parent barycentre
 
-	DWORD i;
+	UInt32 i;
 	int flg = EPHEM_TRUEPOS | EPHEM_TRUEVEL;
 	bool havevel;
 	bool havetrue = false, havebary = false;
@@ -354,7 +234,7 @@ int CelestialBody::RelTrueAndBaryState()
 
 		} else {
 
-			el->Update (bpos, bvel);
+			el->Update (bpos, bvel, CelestialClock().SimT1);
 			havebary = true;
 
 		}
@@ -439,7 +319,7 @@ void CelestialBody::Update (bool force)
 		if (flg = ExternPosition()) { // state updated externally
 			el_valid = false;         // need to re-calculate elements
 		} else {                      // propagate elements: use 2-body approximation
-			el->Update (*gpos, *gvel);
+			el->Update (*gpos, *gvel, CelestialClock().SimT1);
 			flg = EPHEM_TRUEPOS | EPHEM_TRUEVEL;
 		}
 
@@ -496,7 +376,7 @@ void CelestialBody::UpdatePrecession ()
 	// Tilt of rotation axis, including precession
 	// See "Planetary axis precession" in "Orbiter Technical Reference" for algorithm
 
-	Lrel = Lrel0 + prec_omega*(td.MJD1-mjd_rel);
+	Lrel = Lrel0 + prec_omega*(CelestialClock().MJD1-mjd_rel);
 	double sinl = sin(Lrel), cosl = cos(Lrel);
 	// R_rel component of R_ref*R_rel
 	Matrix R_ref_rel (cosl, -sinl*sin_eps, -sinl*cos_eps,
@@ -524,7 +404,7 @@ void CelestialBody::UpdateRotation ()
 	// Rotation of object around its local axis of rotation (y-axis)
 	// See "Planetary axis precession" in "Orbiter Technical Reference" for algorithm
 
-	rotation = posangle (Dphi + td.SimT1*rot_omega - Lrel*cos_eps + rotation_off);
+	rotation = orbiter::math::PositiveAngle (Dphi + CelestialClock().SimT1*rot_omega - Lrel*cos_eps + rotation_off, PI2);
 	double cosr = cos(rotation), sinr = sin(rotation);
 	s1->R.Set (cosr, 0.0, -sinr,
 	           0.0,  1.0,  0.0,
@@ -537,8 +417,8 @@ void CelestialBody::UpdateRotation ()
 
 void CelestialBody::GetRotation (double t, Matrix &rot) const
 {
-	// Note: this function assumes current precession, i.e. mjd sufficiently close to td.mjd
-	double r = posangle (Dphi + t*rot_omega - Lrel*cos_eps + rotation_off);
+	// Note: this function assumes current precession, i.e. mjd sufficiently close to CelestialClock().mjd
+	double r = orbiter::math::PositiveAngle (Dphi + t*rot_omega - Lrel*cos_eps + rotation_off, PI2);
 	double cosr = cos(r), sinr = sin(r);
 	rot.Set (cosr, 0.0, -sinr,
 	 	     0.0,  1.0,  0.0,
@@ -550,8 +430,8 @@ void CelestialBody::GetRotation (double t, Matrix &rot) const
 
 int CelestialBody::ExternEphemeris (double mjd, int req, double *res) const
 {
-	if (module)
-		return module->clbkEphemeris (mjd, req, res); // new interface
+	if (GetCelestialServices().HasModule(*this))
+		return GetCelestialServices().Ephemeris(*this, mjd, req, res); // new interface
 	if (modIntf.oplanetEphemeris) {                   // OBSOLETE!
 		int format;
 		modIntf.oplanetEphemeris (mjd, res, format);
@@ -562,8 +442,8 @@ int CelestialBody::ExternEphemeris (double mjd, int req, double *res) const
 
 int CelestialBody::ExternFastEphemeris (double simt, int req, double *res) const
 {
-	if (module) {
-		return module->clbkFastEphemeris (simt, req, res); // new interface
+	if (GetCelestialServices().HasModule(*this)) {
+		return GetCelestialServices().FastEphemeris(*this, simt, req, res); // new interface
 	}
 
 	if (modIntf.oplanetFastEphemeris) {
@@ -580,8 +460,8 @@ int CelestialBody::ExternPosition ()
 	static int req = EPHEM_TRUEPOS | EPHEM_TRUEVEL | EPHEM_BARYPOS | EPHEM_BARYVEL;
 	int flg;
 
-	flg = ExternFastEphemeris (td.SimT1, req, res);
-	if (!flg) flg = ExternEphemeris (td.MJD1, req, res);
+	flg = ExternFastEphemeris (CelestialClock().SimT1, req, res);
+	if (!flg) flg = ExternEphemeris (CelestialClock().MJD1, req, res);
 
 	if (flg) InterpretEphemeris (res, flg, &s0->pos, &s0->vel, &bpos, &bvel);
 
@@ -593,8 +473,8 @@ int CelestialBody::ExternState (double *res)
 	static int req = EPHEM_TRUEPOS | EPHEM_TRUEVEL | EPHEM_BARYPOS | EPHEM_BARYVEL;
 	int flg;
 
-	flg = ExternFastEphemeris (td.SimT1, req, res);
-	if (!flg) flg = ExternEphemeris (td.MJD1, req, res);
+	flg = ExternFastEphemeris (CelestialClock().SimT1, req, res);
+	if (!flg) flg = ExternEphemeris (CelestialClock().MJD1, req, res);
 	return flg;
 }
 
@@ -606,7 +486,7 @@ bool CelestialBody::PositionAtTime (double t, Vector *p) const
 	double res[12];
 	static Vector bp;
 
-	int flg = ExternEphemeris (td.MJD_ref+Day(t), EPHEM_TRUEPOS, res);
+	int flg = ExternEphemeris (CelestialClock().MJD_ref+Day(t), EPHEM_TRUEPOS, res);
 	if (flg) {
 		InterpretEphemeris (res, flg, p, 0, &bp, 0);
 		if (!(flg & EPHEM_TRUEPOS)) *p = bp; // fudge: return barycentre pos
@@ -630,7 +510,7 @@ bool CelestialBody::PosVelAtTime (double t, Vector *p, Vector *v) const
 	double res[12];
 	static Vector bp, bv;
 
-	int flg = ExternEphemeris (td.MJD_ref+Day(t), EPHEM_TRUEPOS | EPHEM_TRUEVEL, res);
+	int flg = ExternEphemeris (CelestialClock().MJD_ref+Day(t), EPHEM_TRUEPOS | EPHEM_TRUEVEL, res);
 	if (flg) {
 		InterpretEphemeris (res, flg, p, v, &bp, &bv);
 		if (!(flg & EPHEM_TRUEPOS)) *p = bp;
@@ -695,88 +575,28 @@ Vector CelestialBody::InterpolatePosition (double n) const
 StateVectors CelestialBody::InterpolateState (double n) const
 {
 	// Celestial body state vectors at fractional time n [0..1] between
-	// s0 at td.SimT0 and s1 at td.SimT1
+	// s0 at CelestialClock().SimT0 and s1 at CelestialClock().SimT1
 	// Note: n > 0 is only allowed during the update phase (between 
 	// BeginStateUpdate and EndStateUpdate)
 
 	if (!n) return *s0;
-	dCHECK(s1, "Update state not available")
+	GetBodyServices().CheckUpdateState(s1 != nullptr);
 	if (n == 1.0) return *s1;
 
 	StateVectors sv;
 	sv.pos = InterpolatePosition (n);
 	sv.vel = s0->vel*(1.0-n) + s1->vel*n; // may need a better interpolation
-	GetRotation (td.SimT0 + td.SimDT*n, sv.R);
+	GetRotation (CelestialClock().SimT0 + CelestialClock().SimDT*n, sv.R);
 	sv.Q.Set (sv.R);
 	sv.omega.Set (s0->omega*(1.0-n) + s1->omega*n); // is this ok?
 	return sv;
 }
 
-void CelestialBody::RegisterModule (char *dllname)
-{
-	char cbuf[256];
-	module = 0;                              // reset new interface
-	memset (&modIntf, 0, sizeof (modIntf));  // reset old interface
-	sprintf (cbuf, "Modules\\Celbody\\%s.dll", dllname); // try new module location
-	hMod = LoadLibrary (cbuf);
-	if (!hMod) {
-		sprintf (cbuf, "Modules\\%s.dll", dllname);  // try legacy module location
-		hMod = LoadLibrary (cbuf);
-	}
-	if (!hMod) {
-		// A body whose module cannot be loaded falls back to its config elements, or, if it has none, to a
-		// dynamic integration from a zero relative state; both are wrong silently, so the failure is logged
-		// with the meaning of the two usual causes: a DLL built for the other architecture, and a DLL whose
-		// runtime library (for example an older Visual C++ redistributable) is not installed.
-		const DWORD err = GetLastError();
-		const char *hint = (err == ERROR_BAD_EXE_FORMAT) ? ": the DLL was built for a different architecture than this Orbiter" :
-		                   (err == ERROR_MOD_NOT_FOUND)  ? ": the DLL or one of its dependencies, such as a runtime library it was built against, is missing" : "";
-		LOGOUT_WARN("Celestial body %s: ephemeris module %s.dll could not be loaded (Windows error %lu%s); the body falls back to the orbital elements in its config file, if it has any", name.c_str(), dllname, err, hint);
-		return;
-	}
-
-	// Check if the module provides instance initialisation
-	typedef CELBODY* (*INITPROC)(OBJHANDLE);
-	INITPROC init_proc = (INITPROC)GetProcAddress (hMod, "InitInstance");
-	if (init_proc) { // load interface class
-
-		module = init_proc ((OBJHANDLE)this);
-
-	} else {         // check for old-style interface
-		string funcname;
-
-		funcname = name + "_SetPrecision";
-		modIntf.oplanetSetPrecision = (OPLANET_SetPrecision)GetProcAddress (hMod, funcname.c_str());
-
-		funcname = name + "_Ephemeris";
-		modIntf.oplanetEphemeris = (OPLANET_Ephemeris)GetProcAddress (hMod, funcname.c_str());
-
-		funcname = name + "_FastEphemeris";
-		modIntf.oplanetFastEphemeris = (OPLANET_FastEphemeris)GetProcAddress (hMod, funcname.c_str());
-
-		funcname = name + "_AtmPrm";
-		modIntf.oplanetAtmPrm = (OPLANET_AtmPrm)GetProcAddress (hMod, funcname.c_str());
-	}
-}
+void CelestialBody::RegisterModule (char *name)
+{ GetCelestialServices().RegisterModule(*this, name); }
 
 void CelestialBody::ClearModule ()
-{
-	if (hMod) {
-		if (module) { // new interface
-			typedef void (*EXITPROC)(CELBODY*);
-			EXITPROC exit_proc = (EXITPROC)GetProcAddress (hMod, "ExitInstance");
-			if (exit_proc) { // allow module to clean up
-				exit_proc (module);
-			} else {         // no cleanup - we delete the interface class here
-				delete module;
-			}
-			module = 0;
-		}
-		FreeLibrary (hMod);
-		hMod = 0;
-	}
-	memset (&modIntf, 0, sizeof (modIntf)); // old interface
-}
+{ GetCelestialServices().ClearModule(*this); }
 
 // =======================================================================
 // Nonmember functions
@@ -850,157 +670,5 @@ void InterpretEphemeris (double *data, int flg, Vector *pos, Vector *vel, Vector
 			bvel->z = p[5];
 		}
 	}
-}
-
-// =======================================================================
-// Class CELBODY: API interface class
-
-CELBODY::CELBODY ()
-{ version = 1; }
-
-bool CELBODY::bEphemeris () const
-{ return false; }
-
-void CELBODY::clbkInit (FILEHANDLE cfg)
-{}
-
-int CELBODY::clbkEphemeris (double mjd, int req, double *ret)
-{ return 0; }
-
-int CELBODY::clbkFastEphemeris (double simt, int req, double *ret)
-{ return 0; }
-
-bool CELBODY::clbkAtmParam (double alt, ATMPARAM *prm)
-{ return false; }
-
-void CELBODY::Pol2Crt (double *pol, double *crt)
-{
-	::Pol2Crt (pol, crt, true, true);
-}
-
-
-// =======================================================================
-// class CELBODY2: API interface class
-
-CELBODY2::CELBODY2 (OBJHANDLE hCBody): CELBODY ()
-{
-	version++;
-	hBody = hCBody;
-	atm = NULL;
-	hAtmModule = NULL;
-}
-
-CELBODY2::~CELBODY2 ()
-{
-	FreeAtmosphere();
-}
-
-void CELBODY2::clbkInit (FILEHANDLE cfg)
-{
-	CELBODY::clbkInit (cfg);
-
-	// Load external atmosphere modules
-	if (!hAtmModule) {
-		// 1: try Config\<Name>\Atmosphere.cfg for interactive setting
-		char fname[256], name[256];
-		oapiGetObjectName (hBody, name, 256);
-		strcat (name, "\\Atmosphere.cfg");
-		FILEHANDLE hFile = oapiOpenFile (name, FILE_IN, CONFIG);
-		if (oapiReadItem_string (hFile, (char*)"MODULE_ATM", fname) || oapiReadItem_string (cfg, (char*)"MODULE_ATM", fname)) {
-			if (_stricmp (fname, "[None]"))
-				LoadAtmosphereModule (fname);
-		}
-		oapiCloseFile (hFile, FILE_IN);
-	}
-}
-
-OBJHANDLE CELBODY2::GetParent () const
-{
-	return (OBJHANDLE)((CelestialBody*)hBody)->cbody;
-}
-
-OBJHANDLE CELBODY2::GetChild (DWORD idx) const
-{
-	CelestialBody *cbody = (CelestialBody*)hBody;
-	if (idx < cbody->nsecondary) return (OBJHANDLE)cbody->secondary[idx];
-	else                         return NULL;
-}
-
-void CELBODY2::SetAtmosphere (ATMOSPHERE *a)
-{
-	FreeAtmosphere(); // unload existing atmosphere instance
-	atm = a;
-}
-
-bool CELBODY2::FreeAtmosphere ()
-{
-	if (!atm) return false;
-	if (!FreeAtmosphereModule()) {
-		delete atm;
-		atm = 0;
-	}
-	return true;
-}
-
-bool CELBODY2::LoadAtmosphereModule (const char *fname)
-{
-	char path[256], name[256];
-	oapiGetObjectName (hBody, name, 256);
-	sprintf (path, "Modules\\Celbody\\%s\\Atmosphere", name);
-	if (!(hAtmModule = g_pOrbiter->LoadModule (path, fname))) return false;
-	ATMOSPHERE *(*func)(CELBODY2*) = (ATMOSPHERE*(*)(CELBODY2*))GetProcAddress (hAtmModule, "CreateAtmosphere");
-	if (!func) {
-		g_pOrbiter->UnloadModule (fname);
-		hAtmModule = NULL;
-		return false;
-	}
-	atm = func(this);
-	return true;
-}
-
-bool CELBODY2::FreeAtmosphereModule ()
-{
-	if (!hAtmModule) return false;
-	if (atm) {
-		void (*func)(ATMOSPHERE*) = (void(*)(ATMOSPHERE*))GetProcAddress(hAtmModule, "DeleteAtmosphere");
-		if (func) {
-			func (atm);
-		} else {
-			// no instance destruction support in module - let's do it ourselves
-			delete atm;
-		}
-		atm = 0;
-	}
-	g_pOrbiter->UnloadModule (hAtmModule);
-	hAtmModule = NULL;
-	return true;
-}
-
-double CELBODY2::SidRotPeriod () const
-{
-	return ((CelestialBody*)hBody)->rot_T;
-}
-
-
-// =======================================================================
-// class ATMOSPHERE: API interface class
-
-ATMOSPHERE::ATMOSPHERE (CELBODY2 *body)
-{
-	cbody =  body;
-}
-
-bool ATMOSPHERE::clbkConstants (ATMCONST *atmc) const
-{
-	// Some Earth defaults. Probably not very useful in general, but
-	// we want to make sure they are set to physical values.
-	atmc->R = 286.91;
-	atmc->gamma = 1.4;
-	return false;
-}
-
-bool ATMOSPHERE::clbkParams (const PRM_IN *prm_in, PRM_OUT *prm_out)
-{
-	return false;
 }
 

@@ -37,6 +37,7 @@
 #include "Production/WindowsSession.h"
 #include "Production/WindowsBodyServices.h"
 #include "Production/WindowsRigidBodyServices.h"
+#include "Production/WindowsCelestialServices.h"
 #include "Production/WindowsMeshServices.h"
 #include "Launchpad.h"
 #include "MenuInfoBar.h"
@@ -270,6 +271,7 @@ Orbiter::Orbiter () : worldFactory(*this), world(worldFactory)
 	orbiter::production::BindMeshServices(orbiter::production::WindowsMeshServices(*this));
 	orbiter::production::BindBodyServices(&orbiter::production::GetWindowsBodyServices());
 	orbiter::production::BindRigidBodyServices(&orbiter::production::GetWindowsRigidBodyServices());
+	orbiter::production::BindCelestialServices(&orbiter::production::GetWindowsCelestialServices());
 	// override base class defaults
     //m_bAppUseZBuffer  = TRUE;
     //m_fnConfirmDevice = ConfirmDevice;
@@ -350,6 +352,7 @@ Orbiter::~Orbiter ()
 	meshmanager.Flush();
 	CloseApp ();
 	orbiter::production::BindMeshServices({});
+	orbiter::production::BindCelestialServices(nullptr);
 	orbiter::production::BindRigidBodyServices(nullptr);
 	orbiter::production::BindBodyServices(nullptr);
 }

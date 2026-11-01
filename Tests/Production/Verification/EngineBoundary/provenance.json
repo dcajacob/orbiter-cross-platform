@@ -155,6 +155,42 @@
         "report": "module-local-linux.json",
         "sha256": "0d749f67977fbd5660dda046935d09ee10657659968e475f905d5f1ee2b87312"
       }
+    },
+    {
+      "component": "pines-gravity",
+      "source": "c73d14777c7d90a0149391153bf32babf8f2a3a1",
+      "runs": {
+        "production": 41282440355,
+        "client": 41282440315,
+        "portable": 41282440466
+      },
+      "status": "passed",
+      "original_comparison_zip_sha256": "e8cc0b02501af0c3481c5e57066b0d16c89148aa168be0bd383039c79a88872c",
+      "preserved_report": "pines-client-comparison.json",
+      "report_sha256": "6a13f99e5600ee54002f5d6e76c91c8fbafaf2b5052437e0bcc1c961b3f48f0a",
+      "native_comparison": {
+        "original_zip_sha256": "c7c1b3bd7ad6c6869dbd151156b696b8be3dad12e0b3998de4fe6766ce94cde5",
+        "preserved_report": "pines-native-parity.json",
+        "report_sha256": "462d96051f6cdfd25853cb61da4667939c63d6a29991d4c1a77012e2a946daa6"
+      },
+      "force_reference": "Tests/Production/Gravity/Reference/provenance.json",
+      "supplemental_reports": [
+        {
+          "file": "pines-gravity-comparison.json",
+          "sha256": "6051241b64db48a9d04a62aa418bdd6b6a4acf27682676bf40c423953985d788",
+          "original_zip_sha256": "d1552b30f12aff21e96244404d70db33cb7b4240bdb7ff50aa5d2db793195394"
+        },
+        {
+          "file": "pines-gravity-debug-build-comparison.json",
+          "sha256": "6051241b64db48a9d04a62aa418bdd6b6a4acf27682676bf40c423953985d788",
+          "original_zip_sha256": "d1552b30f12aff21e96244404d70db33cb7b4240bdb7ff50aa5d2db793195394"
+        },
+        {
+          "file": "pines-gravity-release-build-comparison.json",
+          "sha256": "6051241b64db48a9d04a62aa418bdd6b6a4acf27682676bf40c423953985d788",
+          "original_zip_sha256": "d1552b30f12aff21e96244404d70db33cb7b4240bdb7ff50aa5d2db793195394"
+        }
+      ]
     }
   ]
 }

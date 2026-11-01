@@ -8,6 +8,7 @@
 
 #include "Vecmat.h"
 #include "AstroMath.h"
+#include <istream>
 
 // =======================================================================
 // class Elements
@@ -26,6 +27,7 @@ public:
 
 	Elements (char *fname);
 	// construct from file
+	Elements (std::istream& input, double reference_mjd);
 
 	// Explicit-time entry points used by the portable engine. Legacy overloads
 	// remain application adapters; no object layout or numerical formula changes.
@@ -164,6 +166,7 @@ public:
 	double sino, coso;	// sin and cos of omega
 
 private:
+	void ReadConfiguration(std::istream& input, double reference_mjd);
 	// secondary elements
 	double priv_m;		// mass of orbiter [kg]
 	double priv_M;		// mass of central object [kg]

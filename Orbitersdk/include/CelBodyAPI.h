@@ -29,13 +29,7 @@
 ///  Ephemeris data format bitflags
 // ===========================================================================
 //@{
-#define EPHEM_TRUEPOS     0x01	///< true body position
-#define EPHEM_TRUEVEL     0x02	///< true body velocity
-#define EPHEM_BARYPOS     0x04	///< barycentric position
-#define EPHEM_BARYVEL     0x08	///< barycentric velocity
-#define EPHEM_BARYISTRUE  0x10	///< body has no child objects
-#define EPHEM_PARENTBARY  0x20	///< ephemerides are computed in terms of the barycentre of the parent body's system
-#define EPHEM_POLAR       0x40	///< data is returned in polar format
+#include "OrbiterCelestialData.h"
 //@}
 
 // Used for ephemeris interpolation

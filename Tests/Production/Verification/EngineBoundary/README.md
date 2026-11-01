@@ -20,6 +20,7 @@ and Linux GCC / Windows MSVC x64 Debug/Release portable checks.
 | Mesh count/index validation before narrowing | `24591de6` | [41276717087](https://github.com/dcajacob/orbiter-cross-platform/actions/runs/41276717087) | [41276717080, attempt 2](https://github.com/dcajacob/orbiter-cross-platform/actions/runs/41276717080/attempts/2) | [41276717132](https://github.com/dcajacob/orbiter-cross-platform/actions/runs/41276717132) |
 | Production Camera/PlanetarySystem ownership | `26f0bc37` | [41279054097](https://github.com/dcajacob/orbiter-cross-platform/actions/runs/41279054097) | [41279054051](https://github.com/dcajacob/orbiter-cross-platform/actions/runs/41279054051) | [41279054091](https://github.com/dcajacob/orbiter-cross-platform/actions/runs/41279054091) |
 | Native module loader/bootstrap and actual shared Body fixture | `15867de9` | [41280064395](https://github.com/dcajacob/orbiter-cross-platform/actions/runs/41280064395) | [41280064421](https://github.com/dcajacob/orbiter-cross-platform/actions/runs/41280064421) | [41280064405](https://github.com/dcajacob/orbiter-cross-platform/actions/runs/41280064405) |
+| Original Pines gravity and portable model loading | `c73d1477` | [41282440355](https://github.com/dcajacob/orbiter-cross-platform/actions/runs/41282440355) | [41282440315](https://github.com/dcajacob/orbiter-cross-platform/actions/runs/41282440315) | [41282440466](https://github.com/dcajacob/orbiter-cross-platform/actions/runs/41282440466) |
 
 The preserved `*-client-comparison.json` reports show zero numerical and
 projected-landmark differences and SSIM 1.0 both between configurations and
@@ -88,3 +89,11 @@ rejection of an actual module from a separate engine/SDK build before
 initialization. The matching module completes twenty production Body lifetimes.
 This is an internal bootstrap fixture; native stock module interfaces and a
 complete production world remain outstanding.
+
+The Pines extraction also passes its separately frozen pre-extraction Windows
+force reference: all 864 queries agree exactly across Windows/Linux Debug/Release
+and each executable repeats byte-identically. The twelve independent J2 checks
+pass. `pines-gravity-*.json` reports additionally compare standalone and full
+application builds. The class/file tests cover all seven tracked coefficient
+models and explicit parser/resource failures. These are direct force queries,
+not native Solar System initialization.

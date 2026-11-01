@@ -117,3 +117,22 @@ bool FindLine (istream &is, const char *line)
 	return ok;
 }
 
+
+
+bool GetItemInt (istream &is, const char *label, int &val)
+{
+	char g_cbuf[1024];
+	if (!GetItemString (is, label, g_cbuf)) return false;
+	return (sscanf (g_cbuf, "%d", &val) == 1);
+}
+
+
+bool GetItemBool (istream &is, const char *label, bool &val)
+{
+	char g_cbuf[1024];
+	if (!GetItemString (is, label, g_cbuf)) return false;
+	if (!orbiter::production::ComparePrefix (g_cbuf, "true", 4)) { val = true; return true; }
+	else if (!orbiter::production::ComparePrefix (g_cbuf, "false", 5)) { val = false; return true; }
+	return false;
+}
+

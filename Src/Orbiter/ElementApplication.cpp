@@ -28,15 +28,6 @@ void Elements::Update(Vector &pos, Vector &vel) { Update(pos, vel, td.SimT1); }
 
 Elements::Elements (char *fname)
 {
-	double epoch;
 	ifstream ifs (g_pOrbiter->ConfigPath (fname));
-	if (!GetItemReal (ifs, "Epoch", epoch))           epoch  = 2000.0;
-	mjd_epoch = Jepoch2MJD (epoch);
-	t_epoch   = (mjd_epoch-td.MJD_ref)*86400.0;
-	if (!GetItemReal (ifs, "SemiMajorAxis", a))       a      = 1.0;
-	if (!GetItemReal (ifs, "Eccentricity", e))        e      = 0.0;
-	if (!GetItemReal (ifs, "Inclination", i))         i      = 0.0;
-	if (!GetItemReal (ifs, "LongAscNode", theta))     theta  = 0.0;
-	if (!GetItemReal (ifs, "LongPerihelion", omegab)) omegab = 0.0;
-	if (!GetItemReal (ifs, "MeanLongitude", L))       L      = 0.0;
+	ReadConfiguration(ifs, td.MJD_ref);
 }

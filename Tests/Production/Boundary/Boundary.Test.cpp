@@ -4,6 +4,9 @@
 #include "Production/MeshData.h"
 #include "TimeData.h"
 #include "Body.h"
+#include "OrbiterCelestialData.h"
+#include <cstddef>
+#include <type_traits>
 #include <cmath>
 #include <filesystem>
 #include <fstream>
@@ -12,6 +15,11 @@
 #include <sstream>
 #include <stdexcept>
 #include <vector>
+
+static_assert(std::is_standard_layout<ATMPARAM>::value && sizeof(ATMPARAM)==24 && alignof(ATMPARAM)==8);
+static_assert(offsetof(ATMPARAM,T)==0 && offsetof(ATMPARAM,p)==8 && offsetof(ATMPARAM,rho)==16);
+static_assert(std::is_same<decltype(ATMPARAM::T),double>::value &&
+    std::is_same<decltype(ATMPARAM::p),double>::value && std::is_same<decltype(ATMPARAM::rho),double>::value);
 
 using namespace orbiter::production;
 namespace fs = std::filesystem;

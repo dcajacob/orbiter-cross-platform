@@ -317,11 +317,6 @@ char *readline (istream &is)
 	return 0; // never gets here
 }
 
-bool GetItemInt (istream &is, const char *label, int &val)
-{
-	if (!GetItemString (is, label, g_cbuf)) return false;
-	return (sscanf (g_cbuf, "%d", &val) == 1);
-}
 
 bool GetItemSize(istream& is, const char* label, size_t& val)
 {
@@ -335,13 +330,6 @@ bool GetItemHex (istream &is, const char *label, int &val)
 	return (sscanf (g_cbuf, "%x", &val) == 1);
 }
 
-bool GetItemBool (istream &is, const char *label, bool &val)
-{
-	if (!GetItemString (is, label, g_cbuf)) return false;
-	if (!_strnicmp (g_cbuf, "true", 4)) { val = true; return true; }
-	else if (!_strnicmp (g_cbuf, "false", 5)) { val = false; return true; }
-	return false;
-}
 
 bool GetItemVECTOR (istream &is, const char *label, VECTOR3 &val)
 {

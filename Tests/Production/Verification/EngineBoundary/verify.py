@@ -64,6 +64,10 @@ def verify():
                         'local checks did not pass')
             rejection = report['checks']['independent_build_rejection']
             check(local(BASE, rejection['log']).read_bytes(), rejection['log_sha256'], rejection['log'])
+        for extra in entry.get('supplemental_reports', []):
+            data = local(BASE, extra['file']).read_bytes()
+            check(data, extra['sha256'], extra['file'])
+            require(json.loads(data)['status'] == 'passed', 'supplemental component comparison failed')
 
     evidence = BASE/'Evidence'
     portable = json.loads((evidence/'portable-artifacts.json').read_text())

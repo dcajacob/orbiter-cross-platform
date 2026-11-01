@@ -86,6 +86,34 @@ files, CRLF, corrupt/truncated input, overflow, file release and repeated reload
 These direct force queries do not construct a native Solar System or exercise the
 world's external coordinate transformation.
 
+The original `CelestialBody` class now compiles in the same library. Its
+hierarchy, barycentre calculations, polar conversion, precession, rotation,
+interpolation and ephemeris interpretation retain their original formulas and
+ordering. The source audit checks the calculation methods after explicit
+clock/service substitutions, the unchanged numerical fields and the verbatim
+Windows SDK implementation tail. Clock queries use the bound production
+`TimeData`; Windows calls the same legacy DLL initialization/ephemeris/shutdown
+entries. The configuration stream passed to the Windows SDK remains the actual
+`ifstream` object, preserving its opaque `FILEHANDLE` interpretation.
+
+Configuration access is in `CelbodyFile.cpp`; element-file parsing takes an
+explicit stream and epoch, with the original Windows filename constructor as an
+adapter. Integer/boolean configuration readers use local scratch storage.
+Initialization exceptions release registered modules and allocated harmonic
+arrays. Native hosts must require valid gravity resources; Windows retains its
+existing logged fallback policy. Empty hierarchy pointers are initialized, and
+zero-child copying avoids reading an uninitialized pointer.
+
+SDK constants, `ATMPARAM` and object/ephemeris flags are extracted verbatim into
+`OrbiterCelestialData.h`. The audit reconstructs both original public Windows
+headers, and layout assertions cover all atmospheric fields. SDK classes,
+exports and virtual ordering remain unchanged. Controlled native class tests
+exercise circular elements, epoch loading, rotation, hierarchy/barycentre state,
+interpolation, callback ordering and failed initialization. Their ephemerides are
+unit fixtures, not native SPICE or stock-object replacements. `PlanetarySystem`,
+`Planet`, `Star`, `Vessel` and `Camera` still need extraction/integration before
+there is a native production world.
+
 An independent inertial/free-spin test runs each propagator for 6,000 quarter-
 second steps twice, with the same seed and finalized sampling. It checks the
 analytical translation/rotation and energy/angular-momentum invariants within
@@ -202,6 +230,6 @@ budgets are unchanged. Neither inherited disabled workflow is modified.
 
 Remaining Phase 3 work includes full session/platform lifetime extraction,
 configuration/scenario/resource integration, platform service separation for
-`CelestialBody`, `Vessel` and `Camera`, instrumentation dependencies and the source-built native SDK/module
+`PlanetarySystem`, `Planet`, `Star`, `Vessel` and `Camera`, instrumentation dependencies and the source-built native SDK/module
 boundary. These shared components do not yet satisfy the Phase 3
 exit gate that Linux builds the production engine and its authoritative objects.

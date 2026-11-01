@@ -27,6 +27,7 @@ set(common_src
 	Production/WindowsWorld.cpp
 	Production/WindowsBodyServices.cpp
 	Production/WindowsRigidBodyServices.cpp
+	Production/WindowsCelestialServices.cpp
 	Production/WindowsMeshServices.cpp
 	PlaybackEd.cpp
 	Psys.cpp
@@ -63,7 +64,7 @@ set(common_src
 	Select.cpp
 	OptionsPages.cpp
 # Body classes
-	Celbody.cpp
+	CelbodySdk.cpp
 	Planet.cpp
 	Star.cpp
 # Vessel classes
