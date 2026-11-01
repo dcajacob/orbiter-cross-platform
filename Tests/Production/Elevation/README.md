@@ -1,9 +1,16 @@
 # Original production terrain observations
 
-This is a **reference-capture preparation**, not an accepted reference or a
-native terrain implementation. The original `elevmgr.cpp` remains untouched.
-Extraction waits for repeated native Windows Debug/Release observations to pass
-the predeclared budgets. Reference files will not refresh automatically.
+The original Windows reference is **accepted**; this is not yet a native terrain
+implementation. [Run 41292909453](https://github.com/dcajacob/orbiter-cross-platform/actions/runs/41292909453)
+passes Debug and Release with byte-identical repeats and zero cross-build error
+at source `c1fb3fad`. [Reference provenance](Reference/provenance.json) preserves
+all original artifact bytes, per-member hashes, compiler/build output, runtime
+identity, logs, traces and comparison results. Reference files never refresh
+automatically. Verify them with:
+
+```sh
+python3 -B Tests/Production/Elevation/frozen_reference.py
+```
 
 Preparation run `41292582063` exposed a missing `ORBITER_MODULE` declaration in
 the observation plugin, so the legacy loader did not dispatch its callbacks.

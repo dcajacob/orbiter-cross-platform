@@ -1,0 +1,118 @@
+{
+  "schema": 1,
+  "status": "accepted",
+  "automatic_refresh": false,
+  "run_id": 41292909453,
+  "run_url": "https://github.com/dcajacob/orbiter-cross-platform/actions/runs/41292909453",
+  "observer_source": "c1fb3fadadbe57a241961e002914c4749396197e",
+  "runtime_source": "2e8bbbf24f5cf53e3e6dadd33fe8ef000748b3cc",
+  "protocol_sha256_lf": "6251f95b2b98417ceb097b36eb1e7c8229a86e1b838e8232472d4877c0720206",
+  "evidence": [
+    {
+      "file": "original-terrain-Release-x64.zip",
+      "id": 13078475300,
+      "sha256": "56ed0d2fd903dcba8fb82a60736d34f930996eeadef141aa1f5e04d0c508fb33",
+      "bytes": 265980,
+      "members_sha256": {
+        "out/elevation-observation/capture.json": "1ac1070538823912b7a56df3a94f6c5cbfe254d17a99d466c146c502b3fe27c7",
+        "out/elevation-observation/mode-1-run-1/elevation-points.csv": "5bbc2a77a2cfaf855c5153dea7286439b813fdb9c726e4c57595012287b826aa",
+        "out/elevation-observation/mode-1-run-1/elevation.csv": "33cea8b1c51950d85a4c873290c78a2846d1df71dbe4f0199e5bd5a6ad24425f",
+        "out/elevation-observation/mode-1-run-1/console.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "out/elevation-observation/mode-1-run-1/Kernels/orbiter.log": "98c86d3279d6596b0fe5332c2dfdab65e2fd0716410df8b14ce01d514bda861a",
+        "out/elevation-observation/mode-1-run-1/Orbiter.log": "b216fcae605a0e29b4cd2abbdba554dacfb2d13ac9d86162454b41c36dd7f0b9",
+        "out/elevation-observation/mode-1-run-2/console.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "out/elevation-observation/mode-1-run-2/elevation-points.csv": "5bbc2a77a2cfaf855c5153dea7286439b813fdb9c726e4c57595012287b826aa",
+        "out/elevation-observation/mode-1-run-2/elevation.csv": "33cea8b1c51950d85a4c873290c78a2846d1df71dbe4f0199e5bd5a6ad24425f",
+        "out/elevation-observation/mode-1-run-2/Kernels/orbiter.log": "98c86d3279d6596b0fe5332c2dfdab65e2fd0716410df8b14ce01d514bda861a",
+        "out/elevation-observation/mode-1-run-2/Orbiter.log": "253403661f05538deeb4059a57c9f92435a8152685bb97445a04036466aa6d1b",
+        "out/elevation-observation/mode-1-trace-1.csv": "33cea8b1c51950d85a4c873290c78a2846d1df71dbe4f0199e5bd5a6ad24425f",
+        "out/elevation-observation/mode-1-trace-2.csv": "33cea8b1c51950d85a4c873290c78a2846d1df71dbe4f0199e5bd5a6ad24425f",
+        "out/elevation-observation/mode-2-run-1/console.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "out/elevation-observation/mode-2-run-1/elevation-points.csv": "5bbc2a77a2cfaf855c5153dea7286439b813fdb9c726e4c57595012287b826aa",
+        "out/elevation-observation/mode-2-run-1/elevation.csv": "c8f78420d5aba29837c99e1cd0bbe858f8bd16156cf7a52cf09661df7bc9d000",
+        "out/elevation-observation/mode-2-run-1/Kernels/orbiter.log": "98c86d3279d6596b0fe5332c2dfdab65e2fd0716410df8b14ce01d514bda861a",
+        "out/elevation-observation/mode-2-run-1/Orbiter.log": "3a23c3217e4bc47c7b46d4a17fd1464cdd95a5ea34db83ff27b72e10780c8aa0",
+        "out/elevation-observation/mode-2-run-2/console.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "out/elevation-observation/mode-2-run-2/elevation-points.csv": "5bbc2a77a2cfaf855c5153dea7286439b813fdb9c726e4c57595012287b826aa",
+        "out/elevation-observation/mode-2-run-2/elevation.csv": "c8f78420d5aba29837c99e1cd0bbe858f8bd16156cf7a52cf09661df7bc9d000",
+        "out/elevation-observation/mode-2-run-2/Kernels/orbiter.log": "98c86d3279d6596b0fe5332c2dfdab65e2fd0716410df8b14ce01d514bda861a",
+        "out/elevation-observation/mode-2-run-2/Orbiter.log": "07e2e7d98d691c6cb42ca8cc4a8c221244665c2a6730f6610dfd8e28c03c803b",
+        "out/elevation-observation/mode-2-trace-1.csv": "c8f78420d5aba29837c99e1cd0bbe858f8bd16156cf7a52cf09661df7bc9d000",
+        "out/elevation-observation/mode-2-trace-2.csv": "c8f78420d5aba29837c99e1cd0bbe858f8bd16156cf7a52cf09661df7bc9d000",
+        "terrain-build.log": "c818701f52e2092062cd0137bd0fc859365ac7c9e4b89384386713c599962ddc",
+        "terrain-compiler.txt": "6633337fe220528955141f9bbe65eae56d4c61e750edf47f09bd743368317378",
+        "terrain-configure.log": "f0a37f6267d49d5c440a373dc703bfadb787c310307f7ad3524d1c3e3759ac93"
+      },
+      "configuration": "Release",
+      "capture_member": "out/elevation-observation/capture.json",
+      "trace_members": {
+        "1": [
+          "out/elevation-observation/mode-1-trace-1.csv",
+          "out/elevation-observation/mode-1-trace-2.csv"
+        ],
+        "2": [
+          "out/elevation-observation/mode-2-trace-1.csv",
+          "out/elevation-observation/mode-2-trace-2.csv"
+        ]
+      }
+    },
+    {
+      "file": "original-terrain-comparison.zip",
+      "id": 13077916581,
+      "sha256": "ecc18543666adf5fb33b6f5f44b4ce92062cefc9ac9cb390abe6e3fb1edaaf30",
+      "bytes": 432,
+      "members_sha256": {
+        "terrain-original-comparison.json": "457e331bcbccd881925a3604dc5d5b004a1df4ab6608d9e74d63313742e760c9"
+      },
+      "comparison_member": "terrain-original-comparison.json"
+    },
+    {
+      "file": "original-terrain-Debug-x64.zip",
+      "id": 13077779080,
+      "sha256": "c44493dbee78fd4f216d8daa91c763efee729a68f94e76010c5085617ba7b565",
+      "bytes": 266273,
+      "members_sha256": {
+        "out/elevation-observation/capture.json": "df1184af3304c53526a755f60549fd262a64228edf14904ee2dc1d3b9bd98938",
+        "out/elevation-observation/mode-1-run-1/console.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "out/elevation-observation/mode-1-run-1/elevation-points.csv": "5bbc2a77a2cfaf855c5153dea7286439b813fdb9c726e4c57595012287b826aa",
+        "out/elevation-observation/mode-1-run-1/elevation.csv": "33cea8b1c51950d85a4c873290c78a2846d1df71dbe4f0199e5bd5a6ad24425f",
+        "out/elevation-observation/mode-1-run-1/Kernels/orbiter.log": "98c86d3279d6596b0fe5332c2dfdab65e2fd0716410df8b14ce01d514bda861a",
+        "out/elevation-observation/mode-1-run-1/Orbiter.log": "d68001776d26f6ee05789e0c3b07a3c74b942b8416df4145556b29991adfafac",
+        "out/elevation-observation/mode-1-run-2/console.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "out/elevation-observation/mode-1-run-2/elevation-points.csv": "5bbc2a77a2cfaf855c5153dea7286439b813fdb9c726e4c57595012287b826aa",
+        "out/elevation-observation/mode-1-run-2/elevation.csv": "33cea8b1c51950d85a4c873290c78a2846d1df71dbe4f0199e5bd5a6ad24425f",
+        "out/elevation-observation/mode-1-run-2/Kernels/orbiter.log": "98c86d3279d6596b0fe5332c2dfdab65e2fd0716410df8b14ce01d514bda861a",
+        "out/elevation-observation/mode-1-run-2/Orbiter.log": "253b8e748e77ba4714846838e0a852bae06b122cd44a34c1ed13e3b44ba358a4",
+        "out/elevation-observation/mode-1-trace-1.csv": "33cea8b1c51950d85a4c873290c78a2846d1df71dbe4f0199e5bd5a6ad24425f",
+        "out/elevation-observation/mode-1-trace-2.csv": "33cea8b1c51950d85a4c873290c78a2846d1df71dbe4f0199e5bd5a6ad24425f",
+        "out/elevation-observation/mode-2-run-1/console.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "out/elevation-observation/mode-2-run-1/elevation-points.csv": "5bbc2a77a2cfaf855c5153dea7286439b813fdb9c726e4c57595012287b826aa",
+        "out/elevation-observation/mode-2-run-1/elevation.csv": "c8f78420d5aba29837c99e1cd0bbe858f8bd16156cf7a52cf09661df7bc9d000",
+        "out/elevation-observation/mode-2-run-1/Kernels/orbiter.log": "98c86d3279d6596b0fe5332c2dfdab65e2fd0716410df8b14ce01d514bda861a",
+        "out/elevation-observation/mode-2-run-1/Orbiter.log": "12b8b15d4c4a9e136340bc8ac1461f445b2d35e96c186ca501e970a40d9bd119",
+        "out/elevation-observation/mode-2-run-2/console.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "out/elevation-observation/mode-2-run-2/elevation-points.csv": "5bbc2a77a2cfaf855c5153dea7286439b813fdb9c726e4c57595012287b826aa",
+        "out/elevation-observation/mode-2-run-2/elevation.csv": "c8f78420d5aba29837c99e1cd0bbe858f8bd16156cf7a52cf09661df7bc9d000",
+        "out/elevation-observation/mode-2-run-2/Kernels/orbiter.log": "98c86d3279d6596b0fe5332c2dfdab65e2fd0716410df8b14ce01d514bda861a",
+        "out/elevation-observation/mode-2-run-2/Orbiter.log": "fa3d662aa1b7f737e673d49cd0be5d9610dca688b569ac9df428dd8c240beeaf",
+        "out/elevation-observation/mode-2-trace-1.csv": "c8f78420d5aba29837c99e1cd0bbe858f8bd16156cf7a52cf09661df7bc9d000",
+        "out/elevation-observation/mode-2-trace-2.csv": "c8f78420d5aba29837c99e1cd0bbe858f8bd16156cf7a52cf09661df7bc9d000",
+        "terrain-build.log": "c818701f52e2092062cd0137bd0fc859365ac7c9e4b89384386713c599962ddc",
+        "terrain-compiler.txt": "6633337fe220528955141f9bbe65eae56d4c61e750edf47f09bd743368317378",
+        "terrain-configure.log": "2fca6fc5a47fa4b1f2a0cf7165a2ce5510aba93bf6d453c7c640586525b459c5"
+      },
+      "configuration": "Debug",
+      "capture_member": "out/elevation-observation/capture.json",
+      "trace_members": {
+        "1": [
+          "out/elevation-observation/mode-1-trace-1.csv",
+          "out/elevation-observation/mode-1-trace-2.csv"
+        ],
+        "2": [
+          "out/elevation-observation/mode-2-trace-1.csv",
+          "out/elevation-observation/mode-2-trace-2.csv"
+        ]
+      }
+    }
+  ]
+}
