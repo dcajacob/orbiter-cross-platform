@@ -209,6 +209,24 @@
         "preserved_report": "celestial-native-parity.json",
         "report_sha256": "462d96051f6cdfd25853cb61da4667939c63d6a29991d4c1a77012e2a946daa6"
       }
+    },
+    {
+      "component": "production-star",
+      "source": "c7ce278c0c93686d769c3e617bffbc1078c67159",
+      "runs": {
+        "production": 41285673276,
+        "client": 41285673352,
+        "portable": 41285673267
+      },
+      "status": "passed",
+      "original_comparison_zip_sha256": "9c7701598dd4bc49ad2053135e9ae265a6669cbe3fe78c8f1d41f37c93384e0e",
+      "preserved_report": "star-client-comparison.json",
+      "report_sha256": "cbd3bceda8fff7ac1400224515d7ca994ae7aa26885e039ac937eae66dfd433c",
+      "native_comparison": {
+        "original_zip_sha256": "f5e2c3927bac1a02082670d7e8236beeda3f947b0b08066439d58adcbfa7bc76",
+        "preserved_report": "star-native-parity.json",
+        "report_sha256": "462d96051f6cdfd25853cb61da4667939c63d6a29991d4c1a77012e2a946daa6"
+      }
     }
   ]
 }

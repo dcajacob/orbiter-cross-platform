@@ -23,6 +23,8 @@ and Linux GCC / Windows MSVC x64 Debug/Release portable checks.
 | Original Pines gravity and portable model loading | `c73d1477` | [41282440355](https://github.com/dcajacob/orbiter-cross-platform/actions/runs/41282440355) | [41282440315](https://github.com/dcajacob/orbiter-cross-platform/actions/runs/41282440315) | [41282440466](https://github.com/dcajacob/orbiter-cross-platform/actions/runs/41282440466) |
 | Production CelestialBody and Windows module adapters | `c2813bf8` | [41284623399](https://github.com/dcajacob/orbiter-cross-platform/actions/runs/41284623399) | [41284623366](https://github.com/dcajacob/orbiter-cross-platform/actions/runs/41284623366) | [41284623362](https://github.com/dcajacob/orbiter-cross-platform/actions/runs/41284623362) |
 
+| Production Star initialization and updates | `c7ce278c` | [41285673276](https://github.com/dcajacob/orbiter-cross-platform/actions/runs/41285673276) | [41285673352](https://github.com/dcajacob/orbiter-cross-platform/actions/runs/41285673352) | [41285673267](https://github.com/dcajacob/orbiter-cross-platform/actions/runs/41285673267) |
+
 The preserved `*-client-comparison.json` reports show zero numerical and
 projected-landmark differences and SSIM 1.0 both between configurations and
 against the frozen original client. No image masks or changed budgets apply.
