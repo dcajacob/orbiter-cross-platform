@@ -1,0 +1,42 @@
+{
+  "schema": 1,
+  "automatic_refresh": false,
+  "production_source": "38b7c627878ea893390675616897071f8bb8e90f",
+  "scope": "Actual production Pines perturbation queries in right-handed body-fixed axes; input km, output SI m/s^2; excludes point mass and world coordinate transforms",
+  "models": [
+    "Earth",
+    "Moon"
+  ],
+  "cutoff": 32,
+  "degrees": [
+    2,
+    4,
+    12,
+    32
+  ],
+  "orders": "0, degree/2, degree",
+  "queries": 864,
+  "budgets": {
+    "acceleration_absolute_m_s2": 1e-12,
+    "acceleration_relative": 1e-10,
+    "rule": "Euclidean vector error <= absolute + relative * reference vector magnitude; exact discrete identities and query positions"
+  },
+  "repeat_policy": "two byte-identical traces per executable/configuration",
+  "production_source_sha256_lf": {
+    "Src/Orbiter/PinesGrav.cpp": "e7ad2903085ec7eed53f02515ac9c02c24d251cedb0ae0c665584675618e5528",
+    "Src/Orbiter/PinesGrav.h": "fe0a8da8f24ac60ea2ab120d260274515f75fa3d7a18841d73d50240eee4cae9"
+  },
+  "inputs_sha256": {
+    "GravityModels/egm96_to360.tab": "a2a24189f84a7dfe42c99fd8eb6cf5369f8796015f8ef5909eb59678a5a626ee",
+    "GravityModels/jgl165p1.sha": "96cc6612574d0689d8b437dfbc9d430e0c8e23a26ce76d6da82e13c23ea5ca3b",
+    "Tests/Production/Gravity/Observe.cpp": "9671b41ed54942264f3aa4878dbeb94526ccbd088075e28b6d0c2a45e29bb104",
+    "Tests/Production/Gravity/capture.py": "a4724be4aa0cbcde808c80e922bc5b9dcf45e693e6f9114098662bbe66d8e8e3",
+    "Tests/Production/Gravity/J2.tab": "52c97b861788bc6ee8f87586672cc272f1583ba378521ff2a995edfba6acc6e6",
+    "Tests/Production/Gravity/CMakeLists.txt": "657fb28810627bded1c501b97d36bb5ba5ec42f13a210bf837e6ee966850c50a"
+  },
+  "independent_check": {
+    "model": "normalized J2 only, coefficient 0.001",
+    "queries": 12,
+    "acceleration_absolute_m_s2": 1e-12
+  }
+}

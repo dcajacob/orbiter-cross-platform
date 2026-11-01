@@ -169,6 +169,11 @@ The [preserved verification reports](../../Tests/Production/Verification/EngineB
 record accepted component sources, hosted runs and original artifact hashes;
 local Linux results are reported separately.
 
+Before extracting nonspherical gravity, the [Pines observation protocol](../../Tests/Production/Gravity/README.md)
+captures the unchanged Windows implementation against locked stock Earth/Moon
+coefficients and an independent J2 check. Hosted reference acceptance is required
+before changing that source; local preparation is not a Windows capture.
+
 The real-client workflow now builds the **current** production application and
 SDK together, rather than reusing the pre-extraction application. It compares
 Debug/Release against each other and both against the accepted Phase 2 state,

@@ -11,3 +11,8 @@ Src/Orbiter/Vessel.cpp -text whitespace=cr-at-eol
 
 # Accepted client evidence retains the exact original Windows artifact bytes.
 Tests/Production/ClientReference/** -text whitespace=cr-at-eol
+
+# Gravity reference inputs and traces identify exact bytes on both hosts.
+Tests/Production/Gravity/** text eol=lf
+GravityModels/egm96_to360.tab -text
+GravityModels/jgl165p1.sha -text

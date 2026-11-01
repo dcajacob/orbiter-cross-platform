@@ -1,0 +1,12 @@
+cmake_minimum_required(VERSION 3.19)
+project(OrbiterProductionGravityReference LANGUAGES CXX)
+if(NOT WIN32)
+    message(FATAL_ERROR "Pre-extraction Pines reference capture requires native Windows")
+endif()
+add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/../../../Src/Orbiter/Production" production-core)
+add_executable(production_gravity_observer Observe.cpp
+    "${CMAKE_CURRENT_SOURCE_DIR}/../../../Src/Orbiter/PinesGrav.cpp")
+target_compile_definitions(production_gravity_observer PRIVATE NOGRAPHICS DIRECTINPUT_VERSION=0x0800)
+target_link_libraries(production_gravity_observer PRIVATE orbiter_production_boundary)
+set_target_properties(production_gravity_observer PROPERTIES OUTPUT_NAME production-gravity-observer)
+orbiter_stage_core_runtime(production_gravity_observer)

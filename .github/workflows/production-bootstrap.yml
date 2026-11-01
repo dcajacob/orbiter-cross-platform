@@ -28,6 +28,46 @@ permissions:
   contents: read
 
 jobs:
+  windows-gravity:
+    name: Unchanged Windows Pines ${{ matrix.configuration }} x64
+    runs-on: windows-2022
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        configuration: [Debug, Release]
+    steps:
+      - uses: actions/checkout@v7
+      - uses: ilammy/msvc-dev-cmd@v1
+        with:
+          vsversion: '17.0'
+          arch: x64
+      - name: Build the actual production gravity observer
+        shell: pwsh
+        run: |
+          cmake -S Tests/Production/Gravity -B out/gravity-build -G Ninja -DCMAKE_BUILD_TYPE=${{ matrix.configuration }} 2>&1 | Tee-Object gravity-configure.log
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          cmd /c "cl 2>&1 & exit /b 0" | Out-File out/gravity-build/compiler.txt
+          cmake --build out/gravity-build --parallel 2 2>&1 | Tee-Object out/gravity-build/build.log
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          Get-ChildItem out/gravity-build -Recurse -Include *.exe,*.dll | Get-FileHash -Algorithm SHA256 | Format-List | Out-File out/gravity-build/binaries.txt
+      - name: Capture repeated queries and check the analytical J2 fixture
+        run: >-
+          python Tests/Production/Gravity/capture.py capture
+          --executable out/gravity-build/production-gravity-observer.exe
+          --output out/production-gravity --configuration ${{ matrix.configuration }}
+      - name: Preserve independent Windows observation evidence
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: production-gravity-${{ matrix.configuration }}-x64
+          retention-days: 90
+          path: |
+            gravity-configure.log
+            out/gravity-build/*.log
+            out/gravity-build/*.txt
+            out/production-gravity/**
+
   inventory:
     name: Frozen production inventory
     runs-on: ubuntu-24.04
@@ -153,6 +193,11 @@ jobs:
         run: |
           ctest --test-dir out/production-app --output-on-failure 2>&1 | Tee-Object out/production-app/ctest.log
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - name: Observe unchanged production Pines gravity twice
+        run: >-
+          python Tests/Production/Gravity/capture.py capture
+          --executable out/production-app/production-gravity-observer.exe
+          --output out/production-gravity --configuration ${{ matrix.configuration }}
       - name: Verify existing frozen two-body reference
         run: >-
           python Tests/Portable/verify_windows_application.py
@@ -222,6 +267,7 @@ jobs:
             out/production-app/*.txt
             out/production-app/build-inputs.json
             out/production-app/Testing/Temporary/*.log
+            out/production-gravity/**
             out/original-verification/**/trace.csv
             out/original-verification/**/*.json
             out/production-reference/**/*.csv
@@ -233,7 +279,7 @@ jobs:
 
   compare-production:
     name: Production Debug/Release numerical and lifecycle comparison
-    needs: windows-production
+    needs: [windows-production, windows-gravity]
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v7
@@ -245,6 +291,14 @@ jobs:
         with:
           name: production-reference-Release-x64
           path: out/release
+      - uses: actions/download-artifact@v8
+        with:
+          name: production-gravity-Debug-x64
+          path: out/gravity-debug
+      - uses: actions/download-artifact@v8
+        with:
+          name: production-gravity-Release-x64
+          path: out/gravity-release
       - name: Compare all objects and controlled quantities without changing budgets
         run: >-
           python3 -B Tests/Production/compare_references.py
@@ -254,6 +308,17 @@ jobs:
         run: >-
           python3 -B Tests/Production/behavior_suite.py --compare out/debug/production-behavior
           --output out/release/production-behavior
+      - name: Validate predeclared Pines budgets before platform extraction
+        run: >-
+          python3 -B Tests/Production/Gravity/capture.py compare
+          --reference out/debug/production-gravity/trace-1.csv
+          --candidate out/release/production-gravity/trace-1.csv
+          --report gravity-comparison.json
+      - name: Compare standalone and full-application-build observations
+        shell: bash
+        run: |
+          python3 -B Tests/Production/Gravity/capture.py compare --reference out/debug/production-gravity/trace-1.csv --candidate out/gravity-debug/out/production-gravity/trace-1.csv --report gravity-debug-build-comparison.json
+          python3 -B Tests/Production/Gravity/capture.py compare --reference out/release/production-gravity/trace-1.csv --candidate out/gravity-release/out/production-gravity/trace-1.csv --report gravity-release-build-comparison.json
       - uses: actions/upload-artifact@v7
         if: always()
         with:
@@ -261,4 +326,6 @@ jobs:
           retention-days: 30
           path: |
             production-comparison.json
+            gravity-comparison.json
+            gravity-*-build-comparison.json
             out/release/production-behavior/cross-configuration.json
