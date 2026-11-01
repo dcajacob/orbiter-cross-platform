@@ -53,7 +53,7 @@ def main():
     report=dict(status='passed',scope='Production Planet/Base/terrain/CPU mesh component lifecycle; not a native world/application/renderer',
         source=subprocess.check_output(['git','-C',str(ROOT),'rev-parse','HEAD'],text=True).strip(),
         executable_sha256=digest(args.executable),source_inputs=source_inputs,data_inputs=inputs,log_sha256=digest(output/'run.log'))
-    (output/'comparison.json').write_text(json.dumps(report,indent=2)+'\n')
+    (output/'planet-components.json').write_text(json.dumps(report,indent=2)+'\n')
     print('Production stock planets, 39 bases, CPU geometry and 20 load/unload cycles passed')
 
 if __name__=='__main__':main()
