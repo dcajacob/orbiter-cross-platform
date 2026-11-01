@@ -68,7 +68,7 @@ jobs:
             terrain-*.log
             terrain-compiler.txt
             out/elevation-observation/*.json
-            out/elevation-observation/*.csv
+            out/elevation-observation/**/*.csv
             out/elevation-observation/**/Orbiter.log
             out/elevation-observation/**/console.txt
   compare:

@@ -1,5 +1,6 @@
 // Licensed under the MIT License
 // Read-only queries of the original production world's elevation manager.
+#define ORBITER_MODULE
 #include "Orbitersdk.h"
 #include <cmath>
 #include <cstdlib>

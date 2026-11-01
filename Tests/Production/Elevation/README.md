@@ -5,6 +5,11 @@ native terrain implementation. The original `elevmgr.cpp` remains untouched.
 Extraction waits for repeated native Windows Debug/Release observations to pass
 the predeclared budgets. Reference files will not refresh automatically.
 
+Preparation run `41292582063` exposed a missing `ORBITER_MODULE` declaration in
+the observation plugin, so the legacy loader did not dispatch its callbacks.
+It is a failed setup attempt, not an accepted terrain run. The declaration is
+corrected; no production terrain source, query or budget was changed.
+
 The observer loads the accepted source-built Windows application/SDK from
 `2e8bbbf2`, using real Sol, ISS and ShuttlePB plus the original verified data and
 standard Earth/Moon/Mars elevation archives. It calls the existing production
