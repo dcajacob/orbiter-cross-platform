@@ -1,13 +1,6 @@
 name: Frozen Production Flight Reference
 
 on:
-  push:
-    branches: ['codex/production-**']
-    paths:
-      - '.github/workflows/production-flight-reference.yml'
-      - 'Tests/Production/Flight/**'
-      - 'Tests/Production/BehaviorBuild/**'
-      - 'Tests/Production/BehaviorDriver.cpp'
   workflow_dispatch:
 
 permissions:

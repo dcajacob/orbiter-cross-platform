@@ -1,0 +1,31 @@
+{
+  "schema": 1,
+  "status": "accepted pre-flight Windows reference",
+  "automatic_refresh": false,
+  "run_id": 41350187262,
+  "application_source": "391919027ac3e4a4d42f145373c788fc859c32cd",
+  "driver_source": "a72fabef7bae160580d76bcf7aa25960d715e824",
+  "artifacts": {
+    "Debug": {
+      "path": "flight-reference-Debug.zip",
+      "sha256": "5e987fd51b20b3c7981955033fbe8952d1cfb2642ad23a11d92068ed627dfb5f"
+    },
+    "Release": {
+      "path": "flight-reference-Release.zip",
+      "sha256": "f3ccc3fbd28117634d623078f897403c90cf067422b389a109d82d3b01a2a815"
+    },
+    "comparison": {
+      "path": "flight-reference-comparison.zip",
+      "sha256": "1d86c78995289080437aa7c9bf4ddf9dc2dbf4334c9b5ca2bd578e1bf724ec15"
+    }
+  },
+  "budgets": {
+    "position_m": 0.01,
+    "velocity_m_s": 1e-05,
+    "rotation_rad": 1e-08,
+    "angular_velocity_rad_s": 1e-10,
+    "mjd_days": 1e-10,
+    "propulsion_relative": 1e-08,
+    "propulsion_absolute_kg": 1e-08
+  }
+}
