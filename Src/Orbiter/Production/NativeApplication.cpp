@@ -55,13 +55,19 @@ struct Resources {
         highTextures(assets/"Textures2"),planets(planetary/"Textures"),meshFiles(assets/"Meshes") {}
 };
 [[noreturn]] void unsupported(const char* text) {throw std::runtime_error(std::string("Native production external view does not support ")+text);}
+double RcsLevel(const VESSEL& vessel) {
+    double level=0;
+    for(int group=THGROUP_ATT_PITCHUP;group<=THGROUP_ATT_BACK;++group)
+        level=std::max(level,vessel.GetThrusterGroupLevel(THGROUP_TYPE(group)));
+    return level;
+}
 struct Runtime final:BodyServices,RigidBodyServices,SurfaceServices,NavigationServices,VesselServices,
     CameraServices,WorldFactory,SessionServices {
     Resources& resources;const ResourceResolver& config;Config settings;TimeData time;CFG_PHYSICSPRM physics{};
     PlanetarySystem* system=nullptr;NativeRenderContext render;bool updating=false,force=true,running=false,playback=false,active=true;
     MeshManager meshes;NativeCelestialServices celestial;std::unique_ptr<NativeElevationServices> terrain;
     std::unique_ptr<WorldVesselServices> vessels;WorldOwner world;std::unique_ptr<NativeModule> graphicsModule;
-    std::ofstream lifecycle,trace,flightTrace,inputTrace,inputEvents;
+    std::ofstream lifecycle,trace,flightTrace,inputTrace,inputEvents,thrustTrace;
     unsigned pendingCockpitRedraw=0,inputTick=0,completedTicks=0;
     FlightControls controls;FlightReplay replay;FlightInput input;
     std::unique_ptr<State> scenarioState;
@@ -134,7 +140,7 @@ struct Runtime final:BodyServices,RigidBodyServices,SurfaceServices,NavigationSe
         if(finished)return;
         if(render.graphics)render.graphics->CloseSession();world.Reset();meshes.Flush();
         if(render.graphics)render.graphics->Close();graphicsModule.reset();render.graphics=nullptr;
-        for(auto* file:{&lifecycle,&trace,&flightTrace,&inputTrace,&inputEvents})if(file->is_open())file->close();
+        for(auto* file:{&lifecycle,&trace,&flightTrace,&inputTrace,&inputEvents,&thrustTrace})if(file->is_open())file->close();
         finished=true;
     }
     ~Runtime() {
@@ -170,6 +176,8 @@ struct Runtime final:BodyServices,RigidBodyServices,SurfaceServices,NavigationSe
             inputTrace.open(evidence/"input-state.csv");inputTrace.imbue(std::locale::classic());inputTrace.exceptions(std::ios::badbit|std::ios::failbit);
             inputTrace<<std::setprecision(17)<<"tick,keys,x,y,rz,alternate,throttle\n";
             inputEvents.open(evidence/"input-events.csv");inputEvents.exceptions(std::ios::badbit|std::ios::failbit);inputEvents<<"tick,key,down,lshift,rshift,lctrl,rctrl,lalt,ralt\n";
+            thrustTrace.open(evidence/"thrust-state.csv");thrustTrace.imbue(std::locale::classic());thrustTrace.exceptions(std::ios::badbit|std::ios::failbit);
+            thrustTrace<<std::setprecision(17)<<"tick,input_tick,seconds,object,main,hover,rcs,exhaust,navmask\n";
         }
         graphicsModule=std::make_unique<NativeModule>(resources.modules.Resolve("Graphics/OGLClient.so"),ORBITER_NATIVE_GRAPHICS,&render);
         render.graphics=static_cast<NativeGraphics*>(graphicsModule->Instance());render.graphics->Open();
@@ -311,6 +319,13 @@ struct Runtime final:BodyServices,RigidBodyServices,SurfaceServices,NavigationSe
     void FinaliseBodies() override {system->FinaliseUpdate();}
     void AdvanceTime(bool state) override {time.EndStep(state);if(state)++completedTicks;}
     void WriteTrace() override {
+        if(thrustTrace.is_open()) {
+            auto* v=render.focus->GetModuleInterface();double exhaust=0;unsigned mask=0;
+            for(unsigned i=0;i<v->GetExhaustCount();++i)exhaust=std::max(exhaust,v->GetExhaustLevel(i));
+            for(int nav=1;nav<=7;++nav)if(v->GetNavmodeState(nav))mask|=1u<<nav;
+            thrustTrace<<completedTicks<<','<<inputTick<<','<<time.SimT0<<','<<v->GetName()<<','<<v->GetThrusterGroupLevel(THGROUP_MAIN)<<','
+                <<v->GetThrusterGroupLevel(THGROUP_HOVER)<<','<<RcsLevel(*v)<<','<<exhaust<<','<<mask<<'\n';
+        }
         if(flightTrace.is_open()) {
             const auto& ep=system->GetGravObj("Earth",true)->GPos();const auto& ev=system->GetGravObj("Earth",true)->GVel();
             for(auto* vessel:{system->GetVessel("ISS",true),system->GetVessel("PB",true)}) {
@@ -347,8 +362,13 @@ struct Runtime final:BodyServices,RigidBodyServices,SurfaceServices,NavigationSe
         auto* v=render.focus->GetModuleInterface();std::ostringstream text;text.imbue(std::locale::classic());
         text<<"Orbiter | "<<v->GetName()<<" | "<<(running?"RUNNING":"PAUSED")<<" t="<<std::fixed<<std::setprecision(3)<<time.SimT0<<"s"
             <<" | RCS "<<(v->GetAttitudeMode()==1?"ROT":v->GetAttitudeMode()==2?"LIN":"OFF")
+            <<' '<<std::setprecision(0)<<RcsLevel(*v)*100<<"%"
             <<" | MAIN "<<std::setprecision(0)<<v->GetThrusterGroupLevel(THGROUP_MAIN)*100<<"% HOV "<<v->GetThrusterGroupLevel(THGROUP_HOVER)*100<<"%"
-            <<" | fuel "<<std::setprecision(3)<<v->GetFuelMass()<<"kg | x"<<time.Warp();
+            <<" | NAV";
+        bool navActive=false;const char* names[]={"","KILLROT","LEVEL","PRO","RETRO","NORMAL","ANTINORMAL","ALT"};
+        for(int mode=1;mode<=7;++mode)if(v->GetNavmodeState(mode)){text<<' '<<names[mode];navActive=true;}
+        if(!navActive)text<<" none";
+        text<<" | fuel "<<std::setprecision(3)<<v->GetFuelMass()<<"kg | x"<<time.Warp();
         if(auto dock=v->DockCount()?v->GetDockStatus(v->GetDockHandle(0)):nullptr)text<<" | DOCKED "<<static_cast<Vessel*>(dock)->Name();
         else text<<" | ISS "<<std::setprecision(1)<<render.focus->GPos().dist(system->GetVessel("ISS",true)->GPos())<<"m";
         return text.str();

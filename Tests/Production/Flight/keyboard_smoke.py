@@ -18,6 +18,7 @@ def wait(action,message,timeout=15):
 def main():
     p=argparse.ArgumentParser(description=__doc__)
     for name in ('executable','assets','data','modules','planets','output'):p.add_argument('--'+name,type=Path,required=True)
+    p.add_argument('--keymap',type=Path,default=ROOT/'Tests/Production/Flight/keymap-laptop.cfg')
     a=p.parse_args();out=a.output.resolve();out.mkdir(parents=True,exist_ok=True)
     x=C.CDLL(ctypes.util.find_library('X11'))
     x.XOpenDisplay.argtypes=[C.c_char_p];x.XOpenDisplay.restype=C.c_void_p
@@ -71,12 +72,42 @@ def main():
         key(window,'s',False,4);key(window,'Control_L',False);time.sleep(.1)
     argv=[str(a.executable.resolve())]
     for name in ('assets','data','modules','planets'):argv+=['--'+name,str(getattr(a,name).resolve())]
-    argv+=['--config',str(ROOT/'Tests/Production/NativeScene/Orbiter.cfg'),'--scenario',str(ROOT/'Tests/Production/NativeScene/Sol-ISS-ShuttlePB.scn'),'--keymap',str(ROOT/'Tests/Production/Flight/keymap-laptop.cfg'),'--save',str(out/'checkpoint.scn'),'--evidence',str(out),'--run']
+    argv+=['--config',str(ROOT/'Tests/Production/NativeScene/Orbiter.cfg'),'--scenario',str(ROOT/'Tests/Production/NativeScene/Sol-ISS-ShuttlePB.scn'),'--keymap',str(a.keymap.resolve()),'--save',str(out/'checkpoint.scn'),'--evidence',str(out),'--run']
     with (out/'console.log').open('w') as log:
         process=subprocess.Popen(argv,stdout=log,stderr=subprocess.STDOUT,env={**os.environ,'XDG_SESSION_TYPE':'x11'})
         try:
             window=wait(lambda:owned(process.pid),'Actual owned Orbiter window did not initialize')
             x.XSetInputFocus(display,window,1,0);x.XFlush(display);time.sleep(.15)
+            def seconds():return float(re.search(r't=([0-9.]+)s',title(window)).group(1))
+            def advance(duration):
+                start=seconds();wait(lambda:seconds()>=start+duration,'Flight time did not advance')
+            releaseChecks=[]
+            for mode in ('ROT','LIN'):
+                if mode=='LIN':tap(window,'f')
+                wait(lambda:'RCS '+mode in title(window),'RCS mode key did not reach production vessel')
+                for shifted in (False,True):
+                    for direction in ('w','s','a','d','z','c'):
+                        if shifted:key(window,'Shift_L',True)
+                        key(window,direction,True,1 if shifted else 0)
+                        expected='RCS '+mode+(' 10%' if shifted else ' 100%')
+                        wait(lambda:expected in title(window),'RCS did not fire at requested power: '+expected)
+                        advance(.12);key(window,direction,False,1 if shifted else 0)
+                        if shifted:key(window,'Shift_L',False)
+                        wait(lambda:'RCS '+mode+' 0%' in title(window),'RCS stayed on after release: '+direction)
+                        advance(.2)
+                        state=title(window)
+                        require('NAV none' in state and 'MAIN 0% HOV 0%' in state,
+                                'RCS direction also latched another control: '+direction+'; '+state)
+                        releaseChecks.append(dict(mode=mode,key=direction,power=.1 if shifted else 1.,released_state=state))
+            # Losing focus while a key is held must also release manual RCS.
+            key(window,'w',True);wait(lambda:'RCS LIN 100%' in title(window),'Focus-loss setup did not fire RCS')
+            x.XSetInputFocus(display,root,1,0);x.XFlush(display)
+            wait(lambda:'RCS LIN 0%' in title(window),'RCS remained on after window lost focus')
+            key(window,'w',False);x.XSetInputFocus(display,window,1,0);x.XFlush(display)
+            advance(.2);require('RCS LIN 0%' in title(window),'RCS reactivated on focus regain')
+            releaseEnd=seconds()
+            # Return to rotation mode for the existing flight/save/reload exercise.
+            tap(window,'f')
             key(window,'Prior',True)
             thrust=wait(lambda:(lambda m:m and int(m.group(1))>=5)(re.search(r'MAIN ([1-9][0-9]*)%',title(window))),'Laptop throttle key did not reach production vessel')
             key(window,'Prior',False);time.sleep(.1)
@@ -107,7 +138,22 @@ def main():
                     require(math.dist([float(before[k]) for k in fields],[float(after[k]) for k in fields])<=limit,'In-process reload exceeds original stock serialization precision')
                 require(abs(float(before['mjd'])-float(after['mjd']))<=1e-10,'In-process reload changed finalized epoch')
             require(json.loads((out/'native-window.json').read_text())['backend']=='x11','Keyboard test did not use actual X11')
-            report=dict(status='passed',keyboard_throttle=True,rcs_mode=True,rcs_translation=True,propellant_used=True,pause=True,single_step=True,stock_quicksave=True,in_process_reload=True,exit=True)
+            # Verify finalized physical thruster/exhaust levels, independently of the title readout.
+            thrustRows=list(csv.DictReader((out/'thrust-state.csv').open()))
+            inputs={int(row['tick']):row for row in csv.DictReader((out/'input-state.csv').open())}
+            checked=0
+            for row in thrustRows:
+                if int(row['tick'])==0 or float(row['seconds'])>releaseEnd:continue
+                snapshot=inputs.get(int(row['input_tick']))
+                require(snapshot is not None,'Finalized release state has no recorded input')
+                require(float(row['main'])==0 and float(row['hover'])==0 and int(row['navmask'])==0,
+                        'RCS direction activated unrelated thrust or an autopilot')
+                keys=bytes.fromhex(snapshot['keys'])
+                if not any(keys[code] for code in (0x11,0x1f,0x1e,0x20,0x2c,0x2e)):
+                    require(float(row['rcs'])==0 and float(row['exhaust'])==0,'Finalized jets persisted without a held RCS key')
+                    checked+=1
+            require(checked>=24,'Insufficient finalized release samples')
+            report=dict(status='passed',keyboard_throttle=True,rcs_mode=True,rcs_translation=True,rcs_hold_release=releaseChecks,rcs_release_samples=checked,rcs_focus_release=True,propellant_used=True,pause=True,single_step=True,stock_quicksave=True,in_process_reload=True,exit=True)
             (out/'keyboard-verification.json').write_text(json.dumps(report,indent=2)+'\n');print(json.dumps(report))
         finally:
             if process.poll() is None:

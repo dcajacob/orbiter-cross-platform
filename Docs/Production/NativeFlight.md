@@ -36,6 +36,7 @@ libraries mapped by an already running application.
 | Toggle RCS off/on | Ctrl-F |
 | Reduced RCS power | Hold Shift with the direction key |
 | Kill rotation | K |
+| Toggle altitude hold | Ctrl-A |
 | Prograde / retrograde | [ / ] |
 | Orbit normal / antinormal | ; / ' |
 | Pause/resume | Space or Ctrl-P |
@@ -46,8 +47,15 @@ libraries mapped by an already running application.
 | Orbit camera / zoom | Right-drag / wheel |
 | Close | Escape |
 
-The title bar shows actual simulation time, thrust, fuel, RCS mode, ISS range and
-docking state. Saves default to `$XDG_DATA_HOME/orbiter/Scenarios/Quicksave.scn`,
+RCS direction keys are momentary: hold to fire, release to stop firing. Motion
+continues after release until an opposing force or torque changes it. Main and
+hover throttle settings persist. Autopilots can command thrust independently.
+The laptop preset moves altitude hold from A to Ctrl-A so the left RCS key
+cannot accidentally enable it.
+
+The title bar shows actual simulation time, main/hover throttle, fuel, RCS mode
+and power, active autopilots, ISS range and docking state. Saves default to
+`$XDG_DATA_HOME/orbiter/Scenarios/Quicksave.scn`,
 or `$HOME/.local/share/orbiter/Scenarios/Quicksave.scn`; `--save PATH` overrides it.
 Quicksave writes only finalized states through original `State::Write`,
 `Camera::Write` and `PlanetarySystem::Write`/vessel module serializers. Reload
@@ -157,3 +165,22 @@ The native client CI workflow runs original scene/image parity, flight parity,
 twenty complete sessions and real keyboard interaction under software OpenGL in
 Ubuntu 24.04 Debug/Release. The existing Windows application/client, SDK, portable,
 world/terrain and SPICE workflows continue independently.
+
+The keyboard regression also holds and releases all six keys in both RCS modes,
+at full and reduced power, and verifies release on focus loss. It checks actual
+finalized thruster/exhaust levels in `thrust-state.csv` against the per-tick input
+log, and rejects unintended autopilot or main/hover activation. The thrust trace
+records completed physics ticks separately from host input ticks (which include
+paused ticks); power values are fractions of full thrust. RCS power is the
+maximum of the twelve actual RCS group levels, and exhaust power is the maximum
+of the vessel's declared exhaust levels. Stock ShuttlePB declares main/hover
+exhausts, without a separate exhaust visual for each RCS jet.
+
+The laptop-keymap follow-up was reproduced locally with the old A binding:
+releasing A left altitude hold enabled and the hover engine firing. With Ctrl-A,
+all 24 hold/release combinations and focus loss pass under Xvfb/llvmpipe, with
+384 finalized idle samples at zero RCS/exhaust power. The six frozen flight
+comparisons pass their unchanged budgets (maximum position difference
+0.0000019073522708 m), both rendering frequencies agree, twenty complete sessions
+pass, and all thirty portable tests pass. These are local follow-up results;
+the hosted runs linked above describe the earlier `db1d7fa1` delivery.
