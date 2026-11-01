@@ -39,10 +39,27 @@ The production workflow archives both traces, logs and source/input/executable
 metadata alongside compiler settings and full application metadata, then compares
 Debug/Release. A small independent Windows build executes the identical source
 without building the application; its outputs must also match each configuration
-of the full application build. Accepted Windows evidence must be frozen explicitly before
-porting this subsystem; no reference exists yet at this preparation stage.
+of the full application build.
 
-Run the read-only input/source verification and comparator checks on Linux:
+The [accepted Windows reference](Reference/provenance.json) comes from source
+`d85fc0b8` and [hosted run 41280522652](https://github.com/dcajacob/orbiter-cross-platform/actions/runs/41280522652).
+All four builds produced the same trace bytes (SHA256
+`87b154d6212f742556f610ab42b4b9a6708555bcfc878b7acafa50760d198173`),
+and all twelve analytical checks passed in each run. The evidence includes
+original standalone artifacts and filtered full-application build/trace archives,
+with original GitHub artifact digests and every preserved member's hash. No
+compiled binaries are added to Git. The initial standalone macro-definition
+failure is recorded separately and is not accepted as numerical evidence.
+
+Reference acceptance is explicit; no command refreshes it. Verify all archived
+members, repeat equality and cross-build budgets offline with:
+
+```sh
+python3 -B Tests/Production/Gravity/frozen_reference.py
+```
+
+On the original capture checkout, run the read-only input/source verification
+and comparator checks on Linux:
 
 ```sh
 python3 -B Tests/Production/Gravity/capture.py verify-original

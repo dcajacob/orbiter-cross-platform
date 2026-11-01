@@ -171,8 +171,10 @@ local Linux results are reported separately.
 
 Before extracting nonspherical gravity, the [Pines observation protocol](../../Tests/Production/Gravity/README.md)
 captures the unchanged Windows implementation against locked stock Earth/Moon
-coefficients and an independent J2 check. Hosted reference acceptance is required
-before changing that source; local preparation is not a Windows capture.
+coefficients and an independent J2 check. The accepted reference from hosted
+run 41280522652 has identical traces in standalone/application Debug/Release
+builds, and is frozen before extracting that source. Its force-query budgets
+supplement the unchanged orbit/contact references.
 
 The real-client workflow now builds the **current** production application and
 SDK together, rather than reusing the pre-extraction application. It compares

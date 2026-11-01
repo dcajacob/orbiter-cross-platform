@@ -1,0 +1,213 @@
+{
+  "schema": 1,
+  "status": "accepted",
+  "automatic_refresh": false,
+  "scope": "Actual production Pines perturbation queries in right-handed body-fixed axes; input km, output SI m/s^2; excludes point mass and world coordinate transforms",
+  "production_source": "38b7c627878ea893390675616897071f8bb8e90f",
+  "capture_sources": [
+    "d85fc0b8b11fac58d442eec2793d08cf858e461b"
+  ],
+  "run_id": 41280522652,
+  "run_url": "https://github.com/dcajacob/orbiter-cross-platform/actions/runs/41280522652",
+  "protocol_sha256": "e28b89966ad6c507e573b9564039d48ae3763ad0e744704e9c10164295d1898a",
+  "budgets": {
+    "acceleration_absolute_m_s2": 1e-12,
+    "acceleration_relative": 1e-10,
+    "rule": "Euclidean vector error <= absolute + relative * reference vector magnitude; exact discrete identities and query positions"
+  },
+  "independent_check": {
+    "model": "normalized J2 only, coefficient 0.001",
+    "queries": 12,
+    "acceleration_absolute_m_s2": 1e-12
+  },
+  "trace": {
+    "file": "trace.csv",
+    "sha256": "87b154d6212f742556f610ab42b4b9a6708555bcfc878b7acafa50760d198173",
+    "samples": 864
+  },
+  "evidence": [
+    {
+      "configuration": "Debug",
+      "build": "standalone",
+      "source": "d85fc0b8b11fac58d442eec2793d08cf858e461b",
+      "run_id": 41280522652,
+      "artifact_id": 13072887979,
+      "original_artifact_sha256": "cba46a985021ff4f16952076148722dc1ff097e2b3d7a8f336b24ce21c8ca344",
+      "storage": "original artifact",
+      "file": "Evidence/standalone-Debug.zip",
+      "sha256": "cba46a985021ff4f16952076148722dc1ff097e2b3d7a8f336b24ce21c8ca344",
+      "capture_member": "out/production-gravity/capture.json",
+      "trace_members": [
+        "out/production-gravity/trace-1.csv",
+        "out/production-gravity/trace-2.csv"
+      ],
+      "members_sha256": {
+        "gravity-configure.log": "7f8b1a5927dc1bc47d947ea5c92c0563e0d24e2f8ca983a623650d3b597d19a2",
+        "out/gravity-build/binaries.txt": "c8dbfb418c5d59219c0c09b60f47d26713d0737b1d2454d3e5acbc85155c45f2",
+        "out/gravity-build/build.log": "72deb6d2701a1725569270a3e2653d29fdeb503e155a917480f856d63edcf6d4",
+        "out/gravity-build/CMakeCache.txt": "8e54657b8e76acce6584ad0f75341e37b1c4e52c5b3973cdc13bd4f097919bd9",
+        "out/gravity-build/compiler.txt": "6633337fe220528955141f9bbe65eae56d4c61e750edf47f09bd743368317378",
+        "out/production-gravity/capture.json": "a895fc27cf36b4b9003bd32e7904a1541c0c90d1e2b606c17a3034daffca684b",
+        "out/production-gravity/run-1.log": "7f3d3873aae5840f903fad0ddaeeb2dbc2a1afffa2cd667f66602d017a825d3b",
+        "out/production-gravity/run-2.log": "7f3d3873aae5840f903fad0ddaeeb2dbc2a1afffa2cd667f66602d017a825d3b",
+        "out/production-gravity/trace-1.csv": "87b154d6212f742556f610ab42b4b9a6708555bcfc878b7acafa50760d198173",
+        "out/production-gravity/trace-2.csv": "87b154d6212f742556f610ab42b4b9a6708555bcfc878b7acafa50760d198173"
+      }
+    },
+    {
+      "configuration": "Release",
+      "build": "standalone",
+      "source": "d85fc0b8b11fac58d442eec2793d08cf858e461b",
+      "run_id": 41280522652,
+      "artifact_id": 13073112366,
+      "original_artifact_sha256": "3f08ad704861dc977ac40f8283633140876bbf6f380975fab666a2a8d7a9ad50",
+      "storage": "original artifact",
+      "file": "Evidence/standalone-Release.zip",
+      "sha256": "3f08ad704861dc977ac40f8283633140876bbf6f380975fab666a2a8d7a9ad50",
+      "capture_member": "out/production-gravity/capture.json",
+      "trace_members": [
+        "out/production-gravity/trace-1.csv",
+        "out/production-gravity/trace-2.csv"
+      ],
+      "members_sha256": {
+        "out/gravity-build/build.log": "d018e084ed69ebf450db56dcac0ce2d1ccd48ac6782a700bed4ae27493b41576",
+        "gravity-configure.log": "fa50d7da29d0c844723366c8030bfd7fb6a883f4de02808bc1f37667869471ae",
+        "out/gravity-build/binaries.txt": "529e61b4d7a5df651257c50860f97af0b42fdccde10e6ca41fb28b20939d507c",
+        "out/gravity-build/CMakeCache.txt": "c64988a479be658f6ff3eb4e5069df783f5bc9a2a92d012afdcc3eb06309c391",
+        "out/gravity-build/compiler.txt": "6633337fe220528955141f9bbe65eae56d4c61e750edf47f09bd743368317378",
+        "out/production-gravity/capture.json": "6181b4fd6a81ce12c36355b6d18ac21f034888909901cc7f37e2091f7e383663",
+        "out/production-gravity/run-1.log": "7f3d3873aae5840f903fad0ddaeeb2dbc2a1afffa2cd667f66602d017a825d3b",
+        "out/production-gravity/run-2.log": "7f3d3873aae5840f903fad0ddaeeb2dbc2a1afffa2cd667f66602d017a825d3b",
+        "out/production-gravity/trace-1.csv": "87b154d6212f742556f610ab42b4b9a6708555bcfc878b7acafa50760d198173",
+        "out/production-gravity/trace-2.csv": "87b154d6212f742556f610ab42b4b9a6708555bcfc878b7acafa50760d198173"
+      }
+    },
+    {
+      "configuration": "Debug",
+      "build": "application",
+      "source": "d85fc0b8b11fac58d442eec2793d08cf858e461b",
+      "run_id": 41280522652,
+      "artifact_id": 13073148783,
+      "original_artifact_sha256": "03608cd4a261f768d9c602346d5792e10e7ffee5952b3a73dae0d72441fdb767",
+      "storage": "filtered gravity/build metadata members; no compiled binaries",
+      "file": "Evidence/application-Debug.zip",
+      "sha256": "b83f5ebdd059efe467aa4dfaba914804d5a7273aefaf1544e5e833306798b845",
+      "capture_member": "production-gravity/capture.json",
+      "trace_members": [
+        "production-gravity/trace-1.csv",
+        "production-gravity/trace-2.csv"
+      ],
+      "members_sha256": {
+        "production-app/CMakeCache.txt": "a93e9917f779c5d444fa19dd5c314d9ffc9f2f16643f418af9a26e7d17bc68ff",
+        "production-app/Testing/Temporary/LastTest.log": "62a9353c05a46f4f3997e6a3ffd5e9264d1a3a1128f34596a39910439c890d43",
+        "production-app/build-inputs.json": "05f8235d08b664cabcb87d4f69a024f70c53a1e6ac64544670cd7dffcdf3c76f",
+        "production-app/build-metadata.txt": "998a30d7d50df5ba15d6f611a2807c9fc3d2ed5c7340ff3efa649f03359c9a6b",
+        "production-app/build.log": "6f5af6b13b2a1c608ea9c30dadc22ac30008fec9e28ba6905628473e9b59ccc3",
+        "production-app/compiler.txt": "6633337fe220528955141f9bbe65eae56d4c61e750edf47f09bd743368317378",
+        "production-app/configure.log": "f3ace46b70360aaf48b689e7b3e3c538236bafb16e56d36f2c0990bf1bbef3e6",
+        "production-app/ctest.log": "f5f1340713df280b77d1fd6ebc8dc7f32668e9b438df58384e796ee086737d56",
+        "production-gravity/capture.json": "e17b03aa0eab207c87750fd2d7cf315580b7d78887484641e11893581f5b9d48",
+        "production-gravity/run-1.log": "7f3d3873aae5840f903fad0ddaeeb2dbc2a1afffa2cd667f66602d017a825d3b",
+        "production-gravity/run-2.log": "7f3d3873aae5840f903fad0ddaeeb2dbc2a1afffa2cd667f66602d017a825d3b",
+        "production-gravity/trace-1.csv": "87b154d6212f742556f610ab42b4b9a6708555bcfc878b7acafa50760d198173",
+        "production-gravity/trace-2.csv": "87b154d6212f742556f610ab42b4b9a6708555bcfc878b7acafa50760d198173"
+      }
+    },
+    {
+      "configuration": "Release",
+      "build": "application",
+      "source": "d85fc0b8b11fac58d442eec2793d08cf858e461b",
+      "run_id": 41280522652,
+      "artifact_id": 13073745015,
+      "original_artifact_sha256": "80636a0a3cbe5042c76b07fc791bc06c0059c9b33f7aa14ae3de9bad20f7fd5a",
+      "storage": "filtered gravity/build metadata members; no compiled binaries",
+      "file": "Evidence/application-Release.zip",
+      "sha256": "c1f44f35ae68c9bddada9ce11539121c37d25af22f913615ac17dd01c0ba8d65",
+      "capture_member": "production-gravity/capture.json",
+      "trace_members": [
+        "production-gravity/trace-1.csv",
+        "production-gravity/trace-2.csv"
+      ],
+      "members_sha256": {
+        "production-app/CMakeCache.txt": "83db1b2ecb29c735ec169c1d1cdd6c26ee1b2de6c4cea69fe5278ca845b276ef",
+        "production-app/Testing/Temporary/LastTest.log": "84f057907447c058a010fa1f857a9eec0c782afdf2bea9e9f1bde0bbbce198e7",
+        "production-app/build-inputs.json": "7d6b3a37d286201bf51611fa935083e61d123b57a7b668668ee246a4e2b0fb9e",
+        "production-app/build-metadata.txt": "998a30d7d50df5ba15d6f611a2807c9fc3d2ed5c7340ff3efa649f03359c9a6b",
+        "production-app/build.log": "450fd6bef86a7f873de69804db1aacd6ee5dca3cc43f7784ab2e1d45ec2ab581",
+        "production-app/compiler.txt": "6633337fe220528955141f9bbe65eae56d4c61e750edf47f09bd743368317378",
+        "production-app/configure.log": "d4cc2b6085a14aaa2c4dd1ce19bc052493ce718870dd82b7afe01f5a8ee86bce",
+        "production-app/ctest.log": "a4a1cf51dee722ee2193fcb872aad44527aca33ea0f475e333d15e7fb40949dd",
+        "production-gravity/capture.json": "ea2d6e9489c4f9625f4561fbb2e840480903bc97e938905314fe4cf7ede9954c",
+        "production-gravity/run-1.log": "7f3d3873aae5840f903fad0ddaeeb2dbc2a1afffa2cd667f66602d017a825d3b",
+        "production-gravity/run-2.log": "7f3d3873aae5840f903fad0ddaeeb2dbc2a1afffa2cd667f66602d017a825d3b",
+        "production-gravity/trace-1.csv": "87b154d6212f742556f610ab42b4b9a6708555bcfc878b7acafa50760d198173",
+        "production-gravity/trace-2.csv": "87b154d6212f742556f610ab42b4b9a6708555bcfc878b7acafa50760d198173"
+      }
+    }
+  ],
+  "comparisons": {
+    "gravity-comparison.json": {
+      "status": "passed",
+      "samples": 864,
+      "maximum_acceleration_error_m_s2": 0.0,
+      "budgets": {
+        "acceleration_absolute_m_s2": 1e-12,
+        "acceleration_relative": 1e-10,
+        "rule": "Euclidean vector error <= absolute + relative * reference vector magnitude; exact discrete identities and query positions"
+      },
+      "reference_sha256": "87b154d6212f742556f610ab42b4b9a6708555bcfc878b7acafa50760d198173",
+      "candidate_sha256": "87b154d6212f742556f610ab42b4b9a6708555bcfc878b7acafa50760d198173"
+    },
+    "gravity-release-build-comparison.json": {
+      "status": "passed",
+      "samples": 864,
+      "maximum_acceleration_error_m_s2": 0.0,
+      "budgets": {
+        "acceleration_absolute_m_s2": 1e-12,
+        "acceleration_relative": 1e-10,
+        "rule": "Euclidean vector error <= absolute + relative * reference vector magnitude; exact discrete identities and query positions"
+      },
+      "reference_sha256": "87b154d6212f742556f610ab42b4b9a6708555bcfc878b7acafa50760d198173",
+      "candidate_sha256": "87b154d6212f742556f610ab42b4b9a6708555bcfc878b7acafa50760d198173"
+    },
+    "gravity-debug-build-comparison.json": {
+      "status": "passed",
+      "samples": 864,
+      "maximum_acceleration_error_m_s2": 0.0,
+      "budgets": {
+        "acceleration_absolute_m_s2": 1e-12,
+        "acceleration_relative": 1e-10,
+        "rule": "Euclidean vector error <= absolute + relative * reference vector magnitude; exact discrete identities and query positions"
+      },
+      "reference_sha256": "87b154d6212f742556f610ab42b4b9a6708555bcfc878b7acafa50760d198173",
+      "candidate_sha256": "87b154d6212f742556f610ab42b4b9a6708555bcfc878b7acafa50760d198173"
+    }
+  },
+  "original_comparison_artifact": {
+    "id": 13073735078,
+    "sha256": "1b38e1028d5050b4d06c83a3f4c6f5967863b31b668b353445a415a90acc5366"
+  },
+  "preparation_failure": {
+    "source": "466d838c534a534d2d966b8d19eaf562a41861dc",
+    "run_id": 41280384433,
+    "jobs": [
+      124770946157,
+      124770946206
+    ],
+    "reason": "Standalone project omitted production NOMINMAX definition; compile failed at Config.h:400 before execution. Corrected in capture source; no numerical budget changed.",
+    "evidence": [
+      {
+        "configuration": "Debug",
+        "artifact_id": 13073425280,
+        "file": "Evidence/failed-standalone-Debug.zip",
+        "sha256": "00a01a1310b0bfb1bbf01678039b05213ecd625604dbf8ca24ba492b6b414588"
+      },
+      {
+        "configuration": "Release",
+        "artifact_id": 13072902560,
+        "file": "Evidence/failed-standalone-Release.zip",
+        "sha256": "8ed740d4c39c4c28ae42a155c737633599526c4b1a6732e4964aaeee2a90915b"
+      }
+    ]
+  }
+}
