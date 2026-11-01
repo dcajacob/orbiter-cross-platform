@@ -43,3 +43,19 @@ references cover only the two declared reduced cases. They do not establish
 terrain/contact/docking, atmosphere, all RCS/autopilot modes, clock/lifetime
 transitions, save/reload precision, vessel callback ordering or graphics/cockpit
 acceptance. Capture those cases before extracting their affected subsystems.
+
+## Atmosphere profile discovered during the native vessel extraction
+
+The immutable logs in this early capture report missing `EarthAtmJ71G.dll` and
+`MarsAtm2006.dll`: its build-tree staging did not reproduce the atmosphere
+modules' body-specific install directories. These traces retain that original
+fallback atmosphere profile. They are unchanged and still protect that Windows
+profile; they must not be used to disable correctly installed native forces.
+
+The later, pre-extraction [behavior references](../BehaviorReference/README.md)
+from run `41193020450` explicitly stage the source-built atmosphere DLLs at their
+CMake install destinations. Their RCS, autopilot and callback-fixture numerical
+states are the matching references for native vessels with the actual J71G
+module. The native component verifier checks initial nonzero density and retains
+all original numerical budgets. A matching, correctly staged long-duration
+Windows/native comparison is still required for the 6,000-step production runs.

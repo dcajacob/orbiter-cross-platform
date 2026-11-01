@@ -9,7 +9,9 @@ The [production release work](Docs/Production/README.md) now has separate scope,
 capabilities and gates. The real Windows OpenGL client passes its production
 scene gate. Current work is Phase 3: extracting the production engine for native
 Linux. Shared production classes and native SPICE/atmosphere modules pass their
-component checks; a native production world and textured client are still pending.
+component checks. The actual native Sol world now loads the original ISS vessel
+and a source-built ShuttlePB through the checked native SDK. The production
+camera, textured client and native application integration are still pending.
 
 **Milestone complete (2026-10-31): native headless Windows/Linux parity is
 verified.** The command-line runner advances the supported unpowered vessel for

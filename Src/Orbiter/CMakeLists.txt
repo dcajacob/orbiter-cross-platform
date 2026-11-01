@@ -72,6 +72,10 @@ set(common_src
 	Vessel.cpp
 	VesselApplication.cpp
 	VesselSdk.cpp
+	VesselSdkApplication.cpp
+	VesselLights.cpp
+	VesselFlightMath.cpp
+	VesselRecorder.cpp
 	Vesselstatus.cpp
 # Surface base classes
 # Cockpit classes

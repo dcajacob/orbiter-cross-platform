@@ -1436,6 +1436,9 @@ protected:
 	// register a vessel library
 
 	void ClearModule ();
+#ifndef _WIN32
+	static void ReleaseNativeInterface(VESSEL* interface);
+#endif
 	// clear interface pointers and unload module
 
 #ifdef _WIN32

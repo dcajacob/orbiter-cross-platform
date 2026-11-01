@@ -881,19 +881,6 @@ DLLEXPORT VECTOR3 oapiGetWindVector (OBJHANDLE hPlanet, double lng, double lat, 
 // ===========================================================================
 // Aerodynamics helper functions
 
-DLLEXPORT double oapiGetInducedDrag (double cl, double A, double eps)
-{
-	return (cl*cl)/(Pi*A*eps);
-}
-
-DLLEXPORT double oapiGetWaveDrag (double M, double M1, double M2, double M3, double cmax)
-{
-	if (M < M1) return 0.0;
-	if (M < M2) return cmax * (M-M1)/(M2-M1);
-	if (M < M3) return cmax;
-	return cmax * sqrt ((M3*M3-1.0)/(M*M-1.0));
-}
-
 // ===========================================================================
 
 DLLEXPORT void oapiGetEngineStatus (OBJHANDLE hVessel, ENGINESTATUS *es)

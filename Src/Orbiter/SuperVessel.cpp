@@ -42,7 +42,7 @@ SuperVessel::SuperVessel (Vessel *vessel)
 	bOrbitStabilised = false;
 	cbody = 0;
 	size = vessel->Size();
-	el = new Elements; GetRigidBodyServices().TraceAllocation(__FILE__,__LINE__);
+	el = new Elements(GetRigidBodyServices().Time().MJD_ref); GetRigidBodyServices().TraceAllocation(__FILE__,__LINE__);
 	s0->omega.Set (vessel->AngularVelocity());
 	s0->pos.Set (vessel->GPos());
 	rpos_base.Set (s0->pos);
@@ -102,7 +102,7 @@ SuperVessel::SuperVessel (Vessel *vessel1, Vessel *vessel2, int port1, int port2
 	s0->Q.Set (vessel1->s0->Q);
 	bOrbitStabilised = false;
 	cbody = 0;
-	el = new Elements; GetRigidBodyServices().TraceAllocation(__FILE__,__LINE__);
+	el = new Elements(GetRigidBodyServices().Time().MJD_ref); GetRigidBodyServices().TraceAllocation(__FILE__,__LINE__);
 
 	// add up linear momentae
 	if (mixmoments) {
@@ -852,7 +852,7 @@ void SuperVessel::SetOrbitReference (CelestialBody *body)
 {
 	if (body && body != cbody) {               // otherwise nothing to do
 		cbody = body;
-		el->Setup (mass, cbody->Mass(), el->MJDepoch());
+		el->Setup (mass, cbody->Mass(), el->MJDepoch(), GetRigidBodyServices().Time().MJD_ref);
 		bOrbitStabilised = false;      // enforce recalculation of elements
 		for (oapi::UInt32 i = 0; i < nv; i++) // propagate to individual vessels
 			vlist[i].vessel->SetOrbitReference (body);

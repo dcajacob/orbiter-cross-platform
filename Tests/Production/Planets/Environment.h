@@ -32,7 +32,7 @@
 #include <vector>
 using namespace orbiter::production;
 namespace production_component_test {
-struct Environment final : BodyServices,RigidBodyServices,SurfaceServices,NavigationServices {
+struct Environment : BodyServices,RigidBodyServices,SurfaceServices,NavigationServices {
     const ResourceResolver& config;
     Config settings;
     PlanetarySystem* system=nullptr;

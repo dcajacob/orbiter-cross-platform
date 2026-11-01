@@ -24,7 +24,13 @@ def ranges(source):
     result.extend(record_ranges(source))
     result.extend(extra_ranges(source))
     result.extend(simulation_ranges(source))
+    result.append(light_range(source))
     return result
+
+def light_range(source):
+    start=source.index(b'class OAPIFUNC LightEmitter')
+    end=source.index(b'//@}',start)
+    return start,end,b'#include "OrbiterLightData.h"\n'
 
 def simulation_ranges(source):
     result=[]
@@ -90,6 +96,9 @@ def verify():
     simulation=current('Orbitersdk/include/OrbiterSimulationData.h').replace(b'oapi::UInt32',b'DWORD').replace(b'oapi::UInt16',b'WORD').replace(b'oapi::UInt',b'UINT')
     for start,end,_ in simulation_ranges(source):
         if source[start:end] not in simulation:raise ValueError('Simulation SDK flags or engine status changed')
+    start,end,_=light_range(source)
+    if source[start:end].rstrip() not in current('Orbitersdk/include/OrbiterLightData.h'):
+        raise ValueError('Original SDK logical light classes changed')
     if restore_api(current('Orbitersdk/include/OrbiterAPI.h'))!=source:raise ValueError('SDK changed beyond declared vessel value extraction')
     vessel=current('Orbitersdk/include/VesselAPI.h')
     for name in (b'OrbiterValueTypes.h',b'OrbiterSdkDrawingTypes.h'):

@@ -6,8 +6,12 @@
 // Interface in OrbiterAPI.h
 //-----------------------------------------------------------------------------
 
+#ifdef _WIN32
 #define OAPI_IMPLEMENTATION
 #include "OrbiterAPI.h"
+#else
+#include "NativeVesselAPI.h"
+#endif
 #include "Vessel.h"
 
 extern char DBG_MSG[256];

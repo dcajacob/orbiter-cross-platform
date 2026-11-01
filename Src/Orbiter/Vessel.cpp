@@ -100,7 +100,7 @@ Vessel::Vessel (const PlanetarySystem *psys, const char *_name, const char *_cla
 	// Set class capabilities
 	SetClassCaps (classf);
 
-	el = new Elements; GetRigidBodyServices().TraceAllocation(__FILE__,__LINE__);
+	el = new Elements(GetRigidBodyServices().Time().MJD_ref); GetRigidBodyServices().TraceAllocation(__FILE__,__LINE__);
 
 	// Set status from parameters
 	SetState (status);
@@ -134,7 +134,7 @@ Vessel::Vessel (const PlanetarySystem *psys, const char *_name, const char *_cla
 	// Set class capabilities
 	SetClassCaps (classf);
 
-	el = new Elements; GetRigidBodyServices().TraceAllocation(__FILE__,__LINE__);
+	el = new Elements(GetRigidBodyServices().Time().MJD_ref); GetRigidBodyServices().TraceAllocation(__FILE__,__LINE__);
 
 	// Set status from parameters
 	if (modIntf.v->Version() >= 1)
@@ -176,7 +176,7 @@ Vessel::Vessel (const PlanetarySystem *psys, const char *_name, const char *_cla
 	// Set class capabilities
 	SetClassCaps (classf);
 
-	el = new Elements; GetRigidBodyServices().TraceAllocation(__FILE__,__LINE__);
+	el = new Elements(GetRigidBodyServices().Time().MJD_ref); GetRigidBodyServices().TraceAllocation(__FILE__,__LINE__);
 
 	// Read status from scenario file
 	Read (ifs);
@@ -1496,8 +1496,15 @@ void Vessel::ClearExhaustDefinitions ()
 
 	// delete exhaust definitions
 	if (nexhaust) {
-		for (i = 0; i < nexhaust; i++)
+		for (i = 0; i < nexhaust; i++) {
+			if (exhaust[i]->level && (exhaust[i]->flags & EXHAUST_CONSTANTLEVEL))
+				delete exhaust[i]->level;
+			if (exhaust[i]->lpos && (exhaust[i]->flags & EXHAUST_CONSTANTPOS))
+				delete exhaust[i]->lpos;
+			if (exhaust[i]->ldir && (exhaust[i]->flags & EXHAUST_CONSTANTDIR))
+				delete exhaust[i]->ldir;
 			delete exhaust[i];
+		}
 		delete []exhaust;
 		exhaust = NULL;
 		nexhaust = 0;
@@ -7304,7 +7311,7 @@ ANIMATIONCOMP *Vessel::AddAnimationComponent (oapi::UInt an, double state0, doub
 	ANIMATIONCOMP **tmp = new ANIMATIONCOMP*[ncomp+1]; GetRigidBodyServices().TraceAllocation(__FILE__,__LINE__);
 	if (ncomp) {
 		memcpy (tmp, A->comp, ncomp*sizeof(ANIMATIONCOMP*));
-		delete A->comp;
+		delete []A->comp;
 	}
 	A->comp = tmp;
 	ANIMATIONCOMP *ac = new ANIMATIONCOMP; GetRigidBodyServices().TraceAllocation(__FILE__,__LINE__);

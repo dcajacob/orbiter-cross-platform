@@ -83,9 +83,9 @@ bool Vessel::ParseScenarioLine (char *line, VESSELSTATUS &vs)
 		Vector rpos, rvel;
 		sscanf (line+8, "%lf%lf%lf%lf%lf%lf%lf",  &a, &e, &i, &theta, &omegab, &L, &elmjd);
 		if (vs.rbody) {
-			el->Set (a, e, i*RAD, theta*RAD, omegab*RAD, L*RAD, elmjd);
+			el->Set (a, e, i*RAD, theta*RAD, omegab*RAD, L*RAD, elmjd, GetRigidBodyServices().Time().MJD_ref);
 			el->Setup (mass, ((Body*)vs.rbody)->Mass(), GetRigidBodyServices().Time().MJD_ref, GetRigidBodyServices().Time().MJD_ref);
-			el->Update (rpos, rvel);
+			el->Update (rpos, rvel, GetRigidBodyServices().Time().SimT1);
 			vs.rpos.x = rpos.x, vs.rpos.y = rpos.y, vs.rpos.z = rpos.z;
 			vs.rvel.x = rvel.x, vs.rvel.y = rvel.y, vs.rvel.z = rvel.z;
 			el_valid = true;
@@ -326,9 +326,9 @@ bool Vessel::ParseScenarioLine2 (char *line, void *status)
 		Vector rpos, rvel;
 		sscanf (line+8, "%lf%lf%lf%lf%lf%lf%lf",  &a, &e, &i, &theta, &omegab, &L, &elmjd);
 		if (vs->rbody) {
-			el->Set (a, e, i*RAD, theta*RAD, omegab*RAD, L*RAD, elmjd);
+			el->Set (a, e, i*RAD, theta*RAD, omegab*RAD, L*RAD, elmjd, GetRigidBodyServices().Time().MJD_ref);
 			el->Setup (mass, ((Body*)vs->rbody)->Mass(), GetRigidBodyServices().Time().MJD_ref, GetRigidBodyServices().Time().MJD_ref);
-			el->Update (rpos, rvel);
+			el->Update (rpos, rvel, GetRigidBodyServices().Time().SimT1);
 			vs->rpos.x = rpos.x, vs->rpos.y = rpos.y, vs->rpos.z = rpos.z;
 			vs->rvel.x = rvel.x, vs->rvel.y = rvel.y, vs->rvel.z = rvel.z;
 			el_valid = true;

@@ -2,7 +2,7 @@ name: Production World and Terrain Windows and Linux
 on:
   push:
     branches: ['codex/production-**']
-    paths: ['Src/Orbiter/**', 'Src/Celbody/**', 'Orbitersdk/**', 'Tests/Production/Elevation/**', 'Tests/Production/Planets/**', 'Tests/Production/World/**', '.github/workflows/production-elevation.yml']
+    paths: ['Src/Orbiter/**', 'Src/Celbody/**', 'Orbitersdk/**', 'Tests/Production/Elevation/**', 'Tests/Production/Planets/**', 'Tests/Production/World/**', 'Tests/Production/Vessels/**', 'Tests/Production/StockControlSchedules.h', '.github/workflows/production-elevation.yml']
   workflow_dispatch:
 permissions:
   contents: read
@@ -51,8 +51,8 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          cmake -S Src/Orbiter/Production -B out/terrain-native -G Ninja -DCMAKE_BUILD_TYPE=${{ matrix.configuration }} -DORBITER_BUILD_NATIVE_CELESTIAL_MODULES=ON 2>&1 | tee terrain-configure.log
-          cmake --build out/terrain-native --target production_native_elevation_observer production_native_planet_observer production_native_world_observer --parallel 2 2>&1 | tee terrain-build.log
+          cmake -S Src/Orbiter/Production -B out/terrain-native -G Ninja -DCMAKE_BUILD_TYPE=${{ matrix.configuration }} -DORBITER_BUILD_NATIVE_CELESTIAL_MODULES=ON -DORBITER_BUILD_NATIVE_VESSELS=${{ runner.os == 'Linux' && 'ON' || 'OFF' }} 2>&1 | tee terrain-configure.log
+          cmake --build out/terrain-native --target production_native_elevation_observer production_native_planet_observer production_native_world_observer ${{ runner.os == 'Linux' && 'production_native_vessel_observer' || '' }} --parallel 2 2>&1 | tee terrain-build.log
       - uses: actions/cache@v6
         with:
           path: out/data-cache/production-stock-data-v1.zip
@@ -87,6 +87,13 @@ jobs:
           --executable out/terrain-native/production_native_planet_observer${{ runner.os == 'Windows' && '.exe' || '' }}
           --modules out/terrain-native/NativeModules --data out/data --planets out/planets
           --output out/planet-observation
+      - name: Verify actual native stock vessel dynamics against matching frozen Windows
+        if: runner.os == 'Linux'
+        run: >-
+          python3 -B Tests/Production/Vessels/verify.py
+          --executable out/terrain-native/production_native_vessel_observer
+          --modules out/terrain-native/NativeModules --data out/data --planets out/planets
+          --configuration ${{ matrix.configuration }} --output out/vessel-observation
       - uses: actions/upload-artifact@v7
         if: always()
         with:
@@ -103,6 +110,9 @@ jobs:
             out/world-observation/*.csv
             out/world-observation/*.json
             out/world-observation/*.log
+            out/vessel-observation/**/*.csv
+            out/vessel-observation/**/*.log
+            out/vessel-observation/*.json
   parity:
     name: Production terrain Windows/Linux parity
     needs: native

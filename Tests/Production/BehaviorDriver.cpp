@@ -3,6 +3,7 @@
 // autopilot and scenario operation below goes through the production SDK.
 #define ORBITER_MODULE
 #include "Orbitersdk.h"
+#include "StockControlSchedules.h"
 #include "ApplicationObservation.h"
 #include <algorithm>
 #include <cmath>
@@ -86,21 +87,13 @@ public:
             event("module.pre","","");
             VESSEL *v = oapiGetVesselInterface(target);
             if (id == "rcs") {
-                const THGROUP_TYPE groups[] = {THGROUP_ATT_PITCHUP,THGROUP_ATT_PITCHDOWN,THGROUP_ATT_YAWLEFT,
-                    THGROUP_ATT_YAWRIGHT,THGROUP_ATT_BANKLEFT,THGROUP_ATT_BANKRIGHT,THGROUP_ATT_UP,THGROUP_ATT_DOWN,
-                    THGROUP_ATT_LEFT,THGROUP_ATT_RIGHT,THGROUP_ATT_FORWARD,THGROUP_ATT_BACK};
                 // Groups share physical thrusters. Clear them before applying
                 // the selected group so a later zero cannot erase its command.
-                for (auto group:groups) v->SetThrusterGroupLevel(group,0);
-                if (tick/40 < 12 && tick%40 < 8) v->SetThrusterGroupLevel(groups[tick/40],.2);
+                production_test::Rcs(v,tick);
                 event("input.rcs",nameOf(target),std::to_string(tick/40)+":"+std::to_string(tick%40 < 8 ? .2 : 0));
             } else if (id == "autopilot") {
-                const int modes[] = {NAVMODE_KILLROT,NAVMODE_PROGRADE,NAVMODE_RETROGRADE,NAVMODE_NORMAL,NAVMODE_ANTINORMAL};
-                if (tick%80 == 0 && tick/80 < 5) {
-                    for (int mode:modes) v->DeactivateNavmode(mode);
-                    v->ActivateNavmode(modes[tick/80]);
-                    event("input.navmode",nameOf(target),std::to_string(modes[tick/80]));
-                }
+                if (int mode=production_test::Autopilot(v,tick))
+                    event("input.navmode",nameOf(target),std::to_string(mode));
             } else if (id == "atmosphere") {
                 if (tick == 0) { v->ActivateNavmode(NAVMODE_HLEVEL); event("input.navmode",nameOf(target),"hlevel"); }
                 v->SetThrusterGroupLevel(THGROUP_MAIN,.15);

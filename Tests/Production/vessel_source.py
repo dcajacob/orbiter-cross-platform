@@ -7,11 +7,17 @@ from surface_source import equal
 ROOT=Path(__file__).resolve().parents[2]
 PRIOR='0e794eb0'
 def old(name):return subprocess.check_output(['git','-C',str(ROOT),'show',PRIOR+':'+name]).replace(b'\r\n',b'\n').decode('cp1252')
-def now(name):return (ROOT/name).read_bytes().replace(b'\r\n',b'\n').decode('cp1252')
+def now(name):
+    source=(ROOT/name).read_bytes().replace(b'\r\n',b'\n').decode('cp1252')
+    if (ROOT/'Src/Orbiter/VesselSdkApplication.cpp').exists():
+        from vessel_runtime_source import previous_files
+        source=previous_files().get(name,source)
+    return source
 def scalars(source):
     for a,b in [('oapi::UInt32','DWORD'),('oapi::UInt16','WORD'),('oapi::UInt','UINT'),('std::uintptr_t','DWORD_PTR'),('std::uint8_t','BYTE')]:source=source.replace(a,b)
     return source
 def restore_header(source):
+    source=source.replace('#ifndef _WIN32\n\tstatic void ReleaseNativeInterface(VESSEL* interface);\n#endif\n','')
     source=source.replace('#include "Production/VesselServices.h"\n','')
     source=source.replace('#ifdef _WIN32\n#include "GraphicsAPI.h"\n#include "Log.h"\n#else\n#include "NativeVesselAPI.h"\n#include <stdexcept>\nnamespace oapi {class ParticleStream;}\n#endif','#include "GraphicsAPI.h"\n#include "Log.h"')
     source=source.replace('namespace oapi {class Sketchpad;}','class oapi::Sketchpad;')

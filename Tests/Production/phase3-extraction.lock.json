@@ -2,7 +2,7 @@
   "schema": 1,
   "production_source": "38b7c627878ea893390675616897071f8bb8e90f",
   "observed_source": "684bd5b27005feecfa9effe796bd216f85e3392f",
-  "scope": "Shared production Body, RigidBody, CelestialBody, Star, Planet, Base, BaseObject, actual PlanetarySystem loading/lifecycle through explicit real-vessel adapters, VesselBase surface/contact calculations, original propagators, actual Pines nonspherical gravity, CPU Mesh/MeshManager, fixed-width planetary archives, scenario environment/focus metadata production Config settings, frame ordering and authoritative world object ownership; platform services, indexed resources and an internal native module bootstrap and actual native SPICE/atmosphere interfaces; verbatim SDK mesh/celestial/visual value records and constants with original Windows declaration/layout checks. Full production world/module SDK extraction remains incomplete.",
+  "scope": "Shared production Body, RigidBody, CelestialBody, Star, Planet, Base, BaseObject, actual PlanetarySystem loading/lifecycle through explicit real-vessel adapters, VesselBase surface/contact calculations, original propagators, actual Pines nonspherical gravity, CPU Mesh/MeshManager, fixed-width planetary archives, scenario environment/focus metadata production Config settings, frame ordering and authoritative world object ownership; platform services, indexed resources and an internal native module bootstrap and actual native SPICE/atmosphere interfaces; verbatim SDK mesh/celestial/visual value records and constants with original Windows declaration/layout checks. Full production world/module SDK extraction remains incomplete. Original production Vessel, SDK vessel delegates, lights, recorder and source-built ShuttlePB now execute through explicit native services; headless numerical components only, camera/rendering application integration remains pending.",
   "required_runtime_gates": [
     "frozen two-body reference",
     "frozen production orbit/propulsion",
@@ -19,11 +19,11 @@
       "original_sha256_lf": "42ea7373077f698dbfcf42358b74439aaa187c1de6f5c41194bbbbd8bc016bef"
     },
     "Orbitersdk/include/NativeVesselAPI.h": {
-      "sha256_lf": "ce0d4021a31d7469d36677cde2c9cbdb1eb49112a70ddb0a9aa81cd5e478ccac",
+      "sha256_lf": "2a880e0f5d294326e416b6d4a635af4a95a9aba6b01bf8d95c8ff109df0edac2",
       "original_sha256_lf": null
     },
     "Orbitersdk/include/OrbiterAPI.h": {
-      "sha256_lf": "b50a006df5d7899ae348b2bb765e8d6ba10ec049684ffa42013aec099e7dcd4d",
+      "sha256_lf": "74c8316f8ab212b11b59887b1c9ce6f8672920781e5c4e11a157dce20b51cbb6",
       "original_sha256_lf": "3425025c178218dce10bf7b8edf296dfe7eda8f171d925aca622a7534735fd31"
     },
     "Orbitersdk/include/OrbiterAnimationData.h": {
@@ -41,6 +41,10 @@
     "Orbitersdk/include/OrbiterHandles.h": {
       "sha256_lf": "473ccc0368115a422d7d65c9aece0c005fbacff4a508feec8791e2263eebfcc0",
       "original_sha256_lf": null
+    },
+    "Orbitersdk/include/OrbiterLightData.h": {
+      "original_sha256_lf": null,
+      "sha256_lf": "349e62854223332f24bb2e9a884e383ae59318daabbfc941132aa7637de4ab1e"
     },
     "Orbitersdk/include/OrbiterMeshData.h": {
       "sha256_lf": "5ba232bc40f466d21106d3253f78ce3f5bfa307e8926406a857cc344d4701e67",
@@ -171,7 +175,7 @@
       "original_sha256_lf": "8899635492ca087f2ad7532555b4bbdf557bb4ca4c736136adec4d68936325d5"
     },
     "Src/Orbiter/CMakeLists.txt": {
-      "sha256_lf": "6b895529ef780108223316f2cbbe78f045c30b38b3ee7cc71b9c67150d009c45",
+      "sha256_lf": "75d559919b4d5825991619391d9ff3dced549e4def072d0cc8aa38571e95c668",
       "original_sha256_lf": "4ba30d001a975912a85b238851629fb999e483d8b2ba1974eb9bef9e9beb60ac"
     },
     "Src/Orbiter/Celbody.cpp": {
@@ -218,6 +222,14 @@
       "sha256_lf": "ff604c6ae68aa78f6d77eb118ccb419502a56a3245eac556b33d87c178220ddc",
       "original_sha256_lf": null
     },
+    "Src/Orbiter/FlightRecorder.cpp": {
+      "original_sha256_lf": "dcfb0820387342c840e29beb4bc6bbeb8f29c1478c6598c8295ee0b61a22ca01",
+      "sha256_lf": "a86b083a20121fb9a4da6df5c8e32dd0e8801d599c3d9e3df89acfd0459fc9fb"
+    },
+    "Src/Orbiter/LightEmitter.cpp": {
+      "original_sha256_lf": "d0f2d9e595d4ed5ddd734119d02b12eb0a3cdb9eeca988bc834eeec4a02ed960",
+      "sha256_lf": "d3dd19ccf81c090206bad130fd5453f08a9c1181f73330caa6bf9220cd656b7f"
+    },
     "Src/Orbiter/Mesh.cpp": {
       "sha256_lf": "6cf755dcd45c07c2201e1ba8629dab2e2817158f47b6f1dc1e2335ab0e959c51",
       "original_sha256_lf": "5bef72bc1069528e33231ee1df66be3f424d1d1c6863b653c36d351f8d1a1c44"
@@ -243,7 +255,7 @@
       "original_sha256_lf": "32db52be7f0355c383d7ae8f4fd033170e3c13c272bd11a4c0be9453d25dd297"
     },
     "Src/Orbiter/OrbiterAPI.cpp": {
-      "sha256_lf": "61acb3ba908226079c6faa72ff75a6eee83fa991fe8a3184286a71116f2a2d2e",
+      "sha256_lf": "e6c63886a21cc5403b811f764e3a93c5db1e90111a6104230bb12f18a8634e1e",
       "original_sha256_lf": "6ab4e355f274bda7296d794e45e38ad9f1cc5a051dd1d40eea14b55d6412dbb2"
     },
     "Src/Orbiter/Pane.h": {
@@ -283,7 +295,7 @@
       "original_sha256_lf": null
     },
     "Src/Orbiter/Production/CMakeLists.txt": {
-      "sha256_lf": "c3a71e47f5dc4da4592cb7b181eee969884298ab536ec5c5bd7d95085b6849b5",
+      "sha256_lf": "68fa65b236c21c466276c762d79d3ce6b2acd9a4e8430ba1a1783a60cd6ba992",
       "original_sha256_lf": null
     },
     "Src/Orbiter/Production/CelestialServices.cpp": {
@@ -386,6 +398,10 @@
       "sha256_lf": "8f56d7e6e09a4eefca06be461a388eb8620d0316a1a8273fe0b378a8c09d947e",
       "original_sha256_lf": null
     },
+    "Src/Orbiter/Production/NativeCockpitUnavailable.cpp": {
+      "original_sha256_lf": null,
+      "sha256_lf": "bd82efea27cde26b8ec2a7a6eb0747254b9a939f62cb3714d5418c6d99a9c72c"
+    },
     "Src/Orbiter/Production/NativeElevationServices.cpp": {
       "sha256_lf": "f4bc105087fbcbd575547cedab1d86b49769f3d29d5c1bc515271ec71f764767",
       "original_sha256_lf": null
@@ -401,6 +417,34 @@
     "Src/Orbiter/Production/NativeModule.h": {
       "sha256_lf": "3d693b5b268409bb2f571a9fbb2b5b90fe3137c0a9a992a8cac55d51738adb4e",
       "original_sha256_lf": null
+    },
+    "Src/Orbiter/Production/NativeVesselApplication.cpp": {
+      "original_sha256_lf": null,
+      "sha256_lf": "c027a1c1e760adde8934e11ed4c564e6f0db9a29191b50ad0bedc1a93286d6ca"
+    },
+    "Src/Orbiter/Production/NativeVesselFactory.h": {
+      "original_sha256_lf": null,
+      "sha256_lf": "a74a337bdb129aecfd4062614cbeba2c062697ae08fa57585d58724140a65c9c"
+    },
+    "Src/Orbiter/Production/NativeVesselModule.cpp": {
+      "original_sha256_lf": null,
+      "sha256_lf": "7cc851715f37e9f7cac0a0f24469c4db6070b7f005e5a2368d1a91c18345b7ce"
+    },
+    "Src/Orbiter/Production/NativeVesselModule.h": {
+      "original_sha256_lf": null,
+      "sha256_lf": "e144f5f72c4f1af67d75d938aa07b8ee602ef26b09282d64b10df76b4761d378"
+    },
+    "Src/Orbiter/Production/NativeVessels.cmake": {
+      "original_sha256_lf": null,
+      "sha256_lf": "bd233617b7b0237c3004d36dafa0a4f1de8da954974756922d027797832514c2"
+    },
+    "Src/Orbiter/Production/NativeWorldVesselServices.cpp": {
+      "original_sha256_lf": null,
+      "sha256_lf": "fd058adebe23341185b3fcdbd59ab1ece1a706ce466b4bea2feb077ded6af24b"
+    },
+    "Src/Orbiter/Production/NativeWorldVesselServices.h": {
+      "original_sha256_lf": null,
+      "sha256_lf": "f206cd5639c1b47b4c67c2fd2b143181dbf7a3f40f6094856c0aaecbcbfac984"
     },
     "Src/Orbiter/Production/NavigationData.h": {
       "sha256_lf": "350c42086dbf7f3d196fbd76197f7e8537ffefe2c3b8440ef559acf058e6b653",
@@ -502,12 +546,16 @@
       "sha256_lf": "411605df6fe36cbc5ad2bca11b4c3170682bb5a8696c086565c3146018285724",
       "original_sha256_lf": null
     },
+    "Src/Orbiter/Production/VesselRecorderState.h": {
+      "original_sha256_lf": null,
+      "sha256_lf": "487dc147e7ead4328baa9fd3dbd54bafafc945aa9da619ab1966a180752158f0"
+    },
     "Src/Orbiter/Production/VesselServices.cpp": {
       "sha256_lf": "0bf6bc832fd0110abaafb5818bcf0bf7865045796018f4587cfb5d42c5a36d61",
       "original_sha256_lf": null
     },
     "Src/Orbiter/Production/VesselServices.h": {
-      "sha256_lf": "0ae59a7c2fdc3ec4ea256157c713433c6f1402291b65c92cb48a7641843a0a27",
+      "sha256_lf": "44bf9b19d8a493896dc1ea971673e611e4f21ba0c58b937f9e998c5c26c91752",
       "original_sha256_lf": null
     },
     "Src/Orbiter/Production/WindowsBodyServices.cpp": {
@@ -575,7 +623,7 @@
       "original_sha256_lf": null
     },
     "Src/Orbiter/Production/WindowsVesselServices.cpp": {
-      "sha256_lf": "d68f21f281c97d28b12dac9734263fe8876d78ef856ceaf7f17def4235866bd1",
+      "sha256_lf": "81e18bab2a897a81b3accc904d7a672b9309385e7ab892e7e49c46d5f2563a90",
       "original_sha256_lf": null
     },
     "Src/Orbiter/Production/WindowsVesselServices.h": {
@@ -671,7 +719,7 @@
       "original_sha256_lf": null
     },
     "Src/Orbiter/SuperVessel.cpp": {
-      "sha256_lf": "f9639ec09c95ef972edebebd835bcb42bab051008f424da7c16baf2ea0dcb173",
+      "sha256_lf": "1b8f9aa488e27e2e4f803e58f25cbe86a2d41ece4a3d0b2a55a72c21e174d7eb",
       "original_sha256_lf": "019ea38b4732d864efbb2cabb0bb30cb53f063be62d18d542575c71b297fb417"
     },
     "Src/Orbiter/SuperVessel.h": {
@@ -695,24 +743,40 @@
       "original_sha256_lf": "72936830e11eec20b86f2f616f2988f94932e6700112bbb1d01d2a6cdb3aa808"
     },
     "Src/Orbiter/Vessel.cpp": {
-      "sha256_lf": "1b1816a93d19f4719ef9e0ffd9d7714120ccb94be991451f633541ffb1440a5f",
+      "sha256_lf": "0a5b9bd68dee7a0c702c021eb9fcac5243bc9df1e1319de4c0ace9e4d23f205b",
       "original_sha256_lf": "9e34db9a70552f94f3966dbb14d57b3833e5f8f69246d5454c71161e93664e13"
     },
     "Src/Orbiter/Vessel.h": {
-      "sha256_lf": "bee830410a3e72793eb78a7f438a4c91b1a0bda2c4e0733dabfc02db2d7b4525",
+      "sha256_lf": "e87af115d5fa93a7d55d6cd348535fade0e7e997c3b665c700f512681a2460d4",
       "original_sha256_lf": "1d9a42f97d282bbe03fc9b176cefb81d45d36dd990bae8944925502e483e10dd"
     },
     "Src/Orbiter/VesselApplication.cpp": {
-      "sha256_lf": "3495aa467ddeb1c4b63b29d057678a8d0268cc3872e8a7bfcd280eafa95add4a",
+      "sha256_lf": "0685720499d955e16c25df28493d969214357912b2637fec0e18ceff5f479b40",
       "original_sha256_lf": null
+    },
+    "Src/Orbiter/VesselFlightMath.cpp": {
+      "original_sha256_lf": null,
+      "sha256_lf": "7362a24a96e288d1bcf980dd846d2e26ab63553cc480560b1e0c03a28fb6ae24"
+    },
+    "Src/Orbiter/VesselLights.cpp": {
+      "original_sha256_lf": null,
+      "sha256_lf": "25d55b7c60773641b4ae3551b5b6ddee6fb62bd98fbb151891b9aa1e72a92b09"
     },
     "Src/Orbiter/VesselPorts.h": {
       "sha256_lf": "8439eda1f0a4df00ec92d1a58ed0090271431d567249f992366d39b189c4f086",
       "original_sha256_lf": null
     },
+    "Src/Orbiter/VesselRecorder.cpp": {
+      "original_sha256_lf": null,
+      "sha256_lf": "ae8e47dacd0ad76207643941c692f79c66fd7978e96e15fd99037340f4394539"
+    },
     "Src/Orbiter/VesselSdk.cpp": {
-      "sha256_lf": "f6beb104026dcdbcf677767d7bed00fb77ae1127fdcc8a1d1b11a34bf4da09ea",
+      "sha256_lf": "e24490857aa99b07bf9250d5a9acfe2afa96e8094b0c5a4aeb910036ffa243ea",
       "original_sha256_lf": null
+    },
+    "Src/Orbiter/VesselSdkApplication.cpp": {
+      "original_sha256_lf": null,
+      "sha256_lf": "78bde75fa254eb1a005c83d35529583212227e9fdccfcaa05eab8d2f08749430"
     },
     "Src/Orbiter/Vesselbase.cpp": {
       "sha256_lf": "03798e377853e844767feeb08ff5f4a905ab2b63c86f8ce73301fc184f4b3753",
@@ -723,7 +787,7 @@
       "original_sha256_lf": "397003ab60932ebcebb2ab3cf79eeb97179146b5cd0d43a0a09f781e5ffe6c8f"
     },
     "Src/Orbiter/Vesselstatus.cpp": {
-      "sha256_lf": "b0e4e60cf72f13ccc915cc68c0b3f33006930d05a793706e5d59584a32957e33",
+      "sha256_lf": "b4498f73dd9b2034bd56cec0e62b457f73222b26ba8329f5ebc0447e8457dfd4",
       "original_sha256_lf": "2931f909c1d77cc5bd7c952834a82414ca54d58d98b4c0d3d86d44c1795b643b"
     },
     "Src/Orbiter/WindData.h": {
@@ -749,6 +813,14 @@
     "Src/Orbiter/elevmgrFile.cpp": {
       "sha256_lf": "5b019dd244b38bede572d8a43de22ae7c8f27f9468628ccf2250c5cdec6b7c2c",
       "original_sha256_lf": null
+    },
+    "Src/Vessel/ShuttlePB/NativeShuttlePBFactory.inc": {
+      "original_sha256_lf": null,
+      "sha256_lf": "8df3cbd30f6bc03fcfc2d13ff29a5034ff2146c7f06ae2897ecb85cd1989e250"
+    },
+    "Src/Vessel/ShuttlePB/ShuttlePB.cpp": {
+      "original_sha256_lf": "126cc5aa4e2f6ca96c478660fb47b4a4e23f1daa5f28911fff7a95cf25c3cf7a",
+      "sha256_lf": "c46bc345a45e28446833ee951eb4e8f1dd856a336b84104816e47317df00ff23"
     }
   }
 }

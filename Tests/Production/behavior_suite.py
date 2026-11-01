@@ -135,8 +135,8 @@ def validate(directory,case):
                 initial_fuel=float(own[0]['fuel']),final_fuel=float(own[-1]['fuel']))
 
 
-def compare(reference,candidate,case):
-    a,b=rows(reference/'behavior-state.csv'),rows(candidate/'behavior-state.csv')
+def compare_states(reference,candidate,case):
+    a,b=rows(reference),rows(candidate)
     require(len(a)==len(b),'behavior sample counts differ')
     maxima=dict(position_m=0.,velocity_m_s=0.,rotation_rad=0.,angular_velocity_rad_s=0.,mjd_days=0.,mass_fraction=0.)
     contact=case['budgets']=='contact'
@@ -158,6 +158,11 @@ def compare(reference,candidate,case):
             fraction=abs(float(ref[field])-float(got[field]))/max(1e-8,abs(float(ref[field]))*1e-8)
             require(fraction<=1,'production mass/propellant budget exceeded')
             maxima['mass_fraction']=max(maxima['mass_fraction'],fraction)
+    return maxima
+
+
+def compare(reference,candidate,case):
+    maxima=compare_states(reference/'behavior-state.csv',candidate/'behavior-state.csv',case)
     require((reference/'behavior-events.csv').read_bytes()==(candidate/'behavior-events.csv').read_bytes(),
             'production inputs/callback sequence differs')
     for filename in ('behavior-propellant.csv','behavior-animations.csv'):

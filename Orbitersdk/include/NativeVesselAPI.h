@@ -34,7 +34,10 @@ struct VESSELPARAM;
 #define OAPIFUNC __attribute__((visibility("default")))
 #define ORBITER_NATIVE_OWNS_OAPIFUNC
 #endif
+#include "OrbiterLightData.h"
 #include "VesselAPI.h"
+OAPIFUNC double oapiGetInducedDrag(double cl,double aspect,double efficiency);
+OAPIFUNC double oapiGetWaveDrag(double mach,double m1,double m2,double m3,double maximum);
 #ifdef ORBITER_NATIVE_OWNS_OAPIFUNC
 #undef OAPIFUNC
 #undef ORBITER_NATIVE_OWNS_OAPIFUNC
