@@ -5,7 +5,7 @@ from pathlib import Path
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]))
 from behavior_suite import stage,compare,FILES
 from mesa_runtime import require,digest
-CASES=[dict(id=name,frames=frames,fixed_step=.25,fixture=fixture,budgets='orbital',epoch=51982.5)
+CASES=[dict(id=name,frames=frames,fixed_step=.25,fixture=fixture,budgets='orbital',epoch=51982.5,target='PB')
        for name,frames,fixture in [('manual_flight',980,'orbit'),('pb_persistence',60,'orbit'),('pb_reload',60,'reload')]]
 def main():
     p=argparse.ArgumentParser(description=__doc__)

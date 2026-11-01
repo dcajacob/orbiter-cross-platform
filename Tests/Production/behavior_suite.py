@@ -75,7 +75,7 @@ def validate(directory,case):
         require(phase in phases,'real production callback not observed: '+phase)
     for row in states:
         require(float(row['mass'])>0 and float(row['fuel'])>=0,'invalid stock mass/propellant')
-    target='DG' if case['fixture'] in ('ground','dg_orbit','reload') else 'PB'
+    target=case.get('target','DG' if case['fixture'] in ('ground','dg_orbit','reload') else 'PB')
     own=[row for row in states if row['object']==target]
     require(len(own)==expected+1,'target stock vessel disappeared')
     identifier=case['id']
