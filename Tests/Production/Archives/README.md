@@ -29,5 +29,17 @@ python Tests/Production/Archives/observations.py `
 
 This is an archive reader gate, not native terrain, contact or world acceptance.
 The existing frozen production behavior/contact references remain required.
-Archive extraction must wait for the original Windows capture to pass and be
-explicitly preserved.
+The original Windows capture from source `ba323026` is explicitly accepted in
+`Reference/`: hosted run
+[41286317998](https://github.com/dcajacob/orbiter-cross-platform/actions/runs/41286317998)
+passed Debug and Release, two exact decodes per archive. Both configurations
+agree exactly and match the independent decoder, including sparse 64-bit
+seeking. The raw artifact ZIPs retain compiler/build logs and observation
+manifests with per-member hashes. Verify them without network or reference edits:
+
+```sh
+python3 -B Tests/Production/Archives/frozen_reference.py
+```
+
+Subsequent extraction must compare against this accepted evidence. The original
+capture command rejects changed production source and cannot refresh it.
