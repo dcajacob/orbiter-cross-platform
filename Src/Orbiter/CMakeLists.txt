@@ -31,7 +31,7 @@ set(common_src
 	Psys.cpp
 	Script.cpp
 	Shadow.cpp
-	State.cpp
+	StateApplication.cpp
 	VectorMap.cpp
     ConsoleManager.cpp
 # Launchpad

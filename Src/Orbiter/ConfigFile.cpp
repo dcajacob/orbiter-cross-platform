@@ -1,6 +1,7 @@
 // Copyright (c) Martin Schweiger
 // Licensed under the MIT License
 #include "ConfigFile.h"
+#include "Production/Text.h"
 #include <cstring>
 #ifndef _WIN32
 #include <strings.h>
@@ -87,5 +88,32 @@ bool GetItemVector (istream &is, const char *label, Vector &val)
 	if (sscanf (g_cbuf, "%lf%lf%lf", &x, &y, &z) != 3) return false;
 	val.Set (x,y,z);
 	return true;
+}
+
+
+bool FindLine (istream &is, const char *line)
+{
+	char g_cbuf[1024];
+	const int g_buflen = sizeof(g_cbuf);
+	bool ok = false;
+	is.seekg (0); // rewind stream
+	if (is.good()) {
+		int len = strlen(line);
+		for (;;) {
+			if (!is.getline (g_cbuf, g_buflen)) {
+				if (is.eof()) break;               // EOF
+				else is.clear();                   // heal stream to continue after truncation error
+			}
+			if (!orbiter::production::ComparePrefix (g_cbuf, line, len)) {  // found string
+				ok = true;
+				break;
+			}
+		}
+	}
+	if (!ok) { // reset stream
+		is.clear();
+		is.seekg(0);
+	}
+	return ok;
 }
 

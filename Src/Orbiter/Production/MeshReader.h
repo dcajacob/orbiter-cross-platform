@@ -3,6 +3,7 @@
 #ifndef ORBITER_PRODUCTION_MESH_READER_H
 #define ORBITER_PRODUCTION_MESH_READER_H
 #include <istream>
+#include "Text.h"
 #include <cstring>
 #include <cstdio>
 #include <cstdint>
@@ -19,16 +20,6 @@ inline bool ReadMeshLine(std::istream& input, char (&line)[256])
     const auto length = std::strlen(line);
     if (length && line[length-1] == '\r') line[length-1] = '\0';
     return true;
-}
-inline int ComparePrefix(const char* a, const char* b, std::size_t count)
-{
-    for (std::size_t i = 0; i < count; ++i) {
-        auto lower = [](unsigned char c) { return c >= 'A' && c <= 'Z' ? c + 32 : c; };
-        const int x = lower(static_cast<unsigned char>(a[i]));
-        const int y = lower(static_cast<unsigned char>(b[i]));
-        if (x != y || !x) return x - y;
-    }
-    return 0;
 }
 
 // Original production MSHX1 parser, with resource acquisition supplied by a sink.

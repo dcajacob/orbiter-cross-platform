@@ -85,6 +85,22 @@ the root and symlinks fail explicitly. The production Windows configuration
 path adapter is still unchanged; integrating this resolver throughout the world
 loader remains work for the next extraction.
 
+The original `State` environment/focus metadata parser and writer also compile
+in the library. Native calls take an explicit default MJD, current MJD/focus,
+and file path or input stream. Windows call forms remain application adapters
+that supply the original system-clock conversion, test observation hook and
+focus object. MJD/JD/Julian-epoch interpretation and ten-decimal MJD save precision
+are unchanged. The original section finder uses call-local scratch storage;
+the original CSS colour table/parser is shared without device types. An absent
+splash colour starts at zero rather than uninitialized memory.
+
+Tests read all 157 original stock environment/focus headers with a recorded
+default epoch, plus CRLF, date-format, missing-file and save/reload cases. A sorted,
+locale-independent metadata manifest is compared exactly across the four hosted
+platform/configuration builds. This is metadata coverage only: vessel records,
+modules, camera, instruments and world initialization are not exercised by that
+test and remain part of the production scenario gate.
+
 Build this boundary without a display, SDK, renderer or asset download:
 
 ```sh
@@ -109,6 +125,10 @@ then checks the declared extraction files and rejects other production/SDK
 changes. This ledger is a source-review aid; it does not establish behavioral
 equivalence. The frozen two-body, production orbit/propulsion, fourteen behavior
 cases and real-client references supply that separate runtime gate.
+
+The [preserved verification reports](../../Tests/Production/Verification/EngineBoundary/README.md)
+record accepted component sources, hosted runs and original artifact hashes;
+local Linux results are reported separately.
 
 The real-client workflow now builds the **current** production application and
 SDK together, rather than reusing the pre-extraction application. It compares

@@ -4,6 +4,8 @@ import argparse
 import json
 from pathlib import Path
 import sys
+import csv
+import hashlib
 
 sys.dont_write_bytecode = True
 from trace_tools import load_trace, compare, validate_orbit, require
@@ -47,6 +49,15 @@ def main():
                     'nonrepeatable production RigidBody trace: '+platform)
             if baseline is None:baseline=rows
             result['production_rigid_body'][name][platform]=compare(baseline,rows)
+    metadata=None
+    for platform in platforms:
+        data=(args.artifacts/platform/'out/portable/traces/production-scenario-metadata.csv').read_bytes()
+        if metadata is None:metadata=data
+        require(data==metadata,'production scenario metadata differs: '+platform)
+    rows=list(csv.DictReader(metadata.decode('utf-8').splitlines()))
+    require(len(rows)==157 and len({r['scenario'] for r in rows})==157,'incomplete stock scenario metadata')
+    result['production_scenario_metadata']={'scenarios':157,'identical_platforms':platforms,
+        'sha256':hashlib.sha256(metadata).hexdigest(),'coverage':'environment/focus parsing only; no world initialization'}
     args.report.write_text(json.dumps(result,indent=2,allow_nan=False)+"\n")
     print(json.dumps(result,indent=2,allow_nan=False))
 

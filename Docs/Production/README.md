@@ -45,7 +45,7 @@ may satisfy a production acceptance case.
 | --- | --- | --- |
 | Vecmat, elements, two-body RK4 | Verified restricted fixtures | Preserve frozen references unchanged |
 | Window/input/procedural view | POC only | Native production window, input and real graphics client |
-| Production world and session | Shared frame ordering and `Body`/`RigidBody`; world loading unavailable | Existing lifecycle, shared engine library and platform services |
+| Production world and session | Shared frame ordering, `Body`/`RigidBody` and scenario environment/focus metadata; world loading unavailable | Existing lifecycle, shared engine library and platform services |
 | SPICE Solar System | Unsupported | Current `Src/Celbody/SPICE`, CSPICE, `orbiter.bsp`, TLS/PCK and coverage verification |
 | Native module ABI | Unsupported | Source-built vessels, celbodies, atmospheres, plugins; version/toolchain check |
 | Real stock meshes/materials/animations | Production CPU `Mesh`/`MeshManager`; world/animation integration unavailable | Existing CPU mesh data separated from D3D resources; actual group identities |
@@ -88,7 +88,7 @@ NRLMSISE C package; its author notice is retained.
 | 0 | Honest POC labeling, scope and inventories | Source inventory implemented; no production runtime claim |
 | 1 | Production Windows references and hosted WGL | Accepted: original orbit/propulsion, 14 repeated behavior cases, Debug/Release comparison, hosted WGL and data/resource locks |
 | 2 | Real Windows OpenGL client | Hosted Debug/Release execution passed; actual Sol/ISS/ShuttlePB, deterministic images/states, normal teardown. [Evidence and commands](WindowsClient.md) |
-| 3 | Production engine/platform boundary | In progress: shared production `Body`/`RigidBody`, propagators, frame ordering, CPU mesh objects and indexed resource service. [Scope and remaining gates](EngineBoundary.md). Linux production world build is still required. |
+| 3 | Production engine/platform boundary | In progress: shared production `Body`/`RigidBody`, propagators, frame ordering, CPU mesh objects, scenario metadata and indexed resources. [Scope and remaining gates](EngineBoundary.md). Linux production world build is still required. |
 | 4 | Native real world/external client | Not started; SPICE and actual ISS then native ShuttlePB; cross-platform state/scene parity |
 | 5 | Usable flight and interaction | Not started; propulsion, fuel, all RCS axes, autopilot, docking, contact, persistence |
 | 6 | Cockpit and Delta-glider | Not started; real DG/DG-S 2D/VC, HUD/MFDs, animations and controls |
@@ -302,9 +302,12 @@ state comparisons pass without tolerance changes. Actual automatic docking to
 ISS occurs at tick 250. Saved states are observed only after finalization.
 
 The original two-body and production orbit/propulsion goldens remain untouched.
-`observation_source.py` verifies that removing explicitly marked test-only blocks
-recovers every original production source byte. Internal observation exports are
-compiled only by the test option; the public Windows SDK remains unchanged.
+`observation_source.py` first verifies that the accepted observation source
+conserves every original production byte after removing its marked test blocks.
+During Phase 3 it also audits the explicit extraction ledger and the verbatim SDK
+value-record moves. Frozen runtime comparisons remain a separate required gate.
+Internal observation exports are compiled only by the test option; Windows SDK
+declarations and binary layouts are preserved.
 
 ```sh
 python3 -B Tests/Production/observation_source.py

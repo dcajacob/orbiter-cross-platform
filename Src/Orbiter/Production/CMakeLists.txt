@@ -5,9 +5,9 @@ if(CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
     include(CTest)
 endif()
 add_library(orbiter_production_boundary SHARED
-    Session.cpp ResourceResolver.cpp MeshData.cpp MeshServices.cpp BodyServices.cpp RigidBodyServices.cpp
+    Session.cpp ResourceResolver.cpp MeshData.cpp MeshServices.cpp BodyServices.cpp RigidBodyServices.cpp ScenarioColor.cpp
     ../Body.cpp ../Rigidbody.cpp ../BodyIntegrator.cpp ../Element.cpp
-    ../Vecmat.cpp ../TimeData.cpp ../ConfigFile.cpp ../Mesh.cpp)
+    ../Vecmat.cpp ../TimeData.cpp ../ConfigFile.cpp ../Mesh.cpp ../State.cpp)
 target_compile_features(orbiter_production_boundary PUBLIC cxx_std_17)
 target_compile_definitions(orbiter_production_boundary
     PUBLIC ORBITER_PRODUCTION_SHARED PRIVATE ORBITER_PRODUCTION_BUILD)

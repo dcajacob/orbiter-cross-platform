@@ -352,30 +352,6 @@ bool GetItemVECTOR (istream &is, const char *label, VECTOR3 &val)
 	return true;
 }
 
-bool FindLine (istream &is, const char *line)
-{
-	bool ok = false;
-	is.seekg (0); // rewind stream
-	if (is.good()) {
-		int len = strlen(line);
-		for (;;) {
-			if (!is.getline (g_cbuf, g_buflen)) {
-				if (is.eof()) break;               // EOF
-				else is.clear();                   // heal stream to continue after truncation error
-			}
-			if (!_strnicmp (g_cbuf, line, len)) {  // found string
-				ok = true;
-				break;
-			}
-		}
-	}
-	if (!ok) { // reset stream
-		is.clear();
-		is.seekg(0);
-	}
-	return ok;
-}
-
 int ListIndex (int listlen, char **list, char *label)
 {
 	for (int i = 0; i < listlen; i++)

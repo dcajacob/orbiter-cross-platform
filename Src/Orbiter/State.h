@@ -12,24 +12,32 @@
 #include <iostream>
 #include <fstream>
 #include <string>
+#include <filesystem>
+#include "Production/CoreTypes.h"
 
 class State {
 public:
 	State();
+	explicit State(double defaultMjd);
 
 	double Mjd() const { return mjd; }
 	char *Solsys() { return const_cast<char *>(solsys.c_str()); }
 	const char *Context() const { return context.length() ? context.c_str() : 0; }
 	const char *SplashScreen() const { return splashscreen.length() ? splashscreen.c_str() : 0; }
-	DWORD SplashColor() const { return splashcolor; }
+	orbiter::production::UInt32 SplashColor() const { return splashcolor; }
 	const char *Script() const { return script.length() ? script.c_str() : 0; }
 	const char *Focus() const { return focus.c_str(); }
 	const char *ScnHelp() const { return (scnhelp.length() ? scnhelp.c_str() : 0); }
 	const char *PlaybackDir() const { return (playback.length() ? playback.c_str() : scenario.c_str()); }
 	void Update ();
+	void Update(double currentMjd, const char* focusName);
 
 	/// \brief Read state from scenario file
 	bool Read (const char *fname);
+	// Native hosts supply the default epoch explicitly; no application clock,
+	// world, working-directory policy or observation hook is consulted here.
+	bool Read(const std::filesystem::path& path, double defaultMjd);
+	bool Read(std::istream& input, const std::filesystem::path& path, double defaultMjd);
 
 	/// \brief Write state as scenario file
 	/// \param ofs scenario file stream
@@ -46,7 +54,7 @@ private:
 	std::string solsys;       // name of planetary system
 	std::string context;      // scenario context
 	std::string splashscreen;// scenario splash screen
-	DWORD splashcolor;     // text color on splashscreen
+	orbiter::production::UInt32 splashcolor = 0; // text color on splashscreen
 	std::string script;      // scenario script
 	std::string focus;        // current focus vessel
 	std::string scnhelp;     // scenario help file

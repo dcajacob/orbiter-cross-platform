@@ -1,8 +1,3 @@
-// ORBITER_PRODUCTION_OBSERVATION_BEGIN
-#ifdef ORBITER_PRODUCTION_OBSERVATION
-#include "ApplicationObservation.h"
-#endif
-// ORBITER_PRODUCTION_OBSERVATION_END
 // Copyright (c) Martin Schweiger
 // Licensed under the MIT License
 
@@ -12,43 +7,45 @@
 // Contains solar system environment, time, focus vessel, scenario help page
 // =============================================================
 
-#define STRICT 1
-
 #include <fstream>
 #include <iomanip>
 #include <string>
 #include <stdio.h>
-#include "Orbiter.h"
-#include "Config.h"
 #include "State.h"
-#include "Vessel.h"
-#include "Astro.h"
-#include "Util.h"
+#include "AstroMath.h"
+#include "ConfigFile.h"
+#include "Production/ScenarioColor.h"
+#include "Production/Text.h"
+#include <cstring>
 
 using namespace std;
 
-extern Vessel *g_focusobj;
-extern TimeData td;
-
 // =============================================================
 
-State::State ()
+State::State (double defaultMjd)
 {
-	mjd = mjd0 = MJD (time (NULL)); // default to current system time
+	mjd = mjd0 = defaultMjd;
 	solsys = "Sol";         // default name
 }
 
-void State::Update ()
+void State::Update (double currentMjd, const char* focusName)
 {
-	mjd  = td.MJD1;
-	focus = g_focusobj->Name();
+	mjd  = currentMjd;
+	focus = focusName;
 }
 
-bool State::Read (const char *fname)
+bool State::Read (const std::filesystem::path& path, double defaultMjd)
 {
-	ifstream ifs (fname, ios::in);
+	ifstream ifs (path, ios::in);
 	if (!ifs) return false;
+	return Read(ifs,path,defaultMjd);
+}
 
+bool State::Read (std::istream& ifs, const std::filesystem::path& path, double defaultMjd)
+{
+	if (!ifs) return false;
+	const std::string filename = path.string();
+	const char* fname = filename.c_str();
 	int i;
 	scenario = fname;
 	for (i = strlen(fname); i >= 0; i--)
@@ -57,13 +54,7 @@ bool State::Read (const char *fname)
 
 	char cbuf[256], *pc;
 	double t;
-	mjd0 = MJD (time (NULL)); // default to current system time
-	mjd0 += UTC_CT_diff*day;  // map from UTC to CT (or TDB) time scales
-// ORBITER_PRODUCTION_OBSERVATION_BEGIN
-#ifdef ORBITER_PRODUCTION_OBSERVATION
-mjd0 = OrbiterTestDefaultMjd(mjd0);
-#endif
-// ORBITER_PRODUCTION_OBSERVATION_END
+	mjd0 = defaultMjd; // supplied by the host, including its UTC/CT policy
 	mjd = mjd0;
 	solsys.clear();           // no scenario solsys by default
 	context.clear();          // no scenario context by default
@@ -77,31 +68,31 @@ mjd0 = OrbiterTestDefaultMjd(mjd0);
 		for (;;) {
 			if (!ifs.getline (cbuf, 256)) break;
 			pc = trim_string (cbuf);
-			if (!_stricmp (pc, "END_ENVIRONMENT")) break;
-			if (!_strnicmp (pc, "Date", 4)) {
+			if (!orbiter::production::ComparePrefix (pc, "END_ENVIRONMENT", sizeof("END_ENVIRONMENT"))) break;
+			if (!orbiter::production::ComparePrefix (pc, "Date", 4)) {
 				pc = trim_string (pc+4);
-				if (!_strnicmp (pc, "MJD", 3) && sscanf (pc+3, "%lf", &t) == 1)
+				if (!orbiter::production::ComparePrefix (pc, "MJD", 3) && sscanf (pc+3, "%lf", &t) == 1)
 					mjd = mjd0 = t;
-				else if (!_strnicmp (pc, "JD", 2) && sscanf (pc+2, "%lf", &t) == 1)
+				else if (!orbiter::production::ComparePrefix (pc, "JD", 2) && sscanf (pc+2, "%lf", &t) == 1)
 					mjd = mjd0 = t-2400000.5;
-				else if (!_strnicmp (pc, "JE", 2) && sscanf (pc+2, "%lf", &t) == 1)
+				else if (!orbiter::production::ComparePrefix (pc, "JE", 2) && sscanf (pc+2, "%lf", &t) == 1)
 					mjd = mjd0 = Jepoch2MJD (t);
-			} else if (!_strnicmp (pc, "System", 6)) {
+			} else if (!orbiter::production::ComparePrefix (pc, "System", 6)) {
 				solsys = trim_string (pc+6);
-			} else if (!_strnicmp (pc, "Context", 7)) {
+			} else if (!orbiter::production::ComparePrefix (pc, "Context", 7)) {
 				context = trim_string (pc+7);
-			} else if (!_strnicmp (pc, "SplashScreen", 12)) {
+			} else if (!orbiter::production::ComparePrefix (pc, "SplashScreen", 12)) {
 				char color[256];
 				int nChar = 0;
-				if(sscanf(pc+12, "%255s %n", &color, &nChar)==1) {
+				if(sscanf(pc+12, "%255s %n", color, &nChar)==1) {
 					splashcolor = GetCSSColor(color);
 					splashscreen = trim_string (pc+12+nChar);
 				}
-			} else if (!_strnicmp (pc, "Script", 6)) {
+			} else if (!orbiter::production::ComparePrefix (pc, "Script", 6)) {
 				script = trim_string (pc+6);
-			} else if (!_strnicmp (pc, "Help", 4)) {
+			} else if (!orbiter::production::ComparePrefix (pc, "Help", 4)) {
 				scnhelp = trim_string (pc+4);
-			} else if (!_strnicmp (pc, "Playback", 8)) {
+			} else if (!orbiter::production::ComparePrefix (pc, "Playback", 8)) {
 				playback = trim_string (pc+8);
 			}
 		}
@@ -110,8 +101,8 @@ mjd0 = OrbiterTestDefaultMjd(mjd0);
 		for (;;) {
 			if (!ifs.getline (cbuf, 256)) break;
 			pc = trim_string (cbuf);
-			if (!_stricmp (pc, "END_FOCUS")) break;
-			if (!_strnicmp (pc, "Ship", 4)) {
+			if (!orbiter::production::ComparePrefix (pc, "END_FOCUS", sizeof("END_FOCUS"))) break;
+			if (!orbiter::production::ComparePrefix (pc, "Ship", 4)) {
 				focus = trim_string (pc+4);
 			}
 		}
