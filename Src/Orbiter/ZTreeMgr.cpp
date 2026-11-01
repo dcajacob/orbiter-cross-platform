@@ -1,218 +1,180 @@
 // Copyright (c) Martin Schweiger
 // Licensed under the MIT License
-
 #include "ZTreeMgr.h"
-#include "zlib.h"
-#include "util.h"
+#include <zlib.h>
+#include <algorithm>
+#include <array>
+#include <cstring>
+#include <memory>
+#include <stdexcept>
+#include <utility>
 
-// =======================================================================
-// File header for compressed tree files
-
-TreeFileHeader::TreeFileHeader ()
+namespace {
+void require(bool condition,const char* message) {if (!condition) throw std::runtime_error(message);}
+std::uint64_t integer(const unsigned char* bytes,unsigned count=4)
 {
-	magic[0] = 'T';
-	magic[1] = 'X';
-	magic[2] = 1;
-	magic[3] = 0;
-	size = sizeof(TreeFileHeader);
-	flags = 0;
-	nodeCount = 0;
-	dataOfs = size;
-	dataLength = 0;
-	rootPos1 = rootPos2 = rootPos3 = rootPos4[0] = rootPos4[1] = (DWORD)-1;
+    std::uint64_t result=0;
+    for (unsigned i=0;i<count;++i) result|=std::uint64_t(bytes[i])<<(i*8);
+    return result;
+}
+void encode(unsigned char* bytes,std::uint64_t value,unsigned count=4)
+{for (unsigned i=0;i<count;++i) bytes[i]=static_cast<unsigned char>(value>>(i*8));}
+template<class Reader> std::vector<TreeNode> records(std::uint32_t count,Reader read)
+{
+    std::vector<TreeNode> result;
+    std::array<unsigned char,32> bytes;
+    for (std::uint32_t i=0;i<count;++i) {
+        require(read(bytes.data(),bytes.size()),"Truncated planetary archive table");
+        TreeNode node;
+        const auto position=integer(bytes.data(),8);
+        require(position<=INT64_MAX,"Negative/overflowing planetary archive node offset");
+        node.pos=static_cast<std::int64_t>(position);node.size=static_cast<std::uint32_t>(integer(bytes.data()+8));
+        for (unsigned child=0;child<4;++child) {
+            node.child[child]=static_cast<std::uint32_t>(integer(bytes.data()+12+4*child));
+            require(node.child[child]==UINT32_MAX || node.child[child]<count,"Invalid planetary archive child index");
+        }
+        result.push_back(node); // Four disk padding bytes need not be zero.
+    }
+    // Reject cycles without recursion, including disconnected corrupt nodes.
+    std::vector<unsigned char> visited(count,0);
+    std::vector<std::pair<std::uint32_t,unsigned>> stack;
+    for (std::uint32_t i=0;i<count;++i) {
+        if (visited[i]) continue;
+        visited[i]=1;stack.emplace_back(i,0);
+        while (!stack.empty()) {
+            auto& frame=stack.back();
+            if (frame.second==4) {visited[frame.first]=2;stack.pop_back();continue;}
+            const auto child=result[frame.first].child[frame.second++];
+            if (child==UINT32_MAX || visited[child]==2) continue;
+            require(visited[child]==0,"Cycle in planetary archive child graph");
+            visited[child]=1;stack.emplace_back(child,0);
+        }
+    }
+    return result;
+}
 }
 
-// -----------------------------------------------------------------------
-
-size_t TreeFileHeader::fwrite(FILE *f)
+TreeFileHeader::TreeFileHeader():magic{'T','X',1,0},size(48),flags(0),dataOfs(48),dataLength(0),nodeCount(0),
+    rootPos1(UINT32_MAX),rootPos2(UINT32_MAX),rootPos3(UINT32_MAX),rootPos4{UINT32_MAX,UINT32_MAX} {}
+bool TreeFileHeader::Decode(const unsigned char* bytes)
 {
-	return ::fwrite(this, sizeof(TreeFileHeader), 1, f);
+    if (std::memcmp(bytes,magic,4) || integer(bytes+4)!=48 || (integer(bytes+8)&~std::uint64_t(1))) return false;
+    const auto length=integer(bytes+16,8);
+    if (length>INT64_MAX) return false;
+    flags=static_cast<std::uint32_t>(integer(bytes+8));dataOfs=static_cast<std::uint32_t>(integer(bytes+12));
+    dataLength=static_cast<std::int64_t>(length);nodeCount=static_cast<std::uint32_t>(integer(bytes+24));
+    rootPos1=static_cast<std::uint32_t>(integer(bytes+28));rootPos2=static_cast<std::uint32_t>(integer(bytes+32));
+    rootPos3=static_cast<std::uint32_t>(integer(bytes+36));
+    for (unsigned i=0;i<2;++i) rootPos4[i]=static_cast<std::uint32_t>(integer(bytes+40+4*i));
+    return true;
 }
-
-// -----------------------------------------------------------------------
-
-bool TreeFileHeader::fread(FILE *f)
+bool TreeFileHeader::Read(std::istream& stream)
+{std::array<unsigned char,48> bytes;return bool(stream.read(reinterpret_cast<char*>(bytes.data()),bytes.size())) && Decode(bytes.data());}
+bool TreeFileHeader::fread(std::FILE* file)
+{std::array<unsigned char,48> bytes;return file && std::fread(bytes.data(),1,bytes.size(),file)==bytes.size() && Decode(bytes.data());}
+std::size_t TreeFileHeader::fwrite(std::FILE* file)
 {
-	BYTE buf[4];
-	DWORD sz, flags;
-	if (::fread(buf, 1, 4, f) < 4 || memcmp(buf, magic, 4))
-		return false;
-	if (::fread(&sz, sizeof(DWORD), 1, f) != 1 || sz != size)
-		return false;
-	::fread(&flags, sizeof(DWORD), 1, f);
-	::fread(&dataOfs, sizeof(DWORD), 1, f);
-	::fread(&dataLength, sizeof(__int64), 1, f);
-	::fread(&nodeCount, sizeof(DWORD), 1, f);
-	::fread(&rootPos1, sizeof(DWORD), 1, f);
-	::fread(&rootPos2, sizeof(DWORD), 1, f);
-	::fread(&rootPos3, sizeof(DWORD), 1, f);
-	::fread(rootPos4, sizeof(DWORD), 2, f);
-	return true;
+    std::array<unsigned char,48> bytes{};
+    std::copy(magic,magic+4,bytes.begin());encode(bytes.data()+4,48);encode(bytes.data()+8,flags);
+    encode(bytes.data()+12,dataOfs);encode(bytes.data()+16,static_cast<std::uint64_t>(dataLength),8);
+    const std::uint32_t values[]={nodeCount,rootPos1,rootPos2,rootPos3,rootPos4[0],rootPos4[1]};
+    for (unsigned i=0;i<6;++i) encode(bytes.data()+24+4*i,values[i]);
+    return file && std::fwrite(bytes.data(),bytes.size(),1,file)==1 ? 1:0;
 }
-
-// =======================================================================
-// Tree table of contents
-
-TreeTOC::TreeTOC()
+void TreeTOC::Read(std::uint32_t count,std::istream& stream)
+{tree=records(count,[&](unsigned char* data,std::size_t size){return bool(stream.read(reinterpret_cast<char*>(data),size));});}
+std::size_t TreeTOC::fread(std::uint32_t count,std::FILE* file)
 {
-	ntree = 0;
-	ntreebuf = 0;
-	tree = NULL;
-	totlength = 0;
+    if (!file) return 0;
+    try {tree=records(count,[&](unsigned char* data,std::size_t size){return std::fread(data,1,size,file)==size;});return count;}
+    catch (const std::exception&) {return 0;}
 }
-
-// -----------------------------------------------------------------------
-
-TreeTOC::~TreeTOC()
+std::uint32_t TreeTOC::NodeSizeDeflated(std::uint32_t index) const
 {
-	if (ntreebuf) {
-		delete[] tree;
-		tree = NULL;
-	}
+    if (index>=size()) return 0;
+    const auto length=(index+1<size()?tree[index+1].pos:totlength)-tree[index].pos;
+    return length>=0 && std::uint64_t(length)<=UINT32_MAX?static_cast<std::uint32_t>(length):0;
 }
-
-// -----------------------------------------------------------------------
-
-size_t TreeTOC::fread(DWORD size, FILE *f)
-{
-	if (ntreebuf != size) {
-		TreeNode *tmp = new TreeNode[size];
-		if (ntreebuf) delete []tree;
-		tree = tmp;
-		ntree = ntreebuf = size;
-	}
-	return ::fread(tree, sizeof(TreeNode), size, f);
-}
-
-// =======================================================================
-// ZTreeMgr class: manage a single layer tree for a planet
-
-ZTreeMgr *ZTreeMgr::CreateFromFile(const char *PlanetPath, Layer _layer)
-{
-	ZTreeMgr *mgr = new ZTreeMgr(PlanetPath, _layer);
-	if (!mgr->TOC().size()) {
-		delete mgr;
-		mgr = 0;
-	}
-	return mgr;
-}
-
-// -----------------------------------------------------------------------
-
-ZTreeMgr::ZTreeMgr(const char *PlanetPath, Layer _layer)
-{
-	path = new char[strlen(PlanetPath)+1];
-	strcpy(path, PlanetPath);
-	layer = _layer;
-	treef = 0;
-	OpenArchive();
-}
-
-// -----------------------------------------------------------------------
-
-ZTreeMgr::~ZTreeMgr()
-{
-	delete []path;
-	path = NULL;
-	if (treef) fclose(treef);
-}
-
-// -----------------------------------------------------------------------
-
+ZTreeMgr* ZTreeMgr::CreateFromFile(const char* planetPath,Layer layer)
+{auto manager=std::make_unique<ZTreeMgr>(planetPath,layer);return manager->TOC().size()?manager.release():nullptr;}
+ZTreeMgr::ZTreeMgr(const char* planetPath,Layer value):path(planetPath?planetPath:""),layer(value)
+{if (!planetPath || !*planetPath) error="Empty planetary archive directory";else OpenArchive();}
 bool ZTreeMgr::OpenArchive()
 {
-	const char *name[6] = { "Surf", "Mask", "Elev", "Elev_mod", "Label", "Cloud" };
-	char fname[256];
-	sprintf (fname, "%s\\Archive\\%s.tree", path, name[layer]);
-	treef = fopen(fname, "rb");
-	if (!treef) return false;
-
-	TreeFileHeader tfh;
-	if (!tfh.fread(treef)) {
-		fclose(treef);
-		treef = 0;
-		return false;
-	}
-	rootPos1 = tfh.rootPos1;
-	rootPos2 = tfh.rootPos2;
-	rootPos3 = tfh.rootPos3;
-	for (int i = 0; i < 2; i++)
-		rootPos4[i] = tfh.rootPos4[i];
-	dofs = (__int64)tfh.dataOfs;
-
-	if (!toc.fread(tfh.nodeCount, treef)) {
-		fclose(treef);
-		treef = 0;
-		return false;
-	}
-	toc.totlength = tfh.dataLength;
-
-	return true;
+    try {
+        const char* names[]={"Surf","Mask","Elev","Elev_mod","Label","Cloud"};
+        require(layer>=LAYER_SURF && layer<=LAYER_CLOUD,"Invalid planetary archive layer");
+        treef.open(path/"Archive"/(std::string(names[layer])+".tree"),std::ios::binary);
+        require(bool(treef),"Missing/unreadable planetary archive");
+        treef.seekg(0,std::ios::end);
+        const auto fileEnd=treef.tellg();
+        require(fileEnd>=0,"Cannot measure planetary archive");
+        treef.seekg(0);
+        TreeFileHeader header;
+        require(header.Read(treef),"Invalid/truncated/unsupported planetary archive header");
+        const std::uint64_t minimum=48+std::uint64_t(header.nodeCount)*32;
+        require(header.nodeCount>0 && minimum<=header.dataOfs,"Invalid planetary archive table extent");
+        const auto fileSize=static_cast<std::uint64_t>(fileEnd);
+        require(header.dataOfs<=fileSize && std::uint64_t(header.dataLength)<=fileSize-header.dataOfs,
+            "Planetary archive data extent exceeds file");
+        for (auto root : {header.rootPos1,header.rootPos2,header.rootPos3,header.rootPos4[0],header.rootPos4[1]})
+            require(root==UINT32_MAX || root<header.nodeCount,"Invalid planetary archive root index");
+        TreeTOC candidate;candidate.Read(header.nodeCount,treef);candidate.totlength=header.dataLength;
+        for (std::uint32_t i=0;i<candidate.size();++i) {
+            const auto position=candidate[i].pos;
+            const auto next=i+1<candidate.size()?candidate[i+1].pos:header.dataLength;
+            require(position<=next && next<=header.dataLength && std::uint64_t(next-position)<=UINT32_MAX,
+                "Invalid planetary archive node extent");
+            require(!candidate[i].size || next>position,"Missing compressed planetary archive node");
+        }
+        toc=std::move(candidate);dofs=header.dataOfs;
+        rootPos1=header.rootPos1;rootPos2=header.rootPos2;rootPos3=header.rootPos3;
+        rootPos4[0]=header.rootPos4[0];rootPos4[1]=header.rootPos4[1];
+        error.clear();return true;
+    } catch (const std::exception& failure) {
+        error=failure.what();treef.close();toc=TreeTOC();return false;
+    }
 }
-
-// -----------------------------------------------------------------------
-
-DWORD ZTreeMgr::Idx(int lvl, int ilat, int ilng)
+std::uint32_t ZTreeMgr::Idx(int lvl,int ilat,int ilng)
 {
-	if (lvl <= 4) {
-		return (lvl == 1 ? rootPos1 : lvl == 2 ? rootPos2 : lvl == 3 ? rootPos3 : rootPos4[ilng]);
-	} else {
-		int plvl = lvl-1;
-		int pilat = ilat/2;
-		int pilng = ilng/2;
-		DWORD pidx = Idx(plvl, pilat, pilng);
-		if (pidx == (DWORD)-1)
-			return pidx;
-		int cidx = ((ilat&1) << 1) + (ilng&1);
-		return toc[pidx].child[cidx];
-	}
+    // Bound shifts/indices before applying the original quadtree ordering.
+    if (!toc.size() || lvl<1 || lvl>34 || ilat<0 || ilng<0) return UINT32_MAX;
+    if (lvl<4 && (ilat || ilng)) return UINT32_MAX;
+    if (lvl>=4 && (std::uint64_t(ilat)>=(std::uint64_t(1)<<(lvl-4)) ||
+        std::uint64_t(ilng)>=(std::uint64_t(2)<<(lvl-4)))) return UINT32_MAX;
+    if (lvl<=4) {
+        return (lvl==1?rootPos1:lvl==2?rootPos2:lvl==3?rootPos3:rootPos4[ilng]);
+    } else {
+        int plvl=lvl-1;
+        int pilat=ilat/2;
+        int pilng=ilng/2;
+        std::uint32_t pidx=Idx(plvl,pilat,pilng);
+        if (pidx==UINT32_MAX) return pidx;
+        int cidx=((ilat&1)<<1)+(ilng&1);
+        return toc[pidx].child[cidx];
+    }
 }
-
-// -----------------------------------------------------------------------
-
-DWORD ZTreeMgr::ReadData(DWORD idx, BYTE **outp)
+std::uint32_t ZTreeMgr::ReadData(std::uint32_t index,unsigned char** output)
 {
-	if (idx == (DWORD)-1) return 0; // sanity check
-
-	DWORD esize = NodeSizeInflated(idx);
-	if (!esize) // node doesn't have data, but has descendants with data
-		return 0;
-
-	if (_fseeki64(treef, toc[idx].pos+dofs, SEEK_SET))
-		return 0;
-
-	DWORD zsize = NodeSizeDeflated(idx);
-	BYTE *zbuf = new BYTE[zsize];	
-	fread(zbuf, 1, zsize, treef);
-
-	BYTE *ebuf = new BYTE[esize];
-
-	DWORD ndata = Inflate(zbuf, zsize, ebuf, esize);
-	delete []zbuf;
-	zbuf = NULL;
-
-	if (!ndata) {
-		delete []ebuf;
-		ebuf = 0;
-	}
-	*outp = ebuf;
-	return ndata;
+    if (!output) {error="Missing planetary archive output pointer";return 0;}
+    *output=nullptr;
+    if (index>=toc.size() || !toc.NodeSizeInflated(index)) return 0;
+    try {
+        const auto inflated=toc.NodeSizeInflated(index),compressed=toc.NodeSizeDeflated(index);
+        treef.clear();treef.seekg(dofs+toc[index].pos);
+        require(bool(treef),"Planetary archive seek failed");
+        std::vector<unsigned char> input(compressed);
+        require(bool(treef.read(reinterpret_cast<char*>(input.data()),input.size())),"Truncated planetary archive payload");
+        std::unique_ptr<unsigned char[]> result(new unsigned char[inflated]);
+        require(Inflate(input.data(),compressed,result.get(),inflated)==inflated,"Corrupt planetary archive payload/size");
+        *output=result.release();error.clear();return inflated;
+    } catch (const std::exception& failure) {error=failure.what();return 0;}
 }
-
-// -----------------------------------------------------------------------
-
-DWORD ZTreeMgr::Inflate(const BYTE *inp, DWORD ninp, BYTE *outp, DWORD noutp)
+std::uint32_t ZTreeMgr::Inflate(const unsigned char* input,std::uint32_t inputSize,unsigned char* output,std::uint32_t outputSize)
 {
-	DWORD ndata = noutp;
-	if (uncompress (outp, &ndata, inp, ninp) != Z_OK)
-		return 0;
-	return ndata;
+    // uLong is 32 bits on Windows, 64 bits on native LP64 Linux.
+    uLongf actual=outputSize;uLong consumed=inputSize;
+    if (uncompress2(output,&actual,input,&consumed)!=Z_OK || actual!=outputSize || consumed!=inputSize) return 0;
+    return static_cast<std::uint32_t>(actual);
 }
-
-// -----------------------------------------------------------------------
-
-void ZTreeMgr::ReleaseData(BYTE *data)
-{
-	delete []data;
-	data = NULL;
-}
+void ZTreeMgr::ReleaseData(unsigned char* data) {delete[] data;}

@@ -396,7 +396,7 @@ int Mesh::EditGroup (UInt32 grp, MeshGroupEdit *ges)
 int Mesh::AddMaterial (MATERIAL &mtrl)
 {
 	MATERIAL *tmp_Mtrl = new MATERIAL[nMtrl+1]; TRACENEW
-	memcpy (tmp_Mtrl, Mtrl, sizeof(MATERIAL)*nMtrl);
+	if (nMtrl) memcpy (tmp_Mtrl, Mtrl, sizeof(MATERIAL)*nMtrl);
 	memcpy (tmp_Mtrl+nMtrl, &mtrl, sizeof(MATERIAL));
 	if (nMtrl) {
 		delete []Mtrl;

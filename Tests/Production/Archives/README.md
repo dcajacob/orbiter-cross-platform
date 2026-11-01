@@ -43,3 +43,31 @@ python3 -B Tests/Production/Archives/frozen_reference.py
 
 Subsequent extraction must compare against this accepted evidence. The original
 capture command rejects changed production source and cannot refresh it.
+
+The shared reader's current verification command is separate from historical
+capture and never writes `Reference/`:
+
+```sh
+cmake -S Src/Orbiter/Production -B out/archive-core -G Ninja -DCMAKE_BUILD_TYPE=Release
+cmake --build out/archive-core
+ctest --test-dir out/archive-core --output-on-failure
+python3 -B Tests/Production/Archives/verify_port.py \
+  --executable out/archive-core/tests/production_archive_observer \
+  --data /path/to/verified/data --output out/archive-verification --configuration Release
+```
+
+On Windows append `.exe` to the observer filename. Linux needs native zlib
+development headers >=1.2.11 when building; its runtime uses the OS zlib library.
+Windows builds link the original pinned zlib source. The normal CTest cases use
+generated fixtures only and do not download planetary assets. Full archive jobs
+run the locked 28-file data profile on Windows/Linux Debug/Release and require
+exact agreement between all four builds and original Windows.
+
+The engine reader validates disk extents, roots, child indices/cycles, payload
+sizes and stream/decompression failures. It retains the existing factory's null
+failure result and exposes an internal diagnostic with `Error()`. Invalid tile
+coordinates and missing tiles return no data; output pointers are cleared.
+Seventy failure/resource cases cover truncated headers, unsupported headers,
+invalid graph/offsets, corrupt/trailing compressed input and truncation after
+opening. Repeated real reader load/decode/unload and explicit header round trips
+are checked. These reader lifetimes do not count as graphical world sessions.

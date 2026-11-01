@@ -44,7 +44,7 @@ jobs:
         if: runner.os == 'Linux'
         run: |
           sudo apt-get update
-          sudo apt-get install -y libwayland-dev libxkbcommon-dev xorg-dev xvfb libgl1-mesa-dri
+          sudo apt-get install -y libwayland-dev libxkbcommon-dev xorg-dev xvfb libgl1-mesa-dri zlib1g-dev
       - name: Configure
         shell: bash
         run: |
@@ -106,6 +106,7 @@ jobs:
             build.log
             ctest.log
             out/portable/CMakeCache.txt
+            out/portable/traces/production-archives/**
             out/portable/Testing/Temporary/*.log
             out/portable/traces/*.csv
             out/portable/traces/*.json

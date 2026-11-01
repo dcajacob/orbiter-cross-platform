@@ -86,6 +86,24 @@ files, CRLF, corrupt/truncated input, overflow, file release and repeated reload
 These direct force queries do not construct a native Solar System or exercise the
 world's external coordinate transformation.
 
+The engine's `ZTreeMgr` archive reader is now shared as well. Explicit
+little-endian 48-byte headers and 32-byte disk records replace Windows structure
+reads. Native standard streams retain 64-bit payload positions; the zlib length
+types are correct on both LLP64 Windows and LP64 Linux. The original quadtree
+ordering and all stock decoded contents are checked against separately frozen
+pre-extraction Windows evidence. Invalid headers, roots, children/cycles, extents,
+truncation and corrupt/size-mismatched compressed blocks fail with an internal
+diagnostic. Missing/empty tile output pointers are cleared.
+
+The standalone tests need only generated records, including nonzero disk padding
+and sparse offsets beyond four GiB. Full archive jobs additionally verify the 28
+locked publisher files and forty queries per file, twice per executable. The
+independent decoder, exact Windows reference and cross-platform comparison use no
+floating-point tolerances. Linux uses native zlib >=1.2.11; Windows uses the
+original pinned zlib source. This ports engine archive access only: production
+elevation/contact/world integration and the renderer's separate archive reader
+remain later work. See the [archive gate](../../Tests/Production/Archives/README.md).
+
 The original `CelestialBody` class now compiles in the same library. Its
 hierarchy, barycentre calculations, polar conversion, precession, rotation,
 interpolation and ephemeris interpretation retain their original formulas and

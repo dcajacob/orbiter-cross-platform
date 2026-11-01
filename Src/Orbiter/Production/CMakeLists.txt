@@ -4,11 +4,32 @@ if(CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
     project(OrbiterProductionBoundary LANGUAGES CXX)
     include(CTest)
 endif()
+# Use the original application's pinned zlib when it is already configured.
+# Standalone Windows builds use that same source; Linux uses its native zlib.
+if(TARGET zlibstatic)
+    set(_archive_zlib zlibstatic)
+    get_target_property(_archive_zlib_source zlibstatic SOURCE_DIR)
+    get_target_property(_archive_zlib_build zlibstatic BINARY_DIR)
+    set(_archive_zlib_includes "${_archive_zlib_source}" "${_archive_zlib_build}")
+elseif(WIN32)
+    enable_language(C)
+    include(FetchContent)
+    set(CMAKE_POLICY_VERSION_MINIMUM 3.5)
+    set(SKIP_INSTALL_ALL ON)
+    FetchContent_Declare(zlib GIT_REPOSITORY https://github.com/madler/zlib.git
+        GIT_TAG cacf7f1d4e3d44d871b605da3b647f07d718623f)
+    FetchContent_MakeAvailable(zlib)
+    set(_archive_zlib zlibstatic)
+    set(_archive_zlib_includes "${zlib_SOURCE_DIR}" "${zlib_BINARY_DIR}")
+else()
+    find_package(ZLIB 1.2.11 REQUIRED)
+    set(_archive_zlib ZLIB::ZLIB)
+endif()
 add_library(orbiter_production_boundary SHARED
     Session.cpp WorldOwner.cpp NativeModule.cpp ResourceResolver.cpp MeshData.cpp MeshServices.cpp BodyServices.cpp RigidBodyServices.cpp CelestialServices.cpp ScenarioColor.cpp
     ../Body.cpp ../Rigidbody.cpp ../BodyIntegrator.cpp ../Element.cpp
     ../Vecmat.cpp ../TimeData.cpp ../ConfigFile.cpp ../Mesh.cpp ../State.cpp
-    ../PinesGrav.cpp ../PinesGravFile.cpp ../Celbody.cpp ../CelbodyFile.cpp ../ElementFile.cpp ../Star.cpp)
+    ../PinesGrav.cpp ../PinesGravFile.cpp ../Celbody.cpp ../CelbodyFile.cpp ../ElementFile.cpp ../Star.cpp ../ZTreeMgr.cpp)
 target_compile_features(orbiter_production_boundary PUBLIC cxx_std_17)
 target_compile_definitions(orbiter_production_boundary
     PUBLIC ORBITER_PRODUCTION_SHARED ORBITER_NATIVE_BUILD_CONFIGURATION="$<CONFIG>" PRIVATE ORBITER_PRODUCTION_BUILD)
@@ -17,6 +38,8 @@ target_include_directories(orbiter_production_boundary PUBLIC "${CMAKE_CURRENT_S
 set_target_properties(orbiter_production_boundary PROPERTIES
     CXX_EXTENSIONS OFF FOLDER Core WINDOWS_EXPORT_ALL_SYMBOLS ON)
 target_link_libraries(orbiter_production_boundary PRIVATE ${CMAKE_DL_LIBS})
+target_link_libraries(orbiter_production_boundary PRIVATE ${_archive_zlib})
+target_include_directories(orbiter_production_boundary PRIVATE ${_archive_zlib_includes})
 
 # The native bootstrap is tied to this SDK build, source ABI and toolchain.
 # Consumers use its generated header and linked target; independently configured

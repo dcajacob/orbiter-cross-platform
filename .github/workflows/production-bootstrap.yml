@@ -29,28 +29,30 @@ permissions:
 
 jobs:
   windows-archives:
-    name: Original planetary archives ${{ matrix.configuration }} x64
-    runs-on: windows-2022
+    name: Shared planetary archives ${{ matrix.os }} ${{ matrix.configuration }} x64
+    runs-on: ${{ matrix.os }}
     timeout-minutes: 20
     strategy:
       fail-fast: false
       matrix:
+        os: [ubuntu-24.04, windows-2022]
         configuration: [Debug, Release]
     steps:
       - uses: actions/checkout@v7
       - uses: ilammy/msvc-dev-cmd@v1
+        if: runner.os == 'Windows'
         with:
           vsversion: '17.0'
           arch: x64
-      - name: Build unchanged production archive observation with pinned zlib
-        shell: pwsh
+      - name: Install native Linux archive dependency
+        if: runner.os == 'Linux'
+        run: sudo apt-get update && sudo apt-get install -y zlib1g-dev
+      - name: Build shared production archive observation
+        shell: bash
         run: |
-          cmake -S Tests/Production/Archives -B out/archive-build -G Ninja -DCMAKE_BUILD_TYPE=${{ matrix.configuration }} 2>&1 | Tee-Object archive-configure.log
-          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-          cmake --build out/archive-build --target production_archive_observer --parallel 2 2>&1 | Tee-Object out/archive-build/build.log
-          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-          cmd /c "cl 2>&1 & exit /b 0" | Out-File out/archive-build/compiler.txt
-          git -C out/archive-build/_deps/zlib-src rev-parse HEAD | Out-File out/archive-build/zlib-commit.txt
+          set -euo pipefail
+          cmake -S Src/Orbiter/Production -B out/archive-build -G Ninja -DCMAKE_BUILD_TYPE=${{ matrix.configuration }} 2>&1 | tee archive-configure.log
+          cmake --build out/archive-build --target production_archive_observer --parallel 2 2>&1 | tee out/archive-build/build.log
       - uses: actions/cache@v6
         with:
           path: out/planet-cache/Orbiter2016.zip
@@ -59,16 +61,16 @@ jobs:
         run: >-
           python Tests/Production/prepare_data.py --lock Tests/Production/standard-planets.lock.json
           --archive out/planet-cache/Orbiter2016.zip --destination out/standard-planets
-      - name: Observe repeated original Windows decoding
+      - name: Compare repeated shared decoding against frozen Windows
         run: >-
-          python Tests/Production/Archives/observations.py
-          --executable out/archive-build/production_archive_observer.exe --data out/standard-planets
+          python Tests/Production/Archives/verify_port.py
+          --executable out/archive-build/tests/production_archive_observer${{ runner.os == 'Windows' && '.exe' || '' }} --data out/standard-planets
           --output out/production-archives --configuration ${{ matrix.configuration }}
-      - name: Preserve original archive evidence, including failures
+      - name: Preserve shared archive evidence, including failures
         if: always()
         uses: actions/upload-artifact@v7
         with:
-          name: production-archives-${{ matrix.configuration }}-x64
+          name: production-archives-${{ matrix.os }}-${{ matrix.configuration }}-x64
           retention-days: 90
           path: |
             archive-configure.log
@@ -76,6 +78,27 @@ jobs:
             out/archive-build/*.log
             out/production-archives/*.json
             out/production-archives/*.log
+
+  compare-archives:
+    name: Production archive Windows/Linux exact comparison
+    needs: [windows-archives]
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/download-artifact@v8
+        with:
+          pattern: production-archives-*-*-x64
+          path: out/archive-evidence
+      - name: Compare all four shared builds against the frozen original Windows records
+        run: >-
+          python3 -B Tests/Production/Archives/compare_platforms.py
+          --evidence out/archive-evidence --report archive-platform-comparison.json
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: production-archive-comparison
+          retention-days: 90
+          path: archive-platform-comparison.json
 
   windows-gravity:
     name: Shared production Pines ${{ matrix.configuration }} x64
@@ -130,6 +153,7 @@ jobs:
           python3 -B Tests/Production/frozen_reference.py
           python3 -B Tests/Production/frozen_behavior.py
           python3 -B Tests/Production/Gravity/frozen_reference.py
+          python3 -B Tests/Production/Archives/frozen_reference.py
           python3 -B Tests/Production/Gravity/test_comparison.py
 
   windows-wgl:
@@ -297,9 +321,9 @@ jobs:
           python Tests/Production/behavior_suite.py --orbiter out/production-app/Orbiter.exe
           --data out/production-data --planets out/standard-planets --output out/production-behavior
           --configuration ${{ matrix.configuration }}
-      - name: Observe unchanged planetary archive decoding before extraction
+      - name: Compare shared application archive decoding against frozen Windows
         run: >-
-          python Tests/Production/Archives/observations.py
+          python Tests/Production/Archives/verify_port.py
           --executable out/production-app/production_archive_observer.exe --data out/standard-planets
           --output out/production-archives --configuration ${{ matrix.configuration }}
       - name: Compare behavior against the explicitly frozen production references

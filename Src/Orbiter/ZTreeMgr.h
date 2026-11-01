@@ -1,120 +1,77 @@
 // Copyright (c) Martin Schweiger
 // Licensed under the MIT License
-
-// =======================================================================
-// ZTreeMgr.h
-// Manage compressed and packed tile trees for planetary surface and cloud layers.
-// =======================================================================
-
 #ifndef __ZTREEMGR_H
 #define __ZTREEMGR_H
+#include "Production/Export.h"
+#include <cstdint>
+#include <cstdio>
+#include <filesystem>
+#include <fstream>
+#include <string>
+#include <vector>
 
-#include <iostream>
-#include <windows.h>
-
-// =======================================================================
-// Tree node structure
-
+// In-memory values. Disk records are explicitly decoded, never read through
+// compiler layout: 48-byte header, 32-byte node, little-endian integers.
 struct TreeNode {
-	__int64 pos;  // file position of node data
-	DWORD size;   // data block size [bytes]
-	DWORD child[4]; // array index positions of the children ((DWORD)-1=no child)
-
-	TreeNode() {
-		pos = 0;
-		size = 0;
-		for (int i = 0; i < 4; i++) child[i] = (DWORD)-1;
-	}
+    std::int64_t pos=0;
+    std::uint32_t size=0;
+    std::uint32_t child[4]={UINT32_MAX,UINT32_MAX,UINT32_MAX,UINT32_MAX};
 };
-
-// =======================================================================
-// File header for compressed tree files
-
-class TreeFileHeader {
-	friend class ZTreeMgr;
-
+class ORBITER_PRODUCTION_API TreeFileHeader {
+    friend class ZTreeMgr;
 public:
-	TreeFileHeader();
-	size_t fwrite(FILE *f);
-	bool fread(FILE *f);
-
+    TreeFileHeader();
+    std::size_t fwrite(std::FILE* file);
+    bool fread(std::FILE* file);
 private:
-	BYTE magic[4];      // file ID and version
-	DWORD size;         // header size [bytes]
-	DWORD flags;        // bit flags
-	DWORD dataOfs;      // file offset of start of data block (header + TOC)
-	__int64 dataLength; // total length of compressed data block
-	DWORD nodeCount;    // total number of tree nodes
-	DWORD rootPos1;     // index of level-1 tile ((DWORD)-1 for not present)
-	DWORD rootPos2;     // index of level-2 tile ((DWORD)-1 for not present)
-	DWORD rootPos3;     // index of level-3 tile ((DWORD)-1 for not present)
-	DWORD rootPos4[2];  // index of the level-4 tiles (quadtree roots; (DWORD)-1 for not present)
+    bool Read(std::istream& stream);
+    bool Decode(const unsigned char* bytes);
+    unsigned char magic[4];
+    std::uint32_t size,flags,dataOfs;
+    std::int64_t dataLength;
+    std::uint32_t nodeCount,rootPos1,rootPos2,rootPos3,rootPos4[2];
 };
-
-// =======================================================================
-// Tree table of contents
-
-class TreeTOC {
-	friend class ZTreeMgr;
-
+class ORBITER_PRODUCTION_API TreeTOC {
+    friend class ZTreeMgr;
 public:
-	TreeTOC();
-	~TreeTOC();
-	size_t fread(DWORD size, FILE *f);
-	inline DWORD size() const { return ntree; }
-	inline const TreeNode &operator[](int idx) const { return tree[idx]; }
-
-	inline DWORD NodeSizeDeflated(DWORD idx) const
-	{ return (DWORD)((idx < ntree-1 ? tree[idx+1].pos : totlength) - tree[idx].pos); }
-
-	inline DWORD NodeSizeInflated(DWORD idx) const
-	{ return tree[idx].size; }
-
+    TreeTOC()=default;
+    std::size_t fread(std::uint32_t count,std::FILE* file);
+    std::uint32_t size() const {return static_cast<std::uint32_t>(tree.size());}
+    const TreeNode& operator[](std::uint32_t index) const {return tree.at(index);}
+    std::uint32_t NodeSizeDeflated(std::uint32_t index) const;
+    std::uint32_t NodeSizeInflated(std::uint32_t index) const {return index<size()?tree[index].size:0;}
 private:
-	TreeNode *tree;    // array containing all tree node entries
-	DWORD ntree;       // number of entries
-	DWORD ntreebuf;    // array size
-	__int64 totlength; // total data size (deflated)
+    void Read(std::uint32_t count,std::istream& stream);
+    std::vector<TreeNode> tree;
+    std::int64_t totlength=0;
 };
-
-// =======================================================================
-// ZTreeMgr class: manage a single layer tree for a planet
-
-class ZTreeMgr {
+class ORBITER_PRODUCTION_API ZTreeMgr {
 public:
-	enum Layer { LAYER_SURF, LAYER_MASK, LAYER_ELEV, LAYER_ELEVMOD, LAYER_LABEL, LAYER_CLOUD };
-	static ZTreeMgr *CreateFromFile(const char *PlanetPath, Layer _layer);
-	ZTreeMgr(const char *PlanetPath, Layer _layer);
-	~ZTreeMgr();
-	const TreeTOC &TOC() const { return toc; }
-
-	DWORD Idx(int lvl, int ilat, int ilng);
-	// return the array index of an arbitrary tile ((DWORD)-1: not present)
-
-	DWORD ReadData(DWORD idx, BYTE **outp);
-
-	inline DWORD ReadData(int lvl, int ilat, int ilng, BYTE **outp)
-	{ return (ilat < 0 || ilng < 0) ? 0 : ReadData(Idx(lvl, ilat, ilng), outp); }
-
-	void ReleaseData(BYTE *data);
-
-	inline DWORD NodeSizeDeflated(DWORD idx) const { return toc.NodeSizeDeflated(idx); }
-	inline DWORD NodeSizeInflated(DWORD idx) const { return toc.NodeSizeInflated(idx); }
-
+    enum Layer {LAYER_SURF,LAYER_MASK,LAYER_ELEV,LAYER_ELEVMOD,LAYER_LABEL,LAYER_CLOUD};
+    static ZTreeMgr* CreateFromFile(const char* planetPath,Layer layer);
+    ZTreeMgr(const char* planetPath,Layer layer);
+    ~ZTreeMgr()=default;
+    ZTreeMgr(const ZTreeMgr&)=delete;
+    ZTreeMgr& operator=(const ZTreeMgr&)=delete;
+    const TreeTOC& TOC() const {return toc;}
+    const std::string& Error() const {return error;}
+    std::uint32_t Idx(int level,int latitude,int longitude);
+    std::uint32_t ReadData(std::uint32_t index,unsigned char** output);
+    std::uint32_t ReadData(int level,int latitude,int longitude,unsigned char** output)
+    {return ReadData(Idx(level,latitude,longitude),output);}
+    void ReleaseData(unsigned char* data);
+    std::uint32_t NodeSizeDeflated(std::uint32_t index) const {return toc.NodeSizeDeflated(index);}
+    std::uint32_t NodeSizeInflated(std::uint32_t index) const {return toc.NodeSizeInflated(index);}
 protected:
-	bool OpenArchive();
-	DWORD Inflate(const BYTE *inp, DWORD ninp, BYTE *outp, DWORD noutp);
-
+    bool OpenArchive();
+    std::uint32_t Inflate(const unsigned char* input,std::uint32_t inputSize,unsigned char* output,std::uint32_t outputSize);
 private:
-	char *path;
-	Layer layer;
-	FILE *treef;
-	TreeTOC toc;
-	DWORD rootPos1;    // index of level-1 tile ((DWORD)-1 for not present)
-	DWORD rootPos2;    // index of level-2 tile ((DWORD)-1 for not present)
-	DWORD rootPos3;    // index of level-3 tile ((DWORD)-1 for not present)
-	DWORD rootPos4[2]; // index of the level-4 tiles (quadtree roots; (DWORD)-1 for not present)
-	__int64 dofs;
+    std::filesystem::path path;
+    Layer layer;
+    std::ifstream treef;
+    TreeTOC toc;
+    std::uint32_t rootPos1=UINT32_MAX,rootPos2=UINT32_MAX,rootPos3=UINT32_MAX,rootPos4[2]={UINT32_MAX,UINT32_MAX};
+    std::int64_t dofs=0;
+    std::string error;
 };
-
-#endif // !__ZTREEMGR_H
+#endif

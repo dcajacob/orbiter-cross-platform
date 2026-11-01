@@ -114,7 +114,6 @@ set(common_src
 	Log.cpp
 	Memstat.cpp
 	Util.cpp
-	ZTreeMgr.cpp
 # Resources
 	Orbiter.rc
 	Orbiter.ico
