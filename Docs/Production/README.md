@@ -45,12 +45,12 @@ may satisfy a production acceptance case.
 | --- | --- | --- |
 | Vecmat, elements, two-body RK4 | Verified restricted fixtures | Preserve frozen references unchanged |
 | Window/input/procedural view | POC only | Native production window, input and real graphics client |
-| Production world and session | Unsupported | Existing lifecycle, shared engine library and platform services |
+| Production world and session | Shared frame ordering and `Body`/`RigidBody`; world loading unavailable | Existing lifecycle, shared engine library and platform services |
 | SPICE Solar System | Unsupported | Current `Src/Celbody/SPICE`, CSPICE, `orbiter.bsp`, TLS/PCK and coverage verification |
 | Native module ABI | Unsupported | Source-built vessels, celbodies, atmospheres, plugins; version/toolchain check |
-| Real stock meshes/materials/animations | Unsupported | Existing CPU mesh parser separated from D3D resources; actual group identities |
+| Real stock meshes/materials/animations | Shared CPU parser; world/animation integration unavailable | Existing CPU mesh data separated from D3D resources; actual group identities |
 | Planet tiles and elevation | Unsupported | Portable fixed-width archives, 64-bit offsets; engine contact queries independent of visibility |
-| Resource resolution | POC fixture paths only | Indexed Windows-separator/case-insensitive resolver with ambiguous alias errors |
+| Resource resolution | Indexed service; production world integration pending | Indexed Windows-separator/case-insensitive resolver with ambiguous alias errors |
 | Texture loading | Unsupported in production | Signature-based DDS DXT1/3/5 and uncompressed formats; BMP in `.dds` files |
 | Propulsion, RCS, atmosphere, docking, contacts | Unsupported in native application | Preserve original systems; production references before extraction |
 | HUD/MFD/2D panels/VC/Sketchpad | Unsupported | Original instruments, redraws, surfaces, fonts/TextW, picking and interaction |

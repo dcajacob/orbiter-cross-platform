@@ -26,9 +26,11 @@
 #include <vector>
 
 #include "Vesselbase.h"
+#include "GraphicsAPI.h"
 #include "Log.h"
 
 class Elements;
+class Mesh;
 class CelestialBody;
 class Planet;
 class PlanetarySystem;

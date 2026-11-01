@@ -157,6 +157,10 @@
     "Src/Orbiter/Rigidbody.h": {
       "sha256_lf": "f128be10c0f09d39de4c72158e805d519d41d18a898022b41dffad812c9319ed",
       "original_sha256_lf": "f10bca653c79c1ecb860e5ad89cc6aa777c552c62563cb44bdc8b1701e0e0049"
+    },
+    "Src/Orbiter/Vessel.h": {
+      "sha256_lf": "0f68f0f481b62ccbf6393ac530d419d826d5c6e894ef53a09d2bcfc44a6b5e2c",
+      "original_sha256_lf": "1d9a42f97d282bbe03fc9b176cefb81d45d36dd990bae8944925502e483e10dd"
     }
   }
 }
