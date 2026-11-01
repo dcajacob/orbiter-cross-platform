@@ -19,11 +19,15 @@
       "original_sha256_lf": "42ea7373077f698dbfcf42358b74439aaa187c1de6f5c41194bbbbd8bc016bef"
     },
     "Orbitersdk/include/OrbiterAPI.h": {
-      "sha256_lf": "0d0bd113d21d640f03531eb0b414daf89ec00202fd4cc67facd526eb1fb12a29",
+      "sha256_lf": "0bf99424ec95f378fbe7d152f7ddde8f09054e1cfe6e3a7e52a4282b0797572d",
       "original_sha256_lf": "3425025c178218dce10bf7b8edf296dfe7eda8f171d925aca622a7534735fd31"
     },
     "Orbitersdk/include/OrbiterCelestialData.h": {
       "sha256_lf": "7ba981423d704f370eb0abdc2d16652ce1c62a507d29bb9ab0f64234f7e42df9",
+      "original_sha256_lf": null
+    },
+    "Orbitersdk/include/OrbiterGeometry.h": {
+      "sha256_lf": "624371607dbdc800bd19f1db135adeb1862013710667c0abc40f1b91650c68a6",
       "original_sha256_lf": null
     },
     "Orbitersdk/include/OrbiterHandles.h": {
@@ -36,6 +40,10 @@
     },
     "Orbitersdk/include/OrbiterPlanetData.h": {
       "sha256_lf": "4ffce90d931bc0b440747fbef288ebafdbcc600d6d3eb6d93853c619a9c39118",
+      "original_sha256_lf": null
+    },
+    "Orbitersdk/include/OrbiterVectorMath.h": {
+      "sha256_lf": "90d7de772082cdab15cc5ee8f9fa612aae0fc0d02082beee904881b4a5618659",
       "original_sha256_lf": null
     },
     "Orbitersdk/include/OrbiterVisualData.h": {
