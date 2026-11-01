@@ -5,6 +5,7 @@
 #define ORBITER_H
 
 #include "Config.h"
+#include "GraphicsAPI.h"
 #include "Input.h"
 #include "Select.h"
 #include "Keymap.h"

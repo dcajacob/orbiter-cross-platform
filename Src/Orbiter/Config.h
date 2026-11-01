@@ -403,7 +403,7 @@ public:
 	void DelActiveModule (const std::string& name);
 
 	inline void SetAmbientLevel (orbiter::production::UInt32 lvl)
-	{ AmbientColour = (CfgVisualPrm.AmbientLevel = std::min (lvl, (orbiter::production::UInt32)0xff)) * 0x01010101; }
+	{ AmbientColour = (CfgVisualPrm.AmbientLevel = (std::min) (lvl, (orbiter::production::UInt32)0xff)) * 0x01010101; }
 
 	const void *GetParam (orbiter::production::UInt32 paramtype) const;
 	// return a specific parameter setting (paramtype defined in GraphicsAPI.h)

@@ -127,7 +127,7 @@
       "original_sha256_lf": "f0a03d9ba9251f654c4c2b719acd04a09db6b595ddeefdfe63d5354b2ef4155f"
     },
     "Src/Orbiter/Config.h": {
-      "sha256_lf": "95c52e2e20e0ae064f6653b1e8360f6fc3f4a1131b5806c59681c4c30e24cffc",
+      "sha256_lf": "2e0238061b281582a018fc6eeab5c0d1ec946a7aea7c402daa5639dbeef4877c",
       "original_sha256_lf": "448cc321227be3d37d31d8e8c1f4daa228208293dda455b84512997327c73a33"
     },
     "Src/Orbiter/ConfigFile.cpp": {
@@ -163,7 +163,7 @@
       "original_sha256_lf": "d9bcee218c141dc3896d599a3e25323f84d1259bc2aa209e752eb8c03ea4b298"
     },
     "Src/Orbiter/Orbiter.h": {
-      "sha256_lf": "8507d23b96d09cc62dd8d42b77b3ad8c0467778d8c9bc700a7d3be91e28b24f7",
+      "sha256_lf": "38e8ddb078a9b75520c313798de80bce78e64773d1115f10a355a26e396f698d",
       "original_sha256_lf": "32db52be7f0355c383d7ae8f4fd033170e3c13c272bd11a4c0be9453d25dd297"
     },
     "Src/Orbiter/OrbiterAPI.cpp": {
