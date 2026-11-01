@@ -1,0 +1,75 @@
+{
+  "schema": 1,
+  "status": "accepted",
+  "automatic_refresh": false,
+  "protocol_sha256": "6489b6c3507d27c5dd3783fcc2a86985fc548962a3a70325e42f4e132f4f8883",
+  "scope": "Actual original production SPICE callbacks; not native world/graphics",
+  "comparison": {
+    "status": "passed",
+    "rows": 25092,
+    "maximum_error": {
+      "position_m": 0.0,
+      "velocity_m_s": 0.0
+    },
+    "budgets": {
+      "position_m": 0.01,
+      "velocity_m_s": 1e-05
+    }
+  },
+  "evidence": [
+    {
+      "file": "windows-release.zip",
+      "sha256": "4df9ca3a5a631cbbdca26bd05057dc9282359fc0ece7f0bb87211e0d89a619da",
+      "artifact_id": 13076945717,
+      "run_id": 41289480046,
+      "source": "162fb1a3a66fc10f24848abe0c78097895a6cf8c",
+      "configuration": "Release",
+      "capture_member": "out/spice-observation/capture.json",
+      "trace_members": [
+        "out/spice-observation/trace-1.csv",
+        "out/spice-observation/trace-2.csv"
+      ],
+      "members_sha256": {
+        "out/spice-observation/capture.json": "a642d1ffe5d0737e6d8fdd3b2b3c587ade3b90f0a5fc942cf86658d63ea89e3c",
+        "out/spice-observation/run-1/console.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "out/spice-observation/run-1/Kernels/orbiter.log": "98c86d3279d6596b0fe5332c2dfdab65e2fd0716410df8b14ce01d514bda861a",
+        "out/spice-observation/run-1/Orbiter.log": "999a16ab82174cacc25f3d5018214d35aaa193bea351ef51937fa06fa679cf83",
+        "out/spice-observation/run-2/console.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "out/spice-observation/run-2/Kernels/orbiter.log": "98c86d3279d6596b0fe5332c2dfdab65e2fd0716410df8b14ce01d514bda861a",
+        "out/spice-observation/run-2/Orbiter.log": "660ead6d884819bc72e19944c5826ef425d1b70384edec4897fe2690aa04069b",
+        "out/spice-observation/trace-1.csv": "684b0381f0ec2cc2eb24a4b4494e40b4e96ee018eaaf23111e23743a43776e26",
+        "out/spice-observation/trace-2.csv": "684b0381f0ec2cc2eb24a4b4494e40b4e96ee018eaaf23111e23743a43776e26",
+        "spice-build.log": "5c45934d93c317eacee89a9ca1d09660bbf22f5fc93b59c3ab715820c73564d9",
+        "spice-compiler.txt": "6633337fe220528955141f9bbe65eae56d4c61e750edf47f09bd743368317378",
+        "spice-configure.log": "0f0600427e12dca58491bb363d0fafb54b4fb8fca275666c41efe2465298a784"
+      }
+    },
+    {
+      "file": "windows-debug.zip",
+      "sha256": "e52b33974441d711666b7a80d30d5bef8309457c88e2e4e4db3d2d4bca47bbb1",
+      "artifact_id": 13076004847,
+      "run_id": 41289480046,
+      "source": "162fb1a3a66fc10f24848abe0c78097895a6cf8c",
+      "configuration": "Debug",
+      "capture_member": "out/spice-observation/capture.json",
+      "trace_members": [
+        "out/spice-observation/trace-1.csv",
+        "out/spice-observation/trace-2.csv"
+      ],
+      "members_sha256": {
+        "out/spice-observation/capture.json": "c65a67911fa416c9ea8c0bf145288535cff23971eced03c3bb7ad312d6383451",
+        "out/spice-observation/run-1/console.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "out/spice-observation/run-1/Kernels/orbiter.log": "98c86d3279d6596b0fe5332c2dfdab65e2fd0716410df8b14ce01d514bda861a",
+        "out/spice-observation/run-1/Orbiter.log": "175e58c40bcc75d8ec1b54539bcfcccb7e415d4061dca7286aa05e16becd9ed1",
+        "out/spice-observation/run-2/console.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "out/spice-observation/run-2/Kernels/orbiter.log": "98c86d3279d6596b0fe5332c2dfdab65e2fd0716410df8b14ce01d514bda861a",
+        "out/spice-observation/run-2/Orbiter.log": "5cd819646aa244c16167aa13caf9754e0e2a12fdfa13be1b17aa694374c224fc",
+        "out/spice-observation/trace-1.csv": "684b0381f0ec2cc2eb24a4b4494e40b4e96ee018eaaf23111e23743a43776e26",
+        "out/spice-observation/trace-2.csv": "684b0381f0ec2cc2eb24a4b4494e40b4e96ee018eaaf23111e23743a43776e26",
+        "spice-build.log": "5c45934d93c317eacee89a9ca1d09660bbf22f5fc93b59c3ab715820c73564d9",
+        "spice-compiler.txt": "6633337fe220528955141f9bbe65eae56d4c61e750edf47f09bd743368317378",
+        "spice-configure.log": "3e80c986228da1c88b6582261302d36a5217f3b817a0c911caa6f146edc2310b"
+      }
+    }
+  ]
+}
