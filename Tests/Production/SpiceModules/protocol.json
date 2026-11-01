@@ -21,13 +21,14 @@
     "Src/Celbody/SPICE/spice.cpp": "dc4d53c2049273b9d62420160c22976e3b999c22d6961b891213ec183434a1f5"
   },
   "inputs_sha256_lf": {
-    "Tests/Production/SpiceModules/Observe.cpp": "1d444f921dd84392df78e65f19f5326b1d50ec9d72a7e0d0342b0ce8bdf58b20",
+    "Tests/Production/SpiceModules/Observe.cpp": "741227f54bc218005cc2f04acdc548ebd1ede54ce4af4c931742753b523b5f0b",
     "Tests/Production/SpiceModules/CMakeLists.txt": "c93ef11c69f853a80c9938c179855aeeeef7d483183f528600a8ab3c4ca16198",
     "Tests/Production/SpiceModules/epochs.txt": "488b886ed8eb87da61edef5787c792b050a9114719f8cf6001fc79d51b042b39",
     "Tests/Production/SpiceModules/bodies.txt": "418c0ed4c4fc877b234175405f9aaded8cf264806d91a64028e40fe340f2c9bb",
     "Tests/Production/stock-data.lock.json": "155fb89d22d58af113da6ff662904d74f82bbbbb7b9deb5e654b7c7141e27620",
-    "Tests/Production/SpiceModules/capture.py": "2cb6089ba4fc52981555fbe4f6fb61340535f0fda61419cc606855d0e6061b3c",
+    "Tests/Production/SpiceModules/capture.py": "d21b93aa4c2c44b0127610afa968fe5dad5c5f6f9849c9a1a525702d975c93d7",
     "Tests/Production/Fixtures/Sol-ISS-ShuttlePB.scn": "bcd836d4f80d5c85cf71e132830a23b5ab47607a9a5c00f498b19bf645459783",
     "Tests/Production/Fixtures/Orbiter.cfg": "eed4bb294b9f868822399439ee625ee8108e07e6bf8019217daef16e92e5ddde"
-  }
+  },
+  "unused_output": "Each unreturned three-vector block is explicitly zero; Sun barycentric-only requests may return zero flags, as allowed by the existing SDK"
 }

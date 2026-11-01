@@ -31,7 +31,12 @@ public:
             auto sample=[&](const std::string& body,CELBODY* module,const char* mode,int request,int index,double time,bool fast,bool record) {
                 std::array<double,12> values{};
                 const int response=fast?module->clbkFastEphemeris(time,request,values.data()):module->clbkEphemeris(time,request,values.data());
-                if (!response) throw std::runtime_error("Production SPICE query returned no ephemeris");
+                if (!response && !(body=="Sun" && request==(EPHEM_BARYPOS|EPHEM_BARYVEL)))
+                    throw std::runtime_error("Production SPICE query returned no ephemeris: "+body+"/"+mode+"/"+std::to_string(request));
+                // Unreturned blocks have no API meaning. Record explicit zeros
+                // rather than cached/uninitialized contents of unused slots.
+                for (int block=0;block<4;++block)
+                    if (!(response&(1<<block))) for (int j=0;j<3;++j) values[3*block+j]=0;
                 for (double value:values) if (!std::isfinite(value)) throw std::runtime_error("Nonfinite production SPICE state");
                 if (record) {
                     out<<body<<','<<mode<<','<<request<<','<<index<<','<<time<<','<<response;

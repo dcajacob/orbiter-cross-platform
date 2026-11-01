@@ -46,7 +46,8 @@ def rows(data):
                 row=result[index];index+=1
                 require([row['body'],row['mode'],int(row['request']),int(row['index']),float(row['time'])]==
                     [body,mode,request,tick,time],'SPICE discrete query schedule differs')
-                require(int(row['response'])>0 and all(math.isfinite(float(row['p'+str(i)])) for i in range(12)),
+                require((int(row['response'])>0 or (body=='Sun' and request==12)) and
+                    all(math.isfinite(float(row['p'+str(i)])) for i in range(12)),
                     'missing/nonfinite production SPICE response')
     return result
 
