@@ -15,12 +15,7 @@ ROOT=Path(__file__).resolve().parents[3]
 sys.path.insert(0,str(ROOT/'Tests/Production'))
 from mesa_runtime import digest,require
 
-def main():
-    parser=argparse.ArgumentParser(description=__doc__)
-    for name in ('executable','modules','data','planets','output'):
-        parser.add_argument('--'+name,type=Path,required=True)
-    args=parser.parse_args()
-    output=args.output.resolve();output.mkdir(parents=True,exist_ok=True)
+def prepare(args,output):
     source_inputs={}
     fixture=tempfile.TemporaryDirectory(prefix='planet-config-',dir=output)
     config=Path(fixture.name)
@@ -40,6 +35,15 @@ def main():
             path=base/relative
             require(path.is_file() and path.stat().st_size==record['bytes'] and digest(path)==record['sha256'],'Planet input differs: '+relative)
             inputs[relative]=record['sha256']
+    return fixture,config,source_inputs,inputs
+
+def main():
+    parser=argparse.ArgumentParser(description=__doc__)
+    for name in ('executable','modules','data','planets','output'):
+        parser.add_argument('--'+name,type=Path,required=True)
+    args=parser.parse_args()
+    output=args.output.resolve();output.mkdir(parents=True,exist_ok=True)
+    fixture,config,source_inputs,inputs=prepare(args,output)
     command=[str(args.executable.resolve(strict=True)),str(config),str(args.data.resolve()),str(args.modules.resolve()),str((args.planets/'Textures').resolve()),str(ROOT/'Meshes')]
     process=subprocess.run(command,stdout=subprocess.PIPE,stderr=subprocess.STDOUT,timeout=300)
     (output/'run.log').write_bytes(process.stdout)
