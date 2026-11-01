@@ -60,6 +60,61 @@
       "original_comparison_zip_sha256": "7df451595ec540c21a18d83f84b5b3b354451b44e42f875ecb9cc302ce44bc7c",
       "preserved_report": "sdk-records-client-comparison.json",
       "report_sha256": "ab3ed3ad4277ed70f3ea3d8dfd4d1557cb03e876884464b2206b3ce295b13280"
+    },
+    {
+      "component": "mesh",
+      "source": "57754800d121d4a18d4a7f04bb5f68d02d74e287",
+      "runs": {
+        "production": 41274799922,
+        "client": 41274799926,
+        "portable": 41274799830
+      },
+      "status": "passed",
+      "original_comparison_zip_sha256": "effff7bee1b541c1241bb32272b9bb204fd6c17062eaffa232c64b59bbdcbd34",
+      "preserved_report": "mesh-client-comparison.json",
+      "report_sha256": "e4b3f3f8ad18c9193ea632586f9e17e2a21abe463b392bee9c523d19bd750468"
+    },
+    {
+      "component": "scenario-metadata",
+      "source": "c14360abff34293f361cf13ca07050eb6ef801e4",
+      "runs": {
+        "production": 41275682190,
+        "client": 41275682231,
+        "portable": 41275682252
+      },
+      "status": "passed",
+      "original_comparison_zip_sha256": "3f704550d613f2197c723eb182543257897a2f5273055344167913c48399ba5e",
+      "preserved_report": "state-client-comparison.json",
+      "report_sha256": "48cfb773e3b75579f2b488fc20f72b473dfef83b0d51dad448aee80a400f38de",
+      "native_comparison": {
+        "original_zip_sha256": "0bb343024d592ded3910391e4cff35cbcf676b7b5b6b1f5638a667804131ac7b",
+        "preserved_report": "state-native-parity.json",
+        "report_sha256": "80a6e34c3ed941f28b74f85fe79724cd42ff325074799f15a85866b28dbbe9b8"
+      },
+      "evidence_manifests": [
+        "Evidence/portable-artifacts.json",
+        "Evidence/windows-client-artifacts.json"
+      ]
+    },
+    {
+      "component": "mesh-integer-validation",
+      "source": "24591de685fd7ef4e80b620f298eb2b1c99780ec",
+      "runs": {
+        "production": 41276717087,
+        "client": 41276717080,
+        "portable": 41276717132
+      },
+      "status": "passed",
+      "original_comparison_zip_sha256": "166bca5f1e00486726727c6067755278b60a4f033b5e1edc89c71d1a660ecd79",
+      "preserved_report": "guard-client-comparison.json",
+      "report_sha256": "7e18bd10852bc7c663f0e5bddace542819b4a90d4847bf6e8762698d9c85ee6c",
+      "native_comparison": {
+        "original_zip_sha256": "d3da3359c36c4c5d2d14905bf10f18466fcc20998c8913d6d75211ec993238a4",
+        "preserved_report": "guard-native-parity.json",
+        "report_sha256": "80a6e34c3ed941f28b74f85fe79724cd42ff325074799f15a85866b28dbbe9b8"
+      },
+      "client_attempt": 2,
+      "setup_retry_record": "graphics-setup-retry.json"
     }
   ]
 }

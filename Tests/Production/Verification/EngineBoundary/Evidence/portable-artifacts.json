@@ -1,0 +1,35 @@
+{
+  "source": "c14360abff34293f361cf13ca07050eb6ef801e4",
+  "run": 41275682252,
+  "contents": "CI logs, CMake cache, traces and existing POC regression images only; no binaries or asset packages. POC images are not production-client evidence.",
+  "artifacts": [
+    {
+      "name": "portable-ubuntu-24.04-Release-x64",
+      "id": 13071327718,
+      "digest": "sha256:5dd2d8e6c10082b74a40e150b4c9dc5d406c2900081419f859b34dd645e5c28f",
+      "size": 1228233,
+      "file": "41275682252-portable-ubuntu-24.04-Release-x64.zip"
+    },
+    {
+      "name": "portable-windows-2022-Release-x64",
+      "id": 13071083360,
+      "digest": "sha256:99ff28e504c8db7a32c5edf840562b1f86ad439b55ec15f99c91680966a61665",
+      "size": 870318,
+      "file": "41275682252-portable-windows-2022-Release-x64.zip"
+    },
+    {
+      "name": "portable-ubuntu-24.04-Debug-x64",
+      "id": 13071018374,
+      "digest": "sha256:5c7215cde7f06618bc12a282afc131299925fa8260d183fd426f768d0b419081",
+      "size": 1228219,
+      "file": "41275682252-portable-ubuntu-24.04-Debug-x64.zip"
+    },
+    {
+      "name": "portable-windows-2022-Debug-x64",
+      "id": 13070838740,
+      "digest": "sha256:0ac48611e00d70c3445745f5022ee5f306ad910e536310f73495b71d2722cff7",
+      "size": 870338,
+      "file": "41275682252-portable-windows-2022-Debug-x64.zip"
+    }
+  ]
+}

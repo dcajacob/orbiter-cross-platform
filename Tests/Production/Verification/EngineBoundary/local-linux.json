@@ -1,0 +1,24 @@
+{
+  "schema": 1,
+  "source": "c14360abff34293f361cf13ca07050eb6ef801e4",
+  "scope": "Local Linux component verification; not a complete native production engine or hosted Windows result",
+  "host": "Linux-7.0.0-42-generic-x86_64-with-glibc2.43",
+  "compiler": "g++ (Ubuntu 15.2.0-16ubuntu1) 15.2.0",
+  "cmake": "cmake version 4.2.3",
+  "checks": {
+    "debug_suite": "passed, 16 CTest entries (collision disabled locally); final scenario guard rechecked separately",
+    "release_suite": "passed, 17 CTest entries including collision; final scenario guard rechecked separately",
+    "sanitizers": "7 boundary tests passed with ASan/UBSan/LeakSanitizer outside ptrace; final scenario guard rechecked separately",
+    "metadata": "157 original environment/focus headers; Debug and Release byte-identical",
+    "installed_runner": "6000 one-second steps from /tmp; library resolved from installed relative RPATH; original two-body budgets pass"
+  },
+  "metadata_sha256": "cf0740acab63ccf7cf34b9819b9227d27e5eeffbac14c070f721cd996f8bd5a0",
+  "phase_3_complete": false,
+  "mesh_integer_followup": {
+    "source": "24591de685fd7ef4e80b620f298eb2b1c99780ec",
+    "debug": "3 focused mesh/layout tests passed",
+    "release": "3 focused mesh/layout tests passed",
+    "sanitizers": "2 focused mesh tests passed with ASan/UBSan/LeakSanitizer outside ptrace",
+    "scope": "Oversized/negative decimal counts and indices are rejected before narrowing; leading plus syntax and all tracked stock mesh files pass"
+  }
+}

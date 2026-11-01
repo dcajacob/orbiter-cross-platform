@@ -1,0 +1,33 @@
+{
+  "source": "24591de685fd7ef4e80b620f298eb2b1c99780ec",
+  "run_id": 41276717080,
+  "run_attempt": 1,
+  "job_id": 124760259191,
+  "status": "setup failure before Orbiter execution; not accepted as a graphics run",
+  "stage": "Stage the pinned application-local software OpenGL driver",
+  "excerpt": [
+    "2026-11-01T05:27:46.5075879Z 100% tests passed, 0 tests failed out of 9",
+    "2026-11-01T05:33:47.4270676Z tar: Child process exited with status 1",
+    "2026-11-01T05:33:47.4271329Z tar: Error exit delayed from previous errors",
+    "2026-11-01T05:33:47.4380606Z Command '['tar', '-tf', 'D:\\\\a\\\\orbiter-cross-platform\\\\orbiter-cross-platform\\\\out\\\\mesa-cache\\\\mingw-w64-ucrt-x86_64-zlib-1.3.2-3-any.pkg.tar.zst']' returned non-zero exit status 1."
+  ],
+  "retry": {
+    "run_attempt": 2,
+    "job_id": 124762905298,
+    "source_unchanged": true,
+    "status": "passed, including actual Windows Orbiter execution and frozen scene/image comparison",
+    "debug_artifact_id": 13072545432,
+    "debug_artifact_sha256": "c2406b077e0dfd5dd8c704f133ab90f4ae30c6d68cdef8a207ba897f81e03378"
+  },
+  "package": {
+    "name": "mingw-w64-ucrt-x86_64-zlib",
+    "filename": "mingw-w64-ucrt-x86_64-zlib-1.3.2-3-any.pkg.tar.zst",
+    "sha256": "130e6ef04c654fc2150a177600aa5ed0035087665a893479d2c85ba7485d5704"
+  },
+  "log": {
+    "file": "Evidence/41276717080-attempt1-Debug-setup.log.gz",
+    "sha256_gzip": "91961e8863080fc01ad586a6df66e93f83c9e06e4d2a081f83c255cb472b03a4",
+    "sha256_decoded_lf_utf8": "f8c095ac61b3914f7751ad073980419172e4540dab1d85e3df6d3853faed031f",
+    "format": "Complete decoded GitHub job log, UTF-8 with LF line endings"
+  }
+}
