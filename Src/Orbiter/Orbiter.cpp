@@ -152,7 +152,6 @@ HRESULT ConfirmDevice (DDCAPS*, D3DDEVICEDESC7*);
 //LRESULT CALLBACK WndProc3D (HWND, UINT, WPARAM, LPARAM);
 INT_PTR CALLBACK BkMsgProc (HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
-VOID    DestroyWorld ();
 void    SetEnvironmentVars ();
 HANDLE hMutex = 0;
 HANDLE hConsoleMutex = 0;
@@ -254,33 +253,7 @@ bool Orbiter::InitializeWorld (char *name)
 {
 	if (hRenderWnd)
 		g_pane = new Pane (gclient, hRenderWnd, viewW, viewH, viewBPP); TRACENEW
-	if (g_camera) delete g_camera;
-	g_camera = new Camera (g_nearplane, g_farplane); TRACENEW
-	g_camera->ResizeViewport (viewW, viewH);
-	if (g_psys) delete g_psys;
-
-	auto outputCallback = [](const char* msg, int line, void* callbackContext) 
-	{ 
-		Orbiter* _this = static_cast<Orbiter*>(callbackContext);
-		_this->OutputLoadStatus(msg, line); 
-	};
-
-	g_psys = new PlanetarySystem(name, pConfig, outputCallback, this); TRACENEW
-	if (!g_psys->nObj()) {  // sanity check
-		DestroyWorld();
-		return false;
-	}
-	return true;
-}
-
-// =======================================================================
-// DestroyWorld()
-// Destroy logical objects
-
-VOID DestroyWorld ()
-{
-	if (g_camera) { delete g_camera; g_camera = 0; }
-	if (g_psys)   { delete g_psys;   g_psys = 0; }
+	return world.Initialize(name);
 }
 
 //=============================================================================
@@ -292,7 +265,7 @@ VOID DestroyWorld ()
 // Name: Orbiter()
 // Desc: Application constructor. Sets attributes for the app.
 //-----------------------------------------------------------------------------
-Orbiter::Orbiter ()
+Orbiter::Orbiter () : worldFactory(*this), world(worldFactory)
 {
 	orbiter::production::BindMeshServices(orbiter::production::WindowsMeshServices(*this));
 	orbiter::production::BindBodyServices(&orbiter::production::GetWindowsBodyServices());
@@ -373,6 +346,7 @@ Orbiter::Orbiter ()
 //-----------------------------------------------------------------------------
 Orbiter::~Orbiter ()
 {
+	world.Reset();
 	meshmanager.Flush();
 	CloseApp ();
 	orbiter::production::BindMeshServices({});
@@ -942,7 +916,7 @@ void Orbiter::CloseSession ()
 		if (pDlgMgr)  { delete pDlgMgr; pDlgMgr = 0; }
 		Instrument::GlobalExit (gclient);
 		meshmanager.Flush(); // destroy buffered meshes
-		DestroyWorld ();     // destroy logical objects
+		world.Reset();      // destroy logical objects
 		if (gclient)
 			gclient->clbkDestroyRenderWindow (false); // destroy graphics objects
 

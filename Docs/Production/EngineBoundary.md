@@ -5,6 +5,21 @@ on Linux. `orbiter_production_boundary` is an internal shared library containing
 the first extracted production services; it is not a native Orbiter executable.
 The restricted POC session and all original reference files remain unchanged.
 
+`WorldOwner` now owns the production `Camera` and `PlanetarySystem` lifetimes.
+Windows creates the original classes through `WindowsWorldFactory`; the existing
+application globals are non-owning aliases. Replacement keeps the original new-
+camera-before-new-world order, and teardown releases the camera before the world.
+Normal session close releases both before graphics/plugin shutdown. Application
+destruction also releases any remaining world before unloading modules. Partial
+initialization failures release owned resources and propagate their errors.
+Window, panel and input lifetime remain in the Windows host.
+
+The portable ownership tests cover twenty token lifetimes, replacement, empty
+worlds, failed factories and destruction. They do not construct a native world
+and do not satisfy the twenty-real-session graphics gate. `PlanetarySystem` and
+`Camera` implementations still need platform extraction before a Linux factory
+can create them.
+
 The first extraction moves `Orbiter::UpdateWorld` and `EndTimeStep` ordering
 into `Production/Session.cpp`. Windows Orbiter invokes these functions through
 `WindowsSessionServices`, which calls the original `PlanetarySystem`, module,

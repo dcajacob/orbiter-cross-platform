@@ -2,7 +2,7 @@
   "schema": 1,
   "production_source": "38b7c627878ea893390675616897071f8bb8e90f",
   "observed_source": "684bd5b27005feecfa9effe796bd216f85e3392f",
-  "scope": "Shared production Body, RigidBody, original propagators, CPU Mesh/MeshManager, scenario environment/focus metadata and frame ordering; platform services and indexed resources; verbatim SDK mesh value records with original Windows declaration/layout checks. Full production world/module SDK extraction remains incomplete.",
+  "scope": "Shared production Body, RigidBody, original propagators, CPU Mesh/MeshManager, scenario environment/focus metadata frame ordering and authoritative world object ownership; platform services and indexed resources; verbatim SDK mesh value records with original Windows declaration/layout checks. Full production world/module SDK extraction remains incomplete.",
   "required_runtime_gates": [
     "frozen two-body reference",
     "frozen production orbit/propulsion",
@@ -43,7 +43,7 @@
       "original_sha256_lf": "8899635492ca087f2ad7532555b4bbdf557bb4ca4c736136adec4d68936325d5"
     },
     "Src/Orbiter/CMakeLists.txt": {
-      "sha256_lf": "8a425bf153a97b9c0858ff8c613b15cb48fa16fb220dad4e29495eab89cf51ed",
+      "sha256_lf": "8d9542c380951934b42b6f9e82b5707756d82f87d642c8e202fcf1e6c91e26e8",
       "original_sha256_lf": "4ba30d001a975912a85b238851629fb999e483d8b2ba1974eb9bef9e9beb60ac"
     },
     "Src/Orbiter/Config.cpp": {
@@ -71,11 +71,11 @@
       "original_sha256_lf": "fb4c1f4a5bec410ff05d635cd547bd6b2067ed5d26faba315248e2ae2abd3284"
     },
     "Src/Orbiter/Orbiter.cpp": {
-      "sha256_lf": "f80951386ab42394bac1199eeab4f87721b08fce26754b3a992ef020ceada5cc",
+      "sha256_lf": "c189b4fef62700968996510a765fa655eaa62c0c7e799d3c8643255864973835",
       "original_sha256_lf": "d9bcee218c141dc3896d599a3e25323f84d1259bc2aa209e752eb8c03ea4b298"
     },
     "Src/Orbiter/Orbiter.h": {
-      "sha256_lf": "9c1997db0140d320ec7d6804290e3d001ae218fd29fb53642626cbc71c47787a",
+      "sha256_lf": "8507d23b96d09cc62dd8d42b77b3ad8c0467778d8c9bc700a7d3be91e28b24f7",
       "original_sha256_lf": "32db52be7f0355c383d7ae8f4fd033170e3c13c272bd11a4c0be9453d25dd297"
     },
     "Src/Orbiter/OrbiterAPI.cpp": {
@@ -95,7 +95,7 @@
       "original_sha256_lf": null
     },
     "Src/Orbiter/Production/CMakeLists.txt": {
-      "sha256_lf": "4d6d15b4fecf72a99245d0b73d9a0eb18a5e03dbb4ca78f4db18d38da2ab863b",
+      "sha256_lf": "bd325ff3638817c9da5920ae517322371f88ba642bc85b8af07f3612880ba8bd",
       "original_sha256_lf": null
     },
     "Src/Orbiter/Production/CoreTypes.h": {
@@ -204,6 +204,22 @@
     },
     "Src/Orbiter/Production/WindowsSession.h": {
       "sha256_lf": "ba50e458d072c180c126758a6801c65e2d2b8924bad8c33a552ecc087948ea24",
+      "original_sha256_lf": null
+    },
+    "Src/Orbiter/Production/WindowsWorld.cpp": {
+      "sha256_lf": "a6551e06af6dd5bd6a10e52f08197508110cb60e75f3e369ae75926baf5b1ea7",
+      "original_sha256_lf": null
+    },
+    "Src/Orbiter/Production/WindowsWorld.h": {
+      "sha256_lf": "132578f5a45db80262ec531276451dfc5013c0e772049ab1b6deb2d9bb44e286",
+      "original_sha256_lf": null
+    },
+    "Src/Orbiter/Production/WorldOwner.cpp": {
+      "sha256_lf": "afc2ed0c883392ec09ff8a19a7f3f766bace8fa1563be10f61b9514116254003",
+      "original_sha256_lf": null
+    },
+    "Src/Orbiter/Production/WorldOwner.h": {
+      "sha256_lf": "1711cfe7685fea03148cca07a264bc697b7c23849d60f82712f8063765c71571",
       "original_sha256_lf": null
     },
     "Src/Orbiter/Rigidbody.cpp": {

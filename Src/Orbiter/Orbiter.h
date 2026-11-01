@@ -14,6 +14,7 @@
 #include "D3dmath.h"
 #include "TimeData.h"
 #include "PhysicsTrace.h"
+#include "Production/WindowsWorld.h"
 #include <chrono>
 
 class DInput;
@@ -48,6 +49,7 @@ typedef void (*OPC_Proc)(void);
 //-----------------------------------------------------------------------------
 class Orbiter {
 	friend class orbiter::production::WindowsSessionServices;
+	friend class orbiter::production::WindowsWorldFactory;
 	friend class ScriptInterface;
 	friend class oapi::GraphicsClient;
 	friend class OrbiterGraphics;
@@ -362,6 +364,8 @@ protected:
     HRESULT DeleteDeviceObjects ();
 
 private:
+	orbiter::production::WindowsWorldFactory worldFactory;
+	orbiter::production::WorldOwner world;
 	void UpdateSessionVisuals(bool running);
 	void WritePhysicsTrace(bool initial);
 	orbiter::PhysicsTrace physicsTrace;

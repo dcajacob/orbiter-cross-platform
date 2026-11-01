@@ -24,6 +24,7 @@ set(common_src
 	Nav.cpp
 	Orbiter.cpp
 	Production/WindowsSession.cpp
+	Production/WindowsWorld.cpp
 	Production/WindowsBodyServices.cpp
 	Production/WindowsRigidBodyServices.cpp
 	Production/WindowsMeshServices.cpp
