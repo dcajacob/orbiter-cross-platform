@@ -11,7 +11,10 @@ def load():
     directory=HERE/'Reference'
     metadata=json.loads((directory/'provenance.json').read_text())
     require(metadata['status']=='accepted' and metadata['automatic_refresh'] is False,'Windows SPICE reference not accepted')
-    require(hashlib.sha256((HERE/'protocol.json').read_bytes()).hexdigest()==metadata['protocol_sha256'],'accepted SPICE protocol changed')
+    protocol_bytes=(HERE/'protocol.json').read_bytes().replace(b'\r\n',b'\n')
+    require(hashlib.sha256(protocol_bytes).hexdigest()==metadata['protocol_sha256_lf'],'accepted SPICE protocol changed')
+    require(hashlib.sha256(protocol_bytes.replace(b'\n',b'\r\n')).hexdigest()==metadata['protocol_sha256'],
+            'original Windows protocol bytes cannot be reconstructed')
     protocol();traces=[];configurations=set()
     for record in metadata['evidence']:
         name=PurePosixPath(record['file'])

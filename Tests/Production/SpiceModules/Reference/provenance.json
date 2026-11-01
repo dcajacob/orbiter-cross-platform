@@ -2,7 +2,7 @@
   "schema": 1,
   "status": "accepted",
   "automatic_refresh": false,
-  "protocol_sha256": "6489b6c3507d27c5dd3783fcc2a86985fc548962a3a70325e42f4e132f4f8883",
+  "protocol_sha256": "149f8e17081dfcc4777113c4df66d97f0fc98041536b57528ba98c4564eb7119",
   "scope": "Actual original production SPICE callbacks; not native world/graphics",
   "comparison": {
     "status": "passed",
@@ -71,5 +71,10 @@
         "spice-configure.log": "3e80c986228da1c88b6582261302d36a5217f3b817a0c911caa6f146edc2310b"
       }
     }
-  ]
+  ],
+  "protocol_sha256_lf": "6489b6c3507d27c5dd3783fcc2a86985fc548962a3a70325e42f4e132f4f8883",
+  "metadata_correction": {
+    "reason": "The original Windows checkout used CRLF for this new nested JSON file. Preserve its actual recorded hash and separately lock/reconstruct the identical LF contents. Trace archives and budgets are unchanged.",
+    "initial_local_lf_hash": "6489b6c3507d27c5dd3783fcc2a86985fc548962a3a70325e42f4e132f4f8883"
+  }
 }
