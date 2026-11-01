@@ -1,0 +1,138 @@
+{
+  "status": "passed",
+  "numerical": {
+    "position_m": 0.0,
+    "velocity_m_s": 0.0,
+    "rotation_rad": 0.0,
+    "angular_velocity_rad_s": 0.0,
+    "mjd_days": 0.0,
+    "mass_fraction": 0.0
+  },
+  "maximum_projected_landmark_error_px": 0.0,
+  "landmarks_px": {
+    "Earth": [
+      629.0643202932391,
+      359.99999999948983
+    ],
+    "ISS": [
+      639.9990443243344,
+      360.0000110732057
+    ],
+    "PB": [
+      640.0,
+      360.0
+    ]
+  },
+  "ssim": 1.0,
+  "ssim_method": "RGB 11x11 Gaussian sigma 1.5; population covariance; valid crop; no masks",
+  "reference_provenance": {
+    "renderer_source": "26f0bc378fb98b9d3b7d13de0c3ce13b0f493898",
+    "application_source": "26f0bc378fb98b9d3b7d13de0c3ce13b0f493898",
+    "data_profiles_sha256": {
+      "stock-data.lock.json": "155fb89d22d58af113da6ff662904d74f82bbbbb7b9deb5e654b7c7141e27620",
+      "standard-planets.lock.json": "de0366be8f138b11135e5f675cc44ae0d4cf9a8b11fe0f71772ad617237185c4",
+      "mesa-ucrt64.lock.json": "16d52920c82eab9db41f46bd0511ce87260ed1a6c95a05361cd0248b01516a6c"
+    }
+  },
+  "candidate_provenance": {
+    "renderer_source": "26f0bc378fb98b9d3b7d13de0c3ce13b0f493898",
+    "application_source": "26f0bc378fb98b9d3b7d13de0c3ce13b0f493898",
+    "data_profiles_sha256": {
+      "stock-data.lock.json": "155fb89d22d58af113da6ff662904d74f82bbbbb7b9deb5e654b7c7141e27620",
+      "standard-planets.lock.json": "de0366be8f138b11135e5f675cc44ae0d4cf9a8b11fe0f71772ad617237185c4",
+      "mesa-ucrt64.lock.json": "16d52920c82eab9db41f46bd0511ce87260ed1a6c95a05361cd0248b01516a6c"
+    }
+  },
+  "frozen_debug": {
+    "status": "passed",
+    "numerical": {
+      "position_m": 0.0,
+      "velocity_m_s": 0.0,
+      "rotation_rad": 0.0,
+      "angular_velocity_rad_s": 0.0,
+      "mjd_days": 0.0,
+      "mass_fraction": 0.0
+    },
+    "maximum_projected_landmark_error_px": 0.0,
+    "landmarks_px": {
+      "Earth": [
+        629.0643202932391,
+        359.99999999948983
+      ],
+      "ISS": [
+        639.9990443243344,
+        360.0000110732057
+      ],
+      "PB": [
+        640.0,
+        360.0
+      ]
+    },
+    "ssim": 1.0,
+    "ssim_method": "RGB 11x11 Gaussian sigma 1.5; population covariance; valid crop; no masks",
+    "reference_provenance": {
+      "renderer_source": "21f92f44f3afd0c3ca8a704edd4ef2ce8e10c6a0",
+      "application_source": "06d8989823c59e651061d409425c19ec71360bfa",
+      "data_profiles_sha256": {
+        "stock-data.lock.json": "155fb89d22d58af113da6ff662904d74f82bbbbb7b9deb5e654b7c7141e27620",
+        "standard-planets.lock.json": "de0366be8f138b11135e5f675cc44ae0d4cf9a8b11fe0f71772ad617237185c4",
+        "mesa-ucrt64.lock.json": "16d52920c82eab9db41f46bd0511ce87260ed1a6c95a05361cd0248b01516a6c"
+      }
+    },
+    "candidate_provenance": {
+      "renderer_source": "26f0bc378fb98b9d3b7d13de0c3ce13b0f493898",
+      "application_source": "26f0bc378fb98b9d3b7d13de0c3ce13b0f493898",
+      "data_profiles_sha256": {
+        "stock-data.lock.json": "155fb89d22d58af113da6ff662904d74f82bbbbb7b9deb5e654b7c7141e27620",
+        "standard-planets.lock.json": "de0366be8f138b11135e5f675cc44ae0d4cf9a8b11fe0f71772ad617237185c4",
+        "mesa-ucrt64.lock.json": "16d52920c82eab9db41f46bd0511ce87260ed1a6c95a05361cd0248b01516a6c"
+      }
+    }
+  },
+  "frozen_release": {
+    "status": "passed",
+    "numerical": {
+      "position_m": 0.0,
+      "velocity_m_s": 0.0,
+      "rotation_rad": 0.0,
+      "angular_velocity_rad_s": 0.0,
+      "mjd_days": 0.0,
+      "mass_fraction": 0.0
+    },
+    "maximum_projected_landmark_error_px": 0.0,
+    "landmarks_px": {
+      "Earth": [
+        629.0643202932391,
+        359.99999999948983
+      ],
+      "ISS": [
+        639.9990443243344,
+        360.0000110732057
+      ],
+      "PB": [
+        640.0,
+        360.0
+      ]
+    },
+    "ssim": 1.0,
+    "ssim_method": "RGB 11x11 Gaussian sigma 1.5; population covariance; valid crop; no masks",
+    "reference_provenance": {
+      "renderer_source": "21f92f44f3afd0c3ca8a704edd4ef2ce8e10c6a0",
+      "application_source": "06d8989823c59e651061d409425c19ec71360bfa",
+      "data_profiles_sha256": {
+        "stock-data.lock.json": "155fb89d22d58af113da6ff662904d74f82bbbbb7b9deb5e654b7c7141e27620",
+        "standard-planets.lock.json": "de0366be8f138b11135e5f675cc44ae0d4cf9a8b11fe0f71772ad617237185c4",
+        "mesa-ucrt64.lock.json": "16d52920c82eab9db41f46bd0511ce87260ed1a6c95a05361cd0248b01516a6c"
+      }
+    },
+    "candidate_provenance": {
+      "renderer_source": "26f0bc378fb98b9d3b7d13de0c3ce13b0f493898",
+      "application_source": "26f0bc378fb98b9d3b7d13de0c3ce13b0f493898",
+      "data_profiles_sha256": {
+        "stock-data.lock.json": "155fb89d22d58af113da6ff662904d74f82bbbbb7b9deb5e654b7c7141e27620",
+        "standard-planets.lock.json": "de0366be8f138b11135e5f675cc44ae0d4cf9a8b11fe0f71772ad617237185c4",
+        "mesa-ucrt64.lock.json": "16d52920c82eab9db41f46bd0511ce87260ed1a6c95a05361cd0248b01516a6c"
+      }
+    }
+  }
+}

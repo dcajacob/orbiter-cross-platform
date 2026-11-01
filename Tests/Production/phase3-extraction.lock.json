@@ -2,7 +2,7 @@
   "schema": 1,
   "production_source": "38b7c627878ea893390675616897071f8bb8e90f",
   "observed_source": "684bd5b27005feecfa9effe796bd216f85e3392f",
-  "scope": "Shared production Body, RigidBody, original propagators, CPU Mesh/MeshManager, scenario environment/focus metadata frame ordering and authoritative world object ownership; platform services and indexed resources; verbatim SDK mesh value records with original Windows declaration/layout checks. Full production world/module SDK extraction remains incomplete.",
+  "scope": "Shared production Body, RigidBody, original propagators, CPU Mesh/MeshManager, scenario environment/focus metadata frame ordering and authoritative world object ownership; platform services, indexed resources and an internal native module bootstrap; verbatim SDK mesh value records with original Windows declaration/layout checks. Full production world/module SDK extraction remains incomplete.",
   "required_runtime_gates": [
     "frozen two-body reference",
     "frozen production orbit/propulsion",
@@ -95,7 +95,7 @@
       "original_sha256_lf": null
     },
     "Src/Orbiter/Production/CMakeLists.txt": {
-      "sha256_lf": "bd325ff3638817c9da5920ae517322371f88ba642bc85b8af07f3612880ba8bd",
+      "sha256_lf": "a956839bcdb25d522fc880ee1698368a7d67ac3e2a8472eb54c640be71cb5eaa",
       "original_sha256_lf": null
     },
     "Src/Orbiter/Production/CoreTypes.h": {
@@ -136,6 +136,26 @@
     },
     "Src/Orbiter/Production/MeshTypes.h": {
       "sha256_lf": "e89d6443b245a68e4540037c1243cf7a44872729f70a9c72f910f71058be3033",
+      "original_sha256_lf": null
+    },
+    "Src/Orbiter/Production/ModuleBootstrap.h": {
+      "sha256_lf": "fd411fa2161e980392a193bc0c46a0e620ea0fb37fe258039897dadf8b1c6372",
+      "original_sha256_lf": null
+    },
+    "Src/Orbiter/Production/NativeAbi.h": {
+      "sha256_lf": "b1643ce2315295330536e111e9567430f3695e63cace0afed677c14dbf75bb39",
+      "original_sha256_lf": null
+    },
+    "Src/Orbiter/Production/NativeBuild.h.in": {
+      "sha256_lf": "46385229425b50b4edfe7eb877c5c4278e718f50e276130f0354a6d51cb70511",
+      "original_sha256_lf": null
+    },
+    "Src/Orbiter/Production/NativeModule.cpp": {
+      "sha256_lf": "d90fc24038e5acf5c20329c08ac433c94fb4603811e7a1fc9aaf38eedb59e82a",
+      "original_sha256_lf": null
+    },
+    "Src/Orbiter/Production/NativeModule.h": {
+      "sha256_lf": "3d693b5b268409bb2f571a9fbb2b5b90fe3137c0a9a992a8cac55d51738adb4e",
       "original_sha256_lf": null
     },
     "Src/Orbiter/Production/ResourceResolver.cpp": {

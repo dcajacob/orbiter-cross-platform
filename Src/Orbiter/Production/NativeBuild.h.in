@@ -1,0 +1,5 @@
+// Generated for this engine/SDK build. Keep this header with its shared library.
+#ifndef ORBITER_NATIVE_BUILD_H
+#define ORBITER_NATIVE_BUILD_H
+#define ORBITER_NATIVE_BUILD_BASE "@ORBITER_NATIVE_BUILD_BASE@"
+#endif

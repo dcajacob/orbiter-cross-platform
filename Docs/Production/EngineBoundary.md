@@ -14,6 +14,27 @@ destruction also releases any remaining world before unloading modules. Partial
 initialization failures release owned resources and propagate their errors.
 Window, panel and input lifetime remain in the Windows host.
 
+The internal native bootstrap loads a module with the platform's actual dynamic
+loader (`dlopen` on Linux, `LoadLibraryExW` on Windows), checks its descriptor,
+architecture, kind, SDK build and C++ toolchain/standard-library tag, then calls
+explicit initialization. Shutdown runs before unloading the library. Missing
+libraries/entries, incompatible builds and failed initialization produce errors.
+The existing Windows SDK and its legacy DLL registration path are unchanged.
+
+The generated build identifier pairs a shared engine library with its SDK headers;
+it includes a persistent per-build token, source/header hashes, compiler settings
+and configuration. Modules must consume that build's CMake target and generated
+header. Independently configured engine builds, Debug/Release configurations and
+incompatible compiler/STL settings are not interchangeable. This is an internal
+bootstrap contract, not a released native SDK or arbitrary C++ ABI compatibility.
+
+A loadable fixture constructs an actual production `Body` through the same shared
+library and services as its host. Tests cover twenty module initialize/shutdown/
+unload cycles and reject invalid ABI/build/toolchain/kind/size descriptors,
+missing entries and initialization failure. It is not a stock vessel module and
+does not satisfy the real-world or twenty-real-graphics-session gates. Native
+vessel, celestial-body, atmosphere and graphics interfaces still need extraction.
+
 The portable ownership tests cover twenty token lifetimes, replacement, empty
 worlds, failed factories and destruction. They do not construct a native world
 and do not satisfy the twenty-real-session graphics gate. `PlanetarySystem` and
@@ -154,7 +175,7 @@ Debug/Release against each other and both against the accepted Phase 2 state,
 callback, object/asset, camera and image evidence. Numerical, one-pixel and SSIM
 budgets are unchanged. Neither inherited disabled workflow is modified.
 
-Remaining Phase 3 work includes production world/session ownership and teardown,
+Remaining Phase 3 work includes full session/platform lifetime extraction,
 configuration/scenario/resource integration, platform service separation for
 `CelestialBody`, `Vessel` and `Camera`, instrumentation dependencies and the source-built native SDK/module
 boundary. These shared components do not yet satisfy the Phase 3

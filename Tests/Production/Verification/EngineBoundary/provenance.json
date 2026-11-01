@@ -115,6 +115,24 @@
       },
       "client_attempt": 2,
       "setup_retry_record": "graphics-setup-retry.json"
+    },
+    {
+      "component": "world-ownership",
+      "source": "26f0bc378fb98b9d3b7d13de0c3ce13b0f493898",
+      "runs": {
+        "production": 41279054097,
+        "client": 41279054051,
+        "portable": 41279054091
+      },
+      "status": "passed",
+      "original_comparison_zip_sha256": "83678e751aff803e13fe2361c389894a8661ba9db891fb7b975dd48dda6096c7",
+      "preserved_report": "world-client-comparison.json",
+      "report_sha256": "8363b2e29974b6fc55f9074e6a1c7ce021dc0ea83dcbe3c4366328e48903ef1f",
+      "native_comparison": {
+        "original_zip_sha256": "3d437359d3c64c4e7e2933be13ab062365b67f5f4479fcb186e42d74fe8ed5f6",
+        "preserved_report": "world-native-parity.json",
+        "report_sha256": "80a6e34c3ed941f28b74f85fe79724cd42ff325074799f15a85866b28dbbe9b8"
+      }
     }
   ]
 }

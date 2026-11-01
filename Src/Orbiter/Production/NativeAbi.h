@@ -1,0 +1,42 @@
+// Licensed under the MIT License
+#ifndef ORBITER_NATIVE_ABI_H
+#define ORBITER_NATIVE_ABI_H
+#include "OrbiterNativeBuild.h"
+#include <string>
+#ifndef ORBITER_NATIVE_BUILD_CONFIGURATION
+#error Native modules must consume the matching engine SDK build target
+#endif
+#define ORBITER_NATIVE_TEXT_IMPL(x) #x
+#define ORBITER_NATIVE_TEXT(x) ORBITER_NATIVE_TEXT_IMPL(x)
+#ifdef __clang__
+#define ORBITER_NATIVE_COMPILER "clang-" __clang_version__
+#elif defined(_MSC_FULL_VER)
+#define ORBITER_NATIVE_COMPILER "msvc-" ORBITER_NATIVE_TEXT(_MSC_FULL_VER)
+#else
+#define ORBITER_NATIVE_COMPILER "gcc-" __VERSION__
+#endif
+#ifdef _MSVC_STL_VERSION
+#define ORBITER_NATIVE_STDLIB "msvc-stl-" ORBITER_NATIVE_TEXT(_MSVC_STL_VERSION) \
+    "-iter-" ORBITER_NATIVE_TEXT(_ITERATOR_DEBUG_LEVEL)
+#elif defined(__GLIBCXX__)
+#ifdef _GLIBCXX_DEBUG
+#define ORBITER_NATIVE_GLIBCXX_DEBUG "debug"
+#else
+#define ORBITER_NATIVE_GLIBCXX_DEBUG "normal"
+#endif
+#define ORBITER_NATIVE_STDLIB "libstdc++-" ORBITER_NATIVE_TEXT(__GLIBCXX__) \
+    "-abi-" ORBITER_NATIVE_TEXT(_GLIBCXX_USE_CXX11_ABI) "-" ORBITER_NATIVE_GLIBCXX_DEBUG \
+    "-gxx-" ORBITER_NATIVE_TEXT(__GXX_ABI_VERSION)
+#elif defined(_LIBCPP_VERSION)
+#define ORBITER_NATIVE_STDLIB "libc++-" ORBITER_NATIVE_TEXT(_LIBCPP_VERSION)
+#else
+#error Unsupported native SDK standard library
+#endif
+#ifdef _MSVC_LANG
+#define ORBITER_NATIVE_LANGUAGE ORBITER_NATIVE_TEXT(_MSVC_LANG)
+#else
+#define ORBITER_NATIVE_LANGUAGE ORBITER_NATIVE_TEXT(__cplusplus)
+#endif
+#define ORBITER_NATIVE_SDK_BUILD ORBITER_NATIVE_BUILD_BASE ":" ORBITER_NATIVE_BUILD_CONFIGURATION
+#define ORBITER_NATIVE_CPP_ABI ORBITER_NATIVE_COMPILER ":" ORBITER_NATIVE_STDLIB ":" ORBITER_NATIVE_LANGUAGE
+#endif
