@@ -1,26 +1,30 @@
 // Copyright (c) Martin Schweiger
 // Licensed under the MIT License
 
+#ifdef _WIN32
 #include <d3d.h>
+#endif
+#include <cstring>
+#include <cstdlib>
+#include "TimeData.h"
+#include <algorithm>
+#include "Mesh.h"
+#include "Production/SurfaceServices.h"
+#include "Production/CelestialServices.h"
+#include "Production/Text.h"
+#include "Production/NavigationText.h"
 #include <stdio.h>
 #include <iostream>
 #include <fstream>
-#include "Orbiter.h"
 #include "Config.h"
 #include "Planet.h"
 #include "Baseobj.h"
 #include "Base.h"
-#include "Camera.h"
-#include "Log.h"
 #include "Shadow.h"
-#include "Util.h"
 
 using namespace std;
+using namespace orbiter::production;
 
-extern Orbiter *g_pOrbiter;
-extern TimeData td;
-extern Camera *g_camera;
-extern char DBG_MSG[256];
 
 // ==============================================================================
 // class BaseObject
@@ -44,40 +48,40 @@ BaseObject *BaseObject::Create (const Base *_base, istream &is)
 		if (!is.getline (cbuf, 256)) return 0;
 		trim_string (cbuf);
 		if ((tok = strtok (cbuf, " \t")) == NULL) continue;
-		if      (!_stricmp (tok, "END_OBJECTLIST"))
+		if      (!CompareText (tok, "END_OBJECTLIST"))
 			return 0;
-		else if (!_stricmp (tok, "MESH")) {
-			bo = new MeshObject (_base); TRACENEW
-		} else if (!_stricmp (tok, "BLOCK")) {
-			bo = new Block (_base); TRACENEW
-		} else if (!_stricmp (tok, "HANGAR")) {
-			bo = new Hangar (_base); TRACENEW
-		} else if (!_stricmp (tok, "HANGAR2")) {
-			bo = new Hangar2 (_base); TRACENEW
-		} else if (!_stricmp (tok, "HANGAR3")) {
-			bo = new Hangar3 (_base); TRACENEW
-		} else if (!_stricmp (tok, "TANK")) {
-			bo = new Tank (_base); TRACENEW
-		} else if (!_stricmp (tok, "LPAD1")) {
-			bo = new Lpad01 (_base); TRACENEW
-		} else if (!_stricmp (tok, "LPAD2")) {
-			bo = new Lpad02 (_base); TRACENEW
-		} else if (!_stricmp (tok, "LPAD2A")) {
-			bo = new Lpad02a (_base); TRACENEW
-		} else if (!_stricmp (tok, "RUNWAY")) {
-			bo = new Runway (_base); TRACENEW
-		} else if (!_stricmp (tok, "RUNWAYLIGHTS")) {
-			bo = new RunwayLights (_base); TRACENEW
-		} else if (!_stricmp (tok, "BEACONARRAY")) {
-			bo = new BeaconArray (_base); TRACENEW
-		} else if (!_stricmp (tok, "TRAIN1")) {
-			bo = new Train1 (_base); TRACENEW
-		} else if (!_stricmp (tok, "TRAIN2")) {
-			bo = new Train2 (_base); TRACENEW
-		} else if (!_stricmp (tok, "SOLARPLANT")) {
-			bo = new SolarPlant (_base); TRACENEW
+		else if (!CompareText (tok, "MESH")) {
+			bo = new MeshObject (_base); TraceSurfaceAllocation(__FILE__,__LINE__);
+		} else if (!CompareText (tok, "BLOCK")) {
+			bo = new Block (_base); TraceSurfaceAllocation(__FILE__,__LINE__);
+		} else if (!CompareText (tok, "HANGAR")) {
+			bo = new Hangar (_base); TraceSurfaceAllocation(__FILE__,__LINE__);
+		} else if (!CompareText (tok, "HANGAR2")) {
+			bo = new Hangar2 (_base); TraceSurfaceAllocation(__FILE__,__LINE__);
+		} else if (!CompareText (tok, "HANGAR3")) {
+			bo = new Hangar3 (_base); TraceSurfaceAllocation(__FILE__,__LINE__);
+		} else if (!CompareText (tok, "TANK")) {
+			bo = new Tank (_base); TraceSurfaceAllocation(__FILE__,__LINE__);
+		} else if (!CompareText (tok, "LPAD1")) {
+			bo = new Lpad01 (_base); TraceSurfaceAllocation(__FILE__,__LINE__);
+		} else if (!CompareText (tok, "LPAD2")) {
+			bo = new Lpad02 (_base); TraceSurfaceAllocation(__FILE__,__LINE__);
+		} else if (!CompareText (tok, "LPAD2A")) {
+			bo = new Lpad02a (_base); TraceSurfaceAllocation(__FILE__,__LINE__);
+		} else if (!CompareText (tok, "RUNWAY")) {
+			bo = new Runway (_base); TraceSurfaceAllocation(__FILE__,__LINE__);
+		} else if (!CompareText (tok, "RUNWAYLIGHTS")) {
+			bo = new RunwayLights (_base); TraceSurfaceAllocation(__FILE__,__LINE__);
+		} else if (!CompareText (tok, "BEACONARRAY")) {
+			bo = new BeaconArray (_base); TraceSurfaceAllocation(__FILE__,__LINE__);
+		} else if (!CompareText (tok, "TRAIN1")) {
+			bo = new Train1 (_base); TraceSurfaceAllocation(__FILE__,__LINE__);
+		} else if (!CompareText (tok, "TRAIN2")) {
+			bo = new Train2 (_base); TraceSurfaceAllocation(__FILE__,__LINE__);
+		} else if (!CompareText (tok, "SOLARPLANT")) {
+			bo = new SolarPlant (_base); TraceSurfaceAllocation(__FILE__,__LINE__);
 		} else {
-			LOGOUT ("BaseObject: Parse error");
+			GetSurfaceServices().Log("BaseObject: Parse error");
 			return 0;
 		}
 		if (bo) {
@@ -85,7 +89,7 @@ BaseObject *BaseObject::Create (const Base *_base, istream &is)
 				return bo;
 			} else { // parse error
 				delete bo;
-				LOGOUT ("BaseObject: Parse error %d", err);
+				GetSurfaceServices().Log("BaseObject: Parse error "+std::to_string(err));
 				return 0;
 			}
 		}
@@ -103,12 +107,12 @@ int BaseObject::Read (istream &is)
 			continue; // empty line
 		sscanf (cp, "%s", label);
 		value = trim_string(cp+strlen(label));
-		if (!_stricmp (label, "POS")) {
+		if (!CompareText (label, "POS")) {
 			if (sscanf (value, "%lf%lf%lf", &relpos.x, &relpos.y, &relpos.z) != 3) {
 				ParseError("POS: expected 3 scalar values");
 				res = 2;
 			}
-		} else if (!_stricmp (label, "SCALE")) {
+		} else if (!CompareText (label, "SCALE")) {
 			int nv = sscanf (value, "%lf%lf%lf", &scale.x, &scale.y, &scale.z);
 			if (nv < 3) {
 				if (nv == 1) {
@@ -118,20 +122,20 @@ int BaseObject::Read (istream &is)
 					res = 2;
 				}
 			}
-		} else if (!_stricmp (label, "ROT")) {
+		} else if (!CompareText (label, "ROT")) {
 			if (sscanf (value, "%lf", &rot) != 1) {
 				ParseError("ROT: expected a scalar value");
 				res = 2;
 			} else {
 				rot *= RAD;
 			}
-		} else if (!_stricmp (label, "COLLISION")) {
+		} else if (!CompareText (label, "COLLISION")) {
 			bCollision = true;
 		} else {
 			r = ParseLine (label, value);
 			if (!res) res = r;
 		}
-	} while (_stricmp (label, "END"));
+	} while (CompareText (label, "END"));
 	return res;
 }
 
@@ -146,12 +150,12 @@ void BaseObject::Setup ()
 	relpos.y += yofs;
 }
 
-D3DVALUE BaseObject::ElevCorrection (D3DVALUE px, D3DVALUE pz)
+SurfaceScalar BaseObject::ElevCorrection (SurfaceScalar px, SurfaceScalar pz)
 {
 	double r = base->RefPlanet()->Size();
 	double r2 = r*r;
 	double d2 = px*px + pz*pz;
-	return D3DVAL(r - sqrt (r2+d2));
+	return SurfaceScalar(r - sqrt (r2+d2));
 }
 
 void BaseObject::MapToCurvature (NTVERTEX *vtx, int nvtx)
@@ -180,8 +184,8 @@ void BaseObject::MapToAltitude (NTVERTEX *vtx, int nvtx)
 void BaseObject::ParseError (const char *msg) const
 {
 	char errmsg[256];
-	_snprintf (errmsg, 255, "Parse error from base definition file for %s: %s", base->Name(), msg);
-	LOGOUT_ERR(errmsg);
+	NavigationText (errmsg, 255, "Parse error from base definition file for %s: %s", base->Name(), msg);
+	GetSurfaceServices().Log(errmsg);
 }
 
 // ==============================================================================
@@ -208,27 +212,29 @@ MeshObject::~MeshObject ()
 int MeshObject::ParseLine (const char *label, const char *value)
 {
 	int res = 0;
-	if (!_stricmp (label, "FILE")) {
-		fname = _strdup (value);
-	} else if (!_stricmp (label, "WRAPTOSURFACE")) {
+	if (!CompareText (label, "FILE")) {
+		fname = static_cast<char*>(std::malloc(std::strlen(value)+1));
+		if (!fname) throw std::bad_alloc();
+		std::strcpy(fname,value);
+	} else if (!CompareText (label, "WRAPTOSURFACE")) {
 		specs |= OBJSPEC_WRAPTOSURFACE;
-	} else if (!_stricmp (label, "COLLISION")) {
+	} else if (!CompareText (label, "COLLISION")) {
 		specs |= OBJSPEC_COLLISION;
-	} else if (!_stricmp (label, "SHADOW")) {
+	} else if (!CompareText (label, "SHADOW")) {
 		specs |= OBJSPEC_RENDERSHADOW /*| OBJSPEC_EXPORTSHADOWMESH*/;
 		// removed OBJSPEC_EXPORTSHADOWMESH to avoid accumulated shadow meshes with excessive
 		// vertex numbers (vertex buffers are limited to 64000 vertices)
-	} else if (!_stricmp (label, "OWNSHADOW")) {
+	} else if (!CompareText (label, "OWNSHADOW")) {
 		specs |= OBJSPEC_OWNSHADOW;
-	} else if (!_stricmp (label, "UNDERSHADOWS")) {
+	} else if (!CompareText (label, "UNDERSHADOWS")) {
 		undersh = true;
-	} else if (!_stricmp (label, "PRELOAD")) {
+	} else if (!CompareText (label, "PRELOAD")) {
 		preload = true;
-	} else if (!_stricmp (label, "LPAD")) {
+	} else if (!CompareText (label, "LPAD")) {
 		specs |= OBJSPEC_LPAD;
-	} else if (!_stricmp (label, "OWNMATERIAL")) {
+	} else if (!CompareText (label, "OWNMATERIAL")) {
 		ownmat = true;
-	} else if (!_stricmp (label, "TEX")) {
+	} else if (!CompareText (label, "TEX")) {
 		texid = NameToId (value);
 	}
 	return res;
@@ -282,7 +288,7 @@ void MeshObject::Deactivate ()
 #endif
 }
 
-bool MeshObject::GetGroupSpec (int grp, DWORD &nvtx, DWORD &nidx, LONGLONG &_texid,
+bool MeshObject::GetGroupSpec (int grp, UInt32 &nvtx, UInt32 &nidx, SurfaceName &_texid,
 	bool &undershadow, bool &groundshadow)
 {
 	GroupSpec *gs = mesh->GetGroup (grp);
@@ -295,13 +301,13 @@ bool MeshObject::GetGroupSpec (int grp, DWORD &nvtx, DWORD &nidx, LONGLONG &_tex
 	return true;
 }
 
-void MeshObject::ExportGroup (int grp, NTVERTEX *vtx, WORD *idx, DWORD &idx_ofs)
+void MeshObject::ExportGroup (int grp, NTVERTEX *vtx, UInt16 *idx, UInt32 &idx_ofs)
 {
 	GroupSpec *gs = mesh->GetGroup (grp);
 	if (gs) {
-		WORD iofs = (WORD)idx_ofs;
+		UInt16 iofs = (UInt16)idx_ofs;
 		memcpy (vtx, gs->Vtx, gs->nVtx*sizeof(NTVERTEX));
-		for (DWORD i = 0; i < gs->nIdx; i++)
+		for (UInt32 i = 0; i < gs->nIdx; i++)
 			idx[i] = gs->Idx[i]+iofs;
 	}
 }
@@ -320,28 +326,28 @@ Mesh* MeshObject::GetCollisionMesh ()
 Mesh *MeshObject::ExportShadowMesh (double &shelev)
 {
 	if (!(specs & OBJSPEC_EXPORTSHADOWMESH)) return NULL;
-	DWORD i, j, nvtx = 0, nidx = 0, ngrp = mesh->nGroup();
+	UInt32 i, j, nvtx = 0, nidx = 0, ngrp = mesh->nGroup();
 	for (i = 0; i < ngrp; i++) {
 		GroupSpec *grp = mesh->GetGroup(i);
 		if (grp->UsrFlag & 0x1) continue; // no shadows
 		nvtx += grp->nVtx;
 		nidx += grp->nIdx;
 	}
-	NTVERTEX *vtx = new NTVERTEX[nvtx]; TRACENEW
-	WORD *idx = new WORD[nidx]; TRACENEW
+	NTVERTEX *vtx = new NTVERTEX[nvtx]; TraceSurfaceAllocation(__FILE__,__LINE__);
+	UInt16 *idx = new UInt16[nidx]; TraceSurfaceAllocation(__FILE__,__LINE__);
 	nvtx = nidx = 0;
 	for (i = 0; i < ngrp; i++) {
 		GroupSpec *grp = mesh->GetGroup(i);
 		if (grp->UsrFlag & 0x1) continue; // no shadows
 		memcpy (vtx+nvtx, grp->Vtx, grp->nVtx*sizeof(NTVERTEX));
 		for (j = 0; j < grp->nIdx; j++)
-			idx[nidx+j] = grp->Idx[j]+(WORD)nvtx;
+			idx[nidx+j] = grp->Idx[j]+(UInt16)nvtx;
 		nvtx += grp->nVtx;
 		nidx += grp->nIdx;
 	}
 
 	shelev = yofs;
-	if (nvtx) { TRACENEW; return new Mesh (vtx, nvtx, idx, nidx); }
+	if (nvtx) { TraceSurfaceAllocation(__FILE__,__LINE__);; return new Mesh (vtx, nvtx, idx, nidx); }
 	else return NULL;
 }
 
@@ -349,7 +355,7 @@ bool MeshObject::LoadMesh (char *fname)
 {
 	int i;
 
-	if (!mesh) { mesh = new Mesh; TRACENEW }
+	if (!mesh) { mesh = new Mesh; TraceSurfaceAllocation(__FILE__,__LINE__); }
 	if (!::LoadMesh (fname, *mesh)) {
 		delete mesh; mesh = 0;
 		ngrp = 0;
@@ -379,13 +385,17 @@ void MeshObject::UpdateShadow (Vector &fromsun, double azim)
 	az = (float)fromsun.z;
 }
 
+#ifdef _WIN32
 void MeshObject::Render (LPDIRECT3DDEVICE7 dev, bool day)
 {
 }
+#endif
 
+#ifdef _WIN32
 void MeshObject::RenderShadow (LPDIRECT3DDEVICE7 dev)
 {
 }
+#endif
 
 // ==============================================================================
 // class Block (simple buildings etc.)
@@ -408,8 +418,8 @@ Block::~Block ()
 int Block::ParseLine (const char *label, const char *value)
 {
 	int res = 0;
-	if (!_strnicmp (label, "TEX", 3)) {
-		D3DVALUE su, sv;
+	if (!ComparePrefix (label, "TEX", 3)) {
+		SurfaceScalar su, sv;
 		int i;
 		char name[32];
 		if (sscanf (label+3, "%d", &i) != 1 || i < 1 || i > 3) {
@@ -430,12 +440,12 @@ int Block::ParseLine (const char *label, const char *value)
 void Block::Activate ()
 {
 	if (dyndata) return;  // active already
-	dyndata = new struct DYNDATA; TRACENEW
-	dyndata->databuf = new D3DVALUE[13]; TRACENEW
-	D3DVALUE dx = 0.5f*scale.x, dy = scale.y, dz = 0.5f*scale.z;
-	D3DVALUE srot = (D3DVALUE)sin(rot), crot = (D3DVALUE)cos(rot);
-	D3DVALUE dxcrot = dx*crot, dxsrot = dx*srot;
-	D3DVALUE dzsrot = dz*srot, dzcrot = dz*crot;
+	dyndata = new struct DYNDATA; TraceSurfaceAllocation(__FILE__,__LINE__);
+	dyndata->databuf = new SurfaceScalar[13]; TraceSurfaceAllocation(__FILE__,__LINE__);
+	SurfaceScalar dx = 0.5f*scale.x, dy = scale.y, dz = 0.5f*scale.z;
+	SurfaceScalar srot = (SurfaceScalar)sin(rot), crot = (SurfaceScalar)cos(rot);
+	SurfaceScalar dxcrot = dx*crot, dxsrot = dx*srot;
+	SurfaceScalar dzsrot = dz*srot, dzcrot = dz*crot;
 	dyndata->databuf[0] =  dxcrot + dzsrot + relpos.x;
 	dyndata->databuf[1] = -dxcrot + dzsrot + relpos.x;
 	dyndata->databuf[2] = -dxcrot - dzsrot + relpos.x;
@@ -461,13 +471,13 @@ void Block::Deactivate ()
 	}
 }
 
-bool Block::GetGroupSpec (int grp, DWORD &nvtx, DWORD &nidx, LONGLONG &_texid,
+bool Block::GetGroupSpec (int grp, UInt32 &nvtx, UInt32 &nidx, SurfaceName &_texid,
 	bool &undershadow, bool &groundshadow)
 {
 	if (grp < 0 || grp >= 3) return false;
 
-	static DWORD nv[3] = {8,8,4};
-	static DWORD ni[3] = {12,12,6};
+	static UInt32 nv[3] = {8,8,4};
+	static UInt32 ni[3] = {12,12,6};
 	nvtx = nv[grp];
 	nidx = ni[grp];
 	undershadow = false;
@@ -476,12 +486,12 @@ bool Block::GetGroupSpec (int grp, DWORD &nvtx, DWORD &nidx, LONGLONG &_texid,
 	return true;
 }
 
-void Block::ExportGroup (int grp, NTVERTEX *vtx, WORD *idx, DWORD &idx_ofs)
+void Block::ExportGroup (int grp, NTVERTEX *vtx, UInt16 *idx, UInt32 &idx_ofs)
 {
-	static WORD sidx[12] = {0,1,2,2,3,0,4,5,6,6,7,4};
-	DWORD i;
-	WORD iofs = (WORD)idx_ofs;
-	D3DVALUE *db = dyndata->databuf;
+	static UInt16 sidx[12] = {0,1,2,2,3,0,4,5,6,6,7,4};
+	UInt32 i;
+	UInt16 iofs = (UInt16)idx_ofs;
+	SurfaceScalar *db = dyndata->databuf;
 
 	switch (grp) {
 	case 0:
@@ -556,12 +566,12 @@ void Block::ExportGroup (int grp, NTVERTEX *vtx, WORD *idx, DWORD &idx_ofs)
 
 Mesh *Block::ExportShadowMesh (double &shelev)
 {
-	static WORD sidx[30] = {0,1,4, 4,1,5, 1,2,5, 5,2,6, 2,3,6, 6,3,7, 3,0,7, 7,0,4, 4,5,6, 6,7,4};
-	D3DVALUE *db = dyndata->databuf;
-	DWORD i, nvtx = 8, nidx = 30;
-	NTVERTEX *vtx = new NTVERTEX[nvtx]; TRACENEW
-	WORD *idx = new WORD[nidx]; TRACENEW
-	memcpy (idx, sidx, nidx*sizeof(WORD));
+	static UInt16 sidx[30] = {0,1,4, 4,1,5, 1,2,5, 5,2,6, 2,3,6, 6,3,7, 3,0,7, 7,0,4, 4,5,6, 6,7,4};
+	SurfaceScalar *db = dyndata->databuf;
+	UInt32 i, nvtx = 8, nidx = 30;
+	NTVERTEX *vtx = new NTVERTEX[nvtx]; TraceSurfaceAllocation(__FILE__,__LINE__);
+	UInt16 *idx = new UInt16[nidx]; TraceSurfaceAllocation(__FILE__,__LINE__);
+	memcpy (idx, sidx, nidx*sizeof(UInt16));
 	memset (vtx, 0, nvtx*sizeof(NTVERTEX));
 	for (i = 0; i < 8; i++)	{
 		vtx[i].x = db[i%4];
@@ -569,21 +579,21 @@ Mesh *Block::ExportShadowMesh (double &shelev)
 		vtx[i].z = db[6+i%4];
 	}
 	shelev = yofs;
-	TRACENEW; return new Mesh (vtx, nvtx, idx, nidx);
+	TraceSurfaceAllocation(__FILE__,__LINE__);; return new Mesh (vtx, nvtx, idx, nidx);
 }
 
 #ifdef UNDEF
-bool Block::GetShadowSpec (DWORD &nvtx, DWORD &nidx)
+bool Block::GetShadowSpec (UInt32 &nvtx, UInt32 &nidx)
 {
 	nvtx = 6;
 	nidx = 12;
 	return true;
 }
 
-void Block::ExportShadow (VERTEX_XYZ *vtx, WORD *idx)
+void Block::ExportShadow (SurfacePoint *vtx, UInt16 *idx)
 {
-	static WORD sidx[12] = {0,1,2,2,1,3,2,3,4,4,3,5};
-	DWORD i;
+	static UInt16 sidx[12] = {0,1,2,2,1,3,2,3,4,4,3,5};
+	UInt32 i;
 	for (i = 0; i < 12; i++) idx[i] = sidx[i];
 	for (i = 0; i < 6; i++) vtx[i].y = dyndata->databuf[12];
 	dyndata->shvtx = vtx;
@@ -591,12 +601,12 @@ void Block::ExportShadow (VERTEX_XYZ *vtx, WORD *idx)
 
 void Block::UpdateShadow (Vector &fromsun, double az)
 {
-	D3DVALUE dx0 = pos.y*(D3DVALUE)fromsun.x;
-	D3DVALUE dx1 = (pos.y+scale.y)*(D3DVALUE)fromsun.x;
-	D3DVALUE dz0 = pos.y*(D3DVALUE)fromsun.z;
-	D3DVALUE dz1 = (pos.y+scale.y)*(D3DVALUE)fromsun.z;
+	SurfaceScalar dx0 = pos.y*(SurfaceScalar)fromsun.x;
+	SurfaceScalar dx1 = (pos.y+scale.y)*(SurfaceScalar)fromsun.x;
+	SurfaceScalar dz0 = pos.y*(SurfaceScalar)fromsun.z;
+	SurfaceScalar dz1 = (pos.y+scale.y)*(SurfaceScalar)fromsun.z;
 	D3DVERTEX *gv0 = dyndata->gv0;
-	VERTEX_XYZ *vptr = dyndata->shvtx;
+	SurfacePoint *vptr = dyndata->shvtx;
 	az -= rot;
 	if (az < -Pi) az += Pi2;
 	else if (az > Pi) az -= Pi2;
@@ -657,8 +667,8 @@ Hangar::~Hangar ()
 int Hangar::ParseLine (const char *label, const char *value)
 {
 	int res = 0;
-	if (!_strnicmp (label, "TEX", 3)) {
-		D3DVALUE su, sv;
+	if (!ComparePrefix (label, "TEX", 3)) {
+		SurfaceScalar su, sv;
 		int i;
 		char name[32];
 		if (sscanf (label+3, "%d", &i) != 1 || i < 1 || i > 3) {
@@ -679,18 +689,18 @@ int Hangar::ParseLine (const char *label, const char *value)
 void Hangar::Activate ()
 {
 	if (dyndata) return; // active already
-	dyndata = new struct DYNDATA; TRACENEW
-	dyndata->Vtx = new NTVERTEX[44]; TRACENEW
+	dyndata = new struct DYNDATA; TraceSurfaceAllocation(__FILE__,__LINE__);
+	dyndata->Vtx = new NTVERTEX[44]; TraceSurfaceAllocation(__FILE__,__LINE__);
 	NTVERTEX *Vtx = dyndata->Vtx;
-	D3DVALUE dx = 0.5f*scale.x, dy = scale.y, dz = 0.5f*scale.z;
-	D3DVALUE dy1 = 0.5f*dy; // side wall height
-	D3DVALUE dy2 = dy-dy1;  // roof height
-	D3DVALUE srot = (D3DVALUE)sin(rot), crot = (D3DVALUE)cos(rot);
-	D3DVALUE dxcrot = dx*crot, dxsrot = dx*srot;
-	D3DVALUE dzsrot = dz*srot, dzcrot = dz*crot;
-	D3DVALUE dxcrot1 = 0.72f*dxcrot, dxcrot2 = 0.28f*dxcrot;
-	D3DVALUE dxsrot1 = 0.72f*dxsrot, dxsrot2 = 0.28f*dxsrot;
-	D3DVALUE tufac = tuscale[0]*dz/dx;
+	SurfaceScalar dx = 0.5f*scale.x, dy = scale.y, dz = 0.5f*scale.z;
+	SurfaceScalar dy1 = 0.5f*dy; // side wall height
+	SurfaceScalar dy2 = dy-dy1;  // roof height
+	SurfaceScalar srot = (SurfaceScalar)sin(rot), crot = (SurfaceScalar)cos(rot);
+	SurfaceScalar dxcrot = dx*crot, dxsrot = dx*srot;
+	SurfaceScalar dzsrot = dz*srot, dzcrot = dz*crot;
+	SurfaceScalar dxcrot1 = 0.72f*dxcrot, dxcrot2 = 0.28f*dxcrot;
+	SurfaceScalar dxsrot1 = 0.72f*dxsrot, dxsrot2 = 0.28f*dxsrot;
+	SurfaceScalar tufac = tuscale[0]*dz/dx;
 
 	Vtx[0].x  = Vtx[7].x  = Vtx[17].x = Vtx[18].x = Vtx[29].x =  dxcrot  + dzsrot + relpos.x;
 	Vtx[1].x  = Vtx[2].x  = Vtx[20].x = Vtx[23].x = Vtx[39].x = -dxcrot  + dzsrot + relpos.x;
@@ -774,13 +784,13 @@ void Hangar::Deactivate ()
 	}
 }
 
-bool Hangar::GetGroupSpec (int grp, DWORD &nvtx, DWORD &nidx, LONGLONG &_texid,
+bool Hangar::GetGroupSpec (int grp, UInt32 &nvtx, UInt32 &nidx, SurfaceName &_texid,
 	bool &undershadow, bool &groundshadow)
 {
 	if (grp < 0 || grp >= 3) return false;
 
-	static DWORD nv[3] = {28,4,12};
-	static DWORD ni[3] = {54,6,30};
+	static UInt32 nv[3] = {28,4,12};
+	static UInt32 ni[3] = {54,6,30};
 	nvtx = nv[grp];
 	nidx = ni[grp];
 	_texid = texid[grp];
@@ -789,15 +799,15 @@ bool Hangar::GetGroupSpec (int grp, DWORD &nvtx, DWORD &nidx, LONGLONG &_texid,
 	return true;
 }
 
-void Hangar::ExportGroup (int grp, NTVERTEX *vtx, WORD *idx, DWORD &idx_ofs)
+void Hangar::ExportGroup (int grp, NTVERTEX *vtx, UInt16 *idx, UInt32 &idx_ofs)
 {
-	static WORD sidx0[54] = {0,24,7,27,7,24,25,1,26,2,26,1,6,7,2,2,3,6,5,6,3,3,4,5,
+	static UInt16 sidx0[54] = {0,24,7,27,7,24,25,1,26,2,26,1,6,7,2,2,3,6,5,6,3,3,4,5,
 		                     8,9,10,10,15,8,15,10,11,11,14,15,14,11,12,12,13,14,
 							 16,17,19,18,19,17,20,21,23,22,23,21};
-	static WORD sidx1[6]  = {0,1,3,2,3,1};
-	static WORD sidx2[30] = {0,1,2,3,2,1,2,3,4,5,4,3,4,5,6,7,6,5,6,7,8,9,8,7,8,9,10,11,10,9};
-	DWORD i;
-	WORD iofs = (WORD)idx_ofs;
+	static UInt16 sidx1[6]  = {0,1,3,2,3,1};
+	static UInt16 sidx2[30] = {0,1,2,3,2,1,2,3,4,5,4,3,4,5,6,7,6,5,6,7,8,9,8,7,8,9,10,11,10,9};
+	UInt32 i;
+	UInt16 iofs = (UInt16)idx_ofs;
 
 	switch (grp) {
 	case 0:
@@ -817,37 +827,37 @@ void Hangar::ExportGroup (int grp, NTVERTEX *vtx, WORD *idx, DWORD &idx_ofs)
 
 Mesh *Hangar::ExportShadowMesh (double &shelev)
 {
-	static WORD sidx[78] = {
+	static UInt16 sidx[78] = {
 		0,1,2,3,2,1,2,3,4,5,4,3,4,5,6,7,6,5,6,7,8,9,8,7,8,9,10,11,10,9, // roof
 		0,12,1, 12,13,1, 11,15,10, 15,14,10,            // side walls
 		10,14,12, 0,10,12, 8,10,0, 2,8,0, 6,8,2, 4,6,2, // front wall
 		1,13,15, 11,1,15, 3,1,11, 9,3,11, 5,3,9, 7,5,9  // back wall
 	};
-	DWORD nvtx = 16;
-	DWORD nidx = 78;
-	NTVERTEX *vtx = new NTVERTEX[nvtx]; TRACENEW
-	WORD *idx = new WORD[nidx]; TRACENEW
+	UInt32 nvtx = 16;
+	UInt32 nidx = 78;
+	NTVERTEX *vtx = new NTVERTEX[nvtx]; TraceSurfaceAllocation(__FILE__,__LINE__);
+	UInt16 *idx = new UInt16[nidx]; TraceSurfaceAllocation(__FILE__,__LINE__);
 	memcpy (vtx, dyndata->Vtx+28, 12*sizeof(NTVERTEX));
 	vtx[12] = dyndata->Vtx[9];
 	vtx[13] = dyndata->Vtx[0];
 	vtx[14] = dyndata->Vtx[8];
 	vtx[15] = dyndata->Vtx[1];
-	memcpy (idx, sidx, nidx*sizeof(WORD));
+	memcpy (idx, sidx, nidx*sizeof(UInt16));
 	shelev = yofs;
-	TRACENEW; return new Mesh (vtx, nvtx, idx, nidx);
+	TraceSurfaceAllocation(__FILE__,__LINE__);; return new Mesh (vtx, nvtx, idx, nidx);
 }
 
 #ifdef UNDEF
-bool Hangar::GetShadowSpec (DWORD &nvtx, DWORD &nidx)
+bool Hangar::GetShadowSpec (UInt32 &nvtx, UInt32 &nidx)
 {
 	nvtx = 10;
 	nidx = 24;
 	return true;
 }
 
-void Hangar::ExportShadow (VERTEX_XYZ *vtx, WORD *idx)
+void Hangar::ExportShadow (SurfacePoint *vtx, UInt16 *idx)
 {
-	for (WORD i = 0; i < 8; i++) {
+	for (UInt16 i = 0; i < 8; i++) {
 		*idx++ = 0;
 		*idx++ = i+2;
 		*idx++ = i+1;
@@ -858,12 +868,12 @@ void Hangar::ExportShadow (VERTEX_XYZ *vtx, WORD *idx)
 
 void Hangar::UpdateShadow (Vector &fromsun, double az)
 {
-	static VECTOR2D proj[16];
-	D3DVALUE dx = (D3DVALUE)fromsun.x, dz = (D3DVALUE)fromsun.z;
-	DWORD i, nCH;
-	WORD *CHidx;
+	static SurfacePoint2 proj[16];
+	SurfaceScalar dx = (SurfaceScalar)fromsun.x, dz = (SurfaceScalar)fromsun.z;
+	UInt32 i, nCH;
+	UInt16 *CHidx;
 	D3DVERTEX *Vtx = dyndata->Vtx;
-	VERTEX_XYZ *vptr = dyndata->shvtx;
+	SurfacePoint *vptr = dyndata->shvtx;
 
 	// project bounding vertices onto y=0
 	for (i = 0; i < 16; i++) {
@@ -901,13 +911,13 @@ Hangar2::~Hangar2 ()
 int Hangar2::ParseLine (const char *label, const char *value)
 {
 	int res = 0;
-	if (!_stricmp (label, "ROOFH")) {
+	if (!CompareText (label, "ROOFH")) {
 		if (sscanf (value, "%f", &roofh) != 1) {
 			ParseError("Hangar2: ROOFH: Expected scalar value");
 			res = 2;
 		}
-	} else if (!_strnicmp (label, "TEX", 3)) {
-		D3DVALUE su, sv;
+	} else if (!ComparePrefix (label, "TEX", 3)) {
+		SurfaceScalar su, sv;
 		int i;
 		char name[32];
 		if (sscanf (label+3, "%d", &i) != 1 || i < 1 || i > 3) {
@@ -925,13 +935,13 @@ int Hangar2::ParseLine (const char *label, const char *value)
 	return res;
 }
 
-bool Hangar2::GetGroupSpec (int grp, DWORD &nvtx, DWORD &nidx, LONGLONG &_texid,
+bool Hangar2::GetGroupSpec (int grp, UInt32 &nvtx, UInt32 &nidx, SurfaceName &_texid,
 	bool &undershadow, bool &groundshadow)
 {
 	if (grp < 0 || grp >= 3) return false;
 
-	static DWORD nv[3] = {10,8,8};
-	static DWORD ni[3] = {18,12,12};
+	static UInt32 nv[3] = {10,8,8};
+	static UInt32 ni[3] = {18,12,12};
 	nvtx = nv[grp];
 	nidx = ni[grp];
 	_texid = texid[grp];
@@ -940,12 +950,12 @@ bool Hangar2::GetGroupSpec (int grp, DWORD &nvtx, DWORD &nidx, LONGLONG &_texid,
 	return true;
 }
 
-void Hangar2::ExportGroup (int grp, NTVERTEX *vtx, WORD *idx, DWORD &idx_ofs)
+void Hangar2::ExportGroup (int grp, NTVERTEX *vtx, UInt16 *idx, UInt32 &idx_ofs)
 {
-	static WORD sidx0[18] = {0,1,2,2,4,0,4,2,3,6,5,9,9,7,6,7,9,8};
-	static WORD sidx1[12] = {0,1,3,2,3,1,5,4,6,7,6,4};
-	DWORD i;
-	WORD iofs = (WORD)idx_ofs;
+	static UInt16 sidx0[18] = {0,1,2,2,4,0,4,2,3,6,5,9,9,7,6,7,9,8};
+	static UInt16 sidx1[12] = {0,1,3,2,3,1,5,4,6,7,6,4};
+	UInt32 i;
+	UInt16 iofs = (UInt16)idx_ofs;
 
 	switch (grp) {
 	case 0:
@@ -965,32 +975,32 @@ void Hangar2::ExportGroup (int grp, NTVERTEX *vtx, WORD *idx, DWORD &idx_ofs)
 
 Mesh *Hangar2::ExportShadowMesh (double &shelev)
 {
-	static WORD sidx[42] = {
+	static UInt16 sidx[42] = {
 		0,1,2,2,4,0,4,2,3,6,5,9,9,7,6,7,9,8, // front and back walls
 		0,4,5, 9,5,4, 1,6,7, 7,2,1,          // side walls
 		3,9,4, 9,3,8, 3,2,8, 2,7,8           // roof
 	};
-	DWORD nvtx = 10;
-	DWORD nidx = 42;
-	NTVERTEX *vtx = new NTVERTEX[nvtx]; TRACENEW
-	WORD *idx = new WORD[nidx]; TRACENEW
+	UInt32 nvtx = 10;
+	UInt32 nidx = 42;
+	NTVERTEX *vtx = new NTVERTEX[nvtx]; TraceSurfaceAllocation(__FILE__,__LINE__);
+	UInt16 *idx = new UInt16[nidx]; TraceSurfaceAllocation(__FILE__,__LINE__);
 	memcpy (vtx, dyndata->Vtx, 10*sizeof(NTVERTEX));
-	memcpy (idx, sidx, nidx*sizeof(WORD));
+	memcpy (idx, sidx, nidx*sizeof(UInt16));
 	shelev = yofs;
-	TRACENEW; return new Mesh (vtx, nvtx, idx, nidx);
+	TraceSurfaceAllocation(__FILE__,__LINE__);; return new Mesh (vtx, nvtx, idx, nidx);
 }
 
 #ifdef UNDEF
-bool Hangar2::GetShadowSpec (DWORD &nvtx, DWORD &nidx)
+bool Hangar2::GetShadowSpec (UInt32 &nvtx, UInt32 &nidx)
 {
 	nvtx = 7;
 	nidx = 15;
 	return true;
 }
 
-void Hangar2::ExportShadow (VERTEX_XYZ *vtx, WORD *idx)
+void Hangar2::ExportShadow (SurfacePoint *vtx, UInt16 *idx)
 {
-	for (WORD i = 0; i < 5; i++) {
+	for (UInt16 i = 0; i < 5; i++) {
 		*idx++ = 0;
 		*idx++ = i+2;
 		*idx++ = i+1;
@@ -1001,12 +1011,12 @@ void Hangar2::ExportShadow (VERTEX_XYZ *vtx, WORD *idx)
 
 void Hangar2::UpdateShadow (Vector &fromsun, double az)
 {
-	static VECTOR2D proj[10];
-	D3DVALUE dx = (D3DVALUE)fromsun.x, dz = (D3DVALUE)fromsun.z;
-	DWORD i, nCH;
-	WORD *CHidx;
+	static SurfacePoint2 proj[10];
+	SurfaceScalar dx = (SurfaceScalar)fromsun.x, dz = (SurfaceScalar)fromsun.z;
+	UInt32 i, nCH;
+	UInt16 *CHidx;
 	D3DVERTEX *Vtx = dyndata->Vtx;
-	VERTEX_XYZ *vptr = dyndata->shvtx;
+	SurfacePoint *vptr = dyndata->shvtx;
 
 	// project bounding vertices onto y=0
 	for (i = 0; i < 10; i++) {
@@ -1025,16 +1035,16 @@ void Hangar2::UpdateShadow (Vector &fromsun, double az)
 void Hangar2::Activate ()
 {
     if (dyndata) return; // active already
-    dyndata = new struct DYNDATA; TRACENEW
-    dyndata->Vtx = new NTVERTEX[26]; TRACENEW
+    dyndata = new struct DYNDATA; TraceSurfaceAllocation(__FILE__,__LINE__);
+    dyndata->Vtx = new NTVERTEX[26]; TraceSurfaceAllocation(__FILE__,__LINE__);
     NTVERTEX *Vtx = dyndata->Vtx;
-    D3DVALUE dx = 0.5f*scale.x, dy = scale.y, dz = 0.5f*scale.z;
-    D3DVALUE dy2 = (roofh < 0.0 || roofh > dy ? 0.5f*dy : roofh); // roof height
-    D3DVALUE dy1 = dy - dy2; // side wall height
-    D3DVALUE srot = (D3DVALUE)sin(rot), crot = (D3DVALUE)cos(rot);
-    D3DVALUE dxcrot = dx*crot, dxsrot = dx*srot;
-    D3DVALUE dzsrot = dz*srot, dzcrot = dz*crot;
-    D3DVALUE tufac = tuscale[0]*dz/dx;
+    SurfaceScalar dx = 0.5f*scale.x, dy = scale.y, dz = 0.5f*scale.z;
+    SurfaceScalar dy2 = (roofh < 0.0 || roofh > dy ? 0.5f*dy : roofh); // roof height
+    SurfaceScalar dy1 = dy - dy2; // side wall height
+    SurfaceScalar srot = (SurfaceScalar)sin(rot), crot = (SurfaceScalar)cos(rot);
+    SurfaceScalar dxcrot = dx*crot, dxsrot = dx*srot;
+    SurfaceScalar dzsrot = dz*srot, dzcrot = dz*crot;
+    SurfaceScalar tufac = tuscale[0]*dz/dx;
 
     Vtx[0].x = Vtx[4].x = Vtx[11].x = Vtx[12].x = Vtx[19].x =  dxcrot + dzsrot + relpos.x;
     Vtx[1].x = Vtx[2].x = Vtx[15].x = Vtx[16].x = Vtx[23].x = -dxcrot + dzsrot + relpos.x;
@@ -1112,8 +1122,8 @@ Hangar3::~Hangar3 ()
 int Hangar3::ParseLine (const char *label, const char *value)
 {
 	int res = 0;
-	if (!_strnicmp (label, "TEX", 3)) {
-		D3DVALUE su, sv;
+	if (!ComparePrefix (label, "TEX", 3)) {
+		SurfaceScalar su, sv;
 		int i;
 		char name[32];
 		if (sscanf (label+3, "%d", &i) != 1 || i < 1 || i > 3) {
@@ -1131,13 +1141,13 @@ int Hangar3::ParseLine (const char *label, const char *value)
 	return res;
 }
 
-bool Hangar3::GetGroupSpec (int grp, DWORD &nvtx, DWORD &nidx, LONGLONG &_texid,
+bool Hangar3::GetGroupSpec (int grp, UInt32 &nvtx, UInt32 &nidx, SurfaceName &_texid,
 	bool &undershadow, bool &groundshadow)
 {
 	if (grp < 0 || grp >= 3) return false;
 
-	static DWORD nv[3] = {18,8,14};
-	static DWORD ni[3] = {36,24,36};
+	static UInt32 nv[3] = {18,8,14};
+	static UInt32 ni[3] = {36,24,36};
 	nvtx = nv[grp];
 	nidx = ni[grp];
 	_texid = texid[grp];
@@ -1146,14 +1156,14 @@ bool Hangar3::GetGroupSpec (int grp, DWORD &nvtx, DWORD &nidx, LONGLONG &_texid,
 	return true;
 }
 
-void Hangar3::ExportGroup (int grp, NTVERTEX *vtx, WORD *idx, DWORD &idx_ofs)
+void Hangar3::ExportGroup (int grp, NTVERTEX *vtx, UInt16 *idx, UInt32 &idx_ofs)
 {
-	static WORD sidx0[60] = {0,6,1,1,6,5,1,5,2,2,5,4,2,4,3, // back wall
+	static UInt16 sidx0[60] = {0,6,1,1,6,5,1,5,2,2,5,4,2,4,3, // back wall
 	          				 7,8,14,8,9,14,9,10,16,16,10,17,10,11,17,11,12,15,12,13,15}; // front wall
-	static WORD sidx1[24] = {0,1,5,5,4,0,6,7,4,4,5,6,2,3,7,7,6,2,1,2,6,6,5,1}; // entry
-	static WORD sidx2[36] = {0,1,7,8,7,1,1,2,8,9,8,2,2,3,9,10,9,3,3,4,10,4,11,10,4,5,11,12,11,5,5,6,12,13,12,6}; // roof
-	DWORD i;
-	WORD iofs = (WORD)idx_ofs;
+	static UInt16 sidx1[24] = {0,1,5,5,4,0,6,7,4,4,5,6,2,3,7,7,6,2,1,2,6,6,5,1}; // entry
+	static UInt16 sidx2[36] = {0,1,7,8,7,1,1,2,8,9,8,2,2,3,9,10,9,3,3,4,10,4,11,10,4,5,11,12,11,5,5,6,12,13,12,6}; // roof
+	UInt32 i;
+	UInt16 iofs = (UInt16)idx_ofs;
 
 	switch (grp) {
 	case 0:
@@ -1173,32 +1183,32 @@ void Hangar3::ExportGroup (int grp, NTVERTEX *vtx, WORD *idx, DWORD &idx_ofs)
 
 Mesh *Hangar3::ExportShadowMesh (double &shelev)
 {
-	static WORD sidx[66] = {
+	static UInt16 sidx[66] = {
 		0,1,7,8,7,1,1,2,8,9,8,2,2,3,9,10,9,3,3,4,10,4,11,10,4,5,11,12,11,5,5,6,12,13,12,6,
 		0,6,1, 1,6,5, 1,5,2, 2,5,4, 3,2,4, // front wall
 		7,8,13, 8,12,13, 9,12,8, 9,11,12, 9,10,11 // back wall
 	}; // roof
-	DWORD nvtx = 14;
-	DWORD nidx = 66;
-	NTVERTEX *vtx = new NTVERTEX[nvtx]; TRACENEW
-	WORD *idx = new WORD[nidx]; TRACENEW
+	UInt32 nvtx = 14;
+	UInt32 nidx = 66;
+	NTVERTEX *vtx = new NTVERTEX[nvtx]; TraceSurfaceAllocation(__FILE__,__LINE__);
+	UInt16 *idx = new UInt16[nidx]; TraceSurfaceAllocation(__FILE__,__LINE__);
 	memcpy (vtx, dyndata->Vtx+26, nvtx*sizeof(NTVERTEX));
-	memcpy (idx, sidx, nidx*sizeof(WORD));
+	memcpy (idx, sidx, nidx*sizeof(UInt16));
 	shelev = yofs;
-	TRACENEW; return new Mesh (vtx, nvtx, idx, nidx);
+	TraceSurfaceAllocation(__FILE__,__LINE__);; return new Mesh (vtx, nvtx, idx, nidx);
 }
 
 #ifdef UNDEF
-bool Hangar3::GetShadowSpec (DWORD &nvtx, DWORD &nidx)
+bool Hangar3::GetShadowSpec (UInt32 &nvtx, UInt32 &nidx)
 {
 	nvtx = 9;
 	nidx = 21;
 	return true;
 }
 
-void Hangar3::ExportShadow (VERTEX_XYZ *vtx, WORD *idx)
+void Hangar3::ExportShadow (SurfacePoint *vtx, UInt16 *idx)
 {
-	for (WORD i = 0; i < 7; i++) {
+	for (UInt16 i = 0; i < 7; i++) {
 		*idx++ = 0;
 		*idx++ = i+2;
 		*idx++ = i+1;
@@ -1209,12 +1219,12 @@ void Hangar3::ExportShadow (VERTEX_XYZ *vtx, WORD *idx)
 
 void Hangar3::UpdateShadow (Vector &fromsun, double az)
 {
-	static VECTOR2D proj[14];
-	D3DVALUE dx = (D3DVALUE)fromsun.x, dz = (D3DVALUE)fromsun.z;
-	DWORD i, nCH;
-	WORD *CHidx;
+	static SurfacePoint2 proj[14];
+	SurfaceScalar dx = (SurfaceScalar)fromsun.x, dz = (SurfaceScalar)fromsun.z;
+	UInt32 i, nCH;
+	UInt16 *CHidx;
 	D3DVERTEX *Vtx = dyndata->Vtx;
-	VERTEX_XYZ *vptr = dyndata->shvtx;
+	SurfacePoint *vptr = dyndata->shvtx;
 
 	// project bounding vertices onto y=0
 	for (i = 0; i < 14; i++) {
@@ -1232,19 +1242,19 @@ void Hangar3::UpdateShadow (Vector &fromsun, double az)
 
 void Hangar3::Activate ()
 {
-    static D3DVALUE recess = 2.0f; // should be configurable
+    static SurfaceScalar recess = 2.0f; // should be configurable
     if (dyndata) return; // active already
-    dyndata = new struct DYNDATA; TRACENEW
-    dyndata->Vtx = new NTVERTEX[40]; TRACENEW
+    dyndata = new struct DYNDATA; TraceSurfaceAllocation(__FILE__,__LINE__);
+    dyndata->Vtx = new NTVERTEX[40]; TraceSurfaceAllocation(__FILE__,__LINE__);
     NTVERTEX *Vtx = dyndata->Vtx;
-    D3DVALUE dx = 0.5f*scale.x, dy = scale.y, dz = 0.5f*scale.z;
-    D3DVALUE h1 = 0.543f*dy, h2 = 0.884f*dy, h3 = dy;
-    D3DVALUE srot = (D3DVALUE)sin(rot), crot = (D3DVALUE)cos(rot);
-    D3DVALUE dxcrot = dx*crot, dxsrot = dx*srot;
-    D3DVALUE dzsrot = dz*srot, dzcrot = dz*crot;
-    D3DVALUE dxcrot1 = 0.707f*dxcrot, dxcrot2 = 0.366f*dxcrot;
-    D3DVALUE dxsrot1 = 0.707f*dxsrot, dxsrot2 = 0.366f*dxsrot;
-    D3DVALUE dzcrot1 = (dz-recess)*crot, dzsrot1 = (dz-recess)*srot;
+    SurfaceScalar dx = 0.5f*scale.x, dy = scale.y, dz = 0.5f*scale.z;
+    SurfaceScalar h1 = 0.543f*dy, h2 = 0.884f*dy, h3 = dy;
+    SurfaceScalar srot = (SurfaceScalar)sin(rot), crot = (SurfaceScalar)cos(rot);
+    SurfaceScalar dxcrot = dx*crot, dxsrot = dx*srot;
+    SurfaceScalar dzsrot = dz*srot, dzcrot = dz*crot;
+    SurfaceScalar dxcrot1 = 0.707f*dxcrot, dxcrot2 = 0.366f*dxcrot;
+    SurfaceScalar dxsrot1 = 0.707f*dxsrot, dxsrot2 = 0.366f*dxsrot;
+    SurfaceScalar dzcrot1 = (dz-recess)*crot, dzsrot1 = (dz-recess)*srot;
     Vtx[ 0].x = Vtx[26].x =  dxcrot  + dzsrot + relpos.x;
     Vtx[ 1].x = Vtx[27].x =  dxcrot1 + dzsrot + relpos.x;
     Vtx[ 2].x = Vtx[28].x =  dxcrot2 + dzsrot + relpos.x;
@@ -1347,14 +1357,14 @@ Tank::Tank (const Base *_base): BaseObject (_base)
 int Tank::ParseLine (const char *label, const char *value)
 {
 	int res = 0;
-	if (!_stricmp (label, "NSTEP")) {
+	if (!CompareText (label, "NSTEP")) {
 		if (sscanf (value, "%d", &nstep) != 1) {
 			ParseError("Tank: NSTEP: Expected integer value");
 			res = 2;
 		}
 		if (nstep < 3) nstep = 3;
-	} else if (!_strnicmp (label, "TEX", 3)) {
-		D3DVALUE su, sv;
+	} else if (!ComparePrefix (label, "TEX", 3)) {
+		SurfaceScalar su, sv;
 		int i;
 		char name[32];
 		if (sscanf (label+3, "%d", &i) != 1 || i < 1 || i > 2) {
@@ -1375,19 +1385,19 @@ int Tank::ParseLine (const char *label, const char *value)
 void Tank::Activate ()
 {
 	if (dyndata) return; // active already
-	dyndata = new struct DYNDATA; TRACENEW
-	dyndata->Vtx = new NTVERTEX[nstep*3+3]; TRACENEW
+	dyndata = new struct DYNDATA; TraceSurfaceAllocation(__FILE__,__LINE__);
+	dyndata->Vtx = new NTVERTEX[nstep*3+3]; TraceSurfaceAllocation(__FILE__,__LINE__);
 	NTVERTEX *Vtx = dyndata->Vtx;
-	D3DVALUE dx, dz, dnx, dnz, fac, ifac = 1.0f/(D3DVALUE)nstep;
-	D3DVALUE srot = (D3DVALUE)sin(rot), crot = (D3DVALUE)cos(rot);
-	DWORD i, ofs1 = nstep+1, ofs2 = 2*nstep+2;
+	SurfaceScalar dx, dz, dnx, dnz, fac, ifac = 1.0f/(SurfaceScalar)nstep;
+	SurfaceScalar srot = (SurfaceScalar)sin(rot), crot = (SurfaceScalar)cos(rot);
+	UInt32 i, ofs1 = nstep+1, ofs2 = 2*nstep+2;
 	double alpha;
 
 	for (i = 0; i < nstep; i++) {
-		fac = (D3DVALUE)i*ifac;
+		fac = (SurfaceScalar)i*ifac;
 		alpha = Pi2*fac;
-		dx = (dnx = (D3DVALUE)cos(alpha)) * scale.x;
-		dz = (dnz = (D3DVALUE)sin(alpha)) * scale.z;
+		dx = (dnx = (SurfaceScalar)cos(alpha)) * scale.x;
+		dz = (dnz = (SurfaceScalar)sin(alpha)) * scale.z;
 		Vtx[i].x = Vtx[ofs1+i].x = Vtx[ofs2+i].x = crot*dx - srot*dz + relpos.x;
 		Vtx[i].z = Vtx[ofs1+i].z = Vtx[ofs2+i].z = srot*dx + crot*dz + relpos.z;
 		Vtx[i].y = relpos.y;
@@ -1423,7 +1433,7 @@ void Tank::Deactivate ()
 	}
 }
 
-bool Tank::GetGroupSpec (int grp, DWORD &nvtx, DWORD &nidx, LONGLONG &_texid,
+bool Tank::GetGroupSpec (int grp, UInt32 &nvtx, UInt32 &nidx, SurfaceName &_texid,
 	bool &undershadow, bool &groundshadow)
 {
 	switch (grp) {
@@ -1446,9 +1456,9 @@ bool Tank::GetGroupSpec (int grp, DWORD &nvtx, DWORD &nidx, LONGLONG &_texid,
 	}
 }
 
-void Tank::ExportGroup (int grp, NTVERTEX *vtx, WORD *idx, DWORD &idx_ofs)
+void Tank::ExportGroup (int grp, NTVERTEX *vtx, UInt16 *idx, UInt32 &idx_ofs)
 {
-	WORD i, ofs = (WORD)(nstep+1), iofs = (WORD)idx_ofs;
+	UInt16 i, ofs = (UInt16)(nstep+1), iofs = (UInt16)idx_ofs;
 
 	switch (grp) {
 	case 0:
@@ -1475,14 +1485,14 @@ void Tank::ExportGroup (int grp, NTVERTEX *vtx, WORD *idx, DWORD &idx_ofs)
 
 Mesh *Tank::ExportShadowMesh (double &shelev)
 {
-	DWORD nvtx = nstep*2;
-	DWORD nidx = nstep*6 + (nstep-2)*3;
-	NTVERTEX *vtx = new NTVERTEX[nvtx]; TRACENEW
-	WORD *id, *idx = new WORD[nidx]; TRACENEW
+	UInt32 nvtx = nstep*2;
+	UInt32 nidx = nstep*6 + (nstep-2)*3;
+	NTVERTEX *vtx = new NTVERTEX[nvtx]; TraceSurfaceAllocation(__FILE__,__LINE__);
+	UInt16 *id, *idx = new UInt16[nidx]; TraceSurfaceAllocation(__FILE__,__LINE__);
 	memcpy (vtx, dyndata->Vtx, nstep*sizeof(NTVERTEX));
 	memcpy (vtx+nstep, dyndata->Vtx+nstep+1, nstep*sizeof(NTVERTEX));
 
-	WORD i, ofs = (WORD)nstep, ns = (WORD)nstep;
+	UInt16 i, ofs = (UInt16)nstep, ns = (UInt16)nstep;
 	for (i = 0, id = idx; i < ns; i++) {
 		*id++ = i;
 		*id++ = ofs+i;
@@ -1497,20 +1507,20 @@ Mesh *Tank::ExportShadowMesh (double &shelev)
 		*id++ = ofs+i;
 	}
 	shelev = yofs;
-	TRACENEW; return new Mesh (vtx, nvtx, idx, nidx);
+	TraceSurfaceAllocation(__FILE__,__LINE__);; return new Mesh (vtx, nvtx, idx, nidx);
 }
 
 #ifdef UNDEF
-bool Tank::GetShadowSpec (DWORD &nvtx, DWORD &nidx)
+bool Tank::GetShadowSpec (UInt32 &nvtx, UInt32 &nidx)
 {
 	nvtx = nstep+2;
 	nidx = nstep*3;
 	return true;
 }
 
-void Tank::ExportShadow (VERTEX_XYZ *vtx, WORD *idx)
+void Tank::ExportShadow (SurfacePoint *vtx, UInt16 *idx)
 {
-	for (WORD i = 0; i < nstep; i++) {
+	for (UInt16 i = 0; i < nstep; i++) {
 		*idx++ = 0;
 		*idx++ = i+2;
 		*idx++ = i+1;
@@ -1521,17 +1531,17 @@ void Tank::ExportShadow (VERTEX_XYZ *vtx, WORD *idx)
 
 void Tank::UpdateShadow (Vector &fromsun, double az)
 {
-	static DWORD nproj = 24;
-	static VECTOR2D *proj = new VECTOR2D[24];
-	D3DVALUE dx = (D3DVALUE)fromsun.x, dz = (D3DVALUE)fromsun.z;
-	DWORD i, nCH;
-	WORD *CHidx;
+	static UInt32 nproj = 24;
+	static SurfacePoint2 *proj = new SurfacePoint2[24];
+	SurfaceScalar dx = (SurfaceScalar)fromsun.x, dz = (SurfaceScalar)fromsun.z;
+	UInt32 i, nCH;
+	UInt16 *CHidx;
 	D3DVERTEX *Vtx = dyndata->Vtx;
-	VERTEX_XYZ *vptr = dyndata->shvtx;
+	SurfacePoint *vptr = dyndata->shvtx;
 
 	if (nstep*2 > nproj) {
 		delete []proj;
-		proj = new VECTOR2D[nproj = nstep*2]; TRACENEW
+		proj = new SurfacePoint2[nproj = nstep*2]; TraceSurfaceAllocation(__FILE__,__LINE__);
 	}
 	// project bounding vertices onto y=0
 	for (i = 0; i < nstep; i++) {
@@ -1608,7 +1618,7 @@ NTVERTEX Lpad01::Vtx[44] = {
 	{-17.334f,0,-41.848f,-0.270598f,0.707107f,-0.653282f, 0.9375,0.5}
 };
 
-WORD Lpad01::Idx[144] = {
+UInt16 Lpad01::Idx[144] = {
 	0,1,6,1,7,6,1,8,7,1,9,8,1,2,9,2,10,9,2,11,10,2,3,11,
 	3,4,11,4,12,11,4,13,12,4,14,13,4,5,14,5,15,14,5,6,15,5,0,6,
 	16,19,17,18,17,19,
@@ -1631,9 +1641,9 @@ Lpad01::Lpad01 (const Base *_base): Lpad (_base)
 int Lpad01::ParseLine (const char *label, const char *value)
 {
 	int res = 0;
-	if (!_stricmp (label, "TEX")) {
+	if (!CompareText (label, "TEX")) {
 		texid = NameToId (value);
-	} else if (!_stricmp (label, "NAV")) {
+	} else if (!CompareText (label, "NAV")) {
 		if (sscanf (value, "%f", &ILSfreq) != 1) {
 			ParseError ("Lpad1: NAV: expected scalar value");
 			res = 2;
@@ -1642,7 +1652,7 @@ int Lpad01::ParseLine (const char *label, const char *value)
 	return res;
 }
 
-bool Lpad01::GetGroupSpec (int grp, DWORD &nvtx, DWORD &nidx, LONGLONG &_texid,
+bool Lpad01::GetGroupSpec (int grp, UInt32 &nvtx, UInt32 &nidx, SurfaceName &_texid,
 	bool &undershadow, bool &groundshadow)
 {
 	if (grp == 0) {
@@ -1655,12 +1665,12 @@ bool Lpad01::GetGroupSpec (int grp, DWORD &nvtx, DWORD &nidx, LONGLONG &_texid,
 	} else return false;
 }
 
-void Lpad01::ExportGroup (int grp, NTVERTEX *vtx, WORD *idx, DWORD &idx_ofs)
+void Lpad01::ExportGroup (int grp, NTVERTEX *vtx, UInt16 *idx, UInt32 &idx_ofs)
 {
 	if (grp == 0) {
-		D3DVALUE cosr = scale.x*(D3DVALUE)cos(rot), sinr = scale.x*(D3DVALUE)sin(rot);
-		DWORD i;
-		WORD iofs = (WORD)idx_ofs;
+		SurfaceScalar cosr = scale.x*(SurfaceScalar)cos(rot), sinr = scale.x*(SurfaceScalar)sin(rot);
+		UInt32 i;
+		UInt16 iofs = (UInt16)idx_ofs;
 		NTVERTEX *src = Vtx;
 		memcpy (vtx, src, 44*sizeof(NTVERTEX));
 		vtx[16].tu = vtx[17].tu = (vtx[18].tu = vtx[19].tu = ((padno+1)%5)*0.1875f) + 0.1875f;
@@ -1714,7 +1724,7 @@ NTVERTEX Lpad02::Vtx[28] = {
 	{-15,0,-17.5,  0,1,0,   0.1875f,0.5     }
 };
 
-WORD Lpad02::Idx[60] = {
+UInt16 Lpad02::Idx[60] = {
 	0,1,2, 2,1,3, 2,3,5, 5,4,2, 4,5,7, 7,6,4, 6,7,8, 8,7,9,
 	9,11,8, 8,11,10, 10,11,1, 1,0,10,
 	12,13,15, 14,15,13, 16,17,19, 18,19,17,
@@ -1730,9 +1740,9 @@ Lpad02::Lpad02 (const Base *_base): Lpad (_base)
 int Lpad02::ParseLine (const char *label, const char *value)
 {
 	int res = 0;
-	if (!_stricmp (label, "TEX")) {
+	if (!CompareText (label, "TEX")) {
 		texid = NameToId (value);
-	} else if (!_stricmp (label, "NAV")) {
+	} else if (!CompareText (label, "NAV")) {
 		if (sscanf (value, "%f", &ILSfreq) != 1) {
 			ParseError ("Lpad2: NAV: expected scalar value");
 			res = 2;
@@ -1741,7 +1751,7 @@ int Lpad02::ParseLine (const char *label, const char *value)
 	return res;
 }
 
-bool Lpad02::GetGroupSpec (int grp, DWORD &nvtx, DWORD &nidx, LONGLONG &_texid,
+bool Lpad02::GetGroupSpec (int grp, UInt32 &nvtx, UInt32 &nidx, SurfaceName &_texid,
 	bool &undershadow, bool &groundshadow)
 {
 	if (grp == 0) {
@@ -1754,12 +1764,12 @@ bool Lpad02::GetGroupSpec (int grp, DWORD &nvtx, DWORD &nidx, LONGLONG &_texid,
 	} else return false;
 }
 
-void Lpad02::ExportGroup (int grp, NTVERTEX *vtx, WORD *idx, DWORD &idx_ofs)
+void Lpad02::ExportGroup (int grp, NTVERTEX *vtx, UInt16 *idx, UInt32 &idx_ofs)
 {
 	if (grp == 0) {
-		D3DVALUE cosr = scale.x*(D3DVALUE)cos(rot), sinr = scale.x*(D3DVALUE)sin(rot);
-		DWORD i;
-		WORD iofs = (WORD)idx_ofs;
+		SurfaceScalar cosr = scale.x*(SurfaceScalar)cos(rot), sinr = scale.x*(SurfaceScalar)sin(rot);
+		UInt32 i;
+		UInt16 iofs = (UInt16)idx_ofs;
 		NTVERTEX *src = Vtx;
 		memcpy (vtx, src, 28*sizeof(NTVERTEX));
 		// set pad number
@@ -1830,7 +1840,7 @@ NTVERTEX Lpad02a::Vtx[37] = {
 	{-10,0,  2.917f,  0,1,0,    0.375f, 0.0547f}
 };
 
-WORD Lpad02a::Idx[96] = {
+UInt16 Lpad02a::Idx[96] = {
 	4,13,12,  3,4,12,  3,12,9,  0,3,9,  0,9,1,  1,9,10,
 	4,14,13,  5,14,4,  5,11,14, 2,11,5, 1,11,2, 1,10,11,
 	4,15,16,  3,15,4,  3,18,15, 6,18,3, 6,7,18, 18,7,19,
@@ -1848,9 +1858,9 @@ Lpad02a::Lpad02a (const Base *_base): Lpad (_base)
 int Lpad02a::ParseLine (const char *label, const char *value)
 {
 	int res = 0;
-	if (!_stricmp (label, "TEX")) {
+	if (!CompareText (label, "TEX")) {
 		texid = NameToId (value);
-	} else if (!_stricmp (label, "NAV")) {
+	} else if (!CompareText (label, "NAV")) {
 		if (sscanf (value, "%f", &ILSfreq) != 1) {
 			ParseError ("Lpad2a: NAV: expected scalar value");
 			res = 2;
@@ -1859,7 +1869,7 @@ int Lpad02a::ParseLine (const char *label, const char *value)
 	return res;
 }
 
-bool Lpad02a::GetGroupSpec (int grp, DWORD &nvtx, DWORD &nidx, LONGLONG &_texid,
+bool Lpad02a::GetGroupSpec (int grp, UInt32 &nvtx, UInt32 &nidx, SurfaceName &_texid,
 	bool &undershadow, bool &groundshadow)
 {
 	if (grp == 0) {
@@ -1872,12 +1882,12 @@ bool Lpad02a::GetGroupSpec (int grp, DWORD &nvtx, DWORD &nidx, LONGLONG &_texid,
 	} else return false;
 }
 
-void Lpad02a::ExportGroup (int grp, NTVERTEX *vtx, WORD *idx, DWORD &idx_ofs)
+void Lpad02a::ExportGroup (int grp, NTVERTEX *vtx, UInt16 *idx, UInt32 &idx_ofs)
 {
 	if (grp == 0) {
-		D3DVALUE cosr = scale.x*(D3DVALUE)cos(rot), sinr = scale.x*(D3DVALUE)sin(rot);
-		DWORD i;
-		WORD iofs = (WORD)idx_ofs;
+		SurfaceScalar cosr = scale.x*(SurfaceScalar)cos(rot), sinr = scale.x*(SurfaceScalar)sin(rot);
+		UInt32 i;
+		UInt16 iofs = (UInt16)idx_ofs;
 		NTVERTEX *src = Vtx;
 		memcpy (vtx, src, 37*sizeof(NTVERTEX));
 
@@ -1938,7 +1948,7 @@ Runway::~Runway ()
 	}
 }
 
-bool Runway::GetGroupSpec (int grp, DWORD &nvtx, DWORD &nidx, LONGLONG &_texid,
+bool Runway::GetGroupSpec (int grp, UInt32 &nvtx, UInt32 &nidx, SurfaceName &_texid,
 	bool &undershadow, bool &groundshadow)
 {
 	switch (grp) {
@@ -1954,10 +1964,10 @@ bool Runway::GetGroupSpec (int grp, DWORD &nvtx, DWORD &nidx, LONGLONG &_texid,
 	}
 }
 
-void Runway::ExportGroup (int grp, NTVERTEX *vtx, WORD *idx, DWORD &idx_ofs)
+void Runway::ExportGroup (int grp, NTVERTEX *vtx, UInt16 *idx, UInt32 &idx_ofs)
 {
-	DWORD i;
-	WORD iofs = (WORD)idx_ofs;
+	UInt32 i;
+	UInt16 iofs = (UInt16)idx_ofs;
 
 	switch (grp) {
 	case 0:
@@ -1971,31 +1981,31 @@ int Runway::Read (istream &is)
 {
 	char cbuf[256], *cp, label[32];
 	int i;
-	DWORD k;
+	UInt32 k;
 
 	do {
 		if (!is.getline (cbuf, 256)) return 1; // premature end of file
 		cp = trim_string (cbuf);
 		sscanf (cp, "%s", label);
-		if (!_stricmp (label, "END1"))
+		if (!CompareText (label, "END1"))
 			sscanf (cp+4, "%f%f%f", &end1.x, &end1.y, &end1.z);
-		else if (!_stricmp (label, "END2"))
+		else if (!CompareText (label, "END2"))
 			sscanf (cp+4, "%f%f%f", &end2.x, &end2.y, &end2.z);
-		else if (!_stricmp (label, "WIDTH")) {
+		else if (!CompareText (label, "WIDTH")) {
 			sscanf (cp+5, "%f", &width);
 			width *= 0.5f;
-		} else if (!_strnicmp (label, "ILS", 3)) {
+		} else if (!ComparePrefix (label, "ILS", 3)) {
 			float freq;
 			sscanf (cp+3, "%d%f", &i, &freq);
 			ILSfreq[i-1] = freq;
-		} else if (!_stricmp (label, "NRWSEG")) {
+		} else if (!CompareText (label, "NRWSEG")) {
 			if (nrwseg) {
 				delete []rwseg;
 				rwseg = NULL;
 			}
 			sscanf (cp+6, "%d", &nrwseg);
 			if (nrwseg) {
-				rwseg = new RWSEG[nrwseg]; TRACENEW
+				rwseg = new RWSEG[nrwseg]; TraceSurfaceAllocation(__FILE__,__LINE__);
 				for (k = 0; k < nrwseg; k++) {  // reset defaults
 					rwseg[k].subseg = (k ? 0 : 4);
 					rwseg[k].len    = (k ? 0.0f : 1.0f);
@@ -2005,9 +2015,9 @@ int Runway::Read (istream &is)
 					rwseg[k].tv1    = 10.0f;
 				}
 			}
-		} else if (!_strnicmp (label, "RWSEG", 5)) {
-			D3DVALUE seglen, tu0, tu1, tv0, tv1;
-			DWORD subseg;
+		} else if (!ComparePrefix (label, "RWSEG", 5)) {
+			SurfaceScalar seglen, tu0, tu1, tv0, tv1;
+			UInt32 subseg;
 			sscanf (cp+5, "%d%d%f%f%f%f%f", &i, &subseg, &seglen, &tu0, &tu1, &tv0, &tv1);
 			if (--i >= 0 && i < (int)nrwseg) {
 				rwseg[i].subseg = subseg;
@@ -2017,21 +2027,21 @@ int Runway::Read (istream &is)
 				rwseg[i].tv0    = tv0;
 				rwseg[i].tv1    = tv1;
 			}
-		} else if (!_stricmp (label, "RWTEX")) {
+		} else if (!CompareText (label, "RWTEX")) {
 			sscanf (cp+5, "%s", label);
 			texid[0] = NameToId (label);
 		}
-	} while (_stricmp (label, "END"));
+	} while (CompareText (label, "END"));
 	return 0;
 }
 
 void Runway::Activate ()
 {
 	if (dyndata) return; // active already
-	dyndata = new struct DYNDATA; TRACENEW
+	dyndata = new struct DYNDATA; TraceSurfaceAllocation(__FILE__,__LINE__);
 
-	DWORD i, j, k, m;
-	WORD ofs;
+	UInt32 i, j, k, m;
+	UInt16 ofs;
 
 	dyndata->nRwVtx = dyndata->nRwIdx = 0;
 	for (i = 0; i < nrwseg; i++) {
@@ -2040,16 +2050,16 @@ void Runway::Activate ()
 			dyndata->nRwIdx += rwseg[i].subseg * 6;
 		}
 	}
-	dyndata->RwVtx = new NTVERTEX[dyndata->nRwVtx]; TRACENEW
-	dyndata->RwIdx = new WORD[dyndata->nRwIdx]; TRACENEW
+	dyndata->RwVtx = new NTVERTEX[dyndata->nRwVtx]; TraceSurfaceAllocation(__FILE__,__LINE__);
+	dyndata->RwIdx = new UInt16[dyndata->nRwIdx]; TraceSurfaceAllocation(__FILE__,__LINE__);
 
-	D3DVALUE x, z, step;
-	D3DVALUE dx = end2.x - end1.x;
-	D3DVALUE dz = end2.z - end1.z;
-	D3DVALUE len = D3DVAL(std::hypot (dx, dz));
-	D3DVALUE dwx = (width/len) * dz;
-	D3DVALUE dwz = (width/len) * dx;
-	D3DVALUE s0, x0, z0, ddx, ddz;
+	SurfaceScalar x, z, step;
+	SurfaceScalar dx = end2.x - end1.x;
+	SurfaceScalar dz = end2.z - end1.z;
+	SurfaceScalar len = SurfaceScalar(std::hypot (dx, dz));
+	SurfaceScalar dwx = (width/len) * dz;
+	SurfaceScalar dwz = (width/len) * dx;
+	SurfaceScalar s0, x0, z0, ddx, ddz;
 
 	for (i = k = m = 0, s0 = 0.0f; i < nrwseg; i++) {
 		x0 = dx*s0 + end1.x;
@@ -2057,7 +2067,7 @@ void Runway::Activate ()
 		ddx = rwseg[i].len * dx;
 		ddz = rwseg[i].len * dz;
 		for (j = 0; j < rwseg[i].subseg; j++) {
-			ofs = (WORD)(k + j*2);
+			ofs = (UInt16)(k + j*2);
 			dyndata->RwIdx[m++] = ofs;
 			dyndata->RwIdx[m++] = ofs+1;
 			dyndata->RwIdx[m++] = ofs+2;
@@ -2066,7 +2076,7 @@ void Runway::Activate ()
 			dyndata->RwIdx[m++] = ofs+1;
 		}
 		for (j = 0; j <= rwseg[i].subseg; j++) {
-			step = D3DVAL(j)/D3DVAL(rwseg[i].subseg);
+			step = SurfaceScalar(j)/SurfaceScalar(rwseg[i].subseg);
 			x = x0 + step*ddx;
 			z = z0 + step*ddz;
 			dyndata->RwVtx[k].x = x + dwx;
@@ -2132,26 +2142,26 @@ int RunwayLights::Read (istream &is)
 		if (!is.getline (cbuf, 256)) return 1; // premature end of file
 		cp = trim_string (cbuf);
 		sscanf (cp, "%s", label);
-		if (!_stricmp (label, "END1"))
+		if (!CompareText (label, "END1"))
 			sscanf (cp+4, "%f%f%f", &end1.x, &end1.y, &end1.z);
-		else if (!_stricmp (label, "END2"))
+		else if (!CompareText (label, "END2"))
 			sscanf (cp+4, "%f%f%f", &end2.x, &end2.y, &end2.z);
-		else if (!_stricmp (label, "COUNT1"))
+		else if (!CompareText (label, "COUNT1"))
 			sscanf (cp+6, "%d", &count1);
-		else if (!_stricmp (label, "WIDTH")) {
+		else if (!CompareText (label, "WIDTH")) {
 			sscanf (cp+5, "%f", &width);
 			width *= 0.5f;
-		} else if (!_stricmp (label, "PAPI")) {
-			if (!papi) { papi = new struct PAPIDATA; TRACENEW }
+		} else if (!CompareText (label, "PAPI")) {
+			if (!papi) { papi = new struct PAPIDATA; TraceSurfaceAllocation(__FILE__,__LINE__); }
 			sscanf (cp+4, "%f%f%f", &papi->apprangle, &papi->aperture, &papi->ofs);
 			papi->apprangle *= (float)RAD;
 			papi->aperture *= (float)RAD;
-		} else if (!_stricmp (label, "VASI")) {
-			if (!vasi) { vasi = new struct VASIDATA; TRACENEW }
+		} else if (!CompareText (label, "VASI")) {
+			if (!vasi) { vasi = new struct VASIDATA; TraceSurfaceAllocation(__FILE__,__LINE__); }
 			sscanf (cp+4, "%f%f%f", &vasi->apprangle, &vasi->lightsep, &vasi->ofs);
 			vasi->apprangle *= (float)RAD;
 		}
-	} while (_stricmp (label, "END"));
+	} while (CompareText (label, "END"));
 	return 0;
 }
 
@@ -2168,16 +2178,18 @@ void RunwayLights::Setup ()
 	end2.x = vtx[1].x, end2.y = vtx[1].y, end2.z = vtx[1].z;
 }
 
+#ifdef _WIN32
 void RunwayLights::Render (LPDIRECT3DDEVICE7 dev, bool day)
 {
 }
+#endif
 
-void RunwayLights::VertexArray (DWORD count, const Vector &cpos, const Vector &pos, const Vector &ofs, double size, POSTEXVERTEX *&Vtx)
+void RunwayLights::VertexArray (UInt32 count, const Vector &cpos, const Vector &pos, const Vector &ofs, double size, SurfaceTextureVertex *&Vtx)
 {
 	size *= 0.15; // for distance resizing (see below bsize)
 
-	DWORD i;
-	double bsize, ap = g_camera->Aperture();
+	UInt32 i;
+	double bsize, ap = GetSurfaceServices().CameraAperture();
 	Vector p(pos), bdir, v1, v2;
 
 	for (i = 0; i < count; i++) {
@@ -2227,11 +2239,11 @@ void RunwayLights::VertexArray (DWORD count, const Vector &cpos, const Vector &p
 void RunwayLights::Update ()
 {
 	Vector pos, ofs;
-	POSTEXVERTEX *Vtx;
+	SurfaceTextureVertex *Vtx;
 
 	// transform camera position and direction into local base coords
-	Vector cpos (tmul (base->GRot(), g_camera->GPos()-base->GPos()));
-	Vector cdir (tmul (base->GRot(), g_camera->Direction()));
+	Vector cpos (tmul (base->GRot(), GetSurfaceServices().CameraPosition()-base->GPos()));
+	Vector cdir (tmul (base->GRot(), GetSurfaceServices().CameraDirection()));
 
 	bool look12 = (dotp (cdir, dyndata->ref2-dyndata->ref1) >= 0);
 	// camera looks in direction from ref1 to ref2
@@ -2250,7 +2262,7 @@ void RunwayLights::Update ()
 		int nwhite = (int)((alpha-papi->apprangle)/papi->aperture + 2.5);
 		if      (nwhite < 0) nwhite = 0;
 		else if (nwhite > 4) nwhite = 4;
-		dyndata->PAPIwhite = (DWORD)nwhite;
+		dyndata->PAPIwhite = (UInt32)nwhite;
 	}
 
 	dyndata->night = (*dyndata->csun < 0.2);
@@ -2285,8 +2297,8 @@ void RunwayLights::Update ()
 	pos = (look12 ? dyndata->ref1 : dyndata->ref2) + ofs;
 	VertexArray (dyndata->nb_approach-1, cpos, pos, ofs, 1.0, Vtx);
 	// modify the last vertex to animate strobe
-	if (td.SimT1 > dyndata->flashtime) {
-		dyndata->flashtime = td.SimT1+0.1; // flash at 10 Hz
+	if (CelestialClock().SimT1 > dyndata->flashtime) {
+		dyndata->flashtime = CelestialClock().SimT1+0.1; // flash at 10 Hz
 		if (--dyndata->flashpos < 0) dyndata->flashpos = 15;
 	}
 	VertexArray (1, cpos, pos + ofs*(dyndata->flashpos-0.5), ofs, 1.0, Vtx);
@@ -2340,11 +2352,11 @@ void RunwayLights::Activate ()
 {
 	if (dyndata) return; // active already
 
-	DWORD i, j, ii, n, nv, ni, nbc, nbs, nba, nbe, nbvw, nbvr, nbwn, nbwd, nbr, nbp, nbt;
-	POSTEXVERTEX *Vtx;
-	WORD *Idx;
+	UInt32 i, j, ii, n, nv, ni, nbc, nbs, nba, nbe, nbvw, nbvr, nbwn, nbwd, nbr, nbp, nbt;
+	SurfaceTextureVertex *Vtx;
+	UInt16 *Idx;
 
-	dyndata = new struct DYNDATA; TRACENEW
+	dyndata = new struct DYNDATA; TraceSurfaceAllocation(__FILE__,__LINE__);
 
 	nbs  = dyndata->nb_side = count1;                    // number of lights at one runway side
 	nbc  = dyndata->nb_centre = count1*2-1;              // number of lights along runway centre
@@ -2375,9 +2387,9 @@ void RunwayLights::Activate ()
 		//dyndata->ofs4.y += vasi->lightsep * tan(vasi->apprangle);
 	}
 
-	Vtx = dyndata->Vtx = new POSTEXVERTEX[dyndata->nVtx = nv = nbt*4]; TRACENEW
+	Vtx = dyndata->Vtx = new SurfaceTextureVertex[dyndata->nVtx = nv = nbt*4]; TraceSurfaceAllocation(__FILE__,__LINE__);
 	ni = nbt*6; if (papi) ni += 8*6; // we have separate indices for white and red PAPI lights
-	Idx = dyndata->Idx = new WORD[dyndata->nIdx = ni]; TRACENEW
+	Idx = dyndata->Idx = new UInt16[dyndata->nIdx = ni]; TraceSurfaceAllocation(__FILE__,__LINE__);
 	dyndata->Vtx_white_night = Vtx; dyndata->nVtx_white_night = nbwn*4;
 	dyndata->Idx_white_night = Idx; dyndata->nIdx_white_night = nbwn*6;
 	dyndata->Vtx_white_day   = dyndata->Vtx_white_night + nbwn*4; dyndata->nVtx_white_day = nbwd*4;
@@ -2385,7 +2397,7 @@ void RunwayLights::Activate ()
 	dyndata->Vtx_red         = dyndata->Vtx_white_day + nbwd*4;   dyndata->nVtx_red = nbr*4;
 	dyndata->Idx_red         = dyndata->Idx_white_day + nbwd*6;   dyndata->nIdx_red = nbr*6;
 	dyndata->flashpos = 15;
-	dyndata->flashtime = td.SimT0;
+	dyndata->flashtime = CelestialClock().SimT0;
 
 	for (i = 0; i < nbt; i++) {
 		Vtx[i*4  ].tu = Vtx[i*4+3].tu = Vtx[i*4  ].tv = Vtx[i*4+1].tv = 0.0;
@@ -2398,7 +2410,7 @@ void RunwayLights::Activate ()
 		case 2: Idx = dyndata->Idx_red;         n = nbr;  break;
 		}
 		for (i = ii = 0; i < n; i++) {
-			WORD idx = (WORD)(i*4);
+			UInt16 idx = (UInt16)(i*4);
 			Idx[ii++] = idx;
 			Idx[ii++] = idx+2;
 			Idx[ii++] = idx+1;
@@ -2411,7 +2423,7 @@ void RunwayLights::Activate ()
 		dyndata->Vtx_PAPI = dyndata->Vtx_red + nbr*4;
 		dyndata->Idx_PAPI_r = dyndata->Idx_red + nbr*6;
 		dyndata->Idx_PAPI_w = dyndata->Idx_PAPI_r + 8*6;
-		static WORD idx[96] = {0,2,1,3,2,0,16,18,17,19,18,16,       // red (inner lights)
+		static UInt16 idx[96] = {0,2,1,3,2,0,16,18,17,19,18,16,       // red (inner lights)
 			                   4,6,5,7,6,4,20,22,21,23,22,20,       // red (inner-mid lights)
 							   8,10,9,11,10,8,24,26,25,27,26,24,    // red (outer-mid lights)
 							   12,14,13,15,14,12,28,30,29,31,30,28, // red (outer lights)
@@ -2419,13 +2431,13 @@ void RunwayLights::Activate ()
 							   8,10,9,11,10,8,24,26,25,27,26,24,    // white (outer-mid lights)
 			                   4,6,5,7,6,4,20,22,21,23,22,20,       // white (inner-mid-lights)
 							   0,2,1,3,2,0,16,18,17,19,18,16};      // white (inner lights)
-		memcpy (dyndata->Idx_PAPI_r, idx, 96*sizeof(WORD));
+		memcpy (dyndata->Idx_PAPI_r, idx, 96*sizeof(UInt16));
 	}
 	dyndata->csun = &base->SunDirectionBuffered()->y;
 
 	static char texname[8] = {'B','A','L','L',0,0,0,0};
 	SURFHANDLE dummy;
-	base->GetGenericTexture (*(LONGLONG*)texname, (SURFHANDLE&)dyndata->tex, dummy);
+	base->GetGenericTexture (*(SurfaceName*)texname, (SURFHANDLE&)dyndata->tex, dummy);
 }
 
 void RunwayLights::Deactivate ()
@@ -2458,34 +2470,36 @@ int BeaconArray::Read (istream &is)
 		if (!is.getline (cbuf, 256)) return 1; // premature end of file
 		cp = trim_string (cbuf);
 		sscanf (cp, "%s", label);
-		if (!_stricmp (label, "END1"))
+		if (!CompareText (label, "END1"))
 			sscanf (cp+4, "%f%f%f", &end1.x, &end1.y, &end1.z);
-		else if (!_stricmp (label, "END2"))
+		else if (!CompareText (label, "END2"))
 			sscanf (cp+4, "%f%f%f", &end2.x, &end2.y, &end2.z);
-		else if (!_stricmp (label, "COUNT"))
+		else if (!CompareText (label, "COUNT"))
 			sscanf (cp+5, "%d", &count);
-		else if (!_stricmp (label, "SIZE"))
+		else if (!CompareText (label, "SIZE"))
 			sscanf (cp+4, "%lf", &size);
-		else if (!_stricmp (label, "COL"))
+		else if (!CompareText (label, "COL"))
 			sscanf (cp+3, "%f%f%f", &col_r, &col_g, &col_b);
-	} while (_stricmp (label, "END"));
+	} while (CompareText (label, "END"));
 	return 0;
 }
 
+#ifdef _WIN32
 void BeaconArray::Render (LPDIRECT3DDEVICE7 dev, bool day)
 {
 }
+#endif
 
 void BeaconArray::Update ()
 {
 	const double resize_fac = 0.1;
 
-	DWORD i;
+	UInt32 i;
 	Vector p, v1, v2;
 	double bsize = size;
 
 	// transform camera into local base coords
-	Vector cdir (tmul (base->GRot(), g_camera->GPos()-base->GPos()));
+	Vector cdir (tmul (base->GRot(), GetSurfaceServices().CameraPosition()-base->GPos()));
 
 	for (i = 0; i < count; i++) {
 		Vector bdir (Pos[i]-cdir); // vector from camera to beacon i
@@ -2524,11 +2538,11 @@ void BeaconArray::Update ()
 
 void BeaconArray::Activate ()
 {
-	DWORD i, ii;
+	UInt32 i, ii;
 
-	Vtx = new POSTEXVERTEX[nVtx = count*4]; TRACENEW
-	Idx = new WORD[nIdx = count*6]; TRACENEW
-	Pos = new Vector[count]; TRACENEW
+	Vtx = new SurfaceTextureVertex[nVtx = count*4]; TraceSurfaceAllocation(__FILE__,__LINE__);
+	Idx = new UInt16[nIdx = count*6]; TraceSurfaceAllocation(__FILE__,__LINE__);
+	Pos = new Vector[count]; TraceSurfaceAllocation(__FILE__,__LINE__);
 
 	double ici, ic = 1.0/(count-1);
 	for (i = 0; i < count; i++) {
@@ -2544,7 +2558,7 @@ void BeaconArray::Activate ()
 	}
 
 	for (i = ii = 0; i < count; i++) {
-		WORD idx = (WORD)(i*4);
+		UInt16 idx = (UInt16)(i*4);
 		Idx[ii++] = idx;
 		Idx[ii++] = idx+2;
 		Idx[ii++] = idx+1;
@@ -2552,12 +2566,12 @@ void BeaconArray::Activate ()
 		Idx[ii++] = idx+2;
 		Idx[ii++] = idx;
 	}
-	lightmat = new D3DMATERIAL7; TRACENEW
+	lightmat = new SurfaceMaterial; TraceSurfaceAllocation(__FILE__,__LINE__);
 	lightmat->emissive.r = col_r;
 	lightmat->emissive.g = col_g;
 	lightmat->emissive.b = col_b;
 
-	static LONGLONG texid = NameToId ("Ball");
+	static SurfaceName texid = NameToId ("Ball");
 	SURFHANDLE dummy;
 	base->GetGenericTexture (texid, (SURFHANDLE&)tex, dummy);
 }
@@ -2584,14 +2598,14 @@ Train::Train (const Base *_base): BaseObject (_base)
 	slowzone = 100.0f;
 }
 
-void Train::Init (const D3DVECTOR &_end1, const D3DVECTOR &_end2)
+void Train::Init (const SurfaceVector &_end1, const SurfaceVector &_end2)
 {
 	end1 = _end1;
 	end2 = _end2;
 	dir.x = end2.x - end1.x;
 	dir.y = end2.y - end1.y;
 	dir.z = end2.z - end1.z;
-	length = (D3DVALUE)sqrt (dir.x*dir.x + dir.y*dir.y + dir.z*dir.z);
+	length = (SurfaceScalar)sqrt (dir.x*dir.x + dir.y*dir.y + dir.z*dir.z);
 	dir.x /= length;
 	dir.y /= length;
 	dir.z /= length;
@@ -2609,18 +2623,18 @@ void Train::Setup ()
 	end2.y += base->RefPlanet()->Elevation (lng, lat)-base->Elevation();
 }
 
-void Train::SetCabin (DWORD nvtx, const NTVERTEX *ref, NTVERTEX *res, const D3DVECTOR &pos, const D3DVECTOR &ofs)
+void Train::SetCabin (UInt32 nvtx, const NTVERTEX *ref, NTVERTEX *res, const SurfaceVector &pos, const SurfaceVector &ofs)
 {
 	// rotation matrix
-	D3DVALUE sinth, costh, cosph, sinph, vx, vy, vz;
-	costh = (D3DVALUE)cos (asin (sinth = (end2.y-end1.y)/length));
+	SurfaceScalar sinth, costh, cosph, sinph, vx, vy, vz;
+	costh = (SurfaceScalar)cos (asin (sinth = (end2.y-end1.y)/length));
 	double ph = atan2 (end2.x-end1.x, end2.z-end1.z);
-	cosph = (D3DVALUE)cos(ph), sinph = (D3DVALUE)sin(ph);
-	D3DVALUE r11 =  cosph, r12 = -sinph*sinth, r13 = sinph*costh;
-	D3DVALUE r21 =  0.0,   r22 =  costh,       r23 = sinth;
-	D3DVALUE r31 = -sinph, r32 = -cosph*sinth, r33 = cosph*costh;
+	cosph = (SurfaceScalar)cos(ph), sinph = (SurfaceScalar)sin(ph);
+	SurfaceScalar r11 =  cosph, r12 = -sinph*sinth, r13 = sinph*costh;
+	SurfaceScalar r21 =  0.0,   r22 =  costh,       r23 = sinth;
+	SurfaceScalar r31 = -sinph, r32 = -cosph*sinth, r33 = cosph*costh;
 
-	for (DWORD i = 0; i < nvtx; i++) {
+	for (UInt32 i = 0; i < nvtx; i++) {
 		const NTVERTEX &vtx = ref[i];
 		vx = vtx.x + ofs.x;
 		vy = vtx.y + ofs.y;
@@ -2631,10 +2645,10 @@ void Train::SetCabin (DWORD nvtx, const NTVERTEX *ref, NTVERTEX *res, const D3DV
 	}
 }
 
-D3DVALUE Train::MoveCabin (D3DVALUE &pos, D3DVALUE &vel, bool &atmin)
+SurfaceScalar Train::MoveCabin (SurfaceScalar &pos, SurfaceScalar &vel, bool &atmin)
 {
 	atmin = false;
-	D3DVALUE ds = vel*(D3DVALUE)td.SimDT;
+	SurfaceScalar ds = vel*(SurfaceScalar)CelestialClock().SimDT;
 	if ((pos += ds) < slowzone) {
 		if (pos < minpos) ds -= pos-minpos, pos = minpos, vel = 1.0, atmin = true;
 		else vel = ((pos-minpos)*speedfac+1.0f) * (vel > 0.0 ? 1.0f:-1.0f);
@@ -2681,7 +2695,7 @@ static NTVERTEX cabin1[30] = {
 	{-2.2f,0.5,-9.5,  -0.866f,-0.5,0, 0.95f,1},
 };
 
-static WORD cabin1_idx[78] = {
+static UInt16 cabin1_idx[78] = {
 	0,1,2,3,2,1,2,3,4,5,4,3,4,5,6,7,6,5,6,7,8,9,8,7,8,9,10,11,10,9,
 	10,11,12,13,12,11,12,13,14,15,14,13,14,15,16,17,16,15,
 	18,19,20,21,20,19,20,21,22,23,22,21,24,25,26,27,26,25,26,27,28,29,28,27
@@ -2698,7 +2712,7 @@ static NTVERTEX mrail1[8] = {
 	{ 2.5,0,1,   0.707f,0.707f,0,   6,0.5}
 };
 
-static WORD mrail1_idx[18] = {
+static UInt16 mrail1_idx[18] = {
 	0,1,2,3,2,1,2,3,4,5,4,3,4,5,6,7,6,5
 };
 
@@ -2723,19 +2737,19 @@ int Train1::Read (istream &is)
 		if (!is.getline (cbuf, 256)) return 1; // premature end of file
 		cp = trim_string (cbuf);
 		sscanf (cp, "%s", label);
-		if (!_stricmp (label, "END1"))
+		if (!CompareText (label, "END1"))
 			sscanf (cp+4, "%f%f%f", &end1.x, &end1.y, &end1.z);
-		else if (!_stricmp (label, "END2"))
+		else if (!CompareText (label, "END2"))
 			sscanf (cp+4, "%f%f%f", &end2.x, &end2.y, &end2.z);
-		else if (!_stricmp (label, "MAXSPEED"))
+		else if (!CompareText (label, "MAXSPEED"))
 			sscanf (cp+8, "%f", &maxspeed);
-		else if (!_stricmp (label, "SLOWZONE"))
+		else if (!CompareText (label, "SLOWZONE"))
 			sscanf (cp+8, "%f", &slowzone);
-		else if (!_stricmp (label, "TEX")) {
+		else if (!CompareText (label, "TEX")) {
 			sscanf (cp+3, "%s%f", label, &tuscale_track);
 			texid = NameToId (label);
 		}
-	} while (_stricmp (label, "END"));
+	} while (CompareText (label, "END"));
 
 	Init (end1, end2);
 	return 0;
@@ -2745,21 +2759,21 @@ void Train1::Activate ()
 {
 	if (dyndata) return; // already active
 
-	DWORD i;
-	dyndata = new struct DYNDATA; TRACENEW
-	dyndata->Vtx = new NTVERTEX[38]; TRACENEW
+	UInt32 i;
+	dyndata = new struct DYNDATA; TraceSurfaceAllocation(__FILE__,__LINE__);
+	dyndata->Vtx = new NTVERTEX[38]; TraceSurfaceAllocation(__FILE__,__LINE__);
 	dyndata->tick = rand()%10000;
 	shvtx = 0;
 	NTVERTEX *Vtx = dyndata->Vtx;
 
 	// rotation matrix
-	D3DVALUE sinth, costh, cosph, sinph;
-	costh = (D3DVALUE)cos (asin (sinth = (end2.y-end1.y)/length));
+	SurfaceScalar sinth, costh, cosph, sinph;
+	costh = (SurfaceScalar)cos (asin (sinth = (end2.y-end1.y)/length));
 	double ph = atan2 (end2.x-end1.x, end2.z-end1.z);
-	cosph = (D3DVALUE)cos(ph), sinph = (D3DVALUE)sin(ph);
-	D3DVALUE r11 =  cosph, r12 = -sinph*sinth, r13 = sinph*costh;
-	D3DVALUE r21 =  0.0,   r22 =  costh,       r23 = sinth;
-	D3DVALUE r31 = -sinph, r32 = -cosph*sinth, r33 = cosph*costh;
+	cosph = (SurfaceScalar)cos(ph), sinph = (SurfaceScalar)sin(ph);
+	SurfaceScalar r11 =  cosph, r12 = -sinph*sinth, r13 = sinph*costh;
+	SurfaceScalar r21 =  0.0,   r22 =  costh,       r23 = sinth;
+	SurfaceScalar r31 = -sinph, r32 = -cosph*sinth, r33 = cosph*costh;
 
 	// cabin vertices
 	for (i = 0; i < 30; i++) {
@@ -2776,7 +2790,7 @@ void Train1::Activate ()
 	for (i = 0; i < 8; i++) {
 		NTVERTEX &src = mrail1[i];
 		NTVERTEX &tgt = Vtx[30+i];
-		D3DVALUE vz = (i%2 ? length : 0.0f);
+		SurfaceScalar vz = (i%2 ? length : 0.0f);
 		tgt.x  = src.x*r11 + src.y*r12 + vz*r13 + end1.x;
 		tgt.y  = src.x*r21 + src.y*r22 + vz*r23 + end1.y;
 		tgt.z  = src.x*r31 + src.y*r32 + vz*r33 + end1.z;
@@ -2791,7 +2805,7 @@ void Train1::Activate ()
 	base->GetGenericTexture (texid, (SURFHANDLE&)dyndata->tex, dummy);
 
 	cpos = minpos, cvel = 1.0;
-	D3DVECTOR ofs; ofs.x = ofs.y = 0; ofs.z = minpos;
+	SurfaceVector ofs; ofs.x = ofs.y = 0; ofs.z = minpos;
 	SetCabin (30, cabin1, Vtx, end1, ofs);
 }
 
@@ -2805,7 +2819,7 @@ void Train1::Deactivate ()
 	}
 }
 
-bool Train1::GetGroupSpec (int grp, DWORD &nvtx, DWORD &nidx, LONGLONG &_texid,
+bool Train1::GetGroupSpec (int grp, UInt32 &nvtx, UInt32 &nidx, SurfaceName &_texid,
 	bool &undershadow, bool &groundshadow)
 {
 	switch (grp) {
@@ -2828,10 +2842,10 @@ bool Train1::GetGroupSpec (int grp, DWORD &nvtx, DWORD &nidx, LONGLONG &_texid,
 	}
 }
 
-void Train1::ExportGroup (int grp, NTVERTEX *vtx, WORD *idx, DWORD &idx_ofs)
+void Train1::ExportGroup (int grp, NTVERTEX *vtx, UInt16 *idx, UInt32 &idx_ofs)
 {
-	DWORD i;
-	WORD iofs = (WORD)idx_ofs;
+	UInt32 i;
+	UInt16 iofs = (UInt16)idx_ofs;
 
 	switch (grp) {
 	case 0:
@@ -2846,16 +2860,16 @@ void Train1::ExportGroup (int grp, NTVERTEX *vtx, WORD *idx, DWORD &idx_ofs)
 	}
 }
 
-bool Train1::GetShadowSpec (DWORD &nvtx, DWORD &nidx)
+bool Train1::GetShadowSpec (UInt32 &nvtx, UInt32 &nidx)
 {
 	nvtx = 8;
 	nidx = 18;
 	return true;
 }
 
-void Train1::ExportShadow (VERTEX_XYZ *vtx, WORD *idx)
+void Train1::ExportShadow (SurfacePoint *vtx, UInt16 *idx)
 {
-	WORD i;
+	UInt16 i;
 
 	for (i = 0; i < 6; i++) {
 		*idx++ = 0;
@@ -2868,13 +2882,13 @@ void Train1::ExportShadow (VERTEX_XYZ *vtx, WORD *idx)
 
 void Train1::Update ()
 {
-	DWORD i;
+	UInt32 i;
 	// update cabin position
 	bool reset;
-	D3DVALUE shift = MoveCabin (cpos, cvel, reset);
-	D3DVALUE dx = shift*dir.x, dy = shift*dir.y, dz = shift*dir.z;
+	SurfaceScalar shift = MoveCabin (cpos, cvel, reset);
+	SurfaceScalar dx = shift*dir.x, dy = shift*dir.y, dz = shift*dir.z;
 	if (reset && ++dyndata->tick > 10000) {
-		D3DVECTOR ofs; ofs.x = ofs.y = 0.0f; ofs.z = minpos;
+		SurfaceVector ofs; ofs.x = ofs.y = 0.0f; ofs.z = minpos;
 		SetCabin (30, cabin1, cabinvtx, end1, ofs);
 		dyndata->tick = 0;
 	} else {
@@ -2883,7 +2897,7 @@ void Train1::Update ()
 			cvtx[i].x += dx, cvtx[i].y += dy, cvtx[i].z += dz;
 	}
 	// update cabin shadow
-	VERTEX_XYZ *_shvtx = shvtx;
+	SurfacePoint *_shvtx = shvtx;
 	if (_shvtx) 
 		for (i = 0; i < 8; i++)
 			_shvtx[i].x += dx, _shvtx[i].z += dz;
@@ -2891,12 +2905,12 @@ void Train1::Update ()
 
 void Train1::UpdateShadow (Vector &fromsun, double az)
 {
-	static DWORD i, j, nCH, ii[12] = {2,3,4,5,6,7,10,11,12,13,14,15};
-	static VECTOR2D proj[12];
-	D3DVALUE dx = (D3DVALUE)fromsun.x, dz = (D3DVALUE)fromsun.z;
-	WORD *CHidx;
+	static UInt32 i, j, nCH, ii[12] = {2,3,4,5,6,7,10,11,12,13,14,15};
+	static SurfacePoint2 proj[12];
+	SurfaceScalar dx = (SurfaceScalar)fromsun.x, dz = (SurfaceScalar)fromsun.z;
+	UInt16 *CHidx;
 	NTVERTEX *cvtx = cabinvtx;
-	VERTEX_XYZ *vptr = shvtx;
+	SurfacePoint *vptr = shvtx;
 
 	// project bounding vertices onto y=0
 	for (i = 0; i < 12; i++) {
@@ -2998,21 +3012,21 @@ int Train2::Read (istream &is)
 		if (!is.getline (cbuf, 256)) return 1; // premature end of file
 		cp = trim_string (cbuf);
 		sscanf (cp, "%s", label);
-		if (!_stricmp (label, "END1"))
+		if (!CompareText (label, "END1"))
 			sscanf (cp+4, "%f%f%f", &end1.x, &end1.y, &end1.z);
-		else if (!_stricmp (label, "END2"))
+		else if (!CompareText (label, "END2"))
 			sscanf (cp+4, "%f%f%f", &end2.x, &end2.y, &end2.z);
-		else if (!_stricmp (label, "HEIGHT"))
+		else if (!CompareText (label, "HEIGHT"))
 			sscanf (cp+6, "%f", &height);
-		else if (!_stricmp (label, "MAXSPEED"))
+		else if (!CompareText (label, "MAXSPEED"))
 			sscanf (cp+8, "%f", &maxspeed);
-		else if (!_stricmp (label, "SLOWZONE"))
+		else if (!CompareText (label, "SLOWZONE"))
 			sscanf (cp+8, "%f", &slowzone);
-		else if (!_stricmp (label, "TEX")) {
+		else if (!CompareText (label, "TEX")) {
 			sscanf (cp+3, "%s%f", label, &tuscale_track);
 			texid = NameToId (label);
 		}
-	} while (_stricmp (label, "END"));
+	} while (CompareText (label, "END"));
 
 	Init (end1, end2);
 	return 0;
@@ -3024,31 +3038,31 @@ void Train2::Activate ()
 	int i, j, ng;
 
 	if (dyndata) return; // already active
-	dyndata = new struct DYNDATA; TRACENEW
+	dyndata = new struct DYNDATA; TraceSurfaceAllocation(__FILE__,__LINE__);
 	dyndata->ng = ng = (int)(length / gdist) + 1;
-	dyndata->rail = new NTVERTEX[(ng+1)*12 + ng*8]; TRACENEW
-	dyndata->rshvtx = new VERTEX_XYZ[(ng+1)*2]; TRACENEW
+	dyndata->rail = new NTVERTEX[(ng+1)*12 + ng*8]; TraceSurfaceAllocation(__FILE__,__LINE__);
+	dyndata->rshvtx = new SurfacePoint[(ng+1)*2]; TraceSurfaceAllocation(__FILE__,__LINE__);
 	shvtx = 0;
 	dyndata->tick = rand()%10000;
 
-	D3DVALUE dx = (end2.x-end1.x)/(D3DVALUE)ng;
-	D3DVALUE dy = (end2.y-end1.y)/(D3DVALUE)ng;
-	D3DVALUE dz = (end2.z-end1.z)/(D3DVALUE)ng;
+	SurfaceScalar dx = (end2.x-end1.x)/(SurfaceScalar)ng;
+	SurfaceScalar dy = (end2.y-end1.y)/(SurfaceScalar)ng;
+	SurfaceScalar dz = (end2.z-end1.z)/(SurfaceScalar)ng;
 
 	// rotation matrix
 	double ph = atan2 (end2.x-end1.x, end2.z-end1.z);
-	D3DVALUE sinth = (end2.y-end1.y)/length, costh = (D3DVALUE)(cos(asin(sinth)));
-	D3DVALUE cosph = (D3DVALUE)cos(ph), sinph = (D3DVALUE)sin(ph);
-	D3DVALUE r11 =  cosph, r12 = -sinph*sinth, r13 = sinph*costh;
-	D3DVALUE r21 =  0.0f,  r22 =  costh,       r23 = sinth;
-	D3DVALUE r31 = -sinph, r32 = -cosph*sinth, r33 = cosph*costh;
+	SurfaceScalar sinth = (end2.y-end1.y)/length, costh = (SurfaceScalar)(cos(asin(sinth)));
+	SurfaceScalar cosph = (SurfaceScalar)cos(ph), sinph = (SurfaceScalar)sin(ph);
+	SurfaceScalar r11 =  cosph, r12 = -sinph*sinth, r13 = sinph*costh;
+	SurfaceScalar r21 =  0.0f,  r22 =  costh,       r23 = sinth;
+	SurfaceScalar r31 = -sinph, r32 = -cosph*sinth, r33 = cosph*costh;
 
 	// first girder
 	for (i = 0; i < 12; i++) {
 		// note we don't tilt girders even if p1.y != p2.y
 		NTVERTEX &src = girder_template[i];
 		NTVERTEX &tgt = dyndata->rail[i];
-		D3DVALUE vy = (i%2 ? (i==5 || i==11 ? 0:height+4) : (i==0 || i==6 ? 0:height));
+		SurfaceScalar vy = (i%2 ? (i==5 || i==11 ? 0:height+4) : (i==0 || i==6 ? 0:height));
 		tgt.x  =  src.x*cosph + src.z*sinph + end1.x;
 		tgt.y  =  vy + end1.y;
 		tgt.z  = -src.x*sinph + src.z*cosph + end1.z;
@@ -3070,7 +3084,7 @@ void Train2::Activate ()
 	for (i = 0; i < 8; i++) { // rotate and move to start position
 		NTVERTEX &src = support_template[i];
 		NTVERTEX &tgt = dyndata->rail[(ng+1)*12+i];
-		D3DVALUE vz = (i==2 || i==3 || i==6 || i==7 ? length/(D3DVALUE)dyndata->ng : 0.0f);
+		SurfaceScalar vz = (i==2 || i==3 || i==6 || i==7 ? length/(SurfaceScalar)dyndata->ng : 0.0f);
 		tgt.x  = src.x*r11 + vz*r13 + end1.x;
 		tgt.y  = src.x*r21 + vz*r23 + end1.y + height;
 		tgt.z  = src.x*r31 + vz*r33 + end1.z;
@@ -3089,7 +3103,6 @@ void Train2::Activate ()
 	}
 
 	// rail shadow
-	D3DCOLOR shcol = D3DRGBA(0,0,0,0.3);
 	for (i = 0; i < (ng+1)*2; i++) {
 		dyndata->rshvtx[i].y = 0.0;
 		//dyndata->rshvtx[i].col = shcol;
@@ -3113,7 +3126,7 @@ void Train2::Deactivate ()
 	}
 }
 
-bool Train2::GetGroupSpec (int grp, DWORD &nvtx, DWORD &nidx, LONGLONG &_texid,
+bool Train2::GetGroupSpec (int grp, UInt32 &nvtx, UInt32 &nidx, SurfaceName &_texid,
 	bool &undershadow, bool &groundshadow)
 {
 	switch (grp) {
@@ -3130,19 +3143,19 @@ bool Train2::GetGroupSpec (int grp, DWORD &nvtx, DWORD &nidx, LONGLONG &_texid,
 	}
 }
 
-void Train2::ExportGroup (int grp, NTVERTEX *vtx, WORD *idx, DWORD &idx_ofs)
+void Train2::ExportGroup (int grp, NTVERTEX *vtx, UInt16 *idx, UInt32 &idx_ofs)
 {
-	DWORD i;
-	WORD iofs = (WORD)idx_ofs;
-	D3DVECTOR ofs;
+	UInt32 i;
+	UInt16 iofs = (UInt16)idx_ofs;
+	SurfaceVector ofs;
 
 	// rotation matrix
 	double ph = atan2 (end2.x-end1.x, end2.z-end1.z);
-	D3DVALUE sinth = (end2.y-end1.y)/length, costh = (D3DVALUE)(cos(asin(sinth)));
-	D3DVALUE cosph = (D3DVALUE)cos(ph), sinph = (D3DVALUE)sin(ph);
-	D3DVALUE r11 =  cosph, r12 = -sinph*sinth, r13 = sinph*costh;
-	D3DVALUE r21 =  0.0f,  r22 =  costh,       r23 = sinth;
-	D3DVALUE r31 = -sinph, r32 = -cosph*sinth, r33 = cosph*costh;
+	SurfaceScalar sinth = (end2.y-end1.y)/length, costh = (SurfaceScalar)(cos(asin(sinth)));
+	SurfaceScalar cosph = (SurfaceScalar)cos(ph), sinph = (SurfaceScalar)sin(ph);
+	SurfaceScalar r11 =  cosph, r12 = -sinph*sinth, r13 = sinph*costh;
+	SurfaceScalar r21 =  0.0f,  r22 =  costh,       r23 = sinth;
+	SurfaceScalar r31 = -sinph, r32 = -cosph*sinth, r33 = cosph*costh;
 
 	switch (grp) {
 	case 0:
@@ -3165,16 +3178,16 @@ void Train2::ExportGroup (int grp, NTVERTEX *vtx, WORD *idx, DWORD &idx_ofs)
 	}
 }
 
-bool Train2::GetShadowSpec (DWORD &nvtx, DWORD &nidx)
+bool Train2::GetShadowSpec (UInt32 &nvtx, UInt32 &nidx)
 {
 	nvtx = 16;
 	nidx = 36;
 	return true;
 }
 
-void Train2::ExportShadow (VERTEX_XYZ *vtx, WORD *idx)
+void Train2::ExportShadow (SurfacePoint *vtx, UInt16 *idx)
 {
-	WORD i, j;
+	UInt16 i, j;
 
 	for (j = 0; j < 2; j++) {
 		for (i = 0; i < 6; i++) {
@@ -3189,14 +3202,14 @@ void Train2::ExportShadow (VERTEX_XYZ *vtx, WORD *idx)
 
 void Train2::Update ()
 {
-	DWORD i, j;
+	UInt32 i, j;
 	// update cabin position
 	bool reset;
 	for (j = 0; j < 2; j++) {
-		D3DVALUE shift = MoveCabin (dyndata->cpos[j], dyndata->cvel[j], reset);
-		D3DVALUE dx = shift*dir.x, dy = shift*dir.y, dz = shift*dir.z;
+		SurfaceScalar shift = MoveCabin (dyndata->cpos[j], dyndata->cvel[j], reset);
+		SurfaceScalar dx = shift*dir.x, dy = shift*dir.y, dz = shift*dir.z;
 		if (reset && ++dyndata->tick > 10000) {
-			D3DVECTOR ofs;
+			SurfaceVector ofs;
 			ofs.x = (j ? -2.5f:2.5f);
 			ofs.y = height-1.0f;
 			ofs.z = minpos;
@@ -3209,7 +3222,7 @@ void Train2::Update ()
 		}
 		// update cabin shadow
 		if (shvtx) {
-			VERTEX_XYZ *_shvtx = shvtx + j*8;
+			SurfacePoint *_shvtx = shvtx + j*8;
 			for (i = 0; i < 8; i++)
 				_shvtx[i].x += dx, _shvtx[i].z += dz;
 		}
@@ -3218,14 +3231,14 @@ void Train2::Update ()
 
 void Train2::UpdateShadow (Vector &fromsun, double az)
 {
-	static DWORD i, j, nCH, ii[12] = {2,3,4,5,6,7,10,11,12,13,14,15};
-	static VECTOR2D proj[12];
-	D3DVALUE dx = (D3DVALUE)fromsun.x, dz = (D3DVALUE)fromsun.z;
-	WORD *CHidx;
+	static UInt32 i, j, nCH, ii[12] = {2,3,4,5,6,7,10,11,12,13,14,15};
+	static SurfacePoint2 proj[12];
+	SurfaceScalar dx = (SurfaceScalar)fromsun.x, dz = (SurfaceScalar)fromsun.z;
+	UInt16 *CHidx;
 	NTVERTEX *vtx = cabinvtx[0];
-	VERTEX_XYZ *vptr = shvtx;
-	D3DVALUE ddx = cabinvtx[1][0].x - vtx[0].x;
-	D3DVALUE ddz = cabinvtx[1][0].z - vtx[0].z;
+	SurfacePoint *vptr = shvtx;
+	SurfaceScalar ddx = cabinvtx[1][0].x - vtx[0].x;
+	SurfaceScalar ddz = cabinvtx[1][0].z - vtx[0].z;
 
 	// project bounding vertices onto y=0
 	for (i = 0; i < 12; i++) {
@@ -3241,9 +3254,9 @@ void Train2::UpdateShadow (Vector &fromsun, double az)
 	}
 
 	// update rail shadow
-	ddx = (end2.x-end1.x)/(D3DVALUE)dyndata->ng;
-	ddz = (end2.z-end1.z)/(D3DVALUE)dyndata->ng;
-	WORD ng = dyndata->ng;
+	ddx = (end2.x-end1.x)/(SurfaceScalar)dyndata->ng;
+	ddz = (end2.z-end1.z)/(SurfaceScalar)dyndata->ng;
+	UInt16 ng = dyndata->ng;
 	for (i = 0; i < 2; i++) {
 		vptr = dyndata->rshvtx+i;
 		vtx = dyndata->rail+(ng+1)*12+i;
@@ -3257,11 +3270,12 @@ void Train2::UpdateShadow (Vector &fromsun, double az)
 	}
 }
 
+#ifdef _WIN32
 void Train2::Render (LPDIRECT3DDEVICE7 dev, bool day)
 {
 	int i;
 	NTVERTEX *vtx = dyndata->rail;
-	DWORD ambient;
+	UInt32 ambient;
 
 	dev->SetRenderState (D3DRENDERSTATE_ALPHABLENDENABLE, TRUE);
 	dev->SetTexture (0, day ? dyndata->dtex : dyndata->ntex);
@@ -3285,12 +3299,15 @@ void Train2::Render (LPDIRECT3DDEVICE7 dev, bool day)
 	dev->SetRenderState (D3DRENDERSTATE_ALPHABLENDENABLE, FALSE);
 	if (!day) dev->SetRenderState (D3DRENDERSTATE_AMBIENT, ambient);
 }
+#endif
 
+#ifdef _WIN32
 void Train2::RenderShadow (LPDIRECT3DDEVICE7 dev)
 {
 	dev->DrawPrimitive (
 		D3DPT_TRIANGLESTRIP, D3DFVF_XYZ /*| D3DFVF_DIFFUSE*/, dyndata->rshvtx, (dyndata->ng+1)*2, NULL);
 }
+#endif
 
 // ==============================================================================
 // class SolarPlant (self-aligning solar panel array)
@@ -3322,35 +3339,36 @@ int SolarPlant::Read (istream &is)
 		if (!is.getline (cbuf, 256)) return 1; // premature end of file
 		cp = trim_string (cbuf);
 		sscanf (cp, "%s", label);
-		if (!_stricmp (label, "POS"))
+		if (!CompareText (label, "POS"))
 			sscanf (cp+3, "%f%f%f", &pos.x, &pos.y, &pos.z);
-		else if (!_stricmp (label, "SCALE"))
+		else if (!CompareText (label, "SCALE"))
 			sscanf (cp+5, "%f", &scale);
-		else if (!_stricmp (label, "SPACING"))
+		else if (!CompareText (label, "SPACING"))
 			sscanf (cp+7, "%f%f", &sepx, &sepz);
-		else if (!_stricmp (label, "GRID"))
+		else if (!CompareText (label, "GRID"))
 			sscanf (cp+4, "%d%d", &nrow, &ncol);
-		else if (!_stricmp (label, "ROT")) {
+		else if (!CompareText (label, "ROT")) {
 			sscanf (cp+3, "%f", &rot);
-			rot *= (D3DVALUE)RAD;
-		} else if (!_stricmp (label, "TEX")) {
-			D3DVALUE su, sv;
+			rot *= (SurfaceScalar)RAD;
+		} else if (!CompareText (label, "TEX")) {
+			SurfaceScalar su, sv;
 			i = sscanf (cp+3, "%s%f%f", label, &su, &sv);
 			texid = NameToId (label);
 			if (i > 1) tuscale = su;
 			if (i > 2) tvscale = sv;
 		}
-	} while (_stricmp (label, "END"));
+	} while (CompareText (label, "END"));
 	npanel = nrow*ncol;
 	return 0;
 }
 
+#ifdef _WIN32
 void SolarPlant::Render (LPDIRECT3DDEVICE7 dev, bool)
 {
 	int i, j;
 
 	// check for flashing panels
-	Vector pc, cdir (tmul (base->GRot(), g_camera->GPos()-base->GPos()));
+	Vector pc, cdir (tmul (base->GRot(), GetSurfaceServices().CameraPosition()-base->GPos()));
 	bool anyflash = false;
 	double alpha;
 	for (i = 0; i < npanel; i++) {
@@ -3376,22 +3394,25 @@ void SolarPlant::Render (LPDIRECT3DDEVICE7 dev, bool)
 			}
 	dev->SetRenderState (D3DRENDERSTATE_ALPHABLENDENABLE, FALSE);
 }
+#endif
 
+#ifdef _WIN32
 void SolarPlant::RenderShadow (LPDIRECT3DDEVICE7 dev)
 {
 	if (have_shadows)
 		dev->DrawIndexedPrimitive (
 			D3DPT_TRIANGLELIST, D3DFVF_XYZ /*| D3DFVF_DIFFUSE*/, ShVtx, nShVtx, ShIdx, nShIdx, 0);
 }
+#endif
 
 void SolarPlant::Activate ()
 {
 	int i, j, idx, idx_ofs, vtx_ofs;
-	DWORD n;
-	D3DVALUE x, z;
-	D3DVALUE crot = (D3DVALUE)cos(rot);
-	D3DVALUE srot = (D3DVALUE)sin(rot);
-	ppos = new D3DVECTOR[npanel]; TRACENEW
+	UInt32 n;
+	SurfaceScalar x, z;
+	SurfaceScalar crot = (SurfaceScalar)cos(rot);
+	SurfaceScalar srot = (SurfaceScalar)sin(rot);
+	ppos = new SurfaceVector[npanel]; TraceSurfaceAllocation(__FILE__,__LINE__);
 	for (i = idx = 0; i < nrow; i++) {
 		x = sepx * (i-0.5f*(nrow-1));
 		for (j = 0; j < ncol; j++) {
@@ -3402,9 +3423,9 @@ void SolarPlant::Activate ()
 			idx++;
 		}
 	}
-	Vtx = new NTVERTEX[nVtx = npanel*12]; TRACENEW
-	Idx = new WORD[nIdx = npanel*21]; TRACENEW
-	flash = new bool[npanel]; TRACENEW
+	Vtx = new NTVERTEX[nVtx = npanel*12]; TraceSurfaceAllocation(__FILE__,__LINE__);
+	Idx = new UInt16[nIdx = npanel*21]; TraceSurfaceAllocation(__FILE__,__LINE__);
+	flash = new bool[npanel]; TraceSurfaceAllocation(__FILE__,__LINE__);
 
 	// mesh for all panels
 	idx_ofs = npanel*6, vtx_ofs = npanel*4;
@@ -3442,7 +3463,7 @@ void SolarPlant::Activate ()
 	}
 	// the panel stands
 	idx_ofs = npanel*12; vtx_ofs = npanel*8;
-	D3DVALUE v1 = 2.89f*scale, v2 = 2.5f*scale, v3 = 1.44f*scale;
+	SurfaceScalar v1 = 2.89f*scale, v2 = 2.5f*scale, v3 = 1.44f*scale;
 	for (i = 0; i < npanel; i++) {
 		Idx[idx_ofs++] = vtx_ofs;
 		Idx[idx_ofs++] = vtx_ofs+1;
@@ -3468,11 +3489,10 @@ void SolarPlant::Activate ()
 		vtx_ofs += 4;
 	}
 	// shadow mesh
-	if (g_pOrbiter->Cfg()->CfgVisualPrm.bShadows) {
-		ShVtx = new VERTEX_XYZ[nShVtx = npanel*4]; TRACENEW
-		ShIdx = new WORD[nShIdx = npanel*6]; TRACENEW
+	if (GetSurfaceServices().Configuration().CfgVisualPrm.bShadows) {
+		ShVtx = new SurfacePoint[nShVtx = npanel*4]; TraceSurfaceAllocation(__FILE__,__LINE__);
+		ShIdx = new UInt16[nShIdx = npanel*6]; TraceSurfaceAllocation(__FILE__,__LINE__);
 		Vector4 shadowCol = base->ShadowColor();
-		D3DCOLOR shcol = D3DRGBA(shadowCol.x, shadowCol.y, shadowCol.z, shadowCol.w);
 		for (n = 0; n < nShVtx; n++) {
 			ShVtx[n].y = 0.0f;
 			//ShVtx[n].col = shcol;
@@ -3502,7 +3522,7 @@ void SolarPlant::Deactivate ()
 	Idx = NULL;
 	delete []flash;
 	flash = NULL;
-	if (g_pOrbiter->Cfg()->CfgVisualPrm.bShadows) {
+	if (GetSurfaceServices().Configuration().CfgVisualPrm.bShadows) {
 		delete []ShVtx;
 		ShVtx = NULL;
 		delete []ShIdx;
@@ -3512,7 +3532,7 @@ void SolarPlant::Deactivate ()
 
 void SolarPlant::Update ()
 {
-	if (td.SimT1 < updT) return;
+	if (CelestialClock().SimT1 < updT) return;
 
 	// panel orientation
 	nml = *base->SunDirectionBuffered();
@@ -3522,15 +3542,15 @@ void SolarPlant::Update ()
 	}
 
 	int i, vtx_ofs = npanel*4;
-	D3DVALUE dx = 8.0f*scale, dz = 4.0f*scale;
+	SurfaceScalar dx = 8.0f*scale, dz = 4.0f*scale;
 	double tht = acos (nml.y);         // tilt angle
 	double phi = atan2 (nml.z, nml.x); // rotation angle
-	D3DVALUE ctht = (D3DVALUE)cos(tht), stht = (D3DVALUE)sin(tht);
-	D3DVALUE cphi = (D3DVALUE)cos(phi), sphi = (D3DVALUE)sin(phi);
+	SurfaceScalar ctht = (SurfaceScalar)cos(tht), stht = (SurfaceScalar)sin(tht);
+	SurfaceScalar cphi = (SurfaceScalar)cos(phi), sphi = (SurfaceScalar)sin(phi);
 	// rotation matrix
-	D3DVALUE r11 = cphi*ctht, r12 = cphi*stht, r13 = -sphi;
-	D3DVALUE r21 = -stht,     r22 = ctht,      r23 = 0.0f;
-	D3DVALUE r31 = sphi*ctht, r32 = sphi*stht, r33 = cphi;
+	SurfaceScalar r11 = cphi*ctht, r12 = cphi*stht, r13 = -sphi;
+	SurfaceScalar r21 = -stht,     r22 = ctht,      r23 = 0.0f;
+	SurfaceScalar r31 = sphi*ctht, r32 = sphi*stht, r33 = cphi;
 
 	for (i = 0; i < npanel; i++) { // rotate panels into sun
 		Vtx[i*4].x   = Vtx[vtx_ofs+i*4].x   = ppos[i].x - r11*dx - r13*dz;
@@ -3545,26 +3565,26 @@ void SolarPlant::Update ()
 		Vtx[i*4+3].x = Vtx[vtx_ofs+i*4+3].x = ppos[i].x + r11*dx - r13*dz;
 		Vtx[i*4+3].y = Vtx[vtx_ofs+i*4+3].y = ppos[i].y + r21*dx;
 		Vtx[i*4+3].z = Vtx[vtx_ofs+i*4+3].z = ppos[i].z + r31*dx - r33*dz;
-		Vtx[i*4].nx = Vtx[i*4+1].nx = Vtx[i*4+2].nx = Vtx[i*4+3].nx = (D3DVALUE)nml.x;
-		Vtx[i*4].ny = Vtx[i*4+1].ny = Vtx[i*4+2].ny = Vtx[i*4+3].ny = (D3DVALUE)nml.y;
-		Vtx[i*4].nz = Vtx[i*4+1].nz = Vtx[i*4+2].nz = Vtx[i*4+3].nz = (D3DVALUE)nml.z;
-		Vtx[vtx_ofs+i*4].nx = Vtx[vtx_ofs+i*4+1].nx = Vtx[vtx_ofs+i*4+2].nx = Vtx[vtx_ofs+i*4+3].nx = -(D3DVALUE)nml.x;
-		Vtx[vtx_ofs+i*4].ny = Vtx[vtx_ofs+i*4+1].ny = Vtx[vtx_ofs+i*4+2].ny = Vtx[vtx_ofs+i*4+3].ny = -(D3DVALUE)nml.x;
-		Vtx[vtx_ofs+i*4].nz = Vtx[vtx_ofs+i*4+1].nz = Vtx[vtx_ofs+i*4+2].nz = Vtx[vtx_ofs+i*4+3].nz = -(D3DVALUE)nml.x;
+		Vtx[i*4].nx = Vtx[i*4+1].nx = Vtx[i*4+2].nx = Vtx[i*4+3].nx = (SurfaceScalar)nml.x;
+		Vtx[i*4].ny = Vtx[i*4+1].ny = Vtx[i*4+2].ny = Vtx[i*4+3].ny = (SurfaceScalar)nml.y;
+		Vtx[i*4].nz = Vtx[i*4+1].nz = Vtx[i*4+2].nz = Vtx[i*4+3].nz = (SurfaceScalar)nml.z;
+		Vtx[vtx_ofs+i*4].nx = Vtx[vtx_ofs+i*4+1].nx = Vtx[vtx_ofs+i*4+2].nx = Vtx[vtx_ofs+i*4+3].nx = -(SurfaceScalar)nml.x;
+		Vtx[vtx_ofs+i*4].ny = Vtx[vtx_ofs+i*4+1].ny = Vtx[vtx_ofs+i*4+2].ny = Vtx[vtx_ofs+i*4+3].ny = -(SurfaceScalar)nml.x;
+		Vtx[vtx_ofs+i*4].nz = Vtx[vtx_ofs+i*4+1].nz = Vtx[vtx_ofs+i*4+2].nz = Vtx[vtx_ofs+i*4+3].nz = -(SurfaceScalar)nml.x;
 	}
-	updT = td.SimT1 + 60.0;
+	updT = CelestialClock().SimT1 + 60.0;
 }
 
 void SolarPlant::UpdateShadow (Vector &fromsun, double az)
 {
-	if (!g_pOrbiter->Cfg()->CfgVisualPrm.bShadows) return;
+	if (!GetSurfaceServices().Configuration().CfgVisualPrm.bShadows) return;
 	if (have_shadows = (nml.y > 0.2)) {
 		int i, j;
 		double a;
-		D3DVALUE anx, anz;
+		SurfaceScalar anx, anz;
 		for (i = 0; i < 4; i++) {
 			a = Vtx[i].y/nml.y;
-			anx = (D3DVALUE)(a*nml.x), anz = (D3DVALUE)(a*nml.z);
+			anx = (SurfaceScalar)(a*nml.x), anz = (SurfaceScalar)(a*nml.z);
 			for (j = 0; j < npanel; j++) {
 				ShVtx[j*4+i].x = Vtx[j*4+i].x - anx;
 				ShVtx[j*4+i].z = Vtx[j*4+i].z - anz;

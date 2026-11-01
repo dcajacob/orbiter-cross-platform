@@ -39,6 +39,9 @@ def verify():
     if ledger['observed_source'] != CAPTURE or ledger['production_source'] != BASE:
         raise ValueError('extraction baseline identity changed')
     declared = ledger['files']
+    if 'Src/Orbiter/Production/SurfaceServices.cpp' in declared:
+        from surface_source import verify as verify_surface
+        verify_surface()
     if 'Src/Orbiter/elevmgrFile.cpp' in declared:
         from elevation_source import verify as verify_elevation
         verify_elevation()
@@ -182,6 +185,16 @@ def verify():
             if not block or data.count(block[0])!=1:
                 raise ValueError('SDK ATMPARAM was not conserved verbatim')
             ranges.append((original.rfind(b'/**',0,block.start()),block.end(),b''))
+            block=re.search(rb'typedef struct \{(?:(?!typedef struct \{).)*?\} ATMCONST;',original,re.S)
+            if not block or data.count(block[0])!=1:
+                raise ValueError('SDK ATMCONST was not conserved verbatim')
+            ranges.append((original.rfind(b'/**',0,block.start()),block.end(),b''))
+            planet_data=(ROOT/'Orbitersdk/include/OrbiterPlanetData.h').read_bytes()
+            start=original.rfind(b'// ===========================================================================',0,original.index(b'/// \\defgroup objprm'))
+            end=original.index(b'//@}',start)+len(b'//@}')
+            if planet_data.count(original[start:end])!=1:
+                raise ValueError('SDK planet flags were not conserved verbatim')
+            ranges.append((start,end,b'#include "OrbiterPlanetData.h"'))
             start=original.index(b'// Object types\n')
             end=original.index(b'\n',original.index(b'#define OBJTP_SURFBASE',start))+1
             if data.count(original[start:end])!=1:

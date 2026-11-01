@@ -45,11 +45,11 @@ may satisfy a production acceptance case.
 | --- | --- | --- |
 | Vecmat, elements, two-body RK4 | Verified restricted fixtures | Preserve frozen references unchanged |
 | Window/input/procedural view | POC only | Native production window, input and real graphics client |
-| Production world and session | Shared frame ordering, `Body`/`RigidBody`/`CelestialBody`/`Star`, Pines gravity and scenario environment/focus metadata; world loading unavailable | Existing lifecycle, shared engine library and platform services |
+| Production world and session | Shared frame ordering, `Body`/`RigidBody`/`CelestialBody`/`Star`/`Planet`/`Base`/`VesselBase`, Pines gravity and scenario environment/focus metadata; complete world loading unavailable | Existing lifecycle, shared engine library and platform services |
 | SPICE Solar System | Actual native celestial modules; hosted Windows/Linux Debug/Release direct-callback parity passes, full world integration pending | Current `Src/Celbody/SPICE`, CSPICE, `orbiter.bsp`, TLS/PCK and coverage verification |
 | Native module ABI | Internal loader/bootstrap with SDK-build and toolchain checks; stock module APIs unavailable | Source-built vessels, celbodies, atmospheres, plugins; version/toolchain check |
 | Real stock meshes/materials/animations | Production CPU `Mesh`/`MeshManager`; world/animation integration unavailable | Existing CPU mesh data separated from D3D resources; actual group identities |
-| Planet tiles and elevation | Shared engine archive reader; native elevation/world integration unavailable | Portable fixed-width archives, 64-bit offsets; engine contact queries independent of visibility |
+| Planet tiles and elevation | Shared archive reader and actual elevation manager; frozen Windows/Linux direct-query parity passes; native planet/base component verification added | Portable fixed-width archives, 64-bit offsets; engine contact queries independent of visibility |
 | Resource resolution | Indexed service; production world integration pending | Indexed Windows-separator/case-insensitive resolver with ambiguous alias errors |
 | Texture loading | Unsupported in production | Signature-based DDS DXT1/3/5 and uncompressed formats; BMP in `.dds` files |
 | Propulsion, RCS, atmosphere, docking, contacts | Unsupported in native application | Preserve original systems; production references before extraction |

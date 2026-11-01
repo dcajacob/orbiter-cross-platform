@@ -21,10 +21,6 @@ const double parsec = AU/tan(1.0/3600.0*_RAD_);
 const double iparsec = 1.0/parsec;
 // inverse of parsec
 
-inline double E_grav (double M, double d2)
-{ return Ggrav * M / d2; }
-// magnitude of gravitation field strength caused by mass M at distance d,
-// where d2 = d*d
 
 const double UTC_CT_diff = 66.184;
 // Current difference between UTC (Coordinated Universal Time) and CT (Coordinate Time)
@@ -72,17 +68,7 @@ void Ecl2Equ (double cosob, double sinob, double l, double b, double &ra, double
 
 // *** Geographical routines ***
 
-double Orthodome (double lng1, double lat1, double lng2, double lat2);
-// given the equatorial coordinates (lng1,lat1) and (lng2,lat2) of
-// two points 1 and 2 on the surface of a sphere this calculates the
-// shortest (orthodome) distance between them (in rad)
-
-void Orthodome (double lng1, double lat1, double lng2, double lat2,
-				double &dist, double &dir);
-// given the equatorial coordinates (lng1,lat1) and (lng2,lat2) of
-// two points 1 and 2 on the surface of a sphere this calculates the
-// shortest (orthodome) distance between them (in rad) and the compass
-// direction of point 2 as seen from point 1
+#include "Production/SurfaceNavigation.h"
 
 char *FloatStr (double f, int precision = 4);
 // Formats floating point value f with given precision, using 'k', 'M' and 'G'

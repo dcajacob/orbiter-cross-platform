@@ -10,6 +10,10 @@
 #include "Body.h"
 #include "Config.h"
 #include "Nav.h"
+#include "Production/SurfaceTypes.h"
+#include "OrbiterVisualData.h"
+using orbiter::production::UInt32;
+using orbiter::production::SurfaceName;
 
 class Planet;
 class PlanetarySystem;
@@ -38,7 +42,7 @@ typedef struct {
 // =======================================================================
 // Class Base
 
-class Base: public Body {
+class ORBITER_PRODUCTION_API Base: public Body {
 	friend class VBase;
 
 public:
@@ -70,24 +74,24 @@ public:
 	void Rel_EquPos (const Vector &relpos, double &_lng, double &_lat) const;
 	// converts a base-relative position into longitude/latitude
 
-	void Pad_EquPos (DWORD padno, double &_lng, double &_lat) const;
+	void Pad_EquPos (UInt32 padno, double &_lng, double &_lat) const;
 	// Return equatorial coordinates of landing pad 'padno'
 
-	inline DWORD nPad() const { return npad; }
+	inline UInt32 nPad() const { return npad; }
 	inline LpadSpec *PadStatus (int padno) { return lspec+padno; }
 	inline const LpadSpec *PadStatus (int padno) const { return lspec+padno; }
 	// number of landing pads and pad status
 
-	inline DWORD nRwy() const { return nrwy; }
-	inline RwySpec *RwyStatus (DWORD rwyno) { return rwy+rwyno; }
-	inline const RwySpec *RwyStatus (DWORD rwyno) const { return rwy+rwyno; }
+	inline UInt32 nRwy() const { return nrwy; }
+	inline RwySpec *RwyStatus (UInt32 rwyno) { return rwy+rwyno; }
+	inline const RwySpec *RwyStatus (UInt32 rwyno) const { return rwy+rwyno; }
 
-	inline DWORD nNav() const { return nnav; }
+	inline UInt32 nNav() const { return nnav; }
 	inline const NavManager &NavMgr() const { return navlist; }
 
-	inline DWORD nVOR() const { return nvor; }
-	inline Nav *VOR (DWORD i) { return vor[i]; }
-	inline const Nav *VOR (DWORD i) const { return vor[i]; }
+	inline UInt32 nVOR() const { return nvor; }
+	inline Nav *VOR (UInt32 i) { return vor[i]; }
+	inline const Nav *VOR (UInt32 i) const { return vor[i]; }
 
 	int LandedAtPad (const Vessel *vessel) const;
 	// returns padno at which 'vessel' is landed, or -1 if not
@@ -105,7 +109,7 @@ public:
 	void ClearPad (Vessel *vessel);
 	// mark the pad occupied by or reserved for 'vessel' as free
 
-	int RequestLanding (Vessel *vessel, DWORD &padno);
+	int RequestLanding (Vessel *vessel, UInt32 &padno);
 	int RequestTakeoff ();
 	// Request for landing/takeoff. Return value is result:
 	// 1=denied, 2=still pending, 3=granted.
@@ -135,28 +139,28 @@ public:
 	inline Vector4 ShadowColor () const { return Vector4(0.0, 0.0, 0.0, 0.7); }
 	// colour and transparency of shadows. Make this planet-specific
 
-	DWORD GetTileList (const SurftileSpec **_tile) const;
+	UInt32 GetTileList (const SurftileSpec **_tile) const;
 
-	bool GetGenericTexture (LONGLONG id, SURFHANDLE &daytex, SURFHANDLE &nighttex) const;
+	bool GetGenericTexture (SurfaceName id, SURFHANDLE &daytex, SURFHANDLE &nighttex) const;
 	// return day and night textures for given texture id
 	// if not found, returns false and sets both textures to NULL
 
-	DWORD GetGenericTextureIdx (LONGLONG id) const;
+	UInt32 GetGenericTextureIdx (SurfaceName id) const;
 	// return index of generic textures corresponding to 'id'
 
-	void ExportBaseStructures (Mesh ***mesh_us, DWORD *nmesh_us, Mesh ***mesh_os, DWORD *nmesh_os) const;
+	void ExportBaseStructures (Mesh ***mesh_us, UInt32 *nmesh_us, Mesh ***mesh_os, UInt32 *nmesh_os) const;
 	// Export base structures as mesh lists.
 	// Includes mesh objects as well as object primitives. Primitives are
 	// compacted into a single mesh.
 	// Mesh lists are separated into objects rendered under/above ground shadows
 
-	void ExportShadowGeometry (Mesh ***mesh_shadow, double **elev, DWORD *nmesh_shadow) const;
+	void ExportShadowGeometry (Mesh ***mesh_shadow, double **elev, UInt32 *nmesh_shadow) const;
 	// Export base structures as mesh lists. This version only exports
 	// "above shadow" objects, without textures and materials, and does not
 	// restructure the object elements. Can be used for shadow projection
 	// calculations
 
-	void ExportCollisionMeshes (Mesh ***mesh_col, DWORD *nmesh_col) const;
+	void ExportCollisionMeshes (Mesh ***mesh_col, UInt32 *nmesh_col) const;
 	// Export base structures marked with COLLISION as mesh lists for
 	// vessel-to-base collision detection
 
@@ -183,33 +187,33 @@ private:
 	bool bObjmapsphere;            // map base objects onto spherical planet surface?
 	Vector rotvel;                 // base velocity as result of planet rotation in local planet coords (rotvel.y=0)
 
-	DWORD npad;                    // number of landing pads
+	UInt32 npad;                    // number of landing pads
 	int padfree;                   // number of available (unoccupied) pads
 	LpadSpec *lspec;               // list of landing pads
 
-	DWORD nrwy;                    // number of runways
+	UInt32 nrwy;                    // number of runways
 	RwySpec *rwy;                  // list of runways
 
-	DWORD nnav;                    // number of nav transmitters
+	UInt32 nnav;                    // number of nav transmitters
 	NavManager navlist;            // list of nav transmitters
 
-	DWORD nvor;                    // number of associated VOR transmitters
+	UInt32 nvor;                    // number of associated VOR transmitters
 	Nav **vor;                     // list of VOR transmitters
 
 	BaseObject **obj;              // list of base objects
-	DWORD nobj;                    // number of base objects
+	UInt32 nobj;                    // number of base objects
 
 	mutable Mesh *genmsh_os, *genmsh_us, *genmsh_col; // meshes for generic base structures (above/below shadows/collision)
 	mutable Mesh **objmsh_os, **objmsh_us; // meshes for base structures (above/below shadows)
 	mutable Mesh **objmsh_sh;              // meshes for shadow projection calculations
 	mutable Mesh **objmsh_col;             // meshes for collision
 	mutable double *sh_elev;               // object elevation (for shadow projection calculation)
-	mutable DWORD nobjmsh_os, nobjmsh_us, nobjmsh_sh, nobjmsh_col; // list lenghts
+	mutable UInt32 nobjmsh_os, nobjmsh_us, nobjmsh_sh, nobjmsh_col; // list lenghts
 	mutable bool objmsh_valid;
 
 	SurftileSpec *tile;            // list of surface tiles
-	DWORD ntilebuf;                // list length
-	DWORD ntile;                   // number of surface tiles
+	UInt32 ntilebuf;                // list length
+	UInt32 ntile;                   // number of surface tiles
 
 	Vector sundir;                 // sun direction in base coordinates
 	double sundir_updt;            // time of next buffered sun direction update
@@ -219,7 +223,7 @@ private:
 	static Mesh *generic_obj_mesh;           // meshes for generic objects
 	static int ngenericmesh;                 // number of generic meshes
 	static char **generic_tex_name;          // list of names for generic textures
-	static LONGLONG *generic_tex_id;         // list of generic texture ids (only uses first 8 characters of texture name!)
+	static SurfaceName *generic_tex_id;         // list of generic texture ids (only uses first 8 characters of texture name!)
 	static SURFHANDLE *generic_dtex;         // generic daytime textures
 	static SURFHANDLE *generic_ntex;         // generic nighttime textures
 	static int ngenerictex;                  // number of generic textures

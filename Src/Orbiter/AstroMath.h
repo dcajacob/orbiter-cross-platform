@@ -12,4 +12,9 @@ inline double Day(double sec) { return sec * day; }
 inline double Jepoch2MJD(double J) { return (J-2000.0)*365.25 + MJD2000; }
 inline double MJD2Jepoch(double mjd) { return 2000.0 + (mjd-MJD2000)/365.25; }
 
+inline double E_grav (double M, double d2)
+{ return Ggrav * M / d2; }
+// magnitude of gravitation field strength caused by mass M at distance d,
+// where d2 = d*d
+
 #endif

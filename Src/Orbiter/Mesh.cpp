@@ -753,7 +753,7 @@ public:
 	void CalcNormals(int group, bool missingOnly) { mesh.CalcNormals(group, missingOnly); }
 	void AddMaterial(Material& material) { mesh.AddMaterial(material); }
 	void ReleaseTextures() { mesh.ReleaseTextures(); }
-	void CreateTextures(int count) { mesh.Tex = new MeshSurface[mesh.nTex = count](); mesh.textureSources.resize(count); }
+	void CreateTextures(int count) { mesh.nTex=count; mesh.Tex = count ? new MeshSurface[count]() : nullptr; mesh.textureSources.resize(count); }
 	void LoadTexture(int index, const char* name, UInt32 flags)
 	{
 		mesh.textureSources.at(index) = {name, static_cast<std::uint32_t>(flags)};

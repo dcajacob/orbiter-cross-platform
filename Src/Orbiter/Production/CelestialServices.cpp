@@ -12,4 +12,8 @@ CelestialServices& GetCelestialServices()
     return *bound;
 }
 TimeData& CelestialClock() { return GetRigidBodyServices().Time(); }
+int CelestialServices::AtmosphereModel(const CelestialBody&,ATMCONST&) const
+{throw std::logic_error("Production celestial host has no atmosphere binding");}
+void CelestialServices::AtmosphereParameters(const CelestialBody&,int,double,double,double,ATMPARAM&) const
+{throw std::logic_error("Production celestial host has no atmosphere binding");}
 }

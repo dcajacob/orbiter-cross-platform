@@ -11,7 +11,7 @@
 
 extern Orbiter *g_pOrbiter;
 
-LONGLONG NameToId (const char *name);
+#include "Production/SurfaceTypes.h"
 // converts a file name into an identifier. Note that this is not guaranteed to be unique.
 
 // should go into the graphics client

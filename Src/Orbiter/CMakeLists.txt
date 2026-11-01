@@ -26,12 +26,12 @@ set(common_src
 	Production/WindowsRigidBodyServices.cpp
 	Production/WindowsCelestialServices.cpp
 	Production/WindowsElevationServices.cpp
+	Production/WindowsSurfaceServices.cpp
 	Production/WindowsNavigationServices.cpp
 	Production/WindowsMeshServices.cpp
 	PlaybackEd.cpp
 	Psys.cpp
 	Script.cpp
-	Shadow.cpp
 	StateApplication.cpp
 	VectorMap.cpp
     ConsoleManager.cpp
@@ -64,17 +64,13 @@ set(common_src
 	OptionsPages.cpp
 # Body classes
 	CelbodySdk.cpp
-	Planet.cpp
 # Vessel classes
 	FlightRecorder.cpp
 	CollisionCore.cpp
 	SuperVessel.cpp
 	Vessel.cpp
-	Vesselbase.cpp
 	Vesselstatus.cpp
 # Surface base classes
-	Base.cpp
-	Baseobj.cpp
 # Cockpit classes
 	Defpanel.cpp
 	hud.cpp

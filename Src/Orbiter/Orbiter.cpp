@@ -39,6 +39,7 @@
 #include "Production/WindowsRigidBodyServices.h"
 #include "Production/WindowsCelestialServices.h"
 #include "Production/WindowsMeshServices.h"
+#include "Production/WindowsSurfaceServices.h"
 #include "Production/WindowsNavigationServices.h"
 #include "Production/WindowsElevationServices.h"
 #include "Launchpad.h"
@@ -274,6 +275,7 @@ Orbiter::Orbiter () : worldFactory(*this), world(worldFactory)
 	orbiter::production::BindBodyServices(&orbiter::production::GetWindowsBodyServices());
 	orbiter::production::BindRigidBodyServices(&orbiter::production::GetWindowsRigidBodyServices());
 	orbiter::production::BindCelestialServices(&orbiter::production::GetWindowsCelestialServices());
+	orbiter::production::BindSurfaceServices(&orbiter::production::GetWindowsSurfaceServices());
 	orbiter::production::BindNavigationServices(&orbiter::production::GetWindowsNavigationServices());
 	orbiter::production::BindElevationServices(&orbiter::production::GetWindowsElevationServices());
 	// override base class defaults
@@ -358,6 +360,7 @@ Orbiter::~Orbiter ()
 	orbiter::production::BindMeshServices({});
 	orbiter::production::BindElevationServices(nullptr);
 	orbiter::production::BindNavigationServices(nullptr);
+	orbiter::production::BindSurfaceServices(nullptr);
 	orbiter::production::BindCelestialServices(nullptr);
 	orbiter::production::BindRigidBodyServices(nullptr);
 	orbiter::production::BindBodyServices(nullptr);

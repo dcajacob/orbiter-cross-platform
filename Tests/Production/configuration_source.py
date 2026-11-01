@@ -56,6 +56,11 @@ def verify():
     if values.count(flags) != 1 or values.count(star) != 1:
         raise ValueError('public visual values were not extracted verbatim')
     sdk = (sdk[:start]+b'#include "OrbiterVisualData.h"\n\n'+sdk[end:]).replace(star+b'\n',b'')
+    for record in (b'SurftileSpec',b'FogParam'):
+        block = re.search(rb'struct '+record+rb' \{.*?\n\};',sdk,re.S)[0]
+        if values.count(block)!=1:
+            raise ValueError('public surface/fog record was not extracted verbatim')
+        sdk=sdk.replace(block+b'\n',b'')
     if sdk != current(name):
         raise ValueError('Windows graphics SDK changed beyond verbatim value extraction')
     name = 'Src/Orbiter/VectorMap.h'

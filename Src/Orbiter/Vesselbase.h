@@ -27,7 +27,7 @@ typedef struct { // touchdown vertex specifications
 
 struct WindPrm;
 
-struct SurfParam {//Surface-relative vessel state
+struct ORBITER_PRODUCTION_API SurfParam {//Surface-relative vessel state
 	void Set (const StateVectors &s, const StateVectors &s_ref, const CelestialBody *ref,
 		std::vector<ElevationTile> *etilecache=NULL, WindPrm *windprm=NULL);
 	// Set surface parameters from object and reference state vectors
@@ -66,10 +66,7 @@ struct SurfParam {//Surface-relative vessel state
 	Matrix L2H;               // rotation matrix planet-local -> local horizon
 };
 
-struct WindPrm {           // per-vessel wind parameters
-	double pert_t;            // time for wind perturbation vector
-	Vector pert_v;            // wind perturbation vector
-};
+#include "WindData.h"
 
 // =======================================================================
 
@@ -79,7 +76,7 @@ class Base;
 // =======================================================================
 // Class VesselBase
 
-class VesselBase: public RigidBody {
+class ORBITER_PRODUCTION_API VesselBase: public RigidBody {
 public:
 	VesselBase ();
 	VesselBase (double _mass, double _size, const Vector &_pmi);

@@ -52,7 +52,7 @@ jobs:
         run: |
           set -euo pipefail
           cmake -S Src/Orbiter/Production -B out/terrain-native -G Ninja -DCMAKE_BUILD_TYPE=${{ matrix.configuration }} -DORBITER_BUILD_NATIVE_CELESTIAL_MODULES=ON 2>&1 | tee terrain-configure.log
-          cmake --build out/terrain-native --target production_native_elevation_observer --parallel 2 2>&1 | tee terrain-build.log
+          cmake --build out/terrain-native --target production_native_elevation_observer production_native_planet_observer --parallel 2 2>&1 | tee terrain-build.log
       - uses: actions/cache@v6
         with:
           path: out/data-cache/production-stock-data-v1.zip
@@ -75,6 +75,12 @@ jobs:
           --executable out/terrain-native/production_native_elevation_observer${{ runner.os == 'Windows' && '.exe' || '' }}
           --modules out/terrain-native/NativeModules --data out/data --planets out/planets
           --output out/terrain-observation --configuration ${{ matrix.configuration }}
+      - name: Exercise actual stock planet/base CPU geometry and repeated lifetime
+        run: >-
+          python Tests/Production/Planets/verify.py
+          --executable out/terrain-native/production_native_planet_observer${{ runner.os == 'Windows' && '.exe' || '' }}
+          --modules out/terrain-native/NativeModules --data out/data --planets out/planets
+          --output out/planet-observation
       - uses: actions/upload-artifact@v7
         if: always()
         with:
@@ -86,6 +92,8 @@ jobs:
             out/terrain-observation/*.csv
             out/terrain-observation/*.json
             out/terrain-observation/*.log
+            out/planet-observation/*.log
+            out/planet-observation/*.json
   parity:
     name: Production terrain Windows/Linux parity
     needs: native

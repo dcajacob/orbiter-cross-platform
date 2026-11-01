@@ -1,15 +1,18 @@
 // Copyright (c) Martin Schweiger
 // Licensed under the MIT License
 
-#include "Orbiter.h"
+#include "Production/RigidBodyServices.h"
+#include "Production/CelestialServices.h"
+#include "Planet.h"
+#include "Base.h"
+#include <algorithm>
 #include "Vesselbase.h"
-#include "Psys.h"
+#include "PsysCore.h"
 
 using std::max;
 
-extern PlanetarySystem *g_psys;
-extern TimeData td;
-extern char DBG_MSG[256];
+using orbiter::production::GetRigidBodyServices;
+using orbiter::production::CelestialClock;
 
 
 // =======================================================================
@@ -226,9 +229,9 @@ bool VesselBase::Activate (bool force)
 void VesselBase::PostUpdate ()
 {
 	// Check periodically for proxy-bodies
-	if (fstatus == FLIGHTSTATUS_FREEFLIGHT && td.SimT1 > proxyT) {
+	if (fstatus == FLIGHTSTATUS_FREEFLIGHT && CelestialClock().SimT1 > proxyT) {
 		UpdateProxies ();
-		proxyT = td.SimT1 + 100.0;  // update every 100 seconds
+		proxyT = CelestialClock().SimT1 + 100.0;  // update every 100 seconds
 	}
 
 	// Check for surface contact
@@ -256,15 +259,15 @@ void VesselBase::CheckLanded ()
 		else {
 			static const double eps = 1e-4;
 			Vector prel (tmul(proxybody->s0->R, s0->pos - proxybody->s0->pos)); // vessel position in planet local coords
-			double dt = td.SimT0 - LandingTest.testt;
+			double dt = CelestialClock().SimT0 - LandingTest.testt;
 			if (dt < 0.1) return;
 			double dst2 = prel.dist2 (LandingTest.surfpos);
 			double dangle = angle (s0->Q, LandingTest.surfrot);
 			LandingTest.surfpos = prel;
 			LandingTest.surfrot.Set (s0->Q);
 			if (dst2/dt > 1e-4 || dangle/dt > 1e-4) {
-				LandingTest.testt = td.SimT0; // still moving -> reset timer
-			} else if (td.SimT0 - LandingTest.testt > 5.0) {
+				LandingTest.testt = CelestialClock().SimT0; // still moving -> reset timer
+			} else if (CelestialClock().SimT0 - LandingTest.testt > 5.0) {
 				// heading of landed vessel
 				double lng, lat, rad, dir;
 				proxybody->LocalToEquatorial (prel, lng, lat, rad);
@@ -286,7 +289,7 @@ void VesselBase::CheckLanded ()
 	} else {
 		if (bSurfaceContact && !ThrustEngaged()) {
 			LandingTest.testing = true;
-			LandingTest.testt = td.SimT0;
+			LandingTest.testt = CelestialClock().SimT0;
 			LandingTest.surfpos.Set (tmul(proxybody->s0->R, s0->pos - proxybody->s0->pos));
 			LandingTest.surfrot.Set (s0->Q); // should really subtract proxybody rotation here
 		}
@@ -324,14 +327,14 @@ void VesselBase::GetIntermediateMoments (Vector &acc, Vector &tau,
 
 void VesselBase::UpdateProxies ()
 {
-	DWORD i, ng = g_psys->nGrav();
+	orbiter::production::UInt32 i, ng = GetRigidBodyServices().World()->nGrav();
 	double dist2, proxydist2, proxypdist2;
 	CelestialBody *grav;
 	Planet *pl = 0;
 
 	// Check for closest celestial body and planet
 	for (i = 0, proxydist2 = proxypdist2 = 1e100; i < ng; i++) {
-		grav = g_psys->GetGravObj(i);
+		grav = GetRigidBodyServices().World()->GetGravObj(i);
 		dist2 = s0->pos.dist2 (grav->s0->pos) - grav->Size(); // distance squared from body surface
 		if (dist2 < proxydist2) {
 			proxydist2 = dist2;
@@ -358,7 +361,7 @@ void VesselBase::UpdateProxies ()
 
 	// check for orbit reference body
 	double gfrac;
-	SetOrbitReference (g_psys->GetDominantGravitySource (s0->pos, gfrac));
+	SetOrbitReference (GetRigidBodyServices().World()->GetDominantGravitySource (s0->pos, gfrac));
 }
 
 // ==============================================================
@@ -375,7 +378,7 @@ bool VesselBase::SurfaceProximity () const
 	if (alt < 3.0*size) return true;
 	return false;
 	// now extrapolate to end of time step
-	Vector sp1 = s0->pos + (s0->vel + acc * 0.5*td.SimDT)*td.SimDT;
+	Vector sp1 = s0->pos + (s0->vel + acc * 0.5*CelestialClock().SimDT)*CelestialClock().SimDT;
 	dist = sp1.dist (proxybody->s1->pos);
 	alt = dist-rad;
 	return (alt < 3.0*size);
@@ -409,7 +412,7 @@ bool VesselBase::ValidateStateUpdate (StateVectors *s)
 			return false;
 		} else if (!collision_speed_checked) {
 			collision_speed_checked = true;
-			double vsmax = -0.1 * MaxSubStep()/td.SimDT; // allow max 0.1m / substep surface penetration
+			double vsmax = -0.1 * MaxSubStep()/CelestialClock().SimDT; // allow max 0.1m / substep surface penetration
 			Vector hn (tmul(GRot(), GPos()-proxybody->GPos()).unit());
 			double vs = dotp (sp.groundvel_ship, hn);
 			if (vs < vsmax) {

@@ -2,6 +2,7 @@
 #ifndef ORBITER_PRODUCTION_CELESTIAL_SERVICES_H
 #define ORBITER_PRODUCTION_CELESTIAL_SERVICES_H
 #include "Export.h"
+#include "OrbiterCelestialData.h"
 #include <filesystem>
 #include <fstream>
 #include <string>
@@ -20,6 +21,8 @@ public:
     virtual bool HasEphemeris(const CelestialBody&) const = 0;
     virtual int Ephemeris(const CelestialBody&, double mjd, int request, double* result) const = 0;
     virtual int FastEphemeris(const CelestialBody&, double seconds, int request, double* result) const = 0;
+    virtual int AtmosphereModel(const CelestialBody&,ATMCONST&) const;
+    virtual void AtmosphereParameters(const CelestialBody&,int model,double altitude,double longitude,double latitude,ATMPARAM&) const;
     virtual std::filesystem::path GravityModelPath(const char* name) const = 0;
     virtual void ConfigFailure(const std::filesystem::path&) = 0;
     virtual bool RequireGravityModel() const = 0;

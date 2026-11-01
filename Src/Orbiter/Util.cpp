@@ -8,16 +8,6 @@
 #include <unordered_map>
 #include <algorithm>
 
-LONGLONG NameToId (const char *name)
-{
-	LONGLONG id = 0;
-	const char *c;
-	char *cid = (char*)&id;
-	int i = 0;
-	for (c = name; *c; c++, i++) cid[i%8] += toupper (*c);
-	return id;
-}
-
 double rand1()
 {
 	static double irmax = 1.0/(double)RAND_MAX;

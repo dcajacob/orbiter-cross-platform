@@ -1,24 +1,21 @@
 // Copyright (c) Martin Schweiger
 // Licensed under the MIT License
 
-#include "Orbiter.h"
+#include "Production/SurfaceServices.h"
+#include "Production/CelestialServices.h"
+#include "Production/Text.h"
 #include "Base.h"
 #include "Baseobj.h"
-#include "Vessel.h"
 #include "Planet.h"
-#include "Psys.h"
-#include "Astro.h"
+#include "AstroMath.h"
+#include "Production/SurfaceNavigation.h"
+#include "TimeData.h"
 #include "Mesh.h"
-#include "Log.h"
-#include "Util.h"
-#include "GraphicsAPI.h"
 #include <fstream>
 
 using namespace std;
+using namespace orbiter::production;
 
-extern Orbiter *g_pOrbiter;
-extern TimeData td;
-extern char DBG_MSG[256];
 
 static int refcount = 0;
 
@@ -31,7 +28,7 @@ int         Base::ngenericmesh = 0;
 SURFHANDLE *Base::generic_dtex = 0;
 SURFHANDLE *Base::generic_ntex = 0;
 char      **Base::generic_tex_name = 0;
-LONGLONG   *Base::generic_tex_id = 0;
+SurfaceName   *Base::generic_tex_id = 0;
 int         Base::ngenerictex = 0;
 
 // ==========================================================
@@ -42,13 +39,19 @@ Base::Base (char *fname, Planet *_planet, double _lng, double _lat)
 {
 	char cbuf[256];
 	int texid = 0, bias = 0;
+	obj=nullptr; lspec=nullptr; rwy=nullptr; vor=nullptr;
+	genmsh_os=genmsh_us=genmsh_col=nullptr;
+	objmsh_os=objmsh_us=objmsh_sh=objmsh_col=nullptr;
+	sh_elev=nullptr; nobjmsh_os=nobjmsh_us=nobjmsh_sh=nobjmsh_col=0;
+	objmsh_valid=false; tile=nullptr; ntile=ntilebuf=0;
+	padfree=0; objscale=100.0; bObjmapsphere=false;
 	//visual = 0;
 	sundir.Set(0,-1,0);
 	sundir_updt = 0.0;
 
 	InitDeviceObjects ();
 
-	ifstream ifs (g_pOrbiter->ConfigPath(fname));
+	ifstream ifs (GetBodyServices().ConfigPath(fname));
 
 	// read location information from file, if available
 	if (ifs && GetItemString (ifs, "LOCATION", cbuf)) {
@@ -72,11 +75,11 @@ Base::Base (char *fname, Planet *_planet, double _lng, double _lat)
 	if (FindLine (ifs, "BEGIN_NAVBEACON")) {
 		char cbuf[256];
 		for (;;) {
-			if (!ifs.getline (cbuf, 256) || !_strnicmp (cbuf, "END_NAVBEACON", 13)) break;
+			if (!ifs.getline (cbuf, 256) || !ComparePrefix (cbuf, "END_NAVBEACON", 13)) break;
 			Nav *nv = ParseNav (cbuf, _planet);
 			if (nv) {
 				_planet->NavMgr().AddNav (nv);
-				Nav **tmp = new Nav*[nvor+1]; TRACENEW
+				Nav **tmp = new Nav*[nvor+1]; TraceSurfaceAllocation(__FILE__,__LINE__);
 				if (nvor) {
 					memcpy (tmp, vor, nvor*sizeof(Nav*));
 					delete []vor;
@@ -98,15 +101,15 @@ Base::Base (char *fname, Planet *_planet, double _lng, double _lat)
 	if (FindLine (ifs, "BEGIN_OBJECTLIST")) {
 		BaseObject *bo;
 		while (bo = BaseObject::Create (this, ifs)) {
-			BaseObject **tmp = new BaseObject*[nobj+1]; TRACENEW
-			memcpy (tmp, obj, nobj*sizeof(BaseObject*));
+			BaseObject **tmp = new BaseObject*[nobj+1]; TraceSurfaceAllocation(__FILE__,__LINE__);
+			if (nobj) memcpy (tmp, obj, nobj*sizeof(BaseObject*));
 			if (nobj) delete []obj;
 			obj = tmp;
 			obj[nobj++] = bo;
 			// register landing pads
 			if (bo->GetSpecs() & OBJSPEC_LPAD) {
 				((Lpad*)bo)->SetPadno (npad);
-				LpadSpec *tmp = new LpadSpec[npad+1]; TRACENEW
+				LpadSpec *tmp = new LpadSpec[npad+1]; TraceSurfaceAllocation(__FILE__,__LINE__);
 				if (npad) memcpy (tmp, lspec, npad*sizeof(LpadSpec)), delete []lspec;
 				lspec = tmp;
 				const Vector &pos = ((Lpad*)bo)->GetPos();
@@ -116,12 +119,12 @@ Base::Base (char *fname, Planet *_planet, double _lng, double _lat)
 				if (float freq = ((Lpad*)bo)->GetILSfreq()) {
 					double plng, plat;
 					Rel_EquPos (lspec[npad].relpos, plng, plat);
-					navlist.AddNav (lspec[npad].nav = new Nav_VTOL (this, npad, plng, plat, freq)); TRACENEW
+					navlist.AddNav (lspec[npad].nav = new Nav_VTOL (this, npad, plng, plat, freq)); TraceSurfaceAllocation(__FILE__,__LINE__);
 				} else lspec[npad].nav = 0;
 				npad++;
 			} else if (bo->GetSpecs() & OBJSPEC_RWY) {
 				Runway *prwy = (Runway*)bo;
-				RwySpec *tmp = new RwySpec[nrwy+1]; TRACENEW
+				RwySpec *tmp = new RwySpec[nrwy+1]; TraceSurfaceAllocation(__FILE__,__LINE__);
 				if (nrwy) memcpy (tmp, rwy, nrwy*sizeof(RwySpec)), delete []rwy;
 				rwy = tmp;
 				Vector p1 (Vector (prwy->end1.x, prwy->end1.y, prwy->end1.z));
@@ -129,14 +132,14 @@ Base::Base (char *fname, Planet *_planet, double _lng, double _lat)
 				Rel_EquPos (p1, rwy[nrwy].lng1, rwy[nrwy].lat1);
 				Rel_EquPos (p2, rwy[nrwy].lng2, rwy[nrwy].lat2);
 				Orthodome (rwy[nrwy].lng1, rwy[nrwy].lat1, rwy[nrwy].lng2, rwy[nrwy].lat2, rwy[nrwy].length, rwy[nrwy].appr1);
-				rwy[nrwy].appr1 = posangle (rwy[nrwy].appr1);
+				rwy[nrwy].appr1 = SurfacePositiveAngle (rwy[nrwy].appr1);
 				rwy[nrwy].length *= cbody->Size();
 				if (float freq = prwy->GetILSfreq(0)) {
-					navlist.AddNav (rwy[nrwy].ils1 = new Nav_ILS (this, rwy[nrwy].appr1, rwy[nrwy].lng1, rwy[nrwy].lat1, freq)); TRACENEW
+					navlist.AddNav (rwy[nrwy].ils1 = new Nav_ILS (this, rwy[nrwy].appr1, rwy[nrwy].lng1, rwy[nrwy].lat1, freq)); TraceSurfaceAllocation(__FILE__,__LINE__);
 				}
 				else rwy[nrwy].ils1 = 0;
 				if (float freq = prwy->GetILSfreq(1)) {
-					navlist.AddNav (rwy[nrwy].ils2 = new Nav_ILS (this, posangle (rwy[nrwy].appr1+Pi), rwy[nrwy].lng2, rwy[nrwy].lat2, freq)); TRACENEW
+					navlist.AddNav (rwy[nrwy].ils2 = new Nav_ILS (this, SurfacePositiveAngle (rwy[nrwy].appr1+Pi), rwy[nrwy].lng2, rwy[nrwy].lat2, freq)); TraceSurfaceAllocation(__FILE__,__LINE__);
 				}
 				else rwy[nrwy].ils2 = 0;
 				nrwy++;
@@ -152,10 +155,10 @@ Base::Base (char *fname, Planet *_planet, double _lng, double _lat)
 		char cbuf[256];
 		int res, texflag, ilng, ilat;
 		for (;;) {
-			if (!ifs.getline(cbuf,256) || !_strnicmp (cbuf, "END_SURFTILELIST", 16)) break;
+			if (!ifs.getline(cbuf,256) || !ComparePrefix (cbuf, "END_SURFTILELIST", 16)) break;
 			sscanf (cbuf, "%d%d%d%d", &res, &ilng, &ilat, &texflag);
 			if (ntile == ntilebuf) {
-				SurftileSpec *tmp = new SurftileSpec[ntilebuf+32]; TRACENEW
+				SurftileSpec *tmp = new SurftileSpec[ntilebuf+32]; TraceSurfaceAllocation(__FILE__,__LINE__);
 				if (ntile) {
 					memcpy (tmp, tile, ntile*sizeof(SurftileSpec));
 					delete []tile;
@@ -186,10 +189,13 @@ Base::~Base ()
 		obj = NULL;
 	}
 	if (nvor) { delete []vor; vor = NULL; }
-	//if (genmsh_os) delete genmsh_os;
-	//if (genmsh_us) delete genmsh_us;
-	// Need to think about this! Destructor tries to release mesh textures,
-	// but in this case they are not managed by the mesh.
+	// The generated meshes borrow static textures; release their CPU geometry
+	// without releasing the shared surfaces. Object meshes belong to obj[].
+	for (Mesh* mesh : {genmsh_os,genmsh_us,genmsh_col}) if (mesh) {
+		for (UInt32 texture=0;texture<mesh->nTexture();++texture) mesh->SetTexture(texture,nullptr,false);
+		delete mesh;
+	}
+	for (UInt32 shadow=0;shadow<nobjmsh_sh;++shadow) delete objmsh_sh[shadow];
 
 	if (objmsh_os) { delete []objmsh_os; objmsh_os = NULL; }
 	if (objmsh_us) { delete []objmsh_us; objmsh_us = NULL; }
@@ -202,30 +208,30 @@ void Base::CreateStaticDeviceObjects ()
 {
 	ngenericmesh = 0;
 	ngenerictex  = 0;
-	ifstream ifs (g_pOrbiter->ConfigPath ("Base"));
+	ifstream ifs (GetBodyServices().ConfigPath ("Base"));
 	if (ifs) {
 		char cbuf[256], **tmp_list;
-		LONGLONG *tmp_id;
+		SurfaceName *tmp_id;
 		// load list of generic texture names
 		if (FindLine (ifs, "begin_textures")) {
 			for (;;) {
-				if (!ifs.getline (cbuf, 256) || !_strnicmp (cbuf, "end_textures", 12)) break;
+				if (!ifs.getline (cbuf, 256) || !ComparePrefix (cbuf, "end_textures", 12)) break;
 				char *str = trim_string (cbuf);
 				if (*str) {
-					tmp_list = new char*[ngenerictex+1]; TRACENEW
-					tmp_id   = new LONGLONG[ngenerictex+1]; TRACENEW
+					tmp_list = new char*[ngenerictex+1]; TraceSurfaceAllocation(__FILE__,__LINE__);
+					tmp_id   = new SurfaceName[ngenerictex+1]; TraceSurfaceAllocation(__FILE__,__LINE__);
 					if (ngenerictex) {
 						memcpy (tmp_list, generic_tex_name, ngenerictex*sizeof(char*));
 						delete []generic_tex_name;
 						generic_tex_name = NULL;
-						memcpy (tmp_id, generic_tex_id, ngenerictex*sizeof(LONGLONG));
+						memcpy (tmp_id, generic_tex_id, ngenerictex*sizeof(SurfaceName));
 						delete []generic_tex_id;
 						generic_tex_id = NULL;
 					}
 					generic_tex_name = tmp_list;
 					generic_tex_id = tmp_id;
 					int len = strlen(str);
-					generic_tex_name[ngenerictex] = new char[len+1]; TRACENEW
+					generic_tex_name[ngenerictex] = new char[len+1]; TraceSurfaceAllocation(__FILE__,__LINE__);
 					strcpy (generic_tex_name[ngenerictex], str);
 					generic_tex_id[ngenerictex] = NameToId (str);
 				    ngenerictex++;
@@ -234,21 +240,21 @@ void Base::CreateStaticDeviceObjects ()
 		}
 		// load generic textures
 		if (ngenerictex) {
-			generic_dtex = new SURFHANDLE[ngenerictex]; TRACENEW
-			generic_ntex = new SURFHANDLE[ngenerictex]; TRACENEW
+			generic_dtex = new SURFHANDLE[ngenerictex]; TraceSurfaceAllocation(__FILE__,__LINE__);
+			generic_ntex = new SURFHANDLE[ngenerictex]; TraceSurfaceAllocation(__FILE__,__LINE__);
 			// the actual load is performed by InitStaticDeviceObjects
 		}
 	}
 
-	oapi::GraphicsClient *gclient = g_pOrbiter->GetGraphicsClient();
+	const bool graphics = GetSurfaceServices().HasGraphics();
 	char fname[256];
 
 	for (int i = 0; i < ngenerictex; i++) {
-		if (gclient) {
+		if (graphics) {
 			sprintf (fname, "%s.dds", generic_tex_name[i]);
-			generic_dtex[i] = gclient->clbkLoadTexture (fname);
+			generic_dtex[i] = GetSurfaceServices().LoadTexture (fname,false);
 			sprintf (fname, "%s_n.dds", generic_tex_name[i]);
-			generic_ntex[i] = gclient->clbkLoadTexture (fname);
+			generic_ntex[i] = GetSurfaceServices().LoadTexture (fname,false);
 		} else {
 			generic_dtex[i] = NULL;
 			generic_ntex[i] = NULL;
@@ -258,24 +264,18 @@ void Base::CreateStaticDeviceObjects ()
 	
 void Base::DestroyStaticDeviceObjects ()
 {
-	// destroy common static resources
-	oapi::GraphicsClient *gclient = g_pOrbiter->GetGraphicsClient();
-
-	// destroy textures
-	if (gclient && ngenerictex) {
-		for (int i = 0; i < ngenerictex; i++) {
-			if (generic_dtex[i]) gclient->clbkReleaseTexture (generic_dtex[i]);
-			if (generic_ntex[i]) gclient->clbkReleaseTexture (generic_ntex[i]);
-			delete []generic_tex_name[i];
-			generic_tex_name[i] = NULL;
-		}
-		delete []generic_tex_name;
-		generic_tex_name = NULL;
-		delete []generic_dtex;
-		generic_dtex = NULL;
-		delete []generic_ntex;
-		generic_ntex = NULL;
+	// CPU resource names/arrays also exist in a headless session.
+	const bool graphics=GetSurfaceServices().HasGraphics();
+	for (int i=0;i<ngenerictex;++i) {
+		if (graphics && generic_dtex[i]) GetSurfaceServices().ReleaseTexture(generic_dtex[i],false);
+		if (graphics && generic_ntex[i]) GetSurfaceServices().ReleaseTexture(generic_ntex[i],false);
+		delete []generic_tex_name[i];
 	}
+	delete []generic_tex_name; generic_tex_name=nullptr;
+	delete []generic_tex_id; generic_tex_id=nullptr;
+	delete []generic_dtex; generic_dtex=nullptr;
+	delete []generic_ntex; generic_ntex=nullptr;
+	ngenerictex=0;
 }
 
 void Base::InitDeviceObjects ()
@@ -297,7 +297,7 @@ void Base::Setup ()
 		cbody->EquatorialToLocal (lng, lat, rad, rpos);
 	}
 
-	for (DWORD i = 0; i < nobj; i++)
+	for (UInt32 i = 0; i < nobj; i++)
 		obj[i]->Setup();
 }
 
@@ -305,8 +305,8 @@ bool Base::InitSurfaceTiles () const
 {
 	if (!ntile) return false;
 
-	static DWORD nlat[10] = {128, 256, 512, 1024, 2048, 4096, 8192, 16384, 32768, 65536};
-	DWORD i;
+	static UInt32 nlat[10] = {128, 256, 512, 1024, 2048, 4096, 8192, 16384, 32768, 65536};
+	UInt32 i;
 	float r = (float)rad;
 	float cphi = (float)cos (lng), sphi = (float)sin (lng);
 	float ctht = (float)cos (lat), stht = (float)sin (lat);
@@ -320,7 +320,7 @@ bool Base::InitSurfaceTiles () const
 
 		// 1. Create the tile meshes
 		if (!tile[i].mesh) {
-			Mesh *mesh = new Mesh; TRACENEW
+			Mesh *mesh = new Mesh; TraceSurfaceAllocation(__FILE__,__LINE__);
 			tile[i].mesh = (MESHHANDLE)mesh;
 			int n = nlat[tile[i].res], n4 = n*4;
 			int alat = tile[i].ilat;
@@ -340,7 +340,7 @@ bool Base::InitSurfaceTiles () const
 			sprintf (cbuf, "%s_%d_%c%04d_%c%04d.dds", cbody->Name(), tile[i].res,
 				tile[i].ilng >= 0 ? 'e':'w', abs(tile[i].ilng),
 				tile[i].ilat >= 0 ? 'n':'s', abs(tile[i].ilat));
-			tile[i].tex = g_pOrbiter->LoadTexture (cbuf);			
+			tile[i].tex = GetSurfaceServices().LoadTexture (cbuf,true);
 		}
 	}
 
@@ -350,13 +350,13 @@ bool Base::InitSurfaceTiles () const
 void Base::DestroySurfaceTiles ()
 {
 	if (ntilebuf) {
-		for (DWORD i = 0; i < ntile; i++) {
+		for (UInt32 i = 0; i < ntile; i++) {
 			if (tile[i].mesh) {
 				delete (Mesh*)tile[i].mesh;
 				tile[i].mesh = NULL;
 			}
 			if (tile[i].tex) {
-				g_pOrbiter->ReleaseSurface (tile[i].tex);
+				GetSurfaceServices().ReleaseTexture (tile[i].tex,true);
 				tile[i].tex = NULL;
 			}
 		}
@@ -385,21 +385,21 @@ void Base::Attach (Planet *_parent)
 	rotvel.Set (-v*slng, 0.0, v*clng);        // velocity vector in non-rotating planet coords
 }
 
-DWORD Base::GetTileList (const SurftileSpec **_tile) const
+UInt32 Base::GetTileList (const SurftileSpec **_tile) const
 {
 	if (ntile && !tile[0].mesh)
 		InitSurfaceTiles();
 	*_tile = tile; return ntile;
 }
 
-void Base::ExportBaseStructures (Mesh ***mesh_us, DWORD *nmesh_us, Mesh ***mesh_os, DWORD *nmesh_os) const
+void Base::ExportBaseStructures (Mesh ***mesh_us, UInt32 *nmesh_us, Mesh ***mesh_os, UInt32 *nmesh_os) const
 {
 	ScanObjectMeshes();
 	*mesh_os = objmsh_os;  *nmesh_os = nobjmsh_os;
 	*mesh_us = objmsh_us;  *nmesh_us = nobjmsh_us;
 }
 
-void Base::ExportShadowGeometry (Mesh ***mesh_shadow, double **elev, DWORD *nmesh_shadow) const
+void Base::ExportShadowGeometry (Mesh ***mesh_shadow, double **elev, UInt32 *nmesh_shadow) const
 {
 	ScanObjectMeshes();
 	*mesh_shadow = objmsh_sh;
@@ -407,7 +407,7 @@ void Base::ExportShadowGeometry (Mesh ***mesh_shadow, double **elev, DWORD *nmes
 	*nmesh_shadow = nobjmsh_sh;
 }
 
-void Base::ExportCollisionMeshes (Mesh ***mesh_col, DWORD *nmesh_col) const
+void Base::ExportCollisionMeshes (Mesh ***mesh_col, UInt32 *nmesh_col) const
 {
 	ScanObjectMeshes();
 	*mesh_col = objmsh_col;
@@ -418,13 +418,13 @@ void Base::ScanObjectMeshes () const
 {
 	if (objmsh_valid) return; // done already
 
-	DWORD i, j, k, ng, spec, nvtx, nidx;
-	LONGLONG texid;
+	UInt32 i, j, k, ng, spec, nvtx, nidx;
+	SurfaceName texid;
 	bool undersh, groundsh;
 	GroupSpec *grp_os = 0, *grp_us = 0, *grp_col = 0; // mesh groups for the meshes compiled from generic primitives (over and under shadows)
-	DWORD ngrp_os = 0, ngrp_us = 0, ngrp_col = 0;
+	UInt32 ngrp_os = 0, ngrp_us = 0, ngrp_col = 0;
 	nobjmsh_os = nobjmsh_us = nobjmsh_sh = nobjmsh_col = 0;
-	bool bshadow = g_pOrbiter->Cfg()->CfgVisualPrm.bShadows;
+	bool bshadow = GetSurfaceServices().Configuration().CfgVisualPrm.bShadows;
 
 	for (i = 0; i < nobj; i++) {
 		BaseObject *bo = obj[i];
@@ -434,9 +434,9 @@ void Base::ScanObjectMeshes () const
 			ng = bo->nGroup();
 			for (j = 0; j < ng; j++) {
 				if (bo->GetGroupSpec (j, nvtx, nidx, texid, undersh, groundsh)) {
-					DWORD &ngrp     = (undersh ? ngrp_us : ngrp_os);
+					UInt32 &ngrp     = (undersh ? ngrp_us : ngrp_os);
 					GroupSpec *&grp = (undersh ? grp_us : grp_os);
-					DWORD texidx = GetGenericTextureIdx (texid);
+					UInt32 texidx = GetGenericTextureIdx (texid);
 					for (k = 0; k < ngrp; k++) {
 						if (grp[k].TexIdx == texidx && (grp[k].UsrFlag & 0x1) != groundsh) {
 							grp[k].nVtx += nvtx;
@@ -445,7 +445,7 @@ void Base::ScanObjectMeshes () const
 						}
 					}
 					if (k == ngrp) { // a new vertex group
-						GroupSpec *tmp = new GroupSpec[ngrp+1]; TRACENEW
+						GroupSpec *tmp = new GroupSpec[ngrp+1]; TraceSurfaceAllocation(__FILE__,__LINE__);
 						if (ngrp) {
 							memcpy (tmp, grp, ngrp*sizeof(GroupSpec));
 							delete []grp;
@@ -464,7 +464,7 @@ void Base::ScanObjectMeshes () const
 			ng = bo->nGroup();
 			for (j = 0; j < ng; j++) {
 				if (bo->GetGroupSpec (j, nvtx, nidx, texid, undersh, groundsh)) {
-					DWORD texidx = GetGenericTextureIdx (texid);
+					UInt32 texidx = GetGenericTextureIdx (texid);
 					for (k = 0; k < ngrp_col; k++) {
 						if (grp_col[k].TexIdx == texidx && (grp_col[k].UsrFlag & 0x1) != groundsh) {
 							grp_col[k].nVtx += nvtx;
@@ -473,7 +473,7 @@ void Base::ScanObjectMeshes () const
 						}
 					}
 					if (k == ngrp_col) {
-						GroupSpec *tmp = new GroupSpec[ngrp_col+1]; TRACENEW
+						GroupSpec *tmp = new GroupSpec[ngrp_col+1]; TraceSurfaceAllocation(__FILE__,__LINE__);
 						if (ngrp_col) {
 							memcpy (tmp, grp_col, ngrp_col*sizeof(GroupSpec));
 							delete []grp_col;
@@ -497,12 +497,12 @@ void Base::ScanObjectMeshes () const
 	}
 
 	for (i = 0; i < 3; i++) {
-		DWORD &ngrp = (i==0 ? ngrp_us : (i==1 ? ngrp_os : ngrp_col));
+		UInt32 &ngrp = (i==0 ? ngrp_us : (i==1 ? ngrp_os : ngrp_col));
 		if (!ngrp) continue;
 		GroupSpec *&grp = (i==0 ? grp_us : (i==1 ? grp_os : grp_col));
 		for (j = 0; j < ngrp; j++) {
-			grp[j].Vtx = new NTVERTEX[grp[j].nVtx]; TRACENEW
-			grp[j].Idx = new WORD[grp[j].nIdx]; TRACENEW
+			grp[j].Vtx = new NTVERTEX[grp[j].nVtx]; TraceSurfaceAllocation(__FILE__,__LINE__);
+			grp[j].Idx = new UInt16[grp[j].nIdx]; TraceSurfaceAllocation(__FILE__,__LINE__);
 			grp[j].nVtx = 0;
 			grp[j].nIdx = 0;
 		}
@@ -510,10 +510,10 @@ void Base::ScanObjectMeshes () const
 	if (ngrp_os) nobjmsh_os++;
 	if (ngrp_us) nobjmsh_us++;
 	if (ngrp_col) nobjmsh_col++;
-	if (nobjmsh_os) { objmsh_os = new Mesh*[nobjmsh_os]; nobjmsh_os = 0; TRACENEW }
-	if (nobjmsh_us) { objmsh_us = new Mesh*[nobjmsh_us]; nobjmsh_us = 0; TRACENEW }
-	if (nobjmsh_sh) { objmsh_sh = new Mesh*[nobjmsh_sh]; sh_elev = new double[nobjmsh_sh]; nobjmsh_sh = 0; TRACENEW }
-	if (nobjmsh_col) { objmsh_col = new Mesh*[nobjmsh_col]; nobjmsh_col = 0; TRACENEW }
+	if (nobjmsh_os) { objmsh_os = new Mesh*[nobjmsh_os]; nobjmsh_os = 0; TraceSurfaceAllocation(__FILE__,__LINE__); }
+	if (nobjmsh_us) { objmsh_us = new Mesh*[nobjmsh_us]; nobjmsh_us = 0; TraceSurfaceAllocation(__FILE__,__LINE__); }
+	if (nobjmsh_sh) { objmsh_sh = new Mesh*[nobjmsh_sh]; sh_elev = new double[nobjmsh_sh]; nobjmsh_sh = 0; TraceSurfaceAllocation(__FILE__,__LINE__); }
+	if (nobjmsh_col) { objmsh_col = new Mesh*[nobjmsh_col]; nobjmsh_col = 0; TraceSurfaceAllocation(__FILE__,__LINE__); }
 
 	for (i = 0; i < nobj; i++) {
 		BaseObject *bo = obj[i];
@@ -522,9 +522,9 @@ void Base::ScanObjectMeshes () const
 			ng = bo->nGroup();
 			for (j = 0; j < ng; j++) {
 				bo->GetGroupSpec (j, nvtx, nidx, texid, undersh, groundsh);
-				DWORD &ngrp     = (undersh ? ngrp_us : ngrp_os);
+				UInt32 &ngrp     = (undersh ? ngrp_us : ngrp_os);
 				GroupSpec *&grp = (undersh ? grp_us : grp_os);
-				DWORD texidx = GetGenericTextureIdx (texid);
+				UInt32 texidx = GetGenericTextureIdx (texid);
 				for (k = 0; k < ngrp; k++) {
 					if (grp[k].TexIdx == texidx && (grp[k].UsrFlag & 0x1) != groundsh) break;
 				}
@@ -537,7 +537,7 @@ void Base::ScanObjectMeshes () const
 			ng = bo->nGroup();
 			for (j = 0; j < ng; j++) {
 				bo->GetGroupSpec (j, nvtx, nidx, texid, undersh, groundsh);
-				DWORD texidx = GetGenericTextureIdx (texid);
+				UInt32 texidx = GetGenericTextureIdx (texid);
 				for (k = 0; k < ngrp_col; k++) {
 					if (grp_col[k].TexIdx == texidx && (grp_col[k].UsrFlag & 0x1) != groundsh) break;
 				}
@@ -561,20 +561,20 @@ void Base::ScanObjectMeshes () const
 	}
 
 	for (i = 0; i < 3; i++) {
-		DWORD &ngrp = (i==0 ? ngrp_us : (i==1 ? ngrp_os : ngrp_col));
+		UInt32 &ngrp = (i==0 ? ngrp_us : (i==1 ? ngrp_os : ngrp_col));
 		if (!ngrp) continue;
 		GroupSpec *&grp = (i==0 ? grp_us : (i==1 ? grp_os : grp_col));
-		Mesh *mesh = new Mesh; TRACENEW
+		Mesh *mesh = new Mesh; TraceSurfaceAllocation(__FILE__,__LINE__);
 		if (i==0) genmsh_us = mesh;
 		else if (i==1) genmsh_os = mesh;
 		else genmsh_col = mesh;
 
 		for (j = 0; j < ngrp; j++) {
-			DWORD texidx = grp[j].TexIdx;
-			int tidx = (texidx != (DWORD)-1 ? mesh->AddTexture (generic_dtex[texidx]) : SPEC_DEFAULT);
+			UInt32 texidx = grp[j].TexIdx;
+			int tidx = (texidx != (UInt32)-1 ? mesh->AddTexture (generic_dtex[texidx]) : SPEC_DEFAULT);
 			int gidx = mesh->AddGroup (grp[j].Vtx, grp[j].nVtx, grp[j].Idx, grp[j].nIdx, SPEC_DEFAULT, tidx);
 			mesh->GetGroup(gidx)->UsrFlag = grp[j].UsrFlag;
-			if (texidx != (DWORD)-1 && generic_ntex[texidx]) {
+			if (texidx != (UInt32)-1 && generic_ntex[texidx]) {
 				tidx = mesh->AddTexture (generic_ntex[texidx]);
 				mesh->GetGroup(gidx)->TexIdxEx[0] = tidx;
 			}
@@ -599,10 +599,10 @@ void Base::Update (bool force)
 	s1->vel.Set (mul (cbody->s1->R, rotvel) + cbody->s1->vel);
 
 	// periodically update some secondary parameters
-	if (td.SimT1 > sundir_updt || force) {
+	if (CelestialClock().SimT1 > sundir_updt || force) {
 		sundir = SunDirection();
 		double csun = sundir.y;
-		sundir_updt = td.SimT1 + (csun < -0.1 ? 50.0 : csun > 0.1 ? 10.0 : 2.0);
+		sundir_updt = CelestialClock().SimT1 + (csun < -0.1 ? 50.0 : csun > 0.1 ? 10.0 : 2.0);
 	}
 }
 
@@ -612,7 +612,7 @@ void Base::Rel_EquPos (const Vector &relpos, double &_lng, double &_lat) const
 	_lat = lat - relpos.x/cbody->Size();
 }
 
-void Base::Pad_EquPos (DWORD padno, double &_lng, double &_lat) const
+void Base::Pad_EquPos (UInt32 padno, double &_lng, double &_lat) const
 {
 	_lng = lng;
 	_lat = lat;
@@ -622,7 +622,7 @@ void Base::Pad_EquPos (DWORD padno, double &_lng, double &_lat) const
 	}
 }
 
-bool Base::GetGenericTexture (LONGLONG id, SURFHANDLE &daytex, SURFHANDLE &nighttex) const
+bool Base::GetGenericTexture (SurfaceName id, SURFHANDLE &daytex, SURFHANDLE &nighttex) const
 {
 	for (int i = 0; i < ngenerictex; i++)
 		if (id == generic_tex_id[i]) {
@@ -634,40 +634,40 @@ bool Base::GetGenericTexture (LONGLONG id, SURFHANDLE &daytex, SURFHANDLE &night
 	return false;
 }
 
-DWORD Base::GetGenericTextureIdx (LONGLONG id) const
+UInt32 Base::GetGenericTextureIdx (SurfaceName id) const
 {
-	for (DWORD i = 0; i < ngenerictex; i++)
+	for (UInt32 i = 0; i < ngenerictex; i++)
 		if (id == generic_tex_id[i])
 			return i;
-	return (DWORD)-1;
+	return (UInt32)-1;
 }
 
 int Base::OccupyPad (Vessel *vessel, int pad, bool forcepad)
 {
 	int pd;
-	DWORD i;
+	UInt32 i;
 
 	if (forcepad) {
 		if (pad < 0) return -1;
 		if (lspec[pad].status == 0) padfree--;
 		lspec[pad].status = 1;
-		lspec[pad].vessel = vessel;
+		lspec[pad].vessel = GetSurfaceServices().VesselState(vessel);
 		return pad;
 	}
 	if (!padfree) return -1;
 	if (pad >= 0 && lspec[pad].status == 0) {
 		lspec[pad].status = 1;
-		lspec[pad].vessel = vessel;
+		lspec[pad].vessel = GetSurfaceServices().VesselState(vessel);
 		padfree--;
 		return pad;
 	}
 	// pick random free pad
-	pd = (rand()*padfree)/(RAND_MAX+1);
+	pd = (static_cast<std::int64_t>(rand())*padfree)/(static_cast<std::int64_t>(RAND_MAX)+1);
 	for (i = 0; i < npad; i++) {
 		if (lspec[i].status == 0) {
 			if (!pd--) {
 				lspec[i].status = 1;
-				lspec[i].vessel = vessel;
+				lspec[i].vessel = GetSurfaceServices().VesselState(vessel);
 				padfree--;
 				return (int)i;
 			}
@@ -681,14 +681,14 @@ int Base::OccupyPad (Vessel *vessel, double _lng, double _lat)
 {
 	const double padrad = 20.0; // landing pad size
 	double plng, plat, dist, bdir;
-	for (DWORD i = 0; i < npad; i++) {
+	for (UInt32 i = 0; i < npad; i++) {
 		Pad_EquPos (i, plng, plat);
 		Orthodome (_lng, _lat, plng, plat, dist, bdir);
 		dist *= cbody->Size();
 		if (dist < padrad) {
 			if (lspec[i].status == 0) {
 				lspec[i].status = 1;
-				lspec[i].vessel = vessel;
+				lspec[i].vessel = GetSurfaceServices().VesselState(vessel);
 				padfree--;
 				return (int)i;
 			}
@@ -699,8 +699,8 @@ int Base::OccupyPad (Vessel *vessel, double _lng, double _lat)
 
 void Base::ClearPad (Vessel *vessel)
 {
-	for (DWORD i = 0; i < npad; i++)
-		if (lspec[i].status && lspec[i].vessel == vessel) {
+	for (UInt32 i = 0; i < npad; i++)
+		if (lspec[i].status && lspec[i].vessel == GetSurfaceServices().VesselState(const_cast<Vessel*>(vessel))) {
 			lspec[i].status = 0;
 			lspec[i].vessel = 0;
 			padfree++;
@@ -709,22 +709,22 @@ void Base::ClearPad (Vessel *vessel)
 
 int Base::LandedAtPad (const Vessel *vessel) const
 {
-	for (DWORD i = 0; i < npad; i++)
-		if (lspec[i].status == 1 && lspec[i].vessel == vessel)
+	for (UInt32 i = 0; i < npad; i++)
+		if (lspec[i].status == 1 && lspec[i].vessel == GetSurfaceServices().VesselState(const_cast<Vessel*>(vessel)))
 			return (int)i;
 	return -1;
 }
 
-int Base::RequestLanding (Vessel *vessel, DWORD &padno)
+int Base::RequestLanding (Vessel *vessel, UInt32 &padno)
 {
 	if (rand() < RAND_MAX/2) return 2; // keep pending
 	if (!padfree) return 1;     // deny
-	int pd = (rand()*padfree)/(RAND_MAX+1);
-	for (DWORD i = 0; i < npad; i++) {
+	int pd = (static_cast<std::int64_t>(rand())*padfree)/(static_cast<std::int64_t>(RAND_MAX)+1);
+	for (UInt32 i = 0; i < npad; i++) {
 		if (lspec[i].status == 0) {
 			if (!pd--) {
 				lspec[i].status = 2;
-				lspec[i].vessel = vessel;
+				lspec[i].vessel = GetSurfaceServices().VesselState(vessel);
 				padfree--;
 				padno = i;
 				return 4; // grant clearance
@@ -743,8 +743,8 @@ int Base::RequestTakeoff ()
 
 void Base::ReportTakeoff (Vessel *vessel)
 {
-	for (DWORD i = 0; i < npad; i++) {
-		if (lspec[i].status == 1 && lspec[i].vessel == vessel) {
+	for (UInt32 i = 0; i < npad; i++) {
+		if (lspec[i].status == 1 && lspec[i].vessel == GetSurfaceServices().VesselState(const_cast<Vessel*>(vessel))) {
 			lspec[i].status = 0;
 			lspec[i].vessel = 0;
 			padfree++;
@@ -756,7 +756,7 @@ int Base::ReportTouchdown (VesselBase *vessel, double vlng, double vlat)
 {
 	const double padrad = 30.0; // landing pad size
 	double plng, plat, dist, bdir;
-	DWORD i, padno = (DWORD)-1;
+	UInt32 i, padno = (UInt32)-1;
 	for (i = 0; i < npad; i++) {
 		Pad_EquPos (i, plng, plat);
 		Orthodome (vlng, vlat, plng, plat, dist, bdir);
@@ -770,9 +770,9 @@ int Base::ReportTouchdown (VesselBase *vessel, double vlng, double vlat)
 			break;
 		}
 	}
-	if (padno != (DWORD)-1) { // cancel all other requests for this vessel
-		if (g_pOrbiter->Cfg()->CfgLogicPrm.bPadRefuel)
-			vessel->Refuel();
+	if (padno != (UInt32)-1) { // cancel all other requests for this vessel
+		if (GetSurfaceServices().Configuration().CfgLogicPrm.bPadRefuel)
+			GetSurfaceServices().Refuel(*vessel);
 		for (i = 0; i < npad; i++) {
 			if (i == padno) continue;
 			if (lspec[i].status && lspec[i].vessel == vessel) {

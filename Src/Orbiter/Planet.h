@@ -19,8 +19,11 @@
 
 #include "Celbody.h"
 #include "Nav.h"
-#include "GraphicsAPI.h"
-#include "Orbiter.h"
+#include "OrbiterVisualData.h"
+#include "OrbiterPlanetData.h"
+#include "Production/SceneLabels.h"
+#include "WindData.h"
+#include "Production/PlanetTypes.h"
 #include <functional>
 #include <filesystem>
 namespace fs = std::filesystem;
@@ -32,20 +35,20 @@ class Star;
 class Elements;
 class Base;
 class TileManager;
+template<class T> class TileManager2;
 class SurfTile;
 class CloudTile;
 class ElevationManager;
-struct WindPrm;
 
 struct _finddata_t;
 
 #pragma pack(push,1)
 
 typedef struct {          // texture tile hierarchy element
-	WORD nSubtile;        // number of children at next higher level
+	orbiter::production::UInt16 nSubtile;        // number of children at next higher level
 	bool bCover;          // children cover tile completely
-	DWORD ChildFlag[4];   // subtile flags. bit0: subtile area contains land; bit1: subtile area contains water; bit2: subtile is present
-	DWORD ChildIdx[4];    // texture indices for children ((DWORD)-1: child subtile not present)
+	orbiter::production::UInt32 ChildFlag[4];   // subtile flags. bit0: subtile area contains land; bit1: subtile area contains water; bit2: subtile is present
+	orbiter::production::UInt32 ChildIdx[4];    // texture indices for children ((orbiter::production::UInt32)-1: child subtile not present)
 
 	// the following fields are transient visibility flags which change
 	// with each frame
@@ -74,7 +77,7 @@ typedef struct {
 // =======================================================================
 // Class Planet
 
-class Planet: public CelestialBody {
+class ORBITER_PRODUCTION_API Planet: public CelestialBody {
 	friend class VPlanet;
 	friend class TileManager;
 	template<class T> friend class TileManager2;
@@ -92,7 +95,7 @@ public:
 
 	int Type() const { return OBJTP_PLANET; }
 
-	const void *GetParam (DWORD paramtype) const;
+	const void *GetParam (orbiter::production::UInt32 paramtype) const;
 
 	void SetPsys (const PlanetarySystem *_psys)
 	{ psys = _psys; }
@@ -100,16 +103,16 @@ public:
 	const PlanetarySystem *GetPsys () const
 	{ return psys; }
 
-	inline DWORD nNav() const { return nnav; }
+	inline orbiter::production::UInt32 nNav() const { return nnav; }
 	inline NavManager &NavMgr() { return navlist; }
 	inline const NavManager &NavMgr() const { return navlist; }
 
-	inline DWORD nBase() const { return nbase; }
+	inline orbiter::production::UInt32 nBase() const { return nbase; }
 
 	bool AddBase (Base *_base);
 	// Add _base to planet's base list. Returns false if base with this name already exists
 
-	Base *GetBase (DWORD i) const { return baselist[i]; }
+	Base *GetBase (orbiter::production::UInt32 i) const { return baselist[i]; }
 	// return the planet's i'th surface base (assuming all children are bases)
 
 	Base *GetBase (const char *_name, bool ignorecase = false);
@@ -151,11 +154,11 @@ public:
 	inline double ShadowDepth () const { return shadowalpha; }
 	inline double CloudRotationAngle () const { return cloudrot; }
 	inline float CloudShadowDepth () const { return cloudshadowcol; }
-	inline DWORD MaxPatchLevel() const { return max_patch_level; }
+	inline orbiter::production::UInt32 MaxPatchLevel() const { return max_patch_level; }
 	inline double BBExcess() const { return bb_excess; }
 	inline double ElevationResolution() const { return elev_res; }
 	inline int LabelFormat() const { return label_version; }
-	inline const oapi::GraphicsClient::LABELTYPE *LabelLegend() const { return labelLegend; }
+	inline const orbiter::production::SceneLabelType *LabelLegend() const { return labelLegend; }
 	inline int NumLabelLegend() const { return nLabelLegend; }
 
 	void SetLabelActive(int i, bool active)
@@ -185,24 +188,7 @@ public:
 	TileManager2<SurfTile> *SurfMgr2() const { return smgr2; }
 	ElevationManager *ElevMgr() const { return emgr; }
 	TileManager2<CloudTile> *CloudMgr2() const { return cmgr2; }
-	void ForEach(int type, std::function<void(const fs::directory_entry&)> callback) {
-		extern Orbiter* g_pOrbiter;
-		fs::path path;
-		std::string ext;
-		switch (type) {
-		case FILETYPE_MARKER:
-			ext = ".mkr";
-			if (labelpath) path = labelpath;
-			else           path = fs::path(g_pOrbiter->Cfg()->CfgDirPrm.ConfigDir) / name / "Marker";
-			break;
-		}
-		std::error_code ec;
-		for (const auto& entry : fs::directory_iterator(path, ec)) {
-			if (entry.path().extension().string() == ext) {
-				callback(entry);
-			}
-		}
-	}
+	void ForEach(int type, std::function<void(const fs::directory_entry&)> callback);
 
 	//USERLABELSPEC const *GetUserLabel (int idx) const { return userlabel+idx; }
 	//int nUserLabel () const { return nuserlabel; }
@@ -214,7 +200,7 @@ public:
 	//	float distfac;
 	//	bool active;
 	//};
-	oapi::GraphicsClient::LABELLIST *LabelList (int *nlist = 0) const { if (nlist) *nlist = nlabellist; return labellist; }
+	orbiter::production::SceneLabelList *LabelList (int *nlist = 0) const { if (nlist) *nlist = nlabellist; return labellist; }
 	void ScanLabelLists (std::ifstream &cfg);
 	// read surface label lists as defined in config file
 
@@ -257,7 +243,7 @@ protected:
 	double bb_excess;        // specifies how much to inflate the bounding box (1=double each side)
 	FogParam fog;            // distance fog render parameters
 	static bool bEnableWind; // allow atmospheric wind effects
-	oapi::GraphicsClient::LABELTYPE *labelLegend;  // label type legend (label_version >= 2)
+	orbiter::production::SceneLabelType *labelLegend;  // label type legend (label_version >= 2)
 	int nLabelLegend;        // number of entries in legend
 
 private:
@@ -266,7 +252,7 @@ private:
 
 	const PlanetarySystem *psys; // system the planet belongs to
 
-	DWORD nbase;
+	orbiter::production::UInt32 nbase;
 	Base **baselist;
 	// list of surface bases
 
@@ -277,21 +263,21 @@ private:
 	int nobserver;
 	GROUNDOBSERVERSPEC **observer;
 
-	oapi::GraphicsClient::LABELLIST *labellist;
+	orbiter::production::SceneLabelList *labellist;
 	int nlabellist;
 	char *labelpath;
 
-	DWORD max_patch_level;
+	orbiter::production::UInt32 max_patch_level;
 	// resolution limit for sphere patch representation of planet's visual (<= 10)
 
 	int min_cloud_level;
 	int max_cloud_level;
 	// separate cloud layer is rendered from this resolution
 
-	LPDIRECTDRAWSURFACE7 *cloudtex;   // textures for cloud layer - TODO: replace with SURFHANDLE!
+	orbiter::production::PlanetLegacyTexture *cloudtex;   // textures for cloud layer - TODO: replace with SURFHANDLE!
 	int ncloudtex;
 
-	LPDIRECTDRAWSURFACE7 *ringtex;    // textures for ring system (if bHasRings) - TODO: replace with SURFHANDLE!
+	orbiter::production::PlanetLegacyTexture *ringtex;    // textures for ring system (if bHasRings) - TODO: replace with SURFHANDLE!
 	int nringtex;
 
 	int tmgr_version;                 // which tile manager?

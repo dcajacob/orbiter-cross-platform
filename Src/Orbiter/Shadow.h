@@ -4,9 +4,12 @@
 #ifndef __SHADOW_H
 #define __SHADOW_H
 
-#include "D3d7util.h"
+#include "Production/SurfaceTypes.h"
+using orbiter::production::UInt32;
+using orbiter::production::UInt16;
+using orbiter::production::SurfacePoint2;
 
-VOID Find2DConvexHull( DWORD dwNumInVertices, VECTOR2D* pInVertices,
-					   DWORD* pdwNumOutIndices, WORD** ppOutIndices );
+ORBITER_PRODUCTION_API void Find2DConvexHull( UInt32 dwNumInVertices, SurfacePoint2* pInVertices,
+					   UInt32* pdwNumOutIndices, UInt16** ppOutIndices );
 
 #endif // !__SHADOW_H

@@ -5,14 +5,15 @@
 
 
 #include "Shadow.h"
-#include "Log.h"
+#include <cstdlib>
+#include <vector>
 
-BOOL ccw( VECTOR2D* P[], int i, int j, int k )
+bool ccw( SurfacePoint2* P[], int i, int j, int k )
 {
-	FLOAT a = P[i]->x - P[j]->x;
-	FLOAT b = P[i]->y - P[j]->y;
-	FLOAT c = P[k]->x - P[j]->x;
-	FLOAT d = P[k]->y - P[j]->y;
+	float a = P[i]->x - P[j]->x;
+	float b = P[i]->y - P[j]->y;
+	float c = P[k]->x - P[j]->x;
+	float d = P[k]->y - P[j]->y;
 
 	return ( a*d - b*c <= 0 ); // TRUE if points i, j, k are counterclockwise
 }
@@ -20,16 +21,16 @@ BOOL ccw( VECTOR2D* P[], int i, int j, int k )
 
 
 
-int cmpl( const VOID* a, const VOID* b )
+int cmpl( const void* a, const void* b )
 {
-    VECTOR2D** pVertexPtrA = (VECTOR2D**)a;
-    VECTOR2D** pVertexPtrB = (VECTOR2D**)b;
+    SurfacePoint2** pVertexPtrA = (SurfacePoint2**)a;
+    SurfacePoint2** pVertexPtrB = (SurfacePoint2**)b;
 
-	FLOAT vx = (*pVertexPtrA)->x - (*pVertexPtrB)->x;
+	float vx = (*pVertexPtrA)->x - (*pVertexPtrB)->x;
 	if( vx > 0.0f ) return 1;
 	if( vx < 0.0f ) return -1;
 
-	FLOAT vy = (*pVertexPtrB)->y - (*pVertexPtrA)->y;
+	float vy = (*pVertexPtrB)->y - (*pVertexPtrA)->y;
 	if( vy > 0.0f ) return 1;
 	if( vy < 0.0f ) return -1;
 
@@ -39,7 +40,7 @@ int cmpl( const VOID* a, const VOID* b )
 
 
 
-int cmph( const VOID* a, const VOID* b )
+int cmph( const void* a, const void* b )
 {
 	return cmpl( b, a );
 }
@@ -47,23 +48,23 @@ int cmph( const VOID* a, const VOID* b )
 
 
 
-DWORD MakeChain(VECTOR2D** pVertexPtrs, DWORD dwNumVertexPtrs,
+UInt32 MakeChain(SurfacePoint2** pVertexPtrs, UInt32 dwNumVertexPtrs,
 				 int (*cmp)(const void*, const void*) ) 
 {
-	DWORD s = 1;
+	UInt32 s = 1;
 
-	qsort( pVertexPtrs, dwNumVertexPtrs, sizeof(VECTOR2D*), cmp );
+	qsort( pVertexPtrs, dwNumVertexPtrs, sizeof(SurfacePoint2*), cmp );
 	
-	for( DWORD i=2; i<dwNumVertexPtrs; i++ ) 
+	for( UInt32 i=2; i<dwNumVertexPtrs; i++ )
 	{
-		DWORD j = s;
+		UInt32 j = s;
 		while( j>=1 && ccw( pVertexPtrs, i, j, j-1 ) )
 			j--;
 
 		s = j+1;
 
 		// Swap the vertices s and i
-		VECTOR2D* tmp = pVertexPtrs[s];
+		SurfacePoint2* tmp = pVertexPtrs[s];
 		pVertexPtrs[s] = pVertexPtrs[i];
 		pVertexPtrs[i] = tmp;
 	}
@@ -74,12 +75,12 @@ DWORD MakeChain(VECTOR2D** pVertexPtrs, DWORD dwNumVertexPtrs,
 
 
 
-int ConvexHull2D( VECTOR2D** pVertexPtrs, DWORD dwNumVertexPtrs )
+int ConvexHull2D( SurfacePoint2** pVertexPtrs, UInt32 dwNumVertexPtrs )
 {
 	if( !dwNumVertexPtrs )
 		return 0;
 
-	DWORD cnt = 0;
+	UInt32 cnt = 0;
 
 	// Make lower hull
 	cnt += MakeChain( &pVertexPtrs[0], dwNumVertexPtrs, cmpl );
@@ -94,23 +95,19 @@ int ConvexHull2D( VECTOR2D** pVertexPtrs, DWORD dwNumVertexPtrs )
 
 
 
-VOID Find2DConvexHull( DWORD dwNumInVertices, VECTOR2D* pInVertices,
-					   DWORD* pdwNumOutIndices, WORD** ppOutIndices )
+void Find2DConvexHull( UInt32 dwNumInVertices, SurfacePoint2* pInVertices,
+					   UInt32* pdwNumOutIndices, UInt16** ppOutIndices )
 {
-	DWORD i;
-	static DWORD dwVtxBuf = 0;
-	static WORD *pIndices;
-	// Allocate memory for the hull (max size is dwNumInVertices+1 times the
-	// the storage space for a DWORD and a ptr to a vertex
-	static DWORD dwElementSize = sizeof(DWORD) + sizeof(VECTOR2D*);
-	if (dwNumInVertices > dwVtxBuf) {
-		if (dwVtxBuf) delete []pIndices;
-		pIndices = (WORD*)(new BYTE[(dwNumInVertices+1)*dwElementSize]); TRACENEW
-		dwVtxBuf = dwNumInVertices;
-	}
-    DWORD dwNumIndices  = 0;
-
-	VECTOR2D** ppVertices = (VECTOR2D**)&pIndices[dwNumInVertices+1];
+	UInt32 i;
+	// Separate typed buffers retain the original hull ordering without the
+	// original unaligned pointer array inside a WORD byte buffer.
+	static std::vector<UInt16> indices;
+	static std::vector<SurfacePoint2*> vertices;
+	indices.resize(dwNumInVertices+1);
+	vertices.resize(dwNumInVertices+1);
+	UInt16* pIndices=indices.data();
+	SurfacePoint2** ppVertices=vertices.data();
+	UInt32 dwNumIndices = 0;
 
 	// The algorithm requires array of ptrs to vertices (for qsort) instead of
 	// array of vertices, so do the conversion
@@ -121,9 +118,8 @@ VOID Find2DConvexHull( DWORD dwNumInVertices, VECTOR2D* pInVertices,
 
     // Convert back to array of indices
     for( i=0; i<dwNumIndices;i++ )
-		pIndices[i] = (WORD)( ppVertices[i] - &pInVertices[0] );
+		pIndices[i] = (UInt16)( ppVertices[i] - &pInVertices[0] );
 
 	(*pdwNumOutIndices) = dwNumIndices;
 	(*ppOutIndices)     = pIndices;
 }
-

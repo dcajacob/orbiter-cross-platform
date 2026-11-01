@@ -2,6 +2,8 @@
 // Licensed under the MIT License
 #ifndef ORBITER_VISUAL_DATA_H
 #define ORBITER_VISUAL_DATA_H
+#include "OrbiterVector.h"
+#include "OrbiterHandles.h"
 
 // Unchanged SDK values and star settings; no window or renderer ownership.
 /// \defgroup cfgprm Configuration parameter identifiers
@@ -327,6 +329,21 @@ struct StarRenderPrm {
 	double mag_lo;
 	double brt_min;
 	bool   map_log;
+};
+
+struct SurftileSpec {
+	int res;
+	int texflag;
+	int ilng, ilat;
+	MESHHANDLE mesh;
+	SURFHANDLE tex;
+};
+
+struct FogParam {
+	double dens_0;   ///< fog density at ground level
+	double dens_ref; ///< fog density at reference altitude
+	double alt_ref;  ///< reference altitude [m]
+	VECTOR3 col;     ///< fog colour
 };
 
 #endif

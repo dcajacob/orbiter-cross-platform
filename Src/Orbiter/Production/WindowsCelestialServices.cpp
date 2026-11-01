@@ -91,6 +91,34 @@ public:
     { return body.module->clbkEphemeris(mjd,request,result); }
     int FastEphemeris(const CelestialBody& body, double seconds, int request, double* result) const override
     { return body.module->clbkFastEphemeris(seconds,request,result); }
+    int AtmosphereModel(const CelestialBody& body,ATMCONST& atm) const override {
+        auto* module=body.module; const auto& modIntf=body.modIntf;
+        if (module) {
+            ATMPARAM prm;
+            if (module->Version()>=2 && !((CELBODY2*)module)->LegacyAtmosphereInterface()) {
+                if (auto* atmosphere=((CELBODY2*)module)->GetAtmosphere()) {
+                    atmosphere->clbkConstants(&atm);return 4;
+                }
+            } else if (module->clbkAtmParam(0,&prm)) {
+                atm.p0=prm.p;atm.rho0=prm.rho;return 3;
+            } else if (modIntf.oplanetAtmPrm) {
+                modIntf.oplanetAtmPrm(0,&prm);
+                atm.p0=prm.p;atm.rho0=prm.rho;return 2;
+            }
+        }
+        return 0;
+    }
+    void AtmosphereParameters(const CelestialBody& body,int model,double alt,double lng,double lat,ATMPARAM& result) const override {
+        if (model==2) body.modIntf.oplanetAtmPrm(alt,&result);
+        else if (model==3) body.module->clbkAtmParam(alt,&result);
+        else {
+            ATMOSPHERE::PRM_IN input; ATMOSPHERE::PRM_OUT output;
+            input.alt=alt;input.lng=lng;input.lat=lat;
+            input.flag=ATMOSPHERE::PRM_ALT|ATMOSPHERE::PRM_LNG|ATMOSPHERE::PRM_LAT;
+            ((CELBODY2*)body.module)->GetAtmosphere()->clbkParams(&input,&output);
+            result.p=output.p;result.rho=output.rho;result.T=output.T;
+        }
+    }
     std::filesystem::path GravityModelPath(const char* name) const override
     { return std::string("GravityModels\\")+name; }
     void ConfigFailure(const std::filesystem::path& path) override

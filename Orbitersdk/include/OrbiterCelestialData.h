@@ -3,7 +3,9 @@
 #ifndef ORBITER_SDK_CELESTIAL_DATA_H
 #define ORBITER_SDK_CELESTIAL_DATA_H
 
-// Verbatim SDK constants, value record and flags. No platform services.
+#include "OrbiterVector.h"
+
+// Verbatim SDK constants, value records and flags. No platform services.
 
 const double PI    = 3.14159265358979323846;	///< pi
 const double PI05  = 1.57079632679489661923;	///< pi/2
@@ -41,5 +43,18 @@ typedef struct {
 #define EPHEM_BARYISTRUE  0x10	///< body has no child objects
 #define EPHEM_PARENTBARY  0x20	///< ephemerides are computed in terms of the barycentre of the parent body's system
 #define EPHEM_POLAR       0x40	///< data is returned in polar format
+
+typedef struct {
+	double p0;         ///<     pressure at mean radius ('sea level') [Pa]
+	double rho0;       ///<     density at mean radius
+	double R;          ///<     specific gas constant [J/(K kg)]
+	double gamma;      ///<     ratio of specific heats, c_p/c_v
+	double C;          ///<     exponent for pressure equation (temporary)
+	double O2pp;       ///<     partial pressure of oxygen
+	double altlimit;   ///<     atmosphere altitude limit [m]
+	double radlimit;   ///<     radius limit (altlimit + mean radius)
+	double horizonalt; ///<     horizon rendering altitude
+	VECTOR3 color0;    ///<     sky colour at sea level during daytime
+} ATMCONST;
 
 #endif

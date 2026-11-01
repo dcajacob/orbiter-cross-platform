@@ -4,9 +4,18 @@
 #ifndef __BASEOBJ_H
 #define __BASEOBJ_H
 
-#include "D3dmath.h"
-#include "D3d7util.h"
-#include "Shadow.h"
+#include "Production/SurfaceTypes.h"
+#include "Production/PlanetTypes.h"
+#include "Vecmat.h"
+#include <istream>
+using orbiter::production::UInt32;
+using orbiter::production::UInt16;
+using orbiter::production::SurfaceName;
+using orbiter::production::SurfaceScalar;
+using orbiter::production::SurfaceVector;
+using orbiter::production::SurfacePoint;
+using orbiter::production::SurfaceTextureVertex;
+using orbiter::production::SurfaceMaterial;
 
 #define OBJSPEC_EXPORTMESH         0x0001 // object exports mesh
 #define OBJSPEC_EXPORTVERTEX       0x0002 // object exports vertex groups
@@ -29,7 +38,7 @@
 class Base;
 class Mesh;
 
-class BaseObject {
+class ORBITER_PRODUCTION_API BaseObject {
 public:
 	BaseObject (const Base *_base);
 	virtual ~BaseObject() = default;
@@ -40,7 +49,7 @@ public:
 	virtual int ParseLine (const char *label, const char *value) { return 0; }
 	// interpret a label/value pair read from the object description
 
-	virtual DWORD GetSpecs() const { return 0 | (bCollision ? OBJSPEC_COLLISION : 0); }
+	virtual UInt32 GetSpecs() const { return 0 | (bCollision ? OBJSPEC_COLLISION : 0); }
 
 	virtual void Setup();
 	// Initialisation after reading (but before activation)
@@ -51,13 +60,13 @@ public:
 	int nGroup() { return ngrp; }
 	// number of exported vertex groups
 
-	virtual bool GetGroupSpec (int grp, DWORD &nvtx, DWORD &nidx, LONGLONG &texid,
+	virtual bool GetGroupSpec (int grp, UInt32 &nvtx, UInt32 &nidx, SurfaceName &texid,
 		bool &undershadow, bool &groundshadow) { return false; }
 	// Returns specs for exported group 'grp': length of vertex and index lists,
 	// texture id and flag to indicate whether group should be rendered before shadows
 	// Only objects which set OBJSPEC_EXPORTVERTEX need to implement this
 
-	virtual void ExportGroup (int grp, NTVERTEX *vtx, WORD *idx, DWORD &idx_ofs) {}
+	virtual void ExportGroup (int grp, NTVERTEX *vtx, UInt16 *idx, UInt32 &idx_ofs) {}
 	// Allow the object to export its groups into vertex list vtx and index list idx
 	// On call, idx_ofs is the current total length of the index list and should be
 	// updated by the function
@@ -70,12 +79,12 @@ public:
 
 	virtual Mesh *GetCollisionMesh () { return NULL; }
 
-	virtual bool GetShadowSpec (DWORD &nvtx, DWORD &nidx)
+	virtual bool GetShadowSpec (UInt32 &nvtx, UInt32 &nidx)
 	{ return false; }
 	// Returns specs for exported shadow mesh
 	// Only objects which set OBJSPEC_EXPORTSHADOW need to implement this
 
-	virtual void ExportShadow (VERTEX_XYZ *vtx, WORD *idx) {}
+	virtual void ExportShadow (SurfacePoint *vtx, UInt16 *idx) {}
 	// Allow the object to export its shadow (or part of it).
 	// Note that vtx need not be initialised at this point, but objects should store
 	// the pointer for use in UpdateShadow
@@ -90,11 +99,15 @@ public:
 	// Note that this function is for updates according to changes in sun position.
 	// Fast changing shadows due to dynamic objects should be updated in 'Update'
 
+#ifdef _WIN32
 	virtual void Render (LPDIRECT3DDEVICE7 dev, bool day=true) {}
+#endif
 	// Object renders itself or part of itself. Only objects which set
 	// OBJSPEC_RENDERBEFORESHADOW and/or OBJESPEC_RENDERAFTERSHADOW need to implement this
 
+#ifdef _WIN32
 	virtual void RenderShadow (LPDIRECT3DDEVICE7 dev) {}
+#endif
 	// Object renders its own shadow or part of it.
 	// Only objects which set OBJSPEC_RENDERSHADOW need to implement this
 
@@ -103,7 +116,7 @@ public:
 	// The radius value includes ground elevation
 	// x=lng [rad], y=lat [rad], z=radius [m]
 
-	D3DVALUE ElevCorrection (D3DVALUE px, D3DVALUE pz);
+	SurfaceScalar ElevCorrection (SurfaceScalar px, SurfaceScalar pz);
 	// Calculate elevation (y) correction as a result of sphere curvature
 	// for position px, pz.
 
@@ -136,31 +149,37 @@ protected:
 // ======================================================================================
 // Generic mesh
 
-class MeshObject: public BaseObject {
+class ORBITER_PRODUCTION_API MeshObject: public BaseObject {
 public:
 	MeshObject (const Base *_base);
 	~MeshObject ();
 	int ParseLine (const char *label, const char *value);
 	int Read (std::istream &is);
-	DWORD GetSpecs() const { return specs | (bCollision ? OBJSPEC_COLLISION : 0); }
+	UInt32 GetSpecs() const { return specs | (bCollision ? OBJSPEC_COLLISION : 0); }
 	void Setup();
 	void Activate ();
 	void Deactivate();
-	bool GetGroupSpec (int grp, DWORD &nvtx, DWORD &nidx, LONGLONG &texid,
+	bool GetGroupSpec (int grp, UInt32 &nvtx, UInt32 &nidx, SurfaceName &texid,
 		bool &undershadow, bool &groundshadow);
-	void ExportGroup (int grp, NTVERTEX *vtx, WORD *idx, DWORD &idx_ofs);
+	void ExportGroup (int grp, NTVERTEX *vtx, UInt16 *idx, UInt32 &idx_ofs);
 	Mesh *ExportMesh ();
 	Mesh *ExportShadowMesh (double &elev);
 	Mesh *GetCollisionMesh ();
 	void UpdateShadow (Vector &fromsun, double az);
+
+#ifdef _WIN32
 	void Render (LPDIRECT3DDEVICE7 dev, bool day=true);
+#endif
+
+#ifdef _WIN32
 	void RenderShadow (LPDIRECT3DDEVICE7 dev);
+#endif
 	
 private:
 	bool LoadMesh (char *fname); // load mesh into local buffer
-	DWORD specs;      // object specs as returned by GetSpecs()
+	UInt32 specs;      // object specs as returned by GetSpecs()
 	char *fname;      // mesh file name
-	LONGLONG texid;   // overall texture
+	SurfaceName texid;   // overall texture
 	bool undersh;     // render mesh before shadows?
 	bool preload;     // load mesh at program start?
 	bool rendershadow;
@@ -172,86 +191,86 @@ private:
 // ======================================================================================
 // "5-sided block" (no floor) used as simple building etc.
 
-class Block: public BaseObject {
+class ORBITER_PRODUCTION_API Block: public BaseObject {
 public:
 	Block (const Base *_base);
 	~Block ();
 	int ParseLine (const char *label, const char *value);
-	DWORD GetSpecs() const { return OBJSPEC_EXPORTVERTEX | OBJSPEC_EXPORTSHADOWMESH | (bCollision ? OBJSPEC_COLLISION : 0); }
-	bool GetGroupSpec (int grp, DWORD &nvtx, DWORD &nidx, LONGLONG &texid,
+	UInt32 GetSpecs() const { return OBJSPEC_EXPORTVERTEX | OBJSPEC_EXPORTSHADOWMESH | (bCollision ? OBJSPEC_COLLISION : 0); }
+	bool GetGroupSpec (int grp, UInt32 &nvtx, UInt32 &nidx, SurfaceName &texid,
 		bool &undershadow, bool &groundshadow);
-	void ExportGroup (int grp, NTVERTEX *vtx, WORD *idx, DWORD &idx_ofs);
+	void ExportGroup (int grp, NTVERTEX *vtx, UInt16 *idx, UInt32 &idx_ofs);
 	Mesh *ExportShadowMesh (double &elev);
-	//bool GetShadowSpec (DWORD &nvtx, DWORD &nidx);
-	//void ExportShadow (VERTEX_XYZ *vtx, WORD *idx);
+	//bool GetShadowSpec (UInt32 &nvtx, UInt32 &nidx);
+	//void ExportShadow (SurfacePoint *vtx, UInt16 *idx);
 	//void UpdateShadow (Vector &fromsun, double az);
 	void Activate ();
 	void Deactivate ();
 
 private:
-	LONGLONG  texid[3];   // texture ids
-	D3DVALUE  tuscale[3], tvscale[3]; // texture scaling factors
+	SurfaceName  texid[3];   // texture ids
+	SurfaceScalar  tuscale[3], tvscale[3]; // texture scaling factors
 	struct DYNDATA {
-		D3DVALUE *databuf;    // some geometry data
+		SurfaceScalar *databuf;    // some geometry data
 		//D3DVERTEX *gv0;       // location of exported vertices for group 0
-		//VERTEX_XYZ *shvtx;    // location of exported shadow
+		//SurfacePoint *shvtx;    // location of exported shadow
 	} *dyndata;               // lives only during activation
 };                        
 
 // ======================================================================================
 // class Hangar: a block with a barrel roof
 
-class Hangar: public BaseObject {
+class ORBITER_PRODUCTION_API Hangar: public BaseObject {
 public:
 	Hangar (const Base *_base);
 	~Hangar ();
 	int ParseLine (const char *label, const char *value);
-	DWORD GetSpecs() const { return OBJSPEC_EXPORTVERTEX | OBJSPEC_EXPORTSHADOWMESH | (bCollision ? OBJSPEC_COLLISION : 0); }
-	bool GetGroupSpec (int grp, DWORD &nvtx, DWORD &nidx, LONGLONG &texid,
+	UInt32 GetSpecs() const { return OBJSPEC_EXPORTVERTEX | OBJSPEC_EXPORTSHADOWMESH | (bCollision ? OBJSPEC_COLLISION : 0); }
+	bool GetGroupSpec (int grp, UInt32 &nvtx, UInt32 &nidx, SurfaceName &texid,
 		bool &undershadow, bool &groundshadow);
-	void ExportGroup (int grp, NTVERTEX *vtx, WORD *idx, DWORD &idx_ofs);
+	void ExportGroup (int grp, NTVERTEX *vtx, UInt16 *idx, UInt32 &idx_ofs);
 	Mesh *ExportShadowMesh (double &elev);
-	//bool GetShadowSpec (DWORD &nvtx, DWORD &nidx);
-	//void ExportShadow (VERTEX_XYZ *vtx, WORD *idx);
+	//bool GetShadowSpec (UInt32 &nvtx, UInt32 &nidx);
+	//void ExportShadow (SurfacePoint *vtx, UInt16 *idx);
 	//void UpdateShadow (Vector &fromsun, double az);
 	void Activate ();
 	void Deactivate ();
 
 private:
-	LONGLONG  texid[3];   // texture ids
-	D3DVALUE  tuscale[3], tvscale[3]; // texture scaling factors
+	SurfaceName  texid[3];   // texture ids
+	SurfaceScalar  tuscale[3], tvscale[3]; // texture scaling factors
 	struct DYNDATA {
 		NTVERTEX *Vtx;       // block vertices
-		//VERTEX_XYZ *shvtx;    // location of exported shadow
+		//SurfacePoint *shvtx;    // location of exported shadow
 	} *dyndata;
 };
 
 // ======================================================================================
 // class Hangar2: a block with a tent-shaped roof
 
-class Hangar2: public BaseObject {
+class ORBITER_PRODUCTION_API Hangar2: public BaseObject {
 public:
 	Hangar2 (const Base *_base);
 	~Hangar2 ();
 	int ParseLine (const char *label, const char *value);
-	DWORD GetSpecs() const { return OBJSPEC_EXPORTVERTEX | OBJSPEC_EXPORTSHADOWMESH | (bCollision ? OBJSPEC_COLLISION : 0); }
-	bool GetGroupSpec (int grp, DWORD &nvtx, DWORD &nidx, LONGLONG &texid,
+	UInt32 GetSpecs() const { return OBJSPEC_EXPORTVERTEX | OBJSPEC_EXPORTSHADOWMESH | (bCollision ? OBJSPEC_COLLISION : 0); }
+	bool GetGroupSpec (int grp, UInt32 &nvtx, UInt32 &nidx, SurfaceName &texid,
 		bool &undershadow, bool &groundshadow);
-	void ExportGroup (int grp, NTVERTEX *vtx, WORD *idx, DWORD &idx_ofs);
+	void ExportGroup (int grp, NTVERTEX *vtx, UInt16 *idx, UInt32 &idx_ofs);
 	Mesh *ExportShadowMesh (double &elev);
-	//bool GetShadowSpec (DWORD &nvtx, DWORD &nidx);
-	//void ExportShadow (VERTEX_XYZ *vtx, WORD *idx);
+	//bool GetShadowSpec (UInt32 &nvtx, UInt32 &nidx);
+	//void ExportShadow (SurfacePoint *vtx, UInt16 *idx);
 	//void UpdateShadow (Vector &fromsun, double az);
 	void Activate ();
 	void Deactivate ();
 
 private:
-	D3DVALUE  roofh;      // roof height from base to ridge
-	LONGLONG  texid[3];   // texture ids
-	D3DVALUE  tuscale[3], tvscale[3]; // texture scaling factors
+	SurfaceScalar  roofh;      // roof height from base to ridge
+	SurfaceName  texid[3];   // texture ids
+	SurfaceScalar  tuscale[3], tvscale[3]; // texture scaling factors
 	struct DYNDATA {
 		NTVERTEX *Vtx;      // block vertices
-		//VERTEX_XYZ *shvtx;   // location of exported shadow
+		//SurfacePoint *shvtx;   // location of exported shadow
 	} *dyndata;
 };
 
@@ -259,53 +278,54 @@ private:
 // class Hangar3: hangar-type building with barrel roof reaching to the ground
 // and recessed entry
 
-class Hangar3: public BaseObject {
+class ORBITER_PRODUCTION_API Hangar3: public BaseObject {
 public:
 	Hangar3 (const Base *_base);
 	~Hangar3 ();
 	int ParseLine (const char *label, const char *value);
-	DWORD GetSpecs() const { return OBJSPEC_EXPORTVERTEX | OBJSPEC_EXPORTSHADOWMESH | (bCollision ? OBJSPEC_COLLISION : 0); }
-	bool GetGroupSpec (int grp, DWORD &nvtx, DWORD &nidx, LONGLONG &texid,
+	UInt32 GetSpecs() const { return OBJSPEC_EXPORTVERTEX | OBJSPEC_EXPORTSHADOWMESH | (bCollision ? OBJSPEC_COLLISION : 0); }
+	bool GetGroupSpec (int grp, UInt32 &nvtx, UInt32 &nidx, SurfaceName &texid,
 		bool &undershadow, bool &groundshadow);
-	void ExportGroup (int grp, NTVERTEX *vtx, WORD *idx, DWORD &idx_ofs);
+	void ExportGroup (int grp, NTVERTEX *vtx, UInt16 *idx, UInt32 &idx_ofs);
 	Mesh *ExportShadowMesh (double &elev);
-	//bool GetShadowSpec (DWORD &nvtx, DWORD &nidx);
-	//void ExportShadow (VERTEX_XYZ *vtx, WORD *idx);
+	//bool GetShadowSpec (UInt32 &nvtx, UInt32 &nidx);
+	//void ExportShadow (SurfacePoint *vtx, UInt16 *idx);
 	//void UpdateShadow (Vector &fromsun, double az);
 	void Activate ();
 	void Deactivate ();
 
 private:
-	LONGLONG  texid[3];   // texture ids
-	D3DVALUE  tuscale[3], tvscale[3]; // texture scaling factors
+	SurfaceName  texid[3];   // texture ids
+	SurfaceScalar  tuscale[3], tvscale[3]; // texture scaling factors
 	struct DYNDATA {
 		NTVERTEX *Vtx;      // block vertices
-		//VERTEX_XYZ *shvtx;   // location of exported shadow
+		//SurfacePoint *shvtx;   // location of exported shadow
 	} *dyndata;
 };
 
 // ======================================================================================
 // class Tank: a vertical cylinder without a base face
 
-class Tank: public BaseObject {
+class ORBITER_PRODUCTION_API Tank: public BaseObject {
 public:
 	Tank (const Base *_base);
+	~Tank() override { Deactivate(); }
 	int ParseLine (const char *label, const char *value);
-	DWORD GetSpecs() const { return OBJSPEC_EXPORTVERTEX | OBJSPEC_EXPORTSHADOWMESH | (bCollision ? OBJSPEC_COLLISION : 0); }
-	bool GetGroupSpec (int grp, DWORD &nvtx, DWORD &nidx, LONGLONG &texid,
+	UInt32 GetSpecs() const { return OBJSPEC_EXPORTVERTEX | OBJSPEC_EXPORTSHADOWMESH | (bCollision ? OBJSPEC_COLLISION : 0); }
+	bool GetGroupSpec (int grp, UInt32 &nvtx, UInt32 &nidx, SurfaceName &texid,
 		bool &undershadow, bool &groundshadow);
-	void ExportGroup (int grp, NTVERTEX *vtx, WORD *idx, DWORD &idx_ofs);
+	void ExportGroup (int grp, NTVERTEX *vtx, UInt16 *idx, UInt32 &idx_ofs);
 	Mesh *ExportShadowMesh (double &elev);
-	//bool GetShadowSpec (DWORD &nvtx, DWORD &nidx);
-	//void ExportShadow (VERTEX_XYZ *vtx, WORD *idx);
+	//bool GetShadowSpec (UInt32 &nvtx, UInt32 &nidx);
+	//void ExportShadow (SurfacePoint *vtx, UInt16 *idx);
 	//void UpdateShadow (Vector &fromsun, double az);
 	void Activate ();
 	void Deactivate ();
 
 private:
-	LONGLONG  texid[2];   // texture ids
-	D3DVALUE  tuscale[2], tvscale[2]; // texture scaling factors (mantle and top)
-	DWORD     nstep;      // segments for circle
+	SurfaceName  texid[2];   // texture ids
+	SurfaceScalar  tuscale[2], tvscale[2]; // texture scaling factors (mantle and top)
+	UInt32     nstep;      // segments for circle
 	struct DYNDATA {
 		NTVERTEX *Vtx;      // block vertices
 	} *dyndata;
@@ -314,133 +334,136 @@ private:
 // ======================================================================================
 // class Lpad: base class for landing pads
 
-class Lpad: public BaseObject {
+class ORBITER_PRODUCTION_API Lpad: public BaseObject {
 public:
 	Lpad (const Base *_base);
-	void SetPadno (DWORD no) { padno = no; }
-	DWORD GetPadno () const { return padno; }
+	void SetPadno (UInt32 no) { padno = no; }
+	UInt32 GetPadno () const { return padno; }
 	const Vector &GetPos () const { return relpos; }
 	const float GetILSfreq () const { return ILSfreq; }
 
 protected:
-	DWORD padno;         // pad number
+	UInt32 padno;         // pad number
 	float ILSfreq;       // frequency of pad's VTOL ILS signal transmitter [MHz]
 };
 
 // ======================================================================================
 // class Lpad01: octagonal landing pad
 
-class Lpad01: public Lpad {
+class ORBITER_PRODUCTION_API Lpad01: public Lpad {
 public:
 	Lpad01 (const Base *_base);
 	int ParseLine (const char *label, const char *value);
-	DWORD GetSpecs() const { return OBJSPEC_EXPORTVERTEX | OBJSPEC_LPAD | (bCollision ? OBJSPEC_COLLISION : 0); }
-	bool GetGroupSpec (int grp, DWORD &nvtx, DWORD &nidx, LONGLONG &texid,
+	UInt32 GetSpecs() const { return OBJSPEC_EXPORTVERTEX | OBJSPEC_LPAD | (bCollision ? OBJSPEC_COLLISION : 0); }
+	bool GetGroupSpec (int grp, UInt32 &nvtx, UInt32 &nidx, SurfaceName &texid,
 		bool &undershadow, bool &groundshadow);
-	void ExportGroup (int grp, NTVERTEX *vtx, WORD *idx, DWORD &idx_ofs);
+	void ExportGroup (int grp, NTVERTEX *vtx, UInt16 *idx, UInt32 &idx_ofs);
 
 private:
-	LONGLONG texid;      // texture id
+	SurfaceName texid;      // texture id
 	static NTVERTEX Vtx[44]; // vertex template
-	static WORD Idx[144];     // index template
+	static UInt16 Idx[144];     // index template
 };
 
 // ======================================================================================
 // class Lpad02: square landing pad
 
-class Lpad02: public Lpad {
+class ORBITER_PRODUCTION_API Lpad02: public Lpad {
 public:
 	Lpad02 (const Base *_base);
 	int ParseLine (const char *label, const char *value);
-	DWORD GetSpecs() const { return OBJSPEC_EXPORTVERTEX | OBJSPEC_LPAD | (bCollision ? OBJSPEC_COLLISION : 0); }
-	bool GetGroupSpec (int grp, DWORD &nvtx, DWORD &nidx, LONGLONG &texid,
+	UInt32 GetSpecs() const { return OBJSPEC_EXPORTVERTEX | OBJSPEC_LPAD | (bCollision ? OBJSPEC_COLLISION : 0); }
+	bool GetGroupSpec (int grp, UInt32 &nvtx, UInt32 &nidx, SurfaceName &texid,
 		bool &undershadow, bool &groundshadow);
-	void ExportGroup (int grp, NTVERTEX *vtx, WORD *idx, DWORD &idx_ofs);
+	void ExportGroup (int grp, NTVERTEX *vtx, UInt16 *idx, UInt32 &idx_ofs);
 
 private:
-	LONGLONG texid;      // texture id
+	SurfaceName texid;      // texture id
 	static NTVERTEX Vtx[28]; // vertex template
-	static WORD Idx[60];      // index template
+	static UInt16 Idx[60];      // index template
 };
 
 // ======================================================================================
 // class Lpad02a: square landing pad (variation)
 
-class Lpad02a: public Lpad {
+class ORBITER_PRODUCTION_API Lpad02a: public Lpad {
 public:
 	Lpad02a (const Base *_base);
 	int ParseLine (const char *label, const char *value);
-	DWORD GetSpecs() const { return OBJSPEC_EXPORTVERTEX | OBJSPEC_LPAD | (bCollision ? OBJSPEC_COLLISION : 0); }
-	bool GetGroupSpec (int grp, DWORD &nvtx, DWORD &nidx, LONGLONG &texid,
+	UInt32 GetSpecs() const { return OBJSPEC_EXPORTVERTEX | OBJSPEC_LPAD | (bCollision ? OBJSPEC_COLLISION : 0); }
+	bool GetGroupSpec (int grp, UInt32 &nvtx, UInt32 &nidx, SurfaceName &texid,
 		bool &undershadow, bool &groundshadow);
-	void ExportGroup (int grp, NTVERTEX *vtx, WORD *idx, DWORD &idx_ofs);
+	void ExportGroup (int grp, NTVERTEX *vtx, UInt16 *idx, UInt32 &idx_ofs);
 
 private:
-	LONGLONG texid;      // texture id
+	SurfaceName texid;      // texture id
 	static NTVERTEX Vtx[37]; // vertex template
-	static WORD Idx[96];      // index template
+	static UInt16 Idx[96];      // index template
 };
 
 // ======================================================================================
 // class BeaconArray: line of emissive spheres (implemented as billboards) for
 // runway lighting etc.
 
-class BeaconArray: public BaseObject {
+class ORBITER_PRODUCTION_API BeaconArray: public BaseObject {
 public:
 	BeaconArray (const Base *_base);
-	DWORD GetSpecs() const { return OBJSPEC_RENDERAFTERSHADOW | OBJSPEC_UPDATEVERTEX | (bCollision ? OBJSPEC_COLLISION : 0); }
+	UInt32 GetSpecs() const { return OBJSPEC_RENDERAFTERSHADOW | OBJSPEC_UPDATEVERTEX | (bCollision ? OBJSPEC_COLLISION : 0); }
 	int Read (std::istream &is);
+
+#ifdef _WIN32
 	void Render (LPDIRECT3DDEVICE7 dev, bool day=true);
+#endif
 	void Update ();
 	void Activate ();
 	void Deactivate();
 
 private:
-	D3DVECTOR end1, end2;
-	DWORD count;
+	SurfaceVector end1, end2;
+	UInt32 count;
 	double size;
 	Vector *Pos;
-	POSTEXVERTEX *Vtx;
-	WORD *Idx;
-	DWORD nVtx, nIdx;
-	LPDIRECTDRAWSURFACE7 tex;  // texture to use
+	SurfaceTextureVertex *Vtx;
+	UInt16 *Idx;
+	UInt32 nVtx, nIdx;
+	orbiter::production::PlanetLegacyTexture tex;  // texture to use
 	float col_r, col_g, col_b; // beacon colour
-	D3DMATERIAL7 *lightmat;
+	SurfaceMaterial *lightmat;
 };
 
 // ======================================================================================
 // class Runway: mesh for runway (no lighting)
 
-class Runway: public BaseObject {
+class ORBITER_PRODUCTION_API Runway: public BaseObject {
 	friend class Base;
 public:
 	Runway (const Base *_base);
 	~Runway ();
-	DWORD GetSpecs() const { return OBJSPEC_EXPORTVERTEX | OBJSPEC_RWY | (bCollision ? OBJSPEC_COLLISION : 0); }
-	bool GetGroupSpec (int grp, DWORD &nvtx, DWORD &nidx, LONGLONG &texid,
+	UInt32 GetSpecs() const { return OBJSPEC_EXPORTVERTEX | OBJSPEC_RWY | (bCollision ? OBJSPEC_COLLISION : 0); }
+	bool GetGroupSpec (int grp, UInt32 &nvtx, UInt32 &nidx, SurfaceName &texid,
 		bool &undershadow, bool &groundshadow);
-	void ExportGroup (int grp, NTVERTEX *vtx, WORD *idx, DWORD &idx_ofs);
+	void ExportGroup (int grp, NTVERTEX *vtx, UInt16 *idx, UInt32 &idx_ofs);
 	int Read (std::istream &is);
 	void Activate ();
 	void Deactivate();
 	const float GetILSfreq (int i) const { return ILSfreq[i]; }
 
 private:
-	D3DVECTOR end1, end2;
+	SurfaceVector end1, end2;
 	float ILSfreq[2];
-	DWORD nrwseg;      // number of texture segments in runway mesh
+	UInt32 nrwseg;      // number of texture segments in runway mesh
 	struct RWSEG {                   // runway segment specs
-		DWORD subseg;                // number of sub-segments
-		D3DVALUE len;                // segment length (1=full runway)
-		D3DVALUE tu0, tu1, tv0, tv1; // segment texture coordinates
+		UInt32 subseg;                // number of sub-segments
+		SurfaceScalar len;                // segment length (1=full runway)
+		SurfaceScalar tu0, tu1, tv0, tv1; // segment texture coordinates
 	} *rwseg;
-	D3DVALUE width;    // runway (half-)width [m]
-	LONGLONG texid[1]; // texture ids
+	SurfaceScalar width;    // runway (half-)width [m]
+	SurfaceName texid[1]; // texture ids
 	struct DYNDATA {
-		DWORD nRwVtx;        // number of vertices for runway mesh
-		DWORD nRwIdx;        // number of indices for runway mesh
+		UInt32 nRwVtx;        // number of vertices for runway mesh
+		UInt32 nRwIdx;        // number of indices for runway mesh
 		NTVERTEX *RwVtx;    // list of runway vertices
-		WORD *RwIdx;         // list of runway indices
+		UInt16 *RwIdx;         // list of runway indices
 	} *dyndata;
 };
 
@@ -448,27 +471,30 @@ private:
 // class RunwayLights: standard lighting for runways (using the same techniques
 // as BeaconArray)
 
-class RunwayLights: public BaseObject {
+class ORBITER_PRODUCTION_API RunwayLights: public BaseObject {
 public:
 	RunwayLights (const Base *_base);
 	~RunwayLights ();
 	void Setup ();
-	DWORD GetSpecs() const { return OBJSPEC_RENDERAFTERSHADOW | OBJSPEC_UPDATEVERTEX | (bCollision ? OBJSPEC_COLLISION : 0); }
+	UInt32 GetSpecs() const { return OBJSPEC_RENDERAFTERSHADOW | OBJSPEC_UPDATEVERTEX | (bCollision ? OBJSPEC_COLLISION : 0); }
 	int Read (std::istream &is);
+
+#ifdef _WIN32
 	void Render (LPDIRECT3DDEVICE7 dev, bool day=true);
+#endif
 	void Update ();
 	void Activate ();
 	void Deactivate ();
 
 private:
-	void VertexArray (DWORD count, const Vector &cpos, const Vector &pos, const Vector &ofs, double size, POSTEXVERTEX *&Vtx);
+	void VertexArray (UInt32 count, const Vector &cpos, const Vector &pos, const Vector &ofs, double size, SurfaceTextureVertex *&Vtx);
 	// Calculates the billboard vertices for an array of 'count' beacons, starting at 'pos', each offset from the previous
 	// by 'ofs'. cpos is camera position, 'size' is beacon size, 'Vtx' is the result
 	// The Vtx pointer is moved past the end of the current list on return
 
-	D3DVECTOR end1, end2;
-	DWORD count1;   // number of side line beacons
-	D3DVALUE width; // runway (half-)width [m]
+	SurfaceVector end1, end2;
+	UInt32 count1;   // number of side line beacons
+	SurfaceScalar width; // runway (half-)width [m]
 	struct VASIDATA {                 // parameters for Visual Approach Slope Indicator (VASI)
 		float apprangle;              //    designated approach angle
 		float lightsep;               //    separation between red and white indicator lights
@@ -480,9 +506,9 @@ private:
 		float ofs;                    //    offset from runway end
 	} *papi;
 	struct DYNDATA {
-		DWORD nb_centre, nb_side, nb_approach, nb_end; // number of lights: runway centre, runway side, approach path, runway end
-		DWORD nb_vasi_w, nb_vasi_r;                    // number of white and red VASI approach indicators (if any)
-		DWORD nb_tot, nb_white_night, nb_white_day, nb_red; // number of lights: total, white, red
+		UInt32 nb_centre, nb_side, nb_approach, nb_end; // number of lights: runway centre, runway side, approach path, runway end
+		UInt32 nb_vasi_w, nb_vasi_r;                    // number of white and red VASI approach indicators (if any)
+		UInt32 nb_tot, nb_white_night, nb_white_day, nb_red; // number of lights: total, white, red
 		Vector ref1; // reference point 1 (=end1)
 		Vector ref2; // reference point 2 (=end2)
 		Vector dir;  // unit vector from ref1 to ref2
@@ -496,76 +522,76 @@ private:
 		double flashtime; // time of next strobe light change
 		const double *csun; // pointer to cosine of sun altitude in parent vbase
 		bool night;       // skip runway center and side lines during daytime
-		POSTEXVERTEX *Vtx, *Vtx_white_night, *Vtx_white_day, *Vtx_red, *Vtx_PAPI;
-		WORD *Idx, *Idx_white_night, *Idx_white_day, *Idx_red, *Idx_PAPI_w, *Idx_PAPI_r;
-		DWORD nVtx, nVtx_white_night, nVtx_white_day, nVtx_red;
-		DWORD nIdx, nIdx_white_night, nIdx_white_day, nIdx_red;
-		DWORD PAPIwhite;
-		LPDIRECTDRAWSURFACE7 tex;
+		SurfaceTextureVertex *Vtx, *Vtx_white_night, *Vtx_white_day, *Vtx_red, *Vtx_PAPI;
+		UInt16 *Idx, *Idx_white_night, *Idx_white_day, *Idx_red, *Idx_PAPI_w, *Idx_PAPI_r;
+		UInt32 nVtx, nVtx_white_night, nVtx_white_day, nVtx_red;
+		UInt32 nIdx, nIdx_white_night, nIdx_white_day, nIdx_red;
+		UInt32 PAPIwhite;
+		orbiter::production::PlanetLegacyTexture tex;
 	} *dyndata;
 };
 
 // ======================================================================================
 // class Train: base class for train-type objects (including straight track)
 
-class Train: public BaseObject {
+class ORBITER_PRODUCTION_API Train: public BaseObject {
 public:
 	Train (const Base *_base);
 
 protected:
-	void Init (const D3DVECTOR &_end1, const D3DVECTOR &_end2);
+	void Init (const SurfaceVector &_end1, const SurfaceVector &_end2);
 	void Setup ();
 
-	void SetCabin (DWORD nvtx, const NTVERTEX *ref, NTVERTEX *res,
-		const D3DVECTOR &pos, const D3DVECTOR &ofs);
+	void SetCabin (UInt32 nvtx, const NTVERTEX *ref, NTVERTEX *res,
+		const SurfaceVector &pos, const SurfaceVector &ofs);
 	// Place cabin, defined by vertices 'ref' at position 'pos' (relative
 	// to end1) and return transformed vertices in 'res'
 	// 'ofs' is a translation applied up front
 
-	D3DVALUE MoveCabin (D3DVALUE &pos, D3DVALUE &vel, bool &atmin);
+	SurfaceScalar MoveCabin (SurfaceScalar &pos, SurfaceScalar &vel, bool &atmin);
 	// update cabin position 'pos' and velocity 'vel' and return
 	// the displacement. if 'atmin' is true on exit, the cabin is
 	// at minpos
 
-	D3DVECTOR end1, end2;    // track terminal points in local base coords
-	D3DVECTOR dir;           // direction from end1 to end2
-	D3DVALUE length;         // distance between end1 and end2
-	D3DVALUE minpos, maxpos; // movement limits for train along track
-	D3DVALUE maxspeed;       // max speed [m/s]
-	D3DVALUE slowzone;       // distance over which train decelerates at ends
+	SurfaceVector end1, end2;    // track terminal points in local base coords
+	SurfaceVector dir;           // direction from end1 to end2
+	SurfaceScalar length;         // distance between end1 and end2
+	SurfaceScalar minpos, maxpos; // movement limits for train along track
+	SurfaceScalar maxspeed;       // max speed [m/s]
+	SurfaceScalar slowzone;       // distance over which train decelerates at ends
 
 private:
-	D3DVALUE speedfac;       // aux for cabin movement
+	SurfaceScalar speedfac;       // aux for cabin movement
 };
 
 // ======================================================================================
 // class Train1: monorail-type train
 
-class Train1: public Train {
+class ORBITER_PRODUCTION_API Train1: public Train {
 public:
 	Train1 (const Base *_base);
 	~Train1 ();
 	int Read (std::istream &is);
-	DWORD GetSpecs() const { return OBJSPEC_EXPORTVERTEX | OBJSPEC_EXPORTSHADOW | OBJSPEC_UPDATEVERTEX | (bCollision ? OBJSPEC_COLLISION : 0); }
-	bool GetGroupSpec (int grp, DWORD &nvtx, DWORD &nidx, LONGLONG &_texid,
+	UInt32 GetSpecs() const { return OBJSPEC_EXPORTVERTEX | OBJSPEC_EXPORTSHADOW | OBJSPEC_UPDATEVERTEX | (bCollision ? OBJSPEC_COLLISION : 0); }
+	bool GetGroupSpec (int grp, UInt32 &nvtx, UInt32 &nidx, SurfaceName &_texid,
 		bool &undershadow, bool &groundshadow);
-	void ExportGroup (int grp, NTVERTEX *vtx, WORD *idx, DWORD &idx_ofs);
-	bool GetShadowSpec (DWORD &nvtx, DWORD &nidx);
-	void ExportShadow (VERTEX_XYZ *vtx, WORD *idx);
+	void ExportGroup (int grp, NTVERTEX *vtx, UInt16 *idx, UInt32 &idx_ofs);
+	bool GetShadowSpec (UInt32 &nvtx, UInt32 &nidx);
+	void ExportShadow (SurfacePoint *vtx, UInt16 *idx);
 	void Update ();
 	void UpdateShadow (Vector &fromsun, double az);
 	void Activate ();
 	void Deactivate ();
 
 private:
-	D3DVALUE cpos, cvel;          // cabin position (from p1) and speed
-	LONGLONG texid;               // texture id for cabin and track
-	D3DVALUE tuscale_track;       // texture scaling (for track only)
+	SurfaceScalar cpos, cvel;          // cabin position (from p1) and speed
+	SurfaceName texid;               // texture id for cabin and track
+	SurfaceScalar tuscale_track;       // texture scaling (for track only)
 	NTVERTEX *cabinvtx;           // pointer to exported cabin vertices
-	VERTEX_XYZ *shvtx;            // pointer to exported shadow vertices
+	SurfacePoint *shvtx;            // pointer to exported shadow vertices
 	struct DYNDATA {
 		NTVERTEX *Vtx;            // cabin and track vertices
-		LPDIRECTDRAWSURFACE7 tex; // texture to use
+		orbiter::production::PlanetLegacyTexture tex; // texture to use
 		int tick;                 // render counter
 	} *dyndata;
 };
@@ -573,38 +599,44 @@ private:
 // ======================================================================================
 // class Train2: hangrail-type train
 
-class Train2: public Train {
+class ORBITER_PRODUCTION_API Train2: public Train {
 public:
 	Train2 (const Base *_base);
 	~Train2 ();
 	int Read (std::istream &is);
-	DWORD GetSpecs() const { return OBJSPEC_EXPORTVERTEX | OBJSPEC_EXPORTSHADOW |
+	UInt32 GetSpecs() const { return OBJSPEC_EXPORTVERTEX | OBJSPEC_EXPORTSHADOW |
 		OBJSPEC_RENDERAFTERSHADOW | OBJSPEC_RENDERSHADOW | OBJSPEC_UPDATEVERTEX | (bCollision ? OBJSPEC_COLLISION : 0); }
-	bool GetGroupSpec (int grp, DWORD &nvtx, DWORD &nidx, LONGLONG &_texid,
+	bool GetGroupSpec (int grp, UInt32 &nvtx, UInt32 &nidx, SurfaceName &_texid,
 		bool &undershadow, bool &groundshadow);
-	void ExportGroup (int grp, NTVERTEX *vtx, WORD *idx, DWORD &idx_ofs);
-	bool GetShadowSpec (DWORD &nvtx, DWORD &nidx);
-	void ExportShadow (VERTEX_XYZ *vtx, WORD *idx);
+	void ExportGroup (int grp, NTVERTEX *vtx, UInt16 *idx, UInt32 &idx_ofs);
+	bool GetShadowSpec (UInt32 &nvtx, UInt32 &nidx);
+	void ExportShadow (SurfacePoint *vtx, UInt16 *idx);
 	void Update ();
 	void UpdateShadow (Vector &fromsun, double az);
 	void Activate ();
 	void Deactivate ();
+
+#ifdef _WIN32
 	void Render (LPDIRECT3DDEVICE7 dev, bool day);
+#endif
+
+#ifdef _WIN32
 	void RenderShadow (LPDIRECT3DDEVICE7 dev);
+#endif
 
 private:
-	D3DVALUE height;            // height of supports over ground
-	LONGLONG texid;             // texture id for cabin and track
-	D3DVALUE tuscale_track;     // texture scaling (for track only)
+	SurfaceScalar height;            // height of supports over ground
+	SurfaceName texid;             // texture id for cabin and track
+	SurfaceScalar tuscale_track;     // texture scaling (for track only)
 	NTVERTEX *cabinvtx[2];     // pointers to exported cabin vertices
-	VERTEX_XYZ *shvtx;          // pointer to exported shadow vertices
+	SurfacePoint *shvtx;          // pointer to exported shadow vertices
 	struct DYNDATA {
-		D3DVALUE cpos[2];       // cabin positions (from end1)
-		D3DVALUE cvel[2];		// cabin speeds
+		SurfaceScalar cpos[2];       // cabin positions (from end1)
+		SurfaceScalar cvel[2];		// cabin speeds
 		NTVERTEX *rail;        // girder and traverse vertices
-		VERTEX_XYZ *rshvtx;     // pointer to rail shadow
-		LPDIRECTDRAWSURFACE7 dtex, ntex; // textures to use
-		WORD ng;                // number of girders
+		SurfacePoint *rshvtx;     // pointer to rail shadow
+		orbiter::production::PlanetLegacyTexture dtex, ntex; // textures to use
+		UInt16 ng;                // number of girders
 		int tick;               // render counter
 	} *dyndata;
 };
@@ -612,36 +644,42 @@ private:
 // ======================================================================================
 // SolarPlant: array of solar panels, aligning themselves with the sun
 
-class SolarPlant: public BaseObject {
+class ORBITER_PRODUCTION_API SolarPlant: public BaseObject {
 public:
 	SolarPlant (const Base *_base);
 	~SolarPlant ();
 	int Read (std::istream &is);
-	DWORD GetSpecs() const { return OBJSPEC_RENDERAFTERSHADOW | OBJSPEC_RENDERSHADOW | OBJSPEC_UPDATEVERTEX | (bCollision ? OBJSPEC_COLLISION : 0); }
+	UInt32 GetSpecs() const { return OBJSPEC_RENDERAFTERSHADOW | OBJSPEC_RENDERSHADOW | OBJSPEC_UPDATEVERTEX | (bCollision ? OBJSPEC_COLLISION : 0); }
+
+#ifdef _WIN32
 	void Render (LPDIRECT3DDEVICE7 dev, bool day=true);
+#endif
+
+#ifdef _WIN32
 	void RenderShadow (LPDIRECT3DDEVICE7 dev);
+#endif
 	void Update ();
 	void UpdateShadow (Vector &fromsun, double az);
 	void Activate ();
 	void Deactivate();
 
 private:
-	D3DVECTOR pos;             // position of footprint centre in local base coords
-	D3DVALUE scale;            // scale factor for panels
-	D3DVALUE rot;              // rotation around vertical axis
-	D3DVALUE sepx, sepz;       // panel spacing in x and z direction [m]
+	SurfaceVector pos;             // position of footprint centre in local base coords
+	SurfaceScalar scale;            // scale factor for panels
+	SurfaceScalar rot;              // rotation around vertical axis
+	SurfaceScalar sepx, sepz;       // panel spacing in x and z direction [m]
 	int nrow, ncol;            // number of rows and columns of panel matrix
 	int npanel;                // number of panels in the plant
-	LONGLONG texid;            // texture id
-	D3DVALUE tuscale, tvscale; // texture scaling factors
-	D3DVECTOR *ppos;           // reference positions for each panel
+	SurfaceName texid;            // texture id
+	SurfaceScalar tuscale, tvscale; // texture scaling factors
+	SurfaceVector *ppos;           // reference positions for each panel
 	NTVERTEX *Vtx;            // panel vertices
-	VERTEX_XYZ *ShVtx;         // shadow vertices
-	WORD *Idx, *ShIdx;         // panel and shadow mesh indices
-	DWORD nVtx, nShVtx;        // number of vertices
-	DWORD nIdx, nShIdx;        // number of indices
+	SurfacePoint *ShVtx;         // shadow vertices
+	UInt16 *Idx, *ShIdx;         // panel and shadow mesh indices
+	UInt32 nVtx, nShVtx;        // number of vertices
+	UInt32 nIdx, nShIdx;        // number of indices
 	bool *flash;               // panel flashing in sunlight?
-	LPDIRECTDRAWSURFACE7 tex;  // texture to use
+	orbiter::production::PlanetLegacyTexture tex;  // texture to use
 	Vector nml;                // pointing direction of panels (towards sun)
 	//VBase *vbase;              // associated base visual
 

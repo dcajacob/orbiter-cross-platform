@@ -47,6 +47,28 @@ int NativeCelestialServices::Ephemeris(const CelestialBody& body,double time,int
 {return Interface(body).clbkEphemeris(time,request,result);}
 int NativeCelestialServices::FastEphemeris(const CelestialBody& body,double time,int request,double* result) const
 {return Interface(body).clbkFastEphemeris(time,request,result);}
+int NativeCelestialServices::AtmosphereModel(const CelestialBody& body,ATMCONST& result) const
+{
+    if (!HasModule(body)) return 0;
+    if (auto* atmosphere=Interface(body).GetAtmosphere()) {
+        native::AtmosphereConstants value{};
+        atmosphere->clbkConstants(&value);
+        result={value.p0,value.rho0,value.R,value.gamma,value.C,value.O2pp,value.altlimit,value.radlimit,value.horizonalt,value.color0};
+        return 4;
+    }
+    return 0; // Stock SPICE explicitly selects the advanced atmosphere interface.
+}
+void NativeCelestialServices::AtmosphereParameters(const CelestialBody& body,int model,double altitude,double longitude,double latitude,ATMPARAM& result) const
+{
+    if (model!=4 || !Interface(body).GetAtmosphere())
+        throw std::runtime_error("Unsupported native atmosphere interface for "+std::string(body.Name()));
+    native::AtmosphereInput input;
+    native::AtmosphereOutput output;
+    input.alt=altitude; input.lng=longitude; input.lat=latitude;
+    input.flag=native::Atmosphere::PRM_ALT|native::Atmosphere::PRM_LNG|native::Atmosphere::PRM_LAT;
+    Interface(body).GetAtmosphere()->clbkParams(&input,&output);
+    result.p=output.p;result.rho=output.rho;result.T=output.T;
+}
 std::filesystem::path NativeCelestialServices::GravityModelPath(const char* name) const {return data.Resolve("GravityModels/"+std::string(name));}
 void NativeCelestialServices::ConfigFailure(const std::filesystem::path& path) {throw std::runtime_error("Missing celestial configuration: "+path.string());}
 void NativeCelestialServices::Log(const std::string& message) {std::clog<<message<<'\n';}

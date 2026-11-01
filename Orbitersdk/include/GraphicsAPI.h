@@ -24,23 +24,10 @@ typedef void *HDC;
 const UINT TEXIDX_MFD0 = (UINT)(-1) - MAXMFD;
 
 
-struct SurftileSpec {
-	int res;
-	int texflag;
-	int ilng, ilat;
-	MESHHANDLE mesh;
-	SURFHANDLE tex;
-};
 
 /**
  * \brief Distance fog render parameters
  */
-struct FogParam {
-	double dens_0;   ///< fog density at ground level
-	double dens_ref; ///< fog density at reference altitude
-	double alt_ref;  ///< reference altitude [m]
-	VECTOR3 col;     ///< fog colour
-};
 
 class Orbiter;
 struct IWICImagingFactory;
