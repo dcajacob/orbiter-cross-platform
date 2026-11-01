@@ -14,6 +14,7 @@
 #include "Astro.h"
 #include "Element.h"
 #include "Planet.h"
+#include "Vesselbase.h"
 #include "elevmgr.h"
 #include "Base.h"
 #include "Camera.h"
