@@ -49,7 +49,7 @@ may satisfy a production acceptance case.
 | Capability | Current native implementation | Release requirement / dependency |
 | --- | --- | --- |
 | Vecmat, elements, two-body RK4 | Verified restricted fixtures | Preserve frozen references unchanged |
-| Window/input/procedural view | POC only | Native production window, input and real graphics client |
+| Native window and input | Production external view with camera orbit/zoom; flight-device input pending. Procedural viewer remains a separate POC | Native production window, flight input and real graphics client |
 | Production world and session | Shared frame ordering and actual celestial `PlanetarySystem`, `Body`/`RigidBody`/`CelestialBody`/`Star`/`Planet`/`Base`/`VesselBase`; actual native Vessel/Camera/Session external view added; general application integration pending | Existing lifecycle, shared engine library and platform services |
 | SPICE Solar System | Actual native celestial modules; hosted Windows/Linux Debug/Release direct-callback parity passes, actual native Sol world/external-view integration added | Current `Src/Celbody/SPICE`, CSPICE, `orbiter.bsp`, TLS/PCK and coverage verification |
 | Native module ABI | Internal loader/bootstrap and actual celestial/atmosphere APIs with SDK-build and toolchain checks; checked source-built ShuttlePB/native vessel SDK added | Source-built vessels, celbodies, atmospheres, plugins; version/toolchain check |
@@ -60,7 +60,7 @@ may satisfy a production acceptance case.
 | Propulsion, RCS, atmosphere, docking, contacts | Original native Vessel and atmosphere; component RCS/autopilot and rendered orbit states pass; interactive flight/contact cases pending | Preserve original systems; production references before extraction |
 | HUD/MFD/2D panels/VC/Sketchpad | Unsupported | Original instruments, redraws, surfaces, fonts/TextW, picking and interaction |
 | Lua, tutorials, playback, editor, audio | Unsupported | Bundled modules/scripts and portable views over existing logic |
-| Installation and assets | POC fixture bundle only | Relocatable runtime, native SDK, verified/offline/resumable separate asset installer |
+| Installation and assets | Source-built production preview with explicit verified stock-data roots; POC bundle remains separate | Relocatable runtime, native SDK, verified/offline/resumable separate asset installer |
 
 [Graphics callback inventory](graphics-capabilities.csv) and
 [Sketchpad method inventory](sketchpad-capabilities.csv) explicitly record
@@ -93,8 +93,8 @@ NRLMSISE C package; its author notice is retained.
 | 0 | Honest POC labeling, scope and inventories | Source inventory implemented; no production runtime claim |
 | 1 | Production Windows references and hosted WGL | Accepted: original orbit/propulsion, 14 repeated behavior cases, Debug/Release comparison, hosted WGL and data/resource locks |
 | 2 | Real Windows OpenGL client | Hosted Debug/Release execution passed; actual Sol/ISS/ShuttlePB, deterministic images/states, normal teardown. [Evidence and commands](WindowsClient.md) |
-| 3 | Production engine/platform boundary | In progress: shared production `Body`/`RigidBody`, propagators, frame ordering, CPU mesh objects, scenario metadata and indexed resources. [Scope and remaining gates](EngineBoundary.md). Linux production world build is still required. |
-| 4 | Native real world/external client | Not started; SPICE and actual ISS then native ShuttlePB; cross-platform state/scene parity |
+| 3 | Production engine/platform boundary | Native shared production world, original Vessel/Camera/Session and checked source-built modules now build and run. General application, instrumentation and module coverage remain in progress. [Scope and remaining gates](EngineBoundary.md) |
+| 4 | Native real world/external client | Narrow Sol/ISS/ShuttlePB external view runs on laptop Wayland and hosted Ubuntu 24.04 Debug/Release. Current Windows application/client and frozen state/image/landmark checks pass. General compatibility, repeated in-process sessions and remaining hardware gates are still open. [Evidence](NativeExternalView.md) |
 | 5 | Usable flight and interaction | Not started; propulsion, fuel, all RCS axes, autopilot, docking, contact, persistence |
 | 6 | Cockpit and Delta-glider | Not started; real DG/DG-S 2D/VC, HUD/MFDs, animations and controls |
 | 7 | Practical stock experience | Not started; remaining modules, Lua, audio, scenarios, settings and input configuration |

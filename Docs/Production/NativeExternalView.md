@@ -25,11 +25,46 @@ The manifest records 484 mesh draws and 660,483 mesh indices at capture,
 real textured Earth/Moon archive reads, actual module paths/hashes, and normal
 visual registration, unregistration, 60 presentations and context teardown.
 
-These are local hardware results. Hosted Ubuntu 24.04 Debug/Release and current
-Windows SDK/application/real-client validation are separate CI gates. The
-workflow `native-production-client.yml` executes real windows using Xvfb and
-Mesa llvmpipe; its report verifies the actual reported software renderer and
-loaded library paths. A successful compile does not count as graphics execution.
+These are local hardware results. The separate hosted Ubuntu 24.04 Debug/Release
+gate also passes at source `6a05c4b9148327afe18ee6f7145fba2e6a451c4d` in
+[run 41342846484](https://github.com/dcajacob/orbiter-cross-platform/actions/runs/41342846484).
+Both configurations repeat identically and score **0.9881094596017364** against
+the unchanged Windows image. The workflow `native-production-client.yml` opens
+real X11 windows under Xvfb and Mesa llvmpipe; its report verifies the actual
+reported software renderer and loaded library paths. A successful compile does
+not count as graphics execution.
+
+Current Windows SDK/application/real-client validation passes separately on that
+same source in
+[run 41342846442](https://github.com/dcajacob/orbiter-cross-platform/actions/runs/41342846442).
+Both MSVC configurations build the current application and separate client,
+pass all 21 existing application/SDK tests, execute the real Sol/ISS/ShuttlePB
+scene twice, verify loaded Mesa DLL paths/hashes, and shut down normally.
+The final Windows comparison passes with zero numerical and projected-landmark
+differences and **SSIM 1.0** against the unchanged frozen Windows images.
+
+The hosted artifacts contain both runs' states, images, draw/asset/module
+manifests, lifecycle evidence, failure checks, build logs, caches and licenses:
+
+| Artifact | SHA256 of original ZIP |
+| --- | --- |
+| [Debug](https://github.com/dcajacob/orbiter-cross-platform/actions/runs/41342846484/artifacts/13098088156) | `5533715baba86a97737a227dc69db033e5204b8404149349031d09650c464e26` |
+| [Release](https://github.com/dcajacob/orbiter-cross-platform/actions/runs/41342846484/artifacts/13098575499) | `b0c89460171ea61292f6887f0b337e8ee029a882f1dbbe7b3e8c3df31c191459` |
+
+These GitHub artifacts have 90-day retention. Their recorded hashes identify the
+original hosted archives; they are not new numerical or image references.
+
+The shared engine also passes the full Windows production-reference workflow at
+`391919027ac3e4a4d42f145373c788fc859c32cd` in
+[run 41342204437](https://github.com/dcajacob/orbiter-cross-platform/actions/runs/41342204437):
+both application builds and existing tests, the original two-body checks,
+frozen orbit/propulsion references, fourteen repeated behavior cases,
+Debug/Release numerical/lifecycle comparisons, WGL and planetary archives.
+The following `6a05c4b9` change only repairs the renderer's Windows tile-label
+include boundary; it changes no engine or SDK source. The current
+[portable Linux/Windows matrix](https://github.com/dcajacob/orbiter-cross-platform/actions/runs/41342846514)
+also passes. Local ASan/LSan/UBSan vessel verification and all 29 portable tests
+pass separately; these do not establish GPU sanitizer coverage.
 
 For the prepared laptop build:
 
