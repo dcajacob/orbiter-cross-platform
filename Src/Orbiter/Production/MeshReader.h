@@ -156,7 +156,6 @@ std::istream& ReadMesh(std::istream& is, Sink& mesh)
 			mesh.AddGroup (ownedVertices.release(), nvtx, ownedIndices.release(), nidx, mtrl_idx, tex_idx, zbias);
 			mesh.SetGroupFlags(g, flag, uflag);
 			if (calcnml) mesh.CalcNormals (g, true);
-			if (flag & 0x04) mesh.StaticGroup(g);
 		}
 	}
 

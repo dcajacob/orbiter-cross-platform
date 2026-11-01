@@ -311,7 +311,7 @@ bool Base::InitSurfaceTiles () const
 	float cphi = (float)cos (lng), sphi = (float)sin (lng);
 	float ctht = (float)cos (lat), stht = (float)sin (lat);
 
-	D3DMATRIX R = {(float)rrot.m11, (float)rrot.m12, (float)rrot.m13, 0,
+	orbiter::production::MeshTransform4 R = {(float)rrot.m11, (float)rrot.m12, (float)rrot.m13, 0,
 		           (float)rrot.m21, (float)rrot.m22, (float)rrot.m23, 0,
 				   (float)rrot.m31, (float)rrot.m32, (float)rrot.m33, 0,
 				   0,               0,               0,               1};

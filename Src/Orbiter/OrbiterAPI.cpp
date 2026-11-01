@@ -1551,7 +1551,16 @@ DLLEXPORT int oapiGetMeshGroup (DEVMESHHANDLE hMesh, DWORD grpidx, GROUPREQUESTS
 
 DLLEXPORT int oapiEditMeshGroup (MESHHANDLE hMesh, DWORD grpidx, GROUPEDITSPEC *ges)
 {
-	return ((Mesh*)hMesh)->EditGroup (grpidx, ges);
+	Mesh* mesh=(Mesh*)hMesh;
+	if (grpidx>=mesh->nGroup()) return 1;
+	orbiter::production::MeshGroupEdit edit{};
+	edit.flags=ges->flags;
+	if (ges->flags & (GRPEDIT_SETUSERFLAG|GRPEDIT_ADDUSERFLAG|GRPEDIT_DELUSERFLAG)) edit.UsrFlag=ges->UsrFlag;
+	if (ges->flags & GRPEDIT_VTXMOD) {
+		edit.nVtx=ges->nVtx;
+		if (edit.nVtx) { edit.Vtx=ges->Vtx; edit.vIdx=ges->vIdx; }
+	}
+	return ((Mesh*)hMesh)->EditGroup (grpidx, &edit);
 }
 
 DLLEXPORT int oapiEditMeshGroup (DEVMESHHANDLE hMesh, DWORD grpidx, GROUPEDITSPEC *ges)
@@ -1567,7 +1576,7 @@ DLLEXPORT DWORD oapiMeshMaterialCount (MESHHANDLE hMesh)
 
 DLLEXPORT MATERIAL *oapiMeshMaterial (MESHHANDLE hMesh, DWORD idx)
 {
-	return (MATERIAL*)(((Mesh*)hMesh)->GetMaterial (idx));
+	return ((Mesh*)hMesh)->GetMaterial (idx);
 }
 
 DLLEXPORT int oapiMeshMaterial (DEVMESHHANDLE hMesh, DWORD matidx, MATERIAL *mat)
@@ -1596,8 +1605,7 @@ DLLEXPORT int oapiSetMaterial (DEVMESHHANDLE hMesh, DWORD matidx, const MATERIAL
 
 DLLEXPORT DWORD oapiAddMaterial (MESHHANDLE hMesh, MATERIAL *mat)
 {
-	D3DMATERIAL7 *m = (D3DMATERIAL7*)mat;
-	return ((Mesh*)hMesh)->AddMaterial (*m);
+	return ((Mesh*)hMesh)->AddMaterial (*mat);
 }
 
 DLLEXPORT bool oapiDeleteMaterial (MESHHANDLE hMesh, DWORD idx)

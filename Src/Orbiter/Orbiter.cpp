@@ -37,6 +37,7 @@
 #include "Production/WindowsSession.h"
 #include "Production/WindowsBodyServices.h"
 #include "Production/WindowsRigidBodyServices.h"
+#include "Production/WindowsMeshServices.h"
 #include "Launchpad.h"
 #include "MenuInfoBar.h"
 #include "Dialogs.h"
@@ -293,6 +294,7 @@ VOID DestroyWorld ()
 //-----------------------------------------------------------------------------
 Orbiter::Orbiter ()
 {
+	orbiter::production::BindMeshServices(orbiter::production::WindowsMeshServices(*this));
 	orbiter::production::BindBodyServices(&orbiter::production::GetWindowsBodyServices());
 	orbiter::production::BindRigidBodyServices(&orbiter::production::GetWindowsRigidBodyServices());
 	// override base class defaults
@@ -371,7 +373,9 @@ Orbiter::Orbiter ()
 //-----------------------------------------------------------------------------
 Orbiter::~Orbiter ()
 {
+	meshmanager.Flush();
 	CloseApp ();
+	orbiter::production::BindMeshServices({});
 	orbiter::production::BindRigidBodyServices(nullptr);
 	orbiter::production::BindBodyServices(nullptr);
 }

@@ -48,7 +48,7 @@ may satisfy a production acceptance case.
 | Production world and session | Shared frame ordering and `Body`/`RigidBody`; world loading unavailable | Existing lifecycle, shared engine library and platform services |
 | SPICE Solar System | Unsupported | Current `Src/Celbody/SPICE`, CSPICE, `orbiter.bsp`, TLS/PCK and coverage verification |
 | Native module ABI | Unsupported | Source-built vessels, celbodies, atmospheres, plugins; version/toolchain check |
-| Real stock meshes/materials/animations | Shared CPU parser; world/animation integration unavailable | Existing CPU mesh data separated from D3D resources; actual group identities |
+| Real stock meshes/materials/animations | Production CPU `Mesh`/`MeshManager`; world/animation integration unavailable | Existing CPU mesh data separated from D3D resources; actual group identities |
 | Planet tiles and elevation | Unsupported | Portable fixed-width archives, 64-bit offsets; engine contact queries independent of visibility |
 | Resource resolution | Indexed service; production world integration pending | Indexed Windows-separator/case-insensitive resolver with ambiguous alias errors |
 | Texture loading | Unsupported in production | Signature-based DDS DXT1/3/5 and uncompressed formats; BMP in `.dds` files |
@@ -88,7 +88,7 @@ NRLMSISE C package; its author notice is retained.
 | 0 | Honest POC labeling, scope and inventories | Source inventory implemented; no production runtime claim |
 | 1 | Production Windows references and hosted WGL | Accepted: original orbit/propulsion, 14 repeated behavior cases, Debug/Release comparison, hosted WGL and data/resource locks |
 | 2 | Real Windows OpenGL client | Hosted Debug/Release execution passed; actual Sol/ISS/ShuttlePB, deterministic images/states, normal teardown. [Evidence and commands](WindowsClient.md) |
-| 3 | Production engine/platform boundary | In progress: shared production `Body`/`RigidBody`, propagators, frame ordering, CPU mesh reader and indexed resource service. [Scope and remaining gates](EngineBoundary.md). Linux production world build is still required. |
+| 3 | Production engine/platform boundary | In progress: shared production `Body`/`RigidBody`, propagators, frame ordering, CPU mesh objects and indexed resource service. [Scope and remaining gates](EngineBoundary.md). Linux production world build is still required. |
 | 4 | Native real world/external client | Not started; SPICE and actual ISS then native ShuttlePB; cross-platform state/scene parity |
 | 5 | Usable flight and interaction | Not started; propulsion, fuel, all RCS axes, autopilot, docking, contact, persistence |
 | 6 | Cockpit and Delta-glider | Not started; real DG/DG-S 2D/VC, HUD/MFDs, animations and controls |
@@ -322,5 +322,8 @@ actual published assets. Original frozen input-profile hashes remain unchanged.
 The real separately built Windows `GraphicsClient` now executes with Win32/WGL
 and actual Sol, ISS and ShuttlePB objects, meshes, materials, textures and
 camera/visual callbacks. [The client milestone](WindowsClient.md) records the
-passing scope, reproducible commands and remaining gates. Production engine
-extraction for Linux is next; the restricted POC session remains regression coverage.
+passing scope, reproducible commands and remaining gates. [Production engine
+extraction](EngineBoundary.md) is in progress: the actual `Body`, `RigidBody`,
+propagators and CPU mesh objects build in a shared Windows/Linux library.
+The world, native module SDK and full session still need extraction; the
+restricted POC session remains regression coverage.

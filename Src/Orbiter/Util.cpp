@@ -18,14 +18,6 @@ LONGLONG NameToId (const char *name)
 	return id;
 }
 
-DWORDLONG Str2Crc (const char *str)
-{
-	DWORDLONG crc = 0;
-	for (const char *c = str; *c; c++)
-		crc += (DWORDLONG)*c;
-	return crc;
-}
-
 double rand1()
 {
 	static double irmax = 1.0/(double)RAND_MAX;

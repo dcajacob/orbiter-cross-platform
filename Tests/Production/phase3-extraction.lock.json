@@ -2,7 +2,7 @@
   "schema": 1,
   "production_source": "38b7c627878ea893390675616897071f8bb8e90f",
   "observed_source": "684bd5b27005feecfa9effe796bd216f85e3392f",
-  "scope": "Production frame ordering and Windows service adapters; production Body, RigidBody, original propagators and common math/time/config in the shared library; shared MSHX1/normal reader and native CPU sink; indexed resource service. Not the complete Linux production engine.",
+  "scope": "Shared production Body, RigidBody, original propagators, CPU Mesh/MeshManager and frame ordering; platform services and indexed resources; verbatim SDK mesh value records with original Windows declaration/layout checks. Full production world/module SDK extraction remains incomplete.",
   "required_runtime_gates": [
     "frozen two-body reference",
     "frozen production orbit/propulsion",
@@ -22,6 +22,10 @@
       "sha256_lf": "5ef35a807b235d37e9babc956db3b04b225f42929777af3e193809c21fa2a6b7",
       "original_sha256_lf": "d3d119bb989d226f32498a710e8b77fa89b0d4cc9c05581a3a7a039777d95152"
     },
+    "Src/Orbiter/Base.cpp": {
+      "sha256_lf": "a2ede4739b2449d136c115132535c4fb7555bcda78501dbbcc2b5fc2ad6a7df5",
+      "original_sha256_lf": "ce6b643602698127535b65776dcfc4f1f06e6febe6616b65093c867874da8a51"
+    },
     "Src/Orbiter/Base.h": {
       "sha256_lf": "d325c109167083f3b3cd520639298592bdecde920371bfd8ce719788273faea8",
       "original_sha256_lf": "943cee3b46afc99efa635df5a6eee53e3e26098a3ad2f5bea6fa95406ce96261"
@@ -39,7 +43,7 @@
       "original_sha256_lf": "8899635492ca087f2ad7532555b4bbdf557bb4ca4c736136adec4d68936325d5"
     },
     "Src/Orbiter/CMakeLists.txt": {
-      "sha256_lf": "dc7b50ea52a2e126916d732c822c2e028c3b8d95cdffde125ace2f61b30729ab",
+      "sha256_lf": "99297acbb8190b533c78417715f9981cb26edc841feecb59f4bde017fe457750",
       "original_sha256_lf": "4ba30d001a975912a85b238851629fb999e483d8b2ba1974eb9bef9e9beb60ac"
     },
     "Src/Orbiter/Config.cpp": {
@@ -59,20 +63,24 @@
       "original_sha256_lf": "c71206d9041fd9e026f1934dc59197e1a28a62fefab3cdf2fe153567a81a891e"
     },
     "Src/Orbiter/Mesh.cpp": {
-      "sha256_lf": "774871d665c016049a015ff81ec4d75bedce4a240acac5a5ae7a927baa28c4c6",
+      "sha256_lf": "aca808c838608090752e34c62e29ffcb9cca3337efe2c7c21744b7329c6b9c2d",
       "original_sha256_lf": "5bef72bc1069528e33231ee1df66be3f424d1d1c6863b653c36d351f8d1a1c44"
     },
     "Src/Orbiter/Mesh.h": {
-      "sha256_lf": "667cab3dc9926d78d7c13532e3b40e2d63cd3b13f1ab01c16632f5db0fc9dbc2",
+      "sha256_lf": "fb6af3f2c3f6d146fed564945e4a47f51003a8e5a6cdd2b17cc52c48bb2b4030",
       "original_sha256_lf": "fb4c1f4a5bec410ff05d635cd547bd6b2067ed5d26faba315248e2ae2abd3284"
     },
     "Src/Orbiter/Orbiter.cpp": {
-      "sha256_lf": "d9fb6c84685e2c4e76ba7667f7e4e7a7cb7d4c093b6927c7c375000a38dd6ac6",
+      "sha256_lf": "f80951386ab42394bac1199eeab4f87721b08fce26754b3a992ef020ceada5cc",
       "original_sha256_lf": "d9bcee218c141dc3896d599a3e25323f84d1259bc2aa209e752eb8c03ea4b298"
     },
     "Src/Orbiter/Orbiter.h": {
-      "sha256_lf": "f4310419b6a5c2e957aec05d1611eb174814aa1a875529326220a62b95203a90",
+      "sha256_lf": "9c1997db0140d320ec7d6804290e3d001ae218fd29fb53642626cbc71c47787a",
       "original_sha256_lf": "32db52be7f0355c383d7ae8f4fd033170e3c13c272bd11a4c0be9453d25dd297"
+    },
+    "Src/Orbiter/OrbiterAPI.cpp": {
+      "sha256_lf": "61acb3ba908226079c6faa72ff75a6eee83fa991fe8a3184286a71116f2a2d2e",
+      "original_sha256_lf": "6ab4e355f274bda7296d794e45e38ad9f1cc5a051dd1d40eea14b55d6412dbb2"
     },
     "Src/Orbiter/PhysicsConfig.h": {
       "sha256_lf": "7657a6aa0fe6427a734aaabaa8fc5eb26edd615cc73360eaf22a45a53eb86ff8",
@@ -87,7 +95,11 @@
       "original_sha256_lf": null
     },
     "Src/Orbiter/Production/CMakeLists.txt": {
-      "sha256_lf": "ccaab12433515e45271174b1009eaf4585452fc692aa52c817bb7c59e1e0ebc7",
+      "sha256_lf": "bc4050f2c3d0d2b5313fb17626be0eb9b8222c145fe02e2b533e21501ea0e605",
+      "original_sha256_lf": null
+    },
+    "Src/Orbiter/Production/CoreTypes.h": {
+      "sha256_lf": "9357fe8bf99700ee83add3ad0e61d6137c61a74185bb01601c11f3ddf06fcb86",
       "original_sha256_lf": null
     },
     "Src/Orbiter/Production/Export.h": {
@@ -95,11 +107,15 @@
       "original_sha256_lf": null
     },
     "Src/Orbiter/Production/MeshData.cpp": {
-      "sha256_lf": "49f05f32980a651a7bb302cb5eedc25fb6187eee36588dd752cd3465c0fe6481",
+      "sha256_lf": "770ed32c52f75f391a9c629f4bc6129a0897d4bbb4319998cbb8dabd2f0e2a29",
       "original_sha256_lf": null
     },
     "Src/Orbiter/Production/MeshData.h": {
       "sha256_lf": "93c1deeeeefb72ca46cce5b46f1e3ce4e3a7e7ae4d3fa37938b44b934e4721d7",
+      "original_sha256_lf": null
+    },
+    "Src/Orbiter/Production/MeshEditFlags.h": {
+      "sha256_lf": "6443b3502e92c365513b479f6a668eba2188dc73c8ea40f4d6cadc22d910bcd8",
       "original_sha256_lf": null
     },
     "Src/Orbiter/Production/MeshNormals.h": {
@@ -107,7 +123,19 @@
       "original_sha256_lf": null
     },
     "Src/Orbiter/Production/MeshReader.h": {
-      "sha256_lf": "e42401e41e097c77c54b21208751c52ac1c1265cc570e0c95363109678820e71",
+      "sha256_lf": "5d4a203f9117a98b1f9ead54469e33f69498a0fea525db557b32fb538ccf1f86",
+      "original_sha256_lf": null
+    },
+    "Src/Orbiter/Production/MeshServices.cpp": {
+      "sha256_lf": "f896afde7f0bfbc59465284ae2a8c662f53d39b5cec5678128cd0edabd1ed55f",
+      "original_sha256_lf": null
+    },
+    "Src/Orbiter/Production/MeshServices.h": {
+      "sha256_lf": "6fe52793805232caedab64eb885e632cbb0d9caf1e1212ac614ed76d8bd7819d",
+      "original_sha256_lf": null
+    },
+    "Src/Orbiter/Production/MeshTypes.h": {
+      "sha256_lf": "e89d6443b245a68e4540037c1243cf7a44872729f70a9c72f910f71058be3033",
       "original_sha256_lf": null
     },
     "Src/Orbiter/Production/ResourceResolver.cpp": {
@@ -142,6 +170,14 @@
       "sha256_lf": "3ea6a9e55c9344328d3257ceb3f610745e1aa6e0b575a1968507c2ae51ef9077",
       "original_sha256_lf": null
     },
+    "Src/Orbiter/Production/WindowsMeshServices.cpp": {
+      "sha256_lf": "3e525b2bd048c8700acfa604f07c5daee7c320a9e5ca00598cebaa35d77fc819",
+      "original_sha256_lf": null
+    },
+    "Src/Orbiter/Production/WindowsMeshServices.h": {
+      "sha256_lf": "025cc4d9116258a0e901e3b22e5a9b0a1f3ab7329f6abaff5d6c146d8c3f701c",
+      "original_sha256_lf": null
+    },
     "Src/Orbiter/Production/WindowsRigidBodyServices.cpp": {
       "sha256_lf": "ad22114d653054c88b1a94ec19fd58feff1862276b9d47c8b34ac04f649070ca",
       "original_sha256_lf": null
@@ -165,6 +201,10 @@
     "Src/Orbiter/Rigidbody.h": {
       "sha256_lf": "f128be10c0f09d39de4c72158e805d519d41d18a898022b41dffad812c9319ed",
       "original_sha256_lf": "f10bca653c79c1ecb860e5ad89cc6aa777c552c62563cb44bdc8b1701e0e0049"
+    },
+    "Src/Orbiter/Util.cpp": {
+      "sha256_lf": "6c9abbc82805d6bd172c17ad0258f01c6d0b30cbb2e629e4640d6f46d9d27c4a",
+      "original_sha256_lf": "ab2627599b997f2cf56f6536801ecd59e1374181bfa14a6416a6dbbac00198e2"
     },
     "Src/Orbiter/Vessel.h": {
       "sha256_lf": "0f68f0f481b62ccbf6393ac530d419d826d5c6e894ef53a09d2bcfc44a6b5e2c",

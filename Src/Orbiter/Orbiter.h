@@ -11,6 +11,7 @@
 #include <stdio.h>
 #include <commctrl.h>
 #include "Mesh.h"
+#include "D3dmath.h"
 #include "TimeData.h"
 #include "PhysicsTrace.h"
 #include <chrono>

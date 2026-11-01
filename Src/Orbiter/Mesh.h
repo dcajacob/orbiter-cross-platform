@@ -2,29 +2,40 @@
 // Licensed under the MIT License
 
 // =======================================================================
-// Classes to support meshes under D3D:
+// Production CPU mesh data and operations:
 // Triangle, Mesh
 // =======================================================================
 
 #ifndef __MESH_H
 #define __MESH_H
 
-#define OAPI_IMPLEMENTATION
-#include <d3d.h>
-#include <d3dtypes.h>
 #include <iostream>
-#include "OrbiterAPI.h"
+#include <vector>
+#include "OrbiterMeshData.h"
+#include "Production/MeshServices.h"
+#include "Production/MeshTypes.h"
+#include "Production/MeshEditFlags.h"
+#include "Production/MeshData.h"
+using orbiter::production::UInt32;
+using orbiter::production::UInt16;
+using orbiter::production::UInt64;
+using orbiter::production::MeshSurface;
+using orbiter::production::MeshVector3;
+using orbiter::production::MeshTransform4;
+using orbiter::production::MeshGroupRequest;
+using orbiter::production::MeshGroupEdit;
+using orbiter::production::MeshExtraTextures;
 
 typedef char Str256[256];
 
-const DWORD SPEC_DEFAULT = (DWORD)(-1); // "default" material/texture flag
-const DWORD SPEC_INHERIT = (DWORD)(-2); // "inherit" material/texture flag
+const UInt32 SPEC_DEFAULT = (UInt32)(-1); // "default" material/texture flag
+const UInt32 SPEC_INHERIT = (UInt32)(-2); // "inherit" material/texture flag
 
 // =======================================================================
 // Class Triangle
 // triangular surface patch
 
-class Triangle {
+class ORBITER_PRODUCTION_API Triangle {
 public:
 	Triangle ();
 	Triangle (const Triangle &tri);
@@ -44,30 +55,29 @@ public:
 
 typedef struct {
 	NTVERTEX  *Vtx;
-	WORD      *Idx;
-	DWORD     nVtx;
-	DWORD     nIdx;
-	DWORD     MtrlIdx;
-	DWORD     TexIdx;
-	DWORD     UsrFlag;
-	WORD      zBias;
-	WORD      Flags;
-	DWORD     TexIdxEx[MAXTEX];
-	float     TexMixEx[MAXTEX];
-	LPDIRECT3DVERTEXBUFFER7 VtxBuf;
+	UInt16      *Idx;
+	UInt32     nVtx;
+	UInt32     nIdx;
+	UInt32     MtrlIdx;
+	UInt32     TexIdx;
+	UInt32     UsrFlag;
+	UInt16      zBias;
+	UInt16      Flags;
+	UInt32     TexIdxEx[MeshExtraTextures];
+	float     TexMixEx[MeshExtraTextures];
 } GroupSpec;
 
 // =======================================================================
 // Class Mesh
 
-class Mesh {
-	friend class WindowsMeshSink;
+class ORBITER_PRODUCTION_API Mesh {
+	friend class EngineMeshSink;
 public:
 	Mesh ();
 	// Create an empty mesh
 
-	Mesh (NTVERTEX *vtx, DWORD nvtx, WORD *idx, DWORD nidx,
-		DWORD matidx = SPEC_DEFAULT, DWORD texidx = SPEC_DEFAULT);
+	Mesh (NTVERTEX *vtx, UInt32 nvtx, UInt16 *idx, UInt32 nidx,
+		UInt32 matidx = SPEC_DEFAULT, UInt32 texidx = SPEC_DEFAULT);
 	// Create a single-group mesh
 
 	Mesh (const Mesh &mesh);
@@ -84,123 +94,112 @@ public:
 	const char* GetName() const;
 	void SetName(const char* name);
 
-	DWORD GetFlags () const { return Flags; }
-	void SetFlags (DWORD flags) { Flags = flags; }
+	UInt32 GetFlags () const { return Flags; }
+	void SetFlags (UInt32 flags) { Flags = flags; }
 
-	void SetupGroup (DWORD grp);
+	void SetupGroup (UInt32 grp);
 	// Re-apply setup for a particular group (e.g. after transformation)
 
-	inline DWORD nGroup() const { return nGrp; }
+	inline UInt32 nGroup() const { return nGrp; }
 	// Number of groups
 
-	inline DWORD nMaterial() const { return nMtrl; }
+	inline UInt32 nMaterial() const { return nMtrl; }
 	// Number of materials
 
-	inline DWORD nTexture() const { return nTex; }
+	inline UInt32 nTexture() const { return nTex; }
+	const std::vector<orbiter::production::MeshTexture>& TextureSources() const { return textureSources; }
 	// Number of textures
 
-	inline GroupSpec *GetGroup (DWORD grp) { return (grp < nGrp ? Grp+grp : 0); }
+	inline GroupSpec *GetGroup (UInt32 grp) { return (grp < nGrp ? Grp+grp : 0); }
 	// return a pointer to the group specification for group grp
 
-	inline DWORD GetGroupUsrFlag (DWORD grp) const { return (grp < nGrp ? Grp[grp].UsrFlag : 0); }
+	inline UInt32 GetGroupUsrFlag (UInt32 grp) const { return (grp < nGrp ? Grp[grp].UsrFlag : 0); }
 	// return the user-defined flag for group grp
 
-	int AddGroup (NTVERTEX *vtx, DWORD nvtx, WORD *idx, DWORD nidx,
-		DWORD mtrl_idx = SPEC_INHERIT, DWORD tex_idx = SPEC_INHERIT,
-		WORD zbias = 0, DWORD flag = 0, bool deepcopy = false);
+	int AddGroup (NTVERTEX *vtx, UInt32 nvtx, UInt16 *idx, UInt32 nidx,
+		UInt32 mtrl_idx = SPEC_INHERIT, UInt32 tex_idx = SPEC_INHERIT,
+		UInt16 zbias = 0, UInt32 flag = 0, bool deepcopy = false);
 	// Add new group to the mesh and return its group index
 	// The vtx and idx lists must have been dynamically allocated. They
 	// are shallow-copied, and the mesh takes ownership.
 	// The calling program must not delete them.
 
-	bool AddGroupBlock (DWORD grp, const NTVERTEX *vtx, DWORD nvtx, const WORD *idx, DWORD nidx);
+	bool AddGroupBlock (UInt32 grp, const NTVERTEX *vtx, UInt32 nvtx, const UInt16 *idx, UInt32 nidx);
 	// Add geometry (vertices and indices) to an existing group.
 	// Indices (idx) are zero-based. When adding them to the group, index
 	// offsets are added automatically.
 
-	bool DeleteGroup (DWORD grp);
+	bool DeleteGroup (UInt32 grp);
 	// Delete group 'grp'. Note that the indices of the other
 	// groups may change as a result.
 	// Return value is false if grp index is out of range
 
-	int GetGroup (DWORD grp, GROUPREQUESTSPEC *grs);
+	int GetGroup (UInt32 grp, MeshGroupRequest *grs);
 	// retrieve vertex and index data (deep copy)
 
-	int EditGroup (DWORD grp, GROUPEDITSPEC *ges);
+	int EditGroup (UInt32 grp, MeshGroupEdit *ges);
 	// edit/replace parts of the group
-
-	bool MakeGroupVertexBuffer (DWORD grp);
-	// copy the group vertex information into a vertex buffer in video memory
-	// Ignored if the device has no T&L capability
 
 	void AddMesh (Mesh &mesh);
 	// Merge "mesh" into "this", by adding all groups of "mesh"
 	// Currently this does not use the materials and textures of "mesh"
 
-	inline D3DMATERIAL7 *GetMaterial (DWORD matidx)
+	inline MATERIAL *GetMaterial (UInt32 matidx)
 	{ return (matidx < nMtrl ? Mtrl+matidx : 0); }
 	// return a material pointer
 
-	int AddMaterial (D3DMATERIAL7 &mtrl);
+	int AddMaterial (MATERIAL &mtrl);
 	// Add new material to the mesh and return its list index
 
-	bool DeleteMaterial (DWORD matidx);
+	bool DeleteMaterial (UInt32 matidx);
 	// Delete material with index 'matidx' from the list. Any groups
 	// using that material are reset to material 0. Any group material
 	// indices > matidx are decremented to account for changed list
 
-	int AddTexture (SURFHANDLE tex);
+	int AddTexture (MeshSurface tex);
 	// Add new texture to the mesh and return its list index
 	// If the texture exists already, it is not added again, but the index
 	// of the existing texture is returned
 
-	bool SetTexture (DWORD texidx, SURFHANDLE tex, bool release_old = true);
+	bool SetTexture (UInt32 texidx, MeshSurface tex, bool release_old = true);
 	// replace a texture
 
-	inline LPDIRECTDRAWSURFACE7 GetTexture (DWORD texidx)
-	{ return (texidx < nTex ? (LPDIRECTDRAWSURFACE7)Tex[texidx] : 0); }
+	inline MeshSurface GetTexture (UInt32 texidx)
+	{ return (texidx < nTex ? Tex[texidx] : 0); }
 	// return a texture pointer
 
-	void SetTexMixture (DWORD grp, DWORD ntex, float mix);
-	void SetTexMixture (DWORD ntex, float mix);
+	void SetTexMixture (UInt32 grp, UInt32 ntex, float mix);
+	void SetTexMixture (UInt32 ntex, float mix);
 
-	void ScaleGroup (DWORD grp, D3DVALUE sx, D3DVALUE sy, D3DVALUE sz);
-	void Scale (D3DVALUE sx, D3DVALUE sy, D3DVALUE sz);
+	void ScaleGroup (UInt32 grp, float sx, float sy, float sz);
+	void Scale (float sx, float sy, float sz);
 	// scale an individual group or the whole mesh
 
-	void TranslateGroup (DWORD grp, D3DVALUE dx, D3DVALUE dy, D3DVALUE dz);
-	void Translate (D3DVALUE dx, D3DVALUE dy, D3DVALUE dz);
+	void TranslateGroup (UInt32 grp, float dx, float dy, float dz);
+	void Translate (float dx, float dy, float dz);
 	// translate an individual group or the whole mesh
 
 	enum RotAxis { ROTATE_X, ROTATE_Y, ROTATE_Z };
-	void RotateGroup (DWORD grp, RotAxis axis, D3DVALUE angle);
-	void Rotate (RotAxis axis, D3DVALUE angle);
+	void RotateGroup (UInt32 grp, RotAxis axis, float angle);
+	void Rotate (RotAxis axis, float angle);
 	// rotate the mesh 'angle' rad around a coordiate axis
 
-	void TransformGroup (DWORD grp, const D3DMATRIX &mat);
-	void Transform (const D3DMATRIX &mat);
+	void TransformGroup (UInt32 grp, const MeshTransform4 &mat);
+	void Transform (const MeshTransform4 &mat);
 	// rotate mesh using the provided rotation matrix
 
-	void TexScaleGroup (DWORD grp, D3DVALUE su, D3DVALUE sv);
-	void TexScale (D3DVALUE su, D3DVALUE sv);
+	void TexScaleGroup (UInt32 grp, float su, float sv);
+	void TexScale (float su, float sv);
 	// scale the texture coordinates of an individual group or the whole mesh
 
-	void CalcNormals (DWORD grp, bool missingonly);
+	void CalcNormals (UInt32 grp, bool missingonly);
 	// automatic calculation of vertex normals for group grp
 	// if missingonly=true then only normals with zero length are calculated
 
-	void CalcTexCoords (DWORD grp);
+	void CalcTexCoords (UInt32 grp);
 	// under construction
 
 	void Clear ();
-
-	DWORD Render (LPDIRECT3DDEVICE7 dev);
-	// render the mesh using device dev
-	// return value is the number of rendered groups
-
-	void RenderGroup (LPDIRECT3DDEVICE7 dev, DWORD grp, bool setstate = true) const;
-	// render a single mesh group
-	// if setstate=false, the group render parameters are skipped
 
 	static void GlobalEnableSpecular (bool enable);
 	void EnableMatAlpha (bool enable);
@@ -216,19 +215,20 @@ protected:
 	// Release textures acquired by the mesh
 
 private:
-	DWORD nGrp;         // number of groups
+	UInt32 nGrp;         // number of groups
 	GroupSpec *Grp;     // list of group specs	
 
-	DWORD nMtrl;        // number of materials
-	D3DMATERIAL7 *Mtrl; // list of materials used by the mesh
+	UInt32 nMtrl;        // number of materials
+	MATERIAL *Mtrl; // list of materials used by the mesh
 
-	DWORD nTex;         // number of textures
-	SURFHANDLE *Tex;    // list of textures used by the mesh
+	UInt32 nTex;         // number of textures
+	MeshSurface *Tex;    // host-owned texture handles
+	std::vector<orbiter::production::MeshTexture> textureSources;
 
 	bool GrpSetup;      // true if the following arrays are allocated
-	D3DVECTOR *GrpCnt;  // list of barycentres for each group (local coords)
-	D3DVALUE *GrpRad;   // list of max. radii for each group
-	DWORD *GrpVis;      // visibility flags for each group
+	MeshVector3 *GrpCnt;  // list of barycentres for each group (local coords)
+	float *GrpRad;   // list of max. radii for each group
+	UInt32 *GrpVis;      // visibility flags for each group
 	char* name;
 
 	// global mesh flags
@@ -236,7 +236,7 @@ private:
 	bool bModulateMatAlpha;
 	// modulate material alpha with texture alpha (if disabled, any groups
 	// that use textures ignore the material alpha values)
-	DWORD Flags;        // bit | effect
+	UInt32 Flags = 0;    // bit | effect
 	                    // 0   | set: mesh casts shadow (used for base object meshes)
 						// 1   | set: use global shadow flag (bit 0) for all groups; unset: use individual group flags
 };
@@ -244,7 +244,7 @@ private:
 // =======================================================================
 // Class MeshManager: globally managed meshes
 
-class MeshManager {
+class ORBITER_PRODUCTION_API MeshManager {
 public:
 	MeshManager();
 	~MeshManager();
@@ -258,7 +258,7 @@ public:
 private:
 	struct MeshBuffer {
 		Mesh *mesh;
-		DWORDLONG crc;
+		UInt64 crc;
 		char fname[32];
 	} *mlist;
 	int nmlist, nmlistbuf;

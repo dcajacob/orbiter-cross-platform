@@ -21,12 +21,12 @@ set(common_src
 	Input.cpp
 	Keymap.cpp
 	LightEmitter.cpp
-	Mesh.cpp
 	Nav.cpp
 	Orbiter.cpp
 	Production/WindowsSession.cpp
 	Production/WindowsBodyServices.cpp
 	Production/WindowsRigidBodyServices.cpp
+	Production/WindowsMeshServices.cpp
 	PlaybackEd.cpp
 	Psys.cpp
 	Script.cpp

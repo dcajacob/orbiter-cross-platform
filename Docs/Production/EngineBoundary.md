@@ -55,8 +55,28 @@ records from `OrbiterMeshData.h`. Their declarations are extracted verbatim from
 the Windows SDK. The source audit reconstructs the original SDK header around
 that extraction and rejects other changes to its declarations. Independent
 layout checks enforce all field offsets, sizes and alignment on both platforms.
-This provides shared value records, not a native vessel/module SDK. The complete
-engine `Mesh` object and its device-resource separation remain to be extracted.
+This provides shared value records, not a native vessel/module SDK.
+
+The actual production `Mesh` and `MeshManager` now compile in the shared library.
+Geometry, group edits, transforms, normals, materials and cache behavior use
+their original calculations. The disabled Direct3D vertex-buffer field and
+unimplemented device-rendering functions are removed from the CPU object; GPU
+buffers remain renderer-owned. Textures are opaque host resources, with declared
+source names/flags retained as CPU metadata. File access, texture acquisition,
+release, allocation diagnostics and error reporting use an explicit host callback
+table. The Windows table calls the original application and graphics client.
+Default mesh flags are initialized to zero instead of exposing uninitialized
+memory. The SDK material API now accesses actual `MATERIAL` storage directly.
+
+Windows adapters check every group field's type and offset against the SDK,
+as well as every edit-mask value. The SDK edit adapter retains the original
+out-of-range behavior and only reads fields selected by its flags. Tests load
+the real stock ShuttlePB through `MeshManager`, verify deep geometry copies,
+indexed edits, transforms, material ownership, source identities, caching,
+missing-resource failures and host resource callbacks. These CPU tests do not
+substitute for actual graphics-client execution.
+Partially parsed meshes are rejected before caching and released even when the
+host's error callback throws.
 
 `ResourceResolver` indexes an explicit resource root, normalizes stock Windows
 separators and ASCII case, preserves actual filename spelling, and rejects
@@ -99,5 +119,5 @@ budgets are unchanged. Neither inherited disabled workflow is modified.
 Remaining Phase 3 work includes production world/session ownership and teardown,
 configuration/scenario/resource integration, platform service separation for
 `CelestialBody`, `Vessel` and `Camera`, instrumentation dependencies and the source-built native SDK/module
-boundary. A shared coordinator and CPU asset reader do not satisfy the Phase 3
+boundary. These shared components do not yet satisfy the Phase 3
 exit gate that Linux builds the production engine and its authoritative objects.

@@ -39,9 +39,6 @@ public:
         CalculateMeshNormals(g.vertices.data(), g.indices.data(),
             static_cast<int>(g.vertices.size()), static_cast<int>(g.indices.size()/3), missingOnly);
     }
-    // STATIC is retained as CPU metadata. GPU buffer creation belongs to the
-    // renderer; it is neither attempted nor reported as successful here.
-    void StaticGroup(int) {}
     void AddMaterial(const Material& material) { data.materials.push_back(material); }
     void ReleaseTextures() { data.textures.clear(); }
     void CreateTextures(int count) { data.textures.resize(count); }
