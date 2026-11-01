@@ -10,6 +10,14 @@
     "Windows Debug/Release real client against frozen Phase 2 scene/image"
   ],
   "files": {
+    "Orbitersdk/include/OrbiterAPI.h": {
+      "sha256_lf": "efe60bd70823ac4041e461e3189b85e9016ffaf34b1151441e3e6816bb4e1b07",
+      "original_sha256_lf": "3425025c178218dce10bf7b8edf296dfe7eda8f171d925aca622a7534735fd31"
+    },
+    "Orbitersdk/include/OrbiterMeshData.h": {
+      "sha256_lf": "5ba232bc40f466d21106d3253f78ce3f5bfa307e8926406a857cc344d4701e67",
+      "original_sha256_lf": null
+    },
     "Src/ClientNative/CMakeLists.txt": {
       "sha256_lf": "5ef35a807b235d37e9babc956db3b04b225f42929777af3e193809c21fa2a6b7",
       "original_sha256_lf": "d3d119bb989d226f32498a710e8b77fa89b0d4cc9c05581a3a7a039777d95152"
@@ -91,7 +99,7 @@
       "original_sha256_lf": null
     },
     "Src/Orbiter/Production/MeshData.h": {
-      "sha256_lf": "77a2ce16c54b1e95982ef0a57e22eb13eac0ed6af42b11c7e157999e5c053b48",
+      "sha256_lf": "93c1deeeeefb72ca46cce5b46f1e3ce4e3a7e7ae4d3fa37938b44b934e4721d7",
       "original_sha256_lf": null
     },
     "Src/Orbiter/Production/MeshNormals.h": {

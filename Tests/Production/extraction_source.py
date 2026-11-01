@@ -10,6 +10,7 @@ import hashlib
 import json
 from pathlib import Path
 import subprocess
+import re
 
 ROOT = Path(__file__).resolve().parents[2]
 CAPTURE = '684bd5b27005feecfa9effe796bd216f85e3392f'
@@ -46,6 +47,21 @@ def verify():
             raise ValueError('extraction ledger does not match source: '+name)
         if entry['original_sha256_lf'] is not None and checksum(git('show', CAPTURE+':'+name)) != entry['original_sha256_lf']:
             raise ValueError('original extraction source changed: '+name)
+    mesh_records=ROOT/'Orbitersdk/include/OrbiterMeshData.h'
+    if mesh_records.exists():
+        original=git('show', CAPTURE+':Orbitersdk/include/OrbiterAPI.h').replace(b'\r\n',b'\n')
+        extracted=mesh_records.read_bytes().replace(b'\r\n',b'\n')
+        ranges=[]
+        for name in (b'COLOUR4',b'NTVERTEX',b'MATERIAL'):
+            block=re.search(rb'typedef struct \{(?:(?!typedef struct \{).)*?\} '+name+rb';',original,re.S)
+            if not block or extracted.count(block[0])!=1:
+                raise ValueError('public mesh SDK record was not conserved verbatim: '+name.decode())
+            ranges.append((original.rfind(b'/**',0,block.start()),block.end()))
+        expected=original
+        for index,(start,end) in reversed(list(enumerate(ranges))):
+            expected=expected[:start]+(b'#include "OrbiterMeshData.h"' if index==0 else b'')+expected[end:]
+        if expected!=(ROOT/'Orbitersdk/include/OrbiterAPI.h').read_bytes().replace(b'\r\n',b'\n'):
+            raise ValueError('Windows SDK changed beyond the verbatim mesh record extraction')
     print('Verified original observation-only source and', len(declared),
           'explicit extraction files; frozen runtime references remain required')
 

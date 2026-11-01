@@ -50,6 +50,14 @@ resources. Three-coordinate untextured vertices and CRLF input are supported,
 as required by the original stock meshes. Negative geometry counts, truncated
 geometry and invalid indices fail rather than being dereferenced.
 
+The shared reader uses the SDK's actual `NTVERTEX`, `COLOUR4` and `MATERIAL`
+records from `OrbiterMeshData.h`. Their declarations are extracted verbatim from
+the Windows SDK. The source audit reconstructs the original SDK header around
+that extraction and rejects other changes to its declarations. Independent
+layout checks enforce all field offsets, sizes and alignment on both platforms.
+This provides shared value records, not a native vessel/module SDK. The complete
+engine `Mesh` object and its device-resource separation remain to be extracted.
+
 `ResourceResolver` indexes an explicit resource root, normalizes stock Windows
 separators and ASCII case, preserves actual filename spelling, and rejects
 conflicting file **or directory** aliases. Missing resources, paths escaping

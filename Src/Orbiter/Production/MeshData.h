@@ -2,18 +2,16 @@
 #ifndef ORBITER_PRODUCTION_MESH_DATA_H
 #define ORBITER_PRODUCTION_MESH_DATA_H
 #include "Export.h"
+#include "OrbiterMeshData.h"
 #include <cstdint>
 #include <istream>
 #include <string>
 #include <vector>
 
 namespace orbiter::production {
-struct MeshVertex { float x, y, z, nx, ny, nz, tu, tv; };
-struct MeshColour { float r, g, b, a; };
-struct MeshMaterial {
-    MeshColour diffuse, ambient, specular, emissive;
-    float power;
-};
+using MeshVertex = NTVERTEX;
+using MeshColour = COLOUR4;
+using MeshMaterial = MATERIAL;
 struct MeshGroup {
     std::vector<MeshVertex> vertices;
     std::vector<std::uint16_t> indices;
