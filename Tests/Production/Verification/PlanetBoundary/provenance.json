@@ -1,0 +1,74 @@
+{
+  "schema": 1,
+  "source": "6b930c00269287c5a386baf70bb81e57b20b57bd",
+  "run": 41297023065,
+  "scope": "Accepted Windows planet/base extraction; actual application/SDK and original real-client states/image; not native graphics",
+  "automatic_refresh": false,
+  "artifacts": [
+    {
+      "id": 13080191620,
+      "name": "real-client-Debug",
+      "sha256": "97c13d69761bc2304b4393268abb574b30f6caff3f3301ad5d193f683b00664a",
+      "bytes": 12382906,
+      "filtered_file": "real-client-Debug-reports.zip",
+      "filtered_sha256": "b15a954921d5d59864459104c195ea81ee24aa920fed0b32127337fd923b7cb3",
+      "members_sha256": {
+        "out/client-execution/client-summary.json": "62662d653279b71641a6f13165ef0f75ac7d6774199c24317d04aea718d29b98",
+        "out/client-execution/scene/client-report.json": "ea165db6bedb1d7d2433f37d9d8acf76ebf6b17c1c921d4ccf6f29ece5a33e00",
+        "out/client-execution/scene/graphics-lifecycle.json": "df7514880a865666d7ff653c5f63158753beffc1be13e4fda55ad112cca2d37b",
+        "out/client-execution/scene/invocation.json": "dd975f1ab2c7ef260a2c52515b9111239d1983a85d429008d5ee4df8093d0798",
+        "out/client-execution/scene/mesa-bindings.json": "3f1e71c46b542cd8683de4f40b67db3115961cac5035315cc01b7c57cc43e9ea",
+        "out/client-execution/scene/Modules/OGLClient/dependencies.lock.json": "80d217de95a4a31f06b6df0f0f0f1544242c493a3382997690beac9c9f0800ce",
+        "out/client-execution/scene/renderer-info.json": "b1035deb8d14e84f2dc01124f453dc06daec1eb0cebb1ef44bb81217e5cd0fb5",
+        "out/client-execution/scene/scene-summary.json": "e96eed18d42fa7086797d6be4dbae4b0fa316e928d1dfa3f017088a25d8f7b2b",
+        "out/client-execution/scene-repeat/client-report.json": "3f4e8f34acc086ae31ea3d6613920b32771e99464fe572f259715ecf86ecb48d",
+        "out/client-execution/scene-repeat/graphics-lifecycle.json": "df7514880a865666d7ff653c5f63158753beffc1be13e4fda55ad112cca2d37b",
+        "out/client-execution/scene-repeat/invocation.json": "d58cb84d905b13db2afcb1f4bfe59957bfeca4ef8a978c5ea3d6a5c777ee1e3d",
+        "out/client-execution/scene-repeat/mesa-bindings.json": "3f1e71c46b542cd8683de4f40b67db3115961cac5035315cc01b7c57cc43e9ea",
+        "out/client-execution/scene-repeat/Modules/OGLClient/dependencies.lock.json": "80d217de95a4a31f06b6df0f0f0f1544242c493a3382997690beac9c9f0800ce",
+        "out/client-execution/scene-repeat/renderer-info.json": "b1035deb8d14e84f2dc01124f453dc06daec1eb0cebb1ef44bb81217e5cd0fb5",
+        "out/client-execution/scene-repeat/scene-summary.json": "e96eed18d42fa7086797d6be4dbae4b0fa316e928d1dfa3f017088a25d8f7b2b",
+        "out/runtime-rebuild/build-inputs.json": "5330ab957b677a1eca187664d2d9da8d1e749e97c142d63c5f597858b90d3e61",
+        "out/production-app/Modules/OGLClient/dependencies.lock.json": "80d217de95a4a31f06b6df0f0f0f1544242c493a3382997690beac9c9f0800ce"
+      }
+    },
+    {
+      "id": 13080007096,
+      "name": "real-client-comparison",
+      "sha256": "331ef417a24aeb2b8b086cbdc27aebf1d029180ef8eab3cd34822a69d5ffb35f",
+      "bytes": 951,
+      "filtered_file": "real-client-comparison-reports.zip",
+      "filtered_sha256": "284d5bee3f94af64a782b47087a3425dfed90108503d5a5556d489e88be432ce",
+      "members_sha256": {
+        "client-comparison.json": "f91f5e73c96f5c37331077d271c0d404a20961ed326a992e991779231477a43b"
+      }
+    },
+    {
+      "id": 13079637693,
+      "name": "real-client-Release",
+      "sha256": "deecd512f20ec38e21fd0f9ece720846de94b09a88d78eb25cbd0d755d84f377",
+      "bytes": 11607007,
+      "filtered_file": "real-client-Release-reports.zip",
+      "filtered_sha256": "aebf8fa0181a7c31555cae4edc24133c7582de82fcbfc4a9c85a75c9a490c8da",
+      "members_sha256": {
+        "out/client-execution/client-summary.json": "b1915f9532d4adfcfa0c41f267051564d263f7103db0bf2d017b1a0c2abaffef",
+        "out/client-execution/scene/client-report.json": "409f613794152bf98379d3e4d68e950202a3d6ba7225ade4d28eaa62572a181f",
+        "out/client-execution/scene/graphics-lifecycle.json": "df7514880a865666d7ff653c5f63158753beffc1be13e4fda55ad112cca2d37b",
+        "out/client-execution/scene/invocation.json": "dd975f1ab2c7ef260a2c52515b9111239d1983a85d429008d5ee4df8093d0798",
+        "out/client-execution/scene/mesa-bindings.json": "1bc03f9e7ffb434bdc86e17f5e3169339c46c4caceaf028991555331003e16af",
+        "out/client-execution/scene/Modules/OGLClient/dependencies.lock.json": "80d217de95a4a31f06b6df0f0f0f1544242c493a3382997690beac9c9f0800ce",
+        "out/client-execution/scene/renderer-info.json": "b1035deb8d14e84f2dc01124f453dc06daec1eb0cebb1ef44bb81217e5cd0fb5",
+        "out/client-execution/scene/scene-summary.json": "e96eed18d42fa7086797d6be4dbae4b0fa316e928d1dfa3f017088a25d8f7b2b",
+        "out/client-execution/scene-repeat/client-report.json": "c8fab2a57309f5122d724686084dba636220a903258f058c1681e0bb232e9722",
+        "out/client-execution/scene-repeat/graphics-lifecycle.json": "df7514880a865666d7ff653c5f63158753beffc1be13e4fda55ad112cca2d37b",
+        "out/client-execution/scene-repeat/invocation.json": "d58cb84d905b13db2afcb1f4bfe59957bfeca4ef8a978c5ea3d6a5c777ee1e3d",
+        "out/client-execution/scene-repeat/mesa-bindings.json": "1bc03f9e7ffb434bdc86e17f5e3169339c46c4caceaf028991555331003e16af",
+        "out/client-execution/scene-repeat/Modules/OGLClient/dependencies.lock.json": "80d217de95a4a31f06b6df0f0f0f1544242c493a3382997690beac9c9f0800ce",
+        "out/client-execution/scene-repeat/renderer-info.json": "b1035deb8d14e84f2dc01124f453dc06daec1eb0cebb1ef44bb81217e5cd0fb5",
+        "out/client-execution/scene-repeat/scene-summary.json": "e96eed18d42fa7086797d6be4dbae4b0fa316e928d1dfa3f017088a25d8f7b2b",
+        "out/runtime-rebuild/build-inputs.json": "fa832d1a34b5d96e0f42749bbc423639df40fb9fa00592caff4f2e8bbc3279e3",
+        "out/production-app/Modules/OGLClient/dependencies.lock.json": "80d217de95a4a31f06b6df0f0f0f1544242c493a3382997690beac9c9f0800ce"
+      }
+    }
+  ]
+}
