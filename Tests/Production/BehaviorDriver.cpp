@@ -4,6 +4,7 @@
 #define ORBITER_MODULE
 #include "Orbitersdk.h"
 #include "StockControlSchedules.h"
+#include "Flight/Schedules.h"
 #include "ApplicationObservation.h"
 #include <algorithm>
 #include <cmath>
@@ -38,7 +39,7 @@ public:
         require(bool(config >> id >> totalFrames >> dt >> epoch), "invalid behavior-case.txt");
         require(totalFrames > 0 && dt > 0 && std::isfinite(dt) && std::isfinite(epoch), "invalid behavior timing");
         const std::vector<std::string> supported = {"rcs", "autopilot", "atmosphere", "landed", "contact",
-            "docked", "dock_approach", "attachments", "clock", "lifetime", "dg_animations", "dg_persistence", "dg_reload", "callbacks"};
+            "docked", "dock_approach", "attachments", "clock", "lifetime", "dg_animations", "dg_persistence", "dg_reload", "callbacks", "manual_flight", "pb_persistence", "pb_reload"};
         require(std::find(supported.begin(),supported.end(),id) != supported.end(), "unsupported behavior case");
         open(events,"behavior-events.csv"); open(states,"behavior-state.csv");
         open(propellant,"behavior-propellant.csv"); open(animations,"behavior-animations.csv");
@@ -86,7 +87,11 @@ public:
             require(started && std::isfinite(step) && step > 0,"invalid production step");
             event("module.pre","","");
             VESSEL *v = oapiGetVesselInterface(target);
-            if (id == "rcs") {
+            if (id == "manual_flight") {
+                production_test::ManualFlight(v,tick);
+            } else if (id == "pb_persistence") {
+                v->SetThrusterGroupLevel(THGROUP_MAIN,.2);
+            } else if (id == "rcs") {
                 // Groups share physical thrusters. Clear them before applying
                 // the selected group so a later zero cannot erase its command.
                 production_test::Rcs(v,tick);
@@ -144,7 +149,7 @@ public:
             if (started && std::string(phase) == "app.frame.end") {
                 ++frame;
                 if (running) { ++tick; snapshot(); }
-                if (id == "dg_persistence" && running && tick == 40) {
+                if ((id == "dg_persistence" || id == "pb_persistence") && running && tick == 40) {
                     // Save only after state finalization and EndStep, so the
                     // stock serializer's MJD1 and its state vectors agree.
                     require(oapiSaveScenario("BehaviorSnapshot","Windows production persistence checkpoint"),"save checkpoint failed");
