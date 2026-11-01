@@ -36,6 +36,7 @@
 #include "Orbiter.h"
 #include "Production/WindowsSession.h"
 #include "Production/WindowsWorldVesselServices.h"
+#include "Production/WindowsVesselServices.h"
 #include "Production/WindowsBodyServices.h"
 #include "Production/WindowsRigidBodyServices.h"
 #include "Production/WindowsCelestialServices.h"
@@ -277,6 +278,7 @@ Orbiter::Orbiter () : worldFactory(*this), world(worldFactory)
 	orbiter::production::BindRigidBodyServices(&orbiter::production::GetWindowsRigidBodyServices());
 	orbiter::production::BindCelestialServices(&orbiter::production::GetWindowsCelestialServices());
 	orbiter::production::BindWorldVesselServices(&orbiter::production::GetWindowsWorldVesselServices());
+	orbiter::production::BindVesselServices(&orbiter::production::GetWindowsVesselServices());
 	orbiter::production::BindSurfaceServices(&orbiter::production::GetWindowsSurfaceServices());
 	orbiter::production::BindNavigationServices(&orbiter::production::GetWindowsNavigationServices());
 	orbiter::production::BindElevationServices(&orbiter::production::GetWindowsElevationServices());
@@ -364,6 +366,7 @@ Orbiter::~Orbiter ()
 	orbiter::production::BindNavigationServices(nullptr);
 	orbiter::production::BindSurfaceServices(nullptr);
 	orbiter::production::BindWorldVesselServices(nullptr);
+	orbiter::production::BindVesselServices(nullptr);
 	orbiter::production::BindCelestialServices(nullptr);
 	orbiter::production::BindRigidBodyServices(nullptr);
 	orbiter::production::BindBodyServices(nullptr);

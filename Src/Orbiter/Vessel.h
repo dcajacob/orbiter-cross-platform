@@ -26,8 +26,16 @@
 #include <vector>
 
 #include "Vesselbase.h"
+#include "Production/VesselServices.h"
+#ifdef _WIN32
 #include "GraphicsAPI.h"
 #include "Log.h"
+#else
+#include "NativeVesselAPI.h"
+#include <stdexcept>
+namespace oapi {class ParticleStream;}
+struct ENGINESTATUS;
+#endif
 
 class Elements;
 class Mesh;
@@ -42,7 +50,7 @@ class Nav;
 class Nav_IDS;
 class Nav_XPDR;
 class ExhaustStream;
-class oapi::Sketchpad;
+namespace oapi {class Sketchpad;}
 class LightEmitter;
 class Select;
 class InputBox;
@@ -53,21 +61,21 @@ typedef char Str64[64];
 #define SD_NAME 0x0001 // include vessel name and class name in scenario data
 
 struct ScenarioData { // packed vessel state
-	DWORD size;             // size of the complete data block
-	DWORD flag;
-	BYTE fstate;            // flight status
+	oapi::UInt32 size;             // size of the complete data block
+	oapi::UInt32 flag;
+	std::uint8_t fstate;            // flight status
 	union {
 		struct {
 			Vector rpos;    // reference body-relative position
 			Vector rvel;    // reference body-relative velocity
 			Vector arot;    // orientation (Euler angles)
 			Vector vrot;    // angular velocity
-		};
+		} orbital;
 		struct {
 			double lng;     // longitude of landing site [rad]
 			double lat;     // latitude of landing site [rad]
 			double hdg;     // orientation on the ground
-		};
+		} landed;
 	};
 	char buf[1];            // pointer to variable-length parameters
 };
@@ -124,7 +132,7 @@ typedef struct {      // airfoil control surface definition
 	int axis;               // axis orientation: 1=+Y, 2=-Y, 3=+X, 4=-X (should allow freely defined axes)
 	double area;            // surface area
 	double dCl;             // lift coefficient differential
-	UINT anim;              // animation reference ((UINT)-1 for none)
+	oapi::UInt anim;              // animation reference ((oapi::UInt)-1 for none)
 } CtrlsurfSpec;
 
 typedef struct {      // variable drag element definition
@@ -148,7 +156,7 @@ typedef struct tagAttachmentSpec { // parent/child attachment definition
 
 typedef struct {      // nav radio definition
 	float freq;             // current frequency [MHz]
-	DWORD step;             // discrete frequency setting (freq = MinFreq + step * 0.05MHz)
+	oapi::UInt32 step;             // discrete frequency setting (freq = MinFreq + step * 0.05MHz)
 	int dbidx;              // index into NAV data base for current proxybody and frequency
 	const Nav *sender;      // incoming transmitter signal
 } NavRadioSpec;
@@ -163,7 +171,7 @@ typedef struct {      // reentry texture definition
 typedef struct {      // list of animation sequences - OBSOLETE
 	double defstate;        // default mesh state
 	double state;           // current state
-	UINT ncomp;             // # components
+	oapi::UInt ncomp;             // # components
 	ANIMCOMP **comp;        // pointer to list of components
 } ANIMSEQ;
 
@@ -263,7 +271,7 @@ public:
 	void PostCreation ();
 	// This is called by the psys manager after all vessels have been created
 
-	void ProcessMessage (DWORD msg, void *data);
+	void ProcessMessage (oapi::UInt32 msg, void *data);
 	// Process a message sent by the system
 
 	void Destroying (const Vessel *vessel);
@@ -275,7 +283,7 @@ public:
 	 * \param cat option category (see \ref optcat)
 	 * \param item option item (see \ref optitem)
 	 */
-	void OptionChanged(DWORD cat, DWORD item);
+	void OptionChanged(oapi::UInt32 cat, oapi::UInt32 item);
 
 	inline void RequestDestruct()
 	{ kill_pending = true; }
@@ -348,7 +356,7 @@ public:
 	//   1 = file could not be opened
 	//   2 = parse error
 
-	bool SetTouchdownPoints (const TOUCHDOWNVTX *tdvtx, DWORD ntp = 3);
+	bool SetTouchdownPoints (const TOUCHDOWNVTX *tdvtx, oapi::UInt32 ntp = 3);
 	// sets the touchdown points in the vessel frame
 	// tp should contain 3 points (not collinear!)
 
@@ -486,7 +494,7 @@ public:
 	 * \note If the type ID refers to a group already previously created (default or
 	 *    user-defined), the previous definition is overwritten.
 	 */
-	ThrustGroupSpec *CreateThrusterGroup (ThrustSpec **ts, DWORD nts, THGROUP_TYPE thgt);
+	ThrustGroupSpec *CreateThrusterGroup (ThrustSpec **ts, oapi::UInt32 nts, THGROUP_TYPE thgt);
 
 	/**
 	 * \brief Remove a thruster group definition
@@ -523,7 +531,7 @@ public:
 	 *    default types or a user-defined type (THGROUP_USER+x)
 	 * \return Number of thrusters assigned to the group
 	 */
-	DWORD NumThrusters(THGROUP_TYPE thgt) const;
+	oapi::UInt32 NumThrusters(THGROUP_TYPE thgt) const;
 
 	/**
 	 * \brief Check if a thruster is member of a thruster group
@@ -540,7 +548,7 @@ public:
 	 */
 	inline void SetThrusterGroupLevel (ThrustGroupSpec *tgs, double level)
 	{
-		dCHECK(tgs, "Zero ThrustGroupSpec pointer not permitted.")
+		orbiter::production::GetVesselServices().Check(tgs != nullptr, "Zero ThrustGroupSpec pointer not permitted.");
 
 		for (auto it = tgs->ts.begin(); it != tgs->ts.end(); it++)
 			SetThrusterLevel(*it, level);
@@ -563,7 +571,7 @@ public:
 	 */
 	inline void SetThrusterGroupOverride(ThrustGroupSpec* tgs, double level)
 	{
-		dCHECK(tgs, "Zero ThrustGroupSpec pointer not permitted.")
+		orbiter::production::GetVesselServices().Check(tgs != nullptr, "Zero ThrustGroupSpec pointer not permitted.");
 
 		for (auto it = tgs->ts.begin(); it != tgs->ts.end(); it++)
 			SetThrusterOverride(*it, level);
@@ -612,7 +620,7 @@ public:
 	 */
 	inline void IncThrusterGroupOverride (ThrustGroupSpec *tgs, double dlevel)
 	{
-		dCHECK(tgs, "Zero ThrustGroupSpec pointer not permitted.")
+		orbiter::production::GetVesselServices().Check(tgs != nullptr, "Zero ThrustGroupSpec pointer not permitted.");
 
 		for (auto it = tgs->ts.begin(); it != tgs->ts.end(); it++)
 			IncThrusterOverride (*it, dlevel);
@@ -655,7 +663,7 @@ public:
 	 */
 	inline double GetThrusterGroupMaxth (const ThrustGroupSpec *tgs) const
 	{
-		dCHECK(tgs, "Zero ThrustGroupSpec pointer not permitted.")
+		orbiter::production::GetVesselServices().Check(tgs != nullptr, "Zero ThrustGroupSpec pointer not permitted.");
 		return tgs->maxth_sum;
 	}
 
@@ -702,16 +710,16 @@ public:
 	// linear groups consist of 2 thrusters each, so the total thrust for linear modes is 2*maxth
 
 #ifdef UNDEF
-	UINT AddExhaust (ThrustSpec *ts, double lscale, double wscale, double lofs = 0,
+	oapi::UInt AddExhaust (ThrustSpec *ts, double lscale, double wscale, double lofs = 0,
 		const Vector *pos = 0, const Vector *dir = 0, SURFHANDLE tex = 0, double modulate = 0.0);
 	// Add an exhaust render specification for thruster ts, using its 'level' parameter for
 	// scaling. Unless pos and/or dir are explicitly specified, they are linked to the thruster
 	// 'pos' and 'dir' parameters. lscale and wscale are exhaust length and width scales.
 #endif
 
-	UINT AddExhaust (EXHAUSTSPEC *spec);
+	oapi::UInt AddExhaust (EXHAUSTSPEC *spec);
 
-	bool DelExhaust (UINT idx);
+	bool DelExhaust (oapi::UInt idx);
 	// removes the idx-th exhaust render specification from the list
 
 	oapi::ParticleStream *AddParticleStream (PARTICLESTREAMSPEC *pss, const Vector &pos, const Vector &dir, double *lvl);
@@ -756,10 +764,10 @@ public:
 	void ClearLightEmitters ();
 	// Delete all light emitters defined for the vessel
 
-	DWORD LightEmitterCount () const { return nemitter; }
+	oapi::UInt32 LightEmitterCount () const { return nemitter; }
 	// Returns the number of emitters defined for the vessel
 
-	const LightEmitter *GetLightEmitter (DWORD i) const { return emitter[i]; }
+	const LightEmitter *GetLightEmitter (oapi::UInt32 i) const { return emitter[i]; }
 	// Returns an emitter identified by index
 
 	void LightEmitterState (LightEmitter *le, int param, void *value);
@@ -782,7 +790,7 @@ public:
 	void ClearPropellantResources ();
 	// Remove all propellant resources, and unlink all thrusters from their resources
 
-	inline TankSpec *PropellantHandle (DWORD idx) const
+	inline TankSpec *PropellantHandle (oapi::UInt32 idx) const
 	{ return (idx < ntank ? tank[idx] : 0); }
 
 	inline TankSpec *DefaultPropellantHandle () const
@@ -817,25 +825,25 @@ public:
 	bool GetAirfoilParam (AirfoilSpec *af, VECTOR3 *ref, AirfoilCoeffFunc *cf, void **context, double *c, double *S, double *A);
 	// Return airfoil parameters
 
-	void EditAirfoil (AirfoilSpec *af, DWORD flag, const Vector &ref, AirfoilCoeffFunc cf, double c, double S, double A);
+	void EditAirfoil (AirfoilSpec *af, oapi::UInt32 flag, const Vector &ref, AirfoilCoeffFunc cf, double c, double S, double A);
 	// Edit an existing airfoil definition
 
 	bool DelAirfoil (AirfoilSpec *af);
 	// Delete an airfoil. Returns false on failure.
 
-	bool DelAirfoil (DWORD i);
+	bool DelAirfoil (oapi::UInt32 i);
 	// Delete an airfoil given by its index. Returns false on failure.
 
 	void ClearAirfoilDefinitions ();
 	// Remove all airfoil lift,drag definitions
 
-	CtrlsurfSpec *CreateControlSurface (AIRCTRL_TYPE ctrl, double area, double dCl, const Vector &ref, int axis, double delay = 1.0, UINT anim = (UINT)-1);
+	CtrlsurfSpec *CreateControlSurface (AIRCTRL_TYPE ctrl, double area, double dCl, const Vector &ref, int axis, double delay = 1.0, oapi::UInt anim = (oapi::UInt)-1);
 	// Create a new control surface definition of the specified type
 
 	bool DelControlSurface (CtrlsurfSpec *cs);
 	// Delete a control surfce. Returns false on failure.
 
-	bool DelControlSurface (DWORD i);
+	bool DelControlSurface (oapi::UInt32 i);
 	// Delete a control surface given by its index. Returns false on failure.
 
 	void ClearControlSurfaceDefinitions ();
@@ -856,7 +864,7 @@ public:
 	void ClearVariableDragElements ();
 	// Remove all drag element definitions
 
-	void ApplyUserAttitudeControls (DWORD *ctrl);
+	void ApplyUserAttitudeControls (oapi::UInt32 *ctrl);
 	// translate user keyboard/joystick input into RCS or airfoil response (single frame)
 
 	void IncTrim (AIRCTRL_TYPE ctrl);
@@ -876,7 +884,7 @@ public:
 	void UnregisterMFDModes ();
 	// Un-register all locally defined MFD modes
 
-	DWORD GetMFDModes (const MFDMODE **modelist) const
+	oapi::UInt32 GetMFDModes (const MFDMODE **modelist) const
 	{ *modelist = mfdmode; return nmfdmode; }
 
 	// ========================================================================
@@ -959,8 +967,8 @@ public:
 	bool SetAttMode (int mode, bool fromstream = false);
 	// return/toggle/set attitude thruster mode (0=disable, 1=rot, 2=lin)
 
-	DWORD ToggleADCtrlMode ();
-	void SetADCtrlMode (DWORD mode, bool fromstream = false);
+	oapi::UInt32 ToggleADCtrlMode ();
+	void SetADCtrlMode (oapi::UInt32 mode, bool fromstream = false);
 	// connect/disconnect user input to aerodynamic control surfaces
 
 	void SetWBrakeLevel (double level, int which = 0, bool permanent = true);
@@ -984,7 +992,7 @@ public:
 	void ShiftDocks (const Vector &ofs);
 	// shift all dock positions by ofs
 
-	inline const PortSpec *GetDockParams (DWORD did) const { return dock[did]; }
+	inline const PortSpec *GetDockParams (oapi::UInt32 did) const { return dock[did]; }
 
 	Vector GetDockGPos (const PortSpec *dock) const
 	{ return (mul (s0->R, dock->ref) + s0->pos); }
@@ -994,28 +1002,28 @@ public:
 	// Set instrument docking approach specs for a docking port
 
 	bool DelDock (PortSpec *dock);
-	bool DelDock (DWORD i);
+	bool DelDock (oapi::UInt32 i);
 	// Delete a dock (by spec or index), after undocking any docked vessel.
 	// Returns false on failure.
 
 	void ClearDockDefinitions ();
 	// Remove all dock definitions
 
-	void RegisterDocking (DWORD did, Vessel *mate, DWORD matedid);
+	void RegisterDocking (oapi::UInt32 did, Vessel *mate, oapi::UInt32 matedid);
 	// Register a docking event at dock 'did' with vessel 'mate' and mate's dock 'matedid'
 
-	void UnregisterDocking (DWORD did);
+	void UnregisterDocking (oapi::UInt32 did);
 	// Register an undocking event at dock 'did'
 
 	void MoveDock(PortSpec* dock, const Vector& pos, const Vector& dir, const Vector& rot);
 	PortSpec* GetProxyDock(PortSpec* pD);
 	bool GetTargetDockAlignment(PortSpec* pD, PortSpec* pT, Vector* ofs, Vector* dir, Vector* rot, Vector* rvel = nullptr);
 
-	int Dock (Vessel *target, DWORD mydid, DWORD tgtdid, DWORD mode = 0);
+	int Dock (Vessel *target, oapi::UInt32 mydid, oapi::UInt32 tgtdid, oapi::UInt32 mode = 0);
 	// Dock with 'target', using dock 'mydid' and attach to target dock 'tgtdid'
 	// Return values: 0=ok, 1=my dock in use, 2=target dock in use, 3=already docked to target
 
-	bool Undock (UINT did, const Vessel *exclude = 0, double vsep = 0.2);
+	bool Undock (oapi::UInt did, const Vessel *exclude = 0, double vsep = 0.2);
 	// Perform undocking from object docked at 'did' with separation velocity
 	// 'vsep', but excluding object 'exclude'
 
@@ -1023,10 +1031,10 @@ public:
 	// This version asks for a dock to disengage, if the vessel defines more
 	// than one dock.
 
-	inline DWORD nDock () const { return ndock; }
-	inline Vessel *DockMate (DWORD n) const { return dock[n]->mate; }
+	inline oapi::UInt32 nDock () const { return ndock; }
+	inline Vessel *DockMate (oapi::UInt32 n) const { return dock[n]->mate; }
 
-	void RelDockingPos (const Vessel *target, UINT mydid, UINT tgtdid, Vector &P, Matrix &R);
+	void RelDockingPos (const Vessel *target, oapi::UInt mydid, oapi::UInt tgtdid, Vector &P, Matrix &R);
 	// Calculate the relative position 'P' and orientation 'R' of 'target'
 	// in my reference frame, if we are docked between 'mydid' and 'tgtdid'
 
@@ -1069,10 +1077,10 @@ public:
 	void InitAttachmentToParent (AttachmentSpec *asc, bool allow_loose = true);
 	// set relative rotation matrix and position of child after attached to a parent
 
-	DWORD GetAttachmentIndex (AttachmentSpec *as) const;
-	// returns the list index of as (either in child or parent list) or (DWORD)-1 if not present
+	oapi::UInt32 GetAttachmentIndex (AttachmentSpec *as) const;
+	// returns the list index of as (either in child or parent list) or (oapi::UInt32)-1 if not present
 
-	AttachmentSpec *GetAttachmentFromIndex (bool toparent, DWORD i);
+	AttachmentSpec *GetAttachmentFromIndex (bool toparent, oapi::UInt32 i);
 	// returns the attachment for a given index from either the to-parent or the to-child list
 
 	void ShiftAttachments (const Vector &ofs);
@@ -1081,17 +1089,17 @@ public:
 	// ========================================================================
 	// navigation radio interface
 
-	bool SetNavChannel (DWORD n, DWORD ch);
-	bool IncNavChannel (DWORD n, int dch);
-	DWORD GetNavChannel (DWORD n) const;
-	float GetNavFreq (DWORD n) const;
+	bool SetNavChannel (oapi::UInt32 n, oapi::UInt32 ch);
+	bool IncNavChannel (oapi::UInt32 n, int dch);
+	oapi::UInt32 GetNavChannel (oapi::UInt32 n) const;
+	float GetNavFreq (oapi::UInt32 n) const;
 
 	inline Nav_XPDR *GetXPDR () const { return xpdr; }
-	DWORD GetXpdrChannel () const;
+	oapi::UInt32 GetXpdrChannel () const;
 	bool GetXpdrFreq (float &freq) const;
-	bool SetXpdrChannel (DWORD ch);
+	bool SetXpdrChannel (oapi::UInt32 ch);
 	bool IncXpdrChannel (int dch);
-	bool SetIDSChannel (PortSpec *ps, DWORD ch);
+	bool SetIDSChannel (PortSpec *ps, oapi::UInt32 ch);
 
 	bool SetNavMode (int mode, bool fromstream = false);
 	bool ClrNavMode (int mode, bool record = true, bool fromstream = false);
@@ -1114,7 +1122,7 @@ public:
 	void ClearBeacons ();
 	// remove all beacons
 
-	const BEACONLIGHTSPEC *GetBeacon (DWORD idx) const;
+	const BEACONLIGHTSPEC *GetBeacon (oapi::UInt32 idx) const;
 
 	inline VESSEL *GetModuleInterface () { return modIntf.v; }
 	// Return module interface for vessel. Guaranteed to exist even if the
@@ -1123,7 +1131,7 @@ public:
 	int ConsumeDirectKey (char *buffer);
 	// Keyboard handler for immediate keys
 
-	int ConsumeBufferedKey (DWORD key, bool down, char *kstate);
+	int ConsumeBufferedKey (oapi::UInt32 key, bool down, char *kstate);
 	// Keyboard handler for buffered keys
 
 	void Update (bool force = false);
@@ -1159,7 +1167,7 @@ public:
 	void ModuleSignalRCSmode (int mode);
 	// Notifies module of RCS mode change by calling VESSEL2::clbkRCSMode function
 
-	void ModuleSignalADCtrlmode (DWORD mode);
+	void ModuleSignalADCtrlmode (oapi::UInt32 mode);
 	// Notifies module of aerodynamic control mode change by calling VESSEL2::clbkADCtrlmode
 
 	void ModuleSignalNavmode (int mode, bool active);
@@ -1181,7 +1189,7 @@ public:
 
 	inline void SetLandingTarget (Base *target) { landtgt = target; }
 	inline Base *LandingTarget () const { return landtgt; }
-	inline DWORD PortNo () const { return nport; }
+	inline oapi::UInt32 PortNo () const { return nport; }
 	inline int   LCommsStatus() const { return lstatus; }
 	//inline int   DCommsStatus() const { return dstatus; }
 	// set and retrieve the vessel's target (base) for landing/docking
@@ -1354,7 +1362,7 @@ protected:
 	// Parse a single line directly into vessel structure, bypassing any VESSELSTATUSx structure
 	// This is used for any status options that are not currently represented in VESSELSTATUSx
 
-	DWORD PackDefaultState (char **data, DWORD flag);
+	oapi::UInt32 PackDefaultState (char **data, oapi::UInt32 flag);
 	// pack the default vessel state parameters into a data buffer
 	// (e.g. for passing between remote sessions)
 	// *data is dynamically allocated and must be deallocated by the caller after use
@@ -1377,21 +1385,21 @@ protected:
 	void ReadGenericCaps (std::ifstream &ifs);
 	// read generic vessel caps from a class cfg file
 
-	UINT AddMesh (const char *mname, const VECTOR3 *ofs = 0);
+	oapi::UInt AddMesh (const char *mname, const VECTOR3 *ofs = 0);
 	// add a mesh with offset to the list (load from file). Return value is mesh index
 
-	UINT AddMesh (MESHHANDLE hMesh, const VECTOR3 *ofs = 0);
+	oapi::UInt AddMesh (MESHHANDLE hMesh, const VECTOR3 *ofs = 0);
 	// add a mesh with offset to the list (copy from handle). Return value is mesh index
 
-	UINT InsertMesh (const char *mname, UINT idx, const VECTOR3 *ofs = 0);
+	oapi::UInt InsertMesh (const char *mname, oapi::UInt idx, const VECTOR3 *ofs = 0);
 	// Insert a mesh at a particular position (load from file). If a mesh is already registered
 	// with index 'idx', the existing mesh is replaced
 
-	UINT InsertMesh (MESHHANDLE hMesh, UINT idx, const VECTOR3 *ofs = 0);
+	oapi::UInt InsertMesh (MESHHANDLE hMesh, oapi::UInt idx, const VECTOR3 *ofs = 0);
 	// Insert a mesh at a particular position (copy from handle). If a mesh is already registered
 	// with index 'idx', the existing mesh is replaced
 
-	bool DelMesh (UINT idx, bool retain_anim = false);
+	bool DelMesh (oapi::UInt idx, bool retain_anim = false);
 	// Remove mesh with index 'idx'. Returns false if idx is out of range
 	// If retain_anim=true, animation components associated with the mesh
 	// are not removed.
@@ -1400,26 +1408,26 @@ protected:
 	// remove all entries from mesh list
 	// If retain_anim=true, animations are not removed.
 
-	bool ShiftMesh (UINT idx, const VECTOR3 &ofs);
+	bool ShiftMesh (oapi::UInt idx, const VECTOR3 &ofs);
 	// shift mesh 'idx' by 'ofs' from current position
 
-	const MESHHANDLE GetMeshTemplate (UINT idx) const;
+	const MESHHANDLE GetMeshTemplate (oapi::UInt idx) const;
 	// returns template handle for pre-loaded mesh, or NULL if not available
 
-	const char *GetMeshName (UINT idx) const;
+	const char *GetMeshName (oapi::UInt idx) const;
 	// returns mesh name for on-demand mesh, or NULL for pre-loaded mesh
 
-	Mesh *CopyMeshFromTemplate (UINT idx);
+	Mesh *CopyMeshFromTemplate (oapi::UInt idx);
 	// Creates a new copy of the vessel's idx-th mesh, either by
 	// copying from the preloaded template, or by reading from file.
 	// If idx is out of range, or the mesh could not be read, the
 	// return value is 0.
 	// If vismode!=0, it will be set to the mesh visibility mode.
 
-	void SetMeshVisibilityMode (UINT meshidx, WORD mode);
+	void SetMeshVisibilityMode (oapi::UInt meshidx, oapi::UInt16 mode);
 	// set visibility flag for mesh in cockpit view/external view
 
-	int MeshModified (MESHHANDLE hMesh, UINT grp, DWORD modflag);
+	int MeshModified (MESHHANDLE hMesh, oapi::UInt grp, oapi::UInt32 modflag);
 	// Notify the visualisation subsystem of a modification of a mesh group
 
 	bool LoadModule (std::ifstream &classf);
@@ -1431,7 +1439,12 @@ protected:
 	void ClearModule ();
 	// clear interface pointers and unload module
 
-	HINSTANCE hMod;        // module handle
+#ifdef _WIN32
+	HINSTANCE hMod;
+#else
+	void* hMod;
+#endif
+	// Module handle; native ownership is provided by the checked module loader.
 	struct {               // module interface
 		VESSEL *v;
 		int version;
@@ -1479,16 +1492,16 @@ private:
 	// orientation rot (all w.r.t. ecliptic axis orientation). _vrot is rotation vector (rad/s) around the
 	// three axes, if provided
 
-	void InitNavRadios (DWORD n);
+	void InitNavRadios (oapi::UInt32 n);
 	// define the number of navigation radios supported by the vessel
 
-	DWORD IncRadioChannel (DWORD ch, int step) const;
+	oapi::UInt32 IncRadioChannel (oapi::UInt32 ch, int step) const;
 	// Generic functions to step through radio frequencies
 
 	void UpdateProxies ();
 	// check for grav reference body, and closest planet, base and station
 
-	void UpdateReceiverStatus (DWORD idx = 0xffff);
+	void UpdateReceiverStatus (oapi::UInt32 idx = 0xffff);
 	// update reception status for NAV receiver idx (or for all by default)
 
 	double IlluminationFactor () const;
@@ -1496,7 +1509,7 @@ private:
 	// only considers shadowing effect from closest planet
 	// currently ignores atmospheric effects
 
-	UINT MakeFreeMeshEntry (UINT idx = (UINT)-1);
+	oapi::UInt MakeFreeMeshEntry (oapi::UInt idx = (oapi::UInt)-1);
 	// If 'idx'==-1, return a pointer to an unused entry into the mesh list (add new entry if required)
 	// If 'idx' is set, force this entry to be created (may replace an existing entry)
 
@@ -1514,29 +1527,29 @@ private:
 
 	// exhaust specs
 	EXHAUSTSPEC **exhaust;                       // list of exhaust definitions
-	DWORD nexhaust;                              // length of exhaust list
+	oapi::UInt32 nexhaust;                              // length of exhaust list
 	OldExhaustSpec **oexhaust;                   // list of old (obsolete) exhaust definitions
-	DWORD noexhaust;                             // length of oexhaust list
+	oapi::UInt32 noexhaust;                             // length of oexhaust list
 
 	// particle system
 	oapi::ParticleStream **contrail;
-	DWORD ncontrail;
+	oapi::UInt32 ncontrail;
 	oapi::ParticleStream **reentrystream;
-	DWORD nreentrystream;
+	oapi::UInt32 nreentrystream;
 
 	// propellant resource specs
 	TankSpec **tank;                             // list of propellant resource definitions
-	DWORD ntank;                                 // length of propellant list
+	oapi::UInt32 ntank;                                 // length of propellant list
 	TankSpec *def_tank;                          // default propellant handle (for generic HUD display)
 	double max_angular_moment[6];                // max angular momentum for the 6 standard rotational attitude thruster groups
 
 	// airfoil specs
 	AirfoilSpec **airfoil;
-	DWORD nairfoil;
+	oapi::UInt32 nairfoil;
 
 	// airfoil control surface specs
 	CtrlsurfSpec **ctrlsurf;                     // list of airfoil control surface definitions
-	DWORD nctrlsurf;                             // length of control surface list
+	oapi::UInt32 nctrlsurf;                             // length of control surface list
 	struct {                                     // status for elevator,rudder,aileron etc. (-1..+1)
 		double ttgt;                                 // target setting (transient)
 		double ptgt;                                 // target setting (permanent)
@@ -1548,46 +1561,46 @@ private:
 
 	// drag element specs
 	DragElementSpec **dragel;                    // list of variable drag element definitions
-	DWORD ndragel;                               // length of drag element list
+	oapi::UInt32 ndragel;                               // length of drag element list
 
 	// docking port specs
 	PortSpec **dock;                             // list of docking port definitions
-	DWORD ndock;                                 // length of docking port list
+	oapi::UInt32 ndock;                                 // length of docking port list
 	int dockmode;                                // 0=2006 legacy mode, 1=2010 mode
 	double undock_t;                             // time of last undock event
 
 	// parent/child attachment specs
 	AttachmentSpec **pattach;                    // "attachment to parent" list
 	AttachmentSpec **cattach;                    // "attachment to children" list
-	DWORD npattach, ncattach;                    // list lengths
+	oapi::UInt32 npattach, ncattach;                    // list lengths
 	AttachmentSpec *attach;                      // the current attachment to a parent, if applicable
 	Matrix attach_rrot;                          // rotation matrix from vessel to current parent
 	Vector attach_rpos;                          // position of vessel in current parent's frame
 
 	struct {                                     // this structure is used when parsing attachment
-		DWORD ci, pi;                            // info from a scenario to prepare deferred attachment
+		oapi::UInt32 ci, pi;                            // info from a scenario to prepare deferred attachment
 		char *pname;                             // should be merged into VESSELSTATUS
 	} attach_status;
 
 	// navigation radios
 	NavRadioSpec *nav;                           // list of nav radio settings
-	DWORD nnav;                                  // number of nav radios
+	oapi::UInt32 nnav;                                  // number of nav radios
 
 	// transponder
 	Nav_XPDR *xpdr;
 
 	// beacon lights
 	BEACONLIGHTSPEC **beacon;
-	DWORD nbeacon;
+	oapi::UInt32 nbeacon;
 
 	LightEmitter **emitter;
-	DWORD nemitter;
+	oapi::UInt32 nemitter;
 
 	// reentry texture definition
 	ReentryRenderSpec reentry;
 
 	// locally defined MFD modes
-	DWORD nmfdmode;                              // number of locally defined modes
+	oapi::UInt32 nmfdmode;                              // number of locally defined modes
 	MFDMODE *mfdmode;                            // list of locally defined modes
 
 	double emass, fmass, pfmass; // empty mass, current total fuel mass, previous total fuel mass
@@ -1609,7 +1622,7 @@ private:
 	bool burnfuel;               // no unlimited fuel
 	bool extpassmesh;
 	int attmode;                 // 0=disabled, 1=rotational, 2=transversal attitude thruster mode
-	DWORD ctrlsurfmode;          // disable/enable airfoil control surfaces. bit0=elevator, bit1=rudder, bit2=aileron
+	oapi::UInt32 ctrlsurfmode;          // disable/enable airfoil control surfaces. bit0=elevator, bit1=rudder, bit2=aileron
 
 	bool nosesteering;           // nosewheel steering active?
 	double nosewheeldir;         // nosewheel orientation (-1..1)
@@ -1632,15 +1645,15 @@ private:
 	struct {
 		double dist;
 		Vessel *vessel;
-		DWORD dock;
+		oapi::UInt32 dock;
 	} closedock;
 
 	Vessel *proxyvessel;      // closest vessel
 	SuperVessel *supervessel; // vessel superstructure (docking complex)
 	Base    *landtgt;         // landing target (base)
 	int   lstatus;            // landing/docking comms status (0=no contact, 1=contact,
-	DWORD nport;              // allocated landing pad/docking port no (>=0, (DWORD)-1=none)
-	UINT  scanvessel;         // next vessel to check for docking event
+	oapi::UInt32 nport;              // allocated landing pad/docking port no (>=0, (oapi::UInt32)-1=none)
+	oapi::UInt  scanvessel;         // next vessel to check for docking event
 
 	mutable bool surfprm_valid;
 	bool pyp_valid;
@@ -1651,8 +1664,8 @@ private:
 	Vector touchdown_nm;   // upward normal of touchdown plane (vessel frame)
 	Vector touchdown_cg;   // projection of CG onto touchdown plane
 	TOUCHDOWN_VTX *touchdown_vtx;
-	DWORD ntouchdown_vtx;    // number of touchdown vertices
-	DWORD next_hullvtx;      // used by hull vertex iterator
+	oapi::UInt32 ntouchdown_vtx;    // number of touchdown vertices
+	oapi::UInt32 next_hullvtx;      // used by hull vertex iterator
 
 	Vector campos;             // internal camera position (cockpit mode);
 	Vector camdir0;            // internal default camera direction (cockpit mode)
@@ -1679,7 +1692,7 @@ private:
 	mutable bool weight_valid; // flag for 'Weight' up to date
 	double Lift, Drag, SideForce;         // current lift and drag magnitudes
 
-	DWORD navmode;             // bitflags for currently active navmodes
+	oapi::UInt32 navmode;             // bitflags for currently active navmodes
 	struct HoverHoldAlt {      // Hover hold altitude data
 		double alt;            //   hover hold target altitude
 		double palt;           //   hover hold previous altitude
@@ -1719,11 +1732,11 @@ private:
 		Str64 meshname;    // mesh file names for the visual
 		MESHHANDLE hMesh;  // pointer to preloaded mesh, if present
 		VECTOR3 meshofs;   // mesh offset in vessel coords
-		DWORD_PTR crc;         // mesh id
-		WORD vismode;      // visibility mode: 1=external only, 2=internal only, 3=both
+		std::uintptr_t crc;         // mesh id
+		oapi::UInt16 vismode;      // visibility mode: 1=external only, 2=internal only, 3=both
 	} **meshlist;
-	UINT nmesh;        // number of meshes
-	DWORD_PTR mesh_crc;    // visual state checksum
+	oapi::UInt nmesh;        // number of meshes
+	std::uintptr_t mesh_crc;    // visual state checksum
 
 	bool bIsConvexCollider; // If true, uses GJK Convex Hull. If false, uses Point-vs-Triangle mesh collision.
 
@@ -1731,9 +1744,9 @@ public:
 	// Hull vertex cache for mesh collision (vessel-local coords)
 	struct HullVertex {
 		VECTOR3 pos;
-		UINT meshIdx;
-		DWORD groupIdx;
-		DWORD clusterIdx;
+		oapi::UInt meshIdx;
+		oapi::UInt32 groupIdx;
+		oapi::UInt32 clusterIdx;
 	};
 	struct HullGroupSlice {
 		size_t startIdx;
@@ -1745,9 +1758,9 @@ protected:
 	std::vector<HullVertex> m_hullCacheStatic; // original untransformed vertices
 	std::vector<HullGroupSlice> m_hullGroupSlices; // groups of vertices by submesh
 	std::vector<VECTOR3> m_hullCache;   // cached hull vertices in vessel-local frame (animated)
-	std::vector<WORD> m_convexHullIdx;  // quickhull triangle indices (3 per face) for visualization
+	std::vector<oapi::UInt16> m_convexHullIdx;  // quickhull triangle indices (3 per face) for visualization
 	mutable std::vector<VECTOR3> m_clearZoneCache; // cache for clear zone bounding boxes (min/max pairs)
-	UINT m_hullCacheMeshCount;          // nmesh when cache was last built
+	oapi::UInt m_hullCacheMeshCount;          // nmesh when cache was last built
 	std::vector<VECTOR3> m_hullCacheP;  // hull points in planet-local frame
 	Vector m_hullMinP, m_hullMaxP;      // AABB of hull points in planet-local frame
 	bool m_hullCachePValid;             // true if m_hullCacheP is valid for current frame
@@ -1763,8 +1776,8 @@ protected:
 
 public:
 	void RefreshCollisionOverlapState();
-	static DWORD GetDisabledCollisionPairCount();
-	static bool GetDisabledCollisionPair(DWORD index, OBJHANDLE *hVessel1, OBJHANDLE *hVessel2);
+	static oapi::UInt32 GetDisabledCollisionPairCount();
+	static bool GetDisabledCollisionPair(oapi::UInt32 index, OBJHANDLE *hVessel1, OBJHANDLE *hVessel2);
 	static bool IsCollisionPairDisabled(const Vessel *v1, const Vessel *v2);
 	static void AddDisabledCollisionPair(Vessel *v1, Vessel *v2);
 	static void RemoveDisabledCollisionPair(const Vessel *v1, const Vessel *v2);
@@ -1772,7 +1785,7 @@ public:
 
 protected:
 
-	UINT exhaust_id;   // next exhaust id to attach
+	oapi::UInt exhaust_id;   // next exhaust id to attach
 
 	int killrot_delay;   // delay counter for killrot terminate
 	bool kill_pending;
@@ -1824,7 +1837,7 @@ private:
 	// system time for last sample output (pos, att)
 
 	double *frec_eng;
-	DWORD nfrec_eng;
+	oapi::UInt32 nfrec_eng;
 	double frec_eng_simt;
 	// Current engine status list
 
@@ -1865,44 +1878,44 @@ private:
 
 // BEGIN OBSOLETE
 
-	UINT AddAnimSeq (double defmeshstate);
+	oapi::UInt AddAnimSeq (double defmeshstate);
 	// add an animation sequence to the list
 	// defmeshstate (0..1) is the animation state of this sequence stored in the original mesh
 
-	bool AddAnimSeqComp (UINT seq, ANIMCOMP *comp);
+	bool AddAnimSeqComp (oapi::UInt seq, ANIMCOMP *comp);
 	// add a component to an existing animation sequence
 
-	bool SetAnimState (UINT seq, double state);
+	bool SetAnimState (oapi::UInt seq, double state);
 	// sets the state (0..1) of an animation sequence
 
 	void ClearAnimSeqs (void);
 	// removes all animation sequences
 
-	UINT nanimseq;        // number of animation sequences
+	oapi::UInt nanimseq;        // number of animation sequences
 	ANIMSEQ *animseq;     // list of animation sequences
 
 // END OBSOLETE
 
-	UINT CreateAnimation (double initial_state);
+	oapi::UInt CreateAnimation (double initial_state);
 	// Create a new animation
 	// initial_state (0..1) is the state of the animation of the unmodified mesh
 
-	ANIMATIONCOMP *AddAnimationComponent (UINT an, double state0, double state1,
+	ANIMATIONCOMP *AddAnimationComponent (oapi::UInt an, double state0, double state1,
 		MGROUP_TRANSFORM *trans, ANIMATIONCOMP *parent = NULL);
 	// Add a new component to animation 'an' with end states 'state0' and 'state1'
 	// 'trans' defines the transform. If 'parent' is defined, the animation is
 	// inserted as a child of 'parent'
 
-	bool DelAnimationComponent (UINT an, ANIMATIONCOMP *comp);
+	bool DelAnimationComponent (oapi::UInt an, ANIMATIONCOMP *comp);
 	// Remove a component from an animation
 
-	bool SetAnimation (UINT an, double state);
+	bool SetAnimation (oapi::UInt an, double state);
 	// Set the state (0..1) of animation 'an'
 
-	double GetAnimation (UINT an);
+	double GetAnimation (oapi::UInt an);
 	// Returns the current state of animation 'an'
 
-	bool DelAnimation (UINT an);
+	bool DelAnimation (oapi::UInt an);
 	// Deletes animation 'an' by removing all its components.
 	// The animation state of the mesh is reset to its default position
 	// before the animation is removed.
@@ -1911,7 +1924,7 @@ private:
 	// Remove all animations. If reset==true, all animated groups on visuals
 	// are reset to their initial states before the animations are destroyed
 
-	UINT nanim;			// number of animations
+	oapi::UInt nanim;			// number of animations
 	ANIMATION *anim;	// list of animations
 
 	bool EditorModule (char *cbuf) const;
@@ -1919,8 +1932,16 @@ private:
 	// extensions for the vessel
 
 	// API interface functions
+#ifdef _WIN32
 	friend OAPIFUNC double oapiGetMaxFuelMass (OBJHANDLE hVessel);
-	friend OAPIFUNC PROPELLANT_HANDLE oapiGetPropellantHandle (OBJHANDLE hVessel, DWORD idx);
+#else
+	friend double oapiGetMaxFuelMass (OBJHANDLE hVessel);
+#endif
+#ifdef _WIN32
+	friend OAPIFUNC PROPELLANT_HANDLE oapiGetPropellantHandle (OBJHANDLE hVessel, oapi::UInt32 idx);
+#else
+	friend PROPELLANT_HANDLE oapiGetPropellantHandle (OBJHANDLE hVessel, oapi::UInt32 idx);
+#endif
 };
 
 #endif // !__VESSEL_H

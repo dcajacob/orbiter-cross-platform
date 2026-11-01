@@ -22,6 +22,7 @@ set(common_src
 	Orbiter.cpp
 	Production/WindowsSession.cpp
 	Production/WindowsWorldVesselServices.cpp
+	Production/WindowsVesselServices.cpp
 	Production/WindowsWorld.cpp
 	Production/WindowsBodyServices.cpp
 	Production/WindowsRigidBodyServices.cpp

@@ -2,6 +2,17 @@ if(NOT TARGET orbiter_production_boundary)
     add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/../../../Src/Orbiter/Production" production-boundary)
 endif()
 find_package(Python3 3.9 COMPONENTS Interpreter REQUIRED)
+add_executable(production_vessel_declarations_test VesselDeclarations.Test.cpp)
+target_link_libraries(production_vessel_declarations_test PRIVATE orbiter_production_boundary)
+orbiter_stage_core_runtime(production_vessel_declarations_test)
+add_test(NAME Production.VesselDeclarations COMMAND production_vessel_declarations_test)
+if(NOT WIN32)
+    # Compile the actual state/assembly sources while the owning Vessel module
+    # boundary is extracted. These objects are not a runnable native vessel.
+    add_library(production_vessel_state_objects OBJECT
+        ../../../Src/Orbiter/Vesselstatus.cpp ../../../Src/Orbiter/SuperVessel.cpp)
+    target_link_libraries(production_vessel_state_objects PRIVATE orbiter_production_boundary)
+endif()
 add_executable(production_navigation_test Navigation.Test.cpp)
 target_link_libraries(production_navigation_test PRIVATE orbiter_production_boundary)
 orbiter_stage_core_runtime(production_navigation_test)

@@ -51,7 +51,11 @@ def verify():
     name='Src/Orbiter/Vessel.h';old=original(name)
     start=old.index(b'typedef struct {      // docking port definition');end=old.index(b'} PortSpec;',start)+len(b'} PortSpec;')
     port=current('Src/Orbiter/VesselPorts.h').replace(b'typedef struct PortSpec {',b'typedef struct {').replace(b'orbiter::production::UInt32',b'DWORD')
-    if port.count(old[start:end])!=1 or old[:start]+b'#include "VesselPorts.h"'+old[end:]!=current(name):
+    actual=current(name)
+    if (ROOT/'Src/Orbiter/Production/VesselServices.h').exists():
+        from vessel_source import restore_header
+        actual=restore_header(actual.decode('cp1252')).encode('cp1252')
+    if port.count(old[start:end])!=1 or old[:start]+b'#include "VesselPorts.h"'+old[end:]!=actual:
         raise ValueError('production docking port layout or vessel declarations changed')
     api=original('Orbitersdk/include/OrbiterAPI.h')
     record=re.search(rb'typedef struct \{(?:(?!typedef struct \{).)*?\} NAVDATA;',api,re.S)[0]

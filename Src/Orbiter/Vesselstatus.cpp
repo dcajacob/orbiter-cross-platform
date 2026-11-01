@@ -6,16 +6,20 @@
 // concerned with VESSELCLASS interfaces
 // ==============================================================
 
-#include "Orbiter.h"
 #include "Vessel.h"
-#include "Supervessel.h"
+#include "Planet.h"
+#include "Star.h"
+#include "Production/GeometryConversions.h"
+#include "Nav.h"
+#include "ConfigFile.h"
+#include "Production/Text.h"
+#include "Production/RigidBodyServices.h"
+#include "Production/SurfaceServices.h"
+#include "SuperVessel.h"
 #include "Config.h"
-#include "Pane.h"
 #include "Element.h"
-#include "Psys.h"
+#include "PsysCore.h"
 #include "Base.h"
-#include "Util.h"
-#include "Log.h"
 #include <fstream>
 #include <iomanip>
 #include <stdio.h>
@@ -23,10 +27,7 @@
 
 using std::min;
 
-extern Orbiter *g_pOrbiter;
-extern TimeData td;
-extern PlanetarySystem *g_psys;
-extern char DBG_MSG[256];
+using namespace orbiter::production;
 
 // ==============================================================
 // ParseScenarioLineX versions
@@ -38,20 +39,20 @@ extern char DBG_MSG[256];
 bool Vessel::ParseScenarioLine (char *line, VESSELSTATUS &vs)
 {
 	char cbuf[256], *pd, c;
-	DWORD n;
+	oapi::UInt32 n;
 	double lvl;
 
-	if (!_strnicmp (line, "STATUS", 6)) {
+	if (!ComparePrefix (line, "STATUS", 6)) {
 		line = trim_string (line+6);
-		if (!_strnicmp (line, "LANDED", 6)) {
-			vs.rbody = (OBJHANDLE)g_psys->GetGravObj (trim_string (line+6));
+		if (!ComparePrefix (line, "LANDED", 6)) {
+			vs.rbody = (OBJHANDLE)GetRigidBodyServices().World()->GetGravObj (trim_string (line+6));
 			vs.status = 1;
 			vs.vdata[0].z = 0.0f; // default when landed
-		} else if (!_strnicmp (line, "ORBITING", 8)) {
-			vs.rbody = (OBJHANDLE)g_psys->GetGravObj (trim_string (line+8));
+		} else if (!ComparePrefix (line, "ORBITING", 8)) {
+			vs.rbody = (OBJHANDLE)GetRigidBodyServices().World()->GetGravObj (trim_string (line+8));
 			vs.status = 0;
 		}
-	} else if (!_strnicmp (line, "BASE", 4)) {
+	} else if (!ComparePrefix (line, "BASE", 4)) {
 		line = trim_string (line+4);
 		if (pd = strtok (line, ":")) {
 			strcpy (cbuf, pd);
@@ -66,58 +67,58 @@ bool Vessel::ParseScenarioLine (char *line, VESSELSTATUS &vs)
 				// place ship in centre of landing pad by default
 			}
 		}
-	} else if (!_strnicmp (line, "POS", 3)) {
+	} else if (!ComparePrefix (line, "POS", 3)) {
 		sscanf (line+3, "%lf%lf", &vs.vdata[0].x, &vs.vdata[0].y);
 		vs.vdata[0].x *= RAD;
 		vs.vdata[0].y *= RAD;
-	} else if (!_strnicmp (line, "HEADING", 7)) {
+	} else if (!ComparePrefix (line, "HEADING", 7)) {
 		sscanf (line+7, "%lf", &vs.vdata[0].z);
 		vs.vdata[0].z *= RAD;
-	} else if (!_strnicmp (line, "RPOS", 4)) {
+	} else if (!ComparePrefix (line, "RPOS", 4)) {
 		sscanf (line+4, "%lf%lf%lf", &vs.rpos.x, &vs.rpos.y, &vs.rpos.z);
-	} else if (!_strnicmp (line, "RVEL", 4)) {
+	} else if (!ComparePrefix (line, "RVEL", 4)) {
 		sscanf (line+4, "%lf%lf%lf", &vs.rvel.x, &vs.rvel.y, &vs.rvel.z);
-	} else if (!_strnicmp (line, "ELEMENTS", 8)) {
+	} else if (!ComparePrefix (line, "ELEMENTS", 8)) {
 		double a, e, i, theta, omegab, L, elmjd;
 		Vector rpos, rvel;
 		sscanf (line+8, "%lf%lf%lf%lf%lf%lf%lf",  &a, &e, &i, &theta, &omegab, &L, &elmjd);
 		if (vs.rbody) {
 			el->Set (a, e, i*RAD, theta*RAD, omegab*RAD, L*RAD, elmjd);
-			el->Setup (mass, ((Body*)vs.rbody)->Mass(), td.MJD_ref);
+			el->Setup (mass, ((Body*)vs.rbody)->Mass(), GetRigidBodyServices().Time().MJD_ref, GetRigidBodyServices().Time().MJD_ref);
 			el->Update (rpos, rvel);
 			vs.rpos.x = rpos.x, vs.rpos.y = rpos.y, vs.rpos.z = rpos.z;
 			vs.rvel.x = rvel.x, vs.rvel.y = rvel.y, vs.rvel.z = rvel.z;
 			el_valid = true;
 		}
-	} else if (!_strnicmp (line, "AROT", 4)) {
+	} else if (!ComparePrefix (line, "AROT", 4)) {
 		sscanf (line+4, "%lf%lf%lf", &vs.arot.x, &vs.arot.y, &vs.arot.z);
 		vs.arot.x *= RAD, vs.arot.y *= RAD, vs.arot.z *= RAD;
-	} else if (!_strnicmp (line, "VROT", 4)) {
+	} else if (!ComparePrefix (line, "VROT", 4)) {
 		sscanf (line+4, "%lf%lf%lf", &vs.vrot.x, &vs.vrot.y, &vs.vrot.z);
 		vs.vrot.x *= RAD, vs.vrot.y *= RAD, vs.vrot.z *= RAD;
-	} else if (!_strnicmp (line, "FUEL", 4)) {  // old style propellant interface
+	} else if (!ComparePrefix (line, "FUEL", 4)) {  // old style propellant interface
 		sscanf (line+4, "%lf", &vs.fuel);
-	} else if (!_strnicmp (line, "PRPLEVEL", 8)) { // new style propellant interface
+	} else if (!ComparePrefix (line, "PRPLEVEL", 8)) { // new style propellant interface
 		for (pd = strtok (line+8, " "); pd; pd = strtok (NULL, " "))
 			if (sscanf (pd, "%d%c%lf", &n, &c, &lvl) == 3)
 				if (n < ntank && tank[n] == def_tank) vs.fuel = lvl;
-	} else if (!_strnicmp (line, "THLEVEL", 7)) {
+	} else if (!ComparePrefix (line, "THLEVEL", 7)) {
 		for (pd = strtok (line+7, " "); pd; pd = strtok (NULL, " ")) {
 			if (sscanf (pd, "%d%c%lf", &n, &c, &lvl) == 3 && n < m_thruster.size()) {
 				m_thruster[n]->level = m_thruster[n]->level_permanent = lvl;
 				m_thruster[n]->level_override = 0.0;
 			}
 		}
-	} else if (!_strnicmp (line, "IDS", 3)) {
-		DWORD step, irange, m, i;
+	} else if (!ComparePrefix (line, "IDS", 3)) {
+		oapi::UInt32 step, irange, m, i;
 		for (pd = strtok (line+3, " "), n = 0; n < ndock && pd; pd = strtok (NULL, " ")) {
 			if ((m = sscanf (pd, "%d%c%d%c%d", &i, &c, &step, &c, &irange)) >= 3 && i < ndock) {
 				if (m < 5) irange = 20;
 				SetDockIDS (dock[i], (float)(step*0.05 + NAV_RADIO_FREQ_MIN), (float)(irange*1e3));
 			}
 		}
-	} else if (!_strnicmp (line, "NAVFREQ", 7)) {
-		DWORD step;
+	} else if (!ComparePrefix (line, "NAVFREQ", 7)) {
+		oapi::UInt32 step;
 		for (pd = strtok (line+7, " "), n = 0; n < nnav && pd; pd = strtok (NULL, " "))
 			if (sscanf (pd, "%d", &step) == 1) {
 				nav[n].freq = (float)((nav[n].step = step)*0.05 + NAV_RADIO_FREQ_MIN);
@@ -133,30 +134,30 @@ bool Vessel::ParseScenarioLine (char *line, VESSELSTATUS &vs)
 bool Vessel::ParseScenarioLine2 (char *line, void *status)
 {
 	char cbuf[256], *pd, c;
-	DWORD nn, n;
+	oapi::UInt32 nn, n;
 	double lvl;
 	VESSELSTATUS2 *vs = (VESSELSTATUS2*)status;
 
-	if (!_strnicmp (line, "STATUS", 6)) {
+	if (!ComparePrefix (line, "STATUS", 6)) {
 
 		line = trim_string (line+6);
-		if (!_strnicmp (line, "LANDED", 6)) {
-			vs->rbody = (OBJHANDLE)g_psys->GetGravObj (trim_string (line+6));
+		if (!ComparePrefix (line, "LANDED", 6)) {
+			vs->rbody = (OBJHANDLE)GetRigidBodyServices().World()->GetGravObj (trim_string (line+6));
 			vs->surf_hdg = 0.0; // default when landed
 			vs->status = 1;
 			vs->arot.x = 10; // flag for 'not set'
-		} else if (!_strnicmp (line, "ORBITING", 8)) {
-			vs->rbody = (OBJHANDLE)g_psys->GetGravObj (trim_string (line+8));
+		} else if (!ComparePrefix (line, "ORBITING", 8)) {
+			vs->rbody = (OBJHANDLE)GetRigidBodyServices().World()->GetGravObj (trim_string (line+8));
 			vs->status = 0;
 #ifdef UNDEF
 		} else if (!strnicmp (line, "DOCKED", 6)) {
 			line = trim_string (line+6);
 			if (pd = strtok (line, ":")) {
 				strcpy (cbuf, pd);
-				vs->rbody = (OBJHANDLE)g_psys->GetGravObj (trim_string (cbuf));
+				vs->rbody = (OBJHANDLE)GetRigidBodyServices().World()->GetGravObj (trim_string (cbuf));
 				if (pd = strtok (NULL, ":")) {
 					strcpy (cbuf, pd);
-					vs->base = (OBJHANDLE)g_psys->GetStation (trim_string (cbuf));
+					vs->base = (OBJHANDLE)GetRigidBodyServices().World()->GetStation (trim_string (cbuf));
 					if (pd = strtok (NULL, ":")) {
 							sscanf (pd, "%d", &vs->port);
 						vs->status = 3;
@@ -166,7 +167,7 @@ bool Vessel::ParseScenarioLine2 (char *line, void *status)
 #endif
 		}
 
-	} else if (!_strnicmp (line, "BASE", 4)) {
+	} else if (!ComparePrefix (line, "BASE", 4)) {
 
 		line = trim_string (line+4);
 		if (pd = strtok (line, ":")) {
@@ -177,8 +178,7 @@ bool Vessel::ParseScenarioLine2 (char *line, void *status)
 			if (!base) {
 				char cerr[1024];
 				sprintf (cerr, "Scenario parse error for vessel %s: base '%s' not found on body '%s'.", name.c_str(), trim_string(cbuf), ((Planet*)vs->rbody)->Name());
-				LOGOUT_ERR(cerr);
-				g_pOrbiter->TerminateOnError();
+				GetVesselServices().Fatal(cerr);
 			}
 			vs->base = (OBJHANDLE)base;
 			if (pd = strtok (NULL, ":")) {
@@ -189,18 +189,18 @@ bool Vessel::ParseScenarioLine2 (char *line, void *status)
 			}
 		}
 
-	} else if (!_strnicmp (line, "POS", 3)) {
+	} else if (!ComparePrefix (line, "POS", 3)) {
 
 		sscanf (line+3, "%lf%lf", &vs->surf_lng, &vs->surf_lat);
 		vs->surf_lng *= RAD;
 		vs->surf_lat *= RAD;
 
-	} else if (!_strnicmp (line, "HEADING", 7)) {
+	} else if (!ComparePrefix (line, "HEADING", 7)) {
 
 		sscanf (line+7, "%lf", &vs->surf_hdg);
 		vs->surf_hdg *= RAD;
 
-	} else if (!_strnicmp (line, "PRPLEVEL", 8)) { // propellant status
+	} else if (!ComparePrefix (line, "PRPLEVEL", 8)) { // propellant status
 
 		if (vs->nfuel) delete []vs->fuel;
 		// pass 1: find out how many propellant definitions there are
@@ -208,7 +208,7 @@ bool Vessel::ParseScenarioLine2 (char *line, void *status)
 			if (*pd == ':') nn++;
 		}
 		vs->nfuel = nn;
-		vs->fuel = new VESSELSTATUS2::FUELSPEC[nn]; TRACENEW
+		vs->fuel = new VESSELSTATUS2::FUELSPEC[nn]; GetRigidBodyServices().TraceAllocation(__FILE__,__LINE__);
 		// pass 2: read propellant definitions
 		for (nn = 0, pd = strtok (line+8, " "); pd; pd = strtok (NULL, " "))
 			if (sscanf (pd, "%d%c%lf", &n, &c, &lvl) == 3) {
@@ -217,22 +217,22 @@ bool Vessel::ParseScenarioLine2 (char *line, void *status)
 				nn++;
 			}
 
-	} else if (!_strnicmp (line, "FUEL", 4)) { // global propellant resource setting
+	} else if (!ComparePrefix (line, "FUEL", 4)) { // global propellant resource setting
 
 		if (sscanf (line+4, "%lf", &lvl)) { // old style fuel definition
 			if (vs->nfuel) delete []vs->fuel;
-			vs->fuel = new VESSELSTATUS2::FUELSPEC[vs->nfuel = 1]; TRACENEW
-			vs->fuel[0].idx = (DWORD)-1; // mark 'global'
+			vs->fuel = new VESSELSTATUS2::FUELSPEC[vs->nfuel = 1]; GetRigidBodyServices().TraceAllocation(__FILE__,__LINE__);
+			vs->fuel[0].idx = (oapi::UInt32)-1; // mark 'global'
 			vs->fuel[0].level = lvl;
 		}
 
-	} else if (!_strnicmp (line, "THLEVEL", 7)) { // read thruster status
+	} else if (!ComparePrefix (line, "THLEVEL", 7)) { // read thruster status
 
 		if (vs->nthruster) delete []vs->thruster;
 		// pass 1: find out how many thruster defintions there are
 		for (nn = 0, pd = line+7; *pd; pd++) if (*pd == ':') nn++;
 		vs->nthruster = nn;
-		vs->thruster = new VESSELSTATUS2::THRUSTSPEC[nn]; TRACENEW
+		vs->thruster = new VESSELSTATUS2::THRUSTSPEC[nn]; GetRigidBodyServices().TraceAllocation(__FILE__,__LINE__);
 		// pass 2: read thruster definitions
 		for (nn = 0, pd = strtok (line+7, " "); pd; pd = strtok (NULL, " "))
 			if (sscanf (pd, "%d%c%lf", &n, &c, &lvl) == 3) {
@@ -241,7 +241,7 @@ bool Vessel::ParseScenarioLine2 (char *line, void *status)
 				nn++;
 			}
 
-	} else if (!_strnicmp (line, "ENGINE_MAIN", 11)) { // old style main/retro thruster status
+	} else if (!ComparePrefix (line, "ENGINE_MAIN", 11)) { // old style main/retro thruster status
 
 		if (sscanf (line+11, "%lf", &lvl)) {
 			if (lvl > 0) {
@@ -249,7 +249,7 @@ bool Vessel::ParseScenarioLine2 (char *line, void *status)
 				for (auto it = tgs.ts.begin(); it != tgs.ts.end(); it++) {
 					for (nn = 0; nn < m_thruster.size(); nn++) {
 						if (m_thruster[nn] == *it) {
-							VESSELSTATUS2::THRUSTSPEC *tmp = new VESSELSTATUS2::THRUSTSPEC[vs->nthruster+1]; TRACENEW
+							VESSELSTATUS2::THRUSTSPEC *tmp = new VESSELSTATUS2::THRUSTSPEC[vs->nthruster+1]; GetRigidBodyServices().TraceAllocation(__FILE__,__LINE__);
 							if (vs->nthruster) { memcpy (tmp, vs->thruster, vs->nthruster*sizeof (VESSELSTATUS2::THRUSTSPEC)); delete []vs->thruster; }
 							tmp[vs->nthruster].idx = nn;
 							tmp[vs->nthruster].level = lvl;
@@ -263,7 +263,7 @@ bool Vessel::ParseScenarioLine2 (char *line, void *status)
 				for (auto it = tgs.ts.begin(); it != tgs.ts.end(); it++) {
 					for (nn = 0; nn < m_thruster.size(); nn++) {
 						if (m_thruster[nn] == *it) {
-							VESSELSTATUS2::THRUSTSPEC *tmp = new VESSELSTATUS2::THRUSTSPEC[vs->nthruster+1]; TRACENEW
+							VESSELSTATUS2::THRUSTSPEC *tmp = new VESSELSTATUS2::THRUSTSPEC[vs->nthruster+1]; GetRigidBodyServices().TraceAllocation(__FILE__,__LINE__);
 							if (vs->nthruster) { memcpy (tmp, vs->thruster, vs->nthruster*sizeof (VESSELSTATUS2::THRUSTSPEC)); delete []vs->thruster; }
 							tmp[vs->nthruster].idx = nn;
 							tmp[vs->nthruster].level = -lvl;
@@ -274,14 +274,14 @@ bool Vessel::ParseScenarioLine2 (char *line, void *status)
 				}
 			}
 		}
-	} else if (!_strnicmp (line, "ENGINE_HOVR", 11)) { // old style hover thruster status
+	} else if (!ComparePrefix (line, "ENGINE_HOVR", 11)) { // old style hover thruster status
 
 		if (sscanf (line+11, "%lf", &lvl) && lvl > 0) {
 			ThrustGroupSpec& tgs = m_thrusterGroupDef[THGROUP_HOVER];
 			for (auto it = tgs.ts.begin(); it != tgs.ts.end(); it++) {
 				for (nn = 0; nn < m_thruster.size(); nn++) {
 					if (m_thruster[nn] == *it) {
-						VESSELSTATUS2::THRUSTSPEC *tmp = new VESSELSTATUS2::THRUSTSPEC[vs->nthruster+1]; TRACENEW
+						VESSELSTATUS2::THRUSTSPEC *tmp = new VESSELSTATUS2::THRUSTSPEC[vs->nthruster+1]; GetRigidBodyServices().TraceAllocation(__FILE__,__LINE__);
 						if (vs->nthruster) { memcpy (tmp, vs->thruster, vs->nthruster*sizeof (VESSELSTATUS2::THRUSTSPEC)); delete []vs->thruster; }
 						tmp[vs->nthruster].idx = nn;
 						tmp[vs->nthruster].level = lvl;
@@ -292,49 +292,49 @@ bool Vessel::ParseScenarioLine2 (char *line, void *status)
 			}
 		}
 
-	} else if (!_strnicmp (line, "DOCKINFO", 8)) {
+	} else if (!ComparePrefix (line, "DOCKINFO", 8)) {
 
 		if (vs->ndockinfo) delete []vs->dockinfo;
 		// pass 1: find number of dock info records
 		for (nn = 0, pd = line+8; *pd; pd++) if (*pd == ':') nn++;
 		vs->ndockinfo = nn;
-		vs->dockinfo = new VESSELSTATUS2::DOCKINFOSPEC[nn]; TRACENEW
+		vs->dockinfo = new VESSELSTATUS2::DOCKINFOSPEC[nn]; GetRigidBodyServices().TraceAllocation(__FILE__,__LINE__);
 		// pass 2: read dock info records
 		for (nn = 0, pd = strtok (line+8, " "); pd; pd = strtok (NULL, " ")) {
 			sscanf (pd, "%d:%d,%s", &vs->dockinfo[nn].idx, &vs->dockinfo[nn].ridx, cbuf);
 			// DODGY - cast name into 4 bytes of vessel pointer!
 			vs->dockinfo[nn].rvessel = 0;
-			BYTE *tmp = (BYTE*)&vs->dockinfo[nn].rvessel;
+			std::uint8_t *tmp = (std::uint8_t*)&vs->dockinfo[nn].rvessel;
 			for (int i = 0; cbuf[i]; i++) tmp[i%4] += cbuf[i];
 			nn++;
 		}
 
-	} else if (!_strnicmp (line, "RPOS", 4)) {
+	} else if (!ComparePrefix (line, "RPOS", 4)) {
 		sscanf (line+4, "%lf%lf%lf", &vs->rpos.x, &vs->rpos.y, &vs->rpos.z);
-	} else if (!_strnicmp (line, "RVEL", 4)) {
+	} else if (!ComparePrefix (line, "RVEL", 4)) {
 		sscanf (line+4, "%lf%lf%lf", &vs->rvel.x, &vs->rvel.y, &vs->rvel.z);
-	} else if (!_strnicmp (line, "AROT", 4)) {
+	} else if (!ComparePrefix (line, "AROT", 4)) {
 		sscanf (line+4, "%lf%lf%lf", &vs->arot.x, &vs->arot.y, &vs->arot.z);
 		vs->arot.x *= RAD, vs->arot.y *= RAD, vs->arot.z *= RAD;
-	} else if (!_strnicmp (line, "VROT", 4)) {
+	} else if (!ComparePrefix (line, "VROT", 4)) {
 		sscanf (line+4, "%lf%lf%lf", &vs->vrot.x, &vs->vrot.y, &vs->vrot.z);
 		vs->vrot.x *= RAD, vs->vrot.y *= RAD, vs->vrot.z *= RAD;
-	} else if (!_strnicmp (line, "ALT", 3)) { // NOTE: 'ALT' and 'VROT' cannot be used together. ALT is used for landed vessels
+	} else if (!ComparePrefix (line, "ALT", 3)) { // NOTE: 'ALT' and 'VROT' cannot be used together. ALT is used for landed vessels
 		sscanf (line+3, "%lf", &vs->vrot.x);
-	} else if (!_strnicmp (line, "ELEMENTS", 8)) {
+	} else if (!ComparePrefix (line, "ELEMENTS", 8)) {
 		double a, e, i, theta, omegab, L, elmjd;
 		Vector rpos, rvel;
 		sscanf (line+8, "%lf%lf%lf%lf%lf%lf%lf",  &a, &e, &i, &theta, &omegab, &L, &elmjd);
 		if (vs->rbody) {
 			el->Set (a, e, i*RAD, theta*RAD, omegab*RAD, L*RAD, elmjd);
-			el->Setup (mass, ((Body*)vs->rbody)->Mass(), td.MJD_ref);
+			el->Setup (mass, ((Body*)vs->rbody)->Mass(), GetRigidBodyServices().Time().MJD_ref, GetRigidBodyServices().Time().MJD_ref);
 			el->Update (rpos, rvel);
 			vs->rpos.x = rpos.x, vs->rpos.y = rpos.y, vs->rpos.z = rpos.z;
 			vs->rvel.x = rvel.x, vs->rvel.y = rvel.y, vs->rvel.z = rvel.z;
 			el_valid = true;
 		}
-	} else if (!_strnicmp (line, "IDS", 3)) {
-		DWORD step, irange, m, i, n = 0;
+	} else if (!ComparePrefix (line, "IDS", 3)) {
+		oapi::UInt32 step, irange, m, i, n = 0;
 		char c;
 		for (pd = strtok (line+3, " "); n < ndock && pd; pd = strtok (NULL, " ")) {
 			if ((m = sscanf (pd, "%d%c%d%c%d", &i, &c, &step, &c, &irange)) >= 3 && i < ndock) {
@@ -342,14 +342,14 @@ bool Vessel::ParseScenarioLine2 (char *line, void *status)
 				SetDockIDS (dock[i], (float)(step*0.05 + NAV_RADIO_FREQ_MIN), (float)(irange*1e3));
 			}
 		}
-	} else if (!_strnicmp (line, "NAVFREQ", 7)) {
-		DWORD step, n = 0;
+	} else if (!ComparePrefix (line, "NAVFREQ", 7)) {
+		oapi::UInt32 step, n = 0;
 		for (pd = strtok (line+7, " "); n < nnav && pd; pd = strtok (NULL, " "))
 			if (sscanf (pd, "%d", &step) == 1) {
 				nav[n].freq = (float)((nav[n].step = step)*0.05 + NAV_RADIO_FREQ_MIN);
 				n++;
 			}
-	} else if (!_strnicmp (line, "XPDR", 4)) {
+	} else if (!ComparePrefix (line, "XPDR", 4)) {
 		sscanf (line+4, "%d", &vs->xpdr);
 	} else return ParseScenarioLineDirect (line);
 	return true;
@@ -364,28 +364,28 @@ bool Vessel::ParseScenarioLine2 (char *line, void *status)
 
 bool Vessel::ParseScenarioLineDirect (char *line)
 {
-	if (!_strnicmp (line, "RCSMODE", 7)) {
+	if (!ComparePrefix (line, "RCSMODE", 7)) {
 		sscanf (line+7, "%d", &attmode);
 		return true;
-	} else if (!_strnicmp (line, "AFCMODE", 7)) {
+	} else if (!ComparePrefix (line, "AFCMODE", 7)) {
 		sscanf (line+7, "%d", &ctrlsurfmode);
 		return true;
-	} else if (!_strnicmp (line, "ATTACHED", 8)) {
+	} else if (!ComparePrefix (line, "ATTACHED", 8)) {
 		char cbuf[256];
 		sscanf (line+8, "%d:%d,%s", &attach_status.ci, &attach_status.pi, cbuf);
 		if (attach_status.pname) delete []attach_status.pname;
-		attach_status.pname = new char[strlen(cbuf)+1]; TRACENEW
+		attach_status.pname = new char[strlen(cbuf)+1]; GetRigidBodyServices().TraceAllocation(__FILE__,__LINE__);
 		strcpy (attach_status.pname, cbuf);
 		return true;
-	} else if (!_strnicmp (line, "FLIGHTDATA", 10)) {
+	} else if (!ComparePrefix (line, "FLIGHTDATA", 10)) {
 		bRequestPlayback = true;
 	}
 	return false;
 }
 
-DWORD Vessel::PackDefaultState (char **data, DWORD flag)
+oapi::UInt32 Vessel::PackDefaultState (char **data, oapi::UInt32 flag)
 {
-	DWORD size = sizeof(ScenarioData)-sizeof(char*);
+	oapi::UInt32 size = sizeof(ScenarioData)-sizeof(char*);
 	const char *cname = (fstatus == FLIGHTSTATUS_FREEFLIGHT ? cbody->Name() : proxyplanet->Name());
 	size += strlen(cname)+1;
 	if (flag & SD_NAME) {
@@ -393,21 +393,21 @@ DWORD Vessel::PackDefaultState (char **data, DWORD flag)
 		size += (classname ? strlen(classname)+1 : 1);
 	}
 	*data = new char[size];
-	ScenarioData *sd = (ScenarioData*)*data; TRACENEW
+	ScenarioData *sd = (ScenarioData*)*data; GetRigidBodyServices().TraceAllocation(__FILE__,__LINE__);
 	sd->size = size;
 	sd->flag = flag;
-	sd->fstate = (BYTE)fstatus;
+	sd->fstate = (std::uint8_t)fstatus;
 	switch (fstatus) {
 	case FLIGHTSTATUS_FREEFLIGHT:
-		sd->rpos = cpos;
-		sd->rvel = cvel;
-		EulerAngles (s0->R, sd->arot);
-		sd->vrot = s0->omega;
+		sd->orbital.rpos = cpos;
+		sd->orbital.rvel = cvel;
+		EulerAngles (s0->R, sd->orbital.arot);
+		sd->orbital.vrot = s0->omega;
 		break;
 	case FLIGHTSTATUS_LANDED:
-		sd->lng = sp.lng;
-		sd->lat = sp.lat;
-		sd->hdg = sp.dir;
+		sd->landed.lng = sp.lng;
+		sd->landed.lat = sp.lat;
+		sd->landed.hdg = sp.dir;
 		break;
 	}
 	strcpy (sd->buf, cname);
@@ -422,17 +422,17 @@ void Vessel::ApplyPackedState (const char *data)
 	ScenarioData *sd = (ScenarioData*)data;
 
 	pc = strtok (sd->buf, "\n");
-	cbody = g_psys->GetGravObj (pc);
-	if (!cbody) cbody = g_psys->GetStar(0); // a rather desparate default to keep things going
-	el->Setup (mass, cbody->Mass(), td.MJD_ref);
+	cbody = GetRigidBodyServices().World()->GetGravObj (pc);
+	if (!cbody) cbody = GetRigidBodyServices().World()->GetStar(0); // a rather desparate default to keep things going
+	el->Setup (mass, cbody->Mass(), GetRigidBodyServices().Time().MJD_ref, GetRigidBodyServices().Time().MJD_ref);
 
 	switch (sd->fstate) {
 	case 0: // freeflight
-		InitOrbiting (sd->rpos, sd->rvel, sd->arot, &sd->vrot);
+		InitOrbiting (sd->orbital.rpos, sd->orbital.rvel, sd->orbital.arot, &sd->orbital.vrot);
 		break;
 	case 1: // landed
-		InitLanded ((Planet*)cbody, sd->lng, sd->lat, sd->hdg);
-		if (proxybase) proxybase->ReportTouchdown (this, sd->lng, sd->lat);
+		InitLanded ((Planet*)cbody, sd->landed.lng, sd->landed.lat, sd->landed.hdg);
+		if (proxybase) proxybase->ReportTouchdown (this, sd->landed.lng, sd->landed.lat);
 		break;
 	}
 }
@@ -450,7 +450,7 @@ void Vessel::SetState (const VESSELSTATUS &status)
 	Vector rpos, rvel, orient, vrot;
 
 	cbody = (CelestialBody*)status.rbody;
-	if (!cbody) cbody = g_psys->GetStar(0); // use first sun if no reference is set
+	if (!cbody) cbody = GetRigidBodyServices().World()->GetStar(0); // use first sun if no reference is set
 	if (!cbody) return;                     // big trouble!
 
 	if (status.flag[0] & 2 && def_tank) {
@@ -458,7 +458,7 @@ void Vessel::SetState (const VESSELSTATUS &status)
 		SetPropellantMass (def_tank, status.fuel*def_tank->maxmass);
 	}
 	UpdateMass(); pfmass = fmass;
-	el->Setup (mass, cbody->Mass(), td.MJD_ref);
+	el->Setup (mass, cbody->Mass(), GetRigidBodyServices().Time().MJD_ref, GetRigidBodyServices().Time().MJD_ref);
 
 	if (status.flag[0] & 1) { // old-style thruster definition
 		if (status.eng_main >= 0.0) {
@@ -498,7 +498,7 @@ void Vessel::SetState (const VESSELSTATUS &status)
 		break;
 	}
 	m_hullCachePValid = false;
-	if (g_psys && g_psys->isVessel(this))
+	if (GetRigidBodyServices().World() && GetRigidBodyServices().World()->isVessel(this))
 		RefreshCollisionOverlapState();
 }
 
@@ -508,15 +508,15 @@ void Vessel::SetState (const VESSELSTATUS &status)
 void Vessel::SetState2 (const void *status)
 {
 	VESSELSTATUS2 *vs = (VESSELSTATUS2*)status;
-	DWORD i, idx;
+	oapi::UInt32 i, idx;
 	double lvl;
 
 	cbody = (CelestialBody*)vs->rbody;
-	if (!cbody) cbody = g_psys->GetStar(0); // a rather desparate default to keep things going
+	if (!cbody) cbody = GetRigidBodyServices().World()->GetStar(0); // a rather desparate default to keep things going
 
 	// should we call SetDefaultState() at this point?
 	landtgt = 0;
-	nport = (DWORD)-1;
+	nport = (oapi::UInt32)-1;
 	lstatus = 0;
 
 	// set propellant status
@@ -529,12 +529,12 @@ void Vessel::SetState2 (const void *status)
 			lvl = vs->fuel[i].level;
 			if (idx < ntank)
 				SetPropellantMass (tank[idx], lvl*tank[idx]->maxmass);
-			else if (idx == (DWORD)-1) // global setting
+			else if (idx == (oapi::UInt32)-1) // global setting
 				for (idx = 0; idx < ntank; idx++)
 					SetPropellantMass (tank[idx], lvl*tank[idx]->maxmass);
 		}
 	}
-	el->Setup (mass, cbody->Mass(), td.MJD_ref);
+	el->Setup (mass, cbody->Mass(), GetRigidBodyServices().Time().MJD_ref, GetRigidBodyServices().Time().MJD_ref);
 
 	// set thruster status
 	if (vs->flag & VS_THRUSTRESET)
@@ -594,7 +594,7 @@ void Vessel::SetState2 (const void *status)
 	}
 	if (xpdr && vs->xpdr) xpdr->SetStep (vs->xpdr);
 	m_hullCachePValid = false;
-	if (g_psys && g_psys->isVessel(this))
+	if (GetRigidBodyServices().World() && GetRigidBodyServices().World()->isVessel(this))
 		RefreshCollisionOverlapState();
 }
 
@@ -663,7 +663,7 @@ void Vessel::GetState (VESSELSTATUS &status)
 void Vessel::GetState2 (void *status)
 {
 	VESSELSTATUS2 *vs = (VESSELSTATUS2*)status;
-	DWORD i;
+	oapi::UInt32 i;
 
 	vs->rbody = (OBJHANDLE)cbody;
 	vs->base  = proxybase;
@@ -683,7 +683,7 @@ void Vessel::GetState2 (void *status)
 
 	if (vs->flag & VS_FUELLIST) {
 		vs->nfuel = ntank;
-		if (!vs->fuel) { vs->fuel = new VESSELSTATUS2::FUELSPEC[ntank]; TRACENEW }
+		if (!vs->fuel) { vs->fuel = new VESSELSTATUS2::FUELSPEC[ntank]; GetRigidBodyServices().TraceAllocation(__FILE__,__LINE__); }
 		for (i = 0; i < ntank; i++) {
 			vs->fuel[i].idx = i;
 			vs->fuel[i].level = tank[i]->mass / tank[i]->maxmass;
@@ -691,7 +691,7 @@ void Vessel::GetState2 (void *status)
 	}
 	if (vs->flag & VS_THRUSTLIST) {
 		vs->nthruster = m_thruster.size();
-		if (!vs->thruster) { vs->thruster = new VESSELSTATUS2::THRUSTSPEC[m_thruster.size()]; TRACENEW }
+		if (!vs->thruster) { vs->thruster = new VESSELSTATUS2::THRUSTSPEC[m_thruster.size()]; GetRigidBodyServices().TraceAllocation(__FILE__,__LINE__); }
 		for (i = 0; i < m_thruster.size(); i++) {
 			vs->thruster[i].idx = i;
 			vs->thruster[i].level = m_thruster[i]->level;
@@ -699,7 +699,7 @@ void Vessel::GetState2 (void *status)
 	}
 	if (vs->flag & VS_DOCKINFOLIST) {
 		vs->ndockinfo = ndock;
-		if (!vs->dockinfo) { vs->dockinfo = new VESSELSTATUS2::DOCKINFOSPEC[ndock]; TRACENEW }
+		if (!vs->dockinfo) { vs->dockinfo = new VESSELSTATUS2::DOCKINFOSPEC[ndock]; GetRigidBodyServices().TraceAllocation(__FILE__,__LINE__); }
 		for (i = 0; i < ndock; i++) {
 			vs->dockinfo[i].idx = i;
 			vs->dockinfo[i].ridx = dock[i]->matedock;
@@ -717,7 +717,7 @@ int Vessel::TouchdownPointsFromFile (const char *fname)
 	char line[512], *c;
 	strcpy (line, fname);
 	strcat (line, ".dat");
-	std::ifstream ifs (g_pOrbiter->Cfg()->ConfigPathNoext (line));
+	std::ifstream ifs (GetVesselServices().ConfigFile(line,false));
 	if (!ifs.good()) return 1;
 
 	// parse the touchdown point specs

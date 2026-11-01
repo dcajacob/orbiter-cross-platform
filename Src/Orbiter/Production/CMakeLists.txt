@@ -26,7 +26,7 @@ else()
     set(_archive_zlib ZLIB::ZLIB)
 endif()
 add_library(orbiter_production_boundary SHARED
-    WorldVesselServices.cpp SurfaceNavigation.cpp SurfaceServices.cpp SurfaceNames.cpp Session.cpp WorldOwner.cpp NativeModule.cpp NativeCelestialApi.cpp NativeCelestialServices.cpp NavigationServices.cpp ElevationServices.cpp NativeElevationServices.cpp ResourceResolver.cpp MeshData.cpp MeshServices.cpp BodyServices.cpp RigidBodyServices.cpp CelestialServices.cpp ScenarioColor.cpp
+    VesselServices.cpp WorldVesselServices.cpp SurfaceNavigation.cpp SurfaceServices.cpp SurfaceNames.cpp Session.cpp WorldOwner.cpp NativeModule.cpp NativeCelestialApi.cpp NativeCelestialServices.cpp NavigationServices.cpp ElevationServices.cpp NativeElevationServices.cpp ResourceResolver.cpp MeshData.cpp MeshServices.cpp BodyServices.cpp RigidBodyServices.cpp CelestialServices.cpp ScenarioColor.cpp
     ../Body.cpp ../Rigidbody.cpp ../BodyIntegrator.cpp ../Element.cpp
     ../Vecmat.cpp ../TimeData.cpp ../Config.cpp ../ConfigFile.cpp ../Mesh.cpp ../State.cpp
     ../Psys.cpp ../Vesselbase.cpp ../Planet.cpp ../Base.cpp ../Baseobj.cpp ../Shadow.cpp ../elevmgr.cpp ../elevmgrFile.cpp ../Nav.cpp ../PsysGravity.cpp ../PinesGrav.cpp ../PinesGravFile.cpp ../Celbody.cpp ../CelbodyFile.cpp ../ElementFile.cpp ../Star.cpp ../ZTreeMgr.cpp)

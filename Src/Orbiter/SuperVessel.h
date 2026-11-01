@@ -88,7 +88,7 @@ public:
 	// *this. If vessel2 is part of a superstructure, that superstructure is merged into
 	// *this.
 
-	void Detach (Vessel *vessel, DWORD port, double vsep = 0.2);
+	void Detach (Vessel *vessel, oapi::UInt32 port, double vsep = 0.2);
 	// detach "vessel" from the super-structure
 	
 	void SoftDockUpdate(Vessel* vessel, PortSpec* pD);
@@ -204,7 +204,7 @@ private:
 
 	// *** component data ***
 	SubVesselData *vlist; // list of associated vessels
-	DWORD nv;             // length of vlist;
+	oapi::UInt32 nv;             // length of vlist;
 
 	// *** global data ***
 	Vector cg;            // centre of gravity in supervessel coords
@@ -224,7 +224,7 @@ private:
 	//bool bOrbitStabilised;      // stabilised orbit
 
 	TOUCHDOWN_VTX hullvtx; // used by hull vertex iterator
-	DWORD next_hullvessel; // used by hull vertex iterator
+	oapi::UInt32 next_hullvessel; // used by hull vertex iterator
 };
 
 #endif // !__SUPERVESSEL_H
