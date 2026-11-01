@@ -1,0 +1,33 @@
+{
+  "schema": 1,
+  "automatic_refresh": false,
+  "production_source": "38b7c627878ea893390675616897071f8bb8e90f",
+  "runtime_source": "2e8bbbf24f5cf53e3e6dadd33fe8ef000748b3cc",
+  "bodies": 41,
+  "epochs": 129,
+  "rows": 24969,
+  "requests": [
+    3,
+    12,
+    15
+  ],
+  "budgets": {
+    "position_m": 0.01,
+    "velocity_m_s": 1e-05
+  },
+  "repeat_policy": "two byte-identical traces per Windows configuration; exact identities, time, requests and response flags",
+  "scope": "actual production celestial module callbacks before extraction, SI true/barycentric position and velocity, existing module coordinate conventions; not world integration or session lifecycle",
+  "production_source_sha256_lf": {
+    "Src/Celbody/SPICE/spice.cpp": "dc4d53c2049273b9d62420160c22976e3b999c22d6961b891213ec183434a1f5"
+  },
+  "inputs_sha256_lf": {
+    "Tests/Production/SpiceModules/Observe.cpp": "1d444f921dd84392df78e65f19f5326b1d50ec9d72a7e0d0342b0ce8bdf58b20",
+    "Tests/Production/SpiceModules/CMakeLists.txt": "137ca14bec28094ddde2d158290222f728975bf41b028a2e41723e1368da7b6c",
+    "Tests/Production/SpiceModules/epochs.txt": "488b886ed8eb87da61edef5787c792b050a9114719f8cf6001fc79d51b042b39",
+    "Tests/Production/SpiceModules/bodies.txt": "418c0ed4c4fc877b234175405f9aaded8cf264806d91a64028e40fe340f2c9bb",
+    "Tests/Production/stock-data.lock.json": "155fb89d22d58af113da6ff662904d74f82bbbbb7b9deb5e654b7c7141e27620",
+    "Tests/Production/SpiceModules/capture.py": "3b698be6b1d4c204855fa615b7dd8630b76d4ea7dbf94a890a5fa03928ff7247",
+    "Tests/Production/Fixtures/Sol-ISS-ShuttlePB.scn": "bcd836d4f80d5c85cf71e132830a23b5ab47607a9a5c00f498b19bf645459783",
+    "Tests/Production/Fixtures/Orbiter.cfg": "eed4bb294b9f868822399439ee625ee8108e07e6bf8019217daef16e92e5ddde"
+  }
+}

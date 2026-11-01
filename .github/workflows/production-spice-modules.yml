@@ -1,0 +1,64 @@
+name: Production SPICE Module Reference
+on:
+  push:
+    branches: ['codex/production-**']
+    paths: ['Tests/Production/SpiceModules/**', '.github/workflows/production-spice-modules.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  observe:
+    name: Original Windows SPICE ${{ matrix.configuration }} x64
+    runs-on: windows-2022
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        configuration: [Debug, Release]
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - uses: ilammy/msvc-dev-cmd@v1
+        with:
+          vsversion: '17.0'
+          arch: x64
+      - uses: actions/download-artifact@v8
+        with:
+          name: production-runtime-${{ matrix.configuration }}-x64
+          run-id: 41286856235
+          github-token: ${{ github.token }}
+          path: out/runtime-package
+      - name: Unpack the accepted pre-extraction application and SDK
+        run: python -m zipfile -e out/runtime-package/windows-test-runtime.zip out/runtime
+      - name: Build only the observation plugin against that exact SDK
+        shell: pwsh
+        run: |
+          cmake -S Tests/Production/SpiceModules -B out/spice-observer -G Ninja -DCMAKE_BUILD_TYPE=${{ matrix.configuration }} "-DORBITER_TEST_RUNTIME:PATH=$pwd/out/runtime" 2>&1 | Tee-Object spice-configure.log
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          cmake --build out/spice-observer --parallel 2 2>&1 | Tee-Object spice-build.log
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          cmd /c "cl 2>&1 & exit /b 0" | Out-File spice-compiler.txt
+      - uses: actions/cache@v6
+        with:
+          path: out/data-cache/Orbiter-x64.zip
+          key: production-data-${{ hashFiles('Tests/Production/stock-data.lock.json') }}
+      - name: Prepare exact production kernels and data
+        run: python Tests/Production/prepare_data.py --archive out/data-cache/Orbiter-x64.zip --destination out/data
+      - name: Query actual production modules twice before extraction
+        run: >-
+          python Tests/Production/SpiceModules/capture.py --runtime out/runtime --data out/data
+          --output out/spice-observation --configuration ${{ matrix.configuration }}
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: production-spice-modules-${{ matrix.configuration }}-x64
+          retention-days: 90
+          path: |
+            spice-*.log
+            spice-compiler.txt
+            out/spice-observation/trace-*.csv
+            out/spice-observation/capture.json
+            out/spice-observation/**/Orbiter.log
+            out/spice-observation/**/console.txt

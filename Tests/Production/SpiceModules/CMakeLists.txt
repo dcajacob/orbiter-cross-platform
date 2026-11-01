@@ -1,0 +1,13 @@
+cmake_minimum_required(VERSION 3.19)
+project(ProductionSpiceObservation LANGUAGES CXX)
+if(NOT WIN32 OR NOT MSVC)
+    message(FATAL_ERROR "Original module capture requires the native Windows application")
+endif()
+set(ORBITER_TEST_RUNTIME "" CACHE PATH "Verified same-build Windows application and SDK")
+add_library(ProductionSpiceObserver MODULE Observe.cpp)
+target_compile_features(ProductionSpiceObserver PRIVATE cxx_std_17)
+target_compile_definitions(ProductionSpiceObserver PRIVATE NOMINMAX)
+target_include_directories(ProductionSpiceObserver PRIVATE "${ORBITER_TEST_RUNTIME}/Orbitersdk/include")
+target_link_libraries(ProductionSpiceObserver PRIVATE "${ORBITER_TEST_RUNTIME}/Orbitersdk/lib/Orbiter.lib"
+    "${ORBITER_TEST_RUNTIME}/Orbitersdk/lib/Orbitersdk.lib")
+set_target_properties(ProductionSpiceObserver PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${ORBITER_TEST_RUNTIME}/Modules/Plugin")
