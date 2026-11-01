@@ -33,7 +33,7 @@ bool iequal(const std::string& s1, const std::string& s2);
 
 #include "Production/GeometryConversions.h"
 
-double rand1();
+#include "Production/Random.h"
 // uniformly distributed random number, range [0,1]
 
 RECT GetClientPos (HWND hWnd, HWND hChild);

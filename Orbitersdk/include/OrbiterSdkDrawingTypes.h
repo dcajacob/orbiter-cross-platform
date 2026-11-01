@@ -7,14 +7,14 @@
 #endif
 namespace oapi {
 #ifdef _WIN32
-using Rectangle=RECT;
-using DrawContext=HDC;
+using SdkRectangle=RECT;
+using SdkDrawContext=HDC;
 #else
-struct Rectangle {std::int32_t left,top,right,bottom;};
+struct SdkRectangle {std::int32_t left,top,right,bottom;};
 // Native clients must port GDI drawing to Sketchpad. This opaque context is an
 // SDK drawing resource, not a simulated Windows device context or GDI API.
-class DrawingContext;
-using DrawContext=DrawingContext*;
+class SdkDrawingContext;
+using SdkDrawContext=SdkDrawingContext*;
 #endif
 }
 #endif

@@ -34,7 +34,6 @@
 #include "NativeVesselAPI.h"
 #include <stdexcept>
 namespace oapi {class ParticleStream;}
-struct ENGINESTATUS;
 #endif
 
 class Elements;

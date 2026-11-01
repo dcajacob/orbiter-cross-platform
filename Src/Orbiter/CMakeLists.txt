@@ -70,6 +70,8 @@ set(common_src
 	CollisionCore.cpp
 	SuperVessel.cpp
 	Vessel.cpp
+	VesselApplication.cpp
+	VesselSdk.cpp
 	Vesselstatus.cpp
 # Surface base classes
 # Cockpit classes

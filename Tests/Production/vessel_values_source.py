@@ -23,6 +23,20 @@ def ranges(source):
     result.append((start,end,b'#include "OrbiterAnimationData.h"\n\n'))
     result.extend(record_ranges(source))
     result.extend(extra_ranges(source))
+    result.extend(simulation_ranges(source))
+    return result
+
+def simulation_ranges(source):
+    result=[]
+    block=re.search(rb'typedef struct \{(?:(?!typedef struct \{).)*?\} ENGINESTATUS;',source,re.S)
+    result.append((block.start(),block.end(),b'#include "OrbiterSimulationData.h"'))
+    for name in (b'ELEMENTS',b'ORBITPARAM',b'GROUPEDITSPEC',b'GROUPREQUESTSPEC'):
+        block=re.search(rb'typedef struct \{(?:(?!typedef struct \{).)*?\} '+name+rb';',source,re.S)
+        result.append((block.start(),block.end(),b''))
+    for match in re.finditer(rb'^#define (?:EVENT_VESSEL_|NAVBIT_|PROP_|MESHVIS_|PANEL_REDRAW_|EXHAUST_|OPTCAT_|OPTITEM_)[^\n]*',source,re.M):
+        result.append((match.start(),match.end(),b''))
+    start=source.index(b'const UINT ALLDOCKS');end=source.index(b'\n',start)
+    result.append((start,end,b''))
     return result
 
 def extra_ranges(source):
@@ -73,13 +87,16 @@ def verify():
     records=current('Orbitersdk/include/OrbiterVesselRecords.h').replace(b'oapi::UInt32',b'DWORD').replace(b'oapi::UInt',b'UINT')
     for start,end,_ in record_ranges(source):
         if source[start:end].rstrip() not in records:raise ValueError('Vessel status/particle/exhaust/beacon records changed beyond exact scalar aliases')
+    simulation=current('Orbitersdk/include/OrbiterSimulationData.h').replace(b'oapi::UInt32',b'DWORD').replace(b'oapi::UInt16',b'WORD').replace(b'oapi::UInt',b'UINT')
+    for start,end,_ in simulation_ranges(source):
+        if source[start:end] not in simulation:raise ValueError('Simulation SDK flags or engine status changed')
     if restore_api(current('Orbitersdk/include/OrbiterAPI.h'))!=source:raise ValueError('SDK changed beyond declared vessel value extraction')
     vessel=current('Orbitersdk/include/VesselAPI.h')
     for name in (b'OrbiterValueTypes.h',b'OrbiterSdkDrawingTypes.h'):
         vessel=vessel.replace(b'#include "'+name+b'"\n',b'',1)
     for before,after in ((b'oapi::UInt32',b'DWORD'),(b'oapi::UInt16',b'WORD'),
-                         (b'oapi::UInt',b'UINT'),(b'oapi::Rectangle',b'RECT'),
-                         (b'oapi::DrawContext',b'HDC')):
+                         (b'oapi::UInt',b'UINT'),(b'oapi::SdkRectangle',b'RECT'),
+                         (b'oapi::SdkDrawContext',b'HDC')):
         vessel=vessel.replace(before,after)
     original_vessel=subprocess.check_output(['git','-C',str(ROOT),'show',PRIOR+':Orbitersdk/include/VesselAPI.h']).replace(b'\r\n',b'\n')
     if vessel!=original_vessel:raise ValueError('Vessel SDK declarations changed beyond exact Windows aliases')

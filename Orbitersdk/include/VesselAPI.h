@@ -5717,10 +5717,10 @@ public:
 	 *   VESSEL3::clbkDrawHUD.
 	 * \note For vessels derived from VESSEL3 orbiter will not call this method,
 	 *   but will call the VESSEL3::clbkDrawHUD method instead. The VESSEL3
-	 *   version uses a generic \e Sketchpad drawing context instead of a oapi::DrawContext.
+	 *   version uses a generic \e Sketchpad drawing context instead of a oapi::SdkDrawContext.
 	 * \sa VESSEL3::clbkDrawHUD, \ref progflow1
 	 */
-	virtual void clbkDrawHUD (int mode, const HUDPAINTSPEC *hps, oapi::DrawContext hDC);
+	virtual void clbkDrawHUD (int mode, const HUDPAINTSPEC *hps, oapi::SdkDrawContext hDC);
 
 	/**
 	 * \brief Reaction Control System mode change notification.
@@ -6187,7 +6187,7 @@ public:
 	 *   VESSEL4::RegisterPanelArea can improve graphics performance.
 	 * \sa VESSEL4::RegisterPanelArea
 	 */
-	int RegisterPanelArea (PANELHANDLE hPanel, int id, const oapi::Rectangle &pos, const oapi::Rectangle &texpos, int draw_event, int mouse_event, int bkmode);
+	int RegisterPanelArea (PANELHANDLE hPanel, int id, const oapi::SdkRectangle &pos, const oapi::SdkRectangle &texpos, int draw_event, int mouse_event, int bkmode);
 
 	/**
 	 * \brief Register an area of the panel to receive mouse and redraw events.
@@ -6216,7 +6216,7 @@ public:
 	 *   appropriate attributes, or VESSEL4::RegisterPanelArea should be used instead.
 	 * \sa VESSEL4::RegisterPanelArea, oapiCreateSurfaceEx
 	 */
-	int RegisterPanelArea (PANELHANDLE hPanel, int id, const oapi::Rectangle &pos, int draw_event, int mouse_event, SURFHANDLE surf = NULL, void *context = NULL);
+	int RegisterPanelArea (PANELHANDLE hPanel, int id, const oapi::SdkRectangle &pos, int draw_event, int mouse_event, SURFHANDLE surf = NULL, void *context = NULL);
 
 	/**
 	 * \brief Mouse event notification for 2-D panel views.
@@ -6452,7 +6452,7 @@ public:
 	 *   to draw_event. If only blitting access is required, these flags should be omitted
 	 *   for improved performance.
 	 */
-	int RegisterPanelArea (PANELHANDLE hPanel, int id, const oapi::Rectangle &pos, int texidx, const oapi::Rectangle &texpos, int draw_event, int mouse_event, int bkmode);
+	int RegisterPanelArea (PANELHANDLE hPanel, int id, const oapi::SdkRectangle &pos, int texidx, const oapi::SdkRectangle &texpos, int draw_event, int mouse_event, int bkmode);
 
 	using VESSEL3::RegisterPanelArea; // keep previous interface valid
 

@@ -9,6 +9,7 @@
 #include "OrbiterVectorMath.h"
 #include "OrbiterVesselData.h"
 #include "OrbiterVesselRecords.h"
+#include "OrbiterSimulationData.h"
 #include "OrbiterAnimationData.h"
 #include "OrbiterMeshData.h"
 #include "OrbiterCelestialData.h"
@@ -28,11 +29,7 @@ struct HUDPAINTSPEC;
 struct MFDMODESPEC;
 struct MFDMODESPECEX;
 struct HUDPARAM;
-struct GROUPREQUESTSPEC;
-struct GROUPEDITSPEC;
 struct VESSELPARAM;
-struct ELEMENTS;
-struct ORBITPARAM;
 #ifndef OAPIFUNC
 #define OAPIFUNC __attribute__((visibility("default")))
 #define ORBITER_NATIVE_OWNS_OAPIFUNC
