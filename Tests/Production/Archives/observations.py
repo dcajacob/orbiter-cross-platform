@@ -39,6 +39,14 @@ def file_sha(path):
     return result.hexdigest()
 
 
+def stored_zlib(payload):
+    """Deterministic RFC 1950/1951 stored blocks, independent of zlib version."""
+    blocks = [payload[i:i+65535] for i in range(0,len(payload),65535)] or [b'']
+    return (b'\x78\x01'+b''.join(bytes([int(i==len(blocks)-1)])+
+        struct.pack('<HH',len(block),65535-len(block))+block for i,block in enumerate(blocks))+
+        struct.pack('>I',zlib.adler32(payload)&ABSENT))
+
+
 def fixtures(directory):
     """Write explicit disk records, including nonzero ignored node padding."""
     result = []
@@ -49,7 +57,7 @@ def fixtures(directory):
     for name, payloads, base in cases:
         path = directory/name/'Archive'/'Surf.tree'
         path.parent.mkdir(parents=True, exist_ok=True)
-        blocks = [zlib.compress(value, 6) if value else b'' for value in payloads]
+        blocks = [stored_zlib(value) if value else b'' for value in payloads]
         positions, offset = [], base
         for block in blocks:
             positions.append(offset)

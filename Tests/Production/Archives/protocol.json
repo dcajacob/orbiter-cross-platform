@@ -16,7 +16,9 @@
   },
   "inputs_sha256_lf": {
     "Tests/Production/Archives/Observe.cpp": "aab58ad0dc6a249a97ff23d5631ff7b9da171d4f9e3e20bd44ac015953bc1a7b",
-    "Tests/Production/Archives/observations.py": "6c022436bda4523b116ba6f2005b414cca148e4d5774b8a21e64e5317120f87e",
-    "Tests/Production/standard-planets.lock.json": "de0366be8f138b11135e5f675cc44ae0d4cf9a8b11fe0f71772ad617237185c4"
-  }
+    "Tests/Production/Archives/observations.py": "1fc26328447b141623e17908694095fafcf676a40e5475b1c34bae930d656123",
+    "Tests/Production/standard-planets.lock.json": "de0366be8f138b11135e5f675cc44ae0d4cf9a8b11fe0f71772ad617237185c4",
+    "Tests/Production/Archives/CMakeLists.txt": "954c1448b39c52b9601bcc12a4a0cbc3e60c0c28d99d14046dadec28a9b3fcdf"
+  },
+  "zlib_source": "cacf7f1d4e3d44d871b605da3b647f07d718623f"
 }

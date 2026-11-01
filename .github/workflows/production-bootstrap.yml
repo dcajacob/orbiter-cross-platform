@@ -28,6 +28,55 @@ permissions:
   contents: read
 
 jobs:
+  windows-archives:
+    name: Original planetary archives ${{ matrix.configuration }} x64
+    runs-on: windows-2022
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        configuration: [Debug, Release]
+    steps:
+      - uses: actions/checkout@v7
+      - uses: ilammy/msvc-dev-cmd@v1
+        with:
+          vsversion: '17.0'
+          arch: x64
+      - name: Build unchanged production archive observation with pinned zlib
+        shell: pwsh
+        run: |
+          cmake -S Tests/Production/Archives -B out/archive-build -G Ninja -DCMAKE_BUILD_TYPE=${{ matrix.configuration }} 2>&1 | Tee-Object archive-configure.log
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          cmake --build out/archive-build --target production_archive_observer --parallel 2 2>&1 | Tee-Object out/archive-build/build.log
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          cmd /c "cl 2>&1 & exit /b 0" | Out-File out/archive-build/compiler.txt
+          git -C out/archive-build/_deps/zlib-src rev-parse HEAD | Out-File out/archive-build/zlib-commit.txt
+      - uses: actions/cache@v6
+        with:
+          path: out/planet-cache/Orbiter2016.zip
+          key: production-standard-planets-${{ hashFiles('Tests/Production/standard-planets.lock.json') }}
+      - name: Prepare digest-verified original publisher archives
+        run: >-
+          python Tests/Production/prepare_data.py --lock Tests/Production/standard-planets.lock.json
+          --archive out/planet-cache/Orbiter2016.zip --destination out/standard-planets
+      - name: Observe repeated original Windows decoding
+        run: >-
+          python Tests/Production/Archives/observations.py
+          --executable out/archive-build/production_archive_observer.exe --data out/standard-planets
+          --output out/production-archives --configuration ${{ matrix.configuration }}
+      - name: Preserve original archive evidence, including failures
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: production-archives-${{ matrix.configuration }}-x64
+          retention-days: 90
+          path: |
+            archive-configure.log
+            out/archive-build/*.txt
+            out/archive-build/*.log
+            out/production-archives/*.json
+            out/production-archives/*.log
+
   windows-gravity:
     name: Shared production Pines ${{ matrix.configuration }} x64
     runs-on: windows-2022
