@@ -9,7 +9,7 @@
 #define ORBITER_MODULE
 #include "EarthAtm2006.h"
 
-bool EarthAtmosphere_2006::clbkConstants (ATMCONST *atmc) const
+bool EarthAtmosphere_2006::clbkConstants (AtmosphereConstants *atmc) const
 {
 	atmc->p0       = 101325;
 	atmc->rho0     = 1.2250;
@@ -98,18 +98,19 @@ bool EarthAtmosphere_2006::clbkParams (const PRM_IN *prm_in, PRM_OUT *prm)
 // API interface
 // ======================================================================
 
+#ifndef ORBITER_NATIVE_MODULE
 DLLCLBK void InitModule (HINSTANCE hModule)
 {}
 
 DLLCLBK void ExitModule (HINSTANCE hModule)
 {}
 
-DLLCLBK ATMOSPHERE *CreateAtmosphere (CELBODY2 *cbody)
+DLLCLBK AtmosphereBase *CreateAtmosphere (AtmosphereCelestial *cbody)
 {
 	return new EarthAtmosphere_2006 (cbody);
 }
 
-DLLCLBK void DeleteAtmosphere (ATMOSPHERE *atm)
+DLLCLBK void DeleteAtmosphere (AtmosphereBase *atm)
 {
 	delete (EarthAtmosphere_2006*)atm;
 }
@@ -123,3 +124,6 @@ DLLCLBK char *ModelDesc ()
 {
 	return (char*)"A simple static atmosphere model. This model was used in Orbiter 2006. It underestimates atmospheric density and pressure above ~120km and terminates at 200km, which simplifies orbit-keeping for LEO objects.";
 }
+#else
+#include "../NativeAtmosphereFactory.inc"
+#endif

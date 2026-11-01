@@ -2,7 +2,7 @@
   "schema": 1,
   "production_source": "38b7c627878ea893390675616897071f8bb8e90f",
   "observed_source": "684bd5b27005feecfa9effe796bd216f85e3392f",
-  "scope": "Shared production Body, RigidBody, CelestialBody, Star, original propagators, actual Pines nonspherical gravity, CPU Mesh/MeshManager, fixed-width planetary archives, scenario environment/focus metadata frame ordering and authoritative world object ownership; platform services, indexed resources and an internal native module bootstrap; verbatim SDK mesh/celestial value records and constants with original Windows declaration/layout checks. Full production world/module SDK extraction remains incomplete.",
+  "scope": "Shared production Body, RigidBody, CelestialBody, Star, original propagators, actual Pines nonspherical gravity, CPU Mesh/MeshManager, fixed-width planetary archives, scenario environment/focus metadata frame ordering and authoritative world object ownership; platform services, indexed resources and an internal native module bootstrap and actual native SPICE/atmosphere interfaces; verbatim SDK mesh/celestial value records and constants with original Windows declaration/layout checks. Full production world/module SDK extraction remains incomplete.",
   "required_runtime_gates": [
     "frozen two-body reference",
     "frozen production orbit/propulsion",
@@ -25,6 +25,50 @@
     "Orbitersdk/include/OrbiterMeshData.h": {
       "sha256_lf": "5ba232bc40f466d21106d3253f78ce3f5bfa307e8926406a857cc344d4701e67",
       "original_sha256_lf": null
+    },
+    "Src/Celbody/Atmosphere/AtmospherePlatform.h": {
+      "sha256_lf": "0f8017b5a52eccc619d3c4b51f9a75d2fe94f03961fb4af033977a33b2706a39",
+      "original_sha256_lf": null
+    },
+    "Src/Celbody/Atmosphere/EarthAtm2006/EarthAtm2006.cpp": {
+      "sha256_lf": "58196a3ec65e4c26a0a256065ee0dd2b43836d6e520b6649bb3e24a61dd45669",
+      "original_sha256_lf": "cf4e3d046bfca3ec40173716543fd4fd7cf4094c77e7b6a4a3cc70c05e0f1889"
+    },
+    "Src/Celbody/Atmosphere/EarthAtm2006/EarthAtm2006.h": {
+      "sha256_lf": "bb5d615192b3fd90b8ba8e6c6710e05b42a6c2fa4caed7f8209c4bc69794110f",
+      "original_sha256_lf": "8e3a1663681afa1891b02235b27bdb9b6ec11a6e3957bd348594070b4dd8a924"
+    },
+    "Src/Celbody/Atmosphere/EarthAtmJ71G/EarthAtmJ71G.cpp": {
+      "sha256_lf": "647a455e085c1d5163a7bf2d47cc38fbd6415896a1af517e38899595c5cc351c",
+      "original_sha256_lf": "5737b555ccad87694b240d12bbecec626fa1f51c5abf7462a27277cd859da5aa"
+    },
+    "Src/Celbody/Atmosphere/EarthAtmJ71G/EarthAtmJ71G.h": {
+      "sha256_lf": "23a487d54dec6b55cb678452af24569f11e07c7b8ca7064dfbcc2e7fe5770291",
+      "original_sha256_lf": "2182c500b511242c265f5b9c2cc995b3fac1e2be0fe5dad2394d56847f29c126"
+    },
+    "Src/Celbody/Atmosphere/MarsAtm2006/MarsAtm2006.cpp": {
+      "sha256_lf": "861c8c757df555d77597dab74969322a29447036b63ec74a62d70b6204c9d07d",
+      "original_sha256_lf": "3cbefc5191059e247e9117303a968964485d84fea8ac363df4213c64183ff1f9"
+    },
+    "Src/Celbody/Atmosphere/MarsAtm2006/MarsAtm2006.h": {
+      "sha256_lf": "79f6202a0229ce05a903d35299b844a203a76c1ef37109aa2c141f4811510c04",
+      "original_sha256_lf": "60425437646deb9fecbffa5378033e12451a564b400ed54583286fa1549ead0a"
+    },
+    "Src/Celbody/Atmosphere/NativeAtmosphereFactory.inc": {
+      "sha256_lf": "043557463ebd102b9155f8fd2a8831729aa47019dfcdfc79e8603dd68a116d88",
+      "original_sha256_lf": null
+    },
+    "Src/Celbody/SPICE/NativeSpiceFactory.inc": {
+      "sha256_lf": "bdf01906095de6581c6e8e97145a2a42b8aae574a8c5638c13fb94a91403cfac",
+      "original_sha256_lf": null
+    },
+    "Src/Celbody/SPICE/SpicePlatform.h": {
+      "sha256_lf": "6e83c3f2a24cb4ad7addc9f7d57dd3fa23dbb2d339eae7c110207905ee5d9b35",
+      "original_sha256_lf": null
+    },
+    "Src/Celbody/SPICE/spice.cpp": {
+      "sha256_lf": "dd357a209b5dae3db1ead2f0d4abd47badcaf2af75ca311d1ed273989b0a170b",
+      "original_sha256_lf": "dc4d53c2049273b9d62420160c22976e3b999c22d6961b891213ec183434a1f5"
     },
     "Src/ClientNative/CMakeLists.txt": {
       "sha256_lf": "5ef35a807b235d37e9babc956db3b04b225f42929777af3e193809c21fa2a6b7",
@@ -143,7 +187,7 @@
       "original_sha256_lf": null
     },
     "Src/Orbiter/Production/CMakeLists.txt": {
-      "sha256_lf": "3128845e82dd4438ca3b53da64d61c2f36831997449c980b1a4eece7cc5f8705",
+      "sha256_lf": "b9d3a1763ec7f0b955b1907fe81bf9d23aa24e19ad204263f12961f051184657",
       "original_sha256_lf": null
     },
     "Src/Orbiter/Production/CelestialServices.cpp": {
@@ -204,6 +248,26 @@
     },
     "Src/Orbiter/Production/NativeBuild.h.in": {
       "sha256_lf": "46385229425b50b4edfe7eb877c5c4278e718f50e276130f0354a6d51cb70511",
+      "original_sha256_lf": null
+    },
+    "Src/Orbiter/Production/NativeCelestialApi.cpp": {
+      "sha256_lf": "fc261a104146ddf1afd48a9a28be114fe5960931a3089418c5b69338a9faa82b",
+      "original_sha256_lf": null
+    },
+    "Src/Orbiter/Production/NativeCelestialApi.h": {
+      "sha256_lf": "62707371489ad12b405f0527ca5d8cc64df699958769e40b089fe4823f9c9b2a",
+      "original_sha256_lf": null
+    },
+    "Src/Orbiter/Production/NativeCelestialModules.cmake": {
+      "sha256_lf": "47016bf74951637b2a79ef7c64b7b0f610194895d4be6218e620fd504e62d2fb",
+      "original_sha256_lf": null
+    },
+    "Src/Orbiter/Production/NativeCelestialServices.cpp": {
+      "sha256_lf": "116d40442387ad24547a0d8ee29a3f10c7c5ded3b42f0741cafca88b6753d174",
+      "original_sha256_lf": null
+    },
+    "Src/Orbiter/Production/NativeCelestialServices.h": {
+      "sha256_lf": "f18cd8c9d4fc439219a9b20c7bea49c5c6abf5653de8947ab2358ddb5a7cd090",
       "original_sha256_lf": null
     },
     "Src/Orbiter/Production/NativeModule.cpp": {

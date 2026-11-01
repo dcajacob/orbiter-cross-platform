@@ -26,7 +26,7 @@ else()
     set(_archive_zlib ZLIB::ZLIB)
 endif()
 add_library(orbiter_production_boundary SHARED
-    Session.cpp WorldOwner.cpp NativeModule.cpp ResourceResolver.cpp MeshData.cpp MeshServices.cpp BodyServices.cpp RigidBodyServices.cpp CelestialServices.cpp ScenarioColor.cpp
+    Session.cpp WorldOwner.cpp NativeModule.cpp NativeCelestialApi.cpp NativeCelestialServices.cpp ResourceResolver.cpp MeshData.cpp MeshServices.cpp BodyServices.cpp RigidBodyServices.cpp CelestialServices.cpp ScenarioColor.cpp
     ../Body.cpp ../Rigidbody.cpp ../BodyIntegrator.cpp ../Element.cpp
     ../Vecmat.cpp ../TimeData.cpp ../ConfigFile.cpp ../Mesh.cpp ../State.cpp
     ../PinesGrav.cpp ../PinesGravFile.cpp ../Celbody.cpp ../CelbodyFile.cpp ../ElementFile.cpp ../Star.cpp ../ZTreeMgr.cpp)
@@ -79,6 +79,10 @@ if(DEFINED ORBITER_BINARY_ROOT_DIR)
     install(TARGETS orbiter_production_boundary RUNTIME DESTINATION "${ORBITER_INSTALL_ROOT_DIR}")
 else()
     install(TARGETS orbiter_production_boundary LIBRARY DESTINATION lib RUNTIME DESTINATION bin)
+endif()
+option(ORBITER_BUILD_NATIVE_CELESTIAL_MODULES "Build source-rebuilt production celestial modules" OFF)
+if(ORBITER_BUILD_NATIVE_CELESTIAL_MODULES)
+    include(NativeCelestialModules.cmake)
 endif()
 if(CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR AND BUILD_TESTING)
     add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/../../../Tests/Production/Boundary" tests)

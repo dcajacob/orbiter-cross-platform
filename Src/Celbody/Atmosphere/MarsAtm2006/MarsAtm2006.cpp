@@ -9,7 +9,7 @@
 #define ORBITER_MODULE
 #include "MarsAtm2006.h"
 
-bool MarsAtmosphere_2006::clbkConstants (ATMCONST *atmc) const
+bool MarsAtmosphere_2006::clbkConstants (AtmosphereConstants *atmc) const
 {
 	atmc->p0       = 0.61e3;
 	atmc->rho0     = 0.02;
@@ -82,18 +82,19 @@ bool MarsAtmosphere_2006::clbkParams (const PRM_IN *prm_in, PRM_OUT *prm)
 // API interface
 // ======================================================================
 
+#ifndef ORBITER_NATIVE_MODULE
 DLLCLBK void InitModule (HINSTANCE hModule)
 {}
 
 DLLCLBK void ExitModule (HINSTANCE hModule)
 {}
 
-DLLCLBK ATMOSPHERE *CreateAtmosphere (CELBODY2 *cbody)
+DLLCLBK AtmosphereBase *CreateAtmosphere (AtmosphereCelestial *cbody)
 {
 	return new MarsAtmosphere_2006 (cbody);
 }
 
-DLLCLBK void DeleteAtmosphere (ATMOSPHERE *atm)
+DLLCLBK void DeleteAtmosphere (AtmosphereBase *atm)
 {
 	delete (MarsAtmosphere_2006*)atm;
 }
@@ -107,3 +108,6 @@ DLLCLBK char *ModelDesc ()
 {
 	return (char*)"A simple static Mars atmosphere model. This is the model used in Orbiter 2006.";
 }
+#else
+#include "../NativeAtmosphereFactory.inc"
+#endif

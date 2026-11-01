@@ -1,0 +1,46 @@
+# Original production sources, compiled against the internal native module API.
+set(_celbody_sources "${CMAKE_CURRENT_LIST_DIR}/../../Celbody")
+if(WIN32 AND MSVC)
+    set(_cspice_platform win_x64)
+    set(_cspice_library cspice.lib)
+elseif(CMAKE_SYSTEM_NAME STREQUAL "Linux" AND CMAKE_SIZEOF_VOID_P EQUAL 8)
+    set(_cspice_platform linux_x64)
+    set(_cspice_library cspice.a)
+else()
+    message(FATAL_ERROR "Native SPICE currently supports MSVC Windows x64 and native Linux x64")
+endif()
+add_library(orbiter_native_spice MODULE "${_celbody_sources}/SPICE/spice.cpp")
+target_compile_definitions(orbiter_native_spice PRIVATE ORBITER_NATIVE_MODULE)
+target_include_directories(orbiter_native_spice PRIVATE "${_celbody_sources}/SPICE/cspice/${_cspice_platform}/include")
+target_link_libraries(orbiter_native_spice PRIVATE orbiter_production_boundary
+    "${_celbody_sources}/SPICE/cspice/${_cspice_platform}/lib/${_cspice_library}")
+set_target_properties(orbiter_native_spice PROPERTIES PREFIX "" OUTPUT_NAME spice
+    LIBRARY_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/NativeModules/Celbody"
+    RUNTIME_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/NativeModules/Celbody")
+
+foreach(_model IN ITEMS EarthAtmJ71G EarthAtm2006 MarsAtm2006)
+    if(_model STREQUAL "EarthAtmJ71G")
+        set(_class EarthAtmosphere_J71G)
+        set(_body Earth)
+    elseif(_model STREQUAL "EarthAtm2006")
+        set(_class EarthAtmosphere_2006)
+        set(_body Earth)
+    else()
+        set(_class MarsAtmosphere_2006)
+        set(_body Mars)
+    endif()
+    add_library(orbiter_native_${_model} MODULE "${_celbody_sources}/Atmosphere/${_model}/${_model}.cpp")
+    target_compile_definitions(orbiter_native_${_model} PRIVATE ORBITER_NATIVE_MODULE
+        ORBITER_NATIVE_ATMOSPHERE_CLASS=${_class} ORBITER_NATIVE_ATMOSPHERE_NAME="${_model}")
+    target_link_libraries(orbiter_native_${_model} PRIVATE orbiter_production_boundary)
+    set_target_properties(orbiter_native_${_model} PROPERTIES PREFIX "" OUTPUT_NAME ${_model}
+        LIBRARY_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/NativeModules/Celbody/${_body}/Atmosphere"
+        RUNTIME_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/NativeModules/Celbody/${_body}/Atmosphere")
+endforeach()
+if(BUILD_TESTING)
+    add_executable(production_native_spice_observer "${CMAKE_CURRENT_LIST_DIR}/../../../Tests/Production/SpiceModules/NativeObserve.cpp")
+    target_link_libraries(production_native_spice_observer PRIVATE orbiter_production_boundary)
+    add_dependencies(production_native_spice_observer orbiter_native_spice orbiter_native_EarthAtmJ71G
+        orbiter_native_EarthAtm2006 orbiter_native_MarsAtm2006)
+    orbiter_stage_core_runtime(production_native_spice_observer)
+endif()

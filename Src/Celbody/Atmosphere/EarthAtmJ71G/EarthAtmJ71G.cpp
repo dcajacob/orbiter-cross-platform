@@ -25,7 +25,7 @@ double molweight_fit (double Z, double Tinf);
 // ===========================================================================
 // Constructor
 
-EarthAtmosphere_J71G::EarthAtmosphere_J71G (CELBODY2 *body): ATMOSPHERE (body)
+EarthAtmosphere_J71G::EarthAtmosphere_J71G (AtmosphereCelestial *body): AtmosphereBase (body)
 {
 	hBody = body->GetHandle();
 	atmprm.mjd = -1e10; // invalidate
@@ -42,7 +42,7 @@ const char *EarthAtmosphere_J71G::clbkName () const
 // ===========================================================================
 // Some constants of the atmospheric model
 
-bool EarthAtmosphere_J71G::clbkConstants (ATMCONST *atmc) const
+bool EarthAtmosphere_J71G::clbkConstants (AtmosphereConstants *atmc) const
 {
 	atmc->p0       = 101325;
 	atmc->rho0     = 1.2247;
@@ -69,13 +69,13 @@ bool EarthAtmosphere_J71G::clbkParams (const PRM_IN *prm_in, PRM_OUT *prm)
 	double Fbar = (prm_in->flag & PRM_FBR ? prm_in->f107bar : 140.0);
 	double Kp = (prm_in->flag & PRM_AP ? prm_in->ap : 3.0);
 
-	double mjd = oapiGetSimMJD();
+	double mjd = AtmosphereSimMJD(cbody);
 	if (fabs (mjd - atmprm.mjd) > 0.0417) {
 		// Update sun's geographic position once an hour
 		VECTOR3 gsun;
 		double r;
-		oapiGetGlobalPos (hBody, &gsun);
-		oapiGlobalToEqu (hBody, -gsun, &atmprm.Slng, &atmprm.Slat, &r);
+		AtmosphereGlobalPosition (cbody, hBody, &gsun);
+		AtmosphereGlobalToEquatorial (cbody, hBody, AtmosphereNegate(gsun), &atmprm.Slng, &atmprm.Slat, &r);
 		atmprm.mjd = mjd;
 	}	
 	double Slat = atmprm.Slat;
@@ -815,18 +815,19 @@ double molweight_fit (double Z, double Tinf)
 // API interface
 // ======================================================================
 
+#ifndef ORBITER_NATIVE_MODULE
 DLLCLBK void InitModule (HINSTANCE hModule)
 {}
 
 DLLCLBK void ExitModule (HINSTANCE hModule)
 {}
 
-DLLCLBK ATMOSPHERE *CreateAtmosphere (CELBODY2 *cbody)
+DLLCLBK AtmosphereBase *CreateAtmosphere (AtmosphereCelestial *cbody)
 {
 	return new EarthAtmosphere_J71G (cbody);
 }
 
-DLLCLBK void DeleteAtmosphere (ATMOSPHERE *atm)
+DLLCLBK void DeleteAtmosphere (AtmosphereBase *atm)
 {
 	delete (EarthAtmosphere_J71G*)atm;
 }
@@ -840,3 +841,6 @@ DLLCLBK char *ModelDesc ()
 {
 	return (char*)"An implementation of the Jacchia71-Gill (J71C) atmospheric model. This uses a static US Standard Atmosphere model up to 90km, and a diffusion-equilibrium solution from 90 to 2500km altitude.\r\n\r\nSee \"Earth Atmosphere Model\" in \"Orbiter Technical Reference\" for details.";
 }
+#else
+#include "../NativeAtmosphereFactory.inc"
+#endif

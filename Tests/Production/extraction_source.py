@@ -39,6 +39,9 @@ def verify():
     if ledger['observed_source'] != CAPTURE or ledger['production_source'] != BASE:
         raise ValueError('extraction baseline identity changed')
     declared = ledger['files']
+    if 'Src/Celbody/SPICE/spice.cpp' in declared:
+        from SpiceModules.source_audit import verify as verify_celestial_modules
+        verify_celestial_modules()
     current = git('diff', '--name-only', CAPTURE, '--', 'Src', 'Orbitersdk', 'Extern', 'CMakeLists.txt').decode().splitlines()
     if set(current) - set(declared):
         raise ValueError('undeclared production change: '+str(sorted(set(current)-set(declared))))

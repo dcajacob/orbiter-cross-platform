@@ -4,23 +4,22 @@
 #ifndef __EARTHATMJ71G_H
 #define __EARTHATMJ71G_H
 
-#include "OrbiterAPI.h"
-#include "CelbodyAPI.h"
+#include "../AtmospherePlatform.h"
 
 // ======================================================================
 // class EarthAtmosphere_J71G
 // Implementation of Jacchia71-Gill atmosphere model
 // ======================================================================
 
-class EarthAtmosphere_J71G: public ATMOSPHERE {
+class EarthAtmosphere_J71G: public AtmosphereBase {
 public:
-	EarthAtmosphere_J71G (CELBODY2 *body);
+	EarthAtmosphere_J71G (AtmosphereCelestial *body);
 	const char *clbkName () const;
-	bool clbkConstants (ATMCONST *atmc) const;
+	bool clbkConstants (AtmosphereConstants *atmc) const;
 	bool clbkParams (const PRM_IN *prm_in, PRM_OUT *prm);
 
 private:
-	OBJHANDLE hBody;   // handle for the associated celestial body
+	AtmosphereBodyHandle hBody;   // handle for the associated celestial body
 
 	// Time-dependent atmospheric parameters at last evaluation
 	struct {

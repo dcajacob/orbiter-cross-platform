@@ -138,6 +138,22 @@ method retain the original implementation. Native class tests use this actual
 class as their primary, including automatic module ephemeris initialization.
 They still use controlled unit callbacks, not native SPICE or a stock world.
 
+The next boundary now loads the actual source-rebuilt SPICE module and Earth J71G,
+Earth 2006 and Mars 2006 atmospheres through native `dlopen`/Windows dynamic
+loading and the checked internal SDK. Explicit services connect real production
+celestial objects, configuration streams, the unchanged clock conversion and
+indexed resource roots. The original module formulas and atmosphere calculations
+are conserved by a separate source audit. Windows legacy entry points and public
+SDK declarations are retained. Native cleanup destroys atmospheres, closes the
+SPICE kernel pool and unloads modules in that order.
+
+The [direct-module verification](../../Tests/Production/SpiceModules/README.md)
+uses a separately frozen pre-port Windows application reference. All 41 native
+module instances match its 25,092 samples exactly in local Debug/Release and
+strict sanitizer runs. These tests construct actual production celestial bodies,
+but do not replace the missing native `Planet`/`PlanetarySystem`/`Vessel`/`Camera`
+session. They are not native textured-scene evidence.
+
 An independent inertial/free-spin test runs each propagator for 6,000 quarter-
 second steps twice, with the same seed and finalized sampling. It checks the
 analytical translation/rotation and energy/angular-momentum invariants within

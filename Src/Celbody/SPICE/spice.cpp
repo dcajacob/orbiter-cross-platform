@@ -29,7 +29,7 @@ SOFTWARE.
 #include <iostream>
 #include <set>
 #include <vector>
-#include "Orbitersdk.h"
+#include "SpicePlatform.h"
 #include "SpiceUsr.h"
 
 using namespace std;
@@ -43,16 +43,16 @@ bool load_kernel(const string& kernel_name)
 	char s[1024];
 	if (loaded_kernels.find(kernel_name) != loaded_kernels.end())
 		return true;
-	furnsh_c(kernel_name.c_str());
+	furnsh_c(SpiceKernelPath(kernel_name).c_str());
 	if (failed_c())
 	{
 		getmsg_c("long", sizeof(s), s);
 		reset_c();
 		return false;
 	}
-	sprintf_s(s, 1024, "spice.dll: Kernel %s - OK.", kernel_name.c_str());
+	std::snprintf(s, 1024, "spice.dll: Kernel %s - OK.", kernel_name.c_str());
 	loaded_kernels.insert(kernel_name);
-	oapiWriteLog(s);
+	SpiceLog(s);
 	return true;
 }
 
@@ -70,7 +70,7 @@ bool get_id(char* name, int* id)
 		else
 		{
 			long spiceIDlng;
-			if (sscanf_s(name, " %ld", &spiceIDlng) == 1)
+			if (std::sscanf(name, " %ld", &spiceIDlng) == 1)
 			{
 				*id = (int)spiceIDlng;
 				found = SPICETRUE;
@@ -80,27 +80,27 @@ bool get_id(char* name, int* id)
 	return found == SPICETRUE;
 }
 
-class SpiceBody : public CELBODY2
+class SpiceBody : public SpiceModuleBase
 {
 public:
-	SpiceBody(OBJHANDLE hCBody);
+	SpiceBody(SpiceBodyContext hCBody);
 	bool bEphemeris() const;
-	void clbkInit(FILEHANDLE cfg);
+	void clbkInit(SpiceConfiguration cfg);
 	int clbkEphemeris(double mjd, int req, double* ret);
 	int clbkFastEphemeris(double simt, int req, double* ret);
-	bool clbkAtmParam(double alt, ATMPARAM* prm);
+	bool clbkAtmParam(double alt, SpiceAtmosphereParameters* prm);
 
 	inline bool LegacyAtmosphereInterface() const
 	{
 		return false;
 	};
 
-	inline ATMOSPHERE* GetAtmosphere() const
+	inline SpiceAtmosphere* GetAtmosphere() const
 	{
 		return atm;
 	};
 
-	void SpiceBody::show_error(char* s);
+	void show_error(char* s);
 
 private:
 	char body_name[256];
@@ -118,7 +118,7 @@ private:
 	double elts_end[8];
 	double elts_sys_begin[8];
 	double elts_sys_end[8];
-	void SpiceBody::Interpolate(double simt, double* r);
+	void Interpolate(double simt, double* r);
 	double interval;
 	int response = -1;
 	int prev_response = -1;
@@ -126,17 +126,17 @@ private:
 	double t_end = -1.0e99;
 	double sp_beg[12];
 	double sp_end[12];
-	double SpiceBody::calc_gm(double* state1, double* state2, double dt);
+	double calc_gm(double* state1, double* state2, double dt);
 	double gm, gm_sys;
 };
 
 void SpiceBody::show_error(char* s)
 {
-	oapiWriteLog(s);
+	SpiceLog(s);
 	error = true;
 }
 
-SpiceBody::SpiceBody(OBJHANDLE hCBody) : CELBODY2(hCBody)
+SpiceBody::SpiceBody(SpiceBodyContext hCBody) : SpiceModuleBase(hCBody)
 {
 	// add constructor code here
 	version = 2;
@@ -192,7 +192,7 @@ int stringsplit(string str, const string delim, vector<string>& results)
 	return cnt;
 }
 
-void SpiceBody::clbkInit(FILEHANDLE cfg)
+void SpiceBody::clbkInit(SpiceConfiguration cfg)
 {
 	// read parameters from config file (e.g. tolerance limits, etc)
 	// perform any required initialisation (e.g. read perturbation terms from data files)
@@ -201,49 +201,49 @@ void SpiceBody::clbkInit(FILEHANDLE cfg)
 	bool default_interval = true;
 
 	// old atmosphere!
-	if (oapiReadItem_string(cfg, "Module_Atm", s))
+	if (SpiceReadString(cfg, "Module_Atm", s))
 	{
-		// oapiWriteLog(s);
+		// SpiceLog(s);
 		if (!LoadAtmosphereModule(s))
 		{
-			sprintf_s(s, 256, "spice.dll: Error in %s - Module_Atm is wrong!", body_name);
+			std::snprintf(s, 256, "spice.dll: Error in %s - Module_Atm is wrong!", body_name);
 			show_error(s);
 			return;
 		};
-		// if (atm==NULL) oapiWriteLog("NULL atm");
+		// if (atm==NULL) SpiceLog("NULL atm");
 	};
 
-	if (oapiReadItem_string(cfg, "Kernel", s) && !stringsplit(s, ",", kernels))
+	if (SpiceReadString(cfg, "Kernel", s) && !stringsplit(s, ",", kernels))
 	{
-		sprintf_s(s, 256, "spice.dll: Error in %s - Kernel parameter is wrong!", body_name);
+		std::snprintf(s, 256, "spice.dll: Error in %s - Kernel parameter is wrong!", body_name);
 		show_error(s);
 		return;
 	}
 
-	if (!oapiReadItem_string(cfg, "Body", body_name))
+	if (!SpiceReadString(cfg, "Body", body_name))
 	{
-		sprintf_s(s, 256, "spice.dll: Error in %s - Not specified: body name!", body_name);
-		show_error(s);
-		exit(1);
-		return;
-	}
-
-	if (!oapiReadItem_string(cfg, "Barycenter", bary_name))
-	{
-		sprintf_s(s, 256, "spice.dll: Error in %s - Not specified: barycenter name!", body_name);
+		std::snprintf(s, 256, "spice.dll: Error in %s - Not specified: body name!", body_name);
 		show_error(s);
 		exit(1);
 		return;
 	}
 
-	if (!oapiReadItem_float(cfg, "Interval", interval))
+	if (!SpiceReadString(cfg, "Barycenter", bary_name))
+	{
+		std::snprintf(s, 256, "spice.dll: Error in %s - Not specified: barycenter name!", body_name);
+		show_error(s);
+		exit(1);
+		return;
+	}
+
+	if (!SpiceReadReal(cfg, "Interval", interval))
 	{
 		interval = 60.0;
 	}
 
-	if (!oapiReadItem_string(cfg, "ParentBarycenter", parent_bary_name))
+	if (!SpiceReadString(cfg, "ParentBarycenter", parent_bary_name))
 	{
-		sprintf_s(s, 256, "spice.dll: Error in %s - Not specified the ParentBarycenter!", body_name);
+		std::snprintf(s, 256, "spice.dll: Error in %s - Not specified the ParentBarycenter!", body_name);
 		show_error(s);
 		exit(1);
 		return;
@@ -251,35 +251,35 @@ void SpiceBody::clbkInit(FILEHANDLE cfg)
 
 	if (!get_id(parent_bary_name, &parent_bary_id))
 	{
-		sprintf_s(s, 256, "spice.dll: Couldn't find SPICE ID for %s", parent_bary_name);
+		std::snprintf(s, 256, "spice.dll: Couldn't find SPICE ID for %s", parent_bary_name);
 		show_error(s);
 		exit(1);
 		return;
 	}
 
-	if (!oapiReadItem_string(cfg, "Origin", origin_name))
+	if (!SpiceReadString(cfg, "Origin", origin_name))
 	{
-		sprintf_s(s, 256, "spice.dll: Error in %s - Not specified the origin name!", body_name);
+		std::snprintf(s, 256, "spice.dll: Error in %s - Not specified the origin name!", body_name);
 		show_error(s);
 		exit(1);
 		return;
 	}
 
-	if (!oapiReadItem_float(cfg, "GM", gm))
+	if (!SpiceReadReal(cfg, "GM", gm))
 	{
 		gm = -1.0;
 	}
 
-	if (!oapiReadItem_float(cfg, "GMSystem", gm_sys))
+	if (!SpiceReadReal(cfg, "GMSystem", gm_sys))
 	{
 		gm_sys = -1.0;
 	}
 
 
-	if (oapiReadItem_float(cfg, "Beginning", kernel_begin))
+	if (SpiceReadReal(cfg, "Beginning", kernel_begin))
 	{
 		kernel_begin = (kernel_begin - 51544.5) * 86400.0;
-		if (oapiReadItem_float(cfg, "Ending", kernel_end))
+		if (SpiceReadReal(cfg, "Ending", kernel_end))
 		{
 			kernel_end = (kernel_end - 51544.5) * 86400.0;
 			if (kernel_end > kernel_begin)
@@ -293,7 +293,7 @@ void SpiceBody::clbkInit(FILEHANDLE cfg)
 		trimspaces(*i);
 		if (!load_kernel(*i))
 		{
-			sprintf_s(s, 256, "spice.dll: %s - Couldn't load kernel: %s", body_name, (*i).c_str());
+			std::snprintf(s, 256, "spice.dll: %s - Couldn't load kernel: %s", body_name, (*i).c_str());
 			show_error(s);
 			exit(1);
 			return;
@@ -303,7 +303,7 @@ void SpiceBody::clbkInit(FILEHANDLE cfg)
 
 	if (!get_id(body_name, &body_id))
 	{
-		sprintf_s(s, 256, "spice.dll: Couldn't find SPICE ID for %s", body_name);
+		std::snprintf(s, 256, "spice.dll: Couldn't find SPICE ID for %s", body_name);
 		show_error(s);
 		exit(1);
 		return;
@@ -311,7 +311,7 @@ void SpiceBody::clbkInit(FILEHANDLE cfg)
 
 	if (!get_id(origin_name, &origin_id))
 	{
-		sprintf_s(s, 256, "spice.dll: Couldn't find SPICE ID for %s", origin_name);
+		std::snprintf(s, 256, "spice.dll: Couldn't find SPICE ID for %s", origin_name);
 		show_error(s);
 		exit(1);
 		return;
@@ -319,7 +319,7 @@ void SpiceBody::clbkInit(FILEHANDLE cfg)
 
 	if (!get_id(bary_name, &bary_id))
 	{
-		sprintf_s(s, 256, "spice.dll: Couldn't find SPICE ID for %s", bary_name);
+		std::snprintf(s, 256, "spice.dll: Couldn't find SPICE ID for %s", bary_name);
 		show_error(s);
 		exit(1);
 		return;
@@ -347,7 +347,7 @@ void SpiceBody::clbkInit(FILEHANDLE cfg)
 	SpiceInt nIntervals = card_c(&targetCoverage) / 2;
 	if (nIntervals <= 0 && body_id != 0)
 	{
-		sprintf_s(s, 256, "spice.dll: Couldn't find object %s in SPICE kernel pool!", body_name);
+		std::snprintf(s, 256, "spice.dll: Couldn't find object %s in SPICE kernel pool!", body_name);
 		show_error(s);
 		if (failed_c())
 		{
@@ -377,7 +377,7 @@ void SpiceBody::clbkInit(FILEHANDLE cfg)
 		kernel_end -= 0.001;
 		if (body_id != 0 && !wnincd_c(kernel_begin, kernel_end, &targetCoverage))
 		{
-			sprintf_s(s, 256, "spice.dll: Specified time interval for target %s not available.", body_name);
+			std::snprintf(s, 256, "spice.dll: Specified time interval for target %s not available.", body_name);
 			show_error(s);
 			exit(1);
 			return;
@@ -442,7 +442,7 @@ void SpiceBody::clbkInit(FILEHANDLE cfg)
 	if (failed_c())
 	{
 		char errorString[256];
-		sprintf_s(errorString, 256, "spice.dll, ERROR in failed_c() during init for %s: ", body_name);
+		std::snprintf(errorString, 256, "spice.dll, ERROR in failed_c() during init for %s: ", body_name);
 
 		char errMsg[1024];
 		getmsg_c("long", sizeof(errMsg), errMsg);
@@ -458,12 +458,12 @@ void SpiceBody::clbkInit(FILEHANDLE cfg)
 		return;
 	}
 
-	sprintf_s(s, 256, "spice.dll: %s (MJD %.1f - %.1f) - OK",
+	std::snprintf(s, 256, "spice.dll: %s (MJD %.1f - %.1f) - OK",
 		body_name, kernel_begin / 86400.0 + 51544.5, kernel_end / 86400.0 + 51544.5);
-	oapiWriteLog(s);
+	SpiceLog(s);
 
 	// caching
-	double t0 = (oapiTime2MJD(0) - 51544.5) * 86400.0;
+	double t0 = (SpiceTimeToMJD(0) - 51544.5) * 86400.0;
 	if (t0 < kernel_begin)
 		t0 = kernel_begin;
 	double t1 = t0 + 365.0 * 86400.0;
@@ -472,31 +472,31 @@ void SpiceBody::clbkInit(FILEHANDLE cfg)
 	for (double t = t0; t < t1; t += 86400.0)
 		spkgeo_c(body_id, t, "ECLIPJ2000", origin_id, state1, &lt);
 
-	CELBODY2::clbkInit(cfg);
+	SpiceModuleBase::clbkInit(cfg);
 }
 
-bool SpiceBody::clbkAtmParam(double alt, ATMPARAM* prm)
+bool SpiceBody::clbkAtmParam(double alt, SpiceAtmosphereParameters* prm)
 {
-	ATMOSPHERE::PRM_IN prm_in;
+	SpiceAtmosphere::PRM_IN prm_in;
 	prm_in.alt = alt;
 	prm_in.lat = 0.0;
 	prm_in.lng = 0.0;
 	prm_in.ap = 0.0;
 	prm_in.f107 = 0.0;
 	prm_in.f107bar = 0.0;
-	prm_in.flag = ATMOSPHERE::PRM_ALT;
-	ATMOSPHERE::PRM_OUT prm_out;
+	prm_in.flag = SpiceAtmosphere::PRM_ALT;
+	SpiceAtmosphere::PRM_OUT prm_out;
 	prm->p = 0.0;
 	prm->rho = 0.0;
 	prm->T = 0.0;
 	if (atm == NULL)
 	{
-		// oapiWriteLog("null ATM");
+		// SpiceLog("null ATM");
 		return false;
 	};
 	bool res = atm->clbkParams(&prm_in, &prm_out);
 	if (!res)
-		oapiWriteLog("false ATM");
+		SpiceLog("false ATM");
 	prm->p = prm_out.p;
 	prm->rho = prm_out.rho;
 	prm->T = prm_out.T;
@@ -562,7 +562,7 @@ int SpiceBody::clbkEphemeris(double mjd, int req, double* r)
 
 		//Error handeling for allowing conic orbit approximateion outside of the loaded kernels. If not allowed, we want to exit quickly.
 		char s[512];
-		sprintf_s(s, 512, "spice.dll: Scenerio MJD for %s is outside loaded kernel data. Closing Simulation\n\tUse kernel with longer date range or remove %s from sol.cfg", body_name, body_name);
+		std::snprintf(s, 512, "spice.dll: Scenerio MJD for %s is outside loaded kernel data. Closing Simulation\n\tUse kernel with longer date range or remove %s from sol.cfg", body_name, body_name);
 		show_error(s);
 		exit(1);
 //This code is disabled as there isn't a good way currently of notifying the user what is happening or the source of errors.
@@ -645,22 +645,22 @@ int SpiceBody::clbkFastEphemeris(double simt, int req, double* r)
 	if (simt > t_beg && simt <= t_end)
 	{
 		Interpolate(simt, r);
-		// sprintf_s(s, 1024, "I %s;%.8f;%d;%.8f;%.8f;%.8f;%.8f;%.8f;%.8f;%.8f;%.8f;%.8f;%.8f;%.8f;%.8f",
+		// std::snprintf(s, 1024, "I %s;%.8f;%d;%.8f;%.8f;%.8f;%.8f;%.8f;%.8f;%.8f;%.8f;%.8f;%.8f;%.8f;%.8f",
 		//	body_name, simt, response, r[0], r[1], r[2], r[3], r[4], r[5], r[6], r[7], r[8], r[9], r[10], r[11]);
-		// oapiWriteLog(s);
+		// SpiceLog(s);
 	}
 	else if (simt > t_end && simt <= t_end + interval)
 	{
 		t_beg = t_end;
 		memcpy(sp_beg, sp_end, 12 * sizeof(double));
 		t_end = t_beg + interval;
-		response = clbkEphemeris(oapiTime2MJD(t_end), req, sp_end);
+		response = clbkEphemeris(SpiceTimeToMJD(t_end), req, sp_end);
 
 		if (prev_response != response)
 		{
 			t_beg = simt;
 			t_end = simt;
-			response = clbkEphemeris(oapiTime2MJD(simt), req, r);
+			response = clbkEphemeris(SpiceTimeToMJD(simt), req, r);
 			memcpy(sp_end, r, 12 * sizeof(double));
 		}
 		else
@@ -672,7 +672,7 @@ int SpiceBody::clbkFastEphemeris(double simt, int req, double* r)
 	{
 		t_beg = simt;
 		t_end = simt;
-		response = clbkEphemeris(oapiTime2MJD(simt), req, r);
+		response = clbkEphemeris(SpiceTimeToMJD(simt), req, r);
 		memcpy(sp_end, r, 12 * sizeof(double));
 	}
 
@@ -739,6 +739,7 @@ double SpiceBody::calc_gm(double* state1, double* state2, double dt)
 	return g;
 }
 
+#ifndef ORBITER_NATIVE_MODULE
 DLLCLBK void InitModule(HINSTANCE hModule)
 {
 	// module initialisation
@@ -763,3 +764,7 @@ DLLCLBK void ExitInstance(CELBODY* body)
 	// instance cleanup
 	delete (SpiceBody*)body;
 }
+
+#else
+#include "NativeSpiceFactory.inc"
+#endif

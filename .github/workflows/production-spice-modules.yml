@@ -1,64 +1,76 @@
-name: Production SPICE Module Reference
+name: Native Production SPICE Modules
 on:
   push:
     branches: ['codex/production-**']
-    paths: ['Tests/Production/SpiceModules/**', '.github/workflows/production-spice-modules.yml']
+    paths: ['Src/Celbody/**', 'Src/Orbiter/Production/**', 'Tests/Production/SpiceModules/**', '.github/workflows/production-spice-modules.yml']
   workflow_dispatch:
 permissions:
   contents: read
-  actions: read
 jobs:
-  observe:
-    name: Original Windows SPICE ${{ matrix.configuration }} x64
-    runs-on: windows-2022
+  native:
+    name: Native production SPICE ${{ matrix.os }} ${{ matrix.configuration }} x64
+    runs-on: ${{ matrix.os }}
     timeout-minutes: 20
     strategy:
       fail-fast: false
       matrix:
+        os: [ubuntu-24.04, windows-2022]
         configuration: [Debug, Release]
     steps:
       - uses: actions/checkout@v7
         with:
           fetch-depth: 0
       - uses: ilammy/msvc-dev-cmd@v1
+        if: runner.os == 'Windows'
         with:
           vsversion: '17.0'
           arch: x64
-      - uses: actions/download-artifact@v8
-        with:
-          name: production-runtime-${{ matrix.configuration }}-x64
-          run-id: 41286856235
-          github-token: ${{ github.token }}
-          path: out/runtime-package
-      - name: Unpack the accepted pre-extraction application and SDK
-        run: python -m zipfile -e out/runtime-package/windows-test-runtime.zip out/runtime
-      - name: Build only the observation plugin against that exact SDK
-        shell: pwsh
+      - name: Install native Linux archive dependency
+        if: runner.os == 'Linux'
+        run: sudo apt-get update && sudo apt-get install -y zlib1g-dev
+      - name: Build actual production source modules and direct observer
+        shell: bash
         run: |
-          cmake -S Tests/Production/SpiceModules -B out/spice-observer -G Ninja -DCMAKE_BUILD_TYPE=${{ matrix.configuration }} "-DORBITER_TEST_RUNTIME:PATH=$pwd/out/runtime" 2>&1 | Tee-Object spice-configure.log
-          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-          cmake --build out/spice-observer --parallel 2 2>&1 | Tee-Object spice-build.log
-          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-          cmd /c "cl 2>&1 & exit /b 0" | Out-File spice-compiler.txt
+          set -euo pipefail
+          cmake -S Src/Orbiter/Production -B out/spice-native -G Ninja -DCMAKE_BUILD_TYPE=${{ matrix.configuration }} -DORBITER_BUILD_NATIVE_CELESTIAL_MODULES=ON 2>&1 | tee spice-configure.log
+          cmake --build out/spice-native --target production_native_spice_observer --parallel 2 2>&1 | tee spice-build.log
       - uses: actions/cache@v6
         with:
           path: out/data-cache/Orbiter-x64.zip
           key: production-data-${{ hashFiles('Tests/Production/stock-data.lock.json') }}
       - name: Prepare exact production kernels and data
         run: python Tests/Production/prepare_data.py --archive out/data-cache/Orbiter-x64.zip --destination out/data
-      - name: Query actual production modules twice before extraction
+      - name: Compare real native modules with frozen original Windows
         run: >-
-          python Tests/Production/SpiceModules/capture.py --runtime out/runtime --data out/data
+          python Tests/Production/SpiceModules/verify_port.py
+          --executable out/spice-native/production_native_spice_observer${{ runner.os == 'Windows' && '.exe' || '' }}
+          --modules out/spice-native/NativeModules --data out/data
           --output out/spice-observation --configuration ${{ matrix.configuration }}
       - uses: actions/upload-artifact@v7
         if: always()
         with:
-          name: production-spice-modules-${{ matrix.configuration }}-x64
+          name: native-spice-${{ matrix.os }}-${{ matrix.configuration }}-x64
           retention-days: 90
           path: |
             spice-*.log
-            spice-compiler.txt
-            out/spice-observation/trace-*.csv
-            out/spice-observation/capture.json
-            out/spice-observation/**/Orbiter.log
-            out/spice-observation/**/console.txt
+            out/spice-native/CMakeCache.txt
+            out/spice-observation/*.csv
+            out/spice-observation/*.json
+            out/spice-observation/*.log
+  compare:
+    name: Native SPICE Windows/Linux parity
+    needs: [native]
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/download-artifact@v8
+        with:
+          pattern: native-spice-*-*-x64
+          path: out/evidence
+      - run: python3 -B Tests/Production/SpiceModules/compare_platforms.py --evidence out/evidence --report native-spice-parity.json
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: native-spice-parity
+          retention-days: 90
+          path: native-spice-parity.json
