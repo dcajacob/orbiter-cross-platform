@@ -68,6 +68,24 @@ and `CelestialBody`; no force model or integrator is replaced. The numerical
 configuration structure is shared without pulling in application or SDK UI
 headers. Optional allocation diagnostics remain a host policy.
 
+The actual `PinesGravProp` now compiles in this library as well. Its force
+formula, associated-Legendre recurrence and private numerical workspace remain
+verbatim; the source audit enforces that separately from runtime parity. File
+loading uses an explicit standard C++ path, bounded integer parsing and temporary
+coefficient storage. Missing/truncated/nonfinite/inconsistent input and unsupported
+normalization fail without replacing a previously valid model. File handles close
+on success and failure, and reloads release previous arrays. Windows retains the
+original `readGravModel` call form as an adapter.
+
+The immutable Windows reference covers 864 Earth/Moon queries plus an independent
+J2 solution, captured before extraction in standalone and full application builds.
+Each native executable repeats those queries twice and compares against that
+reference with the predeclared force budgets; the four-platform CI also compares
+the native traces. Parser tests cover every one of the seven tracked stock model
+files, CRLF, corrupt/truncated input, overflow, file release and repeated reloads.
+These direct force queries do not construct a native Solar System or exercise the
+world's external coordinate transformation.
+
 An independent inertial/free-spin test runs each propagator for 6,000 quarter-
 second steps twice, with the same seed and finalized sampling. It checks the
 analytical translation/rotation and energy/angular-momentum invariants within

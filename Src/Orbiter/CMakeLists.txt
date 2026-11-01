@@ -63,7 +63,6 @@ set(common_src
 	Select.cpp
 	OptionsPages.cpp
 # Body classes
-	PinesGrav.cpp
 	Celbody.cpp
 	Planet.cpp
 	Star.cpp

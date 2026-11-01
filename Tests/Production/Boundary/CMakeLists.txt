@@ -1,6 +1,25 @@
 if(NOT TARGET orbiter_production_boundary)
     add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/../../../Src/Orbiter/Production" production-boundary)
 endif()
+find_package(Python3 3.9 COMPONENTS Interpreter REQUIRED)
+add_executable(production_gravity_observer ../Gravity/Observe.cpp)
+target_link_libraries(production_gravity_observer PRIVATE orbiter_production_boundary)
+set_target_properties(production_gravity_observer PROPERTIES OUTPUT_NAME production-gravity-observer)
+if(DEFINED ORBITER_BINARY_ROOT_DIR)
+    set_target_properties(production_gravity_observer PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${ORBITER_BINARY_ROOT_DIR}")
+endif()
+orbiter_stage_core_runtime(production_gravity_observer)
+add_test(NAME Production.PinesGravity COMMAND ${Python3_EXECUTABLE}
+    -B "${CMAKE_CURRENT_SOURCE_DIR}/../Gravity/verify_port.py"
+    --executable $<TARGET_FILE:production_gravity_observer>
+    --output "${PROJECT_BINARY_DIR}/traces/production-gravity" --configuration $<CONFIG>)
+set_tests_properties(Production.PinesGravity PROPERTIES TIMEOUT 150)
+add_executable(production_pines_file_test PinesFile.Test.cpp)
+target_link_libraries(production_pines_file_test PRIVATE orbiter_production_boundary)
+orbiter_stage_core_runtime(production_pines_file_test)
+add_test(NAME Production.PinesFile COMMAND production_pines_file_test "${CMAKE_CURRENT_BINARY_DIR}"
+    "${CMAKE_CURRENT_SOURCE_DIR}/../../../GravityModels")
+set_tests_properties(Production.PinesFile PROPERTIES TIMEOUT 30)
 add_executable(production_boundary_test Boundary.Test.cpp)
 target_link_libraries(production_boundary_test PRIVATE orbiter_production_boundary)
 add_executable(production_world_owner_test WorldOwner.Test.cpp)

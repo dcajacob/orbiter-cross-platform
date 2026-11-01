@@ -20,11 +20,9 @@
 */
 
 
-#include <fstream>
 #include <cmath>
 #include "Vecmat.h"
 #include "PinesGrav.h"
-#include "Orbiter.h"
 
 PinesGravProp::PinesGravProp(CelestialBody* celestialbody)
 {
@@ -105,81 +103,6 @@ inline void PinesGravProp::GenerateAssocLegendreMatrix(int maxDegree)
 		A[NM(n, 0)] = A[NM(n, 0)] * sqrt(0.5);
 	}
 
-}
-
-int PinesGravProp::readGravModel(char* filename, int cutoff, int &actualLoadedTerms, int &maxModelTerms)
-{
-	FILE* gravModelFile = nullptr;
-	char gravFileLine[512];
-	bool isEOF = false;
-	CoeffCutoff = cutoff;
-	unsigned int linecount = 0;
-	unsigned int cutoffLines = (cutoff * cutoff + cutoff) / 2 + cutoff;
-	unsigned int maxLines = cutoffLines;
-
-	try {
-		C = new double[(size_t)NM(cutoff + 1, cutoff + 1)];
-		S = new double[(size_t)NM(cutoff + 1, cutoff + 1)];
-		R = new double[(size_t)cutoff + 2];
-		I = new double[(size_t)cutoff + 2];
-		A = new double[NM((size_t)cutoff + 3, (size_t)cutoff + 3)];
-	}
-	catch (std::bad_alloc) {
-		return 2; //Could not allocate space
-	}
-	numCoeff = 0;
-
-	C[0] = 0;	//This needs to be 0 unless you want the point-mass gravity as well.
-	S[0] = 0; 
-
-	int file_error = fopen_s(&gravModelFile, filename, "rt");
-
-	if (file_error == 0 && gravModelFile) {
-		while (fgets(gravFileLine, 511, gravModelFile))
-		{
-			if (feof(gravModelFile))
-			{
-				break;
-			}
-
-			if (linecount == 0) {
-				if (!sscanf(gravFileLine, " %lf , %lf , %*lf , %d , %d , %d , %lf , %lf \n",
-					&refRad,
-					&GM,
-					&order,
-					&degree,
-					&normalized,
-					&referenceLat,
-					&referenceLon)) {
-					return 3; //Bad first line format
-				}
-				maxLines = NM(order, degree);
-
-				if (maxLines < cutoffLines) {
-					cutoffLines = maxLines;
-					CoeffCutoff = (int)std::lround((sqrt(9+8*cutoffLines)-3)/2); //Solution to n for (2^2+n)/n+2 = orderDegree
-				}
-				numCoeff = linecount += 2;
-			}
-			else if (linecount <= cutoffLines + 1) {
-
-				unsigned int lineindex = linecount - 1; //this is so we start loading coefficients at n=1
-
-				if (!sscanf(gravFileLine, " %*d , %*d , %lf , %lf , %*lf , %*lf \n",
-					&C[lineindex],
-					&S[lineindex])) {
-					return 4;//Bad coefficient line format
-				}
-				numCoeff = linecount++;
-			}
-		}
-		actualLoadedTerms = NM(CoeffCutoff, CoeffCutoff);
-		maxModelTerms = NM(order,degree);
-		return 0; //successfully loaded gravity coefficients
-	}
-	else {
-		return 1; //Could Not Open File
-	}
 }
 
 Vector PinesGravProp::GetPinesGrav(const Vector rpos, const int maxDegree, const int maxOrder)

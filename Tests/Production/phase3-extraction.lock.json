@@ -2,7 +2,7 @@
   "schema": 1,
   "production_source": "38b7c627878ea893390675616897071f8bb8e90f",
   "observed_source": "684bd5b27005feecfa9effe796bd216f85e3392f",
-  "scope": "Shared production Body, RigidBody, original propagators, CPU Mesh/MeshManager, scenario environment/focus metadata frame ordering and authoritative world object ownership; platform services, indexed resources and an internal native module bootstrap; verbatim SDK mesh value records with original Windows declaration/layout checks. Full production world/module SDK extraction remains incomplete.",
+  "scope": "Shared production Body, RigidBody, original propagators, actual Pines nonspherical gravity, CPU Mesh/MeshManager, scenario environment/focus metadata frame ordering and authoritative world object ownership; platform services, indexed resources and an internal native module bootstrap; verbatim SDK mesh value records with original Windows declaration/layout checks. Full production world/module SDK extraction remains incomplete.",
   "required_runtime_gates": [
     "frozen two-body reference",
     "frozen production orbit/propulsion",
@@ -43,7 +43,7 @@
       "original_sha256_lf": "8899635492ca087f2ad7532555b4bbdf557bb4ca4c736136adec4d68936325d5"
     },
     "Src/Orbiter/CMakeLists.txt": {
-      "sha256_lf": "8d9542c380951934b42b6f9e82b5707756d82f87d642c8e202fcf1e6c91e26e8",
+      "sha256_lf": "4c4cc21b0b7d273cc321f68902dae14656b9af698b36f6f793b3e785457c1c5b",
       "original_sha256_lf": "4ba30d001a975912a85b238851629fb999e483d8b2ba1974eb9bef9e9beb60ac"
     },
     "Src/Orbiter/Config.cpp": {
@@ -86,6 +86,18 @@
       "sha256_lf": "7657a6aa0fe6427a734aaabaa8fc5eb26edd615cc73360eaf22a45a53eb86ff8",
       "original_sha256_lf": null
     },
+    "Src/Orbiter/PinesGrav.cpp": {
+      "sha256_lf": "610485e29e14315e785eab1b4905fd69cd926b145f28278d0376485c229353bf",
+      "original_sha256_lf": "e7ad2903085ec7eed53f02515ac9c02c24d251cedb0ae0c665584675618e5528"
+    },
+    "Src/Orbiter/PinesGrav.h": {
+      "sha256_lf": "4522342b3f53ebf2e0640b92ab29d4f447b72d0c11ced77ee9208ac9db751674",
+      "original_sha256_lf": "fe0a8da8f24ac60ea2ab120d260274515f75fa3d7a18841d73d50240eee4cae9"
+    },
+    "Src/Orbiter/PinesGravFile.cpp": {
+      "sha256_lf": "a310e24516e151697de948098df483bfd267bd98896a4dd2b8495b3a8f8e57fb",
+      "original_sha256_lf": null
+    },
     "Src/Orbiter/Production/BodyServices.cpp": {
       "sha256_lf": "ca16957b5941162e75951ac8fe1e1a54c7286abb563d74c33d977124c4037298",
       "original_sha256_lf": null
@@ -95,7 +107,7 @@
       "original_sha256_lf": null
     },
     "Src/Orbiter/Production/CMakeLists.txt": {
-      "sha256_lf": "a956839bcdb25d522fc880ee1698368a7d67ac3e2a8472eb54c640be71cb5eaa",
+      "sha256_lf": "ddedd66446dd5c1f997ef40cdec6a30f2e25a50a12f815738be8b0d6b8e8941e",
       "original_sha256_lf": null
     },
     "Src/Orbiter/Production/CoreTypes.h": {

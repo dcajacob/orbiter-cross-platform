@@ -9,6 +9,9 @@ import hashlib
 
 sys.dont_write_bytecode = True
 from trace_tools import load_trace, compare, validate_orbit, require
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]/'Production/Gravity'))
+from frozen_reference import load as load_gravity_reference
+from capture import compare as compare_gravity
 
 
 def main():
@@ -58,6 +61,16 @@ def main():
     require(len(rows)==157 and len({r['scenario'] for r in rows})==157,'incomplete stock scenario metadata')
     result['production_scenario_metadata']={'scenarios':157,'identical_platforms':platforms,
         'sha256':hashlib.sha256(metadata).hexdigest(),'coverage':'environment/focus parsing only; no world initialization'}
+    reference, golden = load_gravity_reference(Path(__file__).resolve().parents[1]/'Production/Gravity/Reference')
+    result['production_pines']={'capture_sources':reference['capture_sources'],'platforms':{}}
+    baseline = None
+    for platform in platforms:
+        root = args.artifacts/platform/'out/portable/traces/production-gravity'
+        current = root/'trace-1.csv'
+        require(current.read_bytes() == (root/'trace-2.csv').read_bytes(), 'nonrepeatable production Pines trace: '+platform)
+        if baseline is None: baseline = current
+        result['production_pines']['platforms'][platform] = {
+            'frozen_windows':compare_gravity(golden,current), 'cross_platform':compare_gravity(baseline,current)}
     args.report.write_text(json.dumps(result,indent=2,allow_nan=False)+"\n")
     print(json.dumps(result,indent=2,allow_nan=False))
 

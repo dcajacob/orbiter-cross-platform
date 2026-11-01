@@ -4,15 +4,6 @@ add_subdirectory(Production/Boundary)
 # Test-only control/observation plugin; never installed as a stock module.
 option(ORBITER_PRODUCTION_REFERENCE_CAPTURE "Build production Windows reference driver" OFF)
 if(WIN32 AND ORBITER_PRODUCTION_REFERENCE_CAPTURE)
-    # Observe the actual, still unmodified Pines source before porting it.
-    add_executable(production_gravity_observer Production/Gravity/Observe.cpp
-        "${PROJECT_SOURCE_DIR}/Src/Orbiter/PinesGrav.cpp")
-    target_include_directories(production_gravity_observer PRIVATE $<TARGET_PROPERTY:Orbiter,INCLUDE_DIRECTORIES>)
-    target_compile_definitions(production_gravity_observer PRIVATE NOGRAPHICS DIRECTINPUT_VERSION=0x0800)
-    target_link_libraries(production_gravity_observer PRIVATE orbiter_production_boundary)
-    set_target_properties(production_gravity_observer PROPERTIES
-        OUTPUT_NAME production-gravity-observer RUNTIME_OUTPUT_DIRECTORY "${ORBITER_BINARY_ROOT_DIR}")
-    orbiter_stage_core_runtime(production_gravity_observer)
     target_sources(${OrbiterTgt} PRIVATE Production/ApplicationObservation.cpp)
     target_include_directories(${OrbiterTgt} PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/Production")
     target_compile_definitions(${OrbiterTgt} PRIVATE ORBITER_PRODUCTION_OBSERVATION=1)

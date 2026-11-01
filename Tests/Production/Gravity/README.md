@@ -67,3 +67,11 @@ python3 -B Tests/Production/Gravity/test_comparison.py
 ```
 
 These local checks do not execute the Windows implementation or satisfy capture.
+
+The shared implementation is now built by `Src/Orbiter/Production`, with
+`Production.PinesGravity` and `Production.PinesFile` in CTest. The former runs
+the immutable observer against the actual shared library twice and compares with
+the frozen Windows trace; the latter checks all seven stock coefficient files
+and explicit parser/resource failure paths. `verify_port.py` writes candidate
+outputs only. The original `capture.py` and standalone `CMakeLists.txt` remain
+locked recipes for the **original capture checkout**, not the current port build.

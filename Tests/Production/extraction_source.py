@@ -47,6 +47,20 @@ def verify():
             raise ValueError('extraction ledger does not match source: '+name)
         if entry['original_sha256_lf'] is not None and checksum(git('show', CAPTURE+':'+name)) != entry['original_sha256_lf']:
             raise ValueError('original extraction source changed: '+name)
+    # Only the file loader and unused application include leave this source.
+    # All force formulas, recurrence/stage ordering and private numerical fields
+    # remain verbatim from the original production implementation.
+    if (ROOT/'Src/Orbiter/PinesGravFile.cpp').exists():
+        original = git('show', CAPTURE+':Src/Orbiter/PinesGrav.cpp').replace(b'\r\n',b'\n')
+        start = original.index(b'int PinesGravProp::readGravModel(')
+        end = original.index(b'Vector PinesGravProp::GetPinesGrav', start)
+        expected = (original[:start]+original[end:]).replace(b'#include <fstream>\n',b'').replace(b'#include "Orbiter.h"\n',b'')
+        if expected != (ROOT/'Src/Orbiter/PinesGrav.cpp').read_bytes().replace(b'\r\n',b'\n'):
+            raise ValueError('production Pines force/recurrence implementation changed')
+        original = git('show', CAPTURE+':Src/Orbiter/PinesGrav.h').replace(b'\r\n',b'\n')
+        actual = (ROOT/'Src/Orbiter/PinesGrav.h').read_bytes().replace(b'\r\n',b'\n')
+        if original.split(b'private:',1)[1] != actual.split(b'private:',1)[1]:
+            raise ValueError('production Pines numerical workspace changed')
     mesh_records=ROOT/'Orbitersdk/include/OrbiterMeshData.h'
     if mesh_records.exists():
         original=git('show', CAPTURE+':Orbitersdk/include/OrbiterAPI.h').replace(b'\r\n',b'\n')

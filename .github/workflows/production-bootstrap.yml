@@ -29,7 +29,7 @@ permissions:
 
 jobs:
   windows-gravity:
-    name: Unchanged Windows Pines ${{ matrix.configuration }} x64
+    name: Shared production Pines ${{ matrix.configuration }} x64
     runs-on: windows-2022
     timeout-minutes: 15
     strategy:
@@ -45,16 +45,16 @@ jobs:
       - name: Build the actual production gravity observer
         shell: pwsh
         run: |
-          cmake -S Tests/Production/Gravity -B out/gravity-build -G Ninja -DCMAKE_BUILD_TYPE=${{ matrix.configuration }} 2>&1 | Tee-Object gravity-configure.log
+          cmake -S Src/Orbiter/Production -B out/gravity-build -G Ninja -DCMAKE_BUILD_TYPE=${{ matrix.configuration }} 2>&1 | Tee-Object gravity-configure.log
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           cmd /c "cl 2>&1 & exit /b 0" | Out-File out/gravity-build/compiler.txt
-          cmake --build out/gravity-build --parallel 2 2>&1 | Tee-Object out/gravity-build/build.log
+          cmake --build out/gravity-build --target production_gravity_observer --parallel 2 2>&1 | Tee-Object out/gravity-build/build.log
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           Get-ChildItem out/gravity-build -Recurse -Include *.exe,*.dll | Get-FileHash -Algorithm SHA256 | Format-List | Out-File out/gravity-build/binaries.txt
       - name: Capture repeated queries and check the analytical J2 fixture
         run: >-
-          python Tests/Production/Gravity/capture.py capture
-          --executable out/gravity-build/production-gravity-observer.exe
+          python Tests/Production/Gravity/verify_port.py
+          --executable out/gravity-build/tests/production-gravity-observer.exe
           --output out/production-gravity --configuration ${{ matrix.configuration }}
       - name: Preserve independent Windows observation evidence
         if: always()
@@ -80,6 +80,8 @@ jobs:
           python3 -B Tests/Production/inventory.py --verify
           python3 -B Tests/Production/frozen_reference.py
           python3 -B Tests/Production/frozen_behavior.py
+          python3 -B Tests/Production/Gravity/frozen_reference.py
+          python3 -B Tests/Production/Gravity/test_comparison.py
 
   windows-wgl:
     name: Windows WGL ${{ matrix.configuration }} x64
@@ -193,9 +195,9 @@ jobs:
         run: |
           ctest --test-dir out/production-app --output-on-failure 2>&1 | Tee-Object out/production-app/ctest.log
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-      - name: Observe unchanged production Pines gravity twice
+      - name: Compare shared production Pines with the frozen Windows reference
         run: >-
-          python Tests/Production/Gravity/capture.py capture
+          python Tests/Production/Gravity/verify_port.py
           --executable out/production-app/production-gravity-observer.exe
           --output out/production-gravity --configuration ${{ matrix.configuration }}
       - name: Verify existing frozen two-body reference
@@ -308,7 +310,7 @@ jobs:
         run: >-
           python3 -B Tests/Production/behavior_suite.py --compare out/debug/production-behavior
           --output out/release/production-behavior
-      - name: Validate predeclared Pines budgets before platform extraction
+      - name: Compare production Pines across configurations without changing budgets
         run: >-
           python3 -B Tests/Production/Gravity/capture.py compare
           --reference out/debug/production-gravity/trace-1.csv

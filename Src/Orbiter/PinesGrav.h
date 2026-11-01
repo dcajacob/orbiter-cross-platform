@@ -21,14 +21,20 @@
 
 #ifndef __PINESGRAV_H
 #define __PINESGRAV_H
+#include "Vecmat.h"
+#include "Production/Export.h"
+#include <filesystem>
 class CelestialBody;
 
-class PinesGravProp
+class ORBITER_PRODUCTION_API PinesGravProp
 {
 public:
 	PinesGravProp(CelestialBody* celestialbody);
 	~PinesGravProp();
+	PinesGravProp(const PinesGravProp&) = delete;
+	PinesGravProp& operator=(const PinesGravProp&) = delete;
 	int readGravModel(char* filename, int cutoff, int& actualLoadedTerms, int& maxModelTerms);
+	int ReadGravityModel(const std::filesystem::path& filename, int cutoff, int& actualLoadedTerms, int& maxModelTerms);
 	Vector GetPinesGrav(const Vector rposmax, const int maxDegree, const int maxOrder);
 	inline unsigned int GetCoeffCutoff() const { return CoeffCutoff; }
 private:
