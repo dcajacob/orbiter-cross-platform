@@ -2,7 +2,7 @@
   "schema": 1,
   "production_source": "38b7c627878ea893390675616897071f8bb8e90f",
   "observed_source": "684bd5b27005feecfa9effe796bd216f85e3392f",
-  "scope": "Shared production Body, RigidBody, CelestialBody, Star, Planet, Base, BaseObject, VesselBase surface/contact calculations, original propagators, actual Pines nonspherical gravity, CPU Mesh/MeshManager, fixed-width planetary archives, scenario environment/focus metadata production Config settings, frame ordering and authoritative world object ownership; platform services, indexed resources and an internal native module bootstrap and actual native SPICE/atmosphere interfaces; verbatim SDK mesh/celestial/visual value records and constants with original Windows declaration/layout checks. Full production world/module SDK extraction remains incomplete.",
+  "scope": "Shared production Body, RigidBody, CelestialBody, Star, Planet, Base, BaseObject, actual PlanetarySystem loading/lifecycle through explicit real-vessel adapters, VesselBase surface/contact calculations, original propagators, actual Pines nonspherical gravity, CPU Mesh/MeshManager, fixed-width planetary archives, scenario environment/focus metadata production Config settings, frame ordering and authoritative world object ownership; platform services, indexed resources and an internal native module bootstrap and actual native SPICE/atmosphere interfaces; verbatim SDK mesh/celestial/visual value records and constants with original Windows declaration/layout checks. Full production world/module SDK extraction remains incomplete.",
   "required_runtime_gates": [
     "frozen two-body reference",
     "frozen production orbit/propulsion",
@@ -91,11 +91,11 @@
       "original_sha256_lf": "d3d119bb989d226f32498a710e8b77fa89b0d4cc9c05581a3a7a039777d95152"
     },
     "Src/Orbiter/Astro.cpp": {
-      "sha256_lf": "d32c65c13242df22dda44a5d2f325ba322d8a9855d4b8734c8b71c2e299e9188",
+      "sha256_lf": "7da20cc343cf8f31f6fa02327ecc96e7b8c25cc2126b6ce16e404b40cd07ad8e",
       "original_sha256_lf": "82ea743582531793fc564092ec83a1fa3651d094bd7480d6ab9ffe0e82d8ec05"
     },
     "Src/Orbiter/Astro.h": {
-      "sha256_lf": "6b47927564213b75a1f9c42982924a7fd0cf65e6a250f6baf453d653b132c649",
+      "sha256_lf": "53a6c7df32a1d4ff38cad6b728be815fbd94de07f2c473db7ae4a821251d71a9",
       "original_sha256_lf": "66a6de37a0d7a51e32c1564ccb48228802fd65bd5f1b4a6c931ea86ff9b6a4a8"
     },
     "Src/Orbiter/AstroMath.h": {
@@ -131,7 +131,7 @@
       "original_sha256_lf": "8899635492ca087f2ad7532555b4bbdf557bb4ca4c736136adec4d68936325d5"
     },
     "Src/Orbiter/CMakeLists.txt": {
-      "sha256_lf": "2a6c37c728dd33218320f2942f855c68232431de87cfca9605e341703c1f583f",
+      "sha256_lf": "c673496948af3b643546e70bd96f95e0b973b4e6e220d0aa5db12763f54413a6",
       "original_sha256_lf": "4ba30d001a975912a85b238851629fb999e483d8b2ba1974eb9bef9e9beb60ac"
     },
     "Src/Orbiter/Celbody.cpp": {
@@ -195,7 +195,7 @@
       "original_sha256_lf": "bbc06fe202e61e5f402693795e81bba6424a8af06fbcf3ff8ea25169c449297c"
     },
     "Src/Orbiter/Orbiter.cpp": {
-      "sha256_lf": "66c6de42ffe36a772a58aca4bdeffe9513dd206bbc5c5eba64c255f5f47c1636",
+      "sha256_lf": "a3f9655e39618eb5a1bea607ad5f280715f905df2e47e5466f07a9c71e9a9add",
       "original_sha256_lf": "d9bcee218c141dc3896d599a3e25323f84d1259bc2aa209e752eb8c03ea4b298"
     },
     "Src/Orbiter/Orbiter.h": {
@@ -239,7 +239,7 @@
       "original_sha256_lf": null
     },
     "Src/Orbiter/Production/CMakeLists.txt": {
-      "sha256_lf": "fefc82e0685783f776a13af0caec447419a9f26fcf32e1b030e0b09f28dc1dc0",
+      "sha256_lf": "096322ccc397bd545808a220c1d1e3bf7f29214698852d4b4ef0c6cdac3e1bb7",
       "original_sha256_lf": null
     },
     "Src/Orbiter/Production/CelestialServices.cpp": {
@@ -327,7 +327,7 @@
       "original_sha256_lf": null
     },
     "Src/Orbiter/Production/NativeCelestialModules.cmake": {
-      "sha256_lf": "321cf618e680ace8d914f466751f96fca8c69ce132bc79450bbea41f4e1e19a8",
+      "sha256_lf": "459a17a88d8d49827ab1307ba2987940a2d41b2f6a942d5416b135f5ac021a50",
       "original_sha256_lf": null
     },
     "Src/Orbiter/Production/NativeCelestialServices.cpp": {
@@ -415,11 +415,11 @@
       "original_sha256_lf": null
     },
     "Src/Orbiter/Production/SurfaceNavigation.cpp": {
-      "sha256_lf": "e81f69ca2f9748bc32ff0fa50d07f8c624394d5f5b383ea221a2cfbf7d017cfd",
+      "sha256_lf": "c6bb20c3671298a4c1cbd7ecc0039a446534a1cedd7c48e3456a1a7f5d7a44b0",
       "original_sha256_lf": null
     },
     "Src/Orbiter/Production/SurfaceNavigation.h": {
-      "sha256_lf": "24f4006cddbe2a44d59a6055c43169bd08f6f75ca42f82e321cb34b661513fdf",
+      "sha256_lf": "b3263e076e2ec34ca40e64b1173ca66f1866395fd0d42446e2b1c18e329ee533",
       "original_sha256_lf": null
     },
     "Src/Orbiter/Production/SurfaceServices.cpp": {
@@ -510,6 +510,14 @@
       "sha256_lf": "132578f5a45db80262ec531276451dfc5013c0e772049ab1b6deb2d9bb44e286",
       "original_sha256_lf": null
     },
+    "Src/Orbiter/Production/WindowsWorldVesselServices.cpp": {
+      "sha256_lf": "faff46cb94d75c75496830a465309964880d66dc10fc0bc8ac1aa0dd2c917dc0",
+      "original_sha256_lf": null
+    },
+    "Src/Orbiter/Production/WindowsWorldVesselServices.h": {
+      "sha256_lf": "137d3ef768dd1f331c36ab4bfa467d8db70888d55722cc2e36b9e18b7ea790ec",
+      "original_sha256_lf": null
+    },
     "Src/Orbiter/Production/WorldOwner.cpp": {
       "sha256_lf": "afc2ed0c883392ec09ff8a19a7f3f766bace8fa1563be10f61b9514116254003",
       "original_sha256_lf": null
@@ -518,8 +526,16 @@
       "sha256_lf": "1711cfe7685fea03148cca07a264bc697b7c23849d60f82712f8063765c71571",
       "original_sha256_lf": null
     },
+    "Src/Orbiter/Production/WorldVesselServices.cpp": {
+      "sha256_lf": "32729e1707c339bf88eda6b1251a0d7fc500a2d53a261a5f7cca6974de5a7afb",
+      "original_sha256_lf": null
+    },
+    "Src/Orbiter/Production/WorldVesselServices.h": {
+      "sha256_lf": "30872f8e291bb3da75e9b0e4101c0eb01cc8c0353b09aa1c0c956af090c57ed4",
+      "original_sha256_lf": null
+    },
     "Src/Orbiter/Psys.cpp": {
-      "sha256_lf": "c3f63d65768de05b4676284dd51a16f5f3f99c090a96206294222659d5ab8941",
+      "sha256_lf": "6c90f704fd0df383d8e7594523327126a1f0ef229466a561a243469325acabb3",
       "original_sha256_lf": "24c7a7e0fb3b5e49e822632074d7919060c82e131866daa78cc0f3c872a9eb38"
     },
     "Src/Orbiter/Psys.h": {
@@ -527,7 +543,7 @@
       "original_sha256_lf": "a8a62b3bc05ef4813ad6345d4349cd121826a01d4f723cfe222c094fd3eecb82"
     },
     "Src/Orbiter/PsysCore.h": {
-      "sha256_lf": "a8d9cfab06ddff866b790752999cc0f344ecc98e7df7e33d8cb0017b88aa1f92",
+      "sha256_lf": "5713fd5b41c76b3d5635710279f8705c7b1fbc27bfdec9dd5858af85601ca616",
       "original_sha256_lf": null
     },
     "Src/Orbiter/PsysGravity.cpp": {

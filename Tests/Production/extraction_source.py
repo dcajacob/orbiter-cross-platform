@@ -39,6 +39,9 @@ def verify():
     if ledger['observed_source'] != CAPTURE or ledger['production_source'] != BASE:
         raise ValueError('extraction baseline identity changed')
     declared = ledger['files']
+    if 'Src/Orbiter/Production/WorldVesselServices.cpp' in declared:
+        from world_source import verify as verify_world
+        verify_world()
     if 'Src/Orbiter/Production/SurfaceServices.cpp' in declared:
         from surface_source import verify as verify_surface
         verify_surface()
@@ -128,7 +131,7 @@ def verify():
             b'#include "Base.h"\n#include "Star.h"\n#include "Planet.h"\n',b'').replace(
             b'orbiter::production::UInt32 PlanetarySystem::nBase(const Planet *planet) const { return planet->nBase(); }\n'
             b'Base *PlanetarySystem::GetBase (const Planet *planet, orbiter::production::UInt32 i) { return planet->GetBase(i); }\n\n',b'')
-        if canonical != original[:start]+original[end:]:
+        if 'Src/Orbiter/Production/WorldVesselServices.cpp' not in declared and canonical != original[:start]+original[end:]:
             raise ValueError('production world lifecycle/configuration changed outside gravity extraction')
         original = git('show',parent+':Src/Orbiter/Psys.h').replace(b'\r\n',b'\n')
         actual = (ROOT/'Src/Orbiter/PsysCore.h').read_bytes().replace(b'\r\n',b'\n')

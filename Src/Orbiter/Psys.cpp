@@ -3,33 +3,39 @@
 
 // Implementation of class PlanetarySystem
 
-#include "Astro.h"
+#include "AstroMath.h"
+#include "Production/SurfaceNavigation.h"
+#include "Production/SurfaceServices.h"
+#include "Production/WorldVesselServices.h"
+#include "Production/Text.h"
+#include "Production/CelestialServices.h"
+#include "Production/RigidBodyServices.h"
 #include <fstream>
 #include <stdio.h>
 #include <string.h>
 #include <algorithm>
 
 #include "Config.h"
-#include "Psys.h"
+#include "PsysCore.h"
 #include "Base.h"
 #include "Star.h"
 #include "Planet.h"
 #include "PhysicsCore.h"
 #include "TimeData.h"
 #include "Element.h"
-#include "Vessel.h"
-#include "SuperVessel.h"
-#include "Log.h"
 
 using namespace std;
+using namespace orbiter::production;
 
-extern TimeData td;
-extern bool g_bForceUpdate;
-extern char DBG_MSG[256];
 
 PlanetarySystem::PlanetarySystem (char *fname, const Config* config, OutputLoadStatusCallback outputLoadStatus, void* callbackContext)
 {
-	Read (fname, config, outputLoadStatus, callbackContext);
+	try {
+		Read (fname, config, outputLoadStatus, callbackContext);
+	} catch (...) {
+		Clear();
+		throw;
+	}
 }
 
 PlanetarySystem::~PlanetarySystem ()
@@ -45,7 +51,7 @@ void PlanetarySystem::Clear ()
 	//Vessel destructor broadcasts messages to every other vessel in 'vessels'.
 	//We remove it from the collection as soon as we deleted it to prevent the next Vessel to broadcast to the free'd one.
 	while (vessels.size()) {
-		DelBody(vessels.back());
+		DelBody(&GetWorldVesselServices().State(*vessels.back()));
 		vessels.pop_back();
 	}
 
@@ -60,11 +66,11 @@ void PlanetarySystem::Clear ()
 	planets   .clear();
 	celestials.clear();
 
-	g_bForceUpdate = true;
+	GetWorldVesselServices().ForceUpdate();
 
 	//Supervessels are not stored in 'bodies' so we have to take care of them manually
 	for (size_t i = 0; i < supervessels.size(); ++i) {
-		delete supervessels[i];
+		GetWorldVesselServices().DeleteStructure(supervessels[i]);
 	}
 	supervessels.clear();
 }
@@ -78,40 +84,40 @@ void PlanetarySystem::InitState (const char *fname)
 		for (;;) {
 			if (!ifs.getline (cbuf, 256)) break;
 			pc = trim_string (cbuf);
-			if (!_stricmp (pc, "END_SHIPS")) break;
+			if (!CompareText (pc, "END_SHIPS")) break;
 			for (pd = pc; *pd != '\0' && *pd != ':'; pd++);
 			if (*pd) *pd++ = '\0';
 			else pd = 0;
-			AddVessel (new Vessel (this, pc, pd, ifs)); TRACENEW
+			AddVessel (GetWorldVesselServices().Create(*this,pc,pd,ifs)); GetRigidBodyServices().TraceAllocation(__FILE__,__LINE__);
 		}
 	}
 }
 
 void PlanetarySystem::PostCreation ()
 {
-	for (size_t i = 0; i < vessels.size(); ++i) vessels[i]->PostCreation();
-	for (size_t i = 0; i < vessels.size(); ++i) vessels[i]->InitSupervessel();
-	for (size_t i = 0; i < vessels.size(); ++i) vessels[i]->ModulePostCreation();
+	for (size_t i = 0; i < vessels.size(); ++i) GetWorldVesselServices().PostCreation(*vessels[i]);
+	for (size_t i = 0; i < vessels.size(); ++i) GetWorldVesselServices().InitSupervessel(*vessels[i]);
+	for (size_t i = 0; i < vessels.size(); ++i) GetWorldVesselServices().ModulePostCreation(*vessels[i]);
 }
 
 void PlanetarySystem::Write (ostream &os)
 {
 	os << "BEGIN_SHIPS" << endl;
 	for (size_t i = 0; i < vessels.size(); ++i)
-		vessels[i]->Write (os);
+		GetWorldVesselServices().Write(*vessels[i],os);
 	os << "END_SHIPS" << endl;
 }
 
 Body *PlanetarySystem::GetObj (const char *name, bool ignorecase)
 {
-	for (DWORD i = 0; i < bodies.size(); i++)
+	for (UInt32 i = 0; i < bodies.size(); i++)
 		if (!StrComp (bodies[i]->Name(), name, ignorecase)) return bodies[i];
 	return 0;
 }
 
 CelestialBody *PlanetarySystem::GetGravObj (const char *name, bool ignorecase) const
 {
-	for (DWORD i = 0; i < celestials.size(); i++)
+	for (UInt32 i = 0; i < celestials.size(); i++)
 		if (!StrComp (celestials[i]->Name(), name, ignorecase)) return celestials[i];
 	return 0;
 }
@@ -125,21 +131,21 @@ Planet *PlanetarySystem::GetPlanet (const char *name, bool ignorecase)
 
 Vessel *PlanetarySystem::GetVessel (const char *name, bool ignorecase) const
 {
-	for (DWORD i = 0; i < vessels.size(); i++)
-		if (!StrComp (vessels[i]->Name(), name, ignorecase)) return vessels[i];
+	for (UInt32 i = 0; i < vessels.size(); i++)
+		if (!StrComp (GetWorldVesselServices().Name(*vessels[i]), name, ignorecase)) return vessels[i];
 	return 0;
 }
 
 bool PlanetarySystem::isObject (const Body *obj) const
 {
-	for (DWORD i = 0; i < bodies.size(); i++)
+	for (UInt32 i = 0; i < bodies.size(); i++)
 		if (bodies[i] == obj) return true;
 	return false;
 }
 
 bool PlanetarySystem::isVessel (const Vessel *v) const
 {
-	for (DWORD i = 0; i < vessels.size(); i++)
+	for (UInt32 i = 0; i < vessels.size(); i++)
 		if (vessels[i] == v) return true;
 	return false;
 }
@@ -149,7 +155,7 @@ Base *PlanetarySystem::GetBase (const Planet *planet, orbiter::production::UInt3
 
 Base *PlanetarySystem::GetBase (const Planet *planet, const char *name, bool ignorecase)
 {
-	for (DWORD i = 0; i < planet->nBase(); i++)
+	for (UInt32 i = 0; i < planet->nBase(); i++)
 		if (!StrComp (planet->GetBase(i)->Name(), name, ignorecase))
 			return planet->GetBase(i);
 	return 0;
@@ -157,7 +163,7 @@ Base *PlanetarySystem::GetBase (const Planet *planet, const char *name, bool ign
 
 Base *PlanetarySystem::GetBase (const char *name, bool ignorecase)
 {
-	for (DWORD i = 0; i < celestials.size(); i++) {
+	for (UInt32 i = 0; i < celestials.size(); i++) {
 		if (celestials[i]->Type() != OBJTP_PLANET) continue;
 		Planet *planet = (Planet*)celestials[i];
 		Base *base = GetBase (planet, name, ignorecase);
@@ -166,19 +172,19 @@ Base *PlanetarySystem::GetBase (const char *name, bool ignorecase)
 	return 0;
 }
 
-void PlanetarySystem::OptionChanged(DWORD cat, DWORD item)
+void PlanetarySystem::OptionChanged(UInt32 cat, UInt32 item)
 {
 	for (size_t i = 0; i < vessels.size(); i++)
-		vessels[i]->OptionChanged(cat, item);
+		GetWorldVesselServices().OptionChanged(*vessels[i],cat,item);
 }
 
 bool PlanetarySystem::Read (char *fname, const Config* config, OutputLoadStatusCallback outputLoadStatus, void* callbackContext)
 {
 	int i;
-	DWORD j;
+	UInt32 j;
 	char cbuf[256], label[128];
 	
-	ifstream ifs (config->ConfigPath(fname));
+	ifstream ifs (GetBodyServices().ConfigPath(fname));
 	if (!ifs) return false;
 	Clear();
 	if (GetItemString (ifs, "Name", cbuf)) {
@@ -190,7 +196,7 @@ bool PlanetarySystem::Read (char *fname, const Config* config, OutputLoadStatusC
 		sprintf (label, "Star%zd", stars.size() + 1);
 		if (!GetItemString (ifs, label, cbuf)) break;
 		OutputLoadStatus (cbuf, outputLoadStatus, callbackContext);
-		AddStar (new Star (cbuf)); TRACENEW
+		AddStar (new Star (cbuf)); GetRigidBodyServices().TraceAllocation(__FILE__,__LINE__);
 	}
 
 	// read planets
@@ -198,7 +204,7 @@ bool PlanetarySystem::Read (char *fname, const Config* config, OutputLoadStatusC
 		sprintf (label, "Planet%d", i+1);
 		if (!GetItemString (ifs, label, cbuf)) break;
 		OutputLoadStatus (cbuf, outputLoadStatus, callbackContext);
-		Planet *planet = new Planet (cbuf); TRACENEW
+		Planet *planet = new Planet (cbuf); GetRigidBodyServices().TraceAllocation(__FILE__,__LINE__);
 		AddPlanet (planet, stars[0]);
 		ScanMoons (ifs, planet, planet->Name());
 	}
@@ -231,14 +237,14 @@ void PlanetarySystem::ScanLabelLists (ifstream &cfg, bool bScanHeaders)
 {
 	int i;
 	char cbuf[256];
-	oapi::GraphicsClient::LABELLIST* ll;
+	SceneLabelList* ll;
 	int idx = 0;
 	ForEach(FILETYPE_MARKER, [&](const fs::directory_entry& entry) {
 		// open marker file
 		ifstream ulf(entry.path());
 		// read label header
 		if (bScanHeaders) {
-			oapi::GraphicsClient::LABELLIST list;
+			SceneLabelList list;
 			//list.marker.clear();
 			list.colour = 1;
 			list.shape = 0;
@@ -250,33 +256,33 @@ void PlanetarySystem::ScanLabelLists (ifstream &cfg, bool bScanHeaders)
 			if (FindLine(ulf, "BEGIN_HEADER")) {
 				char item[256], value[256];
 				for (;;) {
-					if (!ulf.getline(cbuf, 256) || !_strnicmp(cbuf, "END_HEADER", 10)) break;
+					if (!ulf.getline(cbuf, 256) || !ComparePrefix(cbuf, "END_HEADER", 10)) break;
 					sscanf(cbuf, "%s %s", item, value);
-					if (!_stricmp(item, "InitialState")) {
-						if (!_stricmp(value, "on")) list.active = true;
+					if (!CompareText(item, "InitialState")) {
+						if (!CompareText(value, "on")) list.active = true;
 					}
-					else if (!_stricmp(item, "ColourIdx")) {
+					else if (!CompareText(item, "ColourIdx")) {
 						int col;
 						sscanf(value, "%d", &col);
 						list.colour = max(0, min(5, col));
 					}
-					else if (!_stricmp(item, "ShapeIdx")) {
+					else if (!CompareText(item, "ShapeIdx")) {
 						int shape;
 						sscanf(value, "%d", &shape);
 						list.shape = max(0, min(6, shape));
 					}
-					else if (!_stricmp(item, "Size")) {
+					else if (!CompareText(item, "Size")) {
 						float size;
 						sscanf(value, "%f", &size);
 						list.size = max(0.1f, min(2.0f, size));
 					}
-					else if (!_stricmp(item, "DistanceFactor")) {
+					else if (!CompareText(item, "DistanceFactor")) {
 						float distfac;
 						sscanf(value, "%f", &distfac);
 						list.distfac = max(1e-5f, min(1e3f, distfac));
 					}
-					else if (!_stricmp(item, "Frame")) {
-						if (_stricmp(value, "Ecliptic"))
+					else if (!CompareText(item, "Frame")) {
+						if (CompareText(value, "Ecliptic"))
 							list.flag = 1; // flag for celestial position data
 					}
 				}
@@ -309,7 +315,7 @@ void PlanetarySystem::ScanLabelLists (ifstream &cfg, bool bScanHeaders)
 					double ra = lng, dc = lat;
 					Equ2Ecl(coseps, sineps, ra, dc, lng, lat);
 				}
-				oapi::GraphicsClient::LABELSPEC ls;
+				SceneLabel ls;
 				double xz = cos(lat);
 				ls.pos.y = sin(lat);
 				ls.pos.x = xz * cos(lng);
@@ -381,7 +387,7 @@ void PlanetarySystem::ScanMoons (istream &is, CelestialBody *cbody, const char *
 	for (int i = 0;; i++) {
 		sprintf (cbuf, "%s:Moon%d", id, i+1);
 		if (!GetItemString (is, cbuf, name)) return;
-		Planet *moon = new Planet (name); TRACENEW
+		Planet *moon = new Planet (name); GetRigidBodyServices().TraceAllocation(__FILE__,__LINE__);
 		AddPlanet (moon, cbody);
 		ScanMoons (is, moon, cbuf); // recursion
 	}
@@ -400,8 +406,8 @@ void PlanetarySystem::AddGrav (CelestialBody *newBody)
 size_t PlanetarySystem::AddVessel (Vessel *_vessel)
 {
 	vessels.emplace_back(_vessel);
-	AddBody (_vessel); // register in general list
-	g_bForceUpdate = true;
+	AddBody (&GetWorldVesselServices().State(*_vessel)); // register in general list
+	GetWorldVesselServices().ForceUpdate();
 	return vessels.size();
 }
 
@@ -416,11 +422,11 @@ bool PlanetarySystem::DelVessel (Vessel *_vessel)
 	if (i == vessels.size())
 		return false; // vessels not found in list
 
-	DelBody (_vessel); //DelBody takes care of freeing the vessel
+	DelBody (&GetWorldVesselServices().State(*_vessel)); //DelBody takes care of freeing the vessel
 	std::iter_swap(vessels.begin() + i, vessels.end() - 1);
 	vessels.pop_back();
 
-	g_bForceUpdate = true;
+	GetWorldVesselServices().ForceUpdate();
 	return true;
 }
 
@@ -440,7 +446,7 @@ bool PlanetarySystem::DelSuperVessel (SuperVessel *sv)
 	if (i == supervessels.size())
 		return false; // vessels not found in list
 
-	delete supervessels[i];
+	GetWorldVesselServices().DeleteStructure(supervessels[i]);
 
 	//Note that supervesslels unlike other bodies are NOT also present in the 'bodies'
 	std::iter_swap(supervessels.begin() + i, supervessels.end() - 1);
@@ -453,52 +459,52 @@ void PlanetarySystem::DockVessels (Vessel *vessel1, Vessel *vessel2, int port1, 
 {
 	// if the vessels are already complex structures, store a reference to
 	// the superstructures so we can remove them after merging
-	SuperVessel *sv1 = vessel1->SuperStruct();
-	SuperVessel *sv2 = vessel2->SuperStruct();
+	SuperVessel *sv1 = GetWorldVesselServices().Structure(*vessel1);
+	SuperVessel *sv2 = GetWorldVesselServices().Structure(*vessel2);
 
 	if (!sv1 && !sv2) {    // create a new super-structure
-		AddSuperVessel (new SuperVessel (vessel1, vessel2, port1, port2, mixmoments)); TRACENEW
+		AddSuperVessel (GetWorldVesselServices().CreateStructure(*vessel1,*vessel2,port1,port2,mixmoments)); GetRigidBodyServices().TraceAllocation(__FILE__,__LINE__);
 	} else if (sv1 && sv2) { // merge sv2 into sv1
-		sv1->Merge (vessel1, port1, vessel2, port2);
+		GetWorldVesselServices().Merge(*sv1,*vessel1,port1,*vessel2,port2);
 		DelSuperVessel (sv2);
 	} else if (sv1) {        // add vessel2 into sv1
-		sv1->Add (vessel1, port1, vessel2, port2, mixmoments);
+		GetWorldVesselServices().Add(*sv1,*vessel1,port1,*vessel2,port2,mixmoments);
 	} else {                 // add vessel1 into sv2
-		sv2->Add (vessel2, port2, vessel1, port1, mixmoments);
+		GetWorldVesselServices().Add(*sv2,*vessel2,port2,*vessel1,port1,mixmoments);
 	}
 }
 
 void PlanetarySystem::UndockVessel (SuperVessel *sv, Vessel *_vessel, int port, double vsep)
 {
-	sv->Detach (_vessel, port, vsep);
-	if (!sv->nVessel()) {
+	GetWorldVesselServices().Detach(*sv,*_vessel,port,vsep);
+	if (GetWorldVesselServices().Empty(*sv)) {
 		DelSuperVessel(sv);
 	}
 }
 
 void PlanetarySystem::Update (bool force)
 {
-	DWORD i;
+	UInt32 i;
 	for (i = 0; i < bodies      .size(); i++) bodies      [i]->BeginStateUpdate ();
 	for (i = 0; i < stars       .size(); i++) stars       [i]->RelTrueAndBaryState();
 	for (i = 0; i < stars       .size(); i++) stars       [i]->AbsTrueState();
 	for (i = 0; i < celestials  .size(); i++) celestials  [i]->Update (force);
-	for (i = 0; i < vessels     .size(); i++) vessels     [i]->UpdateBodyForces ();
-	for (i = 0; i < supervessels.size(); i++) supervessels[i]->Update (force);
-	for (i = 0; i < vessels     .size(); i++) vessels     [i]->Update (force);
+	for (i = 0; i < vessels     .size(); i++) GetWorldVesselServices().UpdateBodyForces(*vessels[i]);
+	for (i = 0; i < supervessels.size(); i++) GetWorldVesselServices().Update(*supervessels[i],force);
+	for (i = 0; i < vessels     .size(); i++) GetWorldVesselServices().Update(*vessels[i],force);
 }
 
 void PlanetarySystem::FinaliseUpdate ()
 {
-	DWORD i;
+	UInt32 i;
 	for (i = 0; i < bodies.size(); i++) bodies[i]->EndStateUpdate ();
-	for (i = 0; i < supervessels.size(); i++) supervessels[i]->PostUpdate ();
-	for (i = 0; i < vessels.size(); i++) vessels[i]->PostUpdate ();
+	for (i = 0; i < supervessels.size(); i++) GetWorldVesselServices().PostUpdate(*supervessels[i]);
+	for (i = 0; i < vessels.size(); i++) GetWorldVesselServices().PostUpdate(*vessels[i]);
 }
 
 void PlanetarySystem::Timejump (const TimeJumpData& jump)
 {
-	DWORD i;
+	UInt32 i;
 	for (i = 0; i < bodies.size(); i++) bodies[i]->BeginStateUpdate ();
 	for (i = 0; i < stars.size(); i++) stars[i]->RelTrueAndBaryState();
 	for (i = 0; i < stars.size(); i++) stars[i]->AbsTrueState();
@@ -506,23 +512,30 @@ void PlanetarySystem::Timejump (const TimeJumpData& jump)
 	for (i = 0; i < bodies.size(); i++) bodies[i]->EndStateUpdate ();
 
 	for (i = 0; i < vessels.size(); i++)
-		vessels[i]->Timejump(jump.dt, jump.mode);
+		GetWorldVesselServices().Timejump(*vessels[i],jump.dt,jump.mode);
 }
 
 void PlanetarySystem::InitDeviceObjects ()
 {
-	for (DWORD i = 0; i < bodies.size(); i++)
+	for (UInt32 i = 0; i < bodies.size(); i++)
 		bodies[i]->InitDeviceObjects();
 }
 
 void PlanetarySystem::DestroyDeviceObjects ()
 {
-	for (DWORD i = 0; i < bodies.size(); i++)
+	for (UInt32 i = 0; i < bodies.size(); i++)
 		bodies[i]->DestroyDeviceObjects();
 }
 
-void PlanetarySystem::BroadcastVessel (DWORD msg, void *data)
+void PlanetarySystem::BroadcastVessel (UInt32 msg, void *data)
 {
-	for (DWORD i = 0; i < vessels.size(); i++)
-		vessels[i]->ProcessMessage (msg, data);
+	for (UInt32 i = 0; i < vessels.size(); i++)
+		GetWorldVesselServices().ProcessMessage(*vessels[i],msg,data);
+}
+void PlanetarySystem::ForEach(int type, std::function<void(const std::filesystem::directory_entry&)> callback) {
+    std::error_code ec;
+    const auto path=GetSurfaceServices().MarkerDirectory(m_Name.c_str(),m_labelPath.c_str());
+    for (const auto& entry:std::filesystem::directory_iterator(path,ec)) {
+        if (entry.path().extension().string()==".mkr") callback(entry);
+    }
 }

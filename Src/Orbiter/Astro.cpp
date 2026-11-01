@@ -88,22 +88,6 @@ double Obliquity (double jc)
 	return 0.4090928042 - (2.269655248e-4 + (2.860400719e-9 - 8.789672039e-9*jc)*jc)*jc;
 }
 
-void Equ2Ecl (double cosob, double sinob, double ra, double dc, double &l, double &b)
-{
-	double sinra = sin (ra), cosra = cos (ra);
-	double sindc = sin (dc), cosdc = cos (dc);
-	l = atan2 (sinra*cosdc*cosob + sindc*sinob, cosra*cosdc);
-	b = asin  (sindc*cosob - sinra*cosdc*sinob);
-}
-
-void Ecl2Equ (double cosob, double sinob, double l, double b, double &ra, double &dc)
-{
-	double sinl = sin (l), cosl = cos (l);
-	double sinb = sin (b), cosb = cos (b);
-	ra = atan2 (sinl*cosb*cosob - sinb*sinob, cosb*cosl);
-	dc = asin  (sinb*cosob + cosb*sinl*sinob);
-}
-
 static char strbuf[256];
 
 char *DistStr (double dist, int precision)

@@ -45,9 +45,9 @@ may satisfy a production acceptance case.
 | --- | --- | --- |
 | Vecmat, elements, two-body RK4 | Verified restricted fixtures | Preserve frozen references unchanged |
 | Window/input/procedural view | POC only | Native production window, input and real graphics client |
-| Production world and session | Shared frame ordering, `Body`/`RigidBody`/`CelestialBody`/`Star`/`Planet`/`Base`/`VesselBase`, Pines gravity and scenario environment/focus metadata; complete world loading unavailable | Existing lifecycle, shared engine library and platform services |
+| Production world and session | Shared frame ordering and actual celestial `PlanetarySystem`, `Body`/`RigidBody`/`CelestialBody`/`Star`/`Planet`/`Base`/`VesselBase`; native vessels/camera/full session unavailable | Existing lifecycle, shared engine library and platform services |
 | SPICE Solar System | Actual native celestial modules; hosted Windows/Linux Debug/Release direct-callback parity passes, full world integration pending | Current `Src/Celbody/SPICE`, CSPICE, `orbiter.bsp`, TLS/PCK and coverage verification |
-| Native module ABI | Internal loader/bootstrap with SDK-build and toolchain checks; stock module APIs unavailable | Source-built vessels, celbodies, atmospheres, plugins; version/toolchain check |
+| Native module ABI | Internal loader/bootstrap and actual celestial/atmosphere APIs with SDK-build and toolchain checks; native vessel SDK unavailable | Source-built vessels, celbodies, atmospheres, plugins; version/toolchain check |
 | Real stock meshes/materials/animations | Production CPU `Mesh`/`MeshManager`; world/animation integration unavailable | Existing CPU mesh data separated from D3D resources; actual group identities |
 | Planet tiles and elevation | Shared archive reader and actual elevation manager; frozen Windows/Linux direct-query parity passes; native planet/base component verification added | Portable fixed-width archives, 64-bit offsets; engine contact queries independent of visibility |
 | Resource resolution | Indexed service; production world integration pending | Indexed Windows-separator/case-insensitive resolver with ambiguous alias errors |
@@ -329,5 +329,7 @@ passing scope, reproducible commands and remaining gates. [Production engine
 extraction](EngineBoundary.md) is in progress: the actual `Body`, `RigidBody`,
 propagators, celestial-body/star calculations, CPU mesh objects and planetary
 archive reader build in a shared Windows/Linux library.
-The world, native module SDK and full session still need extraction; the
-restricted POC session remains regression coverage.
+The [actual celestial world](../../Tests/Production/World/README.md) now loads
+Sol and advances its original finalized states in the shared core. Native
+vessels, their SDK, the camera and full session/client integration still need
+extraction; the restricted POC session remains regression coverage.

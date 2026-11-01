@@ -57,17 +57,6 @@ char *DateStr (double mjd);
 double Obliquity (double jc);
 // returns Earth's obliquity (rad) of ecliptic at Julian century jc
 
-void Equ2Ecl (double cosob, double sinob, double ra, double dc, double &l, double &b);
-// Convert equatorial coordinates ra,dc into ecliptic coordinates l,b
-// given sin and cos of obliquity
-
-void Ecl2Equ (double cosob, double sinob, double l, double b, double &ra, double &dc);
-// Convert ecliptic coordinates l (longitude) and b (latitude) into
-// equatorial coordinates ra (right ascension) and dc (declination)
-// given sin and cos of obliquity
-
-// *** Geographical routines ***
-
 #include "Production/SurfaceNavigation.h"
 
 char *FloatStr (double f, int precision = 4);

@@ -275,6 +275,7 @@ Orbiter::Orbiter () : worldFactory(*this), world(worldFactory)
 	orbiter::production::BindBodyServices(&orbiter::production::GetWindowsBodyServices());
 	orbiter::production::BindRigidBodyServices(&orbiter::production::GetWindowsRigidBodyServices());
 	orbiter::production::BindCelestialServices(&orbiter::production::GetWindowsCelestialServices());
+	orbiter::production::BindWorldVesselServices(&orbiter::production::GetWindowsWorldVesselServices());
 	orbiter::production::BindSurfaceServices(&orbiter::production::GetWindowsSurfaceServices());
 	orbiter::production::BindNavigationServices(&orbiter::production::GetWindowsNavigationServices());
 	orbiter::production::BindElevationServices(&orbiter::production::GetWindowsElevationServices());
@@ -361,6 +362,7 @@ Orbiter::~Orbiter ()
 	orbiter::production::BindElevationServices(nullptr);
 	orbiter::production::BindNavigationServices(nullptr);
 	orbiter::production::BindSurfaceServices(nullptr);
+	orbiter::production::BindWorldVesselServices(nullptr);
 	orbiter::production::BindCelestialServices(nullptr);
 	orbiter::production::BindRigidBodyServices(nullptr);
 	orbiter::production::BindBodyServices(nullptr);

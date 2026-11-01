@@ -21,6 +21,7 @@ set(common_src
 	LightEmitter.cpp
 	Orbiter.cpp
 	Production/WindowsSession.cpp
+	Production/WindowsWorldVesselServices.cpp
 	Production/WindowsWorld.cpp
 	Production/WindowsBodyServices.cpp
 	Production/WindowsRigidBodyServices.cpp
@@ -30,7 +31,6 @@ set(common_src
 	Production/WindowsNavigationServices.cpp
 	Production/WindowsMeshServices.cpp
 	PlaybackEd.cpp
-	Psys.cpp
 	Script.cpp
 	StateApplication.cpp
 	VectorMap.cpp

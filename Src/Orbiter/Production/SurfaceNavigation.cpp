@@ -36,3 +36,19 @@ double Orthodome (double lng1, double lat1, double lng2, double lat2)
 	double cosa  = slat2*slat1 + clat2*clat1*cosA;
 	return acos (cosa);
 }
+
+void Equ2Ecl (double cosob, double sinob, double ra, double dc, double &l, double &b)
+{
+	double sinra = sin (ra), cosra = cos (ra);
+	double sindc = sin (dc), cosdc = cos (dc);
+	l = atan2 (sinra*cosdc*cosob + sindc*sinob, cosra*cosdc);
+	b = asin  (sindc*cosob - sinra*cosdc*sinob);
+}
+
+void Ecl2Equ (double cosob, double sinob, double l, double b, double &ra, double &dc)
+{
+	double sinl = sin (l), cosl = cos (l);
+	double sinb = sin (b), cosb = cos (b);
+	ra = atan2 (sinl*cosb*cosob - sinb*sinob, cosb*cosl);
+	dc = asin  (sinb*cosob + cosb*sinl*sinob);
+}

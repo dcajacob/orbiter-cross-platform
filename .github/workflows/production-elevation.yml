@@ -1,4 +1,4 @@
-name: Production Terrain Windows and Linux
+name: Production World and Terrain Windows and Linux
 on:
   push:
     branches: ['codex/production-**']
@@ -52,7 +52,7 @@ jobs:
         run: |
           set -euo pipefail
           cmake -S Src/Orbiter/Production -B out/terrain-native -G Ninja -DCMAKE_BUILD_TYPE=${{ matrix.configuration }} -DORBITER_BUILD_NATIVE_CELESTIAL_MODULES=ON 2>&1 | tee terrain-configure.log
-          cmake --build out/terrain-native --target production_native_elevation_observer production_native_planet_observer --parallel 2 2>&1 | tee terrain-build.log
+          cmake --build out/terrain-native --target production_native_elevation_observer production_native_planet_observer production_native_world_observer --parallel 2 2>&1 | tee terrain-build.log
       - uses: actions/cache@v6
         with:
           path: out/data-cache/production-stock-data-v1.zip
@@ -75,6 +75,12 @@ jobs:
           --executable out/terrain-native/production_native_elevation_observer${{ runner.os == 'Windows' && '.exe' || '' }}
           --modules out/terrain-native/NativeModules --data out/data --planets out/planets
           --output out/terrain-observation --configuration ${{ matrix.configuration }}
+      - name: Compare actual Sol world against frozen Windows and repeated finalized steps
+        run: >-
+          python Tests/Production/World/verify.py
+          --executable out/terrain-native/production_native_world_observer${{ runner.os == 'Windows' && '.exe' || '' }}
+          --modules out/terrain-native/NativeModules --data out/data --planets out/planets
+          --output out/world-observation --configuration ${{ matrix.configuration }}
       - name: Exercise actual stock planet/base CPU geometry and repeated lifetime
         run: >-
           python Tests/Production/Planets/verify.py
@@ -94,6 +100,9 @@ jobs:
             out/terrain-observation/*.log
             out/planet-observation/*.log
             out/planet-observation/*.json
+            out/world-observation/*.csv
+            out/world-observation/*.json
+            out/world-observation/*.log
   parity:
     name: Production terrain Windows/Linux parity
     needs: native
@@ -105,12 +114,15 @@ jobs:
           pattern: native-terrain-*-*-x64
           path: out/evidence
       - run: python3 -B Tests/Production/Elevation/compare_platforms.py --evidence out/evidence --report native-terrain-parity.json
+      - run: python3 -B Tests/Production/World/compare_platforms.py --evidence out/evidence --report native-world-parity.json
       - uses: actions/upload-artifact@v7
         if: always()
         with:
           name: native-terrain-parity
           retention-days: 90
-          path: native-terrain-parity.json
+          path: |
+            native-terrain-parity.json
+            native-world-parity.json
   observe:
     needs: reference
     if: needs.reference.outputs.capture == 'true'
