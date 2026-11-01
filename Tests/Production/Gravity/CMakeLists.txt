@@ -3,6 +3,10 @@ project(OrbiterProductionGravityReference LANGUAGES CXX)
 if(NOT WIN32)
     message(FATAL_ERROR "Pre-extraction Pines reference capture requires native Windows")
 endif()
+if(MSVC)
+    # Match the production application's Windows macro and narrowing policies.
+    add_compile_options(/we4311 /DNOMINMAX)
+endif()
 add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/../../../Src/Orbiter/Production" production-core)
 add_executable(production_gravity_observer Observe.cpp
     "${CMAKE_CURRENT_SOURCE_DIR}/../../../Src/Orbiter/PinesGrav.cpp")
