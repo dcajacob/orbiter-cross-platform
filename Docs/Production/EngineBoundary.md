@@ -80,6 +80,21 @@ identity and public graphics signatures. Direct tests additionally check
 circular centripetal acceleration and equatorial/polar J2 conventions. This
 does not yet make the production world loader or vessel classes native.
 
+The production navigation transmitters and manager also build in this library.
+Frequency/channel conversion, inverse-square signal fields, range boundaries,
+data records, transmitter ordering and coordinate formulas are retained.
+Typed queries reach the actual Windows planets, bases, vessels and docking ports;
+native world queries fail explicitly until bound. Orbiter's opaque handles are
+extracted verbatim from the Windows SDK, and Windows keeps its actual `NAVDATA`
+type. The private docking-port record keeps its fields and order. The original
+scalar-owned transmitters were incorrectly deleted as arrays through a base
+without a virtual destructor; shared ownership now uses scalar deletion and a
+virtual destructor on this private class. Empty pointers are initialized, and
+the placeholder channel conversion uses an explicit signed intermediate before
+unsigned wrapping. No public Windows SDK class or virtual ordering changes.
+Native tests check field/range semantics, description truncation, sorted list
+growth, and exact derived-instance cleanup under sanitizers.
+
 The actual `PinesGravProp` now compiles in this library as well. Its force
 formula, associated-Legendre recurrence and private numerical workspace remain
 verbatim; the source audit enforces that separately from runtime parity. File

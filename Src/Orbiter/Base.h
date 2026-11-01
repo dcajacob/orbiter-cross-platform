@@ -14,6 +14,7 @@
 class Planet;
 class PlanetarySystem;
 class Vessel;
+class VesselBase;
 class Mesh;
 class BaseObject;
 class Base;

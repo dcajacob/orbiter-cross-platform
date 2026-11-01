@@ -39,6 +39,9 @@ def verify():
     if ledger['observed_source'] != CAPTURE or ledger['production_source'] != BASE:
         raise ValueError('extraction baseline identity changed')
     declared = ledger['files']
+    if 'Src/Orbiter/Production/NavigationServices.cpp' in declared:
+        from navigation_source import verify as verify_navigation
+        verify_navigation()
     if 'Src/Orbiter/Production/ConfigurationTypes.h' in declared:
         from configuration_source import verify as verify_configuration
         verify_configuration()
@@ -157,6 +160,13 @@ def verify():
                 raise ValueError('public mesh SDK record was not conserved verbatim: '+name.decode())
             ranges.append((original.rfind(b'/**',0,block.start()),block.end(),
                 b'#include "OrbiterMeshData.h"' if index==0 else b''))
+        handles = ROOT/'Orbitersdk/include/OrbiterHandles.h'
+        if handles.exists():
+            start = original.index(b'/// \\brief Handle for objects (vessels, stations, planets)')
+            end = original.index(b'//@}',start)
+            if handles.read_bytes().replace(b'\r\n',b'\n').count(original[start:end]) != 1:
+                raise ValueError('Orbiter opaque handles were not conserved verbatim')
+            ranges.append((start,end,b'#include "OrbiterHandles.h"\n'))
         celestial_records=ROOT/'Orbitersdk/include/OrbiterCelestialData.h'
         if celestial_records.exists():
             data=celestial_records.read_bytes().replace(b'\r\n',b'\n')

@@ -35,6 +35,7 @@ class TileManager;
 class SurfTile;
 class CloudTile;
 class ElevationManager;
+struct WindPrm;
 
 struct _finddata_t;
 

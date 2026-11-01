@@ -20,13 +20,13 @@ set(common_src
 	Input.cpp
 	Keymap.cpp
 	LightEmitter.cpp
-	Nav.cpp
 	Orbiter.cpp
 	Production/WindowsSession.cpp
 	Production/WindowsWorld.cpp
 	Production/WindowsBodyServices.cpp
 	Production/WindowsRigidBodyServices.cpp
 	Production/WindowsCelestialServices.cpp
+	Production/WindowsNavigationServices.cpp
 	Production/WindowsMeshServices.cpp
 	PlaybackEd.cpp
 	Psys.cpp

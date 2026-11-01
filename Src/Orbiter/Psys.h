@@ -9,5 +9,6 @@
 #include "Base.h"
 #include "Star.h"
 #include "Planet.h"
+#include "Vessel.h"
 #endif
 #endif
