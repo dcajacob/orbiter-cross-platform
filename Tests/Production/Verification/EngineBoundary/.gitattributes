@@ -1,0 +1,2 @@
+# Verification hashes identify original evidence bytes, including on Windows.
+* -text whitespace=cr-at-eol

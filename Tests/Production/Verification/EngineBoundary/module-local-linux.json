@@ -1,0 +1,42 @@
+{
+  "schema": 1,
+  "engine_source": "15867de9808b8fc1ee8b4affc0cb3737c50c2e63",
+  "scope": "Local Linux native bootstrap checks, not a native stock module SDK or production world",
+  "host": "Linux-7.0.0-42-generic-x86_64-with-glibc2.43",
+  "compiler": "g++ (Ubuntu 15.2.0-16ubuntu1) 15.2.0",
+  "cmake": "cmake version 4.2.3",
+  "checks": {
+    "debug_suite": {
+      "passed": 18,
+      "failed": 0,
+      "test_log_sha256": "b5f3b07b3fcf4a7cbfef7f49e5b963443cb46b389863a3806323915670a80ae6"
+    },
+    "release_suite": {
+      "passed": 19,
+      "failed": 0,
+      "test_log_sha256": "573005b3fc6e3d67486c83e2d90ba73791d397c7e099bc31c65cf839b1f9738e"
+    },
+    "sanitizers": {
+      "passed": 9,
+      "failed": 0,
+      "test_log_sha256": "9a202ec151c305674fedb5b24f1776c38c738775381972c4fc16360328376b01",
+      "policy": "ASan/UBSan/LeakSanitizer executed outside ptrace; no leak suppression"
+    },
+    "standalone_boundary": {
+      "passed": 9,
+      "failed": 0,
+      "test_log_sha256": "12fb0fca180d457ccb079faab171281053fed42bf5dc8297f423c445302e3797"
+    },
+    "bootstrap_c_header": "GCC C11 pedantic syntax check passed",
+    "independent_build_rejection": {
+      "status": "passed",
+      "engine_source": "15867de9808b8fc1ee8b4affc0cb3737c50c2e63",
+      "host": "Debug standalone boundary",
+      "rejected_module": "Release from independently configured portable build",
+      "module_sha256": "00973388ca450813cf2e9a805dd9cdb5e9027fe0a4b2c1625143472a2ae4b66a",
+      "scope": "actual independent-build rejection before initialization; twenty valid Body module lifetimes also pass",
+      "log": "module-independent-build-rejection.txt",
+      "log_sha256": "14646cc2de3156a75a74e7dacd24b63d3b4fd445e9dbfa2e8faac3bb91415bc3"
+    }
+  }
+}

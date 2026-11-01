@@ -53,6 +53,17 @@ def verify():
             native = entry['native_comparison']
             check(local(BASE, native['preserved_report']).read_bytes(), native['report_sha256'],
                   native['preserved_report'])
+        if 'local_verification' in entry:
+            record = entry['local_verification']
+            data = local(BASE, record['report']).read_bytes()
+            check(data, record['sha256'], record['report'])
+            report = json.loads(data)
+            require(report['engine_source'] == entry['source'], 'local engine source differs')
+            for name in ('debug_suite', 'release_suite', 'sanitizers', 'standalone_boundary'):
+                require(report['checks'][name]['failed'] == 0 and report['checks'][name]['passed'] > 0,
+                        'local checks did not pass')
+            rejection = report['checks']['independent_build_rejection']
+            check(local(BASE, rejection['log']).read_bytes(), rejection['log_sha256'], rejection['log'])
 
     evidence = BASE/'Evidence'
     portable = json.loads((evidence/'portable-artifacts.json').read_text())

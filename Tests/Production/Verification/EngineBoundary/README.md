@@ -19,6 +19,7 @@ and Linux GCC / Windows MSVC x64 Debug/Release portable checks.
 | Original State metadata with explicit epoch/path | `c14360ab` | [41275682190](https://github.com/dcajacob/orbiter-cross-platform/actions/runs/41275682190) | [41275682231](https://github.com/dcajacob/orbiter-cross-platform/actions/runs/41275682231) | [41275682252](https://github.com/dcajacob/orbiter-cross-platform/actions/runs/41275682252) |
 | Mesh count/index validation before narrowing | `24591de6` | [41276717087](https://github.com/dcajacob/orbiter-cross-platform/actions/runs/41276717087) | [41276717080, attempt 2](https://github.com/dcajacob/orbiter-cross-platform/actions/runs/41276717080/attempts/2) | [41276717132](https://github.com/dcajacob/orbiter-cross-platform/actions/runs/41276717132) |
 | Production Camera/PlanetarySystem ownership | `26f0bc37` | [41279054097](https://github.com/dcajacob/orbiter-cross-platform/actions/runs/41279054097) | [41279054051](https://github.com/dcajacob/orbiter-cross-platform/actions/runs/41279054051) | [41279054091](https://github.com/dcajacob/orbiter-cross-platform/actions/runs/41279054091) |
+| Native module loader/bootstrap and actual shared Body fixture | `15867de9` | [41280064395](https://github.com/dcajacob/orbiter-cross-platform/actions/runs/41280064395) | [41280064421](https://github.com/dcajacob/orbiter-cross-platform/actions/runs/41280064421) | [41280064405](https://github.com/dcajacob/orbiter-cross-platform/actions/runs/41280064405) |
 
 The preserved `*-client-comparison.json` reports show zero numerical and
 projected-landmark differences and SSIM 1.0 both between configurations and
@@ -80,3 +81,10 @@ reconstruction without network access or reference changes:
 ```sh
 python3 -B Tests/Production/Verification/EngineBoundary/verify.py
 ```
+
+`module-local-linux.json` separately records 18 Debug and 19 Release checks,
+nine standalone and sanitizer checks, C11 bootstrap-header compilation, and
+rejection of an actual module from a separate engine/SDK build before
+initialization. The matching module completes twenty production Body lifetimes.
+This is an internal bootstrap fixture; native stock module interfaces and a
+complete production world remain outstanding.

@@ -133,6 +133,28 @@
         "preserved_report": "world-native-parity.json",
         "report_sha256": "80a6e34c3ed941f28b74f85fe79724cd42ff325074799f15a85866b28dbbe9b8"
       }
+    },
+    {
+      "component": "native-module-bootstrap",
+      "source": "15867de9808b8fc1ee8b4affc0cb3737c50c2e63",
+      "runs": {
+        "production": 41280064395,
+        "client": 41280064421,
+        "portable": 41280064405
+      },
+      "status": "passed",
+      "original_comparison_zip_sha256": "aa3af84a4172633eae41e6c4454cbb9f9c0ecc62216e3899d08db368be2d9132",
+      "preserved_report": "module-client-comparison.json",
+      "report_sha256": "5468cb0a02f97541d62cb1bb574c8a510a2136e39808e8f6b78b5f4b01c20bb3",
+      "native_comparison": {
+        "original_zip_sha256": "5dbf4778e6849a2dec9ed64f2cb52aca68d2189bcec1265d2b83fee7a3b83232",
+        "preserved_report": "module-native-parity.json",
+        "report_sha256": "80a6e34c3ed941f28b74f85fe79724cd42ff325074799f15a85866b28dbbe9b8"
+      },
+      "local_verification": {
+        "report": "module-local-linux.json",
+        "sha256": "0d749f67977fbd5660dda046935d09ee10657659968e475f905d5f1ee2b87312"
+      }
     }
   ]
 }

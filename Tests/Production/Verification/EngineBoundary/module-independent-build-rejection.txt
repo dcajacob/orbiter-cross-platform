@@ -1,0 +1,9 @@
+Rejected fixture 2: Native module bootstrap version mismatch
+Rejected fixture 3: Native module SDK build mismatch
+Rejected fixture 4: Native module C++ toolchain/ABI mismatch
+Rejected fixture 5: Native module kind mismatch
+Rejected fixture 6: Native module descriptor size mismatch
+Rejected fixture 7: Native module lifecycle entry is missing
+Rejected fixture 8: Native module initialization failed: ProductionBodyBoundaryFixture: intentional fixture initialization failure
+Rejected fixture 9: Missing native module entry: OrbiterNativeQuery: /home/dan/GIT/orbiter-cross-platform/out/production-boundary/tests/liborbiter_production_boundary.so: undefined symbol: OrbiterNativeQuery
+Native bootstrap: twenty actual module/Body lifetimes, shared services, ABI/build/toolchain/kind checks and explicit failures passed
