@@ -18,9 +18,17 @@
       "sha256_lf": "f5a7a192319b96ea6d9ff798e109e0dfd6a0d8c44870c216b28a31540012ecd9",
       "original_sha256_lf": "42ea7373077f698dbfcf42358b74439aaa187c1de6f5c41194bbbbd8bc016bef"
     },
+    "Orbitersdk/include/NativeVesselAPI.h": {
+      "sha256_lf": "f094ed3abcc075ea6835b86f09115762e5077f704391b99718886f12fc03cece",
+      "original_sha256_lf": null
+    },
     "Orbitersdk/include/OrbiterAPI.h": {
-      "sha256_lf": "0bf99424ec95f378fbe7d152f7ddde8f09054e1cfe6e3a7e52a4282b0797572d",
+      "sha256_lf": "c4375fd5fc31d63707677cb7214db207b631166e31aeeaee20125d539d2b3a95",
       "original_sha256_lf": "3425025c178218dce10bf7b8edf296dfe7eda8f171d925aca622a7534735fd31"
+    },
+    "Orbitersdk/include/OrbiterAnimationData.h": {
+      "sha256_lf": "98cbc950f4342e529e70562e0dcbc69e77f296d920304b4d7be097b36084a225",
+      "original_sha256_lf": null
     },
     "Orbitersdk/include/OrbiterCelestialData.h": {
       "sha256_lf": "7ba981423d704f370eb0abdc2d16652ce1c62a507d29bb9ab0f64234f7e42df9",
@@ -42,13 +50,33 @@
       "sha256_lf": "4ffce90d931bc0b440747fbef288ebafdbcc600d6d3eb6d93853c619a9c39118",
       "original_sha256_lf": null
     },
+    "Orbitersdk/include/OrbiterSdkDrawingTypes.h": {
+      "sha256_lf": "55cbe59548bab71618713bd628201f72692cb7415553315b5d3b49e6355b7361",
+      "original_sha256_lf": null
+    },
+    "Orbitersdk/include/OrbiterValueTypes.h": {
+      "sha256_lf": "13fe3cc8871fa10968605800f5ac0fefbd46c1c212034f865d70b0e3e403bb91",
+      "original_sha256_lf": null
+    },
     "Orbitersdk/include/OrbiterVectorMath.h": {
       "sha256_lf": "90d7de772082cdab15cc5ee8f9fa612aae0fc0d02082beee904881b4a5618659",
+      "original_sha256_lf": null
+    },
+    "Orbitersdk/include/OrbiterVesselData.h": {
+      "sha256_lf": "071851ca526338b894d974034cfabb15d231be4282cec63ff0b773ad1fac73bd",
+      "original_sha256_lf": null
+    },
+    "Orbitersdk/include/OrbiterVesselRecords.h": {
+      "sha256_lf": "61bf026085ca8a0c9da3480068f366680517765d8e3a53ebd7604817fc077e1c",
       "original_sha256_lf": null
     },
     "Orbitersdk/include/OrbiterVisualData.h": {
       "sha256_lf": "9076c461dfff334a05cda23ac5603ec0e085cc165f47178d52b32e1b4a7d7825",
       "original_sha256_lf": null
+    },
+    "Orbitersdk/include/VesselAPI.h": {
+      "sha256_lf": "18858e7192b9ab53d9199c081081103acd7903425b9eeb199a3806ab408c7a35",
+      "original_sha256_lf": "03a859e5ed15b59a4de862b3e161a48b214610103d4fe47b7ee311b6a15c2197"
     },
     "Src/Celbody/Atmosphere/AtmospherePlatform.h": {
       "sha256_lf": "0f8017b5a52eccc619d3c4b51f9a75d2fe94f03961fb4af033977a33b2706a39",

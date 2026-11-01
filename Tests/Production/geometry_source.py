@@ -18,7 +18,11 @@ def verify():
     if calculations.rstrip() not in current('Orbitersdk/include/OrbiterVectorMath.h'):
         raise ValueError('SDK geometry calculations changed')
     source=source[:start]+b'#include "OrbiterVectorMath.h"\n\n'+source[end:]
-    if source!=current(name) or original('Orbitersdk/include/OrbiterVector.h')!=current('Orbitersdk/include/OrbiterVector.h'):
+    actual=current(name)
+    if (ROOT/'Orbitersdk/include/OrbiterVesselData.h').exists():
+        from vessel_values_source import restore_api
+        actual=restore_api(actual)
+    if source!=actual or original('Orbitersdk/include/OrbiterVector.h')!=current('Orbitersdk/include/OrbiterVector.h'):
         raise ValueError('Windows SDK changed beyond geometry extraction')
     print('Original SDK vector/matrix layouts and inline calculations extracted verbatim')
 if __name__=='__main__':verify()

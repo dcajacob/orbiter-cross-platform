@@ -39,6 +39,9 @@ def verify():
     if ledger['observed_source'] != CAPTURE or ledger['production_source'] != BASE:
         raise ValueError('extraction baseline identity changed')
     declared = ledger['files']
+    if 'Orbitersdk/include/OrbiterVesselData.h' in declared:
+        from vessel_values_source import verify as verify_vessel_values
+        verify_vessel_values()
     if 'Orbitersdk/include/OrbiterVectorMath.h' in declared:
         from geometry_source import verify as verify_geometry
         verify_geometry()
@@ -172,6 +175,9 @@ def verify():
                 raise ValueError('public mesh SDK record was not conserved verbatim: '+name.decode())
             ranges.append((original.rfind(b'/**',0,block.start()),block.end(),
                 b'#include "OrbiterMeshData.h"' if index==0 else b''))
+        if 'Orbitersdk/include/OrbiterVesselData.h' in declared:
+            from vessel_values_source import ranges as vessel_value_ranges
+            ranges.extend(vessel_value_ranges(original))
         if 'Orbitersdk/include/OrbiterVectorMath.h' in declared:
             start=original.index(b'/**\n * \\brief 4-element vector\n */')
             end=original.index(b'//@}',start)

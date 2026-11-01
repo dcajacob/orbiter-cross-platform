@@ -17,6 +17,8 @@
 
 #ifndef __VESSELAPI_H
 #define __VESSELAPI_H
+#include "OrbiterValueTypes.h"
+#include "OrbiterSdkDrawingTypes.h"
 
 #if defined(_MSC_VER) && (_MSC_VER < 1920 ) // Microsoft Visual Studio Version 2017 and lower
 #include <algorithm>
@@ -411,9 +413,9 @@ public:
 	 * \param [out] tdvtx Reference of touchdown descriptor to be filled.
 	 * \param [in] idx Vertex index (>= 0)
 	 * \return True on success (index in valid range) false otherwise.
-	 * \sa GetTouchdownPointCount, SetTouchdownPoints(const TOUCHDOWNVTX*,DWORD)const
+	 * \sa GetTouchdownPointCount, SetTouchdownPoints(const TOUCHDOWNVTX*,oapi::UInt32)const
 	 */
-	bool GetTouchdownPoint (TOUCHDOWNVTX &tdvtx, DWORD idx) const;
+	bool GetTouchdownPoint (TOUCHDOWNVTX &tdvtx, oapi::UInt32 idx) const;
 
 	/**
 	 * \brief Defines an arbitrary number of vessel surface contact points
@@ -427,14 +429,14 @@ public:
 	 *   points, e.g. for simulating gear suspension.
 	 * \sa GetTouchdownPointCount, GetTouchdownPoint
 	 */
-	void SetTouchdownPoints (const TOUCHDOWNVTX *tdvtx, DWORD ntdvtx) const;
+	void SetTouchdownPoints (const TOUCHDOWNVTX *tdvtx, oapi::UInt32 ntdvtx) const;
 
 	/**
 	 * \brief Returns the number of touchdown points defining the impact hull of
 	 *   the vessel;
 	 * \return Number of touchdown points
 	 */
-	DWORD GetTouchdownPointCount () const;
+	oapi::UInt32 GetTouchdownPointCount () const;
 
 	/**
 	 * \brief Set friction coefficients for ground contact.
@@ -650,7 +652,7 @@ public:
 	 *    - 0 = simple vessel (not docked to anything),
 	 *    - 1 = part of superstructure, (docked to another vessel)
 	 */
-	DWORD GetFlightStatus () const;
+	oapi::UInt32 GetFlightStatus () const;
 
 	/**
 	 * \brief Returns current (total) vessel mass.
@@ -864,7 +866,7 @@ public:
 	 * \sa SetADCtrlMode, CreateControlSurface, CreateControlSurface2,
 	 *   GetControlSurfaceLevel, SetControlSurfaceLevel
 	 */
-	DWORD GetADCtrlMode () const;
+	oapi::UInt32 GetADCtrlMode () const;
 
 	/**
 	 * \brief Configure manual input mode for aerodynamic control surfaces.
@@ -880,7 +882,7 @@ public:
 	 * \sa GetADCtrlMode, CreateControlSurface, CreateControlSurface2,
 	 *   GetControlSurfaceLevel, SetControlSurfaceLevel
 	 */
-	void SetADCtrlMode (DWORD mode) const;
+	void SetADCtrlMode (oapi::UInt32 mode) const;
 
 	/**
 	 * \brief Activates one of the automated orbital navigation modes.
@@ -1573,7 +1575,7 @@ public:
 	 *   \e AirfoilCoeffFunc when passed to EditAirfoil.
 	 * \sa CreateAirfoil2, CreateAirfoil3
 	 */
-	void EditAirfoil (AIRFOILHANDLE hAirfoil, DWORD flag, const VECTOR3 &ref, AirfoilCoeffFunc cf, double c, double S, double A) const;
+	void EditAirfoil (AIRFOILHANDLE hAirfoil, oapi::UInt32 flag, const VECTOR3 &ref, AirfoilCoeffFunc cf, double c, double S, double A) const;
 
 	/**
 	 * \brief Deletes a previously defined airfoil.
@@ -1636,7 +1638,7 @@ public:
 	 * \sa CreateControlSurface2, CreateControlSurface3
 	 */
 	void CreateControlSurface (AIRCTRL_TYPE type, double area, double dCl,
-		const VECTOR3 &ref, int axis = AIRCTRL_AXIS_AUTO, UINT anim = (UINT)-1) const;
+		const VECTOR3 &ref, int axis = AIRCTRL_AXIS_AUTO, oapi::UInt anim = (oapi::UInt)-1) const;
 
 	/**
 	 * \brief Creates an aerodynamic control surface and returns a handle.
@@ -1653,7 +1655,7 @@ public:
 	 * \sa CreateControlSurface, CreateControlSurface3, DelControlSurface
 	 */
 	CTRLSURFHANDLE CreateControlSurface2 (AIRCTRL_TYPE type, double area, double dCl,
-		const VECTOR3 &ref, int axis = AIRCTRL_AXIS_AUTO, UINT anim = (UINT)-1) const;
+		const VECTOR3 &ref, int axis = AIRCTRL_AXIS_AUTO, oapi::UInt anim = (oapi::UInt)-1) const;
 
 	/**
 	 * \brief Creates an aerodynamic control surface and returns a handle.
@@ -1672,7 +1674,7 @@ public:
 	 * \sa CreateControlSurface, CreateControlSurface2
 	 */
 	CTRLSURFHANDLE CreateControlSurface3 (AIRCTRL_TYPE type, double area, double dCl,
-		const VECTOR3 &ref, int axis = AIRCTRL_AXIS_AUTO, double delay = 1.0, UINT anim = (UINT)-1) const;
+		const VECTOR3 &ref, int axis = AIRCTRL_AXIS_AUTO, double delay = 1.0, oapi::UInt anim = (oapi::UInt)-1) const;
 
 	/**
 	 * \brief Deletes a previously defined aerodynamic control surface.
@@ -2155,14 +2157,14 @@ public:
 	 * \param nPts [out] Number of points in the cloud
 	 * \return Pointer to array of VECTOR3 local points, or NULL if none
 	 */
-	const VECTOR3 *GetCollisionPointCloud (DWORD &nPts) const;
+	const VECTOR3 *GetCollisionPointCloud (oapi::UInt32 &nPts) const;
 
 	/**
 	 * \brief Returns the generated QuickHull triangle indices for the convex hull.
 	 * \param nIdx [out] Number of indices (always a multiple of 3)
-	 * \return Pointer to array of WORD indices into the point cloud, or NULL if none
+	 * \return Pointer to array of oapi::UInt16 indices into the point cloud, or NULL if none
 	 */
-	const WORD *GetCollisionHullIndices (DWORD &nIdx) const;
+	const oapi::UInt16 *GetCollisionHullIndices (oapi::UInt32 &nIdx) const;
 
 	/**
 	 * \brief Returns true if the vessel uses the implicit GJK Convex Hull for collisions.
@@ -2174,7 +2176,7 @@ public:
 	 * \param nBoxes [out] Number of bounding boxes
 	 * \return Pointer to an array of VECTOR3 pairs (min, max, min, max, ...), or NULL if none
 	 */
-	const VECTOR3 *GetCollisionClearZones (DWORD &nBoxes) const;
+	const VECTOR3 *GetCollisionClearZones (oapi::UInt32 &nBoxes) const;
 	//@}
 
 
@@ -2233,7 +2235,7 @@ public:
 	 *   vessel.
 	 * \sa CreatePropellantResource, GetPropellantHandleByIndex
 	 */
-	DWORD GetPropellantCount () const;
+	oapi::UInt32 GetPropellantCount () const;
 
 	/**
 	 * \brief Returns the handle of a propellant resource for a given index.
@@ -2247,7 +2249,7 @@ public:
 	 *   corresponding resource is deleted.
 	 * \sa CreatePropellantResource, GetPropellantCount
 	 */
-	PROPELLANT_HANDLE GetPropellantHandleByIndex (DWORD idx) const;
+	PROPELLANT_HANDLE GetPropellantHandleByIndex (oapi::UInt32 idx) const;
 
 	/**
 	 * \brief Returns the maximum capacity of a propellant resource.
@@ -2481,7 +2483,7 @@ public:
 	 * \return Number of logical thruster definitions.
 	 * \sa CreateThruster, GetThrusterHandleByIndex
 	 */
-	DWORD GetThrusterCount () const;
+	oapi::UInt32 GetThrusterCount () const;
 
 	/**
 	 * \brief Returns the handle of a thruster specified by its index.
@@ -2496,7 +2498,7 @@ public:
 	 *   thruster is deleted.
 	 * \sa CreateThruster, DelThruster, GetThrusterCount
 	 */
-	THRUSTER_HANDLE GetThrusterHandleByIndex (DWORD idx) const;
+	THRUSTER_HANDLE GetThrusterHandleByIndex (oapi::UInt32 idx) const;
 
 	/**
 	 * \brief Returns a handle for the propellant resource feeding the
@@ -2910,7 +2912,7 @@ public:
 	 *   GetUserThrusterGroupCount() to obtain this value.
 	 * \sa GetThrusterGroupHandle, GetUserThrusterGroupCount
 	 */
-	THGROUP_HANDLE GetUserThrusterGroupHandleByIndex (DWORD idx) const;
+	THGROUP_HANDLE GetUserThrusterGroupHandleByIndex (oapi::UInt32 idx) const;
 
 	/**
 	 * \brief Returns the number of thrusters assigned to a logical thruster group.
@@ -2921,7 +2923,7 @@ public:
 	 *   values over all groups can be different to the total number of thrusters.
 	 * \sa GetGroupThrusterCount(THGROUP_TYPE)const
 	 */
-	DWORD GetGroupThrusterCount (THGROUP_HANDLE thg) const;
+	oapi::UInt32 GetGroupThrusterCount (THGROUP_HANDLE thg) const;
 
 	/**
 	 * \brief Returns the number of thrusters assigned to a standard logical thruster
@@ -2936,7 +2938,7 @@ public:
 	 *   values over all groups can be different to the overall number of thrusters.
 	 * \sa GetGroupThrusterCount(THGROUP_HANDLE)const
 	 */
-	DWORD GetGroupThrusterCount (THGROUP_TYPE thgt) const;
+	oapi::UInt32 GetGroupThrusterCount (THGROUP_TYPE thgt) const;
 
 	/**
 	 * \brief Returns a handle for a thruster that belongs to a specified thruster
@@ -2945,7 +2947,7 @@ public:
 	 * \param idx thuster index (0 <= idx < GetGroupThrusterCount())
 	 * \return Thuster handle
 	 */
-	THRUSTER_HANDLE GetGroupThruster (THGROUP_HANDLE thg, DWORD idx) const;
+	THRUSTER_HANDLE GetGroupThruster (THGROUP_HANDLE thg, oapi::UInt32 idx) const;
 
 	/**
 	 * \brief Returns a handle for a thruster that belongs to a thruster
@@ -2954,9 +2956,9 @@ public:
 	 * \param idx thruster index (0 <= idx < GetGroupThrusterCount())
 	 * \return Thruster handle
 	 * \note This function only works for standard group types. Do not use with
-	 *   THGROUP_USER. For user-defined groups, use GetGroupThruster(THGROUP_HANDLE,DWORD)const.
+	 *   THGROUP_USER. For user-defined groups, use GetGroupThruster(THGROUP_HANDLE,oapi::UInt32)const.
 	 */
-	THRUSTER_HANDLE GetGroupThruster (THGROUP_TYPE thgt, DWORD idx) const;
+	THRUSTER_HANDLE GetGroupThruster (THGROUP_TYPE thgt, oapi::UInt32 idx) const;
 
 	/**
 	 * \brief Returns the number of user-defined (nonstandard) thruster groups.
@@ -2965,7 +2967,7 @@ public:
 	 *   groups (created with the THGROUP_USER flag). It does not contain any standard
 	 *   thruster groups (such as THGROUP_MAIN, etc.)
 	 */
-	DWORD GetUserThrusterGroupCount () const;
+	oapi::UInt32 GetUserThrusterGroupCount () const;
 
 	/**
 	 * \brief Indicates if a default thruster group is defined by the vessel.
@@ -3090,7 +3092,7 @@ public:
 	 *   are of the specified mode (linear or rotational) will return
 	 *   nonzero values.
 	 */
-	double GetManualControlLevel (THGROUP_TYPE thgt, DWORD mode = MANCTRL_ATTMODE, DWORD device = MANCTRL_ANYDEVICE) const;
+	double GetManualControlLevel (THGROUP_TYPE thgt, oapi::UInt32 mode = MANCTRL_ATTMODE, oapi::UInt32 device = MANCTRL_ANYDEVICE) const;
 	//@}
 
 	/// \name Reaction control system
@@ -3262,7 +3264,7 @@ public:
 	 *   to the default key handler.
 	 * \sa VESSEL2::clbkConsumeBufferedKey
 	 */
-	int SendBufferedKey (DWORD key, bool down=true, char *kstate=0);
+	int SendBufferedKey (oapi::UInt32 key, bool down=true, char *kstate=0);
 	//@}
 
 	/// \name Navigation radio interface
@@ -3278,14 +3280,14 @@ public:
 	 * \note Default is 2 NAV receivers.
 	 * \sa GetNavCount
 	 */
-	void InitNavRadios (DWORD nnav) const;
+	void InitNavRadios (oapi::UInt32 nnav) const;
 
 	/**
 	 * \brief Returns the number of NAV radio receivers.
 	 * \return Number of NAV receivers (>= 0)
 	 * \sa InitNavRadios
 	 */
-	DWORD GetNavCount () const;
+	oapi::UInt32 GetNavCount () const;
 
 	/**
 	 * \brief Sets the channel of a NAV radio receiver.
@@ -3297,7 +3299,7 @@ public:
 	 *   0.05 MHz, corresponding to channels 0 to 639.
 	 * \sa InitNavRadios, GetNavChannel
 	 */
-	bool SetNavChannel (DWORD n, DWORD ch) const;
+	bool SetNavChannel (oapi::UInt32 n, oapi::UInt32 ch) const;
 
 	/**
 	 * \brief Returns the current channel setting of a NAV radio receiver.
@@ -3306,7 +3308,7 @@ public:
 	 *   return value is 0.
 	 * \sa GetNavRecvFreq, SetNavChannel
 	 */
-	DWORD GetNavChannel (DWORD n) const;
+	oapi::UInt32 GetNavChannel (oapi::UInt32 n) const;
 
 	/**
 	 * \brief Returns the current radio frequency of a NAV radio receiver.
@@ -3315,7 +3317,7 @@ public:
 	 *   \a n is out of range, the return value is 0.0.
 	 * \sa GetNavChannel
 	 */
-	float GetNavRecvFreq (DWORD n) const;
+	float GetNavRecvFreq (oapi::UInt32 n) const;
 
 	/**
 	 * \brief Enable/disable transmission of transponder signal.
@@ -3340,7 +3342,7 @@ public:
 	 *   is given by f = (108.0 + 0.05 \a ch) MHz.
 	 * \sa EnableTransponder, SetNavChannel
 	 */
-	bool SetTransponderChannel (DWORD ch) const;
+	bool SetTransponderChannel (oapi::UInt32 ch) const;
 
 	/**
 	 * \brief Enable/disable one of the vessel's IDS (Instrument Docking
@@ -3366,7 +3368,7 @@ public:
 	 *   is given by f = (108.0 + 0.05 \a ch) MHz.
 	 * \sa EnableIDS, SetTransponderChannel, SetNavChannel
 	 */
-	bool SetIDSChannel (DOCKHANDLE hDock, DWORD ch) const;
+	bool SetIDSChannel (DOCKHANDLE hDock, oapi::UInt32 ch) const;
 
 	/**
 	 * \brief Return handle of vessel transponder if available.
@@ -3413,7 +3415,7 @@ public:
 	 *   depending on the radio frequency of the corresponding receiver, the vessel
 	 *   position and the position of radio transmitters in the range of the receiver.
 	 */
-	NAVHANDLE GetNavSource (DWORD n) const;
+	NAVHANDLE GetNavSource (oapi::UInt32 n) const;
 	//@}
 
 	/// \name Cockpit camera methods
@@ -3639,7 +3641,7 @@ public:
 	 *   vessel moves within visual range of the observer camera).
 	 * \sa AddMesh(MESHHANDLE,const VECTOR3*)const, DelMesh
 	 */
-	UINT AddMesh (const char *meshname, const VECTOR3 *ofs=0) const;
+	oapi::UInt AddMesh (const char *meshname, const VECTOR3 *ofs=0) const;
 
 	/**
 	 * \brief Add a pre-loaded mesh definition to the vessel.
@@ -3653,7 +3655,7 @@ public:
 	 *   camera), it creates its individual mesh as a copy of the template.
 	 * \sa AddMesh(const char*,const VECTOR3*)const, oapiLoadMeshGlobal, DelMesh
 	 */
-	UINT AddMesh (MESHHANDLE hMesh, const VECTOR3 *ofs=0) const;
+	oapi::UInt AddMesh (MESHHANDLE hMesh, const VECTOR3 *ofs=0) const;
 
 	/**
 	 * \brief Insert or replace a mesh at a specific index location of the vessel's mesh list.
@@ -3672,11 +3674,11 @@ public:
 	 *   is overwritten. If idx > number of meshes, then the required number of (empty) entries
 	 *   is generated.
 	 * \note The return value is always equal to \a idx.
-	 * \sa InsertMesh(MESHHANDLE,UINT,const VECTOR3*)const,
+	 * \sa InsertMesh(MESHHANDLE,oapi::UInt,const VECTOR3*)const,
 	 *   AddMesh(const char*,const VECTOR3*)const,
 	 *   AddMesh(MESHHANDLE,const VECTOR3*)const
 	 */
-	UINT InsertMesh (const char *meshname, UINT idx, const VECTOR3 *ofs=0) const;
+	oapi::UInt InsertMesh (const char *meshname, oapi::UInt idx, const VECTOR3 *ofs=0) const;
 
 	/**
 	 * \brief Insert or replace a mesh at a specific index location of the vessel's mesh list.
@@ -3694,11 +3696,11 @@ public:
 	 *   it is overwritten. If idx > number of meshes, then the required number of (empty)
 	 *   entries is generated.
 	 * \note The return value is always equal to \a idx.
-	 * \sa InsertMesh(const char*,UINT,const VECTOR3*)const,
+	 * \sa InsertMesh(const char*,oapi::UInt,const VECTOR3*)const,
 	 *   AddMesh(const char*,const VECTOR3*)const,
 	 *   AddMesh(MESHHANDLE,const VECTOR3*)const
 	 */
-	UINT InsertMesh (MESHHANDLE hMesh, UINT idx, const VECTOR3 *ofs=0) const;
+	oapi::UInt InsertMesh (MESHHANDLE hMesh, oapi::UInt idx, const VECTOR3 *ofs=0) const;
 
 	/**
 	 * \brief Remove a mesh from the vessel's mesh list.
@@ -3720,7 +3722,7 @@ public:
 	 *   deleted meshes can lead to undefined behaviour.
 	 * \sa InsertMesh, AddMesh, ClearMeshes
 	 */
-	bool DelMesh (UINT idx, bool retain_anim=false) const;
+	bool DelMesh (oapi::UInt idx, bool retain_anim=false) const;
 
 	/**
 	 * \brief Shift the position of a mesh relative to the vessel's local coordinate
@@ -3732,7 +3734,7 @@ public:
 	 *   but resets the mesh position instantly.
 	 * \sa ShiftMeshes, GetMeshOffset
 	 */
-	bool ShiftMesh (UINT idx, const VECTOR3 &ofs) const;
+	bool ShiftMesh (oapi::UInt idx, const VECTOR3 &ofs) const;
 
 	/**
 	 * \brief Shift the position of all meshes relative to the vessel's local
@@ -3753,7 +3755,7 @@ public:
 	 * \return true if idx refers to a valid mesh index
 	 * \sa AddMesh, InsertMesh, ShiftMesh, ShiftMeshes
 	 */
-	bool GetMeshOffset (UINT idx, VECTOR3 &ofs) const;
+	bool GetMeshOffset (oapi::UInt idx, VECTOR3 &ofs) const;
 
 	/**
 	 * \brief Number of meshes
@@ -3761,7 +3763,7 @@ public:
 	 * Returns the number of meshes currently defined for the vessel
 	 * \return mesh count (>= 0)
 	 */
-	UINT GetMeshCount () const;
+	oapi::UInt GetMeshCount () const;
 
 	/**
 	 * \brief Obtain mesh handle for a vessel mesh
@@ -3778,7 +3780,7 @@ public:
 	 *   use \ref GetDevMesh .
 	 * \sa GetMeshTemplate, GetMeshCount, GetDevMesh
 	 */
-	MESHHANDLE GetMesh (VISHANDLE vis, UINT idx) const;
+	MESHHANDLE GetMesh (VISHANDLE vis, oapi::UInt idx) const;
 
 	/**
 	 * \brief Returns a handle for a device-specific mesh instance
@@ -3792,7 +3794,7 @@ public:
 	 *   as the handle returned by \ref GetMesh .
 	 * \sa GetMesh
 	 */
-	DEVMESHHANDLE GetDevMesh (VISHANDLE vis, UINT idx) const;
+	DEVMESHHANDLE GetDevMesh (VISHANDLE vis, oapi::UInt idx) const;
 
 	/**
 	 * \brief Obtain a handle for a vessel mesh template
@@ -3807,7 +3809,7 @@ public:
 	 *   never be modified by individual vessels. Orbiter creates individual
 	 *   copies of the templates whenever a vessel is rendered.
 	 */
-	const MESHHANDLE GetMeshTemplate (UINT idx) const;
+	const MESHHANDLE GetMeshTemplate (oapi::UInt idx) const;
 
 	/**
 	 * \brief Obtain mesh file name for an on-demand mesh.
@@ -3821,7 +3823,7 @@ public:
 	 * \note Graphics clients can obtain pre-loaded mesh file names by
 	 *   intercepting the oapi::GraphicsClient::clbkStoreMeshPersistent() method.
 	 */
-	const char *GetMeshName (UINT idx) const;
+	const char *GetMeshName (oapi::UInt idx) const;
 
 	/**
 	 * \brief Make a copy of one of the vessel's mesh templates.
@@ -3832,7 +3834,7 @@ public:
 	 *   vessels. If a vessel needs to modify its meshes, it should operate on
 	 *   a copy of the template.
 	 */
-	MESHHANDLE CopyMeshFromTemplate (UINT idx) const;
+	MESHHANDLE CopyMeshFromTemplate (oapi::UInt idx) const;
 
 	/**
 	 * \brief Returns the visibility flags for a vessel mesh.
@@ -3841,7 +3843,7 @@ public:
 	 *   values).
 	 * \sa SetMeshVisibilityMode, meshvis
 	 */
-	WORD GetMeshVisibilityMode (UINT idx) const;
+	oapi::UInt16 GetMeshVisibilityMode (oapi::UInt idx) const;
 
 	/**
 	 * \brief Set the visibility flags for a vessel mesh.
@@ -3869,7 +3871,7 @@ public:
 	 *   objects.
 	 * \sa GetMeshVisibilityMode, meshvis
 	 */
-	void SetMeshVisibilityMode (UINT idx, WORD mode) const;
+	void SetMeshVisibilityMode (oapi::UInt idx, oapi::UInt16 mode) const;
 
 	/**
 	 * \brief Affine transformation of a mesh group.
@@ -3902,7 +3904,7 @@ public:
 	 *   themselves.
 	 * \sa oapiMeshGroup, oapiMeshGroupEx
 	 */
-	int MeshModified (MESHHANDLE hMesh, UINT grp, DWORD modflag);
+	int MeshModified (MESHHANDLE hMesh, oapi::UInt grp, oapi::UInt32 modflag);
 	//@}
 
 	/// \name Animations
@@ -3963,7 +3965,7 @@ public:
 	 *   mesh file, set initial_state to 1.
 	 * \sa DelAnimation, AddAnimationComponent
 	 */
-	UINT CreateAnimation (double initial_state) const;
+	oapi::UInt CreateAnimation (double initial_state) const;
 
 	/**
 	 * \brief Delete an existing mesh animation object.
@@ -3979,7 +3981,7 @@ public:
 	 *   returned to the default state.
 	 * \sa CreateAnimation
 	 */
-	bool DelAnimation (UINT anim) const;
+	bool DelAnimation (oapi::UInt anim) const;
 
 	/**
 	 * \brief Add a component (rotation, translation or scaling) to an
@@ -4034,7 +4036,7 @@ public:
 	 *   scale.y = scale.z is required.
 	 * \sa CreateAnimation, DelAnimationComponent, animationflags
 	 */
-	ANIMATIONCOMPONENT_HANDLE AddAnimationComponent (UINT anim, double state0, double state1,
+	ANIMATIONCOMPONENT_HANDLE AddAnimationComponent (oapi::UInt anim, double state0, double state1,
 		MGROUP_TRANSFORM *trans, ANIMATIONCOMPONENT_HANDLE parent = NULL) const;
 
 	/**
@@ -4049,7 +4051,7 @@ public:
 	 *   result in undefined behaviour.
      * \sa AddAnimationComponent
 	 */
-	bool DelAnimationComponent (UINT anim, ANIMATIONCOMPONENT_HANDLE hAC);
+	bool DelAnimationComponent (oapi::UInt anim, ANIMATIONCOMPONENT_HANDLE hAC);
 
 	/**
 	 * \brief Set the state of an animation.
@@ -4063,7 +4065,7 @@ public:
 	 *   as to provide a smooth movement of the animated parts.
 	 * \sa GetAnimation
 	 */
-	bool SetAnimation (UINT anim, double state) const;
+	bool SetAnimation (oapi::UInt anim, double state) const;
 
 	/**
 	 * \brief Return the current state of an animation
@@ -4071,7 +4073,7 @@ public:
 	 * \return animation state (0 ... 1)
 	 * \sa SetAnimation
 	 */
-	double GetAnimation (UINT anim) const;
+	double GetAnimation (oapi::UInt anim) const;
 
 	/**
 	 * \brief Returns a pointer to the array of animations defined by the vessel
@@ -4080,7 +4082,7 @@ public:
 	 * \note The pointer can become invalid whenever the vessel adds or deletes
 	 *   animations. It should therefore not be stored, but queried on demand.
 	 */
-	UINT GetAnimPtr (ANIMATION **anim) const;
+	oapi::UInt GetAnimPtr (ANIMATION **anim) const;
 	//@}
 
 
@@ -4419,7 +4421,7 @@ public:
 	 * \return Number of docking ports.
 	 * \sa CreateDock, DelDock, ClearDockDefinitions
 	 */
-	UINT DockCount () const;
+	oapi::UInt DockCount () const;
 
 	/**
 	 * \brief Returns a handle to a docking port.
@@ -4427,7 +4429,7 @@ public:
 	 * \return Dock handle, or NULL if index is out of range.
 	 * \sa CreateDock, DelDock, SetDockParams, GetDockParams, GetDockStatus, oapiGetDockHandle
 	 */
-	DOCKHANDLE GetDockHandle (UINT n) const;
+	DOCKHANDLE GetDockHandle (oapi::UInt n) const;
 
 	/**
 	 * \brief Returns a handle to a docked vessel.
@@ -4446,7 +4448,7 @@ public:
 	 *   \code (GetDockStatus (GetDockHandle(port)) ? 1:0) \endcode
 	 * \sa GetDockStatus, GetDockHandle
 	 */
-	UINT DockingStatus (UINT port) const;
+	oapi::UInt DockingStatus (oapi::UInt port) const;
 
 	/**
 	 * \brief Moves a docking port while vessel is docked. 
@@ -4517,8 +4519,8 @@ public:
 	 *	 bring the vessel to alignment and hard-dock using MoveDock.
 	 * \sa Undock, GetDockHandle, GetDockStatus, DockCount, MoveDock
 	 */
-	int Dock (OBJHANDLE target, UINT n, UINT tgtn, UINT mode) const;
-	int Dock (DOCKHANDLE hSrc, DOCKHANDLE hTgt, DWORD mode) const;
+	int Dock (OBJHANDLE target, oapi::UInt n, oapi::UInt tgtn, oapi::UInt mode) const;
+	int Dock (DOCKHANDLE hSrc, DOCKHANDLE hTgt, oapi::UInt32 mode) const;
 
 	/**
 	 * \brief Release a docked vessel from a docking port.
@@ -4532,7 +4534,7 @@ public:
 	 *   ALLDOCKS.
 	 * \sa Dock, GetDockHandle, GetDockStatus, DockCount
 	 */
-	bool Undock (UINT n, const OBJHANDLE exclude = 0) const;
+	bool Undock (oapi::UInt n, const OBJHANDLE exclude = 0) const;
 
 	/**
 	 * \brief Set the docking approach mode for all docking ports.
@@ -4669,7 +4671,7 @@ public:
 	 *   GetAttachmentId, GetAttachmentStatus, GetAttachmentIndex, GetAttachmentHandle,
 	 *   AttachChild, DetachChild
 	 */
-	DWORD AttachmentCount (bool toparent) const;
+	oapi::UInt32 AttachmentCount (bool toparent) const;
 
 	/**
 	 * \brief Return the list index of the vessel's attachment point defined
@@ -4686,7 +4688,7 @@ public:
 	 *   GetAttachmentId, GetAttachmentStatus, AttachmentCount, GetAttachmentHandle,
 	 *   AttachChild, DetachChild
 	 */
-	DWORD GetAttachmentIndex (ATTACHMENTHANDLE attachment) const;
+	oapi::UInt32 GetAttachmentIndex (ATTACHMENTHANDLE attachment) const;
 
 	/**
 	 * \brief Return the handle of an attachment point identified by its list
@@ -4699,7 +4701,7 @@ public:
 	 *   GetAttachmentId, GetAttachmentStatus, AttachmentCount, GetAttachmentIndex,
 	 *   AttachChild, DetachChild
 	 */
-	ATTACHMENTHANDLE GetAttachmentHandle (bool toparent, DWORD i) const;
+	ATTACHMENTHANDLE GetAttachmentHandle (bool toparent, oapi::UInt32 i) const;
 
 	/**
 	 * \brief Attach a child vessel to an attachment point.
@@ -4765,7 +4767,7 @@ public:
 	 *   DelExhaust,CreateThruster,SetThrusterRef,SetThrusterDir,SetThrusterLevel,
 	 *   oapiRegisterExhaustTexture
 	 */
-	UINT AddExhaust (THRUSTER_HANDLE th, double lscale, double wscale, SURFHANDLE tex = 0) const;
+	oapi::UInt AddExhaust (THRUSTER_HANDLE th, double lscale, double wscale, SURFHANDLE tex = 0) const;
 
 	/**
 	 * \brief Add an exhaust render definition for a thruster with additional
@@ -4783,7 +4785,7 @@ public:
 	 *   DelExhaust,CreateThruster,SetThrusterRef,SetThrusterDir,SetThrusterLevel,
 	 *   oapiRegisterExhaustTexture
 	 */
-	UINT AddExhaust (THRUSTER_HANDLE th, double lscale, double wscale, double lofs, SURFHANDLE tex = 0) const;
+	oapi::UInt AddExhaust (THRUSTER_HANDLE th, double lscale, double wscale, double lofs, SURFHANDLE tex = 0) const;
 
 	/**
 	 * \brief Add an exhaust render definition for a thruster with explicit
@@ -4814,7 +4816,7 @@ public:
 	 *   DelExhaust,CreateThruster,SetThrusterRef,SetThrusterDir,SetThrusterLevel,
 	 *   oapiRegisterExhaustTexture
 	 */
-	UINT AddExhaust (THRUSTER_HANDLE th, double lscale, double wscale, const VECTOR3 &pos, const VECTOR3 &dir, SURFHANDLE tex = 0) const;
+	oapi::UInt AddExhaust (THRUSTER_HANDLE th, double lscale, double wscale, const VECTOR3 &pos, const VECTOR3 &dir, SURFHANDLE tex = 0) const;
 
 	/**
 	 * \brief Add an exhaust render definition defined by a parameter structure.
@@ -4851,7 +4853,7 @@ public:
 	 * \note spec->tex can be used to provide a custom exhaust texture. If spec->tex
 	 *  == NULL, then the default exhaust texture is used.
 	 */
-	UINT AddExhaust (EXHAUSTSPEC *spec);
+	oapi::UInt AddExhaust (EXHAUSTSPEC *spec);
 
 	/**
 	 * \brief Removes an exhaust render definition.
@@ -4859,14 +4861,14 @@ public:
 	 * \return \e false if exhaust definition does not exist, \e true otherwise.
 	 * \sa AddExhaust, GetExhaustCount
 	 */
-	bool DelExhaust (UINT idx) const;
+	bool DelExhaust (oapi::UInt idx) const;
 
 	/**
 	 * \brief Returns the number of exhaust render definitions for the vessel.
 	 * \return Number of exhaust render definitions
 	 * \sa AddExhaust, DelExhaust
 	 */
-	DWORD GetExhaustCount () const;
+	oapi::UInt32 GetExhaustCount () const;
 
 	/**
 	 * \brief Returns the parameters of an exhaust definition.
@@ -4879,7 +4881,7 @@ public:
 	 * \return \e false if \a idx out of range, \e true otherwise.
 	 * \sa AddExhaust
 	 */
-	bool GetExhaustSpec (UINT idx, double *lscale, double *wscale, VECTOR3 *pos, VECTOR3 *dir, SURFHANDLE *tex) const;
+	bool GetExhaustSpec (oapi::UInt idx, double *lscale, double *wscale, VECTOR3 *pos, VECTOR3 *dir, SURFHANDLE *tex) const;
 
 	/**
 	 * \brief Returns the parameters of an exhaust definition in a structure.
@@ -4889,7 +4891,7 @@ public:
 	 * \note On return the parameters of the specified exhaust object are
 	 *   copied into the structure pointed to by spec.
 	 */
-	bool GetExhaustSpec (UINT idx, EXHAUSTSPEC *spec);
+	bool GetExhaustSpec (oapi::UInt idx, EXHAUSTSPEC *spec);
 
 	/**
 	 * \brief Returns the current level of an exhaust source.
@@ -4899,7 +4901,7 @@ public:
 	 *   to which the exhaust definition is attached.
 	 * \sa AddExhaust, GetThrusterLevel
 	 */
-	double GetExhaustLevel (UINT idx) const;
+	double GetExhaustLevel (oapi::UInt idx) const;
 
 	/**
 	 * \brief Select a previously registered texture to be used for rendering reentry flames.
@@ -5116,7 +5118,7 @@ public:
 	 * \note The list index for a given beacon can change when the vessel
 	 *   adds or deletes beacons.
 	 */
-	const BEACONLIGHTSPEC *GetBeacon (DWORD idx) const;
+	const BEACONLIGHTSPEC *GetBeacon (oapi::UInt32 idx) const;
 	//@}
 
 
@@ -5163,7 +5165,7 @@ public:
 	 * \brief Returns the number of light sources defined for the vessel.
 	 * \return Number of light sources.
 	 */
-	DWORD LightEmitterCount () const;
+	oapi::UInt32 LightEmitterCount () const;
 
 	/**
 	 * \brief Returns a pointer to a light source object identified by index.
@@ -5173,7 +5175,7 @@ public:
 	 *   the list are deleted.
 	 * \sa LightEmitterCount
 	 */
-	const LightEmitter *GetLightEmitter (DWORD i) const;
+	const LightEmitter *GetLightEmitter (oapi::UInt32 i) const;
 
 	/**
 	 * \brief Deletes the specified light source from the vessel.
@@ -5247,7 +5249,7 @@ public:
 	 *   AddExhaust(THRUSTER_HANDLE,double,double,double,SURFHANDLE)const,
 	 *   AddExhaust(THRUSTER_HANDLE,double,double,const VECTOR3&,const VECTOR3&,SURFHANDLE)const
 	 */
-	void SetExhaustScales (EXHAUSTTYPE exh, WORD id, double lscale, double wscale) const;
+	void SetExhaustScales (EXHAUSTTYPE exh, oapi::UInt16 id, double lscale, double wscale) const;
 
 	/**
 	 * \brief Delete a thruster group and (optionally) all associated thrusters.
@@ -5265,16 +5267,16 @@ public:
 	 */
 	bool DelThrusterGroup (THGROUP_HANDLE &thg, THGROUP_TYPE thgt, bool delth = false) const;
 
-	UINT   AddExhaustRef (EXHAUSTTYPE exh, VECTOR3 &pos, double lscale = -1.0, double wscale = -1.0, VECTOR3 *dir = 0) const; // obsolete
-	void   DelExhaustRef (EXHAUSTTYPE exh, WORD id) const;  // obsolete
+	oapi::UInt   AddExhaustRef (EXHAUSTTYPE exh, VECTOR3 &pos, double lscale = -1.0, double wscale = -1.0, VECTOR3 *dir = 0) const; // obsolete
+	void   DelExhaustRef (EXHAUSTTYPE exh, oapi::UInt16 id) const;  // obsolete
 	void   ClearExhaustRefs (void) const; // obsolete
-	UINT   AddAttExhaustRef (const VECTOR3 &pos, const VECTOR3 &dir, double wscale = 1.0, double lscale = 1.0) const; // obsolete
-	void   AddAttExhaustMode (UINT idx, ATTITUDEMODE mode, int axis, int dir) const; // obsolete
+	oapi::UInt   AddAttExhaustRef (const VECTOR3 &pos, const VECTOR3 &dir, double wscale = 1.0, double lscale = 1.0) const; // obsolete
+	void   AddAttExhaustMode (oapi::UInt idx, ATTITUDEMODE mode, int axis, int dir) const; // obsolete
 	void   ClearAttExhaustRefs (void) const; // obsolete
 
 	/**
 	 * \brief Defines the three points defining the vessel's ground contact plane.
-	 * \deprecated This method has been replaced by VESSEL::SetTouchdownPoints(const TOUCHDOWNVTX*,DWORD)const
+	 * \deprecated This method has been replaced by VESSEL::SetTouchdownPoints(const TOUCHDOWNVTX*,oapi::UInt32)const
 	 * \param pt1 touchdown point of nose wheel (or equivalent)
 	 * \param pt2 touchdown point of left main wheel (or equivalent)
 	 * \param pt3 touchdown point of right main wheel (or equivalent)
@@ -5291,25 +5293,25 @@ public:
 	 *   touchdown points should be modified gradually by small amounts
 	 *   over time (proportional to simulation time steps). 
 	 * \note This method is retained only for backward compatibility. Vessels should now use
-	 *   SetTouchdownPoints(const TOUCHDOWNVTX*,DWORD)const to define a convex hull of touchdown points.
+	 *   SetTouchdownPoints(const TOUCHDOWNVTX*,oapi::UInt32)const to define a convex hull of touchdown points.
 	 * \note The touchdown stiffness and damping parameters are guessed according to the vessel
 	 *   empty mass. Therefore, SetTouchdownPoints should be called \e after defining the empty
 	 *   vessel mass with SetEmptyMass.
-	 * \sa GetTouchdownPoints, GetCOG_elev, \ref SetTouchdownPoints(const TOUCHDOWNVTX*, DWORD)const
+	 * \sa GetTouchdownPoints, GetCOG_elev, \ref SetTouchdownPoints(const TOUCHDOWNVTX*, oapi::UInt32)const
 	 *   SetEmptyMass
 	 */
 	void SetTouchdownPoints (const VECTOR3 &pt1, const VECTOR3 &pt2, const VECTOR3 &pt3) const;
 
 	/**
 	 * \brief Returns the three points defining the vessel's ground contact plane.
-	 * \deprecated This method has been replaced by VESSEL::GetTouchdownPoint(TOUCHDOWNVTX&,DWORD)const
+	 * \deprecated This method has been replaced by VESSEL::GetTouchdownPoint(TOUCHDOWNVTX&,oapi::UInt32)const
 	 * \param pt1 touchdown point of nose wheel (or equivalent)
 	 * \param pt2 touchdown point of left main wheel (or equivalent)
 	 * \param pt3 touchdown point of right main wheel (or equivalent)
 	 * \note The function returns 3 reference points defining the vessel's
 	 *   surface contact points when touched down on a planetary surface
 	 *   (e.g. landing gear).
-	 * \note This function is superseded by \ref GetTouchdownPoint(TOUCHDOWNVTX&,DWORD)const, which
+	 * \note This function is superseded by \ref GetTouchdownPoint(TOUCHDOWNVTX&,oapi::UInt32)const, which
 	 *   provides access to additional parameters and can be used for touchdown points >= 3.
 	 * \sa GetTouchdownPoint, SetTouchdownPoints, GetCOG_elev
 	 */
@@ -5340,7 +5342,7 @@ public:
 	 * \param ch channel (>= 0)
 	 * \return \e false on error (index out of range), \e true otherwise
 	 */
-	bool SetNavRecv (DWORD n, DWORD ch) const;
+	bool SetNavRecv (oapi::UInt32 n, oapi::UInt32 ch) const;
 
 	/**
 	 * \brief Returns the current channel setting of a NAV radio receiver.
@@ -5349,7 +5351,7 @@ public:
 	 * \return Receiver channel [0..639]. If index \a n is out of range, the
 	 *   return value is 0.
 	 */
-	DWORD GetNavRecv (DWORD n) const;
+	oapi::UInt32 GetNavRecv (oapi::UInt32 n) const;
 
 	/**
 	 * \brief Set the altitude of the vessel's centre of gravity over ground level when
@@ -5382,11 +5384,11 @@ public:
 	 *   all of the vessel's meshes.
 	 * \sa SetMeshVisibilityMode
 	 */
-	void SetMeshVisibleInternal (UINT idx, bool visible) const;
+	void SetMeshVisibleInternal (oapi::UInt idx, bool visible) const;
 
-	UINT   RegisterAnimSequence (double defmeshstate) const; // obsolete
-	bool   AddAnimComp (UINT seq, ANIMCOMP *comp); // obsolete
-	bool   SetAnimState (UINT seq, double state); // obsolete
+	oapi::UInt   RegisterAnimSequence (double defmeshstate) const; // obsolete
+	bool   AddAnimComp (oapi::UInt seq, ANIMCOMP *comp); // obsolete
+	bool   SetAnimState (oapi::UInt seq, double state); // obsolete
 
 	/**
 	 * \brief Causes Orbiter to write default vessel parameters to a scenario file.
@@ -5715,10 +5717,10 @@ public:
 	 *   VESSEL3::clbkDrawHUD.
 	 * \note For vessels derived from VESSEL3 orbiter will not call this method,
 	 *   but will call the VESSEL3::clbkDrawHUD method instead. The VESSEL3
-	 *   version uses a generic \e Sketchpad drawing context instead of a HDC.
+	 *   version uses a generic \e Sketchpad drawing context instead of a oapi::DrawContext.
 	 * \sa VESSEL3::clbkDrawHUD, \ref progflow1
 	 */
-	virtual void clbkDrawHUD (int mode, const HUDPAINTSPEC *hps, HDC hDC);
+	virtual void clbkDrawHUD (int mode, const HUDPAINTSPEC *hps, oapi::DrawContext hDC);
 
 	/**
 	 * \brief Reaction Control System mode change notification.
@@ -5756,7 +5758,7 @@ public:
 	 *   indicates fully enabled.
 	 * \sa \ref progflow1
 	 */
-	virtual void clbkADCtrlMode (DWORD mode);
+	virtual void clbkADCtrlMode (oapi::UInt32 mode);
 
 	/**
 	 * \brief HUD mode change notification
@@ -5894,7 +5896,7 @@ public:
 	 *   if multiple key events have occurred in the last time step.
 	 * \sa clbkConsumeDirectKey, \ref progflow1
 	 */
-	virtual int clbkConsumeBufferedKey (DWORD key, bool down, char *kstate);
+	virtual int clbkConsumeBufferedKey (oapi::UInt32 key, bool down, char *kstate);
 
 	/**
 	 * \brief Generic cockpit view mode request notification
@@ -6121,7 +6123,7 @@ public:
 	 *   caller should release them at some point.
 	 * \note The surfaces can contain an alpha channel to handle transparency.
 	 */
-	int SetPanelBackground (PANELHANDLE hPanel, SURFHANDLE *hSurf, DWORD nsurf, MESHHANDLE hMesh, DWORD width, DWORD height, DWORD baseline = 0, DWORD scrollflag = 0);
+	int SetPanelBackground (PANELHANDLE hPanel, SURFHANDLE *hSurf, oapi::UInt32 nsurf, MESHHANDLE hMesh, oapi::UInt32 width, oapi::UInt32 height, oapi::UInt32 baseline = 0, oapi::UInt32 scrollflag = 0);
 
 	/**
 	 * \brief Set scaling factors for 2-D instrument panel.
@@ -6185,7 +6187,7 @@ public:
 	 *   VESSEL4::RegisterPanelArea can improve graphics performance.
 	 * \sa VESSEL4::RegisterPanelArea
 	 */
-	int RegisterPanelArea (PANELHANDLE hPanel, int id, const RECT &pos, const RECT &texpos, int draw_event, int mouse_event, int bkmode);
+	int RegisterPanelArea (PANELHANDLE hPanel, int id, const oapi::Rectangle &pos, const oapi::Rectangle &texpos, int draw_event, int mouse_event, int bkmode);
 
 	/**
 	 * \brief Register an area of the panel to receive mouse and redraw events.
@@ -6214,7 +6216,7 @@ public:
 	 *   appropriate attributes, or VESSEL4::RegisterPanelArea should be used instead.
 	 * \sa VESSEL4::RegisterPanelArea, oapiCreateSurfaceEx
 	 */
-	int RegisterPanelArea (PANELHANDLE hPanel, int id, const RECT &pos, int draw_event, int mouse_event, SURFHANDLE surf = NULL, void *context = NULL);
+	int RegisterPanelArea (PANELHANDLE hPanel, int id, const oapi::Rectangle &pos, int draw_event, int mouse_event, SURFHANDLE surf = NULL, void *context = NULL);
 
 	/**
 	 * \brief Mouse event notification for 2-D panel views.
@@ -6286,7 +6288,7 @@ public:
 	 *   panels via SURFHANDLES instead of bitmaps.
 	 * \sa \ref progflow1
 	 */
-	virtual bool clbkLoadPanel2D (int id, PANELHANDLE hPanel, DWORD viewW, DWORD viewH);
+	virtual bool clbkLoadPanel2D (int id, PANELHANDLE hPanel, oapi::UInt32 viewW, oapi::UInt32 viewH);
 
 	/**
 	 * \brief HUD redraw notification
@@ -6450,7 +6452,7 @@ public:
 	 *   to draw_event. If only blitting access is required, these flags should be omitted
 	 *   for improved performance.
 	 */
-	int RegisterPanelArea (PANELHANDLE hPanel, int id, const RECT &pos, int texidx, const RECT &texpos, int draw_event, int mouse_event, int bkmode);
+	int RegisterPanelArea (PANELHANDLE hPanel, int id, const oapi::Rectangle &pos, int texidx, const oapi::Rectangle &texpos, int draw_event, int mouse_event, int bkmode);
 
 	using VESSEL3::RegisterPanelArea; // keep previous interface valid
 
@@ -6465,9 +6467,9 @@ public:
 	 * \code
 	 * typedef struct {
 	 *   char *name;    // points to the name of the new mode
-	 *   DWORD key;     // mode selection key
+	 *   oapi::UInt32 key;     // mode selection key
 	 *   void *context; // mode-specific context pointer
-	 *   int (*msgproc)(UINT,UINT,WPARAM,LPARAM);   // address of MFD message parser
+	 *   int (*msgproc)(oapi::UInt,oapi::UInt,WPARAM,LPARAM);   // address of MFD message parser
 	 * } MFDMODESPEC; \endcode
 	 * \note The mode identifier retrieved by oapiGetMFDMode() for MFD modes
 	 *   registered by this method starts with 1000 for the first registered mode
