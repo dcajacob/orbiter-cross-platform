@@ -37,7 +37,7 @@ def restore_api(actual):
     equal(source[c:d]+source[a:b],body,'Original camera SDK modes and constants')
     expected=source[:a]+'#include "OrbiterCameraData.h"\n\n'+source[b:]
     expected=expected.replace(source[c:d],'',1)
-    text=actual.decode('cp1252') if isinstance(actual,bytes) else actual
+    text=(actual.decode('cp1252') if isinstance(actual,bytes) else actual).replace('\r\n','\n')
     if expected!=text:raise ValueError('Camera SDK extraction changed other Windows API bytes')
     return source.encode('cp1252') if isinstance(actual,bytes) else source
 
@@ -60,6 +60,7 @@ def verify():
     equal(source[:a]+source[b:],raw(path),'Windows external camera registration')
     moved=raw('Src/Orbiter/CameraControl.cpp');moved=moved[moved.index('ExternalCameraControl::ExternalCameraControl'):].replace('oapi::UInt32','DWORD')
     equal(source[a:b],moved,'Original external camera control state')
-    restore_api((ROOT/'Orbitersdk/include/OrbiterAPI.h').read_bytes())
+    content=(ROOT/'Orbitersdk/include/OrbiterAPI.h').read_bytes().replace(b'\r\n',b'\n')
+    assert restore_api(content)==restore_api(content.replace(b'\n',b'\r\n')), 'Windows checkout line endings changed the SDK audit'
     print('Original production camera calculations, Windows input/projection adapters and SDK modes conserved')
 if __name__=='__main__':verify()
