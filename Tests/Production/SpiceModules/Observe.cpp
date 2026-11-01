@@ -51,6 +51,10 @@ public:
                 for (int request:{EPHEM_TRUEPOS|EPHEM_TRUEVEL,EPHEM_BARYPOS|EPHEM_BARYVEL,
                     EPHEM_TRUEPOS|EPHEM_TRUEVEL|EPHEM_BARYPOS|EPHEM_BARYVEL}) {
                     for (std::size_t i=0;i<epochs.size();++i) sample(body,module,"slow",request,static_cast<int>(i),epochs[i],false,true);
+                    // Production keeps one request mask per interpolation
+                    // stream. Reset outside the prior time bracket before
+                    // probing another mask; the cache is not keyed by mask.
+                    sample(body,module,"reset",request,0,-1000000.0,true,true);
                     for (int i=0;i<=6000;++i) sample(body,module,"forward",request,i,static_cast<double>(i),true,i%100==0);
                     int index=0;
                     for (double time:{6000.0,6000.5,6030.0,0.0,-1.0,120.0,60.0,61.0,3600.0,10.0,0.0,0.125,7200.0})

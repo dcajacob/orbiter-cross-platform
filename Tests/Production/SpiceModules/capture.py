@@ -40,6 +40,7 @@ def rows(data):
     for body in bodies:
         for request in lock['requests']:
             schedule=[('slow',i,time) for i,time in enumerate(epochs)]
+            schedule += [('reset',0,-1000000.)]
             schedule += [('forward',i,float(i)) for i in range(0,6001,100)]
             schedule += [('jump',i,time) for i,time in enumerate([6000.,6000.5,6030.,0.,-1.,120.,60.,61.,3600.,10.,0.,0.125,7200.])]
             for mode,tick,time in schedule:
