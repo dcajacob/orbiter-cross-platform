@@ -1,0 +1,65 @@
+{
+  "schema": 1,
+  "phase": 3,
+  "phase_complete": false,
+  "reference_policy": "Original two-body, production state/lifecycle and Phase 2 client references remain unchanged. These are verification outputs, never replacement goldens.",
+  "hosted": [
+    {
+      "component": "frame",
+      "source": "f7861ec8f8cd6485b6dd37532c777ea5e6a313cc",
+      "runs": {
+        "production": 41238486267,
+        "client": 41238486523,
+        "portable": 41238486499
+      },
+      "status": "passed",
+      "original_comparison_zip_sha256": "05f1d608f387c99516fd71c0d7c00fbc2a3ae35cf1f96127da1f310444991c68",
+      "preserved_report": "frame-client-comparison.json",
+      "report_sha256": "f51a01a7da43a2b5e03528be281342f5163fccf38b20814ea5b9db8e3d6e9550"
+    },
+    {
+      "component": "body",
+      "source": "240b17a75aad535b1a38c91330abf0e06aa1b367",
+      "runs": {
+        "production": 41239902123,
+        "client": 41239902090,
+        "portable": 41239902155
+      },
+      "status": "passed",
+      "original_comparison_zip_sha256": "3fd5767dbdc489e103d945d7549d84dc65d70cb1378fc8088cac4e1dce7703f0",
+      "preserved_report": "body-client-comparison.json",
+      "report_sha256": "7c7a68ba496232fefbb9cbb12478d88bd900ac3597ccb58595baae4bede43564"
+    },
+    {
+      "component": "rigid",
+      "source": "94d5267e4762391d58475b236c1efac8f30645c3",
+      "runs": {
+        "production": 41272634399,
+        "client": 41272634438,
+        "portable": 41272634393
+      },
+      "status": "passed",
+      "original_comparison_zip_sha256": "9e7977b1f73014c3faaca1f733c59edb381c7c8a541e05dd48b0cba544195f52",
+      "preserved_report": "rigid-client-comparison.json",
+      "report_sha256": "f0ba191c351227c226b3a7e146df991dda22a312903c9e3b052d3f73271be4e1",
+      "native_comparison": {
+        "original_zip_sha256": "b983bfc9e6a67ab0be92bd6441ea70b344ffbadaca17f60f2a7cbc2e53cd5e56",
+        "preserved_report": "rigid-native-parity.json",
+        "report_sha256": "f4f2ff42849fea42ca079c7e8d0fa4c5f40adf26d2a383d2a5b449e62fc527ab"
+      }
+    },
+    {
+      "component": "sdk-records",
+      "source": "a72fb8b8d89dcdd66a8f31ce6256e5fb8321b252",
+      "runs": {
+        "production": 41273799957,
+        "client": 41273799955,
+        "portable": 41273799993
+      },
+      "status": "passed",
+      "original_comparison_zip_sha256": "7df451595ec540c21a18d83f84b5b3b354451b44e42f875ecb9cc302ce44bc7c",
+      "preserved_report": "sdk-records-client-comparison.json",
+      "report_sha256": "ab3ed3ad4277ed70f3ea3d8dfd4d1557cb03e876884464b2206b3ce295b13280"
+    }
+  ]
+}

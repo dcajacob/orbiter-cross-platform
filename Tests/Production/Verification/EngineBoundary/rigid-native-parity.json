@@ -1,0 +1,598 @@
+{
+  "orbit": {
+    "portable-ubuntu-24.04-Debug-x64": {
+      "analytical": {
+        "position_m": 1.4143184329290157e-06,
+        "velocity_m_s": 1.5482178103083438e-09,
+        "orientation_rad": 0.0,
+        "angular_velocity_rad_s": 0.0,
+        "energy_relative": 3.774758283725532e-15,
+        "momentum_relative": 1.887379141862766e-15
+      },
+      "frozen_reference": {
+        "position_m": 1.1175870895385742e-07,
+        "velocity_m_s": 8.866990313695243e-11,
+        "orientation_rad": 0.0,
+        "angular_velocity_rad_s": 0.0,
+        "mjd_days": 0.0
+      },
+      "cross_platform": {
+        "position_m": 0.0,
+        "velocity_m_s": 0.0,
+        "orientation_rad": 0.0,
+        "angular_velocity_rad_s": 0.0,
+        "mjd_days": 0.0
+      }
+    },
+    "portable-ubuntu-24.04-Release-x64": {
+      "analytical": {
+        "position_m": 1.4143184329290157e-06,
+        "velocity_m_s": 1.5482178103083438e-09,
+        "orientation_rad": 0.0,
+        "angular_velocity_rad_s": 0.0,
+        "energy_relative": 3.774758283725532e-15,
+        "momentum_relative": 1.887379141862766e-15
+      },
+      "frozen_reference": {
+        "position_m": 1.1175870895385742e-07,
+        "velocity_m_s": 8.866990313695243e-11,
+        "orientation_rad": 0.0,
+        "angular_velocity_rad_s": 0.0,
+        "mjd_days": 0.0
+      },
+      "cross_platform": {
+        "position_m": 0.0,
+        "velocity_m_s": 0.0,
+        "orientation_rad": 0.0,
+        "angular_velocity_rad_s": 0.0,
+        "mjd_days": 0.0
+      }
+    },
+    "portable-windows-2022-Debug-x64": {
+      "analytical": {
+        "position_m": 1.4143184329290157e-06,
+        "velocity_m_s": 1.5482178103083438e-09,
+        "orientation_rad": 0.0,
+        "angular_velocity_rad_s": 0.0,
+        "energy_relative": 3.774758283725532e-15,
+        "momentum_relative": 1.887379141862766e-15
+      },
+      "frozen_reference": {
+        "position_m": 1.1175870895385742e-07,
+        "velocity_m_s": 8.866990313695243e-11,
+        "orientation_rad": 0.0,
+        "angular_velocity_rad_s": 0.0,
+        "mjd_days": 0.0
+      },
+      "cross_platform": {
+        "position_m": 0.0,
+        "velocity_m_s": 0.0,
+        "orientation_rad": 0.0,
+        "angular_velocity_rad_s": 0.0,
+        "mjd_days": 0.0
+      }
+    },
+    "portable-windows-2022-Release-x64": {
+      "analytical": {
+        "position_m": 1.4143184329290157e-06,
+        "velocity_m_s": 1.5482178103083438e-09,
+        "orientation_rad": 0.0,
+        "angular_velocity_rad_s": 0.0,
+        "energy_relative": 3.774758283725532e-15,
+        "momentum_relative": 1.887379141862766e-15
+      },
+      "frozen_reference": {
+        "position_m": 1.1175870895385742e-07,
+        "velocity_m_s": 8.866990313695243e-11,
+        "orientation_rad": 0.0,
+        "angular_velocity_rad_s": 0.0,
+        "mjd_days": 0.0
+      },
+      "cross_platform": {
+        "position_m": 0.0,
+        "velocity_m_s": 0.0,
+        "orientation_rad": 0.0,
+        "angular_velocity_rad_s": 0.0,
+        "mjd_days": 0.0
+      }
+    }
+  },
+  "orbit-half": {
+    "portable-ubuntu-24.04-Debug-x64": {
+      "analytical": {
+        "position_m": 1.1808439414391757e-07,
+        "velocity_m_s": 7.676480107332897e-11,
+        "orientation_rad": 0.0,
+        "angular_velocity_rad_s": 0.0,
+        "energy_relative": 6.439293542825908e-15,
+        "momentum_relative": 3.1086244689504383e-15
+      },
+      "frozen_reference": {
+        "position_m": 1.2013700229374393e-07,
+        "velocity_m_s": 8.228791220075452e-11,
+        "orientation_rad": 0.0,
+        "angular_velocity_rad_s": 0.0,
+        "mjd_days": 0.0
+      },
+      "cross_platform": {
+        "position_m": 0.0,
+        "velocity_m_s": 0.0,
+        "orientation_rad": 0.0,
+        "angular_velocity_rad_s": 0.0,
+        "mjd_days": 0.0
+      }
+    },
+    "portable-ubuntu-24.04-Release-x64": {
+      "analytical": {
+        "position_m": 1.1808439414391757e-07,
+        "velocity_m_s": 7.676480107332897e-11,
+        "orientation_rad": 0.0,
+        "angular_velocity_rad_s": 0.0,
+        "energy_relative": 6.439293542825908e-15,
+        "momentum_relative": 3.1086244689504383e-15
+      },
+      "frozen_reference": {
+        "position_m": 1.2013700229374393e-07,
+        "velocity_m_s": 8.228791220075452e-11,
+        "orientation_rad": 0.0,
+        "angular_velocity_rad_s": 0.0,
+        "mjd_days": 0.0
+      },
+      "cross_platform": {
+        "position_m": 0.0,
+        "velocity_m_s": 0.0,
+        "orientation_rad": 0.0,
+        "angular_velocity_rad_s": 0.0,
+        "mjd_days": 0.0
+      }
+    },
+    "portable-windows-2022-Debug-x64": {
+      "analytical": {
+        "position_m": 1.1808439414391757e-07,
+        "velocity_m_s": 7.676480107332897e-11,
+        "orientation_rad": 0.0,
+        "angular_velocity_rad_s": 0.0,
+        "energy_relative": 6.439293542825908e-15,
+        "momentum_relative": 3.1086244689504383e-15
+      },
+      "frozen_reference": {
+        "position_m": 1.2013700229374393e-07,
+        "velocity_m_s": 8.228791220075452e-11,
+        "orientation_rad": 0.0,
+        "angular_velocity_rad_s": 0.0,
+        "mjd_days": 0.0
+      },
+      "cross_platform": {
+        "position_m": 0.0,
+        "velocity_m_s": 0.0,
+        "orientation_rad": 0.0,
+        "angular_velocity_rad_s": 0.0,
+        "mjd_days": 0.0
+      }
+    },
+    "portable-windows-2022-Release-x64": {
+      "analytical": {
+        "position_m": 1.1808439414391757e-07,
+        "velocity_m_s": 7.676480107332897e-11,
+        "orientation_rad": 0.0,
+        "angular_velocity_rad_s": 0.0,
+        "energy_relative": 6.439293542825908e-15,
+        "momentum_relative": 3.1086244689504383e-15
+      },
+      "frozen_reference": {
+        "position_m": 1.2013700229374393e-07,
+        "velocity_m_s": 8.228791220075452e-11,
+        "orientation_rad": 0.0,
+        "angular_velocity_rad_s": 0.0,
+        "mjd_days": 0.0
+      },
+      "cross_platform": {
+        "position_m": 0.0,
+        "velocity_m_s": 0.0,
+        "orientation_rad": 0.0,
+        "angular_velocity_rad_s": 0.0,
+        "mjd_days": 0.0
+      }
+    }
+  },
+  "spin": {
+    "portable-ubuntu-24.04-Debug-x64": {
+      "analytical": {
+        "position_m": 1.4143184329290157e-06,
+        "velocity_m_s": 1.5482178103083438e-09,
+        "orientation_rad": 4.999946986498749e-10,
+        "angular_velocity_rad_s": 0.0,
+        "energy_relative": 3.774758283725532e-15,
+        "momentum_relative": 1.887379141862766e-15
+      },
+      "frozen_reference": {
+        "position_m": 1.1175870895385742e-07,
+        "velocity_m_s": 8.866990313695243e-11,
+        "orientation_rad": 0.0,
+        "angular_velocity_rad_s": 0.0,
+        "mjd_days": 0.0
+      },
+      "cross_platform": {
+        "position_m": 0.0,
+        "velocity_m_s": 0.0,
+        "orientation_rad": 0.0,
+        "angular_velocity_rad_s": 0.0,
+        "mjd_days": 0.0
+      }
+    },
+    "portable-ubuntu-24.04-Release-x64": {
+      "analytical": {
+        "position_m": 1.4143184329290157e-06,
+        "velocity_m_s": 1.5482178103083438e-09,
+        "orientation_rad": 4.999946986498749e-10,
+        "angular_velocity_rad_s": 0.0,
+        "energy_relative": 3.774758283725532e-15,
+        "momentum_relative": 1.887379141862766e-15
+      },
+      "frozen_reference": {
+        "position_m": 1.1175870895385742e-07,
+        "velocity_m_s": 8.866990313695243e-11,
+        "orientation_rad": 0.0,
+        "angular_velocity_rad_s": 0.0,
+        "mjd_days": 0.0
+      },
+      "cross_platform": {
+        "position_m": 0.0,
+        "velocity_m_s": 0.0,
+        "orientation_rad": 0.0,
+        "angular_velocity_rad_s": 0.0,
+        "mjd_days": 0.0
+      }
+    },
+    "portable-windows-2022-Debug-x64": {
+      "analytical": {
+        "position_m": 1.4143184329290157e-06,
+        "velocity_m_s": 1.5482178103083438e-09,
+        "orientation_rad": 4.999946986498749e-10,
+        "angular_velocity_rad_s": 0.0,
+        "energy_relative": 3.774758283725532e-15,
+        "momentum_relative": 1.887379141862766e-15
+      },
+      "frozen_reference": {
+        "position_m": 1.1175870895385742e-07,
+        "velocity_m_s": 8.866990313695243e-11,
+        "orientation_rad": 0.0,
+        "angular_velocity_rad_s": 0.0,
+        "mjd_days": 0.0
+      },
+      "cross_platform": {
+        "position_m": 0.0,
+        "velocity_m_s": 0.0,
+        "orientation_rad": 0.0,
+        "angular_velocity_rad_s": 0.0,
+        "mjd_days": 0.0
+      }
+    },
+    "portable-windows-2022-Release-x64": {
+      "analytical": {
+        "position_m": 1.4143184329290157e-06,
+        "velocity_m_s": 1.5482178103083438e-09,
+        "orientation_rad": 4.999946986498749e-10,
+        "angular_velocity_rad_s": 0.0,
+        "energy_relative": 3.774758283725532e-15,
+        "momentum_relative": 1.887379141862766e-15
+      },
+      "frozen_reference": {
+        "position_m": 1.1175870895385742e-07,
+        "velocity_m_s": 8.866990313695243e-11,
+        "orientation_rad": 0.0,
+        "angular_velocity_rad_s": 0.0,
+        "mjd_days": 0.0
+      },
+      "cross_platform": {
+        "position_m": 0.0,
+        "velocity_m_s": 0.0,
+        "orientation_rad": 0.0,
+        "angular_velocity_rad_s": 0.0,
+        "mjd_days": 0.0
+      }
+    }
+  },
+  "production_rigid_body": {
+    "production-rigid-0": {
+      "portable-ubuntu-24.04-Debug-x64": {
+        "position_m": 0.0,
+        "velocity_m_s": 0.0,
+        "orientation_rad": 0.0,
+        "angular_velocity_rad_s": 0.0,
+        "mjd_days": 0.0
+      },
+      "portable-ubuntu-24.04-Release-x64": {
+        "position_m": 0.0,
+        "velocity_m_s": 0.0,
+        "orientation_rad": 0.0,
+        "angular_velocity_rad_s": 0.0,
+        "mjd_days": 0.0
+      },
+      "portable-windows-2022-Debug-x64": {
+        "position_m": 0.0,
+        "velocity_m_s": 0.0,
+        "orientation_rad": 0.0,
+        "angular_velocity_rad_s": 0.0,
+        "mjd_days": 0.0
+      },
+      "portable-windows-2022-Release-x64": {
+        "position_m": 0.0,
+        "velocity_m_s": 0.0,
+        "orientation_rad": 0.0,
+        "angular_velocity_rad_s": 0.0,
+        "mjd_days": 0.0
+      }
+    },
+    "production-rigid-1": {
+      "portable-ubuntu-24.04-Debug-x64": {
+        "position_m": 0.0,
+        "velocity_m_s": 0.0,
+        "orientation_rad": 0.0,
+        "angular_velocity_rad_s": 0.0,
+        "mjd_days": 0.0
+      },
+      "portable-ubuntu-24.04-Release-x64": {
+        "position_m": 0.0,
+        "velocity_m_s": 0.0,
+        "orientation_rad": 0.0,
+        "angular_velocity_rad_s": 0.0,
+        "mjd_days": 0.0
+      },
+      "portable-windows-2022-Debug-x64": {
+        "position_m": 0.0,
+        "velocity_m_s": 0.0,
+        "orientation_rad": 0.0,
+        "angular_velocity_rad_s": 0.0,
+        "mjd_days": 0.0
+      },
+      "portable-windows-2022-Release-x64": {
+        "position_m": 0.0,
+        "velocity_m_s": 0.0,
+        "orientation_rad": 0.0,
+        "angular_velocity_rad_s": 0.0,
+        "mjd_days": 0.0
+      }
+    },
+    "production-rigid-2": {
+      "portable-ubuntu-24.04-Debug-x64": {
+        "position_m": 0.0,
+        "velocity_m_s": 0.0,
+        "orientation_rad": 0.0,
+        "angular_velocity_rad_s": 0.0,
+        "mjd_days": 0.0
+      },
+      "portable-ubuntu-24.04-Release-x64": {
+        "position_m": 0.0,
+        "velocity_m_s": 0.0,
+        "orientation_rad": 0.0,
+        "angular_velocity_rad_s": 0.0,
+        "mjd_days": 0.0
+      },
+      "portable-windows-2022-Debug-x64": {
+        "position_m": 4.001776687800884e-11,
+        "velocity_m_s": 0.0,
+        "orientation_rad": 0.0,
+        "angular_velocity_rad_s": 0.0,
+        "mjd_days": 0.0
+      },
+      "portable-windows-2022-Release-x64": {
+        "position_m": 4.001776687800884e-11,
+        "velocity_m_s": 0.0,
+        "orientation_rad": 0.0,
+        "angular_velocity_rad_s": 0.0,
+        "mjd_days": 0.0
+      }
+    },
+    "production-rigid-3": {
+      "portable-ubuntu-24.04-Debug-x64": {
+        "position_m": 0.0,
+        "velocity_m_s": 0.0,
+        "orientation_rad": 0.0,
+        "angular_velocity_rad_s": 0.0,
+        "mjd_days": 0.0
+      },
+      "portable-ubuntu-24.04-Release-x64": {
+        "position_m": 0.0,
+        "velocity_m_s": 0.0,
+        "orientation_rad": 0.0,
+        "angular_velocity_rad_s": 0.0,
+        "mjd_days": 0.0
+      },
+      "portable-windows-2022-Debug-x64": {
+        "position_m": 2.000888343900442e-11,
+        "velocity_m_s": 0.0,
+        "orientation_rad": 0.0,
+        "angular_velocity_rad_s": 0.0,
+        "mjd_days": 0.0
+      },
+      "portable-windows-2022-Release-x64": {
+        "position_m": 2.000888343900442e-11,
+        "velocity_m_s": 0.0,
+        "orientation_rad": 0.0,
+        "angular_velocity_rad_s": 0.0,
+        "mjd_days": 0.0
+      }
+    },
+    "production-rigid-4": {
+      "portable-ubuntu-24.04-Debug-x64": {
+        "position_m": 0.0,
+        "velocity_m_s": 0.0,
+        "orientation_rad": 0.0,
+        "angular_velocity_rad_s": 0.0,
+        "mjd_days": 0.0
+      },
+      "portable-ubuntu-24.04-Release-x64": {
+        "position_m": 0.0,
+        "velocity_m_s": 0.0,
+        "orientation_rad": 0.0,
+        "angular_velocity_rad_s": 0.0,
+        "mjd_days": 0.0
+      },
+      "portable-windows-2022-Debug-x64": {
+        "position_m": 8.003553375601768e-11,
+        "velocity_m_s": 0.0,
+        "orientation_rad": 0.0,
+        "angular_velocity_rad_s": 0.0,
+        "mjd_days": 0.0
+      },
+      "portable-windows-2022-Release-x64": {
+        "position_m": 8.003553375601768e-11,
+        "velocity_m_s": 0.0,
+        "orientation_rad": 0.0,
+        "angular_velocity_rad_s": 0.0,
+        "mjd_days": 0.0
+      }
+    },
+    "production-rigid-5": {
+      "portable-ubuntu-24.04-Debug-x64": {
+        "position_m": 0.0,
+        "velocity_m_s": 0.0,
+        "orientation_rad": 0.0,
+        "angular_velocity_rad_s": 0.0,
+        "mjd_days": 0.0
+      },
+      "portable-ubuntu-24.04-Release-x64": {
+        "position_m": 0.0,
+        "velocity_m_s": 0.0,
+        "orientation_rad": 0.0,
+        "angular_velocity_rad_s": 0.0,
+        "mjd_days": 0.0
+      },
+      "portable-windows-2022-Debug-x64": {
+        "position_m": 8.003553375601768e-11,
+        "velocity_m_s": 0.0,
+        "orientation_rad": 0.0,
+        "angular_velocity_rad_s": 0.0,
+        "mjd_days": 0.0
+      },
+      "portable-windows-2022-Release-x64": {
+        "position_m": 8.003553375601768e-11,
+        "velocity_m_s": 0.0,
+        "orientation_rad": 0.0,
+        "angular_velocity_rad_s": 0.0,
+        "mjd_days": 0.0
+      }
+    },
+    "production-rigid-6": {
+      "portable-ubuntu-24.04-Debug-x64": {
+        "position_m": 0.0,
+        "velocity_m_s": 0.0,
+        "orientation_rad": 0.0,
+        "angular_velocity_rad_s": 0.0,
+        "mjd_days": 0.0
+      },
+      "portable-ubuntu-24.04-Release-x64": {
+        "position_m": 0.0,
+        "velocity_m_s": 0.0,
+        "orientation_rad": 0.0,
+        "angular_velocity_rad_s": 0.0,
+        "mjd_days": 0.0
+      },
+      "portable-windows-2022-Debug-x64": {
+        "position_m": 0.0,
+        "velocity_m_s": 0.0,
+        "orientation_rad": 0.0,
+        "angular_velocity_rad_s": 0.0,
+        "mjd_days": 0.0
+      },
+      "portable-windows-2022-Release-x64": {
+        "position_m": 0.0,
+        "velocity_m_s": 0.0,
+        "orientation_rad": 0.0,
+        "angular_velocity_rad_s": 0.0,
+        "mjd_days": 0.0
+      }
+    },
+    "production-rigid-7": {
+      "portable-ubuntu-24.04-Debug-x64": {
+        "position_m": 0.0,
+        "velocity_m_s": 0.0,
+        "orientation_rad": 0.0,
+        "angular_velocity_rad_s": 0.0,
+        "mjd_days": 0.0
+      },
+      "portable-ubuntu-24.04-Release-x64": {
+        "position_m": 0.0,
+        "velocity_m_s": 0.0,
+        "orientation_rad": 0.0,
+        "angular_velocity_rad_s": 0.0,
+        "mjd_days": 0.0
+      },
+      "portable-windows-2022-Debug-x64": {
+        "position_m": 0.0,
+        "velocity_m_s": 0.0,
+        "orientation_rad": 0.0,
+        "angular_velocity_rad_s": 0.0,
+        "mjd_days": 0.0
+      },
+      "portable-windows-2022-Release-x64": {
+        "position_m": 0.0,
+        "velocity_m_s": 0.0,
+        "orientation_rad": 0.0,
+        "angular_velocity_rad_s": 0.0,
+        "mjd_days": 0.0
+      }
+    },
+    "production-rigid-8": {
+      "portable-ubuntu-24.04-Debug-x64": {
+        "position_m": 0.0,
+        "velocity_m_s": 0.0,
+        "orientation_rad": 0.0,
+        "angular_velocity_rad_s": 0.0,
+        "mjd_days": 0.0
+      },
+      "portable-ubuntu-24.04-Release-x64": {
+        "position_m": 0.0,
+        "velocity_m_s": 0.0,
+        "orientation_rad": 0.0,
+        "angular_velocity_rad_s": 0.0,
+        "mjd_days": 0.0
+      },
+      "portable-windows-2022-Debug-x64": {
+        "position_m": 0.0,
+        "velocity_m_s": 0.0,
+        "orientation_rad": 0.0,
+        "angular_velocity_rad_s": 0.0,
+        "mjd_days": 0.0
+      },
+      "portable-windows-2022-Release-x64": {
+        "position_m": 0.0,
+        "velocity_m_s": 0.0,
+        "orientation_rad": 0.0,
+        "angular_velocity_rad_s": 0.0,
+        "mjd_days": 0.0
+      }
+    },
+    "production-rigid-9": {
+      "portable-ubuntu-24.04-Debug-x64": {
+        "position_m": 0.0,
+        "velocity_m_s": 0.0,
+        "orientation_rad": 0.0,
+        "angular_velocity_rad_s": 0.0,
+        "mjd_days": 0.0
+      },
+      "portable-ubuntu-24.04-Release-x64": {
+        "position_m": 0.0,
+        "velocity_m_s": 0.0,
+        "orientation_rad": 0.0,
+        "angular_velocity_rad_s": 0.0,
+        "mjd_days": 0.0
+      },
+      "portable-windows-2022-Debug-x64": {
+        "position_m": 1.1459633242338896e-10,
+        "velocity_m_s": 0.0,
+        "orientation_rad": 0.0,
+        "angular_velocity_rad_s": 0.0,
+        "mjd_days": 0.0
+      },
+      "portable-windows-2022-Release-x64": {
+        "position_m": 1.1459633242338896e-10,
+        "velocity_m_s": 0.0,
+        "orientation_rad": 0.0,
+        "angular_velocity_rad_s": 0.0,
+        "mjd_days": 0.0
+      }
+    }
+  }
+}
