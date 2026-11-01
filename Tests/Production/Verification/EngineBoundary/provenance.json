@@ -191,6 +191,24 @@
           "original_zip_sha256": "d1552b30f12aff21e96244404d70db33cb7b4240bdb7ff50aa5d2db793195394"
         }
       ]
+    },
+    {
+      "component": "celestial-body",
+      "source": "c2813bf8a3d1dfce2b2bbda2c680445d7edaa1bb",
+      "runs": {
+        "production": 41284623399,
+        "client": 41284623366,
+        "portable": 41284623362
+      },
+      "status": "passed",
+      "original_comparison_zip_sha256": "3bfb2e1368adc26e829b180429d578d71d354b26bf7d7302ad9d8a0bf2025e3a",
+      "preserved_report": "celestial-client-comparison.json",
+      "report_sha256": "38f5ecfc58f88044bb262993fcb0e2467d6daa6a002caa1c6b41ffbe56b41f76",
+      "native_comparison": {
+        "original_zip_sha256": "5226445e93b18e1831b1562df67e5ce6a7b743d3a5235f6c5e56b3b79647779b",
+        "preserved_report": "celestial-native-parity.json",
+        "report_sha256": "462d96051f6cdfd25853cb61da4667939c63d6a29991d4c1a77012e2a946daa6"
+      }
     }
   ]
 }

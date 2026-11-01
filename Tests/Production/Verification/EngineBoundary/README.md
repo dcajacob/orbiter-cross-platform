@@ -21,6 +21,7 @@ and Linux GCC / Windows MSVC x64 Debug/Release portable checks.
 | Production Camera/PlanetarySystem ownership | `26f0bc37` | [41279054097](https://github.com/dcajacob/orbiter-cross-platform/actions/runs/41279054097) | [41279054051](https://github.com/dcajacob/orbiter-cross-platform/actions/runs/41279054051) | [41279054091](https://github.com/dcajacob/orbiter-cross-platform/actions/runs/41279054091) |
 | Native module loader/bootstrap and actual shared Body fixture | `15867de9` | [41280064395](https://github.com/dcajacob/orbiter-cross-platform/actions/runs/41280064395) | [41280064421](https://github.com/dcajacob/orbiter-cross-platform/actions/runs/41280064421) | [41280064405](https://github.com/dcajacob/orbiter-cross-platform/actions/runs/41280064405) |
 | Original Pines gravity and portable model loading | `c73d1477` | [41282440355](https://github.com/dcajacob/orbiter-cross-platform/actions/runs/41282440355) | [41282440315](https://github.com/dcajacob/orbiter-cross-platform/actions/runs/41282440315) | [41282440466](https://github.com/dcajacob/orbiter-cross-platform/actions/runs/41282440466) |
+| Production CelestialBody and Windows module adapters | `c2813bf8` | [41284623399](https://github.com/dcajacob/orbiter-cross-platform/actions/runs/41284623399) | [41284623366](https://github.com/dcajacob/orbiter-cross-platform/actions/runs/41284623366) | [41284623362](https://github.com/dcajacob/orbiter-cross-platform/actions/runs/41284623362) |
 
 The preserved `*-client-comparison.json` reports show zero numerical and
 projected-landmark differences and SSIM 1.0 both between configurations and
@@ -97,3 +98,10 @@ pass. `pines-gravity-*.json` reports additionally compare standalone and full
 application builds. The class/file tests cover all seven tracked coefficient
 models and explicit parser/resource failures. These are direct force queries,
 not native Solar System initialization.
+
+The celestial extraction preserves all production state/callback and client
+comparisons. Its actual class runs on Linux and Windows in controlled conic,
+rotation, barycentre, interpolation, ephemeris/fallback-order and failure-cleanup
+fixtures. Those callbacks are unit fixtures, not native stock SPICE modules.
+The SDK audit conserves constants, atmospheric data, object/ephemeris flags and
+all original Windows class declarations and implementations.
