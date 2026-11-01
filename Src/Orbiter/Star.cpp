@@ -4,19 +4,9 @@
 // Implementation of class StarSpec
 
 #include <fstream>
-#include <stdio.h>
-#include "Orbiter.h"
-#include "Config.h"
 #include "Star.h"
-#include "Camera.h"
-#include "Log.h"
-
 using namespace std;
-
-extern Orbiter *g_pOrbiter;
-extern Camera *g_camera;
-extern char DBG_MSG[256];
-
+using namespace orbiter::production;
 
 Star::Star (double _mass, double _mean_radius)
 : CelestialBody (_mass, _mean_radius)
@@ -27,7 +17,7 @@ Star::Star (double _mass, double _mean_radius)
 Star::Star (char *fname)
 : CelestialBody (fname)
 {
-	ifstream ifs (g_pOrbiter->ConfigPath (fname));
+	ifstream ifs (GetBodyServices().ConfigPath(fname));
 	if (!ifs) return;
 	bDynamicPosVel = false;
 	// read star-specific parameters here
@@ -48,7 +38,7 @@ void Star::Setup ()
 
 void Star::Update (bool force)
 {
-	if (bDynamicPosVel || module && module->bEphemeris())
+	if (bDynamicPosVel || GetCelestialServices().HasModule(*this) && GetCelestialServices().HasEphemeris(*this))
 		CelestialBody::Update (force);
 	// otherwise don't update: keep star in the origin
 	// of the global coordinate system

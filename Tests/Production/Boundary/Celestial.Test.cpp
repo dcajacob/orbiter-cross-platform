@@ -2,6 +2,7 @@
 // Actual production CelestialBody tests. Controlled module callbacks are unit
 // fixtures, not native SPICE modules or a substitute stock Solar System.
 #include "Celbody.h"
+#include "Star.h"
 #include "Element.h"
 #include "Production/RigidBodyServices.h"
 #include <cmath>
@@ -111,8 +112,9 @@ int main(int argc,char** argv)
         configuration(host,"Primary","Mass = 5.972e24\nSize = 6378000\nSidRotPeriod = 1000\n");
         configuration(host,"Orbiter","Mass = 1000\nSize = 1\nHasElements = TRUE\nEllipticOrbit = TRUE\nSemiMajorAxis = 7000000\n");
         {
-            char p[]="Primary",o[]="Orbiter";TestBody primary(p),orbiter(o);
-            primary.Setup();orbiter.Setup();orbiter.Attach(&primary);
+            char p[]="Primary",o[]="Orbiter";Star primary(p);TestBody orbiter(o);
+            orbiter.Setup();orbiter.Attach(&primary);
+            require(primary.Type()==OBJTP_STAR,"Production star type changed");
             require(primary.nSecondary()==1 && primary.Secondary(0)==&orbiter && orbiter.Primary()==&primary,
                     "Production hierarchy did not retain its authoritative objects");
             Vector pos,vel;require(orbiter.PosVelAtTime(1000,&pos,&vel),"Configured conic was unavailable");
@@ -125,9 +127,9 @@ int main(int argc,char** argv)
         configuration(host,"Root","Mass = 10\nSize = 1\nModule = fixture\n");
         configuration(host,"Child","Mass = 1\nSize = 1\nModule = fixture\n");
         {
-            char r[]="Root",c[]="Child";TestBody root(r),child(c);
-            root.Setup();root.Prime();child.Setup();child.Attach(&root);
-            require(host.events==std::vector<std::string>{"register:Root","init:Root","has:Root","register:Child","init:Child","has:Child", "fast:Root","ephemeris:Root","fast:Child","ephemeris:Child"} && host.registrations==2,
+            char r[]="Root",c[]="Child";Star root(r);TestBody child(c);
+            child.Setup();child.Attach(&root);
+            require(host.events==std::vector<std::string>{"register:Root","init:Root","has:Root","fast:Root","ephemeris:Root","register:Child","init:Child","has:Child","fast:Child","ephemeris:Child"} && host.registrations==2,
                     "Unexpected module initialization");
             host.events.clear();host.time.SetFixedStep(1);host.time.BeginStep(1,true);host.updating=true;
             root.BeginStateUpdate();child.BeginStateUpdate();root.RelTrueAndBaryState();root.AbsTrueState();

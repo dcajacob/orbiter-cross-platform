@@ -8,7 +8,7 @@
 
 #include "Celbody.h"
 
-class Star: public CelestialBody {
+class ORBITER_PRODUCTION_API Star: public CelestialBody {
 	friend class VStar;
 
 public:

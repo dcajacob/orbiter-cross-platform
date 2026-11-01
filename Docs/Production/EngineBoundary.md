@@ -111,8 +111,14 @@ exports and virtual ordering remain unchanged. Controlled native class tests
 exercise circular elements, epoch loading, rotation, hierarchy/barycentre state,
 interpolation, callback ordering and failed initialization. Their ephemerides are
 unit fixtures, not native SPICE or stock-object replacements. `PlanetarySystem`,
-`Planet`, `Star`, `Vessel` and `Camera` still need extraction/integration before
+`Planet`, `Vessel` and `Camera` still need extraction/integration before
 there is a native production world.
+
+The production `Star` class also compiles here, using the same bound file and
+module services. Its setup, state-update guard, light colour and barycentre
+method retain the original implementation. Native class tests use this actual
+class as their primary, including automatic module ephemeris initialization.
+They still use controlled unit callbacks, not native SPICE or a stock world.
 
 An independent inertial/free-spin test runs each propagator for 6,000 quarter-
 second steps twice, with the same seed and finalized sampling. It checks the
@@ -230,6 +236,6 @@ budgets are unchanged. Neither inherited disabled workflow is modified.
 
 Remaining Phase 3 work includes full session/platform lifetime extraction,
 configuration/scenario/resource integration, platform service separation for
-`PlanetarySystem`, `Planet`, `Star`, `Vessel` and `Camera`, instrumentation dependencies and the source-built native SDK/module
+`PlanetarySystem`, `Planet`, `Vessel` and `Camera`, instrumentation dependencies and the source-built native SDK/module
 boundary. These shared components do not yet satisfy the Phase 3
 exit gate that Linux builds the production engine and its authoritative objects.

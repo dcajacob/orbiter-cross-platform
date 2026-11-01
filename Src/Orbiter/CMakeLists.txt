@@ -66,7 +66,6 @@ set(common_src
 # Body classes
 	CelbodySdk.cpp
 	Planet.cpp
-	Star.cpp
 # Vessel classes
 	FlightRecorder.cpp
 	CollisionCore.cpp

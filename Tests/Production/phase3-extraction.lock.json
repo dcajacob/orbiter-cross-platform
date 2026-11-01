@@ -2,7 +2,7 @@
   "schema": 1,
   "production_source": "38b7c627878ea893390675616897071f8bb8e90f",
   "observed_source": "684bd5b27005feecfa9effe796bd216f85e3392f",
-  "scope": "Shared production Body, RigidBody, CelestialBody, original propagators, actual Pines nonspherical gravity, CPU Mesh/MeshManager, scenario environment/focus metadata frame ordering and authoritative world object ownership; platform services, indexed resources and an internal native module bootstrap; verbatim SDK mesh/celestial value records and constants with original Windows declaration/layout checks. Full production world/module SDK extraction remains incomplete.",
+  "scope": "Shared production Body, RigidBody, CelestialBody, Star, original propagators, actual Pines nonspherical gravity, CPU Mesh/MeshManager, scenario environment/focus metadata frame ordering and authoritative world object ownership; platform services, indexed resources and an internal native module bootstrap; verbatim SDK mesh/celestial value records and constants with original Windows declaration/layout checks. Full production world/module SDK extraction remains incomplete.",
   "required_runtime_gates": [
     "frozen two-body reference",
     "frozen production orbit/propulsion",
@@ -51,7 +51,7 @@
       "original_sha256_lf": "8899635492ca087f2ad7532555b4bbdf557bb4ca4c736136adec4d68936325d5"
     },
     "Src/Orbiter/CMakeLists.txt": {
-      "sha256_lf": "fe138739fc9416754c7e8ad7fa84a3a2a0dd6fad57b3718d3bf1e2f71df55b8d",
+      "sha256_lf": "45867586ebcc1a62664f56de773d60e774021c76b9c4d9518fba2aeb269da8bf",
       "original_sha256_lf": "4ba30d001a975912a85b238851629fb999e483d8b2ba1974eb9bef9e9beb60ac"
     },
     "Src/Orbiter/Celbody.cpp": {
@@ -143,7 +143,7 @@
       "original_sha256_lf": null
     },
     "Src/Orbiter/Production/CMakeLists.txt": {
-      "sha256_lf": "2cb453e14c4c0a288efe7a737e0e392d2d7ed1d5796d63ee24bf250a5c55cce6",
+      "sha256_lf": "18f9cbf9ae11f47145362307fc52b7177b0234af225e6fd6e6698ea84762b916",
       "original_sha256_lf": null
     },
     "Src/Orbiter/Production/CelestialServices.cpp": {
@@ -313,6 +313,14 @@
     "Src/Orbiter/Rigidbody.h": {
       "sha256_lf": "f128be10c0f09d39de4c72158e805d519d41d18a898022b41dffad812c9319ed",
       "original_sha256_lf": "f10bca653c79c1ecb860e5ad89cc6aa777c552c62563cb44bdc8b1701e0e0049"
+    },
+    "Src/Orbiter/Star.cpp": {
+      "sha256_lf": "7535b8eeaeb1903eff6417490045ee50ed46dec89caad8b0b7b6ac83beda6dee",
+      "original_sha256_lf": "dc234766fd71733959a3b24bcad3b9ab4585d002290e12bdc0c060c8168e70a0"
+    },
+    "Src/Orbiter/Star.h": {
+      "sha256_lf": "718ccaf669bb39b2c9f1b4b55a57fa463d3526198930d47fc97f6f0c58169ded",
+      "original_sha256_lf": "6062d9f3ed1e2ade4751228bd425af2e5c50ef4a755d44b8d7e98734fe69c5b6"
     },
     "Src/Orbiter/State.cpp": {
       "sha256_lf": "1c68a5584c4d69e2b749062ce8770adead2145547f5c03bcc2d044d75d719fbe",

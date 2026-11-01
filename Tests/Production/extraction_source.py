@@ -97,6 +97,14 @@ def verify():
         if canonical.rstrip(b'\n')!=original.split(b'protected:',1)[1].rstrip(b'\n'):
             raise ValueError('celestial numerical state layout changed beyond portable scalar/module handle spelling')
     mesh_records=ROOT/'Orbitersdk/include/OrbiterMeshData.h'
+    if 'Src/Orbiter/Star.cpp' in declared:
+        original=git('show',CAPTURE+':Src/Orbiter/Star.cpp').replace(b'\r\n',b'\n')
+        actual=(ROOT/'Src/Orbiter/Star.cpp').read_bytes().replace(b'\r\n',b'\n')
+        canonical=actual[actual.index(b'Star::Star (double'):].replace(
+            b'GetBodyServices().ConfigPath(fname)',b'g_pOrbiter->ConfigPath (fname)').replace(
+            b'GetCelestialServices().HasModule(*this) && GetCelestialServices().HasEphemeris(*this)',b'module && module->bEphemeris()')
+        if canonical!=original[original.index(b'Star::Star (double'):] :
+            raise ValueError('production Star behavior changed beyond host service substitutions')
     if mesh_records.exists():
         original=git('show', CAPTURE+':Orbitersdk/include/OrbiterAPI.h').replace(b'\r\n',b'\n')
         extracted=mesh_records.read_bytes().replace(b'\r\n',b'\n')

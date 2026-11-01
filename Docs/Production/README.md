@@ -45,7 +45,7 @@ may satisfy a production acceptance case.
 | --- | --- | --- |
 | Vecmat, elements, two-body RK4 | Verified restricted fixtures | Preserve frozen references unchanged |
 | Window/input/procedural view | POC only | Native production window, input and real graphics client |
-| Production world and session | Shared frame ordering, `Body`/`RigidBody`/`CelestialBody`, Pines gravity and scenario environment/focus metadata; world loading unavailable | Existing lifecycle, shared engine library and platform services |
+| Production world and session | Shared frame ordering, `Body`/`RigidBody`/`CelestialBody`/`Star`, Pines gravity and scenario environment/focus metadata; world loading unavailable | Existing lifecycle, shared engine library and platform services |
 | SPICE Solar System | Unsupported | Current `Src/Celbody/SPICE`, CSPICE, `orbiter.bsp`, TLS/PCK and coverage verification |
 | Native module ABI | Internal loader/bootstrap with SDK-build and toolchain checks; stock module APIs unavailable | Source-built vessels, celbodies, atmospheres, plugins; version/toolchain check |
 | Real stock meshes/materials/animations | Production CPU `Mesh`/`MeshManager`; world/animation integration unavailable | Existing CPU mesh data separated from D3D resources; actual group identities |
