@@ -7,6 +7,15 @@ Native interfaces use explicit production body, clock, configuration and indexed
 resource services. They contain no Win32 API emulation. Windows legacy module
 entry points, public SDK declarations and class layouts remain unchanged.
 
+Hosted native execution now passes Windows MSVC and Linux GCC x64 Debug and
+Release in [run 41291123424](https://github.com/dcajacob/orbiter-cross-platform/actions/runs/41291123424),
+source `b165fc21`. All four builds produce repeated traces byte-identical to
+the original Windows application reference. [Preserved evidence](Verification/provenance.json)
+retains compiler/build output, actual binary/module/data hashes and comparison
+reports; identical trace bytes refer to their existing frozen ZIP member.
+Verify this evidence offline with
+`python3 -B Tests/Production/SpiceModules/Verification/verify.py`.
+
 The original Windows reference was captured before modifying these sources,
 using the accepted application/SDK from source `2e8bbbf2`. Hosted run
 [41289480046](https://github.com/dcajacob/orbiter-cross-platform/actions/runs/41289480046)

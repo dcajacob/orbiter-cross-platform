@@ -13,7 +13,6 @@ set(common_src
 	Astro.cpp
 	Camera.cpp
 	cmdline.cpp
-	Config.cpp
 	console_ng.cpp
 	ElementApplication.cpp
 	elevmgr.cpp

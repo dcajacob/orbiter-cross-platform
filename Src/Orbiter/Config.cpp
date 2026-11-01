@@ -15,11 +15,11 @@
 #include <string.h>
 #include <stdio.h>
 #include "Config.h"
-#include "Astro.h"
+#include "OrbiterCelestialData.h"
+#include "Production/MapFlags.h"
+#ifdef _WIN32
 #include "Log.h"
-#include "VectorMap.h"
-#include "GraphicsAPI.h"
-#include "resource.h"
+#endif
 
 using namespace std;
 
@@ -273,13 +273,13 @@ CFG_WINDOWPOS CfgWindowPos_default = {
 
 // =============================================================
 
-ostream &operator<< (ostream &out, const RECT &r)
+ostream &operator<< (ostream &out, const orbiter::production::ConfigurationRectangle &r)
 {
 	out << r.left << ' ' << r.top << ' ' << r.right << ' ' << r.bottom;
 	return out;
 }
 
-bool operator!= (const RECT &r1, const RECT &r2)
+bool operator!= (const orbiter::production::ConfigurationRectangle &r1, const orbiter::production::ConfigurationRectangle &r2)
 {
 	return (r1.left != r2.left || r1.top != r2.top || r1.right != r2.right || r1.bottom != r2.bottom);
 }
@@ -301,7 +301,12 @@ char *readline (istream &is)
 	cbuf[0] = '\0';
 	int chunk = len;
 	for (;;) {
-		if (is.getline (c, chunk)) return cbuf;
+		if (is.getline (c, chunk)) {
+			// Match Windows text streams when reading stock CRLF files on POSIX.
+			const size_t length = strlen(cbuf);
+			if (length && cbuf[length-1] == '\r') cbuf[length-1] = '\0';
+			return cbuf;
+		}
 		else if (is.eof()) return 0;
 		else { // buffer too small
 			char *tmp = new char[len+inc];
@@ -343,7 +348,7 @@ bool GetItemVECTOR (istream &is, const char *label, VECTOR3 &val)
 int ListIndex (int listlen, char **list, char *label)
 {
 	for (int i = 0; i < listlen; i++)
-		if (!_stricmp (label, list[i])) return i;
+		if (!orbiter::production::CompareText (label, list[i])) return i;
 	return -1;
 }
 
@@ -370,7 +375,10 @@ bool Config::Load(const char *fname)
 	bool b;
 	char cbuf[256], tag[256];
 
-	Root = new char[strlen(fname)+1]; TRACENEW
+	Root = new char[strlen(fname)+1];
+#ifdef _WIN32
+	TRACENEW
+#endif
 	strcpy (Root, fname);
 
 	ifstream ifs (fname);
@@ -420,21 +428,21 @@ bool Config::Load(const char *fname)
 
 	// Device information
 	GetInt  (ifs, "DeviceIndex", CfgDevPrm.Device_idx);
-	if (GetInt (ifs, "ModeIndex", i)) CfgDevPrm.Device_mode = (DWORD)i;
-	if (GetInt(ifs, "OutputIndex", i)) CfgDevPrm.Device_out = (DWORD)i;
-	if (GetInt(ifs, "Style", i)) CfgDevPrm.Device_style = (DWORD)i;
+	if (GetInt (ifs, "ModeIndex", i)) CfgDevPrm.Device_mode = (orbiter::production::UInt32)i;
+	if (GetInt(ifs, "OutputIndex", i)) CfgDevPrm.Device_out = (orbiter::production::UInt32)i;
+	if (GetInt(ifs, "Style", i)) CfgDevPrm.Device_style = (orbiter::production::UInt32)i;
 	GetBool (ifs, "DeviceForceEnum", CfgDevPrm.bForceEnum);
 	GetBool (ifs, "Fullscreen", CfgDevPrm.bFullscreen);
 	GetBool (ifs, "Stereo", CfgDevPrm.bStereo);
 	GetBool (ifs, "NoVSync", CfgDevPrm.bNoVsync);
 	GetBool (ifs, "StencilBuffer", CfgDevPrm.bTryStencil);
 	GetBool (ifs, "FullscreenPageflip", CfgDevPrm.bPageflip);
-	if (GetInt (ifs, "WindowWidth", i))  CfgDevPrm.WinW = (DWORD)i;
-	if (GetInt (ifs, "WindowHeight", i)) CfgDevPrm.WinH = (DWORD)i;
+	if (GetInt (ifs, "WindowWidth", i))  CfgDevPrm.WinW = (orbiter::production::UInt32)i;
+	if (GetInt (ifs, "WindowHeight", i)) CfgDevPrm.WinH = (orbiter::production::UInt32)i;
 
 	// Joystick information
 	if (GetInt (ifs, "JoystickIndex", i))
-		CfgJoystickPrm.Joy_idx = (DWORD)i;
+		CfgJoystickPrm.Joy_idx = (orbiter::production::UInt32)i;
 	if (GetInt (ifs, "JoystickThrottleAxis", i))
 		CfgJoystickPrm.ThrottleAxis = max (0, min (3, i));
 	if (GetInt (ifs, "JoystickThrottleSaturation", i))
@@ -466,7 +474,7 @@ bool Config::Load(const char *fname)
 
 	// map dialog parameters
 	if (GetInt (ifs, "MapDlgFlag", i))
-		CfgMapPrm.DispFlag = (DWORD)i;
+		CfgMapPrm.DispFlag = (orbiter::production::UInt32)i;
 
 	// Logical parameters
 	GetBool (ifs, "StartPaused", CfgLogicPrm.bStartPaused);
@@ -546,9 +554,9 @@ bool Config::Load(const char *fname)
 	GetBool (ifs, "EnableParticleStreams", CfgVisualPrm.bParticleStreams);
 	GetBool (ifs, "EnableLocalLights", CfgVisualPrm.bLocalLight);
 	if (GetInt (ifs, "MaxLights", i))
-		CfgVisualPrm.MaxLight = (DWORD)i;
+		CfgVisualPrm.MaxLight = (orbiter::production::UInt32)i;
 	if (GetInt (ifs, "AmbientLevel", i))
-		SetAmbientLevel ((DWORD)i);
+		SetAmbientLevel ((orbiter::production::UInt32)i);
 	if (GetInt (ifs, "PlanetMaxPatchLevel", i))
 		CfgVisualPrm.PlanetMaxLevel = max (1, min (SURF_MAX_PATCHLEVEL2, i));
 	if (GetReal (ifs, "PlanetPatchRes", d))
@@ -589,9 +597,9 @@ bool Config::Load(const char *fname)
 
 	// visual helper parameters
 	if (GetInt (ifs, "Planetarium", i))
-		CfgVisHelpPrm.flagPlanetarium = (DWORD)i;
+		CfgVisHelpPrm.flagPlanetarium = (orbiter::production::UInt32)i;
 	if (GetInt(ifs, "SurfMarkers", i))
-		CfgVisHelpPrm.flagMarkers = (DWORD)i;
+		CfgVisHelpPrm.flagMarkers = (orbiter::production::UInt32)i;
 	if (GetString (ifs, "Bodyforces", cbuf))
 		sscanf (cbuf, "%u%f%f", &CfgVisHelpPrm.flagBodyForce, &CfgVisHelpPrm.scaleBodyForce, &CfgVisHelpPrm.opacBodyForce);
 	if (GetString (ifs, "CoordinateAxes", cbuf))
@@ -616,9 +624,9 @@ bool Config::Load(const char *fname)
 
 	// user interface parameters
 	if (GetInt(ifs, "MouseFocusMode", i) && i >= 0 && i <= 2)
-		CfgUIPrm.MouseFocusMode = (DWORD)i;
+		CfgUIPrm.MouseFocusMode = (orbiter::production::UInt32)i;
 	if (GetInt (ifs, "MenubarMode", i) && i >= 0 && i <= 2)
-		CfgUIPrm.MenuMode = (DWORD)i;
+		CfgUIPrm.MenuMode = (orbiter::production::UInt32)i;
 	GetBool (ifs, "MenubarLabelAlways", CfgUIPrm.bMenuLabelAlways);
 	if (GetInt (ifs, "MenuButtonHoverSize", i))
 		CfgUIPrm.MenuButtonHoverSize = i;
@@ -634,9 +642,9 @@ bool Config::Load(const char *fname)
 	if (GetInt (ifs, "MenubarOpacity", i) && i >= 0 && i <= 10)
 		CfgUIPrm.MenuOpacity = i;
 	if (GetInt (ifs, "InfobarOpacity", i) && i >= 0 && i <= 10)
-		CfgUIPrm.InfoOpacity = (DWORD)i;
+		CfgUIPrm.InfoOpacity = (orbiter::production::UInt32)i;
 	if (GetInt (ifs, "MenubarSpeed", i) && i >= 1 && i <= 20)
-		CfgUIPrm.MenuScrollspeed = (DWORD)i;
+		CfgUIPrm.MenuScrollspeed = (orbiter::production::UInt32)i;
 	GetInt (ifs, "SelVesselTab", CfgUIPrm.SelVesselTab);
 	GetInt (ifs, "SelVesselRange", CfgUIPrm.SelVesselRange);
 	GetBool (ifs, "SelVesselFlat", CfgUIPrm.bSelVesselFlat);
@@ -702,7 +710,7 @@ bool Config::Load(const char *fname)
 	// list of active modules
 	if (FindLine (ifs, "ACTIVE_MODULES")) {
 		char cbuf[256];
-		while (ifs.getline (cbuf, 256) && _strnicmp (cbuf, "END_MODULES", 11))
+		while (ifs.getline (cbuf, 256) && orbiter::production::ComparePrefix (cbuf, "END_MODULES", 11))
 			m_activeModules.push_back(std::string(trim_string(cbuf)));
 	}
 	return true;
@@ -736,12 +744,15 @@ void Config::SetDefaults ()
 	Root = 0;
 
 	bEchoAll = bEchoAll_default;
-	memset (&rLaunchpad, 0, sizeof(RECT));
+	memset (&rLaunchpad, 0, sizeof(orbiter::production::ConfigurationRectangle));
 
-	RECT r;
+#ifdef _WIN32
+	orbiter::production::ConfigurationRectangle r;
 	GetWindowRect (GetDesktopWindow(), &r);
 	CfgDevPrm_default.WinW = r.right-r.left; CfgDevPrm_default.WinH = r.bottom-r.top;
 	// use the screen size as the default render window size
+#endif
+	// Native window selection supplies monitor dimensions in its window adapter.
 
 	AmbientColour = 0x0c0c0c0c;
 
@@ -772,7 +783,7 @@ void Config::SetDefaults_Capture ()
 	CfgCapturePrm = CfgCapturePrm_default;       // screen capture parameters
 }
 
-const void *Config::GetParam (DWORD paramtype) const
+const void *Config::GetParam (orbiter::production::UInt32 paramtype) const
 {
 	switch (paramtype) {
 	case CFGPRM_SURFACEMAXLEVEL:
@@ -852,14 +863,14 @@ const void *Config::GetParam (DWORD paramtype) const
 	}
 }
 
-BOOL Config::Write (const char *fname) const
+orbiter::production::ConfigurationWriteResult Config::Write (const char *fname) const
 {
 	int i;
 
 	if (!fname) fname = Root;
-	if (!fname) return FALSE;
+	if (!fname) return 0;
 	ofstream ofs (fname);
-	if (!ofs) return FALSE;
+	if (!ofs) return 0;
 
 	ofs << "; === ORBITER Master Configuration File ===\n";
 	ofs << "EchoAllParams = " << BoolStr (bEchoAll) << '\n';
@@ -1289,7 +1300,7 @@ BOOL Config::Write (const char *fname) const
 		ofs << "END_MODULES" << endl;
 	}
 	ofs << flush;
-	return TRUE;
+	return 1;
 }
 
 char *Config::ConfigPath (const char *name) const
@@ -1389,6 +1400,8 @@ bool Config::GetString (istream &is, const char *category, char *val)
 	// cut comments
 	for (i = 0; cbuf[i] && cbuf[i] != ';'; i++);
 	cbuf[i] = '\0';
+	// Windows text streams remove CR; POSIX text streams retain it.
+	if (i && cbuf[i-1] == '\r') cbuf[i-1] = '\0';
 
 	// find value
 	for (i = 0; cbuf[i] && cbuf[i] != '='; i++);
@@ -1420,8 +1433,8 @@ bool Config::GetSize (istream& is, const char* category, size_t& val)
 bool Config::GetBool (istream &is, const char *category, bool &val)
 {
 	if (!GetString (is, category, g_cbuf)) return false;
-	if (!_strnicmp (g_cbuf, "true", 4)) { val = true; return true; }
-	else if (!_strnicmp (g_cbuf, "false", 5)) { val = false; return true; }
+	if (!orbiter::production::ComparePrefix (g_cbuf, "true", 4)) { val = true; return true; }
+	else if (!orbiter::production::ComparePrefix (g_cbuf, "false", 5)) { val = false; return true; }
 	return false;
 }
 

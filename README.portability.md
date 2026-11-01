@@ -6,8 +6,10 @@ and screenshots remain preserved; they do not establish production engine,
 stock asset, graphics-plugin, cockpit or playable Orbiter support.
 
 The [production release work](Docs/Production/README.md) now has separate scope,
-capabilities and gates. The current work is Phase 0–1: frozen production inputs
-and native Windows WGL/reference capture, before production extraction.
+capabilities and gates. The real Windows OpenGL client passes its production
+scene gate. Current work is Phase 3: extracting the production engine for native
+Linux. Shared production classes and native SPICE/atmosphere modules pass their
+component checks; a native production world and textured client are still pending.
 
 **Milestone complete (2026-10-31): native headless Windows/Linux parity is
 verified.** The command-line runner advances the supported unpowered vessel for

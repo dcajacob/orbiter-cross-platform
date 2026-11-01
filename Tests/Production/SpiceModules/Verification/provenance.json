@@ -1,0 +1,265 @@
+{
+  "schema": 1,
+  "status": "passed",
+  "scope": "actual native production celestial modules; no native world or renderer",
+  "source": "b165fc21a036aa6bde2343c35ac9ca7992441a82",
+  "run_id": 41291123424,
+  "run_url": "https://github.com/dcajacob/orbiter-cross-platform/actions/runs/41291123424",
+  "artifacts": [
+    {
+      "name": "native-spice-ubuntu-24.04-Debug-x64",
+      "id": 13077611696,
+      "original_sha256": "sha256:4cc928f1b00d7b0dcfd9cd2908903a0b0cb4a36d2acf1c4fb0bd1c11543c59fd",
+      "original_bytes": 2618658,
+      "file": "native-spice-ubuntu-24.04-Debug-x64.zip",
+      "sha256": "95b4dd384f9855e2506dd7535c9607e51fe9b012efd31cdd05edcebcf3428564",
+      "members": [
+        {
+          "path": "out/spice-native/CMakeCache.txt",
+          "sha256": "07f5fbbf85f22c06fd6a95790bf0f8e524426ddbbde5588c9112d18c06ddd6d7",
+          "bytes": 16659
+        },
+        {
+          "path": "out/spice-observation/run-1.log",
+          "sha256": "e391eff9d988baaea8754b7aede01b20dfc31876b39be40073f5e2e74869f1ce",
+          "bytes": 10515
+        },
+        {
+          "path": "out/spice-observation/comparison.json",
+          "sha256": "d12b4eb9fb9cc42b75f923bcbbe811e0846809d88d27b491af32179e8b5b1f8c",
+          "bytes": 4110
+        },
+        {
+          "path": "out/spice-observation/run-2.log",
+          "sha256": "e391eff9d988baaea8754b7aede01b20dfc31876b39be40073f5e2e74869f1ce",
+          "bytes": 10515
+        },
+        {
+          "path": "out/spice-observation/trace-1.csv",
+          "sha256": "684b0381f0ec2cc2eb24a4b4494e40b4e96ee018eaaf23111e23743a43776e26",
+          "bytes": 4233622,
+          "storage": {
+            "kind": "existing_zip_member",
+            "archive": "Tests/Production/SpiceModules/Reference/windows-debug.zip",
+            "member": "out/spice-observation/trace-1.csv"
+          }
+        },
+        {
+          "path": "spice-build.log",
+          "sha256": "f1cc60c7186dd3f1bcfd815326cd2eec178729264056b82a3244b31299f21dcd",
+          "bytes": 20858
+        },
+        {
+          "path": "out/spice-observation/trace-2.csv",
+          "sha256": "684b0381f0ec2cc2eb24a4b4494e40b4e96ee018eaaf23111e23743a43776e26",
+          "bytes": 4233622,
+          "storage": {
+            "kind": "existing_zip_member",
+            "archive": "Tests/Production/SpiceModules/Reference/windows-debug.zip",
+            "member": "out/spice-observation/trace-1.csv"
+          }
+        },
+        {
+          "path": "spice-configure.log",
+          "sha256": "cada27eb53c16bb04074f5b27662272987771d5dd857b058c2954fca983373bc",
+          "bytes": 669
+        }
+      ]
+    },
+    {
+      "name": "native-spice-ubuntu-24.04-Release-x64",
+      "id": 13077357404,
+      "original_sha256": "sha256:0959882c87ffcad83121bbb67e09268a5263d77d987d8e7776d1e6357de7375d",
+      "original_bytes": 2618862,
+      "file": "native-spice-ubuntu-24.04-Release-x64.zip",
+      "sha256": "a98f47589413eafa6151e817a6fc8548aaecb1fb7b4c3ba8d90b214bfc6e9f6b",
+      "members": [
+        {
+          "path": "out/spice-native/CMakeCache.txt",
+          "sha256": "ae3396706b9cda1b563cd1335c156ca8898d4afe9e1d19b1144d8b3ad1ae2fc7",
+          "bytes": 16661
+        },
+        {
+          "path": "out/spice-observation/comparison.json",
+          "sha256": "fdc32dfec68349ce914b4b4cd91558c569fefed05ec8695d7d1e7b41fb02a462",
+          "bytes": 4112
+        },
+        {
+          "path": "out/spice-observation/run-1.log",
+          "sha256": "e391eff9d988baaea8754b7aede01b20dfc31876b39be40073f5e2e74869f1ce",
+          "bytes": 10515
+        },
+        {
+          "path": "out/spice-observation/run-2.log",
+          "sha256": "e391eff9d988baaea8754b7aede01b20dfc31876b39be40073f5e2e74869f1ce",
+          "bytes": 10515
+        },
+        {
+          "path": "out/spice-observation/trace-1.csv",
+          "sha256": "684b0381f0ec2cc2eb24a4b4494e40b4e96ee018eaaf23111e23743a43776e26",
+          "bytes": 4233622,
+          "storage": {
+            "kind": "existing_zip_member",
+            "archive": "Tests/Production/SpiceModules/Reference/windows-debug.zip",
+            "member": "out/spice-observation/trace-1.csv"
+          }
+        },
+        {
+          "path": "out/spice-observation/trace-2.csv",
+          "sha256": "684b0381f0ec2cc2eb24a4b4494e40b4e96ee018eaaf23111e23743a43776e26",
+          "bytes": 4233622,
+          "storage": {
+            "kind": "existing_zip_member",
+            "archive": "Tests/Production/SpiceModules/Reference/windows-debug.zip",
+            "member": "out/spice-observation/trace-1.csv"
+          }
+        },
+        {
+          "path": "spice-build.log",
+          "sha256": "1e7374f5d307ea1694ed44ecb4d04c82fe1e23b8e40f3e931d52fb038e1e3501",
+          "bytes": 29859
+        },
+        {
+          "path": "spice-configure.log",
+          "sha256": "843b362139d4c1e15941b99bfb5c3c5ae570f49d42d35f12a2be886bb712e0e6",
+          "bytes": 669
+        }
+      ]
+    },
+    {
+      "name": "native-spice-windows-2022-Debug-x64",
+      "id": 13076934678,
+      "original_sha256": "sha256:09e0b07ec51676e1242d4bef63ba1ce9098182a3f755d3ea030e0984d4752459",
+      "original_bytes": 2618669,
+      "file": "native-spice-windows-2022-Debug-x64.zip",
+      "sha256": "9e13506dc593df600cddf313bb1c69862ff8eccab82f051caada61a76155e665",
+      "members": [
+        {
+          "path": "out/spice-native/CMakeCache.txt",
+          "sha256": "22dbca4302fb59fc9f768e7eb7cfac6c0381ceb1e8f00842e76c9715d9b65054",
+          "bytes": 21372
+        },
+        {
+          "path": "out/spice-observation/comparison.json",
+          "sha256": "e37b0390599ea14708652818b36675d46a375917d2d116ac7da9ba80f56b883f",
+          "bytes": 4159
+        },
+        {
+          "path": "out/spice-observation/run-1.log",
+          "sha256": "4d0522889edb2bef07f76aa1ce1f2c4c154f0bbb96c30e7ed1e5c7c3bbbbca75",
+          "bytes": 10025
+        },
+        {
+          "path": "out/spice-observation/run-2.log",
+          "sha256": "4d0522889edb2bef07f76aa1ce1f2c4c154f0bbb96c30e7ed1e5c7c3bbbbca75",
+          "bytes": 10025
+        },
+        {
+          "path": "out/spice-observation/trace-1.csv",
+          "sha256": "684b0381f0ec2cc2eb24a4b4494e40b4e96ee018eaaf23111e23743a43776e26",
+          "bytes": 4233622,
+          "storage": {
+            "kind": "existing_zip_member",
+            "archive": "Tests/Production/SpiceModules/Reference/windows-debug.zip",
+            "member": "out/spice-observation/trace-1.csv"
+          }
+        },
+        {
+          "path": "out/spice-observation/trace-2.csv",
+          "sha256": "684b0381f0ec2cc2eb24a4b4494e40b4e96ee018eaaf23111e23743a43776e26",
+          "bytes": 4233622,
+          "storage": {
+            "kind": "existing_zip_member",
+            "archive": "Tests/Production/SpiceModules/Reference/windows-debug.zip",
+            "member": "out/spice-observation/trace-1.csv"
+          }
+        },
+        {
+          "path": "spice-build.log",
+          "sha256": "fb8b2eccdf6500c61e743141d183b91f311ec480c53544c56952c109c5f148ee",
+          "bytes": 6234
+        },
+        {
+          "path": "spice-configure.log",
+          "sha256": "11a5ecc7c9a3e8b409492fb142683c724a6f14bcdfde31b089ac121224af536e",
+          "bytes": 2074
+        }
+      ]
+    },
+    {
+      "name": "native-spice-parity",
+      "id": 13076798539,
+      "original_sha256": "sha256:2ce81bd8b7f7f3054ecbed8c1a0f155d043b7580aee3ca8dadccb2bdc27d04dd",
+      "original_bytes": 546,
+      "file": "native-spice-parity.zip",
+      "sha256": "0648f6bffebe6b68608f372b1110545c4c75973de981f84d5d36a52938ed9be3",
+      "members": [
+        {
+          "path": "native-spice-parity.json",
+          "sha256": "fd65cf7ea98fe2622de19c26d472ef6125cb73e20e5df9532d79dbed8f747cd0",
+          "bytes": 1513
+        }
+      ]
+    },
+    {
+      "name": "native-spice-windows-2022-Release-x64",
+      "id": 13076618771,
+      "original_sha256": "sha256:adca7c976d139f013ca4fb9f16c9e5b4c418f416d4323b886a1112b79537b9d4",
+      "original_bytes": 2618660,
+      "file": "native-spice-windows-2022-Release-x64.zip",
+      "sha256": "d1da318e9cfb7bf17e338ba45616757023bd21e81f88c54dfaba795cbd6e097f",
+      "members": [
+        {
+          "path": "out/spice-native/CMakeCache.txt",
+          "sha256": "e2ab0710153a7661628375b78a866fce1e1ce9fb128b682ff327486e3849d16e",
+          "bytes": 21374
+        },
+        {
+          "path": "out/spice-observation/comparison.json",
+          "sha256": "e9e52bfea300630e41467aa2fc6c8ba1f09162215afd4fefe8538940b19fd342",
+          "bytes": 4161
+        },
+        {
+          "path": "out/spice-observation/run-1.log",
+          "sha256": "4d0522889edb2bef07f76aa1ce1f2c4c154f0bbb96c30e7ed1e5c7c3bbbbca75",
+          "bytes": 10025
+        },
+        {
+          "path": "out/spice-observation/run-2.log",
+          "sha256": "4d0522889edb2bef07f76aa1ce1f2c4c154f0bbb96c30e7ed1e5c7c3bbbbca75",
+          "bytes": 10025
+        },
+        {
+          "path": "out/spice-observation/trace-1.csv",
+          "sha256": "684b0381f0ec2cc2eb24a4b4494e40b4e96ee018eaaf23111e23743a43776e26",
+          "bytes": 4233622,
+          "storage": {
+            "kind": "existing_zip_member",
+            "archive": "Tests/Production/SpiceModules/Reference/windows-debug.zip",
+            "member": "out/spice-observation/trace-1.csv"
+          }
+        },
+        {
+          "path": "out/spice-observation/trace-2.csv",
+          "sha256": "684b0381f0ec2cc2eb24a4b4494e40b4e96ee018eaaf23111e23743a43776e26",
+          "bytes": 4233622,
+          "storage": {
+            "kind": "existing_zip_member",
+            "archive": "Tests/Production/SpiceModules/Reference/windows-debug.zip",
+            "member": "out/spice-observation/trace-1.csv"
+          }
+        },
+        {
+          "path": "spice-build.log",
+          "sha256": "ff9539d2793b382cd031898e7d3b97d938e71ebc326cb0796eeab43d67e3ce82",
+          "bytes": 6233
+        },
+        {
+          "path": "spice-configure.log",
+          "sha256": "7f38b36615981fe1e183f35b71175b32d9263923c18b1bca0330ec3802244332",
+          "bytes": 2074
+        }
+      ]
+    }
+  ]
+}

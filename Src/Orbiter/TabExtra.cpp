@@ -364,7 +364,6 @@ void ExtraDynamics::InitDialog (HWND hWnd)
 
 void ExtraDynamics::ResetDialog (HWND hWnd)
 {
-	extern CFG_PHYSICSPRM CfgPhysicsPrm_default;
 	SetDialog (hWnd, CfgPhysicsPrm_default);
 }
 
@@ -584,7 +583,6 @@ void ExtraAngDynamics::InitDialog (HWND hWnd)
 
 void ExtraAngDynamics::ResetDialog (HWND hWnd)
 {
-	extern CFG_PHYSICSPRM CfgPhysicsPrm_default;
 	SetDialog (hWnd, CfgPhysicsPrm_default);
 }
 
@@ -783,7 +781,6 @@ void ExtraStabilisation::InitDialog (HWND hWnd)
 
 void ExtraStabilisation::ResetDialog (HWND hWnd)
 {
-	extern CFG_PHYSICSPRM CfgPhysicsPrm_default;
 	SetDialog (hWnd, CfgPhysicsPrm_default);
 }
 
@@ -930,7 +927,6 @@ void ExtraMfdConfig::InitDialog (HWND hWnd)
 
 void ExtraMfdConfig::ResetDialog (HWND hWnd)
 {
-	extern CFG_INSTRUMENTPRM CfgInstrumentPrm_default;
 	SetDialog (hWnd, CfgInstrumentPrm_default);
 }
 
@@ -1085,7 +1081,6 @@ void ExtraShutdown::InitDialog (HWND hWnd)
 
 void ExtraShutdown::ResetDialog (HWND hWnd)
 {
-	extern CFG_DEBUGPRM CfgDebugPrm_default;
 	SetDialog (hWnd, CfgDebugPrm_default);
 }
 
@@ -1162,7 +1157,6 @@ void ExtraFixedStep::InitDialog (HWND hWnd)
 
 void ExtraFixedStep::ResetDialog (HWND hWnd)
 {
-	extern CFG_DEBUGPRM CfgDebugPrm_default;
 	SetDialog (hWnd, CfgDebugPrm_default);
 }
 
@@ -1276,7 +1270,6 @@ void ExtraRenderingOptions::InitDialog (HWND hWnd)
 
 void ExtraRenderingOptions::ResetDialog (HWND hWnd)
 {
-	extern CFG_DEBUGPRM CfgDebugPrm_default;
 	SetDialog (hWnd, CfgDebugPrm_default);
 }
 
@@ -1345,7 +1338,6 @@ void ExtraPerformanceSettings::InitDialog (HWND hWnd)
 
 void ExtraPerformanceSettings::ResetDialog (HWND hWnd)
 {
-	extern CFG_DEBUGPRM CfgDebugPrm_default;
 	SetDialog (hWnd, CfgDebugPrm_default);
 }
 
@@ -1425,7 +1417,6 @@ void ExtraLaunchpadOptions::InitDialog (HWND hWnd)
 
 void ExtraLaunchpadOptions::ResetDialog (HWND hWnd)
 {
-	extern CFG_DEBUGPRM CfgDebugPrm_default;
 	SetDialog (hWnd, CfgDebugPrm_default);
 }
 
@@ -1506,7 +1497,6 @@ void ExtraLogfileOptions::InitDialog (HWND hWnd)
 
 void ExtraLogfileOptions::ResetDialog (HWND hWnd)
 {
-	extern CFG_DEBUGPRM CfgDebugPrm_default;
 	SetDialog (hWnd, CfgDebugPrm_default);
 }
 

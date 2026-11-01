@@ -10,13 +10,17 @@
 #ifndef __CONFIG_H
 #define __CONFIG_H
 
-//#include <d3d.h>
-#include <windows.h>
+#include "Production/ConfigurationTypes.h"
+#include "Production/Export.h"
+#include "Production/Text.h"
+#include <algorithm>
+#include <cstring>
 #include "Vecmat.h"
 #include <iostream>
 #include <fstream>
 #include <list>
-#include "GraphicsAPI.h"
+#include "OrbiterVisualData.h"
+#include "OrbiterVector.h"
 
 #include "PhysicsConfig.h"
 
@@ -73,9 +77,9 @@ struct CFG_VISUALPRM {
 	bool   bReentryFlames;		// render reentry flames?
 	bool   bParticleStreams;	// render particle streams? (exhaust, contrails, etc.)
 	bool   bLocalLight;			// enable local light sources?
-	DWORD  MaxLight;			// max number of light sources
-	DWORD  AmbientLevel;		// ambient light level (0-255)
-	DWORD  PlanetMaxLevel;		// max. planet patch resolution level
+	orbiter::production::UInt32  MaxLight;			// max number of light sources
+	orbiter::production::UInt32  AmbientLevel;		// ambient light level (0-255)
+	orbiter::production::UInt32  PlanetMaxLevel;		// max. planet patch resolution level
 	double PlanetPatchRes;		// resolution scaling for planet patches
 	double LightBrightness;		// brightness of planetary night lights
 	bool   bUseStarDots;        // render stars as pixels?
@@ -146,11 +150,11 @@ struct CFG_PLANETRENDERPRM {
 	int    PatchRes;            // power n of surface patch mesh resolution 2<<n [n=4,5]
 	int    LoadFrequency;       // tile load frequency
 	int    AnisoMode;
-	DWORD  TileLoadFlags;       // flags for planetary tile load mechanism
+	orbiter::production::UInt32  TileLoadFlags;       // flags for planetary tile load mechanism
 };
 
 struct CFG_MAPPRM {
-	DWORD DispFlag;
+	orbiter::production::UInt32 DispFlag;
 };
 
 struct CFG_RECPLAYPRM {
@@ -167,23 +171,23 @@ struct CFG_RECPLAYPRM {
 
 struct CFG_DEVPRM {
 	int    Device_idx;			// index of default device
-	DWORD  Device_mode;			// index of default fullscreen mode
-	DWORD  Device_out;			// device output
-	DWORD  Device_style;		// Rendering layout
+	orbiter::production::UInt32  Device_mode;			// index of default fullscreen mode
+	orbiter::production::UInt32  Device_out;			// device output
+	orbiter::production::UInt32  Device_style;		// Rendering layout
 	bool   bForceEnum;			// force enumeration, bypass device.dat
 	bool   bFullscreen;			// use window mode
 	bool   bStereo;				// use stereo mode
 	bool   bNoVsync;			// no vertical sync (fullscreen only)
 	bool   bTryStencil;			// try stencil buffers when available
 	bool   bPageflip;			// allow page flipping in fullscreen mode (disabling can fix flicker problem)
-	DWORD  WinW;				// window width (pixel) for windowed mode
-	DWORD  WinH;				// window height (pixel) for windowed mode
+	orbiter::production::UInt32  WinW;				// window width (pixel) for windowed mode
+	orbiter::production::UInt32  WinH;				// window height (pixel) for windowed mode
 };
 
 struct CFG_JOYSTICKPRM {
-	DWORD  Joy_idx;				// joystick device index (0=disabled)
+	orbiter::production::UInt32  Joy_idx;				// joystick device index (0=disabled)
 	int    Deadzone;			// central deadzone range for all axes (0-10000)
-	DWORD  ThrottleAxis;		// joystick throttle axis (0=none, 1=z-axis, 2=slider 0, 3=slider 1)
+	orbiter::production::UInt32  ThrottleAxis;		// joystick throttle axis (0=none, 1=z-axis, 2=slider 0, 3=slider 1)
 	int    ThrottleSaturation;	// saturation level for joystick throttle control (0-10000)
 	bool   bThrottleIgnore;		// ignore joystick throttle setting on start
 };
@@ -218,10 +222,10 @@ struct CFG_FONTPRM {
 	float  dlgFont_Scale;		            // font scaling factor
 	char   dlgFont1_Face[64];	            // dialog font face name
 	float  ImGui_FontSize;		            // Font size for ImGui dialogs
-	char   ImGui_DefaultFontFile[MAX_PATH];	    // Font file for ImGui default font
-	char   ImGui_ConsoleFontFile[MAX_PATH];	    // Font file for ImGui default font
-	char   ImGui_MonospacedFontFile[MAX_PATH];  // Font file for ImGui default font
-	char   ImGui_ManuscriptFontFile[MAX_PATH];  // Font file for ImGui default font
+	char   ImGui_DefaultFontFile[orbiter::production::ConfigurationFontPathCapacity];	    // Font file for ImGui default font
+	char   ImGui_ConsoleFontFile[orbiter::production::ConfigurationFontPathCapacity];	    // Font file for ImGui default font
+	char   ImGui_MonospacedFontFile[orbiter::production::ConfigurationFontPathCapacity];  // Font file for ImGui default font
+	char   ImGui_ManuscriptFontFile[orbiter::production::ConfigurationFontPathCapacity];  // Font file for ImGui default font
 };
 
 struct CFG_CAMERAPRM {
@@ -231,13 +235,13 @@ struct CFG_CAMERAPRM {
 };
 
 struct CFG_WINDOWPOS {
-	RECT DlgMap;                // map window position
-	RECT DlgInfo;               // info window position
-	RECT DlgCamera;             // camera dialog position
-	RECT DlgFocus;				// focus dialog position
-	RECT DlgTacc;               // time acceleration dialog position
-	RECT DlgOptions;            // options dialog position
-	RECT DlgVishelper;          // visual helper dialog position
+	orbiter::production::ConfigurationRectangle DlgMap;                // map window position
+	orbiter::production::ConfigurationRectangle DlgInfo;               // info window position
+	orbiter::production::ConfigurationRectangle DlgCamera;             // camera dialog position
+	orbiter::production::ConfigurationRectangle DlgFocus;				// focus dialog position
+	orbiter::production::ConfigurationRectangle DlgTacc;               // time acceleration dialog position
+	orbiter::production::ConfigurationRectangle DlgOptions;            // options dialog position
+	orbiter::production::ConfigurationRectangle DlgVishelper;          // visual helper dialog position
 	int LaunchpadScnListWidth;  // width of Launchpad scenario list
 	int LaunchpadModListWidth;  // width of Launchpad modules list
 	int LaunchpadExtListWidth;  // width of Launchpad extras list
@@ -291,19 +295,19 @@ int ListIndex      (int listlen, char **list, char *label);
 
 inline int StrComp (const char *str1, const char *str2, bool ignorecase)
 {
-	if (ignorecase) return _stricmp (str1, str2);
+	if (ignorecase) return orbiter::production::CompareText (str1, str2);
 	else            return strcmp (str1, str2);
 }
 
 inline int StrNComp (const char *str1, const char *str2, int n, bool ignorecase)
 {
-	if (ignorecase) return _strnicmp (str1, str2, n);
+	if (ignorecase) return orbiter::production::ComparePrefix (str1, str2, n);
 	else            return strncmp (str1, str2, n);
 }
 
 // =============================================================
 
-class Config {
+class ORBITER_PRODUCTION_API Config {
 public:
 	Config ();
 
@@ -311,6 +315,8 @@ public:
 	// construct from defaults in file "fname"
 
 	~Config ();
+	Config(const Config&) = delete;
+	Config& operator=(const Config&) = delete;
 
 	void SetDefaults ();
 	void SetDefaults_Capture ();
@@ -319,7 +325,7 @@ public:
 
 	bool Load(const char* fname);
 
-	BOOL Write (const char *fname = 0) const;
+	orbiter::production::ConfigurationWriteResult Write (const char *fname = 0) const;
 	// write config parameters to file "fname"
 	// returns FALSE if write fails
 
@@ -346,13 +352,13 @@ public:
 	// fill cbuf with the complete path for file name.ext in the planetary texture directory
 
 	bool bEchoAll;          // echo all configuration parameters (or only non-default ones)?
-	RECT rLaunchpad;        // launchpad dialog position
+	orbiter::production::ConfigurationRectangle rLaunchpad;        // launchpad dialog position
 
 	// directory information
 	char *Root;             // master config file
 
 	// visual parameters
-	DWORD AmbientColour;         // RGBA value of ambient component
+	orbiter::production::UInt32 AmbientColour;         // RGBA value of ambient component
 
 	CFG_DIRPRM CfgDirPrm;				// subdirectory list
 	CFG_PHYSICSPRM CfgPhysicsPrm;		// physics engine parameters
@@ -396,10 +402,10 @@ public:
 	 */
 	void DelActiveModule (const std::string& name);
 
-	inline void SetAmbientLevel (DWORD lvl)
-	{ AmbientColour = (CfgVisualPrm.AmbientLevel = std::min (lvl, (DWORD)0xff)) * 0x01010101; }
+	inline void SetAmbientLevel (orbiter::production::UInt32 lvl)
+	{ AmbientColour = (CfgVisualPrm.AmbientLevel = std::min (lvl, (orbiter::production::UInt32)0xff)) * 0x01010101; }
 
-	const void *GetParam (DWORD paramtype) const;
+	const void *GetParam (orbiter::production::UInt32 paramtype) const;
 	// return a specific parameter setting (paramtype defined in GraphicsAPI.h)
 
 	// Read items from master config
@@ -429,5 +435,10 @@ private:
 
 	std::list<std::string> m_activeModules; ///< list of active modules
 };
+
+// Defaults used by the existing Windows settings dialogs.
+extern ORBITER_PRODUCTION_API CFG_PHYSICSPRM CfgPhysicsPrm_default;
+extern ORBITER_PRODUCTION_API CFG_INSTRUMENTPRM CfgInstrumentPrm_default;
+extern ORBITER_PRODUCTION_API CFG_DEBUGPRM CfgDebugPrm_default;
 
 #endif // !__CONFIG_H

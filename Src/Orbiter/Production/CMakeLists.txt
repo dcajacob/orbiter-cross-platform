@@ -28,7 +28,7 @@ endif()
 add_library(orbiter_production_boundary SHARED
     Session.cpp WorldOwner.cpp NativeModule.cpp NativeCelestialApi.cpp NativeCelestialServices.cpp ResourceResolver.cpp MeshData.cpp MeshServices.cpp BodyServices.cpp RigidBodyServices.cpp CelestialServices.cpp ScenarioColor.cpp
     ../Body.cpp ../Rigidbody.cpp ../BodyIntegrator.cpp ../Element.cpp
-    ../Vecmat.cpp ../TimeData.cpp ../ConfigFile.cpp ../Mesh.cpp ../State.cpp
+    ../Vecmat.cpp ../TimeData.cpp ../Config.cpp ../ConfigFile.cpp ../Mesh.cpp ../State.cpp
     ../PinesGrav.cpp ../PinesGravFile.cpp ../Celbody.cpp ../CelbodyFile.cpp ../ElementFile.cpp ../Star.cpp ../ZTreeMgr.cpp)
 target_compile_features(orbiter_production_boundary PUBLIC cxx_std_17)
 target_compile_definitions(orbiter_production_boundary
@@ -38,6 +38,10 @@ target_include_directories(orbiter_production_boundary PUBLIC "${CMAKE_CURRENT_S
 set_target_properties(orbiter_production_boundary PROPERTIES
     CXX_EXTENSIONS OFF FOLDER Core WINDOWS_EXPORT_ALL_SYMBOLS ON)
 target_link_libraries(orbiter_production_boundary PRIVATE ${CMAKE_DL_LIBS})
+if(WIN32)
+    target_compile_definitions(orbiter_production_boundary PRIVATE NOMINMAX)
+    target_link_libraries(orbiter_production_boundary PRIVATE user32)
+endif()
 target_link_libraries(orbiter_production_boundary PRIVATE ${_archive_zlib})
 target_include_directories(orbiter_production_boundary PRIVATE ${_archive_zlib_includes})
 

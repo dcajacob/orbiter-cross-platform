@@ -14,5 +14,11 @@ inline int ComparePrefix(const char* a, const char* b, std::size_t count)
     return 0;
 }
 
+inline int CompareText(const char* a, const char* b)
+{
+    std::size_t count = 0;
+    while (a[count] && b[count]) ++count;
+    return ComparePrefix(a, b, count + 1);
+}
 }
 #endif

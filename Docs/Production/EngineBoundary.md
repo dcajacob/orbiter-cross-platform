@@ -150,9 +150,25 @@ SPICE kernel pool and unloads modules in that order.
 The [direct-module verification](../../Tests/Production/SpiceModules/README.md)
 uses a separately frozen pre-port Windows application reference. All 41 native
 module instances match its 25,092 samples exactly in local Debug/Release and
-strict sanitizer runs. These tests construct actual production celestial bodies,
+strict sanitizer runs. Hosted Windows/Linux Debug/Release executions at
+`b165fc21` also produce traces byte-identical to the original Windows reference.
+Their logs, metadata and comparisons are [preserved and independently verifiable](../../Tests/Production/SpiceModules/Verification/provenance.json).
+These tests construct actual production celestial bodies,
 but do not replace the missing native `Planet`/`PlanetarySystem`/`Vessel`/`Camera`
 session. They are not native textured-scene evidence.
+
+The production `Config` implementation now builds in the shared library too.
+All production defaults, propagation selection and file parsing/persistence are
+retained. Native streams strip CR from stock CRLF strings, matching Windows text
+streams. Explicit configuration paths remain the host's responsibility; legacy
+Windows path composition is not used as a native resource resolver. Windows
+keeps its actual `RECT`/`DWORD`/`BOOL` types and desktop-size query; native code
+uses internal scalar/window-coordinate values and supplies monitor selection
+through its window adapter. No Win32 APIs are emulated. The star settings and
+visual/map identifiers are extracted verbatim; the original Windows graphics
+SDK is reconstructed by the source audit. The native configuration test checks
+real propagation settings, visual access, CRLF module names and a stock-format
+save/reload, including the original serialization and video-setting ownership.
 
 An independent inertial/free-spin test runs each propagator for 6,000 quarter-
 second steps twice, with the same seed and finalized sampling. It checks the
