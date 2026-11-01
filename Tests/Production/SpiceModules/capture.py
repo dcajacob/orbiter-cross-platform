@@ -74,6 +74,8 @@ def main():
     output=args.output.resolve();reference=HERE/'Reference'
     require(not output.exists() and output!=reference and reference not in output.parents,'capture needs a new non-reference output')
     runtime=args.runtime.resolve();data=args.data.resolve()
+    require((runtime/'Modules/Plugin/ProductionSpiceObserver.dll').is_file(),
+            'observer DLL was not staged in the source-built runtime plugin directory')
     manifest=json.loads((runtime/'test-runtime.json').read_text())
     require(manifest['source_commit']==lock['runtime_source'],'SPICE observer needs the pinned source-built application')
     # The observer is added after unpacking; all original runtime files remain exact.
