@@ -8,6 +8,7 @@ import platform
 import subprocess
 from frozen_reference import load
 from capture import HERE,ROOT,compare,require
+from mesa_runtime import digest
 
 def main():
     parser=argparse.ArgumentParser(description=__doc__)
@@ -21,8 +22,17 @@ def main():
     require(output!=reference and reference not in output.parents,'cannot overwrite accepted SPICE evidence')
     output.mkdir(parents=True,exist_ok=True)
     executable=args.executable.resolve(strict=True);modules=args.modules.resolve(strict=True)
+    data=args.data.resolve()
+    profile=json.loads((HERE.parent/'stock-data.lock.json').read_text())
+    data_hashes={}
+    for name,record in profile['data_files'].items():
+        if name.startswith(('Kernels/','GravityModels/')):
+            path=data/name
+            require(path.is_file() and path.stat().st_size==record['bytes'] and
+                    digest(path)==record['sha256'],'native celestial data differs: '+name)
+            data_hashes[name]=record['sha256']
     for repeat in (1,2):
-        command=[str(executable),str(ROOT/'Src/Celbody/SPICE/Config'),str(args.data.resolve()),str(modules),
+        command=[str(executable),str(ROOT/'Src/Celbody/SPICE/Config'),str(data),str(modules),
                  str(HERE/'bodies.txt'),str(HERE/'epochs.txt'),str(output/f'trace-{repeat}.csv')]
         result=subprocess.run(command,stdout=subprocess.PIPE,stderr=subprocess.STDOUT,timeout=180)
         (output/f'run-{repeat}.log').write_bytes(result.stdout)
@@ -34,6 +44,7 @@ def main():
     report.update(source=subprocess.check_output(['git','-C',str(ROOT),'rev-parse','HEAD'],text=True).strip(),
         configuration=args.configuration,host=platform.platform(),executable_sha256=checksum(executable),
         modules_sha256={p.relative_to(modules).as_posix():checksum(p) for p in modules.rglob('*') if p.is_file() and p.suffix in ('.so','.dll')},
+        data_files_sha256=data_hashes,
         working_tree_dirty=bool(subprocess.check_output(['git','-C',str(ROOT),'diff','--name-only','--','Src','Orbitersdk'])),
         reference_protocol_sha256_lf=metadata['protocol_sha256_lf'],
         scope='actual native SPICE/atmosphere modules and production CelestialBody configuration; direct callbacks only, not a production world/session or renderer')

@@ -11,6 +11,8 @@ namespace orbiter::production {
 class ORBITER_PRODUCTION_API NativeCelestialServices final : public CelestialServices,public native::CelestialHost {
 public:
     NativeCelestialServices(const ResourceResolver& config,const ResourceResolver& data,const ResourceResolver& modules);
+    NativeCelestialServices(const NativeCelestialServices&)=delete;
+    NativeCelestialServices& operator=(const NativeCelestialServices&)=delete;
     void RegisterModule(CelestialBody&,const char* name) override;
     void ClearModule(CelestialBody&) override;
     bool HasModule(const CelestialBody&) const override;

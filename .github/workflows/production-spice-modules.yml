@@ -36,10 +36,12 @@ jobs:
           cmake --build out/spice-native --target production_native_spice_observer --parallel 2 2>&1 | tee spice-build.log
       - uses: actions/cache@v6
         with:
-          path: out/data-cache/Orbiter-x64.zip
-          key: production-data-${{ hashFiles('Tests/Production/stock-data.lock.json') }}
+          path: out/data-cache/production-stock-data-v1.zip
+          key: production-native-data-${{ hashFiles('Tests/Production/input-storage.lock.json') }}
       - name: Prepare exact production kernels and data
-        run: python Tests/Production/prepare_data.py --archive out/data-cache/Orbiter-x64.zip --destination out/data
+        run: >-
+          python Tests/Production/prepare_native_data.py --archive out/data-cache/production-stock-data-v1.zip
+          --destination out/data --group celestial
       - name: Compare real native modules with frozen original Windows
         run: >-
           python Tests/Production/SpiceModules/verify_port.py

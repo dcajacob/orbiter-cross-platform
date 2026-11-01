@@ -267,7 +267,7 @@
       "original_sha256_lf": null
     },
     "Src/Orbiter/Production/NativeCelestialServices.h": {
-      "sha256_lf": "f18cd8c9d4fc439219a9b20c7bea49c5c6abf5653de8947ab2358ddb5a7cd090",
+      "sha256_lf": "bd643fdd07aba81b914abd6aad07fd8c5834714c22ade9da55d3b975dfefed96",
       "original_sha256_lf": null
     },
     "Src/Orbiter/Production/NativeModule.cpp": {
