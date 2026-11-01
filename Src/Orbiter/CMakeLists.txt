@@ -15,7 +15,6 @@ set(common_src
 	cmdline.cpp
 	Config.cpp
 	console_ng.cpp
-	Element.cpp
 	ElementApplication.cpp
 	elevmgr.cpp
 	Help.cpp
@@ -27,6 +26,7 @@ set(common_src
 	Orbiter.cpp
 	Production/WindowsSession.cpp
 	Production/WindowsBodyServices.cpp
+	Production/WindowsRigidBodyServices.cpp
 	PlaybackEd.cpp
 	Psys.cpp
 	Script.cpp
@@ -62,11 +62,9 @@ set(common_src
 	Select.cpp
 	OptionsPages.cpp
 # Body classes
-	BodyIntegrator.cpp
 	PinesGrav.cpp
 	Celbody.cpp
 	Planet.cpp
-	Rigidbody.cpp
 	Star.cpp
 # Vessel classes
 	FlightRecorder.cpp

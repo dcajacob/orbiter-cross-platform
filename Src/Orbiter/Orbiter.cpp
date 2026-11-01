@@ -36,6 +36,7 @@
 #include "Orbiter.h"
 #include "Production/WindowsSession.h"
 #include "Production/WindowsBodyServices.h"
+#include "Production/WindowsRigidBodyServices.h"
 #include "Launchpad.h"
 #include "MenuInfoBar.h"
 #include "Dialogs.h"
@@ -293,6 +294,7 @@ VOID DestroyWorld ()
 Orbiter::Orbiter ()
 {
 	orbiter::production::BindBodyServices(&orbiter::production::GetWindowsBodyServices());
+	orbiter::production::BindRigidBodyServices(&orbiter::production::GetWindowsRigidBodyServices());
 	// override base class defaults
     //m_bAppUseZBuffer  = TRUE;
     //m_fnConfirmDevice = ConfirmDevice;
@@ -370,6 +372,7 @@ Orbiter::Orbiter ()
 Orbiter::~Orbiter ()
 {
 	CloseApp ();
+	orbiter::production::BindRigidBodyServices(nullptr);
 	orbiter::production::BindBodyServices(nullptr);
 }
 

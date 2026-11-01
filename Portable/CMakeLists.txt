@@ -11,7 +11,6 @@ if(NOT TARGET orbiter_production_boundary)
     add_subdirectory(../Src/Orbiter/Production production-boundary)
 endif()
 add_library(orbiter_portable_core STATIC
-    ../Src/Orbiter/Element.cpp
     ../Src/Orbiter/Portable/SimulationSession.cpp)
 target_link_libraries(orbiter_portable_core PUBLIC orbiter_production_boundary)
 target_include_directories(orbiter_portable_core PUBLIC

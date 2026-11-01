@@ -24,6 +24,22 @@ in this library, including the unchanged POC regressions that consume them.
 Numeric configuration readers use call-local scratch storage in place of the
 application configuration file's global buffer.
 
+`RigidBody`, all ten existing RK/symplectic propagators and the existing Encke
+code now compile in this library as well. `RigidBodyServices` supplies the
+original physics settings, simulation clock, reference-body states and gravity
+queries. The Windows implementation delegates to the actual `PlanetarySystem`
+and `CelestialBody`; no force model or integrator is replaced. The numerical
+configuration structure is shared without pulling in application or SDK UI
+headers. Optional allocation diagnostics remain a host policy.
+
+An independent inertial/free-spin test runs each propagator for 6,000 quarter-
+second steps twice, with the same seed and finalized sampling. It checks the
+analytical translation/rotation and energy/angular-momentum invariants within
+the existing budgets. Each run writes 601 samples. The hosted matrix compares
+all ten production-class traces across Windows/Linux Debug/Release, separately
+from the original two-body goldens. This empty-force-field test has no primary,
+ephemerides or vessel module and is not a runnable production scenario.
+
 The original MSHX1 reader and angle-weighted normal calculations now have shared
 implementations without Windows or Direct3D headers. The Windows sink retains
 the existing internal mesh and SDK representations and performs real renderer
@@ -74,6 +90,6 @@ budgets are unchanged. Neither inherited disabled workflow is modified.
 
 Remaining Phase 3 work includes production world/session ownership and teardown,
 configuration/scenario/resource integration, platform service separation for
-`RigidBody`, `Vessel` and `Camera`, instrumentation dependencies and the source-built native SDK/module
+`CelestialBody`, `Vessel` and `Camera`, instrumentation dependencies and the source-built native SDK/module
 boundary. A shared coordinator and CPU asset reader do not satisfy the Phase 3
 exit gate that Linux builds the production engine and its authoritative objects.

@@ -13,24 +13,18 @@
 // Hierarchy:  Body --> RigidBody
 // =======================================================================
 
-#include "Orbiter.h"
 #include "Rigidbody.h"
+#include "Production/RigidBodyServices.h"
 #include "PhysicsCore.h"
-#include "Celbody.h"
-#include "Psys.h"
 #include "Element.h"
-#include "Astro.h"
-#include "Log.h"
-
+#include "ConfigFile.h"
+#include <algorithm>
+#include <cstdlib>
+#include <cerrno>
+#include <cstring>
 using namespace std;
-
-// =======================================================================
-// Externals
-
-extern Orbiter *g_pOrbiter;
-extern TimeData td;
-extern PlanetarySystem *g_psys; // pointer to planetary system
-extern char DBG_MSG[256];
+using orbiter::production::GetBodyServices;
+using orbiter::production::GetRigidBodyServices;
 
 bool       RigidBody::bDistmass = false;
 bool       RigidBody::bGPerturb = false;
@@ -63,7 +57,7 @@ RigidBody::RigidBody (double _mass, double _size, const Vector &_pmi): Body (_ma
 RigidBody::RigidBody (char *fname): Body (fname)
 {
 	SetDefaultCaps ();
-	ifstream ifs (g_pOrbiter->ConfigPath (fname));
+	ifstream ifs (GetBodyServices().ConfigPath(fname));
 	if (ifs) ReadGenericCaps (ifs);
 }
 
@@ -84,14 +78,14 @@ void RigidBody::SetDefaultCaps ()
 
 	pmi.Set (-1,-1,-1); // "undef"
 	bDynamicPosVel = true;
-	bCanUpdateStabilised = g_pOrbiter->Cfg()->CfgPhysicsPrm.bOrbitStabilise;
-	bDistmass = g_pOrbiter->Cfg()->CfgPhysicsPrm.bDistributedMass;
-	bGPerturb = g_pOrbiter->Cfg()->CfgPhysicsPrm.bNonsphericalGrav;
+	bCanUpdateStabilised = GetRigidBodyServices().Physics().bOrbitStabilise;
+	bDistmass = GetRigidBodyServices().Physics().bDistributedMass;
+	bGPerturb = GetRigidBodyServices().Physics().bNonsphericalGrav;
 	bOrbitStabilised = false;
 	bIgnoreGravTorque = false;
 	tidaldamp = 0.0;
 	PropLevel = 0;
-	PropSubMax = g_pOrbiter->Cfg()->CfgPhysicsPrm.PropSubMax;
+	PropSubMax = GetRigidBodyServices().Physics().PropSubMax;
 	nPropSubsteps = 1;
 	gfielddata.ngrav = 0;
 	gfielddata.updt = -1e10; // invalidate
@@ -113,18 +107,18 @@ void RigidBody::SetOrbitReference (CelestialBody *body)
 {
 	if (body && body != cbody) { // otherwise nothing to do
 		cbody = body;
-		el->Setup (mass, cbody->Mass(), el->MJDepoch());
+		el->Setup (mass, GetRigidBodyServices().Reference(cbody).Mass(), el->MJDepoch(), GetRigidBodyServices().Time().MJD_ref);
 		el_valid = false;
 	}
 }
 
 const Elements *RigidBody::Els () const
 {
-	extern bool g_bStateUpdate;
+	auto &td = GetRigidBodyServices().Time();
 	if (cbody && el) {
 		if (!el_valid) {
-			el->Calculate (cpos, cvel, g_bStateUpdate ? td.SimT1 : td.SimT0);
-			//el->Calculate (s0->pos-cbody->GPos(), s0->vel-cbody->GVel(), td.SimT0);
+			el->Calculate (cpos, cvel, GetBodyServices().IsUpdating() ? td.SimT1 : td.SimT0);
+			//el->Calculate (s0->pos-GetRigidBodyServices().Reference(cbody).GPos(), s0->vel-cbody->GVel(), td.SimT0);
 			el_valid = true;
 		}
 		return el;
@@ -136,13 +130,13 @@ const Elements *RigidBody::Els () const
 void RigidBody::SetupPropagationModes ()
 {
 	int i;
-	nPropLevel = g_pOrbiter->Cfg()->CfgPhysicsPrm.nLPropLevel;
+	nPropLevel = GetRigidBodyServices().Physics().nLPropLevel;
 	for (i = 0; i < nPropLevel; i++) {
-		PropMode[i].ttgt = g_pOrbiter->Cfg()->CfgPhysicsPrm.PropTTgt[i];
-		PropMode[i].atgt = g_pOrbiter->Cfg()->CfgPhysicsPrm.PropATgt[i];
-		PropMode[i].tlim = g_pOrbiter->Cfg()->CfgPhysicsPrm.PropTLim[i];
-		PropMode[i].alim = g_pOrbiter->Cfg()->CfgPhysicsPrm.PropALim[i];
-		PropMode[i].propidx = g_pOrbiter->Cfg()->CfgPhysicsPrm.PropMode[i];
+		PropMode[i].ttgt = GetRigidBodyServices().Physics().PropTTgt[i];
+		PropMode[i].atgt = GetRigidBodyServices().Physics().PropATgt[i];
+		PropMode[i].tlim = GetRigidBodyServices().Physics().PropTLim[i];
+		PropMode[i].alim = GetRigidBodyServices().Physics().PropALim[i];
+		PropMode[i].propidx = GetRigidBodyServices().Physics().PropMode[i];
 		switch (PropMode[i].propidx) {
 		case PROP_RK2:  PropMode[i].propagator = &RigidBody::RK2_LinAng;  break;
 		case PROP_RK4:  PropMode[i].propagator = &RigidBody::RK4_LinAng;  break;
@@ -165,6 +159,7 @@ void RigidBody::SetupPropagationModes ()
 
 void RigidBody::SetPropagator (int &plevel, int &nstep) const
 {
+	auto &td = GetRigidBodyServices().Time();
 	// 1. Time step limit
 	for (plevel = 0; plevel < nPropLevel-1; plevel++)
 		if (td.SimDT < PropMode[plevel].tlim)
@@ -182,6 +177,7 @@ void RigidBody::SetPropagator (int &plevel, int &nstep) const
 
 void RigidBody::Update (bool force)
 {
+	auto &td = GetRigidBodyServices().Time();
 	if (bDynamicPosVel) {
 
 		// Update velocity and position according to
@@ -204,18 +200,18 @@ void RigidBody::Update (bool force)
 
 		// Update the list of gravity field sources
 		if (force || !gfielddata.ngrav) {
-			ScanGFieldSources (g_psys);
+			ScanGFieldSources (GetRigidBodyServices().World());
 			gfielddata.updt = td.SimT0 + (gfielddata_updt_interval*rand())/RAND_MAX;
 			// randomize update times
 		} else if (td.SimT0 > gfielddata.updt) {
-			UpdateGFieldSources (g_psys);
+			UpdateGFieldSources (GetRigidBodyServices().World());
 			gfielddata.updt = td.SimT0 + gfielddata_updt_interval;
 		}
 
 		// First check if we should do a stabilised state update
 		if (bCanUpdateStabilised &&
-			ostep > g_pOrbiter->Cfg()->CfgPhysicsPrm.Stabilise_SLimit &&
-			g_psys->GetGravityContribution (cbody, cpos+cbody->GPos()) > 1-g_pOrbiter->Cfg()->CfgPhysicsPrm.Stabilise_PLimit) {
+			ostep > GetRigidBodyServices().Physics().Stabilise_SLimit &&
+			GetRigidBodyServices().GravityContribution (cbody, cpos+GetRigidBodyServices().Reference(cbody).GPos()) > 1-GetRigidBodyServices().Physics().Stabilise_PLimit) {
 
 			nPropSubsteps = 1; // for now
 			double dt = td.SimDT/nPropSubsteps;
@@ -231,8 +227,8 @@ void RigidBody::Update (bool force)
 				el->Calculate (cpos, cvel, td.SimT0); // get elements from previous step
 			}
 			Encke();
-			s1->pos.Set (cpos + cbody->s1->pos);
-			s1->vel.Set (cvel + cbody->s1->vel);
+			s1->pos.Set (cpos + GetRigidBodyServices().Reference(cbody).s1->pos);
+			s1->vel.Set (cvel + GetRigidBodyServices().Reference(cbody).s1->vel);
 			FlushRPos();
 			FlushRVel();
 			s1->R.Set (s1->Q);
@@ -270,7 +266,6 @@ void RigidBody::Update (bool force)
 		// numerical instabilities in the angular integration to
 		// leading to a velocity explosion - a last resort
 		const double vmag_max = 100.0*Pi; // limit angular velocities to 100Hz - make user-definable!
-		extern int errno;
 		errno = 0;
 		double vmag = s1->omega.length();
 		if (vmag > vmag_max || errno) {
@@ -289,8 +284,8 @@ void RigidBody::Update (bool force)
 	Body::Update (force);
 
 	if (cbody) {
-		cpos = s1->pos - cbody->s1->pos;
-		cvel = s1->vel - cbody->s1->vel;
+		cpos = s1->pos - GetRigidBodyServices().Reference(cbody).s1->pos;
+		cvel = s1->vel - GetRigidBodyServices().Reference(cbody).s1->vel;
 	}
 }
 
@@ -298,20 +293,21 @@ void RigidBody::Update (bool force)
 
 void RigidBody::ScanGFieldSources (const PlanetarySystem *psys)
 {
-	psys->ScanGFieldSources (&s0->pos, this, &gfielddata);
+	GetRigidBodyServices().ScanGravity(psys, s0->pos, this, &gfielddata, false);
 }
 
 // =======================================================================
 
 void RigidBody::UpdateGFieldSources (const PlanetarySystem *psys)
 {
-	psys->UpdateGFieldSources (&s0->pos, this, &gfielddata);
+	GetRigidBodyServices().ScanGravity(psys, s0->pos, this, &gfielddata, true);
 }
 
 // =======================================================================
 
 Vector RigidBody::InterpolatePos (const Vector &p0, const Vector &p1, double t1, double dt, double tfrac) const
 {
+	auto &td = GetRigidBodyServices().Time();
 	if (ostep < 1e-3) {        // use simple linear interpolation
 		return p0 + (p1-p0)*tfrac;
 	} else if (ostep < 1e-2) { // slightly more sophisticated interpolation
@@ -332,17 +328,17 @@ void RigidBody::GetIntermediateMoments (Vector &acc, Vector &tau,
 	const StateVectors &state, double tfrac, double dt)
 {
 	// linear acceleration due to graviational field
-	acc = g_psys->Gacc_intermediate (state.pos, tfrac, this, &gfielddata);
+	acc = GetRigidBodyServices().Acceleration (state.pos, tfrac, this, &gfielddata);
 
 	// angular acceleration due to gravity gradient torque
 	if (!cbody || bIgnoreGravTorque) {
 		tau.Set (0,0,0);
 	} else {
 		// map cbody into vessel frame
-		Vector R0 (tmul (state.Q, cbody->InterpolatePosition (tfrac) - state.pos));
+		Vector R0 (tmul (state.Q, GetRigidBodyServices().ReferencePosition(cbody, tfrac) - state.pos));
 		double r0 = R0.length();
 		Vector Re = R0/r0;
-		double mag = 3.0 * Ggrav * cbody->Mass() / pow(r0,3.0);
+		double mag = 3.0 * Ggrav * GetRigidBodyServices().Reference(cbody).Mass() / pow(r0,3.0);
 		tau.Set (crossp (pmi*Re, Re) * mag);
 
 		// damping of angular velocity
@@ -369,19 +365,19 @@ void RigidBody::GetIntermediateMoments_pert (Vector &acc, Vector &tau,
 	acc.Set (0,0,0);
 	tau.Set (0,0,0);
 #else
-	Vector gpos = state_rel.pos + cbody->InterpolatePosition (tfrac);
+	Vector gpos = state_rel.pos + GetRigidBodyServices().ReferencePosition(cbody, tfrac);
 	// linear acceleration due to graviational field
-	acc = g_psys->Gacc_intermediate_pert (cbody, state_rel.pos, tfrac, this, &gfielddata);
+	acc = GetRigidBodyServices().PerturbedAcceleration (cbody, state_rel.pos, tfrac, this, &gfielddata);
 
 	// angular acceleration due to gravity gradient torque
 	if (!cbody || bIgnoreGravTorque) {
 		tau.Set (0,0,0);
 	} else {
 		// map cbody into vessel frame
-		Vector R0 (tmul (state_rel.Q, cbody->InterpolatePosition (tfrac) - gpos));
+		Vector R0 (tmul (state_rel.Q, GetRigidBodyServices().ReferencePosition(cbody, tfrac) - gpos));
 		double r0 = R0.length();
 		Vector Re = R0/r0;
-		double mag = 3.0 * Ggrav * cbody->Mass() / pow(r0,3.0);
+		double mag = 3.0 * Ggrav * GetRigidBodyServices().Reference(cbody).Mass() / pow(r0,3.0);
 		tau.Set (crossp (pmi*Re, Re) * mag);
 
 		// damping of angular velocity
@@ -404,10 +400,10 @@ Vector RigidBody::GetPertAcc (const PertIntData &data, const Vector &pos, double
 	// between vessel position and central body position (at last step)
 
 	static Vector zero(0,0,0);
-	Vector accp (g_psys->GaccRel (pos, cbody, tfrac, cbody, &gfielddata) - g_psys->GaccRel (zero, cbody, tfrac, cbody, &gfielddata));
+	Vector accp (GetRigidBodyServices().RelativeAcceleration (pos, cbody, tfrac, cbody, &gfielddata) - GetRigidBodyServices().RelativeAcceleration (zero, cbody, tfrac, cbody, &gfielddata));
 
 	if (data.nonspherical)
-		accp += SingleGacc_perturbation (-pos, cbody);
+		accp += GetRigidBodyServices().NonsphericalAcceleration (-pos, cbody);
 
 	return accp;
 }
@@ -416,15 +412,16 @@ Vector RigidBody::GetPertAcc (const PertIntData &data, const Vector &pos, double
 
 Vector RigidBody::GetTorque () const
 {
+	auto &td = GetRigidBodyServices().Time();
 	if (!cbody || bIgnoreGravTorque) return Vector(0,0,0); // sanity check
 
 	Vector R0;
 
 	// map cbody into vessel frame
-	R0.Set (tmul (s0->R, cbody->s0->pos - s0->pos));
+	R0.Set (tmul (s0->R, GetRigidBodyServices().Reference(cbody).s0->pos - s0->pos));
 	double r0 = R0.length();
 	Vector Re = R0/r0;
-	double mag = 3.0 * Ggrav * cbody->Mass() / pow(r0,3.0);
+	double mag = 3.0 * Ggrav * GetRigidBodyServices().Reference(cbody).Mass() / pow(r0,3.0);
 	Vector M (crossp (pmi*Re, Re) * mag);
 
 	// damping of angular velocity
@@ -512,7 +509,7 @@ void RigidBody::SetDynamicUpdate (bool dynamic)
 	}
 }
 
-const char *RigidBody::PropagatorStr (DWORD idx, bool verbose) {
+const char *RigidBody::PropagatorStr (orbiter::production::BodyParameter idx, bool verbose) {
 	static const char *ShortPropModeStr[NPROP_METHOD] = {
 		"RK2", "RK4", "RK5", "RK6", "RK7", "RK8",
 		"SY2", "SY4", "SY6", "SY8"

@@ -5,12 +5,14 @@ if(CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
     include(CTest)
 endif()
 add_library(orbiter_production_boundary SHARED
-    Session.cpp ResourceResolver.cpp MeshData.cpp BodyServices.cpp
-    ../Body.cpp ../Vecmat.cpp ../TimeData.cpp ../ConfigFile.cpp)
+    Session.cpp ResourceResolver.cpp MeshData.cpp BodyServices.cpp RigidBodyServices.cpp
+    ../Body.cpp ../Rigidbody.cpp ../BodyIntegrator.cpp ../Element.cpp
+    ../Vecmat.cpp ../TimeData.cpp ../ConfigFile.cpp)
 target_compile_features(orbiter_production_boundary PUBLIC cxx_std_17)
 target_compile_definitions(orbiter_production_boundary
     PUBLIC ORBITER_PRODUCTION_SHARED PRIVATE ORBITER_PRODUCTION_BUILD)
-target_include_directories(orbiter_production_boundary PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/..")
+target_include_directories(orbiter_production_boundary PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/.."
+    "${CMAKE_CURRENT_SOURCE_DIR}/../../../Orbitersdk/include")
 set_target_properties(orbiter_production_boundary PROPERTIES
     CXX_EXTENSIONS OFF FOLDER Core WINDOWS_EXPORT_ALL_SYMBOLS ON)
 

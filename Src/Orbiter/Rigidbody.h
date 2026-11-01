@@ -17,19 +17,21 @@
 #define __RIGIDBODY_H
 
 #include "Body.h"
-#include "Config.h"
+#include "PhysicsConfig.h"
+#include <fstream>
+class PlanetarySystem;
 
 class RigidBody;
 
 // =======================================================================
 // typdefs
 
-const DWORD MAXGFIELDLIST = 20;
+const orbiter::production::BodyParameter MAXGFIELDLIST = 20;
 
 typedef struct {         // used for dynamic grav updates
-	DWORD gravidx[MAXGFIELDLIST]; // index list for gravity source objects
-	DWORD ngrav;                  // number of gravity sources
-	DWORD testidx;                // index for next object to test
+	orbiter::production::BodyParameter gravidx[MAXGFIELDLIST]; // index list for gravity source objects
+	orbiter::production::BodyParameter ngrav;                  // number of gravity sources
+	orbiter::production::BodyParameter testidx;                // index for next object to test
 	double updt;                  // time of next list update
 } GFieldData;
 
@@ -56,7 +58,7 @@ typedef void (RigidBody::*LinAngPropagator)(double, int, int);
 
 // =======================================================================
 
-class RigidBody: public Body {
+class ORBITER_PRODUCTION_API RigidBody: public Body {
 public:
 	RigidBody ();
 	RigidBody (double _mass, double _size, const Vector &_pmi);
@@ -145,7 +147,7 @@ public:
 	// Trivial angular acceleration calculation: ignores cross-axis
 	// coupling terms and torque, and always returns zero
 
-	static const char *PropagatorStr (DWORD idx, bool verbose = true);
+	static const char *PropagatorStr (orbiter::production::BodyParameter idx, bool verbose = true);
 	// Returns a string describing the dynamic state propagator
 	// given by index idx.
 

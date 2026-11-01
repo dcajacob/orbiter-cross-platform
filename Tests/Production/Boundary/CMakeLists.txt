@@ -3,6 +3,11 @@ if(NOT TARGET orbiter_production_boundary)
 endif()
 add_executable(production_boundary_test Boundary.Test.cpp)
 target_link_libraries(production_boundary_test PRIVATE orbiter_production_boundary)
+add_executable(production_rigid_body_test RigidBody.Test.cpp)
+target_link_libraries(production_rigid_body_test PRIVATE orbiter_production_boundary)
+orbiter_stage_core_runtime(production_rigid_body_test)
+add_test(NAME Production.RigidBodyBoundary COMMAND production_rigid_body_test "${PROJECT_BINARY_DIR}/traces")
+set_tests_properties(Production.RigidBodyBoundary PROPERTIES TIMEOUT 30)
 # Windows locates shared dependencies beside the executable, not via an RPATH.
 add_custom_command(TARGET production_boundary_test POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy_if_different $<TARGET_FILE:orbiter_production_boundary>

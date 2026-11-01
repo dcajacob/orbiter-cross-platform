@@ -40,15 +40,14 @@
 //     can add their own components)
 // =======================================================================
 
-#include "Orbiter.h"
 #include "Rigidbody.h"
+#include "Production/RigidBodyServices.h"
 #include "PhysicsCore.h"
 #include "Element.h"
-#include "Log.h"
-#include <stdio.h>
-
-extern TimeData td;
-extern char DBG_MSG[256];
+#include <cstdio>
+using orbiter::production::GetRigidBodyServices;
+// The host retains the original optional allocation-diagnostic policy.
+#define TRACENEW GetRigidBodyServices().TraceAllocation(__FILE__, __LINE__);
 
 // ===========================================================================
 // Runge-Kutta integration parameters (RK5-RK8)
@@ -411,6 +410,7 @@ void RigidBody::SY8_LinAng (double h, int nsub, int isub)
 
 void RigidBody::RK2_LinAng_Encke (double h, int nsub, int isub)
 {
+	auto &td = GetRigidBodyServices().Time();
 	double t = td.SimT0 + h;
 	double mu = Ggrav * ((Body*)cbody)->Mass();
 	Vector Rb, Vb, alpha, beta;
@@ -515,6 +515,7 @@ void RigidBody::RK8_Pert (const PertIntData &data)
 
 void RigidBody::Encke ()
 {
+	auto &td = GetRigidBodyServices().Time();
 	static double ch[13] = {
 		0, 0, 0, 0, 0, 34.0/105.0, 9.0/35.0, 9.0/35.0,
 		9.0/280.0, 9.0/280.0, 0, 41.0/840.0, 41.0/840.0
