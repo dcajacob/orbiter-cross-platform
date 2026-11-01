@@ -68,6 +68,18 @@ and `CelestialBody`; no force model or integrator is replaced. The numerical
 configuration structure is shared without pulling in application or SDK UI
 headers. Optional allocation diagnostics remain a host policy.
 
+The original `PlanetarySystem` gravity methods now compile in the shared library:
+source selection, full/intermediate/relative fields, Pines/J2 perturbations,
+dominant-source queries and radiation momentum flux. The entire calculation
+section is conserved after integer type spelling; its summation and ephemeris
+ordering are unchanged. Windows still initializes and updates its original
+world, calling these shared methods. The internal class declaration is separate
+from the Windows application umbrella headers. Native scene label records use
+internal types; Windows aliases the actual nested SDK types, preserving their
+identity and public graphics signatures. Direct tests additionally check
+circular centripetal acceleration and equatorial/polar J2 conventions. This
+does not yet make the production world loader or vessel classes native.
+
 The actual `PinesGravProp` now compiles in this library as well. Its force
 formula, associated-Legendre recurrence and private numerical workspace remain
 verbatim; the source audit enforces that separately from runtime parity. File

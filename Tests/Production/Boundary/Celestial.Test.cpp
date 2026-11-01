@@ -3,6 +3,7 @@
 // fixtures, not native SPICE modules or a substitute stock Solar System.
 #include "Celbody.h"
 #include "Star.h"
+#include "PsysCore.h"
 #include "Element.h"
 #include "Production/RigidBodyServices.h"
 #include <cmath>
@@ -123,7 +124,26 @@ int main(int argc,char** argv)
             close(vel,Vector(-7000000*rate*std::sin(rate*1000),0,7000000*rate*std::cos(rate*1000)),1e-5,"Circular celestial velocity");
             Matrix rotation;primary.GetRotation(250,rotation);
             close(mul(rotation,Vector(1,0,0)),Vector(0,0,1),1e-12,"Sidereal rotation convention changed");
+            const double radius = 7000000;
+            const double speed = rate*radius;
+            close(SingleGacc(Vector(-radius,0,0), &primary), Vector(-speed*speed/radius,0,0),
+                1e-12, "Shared production gravity differs from circular centripetal acceleration");
         }
+        configuration(host,"J2","Mass = 5.972e24\nSize = 6378000\nJCoeff = 0.001\n");
+        host.physics.bNonsphericalGrav = true;
+        {
+            char name[]="J2";TestBody body(name);body.Setup();
+            // Independent closed-form equator/pole J2 perturbations. World force
+            // accumulation and all configured production states have separate
+            // frozen Windows application comparisons.
+            const double r=7000000,mu=Ggrav*body.Mass();
+            const double scale=mu*.001*6378000.*6378000./(r*r*r*r);
+            close(SingleGacc_perturbation(Vector(-r,0,0),&body),Vector(-1.5*scale,0,0),
+                1e-12,"Production global-frame J2 equator convention differs");
+            close(SingleGacc_perturbation(Vector(0,-r,0),&body),Vector(0,3*scale,0),
+                1e-12,"Production global-frame J2 pole convention differs");
+        }
+        host.physics.bNonsphericalGrav = false;
         configuration(host,"Root","Mass = 10\nSize = 1\nModule = fixture\n");
         configuration(host,"Child","Mass = 1\nSize = 1\nModule = fixture\n");
         {

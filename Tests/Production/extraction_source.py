@@ -102,6 +102,31 @@ def verify():
         canonical=actual.split(b'protected:',1)[1].replace(b'orbiter::production::UInt32',b'DWORD').replace(b'void* hMod',b'HINSTANCE hMod')
         if canonical.rstrip(b'\n')!=original.split(b'protected:',1)[1].rstrip(b'\n'):
             raise ValueError('celestial numerical state layout changed beyond portable scalar/module handle spelling')
+    if 'Src/Orbiter/PsysGravity.cpp' in declared:
+        # Move the entire force/source-selection section, including its summation
+        # order and ephemeris calls. No alternate native force implementation.
+        parent = 'bef087ce'
+        original = git('show', parent+':Src/Orbiter/Psys.cpp').replace(b'\r\n',b'\n')
+        start = original.index(b'void PlanetarySystem::ScanGFieldSources (')
+        end = original.index(b'void PlanetarySystem::Update (bool force)',start)
+        extracted = (ROOT/'Src/Orbiter/PsysGravity.cpp').read_bytes().replace(b'\r\n',b'\n')
+        extracted = extracted[extracted.index(b'void PlanetarySystem::ScanGFieldSources ('):].replace(b'orbiter::production::UInt32',b'DWORD')
+        def force_text(source):
+            return b'\n'.join(line.rstrip(b' \t') for line in source.splitlines()).rstrip(b'\n')
+        if force_text(extracted) != force_text(original[start:end]):
+            raise ValueError('production world gravity formulas/source selection or accumulation order changed')
+        canonical = (ROOT/'Src/Orbiter/Psys.cpp').read_bytes().replace(b'\r\n',b'\n').replace(
+            b'#include "Base.h"\n#include "Star.h"\n#include "Planet.h"\n',b'').replace(
+            b'orbiter::production::UInt32 PlanetarySystem::nBase(const Planet *planet) const { return planet->nBase(); }\n'
+            b'Base *PlanetarySystem::GetBase (const Planet *planet, orbiter::production::UInt32 i) { return planet->GetBase(i); }\n\n',b'')
+        if canonical != original[:start]+original[end:]:
+            raise ValueError('production world lifecycle/configuration changed outside gravity extraction')
+        original = git('show',parent+':Src/Orbiter/Psys.h').replace(b'\r\n',b'\n')
+        actual = (ROOT/'Src/Orbiter/PsysCore.h').read_bytes().replace(b'\r\n',b'\n')
+        canonical = actual.split(b'private:',1)[1].replace(b'orbiter::production::SceneLabelList',b'oapi::GraphicsClient::LABELLIST').replace(
+            b'#endif // !ORBITER_PRODUCTION_SYSTEM_CORE_H',b'#endif // !__PSYS_H')
+        if canonical != original.split(b'private:',1)[1]:
+            raise ValueError('production planetary-system private storage changed')
     mesh_records=ROOT/'Orbitersdk/include/OrbiterMeshData.h'
     if 'Src/Orbiter/ZTreeMgr.cpp' in declared:
         original=git('show',CAPTURE+':Src/Orbiter/ZTreeMgr.cpp').replace(b'\r\n',b'\n')
