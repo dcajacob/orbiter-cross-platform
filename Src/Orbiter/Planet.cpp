@@ -3,8 +3,6 @@
 
 // Implementation of class Planet
 
-#define OAPI_IMPLEMENTATION
-
 #include <fstream>
 #include <stdio.h>
 #include <string.h>

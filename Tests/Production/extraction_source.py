@@ -189,7 +189,7 @@ def verify():
             if not block or data.count(block[0])!=1:
                 raise ValueError('SDK ATMCONST was not conserved verbatim')
             ranges.append((original.rfind(b'/**',0,block.start()),block.end(),b''))
-            planet_data=(ROOT/'Orbitersdk/include/OrbiterPlanetData.h').read_bytes()
+            planet_data=(ROOT/'Orbitersdk/include/OrbiterPlanetData.h').read_bytes().replace(b'\r\n',b'\n')
             start=original.rfind(b'// ===========================================================================',0,original.index(b'/// \\defgroup objprm'))
             end=original.index(b'//@}',start)+len(b'//@}')
             if planet_data.count(original[start:end])!=1:
