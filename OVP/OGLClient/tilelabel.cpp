@@ -3,7 +3,9 @@
 
 #include "tilelabel.h"
 #include "RendererFiles.h"
+#ifndef _WIN32
 #include "Production/Text.h"
+#endif
 #include "OGLCamera.h"
 #include <limits>
 #include <sstream>
@@ -11,6 +13,17 @@
 #include "Scene.h"
 #include "surfmgr2.h"
 #include <cstring>
+
+namespace {
+int CompareLabelText(const char* left, const char* right)
+{
+#ifdef _WIN32
+	return _stricmp(left, right);
+#else
+	return orbiter::production::CompareText(left, right);
+#endif
+}
+}
 
 TileLabel *TileLabel::Create(const SurfTile *stile)
 {
@@ -72,7 +85,7 @@ bool TileLabel::Read()
 		std::ifstream ifs(RendererFilePath(texpath));
 		if (ifs.good()) {
 			ifs >> typestr >> lat >> lng >> altstr;
-			if (!orbiter::production::CompareText(altstr, "nan")) alt = std::numeric_limits<double>::quiet_NaN();
+			if (!CompareLabelText(altstr, "nan")) alt = std::numeric_limits<double>::quiet_NaN();
 			else alt = std::atof(altstr);
 			ifs.getline(name, 256);
 			while(ifs.good()) {
@@ -98,7 +111,7 @@ bool TileLabel::Read()
 				strcpy(label[nlabel]->label, lb);
 				nlabel++;
 				ifs >> typestr >> lat >> lng >> altstr;
-				if (!orbiter::production::CompareText(altstr, "nan")) alt = std::numeric_limits<double>::quiet_NaN();
+				if (!CompareLabelText(altstr, "nan")) alt = std::numeric_limits<double>::quiet_NaN();
 				else alt = std::atof(altstr);
 				ifs.getline(name, 256);
 			}
@@ -111,7 +124,7 @@ bool TileLabel::Read()
 			{
 				std::istringstream iss((char*)buf);
 				iss >> typestr >> lat >> lng >> altstr;
-				if (!orbiter::production::CompareText(altstr, "nan")) alt = std::numeric_limits<double>::quiet_NaN();
+				if (!CompareLabelText(altstr, "nan")) alt = std::numeric_limits<double>::quiet_NaN();
 				else alt = std::atof(altstr);
 				iss.getline(name, 256);
 				while (iss.good()) {
@@ -138,7 +151,7 @@ bool TileLabel::Read()
 					nlabel++;
 					if (iss.tellg() >= ndata) break;
 					iss >> typestr >> lat >> lng >> altstr;
-					if (!orbiter::production::CompareText(altstr, "nan")) alt = std::numeric_limits<double>::quiet_NaN();
+					if (!CompareLabelText(altstr, "nan")) alt = std::numeric_limits<double>::quiet_NaN();
 					else alt = std::atof(altstr);
 					iss.getline(name, 256);
 				}
