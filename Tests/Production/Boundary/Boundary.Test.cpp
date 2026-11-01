@@ -8,6 +8,7 @@
 #include <filesystem>
 #include <fstream>
 #include <iostream>
+#include <cstring>
 #include <sstream>
 #include <stdexcept>
 #include <vector>
@@ -158,6 +159,21 @@ void meshTests(const fs::path& root)
     for (const auto& bad : {std::string("not a mesh"), triangle.substr(0, triangle.size()-4),
         std::string("MSHX1\nGROUPS 1\nGEOM -3 1\n")}) {
         rejects([&] { std::istringstream stream(bad); LoadMeshData(stream); });
+    }
+    for (const char* indices : {"65536 1 2", "-65536 1 2", "4294967296 1 2", "-1 1 2", "0 1 3",
+        "9999999999999999999999999999999999 1 2", "+-0 1 2"}) {
+        const auto bad = triangle.substr(0, triangle.rfind("0 1 2\n")) + indices + '\n';
+        rejects([&] { std::istringstream stream(bad); LoadMeshData(stream); });
+    }
+    std::istringstream signedIndices(triangle.substr(0, triangle.rfind("0 1 2\n")) + "+0 +1 +2\n");
+    require(LoadMeshData(signedIndices).groups[0].indices == g.indices,"Valid signed index syntax changed");
+    for (const auto& counts : {std::pair<const char*,const char*>{"GROUPS 1","GROUPS 4294967297"},
+        {"GEOM 3 1","GEOM 4294967299 1"},{"GEOM 3 1","GEOM 3 4294967297"}}) {
+        auto bad=triangle;bad.replace(bad.find(counts.first),std::strlen(counts.first),counts.second);
+        rejects([&] { std::istringstream stream(bad); LoadMeshData(stream); });
+    }
+    for (const char* counts : {"MATERIALS 4294967296\nTEXTURES 0\n","MATERIALS 0\nTEXTURES 4294967296\n"}) {
+        rejects([&] { std::istringstream stream(triangle+counts); LoadMeshData(stream); });
     }
     std::size_t count = 0;
     for (const auto& path : fs::recursive_directory_iterator(root)) {

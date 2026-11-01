@@ -11,6 +11,7 @@
 #include <cctype>
 #include <memory>
 #include <limits>
+#include <charconv>
 
 namespace orbiter::production {
 using NameBuffer = char[256];
@@ -19,6 +20,25 @@ inline bool ReadMeshLine(std::istream& input, char (&line)[256])
     if (!input.getline(line, 256)) return false;
     const auto length = std::strlen(line);
     if (length && line[length-1] == '\r') line[length-1] = '\0';
+    return true;
+}
+inline bool ReadMeshInteger(const char*& cursor, const char* end, long long& value)
+{
+    while (cursor != end && std::isspace(static_cast<unsigned char>(*cursor))) ++cursor;
+    if (cursor != end && *cursor == '+') {
+        ++cursor; // scanf accepted a leading plus; from_chars does not
+        if (cursor == end || *cursor < '0' || *cursor > '9') return false;
+    }
+    const auto parsed = std::from_chars(cursor, end, value);
+    if (parsed.ec != std::errc{}) return false;
+    cursor = parsed.ptr;
+    return true;
+}
+inline bool ReadMeshCount(const char*& cursor, const char* end, int& value)
+{
+    long long count;
+    if (!ReadMeshInteger(cursor, end, count) || count < 0 || count > std::numeric_limits<int>::max()) return false;
+    value = static_cast<int>(count);
     return true;
 }
 
@@ -47,7 +67,8 @@ std::istream& ReadMesh(std::istream& is, Sink& mesh)
 	for (;;) {
 		if (!ReadMeshLine(is, cbuf)) return is;
 		if (!ComparePrefix (cbuf, "GROUPS", 6)) {
-			if (sscanf (cbuf+6, "%d", &ngrp) != 1 || ngrp <= 0) return fail();
+			const char* cursor = cbuf+6;
+			if (!ReadMeshCount(cursor, cbuf+std::strlen(cbuf), ngrp) || ngrp <= 0) return fail();
 			break;
 		} else if (!ComparePrefix (cbuf, "STATICMESH", 10)) {
 			staticmesh = true;
@@ -98,7 +119,9 @@ std::istream& ReadMesh(std::istream& is, Sink& mesh)
 			} else if (!ComparePrefix (cbuf, "DYNAMIC", 7)) {
 				flag ^= 0x04;
 			} else if (!ComparePrefix (cbuf, "GEOM", 4)) {    // read geometry
-				if (sscanf (cbuf+4, "%d%d", &nvtx, &ntri) != 2 || nvtx <= 0 ||
+				const char* cursor = cbuf+4;
+				const char* end = cbuf+std::strlen(cbuf);
+				if (!ReadMeshCount(cursor, end, nvtx) || !ReadMeshCount(cursor, end, ntri) || nvtx <= 0 ||
 					nvtx > 65536 || ntri <= 0 || ntri > std::numeric_limits<int>::max()/3) return fail();
 				nidx = ntri*3;
 				ownedVertices.reset(new Vertex[nvtx]);
@@ -131,8 +154,15 @@ std::istream& ReadMesh(std::istream& is, Sink& mesh)
 				std::memset(idx, 0, sizeof(Index)*nidx);
 				for (i = j = 0; i < ntri; i++) {
 					if (!ReadMeshLine(is, cbuf)) return is;
-					if (sscanf(cbuf, "%" SCNu16 "%" SCNu16 "%" SCNu16, idx+j, idx+j+1, idx+j+2) != 3 ||
-						idx[j] >= nvtx || idx[j+1] >= nvtx || idx[j+2] >= nvtx) return fail();
+					// Validate before narrowing: scanf into a 16-bit destination
+					// can wrap malformed file values into valid vertex indices.
+					const char* cursor = cbuf;
+					const char* end = cbuf + std::strlen(cbuf);
+					for (int k = 0; k < 3; ++k) {
+						long long index;
+						if (!ReadMeshInteger(cursor, end, index) || index < 0 || index >= nvtx) return fail();
+						idx[j+k] = static_cast<Index>(index);
+					}
 					j += 3;
 				}
 				if (flipidx)
@@ -151,8 +181,9 @@ std::istream& ReadMesh(std::istream& is, Sink& mesh)
 	}
 
 	// read material list
-	if (ReadMeshLine(is, cbuf) && !strncmp (cbuf, "MATERIALS", 9) && (sscanf (cbuf+9, "%d", &nmtrl) == 1)) {
-		if (nmtrl < 0) return fail();
+	if (ReadMeshLine(is, cbuf) && !strncmp (cbuf, "MATERIALS", 9)) {
+		const char* cursor = cbuf+9;
+		if (!ReadMeshCount(cursor, cbuf+std::strlen(cbuf), nmtrl)) return fail();
 		std::unique_ptr<NameBuffer[]> matname(new NameBuffer[nmtrl]);
 		NameBuffer mnm;
 		for (i = 0; i < nmtrl; i++) {
@@ -179,8 +210,9 @@ std::istream& ReadMesh(std::istream& is, Sink& mesh)
 
 	// read texture list
 	mesh.ReleaseTextures ();
-	if (ReadMeshLine(is, cbuf) && !strncmp (cbuf, "TEXTURES", 8) && (sscanf (cbuf+8, "%d", &ntex) == 1)) {
-		if (ntex < 0) return fail();
+	if (ReadMeshLine(is, cbuf) && !strncmp (cbuf, "TEXTURES", 8)) {
+		const char* cursor = cbuf+8;
+		if (!ReadMeshCount(cursor, cbuf+std::strlen(cbuf), ntex)) return fail();
 		mesh.CreateTextures(ntex);
 		NameBuffer texname = {}, flagstr;
 		for (i = 0; i < ntex; i++) {

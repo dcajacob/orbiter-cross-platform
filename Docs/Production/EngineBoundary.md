@@ -49,6 +49,9 @@ flags and user flags are retained. Native CPU loading does not allocate GPU
 resources. Three-coordinate untextured vertices and CRLF input are supported,
 as required by the original stock meshes. Negative geometry counts, truncated
 geometry and invalid indices fail rather than being dereferenced.
+Counts and triangle indices are range-checked before narrowing, including
+oversized decimal input that would wrap a 16-bit or 32-bit destination. Valid
+signed-positive index syntax and all original stock meshes remain supported.
 
 The shared reader uses the SDK's actual `NTVERTEX`, `COLOUR4` and `MATERIAL`
 records from `OrbiterMeshData.h`. Their declarations are extracted verbatim from
