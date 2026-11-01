@@ -41,3 +41,30 @@ or Linux results cannot substitute for Windows application execution.
 The dedicated `production-elevation.yml` captures logs, toolchain output, input
 identity, repeated CSV files and comparisons. A passing capture must be frozen
 and independently verified before changing elevation calculations or file access.
+
+The shared production manager now compiles natively with explicit settings,
+resource paths, cache time and filter dispatch. File decoding is separate from
+interpolation, with fixed-width header fields, checked payloads and owned file
+handles/arrays. Required invalid archives fail explicitly. Optional absent tiles
+retain the original parent lookup. Native archive paths use the indexed actual
+filename, including directory/filename case.
+
+ASan identified a pre-existing cubic point/normal read beyond tile padding. The
+point sampler now applies the original grid sampler's boundary stencil. Local
+Debug, Release and strict ASan/UBSan/leak runs match the frozen heights/normals
+exactly in both modes; no budget or reference changed. The direct observer uses
+actual production bodies/modules and the same configuration values, with the
+original Sun-before-planets kernel initialization. It is not a native world or
+rendered scene. The workflow now verifies the frozen evidence and runs all four
+native platform/configuration builds instead of automatically recapturing it.
+
+```sh
+cmake -S Src/Orbiter/Production -B out/terrain \
+  -DCMAKE_BUILD_TYPE=Release -DORBITER_BUILD_NATIVE_CELESTIAL_MODULES=ON
+cmake --build out/terrain --target production_native_elevation_observer -j2
+python3 -B Tests/Production/Elevation/verify_port.py \
+  --executable out/terrain/production_native_elevation_observer \
+  --modules out/terrain/NativeModules --data /path/to/verified/celestial-data \
+  --planets /path/to/verified/standard-planets \
+  --output out/terrain-comparison --configuration Release
+```

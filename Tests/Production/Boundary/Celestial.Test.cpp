@@ -6,6 +6,7 @@
 #include "PsysCore.h"
 #include "Element.h"
 #include "Production/RigidBodyServices.h"
+#include "ElevationFiles.Test.h"
 #include <cmath>
 #include <cstring>
 #include <filesystem>
@@ -116,6 +117,7 @@ int main(int argc,char** argv)
             char p[]="Primary",o[]="Orbiter";Star primary(p);TestBody orbiter(o);
             orbiter.Setup();orbiter.Attach(&primary);
             require(primary.Type()==OBJTP_STAR,"Production star type changed");
+            elevation_files_test::run(primary,host.directory);
             require(primary.nSecondary()==1 && primary.Secondary(0)==&orbiter && orbiter.Primary()==&primary,
                     "Production hierarchy did not retain its authoritative objects");
             Vector pos,vel;require(orbiter.PosVelAtTime(1000,&pos,&vel),"Configured conic was unavailable");

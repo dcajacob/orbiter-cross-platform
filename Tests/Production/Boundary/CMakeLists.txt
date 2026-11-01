@@ -15,6 +15,9 @@ set_tests_properties(Production.Configuration PROPERTIES TIMEOUT 30)
 add_test(NAME Production.NativeCelestialEvidence COMMAND ${Python3_EXECUTABLE} -B
     "${CMAKE_CURRENT_SOURCE_DIR}/../SpiceModules/Verification/verify.py")
 set_tests_properties(Production.NativeCelestialEvidence PROPERTIES TIMEOUT 60)
+add_test(NAME Production.TerrainEvidence COMMAND ${Python3_EXECUTABLE} -B
+    "${CMAKE_CURRENT_SOURCE_DIR}/../Elevation/frozen_reference.py")
+set_tests_properties(Production.TerrainEvidence PROPERTIES TIMEOUT 60)
 add_executable(production_archive_observer ../Archives/Observe.cpp)
 target_link_libraries(production_archive_observer PRIVATE orbiter_production_boundary)
 if(DEFINED ORBITER_BINARY_ROOT_DIR)

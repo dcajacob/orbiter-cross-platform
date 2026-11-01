@@ -4,8 +4,11 @@
 #ifndef __ELEVMGR_H
 #define __ELEVMGR_H
 
-#include "windows.h"
-#include "vecmat.h"
+#include "Vecmat.h"
+#include "Production/CoreTypes.h"
+#include "Production/ElevationServices.h"
+#include "Production/Export.h"
+#include <cstdint>
 #include "ZTreeMgr.h"
 #include <vector>
 
@@ -34,7 +37,7 @@ struct ElevationTile {
 		nmlidx = 0;
 	}
 
-	INT16 *data;
+	std::int16_t *data;
 	int lvl, tgtlvl;
 	double latmin, latmax;
 	double lngmin, lngmax;
@@ -48,10 +51,13 @@ struct ElevationTile {
 	const class ElevationManager* mgr;
 };
 
-class ElevationManager {
+class ORBITER_PRODUCTION_API ElevationManager {
 public:
 	ElevationManager (const CelestialBody *_cbody);
+	ElevationManager(const CelestialBody*,const orbiter::production::ElevationSetup&,orbiter::production::ElevationServices&);
 	~ElevationManager();
+	ElevationManager(const ElevationManager&)=delete;
+	ElevationManager& operator=(const ElevationManager&)=delete;
 	double Elevation (double lat, double lng, int reqlvl=0, std::vector<ElevationTile> *tilecache = 0, Vector *normal=0, int *lvl=0) const;
 	/**
 	* \brief Synthesize an elevation tile by interpolating from the parent
@@ -66,22 +72,23 @@ public:
 	* \param emean if != 0, receives mean elevation
 	* \note Requires lvl > plvl. The parent tile parameters must be an actual parent of the target (i.e. target covers a sub-area of the parent)
 	*/
-	void ElevationGrid (int ilat, int ilng, int lvl, int pilat, int pilng, int plvl, INT16 *pelev, float *elev, double *emean=0) const;
-	void ElevationGrid(int ilat, int ilng, int lvl, int pilat, int pilng, int plvl, INT16* pelev, INT16* elev, double* emean = 0) const;
+	void ElevationGrid (int ilat, int ilng, int lvl, int pilat, int pilng, int plvl, std::int16_t *pelev, float *elev, double *emean=0) const;
+	void ElevationGrid(int ilat, int ilng, int lvl, int pilat, int pilng, int plvl, std::int16_t* pelev, std::int16_t* elev, double* emean = 0) const;
 
 protected:
 	int  Quadrant(double lat, double lng, int lvl) const;
 	bool TileIdx (double lat, double lng, int lvl, int *ilat, int *ilng) const;
-	INT16 *LoadElevationTile (int lvl, int ilat, int ilng, double tgt_res) const;
-	bool LoadElevationTile_mod (int lvl, int ilat, int ilng, double tgt_res, INT16 *elev) const;
+	std::int16_t *LoadElevationTile (int lvl, int ilat, int ilng, double tgt_res) const;
+	bool LoadElevationTile_mod (int lvl, int ilat, int ilng, double tgt_res, std::int16_t *elev) const;
 	bool HasElevationTile(int lvl, int ilat, int ilng) const;
 
 private:
+	orbiter::production::ElevationServices* services;
 	const CelestialBody *cbody;
 	int maxlvl = 0;
 	int mode = 0;  // elevation mode (0=no elevation, 1=linear interpolation, 2=cubic interpolation)
 	double elev_res = 1;  // elevation resolution [m]
-	DWORD tilesource = 2; // bit 1: try loading from cache, bit 2: try loading from archive
+	orbiter::production::UInt32 tilesource = 2; // bit 1: try loading from cache, bit 2: try loading from archive
 	ZTreeMgr *treeMgr[5];
 	bool bDirExists, bModExists;
 	mutable std::vector<ElevationTile> *local_cache = nullptr;

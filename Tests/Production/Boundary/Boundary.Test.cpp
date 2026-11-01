@@ -134,6 +134,10 @@ void resourceTests(const fs::path& temporary)
     require(resources.FileCount() == 1, "Resource index omitted a file");
     require(resources.Resolve("iss\\STATION.MSH") == fs::canonical(root)/"ISS"/"Station.msh", "Case/separator lookup failed");
     require(resources.Contains("./Iss//Station.msh"), "Normalized lookup failed");
+    require(resources.ContainsDirectory("iSs") && resources.ResolveDirectory("ISS")==fs::canonical(root)/"ISS",
+        "Indexed directory case lookup failed");
+    require(!resources.ContainsDirectory("ISS/Station.msh"),"File was treated as a resource directory");
+    rejects([&] {resources.ResolveDirectory("missing");});
     for (const auto* invalid : {"../Station.msh", "ISS/../../x", "/ISS/x", "C:\\ISS\\x", "\\\\server\\x", ""})
         rejects([&] { resources.Resolve(invalid); });
     rejects([&] { resources.Resolve("missing.msh"); });

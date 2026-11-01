@@ -49,7 +49,8 @@ ResourceResolver::ResourceResolver(const fs::path& directory)
         // Explicitly reject it rather than silently omit required resources.
         if (entry.is_symlink()) throw std::runtime_error("Symlink in resource root: " + relative.string());
         if (entry.is_regular_file()) files.emplace(key, entry.path());
-        else if (!entry.is_directory()) throw std::runtime_error("Unsupported resource entry: " + relative.string());
+        else if (entry.is_directory()) directories.emplace(key,entry.path());
+        else throw std::runtime_error("Unsupported resource entry: " + relative.string());
     }
 }
 
@@ -62,5 +63,15 @@ fs::path ResourceResolver::Resolve(const std::string& relative) const
 bool ResourceResolver::Contains(const std::string& relative) const
 {
     return files.count(Normalize(relative)) != 0;
+}
+fs::path ResourceResolver::ResolveDirectory(const std::string& relative) const
+{
+    const auto found=directories.find(Normalize(relative));
+    if (found==directories.end()) throw std::runtime_error("Missing resource directory: "+relative+" under "+root.string());
+    return found->second;
+}
+bool ResourceResolver::ContainsDirectory(const std::string& relative) const
+{
+    return directories.count(Normalize(relative))!=0;
 }
 }

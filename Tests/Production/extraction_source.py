@@ -39,6 +39,9 @@ def verify():
     if ledger['observed_source'] != CAPTURE or ledger['production_source'] != BASE:
         raise ValueError('extraction baseline identity changed')
     declared = ledger['files']
+    if 'Src/Orbiter/elevmgrFile.cpp' in declared:
+        from elevation_source import verify as verify_elevation
+        verify_elevation()
     if 'Src/Orbiter/Production/NavigationServices.cpp' in declared:
         from navigation_source import verify as verify_navigation
         verify_navigation()

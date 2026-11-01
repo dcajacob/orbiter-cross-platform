@@ -15,12 +15,15 @@ public:
     explicit ResourceResolver(const std::filesystem::path& root);
     std::filesystem::path Resolve(const std::string& relative) const;
     bool Contains(const std::string& relative) const;
+    std::filesystem::path ResolveDirectory(const std::string& relative) const;
+    bool ContainsDirectory(const std::string& relative) const;
     const std::filesystem::path& Root() const { return root; }
     std::size_t FileCount() const { return files.size(); }
     static std::string Normalize(const std::string& relative);
 private:
     std::filesystem::path root;
     std::map<std::string, std::filesystem::path> files;
+    std::map<std::string, std::filesystem::path> directories;
 };
 }
 #endif

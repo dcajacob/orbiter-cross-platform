@@ -131,6 +131,29 @@ original pinned zlib source. This ports engine archive access only: production
 elevation/contact/world integration and the renderer's separate archive reader
 remain later work. See the [archive gate](../../Tests/Production/Archives/README.md).
 
+The production `ElevationManager` now builds in the shared core. Its original
+linear/cubic interpolation, normal calculation, cache selection and grid
+interpolation retain one implementation. Explicit settings, resource paths,
+cache time and optional filter dispatch replace application access. Windows
+retains its actual planet/configuration values and client filter callback;
+native queries use indexed, verified archive/loose-file paths. File loading and
+original scale/offset/mask conversion are separate from interpolation. Checked
+100-byte headers and payload extents reject unsupported or truncated tiles;
+files and temporary arrays close on failures. Indexed directories and explicit
+archive filenames preserve case-insensitive stock lookup without changing
+quadtree mapping.
+
+The original point sampler read past its one-sample padding at upper tile
+edges. ASan reproduced this on the locked query set. Point interpolation and
+normal derivatives now use the same bounded stencil as the original grid
+sampler; formulas and evaluation order are retained. Both interpolation modes
+match all 2,040 frozen original Windows heights/normals exactly in local Debug,
+Release and strict sanitizer runs, including repeated executions. The
+[terrain reference](../../Tests/Production/Elevation/README.md) was captured and
+frozen before extraction. Direct tests still use original body configuration
+and real modules/archives; they do not create a native production world, vessel
+or renderer. Hosted full-application and terrain checks remain required.
+
 The original `CelestialBody` class now compiles in the same library. Its
 hierarchy, barycentre calculations, polar conversion, precession, rotation,
 interpolation and ephemeris interpretation retain their original formulas and

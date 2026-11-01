@@ -99,12 +99,20 @@ ZTreeMgr* ZTreeMgr::CreateFromFile(const char* planetPath,Layer layer)
 {auto manager=std::make_unique<ZTreeMgr>(planetPath,layer);return manager->TOC().size()?manager.release():nullptr;}
 ZTreeMgr::ZTreeMgr(const char* planetPath,Layer value):path(planetPath?planetPath:""),layer(value)
 {if (!planetPath || !*planetPath) error="Empty planetary archive directory";else OpenArchive();}
+ZTreeMgr::ZTreeMgr(const std::filesystem::path& file,Layer value,bool direct):path(file),directPath(direct),layer(value)
+{if (path.empty()) error="Empty planetary archive filename";else OpenArchive();}
+std::unique_ptr<ZTreeMgr> ZTreeMgr::OpenArchiveFile(const std::filesystem::path& file,Layer layer)
+{
+    auto manager=std::unique_ptr<ZTreeMgr>(new ZTreeMgr(file,layer,true));
+    if (!manager->TOC().size()) throw std::runtime_error(manager->Error()+": "+file.string());
+    return manager;
+}
 bool ZTreeMgr::OpenArchive()
 {
     try {
         const char* names[]={"Surf","Mask","Elev","Elev_mod","Label","Cloud"};
         require(layer>=LAYER_SURF && layer<=LAYER_CLOUD,"Invalid planetary archive layer");
-        treef.open(path/"Archive"/(std::string(names[layer])+".tree"),std::ios::binary);
+        treef.open(directPath ? path : path/"Archive"/(std::string(names[layer])+".tree"),std::ios::binary);
         require(bool(treef),"Missing/unreadable planetary archive");
         treef.seekg(0,std::ios::end);
         const auto fileEnd=treef.tellg();

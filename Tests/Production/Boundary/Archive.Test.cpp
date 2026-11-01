@@ -18,6 +18,8 @@ int main(int argc,char** argv)
             require(!archive.TOC().size() && !archive.Error().empty(),"Invalid archive accepted without error");
             std::unique_ptr<ZTreeMgr> factory(ZTreeMgr::CreateFromFile(argv[1],ZTreeMgr::LAYER_SURF));
             require(!factory,"Invalid archive factory succeeded");
+            bool rejected=false;try {ZTreeMgr::OpenArchiveFile(path,ZTreeMgr::LAYER_SURF);}catch(const std::runtime_error&){rejected=true;}
+            require(rejected,"Required invalid archive did not fail explicitly");
             if (std::filesystem::exists(path)) require(std::filesystem::remove(path),"Invalid archive handle leaked");
         } else if (mode=="corrupt" || mode=="truncated") {
             require(archive.TOC().size()>0,"Corruption fixture header did not open");
@@ -27,6 +29,9 @@ int main(int argc,char** argv)
             require(!archive.ReadData(index,&output) && !output && !archive.Error().empty(),"Corrupt payload returned success/stale memory");
         } else if (mode=="valid") {
             require(archive.TOC().size()==9 && archive.Error().empty(),"Valid archive did not open");
+            auto direct=ZTreeMgr::OpenArchiveFile(path,ZTreeMgr::LAYER_SURF);
+            require(direct->TOC().size()==archive.TOC().size() && direct->Idx(5,1,1)==archive.Idx(5,1,1),
+                "Explicit indexed archive opening changed quadtree mapping");
             for (const auto& q : {std::array<int,3>{0,0,0},{-1,0,0},{35,0,0},{4,-1,0},{4,0,-1},{4,1,0},{4,0,2},{1,0,1},{5,2,0},{5,0,4}})
                 require(archive.Idx(q[0],q[1],q[2])==UINT32_MAX,"Invalid coordinate succeeded");
             require(archive.Idx(5,0,0)==5 && archive.Idx(5,0,1)==6 && archive.Idx(5,1,0)==7 && archive.Idx(5,1,1)==8,"Child quadrant ordering changed");

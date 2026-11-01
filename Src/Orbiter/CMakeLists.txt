@@ -15,7 +15,6 @@ set(common_src
 	cmdline.cpp
 	console_ng.cpp
 	ElementApplication.cpp
-	elevmgr.cpp
 	Help.cpp
 	Input.cpp
 	Keymap.cpp
@@ -26,6 +25,7 @@ set(common_src
 	Production/WindowsBodyServices.cpp
 	Production/WindowsRigidBodyServices.cpp
 	Production/WindowsCelestialServices.cpp
+	Production/WindowsElevationServices.cpp
 	Production/WindowsNavigationServices.cpp
 	Production/WindowsMeshServices.cpp
 	PlaybackEd.cpp

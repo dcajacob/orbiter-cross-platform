@@ -7,6 +7,7 @@
 #include <cstdio>
 #include <filesystem>
 #include <fstream>
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -49,6 +50,9 @@ class ORBITER_PRODUCTION_API ZTreeMgr {
 public:
     enum Layer {LAYER_SURF,LAYER_MASK,LAYER_ELEV,LAYER_ELEVMOD,LAYER_LABEL,LAYER_CLOUD};
     static ZTreeMgr* CreateFromFile(const char* planetPath,Layer layer);
+    // Open an already indexed filename, preserving its actual case on disk.
+    // Required corrupt/missing archives throw instead of becoming absent layers.
+    static std::unique_ptr<ZTreeMgr> OpenArchiveFile(const std::filesystem::path& file,Layer layer);
     ZTreeMgr(const char* planetPath,Layer layer);
     ~ZTreeMgr()=default;
     ZTreeMgr(const ZTreeMgr&)=delete;
@@ -66,7 +70,9 @@ protected:
     bool OpenArchive();
     std::uint32_t Inflate(const unsigned char* input,std::uint32_t inputSize,unsigned char* output,std::uint32_t outputSize);
 private:
+    ZTreeMgr(const std::filesystem::path& file,Layer layer,bool direct);
     std::filesystem::path path;
+    bool directPath=false;
     Layer layer;
     std::ifstream treef;
     TreeTOC toc;

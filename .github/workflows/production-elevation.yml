@@ -1,8 +1,8 @@
-name: Original Production Windows Terrain
+name: Production Terrain Windows and Linux
 on:
   push:
     branches: ['codex/production-**']
-    paths: ['Tests/Production/Elevation/**', '.github/workflows/production-elevation.yml']
+    paths: ['Src/Orbiter/**', 'Src/Celbody/**', 'Orbitersdk/**', 'Tests/Production/Elevation/**', '.github/workflows/production-elevation.yml']
   workflow_dispatch:
 permissions:
   contents: read
@@ -24,6 +24,85 @@ jobs:
           else
             echo 'capture=true' >> "$GITHUB_OUTPUT"
           fi
+  native:
+    name: Shared terrain ${{ matrix.os }} ${{ matrix.configuration }} x64
+    needs: reference
+    if: needs.reference.outputs.capture == 'false'
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-24.04, windows-2022]
+        configuration: [Debug, Release]
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - uses: ilammy/msvc-dev-cmd@v1
+        if: runner.os == 'Windows'
+        with:
+          vsversion: '17.0'
+          arch: x64
+      - name: Install native archive dependency
+        if: runner.os == 'Linux'
+        run: sudo apt-get update && sudo apt-get install -y zlib1g-dev
+      - name: Build original shared terrain and actual native module dependencies
+        shell: bash
+        run: |
+          set -euo pipefail
+          cmake -S Src/Orbiter/Production -B out/terrain-native -G Ninja -DCMAKE_BUILD_TYPE=${{ matrix.configuration }} -DORBITER_BUILD_NATIVE_CELESTIAL_MODULES=ON 2>&1 | tee terrain-configure.log
+          cmake --build out/terrain-native --target production_native_elevation_observer --parallel 2 2>&1 | tee terrain-build.log
+      - uses: actions/cache@v6
+        with:
+          path: out/data-cache/production-stock-data-v1.zip
+          key: production-native-data-${{ hashFiles('Tests/Production/input-storage.lock.json') }}
+      - uses: actions/cache@v6
+        with:
+          path: out/planet-cache/Orbiter2016.zip
+          key: production-standard-planets-${{ hashFiles('Tests/Production/standard-planets.lock.json') }}
+      - name: Verify original celestial data from audited immutable storage
+        run: >-
+          python Tests/Production/prepare_native_data.py --archive out/data-cache/production-stock-data-v1.zip
+          --destination out/data --group celestial
+      - name: Verify original planetary archives
+        run: >-
+          python Tests/Production/prepare_data.py --lock Tests/Production/standard-planets.lock.json
+          --archive out/planet-cache/Orbiter2016.zip --destination out/planets
+      - name: Compare repeated production terrain queries with frozen original Windows
+        run: >-
+          python Tests/Production/Elevation/verify_port.py
+          --executable out/terrain-native/production_native_elevation_observer${{ runner.os == 'Windows' && '.exe' || '' }}
+          --modules out/terrain-native/NativeModules --data out/data --planets out/planets
+          --output out/terrain-observation --configuration ${{ matrix.configuration }}
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: native-terrain-${{ matrix.os }}-${{ matrix.configuration }}-x64
+          retention-days: 90
+          path: |
+            terrain-*.log
+            out/terrain-native/CMakeCache.txt
+            out/terrain-observation/*.csv
+            out/terrain-observation/*.json
+            out/terrain-observation/*.log
+  parity:
+    name: Production terrain Windows/Linux parity
+    needs: native
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/download-artifact@v8
+        with:
+          pattern: native-terrain-*-*-x64
+          path: out/evidence
+      - run: python3 -B Tests/Production/Elevation/compare_platforms.py --evidence out/evidence --report native-terrain-parity.json
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: native-terrain-parity
+          retention-days: 90
+          path: native-terrain-parity.json
   observe:
     needs: reference
     if: needs.reference.outputs.capture == 'true'
