@@ -35,6 +35,7 @@
 #include "resource.h"
 #include "Orbiter.h"
 #include "Production/WindowsSession.h"
+#include "Production/WindowsWorldVesselServices.h"
 #include "Production/WindowsBodyServices.h"
 #include "Production/WindowsRigidBodyServices.h"
 #include "Production/WindowsCelestialServices.h"
