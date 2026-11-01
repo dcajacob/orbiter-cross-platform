@@ -4,6 +4,13 @@ add_subdirectory(Production/Boundary)
 # Test-only control/observation plugin; never installed as a stock module.
 option(ORBITER_PRODUCTION_REFERENCE_CAPTURE "Build production Windows reference driver" OFF)
 if(WIN32 AND ORBITER_PRODUCTION_REFERENCE_CAPTURE)
+    # Observe the original archive code before replacing raw Windows disk I/O.
+    add_executable(production_archive_observer Production/Archives/Observe.cpp
+        ../Src/Orbiter/ZTreeMgr.cpp)
+    target_link_libraries(production_archive_observer PRIVATE orbiter_production_boundary zlib)
+    target_compile_definitions(production_archive_observer PRIVATE NOGRAPHICS DIRECTINPUT_VERSION=0x0800 NOMINMAX)
+    set_target_properties(production_archive_observer PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${ORBITER_BINARY_ROOT_DIR}")
+    orbiter_stage_core_runtime(production_archive_observer)
     target_sources(${OrbiterTgt} PRIVATE Production/ApplicationObservation.cpp)
     target_include_directories(${OrbiterTgt} PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/Production")
     target_compile_definitions(${OrbiterTgt} PRIVATE ORBITER_PRODUCTION_OBSERVATION=1)

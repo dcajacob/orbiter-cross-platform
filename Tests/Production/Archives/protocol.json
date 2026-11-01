@@ -1,0 +1,22 @@
+{
+  "schema": 1,
+  "automatic_refresh": false,
+  "production_source": "38b7c627878ea893390675616897071f8bb8e90f",
+  "comparison": "exact integer identities and decoded bytes",
+  "repeat_policy": "two byte-identical observations independently checked against explicit 48-byte headers, 32-byte nodes and zlib decoding",
+  "archives": 28,
+  "fixtures": [
+    "records",
+    "sparse64"
+  ],
+  "queries_per_archive": 40,
+  "production_source_sha256_lf": {
+    "Src/Orbiter/ZTreeMgr.cpp": "930135d3de460348b0565c4ccae35e2307bcc3db6785120a801dc930ee84161c",
+    "Src/Orbiter/ZTreeMgr.h": "4e350bc0023f609df87bdf79a8b5ee4cfd6e9411311e35a4ebd71b496fc61ecd"
+  },
+  "inputs_sha256_lf": {
+    "Tests/Production/Archives/Observe.cpp": "aab58ad0dc6a249a97ff23d5631ff7b9da171d4f9e3e20bd44ac015953bc1a7b",
+    "Tests/Production/Archives/observations.py": "6c022436bda4523b116ba6f2005b414cca148e4d5774b8a21e64e5317120f87e",
+    "Tests/Production/standard-planets.lock.json": "de0366be8f138b11135e5f675cc44ae0d4cf9a8b11fe0f71772ad617237185c4"
+  }
+}

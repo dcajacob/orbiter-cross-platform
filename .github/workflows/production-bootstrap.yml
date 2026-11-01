@@ -248,6 +248,11 @@ jobs:
           python Tests/Production/behavior_suite.py --orbiter out/production-app/Orbiter.exe
           --data out/production-data --planets out/standard-planets --output out/production-behavior
           --configuration ${{ matrix.configuration }}
+      - name: Observe unchanged planetary archive decoding before extraction
+        run: >-
+          python Tests/Production/Archives/observations.py
+          --executable out/production-app/production_archive_observer.exe --data out/standard-planets
+          --output out/production-archives --configuration ${{ matrix.configuration }}
       - name: Compare behavior against the explicitly frozen production references
         run: >-
           python Tests/Production/frozen_behavior.py --candidate out/production-behavior
@@ -270,6 +275,8 @@ jobs:
             out/production-app/build-inputs.json
             out/production-app/Testing/Temporary/*.log
             out/production-gravity/**
+            out/production-archives/*.json
+            out/production-archives/*.log
             out/original-verification/**/trace.csv
             out/original-verification/**/*.json
             out/production-reference/**/*.csv
