@@ -11,7 +11,8 @@ from compare_client import image_ssim
 
 def fixture(case):
     text=scenario(case['fixture']).replace('MODE Extern','MODE Cockpit')
-    if case.get('class')=='DeltaGlider':text=text.replace('DG:DG-S','DG:DeltaGlider')
+    if case.get('class')=='DeltaGlider':
+        text=text.replace('DG:DG-S','DG:DeltaGlider').replace('PRPLEVEL 0:0.8 1:1 2:1','PRPLEVEL 0:0.8 1:1').replace('  TANKCONFIG 1\n','')
     panel={1:'',2:'BEGIN_PANEL\nEND_PANEL\n',3:'BEGIN_VC\nEND_VC\n'}[case['cockpit']]
     return text.replace('BEGIN_SHIPS','BEGIN_HUD\n  TYPE '+{1:'Orbit',2:'Surface',3:'Docking'}[case['hud']]+'\nEND_HUD\n'+panel+'BEGIN_SHIPS')
 

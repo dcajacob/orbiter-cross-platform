@@ -13,6 +13,8 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 #include "Scene.h"
 #include "OGLCamera.h"
 #include <cstring>
+#include <limits>
+#include <stdexcept>
 
 #include <cwchar>
 #ifdef _WIN32
@@ -427,7 +429,10 @@ OGLFont::OGLFont (int height, bool prop, const char *face, FontStyle style, int 
 {
 	rotationRadians = -3.1415926535898/180.0 * (orientation * 0.1f);
     m_facename = face;
-    m_Height = height;
+    if(height==0 || height==std::numeric_limits<int>::min())throw std::invalid_argument("Invalid OpenGL font height");
+    // Orbiter uses negative heights for character height; NanoVG requires a
+    // positive size. Preserve the existing positive cell-height mapping.
+    m_Height = height<0 ? -height : height;
 	antialiased = aa;
 
     // Bundled, pinned fonts keep host font discovery out of rendering.

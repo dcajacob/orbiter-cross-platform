@@ -28,6 +28,22 @@ unchanged stock 10 Hz wall-time MFD limiter does not discard updates. Simulation
 clocks, numerical formulas and the MFD scheduler are unchanged. The FPS, menu and
 information bars are hidden; no image masks are used.
 
+`source.lock.json` preserves hashes of 98 original cockpit, instrumentation,
+selection and DG/DG-S owning sources. `sources.py --current` verifies they are
+unchanged before capture. These source pins are independent of runtime acceptance.
+
+Initial captures are not accepted: a missing direct MSVC include was corrected,
+the harness now selects and verifies actual llvmpipe, and cockpit initialization
+exposed negative font heights passed unchanged to NanoVG. The shared renderer
+now maps negative character heights to positive raster sizes and rejects invalid
+surface dimensions without aborting. The packed depth/stencil target is attached
+through its matching GL attachment. A separate native renderer probe verifies
+actual glyph pixels, sensible negative-height metrics, GL error state and surface
+rejection without creating a replacement simulation or instrument. Locally it
+reports 9x14 metrics and 271 colored glyph pixels for the `-14` request; the old
+preserved renderer fails the same focused exercise. Full Windows cockpit probes
+must pass before any capture is frozen or instrumentation extraction starts.
+
 Before extraction, require repeat-identical numerical and displayed-text traces,
 finite finalized state, actual expected cockpit/MFD modes, numerical display
 calls, normal real window/context teardown, no GL errors and SSIM at least 0.98.

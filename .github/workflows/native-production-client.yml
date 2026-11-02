@@ -78,6 +78,13 @@ jobs:
               allowed=['amd-6121d02-sse2'] if '${{ matrix.math_profile }}'=='sse2' else ['amd-6121d02-fma3','amd-6121d02-sse2']
               assert numerics['math'] in allowed, 'Wrong actual CPU math profile'
           PY
+      - name: Verify real instrument render targets and negative-height font glyph pixels
+        shell: bash
+        run: |
+          set -euo pipefail
+          cmake -S Tests/Production/Cockpit/RendererProbe -B out/renderer-probe -G Ninja -DCMAKE_BUILD_TYPE=${{ matrix.configuration }} -DORBITER_ENGINE_BUILD="$PWD/out/native-engine" 2>&1 | tee native-instrument-probe-build.log
+          cmake --build out/renderer-probe --parallel 2 2>&1 | tee -a native-instrument-probe-build.log
+          xvfb-run -a env LIBGL_ALWAYS_SOFTWARE=1 GALLIUM_DRIVER=llvmpipe out/renderer-probe/renderer-probe "$PWD/out/native-engine/NativeModules/Graphics/OGLClient.so" "$PWD/out/scene-resources" "$PWD/out/planets" "$PWD/out/renderer-probe/report.json" 2>&1 | tee native-instrument-probe.log
       - name: Verify flyable stock ShuttlePB, timing, docking and persistence
         shell: bash
         run: |
@@ -115,6 +122,7 @@ jobs:
             out/native-math/math-verification.json
             out/native-math/CMakeCache.txt
             native-*.log
+            out/renderer-probe/report.json
             out/native-engine/CMakeCache.txt
             out/native-renderer/CMakeCache.txt
             out/native-engine/native-sdk/OrbiterNativeBuild.h

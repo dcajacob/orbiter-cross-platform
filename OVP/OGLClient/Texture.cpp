@@ -899,6 +899,11 @@ OGLTexture *TextureManager::CreateTextureFromTexId(GLuint texId, int width, int 
 // from http://www.opengl-tutorial.org/fr/intermediate-tutorials/tutorial-14-render-to-texture/
 OGLTexture *TextureManager::GetTextureForRendering(int w, int h, int attrib)
 {
+    GLint maximum=0;glGetIntegerv(GL_MAX_TEXTURE_SIZE,&maximum);
+    if(w<=0 || h<=0 || w>maximum || h>maximum){
+        fprintf(stderr,"OpenGL surface dimensions unsupported: %dx%d (maximum %d)\n",w,h,maximum);
+        return nullptr;
+    }
     OGLTexture *tex = new OGLTexture;
     tex->m_RefCnt = 1;
     tex->m_InCache = false;
@@ -947,14 +952,14 @@ OGLTexture *TextureManager::GetTextureForRendering(int w, int h, int attrib)
     glBindRenderbuffer(GL_RENDERBUFFER, tex->m_RBO);
     glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, w, h);
     glBindRenderbuffer(GL_RENDERBUFFER, 0);
-    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_STENCIL_ATTACHMENT, GL_RENDERBUFFER, tex->m_RBO);
+    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, tex->m_RBO);
 
     if(glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
     {
         GLenum t = glCheckFramebufferStatus(GL_FRAMEBUFFER);
-        printf("glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE (0x%x)\n", t);
-        abort();
-        exit(-1);
+        fprintf(stderr,"OpenGL surface incomplete: %dx%d flags=0x%x status=0x%x\n",w,h,attrib,t);
+        glBindTexture(GL_TEXTURE_2D,0);glBindFramebuffer(GL_FRAMEBUFFER,oldFB);
+        tex->Release();return nullptr;
     }
 	glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);

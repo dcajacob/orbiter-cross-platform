@@ -7,6 +7,9 @@ on:
 permissions:
   contents: read
   actions: read
+concurrency:
+  group: production-cockpit-reference-${{ github.ref }}
+  cancel-in-progress: true
 jobs:
   cockpit:
     name: Original production cockpit ${{ matrix.configuration }} x64
@@ -50,6 +53,8 @@ jobs:
         run: |
           Expand-Archive out/runtime-archive/windows-test-runtime.zip out/production-app
           python Tests/Production/verify_test_runtime.py --runtime out/production-app --source d14fa7941bd4b60bd5b07c8e444ebfb87761893f
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          python -B Tests/Production/Cockpit/sources.py --current
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
       - name: Build the separate real GraphicsClient with observation-only text/capture hooks
         shell: pwsh
