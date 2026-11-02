@@ -1,8 +1,5 @@
 name: Production Cockpit Windows Reference
 on:
-  push:
-    branches: ['codex/production-**']
-    paths: ['Tests/Production/Cockpit/**', 'OVP/OGLClient/InstrumentEvidence.h', '.github/workflows/production-cockpit-reference.yml']
   workflow_dispatch:
 permissions:
   contents: read

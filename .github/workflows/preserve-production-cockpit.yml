@@ -1,0 +1,51 @@
+name: Preserve Accepted Windows Cockpit Evidence
+on:
+  push:
+    branches: ['codex/production-**']
+    paths:
+      - '.github/workflows/preserve-production-cockpit.yml'
+      - 'Tests/Production/Cockpit/Reference/provenance.json'
+      - 'Tests/Production/Cockpit/frozen.py'
+      - 'Tests/Production/Cockpit/preserve.py'
+  workflow_dispatch:
+permissions:
+  contents: write
+  actions: read
+concurrency:
+  group: accepted-windows-cockpit-v1
+  cancel-in-progress: false
+jobs:
+  preserve:
+    if: github.repository == 'dcajacob/orbiter-cross-platform'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    env:
+      GH_TOKEN: ${{ github.token }}
+      GH_REPO: ${{ github.repository }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - run: python3 -B Tests/Production/Cockpit/frozen.py
+      - name: Verify and download explicitly accepted source-built evidence
+        run: python3 -B Tests/Production/Cockpit/preserve.py --output out/cockpit-preserved
+      - name: Preserve original captures and binaries without replacing an existing release
+        run: |
+          if gh release view production-windows-cockpit-v1 >/dev/null 2>&1; then
+            mkdir out/previous
+            gh release download production-windows-cockpit-v1 --pattern provenance.json --pattern files.json --dir out/previous
+            cmp out/cockpit-preserved/provenance.json out/previous/provenance.json
+            cmp out/cockpit-preserved/files.json out/previous/files.json
+          else
+            gh release create production-windows-cockpit-v1 out/cockpit-preserved/* \
+              --target "$GITHUB_SHA" --prerelease \
+              --title 'Original Windows cockpit and instrument reference v1' \
+              --notes-file Tests/Production/Cockpit/Reference/README.md
+          fi
+      - name: Verify the public evidence can be staged from release storage
+        run: python3 -B Tests/Production/Cockpit/frozen.py --cache out/public-cache --output out/public-reference
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: preserved-cockpit-evidence-index
+          path: out/cockpit-preserved/files.json

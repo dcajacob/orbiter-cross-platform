@@ -1,0 +1,158 @@
+{
+  "status": "passed",
+  "cases": {
+    "generic_orbit_surface": {
+      "maxima": {
+        "position_m": 0.0,
+        "velocity_m_s": 0.0,
+        "rotation_rad": 0.0,
+        "angular_velocity_rad_s": 0.0,
+        "mjd_days": 0.0,
+        "propellant_fraction": 0.0
+      },
+      "identical_display_text": true,
+      "identical_hud_atlas_updates": true,
+      "overlay_pixel_error": 0.0,
+      "ssim": {
+        "20": 1.0,
+        "50": 1.0
+      }
+    },
+    "generic_map_hsi": {
+      "maxima": {
+        "position_m": 0.0,
+        "velocity_m_s": 0.0,
+        "rotation_rad": 0.0,
+        "angular_velocity_rad_s": 0.0,
+        "mjd_days": 0.0,
+        "propellant_fraction": 0.0
+      },
+      "identical_display_text": true,
+      "identical_hud_atlas_updates": true,
+      "overlay_pixel_error": 0.0,
+      "ssim": {
+        "20": 1.0,
+        "50": 1.0
+      }
+    },
+    "generic_landing_docking": {
+      "maxima": {
+        "position_m": 0.0,
+        "velocity_m_s": 0.0,
+        "rotation_rad": 0.0,
+        "angular_velocity_rad_s": 0.0,
+        "mjd_days": 0.0,
+        "propellant_fraction": 0.0
+      },
+      "identical_display_text": true,
+      "identical_hud_atlas_updates": true,
+      "overlay_pixel_error": 0.0,
+      "ssim": {
+        "20": 1.0,
+        "50": 1.0
+      }
+    },
+    "generic_align_sync": {
+      "maxima": {
+        "position_m": 0.0,
+        "velocity_m_s": 0.0,
+        "rotation_rad": 0.0,
+        "angular_velocity_rad_s": 0.0,
+        "mjd_days": 0.0,
+        "propellant_fraction": 0.0
+      },
+      "identical_display_text": true,
+      "identical_hud_atlas_updates": true,
+      "overlay_pixel_error": 0.0,
+      "ssim": {
+        "20": 1.0,
+        "50": 1.0
+      }
+    },
+    "generic_transfer_comms": {
+      "maxima": {
+        "position_m": 0.0,
+        "velocity_m_s": 0.0,
+        "rotation_rad": 0.0,
+        "angular_velocity_rad_s": 0.0,
+        "mjd_days": 0.0,
+        "propellant_fraction": 0.0
+      },
+      "identical_display_text": true,
+      "identical_hud_atlas_updates": true,
+      "overlay_pixel_error": 0.0,
+      "ssim": {
+        "20": 1.0,
+        "50": 1.0
+      }
+    },
+    "dg_panel": {
+      "maxima": {
+        "position_m": 0.0,
+        "velocity_m_s": 0.0,
+        "rotation_rad": 0.0,
+        "angular_velocity_rad_s": 0.0,
+        "mjd_days": 0.0,
+        "propellant_fraction": 0.0
+      },
+      "identical_display_text": true,
+      "identical_hud_atlas_updates": true,
+      "overlay_pixel_error": 0.0,
+      "ssim": {
+        "20": 1.0,
+        "50": 1.0
+      }
+    },
+    "dg_vc": {
+      "maxima": {
+        "position_m": 0.0,
+        "velocity_m_s": 0.0,
+        "rotation_rad": 0.0,
+        "angular_velocity_rad_s": 0.0,
+        "mjd_days": 0.0,
+        "propellant_fraction": 0.0
+      },
+      "identical_display_text": true,
+      "identical_hud_atlas_updates": true,
+      "overlay_pixel_error": 0.0,
+      "ssim": {
+        "20": 1.0,
+        "50": 1.0
+      }
+    },
+    "dgs_panel": {
+      "maxima": {
+        "position_m": 0.0,
+        "velocity_m_s": 0.0,
+        "rotation_rad": 0.0,
+        "angular_velocity_rad_s": 0.0,
+        "mjd_days": 0.0,
+        "propellant_fraction": 0.0
+      },
+      "identical_display_text": true,
+      "identical_hud_atlas_updates": true,
+      "overlay_pixel_error": 0.0,
+      "ssim": {
+        "20": 1.0,
+        "50": 1.0
+      }
+    },
+    "dgs_vc": {
+      "maxima": {
+        "position_m": 0.0,
+        "velocity_m_s": 0.0,
+        "rotation_rad": 0.0,
+        "angular_velocity_rad_s": 0.0,
+        "mjd_days": 0.0,
+        "propellant_fraction": 0.0
+      },
+      "identical_display_text": true,
+      "identical_hud_atlas_updates": true,
+      "overlay_pixel_error": 0.0,
+      "ssim": {
+        "20": 1.0,
+        "50": 1.0
+      }
+    }
+  }
+}

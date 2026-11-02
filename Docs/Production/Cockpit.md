@@ -4,6 +4,15 @@ Phase 6 is in progress. Phase 5 remains accepted; the prepared laptop preview is
 still the verified production ShuttlePB/ISS external-view build. No native
 cockpit or Delta-glider capability is claimed by the engineering probes below.
 
+The pre-extraction reference gate is accepted in
+[run 41458001638](https://github.com/dcajacob/orbiter-cross-platform/actions/runs/41458001638).
+All nine cases run twice in both MSVC configurations. All state and projected
+overlay differences are zero, displayed text/atlas traces match exactly, and
+every image comparison has SSIM 1.0. Both complete Windows builds pass all 22
+existing tests. Independent local comparison of hash-verified artifacts agrees.
+[Reference provenance and commands](../../Tests/Production/Cockpit/Reference/README.md)
+pin the captures and budgets; capture is now manual-only.
+
 Initial diagnostics execute the original Windows application and SDK at
 `d14fa7941bd4b60bd5b07c8e444ebfb87761893f`, from Phase 5 run 41396231165.
 The current candidate completely rebuilds Windows at
