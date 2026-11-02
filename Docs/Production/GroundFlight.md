@@ -3,8 +3,10 @@
 The native flight host uses the production `PlanetarySystem`, Earth/SPICE and
 atmosphere, terrain/contact code and source-built stock ShuttlePB. Local Debug
 now passes all seven frozen ground cases and the additional controlled upright
-landing. Hosted qualification of this numerical fix is still required. Phase 5
-and the stock-playable release are not declared complete by these local results.
+landing. Hosted Ubuntu 24.04 Debug/Release now passes with automatic and forced SSE2
+math. Current Windows application/SDK/client/reference checks also pass.
+Attachment and vessel lifetime integration keep Phase 5 open; the stock-playable
+release remains incomplete.
 
 ## Frozen original Windows evidence
 
@@ -76,6 +78,33 @@ The integrated evidence is under `out/native-ground-reference-fix`,
 `out/native-controlled-sse2`. These are local laptop results, separate from
 hosted Ubuntu 24.04/MSVC qualification.
 
+## Hosted qualification
+
+[The native client matrix](https://github.com/dcajacob/orbiter-cross-platform/actions/runs/41387877919)
+passes all four combinations of Debug/Release and automatic/SSE2 math at
+`85b3cf3e`. Every combination passes primitive/MPFR checks, real scene/image
+comparison, six orbital flight cases, twenty sessions, actual keyboard events,
+controlled upright landing and all seven ground cases. Both rendering intervals
+produce identical numerical histories and checkpoints within each configuration.
+The largest observed impact attitude difference is 4.70e-6 rad, below 0.001 rad;
+controlled-flight propellant differences remain below 1.87e-10 kg.
+
+The same numerical source passes the current
+[Windows application/SDK and real OpenGL client](https://github.com/dcajacob/orbiter-cross-platform/actions/runs/41387877934),
+[original production orbit/propulsion and fourteen behavior references](https://github.com/dcajacob/orbiter-cross-platform/actions/runs/41387877944),
+[portable Windows/Linux comparisons](https://github.com/dcajacob/orbiter-cross-platform/actions/runs/41387877926)
+and [SPICE parity](https://github.com/dcajacob/orbiter-cross-platform/actions/runs/41387877921).
+The [terrain/world matrix](https://github.com/dcajacob/orbiter-cross-platform/actions/runs/41388594785)
+passes at `879d14ef`, which only adds the missing test-oracle package to that
+workflow. Numerical, SDK, renderer and test sources are identical to `85b3cf3e`.
+
+[The evidence record](NumericalRuntimeVerification.json) preserves run/source
+identities, all four downloaded and SHA256-verified native artifact digests,
+Windows client artifact digests, reported numerical profiles, measured errors
+and local preview identity. Hosted artifacts contain full traces, logs, images,
+reports, loaded modules/assets and build metadata, retained for 90 days. This
+record is an observation report and cannot replace a frozen reference.
+
 ## Why the earlier comparisons failed
 
 Earlier hosted checks reproduced two failures: uncontrolled-impact attitude and
@@ -123,6 +152,18 @@ twenty sessions, actual keyboard events, controlled landing and all seven ground
 cases. Reports retain the actual numerical profile, modules, assets, images,
 traces and build settings. Windows application/SDK/client checks remain required.
 
+## Remaining Phase 5 integration
+
+Ground-flight parity does not close the whole phase. The frozen original
+`attachments` and `lifetime` cases still need native application comparisons:
+real child-vessel creation, attach/detach, live focus changes and deferred
+deletion with matching visual/module lifetime. The current native application
+explicitly rejects pending dynamic deletion. Twenty full session reloads cover
+world replacement, not these in-session object transitions.
+
+These are the next interaction gates before declaring Phase 5 complete.
+Phase 6 cockpit/HUD/MFD/Delta-glider work has not started.
+
 ## Ground preview
 
 ```sh
@@ -137,5 +178,7 @@ resumes; Home/End increase/decrease persistent hover throttle. W/S, A/D and Z/C
 are momentary RCS controls: hold to fire and release to stop. F selects RCS mode,
 Ctrl-F disables/enables RCS, and Alt-F toggles aerodynamic controls. The title
 reports actual flight status, terrain height, airspeed, fuel, thrust and autopilots.
-Cockpit and flight instruments remain Phase 6 work. A pre-fix preview remains
-experimental until explicitly replaced with a verified matching snapshot.
+Cockpit and flight instruments remain Phase 6 work. The prepared laptop snapshot
+is the clean Ninja build of `85b3cf3e`; it passes an outside-checkout launch with
+120 ticks, eight presents and complete graphics teardown. Earlier immutable
+snapshots remain available.

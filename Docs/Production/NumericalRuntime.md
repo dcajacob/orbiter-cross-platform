@@ -73,6 +73,10 @@ ctest --test-dir out/native-math --output-on-failure
 The standalone tests require MPFR development headers/library (`libmpfr-dev` on
 Ubuntu); the application does not depend on MPFR. Reports record the loaded
 oracle library version, path and hash. Local results are separate from hosted
-qualification. The native workflow runs the full actual-client suite in Debug
-and Release with automatic and forced SSE2 dispatch. Current flight results and
-remaining gates are tracked in [GroundFlight.md](GroundFlight.md).
+qualification. The full hosted actual-client suite now passes in Debug and
+Release with automatic and forced SSE2 dispatch, together with the preserved
+Windows application/SDK/client/reference checks.
+[NumericalRuntimeVerification.json](NumericalRuntimeVerification.json) records
+the source revisions, actual profiles, measured errors and verified artifact
+digests. Current flight results and remaining gates are tracked in
+[GroundFlight.md](GroundFlight.md).

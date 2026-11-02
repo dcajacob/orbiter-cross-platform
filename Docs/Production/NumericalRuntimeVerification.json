@@ -1,0 +1,372 @@
+{
+  "schema": 1,
+  "purpose": "Observed qualification evidence; never a simulation reference or tolerance definition",
+  "numerical_source": "85b3cf3e907ab8d01ed9d751e0b1ee552da20fb1",
+  "ci_dependency_revision": "879d14ef9ec1e41d719334c7ede5856cba5fdc82",
+  "source_equivalence_command": "git diff --exit-code 85b3cf3e 879d14ef -- Src Orbitersdk Extern OVP Tests",
+  "qualified_runs": [
+    {
+      "id": 41387877919,
+      "name": "Native Production OpenGL External View",
+      "status": "completed",
+      "conclusion": "success",
+      "source": "85b3cf3e907ab8d01ed9d751e0b1ee552da20fb1",
+      "url": "https://github.com/dcajacob/orbiter-cross-platform/actions/runs/41387877919"
+    },
+    {
+      "id": 41387877934,
+      "name": "Production Windows OpenGL Client",
+      "status": "completed",
+      "conclusion": "success",
+      "source": "85b3cf3e907ab8d01ed9d751e0b1ee552da20fb1",
+      "url": "https://github.com/dcajacob/orbiter-cross-platform/actions/runs/41387877934"
+    },
+    {
+      "id": 41387877944,
+      "name": "Production Bootstrap",
+      "status": "completed",
+      "conclusion": "success",
+      "source": "85b3cf3e907ab8d01ed9d751e0b1ee552da20fb1",
+      "url": "https://github.com/dcajacob/orbiter-cross-platform/actions/runs/41387877944"
+    },
+    {
+      "id": 41387877926,
+      "name": "Portable Core and Windows Reference",
+      "status": "completed",
+      "conclusion": "success",
+      "source": "85b3cf3e907ab8d01ed9d751e0b1ee552da20fb1",
+      "url": "https://github.com/dcajacob/orbiter-cross-platform/actions/runs/41387877926"
+    },
+    {
+      "id": 41387877921,
+      "name": "Native Production SPICE Modules",
+      "status": "completed",
+      "conclusion": "success",
+      "source": "85b3cf3e907ab8d01ed9d751e0b1ee552da20fb1",
+      "url": "https://github.com/dcajacob/orbiter-cross-platform/actions/runs/41387877921"
+    },
+    {
+      "id": 41388594785,
+      "name": "Production World and Terrain Windows and Linux",
+      "status": "completed",
+      "conclusion": "success",
+      "source": "879d14ef9ec1e41d719334c7ede5856cba5fdc82",
+      "url": "https://github.com/dcajacob/orbiter-cross-platform/actions/runs/41388594785"
+    }
+  ],
+  "native_artifacts": [
+    {
+      "id": 13116378240,
+      "name": "native-production-client-Release-automatic-x64",
+      "run_id": 41387877919,
+      "size_in_bytes": 79291955,
+      "sha256": "ab5d330b756cfcd0d4a422d49e525601430483043a6c49494876b3a5b6297361"
+    },
+    {
+      "id": 13116184357,
+      "name": "native-production-client-Debug-automatic-x64",
+      "run_id": 41387877919,
+      "size_in_bytes": 79416895,
+      "sha256": "2aac0027ed950f97a4391e06c800acbfaf15a7b498eb53fffca5eb04f966c0f5"
+    },
+    {
+      "id": 13116118000,
+      "name": "native-production-client-Debug-sse2-x64",
+      "run_id": 41387877919,
+      "size_in_bytes": 79409586,
+      "sha256": "b6d510df3feeb15f10010f6037be0a2fdb73b0f7d77aef92be4f502d3f1e1c91"
+    },
+    {
+      "id": 13115979235,
+      "name": "native-production-client-Release-sse2-x64",
+      "run_id": 41387877919,
+      "size_in_bytes": 79229867,
+      "sha256": "53129f235af0fb6f6e4da4a6d9c76ddaaf67566fd9baad436ef9569272a7ebf9"
+    }
+  ],
+  "windows_client_artifacts": [
+    {
+      "id": 13116682326,
+      "name": "real-client-Release",
+      "run_id": 41387877934,
+      "sha256": "b080de27f57e748f654428af15a512c8fdac0aa9e8b72a34d535549dcde6c63a"
+    },
+    {
+      "id": 13116123168,
+      "name": "real-client-comparison",
+      "run_id": 41387877934,
+      "sha256": "556e21b5f47b25d130f67818b0c04042e6d86e5487972cca58880f03f8286ec6"
+    },
+    {
+      "id": 13115909953,
+      "name": "real-client-Debug",
+      "run_id": 41387877934,
+      "sha256": "8c0bab4f8797c0dc941a82fd43c5b7f3cba083e1cbfe89c2027a2c576d38fdde"
+    }
+  ],
+  "original_ground_reference_run": 41368023101,
+  "original_controlled_reference_run": 41374941546,
+  "phase5_complete": false,
+  "remaining_phase5": [
+    "Native attachments comparison",
+    "Live vessel creation and focus changes",
+    "Deferred deletion and visual/module lifetime comparison"
+  ],
+  "native_observations": [
+    {
+      "profile": "Release-automatic",
+      "artifact_id": 13116378240,
+      "sha256": "ab5d330b756cfcd0d4a422d49e525601430483043a6c49494876b3a5b6297361",
+      "numerics": {
+        "math": "amd-6121d02-fma3",
+        "random": "private-msvc-lcg32",
+        "random_maximum": 32767,
+        "process_seed": 0
+      },
+      "scene_ssim": [
+        0.9881094596017364,
+        0.9881094596017364
+      ],
+      "controlled_maxima": {
+        "position_m": 1.1175870895385742e-08,
+        "velocity_m_s": 2.3893306233806697e-07,
+        "rotation_rad": 6.9931404638170225e-09,
+        "angular_velocity_rad_s": 4.6332501370672053e-07,
+        "mjd_days": 0.0,
+        "mass_fraction": 2.5155520895673755e-05
+      },
+      "maximum_propellant_difference_kg": 1.8621904018800706e-10,
+      "impact_maxima": {
+        "position_m": 3.0785986778023386e-05,
+        "velocity_m_s": 9.567999547640342e-05,
+        "rotation_rad": 4.695625488113315e-06,
+        "angular_velocity_rad_s": 0.00011335953935891865,
+        "mjd_days": 0.0,
+        "mass_fraction": 3.6621810323851825e-08
+      },
+      "controlled_render_frequency_independent": true,
+      "math": [
+        {
+          "profile": "automatic",
+          "windows_samples_exact": 28800,
+          "mpfr_samples": 6191,
+          "maximum_ulps": {
+            "sin": 1,
+            "cos": 1,
+            "asin": 1,
+            "atan2": 0
+          },
+          "edge_cases": "passed"
+        },
+        {
+          "profile": "sse2",
+          "windows_samples_exact": 28800,
+          "mpfr_samples": 6191,
+          "maximum_ulps": {
+            "sin": 1,
+            "cos": 1,
+            "asin": 1,
+            "atan2": 0
+          },
+          "edge_cases": "passed"
+        }
+      ]
+    },
+    {
+      "profile": "Debug-automatic",
+      "artifact_id": 13116184357,
+      "sha256": "2aac0027ed950f97a4391e06c800acbfaf15a7b498eb53fffca5eb04f966c0f5",
+      "numerics": {
+        "math": "amd-6121d02-fma3",
+        "random": "private-msvc-lcg32",
+        "random_maximum": 32767,
+        "process_seed": 0
+      },
+      "scene_ssim": [
+        0.9881094596017364,
+        0.9881094596017364
+      ],
+      "controlled_maxima": {
+        "position_m": 7.450580596923828e-09,
+        "velocity_m_s": 1.873973225143918e-07,
+        "rotation_rad": 5.6102202496488215e-09,
+        "angular_velocity_rad_s": 3.6329371015954377e-07,
+        "mjd_days": 0.0,
+        "mass_fraction": 1.5364845230732204e-06
+      },
+      "maximum_propellant_difference_kg": 1.1368683772161603e-11,
+      "impact_maxima": {
+        "position_m": 0.0,
+        "velocity_m_s": 0.0,
+        "rotation_rad": 0.0,
+        "angular_velocity_rad_s": 0.0,
+        "mjd_days": 0.0,
+        "mass_fraction": 0.0
+      },
+      "controlled_render_frequency_independent": true,
+      "math": [
+        {
+          "profile": "automatic",
+          "windows_samples_exact": 28800,
+          "mpfr_samples": 6191,
+          "maximum_ulps": {
+            "sin": 1,
+            "cos": 1,
+            "asin": 1,
+            "atan2": 0
+          },
+          "edge_cases": "passed"
+        },
+        {
+          "profile": "sse2",
+          "windows_samples_exact": 28800,
+          "mpfr_samples": 6191,
+          "maximum_ulps": {
+            "sin": 1,
+            "cos": 1,
+            "asin": 1,
+            "atan2": 0
+          },
+          "edge_cases": "passed"
+        }
+      ]
+    },
+    {
+      "profile": "Debug-sse2",
+      "artifact_id": 13116118000,
+      "sha256": "b6d510df3feeb15f10010f6037be0a2fdb73b0f7d77aef92be4f502d3f1e1c91",
+      "numerics": {
+        "math": "amd-6121d02-sse2",
+        "random": "private-msvc-lcg32",
+        "random_maximum": 32767,
+        "process_seed": 0
+      },
+      "scene_ssim": [
+        0.9881094596017364,
+        0.9881094596017364
+      ],
+      "controlled_maxima": {
+        "position_m": 7.450580596923828e-09,
+        "velocity_m_s": 1.0181744371611852e-07,
+        "rotation_rad": 2.9819365031792574e-09,
+        "angular_velocity_rad_s": 1.9812384849239151e-07,
+        "mjd_days": 0.0,
+        "mass_fraction": 9.383520476528636e-06
+      },
+      "maximum_propellant_difference_kg": 6.94626578479074e-11,
+      "impact_maxima": {
+        "position_m": 3.059808953285511e-05,
+        "velocity_m_s": 2.6714340590987578e-05,
+        "rotation_rad": 2.441595332364317e-06,
+        "angular_velocity_rad_s": 0.00010855412589308639,
+        "mjd_days": 0.0,
+        "mass_fraction": 6.130858144224581e-08
+      },
+      "controlled_render_frequency_independent": true,
+      "math": [
+        {
+          "profile": "automatic",
+          "windows_samples_exact": 28800,
+          "mpfr_samples": 6191,
+          "maximum_ulps": {
+            "sin": 1,
+            "cos": 1,
+            "asin": 1,
+            "atan2": 0
+          },
+          "edge_cases": "passed"
+        },
+        {
+          "profile": "sse2",
+          "windows_samples_exact": 28800,
+          "mpfr_samples": 6191,
+          "maximum_ulps": {
+            "sin": 1,
+            "cos": 1,
+            "asin": 1,
+            "atan2": 0
+          },
+          "edge_cases": "passed"
+        }
+      ]
+    },
+    {
+      "profile": "Release-sse2",
+      "artifact_id": 13115979235,
+      "sha256": "53129f235af0fb6f6e4da4a6d9c76ddaaf67566fd9baad436ef9569272a7ebf9",
+      "numerics": {
+        "math": "amd-6121d02-sse2",
+        "random": "private-msvc-lcg32",
+        "random_maximum": 32767,
+        "process_seed": 0
+      },
+      "scene_ssim": [
+        0.9881094596017364,
+        0.9881094596017364
+      ],
+      "controlled_maxima": {
+        "position_m": 1.1175870895385742e-08,
+        "velocity_m_s": 1.533196632196351e-07,
+        "rotation_rad": 4.34879156492067e-09,
+        "angular_velocity_rad_s": 2.98155100482209e-07,
+        "mjd_days": 0.0,
+        "mass_fraction": 1.7952867381795414e-05
+      },
+      "maximum_propellant_difference_kg": 1.3289991329656914e-10,
+      "impact_maxima": {
+        "position_m": 3.075116847343214e-05,
+        "velocity_m_s": 9.875265460936088e-05,
+        "rotation_rad": 3.975774272973686e-06,
+        "angular_velocity_rad_s": 0.00020692106657834914,
+        "mjd_days": 0.0,
+        "mass_fraction": 9.19628721633687e-08
+      },
+      "controlled_render_frequency_independent": true,
+      "math": [
+        {
+          "profile": "automatic",
+          "windows_samples_exact": 28800,
+          "mpfr_samples": 6191,
+          "maximum_ulps": {
+            "sin": 1,
+            "cos": 1,
+            "asin": 1,
+            "atan2": 0
+          },
+          "edge_cases": "passed"
+        },
+        {
+          "profile": "sse2",
+          "windows_samples_exact": 28800,
+          "mpfr_samples": 6191,
+          "maximum_ulps": {
+            "sin": 1,
+            "cos": 1,
+            "asin": 1,
+            "atan2": 0
+          },
+          "edge_cases": "passed"
+        }
+      ]
+    }
+  ],
+  "local": {
+    "portable_tests": {
+      "Debug": 31,
+      "Release": 32
+    },
+    "scene_ssim": 0.9881491503795506,
+    "zero_landmark_error": true,
+    "all_seven_ground_cases": "passed",
+    "controlled_landing": "passed",
+    "forced_sse2_both_former_failures": "passed",
+    "orbital_cases": 6,
+    "complete_sessions": 20,
+    "rcs_hold_release_cases": 24,
+    "terrain_world_planet_vessel_components": "passed",
+    "preview_source": "85b3cf3e907ab8d01ed9d751e0b1ee552da20fb1",
+    "preview_version": "3a9dcb2f1c13ec34244d9aaadc4e074647557edb7c903a0c37581c2e4454b9d9",
+    "preview_manifest_sha256": "5b22cabafec092d9111301c29a9fa08848196885588832318fba5e48f9414d1e",
+    "preview_outside_checkout": "passed 120 ticks, eight successful presents, complete context release; state trace identical after Ninja path correction"
+  }
+}
