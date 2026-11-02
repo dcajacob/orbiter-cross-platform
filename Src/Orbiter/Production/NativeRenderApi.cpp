@@ -2,6 +2,7 @@
 // Licensed under the MIT License
 // Production SDK read/delegation functions, adapted to the actual native world.
 #include "NativeGraphics.h"
+#include "VesselLifetime.h"
 #include "VesselServices.h"
 #include "RigidBodyServices.h"
 #include "CelestialServices.h"
@@ -20,6 +21,53 @@
 #include <stdexcept>
 using namespace orbiter::production;
 using std::ifstream;
+namespace {
+Vessel* liveVessel(OBJHANDLE handle) {
+    for(auto* vessel:GetNativeRenderContext().world->GetVessels())if(vessel==handle)return vessel;
+    return nullptr;
+}
+Body* liveBody(OBJHANDLE handle) {
+    auto* world=GetNativeRenderContext().world;
+    for(int i=0;i<world->nObj();++i)if(world->GetObj(i)==handle)return world->GetObj(i);
+    return nullptr;
+}
+VesselLifetimeServices& lifetime() {
+    auto* result=GetNativeRenderContext().lifetime;
+    if(!result)throw std::logic_error("Native vessel lifetime service is not bound");return *result;
+}
+void validateCreation(const char* name,const char* classname) {
+    if(!name || !*name || std::strlen(name)>=64 || !classname || !*classname || std::strpbrk(name,"\r\n:;, /\\") ||
+       GetNativeRenderContext().world->GetVessel(name,true))throw std::runtime_error("Invalid or duplicate native vessel name/class");
+}
+}
+OBJHANDLE oapiSetFocusObject(OBJHANDLE handle) {
+    auto* vessel=liveVessel(handle);if(!vessel)return nullptr;
+    return orbiter::production::SetFocusObject(lifetime(),vessel);
+}
+VESSEL* oapiGetFocusInterface() {auto* vessel=GetNativeRenderContext().focus;return vessel?vessel->GetModuleInterface():nullptr;}
+OBJHANDLE oapiGetVesselByName(char* name) {return GetNativeRenderContext().world->GetVessel(name,true);}
+OBJHANDLE oapiGetVesselByIndex(int index) {auto* world=GetNativeRenderContext().world;return index>=0 && index<world->nVessel()?world->GetVessel(index):nullptr;}
+oapi::UInt32 oapiGetVesselCount() {return GetNativeRenderContext().world->nVessel();}
+OBJHANDLE oapiCreateVessel(const char* name,const char* classname,const VESSELSTATUS& status) {
+    validateCreation(name,classname);
+    auto* vessel=new Vessel(GetNativeRenderContext().world,name,classname,status);
+    GetVesselServices().InsertVessel(vessel);return vessel;
+}
+OBJHANDLE oapiCreateVesselEx(const char* name,const char* classname,const void* status) {
+    validateCreation(name,classname);
+    if(!status || (*static_cast<const int*>(status)!=1 && *static_cast<const int*>(status)!=2))
+        throw std::runtime_error("Unsupported native vessel status version");
+    auto* vessel=new Vessel(GetNativeRenderContext().world,name,classname,status);
+    GetVesselServices().InsertVessel(vessel);return vessel;
+}
+bool oapiDeleteVessel(OBJHANDLE handle,OBJHANDLE alternative) {
+    auto* vessel=liveVessel(handle);if(!vessel)return false;
+    if(GetNativeRenderContext().camera->Target()==vessel && alternative) {
+        auto* replacement=liveBody(alternative);if(!replacement || replacement==vessel)return false;
+        lifetime().SetView(replacement,1);
+    }
+    vessel->RequestDestruct();return true;
+}
 namespace {char debugMessage[1024]{};void RenderLog(const char* text) {std::clog<<text<<'\n';}}
  double oapiCameraAperture ()
 {

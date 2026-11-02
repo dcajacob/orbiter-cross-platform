@@ -38,6 +38,9 @@ static const double amax = 8.0;  // max rotation acceleration (rad/s^2)
 
 Camera::Camera (double _nearplane, double _farplane)
 {
+	// Setters below read this mode before the first scenario/camera attachment.
+	external_view = true;
+	rrot0.Set (1,0,0, 0,1,0, 0,0,1);
 	extmode = CAMERA_TARGETRELATIVE;
 	intmode = CAMERA_GENERICCOCKPIT;
 	action  = CAMERA_NORMAL;
@@ -56,7 +59,6 @@ Camera::Camera (double _nearplane, double _farplane)
 	gos.planet[0] = gos.site[0] = gos.addr[0] = '\0';
 	planet_proxy = 0;
 	npreset = 0;
-	external_view = true;//false;
 	#ifdef _WIN32
 	pv_mat_valid = false;
 #endif

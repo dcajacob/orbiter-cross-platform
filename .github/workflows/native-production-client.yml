@@ -83,12 +83,17 @@ jobs:
         run: |
           set -euo pipefail
           xvfb-run -a -s '-screen 0 1920x1080x24' env LIBGL_ALWAYS_SOFTWARE=1 GALLIUM_DRIVER=llvmpipe python3 -B Tests/Production/Flight/verify.py --executable out/native-engine/orbiter-production --assets out/scene-resources --data out/data --modules out/native-engine/NativeModules --planets out/planets --configuration ${{ matrix.configuration }} --output out/native-flight-evidence 2>&1 | tee native-flight-verification.log
+      - name: Verify focused deletion, camera fallback, simultaneous deletion and twenty live object cycles
+        shell: bash
+        run: |
+          set -euo pipefail
+          xvfb-run -a -s '-screen 0 1920x1080x24' env LIBGL_ALWAYS_SOFTWARE=1 GALLIUM_DRIVER=llvmpipe python3 -B Tests/Production/Flight/lifetime_edges.py --executable out/native-engine/orbiter-production --assets out/scene-resources --data out/data --modules out/native-engine/NativeModules --planets out/planets --output out/native-lifetime-evidence 2>&1 | tee native-lifetime-verification.log
       - name: Exercise actual keyboard control and in-process reload in an owned X11 window
         id: keyboard
         shell: bash
         run: |
           set -euo pipefail
-          xvfb-run -a -s '-screen 0 1920x1080x24' env LIBGL_ALWAYS_SOFTWARE=1 GALLIUM_DRIVER=llvmpipe python3 -B Tests/Production/Flight/keyboard_smoke.py --executable out/native-engine/orbiter-production --assets out/scene-resources --data out/data --modules out/native-engine/NativeModules --planets out/planets --output out/native-keyboard-evidence 2>&1 | tee native-keyboard-verification.log
+          xvfb-run -a -s '-screen 0 1920x1080x24' env LIBGL_ALWAYS_SOFTWARE=1 GALLIUM_DRIVER=llvmpipe python3 -B Tests/Production/Flight/keyboard_smoke.py --lifecycle --executable out/native-engine/orbiter-production --assets out/scene-resources --data out/data --modules out/native-engine/NativeModules --planets out/planets --output out/native-keyboard-evidence 2>&1 | tee native-keyboard-verification.log
       - name: Verify controlled upright takeoff and landing against the additional frozen original Windows reference
         shell: bash
         run: |
@@ -115,6 +120,7 @@ jobs:
             out/native-engine/native-sdk/OrbiterNativeBuild.h
             out/native-scene-evidence/**
             out/native-flight-evidence/**
+            out/native-lifetime-evidence/**
             out/native-keyboard-evidence/**
             out/native-ground-evidence/**
             out/native-controlled-landing/**

@@ -179,11 +179,11 @@ protected:
 	bool CopyMaterial (OGLMaterial *mat7, MATERIAL *mat);
 
 private:
-	GROUPREC **Grp;             // list of mesh groups
+	GROUPREC **Grp = nullptr;   // list of mesh groups
 	int nGrp;                 // number of mesh groups
 	OGLTexture **Tex;  // list of mesh textures
 	int nTex;                 // number of mesh textures
-	OGLMaterial *Mtrl;         // list of mesh materials
+	OGLMaterial *Mtrl = nullptr; // list of mesh materials
 	int nMtrl;                // number of mesh materials
 	bool bTemplate;             // mesh used as template only (not for rendering)
 	bool bModulateMatAlpha;     // mix material and texture alpha channels

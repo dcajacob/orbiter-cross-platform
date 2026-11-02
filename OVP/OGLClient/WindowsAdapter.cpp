@@ -76,7 +76,7 @@ void OGLClient::clbkDestroyRenderWindow(bool fastclose) {
     if(mContext) wglMakeCurrent(mDC,mContext);
     mScene.reset();mMeshManager.reset();
     if(mResources) {
-        OGLPad::GlobalExit();vVessel::GlobalExit();OGLParticleStream::GlobalExit();vStar::GlobalExit();
+        OGLPad::GlobalExit();vVessel::GlobalExit();OGLParticleStream::GlobalExit();vStar::GlobalExit();HazeManager::GlobalExit();
         TileManager2Base::GlobalExit();TileManager::GlobalExit();vObject::GlobalExit();
         mResources=false;
     }

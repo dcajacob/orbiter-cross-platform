@@ -209,7 +209,7 @@ void OGLClient::clbkDestroyRenderWindow(bool)
     if(!nativeWindow) return;
     glfwMakeContextCurrent(nativeWindow);mScene.reset();mMeshManager.reset();
     if(mResources) {
-        OGLPad::GlobalExit();vVessel::GlobalExit();OGLParticleStream::GlobalExit();vStar::GlobalExit();
+        OGLPad::GlobalExit();vVessel::GlobalExit();OGLParticleStream::GlobalExit();vStar::GlobalExit();HazeManager::GlobalExit();
         TileManager2Base::GlobalExit();TileManager::GlobalExit();vObject::GlobalExit();mResources=false;
     }
     mTextureManager.reset();Renderer::GlobalExit();

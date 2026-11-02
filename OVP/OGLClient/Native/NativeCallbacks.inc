@@ -4,6 +4,8 @@ RenderInput Poll() override;
 void Resize(int,int) override;
 void Status(const std::string&) override;
 void PostCreation() override {clbkPostCreation();}
+void NewVessel(OBJHANDLE vessel) override {clbkNewVessel(vessel);}
+void DeleteVessel(OBJHANDLE vessel) override {clbkDeleteVessel(vessel);}
 void Render() override {clbkClearFrame();clbkRenderScene();}
 bool Present() override {return clbkDisplayFrame();}
 void CloseSession() override {clbkCloseSession(false);}

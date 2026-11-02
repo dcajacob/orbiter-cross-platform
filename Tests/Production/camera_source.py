@@ -50,6 +50,10 @@ def verify():
     for a,b in [('g_pOrbiter->Cfg()->','GetCameraServices().Configuration().'),('g_psys','GetRigidBodyServices().World()'),('g_focusobj','GetCameraServices().Focus()'),('td.','GetRigidBodyServices().Time().'),('g_pOrbiter->SetFocusObject','GetCameraServices().SetFocus'),('g_pOrbiter->SetFOV','GetCameraServices().SetFOV'),('g_pOrbiter->ScnPath','GetCameraServices().ScenarioPath'),('g_pane->','GetCameraServices().'),('TRACENEW','GetRigidBodyServices().TraceAllocation(__FILE__,__LINE__);'),('_strnicmp','ComparePrefix'),('_stricmp','CompareText'),('strnicmp','ComparePrefix'),('normangle (','NormalizeCameraAngle ('),('DWORD','oapi::UInt32')]:core=core.replace(a,b)
     core=core.replace('\tVObject **vobj, *vo;\n\tconst Body *bd;\n\tint i, nobj;','\tint i;\n\tVObject **vobj, *vo;\n\tconst Body *bd;\n\tint nobj;')
     actual=windows(raw('Src/Orbiter/Camera.cpp'));actual=actual[actual.index('static Vector nullvec;'):]
+    # ASan/UBSan found the original constructor reading external_view before
+    # assignment. Initial setters must also receive an initialized old matrix.
+    actual=actual.replace('\t// Setters below read this mode before the first scenario/camera attachment.\n\texternal_view = true;\n\trrot0.Set (1,0,0, 0,1,0, 0,0,1);\n','',1)
+    actual=actual.replace('\tnpreset = 0;\n','\tnpreset = 0;\n\texternal_view = true;//false;\n',1)
     equal(core,actual,'All production camera/ground observer/preset calculations and ordering')
     api=old('Orbitersdk/include/OrbiterAPI.h');a,b=span(api,'normangle');helper=raw('Src/Orbiter/Camera.cpp');c,d=span(helper,'NormalizeCameraAngle')
     equal(api[a:b].replace('inline double normangle','static double NormalizeCameraAngle'),helper[c:d],'Original signed angle normalization')

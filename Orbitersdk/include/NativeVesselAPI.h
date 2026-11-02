@@ -39,6 +39,14 @@ struct VESSELPARAM;
 #include "VesselAPI.h"
 OAPIFUNC double oapiGetInducedDrag(double cl,double aspect,double efficiency);
 OAPIFUNC double oapiGetWaveDrag(double mach,double m1,double m2,double m3,double maximum);
+OAPIFUNC OBJHANDLE oapiCreateVessel(const char*,const char*,const VESSELSTATUS&);
+OAPIFUNC OBJHANDLE oapiCreateVesselEx(const char*,const char*,const void*);
+OAPIFUNC bool oapiDeleteVessel(OBJHANDLE,OBJHANDLE alternative=nullptr);
+OAPIFUNC OBJHANDLE oapiSetFocusObject(OBJHANDLE);
+OAPIFUNC VESSEL* oapiGetFocusInterface();
+OAPIFUNC OBJHANDLE oapiGetVesselByName(char*);
+OAPIFUNC OBJHANDLE oapiGetVesselByIndex(int);
+OAPIFUNC oapi::UInt32 oapiGetVesselCount();
 #ifdef ORBITER_NATIVE_OWNS_OAPIFUNC
 #undef OAPIFUNC
 #undef ORBITER_NATIVE_OWNS_OAPIFUNC

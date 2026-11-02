@@ -17,6 +17,12 @@ def commands(name):
             add(80+slot*40,'attitude',1 if slot<6 else 2)
             for tick in range(80+slot*40,88+slot*40):add(tick,'rcs'+str(group),.2)
         for i,mode in enumerate((1,3,4,5,6)):add(560+i*80,'navreset',0);add(560+i*80,'nav',mode)
+    if name in ('attachments','lifetime'):
+        add(1 if name=='attachments' else 10,'create','Child ShuttlePB')
+        if name=='attachments':
+            add(1,'attachment','Child');add(10,'attach','Child');add(30,'detach','Child')
+        else:
+            add(11,'focus','Child');add(20,'focus','PB');add(30,'delete','Child PB')
     if name=='pb_persistence':add(0,'main',.2);add(39,'save',1,'after')
     if name=='docked':add(10,'undock',0)
     if name=='clock':
@@ -42,7 +48,7 @@ def main():
     extract(newroot/new['artifacts'][a.configuration]['path'],out/'reference')
     cases={c['id']:c for c in json.loads((ROOT/'Tests/Production/behavior-cases.json').read_text())['cases']}
     cases.update({name:dict(id=name,frames=count,fixed_step=.25,fixture=fixture,budgets='orbital') for name,count,fixture in [('manual_flight',980,'orbit'),('pb_persistence',60,'orbit'),('pb_reload',60,'reload')]})
-    names=a.case or ['manual_flight','docked','dock_approach','clock','pb_persistence','pb_reload']
+    names=a.case or ['manual_flight','docked','dock_approach','clock','pb_persistence','pb_reload','attachments','lifetime']
     report={}
     for name in names:
         case=cases[name];fixture=out/(name+'.scn')
@@ -59,6 +65,9 @@ def main():
             require(process.returncode==0,'Native production flight failed: '+str(directory))
             histories.append((directory/'flight-state.csv').read_bytes())
             roundtrips.append(compare_states(out/'reference'/name/'behavior-state.csv',directory/'flight-state.csv',case))
+            if name in ('attachments','lifetime'):
+                from lifecycle import verify_lifetime
+                roundtrips[-1]['lifetime']=verify_lifetime(out/'reference'/name,directory,case)
             lifecycle=json.loads((directory/'graphics-lifecycle.json').read_text());require(lifecycle['context_deleted'] and lifecycle['successful_presents']>0,'Flight graphics lifecycle incomplete')
         require(histories[0]==histories[1],'Physics changes with render frequency: '+name)
         report[name]=dict(render_frequency_independent=True,windows_differences=roundtrips)

@@ -19,6 +19,7 @@
 // ==============================================================
 
 #include "Scene.h"
+#include <algorithm>
 #include "Evidence.h"
 #include "OGLCamera.h"
 #include "OGLMesh.h"
@@ -295,6 +296,10 @@ void Scene::AddLocalLight (const LightEmitter *le, const vObject *vo, int idx)
 void Scene::Update ()
 {
 	cam->Update (); // update camera parameters
+	// Creation notifications precede engine PostCreation/finalization. Register
+	// immediately, then refresh visibility with the finalized body/current camera.
+	for (auto body:pendingVessels) CheckVisual(body);
+	pendingVessels.clear();
 
 	light->Update (); // update light sources
 
@@ -840,10 +845,12 @@ void Scene::RenderObjectMarker (oapi::Sketchpad *skp, const VECTOR3 &gpos, const
 void Scene::NewVessel (OBJHANDLE hVessel)
 {
 	CheckVisual (hVessel);
+	pendingVessels.push_back(hVessel);
 }
 
 void Scene::DeleteVessel (OBJHANDLE hVessel)
 {
+	pendingVessels.erase(std::remove(pendingVessels.begin(),pendingVessels.end(),hVessel),pendingVessels.end());
 	VOBJREC *pv = FindVisual (hVessel);
 	if (pv) DelVisualRec (pv);
 }

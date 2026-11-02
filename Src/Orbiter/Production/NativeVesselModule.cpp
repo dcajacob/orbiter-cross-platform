@@ -4,11 +4,20 @@
 #include "Config.h"
 #include "ConfigFile.h"
 #include "SurfaceServices.h"
+#include "RigidBodyServices.h"
+#include "TimeData.h"
+#include "NativeObservation/ApplicationObservation.h"
 #include <cstring>
 #include <memory>
 #include <stdexcept>
 namespace orbiter::production {
-namespace {const ResourceResolver* resources=nullptr;}
+namespace {
+const ResourceResolver* resources=nullptr;
+void moduleEvent(const char* phase,const Vessel& vessel) {
+    const auto& time=GetRigidBodyServices().Time();
+    OrbiterTestObserve(phase,vessel.Name(),time.SimT0,time.MJD0,1);
+}
+}
 const ResourceResolver* BindNativeVesselModuleResources(const ResourceResolver* next)
 {auto* previous=resources;resources=next;return previous;}
 namespace {
@@ -25,6 +34,7 @@ struct LoadedVessel {
         instance=static_cast<native::VesselInstance*>(module->Instance());
         if(instance->size!=sizeof(*instance) || !instance->vessel || !instance->release)
             throw std::runtime_error("Native vessel interface is incompatible: "+std::string(name));
+        moduleEvent("module.library.open",vessel);
     }
 };
 }
@@ -54,10 +64,16 @@ void Vessel::ReleaseNativeInterface(VESSEL* interface)
 {
     auto* vessel=static_cast<Vessel*>(interface->GetHandle());
     auto* loaded=static_cast<LoadedVessel*>(vessel->hMod);
+    moduleEvent("module.interface.release.before",*vessel);
     loaded->instance->release(loaded->instance);
+    moduleEvent("module.interface.release.after",*vessel);
 }
 void Vessel::ClearModule()
 {
-    delete static_cast<LoadedVessel*>(hMod);hMod=nullptr;
+    const bool loaded=hMod!=nullptr;
+    if(loaded)moduleEvent("module.library.close.before",*this);
+    delete static_cast<LoadedVessel*>(hMod);
+    if(loaded)moduleEvent("module.library.close.after",*this);
+    hMod=nullptr;
     std::memset(&modIntf,0,sizeof(modIntf));
 }

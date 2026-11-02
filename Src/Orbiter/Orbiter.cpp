@@ -35,6 +35,7 @@
 #include "resource.h"
 #include "Orbiter.h"
 #include "Production/WindowsSession.h"
+#include "Production/WindowsVesselLifetime.h"
 #include "Production/WindowsWorldVesselServices.h"
 #include "Production/WindowsVesselServices.h"
 #include "Production/WindowsCameraServices.h"
@@ -1220,27 +1221,8 @@ void Orbiter::Freeze (bool bFreeze)
 //-----------------------------------------------------------------------------
 Vessel *Orbiter::SetFocusObject (Vessel *vessel, bool setview)
 {
-	if (vessel == g_focusobj) return 0; // nothing to do
-
-	g_pfocusobj = g_focusobj;
-	g_focusobj = vessel;
-
-	// Inform pane about focus change
-	if (g_pane) g_pane->FocusChanged (g_focusobj);
-
-	// switch camera
-	if (setview) SetView (g_focusobj, 2);
-
-	// vessel and plugin callback
-	if (g_pfocusobj) g_pfocusobj->FocusChanged (false, g_focusobj, g_pfocusobj);
-	g_focusobj->FocusChanged (true, g_focusobj, g_pfocusobj);
-
-	for (auto it = m_Plugin.begin(); it != m_Plugin.end(); it++)
-		it->pModule->clbkFocusChanged(g_focusobj, g_pfocusobj);
-
-	if (pDlgMgr) pDlgMgr->BroadcastMessage (MSG_FOCUSVESSEL, vessel);
-
-	return g_pfocusobj;
+	orbiter::production::WindowsVesselLifetime services(*this);
+	return orbiter::production::SetFocusObject(services, vessel, setview);
 }
 
 // =======================================================================
@@ -1259,21 +1241,8 @@ void Orbiter::SetView (Body *body, int mode)
 //-----------------------------------------------------------------------------
 void Orbiter::InsertVessel (Vessel *vessel)
 {
-	g_psys->AddVessel (vessel);
-
-	// broadcast vessel creation to plugins
-	for (auto it = m_Plugin.begin(); it != m_Plugin.end(); it++)
-		it->pModule->clbkNewVessel((OBJHANDLE)vessel);
-
-	if (gclient)
-		gclient->clbkNewVessel((OBJHANDLE)vessel);
-
-	if (pDlgMgr) pDlgMgr->BroadcastMessage (MSG_CREATEVESSEL, vessel);
-	//if (gclient) gclient->clbkDialogBroadcast (MSG_CREATEVESSEL, vessel);
-
-	vessel->PostCreation();
-	vessel->InitSupervessel();
-	vessel->ModulePostCreation();
+	orbiter::production::WindowsVesselLifetime services(*this);
+	orbiter::production::InsertVessel(services, vessel);
 }
 
 //-----------------------------------------------------------------------------
@@ -1283,66 +1252,8 @@ void Orbiter::InsertVessel (Vessel *vessel)
 //-----------------------------------------------------------------------------
 bool Orbiter::KillVessels ()
 {
-	int i, n = g_psys->nVessel();
-	DWORD j;
-
-	for (i = n-1; i >= 0; i--) {
-		if (g_psys->GetVessel(i)->KillPending()) {
-			Vessel *vessel = g_psys->GetVessel(i);
-			// switch to new focus object
-			if (vessel == g_focusobj) {
-				if (vessel->ProxyVessel() && !vessel->ProxyVessel()->KillPending()) {
-					SetFocusObject (vessel->ProxyVessel(), false);
-				} else {
-					double d, dmin = 1e20;
-					Vessel *v, *tgt = 0;
-					for (j = 0; j < g_psys->nVessel(); j++) {
-						v = g_psys->GetVessel(j);
-						if (v->KillPending()) continue;
-						if (v != vessel && v->GetEnableFocus()) {
-							d = vessel->GPos().dist (v->GPos());
-							if (d < dmin) dmin = d, tgt = v;
-						}
-					}
-					if (tgt) SetFocusObject (tgt, false);
-					else return false; // no focus object available - give up
-				}
-			}
-			if (vessel == g_pfocusobj)
-				g_pfocusobj = 0; // clear previous focus (for Ctrl-F3 fast-switching)
-
-			// switch to new camera target
-			if (g_camera) {
-				if (vessel == g_camera->Target())
-					SetView(g_focusobj, 1); // this should be handled by Camera::BodyDeleted
-
-				g_camera->BodyDeleted(vessel);
-			}
-
-			// broadcast vessel destruction to plugins
-			for (auto it = m_Plugin.begin(); it != m_Plugin.end(); it++)
-				it->pModule->clbkDeleteVessel((OBJHANDLE)vessel);
-
-			if (gclient)
-				gclient->clbkDeleteVessel((OBJHANDLE)vessel);
-			// broadcast vessel destruction to all vessels
-			g_psys->BroadcastVessel (MSG_KILLVESSEL, vessel);
-			// broadcast vessel destruction to all MFDs
-			if (g_pane) g_pane->DelVessel (vessel);
-			// broadcast vessel destruction to all open dialogs
-			//if (gclient) gclient->clbkDialogBroadcast (MSG_KILLVESSEL, vessel);
-			if (pDlgMgr) pDlgMgr->BroadcastMessage (MSG_KILLVESSEL, vessel);
-			// echo deletion on console window
-			if (m_pConsole) {
-				char cbuf[256];
-				sprintf (cbuf, "Vessel %s deleted", vessel->Name());
-				m_pConsole->Echo(cbuf);
-			}
-			// kill the vessel
-			g_psys->DelVessel (vessel);
-		}
-	}
-	return true;
+	orbiter::production::WindowsVesselLifetime services(*this);
+	return orbiter::production::KillVessels(services);
 }
 
 void Orbiter::NotifyObjectJump (const Body *obj, const Vector &shift)

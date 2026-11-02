@@ -29,6 +29,7 @@ public:
 	HazeManager (const vPlanet *vplanet);
 
 	static void GlobalInit ();
+	static void GlobalExit ();
 
 	void Render (OGLCamera *c, glm::mat4 &wmat, bool dual = false);
 

@@ -132,6 +132,9 @@ protected:
 	void AnimateComponent (ANIMATIONCOMP *comp, const glm::mat4 &T);
 
 private:
+	static inline IndexBuffer* exhaustIBO=nullptr;
+	static inline VertexArray* exhaustVBA=nullptr;
+	static inline VertexBuffer* exhaustVBO=nullptr;
 	VESSEL *vessel;       // access instance for the vessel
 	struct MESHREC {
 		OGLMesh *mesh;   // DX7 mesh representation

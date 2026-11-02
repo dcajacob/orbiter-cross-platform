@@ -20,6 +20,7 @@
 
 #ifndef __SCENE_H
 #define __SCENE_H
+#include <vector>
 
 #include "OGLClient.h"
 #include "CelSphere.h"
@@ -135,6 +136,7 @@ private:
 	OGLCamera *cam;               // camera object
 	OGLCelestialSphere *csphere;  // celestial sphere background
 	int iVCheck;             // index of last object checked for visibility
+	std::vector<OBJHANDLE> pendingVessels;
 //	uint32_t zclearflag;          // z and stencil buffer clear flag
 
 	OGLParticleStream **pstream; // list of particle streams

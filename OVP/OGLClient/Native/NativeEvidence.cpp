@@ -15,7 +15,7 @@
 namespace Evidence {
 namespace {
 bool enabled=false,captured=false;unsigned frames=0,draws=0,presents=0;uint64_t indices=0;
-std::ofstream events,assets;std::set<std::string> seen;std::map<std::string,unsigned> objectDraws;
+std::ofstream events,assets,visualMeshes;std::set<std::string> seen;std::map<std::string,unsigned> objectDraws;
 std::string currentObject;std::map<std::string,std::pair<unsigned,uint64_t>> planetTiles;
 std::map<std::pair<std::string,int>,uint64_t> archiveReads;
 std::string name(OBJHANDLE h) {char value[256]{};oapiGetObjectName(h,value,sizeof(value));return value;}
@@ -29,6 +29,7 @@ void Begin() {
     std::filesystem::create_directories(GetNativeRenderContext().evidence);
     frames=draws=presents=0;indices=0;captured=false;seen.clear();objectDraws.clear();currentObject.clear();planetTiles.clear();archiveReads.clear();
     events=output("visual-events.csv");events<<"frame,event,object,type\n";assets=output("loaded-assets.txt");
+    visualMeshes=output("visual-meshes.csv");visualMeshes<<"frame,object,class,module_version,index,name,groups,materials,textures,thrusters\n";
     int width,height;g_client->GetViewportSize(&width,&height);auto info=output("renderer-info.json");
     info<<"{\"vendor\":"<<std::quoted(reinterpret_cast<const char*>(glGetString(GL_VENDOR)))
         <<",\"renderer\":"<<std::quoted(reinterpret_cast<const char*>(glGetString(GL_RENDERER)))
@@ -39,10 +40,27 @@ void Presented() {if(enabled)++presents;}
 void End(bool deleted) {
     if(!enabled)return;auto record=output("graphics-lifecycle.json");
     record<<"{\"rendered_frames\":"<<frames<<",\"successful_presents\":"<<presents<<",\"context_deleted\":"<<(deleted?"true":"false")<<"}\n";
-    events.close();assets.close();enabled=false;
+    auto allDraws=output("object-draws-all.csv");allDraws<<"object,mesh_draw_calls\n";
+    for(const auto& entry:objectDraws)allDraws<<entry.first<<','<<entry.second<<'\n';
+    events.close();assets.close();visualMeshes.close();enabled=false;
 }
 void Visual(const char *event,OBJHANDLE object) {
     if(enabled){events<<frames<<','<<event<<','<<name(object)<<','<<oapiGetObjectType(object)<<'\n';events.flush();}
+    if(enabled && std::string(event)=="register" && oapiGetObjectType(object)==OBJTP_VESSEL) {
+        auto* vessel=oapiGetVesselInterface(object);
+        for(oapi::UInt32 i=0;i<vessel->GetMeshCount();++i) {
+            struct OwnedMesh {MESHHANDLE value=nullptr;~OwnedMesh(){if(value)oapiDeleteMesh(value);}} owned;
+            auto mesh=vessel->GetMeshTemplate(i);
+            const char* meshName=vessel->GetMeshName(i);
+            if(!mesh)mesh=owned.value=vessel->CopyMeshFromTemplate(i);
+            if(mesh && !meshName)meshName=oapiGetMeshFilename(mesh);
+            if(!mesh)throw std::runtime_error("Lifecycle visual stock mesh is unavailable");
+            if(!meshName)throw std::runtime_error("Lifecycle visual mesh identity is unavailable");
+            visualMeshes<<frames<<','<<name(object)<<','<<vessel->GetClassName()<<','<<vessel->Version()<<','<<i<<','<<meshName<<','
+                <<oapiMeshGroupCount(mesh)<<','<<oapiMeshMaterialCount(mesh)<<','<<oapiMeshTextureCount(mesh)<<','<<vessel->GetThrusterCount()<<'\n';
+        }
+        visualMeshes.flush();
+    }
 }
 void Asset(const char *path) { if(enabled && path && seen.insert(path).second){assets<<path<<'\n';assets.flush();} }
 void Object(OBJHANDLE object) { if(enabled)currentObject=object?name(object):std::string(); }

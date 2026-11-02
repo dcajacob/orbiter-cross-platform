@@ -64,6 +64,9 @@ void vVessel::GlobalInit ()
 
 void vVessel::GlobalExit ()
 {
+	delete exhaustVBA;exhaustVBA=nullptr;
+	delete exhaustVBO;exhaustVBO=nullptr;
+	delete exhaustIBO;exhaustIBO=nullptr;
 	if (defexhausttex) {
 		defexhausttex->Release();
 		defexhausttex = 0;
@@ -431,13 +434,10 @@ bool vVessel::RenderExhaust ()
 	};
 	static uint16_t ExhaustIdx[12] = {0,1,2, 3,2,1, 4,5,6, 7,6,5};
 
-	static IndexBuffer *IBO;
-	static VertexArray *VBA;
-	static VertexBuffer *VBO;
-
-	static bool need_setup2 = true;
-	if(need_setup2) {
-		need_setup2 = false;
+	auto*& IBO=exhaustIBO;
+	auto*& VBA=exhaustVBA;
+	auto*& VBO=exhaustVBO;
+	if(!VBA) {
 		VBA = new VertexArray();
 		VBA->Bind();
 

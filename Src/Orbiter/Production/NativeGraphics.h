@@ -32,6 +32,8 @@ public:
     virtual void Resize(int,int)=0;
     virtual void Status(const std::string&)=0;
     virtual void PostCreation()=0;
+    virtual void NewVessel(OBJHANDLE)=0;
+    virtual void DeleteVessel(OBJHANDLE)=0;
     virtual void Render()=0;
     virtual bool Present()=0;
     virtual void CloseSession()=0;
@@ -55,6 +57,7 @@ public:
 struct NativeRenderContext {
     Config* configuration=nullptr;PlanetarySystem* world=nullptr;Camera* camera=nullptr;
     Vessel* focus=nullptr;TimeData* time=nullptr;MeshManager* meshes=nullptr;
+    class VesselLifetimeServices* lifetime=nullptr;
     const ResourceResolver *textures=nullptr,*highTextures=nullptr,*planetTextures=nullptr,*meshFiles=nullptr,*programFiles=nullptr;
     NativeGraphics* graphics=nullptr;bool paused=true,showGrapple=false;
     int joystickThrottleAxis=-1,joystickTwistAxis=2;

@@ -1,6 +1,8 @@
 // Copyright (c) Martin Schweiger
 // Licensed under the MIT License
 #include "Random.h"
+#include "VesselLifetime.h"
+#include "NativeObservation/ApplicationObservation.h"
 // Narrow production external-view host. It owns real WorldOwner/Camera/Psys,
 // native source modules and the original shared Session ordering, never POC state.
 #include "NativeGraphics.h"
@@ -68,18 +70,33 @@ int ReadFlightStatus(const VESSEL& vessel) {
     VESSELSTATUS2 status{};status.version=2;vessel.GetStatusEx(&status);return status.status;
 }
 struct Runtime final:BodyServices,RigidBodyServices,SurfaceServices,NavigationServices,VesselServices,
-    CameraServices,WorldFactory,SessionServices {
+    CameraServices,WorldFactory,SessionServices,VesselLifetimeServices {
     Resources& resources;const ResourceResolver& config;Config settings;TimeData time;CFG_PHYSICSPRM physics{};
     PlanetarySystem* system=nullptr;NativeRenderContext render;bool updating=false,force=true,running=false,playback=false,active=true;
     MeshManager meshes;NativeCelestialServices celestial;std::unique_ptr<NativeElevationServices> terrain;
     std::unique_ptr<WorldVesselServices> vessels;WorldOwner world;std::unique_ptr<NativeModule> graphicsModule;
     std::ofstream lifecycle,trace,flightTrace,inputTrace,inputEvents,thrustTrace,animationTrace,controlTrace,mathTrace,contactTrace;
-    unsigned pendingCockpitRedraw=0,inputTick=0,completedTicks=0;
+    unsigned pendingCockpitRedraw=0,inputTick=0,completedTicks=0,observationTick=0;
     FlightControls controls;FlightReplay replay;FlightInput input;
     std::unique_ptr<State> scenarioState;
     std::filesystem::path savePath;
+    Vessel* previousFocus=nullptr;
+    struct AttachmentPair {Vessel* parent;ATTACHMENTHANDLE parentHandle,childHandle;};
+    std::map<std::string,AttachmentPair> attachments;
+    std::ofstream vesselCallbacks,lifetimeEvents;
     bool savePending=false,reloadPending=false,stepOnce=false,finished=false;
     std::string testCase;
+    void EventAt(const char* phase,const char* object,const char* detail,double seconds,double mjd) {
+        if(lifetimeEvents.is_open())lifetimeEvents<<inputTick<<','<<observationTick<<','<<seconds<<','<<mjd<<','<<phase<<','<<object<<','<<detail<<'\n';
+    }
+    void LifetimeEvent(const char* phase,const char* object="",const char* detail="") {EventAt(phase,object,detail,time.SimT0,time.MJD0);}
+    static void VesselEvent(void* context,const char* phase,const char* object,double seconds,double mjd,int) {
+        auto& self=*static_cast<Runtime*>(context);self.EventAt(phase,object,"1",seconds,mjd);
+        if(self.vesselCallbacks.is_open())self.vesselCallbacks<<self.inputTick<<','<<self.completedTicks<<','<<seconds<<','<<mjd<<','<<phase<<','<<object<<'\n';
+    }
+    Vessel* RequireVessel(const std::string& name) {
+        auto* vessel=system->GetVessel(name.c_str(),true);if(!vessel)throw std::runtime_error("Required live vessel missing: "+name);return vessel;
+    }
     void Commands(const char* phase) {
         for(const auto& command:replay.Take(inputTick,phase)) {
             auto* v=render.focus->GetModuleInterface();
@@ -98,6 +115,43 @@ struct Runtime final:BodyServices,RigidBodyServices,SurfaceServices,NavigationSe
                 if(forward)state.rvel+=mul(r,_V(0,0,forward));
                 if(down)state.rvel-=state.rpos*(down/length(state.rpos));
                 state.status=0;state.flag=0;v->DefSetStateEx(&state);continue;
+            }
+            if(command.action=="create" || command.action=="create_legacy") {
+                std::istringstream fields(command.value);std::string name,type,extra;
+                if(!(fields>>name>>type) || fields>>extra)throw std::runtime_error("Creation requires vessel name and class");
+                VESSELSTATUS2 state{};state.version=2;v->GetStatusEx(&state);state.rpos.x+=100;state.flag=0;
+                OBJHANDLE child;
+                if(command.action=="create_legacy") {VESSELSTATUS legacy{};v->GetStatus(legacy);legacy.rpos.x+=100;child=oapiCreateVessel(name.c_str(),type.c_str(),legacy);}
+                else child=oapiCreateVesselEx(name.c_str(),type.c_str(),&state);
+                if(!child || oapiGetVesselInterface(child)->GetThrusterCount()!=16)throw std::runtime_error("Required source-built child vessel module missing");
+                LifetimeEvent("input.create",name.c_str(),type.c_str());continue;
+            }
+            if(command.action=="focus") {
+                auto* next=RequireVessel(command.value);auto* before=render.focus;auto previous=oapiSetFocusObject(next);
+                if(previous!=(before==next?nullptr:before) || oapiGetFocusInterface()!=next->GetModuleInterface())throw std::logic_error("Focus SDK return/interface contract failed");
+                LifetimeEvent("input.focus",next->Name());continue;
+            }
+            if(command.action=="delete") {
+                std::istringstream fields(command.value);std::string name,replacement,extra;
+                if(!(fields>>name))throw std::runtime_error("Deletion requires a vessel name");
+                fields>>replacement;if(fields>>extra)throw std::runtime_error("Invalid deletion arguments");
+                auto* vessel=RequireVessel(name);auto* target=replacement.empty()?nullptr:system->GetObj(replacement.c_str(),true);
+                if(!replacement.empty() && !target)throw std::runtime_error("Required alternative camera target missing");
+                if(!oapiDeleteVessel(vessel,target))throw std::runtime_error("Vessel deletion request failed");
+                LifetimeEvent("input.delete",name.c_str());continue;
+            }
+            if(command.action=="attachment") {
+                auto* child=RequireVessel(command.value)->GetModuleInterface();
+                auto a=v->CreateAttachment(false,_V(0,0,5),_V(0,0,1),_V(0,1,0),"parent");
+                auto b=child->CreateAttachment(true,_V(0,0,-5),_V(0,0,-1),_V(0,1,0),"child");
+                if(!a || !b || !attachments.emplace(command.value,AttachmentPair{static_cast<Vessel*>(v->GetHandle()),a,b}).second)throw std::runtime_error("Attachment creation failed or duplicated");continue;
+            }
+            if(command.action=="attach" || command.action=="detach") {
+                auto* child=RequireVessel(command.value);auto it=attachments.find(command.value);
+                if(it==attachments.end())throw std::runtime_error("Required attachment not created");
+                const bool valid=command.action=="attach"?it->second.parent->GetModuleInterface()->AttachChild(child,it->second.parentHandle,it->second.childHandle):it->second.parent->GetModuleInterface()->DetachChild(it->second.parentHandle,.2);
+                if(!valid)throw std::runtime_error("Attachment operation failed");
+                LifetimeEvent(command.action=="attach"?"input.attach":"input.detach",v->GetName(),child->Name());continue;
             }
             const double value=FlightNumber(command.value);
             if(command.action=="main" || command.action=="hover") {
@@ -151,6 +205,11 @@ struct Runtime final:BodyServices,RigidBodyServices,SurfaceServices,NavigationSe
                 if(keymap.IsLogicalKey(code,snapshot.keys.data(),OAPI_LKEY_Quicksave)) {savePending=true;continue;}
                 if(code==OAPI_KEY_F5 && !KEYMOD_CONTROL(snapshot.keys.data())) {reloadPending=true;continue;}
                 if(code==OAPI_KEY_F6 && !KEYMOD_CONTROL(snapshot.keys.data())) {stepOnce=true;continue;}
+                if(keymap.IsLogicalKey(code,snapshot.keys.data(),OAPI_LKEY_DlgSelectVessel)) {
+                    const auto& list=system->GetVessels();auto it=std::find(list.begin(),list.end(),render.focus);auto start=std::size_t(it-list.begin());
+                    for(std::size_t i=1;i<=list.size();++i) {auto* next=list[(start+i)%list.size()];if(next->GetEnableFocus() && !next->KillPending()) {orbiter::production::SetFocusObject(*this,next);break;}}continue;
+                }
+                if(keymap.IsLogicalKey(code,snapshot.keys.data(),OAPI_LKEY_SelectPrevVessel)) {if(previousFocus)orbiter::production::SetFocusObject(*this,previousFocus);continue;}
                 if(keymap.IsLogicalKey(code,snapshot.keys.data(),OAPI_LKEY_Quit)) {active=false;continue;}
                 if(keymap.IsLogicalKey(code,snapshot.keys.data(),OAPI_LKEY_IncSimSpeed)) {SetWarpFactor(std::pow(10.,std::floor(std::log10(time.Warp())+1e-6)+1));continue;}
                 if(keymap.IsLogicalKey(code,snapshot.keys.data(),OAPI_LKEY_DecSimSpeed)) {SetWarpFactor(std::pow(10.,std::ceil(std::log10(time.Warp())-1e-6)-1));continue;}
@@ -170,12 +229,12 @@ struct Runtime final:BodyServices,RigidBodyServices,SurfaceServices,NavigationSe
         if(finished)return;
         if(render.graphics)render.graphics->CloseSession();world.Reset();meshes.Flush();
         if(render.graphics)render.graphics->Close();graphicsModule.reset();render.graphics=nullptr;
-        for(auto* file:{&lifecycle,&trace,&flightTrace,&inputTrace,&inputEvents,&thrustTrace,&animationTrace,&controlTrace,&mathTrace,&contactTrace})if(file->is_open())file->close();
+        for(auto* file:{&vesselCallbacks,&lifetimeEvents,&lifecycle,&trace,&flightTrace,&inputTrace,&inputEvents,&thrustTrace,&animationTrace,&controlTrace,&mathTrace,&contactTrace})if(file->is_open())file->close();
         finished=true;
     }
     ~Runtime() {
         try {Finish();}catch(const std::exception& error) {std::cerr<<"Production teardown: "<<error.what()<<'\n';}
-        BindFlightControls(nullptr);BindNativeRenderContext(nullptr);BindNativeVesselModuleResources(nullptr);BindVesselServices(nullptr);
+        BindVesselObserver(nullptr,nullptr);BindFlightControls(nullptr);BindNativeRenderContext(nullptr);BindNativeVesselModuleResources(nullptr);BindVesselServices(nullptr);
         BindCameraServices(nullptr);BindWorldVesselServices(nullptr);BindElevationServices(nullptr);BindMeshServices({});
         BindNavigationServices(nullptr);BindSurfaceServices(nullptr);BindCelestialServices(nullptr);BindRigidBodyServices(nullptr);BindBodyServices(nullptr);
     }
@@ -201,6 +260,9 @@ struct Runtime final:BodyServices,RigidBodyServices,SurfaceServices,NavigationSe
         if(!evidence.empty()) {std::filesystem::create_directories(evidence);lifecycle.open(evidence/"application-lifecycle.csv");lifecycle.exceptions(std::ios::badbit|std::ios::failbit);lifecycle<<"event,seconds,mjd,running\n";
             trace.open(evidence/"production-state.csv");trace.imbue(std::locale::classic());trace.exceptions(std::ios::badbit|std::ios::failbit);trace<<std::setprecision(17)<<"step,seconds,mjd,object,x,y,z,vx,vy,vz,m11,m12,m13,m21,m22,m23,m31,m32,m33,wx,wy,wz,mass,fuel,ground\n";}
         if(!evidence.empty()) {
+            for(auto* file:{&vesselCallbacks,&lifetimeEvents}) {file->imbue(std::locale::classic());file->exceptions(std::ios::badbit|std::ios::failbit);}
+            vesselCallbacks.open(evidence/"vessel-callbacks.csv");vesselCallbacks<<std::setprecision(17)<<"frame,tick,seconds,mjd,phase,object\n";
+            lifetimeEvents.open(evidence/"lifetime-events.csv");lifetimeEvents<<std::setprecision(17)<<"frame,tick,seconds,mjd,phase,object,detail\n";
             std::ofstream numerical(evidence/"numerics.json");numerical.exceptions(std::ios::badbit|std::ios::failbit);
             numerical<<"{\"math\":\""<<SimulationMathProfile()<<"\",\"random\":\"private-msvc-lcg32\",\"random_maximum\":"<<RandomMaximum<<",\"process_seed\":0}\n";
             flightTrace.open(evidence/"flight-state.csv");flightTrace.imbue(std::locale::classic());flightTrace.exceptions(std::ios::badbit|std::ios::failbit);
@@ -219,6 +281,7 @@ struct Runtime final:BodyServices,RigidBodyServices,SurfaceServices,NavigationSe
             contactTrace.open(evidence/"ground-contact.csv");contactTrace.imbue(std::locale::classic());contactTrace.exceptions(std::ios::badbit|std::ios::failbit);
             contactTrace<<std::setprecision(17);contact_observation::Header(contactTrace);
         }
+        render.lifetime=this;BindVesselObserver(VesselEvent,this);
         graphicsModule=std::make_unique<NativeModule>(resources.modules.Resolve("Graphics/OGLClient.so"),ORBITER_NATIVE_GRAPHICS,&render);
         render.graphics=static_cast<NativeGraphics*>(graphicsModule->Instance());render.graphics->Open();
         MeshServices mesh;mesh.context=this;
@@ -232,20 +295,19 @@ struct Runtime final:BodyServices,RigidBodyServices,SurfaceServices,NavigationSe
         RigidBody::GlobalSetup();
         if(!world.Initialize(metadata.Solsys()))throw std::runtime_error("Production solar system contains no objects");
         system->InitState(scenario.string().c_str());
-        auto* pb=system->GetVessel("PB",true);auto* iss=system->GetVessel("ISS",true);
-        if(!pb || !iss || pb->GetModuleInterface()->Version()!=2 || iss->GetModuleInterface()->Version()!=0 ||
-            std::string(pb->GetModuleInterface()->GetClassName())!="ShuttlePB" ||
-            std::string(iss->GetModuleInterface()->GetClassName())!="ProjectAlpha_ISS" ||
-            pb->GetModuleInterface()->GetMeshCount()!=1 || pb->GetModuleInterface()->GetThrusterCount()!=16 ||
-            pb->GetModuleInterface()->GetPropellantCount()!=1 || iss->GetModuleInterface()->GetMeshCount()!=1)
-            throw std::runtime_error("Required actual stock ISS and native ShuttlePB module/capabilities are missing; generic replacement is forbidden");
+        if(!system->nVessel())throw std::runtime_error("Native production session requires a live stock vessel");
+        for(auto* body:system->GetVessels()) {
+            auto* vessel=body->GetModuleInterface();const std::string type=vessel->GetClassName();
+            const bool pb=type=="ShuttlePB" && vessel->Version()==2 && vessel->GetMeshCount()==1 && vessel->GetThrusterCount()==16 && vessel->GetPropellantCount()==1;
+            const bool iss=type=="ProjectAlpha_ISS" && vessel->Version()==0 && vessel->GetMeshCount()==1;
+            if(!pb && !iss)throw std::runtime_error("Required actual stock ISS/native ShuttlePB module and capabilities are missing or unsupported; generic replacement is forbidden");
+        }
         auto* focus=system->GetVessel(metadata.Focus(),true);if(!focus)throw std::runtime_error("Required production focus vessel is missing");
         SetFocus(focus);
         render.camera->ResizeViewport(1280,720);render.camera->InitState(scenario.string().c_str(),focus);
         if(!render.camera->IsExternal())unsupported("cockpits yet; select an external camera");
         render.graphics->PostCreation();system->PostCreation();Commands("start");render.camera->Update();
-        if(system->nGrav()!=41 || system->nVessel()!=2 || !system->GetVessel("ISS",true) || !system->GetVessel("PB",true))
-            throw std::runtime_error("This native scene requires the actual stock Sol, ISS and ShuttlePB graph");
+        if(system->nGrav()!=41)throw std::runtime_error("This native scene requires the actual stock Sol world");
         WriteTrace();
     }
     bool IsUpdating() const override {return updating;}
@@ -321,7 +383,7 @@ struct Runtime final:BodyServices,RigidBodyServices,SurfaceServices,NavigationSe
     double TimejumpDelta() const override {unsupported("time jumps in this scene host");}
     void RedrawCockpitAreas(int flags) override {pendingCockpitRedraw|=unsigned(flags);} // No Panel/VC areas are registered in external-view scope.
     const double* ParticleLevel(const oapi::ParticleStream* stream) const override {return stream->Level();}
-    void InsertVessel(Vessel*) override {unsupported("dynamic vessel creation yet");}
+    void InsertVessel(Vessel* vessel) override {orbiter::production::InsertVessel(*this,vessel);}
     double ManualControl(THGROUP_TYPE group,UInt32 device) const override {return controls.Manual(group,device);}
     void NotifyJump(const Vessel& vessel,const Vector& delta) override {if(&vessel==render.camera->Target())render.camera->Drag(-delta);if(render.camera->Target())render.camera->Update();}
     void ShiftCockpit(const Vessel&,const Vector&) override {unsupported("virtual cockpit movement yet");}
@@ -331,10 +393,23 @@ struct Runtime final:BodyServices,RigidBodyServices,SurfaceServices,NavigationSe
     void PlaybackNote(char*) override {unsupported("playback annotations yet");}
     void EndPlayback() override {unsupported("flight playback yet");}
     Vessel* Focus() const override {return render.focus;}
-    void SetFocus(Vessel* vessel) override {
-        if(vessel==render.focus)return;auto* previous=render.focus;render.focus=vessel;
-        if(previous)previous->FocusChanged(false,vessel,previous);vessel->FocusChanged(true,vessel,previous);
-    }
+    void SetFocus(Vessel* vessel) override {orbiter::production::SetFocusObject(*this,vessel,false);}
+    PlanetarySystem*& LifetimeWorld() override {RequireWorld();return system;}
+    Camera*& LifetimeCamera() override {return render.camera;}
+    Vessel*& CurrentFocus() override {return render.focus;}
+    Vessel*& PreviousFocus() override {return previousFocus;}
+    void SetView(Body* body,int mode) override {render.camera->Attach(body,mode);force=true;LifetimeEvent("camera.target",render.camera->Target()->Name(),render.camera->IsExternal()?"external":"internal");}
+    void PaneFocusChanged(Vessel*) override {} // No Pane is instantiated in external-view scope.
+    void ModuleFocusChanged(Vessel* now,Vessel* previous) override {LifetimeEvent("module.focus",now->Name(),previous?previous->Name():"");}
+    void DialogFocusChanged(Vessel*) override {} // No dialogs are instantiated.
+    void ModuleNewVessel(Vessel* vessel) override {LifetimeEvent("module.create",vessel->Name());}
+    void GraphicsNewVessel(Vessel* vessel) override {render.graphics->NewVessel(vessel);LifetimeEvent("graphics.create",vessel->Name());}
+    void DialogNewVessel(Vessel*) override {} // No dialogs are instantiated.
+    void ModuleDeleteVessel(Vessel* vessel) override {LifetimeEvent("module.delete",vessel->Name());}
+    void GraphicsDeleteVessel(Vessel* vessel) override {render.graphics->DeleteVessel(vessel);for(auto it=attachments.begin();it!=attachments.end();)if(it->first==vessel->Name() || it->second.parent==vessel)it=attachments.erase(it);else ++it;LifetimeEvent("graphics.delete",vessel->Name());}
+    void PaneDeleteVessel(Vessel*) override {} // No MFDs are instantiated.
+    void DialogDeleteVessel(Vessel*) override {} // No dialogs are instantiated.
+    void ConsoleDeleteVessel(Vessel*) override {} // No console view is instantiated.
     void SetFOV(double value) override {if(render.camera->Aperture()!=value){render.camera->SetAperture(value);force=true;}}
     bool SetPanelMode(int) override {unsupported("cockpit panels yet");}
     void SelectPanel(int) override {unsupported("2D panels yet");}
@@ -348,13 +423,13 @@ struct Runtime final:BodyServices,RigidBodyServices,SurfaceServices,NavigationSe
     bool HasObjects(const PlanetarySystem* body) const override {return body->nObj()!=0;}
     void DestroyCamera(Camera* camera) noexcept override {delete camera;render.camera=nullptr;}
     void DestroySystem(PlanetarySystem* body) noexcept override {delete body;render.world=system=nullptr;}
-    void Observe(const char* event,bool state) override {if(lifecycle.is_open())lifecycle<<event<<','<<time.SimT0<<','<<time.MJD0<<','<<state<<'\n';}
-    void ModulePreStep() override {Commands("pre");for(auto* vessel:system->GetVessels())vessel->ModulePreStep(time.SimT0,time.SimDT,time.MJD0);}
+    void Observe(const char* event,bool state) override {LifetimeEvent(event,"",state?"1":"0");if(lifecycle.is_open())lifecycle<<event<<','<<time.SimT0<<','<<time.MJD0<<','<<state<<'\n';}
+    void ModulePreStep() override {LifetimeEvent("module.pre");Commands("pre");for(UInt32 i=0;i<system->nVessel();++i)system->GetVessel(i)->ModulePreStep(time.SimT0,time.SimDT,time.MJD0);}
     void PlaybackStep() override {unsupported("playback yet");}
     void UpdateBodies(bool update) override {system->Update(update);}
     void UpdateDialogs() override {} // No dialogs are instantiated in external-view scope.
-    void ModulePostStep() override {for(auto* vessel:system->GetVessels())vessel->ModulePostStep(time.SimT1,time.SimDT,time.MJD1);}
-    bool DeletePendingVessels() override {for(auto* vessel:system->GetVessels())if(vessel->KillPending())unsupported("dynamic vessel deletion yet");return system->nVessel()!=0;}
+    void ModulePostStep() override {for(UInt32 i=0;i<system->nVessel();++i)system->GetVessel(i)->ModulePostStep(time.SimT1,time.SimDT,time.MJD1);LifetimeEvent("module.post");}
+    bool DeletePendingVessels() override {return orbiter::production::KillVessels(*this);}
     void NoVessels() override {active=false;}
     void FinaliseBodies() override {system->FinaliseUpdate();}
     void AdvanceTime(bool state) override {time.EndStep(state);if(state)++completedTicks;}
@@ -369,7 +444,8 @@ struct Runtime final:BodyServices,RigidBodyServices,SurfaceServices,NavigationSe
         if(flightTrace.is_open()) {
             const auto* earth=system->GetGravObj("Earth",true);
             const auto& ep=system->GetGravObj("Earth",true)->GPos();const auto& ev=system->GetGravObj("Earth",true)->GVel();
-            for(auto* vessel:{system->GetVessel("ISS",true),system->GetVessel("PB",true)}) {
+            auto observed=system->GetVessels();std::sort(observed.begin(),observed.end(),[](const Vessel* a,const Vessel* b){return std::string(a->Name())<b->Name();});
+            for(auto* vessel:observed) {
                 auto* v=vessel->GetModuleInterface();VECTOR3 p{},velocity{},omega{};MATRIX3 r{};
                 v->GetGlobalPos(p);v->GetGlobalVel(velocity);v->GetAngularVel(omega);v->GetRotationMatrix(r);
                 flightTrace<<completedTicks<<','<<time.FrameCount()<<','<<time.SimT0<<','<<time.MJD0<<','<<v->GetName()<<','<<v->GetClassName();
@@ -380,7 +456,10 @@ struct Runtime final:BodyServices,RigidBodyServices,SurfaceServices,NavigationSe
                 }
                 unsigned mask=0;for(int nav=1;nav<=7;++nav)if(v->GetNavmodeState(nav))mask|=1u<<nav;
                 auto dock=v->DockCount()?v->GetDockStatus(v->GetDockHandle(0)):nullptr;
-                flightTrace<<','<<int(v->GroundContact())<<','<<(dock?static_cast<Vessel*>(dock)->Name():"")<<','<<render.focus->Name()<<','<<mask<<",\n";
+                flightTrace<<','<<int(v->GroundContact())<<','<<(dock?static_cast<Vessel*>(dock)->Name():"")<<','<<render.focus->Name()<<','<<mask<<',';
+                for(bool parent:{false,true})for(UInt32 i=0;i<v->AttachmentCount(parent);++i)
+                    if(auto attached=v->GetAttachmentStatus(v->GetAttachmentHandle(parent,i)))flightTrace<<static_cast<Vessel*>(attached)->Name()<<';';
+                flightTrace<<'\n';
                 controlTrace<<completedTicks<<','<<time.SimT0<<','<<v->GetName()<<','<<ReadFlightStatus(*v)<<','<<v->GetADCtrlMode()<<','<<v->GetAttitudeMode()
                     <<','<<v->GetControlSurfaceLevel(AIRCTRL_ELEVATOR)<<','<<v->GetControlSurfaceLevel(AIRCTRL_AILERON)<<','<<v->GetControlSurfaceLevel(AIRCTRL_RUDDER)<<'\n';
                 for(unsigned index=0;index<256;++index) {
@@ -396,9 +475,14 @@ struct Runtime final:BodyServices,RigidBodyServices,SurfaceServices,NavigationSe
             }
         }
         if(!trace.is_open())return;
-        for(const char* name:{"Sun","Earth","Moon","ISS","PB"}) {
-            auto* vessel=system->GetVessel(name,true);const Body* body=vessel?static_cast<const Body*>(vessel):system->GetGravObj(name,true);
-            if(!body)throw std::runtime_error("Required production trace body missing");
+        std::vector<Body*> bodies;
+        for(const char* name:{"Sun","Earth","Moon"}) {
+            auto* body=system->GetGravObj(name,true);if(!body)throw std::runtime_error("Required production trace primary missing");bodies.push_back(body);
+        }
+        auto all=system->GetVessels();std::sort(all.begin(),all.end(),[](const Vessel* a,const Vessel* b){return std::string(a->Name())<b->Name();});
+        for(auto* vessel:all)bodies.push_back(vessel);
+        for(auto* body:bodies) {
+            auto* vessel=body->Type()==OBJTP_VESSEL?static_cast<Vessel*>(body):nullptr;const char* name=body->Name();
             const auto& p=body->GPos();const auto& v=body->GVel();const auto& r=body->GRot();Vector w(0,0,0);if(vessel)w=vessel->AngularVelocity();
             trace<<time.FrameCount()<<','<<time.SimT0<<','<<time.MJD0<<','<<name;
             for(double value:{p.x,p.y,p.z,v.x,v.y,v.z,r.m11,r.m12,r.m13,r.m21,r.m22,r.m23,r.m31,r.m32,r.m33,w.x,w.y,w.z,body->Mass(),vessel?vessel->GetModuleInterface()->GetFuelMass():0}) {
@@ -425,18 +509,18 @@ struct Runtime final:BodyServices,RigidBodyServices,SurfaceServices,NavigationSe
         if(!navActive)text<<" none";
         text<<" | fuel "<<std::setprecision(3)<<v->GetFuelMass()<<"kg | x"<<time.Warp();
         if(auto dock=v->DockCount()?v->GetDockStatus(v->GetDockHandle(0)):nullptr)text<<" | DOCKED "<<static_cast<Vessel*>(dock)->Name();
-        else text<<" | ISS "<<std::setprecision(1)<<render.focus->GPos().dist(system->GetVessel("ISS",true)->GPos())<<"m";
+        else if(auto* iss=system->GetVessel("ISS",true))text<<" | ISS "<<std::setprecision(1)<<render.focus->GPos().dist(iss->GPos())<<"m";
         return text.str();
     }
     void Step(double dt) {
-        Commands("before");Buffered(input);InputRecord();
+        observationTick=completedTicks;Commands("before");Buffered(input);InputRecord();
         const bool wasRunning=running;if(stepOnce){running=true;stepOnce=false;}
         render.paused=!running;time.BeginStep(dt,running);
         if(running)controls.Immediate(*render.focus,time,input);
         Session::UpdateWorld(*this,time,running,playback,updating,force);
         Session::EndTimeStep(*this,time,running,active,force);
         if(!wasRunning)running=false;
-        input.throttle=-1;Commands("after");render.paused=!running;if(savePending){Save();savePending=false;}++inputTick;
+        input.throttle=-1;observationTick=completedTicks;Commands("after");render.paused=!running;if(savePending){Save();savePending=false;}++inputTick;
     }
 };
 }
@@ -493,7 +577,7 @@ int main(int argc,char** argv) {
                 }
                 if(input.width>0 && input.height>0){application.render.graphics->Resize(input.width,input.height);application.render.camera->ResizeViewport(input.width,input.height);}
                 if(frames || ticks) {
-                    for(int n=0;n<(ticks?renderEvery:1) && (!ticks || application.inputTick<unsigned(ticks));++n)application.Step(fixed);
+                    for(int n=0;n<(ticks?renderEvery:1) && application.active && !application.reloadPending && (!ticks || application.inputTick<unsigned(ticks));++n)application.Step(fixed);
                 } else {
                     auto now=std::chrono::steady_clock::now();clock.Add(std::chrono::duration<double>(now-previous).count());previous=now;
                     int count=0;while(count<256 && application.active && !application.reloadPending && clock.Tick()) {application.Step(fixed);++count;}

@@ -47,6 +47,12 @@ HazeManager::HazeManager (const vPlanet *vplanet)
 	hscale = (float)(1.0 - *(double*)oapiGetObjectParam (obj, OBJPRM_PLANET_HAZEEXTENT));
 }
 
+void HazeManager::GlobalExit ()
+{
+	IBO.reset();VBO.reset();VBA.reset();
+	if(horizon) {horizon->Release();horizon=nullptr;}
+}
+
 void HazeManager::GlobalInit ()
 {
 	int i;

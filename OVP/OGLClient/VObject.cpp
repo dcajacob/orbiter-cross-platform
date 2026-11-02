@@ -102,8 +102,11 @@ void vObject::GlobalInit ()
 
 void vObject::GlobalExit ()
 {
+	delete spotVBA;spotVBA=nullptr;
+	delete spotVBO;spotVBO=nullptr;
+	delete spotIBO;spotIBO=nullptr;
 	for (int i = 0; i < 3; i++) {
-		if (blobtex[i]) blobtex[i]->Release();
+		if (blobtex[i]) {blobtex[i]->Release();blobtex[i]=nullptr;}
 	}
 }
 

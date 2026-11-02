@@ -24,6 +24,7 @@ set(common_src
 	LightEmitter.cpp
 	Orbiter.cpp
 	Production/WindowsSession.cpp
+	Production/WindowsVesselLifetime.cpp
 	Production/WindowsWorldVesselServices.cpp
 	Production/WindowsVesselServices.cpp
 	Production/WindowsWorld.cpp

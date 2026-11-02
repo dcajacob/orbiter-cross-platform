@@ -18,6 +18,7 @@ def wait(action,message,timeout=15):
 def main():
     p=argparse.ArgumentParser(description=__doc__)
     for name in ('executable','assets','data','modules','planets','output'):p.add_argument('--'+name,type=Path,required=True)
+    p.add_argument('--lifecycle',action='store_true',help='Also verify live F3/Ctrl-F3 vessel focus and child controls')
     p.add_argument('--keymap',type=Path,default=ROOT/'Tests/Production/Flight/keymap-laptop.cfg')
     a=p.parse_args();out=a.output.resolve();out.mkdir(parents=True,exist_ok=True)
     x=C.CDLL(ctypes.util.find_library('X11'))
@@ -58,7 +59,7 @@ def main():
             x.XGetWindowProperty(display,window,pidAtom,0,1,False,6,C.byref(actual),C.byref(form),C.byref(items),C.byref(remaining),C.byref(data))
             value=C.cast(data,C.POINTER(C.c_ulong))[0] if data and items.value and form.value==32 else 0
             if data:x.XFree(data)
-            if value==pid and title(window).startswith('Orbiter | PB |'):return window
+            if value==pid and title(window).startswith('Orbiter | '):return window
         return None
     def key(window,name,down,state=0):
         event=Event();event.key=KeyEvent(2 if down else 3,0,True,display,window,root,0,0,1,1,1,1,state,x.XKeysymToKeycode(display,x.XStringToKeysym(name.encode())),True)
@@ -70,9 +71,16 @@ def main():
         key(window,'Control_L',True);key(window,'s',True,4)
         wait(lambda:target.is_file() and target.stat().st_mtime_ns!=before,'Quicksave key did not save the production scenario')
         key(window,'s',False,4);key(window,'Control_L',False);time.sleep(.1)
+    fixture=ROOT/'Tests/Production/NativeScene/Sol-ISS-ShuttlePB.scn'
+    if a.lifecycle:
+        import sys
+        sys.path.insert(0,str(ROOT/'Tests/Production'))
+        from behavior_suite import scenario
+        fixture=out/'keyboard-lifecycle.scn'
+        fixture.write_text(scenario('orbit').replace('END_SHIPS','Child:ShuttlePB\n  STATUS Orbiting Earth\n  RPOS 6771200 0 0\n  RVEL 0 0 7672.5\n  AROT 0 0 0\n  VROT 0 0 0\n  PRPLEVEL 0:1\nEND\nEND_SHIPS'))
     argv=[str(a.executable.resolve())]
     for name in ('assets','data','modules','planets'):argv+=['--'+name,str(getattr(a,name).resolve())]
-    argv+=['--config',str(ROOT/'Tests/Production/NativeScene/Orbiter.cfg'),'--scenario',str(ROOT/'Tests/Production/NativeScene/Sol-ISS-ShuttlePB.scn'),'--keymap',str(a.keymap.resolve()),'--save',str(out/'checkpoint.scn'),'--evidence',str(out),'--run']
+    argv+=['--config',str(ROOT/'Tests/Production/NativeScene/Orbiter.cfg'),'--scenario',str(fixture),'--keymap',str(a.keymap.resolve()),'--save',str(out/'checkpoint.scn'),'--evidence',str(out),'--run']
     with (out/'console.log').open('w') as log:
         process=subprocess.Popen(argv,stdout=log,stderr=subprocess.STDOUT,env={**os.environ,'XDG_SESSION_TYPE':'x11'})
         try:
@@ -81,6 +89,14 @@ def main():
             def seconds():return float(re.search(r't=([0-9.]+)s',title(window)).group(1))
             def advance(duration):
                 start=seconds();wait(lambda:seconds()>=start+duration,'Flight time did not advance')
+            focusChecks={}
+            if a.lifecycle:
+                tap(window,'F3');wait(lambda:title(window).startswith('Orbiter | Child |'),'F3 did not select the actual child vessel')
+                key(window,'w',True);wait(lambda:'RCS ROT 100%' in title(window),'Child did not receive keyboard RCS')
+                advance(.12);key(window,'w',False);wait(lambda:'RCS ROT 0%' in title(window),'Child RCS remained on after release')
+                key(window,'Control_L',True);tap(window,'F3',4);key(window,'Control_L',False)
+                wait(lambda:title(window).startswith('Orbiter | PB |'),'Ctrl-F3 did not restore the previous vessel')
+                focusChecks=dict(live_vessel_focus=True,previous_vessel_key=True,focused_child_rcs=True)
             releaseChecks=[]
             for mode in ('ROT','LIN'):
                 if mode=='LIN':tap(window,'f')
@@ -181,7 +197,7 @@ def main():
                 require(held and max(abs(float(r[check['surface']])) for r in held)>.2,'Keyboard did not move actual '+check['surface'])
                 require(settled and all(float(r[check['surface']])==0 and int(r['rcs_mode'])==0 for r in settled),
                         'Actual control surface failed to return to neutral after release: '+check['surface'])
-            report=dict(status='passed',keyboard_throttle=True,rcs_mode=True,rcs_translation=True,rcs_hold_release=releaseChecks,rcs_release_samples=checked,rcs_focus_release=True,aerodynamic_toggle=True,control_surface_release=finChecks,propellant_used=True,pause=True,single_step=True,stock_quicksave=True,in_process_reload=True,exit=True)
+            report=dict(**focusChecks,status='passed',keyboard_throttle=True,rcs_mode=True,rcs_translation=True,rcs_hold_release=releaseChecks,rcs_release_samples=checked,rcs_focus_release=True,aerodynamic_toggle=True,control_surface_release=finChecks,propellant_used=True,pause=True,single_step=True,stock_quicksave=True,in_process_reload=True,exit=True)
             (out/'keyboard-verification.json').write_text(json.dumps(report,indent=2)+'\n');print(json.dumps(report))
         finally:
             if process.poll() is None:

@@ -34,7 +34,7 @@ class MemStat;
 class DDEServer;
 class ImageIO;
 namespace orbiter {
-	namespace production { class WindowsSessionServices; }
+	namespace production { class WindowsSessionServices; class WindowsVesselLifetime; }
 	class ConsoleNG;
 	class LaunchpadDialog;
 }
@@ -50,6 +50,7 @@ typedef void (*OPC_Proc)(void);
 //-----------------------------------------------------------------------------
 class Orbiter {
 	friend class orbiter::production::WindowsSessionServices;
+	friend class orbiter::production::WindowsVesselLifetime;
 	friend class orbiter::production::WindowsWorldFactory;
 	friend class ScriptInterface;
 	friend class oapi::GraphicsClient;

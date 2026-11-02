@@ -133,7 +133,7 @@ OGLMesh::~OGLMesh ()
 {
 	ClearGroups();
 	if (nTex) delete []Tex;
-	if (nMtrl) delete []Mtrl;
+	delete []Mtrl;
 }
 
 void OGLMesh::GlobalInit()
@@ -151,8 +151,8 @@ int OGLMesh::AddGroup (GROUPREC *grp, bool deepcopy)
 	GROUPREC **tmp = new GROUPREC*[nGrp+1];
 	if (nGrp) {
 		memcpy (tmp, Grp, nGrp*sizeof(GROUPREC*));
-		delete []Grp;
 	}
+	delete []Grp;
 	Grp = tmp;
 	if (deepcopy) CopyGroup (Grp[nGrp], grp);
 	else          Grp[nGrp] = grp;
@@ -528,9 +528,10 @@ void OGLMesh::ClearGroups ()
 	if (nGrp) {
 		for (int g = 0; g < nGrp; g++)
 			DeleteGroup (Grp[g]);
-		delete []Grp;
-		nGrp = 0;
 	}
+	delete []Grp;
+	Grp = nullptr;
+	nGrp = 0;
 }
 
 bool OGLMesh::SetTexture (int texidx, SURFHANDLE tex)

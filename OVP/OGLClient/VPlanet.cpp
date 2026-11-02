@@ -153,8 +153,8 @@ vPlanet::~vPlanet ()
 	if (nbase) {
 		for (int i = 0; i < nbase; i++)
 			if (vbase[i]) delete vbase[i];
-		delete []vbase;
 	}
+	delete []vbase;
 	if (surfmgr) delete surfmgr;
 	else if (surfmgr2) delete surfmgr2;
 	if (cloudmgr2) delete cloudmgr2;
