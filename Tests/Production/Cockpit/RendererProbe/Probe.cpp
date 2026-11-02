@@ -4,6 +4,10 @@
 #include "Production/NativeModule.h"
 #include "Config.h"
 #include "TimeData.h"
+#include "Mesh.h"
+#include "Production/MeshServices.h"
+#include <cmath>
+#include <limits>
 #define GL_GLEXT_PROTOTYPES
 #include <GL/gl.h>
 #include "OVP/OGLClient/Texture.h"
@@ -28,6 +32,15 @@ int main(int argc,char** argv){try{
     context.evidence=std::filesystem::absolute(argv[4]).parent_path()/("context-"+std::to_string(cycle));
     client->Open();
     require(client->DesktopHeight()>0,"Real native primary display metrics unavailable");
+    oapi::UInt32 capability=99;require(client->clbkGetRenderParam(RP_COLOURDEPTH,&capability) && capability==32,"Native renderer capability query differs");
+    capability=99;require(!client->clbkGetRenderParam(0xffffffff,&capability) && capability==99,"Unknown renderer capability returned invented data");
+    auto shared=client->clbkCreateTexture(2,2);require(shared,"Native blank instrument texture unavailable");
+    oapi::UInt32 sharedWidth=0,sharedHeight=0;
+    require(client->clbkGetSurfaceSize(shared,&sharedWidth,&sharedHeight) && sharedWidth==2 && sharedHeight==2,"Native texture-size callback differs");
+    const GLuint sharedId=static_cast<OGLTexture*>(shared)->m_TexId;
+    client->clbkIncrSurfaceRef(shared);require(client->clbkReleaseSurface(shared),"Native shared surface release failed");
+    require(client->clbkFillSurface(shared,0x0000ff) && glIsTexture(sharedId),"Native shared surface was destroyed while still referenced");
+    require(client->clbkReleaseSurface(shared) && !glIsTexture(sharedId),"Native last surface release retained a GPU texture");
     require(glGetError()==GL_NO_ERROR,"Context reinitialization produced a GL error");
     glDebugMessageCallback([](GLenum,GLenum type,GLuint,GLenum,GLsizei,const GLchar* message,const void*){
         if(type==GL_DEBUG_TYPE_ERROR)std::cerr<<"Actual GL error: "<<message<<'\n';
@@ -81,6 +94,38 @@ int main(int argc,char** argv){try{
     for(int y=0;y<16;++y) require(std::equal(apiCopied.begin()+size_t(y)*24*4,apiCopied.begin()+size_t(y)*24*4+16*4,
         overlap.begin()+size_t((y+1)*24+1)*4),"Overlapping instrument copy did not snapshot its source");
     require(glGetError()==GL_NO_ERROR,"Instrument brush/fill/blit callbacks produced a GL error");
+    // An isolated graphics primitive tests the real panel callback. It is not
+    // a substitute for a stock vessel, panel or production cockpit session.
+    MeshServices meshServices;meshServices.context=client;
+    meshServices.path=[](void*,const char*)->std::filesystem::path{throw std::logic_error("Panel primitive loads no mesh file");};
+    meshServices.loadTexture=[](void*,const char*,oapi::UInt32)->MeshSurface{throw std::logic_error("Panel primitive loads no mesh textures");};
+    meshServices.releaseTexture=[](void* context,MeshSurface texture){static_cast<NativeGraphics*>(context)->clbkReleaseSurface(texture);};
+    meshServices.error=[](void*,const char* message){throw std::runtime_error(message);};
+    meshServices.allocation=[](void*,const char*,int){};
+    const auto previousMesh=BindMeshServices(meshServices);
+    {
+        Mesh panel;NTVERTEX vertices[4]={{16,16,0,0,0,1,0,0},{32,16,0,0,0,1,1,0},{16,32,0,0,0,1,0,1},{32,32,0,0,0,1,1,1}};
+        oapi::UInt16 indices[6]={0,1,2,2,1,3};panel.AddGroup(vertices,4,indices,6,SPEC_DEFAULT,0,0,0,true);
+        MATRIX3 transform={1,0,0,0,1,0,0,0,1};SURFHANDLE surfaces[]={source};
+        for(bool additive:{false,true})for(float opacity:{1.f,.5f,0.f}) {
+            glBindFramebuffer(GL_FRAMEBUFFER,0);glViewport(0,0,1280,720);glClearColor(0,0,.25f,1);glClear(GL_COLOR_BUFFER_BIT);
+            client->clbkRender2DPanel(surfaces,&panel,&transform,opacity,additive);
+            unsigned char pixel[4]{};glReadPixels(24,720-24,1,1,GL_RGBA,GL_UNSIGNED_BYTE,pixel);
+            const int expectedBlue=int(std::lround(64*(additive?1:1-opacity)));
+            const bool correct=std::abs(int(pixel[0])-int(std::lround(255*opacity)))<=1 && pixel[1]==0 && std::abs(int(pixel[2])-expectedBlue)<=1;
+            if(!correct)std::cerr<<"Panel opacity="<<opacity<<" actual RGBA="<<int(pixel[0])<<','<<int(pixel[1])<<','<<int(pixel[2])<<','<<int(pixel[3])<<'\n';
+            require(correct,
+                "Actual instrument panel callback ignores or misapplies opacity");
+        }
+        bool invalidOpacity=false;
+        try{client->clbkRender2DPanel(surfaces,&panel,&transform,std::numeric_limits<float>::quiet_NaN(),false);}catch(const std::invalid_argument&){invalidOpacity=true;}
+        require(invalidOpacity,"Nonfinite panel opacity silently succeeded");
+        require(glGetError()==GL_NO_ERROR,"Actual panel opacity callback produced a GL error");
+    }
+    BindMeshServices(previousMesh);
+    require(client->clbkScaleBlt(target,0,0,8,8,source,0,0,16,16),"Native instrument scale-copy callback failed");
+    const auto scaled=read(target,24,24);const auto scaledCenter=size_t(4*24+4)*4;
+    require(scaled[scaledCenter]==255 && scaled[scaledCenter+1]==0 && scaled[scaledCenter+2]==0,"Panel opacity leaked into the following instrument copy");
     oapiClearSurface(target);const auto cleared=read(target,24,24);
     for(size_t i=0;i<cleared.size();i+=4)require(cleared[i]==0 && cleared[i+1]==0 && cleared[i+2]==0,"SDK surface clear left colored pixels");
     oapiDestroySurface(source);oapiDestroySurface(target);
@@ -104,7 +149,7 @@ int main(int argc,char** argv){try{
     if(cycle+1!=cycles)continue;
     std::ofstream report(argv[4]);report.exceptions(std::ios::badbit|std::ios::failbit);
     report<<"{\"status\":\"passed\",\"requested_height\":-14,\"character_width\":"<<width<<",\"character_height\":"<<height
-          <<",\"surface_callback_pixels_verified\":true,\"context_cycles\":"<<cycles<<",\"glyph_pixels\":"<<green<<",\"invalid_surface_rejected\":true,\"gl_error\":0,\"compressed_target_changed_pixels\":"<<changed<<"}\n";
+          <<",\"surface_callback_pixels_verified\":true,\"panel_opacity_and_additive_pixels_verified\":true,\"surface_references_verified\":true,\"context_cycles\":"<<cycles<<",\"glyph_pixels\":"<<green<<",\"invalid_surface_rejected\":true,\"gl_error\":0,\"compressed_target_changed_pixels\":"<<changed<<"}\n";
     std::cout<<"Actual font metrics "<<width<<'x'<<height<<"; green glyph pixels "<<green<<'\n';
     }
     context.graphics=nullptr;BindNativeRenderContext(nullptr);

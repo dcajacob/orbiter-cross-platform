@@ -35,6 +35,15 @@ public:
     virtual bool clbkFillSurface(SURFHANDLE,oapi::UInt32) const=0;
     virtual bool clbkBlt(SURFHANDLE,oapi::UInt32,oapi::UInt32,SURFHANDLE,oapi::UInt32=0) const=0;
     virtual bool clbkBlt(SURFHANDLE,oapi::UInt32,oapi::UInt32,SURFHANDLE,oapi::UInt32,oapi::UInt32,oapi::UInt32,oapi::UInt32,oapi::UInt32=0) const=0;
+    virtual bool clbkGetRenderParam(oapi::UInt32,oapi::UInt32*) const=0;
+    virtual SURFHANDLE clbkLoadSurface(const char*,oapi::UInt32,bool=false)=0;
+    virtual SURFHANDLE clbkCreateTexture(oapi::UInt32,oapi::UInt32)=0;
+    virtual bool clbkGetSurfaceSize(SURFHANDLE,oapi::UInt32*,oapi::UInt32*)=0;
+    virtual void clbkIncrSurfaceRef(SURFHANDLE)=0;
+    virtual bool clbkReleaseSurface(SURFHANDLE)=0;
+    virtual bool clbkScaleBlt(SURFHANDLE,oapi::UInt32,oapi::UInt32,oapi::UInt32,oapi::UInt32,SURFHANDLE,oapi::UInt32,oapi::UInt32,oapi::UInt32,oapi::UInt32,oapi::UInt32=0) const=0;
+    virtual void clbkRender2DPanel(SURFHANDLE*,MESHHANDLE,MATRIX3*,bool=false)=0;
+    virtual void clbkRender2DPanel(SURFHANDLE*,MESHHANDLE,MATRIX3*,float,bool=false)=0;
     virtual int DesktopHeight() const=0;
     virtual void Open()=0;
     virtual RenderInput Poll()=0;

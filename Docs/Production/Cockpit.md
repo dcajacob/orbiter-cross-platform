@@ -249,3 +249,20 @@ differences, exact input/text/geometry/lifecycle repeats and image SSIM 1.0.
 The accepted control provenance is frozen separately under
 `CockpitControls/Reference`; capture is now manual-only. This establishes the
 control reference prerequisite without claiming native input integration.
+
+
+The original mouse-control archives are preserved in
+[versioned release storage](https://github.com/dcajacob/orbiter-cross-platform/releases/tag/production-windows-cockpit-controls-v1).
+[Preservation run 41487758735](https://github.com/dcajacob/orbiter-cross-platform/actions/runs/41487758735)
+verifies a fresh public download against the accepted hashes and canonical files.
+
+Native panel rendering now exposes the existing shared renderer's surface,
+texture, reference-count and panel operations through the private cockpit
+contract. The pixel probe reproduced a shared renderer defect: a requested
+50% panel opacity produced fully opaque red. Both renderer adapters now apply
+the requested alpha and additive blending, isolate depth/stencil state and
+reset opacity for subsequent surface copies. Twenty context cycles verify
+actual pixels at opacity 0, 0.5 and 1 in regular/additive modes, invalid-alpha
+rejection, surface reference lifetime and subsequent scaled copies. This is a
+graphics primitive test; it does not stand in for stock cockpit integration.
+The original Windows SDK and graphics-client signatures are unchanged.

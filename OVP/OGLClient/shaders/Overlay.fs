@@ -6,6 +6,7 @@ out vec4 color;
 uniform sampler2D image;
 uniform vec4 color_key;
 uniform bool color_keyed;
+uniform float opacity = 1.0;
 
 vec4 textureCK(in sampler2D t, in vec2 uv, in vec2 texSize, in vec2 texelSize)
 {
@@ -39,6 +40,7 @@ void main()
 		color = texture(image, uv);
 	}*/
 	vec4 sampled = texture(image, uv);
+    sampled.a *= opacity;
 
 	if(color_keyed && sampled.rgb == color_key.rgb)
 		discard;

@@ -15,6 +15,8 @@
 #include "VBase.h"
 #include "cloudmgr2.h"
 #include <glm/gtc/matrix_transform.hpp>
+#include <cmath>
+#include <stdexcept>
 
 #include <imgui.h>
 #include "imgui_impl_opengl3.h"
@@ -242,6 +244,28 @@ bool OGLClient::GetRenderParam (int prm, int *value) const
  */
 void OGLClient::clbkRender2DPanel (SURFHANDLE *hSurf, MESHHANDLE hMesh, MATRIX3 *T, bool transparent)
 {
+    clbkRender2DPanel(hSurf,hMesh,T,1.f,transparent);
+}
+
+/**
+ * \brief Render an instrument panel in cockpit view as a 2D billboard.
+ * \param hSurf array of texture handles for the panel surface
+ * \param hMesh billboard mesh handle
+ * \param T transformation matrix for panel mesh vertices (2D)
+ * \param alpha opacity value, between 0 (transparent) and 1 (opaque)
+ * \param additive If true, panel should be rendered additive (transparent)
+ * \default None.
+ * \note The texture index of each group in the mesh is interpreted as index into the
+ *   hSurf array. Special indices are TEXIDX_MFD0 and above, which specify the
+ *   surfaces representing the MFD displays. These are obtained separately and
+ *   don't need to be present in the hSurf list.
+ * \note The \e additive flag is used when rendering the default "glass
+ *   cockpit" if the user requested. "transparent MFDs". The renderer can
+ *   then use e.g. additive blending for rendering the panel.
+ */
+void OGLClient::clbkRender2DPanel (SURFHANDLE *hSurf, MESHHANDLE hMesh, MATRIX3 *T, float alpha, bool transparent)
+{
+    if(!std::isfinite(alpha) || alpha<0.f || alpha>1.f)throw std::invalid_argument("Panel opacity must be finite and between zero and one");
 	InstrumentEvidence::Overlay(hMesh,T);
 	SurfaceTextureUnit textureUnit;
 	struct HVTX { float tu, tv, x, y; };
@@ -250,6 +274,8 @@ void OGLClient::clbkRender2DPanel (SURFHANDLE *hSurf, MESHHANDLE hMesh, MATRIX3 
 	Renderer::PushBool(Renderer::DEPTH_TEST, false);
 	Renderer::PushBool(Renderer::BLEND, true);
 	Renderer::PushBool(Renderer::CULL_FACE, false);
+    Renderer::PushBool(Renderer::STENCIL_TEST, false);
+    Renderer::PushBlendFunc(GL_SRC_ALPHA,transparent?GL_ONE:GL_ONE_MINUS_SRC_ALPHA);
 
 	glm::mat4 ortho_proj = glm::ortho(0.0f, (float)g_client->GetScene()->GetCamera()->GetWidth(), (float)g_client->GetScene()->GetCamera()->GetHeight(), 0.0f);
 	auto& m_Buffer=mPanelBuffer.buffer;auto& m_VAO=mPanelBuffer.vao;
@@ -274,6 +300,7 @@ void OGLClient::clbkRender2DPanel (SURFHANDLE *hSurf, MESHHANDLE hMesh, MATRIX3 
 	}
 	Renderer::Bind(mOverlayShader);
 	mOverlayShader->SetMat4("projection", ortho_proj);
+    mOverlayShader->SetFloat("opacity",alpha);
 	mOverlayShader->SetFloat("color_keyed", 0.0);
 
 	//s.SetVec3("font_color", vecTextColor);
@@ -366,47 +393,8 @@ void OGLClient::clbkRender2DPanel (SURFHANDLE *hSurf, MESHHANDLE hMesh, MATRIX3 
 	//if (transparent)
 	//	glBlendFunc(GL_DST_ALPHA, GL_ONE_MINUS_DST_ALPHA);
 
-	Renderer::PopBool(3);
-}
-
-/**
- * \brief Render an instrument panel in cockpit view as a 2D billboard.
- * \param hSurf array of texture handles for the panel surface
- * \param hMesh billboard mesh handle
- * \param T transformation matrix for panel mesh vertices (2D)
- * \param alpha opacity value, between 0 (transparent) and 1 (opaque)
- * \param additive If true, panel should be rendered additive (transparent)
- * \default None.
- * \note The texture index of each group in the mesh is interpreted as index into the
- *   hSurf array. Special indices are TEXIDX_MFD0 and above, which specify the
- *   surfaces representing the MFD displays. These are obtained separately and
- *   don't need to be present in the hSurf list.
- * \note The \e additive flag is used when rendering the default "glass
- *   cockpit" if the user requested. "transparent MFDs". The renderer can
- *   then use e.g. additive blending for rendering the panel.
- */
-void OGLClient::clbkRender2DPanel (SURFHANDLE *hSurf, MESHHANDLE hMesh, MATRIX3 *T, float alpha, bool additive)
-{
-	/*
-	bool reset = false;
-	int alphaop, alphaarg2, tfactor;
-	if (alpha < 1.0f) {
-		pd3dDevice->GetTextureStageState (0, D3DTSS_ALPHAOP, &alphaop);
-		pd3dDevice->GetTextureStageState (0, D3DTSS_ALPHAARG2, &alphaarg2);
-		pd3dDevice->GetRenderState (D3DRENDERSTATE_TEXTUREFACTOR, &tfactor);
-		pd3dDevice->SetTextureStageState (0, D3DTSS_ALPHAOP, D3DTOP_MODULATE);
-		pd3dDevice->SetTextureStageState (0, D3DTSS_ALPHAARG2, D3DTA_TFACTOR);
-		pd3dDevice->SetRenderState (D3DRENDERSTATE_TEXTUREFACTOR, D3DRGBA(1,1,1,alpha));
-		reset = true;
-	}*/
-	clbkRender2DPanel (hSurf, hMesh, T, additive);
-/*
-	if (reset) {
-		pd3dDevice->SetTextureStageState (0, D3DTSS_ALPHAOP, alphaop);
-		pd3dDevice->SetTextureStageState (0, D3DTSS_ALPHAARG2, alphaarg2);
-		pd3dDevice->SetRenderState (D3DRENDERSTATE_TEXTUREFACTOR, tfactor);
-	}
-*/
+    Renderer::PopBlendFunc();
+	Renderer::PopBool(4);
 }
 
 /**
@@ -1481,6 +1469,7 @@ bool OGLClient::ScaleBlt (SURFHANDLE tgt, int tgtx, int tgty, int tgtw, int tgth
 
 	Renderer::Bind(mOverlayShader);
 	mOverlayShader->SetMat4("projection", ortho_proj);
+    mOverlayShader->SetFloat("opacity",1.f);
 
 	bool hasck = key_tex->m_colorkey != SURF_NO_CK && key_tex->m_colorkey != 0;
 	if(hasck) {
@@ -1665,6 +1654,7 @@ bool OGLClient::Blt (SURFHANDLE tgt, int tgtx, int tgty, SURFHANDLE src, int src
 
 		Renderer::Bind(mOverlayShader);
 		mOverlayShader->SetMat4("projection", ortho_proj);
+    mOverlayShader->SetFloat("opacity",1.f);
 
 		OGLTexture *key_tex = (OGLTexture *)src;
 		bool hasck = key_tex->m_colorkey != SURF_NO_CK && key_tex->m_colorkey != 0;
@@ -1761,6 +1751,7 @@ bool OGLClient::Blt (SURFHANDLE tgt, int tgtx, int tgty, SURFHANDLE src, int src
 
 		Renderer::Bind(mOverlayShader);
 		mOverlayShader->SetMat4("projection", ortho_proj);
+    mOverlayShader->SetFloat("opacity",1.f);
 
 		OGLTexture *key_tex = (OGLTexture *)src;
 		bool hasck = key_tex->m_colorkey != SURF_NO_CK && key_tex->m_colorkey != 0;

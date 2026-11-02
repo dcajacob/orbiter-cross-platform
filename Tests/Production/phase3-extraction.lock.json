@@ -785,7 +785,7 @@
     },
     "Src/Orbiter/Production/NativeGraphics.h": {
       "original_sha256_lf": null,
-      "sha256_lf": "09f9d77ba3e41737981ec2b19d5e4aaf42b11e2d16f9a4413b2453837752592b",
+      "sha256_lf": "7df1e0b8e7164e9eac3e32f759786ec3854ed2e36683ebd1c4f00dc5fcaf3a87",
       "scope": "Original scheduler, stock MFDs and modern map compile natively with explicit original epoch/time, authoritative world/UI bindings and indexed map resources. Exact Windows calculations and callback order conserved. Native GDI/legacy map/custom-mode entry points fail explicitly until supported; native cockpit owner and DG runtime remain unfinished."
     },
     "Src/Orbiter/Production/NativeModule.cpp": {
