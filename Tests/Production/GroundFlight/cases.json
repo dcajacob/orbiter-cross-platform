@@ -9,6 +9,7 @@
   "cases": [
     {"id": "pb_ground_idle", "frames": 200, "fixture": "edwards"},
     {"id": "pb_atmosphere", "frames": 600, "fixture": "edwards"},
+    {"id": "pb_aerodynamic_controls", "frames": 400, "fixture": "edwards"},
     {"id": "pb_contact", "frames": 600, "fixture": "edwards"},
     {"id": "pb_takeoff_landing", "frames": 1200, "fixture": "edwards"},
     {"id": "pb_ground_persistence", "frames": 400, "fixture": "edwards"},

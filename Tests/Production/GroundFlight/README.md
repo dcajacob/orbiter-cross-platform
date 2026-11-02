@@ -5,11 +5,12 @@ The first gate captures the pinned production Windows application/SDK at
 `391919027ac3e4a4d42f145373c788fc859c32cd`, before any native ground-path changes.
 The existing two-body, production behavior, flight and image goldens are retained.
 
-The six reduced cases use the real ShuttlePB module, Sol/SPICE, J71G, Edwards
+The seven reduced cases use the real ShuttlePB module, Sol/SPICE, J71G, Edwards
 elevation/contact data and original numerical implementations:
 
 - Resting on the ground for ten seconds.
 - Atmospheric flight, initialized 1,500 m above the landed position at 200 m/s.
+- Elevator/aileron inputs and real mesh animations, with RCS off and no fuel use.
 - Unpowered descent from eight metres above the landed position.
 - A scheduled hover-engine takeoff and return to ground contact.
 - A finalized landed save at tick 300 and its subsequent reload.

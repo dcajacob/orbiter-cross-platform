@@ -19,10 +19,16 @@ def validate(directory,case):
     require(max(float(r['density']) for r in own)>.1,'Actual Earth atmosphere is missing')
     identifier=case['id']
     transitions=[int(b['tick']) for a,b in zip(own,own[1:]) if a['ground']!=b['ground']]
-    if identifier=='pb_atmosphere':
+    if identifier in ('pb_atmosphere','pb_aerodynamic_controls'):
         require(max(float(r['drag']) for r in own)>1 and max(float(r['dynamic_pressure']) for r in own)>100,
                 'Stock aerodynamic forces were not exercised')
         require(max(float(r['altitude_agl']) for r in own)>1000,'Airborne atmosphere setup failed')
+        if identifier=='pb_aerodynamic_controls':
+            animations=rows(directory/'behavior-animations.csv');values={}
+            for row in animations:
+                if row['object']=='PB':values.setdefault(row['index'],set()).add(row['state'])
+            require(len(values)==3 and all(len(v)>1 for v in values.values()),'Actual elevator/aileron mesh animations did not change')
+            require(float(own[-1]['fuel'])==float(own[0]['fuel']),'Control-surface case unexpectedly fired engines or RCS')
     elif identifier=='pb_contact':
         require(own[0]['ground']=='0' and any(r['ground']=='1' for r in own),'Descending ShuttlePB did not contact terrain')
     elif identifier=='pb_takeoff_landing':

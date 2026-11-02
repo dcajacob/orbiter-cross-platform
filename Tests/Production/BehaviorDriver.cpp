@@ -67,7 +67,8 @@ public:
                 require(std::string(v->GetClassName())=="ShuttlePB" && v->GetThrusterCount()==16 &&
                     v->GetPropellantCount()==1 && v->GetMeshCount()==1,"real stock ShuttlePB capabilities required");
                 production_test::GroundFlightStart(v,id);
-                if(id=="pb_atmosphere" || id=="pb_contact")event("input.airborne",nameOf(target),id=="pb_atmosphere"?"1500:200":"8:-0.5");
+                if(id=="pb_atmosphere" || id=="pb_aerodynamic_controls" || id=="pb_contact")
+                    event("input.airborne",nameOf(target),id=="pb_contact"?"8:-0.5":"1500:200");
             }
             if (id == "atmosphere" || id == "contact") {
                 VESSELSTATUS2 status{};status.version=2;v->GetStatusEx(&status);
@@ -96,7 +97,8 @@ public:
             VESSEL *v = oapiGetVesselInterface(target);
             if (production_test::GroundFlightCase(id)) {
                 production_test::GroundFlight(v,id,tick);
-                if(id=="pb_atmosphere" || id=="pb_takeoff_landing")event("input.groundflight",nameOf(target),id+":"+std::to_string(tick));
+                if(id=="pb_atmosphere" || id=="pb_aerodynamic_controls" || id=="pb_takeoff_landing")
+                    event("input.groundflight",nameOf(target),id+":"+std::to_string(tick));
             } else if (id == "manual_flight") {
                 production_test::ManualFlight(v,tick);
             } else if (id == "pb_persistence") {
