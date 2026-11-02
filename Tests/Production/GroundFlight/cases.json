@@ -19,11 +19,17 @@
     "position_m": 1,
     "velocity_m_s": 0.1,
     "rotation_rad": 0.001,
-    "angular_velocity_rad_s": 1e-10,
     "mjd_days": 1e-10,
     "propulsion_relative": 1e-8,
     "propulsion_absolute_kg": 1e-8,
     "contact_event_tick": 1
+  },
+  "orbital_budgets": {
+    "position_m": 0.01,
+    "velocity_m_s": 1e-5,
+    "rotation_rad": 1e-8,
+    "angular_velocity_rad_s": 1e-10,
+    "mjd_days": 1e-10
   },
   "repeat": "byte-identical state, propellant, animation and event files; identical input and lifecycle ordering",
   "physics": "Existing production gravity, atmosphere, aerodynamic callbacks and contact integration, with atmospheric wind disabled as in the original reference suite"

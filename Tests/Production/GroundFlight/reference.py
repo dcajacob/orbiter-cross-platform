@@ -4,8 +4,9 @@ import argparse,json,subprocess,sys
 from pathlib import Path
 ROOT=Path(__file__).resolve().parents[3]
 sys.path.insert(0,str(ROOT/'Tests/Production'))
-from behavior_suite import stage,compare,rows,FILES
+from behavior_suite import stage,rows,FILES
 from mesa_runtime import require,digest
+from comparison import compare_windows
 HERE=Path(__file__).resolve().parent
 MANIFEST=json.loads((HERE/'cases.json').read_text())
 CASES=[dict(c,fixed_step=MANIFEST['fixed_step'],epoch=MANIFEST['epoch'],budgets='contact',target='PB') for c in MANIFEST['cases']]
@@ -66,7 +67,17 @@ def main():
     p.add_argument('--compare',type=Path);p.add_argument('--configuration',choices=('Debug','Release'));a=p.parse_args()
     require(a.output is not None,'Explicit output directory required')
     if a.compare:
-        report={c['id']:compare(a.compare/c['id'],a.output/c['id'],c) for c in CASES}
+        report=dict(status='pending',cases={})
+        try:
+            for c in CASES:
+                validate(a.compare/c['id'],c);validate(a.output/c['id'],c)
+                report['cases'][c['id']]=compare_windows(a.compare/c['id'],a.output/c['id'])
+            report['status']='passed'
+        except Exception as error:
+            report.update(status='failed',error=str(error));raise
+        finally:
+            (a.output/'ground-flight-comparison.json').write_text(json.dumps(report,indent=2)+'\n')
+        print(json.dumps(report,indent=2));return
     else:
         require(sys.platform=='win32','Original ground-flight capture requires native Windows')
         require(all((a.orbiter,a.data,a.planets,a.configuration)),'Missing reference capture input')
@@ -75,11 +86,12 @@ def main():
             checkpoint=a.output/'pb_ground_persistence/Scenarios/BehaviorSnapshot.scn' if c['fixture']=='reload' else None
             def setup(directory):
                 if c['fixture']!='reload':(directory/'Scenarios/Behavior.scn').write_bytes((HERE/'Edwards-ShuttlePB.scn').read_bytes())
+                (directory/'Orbiter.cfg').write_text((HERE/'Orbiter.cfg').read_text()+'\nACTIVE_MODULES\n  ProductionBehaviorDriver\nEND_MODULES\n',encoding='ascii')
             for suffix in ('','-repeat'):
                 # before_launch supplies the pinned ground fixture before invocation hashes are recorded.
                 stage(a.orbiter.resolve(),a.data.resolve(),a.planets.resolve(),a.output/(c['id']+suffix),c,checkpoint,setup)
             first=a.output/c['id'];repeat=a.output/(c['id']+'-repeat')
-            report[c['id']]=dict(comparison=compare(first,repeat,c),behavior=validate(first,c))
+            report[c['id']]=dict(comparison=compare_windows(first,repeat),behavior=validate(first,c))
             report[c['id']]['run_inputs_sha256']={name:digest(first/name) for name in
                 ('Orbiter.cfg','Scenarios/Behavior.scn','behavior-case.txt','invocation.json')}
             for name in FILES:require((first/name).read_bytes()==(repeat/name).read_bytes(),'Ground-flight repeat differs: '+name)
@@ -89,7 +101,9 @@ def main():
         report['runtime']=runtime
         report['driver_source']=subprocess.check_output(['git','-C',str(ROOT),'rev-parse','HEAD'],text=True).strip()
         report['input_sha256']={str(path.relative_to(ROOT)):digest(path) for path in
-            (HERE/'cases.json',HERE/'Schedules.h',HERE/'Edwards-ShuttlePB.scn',ROOT/'Tests/Production/BehaviorDriver.cpp',ROOT/'Tests/Production/Fixtures/Orbiter.cfg')}
+            (HERE/'cases.json',HERE/'Schedules.h',HERE/'Edwards-ShuttlePB.scn',HERE/'Orbiter.cfg',
+             HERE/'reference.py',HERE/'comparison.py',ROOT/'Tests/Production/BehaviorDriver.cpp',
+             ROOT/'Tests/Production/behavior_suite.py',ROOT/'Tests/Production/mesa_runtime.py')}
     (a.output/'ground-flight-report.json').write_text(json.dumps(report,indent=2)+'\n')
     print(json.dumps(report,indent=2))
 if __name__=='__main__':main()

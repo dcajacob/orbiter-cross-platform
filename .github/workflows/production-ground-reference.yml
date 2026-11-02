@@ -118,4 +118,4 @@ jobs:
         if: always()
         with:
           name: ground-flight-reference-comparison
-          path: out/release/production-behavior/ground-flight-report.json
+          path: out/release/production-behavior/ground-flight-comparison.json

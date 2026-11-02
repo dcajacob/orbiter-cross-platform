@@ -20,6 +20,12 @@ and a fixed daytime epoch of MJD 51982.75. `cases.json` declares the timings and
 unchanged contact/propulsion budgets. `Schedules.h` contains only SDK setup/control
 commands; it provides no substitute force or terrain model.
 
+The orbital angular-velocity budget applies to the orbiting ISS. PB contact
+comparisons report angular velocity but enforce the agreed contact position,
+velocity, attitude and event budgets, plus the unchanged fuel/mass budget. The
+first harness incorrectly inherited the two-body spin threshold for contact;
+correcting that scope does not change any accepted reference or orbital limit.
+
 The Windows capture requires byte-identical repeats, normal lifecycle and exact
 input/callback ordering. Debug and Release must pass the original state budgets.
 The harness also rejects captures without real atmospheric drag, nonzero Edwards
