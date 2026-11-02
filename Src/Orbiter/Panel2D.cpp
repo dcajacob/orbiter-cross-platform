@@ -1,6 +1,7 @@
 // Copyright (c) Martin Schweiger
 // Licensed under the MIT License
 
+#include "Production/CockpitServices.h"
 #ifdef _WIN32
 #include "Orbiter.h"
 #else

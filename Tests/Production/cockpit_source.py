@@ -95,8 +95,13 @@ namespace oapi {using CockpitClient=GraphicsClient;}
 #endif''',header,'Windows cockpit graphics type identity')
     for name in FILES:
         path='Src/Orbiter/'+name
+        import re
+        view=windows(raw(path))
+        if name.endswith('.cpp') and re.search(r'orbiter::production::Cockpit\w+\s*\(',view):
+            if '#include "Production/CockpitServices.h"' not in view:
+                raise ValueError('Windows cockpit implementation lacks its explicit service include: '+name)
         original=subprocess.check_output(['git','-C',str(ROOT),'show',BASE+':'+path]).decode('cp1252').replace('\r\n','\n')
-        current=windows(raw(path)).replace('oapi::CockpitClient','oapi::GraphicsClient')
+        current=view.replace('oapi::CockpitClient','oapi::GraphicsClient')
         # Only the original known Elements call sites receive explicit time.
         current=current.replace('new Elements(orbiter::production::CockpitTime().MJD_ref)','new Elements()')
         import re
