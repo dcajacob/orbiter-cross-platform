@@ -12,6 +12,14 @@ every image comparison has SSIM 1.0. Both complete Windows builds pass all 22
 existing tests. Independent local comparison of hash-verified artifacts agrees.
 [Reference provenance and commands](../../Tests/Production/Cockpit/Reference/README.md)
 pin the captures and budgets; capture is now manual-only.
+The preservation gate publishes exact original archives and binaries in
+[release storage](https://github.com/dcajacob/orbiter-cross-platform/releases/tag/production-windows-cockpit-v1)
+and verifies a fresh download/staging of the public evidence. Offline staging
+and refusal to overwrite a staged reference were also checked locally.
+The existing Windows client workflow now recompiles the observation driver
+against each current SDK and compares all nine cockpits with that frozen
+reference, including 36 actual MFD texture readbacks. The original Debug/Release
+MFD texture comparison also has SSIM 1.0 in every image.
 
 Initial diagnostics execute the original Windows application and SDK at
 `d14fa7941bd4b60bd5b07c8e444ebfb87761893f`, from Phase 5 run 41396231165.

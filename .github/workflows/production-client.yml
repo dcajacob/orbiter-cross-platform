@@ -10,6 +10,7 @@ on:
       - 'Tests/Production/*source.py'
       - 'Tests/Production/phase3-extraction.lock.json'
       - 'Tests/Production/Client/**'
+      - 'Tests/Production/Cockpit/**'
       - 'Tests/Production/stage_mesa.py'
       - '.github/workflows/production-client.yml'
   workflow_dispatch:
@@ -134,6 +135,24 @@ jobs:
           python Tests/Production/Client/run_client.py --orbiter out/production-app/Orbiter.exe
           --data out/production-data --planets out/standard-planets --mesa out/mesa-runtime
           --configuration ${{ matrix.configuration }} --output out/client-execution
+      - name: Build the unchanged cockpit observation driver against the current SDK
+        shell: pwsh
+        run: |
+          cmake -S Tests/Production/Cockpit -B out/cockpit-driver -G Ninja -DCMAKE_BUILD_TYPE=${{ matrix.configuration }} -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DORBITER_TEST_RUNTIME="$pwd/out/production-app"
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          cmake --build out/cockpit-driver --parallel 2
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - uses: actions/cache@v6
+        with:
+          path: out/cockpit-cache
+          key: frozen-windows-cockpit-${{ hashFiles('Tests/Production/Cockpit/Reference/provenance.json') }}
+      - name: Stage immutable original cockpit captures from versioned release storage
+        run: python -B Tests/Production/Cockpit/frozen.py --cache out/cockpit-cache --output out/cockpit-frozen
+      - name: Compare every current production cockpit with the original Windows reference
+        run: >-
+          python -B Tests/Production/Cockpit/regression.py --orbiter out/production-app/Orbiter.exe
+          --data out/production-data --planets out/standard-planets --mesa out/mesa-runtime
+          --frozen out/cockpit-frozen --configuration ${{ matrix.configuration }} --output out/cockpit-regression
       - uses: actions/upload-artifact@v7
         if: always()
         with:
@@ -147,6 +166,17 @@ jobs:
             out/client-execution/**/*.log
             out/client-execution/**/*.scn
             out/client-execution/**/Orbiter.cfg
+            out/cockpit-regression/**/*.csv
+            out/cockpit-regression/**/*.json
+            out/cockpit-regression/**/*.png
+            out/cockpit-regression/**/*.rgba
+            out/cockpit-regression/**/*.txt
+            out/cockpit-regression/**/*.log
+            out/cockpit-regression/**/*.scn
+            out/cockpit-regression/**/Orbiter.cfg
+            out/cockpit-driver/CMakeCache.txt
+            out/cockpit-driver/compile_commands.json
+            out/production-app/Modules/Plugin/ProductionCockpitDriver.dll
             out/mesa-runtime/*.json
             runtime-configure.log
             runtime-build.log
@@ -179,8 +209,16 @@ jobs:
           --release out/client-artifacts/real-client-Release/out/client-execution/scene
           --frozen Tests/Production/ClientReference
           --report out/client-comparison.json
+      - name: Compare current cockpit states and displayed content across MSVC configurations
+        run: >-
+          python3 -B Tests/Production/Cockpit/compare.py
+          --debug out/client-artifacts/real-client-Debug/out/cockpit-regression
+          --release out/client-artifacts/real-client-Release/out/cockpit-regression
+          --output out/cockpit-comparison.json
       - uses: actions/upload-artifact@v7
         if: always()
         with:
           name: real-client-comparison
-          path: out/client-comparison.json
+          path: |
+            out/client-comparison.json
+            out/cockpit-comparison.json
