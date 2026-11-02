@@ -12,7 +12,9 @@ namespace oapi {class ParticleStream;}
 namespace orbiter::production {
 // Internal same-build native renderer contract. No window handles, GPU classes
 // or renderer math enter production numerical objects or the Windows SDK.
-struct RenderInput {FlightInput flight;bool close=false;int width=0,height=0;double yaw=0,pitch=0,zoom=0;};
+enum class RenderMouseAction {Move,LeftDown,LeftUp,RightDown,RightUp,Wheel};
+struct RenderMouseEvent {RenderMouseAction action;int x=0,y=0;double wheel=0;};
+struct RenderInput {FlightInput flight;std::vector<RenderMouseEvent> mouse;bool close=false;int width=0,height=0;double yaw=0,pitch=0,zoom=0;};
 class ORBITER_PRODUCTION_API NativeGraphics {
 public:
     virtual ~NativeGraphics()=default;

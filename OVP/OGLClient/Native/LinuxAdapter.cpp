@@ -37,6 +37,7 @@
 namespace {
 void require(bool valid,const char* text) {if(!valid) throw std::runtime_error(text);}
 double scroll=0,lastX=0,lastY=0;bool dragging=false;
+std::vector<RenderMouseEvent> mouseEvents;
 const std::map<int,unsigned> keyCodes={
     {GLFW_KEY_A,OAPI_KEY_A},
     {GLFW_KEY_B,OAPI_KEY_B},
@@ -146,12 +147,22 @@ void OGLClient::Open()
     require(nativeWindow!=nullptr,"Native OpenGL window creation failed");
     glfwMakeContextCurrent(nativeWindow);glfwSwapInterval(1);
     require(gladLoadGLLoader(reinterpret_cast<GLADloadproc>(glfwGetProcAddress))!=0,"Native OpenGL function loading failed");
-    scroll=0;dragging=false;keyEvents.clear();joystickDevice=-1;armed=false;throttleSeen=false;
+    scroll=0;dragging=false;keyEvents.clear();mouseEvents.clear();joystickDevice=-1;armed=false;throttleSeen=false;
     glfwSetKeyCallback(nativeWindow,[](GLFWwindow*,int key,int,int action,int) {
         if(action==GLFW_REPEAT)return;
         auto found=keyCodes.find(key);if(found!=keyCodes.end())keyEvents.push_back({found->second,action==GLFW_PRESS});
     });
-    glfwSetScrollCallback(nativeWindow,[](GLFWwindow*,double,double y) {scroll+=y;});
+    glfwSetMouseButtonCallback(nativeWindow,[](GLFWwindow*,int button,int action,int) {
+        if(button!=GLFW_MOUSE_BUTTON_LEFT && button!=GLFW_MOUSE_BUTTON_RIGHT)return;
+        const auto point=g_client->CursorPosition();
+        const auto event=button==GLFW_MOUSE_BUTTON_LEFT?
+            (action==GLFW_PRESS?RenderMouseAction::LeftDown:RenderMouseAction::LeftUp):
+            (action==GLFW_PRESS?RenderMouseAction::RightDown:RenderMouseAction::RightUp);
+        mouseEvents.push_back({event,point.x,point.y,0});
+    });
+    glfwSetScrollCallback(nativeWindow,[](GLFWwindow*,double,double y) {
+        scroll+=y;const auto point=g_client->CursorPosition();mouseEvents.push_back({RenderMouseAction::Wheel,point.x,point.y,y});
+    });
     int width,height;glfwGetFramebufferSize(nativeWindow,&width,&height);m_width=width;m_height=height;
     Evidence::Begin();
     if(!GetNativeRenderContext().evidence.empty()) {
@@ -173,6 +184,7 @@ void OGLClient::Open()
 RenderInput OGLClient::Poll()
 {
     glfwPollEvents();RenderInput input;
+    input.mouse.swap(mouseEvents);
     input.close=glfwWindowShouldClose(nativeWindow) || glfwGetKey(nativeWindow,GLFW_KEY_ESCAPE)==GLFW_PRESS;
     glfwGetFramebufferSize(nativeWindow,&input.width,&input.height);
     if(glfwGetWindowAttrib(nativeWindow,GLFW_FOCUSED)) {

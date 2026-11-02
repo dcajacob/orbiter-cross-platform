@@ -37,6 +37,7 @@
 #include "Pane.h"
 #include "Select.h"
 #include "CockpitSystemClock.h"
+#include "CockpitServices.h"
 #endif
 #include "Star.h"
 #include "ConfigFile.h"
@@ -88,6 +89,9 @@ struct Runtime final:BodyServices,RigidBodyServices,SurfaceServices,NavigationSe
     bool instrumentResources=false,cockpitObserved=false;
     std::ofstream cockpitState;
     CockpitSystemClock cockpitClock;
+    unsigned paneMouseCapture=0;
+    bool observeControls=false;
+    std::ofstream cockpitMouse;
 #endif
     std::unique_ptr<State> scenarioState;
     std::filesystem::path savePath;
@@ -98,6 +102,40 @@ struct Runtime final:BodyServices,RigidBodyServices,SurfaceServices,NavigationSe
     bool savePending=false,reloadPending=false,stepOnce=false,finished=false;
     std::string testCase;
 #ifdef ORBITER_NATIVE_COCKPIT
+    static const char* MouseName(RenderMouseAction action) {
+        switch(action) {
+        case RenderMouseAction::Move:return "move";
+        case RenderMouseAction::LeftDown:return "left_down";
+        case RenderMouseAction::LeftUp:return "left_up";
+        case RenderMouseAction::RightDown:return "right_down";
+        case RenderMouseAction::RightUp:return "right_up";
+        case RenderMouseAction::Wheel:return "wheel";
+        }
+        throw std::invalid_argument("Unknown native mouse event");
+    }
+    bool Mouse(const RenderMouseEvent& mouse) {
+        if(cockpitMouse.is_open())cockpitMouse<<inputTick<<','<<MouseName(mouse.action)<<','<<mouse.x<<','<<mouse.y<<'\n';
+        // Original Orbiter::MouseEvent excludes movement before Pane dispatch.
+        if(mouse.action==RenderMouseAction::Move)return false;
+        oapi::UInt event=0;oapi::UInt32 state=0;unsigned button=0;bool down=false;
+        switch(mouse.action) {
+        case RenderMouseAction::LeftDown:event=CockpitMouse::LeftDown;state=1;button=1;down=true;break;
+        case RenderMouseAction::LeftUp:event=CockpitMouse::LeftUp;button=1;break;
+        case RenderMouseAction::RightDown:event=CockpitMouse::RightDown;state=2;button=2;down=true;break;
+        case RenderMouseAction::RightUp:event=CockpitMouse::RightUp;button=2;break;
+        case RenderMouseAction::Wheel:
+            if(!std::isfinite(mouse.wheel))throw std::invalid_argument("Nonfinite native scroll input");
+            event=CockpitMouse::Wheel;
+            state=oapi::UInt32(std::uint16_t(static_cast<int>(std::clamp(mouse.wheel*120.,-32768.,32767.))))<<16;
+            break;
+        case RenderMouseAction::Move:break;
+        }
+        bool consumed=running && cockpit->ProcessMouse_OnRunning(event,state,mouse.x,mouse.y,input.keys.data());
+        if(!consumed)consumed=cockpit->ProcessMouse_System(event,state,mouse.x,mouse.y,input.keys.data());
+        if(down && consumed)paneMouseCapture|=button;
+        if(!down && button)paneMouseCapture&=~button;
+        return consumed;
+    }
     void CockpitSnapshot() {
         if(!cockpitState.is_open())return;
         auto* v=render.focus->GetModuleInterface();VECTOR3 p{},velocity{},omega{};MATRIX3 rotation{};
@@ -105,7 +143,9 @@ struct Runtime final:BodyServices,RigidBodyServices,SurfaceServices,NavigationSe
         const auto mode=[&](int index){auto* instrument=cockpit->MFD(index);return instrument?instrument->Type():MFD_NONE;};
         cockpitState<<completedTicks<<','<<time.SimT0<<','<<time.MJD0<<','<<v->GetName()<<','<<v->GetClassName()<<','<<cockpit->GetPanelMode()<<','<<cockpit->GetHUDMode()<<','<<mode(0)<<','<<mode(1);
         for(double value:{p.x,p.y,p.z,velocity.x,velocity.y,velocity.z,rotation.m11,rotation.m12,rotation.m13,rotation.m21,rotation.m22,rotation.m23,rotation.m31,rotation.m32,rotation.m33,omega.x,omega.y,omega.z,v->GetMass(),v->GetFuelMass()})cockpitState<<','<<value;
-        cockpitState<<','<<v->GetMeshCount()<<','<<v->GetThrusterCount()<<'\n';cockpitState.flush();
+        cockpitState<<','<<v->GetMeshCount()<<','<<v->GetThrusterCount();
+        if(observeControls)cockpitState<<','<<v->GetAttitudeMode();
+        cockpitState<<'\n';cockpitState.flush();
     }
 #endif
     void EventAt(const char* phase,const char* object,const char* detail,double seconds,double mjd) {
@@ -123,6 +163,18 @@ struct Runtime final:BodyServices,RigidBodyServices,SurfaceServices,NavigationSe
         for(const auto& command:replay.Take(inputTick,phase)) {
             auto* v=render.focus->GetModuleInterface();
 #ifdef ORBITER_NATIVE_COCKPIT
+            if(command.action=="mouse") {
+                std::istringstream fields(command.value);std::string action,extra;int x,y;
+                if(!(fields>>action>>x>>y) || fields>>extra || x<0 || y<0 || x>=cockpit->Width() || y>=cockpit->Height())
+                    throw std::invalid_argument("Mouse replay requires an event and valid viewport coordinates");
+                RenderMouseAction type;
+                if(action=="left_down")type=RenderMouseAction::LeftDown;
+                else if(action=="left_up")type=RenderMouseAction::LeftUp;
+                else if(action=="right_down")type=RenderMouseAction::RightDown;
+                else if(action=="right_up")type=RenderMouseAction::RightUp;
+                else throw std::invalid_argument("Unsupported replay mouse event");
+                Mouse({RenderMouseAction::Move,x,y,0});Mouse({type,x,y,0});continue;
+            }
             if(command.action=="mfd") {
                 std::istringstream fields(command.value);int index,mode;std::string extra;
                 if(!(fields>>index>>mode) || fields>>extra || index<0 || index>=MAXMFD || mode<1 || mode>10)throw std::invalid_argument("MFD replay requires a stock index and mode");
@@ -278,6 +330,7 @@ struct Runtime final:BodyServices,RigidBodyServices,SurfaceServices,NavigationSe
         if(render.graphics)render.graphics->Close();graphicsModule.reset();render.graphics=nullptr;
 #ifdef ORBITER_NATIVE_COCKPIT
         if(cockpitState.is_open())cockpitState.close();
+        if(cockpitMouse.is_open())cockpitMouse.close();
 #endif
         for(auto* file:{&vesselCallbacks,&lifetimeEvents,&lifecycle,&trace,&flightTrace,&inputTrace,&inputEvents,&thrustTrace,&animationTrace,&controlTrace,&mathTrace,&contactTrace})if(file->is_open())file->close();
         finished=true;
@@ -338,8 +391,11 @@ struct Runtime final:BodyServices,RigidBodyServices,SurfaceServices,NavigationSe
         }
 #ifdef ORBITER_NATIVE_COCKPIT
         if(!evidence.empty()) {
+            observeControls=std::filesystem::is_regular_file(evidence/"control-evidence.enabled");
             cockpitState.imbue(std::locale::classic());cockpitState.exceptions(std::ios::badbit|std::ios::failbit);
-            cockpitState.open(evidence/"cockpit-state.csv");cockpitState<<std::setprecision(17)<<"tick,seconds,mjd,object,class,cockpit,hud,left_mfd,right_mfd,x,y,z,vx,vy,vz,m11,m12,m13,m21,m22,m23,m31,m32,m33,wx,wy,wz,mass,fuel,meshes,thrusters\n";
+            cockpitState.open(evidence/"cockpit-state.csv");cockpitState<<std::setprecision(17)<<"tick,seconds,mjd,object,class,cockpit,hud,left_mfd,right_mfd,x,y,z,vx,vy,vz,m11,m12,m13,m21,m22,m23,m31,m32,m33,wx,wy,wz,mass,fuel,meshes,thrusters";
+            cockpitState<<(observeControls?",rcs_mode\n":"\n");
+            if(observeControls){cockpitMouse.open(evidence/"control-inputs.csv");cockpitMouse.exceptions(std::ios::badbit|std::ios::failbit);cockpitMouse<<"tick,event,x,y\n";}
         }
 #endif
         render.lifetime=this;BindVesselObserver(VesselEvent,this);
@@ -688,8 +744,15 @@ int main(int argc,char** argv) {
                     application.input.events.insert(application.input.events.end(),input.flight.events.begin(),input.flight.events.end());
                     application.input.x=input.flight.x;application.input.y=input.flight.y;application.input.rz=input.flight.rz;application.input.alternate=input.flight.alternate;
                     if(input.flight.throttle>=0)application.input.throttle=input.flight.throttle;
+#ifdef ORBITER_NATIVE_COCKPIT
+                    bool wheelConsumed=false;
+                    for(const auto& mouse:input.mouse) {const bool consumed=application.Mouse(mouse);if(mouse.action==RenderMouseAction::Wheel && consumed)wheelConsumed=true;}
+                    if(!application.paneMouseCapture){application.render.camera->ShiftPhi(input.yaw);application.render.camera->ShiftTheta(input.pitch);}
+                    if(input.zoom && !wheelConsumed)application.render.camera->ChangeDist(std::pow(1.1,-input.zoom));
+#else
                     application.render.camera->ShiftPhi(input.yaw);application.render.camera->ShiftTheta(input.pitch);
                     if(input.zoom)application.render.camera->ChangeDist(std::pow(1.1,-input.zoom));
+#endif
                 }
                 if(input.width>0 && input.height>0){application.render.graphics->Resize(input.width,input.height);application.render.camera->ResizeViewport(input.width,input.height);}
                 if(frames || ticks) {

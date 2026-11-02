@@ -741,7 +741,7 @@
     },
     "Src/Orbiter/Production/NativeApplication.cpp": {
       "original_sha256_lf": null,
-      "sha256_lf": "d62ab3da43af088d58ad98852c6f1feac2cd0ac7f44f5c17e3229729cdc82f55"
+      "sha256_lf": "1f9840b4f8e6d8e7780f4459be5e14196b689d0be37af113846200f73a925f9d"
     },
     "Src/Orbiter/Production/NativeBuild.h.in": {
       "sha256_lf": "46385229425b50b4edfe7eb877c5c4278e718f50e276130f0354a6d51cb70511",
@@ -785,7 +785,7 @@
     },
     "Src/Orbiter/Production/NativeGraphics.h": {
       "original_sha256_lf": null,
-      "sha256_lf": "5330b5c1835d7e18dd08bd45bc2caea9a811328319fe0ba4f14e4f198a7ef7b6",
+      "sha256_lf": "cfa0543f9cdc0da90d608bf4b21e294edaf2bf8d2168cd43d7cfe9ab1d7633cc",
       "scope": "Original scheduler, stock MFDs and modern map compile natively with explicit original epoch/time, authoritative world/UI bindings and indexed map resources. Exact Windows calculations and callback order conserved. Native GDI/legacy map/custom-mode entry points fail explicitly until supported; native cockpit owner and DG runtime remain unfinished."
     },
     "Src/Orbiter/Production/NativeModule.cpp": {

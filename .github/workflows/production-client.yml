@@ -153,6 +153,26 @@ jobs:
           python -B Tests/Production/Cockpit/regression.py --orbiter out/production-app/Orbiter.exe
           --data out/production-data --planets out/standard-planets --mesa out/mesa-runtime
           --frozen out/cockpit-frozen --configuration ${{ matrix.configuration }} --output out/cockpit-regression
+      - name: Preserve instrument driver and build the original mouse-control driver against the current SDK
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force out/cockpit-driver-binaries | Out-Null
+          Copy-Item out/production-app/Modules/Plugin/ProductionCockpitDriver.dll out/cockpit-driver-binaries/
+          cmake -S Tests/Production/CockpitControls -B out/cockpit-controls-driver -G Ninja -DCMAKE_BUILD_TYPE=${{ matrix.configuration }} -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DORBITER_TEST_RUNTIME="$pwd/out/production-app"
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          cmake --build out/cockpit-controls-driver --parallel 2
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - uses: actions/cache@v6
+        with:
+          path: out/cockpit-controls-cache
+          key: frozen-windows-cockpit-controls-${{ hashFiles('Tests/Production/CockpitControls/Reference/provenance.json') }}
+      - name: Stage immutable original window-control captures
+        run: python -B Tests/Production/CockpitControls/frozen_controls.py --cache out/cockpit-controls-cache --output out/cockpit-controls-frozen
+      - name: Compare current window-routed stock controls with frozen Windows
+        run: >-
+          python -B Tests/Production/CockpitControls/current.py --orbiter out/production-app/Orbiter.exe
+          --data out/production-data --planets out/standard-planets --mesa out/mesa-runtime
+          --frozen out/cockpit-controls-frozen --configuration ${{ matrix.configuration }} --output out/cockpit-controls-regression
       - uses: actions/upload-artifact@v7
         if: always()
         with:
@@ -176,6 +196,10 @@ jobs:
             out/cockpit-regression/**/Orbiter.cfg
             out/cockpit-driver/CMakeCache.txt
             out/cockpit-driver/compile_commands.json
+            out/cockpit-driver-binaries/**
+            out/cockpit-controls-driver/CMakeCache.txt
+            out/cockpit-controls-driver/compile_commands.json
+            out/cockpit-controls-regression/**
             out/production-app/Modules/Plugin/ProductionCockpitDriver.dll
             out/mesa-runtime/*.json
             runtime-configure.log
@@ -215,6 +239,12 @@ jobs:
           --debug out/client-artifacts/real-client-Debug/out/cockpit-regression
           --release out/client-artifacts/real-client-Release/out/cockpit-regression
           --output out/cockpit-comparison.json
+      - name: Compare current stock control states, inputs and displayed content across MSVC configurations
+        run: >-
+          python3 -B Tests/Production/CockpitControls/compare.py
+          --debug out/client-artifacts/real-client-Debug/out/cockpit-controls-regression
+          --release out/client-artifacts/real-client-Release/out/cockpit-controls-regression
+          --output out/cockpit-controls-comparison.json
       - uses: actions/upload-artifact@v7
         if: always()
         with:
@@ -222,3 +252,4 @@ jobs:
           path: |
             out/client-comparison.json
             out/cockpit-comparison.json
+            out/cockpit-controls-comparison.json

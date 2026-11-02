@@ -2,8 +2,9 @@
 
 Phase 6 is in progress. Phase 5 remains accepted; the prepared laptop preview is
 still the verified production ShuttlePB/ISS external-view build. A separate
-native glass-cockpit candidate passes local instrument comparisons described
-below. Interactive cockpit controls and DG/DG-S integration remain unfinished.
+native glass-cockpit candidate passes hosted Windows/Linux instrument comparisons
+described below. Native glass RCS buttons also pass local control comparisons.
+Selection/input dialogs, DG/DG-S and their 2D/virtual cockpits remain unfinished.
 
 The pre-extraction reference gate is accepted in
 [run 41458001638](https://github.com/dcajacob/orbiter-cross-platform/actions/runs/41458001638).
@@ -27,8 +28,9 @@ Initial diagnostics execute the original Windows application and SDK at
 The current candidate completely rebuilds Windows at
 `f725194209634f7fd5d1d44d426cfa9b5e303e37`, with only the pre-reference fuel-display
 timer repair described below. Complete application/SDK hashes and matching
-owning sources are checked before compiling the SDK-only control driver. Pane,
-HUD, stock MFDs, panel and VC code remain unchanged; no extraction has started.
+owning sources are checked before compiling the SDK-only control driver. At that
+reference stage, Pane, HUD, stock MFDs, panel and VC code were unchanged. Later
+extractions below are checked against this preserved behavior.
 
 The real Windows OpenGL client receives opt-in text/readback observation hooks.
 They record actual Sketchpad calls, original displayed numbers, surface identity,
@@ -362,3 +364,45 @@ original writers/readers. This checks mode persistence; full Windows round-trip
 and DG-specific persistence acceptance remain separate unfinished gates.
 The unchanged default exterior host still reports SSIM `0.9881491503795506`
 in two fresh processes with identical accepted state comparisons.
+
+The original instrument-owner extraction at `809dbca7` passes both complete
+MSVC application/SDK builds and all nine original cockpit cases in
+[Windows run 41497790178](https://github.com/dcajacob/orbiter-cross-platform/actions/runs/41497790178).
+All four Ubuntu 24.04 GCC Debug/Release automatic/SSE2 profiles pass their
+existing flight, lifetime, ground and native instrument gates in
+[native run 41497790041](https://github.com/dcajacob/orbiter-cross-platform/actions/runs/41497790041).
+These runs establish the original ten MFDs and HUD on the native production
+world. They do not establish native DG/DG-S or complete interactive cockpit UI.
+
+## Native glass control routing candidate
+
+The next candidate queues real GLFW left/right button and wheel events with
+framebuffer coordinates, then invokes the original running Pane handler followed
+by its system handler. A consumed button press prevents the external-camera drag
+from also acting on the same press. The private renderer contract changes with
+the native build fingerprint; the public Windows SDK remains unchanged.
+
+`Tests/Production/CockpitControls/native.py` replays the immutable Windows glass
+control schedule through those same native Pane handlers, without setting the
+vessel's RCS mode directly. Two fresh 60-step processes verify ROT to LIN to ROT,
+the exact eight tick/event/coordinate records, finalized state and drawing output.
+Local state differences are zero; projected overlay differences are zero pixels,
+display text and HUD atlas updates match exactly, direct MFD SSIM is 1.0, and
+full-frame SSIM is at least `0.9999991241682158`. Windows CRLF versus Linux LF
+is normalized only when reading the discrete input CSV; all reference file
+hashes are verified before comparison and preserved unchanged.
+
+`mouse_smoke.py` separately delivers targeted X11 events and moves the real server
+cursor in its own process's window. It verifies the actual GLFW callback,
+coordinate conversion, original ROT/LIN hit testing, momentary keyboard thrust,
+focus-loss release, finalized zero jet/exhaust samples, presentation and shutdown.
+The local run passes with 60 finalized release samples. This is distinct from
+the deterministic replay test. Wayland/high-DPI mouse validation remains pending.
+
+Both checks are added after the original instrument gate in every native CI
+profile. `current.py` also adds all five original Windows glass/DG/DG-S 2D/VC
+mouse cases to the current application/SDK regression, with unchanged budgets,
+repeat checks and direct MFD readbacks. Hosted results for this new routing stage
+must pass before acceptance. The frozen producer scripts, original DLLs and
+accepted captures are not regenerated. These are engineering candidates;
+ordinary laptop launchers remain at accepted Phase 5.

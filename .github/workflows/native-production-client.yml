@@ -135,6 +135,17 @@ jobs:
           set -euo pipefail
           python3 -B Tests/Production/Cockpit/frozen.py --cache out/cockpit-reference-cache --output out/frozen-cockpit
           xvfb-run -a -s '-screen 0 1920x1080x24' env LIBGL_ALWAYS_SOFTWARE=1 GALLIUM_DRIVER=llvmpipe python3 -B Tests/Production/Cockpit/native.py --executable out/native-cockpit-engine/orbiter-production --assets out/scene-resources --data out/data --modules out/native-cockpit-engine/NativeModules --planets out/planets --frozen out/frozen-cockpit --configuration ${{ matrix.configuration }} --output out/native-cockpit-evidence 2>&1 | tee native-cockpit-verification.log
+      - name: Verify original native RCS hit testing against frozen Windows mouse inputs
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 -B Tests/Production/CockpitControls/frozen_controls.py --cache out/cockpit-controls-cache --output out/frozen-cockpit-controls
+          xvfb-run -a -s '-screen 0 1920x1080x24' env LIBGL_ALWAYS_SOFTWARE=1 GALLIUM_DRIVER=llvmpipe python3 -B Tests/Production/CockpitControls/native.py --executable out/native-cockpit-engine/orbiter-production --assets out/scene-resources --data out/data --modules out/native-cockpit-engine/NativeModules --planets out/planets --frozen out/frozen-cockpit-controls --configuration ${{ matrix.configuration }} --output out/native-cockpit-controls 2>&1 | tee native-cockpit-controls.log
+      - name: Verify real GLFW mouse clicks and momentary keyboard thrust in an owned X11 cockpit
+        shell: bash
+        run: |
+          set -euo pipefail
+          xvfb-run -a -s '-screen 0 1920x1080x24' env LIBGL_ALWAYS_SOFTWARE=1 GALLIUM_DRIVER=llvmpipe python3 -B Tests/Production/CockpitControls/mouse_smoke.py --executable out/native-cockpit-engine/orbiter-production --assets out/scene-resources --data out/data --modules out/native-cockpit-engine/NativeModules --planets out/planets --output out/native-cockpit-mouse 2>&1 | tee native-cockpit-mouse.log
       - uses: actions/upload-artifact@v7
         if: always()
         with:
@@ -156,6 +167,8 @@ jobs:
             out/native-ground-evidence/**
             out/native-controlled-landing/**
             out/native-cockpit-evidence/**
+            out/native-cockpit-controls/**
+            out/native-cockpit-mouse/**
             out/native-cockpit-engine/CMakeCache.txt
             out/native-cockpit-engine/native-sdk/OrbiterNativeBuild.h
             out/native-cockpit-renderer/CMakeCache.txt
