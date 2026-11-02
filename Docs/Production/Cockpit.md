@@ -422,3 +422,14 @@ unsuppressed LSan reporting remains enabled and reports the prior 46,253-byte,
 match the prior one-context baseline. `LSAN_OPTIONS=exitcode=0` lets the input
 harness finish; the complete leak report is checked separately. This does not
 establish globally leak-free rendering.
+
+Hosted native run [41502859573](https://github.com/dcajacob/orbiter-cross-platform/actions/runs/41502859573)
+passes all four Debug/Release automatic/SSE2 profiles at `23ab2367`, including
+frozen instrument and RCS comparisons and the actual X11 RCS/MFD input test.
+Windows run [41502349620](https://github.com/dcajacob/orbiter-cross-platform/actions/runs/41502349620)
+passes both application/SDK builds, all nine cockpit comparisons and all five
+control cases against the frozen originals. The final cross-configuration
+instrument comparison also passes. Its control comparison stops during provenance
+verification because the comparison job has a shallow checkout. Commit `53405176`
+sets full history for that job and adds the missing `CockpitControls` push trigger.
+Publication and a successful rerun of that comparison remain pending.
