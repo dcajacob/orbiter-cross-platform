@@ -16,6 +16,10 @@ def schedules():
     for name,alternate in [('focused_delete',''),('alternative_camera',' Earth')]:
         cases[name]=[(0,'create','Child ShuttlePB'),(1,'focus','Child'),(4,'delete','Child'+alternate)]
     cases['delete_parent']=[(0,'create','Child ShuttlePB'),(1,'focus','Child'),(4,'delete','PB')]
+    for name,deleted in [('attached_child_delete','Child'),('attached_parent_delete','PB')]:
+        cases[name]=[(0,'create','Child ShuttlePB'),(0,'attachment','Child'),(1,'attach','Child')]
+        if deleted=='PB':cases[name].append((2,'focus','Child'))
+        cases[name].append((4,'delete',deleted))
     cases['simultaneous_delete']=[(0,'create','A ShuttlePB'),(0,'focus','A'),(0,'create','B ShuttlePB'),(0,'focus','PB'),(4,'delete','A'),(4,'delete','B')]
     cases['twenty_cycles']=[]
     for cycle in range(20):
@@ -31,8 +35,10 @@ def check(directory,name):
     if name=='close_last_focus':
         require(int(state[-1]['tick'])<12,'Original no-focus policy failed to close the session')
     else:
-        require(objects==({'Child','ISS'} if name in ('delete_parent','persist_dynamic') else {'PB','ISS'}),'Deleted objects remain or survivors disappeared')
-        require({r['focus'] for r in final}==({'Child'} if name in ('delete_parent','persist_dynamic') else {'PB'}),'Focus did not reach the surviving real vessel')
+        parent_deleted=name in ('delete_parent','attached_parent_delete','persist_dynamic')
+        require(objects==({'Child','ISS'} if parent_deleted else {'PB','ISS'}),'Deleted objects remain or survivors disappeared')
+        require({r['focus'] for r in final}==({'Child'} if parent_deleted else {'PB'}),'Focus did not reach the surviving real vessel')
+        require(all(not r['attached'] for r in final),'Surviving vessel retains a deleted attachment partner')
     if name in ('focused_delete','alternative_camera'):
         targets=[r['object'] for r in events if r['phase']=='camera.target' and int(r['frame'])>=4]
         require(targets==(['Earth'] if name=='alternative_camera' else ['PB']),'Camera retains a deleted vessel or ignores its alternative')

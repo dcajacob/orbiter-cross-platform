@@ -58,11 +58,12 @@ Local Debug/automatic-math results:
   7 groups, 2 materials and 2 textures, and 16 thrusters. Draw evidence confirms
   its geometry renders; registration, interface release and library close are
   verified.
-- Seven supplementary cases cover focused deletion, Earth as alternative camera
+- Nine supplementary cases cover focused deletion, Earth as alternative camera
   target, deletion of the original PB, simultaneous reverse-order deletion,
   twenty live create/focus/delete cycles using both creation APIs, dynamic graph
   save/reload, and original no-focus shutdown. State/checkpoint results do not
-  depend on rendering frequency.
+  depend on rendering frequency. Deleting either member of an attached pair
+  also clears the surviving vessel's attachment relationship.
 - Real keyboard input switches to Child, fires/releases its RCS, restores PB,
   and completes the existing flight, pause, single-step and in-process reload
   checks. Keyboard tests run on a dedicated display to prevent focus interference.
