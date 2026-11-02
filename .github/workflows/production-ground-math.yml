@@ -3,7 +3,7 @@ name: Original Windows Ground Math Observation
 on:
   push:
     branches: ['codex/production-**']
-    paths: ['Src/Orbiter/Production/MathObservation.h', 'Tests/Production/GroundFlight/MathObserve.cpp', 'Tests/Production/GroundFlight/diagnose.py', '.github/workflows/production-ground-math.yml']
+    paths: ['Src/Orbiter/Production/MathObservation.h', 'Tests/Production/GroundFlight/MathObserve.cpp', 'Tests/Production/GroundFlight/MathDispatch.cpp', 'Tests/Production/GroundFlight/diagnose.py', '.github/workflows/production-ground-math.yml']
   workflow_dispatch:
 
 permissions:
@@ -12,13 +12,14 @@ permissions:
 
 jobs:
   behavior:
-    name: Production behavior ${{ matrix.configuration }} x64
+    name: Original Windows math ${{ matrix.variant }} ${{ matrix.configuration }} x64
     runs-on: windows-2022
     timeout-minutes: 60
     strategy:
       fail-fast: false
       matrix:
         configuration: [Debug]
+        variant: [observation, fma-disabled]
     env:
       DXSDK_DIR: '${{ github.workspace }}\DXSDK'
     steps:
@@ -80,15 +81,17 @@ jobs:
         run: |
           python Tests/Production/prepare_data.py --archive out/data-cache/Orbiter-x64.zip --destination out/production-data
           python Tests/Production/prepare_data.py --lock Tests/Production/standard-planets.lock.json --archive out/planet-cache/Orbiter2016.zip --destination out/standard-planets
-      - name: Observe original ShuttlePB atmosphere, terrain contact, takeoff/landing and landed serialization
-        run: >-
-          python Tests/Production/GroundFlight/diagnose.py --orbiter out/production-app/Orbiter.exe
-          --data out/production-data --planets out/standard-planets --output out/production-math
-          --configuration ${{ matrix.configuration }}
+      - name: Observe original math or run the separately identified runtime sensitivity experiment
+        shell: pwsh
+        run: |
+          $extra = @()
+          if ('${{ matrix.variant }}' -eq 'fma-disabled') { $extra = @('--disable-fma3') }
+          python Tests/Production/GroundFlight/diagnose.py --orbiter out/production-app/Orbiter.exe --data out/production-data --planets out/standard-planets --output out/production-math --configuration ${{ matrix.configuration }} @extra
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
       - uses: actions/upload-artifact@v7
         if: always()
         with:
-          name: ground-math-${{ matrix.configuration }}
+          name: ground-math-${{ matrix.configuration }}-${{ matrix.variant }}
           path: |
             out/ground-driver-*.log
             out/driver/CMakeCache.txt

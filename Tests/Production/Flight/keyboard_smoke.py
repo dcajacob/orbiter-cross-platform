@@ -108,6 +108,24 @@ def main():
             releaseEnd=seconds()
             # Return to rotation mode for the existing flight/save/reload exercise.
             tap(window,'f')
+            # Aerodynamic surfaces use the original momentary input path and stock slew time.
+            # Exercise the laptop alias while RCS is disabled so fin motion cannot be
+            # mistaken for a thruster command. Restore both modes before the flight test.
+            def chord(modifier,name,state):
+                key(window,modifier,True);tap(window,name,state);key(window,modifier,False)
+            chord('Control_L','f',4);wait(lambda:'RCS OFF' in title(window),'Cannot disable RCS for control-surface test')
+            if 'AERO ON' in title(window):chord('Alt_L','f',8)
+            wait(lambda:'AERO OFF' in title(window),'Aerodynamic control toggle did not disconnect surfaces')
+            disabledStart=seconds();key(window,'w',True);advance(.5);key(window,'w',False);advance(.3);disabledEnd=seconds()
+            chord('Alt_L','f',8);wait(lambda:'AERO ON' in title(window),'Alt-F did not enable original aerodynamic controls')
+            require('RCS OFF' in title(window),'Alt-F also changed RCS mode')
+            finChecks=[]
+            for direction,surface in (('w','elevator'),('c','aileron')):
+                start=seconds();key(window,direction,True);advance(.65);key(window,direction,False)
+                released=seconds();advance(1.5);end=seconds()
+                finChecks.append(dict(key=direction,surface=surface,start=start,released=released,end=end))
+            chord('Alt_L','f',8);wait(lambda:'AERO OFF' in title(window),'Alt-F did not disable aerodynamic controls')
+            chord('Control_L','f',4);wait(lambda:'RCS ROT' in title(window),'Cannot restore rotation RCS after surface test')
             key(window,'Prior',True)
             thrust=wait(lambda:(lambda m:m and int(m.group(1))>=5)(re.search(r'MAIN ([1-9][0-9]*)%',title(window))),'Laptop throttle key did not reach production vessel')
             key(window,'Prior',False);time.sleep(.1)
@@ -153,7 +171,17 @@ def main():
                     require(float(row['rcs'])==0 and float(row['exhaust'])==0,'Finalized jets persisted without a held RCS key')
                     checked+=1
             require(checked>=24,'Insufficient finalized release samples')
-            report=dict(status='passed',keyboard_throttle=True,rcs_mode=True,rcs_translation=True,rcs_hold_release=releaseChecks,rcs_release_samples=checked,rcs_focus_release=True,propellant_used=True,pause=True,single_step=True,stock_quicksave=True,in_process_reload=True,exit=True)
+            controls=[r for r in csv.DictReader((out/'flight-controls.csv').open()) if r['object']=='PB']
+            disabled=[r for r in controls if disabledStart+.1<float(r['seconds'])<disabledEnd-.1]
+            require(disabled and all(int(r['aerodynamic_mode'])==0 and int(r['rcs_mode'])==0 and float(r['elevator'])==0 for r in disabled),
+                    'Disabled aerodynamic controls responded to held pitch input')
+            for check in finChecks:
+                held=[r for r in controls if check['start']+.15<float(r['seconds'])<check['released']-.1]
+                settled=[r for r in controls if check['end']-.25<float(r['seconds'])<check['end']-.1]
+                require(held and max(abs(float(r[check['surface']])) for r in held)>.2,'Keyboard did not move actual '+check['surface'])
+                require(settled and all(float(r[check['surface']])==0 and int(r['rcs_mode'])==0 for r in settled),
+                        'Actual control surface failed to return to neutral after release: '+check['surface'])
+            report=dict(status='passed',keyboard_throttle=True,rcs_mode=True,rcs_translation=True,rcs_hold_release=releaseChecks,rcs_release_samples=checked,rcs_focus_release=True,aerodynamic_toggle=True,control_surface_release=finChecks,propellant_used=True,pause=True,single_step=True,stock_quicksave=True,in_process_reload=True,exit=True)
             (out/'keyboard-verification.json').write_text(json.dumps(report,indent=2)+'\n');print(json.dumps(report))
         finally:
             if process.poll() is None:

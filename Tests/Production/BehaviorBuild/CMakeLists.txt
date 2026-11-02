@@ -27,3 +27,12 @@ target_link_libraries(ProductionGroundMathDriver PRIVATE
   "${ORBITER_TEST_RUNTIME}/Orbitersdk/lib/Orbitersdk.lib")
 set_target_properties(ProductionGroundMathDriver PROPERTIES
   RUNTIME_OUTPUT_DIRECTORY "${ORBITER_TEST_RUNTIME}/Modules/Plugin")
+add_library(ProductionGroundMathDispatch SHARED ../GroundFlight/MathDispatch.cpp)
+target_compile_features(ProductionGroundMathDispatch PRIVATE cxx_std_17)
+target_compile_definitions(ProductionGroundMathDispatch PRIVATE NOMINMAX)
+target_include_directories(ProductionGroundMathDispatch PRIVATE "${ORBITER_TEST_RUNTIME}/Orbitersdk/include")
+target_link_libraries(ProductionGroundMathDispatch PRIVATE
+  "${ORBITER_TEST_RUNTIME}/Orbitersdk/lib/Orbiter.lib"
+  "${ORBITER_TEST_RUNTIME}/Orbitersdk/lib/Orbitersdk.lib")
+set_target_properties(ProductionGroundMathDispatch PROPERTIES
+  RUNTIME_OUTPUT_DIRECTORY "${ORBITER_TEST_RUNTIME}/Modules/Plugin")
