@@ -64,9 +64,9 @@ jobs:
       - name: Compile the current controls/observation driver against that build
         shell: pwsh
         run: |
-          cmake -S Tests/Production/BehaviorBuild -B out/driver -G Ninja -DCMAKE_BUILD_TYPE=${{ matrix.configuration }} -DORBITER_TEST_RUNTIME="$pwd/out/production-app" 2>&1 | Tee-Object ground-driver-configure.log
+          cmake -S Tests/Production/BehaviorBuild -B out/driver -G Ninja -DCMAKE_BUILD_TYPE=${{ matrix.configuration }} -DORBITER_TEST_RUNTIME="$pwd/out/production-app" 2>&1 | Tee-Object out/ground-driver-configure.log
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-          cmake --build out/driver --parallel 2 2>&1 | Tee-Object ground-driver-build.log
+          cmake --build out/driver --parallel 2 2>&1 | Tee-Object out/ground-driver-build.log
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
       - uses: actions/cache@v6
         with:
@@ -90,7 +90,7 @@ jobs:
         with:
           name: ground-flight-reference-${{ matrix.configuration }}
           path: |
-            ground-driver-*.log
+            out/ground-driver-*.log
             out/driver/CMakeCache.txt
             out/production-app/test-runtime.json
             out/production-behavior/**/*.csv
