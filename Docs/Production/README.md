@@ -130,6 +130,17 @@ the exact locked packages, DLL/license hashes and original loaded-module audit.
 `mesa-extractor.json` records the interpreter, decoder and staging-source hash.
 The frozen original `mesa_runtime.py` remains unchanged.
 
+[Run 41378645209](https://github.com/dcajacob/orbiter-cross-platform/actions/runs/41378645209)
+passed actual Debug and Release WGL execution with the new staging path at
+`3e5097a5`. Both retained manifests match the previously verified 20 package
+and 69 DLL/license hashes exactly. The downloaded evidence ZIPs were verified
+against GitHub's artifact digests:
+
+| Configuration | Artifact | SHA256 |
+| --- | --- | --- |
+| Debug | `13112550228` | `b077798a93b705fe3d5ceb99d649569a8809ffba5a07379f29390a34ab6a3472` |
+| Release | `13111454544` | `1b04137fd5d4b4cd7a30b052d376fdfafa77a04305481e6c402ce06f3b918367` |
+
 The [dedicated workflow](../../.github/workflows/production-bootstrap.yml)
 executes Debug and Release on hosted Windows 2022. The MSVC-built probe creates a
 visible Win32 window and a WGL 3.3 core context, compiles/links shaders, renders a

@@ -107,6 +107,17 @@ capture workflow for the new frozen reference is now manual-only. Further
 work must resolve numerical fidelity without weakening either budget or
 changing the qualified flight inputs.
 
+Hosted Ubuntu 24.04 Debug and Release reproduce the controlled-flight failure
+in [run 41376965467](https://github.com/dcajacob/orbiter-cross-platform/actions/runs/41376965467).
+Both pass the posture, touchdown-speed and render-frequency checks, with maximum
+propellant differences of 0.00001449393 kg (Debug) and 0.00001449388 kg (Release).
+Their preceding real-scene, orbital-flight, session and keyboard checks pass;
+the legacy impact case still fails separately. Locally the controlled-flight
+fuel difference is below 0.000000097 kg before return contact. It grows while
+the vessel is in ground contact with its original altitude/horizon programs active, then
+stops growing when those programs and hover thrust are disabled. This narrows
+the investigation to contact/control feedback without proving its root cause.
+
 The native replay applies the same public SDK operations as the frozen Windows
 control driver. `flight-animations.csv` records actual SDK animation states;
 `flight-controls.csv` records actual flight status, aerodynamic/RCS modes and
