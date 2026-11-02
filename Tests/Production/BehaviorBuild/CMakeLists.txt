@@ -44,3 +44,12 @@ target_link_libraries(ProductionGroundMathDispatch PRIVATE
   "${ORBITER_TEST_RUNTIME}/Orbitersdk/lib/Orbitersdk.lib")
 set_target_properties(ProductionGroundMathDispatch PROPERTIES
   RUNTIME_OUTPUT_DIRECTORY "${ORBITER_TEST_RUNTIME}/Modules/Plugin")
+add_library(ProductionLandingDriver SHARED ../ControlledLanding/Driver.cpp)
+target_compile_features(ProductionLandingDriver PRIVATE cxx_std_17)
+target_compile_definitions(ProductionLandingDriver PRIVATE NOMINMAX)
+target_include_directories(ProductionLandingDriver PRIVATE "${ORBITER_TEST_RUNTIME}/Orbitersdk/include")
+target_link_libraries(ProductionLandingDriver PRIVATE
+  "${ORBITER_TEST_RUNTIME}/Orbitersdk/lib/Orbiter.lib"
+  "${ORBITER_TEST_RUNTIME}/Orbitersdk/lib/Orbitersdk.lib")
+set_target_properties(ProductionLandingDriver PROPERTIES
+  RUNTIME_OUTPUT_DIRECTORY "${ORBITER_TEST_RUNTIME}/Modules/Plugin")

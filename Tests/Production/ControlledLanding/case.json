@@ -1,0 +1,22 @@
+{
+  "schema": 1,
+  "status": "candidate; original Windows qualification required",
+  "name": "controlled_upright_landing",
+  "driver_case_id": "pb_takeoff_landing",
+  "application_source": "391919027ac3e4a4d42f145373c788fc859c32cd",
+  "frames": 6000,
+  "fixed_step": 0.016666666666666666,
+  "epoch": 51982.75,
+  "physical_requirements": {
+    "maximum_body_up_tilt_rad": 0.17453292519943295,
+    "minimum_peak_altitude_agl_m": 8.0,
+    "maximum_touchdown_airspeed_m_s": 1.5,
+    "final_landed_sdk_status": 1
+  },
+  "comparison_budgets": "Unchanged GroundFlight/comparison.py contact budgets, strict orbital budgets for ISS",
+  "schedule": [
+    {"tick": 0, "action": "HLEVEL on; original hover altitude hold at 12 m above terrain"},
+    {"tick": 1200, "action": "Original hover altitude hold target 0 m above terrain"},
+    {"tick": 4800, "action": "Disable both programs; hover throttle zero thereafter"}
+  ]
+}
