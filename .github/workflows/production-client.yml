@@ -123,7 +123,7 @@ jobs:
           path: out/mesa-cache/*.pkg.tar.zst
           key: mesa-ucrt64-${{ hashFiles('Tests/Production/mesa-ucrt64.lock.json') }}
       - name: Stage the pinned application-local software OpenGL driver
-        run: python Tests/Production/mesa_runtime.py stage --cache out/mesa-cache --destination out/mesa-runtime
+        run: python Tests/Production/stage_mesa.py stage --cache out/mesa-cache --destination out/mesa-runtime
       - name: Execute real Windows Orbiter with Sol, ISS and source-built ShuttlePB
         run: >-
           python Tests/Production/Client/run_client.py --orbiter out/production-app/Orbiter.exe
