@@ -1,0 +1,22 @@
+{
+  "schema": 1,
+  "scope": "Original production instrument references before native cockpit extraction; reduced fixtures do not replace stock scenario acceptance",
+  "application_source": "d14fa7941bd4b60bd5b07c8e444ebfb87761893f",
+  "runtime_run": 41396231165,
+  "frames": 60,
+  "fixed_step": 0.25,
+  "epoch": 51982.5,
+  "image_ssim_minimum": 0.98,
+  "budgets": {"position_m": 0.01, "velocity_m_s": 0.00001, "rotation_rad": 1e-8, "angular_velocity_rad_s": 1e-10, "mjd_days": 1e-10, "propellant_relative": 1e-8, "propellant_absolute_kg": 1e-8},
+  "cases": [
+    {"id": "generic_orbit_surface", "fixture": "orbit", "target": "PB", "cockpit": 1, "left": 1, "right": 2, "hud": 1},
+    {"id": "generic_map_hsi", "fixture": "orbit", "target": "PB", "cockpit": 1, "left": 3, "right": 4, "hud": 2},
+    {"id": "generic_landing_docking", "fixture": "orbit", "target": "PB", "cockpit": 1, "left": 5, "right": 6, "hud": 3},
+    {"id": "generic_align_sync", "fixture": "orbit", "target": "PB", "cockpit": 1, "left": 7, "right": 8, "hud": 1},
+    {"id": "generic_transfer_comms", "fixture": "orbit", "target": "PB", "cockpit": 1, "left": 9, "right": 10, "hud": 2},
+    {"id": "dg_panel", "fixture": "dg_orbit", "target": "DG", "class": "DeltaGlider", "cockpit": 2, "left": 1, "right": 2, "hud": 1},
+    {"id": "dg_vc", "fixture": "dg_orbit", "target": "DG", "class": "DeltaGlider", "cockpit": 3, "left": 1, "right": 2, "hud": 2},
+    {"id": "dgs_panel", "fixture": "dg_orbit", "target": "DG", "class": "DG-S", "cockpit": 2, "left": 1, "right": 2, "hud": 1},
+    {"id": "dgs_vc", "fixture": "dg_orbit", "target": "DG", "class": "DG-S", "cockpit": 3, "left": 1, "right": 2, "hud": 2}
+  ]
+}

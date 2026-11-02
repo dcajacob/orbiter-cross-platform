@@ -20,6 +20,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 #endif
 #include <vector>
 #include "Renderer.h"
+#include "InstrumentEvidence.h"
 #include <map>
 
 #define NANOVG_GL3_IMPLEMENTATION
@@ -258,6 +259,7 @@ void OGLPad::GetOrigin (int *x, int *y) const
 
 bool OGLPad::Text (int x, int y, const char *str, int len)
 {
+	InstrumentEvidence::Text(m_tex,width,height,x+m_xOrigin,y+m_yOrigin,cfont->m_Height,textColorNative,str,len);
 	if(nvgFindFont(s_nvg, cfont->m_facename.c_str()) == -1) {
 		nvgCreateFont(s_nvg, cfont->m_facename.c_str(), cfont->m_fontfile.c_str(), cfont->antialiased);
 	}

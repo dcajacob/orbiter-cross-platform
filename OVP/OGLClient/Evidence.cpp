@@ -1,5 +1,6 @@
 #include "glad.h"
 #include "Evidence.h"
+#include "InstrumentEvidence.h"
 #include "OGLClient.h"
 #include "MeshManager.h"
 #include <tlhelp32.h>
@@ -57,6 +58,7 @@ void APIENTRY debugMessage(GLenum,GLenum type,GLuint,GLenum,GLsizei,const GLchar
 }
 }
 void Begin() {
+    InstrumentEvidence::Begin();
     enabled=std::filesystem::is_regular_file("ogl-evidence.enabled");frames=draws=presents=0;indices=0;seen.clear();objectDraws.clear();currentObject.clear();planetTiles.clear();archiveReads.clear();
     if(!enabled)return;
     captured=false;
@@ -75,6 +77,7 @@ void Begin() {
 }
 void Presented() { if(enabled)++presents; }
 void End(bool contextDeleted) {
+    InstrumentEvidence::End();
     if(!enabled)return;
     auto lifecycle=output("graphics-lifecycle.json");
     lifecycle<<"{\"rendered_frames\":"<<frames<<",\"successful_presents\":"<<presents
@@ -92,8 +95,9 @@ void PlanetTile(OBJHANDLE object,unsigned count) {
     if(enabled){auto &tile=planetTiles[name(object)];++tile.first;tile.second+=count;}
 }
 void ArchiveRead(const char *path,int layer,unsigned bytes) { if(enabled && bytes)archiveReads[{path,layer}]+=bytes; }
-void Rendered() { if(enabled)++frames; }
+void Rendered() { if(enabled)++frames;InstrumentEvidence::Rendered(); }
 void Frame() {
+    InstrumentEvidence::Frame();
     if(!enabled || captured || !frames || oapiGetSimTime()<12.5)return;
     if(std::abs(oapiGetSimTime()-12.5)>1e-12)throw std::runtime_error("missing finalized tick-50 render for graphics evidence");
     captured=true;

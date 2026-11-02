@@ -1,0 +1,70 @@
+#!/usr/bin/env python3
+"""Observe original Windows instruments; never overwrite an accepted reference."""
+import argparse,hashlib,json,math,sys,zipfile
+from pathlib import Path
+ROOT=Path(__file__).resolve().parents[3]
+sys.path[:0]=[str(ROOT/'Tests/Production'),str(ROOT/'Tests/Production/Client')]
+from behavior_suite import stage,scenario,rows,git
+from mesa_runtime import require,digest
+from run_client import mesa_files,png
+from compare_client import image_ssim
+
+def fixture(case):
+    text=scenario(case['fixture']).replace('MODE Extern','MODE Cockpit')
+    if case.get('class')=='DeltaGlider':text=text.replace('DG:DG-S','DG:DeltaGlider')
+    panel={1:'',2:'BEGIN_PANEL\nEND_PANEL\n',3:'BEGIN_VC\nEND_VC\n'}[case['cockpit']]
+    return text.replace('BEGIN_SHIPS','BEGIN_HUD\n  TYPE '+{1:'Orbit',2:'Surface',3:'Docking'}[case['hud']]+'\nEND_HUD\n'+panel+'BEGIN_SHIPS')
+
+def inspect(directory,case,settings):
+    require(not (directory/'cockpit-failure.txt').exists(),'Original instrument/control driver failed')
+    require((directory/'cockpit-complete.txt').read_text().strip()=='60','Original session did not complete normally')
+    state=rows(directory/'cockpit-state.csv');text=rows(directory/'instrument-text.csv')
+    require(len(state)==61 and [int(v['tick']) for v in state]==list(range(61)),'Incomplete original finalized instrument states')
+    for row in state:
+        require(all(math.isfinite(float(v)) for k,v in row.items() if k not in ('object','class')),'Nonfinite original instrument state')
+        require(float(row['seconds'])==int(row['tick'])*settings['fixed_step'],'Wrong original fixed-step clock')
+    require(text and len(text)>100,'Actual original instrument drawing was not observed')
+    require(any(float(r['seconds'])>=12.5 for r in text),'Instrument updates stopped before the capture')
+    require(any(any(48<=c<=57 for c in bytes.fromhex(r['text_hex'])) for r in text),'Original instruments drew no numerical values')
+    life=json.loads((directory/'graphics-lifecycle.json').read_text());require(life['context_deleted'] and life['successful_presents']==60,'Actual client lifecycle incomplete')
+    renderer=json.loads((directory/'renderer-info.json').read_text());require('llvmpipe' in renderer['renderer'].lower(),'Original Windows software OpenGL was not loaded')
+    errors=directory/'graphics-errors.txt';require(not errors.exists() or not errors.read_text().strip(),'Original client reported OpenGL errors')
+    hashes={}
+    for frame in (20,50):
+        image=directory/f'instrument-{frame}.rgba';pixels=image.read_bytes();require(len(pixels)==1280*720*4,'Missing original cockpit capture')
+        png(directory/f'instrument-{frame}.png',pixels,1280,720);hashes[str(frame)]=digest(image)
+    return dict(status='passed',samples=len(state),text_calls=len(text),images=hashes,renderer=renderer,lifecycle=life)
+
+def main():
+    p=argparse.ArgumentParser(description=__doc__)
+    for name in ('orbiter','data','planets','mesa','output'):p.add_argument('--'+name,type=Path,required=True)
+    p.add_argument('--configuration',choices=('Debug','Release'),required=True);p.add_argument('--case',action='append')
+    a=p.parse_args();settings=json.loads((Path(__file__).with_name('cases.json')).read_text())
+    require(not a.output.exists(),'Reference output already exists; automatic replacement is forbidden')
+    a.output.mkdir(parents=True);report=dict(status='pending',configuration=a.configuration,source=git('rev-parse','HEAD').decode().strip(),application_source=settings['application_source'],cases={},failures={})
+    runtime=json.loads((a.orbiter.parent/'test-runtime.json').read_text());require(runtime['source_commit']==settings['application_source'],'Wrong pre-extraction application source')
+    for case in settings['cases']:
+        if a.case and case['id'] not in a.case:continue
+        try:
+            dirs=[];observed=[]
+            for repeat in (1,2):
+                directory=a.output.resolve()/(case['id']+'-'+str(repeat))
+                def configure(directory):
+                    config=directory/'Orbiter.cfg';config.write_text(config.read_text().replace('  ProductionBehaviorDriver','  ProductionCockpitDriver\n  OGLClient')+'\nFPS = 0\nMenubarMode = 1\nInfobarMode = 1\nInstrumentUpdateInterval = 0.25\n')
+                    (directory/'Scenarios/Behavior.scn').write_text(fixture(case))
+                    (directory/'cockpit-case.txt').write_text(f"{case['target']} 60 {case['cockpit']} {case['left']} {case['right']} {case['hud']}\n")
+                    (directory/'ogl-evidence.enabled').write_text('Real original production cockpit engineering capture\n')
+                    (directory/'instrument-evidence.enabled').write_text('Original instruction text and frames 20/50; no rendering changes\n')
+                    require((directory/'Modules/Plugin/ProductionCockpitDriver.dll').is_file(),'Same-SDK observation driver missing')
+                    mesa_files(a.mesa.resolve(),directory)
+                stage(a.orbiter.resolve(),a.data.resolve(),a.planets.resolve(),directory,{**case,'frames':60,'fixed_step':settings['fixed_step'],'epoch':settings['epoch']},None,before_launch=configure)
+                observed.append(inspect(directory,case,settings));dirs.append(directory)
+            for name in ('cockpit-state.csv','instrument-text.csv'):
+                require((dirs[0]/name).read_bytes()==(dirs[1]/name).read_bytes(),'Original deterministic repeat differs: '+name)
+            ssim={str(frame):image_ssim((dirs[0]/f'instrument-{frame}.rgba').read_bytes(),(dirs[1]/f'instrument-{frame}.rgba').read_bytes(),1280,720) for frame in (20,50)}
+            require(all(v>=settings['image_ssim_minimum'] for v in ssim.values()),'Original image repeat exceeds predeclared budget')
+            report['cases'][case['id']]=dict(runs=observed,repeat_ssim=ssim,identical_state_and_display_text=True)
+        except Exception as error:report['failures'][case['id']]=str(error)
+    report['status']='passed' if not report['failures'] else 'failed';(a.output/'cockpit-report.json').write_text(json.dumps(report,indent=2)+'\n')
+    print(json.dumps(report,indent=2));require(not report['failures'],'Original cockpit gate failed; do not freeze or extract instrumentation')
+if __name__=='__main__':main()

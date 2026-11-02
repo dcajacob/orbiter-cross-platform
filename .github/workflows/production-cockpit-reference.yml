@@ -1,0 +1,131 @@
+name: Production Cockpit Windows Reference
+on:
+  push:
+    branches: ['codex/production-**']
+    paths: ['Tests/Production/Cockpit/**', 'OVP/OGLClient/InstrumentEvidence.h', '.github/workflows/production-cockpit-reference.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  cockpit:
+    name: Original production cockpit ${{ matrix.configuration }} x64
+    runs-on: windows-2022
+    timeout-minutes: 60
+    strategy:
+      fail-fast: false
+      matrix:
+        configuration: [Debug, Release]
+    env:
+      DXSDK_DIR: '${{ github.workspace }}\DXSDK'
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - uses: ilammy/msvc-dev-cmd@v1
+        with:
+          vsversion: '17.0'
+          arch: x64
+      - uses: actions/cache@v6
+        id: dxsdk
+        with:
+          path: '${{ github.workspace }}\DXSDK'
+          key: dxsdk_jun10
+      - name: Prepare existing SDK dependency
+        if: steps.dxsdk.outputs.cache-hit != 'true'
+        shell: cmd
+        run: |
+          curl --fail -L https://download.microsoft.com/download/a/e/7/ae743f1f-632b-4809-87a9-aa1bb3458e31/DXSDK_Jun10.exe -o DXSDK_Jun10.exe
+          if errorlevel 1 exit /b 1
+          7z x DXSDK_Jun10.exe DXSDK/Include DXSDK/Lib
+          if errorlevel 1 exit /b 1
+      - uses: actions/download-artifact@v8
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          run-id: 41396231165
+          name: production-runtime-${{ matrix.configuration }}-x64
+          path: out/runtime-archive
+      - name: Verify the original pre-cockpit-extraction application and SDK
+        shell: pwsh
+        run: |
+          Expand-Archive out/runtime-archive/windows-test-runtime.zip out/production-app
+          python Tests/Production/verify_test_runtime.py --runtime out/production-app --source d14fa7941bd4b60bd5b07c8e444ebfb87761893f
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - name: Build the separate real GraphicsClient with observation-only text/capture hooks
+        shell: pwsh
+        run: |
+          cmake -S OVP/OGLClient -B out/opengl-client -G Ninja -DCMAKE_BUILD_TYPE=${{ matrix.configuration }} -DCMAKE_POLICY_VERSION_MINIMUM=3.5 -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DORBITER_TEST_RUNTIME="$pwd/out/production-app" "-DDXSDK_DIR=$env:DXSDK_DIR" 2>&1 | Tee-Object cockpit-client-configure.log
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          cmake --build out/opengl-client --target OGLClient --parallel 2 2>&1 | Tee-Object cockpit-client-build.log
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - name: Build the SDK-only instrument control and observation driver
+        shell: pwsh
+        run: |
+          cmake -S Tests/Production/Cockpit -B out/cockpit-driver -G Ninja -DCMAKE_BUILD_TYPE=${{ matrix.configuration }} -DORBITER_TEST_RUNTIME="$pwd/out/production-app"
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          cmake --build out/cockpit-driver --parallel 2
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - uses: actions/cache@v6
+        with:
+          path: out/data-cache/Orbiter-x64.zip
+          key: production-data-${{ hashFiles('Tests/Production/stock-data.lock.json') }}
+      - uses: actions/cache@v6
+        with:
+          path: out/planet-cache/Orbiter2016.zip
+          key: production-standard-planets-${{ hashFiles('Tests/Production/standard-planets.lock.json') }}
+      - name: Prepare verified unchanged stock data
+        run: |
+          python Tests/Production/prepare_data.py --archive out/data-cache/Orbiter-x64.zip --destination out/production-data
+          python Tests/Production/prepare_data.py --lock Tests/Production/standard-planets.lock.json --archive out/planet-cache/Orbiter2016.zip --destination out/standard-planets
+      - uses: actions/cache@v6
+        with:
+          path: out/mesa-cache/*.pkg.tar.zst
+          key: mesa-ucrt64-${{ hashFiles('Tests/Production/mesa-ucrt64.lock.json') }}
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.14'
+      - run: python Tests/Production/stage_mesa.py stage --cache out/mesa-cache --destination out/mesa-runtime
+      - name: Execute original HUD, all ten stock MFDs, DG/DG-S 2D panels and virtual cockpits twice
+        run: >-
+          python -B Tests/Production/Cockpit/reference.py --orbiter out/production-app/Orbiter.exe
+          --data out/production-data --planets out/standard-planets --mesa out/mesa-runtime
+          --configuration ${{ matrix.configuration }} --output out/cockpit-reference
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: production-cockpit-${{ matrix.configuration }}
+          retention-days: 90
+          path: |
+            cockpit-*.log
+            out/production-app/test-runtime.json
+            out/opengl-client/CMakeCache.txt
+            out/opengl-client/compile_commands.json
+            out/cockpit-driver/CMakeCache.txt
+            out/cockpit-reference/**/*.json
+            out/cockpit-reference/**/*.csv
+            out/cockpit-reference/**/*.txt
+            out/cockpit-reference/**/*.log
+            out/cockpit-reference/**/*.png
+            out/cockpit-reference/**/*.rgba
+            out/cockpit-reference/**/*.scn
+            out/cockpit-reference/**/Orbiter.cfg
+  compare:
+    name: Original cockpit Debug/Release comparison
+    needs: cockpit
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/download-artifact@v8
+        with:
+          name: production-cockpit-Debug
+          path: out/debug
+      - uses: actions/download-artifact@v8
+        with:
+          name: production-cockpit-Release
+          path: out/release
+      - run: python3 -B Tests/Production/Cockpit/compare.py --debug out/debug/out/cockpit-reference --release out/release/out/cockpit-reference --output cockpit-comparison.json
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: production-cockpit-comparison
+          path: cockpit-comparison.json

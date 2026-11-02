@@ -2,6 +2,7 @@
 // Actual native renderer evidence, same scene manifest/readback as Windows.
 #include "glad.h"
 #include "Evidence.h"
+#include "InstrumentEvidence.h"
 #include "OGLClient.h"
 #include "MeshManager.h"
 #include <cmath>
@@ -25,6 +26,7 @@ std::ofstream output(const char* name) {
 }
 }
 void Begin() {
+    InstrumentEvidence::Begin(GetNativeRenderContext().evidence);
     enabled=!GetNativeRenderContext().evidence.empty();if(!enabled)return;
     std::filesystem::create_directories(GetNativeRenderContext().evidence);
     frames=draws=presents=0;indices=0;captured=false;seen.clear();objectDraws.clear();currentObject.clear();planetTiles.clear();archiveReads.clear();
@@ -38,6 +40,7 @@ void Begin() {
 }
 void Presented() {if(enabled)++presents;}
 void End(bool deleted) {
+    InstrumentEvidence::End();
     if(!enabled)return;auto record=output("graphics-lifecycle.json");
     record<<"{\"rendered_frames\":"<<frames<<",\"successful_presents\":"<<presents<<",\"context_deleted\":"<<(deleted?"true":"false")<<"}\n";
     auto allDraws=output("object-draws-all.csv");allDraws<<"object,mesh_draw_calls\n";
@@ -69,8 +72,9 @@ void PlanetTile(OBJHANDLE object,unsigned count) {
     if(enabled){auto &tile=planetTiles[name(object)];++tile.first;tile.second+=count;}
 }
 void ArchiveRead(const char *path,int layer,unsigned bytes) { if(enabled && bytes)archiveReads[{path,layer}]+=bytes; }
-void Rendered() { if(enabled)++frames; }
+void Rendered() { if(enabled)++frames;InstrumentEvidence::Rendered(); }
 void Frame() {
+    InstrumentEvidence::Frame();
     if(!enabled || GetNativeRenderContext().captureTime<0 || captured || frames<50 || oapiGetSimTime()<GetNativeRenderContext().captureTime-1e-12)return;
     if(std::abs(oapiGetSimTime()-GetNativeRenderContext().captureTime)>1e-12)throw std::runtime_error("missing finalized tick-50 render for graphics evidence");
     captured=true;
