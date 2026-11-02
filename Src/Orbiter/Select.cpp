@@ -3,7 +3,11 @@
 
 #include "Select.h"
 #include "imgui.h"
+#ifdef _WIN32
 #include "imgui_extras.h"
+#else
+#include "Production/CockpitGuiExports.h"
+#endif
 
 Select::Select():ImGuiDialog("Select") {
     active = false;

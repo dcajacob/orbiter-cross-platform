@@ -687,21 +687,7 @@ typedef struct {
  *   area texture may not need to be updated at each redraw event.
  */
 //@{
-#define PANEL_MAP_NONE          0x00 ///< area texture is undefined (i.e. should be completely redrawn)
-#define PANEL_MAP_BACKGROUND    0x01 ///< area texture contains a copy of the panel background
-#define PANEL_MAP_CURRENT       0x02 ///< area texture contains a copy of the current panel state
-#define PANEL_MAP_BGONREQUEST   0x03 ///< area texture is undefined, but panel background can be requested
-#define PANEL_MAP_DIRECT        0x04 ///< provide the entire input surface to redraw functions without clipping
-//@}
 
-#define PANEL_ATTACH_BOTTOM    0x0001
-#define PANEL_ATTACH_TOP       0x0002
-#define PANEL_ATTACH_LEFT      0x0004
-#define PANEL_ATTACH_RIGHT     0x0008
-#define PANEL_MOVEOUT_BOTTOM   0x0010
-#define PANEL_MOVEOUT_TOP      0x0020
-#define PANEL_MOVEOUT_LEFT     0x0040
-#define PANEL_MOVEOUT_RIGHT    0x0080
 
 #define SURF_NO_CK         0xFFFFFFFF
 #define SURF_PREDEF_CK     0xFFFFFFFE

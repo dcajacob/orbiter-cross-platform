@@ -16,11 +16,54 @@
 #include "PsysCore.h"
 #include "Mesh.h"
 #include "elevmgr.h"
+#ifdef ORBITER_NATIVE_COCKPIT
+#include "Pane.h"
+#include "VCockpit.h"
+#endif
 #include <cstring>
 #include <iostream>
 #include <stdexcept>
 using namespace orbiter::production;
 using std::ifstream;
+SURFHANDLE orbiter::production::RenderCockpitMfd(int id) {
+#ifdef ORBITER_NATIVE_COCKPIT
+    auto* pane=GetNativeRenderContext().cockpitPane;return pane?pane->GetMFDSurface(id):nullptr;
+#else
+    throw std::runtime_error("Native cockpit surface service is unavailable in this build");
+#endif
+}
+SURFHANDLE orbiter::production::RenderCockpitVcMfd(int id,const VCMFDSPEC** spec) {
+#ifdef ORBITER_NATIVE_COCKPIT
+    auto* pane=GetNativeRenderContext().cockpitPane;*spec=pane?pane->GetVCMFDParams(id):nullptr;
+    return pane && pane->GetVC() && pane->MFD(id)?pane->MFD(id)->Texture():nullptr;
+#else
+    throw std::runtime_error("Native virtual cockpit MFD service is unavailable in this build");
+#endif
+}
+SURFHANDLE orbiter::production::RenderCockpitVcHud(const VCHUDSPEC** spec) {
+#ifdef ORBITER_NATIVE_COCKPIT
+    auto* pane=GetNativeRenderContext().cockpitPane;
+    auto* vc=pane && pane->GetHUD()?pane->GetVC():nullptr;
+    if(!vc)return nullptr;*spec=vc->GetHUDParams();return vc->GetHUDSurf();
+#else
+    throw std::runtime_error("Native virtual cockpit HUD service is unavailable in this build");
+#endif
+}
+void orbiter::production::RenderCockpitOverlay() {
+#ifdef ORBITER_NATIVE_COCKPIT
+    auto* pane=GetNativeRenderContext().cockpitPane;
+    if(!pane)throw std::logic_error("Native cockpit pane is not bound");pane->Render();
+#else
+    throw std::runtime_error("Native cockpit overlay service is unavailable in this build");
+#endif
+}
+MESHHANDLE oapiCreateMesh(oapi::UInt32 ngrp,MESHGROUP* grp)
+{
+    Mesh* mesh=new Mesh;
+    for(oapi::UInt32 i=0;i<ngrp;i++)
+        mesh->AddGroup(grp[i].Vtx,grp[i].nVtx,grp[i].Idx,grp[i].nIdx,grp[i].MtrlIdx,grp[i].TexIdx,grp[i].zBias,0,true);
+    return mesh;
+}
 namespace {
 Vessel* liveVessel(OBJHANDLE handle) {
     for(auto* vessel:GetNativeRenderContext().world->GetVessels())if(vessel==handle)return vessel;

@@ -2,21 +2,45 @@
 // Licensed under the MIT License
 
 #include "Production/CockpitServices.h"
+#ifdef _WIN32
 #include "Orbiter.h"
+#else
+#include "Production/CockpitNativeSupport.h"
+#endif
 #include "VCockpit.h"
 #include "Pane.h"
 #include "Camera.h"
 #include "Vessel.h"
+#ifdef _WIN32
 #include "Texture.h"
+#else
+#include "Production/CockpitNativeSupport.h"
+#endif
+#ifdef _WIN32
 #include "Log.h"
+#else
+#include "Production/CockpitNativeSupport.h"
+#endif
+#ifdef _WIN32
 #include "Util.h"
+#else
+#include "Production/CockpitNativeSupport.h"
+#endif
 
 using namespace std;
 
+#ifdef _WIN32
 extern Orbiter *g_pOrbiter;
+#endif
+#ifdef _WIN32
 extern Camera *g_camera;
+#endif
+#ifdef _WIN32
 extern Vessel *g_focusobj;
+#endif
+#ifdef _WIN32
 extern char DBG_MSG[256];
+#endif
 
 // =======================================================================
 // class VirtualCockpit
@@ -25,17 +49,19 @@ VirtualCockpit::VirtualCockpit (int _id, const Pane *_pane)
 {
 	int i;
 
-	gc         = g_pOrbiter->GetGraphicsClient();
+	gc         = orbiter::production::CockpitGraphicsClient();
 	id         = _id;
 	pane       = _pane;
 	narea      = nareabuf = 0;
 	idx_mfocus = -1;
 	mstate     = 0;
 	hud.surf   = NULL;
+#ifdef _WIN32
 	if (g_pOrbiter->IsFullscreen())
 		cwnd = 0;
 	else
 		cwnd = g_pOrbiter->GetRenderWnd();
+#endif
 	for (i = 0; i < 4; i++)
 		connect[i] = -1;
 }
@@ -60,7 +86,7 @@ void VirtualCockpit::Shift (const Vector &shift)
 	ShiftAreas (shift);
 }
 
-void VirtualCockpit::DefineArea (int aid, const RECT &texrect, int draw_mode, int mouse_mode, int bkmode, SURFHANDLE tgt)
+void VirtualCockpit::DefineArea (int aid, const oapi::SdkRectangle &texrect, int draw_mode, int mouse_mode, int bkmode, SURFHANDLE tgt)
 {
 	int draw_event_mode = draw_mode & 0xFF; // strip access flags
 
@@ -95,7 +121,7 @@ void VirtualCockpit::DefineArea (int aid, const RECT &texrect, int draw_mode, in
 		area[narea]->bksurf = NULL;
 		area[narea]->bltmode = PANEL_MAP_NONE;
 	} else {
-		DWORD attrib = OAPISURFACE_RENDERTARGET;
+		oapi::UInt32 attrib = OAPISURFACE_RENDERTARGET;
 		if (draw_mode & PANEL_REDRAW_GDI) attrib |= OAPISURFACE_GDI;
 		if (draw_mode & PANEL_REDRAW_SKETCHPAD) attrib |= OAPISURFACE_SKETCHPAD;
 		area[narea]->surf = gc->clbkCreateSurfaceEx (area[narea]->w, area[narea]->h, attrib);
@@ -156,7 +182,7 @@ bool VirtualCockpit::BltAreaBackground (int idx, SURFHANDLE s)
 	if (gc && s) {
 		Area *a = area[idx];
 		if (a->bltmode == PANEL_MAP_BGONREQUEST && a->bksurf) {
-			RECT r = {0,0,a->w,a->h};
+			oapi::SdkRectangle r = {0,0,a->w,a->h};
 			gc->clbkBlt (s, 0, 0, a->bksurf, 0, 0, a->w, a->h);
 			return true;
 		}
@@ -178,7 +204,7 @@ void VirtualCockpit::RedrawArea (int idx, int event)
 {
 	if (idx < 0) return;
 	SURFHANDLE s = GetArea(idx);
-	if (g_focusobj->VCRedrawEvent (area[idx]->id, event, s) && s) {
+	if (orbiter::production::CockpitFocus()->VCRedrawEvent (area[idx]->id, event, s) && s) {
 		SetArea (idx, s);
 	}
 }
@@ -233,7 +259,7 @@ void VirtualCockpit::ShiftAreas (const Vector &shift)
 	}
 }
 
-SURFHANDLE VirtualCockpit::CreateHUDSurface (const VCHUDSPEC *spec, COLORREF col, double intens)
+SURFHANDLE VirtualCockpit::CreateHUDSurface (const VCHUDSPEC *spec, oapi::UInt32 col, double intens)
 {
 	const int HUDSIZE = orbiter::production::CockpitConfiguration()->CfgInstrumentPrm.PanelMFDHUDSize;
 	if (!hud.surf) {
@@ -271,18 +297,18 @@ void VirtualCockpit::ClearHUD ()
 	}
 }
 
-void VirtualCockpit::SetHUDCol (COLORREF col, double intens)
+void VirtualCockpit::SetHUDCol (oapi::UInt32 col, double intens)
 {
 #ifdef UNDEF
 	if (hud.tpal) {
 		if (col) hud.col = col;
-		if (intens) hud.intens = (BYTE)(intens*200.0);
+		if (intens) hud.intens = (std::uint8_t)(intens*200.0);
 
 		PALETTEENTRY pe[256];
 		memset (pe, 0, 256*sizeof(PALETTEENTRY));
-		pe[1].peRed   /*** = pe[0].peRed ***/  = (BYTE)( hud.col        & 0xff);
-		pe[1].peGreen /*** = pe[0].peGreen ***/ = (BYTE)((hud.col >>  8) & 0xff);
-		pe[1].peBlue  /*** = pe[0].peBlue ***/ = (BYTE)((hud.col >> 16) & 0xff);
+		pe[1].peRed   /*** = pe[0].peRed ***/  = (std::uint8_t)( hud.col        & 0xff);
+		pe[1].peGreen /*** = pe[0].peGreen ***/ = (std::uint8_t)((hud.col >>  8) & 0xff);
+		pe[1].peBlue  /*** = pe[0].peBlue ***/ = (std::uint8_t)((hud.col >> 16) & 0xff);
 		/*** pe[1].peFlags = hud.intens; ***/
 		hud.tpal->SetEntries (0, 0, 256, pe);
 		pe[1].peFlags = pe[0].peRed = pe[0].peGreen = pe[0].peBlue = 0;
@@ -347,20 +373,20 @@ bool VirtualCockpit::SetClickZone_Quadrilateral (int i,
 	return true;
 }
 
-bool VirtualCockpit::ProcessMouse (UINT event, DWORD state, int x, int y)
+bool VirtualCockpit::ProcessMouse (oapi::UInt event, oapi::UInt32 state, int x, int y)
 {
 	mstate = 0;
 	switch (event) {
-	case WM_LBUTTONDOWN:
+	case orbiter::production::CockpitMouse::LeftDown:
 		state = PANEL_MOUSE_LBDOWN | PANEL_MOUSE_LBPRESSED;
 		break;
-	case WM_RBUTTONDOWN:
+	case orbiter::production::CockpitMouse::RightDown:
 		state = PANEL_MOUSE_RBDOWN | PANEL_MOUSE_RBPRESSED;
 		break;
-	case WM_LBUTTONUP:
+	case orbiter::production::CockpitMouse::LeftUp:
 		state = PANEL_MOUSE_LBUP;
 		break;
-	case WM_RBUTTONUP:
+	case orbiter::production::CockpitMouse::RightUp:
 		state = PANEL_MOUSE_RBUP;
 		break;
 	}
@@ -369,11 +395,11 @@ bool VirtualCockpit::ProcessMouse (UINT event, DWORD state, int x, int y)
 
 		// convert mouse position into vessel-local ray
 		Vector gdir, ldir;
-		g_camera->ViewportToGlobalDir (x, y, gdir);
-		ldir = tmul (g_focusobj->GRot(), gdir);
+		orbiter::production::CockpitCamera()->ViewportToGlobalDir (x, y, gdir);
+		ldir = tmul (orbiter::production::CockpitFocus()->GRot(), gdir);
 
 		// vessel-local camera position
-		Vector cpos (tmul (g_focusobj->GRot(), *g_camera->GPosPtr() - g_focusobj->GPos()));
+		Vector cpos (tmul (orbiter::production::CockpitFocus()->GRot(), *orbiter::production::CockpitCamera()->GPosPtr() - orbiter::production::CockpitFocus()->GPos()));
 
 		int i, imatch;
 		double minreldist, mx = 0, my = 0;
@@ -414,7 +440,7 @@ bool VirtualCockpit::ProcessMouse (UINT event, DWORD state, int x, int y)
 		idx_mfocus = imatch;
 
 		if (!(mstate = state & area[imatch]->mouse)) return false;
-		if (g_focusobj->bPlayback() && !(area[imatch]->mouse & PANEL_MOUSE_ONREPLAY)) {
+		if (orbiter::production::CockpitFocus()->bPlayback() && !(area[imatch]->mouse & PANEL_MOUSE_ONREPLAY)) {
 			mstate = 0;
 			return false;
 		}
@@ -428,18 +454,22 @@ bool VirtualCockpit::ProcessMouse (UINT event, DWORD state, int x, int y)
 void VirtualCockpit::GetMouseState (int &idx, int &state, Vector &xs) const
 {
 	if (mstate & PANEL_MOUSE_PRESSED) {
-		POINT pt;
+		oapi::SdkPoint pt;
+#ifdef _WIN32
 		GetCursorPos (&pt);
 		if (cwnd) // need to subtract client window offset
 			ScreenToClient (cwnd, &pt);
+#else
+		pt = orbiter::production::CockpitCursor();
+#endif
 
 		// calculate ray intersection with current focus area
 		Vector gdir, ldir;
-		g_camera->ViewportToGlobalDir (pt.x, pt.y, gdir);
-		ldir = tmul (g_focusobj->GRot(), gdir);
+		orbiter::production::CockpitCamera()->ViewportToGlobalDir (pt.x, pt.y, gdir);
+		ldir = tmul (orbiter::production::CockpitFocus()->GRot(), gdir);
 
 		// vessel-local camera position
-		Vector cpos (tmul (g_focusobj->GRot(), *g_camera->GPosPtr() - g_focusobj->GPos()));
+		Vector cpos (tmul (orbiter::production::CockpitFocus()->GRot(), *orbiter::production::CockpitCamera()->GPosPtr() - orbiter::production::CockpitFocus()->GPos()));
 
 		switch (area[idx_mfocus]->cmode) {
 		case Area::CMODE_SPHERICAL: {
@@ -474,6 +504,6 @@ void VirtualCockpit::Write (ostream &ofs) const
 	ofs << "END_VC" << endl;
 }
 
-void VirtualCockpit::OptionChanged(DWORD cat, DWORD item)
+void VirtualCockpit::OptionChanged(oapi::UInt32 cat, oapi::UInt32 item)
 {
 }

@@ -267,3 +267,11 @@ int OGLClient::DesktopHeight() const {
     const auto* mode=monitor?glfwGetVideoMode(monitor):nullptr;
     require(mode && mode->height>0,"Native primary display mode unavailable");return mode->height;
 }
+
+oapi::SdkPoint OGLClient::CursorPosition() const {
+    require(nativeWindow!=nullptr,"Native cockpit cursor requires an open render window");
+    double x,y;glfwGetCursorPos(nativeWindow,&x,&y);
+    int width,height,fbWidth,fbHeight;glfwGetWindowSize(nativeWindow,&width,&height);glfwGetFramebufferSize(nativeWindow,&fbWidth,&fbHeight);
+    require(width>0 && height>0,"Native cockpit cursor requires positive window dimensions");
+    return {std::int32_t(x*fbWidth/width),std::int32_t(y*fbHeight/height)};
+}

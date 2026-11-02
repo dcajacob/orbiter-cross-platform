@@ -4,15 +4,25 @@
 #include "Production/CockpitServices.h"
 #include "Defpanel.h"
 #include "Pane.h"
+#ifdef _WIN32
 #include "Util.h"
+#else
+#include "Production/CockpitNativeSupport.h"
+#endif
 #include "Vessel.h"
 
 using std::min;
 using std::max;
 
+#ifdef _WIN32
 extern Orbiter *g_pOrbiter;
+#endif
+#ifdef _WIN32
 extern Vessel *g_focusobj;
+#endif
+#ifdef _WIN32
 extern char DBG_MSG[256];
+#endif
 
 static const char *btmlbl[3] = {"PWR","SEL","MNU"};
 int nnv0 = 7; // number of nav modes available
@@ -129,11 +139,11 @@ void DefaultPanel::SetGeometry ()
 		btny[i] = mfdy0 + mfdh/6.0f + (i*mfdh)/7.0f - btnh/2.0f;
 	bbtny = (float)(viewH-btnh-gapw);
 
-	WORD idx[6] = {0,1,2,3,2,1}; // default billboard index list
+	std::uint16_t idx[6] = {0,1,2,3,2,1}; // default billboard index list
 
 	int nVtx, nIdx;
 	NTVERTEX *Vtx;
-	WORD *Idx;
+	std::uint16_t *Idx;
 
 	// MFD display billboards
 	for (n = 0; n < 2; n++) { // left/right MFD
@@ -146,7 +156,7 @@ void DefaultPanel::SetGeometry ()
 		}
 		float mfdx1 = mfdx0 + (float)mfdw;
 		Vtx = new NTVERTEX[nVtx = 4];
-		Idx = new WORD[nIdx = 6];
+		Idx = new std::uint16_t[nIdx = 6];
 		memset (Vtx, 0, nVtx*sizeof(NTVERTEX));
 		for (i = 0; i < 4; i++) {
 			Vtx[i].x = (i%2 ? mfdx1:mfdx0);
@@ -154,13 +164,13 @@ void DefaultPanel::SetGeometry ()
 			Vtx[i].tu = (i%2 ? 1.0f:0.0f);
 			Vtx[i].tv = (i/2 ? 1.0f:0.0f);
 		}
-		memcpy (Idx, idx, 6*sizeof(WORD));
+		memcpy (Idx, idx, 6*sizeof(std::uint16_t));
 
 		mesh.AddGroup (Vtx, nVtx, Idx, nIdx, 0, TEXIDX_MFD0+n);
 
 		// MFD buttons
 		Vtx = new NTVERTEX[nVtx = 4*54];
-		Idx = new WORD[nIdx = 6*54];
+		Idx = new std::uint16_t[nIdx = 6*54];
 		btnx[n][0] = mfdx0-btnw-gapw;
 		btnx[n][1] = mfdx1+gapw;
 		for (k = vofs = 0; k < 2; k++) { // left/right button row
@@ -214,7 +224,7 @@ void DefaultPanel::SetGeometry ()
 	// MFD power button (when MFD display is disabled)
 	for (n = 0; n < 2; n++) {
 		Vtx = new NTVERTEX[nVtx = 4];
-		Idx = new WORD[nIdx = 6];
+		Idx = new std::uint16_t[nIdx = 6];
 		memset (Vtx, 0, nVtx*sizeof(NTVERTEX));
 		for (j = vofs = 0; j < 4; j++) {
 			Vtx[vofs+j].x = bbtnx[n][0]+(j%2)*btnw;
@@ -231,7 +241,7 @@ void DefaultPanel::SetGeometry ()
 
 	// navigation buttons
 	Vtx = new NTVERTEX[nVtx = 4*7];
-	Idx = new WORD[nIdx = 6*7];
+	Idx = new std::uint16_t[nIdx = 6*7];
 	memset (Vtx, 0, nVtx*sizeof(NTVERTEX));
 	float xb[4] = {0,(float)btnw,0,(float)btnw};
 	float yb[4] = {0,0,(float)btnh,(float)btnh};
@@ -252,7 +262,7 @@ void DefaultPanel::SetGeometry ()
 	
 	// engine status display
 	Vtx = new NTVERTEX[nVtx = 27*4];
-	Idx = new WORD[nIdx = 27*6];
+	Idx = new std::uint16_t[nIdx = 27*6];
 	memset (Vtx, 0, nVtx*sizeof(NTVERTEX));
 	float dx = blockdx, dy = blockdy;
 	float xe[4] = {0,195*scale,0,195*scale};
@@ -376,7 +386,7 @@ void DefaultPanel::ResetGeometry()
 
 void DefaultPanel::InitDeviceObjects ()
 {
-	gc = g_pOrbiter->GetGraphicsClient();
+	gc = orbiter::production::CockpitGraphicsClient();
 	if (!gc) return;
 
 	surf = LoadTexture (colidx);
@@ -384,15 +394,17 @@ void DefaultPanel::InitDeviceObjects ()
 	int fh1 = max(12, min(20, pane->H/50));
 	int fh2 = max(10, min(18, pane->H/55));
 	int fh3 = (4*fh)/5;
-	mfdPen  = gc->clbkCreatePen (1, 0, RGB(0,255,0));
+	mfdPen  = gc->clbkCreatePen (1, 0, orbiter::production::CockpitColor(0,255,0));
 	mfdFont = gc->clbkCreateFont (fh1, true, "Sans");
 }
 
+#ifdef _WIN32
 void DefaultPanel::RestoreDeviceObjects (LPDIRECT3D7 d3d, LPDIRECT3DDEVICE7 dev)
 {
 	// This method is currently only supported by the inline client
 	rcsmode = -1;
 }
+#endif
 
 void DefaultPanel::DestroyDeviceObjects ()
 {
@@ -441,7 +453,7 @@ void DefaultPanel::Render ()
 		mesh.GetGroup(4+i)->UsrFlag = 2-visflag;     // show/hide power button
 	}
 	for (i = 0; i < nnvb; i++) {
-		bool active = (g_focusobj->NavModeActive(i+1));
+		bool active = (orbiter::production::CockpitFocus()->NavModeActive(i+1));
 		if (active != nvbstate[i]) {
 			GroupSpec *grp = mesh.GetGroup(navgrp);
 			static float vb[4] = {(texh-34.0f)/texh,(texh-34.0f)/texh,(texh-1.0f)/texh,(texh-1.0f)/texh};
@@ -459,8 +471,8 @@ void DefaultPanel::Render ()
 	float dx = blockdx, dy = blockdy;
 	vofs = 4;
 	if (rcsdispmode) {
-		if (g_focusobj->AttMode() != rcsmode) {
-			rcsmode = g_focusobj->AttMode();
+		if (orbiter::production::CockpitFocus()->AttMode() != rcsmode) {
+			rcsmode = orbiter::production::CockpitFocus()->AttMode();
 			for (i = 0; i < 3; i++) {
 				float dy = texh - (rcsmode == i ? 139.0f : 121.0f);
 				for (j = 0; j < 4; j++)
@@ -472,16 +484,16 @@ void DefaultPanel::Render ()
 	// Update fuel status
 	const TankSpec *ts;
 	vofs += 12;
-	ts = g_focusobj->DefaultPropellantHandle();
-	double newfuel = (ts ? g_focusobj->GetPropellantLevel (ts) : 0.0);
+	ts = orbiter::production::CockpitFocus()->DefaultPropellantHandle();
+	double newfuel = (ts ? orbiter::production::CockpitFocus()->GetPropellantLevel (ts) : 0.0);
 	if (upd_fuel = (newfuel != fuel)) {
 		fuel = newfuel;
 		grp->Vtx[vofs+1].x = grp->Vtx[vofs+3].x = dx+(float)((46.0+fuel*94.0)*scale);
 	}
 	// Update main engine status
 	vofs += 4;
-	double th = g_focusobj->GetThrusterGroupLevel(THGROUP_MAIN);
-	if (!th) th = -g_focusobj->GetThrusterGroupLevel(THGROUP_RETRO);
+	double th = orbiter::production::CockpitFocus()->GetThrusterGroupLevel(THGROUP_MAIN);
+	if (!th) th = -orbiter::production::CockpitFocus()->GetThrusterGroupLevel(THGROUP_RETRO);
 	if (th != engmain) {
 		engmain = th;
 		if (th >= 0.0) {
@@ -496,8 +508,8 @@ void DefaultPanel::Render ()
 	}
 	// Update hover engine status
 	vofs += 4;
-	if (g_focusobj->NumThrusters(THGROUP_HOVER)) {
-		th = g_focusobj->GetThrusterGroupLevel (THGROUP_HOVER);
+	if (orbiter::production::CockpitFocus()->NumThrusters(THGROUP_HOVER)) {
+		th = orbiter::production::CockpitFocus()->GetThrusterGroupLevel (THGROUP_HOVER);
 		if (th != enghovr) {
 			enghovr = th;
 			grp->Vtx[vofs+1].x = grp->Vtx[vofs+3].x = dx+(float)((46.0+enghovr*94.0)*scale);
@@ -511,18 +523,18 @@ void DefaultPanel::Render ()
 	}
 	// Update main engine readout
 	vofs += 4*5;
-	th = (engmain >= 0.0 ? engmain*g_focusobj->GetThrusterGroupMaxth(THGROUP_MAIN) :
-		-engmain*g_focusobj->GetThrusterGroupMaxth(THGROUP_RETRO));
+	th = (engmain >= 0.0 ? engmain*orbiter::production::CockpitFocus()->GetThrusterGroupMaxth(THGROUP_MAIN) :
+		-engmain*orbiter::production::CockpitFocus()->GetThrusterGroupMaxth(THGROUP_RETRO));
 	cb = FmtNum (th);
 	NumOut (cb, engstat_str[1], min(strlen(cb),(size_t)5), grp->Vtx+vofs);
 	// Update hover engine readout
 	vofs += 4*5;
-	cb = FmtNum (enghovr*g_focusobj->GetThrusterGroupMaxth(THGROUP_HOVER));
+	cb = FmtNum (enghovr*orbiter::production::CockpitFocus()->GetThrusterGroupMaxth(THGROUP_HOVER));
 	NumOut (cb, engstat_str[2], min(strlen(cb),(size_t)5), grp->Vtx+vofs);
 	// Update trim indicator and readout
 	vofs += 4*5;
-	if (g_focusobj->bElevTrim) {
-		double trim = g_focusobj->ctrlsurf_level[AIRCTRL_ELEVATORTRIM].curr;
+	if (orbiter::production::CockpitFocus()->bElevTrim) {
+		double trim = orbiter::production::CockpitFocus()->ctrlsurf_level[AIRCTRL_ELEVATORTRIM].curr;
 		if (trim != elevtrim) {
 			for (j = 0; j < 4; j++)
 				grp->Vtx[vofs+j].y = dy + (95.0f + 5.0f*(j/2) - (float)trim*14.5f)*scale;
@@ -540,19 +552,19 @@ void DefaultPanel::Render ()
 	gc->clbkRender2DPanel (&surf, (MESHHANDLE)&mesh, &transf, transpmfd);
 }
 
-bool DefaultPanel::ProcessMouse (UINT event, DWORD state, int x, int y)
+bool DefaultPanel::ProcessMouse (oapi::UInt event, oapi::UInt32 state, int x, int y)
 {
 	switch (event) {
-	case WM_LBUTTONDOWN:
+	case orbiter::production::CockpitMouse::LeftDown:
 		mstate = PANEL_MOUSE_LBDOWN | PANEL_MOUSE_LBPRESSED;
 		break;
-	case WM_RBUTTONDOWN:
+	case orbiter::production::CockpitMouse::RightDown:
 		mstate = PANEL_MOUSE_RBDOWN | PANEL_MOUSE_RBPRESSED;
 		break;
-	case WM_LBUTTONUP:
+	case orbiter::production::CockpitMouse::LeftUp:
 		mstate = PANEL_MOUSE_LBUP;
 		break;
-	case WM_RBUTTONUP:
+	case orbiter::production::CockpitMouse::RightUp:
 		mstate = PANEL_MOUSE_RBUP;
 		break;
 	default:
@@ -648,7 +660,7 @@ bool DefaultPanel::GetRCSButton (int mx, int my, int &btn) const
 
 bool DefaultPanel::GetTrimButton (int mx, int my, int &btn) const
 {
-	if (!pane->hud || !g_focusobj->bElevTrim) return false;
+	if (!pane->hud || !orbiter::production::CockpitFocus()->bElevTrim) return false;
 	float dx = (float)gapw, dy = blockdy;
 	if (mx >= dx + 135.0f*scale && mx <= dx + 148.0f*scale &&
 		my >= dy +  80.0f*scale && my <= dy + 115.0f*scale) {
@@ -670,33 +682,37 @@ void DefaultPanel::PressMFDButton (int mfd, int btn)
 
 void DefaultPanel::PressNavButton (int btn)
 {
-	g_focusobj->TglNavMode (btn+1);
+	orbiter::production::CockpitFocus()->TglNavMode (btn+1);
 }
 
 void DefaultPanel::PressRCSButton (int btn)
 {
-	g_focusobj->SetAttMode (btn);
+	orbiter::production::CockpitFocus()->SetAttMode (btn);
 }
 
 void DefaultPanel::PressTrimButton (int btn)
 {
-	double tgt, ptgt = g_focusobj->ctrlsurf_level[AIRCTRL_ELEVATORTRIM].ptgt;
+	double tgt, ptgt = orbiter::production::CockpitFocus()->ctrlsurf_level[AIRCTRL_ELEVATORTRIM].ptgt;
 	switch (btn) {
 		case 0: tgt = min ( 1.0, ptgt+0.2); break;
 		case 1: tgt = 0.0; break;
 		case 2: tgt = max (-1.0, ptgt-0.2); break;
 	}
 	if (tgt != ptgt) {
-		g_focusobj->SetControlSurfaceLevel (AIRCTRL_ELEVATORTRIM, tgt, false);
+		orbiter::production::CockpitFocus()->SetControlSurfaceLevel (AIRCTRL_ELEVATORTRIM, tgt, false);
 	}
 }
 
 void DefaultPanel::GetButtonState (int &state, int &mfd, int &btn)
 {
 	if (activemfd >= 0 && mstate & PANEL_MOUSE_PRESSED) {
-		POINT pt;
+		oapi::SdkPoint pt;
+#ifdef _WIN32
 		GetCursorPos (&pt);
 		g_pOrbiter->ScreenToClient (&pt);
+#else
+		pt = orbiter::production::CockpitCursor();
+#endif
 		if (GetMFDButton (pt.x, pt.y, mfd, btn) && mfd == activemfd && btn == activebtn) {
 			if (btn < 12) {
 				state = mstate;
@@ -775,7 +791,7 @@ Instrument::Spec DefaultPanel::GetMFDSpec () const
 	return spec;
 }
 
-void DefaultPanel::OptionChanged(DWORD cat, DWORD item)
+void DefaultPanel::OptionChanged(oapi::UInt32 cat, oapi::UInt32 item)
 {
 	if (cat == OPTCAT_INSTRUMENT) {
 		switch (item) {

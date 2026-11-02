@@ -21,6 +21,7 @@ class DefaultPanel;class Panel2D;class Panel;class VirtualCockpit;class MenuInfo
 #include "Body.h"
 #include "Mfd.h"
 #include "Production/CockpitGraphics.h"
+#include "Production/CockpitProjection.h"
 #include "hud.h"
 #include "Select.h"
 
@@ -245,9 +246,7 @@ public:
 
 	void SetPanel2DBlink (VECTOR3 v[4]);
 
-#ifdef _WIN32
-	bool GlobalToHomog (const Vector &glob, D3DVECTOR &homog) const;
-#endif
+	bool GlobalToHomog (const Vector &glob, orbiter::production::CockpitPoint &homog) const;
 	// transform global position glob into homogeneous viewport
 	// coordinates (x=-1: left edge of viewing fustrum etc.)
 	// return value indicates point within fustrum (does not check

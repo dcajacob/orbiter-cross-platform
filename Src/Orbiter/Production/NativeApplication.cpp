@@ -33,6 +33,11 @@
 #include "Camera.h"
 #include "Config.h"
 #include "State.h"
+#ifdef ORBITER_NATIVE_COCKPIT
+#include "Pane.h"
+#include "Select.h"
+#include "CockpitSystemClock.h"
+#endif
 #include "Star.h"
 #include "ConfigFile.h"
 #include "MathObservation.h"
@@ -78,6 +83,12 @@ struct Runtime final:BodyServices,RigidBodyServices,SurfaceServices,NavigationSe
     std::ofstream lifecycle,trace,flightTrace,inputTrace,inputEvents,thrustTrace,animationTrace,controlTrace,mathTrace,contactTrace;
     unsigned pendingCockpitRedraw=0,inputTick=0,completedTicks=0,observationTick=0;
     FlightControls controls;FlightReplay replay;FlightInput input;
+#ifdef ORBITER_NATIVE_COCKPIT
+    std::unique_ptr<Pane> cockpit;
+    bool instrumentResources=false,cockpitObserved=false;
+    std::ofstream cockpitState;
+    CockpitSystemClock cockpitClock;
+#endif
     std::unique_ptr<State> scenarioState;
     std::filesystem::path savePath;
     Vessel* previousFocus=nullptr;
@@ -86,6 +97,17 @@ struct Runtime final:BodyServices,RigidBodyServices,SurfaceServices,NavigationSe
     std::ofstream vesselCallbacks,lifetimeEvents;
     bool savePending=false,reloadPending=false,stepOnce=false,finished=false;
     std::string testCase;
+#ifdef ORBITER_NATIVE_COCKPIT
+    void CockpitSnapshot() {
+        if(!cockpitState.is_open())return;
+        auto* v=render.focus->GetModuleInterface();VECTOR3 p{},velocity{},omega{};MATRIX3 rotation{};
+        v->GetGlobalPos(p);v->GetGlobalVel(velocity);v->GetAngularVel(omega);v->GetRotationMatrix(rotation);
+        const auto mode=[&](int index){auto* instrument=cockpit->MFD(index);return instrument?instrument->Type():MFD_NONE;};
+        cockpitState<<completedTicks<<','<<time.SimT0<<','<<time.MJD0<<','<<v->GetName()<<','<<v->GetClassName()<<','<<cockpit->GetPanelMode()<<','<<cockpit->GetHUDMode()<<','<<mode(0)<<','<<mode(1);
+        for(double value:{p.x,p.y,p.z,velocity.x,velocity.y,velocity.z,rotation.m11,rotation.m12,rotation.m13,rotation.m21,rotation.m22,rotation.m23,rotation.m31,rotation.m32,rotation.m33,omega.x,omega.y,omega.z,v->GetMass(),v->GetFuelMass()})cockpitState<<','<<value;
+        cockpitState<<','<<v->GetMeshCount()<<','<<v->GetThrusterCount()<<'\n';cockpitState.flush();
+    }
+#endif
     void EventAt(const char* phase,const char* object,const char* detail,double seconds,double mjd) {
         if(lifetimeEvents.is_open())lifetimeEvents<<inputTick<<','<<observationTick<<','<<seconds<<','<<mjd<<','<<phase<<','<<object<<','<<detail<<'\n';
     }
@@ -100,6 +122,18 @@ struct Runtime final:BodyServices,RigidBodyServices,SurfaceServices,NavigationSe
     void Commands(const char* phase) {
         for(const auto& command:replay.Take(inputTick,phase)) {
             auto* v=render.focus->GetModuleInterface();
+#ifdef ORBITER_NATIVE_COCKPIT
+            if(command.action=="mfd") {
+                std::istringstream fields(command.value);int index,mode;std::string extra;
+                if(!(fields>>index>>mode) || fields>>extra || index<0 || index>=MAXMFD || mode<1 || mode>10)throw std::invalid_argument("MFD replay requires a stock index and mode");
+                cockpit->OpenMFD(index,mode);continue;
+            }
+            if(command.action=="hud") {
+                double value=FlightNumber(command.value);
+                if(value<0 || value>3 || value!=int(value))throw std::invalid_argument("HUD replay requires mode 0 through 3");
+                cockpit->SetHUDMode(int(value));continue;
+            }
+#endif
             if(command.action=="airborne") {
                 if(std::string(phase)!="start" || time.FrameCount()!=0 || ReadFlightStatus(*v)!=1)
                     throw std::runtime_error("Airborne initialization requires an initially landed vessel at session start");
@@ -187,7 +221,11 @@ struct Runtime final:BodyServices,RigidBodyServices,SurfaceServices,NavigationSe
         try {
             std::ofstream file(temporary);file.exceptions(std::ios::badbit|std::ios::failbit);file.imbue(std::locale::classic());
             scenarioState->Update(time.MJD0,render.focus->Name());scenarioState->Write(file,"Native production ShuttlePB flight");
-            render.camera->Write(file);system->Write(file);file.close();std::filesystem::rename(temporary,savePath);
+            render.camera->Write(file);
+#ifdef ORBITER_NATIVE_COCKPIT
+            if(cockpit)cockpit->Write(file);
+#endif
+            system->Write(file);file.close();std::filesystem::rename(temporary,savePath);
         } catch(...) {std::error_code ignored;std::filesystem::remove(temporary,ignored);throw;}
         std::cout<<"Saved finalized production scenario: "<<savePath<<'\n';
     }
@@ -227,8 +265,20 @@ struct Runtime final:BodyServices,RigidBodyServices,SurfaceServices,NavigationSe
     Runtime(Resources& data):resources(data),config(data.config),celestial(config,data.data,data.modules),world(*this) {}
     void Finish() {
         if(finished)return;
-        if(render.graphics)render.graphics->CloseSession();world.Reset();meshes.Flush();
+        if(render.graphics)render.graphics->CloseSession();
+#ifdef ORBITER_NATIVE_COCKPIT
+        cockpit.reset();render.cockpitPane=nullptr;
+        if(instrumentResources){Instrument::GlobalExit(render.graphics);instrumentResources=false;}
+        // Match the production Windows cockpit shutdown order while the
+        // graphics context and logical world still exist.
+        meshes.Flush();world.Reset();
+#else
+        world.Reset();meshes.Flush();
+#endif
         if(render.graphics)render.graphics->Close();graphicsModule.reset();render.graphics=nullptr;
+#ifdef ORBITER_NATIVE_COCKPIT
+        if(cockpitState.is_open())cockpitState.close();
+#endif
         for(auto* file:{&vesselCallbacks,&lifetimeEvents,&lifecycle,&trace,&flightTrace,&inputTrace,&inputEvents,&thrustTrace,&animationTrace,&controlTrace,&mathTrace,&contactTrace})if(file->is_open())file->close();
         finished=true;
     }
@@ -240,6 +290,10 @@ struct Runtime final:BodyServices,RigidBodyServices,SurfaceServices,NavigationSe
     }
     void Initialize(const std::filesystem::path& master,const std::filesystem::path& scenario,const std::filesystem::path& evidence,double captureTime) {
         if(!settings.Load(master.string().c_str())) throw std::runtime_error("Cannot load explicit production configuration");
+#ifdef ORBITER_NATIVE_COCKPIT
+        if(settings.CfgUIPrm.MenuMode!=1 || settings.CfgUIPrm.InfoMode!=1)
+            unsupported("visible menu/info bars in the cockpit integration candidate; explicitly hide them until menu integration");
+#endif
         if(!settings.GetActiveModules().empty())unsupported("application plugins in this external-view host");
         scenarioState=std::make_unique<State>(51982.5);State& metadata=*scenarioState;if(!metadata.Read(scenario,51982.5))throw std::runtime_error("Cannot parse production scenario");
         if(metadata.Script())unsupported("bundled Lua yet");
@@ -255,6 +309,7 @@ struct Runtime final:BodyServices,RigidBodyServices,SurfaceServices,NavigationSe
         },std::vector<std::string>{"Earth/Archive/Elev.tree","Earth/Archive/Elev_mod.tree","Moon/Archive/Elev.tree","Mars/Archive/Elev.tree"});
         BindElevationServices(terrain.get());
         render.configuration=&settings;render.time=&time;render.meshes=&meshes;render.textures=&resources.textures;
+        render.configurationFiles=&resources.config;
         render.highTextures=&resources.highTextures;render.planetTextures=&resources.planets;render.meshFiles=&resources.meshFiles;render.programFiles=&resources.program;
         render.evidence=evidence;render.captureTime=captureTime;BindNativeRenderContext(&render);
         if(!evidence.empty()) {std::filesystem::create_directories(evidence);lifecycle.open(evidence/"application-lifecycle.csv");lifecycle.exceptions(std::ios::badbit|std::ios::failbit);lifecycle<<"event,seconds,mjd,running\n";
@@ -281,6 +336,12 @@ struct Runtime final:BodyServices,RigidBodyServices,SurfaceServices,NavigationSe
             contactTrace.open(evidence/"ground-contact.csv");contactTrace.imbue(std::locale::classic());contactTrace.exceptions(std::ios::badbit|std::ios::failbit);
             contactTrace<<std::setprecision(17);contact_observation::Header(contactTrace);
         }
+#ifdef ORBITER_NATIVE_COCKPIT
+        if(!evidence.empty()) {
+            cockpitState.imbue(std::locale::classic());cockpitState.exceptions(std::ios::badbit|std::ios::failbit);
+            cockpitState.open(evidence/"cockpit-state.csv");cockpitState<<std::setprecision(17)<<"tick,seconds,mjd,object,class,cockpit,hud,left_mfd,right_mfd,x,y,z,vx,vy,vz,m11,m12,m13,m21,m22,m23,m31,m32,m33,wx,wy,wz,mass,fuel,meshes,thrusters\n";
+        }
+#endif
         render.lifetime=this;BindVesselObserver(VesselEvent,this);
         graphicsModule=std::make_unique<NativeModule>(resources.modules.Resolve("Graphics/OGLClient.so"),ORBITER_NATIVE_GRAPHICS,&render);
         render.graphics=static_cast<NativeGraphics*>(graphicsModule->Instance());render.graphics->Open();
@@ -292,6 +353,13 @@ struct Runtime final:BodyServices,RigidBodyServices,SurfaceServices,NavigationSe
         };
         mesh.releaseTexture=[](void* context,MeshSurface texture){if(texture)static_cast<Runtime*>(context)->render.graphics->ReleaseTextureResource(texture);};
         mesh.error=[](void*,const char* text){throw std::runtime_error(text);};mesh.allocation=[](void*,const char*,int){};BindMeshServices(mesh);
+#ifdef ORBITER_NATIVE_COCKPIT
+        cockpit=std::make_unique<Pane>(render.graphics,1280,720,32);render.cockpitPane=cockpit.get();
+        // Selection/input/help remain unbound until their real UI frame and
+        // input paths are integrated. Requests fail explicitly in the services.
+        static bool modesRegistered=false;if(!modesRegistered){Instrument::RegisterBuiltinModes();modesRegistered=true;}
+        Instrument::GlobalInit(render.graphics);instrumentResources=true;
+#endif
         RigidBody::GlobalSetup();
         if(!world.Initialize(metadata.Solsys()))throw std::runtime_error("Production solar system contains no objects");
         system->InitState(scenario.string().c_str());
@@ -305,8 +373,14 @@ struct Runtime final:BodyServices,RigidBodyServices,SurfaceServices,NavigationSe
         auto* focus=system->GetVessel(metadata.Focus(),true);if(!focus)throw std::runtime_error("Required production focus vessel is missing");
         SetFocus(focus);
         render.camera->ResizeViewport(1280,720);render.camera->InitState(scenario.string().c_str(),focus);
+#ifndef ORBITER_NATIVE_COCKPIT
         if(!render.camera->IsExternal())unsupported("cockpits yet; select an external camera");
-        render.graphics->PostCreation();system->PostCreation();Commands("start");render.camera->Update();
+#endif
+        render.graphics->PostCreation();system->PostCreation();
+#ifdef ORBITER_NATIVE_COCKPIT
+        cockpit->InitState(scenario.string().c_str());
+#endif
+        Commands("start");render.camera->Update();
         if(system->nGrav()!=41)throw std::runtime_error("This native scene requires the actual stock Sol world");
         WriteTrace();
     }
@@ -381,12 +455,23 @@ struct Runtime final:BodyServices,RigidBodyServices,SurfaceServices,NavigationSe
         time.SetWarp(std::clamp(warp,.1,100000.));
     }
     double TimejumpDelta() const override {unsupported("time jumps in this scene host");}
-    void RedrawCockpitAreas(int flags) override {pendingCockpitRedraw|=unsigned(flags);} // No Panel/VC areas are registered in external-view scope.
+    void RedrawCockpitAreas(int flags) override {
+        pendingCockpitRedraw|=unsigned(flags);
+#ifdef ORBITER_NATIVE_COCKPIT
+        if(cockpit)cockpit->RedrawCockpitAreas(flags);
+#endif
+    }
     const double* ParticleLevel(const oapi::ParticleStream* stream) const override {return stream->Level();}
     void InsertVessel(Vessel* vessel) override {orbiter::production::InsertVessel(*this,vessel);}
     double ManualControl(THGROUP_TYPE group,UInt32 device) const override {return controls.Manual(group,device);}
     void NotifyJump(const Vessel& vessel,const Vector& delta) override {if(&vessel==render.camera->Target())render.camera->Drag(-delta);if(render.camera->Target())render.camera->Update();}
-    void ShiftCockpit(const Vessel&,const Vector&) override {unsupported("virtual cockpit movement yet");}
+    void ShiftCockpit(const Vessel& vessel,const Vector& shift) override {
+#ifdef ORBITER_NATIVE_COCKPIT
+        if(cockpit && render.focus==&vessel)cockpit->ShiftVC(shift);
+#else
+        unsupported("virtual cockpit movement yet");
+#endif
+    }
     std::filesystem::path RecorderFile(const char*,bool) override {unsupported("flight recording yet");}
     void PlaybackWarp(double,double) override {unsupported("playback time acceleration yet");}
     void RecallCameraPreset(int index) override {render.camera->RecallPreset(index);}
@@ -399,7 +484,11 @@ struct Runtime final:BodyServices,RigidBodyServices,SurfaceServices,NavigationSe
     Vessel*& CurrentFocus() override {return render.focus;}
     Vessel*& PreviousFocus() override {return previousFocus;}
     void SetView(Body* body,int mode) override {render.camera->Attach(body,mode);force=true;LifetimeEvent("camera.target",render.camera->Target()->Name(),render.camera->IsExternal()?"external":"internal");}
-    void PaneFocusChanged(Vessel*) override {} // No Pane is instantiated in external-view scope.
+    void PaneFocusChanged(Vessel* vessel) override {
+#ifdef ORBITER_NATIVE_COCKPIT
+        if(cockpit)cockpit->FocusChanged(vessel);
+#endif
+    }
     void ModuleFocusChanged(Vessel* now,Vessel* previous) override {LifetimeEvent("module.focus",now->Name(),previous?previous->Name():"");}
     void DialogFocusChanged(Vessel*) override {} // No dialogs are instantiated.
     void ModuleNewVessel(Vessel* vessel) override {LifetimeEvent("module.create",vessel->Name());}
@@ -407,13 +496,23 @@ struct Runtime final:BodyServices,RigidBodyServices,SurfaceServices,NavigationSe
     void DialogNewVessel(Vessel*) override {} // No dialogs are instantiated.
     void ModuleDeleteVessel(Vessel* vessel) override {LifetimeEvent("module.delete",vessel->Name());}
     void GraphicsDeleteVessel(Vessel* vessel) override {render.graphics->DeleteVessel(vessel);for(auto it=attachments.begin();it!=attachments.end();)if(it->first==vessel->Name() || it->second.parent==vessel)it=attachments.erase(it);else ++it;LifetimeEvent("graphics.delete",vessel->Name());}
-    void PaneDeleteVessel(Vessel*) override {} // No MFDs are instantiated.
+    void PaneDeleteVessel(Vessel* vessel) override {
+#ifdef ORBITER_NATIVE_COCKPIT
+        if(cockpit)cockpit->DelVessel(vessel);
+#endif
+    }
     void DialogDeleteVessel(Vessel*) override {} // No dialogs are instantiated.
     void ConsoleDeleteVessel(Vessel*) override {} // No console view is instantiated.
     void SetFOV(double value) override {if(render.camera->Aperture()!=value){render.camera->SetAperture(value);force=true;}}
+#ifdef ORBITER_NATIVE_COCKPIT
+    bool SetPanelMode(int mode) override {if(!cockpit)throw std::logic_error("Native cockpit is not initialized");return cockpit->SetPanelMode(mode);}
+    void SelectPanel(int id) override {if(!cockpit)throw std::logic_error("Native cockpit is not initialized");cockpit->SelectPanel(id);}
+    void SelectVC(int id) override {if(!cockpit)throw std::logic_error("Native cockpit is not initialized");cockpit->SelectVC(id);}
+#else
     bool SetPanelMode(int) override {unsupported("cockpit panels yet");}
     void SelectPanel(int) override {unsupported("2D panels yet");}
     void SelectVC(int) override {unsupported("virtual cockpits yet");}
+#endif
     std::filesystem::path ScenarioPath(const char* name) const override {return name;}
     Camera* CreateCamera() override {return render.camera=new Camera;}
     PlanetarySystem* CreateSystem(const char* name) override {
@@ -423,8 +522,16 @@ struct Runtime final:BodyServices,RigidBodyServices,SurfaceServices,NavigationSe
     bool HasObjects(const PlanetarySystem* body) const override {return body->nObj()!=0;}
     void DestroyCamera(Camera* camera) noexcept override {delete camera;render.camera=nullptr;}
     void DestroySystem(PlanetarySystem* body) noexcept override {delete body;render.world=system=nullptr;}
-    void Observe(const char* event,bool state) override {LifetimeEvent(event,"",state?"1":"0");if(lifecycle.is_open())lifecycle<<event<<','<<time.SimT0<<','<<time.MJD0<<','<<state<<'\n';}
-    void ModulePreStep() override {LifetimeEvent("module.pre");Commands("pre");for(UInt32 i=0;i<system->nVessel();++i)system->GetVessel(i)->ModulePreStep(time.SimT0,time.SimDT,time.MJD0);}
+    void Observe(const char* event,bool state) override {
+#ifdef ORBITER_NATIVE_COCKPIT
+        if(cockpitObserved && std::string(event)=="app.frame.end")CockpitSnapshot();
+#endif
+        LifetimeEvent(event,"",state?"1":"0");if(lifecycle.is_open())lifecycle<<event<<','<<time.SimT0<<','<<time.MJD0<<','<<state<<'\n';}
+    void ModulePreStep() override {LifetimeEvent("module.pre");Commands("pre");
+#ifdef ORBITER_NATIVE_COCKPIT
+        if(!cockpitObserved && render.camera->IsInternal()){CockpitSnapshot();cockpitObserved=true;}
+#endif
+        for(UInt32 i=0;i<system->nVessel();++i)system->GetVessel(i)->ModulePreStep(time.SimT0,time.SimDT,time.MJD0);}
     void PlaybackStep() override {unsupported("playback yet");}
     void UpdateBodies(bool update) override {system->Update(update);}
     void UpdateDialogs() override {} // No dialogs are instantiated in external-view scope.
@@ -492,7 +599,11 @@ struct Runtime final:BodyServices,RigidBodyServices,SurfaceServices,NavigationSe
         }
     }
     void UpdateCamera() override {render.camera->Update();}
-    void UpdatePanels(double,double) override {} // No Panel object is selected.
+    void UpdatePanels(double simt,double syst) override {
+#ifdef ORBITER_NATIVE_COCKPIT
+        if(cockpit)cockpit->Update(simt,syst);
+#endif
+    }
     void UpdateVisuals(bool) override {} // This client updates its visuals in the original Scene::Render phase, as on Windows.
     void CheckSessionLimit() override {}
     std::string Status() const {
@@ -515,7 +626,12 @@ struct Runtime final:BodyServices,RigidBodyServices,SurfaceServices,NavigationSe
     void Step(double dt) {
         observationTick=completedTicks;Commands("before");Buffered(input);InputRecord();
         const bool wasRunning=running;if(stepOnce){running=true;stepOnce=false;}
-        render.paused=!running;time.BeginStep(dt,running);
+        render.paused=!running;
+#ifdef ORBITER_NATIVE_COCKPIT
+        time.BeginStep(cockpitClock.Step(dt),running);
+#else
+        time.BeginStep(dt,running);
+#endif
         if(running)controls.Immediate(*render.focus,time,input);
         Session::UpdateWorld(*this,time,running,playback,updating,force);
         Session::EndTimeStep(*this,time,running,active,force);
@@ -587,7 +703,11 @@ int main(int argc,char** argv) {
                 }
                 if(application.reloadPending) {if(!std::filesystem::is_regular_file(save)){std::cerr<<"No saved scenario exists: "<<save<<'\n';application.reloadPending=false;}else{scenario=save;reload=true;break;}}
                 if(input.width>0 && input.height>0) {
-                    application.render.paused=!application.running;application.render.graphics->Status(application.Status());application.render.graphics->Render();if(!application.render.graphics->Present())throw std::runtime_error("Native frame presentation failed");++presented;
+                    application.render.paused=!application.running;application.render.graphics->Status(application.Status());application.render.graphics->Render();
+#ifdef ORBITER_NATIVE_COCKPIT
+                    application.cockpit->Draw();
+#endif
+                    if(!application.render.graphics->Present())throw std::runtime_error("Native frame presentation failed");++presented;
                 } else std::this_thread::sleep_for(std::chrono::milliseconds(10));
             }
             if((ticks || frames) && !application.replay.Empty())throw std::runtime_error("Unconsumed flight replay commands");

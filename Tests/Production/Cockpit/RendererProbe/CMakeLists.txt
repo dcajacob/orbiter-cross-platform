@@ -26,9 +26,13 @@ add_executable(mfd-orbit-geometry ../OrbitGeometry.Test.cpp)
 target_compile_features(mfd-orbit-geometry PRIVATE cxx_std_17)
 target_include_directories(mfd-orbit-geometry PRIVATE "${ORBITER_ROOT}/Src/Orbiter" "${ORBITER_ROOT}/Orbitersdk/include")
 target_link_libraries(mfd-orbit-geometry PRIVATE native_boundary)
+add_executable(cockpit-system-clock ../Clock.Test.cpp)
+target_compile_features(cockpit-system-clock PRIVATE cxx_std_17)
+target_include_directories(cockpit-system-clock PRIVATE "${ORBITER_ROOT}/Src/Orbiter" "${ORBITER_ROOT}/Orbitersdk/include")
+target_link_libraries(cockpit-system-clock PRIVATE native_boundary)
 # Compile the actual ten stock modes. Object compilation is a portability gate;
 # no native Pane/instrument lifecycle is claimed until the runtime is linked.
-add_library(stock-instrument-objects OBJECT ../../../../Src/Orbiter/Mfd.cpp ../../../../Src/Orbiter/VectorMap.cpp
+add_library(stock-instrument-objects OBJECT ../../../../Src/Orbiter/Pane.cpp ../../../../Src/Orbiter/hud.cpp ../../../../Src/Orbiter/Defpanel.cpp ../../../../Src/Orbiter/Panel2D.cpp ../../../../Src/Orbiter/VCockpit.cpp ../../../../Src/Orbiter/Mfd.cpp ../../../../Src/Orbiter/VectorMap.cpp
     ../../../../Src/Orbiter/MfdOrbit.cpp ../../../../Src/Orbiter/MfdSurface.cpp
     ../../../../Src/Orbiter/MfdMap.cpp ../../../../Src/Orbiter/MfdHsi.cpp
     ../../../../Src/Orbiter/MfdLanding.cpp ../../../../Src/Orbiter/MfdDocking.cpp

@@ -90,7 +90,8 @@ def previous_files():
                 ('GetVesselServices().ShiftCockpit (*vessel, vs);','if ((g_pane) && (g_focusobj == vessel)) g_pane->ShiftVC (vs);')]:current=current.replace(a,b)
     current=re.sub(r'GetVesselServices\(\).Check\(bool\((.*?)\), ("[^"\n]*")\);',r'dCHECK(\1, \2)',current)
     equal(common,current,'Complete production SDK vessel calculations/delegates')
-    application=raw('Src/Orbiter/VesselSdkApplication.cpp')
+    from cockpit_runtime_source import restore as restore_cockpit
+    application=restore_cockpit('Src/Orbiter/VesselSdkApplication.cpp',raw('Src/Orbiter/VesselSdkApplication.cpp'))
     first=span(application,GUI[0]);equal('\n\n'.join(gui),application[first[0]:],'Original Windows cockpit SDK methods')
     result[path]=old(path)
     # Logical light objects and their vessel ownership remain CPU-side original
@@ -98,7 +99,7 @@ def previous_files():
     path='Src/Orbiter/VesselApplication.cpp';s=old(path);lights=[]
     for name in LIGHTS:
         a,b=span(s,'Vessel::'+name);lights.append(s[a:b]);s=s[:a]+s[b:]
-    equal(s,raw(path),path);result[path]=old(path)
+    equal(s,restore_cockpit(path,raw(path)),path);result[path]=old(path)
     light=raw('Src/Orbiter/VesselLights.cpp');a,b=span(light,'Vessel::'+LIGHTS[0])
     equal('\n\n'.join(lights),aliases(light[a:]),'Original vessel light ownership/events')
     path='Src/Orbiter/LightEmitter.cpp';s=raw(path).replace('#ifdef _WIN32\n#define OAPI_IMPLEMENTATION\n#include "OrbiterAPI.h"\n#else\n#include "NativeVesselAPI.h"\n#endif','#define OAPI_IMPLEMENTATION\n#include "OrbiterAPI.h"')

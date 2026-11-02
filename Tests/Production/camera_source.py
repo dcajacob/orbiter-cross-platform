@@ -55,6 +55,10 @@ def verify():
     actual=windows(raw('Src/Orbiter/Camera.cpp'));actual=actual[actual.index('static Vector nullvec;'):]
     # ASan/UBSan found the original constructor reading external_view before
     # assignment. Initial setters must also receive an initialized old matrix.
+    # Native cockpit UBSan found the original first Update reading this bool
+    # before any Rotate call. Its explicit API default is smooth=false.
+    if actual.count('\trot_smooth = false;\n')!=1:raise ValueError('Camera smoothing initialization differs')
+    actual=actual.replace('\trot_smooth = false;\n','',1)
     actual=actual.replace('\t// Setters below read this mode before the first scenario/camera attachment.\n\texternal_view = true;\n\trrot0.Set (1,0,0, 0,1,0, 0,0,1);\n','',1)
     actual=actual.replace('\tnpreset = 0;\n','\tnpreset = 0;\n\texternal_view = true;//false;\n',1)
     equal(core,actual,'All production camera/ground observer/preset calculations and ordering')

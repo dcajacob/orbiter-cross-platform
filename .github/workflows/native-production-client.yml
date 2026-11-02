@@ -14,7 +14,7 @@ jobs:
   native:
     name: Real native client Ubuntu 24.04 ${{ matrix.configuration }} ${{ matrix.math_profile }} x64
     runs-on: ubuntu-24.04
-    timeout-minutes: 45
+    timeout-minutes: 60
     strategy:
       fail-fast: false
       matrix:
@@ -91,6 +91,7 @@ jobs:
           out/renderer-probe/cockpit-sdk-layout 2>&1 | tee native-cockpit-sdk-layout.log
           out/renderer-probe/instrument-declarations 2>&1 | tee native-instrument-declarations.log
           out/renderer-probe/mfd-orbit-geometry 2>&1 | tee native-mfd-orbit-geometry.log
+          out/renderer-probe/cockpit-system-clock 2>&1 | tee native-cockpit-system-clock.log
           xvfb-run -a env LIBGL_ALWAYS_SOFTWARE=1 GALLIUM_DRIVER=llvmpipe out/renderer-probe/renderer-probe "$PWD/out/native-engine/NativeModules/Graphics/OGLClient.so" "$PWD/out/scene-resources" "$PWD/out/planets" "$PWD/out/renderer-probe/report.json" 2>&1 | tee native-instrument-probe.log
       - name: Verify flyable stock ShuttlePB, timing, docking and persistence
         shell: bash
@@ -119,6 +120,21 @@ jobs:
         run: |
           set -euo pipefail
           xvfb-run -a -s '-screen 0 1920x1080x24' env LIBGL_ALWAYS_SOFTWARE=1 GALLIUM_DRIVER=llvmpipe python3 -B Tests/Production/GroundFlight/verify.py --executable out/native-engine/orbiter-production --assets out/scene-resources --data out/data --modules out/native-engine/NativeModules --planets out/planets --configuration ${{ matrix.configuration }} --output out/native-ground-evidence 2>&1 | tee native-ground-verification.log
+      - name: Build the original native glass cockpit as a separate integration candidate
+        shell: bash
+        run: |
+          set -euo pipefail
+          cmake -S Src/Orbiter/Production -B out/native-cockpit-engine -G Ninja -DCMAKE_BUILD_TYPE=${{ matrix.configuration }} -DBUILD_TESTING=OFF -DORBITER_BUILD_NATIVE_CELESTIAL_MODULES=ON -DORBITER_BUILD_NATIVE_VESSELS=ON -DORBITER_BUILD_NATIVE_COCKPIT=ON -DORBITER_MATH_FORCE_SSE2=${{ matrix.math_profile == 'sse2' && 'ON' || 'OFF' }} -DORBITER_NATIVE_UI_ARCHIVE="$PWD/out/ogl-dependencies/imgui.zip" 2>&1 | tee native-cockpit-configure.log
+          cmake --build out/native-cockpit-engine --parallel 2 2>&1 | tee native-cockpit-build.log
+          cmake -S OVP/OGLClient/Native -B out/native-cockpit-renderer -G Ninja -DCMAKE_BUILD_TYPE=${{ matrix.configuration }} -DORBITER_ENGINE_BUILD="$PWD/out/native-cockpit-engine" -DORBITER_RENDERER_DEPENDENCIES="$PWD/out/ogl-dependencies" -DGLFW_BUILD_WAYLAND=OFF 2>&1 | tee native-cockpit-renderer-configure.log
+          cmake --build out/native-cockpit-renderer --parallel 2 2>&1 | tee native-cockpit-renderer-build.log
+          python3 -B Tests/Production/NativeScene/module_exports.py out/native-cockpit-engine/NativeModules/Graphics/OGLClient.so
+      - name: Verify all ten original native stock MFD modes and HUD against frozen Windows
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 -B Tests/Production/Cockpit/frozen.py --cache out/cockpit-reference-cache --output out/frozen-cockpit
+          xvfb-run -a -s '-screen 0 1920x1080x24' env LIBGL_ALWAYS_SOFTWARE=1 GALLIUM_DRIVER=llvmpipe python3 -B Tests/Production/Cockpit/native.py --executable out/native-cockpit-engine/orbiter-production --assets out/scene-resources --data out/data --modules out/native-cockpit-engine/NativeModules --planets out/planets --frozen out/frozen-cockpit --configuration ${{ matrix.configuration }} --output out/native-cockpit-evidence 2>&1 | tee native-cockpit-verification.log
       - uses: actions/upload-artifact@v7
         if: always()
         with:
@@ -139,5 +155,9 @@ jobs:
             out/native-keyboard-evidence/**
             out/native-ground-evidence/**
             out/native-controlled-landing/**
+            out/native-cockpit-evidence/**
+            out/native-cockpit-engine/CMakeCache.txt
+            out/native-cockpit-engine/native-sdk/OrbiterNativeBuild.h
+            out/native-cockpit-renderer/CMakeCache.txt
             out/scene-resources/resources.json
             out/native-engine/NativeModules/Graphics/Licenses/**

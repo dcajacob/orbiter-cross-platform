@@ -11,11 +11,40 @@ class Pane;class Select;class InputBox;
 extern Orbiter* g_pOrbiter;
 extern Pane* g_pane;extern Select* g_select;extern InputBox* g_input;extern HELPCONTEXT DefHelpContext;
 extern TimeData td;extern PlanetarySystem* g_psys;extern Vessel* g_focusobj;
+extern Camera* g_camera;
 #else
 #include "NativeGraphics.h"
 #include <stdexcept>
 #endif
 namespace orbiter::production {
+inline Camera* CockpitCamera() {
+#ifdef _WIN32
+    return g_camera;
+#else
+    auto* camera=GetNativeRenderContext().camera;
+    if(!camera)throw std::logic_error("Native cockpit camera is not bound");return camera;
+#endif
+}
+#ifndef _WIN32
+inline oapi::SdkPoint CockpitCursor() {
+    auto* graphics=GetNativeRenderContext().graphics;
+    if(!graphics)throw std::logic_error("Native cockpit cursor is not bound");return graphics->CursorPosition();
+}
+#endif
+namespace CockpitMouse {
+#ifdef _WIN32
+constexpr oapi::UInt LeftDown=WM_LBUTTONDOWN,RightDown=WM_RBUTTONDOWN,LeftUp=WM_LBUTTONUP,RightUp=WM_RBUTTONUP,Wheel=WM_MOUSEWHEEL;
+#else
+constexpr oapi::UInt LeftDown=1,RightDown=2,LeftUp=3,RightUp=4,Wheel=5;
+#endif
+}
+inline oapi::SdkRectangle CockpitRectangle(int left,int top,int right,int bottom) {
+#ifdef _WIN32
+    return _R(left,top,right,bottom);
+#else
+    return {left,top,right,bottom};
+#endif
+}
 inline int CockpitScreenHeight() {
 #ifdef _WIN32
     return GetSystemMetrics(SM_CYSCREEN);
@@ -110,7 +139,12 @@ inline std::filesystem::path CockpitConfigPath(const char* name) {
 #ifdef _WIN32
     return g_pOrbiter->ConfigPath(name);
 #else
-    return GetBodyServices().ConfigPath(name);
+    // Original optional palette/coast/contour readers test their file stream.
+    // Required world/module configuration continues through BodyServices.
+    const auto* files=GetNativeRenderContext().configurationFiles;
+    if(!files)throw std::logic_error("Native cockpit configuration resolver is not bound");
+    std::string path=name;if(std::filesystem::path(path).extension().empty())path+=".cfg";
+    return files->Contains(path)?files->Resolve(path):files->Root()/ResourceResolver::Normalize(path);
 #endif
 }
 inline bool CockpitReleaseSurface(SURFHANDLE surface) {

@@ -7,12 +7,12 @@ from vessel_runtime_source import equal,raw
 ROOT=Path(__file__).resolve().parents[2]
 BASE='f725194209634f7fd5d1d44d426cfa9b5e303e37'
 FILES=('Pane.h','Pane.cpp','Mfd.h','Mfd.cpp','hud.h','hud.cpp','Panel.h',
-       'Defpanel.h','Defpanel.cpp','Panel2D.h','VCockpit.h','VCockpit.cpp',
+       'Defpanel.h','Defpanel.cpp','Panel2D.h','Panel2D.cpp','VCockpit.h','VCockpit.cpp',
        'VectorMap.h','VectorMap.cpp','MfdSurface.cpp','Select.h',
        'MfdAlign.h','MfdComms.h','MfdDocking.h','MfdHsi.h','MfdLanding.h','MfdMap.h',
        'MfdMap_old.h','MfdOrbit.h','MfdSurface.h','MfdSync.h','MfdTransfer.h','Astro.h',
        'MfdOrbit.cpp','MfdAlign.cpp','MfdComms.cpp','MfdDocking.cpp','MfdHsi.cpp','MfdLanding.cpp',
-       'MfdMap.cpp','MfdSync.cpp','MfdTransfer.cpp')
+       'MfdMap.cpp','MfdSync.cpp','MfdTransfer.cpp','Select.cpp')
 
 def restore_geometry(name,current,original):
     """Prove the shared production conic implementation is an exact code move."""
@@ -44,7 +44,13 @@ class Pane;class Select;class InputBox;
 extern Orbiter* g_pOrbiter;
 extern Pane* g_pane;extern Select* g_select;extern InputBox* g_input;extern HELPCONTEXT DefHelpContext;
 extern TimeData td;extern PlanetarySystem* g_psys;extern Vessel* g_focusobj;
+extern Camera* g_camera;
 namespace orbiter::production {
+inline Camera* CockpitCamera() {return g_camera;}
+namespace CockpitMouse {
+constexpr oapi::UInt LeftDown=WM_LBUTTONDOWN,RightDown=WM_RBUTTONDOWN,LeftUp=WM_LBUTTONUP,RightUp=WM_RBUTTONUP,Wheel=WM_MOUSEWHEEL;
+}
+inline oapi::SdkRectangle CockpitRectangle(int left,int top,int right,int bottom) {return _R(left,top,right,bottom);}
 inline int CockpitScreenHeight() {return GetSystemMetrics(SM_CYSCREEN);}
 inline TimeData& CockpitTime() {return td;}
 inline PlanetarySystem* CockpitWorld() {return g_psys;}
@@ -105,18 +111,25 @@ namespace oapi {using CockpitClient=GraphicsClient;}
             suffix=', '+argument
             if not current[:end-1].endswith(suffix):raise ValueError('Instrument Elements lacks its explicit original time input: '+name)
             current=current[:end-1-len(suffix)]+current[end-1:]
-        for service,application in [('CockpitTime()','td'),('CockpitWorld()','g_psys'),('CockpitFocus()','g_focusobj'),('CockpitPane()','g_pane'),('CockpitSelect()','g_select'),('CockpitInput()','g_input'),('CockpitHelpContext()','DefHelpContext')]:
+        for service,application in [('CockpitCamera()','g_camera'),('CockpitTime()','td'),('CockpitWorld()','g_psys'),('CockpitFocus()','g_focusobj'),('CockpitPane()','g_pane'),('CockpitSelect()','g_select'),('CockpitInput()','g_input'),('CockpitHelpContext()','DefHelpContext')]:
             current=current.replace('orbiter::production::'+service,application)
         current=current.replace('orbiter::production::CockpitConfiguration()','g_pOrbiter->Cfg()')
-        current=current.replace('#include "Production/CockpitServices.h"','')
-        for service,application in [('CockpitColor','RGB'),('CockpitGraphicsClient','g_pOrbiter->GetGraphicsClient'),('CockpitReleaseSurface','g_pOrbiter->ReleaseSurface'),('CockpitDeviceColour','g_pOrbiter->GetDeviceColour'),('CockpitFillSurface','g_pOrbiter->FillSurface'),('CockpitBlt','g_pOrbiter->Blt'),('CockpitConfigPath','g_pOrbiter->ConfigPath'),('ComparePrefix','_strnicmp'),('CompareText','_stricmp'),('CockpitHighWord','HIWORD'),('CockpitLowWord','LOWORD')]:
+        current=current.replace('#include "Production/CockpitServices.h"','').replace('#include "Production/CockpitProjection.h"','')
+        for key,value in [('WM_LBUTTONDOWN','LeftDown'),('WM_RBUTTONDOWN','RightDown'),('WM_LBUTTONUP','LeftUp'),('WM_RBUTTONUP','RightUp'),('WM_MOUSEWHEEL','Wheel')]:current=current.replace('orbiter::production::CockpitMouse::'+value,key)
+        for service,application in [('CockpitColor','RGB'),('CockpitGraphicsClient','g_pOrbiter->GetGraphicsClient'),('CockpitReleaseSurface','g_pOrbiter->ReleaseSurface'),('CockpitDeviceColour','g_pOrbiter->GetDeviceColour'),('CockpitFillSurface','g_pOrbiter->FillSurface'),('CockpitBlt','g_pOrbiter->Blt'),('CockpitConfigPath','g_pOrbiter->ConfigPath'),('ComparePrefix','_strnicmp'),('CompareText','_stricmp'),('CockpitHighWord','HIWORD'),('CockpitLowWord','LOWORD'),('CockpitRectangle','_R')]:
             current=current.replace('orbiter::production::'+service,application)
-        for a,b in [('oapi::UInt32','DWORD'),('std::intptr_t','INT_PTR'),('oapi::SdkDrawContext','HDC'),('oapi::SdkFont','HFONT'),('oapi::SdkPoint','POINT'),('oapi::UInt','UINT'),('oapi::SdkRectangle','RECT')]:current=current.replace(a,b)
+        for a,b in [('orbiter::production::CockpitPoint','D3DVECTOR'),('std::uint16_t','WORD'),('std::uint8_t','BYTE'),('oapi::UInt32','DWORD'),('std::intptr_t','INT_PTR'),('oapi::SdkDrawContext','HDC'),('oapi::SdkFont','HFONT'),('oapi::SdkPoint','POINT'),('oapi::UInt','UINT'),('oapi::SdkRectangle','RECT')]:current=current.replace(a,b)
         if name in ('Mfd.h','hud.h'):current=current.replace('#include "Production/CockpitGraphics.h"','#include "GraphicsAPI.h"')
         else:current=current.replace('#include "Production/CockpitGraphics.h"','')
         if name=='Mfd.h':current=current.replace('class Pane;','class Pane;\nclass oapi::GraphicsClient;',1)
         if name=='VectorMap.h':current=current.replace('explicit DRAWDATA(double reference_mjd):focusel(reference_mjd),tgtvel(reference_mjd) {}','',1)
         if name=='VectorMap.cpp':
+            # LSan attributes 24 leaked font/pen/brush allocations to the map.
+            # Its existing release routine had no caller. Only pair allocation
+            # with that original release routine at destruction.
+            repair='\tCloseGDIResources();\n'
+            if current.count(repair)!=1:raise ValueError('Map resource destruction differs')
+            current=current.replace(repair,'',1)
             current=current.replace(':drawdata(td.MJD_ref)','')
             current=current.replace('drawdata.focusel.Set (*g_focusobj->Els(), td.MJD_ref)','drawdata.focusel.Set (*g_focusobj->Els())')
             current=current.replace('orbiter::production::CockpitScreenHeight()','GetSystemMetrics(SM_CYSCREEN)')

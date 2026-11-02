@@ -40,6 +40,7 @@ Camera::Camera (double _nearplane, double _farplane)
 {
 	// Setters below read this mode before the first scenario/camera attachment.
 	external_view = true;
+	rot_smooth = false;
 	rrot0.Set (1,0,0, 0,1,0, 0,0,1);
 	extmode = CAMERA_TARGETRELATIVE;
 	intmode = CAMERA_GENERICCOCKPIT;

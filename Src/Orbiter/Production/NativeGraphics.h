@@ -44,7 +44,9 @@ public:
     virtual bool clbkScaleBlt(SURFHANDLE,oapi::UInt32,oapi::UInt32,oapi::UInt32,oapi::UInt32,SURFHANDLE,oapi::UInt32,oapi::UInt32,oapi::UInt32,oapi::UInt32,oapi::UInt32=0) const=0;
     virtual void clbkRender2DPanel(SURFHANDLE*,MESHHANDLE,MATRIX3*,bool=false)=0;
     virtual void clbkRender2DPanel(SURFHANDLE*,MESHHANDLE,MATRIX3*,float,bool=false)=0;
+    SURFHANDLE clbkLoadTexture(const char* name,oapi::UInt32 flags) {return LoadTextureResource(name,flags);}
     virtual int DesktopHeight() const=0;
+    virtual oapi::SdkPoint CursorPosition() const=0;
     virtual void Open()=0;
     virtual RenderInput Poll()=0;
     virtual void Resize(int,int)=0;
@@ -79,6 +81,7 @@ struct NativeRenderContext {
     Vessel* focus=nullptr;TimeData* time=nullptr;MeshManager* meshes=nullptr;
     class VesselLifetimeServices* lifetime=nullptr;
     const ResourceResolver *textures=nullptr,*highTextures=nullptr,*planetTextures=nullptr,*meshFiles=nullptr,*programFiles=nullptr;
+    const ResourceResolver* configurationFiles=nullptr;
     NativeGraphics* graphics=nullptr;Pane* cockpitPane=nullptr;Select* cockpitSelect=nullptr;InputBox* cockpitInput=nullptr;HELPCONTEXT* cockpitHelp=nullptr;
     bool paused=true,showGrapple=false;
     int joystickThrottleAxis=-1,joystickTwistAxis=2;
@@ -86,6 +89,10 @@ struct NativeRenderContext {
 };
 ORBITER_PRODUCTION_API NativeRenderContext* BindNativeRenderContext(NativeRenderContext*);
 ORBITER_PRODUCTION_API NativeRenderContext& GetNativeRenderContext();
+ORBITER_PRODUCTION_API SURFHANDLE RenderCockpitMfd(int);
+ORBITER_PRODUCTION_API SURFHANDLE RenderCockpitVcMfd(int,const VCMFDSPEC**);
+ORBITER_PRODUCTION_API SURFHANDLE RenderCockpitVcHud(const VCHUDSPEC**);
+ORBITER_PRODUCTION_API void RenderCockpitOverlay();
 ORBITER_PRODUCTION_API const void* RenderConfig(oapi::UInt32);
 ORBITER_PRODUCTION_API bool RenderTexturePath(const char*,char*,bool planet);
 ORBITER_PRODUCTION_API void RenderRegisterVisual(OBJHANDLE,VISHANDLE);

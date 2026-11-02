@@ -23,6 +23,7 @@ ORBITER_PRODUCTION_API oapi::Pen *oapiCreatePen (int style, int width, oapi::UIn
 ORBITER_PRODUCTION_API SURFHANDLE oapiCreateSurface (int width, int height);
 ORBITER_PRODUCTION_API char *oapiDebugString ();
 ORBITER_PRODUCTION_API void oapiDeleteMesh (MESHHANDLE hMesh);
+ORBITER_PRODUCTION_API MESHHANDLE oapiCreateMesh(oapi::UInt32,MESHGROUP*);
 ORBITER_PRODUCTION_API ELEVHANDLE oapiElevationManager (OBJHANDLE hPlanet);
 ORBITER_PRODUCTION_API void oapiEquToLocal (OBJHANDLE hObj, double lng, double lat, double rad, VECTOR3 *loc);
 ORBITER_PRODUCTION_API OBJHANDLE oapiGetBaseByIndex (OBJHANDLE hPlanet, int index);

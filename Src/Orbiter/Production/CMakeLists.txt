@@ -6,8 +6,12 @@ if(CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
 endif()
 option(ORBITER_BUILD_NATIVE_CELESTIAL_MODULES "Build source-rebuilt production celestial modules" OFF)
 option(ORBITER_BUILD_NATIVE_VESSELS "Build the production native vessel headless host" OFF)
+option(ORBITER_BUILD_NATIVE_COCKPIT "Build the native cockpit integration candidate" OFF)
 if(CMAKE_SYSTEM_NAME STREQUAL "Linux" AND ORBITER_BUILD_NATIVE_VESSELS)
     add_subdirectory(Math)
+endif()
+if(ORBITER_BUILD_NATIVE_COCKPIT AND NOT ORBITER_BUILD_NATIVE_VESSELS)
+    message(FATAL_ERROR "Native cockpit integration requires production native vessels")
 endif()
 # Use the original application's pinned zlib when it is already configured.
 # Standalone Windows builds use that same source; Linux uses its native zlib.
@@ -72,6 +76,15 @@ if(ORBITER_BUILD_NATIVE_VESSELS)
         ../VesselLights.cpp ../LightEmitter.cpp ../VesselFlightMath.cpp ../VesselRecorder.cpp ../CollisionCore.cpp
         NativeCockpitUnavailable.cpp NativeVesselApplication.cpp NativeVesselModule.cpp NativeWorldVesselServices.cpp
         FlightControls.cpp ../Keymap.cpp NativeApplication.cpp NativeRenderApi.cpp NativeParticle.cpp NativeVesselObservation.cpp NativeObservation/ApplicationObservation.h ../CelSphereAPI.cpp ../DrawAPI.cpp ../Camera.cpp ../CameraControl.cpp NativeCameraProjection.cpp NativeVessels.cmake ../../Vessel/ShuttlePB/ShuttlePB.cpp ../../Vessel/ShuttlePB/NativeShuttlePBFactory.inc)
+endif()
+if(ORBITER_BUILD_NATIVE_COCKPIT)
+    list(APPEND _native_sources
+        NativeCockpit.cmake NativeCockpitProjection.cpp NativeCockpitGui.cpp NativeCockpitVessel.cpp
+        CockpitVesselMethods.inc CockpitCameraMethods.inc CockpitPanelMethods.inc
+        ../Pane.cpp ../hud.cpp ../Defpanel.cpp ../Panel2D.cpp ../VCockpit.cpp ../Select.cpp ../Astro.cpp
+        ../Mfd.cpp ../VectorMap.cpp ../MfdOrbit.cpp ../MfdSurface.cpp ../MfdMap.cpp ../MfdHsi.cpp
+        ../MfdLanding.cpp ../MfdDocking.cpp ../MfdAlign.cpp ../MfdSync.cpp ../MfdTransfer.cpp ../MfdComms.cpp
+        ../../../OVP/OGLClient/dependencies.lock.json)
 endif()
 list(APPEND _native_sources ${ORBITER_REFERENCE_MATH_INPUTS})
 set(_native_input "${ORBITER_NATIVE_BUILD_TOKEN}|${CMAKE_CXX_COMPILER_ID}|${CMAKE_CXX_COMPILER_VERSION}|${CMAKE_SYSTEM_NAME}|${CMAKE_SYSTEM_PROCESSOR}|${CMAKE_SIZEOF_VOID_P}|${CMAKE_CXX_FLAGS}|${CMAKE_CXX_FLAGS_DEBUG}|${CMAKE_CXX_FLAGS_RELEASE}|${CMAKE_MSVC_RUNTIME_LIBRARY}|${CMAKE_C_COMPILER_ID}|${CMAKE_C_COMPILER_VERSION}|${CMAKE_C_FLAGS}|${CMAKE_C_FLAGS_DEBUG}|${CMAKE_C_FLAGS_RELEASE}|${ORBITER_MATH_FORCE_SSE2}")

@@ -23,10 +23,10 @@ public:
     void GetBaseShadowGeometry(OBJHANDLE base,MESHHANDLE** m,double** e,oapi::UInt32* n) const {RenderBaseShadows(base,m,e,n);}
     bool ElevationGrid(ELEVHANDLE e,int a,int b,int c,int d,int f,int g,std::int16_t* h,float* i,double* j=nullptr) const {return RenderElevationGrid(e,a,b,c,d,f,g,h,i,j);}
     bool ElevationGrid(ELEVHANDLE e,int a,int b,int c,int d,int f,int g,std::int16_t* h,std::int16_t* i,double* j=nullptr) const {return RenderElevationGrid(e,a,b,c,d,f,g,h,i,j);}
-    SURFHANDLE GetVCHUDSurface(const VCHUDSPEC**) const {throw std::runtime_error("Native external view has no cockpit HUD surface");}
-    SURFHANDLE GetVCMFDSurface(int,const VCMFDSPEC**) const {throw std::runtime_error("Native external view has no virtual cockpit MFD");}
-    SURFHANDLE GetMFDSurface(int) const {throw std::runtime_error("Native external view has no cockpit MFD");}
-    void Render2DOverlay() {throw std::runtime_error("Native external view has no cockpit overlay");}
+    SURFHANDLE GetVCHUDSurface(const VCHUDSPEC** spec) const {return RenderCockpitVcHud(spec);}
+    SURFHANDLE GetVCMFDSurface(int id,const VCMFDSPEC** spec) const {return RenderCockpitVcMfd(id,spec);}
+    SURFHANDLE GetMFDSurface(int id) const {return RenderCockpitMfd(id);}
+    void Render2DOverlay() {RenderCockpitOverlay();}
     bool UseStencilBuffer() const {return true;}
 };
 #include "Production/NativeParticle.h"

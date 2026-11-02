@@ -1,24 +1,40 @@
 // Copyright (c) Martin Schweiger
 // Licensed under the MIT License
 
+#ifdef _WIN32
 #include "Orbiter.h"
+#else
+#include "Production/CockpitNativeSupport.h"
+#endif
 #include "Panel2D.h"
 #include "Pane.h"
 #include "Vessel.h"
+#ifdef _WIN32
 #include <zmouse.h>
+#else
+#include "Production/CockpitNativeSupport.h"
+#endif
 
 using namespace std;
 
+#ifdef _WIN32
 extern Orbiter *g_pOrbiter;
+#endif
+#ifdef _WIN32
 extern Vessel *g_focusobj;
+#endif
+#ifdef _WIN32
 extern TimeData td;
+#endif
+#ifdef _WIN32
 extern char DBG_MSG[256];
+#endif
 
 Panel2D::Panel2D (int _id, Pane *_pane, double scale)
 {
 	int i;
 
-	gc   = g_pOrbiter->GetGraphicsClient();
+	gc   = orbiter::production::CockpitGraphicsClient();
 	if (gc) {
 		gc->clbkGetViewportSize (&viewW, &viewH);
 	} else {
@@ -40,8 +56,10 @@ Panel2D::Panel2D (int _id, Pane *_pane, double scale)
 	idx_mfocus = aid_mfocus = -1;
 	mstate = 0;
 
+#ifdef _WIN32
 	if (g_pOrbiter->IsFullscreen()) cwnd = 0;
 	else                            cwnd = g_pOrbiter->GetRenderWnd();
+#endif
 
 	for (i = 0; i < 4; i++)
 		connect[i] = -1;
@@ -79,12 +97,12 @@ void Panel2D::SetConnections (int left, int right, int top, int bottom)
 	connect[3] = bottom;
 }
 
-int Panel2D::SetBackground (SURFHANDLE *hSurface, DWORD nsurf, MESHHANDLE hMesh, DWORD width, DWORD height, DWORD baseline, DWORD scrollflag)
+int Panel2D::SetBackground (SURFHANDLE *hSurface, oapi::UInt32 nsurf, MESHHANDLE hMesh, oapi::UInt32 width, oapi::UInt32 height, oapi::UInt32 baseline, oapi::UInt32 scrollflag)
 {
 	ReleaseSurfaces();
 	if (nSurf = nsurf) {
 		hSurf = new SURFHANDLE[nSurf];
-		for (DWORD i = 0; i < nsurf; i++) {
+		for (oapi::UInt32 i = 0; i < nsurf; i++) {
 			hSurf[i] = hSurface[i];
 			if (hSurf[i]) gc->clbkIncrSurfaceRef (hSurface[i]);
 		}
@@ -158,7 +176,7 @@ int Panel2D::RegisterMFDGeometry (int MFD_id, int nmesh, int ngroup)
 		grp->TexIdx = TEXIDX_MFD0 + MFD_id;
 		float xmin, xmax, ymin, ymax;
 		xmin = xmax = grp->Vtx[0].x, ymin = ymax = grp->Vtx[0].y;
-		for (DWORD i = 1; i < grp->nVtx; i++) {
+		for (oapi::UInt32 i = 1; i < grp->nVtx; i++) {
 			xmin = min (xmin, grp->Vtx[i].x);
 			xmax = max (xmax, grp->Vtx[i].x);
 			ymin = min (ymin, grp->Vtx[i].y);
@@ -276,18 +294,18 @@ void Panel2D::Render ()
 		// use graphics client to render surface as billboard
 		gc->clbkRender2DPanel (hSurf, hBkgMesh, &transf);
 		extern TimeData td;
-		if (pane->blinkmesh.mesh2d && fmod(td.SysT0,1.0) < 0.7)
+		if (pane->blinkmesh.mesh2d && fmod(orbiter::production::CockpitTime().SysT0,1.0) < 0.7)
 			gc->clbkRender2DPanel (&pane->blinkmesh.tex, pane->blinkmesh.mesh2d, &transf);
 	}
 }
 
-bool Panel2D::ProcessMouse_System(UINT event, DWORD state, int x, int y, const char *kstate)
+bool Panel2D::ProcessMouse_System(oapi::UInt event, oapi::UInt32 state, int x, int y, const char *kstate)
 {
 	// Windows event handler for mouse events
 	switch (event) {
-	case WM_MOUSEWHEEL:
+	case orbiter::production::CockpitMouse::Wheel:
 		if ((KEYMOD_CONTROL(kstate))) {
-			short zDelta = (short)HIWORD(state);
+			short zDelta = (short)orbiter::production::CockpitHighWord(state);
 			zoomaction = (zDelta < 0 ? ZOOM_OUT : ZOOM_IN);
 			refx = x, refy = y;
 			return true;
@@ -297,27 +315,27 @@ bool Panel2D::ProcessMouse_System(UINT event, DWORD state, int x, int y, const c
 	return false;
 }
 
-bool Panel2D::ProcessMouse_OnRunning (UINT event, DWORD state, int x, int y, const char *kstate)
+bool Panel2D::ProcessMouse_OnRunning (oapi::UInt event, oapi::UInt32 state, int x, int y, const char *kstate)
 {
 	mstate = 0;
 
 	// Windows event handler for mouse events
 	switch (event) {
-	case WM_LBUTTONDOWN:
+	case orbiter::production::CockpitMouse::LeftDown:
 		state = PANEL_MOUSE_LBDOWN | PANEL_MOUSE_LBPRESSED;
 		break;
-	case WM_RBUTTONDOWN:
+	case orbiter::production::CockpitMouse::RightDown:
 		state = PANEL_MOUSE_RBDOWN | PANEL_MOUSE_RBPRESSED;
 		break;
-	case WM_LBUTTONUP:
+	case orbiter::production::CockpitMouse::LeftUp:
 		state = PANEL_MOUSE_LBUP;
 		break;
-	case WM_RBUTTONUP:
+	case orbiter::production::CockpitMouse::RightUp:
 		state = PANEL_MOUSE_RBUP;
 		break;
-	//case WM_MOUSEWHEEL:
+	//case orbiter::production::CockpitMouse::Wheel:
 	//	if ((KEYMOD_CONTROL(kstate))) {
-	//		short zDelta = (short)HIWORD(state);
+	//		short zDelta = (short)orbiter::production::CockpitHighWord(state);
 	//		zoomaction = (zDelta < 0 ? ZOOM_OUT : ZOOM_IN);
 	//		refx = x, refy = y;
 	//		return true;
@@ -345,7 +363,7 @@ bool Panel2D::ProcessMouse_OnRunning (UINT event, DWORD state, int x, int y, con
 		mousex = (int)(tx+0.5) - area[i]->pos.left;
 		mousey = (int)(ty+0.5) - area[i]->pos.top;
 		if (!(mstate = state & area[i]->mouse)) return false;
-		if (g_focusobj->bPlayback() && !(area[i]->mouse & PANEL_MOUSE_ONREPLAY)) {
+		if (orbiter::production::CockpitFocus()->bPlayback() && !(area[i]->mouse & PANEL_MOUSE_ONREPLAY)) {
 			mstate = 0;
 			return false;
 		}
@@ -359,10 +377,14 @@ bool Panel2D::ProcessMouse_OnRunning (UINT event, DWORD state, int x, int y, con
 void Panel2D::GetMouseState (int &idx, int &state, int &mx, int &my) const
 {
 	if (mstate & PANEL_MOUSE_PRESSED) {
-		POINT pt;
+		oapi::SdkPoint pt;
+#ifdef _WIN32
 		GetCursorPos (&pt);
 		if (cwnd) // need to subtract client window offset
 			ScreenToClient (cwnd, &pt);
+#else
+		pt = orbiter::production::CockpitCursor();
+#endif
 	    double tx, ty;  // transformed coordinates
 	    tx = ((double)pt.x-x0)/panelscale;
 	    ty = ((double)pt.y-y0)/panelscale;
@@ -394,7 +416,7 @@ void Panel2D::Update (double SimT, double SysT)
 	}
 }
 
-int Panel2D::DefineArea (int aid, const RECT &pos, int draw_mode, int mouse_mode, SURFHANDLE surf, void *context)
+int Panel2D::DefineArea (int aid, const oapi::SdkRectangle &pos, int draw_mode, int mouse_mode, SURFHANDLE surf, void *context)
 {
 	// grow area buffer
 	if (narea == nareabuf) {
@@ -410,7 +432,7 @@ int Panel2D::DefineArea (int aid, const RECT &pos, int draw_mode, int mouse_mode
 	area[narea]->id      = aid;
 	area[narea]->texid   = 0;  // check this!
 	area[narea]->pos     = pos;
-	area[narea]->texpos  = _R(0,0,0,0);
+	area[narea]->texpos  = orbiter::production::CockpitRectangle(0,0,0,0);
 	area[narea]->w       = 0;
 	area[narea]->h       = 0;
 	area[narea]->bltmode = PANEL_MAP_NONE;
@@ -424,7 +446,7 @@ int Panel2D::DefineArea (int aid, const RECT &pos, int draw_mode, int mouse_mode
 	return 0;
 }
 
-int Panel2D::DefineArea (int aid, const RECT &pos, int texid, const RECT &texpos, int draw_mode, int mouse_mode, int bkmode)
+int Panel2D::DefineArea (int aid, const oapi::SdkRectangle &pos, int texid, const oapi::SdkRectangle &texpos, int draw_mode, int mouse_mode, int bkmode)
 {
 	int draw_event_mode = draw_mode & 0xFF; // strip access flags
 
@@ -456,7 +478,7 @@ int Panel2D::DefineArea (int aid, const RECT &pos, int texid, const RECT &texpos
 		area[narea]->surf = NULL;
 		area[narea]->bksurf = NULL;
 	} else {
-		DWORD attrib = OAPISURFACE_RENDERTARGET;
+		oapi::UInt32 attrib = OAPISURFACE_RENDERTARGET;
 		if (draw_mode & PANEL_REDRAW_GDI) attrib |= OAPISURFACE_GDI;
 		if (draw_mode & PANEL_REDRAW_SKETCHPAD) attrib |= OAPISURFACE_SKETCHPAD;
 		area[narea]->surf = gc->clbkCreateSurfaceEx (area[narea]->w, area[narea]->h, attrib);
@@ -469,7 +491,7 @@ int Panel2D::DefineArea (int aid, const RECT &pos, int texid, const RECT &texpos
 			area[narea]->bksurf = NULL;
 			area[narea]->bltmode = PANEL_MAP_NONE;
 			if (area[narea]->surf) {
-				RECT &r = area[narea]->texpos;
+				oapi::SdkRectangle &r = area[narea]->texpos;
 				gc->clbkBlt (area[narea]->surf, 0, 0, hSurf[texid], r.left, r.top, r.right-r.left, r.bottom-r.top);
 			}
 			break;
@@ -478,7 +500,7 @@ int Panel2D::DefineArea (int aid, const RECT &pos, int texid, const RECT &texpos
 			if (!(area[narea]->bksurf = gc->clbkCreateSurfaceEx (area[narea]->w, area[narea]->h, OAPISURFACE_RENDERTARGET))) {
 				area[narea]->bltmode = PANEL_MAP_NONE;
 			} else {
-				RECT &r = area[narea]->texpos;
+				oapi::SdkRectangle &r = area[narea]->texpos;
 				gc->clbkBlt (area[narea]->bksurf, 0, 0, hSurf[texid], r.left, r.top, r.right-r.left, r.bottom-r.top);
 			}
 			break;
@@ -537,7 +559,7 @@ SURFHANDLE Panel2D::GetArea (int idx)
 void Panel2D::RedrawArea (int idx, int event)
 {
 	SURFHANDLE s = GetArea(idx);
-	if (g_focusobj->PanelRedrawEvent (area[idx]->id, event, s, area[idx]->context))
+	if (orbiter::production::CockpitFocus()->PanelRedrawEvent (area[idx]->id, event, s, area[idx]->context))
 		SetArea (idx, s);
 }
 

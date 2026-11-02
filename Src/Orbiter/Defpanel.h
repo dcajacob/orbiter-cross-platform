@@ -11,8 +11,15 @@
 #define __DEFPANEL_H
 
 #define STRICT 1
+#ifdef _WIN32
 #include "Orbiter.h"
+#else
+#include "Production/CockpitNativeSupport.h"
+#endif
 #include "Mfd.h"
+#ifndef _WIN32
+#include "Mesh.h"
+#endif
 #include "Production/CockpitGraphics.h"
 
 // =======================================================================
@@ -26,12 +33,14 @@ public:
 	~DefaultPanel ();
 
 	// Restore all devices (e.g. after render window is re-openend
+#ifdef _WIN32
 	void RestoreDeviceObjects (LPDIRECT3D7 d3d, LPDIRECT3DDEVICE7 dev);
+#endif
 
 	// Render the glass cockpit overlay on top of the target surface
 	void Render ();
 
-	bool ProcessMouse (UINT event, DWORD state, int x, int y);
+	bool ProcessMouse (oapi::UInt event, oapi::UInt32 state, int x, int y);
 	void GetButtonState (int &state, int &mfd, int &btn);
 	inline void SetMouseState (int state) { mstate = state; }
 	inline void SetNavDisplayMode (int mode) { navdispmode = mode; }
@@ -45,7 +54,7 @@ public:
      * \param cat option category (see \ref optcat)
      * \param item option item (see \ref optitem)
      */
-	virtual void OptionChanged(DWORD cat, DWORD item);
+	virtual void OptionChanged(oapi::UInt32 cat, oapi::UInt32 item);
 
 private:
 	void SetGeometry ();

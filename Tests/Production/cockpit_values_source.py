@@ -13,7 +13,8 @@ def ranges(source):
     x=source.rfind('// ===========================================================================',0,source.index('\\defgroup hudmode '))
     y=source.index('//@}',source.index('#define MFD_USER10',x))+len('//@}')
     m=source.index('#define PANEL_MOUSE_IGNORE');n=source.index('\n',source.index('#define PANEL_MOUSE_ONREPLAY',m))
-    return [(a,b,'#include "OrbiterCockpitData.h"'),(x,y,''),(m,n,'')]
+    p=source.index('#define PANEL_MAP_NONE');q=source.index('\n',source.index('#define PANEL_MOVEOUT_RIGHT',p))
+    return [(a,b,'#include "OrbiterCockpitData.h"'),(x,y,''),(m,n,''),(p,q,'')]
 
 def verify_values():
     source=original();blocks=ranges(source)

@@ -466,8 +466,7 @@ void OGLClient::clbkRenderScene ()
 #ifdef _WIN32
 	mScene->Render();
 #else
-    // Explicit external-view capability: cockpit overlays are a later delivery.
-    mScene->Render(false);
+    mScene->Render(GetNativeRenderContext().cockpitPane!=nullptr);
 #endif
     Evidence::Rendered();
 }

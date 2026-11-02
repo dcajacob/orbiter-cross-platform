@@ -1,8 +1,9 @@
 # Phase 6 cockpit and instrument integration
 
 Phase 6 is in progress. Phase 5 remains accepted; the prepared laptop preview is
-still the verified production ShuttlePB/ISS external-view build. No native
-cockpit or Delta-glider capability is claimed by the engineering probes below.
+still the verified production ShuttlePB/ISS external-view build. A separate
+native glass-cockpit candidate passes local instrument comparisons described
+below. Interactive cockpit controls and DG/DG-S integration remain unfinished.
 
 The pre-extraction reference gate is accepted in
 [run 41458001638](https://github.com/dcajacob/orbiter-cross-platform/actions/runs/41458001638).
@@ -266,3 +267,98 @@ actual pixels at opacity 0, 0.5 and 1 in regular/additive modes, invalid-alpha
 rejection, surface reference lifetime and subsequent scaled copies. This is a
 graphics primitive test; it does not stand in for stock cockpit integration.
 The original Windows SDK and graphics-client signatures are unchanged.
+
+
+The panel opacity/surface bridge at `c98fad78` passes the complete Windows
+application/SDK and nine frozen cockpit comparisons in
+[run 41488621194](https://github.com/dcajacob/orbiter-cross-platform/actions/runs/41488621194).
+All four native Debug/Release and automatic/SSE2 profiles pass their existing
+flight, lifetime, terrain, instrument compilation and pixel checks in
+[run 41488621168](https://github.com/dcajacob/orbiter-cross-platform/actions/runs/41488621168).
+
+The next candidate links the original Pane, HUD, default panel, Panel2D, VC,
+instrument scheduler and all ten stock MFD modes into the production engine.
+Windows and native builds include the same original vessel/HUD/panel callback
+bodies, with exact Windows reconstruction checked by
+`cockpit_runtime_source.py`. Original float projection stages are retained in
+the private native camera adapter. The native owner creates the pane before the
+world, initializes it after stock post-creation callbacks, updates it after
+finalization/time/camera, renders its overlay inside the shared renderer, and
+draws the original HUD before presentation. Focus and deletion reach the actual
+pane. Legacy bitmap panels, external/custom MFD plugins, menus and compiled help
+remain explicitly unsupported; visible menu/info bars are rejected in this
+candidate.
+
+Local GCC Debug validation of five glass-cockpit cases runs two fresh processes
+per case, 60 quarter-second steps each. All 61 state rows match original Windows
+exactly, as do displayed text, projected geometry and HUD atlas updates. Every
+native numerical and pixel repeat is identical. Minimum full-frame SSIM is
+`0.9998722026987531`; minimum actual MFD texture SSIM is `0.9989917277303125`.
+The original budgets and frozen captures are unchanged. These local results
+still require hosted validation of this extraction; they do not qualify DG,
+2D/VC interaction, native selection dialogs or the complete Phase 6 gate.
+
+Initial diagnostics exposed two adapter errors. The existing external host used
+the physics quantum as system time, whereas Windows uses three 10 ms startup
+steps and caps subsequent system steps at 100 ms. The native cockpit now uses
+that original policy while production TimeData retains its fixed physics step
+and time acceleration. State and complete drawing traces then match Windows.
+The original vector map treats absent contour files as optional. Its indexed
+native path now preserves that file-open behavior; required world/module assets
+still use strict resolution. No contour geometry is synthesized.
+
+Build the separate candidate with `ORBITER_BUILD_NATIVE_COCKPIT=ON` and
+`ORBITER_NATIVE_UI_ARCHIVE=/absolute/path/to/verified/imgui.zip` in addition to
+the existing native vessel/celestial options. The ImGui archive hash comes from
+the existing renderer lock. Build the matching separate native renderer against
+that engine, then snapshot both with `Flight/prepare-preview.py`. Run:
+
+```sh
+python3 -B Tests/Production/Cockpit/frozen.py --cache out/cockpit-reference-cache --output out/frozen-cockpit
+DISPLAY=:98 LIBGL_ALWAYS_SOFTWARE=1 GALLIUM_DRIVER=llvmpipe \
+  python3 -B Tests/Production/Cockpit/native.py \
+  --executable /absolute/candidate/bin/orbiter-production \
+  --assets /absolute/stock-resources --data /absolute/celestial-data \
+  --modules /absolute/candidate/NativeModules --planets /absolute/planet-data \
+  --frozen out/frozen-cockpit --configuration Debug --output out/native-cockpit-evidence
+```
+
+Use an owned X11 display or `xvfb-run` at 1280x720 or larger. The capture viewport
+is always 1280x720. The dedicated native matrix builds this candidate separately
+from the accepted external/flight engine and archives its traces, images, logs
+and build metadata. The ordinary laptop launchers continue to use Phase 5.
+
+
+The first sanitizer cockpit run stopped at `Camera::Update`: `rot_smooth` had
+never been initialized before an input-free internal camera update. The shared
+constructor now initializes it to `false`, matching `Camera::Rotate`'s explicit
+API default. Source conservation permits only that initialization, alongside
+the prior accepted constructor repairs. Formulas, branch order, public SDK and
+frozen references are unchanged. New hosted Windows comparisons remain required.
+
+
+LeakSanitizer then attributed 660 bytes in 24 allocations to VectorMap's owned
+font, pens and brushes. Its existing `CloseGDIResources` routine had no caller.
+The shared destructor now calls that original release routine after releasing
+the map surface. No instrument calculation or drawing changes. The before-fix
+sanitizer log remains local evidence; repeat-session checks follow the repair.
+Native selection/input/help services remain deliberately unbound until real UI
+frame/input integration, so requests fail explicitly. Cockpit saves delegate to
+the original Pane writer; redraw and focus/deletion events reach the actual pane.
+
+
+After the repairs, actual Map/HSI cockpits create, render and destroy twenty
+sessions without GL, memory-access or undefined-behavior errors. LSan reports
+no remaining map-owned allocations. Unsuppressed X11/Gallium retention remains
+46,253 bytes/791 allocations per context (925,060 bytes/15,820 for twenty distinct
+contexts). This is an external retention limit, not a global leak-free claim;
+it differs from the earlier Phase 5 object-cycle test, which reused one context.
+
+
+The final cleanup candidate also verifies the production Windows mesh-before-
+world destruction order across twenty real sessions. A separate native smoke
+save/reload restores the actual Surface HUD and Map/HSI MFD modes through the
+original writers/readers. This checks mode persistence; full Windows round-trip
+and DG-specific persistence acceptance remain separate unfinished gates.
+The unchanged default exterior host still reports SSIM `0.9881491503795506`
+in two fresh processes with identical accepted state comparisons.

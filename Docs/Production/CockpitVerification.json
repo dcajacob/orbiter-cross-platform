@@ -1,0 +1,261 @@
+{
+  "status": "passed",
+  "reference_run": 41458001638,
+  "configuration": "Debug",
+  "scope": "Local native glass-cockpit instrumentation candidate; interactive controls, DG/DG-S, 2D/VC and Phase 6 acceptance remain unfinished.",
+  "cases": {
+    "generic_orbit_surface": {
+      "comparison": {
+        "maxima": {
+          "position_m": 0.0,
+          "velocity_m_s": 0.0,
+          "rotation_rad": 0.0,
+          "angular_velocity_rad_s": 0.0,
+          "mjd_days": 0.0,
+          "propellant_fraction": 0.0
+        },
+        "identical_display_text": true,
+        "identical_hud_atlas_updates": true,
+        "overlay_pixel_error": 0.0,
+        "ssim": {
+          "20": 0.9999991273464022,
+          "50": 0.9999991241682158
+        }
+      },
+      "mfd_images": {
+        "mfd-0-20": 1.0,
+        "mfd-1-20": 1.0,
+        "mfd-0-50": 1.0,
+        "mfd-1-50": 1.0
+      },
+      "identical_repeats": true
+    },
+    "generic_map_hsi": {
+      "comparison": {
+        "maxima": {
+          "position_m": 0.0,
+          "velocity_m_s": 0.0,
+          "rotation_rad": 0.0,
+          "angular_velocity_rad_s": 0.0,
+          "mjd_days": 0.0,
+          "propellant_fraction": 0.0
+        },
+        "identical_display_text": true,
+        "identical_hud_atlas_updates": true,
+        "overlay_pixel_error": 0.0,
+        "ssim": {
+          "20": 0.9998722026987531,
+          "50": 0.9998723803171067
+        }
+      },
+      "mfd_images": {
+        "mfd-0-20": 0.9989917278180848,
+        "mfd-1-20": 1.0,
+        "mfd-0-50": 0.9989917277303125,
+        "mfd-1-50": 1.0
+      },
+      "identical_repeats": true
+    },
+    "generic_landing_docking": {
+      "comparison": {
+        "maxima": {
+          "position_m": 0.0,
+          "velocity_m_s": 0.0,
+          "rotation_rad": 0.0,
+          "angular_velocity_rad_s": 0.0,
+          "mjd_days": 0.0,
+          "propellant_fraction": 0.0
+        },
+        "identical_display_text": true,
+        "identical_hud_atlas_updates": true,
+        "overlay_pixel_error": 0.0,
+        "ssim": {
+          "20": 0.9999991328662347,
+          "50": 0.9999989323411969
+        }
+      },
+      "mfd_images": {
+        "mfd-0-20": 1.0,
+        "mfd-1-20": 1.0,
+        "mfd-0-50": 1.0,
+        "mfd-1-50": 1.0
+      },
+      "identical_repeats": true
+    },
+    "generic_align_sync": {
+      "comparison": {
+        "maxima": {
+          "position_m": 0.0,
+          "velocity_m_s": 0.0,
+          "rotation_rad": 0.0,
+          "angular_velocity_rad_s": 0.0,
+          "mjd_days": 0.0,
+          "propellant_fraction": 0.0
+        },
+        "identical_display_text": true,
+        "identical_hud_atlas_updates": true,
+        "overlay_pixel_error": 0.0,
+        "ssim": {
+          "20": 0.9999991273464022,
+          "50": 0.9999991241682158
+        }
+      },
+      "mfd_images": {
+        "mfd-0-20": 1.0,
+        "mfd-1-20": 1.0,
+        "mfd-0-50": 1.0,
+        "mfd-1-50": 1.0
+      },
+      "identical_repeats": true
+    },
+    "generic_transfer_comms": {
+      "comparison": {
+        "maxima": {
+          "position_m": 0.0,
+          "velocity_m_s": 0.0,
+          "rotation_rad": 0.0,
+          "angular_velocity_rad_s": 0.0,
+          "mjd_days": 0.0,
+          "propellant_fraction": 0.0
+        },
+        "identical_display_text": true,
+        "identical_hud_atlas_updates": true,
+        "overlay_pixel_error": 0.0,
+        "ssim": {
+          "20": 0.9999989410392155,
+          "50": 0.9999991186483836
+        }
+      },
+      "mfd_images": {
+        "mfd-0-20": 1.0,
+        "mfd-1-20": 1.0,
+        "mfd-0-50": 1.0,
+        "mfd-1-50": 1.0
+      },
+      "identical_repeats": true
+    }
+  },
+  "local_environment": {
+    "build_type": "Debug",
+    "compiler": "c++ (Ubuntu 15.2.0-16ubuntu1) 15.2.0",
+    "distribution": "PRETTY_NAME=\"Ubuntu 26.04.1 LTS\"\nNAME=\"Ubuntu\"\nVERSION_ID=\"26.04\"\nVERSION=\"26.04.1 LTS (Resolute Raccoon)\"\nVERSION_CODENAME=resolute\nID=ubuntu\nID_LIKE=debian\nHOME_URL=\"https://www.ubuntu.com/\"\nSUPPORT_URL=\"https://help.ubuntu.com/\"\nBUG_REPORT_URL=\"https://bugs.launchpad.net/ubuntu/\"\nPRIVACY_POLICY_URL=\"https://www.ubuntu.com/legal/terms-and-policies/privacy-policy\"\nUBUNTU_CODENAME=resolute\nLOGO=ubuntu-logo\n",
+    "renderer": "Mesa llvmpipe on an owned Xvfb display",
+    "hosted_result": "pending for this extraction"
+  },
+  "sanitizers": {
+    "scope": "Local ASan/UBSan/LSan, actual native Map/HSI cockpit; no global leak-free claim",
+    "before_owned_map_leaks": {
+      "bytes": 660,
+      "allocations": 24
+    },
+    "after_owned_map_leaks": {
+      "bytes": 0,
+      "allocations": 0
+    },
+    "session_cycles": 20,
+    "gl_errors": 0,
+    "undefined_behavior_errors_after_repair": 0,
+    "external_graphics_retention_per_context": {
+      "bytes": 46253,
+      "allocations": 791
+    },
+    "external_graphics_retention_20_contexts": {
+      "bytes": 925060,
+      "allocations": 15820
+    },
+    "all_ten_modes": {
+      "status": "passed",
+      "cases": {
+        "generic_orbit_surface": {
+          "owned_errors": 0,
+          "external_baseline_bytes": 46253,
+          "external_baseline_allocations": 791
+        },
+        "generic_map_hsi": {
+          "owned_errors": 0,
+          "external_baseline_bytes": 46253,
+          "external_baseline_allocations": 791
+        },
+        "generic_landing_docking": {
+          "owned_errors": 0,
+          "external_baseline_bytes": 46253,
+          "external_baseline_allocations": 791
+        },
+        "generic_align_sync": {
+          "owned_errors": 0,
+          "external_baseline_bytes": 46253,
+          "external_baseline_allocations": 791
+        },
+        "generic_transfer_comms": {
+          "owned_errors": 0,
+          "external_baseline_bytes": 46253,
+          "external_baseline_allocations": 791
+        }
+      }
+    }
+  },
+  "binaries": {
+    "files": {
+      "bin/orbiter-production": "80d3ce0e85534e1c55052a1442a32bdf2e575fc6f9558618347a13121a3ac3a5",
+      "lib/liborbiter_production_vessels.so": "88d7090e0dc63923a81c6cd3856fd612512bd9a1e8c509f54318a6de889c5ef3",
+      "lib/liborbiter_production_boundary.so": "de6e4760557afe4f5009bb0904d23f3fea45ac3ecbc670cc44a9fdc206e09aad",
+      "NativeModules/Graphics/OGLClient.so": "c95fa8ca51ad6bb751486659f7ec9d8fead0669e0cb65f0da48357c20f66916d",
+      "NativeModules/Celbody/spice.so": "bc3c9328df04a0dff4a934a1190dad0f2f99837a6fd49a0d7692fa53a1821bde",
+      "NativeModules/Vessel/ShuttlePB.so": "4073620c98553208bf1cbddbc77ba2c4dadd749607485bc21ead5d278757d6d3",
+      "NativeModules/Celbody/Earth/Atmosphere/EarthAtm2006.so": "05e3b82f5f74c7ddae845273dd9a9aa36595fc173da7a49b4f906a5c6e5ecc9b",
+      "NativeModules/Celbody/Earth/Atmosphere/EarthAtmJ71G.so": "5b6cd9ed3a4da31f29b7767abb55258b26f8f3bccdc26dd756a5832c0584d445",
+      "NativeModules/Celbody/Mars/Atmosphere/MarsAtm2006.so": "bc72d023a84e75f37cd10392d2fd95915d9bb505cec63d9b0bf17865db09179c",
+      "NativeModules/Graphics/Licenses/nanovg-src-LICENSE.txt": "45185a6680ed83863bef33e1055f9fd76374df4b81c957802c19a286c982dfd2",
+      "NativeModules/Graphics/Licenses/glfw-src-LICENSE.md": "149704059b5d0bf551637e50042dd4de9c2cae921021f6636298911e3a5f9462",
+      "NativeModules/Graphics/Licenses/docs-FTL.TXT": "08c135755dd589039470f1fdbb400daaabaaa50d0b366d19cebff4d22986baa1",
+      "NativeModules/Graphics/Licenses/Orbiter-MIT.txt": "5d85bca87014aa81e9f29639b0f84740ca926a82a4611709b299ed656c2bf976",
+      "NativeModules/Graphics/Licenses/soil2-src-README.md": "11528c4876b9d4020cb481db340930821b2dc7158fd6dd2a8d8921a9965372a8",
+      "NativeModules/Graphics/Licenses/glm-src-copying.txt": "62d2d642c7d054d4fb4c9b42faad617d6c88fcd91e317f8035aa9f277cc159c3",
+      "NativeModules/Graphics/Licenses/dependencies.lock.json": "a5e71023e4a6ba385fe38aadb357b200e506964449f0aca4f034729e94887b00",
+      "NativeModules/Graphics/Licenses/OpenGL-ATTRIBUTION.md": "c67933837b45b8644d63b2e06a837a3292f66c7f534d782b1be3b2cab4e3f7d3",
+      "NativeModules/Graphics/Licenses/imgui-src-LICENSE.txt": "c80c5789748d955c4a650562baa0d750494e2c7128c2ca66aaebe2e3c4e198bf",
+      "NativeModules/Graphics/Licenses/libnsbmp-src-COPYING": "bec1a28e7f95e0b2acc624bf9e6d8556451f454ea6a213f8c1bc0fe792c61ead",
+      "NativeModules/Graphics/Licenses/zlib-src-zlib.h": "4ddc82b4af931ab55f44d977bde81bfbc4151b5dcdccc03142831a301b5ec3c8"
+    },
+    "source_commit": "c98fad780900773cba9336e67c9e60e663f60d1a",
+    "working_tree_dirty": true
+  },
+  "snapshot": "d82c92ad4e207d059caa7a644fceb3a88631b8e9ebfbdbeafa79522841519d01",
+  "local_evidence": {
+    "cockpit_report_sha256": "e1a66bd59496b92b03e7ec0abb36a70a40a0e5ebcb9a76d9614ccef7f51014c4",
+    "sanitizer_report_sha256": "8a734b1a7993be9d6a42f0ccc5f9c39c250d4efbd6298ab493122a5e034422a1"
+  },
+  "cleanup_snapshot": {
+    "identity": "ec72813379dfd07dd6b81ea84f46aa9ee512e0d19326449bfb0038c40500129d",
+    "binaries": {
+      "files": {
+        "bin/orbiter-production": "590013aad9f84ed399a9a2c50bdbb630c75ea4835ca857b66b6ed3a34069cc5e",
+        "lib/liborbiter_production_vessels.so": "88d7090e0dc63923a81c6cd3856fd612512bd9a1e8c509f54318a6de889c5ef3",
+        "lib/liborbiter_production_boundary.so": "19339dec459acb32c31ba250ae004ddf9243b5a0d6720dd6ff19912e11136354",
+        "NativeModules/Graphics/OGLClient.so": "491a200964029c2231f11667e5eeaaeec428fb45119df8225d131b488a16d7f7",
+        "NativeModules/Celbody/spice.so": "03855260d4bcdfc5125682c1cd757cf3cab2c241eea31ffbc9cea2bc39b4b859",
+        "NativeModules/Vessel/ShuttlePB.so": "532046d99b51e10340f8ed72e2e95aa7d1e1a48a21444c8b9d346caee2d2991e",
+        "NativeModules/Celbody/Earth/Atmosphere/EarthAtm2006.so": "0d98f8fbc465222db4f0d3d4044c64627e56875c5410062df885a370f442bf4d",
+        "NativeModules/Celbody/Earth/Atmosphere/EarthAtmJ71G.so": "1b37903e92533fed9654c3de5920cc1a1ca101b27839c4aaccfa0200f4f3f898",
+        "NativeModules/Celbody/Mars/Atmosphere/MarsAtm2006.so": "78485bc504f25115f5537f8e289e8384f14af4dc9948648ab7b5572d6a50dbe5",
+        "NativeModules/Graphics/Licenses/nanovg-src-LICENSE.txt": "45185a6680ed83863bef33e1055f9fd76374df4b81c957802c19a286c982dfd2",
+        "NativeModules/Graphics/Licenses/glfw-src-LICENSE.md": "149704059b5d0bf551637e50042dd4de9c2cae921021f6636298911e3a5f9462",
+        "NativeModules/Graphics/Licenses/docs-FTL.TXT": "08c135755dd589039470f1fdbb400daaabaaa50d0b366d19cebff4d22986baa1",
+        "NativeModules/Graphics/Licenses/Orbiter-MIT.txt": "5d85bca87014aa81e9f29639b0f84740ca926a82a4611709b299ed656c2bf976",
+        "NativeModules/Graphics/Licenses/soil2-src-README.md": "11528c4876b9d4020cb481db340930821b2dc7158fd6dd2a8d8921a9965372a8",
+        "NativeModules/Graphics/Licenses/glm-src-copying.txt": "62d2d642c7d054d4fb4c9b42faad617d6c88fcd91e317f8035aa9f277cc159c3",
+        "NativeModules/Graphics/Licenses/dependencies.lock.json": "a5e71023e4a6ba385fe38aadb357b200e506964449f0aca4f034729e94887b00",
+        "NativeModules/Graphics/Licenses/OpenGL-ATTRIBUTION.md": "c67933837b45b8644d63b2e06a837a3292f66c7f534d782b1be3b2cab4e3f7d3",
+        "NativeModules/Graphics/Licenses/imgui-src-LICENSE.txt": "c80c5789748d955c4a650562baa0d750494e2c7128c2ca66aaebe2e3c4e198bf",
+        "NativeModules/Graphics/Licenses/libnsbmp-src-COPYING": "bec1a28e7f95e0b2acc624bf9e6d8556451f454ea6a213f8c1bc0fe792c61ead",
+        "NativeModules/Graphics/Licenses/zlib-src-zlib.h": "4ddc82b4af931ab55f44d977bde81bfbc4151b5dcdccc03142831a301b5ec3c8"
+      },
+      "source_commit": "c98fad780900773cba9336e67c9e60e663f60d1a",
+      "working_tree_dirty": true
+    },
+    "checks": [
+      "twenty actual sessions with Windows mesh/world teardown order under ASan/UBSan/LSan",
+      "native HUD and MFD mode save/reload through original serializers"
+    ]
+  }
+}

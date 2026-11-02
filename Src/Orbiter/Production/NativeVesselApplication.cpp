@@ -26,6 +26,7 @@ int Vessel::ConsumeBufferedKey(oapi::UInt32 key,bool down,char* state)
     if(!down) return 0;
     return GetFlightControls().DefaultBuffered(*this,key,down,state);
 }
+#ifndef ORBITER_NATIVE_COCKPIT
 void Vessel::DrawHUD(HUD*,oapi::Sketchpad*) {unavailable("HUD drawing");}
 void Vessel::RenderHUD(HUD*,int,HUDPAINTSPEC*,SURFHANDLE) {unavailable("HUD rendering");}
 int Vessel::RegisterMFDMode(const MFDMODESPECEX*) {unavailable("MFD registration");}
@@ -35,6 +36,7 @@ void Vessel::UnregisterMFDModes()
 {if(nmfdmode) unavailable("MFD removal");}
 bool Vessel::LoadPanel2D(int,Panel2D*) const {unavailable("2D panels");}
 void Vessel::LeanCamera(int,bool) {unavailable("cockpit camera movement");}
+#endif
 void Vessel::UndockInteractive(const Vessel* exclude,double separation)
 {
     if(ndock==1) Undock(0,exclude,separation);

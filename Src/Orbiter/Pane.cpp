@@ -5,32 +5,59 @@
 
 #include "Production/CockpitServices.h"
 #include "Pane.h"
+#ifndef _WIN32
+#include "Production/CockpitNativeSupport.h"
+#endif
 #include "Defpanel.h"
 #include "Panel2D.h"
+#ifdef _WIN32
 #include "Panel.h"
+#endif
+#ifdef _WIN32
 #include "MenuInfoBar.h"
+#endif
 #include "VCockpit.h"
 #include <stdio.h>
 #include "Camera.h"
+#ifdef _WIN32
 #include "D3dmath.h"
+#endif
+#ifdef _WIN32
 #include "Log.h"
+#endif
+#ifdef _WIN32
 #include "DlgMgr.h"
+#endif
 #include <assert.h>
 
 using namespace std;
 
+#ifdef _WIN32
 extern Orbiter *g_pOrbiter;
+#endif
+#ifdef _WIN32
 extern TimeData td;
+#endif
+#ifdef _WIN32
 extern Camera *g_camera;
+#endif
+#ifdef _WIN32
 extern Vessel *g_focusobj;
+#endif
+#ifdef _WIN32
 extern char DBG_MSG[256];
+#endif
 
-static COLORREF normalColor = RGB (  0, 255, 0);
-static COLORREF infoColor   = RGB (224, 192, 0);
-static COLORREF brightColor = RGB (255, 224, 128);
+static oapi::UInt32 normalColor = orbiter::production::CockpitColor (  0, 255, 0);
+static oapi::UInt32 infoColor   = orbiter::production::CockpitColor (224, 192, 0);
+static oapi::UInt32 brightColor = orbiter::production::CockpitColor (255, 224, 128);
 
 			   
+#ifdef _WIN32
 Pane::Pane (oapi::CockpitClient *gclient, HWND hwnd, int width, int height, int bpp)
+#else
+Pane::Pane (oapi::CockpitClient *gclient, int width, int height, int bpp)
+#endif
 {
 	// Note: gclient is assumed to be a valid pointer. Nongraphics orbiter
 	// instances should not create a Pane.
@@ -41,7 +68,9 @@ Pane::Pane (oapi::CockpitClient *gclient, HWND hwnd, int width, int height, int 
 	W         = width;
 	H         = height;
 	BPP       = bpp;
+#ifdef _WIN32
 	hWnd      = hwnd;
+#endif
 	hud       = 0;
 	hudmode   = HUD_NONE;
 
@@ -60,13 +89,17 @@ Pane::Pane (oapi::CockpitClient *gclient, HWND hwnd, int width, int height, int 
 	panel     = 0;
 	vcockpit  = 0;
 	
+#ifdef _WIN32
 	if (gc) mibar = new MenuInfoBar ();
 	else    mibar = NULL;
+#else
+	mibar = nullptr;
+#endif
 
 	
 	i = orbiter::production::CockpitConfiguration()->CfgInstrumentPrm.bMfdPow2;
 	if (i == 2) {
-		DWORD val;
+		oapi::UInt32 val;
 		gc->clbkGetRenderParam (RP_REQUIRETEXPOW2, &val);
 		mfdsize_pow2 = (val > 0);
 	} else mfdsize_pow2 = (i > 0);
@@ -81,40 +114,52 @@ Pane::Pane (oapi::CockpitClient *gclient, HWND hwnd, int width, int height, int 
 	mfdTex_blank = NULL;
 	if (gc) {
 		mfdTex_blank = gc->clbkCreateTexture (2,2);
+#ifdef _WIN32
 		static DDBLTFX bltfx = {sizeof(DDBLTFX), 0};
 		bltfx.dwFillColor = 0;
+#endif
 		gc->clbkFillSurface (mfdTex_blank, 0);
 	}
 }
 
 Pane::~Pane ()
 {
-	DWORD i;
+	oapi::UInt32 i;
 	for (i = 0; i < MAXMFD; i++)
 		if (mfd[i].instr) delete mfd[i].instr;
+#ifdef _WIN32
 	if (nemfd) {
+#ifdef _WIN32
 		for (i = 0; i < nemfd; i++)
 			delete emfd[i];
+#endif
 		delete []emfd;
 		emfd = NULL;
 	}
+#endif
 	FreeResources ();
+#ifdef _WIN32
 	if (mibar)    delete mibar;
+#endif
 	if (defpanel) delete defpanel;
 	if (panel2d)  delete panel2d;
+#ifdef _WIN32
 	if (panel)    delete panel;
+#endif
 	if (vcockpit) delete vcockpit;
 	if (hud)      delete hud;
 	if (blinkmesh.mesh2d) oapiDeleteMesh (blinkmesh.mesh2d);
 	if (mfdTex_blank) gc->clbkReleaseSurface (mfdTex_blank);
 }
 
+#ifdef _WIN32
 void Pane::RestoreDeviceObjects (LPDIRECT3D7 d3d, LPDIRECT3DDEVICE7 dev)
 {
 	if (defpanel) defpanel->RestoreDeviceObjects (d3d, dev);
 	for (int i = 0; i < MAXMFD; i++)
 		if (mfd[i].instr) mfd[i].instr->RestoreDeviceObjects (d3d, dev);
 }
+#endif
 
 void Pane::FocusChanged (const Vessel *focus)
 {
@@ -123,20 +168,24 @@ void Pane::FocusChanged (const Vessel *focus)
 	//OpenMFD (1, MFD_NONE);
 	if (panelmode) SetPanelMode (panelmode, true);
 	Instrument::ClearDisabledModes();
-	for (DWORD i = 0; i < nemfd; i++)
+#ifdef _WIN32
+	for (oapi::UInt32 i = 0; i < nemfd; i++)
 		emfd[i]->clbkFocusChanged ((OBJHANDLE)focus);
+#endif
 }
 
 void Pane::DelVessel (const Vessel *vessel)
 {
-	for (DWORD i = 0; i < nemfd; i++)
+#ifdef _WIN32
+	for (oapi::UInt32 i = 0; i < nemfd; i++)
 		if ((Vessel*)emfd[i]->GetVessel() == vessel)
-			emfd[i]->SetVessel ((OBJHANDLE)g_focusobj);
+			emfd[i]->SetVessel ((OBJHANDLE)orbiter::production::CockpitFocus());
+#endif
 	BroadcastMFDMessage (MSG_KILLVESSEL, (void*)vessel);
 	if (hud) hud->ProcessMessage (MSG_KILLVESSEL, (void*)vessel);
 }
 
-bool Pane::MFDConsumeKeyBuffered (int id, DWORD key)
+bool Pane::MFDConsumeKeyBuffered (int id, oapi::UInt32 key)
 {
 	if (key == OAPI_KEY_ESCAPE) {
 		ToggleMFD_on (id);
@@ -147,9 +196,9 @@ bool Pane::MFDConsumeKeyBuffered (int id, DWORD key)
 	return false;
 }
 
-bool Pane::ProcessMouse_System(UINT event, DWORD state, DWORD x, DWORD y, const char *kstate)
+bool Pane::ProcessMouse_System(oapi::UInt event, oapi::UInt32 state, oapi::UInt32 x, oapi::UInt32 y, const char *kstate)
 {
-	if (g_camera->IsExternal()) return false;
+	if (orbiter::production::CockpitCamera()->IsExternal()) return false;
 	// respond to mouse events only in cockpit mode
 
 	bool consumed = false;
@@ -160,15 +209,17 @@ bool Pane::ProcessMouse_System(UINT event, DWORD state, DWORD x, DWORD y, const 
 	return consumed;
 }
 
-bool Pane::ProcessMouse_OnRunning (UINT event, DWORD state, DWORD x, DWORD y, const char *kstate)
+bool Pane::ProcessMouse_OnRunning (oapi::UInt event, oapi::UInt32 state, oapi::UInt32 x, oapi::UInt32 y, const char *kstate)
 {
-	if (g_camera->IsExternal()) return false;
+	if (orbiter::production::CockpitCamera()->IsExternal()) return false;
 	// respond to mouse events only in cockpit mode
 
 	bool consumed = false;
 	if (defpanel)      consumed = defpanel->ProcessMouse (event, state, x, y);
 	else if (panel2d)  consumed = panel2d->ProcessMouse_OnRunning (event, state, x, y, kstate);
+#ifdef _WIN32
 	else if (panel)    consumed = panel->ProcessMouse (event, state, x, y);
+#endif
 	else if (vcockpit) consumed = vcockpit->ProcessMouse (event, state, x, y);
 	return consumed;
 }
@@ -182,7 +233,9 @@ void Pane::RedrawCockpitAreas (int mode)
 {
 	if (panel2d)       panel2d->RedrawAllAreas (mode);
 	else if (vcockpit) vcockpit->RedrawAllAreas (mode);
+#ifdef _WIN32
 	else if (panel)    panel->RedrawAllAreas (mode);
+#endif
 }
 
 bool Pane::SetPanelMode (int pmode, bool force)
@@ -193,7 +246,7 @@ bool Pane::SetPanelMode (int pmode, bool force)
 	if (pmode == panelmode && !force) return true; // nothing to do
 	panelmode = pmode;
 	
-	g_camera->ResetCockpitView();
+	orbiter::production::CockpitCamera()->ResetCockpitView();
 	Vessel::UnsetCameraMovement();
 
 	for (i = 0; i < MAXMFD; i++) {
@@ -204,18 +257,20 @@ bool Pane::SetPanelMode (int pmode, bool force)
 	for (i = 0; i < 3; i++) {
 
 		if (defpanel) { delete defpanel; defpanel = 0; }
+#ifdef _WIN32
 		if (panel)    { delete panel;    panel    = 0; }
+#endif
 		if (panel2d)  { delete panel2d;  panel2d  = 0; }
 		if (vcockpit) { delete vcockpit; vcockpit = 0; }
 
 		switch (panelmode) {
 		case 1:
 			defpanel = new DefaultPanel (this, colidx); TRACENEW
-			ok = g_focusobj->SetGenericCockpit();
+			ok = orbiter::production::CockpitFocus()->SetGenericCockpit();
 			break;
 		case 2:
 			panel2d = new Panel2D (0, this, orbiter::production::CockpitConfiguration()->CfgLogicPrm.PanelScale); TRACENEW
-			if (ok = g_focusobj->LoadPanel2D (0, panel2d)) {
+			if (ok = orbiter::production::CockpitFocus()->LoadPanel2D (0, panel2d)) {
 				//panel2d->RedrawAllAreas (PANEL_REDRAW_INIT);
 				panel2d->Setup();
 				panel_dx = panel_dy = 0.0;
@@ -224,8 +279,9 @@ bool Pane::SetPanelMode (int pmode, bool force)
 				delete panel2d;
 				panel2d = 0;
 			}
+#ifdef _WIN32
 			panel = new Panel (0, this, orbiter::production::CockpitConfiguration()->CfgLogicPrm.PanelScale); TRACENEW
-			if (ok = g_focusobj->LoadPanel (0)) {
+			if (ok = orbiter::production::CockpitFocus()->LoadPanel (0)) {
 				//panel->RedrawAllAreas (PANEL_REDRAW_INIT);
 				panel->Setup ();
 				panel_dx = panel_dy = 0.0;
@@ -233,10 +289,13 @@ bool Pane::SetPanelMode (int pmode, bool force)
 				delete panel;
 				panel = 0;
 			}
+#else
+			if (orbiter::production::CockpitFocus()->LoadPanel(0)) throw std::runtime_error("Native legacy bitmap panels are unavailable");
+#endif
 			break;
 		case 3:
 			vcockpit = new VirtualCockpit (0, this); TRACENEW
-			if (ok = g_focusobj->LoadVC (0)) {
+			if (ok = orbiter::production::CockpitFocus()->LoadVC (0)) {
 				vcid = 0;
 				//vcockpit->RedrawAllAreas (PANEL_REDRAW_INIT);
 			} else {
@@ -260,7 +319,7 @@ bool Pane::SetPanelMode (int pmode, bool force)
 		if (!vcockpit || !vcockpit->GetHUDSurf()) hud->Resize (false);
 
 	static IntCamMode cmode[3] = {CAMERA_GENERICCOCKPIT,CAMERA_2DPANELCOCKPIT,CAMERA_VIRTUALCOCKPIT};
-	g_camera->SetIntMode (cmode[panelmode-1]);
+	orbiter::production::CockpitCamera()->SetIntMode (cmode[panelmode-1]);
 	RedrawCockpitAreas (PANEL_REDRAW_INIT);
 
 	return ok;
@@ -270,7 +329,7 @@ int Pane::SelectPanel (int id)
 {
 	int i;
 
-	if (panelmode != 2 || g_camera->IsExternal()) return -1;
+	if (panelmode != 2 || orbiter::production::CockpitCamera()->IsExternal()) return -1;
 
 	for (i = 0; i < MAXMFD; i++) {
 		if (mfd[i].exist) UnregisterMFD (i);
@@ -278,10 +337,12 @@ int Pane::SelectPanel (int id)
 	}
 
 	if (panel2d) delete panel2d;
+#ifdef _WIN32
 	if (panel) delete panel;
+#endif
 
 	panel2d = new Panel2D (id, this, orbiter::production::CockpitConfiguration()->CfgLogicPrm.PanelScale); TRACENEW
-	if (g_focusobj->LoadPanel2D (id, panel2d)) {
+	if (orbiter::production::CockpitFocus()->LoadPanel2D (id, panel2d)) {
 		panel2d->RedrawAllAreas (PANEL_REDRAW_INIT);
 		panel2d->Setup ();
 		panel_dx = panel_dy = 0.0;
@@ -295,8 +356,9 @@ int Pane::SelectPanel (int id)
 		panel2d = 0;
 	}
 
+#ifdef _WIN32
 	panel = new Panel (id, this, orbiter::production::CockpitConfiguration()->CfgLogicPrm.PanelScale); TRACENEW
-	if (g_focusobj->LoadPanel (id)) {
+	if (orbiter::production::CockpitFocus()->LoadPanel (id)) {
 		panel->RedrawAllAreas (PANEL_REDRAW_INIT);
 		panel->Setup ();
 		panel_dx = panel_dy = 0.0;
@@ -311,13 +373,17 @@ int Pane::SelectPanel (int id)
 		panel = 0;
 		return -1;
 	}
+#else
+	if (orbiter::production::CockpitFocus()->LoadPanel(id)) throw std::runtime_error("Native legacy bitmap panels are unavailable");
+	return -1;
+#endif
 }
 
 int Pane::SelectVC (int id)
 {
 	int i;
 
-	if (panelmode != 3 || g_camera->IsExternal()) return -1;
+	if (panelmode != 3 || orbiter::production::CockpitCamera()->IsExternal()) return -1;
 	for (i = 0; i < MAXMFD; i++) {
 		if (mfd[i].exist) UnregisterMFD (i);
 		mfd[i].upDTscale = 1.0;
@@ -325,9 +391,9 @@ int Pane::SelectVC (int id)
 
 	if (vcockpit) delete vcockpit;
 	vcockpit = new VirtualCockpit (id, this); TRACENEW
-	if (g_focusobj->LoadVC (id)) {
+	if (orbiter::production::CockpitFocus()->LoadVC (id)) {
 		vcid = id;
-		g_camera->ResetCockpitView();
+		orbiter::production::CockpitCamera()->ResetCockpitView();
 		for (i = 0; i < MAXMFD; i++) {
 			if (mfd[i].exist && mfd[i].active)
 				OpenMFD (i, mfd[i].lastmode);
@@ -345,7 +411,7 @@ int Pane::SwitchPanel (int dir)
 {
 	int id = -1;
 
-	if (g_camera->IsExternal()) return -1;
+	if (orbiter::production::CockpitCamera()->IsExternal()) return -1;
 
 	switch (panelmode) {
 	case 2:
@@ -353,8 +419,12 @@ int Pane::SwitchPanel (int dir)
 			id = panel2d->Connect (dir);
 			if (id >= 0) id = SelectPanel (id);
 		} else if (panel) {
+#ifdef _WIN32
 			id = panel->Connect (dir);
 			if (id >= 0) id = SelectPanel (id);
+#else
+		throw std::runtime_error("Native legacy bitmap panels are unavailable");
+#endif
 		}
 		break;
 	case 3:
@@ -369,7 +439,7 @@ int Pane::SwitchPanel (int dir)
 
 void Pane::ShiftPanel (double dx, double dy)
 {
-	if ((!panel && !panel2d) || g_camera->IsExternal()) return;
+	if ((!panel && !panel2d) || orbiter::production::CockpitCamera()->IsExternal()) return;
 
 	// only move in whole pixels to avoid aliasing problems
 	panel_dx += dx;
@@ -380,7 +450,9 @@ void Pane::ShiftPanel (double dx, double dy)
 		if (ix) panel_dx -= ix;
 		if (iy) panel_dy -= iy;
 		if (panel2d) panel2d->Move (ix, iy);
+#ifdef _WIN32
 		else         panel->Move (ix, iy);
+#endif
 	}
 }
 
@@ -388,7 +460,7 @@ void Pane::ShiftPanel(int dir)
 {
 	double dx = 0.0, dy = 0.0;
 	const double speed = orbiter::production::CockpitConfiguration()->CfgLogicPrm.PanelScrollSpeed;
-	const double dt = td.SysDT;
+	const double dt = orbiter::production::CockpitTime().SysDT;
 	switch (dir) {
 	case 0: // left
 		dx = dt * speed;
@@ -440,7 +512,7 @@ bool Pane::SetHUDMode (int _hudmode)
 		break;
 	}
 	if (_hudmode != HUD_NONE) hudmode = _hudmode;
-	g_focusobj->HUDchanged (_hudmode);
+	orbiter::production::CockpitFocus()->HUDchanged (_hudmode);
 	return true;
 }
 
@@ -458,8 +530,8 @@ bool Pane::SetHUDMode (int _hudmode, const HUDPARAM *prm)
 				}
 				} break;
 			case HUD_DOCKING: {
-				DWORD curNav = ((HUD_Docking*)hud)->GetNav();
-				DWORD newNav = prm->HUDdocking.NavIdx;
+				oapi::UInt32 curNav = ((HUD_Docking*)hud)->GetNav();
+				oapi::UInt32 newNav = prm->HUDdocking.NavIdx;
 				if (curNav != newNav) {
 					((HUD_Docking*)hud)->SetNav (newNav);
 					changed = true;
@@ -490,7 +562,7 @@ int Pane::GetHUDMode (HUDPARAM *prm) const
 
 void Pane::SetHUDColour (int idx, double intens, bool force)
 {
-	COLORREF col[4] = {0x00ff00, 0x0044cc, 0x80ffff, 0xcca300};
+	oapi::UInt32 col[4] = {0x00ff00, 0x0044cc, 0x80ffff, 0xcca300};
 
 	bool change_col    = (idx >= 0 && (idx != colidx || force));
 	bool change_intens = (intens >= 0.0 && (intens != hudIntens || force));
@@ -498,13 +570,15 @@ void Pane::SetHUDColour (int idx, double intens, bool force)
 
 	if (change_col)    colidx = idx;
 	if (change_intens) hudIntens = intens;
-	COLORREF hue = col[colidx];
-	hudCol = ((DWORD)((hue & 0xff) * hudIntens)) +
-			 ((DWORD)(((hue >> 8) & 0xff) * hudIntens) << 8) +
-             ((DWORD)((hue >> 16) * hudIntens) << 16);
+	oapi::UInt32 hue = col[colidx];
+	hudCol = ((oapi::UInt32)((hue & 0xff) * hudIntens)) +
+			 ((oapi::UInt32)(((hue >> 8) & 0xff) * hudIntens) << 8) +
+             ((oapi::UInt32)((hue >> 16) * hudIntens) << 16);
 
+#ifdef _WIN32
 	DialogManager *dlgmgr = g_pOrbiter->DlgMgr();
 	dlgmgr->SetMainColor(hudCol);
+#endif
 
 	if (hudpen) gc->clbkReleasePen (hudpen);
 	hudpen = gc->clbkCreatePen (1, 0, hudCol);
@@ -531,12 +605,12 @@ void Pane::SetHUDIntens (double val)
 
 void Pane::IncHUDIntens ()
 {
-	SetHUDColour (-1, min (1.0, hudIntens + td.SysDT*0.3));
+	SetHUDColour (-1, min (1.0, hudIntens + orbiter::production::CockpitTime().SysDT*0.3));
 }
 
 void Pane::DecHUDIntens ()
 {
-	SetHUDColour (-1, max (0.0, hudIntens - td.SysDT*0.3));
+	SetHUDColour (-1, max (0.0, hudIntens - orbiter::production::CockpitTime().SysDT*0.3));
 }
 
 void Pane::RenderCustomHUD (MESHHANDLE hMesh, SURFHANDLE *hTex)
@@ -547,17 +621,19 @@ void Pane::RenderCustomHUD (MESHHANDLE hMesh, SURFHANDLE *hTex)
 // Update GDI elements of 2D pane
 void Pane::Update (double simt, double syst)
 {
-	DWORD j;
+	oapi::UInt32 j;
 
 	// update external MFDs
+#ifdef _WIN32
 	for (j = 0; j < nemfd; j++)
 		emfd[j]->clbkUpdate();
+#endif
 
 	bool global_hud = true;
 	int i, trimy = (13*f1H)/2;
 
 	// perform any BLT updates
-	if (!g_camera->IsExternal()) {
+	if (!orbiter::production::CockpitCamera()->IsExternal()) {
 		// update MFDs
 		for (i = 0; i < MAXMFD; i++) {
 			if (mfd[i].instr) {
@@ -572,7 +648,7 @@ void Pane::Update (double simt, double syst)
 			if (mstate) {
 				aid = panel2d->area[idx]->id;
 				context = panel2d->area[idx]->context;
-				if (g_focusobj->PanelMouseEvent (aid, mstate, mx, my, context) && (panel2d->area[idx]->redraw & PANEL_REDRAW_MOUSE))
+				if (orbiter::production::CockpitFocus()->PanelMouseEvent (aid, mstate, mx, my, context) && (panel2d->area[idx]->redraw & PANEL_REDRAW_MOUSE))
 					panel2d->RedrawArea (idx, PANEL_REDRAW_MOUSE);
 				int nmstate = 0;
 				if (panel2d->area[idx]->mouse & PANEL_MOUSE_LBPRESSED && mstate & (PANEL_MOUSE_LBDOWN | PANEL_MOUSE_LBPRESSED)) nmstate |= PANEL_MOUSE_LBPRESSED;
@@ -581,11 +657,12 @@ void Pane::Update (double simt, double syst)
 			}
 			panel2d->RedrawAllAreas (PANEL_REDRAW_ALWAYS);
 		} else if (panel) { // update other panel instruments
+#ifdef _WIN32
 			int idx, aid, mstate, mx, my;
 			panel->GetMouseState (idx, mstate, mx, my);
 			if (mstate) {
 				aid = panel->area[idx]->id;
-				if (g_focusobj->PanelMouseEvent (aid, mstate, mx, my, 0) && (panel->area[idx]->redraw & PANEL_REDRAW_MOUSE))
+				if (orbiter::production::CockpitFocus()->PanelMouseEvent (aid, mstate, mx, my, 0) && (panel->area[idx]->redraw & PANEL_REDRAW_MOUSE))
 					panel->RedrawArea (idx, PANEL_REDRAW_MOUSE);
 				int nmstate = 0;
 				if (panel->area[idx]->mouse & PANEL_MOUSE_LBPRESSED && mstate & (PANEL_MOUSE_LBDOWN | PANEL_MOUSE_LBPRESSED)) nmstate |= PANEL_MOUSE_LBPRESSED;
@@ -593,13 +670,16 @@ void Pane::Update (double simt, double syst)
 				panel->SetMouseState (nmstate);
 			}
 			panel->RedrawAllAreas (PANEL_REDRAW_ALWAYS);
+#else
+		throw std::runtime_error("Native legacy bitmap panels are unavailable");
+#endif
 		} else if (vcockpit) {
 			int idx, aid, mstate;
 			Vector vx;
 			vcockpit->GetMouseState (idx, mstate, vx);
 			if (mstate) {
 				aid = vcockpit->area[idx]->id;
-				if (g_focusobj->VCMouseEvent (aid, mstate, vx) && (vcockpit->area[idx]->redraw & PANEL_REDRAW_MOUSE))
+				if (orbiter::production::CockpitFocus()->VCMouseEvent (aid, mstate, vx) && (vcockpit->area[idx]->redraw & PANEL_REDRAW_MOUSE))
 					vcockpit->RedrawArea (idx, PANEL_REDRAW_MOUSE);
 				int nmstate = 0;
 				if (vcockpit->area[idx]->mouse & PANEL_MOUSE_LBPRESSED && mstate & (PANEL_MOUSE_LBDOWN | PANEL_MOUSE_LBPRESSED)) nmstate |= PANEL_MOUSE_LBPRESSED;
@@ -638,7 +718,7 @@ void Pane::Update (double simt, double syst)
 
 void Pane::Draw ()
 {
-	if (g_camera && !g_camera->IsExternal() && !vcockpit && hud) {
+	if (orbiter::production::CockpitCamera() && !orbiter::production::CockpitCamera()->IsExternal() && !vcockpit && hud) {
 		oapi::Sketchpad *skp = gc->clbkGetSketchpad (0);
 		if (skp) {
 			SetSketchpadDefault (skp);
@@ -652,12 +732,16 @@ void Pane::Draw ()
 void Pane::Render ()
 {
 	// display the generic panel after the GDI updates so that the MFDs end up on top of the HUD
-	if (g_camera->IsInternal()) {
+	if (orbiter::production::CockpitCamera()->IsInternal()) {
 		if (panel2d) {           // 2D instrument panel mode
 			panel2d->Render ();
 			if (hud) hud->Render ();
 		} else if (panel) {      // legacy panel mode
+#ifdef _WIN32
 			panel->Display (0);
+#else
+		throw std::runtime_error("Native legacy bitmap panels are unavailable");
+#endif
 			if (hud) hud->Render ();
 		} else if (defpanel) {   // generic glass cockpit mode
 			if (hud) hud->Render ();
@@ -669,11 +753,13 @@ void Pane::Render ()
 void Pane::Timejump ()
 {
 	int i;
-	DWORD j;
+	oapi::UInt32 j;
 	for (i = 0; i < MAXMFD; i++)
 		if (mfd[i].instr) mfd[i].instr->Timejump();
+#ifdef _WIN32
 	for (j = 0; j < nemfd; j++)
 		if (emfd[j]->instr) emfd[j]->instr->Timejump();
+#endif
 }
 
 void Pane::TriggerRedrawArea (int pid, int vcid, int area_id)
@@ -685,11 +771,15 @@ void Pane::TriggerRedrawArea (int pid, int vcid, int area_id)
 void Pane::TriggerPanelRedrawArea (int pid, int aid)
 {
 	if (panel) {
+#ifdef _WIN32
 		if (panel->GetId() == pid) {
 			int idx = panel->AreaIndex (aid);
 			if (idx >= 0)
 				panel->RedrawArea (idx, PANEL_REDRAW_USER);
 		}
+#else
+		throw std::runtime_error("Native legacy bitmap panels are unavailable");
+#endif
 	} else if (panel2d) {
 		if (panel2d->GetId() == pid) {
 			int idx = panel2d->AreaIndex (aid);
@@ -709,7 +799,7 @@ void Pane::SetPanel2DBlink (VECTOR3 v[4])
 			{(float)v[2].x,(float)v[2].y,0,  0,0,0,  1,0},
 			{(float)v[3].x,(float)v[3].y,0,  0,0,0,  1,1}
 		};
-		WORD idx[6] = {
+		std::uint16_t idx[6] = {
 			0,1,2,  3,2,1
 		};
 		MESHGROUP grp = {vtx, idx, 4, 6, 0, 0, 0, 0, 0};
@@ -722,9 +812,13 @@ void Pane::SetPanel2DBlink (VECTOR3 v[4])
 bool Pane::BltPanelAreaBackground (int aid, SURFHANDLE surf)
 {
 	if (panel) {
+#ifdef _WIN32
 		int idx = panel->AreaIndex (aid);
 		if (idx >= 0)
 			return panel->BltAreaBackground (idx, surf);
+#else
+		throw std::runtime_error("Native legacy bitmap panels are unavailable");
+#endif
 	} else if (vcockpit) {
 		int idx = vcockpit->AreaIndex (aid);
 		if (idx >= 0)
@@ -749,19 +843,19 @@ void Pane::InitResources ()
 
 	hudfont[0] = gc->clbkCreateFont (-h, false, "Fixed");
 	hudfont[1] = gc->clbkCreateFont (f2H, true, "Sans");
-	hudpen  = gc->clbkCreatePen (1, 0, RGB(0,255,0));
+	hudpen  = gc->clbkCreatePen (1, 0, orbiter::production::CockpitColor(0,255,0));
 
-	DWORD charsize;
+	oapi::UInt32 charsize;
 	if (skp) {
 		skp->SetFont (hudfont[0]);
 		charsize = skp->GetCharSize ();
-		f1W = HIWORD(charsize);
-		f1H = LOWORD(charsize);
+		f1W = orbiter::production::CockpitHighWord(charsize);
+		f1H = orbiter::production::CockpitLowWord(charsize);
 		scaleW = f1W * 10;
 		skp->SetFont (hudfont[1]);
 		charsize = skp->GetCharSize ();
-		f2W = HIWORD(charsize);
-		f2H = LOWORD(charsize);
+		f2W = orbiter::production::CockpitHighWord(charsize);
+		f2H = orbiter::production::CockpitLowWord(charsize);
 		gc->clbkReleaseSketchpad (skp);
 	} else {
 		f1W = f1H = 0;
@@ -788,7 +882,7 @@ void Pane::InitResources ()
 		{ofsx+boxw,ofsy,0, 0,0,0, 16*lineh/texw,(texh-8*lineh-2)/texh},
 		{ofsx+boxw,ofsy+boxh,0, 0,0,0, 16*lineh/texw,(texh-4*lineh-2)/texh}
 	};
-	WORD idx[nidx] = {0,2,1, 2,3,1, 4,6,5, 6,7,5};
+	std::uint16_t idx[nidx] = {0,2,1, 2,3,1, 4,6,5, 6,7,5};
 	infoMesh.AddGroup (vtx, nvtx, idx, nidx, 0, 0, 0, 0, true);
 #endif
 }
@@ -804,14 +898,14 @@ void Pane::FreeResources ()
 
 void Pane::SetSketchpadDefault (oapi::Sketchpad *skp)
 {
-	skp->SetTextColor (RGB(0,255,0));
+	skp->SetTextColor (orbiter::production::CockpitColor(0,255,0));
 	skp->SetPen (hudpen);
 	skp->SetFont (hudfont[0]);
 }
 
 bool Pane::GlobalToScreen (const Vector &glob, int &x, int &y) const
 {
-	D3DVECTOR homog;
+	orbiter::production::CockpitPoint homog;
 	bool vis = GlobalToHomog (glob, homog);
 	if (vis) {
 		x = (int)(W*0.5*(1.0f+homog.x));
@@ -822,7 +916,7 @@ bool Pane::GlobalToScreen (const Vector &glob, int &x, int &y) const
 
 bool Pane::GlobalToScreen (const Vector &glob, double &x, double &y) const
 {
-	D3DVECTOR homog;
+	orbiter::production::CockpitPoint homog;
 	bool vis = GlobalToHomog (glob, homog);
 	if (vis) {
 		x = W*0.5*(1.0f+homog.x);
@@ -831,33 +925,51 @@ bool Pane::GlobalToScreen (const Vector &glob, double &x, double &y) const
 	return vis;
 }
 
-bool Pane::GlobalToHomog (const Vector &glob, D3DVECTOR &homog) const
+#ifdef _WIN32
+bool Pane::GlobalToHomog (const Vector &glob, orbiter::production::CockpitPoint &homog) const
 {
-	//D3DVECTOR gpos = {-(D3DVALUE)glob.x, -(D3DVALUE)glob.y, -(D3DVALUE)glob.z};
-	D3DVECTOR gpos = {(D3DVALUE)glob.x, (D3DVALUE)glob.y, (D3DVALUE)glob.z};
-	return (D3DMath_VectorMatrixMultiply (homog, gpos, *g_camera->D3D_ProjViewMatrix()) == S_OK &&
+	//orbiter::production::CockpitPoint gpos = {-(D3DVALUE)glob.x, -(D3DVALUE)glob.y, -(D3DVALUE)glob.z};
+	orbiter::production::CockpitPoint gpos = {(D3DVALUE)glob.x, (D3DVALUE)glob.y, (D3DVALUE)glob.z};
+	return (D3DMath_VectorMatrixMultiply (homog, gpos, *orbiter::production::CockpitCamera()->D3D_ProjViewMatrix()) == S_OK &&
 		homog.x >= -1.0f && homog.x <= 1.0f &&
 		homog.y >= -1.0f && homog.y <= 1.0f &&
-		/* homog.z >=  0.0 && */ homog.z <= g_camera->HomogZlimit());
+		/* homog.z >=  0.0 && */ homog.z <= orbiter::production::CockpitCamera()->HomogZlimit());
 }
+#else
+bool Pane::GlobalToHomog (const Vector &glob, orbiter::production::CockpitPoint &homog) const
+{
+    return orbiter::production::ProjectCockpitDirection(*orbiter::production::CockpitCamera(),glob,homog);
+}
+#endif
 
+#ifdef _WIN32
 void Pane::ScreenToGlobal (int x, int y, Vector &glob) const
 {
-	D3DVECTOR homog, gpos;
+	orbiter::production::CockpitPoint homog, gpos;
 	homog.x = (float)(x*2.0/W-1.0);
 	homog.y = (float)(1.0-y*2.0/H);
 	homog.z = 0.0f;
 	D3DMATRIX IP;
-	D3DMath_MatrixInvert (IP, *g_camera->D3D_ProjViewMatrix());
+	D3DMath_MatrixInvert (IP, *orbiter::production::CockpitCamera()->D3D_ProjViewMatrix());
 	D3DMath_VectorMatrixMultiply (gpos, homog, IP);
-	//D3DMath_VectorTMatrixMultiply (gpos, homog, *g_camera->D3D_ProjViewMatrix());
+	//D3DMath_VectorTMatrixMultiply (gpos, homog, *orbiter::production::CockpitCamera()->D3D_ProjViewMatrix());
 	glob.Set (-gpos.x, -gpos.y, -gpos.z);
 	glob.unify();
 }
-
-bool Pane::OpenMFD (INT_PTR id, int type, ifstream *ifs)
+#else
+void Pane::ScreenToGlobal (int x,int y,Vector &glob) const
 {
+    orbiter::production::CockpitCamera()->ViewportToGlobalDir(x,y,glob);
+}
+#endif
+
+bool Pane::OpenMFD (std::intptr_t id, int type, ifstream *ifs)
+{
+#ifdef _WIN32
 	if (id >= MAXMFD || id < 0) return ((ExternMFD*)id)->SetMode (type);
+#else
+	if (id >= MAXMFD || id < 0) throw std::invalid_argument("Native MFD index is outside the stock cockpit");
+#endif
 	if (panelmode == 1 && id >= 2) return false;
 	if (panelmode == 2 && !mfd[id].exist) return false;
 
@@ -870,12 +982,16 @@ bool Pane::OpenMFD (INT_PTR id, int type, ifstream *ifs)
 		break;
 	case 2:
 		if (panel) {
+#ifdef _WIN32
 			panel->MFDSize (id, spec.w, spec.h);
 			spec.nbtl  = mfd[id].prm.nbt1;
 			spec.nbtr  = mfd[id].prm.nbt2;
 			spec.bt_y0 = (int)(panel->GetScale()*mfd[id].prm.bt_yofs+0.5);
 			spec.bt_dy = (int)(panel->GetScale()*mfd[id].prm.bt_ydist+0.5);
 			spec.flag = mfd[id].prm.flag;
+#else
+		throw std::runtime_error("Native legacy bitmap panels are unavailable");
+#endif
 		} else if (panel2d) {
 			spec = panel2d->GetMFDSpec(id);
 		}
@@ -902,8 +1018,8 @@ bool Pane::OpenMFD (INT_PTR id, int type, ifstream *ifs)
 	Instrument *newinstr = 0;
 	if (ifs || type != MFD_NONE) {
 		newinstr = (ifs ? 
-			Instrument::Create (*ifs, this, id, spec, g_focusobj) :
-			Instrument::Create (type, this, id, spec, g_focusobj) );
+			Instrument::Create (*ifs, this, id, spec, orbiter::production::CockpitFocus()) :
+			Instrument::Create (type, this, id, spec, orbiter::production::CockpitFocus()) );
 		if (!newinstr) return false; // no mode found
 	}
 
@@ -912,7 +1028,7 @@ bool Pane::OpenMFD (INT_PTR id, int type, ifstream *ifs)
 		delete mfd[id].instr;
 	}
 	mfd[id].instr = newinstr;
-	g_focusobj->MFDchanged (id, type);
+	orbiter::production::CockpitFocus()->MFDchanged (id, type);
 	if (defpanel) defpanel->MFDModeChanged(id, type); //defpanel->RepaintMFDButtons (id);
 
 	return true;
@@ -951,7 +1067,7 @@ bool Pane::CloseMFD (int id)
 	mfd[id].lastmode = mfd[id].instr->Type();
 	delete mfd[id].instr;
 	mfd[id].instr = 0;
-	g_focusobj->MFDchanged (id, MFD_NONE);
+	orbiter::production::CockpitFocus()->MFDchanged (id, MFD_NONE);
 	return true;
 }
 
@@ -968,9 +1084,11 @@ int Pane::BroadcastMFDMessage (int mfdmode, int msg, void *data)
 	for (int i = 0; i < MAXMFD; i++)
 		if (mfd[i].instr && mfd[i].instr->Type() == mfdmode)
 			if (mfd[i].instr->ProcessMessage (msg, data)) nproc++;
-	for (DWORD j = 0; j < nemfd; j++)
+#ifdef _WIN32
+	for (oapi::UInt32 j = 0; j < nemfd; j++)
 		if (emfd[j]->Active() && emfd[j]->instr->Type() == mfdmode)
 			if (emfd[j]->instr->ProcessMessage (msg, data)) nproc++;
+#endif
 	return nproc;
 }
 
@@ -980,20 +1098,24 @@ int Pane::BroadcastMFDMessage (int msg, void *data)
 	for (int i = 0; i < MAXMFD; i++)
 		if (mfd[i].instr)
 			if (mfd[i].instr->ProcessMessage (msg, data)) nproc++;
-	for (DWORD j = 0; j < nemfd; j++)
+#ifdef _WIN32
+	for (oapi::UInt32 j = 0; j < nemfd; j++)
 		if (emfd[j]->Active())
 			if (emfd[j]->instr->ProcessMessage (msg, data)) nproc++;
+#endif
 	return nproc;
 }
 
-void Pane::OptionChanged(DWORD cat, DWORD item)
+void Pane::OptionChanged(oapi::UInt32 cat, oapi::UInt32 item)
 {
 	if (cat == OPTCAT_INSTRUMENT) {
 		if (item == OPTITEM_INSTRUMENT_MFDVCSIZE)
 			mfd_vc_size = orbiter::production::CockpitConfiguration()->CfgInstrumentPrm.VCMFDSize;
+#ifdef _WIN32
 		for (size_t i = 0; i < nemfd; i++)
 			if (emfd[i]->Active())
 				emfd[i]->instr->OptionChanged(cat, item);
+#endif
 		if (defpanel)
 			defpanel->OptionChanged(cat, item);
 		if (vcockpit)
@@ -1017,7 +1139,9 @@ void Pane::RegisterMFD (int id, const MFDSPEC &spec)
 	mfd[id].prm.nbt2     = spec.nbt_right;
 	mfd[id].prm.bt_yofs  = spec.bt_yofs;
 	mfd[id].prm.bt_ydist = spec.bt_ydist;
+#ifdef _WIN32
 	if (panel) panel->RegisterMFD (id, spec);
+#endif
 }
 
 void Pane::RegisterMFD (int id, const EXTMFDSPEC *spec)
@@ -1039,6 +1163,7 @@ void Pane::UnregisterMFD (int id)
 	}
 }
 
+#ifdef _WIN32
 void Pane::RegisterExternMFD (ExternMFD *mfd, const MFDSPEC &spec)
 {
 	ExternMFD **tmp = new ExternMFD*[nemfd+1]; TRACENEW
@@ -1050,7 +1175,7 @@ void Pane::RegisterExternMFD (ExternMFD *mfd, const MFDSPEC &spec)
 	emfd[nemfd] = mfd;
 
 //	// find a unique identifier
-//	DWORD i;
+//	oapi::UInt32 i;
 //	emfd[nemfd]->id = maxMFD;
 //	for (i = 0; i < nemfd; i++)
 //		if (emfd[i]->id >= emfd[nemfd]->id)
@@ -1059,18 +1184,25 @@ void Pane::RegisterExternMFD (ExternMFD *mfd, const MFDSPEC &spec)
 	mfd->SetMode (MFD_ORBIT); // temporary!!!
 	nemfd++;
 }
+#else
+void Pane::RegisterExternMFD (ExternMFD*, const MFDSPEC&) {throw std::runtime_error("Native external MFD plugins are unavailable");}
+#endif
 
+#ifdef _WIN32
 bool Pane::UnregisterExternMFD (ExternMFD *mfd)
 {
-	DWORD i, j, k;
+	oapi::UInt32 i, j, k;
+#ifdef _WIN32
 	for (i = 0; i < nemfd; i++) {
 		if (emfd[i] == mfd) {
 			delete emfd[i];
 			ExternMFD **tmp;
 			if (nemfd > 1) {
 				tmp = new ExternMFD*[nemfd-1]; TRACENEW
+#ifdef _WIN32
 				for (j = k = 0; j < nemfd; j++)
 					if (j != i) tmp[k++] = emfd[j];
+#endif
 			} else {
 				tmp = 0;
 			}
@@ -1080,18 +1212,24 @@ bool Pane::UnregisterExternMFD (ExternMFD *mfd)
 			return true;
 		}
 	}
+#endif
 	return false;
 }
+#else
+bool Pane::UnregisterExternMFD (ExternMFD*) {throw std::runtime_error("Native external MFD plugins are unavailable");}
+#endif
 
 Instrument *Pane::MFD (int which)
 {
 	if (which >= 0 && which < MAXMFD)
 		return mfd[which].instr;
-	for (DWORD i = 0; i < nemfd; i++) {
+#ifdef _WIN32
+	for (oapi::UInt32 i = 0; i < nemfd; i++) {
 		assert(false); // This code section doesn't seem to run. If it does that's trouble
-		if (which == (INT_PTR)emfd[i]->Id())
+		if (which == (std::intptr_t)emfd[i]->Id())
 			return emfd[i]->instr;
 	}
+#endif
 	return NULL;
 }
 
@@ -1146,7 +1284,7 @@ const VCMFDSPEC *Pane::GetVCMFDParams (int id)
 	//return (mfd[id].exist ? mfd[id].vcs : 0);
 }
 
-void Pane::RegisterVCArea (int id, const RECT &tgtrect, int draw_mode, int mouse_mode, int bkmode, SURFHANDLE tgt)
+void Pane::RegisterVCArea (int id, const oapi::SdkRectangle &tgtrect, int draw_mode, int mouse_mode, int bkmode, SURFHANDLE tgt)
 {
 	if (vcockpit) vcockpit->DefineArea (id, tgtrect, draw_mode, mouse_mode, bkmode, tgt);
 }
@@ -1177,43 +1315,57 @@ Instrument::Spec Pane::GetVCMFDSpec ()
 	return spec;
 }
 
-void Pane::RepaintMFDButtons (INT_PTR id, Instrument *instr)
+void Pane::RepaintMFDButtons (std::intptr_t id, Instrument *instr)
 {
 	if (id < MAXMFD && id >= 0 && instr == mfd[id].instr) {
-		if (panelmode >= 1) g_focusobj->MFDchanged (id, mfd[id].instr->Type());
+		if (panelmode >= 1) orbiter::production::CockpitFocus()->MFDchanged (id, mfd[id].instr->Type());
 		if (defpanel) defpanel->RepaintMFDButtons (id);
 	} else {
 		// check if external MFDs actually need to be repainted here
-		for (DWORD i = 0; i < nemfd; i++) {
+#ifdef _WIN32
+		for (oapi::UInt32 i = 0; i < nemfd; i++) {
 			if (emfd[i]->instr == instr) {
 				emfd[i]->clbkRefreshButtons();
 				break;
 			}
 		}
+#endif
 	}
 }
 
-void Pane::RegisterPanelBackground (HBITMAP hBmp, DWORD flag, DWORD ck)
+#ifdef _WIN32
+void Pane::RegisterPanelBackground (HBITMAP hBmp, oapi::UInt32 flag, oapi::UInt32 ck)
 {
 	if (panel) panel->DefineBackground (hBmp, flag, ck);
 	DeleteObject ((HGDIOBJ)hBmp);
 }
+#endif
 
-void Pane::RegisterPanelBackground (SURFHANDLE hSurf, DWORD flag)
+#ifdef _WIN32
+void Pane::RegisterPanelBackground (SURFHANDLE hSurf, oapi::UInt32 flag)
 {
 	// todo
 }
+#else
+void Pane::RegisterPanelBackground (SURFHANDLE, oapi::UInt32) {throw std::runtime_error("Native legacy bitmap panels are unavailable");}
+#endif
 
-void Pane::RegisterPanelArea (int aid, const RECT &pos, int draw_mode, int mouse_mode, int bkmode)
+#ifdef _WIN32
+void Pane::RegisterPanelArea (int aid, const oapi::SdkRectangle &pos, int draw_mode, int mouse_mode, int bkmode)
 {
 	/*if      (panel2d) panel2d->DefineArea (aid, pos, draw_mode, mouse_mode, bkmode);
 	else*/ if (panel)   panel->DefineArea (aid, pos, draw_mode, mouse_mode, bkmode);
 }
+#else
+void Pane::RegisterPanelArea (int,const oapi::SdkRectangle&,int,int,int) {throw std::runtime_error("Native legacy bitmap panels are unavailable");}
+#endif
 
 void Pane::SetPanelNeighbours (int left, int right, int top, int bottom)
 {
 	if      (panel2d) panel2d->SetConnections (left, right, top, bottom);
+#ifdef _WIN32
 	else if (panel)   panel->SetConnections (left, right, top, bottom);
+#endif
 }
 
 void Pane::SetVCNeighbours (int left, int right, int top, int bottom)
@@ -1231,9 +1383,13 @@ bool Pane::Read (ifstream &ifs)
 {
 	if (hud = HUD::Create (ifs, this, gc)) {
 		hudmode = hud->Mode();
-		if (g_focusobj) g_focusobj->HUDchanged (hudmode);
+		if (orbiter::production::CockpitFocus()) orbiter::production::CockpitFocus()->HUDchanged (hudmode);
 	}
+#ifdef _WIN32
 	if (Panel::Read (ifs)) {
+#else
+	if (FindLine (ifs, "BEGIN_PANEL")) {
+#endif
 		SetPanelMode (2);
 	} else if (VirtualCockpit::Read (ifs)) {
 		SetPanelMode (3);
@@ -1260,8 +1416,12 @@ void Pane::Write (ostream &ofs) const
 		ofs << endl;
 	}
 	if (panel) {
+#ifdef _WIN32
 		panel->Write (ofs);
 		ofs << endl;
+#else
+		throw std::runtime_error("Native legacy bitmap panels are unavailable");
+#endif
 	}
 	if (vcockpit) {
 		vcockpit->Write (ofs);

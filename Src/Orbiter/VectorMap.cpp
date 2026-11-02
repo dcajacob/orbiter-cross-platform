@@ -65,7 +65,7 @@ VectorMap::~VectorMap ()
 {
 	if(hMap)
 		oapiDestroySurface(hMap);
-
+	CloseGDIResources();
 }
 
 // =======================================================================

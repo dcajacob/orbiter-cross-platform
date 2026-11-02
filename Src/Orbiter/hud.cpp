@@ -5,24 +5,47 @@
 
 #include "Production/CockpitServices.h"
 #include "Astro.h"
+#ifndef _WIN32
+#include "Base.h"
+#include "Nav.h"
+#endif
 #include "hud.h"
 #include "Pane.h"
+#include "Production/CockpitProjection.h"
 #include "VCockpit.h"
 #include "Camera.h"
 #include "Psys.h"
 #include "Pane.h"
+#ifdef _WIN32
 #include "Log.h"
+#else
+#include "Production/CockpitNativeSupport.h"
+#endif
 #include <fstream>
 
 using namespace std;
 
+#ifdef _WIN32
 extern Orbiter *g_pOrbiter;
+#endif
+#ifdef _WIN32
 extern Camera *g_camera;
+#endif
+#ifdef _WIN32
 extern Vessel *g_focusobj;
+#endif
+#ifdef _WIN32
 extern PlanetarySystem *g_psys;
+#endif
+#ifdef _WIN32
 extern Pane *g_pane;
+#endif
+#ifdef _WIN32
 extern InputBox *g_input;
+#endif
+#ifdef _WIN32
 extern char DBG_MSG[256];
+#endif
 
 const double MAXALT_HUD = 1e15; // make user-selectable
 
@@ -34,7 +57,7 @@ void BoxCoord (const Vector &dockpos, const Vector &dockdir,
 
 static double hudtexw = 512.0;
 static double hudtexh = 256.0;
-static WORD rectidx[6] = {0,2,1, 2,3,1};
+static std::uint16_t rectidx[6] = {0,2,1, 2,3,1};
 
 Mesh HUD::hudMesh;
 
@@ -82,22 +105,22 @@ SURFHANDLE HUD::LoadTexture (int idx)
 void HUD::Draw (oapi::Sketchpad *skp)
 {
 	static const double onedeg = tan (RAD*1.0);
-	if (g_camera->IsExternal()) return; // nothing to do
+	if (orbiter::production::CockpitCamera()->IsExternal()) return; // nothing to do
 
 	if (bVC) {
-		HUDofs.Set ((VCcnt - g_camera->CockpitPos()) * VCscale);
+		HUDofs.Set ((VCcnt - orbiter::production::CockpitCamera()->CockpitPos()) * VCscale);
 		spec.Scale = HUDofs.z * onedeg;
 	} else {
-		spec.Scale = g_camera->Scale() * onedeg;
+		spec.Scale = orbiter::production::CockpitCamera()->Scale() * onedeg;
 	}
 
 	// Determine HUD centre coordinates
-	if (bVC || g_camera->IsCockpitForward()) {
+	if (bVC || orbiter::production::CockpitCamera()->IsCockpitForward()) {
 		spec.CX = HRES05 - (int)HUDofs.x, spec.CY = VRES05 + (int)HUDofs.y;
 		bCNTvis = (spec.CX >= 0 && spec.CX < spec.W && spec.CY >= 0 && spec.CY < spec.H);
 	} else {
-		D3DVECTOR homog;
-		bCNTvis = pane->GlobalToHomog (mul (g_focusobj->GRot(), Vector(0,0,1)), homog);
+		orbiter::production::CockpitPoint homog;
+		bCNTvis = pane->GlobalToHomog (mul (orbiter::production::CockpitFocus()->GRot(), Vector(0,0,1)), homog);
 		if (bCNTforward = (homog.z > 0.0)) {
 			spec.CX = (int)(HRES05*(1.0f+homog.x));
 			spec.CY = (int)(VRES05*(1.0f-homog.y));
@@ -110,7 +133,7 @@ void HUD::Draw (oapi::Sketchpad *skp)
 	skp->SetFont (font);
 	skp->SetPen (pane->hudpen);
 	skp->SetTextColor (pane->hudCol);
-	g_focusobj->DrawHUD (this, skp);
+	orbiter::production::CockpitFocus()->DrawHUD (this, skp);
 }
 
 void HUD::DrawDefault (oapi::Sketchpad *skp)
@@ -131,11 +154,11 @@ void HUD::RenderDefault ()
 	if (ivtx && iidx) {
 		static MATRIX3 transf = {1,-0.5,0, 0,1,-0.5, 0,0,1};
 		GroupSpec *gs = hudMesh.GetGroup(0);
-		DWORD nvtx = gs->nVtx;
-		DWORD nidx = gs->nIdx;
+		oapi::UInt32 nvtx = gs->nVtx;
+		oapi::UInt32 nidx = gs->nIdx;
 		gs->nVtx = ivtx;
 		gs->nIdx = iidx;
-		float intens = (float)g_pane->HudIntens();
+		float intens = (float)orbiter::production::CockpitPane()->HudIntens();
 		gc->clbkRender2DPanel (&hudTex, (MESHHANDLE)&hudMesh, &transf, intens, transp);
 		gs->nVtx = nvtx;
 		gs->nIdx = nidx;
@@ -145,7 +168,7 @@ void HUD::RenderDefault ()
 void HUD::RenderCustom (MESHHANDLE hMesh, SURFHANDLE *hTex)
 {
 	static MATRIX3 transf = {1,-0.5,0, 0,1,-0.5, 0,0,1};
-	float intens = (float)g_pane->HudIntens();
+	float intens = (float)orbiter::production::CockpitPane()->HudIntens();
 	gc->clbkRender2DPanel (hTex, hMesh, &transf, intens, transp);
 }
 
@@ -154,12 +177,12 @@ void HUD::Render ()
 	if (bVC) return;   // don't use render method in VC
 
 	// Determine HUD centre coordinates
-	if (g_camera->IsCockpitForward()) {
+	if (orbiter::production::CockpitCamera()->IsCockpitForward()) {
 		spec.CX = HRES05 - (int)HUDofs.x, spec.CY = VRES05 + (int)HUDofs.y;
 		bCNTvis = (spec.CX >= 0 && spec.CX < spec.W && spec.CY >= 0 && spec.CY < spec.H);
 	} else {
-		D3DVECTOR homog;
-		bCNTvis = pane->GlobalToHomog (mul (g_focusobj->GRot(), Vector(0,0,1)), homog);
+		orbiter::production::CockpitPoint homog;
+		bCNTvis = pane->GlobalToHomog (mul (orbiter::production::CockpitFocus()->GRot(), Vector(0,0,1)), homog);
 		if (bCNTforward = (homog.z > 0.0)) {
 			spec.CX = (int)(HRES05*(1.0f+homog.x));
 			spec.CY = (int)(VRES05*(1.0f-homog.y));
@@ -168,7 +191,7 @@ void HUD::Render ()
 			spec.CY = -10000;
 		}
 	}
-	g_focusobj->RenderHUD (this, Mode(), &spec, hudTex);
+	orbiter::production::CockpitFocus()->RenderHUD (this, Mode(), &spec, hudTex);
 }
 
 void HUD::Resize (bool isVC)
@@ -195,7 +218,7 @@ void HUD::Resize (bool isVC)
 		VRES05 = (spec.H = pane->H)/2;
 		ladder_width = 0.12*spec.W;
 		ladder_range = 0.43*spec.H;
-		HUDofs.Set (0, 0, g_camera->Scale());
+		HUDofs.Set (0, 0, orbiter::production::CockpitCamera()->Scale());
 		spec.Markersize = max(20,spec.H/25); // spec.W/40;
 		boxx = spec.Markersize*10; //HRES05 >> 1;
 		h = spec.H/50;
@@ -210,14 +233,14 @@ void HUD::Resize (bool isVC)
 
 	if (bVC) {
 		SURFHANDLE hudsurf = pane->GetVC()->GetHUDSurf();
-		oapi::CockpitClient *gc = g_pOrbiter->GetGraphicsClient();
+		oapi::CockpitClient *gc = orbiter::production::CockpitGraphicsClient();
 		if (gc) {
 			oapi::Sketchpad *skp = gc->clbkGetSketchpad (hudsurf);
 			if (skp) {
 				skp->SetFont (font);
-				DWORD charsize = skp->GetCharSize();
-				fW = HIWORD(charsize);
-				fH = LOWORD(charsize);
+				oapi::UInt32 charsize = skp->GetCharSize();
+				fW = orbiter::production::CockpitHighWord(charsize);
+				fH = orbiter::production::CockpitLowWord(charsize);
 				gc->clbkReleaseSketchpad (skp);
 			}
 		}
@@ -248,10 +271,10 @@ GroupSpec *HUD::EnsureMeshBuffer(int grp, int nvtx, int nidx)
 		gs->nVtx = nvtx;
 	}
 	if (gs->nIdx < nidx) {
-		WORD *idx = new WORD[nidx];
-		memset(idx, 0, nidx*sizeof(WORD));
+		std::uint16_t *idx = new std::uint16_t[nidx];
+		memset(idx, 0, nidx*sizeof(std::uint16_t));
 		if (gs->nIdx) {
-			memcpy (idx, gs->Idx, gs->nIdx*sizeof(WORD));
+			memcpy (idx, gs->Idx, gs->nIdx*sizeof(std::uint16_t));
 			delete []gs->Idx;
 		}
 		gs->Idx = idx;
@@ -415,8 +438,8 @@ void HUD::AddMesh_DirectionMarker (int &ivtx, int &iidx, const Vector &dir, bool
 	double rad = dy*4.0;
 
 	Vector d;
-	if (bVC) d.Set (tmul (g_focusobj->GRot(), dir));
-	else     d.Set (tmul (g_camera->GRot(), dir));
+	if (bVC) d.Set (tmul (orbiter::production::CockpitFocus()->GRot(), dir));
+	else     d.Set (tmul (orbiter::production::CockpitCamera()->GRot(), dir));
 	double len = std::hypot (d.x, d.y);
 	if (!len) return;
 	double cosa = d.y/len, sina = -d.x/len;
@@ -570,9 +593,9 @@ void HUD::AddMesh_LadderBar (int &ivtx, int &iidx, double sina, double cosa,
 		if (lab) {
 			static const int nvtx = 22;
 			static const int nidx = 36;
-			static WORD idx1[nidx] = {0,1,2, 2,1,3, 2,3,4, 4,3,5,  6,8,7, 8,9,7, 10,12,11, 12,13,11, 14,16,15, 16,17,15,  18,20,19, 20,21,19};
-			static WORD idx2[nidx] = {0,2,1, 2,3,1, 2,4,3, 4,5,3,  6,8,7, 8,9,7, 10,12,11, 12,13,11, 14,16,15, 16,17,15,  18,20,19, 20,21,19};
-			WORD *idx;
+			static std::uint16_t idx1[nidx] = {0,1,2, 2,1,3, 2,3,4, 4,3,5,  6,8,7, 8,9,7, 10,12,11, 12,13,11, 14,16,15, 16,17,15,  18,20,19, 20,21,19};
+			static std::uint16_t idx2[nidx] = {0,2,1, 2,3,1, 2,4,3, 4,5,3,  6,8,7, 8,9,7, 10,12,11, 12,13,11, 14,16,15, 16,17,15,  18,20,19, 20,21,19};
+			std::uint16_t *idx;
 			double x0, x2l, x3l, x4l, x2r, x3r, x4r, y0, y1, y2;
 			x0 = scal*120.0;
 			x2l = -scal*160.0, x3l = -scal*150.0, x4l = -scal*130.0;
@@ -683,7 +706,7 @@ void HUD::AddMesh_HeadingTape (int &ivtx, int &iidx, double hdg, bool marker, do
 	const int nvtx = 8 + 6*4;
 	const int nidx = 12 + 6*6;
 	const double range05 = 30; // half-range in deg
-	const WORD idx[nidx] = {
+	const std::uint16_t idx[nidx] = {
 		0,2,1, 2,3,1, 4,6,5, 6,7,5, // tape
 		8,10,9, 10,11,9, 12,14,13, 14,15,13, 16,18,17, 18,19,17, 20,22,21, 22,23,21, 24,26,25, 26,27,25, 28,30,29, 30,31,29 // labels
 	};
@@ -738,7 +761,7 @@ void HUD::AddMesh_HeadingTape (int &ivtx, int &iidx, double hdg, bool marker, do
 	if (marker) {
 		const int nvtx = 4;
 		const int nidx = 6;
-		static const WORD idx[nidx] = {0,2,1, 2,3,1};
+		static const std::uint16_t idx[nidx] = {0,2,1, 2,3,1};
 		gs = EnsureMeshBuffer (0, ivtx+nvtx, iidx+nidx);
 		double ddir = markerhdg-hdg;
 		while (fabs(ddir) > 180.0) {
@@ -782,7 +805,7 @@ void HUD::AddMesh_AzimuthTape (int &ivtx, int &iidx, double phi, double alpha)
 {
 	static double step = tan (Rad(2.0));          // 2deg tick separation
 	double cosa = cos(alpha), sina = sin(alpha);
-	double d = g_camera->Scale() * step;          // tick separation (pixel)
+	double d = orbiter::production::CockpitCamera()->Scale() * step;          // tick separation (pixel)
 	if (d < ladder_range*0.01)
 		return;            // don't draw if ticks are too close
 
@@ -938,7 +961,7 @@ void HUD::AddMesh_DockApproachGates (int &ivtx, int &iidx, const Body *tgt, cons
 	int i, j;
 	double x[16], y[16], dx1, dy1, dx2, dy2, rx, ry;
 	double linew = renderprm.scal*3;
-	Vector dpos (mul (tgt->GRot(), ps->ref) + tgt->GPos() - g_camera->GPos());
+	Vector dpos (mul (tgt->GRot(), ps->ref) + tgt->GPos() - orbiter::production::CockpitCamera()->GPos());
 	Vector ddir (mul (tgt->GRot(), -ps->dir));
 	Vector ydir (mul (tgt->GRot(), ps->rot));
 	Vector p[4];
@@ -957,8 +980,8 @@ void HUD::AddMesh_DockApproachGates (int &ivtx, int &iidx, const Body *tgt, cons
 	GroupSpec *gs = EnsureMeshBuffer (0, ivtx+nvtx, iidx+nidx);
 	const float tu = (float)(2.0/hudtexw);
 	const float tv = (float)(109.0/hudtexh);
-	const WORD boxidx1[30] = {0,1,4, 1,5,4, 6,7,3, 7,2,3, 4,8,6, 8,11,6, 9,5,10, 5,7,10, 12,13,15, 13,14,15};
-	const WORD boxidx2[30] = {0,4,1, 1,4,5, 6,3,7, 7,3,2, 4,6,8, 8,6,11, 9,10,5, 5,10,7, 12,15,13, 13,15,14};
+	const std::uint16_t boxidx1[30] = {0,1,4, 1,5,4, 6,7,3, 7,2,3, 4,8,6, 8,11,6, 9,5,10, 5,7,10, 12,13,15, 13,14,15};
+	const std::uint16_t boxidx2[30] = {0,4,1, 1,4,5, 6,3,7, 7,3,2, 4,6,8, 8,6,11, 9,10,5, 5,10,7, 12,15,13, 13,15,14};
 	NTVERTEX *vtx = gs->Vtx+ivtx;
 	bool need_setup = true;
 	for (i = 0; i < 10; i++) {
@@ -1118,7 +1141,7 @@ void HUD::DrawTiltedRibbon (oapi::Sketchpad *skp, double phi, double alpha)
 {
 	static double step = tan (Rad(2.0));   // 2deg tick separation
 	double cosa = cos(alpha), sina = sin(alpha);
-	double d   = (bVC ? HUDofs.z : g_camera->Scale()) * step;      // tick separation (pixel)
+	double d   = (bVC ? HUDofs.z : orbiter::production::CockpitCamera()->Scale()) * step;      // tick separation (pixel)
 	if (d < ladder_range*0.01) return;
 	double s   = ladder_width * 0.094; // major tick size                    
 	int    dsx = (int)(s*sina);
@@ -1171,7 +1194,7 @@ bool HUD::GlobalToHUD (const Vector &dir, int &x, int &y) const
 	bool vis;
 
 	if (bVC) {
-		Vector ldir = tmul (g_focusobj->GRot(), dir);
+		Vector ldir = tmul (orbiter::production::CockpitFocus()->GRot(), dir);
 		if (ldir.z <= 0.0) vis = false;
 		else {
 			double fac = HUDofs.z/ldir.z;
@@ -1190,7 +1213,7 @@ bool HUD::GlobalToHUD (const Vector &dir, double &x, double &y) const
 	bool vis;
 
 	if (bVC) {
-		Vector ldir = tmul (g_focusobj->GRot(), dir);
+		Vector ldir = tmul (orbiter::production::CockpitFocus()->GRot(), dir);
 		if (ldir.z <= 0.0) vis = false;
 		else {
 			double fac = HUDofs.z/ldir.z;
@@ -1228,9 +1251,9 @@ oapi::IVECTOR2 *HUD::OffscreenDirMarker (const Vector &dir) const
 	static oapi::IVECTOR2 pt[4];
 	Vector d;
 	if (bVC) {
-		d.Set (tmul (g_focusobj->GRot(), dir));
+		d.Set (tmul (orbiter::production::CockpitFocus()->GRot(), dir));
 	} else {
-		d.Set (tmul (g_camera->GRot(), dir));
+		d.Set (tmul (orbiter::production::CockpitCamera()->GRot(), dir));
 	}
 	double len = std::hypot (d.y, d.x);
 	double scale = spec.Markersize * 0.6;
@@ -1255,12 +1278,12 @@ HUD *HUD::Create (ifstream &ifs, const Pane *_pane, oapi::CockpitClient *gc)
 	for (;hud == 0;) {
 		if (!ifs.getline (cbuf, 256)) return 0;
 		pc = trim_string (cbuf);
-		if (!_strnicmp (pc, "END_HUD", 7)) return 0;
-		if (!_strnicmp (pc, "TYPE", 4)) {
+		if (!orbiter::production::ComparePrefix (pc, "END_HUD", 7)) return 0;
+		if (!orbiter::production::ComparePrefix (pc, "TYPE", 4)) {
 			pc = trim_string (pc+4);
-			if (!_strnicmp (pc, "Orbit", 5)) { hud = new HUD_Orbit (_pane); TRACENEW }
-			else if (!_strnicmp (pc, "Surface", 7)) { hud = new HUD_Surface (_pane); TRACENEW }
-			else if (!_strnicmp (pc, "Docking", 7)) { hud = new HUD_Docking (_pane); TRACENEW }
+			if (!orbiter::production::ComparePrefix (pc, "Orbit", 5)) { hud = new HUD_Orbit (_pane); TRACENEW }
+			else if (!orbiter::production::ComparePrefix (pc, "Surface", 7)) { hud = new HUD_Surface (_pane); TRACENEW }
+			else if (!orbiter::production::ComparePrefix (pc, "Docking", 7)) { hud = new HUD_Docking (_pane); TRACENEW }
 		}
 	}
 	if (hud) hud->ReadParams (ifs);
@@ -1283,7 +1306,7 @@ HUD_Orbit::HUD_Orbit (const Pane *_pane)
 : HUD (_pane)
 {
 	// restore status
-	if (saveprm.vessel == g_focusobj) {
+	if (saveprm.vessel == orbiter::production::CockpitFocus()) {
 		ref = saveprm.ref;
 	} else {
 		ref = 0;
@@ -1295,7 +1318,7 @@ HUD_Orbit::HUD_Orbit (const Pane *_pane)
 HUD_Orbit::~HUD_Orbit ()
 {
 	// save status
-	saveprm.vessel = g_focusobj;
+	saveprm.vessel = orbiter::production::CockpitFocus();
 	saveprm.ref = ref;
 }
 
@@ -1314,7 +1337,7 @@ void HUD_Orbit::Display (oapi::Sketchpad *skp)
 	double lwcosa, lwsina;
 	char cbuf[64];
 
-	const Vessel *self = g_focusobj;
+	const Vessel *self = orbiter::production::CockpitFocus();
 	const Body *cntobj = (ref ? ref : self->ElRef());
 	if (!cntobj) return; // not in orbit - nothing to draw
 
@@ -1387,7 +1410,7 @@ void HUD_Orbit::Display (oapi::Sketchpad *skp)
 
 	Vector Prel = tmul (self->GRot(), P).unit();
 	//if (Prel.z < 0.0) Prel = -Prel;
-	fac = VRES05 / (Prel.z * g_camera->TanAperture());
+	fac = VRES05 / (Prel.z * orbiter::production::CockpitCamera()->TanAperture());
 	px = HRES05 + (int)(Prel.x * fac);
 	py = VRES05 - (int)(Prel.y * fac);
 	// equation of orbital plane in ship's relative coords: ax + by + cz = 0
@@ -1404,7 +1427,7 @@ void HUD_Orbit::Display (oapi::Sketchpad *skp)
 
 	phi0 = floor (Deg(phi)*0.1);
 	static double step = tan (RAD*10.0);
-	d = (bVC ? HUDofs.z : g_camera->Scale()) * step;
+	d = (bVC ? HUDofs.z : orbiter::production::CockpitCamera()->Scale()) * step;
 	if (d > ladder_range*0.1) {
 		d0 = (0.1*Deg(phi) - phi0) * d;
 
@@ -1435,13 +1458,13 @@ void HUD_Orbit::UpdateMesh (int &ivtx, int &iidx)
 	double a, b, c, h, phi, phi0, alpha, d, d0, d1, cosa, sina, v;
 	int iphi, iphi0;
 
-	const Vessel *self = g_focusobj;
+	const Vessel *self = orbiter::production::CockpitFocus();
 	const Body *cntobj = (ref ? ref : self->ElRef());
 	if (!cntobj) return; // not in orbit - nothing to draw
 
 	// Output HUD mode and reference object
 	const char *name = cntobj->Name();
-	if (_strnicmp(name, refname, 63)) {
+	if (orbiter::production::ComparePrefix(name, refname, 63)) {
 		int i;
 		for (i = 0; name[i] && i<63; i++) refname[i] = toupper(name[i]);
 		refname[i] = '\0';
@@ -1456,7 +1479,7 @@ void HUD_Orbit::UpdateMesh (int &ivtx, int &iidx)
 			AddMesh_DirectionMarker (ivtx, iidx, Vunit, true);
 	}
 
-	if (g_camera->IsCockpitForward()) {
+	if (orbiter::production::CockpitCamera()->IsCockpitForward()) {
 		static double step = tan (RAD*10.0);
 		Vector Vrel = tmul (self->GRot(), V).unit();
 		Vector P = self->GPos() - cntobj->GPos();
@@ -1479,7 +1502,7 @@ void HUD_Orbit::UpdateMesh (int &ivtx, int &iidx)
 		phi0 = floor (Deg(phi)*0.1);
 		alpha = atan2 (a, b);
 		sina = sin (alpha), cosa = cos (alpha);
-		d = g_camera->Scale() * step;
+		d = orbiter::production::CockpitCamera()->Scale() * step;
 		if (d > ladder_range*0.1) {
 			d0 = (0.1*Deg(phi) - phi0) * d;
 			iphi0 = iphi = (int)phi0;
@@ -1510,7 +1533,7 @@ void HUD_Orbit::SetReference (const Body *bref)
 
 void HUD_Orbit::SelectReference ()
 {
-	g_input->Open ("HUD reference body (a for auto):", 0, 20, HUD_Orbit::ClbkName_Ref, (void*)this);
+	orbiter::production::CockpitInput()->Open ("HUD reference body (a for auto):", 0, 20, HUD_Orbit::ClbkName_Ref, (void*)this);
 }
 
 bool HUD_Orbit::ClbkName_Ref (InputBox*, char *str, void *data)
@@ -1524,7 +1547,7 @@ bool HUD_Orbit::SelectRef (char *str)
 	if (toupper(str[0]) == 'A' && str[1] == '\0') {
 		ref = 0;
 	} else {
-		Body *obj = g_psys->GetGravObj (str, true);
+		Body *obj = orbiter::production::CockpitWorld()->GetGravObj (str, true);
 		if (!obj) return false;
 		ref = obj;
 	}
@@ -1545,11 +1568,11 @@ void HUD_Orbit::ReadParams (ifstream &ifs)
 			ifs.clear(); break;
 		}
 		pc = trim_string (cbuf);
-		if (!_strnicmp (pc, "END_HUD", 7)) break;
-		if (!_strnicmp (pc, "REF", 3)) {
+		if (!orbiter::production::ComparePrefix (pc, "END_HUD", 7)) break;
+		if (!orbiter::production::ComparePrefix (pc, "REF", 3)) {
 			pc = trim_string (pc+3);
-			if (!_strnicmp (pc, "AUTO", 4)) ref = 0;
-			else ref = g_psys->GetObj (pc, true);
+			if (!orbiter::production::ComparePrefix (pc, "AUTO", 4)) ref = 0;
+			else ref = orbiter::production::CockpitWorld()->GetObj (pc, true);
 		}
 	}
 }
@@ -1576,7 +1599,7 @@ void HUD_Surface::SwitchColour (int idx)
 void HUD_Surface::Display (oapi::Sketchpad *skp)
 {
 	const SurfParam *sp;
-	const Vessel *self = g_focusobj;
+	const Vessel *self = orbiter::production::CockpitFocus();
 	double sina, cosa, lwsina, lwcosa, phi0, d, d0, d1;
 	int iphi, iphi0, xbl, xbr, dx, y, len;
 	char cbuf[40];
@@ -1686,7 +1709,7 @@ void HUD_Surface::Display (oapi::Sketchpad *skp)
 
 	phi0 = floor (Deg(sp->pitch)*0.1);
 	static double step = tan (RAD*10.0);
-	d = (bVC ? HUDofs.z : g_camera->Scale()) * step;
+	d = (bVC ? HUDofs.z : orbiter::production::CockpitCamera()->Scale()) * step;
 	if (d > ladder_range*0.1) {
 		d0 = (0.1*Deg(sp->pitch) - phi0) * d;
 
@@ -1704,12 +1727,12 @@ void HUD_Surface::UpdateMesh (int &ivtx, int &iidx)
 	if (bVC) return; // Render mode only for glass cockpit and 2D instrument panel
 
 	const SurfParam *sp;
-	const Vessel *self = g_focusobj;
+	const Vessel *self = orbiter::production::CockpitFocus();
 	if (!(sp = self->GetSurfParam())) return;  // no data available
 
 	// Output HUD mode and reference object
 	const char *name = sp->ref->Name();
-	if (_strnicmp(name, refname, 63)) {
+	if (orbiter::production::ComparePrefix(name, refname, 63)) {
 		int i;
 		for (i = 0; name[i] && i<63; i++) refname[i] = toupper(name[i]);
 		refname[i] = '\0';
@@ -1721,7 +1744,7 @@ void HUD_Surface::UpdateMesh (int &ivtx, int &iidx)
 	if (sp->groundspd > 1.0)
 		AddMesh_Marker (ivtx, iidx, sp->groundvel_glob.unit(), 1);
 
-	if (g_camera->IsCockpitForward()) {
+	if (orbiter::production::CockpitCamera()->IsCockpitForward()) {
 		// Altitude readout
 		char cbuf[64];
 		bool groundalt = (sp->alt < 1e4);
@@ -1753,7 +1776,7 @@ void HUD_Surface::UpdateMesh (int &ivtx, int &iidx)
 		sina = sin (sp->bank), cosa = cos (sp->bank);
 		phi0 = floor (Deg(sp->pitch)*0.1);
 		static double step = tan (RAD*10.0);
-		d = g_camera->Scale() * step;
+		d = orbiter::production::CockpitCamera()->Scale() * step;
 		if (d > ladder_range*0.1) {
 			d0 = (0.1*Deg(sp->pitch) - phi0) * d;
 			iphi0 = iphi = (int)phi0;
@@ -1780,7 +1803,7 @@ HUD_Docking::HUD_Docking (const Pane *_pane)
 : HUD (_pane)
 {
 	// restore status
-	if (g_focusobj == saveprm.vessel) {
+	if (orbiter::production::CockpitFocus() == saveprm.vessel) {
 		nv = saveprm.nv;
 		Legacy_ref = saveprm.lref;
 		Legacy_port = saveprm.lport;
@@ -1799,7 +1822,7 @@ HUD_Docking::HUD_Docking (const Pane *_pane)
 HUD_Docking::~HUD_Docking ()
 {
 	// save status
-	saveprm.vessel = g_focusobj;
+	saveprm.vessel = orbiter::production::CockpitFocus();
 	saveprm.nv     = nv;
 	saveprm.lref   = Legacy_ref;
 	saveprm.lport  = Legacy_port;
@@ -1818,7 +1841,7 @@ void HUD_Docking::Display (oapi::Sketchpad *skp)
 {
 	int x, y, slen;
 	char cbuf[128];
-	const Vessel *self = g_focusobj;
+	const Vessel *self = orbiter::production::CockpitFocus();
 	const PortSpec *ps = 0;
 	PortSpec local_ps; // only used for legacy stations
 	const Body *tgt = 0;
@@ -1831,7 +1854,7 @@ void HUD_Docking::Display (oapi::Sketchpad *skp)
 			sprintf (cbuf+strlen(cbuf), " [port %d]", Legacy_port+1);
 			if (tgt->Type() == OBJTP_VESSEL) {
 				const Vessel *vessel = (const Vessel*)tgt;
-				if ((DWORD)Legacy_port < vessel->nDock())
+				if ((oapi::UInt32)Legacy_port < vessel->nDock())
 					ps = vessel->GetDockParams (Legacy_port);
 			}
 		}
@@ -1907,7 +1930,7 @@ void HUD_Docking::Display (oapi::Sketchpad *skp)
 	// approach path indicator
 	if (ps) {
 		int i, j, x, y;
-		Vector dpos (mul (tgt->GRot(), ps->ref) + tgt->GPos() - g_camera->GPos());
+		Vector dpos (mul (tgt->GRot(), ps->ref) + tgt->GPos() - orbiter::production::CockpitCamera()->GPos());
 		Vector ddir (mul (tgt->GRot(), -ps->dir));
 		Vector ydir (mul (tgt->GRot(), ps->rot));
 		Vector p[4], pp[2];
@@ -1920,7 +1943,7 @@ void HUD_Docking::Display (oapi::Sketchpad *skp)
 		float ddy = -(float)ydir.y;
 		float ddz = -(float)ydir.z;
 		BoxCoord (dpos, ddir, ydir, dist, p);
-		//double zlimit = g_camera->Farplane() / (g_camera->Farplane()-g_camera->Nearplane());
+		//double zlimit = orbiter::production::CockpitCamera()->Farplane() / (orbiter::production::CockpitCamera()->Farplane()-orbiter::production::CockpitCamera()->Nearplane());
 		for (i = 0; i < 10; i++) {
 			for (j = 0; j < 4; j++) {
 				if (!GlobalToHUD (p[j], x, y)) break;
@@ -1947,7 +1970,7 @@ void HUD_Docking::UpdateMesh (int &ivtx, int &iidx)
 
 	int i;
 	char refstr[128] = "", cbuf[128];
-	const Vessel *self = g_focusobj;
+	const Vessel *self = orbiter::production::CockpitFocus();
 	const PortSpec *ps = 0;
 	PortSpec local_ps; // only used for legacy stations
 	const Body *tgt = 0;
@@ -1960,7 +1983,7 @@ void HUD_Docking::UpdateMesh (int &ivtx, int &iidx)
 			sprintf (refstr+strlen(refstr), " [port %d]", Legacy_port+1);
 			if (tgt->Type() == OBJTP_VESSEL) {
 				const Vessel *vessel = (const Vessel*)tgt;
-				if ((DWORD)Legacy_port < vessel->nDock())
+				if ((oapi::UInt32)Legacy_port < vessel->nDock())
 					ps = vessel->GetDockParams (Legacy_port);
 			}
 		}
@@ -1970,7 +1993,7 @@ void HUD_Docking::UpdateMesh (int &ivtx, int &iidx)
 		NavRadioSpec *nav = self->nav+nv;
 
 		sprintf (cbuf, "NAV%d %0.2fMHz", nv+1, nav->freq);
-		if (_strnicmp(cbuf, navname, 127)) {
+		if (orbiter::production::ComparePrefix(cbuf, navname, 127)) {
 			for (i = 0; cbuf[i] && i<127; i++) navname[i] = cbuf[i];
 			navname[i] = '\0';
 			navwidth = TexBltString (navname, 256, 230);
@@ -1994,7 +2017,7 @@ void HUD_Docking::UpdateMesh (int &ivtx, int &iidx)
 	}
 
 	// Output HUD mode and reference object
-	if (_strnicmp(refstr, refname, 127)) {
+	if (orbiter::production::ComparePrefix(refstr, refname, 127)) {
 		for (i = 0; refstr[i] && i<127; i++) refname[i] = toupper(refstr[i]);
 		refname[i] = '\0';
 		refwidth = TexBltString (refname, 47, 230) + 47;
@@ -2019,7 +2042,7 @@ void HUD_Docking::UpdateMesh (int &ivtx, int &iidx)
 			AddMesh_DirectionMarker (ivtx, iidx, Vunit, false, &xcnt, &ycnt);
 	}
 
-	if (_strnicmp (pc,vstr1, 127)) {
+	if (orbiter::production::ComparePrefix (pc,vstr1, 127)) {
 		strncpy (vstr1, pc, 127);
 		vstr1width = TexBltString (vstr1, 0, 217);
 	}
@@ -2031,7 +2054,7 @@ void HUD_Docking::UpdateMesh (int &ivtx, int &iidx)
 	if (!AddMesh_Marker (ivtx, iidx, prel, 2, &xcnt, &ycnt))
 		AddMesh_DirectionMarker (ivtx, iidx, prel, false, &xcnt, &ycnt);
 	sprintf (cbuf, "D[%s]%s", tgt->Name(), DistStr(len));
-	if (_strnicmp (cbuf, pstr1, 127)) {
+	if (orbiter::production::ComparePrefix (cbuf, pstr1, 127)) {
 		strncpy (pstr1, cbuf, 127);
 		pstr1width = TexBltString (pstr1, 256, 217);
 	}
@@ -2043,7 +2066,7 @@ void HUD_Docking::UpdateMesh (int &ivtx, int &iidx)
 	}
 }
 
-void HUD_Docking::SetNav (DWORD setnav)
+void HUD_Docking::SetNav (oapi::UInt32 setnav)
 {
 	nv = setnav;
 	bUseLegacyReference = false;
@@ -2059,14 +2082,14 @@ void HUD_Docking::SetReference (const Body *ref, int port)
 void HUD_Docking::SelectReference ()
 {
 	bUseLegacyReference = false;
-	if (++nv >= g_focusobj->nnav) nv = 0;
+	if (++nv >= orbiter::production::CockpitFocus()->nnav) nv = 0;
 }
 
 void HUD_Docking::SelectReferenceOld ()
 {
 	// legacy method for docking target selection
 	// this should probably be dropped at some stage
-	g_input->Open ("Docking target (+ optional port #), e.g. 'ISS 1':", 0, 20, HUD_Docking::ClbkName_Ref, (void*)this);
+	orbiter::production::CockpitInput()->Open ("Docking target (+ optional port #), e.g. 'ISS 1':", 0, 20, HUD_Docking::ClbkName_Ref, (void*)this);
 }
 
 void HUD_Docking::ProcessMessage (int msg, void *data)
@@ -2092,9 +2115,9 @@ bool HUD_Docking::ClbkName_Ref (InputBox*, char *str, void *data)
 bool HUD_Docking::SelectRef (char *str)
 {
 	char name[256];
-	DWORD dock;
+	oapi::UInt32 dock;
 	bool bdock = (sscanf (str, "%s%d", name, &dock) == 2);
-	Vessel *obj = g_psys->GetVessel (name, true);
+	Vessel *obj = orbiter::production::CockpitWorld()->GetVessel (name, true);
 	if (!obj) return false;
 	if (bdock && (dock < 1 || dock > obj->nDock())) return false;
 	Legacy_ref  = obj;
@@ -2123,15 +2146,15 @@ void HUD_Docking::ReadParams (ifstream &ifs)
 			ifs.clear(); break;
 		}
 		pc = trim_string (cbuf);
-		if (!_strnicmp (pc, "END_HUD", 7)) break;
-		if (!_strnicmp (pc, "NAV", 3)) {
+		if (!orbiter::production::ComparePrefix (pc, "END_HUD", 7)) break;
+		if (!orbiter::production::ComparePrefix (pc, "NAV", 3)) {
 			sscanf (pc+3, "%d", &nv);
 			bUseLegacyReference = false;
-		} else if (!_strnicmp (pc, "REF", 3)) {
+		} else if (!orbiter::production::ComparePrefix (pc, "REF", 3)) {
 			char name[256];
 			int res, port;
 			res = sscanf (pc+3, "%s%d", name, &port);
-			Legacy_ref = g_psys->GetObj (name, true);
+			Legacy_ref = orbiter::production::CockpitWorld()->GetObj (name, true);
 			if (res >= 2) Legacy_port = port;
 			bUseLegacyReference = true;
 		}
