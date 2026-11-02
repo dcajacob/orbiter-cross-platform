@@ -9,6 +9,7 @@
 #include <locale>
 #include <map>
 #include <stdexcept>
+#include <string>
 #include <vector>
 namespace InstrumentEvidence {
 inline bool enabled=false;
