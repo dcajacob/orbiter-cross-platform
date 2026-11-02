@@ -199,7 +199,14 @@ jobs:
             out/cockpit-driver-binaries/**
             out/cockpit-controls-driver/CMakeCache.txt
             out/cockpit-controls-driver/compile_commands.json
-            out/cockpit-controls-regression/**
+            out/cockpit-controls-regression/**/*.csv
+            out/cockpit-controls-regression/**/*.json
+            out/cockpit-controls-regression/**/*.png
+            out/cockpit-controls-regression/**/*.rgba
+            out/cockpit-controls-regression/**/*.txt
+            out/cockpit-controls-regression/**/*.log
+            out/cockpit-controls-regression/**/*.scn
+            out/cockpit-controls-regression/**/Orbiter.cfg
             out/production-app/Modules/Plugin/ProductionCockpitDriver.dll
             out/mesa-runtime/*.json
             runtime-configure.log
