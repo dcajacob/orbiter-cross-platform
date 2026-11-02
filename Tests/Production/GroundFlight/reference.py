@@ -38,6 +38,9 @@ def validate(directory,case):
         require(airborne and any(r['ground']=='1' for r in own[airborne[-1]+1:]),'ShuttlePB did not return to ground contact')
         require(own[-1]['ground']=='1' and float(own[-1]['altitude_agl'])<3,'ShuttlePB did not finish on the real ground')
         require(float(own[-1]['fuel'])<float(own[0]['fuel']),'Powered takeoff consumed no propellant')
+        saved=(directory/'Scenarios/BehaviorSnapshot.scn').read_text()
+        pb=saved.split('PB:ShuttlePB',1)[1].split('\nEND',1)[0]
+        require('STATUS Landed Earth' in pb,'Touching ground is not a completed landed state')
     else:
         require(all(r['ground']=='1' for r in own),'Landed ShuttlePB lost terrain contact')
     if identifier=='pb_ground_persistence':

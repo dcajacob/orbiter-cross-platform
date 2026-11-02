@@ -2,6 +2,7 @@
 #pragma once
 #include <string>
 namespace production_test {
+constexpr unsigned GroundCheckpointTick=900;
 inline bool GroundFlightCase(const std::string& id) {
     return id=="pb_ground_idle" || id=="pb_atmosphere" || id=="pb_aerodynamic_controls" || id=="pb_contact" ||
         id=="pb_takeoff_landing" || id=="pb_ground_persistence" || id=="pb_ground_reload";
@@ -26,12 +27,14 @@ inline void GroundFlight(VESSEL* v,const std::string& id,unsigned tick) {
         if(tick==0)v->ActivateNavmode(NAVMODE_HLEVEL);
         v->SetThrusterGroupLevel(THGROUP_MAIN,.15);
     } else if(id=="pb_aerodynamic_controls") {
-        v->SetControlSurfaceLevel(AIRCTRL_ELEVATOR,tick>=20 && tick<40?.2:tick>=60 && tick<80?-.2:0.);
-        v->SetControlSurfaceLevel(AIRCTRL_AILERON,tick>=100 && tick<120?.2:tick>=140 && tick<160?-.2:0.);
+        v->SetControlSurfaceLevel(AIRCTRL_ELEVATOR,tick>=60 && tick<120?.2:tick>=180 && tick<240?-.2:0.);
+        v->SetControlSurfaceLevel(AIRCTRL_AILERON,tick>=300 && tick<360?.2:tick>=420 && tick<480?-.2:0.);
     } else if(id=="pb_takeoff_landing") {
         if(tick==0)v->ActivateNavmode(NAVMODE_HLEVEL);
+        if(tick==1200)v->DeactivateNavmode(NAVMODE_HLEVEL);
         // Four seconds lifting, five decelerating, then a powered descent.
-        v->SetThrusterGroupLevel(THGROUP_HOVER,tick<80?1.:tick<180?.65:tick<700?.78:0.);
+        // Release the attitude program before contact; it must not fight the gear.
+        v->SetThrusterGroupLevel(THGROUP_HOVER,tick<240?1.:tick<540?.65:tick<2100?.78:0.);
     }
 }
 }

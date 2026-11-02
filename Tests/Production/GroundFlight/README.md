@@ -12,13 +12,16 @@ elevation/contact data and original numerical implementations:
 - Atmospheric flight, initialized 1,500 m above the landed position at 200 m/s.
 - Elevator/aileron inputs and real mesh animations, with RCS off and no fuel use.
 - Unpowered descent from eight metres above the landed position.
-- A scheduled hover-engine takeoff and return to ground contact.
-- A finalized landed save at tick 300 and its subsequent reload.
+- A scheduled hover-engine takeoff and completed landing (SDK status 1 and a
+  stock `STATUS Landed Earth` save), releasing horizon hold before contact.
+- A finalized landed save at tick 900 and its subsequent reload.
 
-All use 0.05-second steps, the same verified data packages as the existing suites,
+All use the native application's normal 1/60-second tick and the same verified data packages as the existing suites,
 and a fixed daytime epoch of MJD 51982.75. `cases.json` declares the timings and
 unchanged contact/propulsion budgets. `Schedules.h` contains only SDK setup/control
 commands; it provides no substitute force or terrain model.
+The [candidate diagnostics](DIAGNOSTICS.md) preserve the rejected coarse-tick hop,
+its real landed-state failure and the harness corrections made before acceptance.
 
 The orbital angular-velocity budget applies to the orbiting ISS. PB contact
 comparisons report angular velocity but enforce the agreed contact position,
@@ -29,7 +32,7 @@ correcting that scope does not change any accepted reference or orbital limit.
 The Windows capture requires byte-identical repeats, normal lifecycle and exact
 input/callback ordering. Debug and Release must pass the original state budgets.
 The harness also rejects captures without real atmospheric drag, nonzero Edwards
-elevation, lift-off, return to ground contact, or original landed persistence.
+elevation, lift-off, a completed landed state, or original landed persistence.
 Failure blocks native ground-path changes; thresholds are not auto-adjusted.
 
 The capture workflow initially runs on changes to this harness. After accepting

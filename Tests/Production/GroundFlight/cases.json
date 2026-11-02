@@ -4,16 +4,16 @@
   "application_source": "391919027ac3e4a4d42f145373c788fc859c32cd",
   "runtime_run": 41342204437,
   "epoch": 51982.75,
-  "fixed_step": 0.05,
-  "checkpoint_tick": 300,
+  "fixed_step": 0.016666666666666666,
+  "checkpoint_tick": 900,
   "cases": [
-    {"id": "pb_ground_idle", "frames": 200, "fixture": "edwards"},
-    {"id": "pb_atmosphere", "frames": 600, "fixture": "edwards"},
-    {"id": "pb_aerodynamic_controls", "frames": 400, "fixture": "edwards"},
-    {"id": "pb_contact", "frames": 600, "fixture": "edwards"},
-    {"id": "pb_takeoff_landing", "frames": 1200, "fixture": "edwards"},
-    {"id": "pb_ground_persistence", "frames": 400, "fixture": "edwards"},
-    {"id": "pb_ground_reload", "frames": 200, "fixture": "reload"}
+    {"id": "pb_ground_idle", "frames": 600, "fixture": "edwards"},
+    {"id": "pb_atmosphere", "frames": 1800, "fixture": "edwards"},
+    {"id": "pb_aerodynamic_controls", "frames": 1200, "fixture": "edwards"},
+    {"id": "pb_contact", "frames": 1800, "fixture": "edwards"},
+    {"id": "pb_takeoff_landing", "frames": 3600, "fixture": "edwards"},
+    {"id": "pb_ground_persistence", "frames": 1200, "fixture": "edwards"},
+    {"id": "pb_ground_reload", "frames": 600, "fixture": "reload"}
   ],
   "budgets": {
     "position_m": 1,

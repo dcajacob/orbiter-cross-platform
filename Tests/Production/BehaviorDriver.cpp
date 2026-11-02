@@ -167,8 +167,14 @@ public:
                     require(oapiSaveScenario("BehaviorSnapshot","Windows production persistence checkpoint"),"save checkpoint failed");
                     event("input.save",nameOf(target),"BehaviorSnapshot");
                 }
-                if(id=="pb_ground_persistence" && running && tick==300) {
+                if(id=="pb_ground_persistence" && running && tick==production_test::GroundCheckpointTick) {
                     require(oapiSaveScenario("BehaviorSnapshot","Windows production landed ShuttlePB checkpoint"),"save landed checkpoint failed");
+                    event("input.save",nameOf(target),"BehaviorSnapshot");
+                }
+                if(id=="pb_takeoff_landing" && running && tick==totalFrames) {
+                    VESSELSTATUS2 status{};status.version=2;oapiGetVesselInterface(target)->GetStatusEx(&status);
+                    require(status.status==1,"ShuttlePB touched ground but never reached the original landed state");
+                    require(oapiSaveScenario("BehaviorSnapshot","Windows production completed ShuttlePB landing"),"save completed landing failed");
                     event("input.save",nameOf(target),"BehaviorSnapshot");
                 }
                 if (id == "clock") {
