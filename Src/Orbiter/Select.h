@@ -4,7 +4,11 @@
 #ifndef __SELECT_H
 #define __SELECT_H
 
+#ifdef _WIN32
 #include "OrbiterAPI.h"
+#else
+#include "NativeVesselAPI.h"
+#endif
 #include <list>
 
 #define ITEM_SUBMENU 0x01

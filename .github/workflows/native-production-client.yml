@@ -88,6 +88,8 @@ jobs:
           set -euo pipefail
           cmake -S Tests/Production/Cockpit/RendererProbe -B out/renderer-probe -G Ninja -DCMAKE_BUILD_TYPE=${{ matrix.configuration }} -DORBITER_ENGINE_BUILD="$PWD/out/native-engine" 2>&1 | tee native-instrument-probe-build.log
           cmake --build out/renderer-probe --parallel 2 2>&1 | tee -a native-instrument-probe-build.log
+          out/renderer-probe/cockpit-sdk-layout 2>&1 | tee native-cockpit-sdk-layout.log
+          out/renderer-probe/instrument-declarations 2>&1 | tee native-instrument-declarations.log
           xvfb-run -a env LIBGL_ALWAYS_SOFTWARE=1 GALLIUM_DRIVER=llvmpipe out/renderer-probe/renderer-probe "$PWD/out/native-engine/NativeModules/Graphics/OGLClient.so" "$PWD/out/scene-resources" "$PWD/out/planets" "$PWD/out/renderer-probe/report.json" 2>&1 | tee native-instrument-probe.log
       - name: Verify flyable stock ShuttlePB, timing, docking and persistence
         shell: bash

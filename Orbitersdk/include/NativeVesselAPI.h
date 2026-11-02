@@ -14,6 +14,7 @@
 #include "OrbiterMeshData.h"
 #include "OrbiterCelestialData.h"
 #include "OrbiterSdkDrawingTypes.h"
+#include "OrbiterCockpitData.h"
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
@@ -22,18 +23,12 @@ namespace oapi {class Sketchpad;}
 class LightEmitter;
 class PointLight;
 class SpotLight;
-struct MFDSPEC;
-struct VCMFDSPEC;
-struct VCHUDSPEC;
-struct HUDPAINTSPEC;
-struct MFDMODESPEC;
-struct MFDMODESPECEX;
-struct HUDPARAM;
 struct VESSELPARAM;
 #ifndef OAPIFUNC
 #define OAPIFUNC __attribute__((visibility("default")))
 #define ORBITER_NATIVE_OWNS_OAPIFUNC
 #endif
+#include "OrbiterGuiData.h"
 #include "OrbiterLightData.h"
 #include "OrbiterCameraData.h"
 #include "VesselAPI.h"

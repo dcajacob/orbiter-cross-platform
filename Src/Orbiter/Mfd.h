@@ -16,12 +16,18 @@
 #define __MFD_H
 
 #define STRICT 1
+#ifdef _WIN32
 #include "OrbiterAPI.h"
+#else
+#include "NativeVesselAPI.h"
+#endif
 #include "Production/CockpitGraphics.h"
 #include "Vessel.h"
 #include "Element.h"
 #include "Select.h"
+#ifdef _WIN32
 #include <d3d.h>
+#endif
 
 #define ELN 256           // polygon resolution for orbit trajectory
 #define ELNH (ELN/2)
@@ -65,27 +71,29 @@ public:
 		int nbtl, nbtr; // number of buttons on left and right side of display
 		int bt_y0;      // y-offset of top button centreline from top edge of display
 		int bt_dy;      // y-distance between buttons
-		DWORD flag;     // bit flags
+		oapi::UInt32 flag;     // bit flags
 	};
 
-	Instrument (Pane *_pane, INT_PTR _id, const Spec &spec, Vessel *_vessel, bool defer_alloc=false);
+	Instrument (Pane *_pane, std::intptr_t _id, const Spec &spec, Vessel *_vessel, bool defer_alloc=false);
 	virtual ~Instrument ();
+#ifdef _WIN32
 	virtual void RestoreDeviceObjects (LPDIRECT3D7 d3d, LPDIRECT3DDEVICE7 dev) {}
+#endif
 	virtual int Type () const = 0;                 // mode id
 	virtual char ModeSelKey () const = 0;          // mode selection key
 	virtual HELPCONTEXT *HelpTopic () const { return 0; } // help topic (CHM file address) if available
 	bool ConsumeKeyImmediate (char *kstate);
-	bool ConsumeKeyBuffered (DWORD key);
+	bool ConsumeKeyBuffered (oapi::UInt32 key);
 	bool ConsumeButton (int bt, int event);
 	virtual bool KeyImmediate (char *kstate) { return false; }
-	virtual bool KeyBuffered (DWORD key) { return false; }
+	virtual bool KeyBuffered (oapi::UInt32 key) { return false; }
 
 	/**
 	 * \brief Called when the user interactively changes a simulation option
 	 * \param cat option category (see \ref optcat)
 	 * \param item option item (see \ref optitem)
 	 */
-	virtual void OptionChanged(DWORD cat, DWORD item);
+	virtual void OptionChanged(oapi::UInt32 cat, oapi::UInt32 item);
 
 	virtual bool ProcessButton (int bt, int event) { return false; }
 	// used to process buttons in the frame of the MFD (panel mode)
@@ -109,7 +117,9 @@ public:
 
 	virtual bool Update (double upDTscale);
 	virtual void UpdateDraw (oapi::Sketchpad *skp) = 0;
-	virtual void UpdateDraw (HDC hDC) {}
+#ifdef _WIN32
+	virtual void UpdateDraw (oapi::SdkDrawContext hDC) {}
+#endif
 	virtual void UpdateBlt () {}
 	virtual void Timejump ();
 	void Refresh (); // force refresh
@@ -125,7 +135,7 @@ public:
 	void DisplayTitle (oapi::Sketchpad *skp, const char *title) const;
 	// to be called from UpdateDraw
 
-	void DisplayTitle (HDC hDC, const char *title) const;
+	void DisplayTitle (oapi::SdkDrawContext hDC, const char *title) const;
 	// obsolete
 
 	void DisplayModes (int page);
@@ -136,8 +146,8 @@ public:
 	// BeginDraw also draws a rectangle around the border of the instrument
 	// note that BLT operations are not allowed between Begin and End
 
-	HDC BeginDrawHDC ();
-	void EndDrawHDC (HDC hDC);
+	oapi::SdkDrawContext BeginDrawHDC ();
+	void EndDrawHDC (oapi::SdkDrawContext hDC);
 	// Compatibility versions
 
 	// ******************************************************************
@@ -146,12 +156,12 @@ public:
 	// ******************************************************************
 
 	static Instrument *Create (int type, Pane *_pane,
-		INT_PTR _id, const Spec &spec, Vessel *_vessel, bool restore = true);
+		std::intptr_t _id, const Spec &spec, Vessel *_vessel, bool restore = true);
 	// create instrument of the required type
 	// if restore==true then parameters are restored from static saved
 
 	static Instrument *Create (std::ifstream &ifs, Pane *_pane,
-		INT_PTR _id, const Spec &spec, Vessel *_vessel);
+		std::intptr_t _id, const Spec &spec, Vessel *_vessel);
 	// create instrument from stream
 
 	static void RegisterBuiltinModes ();
@@ -174,7 +184,7 @@ public:
 	// Un-register a previously registered user mode
 	// Returns false if mode was not found
 
-	static int ModeIdFromKey (DWORD key);
+	static int ModeIdFromKey (oapi::UInt32 key);
 	// Returns the id of an instrument mode, given its activation key
 	// If no mode matches the key, return value is MFD_NONE
 
@@ -191,21 +201,21 @@ public:
 	// If spec is defined, it points to the mode specs on return
 	// If no mode matches the key, return value is MFD_NONE
 
-	inline const MFDMODE *GetMode (DWORD i) const
+	inline const MFDMODE *GetMode (oapi::UInt32 i) const
 	{ return (i < nGlobalModes ? GlobalMode+i :
 	          i < nGlobalModes+nVesselModes ?
 			  VesselMode+(i-nGlobalModes) : 0); }
 	// Return a mode across global and vessel-specific modes
 
-	static int GetUserMode (DWORD i, MFDMODESPEC *spec);  // may not be necessary
+	static int GetUserMode (oapi::UInt32 i, MFDMODESPEC *spec);  // may not be necessary
 	int GetMFDMode (char *name, const MFDMODESPECEX **spec) const; // may not be necessary
 	int GetMFDModeOld (char *name, const MFDMODESPEC **spec) const; // obsolete
 
 	static int nextmodeid;       // id for next user-defined mode
-	static DWORD nGlobalModes;   // total number of registered modes
+	static oapi::UInt32 nGlobalModes;   // total number of registered modes
 	static MFDMODE *GlobalMode;  // list of pointers to registered modes
 
-	DWORD nVesselModes;          // number of registered vessel-specific modes
+	oapi::UInt32 nVesselModes;          // number of registered vessel-specific modes
 	const MFDMODE *VesselMode;   // list of vessel-specific modes
 
 	static void DisableMode (int id);
@@ -215,12 +225,12 @@ public:
 	void Write (std::ostream &ofs) const;
 	// read/write instrument status from/to stream
 
-	void AllocSurface (DWORD w, DWORD h);
+	void AllocSurface (oapi::UInt32 w, oapi::UInt32 h);
 
 protected:
 	Pane *pane;                 // pointer to pane
 	oapi::CockpitClient *gc;   // graphics client, if available
-	INT_PTR id;                	// instrument id
+	std::intptr_t id;                	// instrument id
 	bool BufKey (char key, double repdelay = 0.5);
 	void SetBuf (char key);
 	int IW, IH;                 // instrument dimensions
@@ -229,7 +239,7 @@ protected:
 	int nbt;                    // total number of buttons per page
 	int bt_y0, bt_dy;           // offset of top button, and button y-distances (pixel)
 	int btnpage;                // currently displayed button page
-	DWORD flag;                 // bit flags
+	oapi::UInt32 flag;                 // bit flags
 	Vessel *vessel;             // spacecraft to which the instrument refers
 	double instrDT;             // instrument update interval
 	double updT, updSysT;       // simulation/system time of next update
@@ -239,27 +249,29 @@ protected:
 	SURFHANDLE tex;             // texture version of MFD display
 
 	// MFD colours
-	static COLORREF col_green1;   // light green
-	static COLORREF col_green2;   // dark green
-	static COLORREF col_yellow1;  // light yellow
-	static COLORREF col_yellow2;  // dark yellow
-	static COLORREF col_grey1;    // light grey
-	static COLORREF col_grey2;    // dark grey
-	static COLORREF col_red1;     // light red
+	static oapi::UInt32 col_green1;   // light green
+	static oapi::UInt32 col_green2;   // dark green
+	static oapi::UInt32 col_yellow1;  // light yellow
+	static oapi::UInt32 col_yellow2;  // dark yellow
+	static oapi::UInt32 col_grey1;    // light grey
+	static oapi::UInt32 col_grey2;    // dark grey
+	static oapi::UInt32 col_red1;     // light red
 
-	oapi::Font *GetDefaultFont (DWORD fontidx);
+	oapi::Font *GetDefaultFont (oapi::UInt32 fontidx);
 	// Returns a predefined font resource
 
-	HFONT SelectDefaultFont (HDC hDC, DWORD i);
+	oapi::SdkFont SelectDefaultFont (oapi::SdkDrawContext hDC, oapi::UInt32 i);
 	// obsolete
 
-	oapi::Pen *GetDefaultPen (DWORD colidx, DWORD intens=0, DWORD style=1);
+	oapi::Pen *GetDefaultPen (oapi::UInt32 colidx, oapi::UInt32 intens=0, oapi::UInt32 style=1);
 	// Returns a predefined pen resource
 
-	HPEN SelectDefaultPen (HDC hDC, DWORD i);
+#ifdef _WIN32
+	HPEN SelectDefaultPen (oapi::SdkDrawContext hDC, oapi::UInt32 i);
+#endif
 	// obsolete
 
-	DWORD GetDefaultColour (DWORD colidx, DWORD intens) const;
+	oapi::UInt32 GetDefaultColour (oapi::UInt32 colidx, oapi::UInt32 intens) const;
 	// Return one of the default MFD colours.
 
 	bool FindScnHeader (std::ifstream &ifs) const;
@@ -267,14 +279,14 @@ protected:
 	virtual bool ReadParams (std::ifstream &ifs) = 0;
 	virtual void WriteParams (std::ostream &ofs) const = 0;
 
-	void OpenSelect_CelBody (const char *title, Select::Callbk enter_cbk, DWORD flag = 0);
+	void OpenSelect_CelBody (const char *title, Select::Callbk enter_cbk, oapi::UInt32 flag = 0);
 	static bool ClbkSelect_CelBody (Select *menu, int item, char *str, void *data);
 	// Open a selection box for a celestial object.
 	// The callback function is called if a selection is made.
 	// The following bit flags are supported:
 	//   1: do not include Star objects
 
-	void OpenSelect_Tgt (const char *title, Select::Callbk enter_cbk, const CelestialBody *ref = 0, DWORD flag = 0);
+	void OpenSelect_Tgt (const char *title, Select::Callbk enter_cbk, const CelestialBody *ref = 0, oapi::UInt32 flag = 0);
 	// Open a selection box for a target object
 	// Supported bitflags:
 	//   1: don't display 'By name' option
@@ -282,16 +294,18 @@ protected:
 
 	// Drawing resources
 	oapi::Font *mfdfont[4];     // MFD font resources
-	bool use_skp_interface;     // true if drawing through Sketchpad, false for HDC
+	bool use_skp_interface;     // true if drawing through Sketchpad, false for oapi::SdkDrawContext
 
 public:
 	static struct DrawResource { // MFD drawing resources
-		COLORREF col;
+		oapi::UInt32 col;
 		oapi::Pen *solidpen;
 		oapi::Pen *dashpen;
 	} draw[MAXDEFCOL][2];  // first index: colour scheme, second index: intensity (0=bright, 1=dim)
 
+#ifdef _WIN32
 	static HPEN hdefpen[MAXPEN];       // deprecated pen resources
+#endif
 
 	static void GlobalInit (oapi::CockpitClient *gc);
 	static void GlobalExit (oapi::CockpitClient *gc);
@@ -308,12 +322,12 @@ private:
 	static bool ClbkName_Tgt (InputBox*, char *str, void *data);
 	// internal callback functions for generic selection dialogs
 
-	static DWORD SelCelBodyFlag;
+	static oapi::UInt32 SelCelBodyFlag;
 	static struct SelTgtPrm {
 		Select::Callbk clbk;
 		char title[256];
 		const CelestialBody *ref;
-		DWORD flag;
+		oapi::UInt32 flag;
 	} seltgtprm;
 
 	int modepage;               // currently displayed modepage (-1=none)
@@ -323,7 +337,7 @@ private:
 	bool showmenu;              // show button menu instead of regular MFD display
 	bool pageonmenu;            // combine menu and page buttons
 
-	static DWORD nDisabledModes;  // number of disabled MFD modes
+	static oapi::UInt32 nDisabledModes;  // number of disabled MFD modes
 	static int *DisabledModes;    // list of disabled MFD modes
 };
 

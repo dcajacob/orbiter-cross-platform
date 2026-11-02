@@ -133,6 +133,25 @@ object, including writes to HUD settings. The same graphics binding covers
 default panels, Panel2D, VC and vector-map marker lists. Source conservation
 checks verify these substitutions before the earlier map-flags audit inspects
 its preserved predecessor. No instrument formula or scheduler changes.
+The first boundary passes the current Windows application/SDK and all nine
+frozen cockpit regressions in
+[run 41464854668](https://github.com/dcajacob/orbiter-cross-platform/actions/runs/41464854668),
+including the Debug/Release comparison. All four native Debug/Release and
+automatic/SSE2 configurations pass in
+[run 41464853680](https://github.com/dcajacob/orbiter-cross-platform/actions/runs/41464853680).
+
+The next extraction shares cockpit SDK records, callback scalar types, HUD/MFD
+mode constants and packed button-menu records. Windows aliases retain original
+field types and callback signatures. Complete source reconstruction checks and
+native/Windows layout tests cover this boundary; native instrument classes are
+still not operational.
+The original ImGui dialog declaration and help-context record are shared too,
+preserving Windows class methods and virtual ordering. Instrument/selection
+headers now use platform SDK scalar/drawing types and isolate Windows-only
+Direct3D/GDI declarations. A separate native declaration test compiles the
+original abstract `Instrument` and selection inheritance without Windows
+headers. Runtime methods, MFD drawing, panels, controls and DG remain separate
+unfinished integration work.
 
 Dedicated development workflows cancel older runs in the same branch group.
 A bounded maintenance workflow prunes only older active production checks;

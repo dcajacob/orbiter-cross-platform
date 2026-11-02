@@ -32,15 +32,18 @@
     },
     "Orbitersdk/include/NativeGraphicsData.h": {
       "original_sha256_lf": null,
-      "sha256_lf": "a18483292d882c53797c92fb176572ca1e78401dde8abc649083c7af85a2d672"
+      "sha256_lf": "a62637f731a96f37b0e06a6d63278a3ade8178c3f977afd293b115023eaa1880",
+      "scope": "Portable cockpit/ImGui SDK data and original instrument declarations. Exact Windows scalar, callback, class, field order and packing conservation plus native header/layout compilation; runtime instrumentation remains incomplete."
     },
     "Orbitersdk/include/NativeVesselAPI.h": {
-      "sha256_lf": "2ab0da9a464b47c1149b52c4390f96e380a3eb09bb99074426e41e68f92054f5",
-      "original_sha256_lf": null
+      "original_sha256_lf": null,
+      "sha256_lf": "6beec38334eb19d99b2c7612999f382fac8dcf58101c475a4976ad3cd336f741",
+      "scope": "Portable cockpit/ImGui SDK data and original instrument declarations. Exact Windows scalar, callback, class, field order and packing conservation plus native header/layout compilation; runtime instrumentation remains incomplete."
     },
     "Orbitersdk/include/OrbiterAPI.h": {
-      "sha256_lf": "a66f40a69c640c06d42a2238cbcdefad5357ccd485c289f8c867231b500c5303",
-      "original_sha256_lf": "3425025c178218dce10bf7b8edf296dfe7eda8f171d925aca622a7534735fd31"
+      "original_sha256_lf": "3425025c178218dce10bf7b8edf296dfe7eda8f171d925aca622a7534735fd31",
+      "sha256_lf": "462c022a0bfc29cd94fd939d935eb9b153525c349ce17c9f9c028196dc6c069d",
+      "scope": "Portable cockpit/ImGui SDK data and original instrument declarations. Exact Windows scalar, callback, class, field order and packing conservation plus native header/layout compilation; runtime instrumentation remains incomplete."
     },
     "Orbitersdk/include/OrbiterAnimationData.h": {
       "sha256_lf": "98cbc950f4342e529e70562e0dcbc69e77f296d920304b4d7be097b36084a225",
@@ -1080,8 +1083,8 @@
     },
     "Src/Orbiter/Mfd.h": {
       "original_sha256_lf": "133e1e852d9563535bb8404420f98aa40ce284e43eb98ba2f7c33652e97a8e10",
-      "sha256_lf": "9037444a8923bf55e6aa05c26b6b3740082abdcb8163cf0c96640f41c61d8a8c",
-      "scope": "Private cockpit graphics binding only. Original algorithms and Windows underlying pointer types conserved by cockpit_source.py; native instrumentation is not operational yet."
+      "sha256_lf": "0afdf1bf94101e11fc41363fcd95554062ba9c0e43ce1cb6e226f7750f94e2aa",
+      "scope": "Portable cockpit/ImGui SDK data and original instrument declarations. Exact Windows scalar, callback, class, field order and packing conservation plus native header/layout compilation; runtime instrumentation remains incomplete."
     },
     "Src/Orbiter/Mfd.cpp": {
       "original_sha256_lf": "0a5d504ea777abd83b0f3ce45e147a946fad03bb3c70a17eb61600e4ff5108f4",
@@ -1147,6 +1150,21 @@
       "original_sha256_lf": null,
       "sha256_lf": "8f8319800563274d231874fc427d52917b67faa67e59541bc873066e5b12e5a6",
       "scope": "Private cockpit graphics/configuration binding. Original algorithms and Windows pointer types conserved by cockpit_source.py; native instrumentation is not operational yet."
+    },
+    "Orbitersdk/include/OrbiterCockpitData.h": {
+      "original_sha256_lf": null,
+      "sha256_lf": "e897f2946d7483b144d8fb9d90001ca831a21ffcdb696efdcacf33348fa9c9a1",
+      "scope": "Portable cockpit/ImGui SDK data and original instrument declarations. Exact Windows scalar, callback, class, field order and packing conservation plus native header/layout compilation; runtime instrumentation remains incomplete."
+    },
+    "Orbitersdk/include/OrbiterGuiData.h": {
+      "original_sha256_lf": null,
+      "sha256_lf": "025e1cca870e254e1d6385b83fbb42f784d1b3110ea07ac9152c49cc711baa1f",
+      "scope": "Portable cockpit/ImGui SDK data and original instrument declarations. Exact Windows scalar, callback, class, field order and packing conservation plus native header/layout compilation; runtime instrumentation remains incomplete."
+    },
+    "Src/Orbiter/Select.h": {
+      "original_sha256_lf": "0ea1560216087f84fe49f388eca414756fcc1135eba1bdc43d106e7b93053f25",
+      "sha256_lf": "2015d69a8974ac8c022d22b1475e89af6fc0a4f5b35f3df7ee33d952f8568e07",
+      "scope": "Portable cockpit/ImGui SDK data and original instrument declarations. Exact Windows scalar, callback, class, field order and packing conservation plus native header/layout compilation; runtime instrumentation remains incomplete."
     }
   }
 }

@@ -39,6 +39,9 @@ def verify():
     if ledger['observed_source'] != CAPTURE or ledger['production_source'] != BASE:
         raise ValueError('extraction baseline identity changed')
     declared = ledger['files']
+    if 'Orbitersdk/include/OrbiterCockpitData.h' in declared:
+        from cockpit_values_source import verify as verify_cockpit_values
+        verify_cockpit_values()
     if 'Src/Orbiter/Production/CockpitGraphics.h' in declared:
         from cockpit_source import verify as verify_cockpit
         verify_cockpit()
@@ -261,7 +264,11 @@ def verify():
         expected=original
         for start,end,replacement in sorted(ranges,reverse=True):
             expected=expected[:start]+replacement+expected[end:]
-        if expected!=(ROOT/'Orbitersdk/include/OrbiterAPI.h').read_bytes().replace(b'\r\n',b'\n'):
+        actual_sdk=(ROOT/'Orbitersdk/include/OrbiterAPI.h').read_bytes().replace(b'\r\n',b'\n')
+        if 'Orbitersdk/include/OrbiterCockpitData.h' in declared:
+            from cockpit_values_source import restore_api as restore_cockpit_values
+            actual_sdk=restore_cockpit_values(actual_sdk)
+        if expected!=actual_sdk:
             raise ValueError('Windows SDK changed beyond the verbatim value extraction')
     print('Verified original observation-only source and', len(declared),
           'explicit extraction files; frozen runtime references remain required')

@@ -25,10 +25,6 @@ namespace oapi {
 		IMAGE_DDS = 4	///< D3D9+ only
 	};
 }
-struct MFDSPEC {oapi::SdkRectangle pos;int nbt_left,nbt_right;int bt_yofs,bt_ydist;};
-struct VCMFDSPEC {oapi::UInt32 nmesh,ngroup;};
-struct VCHUDSPEC {oapi::UInt32 nmesh,ngroup;VECTOR3 hudcnt;double size;};
-struct HUDPAINTSPEC {int W,H,CX,CY;double Scale;int Markersize;};
 #define OAPISURFACE_TEXTURE      0x0001 ///< Surface can be used as a texture (e.g. by associating it with a mesh)
 #define OAPISURFACE_RENDERTARGET 0x0002 ///< Surface can be rendered to by the graphics device
 #define OAPISURFACE_GDI          0x0004 ///< A HDC context can be requested from the surface for GDI drawing
@@ -42,7 +38,6 @@ struct HUDPAINTSPEC {int W,H,CX,CY;double Scale;int Markersize;};
 #define OAPISURFACE_RENDER3D     0x0400 ///< Create a surface that can act as a target for rendering a 3D scene
 #define OAPISURFACE_ANTIALIAS    0x0800 ///< Create a surface with anti-aliasing the level will depend on launchpad settings.
 #define OAPISURFACE_SHARED		 0x1000 ///< Create a shared resource
-#define MAXMFD                  12  ///< Max. number of MFD displays per panel
 typedef struct {
 	NTVERTEX *Vtx;     ///< vertex list
 	oapi::UInt16 *Idx;         ///< index list

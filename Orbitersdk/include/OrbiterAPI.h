@@ -414,49 +414,7 @@ namespace oapi {
 /**
  * \brief Base class for defining an ImGui dialog.
  */
-class OAPIFUNC ImGuiDialog {
-	struct ImGuiDefaultSize {
-		float width;
-		float height;
-	};
-public:
-	/**
-	 * \brief Create an ImGui dialog object.
-	 * \param name Name of the dialog window
-	 * \note This class must by derived from in order to define a custom ImGui dialog
-	 */
-	ImGuiDialog(const char *n, ImGuiDefaultSize ds = {350.0,280.0}):name(n),defaultSize(ds) {}
-	virtual ~ImGuiDialog();
-	bool IsActive() { return active; }
-	void Activate();
-	virtual void Display();
-	void SetHelp(const char *file, const char *topic = NULL) {
-		helpfile = file;
-		if(topic)
-			helptopic = topic;
-		else
-			helptopic.clear();
-	}
-	bool HandleHelpButton();
-protected:
-	/**
-	 * \brief Callback that is executed when the dialog is closed.
-	 * \note The default behavior is to do nothing
-	 */
-	virtual void OnClose() {};
-	/**
-	 * \brief Callback that is executed when the dialog should be drawn.
-	 * \note Orbiter takes care of doing the ImGui::Begin() / ImGui::End() pair
-	 * required to create the window and handle its visibility.
-	 * \note ImGui documentation is available at https://github.com/ocornut/imgui
-	 */
-	virtual void OnDraw() = 0;
-	bool active = false;
-	const std::string name;
-	ImGuiDefaultSize defaultSize;
-	std::string helpfile;
-	std::string helptopic;
-};
+#include "OrbiterGuiData.h"
 
 /**
  * \defgroup locallight Local lighting interface
@@ -575,12 +533,7 @@ typedef bool (*Listentry_clbk)(char *name, DWORD idx, DWORD flag, void *usrdata)
  * \brief Context information for an Orbiter ingame help page.
  * \sa oapiOpenHelp
  */
-typedef struct {
-	char *helpfile; 
-	char *topic;
-	char *toc;
-	char *index;
-} HELPCONTEXT;
+
 
 typedef struct {
 	char *name;
@@ -591,64 +544,7 @@ typedef struct {
 
 #include "OrbiterAnimationData.h"
 
-typedef struct {
-	RECT pos;
-	int nbt_left, nbt_right;
-	int bt_yofs, bt_ydist;
-} MFDSPEC;
-
-typedef struct {
-	DWORD nmesh, ngroup;
-} VCMFDSPEC;
-
-#define MFD_SHOWMODELABELS       0x0001
-#define MFD_TRANSPARENT_WHEN_OFF 0x0002
-
-typedef struct {
-	RECT pos;
-	DWORD nmesh, ngroup;
-	DWORD flag;
-	int nbt1, nbt2;
-	int bt_yofs, bt_ydist;
-} EXTMFDSPEC;
-
-typedef struct {
-	DWORD nmesh, ngroup;
-	VECTOR3 hudcnt;
-	double size;
-} VCHUDSPEC;
-
-typedef struct {
-	int W, H;
-	int CX, CY;
-	double Scale;
-	int Markersize;
-} HUDPAINTSPEC;
-
-typedef struct {
-	char *name;
-	DWORD key;
-	OAPI_MSGTYPE (*msgproc)(UINT,UINT,WPARAM,LPARAM);
-} MFDMODESPEC;
-
-typedef struct {
-	char *name;
-	DWORD key;
-	void *context;
-	OAPI_MSGTYPE (*msgproc)(UINT,UINT,WPARAM,LPARAM);
-} MFDMODESPECEX;
-
-typedef struct {
-	int w, h;
-	MFDMODESPECEX *spec;
-} MFDMODEOPENSPEC;
-
-#pragma pack(push,1)
-typedef struct {
-	const char *line1, *line2;
-	char selchar;
-} MFDBUTTONMENU;
-#pragma pack(pop)
+#include "OrbiterCockpitData.h"
 
 
 #include "OrbiterVesselData.h"
@@ -728,72 +624,7 @@ typedef struct {
 //@}
 
 
-// ===========================================================================
-/// \ingroup defines
-/// \defgroup hudmode HUD mode identifiers
-///  These constants are used to refer to the built-in HUD (head-up display) modes.
-// ===========================================================================
-//@{
-#define HUD_NONE                 0 ///< No mode (turn HUD off)
-#define HUD_ORBIT                1 ///< Orbit HUD mode
-#define HUD_SURFACE              2 ///< Surface HUD mode
-#define HUD_DOCKING              3 ///< Docking HUD mode
-//@}
 
-/**
- * \brief Mode-specific parameters for HUD mode settings
- * \sa oapiSetHUDMode(int,const HUDPARAM*)
- */
-typedef union {
-	struct {
-		OBJHANDLE hRef;   ///< orbit HUD reference object (NULL for auto)
-	} HUDorbit;
-	struct {
-		DWORD NavIdx;       ///< docking HUD nav receiver index (>= 0)
-	} HUDdocking;
-} HUDPARAM;
-
-// ===========================================================================
-/// \ingroup defines
-/// \defgroup mfdmode MFD mode identifiers
-/// These constants are used to refer to the built-in MFD (multifunctional display) modes.
-// ===========================================================================
-//@{
-#define MFD_REFRESHBUTTONS      -1 ///< Refresh MFD buttons
-#define MFD_NONE                 0 ///< No mode (turn MFD off)
-#define MFD_ORBIT                1 ///< Orbit MFD mode
-#define MFD_SURFACE              2 ///< Surface MFD mode
-#define MFD_MAP                  3 ///< Map MFD mode
-#define MFD_HSI                  4 ///< HSI (horizontal situation indicator) MFD mode
-#define MFD_LANDING              5 ///< VTOL support MFD mode
-#define MFD_DOCKING              6 ///< Docking support MFD mode
-#define MFD_OPLANEALIGN          7 ///< Orbital plane alignment MFD mode
-#define MFD_OSYNC                8 ///< Orbit synchronisation MFD mode
-#define MFD_TRANSFER             9 ///< Transfer orbit MFD mode
-#define MFD_COMMS               10 ///< Communications MFD mode
-#define MFD_USERTYPE            64 ///< User-defined MFD mode
-#define BUILTIN_MFD_MODES       10 ///< Number of built-in MFD modes
-//@}
-
-// ===========================================================================
-/// \ingroup defines
-/// \defgroup mfdidentifier MFD identifiers
-// ===========================================================================
-//@{
-#define MAXMFD                  12  ///< Max. number of MFD displays per panel
-#define MFD_LEFT                 0  ///< Left default MFD display
-#define MFD_RIGHT                1  ///< Right default MFD display
-#define MFD_USER1                2  ///< User-defined MFD display 1
-#define MFD_USER2                3  ///< User-defined MFD display 2
-#define MFD_USER3                4  ///< User-defined MFD display 3
-#define MFD_USER4                5  ///< User-defined MFD display 4
-#define MFD_USER5                6  ///< User-defined MFD display 5
-#define MFD_USER6                7  ///< User-defined MFD display 6
-#define MFD_USER7                8  ///< User-defined MFD display 7
-#define MFD_USER8                9  ///< User-defined MFD display 8
-#define MFD_USER9               10  ///< User-defined MFD display 9
-#define MFD_USER10              11  ///< User-defined MFD display 10
-//@}
 
 // ===========================================================================
 /// \ingroup defines

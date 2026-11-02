@@ -31,6 +31,9 @@ def sdk_blocks(source):
     c=source.index('#define COCKPIT_GENERIC');d=source.index('// time propagation modes',c)
     return a,b,c,d
 def restore_api(actual):
+    if (b'OrbiterCockpitData.h' in actual if isinstance(actual,bytes) else 'OrbiterCockpitData.h' in actual):
+        from cockpit_values_source import restore_api as restore_cockpit
+        actual=restore_cockpit(actual)
     source=old('Orbitersdk/include/OrbiterAPI.h');a,b,c,d=sdk_blocks(source)
     header=raw('Orbitersdk/include/OrbiterCameraData.h')
     body=header[header.index('#define COCKPIT_GENERIC'):header.rindex('#endif')]
