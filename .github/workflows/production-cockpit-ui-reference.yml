@@ -1,10 +1,5 @@
 name: Original Windows Cockpit UI Reference
 on:
-  push:
-    branches: ['codex/production-**']
-    paths:
-      - 'Tests/Production/CockpitUI/**'
-      - '.github/workflows/production-cockpit-ui-reference.yml'
   workflow_dispatch:
 permissions:
   contents: read

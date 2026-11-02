@@ -19,3 +19,8 @@ These are candidate captures until Windows Debug, Release and cross-build
 comparison pass and provenance is explicitly preserved. Native selection/input
 integration depends on that acceptance. The capture workflow must become
 manual-only when these references are frozen.
+
+The three cases are accepted from run 41541262748. `Reference/` records the
+exact producer and artifact hashes. `frozen_ui.py` verifies and stages them,
+and `preserve_ui.py` prepares their original archives and logs for release
+storage. The capture workflow is now manual-only.

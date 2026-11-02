@@ -436,3 +436,20 @@ The fix is verified by [run 41507189054](https://github.com/dcajacob/orbiter-cro
 at `881dd518`. Both Windows builds and all final cross-configuration comparisons
 pass, completing the hosted glass mouse-control gate. Selection/input UI and
 real native DG/DG-S cockpits remain unfinished.
+
+### Original selection and input reference
+
+[Run 41541262748](https://github.com/dcajacob/orbiter-cross-platform/actions/runs/41541262748)
+passes original Windows Orbit target entry, Sync transit-list parameter entry
+and SDK input cancellation in two fresh processes per Debug/Release build.
+The preserved application/SDK/client binaries supply the actual dialogs and
+MFD callbacks. The additional observer routes declared mouse/key/character
+messages through its owned render window and records popup bounds, capture
+flags, callbacks and saved instrument settings.
+
+The three cross-build cases have zero numerical and projected-geometry errors,
+exact instrument text, popup/input/callback records and SSIM 1.0 for all captured
+full frames and MFD textures. Local artifact SHA256 verification and comparison
+also pass. The producer, artifacts and per-file hashes are in
+`Tests/Production/CockpitUI/Reference`. Native UI integration and additional
+menu/focus coverage remain pending.
