@@ -29,10 +29,12 @@ limits. Its maximum attitude difference is approximately 0.00674 rad against the
 agreed 0.001 rad budget; that case fails. All seven cases have completed locally
 at both rendering frequencies with byte-identical numerical histories. The
 original production force formulas and all accepted thresholds remain unchanged.
-Hosted Ubuntu 24.04 Debug reproduces the same failure at tick 1821 in
+Hosted Ubuntu 24.04 Debug and Release reproduce the same failure at tick 1821 in
 [run 41371271692](https://github.com/dcajacob/orbiter-cross-platform/actions/runs/41371271692).
-Its existing scene, orbital-flight and keyboard checks pass. Release ground-flight
-results are pending.
+Their existing scene, orbital-flight and keyboard checks pass. The Debug landing
+and math histories are byte-identical to the laptop's histories. The expanded
+keyboard checks also pass both hosted configurations at `6b9923ed` in
+[run 41372043206](https://github.com/dcajacob/orbiter-cross-platform/actions/runs/41372043206).
 
 All thirty portable tests pass locally, as do the six existing orbital-flight
 comparisons, twenty complete sessions and the existing scene/image comparison
@@ -95,6 +97,28 @@ This experiment uses the same frozen application and stock controls, records the
 selected path and compares with the existing reference. It cannot create an
 accepted reference or turn a failed native flight into a passing gate.
 
+The [runtime sensitivity run](https://github.com/dcajacob/orbiter-cross-platform/actions/runs/41372043279)
+confirms that Windows changed from FMA3 enabled to disabled. Its maximum attitude
+difference is 0.0000024416 rad, within the existing 0.001 rad limit. Disabling
+glibc's FMA dispatch locally still fails at tick 1821. An isolated experiment
+with the unmodified BSD-licensed AMD legacy scalar sine/cosine functions also
+fails there. Neither experiment has been adopted as a production dependency or
+accepted runtime profile.
+
+The [expanded read-only probe](https://github.com/dcajacob/orbiter-cross-platform/actions/runs/41372979870)
+confirms matching initial terrain elevation/normal, vessel inertia, touchdown
+geometry, spring stiffness and damping. The first differing angular acceleration
+at tick 2 is approximately 4.7e-14 rad/s². The first observed terrain difference
+comes at tick 4, after the rotation starts differing. These observations do not
+yet locate the first differing intermediate force calculation. Both Windows and
+native expanded probes leave their previous physical traces byte-identical.
+
+The touchdown columns record raw original SDK returns. The pre-existing
+`GetTouchdownPoint` implementation copies an internal record containing an extra
+compression field, so its returned friction fields cannot be interpreted as the
+actual internal friction coefficients. That getter and the physics code have
+not been changed during this investigation.
+
 The diagnostic archive is [artifact 13108294773](https://github.com/dcajacob/orbiter-cross-platform/actions/runs/41371271627/artifacts/13108294773),
 SHA256 `ba893aba659697fe67dd505a53986772a9ed6d807203ac0fa6c779c41f3647ce`.
 After extracting it, reproduce the per-column/same-input report with:
@@ -110,3 +134,23 @@ The report includes input hashes and independent high-precision diagnostic
 evaluations. It is not a flight acceptance report and cannot override the
 frozen comparison. The next investigation is the first differing intermediate
 contact-force calculation, followed by the same unchanged flight gates.
+
+## Experimental ground preview
+
+The ground preview has a dedicated immutable snapshot, separate from the
+accepted orbital preview. It is available for inspection while landing parity
+remains failed; it does not satisfy the Phase 5 exit gate.
+
+```sh
+python3 -B Tests/Production/Flight/prepare-preview.py \
+  --build out/native-vessels --destination out/native-ground-preview
+Tests/Production/GroundFlight/run-local.sh
+```
+
+It starts paused at Edwards on actual stock Earth data with the real ShuttlePB
+module. Space resumes; Home/End increase/decrease hover throttle, and W/S, A/D,
+Z/C retain the momentary RCS controls. Hover throttle persists after releasing
+Home/End. F selects RCS mode, Ctrl-F disables/enables RCS, and Alt-F toggles
+aerodynamic controls. The title reports actual ground state, height above terrain,
+airspeed, fuel, thrust and active autopilots. Cockpits and flight instruments are
+still later gates.

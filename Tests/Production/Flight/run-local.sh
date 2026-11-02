@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 orbiter_root="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/../../.." && pwd)"
-orbiter_preview="$(cd -P -- "$orbiter_root/out/native-flight-preview/current" && pwd)"
+orbiter_preview="$(cd -P -- "${ORBITER_FLIGHT_PREVIEW:-$orbiter_root/out/native-flight-preview/current}" && pwd)"
 orbiter_scenario="$orbiter_root/Tests/Production/NativeScene/Sol-ISS-ShuttlePB.scn"
 orbiter_keymap="$orbiter_root/Tests/Production/Flight/keymap-laptop.cfg"
 orbiter_config="$orbiter_root/Tests/Production/NativeScene/Orbiter.cfg"
