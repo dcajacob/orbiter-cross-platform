@@ -1,0 +1,116 @@
+name: Original Windows Cockpit UI Reference
+on:
+  push:
+    branches: ['codex/production-**']
+    paths:
+      - 'Tests/Production/CockpitUI/**'
+      - '.github/workflows/production-cockpit-ui-reference.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: original-cockpit-ui-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  capture:
+    name: Original real cockpit UI ${{ matrix.configuration }} x64
+    runs-on: windows-2022
+    timeout-minutes: 40
+    strategy:
+      fail-fast: false
+      matrix:
+        configuration: [Debug, Release]
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - uses: ilammy/msvc-dev-cmd@v1
+        with:
+          vsversion: '17.0'
+          arch: x64
+      - uses: actions/cache@v6
+        with:
+          path: out/cockpit-cache
+          key: original-cockpit-control-runtime-${{ matrix.configuration }}-${{ hashFiles('Tests/Production/Cockpit/Reference/provenance.json') }}
+      - name: Verify and stage exact archived original application, SDK and real client
+        run: >-
+          python -B Tests/Production/CockpitControls/prepare.py --configuration ${{ matrix.configuration }}
+          --cache out/cockpit-cache --output out/original-app
+      - name: Build only the additional SDK control/observation driver
+        shell: pwsh
+        run: |
+          cmake -S Tests/Production/CockpitUI -B out/control-driver -G Ninja -DCMAKE_BUILD_TYPE=${{ matrix.configuration }} -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DORBITER_TEST_RUNTIME="$pwd/out/original-app" 2>&1 | Tee-Object control-configure.log
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          cmake --build out/control-driver --parallel 2 2>&1 | Tee-Object control-build.log
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - uses: actions/cache@v6
+        with:
+          path: out/data-cache/Orbiter-x64.zip
+          key: production-data-${{ hashFiles('Tests/Production/stock-data.lock.json') }}
+      - uses: actions/cache@v6
+        with:
+          path: out/planet-cache/Orbiter2016.zip
+          key: production-standard-planets-${{ hashFiles('Tests/Production/standard-planets.lock.json') }}
+      - name: Prepare verified unchanged stock data
+        shell: pwsh
+        run: |
+          python -B Tests/Production/prepare_data.py --archive out/data-cache/Orbiter-x64.zip --destination out/data
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          python -B Tests/Production/prepare_data.py --lock Tests/Production/standard-planets.lock.json --archive out/planet-cache/Orbiter2016.zip --destination out/planets
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - uses: actions/cache@v6
+        with:
+          path: out/mesa-cache/*.pkg.tar.zst
+          key: mesa-ucrt64-${{ hashFiles('Tests/Production/mesa-ucrt64.lock.json') }}
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.14'
+      - run: python -B Tests/Production/stage_mesa.py stage --cache out/mesa-cache --destination out/mesa
+      - name: Capture original target selection, parameter entry and cancellation twice
+        run: >-
+          python -B Tests/Production/CockpitUI/capture.py --orbiter out/original-app/Orbiter.exe
+          --data out/data --planets out/planets --mesa out/mesa --configuration ${{ matrix.configuration }} --output out/control-reference
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: original-cockpit-ui-${{ matrix.configuration }}
+          retention-days: 90
+          path: |
+            control-*.log
+            out/control-reference/**/*.json
+            out/control-reference/**/*.csv
+            out/control-reference/**/*.txt
+            out/control-reference/**/*.log
+            out/control-reference/**/*.png
+            out/control-reference/**/*.rgba
+            out/control-reference/**/*.scn
+            out/control-reference/**/Orbiter.cfg
+            out/original-app/control-reference-runtime.json
+            out/original-app/Modules/Plugin/ProductionCockpitDriver.dll
+            out/control-driver/CMakeCache.txt
+            out/control-driver/compile_commands.json
+  compare:
+    name: Original cockpit UI Debug/Release parity
+    needs: capture
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - uses: actions/download-artifact@v8
+        with:
+          name: original-cockpit-ui-Debug
+          path: out/debug
+      - uses: actions/download-artifact@v8
+        with:
+          name: original-cockpit-ui-Release
+          path: out/release
+      - run: >-
+          python3 -B Tests/Production/CockpitUI/compare_ui.py --debug out/debug/out/control-reference
+          --release out/release/out/control-reference --output cockpit-control-comparison.json
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: original-cockpit-ui-comparison
+          path: cockpit-control-comparison.json
