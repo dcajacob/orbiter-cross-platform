@@ -1,9 +1,6 @@
 name: Windows ShuttlePB Ground Flight Reference
 
 on:
-  push:
-    branches: ['codex/production-**']
-    paths: ['Tests/Production/GroundFlight/**', 'Tests/Production/BehaviorDriver.cpp', '.github/workflows/production-ground-reference.yml']
   workflow_dispatch:
 
 permissions:
