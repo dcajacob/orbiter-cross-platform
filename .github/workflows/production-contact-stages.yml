@@ -1,0 +1,120 @@
+name: Production Contact Stage Observation
+on:
+  push:
+    branches: ['codex/production-**']
+    paths: ['Tests/Production/ContactStages/**', '.github/workflows/production-contact-stages.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  windows:
+    name: Frozen Windows contact stages Debug x64
+    runs-on: windows-2022
+    timeout-minutes: 60
+    env:
+      DXSDK_DIR: '${{ github.workspace }}\DXSDK'
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - uses: actions/checkout@v7
+        with:
+          ref: 391919027ac3e4a4d42f145373c788fc859c32cd
+          path: out/diagnostic-source
+      - uses: ilammy/msvc-dev-cmd@v1
+        with:
+          vsversion: '17.0'
+          arch: x64
+      - uses: actions/cache@v6
+        id: dxsdk
+        with:
+          path: '${{ github.workspace }}\DXSDK'
+          key: dxsdk_jun10
+      - name: Prepare existing SDK dependency
+        if: steps.dxsdk.outputs.cache-hit != 'true'
+        shell: cmd
+        run: |
+          curl --fail -L https://download.microsoft.com/download/a/e/7/ae743f1f-632b-4809-87a9-aa1bb3458e31/DXSDK_Jun10.exe -o DXSDK_Jun10.exe
+          if errorlevel 1 exit /b 1
+          7z x DXSDK_Jun10.exe DXSDK/Include DXSDK/Lib
+          if errorlevel 1 exit /b 1
+      - name: Verify frozen source and insert reversible observations only in its isolated copy
+        shell: pwsh
+        run: |
+          python Tests/Production/GroundFlight/frozen.py
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          python Tests/Production/ControlledLanding/frozen.py
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          git -C out/diagnostic-source diff --exit-code
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          python Tests/Production/ContactStages/prepare.py --source out/diagnostic-source
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - name: Rebuild original Windows production application and SDK with read-only stage observations
+        shell: pwsh
+        run: |
+          cmake -S out/diagnostic-source -B out/diagnostic-build -G Ninja -DCMAKE_BUILD_TYPE=Debug -DCMAKE_C_COMPILER=cl -DCMAKE_CXX_COMPILER=cl -DORBITER_BUILD_D3D9CLIENT=ON -DORBITER_BUILD_XRSOUND=OFF -DORBITER_MAKE_DOC=OFF -DORBITER_MAKE_TESTS=ON -DORBITER_PORTABLE_REFERENCE_CAPTURE=ON -DORBITER_PRODUCTION_REFERENCE_CAPTURE=ON "-DDXSDK_DIR:PATH=$env:DXSDK_DIR" 2>&1 | Tee-Object out/contact-configure.log
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          cmake --build out/diagnostic-build --parallel 2 2>&1 | Tee-Object out/contact-build.log
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          ctest --test-dir out/diagnostic-build --output-on-failure 2>&1 | Tee-Object out/contact-ctest.log
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - name: Build the unchanged qualified control drivers against this same SDK
+        shell: pwsh
+        run: |
+          $build = "$pwd/out/diagnostic-build"
+          $output = "$pwd/out/diagnostic-sdk.zip"
+          Push-Location out/diagnostic-source
+          python Tests/Production/package_test_runtime.py --build "$build" --output "$output"
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          Pop-Location
+          python -c "import pathlib,zipfile; pathlib.Path('out/diagnostic-build/test-runtime.json').write_bytes(zipfile.ZipFile('out/diagnostic-sdk.zip').read('test-runtime.json'))"
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          cmake -S Tests/Production/BehaviorBuild -B out/driver -G Ninja -DCMAKE_BUILD_TYPE=Debug -DORBITER_TEST_RUNTIME="$pwd/out/diagnostic-build"
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          cmake --build out/driver --parallel 2
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          $output = "$pwd/out/diagnostic-runtime.zip"
+          Push-Location out/diagnostic-source
+          python Tests/Production/package_test_runtime.py --build "$build" --output "$output"
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          Pop-Location
+          Expand-Archive out/diagnostic-runtime.zip out/diagnostic-runtime
+          python Tests/Production/build_metadata.py --build out/diagnostic-build
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - uses: actions/cache@v6
+        with:
+          path: out/data-cache/Orbiter-x64.zip
+          key: production-data-${{ hashFiles('Tests/Production/stock-data.lock.json') }}
+      - uses: actions/cache@v6
+        with:
+          path: out/planet-cache/Orbiter2016.zip
+          key: production-standard-planets-${{ hashFiles('Tests/Production/standard-planets.lock.json') }}
+      - name: Prepare identical locked production assets
+        shell: pwsh
+        run: |
+          python Tests/Production/prepare_data.py --archive out/data-cache/Orbiter-x64.zip --destination out/data
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          python Tests/Production/prepare_data.py --lock Tests/Production/standard-planets.lock.json --archive out/planet-cache/Orbiter2016.zip --destination out/planets
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - name: Require byte-identical frozen physical traces before accepting any observations
+        run: >-
+          python Tests/Production/ContactStages/windows.py --orbiter out/diagnostic-runtime/Orbiter.exe
+          --data out/data --planets out/planets --instrumentation out/diagnostic-source/contact-instrumentation.json
+          --output out/contact-stages
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: contact-stage-observation-Debug
+          path: |
+            out/contact-*.log
+            out/diagnostic-source/contact-instrumentation.json
+            out/diagnostic-build/build-inputs.json
+            out/diagnostic-build/CMakeCache.txt
+            out/diagnostic-runtime/test-runtime.json
+            out/contact-stages/**/*.json
+            out/contact-stages/**/*.jsonl
+            out/contact-stages/**/*.csv
+            out/contact-stages/**/*.scn
+            out/contact-stages/**/*.log
+            out/contact-stages/**/*.txt
+            out/contact-stages/**/Orbiter.cfg
