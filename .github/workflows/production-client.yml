@@ -10,6 +10,7 @@ on:
       - 'Tests/Production/*source.py'
       - 'Tests/Production/phase3-extraction.lock.json'
       - 'Tests/Production/Client/**'
+      - 'Tests/Production/stage_mesa.py'
       - '.github/workflows/production-client.yml'
   workflow_dispatch:
 
@@ -122,7 +123,11 @@ jobs:
         with:
           path: out/mesa-cache/*.pkg.tar.zst
           key: mesa-ucrt64-${{ hashFiles('Tests/Production/mesa-ucrt64.lock.json') }}
-      - name: Stage the pinned application-local software OpenGL driver
+      - name: Select Python with in-process Zstandard support
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.14'
+      - name: Decode the verified packages in process
         run: python Tests/Production/stage_mesa.py stage --cache out/mesa-cache --destination out/mesa-runtime
       - name: Execute real Windows Orbiter with Sol, ISS and source-built ShuttlePB
         run: >-
@@ -142,6 +147,7 @@ jobs:
             out/client-execution/**/*.log
             out/client-execution/**/*.scn
             out/client-execution/**/Orbiter.cfg
+            out/mesa-runtime/*.json
             runtime-configure.log
             runtime-build.log
             runtime-ctest.log

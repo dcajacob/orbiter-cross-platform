@@ -112,17 +112,23 @@ cockpit-capable build until Phase 8 passes.
 python3 Tests/Production/inventory.py --verify
 ```
 
-On native Windows, from an MSVC x64 developer shell:
+On native Windows, from an MSVC x64 developer shell with Python 3.14 selected:
 
 ```powershell
 cmake -S Tests/Production -B out/wgl -G Ninja -DCMAKE_BUILD_TYPE=Release
 cmake --build out/wgl
-python Tests/Production/mesa_runtime.py stage --cache out/mesa-cache --destination out/wgl
+python Tests/Production/stage_mesa.py stage --cache out/mesa-cache --destination out/wgl
 python Tests/Production/mesa_runtime.py probe --executable out/wgl/orbiter-wgl-probe.exe --output out/wgl-evidence
 ```
 
 [Accepted hosted WGL evidence](../../Tests/Production/Verification/README.md) records
 actual Debug/Release execution, driver paths/hashes and preserved raw artifacts.
+
+Package staging uses Python 3.14's in-process Zstandard reader to avoid the
+hosted Windows archive tool's intermittent child-decompressor failure. It retains
+the exact locked packages, DLL/license hashes and original loaded-module audit.
+`mesa-extractor.json` records the interpreter, decoder and staging-source hash.
+The frozen original `mesa_runtime.py` remains unchanged.
 
 The [dedicated workflow](../../.github/workflows/production-bootstrap.yml)
 executes Debug and Release on hosted Windows 2022. The MSVC-built probe creates a

@@ -62,7 +62,7 @@ unavailable. A fresh Release rebuild exercises this path. Existing application
 tests and the locked dependency-commit audit must pass before packaging it.
 Artifact retention is therefore not the sole way to reproduce the executable.
 
-Given the verified same-build runtime at `out/production-app`:
+Given the verified same-build runtime at `out/production-app` and Python 3.14:
 
 ```powershell
 cmake -S OVP/OGLClient -B out/opengl-client -G Ninja `
@@ -76,7 +76,7 @@ cmake --build out/driver --parallel 2
 python Tests/Production/prepare_data.py --archive out/data-cache/Orbiter-x64.zip --destination out/production-data
 python Tests/Production/prepare_data.py --lock Tests/Production/standard-planets.lock.json `
   --archive out/planet-cache/Orbiter2016.zip --destination out/standard-planets
-python Tests/Production/mesa_runtime.py stage --cache out/mesa-cache --destination out/mesa-runtime
+python Tests/Production/stage_mesa.py stage --cache out/mesa-cache --destination out/mesa-runtime
 python Tests/Production/Client/run_client.py --orbiter out/production-app/Orbiter.exe `
   --data out/production-data --planets out/standard-planets --mesa out/mesa-runtime `
   --configuration Release --output out/client-execution
@@ -89,9 +89,10 @@ packages and never downloads vessel DLLs over the source-built modules.
 
 ## Deliberate scope
 
-The standalone target currently implements the Windows adapter. The Linux
-production core and platform-neutral client contract have not been extracted.
-The earlier `orbiter-native` viewer remains a separate portability POC.
+This page records the Windows adapter's integration gate. The shared renderer
+also runs through the extracted Linux production core and internal client
+contract; see [native external-view evidence](NativeExternalView.md). The earlier
+`orbiter-native` viewer remains a separate portability POC.
 
 The integration uses a fixed initial viewport and an external camera. Floating
 ImGui platform windows are explicitly disabled and logged; dialogs use the main
