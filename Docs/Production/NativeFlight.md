@@ -7,13 +7,14 @@ quicksave/reload. It retains the actual Sol/SPICE world, stock ISS, source-built
 ShuttlePB and separately built shared OpenGL renderer.
 
 This delivery covers the reduced Earth-orbit ISS/ShuttlePB fixtures. Cockpit,
-HUD/MFD instruments, Delta-glider, atmospheric flight/contact acceptance, Lua,
+HUD/MFD instruments, Delta-glider, Lua,
 normal Orbiter recording/playback, sound, general stock scenarios and installed
 release packaging remain later gates. The title bar reports original vessel
 state; original instruments still require their own integration.
 
-Phase 5 atmospheric/ground-flight work, its separate experimental preview and
-the remaining numerical failures are tracked in [GroundFlight.md](GroundFlight.md).
+The completed Phase 5 atmospheric/ground-flight checks are documented in
+[GroundFlight.md](GroundFlight.md). Attachments, live creation/deletion, focus
+changes and final hosted acceptance are in [VesselLifetime.md](VesselLifetime.md).
 
 ## Run the prepared laptop build
 
@@ -45,6 +46,7 @@ libraries mapped by an already running application.
 | Pause/resume | Space or Ctrl-P |
 | Increase/decrease time acceleration | T / R |
 | Undock from ShuttlePB's port | Ctrl-D while running |
+| Cycle focus-enabled vessels / restore previous focus | F3 / Ctrl-F3 |
 | Quicksave / reload saved scenario | Ctrl-S / F5 |
 | Advance one physics tick while paused | F6 |
 | Orbit camera / zoom | Right-drag / wheel |

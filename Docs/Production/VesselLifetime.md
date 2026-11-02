@@ -1,9 +1,9 @@
 # Phase 5 attachments and live vessel lifetime
 
 The native production host now supports original vessel attachments, runtime
-vessel creation, deferred deletion and focus changes. This completes the local
-implementation of the remaining Phase 5 work. Hosted qualification is pending;
-local results alone do not close the milestone.
+vessel creation, deferred deletion and focus changes. Phase 5 is accepted for
+the reduced production ShuttlePB/ISS scope: local checks and all required hosted
+Windows/Linux gates pass.
 
 ## Implementation and scope
 
@@ -79,6 +79,48 @@ resources and empty arrays; these now release while the graphics context exists.
 Camera construction initializes its view mode and reference rotation before
 setters read them. Remaining process-level X11/Mesa leak reports are recorded
 separately and are not described as a clean global leak-sanitizer result.
+The no-dynamic-vessel run and twenty-create/delete run have identical totals:
+46,141 bytes in 789 X11 allocations and 112 bytes in two Gallium allocations.
+No renderer-owned allocations remain in these reports; no suppressions were used.
+
+## Hosted acceptance
+
+[Native run 41396231078](https://github.com/dcajacob/orbiter-cross-platform/actions/runs/41396231078)
+passes all four Ubuntu 24.04 Debug/Release and automatic/SSE2 configurations at
+`d14fa794`. Each passes the eight frozen orbital cases, all nine lifecycle cases,
+twenty session replacements, actual keyboard focus/control/reload, controlled
+upright landing, seven ground cases and original scene/image checks. Every
+attachment/lifetime numerical difference is zero. All 1,364/1,136 selected events
+match the original order and timing at both rendering intervals.
+
+The current [Windows application/SDK/client run](https://github.com/dcajacob/orbiter-cross-platform/actions/runs/41396081168)
+passes both MSVC configurations and frozen scene comparisons, with SSIM 1.0 and
+zero numerical/landmark differences. It uses implementation source `58a356af`;
+`d14fa794` adds only two attachment/deletion tests and documentation. The command
+`git diff --exit-code 58a356af d14fa794 -- Src Orbitersdk Extern OVP` proves the
+production sources are identical.
+
+The full [production-reference workflow](https://github.com/dcajacob/orbiter-cross-platform/actions/runs/41396231165)
+passes current Windows builds/tests, original orbit/propulsion, all fourteen
+repeated behavior cases, and Debug/Release numerical/lifecycle comparison.
+[Portable tests/parity](https://github.com/dcajacob/orbiter-cross-platform/actions/runs/41396231140),
+[terrain/world parity](https://github.com/dcajacob/orbiter-cross-platform/actions/runs/41396081173)
+and [SPICE parity](https://github.com/dcajacob/orbiter-cross-platform/actions/runs/41396081209)
+also pass. The inherited disabled Nightly and Artifact Cleanup workflows remain
+unchanged.
+
+[The evidence record](VesselLifetimeVerification.json) preserves run/source
+identities, artifact links/digests, downloaded ZIP verification, numerical
+profiles, measured results and local binary hashes. Full traces, reports, images,
+build logs, module/asset identities and licenses remain in the archived artifacts;
+downloaded copies are under `out/phase5-verification`. These records are observed
+results, not new frozen references. Laptop Intel/Mesa XWayland checks pass all
+nine lifecycle cases and repeat the scene at SSIM 0.9862598209696377 with zero
+landmark error. The prepared orbital and ground launchers use the matching
+immutable build snapshot.
+
+Phase 6 is next: original cockpit, HUD/MFD, panel/VC interaction and real
+Delta-glider/DG-S integration. The stock-playable release remains incomplete.
 
 ## Reproduce
 

@@ -5,8 +5,8 @@ atmosphere, terrain/contact code and source-built stock ShuttlePB. Local Debug
 now passes all seven frozen ground cases and the additional controlled upright
 landing. Hosted Ubuntu 24.04 Debug/Release now passes with automatic and forced SSE2
 math. Current Windows application/SDK/client/reference checks also pass.
-Attachment and vessel lifetime integration keep Phase 5 open; the stock-playable
-release remains incomplete.
+The remaining attachment and vessel lifetime gates now also pass, completing
+[Phase 5](VesselLifetime.md). The stock-playable release remains incomplete.
 
 ## Frozen original Windows evidence
 

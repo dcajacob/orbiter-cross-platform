@@ -1,0 +1,2299 @@
+{
+  "schema": 1,
+  "status": "accepted_phase_5_reduced_production_shuttlepb_iss",
+  "production_source": "d14fa7941bd4b60bd5b07c8e444ebfb87761893f",
+  "frozen_reference_run": 41193020450,
+  "baseline_source": "391919027ac3e4a4d42f145373c788fc859c32cd",
+  "local": {
+    "orbital_flight": {
+      "path": "out/native-phase5-qualified-flight/flight-verification.json",
+      "sha256": "8a205f312f97f74371560003da72af489f69d222e1e0051af3d48396fb33a45f",
+      "result": {
+        "manual_flight": {
+          "render_frequency_independent": true,
+          "windows_differences": [
+            {
+              "position_m": 0.0,
+              "velocity_m_s": 0.0,
+              "rotation_rad": 0.0,
+              "angular_velocity_rad_s": 0.0,
+              "mjd_days": 0.0,
+              "mass_fraction": 0.0
+            },
+            {
+              "position_m": 0.0,
+              "velocity_m_s": 0.0,
+              "rotation_rad": 0.0,
+              "angular_velocity_rad_s": 0.0,
+              "mjd_days": 0.0,
+              "mass_fraction": 0.0
+            }
+          ]
+        },
+        "docked": {
+          "render_frequency_independent": true,
+          "windows_differences": [
+            {
+              "position_m": 0.0,
+              "velocity_m_s": 0.0,
+              "rotation_rad": 0.0,
+              "angular_velocity_rad_s": 0.0,
+              "mjd_days": 0.0,
+              "mass_fraction": 0.0
+            },
+            {
+              "position_m": 0.0,
+              "velocity_m_s": 0.0,
+              "rotation_rad": 0.0,
+              "angular_velocity_rad_s": 0.0,
+              "mjd_days": 0.0,
+              "mass_fraction": 0.0
+            }
+          ]
+        },
+        "dock_approach": {
+          "render_frequency_independent": true,
+          "windows_differences": [
+            {
+              "position_m": 0.0,
+              "velocity_m_s": 0.0,
+              "rotation_rad": 0.0,
+              "angular_velocity_rad_s": 1.0339757656912846e-25,
+              "mjd_days": 0.0,
+              "mass_fraction": 0.0
+            },
+            {
+              "position_m": 0.0,
+              "velocity_m_s": 0.0,
+              "rotation_rad": 0.0,
+              "angular_velocity_rad_s": 1.0339757656912846e-25,
+              "mjd_days": 0.0,
+              "mass_fraction": 0.0
+            }
+          ]
+        },
+        "clock": {
+          "render_frequency_independent": true,
+          "windows_differences": [
+            {
+              "position_m": 0.0,
+              "velocity_m_s": 0.0,
+              "rotation_rad": 0.0,
+              "angular_velocity_rad_s": 0.0,
+              "mjd_days": 0.0,
+              "mass_fraction": 0.0
+            },
+            {
+              "position_m": 0.0,
+              "velocity_m_s": 0.0,
+              "rotation_rad": 0.0,
+              "angular_velocity_rad_s": 0.0,
+              "mjd_days": 0.0,
+              "mass_fraction": 0.0
+            }
+          ]
+        },
+        "pb_persistence": {
+          "render_frequency_independent": true,
+          "windows_differences": [
+            {
+              "position_m": 0.0,
+              "velocity_m_s": 0.0,
+              "rotation_rad": 0.0,
+              "angular_velocity_rad_s": 0.0,
+              "mjd_days": 0.0,
+              "mass_fraction": 0.0
+            },
+            {
+              "position_m": 0.0,
+              "velocity_m_s": 0.0,
+              "rotation_rad": 0.0,
+              "angular_velocity_rad_s": 0.0,
+              "mjd_days": 0.0,
+              "mass_fraction": 0.0
+            }
+          ]
+        },
+        "pb_reload": {
+          "render_frequency_independent": true,
+          "windows_differences": [
+            {
+              "position_m": 0.0,
+              "velocity_m_s": 0.0,
+              "rotation_rad": 0.0,
+              "angular_velocity_rad_s": 0.0,
+              "mjd_days": 0.0,
+              "mass_fraction": 0.0
+            },
+            {
+              "position_m": 0.0,
+              "velocity_m_s": 0.0,
+              "rotation_rad": 0.0,
+              "angular_velocity_rad_s": 0.0,
+              "mjd_days": 0.0,
+              "mass_fraction": 0.0
+            }
+          ]
+        },
+        "attachments": {
+          "render_frequency_independent": true,
+          "windows_differences": [
+            {
+              "position_m": 0.0,
+              "velocity_m_s": 0.0,
+              "rotation_rad": 0.0,
+              "angular_velocity_rad_s": 0.0,
+              "mjd_days": 0.0,
+              "mass_fraction": 0.0,
+              "lifetime": {
+                "original_order": true,
+                "compared_events": 1364,
+                "child_samples": 79,
+                "actual_child_mesh_drawn": true,
+                "visual_lifetime": true,
+                "module_lifetime": true
+              }
+            },
+            {
+              "position_m": 0.0,
+              "velocity_m_s": 0.0,
+              "rotation_rad": 0.0,
+              "angular_velocity_rad_s": 0.0,
+              "mjd_days": 0.0,
+              "mass_fraction": 0.0,
+              "lifetime": {
+                "original_order": true,
+                "compared_events": 1364,
+                "child_samples": 79,
+                "actual_child_mesh_drawn": true,
+                "visual_lifetime": true,
+                "module_lifetime": true
+              }
+            }
+          ]
+        },
+        "lifetime": {
+          "render_frequency_independent": true,
+          "windows_differences": [
+            {
+              "position_m": 0.0,
+              "velocity_m_s": 0.0,
+              "rotation_rad": 0.0,
+              "angular_velocity_rad_s": 0.0,
+              "mjd_days": 0.0,
+              "mass_fraction": 0.0,
+              "lifetime": {
+                "original_order": true,
+                "compared_events": 1136,
+                "child_samples": 20,
+                "actual_child_mesh_drawn": true,
+                "visual_lifetime": true,
+                "module_lifetime": true
+              }
+            },
+            {
+              "position_m": 0.0,
+              "velocity_m_s": 0.0,
+              "rotation_rad": 0.0,
+              "angular_velocity_rad_s": 0.0,
+              "mjd_days": 0.0,
+              "mass_fraction": 0.0,
+              "lifetime": {
+                "original_order": true,
+                "compared_events": 1136,
+                "child_samples": 20,
+                "actual_child_mesh_drawn": true,
+                "visual_lifetime": true,
+                "module_lifetime": true
+              }
+            }
+          ]
+        },
+        "twenty_sessions": {
+          "status": "passed",
+          "identical_states": true
+        }
+      }
+    },
+    "lifetime_edges": {
+      "path": "out/native-phase5-combined-edges-2/lifetime-edges.json",
+      "sha256": "93ce1d062b6eb1b8f65f909de9b9ea69321d3e96259d15c5f2f61933b8116790",
+      "result": {
+        "focused_delete": {
+          "final_objects": [
+            "ISS",
+            "PB"
+          ],
+          "final_tick": 12,
+          "graphics_released": true,
+          "ownership": "passed",
+          "render_frequency_independent": true
+        },
+        "alternative_camera": {
+          "final_objects": [
+            "ISS",
+            "PB"
+          ],
+          "final_tick": 12,
+          "graphics_released": true,
+          "ownership": "passed",
+          "render_frequency_independent": true
+        },
+        "delete_parent": {
+          "final_objects": [
+            "Child",
+            "ISS"
+          ],
+          "final_tick": 12,
+          "graphics_released": true,
+          "ownership": "passed",
+          "render_frequency_independent": true
+        },
+        "attached_child_delete": {
+          "final_objects": [
+            "ISS",
+            "PB"
+          ],
+          "final_tick": 12,
+          "graphics_released": true,
+          "ownership": "passed",
+          "render_frequency_independent": true
+        },
+        "attached_parent_delete": {
+          "final_objects": [
+            "Child",
+            "ISS"
+          ],
+          "final_tick": 12,
+          "graphics_released": true,
+          "ownership": "passed",
+          "render_frequency_independent": true
+        },
+        "simultaneous_delete": {
+          "final_objects": [
+            "ISS",
+            "PB"
+          ],
+          "final_tick": 12,
+          "graphics_released": true,
+          "ownership": "passed",
+          "render_frequency_independent": true
+        },
+        "twenty_cycles": {
+          "final_objects": [
+            "ISS",
+            "PB"
+          ],
+          "final_tick": 210,
+          "graphics_released": true,
+          "ownership": "passed",
+          "render_frequency_independent": true
+        },
+        "persist_dynamic": {
+          "final_objects": [
+            "Child",
+            "ISS"
+          ],
+          "final_tick": 12,
+          "graphics_released": true,
+          "ownership": "passed",
+          "stock_reload": true,
+          "render_frequency_independent": true
+        },
+        "close_last_focus": {
+          "final_objects": [
+            "ISS",
+            "PB"
+          ],
+          "final_tick": 2,
+          "graphics_released": true,
+          "ownership": "passed",
+          "render_frequency_independent": true
+        }
+      }
+    },
+    "address_undefined": {
+      "path": "out/native-phase5-nine-sanitized/lifetime-edges.json",
+      "sha256": "93ce1d062b6eb1b8f65f909de9b9ea69321d3e96259d15c5f2f61933b8116790"
+    },
+    "keyboard": {
+      "path": "out/native-phase5-isolated-keyboard/keyboard-verification.json",
+      "sha256": "084b8bfd97387c6b2744542f22cb392b8422e30f5d1a217396e1907742f857a6"
+    },
+    "scene": {
+      "path": "out/native-phase5-cleanup-scene/native-scene-report.json",
+      "sha256": "f298592138346932d91bdb4512c9e4c8c9a9ea6a4173e161d274f784841b02e5",
+      "ssim": [
+        0.9881491503795506,
+        0.9881491503795506
+      ]
+    },
+    "leak_attribution": {
+      "path": "out/phase5-lsan-attribution.json",
+      "sha256": "f96d835c032bbd024e4dd4103cd8bbf447a69c811f8a3ede37d6623b695f114c",
+      "result": {
+        "no_dynamic_vessels": {
+          "libX11.so.6": {
+            "bytes": 46141,
+            "allocations": 789
+          },
+          "libgallium-26.0.8-1ubuntu0.3.so": {
+            "bytes": 112,
+            "allocations": 2
+          }
+        },
+        "twenty_create_delete_cycles": {
+          "libX11.so.6": {
+            "bytes": 46141,
+            "allocations": 789
+          },
+          "libgallium-26.0.8-1ubuntu0.3.so": {
+            "bytes": 112,
+            "allocations": 2
+          }
+        }
+      }
+    },
+    "intel_scene": {
+      "path": "out/native-phase5-intel-scene/native-scene-report.json",
+      "sha256": "5e2514bad92b2d8611965dba938c4c25a20d01a4e0e1c40e94244f20d029bf34",
+      "ssim": [
+        0.9862598209696377,
+        0.9862598209696377
+      ]
+    },
+    "intel_lifetime": {
+      "path": "out/native-phase5-intel-lifetime/lifetime-edges.json",
+      "sha256": "93ce1d062b6eb1b8f65f909de9b9ea69321d3e96259d15c5f2f61933b8116790"
+    },
+    "preview": {
+      "files": {
+        "bin/orbiter-production": "bbd8ea80cc3f365134d9b3a160b6dd350af0371f8034b6445d6b80e907a47511",
+        "lib/liborbiter_production_vessels.so": "97b9b1c95f4d3ccb06b07a2ba12051d5ae3059a6983c82ce8c93c4b31b8ec8f2",
+        "lib/liborbiter_production_boundary.so": "c907eb1f4a2fd24f287386f3034ad0cc6c10c568b0137d18396145ae35183967",
+        "NativeModules/Graphics/OGLClient.so": "9d0d776bd37f335cf11c33209fad44db56334e1e00e5362f3eed9128e1919a5a",
+        "NativeModules/Celbody/spice.so": "1dc58e0f16f3e96a67d509500f28848657662b066cb451e421c195c7136f6e46",
+        "NativeModules/Vessel/ShuttlePB.so": "c86c11b181ebb3f0e7b0a8f459d0e1bedcc52be63af55f2a7ba4c7391c76eb4b",
+        "NativeModules/Celbody/Earth/Atmosphere/EarthAtm2006.so": "ddcdf424878df28463cdde9438c27d6b74a581ae537b2bbbf147015d23f21213",
+        "NativeModules/Celbody/Earth/Atmosphere/EarthAtmJ71G.so": "57e095a9237c0e73a817f971bbc7316baa163af381d26ce21e4dd3bda3374012",
+        "NativeModules/Celbody/Mars/Atmosphere/MarsAtm2006.so": "8914c77f6fc1019f7ae3b59f20f5bcbe2d68c26a7c1b06a7a72f2890806a095c",
+        "NativeModules/Graphics/Licenses/nanovg-src-LICENSE.txt": "45185a6680ed83863bef33e1055f9fd76374df4b81c957802c19a286c982dfd2",
+        "NativeModules/Graphics/Licenses/glfw-src-LICENSE.md": "149704059b5d0bf551637e50042dd4de9c2cae921021f6636298911e3a5f9462",
+        "NativeModules/Graphics/Licenses/docs-FTL.TXT": "08c135755dd589039470f1fdbb400daaabaaa50d0b366d19cebff4d22986baa1",
+        "NativeModules/Graphics/Licenses/Orbiter-MIT.txt": "5d85bca87014aa81e9f29639b0f84740ca926a82a4611709b299ed656c2bf976",
+        "NativeModules/Graphics/Licenses/soil2-src-README.md": "11528c4876b9d4020cb481db340930821b2dc7158fd6dd2a8d8921a9965372a8",
+        "NativeModules/Graphics/Licenses/glm-src-copying.txt": "62d2d642c7d054d4fb4c9b42faad617d6c88fcd91e317f8035aa9f277cc159c3",
+        "NativeModules/Graphics/Licenses/dependencies.lock.json": "a5e71023e4a6ba385fe38aadb357b200e506964449f0aca4f034729e94887b00",
+        "NativeModules/Graphics/Licenses/OpenGL-ATTRIBUTION.md": "c67933837b45b8644d63b2e06a837a3292f66c7f534d782b1be3b2cab4e3f7d3",
+        "NativeModules/Graphics/Licenses/imgui-src-LICENSE.txt": "c80c5789748d955c4a650562baa0d750494e2c7128c2ca66aaebe2e3c4e198bf",
+        "NativeModules/Graphics/Licenses/libnsbmp-src-COPYING": "bec1a28e7f95e0b2acc624bf9e6d8556451f454ea6a213f8c1bc0fe792c61ead",
+        "NativeModules/Graphics/Licenses/zlib-src-zlib.h": "4ddc82b4af931ab55f44d977bde81bfbc4151b5dcdccc03142831a301b5ec3c8"
+      },
+      "source_commit": "d14fa7941bd4b60bd5b07c8e444ebfb87761893f",
+      "working_tree_dirty": false
+    },
+    "sanitizer_options": {
+      "ASAN_OPTIONS": "detect_leaks=0:halt_on_error=1",
+      "UBSAN_OPTIONS": "halt_on_error=1:print_stacktrace=1",
+      "leak_diagnostics": "detect_leaks=1 with LD_DEBUG=files for attribution; no suppressions; global detector fails on equal baseline/cycle platform allocations"
+    },
+    "portable_ctest": {
+      "configuration": "Debug",
+      "passed": 31,
+      "failed": 0
+    },
+    "intel_backend": "x11 via XWayland in the Wayland desktop session",
+    "software_backend": "Xvfb X11 with Mesa llvmpipe",
+    "promoted_preview_paths": [
+      "out/native-flight-preview/current",
+      "out/native-ground-preview/current"
+    ],
+    "outside_checkout_smoke": {
+      "working_directory": "/tmp",
+      "launcher": "Tests/Production/Flight/run-local.sh",
+      "exit_code": 0,
+      "graphics_lifecycle": {
+        "rendered_frames": 2,
+        "successful_presents": 2,
+        "context_deleted": true
+      }
+    }
+  },
+  "limitations": [
+    "Native application plugins remain unsupported; module.* rows mark host notification positions.",
+    "Renderer is not sanitizer-instrumented. Global LSan reports external X11/Mesa allocations; no suppressions used.",
+    "Stock compatibility, controller hardware and performance gates remain later release work."
+  ],
+  "purpose": "Observed qualification evidence; never a simulation reference or tolerance definition",
+  "local_archive": {
+    "path": "out/phase5-verification/local-evidence.zip",
+    "sha256": "c8127eb2de28bddd6b3b4361e8e55b9814b8505d4aab4bc213e7eaac24e9b90c",
+    "size_in_bytes": 28493893
+  },
+  "source_equivalence_command": "git diff --exit-code 58a356af d14fa794 -- Src Orbitersdk Extern OVP",
+  "implementation_source": "58a356af4f060b88fe44e55d88433243d21f9f9e",
+  "qualification_source": "d14fa7941bd4b60bd5b07c8e444ebfb87761893f",
+  "verified_utc": "2026-11-02T06:05:48.352488+00:00",
+  "qualified_runs": [
+    {
+      "id": 41396231078,
+      "name": "Native Production OpenGL External View",
+      "status": "completed",
+      "conclusion": "success",
+      "source": "d14fa7941bd4b60bd5b07c8e444ebfb87761893f",
+      "url": "https://github.com/dcajacob/orbiter-cross-platform/actions/runs/41396231078"
+    },
+    {
+      "id": 41396081168,
+      "name": "Production Windows OpenGL Client",
+      "status": "completed",
+      "conclusion": "success",
+      "source": "58a356af4f060b88fe44e55d88433243d21f9f9e",
+      "url": "https://github.com/dcajacob/orbiter-cross-platform/actions/runs/41396081168"
+    },
+    {
+      "id": 41396231165,
+      "name": "Production Bootstrap",
+      "status": "completed",
+      "conclusion": "success",
+      "source": "d14fa7941bd4b60bd5b07c8e444ebfb87761893f",
+      "url": "https://github.com/dcajacob/orbiter-cross-platform/actions/runs/41396231165"
+    },
+    {
+      "id": 41396231140,
+      "name": "Portable Core and Windows Reference",
+      "status": "completed",
+      "conclusion": "success",
+      "source": "d14fa7941bd4b60bd5b07c8e444ebfb87761893f",
+      "url": "https://github.com/dcajacob/orbiter-cross-platform/actions/runs/41396231140"
+    },
+    {
+      "id": 41396081173,
+      "name": "Production World and Terrain Windows and Linux",
+      "status": "completed",
+      "conclusion": "success",
+      "source": "58a356af4f060b88fe44e55d88433243d21f9f9e",
+      "url": "https://github.com/dcajacob/orbiter-cross-platform/actions/runs/41396081173"
+    },
+    {
+      "id": 41396081209,
+      "name": "Native Production SPICE Modules",
+      "status": "completed",
+      "conclusion": "success",
+      "source": "58a356af4f060b88fe44e55d88433243d21f9f9e",
+      "url": "https://github.com/dcajacob/orbiter-cross-platform/actions/runs/41396081209"
+    }
+  ],
+  "qualified_jobs": {
+    "41396231078": [
+      {
+        "id": 125118043511,
+        "name": "Real native client Ubuntu 24.04 Debug automatic x64",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "id": 125118043580,
+        "name": "Real native client Ubuntu 24.04 Release automatic x64",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "id": 125118043715,
+        "name": "Real native client Ubuntu 24.04 Release sse2 x64",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "id": 125118043782,
+        "name": "Real native client Ubuntu 24.04 Debug sse2 x64",
+        "status": "completed",
+        "conclusion": "success"
+      }
+    ],
+    "41396081168": [
+      {
+        "id": 125117583894,
+        "name": "Real Windows client Release x64",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "id": 125117584203,
+        "name": "Real Windows client Debug x64",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "id": 125120694908,
+        "name": "Windows client numerical, scene and image comparison",
+        "status": "completed",
+        "conclusion": "success"
+      }
+    ],
+    "41396231165": [
+      {
+        "id": 125118043731,
+        "name": "Frozen production inventory",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "id": 125118043854,
+        "name": "Shared planetary archives ubuntu-24.04 Debug x64",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "id": 125118043858,
+        "name": "Windows WGL Release x64",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "id": 125118043889,
+        "name": "Shared planetary archives windows-2022 Debug x64",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "id": 125118043900,
+        "name": "Shared planetary archives windows-2022 Release x64",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "id": 125118043955,
+        "name": "Shared production Pines Release x64",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "id": 125118043962,
+        "name": "Shared production Pines Debug x64",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "id": 125118043965,
+        "name": "Windows WGL Debug x64",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "id": 125118044004,
+        "name": "Shared planetary archives ubuntu-24.04 Release x64",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "id": 125119042441,
+        "name": "Windows production reference Debug x64",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "id": 125119042501,
+        "name": "Windows production reference Release x64",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "id": 125119519578,
+        "name": "Production archive Windows/Linux exact comparison",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "id": 125122141677,
+        "name": "Production Debug/Release numerical and lifecycle comparison",
+        "status": "completed",
+        "conclusion": "success"
+      }
+    ],
+    "41396231140": [
+      {
+        "id": 125118043560,
+        "name": "Portable windows-2022 Debug x64",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "id": 125118043813,
+        "name": "Portable ubuntu-24.04 Debug x64",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "id": 125118043834,
+        "name": "Portable ubuntu-24.04 Release x64",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "id": 125118043846,
+        "name": "Portable windows-2022 Release x64",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "id": 125119334238,
+        "name": "Compare native Windows/Linux Debug/Release traces",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "id": 125119335516,
+        "name": "Windows application ${{ matrix.configuration }} frozen-reference verification",
+        "status": "completed",
+        "conclusion": "skipped"
+      },
+      {
+        "id": 125119336401,
+        "name": "Compare Windows application Debug and Release traces",
+        "status": "completed",
+        "conclusion": "skipped"
+      }
+    ],
+    "41396081173": [
+      {
+        "id": 125117583750,
+        "name": "Verify frozen terrain evidence or prepare first capture",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "id": 125117681107,
+        "name": "Shared terrain windows-2022 Debug x64",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "id": 125117681131,
+        "name": "Shared terrain ubuntu-24.04 Release x64",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "id": 125117681136,
+        "name": "Shared terrain windows-2022 Release x64",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "id": 125117681663,
+        "name": "Shared terrain ubuntu-24.04 Debug x64",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "id": 125117682889,
+        "name": "Original terrain Windows ${{ matrix.configuration }} x64",
+        "status": "completed",
+        "conclusion": "skipped"
+      },
+      {
+        "id": 125117683436,
+        "name": "Original terrain Debug/Release comparison",
+        "status": "completed",
+        "conclusion": "skipped"
+      },
+      {
+        "id": 125118928270,
+        "name": "Production terrain Windows/Linux parity",
+        "status": "completed",
+        "conclusion": "success"
+      }
+    ],
+    "41396081209": [
+      {
+        "id": 125117583761,
+        "name": "Native production SPICE windows-2022 Release x64",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "id": 125117583962,
+        "name": "Native production SPICE windows-2022 Debug x64",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "id": 125117584020,
+        "name": "Native production SPICE ubuntu-24.04 Release x64",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "id": 125117584079,
+        "name": "Native production SPICE ubuntu-24.04 Debug x64",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "id": 125118349935,
+        "name": "Native SPICE Windows/Linux parity",
+        "status": "completed",
+        "conclusion": "success"
+      }
+    ]
+  },
+  "artifact_retention_days": 90,
+  "downloaded_artifacts": [
+    {
+      "run_id": 41396081168,
+      "id": 13119971306,
+      "name": "real-client-Release",
+      "size_in_bytes": 11679555,
+      "sha256": "4508a06384812d890bb145b3184d683cbcb50de087a4591942bf580391921f7c",
+      "path": "out/phase5-verification/hosted/41396081168-real-client-Release.zip",
+      "locally_sha256_verified": true,
+      "url": "https://github.com/dcajacob/orbiter-cross-platform/actions/runs/41396081168/artifacts/13119971306"
+    },
+    {
+      "run_id": 41396081168,
+      "id": 13119344089,
+      "name": "real-client-Debug",
+      "size_in_bytes": 12471073,
+      "sha256": "5b66dce5ba0a3766b8a23aa7ed5f0f2a68c5bb20bcd09f4b57a3b0615de8aaa7",
+      "path": "out/phase5-verification/hosted/41396081168-real-client-Debug.zip",
+      "locally_sha256_verified": true,
+      "url": "https://github.com/dcajacob/orbiter-cross-platform/actions/runs/41396081168/artifacts/13119344089"
+    },
+    {
+      "run_id": 41396081168,
+      "id": 13118789673,
+      "name": "real-client-comparison",
+      "size_in_bytes": 949,
+      "sha256": "f9bd3661dd887224a1ae74b3749089ec26fde4f3e09d9e2bf467e981b08303fb",
+      "path": "out/phase5-verification/hosted/41396081168-real-client-comparison.zip",
+      "locally_sha256_verified": true,
+      "url": "https://github.com/dcajacob/orbiter-cross-platform/actions/runs/41396081168/artifacts/13118789673"
+    },
+    {
+      "run_id": 41396231078,
+      "id": 13119223679,
+      "name": "native-production-client-Debug-sse2-x64",
+      "size_in_bytes": 84232186,
+      "sha256": "6572c3ea54dea67a9bbe6fb3827c3fc7f5cb81d962ccc918f41b158a151cbb1c",
+      "path": "out/phase5-verification/hosted/41396231078-native-production-client-Debug-sse2-x64.zip",
+      "locally_sha256_verified": true,
+      "url": "https://github.com/dcajacob/orbiter-cross-platform/actions/runs/41396231078/artifacts/13119223679"
+    },
+    {
+      "run_id": 41396231078,
+      "id": 13119728129,
+      "name": "native-production-client-Debug-automatic-x64",
+      "size_in_bytes": 84234138,
+      "sha256": "0985f4e670682dddb9ec331f40bd281373c86c36c3b7e3bf8c948f48fc82f6e2",
+      "path": "out/phase5-verification/hosted/41396231078-native-production-client-Debug-automatic-x64.zip",
+      "locally_sha256_verified": true,
+      "url": "https://github.com/dcajacob/orbiter-cross-platform/actions/runs/41396231078/artifacts/13119728129"
+    },
+    {
+      "run_id": 41396231078,
+      "id": 13119748519,
+      "name": "native-production-client-Release-sse2-x64",
+      "size_in_bytes": 84317934,
+      "sha256": "b6ab8217e2f35ee183b58f3fa637cc72565d4b09781e84d60f3f6c36505c2a95",
+      "path": "out/phase5-verification/hosted/41396231078-native-production-client-Release-sse2-x64.zip",
+      "locally_sha256_verified": true,
+      "url": "https://github.com/dcajacob/orbiter-cross-platform/actions/runs/41396231078/artifacts/13119748519"
+    },
+    {
+      "run_id": 41396231078,
+      "id": 13119104473,
+      "name": "native-production-client-Release-automatic-x64",
+      "size_in_bytes": 84286700,
+      "sha256": "cbd5321a74bc1ec76a96ba3e847a6577b783f5b21f054e7158bf0a129001b26e",
+      "path": "out/phase5-verification/hosted/41396231078-native-production-client-Release-automatic-x64.zip",
+      "locally_sha256_verified": true,
+      "url": "https://github.com/dcajacob/orbiter-cross-platform/actions/runs/41396231078/artifacts/13119104473"
+    },
+    {
+      "run_id": 41396231165,
+      "id": 13119154468,
+      "name": "production-reference-comparison",
+      "size_in_bytes": 2215,
+      "sha256": "33d97c4f1727000d0c354546a77d11b9c6199f056ebfa3a1a81db21959c6abed",
+      "path": "out/phase5-verification/hosted/41396231165-production-reference-comparison.zip",
+      "locally_sha256_verified": true,
+      "url": "https://github.com/dcajacob/orbiter-cross-platform/actions/runs/41396231165/artifacts/13119154468"
+    },
+    {
+      "run_id": 41396231165,
+      "id": 13119848052,
+      "name": "production-reference-Release-x64",
+      "size_in_bytes": 4894061,
+      "sha256": "5bda5f98fd16d690f8e5cff207feb671d94c33730d10725759846d65aebfb5b5",
+      "path": "out/phase5-verification/hosted/41396231165-production-reference-Release-x64.zip",
+      "locally_sha256_verified": true,
+      "url": "https://github.com/dcajacob/orbiter-cross-platform/actions/runs/41396231165/artifacts/13119848052"
+    },
+    {
+      "run_id": 41396231165,
+      "id": 13119539097,
+      "name": "production-reference-Debug-x64",
+      "size_in_bytes": 4895220,
+      "sha256": "5eb9ae8cdae35472b619863015e677f75b84d605af47eb3633ddf2799a0cf2cd",
+      "path": "out/phase5-verification/hosted/41396231165-production-reference-Debug-x64.zip",
+      "locally_sha256_verified": true,
+      "url": "https://github.com/dcajacob/orbiter-cross-platform/actions/runs/41396231165/artifacts/13119539097"
+    }
+  ],
+  "additional_hosted_artifacts": {
+    "41396231165": [
+      {
+        "id": 13119980570,
+        "name": "production-runtime-Debug-x64",
+        "size_in_bytes": 223582772,
+        "sha256": "7743c20fc4d3c27576a7c309ed3c40f832d0ce1a29c80f64f23eec85886112ed",
+        "expired": false
+      },
+      {
+        "id": 13119877367,
+        "name": "production-runtime-Release-x64",
+        "size_in_bytes": 160338589,
+        "sha256": "054f9f8d6898ab837c5439f1b2a29f9a39aa27629522584041edba4a39b888f0",
+        "expired": false
+      },
+      {
+        "id": 13119848052,
+        "name": "production-reference-Release-x64",
+        "size_in_bytes": 4894061,
+        "sha256": "5bda5f98fd16d690f8e5cff207feb671d94c33730d10725759846d65aebfb5b5",
+        "expired": false
+      },
+      {
+        "id": 13119721932,
+        "name": "production-archives-windows-2022-Debug-x64",
+        "size_in_bytes": 52768,
+        "sha256": "ecf90c32dbb8c2049be5b565442c4d528a33ee3e5c3e30affde893466e02a8be",
+        "expired": false
+      },
+      {
+        "id": 13119721588,
+        "name": "production-archives-ubuntu-24.04-Debug-x64",
+        "size_in_bytes": 51319,
+        "sha256": "2cd1c3992c73962c029888774a86c88519c78b4eb9b2b5b41163cc807d6e8f5f",
+        "expired": false
+      },
+      {
+        "id": 13119676971,
+        "name": "production-wgl-Release-x64",
+        "size_in_bytes": 149902,
+        "sha256": "acaffe6b8cc03f4df5bb635bbc862819e0604ff861e58843b5ea0168bb1d6723",
+        "expired": false
+      },
+      {
+        "id": 13119602259,
+        "name": "production-archives-ubuntu-24.04-Release-x64",
+        "size_in_bytes": 51903,
+        "sha256": "a512cb22acbdfa40aa8f8ccef52f70a628d57db6bf22fbdb29b161e40494703b",
+        "expired": false
+      },
+      {
+        "id": 13119539097,
+        "name": "production-reference-Debug-x64",
+        "size_in_bytes": 4895220,
+        "sha256": "5eb9ae8cdae35472b619863015e677f75b84d605af47eb3633ddf2799a0cf2cd",
+        "expired": false
+      },
+      {
+        "id": 13119393032,
+        "name": "production-gravity-Debug-x64",
+        "size_in_bytes": 49611,
+        "sha256": "2649716705613f1587817b31ab4d4f2e1531e771e5cd3ca10648e458eabfc186",
+        "expired": false
+      },
+      {
+        "id": 13119318978,
+        "name": "production-archives-windows-2022-Release-x64",
+        "size_in_bytes": 52765,
+        "sha256": "c04817cf6feb354dcc01cdff6cba49fd0ee654644311f69a0fb7d7fb19891978",
+        "expired": false
+      },
+      {
+        "id": 13119188267,
+        "name": "production-archive-comparison",
+        "size_in_bytes": 2087,
+        "sha256": "6a0bbb14800d38cd57cac0563eed50d301bf1692a12e4ec83e6bc795bc668dee",
+        "expired": false
+      },
+      {
+        "id": 13119154468,
+        "name": "production-reference-comparison",
+        "size_in_bytes": 2215,
+        "sha256": "33d97c4f1727000d0c354546a77d11b9c6199f056ebfa3a1a81db21959c6abed",
+        "expired": false
+      },
+      {
+        "id": 13119138123,
+        "name": "production-wgl-Debug-x64",
+        "size_in_bytes": 149991,
+        "sha256": "f50d3759019c7b1f0592b8987f4f032b6a0e7ca56662554833fd098627ef3827",
+        "expired": false
+      },
+      {
+        "id": 13118764165,
+        "name": "production-gravity-Release-x64",
+        "size_in_bytes": 49605,
+        "sha256": "b4f30ff28b21b1e140c878d4934056930b8b13f01a6d008bfc8e33d9b758d46f",
+        "expired": false
+      }
+    ],
+    "41396231140": [
+      {
+        "id": 13119811279,
+        "name": "portable-windows-2022-Debug-x64",
+        "size_in_bytes": 920681,
+        "sha256": "8f84a0df7efab81d5bab8afb9e26536ebd35fe5ecd3c58eb07540f09f5c15102",
+        "expired": false
+      },
+      {
+        "id": 13119717068,
+        "name": "portable-ubuntu-24.04-Debug-x64",
+        "size_in_bytes": 1277976,
+        "sha256": "9ec504d4bb797c8f83e56ea535bf49e45d822099efc803a3ec2ca66323a611d6",
+        "expired": false
+      },
+      {
+        "id": 13119667123,
+        "name": "orbiter-native-ubuntu-24.04-Release-x64",
+        "size_in_bytes": 675379,
+        "sha256": "8e9b26ac7221532c59d49e9b109af9c86a62231d2f74d3e758057f34338fe658",
+        "expired": false
+      },
+      {
+        "id": 13119587902,
+        "name": "native-parity-comparison",
+        "size_in_bytes": 1349,
+        "sha256": "a595b6f2290a9475f469b6773c9e2d444bcdce691b200dd381dcb692fef0ec3d",
+        "expired": false
+      },
+      {
+        "id": 13119582591,
+        "name": "portable-ubuntu-24.04-Release-x64",
+        "size_in_bytes": 1278741,
+        "sha256": "1a2737a153135910f3ac523a04db20fd7b2474206440ce0a14eeb77b33fc8531",
+        "expired": false
+      },
+      {
+        "id": 13119299004,
+        "name": "orbiter-native-ubuntu-24.04-Debug-x64",
+        "size_in_bytes": 3979859,
+        "sha256": "e174f650a1b8c5abdb9e0d97b8a673dee98ffddf7fea1a10612b4e8f2a3b0d38",
+        "expired": false
+      },
+      {
+        "id": 13119093283,
+        "name": "orbiter-native-windows-2022-Release-x64",
+        "size_in_bytes": 645633,
+        "sha256": "6203f68e6db0ecbc800972dfe67d1fbd6e02e0264535ebf2b818346d92928509",
+        "expired": false
+      },
+      {
+        "id": 13119023494,
+        "name": "portable-windows-2022-Release-x64",
+        "size_in_bytes": 920664,
+        "sha256": "221420939478a6bda2a883126575cc3d9bf2b2aee21de6dabee7ec2c191ec28e",
+        "expired": false
+      },
+      {
+        "id": 13118964983,
+        "name": "orbiter-native-windows-2022-Debug-x64",
+        "size_in_bytes": 1076836,
+        "sha256": "36210b34db0e82dde090d77552fd073034468e6f39accfc0a55e8406b1bfced6",
+        "expired": false
+      }
+    ],
+    "41396081173": [
+      {
+        "id": 13119736573,
+        "name": "native-terrain-ubuntu-24.04-Release-x64",
+        "size_in_bytes": 8408997,
+        "sha256": "89af7609d540bcf0dc6587f4629dd90361094191b8988ea6701ec855bf86a638",
+        "expired": false
+      },
+      {
+        "id": 13119587401,
+        "name": "native-terrain-windows-2022-Release-x64",
+        "size_in_bytes": 6348121,
+        "sha256": "a60131c5e4b3db13cd6c688229ec9ec125adba0c82e6f83cbe47f0237e991911",
+        "expired": false
+      },
+      {
+        "id": 13119547565,
+        "name": "native-terrain-ubuntu-24.04-Debug-x64",
+        "size_in_bytes": 8408494,
+        "sha256": "21e29ada904a8fca4ac7c2e5b6f3ab0ab9e35d60565eec67ba3ee0a320583395",
+        "expired": false
+      },
+      {
+        "id": 13119537751,
+        "name": "native-terrain-parity",
+        "size_in_bytes": 1003,
+        "sha256": "97fadd65ab63257ca79f7978288f62efdb3d6b6f756da6ba52d02fe3d2325dee",
+        "expired": false
+      },
+      {
+        "id": 13119482709,
+        "name": "native-terrain-windows-2022-Debug-x64",
+        "size_in_bytes": 6348118,
+        "sha256": "68a39ecf93518adb8bfd0c534d11ed313e3c6223219e5a1cb172265ffd69e761",
+        "expired": false
+      }
+    ],
+    "41396081209": [
+      {
+        "id": 13119651602,
+        "name": "native-spice-windows-2022-Release-x64",
+        "size_in_bytes": 2619049,
+        "sha256": "0dbae9384fc317bbf709bc0dec96f853036745cf5cbf6911f66f97250991c1f1",
+        "expired": false
+      },
+      {
+        "id": 13119308437,
+        "name": "native-spice-parity",
+        "size_in_bytes": 546,
+        "sha256": "92651c985e8b0fa6b1dc3291ee79fc1c4002fe8fb81c5c039397c32d8c5fe2e7",
+        "expired": false
+      },
+      {
+        "id": 13119214017,
+        "name": "native-spice-ubuntu-24.04-Debug-x64",
+        "size_in_bytes": 2619279,
+        "sha256": "82d54eb3843d7a0bd79dad7e372c6dd1d759b33097033b3b9650c5440225c7b3",
+        "expired": false
+      },
+      {
+        "id": 13118944858,
+        "name": "native-spice-windows-2022-Debug-x64",
+        "size_in_bytes": 2619055,
+        "sha256": "99aa8cfeb145644315b5b5f048446ca9d3bb295bb0fb3b9efacebffbddb6aafd",
+        "expired": false
+      },
+      {
+        "id": 13118923252,
+        "name": "native-spice-ubuntu-24.04-Release-x64",
+        "size_in_bytes": 2619781,
+        "sha256": "506d77826a8853bd6ae366eb9a97d77efd1ccd8e2e4dae10618d85bd77878996",
+        "expired": false
+      }
+    ]
+  },
+  "native_profiles": {
+    "native-production-client-Debug-sse2-x64": {
+      "numerics": {
+        "math": "amd-6121d02-sse2",
+        "random": "private-msvc-lcg32",
+        "random_maximum": 32767,
+        "process_seed": 0
+      },
+      "flight_cases": [
+        "manual_flight",
+        "docked",
+        "dock_approach",
+        "clock",
+        "pb_persistence",
+        "pb_reload",
+        "attachments",
+        "lifetime",
+        "twenty_sessions"
+      ],
+      "attachment_reference": {
+        "render_frequency_independent": true,
+        "windows_differences": [
+          {
+            "position_m": 0.0,
+            "velocity_m_s": 0.0,
+            "rotation_rad": 0.0,
+            "angular_velocity_rad_s": 0.0,
+            "mjd_days": 0.0,
+            "mass_fraction": 0.0,
+            "lifetime": {
+              "original_order": true,
+              "compared_events": 1364,
+              "child_samples": 79,
+              "actual_child_mesh_drawn": true,
+              "visual_lifetime": true,
+              "module_lifetime": true
+            }
+          },
+          {
+            "position_m": 0.0,
+            "velocity_m_s": 0.0,
+            "rotation_rad": 0.0,
+            "angular_velocity_rad_s": 0.0,
+            "mjd_days": 0.0,
+            "mass_fraction": 0.0,
+            "lifetime": {
+              "original_order": true,
+              "compared_events": 1364,
+              "child_samples": 79,
+              "actual_child_mesh_drawn": true,
+              "visual_lifetime": true,
+              "module_lifetime": true
+            }
+          }
+        ]
+      },
+      "lifetime_reference": {
+        "render_frequency_independent": true,
+        "windows_differences": [
+          {
+            "position_m": 0.0,
+            "velocity_m_s": 0.0,
+            "rotation_rad": 0.0,
+            "angular_velocity_rad_s": 0.0,
+            "mjd_days": 0.0,
+            "mass_fraction": 0.0,
+            "lifetime": {
+              "original_order": true,
+              "compared_events": 1136,
+              "child_samples": 20,
+              "actual_child_mesh_drawn": true,
+              "visual_lifetime": true,
+              "module_lifetime": true
+            }
+          },
+          {
+            "position_m": 0.0,
+            "velocity_m_s": 0.0,
+            "rotation_rad": 0.0,
+            "angular_velocity_rad_s": 0.0,
+            "mjd_days": 0.0,
+            "mass_fraction": 0.0,
+            "lifetime": {
+              "original_order": true,
+              "compared_events": 1136,
+              "child_samples": 20,
+              "actual_child_mesh_drawn": true,
+              "visual_lifetime": true,
+              "module_lifetime": true
+            }
+          }
+        ]
+      },
+      "supplementary_lifecycle": {
+        "focused_delete": {
+          "final_objects": [
+            "ISS",
+            "PB"
+          ],
+          "final_tick": 12,
+          "graphics_released": true,
+          "ownership": "passed",
+          "render_frequency_independent": true
+        },
+        "alternative_camera": {
+          "final_objects": [
+            "ISS",
+            "PB"
+          ],
+          "final_tick": 12,
+          "graphics_released": true,
+          "ownership": "passed",
+          "render_frequency_independent": true
+        },
+        "delete_parent": {
+          "final_objects": [
+            "Child",
+            "ISS"
+          ],
+          "final_tick": 12,
+          "graphics_released": true,
+          "ownership": "passed",
+          "render_frequency_independent": true
+        },
+        "attached_child_delete": {
+          "final_objects": [
+            "ISS",
+            "PB"
+          ],
+          "final_tick": 12,
+          "graphics_released": true,
+          "ownership": "passed",
+          "render_frequency_independent": true
+        },
+        "attached_parent_delete": {
+          "final_objects": [
+            "Child",
+            "ISS"
+          ],
+          "final_tick": 12,
+          "graphics_released": true,
+          "ownership": "passed",
+          "render_frequency_independent": true
+        },
+        "simultaneous_delete": {
+          "final_objects": [
+            "ISS",
+            "PB"
+          ],
+          "final_tick": 12,
+          "graphics_released": true,
+          "ownership": "passed",
+          "render_frequency_independent": true
+        },
+        "twenty_cycles": {
+          "final_objects": [
+            "ISS",
+            "PB"
+          ],
+          "final_tick": 210,
+          "graphics_released": true,
+          "ownership": "passed",
+          "render_frequency_independent": true
+        },
+        "persist_dynamic": {
+          "final_objects": [
+            "Child",
+            "ISS"
+          ],
+          "final_tick": 12,
+          "graphics_released": true,
+          "ownership": "passed",
+          "stock_reload": true,
+          "render_frequency_independent": true
+        },
+        "close_last_focus": {
+          "final_objects": [
+            "ISS",
+            "PB"
+          ],
+          "final_tick": 2,
+          "graphics_released": true,
+          "ownership": "passed",
+          "render_frequency_independent": true
+        }
+      },
+      "keyboard": {
+        "live_vessel_focus": true,
+        "previous_vessel_key": true,
+        "focused_child_rcs": true,
+        "status": "passed",
+        "keyboard_throttle": true,
+        "rcs_mode": true,
+        "rcs_translation": true,
+        "rcs_release_samples": 392,
+        "rcs_focus_release": true,
+        "aerodynamic_toggle": true,
+        "propellant_used": true,
+        "pause": true,
+        "single_step": true,
+        "stock_quicksave": true,
+        "in_process_reload": true,
+        "exit": true
+      },
+      "scene": [
+        {
+          "ssim": 0.9881094596017364,
+          "landmark_errors_px": {
+            "Earth": 0.0,
+            "ISS": 0.0,
+            "PB": 0.0
+          },
+          "states": {
+            "position_m": 0.0,
+            "velocity_m_s": 0.0,
+            "rotation_rad": 0.0,
+            "angular_velocity_rad_s": 0.0,
+            "mjd_days": 0.0,
+            "mass_fraction": 0.0
+          },
+          "renderer": {
+            "vendor": "Mesa",
+            "renderer": "llvmpipe (LLVM 20.1.2, 256 bits)",
+            "version": "4.5 (Core Profile) Mesa 25.2.8-0ubuntu0.24.04.4",
+            "client_width": 1280,
+            "client_height": 720
+          }
+        },
+        {
+          "ssim": 0.9881094596017364,
+          "landmark_errors_px": {
+            "Earth": 0.0,
+            "ISS": 0.0,
+            "PB": 0.0
+          },
+          "states": {
+            "position_m": 0.0,
+            "velocity_m_s": 0.0,
+            "rotation_rad": 0.0,
+            "angular_velocity_rad_s": 0.0,
+            "mjd_days": 0.0,
+            "mass_fraction": 0.0
+          },
+          "renderer": {
+            "vendor": "Mesa",
+            "renderer": "llvmpipe (LLVM 20.1.2, 256 bits)",
+            "version": "4.5 (Core Profile) Mesa 25.2.8-0ubuntu0.24.04.4",
+            "client_width": 1280,
+            "client_height": 720
+          }
+        }
+      ],
+      "ground_status": "passed",
+      "ground_complete_suite": true,
+      "controlled_landing_status": "passed controlled upright landing"
+    },
+    "native-production-client-Debug-automatic-x64": {
+      "numerics": {
+        "math": "amd-6121d02-fma3",
+        "random": "private-msvc-lcg32",
+        "random_maximum": 32767,
+        "process_seed": 0
+      },
+      "flight_cases": [
+        "manual_flight",
+        "docked",
+        "dock_approach",
+        "clock",
+        "pb_persistence",
+        "pb_reload",
+        "attachments",
+        "lifetime",
+        "twenty_sessions"
+      ],
+      "attachment_reference": {
+        "render_frequency_independent": true,
+        "windows_differences": [
+          {
+            "position_m": 0.0,
+            "velocity_m_s": 0.0,
+            "rotation_rad": 0.0,
+            "angular_velocity_rad_s": 0.0,
+            "mjd_days": 0.0,
+            "mass_fraction": 0.0,
+            "lifetime": {
+              "original_order": true,
+              "compared_events": 1364,
+              "child_samples": 79,
+              "actual_child_mesh_drawn": true,
+              "visual_lifetime": true,
+              "module_lifetime": true
+            }
+          },
+          {
+            "position_m": 0.0,
+            "velocity_m_s": 0.0,
+            "rotation_rad": 0.0,
+            "angular_velocity_rad_s": 0.0,
+            "mjd_days": 0.0,
+            "mass_fraction": 0.0,
+            "lifetime": {
+              "original_order": true,
+              "compared_events": 1364,
+              "child_samples": 79,
+              "actual_child_mesh_drawn": true,
+              "visual_lifetime": true,
+              "module_lifetime": true
+            }
+          }
+        ]
+      },
+      "lifetime_reference": {
+        "render_frequency_independent": true,
+        "windows_differences": [
+          {
+            "position_m": 0.0,
+            "velocity_m_s": 0.0,
+            "rotation_rad": 0.0,
+            "angular_velocity_rad_s": 0.0,
+            "mjd_days": 0.0,
+            "mass_fraction": 0.0,
+            "lifetime": {
+              "original_order": true,
+              "compared_events": 1136,
+              "child_samples": 20,
+              "actual_child_mesh_drawn": true,
+              "visual_lifetime": true,
+              "module_lifetime": true
+            }
+          },
+          {
+            "position_m": 0.0,
+            "velocity_m_s": 0.0,
+            "rotation_rad": 0.0,
+            "angular_velocity_rad_s": 0.0,
+            "mjd_days": 0.0,
+            "mass_fraction": 0.0,
+            "lifetime": {
+              "original_order": true,
+              "compared_events": 1136,
+              "child_samples": 20,
+              "actual_child_mesh_drawn": true,
+              "visual_lifetime": true,
+              "module_lifetime": true
+            }
+          }
+        ]
+      },
+      "supplementary_lifecycle": {
+        "focused_delete": {
+          "final_objects": [
+            "ISS",
+            "PB"
+          ],
+          "final_tick": 12,
+          "graphics_released": true,
+          "ownership": "passed",
+          "render_frequency_independent": true
+        },
+        "alternative_camera": {
+          "final_objects": [
+            "ISS",
+            "PB"
+          ],
+          "final_tick": 12,
+          "graphics_released": true,
+          "ownership": "passed",
+          "render_frequency_independent": true
+        },
+        "delete_parent": {
+          "final_objects": [
+            "Child",
+            "ISS"
+          ],
+          "final_tick": 12,
+          "graphics_released": true,
+          "ownership": "passed",
+          "render_frequency_independent": true
+        },
+        "attached_child_delete": {
+          "final_objects": [
+            "ISS",
+            "PB"
+          ],
+          "final_tick": 12,
+          "graphics_released": true,
+          "ownership": "passed",
+          "render_frequency_independent": true
+        },
+        "attached_parent_delete": {
+          "final_objects": [
+            "Child",
+            "ISS"
+          ],
+          "final_tick": 12,
+          "graphics_released": true,
+          "ownership": "passed",
+          "render_frequency_independent": true
+        },
+        "simultaneous_delete": {
+          "final_objects": [
+            "ISS",
+            "PB"
+          ],
+          "final_tick": 12,
+          "graphics_released": true,
+          "ownership": "passed",
+          "render_frequency_independent": true
+        },
+        "twenty_cycles": {
+          "final_objects": [
+            "ISS",
+            "PB"
+          ],
+          "final_tick": 210,
+          "graphics_released": true,
+          "ownership": "passed",
+          "render_frequency_independent": true
+        },
+        "persist_dynamic": {
+          "final_objects": [
+            "Child",
+            "ISS"
+          ],
+          "final_tick": 12,
+          "graphics_released": true,
+          "ownership": "passed",
+          "stock_reload": true,
+          "render_frequency_independent": true
+        },
+        "close_last_focus": {
+          "final_objects": [
+            "ISS",
+            "PB"
+          ],
+          "final_tick": 2,
+          "graphics_released": true,
+          "ownership": "passed",
+          "render_frequency_independent": true
+        }
+      },
+      "keyboard": {
+        "live_vessel_focus": true,
+        "previous_vessel_key": true,
+        "focused_child_rcs": true,
+        "status": "passed",
+        "keyboard_throttle": true,
+        "rcs_mode": true,
+        "rcs_translation": true,
+        "rcs_release_samples": 404,
+        "rcs_focus_release": true,
+        "aerodynamic_toggle": true,
+        "propellant_used": true,
+        "pause": true,
+        "single_step": true,
+        "stock_quicksave": true,
+        "in_process_reload": true,
+        "exit": true
+      },
+      "scene": [
+        {
+          "ssim": 0.9881094596017364,
+          "landmark_errors_px": {
+            "Earth": 0.0,
+            "ISS": 0.0,
+            "PB": 0.0
+          },
+          "states": {
+            "position_m": 0.0,
+            "velocity_m_s": 0.0,
+            "rotation_rad": 0.0,
+            "angular_velocity_rad_s": 0.0,
+            "mjd_days": 0.0,
+            "mass_fraction": 0.0
+          },
+          "renderer": {
+            "vendor": "Mesa",
+            "renderer": "llvmpipe (LLVM 20.1.2, 256 bits)",
+            "version": "4.5 (Core Profile) Mesa 25.2.8-0ubuntu0.24.04.4",
+            "client_width": 1280,
+            "client_height": 720
+          }
+        },
+        {
+          "ssim": 0.9881094596017364,
+          "landmark_errors_px": {
+            "Earth": 0.0,
+            "ISS": 0.0,
+            "PB": 0.0
+          },
+          "states": {
+            "position_m": 0.0,
+            "velocity_m_s": 0.0,
+            "rotation_rad": 0.0,
+            "angular_velocity_rad_s": 0.0,
+            "mjd_days": 0.0,
+            "mass_fraction": 0.0
+          },
+          "renderer": {
+            "vendor": "Mesa",
+            "renderer": "llvmpipe (LLVM 20.1.2, 256 bits)",
+            "version": "4.5 (Core Profile) Mesa 25.2.8-0ubuntu0.24.04.4",
+            "client_width": 1280,
+            "client_height": 720
+          }
+        }
+      ],
+      "ground_status": "passed",
+      "ground_complete_suite": true,
+      "controlled_landing_status": "passed controlled upright landing"
+    },
+    "native-production-client-Release-sse2-x64": {
+      "numerics": {
+        "math": "amd-6121d02-sse2",
+        "random": "private-msvc-lcg32",
+        "random_maximum": 32767,
+        "process_seed": 0
+      },
+      "flight_cases": [
+        "manual_flight",
+        "docked",
+        "dock_approach",
+        "clock",
+        "pb_persistence",
+        "pb_reload",
+        "attachments",
+        "lifetime",
+        "twenty_sessions"
+      ],
+      "attachment_reference": {
+        "render_frequency_independent": true,
+        "windows_differences": [
+          {
+            "position_m": 0.0,
+            "velocity_m_s": 0.0,
+            "rotation_rad": 0.0,
+            "angular_velocity_rad_s": 0.0,
+            "mjd_days": 0.0,
+            "mass_fraction": 0.0,
+            "lifetime": {
+              "original_order": true,
+              "compared_events": 1364,
+              "child_samples": 79,
+              "actual_child_mesh_drawn": true,
+              "visual_lifetime": true,
+              "module_lifetime": true
+            }
+          },
+          {
+            "position_m": 0.0,
+            "velocity_m_s": 0.0,
+            "rotation_rad": 0.0,
+            "angular_velocity_rad_s": 0.0,
+            "mjd_days": 0.0,
+            "mass_fraction": 0.0,
+            "lifetime": {
+              "original_order": true,
+              "compared_events": 1364,
+              "child_samples": 79,
+              "actual_child_mesh_drawn": true,
+              "visual_lifetime": true,
+              "module_lifetime": true
+            }
+          }
+        ]
+      },
+      "lifetime_reference": {
+        "render_frequency_independent": true,
+        "windows_differences": [
+          {
+            "position_m": 0.0,
+            "velocity_m_s": 0.0,
+            "rotation_rad": 0.0,
+            "angular_velocity_rad_s": 0.0,
+            "mjd_days": 0.0,
+            "mass_fraction": 0.0,
+            "lifetime": {
+              "original_order": true,
+              "compared_events": 1136,
+              "child_samples": 20,
+              "actual_child_mesh_drawn": true,
+              "visual_lifetime": true,
+              "module_lifetime": true
+            }
+          },
+          {
+            "position_m": 0.0,
+            "velocity_m_s": 0.0,
+            "rotation_rad": 0.0,
+            "angular_velocity_rad_s": 0.0,
+            "mjd_days": 0.0,
+            "mass_fraction": 0.0,
+            "lifetime": {
+              "original_order": true,
+              "compared_events": 1136,
+              "child_samples": 20,
+              "actual_child_mesh_drawn": true,
+              "visual_lifetime": true,
+              "module_lifetime": true
+            }
+          }
+        ]
+      },
+      "supplementary_lifecycle": {
+        "focused_delete": {
+          "final_objects": [
+            "ISS",
+            "PB"
+          ],
+          "final_tick": 12,
+          "graphics_released": true,
+          "ownership": "passed",
+          "render_frequency_independent": true
+        },
+        "alternative_camera": {
+          "final_objects": [
+            "ISS",
+            "PB"
+          ],
+          "final_tick": 12,
+          "graphics_released": true,
+          "ownership": "passed",
+          "render_frequency_independent": true
+        },
+        "delete_parent": {
+          "final_objects": [
+            "Child",
+            "ISS"
+          ],
+          "final_tick": 12,
+          "graphics_released": true,
+          "ownership": "passed",
+          "render_frequency_independent": true
+        },
+        "attached_child_delete": {
+          "final_objects": [
+            "ISS",
+            "PB"
+          ],
+          "final_tick": 12,
+          "graphics_released": true,
+          "ownership": "passed",
+          "render_frequency_independent": true
+        },
+        "attached_parent_delete": {
+          "final_objects": [
+            "Child",
+            "ISS"
+          ],
+          "final_tick": 12,
+          "graphics_released": true,
+          "ownership": "passed",
+          "render_frequency_independent": true
+        },
+        "simultaneous_delete": {
+          "final_objects": [
+            "ISS",
+            "PB"
+          ],
+          "final_tick": 12,
+          "graphics_released": true,
+          "ownership": "passed",
+          "render_frequency_independent": true
+        },
+        "twenty_cycles": {
+          "final_objects": [
+            "ISS",
+            "PB"
+          ],
+          "final_tick": 210,
+          "graphics_released": true,
+          "ownership": "passed",
+          "render_frequency_independent": true
+        },
+        "persist_dynamic": {
+          "final_objects": [
+            "Child",
+            "ISS"
+          ],
+          "final_tick": 12,
+          "graphics_released": true,
+          "ownership": "passed",
+          "stock_reload": true,
+          "render_frequency_independent": true
+        },
+        "close_last_focus": {
+          "final_objects": [
+            "ISS",
+            "PB"
+          ],
+          "final_tick": 2,
+          "graphics_released": true,
+          "ownership": "passed",
+          "render_frequency_independent": true
+        }
+      },
+      "keyboard": {
+        "live_vessel_focus": true,
+        "previous_vessel_key": true,
+        "focused_child_rcs": true,
+        "status": "passed",
+        "keyboard_throttle": true,
+        "rcs_mode": true,
+        "rcs_translation": true,
+        "rcs_release_samples": 416,
+        "rcs_focus_release": true,
+        "aerodynamic_toggle": true,
+        "propellant_used": true,
+        "pause": true,
+        "single_step": true,
+        "stock_quicksave": true,
+        "in_process_reload": true,
+        "exit": true
+      },
+      "scene": [
+        {
+          "ssim": 0.9881094596017364,
+          "landmark_errors_px": {
+            "Earth": 0.0,
+            "ISS": 0.0,
+            "PB": 0.0
+          },
+          "states": {
+            "position_m": 0.0,
+            "velocity_m_s": 0.0,
+            "rotation_rad": 0.0,
+            "angular_velocity_rad_s": 0.0,
+            "mjd_days": 0.0,
+            "mass_fraction": 0.0
+          },
+          "renderer": {
+            "vendor": "Mesa",
+            "renderer": "llvmpipe (LLVM 20.1.2, 256 bits)",
+            "version": "4.5 (Core Profile) Mesa 25.2.8-0ubuntu0.24.04.4",
+            "client_width": 1280,
+            "client_height": 720
+          }
+        },
+        {
+          "ssim": 0.9881094596017364,
+          "landmark_errors_px": {
+            "Earth": 0.0,
+            "ISS": 0.0,
+            "PB": 0.0
+          },
+          "states": {
+            "position_m": 0.0,
+            "velocity_m_s": 0.0,
+            "rotation_rad": 0.0,
+            "angular_velocity_rad_s": 0.0,
+            "mjd_days": 0.0,
+            "mass_fraction": 0.0
+          },
+          "renderer": {
+            "vendor": "Mesa",
+            "renderer": "llvmpipe (LLVM 20.1.2, 256 bits)",
+            "version": "4.5 (Core Profile) Mesa 25.2.8-0ubuntu0.24.04.4",
+            "client_width": 1280,
+            "client_height": 720
+          }
+        }
+      ],
+      "ground_status": "passed",
+      "ground_complete_suite": true,
+      "controlled_landing_status": "passed controlled upright landing"
+    },
+    "native-production-client-Release-automatic-x64": {
+      "numerics": {
+        "math": "amd-6121d02-fma3",
+        "random": "private-msvc-lcg32",
+        "random_maximum": 32767,
+        "process_seed": 0
+      },
+      "flight_cases": [
+        "manual_flight",
+        "docked",
+        "dock_approach",
+        "clock",
+        "pb_persistence",
+        "pb_reload",
+        "attachments",
+        "lifetime",
+        "twenty_sessions"
+      ],
+      "attachment_reference": {
+        "render_frequency_independent": true,
+        "windows_differences": [
+          {
+            "position_m": 0.0,
+            "velocity_m_s": 0.0,
+            "rotation_rad": 0.0,
+            "angular_velocity_rad_s": 0.0,
+            "mjd_days": 0.0,
+            "mass_fraction": 0.0,
+            "lifetime": {
+              "original_order": true,
+              "compared_events": 1364,
+              "child_samples": 79,
+              "actual_child_mesh_drawn": true,
+              "visual_lifetime": true,
+              "module_lifetime": true
+            }
+          },
+          {
+            "position_m": 0.0,
+            "velocity_m_s": 0.0,
+            "rotation_rad": 0.0,
+            "angular_velocity_rad_s": 0.0,
+            "mjd_days": 0.0,
+            "mass_fraction": 0.0,
+            "lifetime": {
+              "original_order": true,
+              "compared_events": 1364,
+              "child_samples": 79,
+              "actual_child_mesh_drawn": true,
+              "visual_lifetime": true,
+              "module_lifetime": true
+            }
+          }
+        ]
+      },
+      "lifetime_reference": {
+        "render_frequency_independent": true,
+        "windows_differences": [
+          {
+            "position_m": 0.0,
+            "velocity_m_s": 0.0,
+            "rotation_rad": 0.0,
+            "angular_velocity_rad_s": 0.0,
+            "mjd_days": 0.0,
+            "mass_fraction": 0.0,
+            "lifetime": {
+              "original_order": true,
+              "compared_events": 1136,
+              "child_samples": 20,
+              "actual_child_mesh_drawn": true,
+              "visual_lifetime": true,
+              "module_lifetime": true
+            }
+          },
+          {
+            "position_m": 0.0,
+            "velocity_m_s": 0.0,
+            "rotation_rad": 0.0,
+            "angular_velocity_rad_s": 0.0,
+            "mjd_days": 0.0,
+            "mass_fraction": 0.0,
+            "lifetime": {
+              "original_order": true,
+              "compared_events": 1136,
+              "child_samples": 20,
+              "actual_child_mesh_drawn": true,
+              "visual_lifetime": true,
+              "module_lifetime": true
+            }
+          }
+        ]
+      },
+      "supplementary_lifecycle": {
+        "focused_delete": {
+          "final_objects": [
+            "ISS",
+            "PB"
+          ],
+          "final_tick": 12,
+          "graphics_released": true,
+          "ownership": "passed",
+          "render_frequency_independent": true
+        },
+        "alternative_camera": {
+          "final_objects": [
+            "ISS",
+            "PB"
+          ],
+          "final_tick": 12,
+          "graphics_released": true,
+          "ownership": "passed",
+          "render_frequency_independent": true
+        },
+        "delete_parent": {
+          "final_objects": [
+            "Child",
+            "ISS"
+          ],
+          "final_tick": 12,
+          "graphics_released": true,
+          "ownership": "passed",
+          "render_frequency_independent": true
+        },
+        "attached_child_delete": {
+          "final_objects": [
+            "ISS",
+            "PB"
+          ],
+          "final_tick": 12,
+          "graphics_released": true,
+          "ownership": "passed",
+          "render_frequency_independent": true
+        },
+        "attached_parent_delete": {
+          "final_objects": [
+            "Child",
+            "ISS"
+          ],
+          "final_tick": 12,
+          "graphics_released": true,
+          "ownership": "passed",
+          "render_frequency_independent": true
+        },
+        "simultaneous_delete": {
+          "final_objects": [
+            "ISS",
+            "PB"
+          ],
+          "final_tick": 12,
+          "graphics_released": true,
+          "ownership": "passed",
+          "render_frequency_independent": true
+        },
+        "twenty_cycles": {
+          "final_objects": [
+            "ISS",
+            "PB"
+          ],
+          "final_tick": 210,
+          "graphics_released": true,
+          "ownership": "passed",
+          "render_frequency_independent": true
+        },
+        "persist_dynamic": {
+          "final_objects": [
+            "Child",
+            "ISS"
+          ],
+          "final_tick": 12,
+          "graphics_released": true,
+          "ownership": "passed",
+          "stock_reload": true,
+          "render_frequency_independent": true
+        },
+        "close_last_focus": {
+          "final_objects": [
+            "ISS",
+            "PB"
+          ],
+          "final_tick": 2,
+          "graphics_released": true,
+          "ownership": "passed",
+          "render_frequency_independent": true
+        }
+      },
+      "keyboard": {
+        "live_vessel_focus": true,
+        "previous_vessel_key": true,
+        "focused_child_rcs": true,
+        "status": "passed",
+        "keyboard_throttle": true,
+        "rcs_mode": true,
+        "rcs_translation": true,
+        "rcs_release_samples": 414,
+        "rcs_focus_release": true,
+        "aerodynamic_toggle": true,
+        "propellant_used": true,
+        "pause": true,
+        "single_step": true,
+        "stock_quicksave": true,
+        "in_process_reload": true,
+        "exit": true
+      },
+      "scene": [
+        {
+          "ssim": 0.9881094596017364,
+          "landmark_errors_px": {
+            "Earth": 0.0,
+            "ISS": 0.0,
+            "PB": 0.0
+          },
+          "states": {
+            "position_m": 0.0,
+            "velocity_m_s": 0.0,
+            "rotation_rad": 0.0,
+            "angular_velocity_rad_s": 0.0,
+            "mjd_days": 0.0,
+            "mass_fraction": 0.0
+          },
+          "renderer": {
+            "vendor": "Mesa",
+            "renderer": "llvmpipe (LLVM 20.1.2, 256 bits)",
+            "version": "4.5 (Core Profile) Mesa 25.2.8-0ubuntu0.24.04.4",
+            "client_width": 1280,
+            "client_height": 720
+          }
+        },
+        {
+          "ssim": 0.9881094596017364,
+          "landmark_errors_px": {
+            "Earth": 0.0,
+            "ISS": 0.0,
+            "PB": 0.0
+          },
+          "states": {
+            "position_m": 0.0,
+            "velocity_m_s": 0.0,
+            "rotation_rad": 0.0,
+            "angular_velocity_rad_s": 0.0,
+            "mjd_days": 0.0,
+            "mass_fraction": 0.0
+          },
+          "renderer": {
+            "vendor": "Mesa",
+            "renderer": "llvmpipe (LLVM 20.1.2, 256 bits)",
+            "version": "4.5 (Core Profile) Mesa 25.2.8-0ubuntu0.24.04.4",
+            "client_width": 1280,
+            "client_height": 720
+          }
+        }
+      ],
+      "ground_status": "passed",
+      "ground_complete_suite": true,
+      "controlled_landing_status": "passed controlled upright landing"
+    }
+  },
+  "windows_client": {
+    "status": "passed",
+    "numerical": {
+      "position_m": 0.0,
+      "velocity_m_s": 0.0,
+      "rotation_rad": 0.0,
+      "angular_velocity_rad_s": 0.0,
+      "mjd_days": 0.0,
+      "mass_fraction": 0.0
+    },
+    "maximum_projected_landmark_error_px": 0.0,
+    "ssim": 1.0,
+    "frozen_debug": {
+      "status": "passed",
+      "numerical": {
+        "position_m": 0.0,
+        "velocity_m_s": 0.0,
+        "rotation_rad": 0.0,
+        "angular_velocity_rad_s": 0.0,
+        "mjd_days": 0.0,
+        "mass_fraction": 0.0
+      },
+      "ssim": 1.0
+    },
+    "frozen_release": {
+      "status": "passed",
+      "numerical": {
+        "position_m": 0.0,
+        "velocity_m_s": 0.0,
+        "rotation_rad": 0.0,
+        "angular_velocity_rad_s": 0.0,
+        "mjd_days": 0.0,
+        "mass_fraction": 0.0
+      },
+      "ssim": 1.0
+    }
+  },
+  "windows_production_comparison": {
+    "status": "passed; orbit/propulsion candidates eligible for explicit frozen-reference acceptance",
+    "cases": {
+      "orbit": {
+        "vessel": {
+          "position_m": 0.0,
+          "velocity_m_s": 0.0,
+          "orientation_rad": 0.0,
+          "angular_velocity_rad_s": 0.0,
+          "mjd_days": 0.0
+        },
+        "world": {
+          "position_m": 0.0,
+          "velocity_m_s": 0.0,
+          "orientation_rad": 0.0,
+          "angular_velocity_rad_s": 0.0,
+          "mjd_days": 0.0,
+          "mass_error_fraction_of_budget": 0.0,
+          "fuel_error_fraction_of_budget": 0.0
+        }
+      },
+      "controls": {
+        "vessel": {
+          "position_m": 0.0,
+          "velocity_m_s": 0.0,
+          "orientation_rad": 0.0,
+          "angular_velocity_rad_s": 0.0,
+          "mjd_days": 0.0
+        },
+        "world": {
+          "position_m": 0.0,
+          "velocity_m_s": 0.0,
+          "orientation_rad": 0.0,
+          "angular_velocity_rad_s": 0.0,
+          "mjd_days": 0.0,
+          "mass_error_fraction_of_budget": 0.0,
+          "fuel_error_fraction_of_budget": 0.0
+        }
+      }
+    }
+  },
+  "windows_behavior_cross_configuration": {
+    "rcs": {
+      "position_m": 0.0,
+      "velocity_m_s": 0.0,
+      "rotation_rad": 0.0,
+      "angular_velocity_rad_s": 0.0,
+      "mjd_days": 0.0,
+      "mass_fraction": 0.0
+    },
+    "autopilot": {
+      "position_m": 0.0,
+      "velocity_m_s": 0.0,
+      "rotation_rad": 0.0,
+      "angular_velocity_rad_s": 0.0,
+      "mjd_days": 0.0,
+      "mass_fraction": 0.0
+    },
+    "atmosphere": {
+      "position_m": 0.0,
+      "velocity_m_s": 4.556346636343676e-13,
+      "rotation_rad": 1.1983210615419905e-15,
+      "angular_velocity_rad_s": 3.739141854032058e-15,
+      "mjd_days": 0.0,
+      "mass_fraction": 0.0
+    },
+    "landed": {
+      "position_m": 0.0,
+      "velocity_m_s": 0.0,
+      "rotation_rad": 0.0,
+      "angular_velocity_rad_s": 0.0,
+      "mjd_days": 0.0,
+      "mass_fraction": 0.0
+    },
+    "contact": {
+      "position_m": 0.0,
+      "velocity_m_s": 1.4210854715202004e-14,
+      "rotation_rad": 3.019144553311476e-15,
+      "angular_velocity_rad_s": 1.2185714821145924e-14,
+      "mjd_days": 0.0,
+      "mass_fraction": 0.0
+    },
+    "docked": {
+      "position_m": 0.0,
+      "velocity_m_s": 0.0,
+      "rotation_rad": 0.0,
+      "angular_velocity_rad_s": 0.0,
+      "mjd_days": 0.0,
+      "mass_fraction": 0.0
+    },
+    "dock_approach": {
+      "position_m": 0.0,
+      "velocity_m_s": 0.0,
+      "rotation_rad": 0.0,
+      "angular_velocity_rad_s": 1.0339757656912846e-25,
+      "mjd_days": 0.0,
+      "mass_fraction": 0.0
+    },
+    "attachments": {
+      "position_m": 0.0,
+      "velocity_m_s": 0.0,
+      "rotation_rad": 0.0,
+      "angular_velocity_rad_s": 0.0,
+      "mjd_days": 0.0,
+      "mass_fraction": 0.0
+    },
+    "clock": {
+      "position_m": 0.0,
+      "velocity_m_s": 0.0,
+      "rotation_rad": 0.0,
+      "angular_velocity_rad_s": 0.0,
+      "mjd_days": 0.0,
+      "mass_fraction": 0.0
+    },
+    "lifetime": {
+      "position_m": 0.0,
+      "velocity_m_s": 0.0,
+      "rotation_rad": 0.0,
+      "angular_velocity_rad_s": 0.0,
+      "mjd_days": 0.0,
+      "mass_fraction": 0.0
+    },
+    "dg_animations": {
+      "position_m": 0.0,
+      "velocity_m_s": 0.0,
+      "rotation_rad": 0.0,
+      "angular_velocity_rad_s": 0.0,
+      "mjd_days": 0.0,
+      "mass_fraction": 0.0
+    },
+    "dg_persistence": {
+      "position_m": 0.0,
+      "velocity_m_s": 0.0,
+      "rotation_rad": 0.0,
+      "angular_velocity_rad_s": 0.0,
+      "mjd_days": 0.0,
+      "mass_fraction": 0.0
+    },
+    "dg_reload": {
+      "position_m": 0.0,
+      "velocity_m_s": 0.0,
+      "rotation_rad": 0.0,
+      "angular_velocity_rad_s": 0.0,
+      "mjd_days": 0.0,
+      "mass_fraction": 0.0
+    },
+    "callbacks": {
+      "position_m": 0.0,
+      "velocity_m_s": 0.0,
+      "rotation_rad": 0.0,
+      "angular_velocity_rad_s": 0.0,
+      "mjd_days": 0.0,
+      "mass_fraction": 0.0
+    }
+  }
+}
