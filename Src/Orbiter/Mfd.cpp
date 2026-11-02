@@ -5,13 +5,17 @@
 
 #include "Production/CockpitServices.h"
 #include "Pane.h"
+#ifdef _WIN32
 #include "Orbiter.h"
+#endif
 #include "Config.h"
 #include "Mfd.h"
 #include "MfdOrbit.h"
 #include "MfdSurface.h"
 #include "MfdMap.h"
+#ifdef _WIN32
 #include "MfdMap_old.h"
+#endif
 #include "MfdDocking.h"
 #include "MfdLanding.h"
 #include "MfdComms.h"
@@ -19,18 +23,43 @@
 #include "MfdAlign.h"
 #include "MfdSync.h"
 #include "MfdTransfer.h"
+#ifdef _WIN32
 #include "MfdUser.h"
+#endif
+#ifdef _WIN32
 #include "Log.h"
+#endif
+#ifdef _WIN32
 #include "Util.h"
+#endif
 #include "Psys.h"
+#ifndef _WIN32
+#include "Production/CockpitNativeSupport.h"
+#include "Star.h"
+#include <stdexcept>
+#endif
 
 using namespace std;
 
+#ifdef _WIN32
 extern Orbiter *g_pOrbiter;
+#endif
+
+#ifdef _WIN32
 extern PlanetarySystem *g_psys;
+#endif
+
+#ifdef _WIN32
 extern TimeData td;
+#endif
+
+#ifdef _WIN32
 extern Select *g_select;
+#endif
+
+#ifdef _WIN32
 extern InputBox *g_input;
+#endif
 extern char DBG_MSG[256];
 
 static char KeyStr[11] = "[xShift-x]";
@@ -40,7 +69,9 @@ char Key2Char[256] = {
 	' ','A','S','D','F','G','H','J','K','L',';','\'','`',' ',
 	'\\','Z','X','C','V','B','N','M',',','.','/'};
 
+#ifdef _WIN32
 HPEN Instrument::hdefpen[MAXPEN] = {0};
+#endif
 
 struct Instrument::DrawResource Instrument::draw[MAXDEFCOL][2] = {0};
 
@@ -53,9 +84,9 @@ struct Instrument::DrawResource Instrument::draw[MAXDEFCOL][2] = {0};
 	// ******************************************************************
 
 Instrument *Instrument::Create (int type, Pane *_pane,
-	INT_PTR _id, const Spec &spec, Vessel *_vessel, bool restore)
+	std::intptr_t _id, const Spec &spec, Vessel *_vessel, bool restore)
 {
-	DWORD i;
+	oapi::UInt32 i;
 	
 	// check whether mode is disabled
 	for (i = 0; i < nDisabledModes; i++)
@@ -66,7 +97,13 @@ Instrument *Instrument::Create (int type, Pane *_pane,
 	case MFD_ORBIT:       TRACENEW return new Instrument_Orbit       (_pane, _id, spec, _vessel);
 	case MFD_SURFACE:     TRACENEW return new Instrument_Surface     (_pane, _id, spec, _vessel);
 	case MFD_MAP:         TRACENEW if (orbiter::production::CockpitConfiguration()->CfgLogicPrm.MFDMapVersion == 0)
-								return new Instrument_MapOld (_pane, _id, spec, _vessel);
+
+#ifdef _WIN32
+return new Instrument_MapOld (_pane, _id, spec, _vessel);
+#else
+throw std::runtime_error("Native instrument mode requires a Windows legacy/custom MFD adapter");
+#endif
+
 							  else
 								return new Instrument_Map    (_pane, _id, spec, _vessel);
 	case MFD_HSI:         TRACENEW return new Instrument_HSI         (_pane, _id, spec, _vessel);
@@ -76,21 +113,39 @@ Instrument *Instrument::Create (int type, Pane *_pane,
 	case MFD_OSYNC:       TRACENEW return new Instrument_OSync       (_pane, _id, spec, _vessel, restore);
 	case MFD_TRANSFER:    TRACENEW return new Instrument_Transfer    (_pane, _id, spec, _vessel);
 	case MFD_COMMS:       TRACENEW return new Instrument_Comms       (_pane, _id, spec, _vessel);
-	case MFD_USERTYPE:    TRACENEW return new Instrument_User        (_pane, _id, spec, _vessel); // generic user type
+	case MFD_USERTYPE:    TRACENEW
+#ifdef _WIN32
+return new Instrument_User        (_pane, _id, spec, _vessel);
+#else
+throw std::runtime_error("Native instrument mode requires a Windows legacy/custom MFD adapter");
+#endif
+ // generic user type
 	}
 
 	// check for specific user-defined mode
 	for (i = BUILTIN_MFD_MODES; i < nGlobalModes; i++)
 		if (type == GlobalMode[i].id) {
-			TRACENEW return new Instrument_User (_pane, _id, spec, _vessel, type, GlobalMode[i]);
+			TRACENEW
+#ifdef _WIN32
+return new Instrument_User (_pane, _id, spec, _vessel, type, GlobalMode[i]);
+#else
+throw std::runtime_error("Native instrument mode requires a Windows legacy/custom MFD adapter");
+#endif
+
 		}
 
 	// check for vessel-specific modes
 	const MFDMODE *mlist;
-	DWORD nmode = _vessel->GetMFDModes (&mlist);
+	oapi::UInt32 nmode = _vessel->GetMFDModes (&mlist);
 	for (i = 0; i < nmode; i++)
 		if (type == mlist[i].id) {
-			return new Instrument_User (_pane, _id, spec, _vessel, type, mlist[i]);
+
+#ifdef _WIN32
+return new Instrument_User (_pane, _id, spec, _vessel, type, mlist[i]);
+#else
+throw std::runtime_error("Native instrument mode requires a Windows legacy/custom MFD adapter");
+#endif
+
 		}
 
 	// nothing found
@@ -98,7 +153,7 @@ Instrument *Instrument::Create (int type, Pane *_pane,
 }
 
 Instrument *Instrument::Create (ifstream &ifs, Pane *_pane,
-	INT_PTR _id, const Spec &spec, Vessel *_vessel)
+	std::intptr_t _id, const Spec &spec, Vessel *_vessel)
 {
 	static const char *mfdstr[MAXMFD] = {"Left","Right","3","4","5","6","7","8","9","10","11","12"};
 	Instrument *instr = 0;
@@ -110,20 +165,20 @@ Instrument *Instrument::Create (ifstream &ifs, Pane *_pane,
 	for (;instr == 0;) {
 		if (!ifs.getline (cbuf, 256)) return 0;
 		pc = trim_string (cbuf);
-		if (!_strnicmp (pc, "END_MFD", 7)) return 0;
-		if (!_strnicmp (pc, "TYPE", 4)) {
+		if (!orbiter::production::ComparePrefix (pc, "END_MFD", 7)) return 0;
+		if (!orbiter::production::ComparePrefix (pc, "TYPE", 4)) {
 			pc = trim_string (pc+4);
-			if      (!_strnicmp (pc, "Orbit", 5))    instr = Create (MFD_ORBIT, _pane, _id, spec, _vessel);
-			else if (!_strnicmp (pc, "Surface", 7))  instr = Create (MFD_SURFACE, _pane, _id, spec, _vessel);
-			else if (!_strnicmp (pc, "Map", 3))      instr = Create (MFD_MAP, _pane, _id, spec, _vessel);
-			else if (!_strnicmp (pc, "HSI", 3))      instr = Create (MFD_HSI, _pane, _id, spec, _vessel);
-			else if (!_strnicmp (pc, "Launch", 6))   instr = Create (MFD_LANDING, _pane, _id, spec, _vessel);
-			else if (!_strnicmp (pc, "Docking", 7))  instr = Create (MFD_DOCKING, _pane, _id, spec, _vessel);
-			else if (!_strnicmp (pc, "OAlign", 6))   instr = Create (MFD_OPLANEALIGN, _pane, _id, spec, _vessel, false);
-			else if (!_strnicmp (pc, "OSync", 5))    instr = Create (MFD_OSYNC, _pane, _id, spec, _vessel, false);
-			else if (!_strnicmp (pc, "Transfer", 8)) instr = Create (MFD_TRANSFER, _pane, _id, spec, _vessel);
-			else if (!_strnicmp (pc, "COM/NAV", 4))  instr = Create (MFD_COMMS, _pane, _id, spec, _vessel);
-			else if (!_strnicmp (pc, "User", 4))     instr = Create (MFD_USERTYPE, _pane, _id, spec, _vessel);
+			if      (!orbiter::production::ComparePrefix (pc, "Orbit", 5))    instr = Create (MFD_ORBIT, _pane, _id, spec, _vessel);
+			else if (!orbiter::production::ComparePrefix (pc, "Surface", 7))  instr = Create (MFD_SURFACE, _pane, _id, spec, _vessel);
+			else if (!orbiter::production::ComparePrefix (pc, "Map", 3))      instr = Create (MFD_MAP, _pane, _id, spec, _vessel);
+			else if (!orbiter::production::ComparePrefix (pc, "HSI", 3))      instr = Create (MFD_HSI, _pane, _id, spec, _vessel);
+			else if (!orbiter::production::ComparePrefix (pc, "Launch", 6))   instr = Create (MFD_LANDING, _pane, _id, spec, _vessel);
+			else if (!orbiter::production::ComparePrefix (pc, "Docking", 7))  instr = Create (MFD_DOCKING, _pane, _id, spec, _vessel);
+			else if (!orbiter::production::ComparePrefix (pc, "OAlign", 6))   instr = Create (MFD_OPLANEALIGN, _pane, _id, spec, _vessel, false);
+			else if (!orbiter::production::ComparePrefix (pc, "OSync", 5))    instr = Create (MFD_OSYNC, _pane, _id, spec, _vessel, false);
+			else if (!orbiter::production::ComparePrefix (pc, "Transfer", 8)) instr = Create (MFD_TRANSFER, _pane, _id, spec, _vessel);
+			else if (!orbiter::production::ComparePrefix (pc, "COM/NAV", 4))  instr = Create (MFD_COMMS, _pane, _id, spec, _vessel);
+			else if (!orbiter::production::ComparePrefix (pc, "User", 4))     instr = Create (MFD_USERTYPE, _pane, _id, spec, _vessel);
 		}
 	}
 	if (instr) {
@@ -152,7 +207,7 @@ void Instrument::GlobalInit (oapi::CockpitClient *gc)
 	draw[4][1].col = 0xA00000;  // aux colour 4 dim
 
 	// Read customised settings
-	ifstream ifs (g_pOrbiter->ConfigPath ("MFD\\Default"));
+	ifstream ifs (orbiter::production::CockpitConfigPath ("MFD\\Default"));
 	if (ifs) {
 		char label[64];
 		int c;
@@ -172,22 +227,26 @@ void Instrument::GlobalInit (oapi::CockpitClient *gc)
 		}
 	}
 
+#ifdef _WIN32
 	// Deprecated pens
-	COLORREF pencol[MAXPEN] = {
-		RGB(0,255,0), RGB(0,255,0), RGB(0,128,0),
-		RGB(128,128,0), RGB(64,64,0), RGB(128,128,128)
+	oapi::UInt32 pencol[MAXPEN] = {
+		orbiter::production::CockpitColor(0,255,0), orbiter::production::CockpitColor(0,255,0), orbiter::production::CockpitColor(0,128,0),
+		orbiter::production::CockpitColor(128,128,0), orbiter::production::CockpitColor(64,64,0), orbiter::production::CockpitColor(128,128,128)
 	};
 	for (i = 0; i < MAXPEN; i++) {
 		hdefpen[i] = CreatePen (PS_SOLID, 0, pencol[i]);
 	}
+#endif
 }
 
 void Instrument::GlobalExit (oapi::CockpitClient *gc)
 {
 	int i, j;
 
+#ifdef _WIN32
 	for (i = 0; i < MAXPEN; i++)
 		DeleteObject (hdefpen[i]);
+#endif
 	for (i = 0; i < MAXDEFCOL; i++) {
 		for (j = 0; j < 2; j++) {
 			if (gc && draw[i][j].solidpen) gc->clbkReleasePen (draw[i][j].solidpen);
@@ -236,7 +295,7 @@ void Instrument::RegisterBuiltinModes ()
 		MFD_COMMS,
 	};
 	if (nGlobalModes) {
-		for (DWORD i = BUILTIN_MFD_MODES; i < nGlobalModes; i++)
+		for (oapi::UInt32 i = BUILTIN_MFD_MODES; i < nGlobalModes; i++)
 			delete GlobalMode[i].spec;
 		delete []GlobalMode;
 	}
@@ -252,9 +311,9 @@ void Instrument::RegisterBuiltinModes ()
 	// ****            End default Instrument registration           ****
 	// ******************************************************************
 
-int Instrument::ModeIdFromKey (DWORD key)
+int Instrument::ModeIdFromKey (oapi::UInt32 key)
 {
-	for (DWORD i = 0; i < nGlobalModes; i++) {
+	for (oapi::UInt32 i = 0; i < nGlobalModes; i++) {
 		if (GlobalMode[i].spec->key == key) return GlobalMode[i].id;
 	}
 	return MFD_NONE;
@@ -262,8 +321,8 @@ int Instrument::ModeIdFromKey (DWORD key)
 
 int Instrument::ModeFromNameOld (char *name, MFDMODESPEC **spec)
 {
-	for (DWORD i = 0; i < nGlobalModes; i++) {
-		if (!_stricmp (GlobalMode[i].spec->name, name)) {
+	for (oapi::UInt32 i = 0; i < nGlobalModes; i++) {
+		if (!orbiter::production::CompareText (GlobalMode[i].spec->name, name)) {
 			if (spec) *spec = GlobalMode[i].oldspec;
 			return GlobalMode[i].id;
 		}
@@ -273,8 +332,8 @@ int Instrument::ModeFromNameOld (char *name, MFDMODESPEC **spec)
 
 int Instrument::ModeFromName (char *name, MFDMODESPECEX **spec)
 {
-	for (DWORD i = 0; i < nGlobalModes; i++) {
-		if (!_stricmp (GlobalMode[i].spec->name, name)) {
+	for (oapi::UInt32 i = 0; i < nGlobalModes; i++) {
+		if (!orbiter::production::CompareText (GlobalMode[i].spec->name, name)) {
 			if (spec) *spec = GlobalMode[i].spec;
 			return GlobalMode[i].id;
 		}
@@ -285,9 +344,9 @@ int Instrument::ModeFromName (char *name, MFDMODESPECEX **spec)
 int Instrument::VesselModeFromName (const char *name, MFDMODESPECEX **spec)
 {
 	const MFDMODE *mlist;
-	DWORD nmode = vessel->GetMFDModes (&mlist);
-	for (DWORD i = 0; i < nmode; i++) {
-		if (!_stricmp (mlist[i].spec->name, name)) {
+	oapi::UInt32 nmode = vessel->GetMFDModes (&mlist);
+	for (oapi::UInt32 i = 0; i < nmode; i++) {
+		if (!orbiter::production::CompareText (mlist[i].spec->name, name)) {
 			if (spec) *spec = mlist[i].spec;
 			return mlist[i].id;
 		}
@@ -312,7 +371,7 @@ int Instrument::RegisterUserMode (MFDMODESPEC *mode)
 
 	// check for duplicate key codes and disable if required
 	if (mode->key) {
-		DWORD i, k;
+		oapi::UInt32 i, k;
 		for (i = 0; i < nGlobalModes; i++)
 			if (GlobalMode[i].oldspec->key == mode->key) break;
 		if (i < nGlobalModes) { // key already assigned
@@ -354,7 +413,7 @@ int Instrument::RegisterUserMode (MFDMODESPECEX *mode)
 
 	// check for duplicate key codes and disable if required
 	if (mode->key) {
-		DWORD i, k;
+		oapi::UInt32 i, k;
 		for (i = 0; i < nGlobalModes; i++)
 			if (GlobalMode[i].spec->key == mode->key) break;
 		if (i < nGlobalModes) { // key already assigned
@@ -379,7 +438,7 @@ int Instrument::RegisterUserMode (MFDMODESPECEX *mode)
 
 bool Instrument::UnregisterUserMode (int id)
 {
-	DWORD i, j, k;
+	oapi::UInt32 i, j, k;
 	for (i = BUILTIN_MFD_MODES; i < nGlobalModes; i++)
 		if (GlobalMode[i].id == id) break;
 	if (i == nGlobalModes) return false;
@@ -402,7 +461,7 @@ bool Instrument::UnregisterUserMode (int id)
 	return true;
 }
 
-int Instrument::GetUserMode (DWORD i, MFDMODESPEC *spec)
+int Instrument::GetUserMode (oapi::UInt32 i, MFDMODESPEC *spec)
 {
 	i += BUILTIN_MFD_MODES;
 	if (i < nGlobalModes) {
@@ -413,7 +472,7 @@ int Instrument::GetUserMode (DWORD i, MFDMODESPEC *spec)
 
 int Instrument::GetMFDMode (char *name, const MFDMODESPECEX **spec) const
 {
-	for (DWORD i = BUILTIN_MFD_MODES; i < nGlobalModes+nVesselModes; i++) {
+	for (oapi::UInt32 i = BUILTIN_MFD_MODES; i < nGlobalModes+nVesselModes; i++) {
 		const MFDMODE *m = GetMode(i);
 		if (!strcmp (m->Spec()->name, name)) {
 			*spec = m->Spec();
@@ -425,7 +484,7 @@ int Instrument::GetMFDMode (char *name, const MFDMODESPECEX **spec) const
 
 int Instrument::GetMFDModeOld (char *name, const MFDMODESPEC **spec) const
 {
-	for (DWORD i = BUILTIN_MFD_MODES; i < nGlobalModes+nVesselModes; i++) {
+	for (oapi::UInt32 i = BUILTIN_MFD_MODES; i < nGlobalModes+nVesselModes; i++) {
 		const MFDMODE *m = GetMode(i);
 		if (!strcmp (m->Spec()->name, name)) {
 			*spec = m->Oldspec();
@@ -436,12 +495,12 @@ int Instrument::GetMFDModeOld (char *name, const MFDMODESPEC **spec) const
 }
 
 int      Instrument::nextmodeid = BUILTIN_MFD_MODES+1;
-DWORD    Instrument::nGlobalModes     = 0;
+oapi::UInt32    Instrument::nGlobalModes     = 0;
 MFDMODE *Instrument::GlobalMode       = 0;
 
 void Instrument::DisableMode (int id)
 {
-	for (DWORD i = 0; i < nDisabledModes; i++)
+	for (oapi::UInt32 i = 0; i < nDisabledModes; i++)
 		if (DisabledModes[i] == id) return; // disabled already
 
 	int *tmp = new int[nDisabledModes+1]; TRACENEW
@@ -464,22 +523,22 @@ void Instrument::ClearDisabledModes ()
 
 bool Instrument::IsDisabledMode (int id)
 {
-	for (DWORD i = 0; i < nDisabledModes; i++)
+	for (oapi::UInt32 i = 0; i < nDisabledModes; i++)
 		if (DisabledModes[i] == id) return true;
 	return false;
 }
 
-Instrument::Instrument (Pane *_pane, INT_PTR _id, const Spec &spec, Vessel *_vessel, bool defer_alloc)
+Instrument::Instrument (Pane *_pane, std::intptr_t _id, const Spec &spec, Vessel *_vessel, bool defer_alloc)
 {
 	pane = _pane;
-	gc   =  g_pOrbiter->GetGraphicsClient();
+	gc   =  orbiter::production::CockpitGraphicsClient();
 	id   = _id;
 	flag = spec.flag;
 	vessel = _vessel;
 	use_skp_interface = true;
 	instrDT = orbiter::production::CockpitConfiguration()->CfgLogicPrm.InstrUpdDT;
-	updT = td.SimT0-1.0;
-	updSysT = td.SysT0-1.0;
+	updT = orbiter::production::CockpitTime().SimT0-1.0;
+	updSysT = orbiter::production::CockpitTime().SysT0-1.0;
 	dT = 1.0, pT = -1.0;
 	blink = true;
 	showmenu = false;
@@ -510,28 +569,28 @@ Instrument::~Instrument ()
 
 bool Instrument::BufKey (char key, double repdelay)
 {
-	if ((key == lastkey) && (td.SysT0 - lastkeytime < repdelay)) return false;
+	if ((key == lastkey) && (orbiter::production::CockpitTime().SysT0 - lastkeytime < repdelay)) return false;
 	lastkey = key;
-	lastkeytime = td.SysT0;
+	lastkeytime = orbiter::production::CockpitTime().SysT0;
 	return true;
 }
 
 void Instrument::SetBuf (char key)
 {
 	lastkey = key;
-	lastkeytime = td.SysT0;
+	lastkeytime = orbiter::production::CockpitTime().SysT0;
 }
 
 bool Instrument::ConsumeKeyImmediate (char *kstate)
 {
 	bool accepted = KeyImmediate (kstate); // current MFD has consumed key
 	if (accepted && showmenu) {
-		showmenu = false, updT = td.SimT0-1.0;
+		showmenu = false, updT = orbiter::production::CockpitTime().SimT0-1.0;
 	}
 	return accepted;
 }
 
-bool Instrument::ConsumeKeyBuffered (DWORD key)
+bool Instrument::ConsumeKeyBuffered (oapi::UInt32 key)
 {
 	// part 1: global keys
 	switch (key) {
@@ -568,7 +627,7 @@ bool Instrument::ConsumeKeyBuffered (DWORD key)
 			if (!btnpage) showmenu = false;
 		}
 		if (showmenu) DrawMenu(); // draw the button menu
-		else updT = td.SimT0-1.0;     // enforce display refresh
+		else updT = orbiter::production::CockpitTime().SimT0-1.0;     // enforce display refresh
 		return true;
 	}
 
@@ -578,7 +637,7 @@ bool Instrument::ConsumeKeyBuffered (DWORD key)
 			modepage = -1;
 			pane->RepaintMFDButtons (id, this);
 		} else {
-			for (DWORD n = 0; n < nGlobalModes+nVesselModes; n++) {
+			for (oapi::UInt32 n = 0; n < nGlobalModes+nVesselModes; n++) {
 				const MFDMODE *m = GetMode(n);
 				if (IsDisabledMode (m->Id())) continue;
 				if (key == m->Spec()->key) {
@@ -593,7 +652,7 @@ bool Instrument::ConsumeKeyBuffered (DWORD key)
 	// part 3: mfd menu keys
 	bool accepted =  KeyBuffered (key); // current MFD has consumed key
 	if (accepted && showmenu) {
-		showmenu = false, updT = td.SimT0-1.0;
+		showmenu = false, updT = orbiter::production::CockpitTime().SimT0-1.0;
 		//pane->RepaintMFDButtons (id, this);
 	}
 	return accepted;
@@ -605,7 +664,7 @@ bool Instrument::ConsumeButton (int bt, int event)
 
 		// find MFD mode under button
 		int pg, slot;
-		DWORD n;
+		oapi::UInt32 n;
 		for (n = pg = slot = 0; n < nGlobalModes+nVesselModes; n++) {
 			const MFDMODE *m = GetMode(n);
 			if (IsDisabledMode(m->Id())) continue;
@@ -624,13 +683,13 @@ bool Instrument::ConsumeButton (int bt, int event)
 	bt += btnpage*nbt;
 	bool accepted = ProcessButton (bt, event);
 	if (accepted && showmenu) {
-		showmenu = false, updT = td.SimT0-1.0;
+		showmenu = false, updT = orbiter::production::CockpitTime().SimT0-1.0;
 		//pane->RepaintMFDButtons (id, this);
 	}
 	return accepted;
 }
 
-void Instrument::OptionChanged(DWORD cat, DWORD item)
+void Instrument::OptionChanged(oapi::UInt32 cat, oapi::UInt32 item)
 {
 	if (cat == OPTCAT_INSTRUMENT) {
 		switch (item) {
@@ -683,21 +742,21 @@ void Instrument::SetSize (const Spec &spec, bool defer_alloc)
 		oapi::Sketchpad *skp = gc->clbkGetSketchpad (surf);
 		if (skp) {
 			skp->SetFont (mfdfont[0]);
-			DWORD charsize = skp->GetCharSize();
-			cw = HIWORD(charsize);
-			ch = LOWORD(charsize);
+			oapi::UInt32 charsize = skp->GetCharSize();
+			cw = orbiter::production::CockpitHighWord(charsize);
+			ch = orbiter::production::CockpitLowWord(charsize);
 			gc->clbkReleaseSketchpad (skp);
 		}
 	}
 }
 
-void Instrument::AllocSurface (DWORD w, DWORD h)
+void Instrument::AllocSurface (oapi::UInt32 w, oapi::UInt32 h)
 {
 	if (!gc) return;
 
 	if (IsRuningInExternMFD())
 	{
-		DWORD attrib = OAPISURFACE_NOALPHA;
+		oapi::UInt32 attrib = OAPISURFACE_NOALPHA;
 		attrib |= (use_skp_interface ? OAPISURFACE_RENDERTARGET | OAPISURFACE_TEXTURE : OAPISURFACE_GDI | OAPISURFACE_TEXTURE);
 		surf = gc->clbkCreateSurfaceEx(w, h, attrib);
 		//tex = gc->clbkCreateSurfaceEx(w, h, attrib); // no need for tex
@@ -705,8 +764,8 @@ void Instrument::AllocSurface (DWORD w, DWORD h)
 		return;
 	}
 
-	DWORD s_attrib = 0;
-	DWORD t_attrib = OAPISURFACE_RENDERTARGET | OAPISURFACE_TEXTURE | 0;
+	oapi::UInt32 s_attrib = 0;
+	oapi::UInt32 t_attrib = OAPISURFACE_RENDERTARGET | OAPISURFACE_TEXTURE | 0;
 
 	s_attrib |= (use_skp_interface ? OAPISURFACE_RENDERTARGET : OAPISURFACE_GDI | OAPISURFACE_TEXTURE);
 	
@@ -722,11 +781,11 @@ void Instrument::AllocSurface (DWORD w, DWORD h)
 void Instrument::ReleaseSurface ()
 {
 	if (surf) {
-		g_pOrbiter->ReleaseSurface (surf);
+		orbiter::production::CockpitReleaseSurface (surf);
 		surf = NULL;
 	}
 	if (tex) {
-		g_pOrbiter->ReleaseSurface (tex);
+		orbiter::production::CockpitReleaseSurface (tex);
 		tex = NULL;
 	}
 }
@@ -760,9 +819,10 @@ void Instrument::EndDraw (oapi::Sketchpad *skp)
 		gc->clbkReleaseSketchpad (skp);
 }
 
-HDC Instrument::BeginDrawHDC ()
+#ifdef _WIN32
+oapi::SdkDrawContext Instrument::BeginDrawHDC ()
 {
-	HDC hDC;
+	oapi::SdkDrawContext hDC;
 	if (gc && (hDC = gc->clbkGetSurfaceDC (surf))) {
 		SetTextColor (hDC, draw[0][0].col);
 		SelectObject (hDC, mfdfont[0]->GetGDIFont());
@@ -777,8 +837,13 @@ HDC Instrument::BeginDrawHDC ()
 		return 0;
 	}
 }
+#else
+oapi::SdkDrawContext Instrument::BeginDrawHDC ()
+{throw std::runtime_error("Native instruments require the Sketchpad drawing interface");}
+#endif
 
-void Instrument::EndDrawHDC (HDC hDC)
+#ifdef _WIN32
+void Instrument::EndDrawHDC (oapi::SdkDrawContext hDC)
 {
 	if (gc && hDC) {
 		SelectObject (hDC, GetStockObject (NULL_PEN));
@@ -786,14 +851,18 @@ void Instrument::EndDrawHDC (HDC hDC)
 		gc->clbkReleaseSurfaceDC (surf, hDC);
 	}
 }
+#else
+void Instrument::EndDrawHDC (oapi::SdkDrawContext hDC)
+{throw std::runtime_error("Native instruments require the Sketchpad drawing interface");}
+#endif
 
 bool Instrument::Update (double upDTscale)
 {
 	if (!gc) return false;
-	bool tstep = (td.SimT1 >= updT && td.SysT1 >= updSysT);
+	bool tstep = (orbiter::production::CockpitTime().SimT1 >= updT && orbiter::production::CockpitTime().SysT1 >= updSysT);
 	if (tstep && !showmenu && modepage < 0) {
-		dT = td.SimT1 - pT; // actual update interval
-		pT = td.SimT1;
+		dT = orbiter::production::CockpitTime().SimT1 - pT; // actual update interval
+		pT = orbiter::production::CockpitTime().SimT1;
 		blink = !blink;
 		ClearSurface ();
 		UpdateBlt ();
@@ -804,15 +873,19 @@ bool Instrument::Update (double upDTscale)
 				EndDraw (skp);
 			}
 		} else {
-			HDC hDC = BeginDrawHDC();
+#ifdef _WIN32
+			oapi::SdkDrawContext hDC = BeginDrawHDC();
 			if (hDC) {
 				UpdateDraw (hDC);
 				EndDrawHDC (hDC);
 			}
+#else
+			throw std::runtime_error("Native instruments require Sketchpad redraw callbacks");
+#endif
 		}
 		if (tex) gc->clbkBlt (tex, 0, 0, surf); // 'tex' not used in ExternMFD
-		updT = td.SimT1 + instrDT * upDTscale;
-		updSysT = td.SysT1 + 0.1; // don't exceed 10Hz update rate
+		updT = orbiter::production::CockpitTime().SimT1 + instrDT * upDTscale;
+		updSysT = orbiter::production::CockpitTime().SysT1 + 0.1; // don't exceed 10Hz update rate
 		return true;
 	} else return false;
 }
@@ -820,14 +893,14 @@ bool Instrument::Update (double upDTscale)
 void Instrument::Timejump ()
 {
 	Refresh ();
-	pT = td.SimT0;
-	lastkeytime = td.SysT0;
+	pT = orbiter::production::CockpitTime().SimT0;
+	lastkeytime = orbiter::production::CockpitTime().SysT0;
 }
 
 void Instrument::Refresh ()
 {
-	updT = td.SimT0-1.0;
-	updSysT = td.SysT0-1.0;
+	updT = orbiter::production::CockpitTime().SimT0-1.0;
+	updSysT = orbiter::production::CockpitTime().SysT0-1.0;
 }
 
 void Instrument::RepaintButtons ()
@@ -835,18 +908,23 @@ void Instrument::RepaintButtons ()
 	pane->RepaintMFDButtons (id, this);
 }
 
-oapi::Font *Instrument::GetDefaultFont (DWORD fontidx)
+oapi::Font *Instrument::GetDefaultFont (oapi::UInt32 fontidx)
 {
 	return (fontidx < 4 ? mfdfont[fontidx] : 0);
 }
 
-HFONT Instrument::SelectDefaultFont (HDC hDC, DWORD i)
+#ifdef _WIN32
+oapi::SdkFont Instrument::SelectDefaultFont (oapi::SdkDrawContext hDC, oapi::UInt32 i)
 {
 	// obsolete
-	return (i < 4 ? (HFONT)SelectObject (hDC, mfdfont[i]->GetGDIFont()) : 0);
+	return (i < 4 ? (oapi::SdkFont)SelectObject (hDC, mfdfont[i]->GetGDIFont()) : 0);
 }
+#else
+oapi::SdkFont Instrument::SelectDefaultFont (oapi::SdkDrawContext hDC, oapi::UInt32 i)
+{throw std::runtime_error("Native instruments require the Sketchpad drawing interface");}
+#endif
 
-oapi::Pen *Instrument::GetDefaultPen (DWORD colidx, DWORD intens, DWORD style)
+oapi::Pen *Instrument::GetDefaultPen (oapi::UInt32 colidx, oapi::UInt32 intens, oapi::UInt32 style)
 {
 	if (colidx >= MAXDEFCOL || intens >= 2) return 0;
 	switch (style) {
@@ -859,13 +937,15 @@ oapi::Pen *Instrument::GetDefaultPen (DWORD colidx, DWORD intens, DWORD style)
 	}
 }
 
-HPEN Instrument::SelectDefaultPen (HDC hDC, DWORD i)
+#ifdef _WIN32
+HPEN Instrument::SelectDefaultPen (oapi::SdkDrawContext hDC, oapi::UInt32 i)
 {
 	// obsolete
 	return (i < 6 ? (HPEN)SelectObject (hDC, hdefpen[i]) : 0);
 }
+#endif
 
-DWORD Instrument::GetDefaultColour (DWORD colidx, DWORD intens) const
+oapi::UInt32 Instrument::GetDefaultColour (oapi::UInt32 colidx, oapi::UInt32 intens) const
 {
 	if (colidx < MAXDEFCOL && intens < 2)
 		return draw[colidx][intens].col;
@@ -879,12 +959,17 @@ void Instrument::DisplayTitle (oapi::Sketchpad *skp, const char *title) const
 	skp->Text (cw/2, 0, title, strlen(title));
 }
 
-void Instrument::DisplayTitle (HDC hDC, const char *title) const
+#ifdef _WIN32
+void Instrument::DisplayTitle (oapi::SdkDrawContext hDC, const char *title) const
 {
 	// obsolete
 	SetTextColor (hDC, col_grey1);
 	TextOut (hDC, cw/2, 0, title, strlen(title));
 }
+#else
+void Instrument::DisplayTitle (oapi::SdkDrawContext hDC, const char *title) const
+{throw std::runtime_error("Native instruments require Sketchpad text drawing");}
+#endif
 
 void Instrument::DisplayModes (int page)
 {
@@ -1005,31 +1090,31 @@ void Instrument::DrawMenu ()
 	if (tex) gc->clbkBlt (tex, 0, 0, surf);
 }
 
-void Instrument::OpenSelect_CelBody (const char *title, Select::Callbk enter_cbk, DWORD flag)
+void Instrument::OpenSelect_CelBody (const char *title, Select::Callbk enter_cbk, oapi::UInt32 flag)
 {
 	SelCelBodyFlag = flag;
-	g_select->Open (title, ClbkSelect_CelBody, enter_cbk, (void*)this);
+	orbiter::production::CockpitSelect()->Open (title, ClbkSelect_CelBody, enter_cbk, (void*)this);
 }
 
 bool Instrument::ClbkSelect_CelBody (Select *menu, int item, char *str, void *data)
 {
 	int i, n;
 	if (!str) { // root menu
-		n = (SelCelBodyFlag & 1 ? 0 : g_psys->nStar());
+		n = (SelCelBodyFlag & 1 ? 0 : orbiter::production::CockpitWorld()->nStar());
 		for (i = 0; i < n; i++) {
-			Star *star = g_psys->GetStar (i);
+			Star *star = orbiter::production::CockpitWorld()->GetStar (i);
 			menu->Append (star->Name());
 		}
 		if (n) menu->AppendSeparator();
-		n = g_psys->nPlanet();
+		n = orbiter::production::CockpitWorld()->nPlanet();
 		for (i = 0; i < n; i++) {
-			Planet *planet = g_psys->GetPlanet (i);
+			Planet *planet = orbiter::production::CockpitWorld()->GetPlanet (i);
 			if (planet->isMoon()) continue; // only use primaries in root
 			menu->Append (planet->Name(), planet->nSecondary() ? ITEM_SUBMENU : 0);
 		}
 		return true;
 	} else { // submenu
-		CelestialBody *cbody = g_psys->GetGravObj (str, true);
+		CelestialBody *cbody = orbiter::production::CockpitWorld()->GetGravObj (str, true);
 		if (cbody) {
 			n = cbody->nSecondary();
 			for (i = 0; i < n; i++) {
@@ -1042,22 +1127,22 @@ bool Instrument::ClbkSelect_CelBody (Select *menu, int item, char *str, void *da
 	return false;
 }
 
-void Instrument::OpenSelect_Tgt (const char *title, Select::Callbk enter_cbk, const CelestialBody *ref, DWORD flag)
+void Instrument::OpenSelect_Tgt (const char *title, Select::Callbk enter_cbk, const CelestialBody *ref, oapi::UInt32 flag)
 {
 	seltgtprm.ref  = ref;
 	seltgtprm.flag = flag;
 	seltgtprm.clbk = enter_cbk;
 	strncpy (seltgtprm.title, title, 256);
-	g_select->Open (title, ClbkSelect_Tgt, ClbkEnter_Tgt, (void*)this);
+	orbiter::production::CockpitSelect()->Open (title, ClbkSelect_Tgt, ClbkEnter_Tgt, (void*)this);
 }
 
 bool Instrument::ClbkSelect_Tgt (Select *menu, int item, char *str, void *data)
 {
-	DWORD i, j;
+	oapi::UInt32 i, j;
 	char cbuf[256];
 	Instrument *mfd = (Instrument*)data;
 	const CelestialBody *ref = mfd->seltgtprm.ref;
-	DWORD flag = mfd->seltgtprm.flag;
+	oapi::UInt32 flag = mfd->seltgtprm.flag;
 
 	if (!str) { // main menu
 		if (!(flag & 1)) {
@@ -1070,8 +1155,8 @@ bool Instrument::ClbkSelect_Tgt (Select *menu, int item, char *str, void *data)
 	} else {    // submenu
 		if (!strcmp (str, "Spacecraft")) {
 			// pick craft orbiting the reference body
-			for (i = j = 0; i < g_psys->nVessel(); i++) {
-				Vessel *v = g_psys->GetVessel (i);
+			for (i = j = 0; i < orbiter::production::CockpitWorld()->nVessel(); i++) {
+				Vessel *v = orbiter::production::CockpitWorld()->GetVessel (i);
 				if (v == mfd->vessel || v->GetStatus() != FLIGHTSTATUS_FREEFLIGHT) continue;
 				if (v->ElRef() == ref) menu->Append (v->Name()), j++;
 			}
@@ -1086,16 +1171,16 @@ bool Instrument::ClbkSelect_Tgt (Select *menu, int item, char *str, void *data)
 			return true;
 		} else if (!strcmp (str, "More spacecraft")) {
 			// pick all craft
-			for (i = j = 0; i < g_psys->nVessel(); i++) {
-				Vessel *v = g_psys->GetVessel (i);
+			for (i = j = 0; i < orbiter::production::CockpitWorld()->nVessel(); i++) {
+				Vessel *v = orbiter::production::CockpitWorld()->GetVessel (i);
 				if (v == mfd->vessel || v->GetStatus() != FLIGHTSTATUS_FREEFLIGHT) continue;
 				if (v->ElRef() != ref) menu->Append (v->Name()), j++;
 			}
 			return (j > 0);
 		} else if (!strcmp (str, "Celestial bodies")) {
 			// pick bodies orbiting the reference body
-			for (i = j = 0; i < g_psys->nGrav(); i++) {
-				CelestialBody *cbody = g_psys->GetGravObj (i);
+			for (i = j = 0; i < orbiter::production::CockpitWorld()->nGrav(); i++) {
+				CelestialBody *cbody = orbiter::production::CockpitWorld()->GetGravObj (i);
 				if (cbody->ElRef() == ref) menu->Append (cbody->Name()), j++;
 			}
 			if (!j && ref) {
@@ -1119,14 +1204,14 @@ bool Instrument::ClbkEnter_Tgt (Select *menu, int item, char *str, void *data)
 {
 	Instrument* mfd = (Instrument*)data;
 	if (!strcmp (str, "By name ...")) {
-		g_input->Open (seltgtprm.title, 0, 25, ClbkName_Tgt, data);
+		orbiter::production::CockpitInput()->Open (seltgtprm.title, 0, 25, ClbkName_Tgt, data);
 		return true;
 	} else return seltgtprm.clbk (menu, item, str, data);
 }
 
 bool Instrument::ClbkName_Tgt (InputBox*, char *str, void *data)
 {
-	return seltgtprm.clbk (g_select, 0, str, data);
+	return seltgtprm.clbk (orbiter::production::CockpitSelect(), 0, str, data);
 }
 
 void Instrument::Write (ostream &ofs) const
@@ -1148,20 +1233,20 @@ bool Instrument::FindScnHeader (ifstream &ifs) const
 	switch (id) {
 	case 0: strcpy (header+10, "Left"); break;
 	case 1: strcpy (header+10, "Right"); break;
-	default: sprintf (header+10, "%lld", (int64_t)id + 1); break;
+	default: sprintf (header+10, "%lld", (long long)id + 1); break;
 	}
 	return FindLine (ifs, header);
 }
 
-DWORD Instrument::SelCelBodyFlag = 0;
+oapi::UInt32 Instrument::SelCelBodyFlag = 0;
 Instrument::SelTgtPrm Instrument::seltgtprm = {0,0};
-DWORD Instrument::nDisabledModes = 0;
+oapi::UInt32 Instrument::nDisabledModes = 0;
 int *Instrument::DisabledModes = 0;
 
-COLORREF Instrument::col_green1  = RGB(0,  230,  0);
-COLORREF Instrument::col_green2  = RGB(0,  172,  0);
-COLORREF Instrument::col_yellow1 = RGB(230,230,  0);
-COLORREF Instrument::col_yellow2 = RGB(172,172,  0);
-COLORREF Instrument::col_grey1   = RGB(224,224,224);
-COLORREF Instrument::col_grey2   = RGB(140,140,140);
-COLORREF Instrument::col_red1    = RGB(255,  0,  0);
+oapi::UInt32 Instrument::col_green1  = orbiter::production::CockpitColor(0,  230,  0);
+oapi::UInt32 Instrument::col_green2  = orbiter::production::CockpitColor(0,  172,  0);
+oapi::UInt32 Instrument::col_yellow1 = orbiter::production::CockpitColor(230,230,  0);
+oapi::UInt32 Instrument::col_yellow2 = orbiter::production::CockpitColor(172,172,  0);
+oapi::UInt32 Instrument::col_grey1   = orbiter::production::CockpitColor(224,224,224);
+oapi::UInt32 Instrument::col_grey2   = orbiter::production::CockpitColor(140,140,140);
+oapi::UInt32 Instrument::col_red1    = orbiter::production::CockpitColor(255,  0,  0);

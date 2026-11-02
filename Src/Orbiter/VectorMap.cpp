@@ -8,7 +8,13 @@
 #include "VectorMap.h"
 #include "Psys.h"
 #include "Mfd.h"
+#ifdef _WIN32
 #include "Util.h"
+#else
+#include "Production/CockpitNativeSupport.h"
+#include "Base.h"
+#include "Star.h"
+#endif
 
 #include <cmath>
 #include <algorithm>
@@ -19,30 +25,36 @@
 #define OUTLINE_ORBITPLANE 4
 #define OUTLINE_GROUNDTRACK 5
 
-static DWORD col_navaid = 0x808080;
+static oapi::UInt32 col_navaid = 0x808080;
 
 using namespace std;
 
+#ifdef _WIN32
 extern PlanetarySystem *g_psys;
+#endif
+#ifdef _WIN32
 extern Vessel *g_focusobj;
+#endif
+#ifdef _WIN32
 extern TimeData td;
+#endif
 
 bool VectorMap::bsetup = true;
 double VectorMap::cosp[NVTX_CIRCLE] = {0};
 double VectorMap::sinp[NVTX_CIRCLE] = {0};
 
-static COLORREF labelcol[6] = {0x00FFFF, 0xFFFF00, 0x4040FF, 0xFF00FF, 0x40FF40, 0xFF8080};
+static oapi::UInt32 labelcol[6] = {0x00FFFF, 0xFFFF00, 0x4040FF, 0xFF00FF, 0x40FF40, 0xFF8080};
 
 // =======================================================================
 
-VectorMap::VectorMap ()
+VectorMap::VectorMap ():drawdata(orbiter::production::CockpitTime().MJD_ref)
 {
 	SetDefaults();
 }
 
 // =======================================================================
 
-VectorMap::VectorMap (const Planet *pl)
+VectorMap::VectorMap (const Planet *pl):drawdata(orbiter::production::CockpitTime().MJD_ref)
 {
 	SetDefaults();
 }
@@ -101,7 +113,7 @@ void VectorMap::InitGDIResources ()
 
 	fontLabel = NULL;
 	// for default label size, query screen resolution
-	int screenh = GetSystemMetrics(SM_CYSCREEN);
+	int screenh = orbiter::production::CockpitScreenHeight();
 	labelsize = screenh / 100;
 	SetLabelSize(labelsize);
  
@@ -142,7 +154,7 @@ void VectorMap::SetLabelSize(int size)
 
 void VectorMap::AllocCustomResources ()
 {
-	DWORD i;
+	oapi::UInt32 i;
 
 	if (nCustomMkr) {
 		for (i = 0; i < nCustomMkr; i++)
@@ -155,7 +167,7 @@ void VectorMap::AllocCustomResources ()
 	nCustomMkr = mkrset.nset;
 	if (nCustomMkr) {
 		penCustomMkr = new oapi::Pen *[nCustomMkr];
-		colCustomMkr = new COLORREF[nCustomMkr];
+		colCustomMkr = new oapi::UInt32[nCustomMkr];
 		for (i = 0; i < nCustomMkr; i++) {
 			colCustomMkr[i] = labelcol[mkrset.set[i].list->colour];
 			penCustomMkr[i] = oapiCreatePen (1, 1, colCustomMkr[i]);
@@ -167,7 +179,7 @@ void VectorMap::AllocCustomResources ()
 
 void VectorMap::CloseGDIResources ()
 {
-	DWORD i;
+	oapi::UInt32 i;
 	oapiReleaseFont (fontLabel);
 	oapiReleasePen (penGridline);
 	oapiReleasePen (penCoast);
@@ -208,7 +220,7 @@ void VectorMap::Update ()
 	if (!cbody) return;
 
 	if (centermode == 1) {
-		const SurfParam *sp = g_focusobj->GetSurfParam();
+		const SurfParam *sp = orbiter::production::CockpitFocus()->GetSurfParam();
 		if (sp && sp->ref == cbody)
 			SetCenter (sp->lng, sp->lat);
 	} else if (centermode == 2) {
@@ -216,13 +228,13 @@ void VectorMap::Update ()
 			SetCenter (lng, lat);
 	}
 
-	if (drawdata.focus_disp = (true/*planet == g_focusobj->ProxyPlanet()*/)) {
-		strncpy (drawdata.focusname, g_focusobj->Name(), 64);
-		cbody->GlobalToEquatorial (g_focusobj->GPos(), lng, lat, rad);
+	if (drawdata.focus_disp = (true/*planet == orbiter::production::CockpitFocus()->ProxyPlanet()*/)) {
+		strncpy (drawdata.focusname, orbiter::production::CockpitFocus()->Name(), 64);
+		cbody->GlobalToEquatorial (orbiter::production::CockpitFocus()->GPos(), lng, lat, rad);
 		drawdata.focuslng = lng;
 		drawdata.focuslat = lat;
 		drawdata.focusrad = rad/cbody->Size();
-		drawdata.focusel.Set (*g_focusobj->Els());
+		drawdata.focusel.Set (*orbiter::production::CockpitFocus()->Els(), orbiter::production::CockpitTime().MJD_ref);
 		//if (focuscenter) SetCenter (drawdata.focuslng, drawdata.focuslat);
 	}
 	if (drawdata.sun_disp = true) {
@@ -235,12 +247,12 @@ void VectorMap::Update ()
 	int i;
 
 	if (dispflag & DISP_GROUNDTRACK) {
-		if (dispflag & DISP_ORBITFOCUS && g_focusobj->ElRef() == cbody) {
+		if (dispflag & DISP_ORBITFOCUS && orbiter::production::CockpitFocus()->ElRef() == cbody) {
 			for (i = 0; i < nstep; i++) gt_this.Update();
 		}
 		if (dispflag & DISP_ORBITSEL && selection.type == DISP_VESSEL) {
 			Vessel *v = (Vessel*)selection.obj;
-			if ((v != g_focusobj) || ((dispflag & DISP_ORBITFOCUS) == 0)) {
+			if ((v != orbiter::production::CockpitFocus()) || ((dispflag & DISP_ORBITFOCUS) == 0)) {
 				if (v->ElRef() == cbody)
 					for (i = 0; i < nstep; i++) gt_tgt.Update();
 			}
@@ -270,6 +282,7 @@ bool VectorMap::SetCBody (const CelestialBody *body)
 		cbody = body;
 		planet = (cbody->Type() == OBJTP_PLANET ? (const Planet*)cbody : NULL);
 		if (planet) {
+#ifdef _WIN32
 			char path[MAX_PATH], relpath[MAX_PATH];
 			sprintf (relpath, "%s\\data\\coast.vec", cbody->Name());
 			strcpy (path, orbiter::production::CockpitConfiguration()->ConfigPathNoext (relpath));
@@ -277,7 +290,14 @@ bool VectorMap::SetCBody (const CelestialBody *body)
 			sprintf (relpath, "%s\\data\\contour.vec", cbody->Name());
 			strcpy (path, orbiter::production::CockpitConfiguration()->ConfigPathNoext (relpath));
 			contour.Load (path, OUTLINE_CONTOUR);
-			gt_this.Reset (cbody, g_focusobj->Els());
+#else
+            const auto base=std::string(cbody->Name())+"/data/";
+            const auto coastPath=orbiter::production::CockpitConfigPath((base+"coast.vec").c_str()).string();
+            coast.Load(coastPath.c_str(),OUTLINE_COAST);
+            const auto contourPath=orbiter::production::CockpitConfigPath((base+"contour.vec").c_str()).string();
+            contour.Load(contourPath.c_str(),OUTLINE_CONTOUR);
+#endif
+			gt_this.Reset (cbody, orbiter::production::CockpitFocus()->Els());
 			mkrlist = planet->LabelList (&nmkrlist);
 			mkrset.Connect (mkrlist, nmkrlist);
 			AllocCustomResources();
@@ -369,7 +389,7 @@ bool VectorMap::SetSelection (const OBJTYPE &obj)
 		return false;
 	if (obj.type == DISP_VESSEL || obj.type == DISP_MOON) {
 		Body *body = (Body*)obj.obj;
-		if (!g_psys->isObject (body))
+		if (!orbiter::production::CockpitWorld()->isObject (body))
 			return false;
 	}
 	selection = obj;
@@ -394,7 +414,7 @@ void VectorMap::UnsetSelection ()
 
 // ======================================================================
 
-void VectorMap::SetDisplayFlags (DWORD flag)
+void VectorMap::SetDisplayFlags (oapi::UInt32 flag)
 {
 	dispflag = flag;
 	CheckSelection();
@@ -402,7 +422,7 @@ void VectorMap::SetDisplayFlags (DWORD flag)
 
 // ======================================================================
 
-void VectorMap::ToggleDisplayFlags (DWORD flag)
+void VectorMap::ToggleDisplayFlags (oapi::UInt32 flag)
 {
 	dispflag ^= flag;
 	CheckSelection();
@@ -415,7 +435,7 @@ void VectorMap::CheckSelection ()
 	bool clearselection = false;
 	switch (selection.type) {
 	case DISP_VESSEL:
-		if (!(dispflag & DISP_VESSEL) || (dispflag & DISP_FOCUSONLY) && selection.obj != g_focusobj)
+		if (!(dispflag & DISP_VESSEL) || (dispflag & DISP_FOCUSONLY) && selection.obj != orbiter::production::CockpitFocus())
 			clearselection = true;
 		break;
 	case DISP_MOON:
@@ -498,14 +518,14 @@ const VectorMap::OBJTYPE VectorMap::FindObject (int x, int y) const
 	if (!planet) return obj;
 
 	const double hitrad2 = 25.0;
-	DWORD i;
+	oapi::UInt32 i;
 	int j, px, py;
 	double lng, lat, rad, dx, dy, dst2;
 	double dst2min = 1e10;
 
-	if (dispflag & DISP_BASE && findflag & DISP_BASE && g_psys->nBase (planet)) {
-		for (i = 0; i < g_psys->nBase (planet); i++) {
-			Base *base = g_psys->GetBase (planet, i);
+	if (dispflag & DISP_BASE && findflag & DISP_BASE && orbiter::production::CockpitWorld()->nBase (planet)) {
+		for (i = 0; i < orbiter::production::CockpitWorld()->nBase (planet); i++) {
+			Base *base = orbiter::production::CockpitWorld()->GetBase (planet, i);
 			base->EquPos (lng, lat);
 			if (GetMapPos (lng, lat, px, py)) {
 				dx = (double)(x-px);
@@ -561,9 +581,9 @@ const VectorMap::OBJTYPE VectorMap::FindObject (int x, int y) const
 	}
 
 	if (dispflag & DISP_VESSEL && findflag & DISP_VESSEL) {
-		for (i = 0; i < g_psys->nVessel(); i++) {
-			Vessel *v = g_psys->GetVessel(i);
-			if (dispflag & DISP_FOCUSONLY && v != g_focusobj)
+		for (i = 0; i < orbiter::production::CockpitWorld()->nVessel(); i++) {
+			Vessel *v = orbiter::production::CockpitWorld()->GetVessel(i);
+			if (dispflag & DISP_FOCUSONLY && v != orbiter::production::CockpitFocus())
 				continue;
 			const SurfParam *sp = v->GetSurfParam();
 			if (sp->ref == planet) {
@@ -660,7 +680,7 @@ void VectorMap::DrawMap_engine ()
 
 			// custom marker sets
 			if (dispflag & DISP_CUSTOMMARKER) {
-				for (DWORD i = 0; i < mkrset.nset; i++) {
+				for (oapi::UInt32 i = 0; i < mkrset.nset; i++) {
 					if (mkrset.set[i].active)
 						DrawCustomMarkerSet (skp, i);
 				}
@@ -871,7 +891,7 @@ void VectorMap::DrawNavaids (oapi::Sketchpad *skp)
 		int x, y;
 		bool drawdot = (mapx_scale < 400);
 		bool drawlabel = (mapx_scale > 1400);
-		for (DWORD n = 0; n < planet->nNav(); n++) {
+		for (oapi::UInt32 n = 0; n < planet->nNav(); n++) {
 			const Nav *nav = planet->NavMgr().GetNav(n);
 			switch (nav->Type()) {
 			case TRANSMITTER_VOR: {
@@ -900,7 +920,7 @@ void VectorMap::DrawNavaids (oapi::Sketchpad *skp)
 
 void VectorMap::DrawVesselOrbit (oapi::Sketchpad *skp, Vessel *v)
 {
-	bool isfocus = (v == g_focusobj);
+	bool isfocus = (v == orbiter::production::CockpitFocus());
 	if (dispflag & DISP_HORIZONLINE) {
 		const SurfParam *sp = v->GetSurfParam();
 		if (sp && sp->ref == cbody) {
@@ -924,21 +944,21 @@ void VectorMap::DrawVessels (oapi::Sketchpad *skp)
 
 	if (dispflag & DISP_ORBITSEL && selection.type == DISP_VESSEL) {
 		v = (Vessel*)selection.obj;
-		if (v == g_focusobj || !(dispflag & DISP_FOCUSONLY)) {
+		if (v == orbiter::production::CockpitFocus() || !(dispflag & DISP_FOCUSONLY)) {
 			DrawVesselOrbit (skp, v);
-			focus_drawn = (v == g_focusobj);
+			focus_drawn = (v == orbiter::production::CockpitFocus());
 		}
 	}
 	if (dispflag & DISP_ORBITFOCUS && !focus_drawn)
-		DrawVesselOrbit (skp, g_focusobj);
+		DrawVesselOrbit (skp, orbiter::production::CockpitFocus());
 
-	for (DWORD i = 0; i < g_psys->nVessel(); i++) {
-		v = g_psys->GetVessel(i);
-		if (dispflag & DISP_FOCUSONLY && v != g_focusobj)
+	for (oapi::UInt32 i = 0; i < orbiter::production::CockpitWorld()->nVessel(); i++) {
+		v = orbiter::production::CockpitWorld()->GetVessel(i);
+		if (dispflag & DISP_FOCUSONLY && v != orbiter::production::CockpitFocus())
 			continue;
 		const SurfParam *sp = v->GetSurfParam();
 		if (sp && sp->ref == planet) {
-			DrawMarker (skp, sp->lng, sp->lat, v->Name(), v == g_focusobj ? 0:1);
+			DrawMarker (skp, sp->lng, sp->lat, v->Name(), v == orbiter::production::CockpitFocus() ? 0:1);
 		}
 	}
 }
@@ -962,7 +982,7 @@ void VectorMap::DrawMoons (oapi::Sketchpad *skp)
 	}
 
 	if (dispflag & DISP_MOON)
-		for (DWORD i = 0; i < cbody->nSecondary(); i++) {
+		for (oapi::UInt32 i = 0; i < cbody->nSecondary(); i++) {
 			moon = cbody->Secondary (i);
 			cbody->GlobalToEquatorial (moon->GPos(), lng, lat, rad);
 			DrawMarker (skp, lng, lat, moon->Name(), 2);
@@ -977,11 +997,11 @@ void VectorMap::DrawBases (oapi::Sketchpad *skp)
 	if (drawlabel) skp->SetTextColor (Instrument::draw[2][0].col);
 	oapi::Pen *ppen = skp->SetPen (penBase);
 
-	if (planet && g_psys->nBase (planet)) {
+	if (planet && orbiter::production::CockpitWorld()->nBase (planet)) {
 		int x, y;
 		double lng, lat;
-		for (DWORD i = 0; i < g_psys->nBase (planet); i++) {
-			Base *base = g_psys->GetBase (planet, i);
+		for (oapi::UInt32 i = 0; i < orbiter::production::CockpitWorld()->nBase (planet); i++) {
+			Base *base = orbiter::production::CockpitWorld()->GetBase (planet, i);
 			base->EquPos (lng, lat);
 			if (GetMapPos (lng, lat, x, y)) {
 				skp->Rectangle (x-3, y-3, x+4, y+4);
@@ -1018,9 +1038,17 @@ void VectorMap::DrawCustomMarkerSet (oapi::Sketchpad *skp, int idx)
 			} else {
 				skp->Ellipse (x-2, y-2, x+3, y+3);
 				if (drawlabel && set->list->marker[i].label[0].size()) {
+#ifdef _WIN32
 					WCHAR wlabel[256];
 					MultiByteToWideChar(CP_UTF8, 0, set->list->marker[i].label[0].c_str(), -1, wlabel, 256);
 					skp->TextW (x+3, y, wlabel, wcslen(wlabel));
+#else
+                    // Marker data is already UTF-8. The native Sketchpad's
+                    // Text entry accepts the same bytes used after Windows'
+                    // UTF-8 -> UTF-16 -> UTF-8 conversion in TextW.
+                    const auto& label=set->list->marker[i].label[0];
+                    skp->Text(x+3,y,label.c_str(),int(label.size()));
+#endif
 				}
 			}
 		}
@@ -1456,9 +1484,9 @@ void Groundtrack::Reset (const CelestialBody *body, const Elements *_el)
 	vcurr = 1;
 	vlast = 2;
 
-	vtx[vfirst].t = td.SimT0;
+	vtx[vfirst].t = orbiter::production::CockpitTime().SimT0;
 	for (i = 1; i < nvtx; i++) {
-		vtx[i].t = td.SimT0 + (i-1)*tstep;
+		vtx[i].t = orbiter::production::CockpitTime().SimT0 + (i-1)*tstep;
 		vtx[i].dt = vtx[i].t-vtx[i-1].t;
 		vtx[i].rad = 0.5;
 	}
@@ -1475,7 +1503,7 @@ void Groundtrack::CalcPoint (VPointGT &p, double *angvel)
 	el->Pol2Crt (r, ta, pos);
 	loc.Set (tmul (cbody->GRot(), pos));
 	cbody->LocalToEquatorial (loc, lng, lat, rad);
-	p.lng = normangle(lng - Pi2*(p.t-td.SimT0)/cbody->RotT());
+	p.lng = normangle(lng - Pi2*(p.t-orbiter::production::CockpitTime().SimT0)/cbody->RotT());
 	p.lat = lat;
 	p.rad = r/prad;
 
@@ -1496,7 +1524,7 @@ void Groundtrack::Update ()
 	const double dtmax = 3600.0;
 
 	if (!cbody) return;
-	if (td.SimT1 < vtx[vcurr].t) { // simulation has jumped back in time!
+	if (orbiter::production::CockpitTime().SimT1 < vtx[vcurr].t) { // simulation has jumped back in time!
 		Reset (cbody, el);
 		return;
 	}
@@ -1507,7 +1535,7 @@ void Groundtrack::Update ()
 	nv = v1-v0+1;  // number of active vertices
 
 	vp = (vcurr ? vcurr-1 : nvtx-1);
-	vtx[vcurr].t =  td.SimT1;
+	vtx[vcurr].t =  orbiter::production::CockpitTime().SimT1;
 	vtx[vcurr].dt = vtx[vcurr].t - vtx[vp].t;
 	CalcPoint (vtx[vcurr], &omega_curr);
 	if (VtxDst (vtx[vcurr], vtx[vp]) > tgtstep || vtx[vcurr].t >= vtx[(vcurr+1)%nvtx].t) {

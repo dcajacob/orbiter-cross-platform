@@ -35,3 +35,5 @@ oapi::UInt32 clbkGetDeviceColour(std::uint8_t r,std::uint8_t g,std::uint8_t b) o
 bool clbkFillSurface(SURFHANDLE surface,oapi::UInt32 color) const override {return FillSurface(surface,color);}
 bool clbkBlt(SURFHANDLE t,oapi::UInt32 x,oapi::UInt32 y,SURFHANDLE s,oapi::UInt32 flags) const override {return Blt(t,int(x),int(y),s,int(flags));}
 bool clbkBlt(SURFHANDLE t,oapi::UInt32 x,oapi::UInt32 y,SURFHANDLE s,oapi::UInt32 sx,oapi::UInt32 sy,oapi::UInt32 w,oapi::UInt32 h,oapi::UInt32 flags) const override {return Blt(t,int(x),int(y),s,int(sx),int(sy),int(w),int(h),int(flags));}
+
+int DesktopHeight() const override;

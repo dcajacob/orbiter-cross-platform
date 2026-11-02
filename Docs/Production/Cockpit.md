@@ -193,3 +193,36 @@ link the native instrument lifecycle or make DG/DG-S cockpits operational.
 The original application call forms and Windows SDK class/field layouts remain
 unchanged. Current Windows image/state comparisons are required before this
 stage is accepted.
+
+The original `Instrument` base/factory/scheduler also compiles as a native
+object, alongside the ten stock modes. Instrument orbital-element calls now
+pass the original session reference epoch and simulation time explicitly.
+Windows adapters return the same original globals; native bindings query the
+authoritative production services. Selection, input, help and pane access must
+be bound by the future native cockpit owner and fail explicitly if absent.
+Deprecated GDI rendering, the legacy map and custom MFD factories remain
+explicitly unavailable on native builds at this stage. Windows keeps their
+original implementations. This compilation gate does not exercise a runnable
+native instrument scheduler or satisfy the Phase 6 cockpit gate.
+The modern vector-map implementation also compiles natively. Its Elements
+records receive the same explicit epoch. Native coast/contour files use the
+indexed configuration resolver, marker text remains UTF-8 through the real
+Sketchpad, and display-based font sizing queries GLFW's actual primary display
+mode. No window-system metrics are invented. Map captures must control desktop
+resolution as well as viewport size: the frozen original map text records a
+nine-pixel label font, which the original screen-height/100 rule determines.
+This environment requirement must be reproduced during native cockpit parity
+validation.
+
+The stock-mode implementation/drawing-adapter stage at `1b146567` passes
+current Windows application/SDK tests and all original cockpit image, numerical,
+geometry and displayed-text comparisons in
+[run 41474774584](https://github.com/dcajacob/orbiter-cross-platform/actions/runs/41474774584),
+including Debug/Release cross-comparison. All four native profiles pass their
+full existing flight/lifetime/terrain checks and the native instrument
+compilation/pixel probe in
+[run 41474774464](https://github.com/dcajacob/orbiter-cross-platform/actions/runs/41474774464).
+The subsequent scheduler/map/session-binding stage has local source, compilation,
+conic and twenty-context pixel verification, plus unchanged native exterior
+state and SSIM `0.9881491503795506` in two fresh processes. These local results
+are separate from the required hosted validation of that later stage.

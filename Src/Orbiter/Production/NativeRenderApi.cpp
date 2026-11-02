@@ -546,3 +546,18 @@ void oapiBlt(SURFHANDLE target,SURFHANDLE source,int x,int y,int sx,int sy,int w
     if(color_key!=SURF_NO_CK)throw std::runtime_error("Native oapiBlt: obsolete color-key argument is unsupported");
     if(!graphics->clbkBlt(target,x,y,source,sx,sy,width,height))throw std::runtime_error("Native oapiBlt: graphics surface copy failed");
 }
+
+oapi::Brush* oapiCreateBrush(oapi::UInt32 color) {
+    auto* graphics=GetNativeRenderContext().graphics;return graphics?graphics->clbkCreateBrush(color):nullptr;
+}
+void oapiReleaseBrush(oapi::Brush* brush) {
+    if(auto* graphics=GetNativeRenderContext().graphics)graphics->clbkReleaseBrush(brush);
+}
+void oapiDestroySurface(SURFHANDLE surface) {
+    if(auto* graphics=GetNativeRenderContext().graphics)graphics->ReleaseTextureResource(surface);
+}
+void oapiClearSurface(SURFHANDLE surface,oapi::UInt32 color) {
+    if(!surface)return;
+    if(auto* graphics=GetNativeRenderContext().graphics)
+        if(!graphics->clbkFillSurface(surface,color))throw std::runtime_error("Native oapiClearSurface: graphics fill failed");
+}

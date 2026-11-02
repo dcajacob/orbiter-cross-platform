@@ -39,9 +39,22 @@ def verify():
 #include "CockpitGraphics.h"
 #include "BodyServices.h"
 #include "RigidBodyServices.h"
+class Pane;class Select;class InputBox;
 #include "Orbiter.h"
 extern Orbiter* g_pOrbiter;
+extern Pane* g_pane;extern Select* g_select;extern InputBox* g_input;extern HELPCONTEXT DefHelpContext;
+extern TimeData td;extern PlanetarySystem* g_psys;extern Vessel* g_focusobj;
 namespace orbiter::production {
+inline int CockpitScreenHeight() {return GetSystemMetrics(SM_CYSCREEN);}
+inline TimeData& CockpitTime() {return td;}
+inline PlanetarySystem* CockpitWorld() {return g_psys;}
+inline Vessel* CockpitFocus() {return g_focusobj;}
+inline Pane* CockpitPane() {return g_pane;}
+inline Select* CockpitSelect() {return g_select;}
+inline InputBox* CockpitInput() {return g_input;}
+inline HELPCONTEXT& CockpitHelpContext() {return DefHelpContext;}
+inline std::uint16_t CockpitHighWord(oapi::UInt32 value) {return HIWORD(value);}
+inline std::uint16_t CockpitLowWord(oapi::UInt32 value) {return LOWORD(value);}
 inline oapi::UInt32 CockpitColor(std::uint8_t r,std::uint8_t g,std::uint8_t b) {return RGB(r,g,b);}
 inline Config* CockpitConfiguration() {return &GetCameraServices().Configuration();}
 inline oapi::CockpitClient* CockpitGraphicsClient() {return g_pOrbiter->GetGraphicsClient();}
@@ -78,16 +91,38 @@ namespace oapi {using CockpitClient=GraphicsClient;}
         path='Src/Orbiter/'+name
         original=subprocess.check_output(['git','-C',str(ROOT),'show',BASE+':'+path]).decode('cp1252').replace('\r\n','\n')
         current=windows(raw(path)).replace('oapi::CockpitClient','oapi::GraphicsClient')
+        # Only the original known Elements call sites receive explicit time.
+        current=current.replace('new Elements(orbiter::production::CockpitTime().MJD_ref)','new Elements()')
+        import re
+        pattern=re.compile(r'\b(?:shpel2?|tgtel|el2)->(?:Setup|Set|Reset|Update)\s*\(')
+        for match in reversed(list(pattern.finditer(current))):
+            start=match.end()-1;depth=1;end=start+1
+            while depth:
+                if current[end]=='(':depth+=1
+                elif current[end]==')':depth-=1
+                end+=1
+            argument='orbiter::production::CockpitTime().SimT1' if '->Update' in match.group(0) else 'orbiter::production::CockpitTime().MJD_ref'
+            suffix=', '+argument
+            if not current[:end-1].endswith(suffix):raise ValueError('Instrument Elements lacks its explicit original time input: '+name)
+            current=current[:end-1-len(suffix)]+current[end-1:]
+        for service,application in [('CockpitTime()','td'),('CockpitWorld()','g_psys'),('CockpitFocus()','g_focusobj'),('CockpitPane()','g_pane'),('CockpitSelect()','g_select'),('CockpitInput()','g_input'),('CockpitHelpContext()','DefHelpContext')]:
+            current=current.replace('orbiter::production::'+service,application)
         current=current.replace('orbiter::production::CockpitConfiguration()','g_pOrbiter->Cfg()')
         current=current.replace('#include "Production/CockpitServices.h"','')
-        for service,application in [('CockpitColor','RGB'),('CockpitGraphicsClient','g_pOrbiter->GetGraphicsClient'),('CockpitReleaseSurface','g_pOrbiter->ReleaseSurface'),('CockpitDeviceColour','g_pOrbiter->GetDeviceColour'),('CockpitFillSurface','g_pOrbiter->FillSurface'),('CockpitBlt','g_pOrbiter->Blt'),('CockpitConfigPath','g_pOrbiter->ConfigPath'),('ComparePrefix','_strnicmp'),('CompareText','_stricmp')]:
+        for service,application in [('CockpitColor','RGB'),('CockpitGraphicsClient','g_pOrbiter->GetGraphicsClient'),('CockpitReleaseSurface','g_pOrbiter->ReleaseSurface'),('CockpitDeviceColour','g_pOrbiter->GetDeviceColour'),('CockpitFillSurface','g_pOrbiter->FillSurface'),('CockpitBlt','g_pOrbiter->Blt'),('CockpitConfigPath','g_pOrbiter->ConfigPath'),('ComparePrefix','_strnicmp'),('CompareText','_stricmp'),('CockpitHighWord','HIWORD'),('CockpitLowWord','LOWORD')]:
             current=current.replace('orbiter::production::'+service,application)
         for a,b in [('oapi::UInt32','DWORD'),('std::intptr_t','INT_PTR'),('oapi::SdkDrawContext','HDC'),('oapi::SdkFont','HFONT'),('oapi::SdkPoint','POINT'),('oapi::UInt','UINT'),('oapi::SdkRectangle','RECT')]:current=current.replace(a,b)
         if name in ('Mfd.h','hud.h'):current=current.replace('#include "Production/CockpitGraphics.h"','#include "GraphicsAPI.h"')
         else:current=current.replace('#include "Production/CockpitGraphics.h"','')
         if name=='Mfd.h':current=current.replace('class Pane;','class Pane;\nclass oapi::GraphicsClient;',1)
+        if name=='VectorMap.h':current=current.replace('explicit DRAWDATA(double reference_mjd):focusel(reference_mjd),tgtvel(reference_mjd) {}','',1)
+        if name=='VectorMap.cpp':
+            current=current.replace(':drawdata(td.MJD_ref)','')
+            current=current.replace('drawdata.focusel.Set (*g_focusobj->Els(), td.MJD_ref)','drawdata.focusel.Set (*g_focusobj->Els())')
+            current=current.replace('orbiter::production::CockpitScreenHeight()','GetSystemMetrics(SM_CYSCREEN)')
         if name=='MfdHsi.cpp':current=current.replace('static const int arrowseg','static const INT arrowseg').replace('static const int narrowseg','static const INT narrowseg')
         if name=='MfdAlign.cpp':current=current.replace('saveprm = {0,0,0,false,0.0,0.0}','saveprm = {0,0,0,0.0,0.0,false}')
+        if name=='Mfd.cpp':current=current.replace('(long long)id + 1','(int64_t)id + 1')
         current=restore_geometry(name,current,original)
         equal(original.replace('COLORREF','DWORD'),current.replace('COLORREF','DWORD'),'Original cockpit calculations, declarations and call order: '+name)
     print('Original Pane, HUD, MFD and panel algorithms conserved; Windows graphics pointer types unchanged')

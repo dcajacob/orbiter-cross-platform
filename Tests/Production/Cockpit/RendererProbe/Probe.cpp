@@ -27,6 +27,7 @@ int main(int argc,char** argv){try{
     for(unsigned cycle=0;cycle<cycles;++cycle){
     context.evidence=std::filesystem::absolute(argv[4]).parent_path()/("context-"+std::to_string(cycle));
     client->Open();
+    require(client->DesktopHeight()>0,"Real native primary display metrics unavailable");
     require(glGetError()==GL_NO_ERROR,"Context reinitialization produced a GL error");
     glDebugMessageCallback([](GLenum,GLenum type,GLuint,GLenum,GLsizei,const GLchar* message,const void*){
         if(type==GL_DEBUG_TYPE_ERROR)std::cerr<<"Actual GL error: "<<message<<'\n';
@@ -48,10 +49,10 @@ int main(int argc,char** argv){try{
     require(source && target,"Instrument callback surface allocation failed");
     require(client->clbkFillSurface(source,client->clbkGetDeviceColour(20,70,130)),"Device-color fill failed");
     require(client->clbkFillSurface(target,0),"Target fill failed");
-    auto brush=client->clbkCreateBrush(255);require(brush,"Instrument brush callback failed");
+    auto brush=oapiCreateBrush(255);require(brush,"Instrument brush callback failed");
     pad=client->clbkGetSketchpad(source);require(pad,"Callback Sketchpad unavailable");
     pad->SetPen(nullptr);pad->SetBrush(brush);pad->Rectangle(3,3,11,11);
-    client->clbkReleaseSketchpad(pad);client->clbkReleaseBrush(brush);
+    client->clbkReleaseSketchpad(pad);oapiReleaseBrush(brush);
     require(client->clbkBlt(target,4,4,source),"Complete instrument surface copy failed");
     const auto read=[&](SURFHANDLE handle,int w,int h){
         std::vector<unsigned char> data(size_t(w)*h*4);
@@ -80,7 +81,9 @@ int main(int argc,char** argv){try{
     for(int y=0;y<16;++y) require(std::equal(apiCopied.begin()+size_t(y)*24*4,apiCopied.begin()+size_t(y)*24*4+16*4,
         overlap.begin()+size_t((y+1)*24+1)*4),"Overlapping instrument copy did not snapshot its source");
     require(glGetError()==GL_NO_ERROR,"Instrument brush/fill/blit callbacks produced a GL error");
-    client->ReleaseTextureResource(source);client->ReleaseTextureResource(target);
+    oapiClearSurface(target);const auto cleared=read(target,24,24);
+    for(size_t i=0;i<cleared.size();i+=4)require(cleared[i]==0 && cleared[i+1]==0 && cleared[i+2]==0,"SDK surface clear left colored pixels");
+    oapiDestroySurface(source);oapiDestroySurface(target);
     auto stock=client->LoadTextureResource("shuttlepb.dds",4);require(stock,"Actual compressed stock texture missing");
     auto* writable=static_cast<OGLTexture*>(stock);GLint compressedBefore=0,compressedAfter=0;
     glBindTexture(GL_TEXTURE_2D,writable->m_TexId);glGetTexLevelParameteriv(GL_TEXTURE_2D,0,GL_TEXTURE_COMPRESSED,&compressedBefore);

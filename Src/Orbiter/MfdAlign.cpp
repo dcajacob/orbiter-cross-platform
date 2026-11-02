@@ -20,10 +20,21 @@
 
 using namespace std;
 
+#ifdef _WIN32
 extern PlanetarySystem *g_psys;
+#endif
+
+#ifdef _WIN32
 extern TimeData td;
+#endif
+
+#ifdef _WIN32
 extern InputBox *g_input;
+#endif
+
+#ifdef _WIN32
 extern Select *g_select;
+#endif
 extern char DBG_MSG[256];
 
 static const Body *last_target = 0;
@@ -36,8 +47,8 @@ struct Instrument_OPlaneAlign::SavePrm Instrument_OPlaneAlign::saveprm = {0,0,0,
 Instrument_OPlaneAlign::Instrument_OPlaneAlign (Pane *_pane, std::intptr_t _id, const Spec &spec, Vessel *_vessel, bool restore)
 : Instrument (_pane, _id, spec, _vessel)
 {
-	shpel = new Elements(); TRACENEW
-	tgtel = new Elements(); TRACENEW
+	shpel = new Elements(orbiter::production::CockpitTime().MJD_ref); TRACENEW
+	tgtel = new Elements(orbiter::production::CockpitTime().MJD_ref); TRACENEW
 	mode = ORBIT;
 	automode = true;
 	if (restore && vessel == saveprm.usr) {
@@ -53,12 +64,12 @@ Instrument_OPlaneAlign::Instrument_OPlaneAlign (Pane *_pane, std::intptr_t _id, 
 	}
 	if (elref) {
 		shpel->SetMasses(_vessel->Mass(), elref->Mass());
-		shpel->Calculate(vessel->GPos() - elref->GPos(), vessel->GVel() - elref->GVel(), td.SimT1);
-		shpel->Setup (_vessel->Mass(), elref->Mass(), _vessel->Els()->MJDepoch());
+		shpel->Calculate(vessel->GPos() - elref->GPos(), vessel->GVel() - elref->GVel(), orbiter::production::CockpitTime().SimT1);
+		shpel->Setup (_vessel->Mass(), elref->Mass(), _vessel->Els()->MJDepoch(), orbiter::production::CockpitTime().MJD_ref);
 		if (tgt) {
 			tgtel->SetMasses(tgt->Mass(), elref->Mass());
-			tgtel->Calculate(tgt->GPos() - elref->GPos(), tgt->GVel() - elref->GVel(), td.SimT1);
-			tgtel->Setup(tgt->Mass(), elref->Mass(), _vessel->Els()->MJDepoch());
+			tgtel->Calculate(tgt->GPos() - elref->GPos(), tgt->GVel() - elref->GVel(), orbiter::production::CockpitTime().SimT1);
+			tgtel->Setup(tgt->Mass(), elref->Mass(), _vessel->Els()->MJDepoch(), orbiter::production::CockpitTime().MJD_ref);
 		}
 	}
 
@@ -84,14 +95,17 @@ Instrument_OPlaneAlign::~Instrument_OPlaneAlign ()
 
 HELPCONTEXT *Instrument_OPlaneAlign::HelpTopic () const
 {
-	extern HELPCONTEXT DefHelpContext;
-	DefHelpContext.topic = (char*)"/mfd_align.htm";
-	return &DefHelpContext;
+
+#ifdef _WIN32
+extern HELPCONTEXT DefHelpContext;
+#endif
+	orbiter::production::CockpitHelpContext().topic = (char*)"/mfd_align.htm";
+	return &orbiter::production::CockpitHelpContext();
 }
 
 bool Instrument_OPlaneAlign::SelectRef (char *name)
 {
-	CelestialBody *obj = g_psys->GetGravObj (name, true);
+	CelestialBody *obj = orbiter::production::CockpitWorld()->GetGravObj (name, true);
 	if (!obj) return false;
 	SetRef (obj);
 	return true;
@@ -121,8 +135,8 @@ void Instrument_OPlaneAlign::SetTarget (const Body *target)
 		last_target = target;
 		if (elref) {
 			tgtel->SetMasses(tgt->Mass(), elref->Mass());
-			tgtel->Calculate(tgt->GPos() - elref->GPos(), tgt->GVel() - elref->GVel(), td.SimT1);
-			tgtel->Setup(tgt->Mass(), elref->Mass(), shpel->MJDepoch());
+			tgtel->Calculate(tgt->GPos() - elref->GPos(), tgt->GVel() - elref->GVel(), orbiter::production::CockpitTime().SimT1);
+			tgtel->Setup(tgt->Mass(), elref->Mass(), shpel->MJDepoch(), orbiter::production::CockpitTime().MJD_ref);
 		}
 		customel = false;
 		pphi = -1.0;
@@ -133,7 +147,7 @@ void Instrument_OPlaneAlign::SetTarget (const Body *target)
 void Instrument_OPlaneAlign::SetCustomEls (double i, double theta)
 {
 	tgtel->SetMasses (0.0, elref->Mass());
-	tgtel->Reset (1.0, 0.0, i, theta, 0.0, 0.0, td.MJD_ref);
+	tgtel->Reset (1.0, 0.0, i, theta, 0.0, 0.0, orbiter::production::CockpitTime().MJD_ref, orbiter::production::CockpitTime().MJD_ref);
 	tgt = 0;
 	customel = true;
 }
@@ -147,7 +161,7 @@ void Instrument_OPlaneAlign::UpdateDraw (oapi::Sketchpad *skp)
 	double refrad = elref->Size();
 	Vector sp = vessel->GPos() - elref->GPos();
 	Vector sv = vessel->GVel() - elref->GVel();
-	shpel->Calculate(sp, sv, td.SimT1);
+	shpel->Calculate(sp, sv, orbiter::production::CockpitTime().SimT1);
 	bool subsurf_node = (shpel->PeDist() < refrad);
 
 	if (automode) {
@@ -190,7 +204,7 @@ void Instrument_OPlaneAlign::UpdateDraw (oapi::Sketchpad *skp)
 	if (tgt) {
 		tp = tgt->GPos() - elref->GPos();
 		tv = tgt->GVel() - elref->GVel();
-		tgtel->Calculate(tp, tv, td.SimT1);
+		tgtel->Calculate(tp, tv, orbiter::production::CockpitTime().SimT1);
 	}
 
 	bool have_intersection = true;
@@ -201,7 +215,7 @@ void Instrument_OPlaneAlign::UpdateDraw (oapi::Sketchpad *skp)
 			double pd = refrad; // target periapsis distance
 			double le = a - pd; // linear eccentricity
 			double e = le / a; // target eccentricity
-			shpel->Reset(a, e, shpel->i, shpel->theta, shpel->omegab, shpel->L, shpel->MJDepoch());
+			shpel->Reset(a, e, shpel->i, shpel->theta, shpel->omegab, shpel->L, shpel->MJDepoch(), orbiter::production::CockpitTime().MJD_ref);
 		}
 	}
 
@@ -423,7 +437,7 @@ void Instrument_OPlaneAlign::UpdateDraw (oapi::Sketchpad *skp)
 	skp->SetTextColor(draw[0][0].col);
 	skp->Text (CX+x, CY-y-ch/2, "P", 1);
 	pphi = Aan;
-	pT = td.SimT1;
+	pT = orbiter::production::CockpitTime().SimT1;
 }
 
 bool Instrument_OPlaneAlign::GetTimingsFromSurface(double &Tan, double &Aan, double &Tdn, double &Adn, double &VSurf)
@@ -499,7 +513,7 @@ bool Instrument_OPlaneAlign::KeyBuffered (oapi::UInt32 key)
 		SelectAutoRef ();
 		return true;
 	case OAPI_KEY_E:  // custom elements
-		g_input->Open ("Ecliptic inclination and longitude of asc. node [deg.]:", 0, 30, Instrument_OPlaneAlign::CallbackElements, (void*)this);
+		orbiter::production::CockpitInput()->Open ("Ecliptic inclination and longitude of asc. node [deg.]:", 0, 30, Instrument_OPlaneAlign::CallbackElements, (void*)this);
 		return true;
 	case OAPI_KEY_R:  // select reference
 		OpenSelect_CelBody ("Align MFD: Reference", ClbkEnter_Ref);
@@ -567,7 +581,7 @@ bool Instrument_OPlaneAlign::CallbackElements (InputBox*, char *str, void *data)
 
 bool Instrument_OPlaneAlign::SelectTarget (char *name)
 {
-	const Body *obj = g_psys->GetObj (name, true);
+	const Body *obj = orbiter::production::CockpitWorld()->GetObj (name, true);
 	if (obj && obj != elref) {
 		SetTarget (obj);
 		return true;

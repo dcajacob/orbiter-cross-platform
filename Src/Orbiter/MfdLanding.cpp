@@ -58,9 +58,12 @@ Instrument_Landing::~Instrument_Landing ()
 
 HELPCONTEXT *Instrument_Landing::HelpTopic () const
 {
-	extern HELPCONTEXT DefHelpContext;
-	DefHelpContext.topic = (char*)"/mfd_vtol.htm";
-	return &DefHelpContext;
+
+#ifdef _WIN32
+extern HELPCONTEXT DefHelpContext;
+#endif
+	orbiter::production::CockpitHelpContext().topic = (char*)"/mfd_vtol.htm";
+	return &orbiter::production::CockpitHelpContext();
 }
 
 bool Instrument_Landing::KeyBuffered (oapi::UInt32 key)

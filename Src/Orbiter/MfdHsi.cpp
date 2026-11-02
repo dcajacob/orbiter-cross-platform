@@ -68,9 +68,12 @@ Instrument_HSI::~Instrument_HSI ()
 
 HELPCONTEXT *Instrument_HSI::HelpTopic () const
 {
-	extern HELPCONTEXT DefHelpContext;
-	DefHelpContext.topic = (char*)"/mfd_hsi.htm";
-	return &DefHelpContext;
+
+#ifdef _WIN32
+extern HELPCONTEXT DefHelpContext;
+#endif
+	orbiter::production::CockpitHelpContext().topic = (char*)"/mfd_hsi.htm";
+	return &orbiter::production::CockpitHelpContext();
 }
 
 void Instrument_HSI::UpdateDraw (oapi::Sketchpad *skp)

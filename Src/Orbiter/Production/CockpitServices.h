@@ -5,13 +5,92 @@
 #include "CockpitGraphics.h"
 #include "BodyServices.h"
 #include "RigidBodyServices.h"
+class Pane;class Select;class InputBox;
 #ifdef _WIN32
 #include "Orbiter.h"
 extern Orbiter* g_pOrbiter;
+extern Pane* g_pane;extern Select* g_select;extern InputBox* g_input;extern HELPCONTEXT DefHelpContext;
+extern TimeData td;extern PlanetarySystem* g_psys;extern Vessel* g_focusobj;
 #else
 #include "NativeGraphics.h"
+#include <stdexcept>
 #endif
 namespace orbiter::production {
+inline int CockpitScreenHeight() {
+#ifdef _WIN32
+    return GetSystemMetrics(SM_CYSCREEN);
+#else
+    auto* graphics=GetNativeRenderContext().graphics;
+    if(!graphics)throw std::logic_error("Native display service is not bound");return graphics->DesktopHeight();
+#endif
+}
+inline TimeData& CockpitTime() {
+#ifdef _WIN32
+    return td;
+#else
+    return GetRigidBodyServices().Time();
+#endif
+}
+inline PlanetarySystem* CockpitWorld() {
+#ifdef _WIN32
+    return g_psys;
+#else
+    return GetRigidBodyServices().World();
+#endif
+}
+inline Vessel* CockpitFocus() {
+#ifdef _WIN32
+    return g_focusobj;
+#else
+    return GetCameraServices().Focus();
+#endif
+}
+inline Pane* CockpitPane() {
+#ifdef _WIN32
+    return g_pane;
+#else
+    auto* pane=GetNativeRenderContext().cockpitPane;
+    if(!pane)throw std::logic_error("Native cockpit pane is not bound");return pane;
+#endif
+}
+inline Select* CockpitSelect() {
+#ifdef _WIN32
+    return g_select;
+#else
+    auto* select=GetNativeRenderContext().cockpitSelect;
+    if(!select)throw std::logic_error("Native cockpit selection dialog is not bound");return select;
+#endif
+}
+inline InputBox* CockpitInput() {
+#ifdef _WIN32
+    return g_input;
+#else
+    auto* input=GetNativeRenderContext().cockpitInput;
+    if(!input)throw std::logic_error("Native cockpit input dialog is not bound");return input;
+#endif
+}
+inline HELPCONTEXT& CockpitHelpContext() {
+#ifdef _WIN32
+    return DefHelpContext;
+#else
+    auto* help=GetNativeRenderContext().cockpitHelp;
+    if(!help)throw std::logic_error("Native cockpit help context is not bound");return *help;
+#endif
+}
+inline std::uint16_t CockpitHighWord(oapi::UInt32 value) {
+#ifdef _WIN32
+    return HIWORD(value);
+#else
+    return std::uint16_t(value>>16);
+#endif
+}
+inline std::uint16_t CockpitLowWord(oapi::UInt32 value) {
+#ifdef _WIN32
+    return LOWORD(value);
+#else
+    return std::uint16_t(value&0xffff);
+#endif
+}
 inline oapi::UInt32 CockpitColor(std::uint8_t r,std::uint8_t g,std::uint8_t b) {
 #ifdef _WIN32
     return RGB(r,g,b);

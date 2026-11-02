@@ -384,8 +384,8 @@
     },
     "Src/Orbiter/Mfd.cpp": {
       "original_sha256_lf": "0a5d504ea777abd83b0f3ce45e147a946fad03bb3c70a17eb61600e4ff5108f4",
-      "sha256_lf": "77504991793c1e78c8582b7b3507005a077857e1999a31d76f2551a88b38ff86",
-      "scope": "Original ten stock MFD declarations use exact platform SDK aliases; shared original conic geometry is moved without calculation or screen-mapping changes. Full native instrument runtime remains incomplete."
+      "sha256_lf": "eb7925fd42ab9375e7202f4d38582b92ab934913e1448441c229a71e6c55c977",
+      "scope": "Original scheduler, stock MFDs and modern map compile natively with explicit original epoch/time, authoritative world/UI bindings and indexed map resources. Exact Windows calculations and callback order conserved. Native GDI/legacy map/custom-mode entry points fail explicitly until supported; native cockpit owner and DG runtime remain unfinished."
     },
     "Src/Orbiter/Mfd.h": {
       "original_sha256_lf": "133e1e852d9563535bb8404420f98aa40ce284e43eb98ba2f7c33652e97a8e10",
@@ -394,8 +394,8 @@
     },
     "Src/Orbiter/MfdAlign.cpp": {
       "original_sha256_lf": "ec058286e2d11c75142a3e29f9af3a6b122d4b8f906d7ae65b0dee726013a341",
-      "sha256_lf": "584f64675be88f06e646836a31af57db6482a7476af785d6b9d5c05dc4bb15e3",
-      "scope": "Compile all ten original stock instrument implementations with native SDK types. Preserve exact Windows calculations/call order and share panel mouse constants. Native brush/fill/blit callbacks delegate to the shared renderer and are checked by actual pixels across twenty contexts; instrument lifecycle and native DG runtime remain unfinished."
+      "sha256_lf": "dc81f210e5d2e930b770419aabf0dd633cef134b300aa27e558b1cf6f9f03ea3",
+      "scope": "Original scheduler, stock MFDs and modern map compile natively with explicit original epoch/time, authoritative world/UI bindings and indexed map resources. Exact Windows calculations and callback order conserved. Native GDI/legacy map/custom-mode entry points fail explicitly until supported; native cockpit owner and DG runtime remain unfinished."
     },
     "Src/Orbiter/MfdAlign.h": {
       "original_sha256_lf": "a5072818cf93c21b5f9f94619003c9d628209f9bc4f2d77089f09b660f97eae1",
@@ -404,8 +404,8 @@
     },
     "Src/Orbiter/MfdComms.cpp": {
       "original_sha256_lf": "33bb16c654074665d9d3a9d81282925b9eff5135b12fe7b3a52614e6655f6b9f",
-      "sha256_lf": "e94c5bb7d5426a508833ec4f266c181d85f115c62bf9fa6aae336a1be3dd36de",
-      "scope": "Compile all ten original stock instrument implementations with native SDK types. Preserve exact Windows calculations/call order and share panel mouse constants. Native brush/fill/blit callbacks delegate to the shared renderer and are checked by actual pixels across twenty contexts; instrument lifecycle and native DG runtime remain unfinished."
+      "sha256_lf": "151f256c74103307a5094d2900315d436efe4fa501dc3fc66c3e7c5566c1c9fb",
+      "scope": "Original scheduler, stock MFDs and modern map compile natively with explicit original epoch/time, authoritative world/UI bindings and indexed map resources. Exact Windows calculations and callback order conserved. Native GDI/legacy map/custom-mode entry points fail explicitly until supported; native cockpit owner and DG runtime remain unfinished."
     },
     "Src/Orbiter/MfdComms.h": {
       "original_sha256_lf": "cde22b67a0aac6d7495945687e718114cd32072a5c0311e0ac95d904dc561c28",
@@ -414,8 +414,8 @@
     },
     "Src/Orbiter/MfdDocking.cpp": {
       "original_sha256_lf": "87d96e76ec2f81937a03ce896da7182d25abbb5ee0cdb26a4a56b34f09939ae2",
-      "sha256_lf": "7215ea51ba524442192dba2a45dca2ae7eaff0b8b1dd6b35bb4d791d83e3ce84",
-      "scope": "Compile all ten original stock instrument implementations with native SDK types. Preserve exact Windows calculations/call order and share panel mouse constants. Native brush/fill/blit callbacks delegate to the shared renderer and are checked by actual pixels across twenty contexts; instrument lifecycle and native DG runtime remain unfinished."
+      "sha256_lf": "ddc722c33361db38231201cbf843afc05d3d7255ea9de36d1b5c45dcf1d6d096",
+      "scope": "Original scheduler, stock MFDs and modern map compile natively with explicit original epoch/time, authoritative world/UI bindings and indexed map resources. Exact Windows calculations and callback order conserved. Native GDI/legacy map/custom-mode entry points fail explicitly until supported; native cockpit owner and DG runtime remain unfinished."
     },
     "Src/Orbiter/MfdDocking.h": {
       "original_sha256_lf": "9f88ada7e20b847f79308cfc5eaac57fbb80223bcfd0c32eab9085f12e83e168",
@@ -424,8 +424,8 @@
     },
     "Src/Orbiter/MfdHsi.cpp": {
       "original_sha256_lf": "04d5c72381125771ab73fb5ccadc8518ca6cb1e45390315c911c945fb914a148",
-      "sha256_lf": "a49b9935e9fb86132aaab8be790017ad834b18117e7aa5333ead41a17beca173",
-      "scope": "Compile all ten original stock instrument implementations with native SDK types. Preserve exact Windows calculations/call order and share panel mouse constants. Native brush/fill/blit callbacks delegate to the shared renderer and are checked by actual pixels across twenty contexts; instrument lifecycle and native DG runtime remain unfinished."
+      "sha256_lf": "e912a83cad5d3590c23ff5845f5f00f31e96187e86ef3ceff0ca6bba9d906d3d",
+      "scope": "Original scheduler, stock MFDs and modern map compile natively with explicit original epoch/time, authoritative world/UI bindings and indexed map resources. Exact Windows calculations and callback order conserved. Native GDI/legacy map/custom-mode entry points fail explicitly until supported; native cockpit owner and DG runtime remain unfinished."
     },
     "Src/Orbiter/MfdHsi.h": {
       "original_sha256_lf": "eb6c233a4cc0d2e94019c9f6d92b0f5134214a363016f8478e390c4385ff0aa8",
@@ -434,8 +434,8 @@
     },
     "Src/Orbiter/MfdLanding.cpp": {
       "original_sha256_lf": "a548cfce46eeb0b118574bd9c15b2dcdb1f9d6ce40bf005ac412e6dffb569209",
-      "sha256_lf": "2d2549b6242d759a1e5a153deefa8e4ed2aa2fa8fc0680bf2ef9bd4d59409e11",
-      "scope": "Compile all ten original stock instrument implementations with native SDK types. Preserve exact Windows calculations/call order and share panel mouse constants. Native brush/fill/blit callbacks delegate to the shared renderer and are checked by actual pixels across twenty contexts; instrument lifecycle and native DG runtime remain unfinished."
+      "sha256_lf": "45a8c4d72d22ca1249549c8ebdd263c274ad5ab567718d35f70add7cccfbf451",
+      "scope": "Original scheduler, stock MFDs and modern map compile natively with explicit original epoch/time, authoritative world/UI bindings and indexed map resources. Exact Windows calculations and callback order conserved. Native GDI/legacy map/custom-mode entry points fail explicitly until supported; native cockpit owner and DG runtime remain unfinished."
     },
     "Src/Orbiter/MfdLanding.h": {
       "original_sha256_lf": "157bfbad13a21b119dfeb2f5170d88c45bf56bd0ded232803ce0b27c0f1a5012",
@@ -444,8 +444,8 @@
     },
     "Src/Orbiter/MfdMap.cpp": {
       "original_sha256_lf": "0e6ab25b096e0a842ebec4e936f31c3da05e5242a724545a5e197fed0adf168b",
-      "sha256_lf": "708580f944ea03055d74b088f8ee26708ff49da0b9f691cc85654a136d05677c",
-      "scope": "Compile all ten original stock instrument implementations with native SDK types. Preserve exact Windows calculations/call order and share panel mouse constants. Native brush/fill/blit callbacks delegate to the shared renderer and are checked by actual pixels across twenty contexts; instrument lifecycle and native DG runtime remain unfinished."
+      "sha256_lf": "a1e6e03be854b3146c78342b261118599bb12c542290c55423d7d20f3ab442a9",
+      "scope": "Original scheduler, stock MFDs and modern map compile natively with explicit original epoch/time, authoritative world/UI bindings and indexed map resources. Exact Windows calculations and callback order conserved. Native GDI/legacy map/custom-mode entry points fail explicitly until supported; native cockpit owner and DG runtime remain unfinished."
     },
     "Src/Orbiter/MfdMap.h": {
       "original_sha256_lf": "5e3528e71c285b7fa48ca3ed5acc175892d67ea2c8795f3e5784cafcf28d97d8",
@@ -459,8 +459,8 @@
     },
     "Src/Orbiter/MfdOrbit.cpp": {
       "original_sha256_lf": "26bdab789772b7da3fdd0f6f379a51a21bd2e9cfe14d1fa0f92f9b931ebd2a5b",
-      "sha256_lf": "c0433ed213a7f4c5c74d04088bbfb79b78b3fccdda10ba4c3b9658424115f52d",
-      "scope": "Compile all ten original stock instrument implementations with native SDK types. Preserve exact Windows calculations/call order and share panel mouse constants. Native brush/fill/blit callbacks delegate to the shared renderer and are checked by actual pixels across twenty contexts; instrument lifecycle and native DG runtime remain unfinished."
+      "sha256_lf": "d9f17a9a38e0f18b073bc51224249fcdbfdc45ebd35c1b84ae9fcb16a144054f",
+      "scope": "Original scheduler, stock MFDs and modern map compile natively with explicit original epoch/time, authoritative world/UI bindings and indexed map resources. Exact Windows calculations and callback order conserved. Native GDI/legacy map/custom-mode entry points fail explicitly until supported; native cockpit owner and DG runtime remain unfinished."
     },
     "Src/Orbiter/MfdOrbit.h": {
       "original_sha256_lf": "c2ee5449c7d6684cd9dd40d2518e02dbbb41f44c656390e9814cb39c79d1efa5",
@@ -479,8 +479,8 @@
     },
     "Src/Orbiter/MfdSurface.cpp": {
       "original_sha256_lf": "c1a1522edc9fbda54db00341ff078473a1d142f3763bee93b1496434c0644aaf",
-      "sha256_lf": "cec277d46630f57ccd8dd22171ad79070e5301893d15325ab246845df454a2ab",
-      "scope": "Compile all ten original stock instrument implementations with native SDK types. Preserve exact Windows calculations/call order and share panel mouse constants. Native brush/fill/blit callbacks delegate to the shared renderer and are checked by actual pixels across twenty contexts; instrument lifecycle and native DG runtime remain unfinished."
+      "sha256_lf": "d40cceac93887bd8e587eb502b58bdc4514e817e7a0e3545b2ced404442654dc",
+      "scope": "Original scheduler, stock MFDs and modern map compile natively with explicit original epoch/time, authoritative world/UI bindings and indexed map resources. Exact Windows calculations and callback order conserved. Native GDI/legacy map/custom-mode entry points fail explicitly until supported; native cockpit owner and DG runtime remain unfinished."
     },
     "Src/Orbiter/MfdSurface.h": {
       "original_sha256_lf": "5febb34bf6f0734e4ed4f28a64d4f20758dd40d89a18c9831b13fa4189ad1b5d",
@@ -489,8 +489,8 @@
     },
     "Src/Orbiter/MfdSync.cpp": {
       "original_sha256_lf": "c3bf14be049728e07c304d782eb4c9b5c93c5d903a5063f3ad6982c021915487",
-      "sha256_lf": "979f3c45b7ae0769b81386e4feba5a3216352bc70a9c37c5c1fed7a624fce542",
-      "scope": "Compile all ten original stock instrument implementations with native SDK types. Preserve exact Windows calculations/call order and share panel mouse constants. Native brush/fill/blit callbacks delegate to the shared renderer and are checked by actual pixels across twenty contexts; instrument lifecycle and native DG runtime remain unfinished."
+      "sha256_lf": "f5716837471e1b58c7756aac2cce0efc4f841555949cea76c1c763c7b5174ad0",
+      "scope": "Original scheduler, stock MFDs and modern map compile natively with explicit original epoch/time, authoritative world/UI bindings and indexed map resources. Exact Windows calculations and callback order conserved. Native GDI/legacy map/custom-mode entry points fail explicitly until supported; native cockpit owner and DG runtime remain unfinished."
     },
     "Src/Orbiter/MfdSync.h": {
       "original_sha256_lf": "7dc3909008838ef49d15e82c4ade4667d034bb17b47db06bd3ebfdeabe9cbe16",
@@ -499,8 +499,8 @@
     },
     "Src/Orbiter/MfdTransfer.cpp": {
       "original_sha256_lf": "943353210b67847d0f73f2f0562d203ec41fd32407790d2146b80dc7a6a9c06a",
-      "sha256_lf": "004441b234c144151d9095fc4eac1e756343d1bbbca3f63468d6c5c15259a616",
-      "scope": "Compile all ten original stock instrument implementations with native SDK types. Preserve exact Windows calculations/call order and share panel mouse constants. Native brush/fill/blit callbacks delegate to the shared renderer and are checked by actual pixels across twenty contexts; instrument lifecycle and native DG runtime remain unfinished."
+      "sha256_lf": "b9c27d42711aa2c31d7f284c97760753ef72a8929f245f51f6c9f5f1211608a2",
+      "scope": "Original scheduler, stock MFDs and modern map compile natively with explicit original epoch/time, authoritative world/UI bindings and indexed map resources. Exact Windows calculations and callback order conserved. Native GDI/legacy map/custom-mode entry points fail explicitly until supported; native cockpit owner and DG runtime remain unfinished."
     },
     "Src/Orbiter/MfdTransfer.h": {
       "original_sha256_lf": "93a9de4ba8104468a2c8135e223b951124c71bf3e76aacdd5fcec7126ca56846",
@@ -612,8 +612,8 @@
     },
     "Src/Orbiter/Production/CockpitServices.h": {
       "original_sha256_lf": null,
-      "sha256_lf": "acff42ff72ebba80e537acf4d784b6683761e91593a82530c0ae7484addbf9c2",
-      "scope": "Compile all ten original stock instrument implementations with native SDK types. Preserve exact Windows calculations/call order and share panel mouse constants. Native brush/fill/blit callbacks delegate to the shared renderer and are checked by actual pixels across twenty contexts; instrument lifecycle and native DG runtime remain unfinished."
+      "sha256_lf": "bdfe62ee569dc57d702444ecb748d864296d0a0729e27788c4f1c64d9b070fa0",
+      "scope": "Original scheduler, stock MFDs and modern map compile natively with explicit original epoch/time, authoritative world/UI bindings and indexed map resources. Exact Windows calculations and callback order conserved. Native GDI/legacy map/custom-mode entry points fail explicitly until supported; native cockpit owner and DG runtime remain unfinished."
     },
     "Src/Orbiter/Production/ConfigurationTypes.h": {
       "sha256_lf": "ac918e8125269b49da9d5a90afeb96d658b41addae6d44a61d5addf84905628a",
@@ -785,8 +785,8 @@
     },
     "Src/Orbiter/Production/NativeGraphics.h": {
       "original_sha256_lf": null,
-      "sha256_lf": "93b0aab100694d72701f17769f55d5e99a13e79450f0f785bdf3505aa8ca7f9b",
-      "scope": "Compile all ten original stock instrument implementations with native SDK types. Preserve exact Windows calculations/call order and share panel mouse constants. Native brush/fill/blit callbacks delegate to the shared renderer and are checked by actual pixels across twenty contexts; instrument lifecycle and native DG runtime remain unfinished."
+      "sha256_lf": "09f9d77ba3e41737981ec2b19d5e4aaf42b11e2d16f9a4413b2453837752592b",
+      "scope": "Original scheduler, stock MFDs and modern map compile natively with explicit original epoch/time, authoritative world/UI bindings and indexed map resources. Exact Windows calculations and callback order conserved. Native GDI/legacy map/custom-mode entry points fail explicitly until supported; native cockpit owner and DG runtime remain unfinished."
     },
     "Src/Orbiter/Production/NativeModule.cpp": {
       "sha256_lf": "d90fc24038e5acf5c20329c08ac433c94fb4603811e7a1fc9aaf38eedb59e82a",
@@ -810,13 +810,13 @@
     },
     "Src/Orbiter/Production/NativeRenderApi.cpp": {
       "original_sha256_lf": null,
-      "sha256_lf": "04949b7a8be5181c6903e97d38ef96ec11289c4557a2ff47da40c68d6c2a42ac",
-      "scope": "Compile all ten original stock instrument implementations with native SDK types. Preserve exact Windows calculations/call order and share panel mouse constants. Native brush/fill/blit callbacks delegate to the shared renderer and are checked by actual pixels across twenty contexts; instrument lifecycle and native DG runtime remain unfinished."
+      "sha256_lf": "41664c1ae2bef4367efaa2658ae6f681edf6980a378052a50159734952ae86bf",
+      "scope": "Original scheduler, stock MFDs and modern map compile natively with explicit original epoch/time, authoritative world/UI bindings and indexed map resources. Exact Windows calculations and callback order conserved. Native GDI/legacy map/custom-mode entry points fail explicitly until supported; native cockpit owner and DG runtime remain unfinished."
     },
     "Src/Orbiter/Production/NativeRenderApi.h": {
       "original_sha256_lf": null,
-      "sha256_lf": "d29a1c9951e4158e89d0280d7ca3d3e23a80cd2565226065c7a1aed5764aed0b",
-      "scope": "Compile all ten original stock instrument implementations with native SDK types. Preserve exact Windows calculations/call order and share panel mouse constants. Native brush/fill/blit callbacks delegate to the shared renderer and are checked by actual pixels across twenty contexts; instrument lifecycle and native DG runtime remain unfinished."
+      "sha256_lf": "3c3f5b7449b4d49e69f14a041f87e821595657371694b9f72766018b6a4b57f0",
+      "scope": "Original scheduler, stock MFDs and modern map compile natively with explicit original epoch/time, authoritative world/UI bindings and indexed map resources. Exact Windows calculations and callback order conserved. Native GDI/legacy map/custom-mode entry points fail explicitly until supported; native cockpit owner and DG runtime remain unfinished."
     },
     "Src/Orbiter/Production/NativeVesselApplication.cpp": {
       "original_sha256_lf": null,
@@ -1183,13 +1183,13 @@
     },
     "Src/Orbiter/VectorMap.cpp": {
       "original_sha256_lf": "604e34d813ef11aa92934c08911ec2548d747659f5659df8d20469caa9fc01ed",
-      "sha256_lf": "31631de055420b0fb6cab394e664dfb7a82e41289a00e67afe0459a20fecb228",
-      "scope": "Private cockpit graphics/configuration binding. Original algorithms and Windows pointer types conserved by cockpit_source.py; native instrumentation is not operational yet."
+      "sha256_lf": "619a72a0b59a938da5da5a1f615117e083f603d1f681b1493ea3b2febabf7ff5",
+      "scope": "Original scheduler, stock MFDs and modern map compile natively with explicit original epoch/time, authoritative world/UI bindings and indexed map resources. Exact Windows calculations and callback order conserved. Native GDI/legacy map/custom-mode entry points fail explicitly until supported; native cockpit owner and DG runtime remain unfinished."
     },
     "Src/Orbiter/VectorMap.h": {
       "original_sha256_lf": "72936830e11eec20b86f2f616f2988f94932e6700112bbb1d01d2a6cdb3aa808",
-      "sha256_lf": "07025b8c4ed76183e03b28a4194dc8606fcba7c09a67dbea0388ced76d12dd6e",
-      "scope": "Original ten stock MFD declarations use exact platform SDK aliases; shared original conic geometry is moved without calculation or screen-mapping changes. Full native instrument runtime remains incomplete."
+      "sha256_lf": "0c9229eeb8f76615e4000a772b1fe12c159770793463f1989fc30f52bd0a73c5",
+      "scope": "Original scheduler, stock MFDs and modern map compile natively with explicit original epoch/time, authoritative world/UI bindings and indexed map resources. Exact Windows calculations and callback order conserved. Native GDI/legacy map/custom-mode entry points fail explicitly until supported; native cockpit owner and DG runtime remain unfinished."
     },
     "Src/Orbiter/Vessel.cpp": {
       "sha256_lf": "24aa4cd48bae984dcc298dfb45d59afd4d49ec310ea3dd1a2f3c22ed3f997319",

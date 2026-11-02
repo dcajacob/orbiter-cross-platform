@@ -22,10 +22,21 @@
 
 using namespace std;
 
+#ifdef _WIN32
 extern TimeData td;
+#endif
+
+#ifdef _WIN32
 extern PlanetarySystem *g_psys;
+#endif
+
+#ifdef _WIN32
 extern InputBox *g_input;
+#endif
+
+#ifdef _WIN32
 extern Select *g_select;
+#endif
 
 // =======================================================================
 // class Instrument_Transfer
@@ -55,12 +66,12 @@ Instrument_Transfer::Instrument_Transfer (Pane *_pane, std::intptr_t _id, const 
 		l_eject = 0.0;
 		tgt     = 0;
 	}
-	shpel = new Elements(); TRACENEW
-	shpel2 = new Elements(); TRACENEW
+	shpel = new Elements(orbiter::production::CockpitTime().MJD_ref); TRACENEW
+	shpel2 = new Elements(orbiter::production::CockpitTime().MJD_ref); TRACENEW
 	if (elref) {
-		shpel->Set (*src->Els());
-		shpel->Calculate (src->GPos()-elref->GPos(), src->GVel()-elref->GVel(), td.SimT0);
-		shpel2->Set (*shpel);
+		shpel->Set (*src->Els(), orbiter::production::CockpitTime().MJD_ref);
+		shpel->Calculate (src->GPos()-elref->GPos(), src->GVel()-elref->GVel(), orbiter::production::CockpitTime().SimT0);
+		shpel2->Set (*shpel, orbiter::production::CockpitTime().MJD_ref);
 	}
 	tbdown = tbpress = -1e10;
 	hto_a = 0.0;
@@ -95,9 +106,12 @@ Instrument_Transfer::~Instrument_Transfer ()
 
 HELPCONTEXT *Instrument_Transfer::HelpTopic () const
 {
-	extern HELPCONTEXT DefHelpContext;
-	DefHelpContext.topic = (char*)"/mfd_transfer.htm";
-	return &DefHelpContext;
+
+#ifdef _WIN32
+extern HELPCONTEXT DefHelpContext;
+#endif
+	orbiter::production::CockpitHelpContext().topic = (char*)"/mfd_transfer.htm";
+	return &orbiter::production::CockpitHelpContext();
 }
 
 void Instrument_Transfer::SetSize (const Spec &spec)
@@ -135,7 +149,7 @@ void Instrument_Transfer::UpdateDraw (oapi::Sketchpad *skp)
 	if (elref) {
 		sp.Set (src->GPos()-elref->GPos());	// ship in planet coords
 		sv.Set (src->GVel()-elref->GVel());
-		shpel->Calculate (sp, sv, td.SimT1);
+		shpel->Calculate (sp, sv, orbiter::production::CockpitTime().SimT1);
 		bValid = true;
 	} else bValid = false;
 	if (bValid) {
@@ -258,7 +272,7 @@ void Instrument_Transfer::UpdateDraw (oapi::Sketchpad *skp)
 			if (enable_hyp) dt0 += dte;
 
 			// target postition at intersect time
-			tanm = tgtel->TrueAnomaly (tgtel->MeanAnomaly (td.SimT1+dt0));
+			tanm = tgtel->TrueAnomaly (tgtel->MeanAnomaly (orbiter::production::CockpitTime().SimT1+dt0));
 			tlng = tanm + tgtel->omegab;
 			v.Set (mul (rot2, Vector (cos(tanm), 0.0, sin(tanm))));
 			skp->SetPen (draw[1][1].dashpen);
@@ -383,7 +397,7 @@ double Instrument_Transfer::CalcElements (const Elements *el1, Elements *el2, do
 	}
 
 	// calculate new elements
-	el2->Calculate (P, V, td.SimT1);
+	el2->Calculate (P, V, orbiter::production::CockpitTime().SimT1);
 	return dv;
 }
 
@@ -392,18 +406,18 @@ bool Instrument_Transfer::CalcStep ()
 	Vector refpos, a0, a1, a2, v1, v2;
 	double tstep, tstep_i2, tstep_i6, tb, tc;
 
-	a0 = g_psys->GaccAt (step_t, step_gpos, src);
+	a0 = orbiter::production::CockpitWorld()->GaccAt (step_t, step_gpos, src);
 	tstep = step_scale/a0.length();
 	tstep_i2 = tstep*0.5;
 	tstep_i6 = tstep/6.0;
 	tb = step_t + tstep_i2;
 	tc = step_t + tstep;
 	v1 = step_gvel + a0*tstep_i2;
-	a1 = g_psys->GaccAt (tb, step_gpos + step_gvel*tstep_i2, src);
+	a1 = orbiter::production::CockpitWorld()->GaccAt (tb, step_gpos + step_gvel*tstep_i2, src);
 	v2 = step_gvel + a1*tstep_i2;
-	a2 = g_psys->GaccAt (tb, step_gpos + v1*tstep_i2, src);
+	a2 = orbiter::production::CockpitWorld()->GaccAt (tb, step_gpos + v1*tstep_i2, src);
 	step_gpos += (step_gvel + (v1+v2)*2.0 + step_gvel + a2*tstep)*tstep_i6;
-	step_gvel += (a0 + (a1+a2)*2.0 + g_psys->GaccAt (tc, step_gpos+v2*tstep, src))*tstep_i6;
+	step_gvel += (a0 + (a1+a2)*2.0 + orbiter::production::CockpitWorld()->GaccAt (tc, step_gpos+v2*tstep, src))*tstep_i6;
 	if (elref->Type() == OBJTP_PLANET)
 		((Planet*)elref)->PositionAtTime (tc, &refpos);
 	path[step_curr] = step_gpos-refpos;
@@ -414,11 +428,11 @@ bool Instrument_Transfer::CalcStep ()
 bool Instrument_Transfer::InitNumTrajectory (const Elements *el)
 {
 	Vector refpos, refvel, pos, vel;
-	step_t = step_0 = td.SimT0;
+	step_t = step_0 = orbiter::production::CockpitTime().SimT0;
 	if (elref->Type() == OBJTP_PLANET) 
-		if (!((Planet*)elref)->PosVelAtTime (td.SimT0, &refpos, &refvel))
+		if (!((Planet*)elref)->PosVelAtTime (orbiter::production::CockpitTime().SimT0, &refpos, &refvel))
 			return false;
-	el->PosVel (pos, vel, td.SimT0);
+	el->PosVel (pos, vel, orbiter::production::CockpitTime().SimT0);
 	path[0] = pos;
 	step_gpos = pos+refpos;
 	step_gvel = vel+refvel;
@@ -450,7 +464,7 @@ bool Instrument_Transfer::KeyBuffered (oapi::UInt32 key)
 		return true;
 	case OAPI_KEY_S:  // select source
 		OpenSelect_Tgt ("Transfer MFD: Source", ClbkEnter_Src, elref, 0);
-		//g_input->Open ("Enter source orbit body:", 0, 20, Instrument_Transfer::ClbkName_Src, (void*)this);
+		//orbiter::production::CockpitInput()->Open ("Enter source orbit body:", 0, 20, Instrument_Transfer::ClbkName_Src, (void*)this);
 		return true;
 	case OAPI_KEY_T:  // select target
 		OpenSelect_Tgt ("Transfer MFD: Target", ClbkEnter_Tgt, elref, 0);
@@ -464,7 +478,7 @@ bool Instrument_Transfer::KeyBuffered (oapi::UInt32 key)
 		Refresh();
 		return true;
 	case OAPI_KEY_Z:  // change number of trajectory steps
-		g_input->Open ("Enter # time steps:", 0, 20, Instrument_Transfer::ClbkNstep, (void*)this);
+		orbiter::production::CockpitInput()->Open ("Enter # time steps:", 0, 20, Instrument_Transfer::ClbkNstep, (void*)this);
 		return true;
 	}
 	return false;
@@ -491,11 +505,11 @@ bool Instrument_Transfer::KeyImmediate (char *kstate)
 	if (KEYDOWN (kstate, OAPI_KEY_MINUS)) {
 		if (BufKey (OAPI_KEY_MINUS, 0.1)) {
 			double da = 1.0;
-			if (td.SysT0-tbpress < 0.2)
-				da = (td.SysT0-tbdown < 1.0 ? 1.0:10.0);
+			if (orbiter::production::CockpitTime().SysT0-tbpress < 0.2)
+				da = (orbiter::production::CockpitTime().SysT0-tbdown < 1.0 ? 1.0:10.0);
 			else
-				tbdown = td.SysT0;
-			tbpress = td.SysT0;
+				tbdown = orbiter::production::CockpitTime().SysT0;
+			tbpress = orbiter::production::CockpitTime().SysT0;
 			deltav -= da;
 			dv_manip = true;
 			Refresh();
@@ -505,11 +519,11 @@ bool Instrument_Transfer::KeyImmediate (char *kstate)
 	if (KEYDOWN (kstate, OAPI_KEY_EQUALS)) {
 		if (BufKey (OAPI_KEY_EQUALS, 0.1)) {
 			double da = 1.0;
-			if (td.SysT0-tbpress < 0.2)
-				da = (td.SysT0-tbdown < 1.0 ? 1.0:10.0);
+			if (orbiter::production::CockpitTime().SysT0-tbpress < 0.2)
+				da = (orbiter::production::CockpitTime().SysT0-tbdown < 1.0 ? 1.0:10.0);
 			else
-				tbdown = td.SysT0;
-			tbpress = td.SysT0;
+				tbdown = orbiter::production::CockpitTime().SysT0;
+			tbpress = orbiter::production::CockpitTime().SysT0;
 			deltav += da;
 			dv_manip = true;
 			Refresh();
@@ -588,14 +602,14 @@ bool Instrument_Transfer::ClbkNstep (InputBox*, char *str, void *data)
 
 bool Instrument_Transfer::SelectRef (char *str)
 {
-	CelestialBody *obj = g_psys->GetGravObj (str, true);
+	CelestialBody *obj = orbiter::production::CockpitWorld()->GetGravObj (str, true);
 	if (!obj) return false;
 	if (obj == elref) return true; // nothing to do
 
 	elref = obj;
 	shpel->SetMasses (0.0, elref->Mass());
-	shpel->Calculate (src->GPos()-elref->GPos(), src->GVel()-elref->GVel(), td.SimT0);
-	shpel2->Set (*shpel);
+	shpel->Calculate (src->GPos()-elref->GPos(), src->GVel()-elref->GVel(), orbiter::production::CockpitTime().SimT0);
+	shpel2->Set (*shpel, orbiter::production::CockpitTime().MJD_ref);
 	l_eject = 0.0;
 	deltav = 0.0;
 	//a_hyp = shpel->a;
@@ -609,14 +623,14 @@ bool Instrument_Transfer::SelectSrc (const char *str)
 	if (!orbiter::production::CompareText (str, "x")) {
 		obj = vessel;
 	} else {
-		obj = (RigidBody*)g_psys->GetObj (str, true);
+		obj = (RigidBody*)orbiter::production::CockpitWorld()->GetObj (str, true);
 		if (!obj) return false;
 	}
 	if (obj == src) return true; // nothing to do
 
 	src = obj;
-	shpel->Calculate (src->GPos()-elref->GPos(), src->GVel()-elref->GVel(), td.SimT0);
-	shpel2->Set (*shpel);
+	shpel->Calculate (src->GPos()-elref->GPos(), src->GVel()-elref->GVel(), orbiter::production::CockpitTime().SimT0);
+	shpel2->Set (*shpel, orbiter::production::CockpitTime().MJD_ref);
 	l_eject = 0.0;
 	deltav = 0.0;
 	//a_hyp = shpel->a;
@@ -626,7 +640,7 @@ bool Instrument_Transfer::SelectSrc (const char *str)
 
 bool Instrument_Transfer::SelectTarget (char *str)
 {
-	RigidBody *body = (RigidBody*)g_psys->GetObj (str, true);
+	RigidBody *body = (RigidBody*)orbiter::production::CockpitWorld()->GetObj (str, true);
 	if (body && body->ElRef() == elref) {
 		tgt = body;
 		Refresh();

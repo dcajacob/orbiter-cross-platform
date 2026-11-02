@@ -140,6 +140,7 @@ public:
 	bool GetMapCrd (int x, int y, double &lng, double &lat) const;
 
 	struct DRAWDATA { // dynamic data required for drawing map elements
+		explicit DRAWDATA(double reference_mjd):focusel(reference_mjd),tgtvel(reference_mjd) {}
 		bool focus_disp;            // display focus vessel?
 		double focuslng, focuslat;  // position of focus vessel
 		double focusrad;            // focus vessel-planet distance in units of planet radius

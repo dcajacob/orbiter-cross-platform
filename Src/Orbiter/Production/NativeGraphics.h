@@ -7,7 +7,7 @@
 #include "SceneLabels.h"
 #include "FlightInput.h"
 #include <vector>
-class Config;class Camera;class PlanetarySystem;class MeshManager;class TimeData;class Vessel;
+class Config;class Camera;class PlanetarySystem;class MeshManager;class TimeData;class Vessel;class Pane;class Select;class InputBox;
 namespace oapi {class ParticleStream;}
 namespace orbiter::production {
 // Internal same-build native renderer contract. No window handles, GPU classes
@@ -35,6 +35,7 @@ public:
     virtual bool clbkFillSurface(SURFHANDLE,oapi::UInt32) const=0;
     virtual bool clbkBlt(SURFHANDLE,oapi::UInt32,oapi::UInt32,SURFHANDLE,oapi::UInt32=0) const=0;
     virtual bool clbkBlt(SURFHANDLE,oapi::UInt32,oapi::UInt32,SURFHANDLE,oapi::UInt32,oapi::UInt32,oapi::UInt32,oapi::UInt32,oapi::UInt32=0) const=0;
+    virtual int DesktopHeight() const=0;
     virtual void Open()=0;
     virtual RenderInput Poll()=0;
     virtual void Resize(int,int)=0;
@@ -69,7 +70,8 @@ struct NativeRenderContext {
     Vessel* focus=nullptr;TimeData* time=nullptr;MeshManager* meshes=nullptr;
     class VesselLifetimeServices* lifetime=nullptr;
     const ResourceResolver *textures=nullptr,*highTextures=nullptr,*planetTextures=nullptr,*meshFiles=nullptr,*programFiles=nullptr;
-    NativeGraphics* graphics=nullptr;bool paused=true,showGrapple=false;
+    NativeGraphics* graphics=nullptr;Pane* cockpitPane=nullptr;Select* cockpitSelect=nullptr;InputBox* cockpitInput=nullptr;HELPCONTEXT* cockpitHelp=nullptr;
+    bool paused=true,showGrapple=false;
     int joystickThrottleAxis=-1,joystickTwistAxis=2;
     std::filesystem::path evidence;double captureTime=0;
 };

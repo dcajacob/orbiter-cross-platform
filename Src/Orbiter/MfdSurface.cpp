@@ -28,8 +28,14 @@ using namespace std;
 #ifdef _WIN32
 extern Orbiter *g_pOrbiter;
 #endif
+
+#ifdef _WIN32
 extern TimeData td;
+#endif
+
+#ifdef _WIN32
 extern Pane *g_pane;
+#endif
 
 // =======================================================================
 // class Instrument_Surface
@@ -189,9 +195,12 @@ void Instrument_Surface::InitDeviceObjects ()
 
 HELPCONTEXT *Instrument_Surface::HelpTopic () const
 {
-	extern HELPCONTEXT DefHelpContext;
-	DefHelpContext.topic = (char*)"/mfd_surf.htm";
-	return &DefHelpContext;
+
+#ifdef _WIN32
+extern HELPCONTEXT DefHelpContext;
+#endif
+	orbiter::production::CockpitHelpContext().topic = (char*)"/mfd_surf.htm";
+	return &orbiter::production::CockpitHelpContext();
 }
 
 bool Instrument_Surface::KeyBuffered (oapi::UInt32 key)
@@ -679,7 +688,7 @@ bool Instrument_Surface::IAS (const CelestialBody *body, double &ias) const
 
 void Instrument_Surface::CopyToHUD () const
 {
-	g_pane->SetHUDMode (HUD_SURFACE);
+	orbiter::production::CockpitPane()->SetHUDMode (HUD_SURFACE);
 	// TO DO: copy surface reference once this is made selectable
 }
 
@@ -688,10 +697,10 @@ void Instrument_Surface::UpdateDraw (oapi::Sketchpad *skp)
 	static char spdstr[4][4] = {"GS","TAS","IAS","OS"};
 
 	//double dt = SimT - updT + instrDT; // last step interval
-	double v, dt = td.SimT1 - psimt;
+	double v, dt = orbiter::production::CockpitTime().SimT1 - psimt;
 	double pspd = spd;
 	bool spd_valid = false;
-	psimt = td.SimT1;
+	psimt = orbiter::production::CockpitTime().SimT1;
 
 	char cbuf[32];
 

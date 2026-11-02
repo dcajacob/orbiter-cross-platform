@@ -28,7 +28,7 @@ target_include_directories(mfd-orbit-geometry PRIVATE "${ORBITER_ROOT}/Src/Orbit
 target_link_libraries(mfd-orbit-geometry PRIVATE native_boundary)
 # Compile the actual ten stock modes. Object compilation is a portability gate;
 # no native Pane/instrument lifecycle is claimed until the runtime is linked.
-add_library(stock-instrument-objects OBJECT
+add_library(stock-instrument-objects OBJECT ../../../../Src/Orbiter/Mfd.cpp ../../../../Src/Orbiter/VectorMap.cpp
     ../../../../Src/Orbiter/MfdOrbit.cpp ../../../../Src/Orbiter/MfdSurface.cpp
     ../../../../Src/Orbiter/MfdMap.cpp ../../../../Src/Orbiter/MfdHsi.cpp
     ../../../../Src/Orbiter/MfdLanding.cpp ../../../../Src/Orbiter/MfdDocking.cpp

@@ -15,11 +15,25 @@
 
 using namespace std;
 
+#ifdef _WIN32
 extern PlanetarySystem *g_psys;
+#endif
+
+#ifdef _WIN32
 extern TimeData td;
+#endif
+
+#ifdef _WIN32
 extern Pane *g_pane;
+#endif
+
+#ifdef _WIN32
 extern InputBox *g_input;
+#endif
+
+#ifdef _WIN32
 extern Select *g_select;
+#endif
 
 // =======================================================================
 // class Instrument_Docking
@@ -79,9 +93,12 @@ Instrument_Docking::~Instrument_Docking ()
 
 HELPCONTEXT *Instrument_Docking::HelpTopic () const
 {
-	extern HELPCONTEXT DefHelpContext;
-	DefHelpContext.topic = (char*)"/mfd_dock.htm";
-	return &DefHelpContext;
+
+#ifdef _WIN32
+extern HELPCONTEXT DefHelpContext;
+#endif
+	orbiter::production::CockpitHelpContext().topic = (char*)"/mfd_dock.htm";
+	return &orbiter::production::CockpitHelpContext();
 }
 
 void Instrument_Docking::SetupVessel ()
@@ -226,7 +243,7 @@ void Instrument_Docking::UpdateDraw (oapi::Sketchpad *skp)
 	const PortSpec *ps = 0;
 	static PortSpec local_ps;
 
-	double dt = td.SimT1 - updT + instrDT; // last step interval
+	double dt = orbiter::production::CockpitTime().SimT1 - updT + instrDT; // last step interval
 
 	switch (smode) {
 
@@ -625,7 +642,7 @@ bool Instrument_Docking::KeyBuffered (oapi::UInt32 key)
 		Refresh();
 		return true;
 	case OAPI_KEY_T:  // select target - OBSOLETE
-		g_select->Open ("Docking MFD: Target", ClbkSelection_Target, ClbkEnter_Target, (void*)this);
+		orbiter::production::CockpitSelect()->Open ("Docking MFD: Target", ClbkSelection_Target, ClbkEnter_Target, (void*)this);
 		return true;
 	}
 	return false;
@@ -687,15 +704,15 @@ bool Instrument_Docking::ClbkSelection_Target (Select *menu, int item, char *str
 	if (!str) { // main menu
 		menu->Append ("By name ...");
 		menu->AppendSeparator ();
-		for (i = 0; i < g_psys->nVessel(); i++) {
-			vessel = g_psys->GetVessel (i);
+		for (i = 0; i < orbiter::production::CockpitWorld()->nVessel(); i++) {
+			vessel = orbiter::production::CockpitWorld()->GetVessel (i);
 			if (vessel == mfd->vessel) continue;
 			menu->Append (vessel->Name(), vessel->nDock() ? ITEM_SUBMENU : 0);
 		}
 		return true;
 	} else { // submenu
 		char cbuf[256];
-		if (vessel = g_psys->GetVessel (str, true)) {
+		if (vessel = orbiter::production::CockpitWorld()->GetVessel (str, true)) {
 			for (i = 0; i < vessel->nDock(); i++) {
 				sprintf (cbuf, "%s, dock %d", vessel->Name(), i+1);
 				menu->Append (cbuf);
@@ -710,7 +727,7 @@ bool Instrument_Docking::ClbkEnter_Target (Select *menu, int item, char *str, vo
 {
 	Instrument_Docking *mfd = (Instrument_Docking*)data;
 	if (!strcmp (str, "By name ...")) {
-		g_input->Open ("Docking MFD: Enter target (e.g. 'ISS' or 'ISS 1')", 0, 30, CallbackTarget, data);
+		orbiter::production::CockpitInput()->Open ("Docking MFD: Enter target (e.g. 'ISS' or 'ISS 1')", 0, 30, CallbackTarget, data);
 		return true;
 	} else
 		return mfd->SetTarget (str);
@@ -732,7 +749,7 @@ bool Instrument_Docking::SetTarget (char *str)
 		name[len-1] = '\0';
 		bdock = (sscanf (str+len+5, "%d", &dock) == 1);
 	}
-	Vessel *obj = g_psys->GetVessel (name, true);
+	Vessel *obj = orbiter::production::CockpitWorld()->GetVessel (name, true);
 	if (!obj) return false;
 	if (bdock && (dock < 1 || (oapi::UInt32)dock > obj->nDock())) return false;
 	Legacy_ref = obj;
@@ -743,8 +760,8 @@ bool Instrument_Docking::SetTarget (char *str)
 
 void Instrument_Docking::CopyToHUD () const
 {
-	g_pane->SetHUDMode (HUD_DOCKING);
-	HUD *hud = g_pane->GetHUD();
+	orbiter::production::CockpitPane()->SetHUDMode (HUD_DOCKING);
+	HUD *hud = orbiter::production::CockpitPane()->GetHUD();
 	if (hud && hud->Mode() == HUD_DOCKING) {
 		HUD_Docking *dhud = (HUD_Docking*)hud;
 		switch (smode) {

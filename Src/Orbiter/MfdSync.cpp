@@ -17,8 +17,13 @@
 
 using namespace std;
 
+#ifdef _WIN32
 extern PlanetarySystem *g_psys;
+#endif
+
+#ifdef _WIN32
 extern InputBox *g_input;
+#endif
 
 // =======================================================================
 // class Instrument_OSync
@@ -64,9 +69,12 @@ Instrument_OSync::~Instrument_OSync ()
 
 HELPCONTEXT *Instrument_OSync::HelpTopic () const
 {
-	extern HELPCONTEXT DefHelpContext;
-	DefHelpContext.topic = (char*)"/mfd_sync.htm";
-	return &DefHelpContext;
+
+#ifdef _WIN32
+extern HELPCONTEXT DefHelpContext;
+#endif
+	orbiter::production::CockpitHelpContext().topic = (char*)"/mfd_sync.htm";
+	return &orbiter::production::CockpitHelpContext();
 }
 
 void Instrument_OSync::UpdateDraw (oapi::Sketchpad *skp)
@@ -284,7 +292,7 @@ bool Instrument_OSync::KeyBuffered (oapi::UInt32 key)
 		Refresh();
 		return true;
 	case OAPI_KEY_N:  // number of transit times
-		g_input->Open ("Transit list length:", 0, 20, Instrument_OSync::CallbackNorbit, (void*)this);
+		orbiter::production::CockpitInput()->Open ("Transit list length:", 0, 20, Instrument_OSync::CallbackNorbit, (void*)this);
 		return true;
 	case OAPI_KEY_T:  // select target
 		OpenSelect_Tgt ("Sync MFD: Target", ClbkEnter_Tgt, vessel->ElRef(), 2);
@@ -332,7 +340,7 @@ void Instrument_OSync::SetTarget (const RigidBody *target)
 
 bool Instrument_OSync::ClbkEnter_Tgt (Select *menu, int item, char *str, void *data)
 {
-	Body *obj = g_psys->GetObj (str, true);
+	Body *obj = orbiter::production::CockpitWorld()->GetObj (str, true);
 	if (obj) {
 		Instrument_OSync *instr = (Instrument_OSync*)data;
 		instr->SetTarget ((RigidBody*)obj);
@@ -395,7 +403,7 @@ bool Instrument_OSync::ReadParams (ifstream &ifs)
 		}
 	}
 	if (ctgt[0]) {
-		Body *obj = g_psys->GetObj (ctgt, true);
+		Body *obj = orbiter::production::CockpitWorld()->GetObj (ctgt, true);
 		if (obj) SetTarget ((RigidBody*)obj);
 	}
 	if (cmode[0]) {

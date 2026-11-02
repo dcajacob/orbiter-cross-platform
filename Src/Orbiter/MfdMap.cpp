@@ -20,11 +20,26 @@ using namespace std;
 #ifdef _WIN32
 extern Orbiter *g_pOrbiter;
 #endif
+
+#ifdef _WIN32
 extern PlanetarySystem *g_psys;
+#endif
+
+#ifdef _WIN32
 extern Vessel *g_focusobj;
+#endif
+
+#ifdef _WIN32
 extern InputBox *g_input;
+#endif
+
+#ifdef _WIN32
 extern Select *g_select;
+#endif
+
+#ifdef _WIN32
 extern TimeData td;
+#endif
 extern char DBG_MSG[256];
 
 struct Instrument_Map::SavePrm Instrument_Map::saveprm = {0,0,{0,0},1,true};
@@ -103,9 +118,12 @@ Instrument_Map::~Instrument_Map ()
 
 HELPCONTEXT *Instrument_Map::HelpTopic () const
 {
-	extern HELPCONTEXT DefHelpContext;
-	DefHelpContext.topic = (char*)"/mfd_map.htm";
-	return &DefHelpContext;
+
+#ifdef _WIN32
+extern HELPCONTEXT DefHelpContext;
+#endif
+	orbiter::production::CockpitHelpContext().topic = (char*)"/mfd_map.htm";
+	return &orbiter::production::CockpitHelpContext();
 }
 
 // =======================================================================
@@ -132,7 +150,7 @@ bool Instrument_Map::KeyBuffered (oapi::UInt32 key)
 			OpenSelect_CelBody ("Map MFD: Reference", ClbkEnter_Map, 1);
 			return true;
 		case OAPI_KEY_T:  // select target
-			g_select->Open ("Map MFD: Target", ClbkSubmn_Target, ClbkEnter_Target, (void*)this);
+			orbiter::production::CockpitSelect()->Open ("Map MFD: Target", ClbkSubmn_Target, ClbkEnter_Target, (void*)this);
 			return true;
 		case OAPI_KEY_D:  // switch to display parameters page
 			disp_mode = 1;
@@ -151,7 +169,7 @@ bool Instrument_Map::KeyBuffered (oapi::UInt32 key)
 		case OAPI_KEY_RBRACKET:
 		case OAPI_KEY_MINUS:
 		case OAPI_KEY_EQUALS:
-			scroll_t0 = scroll_tp = td.SysT0;
+			scroll_t0 = scroll_tp = orbiter::production::CockpitTime().SysT0;
 			break;
 		}
 		break;
@@ -186,7 +204,7 @@ bool Instrument_Map::KeyBuffered (oapi::UInt32 key)
 
 bool Instrument_Map::KeyImmediate (char *kstate)
 {
-	double t = td.SysT0;
+	double t = orbiter::production::CockpitTime().SysT0;
 	double dt = max(t-scroll_t0, 0.0);
 	double mag = min(dt*0.5, 8.0);
 	double step = (t-scroll_tp) * mag / zoom;
@@ -338,7 +356,7 @@ void Instrument_Map::UpdateDraw (oapi::Sketchpad *skp)
 void Instrument_Map::UpdateDraw_Map (oapi::Sketchpad *skp)
 {
 	if (refplanet) {
-		const SurfParam *sp = (g_focusobj->ProxyPlanet() == refplanet ? vessel->GetSurfParam() : NULL);
+		const SurfParam *sp = (orbiter::production::CockpitFocus()->ProxyPlanet() == refplanet ? vessel->GetSurfParam() : NULL);
 		char cbuf[128];
 		oapi::Font *pfont = 0;
 		int y = IH-ch;
@@ -375,7 +393,7 @@ void Instrument_Map::UpdateDraw_Map (oapi::Sketchpad *skp)
 				base->Name(), fabs(lng)*DEG, lng>=0.0 ? 'E':'W', fabs(lat)*DEG,
 				lat>=0.0 ? 'N':'S');
 			if (sp) lng0 = sp->lng, lat0 = sp->lat;
-			else    refplanet->GlobalToEquatorial (g_focusobj->GPos(), lng0, lat0, rad);
+			else    refplanet->GlobalToEquatorial (orbiter::production::CockpitFocus()->GPos(), lng0, lat0, rad);
 			rad = refplanet->Size();
 			Orthodome (lng0, lat0, lng, lat, adist, hdg);
 			sprintf (cbuf+strlen(cbuf)-1, ", Dst%s, Brg %05.1fº]", DistStr(adist*rad), Deg(posangle(hdg)));
@@ -387,9 +405,9 @@ void Instrument_Map::UpdateDraw_Map (oapi::Sketchpad *skp)
 			} break;
 		}
 		double lng, lat, rad;
-		refplanet->GlobalToEquatorial (g_focusobj->GPos(), lng, lat, rad);
+		refplanet->GlobalToEquatorial (orbiter::production::CockpitFocus()->GPos(), lng, lat, rad);
 		sprintf (cbuf, "%s [%6.2fº%c %6.2fº%c, Alt %s]",
-			g_focusobj->Name(), fabs(lng)*DEG, lng>=0.0 ? 'E':'W', fabs(lat)*DEG,
+			orbiter::production::CockpitFocus()->Name(), fabs(lng)*DEG, lng>=0.0 ? 'E':'W', fabs(lat)*DEG,
 			lat>=0.0 ? 'N':'S', DistStr(rad-refplanet->Size()));
 		if (sp) {
 			Vector hvel (tmul (sp->ref->GRot(), sp->groundvel_glob));
@@ -535,7 +553,7 @@ void Instrument_Map::UpdateBlt ()
 
 bool Instrument_Map::SelectMap (char *str)
 {
-	Planet *planet = g_psys->GetPlanet (str, true);
+	Planet *planet = orbiter::production::CockpitWorld()->GetPlanet (str, true);
 	if (planet) {
 		if (planet == refplanet) return true; // no change
 		refplanet = planet;
@@ -552,7 +570,7 @@ bool Instrument_Map::SelectMap (char *str)
 
 bool Instrument_Map::SelectTarget (char *str)
 {
-	const Body *body = g_psys->GetObj (str, true);
+	const Body *body = orbiter::production::CockpitWorld()->GetObj (str, true);
 	if (!body) {
 		body = refplanet->GetBase (str, true);
 		if (body) vessel->SetLandingTarget((Base*)body);
@@ -756,16 +774,16 @@ bool Instrument_Map::ClbkSubmn_Target (Select *menu, int item, char *str, void *
 				menu->Append (map->refplanet->GetBase(i)->Name());
 			return (i > 0);
 		case 2: // ships
-			for (i = 0, j = 0; i < g_psys->nVessel(); i++) {
-				Vessel *v = g_psys->GetVessel(i);
+			for (i = 0, j = 0; i < orbiter::production::CockpitWorld()->nVessel(); i++) {
+				Vessel *v = orbiter::production::CockpitWorld()->GetVessel(i);
 				if (v == map->vessel || v->GetStatus() != FLIGHTSTATUS_FREEFLIGHT) continue;
 				if (v->ElRef() == map->refplanet)
 					menu->Append (v->Name()), j++;
 			}
 			return (j > 0);
 		case 3: // moons
-			for (i = 0, j = 0; i < g_psys->nGrav(); i++) {
-				Body *body = g_psys->GetGravObj(i);
+			for (i = 0, j = 0; i < orbiter::production::CockpitWorld()->nGrav(); i++) {
+				Body *body = orbiter::production::CockpitWorld()->GetGravObj(i);
 				if (body->Type() == OBJTP_PLANET && body->ElRef() == map->refplanet)
 					menu->Append (body->Name()), j++;
 			}
@@ -781,7 +799,7 @@ bool Instrument_Map::ClbkEnter_Target (Select *menu, int item, char *str, void *
 {
 	Instrument_Map *map = (Instrument_Map*)data;
 	if (!orbiter::production::CompareText (str, "By name ...")) {
-		g_input->Open ("Enter target:", 0, 20, Instrument_Map::ClbkName_Target,
+		orbiter::production::CockpitInput()->Open ("Enter target:", 0, 20, Instrument_Map::ClbkName_Target,
 			map);
 		return true;
 	} else if (!orbiter::production::CompareText (str, "[none]")) {

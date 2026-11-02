@@ -19,11 +19,25 @@
 
 using namespace std;
 
+#ifdef _WIN32
 extern PlanetarySystem *g_psys;
+#endif
+
+#ifdef _WIN32
 extern TimeData td;
+#endif
+
+#ifdef _WIN32
 extern Pane *g_pane;
+#endif
+
+#ifdef _WIN32
 extern InputBox *g_input;
+#endif
+
+#ifdef _WIN32
 extern Select *g_select;
+#endif
 extern char DBG_MSG[256];
 
 // =======================================================================
@@ -51,12 +65,12 @@ Instrument_Orbit::Instrument_Orbit (Pane *_pane, std::intptr_t _id, const Spec &
 		elref = _vessel->ElRef();
 		tgt = 0;
 	}
-	shpel = new Elements(); TRACENEW
-	tgtel = new Elements(); TRACENEW
+	shpel = new Elements(orbiter::production::CockpitTime().MJD_ref); TRACENEW
+	tgtel = new Elements(orbiter::production::CockpitTime().MJD_ref); TRACENEW
 	if (elref) {
-		shpel->Setup (_vessel->Mass(), elref->Mass(), _vessel->Els()->MJDepoch());
+		shpel->Setup (_vessel->Mass(), elref->Mass(), _vessel->Els()->MJDepoch(), orbiter::production::CockpitTime().MJD_ref);
 		if (tgt)
-			tgtel->Setup (tgt->Mass(), elref->Mass(), _vessel->Els()->MJDepoch());
+			tgtel->Setup (tgt->Mass(), elref->Mass(), _vessel->Els()->MJDepoch(), orbiter::production::CockpitTime().MJD_ref);
 	}
 
 	SetSize (spec);
@@ -95,9 +109,12 @@ Instrument_Orbit::~Instrument_Orbit ()
 
 HELPCONTEXT *Instrument_Orbit::HelpTopic () const
 {
-	extern HELPCONTEXT DefHelpContext;
-	DefHelpContext.topic = (char*)"/mfd_orbit.htm";
-	return &DefHelpContext;
+
+#ifdef _WIN32
+extern HELPCONTEXT DefHelpContext;
+#endif
+	orbiter::production::CockpitHelpContext().topic = (char*)"/mfd_orbit.htm";
+	return &orbiter::production::CockpitHelpContext();
 }
 
 bool Instrument_Orbit::KeyBuffered (oapi::UInt32 key)
@@ -196,7 +213,7 @@ void Instrument_Orbit::SetRef (const CelestialBody *ref)
 
 bool Instrument_Orbit::SelectRef (char *str)
 {
-	CelestialBody *obj = g_psys->GetGravObj (str, true);
+	CelestialBody *obj = orbiter::production::CockpitWorld()->GetGravObj (str, true);
 	if (!obj) return false;
 	SetRef (obj);
 	return true;
@@ -209,12 +226,12 @@ void Instrument_Orbit::SelectAutoRef ()
 
 bool Instrument_Orbit::SelectTarget (char *str)
 {
-	Body *body = g_psys->GetObj (str, true);
+	Body *body = orbiter::production::CockpitWorld()->GetObj (str, true);
 	if (body == (Body*)elref) return false;
 	if (body) {
 		tgt = body;
 		if (elref)
-			tgtel->Setup (tgt->Mass(), elref->Mass(), shpel->MJDepoch());
+			tgtel->Setup (tgt->Mass(), elref->Mass(), shpel->MJDepoch(), orbiter::production::CockpitTime().MJD_ref);
 		Refresh();
 		return true;
 	} else return false;
@@ -229,8 +246,8 @@ void Instrument_Orbit::UnselectTarget ()
 
 void Instrument_Orbit::CopyToHUD () const
 {
-	g_pane->SetHUDMode (HUD_ORBIT);
-	HUD *hud = g_pane->GetHUD();
+	orbiter::production::CockpitPane()->SetHUDMode (HUD_ORBIT);
+	HUD *hud = orbiter::production::CockpitPane()->GetHUD();
 	if (hud && hud->Mode() == HUD_ORBIT) {
 		((HUD_Orbit*)hud)->SetReference (elref);
 	}
@@ -282,7 +299,7 @@ void Instrument_Orbit::UpdateDraw (oapi::Sketchpad *skp)
 			pos = tmul (elref->RotObliq(), pos);
 			vel = tmul (elref->RotObliq(), vel);
 		}
-		shpel->Calculate (pos, vel, td.SimT1);
+		shpel->Calculate (pos, vel, orbiter::production::CockpitTime().SimT1);
 		strcpy (title_str+7, elref->Name());
 		strcpy (proj_str+6, projstr[projmode]);
 		instable = (shpel->PeDist() < elref->Size());
@@ -296,7 +313,7 @@ void Instrument_Orbit::UpdateDraw (oapi::Sketchpad *skp)
 			pos = tmul (elref->RotObliq(), pos);
 			vel = tmul (elref->RotObliq(), vel);
 		}
-		tgtel->Calculate (pos, vel, td.SimT1);
+		tgtel->Calculate (pos, vel, orbiter::production::CockpitTime().SimT1);
 		double scale2 = (tgtel->e < 1.0 ? pixrad / tgtel->ApDist() : scale);
 		if (scale2 < scale) scale = scale2;
 	} else {
@@ -347,7 +364,7 @@ void Instrument_Orbit::UpdateDraw (oapi::Sketchpad *skp)
 	DisplayTitle (skp, title_str);
 	// output elref's contribution to gravity field
 	bool dominant;
-	double gfrac = g_psys->GetGravityContribution (elref, vessel->GPos(), &dominant);
+	double gfrac = orbiter::production::CockpitWorld()->GetGravityContribution (elref, vessel->GPos(), &dominant);
 	char cbuf[20];
 	sprintf (cbuf, "G %0.2f", gfrac);
 	skp->SetTextColor (draw[!dominant ? 3 : gfrac < 0.0 ? 1 : 0][0].col);

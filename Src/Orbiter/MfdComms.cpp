@@ -16,7 +16,9 @@
 
 using namespace std;
 
+#ifdef _WIN32
 extern TimeData td;
+#endif
 
 // =======================================================================
 // class Instrument_Comms
@@ -47,21 +49,24 @@ Instrument_Comms::~Instrument_Comms ()
 
 HELPCONTEXT *Instrument_Comms::HelpTopic () const
 {
-	extern HELPCONTEXT DefHelpContext;
-	DefHelpContext.topic = (char*)"/mfd_com.htm";
-	return &DefHelpContext;
+
+#ifdef _WIN32
+extern HELPCONTEXT DefHelpContext;
+#endif
+	orbiter::production::CockpitHelpContext().topic = (char*)"/mfd_com.htm";
+	return &orbiter::production::CockpitHelpContext();
 }
 
 bool Instrument_Comms::Update (double upDTscale)
 {
 	const double stept = 0.05;
-	if (scanning && td.SysT1-t_scan > stept) {
+	if (scanning && orbiter::production::CockpitTime().SysT1-t_scan > stept) {
 		const Nav *nav;
 		if (nav = vessel->nav[sel].sender)
 			scanning = false;
 		else {
 			SwitchFreq (sel, scanning, false);
-			t_scan = td.SysT1+stept;
+			t_scan = orbiter::production::CockpitTime().SysT1+stept;
 			Refresh();
 		}
 	}
@@ -150,7 +155,7 @@ bool Instrument_Comms::KeyBuffered (oapi::UInt32 key)
 		if (sel < vessel->nnav) {
 			SwitchFreq (sel, -1, false);
 			scanning = -1;
-			t_scan = td.SysT0;
+			t_scan = orbiter::production::CockpitTime().SysT0;
 			Refresh();
 		}
 		return true;
@@ -158,7 +163,7 @@ bool Instrument_Comms::KeyBuffered (oapi::UInt32 key)
 		if (sel < vessel->nnav) {
 			SwitchFreq (sel, 1, false);
 			scanning = 1;
-			t_scan = td.SysT0;
+			t_scan = orbiter::production::CockpitTime().SysT0;
 			Refresh();
 		}
 		return true;
