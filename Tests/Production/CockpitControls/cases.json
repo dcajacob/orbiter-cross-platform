@@ -1,0 +1,284 @@
+{
+  "schema": 1,
+  "application_source": "f725194209634f7fd5d1d44d426cfa9b5e303e37",
+  "frames": 60,
+  "fixed_step": 0.25,
+  "epoch": 51982.5,
+  "image_ssim_minimum": 0.98,
+  "budgets": {
+    "position_m": 0.01,
+    "velocity_m_s": 1e-05,
+    "rotation_rad": 1e-08,
+    "angular_velocity_rad_s": 1e-10,
+    "mjd_days": 1e-10,
+    "propellant_relative": 1e-08,
+    "propellant_absolute_kg": 1e-08
+  },
+  "scope": "Additional original Windows mouse-routing and real stock RCS-control references before native cockpit input extraction. Original runtime/client binaries remain pinned; no native cockpit acceptance is claimed.",
+  "expected_rcs": {
+    "initial": 1,
+    "after_tick_10": 2,
+    "after_tick_30": 1
+  },
+  "cases": [
+    {
+      "id": "controls_generic_orbit_surface",
+      "fixture": "orbit",
+      "target": "PB",
+      "cockpit": 1,
+      "left": 1,
+      "right": 2,
+      "hud": 1,
+      "actions": [
+        {
+          "tick": 10,
+          "event": "left_down",
+          "coordinates": "pixel",
+          "point": [
+            85,
+            136,
+            0
+          ]
+        },
+        {
+          "tick": 11,
+          "event": "left_up",
+          "coordinates": "pixel",
+          "point": [
+            85,
+            136,
+            0
+          ]
+        },
+        {
+          "tick": 30,
+          "event": "left_down",
+          "coordinates": "pixel",
+          "point": [
+            54,
+            136,
+            0
+          ]
+        },
+        {
+          "tick": 31,
+          "event": "left_up",
+          "coordinates": "pixel",
+          "point": [
+            54,
+            136,
+            0
+          ]
+        }
+      ]
+    },
+    {
+      "id": "controls_dg_panel",
+      "fixture": "dg_orbit",
+      "target": "DG",
+      "class": "DeltaGlider",
+      "cockpit": 2,
+      "left": 1,
+      "right": 2,
+      "hud": 1,
+      "actions": [
+        {
+          "tick": 10,
+          "event": "left_down",
+          "coordinates": "pixel",
+          "point": [
+            130,
+            430,
+            0
+          ]
+        },
+        {
+          "tick": 11,
+          "event": "left_up",
+          "coordinates": "pixel",
+          "point": [
+            130,
+            430,
+            0
+          ]
+        },
+        {
+          "tick": 30,
+          "event": "left_down",
+          "coordinates": "pixel",
+          "point": [
+            110,
+            430,
+            0
+          ]
+        },
+        {
+          "tick": 31,
+          "event": "left_up",
+          "coordinates": "pixel",
+          "point": [
+            110,
+            430,
+            0
+          ]
+        }
+      ]
+    },
+    {
+      "id": "controls_dg_vc",
+      "fixture": "dg_orbit",
+      "target": "DG",
+      "class": "DeltaGlider",
+      "cockpit": 3,
+      "left": 1,
+      "right": 2,
+      "hud": 1,
+      "actions": [
+        {
+          "tick": 10,
+          "event": "left_down",
+          "coordinates": "local",
+          "point": [
+            0.0725,
+            1.277,
+            7.268
+          ]
+        },
+        {
+          "tick": 11,
+          "event": "left_up",
+          "coordinates": "local",
+          "point": [
+            0.0725,
+            1.277,
+            7.268
+          ]
+        },
+        {
+          "tick": 30,
+          "event": "left_down",
+          "coordinates": "local",
+          "point": [
+            0.0575,
+            1.277,
+            7.268
+          ]
+        },
+        {
+          "tick": 31,
+          "event": "left_up",
+          "coordinates": "local",
+          "point": [
+            0.0575,
+            1.277,
+            7.268
+          ]
+        }
+      ]
+    },
+    {
+      "id": "controls_dgs_panel",
+      "fixture": "dg_orbit",
+      "target": "DG",
+      "class": "DG-S",
+      "cockpit": 2,
+      "left": 1,
+      "right": 2,
+      "hud": 1,
+      "actions": [
+        {
+          "tick": 10,
+          "event": "left_down",
+          "coordinates": "pixel",
+          "point": [
+            130,
+            430,
+            0
+          ]
+        },
+        {
+          "tick": 11,
+          "event": "left_up",
+          "coordinates": "pixel",
+          "point": [
+            130,
+            430,
+            0
+          ]
+        },
+        {
+          "tick": 30,
+          "event": "left_down",
+          "coordinates": "pixel",
+          "point": [
+            110,
+            430,
+            0
+          ]
+        },
+        {
+          "tick": 31,
+          "event": "left_up",
+          "coordinates": "pixel",
+          "point": [
+            110,
+            430,
+            0
+          ]
+        }
+      ]
+    },
+    {
+      "id": "controls_dgs_vc",
+      "fixture": "dg_orbit",
+      "target": "DG",
+      "class": "DG-S",
+      "cockpit": 3,
+      "left": 1,
+      "right": 2,
+      "hud": 1,
+      "actions": [
+        {
+          "tick": 10,
+          "event": "left_down",
+          "coordinates": "local",
+          "point": [
+            0.0725,
+            1.277,
+            7.268
+          ]
+        },
+        {
+          "tick": 11,
+          "event": "left_up",
+          "coordinates": "local",
+          "point": [
+            0.0725,
+            1.277,
+            7.268
+          ]
+        },
+        {
+          "tick": 30,
+          "event": "left_down",
+          "coordinates": "local",
+          "point": [
+            0.0575,
+            1.277,
+            7.268
+          ]
+        },
+        {
+          "tick": 31,
+          "event": "left_up",
+          "coordinates": "local",
+          "point": [
+            0.0575,
+            1.277,
+            7.268
+          ]
+        }
+      ]
+    }
+  ]
+}

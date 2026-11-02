@@ -226,3 +226,13 @@ The subsequent scheduler/map/session-binding stage has local source, compilation
 conic and twenty-context pixel verification, plus unchanged native exterior
 state and SSIM `0.9881491503795506` in two fresh processes. These local results
 are separate from the required hosted validation of that later stage.
+
+Before extracting cockpit mouse routing, `Tests/Production/CockpitControls`
+adds an original Windows control gate using exact archived pre-extraction
+application/SDK/client binaries. The additional driver sends recorded mouse
+messages through the actual owned render window, including real DG/DG-S VC
+hit testing, then verifies the actual vessel's RCS mode. Five cases each run
+twice per Windows configuration. These outputs remain diagnostic until every
+repeat and Debug/Release comparison passes the unchanged budgets. The existing
+nine-case references remain immutable; native cockpit input work must wait for
+this additional gate.
