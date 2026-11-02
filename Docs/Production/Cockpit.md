@@ -43,6 +43,9 @@ rejection without creating a replacement simulation or instrument. Locally it
 reports 9x14 metrics and 271 colored glyph pixels for the `-14` request; the old
 preserved renderer fails the same focused exercise. Full Windows cockpit probes
 must pass before any capture is frozen or instrumentation extraction starts.
+The driver sets instrument modes at the first pre-step: original Orbiter calls
+plugin `clbkSimulationStart` before `Pane::InitState`, so that callback is too
+early to issue MFD commands. Application lifecycle ordering is unchanged.
 
 Before extraction, require repeat-identical numerical and displayed-text traces,
 finite finalized state, actual expected cockpit/MFD modes, numerical display

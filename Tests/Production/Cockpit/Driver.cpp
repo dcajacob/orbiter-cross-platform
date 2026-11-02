@@ -21,7 +21,7 @@ class Driver final:public oapi::Module {
     std::ofstream state,events;
     std::string target;
     unsigned frames=0,total=0;int cockpit=0,left=0,right=0,hud=0;
-    bool started=false;
+    bool started=false,initialized=false;
     template<class F>void guarded(F action){try{action();}catch(const std::exception& e){std::ofstream("cockpit-failure.txt")<<e.what()<<'\n';std::exit(42);}}
     void snapshot(){
         auto* v=oapiGetFocusInterface();require(v && target==v->GetName(),"Cockpit focus differs from required real vessel");
@@ -43,19 +43,26 @@ public:
     ~Driver()override{if(setter)setter(1,nullptr,std::numeric_limits<double>::quiet_NaN());}
     void clbkSimulationStart(RenderMode mode)override{guarded([&]{
         require(mode!=RENDER_NONE,"Real graphics client required");auto* v=oapiGetFocusInterface();require(v && v->GetThrusterCount()>0 && v->GetMeshCount()>0,"Actual stock vessel required");
-        oapiOpenMFD(left,0);oapiOpenMFD(right,1);oapiSetHUDMode(hud);started=true;snapshot();
+        started=true;
     });}
     void clbkPreStep(double,double,double)override{guarded([&]{
         // The stock MFD scheduler limits real-time refresh to 10Hz. Pace these
         // software-rendered fixtures above that bound without altering clocks,
         // calculations, integrators or the original instrumentation scheduler.
         Sleep(120);
+        // Original Orbiter initializes Pane after clbkSimulationStart. The
+        // first pre-step is the first SDK control point with a complete panel.
+        if(!initialized){
+            require(oapiCameraInternal() && oapiCockpitMode()==cockpit,"Scenario cockpit failed to initialize");
+            oapiOpenMFD(left,0);oapiOpenMFD(right,1);oapiSetHUDMode(hud);initialized=true;snapshot();
+        }
         if(frames==10){oapiSetHUDMode(hud%3+1);}
         if(frames==30){oapiSetHUDMode(hud);}
     });}
     void core(const char* phase,const char* object,double seconds,double mjd,int running){guarded([&]{
         events<<frames<<','<<seconds<<','<<mjd<<','<<phase<<','<<object<<','<<running<<'\n';
         if(started && std::string(phase)=="app.frame.end"){
+            require(initialized,"Original frame completed before cockpit setup");
             require(running!=0,"Unexpected paused reference frame");++frames;snapshot();
             require(oapiCameraInternal() && oapiCockpitMode()==cockpit,"Original requested cockpit did not initialize");
             require(oapiGetMFDMode(0)==left && oapiGetMFDMode(1)==right,"Original stock instruments did not initialize");
