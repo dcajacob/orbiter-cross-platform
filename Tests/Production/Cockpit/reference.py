@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """Observe original Windows instruments; never overwrite an accepted reference."""
-import argparse,hashlib,json,math,sys,zipfile
+import argparse,hashlib,json,math,os,sys,zipfile
 from pathlib import Path
 ROOT=Path(__file__).resolve().parents[3]
 sys.path[:0]=[str(ROOT/'Tests/Production'),str(ROOT/'Tests/Production/Client')]
@@ -33,13 +33,15 @@ def inspect(directory,case,settings):
     for frame in (20,50):
         image=directory/f'instrument-{frame}.rgba';pixels=image.read_bytes();require(len(pixels)==1280*720*4,'Missing original cockpit capture')
         png(directory/f'instrument-{frame}.png',pixels,1280,720);hashes[str(frame)]=digest(image)
-    return dict(status='passed',samples=len(state),text_calls=len(text),images=hashes,renderer=renderer,lifecycle=life)
+    geometry=rows(directory/'instrument-geometry.csv');blits=rows(directory/'instrument-self-blits.csv')
+    return dict(status='passed',samples=len(state),text_calls=len(text),overlay_vertices=len(geometry),self_blits=len(blits),images=hashes,renderer=renderer,lifecycle=life)
 
 def main():
     p=argparse.ArgumentParser(description=__doc__)
     for name in ('orbiter','data','planets','mesa','output'):p.add_argument('--'+name,type=Path,required=True)
     p.add_argument('--configuration',choices=('Debug','Release'),required=True);p.add_argument('--case',action='append')
     a=p.parse_args();settings=json.loads((Path(__file__).with_name('cases.json')).read_text())
+    os.environ.update(LIBGL_ALWAYS_SOFTWARE='true',GALLIUM_DRIVER='llvmpipe')
     require(not a.output.exists(),'Reference output already exists; automatic replacement is forbidden')
     a.output.mkdir(parents=True);report=dict(status='pending',configuration=a.configuration,source=git('rev-parse','HEAD').decode().strip(),application_source=settings['application_source'],cases={},failures={})
     runtime=json.loads((a.orbiter.parent/'test-runtime.json').read_text());require(runtime['source_commit']==settings['application_source'],'Wrong pre-extraction application source')
@@ -59,7 +61,7 @@ def main():
                     mesa_files(a.mesa.resolve(),directory)
                 stage(a.orbiter.resolve(),a.data.resolve(),a.planets.resolve(),directory,{**case,'frames':60,'fixed_step':settings['fixed_step'],'epoch':settings['epoch']},None,before_launch=configure)
                 observed.append(inspect(directory,case,settings));dirs.append(directory)
-            for name in ('cockpit-state.csv','instrument-text.csv'):
+            for name in ('cockpit-state.csv','instrument-text.csv','instrument-geometry.csv','instrument-self-blits.csv'):
                 require((dirs[0]/name).read_bytes()==(dirs[1]/name).read_bytes(),'Original deterministic repeat differs: '+name)
             ssim={str(frame):image_ssim((dirs[0]/f'instrument-{frame}.rgba').read_bytes(),(dirs[1]/f'instrument-{frame}.rgba').read_bytes(),1280,720) for frame in (20,50)}
             require(all(v>=settings['image_ssim_minimum'] for v in ssim.values()),'Original image repeat exceeds predeclared budget')

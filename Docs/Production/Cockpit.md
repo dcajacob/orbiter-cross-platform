@@ -16,6 +16,10 @@ font height and color, plus complete 1280x720 frames at ticks 20 and 50. They
 forward the existing drawing path without replacing instrument calculations or
 geometry. The same hooks are available in the shared native renderer but are
 disabled for ordinary runs and previous regression fixtures.
+Overlay vertices/UVs and self-blits into character atlases are recorded too,
+covering HUD numbers drawn with the original bitmap glyph meshes. Glyph/UV and
+atlas-update identities must match; projected overlay differences are limited to
+one pixel, in addition to the full-image and displayed-text gates.
 
 Nine reduced probes cover all ten stock MFD modes, all three HUD modes, and real
 DG/DG-S 2D panels/virtual cockpits. Every probe runs twice with 60 quarter-second

@@ -26,6 +26,7 @@
 #include "stb_image_write.h"
 #include "Renderer.h"
 #include "Evidence.h"
+#include "InstrumentEvidence.h"
 #include "MaterialConversion.h"
 
 // ==============================================================
@@ -223,6 +224,7 @@ bool OGLClient::GetRenderParam (int prm, int *value) const
  */
 void OGLClient::clbkRender2DPanel (SURFHANDLE *hSurf, MESHHANDLE hMesh, MATRIX3 *T, bool transparent)
 {
+	InstrumentEvidence::Overlay(hMesh,T);
 	static int nHVTX = 1;
 	static struct HVTX {
 		float tu, tv;
@@ -1656,6 +1658,7 @@ bool OGLClient::Blt (SURFHANDLE tgt, int tgtx, int tgty, SURFHANDLE src, int fla
  */
 bool OGLClient::Blt (SURFHANDLE tgt, int tgtx, int tgty, SURFHANDLE src, int srcx, int srcy, int w, int h, int flag) const
 {
+	InstrumentEvidence::SelfBlt(tgt,tgtx,tgty,src,srcx,srcy,w,h,flag);
 	Renderer::PushBool(Renderer::BLEND, false);
 	Renderer::PushBool(Renderer::CULL_FACE, false);
 	Renderer::PushBool(Renderer::DEPTH_TEST, false);

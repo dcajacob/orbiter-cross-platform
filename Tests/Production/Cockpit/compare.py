@@ -27,9 +27,17 @@ def compare(debug,release,settings):
                 ratio=abs(float(x[key])-float(y[key]))/max(budgets['propellant_absolute_kg'],abs(float(x[key]))*budgets['propellant_relative'])
                 require(ratio<=1,'Original cockpit mass/propellant budget exceeded');maxima['propellant_fraction']=max(maxima['propellant_fraction'],ratio)
         require((a/'instrument-text.csv').read_bytes()==(b/'instrument-text.csv').read_bytes(),'Original displayed instrument values/order differ between configurations')
+        require((a/'instrument-self-blits.csv').read_bytes()==(b/'instrument-self-blits.csv').read_bytes(),'Original HUD character atlas updates differ')
+        geometry_a,geometry_b=rows(a/'instrument-geometry.csv'),rows(b/'instrument-geometry.csv')
+        require(len(geometry_a)==len(geometry_b),'Original overlay geometry count differs')
+        pixel_error=0.
+        for x,y in zip(geometry_a,geometry_b):
+            for key in ('frame','seconds','overlay','group','vertex','texture','u','v'):require(x[key]==y[key],'Original overlay glyph/texture identity differs: '+key)
+            pixel_error=max(pixel_error,distance([float(x[k]) for k in ('x','y')],[float(y[k]) for k in ('x','y')]))
+        require(pixel_error<=1.,'Original overlay projected position exceeds one pixel')
         images={str(frame):image_ssim((a/f'instrument-{frame}.rgba').read_bytes(),(b/f'instrument-{frame}.rgba').read_bytes(),1280,720) for frame in (20,50)}
         require(all(v>=settings['image_ssim_minimum'] for v in images.values()),'Original cockpit images exceed predeclared budget')
-        results[name]=dict(maxima=maxima,identical_display_text=True,ssim=images)
+        results[name]=dict(maxima=maxima,identical_display_text=True,identical_hud_atlas_updates=True,overlay_pixel_error=pixel_error,ssim=images)
     return results
 def main():
     p=argparse.ArgumentParser(description=__doc__)
