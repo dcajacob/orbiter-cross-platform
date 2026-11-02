@@ -414,3 +414,11 @@ and lifecycle suite locally: all 24 full/fine ROT/LIN hold/release combinations,
 controls, pause/single step, quicksave and in-process reload. This uses a separate
 snapshot of the default engine and matching renderer, without changing either
 accepted laptop launcher.
+
+The real RCS/MFD mouse test also passes with ASan and UBSan: no memory-access or
+undefined-behavior errors during power cycling or instrument replacement. Full
+unsuppressed LSan reporting remains enabled and reports the prior 46,253-byte,
+791-allocation graphics retention. All 71 allocation-size/count report blocks
+match the prior one-context baseline. `LSAN_OPTIONS=exitcode=0` lets the input
+harness finish; the complete leak report is checked separately. This does not
+establish globally leak-free rendering.
