@@ -47,3 +47,25 @@ The five original cases are now accepted in run 41482729373. Their immutable
 provenance, hashes and comparison are in `Reference/`. The capture workflow is
 manual-only; preservation uses a separate workflow. Native input extraction
 must compare against these files rather than recapturing the reference.
+
+Current regression entry points are separate from the frozen producer:
+
+- `current.py` rebuilds the original observation driver against the current
+  Windows SDK and compares all five cases with the staged originals. The normal
+  Windows client workflow runs it after the nine instrument cases.
+- `native.py` compares the supported generic glass case using the same real
+  Pane hit testing and frozen tick/coordinate schedule. Native DG/DG-S panels
+  and virtual cockpits remain unsupported.
+- `mouse_smoke.py` separately verifies actual GLFW/X11 input delivery, RCS mode
+  switches, momentary keyboard thrust and focus-loss release, plus the original
+  MFD power and Surface/Orbit selection buttons. It operates only on the window
+  owned by its child test process. This test is not a frozen numerical replay.
+
+Stage accepted references with `frozen_controls.py --cache <cache> --output
+<frozen>` (add `--offline` to require verified cached archives). Native scripts
+take `--executable`, `--assets`, `--data`, `--modules`, `--planets`, and `--output`;
+the deterministic comparison additionally takes `--frozen` and
+`--configuration Debug|Release`. Run on an owned X11 display or `xvfb-run`, with
+`LIBGL_ALWAYS_SOFTWARE=1 GALLIUM_DRIVER=llvmpipe`. The native workflow runs both
+checks on all four Debug/Release automatic/SSE2 profiles and archives evidence.
+These engineering checks do not establish complete native cockpit compatibility.

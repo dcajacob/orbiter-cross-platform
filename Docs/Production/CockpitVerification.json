@@ -320,33 +320,107 @@
       "status": "passed",
       "transport": "X11 targeted events and real server cursor, GLFW callback, original Pane",
       "actual_rcs_mode_buttons": true,
+      "mfd_power_off_on": true,
+      "mfd_mode_surface_orbit": true,
       "momentary_keyboard_rcs": true,
       "focus_loss_release": true,
-      "finalized_release_samples": 60,
+      "finalized_release_samples": 145,
       "mouse_events": [
         {
-          "tick": "2",
+          "tick": "1",
           "event": "left_down",
           "x": "85",
           "y": "136"
         },
         {
-          "tick": "24",
+          "tick": "3",
           "event": "left_up",
           "x": "85",
           "y": "136"
         },
         {
-          "tick": "47",
+          "tick": "38",
           "event": "left_down",
           "x": "54",
           "y": "136"
         },
         {
-          "tick": "52",
+          "tick": "43",
           "event": "left_up",
           "x": "54",
           "y": "136"
+        },
+        {
+          "tick": "82",
+          "event": "left_down",
+          "x": "155",
+          "y": "703"
+        },
+        {
+          "tick": "91",
+          "event": "left_up",
+          "x": "155",
+          "y": "703"
+        },
+        {
+          "tick": "101",
+          "event": "left_down",
+          "x": "155",
+          "y": "703"
+        },
+        {
+          "tick": "109",
+          "event": "left_up",
+          "x": "155",
+          "y": "703"
+        },
+        {
+          "tick": "119",
+          "event": "left_down",
+          "x": "216",
+          "y": "703"
+        },
+        {
+          "tick": "127",
+          "event": "left_up",
+          "x": "216",
+          "y": "703"
+        },
+        {
+          "tick": "137",
+          "event": "left_down",
+          "x": "20",
+          "y": "445"
+        },
+        {
+          "tick": "146",
+          "event": "left_up",
+          "x": "20",
+          "y": "445"
+        },
+        {
+          "tick": "155",
+          "event": "left_down",
+          "x": "216",
+          "y": "703"
+        },
+        {
+          "tick": "165",
+          "event": "left_up",
+          "x": "216",
+          "y": "703"
+        },
+        {
+          "tick": "173",
+          "event": "left_down",
+          "x": "20",
+          "y": "395"
+        },
+        {
+          "tick": "183",
+          "event": "left_up",
+          "x": "20",
+          "y": "395"
         }
       ]
     },
@@ -355,6 +429,44 @@
       "Selection/input services remain unbound",
       "Native Wayland/high-DPI mouse gate unfinished",
       "Accepted laptop launchers remain Phase 5"
-    ]
+    ],
+    "default_flight_regression": {
+      "snapshot": "d4c078e176337943841faff4205c82f1961c46b9635205c75a9eb2223ffb8116",
+      "report": {
+        "live_vessel_focus": true,
+        "previous_vessel_key": true,
+        "focused_child_rcs": true,
+        "status": "passed",
+        "keyboard_throttle": true,
+        "rcs_mode": true,
+        "rcs_translation": true,
+        "rcs_release_samples": 403,
+        "rcs_focus_release": true,
+        "aerodynamic_toggle": true,
+        "control_surface_release": [
+          {
+            "key": "w",
+            "surface": "elevator",
+            "start": 12.167,
+            "released": 12.817,
+            "end": 14.317
+          },
+          {
+            "key": "c",
+            "surface": "aileron",
+            "start": 14.317,
+            "released": 14.983,
+            "end": 16.483
+          }
+        ],
+        "propellant_used": true,
+        "pause": true,
+        "single_step": true,
+        "stock_quicksave": true,
+        "in_process_reload": true,
+        "exit": true,
+        "rcs_hold_release_combinations": 24
+      }
+    }
   }
 }

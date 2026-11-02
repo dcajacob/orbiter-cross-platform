@@ -395,8 +395,9 @@ hashes are verified before comparison and preserved unchanged.
 `mouse_smoke.py` separately delivers targeted X11 events and moves the real server
 cursor in its own process's window. It verifies the actual GLFW callback,
 coordinate conversion, original ROT/LIN hit testing, momentary keyboard thrust,
-focus-loss release, finalized zero jet/exhaust samples, presentation and shutdown.
-The local run passes with 60 finalized release samples. This is distinct from
+focus-loss release, MFD power off/on and Surface/Orbit mode selection through the
+original buttons, finalized zero jet/exhaust samples, presentation and shutdown.
+The local run passes with 145 finalized release samples. This is distinct from
 the deterministic replay test. Wayland/high-DPI mouse validation remains pending.
 
 Both checks are added after the original instrument gate in every native CI
@@ -406,3 +407,10 @@ repeat checks and direct MFD readbacks. Hosted results for this new routing stag
 must pass before acceptance. The frozen producer scripts, original DLLs and
 accepted captures are not regenerated. These are engineering candidates;
 ordinary laptop launchers remain at accepted Phase 5.
+
+The new private input contract also passes the existing default-flight keyboard
+and lifecycle suite locally: all 24 full/fine ROT/LIN hold/release combinations,
+403 finalized zero-thrust samples, child focus/previous focus, aerodynamic
+controls, pause/single step, quicksave and in-process reload. This uses a separate
+snapshot of the default engine and matching renderer, without changing either
+accepted laptop launcher.

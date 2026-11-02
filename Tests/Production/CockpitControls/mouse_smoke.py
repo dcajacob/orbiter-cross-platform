@@ -55,7 +55,9 @@ def main():
         send(window,4 if down else 5,number,0 if down else 1<<(7+number),px,py)
     case=json.loads((HERE/'cases.json').read_text())['cases'][0]
     text=fixture(case);start=text.index('PB:ShuttlePB\n');end=text.index('\nEND\n',start)
-    (out/'cockpit.scn').write_text(text[:end]+'\n  RCSMODE 1'+text[end:])
+    text=(text[:end]+'\n  RCSMODE 1'+text[end:]).replace('BEGIN_SHIPS',
+        'BEGIN_MFD Left\n  TYPE Orbit\n  REF Earth\nEND_MFD\nBEGIN_MFD Right\n  TYPE Surface\nEND_MFD\nBEGIN_SHIPS')
+    (out/'cockpit.scn').write_text(text)
     (out/'Orbiter.cfg').write_text((ROOT/'Tests/Production/NativeScene/Orbiter.cfg').read_text()+'\nFPS = 0\nMenubarMode = 1\nInfobarMode = 1\nInstrumentUpdateInterval = 0.25\n')
     (out/'control-evidence.enabled').write_text('Actual owned X11 window mouse transport\n')
     argv=[str(a.executable.resolve())]
@@ -79,9 +81,21 @@ def main():
             wait(lambda:'RCS ROT 0%' in title(window),'RCS stayed on after focus loss')
             key(window,'w',False);x.XSetInputFocus(display,window,1,0);x.XFlush(display);time.sleep(.2)
             require('RCS ROT 0%' in title(window),'Thrust reactivated on focus regain')
+            def left_mode():
+                samples=list(csv.DictReader((out/'cockpit-state.csv').open()))
+                complete=[r for r in samples if r.get('left_mfd') and all(v is not None for v in r.values())]
+                return int(complete[-1]['left_mfd']) if complete else -1
+            def click(px,py):
+                button(window,px,py,True);time.sleep(.1);button(window,px,py,False);time.sleep(.1)
+            require(left_mode()==1,'Original initial Orbit MFD is missing')
+            click(155,703);wait(lambda:left_mode()==0,'Actual MFD power button did not turn the instrument off')
+            click(155,703);wait(lambda:left_mode()==1,'Actual MFD power button did not restore Orbit')
+            click(216,703);click(20,445);wait(lambda:left_mode()==2,'Actual MFD mode page did not select Surface')
+            click(216,703);click(20,395);wait(lambda:left_mode()==1,'Actual MFD mode page did not restore Orbit')
             key(window,'Escape',True);require(process.wait(timeout=15)==0,'Actual native mouse session failed')
             inputs=list(csv.DictReader((out/'control-inputs.csv').open()))
-            require([(r['event'],int(r['x']),int(r['y'])) for r in inputs]==[(kind,px,136) for px in (85,54) for kind in ('left_down','left_up')],'Actual GLFW events or framebuffer coordinates differ')
+            points=[(85,136),(54,136),(155,703),(155,703),(216,703),(20,445),(216,703),(20,395)]
+            require([(r['event'],int(r['x']),int(r['y'])) for r in inputs]==[(kind,px,py) for px,py in points for kind in ('left_down','left_up')],'Actual GLFW events or framebuffer coordinates differ')
             state=list(csv.DictReader((out/'cockpit-state.csv').open()));require({int(r['rcs_mode']) for r in state}=={1,2},'Finalized actual vessel modes were not observed')
             levels=list(csv.DictReader((out/'thrust-state.csv').open()))
             keys={int(r['tick']):bytes.fromhex(r['keys']) for r in csv.DictReader((out/'input-state.csv').open())};released=0
@@ -94,9 +108,16 @@ def main():
             life=json.loads((out/'graphics-lifecycle.json').read_text());require(life['context_deleted'] and life['successful_presents']>0,'Mouse session did not present/shut down normally')
             errors=out/'graphics-errors.txt';require(not errors.exists() or not errors.read_text().strip(),'Mouse session OpenGL errors')
             report=dict(status='passed',transport='X11 targeted events and real server cursor, GLFW callback, original Pane',
-                actual_rcs_mode_buttons=True,momentary_keyboard_rcs=True,focus_loss_release=True,finalized_release_samples=released,mouse_events=inputs)
+                actual_rcs_mode_buttons=True,mfd_power_off_on=True,mfd_mode_surface_orbit=True,
+                momentary_keyboard_rcs=True,focus_loss_release=True,finalized_release_samples=released,mouse_events=inputs)
             (out/'mouse-verification.json').write_text(json.dumps(report,indent=2)+'\n');print(json.dumps(report,indent=2))
         finally:
-            if process.poll() is None:process.terminate();process.wait(timeout=10)
+            if process.poll() is None:
+                current=owned(process.pid)
+                if current:
+                    key(current,'Escape',True)
+                    try:process.wait(timeout=3)
+                    except subprocess.TimeoutExpired:process.terminate();process.wait(timeout=10)
+                else:process.terminate();process.wait(timeout=10)
             x.XCloseDisplay(display)
 if __name__=='__main__':main()
