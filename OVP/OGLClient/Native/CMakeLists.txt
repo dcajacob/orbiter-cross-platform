@@ -81,3 +81,15 @@ foreach(notice "${glm_SOURCE_DIR}/copying.txt" "${freetype_SOURCE_DIR}/docs/FTL.
     get_filename_component(component "${parent}" NAME)
     configure_file("${notice}" "${native_notices}/${component}-${name}" COPYONLY)
 endforeach()
+
+set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS "${ORBITER_ENGINE_BUILD}/native-sdk/OrbiterNativeBuild.h")
+file(STRINGS "${ORBITER_ENGINE_BUILD}/native-sdk/OrbiterNativeBuild.h" cockpit_define
+    REGEX "^#define ORBITER_BUILD_NATIVE_COCKPIT 1$")
+if(cockpit_define)
+    find_package(X11 REQUIRED)
+    target_include_directories(orbiter_ogl_native PRIVATE ${X11_INCLUDE_DIR} ${X11_Xrandr_INCLUDE_PATH})
+    target_link_libraries(orbiter_ogl_native PRIVATE X11::X11)
+    target_sources(orbiter_ogl_native PRIVATE
+        "${imgui_SOURCE_DIR}/backends/imgui_impl_glfw.cpp"
+        "${imgui_SOURCE_DIR}/backends/imgui_impl_opengl3.cpp")
+endif()

@@ -453,3 +453,39 @@ full frames and MFD textures. Local artifact SHA256 verification and comparison
 also pass. The producer, artifacts and per-file hashes are in
 `Tests/Production/CockpitUI/Reference`. Native UI integration and additional
 menu/focus coverage remain pending.
+
+### Native selection and parameter input candidate
+
+The engine owns one ImGui CPU context and the original Select/InputBox objects.
+The separate renderer uses the pinned GLFW and OpenGL3 backends, with the
+original styling and fonts. Keyboard capture follows the original dialog and
+focus policy. Mouse capture precedes Pane routing, and release clears camera
+capture even when a popup owns the mouse. Backend shutdown precedes context
+shutdown. The icon font buffer is atlas-owned to repair the inherited 426,112
+byte allocation leak from file loading with borrowed-buffer ownership.
+
+Three local native cases pass against the preserved original Windows UI
+captures. Inputs and popup state are exact, numerical and projected-overlay
+errors are zero, all MFD readbacks have SSIM 1.0, and popup SSIM is at least
+0.9955073. Full-frame SSIM is at least 0.9999420. Repeat frames and MFD pixels are
+exact. The native replay uses the same 120 ms wall-clock delay as the original
+capture driver so the original popup fade runs on comparable timing. Numerical
+step size and image budgets retain their frozen values.
+
+A separate actual X11 test passes target typing, Sync parameter entry,
+cancellation, typing without flight thrust, and return to flight controls.
+The existing RCS/MFD mouse regression passes with 150 finalized release samples.
+The default-engine keyboard/lifecycle regression passes with 424 finalized
+release samples. Twenty ASan/UBSan GUI sessions also shut down successfully with
+an input dialog open. After the font ownership repair, LSan reports two remaining
+allocations totaling 112 bytes per context, or 2,240 bytes across
+20 contexts. Live process mappings place both allocation callers in the system
+Gallium library at offsets `0xef1ba0` and `0xef1b89`. Hosted verification remains
+pending.
+
+The test resource helper stages the hash-verified original manuscript font from
+the existing source tree for disposable tests. General asset staging continues
+to exclude that publication-restricted font. Packaged font distribution remains
+a release dependency. [Local UI evidence](CockpitUIVerification.json) records
+this candidate. Full Phase 6 acceptance still requires broader menu/focus and
+Delta-glider/DG-S cockpit and systems coverage.

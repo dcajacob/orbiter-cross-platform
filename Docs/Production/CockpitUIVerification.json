@@ -1,0 +1,135 @@
+{
+  "status": "passed",
+  "cases": {
+    "orbit_target_name": {
+      "ui": {
+        "exact_inputs": true,
+        "exact_popup_state": true,
+        "popup_ssim": 0.9955465368127345
+      },
+      "comparison": {
+        "maxima": {
+          "position_m": 0.0,
+          "velocity_m_s": 0.0,
+          "rotation_rad": 0.0,
+          "angular_velocity_rad_s": 0.0,
+          "mjd_days": 0.0,
+          "propellant_fraction": 0.0
+        },
+        "identical_display_text": true,
+        "identical_hud_atlas_updates": true,
+        "overlay_pixel_error": 0.0,
+        "ssim": {
+          "20": 0.9999628115425521,
+          "50": 0.9999991241682158
+        }
+      },
+      "mfd_images": {
+        "mfd-0-20": 1.0,
+        "mfd-1-20": 1.0,
+        "mfd-0-50": 1.0,
+        "mfd-1-50": 1.0
+      }
+    },
+    "sync_list_length": {
+      "ui": {
+        "exact_inputs": true,
+        "exact_popup_state": true,
+        "popup_ssim": 0.9955608928403425
+      },
+      "comparison": {
+        "maxima": {
+          "position_m": 0.0,
+          "velocity_m_s": 0.0,
+          "rotation_rad": 0.0,
+          "angular_velocity_rad_s": 0.0,
+          "mjd_days": 0.0,
+          "propellant_fraction": 0.0
+        },
+        "identical_display_text": true,
+        "identical_hud_atlas_updates": true,
+        "overlay_pixel_error": 0.0,
+        "ssim": {
+          "20": 0.999962577379173,
+          "50": 0.9999991241682158
+        }
+      },
+      "mfd_images": {
+        "mfd-0-20": 1.0,
+        "mfd-1-20": 1.0,
+        "mfd-0-50": 1.0,
+        "mfd-1-50": 1.0
+      }
+    },
+    "input_cancel": {
+      "ui": {
+        "exact_inputs": true,
+        "exact_popup_state": true,
+        "popup_ssim": 0.9955073294869738
+      },
+      "comparison": {
+        "maxima": {
+          "position_m": 0.0,
+          "velocity_m_s": 0.0,
+          "rotation_rad": 0.0,
+          "angular_velocity_rad_s": 0.0,
+          "mjd_days": 0.0,
+          "propellant_fraction": 0.0
+        },
+        "identical_display_text": true,
+        "identical_hud_atlas_updates": true,
+        "overlay_pixel_error": 0.0,
+        "ssim": {
+          "20": 0.9999420442577097,
+          "50": 0.9999991241682158
+        }
+      },
+      "mfd_images": {
+        "mfd-0-20": 1.0,
+        "mfd-1-20": 1.0,
+        "mfd-0-50": 1.0,
+        "mfd-1-50": 1.0
+      }
+    }
+  },
+  "scope": "Original native selection/input dialogs, three frozen Windows cases; broader menu/focus coverage and DG/DG-S remain incomplete",
+  "reference_run": 41541262748,
+  "configuration": "Debug",
+  "snapshot": "b04de859bd308c37d71888c37d71d776223c60644143281f28134610e8bbddf8",
+  "hosted_status": "pending",
+  "real_window": {
+    "status": "passed",
+    "target": "ISS",
+    "parameter_entry": true,
+    "parameter_cancel": true,
+    "text_captures_flight_key": true,
+    "flight_resumes_after_dialog": true,
+    "lifecycle": {
+      "rendered_frames": 102,
+      "successful_presents": 102,
+      "context_deleted": true
+    }
+  },
+  "sanitizers": {
+    "owned_font_bytes_before": 426112,
+    "owned_font_bytes_after": 0,
+    "remaining_bytes_per_context": 112,
+    "remaining_allocations_per_context": 2,
+    "remaining_attribution": "Both allocation callers map to libgallium-26.0.8-1ubuntu0.3.so, offsets 0xef1ba0 and 0xef1b89, using the live test process mappings",
+    "context_cycles": 20,
+    "cycle_remaining_bytes": 2240,
+    "cycle_remaining_allocations": 40,
+    "access_or_undefined_behavior_errors": 0,
+    "leak_detection": "enabled, no suppressions; LSAN_OPTIONS=exitcode=0 only permits functional completion",
+    "final_snapshot": "d3107b031a1353c6bb301f9a742ec0ee10ac4638df74a4a3e77ea427218af47c"
+  },
+  "evidence": {
+    "out/phase6-ui-comparison-3/native-ui-report.json": "c7a18910ebb13a9cfd8dfa7039ee8f14db55b42f0481981f27dd3a45add39312",
+    "out/phase6-ui-window-4/ui-verification.json": "829850cdc56411a7dbd78273672ade1e9409c7b4595c5bdbf8c18b63abe40930",
+    "out/phase6-ui-asan-window-2/console.log": "85dd2e8872097d822762c1353c7f3bd5936f8492e91a6053426c7e131ab7453b",
+    "out/phase6-ui-asan-cycles/console.log": "ab5060b01c51caeda3156be8cee9bd0864e8e4bcfc70d786cd7b114fe2aa4935",
+    "out/phase6-ui-asan-mapped-2/console.log": "01a2e19563b6ccb08d5be94108b4615b844a92eddde3de9c91f6934988090f1c",
+    "out/phase6-ui-asan-mapped-2/loaded-maps.txt": "9bcfdb79674499f3e98d82a244865370b2f1ddcf3d4977721557173d69b99def",
+    "out/phase6-ui-asan-mapped-2/ui-verification.json": "e252f55aa8189b9732cc931b5e6b0dc1160abfdbe30a0c49f2efe85829982e5a"
+  }
+}

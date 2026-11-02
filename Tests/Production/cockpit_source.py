@@ -32,6 +32,11 @@ def restore_geometry(name,current,original):
     return current
 
 def verify():
+    original_dialogs = subprocess.check_output(['git','-C',str(ROOT),'show',BASE+':Src/Orbiter/DlgMgr.cpp']).decode().replace('\r\n','\n')
+    style = original_dialogs[original_dialogs.index('static void ApplyGlowTheme'):original_dialogs.index('void DialogManager::InitImGui()')]
+    native_dialogs = raw('Src/Orbiter/Production/NativeCockpitGui.cpp')
+    native_style = native_dialogs[native_dialogs.index('static void ApplyGlowTheme'):native_dialogs.index('std::unique_ptr<Select> selection;')]
+    equal(style.strip(),native_style.strip(),'Original cockpit GUI colors, geometry and styling')
     services=windows(raw('Src/Orbiter/Production/CockpitServices.h'))
     equal('''#ifndef ORBITER_PRODUCTION_COCKPIT_SERVICES_H
 #define ORBITER_PRODUCTION_COCKPIT_SERVICES_H

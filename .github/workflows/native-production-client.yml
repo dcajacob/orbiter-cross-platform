@@ -129,6 +129,8 @@ jobs:
           cmake -S OVP/OGLClient/Native -B out/native-cockpit-renderer -G Ninja -DCMAKE_BUILD_TYPE=${{ matrix.configuration }} -DORBITER_ENGINE_BUILD="$PWD/out/native-cockpit-engine" -DORBITER_RENDERER_DEPENDENCIES="$PWD/out/ogl-dependencies" -DGLFW_BUILD_WAYLAND=OFF 2>&1 | tee native-cockpit-renderer-configure.log
           cmake --build out/native-cockpit-renderer --parallel 2 2>&1 | tee native-cockpit-renderer-build.log
           python3 -B Tests/Production/NativeScene/module_exports.py out/native-cockpit-engine/NativeModules/Graphics/OGLClient.so
+      - name: Stage the original manuscript font for disposable cockpit tests
+        run: python3 -B Tests/Production/CockpitUI/prepare_fonts.py --assets out/scene-resources
       - name: Verify all ten original native stock MFD modes and HUD against frozen Windows
         shell: bash
         run: |
@@ -146,6 +148,17 @@ jobs:
         run: |
           set -euo pipefail
           xvfb-run -a -s '-screen 0 1920x1080x24' env LIBGL_ALWAYS_SOFTWARE=1 GALLIUM_DRIVER=llvmpipe python3 -B Tests/Production/CockpitControls/mouse_smoke.py --executable out/native-cockpit-engine/orbiter-production --assets out/scene-resources --data out/data --modules out/native-cockpit-engine/NativeModules --planets out/planets --output out/native-cockpit-mouse 2>&1 | tee native-cockpit-mouse.log
+      - name: Verify original selection and input dialogs against frozen Windows
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 -B Tests/Production/CockpitUI/frozen_ui.py --cache out/cockpit-ui-cache --output out/frozen-cockpit-ui
+          xvfb-run -a -s '-screen 0 1920x1080x24' env LIBGL_ALWAYS_SOFTWARE=1 GALLIUM_DRIVER=llvmpipe python3 -B Tests/Production/CockpitUI/native.py --executable out/native-cockpit-engine/orbiter-production --assets out/scene-resources --data out/data --modules out/native-cockpit-engine/NativeModules --planets out/planets --frozen out/frozen-cockpit-ui --configuration ${{ matrix.configuration }} --output out/native-cockpit-ui 2>&1 | tee native-cockpit-ui.log
+      - name: Verify actual dialog typing, parameter cancellation and flight input capture
+        shell: bash
+        run: |
+          set -euo pipefail
+          xvfb-run -a -s '-screen 0 1920x1080x24' env LIBGL_ALWAYS_SOFTWARE=1 GALLIUM_DRIVER=llvmpipe python3 -B Tests/Production/CockpitUI/mouse_smoke.py --executable out/native-cockpit-engine/orbiter-production --assets out/scene-resources --data out/data --modules out/native-cockpit-engine/NativeModules --planets out/planets --output out/native-cockpit-ui-window 2>&1 | tee native-cockpit-ui-window.log
       - uses: actions/upload-artifact@v7
         if: always()
         with:
@@ -169,8 +182,11 @@ jobs:
             out/native-cockpit-evidence/**
             out/native-cockpit-controls/**
             out/native-cockpit-mouse/**
+            out/native-cockpit-ui/**
+            out/native-cockpit-ui-window/**
             out/native-cockpit-engine/CMakeCache.txt
             out/native-cockpit-engine/native-sdk/OrbiterNativeBuild.h
             out/native-cockpit-renderer/CMakeCache.txt
             out/scene-resources/resources.json
+            out/scene-resources/cockpit-test-font.json
             out/native-engine/NativeModules/Graphics/Licenses/**

@@ -36,6 +36,7 @@
 #ifdef ORBITER_NATIVE_COCKPIT
 #include "Pane.h"
 #include "Select.h"
+#include "NativeCockpitUi.h"
 #include "CockpitSystemClock.h"
 #include "CockpitServices.h"
 #endif
@@ -86,7 +87,7 @@ struct Runtime final:BodyServices,RigidBodyServices,SurfaceServices,NavigationSe
     FlightControls controls;FlightReplay replay;FlightInput input;
 #ifdef ORBITER_NATIVE_COCKPIT
     std::unique_ptr<Pane> cockpit;
-    bool instrumentResources=false,cockpitObserved=false;
+    bool instrumentResources=false,cockpitObserved=false,guiCreated=false;
     std::ofstream cockpitState;
     CockpitSystemClock cockpitClock;
     unsigned paneMouseCapture=0;
@@ -114,7 +115,7 @@ struct Runtime final:BodyServices,RigidBodyServices,SurfaceServices,NavigationSe
         throw std::invalid_argument("Unknown native mouse event");
     }
     bool Mouse(const RenderMouseEvent& mouse) {
-        if(cockpitMouse.is_open())cockpitMouse<<inputTick<<','<<MouseName(mouse.action)<<','<<mouse.x<<','<<mouse.y<<'\n';
+        if(cockpitMouse.is_open()){cockpitMouse<<inputTick<<','<<MouseName(mouse.action)<<','<<mouse.x<<','<<mouse.y<<'\n';cockpitMouse.flush();}
         // Original Orbiter::MouseEvent excludes movement before Pane dispatch.
         if(mouse.action==RenderMouseAction::Move)return false;
         oapi::UInt event=0;oapi::UInt32 state=0;unsigned button=0;bool down=false;
@@ -130,10 +131,11 @@ struct Runtime final:BodyServices,RigidBodyServices,SurfaceServices,NavigationSe
             break;
         case RenderMouseAction::Move:break;
         }
+        if(!down && button)paneMouseCapture&=~button;
+        if(CockpitGuiCapturesMouse())return true;
         bool consumed=running && cockpit->ProcessMouse_OnRunning(event,state,mouse.x,mouse.y,input.keys.data());
         if(!consumed)consumed=cockpit->ProcessMouse_System(event,state,mouse.x,mouse.y,input.keys.data());
         if(down && consumed)paneMouseCapture|=button;
-        if(!down && button)paneMouseCapture&=~button;
         return consumed;
     }
     void CockpitSnapshot() {
@@ -146,6 +148,7 @@ struct Runtime final:BodyServices,RigidBodyServices,SurfaceServices,NavigationSe
         cockpitState<<','<<v->GetMeshCount()<<','<<v->GetThrusterCount();
         if(observeControls)cockpitState<<','<<v->GetAttitudeMode();
         cockpitState<<'\n';cockpitState.flush();
+        ObserveCockpitGui(completedTicks);
     }
 #endif
     void EventAt(const char* phase,const char* object,const char* detail,double seconds,double mjd) {
@@ -163,6 +166,34 @@ struct Runtime final:BodyServices,RigidBodyServices,SurfaceServices,NavigationSe
         for(const auto& command:replay.Take(inputTick,phase)) {
             auto* v=render.focus->GetModuleInterface();
 #ifdef ORBITER_NATIVE_COCKPIT
+            if(command.action=="ui") {
+                std::istringstream fields(command.value);std::string event,text,extra;int x,y;
+                if(!(fields>>event>>x>>y>>text) || fields>>extra)throw std::invalid_argument("Invalid declared GUI replay input");
+                if(text=="-")text.clear();
+                if(event=="open_input") {
+                    auto enter=[](void*,char*,void*) { return true; };
+                    auto cancel=[](void*,char* value,void* data) {
+                        auto& self=*static_cast<Runtime*>(data);
+                        std::ofstream out(self.render.evidence/"ui-cancel.txt");out<<value<<'\n';return true;
+                    };
+                    oapiOpenInputBoxEx("Reference input cancellation",enter,cancel,nullptr,20,this);
+                } else {
+                    render.graphics->ReplayGuiInput(event,x,y,text);
+                    if(event=="left_down" || event=="popup_down")Mouse({RenderMouseAction::LeftDown,x,y,0});
+                    if(event=="left_up")Mouse({RenderMouseAction::LeftUp,x,y,0});
+                }
+                if(std::filesystem::is_regular_file(render.evidence/"ui-evidence.enabled")) {
+                    const auto path=render.evidence/"ui-inputs.csv";
+                    const bool exists=std::filesystem::exists(path);
+                    std::ofstream out(path,std::ios::app);
+                    if(!exists)out<<"tick,event,x,y,text_hex\n";
+                    out<<inputTick<<','<<event<<','<<x<<','<<y<<',';
+                    static const char hex[]="0123456789abcdef";
+                    for(unsigned char c:text)out<<hex[c>>4]<<hex[c&15];
+                    out<<'\n';
+                }
+                continue;
+            }
             if(command.action=="mouse") {
                 std::istringstream fields(command.value);std::string action,extra;int x,y;
                 if(!(fields>>action>>x>>y) || fields>>extra || x<0 || y<0 || x>=cockpit->Width() || y>=cockpit->Height())
@@ -319,6 +350,11 @@ struct Runtime final:BodyServices,RigidBodyServices,SurfaceServices,NavigationSe
         if(finished)return;
         if(render.graphics)render.graphics->CloseSession();
 #ifdef ORBITER_NATIVE_COCKPIT
+        if (guiCreated) {
+            render.graphics->ShutdownGui();
+            DestroyCockpitGui();
+            guiCreated=false;
+        }
         cockpit.reset();render.cockpitPane=nullptr;
         if(instrumentResources){Instrument::GlobalExit(render.graphics);instrumentResources=false;}
         // Match the production Windows cockpit shutdown order while the
@@ -411,8 +447,8 @@ struct Runtime final:BodyServices,RigidBodyServices,SurfaceServices,NavigationSe
         mesh.error=[](void*,const char* text){throw std::runtime_error(text);};mesh.allocation=[](void*,const char*,int){};BindMeshServices(mesh);
 #ifdef ORBITER_NATIVE_COCKPIT
         cockpit=std::make_unique<Pane>(render.graphics,1280,720,32);render.cockpitPane=cockpit.get();
-        // Selection/input/help remain unbound until their real UI frame and
-        // input paths are integrated. Requests fail explicitly in the services.
+        CreateCockpitGui();guiCreated=true;
+        render.graphics->InitGui();
         static bool modesRegistered=false;if(!modesRegistered){Instrument::RegisterBuiltinModes();modesRegistered=true;}
         Instrument::GlobalInit(render.graphics);instrumentResources=true;
 #endif
@@ -701,18 +737,21 @@ int main(int argc,char** argv) {
         std::map<std::string,std::string> arguments;
         for(int i=1;i<argc;++i) {
             std::string name=argv[i];
-            if(name=="--help") {std::cout<<"orbiter-production --assets PATH --data PATH --modules PATH --planets PATH --config PATH --scenario PATH [--keymap PATH --save PATH --replay PATH --evidence PATH --fixed-step S --ticks N --render-every N --frames N --sessions N --run]\n";return 0;}
+            if(name=="--help") {std::cout<<"orbiter-production --assets PATH --data PATH --modules PATH --planets PATH --config PATH --scenario PATH [--keymap PATH --save PATH --replay PATH --evidence PATH --fixed-step S --ticks N --render-every N --frames N --sessions N --frame-delay-ms N --run]\n";return 0;}
             if(name.rfind("--",0)!=0 || arguments.count(name))throw std::runtime_error("Invalid or duplicate argument: "+name);
             if(name=="--run"){arguments[name]="1";continue;}
             if(i+1==argc || std::string(argv[i+1]).rfind("--",0)==0)throw std::runtime_error("Argument value missing: "+name);
             arguments[name]=argv[++i];
         }
-        const std::vector<std::string> allowed={"--assets","--data","--modules","--planets","--config","--scenario","--evidence","--frames","--fixed-step","--run","--capture-time","--keymap","--save","--replay","--ticks","--render-every","--sessions","--joystick-throttle-axis","--joystick-twist-axis"};
+        const std::vector<std::string> allowed={"--assets","--data","--modules","--planets","--config","--scenario","--evidence","--frames","--fixed-step","--run","--capture-time","--keymap","--save","--replay","--ticks","--render-every","--sessions","--joystick-throttle-axis","--joystick-twist-axis","--frame-delay-ms"};
         for(const auto& entry:arguments)if(std::find(allowed.begin(),allowed.end(),entry.first)==allowed.end())throw std::runtime_error("Unknown argument: "+entry.first);
         for(const char* name:{"--assets","--data","--modules","--planets","--config","--scenario"})if(!arguments.count(name))throw std::runtime_error(std::string("Required argument missing: ")+name);
         const auto absolute=[&](const char* name){return std::filesystem::absolute(arguments.at(name));};
         auto integer=[&](const char* name,int fallback){if(!arguments.count(name))return fallback;double n=FlightNumber(arguments.at(name));if(n<0 || n>10000000 || n!=int(n))throw std::runtime_error(std::string("Invalid integer: ")+name);return int(n);};
         const int frames=integer("--frames",0),ticks=integer("--ticks",0),renderEvery=integer("--render-every",1),sessions=integer("--sessions",1);
+        const int frameDelay=integer("--frame-delay-ms",0);
+        if(frameDelay && (!frames || !arguments.count("--replay") || frameDelay>1000))
+            throw std::runtime_error("Frame delay requires a bounded frame replay and at most 1000 ms");
         const double fixed=arguments.count("--fixed-step")?FlightNumber(arguments.at("--fixed-step")):1.0/60.0;
         const double capture=arguments.count("--capture-time")?FlightNumber(arguments.at("--capture-time")):-1;
         if(fixed<=0 || (arguments.count("--capture-time") && capture<0) || !renderEvery || !sessions || (ticks && frames))throw std::runtime_error("Invalid frame/step/capture/session limits");
@@ -747,14 +786,15 @@ int main(int argc,char** argv) {
 #ifdef ORBITER_NATIVE_COCKPIT
                     bool wheelConsumed=false;
                     for(const auto& mouse:input.mouse) {const bool consumed=application.Mouse(mouse);if(mouse.action==RenderMouseAction::Wheel && consumed)wheelConsumed=true;}
-                    if(!application.paneMouseCapture){application.render.camera->ShiftPhi(input.yaw);application.render.camera->ShiftTheta(input.pitch);}
-                    if(input.zoom && !wheelConsumed)application.render.camera->ChangeDist(std::pow(1.1,-input.zoom));
+                    if(!application.paneMouseCapture && !CockpitGuiCapturesMouse()){application.render.camera->ShiftPhi(input.yaw);application.render.camera->ShiftTheta(input.pitch);}
+                    if(input.zoom && !wheelConsumed && !CockpitGuiCapturesMouse())application.render.camera->ChangeDist(std::pow(1.1,-input.zoom));
 #else
                     application.render.camera->ShiftPhi(input.yaw);application.render.camera->ShiftTheta(input.pitch);
                     if(input.zoom)application.render.camera->ChangeDist(std::pow(1.1,-input.zoom));
 #endif
                 }
                 if(input.width>0 && input.height>0){application.render.graphics->Resize(input.width,input.height);application.render.camera->ResizeViewport(input.width,input.height);}
+                if(frameDelay)std::this_thread::sleep_for(std::chrono::milliseconds(frameDelay));
                 if(frames || ticks) {
                     for(int n=0;n<(ticks?renderEvery:1) && application.active && !application.reloadPending && (!ticks || application.inputTick<unsigned(ticks));++n)application.Step(fixed);
                 } else {
@@ -766,9 +806,14 @@ int main(int argc,char** argv) {
                 }
                 if(application.reloadPending) {if(!std::filesystem::is_regular_file(save)){std::cerr<<"No saved scenario exists: "<<save<<'\n';application.reloadPending=false;}else{scenario=save;reload=true;break;}}
                 if(input.width>0 && input.height>0) {
+#ifdef ORBITER_NATIVE_COCKPIT
+                    application.render.graphics->NewGuiFrame();
+                    BeginCockpitGuiFrame();
+#endif
                     application.render.paused=!application.running;application.render.graphics->Status(application.Status());application.render.graphics->Render();
 #ifdef ORBITER_NATIVE_COCKPIT
                     application.cockpit->Draw();
+                    application.render.graphics->RenderGui();
 #endif
                     if(!application.render.graphics->Present())throw std::runtime_error("Native frame presentation failed");++presented;
                 } else std::this_thread::sleep_for(std::chrono::milliseconds(10));

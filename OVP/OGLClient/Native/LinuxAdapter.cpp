@@ -1,5 +1,12 @@
 // Licensed under the MIT License
 #include "glad.h"
+#include "OrbiterNativeBuild.h"
+#if ORBITER_BUILD_NATIVE_COCKPIT
+#include "imgui.h"
+#include "imgui_impl_glfw.h"
+#include "imgui_impl_opengl3.h"
+#include "Production/NativeCockpitUi.h"
+#endif
 #include "OGLClient.h"
 #include "Scene.h"
 #include "Renderer.h"
@@ -133,6 +140,7 @@ const std::map<int,unsigned> keyCodes={
     {GLFW_KEY_KP_DECIMAL,OAPI_KEY_DECIMAL},
     {GLFW_KEY_KP_ENTER,OAPI_KEY_NUMPADENTER}};
 std::vector<FlightKeyEvent> keyEvents;
+bool guiInitialized=false;
 int joystickDevice=-1;float initialThrottle=0,lastThrottle=0;bool armed=false,throttleSeen=false;
 
 void error(int,const char* text) {std::cerr<<"GLFW: "<<text<<'\n';}
@@ -185,9 +193,14 @@ RenderInput OGLClient::Poll()
 {
     glfwPollEvents();RenderInput input;
     input.mouse.swap(mouseEvents);
-    input.close=glfwWindowShouldClose(nativeWindow) || glfwGetKey(nativeWindow,GLFW_KEY_ESCAPE)==GLFW_PRESS;
+    input.close=glfwWindowShouldClose(nativeWindow);
+    bool captureKeyboard=false;
+#if ORBITER_BUILD_NATIVE_COCKPIT
+    captureKeyboard=CockpitGuiCapturesKeyboard();
+#endif
+    input.close=input.close || (!captureKeyboard && glfwGetKey(nativeWindow,GLFW_KEY_ESCAPE)==GLFW_PRESS);
     glfwGetFramebufferSize(nativeWindow,&input.width,&input.height);
-    if(glfwGetWindowAttrib(nativeWindow,GLFW_FOCUSED)) {
+    if(glfwGetWindowAttrib(nativeWindow,GLFW_FOCUSED) && !captureKeyboard) {
         for(auto pair:keyCodes)if(glfwGetKey(nativeWindow,pair.first)==GLFW_PRESS)input.flight.keys[pair.second]=char(0x80);
         input.flight.events.swap(keyEvents);
         auto& device=joystickDevice;
@@ -286,4 +299,66 @@ oapi::SdkPoint OGLClient::CursorPosition() const {
     int width,height,fbWidth,fbHeight;glfwGetWindowSize(nativeWindow,&width,&height);glfwGetFramebufferSize(nativeWindow,&fbWidth,&fbHeight);
     require(width>0 && height>0,"Native cockpit cursor requires positive window dimensions");
     return {std::int32_t(x*fbWidth/width),std::int32_t(y*fbHeight/height)};
+}
+
+void OGLClient::InitGui() {
+#if ORBITER_BUILD_NATIVE_COCKPIT
+    require(ImGui::GetCurrentContext()!=nullptr, "Engine cockpit GUI context missing");
+    require(ImGui_ImplGlfw_InitForOpenGL(nativeWindow, true), "GLFW cockpit GUI initialization failed");
+    if (!ImGui_ImplOpenGL3_Init("#version 330 core")) {
+        ImGui_ImplGlfw_Shutdown();
+        throw std::runtime_error("OpenGL cockpit GUI initialization failed");
+    }
+    guiInitialized=true;
+#else
+    throw std::runtime_error("This renderer was built without cockpit GUI support");
+#endif
+}
+void OGLClient::NewGuiFrame() {
+#if ORBITER_BUILD_NATIVE_COCKPIT
+    require(guiInitialized, "Cockpit GUI backend missing");
+    ImGui_ImplOpenGL3_NewFrame();
+    ImGui_ImplGlfw_NewFrame();
+#else
+    throw std::runtime_error("This renderer was built without cockpit GUI support");
+#endif
+}
+void OGLClient::RenderGui() {
+#if ORBITER_BUILD_NATIVE_COCKPIT
+    require(guiInitialized, "Cockpit GUI backend missing");
+    ImGui::Render();
+    ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+#else
+    throw std::runtime_error("This renderer was built without cockpit GUI support");
+#endif
+}
+void OGLClient::ShutdownGui() {
+#if ORBITER_BUILD_NATIVE_COCKPIT
+    if (guiInitialized) {
+        ImGui_ImplOpenGL3_Shutdown();
+        ImGui_ImplGlfw_Shutdown();
+        guiInitialized=false;
+    }
+#endif
+}
+
+void OGLClient::ReplayGuiInput(const std::string& event,int x,int y,const std::string& text) {
+#if ORBITER_BUILD_NATIVE_COCKPIT
+    require(guiInitialized,"Replay requires an initialized cockpit GUI");
+    if(event=="move" || event=="left_down" || event=="popup_down" || event=="left_up") {
+        glfwSetCursorPos(nativeWindow,x,y);
+        ImGui_ImplGlfw_CursorPosCallback(nativeWindow,x,y);
+        if(event!="move") ImGui_ImplGlfw_MouseButtonCallback(nativeWindow,GLFW_MOUSE_BUTTON_LEFT,event=="left_up"?GLFW_RELEASE:GLFW_PRESS,0);
+    } else if(event=="key_down" || event=="key_up") {
+        require(x==13,"UI replay currently supports the declared Enter key");
+        ImGui_ImplGlfw_KeyCallback(nativeWindow,GLFW_KEY_ENTER,glfwGetKeyScancode(GLFW_KEY_ENTER),event=="key_down"?GLFW_PRESS:GLFW_RELEASE,0);
+    } else if(event=="text") {
+        for(unsigned char code:text) {
+            require(code>0 && code<128,"UI replay requires declared ASCII text");
+            ImGui_ImplGlfw_CharCallback(nativeWindow,code);
+        }
+    } else throw std::invalid_argument("Unknown GUI replay event");
+#else
+    throw std::runtime_error("This renderer was built without cockpit GUI support");
+#endif
 }

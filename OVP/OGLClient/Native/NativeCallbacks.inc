@@ -44,3 +44,10 @@ SURFHANDLE clbkLoadSurface(const char* name,oapi::UInt32 flags,bool) override {r
 SURFHANDLE clbkCreateTexture(oapi::UInt32 w,oapi::UInt32 h) override {return CreateTexture(int(w),int(h));}
 bool clbkGetSurfaceSize(SURFHANDLE surface,oapi::UInt32* width,oapi::UInt32* height) override {int w=0,h=0;const bool ok=GetSurfaceSize(surface,&w,&h);if(ok){*width=w;*height=h;}return ok;}
 bool clbkScaleBlt(SURFHANDLE t,oapi::UInt32 x,oapi::UInt32 y,oapi::UInt32 w,oapi::UInt32 h,SURFHANDLE s,oapi::UInt32 sx,oapi::UInt32 sy,oapi::UInt32 sw,oapi::UInt32 sh,oapi::UInt32 flags) const override {return ScaleBlt(t,int(x),int(y),int(w),int(h),s,int(sx),int(sy),int(sw),int(sh),int(flags));}
+
+void InitGui() override;
+void NewGuiFrame() override;
+void RenderGui() override;
+void ShutdownGui() override;
+
+void ReplayGuiInput(const std::string&,int,int,const std::string&) override;

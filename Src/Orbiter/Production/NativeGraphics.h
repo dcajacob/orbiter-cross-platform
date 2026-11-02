@@ -56,6 +56,11 @@ public:
     virtual void PostCreation()=0;
     virtual void NewVessel(OBJHANDLE)=0;
     virtual void DeleteVessel(OBJHANDLE)=0;
+    virtual void ReplayGuiInput(const std::string&,int,int,const std::string&)=0;
+    virtual void InitGui()=0;
+    virtual void NewGuiFrame()=0;
+    virtual void RenderGui()=0;
+    virtual void ShutdownGui()=0;
     virtual void Render()=0;
     virtual bool Present()=0;
     virtual void CloseSession()=0;

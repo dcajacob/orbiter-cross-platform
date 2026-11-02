@@ -32,6 +32,8 @@ struct VESSELPARAM;
 #include "OrbiterLightData.h"
 #include "OrbiterCameraData.h"
 #include "VesselAPI.h"
+OAPIFUNC void oapiOpenInputBox(char*,bool(*)(void*,char*,void*),char* = nullptr,int = 20,void* = nullptr);
+OAPIFUNC void oapiOpenInputBoxEx(const char*,bool(*)(void*,char*,void*),bool(*)(void*,char*,void*),char* = nullptr,int = 20,void* = nullptr,oapi::UInt32 = 0);
 OAPIFUNC double oapiGetInducedDrag(double cl,double aspect,double efficiency);
 OAPIFUNC double oapiGetWaveDrag(double mach,double m1,double m2,double m3,double maximum);
 OAPIFUNC OBJHANDLE oapiCreateVessel(const char*,const char*,const VESSELSTATUS&);

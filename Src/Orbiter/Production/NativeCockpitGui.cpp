@@ -2,6 +2,10 @@
 // Licensed under the MIT License
 // Native dialog services surrounding the original Select/InputBox algorithms.
 #include "Select.h"
+#include "Config.h"
+#include "NativeCockpitUi.h"
+#include <memory>
+#include <fstream>
 #include "CockpitGuiExports.h"
 #include "NativeGraphics.h"
 #include "imgui_internal.h"
@@ -70,4 +74,209 @@ namespace ImGui {
 		ImGui::EndPopup();
 	}
 
+}
+
+namespace {
+static void ApplyGlowTheme(const ImVec4& accent)
+{
+    ImGuiStyle& style = ImGui::GetStyle();
+    ImVec4* colors = style.Colors;
+
+    // Base backgrounds
+    const ImVec4 bgDark   = ImVec4(0.02f, 0.03f, 0.05f, 1.0f);
+    const ImVec4 bgMed    = ImVec4(0.07f, 0.08f, 0.12f, 1.0f);
+
+    // Glow layers
+    ImVec4 glowSoft   = ImVec4(accent.x, accent.y, accent.z, 0.20f);
+    ImVec4 glowMedium = ImVec4(accent.x, accent.y, accent.z, 0.35f);
+    ImVec4 glowStrong = ImVec4(accent.x * 1.2f, accent.y * 1.2f, accent.z * 1.2f, 1.0f);
+    ImVec4 title = ImVec4(accent.x * 0.2f, accent.y * 0.2f, accent.z * 0.2f, 1.0f);
+    ImVec4 titleActive = ImVec4(accent.x * 0.35f, accent.y * 0.35f, accent.z * 0.35f, 1.0f);
+
+    // Neon text: bright foreground + soft glow shadow
+    colors[ImGuiCol_Text]         = ImVec4(1, 1, 1, 1);
+    colors[ImGuiCol_TextDisabled] = ImVec4(0.4f, 0.4f, 0.44f, 1);
+
+    // Window backgrounds
+    colors[ImGuiCol_WindowBg] = bgDark;
+    colors[ImGuiCol_ChildBg]  = bgDark;
+    colors[ImGuiCol_PopupBg]  = bgMed;
+
+    // Glow-ish borders
+    colors[ImGuiCol_Border]       = glowMedium;
+    colors[ImGuiCol_BorderShadow] = ImVec4(0,0,0,0);
+
+    // Frames (inputs, checkboxes, sliders)
+    colors[ImGuiCol_FrameBg]        = bgMed;
+    colors[ImGuiCol_FrameBgHovered] = glowSoft;
+    colors[ImGuiCol_FrameBgActive]  = glowMedium;
+
+    // Buttons
+    colors[ImGuiCol_Button]        = glowSoft;
+    colors[ImGuiCol_ButtonHovered] = glowMedium;
+    colors[ImGuiCol_ButtonActive]  = glowStrong;
+
+    // Headers (collapsing header, tree node)
+    colors[ImGuiCol_Header]        = glowSoft;
+    colors[ImGuiCol_HeaderHovered] = glowMedium;
+    colors[ImGuiCol_HeaderActive]  = glowStrong;
+
+    // Checkmark & sliders use bright neon
+    colors[ImGuiCol_CheckMark]       = glowStrong;
+    colors[ImGuiCol_SliderGrab]      = glowMedium;
+    colors[ImGuiCol_SliderGrabActive]= glowStrong;
+
+    // Scrollbar
+    colors[ImGuiCol_ScrollbarBg]          = bgDark;
+    colors[ImGuiCol_ScrollbarGrab]        = glowSoft;
+    colors[ImGuiCol_ScrollbarGrabHovered] = glowMedium;
+    colors[ImGuiCol_ScrollbarGrabActive]  = glowStrong;
+
+    // Separators: bright neon lines
+    colors[ImGuiCol_Separator]        = glowMedium;
+    colors[ImGuiCol_SeparatorHovered] = glowStrong;
+    colors[ImGuiCol_SeparatorActive]  = glowStrong;
+
+    // Title bar
+    colors[ImGuiCol_TitleBg]          = title;
+    colors[ImGuiCol_TitleBgActive]    = titleActive;
+    colors[ImGuiCol_TitleBgCollapsed] = bgDark;
+
+    // Resize grip
+    colors[ImGuiCol_ResizeGrip]        = glowSoft;
+    colors[ImGuiCol_ResizeGripHovered] = glowMedium;
+    colors[ImGuiCol_ResizeGripActive]  = glowStrong;
+
+    // Tabs
+    colors[ImGuiCol_Tab]                = glowSoft;
+    colors[ImGuiCol_TabHovered]         = glowMedium;
+    colors[ImGuiCol_TabActive]          = glowMedium;
+    colors[ImGuiCol_TabUnfocused]       = ImVec4(glowSoft.x, glowSoft.y, glowSoft.z, 0.5f);
+    colors[ImGuiCol_TabUnfocusedActive] = glowMedium;
+
+    style.FrameRounding = 6;
+    style.GrabRounding  = 4;
+    style.WindowRounding = 4;
+
+    style.FrameBorderSize = 1.0f;
+    style.ChildBorderSize = 1.0f;
+    style.WindowBorderSize = 1.0f;
+}
+
+static void ImGuiSetStyle()
+{
+    ImVec4 green = ImVec4(0.0f, 1.0f, 0.0f, 1.0f);
+    ApplyGlowTheme(green);
+
+    ImGuiStyle& style = ImGui::GetStyle();
+    style.WindowMenuButtonPosition = ImGuiDir_Right;
+
+    style.Colors[ImGuiCol_Separator] = style.Colors[ImGuiCol_Button];
+}
+
+
+std::unique_ptr<Select> selection;
+std::unique_ptr<InputBox> inputBox;
+std::ofstream uiEvidence;
+std::ofstream uiFrames;
+}
+
+namespace orbiter::production {
+void CreateCockpitGui() {
+    if (ImGui::GetCurrentContext()) throw std::logic_error("A cockpit GUI context already exists");
+    IMGUI_CHECKVERSION();
+    ImGui::CreateContext();
+    try {
+        auto& context = GetNativeRenderContext();
+        auto& io = ImGui::GetIO();
+        io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
+        // The native client owns one render window, matching the reference client.
+        io.IniFilename = nullptr;
+        ImGuiSetStyle();
+        const auto& fonts = context.configuration->CfgFontPrm;
+        auto load = [&](const char* file, const ImFontConfig* options = nullptr) {
+            auto path = context.programFiles->Resolve(file).string();
+            if (!io.Fonts->AddFontFromFileTTF(path.c_str(), fonts.ImGui_FontSize, options))
+                throw std::runtime_error("Cannot load original cockpit font: " + path);
+        };
+        load(fonts.ImGui_DefaultFontFile);
+        ImFontConfig icons;
+        icons.MergeMode = true;
+        icons.PixelSnapH = true;
+        // AddFontFromFileTTF allocates its input buffer. The atlas must own it
+        // so destroying the GUI releases it instead of cloning and leaking it.
+        icons.FontDataOwnedByAtlas = true;
+        load("Fonts/fa-solid-900.ttf", &icons);
+        load(fonts.ImGui_ConsoleFontFile);
+        load(fonts.ImGui_MonospacedFontFile);
+        load(fonts.ImGui_ManuscriptFontFile);
+        selection = std::make_unique<Select>();
+        inputBox = std::make_unique<InputBox>();
+        context.cockpitSelect = selection.get();
+        context.cockpitInput = inputBox.get();
+        if (std::filesystem::is_regular_file(context.evidence/"ui-evidence.enabled")) {
+            uiEvidence.open(context.evidence/"ui-state.csv");
+            uiFrames.open(context.evidence/"ui-frames.csv");
+            uiEvidence << "tick,popup_hex,x,y,width,height,capture_mouse,capture_keyboard\n";
+        }
+    } catch (...) {
+        DestroyCockpitGui();
+        throw;
+    }
+}
+void DestroyCockpitGui() {
+    if(uiEvidence.is_open())uiEvidence.close();
+    if(uiFrames.is_open())uiFrames.close();
+    inputBox.reset();
+    selection.reset();
+    ImGui::g_popupStates.clear();
+    if (ImGui::GetCurrentContext()) ImGui::DestroyContext();
+}
+void BeginCockpitGuiFrame() {
+    ImGui::NewFrame();
+    const auto& context = GetNativeRenderContext();
+    if (context.configuration->CfgUIPrm.MouseFocusMode != 0 && !ImGui::GetIO().WantCaptureMouse)
+        ImGui::SetWindowFocus(static_cast<const char*>(nullptr));
+    if (selection->IsActive()) selection->Display();
+    if (inputBox->IsActive()) inputBox->Display();
+    ImGui::EndFrame();
+    if(uiFrames.is_open()){uiFrames<<ImGui::GetFrameCount()<<'\n';uiFrames.flush();}
+}
+void ObserveCockpitGui(unsigned tick) {
+    if(!uiEvidence.is_open())return;
+    const auto& io=ImGui::GetIO();
+    bool found=false;
+    for(auto* window:GImGui->Windows) {
+        if(!window->Active || window->Hidden || !(window->Flags & ImGuiWindowFlags_Popup))continue;
+        found=true;
+        uiEvidence<<tick<<',';
+        static const char hex[]="0123456789abcdef";
+        for(const unsigned char* p=reinterpret_cast<const unsigned char*>(window->Name);*p;++p)
+            uiEvidence<<hex[*p>>4]<<hex[*p&15];
+        uiEvidence<<','<<window->Pos.x<<','<<window->Pos.y<<','<<window->Size.x<<','<<window->Size.y
+            <<','<<io.WantCaptureMouse<<','<<io.WantCaptureKeyboard<<'\n';
+    }
+    if(!found)uiEvidence<<tick<<",,0,0,0,0,"<<io.WantCaptureMouse<<','<<io.WantCaptureKeyboard<<'\n';
+    uiEvidence.flush();
+}
+bool CockpitGuiCapturesKeyboard() {
+    if (!ImGui::GetCurrentContext()) return false;
+    const auto& io = ImGui::GetIO();
+    return (selection && selection->IsActive()) || (inputBox && inputBox->IsActive()) ||
+        (io.WantCaptureKeyboard && (GetNativeRenderContext().configuration->CfgUIPrm.MouseFocusMode == 0 || io.WantCaptureMouse));
+}
+bool CockpitGuiCapturesMouse() {
+    return ImGui::GetCurrentContext() && ImGui::GetIO().WantCaptureMouse;
+}
+}
+
+void oapiOpenInputBox(char* title,bool (*callback)(void*,char*,void*),char* buffer,int length,void* data) {
+    auto* input=GetNativeRenderContext().cockpitInput;
+    if(!input)throw std::logic_error("Native input dialog is not initialized");
+    input->Open(title,buffer,length,reinterpret_cast<InputBox::Callbk>(callback),data);
+}
+void oapiOpenInputBoxEx(const char* title,bool (*enter)(void*,char*,void*),bool (*cancel)(void*,char*,void*),char* buffer,int length,void* data,oapi::UInt32 flags) {
+    auto* input=GetNativeRenderContext().cockpitInput;
+    if(!input)throw std::logic_error("Native input dialog is not initialized");
+    input->OpenEx(title,buffer,length,reinterpret_cast<InputBox::Callbk>(enter),reinterpret_cast<InputBox::Callbk>(cancel),data,flags);
 }
