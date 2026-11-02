@@ -1,6 +1,12 @@
 // Copyright (c) Martin Schweiger
 // Licensed under the MIT License
 
+#include "Production/CockpitServices.h"
+#ifndef _WIN32
+#include "Production/CockpitNativeSupport.h"
+#include "Planet.h"
+#endif
+
 #include "Astro.h"
 #include "MfdDocking.h"
 #include "Pane.h"
@@ -22,7 +28,7 @@ struct Instrument_Docking::SavePrm Instrument_Docking::saveprm = {
 	0,Instrument_Docking::NAV,0,0,-1
 };
 
-Instrument_Docking::Instrument_Docking (Pane *_pane, INT_PTR _id, const Spec &spec, Vessel *_vessel, bool restore)
+Instrument_Docking::Instrument_Docking (Pane *_pane, std::intptr_t _id, const Spec &spec, Vessel *_vessel, bool restore)
 : Instrument (_pane, _id, spec, _vessel)
 {
 	int i;
@@ -38,7 +44,7 @@ Instrument_Docking::Instrument_Docking (Pane *_pane, INT_PTR _id, const Spec &sp
 		brush[0] = gc->clbkCreateBrush (col_green2);
 		brush[1] = gc->clbkCreateBrush (col_yellow1);
 		brush[2] = gc->clbkCreateBrush (col_red1);
-		brush[3] = gc->clbkCreateBrush (RGB(255,255,255));
+		brush[3] = gc->clbkCreateBrush (orbiter::production::CockpitColor(255,255,255));
 	} else {
 		for (i = 0; i < 4; i++) brush[i] = 0;
 	}
@@ -89,7 +95,7 @@ void Instrument_Docking::SetupVessel ()
 	}
 }
 
-void Instrument_Docking::SetReference (Vessel *_vessel, DWORD dock)
+void Instrument_Docking::SetReference (Vessel *_vessel, oapi::UInt32 dock)
 {
 	vessel = _vessel;
 	refdock = dock;
@@ -101,7 +107,7 @@ int Instrument_Docking::ProcessMessage (int msg, void *data)
 {
 	struct REFTAG {
 		Vessel *v;
-		DWORD dock;
+		oapi::UInt32 dock;
 	} *ref;
 
 	switch (msg) {
@@ -592,7 +598,7 @@ void Instrument_Docking::DrawArrow(int x0, int y0, int dir, oapi::Sketchpad *skp
 	}
 }
 
-bool Instrument_Docking::KeyBuffered (DWORD key)
+bool Instrument_Docking::KeyBuffered (oapi::UInt32 key)
 {
 	switch (key) {
 	case OAPI_KEY_D:  // docking port
@@ -627,7 +633,7 @@ bool Instrument_Docking::KeyBuffered (DWORD key)
 
 bool Instrument_Docking::ProcessButton (int bt, int event)
 {
-	static const DWORD btkey[6] = { OAPI_KEY_D, OAPI_KEY_N, OAPI_KEY_V, OAPI_KEY_T, OAPI_KEY_S, OAPI_KEY_H };
+	static const oapi::UInt32 btkey[6] = { OAPI_KEY_D, OAPI_KEY_N, OAPI_KEY_V, OAPI_KEY_T, OAPI_KEY_S, OAPI_KEY_H };
 	if (event & PANEL_MOUSE_LBDOWN) {
 		switch(ndock) {
 			case 0:
@@ -674,7 +680,7 @@ int Instrument_Docking::BtnMenu (const MFDBUTTONMENU **menu) const
 
 bool Instrument_Docking::ClbkSelection_Target (Select *menu, int item, char *str, void *data)
 {
-	DWORD i;
+	oapi::UInt32 i;
 	Instrument_Docking *mfd = (Instrument_Docking*)data;
 	Vessel *vessel;
 
@@ -728,7 +734,7 @@ bool Instrument_Docking::SetTarget (char *str)
 	}
 	Vessel *obj = g_psys->GetVessel (name, true);
 	if (!obj) return false;
-	if (bdock && (dock < 1 || (DWORD)dock > obj->nDock())) return false;
+	if (bdock && (dock < 1 || (oapi::UInt32)dock > obj->nDock())) return false;
 	Legacy_ref = obj;
 	Legacy_port = (bdock ? dock : 0) - 1;
 	smode = DIRECT;
@@ -782,16 +788,16 @@ bool Instrument_Docking::ReadParams (ifstream &ifs)
 	for (;;) {
 		if (!ifs.getline (cbuf, 256)) return false;
 		pc = trim_string (cbuf);
-		if (!_strnicmp (pc, "END_MFD", 7)) break;
-		if (!_strnicmp (pc, "NAV", 3)) {
+		if (!orbiter::production::ComparePrefix (pc, "END_MFD", 7)) break;
+		if (!orbiter::production::ComparePrefix (pc, "NAV", 3)) {
 			smode = NAV;
 			sscanf (trim_string (pc+3), "%d", &nv);
-		} else if (!_strnicmp (pc, "VIS", 3)) {
+		} else if (!orbiter::production::ComparePrefix (pc, "VIS", 3)) {
 			smode = VIS;
-		} else if (!_strnicmp (pc, "TARGET", 6)) {
+		} else if (!orbiter::production::ComparePrefix (pc, "TARGET", 6)) {
 			SetTarget (trim_string (pc+6));
 		}
-		else if (!_strnicmp(pc, "SCALE", 5)) {
+		else if (!orbiter::production::ComparePrefix(pc, "SCALE", 5)) {
 			sscanf(trim_string(pc + 5), "%d", &scale);
 		}
 	}

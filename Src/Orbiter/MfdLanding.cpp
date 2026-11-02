@@ -1,6 +1,12 @@
 // Copyright (c) Martin Schweiger
 // Licensed under the MIT License
 
+#include "Production/CockpitServices.h"
+#ifndef _WIN32
+#include "Production/CockpitNativeSupport.h"
+#include "Planet.h"
+#endif
+
 #include "MfdLanding.h"
 #include "Nav.h"
 #include "Astro.h"
@@ -17,7 +23,7 @@ struct Instrument_Landing::SavePrm Instrument_Landing::saveprm = {
 	0, 0
 };
 
-Instrument_Landing::Instrument_Landing (Pane *_pane, INT_PTR _id, const Spec &spec, Vessel *_vessel, bool restore)
+Instrument_Landing::Instrument_Landing (Pane *_pane, std::intptr_t _id, const Spec &spec, Vessel *_vessel, bool restore)
 : Instrument (_pane, _id, spec, _vessel)
 {
 	nv = 0;
@@ -57,7 +63,7 @@ HELPCONTEXT *Instrument_Landing::HelpTopic () const
 	return &DefHelpContext;
 }
 
-bool Instrument_Landing::KeyBuffered (DWORD key)
+bool Instrument_Landing::KeyBuffered (oapi::UInt32 key)
 {
 	switch (key) {
 	case OAPI_KEY_N: // NAV receiver select
@@ -70,7 +76,7 @@ bool Instrument_Landing::KeyBuffered (DWORD key)
 
 bool Instrument_Landing::ProcessButton (int bt, int event)
 {
-	static const DWORD btkey[1] = { OAPI_KEY_N };
+	static const oapi::UInt32 btkey[1] = { OAPI_KEY_N };
 	if (event & PANEL_MOUSE_LBDOWN) {
 		if (bt < 1) return KeyBuffered (btkey[bt]);
 	}
@@ -296,8 +302,8 @@ bool Instrument_Landing::ReadParams (ifstream &ifs)
 	for (;;) {
 		if (!ifs.getline (cbuf, 256)) return false;
 		pc = trim_string (cbuf);
-		if (!_strnicmp (pc, "END_MFD", 7)) break;
-		if (!_strnicmp (pc, "NAV", 3)) {
+		if (!orbiter::production::ComparePrefix (pc, "END_MFD", 7)) break;
+		if (!orbiter::production::ComparePrefix (pc, "NAV", 3)) {
 			sscanf (pc+3, "%d", &nv);
 		}
 	}

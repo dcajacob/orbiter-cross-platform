@@ -1,10 +1,18 @@
 // Copyright (c) Martin Schweiger
 // Licensed under the MIT License
 
+#include "Production/CockpitServices.h"
+#ifndef _WIN32
+#include "Production/CockpitNativeSupport.h"
+#include "Planet.h"
+#endif
+
 #include "MfdComms.h"
 #include "Nav.h"
 #include <stdio.h>
+#ifdef _WIN32
 #include "Orbiter.h"
+#endif
 
 using namespace std;
 
@@ -14,7 +22,7 @@ extern TimeData td;
 // class Instrument_Comms
 // navigation radio manipulation
 
-Instrument_Comms::Instrument_Comms (Pane *_pane, INT_PTR _id, const Spec &spec, Vessel *_vessel)
+Instrument_Comms::Instrument_Comms (Pane *_pane, std::intptr_t _id, const Spec &spec, Vessel *_vessel)
 : Instrument (_pane, _id, spec, _vessel)
 {
 	sel = 0;
@@ -63,7 +71,7 @@ bool Instrument_Comms::Update (double upDTscale)
 
 void Instrument_Comms::UpdateDraw (oapi::Sketchpad *skp)
 {
-	DWORD n;
+	oapi::UInt32 n;
 	int i, sig, len, x = cw/2, y = (3*ch)/2, dy = ch, xx, yy, dd;
 	char cbuf[256];
 	float freq;
@@ -107,7 +115,7 @@ void Instrument_Comms::UpdateDraw (oapi::Sketchpad *skp)
 	DisplayTitle (skp, "NAV Receiver Stack");
 }
 
-bool Instrument_Comms::KeyBuffered (DWORD key)
+bool Instrument_Comms::KeyBuffered (oapi::UInt32 key)
 {
 	switch (key) {
 	case OAPI_KEY_COMMA: // select radio (up)
@@ -158,12 +166,12 @@ bool Instrument_Comms::KeyBuffered (DWORD key)
 	return false;
 }
 
-void Instrument_Comms::SwitchFreq (DWORD line, int step, bool minor)
+void Instrument_Comms::SwitchFreq (oapi::UInt32 line, int step, bool minor)
 {
 	if (minor) {
-		DWORD ch = (line < vessel->nnav ? vessel->GetNavChannel(line) : vessel->GetXpdrChannel());
-		DWORD minor = ch % 20;
-		DWORD major = ch / 20;
+		oapi::UInt32 ch = (line < vessel->nnav ? vessel->GetNavChannel(line) : vessel->GetXpdrChannel());
+		oapi::UInt32 minor = ch % 20;
+		oapi::UInt32 major = ch / 20;
 		if (step > 0) minor = (minor < 19 ? minor+1 : 0);
 		else          minor = (minor >  0 ? minor-1 : 19);
 		step = major*20 + minor - ch;
@@ -174,7 +182,7 @@ void Instrument_Comms::SwitchFreq (DWORD line, int step, bool minor)
 
 bool Instrument_Comms::ProcessButton (int bt, int event)
 {
-	static const DWORD btkey[8] = { OAPI_KEY_COMMA, OAPI_KEY_PERIOD, OAPI_KEY_LBRACKET, OAPI_KEY_MINUS,
+	static const oapi::UInt32 btkey[8] = { OAPI_KEY_COMMA, OAPI_KEY_PERIOD, OAPI_KEY_LBRACKET, OAPI_KEY_MINUS,
 		OAPI_KEY_RBRACKET, OAPI_KEY_EQUALS, OAPI_KEY_Z, OAPI_KEY_X
 	};
 	if (event & PANEL_MOUSE_LBDOWN) {

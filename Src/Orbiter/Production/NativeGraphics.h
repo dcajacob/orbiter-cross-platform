@@ -25,8 +25,16 @@ public:
     oapi::Pen* clbkCreatePen(int style,int width,oapi::UInt32 color) {return CreatePenResource(style,width,color);}
     void clbkReleaseFont(oapi::Font* font) {ReleaseFontResource(font);}
     void clbkReleasePen(oapi::Pen* pen) {ReleasePenResource(pen);}
+    oapi::Brush* clbkCreateBrush(oapi::UInt32 color) {return CreateBrushResource(color);}
+    void clbkReleaseBrush(oapi::Brush* brush) {ReleaseBrushResource(brush);}
     oapi::Sketchpad* clbkGetSketchpad(SURFHANDLE surface) {return AcquireSketchpad(surface);}
 
+    void clbkReleaseSketchpad(oapi::Sketchpad* pad) {ReleaseSketchpadResource(pad);}
+    virtual SURFHANDLE clbkCreateSurfaceEx(oapi::UInt32,oapi::UInt32,oapi::UInt32)=0;
+    virtual oapi::UInt32 clbkGetDeviceColour(std::uint8_t,std::uint8_t,std::uint8_t)=0;
+    virtual bool clbkFillSurface(SURFHANDLE,oapi::UInt32) const=0;
+    virtual bool clbkBlt(SURFHANDLE,oapi::UInt32,oapi::UInt32,SURFHANDLE,oapi::UInt32=0) const=0;
+    virtual bool clbkBlt(SURFHANDLE,oapi::UInt32,oapi::UInt32,SURFHANDLE,oapi::UInt32,oapi::UInt32,oapi::UInt32,oapi::UInt32,oapi::UInt32=0) const=0;
     virtual void Open()=0;
     virtual RenderInput Poll()=0;
     virtual void Resize(int,int)=0;
@@ -46,6 +54,8 @@ public:
     virtual void ReleaseFontResource(oapi::Font*)=0;
     virtual oapi::Pen* CreatePenResource(int,int,oapi::UInt32)=0;
     virtual void ReleasePenResource(oapi::Pen*)=0;
+    virtual oapi::Brush* CreateBrushResource(oapi::UInt32)=0;
+    virtual void ReleaseBrushResource(oapi::Brush*)=0;
     virtual oapi::Sketchpad* AcquireSketchpad(SURFHANDLE)=0;
     virtual void ReleaseSketchpadResource(oapi::Sketchpad*)=0;
     virtual SURFHANDLE CreateSurfaceResource(int,int)=0;

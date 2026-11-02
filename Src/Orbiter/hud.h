@@ -32,7 +32,7 @@ public:
 
 	void Render ();
 
-	virtual DWORD Configure (DWORD item, DWORD value) { return 0; }
+	virtual oapi::UInt32 Configure (oapi::UInt32 item, oapi::UInt32 value) { return 0; }
 	// generic HUD customisation which can be used by individual HUD modes
 	// to set vessel-specific behaviour
 
@@ -187,8 +187,8 @@ public:
 	~HUD_Docking ();
 	int Mode() const { return HUD_DOCKING; }
 	void SwitchColour (int idx);
-	void SetNav (DWORD setnv);
-	DWORD GetNav () const { return nv; }
+	void SetNav (oapi::UInt32 setnv);
+	oapi::UInt32 GetNav () const { return nv; }
 	void SetReference (const Body *ref, int port);
 	void SelectReference ();
 	void SelectReferenceOld ();
@@ -203,7 +203,7 @@ protected:
 	void ReadParams (std::ifstream &ifs);
 
 private:
-	DWORD nv;        // slaved NAV receiver
+	oapi::UInt32 nv;        // slaved NAV receiver
 
 	// Legacy code
 	bool bUseLegacyReference;  // flag for old-style reference selection
@@ -216,7 +216,7 @@ private:
 
 	static struct SavePrm {    // persistent data storage
 		Vessel *vessel;        //     current vessel
-		DWORD nv;              //     slaved NAV receiver
+		oapi::UInt32 nv;              //     slaved NAV receiver
 		const Body *lref;      //     legacy reference
 		int lport;             //     legacy port
 		bool luse;             //     use legacy mechanism?

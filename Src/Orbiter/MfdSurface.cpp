@@ -2,29 +2,42 @@
 // Licensed under the MIT License
 
 #include "Production/CockpitServices.h"
+#ifndef _WIN32
+#include "Production/CockpitNativeSupport.h"
+#include "Planet.h"
+#endif
+
 #include "Astro.h"
 #include "MfdSurface.h"
+#ifdef _WIN32
 #include "Orbiter.h"
+#endif
 #include "Pane.h"
 #include "Celbody.h"
 #include "Psys.h"
 #include "Select.h"
+#ifdef _WIN32
 #include "Util.h"
+#endif
+#ifdef _WIN32
 #include "Log.h"
+#endif
 
 using namespace std;
 
+#ifdef _WIN32
 extern Orbiter *g_pOrbiter;
+#endif
 extern TimeData td;
 extern Pane *g_pane;
 
 // =======================================================================
 // class Instrument_Surface
 
-COLORREF Instrument_Surface::tapelabelcol[2] = {0xFFFFFF,0x60A0FF}; // make configurable
+oapi::UInt32 Instrument_Surface::tapelabelcol[2] = {0xFFFFFF,0x60A0FF}; // make configurable
 struct Instrument_Surface::SavePrm Instrument_Surface::saveprm = { 1 };
 
-Instrument_Surface::Instrument_Surface (Pane *_pane, INT_PTR _id, const Spec &spec, Vessel *_vessel)
+Instrument_Surface::Instrument_Surface (Pane *_pane, std::intptr_t _id, const Spec &spec, Vessel *_vessel)
 : Instrument (_pane, _id, spec, _vessel)
 {
 	sp = 0;
@@ -37,15 +50,15 @@ Instrument_Surface::Instrument_Surface (Pane *_pane, INT_PTR _id, const Spec &sp
 	SetSize (spec);
 	if (instrDT > 0.25) instrDT = 0.25; // force at least 4 Hz refresh rate
 
-	tapecol = g_pOrbiter->GetDeviceColour (0,0,160);
-	hrzcol[0] = g_pOrbiter->GetDeviceColour( 99, 93,231);
-	hrzcol[1] = g_pOrbiter->GetDeviceColour(173,125, 37);
+	tapecol = orbiter::production::CockpitDeviceColour (0,0,160);
+	hrzcol[0] = orbiter::production::CockpitDeviceColour( 99, 93,231);
+	hrzcol[1] = orbiter::production::CockpitDeviceColour(173,125, 37);
 
 	if (gc) {
 		horizonpen = gc->clbkCreatePen (1, 3, 0xFFFFFF);
-		brush[0] = gc->clbkCreateBrush (RGB( 99, 93,231));
-		brush[1] = gc->clbkCreateBrush (RGB(173,125, 37));
-		brush[2] = gc->clbkCreateBrush (RGB(0,0,0));
+		brush[0] = gc->clbkCreateBrush (orbiter::production::CockpitColor( 99, 93,231));
+		brush[1] = gc->clbkCreateBrush (orbiter::production::CockpitColor(173,125, 37));
+		brush[2] = gc->clbkCreateBrush (orbiter::production::CockpitColor(0,0,0));
 	} else {
 		int i;
 		horizonpen = 0;
@@ -70,12 +83,12 @@ Instrument_Surface::~Instrument_Surface ()
 		for (i = 0; i < 3; i++)
 			if (brush[i]) gc->clbkReleaseBrush (brush[i]);
 	}
-	if (horizon) g_pOrbiter->ReleaseSurface (horizon);
-	if (heading) g_pOrbiter->ReleaseSurface (heading);
-	if (tapes1)  g_pOrbiter->ReleaseSurface (tapes1);
-	if (ticks1)  g_pOrbiter->ReleaseSurface (ticks1);
-	if (tapes2)  g_pOrbiter->ReleaseSurface (tapes2);
-	if (ticks2)  g_pOrbiter->ReleaseSurface (ticks2);
+	if (horizon) orbiter::production::CockpitReleaseSurface (horizon);
+	if (heading) orbiter::production::CockpitReleaseSurface (heading);
+	if (tapes1)  orbiter::production::CockpitReleaseSurface (tapes1);
+	if (ticks1)  orbiter::production::CockpitReleaseSurface (ticks1);
+	if (tapes2)  orbiter::production::CockpitReleaseSurface (tapes2);
+	if (ticks2)  orbiter::production::CockpitReleaseSurface (ticks2);
 
 	// save status
 	saveprm.spdmode = spdmode;
@@ -99,7 +112,7 @@ void Instrument_Surface::InitDeviceObjects ()
 
 	// Create heading indicator tape
 	if (heading) {
-		g_pOrbiter->FillSurface (heading, tapecol);
+		orbiter::production::CockpitFillSurface (heading, tapecol);
 		if (skp = gc->clbkGetSketchpad (heading)) {
 			skp->SetFont (GetDefaultFont (3));
 			skp->SetTextColor (tapelabelcol[0]);
@@ -124,7 +137,7 @@ void Instrument_Surface::InitDeviceObjects ()
 
 	// Create tick strip for top row of tapes
 	if (ticks1) {
-		g_pOrbiter->FillSurface (ticks1, tapecol);
+		orbiter::production::CockpitFillSurface (ticks1, tapecol);
 		if (skp = gc->clbkGetSketchpad (ticks1)) {
 			skp->SetPen (wpen);
 			y0 = (hrzr*3)/2;
@@ -149,7 +162,7 @@ void Instrument_Surface::InitDeviceObjects ()
 
 	if (ticks2) {
 		// Create tick strip for bottom row of tapes
-		g_pOrbiter->FillSurface (ticks2, tapecol);
+		orbiter::production::CockpitFillSurface (ticks2, tapecol);
 		if (skp = gc->clbkGetSketchpad (ticks2)) {
 			skp->SetPen (wpen);
 			y0 = (accr*3)/2;
@@ -181,7 +194,7 @@ HELPCONTEXT *Instrument_Surface::HelpTopic () const
 	return &DefHelpContext;
 }
 
-bool Instrument_Surface::KeyBuffered (DWORD key)
+bool Instrument_Surface::KeyBuffered (oapi::UInt32 key)
 {
 	switch (key) {
 	case OAPI_KEY_G: // ground-relative speed (GRS)
@@ -209,7 +222,7 @@ bool Instrument_Surface::KeyBuffered (DWORD key)
 
 bool Instrument_Surface::ProcessButton (int bt, int event)
 {
-	static const DWORD btkey[5] = { OAPI_KEY_I, OAPI_KEY_T, OAPI_KEY_G, OAPI_KEY_O, OAPI_KEY_H };
+	static const oapi::UInt32 btkey[5] = { OAPI_KEY_I, OAPI_KEY_T, OAPI_KEY_G, OAPI_KEY_O, OAPI_KEY_H };
 	if (event & PANEL_MOUSE_LBDOWN) {
 		if (bt < 5) return KeyBuffered (btkey[bt]);
 	}
@@ -324,7 +337,7 @@ void Instrument_Surface::UpdateHorizon ()
 	}
 	if (!n) bblue = (pitch < 0.0);
 
-	g_pOrbiter->FillSurface (horizon, hrzcol[bblue?1:0]);
+	orbiter::production::CockpitFillSurface (horizon, hrzcol[bblue?1:0]);
 
 	oapi::Sketchpad *skp;
 	if (gc && (skp = gc->clbkGetSketchpad (horizon))) {
@@ -408,13 +421,13 @@ void Instrument_Surface::UpdateHorizon ()
 
 void Instrument_Surface::UpdateTapes ()
 {
-	g_pOrbiter->FillSurface (tapes1, tapecol);
-	g_pOrbiter->FillSurface (tapes2, tapecol);
+	orbiter::production::CockpitFillSurface (tapes1, tapecol);
+	orbiter::production::CockpitFillSurface (tapes2, tapecol);
 
 	char cbuf[20] = "";
 	int i, y, xofs, tcki;
 	int dy1 = (hrzr*2)/5, dy2 = (accr*2)/5;
-	RECT r = {0, 0, cw, 0};
+	oapi::SdkRectangle r = {0, 0, cw, 0};
 
 	// speed tape calculations
 	double spd100 = spd*0.01;
@@ -425,7 +438,7 @@ void Instrument_Surface::UpdateTapes ()
 	// speed tape ticks
 	r.top = (hrzr*3)/2 - spd_y0;
 	r.bottom = r.top + 2*hrzr;
-	g_pOrbiter->Blt (tapes1, cw*5, 0, ticks1, 0, r.top, cw, 2*hrzr);
+	orbiter::production::CockpitBlt (tapes1, cw*5, 0, ticks1, 0, r.top, cw, 2*hrzr);
 
 	// altitude tape calculations
 	double alt = (sp->alt < 1e4 ? sp->alt : sp->alt0);
@@ -440,7 +453,7 @@ void Instrument_Surface::UpdateTapes ()
 	r.left = cw; r.right = 2*cw;
 	r.top = (hrzr*3)/2 - alt_y0;
 	r.bottom = r.top + 2*hrzr;
-	g_pOrbiter->Blt (tapes1, cw*6, 0, ticks1, cw, r.top, cw, 2*hrzr);
+	orbiter::production::CockpitBlt (tapes1, cw*6, 0, ticks1, cw, r.top, cw, 2*hrzr);
 
 	// VSI tape calculations
 	double vsp10 = vspd*0.1;
@@ -451,7 +464,7 @@ void Instrument_Surface::UpdateTapes ()
 	// VSI tape ticks
 	r.top = (hrzr*3)/2 - vsi_y0;
 	r.bottom = r.top + 2*hrzr;
-	g_pOrbiter->Blt (tapes1, cw*12, 0, ticks1, cw, r.top, cw, 2*hrzr);
+	orbiter::production::CockpitBlt (tapes1, cw*12, 0, ticks1, cw, r.top, cw, 2*hrzr);
 
 	// acceleration calculations
 	int acc0 = (int)(acc >= 0 ? acc : acc-1);
@@ -462,7 +475,7 @@ void Instrument_Surface::UpdateTapes ()
 	r.left = 0, r.right = cw;
 	r.top = (accr*3)/2 - acc_y0;
 	r.bottom = r.top + 2*accr;
-	g_pOrbiter->Blt (tapes2, cw*4, 0, ticks2, 0, r.top, cw, 2*accr);
+	orbiter::production::CockpitBlt (tapes2, cw*4, 0, ticks2, 0, r.top, cw, 2*accr);
 
 	// vertical acceleration calculations
 	int vac0 = (int)(vacc >= 0 ? vacc : vacc-1);
@@ -473,7 +486,7 @@ void Instrument_Surface::UpdateTapes ()
 	r.left = cw, r.right = 2*cw;
 	r.top = (accr*3)/2 - vac_y0;
 	r.bottom = r.top + 2*accr;
-	g_pOrbiter->Blt (tapes2, cw*5, 0, ticks2, cw, r.top, cw, 2*accr);
+	orbiter::production::CockpitBlt (tapes2, cw*5, 0, ticks2, cw, r.top, cw, 2*accr);
 
 	// AOA calculations
 	int aoa0 = (int)(aoa >= 0 ? aoa : aoa-1);
@@ -483,7 +496,7 @@ void Instrument_Surface::UpdateTapes ()
 	// AOA tape ticks
 	r.top = (accr*3)/2 - aoa_y0;
 	r.bottom = r.top + 2*accr;
-	g_pOrbiter->Blt (tapes2, cw*10, 0, ticks2, cw, r.top, cw, 2*accr);
+	orbiter::production::CockpitBlt (tapes2, cw*10, 0, ticks2, cw, r.top, cw, 2*accr);
 
 	oapi::Sketchpad *skp;
 	if (skp = gc->clbkGetSketchpad (tapes1)) {
@@ -594,7 +607,7 @@ void Instrument_Surface::UpdateTapes ()
 
 void Instrument_Surface::UpdateBlt ()
 {
-	if (!g_pOrbiter->GetGraphicsClient()) return; // no graphics available
+	if (!orbiter::production::CockpitGraphicsClient()) return; // no graphics available
 
 	sp = vessel->GetSurfParam();
 	if (!sp) return;
@@ -605,32 +618,32 @@ void Instrument_Surface::UpdateBlt ()
 
 	if (horizon && heading) {
 		UpdateHorizon();
-		g_pOrbiter->Blt (surf, hrzx0, hrzy0, horizon);
+		orbiter::production::CockpitBlt (surf, hrzx0, hrzy0, horizon);
 
-		static RECT r = {0,0,0,0};
+		static oapi::SdkRectangle r = {0,0,0,0};
 		r.left   = (int)((DEG*sp->dir + 40.0)/440.0 * hdgbmpw) - hrzr;
 		r.right  = r.left+2*hrzr;
 		r.bottom = (3*ch)/2;
-		g_pOrbiter->Blt (surf, hrzx0, diry0, heading, r.left, 0, 2*hrzr, r.bottom);
+		orbiter::production::CockpitBlt (surf, hrzx0, diry0, heading, r.left, 0, 2*hrzr, r.bottom);
 
 		UpdateTapes();
 		r.left = 0, r.right = cw*6, r.top = 0, r.bottom = hrzr*2;
-		g_pOrbiter->Blt (surf, spdx0, hrzy0, tapes1, 0, 0, r.right, r.bottom);
+		orbiter::production::CockpitBlt (surf, spdx0, hrzy0, tapes1, 0, 0, r.right, r.bottom);
 		//surf->BltFast (spdx0, hrzy0, tapes1, &r, DDBLTFAST_WAIT);
 		r.left = cw*6, r.right = cw*12;
-		g_pOrbiter->Blt (surf, altx0, hrzy0, tapes1, cw*6, 0, cw*6, r.bottom);
+		orbiter::production::CockpitBlt (surf, altx0, hrzy0, tapes1, cw*6, 0, cw*6, r.bottom);
 		//surf->BltFast (altx0, hrzy0, tapes1, &r, DDBLTFAST_WAIT);
 		r.left = cw*12, r.right = cw*17;
-		g_pOrbiter->Blt (surf, vspx0, hrzy0, tapes1, cw*12, 0, cw*5, r.bottom);
+		orbiter::production::CockpitBlt (surf, vspx0, hrzy0, tapes1, cw*12, 0, cw*5, r.bottom);
 		//surf->BltFast (vspx0, hrzy0, tapes1, &r, DDBLTFAST_WAIT);
 		r.left = 0, r.right = cw*5, r.top = 0, r.bottom = accr*2;
-		g_pOrbiter->Blt (surf, accx0, accy0, tapes2, 0, 0, cw*5, accr*2);
+		orbiter::production::CockpitBlt (surf, accx0, accy0, tapes2, 0, 0, cw*5, accr*2);
 		//surf->BltFast (accx0, accy0, tapes2, &r, DDBLTFAST_WAIT);
 		r.left = cw*5, r.right = cw*10;
-		g_pOrbiter->Blt (surf, vacx0, accy0, tapes2, cw*5, 0, cw*5, accr*2);
+		orbiter::production::CockpitBlt (surf, vacx0, accy0, tapes2, cw*5, 0, cw*5, accr*2);
 		//surf->BltFast (vacx0, accy0, tapes2, &r, DDBLTFAST_WAIT);
 		r.left = cw*10, r.right = cw*14;
-		g_pOrbiter->Blt (surf, aoax0, accy0, tapes2, cw*10, 0, cw*4, accr*2);
+		orbiter::production::CockpitBlt (surf, aoax0, accy0, tapes2, cw*10, 0, cw*4, accr*2);
 		//surf->BltFast (aoax0, accy0, tapes2, &r, DDBLTFAST_WAIT);
 	}
 }
@@ -979,7 +992,7 @@ void Instrument_Surface::SetSize (const Spec &spec)
 	aoapt[6].x = x0;      aoapt[6].y = y1;
 }
 
-void Instrument_Surface::OptionChanged(DWORD cat, DWORD item)
+void Instrument_Surface::OptionChanged(oapi::UInt32 cat, oapi::UInt32 item)
 {
 	if (cat == OPTCAT_INSTRUMENT) {
 		switch (item) {
@@ -998,8 +1011,8 @@ bool Instrument_Surface::ReadParams (ifstream &ifs)
 	for (;;) {
 		if (!ifs.getline (cbuf, 256)) return false;
 		pc = trim_string (cbuf);
-		if (!_strnicmp (pc, "END_MFD", 7)) break;
-		if (!_strnicmp (pc, "SPDMODE", 7)) {
+		if (!orbiter::production::ComparePrefix (pc, "END_MFD", 7)) break;
+		if (!orbiter::production::ComparePrefix (pc, "SPDMODE", 7)) {
 			n = sscanf (pc+7, "%d", &spdmode);
 			if (spdmode <= 0 || spdmode > 4) spdmode = 1;
 		}

@@ -672,17 +672,7 @@ typedef struct {
  */
 // ===========================================================================
 //@{
-#define PANEL_MOUSE_IGNORE      0x00 ///< Don't generate mouse events
-#define PANEL_MOUSE_LBDOWN      0x01 ///< Left button down event
-#define PANEL_MOUSE_RBDOWN      0x02 ///< Right button down event
-#define PANEL_MOUSE_LBUP        0x04 ///< Left button release event
-#define PANEL_MOUSE_RBUP        0x08 ///< Right button release event
-#define PANEL_MOUSE_LBPRESSED   0x10 ///< Left button down (continuous)
-#define PANEL_MOUSE_RBPRESSED   0x20 ///< Right button down (continuous)
-#define PANEL_MOUSE_DOWN        0x03 ///< Composite down event
-#define PANEL_MOUSE_UP          0x0C ///< Composite release event
-#define PANEL_MOUSE_PRESSED     0x30 ///< Composite down (continous)
-#define PANEL_MOUSE_ONREPLAY    0x40 ///< Create mouse events during replay
+
 //@}
 
 /**

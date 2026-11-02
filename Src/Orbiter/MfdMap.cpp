@@ -1,6 +1,12 @@
 // Copyright (c) Martin Schweiger
 // Licensed under the MIT License
 
+#include "Production/CockpitServices.h"
+#ifndef _WIN32
+#include "Production/CockpitNativeSupport.h"
+#include "Planet.h"
+#endif
+
 #include "Astro.h"
 #include "MfdMap.h"
 #include "Pane.h"
@@ -11,7 +17,9 @@
 
 using namespace std;
 
+#ifdef _WIN32
 extern Orbiter *g_pOrbiter;
+#endif
 extern PlanetarySystem *g_psys;
 extern Vessel *g_focusobj;
 extern InputBox *g_input;
@@ -20,12 +28,12 @@ extern TimeData td;
 extern char DBG_MSG[256];
 
 struct Instrument_Map::SavePrm Instrument_Map::saveprm = {0,0,{0,0},1,true};
-DWORD dispflag_default = DISP_GRIDLINE | DISP_COASTLINE | DISP_CONTOURS | DISP_HORIZONLINE | DISP_VESSEL | DISP_BASE | DISP_GROUNDTRACK | DISP_TERMINATOR | DISP_ORBITFOCUS | DISP_ORBITSEL;
+oapi::UInt32 dispflag_default = DISP_GRIDLINE | DISP_COASTLINE | DISP_CONTOURS | DISP_HORIZONLINE | DISP_VESSEL | DISP_BASE | DISP_GROUNDTRACK | DISP_TERMINATOR | DISP_ORBITFOCUS | DISP_ORBITSEL;
 
 // =======================================================================
 // class Instrument_Map
 
-Instrument_Map::Instrument_Map (Pane *_pane, INT_PTR _id, const Spec &spec, Vessel *_vessel)
+Instrument_Map::Instrument_Map (Pane *_pane, std::intptr_t _id, const Spec &spec, Vessel *_vessel)
 : Instrument (_pane, _id, spec, _vessel)
 {
 	strcpy (title, "Map: ");
@@ -34,7 +42,7 @@ Instrument_Map::Instrument_Map (Pane *_pane, INT_PTR _id, const Spec &spec, Vess
 	refplanet = NULL;
 	VectorMap::OBJTYPE sel = {0,0};
 	dispflag = dispflag_default;
-	DWORD mkrflag = 0;
+	oapi::UInt32 mkrflag = 0;
 	if (_vessel == saveprm.usr) {
 		refplanet = saveprm.ref;
 		sel       = saveprm.sel;
@@ -115,7 +123,7 @@ int Instrument_Map::ProcessMessage (int msg, void *data)
 
 // =======================================================================
 
-bool Instrument_Map::KeyBuffered (DWORD key)
+bool Instrument_Map::KeyBuffered (oapi::UInt32 key)
 {
 	switch (disp_mode) {
 	case 0: // default display
@@ -224,7 +232,7 @@ bool Instrument_Map::ProcessButton (int bt, int event)
 {
 	switch (disp_mode) {
 	case 0: {
-		static const DWORD btkey[10] = { OAPI_KEY_R, OAPI_KEY_T, OAPI_KEY_X, OAPI_KEY_Z, OAPI_KEY_K, OAPI_KEY_D, OAPI_KEY_MINUS, OAPI_KEY_EQUALS, OAPI_KEY_LBRACKET, OAPI_KEY_RBRACKET };
+		static const oapi::UInt32 btkey[10] = { OAPI_KEY_R, OAPI_KEY_T, OAPI_KEY_X, OAPI_KEY_Z, OAPI_KEY_K, OAPI_KEY_D, OAPI_KEY_MINUS, OAPI_KEY_EQUALS, OAPI_KEY_LBRACKET, OAPI_KEY_RBRACKET };
 		if (event & PANEL_MOUSE_LBDOWN) {
 			if (bt < (track ? 6:10)) return KeyBuffered (btkey[bt]);
 		}
@@ -233,7 +241,7 @@ bool Instrument_Map::ProcessButton (int bt, int event)
 		}
 		} break;
 	case 1: {
-		static const DWORD btkey[4] = { OAPI_KEY_MINUS, OAPI_KEY_EQUALS, OAPI_KEY_M, OAPI_KEY_O };
+		static const oapi::UInt32 btkey[4] = { OAPI_KEY_MINUS, OAPI_KEY_EQUALS, OAPI_KEY_M, OAPI_KEY_O };
 		if (event & PANEL_MOUSE_LBDOWN) {
 			if (bt < 4) return KeyBuffered (btkey[bt]);
 		}
@@ -664,28 +672,28 @@ bool Instrument_Map::ReadParams (std::ifstream &ifs)
 	char otgt[128] = "", btgt[128] = "";
 	zoom = 1;
 	double lng, lat;
-	DWORD dflag = dispflag;
+	oapi::UInt32 dflag = dispflag;
 	track = true;
 
 	for (;;) {
 		if (!ifs.getline (cbuf, 256)) return false;
 		pc = trim_string (cbuf);
-		if (!_strnicmp (pc, "END_MFD", 7)) break;
-		if (!_strnicmp (pc, "REF", 3)) {
+		if (!orbiter::production::ComparePrefix (pc, "END_MFD", 7)) break;
+		if (!orbiter::production::ComparePrefix (pc, "REF", 3)) {
 			strcpy (cref, trim_string (pc+3));
-		} else if (!_strnicmp (pc, "TARGET", 6)) {
+		} else if (!orbiter::production::ComparePrefix (pc, "TARGET", 6)) {
 			strcpy (ctgt, trim_string (pc+6));
-		} else if (!_strnicmp (pc, "OTARGET", 7)) { // backward compatibility
+		} else if (!orbiter::production::ComparePrefix (pc, "OTARGET", 7)) { // backward compatibility
 			strcpy (otgt, trim_string (pc+7));
-		} else if (!_strnicmp (pc, "BTARGET", 7)) { // backward compatibility
+		} else if (!orbiter::production::ComparePrefix (pc, "BTARGET", 7)) { // backward compatibility
 			strcpy (btgt, trim_string (pc+7));
-		} else if (!_strnicmp (pc, "ZOOM", 4)) {
+		} else if (!orbiter::production::ComparePrefix (pc, "ZOOM", 4)) {
 			int res = sscanf (trim_string(pc+4), "%d", &zoom);
 			if (res < 1) zoom = 2;
-		} else if (!_strnicmp (pc, "POS", 3)) {
+		} else if (!orbiter::production::ComparePrefix (pc, "POS", 3)) {
 			int res = sscanf (pc+4, "%lf%lf", &lng, &lat);
 			if (res == 2) track = false;
-		} else if (!_strnicmp (pc, "DISP", 4)) {
+		} else if (!orbiter::production::ComparePrefix (pc, "DISP", 4)) {
 			sscanf (trim_string(pc+4), "%d", &dflag);
 		}
 	}
@@ -730,7 +738,7 @@ bool Instrument_Map::ClbkEnter_Map (Select *menu, int item, char *str, void *dat
 
 bool Instrument_Map::ClbkSubmn_Target (Select *menu, int item, char *str, void *data)
 {
-	DWORD i, j;
+	oapi::UInt32 i, j;
 	Instrument_Map *map = (Instrument_Map*)data;
 
 	if (!str) { // main menu
@@ -772,11 +780,11 @@ bool Instrument_Map::ClbkSubmn_Target (Select *menu, int item, char *str, void *
 bool Instrument_Map::ClbkEnter_Target (Select *menu, int item, char *str, void *data)
 {
 	Instrument_Map *map = (Instrument_Map*)data;
-	if (!_stricmp (str, "By name ...")) {
+	if (!orbiter::production::CompareText (str, "By name ...")) {
 		g_input->Open ("Enter target:", 0, 20, Instrument_Map::ClbkName_Target,
 			map);
 		return true;
-	} else if (!_stricmp (str, "[none]")) {
+	} else if (!orbiter::production::CompareText (str, "[none]")) {
 		map->UnselectTarget ();
 		return true;
 	} else

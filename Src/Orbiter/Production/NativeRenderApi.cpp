@@ -538,3 +538,11 @@ double oapiGetPlanetTheta (OBJHANDLE hPlanet)
 {
 	return ((Planet*)hPlanet)->EqLng();
 }
+
+void oapiBlt(SURFHANDLE target,SURFHANDLE source,int x,int y,int sx,int sy,int width,int height,oapi::UInt32 color_key) {
+    if(!source || !target)return;
+    auto* graphics=GetNativeRenderContext().graphics;
+    if(!graphics)return;
+    if(color_key!=SURF_NO_CK)throw std::runtime_error("Native oapiBlt: obsolete color-key argument is unsupported");
+    if(!graphics->clbkBlt(target,x,y,source,sx,sy,width,height))throw std::runtime_error("Native oapiBlt: graphics surface copy failed");
+}

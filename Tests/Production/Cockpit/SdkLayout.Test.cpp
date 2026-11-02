@@ -34,4 +34,6 @@ using NativeMfdCallback=std::intptr_t(*)(oapi::UInt,oapi::UInt,std::uintptr_t,st
 static_assert(std::is_same_v<decltype(MFDMODESPEC{}.msgproc),NativeMfdCallback>);
 static_assert(std::is_same_v<decltype(MFDSPEC{}.pos),oapi::SdkRectangle>);
 #endif
+static_assert(PANEL_MOUSE_LBDOWN==1 && PANEL_MOUSE_RBDOWN==2 && PANEL_MOUSE_LBUP==4 && PANEL_MOUSE_RBUP==8);
+static_assert(PANEL_MOUSE_LBPRESSED==16 && PANEL_MOUSE_RBPRESSED==32 && PANEL_MOUSE_ONREPLAY==64);
 int main(){std::cout<<"Cockpit SDK field layouts, packed menu records and callback types passed\n";}

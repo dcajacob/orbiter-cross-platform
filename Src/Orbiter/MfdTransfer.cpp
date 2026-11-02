@@ -1,14 +1,24 @@
 // Copyright (c) Martin Schweiger
 // Licensed under the MIT License
 
+#include "Production/CockpitServices.h"
+#ifndef _WIN32
+#include "Production/CockpitNativeSupport.h"
+#include "Planet.h"
+#endif
+
 #include "Astro.h"
 #include "MfdTransfer.h"
 #include "Pane.h"
 #include "Celbody.h"
 #include "Psys.h"
+#ifdef _WIN32
 #include "Log.h"
+#endif
 #include "Select.h"
+#ifdef _WIN32
 #include "Orbiter.h"
+#endif
 
 using namespace std;
 
@@ -22,7 +32,7 @@ extern Select *g_select;
 
 struct Instrument_Transfer::SavePrm Instrument_Transfer::saveprm = {0,0,0,0,0.0,0.0,false,false};
 
-Instrument_Transfer::Instrument_Transfer (Pane *_pane, INT_PTR _id, const Spec &spec, Vessel *_vessel)
+Instrument_Transfer::Instrument_Transfer (Pane *_pane, std::intptr_t _id, const Spec &spec, Vessel *_vessel)
 : Instrument (_pane, _id, spec, _vessel)
 {
 	if (_vessel == saveprm.usr) {
@@ -417,7 +427,7 @@ bool Instrument_Transfer::InitNumTrajectory (const Elements *el)
 	return true;
 }
 
-bool Instrument_Transfer::KeyBuffered (DWORD key)
+bool Instrument_Transfer::KeyBuffered (oapi::UInt32 key)
 {
 	switch (key) {
 	case OAPI_KEY_F:  // decrease step scale for numerical trajectory
@@ -511,7 +521,7 @@ bool Instrument_Transfer::KeyImmediate (char *kstate)
 
 bool Instrument_Transfer::ProcessButton (int bt, int event)
 {
-	static const DWORD btkey[14] = { OAPI_KEY_R, OAPI_KEY_S, OAPI_KEY_T, OAPI_KEY_N, OAPI_KEY_X, OAPI_KEY_M, OAPI_KEY_U, OAPI_KEY_Z,
+	static const oapi::UInt32 btkey[14] = { OAPI_KEY_R, OAPI_KEY_S, OAPI_KEY_T, OAPI_KEY_N, OAPI_KEY_X, OAPI_KEY_M, OAPI_KEY_U, OAPI_KEY_Z,
 		OAPI_KEY_COMMA, OAPI_KEY_PERIOD, OAPI_KEY_MINUS, OAPI_KEY_EQUALS, OAPI_KEY_F, OAPI_KEY_G };
 	if (event & PANEL_MOUSE_LBDOWN) {
 		if (bt < 8 || bt >= 12) return KeyBuffered (btkey[bt]);
@@ -596,7 +606,7 @@ bool Instrument_Transfer::SelectRef (char *str)
 bool Instrument_Transfer::SelectSrc (const char *str)
 {
 	RigidBody *obj;
-	if (!_stricmp (str, "x")) {
+	if (!orbiter::production::CompareText (str, "x")) {
 		obj = vessel;
 	} else {
 		obj = (RigidBody*)g_psys->GetObj (str, true);
@@ -660,17 +670,17 @@ bool Instrument_Transfer::ReadParams (ifstream &ifs)
 	for (;;) {
 		if (!ifs.getline (cbuf, 256)) return false;
 		pc = trim_string (cbuf);
-		if (!_strnicmp (pc, "END_MFD", 7)) break;
-		if (!_strnicmp (pc, "REF", 3)) {
+		if (!orbiter::production::ComparePrefix (pc, "END_MFD", 7)) break;
+		if (!orbiter::production::ComparePrefix (pc, "REF", 3)) {
 			strcpy (cref, trim_string (pc+3));
-		} else if (!_strnicmp (pc, "SOURCE", 6)) {
+		} else if (!orbiter::production::ComparePrefix (pc, "SOURCE", 6)) {
 			strcpy (csrc, trim_string (pc+6));
-		} else if (!_strnicmp (pc, "TARGET", 6)) {
+		} else if (!orbiter::production::ComparePrefix (pc, "TARGET", 6)) {
 			strcpy (ctgt, trim_string (pc+6));
-		} else if (!_strnicmp (pc, "SIMORBIT", 8)) {
+		} else if (!orbiter::production::ComparePrefix (pc, "SIMORBIT", 8)) {
 			char flag[32];
 			int res = sscanf (pc+8, "%lf%lf%s", &le, &dv, flag);
-			enable_hyp = (res == 3 && !_stricmp (flag, "SHOW"));
+			enable_hyp = (res == 3 && !orbiter::production::CompareText (flag, "SHOW"));
 			xferprm = true;
 		}
 	}

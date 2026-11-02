@@ -10,7 +10,11 @@
 #include <time.h>
 #include "Vecmat.h"
 #include "AstroMath.h"
+#ifdef _WIN32
 #include "OrbiterAPI.h"
+#else
+#include "NativeVesselAPI.h"
+#endif
 
 const double iAU = 1.0/AU;
 // inverse of AU

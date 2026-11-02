@@ -106,8 +106,8 @@
     },
     "Orbitersdk/include/OrbiterAPI.h": {
       "original_sha256_lf": "3425025c178218dce10bf7b8edf296dfe7eda8f171d925aca622a7534735fd31",
-      "sha256_lf": "462c022a0bfc29cd94fd939d935eb9b153525c349ce17c9f9c028196dc6c069d",
-      "scope": "Portable cockpit/ImGui SDK data and original instrument declarations. Exact Windows scalar, callback, class, field order and packing conservation plus native header/layout compilation; runtime instrumentation remains incomplete."
+      "sha256_lf": "df3e18dee3e562cf65cc0d373d86430c8f278e2ea2ac7bae25e0912db8663507",
+      "scope": "Compile all ten original stock instrument implementations with native SDK types. Preserve exact Windows calculations/call order and share panel mouse constants. Native brush/fill/blit callbacks delegate to the shared renderer and are checked by actual pixels across twenty contexts; instrument lifecycle and native DG runtime remain unfinished."
     },
     "Orbitersdk/include/OrbiterAnimationData.h": {
       "sha256_lf": "98cbc950f4342e529e70562e0dcbc69e77f296d920304b4d7be097b36084a225",
@@ -123,8 +123,8 @@
     },
     "Orbitersdk/include/OrbiterCockpitData.h": {
       "original_sha256_lf": null,
-      "sha256_lf": "e897f2946d7483b144d8fb9d90001ca831a21ffcdb696efdcacf33348fa9c9a1",
-      "scope": "Portable cockpit/ImGui SDK data and original instrument declarations. Exact Windows scalar, callback, class, field order and packing conservation plus native header/layout compilation; runtime instrumentation remains incomplete."
+      "sha256_lf": "3e18bc98abf6837d16c9d4d7288bb8f7b417203d4de332300409ad1c2084a1cf",
+      "scope": "Compile all ten original stock instrument implementations with native SDK types. Preserve exact Windows calculations/call order and share panel mouse constants. Native brush/fill/blit callbacks delegate to the shared renderer and are checked by actual pixels across twenty contexts; instrument lifecycle and native DG runtime remain unfinished."
     },
     "Orbitersdk/include/OrbiterGeometry.h": {
       "sha256_lf": "624371607dbdc800bd19f1db135adeb1862013710667c0abc40f1b91650c68a6",
@@ -236,8 +236,9 @@
       "original_sha256_lf": "82ea743582531793fc564092ec83a1fa3651d094bd7480d6ab9ffe0e82d8ec05"
     },
     "Src/Orbiter/Astro.h": {
-      "sha256_lf": "53a6c7df32a1d4ff38cad6b728be815fbd94de07f2c473db7ae4a821251d71a9",
-      "original_sha256_lf": "66a6de37a0d7a51e32c1564ccb48228802fd65bd5f1b4a6c931ea86ff9b6a4a8"
+      "original_sha256_lf": "66a6de37a0d7a51e32c1564ccb48228802fd65bd5f1b4a6c931ea86ff9b6a4a8",
+      "sha256_lf": "4a4fc9a592936d8dad30b6336162325f399ce551dc885f6cb7c347b67447df07",
+      "scope": "Compile all ten original stock instrument implementations with native SDK types. Preserve exact Windows calculations/call order and share panel mouse constants. Native brush/fill/blit callbacks delegate to the shared renderer and are checked by actual pixels across twenty contexts; instrument lifecycle and native DG runtime remain unfinished."
     },
     "Src/Orbiter/AstroMath.h": {
       "sha256_lf": "a68563a1c8649390d12f549630abb61433e4243c39c62236b6684b1b2bfccf5e",
@@ -391,30 +392,60 @@
       "sha256_lf": "08b920c763eb5ed4cdb875b3b5ba4c92ef034b7be95e3b5975f25fb2292eacd1",
       "scope": "Original ten stock MFD declarations use exact platform SDK aliases; shared original conic geometry is moved without calculation or screen-mapping changes. Full native instrument runtime remains incomplete."
     },
+    "Src/Orbiter/MfdAlign.cpp": {
+      "original_sha256_lf": "ec058286e2d11c75142a3e29f9af3a6b122d4b8f906d7ae65b0dee726013a341",
+      "sha256_lf": "584f64675be88f06e646836a31af57db6482a7476af785d6b9d5c05dc4bb15e3",
+      "scope": "Compile all ten original stock instrument implementations with native SDK types. Preserve exact Windows calculations/call order and share panel mouse constants. Native brush/fill/blit callbacks delegate to the shared renderer and are checked by actual pixels across twenty contexts; instrument lifecycle and native DG runtime remain unfinished."
+    },
     "Src/Orbiter/MfdAlign.h": {
       "original_sha256_lf": "a5072818cf93c21b5f9f94619003c9d628209f9bc4f2d77089f09b660f97eae1",
       "sha256_lf": "49d2b6e6ecbbdb46219a442876b391212de7615fbdf356e7d4e79b950417ea7e",
       "scope": "Original ten stock MFD declarations use exact platform SDK aliases; shared original conic geometry is moved without calculation or screen-mapping changes. Full native instrument runtime remains incomplete."
+    },
+    "Src/Orbiter/MfdComms.cpp": {
+      "original_sha256_lf": "33bb16c654074665d9d3a9d81282925b9eff5135b12fe7b3a52614e6655f6b9f",
+      "sha256_lf": "e94c5bb7d5426a508833ec4f266c181d85f115c62bf9fa6aae336a1be3dd36de",
+      "scope": "Compile all ten original stock instrument implementations with native SDK types. Preserve exact Windows calculations/call order and share panel mouse constants. Native brush/fill/blit callbacks delegate to the shared renderer and are checked by actual pixels across twenty contexts; instrument lifecycle and native DG runtime remain unfinished."
     },
     "Src/Orbiter/MfdComms.h": {
       "original_sha256_lf": "cde22b67a0aac6d7495945687e718114cd32072a5c0311e0ac95d904dc561c28",
       "sha256_lf": "3faa26ab36a1eb5d2cd8bdc2b8d0b16f999f81e152cb83bd2c91ec58863d6b78",
       "scope": "Original ten stock MFD declarations use exact platform SDK aliases; shared original conic geometry is moved without calculation or screen-mapping changes. Full native instrument runtime remains incomplete."
     },
+    "Src/Orbiter/MfdDocking.cpp": {
+      "original_sha256_lf": "87d96e76ec2f81937a03ce896da7182d25abbb5ee0cdb26a4a56b34f09939ae2",
+      "sha256_lf": "7215ea51ba524442192dba2a45dca2ae7eaff0b8b1dd6b35bb4d791d83e3ce84",
+      "scope": "Compile all ten original stock instrument implementations with native SDK types. Preserve exact Windows calculations/call order and share panel mouse constants. Native brush/fill/blit callbacks delegate to the shared renderer and are checked by actual pixels across twenty contexts; instrument lifecycle and native DG runtime remain unfinished."
+    },
     "Src/Orbiter/MfdDocking.h": {
       "original_sha256_lf": "9f88ada7e20b847f79308cfc5eaac57fbb80223bcfd0c32eab9085f12e83e168",
       "sha256_lf": "640c062b0eaa563b300479d597a335b88362da74ebceb70f60d444c05af0491b",
       "scope": "Original ten stock MFD declarations use exact platform SDK aliases; shared original conic geometry is moved without calculation or screen-mapping changes. Full native instrument runtime remains incomplete."
+    },
+    "Src/Orbiter/MfdHsi.cpp": {
+      "original_sha256_lf": "04d5c72381125771ab73fb5ccadc8518ca6cb1e45390315c911c945fb914a148",
+      "sha256_lf": "a49b9935e9fb86132aaab8be790017ad834b18117e7aa5333ead41a17beca173",
+      "scope": "Compile all ten original stock instrument implementations with native SDK types. Preserve exact Windows calculations/call order and share panel mouse constants. Native brush/fill/blit callbacks delegate to the shared renderer and are checked by actual pixels across twenty contexts; instrument lifecycle and native DG runtime remain unfinished."
     },
     "Src/Orbiter/MfdHsi.h": {
       "original_sha256_lf": "eb6c233a4cc0d2e94019c9f6d92b0f5134214a363016f8478e390c4385ff0aa8",
       "sha256_lf": "c18581a42592fcf18680caba1a58a2013981cb58053be323abc9077701a211e7",
       "scope": "Original ten stock MFD declarations use exact platform SDK aliases; shared original conic geometry is moved without calculation or screen-mapping changes. Full native instrument runtime remains incomplete."
     },
+    "Src/Orbiter/MfdLanding.cpp": {
+      "original_sha256_lf": "a548cfce46eeb0b118574bd9c15b2dcdb1f9d6ce40bf005ac412e6dffb569209",
+      "sha256_lf": "2d2549b6242d759a1e5a153deefa8e4ed2aa2fa8fc0680bf2ef9bd4d59409e11",
+      "scope": "Compile all ten original stock instrument implementations with native SDK types. Preserve exact Windows calculations/call order and share panel mouse constants. Native brush/fill/blit callbacks delegate to the shared renderer and are checked by actual pixels across twenty contexts; instrument lifecycle and native DG runtime remain unfinished."
+    },
     "Src/Orbiter/MfdLanding.h": {
       "original_sha256_lf": "157bfbad13a21b119dfeb2f5170d88c45bf56bd0ded232803ce0b27c0f1a5012",
       "sha256_lf": "50fef84eaaf8b2fbe5d62e050c157f67b48d81dedc0470355cac319b274c6e9f",
       "scope": "Original ten stock MFD declarations use exact platform SDK aliases; shared original conic geometry is moved without calculation or screen-mapping changes. Full native instrument runtime remains incomplete."
+    },
+    "Src/Orbiter/MfdMap.cpp": {
+      "original_sha256_lf": "0e6ab25b096e0a842ebec4e936f31c3da05e5242a724545a5e197fed0adf168b",
+      "sha256_lf": "708580f944ea03055d74b088f8ee26708ff49da0b9f691cc85654a136d05677c",
+      "scope": "Compile all ten original stock instrument implementations with native SDK types. Preserve exact Windows calculations/call order and share panel mouse constants. Native brush/fill/blit callbacks delegate to the shared renderer and are checked by actual pixels across twenty contexts; instrument lifecycle and native DG runtime remain unfinished."
     },
     "Src/Orbiter/MfdMap.h": {
       "original_sha256_lf": "5e3528e71c285b7fa48ca3ed5acc175892d67ea2c8795f3e5784cafcf28d97d8",
@@ -425,6 +456,11 @@
       "original_sha256_lf": "1be1311324b9d2883c92902503d6bf54f79d232f4685bd283fc6498e0624b501",
       "sha256_lf": "0c8c061b48a4b541f5d81a059a475d21fc7903a96c9088e3cce9cc5063d9fe98",
       "scope": "Original ten stock MFD declarations use exact platform SDK aliases; shared original conic geometry is moved without calculation or screen-mapping changes. Full native instrument runtime remains incomplete."
+    },
+    "Src/Orbiter/MfdOrbit.cpp": {
+      "original_sha256_lf": "26bdab789772b7da3fdd0f6f379a51a21bd2e9cfe14d1fa0f92f9b931ebd2a5b",
+      "sha256_lf": "c0433ed213a7f4c5c74d04088bbfb79b78b3fccdda10ba4c3b9658424115f52d",
+      "scope": "Compile all ten original stock instrument implementations with native SDK types. Preserve exact Windows calculations/call order and share panel mouse constants. Native brush/fill/blit callbacks delegate to the shared renderer and are checked by actual pixels across twenty contexts; instrument lifecycle and native DG runtime remain unfinished."
     },
     "Src/Orbiter/MfdOrbit.h": {
       "original_sha256_lf": "c2ee5449c7d6684cd9dd40d2518e02dbbb41f44c656390e9814cb39c79d1efa5",
@@ -443,18 +479,28 @@
     },
     "Src/Orbiter/MfdSurface.cpp": {
       "original_sha256_lf": "c1a1522edc9fbda54db00341ff078473a1d142f3763bee93b1496434c0644aaf",
-      "sha256_lf": "bc2fae00f6087d483fe6d02cf22fa57f27a5b4da8b80d2c0a61cdb3635f68ee0",
-      "scope": "Private cockpit graphics/configuration binding. Original algorithms and Windows pointer types conserved by cockpit_source.py; native instrumentation is not operational yet."
+      "sha256_lf": "cec277d46630f57ccd8dd22171ad79070e5301893d15325ab246845df454a2ab",
+      "scope": "Compile all ten original stock instrument implementations with native SDK types. Preserve exact Windows calculations/call order and share panel mouse constants. Native brush/fill/blit callbacks delegate to the shared renderer and are checked by actual pixels across twenty contexts; instrument lifecycle and native DG runtime remain unfinished."
     },
     "Src/Orbiter/MfdSurface.h": {
       "original_sha256_lf": "5febb34bf6f0734e4ed4f28a64d4f20758dd40d89a18c9831b13fa4189ad1b5d",
       "sha256_lf": "a458d28003d63ffbab11beb6ba773677863b79e8a736a1e7621b1e7a77fd806f",
       "scope": "Original ten stock MFD declarations use exact platform SDK aliases; shared original conic geometry is moved without calculation or screen-mapping changes. Full native instrument runtime remains incomplete."
     },
+    "Src/Orbiter/MfdSync.cpp": {
+      "original_sha256_lf": "c3bf14be049728e07c304d782eb4c9b5c93c5d903a5063f3ad6982c021915487",
+      "sha256_lf": "979f3c45b7ae0769b81386e4feba5a3216352bc70a9c37c5c1fed7a624fce542",
+      "scope": "Compile all ten original stock instrument implementations with native SDK types. Preserve exact Windows calculations/call order and share panel mouse constants. Native brush/fill/blit callbacks delegate to the shared renderer and are checked by actual pixels across twenty contexts; instrument lifecycle and native DG runtime remain unfinished."
+    },
     "Src/Orbiter/MfdSync.h": {
       "original_sha256_lf": "7dc3909008838ef49d15e82c4ade4667d034bb17b47db06bd3ebfdeabe9cbe16",
       "sha256_lf": "3f12b81dad7886f343cb83cd1000fca64d65ebfb57830a44e4ce619421891b64",
       "scope": "Original ten stock MFD declarations use exact platform SDK aliases; shared original conic geometry is moved without calculation or screen-mapping changes. Full native instrument runtime remains incomplete."
+    },
+    "Src/Orbiter/MfdTransfer.cpp": {
+      "original_sha256_lf": "943353210b67847d0f73f2f0562d203ec41fd32407790d2146b80dc7a6a9c06a",
+      "sha256_lf": "004441b234c144151d9095fc4eac1e756343d1bbbca3f63468d6c5c15259a616",
+      "scope": "Compile all ten original stock instrument implementations with native SDK types. Preserve exact Windows calculations/call order and share panel mouse constants. Native brush/fill/blit callbacks delegate to the shared renderer and are checked by actual pixels across twenty contexts; instrument lifecycle and native DG runtime remain unfinished."
     },
     "Src/Orbiter/MfdTransfer.h": {
       "original_sha256_lf": "93a9de4ba8104468a2c8135e223b951124c71bf3e76aacdd5fcec7126ca56846",
@@ -488,8 +534,8 @@
     },
     "Src/Orbiter/Pane.h": {
       "original_sha256_lf": "9ea0b381f6a97848c12ac3d08cce898c3b4cdf500338bb21d489236c310fb706",
-      "sha256_lf": "763720e58c0f2ff94afdf856124e539fecfff851a9e07f2d9ed3e80abca3e168",
-      "scope": "Private cockpit graphics binding only. Original algorithms and Windows underlying pointer types conserved by cockpit_source.py; native instrumentation is not operational yet."
+      "sha256_lf": "c8d6348db406ba5a5b73ac9582fddb4f8b90f34e4f4a0adf963ef3d2a23f9004",
+      "scope": "Compile all ten original stock instrument implementations with native SDK types. Preserve exact Windows calculations/call order and share panel mouse constants. Native brush/fill/blit callbacks delegate to the shared renderer and are checked by actual pixels across twenty contexts; instrument lifecycle and native DG runtime remain unfinished."
     },
     "Src/Orbiter/Panel.h": {
       "original_sha256_lf": "d517f73ee3cf326e944b8ac000fd19a75e1b30ac2a4bac59b0c1d481cadce1c3",
@@ -559,10 +605,15 @@
       "sha256_lf": "7b7643c823ae0015e8a5ecf73e296a909c9af346b3be6f41235d2373f90283c9",
       "scope": "Private cockpit graphics binding only. Original algorithms and Windows underlying pointer types conserved by cockpit_source.py; native instrumentation is not operational yet."
     },
+    "Src/Orbiter/Production/CockpitNativeSupport.h": {
+      "original_sha256_lf": null,
+      "sha256_lf": "6a401644f39aada0db2fcdaeec1a90a91c1f2ce496456d1f6cf4a2697cfaac65",
+      "scope": "Compile all ten original stock instrument implementations with native SDK types. Preserve exact Windows calculations/call order and share panel mouse constants. Native brush/fill/blit callbacks delegate to the shared renderer and are checked by actual pixels across twenty contexts; instrument lifecycle and native DG runtime remain unfinished."
+    },
     "Src/Orbiter/Production/CockpitServices.h": {
       "original_sha256_lf": null,
-      "sha256_lf": "8f8319800563274d231874fc427d52917b67faa67e59541bc873066e5b12e5a6",
-      "scope": "Private cockpit graphics/configuration binding. Original algorithms and Windows pointer types conserved by cockpit_source.py; native instrumentation is not operational yet."
+      "sha256_lf": "acff42ff72ebba80e537acf4d784b6683761e91593a82530c0ae7484addbf9c2",
+      "scope": "Compile all ten original stock instrument implementations with native SDK types. Preserve exact Windows calculations/call order and share panel mouse constants. Native brush/fill/blit callbacks delegate to the shared renderer and are checked by actual pixels across twenty contexts; instrument lifecycle and native DG runtime remain unfinished."
     },
     "Src/Orbiter/Production/ConfigurationTypes.h": {
       "sha256_lf": "ac918e8125269b49da9d5a90afeb96d658b41addae6d44a61d5addf84905628a",
@@ -734,7 +785,8 @@
     },
     "Src/Orbiter/Production/NativeGraphics.h": {
       "original_sha256_lf": null,
-      "sha256_lf": "2138bb48a1eeefb5e0e5d67692b325a8b1a5253016f3dc8659a6a6f1e5e6b9f0"
+      "sha256_lf": "93b0aab100694d72701f17769f55d5e99a13e79450f0f785bdf3505aa8ca7f9b",
+      "scope": "Compile all ten original stock instrument implementations with native SDK types. Preserve exact Windows calculations/call order and share panel mouse constants. Native brush/fill/blit callbacks delegate to the shared renderer and are checked by actual pixels across twenty contexts; instrument lifecycle and native DG runtime remain unfinished."
     },
     "Src/Orbiter/Production/NativeModule.cpp": {
       "sha256_lf": "d90fc24038e5acf5c20329c08ac433c94fb4603811e7a1fc9aaf38eedb59e82a",
@@ -758,11 +810,13 @@
     },
     "Src/Orbiter/Production/NativeRenderApi.cpp": {
       "original_sha256_lf": null,
-      "sha256_lf": "75e60a06d7fcaf9b07bf312980bdc9a2031374cb108ef80c372a535f98e53106"
+      "sha256_lf": "04949b7a8be5181c6903e97d38ef96ec11289c4557a2ff47da40c68d6c2a42ac",
+      "scope": "Compile all ten original stock instrument implementations with native SDK types. Preserve exact Windows calculations/call order and share panel mouse constants. Native brush/fill/blit callbacks delegate to the shared renderer and are checked by actual pixels across twenty contexts; instrument lifecycle and native DG runtime remain unfinished."
     },
     "Src/Orbiter/Production/NativeRenderApi.h": {
       "original_sha256_lf": null,
-      "sha256_lf": "5494b35e3a1c66bc3463f3cfb0e096ef2a183a0a3560e2b91bb8934720ba4a23"
+      "sha256_lf": "d29a1c9951e4158e89d0280d7ca3d3e23a80cd2565226065c7a1aed5764aed0b",
+      "scope": "Compile all ten original stock instrument implementations with native SDK types. Preserve exact Windows calculations/call order and share panel mouse constants. Native brush/fill/blit callbacks delegate to the shared renderer and are checked by actual pixels across twenty contexts; instrument lifecycle and native DG runtime remain unfinished."
     },
     "Src/Orbiter/Production/NativeVesselApplication.cpp": {
       "original_sha256_lf": null,
@@ -1216,8 +1270,8 @@
     },
     "Src/Orbiter/hud.h": {
       "original_sha256_lf": "3f18667e52f3dad3698dc79f1e78f5ed9116d1a1de8cecb3cbd8fd02db9de569",
-      "sha256_lf": "bd88915e453834292cefbb97b40a4d8af400c47a8863abef91f0dbdb954a6edc",
-      "scope": "Private cockpit graphics binding only. Original algorithms and Windows underlying pointer types conserved by cockpit_source.py; native instrumentation is not operational yet."
+      "sha256_lf": "fc9ca1d6f85e725c1c4e46bf7f66b680121fecee48f09ee92a1bc054c75897bd",
+      "scope": "Compile all ten original stock instrument implementations with native SDK types. Preserve exact Windows calculations/call order and share panel mouse constants. Native brush/fill/blit callbacks delegate to the shared renderer and are checked by actual pixels across twenty contexts; instrument lifecycle and native DG runtime remain unfinished."
     },
     "Src/Vessel/DeltaGlider/FuelMfd.cpp": {
       "original_sha256_lf": "251be4f317f9568087035a289f652eff96b90e4cd499a92aacaf6e4f0c39b648",

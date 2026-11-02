@@ -18,6 +18,8 @@ oapi::Font* CreateFontResource(int height,bool prop,const char* face,FontStyle s
 void ReleaseFontResource(oapi::Font* font) override {clbkReleaseFont(font);}
 oapi::Pen* CreatePenResource(int style,int width,oapi::UInt32 color) override {return CreatePen(style,width,color);}
 void ReleasePenResource(oapi::Pen* pen) override {clbkReleasePen(pen);}
+oapi::Brush* CreateBrushResource(oapi::UInt32 color) override {return CreateBrush(color);}
+void ReleaseBrushResource(oapi::Brush* brush) override {clbkReleaseBrush(brush);}
 oapi::Sketchpad* AcquireSketchpad(SURFHANDLE surface) override {return GetSketchpad(surface,true);}
 void ReleaseSketchpadResource(oapi::Sketchpad* pad) override {clbkReleaseSketchpad(pad);}
 SURFHANDLE CreateSurfaceResource(int w,int h) override {return CreateSurface(w,h);}
@@ -27,3 +29,9 @@ oapi::ParticleStream* Exhaust(PARTICLESTREAMSPEC* spec,OBJHANDLE vessel,const do
 oapi::ParticleStream* Reentry(PARTICLESTREAMSPEC* spec,OBJHANDLE vessel) override {return clbkCreateReentryStream(spec,vessel);}
 
 void clbkGetViewportSize(oapi::UInt32* width,oapi::UInt32* height) const override {int w,h;GetViewportSize(&w,&h);*width=w;*height=h;}
+
+SURFHANDLE clbkCreateSurfaceEx(oapi::UInt32 w,oapi::UInt32 h,oapi::UInt32 flags) override {return CreateSurfaceEx(int(w),int(h),int(flags));}
+oapi::UInt32 clbkGetDeviceColour(std::uint8_t r,std::uint8_t g,std::uint8_t b) override {return GetDeviceColour(r,g,b);}
+bool clbkFillSurface(SURFHANDLE surface,oapi::UInt32 color) const override {return FillSurface(surface,color);}
+bool clbkBlt(SURFHANDLE t,oapi::UInt32 x,oapi::UInt32 y,SURFHANDLE s,oapi::UInt32 flags) const override {return Blt(t,int(x),int(y),s,int(flags));}
+bool clbkBlt(SURFHANDLE t,oapi::UInt32 x,oapi::UInt32 y,SURFHANDLE s,oapi::UInt32 sx,oapi::UInt32 sy,oapi::UInt32 w,oapi::UInt32 h,oapi::UInt32 flags) const override {return Blt(t,int(x),int(y),s,int(sx),int(sy),int(w),int(h),int(flags));}

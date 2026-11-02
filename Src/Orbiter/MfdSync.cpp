@@ -1,6 +1,12 @@
 // Copyright (c) Martin Schweiger
 // Licensed under the MIT License
 
+#include "Production/CockpitServices.h"
+#ifndef _WIN32
+#include "Production/CockpitNativeSupport.h"
+#include "Planet.h"
+#endif
+
 #include "Astro.h"
 #include "MfdSync.h"
 #include "Pane.h"
@@ -29,7 +35,7 @@ static const char *modestr[7] = {
 
 struct Instrument_OSync::SavePrm Instrument_OSync::saveprm = {0, 0, Instrument_OSync::MODE_INTERSECT1, 0.0, 5};
 
-Instrument_OSync::Instrument_OSync (Pane *_pane, INT_PTR _id, const Spec &spec, Vessel *_vessel, bool restore)
+Instrument_OSync::Instrument_OSync (Pane *_pane, std::intptr_t _id, const Spec &spec, Vessel *_vessel, bool restore)
 : Instrument (_pane, _id, spec, _vessel)
 {
 	mode = MODE_INTERSECT1;
@@ -270,7 +276,7 @@ bool Instrument_OSync::KeyImmediate (char *kstate)
 	return false;
 }
 
-bool Instrument_OSync::KeyBuffered (DWORD key)
+bool Instrument_OSync::KeyBuffered (oapi::UInt32 key)
 {
 	switch (key) {
 	case OAPI_KEY_M:  // switch mode
@@ -289,7 +295,7 @@ bool Instrument_OSync::KeyBuffered (DWORD key)
 
 bool Instrument_OSync::ProcessButton (int bt, int event)
 {
-	static const DWORD btkey[5] = { OAPI_KEY_T, OAPI_KEY_M, OAPI_KEY_N, OAPI_KEY_COMMA, OAPI_KEY_PERIOD };
+	static const oapi::UInt32 btkey[5] = { OAPI_KEY_T, OAPI_KEY_M, OAPI_KEY_N, OAPI_KEY_COMMA, OAPI_KEY_PERIOD };
 	if (event & PANEL_MOUSE_LBDOWN) {
 		if (bt < 3) return KeyBuffered (btkey[bt]);
 	} else if (event & PANEL_MOUSE_LBPRESSED) {
@@ -376,15 +382,15 @@ bool Instrument_OSync::ReadParams (ifstream &ifs)
 	for (;;) {
 		if (!ifs.getline (cbuf, 256)) return false;
 		pc = trim_string (cbuf);
-		if (!_strnicmp (pc, "END_MFD", 7)) break;
-		if (!_strnicmp (pc, "TARGET", 6)) {
+		if (!orbiter::production::ComparePrefix (pc, "END_MFD", 7)) break;
+		if (!orbiter::production::ComparePrefix (pc, "TARGET", 6)) {
 			strcpy (ctgt, trim_string (pc+6));
-		} else if (!_strnicmp (pc, "MODE", 4)) {
+		} else if (!orbiter::production::ComparePrefix (pc, "MODE", 4)) {
 			strcpy (cmode, trim_string (pc+4));
-		} else if (!_strnicmp (pc, "MANUALREF", 9)) {
+		} else if (!orbiter::production::ComparePrefix (pc, "MANUALREF", 9)) {
 			sscanf (pc+9, "%lf", &rlng);
 			rlng *= RAD;
-		} else if (!_strnicmp (pc, "LISTLEN", 7)) {
+		} else if (!orbiter::production::ComparePrefix (pc, "LISTLEN", 7)) {
 			sscanf (pc+7, "%d", &llen);
 		}
 	}
@@ -394,7 +400,7 @@ bool Instrument_OSync::ReadParams (ifstream &ifs)
 	}
 	if (cmode[0]) {
 		for (i = 0; i < 7; i++)
-			if (!_stricmp (cmode, modestr[i])) {
+			if (!orbiter::production::CompareText (cmode, modestr[i])) {
 				mode = (Mode)i;
 				break;
 			}

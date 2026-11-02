@@ -1,6 +1,12 @@
 // Copyright (c) Martin Schweiger
 // Licensed under the MIT License
 
+#include "Production/CockpitServices.h"
+#ifndef _WIN32
+#include "Production/CockpitNativeSupport.h"
+#include "Planet.h"
+#endif
+
 #include "MfdHsi.h"
 #include "Nav.h"
 #include "Base.h"
@@ -16,7 +22,7 @@ using namespace std;
 
 struct Instrument_HSI::SavePrm Instrument_HSI::saveprm = {0, {{0,0}, {0,0}}};
 
-Instrument_HSI::Instrument_HSI (Pane *_pane, INT_PTR _id, const Spec &spec, Vessel *_vessel)
+Instrument_HSI::Instrument_HSI (Pane *_pane, std::intptr_t _id, const Spec &spec, Vessel *_vessel)
 : Instrument (_pane, _id, spec, _vessel)
 {
 	int i;
@@ -34,8 +40,8 @@ Instrument_HSI::Instrument_HSI (Pane *_pane, INT_PTR _id, const Spec &spec, Vess
 		
 	SetSize (spec);
 	if (gc) {
-		pen[0] = gc->clbkCreatePen (1, 1, RGB(160,160,160));
-		pen[1] = gc->clbkCreatePen (1, 1, RGB(255,128,0));
+		pen[0] = gc->clbkCreatePen (1, 1, orbiter::production::CockpitColor(160,160,160));
+		pen[1] = gc->clbkCreatePen (1, 1, orbiter::production::CockpitColor(255,128,0));
 		brush  = gc->clbkCreateBrush (col_yellow1);
 	} else {
 		for (i = 0; i < 2; i++) pen[i] = 0;
@@ -80,7 +86,7 @@ void Instrument_HSI::UpdateDraw (oapi::Sketchpad *skp)
 		2, 2, 2, 4, 4, 4, 4, 4, // outer markers
 		2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2 // gyro ticks
 	};
-	static const INT narrowseg = 3, arrowseg[3] = {7,4,4};
+	static const int narrowseg = 3, arrowseg[3] = {7,4,4};
 
 	static const char *label[12] = {"N", "3", "6", "E", "12", "15", "S", "21", "24", "W", "30", "33"};
 	static int llen[12] = {1,1,1,1,2,2,1,2,2,1,2,2};
@@ -290,7 +296,7 @@ void Instrument_HSI::SetSize (const Spec &spec)
 	psym[2].y = psym[3].y = U3;
 }
 
-bool Instrument_HSI::KeyBuffered (DWORD key)
+bool Instrument_HSI::KeyBuffered (oapi::UInt32 key)
 {
 	switch (key) {
 	case OAPI_KEY_F:
@@ -326,7 +332,7 @@ bool Instrument_HSI::KeyImmediate (char *kstate)
 
 bool Instrument_HSI::ProcessButton (int bt, int event)
 {
-	static const DWORD btkey[4] = { OAPI_KEY_F, OAPI_KEY_N, OAPI_KEY_LBRACKET, OAPI_KEY_RBRACKET };
+	static const oapi::UInt32 btkey[4] = { OAPI_KEY_F, OAPI_KEY_N, OAPI_KEY_LBRACKET, OAPI_KEY_RBRACKET };
 	if (event & PANEL_MOUSE_LBDOWN) {
 		if (bt < 2) return KeyBuffered (btkey[bt]);
 	} else if (event & PANEL_MOUSE_LBPRESSED) {
@@ -360,11 +366,11 @@ bool Instrument_HSI::ReadParams (ifstream &ifs)
 	for (;;) {
 		if (!ifs.getline (cbuf, 256)) return false;
 		pc = trim_string (cbuf);
-		if (!_strnicmp (pc, "END_MFD", 7)) {
+		if (!orbiter::production::ComparePrefix (pc, "END_MFD", 7)) {
 			break;
-		} else if (!_strnicmp (pc, "NAV", 3)) {
+		} else if (!orbiter::production::ComparePrefix (pc, "NAV", 3)) {
 			sscanf (pc+3, "%d%d", &hsi[0].nv, &hsi[1].nv);
-		} else if (!_strnicmp (pc, "OBS", 3)) {
+		} else if (!orbiter::production::ComparePrefix (pc, "OBS", 3)) {
 			sscanf (pc+3, "%lf%lf", &hsi[0].obs, &hsi[1].obs);
 		}
 	}

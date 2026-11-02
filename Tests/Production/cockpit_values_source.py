@@ -12,7 +12,8 @@ def ranges(source):
     a=source.index('typedef struct {\n\tRECT pos;');b=source.index('#pragma pack(pop)',a)+len('#pragma pack(pop)')
     x=source.rfind('// ===========================================================================',0,source.index('\\defgroup hudmode '))
     y=source.index('//@}',source.index('#define MFD_USER10',x))+len('//@}')
-    return [(a,b,'#include "OrbiterCockpitData.h"'),(x,y,'')]
+    m=source.index('#define PANEL_MOUSE_IGNORE');n=source.index('\n',source.index('#define PANEL_MOUSE_ONREPLAY',m))
+    return [(a,b,'#include "OrbiterCockpitData.h"'),(x,y,''),(m,n,'')]
 
 def verify_values():
     source=original();blocks=ranges(source)
@@ -36,7 +37,7 @@ using CockpitSignedParam=LPARAM;
 }''',prefix,'Windows MFD callback scalar identities')
     body=win[len(prefix):].rsplit('#endif',1)[0]
     for a,b in [('oapi::CockpitMessageResult','OAPI_MSGTYPE'),('oapi::CockpitUnsignedParam','WPARAM'),('oapi::CockpitSignedParam','LPARAM'),('oapi::UInt32','DWORD'),('oapi::UInt','UINT'),('oapi::SdkRectangle','RECT')]:body=body.replace(a,b)
-    equal(''.join(source[a:b] for a,b,_ in blocks),body,'Complete original cockpit SDK records, packing, field order and mode values')
+    equal('\n'.join(source[a:b] for a,b,_ in blocks),body,'Complete original cockpit SDK records, packing, field order and mode values')
 
 def restore_gui(text):
     if '#include "OrbiterGuiData.h"' not in text:return text

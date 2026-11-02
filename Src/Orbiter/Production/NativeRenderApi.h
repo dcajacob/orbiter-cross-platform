@@ -6,6 +6,7 @@
 #include "NativeGraphicsData.h"
 #include "DrawAPI.h"
 #include <cstdint>
+ORBITER_PRODUCTION_API void oapiBlt(SURFHANDLE,SURFHANDLE,int,int,int,int,int,int,oapi::UInt32=SURF_NO_CK);
 ORBITER_PRODUCTION_API double oapiCameraAperture ();
 ORBITER_PRODUCTION_API void oapiCameraGlobalDir (VECTOR3 *gdir);
 ORBITER_PRODUCTION_API void oapiCameraGlobalPos (VECTOR3 *gpos);

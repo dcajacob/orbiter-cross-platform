@@ -1,12 +1,20 @@
 // Copyright (c) Martin Schweiger
 // Licensed under the MIT License
 
+#include "Production/CockpitServices.h"
+#ifndef _WIN32
+#include "Production/CockpitNativeSupport.h"
+#include "Planet.h"
+#endif
+
 #include "Astro.h"
 #include "MfdAlign.h"
 #include "Pane.h"
 #include "Planet.h"
 #include "Psys.h"
+#ifdef _WIN32
 #include "Log.h"
+#endif
 #include "Select.h"
 #include <iomanip>
 
@@ -23,9 +31,9 @@ static const Body *last_target = 0;
 // =======================================================================
 // class Instrument_OPlaneAlign
 
-struct Instrument_OPlaneAlign::SavePrm Instrument_OPlaneAlign::saveprm = {0,0,0,0.0,0.0,false};
+struct Instrument_OPlaneAlign::SavePrm Instrument_OPlaneAlign::saveprm = {0,0,0,false,0.0,0.0};
 
-Instrument_OPlaneAlign::Instrument_OPlaneAlign (Pane *_pane, INT_PTR _id, const Spec &spec, Vessel *_vessel, bool restore)
+Instrument_OPlaneAlign::Instrument_OPlaneAlign (Pane *_pane, std::intptr_t _id, const Spec &spec, Vessel *_vessel, bool restore)
 : Instrument (_pane, _id, spec, _vessel)
 {
 	shpel = new Elements(); TRACENEW
@@ -484,7 +492,7 @@ bool Instrument_OPlaneAlign::GetTimingsFromSurface(double &Tan, double &Aan, dou
 	}
 }
 
-bool Instrument_OPlaneAlign::KeyBuffered (DWORD key)
+bool Instrument_OPlaneAlign::KeyBuffered (oapi::UInt32 key)
 {
 	switch (key) {
 	case OAPI_KEY_A:  // auto reference
@@ -508,7 +516,7 @@ bool Instrument_OPlaneAlign::KeyBuffered (DWORD key)
 
 bool Instrument_OPlaneAlign::ProcessButton (int bt, int event)
 {
-	static const DWORD btkey[5] = { OAPI_KEY_R, OAPI_KEY_A, OAPI_KEY_T, OAPI_KEY_E, OAPI_KEY_M };
+	static const oapi::UInt32 btkey[5] = { OAPI_KEY_R, OAPI_KEY_A, OAPI_KEY_T, OAPI_KEY_E, OAPI_KEY_M };
 	if (event & PANEL_MOUSE_LBDOWN) {
 		if (bt < 5) return KeyBuffered (btkey[bt]);
 	}
@@ -603,17 +611,17 @@ bool Instrument_OPlaneAlign::ReadParams (ifstream &ifs)
 	for (;;) {
 		if (!ifs.getline (cbuf, 256)) return false;
 		pc = trim_string (cbuf);
-		if (!_strnicmp (pc, "END_MFD", 7)) break;
-		if (!_strnicmp (pc, "TARGET", 6)) {
+		if (!orbiter::production::ComparePrefix (pc, "END_MFD", 7)) break;
+		if (!orbiter::production::ComparePrefix (pc, "TARGET", 6)) {
 			strcpy (ctgt, trim_string (pc+6));
 		}
-		else if (!_strnicmp(pc, "REF", 3)) {
+		else if (!orbiter::production::ComparePrefix(pc, "REF", 3)) {
 			strcpy(cref, trim_string(pc + 3));
-		} else if (!_strnicmp(pc, "MODE", 4)) {
+		} else if (!orbiter::production::ComparePrefix(pc, "MODE", 4)) {
 			int m;
 			sscanf(pc + 4, "%d", &m);
 			mode = (Mode)m;
-		} else if (!_strnicmp (pc, "TGTELS", 6)) {
+		} else if (!orbiter::production::ComparePrefix (pc, "TGTELS", 6)) {
 			sscanf (pc+6, "%lf%lf", &i, &theta);
 			customels = true;
 		}

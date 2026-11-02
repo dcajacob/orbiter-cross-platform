@@ -43,6 +43,44 @@ int main(int argc,char** argv){try{
     const auto error=glGetError();unsigned green=0;
     for(unsigned i=0;i<sizeof(pixels);i+=4)if(pixels[i+1]>pixels[i]+20 && pixels[i+1]>pixels[i+2]+20)++green;
     client->ReleaseTextureResource(surface);const bool rejected=client->CreateSurfaceResource(0,64)==nullptr;
+    auto source=client->clbkCreateSurfaceEx(16,16,OAPISURFACE_RENDERTARGET|OAPISURFACE_SKETCHPAD);
+    auto target=client->clbkCreateSurfaceEx(24,24,OAPISURFACE_RENDERTARGET|OAPISURFACE_TEXTURE);
+    require(source && target,"Instrument callback surface allocation failed");
+    require(client->clbkFillSurface(source,client->clbkGetDeviceColour(20,70,130)),"Device-color fill failed");
+    require(client->clbkFillSurface(target,0),"Target fill failed");
+    auto brush=client->clbkCreateBrush(255);require(brush,"Instrument brush callback failed");
+    pad=client->clbkGetSketchpad(source);require(pad,"Callback Sketchpad unavailable");
+    pad->SetPen(nullptr);pad->SetBrush(brush);pad->Rectangle(3,3,11,11);
+    client->clbkReleaseSketchpad(pad);client->clbkReleaseBrush(brush);
+    require(client->clbkBlt(target,4,4,source),"Complete instrument surface copy failed");
+    const auto read=[&](SURFHANDLE handle,int w,int h){
+        std::vector<unsigned char> data(size_t(w)*h*4);
+        glBindTexture(GL_TEXTURE_2D,static_cast<OGLTexture*>(handle)->m_TexId);
+        glGetTexImage(GL_TEXTURE_2D,0,GL_RGBA,GL_UNSIGNED_BYTE,data.data());glBindTexture(GL_TEXTURE_2D,0);return data;
+    };
+    const auto sourcePixels=read(source,16,16),copied=read(target,24,24);
+    unsigned filled=0,painted=0;
+    for(int y=0;y<16;++y)for(int x=0;x<16;++x){
+        const auto offset=size_t(y*16+x)*4;
+        const auto r=sourcePixels[offset],g=sourcePixels[offset+1],b=sourcePixels[offset+2];
+        if(r==20 && g==70 && b==130)++filled;
+        if(r==255 && g==0 && b==0)++painted;
+        require(std::equal(sourcePixels.begin()+offset,sourcePixels.begin()+offset+4,copied.begin()+size_t((y+4)*24+x+4)*4),
+            "Complete instrument surface copy changed pixel coordinates or colors");
+    }
+    require(filled>100 && painted>20,"Instrument brush or device color produced incorrect pixels");
+    oapiBlt(target,source,0,0,0,0,16,16);
+    const auto apiCopied=read(target,24,24);
+    for(int y=0;y<16;++y) require(std::equal(sourcePixels.begin()+size_t(y)*16*4,sourcePixels.begin()+size_t(y+1)*16*4,
+        apiCopied.begin()+size_t(y)*24*4),"Native SDK rectangular surface copy differs from its source");
+    bool obsoleteRejected=false;try{oapiBlt(target,source,0,0,0,0,16,16,0);}catch(const std::runtime_error&){obsoleteRejected=true;}
+    require(obsoleteRejected,"Unsupported obsolete SDK color key silently succeeded");
+    require(client->clbkBlt(target,1,1,target,0,0,16,16),"Overlapping instrument copy failed");
+    const auto overlap=read(target,24,24);
+    for(int y=0;y<16;++y) require(std::equal(apiCopied.begin()+size_t(y)*24*4,apiCopied.begin()+size_t(y)*24*4+16*4,
+        overlap.begin()+size_t((y+1)*24+1)*4),"Overlapping instrument copy did not snapshot its source");
+    require(glGetError()==GL_NO_ERROR,"Instrument brush/fill/blit callbacks produced a GL error");
+    client->ReleaseTextureResource(source);client->ReleaseTextureResource(target);
     auto stock=client->LoadTextureResource("shuttlepb.dds",4);require(stock,"Actual compressed stock texture missing");
     auto* writable=static_cast<OGLTexture*>(stock);GLint compressedBefore=0,compressedAfter=0;
     glBindTexture(GL_TEXTURE_2D,writable->m_TexId);glGetTexLevelParameteriv(GL_TEXTURE_2D,0,GL_TEXTURE_COMPRESSED,&compressedBefore);
@@ -63,7 +101,7 @@ int main(int argc,char** argv){try{
     if(cycle+1!=cycles)continue;
     std::ofstream report(argv[4]);report.exceptions(std::ios::badbit|std::ios::failbit);
     report<<"{\"status\":\"passed\",\"requested_height\":-14,\"character_width\":"<<width<<",\"character_height\":"<<height
-          <<",\"context_cycles\":"<<cycles<<",\"glyph_pixels\":"<<green<<",\"invalid_surface_rejected\":true,\"gl_error\":0,\"compressed_target_changed_pixels\":"<<changed<<"}\n";
+          <<",\"surface_callback_pixels_verified\":true,\"context_cycles\":"<<cycles<<",\"glyph_pixels\":"<<green<<",\"invalid_surface_rejected\":true,\"gl_error\":0,\"compressed_target_changed_pixels\":"<<changed<<"}\n";
     std::cout<<"Actual font metrics "<<width<<'x'<<height<<"; green glyph pixels "<<green<<'\n';
     }
     context.graphics=nullptr;BindNativeRenderContext(nullptr);

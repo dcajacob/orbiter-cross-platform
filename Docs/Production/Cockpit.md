@@ -169,3 +169,27 @@ coordinates, clipping and invalid hyperbolic scales. This is actual instrument
 geometry code; the native instrument scheduler, drawing and cockpit runtime
 remain unfinished. Windows cockpit image/numerical regression is still required
 for this extraction.
+
+The SDK/declaration extraction at `a716a8e3` passes the complete current Windows
+application/SDK and all nine frozen cockpit comparisons in
+[run 41471188840](https://github.com/dcajacob/orbiter-cross-platform/actions/runs/41471188840),
+including the Debug/Release comparison. The four native configurations pass in
+[run 41471188877](https://github.com/dcajacob/orbiter-cross-platform/actions/runs/41471188877).
+
+The next stage compiles the actual implementations of all ten stock MFD modes
+as native objects, with original Windows algorithms and callback ordering
+verified by reconstruction. It shares original panel mouse-event constants and
+uses explicit drawing, color, configuration-path and case-comparison services.
+The align-plane saved defaults now use a boolean zero in the boolean slot
+and floating-point zeros in the two angle slots; this preserves all initial
+values and fixes a narrowing initializer rejected by GCC.
+
+Native brush, device-color fill, whole/rectangular blits, overlapping self-blits
+and default SDK `oapiBlt` delegate to the existing shared OpenGL implementation.
+The renderer probe verifies real pixels and resource teardown across twenty
+contexts, including drawing into a compressed stock texture. Obsolete SDK
+color-key arguments fail explicitly on native builds. This stage does not yet
+link the native instrument lifecycle or make DG/DG-S cockpits operational.
+The original application call forms and Windows SDK class/field layouts remain
+unchanged. Current Windows image/state comparisons are required before this
+stage is accepted.

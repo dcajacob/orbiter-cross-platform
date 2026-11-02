@@ -26,3 +26,13 @@ add_executable(mfd-orbit-geometry ../OrbitGeometry.Test.cpp)
 target_compile_features(mfd-orbit-geometry PRIVATE cxx_std_17)
 target_include_directories(mfd-orbit-geometry PRIVATE "${ORBITER_ROOT}/Src/Orbiter" "${ORBITER_ROOT}/Orbitersdk/include")
 target_link_libraries(mfd-orbit-geometry PRIVATE native_boundary)
+# Compile the actual ten stock modes. Object compilation is a portability gate;
+# no native Pane/instrument lifecycle is claimed until the runtime is linked.
+add_library(stock-instrument-objects OBJECT
+    ../../../../Src/Orbiter/MfdOrbit.cpp ../../../../Src/Orbiter/MfdSurface.cpp
+    ../../../../Src/Orbiter/MfdMap.cpp ../../../../Src/Orbiter/MfdHsi.cpp
+    ../../../../Src/Orbiter/MfdLanding.cpp ../../../../Src/Orbiter/MfdDocking.cpp
+    ../../../../Src/Orbiter/MfdAlign.cpp ../../../../Src/Orbiter/MfdSync.cpp
+    ../../../../Src/Orbiter/MfdTransfer.cpp ../../../../Src/Orbiter/MfdComms.cpp)
+target_compile_features(stock-instrument-objects PRIVATE cxx_std_17)
+target_include_directories(stock-instrument-objects PRIVATE "${ORBITER_ROOT}/Src/Orbiter" "${ORBITER_ROOT}/Orbitersdk/include")

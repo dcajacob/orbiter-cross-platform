@@ -10,9 +10,14 @@
 #define __PANE_H
 
 #define STRICT 1
+#ifdef _WIN32
 #include <windows.h>
 #include <mmsystem.h>
 #include "Orbiter.h"
+#else
+#include "NativeVesselAPI.h"
+class DefaultPanel;class Panel2D;class Panel;class VirtualCockpit;class MenuInfoBar;class ExternMFD;
+#endif
 #include "Body.h"
 #include "Mfd.h"
 #include "Production/CockpitGraphics.h"
@@ -52,7 +57,11 @@ class Pane {
 	friend class MenuInfoBar;
 
 public:
+	#ifdef _WIN32
 	Pane (oapi::CockpitClient *gclient, HWND hwnd, int width, int height, int bpp);
+#else
+	Pane (oapi::CockpitClient *gclient, int width, int height, int bpp);
+#endif
 	// Create a new pane with dimension width x height x bpp
 
 	~Pane ();
@@ -62,7 +71,9 @@ public:
 	int BitsPerPixel() const { return BPP; }
 	// Return pane dimensions
 
+#ifdef _WIN32
 	void RestoreDeviceObjects (LPDIRECT3D7 d3d, LPDIRECT3DDEVICE7 dev);
+#endif
 	// Restore all devices (e.g. after render window is re-openend
 
 	void Update (double simt, double syst);
@@ -86,12 +97,12 @@ public:
 	void SetSketchpadDefault (oapi::Sketchpad *skp);
 	// set HUD defaults for drawing objects (font, text colour, pen)
 
-	bool MFDConsumeKeyBuffered (int id, DWORD key);
+	bool MFDConsumeKeyBuffered (int id, oapi::UInt32 key);
 	// Process a buffered key for MFD id
 
-	bool ProcessMouse_System(UINT event, DWORD state, DWORD x, DWORD y, const char *kstate);
+	bool ProcessMouse_System(oapi::UInt event, oapi::UInt32 state, oapi::UInt32 x, oapi::UInt32 y, const char *kstate);
 
-	bool ProcessMouse_OnRunning (UINT event, DWORD state, DWORD x, DWORD y, const char *kstate);
+	bool ProcessMouse_OnRunning (oapi::UInt event, oapi::UInt32 state, oapi::UInt32 x, oapi::UInt32 y, const char *kstate);
 	// Process a mouse click/release
 
 	void RedrawCockpitAreas (int mode);
@@ -173,7 +184,7 @@ public:
 	double SetMFDRefreshIntervalMultiplier (int id, double multiplier);
 	// modify the refresh interval of an MFD
 
-	bool OpenMFD (INT_PTR id, int type, std::ifstream *ifs = 0);
+	bool OpenMFD (std::intptr_t id, int type, std::ifstream *ifs = 0);
 	// open specified instrument as left/right MFD. Returns true if MFD mode has changed
 	// If scenario stream is provided, parameters are read from this stream
 
@@ -194,7 +205,7 @@ public:
 	 * \param cat option category (see \ref optcat)
 	 * \param item option item (see \ref optitem)
 	 */
-	void OptionChanged(DWORD cat, DWORD item);
+	void OptionChanged(oapi::UInt32 cat, oapi::UInt32 item);
 
 	void RegisterMFD (int id, const MFDSPEC &spec);
 	void RegisterMFD (int id, const EXTMFDSPEC *spec);
@@ -204,7 +215,7 @@ public:
 
 	Instrument *MFD (int which);
 
-	void RepaintMFDButtons (INT_PTR id, Instrument *instr);
+	void RepaintMFDButtons (std::intptr_t id, Instrument *instr);
 	Instrument::Spec GetVCMFDSpec ();
 	const VCMFDSPEC *GetVCMFDParams (int id);
 	const VirtualCockpit *GetVC() const { return vcockpit; }
@@ -213,9 +224,11 @@ public:
 	Panel2D *GetPanel2D() { return panel2d; }
 	Panel *GetPanel2D_old() { return panel; }
 
-	void RegisterPanelBackground (HBITMAP hBmp, DWORD flag, DWORD ck);
-	void RegisterPanelBackground (SURFHANDLE hSurf, DWORD flag);
-	void RegisterPanelArea (int id, const RECT &pos, int draw_mode, int mouse_mode, int bkmode);
+#ifdef _WIN32
+	void RegisterPanelBackground (HBITMAP hBmp, oapi::UInt32 flag, oapi::UInt32 ck);
+#endif
+	void RegisterPanelBackground (SURFHANDLE hSurf, oapi::UInt32 flag);
+	void RegisterPanelArea (int id, const oapi::SdkRectangle &pos, int draw_mode, int mouse_mode, int bkmode);
 	void SetPanelNeighbours (int left, int right, int top, int bottom);
 	void SetVCNeighbours (int left, int right, int top, int bottom);
 	void TriggerPanelRedrawArea (int pid, int aid);
@@ -224,7 +237,7 @@ public:
 	void RegisterVCMFD (int id, const VCMFDSPEC *spec);
 	void RegisterVCHUD (const VCHUDSPEC *spec);
 	void ShiftVC (const Vector &shift);
-	void RegisterVCArea (int id, const RECT &tgtrect, int draw_mode, int mouse_mode, int bkmode, SURFHANDLE tgt);
+	void RegisterVCArea (int id, const oapi::SdkRectangle &tgtrect, int draw_mode, int mouse_mode, int bkmode, SURFHANDLE tgt);
 	void SetVCAreaClickmode_Spherical (int id, const Vector &cnt, double rad);
 	void SetVCAreaClickmode_Quadrilateral (int id, const Vector &p1, const Vector &p2, const Vector &p3, const Vector &p4);
 	void TriggerVCRedrawArea (int vcid, int area_id);
@@ -232,7 +245,9 @@ public:
 
 	void SetPanel2DBlink (VECTOR3 v[4]);
 
+#ifdef _WIN32
 	bool GlobalToHomog (const Vector &glob, D3DVECTOR &homog) const;
+#endif
 	// transform global position glob into homogeneous viewport
 	// coordinates (x=-1: left edge of viewing fustrum etc.)
 	// return value indicates point within fustrum (does not check
@@ -266,9 +281,11 @@ private:
 	oapi::CockpitClient *gc; // client instance
 	int W, H, BPP;            // pane dimensions
 	int scaleW;
+#ifdef _WIN32
 	HWND hWnd;               // window handle
+#endif
 	int colidx;              // HUD colour index
-	COLORREF hudCol;         // HUD colour
+	oapi::UInt32 hudCol;         // HUD colour
 	double hudIntens;        // HUD intensity (VC only)
 	oapi::Font *hudfont[2];  // HUD font resource
 	oapi::Pen *hudpen;       // HUD pen resource
@@ -288,7 +305,7 @@ private:
 
 	MFDspec mfd[MAXMFD];       // panel MFD displays
 	ExternMFD **emfd;          // external MFD displays
-	DWORD nemfd;               // number of external MFDs
+	oapi::UInt32 nemfd;               // number of external MFDs
 	bool mfdsize_pow2;         // force power-2 MFD sizes?
 	int mfd_hires_threshold;   // MFD size at which to switch to 512
 	int mfd_vc_size;           // texture size for VC MFD displays (256/512/1024)

@@ -1,13 +1,21 @@
 // Copyright (c) Martin Schweiger
 // Licensed under the MIT License
 
+#include "Production/CockpitServices.h"
+#ifndef _WIN32
+#include "Production/CockpitNativeSupport.h"
+#include "Planet.h"
+#endif
+
 #include "Astro.h"
 #include "MfdOrbit.h"
 #include "Pane.h"
 #include "Celbody.h"
 #include "Psys.h"
 #include "Select.h"
+#ifdef _WIN32
 #include "Log.h"
+#endif
 
 using namespace std;
 
@@ -29,7 +37,7 @@ struct Instrument_Orbit::SavePrm Instrument_Orbit::saveprm = {
 	Instrument_Orbit::DISP_BOTH
 };
 
-Instrument_Orbit::Instrument_Orbit (Pane *_pane, INT_PTR _id, const Spec &spec, Vessel *_vessel)
+Instrument_Orbit::Instrument_Orbit (Pane *_pane, std::intptr_t _id, const Spec &spec, Vessel *_vessel)
 : Instrument (_pane, _id, spec, _vessel)
 {
 	projmode = saveprm.projmode;
@@ -92,7 +100,7 @@ HELPCONTEXT *Instrument_Orbit::HelpTopic () const
 	return &DefHelpContext;
 }
 
-bool Instrument_Orbit::KeyBuffered (DWORD key)
+bool Instrument_Orbit::KeyBuffered (oapi::UInt32 key)
 {
 	switch (key) {
 	case OAPI_KEY_A:  // auto reference
@@ -133,7 +141,7 @@ bool Instrument_Orbit::KeyBuffered (DWORD key)
 
 bool Instrument_Orbit::ProcessButton (int bt, int event)
 {
-	static const DWORD btkey[9] = { OAPI_KEY_R, OAPI_KEY_A, OAPI_KEY_T, OAPI_KEY_N, OAPI_KEY_M, OAPI_KEY_F, OAPI_KEY_P, OAPI_KEY_D, OAPI_KEY_H };
+	static const oapi::UInt32 btkey[9] = { OAPI_KEY_R, OAPI_KEY_A, OAPI_KEY_T, OAPI_KEY_N, OAPI_KEY_M, OAPI_KEY_F, OAPI_KEY_P, OAPI_KEY_D, OAPI_KEY_H };
 	if (event & PANEL_MOUSE_LBDOWN) {
 		if (bt < 9) return KeyBuffered (btkey[bt]);
 	}
@@ -507,31 +515,31 @@ bool Instrument_Orbit::ReadParams (ifstream &ifs)
 	for (;;) {
 		if (!ifs.getline (cbuf, 256)) return false;
 		pc = trim_string (cbuf);
-		if (!_strnicmp (pc, "END_MFD", 7)) break;
-		if (!_strnicmp (pc, "PROJ", 4)) {
+		if (!orbiter::production::ComparePrefix (pc, "END_MFD", 7)) break;
+		if (!orbiter::production::ComparePrefix (pc, "PROJ", 4)) {
 			strcpy (cprj, trim_string (pc+4));
-		} else if (!_strnicmp (pc, "ALT", 3)) {
+		} else if (!orbiter::production::ComparePrefix (pc, "ALT", 3)) {
 			dstmode = DIST_ALT;
-		} else if (!_strnicmp (pc, "REF", 3)) {
+		} else if (!orbiter::production::ComparePrefix (pc, "REF", 3)) {
 			strcpy (cref, trim_string (pc+3));
-		} else if (!_strnicmp (pc, "TARGET", 6)) {
+		} else if (!orbiter::production::ComparePrefix (pc, "TARGET", 6)) {
 			strcpy (ctgt, trim_string (pc+6));
-		} else if (!_strnicmp (pc, "FRAME", 5)) {
+		} else if (!orbiter::production::ComparePrefix (pc, "FRAME", 5)) {
 			pc = trim_string (pc+5);
-			if (!_stricmp (pc, "Ecliptic"))
+			if (!orbiter::production::CompareText (pc, "Ecliptic"))
 				frmmode = FRM_ECL;
-			else if (!_stricmp (pc, "Equator"))
+			else if (!orbiter::production::CompareText (pc, "Equator"))
 				frmmode = FRM_EQU;
 		}
 	}
 	if (cref[0]) SelectRef (cref);
 	if (ctgt[0]) SelectTarget (ctgt);
 	if (cprj[0]) {
-		if (!_strnicmp (cprj, "Ship", 4))
+		if (!orbiter::production::ComparePrefix (cprj, "Ship", 4))
 			projmode = PRJ_SHIP;
-		else if (!_strnicmp (cprj, "Target", 6) && tgt)
+		else if (!orbiter::production::ComparePrefix (cprj, "Target", 6) && tgt)
 			projmode = PRJ_TGT;
-		else if (!_strnicmp (cprj, "Ecliptic", 8) || !_strnicmp (cprj, "Frame", 5))
+		else if (!orbiter::production::ComparePrefix (cprj, "Ecliptic", 8) || !orbiter::production::ComparePrefix (cprj, "Frame", 5))
 			projmode = PRJ_FRM;
 	}
 	return true;
