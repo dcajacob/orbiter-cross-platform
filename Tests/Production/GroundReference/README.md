@@ -1,3 +1,12 @@
+# Posture qualification correction
+The frozen `pb_takeoff_landing` input schedule ends with the vessel inverted
+(approximately 149 degrees of body-up tilt) in the original Windows application.
+Its SDK landed state is real, but it does not establish a usable upright
+landing. The capture and native attitude-budget failure remain preserved.
+The additional `ControlledReference` uses predeclared posture and touchdown-speed
+checks and qualifies a controlled landing independently. No file in the original
+trace archives or their provenance has been replaced.
+
 # Accepted original Windows ground-flight reference
 
 [Run 41368023101](https://github.com/dcajacob/orbiter-cross-platform/actions/runs/41368023101)

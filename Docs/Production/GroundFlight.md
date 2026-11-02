@@ -23,6 +23,12 @@ frozen source, member and archive hashes before using the reference.
 
 ## Native status
 
+The original `pb_takeoff_landing` schedule was subsequently found to end
+inverted: its body-up axis is approximately 149 degrees from radial upright in
+both applications. It is preserved as an uncontrolled-impact regression and
+still fails native attitude parity. Its real SDK landed status alone does not
+establish usable landing support.
+
 Local Debug checks pass six cases. The hover landing reaches the landed state
 with matching contact-event ticks and satisfies the position, velocity and fuel
 limits. Its maximum attitude difference is approximately 0.00674 rad against the
@@ -54,6 +60,52 @@ python3 -B Tests/Production/GroundFlight/verify.py \
   --modules out/native-vessels/NativeModules --planets out/archive-data \
   --configuration Debug --output out/native-ground-verification
 ```
+
+## Controlled upright landing
+
+The additional [original Windows qualification](https://github.com/dcajacob/orbiter-cross-platform/actions/runs/41374941546)
+passes Debug/Release repeats and cross-configuration comparison. Its inputs,
+physical criteria and unmodified trace bytes are separately frozen in
+`Tests/Production/ControlledReference`; no older reference was replaced.
+
+The controller selects Orbiter's original horizon and hover-altitude programs:
+12 m above terrain, then a zero-height target at 20 seconds, with both programs
+and hover thrust disabled at 80 seconds. It advances 6,000 original 1/60-second
+steps. Qualification additionally requires upright posture throughout, an
+actual completed landing, and a touchdown speed no greater than 1.5 m/s.
+
+Local native Debug passes these physical checks and exactly matches the
+Windows liftoff/touchdown ticks (60 and 2348). Two rendering frequencies produce
+identical numerical traces and saved scenarios. The observed maxima against
+Windows are:
+
+| PB quantity | Maximum difference | Existing limit |
+| --- | ---: | ---: |
+| Position | 0.000032 m | 1 m |
+| Velocity | 0.0000693 m/s | 0.1 m/s |
+| Rotation | 0.00000488 rad | 0.001 rad |
+| Propellant | 0.0000145 kg | Approximately 0.0000074 kg |
+
+Propellant and total-mass parity therefore fail. The native flight reaches
+10.67 m above terrain, touches down at 0.6812 m/s and remains within four degrees
+of upright, but that does not override the failed numerical budget. Phase 5
+remains incomplete. All production force formulas and comparison limits remain
+unchanged; no experimental math dependency was adopted.
+
+```sh
+python3 -B Tests/Production/ControlledLanding/frozen.py
+python3 -B Tests/Production/ControlledLanding/verify.py \
+  --executable out/native-vessels/orbiter-production \
+  --assets out/native-scene-resources --data out/native-celestial-data \
+  --modules out/native-vessels/NativeModules --planets out/archive-data \
+  --configuration Debug --output out/native-controlled-landing
+```
+
+CI runs this as a required check and still runs the older ground suite after a
+controlled-flight failure, preserving both sets of reports and traces. The
+capture workflow for the new frozen reference is now manual-only. Further
+work must resolve numerical fidelity without weakening either budget or
+changing the qualified flight inputs.
 
 The native replay applies the same public SDK operations as the frozen Windows
 control driver. `flight-animations.csv` records actual SDK animation states;

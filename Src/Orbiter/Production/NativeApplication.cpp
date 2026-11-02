@@ -106,6 +106,7 @@ struct Runtime final:BodyServices,RigidBodyServices,SurfaceServices,NavigationSe
             else if(command.action=="nav") {if(value<1 || value>7 || value!=int(value))throw std::runtime_error("Invalid autopilot mode");v->ActivateNavmode(int(value));}
             else if(command.action=="navoff") {if(value<1 || value>7 || value!=int(value))throw std::runtime_error("Invalid autopilot mode");v->DeactivateNavmode(int(value));}
             else if(command.action=="navreset") {for(int mode=1;mode<=7;++mode)v->DeactivateNavmode(mode);}
+            else if(command.action=="holdalt_ground") {if(value<0 || value>1e6)throw std::runtime_error("Invalid hover altitude target");v->SetHoverHoldAltitude(value,true);}
             else if(command.action=="aerodynamic") {if(value<0 || value>7 || value!=int(value))throw std::runtime_error("Invalid aerodynamic control mode");v->SetADCtrlMode(UInt32(value));}
             else if(command.action=="elevator" || command.action=="aileron" || command.action=="rudder") {
                 if(value < -1 || value>1)throw std::runtime_error("Invalid control surface level");

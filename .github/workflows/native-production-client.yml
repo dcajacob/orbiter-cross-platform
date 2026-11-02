@@ -71,11 +71,18 @@ jobs:
           set -euo pipefail
           xvfb-run -a -s '-screen 0 1920x1080x24' env LIBGL_ALWAYS_SOFTWARE=1 GALLIUM_DRIVER=llvmpipe python3 -B Tests/Production/Flight/verify.py --executable out/native-engine/orbiter-production --assets out/scene-resources --data out/data --modules out/native-engine/NativeModules --planets out/planets --configuration ${{ matrix.configuration }} --output out/native-flight-evidence 2>&1 | tee native-flight-verification.log
       - name: Exercise actual keyboard control and in-process reload in an owned X11 window
+        id: keyboard
         shell: bash
         run: |
           set -euo pipefail
           xvfb-run -a -s '-screen 0 1920x1080x24' env LIBGL_ALWAYS_SOFTWARE=1 GALLIUM_DRIVER=llvmpipe python3 -B Tests/Production/Flight/keyboard_smoke.py --executable out/native-engine/orbiter-production --assets out/scene-resources --data out/data --modules out/native-engine/NativeModules --planets out/planets --output out/native-keyboard-evidence 2>&1 | tee native-keyboard-verification.log
+      - name: Verify controlled upright takeoff and landing against the additional frozen original Windows reference
+        shell: bash
+        run: |
+          set -euo pipefail
+          xvfb-run -a -s '-screen 0 1920x1080x24' env LIBGL_ALWAYS_SOFTWARE=1 GALLIUM_DRIVER=llvmpipe python3 -B Tests/Production/ControlledLanding/verify.py --executable out/native-engine/orbiter-production --assets out/scene-resources --data out/data --modules out/native-engine/NativeModules --planets out/planets --configuration ${{ matrix.configuration }} --output out/native-controlled-landing 2>&1 | tee native-controlled-landing.log
       - name: Verify atmosphere, control surfaces, ground contact and actual landed persistence
+        if: ${{ !cancelled() && steps.keyboard.outcome == 'success' }}
         shell: bash
         run: |
           set -euo pipefail
@@ -94,5 +101,6 @@ jobs:
             out/native-flight-evidence/**
             out/native-keyboard-evidence/**
             out/native-ground-evidence/**
+            out/native-controlled-landing/**
             out/scene-resources/resources.json
             out/native-engine/NativeModules/Graphics/Licenses/**
