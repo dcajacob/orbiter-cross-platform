@@ -27,6 +27,10 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: production-bootstrap-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   windows-archives:
     name: Shared planetary archives ${{ matrix.os }} ${{ matrix.configuration }} x64

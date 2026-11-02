@@ -8,6 +8,7 @@
 
 #ifndef __VCOCKPIT_H
 #define __VCOCKPIT_H
+#include "Production/CockpitGraphics.h"
 
 // =======================================================================
 // class VirtualCockpit
@@ -86,7 +87,7 @@ private:
 	// returns list index of area given by its identifier (or -1 if doesn't exist)
 
 	const Pane *pane;
-	oapi::GraphicsClient *gc;
+	oapi::CockpitClient *gc;
 	int id;
 	int connect[4];   // connected panels (left,right,up,down) -1=none
 	int idx_mfocus;   // index of area currently receiving mouse focus

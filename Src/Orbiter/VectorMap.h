@@ -11,6 +11,7 @@
 //#define ASYNC_DRAWMAP
 
 #include "Orbiter.h"
+#include "Production/CockpitGraphics.h"
 #include "Planet.h"
 #include "Element.h"
 
@@ -57,9 +58,9 @@ struct PolyLineSet {
 struct CustomMkrSpec {
 	CustomMkrSpec();
 	~CustomMkrSpec();
-	void Connect (oapi::GraphicsClient::LABELLIST *ll);
+	void Connect (oapi::CockpitClient::LABELLIST *ll);
 	void Convert();
-	oapi::GraphicsClient::LABELLIST *list;
+	oapi::CockpitClient::LABELLIST *list;
 	bool active;
 	VPoint *vtx;
 	int nvtx;
@@ -69,7 +70,7 @@ struct CustomMkrSet {
 	CustomMkrSet();
 	~CustomMkrSet();
 	void Clear();
-	void Connect (oapi::GraphicsClient::LABELLIST *ll, int nlist);
+	void Connect (oapi::CockpitClient::LABELLIST *ll, int nlist);
 	CustomMkrSpec *set;
 	DWORD nset;
 };
@@ -225,7 +226,7 @@ protected:
 
 	PolyLineSet coast, contour;  // map vector line sets
 
-	oapi::GraphicsClient::LABELLIST *mkrlist; // custom labels
+	oapi::CockpitClient::LABELLIST *mkrlist; // custom labels
 	int nmkrlist;
 	CustomMkrSet mkrset;
 

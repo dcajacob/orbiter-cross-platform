@@ -3,6 +3,7 @@
 
 #define OAPI_IMPLEMENTATION
 
+#include "Production/CockpitServices.h"
 #include "Pane.h"
 #include "Defpanel.h"
 #include "Panel2D.h"
@@ -63,17 +64,17 @@ Pane::Pane (oapi::CockpitClient *gclient, HWND hwnd, int width, int height, int 
 	else    mibar = NULL;
 
 	
-	i = g_pOrbiter->Cfg()->CfgInstrumentPrm.bMfdPow2;
+	i = orbiter::production::CockpitConfiguration()->CfgInstrumentPrm.bMfdPow2;
 	if (i == 2) {
 		DWORD val;
 		gc->clbkGetRenderParam (RP_REQUIRETEXPOW2, &val);
 		mfdsize_pow2 = (val > 0);
 	} else mfdsize_pow2 = (i > 0);
-	mfd_hires_threshold = g_pOrbiter->Cfg()->CfgInstrumentPrm.MfdHiresThreshold;
-	mfd_vc_size = g_pOrbiter->Cfg()->CfgInstrumentPrm.VCMFDSize;
+	mfd_hires_threshold = orbiter::production::CockpitConfiguration()->CfgInstrumentPrm.MfdHiresThreshold;
+	mfd_vc_size = orbiter::production::CockpitConfiguration()->CfgInstrumentPrm.VCMFDSize;
 
 	InitResources ();
-	SetHUDColour (g_pOrbiter->Cfg()->CfgCameraPrm.HUDCol, 1.0, true);
+	SetHUDColour (orbiter::production::CockpitConfiguration()->CfgCameraPrm.HUDCol, 1.0, true);
 
 	blinkmesh.mesh2d = NULL;
 
@@ -213,7 +214,7 @@ bool Pane::SetPanelMode (int pmode, bool force)
 			ok = g_focusobj->SetGenericCockpit();
 			break;
 		case 2:
-			panel2d = new Panel2D (0, this, g_pOrbiter->Cfg()->CfgLogicPrm.PanelScale); TRACENEW
+			panel2d = new Panel2D (0, this, orbiter::production::CockpitConfiguration()->CfgLogicPrm.PanelScale); TRACENEW
 			if (ok = g_focusobj->LoadPanel2D (0, panel2d)) {
 				//panel2d->RedrawAllAreas (PANEL_REDRAW_INIT);
 				panel2d->Setup();
@@ -223,7 +224,7 @@ bool Pane::SetPanelMode (int pmode, bool force)
 				delete panel2d;
 				panel2d = 0;
 			}
-			panel = new Panel (0, this, g_pOrbiter->Cfg()->CfgLogicPrm.PanelScale); TRACENEW
+			panel = new Panel (0, this, orbiter::production::CockpitConfiguration()->CfgLogicPrm.PanelScale); TRACENEW
 			if (ok = g_focusobj->LoadPanel (0)) {
 				//panel->RedrawAllAreas (PANEL_REDRAW_INIT);
 				panel->Setup ();
@@ -279,7 +280,7 @@ int Pane::SelectPanel (int id)
 	if (panel2d) delete panel2d;
 	if (panel) delete panel;
 
-	panel2d = new Panel2D (id, this, g_pOrbiter->Cfg()->CfgLogicPrm.PanelScale); TRACENEW
+	panel2d = new Panel2D (id, this, orbiter::production::CockpitConfiguration()->CfgLogicPrm.PanelScale); TRACENEW
 	if (g_focusobj->LoadPanel2D (id, panel2d)) {
 		panel2d->RedrawAllAreas (PANEL_REDRAW_INIT);
 		panel2d->Setup ();
@@ -294,7 +295,7 @@ int Pane::SelectPanel (int id)
 		panel2d = 0;
 	}
 
-	panel = new Panel (id, this, g_pOrbiter->Cfg()->CfgLogicPrm.PanelScale); TRACENEW
+	panel = new Panel (id, this, orbiter::production::CockpitConfiguration()->CfgLogicPrm.PanelScale); TRACENEW
 	if (g_focusobj->LoadPanel (id)) {
 		panel->RedrawAllAreas (PANEL_REDRAW_INIT);
 		panel->Setup ();
@@ -386,7 +387,7 @@ void Pane::ShiftPanel (double dx, double dy)
 void Pane::ShiftPanel(int dir)
 {
 	double dx = 0.0, dy = 0.0;
-	const double speed = g_pOrbiter->Cfg()->CfgLogicPrm.PanelScrollSpeed;
+	const double speed = orbiter::production::CockpitConfiguration()->CfgLogicPrm.PanelScrollSpeed;
 	const double dt = td.SysDT;
 	switch (dir) {
 	case 0: // left
@@ -514,7 +515,7 @@ void Pane::SetHUDColour (int idx, double intens, bool force)
 			if (mfd[0].instr) mfd[0].instr->Refresh();
 			if (mfd[1].instr) mfd[1].instr->Refresh();
 		}
-		g_pOrbiter->Cfg()->CfgCameraPrm.HUDCol = colidx;
+		orbiter::production::CockpitConfiguration()->CfgCameraPrm.HUDCol = colidx;
 	}
 }
 
@@ -989,7 +990,7 @@ void Pane::OptionChanged(DWORD cat, DWORD item)
 {
 	if (cat == OPTCAT_INSTRUMENT) {
 		if (item == OPTITEM_INSTRUMENT_MFDVCSIZE)
-			mfd_vc_size = g_pOrbiter->Cfg()->CfgInstrumentPrm.VCMFDSize;
+			mfd_vc_size = orbiter::production::CockpitConfiguration()->CfgInstrumentPrm.VCMFDSize;
 		for (size_t i = 0; i < nemfd; i++)
 			if (emfd[i]->Active())
 				emfd[i]->instr->OptionChanged(cat, item);

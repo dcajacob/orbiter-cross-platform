@@ -13,6 +13,7 @@
 #define STRICT 1
 #include "Orbiter.h"
 #include "Mfd.h"
+#include "Production/CockpitGraphics.h"
 
 // =======================================================================
 // class DefaultPanel
@@ -69,7 +70,7 @@ private:
 	SURFHANDLE LoadTexture (int idx = 0);
 
 	Pane *pane;
-	oapi::GraphicsClient *gc;            // render client
+	oapi::CockpitClient *gc;            // render client
 	SURFHANDLE shRenderTarget;           // render target surface
 	SURFHANDLE surf;                     // surface for panel element textures
 	Mesh mesh;                           // mesh for rendering panel elements

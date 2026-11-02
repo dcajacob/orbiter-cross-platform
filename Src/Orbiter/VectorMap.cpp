@@ -1,6 +1,7 @@
 // Copyright (c) Martin Schweiger
 // Licensed under the MIT License
 
+#include "Production/CockpitServices.h"
 #include "Astro.h"
 #include "DrawAPI.h"
 
@@ -271,10 +272,10 @@ bool VectorMap::SetCBody (const CelestialBody *body)
 		if (planet) {
 			char path[MAX_PATH], relpath[MAX_PATH];
 			sprintf (relpath, "%s\\data\\coast.vec", cbody->Name());
-			strcpy (path, g_pOrbiter->Cfg()->ConfigPathNoext (relpath));
+			strcpy (path, orbiter::production::CockpitConfiguration()->ConfigPathNoext (relpath));
 			coast.Load (path, OUTLINE_COAST);
 			sprintf (relpath, "%s\\data\\contour.vec", cbody->Name());
-			strcpy (path, g_pOrbiter->Cfg()->ConfigPathNoext (relpath));
+			strcpy (path, orbiter::production::CockpitConfiguration()->ConfigPathNoext (relpath));
 			contour.Load (path, OUTLINE_CONTOUR);
 			gt_this.Reset (cbody, g_focusobj->Els());
 			mkrlist = planet->LabelList (&nmkrlist);
@@ -1369,7 +1370,7 @@ CustomMkrSpec::~CustomMkrSpec()
 	}
 }
 
-void CustomMkrSpec::Connect (oapi::GraphicsClient::LABELLIST *ll)
+void CustomMkrSpec::Connect (oapi::CockpitClient::LABELLIST *ll)
 {
 	list = ll;
 }
@@ -1408,7 +1409,7 @@ void CustomMkrSet::Clear()
 	nset = 0;
 }
 
-void CustomMkrSet::Connect (oapi::GraphicsClient::LABELLIST *ll, int nlist)
+void CustomMkrSet::Connect (oapi::CockpitClient::LABELLIST *ll, int nlist)
 {
 	int i, j;
 	Clear();

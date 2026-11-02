@@ -128,3 +128,14 @@ callback tokens, checked against the pinned Windows source by
 `Tests/Production/cockpit_source.py`; the native header also compiles without
 Windows or graphics-library headers. This preparatory boundary does not yet
 build or run the native instrumentation classes.
+Configuration access now uses the existing camera/session service's live Config
+object, including writes to HUD settings. The same graphics binding covers
+default panels, Panel2D, VC and vector-map marker lists. Source conservation
+checks verify these substitutions before the earlier map-flags audit inspects
+its preserved predecessor. No instrument formula or scheduler changes.
+
+Dedicated development workflows cancel older runs in the same branch group.
+A bounded maintenance workflow prunes only older active production checks;
+completed evidence, reference capture/preservation workflows and newer runs
+are excluded. Inherited application, Nightly and Artifact Cleanup workflows are
+unchanged.

@@ -15,6 +15,7 @@
 #define STRICT 1
 #include <windows.h>
 #include "Mfd.h"
+#include "Production/CockpitGraphics.h"
 
 // =======================================================================
 // class Panel2D
@@ -191,7 +192,7 @@ protected:
 	void ReleaseSurfaces ();
 
 private:
-	oapi::GraphicsClient *gc; // graphics client object
+	oapi::CockpitClient *gc; // graphics client object
 	Pane *pane;               // logical cockpit object
 	HWND cwnd;                // window handle for mouse position offset calculations
 	int id;                   // panel identifier (0=main)

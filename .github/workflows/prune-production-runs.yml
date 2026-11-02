@@ -1,0 +1,39 @@
+name: Prune Superseded Production Checks
+on:
+  push:
+    branches: ['codex/production-**']
+    paths: ['.github/workflows/prune-production-runs.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: write
+jobs:
+  prune:
+    if: github.repository == 'dcajacob/orbiter-cross-platform'
+    runs-on: ubuntu-24.04
+    env:
+      GH_TOKEN: ${{ github.token }}
+      GH_REPO: ${{ github.repository }}
+    steps:
+      - name: Cancel only superseded active checks on this production development branch
+        run: |
+          python3 - <<'PY'
+          import json,os,subprocess,urllib.parse
+          repo=os.environ['GH_REPO'];branch=os.environ['GITHUB_REF_NAME'];source=os.environ['GITHUB_SHA']
+          assert repo=='dcajacob/orbiter-cross-platform' and branch.startswith('codex/production-')
+          names={'Production Bootstrap','Portable Core and Windows Reference','Native Production OpenGL External View',
+                 'Production World and Terrain Windows and Linux','Native Production SPICE Modules','Production Windows OpenGL Client'}
+          def api(path):return json.loads(subprocess.check_output(['gh','api',path]))
+          cutoff=api(f'repos/{repo}/actions/runs/{os.environ["GITHUB_RUN_ID"]}')['created_at']
+          cancelled=[]
+          for page in range(1,11):
+              runs=api(f'repos/{repo}/actions/runs?branch={urllib.parse.quote(branch,safe="")}&per_page=100&page={page}')['workflow_runs']
+              for run in runs:
+                  if run['name'] not in names or run['head_branch']!=branch or run['head_sha']==source or run['created_at']>=cutoff or run['status'] not in ('queued','in_progress','waiting','pending','requested'):continue
+                  result=subprocess.run(['gh','api','--method','POST',f'repos/{repo}/actions/runs/{run["id"]}/cancel'],capture_output=True)
+                  if result.returncode and api(f'repos/{repo}/actions/runs/{run["id"]}')['status']!='completed':
+                      raise RuntimeError('Could not cancel superseded active run '+str(run['id'])+': '+result.stderr.decode(errors='replace'))
+                  cancelled.append(dict(id=run['id'],name=run['name'],source=run['head_sha']))
+              if len(runs)<100:break
+          print(json.dumps(dict(kept_source=source,cancelled=cancelled,scope='Only older active development checks; reference capture/preservation and completed evidence are excluded'),indent=2))
+          PY

@@ -832,8 +832,9 @@
       "original_sha256_lf": "61c1826a9ce3c62e3d02f54c36629470f6ffeb0abad2d9b5eb95bc0c0a6bfb8e"
     },
     "Src/Orbiter/VectorMap.h": {
-      "sha256_lf": "f6d63b3a596448273a6e5dc32777be38db7adea0413103f6c88fe7faa8f8ccf9",
-      "original_sha256_lf": "72936830e11eec20b86f2f616f2988f94932e6700112bbb1d01d2a6cdb3aa808"
+      "original_sha256_lf": "72936830e11eec20b86f2f616f2988f94932e6700112bbb1d01d2a6cdb3aa808",
+      "sha256_lf": "f5ce4bcfee2964ffd10191b724c3af1aab84871d93938412c9a98623d8f0238c",
+      "scope": "Private cockpit graphics/configuration binding. Original algorithms and Windows pointer types conserved by cockpit_source.py; native instrumentation is not operational yet."
     },
     "Src/Orbiter/Vessel.cpp": {
       "sha256_lf": "24aa4cd48bae984dcc298dfb45d59afd4d49ec310ea3dd1a2f3c22ed3f997319",
@@ -1074,8 +1075,8 @@
     },
     "Src/Orbiter/Pane.cpp": {
       "original_sha256_lf": "398997e418820aff0d72edd0d977e75182511d3f13a369e0f074182db3f1bdde",
-      "sha256_lf": "b03f88a17b08ef67289f9467aea0a8d56134372cb375c5df3cfe0936f452d73c",
-      "scope": "Private cockpit graphics binding only. Original algorithms and Windows underlying pointer types conserved by cockpit_source.py; native instrumentation is not operational yet."
+      "sha256_lf": "b19647f905db7cc129bcce90e3f4ad2cbbce83cd979515e4e4dd607583a50e65",
+      "scope": "Private cockpit graphics/configuration binding. Original algorithms and Windows pointer types conserved by cockpit_source.py; native instrumentation is not operational yet."
     },
     "Src/Orbiter/Mfd.h": {
       "original_sha256_lf": "133e1e852d9563535bb8404420f98aa40ce284e43eb98ba2f7c33652e97a8e10",
@@ -1084,8 +1085,8 @@
     },
     "Src/Orbiter/Mfd.cpp": {
       "original_sha256_lf": "0a5d504ea777abd83b0f3ce45e147a946fad03bb3c70a17eb61600e4ff5108f4",
-      "sha256_lf": "c98d18775bccc39d096f6f75250fc2cebb2804c10cdf9ecf2a38cefe4b919bec",
-      "scope": "Private cockpit graphics binding only. Original algorithms and Windows underlying pointer types conserved by cockpit_source.py; native instrumentation is not operational yet."
+      "sha256_lf": "45e03dd2f1cd392220449d6634a4c0218ccd6b56c9f0f66656269d06a77f3d63",
+      "scope": "Private cockpit graphics/configuration binding. Original algorithms and Windows pointer types conserved by cockpit_source.py; native instrumentation is not operational yet."
     },
     "Src/Orbiter/hud.h": {
       "original_sha256_lf": "3f18667e52f3dad3698dc79f1e78f5ed9116d1a1de8cecb3cbd8fd02db9de569",
@@ -1094,8 +1095,8 @@
     },
     "Src/Orbiter/hud.cpp": {
       "original_sha256_lf": "7670ec27ef75c9325dd17ff4db5b019aaaed8749df9d67c1262fe846ede73926",
-      "sha256_lf": "92f69d3773357653d9a114b145e0fca5b462f0b982b0716ebe290bdede199f34",
-      "scope": "Private cockpit graphics binding only. Original algorithms and Windows underlying pointer types conserved by cockpit_source.py; native instrumentation is not operational yet."
+      "sha256_lf": "278fd3407d3938cabb02565c62f7874e571345c479261b586d8d5111719782f7",
+      "scope": "Private cockpit graphics/configuration binding. Original algorithms and Windows pointer types conserved by cockpit_source.py; native instrumentation is not operational yet."
     },
     "Src/Orbiter/Panel.h": {
       "original_sha256_lf": "d517f73ee3cf326e944b8ac000fd19a75e1b30ac2a4bac59b0c1d481cadce1c3",
@@ -1106,6 +1107,46 @@
       "original_sha256_lf": null,
       "sha256_lf": "7b7643c823ae0015e8a5ecf73e296a909c9af346b3be6f41235d2373f90283c9",
       "scope": "Private cockpit graphics binding only. Original algorithms and Windows underlying pointer types conserved by cockpit_source.py; native instrumentation is not operational yet."
+    },
+    "Src/Orbiter/Defpanel.cpp": {
+      "original_sha256_lf": "a7cb7d7be6d6120e3a7407b58ebd1fe4cd7552ad5dff73a4d0f7396c1a2815ce",
+      "sha256_lf": "b15d27dfaa92e260c1c6757aa8826ae97a251135e77acf2200f79fed5d4c4f11",
+      "scope": "Private cockpit graphics/configuration binding. Original algorithms and Windows pointer types conserved by cockpit_source.py; native instrumentation is not operational yet."
+    },
+    "Src/Orbiter/Defpanel.h": {
+      "original_sha256_lf": "ae7d437861e792bdc24945f6da5fb6012d090436e89745b7dfd7b30512937184",
+      "sha256_lf": "4854770c958bf528d7697f3c665a0cd49b4cd8640a3bf3d1c229b55e2b8e7e5b",
+      "scope": "Private cockpit graphics/configuration binding. Original algorithms and Windows pointer types conserved by cockpit_source.py; native instrumentation is not operational yet."
+    },
+    "Src/Orbiter/MfdSurface.cpp": {
+      "original_sha256_lf": "c1a1522edc9fbda54db00341ff078473a1d142f3763bee93b1496434c0644aaf",
+      "sha256_lf": "bc2fae00f6087d483fe6d02cf22fa57f27a5b4da8b80d2c0a61cdb3635f68ee0",
+      "scope": "Private cockpit graphics/configuration binding. Original algorithms and Windows pointer types conserved by cockpit_source.py; native instrumentation is not operational yet."
+    },
+    "Src/Orbiter/Panel2D.h": {
+      "original_sha256_lf": "c8a36214609a549f7715a332f2c1a6b66eaf542ff5b0b5646f89cd119a4dff82",
+      "sha256_lf": "042e0f91c85b14ff1ed71e5b14956eb6147f47248f06327b59349061e7398e54",
+      "scope": "Private cockpit graphics/configuration binding. Original algorithms and Windows pointer types conserved by cockpit_source.py; native instrumentation is not operational yet."
+    },
+    "Src/Orbiter/VCockpit.cpp": {
+      "original_sha256_lf": "d68c62ea558f5cf0292b6d0469efdf2699b7557405beab1f474bc96f61f3a2c9",
+      "sha256_lf": "347c242da27afaef926c9b3c41bcca29ae301d1f53a476dd0b6c84a9f8035fbb",
+      "scope": "Private cockpit graphics/configuration binding. Original algorithms and Windows pointer types conserved by cockpit_source.py; native instrumentation is not operational yet."
+    },
+    "Src/Orbiter/VCockpit.h": {
+      "original_sha256_lf": "a7aa6bacbd55eef45ac47289171453fbf446804d1554f2ee69c6e4b50c2a3e5c",
+      "sha256_lf": "3a8b7c169fb56449192cab38efc6a307f8da64472cf072d23c06dac3f8e5a872",
+      "scope": "Private cockpit graphics/configuration binding. Original algorithms and Windows pointer types conserved by cockpit_source.py; native instrumentation is not operational yet."
+    },
+    "Src/Orbiter/VectorMap.cpp": {
+      "original_sha256_lf": "604e34d813ef11aa92934c08911ec2548d747659f5659df8d20469caa9fc01ed",
+      "sha256_lf": "31631de055420b0fb6cab394e664dfb7a82e41289a00e67afe0459a20fecb228",
+      "scope": "Private cockpit graphics/configuration binding. Original algorithms and Windows pointer types conserved by cockpit_source.py; native instrumentation is not operational yet."
+    },
+    "Src/Orbiter/Production/CockpitServices.h": {
+      "original_sha256_lf": null,
+      "sha256_lf": "8f8319800563274d231874fc427d52917b67faa67e59541bc873066e5b12e5a6",
+      "scope": "Private cockpit graphics/configuration binding. Original algorithms and Windows pointer types conserved by cockpit_source.py; native instrumentation is not operational yet."
     }
   }
 }

@@ -3,6 +3,7 @@
 
 #define OAPI_IMPLEMENTATION
 
+#include "Production/CockpitServices.h"
 #include "Pane.h"
 #include "Orbiter.h"
 #include "Config.h"
@@ -64,7 +65,7 @@ Instrument *Instrument::Create (int type, Pane *_pane,
 	switch (type) {
 	case MFD_ORBIT:       TRACENEW return new Instrument_Orbit       (_pane, _id, spec, _vessel);
 	case MFD_SURFACE:     TRACENEW return new Instrument_Surface     (_pane, _id, spec, _vessel);
-	case MFD_MAP:         TRACENEW if (g_pOrbiter->Cfg()->CfgLogicPrm.MFDMapVersion == 0)
+	case MFD_MAP:         TRACENEW if (orbiter::production::CockpitConfiguration()->CfgLogicPrm.MFDMapVersion == 0)
 								return new Instrument_MapOld (_pane, _id, spec, _vessel);
 							  else
 								return new Instrument_Map    (_pane, _id, spec, _vessel);
@@ -476,7 +477,7 @@ Instrument::Instrument (Pane *_pane, INT_PTR _id, const Spec &spec, Vessel *_ves
 	flag = spec.flag;
 	vessel = _vessel;
 	use_skp_interface = true;
-	instrDT = g_pOrbiter->Cfg()->CfgLogicPrm.InstrUpdDT;
+	instrDT = orbiter::production::CockpitConfiguration()->CfgLogicPrm.InstrUpdDT;
 	updT = td.SimT0-1.0;
 	updSysT = td.SysT0-1.0;
 	dT = 1.0, pT = -1.0;
@@ -634,7 +635,7 @@ void Instrument::OptionChanged(DWORD cat, DWORD item)
 	if (cat == OPTCAT_INSTRUMENT) {
 		switch (item) {
 		case OPTITEM_INSTRUMENT_MFDUPDATEINTERVAL:
-			instrDT = g_pOrbiter->Cfg()->CfgLogicPrm.InstrUpdDT;
+			instrDT = orbiter::production::CockpitConfiguration()->CfgLogicPrm.InstrUpdDT;
 			break;
 		}
 	}

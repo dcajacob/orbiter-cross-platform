@@ -64,11 +64,19 @@ def verify():
     if sdk != current(name):
         raise ValueError('Windows graphics SDK changed beyond verbatim value extraction')
     name = 'Src/Orbiter/VectorMap.h'
+    actual_map=current(name)
+    if (ROOT/'Src/Orbiter/Production/CockpitGraphics.h').exists():
+        # Verify the later cockpit binding first, then let this earlier audit
+        # inspect its exact predecessor. No map flags or calculations escape
+        # conservation through a type-name substitution.
+        from cockpit_source import verify as verify_cockpit,BASE as cockpit_base
+        verify_cockpit()
+        actual_map=subprocess.check_output(['git','-C',str(ROOT),'show',cockpit_base+':'+name]).replace(b'\r\n',b'\n')
     source = original(name)
     start = source.index(b'#define DISP_GRIDLINE')
     end = source.index(b'// flag values for RedrawFlag',start)
     if current('Src/Orbiter/Production/MapFlags.h').count(source[start:end]) != 1 or (
-            source[:start]+b'#include "Production/MapFlags.h"\n\n'+source[end:]) != current(name):
+            source[:start]+b'#include "Production/MapFlags.h"\n\n'+source[end:]) != actual_map:
         raise ValueError('map flags changed beyond verbatim value extraction')
     print('Production Config behavior and Windows graphics SDK conserved after explicit platform/CRLF adapters')
 

@@ -6,6 +6,10 @@ on:
   workflow_dispatch:
 permissions:
   contents: read
+concurrency:
+  group: native-production-client-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   native:
     name: Real native client Ubuntu 24.04 ${{ matrix.configuration }} ${{ matrix.math_profile }} x64

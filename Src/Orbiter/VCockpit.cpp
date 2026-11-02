@@ -1,6 +1,7 @@
 // Copyright (c) Martin Schweiger
 // Licensed under the MIT License
 
+#include "Production/CockpitServices.h"
 #include "Orbiter.h"
 #include "VCockpit.h"
 #include "Pane.h"
@@ -234,7 +235,7 @@ void VirtualCockpit::ShiftAreas (const Vector &shift)
 
 SURFHANDLE VirtualCockpit::CreateHUDSurface (const VCHUDSPEC *spec, COLORREF col, double intens)
 {
-	const int HUDSIZE = g_pOrbiter->Cfg()->CfgInstrumentPrm.PanelMFDHUDSize;
+	const int HUDSIZE = orbiter::production::CockpitConfiguration()->CfgInstrumentPrm.PanelMFDHUDSize;
 	if (!hud.surf) {
 		hud.surf = gc->clbkCreateSurfaceEx (HUDSIZE, HUDSIZE, OAPISURFACE_SKETCHPAD | OAPISURFACE_TEXTURE);
 	}

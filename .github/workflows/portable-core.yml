@@ -22,6 +22,10 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: portable-core-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   portable:
     name: Portable ${{ matrix.os }} ${{ matrix.configuration }} x64

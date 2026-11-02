@@ -6,6 +6,10 @@ on:
   workflow_dispatch:
 permissions:
   contents: read
+concurrency:
+  group: production-spice-modules-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   native:
     name: Native production SPICE ${{ matrix.os }} ${{ matrix.configuration }} x64

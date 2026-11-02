@@ -7,6 +7,10 @@ on:
 permissions:
   contents: read
   actions: read
+concurrency:
+  group: production-elevation-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   reference:
     name: Verify frozen terrain evidence or prepare first capture

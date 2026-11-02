@@ -1,6 +1,7 @@
 // Copyright (c) Martin Schweiger
 // Licensed under the MIT License
 
+#include "Production/CockpitServices.h"
 #include "Defpanel.h"
 #include "Pane.h"
 #include "Util.h"
@@ -69,8 +70,8 @@ DefaultPanel::DefaultPanel (Pane *_pane, int cidx): pane(_pane)
 	shRenderTarget = NULL; // should be queried from graphics client
 	surf = NULL;
 	activemfd = activebtn = -1;
-	transpmfd = g_pOrbiter->Cfg()->CfgLogicPrm.bMfdTransparent;
-	compact_layout = g_pOrbiter->Cfg()->CfgLogicPrm.bGlasspitCompact;
+	transpmfd = orbiter::production::CockpitConfiguration()->CfgLogicPrm.bMfdTransparent;
+	compact_layout = orbiter::production::CockpitConfiguration()->CfgLogicPrm.bGlasspitCompact;
 	colidx = cidx;
 
 	elevtrim = 100;
@@ -114,7 +115,7 @@ void DefaultPanel::SetGeometry ()
 	scale = max(0.625f,viewH/800.0f); //viewW/1280.0f;
 
 	// MFD display dimensions
-	mfdw = mfdh = (int)(scale*35.0*(g_pOrbiter->Cfg()->CfgLogicPrm.MFDSize+5));//(viewH*(g_pOrbiter->Cfg()->CfgLogicPrm.MFDSize+5))/23;
+	mfdw = mfdh = (int)(scale*35.0*(orbiter::production::CockpitConfiguration()->CfgLogicPrm.MFDSize+5));//(viewH*(orbiter::production::CockpitConfiguration()->CfgLogicPrm.MFDSize+5))/23;
 	btnw = max(28,viewH/18) /*viewW/28*/, btnh = (33*btnw)/44;
 	gapw = btnw/20;
 	float mfdy0 = (float)(viewH-mfdh-btnh-2*gapw);
@@ -784,7 +785,7 @@ void DefaultPanel::OptionChanged(DWORD cat, DWORD item)
 				RepaintMFDButtons(i);
 			break;
 		case OPTITEM_INSTRUMENT_MFDGENERICTRANSP:
-			transpmfd = g_pOrbiter->Cfg()->CfgLogicPrm.bMfdTransparent;
+			transpmfd = orbiter::production::CockpitConfiguration()->CfgLogicPrm.bMfdTransparent;
 			break;
 		}
 	}

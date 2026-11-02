@@ -3,6 +3,7 @@
 
 #define OAPI_IMPLEMENTATION
 
+#include "Production/CockpitServices.h"
 #include "Astro.h"
 #include "hud.h"
 #include "Pane.h"
@@ -45,7 +46,7 @@ HUD::HUD (const Pane *_pane): pane(_pane)
 	font2 = NULL;
 	Resize (pane->GetVC() != NULL && pane->GetVC()->GetHUDSurf() != NULL);
 	hudTex = (gc ? LoadTexture (colidx) : NULL);
-	transp = g_pOrbiter->Cfg()->CfgLogicPrm.bMfdTransparent;
+	transp = orbiter::production::CockpitConfiguration()->CfgLogicPrm.bMfdTransparent;
 }
 
 HUD::~HUD ()
@@ -179,7 +180,7 @@ void HUD::Resize (bool isVC)
 	fH = pane->f1H;
 
 	if (bVC) {
-		spec.W = spec.H = g_pOrbiter->Cfg()->CfgInstrumentPrm.PanelMFDHUDSize;
+		spec.W = spec.H = orbiter::production::CockpitConfiguration()->CfgInstrumentPrm.PanelMFDHUDSize;
 		HRES05 = VRES05 = (spec.W/2);
 		ladder_width = (HRES05*60)/128;
 		ladder_range = 250;

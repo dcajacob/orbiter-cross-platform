@@ -1,6 +1,7 @@
 // Copyright (c) Martin Schweiger
 // Licensed under the MIT License
 
+#include "Production/CockpitServices.h"
 #include "Astro.h"
 #include "MfdSurface.h"
 #include "Orbiter.h"
@@ -983,7 +984,7 @@ void Instrument_Surface::OptionChanged(DWORD cat, DWORD item)
 	if (cat == OPTCAT_INSTRUMENT) {
 		switch (item) {
 		case OPTITEM_INSTRUMENT_MFDUPDATEINTERVAL:
-			instrDT = min(0.25, g_pOrbiter->Cfg()->CfgLogicPrm.InstrUpdDT);
+			instrDT = min(0.25, orbiter::production::CockpitConfiguration()->CfgLogicPrm.InstrUpdDT);
 			break;
 		}
 	}
