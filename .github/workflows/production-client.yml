@@ -11,6 +11,7 @@ on:
       - 'Tests/Production/phase3-extraction.lock.json'
       - 'Tests/Production/Client/**'
       - 'Tests/Production/Cockpit/**'
+      - 'Tests/Production/CockpitControls/**'
       - 'Tests/Production/stage_mesa.py'
       - '.github/workflows/production-client.yml'
   workflow_dispatch:
@@ -229,6 +230,8 @@ jobs:
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
       - uses: actions/download-artifact@v8
         with:
           pattern: real-client-*
