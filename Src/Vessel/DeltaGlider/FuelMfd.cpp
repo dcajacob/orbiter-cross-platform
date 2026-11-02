@@ -34,6 +34,7 @@ FuelMFD::FuelMFD (VESSEL3 *v): PanelElement (v)
 {
 	isScram = false;
 	Mmain = Mrcs = Mscram = 0.0;
+	Tsample = oapiGetSimTime();
 	memset (&vc_grp, 0, sizeof(GROUPREQUESTSPEC));
 }
 

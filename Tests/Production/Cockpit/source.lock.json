@@ -102,5 +102,13 @@
     "Src/Vessel/DeltaGlider/ThermalSubsys.h": "9fd68c9ce14ca6a4db404d85a85545b4e67aa71a143c981f37993f828840eacc",
     "Src/Vessel/DeltaGlider/dg_vc_anim.h": "87f0faec29597a1ceaeea37865512ffa4ee84d370a195ecef771fb76db715c78",
     "Src/Vessel/DeltaGlider/resource.h": "2f6d3ef9d2a237026c07141d08272a2e89b5b89322a9af9d2b46fb2f52a25916"
+  },
+  "pre_reference_repairs": {
+    "Src/Vessel/DeltaGlider/FuelMfd.cpp": {
+      "reason": "Original Windows Debug/Release capture at 22223709 exposed reading FuelMFD::Tsample before initialization on the first redraw. Initialize its sample time without changing fuel-flow formulas or the engine. Original failed capture remains diagnostic evidence.",
+      "failed_run": 41455123551,
+      "added_line": "\tTsample = oapiGetSimTime();\n",
+      "sha256": "c8533e9b35bdcabe4493e48b9d84fd5d4942480e3b882a0f201475b8431a999d"
+    }
   }
 }

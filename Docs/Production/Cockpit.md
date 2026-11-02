@@ -73,6 +73,19 @@ repeat-identical real DG/DG-S cockpit captures. The remaining alignment/sync
 fixture now selects the actual ISS target through stock scenario syntax, so
 it exercises numerical instrument output instead of the empty-target prompt.
 
+The original Debug/Release cross-check also found a pre-existing DG defect:
+`FuelMFD::Tsample` was read without initialization. Debug's allocator fill and
+Release's initial memory contents caused different first fuel-flow redraws at
+simulation time zero. Run 41455123551 preserves those failed original captures
+(Debug ZIP SHA-256 `b5146b99c785891b8ecdeb795ad60df7d5836d73009106df0851080038ef477c`,
+Release `3a14150617253cf0a5f592c96f90f2381a0aaf338b2c6563f24848b9cde8a15e`).
+These captures cannot qualify as a reference. A single constructor assignment
+now initializes that timer from the current simulation time. No fuel-flow
+formula, physics code or comparison budget changes. The source checker retains
+all original pins and separately verifies the exact one-line repair. A complete
+Windows application/SDK rebuild and new cockpit captures are required before
+extraction; the original pre-repair runtime must not be mixed with this source.
+
 Before extraction, require repeat-identical numerical and displayed-text traces,
 finite finalized state, actual expected cockpit/MFD modes, numerical display
 calls, normal real window/context teardown, no GL errors and SSIM at least 0.98.

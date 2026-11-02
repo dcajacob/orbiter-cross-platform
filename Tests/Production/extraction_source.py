@@ -39,6 +39,12 @@ def verify():
     if ledger['observed_source'] != CAPTURE or ledger['production_source'] != BASE:
         raise ValueError('extraction baseline identity changed')
     declared = ledger['files']
+    if 'Src/Vessel/DeltaGlider/FuelMfd.cpp' in declared:
+        name='Src/Vessel/DeltaGlider/FuelMfd.cpp'
+        repaired=(ROOT/name).read_bytes().replace(b'\r\n',b'\n')
+        added=b'\tTsample = oapiGetSimTime();\n'
+        if repaired.count(added)!=1 or repaired.replace(added,b'',1)!=git('show',CAPTURE+':'+name).replace(b'\r\n',b'\n'):
+            raise ValueError('DG pre-reference repair exceeds sample-time initialization')
     if 'Src/Orbiter/Production/VesselLifetime.h' in declared:
         from lifetime_source import verify as verify_lifetime
         verify_lifetime()

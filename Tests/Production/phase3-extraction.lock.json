@@ -1065,6 +1065,11 @@
     "Src/Orbiter/Production/WindowsVesselLifetime.h": {
       "original_sha256_lf": null,
       "sha256_lf": "ba49231499a999afdb0e8448d4eb67cb440dd5e0642b0e0dbccf17db3c1dcb14"
+    },
+    "Src/Vessel/DeltaGlider/FuelMfd.cpp": {
+      "original_sha256_lf": "251be4f317f9568087035a289f652eff96b90e4cd499a92aacaf6e4f0c39b648",
+      "sha256_lf": "c8533e9b35bdcabe4493e48b9d84fd5d4942480e3b882a0f201475b8431a999d",
+      "scope": "Pre-reference correctness repair only: initialize previously indeterminate fuel-display sample time; no extraction or formula changes."
     }
   }
 }
