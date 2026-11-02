@@ -432,4 +432,7 @@ control cases against the frozen originals. The final cross-configuration
 instrument comparison also passes. Its control comparison stops during provenance
 verification because the comparison job has a shallow checkout. Commit `53405176`
 sets full history for that job and adds the missing `CockpitControls` push trigger.
-Publication and a successful rerun of that comparison remain pending.
+The fix is verified by [run 41507189054](https://github.com/dcajacob/orbiter-cross-platform/actions/runs/41507189054)
+at `881dd518`. Both Windows builds and all final cross-configuration comparisons
+pass, completing the hosted glass mouse-control gate. Selection/input UI and
+real native DG/DG-S cockpits remain unfinished.

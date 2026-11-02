@@ -278,7 +278,7 @@
     }
   },
   "native_mouse_candidate": {
-    "status": "local_and_hosted_native_passed_windows_comparison_pending",
+    "status": "local_and_hosted_passed",
     "snapshot": "1cb6e5350e58341014795ed21e5751d0263a8588e77bd0ad17d6cae65f98968f",
     "replay": {
       "status": "passed",
@@ -608,13 +608,14 @@
         ]
       },
       "windows": {
-        "run": 41502349620,
-        "source": "b9eb48f0",
+        "source": "881dd518",
         "debug": "passed",
         "release": "passed",
         "instrument_comparison": "passed",
-        "control_comparison": "blocked_by_shallow_checkout",
-        "checkout_fix_commit": "53405176"
+        "control_comparison": "passed",
+        "checkout_fix_commit": "53405176",
+        "prior_run": 41502349620,
+        "run": 41507189054
       }
     }
   }
