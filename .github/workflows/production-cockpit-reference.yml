@@ -42,17 +42,34 @@ jobs:
           if errorlevel 1 exit /b 1
           7z x DXSDK_Jun10.exe DXSDK/Include DXSDK/Lib
           if errorlevel 1 exit /b 1
-      - uses: actions/download-artifact@v8
+      - uses: actions/cache@v6
+        id: runtime-cache
         with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          run-id: 41396231165
-          name: production-runtime-${{ matrix.configuration }}-x64
-          path: out/runtime-archive
-      - name: Verify the original pre-cockpit-extraction application and SDK
+          path: out/runtime-archive/windows-test-runtime.zip
+          key: cockpit-original-f725194209634f7fd5d1d44d426cfa9b5e303e37-${{ matrix.configuration }}-${{ env.VCToolsVersion }}
+      - name: Rebuild and test the pinned pre-extraction application including the isolated timer repair
+        if: steps.runtime-cache.outputs.cache-hit != 'true'
+        shell: pwsh
+        run: |
+          git worktree add --detach out/cockpit-source f725194209634f7fd5d1d44d426cfa9b5e303e37
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          cmake -S out/cockpit-source -B out/application-rebuild -G Ninja -DCMAKE_BUILD_TYPE=${{ matrix.configuration }} -DCMAKE_C_COMPILER=cl -DCMAKE_CXX_COMPILER=cl -DORBITER_BUILD_D3D9CLIENT=ON -DORBITER_BUILD_XRSOUND=OFF -DORBITER_MAKE_DOC=OFF -DORBITER_MAKE_TESTS=ON -DORBITER_PORTABLE_REFERENCE_CAPTURE=ON -DORBITER_PRODUCTION_REFERENCE_CAPTURE=ON "-DDXSDK_DIR:PATH=$env:DXSDK_DIR" 2>&1 | Tee-Object cockpit-application-configure.log
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          cmake --build out/application-rebuild --parallel 2 2>&1 | Tee-Object cockpit-application-build.log
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          ctest --test-dir out/application-rebuild --output-on-failure 2>&1 | Tee-Object cockpit-application-tests.log
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          python Tests/Production/build_metadata.py --build out/application-rebuild
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          Push-Location out/cockpit-source
+          python Tests/Production/package_test_runtime.py --build ../application-rebuild --output ../runtime-archive/windows-test-runtime.zip
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          Pop-Location
+      - name: Verify the pinned pre-cockpit-extraction application and SDK
         shell: pwsh
         run: |
           Expand-Archive out/runtime-archive/windows-test-runtime.zip out/production-app
-          python Tests/Production/verify_test_runtime.py --runtime out/production-app --source d14fa7941bd4b60bd5b07c8e444ebfb87761893f
+          python Tests/Production/verify_test_runtime.py --runtime out/production-app --source f725194209634f7fd5d1d44d426cfa9b5e303e37
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           python -B Tests/Production/Cockpit/sources.py --current
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
@@ -66,7 +83,7 @@ jobs:
       - name: Build the SDK-only instrument control and observation driver
         shell: pwsh
         run: |
-          cmake -S Tests/Production/Cockpit -B out/cockpit-driver -G Ninja -DCMAKE_BUILD_TYPE=${{ matrix.configuration }} -DORBITER_TEST_RUNTIME="$pwd/out/production-app"
+          cmake -S Tests/Production/Cockpit -B out/cockpit-driver -G Ninja -DCMAKE_BUILD_TYPE=${{ matrix.configuration }} -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DORBITER_TEST_RUNTIME="$pwd/out/production-app"
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           cmake --build out/cockpit-driver --parallel 2
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
@@ -106,6 +123,13 @@ jobs:
             out/opengl-client/CMakeCache.txt
             out/opengl-client/compile_commands.json
             out/cockpit-driver/CMakeCache.txt
+            out/cockpit-driver/compile_commands.json
+            out/cockpit-driver/*.pdb
+            out/application-rebuild/build-inputs.json
+            out/production-app/Modules/Plugin/OGLClient.dll
+            out/production-app/Modules/Plugin/OGLClient.pdb
+            out/production-app/Modules/Plugin/ProductionCockpitDriver.dll
+            out/production-app/Modules/OGLClient/**
             out/cockpit-reference/**/*.json
             out/cockpit-reference/**/*.csv
             out/cockpit-reference/**/*.txt
@@ -114,6 +138,13 @@ jobs:
             out/cockpit-reference/**/*.rgba
             out/cockpit-reference/**/*.scn
             out/cockpit-reference/**/Orbiter.cfg
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: production-cockpit-runtime-${{ matrix.configuration }}
+          compression-level: 0
+          retention-days: 90
+          path: out/runtime-archive/windows-test-runtime.zip
   compare:
     name: Original cockpit Debug/Release comparison
     needs: cockpit

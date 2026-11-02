@@ -4,11 +4,13 @@ Phase 6 is in progress. Phase 5 remains accepted; the prepared laptop preview is
 still the verified production ShuttlePB/ISS external-view build. No native
 cockpit or Delta-glider capability is claimed by the engineering probes below.
 
-The first gate executes the original Windows application and SDK at
-`d14fa7941bd4b60bd5b07c8e444ebfb87761893f`, from accepted Phase 5 runtime
-artifacts in run 41396231165. The complete original application/SDK file hashes
-and matching owning sources are checked before compiling the SDK-only control
-driver. Pane, HUD, MFD, panel, VC, DG and DG-S implementations remain unchanged.
+Initial diagnostics execute the original Windows application and SDK at
+`d14fa7941bd4b60bd5b07c8e444ebfb87761893f`, from Phase 5 run 41396231165.
+The current candidate completely rebuilds Windows at
+`f725194209634f7fd5d1d44d426cfa9b5e303e37`, with only the pre-reference fuel-display
+timer repair described below. Complete application/SDK hashes and matching
+owning sources are checked before compiling the SDK-only control driver. Pane,
+HUD, stock MFDs, panel and VC code remain unchanged; no extraction has started.
 
 The real Windows OpenGL client receives opt-in text/readback observation hooks.
 They record actual Sketchpad calls, original displayed numbers, surface identity,
