@@ -39,6 +39,9 @@ class OGLClient: public RendererHost {
 	std::unique_ptr<TextureManager> mTextureManager;
 	Shader *mOverlayShader;
 	Shader *mUntexturedShader;
+    struct OverlayBuffer {GLuint buffer=0,vao=0,index=0;bool initialized=false;};
+    mutable OverlayBuffer mPanelBuffer,mFillBuffer,mScaleBuffer,mSurfaceBltBuffer,mWindowBltBuffer;
+    void ReleaseOverlayBuffers();
 public:
 #ifdef _WIN32
 #include "WindowsCallbacks.inc"

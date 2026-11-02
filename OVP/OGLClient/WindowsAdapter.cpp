@@ -80,7 +80,7 @@ void OGLClient::clbkDestroyRenderWindow(bool fastclose) {
         TileManager2Base::GlobalExit();TileManager::GlobalExit();vObject::GlobalExit();
         mResources=false;
     }
-    mTextureManager.reset();Renderer::GlobalExit();
+    ReleaseOverlayBuffers();mTextureManager.reset();Renderer::GlobalExit();
     GraphicsClient::clbkDestroyRenderWindow(fastclose);
     bool contextDeleted=true;
     if(mContext){wglMakeCurrent(nullptr,nullptr);contextDeleted=wglDeleteContext(mContext)!=FALSE;mContext=nullptr;}

@@ -122,13 +122,14 @@ void PopBlendFunc() {
 }
 
 void GlobalInit(int w, int h) {
-    PushBool(DEPTH_TEST, true);
-    PushBool(STENCIL_TEST, false);
-    PushBool(BLEND, true);
-    PushBool(CULL_FACE, true);
-    PushDepthMask(true);
-    PushFrontFace(CW);
-    PushBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    // Cached state and saved stacks belong to one GL context. Reapply the
+    // defaults even when the preceding context happened to use the same values.
+    lastBoolParams.clear();lastFBParams.clear();lastDepthmasks.clear();
+    lastFrontFaces.clear();lastblendfunc.clear();
+    boolParams[DEPTH_TEST]=true;boolParams[STENCIL_TEST]=false;
+    boolParams[BLEND]=true;boolParams[CULL_FACE]=true;
+    current_depthmask=true;current_frontface=CW;
+    current_blendfunc={GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA};
 
     current_fb = 0;
     current_viewport[0] = 0;
@@ -136,6 +137,7 @@ void GlobalInit(int w, int h) {
     current_viewport[2] = w;
     current_viewport[3] = h;
     current_shader = 0;
+    Sync();
     glViewport(0,0,w,h);
 }
 

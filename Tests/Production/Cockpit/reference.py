@@ -15,7 +15,10 @@ def fixture(case):
     if case.get('class')=='DeltaGlider':
         text=text.replace('DG:DG-S','DG:DeltaGlider').replace('PRPLEVEL 0:0.8 1:1 2:1','PRPLEVEL 0:0.8 1:1').replace('  TANKCONFIG 1\n','')
     panel={1:'',2:'BEGIN_PANEL\nEND_PANEL\n',3:'BEGIN_VC\nEND_VC\n'}[case['cockpit']]
-    return text.replace('BEGIN_SHIPS','BEGIN_HUD\n  TYPE '+{1:'Orbit',2:'Surface',3:'Docking'}[case['hud']]+'\nEND_HUD\n'+panel+'BEGIN_SHIPS')
+    instruments=''
+    if case['id']=='generic_align_sync':
+        instruments='BEGIN_MFD Left\n  TYPE OAlign\n  REF Earth\n  TARGET ISS\nEND_MFD\nBEGIN_MFD Right\n  TYPE OSync\n  TARGET ISS\nEND_MFD\n'
+    return text.replace('BEGIN_SHIPS','BEGIN_HUD\n  TYPE '+{1:'Orbit',2:'Surface',3:'Docking'}[case['hud']]+'\nEND_HUD\n'+panel+instruments+'BEGIN_SHIPS')
 
 def inspect(directory,case,settings):
     require(not (directory/'cockpit-failure.txt').exists(),'Original instrument/control driver failed')
@@ -31,6 +34,10 @@ def inspect(directory,case,settings):
     life=json.loads((directory/'graphics-lifecycle.json').read_text());require(life['context_deleted'] and life['successful_presents']==60,'Actual client lifecycle incomplete')
     renderer=json.loads((directory/'renderer-info.json').read_text());require('llvmpipe' in renderer['renderer'].lower(),'Original Windows software OpenGL was not loaded')
     errors=directory/'graphics-errors.txt';require(not errors.exists() or not errors.read_text().strip(),'Original client reported OpenGL errors')
+    registrations=[r for r in rows(directory/'visual-events.csv') if r['event']=='register' and r['object']==case['target']]
+    require(registrations and int(registrations[0]['frame'])==0,'Required real cockpit visual was not registered on the first frame')
+    if case['cockpit']==3:
+        require(any(r['object']==case['target'] and int(r['mesh_draw_calls'])>0 for r in rows(directory/'object-draws.csv')),'Actual stock virtual cockpit mesh was not drawn')
     bindings=json.loads((directory/'mesa-bindings.json').read_text());modules=[];names=set()
     expected={name.casefold():entry for name,entry in bindings['runtime']['files'].items()}
     effective={name.casefold():entry for name,entry in bindings['bindings'].items()};system=Path(os.environ['SystemRoot']).resolve()

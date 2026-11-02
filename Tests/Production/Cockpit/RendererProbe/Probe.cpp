@@ -22,7 +22,15 @@ int main(int argc,char** argv){try{
     NativeRenderContext context;context.configuration=&settings;context.time=&time;context.programFiles=&program;
     context.textures=&textures;context.highTextures=&high;context.planetTextures=&planets;BindNativeRenderContext(&context);
     NativeModule module(std::filesystem::absolute(argv[1]),ORBITER_NATIVE_GRAPHICS,&context);
-    auto* client=static_cast<NativeGraphics*>(module.Instance());context.graphics=client;client->Open();
+    auto* client=static_cast<NativeGraphics*>(module.Instance());context.graphics=client;
+    constexpr unsigned cycles=20;
+    for(unsigned cycle=0;cycle<cycles;++cycle){
+    context.evidence=std::filesystem::absolute(argv[4]).parent_path()/("context-"+std::to_string(cycle));
+    client->Open();
+    require(glGetError()==GL_NO_ERROR,"Context reinitialization produced a GL error");
+    glDebugMessageCallback([](GLenum,GLenum type,GLuint,GLenum,GLsizei,const GLchar* message,const void*){
+        if(type==GL_DEBUG_TYPE_ERROR)std::cerr<<"Actual GL error: "<<message<<'\n';
+    },nullptr);glEnable(GL_DEBUG_OUTPUT);glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
     auto surface=client->CreateSurfaceResource(128,64);require(surface,"Real render target unavailable");
     auto font=client->CreateFontResource(-14,false,"Fixed",FONT_NORMAL,0);auto* pad=client->AcquireSketchpad(surface);
     require(pad && font,"Original Sketchpad/font unavailable");pad->SetFont(font);
@@ -47,13 +55,16 @@ int main(int argc,char** argv){try{
     glGetTexImage(GL_TEXTURE_2D,0,GL_RGBA,GL_UNSIGNED_BYTE,after.data());glBindTexture(GL_TEXTURE_2D,0);
     unsigned changed=0;for(size_t i=0;i<before.size();i+=4)if(!std::equal(before.begin()+i,before.begin()+i+4,after.begin()+i))++changed;
     const auto stockError=glGetError();client->ReleaseTextureResource(stock);
-    client->CloseSession();client->Close();context.graphics=nullptr;
+    client->CloseSession();client->Close();
     require(valid,"Negative font height produced invalid instrument metrics");require(error==GL_NO_ERROR,"Actual instrument render produced a GL error");
     require(green>10,"Actual font produced no colored glyph pixels");require(rejected,"Invalid surface dimensions were accepted");
     require(compressedBefore && !compressedAfter && changed>10 && changed<before.size()/40,"Compressed stock drawing target lost its contents or failed to update");
     require(stockError==GL_NO_ERROR,"Compressed stock drawing target produced a GL error");
+    if(cycle+1!=cycles)continue;
     std::ofstream report(argv[4]);report.exceptions(std::ios::badbit|std::ios::failbit);
     report<<"{\"status\":\"passed\",\"requested_height\":-14,\"character_width\":"<<width<<",\"character_height\":"<<height
-          <<",\"glyph_pixels\":"<<green<<",\"invalid_surface_rejected\":true,\"gl_error\":0,\"compressed_target_changed_pixels\":"<<changed<<"}\n";
-    std::cout<<"Actual font metrics "<<width<<'x'<<height<<"; green glyph pixels "<<green<<'\n';BindNativeRenderContext(nullptr);
+          <<",\"context_cycles\":"<<cycles<<",\"glyph_pixels\":"<<green<<",\"invalid_surface_rejected\":true,\"gl_error\":0,\"compressed_target_changed_pixels\":"<<changed<<"}\n";
+    std::cout<<"Actual font metrics "<<width<<'x'<<height<<"; green glyph pixels "<<green<<'\n';
+    }
+    context.graphics=nullptr;BindNativeRenderContext(nullptr);
 }catch(const std::exception& e){std::cerr<<e.what()<<'\n';BindNativeRenderContext(nullptr);return 1;}}

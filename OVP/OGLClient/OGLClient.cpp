@@ -37,6 +37,16 @@ struct SurfaceTextureUnit {
 };
 }
 
+void OGLClient::ReleaseOverlayBuffers()
+{
+    for(auto* buffer:{&mPanelBuffer,&mFillBuffer,&mScaleBuffer,&mSurfaceBltBuffer,&mWindowBltBuffer}){
+        if(buffer->index)glDeleteBuffers(1,&buffer->index);
+        if(buffer->buffer)glDeleteBuffers(1,&buffer->buffer);
+        if(buffer->vao)glDeleteVertexArrays(1,&buffer->vao);
+        *buffer=OverlayBuffer{};
+    }
+}
+
 // ==============================================================
 // API interface
 // ==============================================================
@@ -234,19 +244,16 @@ void OGLClient::clbkRender2DPanel (SURFHANDLE *hSurf, MESHHANDLE hMesh, MATRIX3 
 {
 	InstrumentEvidence::Overlay(hMesh,T);
 	SurfaceTextureUnit textureUnit;
-	static int nHVTX = 1;
-	static struct HVTX {
-		float tu, tv;
-		float x, y;
-	} *hvtx = new HVTX[1];
+	struct HVTX { float tu, tv, x, y; };
+	std::vector<HVTX> hvtx;
 
 	Renderer::PushBool(Renderer::DEPTH_TEST, false);
 	Renderer::PushBool(Renderer::BLEND, true);
 	Renderer::PushBool(Renderer::CULL_FACE, false);
 
 	glm::mat4 ortho_proj = glm::ortho(0.0f, (float)g_client->GetScene()->GetCamera()->GetWidth(), (float)g_client->GetScene()->GetCamera()->GetHeight(), 0.0f);
-	static GLuint m_Buffer, m_VAO, IBO;
-	static bool init = false;
+	auto& m_Buffer=mPanelBuffer.buffer;auto& m_VAO=mPanelBuffer.vao;
+	auto& IBO=mPanelBuffer.index;auto& init=mPanelBuffer.initialized;
 	if(!init) {
 		init=true;
 		glGenVertexArrays(1, &m_VAO);
@@ -315,12 +322,9 @@ void OGLClient::clbkRender2DPanel (SURFHANDLE *hSurf, MESHHANDLE hMesh, MATRIX3 
 		}
 
 		nvtx = grp->nVtx;
-		if (nvtx > nHVTX) { // increase buffer size
-			delete []hvtx;
-			hvtx = new HVTX[nHVTX = nvtx];
-		}
+		hvtx.resize(nvtx);
 		for (j = 0; j < nvtx; j++) {
-			HVTX *tgtvtx = hvtx+j;
+			HVTX *tgtvtx = hvtx.data()+j;
 			NTVERTEX *srcvtx = grp->Vtx+j;
 			tgtvtx->x = srcvtx->x*scalex + dx;
 			tgtvtx->y = srcvtx->y*scaley + dy;
@@ -331,7 +335,7 @@ void OGLClient::clbkRender2DPanel (SURFHANDLE *hSurf, MESHHANDLE hMesh, MATRIX3 
 		glBindBuffer(GL_ARRAY_BUFFER, m_Buffer);
 		glBindVertexArray(m_VAO);
 		Renderer::CheckError("clbkRender2DPanel glBindBuffer");
-		glBufferSubData(GL_ARRAY_BUFFER, 0, nvtx * sizeof(HVTX), hvtx);
+		glBufferData(GL_ARRAY_BUFFER, nvtx * sizeof(HVTX), hvtx.data(), GL_DYNAMIC_DRAW);
 		Renderer::CheckError("clbkRender2DPanel glBufferSubData");
 		glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 0, NULL);
 		Renderer::CheckError("clbkRender2DPanel glVertexAttribPointer");
@@ -1293,8 +1297,8 @@ bool OGLClient::FillSurface (SURFHANDLE surf, int tgtx, int tgty, int w, int h, 
 {
 	glm::mat4 ortho_proj = glm::ortho(0.0f, (float)g_client->GetScene()->GetCamera()->GetWidth(), (float)g_client->GetScene()->GetCamera()->GetHeight(), 0.0f);
 
-	static GLuint m_Buffer, m_VAO;
-	static bool init = false;
+	auto& m_Buffer=mFillBuffer.buffer;auto& m_VAO=mFillBuffer.vao;
+	auto& init=mFillBuffer.initialized;
 	if(!init) {
 		init=true;
 		glGenVertexArrays(1, &m_VAO);
@@ -1327,6 +1331,8 @@ bool OGLClient::FillSurface (SURFHANDLE surf, int tgtx, int tgty, int w, int h, 
 	};
 	Renderer::PushBool(Renderer::BLEND, false);
 	Renderer::PushBool(Renderer::CULL_FACE, false);
+	Renderer::PushBool(Renderer::DEPTH_TEST, false);
+	Renderer::PushBool(Renderer::STENCIL_TEST, false);
 
 	OGLTexture *m_tex = (OGLTexture *)surf;
 	if(m_tex) {
@@ -1349,9 +1355,9 @@ bool OGLClient::FillSurface (SURFHANDLE surf, int tgtx, int tgty, int w, int h, 
 	Renderer::Bind(mUntexturedShader);
 	mUntexturedShader->SetMat4("projection", ortho_proj);
 	glm::vec3 color;
-	color.r = (float)((col>>16)&0xff)/255.0;
+	color.r = (float)(col&0xff)/255.0;
 	color.g = (float)((col>>8)&0xff)/255.0;
-	color.b = (float)((col>>0)&0xff)/255.0;
+	color.b = (float)((col>>16)&0xff)/255.0;
 	mUntexturedShader->SetVec3("quad_color", color);
 
 	glBindVertexArray(m_VAO);
@@ -1367,7 +1373,7 @@ bool OGLClient::FillSurface (SURFHANDLE surf, int tgtx, int tgty, int w, int h, 
 	if(surf) {
 		Renderer::PopRenderTarget();
 	}
-	Renderer::PopBool(2);
+	Renderer::PopBool(4);
     return true;
 }
 
@@ -1397,8 +1403,12 @@ bool OGLClient::ScaleBlt (SURFHANDLE tgt, int tgtx, int tgty, int tgtw, int tgth
     //printf("OGLClient::ScaleBlt tgtx=%d tgty=%d tgtw=%d tgth=%d\n", tgtx,tgty,tgtw,tgth);
     //printf("OGLClient::ScaleBlt srcx=%d srcy=%d srcw=%d srch=%d\n", srcx,srcy,srcw,srch);
 
+    if(!src || tgtw<=0 || tgth<=0 || srcw<=0 || srch<=0)return false;
+    SurfaceTextureUnit textureUnit;
 	Renderer::PushBool(Renderer::BLEND, false);
 	Renderer::PushBool(Renderer::CULL_FACE, false);
+	Renderer::PushBool(Renderer::DEPTH_TEST, false);
+	Renderer::PushBool(Renderer::STENCIL_TEST, false);
 
 	glm::mat4 ortho_proj;
 
@@ -1410,8 +1420,8 @@ bool OGLClient::ScaleBlt (SURFHANDLE tgt, int tgtx, int tgty, int tgtw, int tgth
 		ortho_proj = glm::ortho(0.0f, (float)g_client->GetScene()->GetCamera()->GetWidth(), (float)g_client->GetScene()->GetCamera()->GetHeight(), 0.0f);
 	}
 
-	static GLuint m_Buffer, m_VAO;
-	static bool init = false;
+	auto& m_Buffer=mScaleBuffer.buffer;auto& m_VAO=mScaleBuffer.vao;
+	auto& init=mScaleBuffer.initialized;
 	if(!init) {
 		init=true;
 		glGenVertexArrays(1, &m_VAO);
@@ -1509,7 +1519,7 @@ bool OGLClient::ScaleBlt (SURFHANDLE tgt, int tgtx, int tgty, int tgtw, int tgth
 		Renderer::PopRenderTarget();
 	}
 
-	Renderer::PopBool(2);
+	Renderer::PopBool(4);
 	return true;
 }
 
@@ -1596,8 +1606,8 @@ bool OGLClient::Blt (SURFHANDLE tgt, int tgtx, int tgty, SURFHANDLE src, int src
 		Renderer::PushRenderTarget(m_tex);
 		glm::mat4 ortho_proj = glm::ortho(0.0f, (float)m_tex->m_Width, 0.0f, (float)m_tex->m_Height);
 
-		static GLuint m_Buffer, m_VAO;
-		static bool init = false;
+		auto& m_Buffer=mSurfaceBltBuffer.buffer;auto& m_VAO=mSurfaceBltBuffer.vao;
+		auto& init=mSurfaceBltBuffer.initialized;
 		if(!init) {
 			init=true;
 			Renderer::CheckError("pre glGenVertexArrays");
@@ -1692,8 +1702,8 @@ bool OGLClient::Blt (SURFHANDLE tgt, int tgtx, int tgty, SURFHANDLE src, int src
 	} else {
 		glm::mat4 ortho_proj = glm::ortho(0.0f, (float)g_client->GetScene()->GetCamera()->GetWidth(), (float)g_client->GetScene()->GetCamera()->GetHeight(), 0.0f);
 
-		static GLuint m_Buffer, m_VAO;
-		static bool init = false;
+		auto& m_Buffer=mWindowBltBuffer.buffer;auto& m_VAO=mWindowBltBuffer.vao;
+		auto& init=mWindowBltBuffer.initialized;
 		if(!init) {
 			init=true;
 			glGenVertexArrays(1, &m_VAO);

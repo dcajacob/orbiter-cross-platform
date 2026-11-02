@@ -296,6 +296,10 @@ void Scene::AddLocalLight (const LightEmitter *le, const vObject *vo, int idx)
 void Scene::Update ()
 {
 	cam->Update (); // update camera parameters
+	// An internal view needs its focus visual on the first frame. The round-
+	// robin check below can otherwise leave the stock cockpit absent until
+	// every Solar System body has been visited (over forty frames in Sol).
+	if(oapiCameraInternal())CheckVisual(oapiGetFocusObject());
 	// Creation notifications precede engine PostCreation/finalization. Register
 	// immediately, then refresh visibility with the finalized body/current camera.
 	for (auto body:pendingVessels) CheckVisual(body);

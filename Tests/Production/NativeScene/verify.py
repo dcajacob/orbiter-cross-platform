@@ -35,6 +35,8 @@ def states(directory,reference):
     return dict(maxima=maximum,budgets=budgets,samples=len(observed))
 
 def inspect(directory,reference,minimum):
+    errors=directory/'graphics-errors.txt'
+    require(not errors.exists() or not errors.read_text().strip(),'Native OpenGL reported actual driver errors')
     lifecycle=json.loads((directory/'graphics-lifecycle.json').read_text())
     require(lifecycle==dict(rendered_frames=60,successful_presents=60,context_deleted=True),'Incomplete native graphics lifecycle')
     scene=rows(directory/'scene.csv');vessels=[r for r in scene if r['type']=='vessel']

@@ -57,6 +57,21 @@ texture: 300 glyph pixels change and the surrounding pixels remain intact.
 Captured MFD textures must contain actual colored drawing and a nonwhite
 background, in addition to recording drawing calls. The cockpit harness stages
 the original runtime independently of the earlier flight trace validator.
+Internal views now check their focus visual on the first render update; the
+general round-robin visibility scan previously left DG's cockpit absent for
+over forty frames while visiting Sol's bodies. Capture checks require the real
+focus visual in the first frame and actual vessel mesh draws for VC cases.
+Panel, surface-copy and rectangle-fill vertex buffers belong to the client and
+are deleted/reset before its GL context is destroyed. Panel uploads allocate
+for the actual group size rather than assuming a 2,048-vertex limit. Rectangle
+fills and scaled copies use the same depth/stencil isolation as ordinary blits.
+The renderer probe reopens the same client across twenty contexts. It exposed
+particle buffers surviving context destruction; their cleanup and context-local
+state-cache reset now pass this exercise without GL errors. Eight of nine
+original Debug instrument cases passed the next diagnostic run, including
+repeat-identical real DG/DG-S cockpit captures. The remaining alignment/sync
+fixture now selects the actual ISS target through stock scenario syntax, so
+it exercises numerical instrument output instead of the empty-target prompt.
 
 Before extraction, require repeat-identical numerical and displayed-text traces,
 finite finalized state, actual expected cockpit/MFD modes, numerical display

@@ -19,6 +19,11 @@ bool enabled=false,captured=false;unsigned frames=0,draws=0,presents=0;uint64_t 
 std::ofstream events,assets,visualMeshes;std::set<std::string> seen;std::map<std::string,unsigned> objectDraws;
 std::string currentObject;std::map<std::string,std::pair<unsigned,uint64_t>> planetTiles;
 std::map<std::pair<std::string,int>,uint64_t> archiveReads;
+void APIENTRY debugMessage(GLenum,GLenum type,GLuint,GLenum,GLsizei,const GLchar* message,const void*) {
+    if(type!=GL_DEBUG_TYPE_ERROR)return;
+    std::ofstream errors(GetNativeRenderContext().evidence/"graphics-errors.txt",std::ios::app);
+    errors<<message<<'\n';
+}
 std::string name(OBJHANDLE h) {char value[256]{};oapiGetObjectName(h,value,sizeof(value));return value;}
 std::ofstream output(const char* name) {
     std::ofstream result(GetNativeRenderContext().evidence/name,std::ios::binary);result.imbue(std::locale::classic());
@@ -29,6 +34,7 @@ void Begin() {
     InstrumentEvidence::Begin(GetNativeRenderContext().evidence);
     enabled=!GetNativeRenderContext().evidence.empty();if(!enabled)return;
     std::filesystem::create_directories(GetNativeRenderContext().evidence);
+    if(glDebugMessageCallback){glEnable(GL_DEBUG_OUTPUT);glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);glDebugMessageCallback(debugMessage,nullptr);}
     frames=draws=presents=0;indices=0;captured=false;seen.clear();objectDraws.clear();currentObject.clear();planetTiles.clear();archiveReads.clear();
     events=output("visual-events.csv");events<<"frame,event,object,type\n";assets=output("loaded-assets.txt");
     visualMeshes=output("visual-meshes.csv");visualMeshes<<"frame,object,class,module_version,index,name,groups,materials,textures,thrusters\n";

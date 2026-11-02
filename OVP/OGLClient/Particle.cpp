@@ -224,6 +224,7 @@ void OGLParticleStream::GlobalInit ()
 
 void OGLParticleStream::GlobalExit ()
 {
+	IBO.reset();eVBO.reset();dVBO.reset();eVBA.reset();dVBA.reset();
 	if (deftex) {
 		deftex->Release();
 		deftex = nullptr;

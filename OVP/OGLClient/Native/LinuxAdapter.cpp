@@ -212,7 +212,7 @@ void OGLClient::clbkDestroyRenderWindow(bool)
         OGLPad::GlobalExit();vVessel::GlobalExit();OGLParticleStream::GlobalExit();vStar::GlobalExit();HazeManager::GlobalExit();
         TileManager2Base::GlobalExit();TileManager::GlobalExit();vObject::GlobalExit();mResources=false;
     }
-    mTextureManager.reset();Renderer::GlobalExit();
+    ReleaseOverlayBuffers();mTextureManager.reset();Renderer::GlobalExit();
     glfwDestroyWindow(nativeWindow);nativeWindow=nullptr;Evidence::End(true);glfwTerminate();
 }
 bool RendererResolveFilePath(const std::string& input,std::string& resolved)
