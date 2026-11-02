@@ -24,4 +24,4 @@ FetchContent_Declare(ui_headers
 FetchContent_MakeAvailable(ui_headers)
 target_include_directories(ProductionCockpitDriver PRIVATE "${ui_headers_SOURCE_DIR}")
 target_compile_definitions(ProductionCockpitDriver PRIVATE
-  "IMGUI_USER_CONFIG=\"${ORBITER_TEST_RUNTIME}/Orbitersdk/include/imconfig.h\"")
+  "IMGUI_USER_CONFIG=\"${CMAKE_CURRENT_SOURCE_DIR}/../../../Extern/imgui/imconfig.h\"")
