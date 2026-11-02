@@ -10,12 +10,14 @@
 #include <stdexcept>
 #include <utility>
 namespace contact_stages {
-struct Call {std::uint64_t index; double seconds, fraction, dt; bool selected;};
-inline Call Begin(double seconds,double fraction,double dt) {
+struct Call {std::uint64_t index; double seconds, fraction, dt; const char* object; bool selected;};
+inline Call& Current() {static Call call{};return call;}
+inline Call Begin(double seconds,double fraction,double dt,const char* object) {
     static std::uint64_t index=0;
-    // First contact calculations and controlled return touchdown. Fixed-step
-    // execution is required; this output never changes either input schedule.
-    return {index++,seconds,fraction,dt,seconds<=0.05 || (seconds>=39.0 && seconds<=41.0)};
+    // Includes the first force divergence and the controlled return touchdown.
+    // Fixed-step execution is required; inputs are never changed by this output.
+    Current()={index++,seconds,fraction,dt,object,seconds<=41.0};
+    return Current();
 }
 inline void Row(const Call& call,const char* stage,int point,
                 std::initializer_list<std::pair<const char*,double>> values) {
@@ -28,7 +30,7 @@ inline void Row(const Call& call,const char* stage,int point,
     }();
     trace<<"{\"call\":"<<call.index<<",\"seconds\":"<<call.seconds
          <<",\"fraction\":"<<call.fraction<<",\"dt\":"<<call.dt
-         <<",\"stage\":\""<<stage<<"\",\"point\":"<<point<<",\"values\":{";
+         <<",\"object\":\""<<call.object<<"\",\"stage\":\""<<stage<<"\",\"point\":"<<point<<",\"values\":{";
     bool first=true;
     for(const auto& value:values) {
         if(!std::isfinite(value.second))throw std::runtime_error("Nonfinite diagnostic contact value");
