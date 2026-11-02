@@ -1,0 +1,50 @@
+{
+  "schema": 1,
+  "scope": "Original Lua execution, yielding, environment isolation and DG AAP references before native extraction",
+  "application_source": "f725194209634f7fd5d1d44d426cfa9b5e303e37",
+  "frames": 60,
+  "fixed_step": 0.25,
+  "epoch": 51982.5,
+  "image_ssim_minimum": 0.98,
+  "budgets": {
+    "position_m": 0.01,
+    "velocity_m_s": 1e-05,
+    "rotation_rad": 1e-08,
+    "angular_velocity_rad_s": 1e-10,
+    "mjd_days": 1e-10,
+    "propellant_relative": 1e-08,
+    "propellant_absolute_kg": 1e-08
+  },
+  "cases": [
+    {
+      "id": "lua_pb",
+      "fixture": "orbit",
+      "target": "PB",
+      "cockpit": 1,
+      "left": 1,
+      "right": 2,
+      "hud": 1
+    },
+    {
+      "id": "lua_dg",
+      "fixture": "dg_orbit",
+      "target": "DG",
+      "class": "DeltaGlider",
+      "cockpit": 2,
+      "left": 1,
+      "right": 2,
+      "hud": 1
+    },
+    {
+      "id": "lua_dgs",
+      "fixture": "dg_orbit",
+      "target": "DG",
+      "class": "DG-S",
+      "cockpit": 2,
+      "left": 1,
+      "right": 2,
+      "hud": 1
+    }
+  ],
+  "runtime_recipe": "Complete application/SDK rebuilt from the pinned source with the isolated DG sample-time initialization repair; no cockpit extraction."
+}
