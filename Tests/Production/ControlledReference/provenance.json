@@ -1,0 +1,114 @@
+{
+  "schema": 1,
+  "status": "qualified original Windows controlled upright landing",
+  "automatic_refresh": false,
+  "run_id": 41374941546,
+  "driver_source": "29eeb2f1caad3f205408624d190e4d24c833af82",
+  "application_source": "391919027ac3e4a4d42f145373c788fc859c32cd",
+  "source_artifacts": {
+    "Debug": {
+      "id": 13110981739,
+      "sha256": "7e6f87ffbbaf7d75988ab8ea7ea87a2b7e09f469c5cd411172b37abae86ad4c2",
+      "size": 5064344
+    },
+    "Release": {
+      "id": 13110732918,
+      "sha256": "0a749ade4db490c81255c803e93f60ed24f824c673d22a16a8249589b85f3810",
+      "size": 5055360
+    },
+    "comparison": {
+      "id": 13109924863,
+      "sha256": "e2162dc53f1cffa9e3749443116cc0c3c10bbfe2d11019928e5b215270aa2c73",
+      "size": 494
+    }
+  },
+  "artifacts": {
+    "Debug": {
+      "path": "controlled-landing-Debug.zip",
+      "sha256": "4fba95e713b0a89047e6d3e5ac1171e5575b6976d61de1b2d9342bbc25568782",
+      "size": 1880969
+    },
+    "Release": {
+      "path": "controlled-landing-Release.zip",
+      "sha256": "36163e6a274b860ac04b308f815ed8cc1415c68e4ec4f189f2b9a19a3ae7a028",
+      "size": 1873541
+    },
+    "comparison": {
+      "path": "controlled-landing-comparison.zip",
+      "sha256": "db50944b3de41404d29408d76ceeb927a518b6ae4491251c7b28f9e70b4c3174",
+      "size": 487
+    }
+  },
+  "members": {
+    "Debug": {
+      "driver/CMakeCache.txt": "b60c28562eaf8a7e3a6b8327fb53c205ad11729a73df7e35121f519941185a3e",
+      "ground-driver-build.log": "a8c5d08d91c3c31d0a8aaa18009f4d517b9fcd1db19c2efd377cd90cc5f7d525",
+      "ground-driver-configure.log": "342a55e1539cd5cd24cccc201650f83afe7b10c7fb80c3afa24c5208dd6fcb52",
+      "production-app/test-runtime.json": "6d2bccbd562b5ac2877c108a6c2580e5304e4ce47e39ee36a2c0a8ac00a4468a",
+      "production-behavior/controlled-landing-report.json": "9f55686b6ad04fcc20acf557c3c8c93f97cf4a0b9db7017513e47fce87fea03a",
+      "production-behavior/controlled-landing/GravityModels/Notes on Gravity Models.txt": "9fdf442ce97e8dcbd988718d50c80b3af332ab711b98090558ddaf173cf6ee99",
+      "production-behavior/controlled-landing/Kernels/orbiter.log": "98c86d3279d6596b0fe5332c2dfdab65e2fd0716410df8b14ce01d514bda861a",
+      "production-behavior/controlled-landing/Kernels/spk_sources.txt": "578e9dcec183e497401918e54b0e353f0e3c097f0d245fb19bc4a1447e97a191",
+      "production-behavior/controlled-landing/Modules/D3D9Client/GKernel.txt": "997d1a9bba583331a857a41dc338954877ce57d413f4d3e3a65bb9b5eb4f6052",
+      "production-behavior/controlled-landing/Orbiter.cfg": "19e5dd0345d6b563f0fd85bd5577a742789304f80d4585017fd3e6320da374db",
+      "production-behavior/controlled-landing/Orbiter.log": "2bf9d1cecc5e9c87ae42a0f7de773a2b1876e0b7f44eaa7aeda186475b2b4f67",
+      "production-behavior/controlled-landing/Scenarios/(Current state).scn": "1200fe7e239368c6e89021299c1f6e5b3ae0afc78a5b867545d91cd8a0a2cd15",
+      "production-behavior/controlled-landing/Scenarios/Behavior.scn": "e33b6485c1035a8052bbec1772ce738941511f0c301d9ecde322af637adc04f9",
+      "production-behavior/controlled-landing/Scenarios/BehaviorSnapshot.scn": "d27fb92ebd2bc35f351e610dfcffc22fbac0efe8cea1e4064e4314ce734a68a3",
+      "production-behavior/controlled-landing/behavior-animations.csv": "c1e7476875403ce5715acab7bd3f9c0ac30c16837cc174b83e8260e83cd9ad84",
+      "production-behavior/controlled-landing/behavior-case.txt": "5092694d3d98d85d174f4aed5f6ee1ad93d46e78741e42349cc28ec556779a58",
+      "production-behavior/controlled-landing/behavior-events.csv": "e36e20bad9a2c9835dd485d84318330a06e68135a06bbe06594df3fc538cffb5",
+      "production-behavior/controlled-landing/behavior-propellant.csv": "5a0b4e3d2a9d55bd576ec08ed7695c29acf3e7e5048845d9b8238c485dd3de65",
+      "production-behavior/controlled-landing/behavior-state.csv": "88510a45be13c696e5b0bb5ce43b7e4019214719a66d16e1661231e19268cedb",
+      "production-behavior/controlled-landing/console.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "production-behavior/controlled-landing/invocation.json": "41e439b4432d58b748f2286223ec01351db26a34912dd2bad7ab23007934ae24"
+    },
+    "Release": {
+      "driver/CMakeCache.txt": "cdcc8a539a4b6dbb48ee603323726dccc62b45295ae79fccd0b3ab0c5622b957",
+      "ground-driver-build.log": "f7336329400e8f22279808ef648e2411bd6cdae67aa83c7c5035b4c205bd50b2",
+      "ground-driver-configure.log": "54ad0f6b0ee7e6b0f5c37c2e2e327db2ea08669532a64a89c8dc35f9c29b8e20",
+      "production-app/test-runtime.json": "366978b799e340e5a16695aa79a437c720967fb65c267350a7fb1bb7cf7e8945",
+      "production-behavior/controlled-landing-report.json": "5a1c9bdd67270ad5a209f7d9867373d22f8cc6a927b95b7494bf3322d061cd98",
+      "production-behavior/controlled-landing/GravityModels/Notes on Gravity Models.txt": "9fdf442ce97e8dcbd988718d50c80b3af332ab711b98090558ddaf173cf6ee99",
+      "production-behavior/controlled-landing/Kernels/orbiter.log": "98c86d3279d6596b0fe5332c2dfdab65e2fd0716410df8b14ce01d514bda861a",
+      "production-behavior/controlled-landing/Kernels/spk_sources.txt": "578e9dcec183e497401918e54b0e353f0e3c097f0d245fb19bc4a1447e97a191",
+      "production-behavior/controlled-landing/Modules/D3D9Client/GKernel.txt": "997d1a9bba583331a857a41dc338954877ce57d413f4d3e3a65bb9b5eb4f6052",
+      "production-behavior/controlled-landing/Orbiter.cfg": "19e5dd0345d6b563f0fd85bd5577a742789304f80d4585017fd3e6320da374db",
+      "production-behavior/controlled-landing/Orbiter.log": "99a7dcdd23c9d94a1fe33abd458d44e444aa8233064d90bdc6d40a669279b259",
+      "production-behavior/controlled-landing/Scenarios/(Current state).scn": "1200fe7e239368c6e89021299c1f6e5b3ae0afc78a5b867545d91cd8a0a2cd15",
+      "production-behavior/controlled-landing/Scenarios/Behavior.scn": "e33b6485c1035a8052bbec1772ce738941511f0c301d9ecde322af637adc04f9",
+      "production-behavior/controlled-landing/Scenarios/BehaviorSnapshot.scn": "d27fb92ebd2bc35f351e610dfcffc22fbac0efe8cea1e4064e4314ce734a68a3",
+      "production-behavior/controlled-landing/behavior-animations.csv": "c1e7476875403ce5715acab7bd3f9c0ac30c16837cc174b83e8260e83cd9ad84",
+      "production-behavior/controlled-landing/behavior-case.txt": "5092694d3d98d85d174f4aed5f6ee1ad93d46e78741e42349cc28ec556779a58",
+      "production-behavior/controlled-landing/behavior-events.csv": "e36e20bad9a2c9835dd485d84318330a06e68135a06bbe06594df3fc538cffb5",
+      "production-behavior/controlled-landing/behavior-propellant.csv": "7276e938a69dc98d6bf4c71726e8816c506900e6c7197e65c7c083fa745ce347",
+      "production-behavior/controlled-landing/behavior-state.csv": "ee56cb722a8b1a112a5a9bb16201c33dec3a197dfda98605654f4318730bdb76",
+      "production-behavior/controlled-landing/console.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "production-behavior/controlled-landing/invocation.json": "41e439b4432d58b748f2286223ec01351db26a34912dd2bad7ab23007934ae24"
+    },
+    "comparison": {
+      "controlled-landing-report.json": "e40c19b7e81de8ac98002b679f203f04ef1d5503b204d235e47667df0669f006"
+    }
+  },
+  "repeat_sha256": {
+    "Debug": {
+      "behavior-state.csv": "88510a45be13c696e5b0bb5ce43b7e4019214719a66d16e1661231e19268cedb",
+      "behavior-events.csv": "e36e20bad9a2c9835dd485d84318330a06e68135a06bbe06594df3fc538cffb5",
+      "behavior-propellant.csv": "5a0b4e3d2a9d55bd576ec08ed7695c29acf3e7e5048845d9b8238c485dd3de65",
+      "behavior-animations.csv": "c1e7476875403ce5715acab7bd3f9c0ac30c16837cc174b83e8260e83cd9ad84"
+    },
+    "Release": {
+      "behavior-state.csv": "ee56cb722a8b1a112a5a9bb16201c33dec3a197dfda98605654f4318730bdb76",
+      "behavior-events.csv": "e36e20bad9a2c9835dd485d84318330a06e68135a06bbe06594df3fc538cffb5",
+      "behavior-propellant.csv": "7276e938a69dc98d6bf4c71726e8816c506900e6c7197e65c7c083fa745ce347",
+      "behavior-animations.csv": "c1e7476875403ce5715acab7bd3f9c0ac30c16837cc174b83e8260e83cd9ad84"
+    }
+  },
+  "input_sha256_lf": {
+    "Tests/Production/ControlledLanding/Controls.h": "0b460f6d4ab47a253e16b030aec490963e3310e50531d109498f558c4c6cb1cb",
+    "Tests/Production/ControlledLanding/Driver.cpp": "18a23d296e50ee616b64a3640cdc695371ba9f43035645df0445c43ad7e87877",
+    "Tests/Production/ControlledLanding/case.json": "7576a52d88b4682d95192196796c63253c07e056f4851000dcab5537919139a5",
+    "Tests/Production/ControlledLanding/capture.py": "18628ed224d8a453c547bd9169f21b06060f5abd67b3b309399cbedb7a5977b4"
+  },
+  "deduplication": "Lossless ZIP/LZMA packing; repeated directories removed only after byte-identical original CSV proof. Every retained member byte is unchanged."
+}

@@ -1,9 +1,6 @@
 name: Windows Controlled ShuttlePB Landing Candidate
 
 on:
-  push:
-    branches: ['codex/production-**']
-    paths: ['Tests/Production/ControlledLanding/**', '.github/workflows/production-controlled-landing.yml']
   workflow_dispatch:
 
 permissions:
