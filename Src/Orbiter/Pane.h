@@ -15,6 +15,7 @@
 #include "Orbiter.h"
 #include "Body.h"
 #include "Mfd.h"
+#include "Production/CockpitGraphics.h"
 #include "hud.h"
 #include "Select.h"
 
@@ -51,7 +52,7 @@ class Pane {
 	friend class MenuInfoBar;
 
 public:
-	Pane (oapi::GraphicsClient *gclient, HWND hwnd, int width, int height, int bpp);
+	Pane (oapi::CockpitClient *gclient, HWND hwnd, int width, int height, int bpp);
 	// Create a new pane with dimension width x height x bpp
 
 	~Pane ();
@@ -262,7 +263,7 @@ private:
 	void FreeResources ();
 	// Free GDI resources
 
-	oapi::GraphicsClient *gc; // client instance
+	oapi::CockpitClient *gc; // client instance
 	int W, H, BPP;            // pane dimensions
 	int scaleW;
 	HWND hWnd;               // window handle

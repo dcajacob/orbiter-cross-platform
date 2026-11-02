@@ -17,7 +17,7 @@
 
 #define STRICT 1
 #include "OrbiterAPI.h"
-#include "GraphicsAPI.h"
+#include "Production/CockpitGraphics.h"
 #include "Vessel.h"
 #include "Element.h"
 #include "Select.h"
@@ -43,7 +43,6 @@ public:
 };
 
 class Pane;
-class oapi::GraphicsClient;
 
 static char work_kstate[256];
 inline char *KstateSet (int key) {
@@ -220,7 +219,7 @@ public:
 
 protected:
 	Pane *pane;                 // pointer to pane
-	oapi::GraphicsClient *gc;   // graphics client, if available
+	oapi::CockpitClient *gc;   // graphics client, if available
 	INT_PTR id;                	// instrument id
 	bool BufKey (char key, double repdelay = 0.5);
 	void SetBuf (char key);
@@ -294,8 +293,8 @@ public:
 
 	static HPEN hdefpen[MAXPEN];       // deprecated pen resources
 
-	static void GlobalInit (oapi::GraphicsClient *gc);
-	static void GlobalExit (oapi::GraphicsClient *gc);
+	static void GlobalInit (oapi::CockpitClient *gc);
+	static void GlobalExit (oapi::CockpitClient *gc);
 
 private:
 	void ReleaseSurface ();

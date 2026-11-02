@@ -307,8 +307,9 @@
       "original_sha256_lf": "6ab4e355f274bda7296d794e45e38ad9f1cc5a051dd1d40eea14b55d6412dbb2"
     },
     "Src/Orbiter/Pane.h": {
-      "sha256_lf": "6cd9404fba1004d302a284952ce8cb2eb9c639d364d5937b8f8dc02b25f2af92",
-      "original_sha256_lf": "9ea0b381f6a97848c12ac3d08cce898c3b4cdf500338bb21d489236c310fb706"
+      "original_sha256_lf": "9ea0b381f6a97848c12ac3d08cce898c3b4cdf500338bb21d489236c310fb706",
+      "sha256_lf": "763720e58c0f2ff94afdf856124e539fecfff851a9e07f2d9ed3e80abca3e168",
+      "scope": "Private cockpit graphics binding only. Original algorithms and Windows underlying pointer types conserved by cockpit_source.py; native instrumentation is not operational yet."
     },
     "Src/Orbiter/PhysicsConfig.h": {
       "sha256_lf": "7657a6aa0fe6427a734aaabaa8fc5eb26edd615cc73360eaf22a45a53eb86ff8",
@@ -1070,6 +1071,41 @@
       "original_sha256_lf": "251be4f317f9568087035a289f652eff96b90e4cd499a92aacaf6e4f0c39b648",
       "sha256_lf": "c8533e9b35bdcabe4493e48b9d84fd5d4942480e3b882a0f201475b8431a999d",
       "scope": "Pre-reference correctness repair only: initialize previously indeterminate fuel-display sample time; no extraction or formula changes."
+    },
+    "Src/Orbiter/Pane.cpp": {
+      "original_sha256_lf": "398997e418820aff0d72edd0d977e75182511d3f13a369e0f074182db3f1bdde",
+      "sha256_lf": "b03f88a17b08ef67289f9467aea0a8d56134372cb375c5df3cfe0936f452d73c",
+      "scope": "Private cockpit graphics binding only. Original algorithms and Windows underlying pointer types conserved by cockpit_source.py; native instrumentation is not operational yet."
+    },
+    "Src/Orbiter/Mfd.h": {
+      "original_sha256_lf": "133e1e852d9563535bb8404420f98aa40ce284e43eb98ba2f7c33652e97a8e10",
+      "sha256_lf": "9037444a8923bf55e6aa05c26b6b3740082abdcb8163cf0c96640f41c61d8a8c",
+      "scope": "Private cockpit graphics binding only. Original algorithms and Windows underlying pointer types conserved by cockpit_source.py; native instrumentation is not operational yet."
+    },
+    "Src/Orbiter/Mfd.cpp": {
+      "original_sha256_lf": "0a5d504ea777abd83b0f3ce45e147a946fad03bb3c70a17eb61600e4ff5108f4",
+      "sha256_lf": "c98d18775bccc39d096f6f75250fc2cebb2804c10cdf9ecf2a38cefe4b919bec",
+      "scope": "Private cockpit graphics binding only. Original algorithms and Windows underlying pointer types conserved by cockpit_source.py; native instrumentation is not operational yet."
+    },
+    "Src/Orbiter/hud.h": {
+      "original_sha256_lf": "3f18667e52f3dad3698dc79f1e78f5ed9116d1a1de8cecb3cbd8fd02db9de569",
+      "sha256_lf": "bd88915e453834292cefbb97b40a4d8af400c47a8863abef91f0dbdb954a6edc",
+      "scope": "Private cockpit graphics binding only. Original algorithms and Windows underlying pointer types conserved by cockpit_source.py; native instrumentation is not operational yet."
+    },
+    "Src/Orbiter/hud.cpp": {
+      "original_sha256_lf": "7670ec27ef75c9325dd17ff4db5b019aaaed8749df9d67c1262fe846ede73926",
+      "sha256_lf": "92f69d3773357653d9a114b145e0fca5b462f0b982b0716ebe290bdede199f34",
+      "scope": "Private cockpit graphics binding only. Original algorithms and Windows underlying pointer types conserved by cockpit_source.py; native instrumentation is not operational yet."
+    },
+    "Src/Orbiter/Panel.h": {
+      "original_sha256_lf": "d517f73ee3cf326e944b8ac000fd19a75e1b30ac2a4bac59b0c1d481cadce1c3",
+      "sha256_lf": "bbea866528d96135b24437d701416d7d4c8012e4ade3bffc036edfe3fd78a295",
+      "scope": "Private cockpit graphics binding only. Original algorithms and Windows underlying pointer types conserved by cockpit_source.py; native instrumentation is not operational yet."
+    },
+    "Src/Orbiter/Production/CockpitGraphics.h": {
+      "original_sha256_lf": null,
+      "sha256_lf": "7b7643c823ae0015e8a5ecf73e296a909c9af346b3be6f41235d2373f90283c9",
+      "scope": "Private cockpit graphics binding only. Original algorithms and Windows underlying pointer types conserved by cockpit_source.py; native instrumentation is not operational yet."
     }
   }
 }

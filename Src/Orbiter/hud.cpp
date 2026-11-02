@@ -209,7 +209,7 @@ void HUD::Resize (bool isVC)
 
 	if (bVC) {
 		SURFHANDLE hudsurf = pane->GetVC()->GetHUDSurf();
-		oapi::GraphicsClient *gc = g_pOrbiter->GetGraphicsClient();
+		oapi::CockpitClient *gc = g_pOrbiter->GetGraphicsClient();
 		if (gc) {
 			oapi::Sketchpad *skp = gc->clbkGetSketchpad (hudsurf);
 			if (skp) {
@@ -1246,7 +1246,7 @@ oapi::IVECTOR2 *HUD::OffscreenDirMarker (const Vector &dir) const
 	return pt;
 }
 
-HUD *HUD::Create (ifstream &ifs, const Pane *_pane, oapi::GraphicsClient *gc)
+HUD *HUD::Create (ifstream &ifs, const Pane *_pane, oapi::CockpitClient *gc)
 {
 	HUD *hud = 0;
 	char cbuf[256], *pc;

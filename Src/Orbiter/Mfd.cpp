@@ -134,7 +134,7 @@ Instrument *Instrument::Create (ifstream &ifs, Pane *_pane,
 	return instr;
 }
 
-void Instrument::GlobalInit (oapi::GraphicsClient *gc)
+void Instrument::GlobalInit (oapi::CockpitClient *gc)
 {
 	int i, j;
 
@@ -181,7 +181,7 @@ void Instrument::GlobalInit (oapi::GraphicsClient *gc)
 	}
 }
 
-void Instrument::GlobalExit (oapi::GraphicsClient *gc)
+void Instrument::GlobalExit (oapi::CockpitClient *gc)
 {
 	int i, j;
 

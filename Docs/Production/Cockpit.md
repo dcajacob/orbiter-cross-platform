@@ -119,3 +119,12 @@ callback order, and add native surface/blit/font/mesh/input support through the
 shared renderer. Then source-build DG/DG-S, compare original displayed precision,
 validate picking and controls on the actual vessel, and run the required stock
 scenarios. A prototype overlay cannot satisfy these gates.
+
+Extraction starts with a private cockpit graphics binding. On Windows it is a
+type alias for the original `GraphicsClient`, retaining exact pointer types and
+function signatures. Native builds bind to the real `NativeGraphics` contract.
+The first Pane/HUD/MFD/panel declaration changes preserve all calculation and
+callback tokens, checked against the pinned Windows source by
+`Tests/Production/cockpit_source.py`; the native header also compiles without
+Windows or graphics-library headers. This preparatory boundary does not yet
+build or run the native instrumentation classes.

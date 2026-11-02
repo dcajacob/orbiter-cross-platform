@@ -12,6 +12,7 @@
 #define STRICT 1
 #include <windows.h>
 #include <fstream>
+#include "Production/CockpitGraphics.h"
 
 // =======================================================================
 // class Panel
@@ -101,7 +102,7 @@ private:
 	void MFDMoved ();
 
 	const Pane *pane;
-	oapi::GraphicsClient *gc;
+	oapi::CockpitClient *gc;
 	int id;                     // panel id
 	SURFHANDLE surf;            // drawing surface
 	LONG tgtW, tgtH;            // panel target width, height

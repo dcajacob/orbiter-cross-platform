@@ -4,7 +4,7 @@
 #ifndef __HUD_H
 #define __HUD_H
 
-#include "GraphicsAPI.h"
+#include "Production/CockpitGraphics.h"
 #include "Mesh.h"
 #include "Vessel.h"
 
@@ -25,7 +25,7 @@ public:
 	void RenderDefault ();
 	void RenderCustom (MESHHANDLE hMesh, SURFHANDLE *hTex);
 	virtual void Resize (bool isVC);
-	static HUD *Create (std::ifstream &ifs, const Pane *_pane, oapi::GraphicsClient *gc);
+	static HUD *Create (std::ifstream &ifs, const Pane *_pane, oapi::CockpitClient *gc);
 	void Write (std::ostream &ofs) const;
 	virtual void SelectReference () {}
 	virtual void ProcessMessage (int msg, void *data) {}
@@ -86,7 +86,7 @@ protected:
 	virtual void ReadParams (std::ifstream &ifs) {}
 
 	const Pane *pane;         // pane instance
-	oapi::GraphicsClient *gc; // client instance
+	oapi::CockpitClient *gc; // client instance
 	int colidx;               // HUD colour index
 	Vector HUDofs;            // HUD centre offset from observer point [pixel]
 	double ladder_width;      // elevation ladder parameters
