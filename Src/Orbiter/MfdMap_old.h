@@ -14,12 +14,12 @@
 
 class Instrument_MapOld: public Instrument {
 public:
-	Instrument_MapOld (Pane *_pane, INT_PTR _id, const Spec &spec, Vessel *_vessel);
+	Instrument_MapOld (Pane *_pane, std::intptr_t _id, const Spec &spec, Vessel *_vessel);
 	~Instrument_MapOld();
 	int Type () const { return MFD_MAP; }
 	char ModeSelKey () const { return 'M'; }
 	HELPCONTEXT *HelpTopic () const;
-	bool KeyBuffered (DWORD key);
+	bool KeyBuffered (oapi::UInt32 key);
 	bool KeyImmediate (char *kstate);
 	bool ProcessButton (int bt, int event);
 	const char *BtnLabel (int bt) const;
@@ -59,7 +59,7 @@ private:
 	int tgtx, tgty, shpx, shpy;
 	//oapi::Pen *pen[4];
 	oapi::Brush *brush[2];
-	POINT proj1[INSTRMAP_NPROJPT+2];
+	oapi::SdkPoint proj1[INSTRMAP_NPROJPT+2];
 	double cosp[INSTRMAP_NPROJPT], sinp[INSTRMAP_NPROJPT];
 	static bool ClbkSubmn_Target (Select*, int, char*, void*);
 	static bool ClbkEnter_Target (Select*, int, char*, void*);

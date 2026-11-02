@@ -158,3 +158,14 @@ A bounded maintenance workflow prunes only older active production checks;
 completed evidence, reference capture/preservation workflows and newer runs
 are excluded. Inherited application, Nightly and Artifact Cleanup workflows are
 unchanged.
+
+All ten stock instrument declarations now compile natively, including their
+original vector-map data. Orbit/transfer plotting uses the extracted original
+`MfdOrbitGeometry.cpp` in the shared production boundary on both platforms.
+Source reconstruction proves the implementation, constants and screen-mapping
+code were moved unchanged. Independent tests exercise forty conic projections
+(circular, eccentric, inclined and hyperbolic), analytical pixel bounds, marker
+coordinates, clipping and invalid hyperbolic scales. This is actual instrument
+geometry code; the native instrument scheduler, drawing and cockpit runtime
+remain unfinished. Windows cockpit image/numerical regression is still required
+for this extraction.

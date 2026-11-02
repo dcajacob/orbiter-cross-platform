@@ -90,6 +90,7 @@ jobs:
           cmake --build out/renderer-probe --parallel 2 2>&1 | tee -a native-instrument-probe-build.log
           out/renderer-probe/cockpit-sdk-layout 2>&1 | tee native-cockpit-sdk-layout.log
           out/renderer-probe/instrument-declarations 2>&1 | tee native-instrument-declarations.log
+          out/renderer-probe/mfd-orbit-geometry 2>&1 | tee native-mfd-orbit-geometry.log
           xvfb-run -a env LIBGL_ALWAYS_SOFTWARE=1 GALLIUM_DRIVER=llvmpipe out/renderer-probe/renderer-probe "$PWD/out/native-engine/NativeModules/Graphics/OGLClient.so" "$PWD/out/scene-resources" "$PWD/out/planets" "$PWD/out/renderer-probe/report.json" 2>&1 | tee native-instrument-probe.log
       - name: Verify flyable stock ShuttlePB, timing, docking and persistence
         shell: bash

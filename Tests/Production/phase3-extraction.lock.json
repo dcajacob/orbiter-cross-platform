@@ -10,6 +10,70 @@
     "Windows Debug/Release real client against frozen Phase 2 scene/image"
   ],
   "files": {
+    "Extern/ReferenceMath/README.md": {
+      "original_sha256_lf": null,
+      "sha256_lf": "5f38a29d5df313f5e72b3beaa22d5441a9591dfaefedee53a1642820f3f5aeee"
+    },
+    "Extern/ReferenceMath/amd/L2_by_pi_bits.asm": {
+      "original_sha256_lf": null,
+      "sha256_lf": "100950f8ad8f8306140cf6a7c021923b9354fbf8f153bb10c5eb3cc1055f2706"
+    },
+    "Extern/ReferenceMath/amd/Lsincos_array.asm": {
+      "original_sha256_lf": null,
+      "sha256_lf": "6ad730c3a1fcc49ea80fab5eefc4395d479d391900396fa0b5fb0f502d7db2d2"
+    },
+    "Extern/ReferenceMath/amd/asin.c": {
+      "original_sha256_lf": null,
+      "sha256_lf": "3985a1b597038ffc712a2cfcbbb63e71e91848c29de91d1c53ab4f45cc924618"
+    },
+    "Extern/ReferenceMath/amd/atan2.c": {
+      "original_sha256_lf": null,
+      "sha256_lf": "417d77250ee71e3ac59ae3e85c6eb8f7b05410e8a1cac37aae08dccd827e5598"
+    },
+    "Extern/ReferenceMath/amd/cos.asm": {
+      "original_sha256_lf": null,
+      "sha256_lf": "ea7156104cf35e1e2b85bd55e4ce29955e00e3285f87fa0b69570fc84a3e9381"
+    },
+    "Extern/ReferenceMath/amd/fm.inc": {
+      "original_sha256_lf": null,
+      "sha256_lf": "6c959f6b43ad82983cf26f840200b68af513f863271bbecc1e6c0ead28562586"
+    },
+    "Extern/ReferenceMath/amd/libm.h": {
+      "original_sha256_lf": null,
+      "sha256_lf": "f9ff549d44d4f4c44f9a9e97a6babf633687cfd9410c327f08da5dc0a8da04b2"
+    },
+    "Extern/ReferenceMath/amd/libm_errno.h": {
+      "original_sha256_lf": null,
+      "sha256_lf": "b406d28c594f907714def4b13dfda16d83243dd0cbc1e6fbc40357a79dc79343"
+    },
+    "Extern/ReferenceMath/amd/libm_inlines.h": {
+      "original_sha256_lf": null,
+      "sha256_lf": "53a977487e08371a06b8c24de0dd517b1c56415afe35f24f2fae7170a823182c"
+    },
+    "Extern/ReferenceMath/amd/libm_util.h": {
+      "original_sha256_lf": null,
+      "sha256_lf": "eb4c69a498ab0ca272249fb31d31a8d051326ecc1c754c6f1c4181c4f4bd868e"
+    },
+    "Extern/ReferenceMath/amd/remainder_piby2_forAsm.asm": {
+      "original_sha256_lf": null,
+      "sha256_lf": "f5fd35d71eee4cbde99f2e7e13381015af15f77893ebde93426eb075f43430e5"
+    },
+    "Extern/ReferenceMath/amd/remainder_piby2_forFMA3.asm": {
+      "original_sha256_lf": null,
+      "sha256_lf": "be6405d8a5dab8c8f39cdc9b9aa4c5d6b81cc434db699b3ac8a1db04b384e653"
+    },
+    "Extern/ReferenceMath/amd/sin.asm": {
+      "original_sha256_lf": null,
+      "sha256_lf": "d1fa13efc660734e35dd9e3457f01cf0970c17ee156e51c196a11a5eb6848e39"
+    },
+    "Extern/ReferenceMath/amd/sincos_special.c": {
+      "original_sha256_lf": null,
+      "sha256_lf": "575b7b287f8f54b19236397fefb00fb6786654b1c1e16866290747f89de6e1df"
+    },
+    "Extern/ReferenceMath/sources.lock.json": {
+      "original_sha256_lf": null,
+      "sha256_lf": "646cbaaaeb793548b980bbff1cebc65d732153d4d258046df3410a679a8d4d6e"
+    },
     "Orbitersdk/include/CamAPI.h": {
       "original_sha256_lf": "ed6d5c3035d3c2e010c78a995efcc6b41bbdd3a030be9c0700264745d5c8326b",
       "sha256_lf": "34873a2e1115314b2d0bb1a159d7cc92a644a92717b0ebecf5dc499d939dfb1a"
@@ -57,9 +121,19 @@
       "sha256_lf": "7ba981423d704f370eb0abdc2d16652ce1c62a507d29bb9ab0f64234f7e42df9",
       "original_sha256_lf": null
     },
+    "Orbitersdk/include/OrbiterCockpitData.h": {
+      "original_sha256_lf": null,
+      "sha256_lf": "e897f2946d7483b144d8fb9d90001ca831a21ffcdb696efdcacf33348fa9c9a1",
+      "scope": "Portable cockpit/ImGui SDK data and original instrument declarations. Exact Windows scalar, callback, class, field order and packing conservation plus native header/layout compilation; runtime instrumentation remains incomplete."
+    },
     "Orbitersdk/include/OrbiterGeometry.h": {
       "sha256_lf": "624371607dbdc800bd19f1db135adeb1862013710667c0abc40f1b91650c68a6",
       "original_sha256_lf": null
+    },
+    "Orbitersdk/include/OrbiterGuiData.h": {
+      "original_sha256_lf": null,
+      "sha256_lf": "025e1cca870e254e1d6385b83fbb42f784d1b3110ea07ac9152c49cc711baa1f",
+      "scope": "Portable cockpit/ImGui SDK data and original instrument declarations. Exact Windows scalar, callback, class, field order and packing conservation plus native header/layout compilation; runtime instrumentation remains incomplete."
     },
     "Orbitersdk/include/OrbiterHandles.h": {
       "sha256_lf": "473ccc0368115a422d7d65c9aece0c005fbacff4a508feec8791e2263eebfcc0",
@@ -257,6 +331,16 @@
       "sha256_lf": "dab59e95e94bb05a069a72476d9b236b93590496c2739a0bb09d400b07a4c466",
       "original_sha256_lf": "c71206d9041fd9e026f1934dc59197e1a28a62fefab3cdf2fe153567a81a891e"
     },
+    "Src/Orbiter/Defpanel.cpp": {
+      "original_sha256_lf": "a7cb7d7be6d6120e3a7407b58ebd1fe4cd7552ad5dff73a4d0f7396c1a2815ce",
+      "sha256_lf": "b15d27dfaa92e260c1c6757aa8826ae97a251135e77acf2200f79fed5d4c4f11",
+      "scope": "Private cockpit graphics/configuration binding. Original algorithms and Windows pointer types conserved by cockpit_source.py; native instrumentation is not operational yet."
+    },
+    "Src/Orbiter/Defpanel.h": {
+      "original_sha256_lf": "ae7d437861e792bdc24945f6da5fb6012d090436e89745b7dfd7b30512937184",
+      "sha256_lf": "4854770c958bf528d7697f3c665a0cd49b4cd8640a3bf3d1c229b55e2b8e7e5b",
+      "scope": "Private cockpit graphics/configuration binding. Original algorithms and Windows pointer types conserved by cockpit_source.py; native instrumentation is not operational yet."
+    },
     "Src/Orbiter/DrawAPI.cpp": {
       "original_sha256_lf": "c7249cfe5d16115cdc91091b1250d49d1c00d43bfe79f3355618b29a7bde82a5",
       "sha256_lf": "1247e9c465f9086726c106fa577d4a2446452297cb35ee6e396aed80683ea004"
@@ -277,6 +361,14 @@
       "original_sha256_lf": "dcfb0820387342c840e29beb4bc6bbeb8f29c1478c6598c8295ee0b61a22ca01",
       "sha256_lf": "a86b083a20121fb9a4da6df5c8e32dd0e8801d599c3d9e3df89acfd0459fc9fb"
     },
+    "Src/Orbiter/Keymap.cpp": {
+      "original_sha256_lf": "41a0833a1dbe7a362adaf7f138311f1d8da27f2a23cb60e41aafe1e833cb6778",
+      "sha256_lf": "4948fbf5f906a2444783330664e10f7d575d376c3bd59441a051842f51affa0d"
+    },
+    "Src/Orbiter/Keymap.h": {
+      "original_sha256_lf": "e6f3de65b94458e8b451d04fcfdcf025e5edce9c2f08daf35c23dd3009b27e7b",
+      "sha256_lf": "cbda8212866ae7ea4968eb78bc114e1e0f96971d011fa73fed3d43f5f0c8bc8e"
+    },
     "Src/Orbiter/LightEmitter.cpp": {
       "original_sha256_lf": "d0f2d9e595d4ed5ddd734119d02b12eb0a3cdb9eeca988bc834eeec4a02ed960",
       "sha256_lf": "d3dd19ccf81c090206bad130fd5453f08a9c1181f73330caa6bf9220cd656b7f"
@@ -288,6 +380,86 @@
     "Src/Orbiter/Mesh.h": {
       "sha256_lf": "fb6af3f2c3f6d146fed564945e4a47f51003a8e5a6cdd2b17cc52c48bb2b4030",
       "original_sha256_lf": "fb4c1f4a5bec410ff05d635cd547bd6b2067ed5d26faba315248e2ae2abd3284"
+    },
+    "Src/Orbiter/Mfd.cpp": {
+      "original_sha256_lf": "0a5d504ea777abd83b0f3ce45e147a946fad03bb3c70a17eb61600e4ff5108f4",
+      "sha256_lf": "77504991793c1e78c8582b7b3507005a077857e1999a31d76f2551a88b38ff86",
+      "scope": "Original ten stock MFD declarations use exact platform SDK aliases; shared original conic geometry is moved without calculation or screen-mapping changes. Full native instrument runtime remains incomplete."
+    },
+    "Src/Orbiter/Mfd.h": {
+      "original_sha256_lf": "133e1e852d9563535bb8404420f98aa40ce284e43eb98ba2f7c33652e97a8e10",
+      "sha256_lf": "08b920c763eb5ed4cdb875b3b5ba4c92ef034b7be95e3b5975f25fb2292eacd1",
+      "scope": "Original ten stock MFD declarations use exact platform SDK aliases; shared original conic geometry is moved without calculation or screen-mapping changes. Full native instrument runtime remains incomplete."
+    },
+    "Src/Orbiter/MfdAlign.h": {
+      "original_sha256_lf": "a5072818cf93c21b5f9f94619003c9d628209f9bc4f2d77089f09b660f97eae1",
+      "sha256_lf": "49d2b6e6ecbbdb46219a442876b391212de7615fbdf356e7d4e79b950417ea7e",
+      "scope": "Original ten stock MFD declarations use exact platform SDK aliases; shared original conic geometry is moved without calculation or screen-mapping changes. Full native instrument runtime remains incomplete."
+    },
+    "Src/Orbiter/MfdComms.h": {
+      "original_sha256_lf": "cde22b67a0aac6d7495945687e718114cd32072a5c0311e0ac95d904dc561c28",
+      "sha256_lf": "3faa26ab36a1eb5d2cd8bdc2b8d0b16f999f81e152cb83bd2c91ec58863d6b78",
+      "scope": "Original ten stock MFD declarations use exact platform SDK aliases; shared original conic geometry is moved without calculation or screen-mapping changes. Full native instrument runtime remains incomplete."
+    },
+    "Src/Orbiter/MfdDocking.h": {
+      "original_sha256_lf": "9f88ada7e20b847f79308cfc5eaac57fbb80223bcfd0c32eab9085f12e83e168",
+      "sha256_lf": "640c062b0eaa563b300479d597a335b88362da74ebceb70f60d444c05af0491b",
+      "scope": "Original ten stock MFD declarations use exact platform SDK aliases; shared original conic geometry is moved without calculation or screen-mapping changes. Full native instrument runtime remains incomplete."
+    },
+    "Src/Orbiter/MfdHsi.h": {
+      "original_sha256_lf": "eb6c233a4cc0d2e94019c9f6d92b0f5134214a363016f8478e390c4385ff0aa8",
+      "sha256_lf": "c18581a42592fcf18680caba1a58a2013981cb58053be323abc9077701a211e7",
+      "scope": "Original ten stock MFD declarations use exact platform SDK aliases; shared original conic geometry is moved without calculation or screen-mapping changes. Full native instrument runtime remains incomplete."
+    },
+    "Src/Orbiter/MfdLanding.h": {
+      "original_sha256_lf": "157bfbad13a21b119dfeb2f5170d88c45bf56bd0ded232803ce0b27c0f1a5012",
+      "sha256_lf": "50fef84eaaf8b2fbe5d62e050c157f67b48d81dedc0470355cac319b274c6e9f",
+      "scope": "Original ten stock MFD declarations use exact platform SDK aliases; shared original conic geometry is moved without calculation or screen-mapping changes. Full native instrument runtime remains incomplete."
+    },
+    "Src/Orbiter/MfdMap.h": {
+      "original_sha256_lf": "5e3528e71c285b7fa48ca3ed5acc175892d67ea2c8795f3e5784cafcf28d97d8",
+      "sha256_lf": "697c48f32260e949134c5211d717db852a5e39e9e70260f33cefca772ac342fa",
+      "scope": "Original ten stock MFD declarations use exact platform SDK aliases; shared original conic geometry is moved without calculation or screen-mapping changes. Full native instrument runtime remains incomplete."
+    },
+    "Src/Orbiter/MfdMap_old.h": {
+      "original_sha256_lf": "1be1311324b9d2883c92902503d6bf54f79d232f4685bd283fc6498e0624b501",
+      "sha256_lf": "0c8c061b48a4b541f5d81a059a475d21fc7903a96c9088e3cce9cc5063d9fe98",
+      "scope": "Original ten stock MFD declarations use exact platform SDK aliases; shared original conic geometry is moved without calculation or screen-mapping changes. Full native instrument runtime remains incomplete."
+    },
+    "Src/Orbiter/MfdOrbit.h": {
+      "original_sha256_lf": "c2ee5449c7d6684cd9dd40d2518e02dbbb41f44c656390e9814cb39c79d1efa5",
+      "sha256_lf": "4e813af750e5e5b50bada2f229a3cf2afdec40cf18d11f35a5570e26170f6932",
+      "scope": "Original ten stock MFD declarations use exact platform SDK aliases; shared original conic geometry is moved without calculation or screen-mapping changes. Full native instrument runtime remains incomplete."
+    },
+    "Src/Orbiter/MfdOrbitGeometry.cpp": {
+      "original_sha256_lf": null,
+      "sha256_lf": "484b357558fdf71cbc4af3e695dd976fce2d287813a290bdc65e82c123827a49",
+      "scope": "Original ten stock MFD declarations use exact platform SDK aliases; shared original conic geometry is moved without calculation or screen-mapping changes. Full native instrument runtime remains incomplete."
+    },
+    "Src/Orbiter/MfdOrbitGeometry.h": {
+      "original_sha256_lf": null,
+      "sha256_lf": "20b107387a8ab54a22ec07ca7ac847d652c9ddaa8f4e1436925103a56539169f",
+      "scope": "Original ten stock MFD declarations use exact platform SDK aliases; shared original conic geometry is moved without calculation or screen-mapping changes. Full native instrument runtime remains incomplete."
+    },
+    "Src/Orbiter/MfdSurface.cpp": {
+      "original_sha256_lf": "c1a1522edc9fbda54db00341ff078473a1d142f3763bee93b1496434c0644aaf",
+      "sha256_lf": "bc2fae00f6087d483fe6d02cf22fa57f27a5b4da8b80d2c0a61cdb3635f68ee0",
+      "scope": "Private cockpit graphics/configuration binding. Original algorithms and Windows pointer types conserved by cockpit_source.py; native instrumentation is not operational yet."
+    },
+    "Src/Orbiter/MfdSurface.h": {
+      "original_sha256_lf": "5febb34bf6f0734e4ed4f28a64d4f20758dd40d89a18c9831b13fa4189ad1b5d",
+      "sha256_lf": "a458d28003d63ffbab11beb6ba773677863b79e8a736a1e7621b1e7a77fd806f",
+      "scope": "Original ten stock MFD declarations use exact platform SDK aliases; shared original conic geometry is moved without calculation or screen-mapping changes. Full native instrument runtime remains incomplete."
+    },
+    "Src/Orbiter/MfdSync.h": {
+      "original_sha256_lf": "7dc3909008838ef49d15e82c4ade4667d034bb17b47db06bd3ebfdeabe9cbe16",
+      "sha256_lf": "3f12b81dad7886f343cb83cd1000fca64d65ebfb57830a44e4ce619421891b64",
+      "scope": "Original ten stock MFD declarations use exact platform SDK aliases; shared original conic geometry is moved without calculation or screen-mapping changes. Full native instrument runtime remains incomplete."
+    },
+    "Src/Orbiter/MfdTransfer.h": {
+      "original_sha256_lf": "93a9de4ba8104468a2c8135e223b951124c71bf3e76aacdd5fcec7126ca56846",
+      "sha256_lf": "f32a7088233a8008096411cc3204c0eb777577d95a5dec359b017cb5b90069ab",
+      "scope": "Original ten stock MFD declarations use exact platform SDK aliases; shared original conic geometry is moved without calculation or screen-mapping changes. Full native instrument runtime remains incomplete."
     },
     "Src/Orbiter/Nav.cpp": {
       "sha256_lf": "7811c9dd937aaa8d42ae735a6fef0a39964b45a0ce3dd622a6167f1497b8c833",
@@ -309,10 +481,25 @@
       "sha256_lf": "e6c63886a21cc5403b811f764e3a93c5db1e90111a6104230bb12f18a8634e1e",
       "original_sha256_lf": "6ab4e355f274bda7296d794e45e38ad9f1cc5a051dd1d40eea14b55d6412dbb2"
     },
+    "Src/Orbiter/Pane.cpp": {
+      "original_sha256_lf": "398997e418820aff0d72edd0d977e75182511d3f13a369e0f074182db3f1bdde",
+      "sha256_lf": "b19647f905db7cc129bcce90e3f4ad2cbbce83cd979515e4e4dd607583a50e65",
+      "scope": "Private cockpit graphics/configuration binding. Original algorithms and Windows pointer types conserved by cockpit_source.py; native instrumentation is not operational yet."
+    },
     "Src/Orbiter/Pane.h": {
       "original_sha256_lf": "9ea0b381f6a97848c12ac3d08cce898c3b4cdf500338bb21d489236c310fb706",
       "sha256_lf": "763720e58c0f2ff94afdf856124e539fecfff851a9e07f2d9ed3e80abca3e168",
       "scope": "Private cockpit graphics binding only. Original algorithms and Windows underlying pointer types conserved by cockpit_source.py; native instrumentation is not operational yet."
+    },
+    "Src/Orbiter/Panel.h": {
+      "original_sha256_lf": "d517f73ee3cf326e944b8ac000fd19a75e1b30ac2a4bac59b0c1d481cadce1c3",
+      "sha256_lf": "bbea866528d96135b24437d701416d7d4c8012e4ade3bffc036edfe3fd78a295",
+      "scope": "Private cockpit graphics binding only. Original algorithms and Windows underlying pointer types conserved by cockpit_source.py; native instrumentation is not operational yet."
+    },
+    "Src/Orbiter/Panel2D.h": {
+      "original_sha256_lf": "c8a36214609a549f7715a332f2c1a6b66eaf542ff5b0b5646f89cd119a4dff82",
+      "sha256_lf": "042e0f91c85b14ff1ed71e5b14956eb6147f47248f06327b59349061e7398e54",
+      "scope": "Private cockpit graphics/configuration binding. Original algorithms and Windows pointer types conserved by cockpit_source.py; native instrumentation is not operational yet."
     },
     "Src/Orbiter/PhysicsConfig.h": {
       "sha256_lf": "7657a6aa0fe6427a734aaabaa8fc5eb26edd615cc73360eaf22a45a53eb86ff8",
@@ -347,8 +534,9 @@
       "original_sha256_lf": null
     },
     "Src/Orbiter/Production/CMakeLists.txt": {
-      "sha256_lf": "eb2bc3c5f47ffbd87509cb3682243fe34351546840f0178fba843d4e64543164",
-      "original_sha256_lf": null
+      "original_sha256_lf": null,
+      "sha256_lf": "2a5148dee6ee688311f91d0ebfe039528651e60126e46f73614fa1af899d2a8c",
+      "scope": "Original ten stock MFD declarations use exact platform SDK aliases; shared original conic geometry is moved without calculation or screen-mapping changes. Full native instrument runtime remains incomplete."
     },
     "Src/Orbiter/Production/CameraServices.cpp": {
       "original_sha256_lf": null,
@@ -366,9 +554,23 @@
       "sha256_lf": "b3b59a26cec3024c71e6812c2beaf353a3449225b0ea8c2271450d4c97a8be9e",
       "original_sha256_lf": null
     },
+    "Src/Orbiter/Production/CockpitGraphics.h": {
+      "original_sha256_lf": null,
+      "sha256_lf": "7b7643c823ae0015e8a5ecf73e296a909c9af346b3be6f41235d2373f90283c9",
+      "scope": "Private cockpit graphics binding only. Original algorithms and Windows underlying pointer types conserved by cockpit_source.py; native instrumentation is not operational yet."
+    },
+    "Src/Orbiter/Production/CockpitServices.h": {
+      "original_sha256_lf": null,
+      "sha256_lf": "8f8319800563274d231874fc427d52917b67faa67e59541bc873066e5b12e5a6",
+      "scope": "Private cockpit graphics/configuration binding. Original algorithms and Windows pointer types conserved by cockpit_source.py; native instrumentation is not operational yet."
+    },
     "Src/Orbiter/Production/ConfigurationTypes.h": {
       "sha256_lf": "ac918e8125269b49da9d5a90afeb96d658b41addae6d44a61d5addf84905628a",
       "original_sha256_lf": null
+    },
+    "Src/Orbiter/Production/ContactObservation.h": {
+      "original_sha256_lf": null,
+      "sha256_lf": "4c33eefc299f0d1566419860ff7917730e56410784a130e2fa9d1a1d258fbfc8"
     },
     "Src/Orbiter/Production/CoreTypes.h": {
       "sha256_lf": "9357fe8bf99700ee83add3ad0e61d6137c61a74185bb01601c11f3ddf06fcb86",
@@ -386,6 +588,30 @@
       "sha256_lf": "5f4b50b3473390c302c6d0d2c542b87cfdf4ce23978c3d279906e87b140640d2",
       "original_sha256_lf": null
     },
+    "Src/Orbiter/Production/FlightClock.h": {
+      "original_sha256_lf": null,
+      "sha256_lf": "b68a5e69f9fee3856a638ff64a52519542efd40c0235ee3c7a826c697ddd8b67"
+    },
+    "Src/Orbiter/Production/FlightControls.cpp": {
+      "original_sha256_lf": null,
+      "sha256_lf": "2dc8a57aa1c896620c33262ce256a408b770552fd1ff0bdc868692aa4800e799"
+    },
+    "Src/Orbiter/Production/FlightControls.h": {
+      "original_sha256_lf": null,
+      "sha256_lf": "35e00988591a12a30e9394f2cf273aee56e3a41d7de60fe90db1c7cd5851e6c8"
+    },
+    "Src/Orbiter/Production/FlightInput.h": {
+      "original_sha256_lf": null,
+      "sha256_lf": "c510ff9f9d9a8c6ace158467ce5cd35f84c760d5d2f01cc8f2ea43700889a570"
+    },
+    "Src/Orbiter/Production/FlightKeys.h": {
+      "original_sha256_lf": null,
+      "sha256_lf": "56bbd6196954cf558cee707f33511257c81db237683cd4179886951254ad4e83"
+    },
+    "Src/Orbiter/Production/FlightReplay.h": {
+      "original_sha256_lf": null,
+      "sha256_lf": "cd8293a087b74a1257c3d8360dc872dd86536ebb7cbec9ffa6ffd44653aa8d88"
+    },
     "Src/Orbiter/Production/GeometryConversions.h": {
       "sha256_lf": "43ceee25d061f045107649dcba1bc648ec6a4d7ae1adb1350616fd44d3c8a6db",
       "original_sha256_lf": null
@@ -393,6 +619,34 @@
     "Src/Orbiter/Production/MapFlags.h": {
       "sha256_lf": "5557b1fe8a287d2165670c8fe17abe1a3d2ab410d9334626014a23ecf5868f04",
       "original_sha256_lf": null
+    },
+    "Src/Orbiter/Production/Math/CMakeLists.txt": {
+      "original_sha256_lf": null,
+      "sha256_lf": "fd2649774d9adab7de1bcca9bd7df7711c423cbd01e9ce27c3d4587e1679ba02"
+    },
+    "Src/Orbiter/Production/Math/NativeError.cpp": {
+      "original_sha256_lf": null,
+      "sha256_lf": "745ecc29959f952f52730dc301291da5e01ac409fc7238fbfeb0f9237be9f224"
+    },
+    "Src/Orbiter/Production/Math/NativeError.h": {
+      "original_sha256_lf": null,
+      "sha256_lf": "05299a1a29f0fd78c049eaad3a21ea8189c2c7ae04a36a9340ed88f38fdaa949"
+    },
+    "Src/Orbiter/Production/Math/Runtime.cpp": {
+      "original_sha256_lf": null,
+      "sha256_lf": "f40f7df1a346e7aa743fa392138d6dfef97060b4545e65cc97e0ab182e590295"
+    },
+    "Src/Orbiter/Production/Math/Runtime.h": {
+      "original_sha256_lf": null,
+      "sha256_lf": "1ab4017b3e2c70e668240eca91dcc0eac37c6d610e7b9cc0f252127c097ac3ac"
+    },
+    "Src/Orbiter/Production/Math/prepare.py": {
+      "original_sha256_lf": null,
+      "sha256_lf": "5d57d5795a475187fccc9f24b91b09fd3be0a4dd870d4fec9f1ff5d4e1cacf1b"
+    },
+    "Src/Orbiter/Production/MathObservation.h": {
+      "original_sha256_lf": null,
+      "sha256_lf": "3207753d54c583dea4911048386c525832f37c595f286b9d96da0ac253b1a69e"
     },
     "Src/Orbiter/Production/MeshData.cpp": {
       "sha256_lf": "770ed32c52f75f391a9c629f4bc6129a0897d4bbb4319998cbb8dabd2f0e2a29",
@@ -490,6 +744,10 @@
       "sha256_lf": "3d693b5b268409bb2f571a9fbb2b5b90fe3137c0a9a992a8cac55d51738adb4e",
       "original_sha256_lf": null
     },
+    "Src/Orbiter/Production/NativeObservation/ApplicationObservation.h": {
+      "original_sha256_lf": null,
+      "sha256_lf": "c935e7fa3ec28650b79308bf38cdf9bf8badb547cb4c44a541de8b9cdc00353e"
+    },
     "Src/Orbiter/Production/NativeParticle.cpp": {
       "original_sha256_lf": null,
       "sha256_lf": "5bab39e8164a62f7c49d2fd242a889a5790b679b76e6245b0984f93d84f7aa1b"
@@ -521,6 +779,10 @@
     "Src/Orbiter/Production/NativeVesselModule.h": {
       "original_sha256_lf": null,
       "sha256_lf": "e144f5f72c4f1af67d75d938aa07b8ee602ef26b09282d64b10df76b4761d378"
+    },
+    "Src/Orbiter/Production/NativeVesselObservation.cpp": {
+      "original_sha256_lf": null,
+      "sha256_lf": "b93871adb66ed198a6bcbae4971d171c8818d553439e93443afca97c8d356a66"
     },
     "Src/Orbiter/Production/NativeVessels.cmake": {
       "original_sha256_lf": null,
@@ -634,6 +896,10 @@
       "sha256_lf": "411605df6fe36cbc5ad2bca11b4c3170682bb5a8696c086565c3146018285724",
       "original_sha256_lf": null
     },
+    "Src/Orbiter/Production/VesselLifetime.h": {
+      "original_sha256_lf": null,
+      "sha256_lf": "03d58f35d47835e4b200b505431f2b377370bef4edfeb0a8cafed45e674da60b"
+    },
     "Src/Orbiter/Production/VesselRecorderState.h": {
       "original_sha256_lf": null,
       "sha256_lf": "487dc147e7ead4328baa9fd3dbd54bafafc945aa9da619ab1966a180752158f0"
@@ -718,6 +984,14 @@
       "sha256_lf": "b5d68321274b4f2121d003e0ee160731a825155e029bcf2ce6e09fc133dbba49",
       "original_sha256_lf": null
     },
+    "Src/Orbiter/Production/WindowsVesselLifetime.cpp": {
+      "original_sha256_lf": null,
+      "sha256_lf": "a154b1314163ce1aff3116d24beba674a699d0eba2b20b33b34b5c8999c5796c"
+    },
+    "Src/Orbiter/Production/WindowsVesselLifetime.h": {
+      "original_sha256_lf": null,
+      "sha256_lf": "ba49231499a999afdb0e8448d4eb67cb440dd5e0642b0e0dbccf17db3c1dcb14"
+    },
     "Src/Orbiter/Production/WindowsVesselServices.cpp": {
       "sha256_lf": "81e18bab2a897a81b3accc904d7a672b9309385e7ab892e7e49c46d5f2563a90",
       "original_sha256_lf": null
@@ -786,6 +1060,11 @@
       "sha256_lf": "f128be10c0f09d39de4c72158e805d519d41d18a898022b41dffad812c9319ed",
       "original_sha256_lf": "f10bca653c79c1ecb860e5ad89cc6aa777c552c62563cb44bdc8b1701e0e0049"
     },
+    "Src/Orbiter/Select.h": {
+      "original_sha256_lf": "0ea1560216087f84fe49f388eca414756fcc1135eba1bdc43d106e7b93053f25",
+      "sha256_lf": "2015d69a8974ac8c022d22b1475e89af6fc0a4f5b35f3df7ee33d952f8568e07",
+      "scope": "Portable cockpit/ImGui SDK data and original instrument declarations. Exact Windows scalar, callback, class, field order and packing conservation plus native header/layout compilation; runtime instrumentation remains incomplete."
+    },
     "Src/Orbiter/Shadow.cpp": {
       "sha256_lf": "6ec93947aaeddac1dbad9ac28f1d46bdf9b31e6cc98304711460fc64fc06b15e",
       "original_sha256_lf": "95cfcbb4aaa0cfb599d2dac523ef0a2792790df1b1a6f1b257e98cf1cae2d78d"
@@ -834,10 +1113,29 @@
       "sha256_lf": "078d2f745c5a98fc2a142dfc72a313deb80365f79ec440e871cd10ae7ff0785d",
       "original_sha256_lf": "61c1826a9ce3c62e3d02f54c36629470f6ffeb0abad2d9b5eb95bc0c0a6bfb8e"
     },
+    "Src/Orbiter/VCockpit.cpp": {
+      "original_sha256_lf": "d68c62ea558f5cf0292b6d0469efdf2699b7557405beab1f474bc96f61f3a2c9",
+      "sha256_lf": "347c242da27afaef926c9b3c41bcca29ae301d1f53a476dd0b6c84a9f8035fbb",
+      "scope": "Private cockpit graphics/configuration binding. Original algorithms and Windows pointer types conserved by cockpit_source.py; native instrumentation is not operational yet."
+    },
+    "Src/Orbiter/VCockpit.h": {
+      "original_sha256_lf": "a7aa6bacbd55eef45ac47289171453fbf446804d1554f2ee69c6e4b50c2a3e5c",
+      "sha256_lf": "3a8b7c169fb56449192cab38efc6a307f8da64472cf072d23c06dac3f8e5a872",
+      "scope": "Private cockpit graphics/configuration binding. Original algorithms and Windows pointer types conserved by cockpit_source.py; native instrumentation is not operational yet."
+    },
+    "Src/Orbiter/Vecmat.cpp": {
+      "original_sha256_lf": "8be3be230618377896b28bf98b6b7e536f0cd2f7294035d041afdbd0aaacbcf2",
+      "sha256_lf": "ef83aa77506674982cbdd0f8be3f402c58abd3ef27f7c1b2d6c6a129a1abc64f"
+    },
+    "Src/Orbiter/VectorMap.cpp": {
+      "original_sha256_lf": "604e34d813ef11aa92934c08911ec2548d747659f5659df8d20469caa9fc01ed",
+      "sha256_lf": "31631de055420b0fb6cab394e664dfb7a82e41289a00e67afe0459a20fecb228",
+      "scope": "Private cockpit graphics/configuration binding. Original algorithms and Windows pointer types conserved by cockpit_source.py; native instrumentation is not operational yet."
+    },
     "Src/Orbiter/VectorMap.h": {
       "original_sha256_lf": "72936830e11eec20b86f2f616f2988f94932e6700112bbb1d01d2a6cdb3aa808",
-      "sha256_lf": "f5ce4bcfee2964ffd10191b724c3af1aab84871d93938412c9a98623d8f0238c",
-      "scope": "Private cockpit graphics/configuration binding. Original algorithms and Windows pointer types conserved by cockpit_source.py; native instrumentation is not operational yet."
+      "sha256_lf": "07025b8c4ed76183e03b28a4194dc8606fcba7c09a67dbea0388ced76d12dd6e",
+      "scope": "Original ten stock MFD declarations use exact platform SDK aliases; shared original conic geometry is moved without calculation or screen-mapping changes. Full native instrument runtime remains incomplete."
     },
     "Src/Orbiter/Vessel.cpp": {
       "sha256_lf": "24aa4cd48bae984dcc298dfb45d59afd4d49ec310ea3dd1a2f3c22ed3f997319",
@@ -911,184 +1209,9 @@
       "sha256_lf": "5b019dd244b38bede572d8a43de22ae7c8f27f9468628ccf2250c5cdec6b7c2c",
       "original_sha256_lf": null
     },
-    "Src/Vessel/ShuttlePB/NativeShuttlePBFactory.inc": {
-      "original_sha256_lf": null,
-      "sha256_lf": "8df3cbd30f6bc03fcfc2d13ff29a5034ff2146c7f06ae2897ecb85cd1989e250"
-    },
-    "Src/Vessel/ShuttlePB/ShuttlePB.cpp": {
-      "original_sha256_lf": "126cc5aa4e2f6ca96c478660fb47b4a4e23f1daa5f28911fff7a95cf25c3cf7a",
-      "sha256_lf": "c46bc345a45e28446833ee951eb4e8f1dd856a336b84104816e47317df00ff23"
-    },
-    "Src/Orbiter/Keymap.cpp": {
-      "original_sha256_lf": "41a0833a1dbe7a362adaf7f138311f1d8da27f2a23cb60e41aafe1e833cb6778",
-      "sha256_lf": "4948fbf5f906a2444783330664e10f7d575d376c3bd59441a051842f51affa0d"
-    },
-    "Src/Orbiter/Keymap.h": {
-      "original_sha256_lf": "e6f3de65b94458e8b451d04fcfdcf025e5edce9c2f08daf35c23dd3009b27e7b",
-      "sha256_lf": "cbda8212866ae7ea4968eb78bc114e1e0f96971d011fa73fed3d43f5f0c8bc8e"
-    },
-    "Src/Orbiter/Production/FlightClock.h": {
-      "original_sha256_lf": null,
-      "sha256_lf": "b68a5e69f9fee3856a638ff64a52519542efd40c0235ee3c7a826c697ddd8b67"
-    },
-    "Src/Orbiter/Production/FlightControls.cpp": {
-      "original_sha256_lf": null,
-      "sha256_lf": "2dc8a57aa1c896620c33262ce256a408b770552fd1ff0bdc868692aa4800e799"
-    },
-    "Src/Orbiter/Production/FlightControls.h": {
-      "original_sha256_lf": null,
-      "sha256_lf": "35e00988591a12a30e9394f2cf273aee56e3a41d7de60fe90db1c7cd5851e6c8"
-    },
-    "Src/Orbiter/Production/FlightInput.h": {
-      "original_sha256_lf": null,
-      "sha256_lf": "c510ff9f9d9a8c6ace158467ce5cd35f84c760d5d2f01cc8f2ea43700889a570"
-    },
-    "Src/Orbiter/Production/FlightKeys.h": {
-      "original_sha256_lf": null,
-      "sha256_lf": "56bbd6196954cf558cee707f33511257c81db237683cd4179886951254ad4e83"
-    },
-    "Src/Orbiter/Production/FlightReplay.h": {
-      "original_sha256_lf": null,
-      "sha256_lf": "cd8293a087b74a1257c3d8360dc872dd86536ebb7cbec9ffa6ffd44653aa8d88"
-    },
-    "Src/Orbiter/Production/MathObservation.h": {
-      "original_sha256_lf": null,
-      "sha256_lf": "3207753d54c583dea4911048386c525832f37c595f286b9d96da0ac253b1a69e"
-    },
-    "Src/Orbiter/Production/ContactObservation.h": {
-      "original_sha256_lf": null,
-      "sha256_lf": "4c33eefc299f0d1566419860ff7917730e56410784a130e2fa9d1a1d258fbfc8"
-    },
-    "Src/Orbiter/Production/Math/CMakeLists.txt": {
-      "original_sha256_lf": null,
-      "sha256_lf": "fd2649774d9adab7de1bcca9bd7df7711c423cbd01e9ce27c3d4587e1679ba02"
-    },
-    "Src/Orbiter/Production/Math/NativeError.cpp": {
-      "original_sha256_lf": null,
-      "sha256_lf": "745ecc29959f952f52730dc301291da5e01ac409fc7238fbfeb0f9237be9f224"
-    },
-    "Src/Orbiter/Production/Math/NativeError.h": {
-      "original_sha256_lf": null,
-      "sha256_lf": "05299a1a29f0fd78c049eaad3a21ea8189c2c7ae04a36a9340ed88f38fdaa949"
-    },
-    "Src/Orbiter/Production/Math/Runtime.cpp": {
-      "original_sha256_lf": null,
-      "sha256_lf": "f40f7df1a346e7aa743fa392138d6dfef97060b4545e65cc97e0ab182e590295"
-    },
-    "Src/Orbiter/Production/Math/Runtime.h": {
-      "original_sha256_lf": null,
-      "sha256_lf": "1ab4017b3e2c70e668240eca91dcc0eac37c6d610e7b9cc0f252127c097ac3ac"
-    },
-    "Src/Orbiter/Production/Math/prepare.py": {
-      "original_sha256_lf": null,
-      "sha256_lf": "5d57d5795a475187fccc9f24b91b09fd3be0a4dd870d4fec9f1ff5d4e1cacf1b"
-    },
-    "Extern/ReferenceMath/README.md": {
-      "original_sha256_lf": null,
-      "sha256_lf": "5f38a29d5df313f5e72b3beaa22d5441a9591dfaefedee53a1642820f3f5aeee"
-    },
-    "Extern/ReferenceMath/amd/L2_by_pi_bits.asm": {
-      "original_sha256_lf": null,
-      "sha256_lf": "100950f8ad8f8306140cf6a7c021923b9354fbf8f153bb10c5eb3cc1055f2706"
-    },
-    "Extern/ReferenceMath/amd/Lsincos_array.asm": {
-      "original_sha256_lf": null,
-      "sha256_lf": "6ad730c3a1fcc49ea80fab5eefc4395d479d391900396fa0b5fb0f502d7db2d2"
-    },
-    "Extern/ReferenceMath/amd/asin.c": {
-      "original_sha256_lf": null,
-      "sha256_lf": "3985a1b597038ffc712a2cfcbbb63e71e91848c29de91d1c53ab4f45cc924618"
-    },
-    "Extern/ReferenceMath/amd/atan2.c": {
-      "original_sha256_lf": null,
-      "sha256_lf": "417d77250ee71e3ac59ae3e85c6eb8f7b05410e8a1cac37aae08dccd827e5598"
-    },
-    "Extern/ReferenceMath/amd/cos.asm": {
-      "original_sha256_lf": null,
-      "sha256_lf": "ea7156104cf35e1e2b85bd55e4ce29955e00e3285f87fa0b69570fc84a3e9381"
-    },
-    "Extern/ReferenceMath/amd/fm.inc": {
-      "original_sha256_lf": null,
-      "sha256_lf": "6c959f6b43ad82983cf26f840200b68af513f863271bbecc1e6c0ead28562586"
-    },
-    "Extern/ReferenceMath/amd/libm.h": {
-      "original_sha256_lf": null,
-      "sha256_lf": "f9ff549d44d4f4c44f9a9e97a6babf633687cfd9410c327f08da5dc0a8da04b2"
-    },
-    "Extern/ReferenceMath/amd/libm_errno.h": {
-      "original_sha256_lf": null,
-      "sha256_lf": "b406d28c594f907714def4b13dfda16d83243dd0cbc1e6fbc40357a79dc79343"
-    },
-    "Extern/ReferenceMath/amd/libm_inlines.h": {
-      "original_sha256_lf": null,
-      "sha256_lf": "53a977487e08371a06b8c24de0dd517b1c56415afe35f24f2fae7170a823182c"
-    },
-    "Extern/ReferenceMath/amd/libm_util.h": {
-      "original_sha256_lf": null,
-      "sha256_lf": "eb4c69a498ab0ca272249fb31d31a8d051326ecc1c754c6f1c4181c4f4bd868e"
-    },
-    "Extern/ReferenceMath/amd/remainder_piby2_forAsm.asm": {
-      "original_sha256_lf": null,
-      "sha256_lf": "f5fd35d71eee4cbde99f2e7e13381015af15f77893ebde93426eb075f43430e5"
-    },
-    "Extern/ReferenceMath/amd/remainder_piby2_forFMA3.asm": {
-      "original_sha256_lf": null,
-      "sha256_lf": "be6405d8a5dab8c8f39cdc9b9aa4c5d6b81cc434db699b3ac8a1db04b384e653"
-    },
-    "Extern/ReferenceMath/amd/sin.asm": {
-      "original_sha256_lf": null,
-      "sha256_lf": "d1fa13efc660734e35dd9e3457f01cf0970c17ee156e51c196a11a5eb6848e39"
-    },
-    "Extern/ReferenceMath/amd/sincos_special.c": {
-      "original_sha256_lf": null,
-      "sha256_lf": "575b7b287f8f54b19236397fefb00fb6786654b1c1e16866290747f89de6e1df"
-    },
-    "Extern/ReferenceMath/sources.lock.json": {
-      "original_sha256_lf": null,
-      "sha256_lf": "646cbaaaeb793548b980bbff1cebc65d732153d4d258046df3410a679a8d4d6e"
-    },
-    "Src/Orbiter/Vecmat.cpp": {
-      "original_sha256_lf": "8be3be230618377896b28bf98b6b7e536f0cd2f7294035d041afdbd0aaacbcf2",
-      "sha256_lf": "ef83aa77506674982cbdd0f8be3f402c58abd3ef27f7c1b2d6c6a129a1abc64f"
-    },
-    "Src/Orbiter/Production/NativeObservation/ApplicationObservation.h": {
-      "original_sha256_lf": null,
-      "sha256_lf": "c935e7fa3ec28650b79308bf38cdf9bf8badb547cb4c44a541de8b9cdc00353e"
-    },
-    "Src/Orbiter/Production/NativeVesselObservation.cpp": {
-      "original_sha256_lf": null,
-      "sha256_lf": "b93871adb66ed198a6bcbae4971d171c8818d553439e93443afca97c8d356a66"
-    },
-    "Src/Orbiter/Production/VesselLifetime.h": {
-      "original_sha256_lf": null,
-      "sha256_lf": "03d58f35d47835e4b200b505431f2b377370bef4edfeb0a8cafed45e674da60b"
-    },
-    "Src/Orbiter/Production/WindowsVesselLifetime.cpp": {
-      "original_sha256_lf": null,
-      "sha256_lf": "a154b1314163ce1aff3116d24beba674a699d0eba2b20b33b34b5c8999c5796c"
-    },
-    "Src/Orbiter/Production/WindowsVesselLifetime.h": {
-      "original_sha256_lf": null,
-      "sha256_lf": "ba49231499a999afdb0e8448d4eb67cb440dd5e0642b0e0dbccf17db3c1dcb14"
-    },
-    "Src/Vessel/DeltaGlider/FuelMfd.cpp": {
-      "original_sha256_lf": "251be4f317f9568087035a289f652eff96b90e4cd499a92aacaf6e4f0c39b648",
-      "sha256_lf": "c8533e9b35bdcabe4493e48b9d84fd5d4942480e3b882a0f201475b8431a999d",
-      "scope": "Pre-reference correctness repair only: initialize previously indeterminate fuel-display sample time; no extraction or formula changes."
-    },
-    "Src/Orbiter/Pane.cpp": {
-      "original_sha256_lf": "398997e418820aff0d72edd0d977e75182511d3f13a369e0f074182db3f1bdde",
-      "sha256_lf": "b19647f905db7cc129bcce90e3f4ad2cbbce83cd979515e4e4dd607583a50e65",
-      "scope": "Private cockpit graphics/configuration binding. Original algorithms and Windows pointer types conserved by cockpit_source.py; native instrumentation is not operational yet."
-    },
-    "Src/Orbiter/Mfd.h": {
-      "original_sha256_lf": "133e1e852d9563535bb8404420f98aa40ce284e43eb98ba2f7c33652e97a8e10",
-      "sha256_lf": "0afdf1bf94101e11fc41363fcd95554062ba9c0e43ce1cb6e226f7750f94e2aa",
-      "scope": "Portable cockpit/ImGui SDK data and original instrument declarations. Exact Windows scalar, callback, class, field order and packing conservation plus native header/layout compilation; runtime instrumentation remains incomplete."
-    },
-    "Src/Orbiter/Mfd.cpp": {
-      "original_sha256_lf": "0a5d504ea777abd83b0f3ce45e147a946fad03bb3c70a17eb61600e4ff5108f4",
-      "sha256_lf": "45e03dd2f1cd392220449d6634a4c0218ccd6b56c9f0f66656269d06a77f3d63",
+    "Src/Orbiter/hud.cpp": {
+      "original_sha256_lf": "7670ec27ef75c9325dd17ff4db5b019aaaed8749df9d67c1262fe846ede73926",
+      "sha256_lf": "278fd3407d3938cabb02565c62f7874e571345c479261b586d8d5111719782f7",
       "scope": "Private cockpit graphics/configuration binding. Original algorithms and Windows pointer types conserved by cockpit_source.py; native instrumentation is not operational yet."
     },
     "Src/Orbiter/hud.h": {
@@ -1096,75 +1219,18 @@
       "sha256_lf": "bd88915e453834292cefbb97b40a4d8af400c47a8863abef91f0dbdb954a6edc",
       "scope": "Private cockpit graphics binding only. Original algorithms and Windows underlying pointer types conserved by cockpit_source.py; native instrumentation is not operational yet."
     },
-    "Src/Orbiter/hud.cpp": {
-      "original_sha256_lf": "7670ec27ef75c9325dd17ff4db5b019aaaed8749df9d67c1262fe846ede73926",
-      "sha256_lf": "278fd3407d3938cabb02565c62f7874e571345c479261b586d8d5111719782f7",
-      "scope": "Private cockpit graphics/configuration binding. Original algorithms and Windows pointer types conserved by cockpit_source.py; native instrumentation is not operational yet."
+    "Src/Vessel/DeltaGlider/FuelMfd.cpp": {
+      "original_sha256_lf": "251be4f317f9568087035a289f652eff96b90e4cd499a92aacaf6e4f0c39b648",
+      "sha256_lf": "c8533e9b35bdcabe4493e48b9d84fd5d4942480e3b882a0f201475b8431a999d",
+      "scope": "Pre-reference correctness repair only: initialize previously indeterminate fuel-display sample time; no extraction or formula changes."
     },
-    "Src/Orbiter/Panel.h": {
-      "original_sha256_lf": "d517f73ee3cf326e944b8ac000fd19a75e1b30ac2a4bac59b0c1d481cadce1c3",
-      "sha256_lf": "bbea866528d96135b24437d701416d7d4c8012e4ade3bffc036edfe3fd78a295",
-      "scope": "Private cockpit graphics binding only. Original algorithms and Windows underlying pointer types conserved by cockpit_source.py; native instrumentation is not operational yet."
-    },
-    "Src/Orbiter/Production/CockpitGraphics.h": {
+    "Src/Vessel/ShuttlePB/NativeShuttlePBFactory.inc": {
       "original_sha256_lf": null,
-      "sha256_lf": "7b7643c823ae0015e8a5ecf73e296a909c9af346b3be6f41235d2373f90283c9",
-      "scope": "Private cockpit graphics binding only. Original algorithms and Windows underlying pointer types conserved by cockpit_source.py; native instrumentation is not operational yet."
+      "sha256_lf": "8df3cbd30f6bc03fcfc2d13ff29a5034ff2146c7f06ae2897ecb85cd1989e250"
     },
-    "Src/Orbiter/Defpanel.cpp": {
-      "original_sha256_lf": "a7cb7d7be6d6120e3a7407b58ebd1fe4cd7552ad5dff73a4d0f7396c1a2815ce",
-      "sha256_lf": "b15d27dfaa92e260c1c6757aa8826ae97a251135e77acf2200f79fed5d4c4f11",
-      "scope": "Private cockpit graphics/configuration binding. Original algorithms and Windows pointer types conserved by cockpit_source.py; native instrumentation is not operational yet."
-    },
-    "Src/Orbiter/Defpanel.h": {
-      "original_sha256_lf": "ae7d437861e792bdc24945f6da5fb6012d090436e89745b7dfd7b30512937184",
-      "sha256_lf": "4854770c958bf528d7697f3c665a0cd49b4cd8640a3bf3d1c229b55e2b8e7e5b",
-      "scope": "Private cockpit graphics/configuration binding. Original algorithms and Windows pointer types conserved by cockpit_source.py; native instrumentation is not operational yet."
-    },
-    "Src/Orbiter/MfdSurface.cpp": {
-      "original_sha256_lf": "c1a1522edc9fbda54db00341ff078473a1d142f3763bee93b1496434c0644aaf",
-      "sha256_lf": "bc2fae00f6087d483fe6d02cf22fa57f27a5b4da8b80d2c0a61cdb3635f68ee0",
-      "scope": "Private cockpit graphics/configuration binding. Original algorithms and Windows pointer types conserved by cockpit_source.py; native instrumentation is not operational yet."
-    },
-    "Src/Orbiter/Panel2D.h": {
-      "original_sha256_lf": "c8a36214609a549f7715a332f2c1a6b66eaf542ff5b0b5646f89cd119a4dff82",
-      "sha256_lf": "042e0f91c85b14ff1ed71e5b14956eb6147f47248f06327b59349061e7398e54",
-      "scope": "Private cockpit graphics/configuration binding. Original algorithms and Windows pointer types conserved by cockpit_source.py; native instrumentation is not operational yet."
-    },
-    "Src/Orbiter/VCockpit.cpp": {
-      "original_sha256_lf": "d68c62ea558f5cf0292b6d0469efdf2699b7557405beab1f474bc96f61f3a2c9",
-      "sha256_lf": "347c242da27afaef926c9b3c41bcca29ae301d1f53a476dd0b6c84a9f8035fbb",
-      "scope": "Private cockpit graphics/configuration binding. Original algorithms and Windows pointer types conserved by cockpit_source.py; native instrumentation is not operational yet."
-    },
-    "Src/Orbiter/VCockpit.h": {
-      "original_sha256_lf": "a7aa6bacbd55eef45ac47289171453fbf446804d1554f2ee69c6e4b50c2a3e5c",
-      "sha256_lf": "3a8b7c169fb56449192cab38efc6a307f8da64472cf072d23c06dac3f8e5a872",
-      "scope": "Private cockpit graphics/configuration binding. Original algorithms and Windows pointer types conserved by cockpit_source.py; native instrumentation is not operational yet."
-    },
-    "Src/Orbiter/VectorMap.cpp": {
-      "original_sha256_lf": "604e34d813ef11aa92934c08911ec2548d747659f5659df8d20469caa9fc01ed",
-      "sha256_lf": "31631de055420b0fb6cab394e664dfb7a82e41289a00e67afe0459a20fecb228",
-      "scope": "Private cockpit graphics/configuration binding. Original algorithms and Windows pointer types conserved by cockpit_source.py; native instrumentation is not operational yet."
-    },
-    "Src/Orbiter/Production/CockpitServices.h": {
-      "original_sha256_lf": null,
-      "sha256_lf": "8f8319800563274d231874fc427d52917b67faa67e59541bc873066e5b12e5a6",
-      "scope": "Private cockpit graphics/configuration binding. Original algorithms and Windows pointer types conserved by cockpit_source.py; native instrumentation is not operational yet."
-    },
-    "Orbitersdk/include/OrbiterCockpitData.h": {
-      "original_sha256_lf": null,
-      "sha256_lf": "e897f2946d7483b144d8fb9d90001ca831a21ffcdb696efdcacf33348fa9c9a1",
-      "scope": "Portable cockpit/ImGui SDK data and original instrument declarations. Exact Windows scalar, callback, class, field order and packing conservation plus native header/layout compilation; runtime instrumentation remains incomplete."
-    },
-    "Orbitersdk/include/OrbiterGuiData.h": {
-      "original_sha256_lf": null,
-      "sha256_lf": "025e1cca870e254e1d6385b83fbb42f784d1b3110ea07ac9152c49cc711baa1f",
-      "scope": "Portable cockpit/ImGui SDK data and original instrument declarations. Exact Windows scalar, callback, class, field order and packing conservation plus native header/layout compilation; runtime instrumentation remains incomplete."
-    },
-    "Src/Orbiter/Select.h": {
-      "original_sha256_lf": "0ea1560216087f84fe49f388eca414756fcc1135eba1bdc43d106e7b93053f25",
-      "sha256_lf": "2015d69a8974ac8c022d22b1475e89af6fc0a4f5b35f3df7ee33d952f8568e07",
-      "scope": "Portable cockpit/ImGui SDK data and original instrument declarations. Exact Windows scalar, callback, class, field order and packing conservation plus native header/layout compilation; runtime instrumentation remains incomplete."
+    "Src/Vessel/ShuttlePB/ShuttlePB.cpp": {
+      "original_sha256_lf": "126cc5aa4e2f6ca96c478660fb47b4a4e23f1daa5f28911fff7a95cf25c3cf7a",
+      "sha256_lf": "c46bc345a45e28446833ee951eb4e8f1dd856a336b84104816e47317df00ff23"
     }
   }
 }

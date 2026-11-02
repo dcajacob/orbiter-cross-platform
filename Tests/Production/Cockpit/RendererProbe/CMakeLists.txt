@@ -22,3 +22,7 @@ target_include_directories(cockpit-sdk-layout PRIVATE "${ORBITER_ROOT}/Orbitersd
 add_executable(instrument-declarations ../InstrumentDeclarations.Test.cpp)
 target_compile_features(instrument-declarations PRIVATE cxx_std_17)
 target_include_directories(instrument-declarations PRIVATE "${ORBITER_ROOT}/Src/Orbiter" "${ORBITER_ROOT}/Orbitersdk/include")
+add_executable(mfd-orbit-geometry ../OrbitGeometry.Test.cpp)
+target_compile_features(mfd-orbit-geometry PRIVATE cxx_std_17)
+target_include_directories(mfd-orbit-geometry PRIVATE "${ORBITER_ROOT}/Src/Orbiter" "${ORBITER_ROOT}/Orbitersdk/include")
+target_link_libraries(mfd-orbit-geometry PRIVATE native_boundary)

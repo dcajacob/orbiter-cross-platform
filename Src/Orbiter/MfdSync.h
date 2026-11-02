@@ -13,14 +13,14 @@
 class Instrument_OSync: public Instrument {
 	friend class Pane;
 public:
-	Instrument_OSync (Pane *_pane, INT_PTR _id, const Spec &spec, Vessel *_vessel, bool restore);
+	Instrument_OSync (Pane *_pane, std::intptr_t _id, const Spec &spec, Vessel *_vessel, bool restore);
 	virtual ~Instrument_OSync ();
 	int Type () const { return MFD_OSYNC; }
 	char ModeSelKey () const { return 'Y'; }
 	HELPCONTEXT *HelpTopic () const;
 	void UpdateDraw (oapi::Sketchpad *skp);
 	void SetSize (const Spec &spec);
-	bool KeyBuffered (DWORD key);
+	bool KeyBuffered (oapi::UInt32 key);
 	bool KeyImmediate (char *kstate);
 	bool ProcessButton (int bt, int event);
 	const char *BtnLabel (int bt) const;

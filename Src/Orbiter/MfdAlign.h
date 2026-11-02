@@ -12,14 +12,14 @@
 
 class Instrument_OPlaneAlign: public Instrument {
 public:
-	Instrument_OPlaneAlign (Pane *_pane, INT_PTR _id, const Spec &spec, Vessel *_vessel, bool restore);
+	Instrument_OPlaneAlign (Pane *_pane, std::intptr_t _id, const Spec &spec, Vessel *_vessel, bool restore);
 	virtual ~Instrument_OPlaneAlign();
 	int Type () const { return MFD_OPLANEALIGN; }
 	char ModeSelKey () const { return 'A'; }
 	HELPCONTEXT *HelpTopic () const;
 	void SetCustomEls (double i, double theta); // set custom target elements
 	void UpdateDraw (oapi::Sketchpad *skp);
-	bool KeyBuffered (DWORD key);
+	bool KeyBuffered (oapi::UInt32 key);
 	bool ProcessButton (int bt, int event);
 	const char *BtnLabel (int bt) const;
 	int BtnMenu (const MFDBUTTONMENU **menu) const;

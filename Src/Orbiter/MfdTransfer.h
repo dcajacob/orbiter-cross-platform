@@ -12,14 +12,14 @@
 
 class Instrument_Transfer: public Instrument {
 public:
-	Instrument_Transfer (Pane *_pane, INT_PTR _id, const Spec &spec, Vessel *_vessel);
+	Instrument_Transfer (Pane *_pane, std::intptr_t _id, const Spec &spec, Vessel *_vessel);
 	virtual ~Instrument_Transfer ();
 	int Type() const { return MFD_TRANSFER; }
 	char ModeSelKey () const { return 'X'; }
 	HELPCONTEXT *HelpTopic () const;
 	void UpdateDraw (oapi::Sketchpad *skp);
 	void SetSize (const Spec &spec);
-	bool KeyBuffered (DWORD key);
+	bool KeyBuffered (oapi::UInt32 key);
 	bool KeyImmediate (char *kstate);
 	bool ProcessButton (int bt, int event);
 	const char *BtnLabel (int bt) const;

@@ -15,13 +15,13 @@
 
 class Instrument_Map: public Instrument {
 public:
-	Instrument_Map (Pane *_pane, INT_PTR _id, const Spec &spec, Vessel *_vessel);
+	Instrument_Map (Pane *_pane, std::intptr_t _id, const Spec &spec, Vessel *_vessel);
 	~Instrument_Map();
 	int Type () const { return MFD_MAP; }
 	char ModeSelKey () const { return 'M'; }
 	HELPCONTEXT *HelpTopic () const;
 	int ProcessMessage (int msg, void *data);
-	bool KeyBuffered (DWORD key);
+	bool KeyBuffered (oapi::UInt32 key);
 	bool KeyImmediate (char *kstate);
 	bool ProcessButton (int bt, int event);
 	const char *BtnLabel (int bt) const;
@@ -60,7 +60,7 @@ private:
 	double scroll_t0, scroll_tp;  // time of scroll start (for acceleration computation)
 
 	int disp_mode;   // MFD display mode: 0=map, 1=display parameter page
-	DWORD dispflag;  // bitflags for display elements
+	oapi::UInt32 dispflag;  // bitflags for display elements
 	int disp_sel;    // current selection for editing display parameters
 	int ndispprm;    // total number of selectable parameters
 	int dispprm_top; // index of topmost list entry (for scrolling)
@@ -72,8 +72,8 @@ private:
 		int zoom;
 		bool track;
 		double lng, lat;
-		DWORD dispflag;
-		DWORD mkrflag;
+		oapi::UInt32 dispflag;
+		oapi::UInt32 mkrflag;
 	} saveprm;
 };
 

@@ -10,7 +10,9 @@
 
 //#define ASYNC_DRAWMAP
 
+#ifdef _WIN32
 #include "Orbiter.h"
+#endif
 #include "Production/CockpitGraphics.h"
 #include "Planet.h"
 #include "Element.h"
@@ -25,7 +27,9 @@
 #define TASKID_TERMINATE 0x3 // terminate thread
 #define TASKID_DRAW      0x4 // redraw canvas
 
+#ifdef _WIN32
 extern Orbiter *g_pOrbiter;
+#endif
 
 struct VPoint {
 	double lng, lat;
@@ -72,7 +76,7 @@ struct CustomMkrSet {
 	void Clear();
 	void Connect (oapi::CockpitClient::LABELLIST *ll, int nlist);
 	CustomMkrSpec *set;
-	DWORD nset;
+	oapi::UInt32 nset;
 };
 
 struct Groundtrack {
@@ -114,11 +118,11 @@ public:
 	void SetZoom (double zoom);
 	void SetCenterMode (int center) { centermode = center; }
 	int GetCenterMode () const { return centermode; }
-	void SetDisplayFlags (DWORD flag);
-	void ToggleDisplayFlags (DWORD flag);
-	DWORD GetDisplayFlags () const { return dispflag; }
-	void SetFindFlags (DWORD flag) { findflag = flag; }
-	DWORD GetFindFlags () const { return findflag; }
+	void SetDisplayFlags (oapi::UInt32 flag);
+	void ToggleDisplayFlags (oapi::UInt32 flag);
+	oapi::UInt32 GetDisplayFlags () const { return dispflag; }
+	void SetFindFlags (oapi::UInt32 flag) { findflag = flag; }
+	oapi::UInt32 GetFindFlags () const { return findflag; }
 
 	// Returns the drawing bitmap SURFHANDLE.
 	// Note: waits for the drawing thread to finish
@@ -241,8 +245,8 @@ protected:
 	double mapx_ofs, mapx_scale; // parameters for longitude mapping
 	double mapy_ofs, mapy_scale; // parameters for latitude mapping
 	int centermode;     // 0=none, 1=keep focusobject centered, 2=keep selection centered
-	DWORD dispflag;     // bitflags for display elements
-	DWORD findflag;     // bitflags for search elements
+	oapi::UInt32 dispflag;     // bitflags for display elements
+	oapi::UInt32 findflag;     // bitflags for search elements
 	OBJTYPE selection;  // selected object
 
 private:
@@ -269,8 +273,8 @@ private:
 	oapi::Pen **penCustomMkr;
 	oapi::Brush *brushDay;
 	oapi::Font *fontLabel;
-	COLORREF *colCustomMkr;
-	DWORD     nCustomMkr;
+	oapi::UInt32 *colCustomMkr;
+	oapi::UInt32     nCustomMkr;
 
 private:
 	void InitGDIResources();
