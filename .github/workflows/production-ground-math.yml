@@ -3,7 +3,7 @@ name: Original Windows Ground Math Observation
 on:
   push:
     branches: ['codex/production-**']
-    paths: ['Src/Orbiter/Production/MathObservation.h', 'Src/Orbiter/Production/ContactObservation.h', 'Tests/Production/GroundFlight/MathObserve.cpp', 'Tests/Production/GroundFlight/MathDispatch.cpp', 'Tests/Production/GroundFlight/diagnose.py', '.github/workflows/production-ground-math.yml']
+    paths: ['Src/Orbiter/Production/MathObservation.h', 'Src/Orbiter/Production/ContactObservation.h', 'Tests/Production/ContactStages/Scheduling.h', 'Tests/Production/GroundFlight/MathObserve.cpp', 'Tests/Production/GroundFlight/MathDispatch.cpp', 'Tests/Production/GroundFlight/diagnose.py', '.github/workflows/production-ground-math.yml']
   workflow_dispatch:
 
 permissions:

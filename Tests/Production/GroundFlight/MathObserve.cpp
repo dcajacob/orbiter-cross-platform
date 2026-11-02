@@ -5,6 +5,7 @@
 #ifdef ORBITER_INTERNAL_CONTACT_OBSERVATION
 #include "Vessel.h"
 #include "../../../Src/Orbiter/Production/ContactObservation.h"
+#include "../ContactStages/Scheduling.h"
 #endif
 #include "../../../Src/Orbiter/Production/MathObservation.h"
 #include <cstdlib>
@@ -16,6 +17,7 @@ class Observer final:public oapi::Module {
     std::ofstream trace;unsigned tick=0;
 #ifdef ORBITER_INTERNAL_CONTACT_OBSERVATION
     std::ofstream contact;
+    std::ofstream scheduling;
 #endif
 public:
     explicit Observer(HINSTANCE instance):Module(instance),trace("ground-math.csv",std::ios::binary) {
@@ -24,6 +26,8 @@ public:
 #ifdef ORBITER_INTERNAL_CONTACT_OBSERVATION
         contact.open("ground-contact.csv",std::ios::binary);contact.imbue(std::locale::classic());contact<<std::setprecision(17);
         orbiter::production::contact_observation::Header(contact);
+        scheduling.open("ground-scheduling.csv",std::ios::binary);scheduling.imbue(std::locale::classic());scheduling<<std::setprecision(17);
+        contact_scheduling::Header(scheduling);
 #endif
     }
     void clbkPreStep(double seconds,double,double) override {
@@ -35,6 +39,12 @@ public:
 #ifdef ORBITER_INTERNAL_CONTACT_OBSERVATION
         orbiter::production::contact_observation::Row(contact,tick,seconds,*vessel);
         if(!contact)std::exit(1);
+        for(const char* name:{"ISS","PB"}) {
+            auto* current=oapiGetVesselInterface(oapiGetVesselByName(const_cast<char*>(name)));
+            if(!current)std::exit(1);
+            contact_scheduling::Row(scheduling,tick,seconds,*current);
+        }
+        if(!scheduling)std::exit(1);
 #endif
         ++tick;
         if(!trace)std::exit(1);
