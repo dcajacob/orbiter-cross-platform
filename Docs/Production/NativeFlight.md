@@ -12,6 +12,9 @@ normal Orbiter recording/playback, sound, general stock scenarios and installed
 release packaging remain later gates. The title bar reports original vessel
 state; original instruments still require their own integration.
 
+Phase 5 atmospheric/ground-flight work, its separate experimental preview and
+the remaining numerical failures are tracked in [GroundFlight.md](GroundFlight.md).
+
 ## Run the prepared laptop build
 
 ```sh

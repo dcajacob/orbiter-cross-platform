@@ -29,7 +29,7 @@ both applications. It is preserved as an uncontrolled-impact regression and
 still fails native attitude parity. Its real SDK landed status alone does not
 establish usable landing support.
 
-Local Debug checks pass six cases. The hover landing reaches the landed state
+Local Debug checks pass six legacy cases. The uncontrolled hop reaches the landed state
 with matching contact-event ticks and satisfies the position, velocity and fuel
 limits. Its maximum attitude difference is approximately 0.00674 rad against the
 agreed 0.001 rad budget; that case fails. All seven cases have completed locally
