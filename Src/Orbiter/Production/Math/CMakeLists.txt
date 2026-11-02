@@ -10,7 +10,9 @@ if(NOT CMAKE_SYSTEM_PROCESSOR MATCHES "^(x86_64|AMD64|amd64)$" OR NOT CMAKE_C_CO
     message(FATAL_ERROR "The production reference math backend currently requires GCC on Linux x86-64")
 endif()
 option(ORBITER_MATH_FORCE_SSE2 "Qualify the baseline CPU math path even on FMA3 hardware" OFF)
-set(_math_upstream "${CMAKE_CURRENT_LIST_DIR}/../../../../Extern/ReferenceMath")
+# The parent SDK records these dependencies too. Normalize before registering
+# them so Ninja receives one spelling per file in its regeneration rule.
+get_filename_component(_math_upstream "${CMAKE_CURRENT_LIST_DIR}/../../../../Extern/ReferenceMath" ABSOLUTE)
 set(_math_generated "${CMAKE_CURRENT_BINARY_DIR}/generated")
 execute_process(COMMAND "${Python3_EXECUTABLE}" -B "${CMAKE_CURRENT_LIST_DIR}/prepare.py"
     --source "${_math_upstream}" --output "${_math_generated}" COMMAND_ERROR_IS_FATAL ANY)
