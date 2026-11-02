@@ -44,9 +44,9 @@ jobs:
         with:
           vsversion: '17.0'
           arch: x64
-      - name: Install native archive dependency
+      - name: Install native archive and test-oracle dependencies
         if: runner.os == 'Linux'
-        run: sudo apt-get update && sudo apt-get install -y zlib1g-dev
+        run: sudo apt-get update && sudo apt-get install -y zlib1g-dev libmpfr-dev
       - name: Build original shared terrain and actual native module dependencies
         shell: bash
         run: |
