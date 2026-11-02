@@ -1,0 +1,29 @@
+{
+  "schema": 1,
+  "description": "Pre-native-ground-flight Windows controls and observations, using the real ShuttlePB and Edwards terrain",
+  "application_source": "391919027ac3e4a4d42f145373c788fc859c32cd",
+  "runtime_run": 41342204437,
+  "epoch": 51982.75,
+  "fixed_step": 0.05,
+  "checkpoint_tick": 300,
+  "cases": [
+    {"id": "pb_ground_idle", "frames": 200, "fixture": "edwards"},
+    {"id": "pb_atmosphere", "frames": 600, "fixture": "edwards"},
+    {"id": "pb_contact", "frames": 600, "fixture": "edwards"},
+    {"id": "pb_takeoff_landing", "frames": 1200, "fixture": "edwards"},
+    {"id": "pb_ground_persistence", "frames": 400, "fixture": "edwards"},
+    {"id": "pb_ground_reload", "frames": 200, "fixture": "reload"}
+  ],
+  "budgets": {
+    "position_m": 1,
+    "velocity_m_s": 0.1,
+    "rotation_rad": 0.001,
+    "angular_velocity_rad_s": 1e-10,
+    "mjd_days": 1e-10,
+    "propulsion_relative": 1e-8,
+    "propulsion_absolute_kg": 1e-8,
+    "contact_event_tick": 1
+  },
+  "repeat": "byte-identical state, propellant, animation and event files; identical input and lifecycle ordering",
+  "physics": "Existing production gravity, atmosphere, aerodynamic callbacks and contact integration, with atmospheric wind disabled as in the original reference suite"
+}

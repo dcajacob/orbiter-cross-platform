@@ -5,6 +5,7 @@
 #include "Orbitersdk.h"
 #include "StockControlSchedules.h"
 #include "Flight/Schedules.h"
+#include "GroundFlight/Schedules.h"
 #include "ApplicationObservation.h"
 #include <algorithm>
 #include <cmath>
@@ -40,7 +41,7 @@ public:
         require(totalFrames > 0 && dt > 0 && std::isfinite(dt) && std::isfinite(epoch), "invalid behavior timing");
         const std::vector<std::string> supported = {"rcs", "autopilot", "atmosphere", "landed", "contact",
             "docked", "dock_approach", "attachments", "clock", "lifetime", "dg_animations", "dg_persistence", "dg_reload", "callbacks", "manual_flight", "pb_persistence", "pb_reload"};
-        require(std::find(supported.begin(),supported.end(),id) != supported.end(), "unsupported behavior case");
+        require(std::find(supported.begin(),supported.end(),id) != supported.end() || production_test::GroundFlightCase(id), "unsupported behavior case");
         open(events,"behavior-events.csv"); open(states,"behavior-state.csv");
         open(propellant,"behavior-propellant.csv"); open(animations,"behavior-animations.csv");
         events << "frame,tick,seconds,mjd,phase,object,detail\n";
@@ -62,6 +63,12 @@ public:
             VESSEL *v = oapiGetVesselInterface(target);
             require(v->GetThrusterCount() > 0 && v->GetPropellantCount() > 0,"stock vessel module did not initialize");
             require(v->GetMeshCount() > 0,"stock vessel mesh did not initialize");
+            if(production_test::GroundFlightCase(id)) {
+                require(std::string(v->GetClassName())=="ShuttlePB" && v->GetThrusterCount()==16 &&
+                    v->GetPropellantCount()==1 && v->GetMeshCount()==1,"real stock ShuttlePB capabilities required");
+                production_test::GroundFlightStart(v,id);
+                if(id=="pb_atmosphere" || id=="pb_contact")event("input.airborne",nameOf(target),id=="pb_atmosphere"?"1500:200":"8:-0.5");
+            }
             if (id == "atmosphere" || id == "contact") {
                 VESSELSTATUS2 status{};status.version=2;v->GetStatusEx(&status);
                 VECTOR3 p{},ev{},ep{};oapiGetGlobalPos(status.rbody,&ep);v->GetGlobalPos(p);
@@ -87,7 +94,10 @@ public:
             require(started && std::isfinite(step) && step > 0,"invalid production step");
             event("module.pre","","");
             VESSEL *v = oapiGetVesselInterface(target);
-            if (id == "manual_flight") {
+            if (production_test::GroundFlightCase(id)) {
+                production_test::GroundFlight(v,id,tick);
+                if(id=="pb_atmosphere" || id=="pb_takeoff_landing")event("input.groundflight",nameOf(target),id+":"+std::to_string(tick));
+            } else if (id == "manual_flight") {
                 production_test::ManualFlight(v,tick);
             } else if (id == "pb_persistence") {
                 v->SetThrusterGroupLevel(THGROUP_MAIN,.2);
@@ -153,6 +163,10 @@ public:
                     // Save only after state finalization and EndStep, so the
                     // stock serializer's MJD1 and its state vectors agree.
                     require(oapiSaveScenario("BehaviorSnapshot","Windows production persistence checkpoint"),"save checkpoint failed");
+                    event("input.save",nameOf(target),"BehaviorSnapshot");
+                }
+                if(id=="pb_ground_persistence" && running && tick==300) {
+                    require(oapiSaveScenario("BehaviorSnapshot","Windows production landed ShuttlePB checkpoint"),"save landed checkpoint failed");
                     event("input.save",nameOf(target),"BehaviorSnapshot");
                 }
                 if (id == "clock") {
