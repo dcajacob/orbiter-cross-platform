@@ -1,8 +1,5 @@
 name: Original Windows Cockpit Control Reference
 on:
-  push:
-    branches: ['codex/production-**']
-    paths: ['Tests/Production/CockpitControls/**', '.github/workflows/production-cockpit-controls-reference.yml']
   workflow_dispatch:
 permissions:
   contents: read

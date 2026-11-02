@@ -1,0 +1,41 @@
+name: Preserve Accepted Original Cockpit Controls
+on:
+  push:
+    branches: ['codex/production-**']
+    paths:
+      - Tests/Production/CockpitControls/Reference/**
+      - Tests/Production/CockpitControls/frozen_controls.py
+      - Tests/Production/CockpitControls/preserve_controls.py
+      - .github/workflows/preserve-production-cockpit-controls.yml
+  workflow_dispatch:
+permissions:
+  contents: write
+  actions: read
+concurrency:
+  group: preserve-original-cockpit-controls
+  cancel-in-progress: false
+jobs:
+  preserve:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    env:
+      GH_TOKEN: ${{ github.token }}
+      GH_REPO: dcajacob/orbiter-cross-platform
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - name: Verify accepted run, exact artifacts, producer inputs and logs
+        run: python3 -B Tests/Production/CockpitControls/preserve_controls.py --output out/accepted-original-controls
+      - name: Publish a new immutable prerelease without replacing existing assets
+        shell: bash
+        run: |
+          set -euo pipefail
+          tag=production-windows-cockpit-controls-v1
+          if gh release view "$tag" >/dev/null 2>&1; then
+            echo 'Accepted control reference release already exists; replacement is forbidden.'
+            exit 1
+          fi
+          gh release create "$tag" out/accepted-original-controls/* --target "$GITHUB_SHA" --prerelease --title 'Original Windows cockpit control reference v1' --notes-file Tests/Production/CockpitControls/Reference/README.md
+      - name: Independently download and verify public release storage
+        run: python3 -B Tests/Production/CockpitControls/frozen_controls.py --cache out/public-control-cache --output out/public-control-verification

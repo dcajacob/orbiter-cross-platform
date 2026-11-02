@@ -208,11 +208,9 @@ The modern vector-map implementation also compiles natively. Its Elements
 records receive the same explicit epoch. Native coast/contour files use the
 indexed configuration resolver, marker text remains UTF-8 through the real
 Sketchpad, and display-based font sizing queries GLFW's actual primary display
-mode. No window-system metrics are invented. Map captures must control desktop
-resolution as well as viewport size: the frozen original map text records a
-nine-pixel label font, which the original screen-height/100 rule determines.
-This environment requirement must be reproduced during native cockpit parity
-validation.
+mode. The Map MFD subsequently overrides that initial label size using
+`max(9, IH / 40)`, so its labels follow instrument height. Desktop/viewport
+metrics are recorded for other vector-map users and reproducibility.
 
 The stock-mode implementation/drawing-adapter stage at `1b146567` passes
 current Windows application/SDK tests and all original cockpit image, numerical,
@@ -236,3 +234,18 @@ twice per Windows configuration. These outputs remain diagnostic until every
 repeat and Debug/Release comparison passes the unchanged budgets. The existing
 nine-case references remain immutable; native cockpit input work must wait for
 this additional gate.
+
+The scheduler/map/session-binding stage at `881a06d0` passes the complete
+Windows application/SDK and nine frozen cockpit regressions, including
+Debug/Release, in
+[run 41480059260](https://github.com/dcajacob/orbiter-cross-platform/actions/runs/41480059260).
+All four native profiles pass in
+[run 41480059302](https://github.com/dcajacob/orbiter-cross-platform/actions/runs/41480059302).
+The additional original control gate passes all five cases, two processes per
+configuration, and cross-configuration comparison in
+[run 41482729373](https://github.com/dcajacob/orbiter-cross-platform/actions/runs/41482729373).
+Independent local archive/hash and comparison checks confirm zero numerical
+differences, exact input/text/geometry/lifecycle repeats and image SSIM 1.0.
+The accepted control provenance is frozen separately under
+`CockpitControls/Reference`; capture is now manual-only. This establishes the
+control reference prerequisite without claiming native input integration.

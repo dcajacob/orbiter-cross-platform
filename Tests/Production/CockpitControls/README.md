@@ -42,3 +42,8 @@ All staging/capture outputs refuse replacement. Once both configurations and
 the comparison pass, preserve provenance, inputs, logs, traces and original
 captures separately and switch the reference workflow to manual-only. Do not
 automatically refresh an accepted reference.
+
+The five original cases are now accepted in run 41482729373. Their immutable
+provenance, hashes and comparison are in `Reference/`. The capture workflow is
+manual-only; preservation uses a separate workflow. Native input extraction
+must compare against these files rather than recapturing the reference.
