@@ -33,6 +33,7 @@
 #include "Star.h"
 #include "ConfigFile.h"
 #include "MathObservation.h"
+#include "ContactObservation.h"
 #include <algorithm>
 #include <chrono>
 #include <cstdlib>
@@ -71,7 +72,7 @@ struct Runtime final:BodyServices,RigidBodyServices,SurfaceServices,NavigationSe
     PlanetarySystem* system=nullptr;NativeRenderContext render;bool updating=false,force=true,running=false,playback=false,active=true;
     MeshManager meshes;NativeCelestialServices celestial;std::unique_ptr<NativeElevationServices> terrain;
     std::unique_ptr<WorldVesselServices> vessels;WorldOwner world;std::unique_ptr<NativeModule> graphicsModule;
-    std::ofstream lifecycle,trace,flightTrace,inputTrace,inputEvents,thrustTrace,animationTrace,controlTrace,mathTrace;
+    std::ofstream lifecycle,trace,flightTrace,inputTrace,inputEvents,thrustTrace,animationTrace,controlTrace,mathTrace,contactTrace;
     unsigned pendingCockpitRedraw=0,inputTick=0,completedTicks=0;
     FlightControls controls;FlightReplay replay;FlightInput input;
     std::unique_ptr<State> scenarioState;
@@ -167,7 +168,7 @@ struct Runtime final:BodyServices,RigidBodyServices,SurfaceServices,NavigationSe
         if(finished)return;
         if(render.graphics)render.graphics->CloseSession();world.Reset();meshes.Flush();
         if(render.graphics)render.graphics->Close();graphicsModule.reset();render.graphics=nullptr;
-        for(auto* file:{&lifecycle,&trace,&flightTrace,&inputTrace,&inputEvents,&thrustTrace,&animationTrace,&controlTrace,&mathTrace})if(file->is_open())file->close();
+        for(auto* file:{&lifecycle,&trace,&flightTrace,&inputTrace,&inputEvents,&thrustTrace,&animationTrace,&controlTrace,&mathTrace,&contactTrace})if(file->is_open())file->close();
         finished=true;
     }
     ~Runtime() {
@@ -211,6 +212,8 @@ struct Runtime final:BodyServices,RigidBodyServices,SurfaceServices,NavigationSe
             controlTrace<<std::setprecision(17)<<"tick,seconds,object,flight_status,aerodynamic_mode,rcs_mode,elevator,aileron,rudder\n";
             mathTrace.open(evidence/"ground-math.csv");mathTrace.imbue(std::locale::classic());mathTrace.exceptions(std::ios::badbit|std::ios::failbit);
             mathTrace<<std::setprecision(17);math_observation::Header(mathTrace);
+            contactTrace.open(evidence/"ground-contact.csv");contactTrace.imbue(std::locale::classic());contactTrace.exceptions(std::ios::badbit|std::ios::failbit);
+            contactTrace<<std::setprecision(17);contact_observation::Header(contactTrace);
         }
         graphicsModule=std::make_unique<NativeModule>(resources.modules.Resolve("Graphics/OGLClient.so"),ORBITER_NATIVE_GRAPHICS,&render);
         render.graphics=static_cast<NativeGraphics*>(graphicsModule->Instance());render.graphics->Open();
@@ -384,6 +387,7 @@ struct Runtime final:BodyServices,RigidBodyServices,SurfaceServices,NavigationSe
                 if(vessel==render.focus) {
                     MATRIX3 er{},ob{};for(unsigned i=0;i<9;++i){er.data[i]=earth->GRot().data[i];ob.data[i]=earth->RotObliq().data[i];}
                     math_observation::Row(mathTrace,completedTicks,time.SimT0,*v,MakeVECTOR3(earth->GPos()),er,ob,earth->Rotation());
+                    contact_observation::Row(contactTrace,completedTicks,time.SimT0,*v);
                 }
             }
         }
