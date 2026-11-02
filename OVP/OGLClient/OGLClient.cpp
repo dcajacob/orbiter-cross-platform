@@ -29,6 +29,14 @@
 #include "InstrumentEvidence.h"
 #include "MaterialConversion.h"
 
+namespace {
+struct SurfaceTextureUnit {
+    GLint previous=GL_TEXTURE0;
+    SurfaceTextureUnit(){glGetIntegerv(GL_ACTIVE_TEXTURE,&previous);glActiveTexture(GL_TEXTURE0);}
+    ~SurfaceTextureUnit(){glActiveTexture(previous);}
+};
+}
+
 // ==============================================================
 // API interface
 // ==============================================================
@@ -225,6 +233,7 @@ bool OGLClient::GetRenderParam (int prm, int *value) const
 void OGLClient::clbkRender2DPanel (SURFHANDLE *hSurf, MESHHANDLE hMesh, MATRIX3 *T, bool transparent)
 {
 	InstrumentEvidence::Overlay(hMesh,T);
+	SurfaceTextureUnit textureUnit;
 	static int nHVTX = 1;
 	static struct HVTX {
 		float tu, tv;
@@ -1254,16 +1263,14 @@ bool OGLClient::clbkUseLaunchpadVideoTab () const
  */
 bool OGLClient::FillSurface (SURFHANDLE surf, uint32_t col) const
 {
-	GLint result;
-	glGetIntegerv(GL_FRAMEBUFFER_BINDING, &result);
-	assert(result == 0);
-	glBindFramebuffer(GL_FRAMEBUFFER, ((OGLTexture *)surf)->m_FBO);
+	if(!surf)return false;
+	Renderer::PushRenderTarget(static_cast<OGLTexture*>(surf));
 	float r = (col&0xff)/255.0;
 	float g = ((col>>8)&0xff)/255.0;
 	float b = ((col>>16)&0xff)/255.0;
 	glClearColor(r, g, b, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT);
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	Renderer::PopRenderTarget();
 
     return true;
 }
@@ -1529,108 +1536,9 @@ bool OGLClient::ScaleBlt (SURFHANDLE tgt, int tgtx, int tgty, int tgtw, int tgth
  */
 bool OGLClient::Blt (SURFHANDLE tgt, int tgtx, int tgty, SURFHANDLE src, int flag) const
 {
-	Renderer::PushBool(Renderer::BLEND, false);
-	Renderer::PushBool(Renderer::CULL_FACE, false);
-	OGLTexture *m_tex = (OGLTexture *)tgt;
-	Renderer::PushRenderTarget(m_tex);
-	glm::mat4 ortho_proj = glm::ortho(0.0f, (float)m_tex->m_Width, 0.0f, (float)m_tex->m_Height);
-
-	static GLuint m_Buffer, m_VAO;
-	static bool init = false;
-	if(!init) {
-		init=true;
-		glGenVertexArrays(1, &m_VAO);
-		Renderer::CheckError("glGenVertexArrays");
-		glBindVertexArray(m_VAO);
-		Renderer::CheckError("glBindVertexArray");
-
-		glGenBuffers(1, &m_Buffer);
-		Renderer::CheckError("glGenBuffers");
-		glBindBuffer(GL_ARRAY_BUFFER, m_Buffer);
-		Renderer::CheckError("glBindBuffer");
-		glBufferData(GL_ARRAY_BUFFER, 6 * 4 * sizeof(GLfloat), NULL, GL_DYNAMIC_DRAW);
-		Renderer::CheckError("glBufferSubData");
-		glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 0, NULL);
-		Renderer::CheckError("glVertexAttribPointer");
-		glEnableVertexAttribArray(0);
-		Renderer::CheckError("glEnableVertexAttribArray");
-
-		glBindVertexArray(0);
-	}
-
-	float tgt_w = m_tex->m_Width;
-	float tgt_h = m_tex->m_Height;
-
-	float src_w = ((OGLTexture *)src)->m_Width;
-	float src_h = ((OGLTexture *)src)->m_Height;
-
-	float s0 = 0;
-	float s1 = 1;
-	float t0 = 0;
-	float t1 = 1;
-
-	const GLfloat vertex[] = {
-		s1, t1, (float)tgtx+src_w, (float)tgty+src_h,
-		s0, t0, (float)tgtx, (float)tgty,
-		s1, t0, (float)tgtx+src_w, (float)tgty,
-
-		s0, t1, (float)tgtx, (float)tgty+src_h,
-		s0, t0, (float)tgtx, (float)tgty,
-		s1, t1, (float)tgtx+src_w, (float)tgty+src_h,
-	};
-	glBindBuffer(GL_ARRAY_BUFFER, m_Buffer);
-	glBindVertexArray(m_VAO);
-	Renderer::CheckError("OGLPad::Text glBindBuffer");
-	glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertex), vertex);
-	Renderer::CheckError("OGLPad::Text glBufferSubData");
-	glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 0, NULL);
-	Renderer::CheckError("OGLPad::Text glVertexAttribPointer");
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-	//	CheckError("OGLPad::Text glBindBuffer0");
-	glEnableVertexAttribArray(0);
-	//CheckError("OGLPad::Text glEnableVertexAttribArray0");
-	glBindVertexArray(0);
-
-	Renderer::Bind(mOverlayShader);
-	mOverlayShader->SetMat4("projection", ortho_proj);
-
-	OGLTexture *key_tex = (OGLTexture *)src;
-	bool hasck = key_tex->m_colorkey != SURF_NO_CK && key_tex->m_colorkey != 0;
-	if(hasck) {
-		uint32_t ck = key_tex->m_colorkey;
-		glm::vec4 ckv;
-		ckv.r = ((ck>>16)&0xff)/255.0;
-		ckv.g = ((ck>>8)&0xff)/255.0;
-		ckv.b = ((ck>>0)&0xff)/255.0;
-		ckv.a = ((ck>>24)&0xff)/255.0;
-		mOverlayShader->SetVec4("color_key", ckv);
-		mOverlayShader->SetFloat("color_keyed", 1.0);
-	} else {
-		mOverlayShader->SetFloat("color_keyed", 0.0);
-	}
-
-	glBindTexture(GL_TEXTURE_2D, ((OGLTexture *)src)->m_TexId);
-	Renderer::CheckError("glBindTexture");
-	if(hasck) {
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	} else {
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	}
-
-	glBindVertexArray(m_VAO);
-	Renderer::CheckError("glBindVertexArray");
-
-	glDrawArrays(GL_TRIANGLES, 0, 6);
-	Renderer::CheckError("glDrawArrays");
-
-	glBindVertexArray(0);
-	glBindTexture(GL_TEXTURE_2D, 0);
-	Renderer::Unbind(mOverlayShader);
-
-	Renderer::PopRenderTarget();
-	Renderer::PopBool(2);
-	return true;
+    if(!src)return false;
+    const auto* texture=static_cast<const OGLTexture*>(src);
+    return Blt(tgt,tgtx,tgty,src,0,0,texture->m_Width,texture->m_Height,flag);
 }
 
 /**
@@ -1659,9 +1567,29 @@ bool OGLClient::Blt (SURFHANDLE tgt, int tgtx, int tgty, SURFHANDLE src, int fla
 bool OGLClient::Blt (SURFHANDLE tgt, int tgtx, int tgty, SURFHANDLE src, int srcx, int srcy, int w, int h, int flag) const
 {
 	InstrumentEvidence::SelfBlt(tgt,tgtx,tgty,src,srcx,srcy,w,h,flag);
+	if(!src || w<=0 || h<=0)return false;
+	SurfaceTextureUnit textureUnit;
+	if(tgt==src){
+        auto* original=static_cast<OGLTexture*>(src);
+        if(srcx<0 || srcy<0 || srcx>original->m_Width-w || srcy>original->m_Height-h)return false;
+        // Snapshot before writing. Sampling the same image currently attached
+        // for drawing is not a valid overlapping SDK surface copy.
+        Renderer::PushRenderTarget(original);
+        GLuint id=0;glGenTextures(1,&id);glBindTexture(GL_TEXTURE_2D,id);
+        glCopyTexImage2D(GL_TEXTURE_2D,0,GL_RGBA8,srcx,srcy,w,h,0);
+        glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAX_LEVEL,0);
+        glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_WRAP_S,GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_WRAP_T,GL_CLAMP_TO_EDGE);
+        Renderer::PopRenderTarget();
+        auto copy=mTextureManager->CreateTextureFromTexId(id,w,h);copy->m_colorkey=original->m_colorkey;
+        const bool result=Blt(tgt,tgtx,tgty,copy,0,0,w,h,flag);copy->Release();return result;
+    }
 	Renderer::PushBool(Renderer::BLEND, false);
 	Renderer::PushBool(Renderer::CULL_FACE, false);
 	Renderer::PushBool(Renderer::DEPTH_TEST, false);
+	Renderer::PushBool(Renderer::STENCIL_TEST, false);
 
 	if(tgt) {
 		OGLTexture *m_tex = (OGLTexture *)tgt;
@@ -1865,7 +1793,7 @@ bool OGLClient::Blt (SURFHANDLE tgt, int tgtx, int tgty, SURFHANDLE src, int src
 
 	}
 
-	Renderer::PopBool(3);
+	Renderer::PopBool(4);
 
 	return true;
 }

@@ -34,6 +34,7 @@ struct OGLTexture
 	bool Release();
 	void AddRef() {m_RefCnt++;}
 	void InitSize();
+	void MakeRenderable();
 	uint32_t m_colorkey;
 	std::string m_file;
 };

@@ -1088,3 +1088,19 @@ void OGLTexture::InitSize()
     glBindTexture(GL_TEXTURE_2D, 0);
 	Renderer::CheckError("!InitSize");
 }
+
+void OGLTexture::MakeRenderable()
+{
+    GLint previous=0,compressed=0;glGetIntegerv(GL_TEXTURE_BINDING_2D,&previous);
+    glBindTexture(GL_TEXTURE_2D,m_TexId);glGetTexLevelParameteriv(GL_TEXTURE_2D,0,GL_TEXTURE_COMPRESSED,&compressed);
+    if(compressed){
+        // Stock panel/vessel textures can become drawing targets after load.
+        // Preserve their actual decoded pixels and handle when making them RW.
+        std::vector<unsigned char> pixels(size_t(m_Width)*m_Height*4);
+        glGetTexImage(GL_TEXTURE_2D,0,GL_RGBA,GL_UNSIGNED_BYTE,pixels.data());
+        glTexImage2D(GL_TEXTURE_2D,0,GL_RGBA8,m_Width,m_Height,0,GL_RGBA,GL_UNSIGNED_BYTE,pixels.data());
+        glGenerateMipmap(GL_TEXTURE_2D);
+        Renderer::CheckError("Decompress stock drawing target");
+    }
+    glBindTexture(GL_TEXTURE_2D,previous);
+}

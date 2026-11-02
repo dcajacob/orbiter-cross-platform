@@ -98,6 +98,11 @@ void ArchiveRead(const char *path,int layer,unsigned bytes) { if(enabled && byte
 void Rendered() { if(enabled)++frames;InstrumentEvidence::Rendered(); }
 void Frame() {
     InstrumentEvidence::Frame();
+    if(InstrumentEvidence::CaptureFrame())for(int i=0;i<2;++i){
+        auto* surface=static_cast<OGLTexture*>(g_client->GetMFDSurface(i));
+        if(!surface)throw std::runtime_error("Required original MFD texture missing");
+        InstrumentEvidence::Mfd(i,surface->m_TexId,surface->m_Width,surface->m_Height);
+    }
     if(!enabled || captured || !frames || oapiGetSimTime()<12.5)return;
     if(std::abs(oapiGetSimTime()-12.5)>1e-12)throw std::runtime_error("missing finalized tick-50 render for graphics evidence");
     captured=true;

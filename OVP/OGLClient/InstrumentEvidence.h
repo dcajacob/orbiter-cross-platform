@@ -8,6 +8,7 @@
 #include <iomanip>
 #include <locale>
 #include <map>
+#include <algorithm>
 #include <stdexcept>
 #include <string>
 #include <vector>
@@ -55,6 +56,19 @@ inline void Text(SURFHANDLE surface,int width,int height,int x,int y,int fontHei
     text<<'\n';
 }
 inline void Rendered() {if(enabled)++frame;}
+inline bool CaptureFrame(){return enabled && (frame==20 || frame==50);}
+inline void Mfd(unsigned index,GLuint texture,int width,int height){
+    if(!CaptureFrame())return;
+    std::vector<unsigned char> pixels(size_t(width)*height*4);GLint previous=0;glGetIntegerv(GL_TEXTURE_BINDING_2D,&previous);
+    glBindTexture(GL_TEXTURE_2D,texture);glGetTexImage(GL_TEXTURE_2D,0,GL_RGBA,GL_UNSIGNED_BYTE,pixels.data());glBindTexture(GL_TEXTURE_2D,previous);
+    if(glGetError()!=GL_NO_ERROR)throw std::runtime_error("Actual MFD texture readback failed");
+    unsigned colored=0,nonwhite=0;
+    for(size_t i=0;i<pixels.size();i+=4){const int r=pixels[i],g=pixels[i+1],b=pixels[i+2];if(r<240 || g<240 || b<240)++nonwhite;if(std::max(r,std::max(g,b))-std::min(r,std::min(g,b))>25)++colored;}
+    const auto base="mfd-"+std::to_string(index)+"-"+std::to_string(frame);
+    std::ofstream image(directory/(base+".rgba"),std::ios::binary);image.exceptions(std::ios::badbit|std::ios::failbit);image.write(reinterpret_cast<const char*>(pixels.data()),pixels.size());
+    std::ofstream report(directory/(base+".json"));report.exceptions(std::ios::badbit|std::ios::failbit);
+    report<<"{\"width\":"<<width<<",\"height\":"<<height<<",\"colored_pixels\":"<<colored<<",\"nonwhite_pixels\":"<<nonwhite<<"}\n";
+}
 inline void Frame() {
     if(!enabled || (frame!=20 && frame!=50))return;
     GLint viewport[4]{};glGetIntegerv(GL_VIEWPORT,viewport);

@@ -4,7 +4,8 @@ import argparse,hashlib,json,math,os,sys,zipfile
 from pathlib import Path
 ROOT=Path(__file__).resolve().parents[3]
 sys.path[:0]=[str(ROOT/'Tests/Production'),str(ROOT/'Tests/Production/Client')]
-from behavior_suite import stage,scenario,rows,git
+from behavior_suite import scenario,rows,git
+from stage import run as stage
 from mesa_runtime import require,digest
 from run_client import mesa_files,png
 from compare_client import image_ssim
@@ -30,12 +31,31 @@ def inspect(directory,case,settings):
     life=json.loads((directory/'graphics-lifecycle.json').read_text());require(life['context_deleted'] and life['successful_presents']==60,'Actual client lifecycle incomplete')
     renderer=json.loads((directory/'renderer-info.json').read_text());require('llvmpipe' in renderer['renderer'].lower(),'Original Windows software OpenGL was not loaded')
     errors=directory/'graphics-errors.txt';require(not errors.exists() or not errors.read_text().strip(),'Original client reported OpenGL errors')
+    bindings=json.loads((directory/'mesa-bindings.json').read_text());modules=[];names=set()
+    expected={name.casefold():entry for name,entry in bindings['runtime']['files'].items()}
+    effective={name.casefold():entry for name,entry in bindings['bindings'].items()};system=Path(os.environ['SystemRoot']).resolve()
+    for line in (directory/'renderer-modules.txt').read_text().splitlines():
+        path=Path(line).resolve();names.add(path.name.casefold())
+        if path.suffix.lower()!='.dll':continue
+        require(directory.resolve() in path.parents or system in path.parents,'Unrecorded external DLL: '+str(path))
+        record=dict(path=str(path),sha256=digest(path));modules.append(record);entry=expected.get(path.name.casefold())
+        if entry:require(path.parent==directory.resolve() and record['sha256']==effective.get(path.name.casefold(),{}).get('effective_sha256',entry['sha256']),'Actual loaded Mesa DLL differs: '+path.name)
+    vessel_module='deltaglider.dll' if case['target']=='DG' else 'shuttlepb.dll'
+    require({'opengl32.dll','libgallium_wgl.dll','oglclient.dll',vessel_module}<=names,'Required actual engine/client/vessel/driver DLL missing')
+    assets={}
+    for line in (directory/'loaded-assets.txt').read_text().splitlines():
+        path=Path(line);path=path if path.is_absolute() else directory/path
+        require(path.is_file(),'Recorded actual stock asset missing');assets[line]=digest(path)
     hashes={}
     for frame in (20,50):
         image=directory/f'instrument-{frame}.rgba';pixels=image.read_bytes();require(len(pixels)==1280*720*4,'Missing original cockpit capture')
         png(directory/f'instrument-{frame}.png',pixels,1280,720);hashes[str(frame)]=digest(image)
+        for index in (0,1):
+            stem=f'mfd-{index}-{frame}';mfd=json.loads((directory/(stem+'.json')).read_text())
+            require(mfd['colored_pixels']>20 and mfd['nonwhite_pixels']>mfd['width']*mfd['height']//4,'Actual MFD display texture is blank')
+            png(directory/(stem+'.png'),(directory/(stem+'.rgba')).read_bytes(),mfd['width'],mfd['height'])
     geometry=rows(directory/'instrument-geometry.csv');blits=rows(directory/'instrument-self-blits.csv')
-    return dict(status='passed',samples=len(state),text_calls=len(text),overlay_vertices=len(geometry),self_blits=len(blits),images=hashes,renderer=renderer,lifecycle=life)
+    return dict(status='passed',samples=len(state),text_calls=len(text),overlay_vertices=len(geometry),self_blits=len(blits),images=hashes,renderer=renderer,lifecycle=life,loaded_modules=modules,asset_sha256=assets)
 
 def main():
     p=argparse.ArgumentParser(description=__doc__)
@@ -60,7 +80,7 @@ def main():
                     (directory/'instrument-evidence.enabled').write_text('Original instruction text and frames 20/50; no rendering changes\n')
                     require((directory/'Modules/Plugin/ProductionCockpitDriver.dll').is_file(),'Same-SDK observation driver missing')
                     mesa_files(a.mesa.resolve(),directory)
-                stage(a.orbiter.resolve(),a.data.resolve(),a.planets.resolve(),directory,{**case,'frames':60,'fixed_step':settings['fixed_step'],'epoch':settings['epoch']},None,before_launch=configure)
+                stage(a.orbiter.resolve(),a.data.resolve(),a.planets.resolve(),directory,{**case,'frames':60,'fixed_step':settings['fixed_step'],'epoch':settings['epoch']},configure)
                 observed.append(inspect(directory,case,settings));dirs.append(directory)
             for name in ('cockpit-state.csv','instrument-text.csv','instrument-geometry.csv','instrument-self-blits.csv'):
                 require((dirs[0]/name).read_bytes()==(dirs[1]/name).read_bytes(),'Original deterministic repeat differs: '+name)

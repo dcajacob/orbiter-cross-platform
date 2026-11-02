@@ -47,6 +47,17 @@ The driver sets instrument modes at the first pre-step: original Orbiter calls
 plugin `clbkSimulationStart` before `Pane::InitState`, so that callback is too
 early to issue MFD commands. Application lifecycle ordering is unchanged.
 
+Subsequent diagnostic runs completed the generic instrument cases but exposed
+blank display copies and compressed stock textures being used as drawing
+targets by DG. These are not accepted golden images. Surface copies now disable
+depth/stencil testing; overlapping self-copies use a source snapshot. A stock
+DDS texture is decoded into the same renderer-owned texture when it first
+becomes writable. The focused native probe checks the real compressed ShuttlePB
+texture: 300 glyph pixels change and the surrounding pixels remain intact.
+Captured MFD textures must contain actual colored drawing and a nonwhite
+background, in addition to recording drawing calls. The cockpit harness stages
+the original runtime independently of the earlier flight trace validator.
+
 Before extraction, require repeat-identical numerical and displayed-text traces,
 finite finalized state, actual expected cockpit/MFD modes, numerical display
 calls, normal real window/context teardown, no GL errors and SSIM at least 0.98.

@@ -8,6 +8,7 @@
 #include <stdio.h>
 #include <unordered_map>
 #include <memory>
+#include <stdexcept>
 #include <glm/gtc/type_ptr.hpp>
 #include "Light.h"
 
@@ -230,6 +231,7 @@ void PushRenderTarget(OGLTexture *tex) {
     lastFBParams.push_back(save);
 
     if(!tex->m_FBO) {
+        tex->MakeRenderable();
         glGenFramebuffers(1, &tex->m_FBO);
         CheckError("glGenFramebuffers(1, &m_FBO)");
         glBindFramebuffer(GL_FRAMEBUFFER, tex->m_FBO);
@@ -251,30 +253,17 @@ void PushRenderTarget(OGLTexture *tex) {
         glDrawBuffers(1, DrawBuffers); // "1" is the size of DrawBuffers
         CheckError("SetAsTarget");
 
-        switch(glCheckFramebufferStatus(GL_FRAMEBUFFER))
-        {
-            case GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT:
-                printf("SetAsTarget: glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT\n");
-                abort();
-                exit(-1);
-            case GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER:
-                printf("SetAsTarget: glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER\n");
-                abort();
-                exit(-1);
-            case GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER:
-                printf("SetAsTarget: glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER\n");
-                abort();
-                exit(-1);
-            case GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT:
-                printf("SetAsTarget: glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT\n");
-                abort();
-                exit(-1);
-            case GL_FRAMEBUFFER_UNSUPPORTED:
-                printf("SetAsTarget: glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_UNSUPPORTED\n");
-                abort();
-                exit(-1);
-            case GL_FRAMEBUFFER_COMPLETE:
-                break;
+        glGenRenderbuffers(1,&tex->m_RBO);
+        glBindRenderbuffer(GL_RENDERBUFFER,tex->m_RBO);
+        glRenderbufferStorage(GL_RENDERBUFFER,GL_DEPTH24_STENCIL8,tex->m_Width,tex->m_Height);
+        glBindRenderbuffer(GL_RENDERBUFFER,0);
+        glFramebufferRenderbuffer(GL_FRAMEBUFFER,GL_DEPTH_STENCIL_ATTACHMENT,GL_RENDERBUFFER,tex->m_RBO);
+
+        const auto status=glCheckFramebufferStatus(GL_FRAMEBUFFER);
+        if(status!=GL_FRAMEBUFFER_COMPLETE){
+            fprintf(stderr,"OpenGL drawing target incomplete: %s %dx%d status=0x%x\n",tex->m_file.c_str(),tex->m_Width,tex->m_Height,status);
+            glBindFramebuffer(GL_FRAMEBUFFER,save.fb);glDeleteFramebuffers(1,&tex->m_FBO);glDeleteRenderbuffers(1,&tex->m_RBO);
+            tex->m_FBO=tex->m_RBO=0;lastFBParams.pop_back();throw std::runtime_error("OpenGL drawing target is unavailable");
         }
 
     } else {
