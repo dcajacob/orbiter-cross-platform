@@ -22,7 +22,8 @@ public:
             if(!std::getline(row,tick,',') || !std::getline(row,phase,',') || !std::getline(row,action,',') || !std::getline(row,value) || value.find(',')!=std::string::npos)
                 throw std::runtime_error("Invalid flight replay row");
             std::size_t end=0;auto index=std::stoul(tick,&end);
-            if(end!=tick.size() || index>10000000 || (phase!="before" && phase!="pre" && phase!="after"))throw std::runtime_error("Invalid flight replay tick/phase");
+            if(end!=tick.size() || index>10000000 || (phase!="start" && phase!="before" && phase!="pre" && phase!="after") ||
+                (phase=="start" && index!=0))throw std::runtime_error("Invalid flight replay tick/phase");
             commands[{unsigned(index),phase}].push_back({action,value});
         }
         if(!file.eof())throw std::runtime_error("Flight replay read failed");

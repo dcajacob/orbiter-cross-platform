@@ -102,6 +102,15 @@ int FlightControls::DefaultBuffered(Vessel& vessel,UInt32 key,bool down,char* ks
 	if (keymap.IsLogicalKey (key, kstate, OAPI_LKEY_RCSMode))        vessel.ToggleAttMode ();
 	if (keymap.IsLogicalKey (key, kstate, OAPI_LKEY_Undock))         vessel.UndockInteractive ();
 
+    // Aerodynamic control surfaces: original ALT-Divide, plus the laptop ALT-F alias.
+    if(!KEYMOD_CONTROL(kstate) && !KEYMOD_SHIFT(kstate) && KEYMOD_ALT(kstate)) {
+        if(key==OAPI_KEY_F)key=OAPI_KEY_DIVIDE;
+		switch (key) {
+		case OAPI_KEY_DIVIDE:   // connect/disconnect user input to aerodynamic control surfaces
+			vessel.ToggleADCtrlMode ();
+			return 1;
+		}
+    }
     return 0;
 }
 double FlightControls::Manual(unsigned group,unsigned device) const {

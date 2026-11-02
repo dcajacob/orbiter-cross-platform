@@ -32,6 +32,7 @@
 #include "State.h"
 #include "Star.h"
 #include "ConfigFile.h"
+#include "MathObservation.h"
 #include <algorithm>
 #include <chrono>
 #include <cstdlib>
@@ -61,13 +62,16 @@ double RcsLevel(const VESSEL& vessel) {
         level=std::max(level,vessel.GetThrusterGroupLevel(THGROUP_TYPE(group)));
     return level;
 }
+int ReadFlightStatus(const VESSEL& vessel) {
+    VESSELSTATUS2 status{};status.version=2;vessel.GetStatusEx(&status);return status.status;
+}
 struct Runtime final:BodyServices,RigidBodyServices,SurfaceServices,NavigationServices,VesselServices,
     CameraServices,WorldFactory,SessionServices {
     Resources& resources;const ResourceResolver& config;Config settings;TimeData time;CFG_PHYSICSPRM physics{};
     PlanetarySystem* system=nullptr;NativeRenderContext render;bool updating=false,force=true,running=false,playback=false,active=true;
     MeshManager meshes;NativeCelestialServices celestial;std::unique_ptr<NativeElevationServices> terrain;
     std::unique_ptr<WorldVesselServices> vessels;WorldOwner world;std::unique_ptr<NativeModule> graphicsModule;
-    std::ofstream lifecycle,trace,flightTrace,inputTrace,inputEvents,thrustTrace;
+    std::ofstream lifecycle,trace,flightTrace,inputTrace,inputEvents,thrustTrace,animationTrace,controlTrace,mathTrace;
     unsigned pendingCockpitRedraw=0,inputTick=0,completedTicks=0;
     FlightControls controls;FlightReplay replay;FlightInput input;
     std::unique_ptr<State> scenarioState;
@@ -76,13 +80,36 @@ struct Runtime final:BodyServices,RigidBodyServices,SurfaceServices,NavigationSe
     std::string testCase;
     void Commands(const char* phase) {
         for(const auto& command:replay.Take(inputTick,phase)) {
-            const double value=FlightNumber(command.value);auto* v=render.focus->GetModuleInterface();
+            auto* v=render.focus->GetModuleInterface();
+            if(command.action=="airborne") {
+                if(std::string(phase)!="start" || time.FrameCount()!=0 || ReadFlightStatus(*v)!=1)
+                    throw std::runtime_error("Airborne initialization requires an initially landed vessel at session start");
+                std::istringstream fields(command.value);fields.imbue(std::locale::classic());std::string heightText,forwardText,downText,extra;
+                if(!(fields>>heightText>>forwardText>>downText) || fields>>extra)throw std::runtime_error("Airborne initialization requires height, forward speed and downward speed");
+                const double height=FlightNumber(heightText),forward=FlightNumber(forwardText),down=FlightNumber(downText);
+                if(height<0)throw std::runtime_error("Airborne height offset must be nonnegative");
+                // The original SDK converts landed state to free flight. No force or integrator is replaced.
+                VESSELSTATUS2 state{};state.version=2;v->GetStatusEx(&state);
+                VECTOR3 p{},ep{};oapiGetGlobalPos(state.rbody,&ep);v->GetGlobalPos(p);state.rpos=p-ep;
+                const double radius=length(state.rpos);state.rpos*=1+height/radius;
+                MATRIX3 r{};v->GetRotationMatrix(r);v->GetGlobalOrientation(state.arot);v->GetAngularVel(state.vrot);
+                if(forward)state.rvel+=mul(r,_V(0,0,forward));
+                if(down)state.rvel-=state.rpos*(down/length(state.rpos));
+                state.status=0;state.flag=0;v->DefSetStateEx(&state);continue;
+            }
+            const double value=FlightNumber(command.value);
             if(command.action=="main" || command.action=="hover") {
                 if(value<0 || value>1)throw std::runtime_error("Invalid replay throttle");
                 v->SetThrusterGroupLevel(command.action=="main"?THGROUP_MAIN:THGROUP_HOVER,value);
             } else if(command.action=="attitude") {if(value!=1 && value!=2 && value!=0)throw std::runtime_error("Invalid RCS mode");v->SetAttitudeMode(int(value));}
             else if(command.action=="nav") {if(value<1 || value>7 || value!=int(value))throw std::runtime_error("Invalid autopilot mode");v->ActivateNavmode(int(value));}
+            else if(command.action=="navoff") {if(value<1 || value>7 || value!=int(value))throw std::runtime_error("Invalid autopilot mode");v->DeactivateNavmode(int(value));}
             else if(command.action=="navreset") {for(int mode=1;mode<=7;++mode)v->DeactivateNavmode(mode);}
+            else if(command.action=="aerodynamic") {if(value<0 || value>7 || value!=int(value))throw std::runtime_error("Invalid aerodynamic control mode");v->SetADCtrlMode(UInt32(value));}
+            else if(command.action=="elevator" || command.action=="aileron" || command.action=="rudder") {
+                if(value < -1 || value>1)throw std::runtime_error("Invalid control surface level");
+                v->SetControlSurfaceLevel(command.action=="elevator"?AIRCTRL_ELEVATOR:command.action=="aileron"?AIRCTRL_AILERON:AIRCTRL_RUDDER,value);
+            }
             else if(command.action=="warp") SetWarpFactor(value);
             else if(command.action=="pause") {if(value!=0 && value!=1)throw std::runtime_error("Invalid pause command");running=value==0;render.paused=!running;}
             else if(command.action=="undock") {if(value<0 || value>=v->DockCount() || std::floor(value)!=value)throw std::runtime_error("Invalid docking port");if(!v->Undock(int(value)))throw std::runtime_error("Replay undocking failed");}
@@ -140,7 +167,7 @@ struct Runtime final:BodyServices,RigidBodyServices,SurfaceServices,NavigationSe
         if(finished)return;
         if(render.graphics)render.graphics->CloseSession();world.Reset();meshes.Flush();
         if(render.graphics)render.graphics->Close();graphicsModule.reset();render.graphics=nullptr;
-        for(auto* file:{&lifecycle,&trace,&flightTrace,&inputTrace,&inputEvents,&thrustTrace})if(file->is_open())file->close();
+        for(auto* file:{&lifecycle,&trace,&flightTrace,&inputTrace,&inputEvents,&thrustTrace,&animationTrace,&controlTrace,&mathTrace})if(file->is_open())file->close();
         finished=true;
     }
     ~Runtime() {
@@ -178,6 +205,12 @@ struct Runtime final:BodyServices,RigidBodyServices,SurfaceServices,NavigationSe
             inputEvents.open(evidence/"input-events.csv");inputEvents.exceptions(std::ios::badbit|std::ios::failbit);inputEvents<<"tick,key,down,lshift,rshift,lctrl,rctrl,lalt,ralt\n";
             thrustTrace.open(evidence/"thrust-state.csv");thrustTrace.imbue(std::locale::classic());thrustTrace.exceptions(std::ios::badbit|std::ios::failbit);
             thrustTrace<<std::setprecision(17)<<"tick,input_tick,seconds,object,main,hover,rcs,exhaust,navmask\n";
+            animationTrace.open(evidence/"flight-animations.csv");animationTrace.imbue(std::locale::classic());animationTrace.exceptions(std::ios::badbit|std::ios::failbit);
+            animationTrace<<std::setprecision(17)<<"tick,object,index,state\n";
+            controlTrace.open(evidence/"flight-controls.csv");controlTrace.imbue(std::locale::classic());controlTrace.exceptions(std::ios::badbit|std::ios::failbit);
+            controlTrace<<std::setprecision(17)<<"tick,seconds,object,flight_status,aerodynamic_mode,rcs_mode,elevator,aileron,rudder\n";
+            mathTrace.open(evidence/"ground-math.csv");mathTrace.imbue(std::locale::classic());mathTrace.exceptions(std::ios::badbit|std::ios::failbit);
+            mathTrace<<std::setprecision(17);math_observation::Header(mathTrace);
         }
         graphicsModule=std::make_unique<NativeModule>(resources.modules.Resolve("Graphics/OGLClient.so"),ORBITER_NATIVE_GRAPHICS,&render);
         render.graphics=static_cast<NativeGraphics*>(graphicsModule->Instance());render.graphics->Open();
@@ -203,7 +236,7 @@ struct Runtime final:BodyServices,RigidBodyServices,SurfaceServices,NavigationSe
         SetFocus(focus);
         render.camera->ResizeViewport(1280,720);render.camera->InitState(scenario.string().c_str(),focus);
         if(!render.camera->IsExternal())unsupported("cockpits yet; select an external camera");
-        render.graphics->PostCreation();system->PostCreation();render.camera->Update();
+        render.graphics->PostCreation();system->PostCreation();Commands("start");render.camera->Update();
         if(system->nGrav()!=41 || system->nVessel()!=2 || !system->GetVessel("ISS",true) || !system->GetVessel("PB",true))
             throw std::runtime_error("This native scene requires the actual stock Sol, ISS and ShuttlePB graph");
         WriteTrace();
@@ -327,6 +360,7 @@ struct Runtime final:BodyServices,RigidBodyServices,SurfaceServices,NavigationSe
                 <<v->GetThrusterGroupLevel(THGROUP_HOVER)<<','<<RcsLevel(*v)<<','<<exhaust<<','<<mask<<'\n';
         }
         if(flightTrace.is_open()) {
+            const auto* earth=system->GetGravObj("Earth",true);
             const auto& ep=system->GetGravObj("Earth",true)->GPos();const auto& ev=system->GetGravObj("Earth",true)->GVel();
             for(auto* vessel:{system->GetVessel("ISS",true),system->GetVessel("PB",true)}) {
                 auto* v=vessel->GetModuleInterface();VECTOR3 p{},velocity{},omega{};MATRIX3 r{};
@@ -340,6 +374,17 @@ struct Runtime final:BodyServices,RigidBodyServices,SurfaceServices,NavigationSe
                 unsigned mask=0;for(int nav=1;nav<=7;++nav)if(v->GetNavmodeState(nav))mask|=1u<<nav;
                 auto dock=v->DockCount()?v->GetDockStatus(v->GetDockHandle(0)):nullptr;
                 flightTrace<<','<<int(v->GroundContact())<<','<<(dock?static_cast<Vessel*>(dock)->Name():"")<<','<<render.focus->Name()<<','<<mask<<",\n";
+                controlTrace<<completedTicks<<','<<time.SimT0<<','<<v->GetName()<<','<<ReadFlightStatus(*v)<<','<<v->GetADCtrlMode()<<','<<v->GetAttitudeMode()
+                    <<','<<v->GetControlSurfaceLevel(AIRCTRL_ELEVATOR)<<','<<v->GetControlSurfaceLevel(AIRCTRL_AILERON)<<','<<v->GetControlSurfaceLevel(AIRCTRL_RUDDER)<<'\n';
+                for(unsigned index=0;index<256;++index) {
+                    const double state=v->GetAnimation(index);if(state<0)break;
+                    if(!std::isfinite(state))throw std::runtime_error("Nonfinite production animation state");
+                    animationTrace<<completedTicks<<','<<v->GetName()<<','<<index<<','<<state<<'\n';
+                }
+                if(vessel==render.focus) {
+                    MATRIX3 er{},ob{};for(unsigned i=0;i<9;++i){er.data[i]=earth->GRot().data[i];ob.data[i]=earth->RotObliq().data[i];}
+                    math_observation::Row(mathTrace,completedTicks,time.SimT0,*v,MakeVECTOR3(earth->GPos()),er,ob,earth->Rotation());
+                }
             }
         }
         if(!trace.is_open())return;
@@ -364,6 +409,8 @@ struct Runtime final:BodyServices,RigidBodyServices,SurfaceServices,NavigationSe
             <<" | RCS "<<(v->GetAttitudeMode()==1?"ROT":v->GetAttitudeMode()==2?"LIN":"OFF")
             <<' '<<std::setprecision(0)<<RcsLevel(*v)*100<<"%"
             <<" | MAIN "<<std::setprecision(0)<<v->GetThrusterGroupLevel(THGROUP_MAIN)*100<<"% HOV "<<v->GetThrusterGroupLevel(THGROUP_HOVER)*100<<"%"
+            <<" | AERO "<<(v->GetADCtrlMode()?"ON":"OFF")<<" | "<<(ReadFlightStatus(*v)==1?"LANDED":v->GroundContact()?"CONTACT":"AIRBORNE")
+            <<" AGL "<<std::setprecision(1)<<v->GetAltitude(ALTMODE_GROUND)<<"m SPD "<<v->GetAirspeed()<<"m/s"
             <<" | NAV";
         bool navActive=false;const char* names[]={"","KILLROT","LEVEL","PRO","RETRO","NORMAL","ANTINORMAL","ALT"};
         for(int mode=1;mode<=7;++mode)if(v->GetNavmodeState(mode)){text<<' '<<names[mode];navActive=true;}
@@ -419,9 +466,9 @@ int main(int argc,char** argv) {
             application.render.joystickThrottleAxis=integer("--joystick-throttle-axis",-1);
             application.render.joystickTwistAxis=integer("--joystick-twist-axis",2);
             if(application.render.joystickThrottleAxis>15 || application.render.joystickTwistAxis>15)throw std::runtime_error("Invalid joystick axis");
+            if(arguments.count("--replay"))application.replay.Load(absolute("--replay"));
             application.savePath=save;application.Initialize(absolute("--config"),scenario,output,capture);
             if(arguments.count("--keymap") && (!std::filesystem::is_regular_file(absolute("--keymap")) || !application.controls.keymap.Read(absolute("--keymap").string().c_str())))throw std::runtime_error("Cannot load explicit flight keymap");
-            if(arguments.count("--replay"))application.replay.Load(absolute("--replay"));
             application.time.SetFixedStep(fixed);application.running=startRunning;application.render.paused=!application.running;
             std::cout<<"Production ShuttlePB flight. Space/Ctrl-P: pause. T/R: warp. Ctrl-S: save. F5: reload. F6: step. Escape: close.\n";
             FlightClock clock(fixed);auto previous=std::chrono::steady_clock::now();

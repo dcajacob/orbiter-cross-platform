@@ -4,12 +4,13 @@ orbiter_root="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/../../.." && pwd)"
 orbiter_preview="$(cd -P -- "$orbiter_root/out/native-flight-preview/current" && pwd)"
 orbiter_scenario="$orbiter_root/Tests/Production/NativeScene/Sol-ISS-ShuttlePB.scn"
 orbiter_keymap="$orbiter_root/Tests/Production/Flight/keymap-laptop.cfg"
+orbiter_config="$orbiter_root/Tests/Production/NativeScene/Orbiter.cfg"
 orbiter_args=()
 while (($#)); do
     case "$1" in
-        --scenario|--keymap)
+        --scenario|--keymap|--config)
             if (($# < 2)); then echo "Missing value: $1" >&2; exit 1; fi
-            if [[ "$1" == --scenario ]]; then orbiter_scenario="$2"; else orbiter_keymap="$2"; fi
+            if [[ "$1" == --scenario ]]; then orbiter_scenario="$2"; elif [[ "$1" == --config ]]; then orbiter_config="$2"; else orbiter_keymap="$2"; fi
             shift 2 ;;
         *) orbiter_args+=("$1"); shift ;;
     esac
@@ -20,5 +21,5 @@ exec "$orbiter_preview/bin/orbiter-production" \
     --data "$orbiter_root/out/native-celestial-data" \
     --modules "$orbiter_preview/NativeModules" \
     --planets "$orbiter_root/out/archive-data" \
-    --config "$orbiter_root/Tests/Production/NativeScene/Orbiter.cfg" \
+    --config "$orbiter_config" \
     --scenario "$orbiter_scenario" --keymap "$orbiter_keymap" "${orbiter_args[@]}"

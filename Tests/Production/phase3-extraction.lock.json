@@ -432,7 +432,7 @@
     },
     "Src/Orbiter/Production/NativeApplication.cpp": {
       "original_sha256_lf": null,
-      "sha256_lf": "166aa8a3d5508578116f2c843e1d3d46f18793ee40bfe6efe5375219573304ed"
+      "sha256_lf": "50335c2da57c4c42f40a1a7a1667df2029c634e946f05af1dcde8fe266bb9e2b"
     },
     "Src/Orbiter/Production/NativeBuild.h.in": {
       "sha256_lf": "46385229425b50b4edfe7eb877c5c4278e718f50e276130f0354a6d51cb70511",
@@ -928,7 +928,7 @@
     },
     "Src/Orbiter/Production/FlightControls.cpp": {
       "original_sha256_lf": null,
-      "sha256_lf": "813b3d83fe45ad22fe1011cc2b9c053e36c3da527e2113cc503695b5749e5423"
+      "sha256_lf": "2dc8a57aa1c896620c33262ce256a408b770552fd1ff0bdc868692aa4800e799"
     },
     "Src/Orbiter/Production/FlightControls.h": {
       "original_sha256_lf": null,
@@ -944,7 +944,11 @@
     },
     "Src/Orbiter/Production/FlightReplay.h": {
       "original_sha256_lf": null,
-      "sha256_lf": "e7fb0dcf7869b540628e4435fe6a2ed5006bcb4b3359d6d4f9421df9f41ab3a2"
+      "sha256_lf": "cd8293a087b74a1257c3d8360dc872dd86536ebb7cbec9ffa6ffd44653aa8d88"
+    },
+    "Src/Orbiter/Production/MathObservation.h": {
+      "original_sha256_lf": null,
+      "sha256_lf": "83ebf9342395b3f7601f442b17b20ec6fb6845a63b9da5575d24d5bcdcfe3198"
     }
   }
 }
