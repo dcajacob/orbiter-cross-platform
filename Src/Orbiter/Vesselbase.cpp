@@ -1,6 +1,7 @@
 // Copyright (c) Martin Schweiger
 // Licensed under the MIT License
 
+#include "Production/Random.h"
 #include "Production/RigidBodyServices.h"
 #include "Production/CelestialServices.h"
 #include "Planet.h"
@@ -202,7 +203,7 @@ void VesselBase::SetDefaultState ()
 	bDynamicGroundContact = true;
 	bSurfaceContact = false;
 	LandingTest.testing = false;
-	proxyT    = -(double)rand()*100.0/(double)RAND_MAX - 1.0;
+	proxyT    = -(double)orbiter::production::RandomInteger()*100.0/(double)orbiter::production::RandomMaximum - 1.0;
 	// distribute update times
 
 	windp.pert_t = 0;

@@ -9,6 +9,8 @@ PRIOR='db1b9d43'
 def old(name):return subprocess.check_output(['git','-C',str(ROOT),'show',PRIOR+':'+name]).replace(b'\r\n',b'\n').decode('cp1252')
 def now(name):return (ROOT/name).read_bytes().replace(b'\r\n',b'\n').decode('cp1252')
 def canonical(s):
+    from random_source import canonical as random_bindings
+    s=random_bindings(s)
     s=re.sub(r'/\*.*?\*/|//[^\n]*','',s,flags=re.S)
     s=re.sub(r'if \(GetMeshServices\(\).allocation\) GetMeshServices\(\).allocation\(GetMeshServices\(\).context,__FILE__,__LINE__\);','',s)
     s=s.replace('GetRigidBodyServices().TraceAllocation(__FILE__,__LINE__);','').replace('TRACENEW','').replace('TraceSurfaceAllocation(__FILE__,__LINE__);','')

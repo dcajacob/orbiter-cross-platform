@@ -1,99 +1,115 @@
-# Phase 5 ground-flight validation (in progress)
+# Phase 5 ground-flight validation
 
-This delivery uses the production `PlanetarySystem`, Earth/SPICE/atmosphere,
-terrain/contact code and source-built stock ShuttlePB. The accepted orbital
-preview remains separate. Phase 5 is not complete while ground-flight parity
-fails, and this is not the stock-playable release.
+The native flight host uses the production `PlanetarySystem`, Earth/SPICE and
+atmosphere, terrain/contact code and source-built stock ShuttlePB. Local Debug
+now passes all seven frozen ground cases and the additional controlled upright
+landing. Hosted qualification of this numerical fix is still required. Phase 5
+and the stock-playable release are not declared complete by these local results.
 
 ## Frozen original Windows evidence
 
 [Run 41368023101](https://github.com/dcajacob/orbiter-cross-platform/actions/runs/41368023101)
 executes the original Windows application and SDK at
-`391919027ac3e4a4d42f145373c788fc859c32cd`, using controls/observations at
-`1c930be8`. All seven cases repeat identically in both MSVC configurations and
-pass the declared cross-configuration budgets. The references and their complete
-provenance are preserved in `Tests/Production/GroundReference`.
+`391919027ac3e4a4d42f145373c788fc859c32cd`, using controls at `1c930be8`.
+All seven cases repeat identically in both MSVC configurations and pass their
+predeclared cross-configuration budgets. Original bytes and provenance remain
+in `Tests/Production/GroundReference`.
 
-The cases cover a resting landed vessel, atmospheric flight, actual elevator and
-aileron mesh animations, unpowered contact, a complete hover takeoff/landing,
-and landed save/reload. The landing must reach the original SDK's landed state
-and save `STATUS Landed Earth`; contact alone does not pass. Each physics tick
-is 1/60 second. The capture workflow is manual-only and the verifier checks all
-frozen source, member and archive hashes before using the reference.
+The additional [controlled landing reference](https://github.com/dcajacob/orbiter-cross-platform/actions/runs/41374941546)
+passes original Windows Debug/Release repeats and comparison. Its inputs,
+physical criteria and unmodified traces are separately frozen in
+`Tests/Production/ControlledReference`. No older reference was replaced.
 
-## Native status
+All fixtures, control schedules, original drivers, reference archives and
+comparison budgets remain unchanged. Capture workflows are manual-only; the
+verifiers check their frozen source/member/archive hashes before comparison.
+The existing two-body and orbital references remain unchanged as well.
 
-The original `pb_takeoff_landing` schedule was subsequently found to end
-inverted: its body-up axis is approximately 149 degrees from radial upright in
-both applications. It is preserved as an uncontrolled-impact regression and
-still fails native attitude parity. Its real SDK landed status alone does not
-establish usable landing support.
+## Local integrated results
 
-Local Debug checks pass six legacy cases. The uncontrolled hop reaches the landed state
-with matching contact-event ticks and satisfies the position, velocity and fuel
-limits. Its maximum attitude difference is approximately 0.00674 rad against the
-agreed 0.001 rad budget; that case fails. All seven cases have completed locally
-at both rendering frequencies with byte-identical numerical histories. The
-original production force formulas and all accepted thresholds remain unchanged.
-Hosted Ubuntu 24.04 Debug and Release reproduce the same failure at tick 1821 in
-[run 41371271692](https://github.com/dcajacob/orbiter-cross-platform/actions/runs/41371271692).
-Their existing scene, orbital-flight and keyboard checks pass. The Debug landing
-and math histories are byte-identical to the laptop's histories. The expanded
-keyboard checks also pass both hosted configurations at `6b9923ed` in
-[run 41372043206](https://github.com/dcajacob/orbiter-cross-platform/actions/runs/41372043206).
+The automatic FMA3 build passes every ground case at rendering intervals of 4
+and 17 ticks. Numerical histories and serialized checkpoints are byte-identical
+between rendering frequencies. Original world/finalization/time ordering and
+actual control-surface animations agree with Windows.
 
-All thirty portable tests pass locally, as do the six existing orbital-flight
-comparisons, twenty complete sessions and the existing scene/image comparison
-(SSIM 0.9881491504). The owned-window keyboard regression passes all 24 RCS
-hold/release combinations, focus loss, Alt-F aerodynamic mode selection, and
-actual elevator/aileron return to neutral. These are local results; they do not
-establish hosted ground-flight parity. CI runs the seven ground cases as a required step after
-the existing scene, orbital flight and keyboard regressions, preserving failed
-reports and traces. The ground verifier runs every case at two rendering
-frequencies and continues collecting failures instead of concealing later cases.
+| Case | Result against original Windows |
+| --- | --- |
+| Resting landed vessel | Zero measured state error |
+| Atmospheric propulsion | Zero measured state error |
+| Elevator/aileron controls | Zero measured state error; actual mesh animations agree |
+| Unpowered contact | Pass; maximum velocity difference 4.17e-11 m/s |
+| Preserved uncontrolled takeoff/impact | Zero measured state error; all six contact ticks agree |
+| Landed save/reload | Zero measured comparison error; original serialization precision checks pass |
+| Controlled upright takeoff/landing | Pass; liftoff/touchdown ticks 60 and 2348 agree |
+
+The old `pb_takeoff_landing` schedule finishes inverted, approximately 149 degrees
+from radial upright in both applications. It is retained as an impact regression;
+its landed status does not qualify safe landing support.
+
+The additional controlled flight uses Orbiter's original horizon and hover-altitude
+programs: target 12 m above terrain, target zero at 20 seconds, then disable both
+programs and hover thrust at 80 seconds. It completes 6,000 steps of 1/60 second,
+reaches 10.6748 m, touches down at 0.6812 m/s and stays within four degrees of
+upright. The original SDK reaches its actual landed state and saves
+`STATUS Landed Earth`.
+
+| Controlled-flight quantity | Maximum FMA3 difference | Existing budget |
+| --- | ---: | ---: |
+| Position | 7.46e-9 m | 1 m |
+| Velocity | 1.88e-7 m/s | 0.1 m/s |
+| Rotation | 5.62e-9 rad | 0.001 rad |
+| Propellant | 1.14e-11 kg | Approximately 7.4e-6 kg |
+
+Forced SSE2 also passes both previously failing flights, at both rendering
+frequencies. Its impact attitude difference is 2.45e-6 rad and controlled-flight
+propellant difference is 6.95e-11 kg, within the unchanged budgets. Local primitive
+tests independently qualify both CPU paths against Windows and MPFR.
+
+The six existing orbital flight comparisons and twenty complete sessions also
+pass. The scene repeats with SSIM 0.9881491504 and zero projected-landmark error.
+Actual keyboard checks pass all 24 RCS hold/release combinations, focus release,
+aerodynamic mode/surface release, pause/step and in-process save/reload. Portable
+CTest passes 31 Debug and 32 Release tests.
+
+The integrated evidence is under `out/native-ground-reference-fix`,
+`out/native-controlled-reference-fix`, `out/native-ground-sse2` and
+`out/native-controlled-sse2`. These are local laptop results, separate from
+hosted Ubuntu 24.04/MSVC qualification.
+
+## Why the earlier comparisons failed
+
+Earlier hosted checks reproduced two failures: uncontrolled-impact attitude and
+controlled-flight mass/propellant. The investigation located different primitive
+math rounding and a process-wide RNG whose algorithm and foreign-library draws
+changed the original update/accumulation schedule. The integrated fix supplies
+private numerical bindings while retaining all existing force calculations and
+ordering. [NumericalRuntime.md](NumericalRuntime.md) records the pinned MIT
+sources, original Windows observations, CPU dispatch, source-conservation proof
+and independent qualification. Production does not use the diagnostic
+process-wide interception experiments.
+
+Historical failing evidence remains available in
+[run 41371271692](https://github.com/dcajacob/orbiter-cross-platform/actions/runs/41371271692)
+and [run 41376965467](https://github.com/dcajacob/orbiter-cross-platform/actions/runs/41376965467).
+The read-only [intermediate force probe](https://github.com/dcajacob/orbiter-cross-platform/actions/runs/41380213246)
+and [math/scheduling observer](https://github.com/dcajacob/orbiter-cross-platform/actions/runs/41382988661)
+proved their original physical traces unchanged before accepting observations.
+Those diagnostic runs cannot replace flight acceptance.
+
+## Reproduce
+
+Build matching production engine/modules and the separate renderer as described
+in [NativeExternalView.md](NativeExternalView.md), then run with a real display
+or an owned Xvfb/llvmpipe display:
 
 ```sh
 python3 -B Tests/Production/GroundFlight/frozen.py
+python3 -B Tests/Production/ControlledLanding/frozen.py
 python3 -B Tests/Production/GroundFlight/verify.py \
   --executable out/native-vessels/orbiter-production \
   --assets out/native-scene-resources --data out/native-celestial-data \
   --modules out/native-vessels/NativeModules --planets out/archive-data \
   --configuration Debug --output out/native-ground-verification
-```
-
-## Controlled upright landing
-
-The additional [original Windows qualification](https://github.com/dcajacob/orbiter-cross-platform/actions/runs/41374941546)
-passes Debug/Release repeats and cross-configuration comparison. Its inputs,
-physical criteria and unmodified trace bytes are separately frozen in
-`Tests/Production/ControlledReference`; no older reference was replaced.
-
-The controller selects Orbiter's original horizon and hover-altitude programs:
-12 m above terrain, then a zero-height target at 20 seconds, with both programs
-and hover thrust disabled at 80 seconds. It advances 6,000 original 1/60-second
-steps. Qualification additionally requires upright posture throughout, an
-actual completed landing, and a touchdown speed no greater than 1.5 m/s.
-
-Local native Debug passes these physical checks and exactly matches the
-Windows liftoff/touchdown ticks (60 and 2348). Two rendering frequencies produce
-identical numerical traces and saved scenarios. The observed maxima against
-Windows are:
-
-| PB quantity | Maximum difference | Existing limit |
-| --- | ---: | ---: |
-| Position | 0.000032 m | 1 m |
-| Velocity | 0.0000693 m/s | 0.1 m/s |
-| Rotation | 0.00000488 rad | 0.001 rad |
-| Propellant | 0.0000145 kg | Approximately 0.0000074 kg |
-
-Propellant and total-mass parity therefore fail. The native flight reaches
-10.67 m above terrain, touches down at 0.6812 m/s and remains within four degrees
-of upright, but that does not override the failed numerical budget. Phase 5
-remains incomplete. All production force formulas and comparison limits remain
-unchanged; no experimental math dependency was adopted.
-
-```sh
-python3 -B Tests/Production/ControlledLanding/frozen.py
 python3 -B Tests/Production/ControlledLanding/verify.py \
   --executable out/native-vessels/orbiter-production \
   --assets out/native-scene-resources --data out/native-celestial-data \
@@ -101,108 +117,13 @@ python3 -B Tests/Production/ControlledLanding/verify.py \
   --configuration Debug --output out/native-controlled-landing
 ```
 
-CI runs this as a required check and still runs the older ground suite after a
-controlled-flight failure, preserving both sets of reports and traces. The
-capture workflow for the new frozen reference is now manual-only. Further
-work must resolve numerical fidelity without weakening either budget or
-changing the qualified flight inputs.
+The native CI matrix runs Debug/Release with automatic and forced SSE2 math,
+actual software-rendered scenes, unchanged image/state budgets, orbital flight,
+twenty sessions, actual keyboard events, controlled landing and all seven ground
+cases. Reports retain the actual numerical profile, modules, assets, images,
+traces and build settings. Windows application/SDK/client checks remain required.
 
-Hosted Ubuntu 24.04 Debug and Release reproduce the controlled-flight failure
-in [run 41376965467](https://github.com/dcajacob/orbiter-cross-platform/actions/runs/41376965467).
-Both pass the posture, touchdown-speed and render-frequency checks, with maximum
-propellant differences of 0.00001449393 kg (Debug) and 0.00001449388 kg (Release).
-Their preceding real-scene, orbital-flight, session and keyboard checks pass;
-the legacy impact case still fails separately. Locally the controlled-flight
-fuel difference is below 0.000000097 kg before return contact. It grows while
-the vessel is in ground contact with its original altitude/horizon programs active, then
-stops growing when those programs and hover thrust are disabled. This narrows
-the investigation to contact/control feedback without proving its root cause.
-
-The native replay applies the same public SDK operations as the frozen Windows
-control driver. `flight-animations.csv` records actual SDK animation states;
-`flight-controls.csv` records actual flight status, aerodynamic/RCS modes and
-control surface levels. The title displays landed/contact/airborne status,
-height above terrain and airspeed. Alt-numpad-divide retains Orbiter's aerodynamic
-control toggle, with Alt-F as the laptop alias.
-
-`ground-math.csv` is an engineering observation of the original SDK state,
-rotation matrices, floating-point control mode and elementary math. Its values
-never feed the simulation. The separate Windows observation module must leave
-the frozen physical traces byte-identical before its diagnostic evidence is
-accepted. No reference is regenerated by that workflow.
-
-## Math investigation
-
-[The original Windows observation run](https://github.com/dcajacob/orbiter-cross-platform/actions/runs/41371271627)
-passes its byte-identical physical-trace proof. The native observation also
-leaves its earlier physical trace byte-identical. Floating-point rounding mode,
-SSE control bits and Earth rotation arguments agree throughout the observations.
-Several sine/cosine evaluations for identical double inputs differ by one ULP
-(one representable double). For example, at tick 2:
-
-| Quantity | Value |
-| --- | --- |
-| Identical longitude input | -2.057446482251491 |
-| Windows cosine | -0.46766757523514924 |
-| Native cosine | -0.4676675752351493 |
-
-This confirms a primitive math difference; it does not yet prove the cause of
-the complete contact divergence. The first full-state differences are tiny
-rotation/angular-velocity differences at tick 2. All six contact-transition
-ticks still match, but the landing first exceeds the attitude budget at tick
-1821. No rounding adjustment, substitute contact model or tolerance change has
-been applied to obtain a pass.
-
-The follow-up workflow separates its observation-only run from a Windows runtime
-sensitivity experiment that disables CRT FMA3 math dispatch. Microsoft documents
-that [the two runtime paths can return different transcendental results](https://learn.microsoft.com/en-us/cpp/c-runtime-library/reference/get-fma3-enable-set-fma3-enable?view=msvc-170).
-This experiment uses the same frozen application and stock controls, records the
-selected path and compares with the existing reference. It cannot create an
-accepted reference or turn a failed native flight into a passing gate.
-
-The [runtime sensitivity run](https://github.com/dcajacob/orbiter-cross-platform/actions/runs/41372043279)
-confirms that Windows changed from FMA3 enabled to disabled. Its maximum attitude
-difference is 0.0000024416 rad, within the existing 0.001 rad limit. Disabling
-glibc's FMA dispatch locally still fails at tick 1821. An isolated experiment
-with the unmodified BSD-licensed AMD legacy scalar sine/cosine functions also
-fails there. Neither experiment has been adopted as a production dependency or
-accepted runtime profile.
-
-The [expanded read-only probe](https://github.com/dcajacob/orbiter-cross-platform/actions/runs/41372979870)
-confirms matching initial terrain elevation/normal, vessel inertia, touchdown
-geometry, spring stiffness and damping. The first differing angular acceleration
-at tick 2 is approximately 4.7e-14 rad/s². The first observed terrain difference
-comes at tick 4, after the rotation starts differing. These observations do not
-yet locate the first differing intermediate force calculation. Both Windows and
-native expanded probes leave their previous physical traces byte-identical.
-
-The touchdown columns record raw original SDK returns. The pre-existing
-`GetTouchdownPoint` implementation copies an internal record containing an extra
-compression field, so its returned friction fields cannot be interpreted as the
-actual internal friction coefficients. That getter and the physics code have
-not been changed during this investigation.
-
-The diagnostic archive is [artifact 13108294773](https://github.com/dcajacob/orbiter-cross-platform/actions/runs/41371271627/artifacts/13108294773),
-SHA256 `ba893aba659697fe67dd505a53986772a9ed6d807203ac0fa6c779c41f3647ce`.
-After extracting it, reproduce the per-column/same-input report with:
-
-```sh
-python3 -B Tests/Production/GroundFlight/math_report.py \
-  --windows PATH/production-math/pb_takeoff_landing/ground-math.csv \
-  --native out/native-ground-math-observation/pb_takeoff_landing-render-4/ground-math.csv \
-  --output out/native-ground-math-report.json
-```
-
-The report includes input hashes and independent high-precision diagnostic
-evaluations. It is not a flight acceptance report and cannot override the
-frozen comparison. The next investigation is the first differing intermediate
-contact-force calculation, followed by the same unchanged flight gates.
-
-## Experimental ground preview
-
-The ground preview has a dedicated immutable snapshot, separate from the
-accepted orbital preview. It is available for inspection while landing parity
-remains failed; it does not satisfy the Phase 5 exit gate.
+## Ground preview
 
 ```sh
 python3 -B Tests/Production/Flight/prepare-preview.py \
@@ -210,10 +131,11 @@ python3 -B Tests/Production/Flight/prepare-preview.py \
 Tests/Production/GroundFlight/run-local.sh
 ```
 
-It starts paused at Edwards on actual stock Earth data with the real ShuttlePB
-module. Space resumes; Home/End increase/decrease hover throttle, and W/S, A/D,
-Z/C retain the momentary RCS controls. Hover throttle persists after releasing
-Home/End. F selects RCS mode, Ctrl-F disables/enables RCS, and Alt-F toggles
-aerodynamic controls. The title reports actual ground state, height above terrain,
-airspeed, fuel, thrust and active autopilots. Cockpits and flight instruments are
-still later gates.
+The launcher resolves an immutable matching binary snapshot. It starts paused
+at Edwards on actual stock Earth data with the real ShuttlePB module. Space
+resumes; Home/End increase/decrease persistent hover throttle. W/S, A/D and Z/C
+are momentary RCS controls: hold to fire and release to stop. F selects RCS mode,
+Ctrl-F disables/enables RCS, and Alt-F toggles aerodynamic controls. The title
+reports actual flight status, terrain height, airspeed, fuel, thrust and autopilots.
+Cockpit and flight instruments remain Phase 6 work. A pre-fix preview remains
+experimental until explicitly replaced with a verified matching snapshot.

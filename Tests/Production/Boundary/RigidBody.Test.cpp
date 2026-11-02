@@ -1,5 +1,6 @@
 // Licensed under the MIT License
 #include "Production/RigidBodyServices.h"
+#include "Production/Random.h"
 #include "PhysicsTrace.h"
 #include <cmath>
 #include <cstdlib>
@@ -49,7 +50,7 @@ struct InertialBody final : RigidBody {
 struct Result { Vector position, velocity, omega; Quaternion rotation; };
 Result run(Environment& env, int propagator, const std::filesystem::path& output)
 {
-    std::srand(0); // same recorded seed for each repeat, including flush scheduling
+    std::srand(0);SeedRandom(0); // same recorded seed, including flush scheduling
     env.physics.nLPropLevel = 1;
     env.physics.PropMode[0] = propagator;
     env.physics.PropTTgt[0] = env.physics.PropATgt[0] = 1e10;

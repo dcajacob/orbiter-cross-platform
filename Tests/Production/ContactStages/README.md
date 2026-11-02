@@ -30,7 +30,11 @@ controlled landing must produce physical, input/callback, propellant and
 animation CSVs byte-identical to the original frozen captures before
 `windows.py` accepts their stage observations. A failed proof blocks analysis.
 
-For Linux, prepare an isolated overlay and matching engine/renderer:
+For Linux, run the following from the preserved pre-fix revision `9aefc8d6`,
+then prepare an isolated overlay and matching engine/renderer. The source hash
+and already failing native diagnostic hashes deliberately stay frozen. The RNG
+bindings in the corrected production source change those bytes; the diagnostic
+must fail closed there rather than silently accept new reference values.
 
 ```sh
 python3 -B Tests/Production/ContactStages/prepare.py \

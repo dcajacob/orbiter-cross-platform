@@ -1,6 +1,7 @@
 // Copyright (c) Martin Schweiger
 // Licensed under the MIT License
 
+#include "Production/Random.h"
 #include <stdlib.h>
 #include <algorithm>
 #include <float.h>
@@ -8,8 +9,8 @@
 
 int irand (int range)
 {
-	static const double drand_max = (double)(RAND_MAX+0.1);
-	return (int)((double)rand()*(double)range/drand_max);
+	static const double drand_max = (double)(orbiter::production::RandomMaximum+0.1);
+	return (int)((double)orbiter::production::RandomInteger()*(double)range/drand_max);
 }
 
 // =======================================================================

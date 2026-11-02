@@ -1,6 +1,7 @@
 // Copyright (c) Martin Schweiger
 // Licensed under the MIT License
 
+#include "Production/Random.h"
 #include "Production/SurfaceServices.h"
 #include "Production/CelestialServices.h"
 #include "Production/Text.h"
@@ -662,7 +663,7 @@ int Base::OccupyPad (Vessel *vessel, int pad, bool forcepad)
 		return pad;
 	}
 	// pick random free pad
-	pd = (static_cast<std::int64_t>(rand())*padfree)/(static_cast<std::int64_t>(RAND_MAX)+1);
+	pd = (static_cast<std::int64_t>(orbiter::production::RandomInteger())*padfree)/(static_cast<std::int64_t>(orbiter::production::RandomMaximum)+1);
 	for (i = 0; i < npad; i++) {
 		if (lspec[i].status == 0) {
 			if (!pd--) {
@@ -717,9 +718,9 @@ int Base::LandedAtPad (const Vessel *vessel) const
 
 int Base::RequestLanding (Vessel *vessel, UInt32 &padno)
 {
-	if (rand() < RAND_MAX/2) return 2; // keep pending
+	if (orbiter::production::RandomInteger() < orbiter::production::RandomMaximum/2) return 2; // keep pending
 	if (!padfree) return 1;     // deny
-	int pd = (static_cast<std::int64_t>(rand())*padfree)/(static_cast<std::int64_t>(RAND_MAX)+1);
+	int pd = (static_cast<std::int64_t>(orbiter::production::RandomInteger())*padfree)/(static_cast<std::int64_t>(orbiter::production::RandomMaximum)+1);
 	for (UInt32 i = 0; i < npad; i++) {
 		if (lspec[i].status == 0) {
 			if (!pd--) {
@@ -737,7 +738,7 @@ int Base::RequestLanding (Vessel *vessel, UInt32 &padno)
 
 int Base::RequestTakeoff ()
 {
-	if (rand() < RAND_MAX/2) return 3; // keep pending
+	if (orbiter::production::RandomInteger() < orbiter::production::RandomMaximum/2) return 3; // keep pending
 	return 5;                   // grant clearance
 }
 

@@ -39,6 +39,9 @@ def verify():
     if ledger['observed_source'] != CAPTURE or ledger['production_source'] != BASE:
         raise ValueError('extraction baseline identity changed')
     declared = ledger['files']
+    if 'Src/Orbiter/Production/Math/Runtime.cpp' in declared:
+        from random_source import verify as verify_random_bindings
+        verify_random_bindings()
     if 'Src/Orbiter/Production/FlightControls.h' in declared:
         from flight_source import verify as verify_flight
         verify_flight()

@@ -3,6 +3,7 @@
 // This is a numerical component observer, with no native camera or renderer.
 #include "../Planets/Environment.h"
 #include "Vessel.h"
+#include "Production/Random.h"
 #include "Production/NativeWorldVesselServices.h"
 #include "Production/NativeVesselModule.h"
 #include "State.h"
@@ -72,7 +73,7 @@ int main(int argc,char** argv)
         if(!controls && !behavior && mode!="orbit") throw std::runtime_error("Unknown reference control mode");
         const int frames=mode=="rcs"?500:mode=="autopilot"?420:mode=="callbacks"?60:6000;
         const double interval=behavior?0.25:1;
-        std::srand(0);
+        std::srand(0);SeedRandom(0);
         ResourceResolver config(argv[1]),data(argv[2]),modules(argv[3]),textures(argv[4]),meshes(argv[5]);
         NativeCelestialServices celestial(config,data,modules);VesselEnvironment environment(config);
         if(!environment.settings.Load(argv[6])) throw std::runtime_error("Cannot read production master configuration");

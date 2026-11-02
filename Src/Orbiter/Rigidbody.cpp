@@ -13,6 +13,7 @@
 // Hierarchy:  Body --> RigidBody
 // =======================================================================
 
+#include "Production/Random.h"
 #include "Rigidbody.h"
 #include "Production/RigidBodyServices.h"
 #include "PhysicsCore.h"
@@ -201,7 +202,7 @@ void RigidBody::Update (bool force)
 		// Update the list of gravity field sources
 		if (force || !gfielddata.ngrav) {
 			ScanGFieldSources (GetRigidBodyServices().World());
-			gfielddata.updt = td.SimT0 + (gfielddata_updt_interval*rand())/RAND_MAX;
+			gfielddata.updt = td.SimT0 + (gfielddata_updt_interval*orbiter::production::RandomInteger())/orbiter::production::RandomMaximum;
 			// randomize update times
 		} else if (td.SimT0 > gfielddata.updt) {
 			UpdateGFieldSources (GetRigidBodyServices().World());

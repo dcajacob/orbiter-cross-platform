@@ -3,6 +3,7 @@
 
 // Implementation of class Planet
 
+#include "Production/Random.h"
 #include <fstream>
 #include <stdio.h>
 #include <string.h>
@@ -891,7 +892,7 @@ Vector Planet::WindVelocity (double lng, double lat, double alt, int frame, Wind
 			double t_dist = fabs(tp-prm->pert_t);
 			double corr = 1.0 - min (1.0, t_dist/corr_length);
 			for (dim = 0; dim < 3; dim += 2) {
-				double p = ((double)rand()/(double)RAND_MAX - 0.5)*pert_amplitude; // make this a normal distribution
+				double p = ((double)orbiter::production::RandomInteger()/(double)orbiter::production::RandomMaximum - 0.5)*pert_amplitude; // make this a normal distribution
 				if (corr)
 					p = corr * prm->pert_v.data[dim] + (1.0-corr) * p;
 				prm->pert_v.data[dim] = p;

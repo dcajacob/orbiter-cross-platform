@@ -105,7 +105,8 @@ def verify():
     expected=expected.replace('double rand1();','#include "Production/Random.h"')
     if expected!=now(name):raise ValueError('Utility header changed beyond verbatim conversions/random extraction')
     a=old('Src/Orbiter/Util.cpp');start=a.index('double rand1()');end=a.index('bool MakePath',start)
-    if a[start:end].rstrip() not in now('Src/Orbiter/Production/Random.cpp') or a[:start]+a[end:]!=now('Src/Orbiter/Util.cpp'):
+    from random_source import canonical as random_bindings
+    if a[start:end].rstrip() not in random_bindings(now('Src/Orbiter/Production/Random.cpp')) or a[:start]+a[end:]!=now('Src/Orbiter/Util.cpp'):
         raise ValueError('Original random-number calculation changed')
     verify_dynamics()
     print('Actual vessel state parsing, persistence, composite dynamics and private storage conserved through platform services')

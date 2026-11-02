@@ -1,3 +1,4 @@
+#include "Production/Random.h"
 // ORBITER_PRODUCTION_OBSERVATION_BEGIN
 #ifdef ORBITER_PRODUCTION_OBSERVATION
 #include "ApplicationObservation.h"
@@ -344,8 +345,8 @@ void Vessel::SetDefaultState ()
 	nforcevec_col = 0;
 	memset(&m_colDebug, 0, sizeof(m_colDebug));
 
-	proxyT    = -(double)rand()*100.0/(double)RAND_MAX - 1.0;
-	commsT    = -(double)rand()*5.0/(double)RAND_MAX - 1.0;
+	proxyT    = -(double)orbiter::production::RandomInteger()*100.0/(double)orbiter::production::RandomMaximum - 1.0;
+	commsT    = -(double)orbiter::production::RandomInteger()*5.0/(double)orbiter::production::RandomMaximum - 1.0;
 	// distribute update times
 	FRecorder_Reset();
 }
@@ -4749,9 +4750,9 @@ void Vessel::RebuildConvexHullVisual() {
       std::vector<VECTOR3> pts(slice.count);
       for (size_t i = 0; i < slice.count; i++) {
           pts[i] = m_hullCache[slice.startIdx + i];
-          pts[i].x += (((double)rand() / RAND_MAX) - 0.5) * 1e-5;
-          pts[i].y += (((double)rand() / RAND_MAX) - 0.5) * 1e-5;
-          pts[i].z += (((double)rand() / RAND_MAX) - 0.5) * 1e-5;
+          pts[i].x += (((double)orbiter::production::RandomInteger() / orbiter::production::RandomMaximum) - 0.5) * 1e-5;
+          pts[i].y += (((double)orbiter::production::RandomInteger() / orbiter::production::RandomMaximum) - 0.5) * 1e-5;
+          pts[i].z += (((double)orbiter::production::RandomInteger() / orbiter::production::RandomMaximum) - 0.5) * 1e-5;
       }
 
       auto getVec = [&](int i) -> Vector { return Vector(pts[i].x, pts[i].y, pts[i].z); };

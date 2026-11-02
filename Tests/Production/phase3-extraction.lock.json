@@ -167,7 +167,7 @@
       "original_sha256_lf": "b56660ce17e579552302ea62bb6fdd6a9741b6b0bd20b84f956cd986ae9319bc"
     },
     "Src/Orbiter/Base.cpp": {
-      "sha256_lf": "2d524208080213f207e60b23f206d9dca5acaaa56e5022ef247dba7f501fe358",
+      "sha256_lf": "958c2afc02f03118dcc6159b9f40127e540b5a0043c59f87ffc4b5d4679126fb",
       "original_sha256_lf": "ce6b643602698127535b65776dcfc4f1f06e6febe6616b65093c867874da8a51"
     },
     "Src/Orbiter/Base.h": {
@@ -175,7 +175,7 @@
       "original_sha256_lf": "943cee3b46afc99efa635df5a6eee53e3e26098a3ad2f5bea6fa95406ce96261"
     },
     "Src/Orbiter/Baseobj.cpp": {
-      "sha256_lf": "085849e0808c817b37a9db41acd63412c40ae3d24c23a9a906aa15b4b45ccc53",
+      "sha256_lf": "ed2dbd61bf683534f9b06583b9dc821b248a6792186ba66ec6f760333ea6a4d9",
       "original_sha256_lf": "6bee41fca7c94374cf0c92bc02a38292440ccca4b63d60817d8cefd12eefea8e"
     },
     "Src/Orbiter/Baseobj.h": {
@@ -327,7 +327,7 @@
       "original_sha256_lf": null
     },
     "Src/Orbiter/Planet.cpp": {
-      "sha256_lf": "e8a1284ddf3ff8855ace623ba4e6298965f4f9765fbe41b4b4fff5c7dca1cc7e",
+      "sha256_lf": "16839acc6a75ae001edbfbdbdc8c309ed9c98c2eb70c894532a94e41993dec8f",
       "original_sha256_lf": "5636b25669596ea2523175f6ebbf016e0659ec4e6f752a8e8f5ef8c6fdcac926"
     },
     "Src/Orbiter/Planet.h": {
@@ -343,7 +343,7 @@
       "original_sha256_lf": null
     },
     "Src/Orbiter/Production/CMakeLists.txt": {
-      "sha256_lf": "d5dd08301fe1d0c4b551ae8842a213bff3ec3a802a7ac4456cc15a2b1a977399",
+      "sha256_lf": "53c4b8a281639be9ed62d4a2958dc294b81d669c265053ad5ca91533850d4ba9",
       "original_sha256_lf": null
     },
     "Src/Orbiter/Production/CameraServices.cpp": {
@@ -432,7 +432,7 @@
     },
     "Src/Orbiter/Production/NativeApplication.cpp": {
       "original_sha256_lf": null,
-      "sha256_lf": "d6d2dc3a2180ce284b7918a652e9e9d2a46ed7c9d1a872509783c5a74b047529"
+      "sha256_lf": "b21a62c5f2d979bd7e7d8d69eb22e5154b3e7dd36619fccdc3aeedb2efd082ed"
     },
     "Src/Orbiter/Production/NativeBuild.h.in": {
       "sha256_lf": "46385229425b50b4edfe7eb877c5c4278e718f50e276130f0354a6d51cb70511",
@@ -551,11 +551,11 @@
       "original_sha256_lf": null
     },
     "Src/Orbiter/Production/Random.cpp": {
-      "sha256_lf": "956748a9bdb1f074bd6836af915f3f93d846cd407298eb302e6187217c3e140f",
+      "sha256_lf": "3c0ac01fa82aa45a569da3631568401b7b368f2de4359522ae61c4c730979824",
       "original_sha256_lf": null
     },
     "Src/Orbiter/Production/Random.h": {
-      "sha256_lf": "894fcac75995d1b3572a430d3f6abdd2ebf79f3fa5068d9c5713214ced09e63e",
+      "sha256_lf": "3c37e2100bed7157bbb79a60fa0fd3b25e5ea3995a0f3fd2acab640532abd62d",
       "original_sha256_lf": null
     },
     "Src/Orbiter/Production/ResourceResolver.cpp": {
@@ -775,7 +775,7 @@
       "original_sha256_lf": null
     },
     "Src/Orbiter/Rigidbody.cpp": {
-      "sha256_lf": "aa941c2d82fe834cad222014dbaaa7daa7fea69d55b5ce2d18926647888d9c12",
+      "sha256_lf": "45675d3b6a89455a54938dcc406ad5772df13e5b20776c7925a0aa5685ed5ee1",
       "original_sha256_lf": "ddd142cc3bb62d654a31674eab58b36a38ede16aaddebeb361319b0d209f083d"
     },
     "Src/Orbiter/Rigidbody.h": {
@@ -811,7 +811,7 @@
       "original_sha256_lf": null
     },
     "Src/Orbiter/SuperVessel.cpp": {
-      "sha256_lf": "1b8f9aa488e27e2e4f803e58f25cbe86a2d41ece4a3d0b2a55a72c21e174d7eb",
+      "sha256_lf": "0f90926e8e1e32256288afc500134e019606522b5000c6e63171dca98eba5960",
       "original_sha256_lf": "019ea38b4732d864efbb2cabb0bb30cb53f063be62d18d542575c71b297fb417"
     },
     "Src/Orbiter/SuperVessel.h": {
@@ -835,7 +835,7 @@
       "original_sha256_lf": "72936830e11eec20b86f2f616f2988f94932e6700112bbb1d01d2a6cdb3aa808"
     },
     "Src/Orbiter/Vessel.cpp": {
-      "sha256_lf": "0a5b9bd68dee7a0c702c021eb9fcac5243bc9df1e1319de4c0ace9e4d23f205b",
+      "sha256_lf": "24aa4cd48bae984dcc298dfb45d59afd4d49ec310ea3dd1a2f3c22ed3f997319",
       "original_sha256_lf": "9e34db9a70552f94f3966dbb14d57b3833e5f8f69246d5454c71161e93664e13"
     },
     "Src/Orbiter/Vessel.h": {
@@ -871,7 +871,7 @@
       "sha256_lf": "78bde75fa254eb1a005c83d35529583212227e9fdccfcaa05eab8d2f08749430"
     },
     "Src/Orbiter/Vesselbase.cpp": {
-      "sha256_lf": "03798e377853e844767feeb08ff5f4a905ab2b63c86f8ce73301fc184f4b3753",
+      "sha256_lf": "f68718e0d648aae4b97c49b35c9e8956897835a54e60d248a1e06ce8776e1c7f",
       "original_sha256_lf": "35f86ad61b02240e645c60c6c71808691a984eb127042581d0d18a8ad899b0b8"
     },
     "Src/Orbiter/Vesselbase.h": {
@@ -953,6 +953,98 @@
     "Src/Orbiter/Production/ContactObservation.h": {
       "original_sha256_lf": null,
       "sha256_lf": "4c33eefc299f0d1566419860ff7917730e56410784a130e2fa9d1a1d258fbfc8"
+    },
+    "Src/Orbiter/Production/Math/CMakeLists.txt": {
+      "original_sha256_lf": null,
+      "sha256_lf": "365d0a683114dc09023c69666e1cdea038cbf831d7f297a868391de6e29b3efb"
+    },
+    "Src/Orbiter/Production/Math/NativeError.cpp": {
+      "original_sha256_lf": null,
+      "sha256_lf": "745ecc29959f952f52730dc301291da5e01ac409fc7238fbfeb0f9237be9f224"
+    },
+    "Src/Orbiter/Production/Math/NativeError.h": {
+      "original_sha256_lf": null,
+      "sha256_lf": "05299a1a29f0fd78c049eaad3a21ea8189c2c7ae04a36a9340ed88f38fdaa949"
+    },
+    "Src/Orbiter/Production/Math/Runtime.cpp": {
+      "original_sha256_lf": null,
+      "sha256_lf": "f40f7df1a346e7aa743fa392138d6dfef97060b4545e65cc97e0ab182e590295"
+    },
+    "Src/Orbiter/Production/Math/Runtime.h": {
+      "original_sha256_lf": null,
+      "sha256_lf": "1ab4017b3e2c70e668240eca91dcc0eac37c6d610e7b9cc0f252127c097ac3ac"
+    },
+    "Src/Orbiter/Production/Math/prepare.py": {
+      "original_sha256_lf": null,
+      "sha256_lf": "5d57d5795a475187fccc9f24b91b09fd3be0a4dd870d4fec9f1ff5d4e1cacf1b"
+    },
+    "Extern/ReferenceMath/README.md": {
+      "original_sha256_lf": null,
+      "sha256_lf": "5f38a29d5df313f5e72b3beaa22d5441a9591dfaefedee53a1642820f3f5aeee"
+    },
+    "Extern/ReferenceMath/amd/L2_by_pi_bits.asm": {
+      "original_sha256_lf": null,
+      "sha256_lf": "100950f8ad8f8306140cf6a7c021923b9354fbf8f153bb10c5eb3cc1055f2706"
+    },
+    "Extern/ReferenceMath/amd/Lsincos_array.asm": {
+      "original_sha256_lf": null,
+      "sha256_lf": "6ad730c3a1fcc49ea80fab5eefc4395d479d391900396fa0b5fb0f502d7db2d2"
+    },
+    "Extern/ReferenceMath/amd/asin.c": {
+      "original_sha256_lf": null,
+      "sha256_lf": "3985a1b597038ffc712a2cfcbbb63e71e91848c29de91d1c53ab4f45cc924618"
+    },
+    "Extern/ReferenceMath/amd/atan2.c": {
+      "original_sha256_lf": null,
+      "sha256_lf": "417d77250ee71e3ac59ae3e85c6eb8f7b05410e8a1cac37aae08dccd827e5598"
+    },
+    "Extern/ReferenceMath/amd/cos.asm": {
+      "original_sha256_lf": null,
+      "sha256_lf": "ea7156104cf35e1e2b85bd55e4ce29955e00e3285f87fa0b69570fc84a3e9381"
+    },
+    "Extern/ReferenceMath/amd/fm.inc": {
+      "original_sha256_lf": null,
+      "sha256_lf": "6c959f6b43ad82983cf26f840200b68af513f863271bbecc1e6c0ead28562586"
+    },
+    "Extern/ReferenceMath/amd/libm.h": {
+      "original_sha256_lf": null,
+      "sha256_lf": "f9ff549d44d4f4c44f9a9e97a6babf633687cfd9410c327f08da5dc0a8da04b2"
+    },
+    "Extern/ReferenceMath/amd/libm_errno.h": {
+      "original_sha256_lf": null,
+      "sha256_lf": "b406d28c594f907714def4b13dfda16d83243dd0cbc1e6fbc40357a79dc79343"
+    },
+    "Extern/ReferenceMath/amd/libm_inlines.h": {
+      "original_sha256_lf": null,
+      "sha256_lf": "53a977487e08371a06b8c24de0dd517b1c56415afe35f24f2fae7170a823182c"
+    },
+    "Extern/ReferenceMath/amd/libm_util.h": {
+      "original_sha256_lf": null,
+      "sha256_lf": "eb4c69a498ab0ca272249fb31d31a8d051326ecc1c754c6f1c4181c4f4bd868e"
+    },
+    "Extern/ReferenceMath/amd/remainder_piby2_forAsm.asm": {
+      "original_sha256_lf": null,
+      "sha256_lf": "f5fd35d71eee4cbde99f2e7e13381015af15f77893ebde93426eb075f43430e5"
+    },
+    "Extern/ReferenceMath/amd/remainder_piby2_forFMA3.asm": {
+      "original_sha256_lf": null,
+      "sha256_lf": "be6405d8a5dab8c8f39cdc9b9aa4c5d6b81cc434db699b3ac8a1db04b384e653"
+    },
+    "Extern/ReferenceMath/amd/sin.asm": {
+      "original_sha256_lf": null,
+      "sha256_lf": "d1fa13efc660734e35dd9e3457f01cf0970c17ee156e51c196a11a5eb6848e39"
+    },
+    "Extern/ReferenceMath/amd/sincos_special.c": {
+      "original_sha256_lf": null,
+      "sha256_lf": "575b7b287f8f54b19236397fefb00fb6786654b1c1e16866290747f89de6e1df"
+    },
+    "Extern/ReferenceMath/sources.lock.json": {
+      "original_sha256_lf": null,
+      "sha256_lf": "646cbaaaeb793548b980bbff1cebc65d732153d4d258046df3410a679a8d4d6e"
+    },
+    "Src/Orbiter/Vecmat.cpp": {
+      "original_sha256_lf": "8be3be230618377896b28bf98b6b7e536f0cd2f7294035d041afdbd0aaacbcf2",
+      "sha256_lf": "ef83aa77506674982cbdd0f8be3f402c58abd3ef27f7c1b2d6c6a129a1abc64f"
     }
   }
 }

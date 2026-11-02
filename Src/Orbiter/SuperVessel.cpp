@@ -9,6 +9,7 @@
 // events of the attached vessels.
 // ==============================================================
 
+#include "Production/Random.h"
 #include "Element.h"
 #include "Celbody.h"
 #include "Planet.h"
@@ -56,7 +57,7 @@ SuperVessel::SuperVessel (Vessel *vessel)
 	UpdateProxies();
 	cpos = s0->pos - cbody->GPos();
 	cvel = s0->vel - cbody->GVel();
-	proxyT    = -(double)rand()*100.0/(double)RAND_MAX - 1.0;
+	proxyT    = -(double)orbiter::production::RandomInteger()*100.0/(double)orbiter::production::RandomMaximum - 1.0;
 
 	// register with vessel
 	vessel->SetSuperStruct (this);
@@ -146,7 +147,7 @@ SuperVessel::SuperVessel (Vessel *vessel1, Vessel *vessel2, int port1, int port2
 	UpdateProxies();
 	if (cbody) cpos = s0->pos - cbody->s0->pos; else cpos = { 0, 0, 0 };
 	if (cbody) cvel = s0->vel - cbody->s0->vel; else cvel = { 0, 0, 0 };
-	proxyT = -(double)rand()*100.0/(double)RAND_MAX - 1.0;
+	proxyT = -(double)orbiter::production::RandomInteger()*100.0/(double)orbiter::production::RandomMaximum - 1.0;
 
 	// register with vessels
 	for (i = 0; i < 2; i++) {

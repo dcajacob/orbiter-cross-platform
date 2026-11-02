@@ -2,19 +2,20 @@ name: Native Production OpenGL External View
 on:
   push:
     branches: ['codex/production-**']
-    paths: ['Src/Orbiter/**', 'Src/Celbody/**', 'Src/Vessel/ShuttlePB/**', 'OVP/OGLClient/**', 'Orbitersdk/**', 'Tests/Production/**', '.github/workflows/native-production-client.yml']
+    paths: ['Src/Orbiter/**', 'Src/Celbody/**', 'Src/Vessel/ShuttlePB/**', 'Extern/ReferenceMath/**', 'OVP/OGLClient/**', 'Orbitersdk/**', 'Tests/Production/**', '.github/workflows/native-production-client.yml']
   workflow_dispatch:
 permissions:
   contents: read
 jobs:
   native:
-    name: Real native client Ubuntu 24.04 ${{ matrix.configuration }} x64
+    name: Real native client Ubuntu 24.04 ${{ matrix.configuration }} ${{ matrix.math_profile }} x64
     runs-on: ubuntu-24.04
     timeout-minutes: 45
     strategy:
       fail-fast: false
       matrix:
         configuration: [Debug, Release]
+        math_profile: [automatic, sse2]
     steps:
       - uses: actions/checkout@v7
         with:
@@ -22,12 +23,19 @@ jobs:
       - name: Install native build and software OpenGL window dependencies
         run: >-
           sudo apt-get update && sudo apt-get install -y zlib1g-dev libgl1-mesa-dev
-          libxrandr-dev libxinerama-dev libxcursor-dev libxi-dev xvfb mesa-utils
+          libxrandr-dev libxinerama-dev libxcursor-dev libxi-dev xvfb mesa-utils libmpfr-dev
+      - name: Verify native math against unchanged Windows primitives and independent MPFR
+        shell: bash
+        run: |
+          set -euo pipefail
+          cmake -S Src/Orbiter/Production/Math -B out/native-math -G Ninja -DCMAKE_BUILD_TYPE=${{ matrix.configuration }} 2>&1 | tee native-math-configure.log
+          cmake --build out/native-math --parallel 2 2>&1 | tee native-math-build.log
+          ctest --test-dir out/native-math --output-on-failure 2>&1 | tee native-math-verification.log
       - name: Build actual production engine and source-built stock/celestial modules
         shell: bash
         run: |
           set -euo pipefail
-          cmake -S Src/Orbiter/Production -B out/native-engine -G Ninja -DCMAKE_BUILD_TYPE=${{ matrix.configuration }} -DBUILD_TESTING=OFF -DORBITER_BUILD_NATIVE_CELESTIAL_MODULES=ON -DORBITER_BUILD_NATIVE_VESSELS=ON 2>&1 | tee native-engine-configure.log
+          cmake -S Src/Orbiter/Production -B out/native-engine -G Ninja -DCMAKE_BUILD_TYPE=${{ matrix.configuration }} -DBUILD_TESTING=OFF -DORBITER_BUILD_NATIVE_CELESTIAL_MODULES=ON -DORBITER_BUILD_NATIVE_VESSELS=ON -DORBITER_MATH_FORCE_SSE2=${{ matrix.math_profile == 'sse2' && 'ON' || 'OFF' }} 2>&1 | tee native-engine-configure.log
           cmake --build out/native-engine --parallel 2 2>&1 | tee native-engine-build.log
       - uses: actions/cache@v6
         with:
@@ -64,6 +72,11 @@ jobs:
           from pathlib import Path
           report=json.loads(Path('out/native-scene-evidence/native-scene-report.json').read_text())
           assert all('llvmpipe' in run['renderer']['renderer'].lower() for run in report['runs']), 'Actual software renderer was not loaded'
+          for directory in ('run-1','run-2'):
+              numerics=json.loads((Path('out/native-scene-evidence')/directory/'numerics.json').read_text())
+              assert numerics['random']=='private-msvc-lcg32' and numerics['random_maximum']==32767
+              allowed=['amd-6121d02-sse2'] if '${{ matrix.math_profile }}'=='sse2' else ['amd-6121d02-fma3','amd-6121d02-sse2']
+              assert numerics['math'] in allowed, 'Wrong actual CPU math profile'
           PY
       - name: Verify flyable stock ShuttlePB, timing, docking and persistence
         shell: bash
@@ -90,9 +103,12 @@ jobs:
       - uses: actions/upload-artifact@v7
         if: always()
         with:
-          name: native-production-client-${{ matrix.configuration }}-x64
+          name: native-production-client-${{ matrix.configuration }}-${{ matrix.math_profile }}-x64
           retention-days: 90
           path: |
+            native-math-*.log
+            out/native-math/math-verification.json
+            out/native-math/CMakeCache.txt
             native-*.log
             out/native-engine/CMakeCache.txt
             out/native-renderer/CMakeCache.txt

@@ -58,10 +58,11 @@ LIGHTS=('AddPointLight','AddSpotLight','DelLightEmitter','ClearLightEmitters','L
 
 @functools.lru_cache(maxsize=1)
 def previous_files():
+    from random_source import canonical as random_bindings
     result={}
     for name in ['Vessel.cpp','Vesselstatus.cpp','SuperVessel.cpp']:
         path='Src/Orbiter/'+name
-        current=clock_adapters(raw(path))
+        current=clock_adapters(random_bindings(raw(path)).replace('#include "Production/Random.h"\n',''))
         if name=='Vessel.cpp':
             # Sanitizer-confirmed upstream array-delete mismatch; no numerical change.
             assert current.count('delete []A->comp;')==2

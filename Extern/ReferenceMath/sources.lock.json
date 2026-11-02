@@ -1,0 +1,64 @@
+{
+  "upstream": "https://github.com/amd/win-libm",
+  "commit": "6121d02aef0c775947d5dc655d7fc4ccfe2144ab",
+  "archive_sha256": "ca15d1bab53cf576ba0bba8c07aa6deac8d2a0fe9d6f219dc35c0d78c5a8d45f",
+  "license": "MIT",
+  "files": {
+    "cos.asm": {
+      "upstream_sha256": "ea7156104cf35e1e2b85bd55e4ce29955e00e3285f87fa0b69570fc84a3e9381",
+      "sha256_lf": "ea7156104cf35e1e2b85bd55e4ce29955e00e3285f87fa0b69570fc84a3e9381"
+    },
+    "sin.asm": {
+      "upstream_sha256": "d1fa13efc660734e35dd9e3457f01cf0970c17ee156e51c196a11a5eb6848e39",
+      "sha256_lf": "d1fa13efc660734e35dd9e3457f01cf0970c17ee156e51c196a11a5eb6848e39"
+    },
+    "remainder_piby2_forAsm.asm": {
+      "upstream_sha256": "f5fd35d71eee4cbde99f2e7e13381015af15f77893ebde93426eb075f43430e5",
+      "sha256_lf": "f5fd35d71eee4cbde99f2e7e13381015af15f77893ebde93426eb075f43430e5"
+    },
+    "remainder_piby2_forFMA3.asm": {
+      "upstream_sha256": "be6405d8a5dab8c8f39cdc9b9aa4c5d6b81cc434db699b3ac8a1db04b384e653",
+      "sha256_lf": "be6405d8a5dab8c8f39cdc9b9aa4c5d6b81cc434db699b3ac8a1db04b384e653"
+    },
+    "Lsincos_array.asm": {
+      "upstream_sha256": "6ad730c3a1fcc49ea80fab5eefc4395d479d391900396fa0b5fb0f502d7db2d2",
+      "sha256_lf": "6ad730c3a1fcc49ea80fab5eefc4395d479d391900396fa0b5fb0f502d7db2d2"
+    },
+    "L2_by_pi_bits.asm": {
+      "upstream_sha256": "100950f8ad8f8306140cf6a7c021923b9354fbf8f153bb10c5eb3cc1055f2706",
+      "sha256_lf": "100950f8ad8f8306140cf6a7c021923b9354fbf8f153bb10c5eb3cc1055f2706"
+    },
+    "fm.inc": {
+      "upstream_sha256": "6c959f6b43ad82983cf26f840200b68af513f863271bbecc1e6c0ead28562586",
+      "sha256_lf": "6c959f6b43ad82983cf26f840200b68af513f863271bbecc1e6c0ead28562586"
+    },
+    "asin.c": {
+      "upstream_sha256": "3985a1b597038ffc712a2cfcbbb63e71e91848c29de91d1c53ab4f45cc924618",
+      "sha256_lf": "3985a1b597038ffc712a2cfcbbb63e71e91848c29de91d1c53ab4f45cc924618"
+    },
+    "atan2.c": {
+      "upstream_sha256": "417d77250ee71e3ac59ae3e85c6eb8f7b05410e8a1cac37aae08dccd827e5598",
+      "sha256_lf": "417d77250ee71e3ac59ae3e85c6eb8f7b05410e8a1cac37aae08dccd827e5598"
+    },
+    "libm.h": {
+      "upstream_sha256": "f9ff549d44d4f4c44f9a9e97a6babf633687cfd9410c327f08da5dc0a8da04b2",
+      "sha256_lf": "f9ff549d44d4f4c44f9a9e97a6babf633687cfd9410c327f08da5dc0a8da04b2"
+    },
+    "libm_util.h": {
+      "upstream_sha256": "eb4c69a498ab0ca272249fb31d31a8d051326ecc1c754c6f1c4181c4f4bd868e",
+      "sha256_lf": "eb4c69a498ab0ca272249fb31d31a8d051326ecc1c754c6f1c4181c4f4bd868e"
+    },
+    "libm_inlines.h": {
+      "upstream_sha256": "53a977487e08371a06b8c24de0dd517b1c56415afe35f24f2fae7170a823182c",
+      "sha256_lf": "53a977487e08371a06b8c24de0dd517b1c56415afe35f24f2fae7170a823182c"
+    },
+    "libm_errno.h": {
+      "upstream_sha256": "b406d28c594f907714def4b13dfda16d83243dd0cbc1e6fbc40357a79dc79343",
+      "sha256_lf": "b406d28c594f907714def4b13dfda16d83243dd0cbc1e6fbc40357a79dc79343"
+    },
+    "sincos_special.c": {
+      "upstream_sha256": "575b7b287f8f54b19236397fefb00fb6786654b1c1e16866290747f89de6e1df",
+      "sha256_lf": "575b7b287f8f54b19236397fefb00fb6786654b1c1e16866290747f89de6e1df"
+    }
+  }
+}

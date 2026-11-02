@@ -1,0 +1,79 @@
+{
+  "schema": 1,
+  "automatic_refresh": false,
+  "purpose": "Primitive observations from the unchanged original Windows runtime; never simulation-reference replacement",
+  "application_source": "391919027ac3e4a4d42f145373c788fc859c32cd",
+  "run_id": 41382988661,
+  "observer_source": "9aefc8d6",
+  "profiles": {
+    "fma3": {
+      "path": "fma3.csv.gz",
+      "sha256": "7ead92def0b0d370b29ef2c5bf0c48573eca2cb413c2b3f912e90be236e102b5",
+      "samples": 28800,
+      "uncompressed_sha256": "e255f16095f37da8cfb6ebd95c9ebec3d319cbe2f537f83806df7592e26ee90e",
+      "artifact_id": 13113848350,
+      "artifact_sha256": "575d3d135b1d7b8bca3772c8a98eae3d926d188359dc713f1b4589755e9cda3a",
+      "original_member": "production-math/pb_takeoff_landing/ground-math.csv",
+      "original_member_sha256": "927f9c72f847affc2a83dec5493fbe1ff5f93e6a502333a0c1d842e9da6ace8f",
+      "observation_proof": {
+        "status": "passed observation-only",
+        "reference_run": 41368023101,
+        "configuration": "Debug"
+      }
+    },
+    "sse2": {
+      "path": "sse2.csv.gz",
+      "sha256": "ab84e92817cb150e054dd853dcc7a3df207594e78e46e27889c013bd26ef0d09",
+      "samples": 28800,
+      "uncompressed_sha256": "224598631982963f6a2714c955e8510fd4a51f5af8307bb946870a4218c37819",
+      "artifact_id": 13114410790,
+      "artifact_sha256": "db0bfffde11d52335dbd9c1387eac8bf0611915991e34a4678bb849f1adec03e",
+      "original_member": "production-math/pb_takeoff_landing/ground-math.csv",
+      "original_member_sha256": "abfbf7387151d60de4bdfdabe59dbd52e37c1246aa621d0d3958dcb433b2c742",
+      "observation_proof": {
+        "status": "completed sensitivity diagnostic",
+        "reference_run": 41368023101,
+        "configuration": "Debug",
+        "dispatch": {
+          "diagnostic_only": true,
+          "previous_fma3": 1,
+          "selected_fma3": 0
+        },
+        "frozen_comparison": {
+          "maxima": {
+            "position_m": 3.059808953285511e-05,
+            "velocity_m_s": 2.6714340590987578e-05,
+            "rotation_rad": 2.441595332364317e-06,
+            "angular_velocity_rad_s": 0.00010855412589308639,
+            "mjd_days": 0.0,
+            "mass_fraction": 6.130858144224581e-08
+          },
+          "contact_events": {
+            "ISS": {
+              "windows": [],
+              "candidate": []
+            },
+            "PB": {
+              "windows": [
+                17,
+                1370,
+                1400,
+                1786,
+                1832,
+                1871
+              ],
+              "candidate": [
+                17,
+                1370,
+                1400,
+                1786,
+                1832,
+                1871
+              ]
+            }
+          }
+        }
+      }
+    }
+  }
+}

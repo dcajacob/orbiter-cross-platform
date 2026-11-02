@@ -1,6 +1,7 @@
 // Copyright (c) Martin Schweiger
 // Licensed under the MIT License
 
+#include "Production/Random.h"
 #ifdef _WIN32
 #include <d3d.h>
 #endif
@@ -2762,7 +2763,7 @@ void Train1::Activate ()
 	UInt32 i;
 	dyndata = new struct DYNDATA; TraceSurfaceAllocation(__FILE__,__LINE__);
 	dyndata->Vtx = new NTVERTEX[38]; TraceSurfaceAllocation(__FILE__,__LINE__);
-	dyndata->tick = rand()%10000;
+	dyndata->tick = orbiter::production::RandomInteger()%10000;
 	shvtx = 0;
 	NTVERTEX *Vtx = dyndata->Vtx;
 
@@ -3043,7 +3044,7 @@ void Train2::Activate ()
 	dyndata->rail = new NTVERTEX[(ng+1)*12 + ng*8]; TraceSurfaceAllocation(__FILE__,__LINE__);
 	dyndata->rshvtx = new SurfacePoint[(ng+1)*2]; TraceSurfaceAllocation(__FILE__,__LINE__);
 	shvtx = 0;
-	dyndata->tick = rand()%10000;
+	dyndata->tick = orbiter::production::RandomInteger()%10000;
 
 	SurfaceScalar dx = (end2.x-end1.x)/(SurfaceScalar)ng;
 	SurfaceScalar dy = (end2.y-end1.y)/(SurfaceScalar)ng;

@@ -1,5 +1,6 @@
 // Copyright (c) Martin Schweiger
 // Licensed under the MIT License
+#include "Random.h"
 // Narrow production external-view host. It owns real WorldOwner/Camera/Psys,
 // native source modules and the original shared Session ordering, never POC state.
 #include "NativeGraphics.h"
@@ -200,6 +201,8 @@ struct Runtime final:BodyServices,RigidBodyServices,SurfaceServices,NavigationSe
         if(!evidence.empty()) {std::filesystem::create_directories(evidence);lifecycle.open(evidence/"application-lifecycle.csv");lifecycle.exceptions(std::ios::badbit|std::ios::failbit);lifecycle<<"event,seconds,mjd,running\n";
             trace.open(evidence/"production-state.csv");trace.imbue(std::locale::classic());trace.exceptions(std::ios::badbit|std::ios::failbit);trace<<std::setprecision(17)<<"step,seconds,mjd,object,x,y,z,vx,vy,vz,m11,m12,m13,m21,m22,m23,m31,m32,m33,wx,wy,wz,mass,fuel,ground\n";}
         if(!evidence.empty()) {
+            std::ofstream numerical(evidence/"numerics.json");numerical.exceptions(std::ios::badbit|std::ios::failbit);
+            numerical<<"{\"math\":\""<<SimulationMathProfile()<<"\",\"random\":\"private-msvc-lcg32\",\"random_maximum\":"<<RandomMaximum<<",\"process_seed\":0}\n";
             flightTrace.open(evidence/"flight-state.csv");flightTrace.imbue(std::locale::classic());flightTrace.exceptions(std::ios::badbit|std::ios::failbit);
             flightTrace<<std::setprecision(17)<<"tick,frame,seconds,mjd,object,class,rx,ry,rz,vx,vy,vz,m11,m12,m13,m21,m22,m23,m31,m32,m33,wx,wy,wz,mass,fuel,altitude_agl,altitude_mean,airspeed,density,dynamic_pressure,lift,drag,ground,dock,focus,navmask,attached\n";
             inputTrace.open(evidence/"input-state.csv");inputTrace.imbue(std::locale::classic());inputTrace.exceptions(std::ios::badbit|std::ios::failbit);
@@ -457,7 +460,7 @@ int main(int argc,char** argv) {
         const double fixed=arguments.count("--fixed-step")?FlightNumber(arguments.at("--fixed-step")):1.0/60.0;
         const double capture=arguments.count("--capture-time")?FlightNumber(arguments.at("--capture-time")):-1;
         if(fixed<=0 || (arguments.count("--capture-time") && capture<0) || !renderEvery || !sessions || (ticks && frames))throw std::runtime_error("Invalid frame/step/capture/session limits");
-        std::srand(0);Resources resources(absolute("--assets"),absolute("--data"),absolute("--modules"),absolute("--planets"));
+        std::srand(0);SeedRandom(0);Resources resources(absolute("--assets"),absolute("--data"),absolute("--modules"),absolute("--planets"));
         std::filesystem::path scenario=absolute("--scenario");
         const auto evidence=arguments.count("--evidence")?absolute("--evidence"):std::filesystem::path{};
         std::filesystem::path save;
