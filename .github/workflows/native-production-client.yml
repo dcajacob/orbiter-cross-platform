@@ -2,7 +2,7 @@ name: Native Production OpenGL External View
 on:
   push:
     branches: ['codex/production-**']
-    paths: ['Src/Orbiter/**', 'Src/Celbody/**', 'Src/Vessel/ShuttlePB/**', 'Src/Vessel/DeltaGlider/**', 'Src/Vessel/Common/**', 'Src/Module/LuaScript/**', 'Extern/Lua/**', 'Extern/ReferenceMath/**', 'OVP/OGLClient/**', 'Orbitersdk/**', 'Tests/Production/**', '.github/workflows/native-production-client.yml']
+    paths: ['Src/Orbiter/**', 'Src/Celbody/**', 'Src/Vessel/ShuttlePB/**', 'Src/Vessel/DeltaGlider/**', 'Src/Vessel/Common/**', 'Src/Vessel/ShuttleA/Help/**', 'Src/Vessel/ShuttleA/ShuttleALua.cpp', 'Src/Vessel/Atlantis/Help/**', 'Src/Plugin/ScnEditor/Help/**', 'Src/Module/LuaScript/**', 'Extern/Lua/**', 'Extern/ReferenceMath/**', 'Extern/ldoc/**', 'Extern/Penlight/**', 'Extern/luafilesystem/**', 'OVP/OGLClient/**', 'Orbitersdk/**', 'Html/**', 'Tests/Production/**', '.github/workflows/native-production-client.yml']
   workflow_dispatch:
 permissions:
   contents: read
@@ -144,6 +144,19 @@ jobs:
           out/native-joystick-test
           c++ -std=c++17 -Wall -Wextra -Werror -I Src/Orbiter Tests/Production/Boundary/CustomCommands.Test.cpp -o out/native-custom-commands-test
           out/native-custom-commands-test
+      - name: Build and validate original Help books and browser navigation
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 -B Tests/Production/Help/prepare.py --destination out/scene-resources/Help --lua out/native-cockpit-engine/native-lua/lua 2>&1 | tee native-help-build.log
+          python3 -B Tests/Production/Help/verify.py --help-root out/scene-resources/Help --output out/native-help-sources.json
+          c++ -std=c++17 -Wall -Wextra -Werror -I Src/Orbiter Tests/Production/Help/Resolve.Test.cpp Src/Orbiter/Production/NativeHelp.cpp Src/Orbiter/Production/ResourceResolver.cpp -o out/native-help-resolver
+          out/native-help-resolver out/scene-resources
+          c++ -std=c++17 -Wall -Wextra -Werror -I Src/Orbiter Tests/Production/Help/Launcher.Test.cpp Src/Orbiter/Production/NativeHelp.cpp Src/Orbiter/Production/ResourceResolver.cpp -o out/native-help-launcher
+          out/native-help-launcher out/native-help-launcher-evidence
+          npm ci --ignore-scripts --prefix Tests/Production/Help
+          echo "ORBITER_HELP_BROWSER=$(command -v google-chrome)" >> "$GITHUB_ENV"
+          ORBITER_HELP_BROWSER="$(command -v google-chrome)" node Tests/Production/Help/browser.cjs --assets out/scene-resources out/native-help-browser
       - name: Generate the original Delta-glider mesh headers and verify every group ID
         shell: bash
         run: |
@@ -199,7 +212,7 @@ jobs:
       - name: Click the visible stock cockpit menu and change ship, warp, pause and save
         run: >-
           xvfb-run -a -s '-screen 0 1920x1080x24' env LIBGL_ALWAYS_SOFTWARE=1 GALLIUM_DRIVER=llvmpipe
-          python3 -B Tests/Production/CockpitUI/mouse_smoke.py --stock-menu --function-probe --executable out/native-cockpit-engine/orbiter-production
+          python3 -B Tests/Production/CockpitUI/mouse_smoke.py --stock-menu --function-probe --help-probe --executable out/native-cockpit-engine/orbiter-production
           --assets out/scene-resources --data out/data --modules out/native-cockpit-engine/NativeModules --planets out/planets --output out/native-stock-menu
       - name: Record and replay stock vessels and commit playback editor changes
         run: >-
@@ -289,6 +302,13 @@ jobs:
             out/native-recording/*/Playback/*.scn
             out/native-recording/*/Flights/*/*
             out/native-stock-menu/menu-verification.json
+            out/native-stock-menu/help-verification.json
+            out/native-stock-menu/help-notification.png
+            out/native-stock-menu/help/**
+            out/native-help-browser/**
+            out/native-help-sources.json
+            out/scene-resources/Help/manifest.json
+            native-help-build.log
             out/native-stock-menu/custom-function-events.txt
             out/native-stock-menu/menu-windows.csv
             out/native-stock-menu/options-state.csv

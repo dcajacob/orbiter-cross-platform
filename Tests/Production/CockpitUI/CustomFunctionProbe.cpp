@@ -3,6 +3,7 @@
 // dialog invoke callbacks. No callback is invoked by this observation wrapper.
 #include "Production/NativeGraphics.h"
 #include "NativeVesselAPI.h"
+#include "Production/NativeInterpreterSdk.h"
 #include <dlfcn.h>
 #include <cstdlib>
 #include <fstream>
@@ -27,6 +28,10 @@ void firstCallback(void* context) {
     char name[]="Replacement";
     replacement=oapiRegisterCustomCmd(name,description,forbidden,nullptr);
     event("first:context:self-unregister:reallocate:replace");
+    if(std::getenv("ORBITER_TEST_HELP_FAILURE")) {
+        HELPCONTEXT help{};help.helpfile=const_cast<char*>("html/missing-help-probe.chm");
+        require(!oapiOpenHelp(&help) && !oapiOpenHelp(&help),"Missing help book did not fail through the SDK");
+    }
 }
 void secondCallback(void* context) {
     require(context==&secondContext && *static_cast<int*>(context)==29,"Second custom function context differs");

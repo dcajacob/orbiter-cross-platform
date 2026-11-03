@@ -1,0 +1,13 @@
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Orbiter Help</title><link rel="stylesheet" href="_viewer.css"></head>
+<body>
+<header><h1 id="title">Orbiter Help</h1><a id="vessel" hidden>Vessel</a><a id="scenario" hidden>Scenario</a><button id="home" type="button">Home</button><button id="back" type="button">Back</button><button id="forward" type="button">Forward</button></header>
+<main><aside aria-label="Help navigation">
+<nav aria-label="Navigation mode"><button id="contents" type="button" aria-pressed="true">Contents</button><button id="index" type="button" aria-pressed="false">Index</button><button id="search" type="button" aria-pressed="false">Search</button></nav>
+<label id="query-label" hidden>Search help <input id="query" type="search" autocomplete="off"></label>
+<p id="status" role="status"></p><ul id="topics"></ul>
+</aside><iframe id="page" title="Help topic" sandbox="allow-scripts allow-same-origin allow-top-navigation-by-user-activation allow-popups"></iframe></main>
+<script src="_catalog.js"></script><script src="_viewer.js"></script>
+</body></html>

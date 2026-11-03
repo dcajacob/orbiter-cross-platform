@@ -119,6 +119,9 @@ const MenuCommand commands[]={
     {"Options","MenuInfoBar/options.png",7,OAPI_LKEY_DlgOptions,[](void*) {OpenMenuDialog(optionsDialog);}},
     {"Map","MenuInfoBar/map.png",8,OAPI_LKEY_DlgMap,[](void*) {OpenMenuDialog(mapDialog);}},
     {"Record","MenuInfoBar/record.png",9,OAPI_LKEY_DlgRecorder,[](void*) {OpenMenuDialog(recorderDialog);}},
+    {"Help","MenuInfoBar/help.png",10,OAPI_LKEY_DlgHelp,[](void*) {
+        HELPCONTEXT help{};help.helpfile=const_cast<char*>("html/orbiter.chm");help.topic=const_cast<char*>("/mainmenu.htm");oapiOpenHelp(&help);
+    }},
     {"Save","MenuInfoBar/save.png",11,0,[](void*) {GetNativeRenderContext().scriptApplication->Quicksave();}},
     {"Exit","MenuInfoBar/exit.png",12,0,[](void*) {GetNativeRenderContext().scriptApplication->EndSession();}},
 };

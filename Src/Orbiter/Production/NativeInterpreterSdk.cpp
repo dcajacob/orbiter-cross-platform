@@ -2,6 +2,7 @@
 // Licensed under the MIT License
 #include "NativeInterpreterSdk.h"
 #include "NativeGraphics.h"
+#include "NativeHelp.h"
 #include "VesselServices.h"
 #include "VesselLifetime.h"
 #include "GeometryConversions.h"
@@ -157,8 +158,31 @@ void __writeLogError(const char *func,const char *file,int line,const char *form
 }
 bool oapiOpenHelp(HELPCONTEXT *help)
 {
-    std::clog<<"Compiled help is unavailable on this host: "<<(help && help->helpfile ? help->helpfile : "")<<'\n';
-    return false;
+    try {
+        const auto& render=context();
+        if(!render.programFiles)throw std::runtime_error("Help resources are not bound");
+        const auto& files=*render.programFiles;
+        auto url=NativeHelpUrl(files,help&&help->helpfile?help->helpfile:"html/orbiter.chm",help&&help->topic?help->topic:"");
+        // The original vessel/scenario metadata names the contextual help book.
+        // Resolve optional contexts independently so an unavailable add-on does
+        // not prevent opening the requested stock topic.
+        for(bool vessel:{true,false}) {
+            const char* metadata=vessel?(render.focus?render.focus->HelpContext():nullptr):render.scenarioHelp.c_str();
+            if(!metadata||!*metadata)continue;
+            try {
+                auto target=NativeContextHelpUrl(files,metadata,vessel);
+                static const char hex[]="0123456789ABCDEF";
+                url+=vessel?"&vessel=":"&scenario=";
+                for(unsigned char c:target) {url+='%';url+=hex[c>>4];url+=hex[c&15];}
+            } catch(const std::exception& error) {std::clog<<"Context help: "<<error.what()<<'\n';}
+        }
+        OpenNativeHelp(url);
+        return true;
+    } catch(const std::exception& error) {
+        std::clog<<"Help: "<<error.what()<<'\n';
+        oapiAddNotification(OAPINOTIF_ERROR,"Orbiter Help",error.what());
+        return false;
+    }
 }
 
 int oapiEditMeshGroup (MESHHANDLE hMesh, oapi::UInt32 grpidx, GROUPEDITSPEC *ges)

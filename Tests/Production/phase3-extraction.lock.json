@@ -581,7 +581,7 @@
     },
     "Src/Orbiter/Production/CMakeLists.txt": {
       "original_sha256_lf": null,
-      "sha256_lf": "f8094bb157b14f0bdf6144591e6bc9d260ee94b496e42bcbe894e98d69dc3e1c",
+      "sha256_lf": "961b84852ca1ccfdc01d133fd9c127e95374a693d46abd2f00134397a9f06738",
       "scope": "Original ten stock MFD declarations use exact platform SDK aliases; shared original conic geometry is moved without calculation or screen-mapping changes. Full native instrument runtime remains incomplete."
     },
     "Src/Orbiter/Production/CameraServices.cpp": {
@@ -741,7 +741,7 @@
     },
     "Src/Orbiter/Production/NativeApplication.cpp": {
       "original_sha256_lf": null,
-      "sha256_lf": "4133aa6b8412d84881ee4b353fcf3823deee67f0bf54f255ecfe9f71920f9d6f"
+      "sha256_lf": "bbabf53b5f7af712c2b92e57066995be1623ba192cf1e4cd24158ca9a3930888"
     },
     "Src/Orbiter/Production/NativeBuild.h.in": {
       "sha256_lf": "f5fb21f83bb6be0c54839fce670e8410f6911eda86da2eef26e4221c1ae25d97",
@@ -785,7 +785,7 @@
     },
     "Src/Orbiter/Production/NativeGraphics.h": {
       "original_sha256_lf": null,
-      "sha256_lf": "a1f42e68eb4d02b0c1932a1b09baae0aaef0144150eb8e2b11ecb97b962a4603",
+      "sha256_lf": "1d501c5cfdf6b547b4efed5d77260c30c8f5d48294f560d1d89f8b75ee5386ce",
       "scope": "Original scheduler, stock MFDs and modern map compile natively with explicit original epoch/time, authoritative world/UI bindings and indexed map resources. Exact Windows calculations and callback order conserved. Native GDI/legacy map/custom-mode entry points fail explicitly until supported; native cockpit owner and DG runtime remain unfinished."
     },
     "Src/Orbiter/Production/NativeModule.cpp": {
@@ -810,7 +810,7 @@
     },
     "Src/Orbiter/Production/NativeRenderApi.cpp": {
       "original_sha256_lf": null,
-      "sha256_lf": "771c64dfdb9fcbd7a12876e73dc1e7c5e141b9d23edc9ad55aff7080025f4d35",
+      "sha256_lf": "7e245745f3eabbe0fd610695cb26de12f9ad6bfe4ad5d0f6c3e79ac13d7e7c1b",
       "scope": "Original scheduler, stock MFDs and modern map compile natively with explicit original epoch/time, authoritative world/UI bindings and indexed map resources. Exact Windows calculations and callback order conserved. Native GDI/legacy map/custom-mode entry points fail explicitly until supported; native cockpit owner and DG runtime remain unfinished."
     },
     "Src/Orbiter/Production/NativeRenderApi.h": {
@@ -1304,11 +1304,11 @@
     },
     "Src/Orbiter/Production/NativeCockpit.cmake": {
       "original_sha256_lf": null,
-      "sha256_lf": "056f58cc0b90b9f92bc57b2037e8de2848ce585ffed2ce80abf03e297c35c761"
+      "sha256_lf": "6258318622da39142243e1eda949d8fbee1ab3a95ee01e2ee561431b07e23fe6"
     },
     "Src/Orbiter/Production/NativeCockpitGui.cpp": {
       "original_sha256_lf": null,
-      "sha256_lf": "974fccdbacd7f66170b9130d3bfe2a7c8d6b1fc5419a1e13796d9e6940c838b7"
+      "sha256_lf": "af79142360a51252efde8977b117ece6408f4561a08e85aba7090baa20875b17"
     },
     "Src/Orbiter/Production/NativeCockpitProjection.cpp": {
       "original_sha256_lf": null,
@@ -1340,7 +1340,7 @@
     },
     "Src/Module/LuaScript/Native/CMakeLists.txt": {
       "original_sha256_lf": null,
-      "sha256_lf": "1f4861319dd80953e1f454250781d1b2bb01988140d6867603dcd185c3ef89cc"
+      "sha256_lf": "02189e39d02e801e984565ee8ef899d61fc0209c161c37389c16162c2bf4be1b"
     },
     "Src/Vessel/Common/Instrument.cpp": {
       "original_sha256_lf": "a358cf68cc90de24b398d431ef38f559c91c12ca6d577cc9dd1e2954b37bd869",
@@ -1652,7 +1652,7 @@
     },
     "Src/Orbiter/Production/NativeInterpreterSdk.cpp": {
       "original_sha256_lf": null,
-      "sha256_lf": "d5898f61f7969d0077e199e6dc3c7622322fd80e59d8f331b83e6e3d4949a315"
+      "sha256_lf": "7add956c7e1f56d260833130756e310c92f8ce6bc7b1c5e54c087dc8999e89da"
     },
     "Src/Orbiter/Production/NativeInterpreterSdk.h": {
       "original_sha256_lf": null,
@@ -1684,11 +1684,11 @@
     },
     "Src/Orbiter/DlgMgr.cpp": {
       "original_sha256_lf": "09b32684f728b22cce17f85bdaa24593e18adc52d8641bebd412a1881c87c8b0",
-      "sha256_lf": "ff4dfd6a701a0e2e04548d549b74425aad0846fa3629342a280b7081ad2772a8"
+      "sha256_lf": "424e2106dd84111f4e8c895cef94a6c40b67534495319ea7e784fb9227c605bb"
     },
     "Src/Orbiter/MenuInfoBar.cpp": {
       "original_sha256_lf": "d0bb8b38f21893ecce434232ae8f05881c33831537c950c69400b92ddbd6ffe7",
-      "sha256_lf": "0721a09e2c1a9f59f5d594682a8d764115e632d7f0a911ab2989751aeee91990"
+      "sha256_lf": "7b7066a595682843566b6dcef825df74e5ee690a3f1762cb46fe3d0e704f5218"
     },
     "Src/Orbiter/Production/GuiMenuButton.inc": {
       "original_sha256_lf": null,
@@ -1805,6 +1805,18 @@
     "Src/Orbiter/PlaybackEd.h": {
       "original_sha256_lf": "0609c17a759d24a28f55abe66521813bb0e8e090bb4af71aa6d35e760cedbbcb",
       "sha256_lf": "3ea3d1a88b7e87398909c3be78cd30aff2cb9b07866b3d5494a6fa024009cd72"
+    },
+    "Src/Orbiter/Production/NativeHelp.cpp": {
+      "original_sha256_lf": null,
+      "sha256_lf": "b55796f9cbb469e4d1046c84bc6f64072e0a1aad7cc0066612f2549cf183d5b9"
+    },
+    "Src/Orbiter/Production/NativeHelp.h": {
+      "original_sha256_lf": null,
+      "sha256_lf": "2e0ac57df1a65082a7b12961c9a0873e44a0fa0d7d79c6e5ef61646d9b76a626"
+    },
+    "Src/Orbiter/Production/GuiNotifications.inc": {
+      "original_sha256_lf": null,
+      "sha256_lf": "a14a9969c3cf8bf3138e73b3fb11d744e591f1d6ac0ed008cc9b4beade4bd6d8"
     }
   }
 }

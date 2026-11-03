@@ -37,6 +37,13 @@ file(GLOB headers "${original_lua_source_SOURCE_DIR}/*.h")
 file(COPY ${headers} DESTINATION "${PROJECT_BINARY_DIR}/sdk/include/lua")
 target_include_directories(lua INTERFACE "${PROJECT_BINARY_DIR}/sdk/include")
 
+# The original documentation generator uses LuaFileSystem and Penlight.
+# Keep this build tool separate from the simulator's Lua module search path.
+add_library(native_doc_lfs MODULE "${ORBITER_SOURCE_ROOT}/Extern/luafilesystem/src/lfs.c")
+target_link_libraries(native_doc_lfs PRIVATE lua)
+set_target_properties(native_doc_lfs PROPERTIES PREFIX "" OUTPUT_NAME lfs
+    LIBRARY_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/doc-tools")
+
 find_package(Threads REQUIRED)
 add_library(native_lua_inline_worker OBJECT
     ../LuaInterpreter/InterpreterExecution.cpp ../LuaInline/InlineEnvironment.cpp)

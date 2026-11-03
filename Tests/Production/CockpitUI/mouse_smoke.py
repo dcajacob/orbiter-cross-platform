@@ -43,6 +43,16 @@ def verify_menu(out,click,advance,button,key,move,window,title,process):
     click(x+42,y+115)
     click(x+228,y+99)
     wait(lambda:' | DG2 | ' in title(window),'Menu ship selection did not change the focused vessel')
+    help_requests=out/'help/requests.jsonl'
+    help_enabled=(out/'help-probe.enabled').exists()
+    def help_count():
+        return len(help_requests.read_text().splitlines()) if help_requests.exists() else 0
+    if help_enabled:
+        command('Help')
+        wait(lambda:help_count()==1,'Help menu did not launch the desktop viewer')
+        move(1270,300)
+        key(window,'Alt_L',True);tap('F1');key(window,'Alt_L',False);advance()
+        wait(lambda:help_count()==2,'Alt-F1 did not launch help')
     command('Function')
     functions=dialog('Custom functions')
     fx,fy=int(float(functions['x'])),int(float(functions['y']))
@@ -50,6 +60,15 @@ def verify_menu(out,click,advance,button,key,move,window,title,process):
     if events.exists():
         click(fx+80,fy+38)
         wait(lambda:'first:context:self-unregister:reallocate:replace' in events.read_text(),'First SDK function did not run')
+        if help_enabled:
+            dialog('##NOTIF0')
+            require(not geometry('##NOTIF1'),'Repeated Help failure was not deduplicated')
+            time.sleep(.6);advance() # Let the original half-second fade complete.
+            from PIL import ImageGrab
+            ImageGrab.grab(xdisplay=os.environ['DISPLAY']).save(out/'help-notification.png')
+            notice=dialog('##NOTIF0')
+            click(int(float(notice['x']))+135,int(float(notice['y']))+15)
+            wait(lambda:not geometry('##NOTIF0'),'Help error dismissal did not expire the original notification')
         click(fx+80,fy+38)
         wait(lambda:'second:context:remove-other:self-unregister' in events.read_text(),'Second SDK function did not run')
     click(fx+int(float(functions['width']))-12,fy+11)
@@ -89,7 +108,10 @@ def verify_menu(out,click,advance,button,key,move,window,title,process):
     recorder=dialog('Flight recorder/player')
     click(int(float(recorder['x']))+int(float(recorder['width']))-12,int(float(recorder['y']))+11)
     command('Camera')
-    dialog('Orbiter: Camera')
+    camera=dialog('Orbiter: Camera')
+    if help_enabled:
+        click(int(float(camera['x']))+int(float(camera['width']))-55,int(float(camera['y']))+10)
+        wait(lambda:help_count()==3,'Original camera dialog help button did not launch its topic')
     command('Options')
     options=dialog('Orbiter: Options')
     ox,oy=int(float(options['x'])),int(float(options['y']))
@@ -147,6 +169,23 @@ def verify_menu(out,click,advance,button,key,move,window,title,process):
         return saved if len(saved)==len(names) and saved!=before_names else None
     names=wait(reordered,'Dragging a stock menu item did not persist its new order')
     require(sorted(names)==sorted(before_names),'Reordering lost a menu command')
+    if help_enabled:
+        requests=[json.loads(line) for line in help_requests.read_text().splitlines()]
+        from urllib.parse import urlsplit,parse_qs
+        topics=[parse_qs(urlsplit(r['url']).query)['topic'][0] for r in requests]
+        require(topics[:2]==['mainmenu.htm','mainmenu.htm'] and topics[2].startswith('cam_'), 'Help opened the wrong original topic')
+        for request in requests:
+            def rendered():
+                reports=list((out/'help'/str(request['pid'])).glob('*.json'))
+                if not reports:return False
+                report=json.loads(reports[0].read_text())
+                return report['url']==request['url'] and not report['errors']
+            wait(rendered,'Desktop viewer did not render the actual requested help URL')
+            context=parse_qs(urlsplit(request['url']).query)
+            require('vessel' in context and 'scenario' in context,'Help omitted original vessel/scenario context')
+            require('dg-s.htm' in context['vessel'][0] and 'quickstart.htm' in context['scenario'][0],'Help used stale focus or scenario context')
+        (out/'help-verification.json').write_text(json.dumps(dict(menu=True,keyboard=True,dialog=True,topics=topics,contexts=True,rendered=True,
+            visible_missing_book=events.exists(),deduplicated=events.exists(),dismissed=events.exists()),indent=2)+'\n')
     (out/'loaded-maps.txt').write_text(Path(f'/proc/{process.pid}/maps').read_text())
     exit_x=int(float(bar['x']))+43+53*names.index('Exit')
     button(window,exit_x,25,True)
@@ -183,9 +222,30 @@ def main():
     p=argparse.ArgumentParser(description=__doc__)
     p.add_argument("--stock-menu",action="store_true")
     p.add_argument("--function-probe",action="store_true")
+    p.add_argument("--help-probe",action="store_true")
     for name in ('executable','assets','data','modules','planets','output'):p.add_argument('--'+name,type=Path,required=True)
     a=p.parse_args();out=a.output.resolve();require(not out.exists(),'Mouse output exists; replacement is forbidden');out.mkdir(parents=True)
     launch_env=dict(os.environ,XDG_SESSION_TYPE='x11')
+    if a.help_probe:
+        require(a.stock_menu,'Help probe requires the stock menu flow')
+        (out/'help-probe.enabled').touch()
+        # Exercise real xdg-open, with an isolated browser selected for the test.
+        app=out/'xdg-data/applications';app.mkdir(parents=True)
+        xdg_config=out/'xdg-config';xdg_config.mkdir()
+        launcher=HERE.parent/'Help/launch_browser.py'
+        import shlex
+        binaries=out/'browser-bin';binaries.mkdir()
+        wrapper=binaries/'orbiter-help-browser'
+        wrapper.write_text('#!/bin/sh\nexec '+shlex.quote(sys.executable)+' '+shlex.quote(str(launcher))+' "$@"\n')
+        wrapper.chmod(0o755)
+        (app/'orbiter-help-test.desktop').write_text('[Desktop Entry]\nType=Application\nName=Orbiter help test\n'
+            'Exec=orbiter-help-browser %u\nMimeType=text/html;x-scheme-handler/file;\nTerminal=false\n')
+        (xdg_config/'mimeapps.list').write_text('[Default Applications]\ntext/html=orbiter-help-test.desktop\nx-scheme-handler/file=orbiter-help-test.desktop\n')
+        launch_env.update(BROWSER=str(launcher),ORBITER_HELP_EVIDENCE=str(out/'help'),ORBITER_TEST_HELP_FAILURE='1',
+            XDG_CURRENT_DESKTOP='X-Generic',XDG_CONFIG_HOME=str(xdg_config),XDG_DATA_HOME=str(app.parent),
+            PATH=str(binaries)+os.pathsep+os.environ['PATH'])
+        selected=subprocess.check_output(['xdg-mime','query','default','text/html'],env=launch_env,text=True).strip()
+        require(selected=='orbiter-help-test.desktop','Isolated desktop did not select the test browser')
     if a.function_probe:
         require(a.stock_menu,'Function probe requires the stock menu flow')
         from custom_functions import build_probe
@@ -239,6 +299,7 @@ def main():
     if a.stock_menu:
         from focus_bars import scenario
         text=scenario().replace('BEGIN_SHIPS','BEGIN_MFD Left\n  TYPE Orbit\n  REF Earth\nEND_MFD\nBEGIN_MFD Right\n  TYPE Surface\nEND_MFD\nBEGIN_SHIPS')
+        if a.help_probe:text=text.replace('BEGIN_ENVIRONMENT','BEGIN_ENVIRONMENT\n  Help Default\\Checklists\\Quickstart,Quickstart')
         (out/'menu-evidence.enabled').touch()
         (out/'instrument-evidence.enabled').touch()
     (out/'cockpit.scn').write_text(text)

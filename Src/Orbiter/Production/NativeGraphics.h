@@ -105,6 +105,7 @@ struct NativeRenderContext {
     class NativeAnnotations* annotations=nullptr;
     class ScriptApplication* scriptApplication=nullptr;
     std::filesystem::path scriptSaveDirectory;
+    std::string scenarioHelp;
     class NativeScriptHost* scripts=nullptr;
     NativeGraphics* graphics=nullptr;Pane* cockpitPane=nullptr;Select* cockpitSelect=nullptr;InputBox* cockpitInput=nullptr;HELPCONTEXT* cockpitHelp=nullptr;
     bool paused=true,showGrapple=false;

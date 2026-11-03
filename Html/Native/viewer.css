@@ -1,0 +1,21 @@
+* { box-sizing: border-box; }
+body { margin: 0; color: #17293d; background: #f4f6f8; font: 16px system-ui, sans-serif; }
+header { height: 64px; display: flex; align-items: center; gap: 8px; padding: 12px 20px; border-bottom: 1px solid #bbc6d1; }
+h1 { flex: 1; font-size: 20px; margin: 0; }
+button, input { font: inherit; }
+button { padding: 7px 10px; border: 1px solid #a5b4c4; border-radius: 4px; background: white; cursor: pointer; color: inherit; }
+button[aria-pressed="true"] { background: #214c77; color: white; }
+button:focus-visible, a:focus-visible, input:focus-visible { outline: 3px solid #278cd8; outline-offset: 2px; }
+main { display: flex; height: calc(100vh - 64px); }
+aside { width: 340px; min-width: 220px; max-width: 45vw; resize: horizontal; overflow: auto; padding: 16px; border-right: 1px solid #bbc6d1; }
+nav { display: flex; gap: 5px; margin-bottom: 16px; }
+label { display: block; } label[hidden] { display: none; }
+input { width: 100%; margin-top: 6px; padding: 8px; }
+#status { font-size: 14px; color: #4c6175; }
+ul { list-style: none; padding: 0; margin: 0; }
+li { margin-bottom: 4px; }
+a { display: block; padding: 5px 3px; color: #145a92; text-decoration: none; }
+a:hover { text-decoration: underline; }
+[hidden] { display: none !important; }
+iframe { flex: 1; width: 0; min-width: 0; border: 0; background: white; }
+@media (max-width: 640px) { header { padding: 8px; } h1 { font-size: 16px; } aside { min-width: 170px; padding: 8px; } nav { flex-wrap: wrap; } button { padding: 5px; } }

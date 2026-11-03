@@ -398,7 +398,7 @@ struct Runtime final:BodyServices,RigidBodyServices,SurfaceServices,NavigationSe
             char description[128];
             std::snprintf(description,sizeof(description),"Orbiter playback scenario at T = %0.0f",time.SimT0);
             SaveTo(render.scriptSaveDirectory/"Playback"/(name+".scn"),description,0,name.c_str());
-            oapiAddNotification(OAPINOTIF_SUCCESS,"Flight recording started",name.c_str());
+            std::clog<<"Flight recording started: "<<name<<'\n';
             return true;
         } catch(const std::exception& error) {
             StopRecording();
@@ -612,6 +612,7 @@ struct Runtime final:BodyServices,RigidBodyServices,SurfaceServices,NavigationSe
 #else
         quicksaveStem=scenario.stem().string();
         initialScenario=scenario;
+        render.scenarioHelp=metadata.ScnHelp()?metadata.ScnHelp():"";
         localPlaybackRoot=CompareText(scenario.parent_path().filename().string().c_str(),"Playback")==0
             ? scenario.parent_path().parent_path() : savePath.parent_path();
         std::string directory=metadata.PlaybackDir();

@@ -1,15 +1,18 @@
 // Copyright (c) Martin Schweiger
 // Licensed under the MIT License
 // Native dialog services surrounding the original Select/InputBox algorithms.
+#define IMGUI_DEFINE_MATH_OPERATORS
 #include "Select.h"
 #include "DlgFocus.h"
 #include "IconsFontAwesome6.h"
 #include "NativeInterpreterSdk.h"
+#include "NativeHelp.h"
 #include "Config.h"
 #include "Pane.h"
 #include "Mfd.h"
 #include "NativeCockpitUi.h"
 #include <memory>
+#include <chrono>
 #include <fstream>
 #include "CockpitGuiExports.h"
 #include "NativeGraphics.h"
@@ -19,6 +22,9 @@
 #include <vector>
 #include <stdexcept>
 using namespace orbiter::production;
+#define ORBITER_NOTIFICATION_EXPORT ORBITER_PRODUCTION_API
+#include "GuiNotifications.inc"
+#undef ORBITER_NOTIFICATION_EXPORT
 namespace {
 std::vector<ImGuiDialog*> moduleDialogs;
 ImFont *uiFonts[4]{};
@@ -312,6 +318,7 @@ void DestroyCockpitGui() {
     focusDialog.reset();
     DestroyCockpitInfoBars();
     moduleDialogs.clear();
+    notifications.clear();
     if(replayClockHook) {
         ImGui::RemoveContextHook(ImGui::GetCurrentContext(),replayClockHook);
         replayClockHook=0;
@@ -329,6 +336,7 @@ void DestroyCockpitGui() {
     if (ImGui::GetCurrentContext()) ImGui::DestroyContext();
 }
 void BeginCockpitGuiFrame() {
+    for(const auto& failure:PollNativeHelp())oapiAddNotification(OAPINOTIF_ERROR,"Orbiter Help",failure.c_str());
     ImGui::NewFrame();
     const auto& context = GetNativeRenderContext();
     if (context.configuration->CfgUIPrm.MouseFocusMode != 0 && !ImGui::GetIO().WantCaptureMouse)
@@ -341,6 +349,7 @@ void BeginCockpitGuiFrame() {
         if (std::find(moduleDialogs.begin(), moduleDialogs.end(), dialog) != moduleDialogs.end() && dialog->IsActive())
             dialog->Display();
     }
+    RenderNotifications();
     ImGui::EndFrame();
     if(menuWindows.is_open()) {
         for(auto* window:GImGui->Windows) {

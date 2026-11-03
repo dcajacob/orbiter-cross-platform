@@ -25,7 +25,7 @@ orientation matrix at tick 38. The paired workflow now also captures Windows
 with SSE2 selected. [Hosted spacecraft comparisons](https://github.com/dcajacob/orbiter-cross-platform/actions/runs/41563089040)
 
 The native cockpit now draws the original dynamic menu and stock PNG icons.
-Ship, Camera, Speed, Pause, Function, Info, Options, Map, Record, Save and Exit are connected. In a local
+Ship, Camera, Speed, Pause, Function, Info, Options, Map, Record, Help, Save and Exit are connected. In a local
 X11 flight, mouse clicks paused and resumed the DG, changed the clock to 10×,
 switched focus to DG-S, and opened the original camera, object information,
 map and menu configuration dialogs. The saved scenario contains the selected
@@ -34,8 +34,85 @@ Dragging Ship past Camera persisted their new order. Exit closed the graphics
 context after all 162 frame presentations. The sanitizer run completed 125
 frame presentations, with two 56-byte allocations originating in Mesa
 libgallium 26.0.8 at offsets `0xef1ba0` and `0xef1b89`.
-Help remains open.
+Help now opens the original documentation in the desktop browser; details and
+the separate remaining Phase 6 gates are below.
 [Delta-glider flight evidence](DeltaGlider.md)
+
+The Help command, Alt-F1 and the original dialog question-mark buttons resolve
+the original `HELPCONTEXT` book/topic through a staged catalog. The desktop
+browser displays local HTML with contents, keyword index, full-text search,
+Back/Forward and the original page imagery. Vessel and Scenario buttons use
+the current focus vessel's `Help` configuration and the scenario's `Help`
+metadata. Unknown books or topics produce a notification. A missing optional
+add-on context does not prevent the requested stock topic from opening.
+
+The development provisioner builds 21 original help books, including stock
+scenario tutorials, DG/DG-S, AAP, scenario-editor documentation and the Lua API.
+It runs the repository's LDoc/Penlight/LuaFileSystem sources against the original
+Lua API annotations. Generated Lua docs include the DG and ShuttleA extensions.
+The manifest hashes generator inputs, the Lua/LuaFileSystem binaries and all
+401 original/copied inputs. Browser copies adapt case-sensitive paths,
+Windows CHM jumps and encoding; the source bytes are retained separately.
+The audit checks unchanged prose across 189 topics and resolves all 2,170
+local links. It also accounts explicitly for two malformed original anchor
+tags and legacy missing-path links; it does not rewrite help prose.
+
+To prepare Help after building the cockpit engine:
+
+```sh
+python3 -B Tests/Production/Help/prepare.py \
+  --lua out/phase6-cockpit-engine/native-lua/lua \
+  --destination out/phase6-dg-resources/Help
+python3 -B Tests/Production/Help/verify.py \
+  --help-root out/phase6-dg-resources/Help \
+  --output out/help-sources.json
+```
+
+Local Chromium checks render each book's default topic and images, exercise
+contents/index/search, history, cross-book navigation, generated Lua docs and
+vessel/scenario buttons. The actual X11 Debug menu flow passed 670 presentations
+and teardown: Help, Alt-F1 and the camera question-mark button each reached
+`xdg-open`, then an isolated real browser rendered `mainmenu.htm`,
+`mainmenu.htm` and `cam_mode.htm`. Each request carried current DG-S and
+Quickstart scenario context. All twelve commands, recorder overwrite handling,
+Function callback ownership, Options persistence/reload, reorder, Save and Exit
+passed in that flow. The hosted matrix now runs these checks with a pinned
+Playwright browser driver and retains the source manifest and screenshots.
+The equivalent Release flow passed 743 presentations, all three help launches,
+the same context checks and complete graphics shutdown.
+
+The desktop launcher receives a single encoded URL, without a command shell.
+It does not inherit simulation file descriptors or engine loader/preload paths.
+The help service polls child exits across simulation sessions, reports desktop
+launcher failures and never terminates the user's browser. A separate process
+test checks exact arguments, descriptor/environment isolation, missing launchers,
+nonzero exits and child reaping. It passes address, undefined-behavior and leak
+checking without suppressions outside the ptrace-based execution sandbox
+(LeakSanitizer cannot operate under that sandbox). These Help checks do not close the existing
+Mesa leak gate, default Windows numerical mismatch, broader stock-vessel
+coverage or physical-controller qualification requirements.
+
+The recorder commit's Windows build was initially stopped by a CRLF-sensitive
+source-audit replacement. `62472a6f` normalizes line endings and limits the
+destructor cleanup adaptation to the destructor itself. LF and CRLF checks
+both pass and both reject removal of the original Load() filename cleanup.
+The complete 439-file source-conservation audit and frozen UI/control/MFD
+reference checks pass unchanged locally.
+
+The original notification implementation is now shared through
+`GuiNotifications.inc`. Native Help failures and scenario-save messages use
+the same widgets, colors, timing, duplicate counter and dismiss/copy controls
+as Windows. Native session teardown clears queued notifications before
+destroying ImGui. The final Debug and Release menu flows completed 703 and
+821 presentations respectively, including a public-SDK missing-book request
+repeated twice and displayed as one `Orbiter Help (x2)` error. The notification
+code is compared against the original source after the export macro adapter.
+The instrumented menu flow completed 700 presentations and additionally
+clicked the error's dismiss button and verified that it expired. Help browser
+launches, contextual topics, and notification deduplication/dismissal passed.
+No address or undefined-behavior errors were reported. Process exit still
+failed with the same unsuppressed 112 bytes in two graphics allocations;
+the subsequent Options reload was therefore not run in that sanitizer flow.
 
 The Windows Debug and Release client regressions and their final comparison
 passed at `607de492` in

@@ -1,0 +1,5 @@
+{
+  "name": "orbiter-native-help-browser-check",
+  "private": true,
+  "dependencies": { "playwright-core": "1.62.1" }
+}

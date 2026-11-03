@@ -69,6 +69,11 @@ def verify_focus_bars():
         equal(before[before.index(start):],after[after.index(start):],'Original '+filename+' interactions')
     widgets=current('Production/GuiAnimatedControls.inc').replace('ORBITER_WIDGET_EXPORT','DLLEXPORT')
     dialog_manager=original('DlgMgr.cpp')
+    start=dialog_manager.index('/* \nNotification handling')
+    end=dialog_manager.index('// ImGui utils',start)
+    equal(dialog_manager[start:end],
+          current('Production/GuiNotifications.inc').replace('ORBITER_NOTIFICATION_EXPORT','DLLEXPORT'),
+          'Original notification widgets, timing, deduplication and dismissal')
     equal(dialog_manager[dialog_manager.index('DLLEXPORT bool BeginAnimatedCombo'):dialog_manager.rindex('\n}')],
           widgets,'Original combo and collapsing-header drawing, animation and input')
     before=original('DlgRecorder.cpp');after=windows(current('DlgRecorder.cpp'))

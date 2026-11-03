@@ -602,8 +602,10 @@ int oapiSetMaterial (DEVMESHHANDLE hMesh, oapi::UInt32 matidx, const MATERIAL *m
 
 oapi::Font* oapiCreateFont(int height,bool prop,const char* face,FontStyle style,int orientation)
 {return GetNativeRenderContext().graphics->CreateFontResource(height,prop,face,style,orientation);}
+#ifndef ORBITER_NATIVE_COCKPIT
 void oapiAddNotification(int type,const char* title,const char* message)
 {std::clog<<title<<": "<<message<<'\n';}
+#endif
 namespace orbiter::production {
 namespace {NativeRenderContext* current=nullptr;}
 NativeRenderContext* BindNativeRenderContext(NativeRenderContext* next)
