@@ -108,8 +108,14 @@ The two automatic packages are retained in the preceding Lua process-exit
 bundle. Asset and font collections are excluded. Remote preservation of the
 complete native/parity bundle remains open.
 
-The stock-corpus termination rules are unchanged at this checkpoint. The
-historical 157-scenario sweep remains
+The four-profile parity checkpoint changed no stock-corpus termination rule.
+The subsequent [corpus harness](../../Tests/Production/StockScenarios/README.md)
+now admits this one pinned intentional exit only after replaying its original
+audit and comparing the complete native state and docking-port traces. Three
+targeted instrumented corpus runs passed, including two ordinary sixty-frame
+scenes and this unchanged stock exit. Sixteen copied-evidence policy controls
+reject forged or incomplete early exits. A fresh full sweep is still required;
+the historical 157-scenario sweep remains
 112 passed and 45 failed; the original failed result is not rewritten as a
 pass. Hosted checks for the repair, other missing stock modules/dependencies,
 final hardware testing and remote evidence preservation remain open. A

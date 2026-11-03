@@ -20,7 +20,14 @@ Wheel work; it is not permission to replace a missing required module.
 File readiness does not prove runtime ABI compatibility or host qualification.
 
 The current host additionally restricts allowed class/capability combinations.
-The complete sweep at runtime source `9418ae29` finds 45 scenarios with their
+The last independently audited complete sweep, at runtime source `09eeed20`,
+attempted all 157 unchanged scenarios: **112 passed and 45 failed**. That
+historical result remains unchanged. Transfer MFD and explicit Lua-exit repairs
+have since passed targeted complete-scene regressions; a fresh full sweep is
+required to establish their effect on the corpus. The earlier results below
+remain historical checkpoints.
+
+The earlier complete sweep at runtime source `9418ae29` found 45 scenarios with their
 declared configuration/module files present. Mir/Wheel now have an explicitly
 qualified local Release automatic capability policy and seven formerly rejected
 scenarios pass. GeneralApiTest still fails its preserved original-Windows
@@ -32,7 +39,7 @@ cases terminate by signal in both historical runtimes. The subsequent startup
 lifetime fix passes clean-rejection regressions for all 25, without qualifying
 their missing dependencies; see [startup lifetime](../../../Docs/Production/VesselStartupLifetime.md).
 
-Each attempted scene must complete 60 original 0.25-second frames with normal
+Each ordinary scene must complete 60 original 0.25-second frames with normal
 context deletion and complete finalized ticks 0 through 60. At every tick the
 actual original vessel trace must contain the entire declared ship manifest,
 including non-focus ships and exact class names. Lua/runtime/sanitizer errors
@@ -42,17 +49,40 @@ epoch for missing/invalid numeric dates is recorded; this does not qualify
 wall-clock Today semantics. This is an initialization/smoke sweep, separate from
 interactive acceptance and additional original Windows state/image comparisons.
 
+`Tests/VesselApiTest.scn` has one explicit intentional-exit policy, established
+by the independently audited original Windows Debug/Release automatic/SSE2
+observations. Its locked scenario and script bytes must match. Before running
+the scene, the harness re-audits all four original profiles and verifies the
+actual native build inputs, configuration, math implementation and binaries.
+A read-only SDK observer retains all eight original vessels and every docking
+port at the unchanged session boundaries. Acceptance requires the original
+13 presentations and 14 finalized snapshots, all 60 ordered assertion log
+events and 28 pass records, exit zero, context deletion and an unchanged
+existing save. Every SDK state and local docking-port observation is compared
+to its original profile with the existing numerical budgets. Other early
+exits retain the ordinary sixty-frame failure. No script or ship is modified.
+
+The run and independent audit record the selected build manifest, all 479
+owning sources, actual CMake cache, retained libraries, observer inputs and
+explicit sanitizer settings. The observer inputs must match their recorded
+immutable producer commit. Instrumented sweeps require leak detection with
+no suppressions. All protected files must remain unchanged throughout the run.
+
 ```sh
 python3 -B Tests/Production/StockScenarios/run.py \
-  --backend wayland --executable out/phase6-base-stations-engine/orbiter-production \
-  --assets out/phase6-dg-resources --data out/native-celestial-data \
-  --modules out/phase6-base-stations-engine/NativeModules --planets out/archive-data \
+  --backend wayland --executable out/phase6-lua-exit-asan-engine/orbiter-production \
+  --assets out/phase6-shuttle-a-resources-v2 --data out/native-celestial-data \
+  --modules out/phase6-lua-exit-asan-engine/NativeModules --planets out/archive-data \
+  --build-record out/phase6-lua-exit-build-asan/build.json \
+  --runtime-source-commit b1e3f1d60485149f5df63b5e89b531cb8ed0d8cf \
+  --stock-exit-reference out/phase6-stock-lua-exit-public-replay-v1 \
   --output out/stock-full-smoke
 
 python3 -B Tests/Production/StockScenarios/verify.py \
-  --capture out/stock-full-smoke --assets out/phase6-dg-resources \
-  --modules out/phase6-base-stations-engine/NativeModules \
-  --runtime-source-commit 9418ae293fc7c4cbee49538163e14d97ec3e5a1c \
+  --capture out/stock-full-smoke --assets out/phase6-shuttle-a-resources-v2 \
+  --modules out/phase6-lua-exit-asan-engine/NativeModules \
+  --runtime-source-commit b1e3f1d60485149f5df63b5e89b531cb8ed0d8cf \
+  --stock-exit-reference out/phase6-stock-lua-exit-public-replay-v1 \
   --output out/stock-full-audit.json
 ```
 
@@ -60,7 +90,7 @@ Use an owned correctness-test display, matching backend, and appropriate
 runtime library path. All output directories/files must be fresh. The sweep
 exits nonzero when any scenario fails and still saves every attempt. The audit
 can successfully validate an incomplete sweep, but reports `audited-incomplete`
-and retains all 113 failures. It never equates that status with passing the
+and retains every failure. It never equates that status with passing the
 corpus gate. `--inventory-only` and selected `--case` runs are not complete
 smoke qualification.
 
@@ -70,6 +100,11 @@ rejection against temporary fixtures and all locked scenario bytes.
 `Manifest.Test.py` removes a non-focus ship at tick 30 from a copied real
 capture. The all-object gate must reject it despite sixty normal presentations
 and shutdown, while preserving the original trace unchanged.
+`ExitPolicy.Test.py` damages copied real stock-exit evidence in sixteen ways,
+including ordinary or unidentified partial exits, changed scenario or staged
+script bytes, absent reference, wrong profile/math, forged or missing assertions,
+missing core/SDK background vessels, ports or ticks, nonzero exit, incomplete
+teardown and an overwritten save. The original capture remains unchanged.
 
 ## Startup rejection regressions
 
