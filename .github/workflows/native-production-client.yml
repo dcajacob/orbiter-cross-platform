@@ -188,6 +188,12 @@ jobs:
           xvfb-run -a -s '-screen 0 1920x1080x24' env LIBGL_ALWAYS_SOFTWARE=1 GALLIUM_DRIVER=llvmpipe
           python3 -B Tests/Production/LuaRuntime/native_flight.py --build out/native-cockpit-engine
           --assets out/scene-resources --data out/data --planets out/planets --output out/native-lua-flight
+      - name: Verify default and explicitly enabled planet cloud-microtexture flags
+        run: >-
+          xvfb-run -a -s '-screen 0 1920x1080x24' env LIBGL_ALWAYS_SOFTWARE=1 GALLIUM_DRIVER=llvmpipe
+          python3 -B Tests/Production/PlanetDefaults/native.py --build out/native-cockpit-engine
+          --renderer-build out/native-cockpit-renderer --assets out/scene-resources --data out/data
+          --planets out/planets --output out/native-planet-defaults
       - name: Operate DG systems and reload moving, deployed and closed mechanisms
         run: >-
           xvfb-run -a -s '-screen 0 1920x1080x24' env LIBGL_ALWAYS_SOFTWARE=1 GALLIUM_DRIVER=llvmpipe
@@ -352,6 +358,7 @@ jobs:
             out/native-lua-flight/*/saved.scn
             out/native-lua-flight/*/console.txt
             out/native-lua-flight/*/graphics-lifecycle.json
+            out/native-planet-defaults/**
             out/native-lua/lua-source.json
             out/native-lua/defined-upvalues/lfunc.c
             out/native-lua/Testing/Temporary/LastTest.log

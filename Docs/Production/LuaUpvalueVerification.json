@@ -112,6 +112,22 @@
     {
       "path": "out/phase6-lua-guards-original-verified/provenance.json",
       "sha256": "67367eac7a1446a940849d8c742368876e4d132cd79bd9ed7d74e8a1b194f133"
+    },
+    {
+      "path": "out/phase6-lua-guards-regressions/verification.json",
+      "sha256": "bc899fa444853d2406560ddb6138d53a3f3db5b774ff026e4216f8ed23e9be48"
+    },
+    {
+      "path": "out/phase6-lua-guards-regressions/camera-comparison.json",
+      "sha256": "c0b39805a7949abe35ed69b93331ede8e54fe9d7113074d7520f736a3cd67260"
     }
-  ]
+  ],
+  "normal_camera_regression": {
+    "status": "passed",
+    "application_processes": 24,
+    "presents": 1440,
+    "original_windows_cases": 12,
+    "full_frame_ssim_minimum": 1.0,
+    "sources_and_binaries_unchanged": true
+  }
 }

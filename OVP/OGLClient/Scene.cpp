@@ -60,7 +60,7 @@ OGLMaterial def_mat = {{1,1,1,1},{1,1,1,1},{1,1,1,1},{0,0,0,1},0};
 const double LABEL_DISTLIMIT = 0.6;
 
 struct PList { // auxiliary structure for object distance sorting
-	vPlanet *vo;
+	vObject *vo; // Both planets and stars use this distance-sorted render list.
 	double dist;
 };
 
@@ -541,7 +541,7 @@ void Scene::Render (bool cockpitOverlay)
 		OBJHANDLE hObj = pv->vobj->Object();
 		int objtp = oapiGetObjectType (hObj);
 		if (objtp == OBJTP_PLANET || objtp == OBJTP_STAR) {
-			plist[np].vo = (vPlanet*)pv->vobj;
+			plist[np].vo = pv->vobj;
 			plist[np].dist = pv->vobj->CamDist();
 			np++;
 		}
@@ -612,7 +612,7 @@ void Scene::Render (bool cockpitOverlay)
 			OBJHANDLE hObj = plist[i].vo->Object();
 			if (oapiGetObjectType(hObj) != OBJTP_PLANET) continue;
 			if (!surfLabelsActive)
-				plist[i].vo->ActivateLabels(true);
+				static_cast<vPlanet*>(plist[i].vo)->ActivateLabels(true);
 			int label_format = *(int*)oapiGetObjectParam(hObj, OBJPRM_PLANET_LABELENGINE);
 			if (label_format == 2) {
 				if (!skp) {

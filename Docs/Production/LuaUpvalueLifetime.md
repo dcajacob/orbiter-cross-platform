@@ -38,11 +38,14 @@ controls, air data and cockpit state are byte-identical on the matching default
 math profile. The accepted reference ZIPs were verified again offline; their
 bytes and all comparison budgets are unchanged.
 
-The fresh fully instrumented engine and renderer get past the Lua failure, but
+The Lua-only fully instrumented engine and renderer get past the Lua failure, but
 stop before Wayland interaction at `Scene.cpp:544`: the renderer downcasts a
 `vStar` to `vPlanet` while building its combined star/planet render list.
 This retained failure prevents a full Wayland sanitizer qualification. No
-sanitizer is disabled, error ignored or reference/budget refreshed.
+sanitizer is disabled, error ignored or reference/budget refreshed. Subsequent
+[renderer and planet initialization repairs](RendererDefinedBehavior.md) get
+through actual input and context teardown; process-level dependency leaks still
+prevent full Wayland sanitizer qualification.
 
 Local evidence is retained in `out/phase6-lua-upvalue-repro/`, including both
 failed original/first-prototype runs and `prototype-verification.json` for the

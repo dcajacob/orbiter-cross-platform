@@ -564,8 +564,9 @@
       "original_sha256_lf": null
     },
     "Src/Orbiter/Planet.cpp": {
-      "sha256_lf": "16839acc6a75ae001edbfbdbdc8c309ed9c98c2eb70c894532a94e41993dec8f",
-      "original_sha256_lf": "5636b25669596ea2523175f6ebbf016e0659ec4e6f752a8e8f5ef8c6fdcac926"
+      "sha256_lf": "0eccb574ab433783baffa5f14ccb8fd4e32aa4e98c4013f030cfc7bbecf6f521",
+      "original_sha256_lf": "5636b25669596ea2523175f6ebbf016e0659ec4e6f752a8e8f5ef8c6fdcac926",
+      "scope": "Initialize the config constructor cloud-microtexture flag to false, matching the numerical constructor; a valid explicit configuration still enables it. This fixes the unsuppressed invalid-bool read for stock Triton, which lacks CloudMicrotextureAlt. All original calculations and configuration parsing remain otherwise unchanged."
     },
     "Src/Orbiter/Planet.h": {
       "sha256_lf": "f62b05a2974cf9cda4ecf1e3e7e85533f994447349c01a6577834f03cb8fcd73",

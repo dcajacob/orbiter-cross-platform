@@ -194,6 +194,7 @@ Planet::Planet (char *fname)
 	int i, n;
 	double d;
 	char cbuf[256], *pc;
+	bCloudMicrotex = false;
 
 	psys         = 0;
 	ncloudtex    = 0;

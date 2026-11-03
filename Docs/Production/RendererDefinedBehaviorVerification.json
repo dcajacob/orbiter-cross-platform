@@ -1,0 +1,153 @@
+{
+  "schema": 1,
+  "status": "source-repairs-and-normal-regressions-passed",
+  "phase6_complete": false,
+  "source_base": "84ce843a17acfa4b55a76f777ae1a66054405bc4",
+  "source_sha256": {
+    "OVP/OGLClient/Scene.cpp": "19f4512fd27ce4e7ebd07e5da6db240f0ce91ed7d286d0a3c658698725e7a7e7",
+    "Src/Orbiter/Planet.cpp": "0eccb574ab433783baffa5f14ccb8fd4e32aa4e98c4013f030cfc7bbecf6f521",
+    "Tests/Production/random_source.py": "bcd4847fd6bb22dff0293ffac2ecee62a386538466fa0c2e1d51fbc94805d910",
+    "Tests/Production/phase3-extraction.lock.json": "8c23d6b34526c9e96ba7cf493d76cc55604457adca722d8aaa252310f020a348",
+    "Tests/Production/PlanetDefaults/NativeProbe.cpp": "2fd84bc4ac63c718005034d98b3b64490f69852896c7b6b30fa48c47be84e4ba",
+    "Tests/Production/PlanetDefaults/native.py": "7238ae0144058978b2309dd06c2031b19898b90f74776301c1f80d49a43c0dc5",
+    "Tests/Production/WindowDecorationLifetime/CMakeLists.txt": "69d17cd6972024ce07a7634690f4baa93bd981cf4292999a1f9165cd787eec2d",
+    "Tests/Production/WindowDecorationLifetime/main.cpp": "48d0b523599440574d3212944d1e46718ed67238735b1068bf3907ea8ac87ff6",
+    ".github/workflows/native-production-client.yml": "c373e54b8e4ea3fe8b427060b460378ea2c07bd012196f3e108ed1d38df085b2"
+  },
+  "repairs": {
+    "renderer_common_base_pointer": true,
+    "planet_config_constructor_false_default": true,
+    "layout_and_numerical_formulas_unchanged": true,
+    "exact_source_conservation_audit": "passed"
+  },
+  "normal_regressions": {
+    "checks": {
+      "lua-schedule": "passed",
+      "lua-flight": "passed",
+      "planet-defaults": "passed",
+      "camera": "passed",
+      "camera-comparison": "passed"
+    },
+    "sources_and_binaries_unchanged": true,
+    "exact_windows_lua_cases": 5,
+    "autopilot_flights": 4,
+    "unchanged_stock_flights": 6,
+    "actual_planet_observations": 240,
+    "camera_processes": 24,
+    "camera_windows_cases": 12,
+    "full_frame_ssim_minimum": 1.0
+  },
+  "full_wayland_sanitizers": {
+    "status": "failed-at-process-exit",
+    "c_and_cxx_engine_and_renderer_instrumented": true,
+    "asan_options": "detect_leaks=1:fast_unwind_on_malloc=0",
+    "lsan_options": "",
+    "ubsan_options": "halt_on_error=1:print_stacktrace=1",
+    "context_lifecycle": {
+      "rendered_frames": 636,
+      "successful_presents": 636,
+      "context_deleted": true
+    },
+    "leaked_bytes": 273300,
+    "leaked_allocations": 6411,
+    "fontconfig_stack_bytes": 273188,
+    "fontconfig_stack_allocations": 6409,
+    "gallium_address_range_bytes": 112,
+    "gallium_address_range_allocations": 2
+  },
+  "isolated_decoration": {
+    "status": "isolated-default-decoration-leak-reproduced",
+    "results": {
+      "prefer": {
+        "returncode": 1,
+        "fontconfig_in_leak_stack": true,
+        "leak_report": true,
+        "normal_window_termination": true,
+        "gtk_decoration_loaded": true,
+        "gtk_loaded": true
+      },
+      "disable": {
+        "returncode": 0,
+        "fontconfig_in_leak_stack": false,
+        "leak_report": false,
+        "normal_window_termination": true,
+        "gtk_decoration_loaded": false,
+        "gtk_loaded": false
+      }
+    },
+    "production_configuration_changed": false
+  },
+  "original_references_and_budgets_unchanged": true,
+  "evidence": [
+    {
+      "path": "out/phase6-planet-defaults-regressions/verification.json",
+      "sha256": "bde975b1db9af289e4292c48367a57e7a7e2d6de2fef734fcaf19025dada03e8"
+    },
+    {
+      "path": "out/phase6-planet-defaults-regressions/camera-comparison.json",
+      "sha256": "c0b39805a7949abe35ed69b93331ede8e54fe9d7113074d7520f736a3cd67260"
+    },
+    {
+      "path": "out/phase6-planet-defaults-regressions/schedule/lua-schedule-report.json",
+      "sha256": "89ac7ca97fe630e309a171026bfb83469230984fe6a55052793f2d2bac612df9"
+    },
+    {
+      "path": "out/phase6-planet-defaults-regressions/flight/flight-report.json",
+      "sha256": "92dfa9db2eccbb392e7fbed99c8085272fdb6465cb94a8b3885133e915e382e3"
+    },
+    {
+      "path": "out/phase6-planet-defaults-regressions/planet-defaults/verification.json",
+      "sha256": "7591f50c3843aa8b4a8f04b79122f2662c101743f8119cc452ee0f6937d25e9b"
+    },
+    {
+      "path": "out/phase6-planet-defaults-source-controls.json",
+      "sha256": "ccaff362376d8d6fdcfafde2d104337a58d587a7a949025b494a28847b6a3520"
+    },
+    {
+      "path": "out/phase6-lua-guards-asan-system-panel-1/runtime-snapshot.json",
+      "sha256": "5c47369b04c81b63ae87f2855ad904e2e3feca896ccd82e3b02bee8749025a7d"
+    },
+    {
+      "path": "out/phase6-scene-types-asan-system-panel-1/runtime-snapshot.json",
+      "sha256": "b64e88752891de065814a8f1014316ce4a3316c8e785cb907cbc961d6db63048"
+    },
+    {
+      "path": "out/phase6-planet-defaults-asan-system-panel-1/runtime-snapshot.json",
+      "sha256": "324bb5fb3b55b7608838b0c46dcecfac28cd877b5da6536a5c9b3438ff82b281"
+    },
+    {
+      "path": "out/phase6-planet-defaults-asan-system-panel-1/leak-address-analysis.json",
+      "sha256": "e6d84c829fe16b6bec533509d00bd888d37c6281063610bf3b161b5ccaff7a1a"
+    },
+    {
+      "path": "out/phase6-window-decoration-capture-final/verification.json",
+      "sha256": "86feebbb32b8d4aa3cc4e9fe9c8f0e19b53992e790d5b91160f0ee7114c41ddf"
+    }
+  ],
+  "local_evidence_archive": {
+    "schema": 1,
+    "status": "preserved-locally",
+    "phase6_complete": false,
+    "path": "out/phase6-defined-behavior-evidence-v2.tar.gz",
+    "size_bytes": 590175709,
+    "sha256": "28ed572712f42da8d9d41108a0eb2cec353b4794621ce3416f9907fe0c33fc2b",
+    "members": 6438,
+    "source_base": "84ce843a17acfa4b55a76f777ae1a66054405bc4",
+    "index_sha256": "d4f1713a479937f04540964b58dc81e784f1b9e8a966ba226be7650aea406515",
+    "original_zip_runtime_and_source_hashes_verified": true,
+    "all_archive_payload_hashes_verified": true,
+    "remote_publication_complete": false
+  },
+  "prior_hosted_qualification": {
+    "run_id": 41650935034,
+    "source_commit": "2c00d29b9d982d4096947636dcd61a89006577a0",
+    "status": "completed",
+    "conclusion": "success",
+    "successful_jobs": 12,
+    "native_profiles": 4,
+    "preserved_windows_profiles": 4,
+    "comparison_profiles": 4,
+    "current_source_qualification_pending": true,
+    "url": "https://github.com/dcajacob/orbiter-cross-platform/actions/runs/41650935034"
+  }
+}

@@ -30,6 +30,12 @@ Debug/Release automatic/SSE2 pairs. Subsequent Wayland and viewport changes
 require their own current hosted qualification.
 [Camera mouse/FOV hosted run](https://github.com/dcajacob/orbiter-cross-platform/actions/runs/41639429419)
 
+Run `41650935034` at `2c00d29b` has now completed all twelve jobs successfully:
+four native profiles, four preserved Windows profiles and four paired
+comparisons. Later viewport, base-texture, station and defined-behavior repairs
+remain subject to current-source hosted qualification.
+[Completed four-profile run](https://github.com/dcajacob/orbiter-cross-platform/actions/runs/41650935034)
+
 Gear, nose cone, radiator, both airlocks, hatch and airbrakes now pass a native
 keyboard and save/reload regression in both gliders and cockpit modes. Debug,
 Release and the unsuppressed sanitizer build each complete 16 fresh processes
@@ -258,9 +264,13 @@ four build/CPU profiles. [Station and base evidence](StockStations.md)
 A fresh build that instruments C as well as C++ exposed a Lua empty-upvalue-list
 undefined access. The native build now uses a hash-checked generated copy with
 two null guards, passes unsuppressed closure/GC stress and all five preserved
-Windows Lua/AAP schedules. The full sanitizer run gets past Lua and stops at an
-invalid renderer star-to-planet cast before Wayland interaction. Broader
-sanitizer qualification remains open. [Failure and fix evidence](LuaUpvalueLifetime.md)
+Windows Lua/AAP schedules. Subsequent repairs remove an invalid renderer
+star-to-planet cast and initialize the missing planet cloud-microtexture default.
+The full instrumented Wayland flow reaches 636 presentations and context
+teardown, then fails LeakSanitizer in system decoration/font and Gallium
+allocations. A minimal GLFW window isolates the decoration leak. Broader
+sanitizer qualification remains open. [Lua fix](LuaUpvalueLifetime.md),
+[renderer repairs and retained failures](RendererDefinedBehavior.md)
 
 The native graphics leak now has an isolated source fix and a passing local
 sanitizer menu flow. Mesa's executable-code allocator retained two bookkeeping
