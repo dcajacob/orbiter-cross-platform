@@ -35,6 +35,8 @@ jobs:
           cmake -S Src/Orbiter/Production/Math -B out/native-math -G Ninja -DCMAKE_BUILD_TYPE=${{ matrix.configuration }} 2>&1 | tee native-math-configure.log
           cmake --build out/native-math --parallel 2 2>&1 | tee native-math-build.log
           ctest --test-dir out/native-math --output-on-failure 2>&1 | tee native-math-verification.log
+      - name: Check production HUD heading-marker scopes with unsuppressed sanitizers
+        run: python3 -B Tests/Production/Cockpit/heading_tape_test.py --output out/heading-check
       - name: Build the pinned native Lua library, interpreter worker and handoff test
         shell: bash
         run: |
@@ -237,6 +239,8 @@ jobs:
           name: native-production-client-${{ matrix.configuration }}-${{ matrix.math_profile }}-x64
           retention-days: 90
           path: |
+            out/heading-check/*.json
+            out/heading-check/*.log
             native-math-*.log
             out/native-math/math-verification.json
             out/native-math/CMakeCache.txt

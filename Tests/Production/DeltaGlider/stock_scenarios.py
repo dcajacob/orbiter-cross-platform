@@ -49,17 +49,25 @@ def fly(args,folder,name,ships,data):
         process=subprocess.run([args.executable,'--config',config,'--scenario',scenario,'--assets',args.assets,'--data',args.data,
             '--modules',args.modules,'--planets',args.planets,'--evidence',folder,'--save',folder/'saved.scn',
             '--frames','60','--fixed-step','0.25','--run'],cwd=folder,stdout=console,stderr=subprocess.STDOUT,timeout=180)
+    return inspect(folder,ships,process.returncode)
+
+
+def inspect(folder,ships,exit_code):
     log=(folder/'console.txt').read_text(errors='replace')
-    problems=[line for line in log.splitlines() if any(marker in line for marker in ('Lua error:','Orbiter native production:','runtime error:'))]
-    if process.returncode:problems.append('process exit '+str(process.returncode))
-    life=json.loads((folder/'graphics-lifecycle.json').read_text())
+    markers=('Lua error:','LuaCall (','Orbiter native production:','runtime error:',
+             'ERROR: AddressSanitizer:','ERROR: LeakSanitizer:')
+    problems=[line for line in log.splitlines() if any(marker in line for marker in markers)]
+    if exit_code:problems.append('process exit '+str(exit_code))
+    lifecycle=folder/'graphics-lifecycle.json'
+    life=json.loads(lifecycle.read_text()) if lifecycle.exists() else {}
     if life!=dict(rendered_frames=60,successful_presents=60,context_deleted=True):problems.append('Incomplete presentation or teardown')
-    with (folder/'playback-state.csv').open() as stream:states=list(csv.DictReader(stream))
+    state=folder/'playback-state.csv'
+    states=list(csv.DictReader(state.read_text().splitlines())) if state.exists() else []
     if [int(r['tick']) for r in states]!=list(range(61)):problems.append('Incomplete finalized state')
     if any(r['object'] not in ships or r['class'].casefold()!=ships[r['object']].casefold() for r in states):
         problems.append('Unexpected focus or vessel class')
-    return dict(frames=life['successful_presents'],focus=sorted({r['object'] for r in states}),
-                playback=bool(states and states[0]['playback']=='1'),problems=problems)
+    return dict(frames=life.get('successful_presents',0),focus=sorted({r['object'] for r in states}),
+                exit_code=exit_code,playback=bool(states and states[0]['playback']=='1'),problems=problems)
 
 
 def main():

@@ -1,0 +1,799 @@
+{
+  "schema": 1,
+  "source_base": "60e6f3409758c78eedba61371a0a892b621a1a9f",
+  "scope": "Linux x86-64 isolated llvmpipe candidate; all loadable DG/DG-S stock scenarios at 60 frames; broader Phase 6 acceptance remains open",
+  "source_sha256": {
+    "Src/Orbiter/hud.cpp": "af479232ef1f60a44052948eea0f7a6587b47dabdab82d34e1fa6dd597bcae28",
+    "Tests/Production/cockpit_source.py": "ca2df8413d03b703040d2bf868abe0a48081ab5a7aa98ed79f5290d5c4b2ee50",
+    "Tests/Production/Cockpit/HeadingTape.Test.cpp": "5eedc28c8d49416ca0c5b1269604016f1a213fa88374a687ca980758d93cdeb8",
+    "Tests/Production/Cockpit/heading_tape_test.py": "f889e38f36c9ac6ec780e2933e472878e3abad1a0a3c7a70cb0fdfefd9848cc2",
+    "Tests/Production/DeltaGlider/stock_scenarios.py": "c2cf6bf472843f888f10f319f0f016d8506bbe871753bc8b58b5f2de6a939c3f"
+  },
+  "heading_fixture": {
+    "baseline": {
+      "status": "failed",
+      "production_method_sha256": "84a87b757718d02d04d00eb896713524d78640f4a4ae7eea1d8245a011e9c04a",
+      "fixture_sha256": "5eedc28c8d49416ca0c5b1269604016f1a213fa88374a687ca980758d93cdeb8",
+      "command": [
+        "c++",
+        "-std=c++17",
+        "-g",
+        "-O0",
+        "-fsanitize=address,undefined",
+        "-fsanitize-address-use-after-scope",
+        "-fno-omit-frame-pointer",
+        "out/phase6-hud-heading-before/heading.cpp",
+        "-o",
+        "out/phase6-hud-heading-before/heading-test"
+      ],
+      "exit_code": 1,
+      "error": "HUD heading-tape test failed"
+    },
+    "fixed": {
+      "status": "passed",
+      "production_method_sha256": "b170ef5553bc0756c5637768c4b26e75edeee76071aaddb584bc0c8d40da63dd",
+      "fixture_sha256": "5eedc28c8d49416ca0c5b1269604016f1a213fa88374a687ca980758d93cdeb8",
+      "command": [
+        "c++",
+        "-std=c++17",
+        "-g",
+        "-O0",
+        "-fsanitize=address,undefined",
+        "-fsanitize-address-use-after-scope",
+        "-fno-omit-frame-pointer",
+        "out/phase6-hud-heading-fixed/heading.cpp",
+        "-o",
+        "out/phase6-hud-heading-fixed/heading-test"
+      ],
+      "exit_code": 0
+    }
+  },
+  "stock_regression": {
+    "scenario": "Navigation/Special orbits/Geostationary orbit.scn",
+    "before": "AddressSanitizer: stack-use-after-scope in HUD::AddMesh_HeadingTape",
+    "fixed": {
+      "frames": 60,
+      "focus": [
+        "GL-01"
+      ],
+      "exit_code": 0,
+      "playback": false,
+      "problems": []
+    }
+  },
+  "census": {
+    "total_dg_scenarios": 122,
+    "loadable": 38,
+    "unsupported": 84,
+    "presentations": 2280,
+    "clean_script_cases": 37,
+    "script_failures": {
+      "Tests/GeneralApiTest.scn": [
+        "LuaCall (Src/Module/LuaScript/LuaInterpreter/Interpreter.cpp:126): .../phase6-dg-resources/Script/Tests/GeneralApiTest.lua:13: Assertion failed"
+      ]
+    },
+    "sanitizer_errors": 0,
+    "all_contexts_deleted": true,
+    "runner_exit_code": 1,
+    "report_sha256": "882f856b307f7d1431ef4f9ec0ae55dfd3cd32b4a22572e7555534d0911631af",
+    "missions": {
+      "2024 Edition/Earth views.scn": {
+        "ships": {
+          "GL-01S": "DG-S"
+        },
+        "sha256_lf": "6a2541a1cde6f3a164e759e1ea651eb7f0744d34b4dfaa8307e31acbce71a530",
+        "other_required_classes": [],
+        "frames": 60,
+        "focus": [
+          "GL-01S"
+        ],
+        "exit_code": 0,
+        "playback": false,
+        "problems": []
+      },
+      "2024 Edition/Solar system.scn": {
+        "ships": {
+          "GL-01S": "DG-S"
+        },
+        "sha256_lf": "a37e431b6f3f9d4da5275b36a9d1542be16fe8a4c62e36ab3d3bc5c4e4166d8e",
+        "other_required_classes": [],
+        "frames": 60,
+        "focus": [
+          "GL-01S"
+        ],
+        "exit_code": 0,
+        "playback": false,
+        "problems": []
+      },
+      "2024 Edition/Spotlights.scn": {
+        "ships": {
+          "ISS": "ProjectAlpha_ISS",
+          "GL-02": "DeltaGlider"
+        },
+        "sha256_lf": "da75530288aae0248292512657d8c5624e100c7ff85b445de7e260076e8387ca",
+        "other_required_classes": [],
+        "frames": 60,
+        "focus": [
+          "GL-02"
+        ],
+        "exit_code": 0,
+        "playback": false,
+        "problems": []
+      },
+      "2024 Edition/Surface impact model.scn": {
+        "ships": {
+          "GL-01S": "DG-S"
+        },
+        "sha256_lf": "ef65c19a8cde088973f2d1b62bfa6bbc5ef8fb06d0add3733d51bce1318d7839",
+        "other_required_classes": [],
+        "frames": 60,
+        "focus": [
+          "GL-01S"
+        ],
+        "exit_code": 0,
+        "playback": false,
+        "problems": []
+      },
+      "2024 Edition/The Alps in 3D.scn": {
+        "ships": {
+          "ISS": "ProjectAlpha_ISS",
+          "GL-01S": "DG-S"
+        },
+        "sha256_lf": "67fefcadb84aa9e4cff63ae0428f0a1b3be2a2c168ac2fb37551077e8502bca5",
+        "other_required_classes": [],
+        "frames": 60,
+        "focus": [
+          "GL-01S"
+        ],
+        "exit_code": 0,
+        "playback": false,
+        "problems": []
+      },
+      "Antelope Valley scenery/DG at Edwards AFB.scn": {
+        "ships": {
+          "GL-01S": "DG-S"
+        },
+        "sha256_lf": "9fd90b6bc056bc399f8b5e720838e91db802f5a5ef35810ee2dd0976bd23ce9a",
+        "other_required_classes": [],
+        "frames": 60,
+        "focus": [
+          "GL-01S"
+        ],
+        "exit_code": 0,
+        "playback": false,
+        "problems": []
+      },
+      "Antelope Valley scenery/Mojave spaceport.scn": {
+        "ships": {
+          "GL-01S": "DG-S"
+        },
+        "sha256_lf": "5af1869a9eb6bbbf6cbea7e4095bcf79f8585e433971241464310ed53ab9aa76",
+        "other_required_classes": [],
+        "frames": 60,
+        "focus": [
+          "GL-01S"
+        ],
+        "exit_code": 0,
+        "playback": false,
+        "problems": []
+      },
+      "Antelope Valley scenery/Mojave to Edwards.scn": {
+        "ships": {
+          "GL-01S": "DG-S"
+        },
+        "sha256_lf": "38b9e1b00982f5560383ed66a7f631350d441693b45de9fd36290f794fc97d30",
+        "other_required_classes": [],
+        "frames": 60,
+        "focus": [
+          "GL-01S"
+        ],
+        "exit_code": 0,
+        "playback": true,
+        "problems": []
+      },
+      "Antelope Valley scenery/Palmdale launchpad.scn": {
+        "ships": {
+          "GL-01S": "DeltaGlider"
+        },
+        "sha256_lf": "13bd91c13271d9ac8789ce4c0af31ca3591b310d7ce0975fc7acfc870608e10b",
+        "other_required_classes": [],
+        "frames": 60,
+        "focus": [
+          "GL-01S"
+        ],
+        "exit_code": 0,
+        "playback": false,
+        "problems": []
+      },
+      "Challenges/Challenge 1 - Launch and docking.scn": {
+        "ships": {
+          "ISS": "ProjectAlpha_ISS",
+          "GL-01": "DeltaGlider"
+        },
+        "sha256_lf": "03811c4d76d644787ca565cec2d4424c3178f6b7d1a467dc777ba4711c3bc85d",
+        "other_required_classes": [],
+        "frames": 60,
+        "focus": [
+          "GL-01"
+        ],
+        "exit_code": 0,
+        "playback": false,
+        "problems": []
+      },
+      "Challenges/Challenge 4 - Entry and landing.scn": {
+        "ships": {
+          "GL-1": "Deltaglider"
+        },
+        "sha256_lf": "62cc92fd11150eb414b0625495d48d7fb9a0419f68c897c916410054e1cebd17",
+        "other_required_classes": [],
+        "frames": 60,
+        "focus": [
+          "GL-1"
+        ],
+        "exit_code": 0,
+        "playback": false,
+        "problems": []
+      },
+      "Delta-glider/Venus descent.scn": {
+        "ships": {
+          "GL-01": "DeltaGlider"
+        },
+        "sha256_lf": "d8ff0cb6586624d84385fa9cf2692e08215c023c582ae47eb30fce6ceb5b358c",
+        "other_required_classes": [],
+        "frames": 60,
+        "focus": [
+          "GL-01"
+        ],
+        "exit_code": 0,
+        "playback": false,
+        "problems": []
+      },
+      "Demo/DG ISS Approach.scn": {
+        "ships": {
+          "ISS": "ProjectAlpha_ISS",
+          "DG-01": "DeltaGlider"
+        },
+        "sha256_lf": "273778357796635026877ebf4c53e35783ce7d1bb444905abfce8157febe899b",
+        "other_required_classes": [],
+        "frames": 60,
+        "focus": [
+          "DG-01"
+        ],
+        "exit_code": 0,
+        "playback": false,
+        "problems": []
+      },
+      "Launch sites and spaceports/DG at Edwards AFB.scn": {
+        "ships": {
+          "GL-01S": "DG-S"
+        },
+        "sha256_lf": "9fd90b6bc056bc399f8b5e720838e91db802f5a5ef35810ee2dd0976bd23ce9a",
+        "other_required_classes": [],
+        "frames": 60,
+        "focus": [
+          "GL-01S"
+        ],
+        "exit_code": 0,
+        "playback": false,
+        "problems": []
+      },
+      "Launch sites and spaceports/Mojave spaceport.scn": {
+        "ships": {
+          "GL-01S": "DG-S"
+        },
+        "sha256_lf": "5af1869a9eb6bbbf6cbea7e4095bcf79f8585e433971241464310ed53ab9aa76",
+        "other_required_classes": [],
+        "frames": 60,
+        "focus": [
+          "GL-01S"
+        ],
+        "exit_code": 0,
+        "playback": false,
+        "problems": []
+      },
+      "Launch sites and spaceports/Palmdale launchpad.scn": {
+        "ships": {
+          "GL-01S": "DeltaGlider"
+        },
+        "sha256_lf": "13bd91c13271d9ac8789ce4c0af31ca3591b310d7ce0975fc7acfc870608e10b",
+        "other_required_classes": [],
+        "frames": 60,
+        "focus": [
+          "GL-01S"
+        ],
+        "exit_code": 0,
+        "playback": false,
+        "problems": []
+      },
+      "Navigation/Special orbits/Geostationary orbit.scn": {
+        "ships": {
+          "GL-01": "DeltaGlider"
+        },
+        "sha256_lf": "5346fa7d44565325f7c98beddaa70f858a181ece8c1e8bea7b694c1c5a41bc97",
+        "other_required_classes": [],
+        "frames": 60,
+        "focus": [
+          "GL-01"
+        ],
+        "exit_code": 0,
+        "playback": false,
+        "problems": []
+      },
+      "Navigation/Special orbits/Lagrange point.scn": {
+        "ships": {
+          "GL-01": "DeltaGlider"
+        },
+        "sha256_lf": "b79b96ee34fab4cae9a8db7bbdcd58ca9c689cf9890428718e2deaece580a258",
+        "other_required_classes": [],
+        "frames": 60,
+        "focus": [
+          "GL-01"
+        ],
+        "exit_code": 0,
+        "playback": false,
+        "problems": []
+      },
+      "Navigation/Special orbits/Sun-synchronous orbit.scn": {
+        "ships": {
+          "GL-01": "DeltaGlider"
+        },
+        "sha256_lf": "286c21e23f84f52031958604c7a8cafb5d46b9739f58b41546cca9df1a9314bd",
+        "other_required_classes": [],
+        "frames": 60,
+        "focus": [
+          "GL-01"
+        ],
+        "exit_code": 0,
+        "playback": false,
+        "problems": []
+      },
+      "Navigation/Special orbits/Tundra orbit.scn": {
+        "ships": {
+          "GL-01": "DeltaGlider"
+        },
+        "sha256_lf": "9a1390c27e6ed1263ed1ef249afc5918957c0409e7f684695eda4979a105346d",
+        "other_required_classes": [],
+        "frames": 60,
+        "focus": [
+          "GL-01"
+        ],
+        "exit_code": 0,
+        "playback": false,
+        "problems": []
+      },
+      "Navigation/TransX/Earth to Mars.scn": {
+        "ships": {
+          "GL-01": "DeltaGlider"
+        },
+        "sha256_lf": "6ac42c8aea882e2fa1db1bbd25e97b9f08cd6564e3e895c1193d4449cfd469f0",
+        "other_required_classes": [],
+        "frames": 60,
+        "focus": [
+          "GL-01"
+        ],
+        "exit_code": 0,
+        "playback": false,
+        "problems": []
+      },
+      "Navigation/TransX/Voyager Grand Tour.scn": {
+        "ships": {
+          "GL-01": "DeltaGlider"
+        },
+        "sha256_lf": "25f111150a3061126c46a7aabafb25dd0f9d2e185ba11a83d6dba5cc1b95c9b5",
+        "other_required_classes": [],
+        "frames": 60,
+        "focus": [
+          "GL-01"
+        ],
+        "exit_code": 0,
+        "playback": false,
+        "problems": []
+      },
+      "Playback/Glider in orbit 1.scn": {
+        "ships": {
+          "GL-01": "DeltaGlider"
+        },
+        "sha256_lf": "c778e0d1fcf81839bc413f177c233215f06ac1868e1b7fe629cfa9be2cb0f401",
+        "other_required_classes": [],
+        "frames": 60,
+        "focus": [
+          "GL-01"
+        ],
+        "exit_code": 0,
+        "playback": true,
+        "problems": []
+      },
+      "Playback/Glider in orbit 2.scn": {
+        "ships": {
+          "GL-01": "DeltaGlider"
+        },
+        "sha256_lf": "6b36dafe80aa1d1dc8da79dbbb6392f53ed8de41ff93f0226db73a1f6aa62ac7",
+        "other_required_classes": [],
+        "frames": 60,
+        "focus": [
+          "GL-01"
+        ],
+        "exit_code": 0,
+        "playback": true,
+        "problems": []
+      },
+      "Playback/Mojave to Edwards.scn": {
+        "ships": {
+          "GL-01S": "DG-S"
+        },
+        "sha256_lf": "38b9e1b00982f5560383ed66a7f631350d441693b45de9fd36290f794fc97d30",
+        "other_required_classes": [],
+        "frames": 60,
+        "focus": [
+          "GL-01S"
+        ],
+        "exit_code": 0,
+        "playback": true,
+        "problems": []
+      },
+      "Tests/GeneralApiTest.scn": {
+        "ships": {
+          "GL-01": "DeltaGlider"
+        },
+        "sha256_lf": "b7a37a80218cd71e0b9265443a091a2a4d58423225f066b626bdc422c1c0ec5e",
+        "other_required_classes": [],
+        "frames": 60,
+        "focus": [
+          "GL-01"
+        ],
+        "exit_code": 0,
+        "playback": false,
+        "problems": [
+          "LuaCall (Src/Module/LuaScript/LuaInterpreter/Interpreter.cpp:126): .../phase6-dg-resources/Script/Tests/GeneralApiTest.lua:13: Assertion failed"
+        ]
+      },
+      "Tests/Manual/ScriptMfdApiTest.scn": {
+        "ships": {
+          "GL-01": "DeltaGlider"
+        },
+        "sha256_lf": "8bcfa95339614c62b61a3856a45da6cb2fed3d8c6cd156c4fb2b9129c9288fc7",
+        "other_required_classes": [],
+        "frames": 60,
+        "focus": [
+          "GL-01"
+        ],
+        "exit_code": 0,
+        "playback": false,
+        "problems": []
+      },
+      "The Solar System/Earth/Earth views 2.scn": {
+        "ships": {
+          "GL-01S": "DG-S"
+        },
+        "sha256_lf": "8848b9177df5ca793198c0987ae2b8a787f55fd7acc66431db14dc1c0e369af1",
+        "other_required_classes": [],
+        "frames": 60,
+        "focus": [
+          "GL-01S"
+        ],
+        "exit_code": 0,
+        "playback": false,
+        "problems": []
+      },
+      "The Solar System/Earth/The Alps in 3D.scn": {
+        "ships": {
+          "ISS": "ProjectAlpha_ISS",
+          "GL-01S": "DG-S"
+        },
+        "sha256_lf": "96fa8cfba5396261551c9f436c96d773e169f748345b41aa31bc1a62bc0b08a9",
+        "other_required_classes": [],
+        "frames": 60,
+        "focus": [
+          "GL-01S"
+        ],
+        "exit_code": 0,
+        "playback": false,
+        "problems": []
+      },
+      "The Solar System/Eclipses/April 8 2005 Panama.scn": {
+        "ships": {
+          "GL-01": "DeltaGlider"
+        },
+        "sha256_lf": "65152ba09ae6e3a1303b8002f8ef1edf226c0891159e262cea4fed6d8c860f9e",
+        "other_required_classes": [],
+        "frames": 60,
+        "focus": [
+          "GL-01"
+        ],
+        "exit_code": 0,
+        "playback": false,
+        "problems": []
+      },
+      "The Solar System/Eclipses/April 8 2005.scn": {
+        "ships": {
+          "GL-01": "DeltaGlider"
+        },
+        "sha256_lf": "87b5d799b18abc277cfda4f2a9d64953b9a84463661496c4b7be6904b11a49b9",
+        "other_required_classes": [],
+        "frames": 60,
+        "focus": [
+          "GL-01"
+        ],
+        "exit_code": 0,
+        "playback": false,
+        "problems": []
+      },
+      "The Solar System/Eclipses/Lunar eclipse 2004.scn": {
+        "ships": {
+          "GL-01": "DeltaGlider"
+        },
+        "sha256_lf": "587fa10e1fe165daf913f9fddbf9e4d92206ec4365fd57d824f70cff20f0dddc",
+        "other_required_classes": [],
+        "frames": 60,
+        "focus": [
+          "GL-01"
+        ],
+        "exit_code": 0,
+        "playback": false,
+        "problems": []
+      },
+      "The Solar System/Jupiter flybys/Galileo's first Ganymede flyby.scn": {
+        "ships": {
+          "Galileo": "DeltaGlider"
+        },
+        "sha256_lf": "90ff80ce57a74f013e3f7b289daad12d86337810362df59fb609c134c7ec3bec",
+        "other_required_classes": [],
+        "frames": 60,
+        "focus": [
+          "Galileo"
+        ],
+        "exit_code": 0,
+        "playback": false,
+        "problems": []
+      },
+      "The Solar System/Jupiter flybys/Galileo's first Io flyby.scn": {
+        "ships": {
+          "Galileo": "DeltaGlider"
+        },
+        "sha256_lf": "7c4502bbbdb6b08865cb382a3708445a4c38e56bb21955aac75c89a617044fb7",
+        "other_required_classes": [],
+        "frames": 60,
+        "focus": [
+          "Galileo"
+        ],
+        "exit_code": 0,
+        "playback": false,
+        "problems": []
+      },
+      "The Solar System/Jupiter flybys/Galileo's second Ganymede flyby.scn": {
+        "ships": {
+          "Galileo": "DeltaGlider"
+        },
+        "sha256_lf": "d8753f5c0f1b36cd7a6e6ed04f5d8774f3b60a99305d1041c890a68a6c84a529",
+        "other_required_classes": [],
+        "frames": 60,
+        "focus": [
+          "Galileo"
+        ],
+        "exit_code": 0,
+        "playback": false,
+        "problems": []
+      },
+      "The Solar System/Jupiter flybys/Galileo's second Io flyby.scn": {
+        "ships": {
+          "Galileo": "DeltaGlider"
+        },
+        "sha256_lf": "cda5e3f448cbee5a6565cea1d43f21773607eaff0a356b9288b13e1edbbe4999",
+        "other_required_classes": [],
+        "frames": 60,
+        "focus": [
+          "Galileo"
+        ],
+        "exit_code": 0,
+        "playback": false,
+        "problems": []
+      },
+      "The Solar System/Jupiter flybys/Tour of Jupiter.scn": {
+        "ships": {
+          "GL-01": "DeltaGlider"
+        },
+        "sha256_lf": "29b0d92a8c28e27347e6e9b4e5f3a5b6ee4feb1ca4c9cc31bd9b8437e9b8f446",
+        "other_required_classes": [],
+        "frames": 60,
+        "focus": [
+          "GL-01"
+        ],
+        "exit_code": 0,
+        "playback": false,
+        "problems": []
+      },
+      "Tutorials/DG stunts.scn": {
+        "ships": {
+          "GL-01": "DG-S"
+        },
+        "sha256_lf": "e029e68bc8afb1617c4b31c28646852d0761cf5b203bd964bda9a374ae8a64c6",
+        "other_required_classes": [],
+        "frames": 60,
+        "focus": [
+          "GL-01"
+        ],
+        "exit_code": 0,
+        "playback": true,
+        "problems": []
+      }
+    }
+  },
+  "evidence_files": {
+    "out/phase6-stock-asan-heading-fixed/004/console.txt": {
+      "sha256": "47c765631cffc32fe8dd72076723bf501b6e29545763f9b2ed4549e66fe999c7",
+      "bytes": 14957
+    },
+    "out/phase6-stock-asan-heading-fixed/013/console.txt": {
+      "sha256": "47c765631cffc32fe8dd72076723bf501b6e29545763f9b2ed4549e66fe999c7",
+      "bytes": 14957
+    },
+    "out/phase6-stock-asan-heading-fixed/068/console.txt": {
+      "sha256": "50fc5835202a0fce393394556cf769bafd7831ba0f4cf03962f5f362039873bd",
+      "bytes": 14970
+    },
+    "out/phase6-stock-asan-heading-fixed/080/console.txt": {
+      "sha256": "ed438dec1cabb53824758e7a0f3290ea115d8d8daafe6c0a442a59811b4d53a4",
+      "bytes": 17017
+    },
+    "out/phase6-stock-asan-heading-fixed/039/console.txt": {
+      "sha256": "6ae2e78be3b6e0c30a9dc3f604de193f417b82283747b11719425e4a8917a5f5",
+      "bytes": 15030
+    },
+    "out/phase6-stock-asan-heading-fixed/051/console.txt": {
+      "sha256": "47c765631cffc32fe8dd72076723bf501b6e29545763f9b2ed4549e66fe999c7",
+      "bytes": 14957
+    },
+    "out/phase6-stock-asan-heading-fixed/087/console.txt": {
+      "sha256": "91bc2b1b2655ae9bdf65902298c0decefe4168f22f19c637fbf03e919bb48c39",
+      "bytes": 15017
+    },
+    "out/phase6-stock-asan-heading-fixed/010/console.txt": {
+      "sha256": "91bc2b1b2655ae9bdf65902298c0decefe4168f22f19c637fbf03e919bb48c39",
+      "bytes": 15017
+    },
+    "out/phase6-stock-asan-heading-fixed/011/console.txt": {
+      "sha256": "47c765631cffc32fe8dd72076723bf501b6e29545763f9b2ed4549e66fe999c7",
+      "bytes": 14957
+    },
+    "out/phase6-stock-asan-heading-fixed/035/console.txt": {
+      "sha256": "50fc5835202a0fce393394556cf769bafd7831ba0f4cf03962f5f362039873bd",
+      "bytes": 14970
+    },
+    "out/phase6-stock-asan-heading-fixed/015/console.txt": {
+      "sha256": "f8e498e4e6f676d3544aad23f8d17d9afc790f5d5c8be1c49edbb2d904551d4b",
+      "bytes": 15030
+    },
+    "out/phase6-stock-asan-heading-fixed/053/console.txt": {
+      "sha256": "b9df2600aa5303ce033902e16a6ef921140b60dff1e2425b0613be771fee9695",
+      "bytes": 14971
+    },
+    "out/phase6-stock-asan-heading-fixed/101/console.txt": {
+      "sha256": "13c3404f587ef81eaee8b119bb35b731b01d956d512584af211f814217e69a69",
+      "bytes": 14972
+    },
+    "out/phase6-stock-asan-heading-fixed/018/console.txt": {
+      "sha256": "54c81c2a86ac083c930c04038758f04ba54d7f58a75693e3f4ae2c636d50eca4",
+      "bytes": 14969
+    },
+    "out/phase6-stock-asan-heading-fixed/069/console.txt": {
+      "sha256": "47c765631cffc32fe8dd72076723bf501b6e29545763f9b2ed4549e66fe999c7",
+      "bytes": 14957
+    },
+    "out/phase6-stock-asan-heading-fixed/091/console.txt": {
+      "sha256": "50fc5835202a0fce393394556cf769bafd7831ba0f4cf03962f5f362039873bd",
+      "bytes": 14970
+    },
+    "out/phase6-stock-asan-heading-fixed/007/console.txt": {
+      "sha256": "19fa79759a14abd86694e5fb812530fe9f5d8bb62b6d792b5cf9371d553c5cca",
+      "bytes": 15030
+    },
+    "out/phase6-stock-asan-heading-fixed/012/console.txt": {
+      "sha256": "47c765631cffc32fe8dd72076723bf501b6e29545763f9b2ed4549e66fe999c7",
+      "bytes": 14957
+    },
+    "out/phase6-stock-asan-heading-fixed/085/console.txt": {
+      "sha256": "47c765631cffc32fe8dd72076723bf501b6e29545763f9b2ed4549e66fe999c7",
+      "bytes": 14957
+    },
+    "out/phase6-stock-asan-heading-fixed/104/console.txt": {
+      "sha256": "50fc5835202a0fce393394556cf769bafd7831ba0f4cf03962f5f362039873bd",
+      "bytes": 14970
+    },
+    "out/phase6-stock-asan-heading-fixed/090/console.txt": {
+      "sha256": "50fc5835202a0fce393394556cf769bafd7831ba0f4cf03962f5f362039873bd",
+      "bytes": 14970
+    },
+    "out/phase6-stock-asan-heading-fixed/063/console.txt": {
+      "sha256": "50fc5835202a0fce393394556cf769bafd7831ba0f4cf03962f5f362039873bd",
+      "bytes": 14970
+    },
+    "out/phase6-stock-asan-heading-fixed/103/console.txt": {
+      "sha256": "13c3404f587ef81eaee8b119bb35b731b01d956d512584af211f814217e69a69",
+      "bytes": 14972
+    },
+    "out/phase6-stock-asan-heading-fixed/008/console.txt": {
+      "sha256": "47c765631cffc32fe8dd72076723bf501b6e29545763f9b2ed4549e66fe999c7",
+      "bytes": 14957
+    },
+    "out/phase6-stock-asan-heading-fixed/059/console.txt": {
+      "sha256": "50fc5835202a0fce393394556cf769bafd7831ba0f4cf03962f5f362039873bd",
+      "bytes": 14970
+    },
+    "out/phase6-stock-asan-heading-fixed/092/console.txt": {
+      "sha256": "50fc5835202a0fce393394556cf769bafd7831ba0f4cf03962f5f362039873bd",
+      "bytes": 14970
+    },
+    "out/phase6-stock-asan-heading-fixed/006/console.txt": {
+      "sha256": "47c765631cffc32fe8dd72076723bf501b6e29545763f9b2ed4549e66fe999c7",
+      "bytes": 14957
+    },
+    "out/phase6-stock-asan-heading-fixed/052/console.txt": {
+      "sha256": "47c765631cffc32fe8dd72076723bf501b6e29545763f9b2ed4549e66fe999c7",
+      "bytes": 14957
+    },
+    "out/phase6-stock-asan-heading-fixed/100/console.txt": {
+      "sha256": "13c3404f587ef81eaee8b119bb35b731b01d956d512584af211f814217e69a69",
+      "bytes": 14972
+    },
+    "out/phase6-stock-asan-heading-fixed/014/console.txt": {
+      "sha256": "b9df2600aa5303ce033902e16a6ef921140b60dff1e2425b0613be771fee9695",
+      "bytes": 14971
+    },
+    "out/phase6-stock-asan-heading-fixed/067/console.txt": {
+      "sha256": "50fc5835202a0fce393394556cf769bafd7831ba0f4cf03962f5f362039873bd",
+      "bytes": 14970
+    },
+    "out/phase6-stock-asan-heading-fixed/062/console.txt": {
+      "sha256": "50fc5835202a0fce393394556cf769bafd7831ba0f4cf03962f5f362039873bd",
+      "bytes": 14970
+    },
+    "out/phase6-stock-asan-heading-fixed/081/console.txt": {
+      "sha256": "50fc5835202a0fce393394556cf769bafd7831ba0f4cf03962f5f362039873bd",
+      "bytes": 14970
+    },
+    "out/phase6-stock-asan-heading-fixed/060/console.txt": {
+      "sha256": "50fc5835202a0fce393394556cf769bafd7831ba0f4cf03962f5f362039873bd",
+      "bytes": 14970
+    },
+    "out/phase6-stock-asan-heading-fixed/066/console.txt": {
+      "sha256": "50fc5835202a0fce393394556cf769bafd7831ba0f4cf03962f5f362039873bd",
+      "bytes": 14970
+    },
+    "out/phase6-stock-asan-heading-fixed/102/console.txt": {
+      "sha256": "13c3404f587ef81eaee8b119bb35b731b01d956d512584af211f814217e69a69",
+      "bytes": 14972
+    },
+    "out/phase6-stock-asan-heading-fixed/114/console.txt": {
+      "sha256": "4fb59a0e1c09e2fd2323673fa39c90dae6d5714dca2bd438b68f5b0c633ed603",
+      "bytes": 14956
+    },
+    "out/phase6-stock-asan-heading-fixed/064/console.txt": {
+      "sha256": "50fc5835202a0fce393394556cf769bafd7831ba0f4cf03962f5f362039873bd",
+      "bytes": 14970
+    },
+    "out/phase6-hud-heading-before/run.log": {
+      "sha256": "d9006a011d7ceb88a7cb9960fbe16668466204f71d788c5ce1a6d05d6e52262f",
+      "bytes": 3533
+    },
+    "out/phase6-hud-heading-fixed/run.log": {
+      "sha256": "cc759ae99cba5c32482f48310a0e9531baef1f3f045fe6575def2a838338a551",
+      "bytes": 84
+    },
+    "out/phase6-hud-heading-source-audit.log": {
+      "sha256": "612a33c899a8856958d602021e8e180f933a7be75e355c75138e80377d9b5801",
+      "bytes": 2413
+    },
+    "out/phase6-stock-asan-mesa-camera-fixed/059/console.txt": {
+      "sha256": "d2108beaefdd4edfc1b6d1fd1f81dbf140e3bcde50397220cd9bdbf846d91d0a",
+      "bytes": 20288
+    },
+    "out/phase6-geostat-asan-heading-fixed-v2/console.txt": {
+      "sha256": "50fc5835202a0fce393394556cf769bafd7831ba0f4cf03962f5f362039873bd",
+      "bytes": 14970
+    }
+  },
+  "runtime_sha256": {
+    "out/phase6-cockpit-asan/orbiter-production": "bd23e0c0b119f45321749c42aa2fdba7ea363548dafa27ea3dbe7cd1d230eb5f",
+    "out/phase6-cockpit-asan/NativeModules/Graphics/OGLClient.so": "cc8c7cb60f4acbda27751ea8b8f558bc235fb3e438f40054848a55961bdb3e9e"
+  }
+}

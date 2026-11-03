@@ -1265,7 +1265,7 @@
     },
     "Src/Orbiter/hud.cpp": {
       "original_sha256_lf": "7670ec27ef75c9325dd17ff4db5b019aaaed8749df9d67c1262fe846ede73926",
-      "sha256_lf": "39ac9236a21d45f6713d9ddc9d75942a218802ad3f51a40f29235f773f54a670",
+      "sha256_lf": "af479232ef1f60a44052948eea0f7a6587b47dabdab82d34e1fa6dd597bcae28",
       "scope": "Private cockpit graphics/configuration binding. Original algorithms and Windows pointer types conserved by cockpit_source.py; native instrumentation is not operational yet."
     },
     "Src/Orbiter/hud.h": {

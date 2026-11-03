@@ -34,6 +34,19 @@ The command now uses the same concrete-type deleter as the engine's camera
 preset and recorder paths. Its calculations and the SDK class layout are
 conserved. [Local lifetime evidence](GraphicsLifetimeVerification.json)
 
+The expanded sanitizer census completes all 38 currently loadable unchanged DG
+scenarios, with 2,280 presentations and clean context teardown. Geostationary
+orbit exposed a HUD heading-marker use-after-scope: branch-local vertex arrays
+expired before the mesh write. The write now runs inside its branch, preserving
+every original coordinate, texture value and index expression. The original
+method fails the new CPU regression; the fixed method passes 24 marker cases
+and the real stock scenario. GeneralApiTest's existing planet-status Lua
+assertion remains reported as a failure. The census now recognizes the
+sanitizer build's `LuaCall` error prefix and retains sanitizer failures even
+when no lifecycle file was written. This is smoke coverage, with broader
+interactive stock acceptance still required.
+[HUD and stock-census evidence](HudHeadingVerification.json)
+
 The cockpit now draws the original target, time and frame-rate displays and
 opens the original spacecraft selection dialog on F3. A two-vessel run used
 the dialog to select DG-S and then return to DG. Both the control focus and the

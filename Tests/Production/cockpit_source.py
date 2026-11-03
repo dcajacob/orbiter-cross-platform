@@ -165,6 +165,24 @@ def verify_focus_bars():
           button,'Original title bar button placement and input')
     print('Verified original info bars, spacecraft selector and title bar button')
 
+def restore_heading_marker_lifetime(current,original):
+    start='void HUD::AddMesh_HeadingTape ('
+    end='void HUD::AddMesh_AzimuthTape ('
+    def method(source):return source[source.index(start):source.index(end)]
+    before,after=method(original),method(current)
+    pointers='\t\tdouble *vtxx, *vtxy, *vtxu, *vtxv;\n'
+    writer_start=before.index('\t\tfor (i = 0; i < nidx; i++) {',before.index(pointers))
+    writer_end=before.rindex('\t}\n}')
+    writer=before[writer_start:writer_end]
+    closure='\t\tauto append_marker = [&](const double *vtxx, const double *vtxy, const double *vtxu, const double *vtxv) {\n'
+    closure+=''.join('\t'+line for line in writer.splitlines(keepends=True))+'\t\t};\n'
+    expected=(before[:writer_start]+before[writer_end:]).replace(pointers,closure,1)
+    for branch in (1,2,3):
+        alias=f'vtxx = vtxx{branch}, vtxy = vtxy{branch}, vtxu = vtxu{branch}, vtxv = vtxv{branch};'
+        expected=expected.replace(alias,f'append_marker(vtxx{branch}, vtxy{branch}, vtxu{branch}, vtxv{branch});',1)
+    equal(expected,after,'Original HUD marker values and mesh writes, consumed before branch-local arrays expire')
+    return current.replace(after,before,1)
+
 def verify():
     verify_focus_bars()
     original_dialogs = subprocess.check_output(['git','-C',str(ROOT),'show',BASE+':Src/Orbiter/DlgMgr.cpp']).decode().replace('\r\n','\n')
@@ -293,6 +311,7 @@ namespace oapi {using CockpitClient=GraphicsClient;}
             for initialization in ('mfd[i].prm      = {};','mfd[id].prm.flag     = 0;'):
                 if current.count(initialization)!=1:raise ValueError('MFD off-state initialization changed')
                 current=current.replace(initialization,'',1)
+        if name=='hud.cpp':current=restore_heading_marker_lifetime(current,original)
         current=restore_geometry(name,current,original)
         equal(original.replace('COLORREF','DWORD'),current.replace('COLORREF','DWORD'),'Original cockpit calculations, declarations and call order: '+name)
     print('Original Pane, HUD, MFD and panel algorithms conserved; Windows graphics pointer types unchanged')

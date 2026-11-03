@@ -768,35 +768,36 @@ void HUD::AddMesh_HeadingTape (int &ivtx, int &iidx, double hdg, bool marker, do
 			if (ddir > 0.0) ddir -= 360.0;
 			else            ddir += 360.0;
 		}
-		double *vtxx, *vtxy, *vtxu, *vtxv;
+		auto append_marker = [&](const double *vtxx, const double *vtxy, const double *vtxu, const double *vtxv) {
+			for (i = 0; i < nidx; i++) {
+				gs->Idx[iidx++] = idx[i]+ivtx;
+			}
+			for (i = 0; i < nvtx; i++, ivtx++) {
+				gs->Vtx[ivtx].x = (float)vtxx[i];
+				gs->Vtx[ivtx].y = (float)vtxy[i];
+				gs->Vtx[ivtx].tu = (float)vtxu[i];
+				gs->Vtx[ivtx].tv = (float)vtxv[i];
+			}
+		};
 		if (ddir > range05) {
 			double vtxx1[nvtx] = {HRES05+scal*260,HRES05+scal*260,HRES05+scal*272,HRES05+scal*272};
 			double vtxy1[nvtx] = {scal*40,scal*62,scal*40,scal*62};
 			double vtxu1[nvtx] = {300/hudtexw,300/hudtexw,305/hudtexw,305/hudtexw};
 			double vtxv1[nvtx] = {0,9/hudtexh,0,9/hudtexh};
-			vtxx = vtxx1, vtxy = vtxy1, vtxu = vtxu1, vtxv = vtxv1;
+			append_marker(vtxx1, vtxy1, vtxu1, vtxv1);
 		} else if (ddir < -range05) {
 			double vtxx2[nvtx] = {HRES05-scal*272,HRES05-scal*272,HRES05-scal*260,HRES05-scal*260};
 			double vtxy2[nvtx] = {scal*40,scal*62,scal*40,scal*62};
 			double vtxu2[nvtx] = {293/hudtexw,293/hudtexw,298/hudtexw,298/hudtexw};
 			double vtxv2[nvtx] = {0,9/hudtexh,0,9/hudtexh};
-			vtxx = vtxx2, vtxy = vtxy2, vtxu = vtxu2, vtxv = vtxv2;
+			append_marker(vtxx2, vtxy2, vtxu2, vtxv2);
 		} else {
 			double ofs = HRES05+ddir*dx*0.1;
 			double vtxx3[nvtx] = {ofs-scal*15,ofs-scal*15,ofs+scal*15,ofs+scal*15};
 			double vtxy3[nvtx] = {scal*49,scal*62,scal*49,scal*62};
 			double vtxu3[nvtx] = {292/hudtexw,292/hudtexw,306/hudtexw,306/hudtexw};
 			double vtxv3[nvtx] = {10/hudtexh,16/hudtexh,10/hudtexh,16/hudtexh};
-			vtxx = vtxx3, vtxy = vtxy3, vtxu = vtxu3, vtxv = vtxv3;
-		}
-		for (i = 0; i < nidx; i++) {
-			gs->Idx[iidx++] = idx[i]+ivtx;
-		}
-		for (i = 0; i < nvtx; i++, ivtx++) {
-			gs->Vtx[ivtx].x = (float)vtxx[i];
-			gs->Vtx[ivtx].y = (float)vtxy[i];
-			gs->Vtx[ivtx].tu = (float)vtxu[i];
-			gs->Vtx[ivtx].tv = (float)vtxv[i];
+			append_marker(vtxx3, vtxy3, vtxu3, vtxv3);
 		}
 	}
 }
