@@ -15,6 +15,7 @@ native=importlib.util.module_from_spec(spec);spec.loader.exec_module(native)
 legacy=native.legacy;ROOT=native.ROOT;require=native.require;digest=native.digest
 from verify_original import compare_state
 from behavior_suite import quaternion,quaternion_angle
+from recording_inputs import LOCK_FILE
 
 
 def safe(name):
@@ -50,7 +51,7 @@ def main():
     p.add_argument('--runtime-source-commit',required=True)
     a=p.parse_args();require(not a.output.exists(),'Native legacy comparison replacement forbidden')
     require(re.fullmatch('[0-9a-f]{40}',a.runtime_source_commit),'Native legacy runtime source must be immutable')
-    config=legacy.settings();pins=json.loads((HERE/'observations.lock.json').read_text())
+    config=legacy.settings();pins=json.loads(LOCK_FILE.read_text())
     require(pins['status']=='audited-original-observations','Full original legacy playback reference is not qualified')
     audit=json.loads(a.original_audit.read_text());report=json.loads((a.native/'capture.json').read_text())
     require(audit['status']=='passed' and audit['processes']==32 and len(audit['profiles'])==4 and
@@ -58,7 +59,7 @@ def main():
             audit['verifier_sha256']==pins['audit_verifier_sha256']==digest(HERE/'audit_original.py'),
             'Complete independently audited original legacy reference required')
     require(report['status']=='captured-awaiting-original-comparison' and not report['failures'] and
-            report['host']=='native-linux' and report['sources_and_binaries_unchanged'] and
+            report['host']=='native-linux' and report['protocol']==2 and report['sources_and_binaries_unchanged'] and
             report['runtime_source_commit']==a.runtime_source_commit and
             set(report['cases'])=={case['id'] for case in config['cases']},'Native legacy profile failed or incomplete')
     identity=report['runtime_identity'];profile=identity['profile']
@@ -75,7 +76,8 @@ def main():
     for name,expected_sha in report['source_sha256_lf'].items():
         body=subprocess.check_output(['git','-C',str(ROOT),'show',report['producer_commit']+':'+safe(name)])
         require(hashlib.sha256(body.replace(b'\r\n',b'\n')).hexdigest()==expected_sha,'Native legacy producer source differs')
-    for name in ('Tests/Production/LegacyStations/cases.json','Tests/Production/LegacyStations/original.py',
+    for name in ('Tests/Production/LegacyStations/cases-v2.json','Tests/Production/LegacyStations/original.py',
+                 'Tests/Production/LegacyStations/recording_inputs.py','Tests/Production/LegacyStations/Playback.h',
                  'Tests/Production/StockVessels/Observation.h'):
         require(report['source_sha256_lf'][name]==old['source_sha256_lf'][name],
                 'Native/original legacy measurement schema or case differs')
@@ -125,6 +127,8 @@ def main():
                 actual=native.inspect(right,case,config,identity,recorded_build,libraries)
                 require(actual==report['cases'][case['id']]['runs'][repeat-1],'Recomputed native legacy outcome differs')
                 errors=compare_state(left,right,config)
+                require((left/'stock-playback.csv').read_bytes().replace(b'\r\n',b'\n')==
+                        (right/'stock-playback.csv').read_bytes().replace(b'\r\n',b'\n'),'Original/native playback flags differ')
                 poses,points=zip(*(geometry(path) for path in (left,right)))
                 require(set(points[0])==set(points[1]),'Original/native legacy landmark identities differ')
                 pixel_error=max(math.dist(points[0][name],points[1][name]) for name in points[0])

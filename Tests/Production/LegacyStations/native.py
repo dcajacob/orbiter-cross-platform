@@ -17,6 +17,7 @@ sys.path[:0]=[str(HERE.parent/'StockScenarios'),str(HERE.parent/'WaylandInput')]
 from inventory import digest,require
 from intentional_exit import build_identity
 from compositor import Compositor
+from recording_inputs import LOCK_FILE,entry_point,recordings,stage_recordings
 
 PROTOCOL_SHARED=('Tests/Production/StockVessels/Observation.h','Tests/Production/StockVessels/original.py',
     'Tests/Production/StockVessels/verify_original.py','Tests/Production/StockScenarios/intentional_exit.py',
@@ -57,8 +58,11 @@ def inspect(out,case,config,identity,build,libraries):
             require(len(meshes)==1 and meshes[0]['name'].lower()==kind.lower(),'Native legacy mesh identity differs')
     require(len((out/'scene.rgba').read_bytes())==1280*720*4,'Native legacy full framebuffer incomplete')
     actual_math=json.loads((out/'numerics.json').read_text())['math']
-    pins=json.loads((HERE/'observations.lock.json').read_text())
-    require(actual_math=='amd-6121d02-'+pins['profiles'][identity['profile']]['actual_math'],'Native legacy actual CRT differs')
+    if LOCK_FILE.exists():
+        pins=json.loads(LOCK_FILE.read_text())
+        require(actual_math=='amd-6121d02-'+pins['profiles'][identity['profile']]['actual_math'],'Native legacy actual CRT differs')
+    else:
+        require(actual_math=='amd-6121d02-'+('sse2' if identity['math_profile']=='sse2' else 'fma3'),'Native legacy actual CRT differs')
     loaded=(out/'renderer-modules.txt').read_text()
     for path in (build/'liborbiter_production_vessels.so',build/'liborbiter_production_boundary.so',
                  build/'NativeModules/Graphics/OGLClient.so',build/'NativeModules/Vessel/DeltaGlider.so',
@@ -67,7 +71,7 @@ def inspect(out,case,config,identity,build,libraries):
     if identity['sanitizer_linked']:
         for path in libraries:require(str(path) in loaded,'Qualified private sanitizer library was not mapped: '+str(path))
     files={str(p.relative_to(out)):digest(p) for p in out.rglob('*') if p.is_file() and
-           p.suffix in ('.csv','.txt','.log','.json','.scn','.rgba')}
+           p.suffix in ('.csv','.txt','.log','.json','.scn','.rgba','.pos','.att','.atc','.dat')}
     return dict(result,status='captured',process_returncode=process['returncode'],actual_math=actual_math,
                 renderer=renderer,lifecycle=life,files_sha256=files)
 
@@ -100,7 +104,7 @@ def main():
     protected={str(ROOT/name):digest(ROOT/name) for name in owning}
     protected.update({str(ROOT/name):value for name,value in build_record['runtime_files_sha256'].items()})
     protected.update({str(path):digest(path) for path in [*source_files,a.build_record]})
-    for name,expected in config['resources_sha256_lf'].items():
+    for name,expected in {**config['resources_sha256_lf'],**config['recording_files_sha256_lf']}.items():
         require(legacy.sha_lf(a.assets/name)==expected,'Staged native legacy resource differs: '+name)
         protected[str(a.assets/name)]=digest(a.assets/name)
     probe=a.output/'legacy-stations-probe.so'
@@ -115,7 +119,7 @@ def main():
     report=dict(status='running',phase6_complete=False,host='native-linux',producer_commit=producer,
         runtime_source_commit=a.runtime_source_commit,runtime_identity=identity,source_sha256_lf=source,
         build_record_path=str(a.build_record),protected_files_sha256=protected,probe_sha256=digest(probe),
-        backend=a.backend,private_library_directories=list(map(str,a.library_directory)),cases={},attempts={},failures={})
+        protocol=2,backend=a.backend,private_library_directories=list(map(str,a.library_directory)),cases={},attempts={},failures={})
     manifest=a.output/'capture.json'
     def save():manifest.write_text(json.dumps(report,indent=2)+'\n')
     save()
@@ -130,16 +134,18 @@ def main():
                     out=a.output/(case['id']+'-'+str(repeat));out.mkdir();paths.append(out)
                     original=(ROOT/'Scenarios'/case['scenario']).read_bytes()
                     require((a.assets/'Scenarios'/case['scenario']).read_bytes()==original,'Native legacy staged scenario differs')
-                    (out/'Scenarios').mkdir();(out/'Scenarios/Behavior.scn').write_bytes(original)
+                    scenario=entry_point(out,case);scenario.parent.mkdir(parents=True,exist_ok=True);scenario.write_bytes(original)
+                    stage_recordings(a.assets,out,case,config)
                     (out/'Orbiter.cfg').write_text((HERE.parent/'NativeScene/Orbiter.cfg').read_text()+
                         '\nFPS = 0\nMenubarMode = 1\nInfobarMode = 1\nInstrumentUpdateInterval = 0.25\n')
                     (out/'replay.csv').write_text('tick,phase,action,value\n')
                     argv=[str(a.build/'orbiter-production'),'--assets',str(a.assets),'--data',str(a.data),
                         '--planets',str(a.planets),'--modules',str(a.build/'NativeModules'),
-                        '--scenario',str(out/'Scenarios/Behavior.scn'),'--config',str(out/'Orbiter.cfg'),
+                        '--scenario',str(scenario),'--config',str(out/'Orbiter.cfg'),
                         '--evidence',str(out),'--save',str(out/'saved.scn'),'--replay',str(out/'replay.csv'),
                         '--frames','60','--fixed-step','.25','--capture-time','12.5','--run']
-                    invocation=dict(argv=argv,input_sha256={'Scenarios/Behavior.scn':digest(out/'Scenarios/Behavior.scn')})
+                    invocation=dict(argv=argv,scenario_entry_point=case['scenario_entry_point'],
+                        input_sha256={name:digest(out/name) for name in [case['scenario_entry_point'],*recordings(case,config)]})
                     (out/'invocation.json').write_text(json.dumps(invocation,indent=2)+'\n')
                     env=dict(environment,LIBGL_ALWAYS_SOFTWARE='1',GALLIUM_DRIVER='llvmpipe',LP_NUM_THREADS='2',
                              LD_LIBRARY_PATH=':'.join(map(str,[a.build,*a.library_directory])))
@@ -158,7 +164,7 @@ def main():
                     recorded=inspect(out,case,config,identity,a.build,a.library_directory)
                     require(json.loads((out/'native-window.json').read_text())['backend']==a.backend,'Native legacy actual backend differs')
                     observed.append(recorded);legacy.png(out/'scene.png',(out/'scene.rgba').read_bytes(),1280,720)
-                for name in ('stock-vessel-state.csv','stock-vessel-docks.csv','camera.csv'):
+                for name in ('stock-vessel-state.csv','stock-vessel-docks.csv','stock-playback.csv','camera.csv'):
                     require((paths[0]/name).read_bytes()==(paths[1]/name).read_bytes(),'Native legacy repeat trace or camera differs')
                 report['cases'][case['id']]=dict(scenario=case['scenario'],runs=observed)
                 print(case['id'],'captured twice',flush=True)

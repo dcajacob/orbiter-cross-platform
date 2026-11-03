@@ -1,0 +1,89 @@
+{
+  "application_source": "f725194209634f7fd5d1d44d426cfa9b5e303e37",
+  "frames": 60,
+  "fixed_step": 0.25,
+  "epoch": 51982.5,
+  "image_ssim_minimum": 0.98,
+  "budgets": {
+    "position_m": 0.01,
+    "velocity_m_s": 1e-05,
+    "rotation_rad": 1e-08,
+    "angular_velocity_rad_s": 1e-10,
+    "mjd_days": 1e-10,
+    "propellant_relative": 1e-08,
+    "propellant_absolute_kg": 1e-08
+  },
+  "schema": 2,
+  "suite": "legacy-stations",
+  "scope": "Four unchanged complete legacy station scenarios using their original entry points, all named playback inputs and observed per-vessel playback flags; original reference v2 before native qualification.",
+  "resources_sha256_lf": {
+    "Config/Vessels/ISS.cfg": "cccb840e6cca110f73b6f64735e2aa2e169e11709010c9c433d2a760f812ec3b",
+    "Config/Vessels/Module1.cfg": "8b82f6d6d3e198e3c449717de772306c81f6024604e6ad5da981efd83d1a7870",
+    "Meshes/ISS.msh": "0bff923705f88391f44f61dec58b694d25eb44c432134f3ca28ee63375c9405b",
+    "Meshes/Module1.msh": "f6ab9e3d1d886ccf8e7a9f7d5971761ea4f70aa0e4799dda5e9a9c6bbadc230f"
+  },
+  "cases": [
+    {
+      "id": "legacy_stations_1",
+      "scenario": "Delta-glider/Smack!.scn",
+      "sha256_lf": "446f38636eceaf727e63272abf65009c9fc513bc1e48e963d430de01d33b68a4",
+      "scenario_entry_point": "Scenarios/Delta-glider/Smack!.scn",
+      "playback_vessels": []
+    },
+    {
+      "id": "legacy_stations_2",
+      "scenario": "Delta-glider/Vessel-vessel.scn",
+      "sha256_lf": "07016cab57da88b05021b9c5983bedcdb1ea7c9c8df44d476c3dab7cffed54b7",
+      "scenario_entry_point": "Scenarios/Delta-glider/Vessel-vessel.scn",
+      "playback_vessels": []
+    },
+    {
+      "id": "legacy_stations_3",
+      "scenario": "Navigation/Space Physics/DG dumbbell.scn",
+      "sha256_lf": "e76aa2812750dcb114f85f0cd9a4ed24727d0204827a339ca680c6cd2dc3afe6",
+      "scenario_entry_point": "Scenarios/Navigation/Space Physics/DG dumbbell.scn",
+      "playback_vessels": []
+    },
+    {
+      "id": "legacy_stations_4",
+      "scenario": "Tutorials/Smack! Rescue.scn",
+      "sha256_lf": "2314c4c57bf931f7f29a9bd044c2c1feec17cc69ecf2fc1b73e46535f8f0a4cf",
+      "scenario_entry_point": "Scenarios/Tutorials/Smack! Rescue.scn",
+      "playback_vessels": [
+        "ISS",
+        "Mir",
+        "Luna-OB1",
+        "GL-01",
+        "GL-02",
+        "PB-01",
+        "SH-01"
+      ],
+      "recording_directory": "Smack! Rescue"
+    }
+  ],
+  "protocol": 2,
+  "recording_files_sha256_lf": {
+    "Flights/Smack! Rescue/GL-01.atc": "8d74cfecf3dfbf5566cf0ee62f0b2939fafa42e147bbce63a200745fa61b1f5e",
+    "Flights/Smack! Rescue/GL-01.att": "77a47b096dd0b1c3424b166a29c96cb3b11a6763702e96fbbbeb5d3c187038a4",
+    "Flights/Smack! Rescue/GL-01.pos": "fa5ab6b298eb939cefd5b7d1d6da9384b2c35d3d532a2ee0d46cd824ba2b9615",
+    "Flights/Smack! Rescue/GL-02.atc": "4caf5867dc15084cbf744901916ea6ef5752a393aaf77008cff1108c2c13039b",
+    "Flights/Smack! Rescue/GL-02.att": "1b47014134626e90c4a854f9bbac832d5b3145230f10562e232ba1f706628523",
+    "Flights/Smack! Rescue/GL-02.pos": "98252f5cc0c80ea66d4d2a9cf6135db8f4f7209855142e9fdbf5372868ca8f96",
+    "Flights/Smack! Rescue/ISS.atc": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "Flights/Smack! Rescue/ISS.att": "0b034b046e8a485d120ed9fa3abc13caa5afa0f9482660df7c1a9c72b0069e63",
+    "Flights/Smack! Rescue/ISS.pos": "b24987ec21360aae38f5b8244d3f0a0a036c8f6e974f35b28ab447c62cee09b9",
+    "Flights/Smack! Rescue/Luna-OB1.atc": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "Flights/Smack! Rescue/Luna-OB1.att": "fa2554731c27ff5139e1df8ce2523e8f75a6c3c56ab9d8e9a57c28adee83ebcc",
+    "Flights/Smack! Rescue/Luna-OB1.pos": "2db17e18ca111ead8957777bb05686f1775f6fbae799a26414c4eb0a63250c4d",
+    "Flights/Smack! Rescue/Mir.atc": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "Flights/Smack! Rescue/Mir.att": "cf342a2ff2bbde2aa10057ff8d89932acf4e32a5e7debc2713420947fe3f63ae",
+    "Flights/Smack! Rescue/Mir.pos": "926b9413697282043577e12c13e3264dcdf3425c8d7955be18c86eee3c4eb802",
+    "Flights/Smack! Rescue/PB-01.atc": "fd07ff7b0cbf1948fcd1d7d6ff402c3031b5e642b0734ecb6f50c82e9a08d258",
+    "Flights/Smack! Rescue/PB-01.att": "52b37461249b46efc74d106366d16b4ff5926e110b379ea60332fe1baafbb752",
+    "Flights/Smack! Rescue/PB-01.pos": "854df51fd1dc76583bda74456ebefd57d8efa83e147c40e74eed371908cf295e",
+    "Flights/Smack! Rescue/SH-01.atc": "87fb982bf58d87270537b6d37a1d4337c87632e26cab19b8a42cbac5b983a697",
+    "Flights/Smack! Rescue/SH-01.att": "a7f82aece2de691a3ac7824595290aa79673c3d272c956d36a6d53be001dee47",
+    "Flights/Smack! Rescue/SH-01.pos": "83e211eb8e056232110ab0e0cf9d7f88409528160270ea8b5ae3dc711486f55c",
+    "Flights/Smack! Rescue/system.dat": "e9b93dfa239a46fa3f41d9a05997243c68f0da0acb05b8293ad545ab0ebe1803"
+  }
+}

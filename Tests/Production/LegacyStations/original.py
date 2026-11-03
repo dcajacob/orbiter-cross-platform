@@ -19,7 +19,8 @@ import importlib.util
 spec=importlib.util.spec_from_file_location('stock_station_observer',HERE.parent/'StockVessels/original.py')
 shared=importlib.util.module_from_spec(spec);spec.loader.exec_module(shared)
 from inventory import ships
-from stage import run as stage
+from stage_original import run as stage
+from recording_inputs import CASE_FILE,entry_point,recordings,inspect_inputs
 from mesa_runtime import require,digest
 from run_client import mesa_files,png
 from compare_client import image_ssim
@@ -29,13 +30,14 @@ rows=shared.rows
 
 
 def settings():
-    config=json.loads((HERE/'cases.json').read_text())
+    config=json.loads(CASE_FILE.read_text())
     accepted=json.loads((HERE.parent/'Cockpit/cases.json').read_text())
     for key in ('application_source','frames','fixed_step','epoch','image_ssim_minimum','budgets'):
         require(config[key]==accepted[key],'Original legacy station clock/source/budget differs: '+key)
-    require(config['suite']=='legacy-stations' and len(config['cases'])==4 and
+    require(config['protocol']==2 and config['suite']=='legacy-stations' and len(config['cases'])==4 and
             len({c['id'] for c in config['cases']})==4,'Original legacy station matrix incomplete')
     files=dict(config['resources_sha256_lf'])
+    files.update(config['recording_files_sha256_lf'])
     files.update({'Scenarios/'+c['scenario']:c['sha256_lf'] for c in config['cases']})
     for name,expected in files.items():
         body=subprocess.check_output(['git','-C',str(ROOT),'show',config['application_source']+':'+name])
@@ -45,10 +47,10 @@ def settings():
 
 
 def inspect_trace(out,case,config):
-    scenario=out/'Scenarios/Behavior.scn'
+    scenario=entry_point(out,case)
     require(sha_lf(scenario)==case['sha256_lf'],'Executed legacy station scenario changed')
     invocation=json.loads((out/'invocation.json').read_text())
-    require(digest(scenario)==invocation['input_sha256']['Scenarios/Behavior.scn'],
+    require(digest(scenario)==invocation['input_sha256'][case['scenario_entry_point']],
             'Executed legacy station scenario changed after staging')
     expected=ships((ROOT/'Scenarios'/case['scenario']).read_bytes().decode('cp1252'))
     state=rows(out/'stock-vessel-state.csv');groups={}
@@ -91,7 +93,9 @@ def inspect_trace(out,case,config):
             require(row['enable_focus']=='0' and row['xpdr']=='1' and
                     tuple(float(row[k]) for k in ('csx','csy','csz'))==(897.2,3641.3,610.8),
                     'Original legacy ISS configuration capabilities differ')
+    playback=inspect_inputs(out,case,config,rows)
     return dict(declared_vessels=len(expected),finalized_ticks=len(groups),all_vessel_rows=len(state),
+                **playback,
                 docking_rows=len(ports),legacy_initial_capabilities=[r for r in observed if r['tick']=='0'])
 
 
@@ -121,7 +125,9 @@ def inspect_artifacts(out,case,config):
     require(actual_math in ('fma3','sse2'),'Unknown actual original CRT')
     names=['stock-vessel-state.csv','stock-vessel-docks.csv','stock-vessel-complete.txt',
         'scene.csv','scene.rgba','camera.csv','renderer-info.json','graphics-lifecycle.json','renderer-modules.txt',
-        'invocation.json','mesa-bindings.json','math-profile.txt','console.txt','Orbiter.log','Scenarios/Behavior.scn','Orbiter.cfg']
+        'invocation.json','mesa-bindings.json','math-profile.txt','console.txt','Orbiter.log',case['scenario_entry_point'],
+        'Orbiter.cfg','stock-playback.csv','process-result.json',*recordings(case,config)]
+    require(json.loads((out/'process-result.json').read_text())['returncode']==0,'Actual original legacy process exit differs')
     return dict(result,status='captured',process_returncode=0,actual_math=actual_math,renderer=renderer,
                 files_sha256={name:digest(out/name) for name in names})
 
@@ -165,7 +171,7 @@ def capture(a):
     a.output.mkdir(parents=True)
     report=dict(status='running',phase6_complete=False,host='original-windows',producer_commit=producer,
         application_source=config['application_source'],configuration=a.configuration,math_profile=a.math_profile,
-        source_sha256_lf=source,settings_sha256_lf=sha_lf(HERE/'cases.json'),runtime=runtime,
+        protocol=2,source_sha256_lf=source,settings_sha256_lf=sha_lf(CASE_FILE),runtime=runtime,
         preserved_files_sha256=protected,observer_sha256=observer_sha,cases={},failures={})
     manifest=a.output/'capture.json'
     def save():manifest.write_text(json.dumps(report,indent=2)+'\n')
@@ -180,11 +186,11 @@ def capture(a):
                     path=directory/'Orbiter.cfg'
                     path.write_text(path.read_text().replace('  ProductionBehaviorDriver','  ProductionCockpitDriver\n  OGLClient')+
                         '\nFPS = 0\nMenubarMode = 1\nInfobarMode = 1\nInstrumentUpdateInterval = 0.25\n')
-                    (directory/'Scenarios/Behavior.scn').write_bytes(original)
+                    scenario=entry_point(directory,case);scenario.parent.mkdir(parents=True,exist_ok=True);scenario.write_bytes(original)
                     for name,checksum in config['resources_sha256_lf'].items():
                         require(sha_lf(directory/name)==checksum,'Staged original legacy config or mesh differs')
                     (directory/'ogl-evidence.enabled').touch();mesa_files(a.mesa,directory)
-                stage(a.executable,a.data,a.planets,out,config,configure)
+                stage(a.executable,a.data,a.planets,out,config,case,configure)
                 require(digest(out/a.executable.name)==protected[a.executable.name] and
                         digest(out/observer)==observer_sha,'Executed original application or observer differs')
                 value=inspect(out,case,config,expected)

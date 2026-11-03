@@ -4,6 +4,7 @@
 #include "NativeVesselAPI.h"
 #include "Production/NativeRenderApi.h"
 #include "../StockVessels/Observation.h"
+#include "Playback.h"
 #include <chrono>
 #include <cstdlib>
 #include <dlfcn.h>
@@ -11,7 +12,7 @@
 
 namespace {
 struct Preload { Preload() { unsetenv("LD_PRELOAD"); } } preload;
-std::ofstream state,docks;
+std::ofstream state,docks,playbackStream;
 bool initialized=false;
 unsigned frames=0;
 }
@@ -22,7 +23,8 @@ void orbiter::production::Session::UpdateWorld(SessionServices& services,const T
     stock_vessels::require(original!=nullptr,"Original legacy UpdateWorld missing");
     std::this_thread::sleep_for(std::chrono::milliseconds(120));
     if(!initialized) {
-        stock_vessels::headers(state,docks);stock_vessels::snapshot(state,docks,0);
+        stock_vessels::headers(state,docks);legacy_playback::open(playbackStream);
+        stock_vessels::snapshot(state,docks,0);legacy_playback::snapshot(playbackStream,0);
         std::ifstream maps("/proc/self/maps");std::ofstream loaded("renderer-modules.txt");loaded<<maps.rdbuf();
         initialized=true;
     }
@@ -35,4 +37,5 @@ void orbiter::production::Session::EndTimeStep(SessionServices& services,TimeDat
     stock_vessels::require(original!=nullptr,"Original legacy EndTimeStep missing");
     original(services,time,running,active,force);
     stock_vessels::snapshot(state,docks,++frames);
+    legacy_playback::snapshot(playbackStream,frames);
 }

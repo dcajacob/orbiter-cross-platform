@@ -58,7 +58,7 @@ def producer_sources(report,producer):
         body=subprocess.check_output(['git','-C',str(ROOT),'show',producer+':'+name])
         require(hashlib.sha256(body.replace(b'\r\n',b'\n')).hexdigest()==expected,
                 'Original legacy producer source differs: '+name)
-    for name in ('original.py','cases.json'):
+    for name in ('original.py','cases-v2.json','recording_inputs.py','stage_original.py','Playback.h','Driver.cpp'):
         require(source[folder+'/'+name]==sha_lf(HERE/name),'Current legacy reader or case protocol differs from producer')
     return source
 
@@ -97,7 +97,7 @@ def audit_profile(base,profile,config,producer,preserved_root=None,metadata=None
             report['host']=='original-windows' and report['producer_commit']==producer and
             report['configuration']==configuration and report['math_profile']==math_profile and
             report['application_source']==config['application_source'] and
-            report['settings_sha256_lf']==sha_lf(HERE/'cases.json') and
+            report['protocol']==2 and report['settings_sha256_lf']==sha_lf(HERE/'cases-v2.json') and
             report['preserved_runtime_unchanged'] and report['observer_sources_unchanged'],
             'Original legacy profile failed, incomplete or misidentified: '+profile)
     sources=producer_sources(report,producer)
@@ -131,7 +131,7 @@ def audit_profile(base,profile,config,producer,preserved_root=None,metadata=None
     require(cache['CMAKE_BUILD_TYPE:STRING']==configuration,'Actual original legacy observer build configuration differs')
     commands=json.loads((build/'compile_commands.json').read_text())
     require(len(commands)==1 and PureWindowsPath(commands[0]['file']).name=='Driver.cpp' and
-            PureWindowsPath(commands[0]['file']).parent.name=='StockVessels' and
+            PureWindowsPath(commands[0]['file']).parent.name=='LegacyStations' and
             re.findall(r'(?:^|\s)[/-](MDd?)(?=\s|$)',commands[0]['command'])==['MDd' if configuration=='Debug' else 'MD'],
             'Actual original legacy observer source or CRT linkage differs')
     modules={}
@@ -160,9 +160,9 @@ def audit_profile(base,profile,config,producer,preserved_root=None,metadata=None
                     (math_profile!='sse2' or actual['actual_math']=='sse2'),'Actual original legacy CRT selection differs')
             module_audit(out,recorded,modules,case)
             runs.append({key:actual[key] for key in ('declared_vessels','finalized_ticks','all_vessel_rows','docking_rows',
-                       'legacy_initial_capabilities','actual_math','renderer')})
+                       'legacy_initial_capabilities','actual_math','renderer','recording_files','playback_rows','playback_vessels')})
         require(runs[0]['actual_math']==runs[1]['actual_math'],'Original legacy repeat changed CRT implementation')
-        for name in ('stock-vessel-state.csv','stock-vessel-docks.csv','camera.csv'):
+        for name in ('stock-vessel-state.csv','stock-vessel-docks.csv','stock-playback.csv','camera.csv'):
             require((paths[0]/name).read_bytes()==(paths[1]/name).read_bytes(),'Original legacy repeat trace differs')
         similarity=legacy.image_ssim((paths[0]/'scene.rgba').read_bytes(),(paths[1]/'scene.rgba').read_bytes(),1280,720)
         require(similarity>=config['image_ssim_minimum'] and similarity==captured['repeat_ssim'],
@@ -180,11 +180,23 @@ def audit_profile(base,profile,config,producer,preserved_root=None,metadata=None
             hashlib.sha256(gate_lf.replace(b'\n',b'\r\n')).hexdigest()},'Original legacy gate source differs')
     positive=legacy.inspect_artifacts(capture/'legacy_stations_3-1',config['cases'][2],config)
     require(control['positive']==positive,'Original legacy gate positive capture differs')
+    playback_control=json.loads((capture/'playback-gate-control.json').read_text())
+    require(playback_control['status']=='passed' and playback_control['original_capture_unchanged'] and
+            {row['control'] for row in playback_control['controls']}=={'missing_position_stream','changed_recording',
+                'false_playback_flag','missing_nonfocus_flag','wrong_entry_point'} and len(playback_control['controls'])==5,
+            'Original playback controls incomplete')
+    playback_source=subprocess.check_output(['git','-C',str(ROOT),'show',producer+':'+HERE.relative_to(ROOT).as_posix()+'/PlaybackGate.Test.py'])
+    playback_lf=playback_source.replace(b'\r\n',b'\n')
+    require(playback_control['source_sha256'] in {hashlib.sha256(playback_lf).hexdigest(),
+            hashlib.sha256(playback_lf.replace(b'\n',b'\r\n')).hexdigest()},'Original playback control source differs')
+    playback_positive=legacy.inspect_inputs(capture/'legacy_stations_4-1',config['cases'][3],config,legacy.rows)
+    require(playback_control['positive']==playback_positive,'Original actual playback control capture differs')
     return dict(capture_sha256=digest(capture/'capture.json'),observer_sha256=digest(observer),
         source_manifest_sha256=hashlib.sha256(json.dumps(sources,sort_keys=True).encode()).hexdigest(),
         runtime_metadata_sha256_lf=sha_lf(runtime_root/'test-runtime.json'),
         client_metadata_sha256_lf=sha_lf(runtime_root/'control-reference-runtime.json'),
-        gate_sha256=digest(control_path),preserved_files=len(protected),cases=cases)
+        gate_sha256=digest(control_path),playback_gate_sha256=digest(capture/'playback-gate-control.json'),
+        preserved_files=len(protected),cases=cases)
 
 
 def main():
@@ -212,7 +224,7 @@ def main():
         for profile in sorted(profiles):
             configuration=profile.split('-',1)[0];entry=next(item for item in downloads['artifacts'] if item['profile']==profile)
             archive=ROOT/safe_name(entry['path'])
-            require(entry['name']=='original-legacy-stations-'+profile and archive.stat().st_size==entry['bytes'] and
+            require(entry['name']=='original-legacy-stations-v2-'+profile and archive.stat().st_size==entry['bytes'] and
                     digest(archive)==entry['sha256'],'Original legacy archive transport differs')
             members=verify_archive(archive,a.artifacts/profile)
             if pins:

@@ -1,4 +1,4 @@
-name: Preserved Windows Legacy Station Reference
+name: Preserved Windows Legacy Station Reference v2
 on:
   push:
     branches: ['codex/production-**']
@@ -7,7 +7,7 @@ on:
 permissions:
   contents: read
 concurrency:
-  group: original-legacy-stations-${{ github.ref }}
+  group: original-legacy-stations-v2-${{ github.ref }}
   cancel-in-progress: false
 jobs:
   original_legacy_stations:
@@ -80,21 +80,28 @@ jobs:
           python -B Tests/Production/LegacyStations/Gate.Test.py
           --capture out/legacy-stations-original/legacy_stations_3-1 --case legacy_stations_3
           --output out/legacy-stations-original/gate-control.json
+      - name: Reject omitted recordings, wrong entry points and false per-vessel playback flags
+        run: >-
+          python -B Tests/Production/LegacyStations/PlaybackGate.Test.py
+          --capture out/legacy-stations-original/legacy_stations_4-1
+          --output out/legacy-stations-original/playback-gate-control.json
       - uses: actions/upload-artifact@v7
         if: always()
         with:
-          name: original-legacy-stations-${{ matrix.configuration }}-${{ matrix.math_profile }}
+          name: original-legacy-stations-v2-${{ matrix.configuration }}-${{ matrix.math_profile }}
           retention-days: 90
           path: |
             out/legacy-stations-original/capture.json
             out/legacy-stations-original/gate-control.json
+            out/legacy-stations-original/playback-gate-control.json
             out/legacy-stations-original/*/*.csv
             out/legacy-stations-original/*/*.rgba
             out/legacy-stations-original/*/*.png
             out/legacy-stations-original/*/*.json
             out/legacy-stations-original/*/*.txt
             out/legacy-stations-original/*/*.log
-            out/legacy-stations-original/*/Scenarios/Behavior.scn
+            out/legacy-stations-original/*/Scenarios/**/*.scn
+            out/legacy-stations-original/*/Flights/**/*
             out/legacy-stations-original/*/Orbiter.cfg
             out/legacy-station-original-runtime/control-reference-runtime.json
             out/legacy-station-original-runtime/test-runtime.json

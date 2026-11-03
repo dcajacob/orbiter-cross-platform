@@ -54,7 +54,7 @@ def main():
                 else:values=[r for r in values if r['tick']!='60']
                 rewrite('stock-vessel-state.csv',values)
             elif name.startswith('changed_scenario') or name=='rewritten_scenario_line_endings':
-                path='Scenarios/Behavior.scn';value=(out/path).read_bytes()
+                path=case['scenario_entry_point'];value=(out/path).read_bytes()
                 value=value+b'\n; changed\n' if name=='changed_scenario' else value.replace(b'\r\n',b'\n')
                 if value==(out/path).read_bytes():value=value.replace(b'\n',b'\r\n')
                 replace(path,value)

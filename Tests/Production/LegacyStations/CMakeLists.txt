@@ -5,8 +5,8 @@ if(NOT WIN32 OR NOT MSVC)
 endif()
 set(ORBITER_TEST_RUNTIME "" CACHE PATH "Preserved original application and SDK")
 get_filename_component(ORBITER_TEST_RUNTIME "${ORBITER_TEST_RUNTIME}" ABSOLUTE)
-# Reuse the accepted read-only observer and its original public SDK fields.
-add_library(ProductionCockpitDriver SHARED ../StockVessels/Driver.cpp)
+# Retain the accepted SDK observations and add passive playback flags.
+add_library(ProductionCockpitDriver SHARED Driver.cpp)
 target_compile_features(ProductionCockpitDriver PRIVATE cxx_std_17)
 target_compile_definitions(ProductionCockpitDriver PRIVATE NOMINMAX)
 target_include_directories(ProductionCockpitDriver PRIVATE
