@@ -1,0 +1,43 @@
+name: Preserve Audited Shuttle-A Controls Originals
+on:
+  push:
+    branches: ['codex/production-**']
+    paths: ['Tests/Production/ShuttleA/Controls/observations.lock.json', 'Tests/Production/ShuttleA/Controls/preserve_original.py', '.github/workflows/preserve-shuttle-a-controls.yml']
+  workflow_dispatch:
+permissions:
+  contents: write
+  actions: read
+concurrency:
+  group: preserve-shuttle-a-controls-original-v1
+  cancel-in-progress: false
+jobs:
+  preserve:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - name: Verify exact archive bytes and independently re-audit all four original profiles
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: >-
+          python3 -B Tests/Production/ShuttleA/Controls/frozen_original.py
+          --cache out/original-controls-cache --output out/original-controls
+          --audit out/original-controls-audit.json
+      - name: Preserve only the audited ZIPs and verify the remote bytes before publication
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: >-
+          python3 -B Tests/Production/ShuttleA/Controls/preserve_original.py --publish
+          --cache out/original-controls-cache --audit out/original-controls-audit.json
+          --output out/preservation.json
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: shuttle-a-controls-preservation
+          retention-days: 90
+          path: |
+            out/preservation.json
+            out/original-controls-audit.json
+            out/original-controls/downloads.json

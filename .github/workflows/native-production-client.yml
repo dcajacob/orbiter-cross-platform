@@ -309,6 +309,20 @@ jobs:
           --data out/data --modules out/native-cockpit-engine/NativeModules --planets out/planets
           --configuration ${{ matrix.configuration }} --math-profile ${{ matrix.math_profile }}
           --output out/native-shuttle-a
+      - name: Operate Shuttle-A keys and reload moving and endpoint states in the complete scene
+        run: >-
+          xvfb-run -a -s '-screen 0 1920x1080x24' env LIBGL_ALWAYS_SOFTWARE=1 GALLIUM_DRIVER=llvmpipe
+          LD_LIBRARY_PATH=${{ github.workspace }}/out/native-cockpit-engine
+          python3 -B Tests/Production/ShuttleA/Controls/capture.py
+          --executable out/native-cockpit-engine/orbiter-production --assets out/scene-resources
+          --data out/data --planets out/planets --configuration ${{ matrix.configuration }}
+          --math-profile ${{ matrix.math_profile }} --runtime-source-commit ${{ github.sha }}
+          --output out/native-shuttle-a-controls
+      - name: Reject missing or forged Shuttle-A controls evidence
+        run: >-
+          python3 -B Tests/Production/ShuttleA/Controls/Gate.Test.py
+          --capture out/native-shuttle-a-controls/shuttle_a_panel-1/moving
+          --output out/native-shuttle-a-controls-gate
       - name: Click the visible stock cockpit menu and change ship, warp, pause and save
         run: >-
           xvfb-run -a -s '-screen 0 1920x1080x24' env LIBGL_ALWAYS_SOFTWARE=1 GALLIUM_DRIVER=llvmpipe
@@ -391,6 +405,8 @@ jobs:
             out/native-stock-stations/**
             out/native-shuttle-a/**
             out/native-shuttle-a-policy/**
+            out/native-shuttle-a-controls/**
+            out/native-shuttle-a-controls-gate/verification.json
             out/native-cockpit-engine/orbiter-production
             out/native-cockpit-engine/**/*.so
             out/camera-gate-check.json
@@ -708,6 +724,19 @@ jobs:
           --original out/shuttle-a-original/${{ matrix.configuration }}-${{ matrix.math_profile }}/shuttle-a-original
           --native runtime/out/native-shuttle-a --runtime-root runtime
           --reference-audit out/shuttle-a-original-audit.json --output shuttle-a-comparison.json
+      - name: Verify the pinned original Windows controls and persistence observations
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: >-
+          python3 -B Tests/Production/ShuttleA/Controls/frozen_original.py
+          --cache out/shuttle-a-controls-cache --output out/shuttle-a-controls-original
+          --audit out/shuttle-a-controls-original-audit.json
+      - name: Compare Shuttle-A controls, saved mechanisms and every vessel in the complete scene
+        run: >-
+          python3 -B Tests/Production/ShuttleA/Controls/compare.py
+          --original out/shuttle-a-controls-original/${{ matrix.configuration }}-${{ matrix.math_profile }}/shuttle-a-controls-original
+          --native runtime/out/native-shuttle-a-controls --runtime-root runtime/out/native-cockpit-engine
+          --reference-audit out/shuttle-a-controls-original-audit.json --output shuttle-a-controls-comparison.json
       - uses: actions/upload-artifact@v7
         if: always()
         with:
@@ -717,3 +746,6 @@ jobs:
             shuttle-a-comparison.json
             out/shuttle-a-original-audit.json
             out/shuttle-a-original/downloads.json
+            shuttle-a-controls-comparison.json
+            out/shuttle-a-controls-original-audit.json
+            out/shuttle-a-controls-original/downloads.json

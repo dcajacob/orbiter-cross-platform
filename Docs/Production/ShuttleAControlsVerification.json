@@ -131,10 +131,16 @@
     "application_source": "f725194209634f7fd5d1d44d426cfa9b5e303e37",
     "producer_commit": "8c5b87fb3afbd8bdcec8097eb4dbd97d9c7f42ef",
     "workflow": "https://github.com/dcajacob/orbiter-cross-platform/actions/runs/41710973164",
-    "status": "all-four-jobs-executing-at-checkpoint",
-    "artifacts_audited": false,
+    "status": "four-profiles-captured-and-audited",
+    "artifacts_audited": true,
     "native_comparison_qualified": false,
-    "frozen_initial_scene_references_unchanged": true
+    "frozen_initial_scene_references_unchanged": true,
+    "processes": 64,
+    "presents": 3648,
+    "observations_lock": "Tests/Production/ShuttleA/Controls/observations.lock.json",
+    "audit": "out/phase6-shuttle-a-controls-original-audit.json",
+    "offline_replay_audit": "out/phase6-shuttle-a-controls-frozen-replay-audit.json",
+    "damaged_cache_control": "out/phase6-shuttle-a-controls-frozen-negative/verification.json"
   },
   "archive": {
     "status": "passed",
@@ -147,14 +153,57 @@
     "remote_preservation": "pending"
   },
   "open_gates": {
-    "original_controls": "Four-profile artifact audit and native comparison pending",
+    "original_controls": "Four original profiles audited and pinned; Release SSE2 native capture/comparison remains pending",
     "native_controls": "Debug/SSE2 profiles and wider input acceptance pending",
     "mouse_and_pods": "Unverified",
     "payload_deployment_and_reload": "Unverified",
     "native_shuttle_a_editor": "Unimplemented",
     "physical_controller": "Unavailable per user; unverified",
-    "stock_corpus": "Full admitted-corpus capture still running; no overall stock acceptance claimed",
+    "stock_corpus": "All 157 attempted and independently audited: 112 passed, 45 failed; two sanitizer diagnostics remain",
     "broader_phase6": "Current full hosted matrix, final hardware performance/input and wider lifetime acceptance remain open",
     "remote_preservation": "Pending"
-  }
+  },
+  "native_profile_comparisons": {
+    "Release-automatic": {
+      "status": "passed",
+      "processes": 16,
+      "presents": 912,
+      "path": "out/phase6-shuttle-a-controls-native-matrix-v2/Release-automatic/comparison.json",
+      "runtime": "out/phase6-shuttle-a-mesh-engine",
+      "actual_configuration": "Release",
+      "actual_math_profile": "automatic"
+    },
+    "Debug-automatic": {
+      "status": "passed",
+      "processes": 16,
+      "presents": 912,
+      "path": "out/phase6-shuttle-a-controls-native-matrix-v2/Debug-automatic/comparison.json",
+      "runtime": "out/phase6-shuttle-a-controls-Debug-automatic-engine",
+      "actual_configuration": "Debug",
+      "actual_math_profile": "automatic"
+    },
+    "Debug-sse2": {
+      "status": "passed",
+      "processes": 16,
+      "presents": 912,
+      "path": "out/phase6-shuttle-a-controls-native-matrix-v2/Debug-sse2/comparison.json",
+      "runtime": "out/phase6-shuttle-a-controls-Debug-sse2-engine",
+      "actual_configuration": "Debug",
+      "actual_math_profile": "sse2"
+    }
+  },
+  "additional_archives": [
+    {
+      "status": "passed",
+      "path": "out/phase6-shuttle-a-controls-original-evidence-v1.tar.gz",
+      "bytes": 75322330,
+      "sha256": "5630c5c49f6c0dd99118b1eac7c119f81bdc218049aaf442215215be036427df",
+      "members": 26,
+      "index_sha256": "9bc3d390f1c88e8bcf1d9d244b7af6182bd1a6e098b64f833386119bc922a92a",
+      "remote_preservation": "pending",
+      "font_and_asset_collections_included": false
+    }
+  ],
+  "hosted_controls": "Four existing native/paired jobs now include controls and persistence; hosted qualification pending",
+  "preservation_workflow": ".github/workflows/preserve-shuttle-a-controls.yml; exact audited ZIPs only, pending execution"
 }

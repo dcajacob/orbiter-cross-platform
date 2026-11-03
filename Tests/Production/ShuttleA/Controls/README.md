@@ -52,3 +52,21 @@ captures must have identical input, observer, scene, clock and budget protocol
 files. Provenance-checking changes do not replace the original observations.
 `Identity.Test.py` rejects a mislabeled real build, a wrong CPU profile and a
 modified copy of an actual engine while proving the retained builds unchanged.
+
+The four original profiles from producer `8c5b87fb` are now audited: 64 sessions
+and 3,648 presents, including deterministic repeats and Debug/Release comparisons
+within each CRT profile. `observations.lock.json` pins their exact ZIP identities
+without automatic refresh. Reproduce the source/artifact audit from a cache:
+
+```sh
+python3 -B Tests/Production/ShuttleA/Controls/frozen_original.py --offline \
+  --cache out/phase6-shuttle-a-controls-original-cache \
+  --output out/shuttle-a-controls-reference --audit out/shuttle-a-controls-reference-audit.json
+```
+
+Missing archives can be obtained using the read-only Actions token in CI. The
+helper removes authorization on redirects away from the GitHub API and verifies
+size, SHA-256 and safe ZIP paths before auditing. A damaged cache is rejected;
+it never selects a replacement run. The corrected local Release automatic
+profile passes all sixteen sessions against these audited originals. Remaining
+native profiles and wider interactive acceptance are still separate gates.

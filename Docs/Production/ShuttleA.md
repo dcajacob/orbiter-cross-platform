@@ -141,7 +141,8 @@ Five negative controls reject a missing background station, missing attachment
 port, missing animation sample, wrong cockpit and forged saved position, with
 the original capture unchanged. The dedicated Windows workflow collects all
 four original build/CRT profiles with the preserved application, SDK and client.
-Those original captures, their artifact audit and native comparisons remain
+All four original profiles and their artifact audit now pass. The corrected
+Release automatic comparison also passes; the other native profiles remain
 pending. The new fixture does not qualify mouse operation, pod controls,
 parachute deployment, the editor or overall Phase 6 acceptance.
 
@@ -169,3 +170,36 @@ the captures and open gates. Its verified local evidence archive contains
 It includes raw captures, observer sources and replay recipes, and refers to the
 previous archive for the matching retained runtime binaries. Asset/font
 collections are excluded. Remote preservation remains pending.
+
+The four original controls profiles are now pinned at producer `8c5b87fb`:
+64 sessions and 3,648 presents. Offline staging re-audits all four archives,
+including exact mechanism/attachment trajectories, all-vessel numerical budgets,
+repeated frames and Debug/Release pairs. A corrupted cached archive is rejected
+before an audit can be created. Their verified local evidence bundle is
+`out/phase6-shuttle-a-controls-original-evidence-v1.tar.gz`: 75,322,330 bytes,
+26 members, SHA-256
+`5630c5c49f6c0dd99118b1eac7c119f81bdc218049aaf442215215be036427df`.
+
+The [admitted-corpus audit](ShuttleAAdmittedCorpusVerification.json) now covers
+all 157 unchanged scenes: 112 passed and 45 failed. The first controller reached
+its 1,800-second limit after 149 completed attempts; a separate invocation ran
+exactly the eight remaining cases with unchanged binaries and source. The
+derived manifest retains every completed raw result and records its origin.
+The independent verifier rechecks all 157 cases. There are no signal-terminated
+scenario processes, 119 complete dependency inventories and seven frozen
+metadata discrepancies.
+
+Two sanitizer diagnostics remain: Transfer MFD reads its uninitialized
+`dv_manip` boolean when a hypothetical orbit is restored; the unchanged vessel
+API script passes its assertions and then calls `oapi.exit(0)`, skipping normal
+graphics teardown and leaving 15,264 bytes in 76 EGL allocations. Four other
+inventory-ready failures reject unqualified legacy ISS capabilities, and the
+original GeneralApiTest assertion remains failed. The other 38 failures have
+incomplete dependencies. These results preserve the full acceptance scope.
+
+The verified local admitted-corpus bundle contains 34,805,441 bytes and 8,522
+members, SHA-256
+`5142eee73ef1f98d08ca18a8c5184b5d2d9303ecf1d919fa8fe5dcb2ce3d28b9`.
+It retains both source captures, the derived provenance, failed cases and
+independent audit, with replay recipes and the matching runtime archive
+reference. Asset/font collections are excluded; remote preservation remains open.

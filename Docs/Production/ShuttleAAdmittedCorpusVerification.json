@@ -1,0 +1,70 @@
+{
+  "schema": 1,
+  "status": "audited-incomplete",
+  "phase6_complete": false,
+  "runtime_source_commit": "09eeed2091b36b18681cd10616b608248008ddaa",
+  "actual_configuration": "Debug",
+  "instrumentation": [
+    "address",
+    "undefined"
+  ],
+  "leak_detection": true,
+  "summary": {
+    "attempted": 157,
+    "passed": 112,
+    "failed": 45,
+    "inventory_ready": 119,
+    "source_metadata_mismatches": 7
+  },
+  "method": "149 completed attempts before a verified 1800-second controller timeout, plus exactly the eight previously unattempted cases. The derived manifest copies each completed raw attempt once; failed results are retained. Independent stock verification rechecks all 157.",
+  "source_and_runtime_unchanged": true,
+  "aggregation_provenance": {
+    "path": "out/phase6-shuttle-a-mesh-complete-corpus/verification.json",
+    "sha256": "b18b705a515cde05966765e50acabbb720f36912adddaed42f1fb792a38ea281"
+  },
+  "independent_audit": {
+    "path": "out/phase6-shuttle-a-mesh-complete-corpus-audit.json",
+    "sha256": "85f13a68ea0f364bc919ef7d5269359dcd7738e16e5f997980e6a7821f5aecc0"
+  },
+  "signal_terminated_scenarios": [],
+  "sanitizer_diagnostics": {
+    "Navigation/Lunar transfer/Lunar transfer 1.scn": [
+      "runtime error:"
+    ],
+    "Tests/VesselApiTest.scn": [
+      "ERROR: LeakSanitizer"
+    ]
+  },
+  "failure_categories": {
+    "incomplete_dependencies": 38,
+    "unqualified_legacy_ISS_capabilities": 4,
+    "transfer_mfd_uninitialized_boolean": 1,
+    "preserved_general_api_assertion": 1,
+    "vessel_api_explicit_process_exit_and_live_EGL_allocations": 1
+  },
+  "findings": [
+    {
+      "scenario": "Navigation/Lunar transfer/Lunar transfer 1.scn",
+      "source": "Src/Orbiter/MfdTransfer.cpp:167",
+      "field": "Instrument_Transfer::dv_manip",
+      "state": "Read before initialization when the hypothetical orbit is enabled; UBSan reports invalid bool value 190. Constructor does not initialize the field."
+    },
+    {
+      "scenario": "Tests/VesselApiTest.scn",
+      "source": "Src/Module/LuaScript/LuaInterpreter/Interpreter.cpp:3883",
+      "state": "All unchanged vessel API script assertions pass, then the original oapi.exit(0) calls exit directly. Normal graphics shutdown is skipped; LeakSanitizer reports 15264 bytes in 76 EGL allocations. The failed lifecycle result is retained."
+    }
+  ],
+  "physical_controller": "Unavailable per user; unverified",
+  "qualification": "Initialization/smoke coverage with all ships. Overall corpus acceptance remains incomplete; no new Windows state/image parity is claimed by this sweep.",
+  "archive": {
+    "status": "passed",
+    "path": "out/phase6-shuttle-a-admitted-corpus-evidence-v1.tar.gz",
+    "bytes": 34805441,
+    "sha256": "5142eee73ef1f98d08ca18a8c5184b5d2d9303ecf1d919fa8fe5dcb2ce3d28b9",
+    "members": 8522,
+    "index_sha256": "a21fe5bb89533be57e8359df864efcb2f87c34d1c613dc073086f273124025ff",
+    "remote_preservation": "pending",
+    "font_and_asset_collections_included": false
+  }
+}

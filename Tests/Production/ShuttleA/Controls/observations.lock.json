@@ -1,0 +1,36 @@
+{
+  "schema": 1,
+  "status": "audited-original-observations",
+  "automatic_refresh": false,
+  "repository": "dcajacob/orbiter-cross-platform",
+  "run_id": 41710973164,
+  "producer_commit": "8c5b87fb3afbd8bdcec8097eb4dbd97d9c7f42ef",
+  "original_application": "f725194209634f7fd5d1d44d426cfa9b5e303e37",
+  "cases_sha256_lf": "5be4503dd4d6930b0f20172db7a553d824bfd40c55da952defea7f1220a43289",
+  "artifacts": [
+    {
+      "id": 13268271114,
+      "name": "original-shuttle-a-controls-Debug-sse2",
+      "bytes": 18989715,
+      "sha256": "6cebe7e3148337197fda5364c0100de4f8ded1143ad712a1893662a43bc15d18"
+    },
+    {
+      "id": 13267459376,
+      "name": "original-shuttle-a-controls-Release-sse2",
+      "bytes": 18948110,
+      "sha256": "739c1709c8b697628a129884b6a01f4baad5759e4e8020f907110978246c3ae5"
+    },
+    {
+      "id": 13266624409,
+      "name": "original-shuttle-a-controls-Debug-automatic",
+      "bytes": 18989673,
+      "sha256": "0e763163735cce4bfb6619d79c3e264a1663b8cf5643597581413b2a92d726dc"
+    },
+    {
+      "id": 13265944999,
+      "name": "original-shuttle-a-controls-Release-automatic",
+      "bytes": 18948344,
+      "sha256": "bc8add3e28a5a18524c8a1c98e4a1db5bdaf1a52010473aa7a34ea675712435d"
+    }
+  ]
+}
