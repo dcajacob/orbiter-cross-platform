@@ -418,6 +418,8 @@ jobs:
             out/focus-bars-original/*/cockpit-state.csv
             out/focus-bars-original/*/instrument-*.rgba
             out/focus-bars-original/*/cockpit-failure.txt
+            out/focus-bars-original/*/console.txt
+            out/focus-bars-original/*/Orbiter.log
             out/focus-bars-original/*/ui-inputs.csv
             out/focus-bars-original/options/Orbiter.cfg
             out/focus-bars-original/function/custom-function-events.txt

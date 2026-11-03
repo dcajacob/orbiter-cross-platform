@@ -81,6 +81,11 @@ def execute(args,name,mode,fps):
     if args.original:
         def configure(directory):
             if name=='function':(directory/'function-probe.enabled').touch()
+            if name=='recorder':
+                # The original installation supplies these parent directories.
+                # FRecorder_PrepareDir creates only Flights/<name>, not Flights.
+                (directory/'Flights').mkdir()
+                (directory/'Scenarios/Playback').mkdir()
             if name.startswith('menu'):menu_preferences(directory/'Config/MenuInfoBar.cfg')
             master=directory/'Orbiter.cfg'
             master.write_text(master.read_text().replace('  ProductionBehaviorDriver','  ProductionCockpitDriver\n  OGLClient')+config)
