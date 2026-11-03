@@ -227,6 +227,9 @@ def capture(args):
     require(not args.output.exists(),'Camera output exists; replacement is forbidden')
     if args.original:
         require(sys.platform=='win32' and args.mesa,'Preserved camera capture requires native Windows and the locked Mesa runtime')
+        # Match the existing preserved cockpit captures, including the actual
+        # llvmpipe driver selection rather than Mesa's default Windows backend.
+        os.environ.update(LIBGL_ALWAYS_SOFTWARE='true',GALLIUM_DRIVER='llvmpipe')
         runtime=json.loads((args.executable.parent/'control-reference-runtime.json').read_text())
         require(runtime['application_source']==config['application_source'],'Wrong preserved Windows application')
         preserved=json.loads((args.executable.parent/'test-runtime.json').read_text())
