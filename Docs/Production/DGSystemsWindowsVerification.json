@@ -1,0 +1,910 @@
+{
+  "schema": 1,
+  "status": "passed",
+  "scope": "Unchanged local exact comparisons of real preserved-original Windows and native hosted captures; capture workflow separately failed in later Help checks",
+  "capture_run": 41602701454,
+  "capture_source": "73067d5d9ce57b9212cbbe068c9a8d8fd92748da",
+  "original_application_source": "f725194209634f7fd5d1d44d426cfa9b5e303e37",
+  "archives": [
+    {
+      "id": 13217876536,
+      "name": "spacecraft-native-Debug-sse2",
+      "size": 24961234,
+      "digest": "sha256:fc8b35cbba4db51990ec9aeb394e2786d37dfdfd498fed25fc321799fc5b2b48"
+    },
+    {
+      "id": 13217821908,
+      "name": "spacecraft-native-Debug-automatic",
+      "size": 24961255,
+      "digest": "sha256:570a78420b205f5662d90c9f64023f1b3cc4ee8dfdd3f160741282258b4fdc9d"
+    },
+    {
+      "id": 13217480959,
+      "name": "spacecraft-native-Release-sse2",
+      "size": 24962552,
+      "digest": "sha256:c20c22ed8441ba485d108108d03cd6ffa48508835e4aa5d3be5cb607c2250397"
+    },
+    {
+      "id": 13216853812,
+      "name": "spacecraft-native-Release-automatic",
+      "size": 24961505,
+      "digest": "sha256:fc29af41ed65ae45ea2e0fea1e49247f98c6b0dde3d877749225f2d92ae97beb"
+    },
+    {
+      "id": 13216595574,
+      "name": "spacecraft-original-Debug-automatic",
+      "size": 21982034,
+      "digest": "sha256:2cc92e5373864e26f2046208b17878c30a348138aad671d42e30736773234909"
+    },
+    {
+      "id": 13216216899,
+      "name": "spacecraft-original-Release-sse2",
+      "size": 21984977,
+      "digest": "sha256:9bb07906e87a713808d25190fff793cad0682e1bb83e019f5a1cb0c16f9f9636"
+    },
+    {
+      "id": 13215634945,
+      "name": "spacecraft-original-Debug-sse2",
+      "size": 21983142,
+      "digest": "sha256:e72b71a3cbde6a5b483bc9dea825b47dd0f51690f28e108e78d59329e397343e"
+    },
+    {
+      "id": 13215494938,
+      "name": "spacecraft-original-Release-automatic",
+      "size": 21985379,
+      "digest": "sha256:cef8326d843e16afa51fa79d558719bb6cd7d8e2ea87b57a662f9a46fc8bf137"
+    }
+  ],
+  "comparisons": {
+    "Debug-automatic": {
+      "output": "out/phase6-dg-systems-hosted/Debug-automatic-comparison.json",
+      "sha256": "29e1651647be9861bfa064737b0342889af66b4ce0eb78d2266e2dc2bb174b6b",
+      "report": {
+        "status": "passed",
+        "cases": {
+          "dg_panel": {
+            "moving": {
+              "exact_mechanism_trajectories": true,
+              "exact_saved_position_and_speed": true,
+              "maxima": {
+                "position_m": 0.0,
+                "velocity_m_s": 0.0,
+                "rotation_rad": 0.0,
+                "angular_velocity_rad_s": 0.0,
+                "mjd_days": 0.0,
+                "propellant_fraction": 0.0
+              }
+            },
+            "resume": {
+              "exact_mechanism_trajectories": true,
+              "exact_saved_position_and_speed": true,
+              "maxima": {
+                "position_m": 0.0,
+                "velocity_m_s": 0.0,
+                "rotation_rad": 0.0,
+                "angular_velocity_rad_s": 0.0,
+                "mjd_days": 0.0,
+                "propellant_fraction": 0.0
+              }
+            },
+            "retract": {
+              "exact_mechanism_trajectories": true,
+              "exact_saved_position_and_speed": true,
+              "maxima": {
+                "position_m": 0.0,
+                "velocity_m_s": 0.0,
+                "rotation_rad": 0.0,
+                "angular_velocity_rad_s": 0.0,
+                "mjd_days": 0.0,
+                "propellant_fraction": 0.0
+              }
+            },
+            "closed-reload": {
+              "exact_mechanism_trajectories": true,
+              "exact_saved_position_and_speed": true,
+              "maxima": {
+                "position_m": 0.0,
+                "velocity_m_s": 0.0,
+                "rotation_rad": 0.0,
+                "angular_velocity_rad_s": 0.0,
+                "mjd_days": 0.0,
+                "propellant_fraction": 0.0
+              }
+            }
+          },
+          "dg_vc": {
+            "moving": {
+              "exact_mechanism_trajectories": true,
+              "exact_saved_position_and_speed": true,
+              "maxima": {
+                "position_m": 0.0,
+                "velocity_m_s": 0.0,
+                "rotation_rad": 0.0,
+                "angular_velocity_rad_s": 0.0,
+                "mjd_days": 0.0,
+                "propellant_fraction": 0.0
+              }
+            },
+            "resume": {
+              "exact_mechanism_trajectories": true,
+              "exact_saved_position_and_speed": true,
+              "maxima": {
+                "position_m": 0.0,
+                "velocity_m_s": 0.0,
+                "rotation_rad": 0.0,
+                "angular_velocity_rad_s": 0.0,
+                "mjd_days": 0.0,
+                "propellant_fraction": 0.0
+              }
+            },
+            "retract": {
+              "exact_mechanism_trajectories": true,
+              "exact_saved_position_and_speed": true,
+              "maxima": {
+                "position_m": 0.0,
+                "velocity_m_s": 0.0,
+                "rotation_rad": 0.0,
+                "angular_velocity_rad_s": 0.0,
+                "mjd_days": 0.0,
+                "propellant_fraction": 0.0
+              }
+            },
+            "closed-reload": {
+              "exact_mechanism_trajectories": true,
+              "exact_saved_position_and_speed": true,
+              "maxima": {
+                "position_m": 0.0,
+                "velocity_m_s": 0.0,
+                "rotation_rad": 0.0,
+                "angular_velocity_rad_s": 0.0,
+                "mjd_days": 0.0,
+                "propellant_fraction": 0.0
+              }
+            }
+          },
+          "dgs_panel": {
+            "moving": {
+              "exact_mechanism_trajectories": true,
+              "exact_saved_position_and_speed": true,
+              "maxima": {
+                "position_m": 0.0,
+                "velocity_m_s": 0.0,
+                "rotation_rad": 0.0,
+                "angular_velocity_rad_s": 0.0,
+                "mjd_days": 0.0,
+                "propellant_fraction": 0.0
+              }
+            },
+            "resume": {
+              "exact_mechanism_trajectories": true,
+              "exact_saved_position_and_speed": true,
+              "maxima": {
+                "position_m": 0.0,
+                "velocity_m_s": 0.0,
+                "rotation_rad": 0.0,
+                "angular_velocity_rad_s": 0.0,
+                "mjd_days": 0.0,
+                "propellant_fraction": 0.0
+              }
+            },
+            "retract": {
+              "exact_mechanism_trajectories": true,
+              "exact_saved_position_and_speed": true,
+              "maxima": {
+                "position_m": 0.0,
+                "velocity_m_s": 0.0,
+                "rotation_rad": 0.0,
+                "angular_velocity_rad_s": 0.0,
+                "mjd_days": 0.0,
+                "propellant_fraction": 0.0
+              }
+            },
+            "closed-reload": {
+              "exact_mechanism_trajectories": true,
+              "exact_saved_position_and_speed": true,
+              "maxima": {
+                "position_m": 0.0,
+                "velocity_m_s": 0.0,
+                "rotation_rad": 0.0,
+                "angular_velocity_rad_s": 0.0,
+                "mjd_days": 0.0,
+                "propellant_fraction": 0.0
+              }
+            }
+          },
+          "dgs_vc": {
+            "moving": {
+              "exact_mechanism_trajectories": true,
+              "exact_saved_position_and_speed": true,
+              "maxima": {
+                "position_m": 0.0,
+                "velocity_m_s": 0.0,
+                "rotation_rad": 0.0,
+                "angular_velocity_rad_s": 0.0,
+                "mjd_days": 0.0,
+                "propellant_fraction": 0.0
+              }
+            },
+            "resume": {
+              "exact_mechanism_trajectories": true,
+              "exact_saved_position_and_speed": true,
+              "maxima": {
+                "position_m": 0.0,
+                "velocity_m_s": 0.0,
+                "rotation_rad": 0.0,
+                "angular_velocity_rad_s": 0.0,
+                "mjd_days": 0.0,
+                "propellant_fraction": 0.0
+              }
+            },
+            "retract": {
+              "exact_mechanism_trajectories": true,
+              "exact_saved_position_and_speed": true,
+              "maxima": {
+                "position_m": 0.0,
+                "velocity_m_s": 0.0,
+                "rotation_rad": 0.0,
+                "angular_velocity_rad_s": 0.0,
+                "mjd_days": 0.0,
+                "propellant_fraction": 0.0
+              }
+            },
+            "closed-reload": {
+              "exact_mechanism_trajectories": true,
+              "exact_saved_position_and_speed": true,
+              "maxima": {
+                "position_m": 0.0,
+                "velocity_m_s": 0.0,
+                "rotation_rad": 0.0,
+                "angular_velocity_rad_s": 0.0,
+                "mjd_days": 0.0,
+                "propellant_fraction": 0.0
+              }
+            }
+          }
+        }
+      }
+    },
+    "Debug-sse2": {
+      "output": "out/phase6-dg-systems-hosted/Debug-sse2-comparison.json",
+      "sha256": "29e1651647be9861bfa064737b0342889af66b4ce0eb78d2266e2dc2bb174b6b",
+      "report": {
+        "status": "passed",
+        "cases": {
+          "dg_panel": {
+            "moving": {
+              "exact_mechanism_trajectories": true,
+              "exact_saved_position_and_speed": true,
+              "maxima": {
+                "position_m": 0.0,
+                "velocity_m_s": 0.0,
+                "rotation_rad": 0.0,
+                "angular_velocity_rad_s": 0.0,
+                "mjd_days": 0.0,
+                "propellant_fraction": 0.0
+              }
+            },
+            "resume": {
+              "exact_mechanism_trajectories": true,
+              "exact_saved_position_and_speed": true,
+              "maxima": {
+                "position_m": 0.0,
+                "velocity_m_s": 0.0,
+                "rotation_rad": 0.0,
+                "angular_velocity_rad_s": 0.0,
+                "mjd_days": 0.0,
+                "propellant_fraction": 0.0
+              }
+            },
+            "retract": {
+              "exact_mechanism_trajectories": true,
+              "exact_saved_position_and_speed": true,
+              "maxima": {
+                "position_m": 0.0,
+                "velocity_m_s": 0.0,
+                "rotation_rad": 0.0,
+                "angular_velocity_rad_s": 0.0,
+                "mjd_days": 0.0,
+                "propellant_fraction": 0.0
+              }
+            },
+            "closed-reload": {
+              "exact_mechanism_trajectories": true,
+              "exact_saved_position_and_speed": true,
+              "maxima": {
+                "position_m": 0.0,
+                "velocity_m_s": 0.0,
+                "rotation_rad": 0.0,
+                "angular_velocity_rad_s": 0.0,
+                "mjd_days": 0.0,
+                "propellant_fraction": 0.0
+              }
+            }
+          },
+          "dg_vc": {
+            "moving": {
+              "exact_mechanism_trajectories": true,
+              "exact_saved_position_and_speed": true,
+              "maxima": {
+                "position_m": 0.0,
+                "velocity_m_s": 0.0,
+                "rotation_rad": 0.0,
+                "angular_velocity_rad_s": 0.0,
+                "mjd_days": 0.0,
+                "propellant_fraction": 0.0
+              }
+            },
+            "resume": {
+              "exact_mechanism_trajectories": true,
+              "exact_saved_position_and_speed": true,
+              "maxima": {
+                "position_m": 0.0,
+                "velocity_m_s": 0.0,
+                "rotation_rad": 0.0,
+                "angular_velocity_rad_s": 0.0,
+                "mjd_days": 0.0,
+                "propellant_fraction": 0.0
+              }
+            },
+            "retract": {
+              "exact_mechanism_trajectories": true,
+              "exact_saved_position_and_speed": true,
+              "maxima": {
+                "position_m": 0.0,
+                "velocity_m_s": 0.0,
+                "rotation_rad": 0.0,
+                "angular_velocity_rad_s": 0.0,
+                "mjd_days": 0.0,
+                "propellant_fraction": 0.0
+              }
+            },
+            "closed-reload": {
+              "exact_mechanism_trajectories": true,
+              "exact_saved_position_and_speed": true,
+              "maxima": {
+                "position_m": 0.0,
+                "velocity_m_s": 0.0,
+                "rotation_rad": 0.0,
+                "angular_velocity_rad_s": 0.0,
+                "mjd_days": 0.0,
+                "propellant_fraction": 0.0
+              }
+            }
+          },
+          "dgs_panel": {
+            "moving": {
+              "exact_mechanism_trajectories": true,
+              "exact_saved_position_and_speed": true,
+              "maxima": {
+                "position_m": 0.0,
+                "velocity_m_s": 0.0,
+                "rotation_rad": 0.0,
+                "angular_velocity_rad_s": 0.0,
+                "mjd_days": 0.0,
+                "propellant_fraction": 0.0
+              }
+            },
+            "resume": {
+              "exact_mechanism_trajectories": true,
+              "exact_saved_position_and_speed": true,
+              "maxima": {
+                "position_m": 0.0,
+                "velocity_m_s": 0.0,
+                "rotation_rad": 0.0,
+                "angular_velocity_rad_s": 0.0,
+                "mjd_days": 0.0,
+                "propellant_fraction": 0.0
+              }
+            },
+            "retract": {
+              "exact_mechanism_trajectories": true,
+              "exact_saved_position_and_speed": true,
+              "maxima": {
+                "position_m": 0.0,
+                "velocity_m_s": 0.0,
+                "rotation_rad": 0.0,
+                "angular_velocity_rad_s": 0.0,
+                "mjd_days": 0.0,
+                "propellant_fraction": 0.0
+              }
+            },
+            "closed-reload": {
+              "exact_mechanism_trajectories": true,
+              "exact_saved_position_and_speed": true,
+              "maxima": {
+                "position_m": 0.0,
+                "velocity_m_s": 0.0,
+                "rotation_rad": 0.0,
+                "angular_velocity_rad_s": 0.0,
+                "mjd_days": 0.0,
+                "propellant_fraction": 0.0
+              }
+            }
+          },
+          "dgs_vc": {
+            "moving": {
+              "exact_mechanism_trajectories": true,
+              "exact_saved_position_and_speed": true,
+              "maxima": {
+                "position_m": 0.0,
+                "velocity_m_s": 0.0,
+                "rotation_rad": 0.0,
+                "angular_velocity_rad_s": 0.0,
+                "mjd_days": 0.0,
+                "propellant_fraction": 0.0
+              }
+            },
+            "resume": {
+              "exact_mechanism_trajectories": true,
+              "exact_saved_position_and_speed": true,
+              "maxima": {
+                "position_m": 0.0,
+                "velocity_m_s": 0.0,
+                "rotation_rad": 0.0,
+                "angular_velocity_rad_s": 0.0,
+                "mjd_days": 0.0,
+                "propellant_fraction": 0.0
+              }
+            },
+            "retract": {
+              "exact_mechanism_trajectories": true,
+              "exact_saved_position_and_speed": true,
+              "maxima": {
+                "position_m": 0.0,
+                "velocity_m_s": 0.0,
+                "rotation_rad": 0.0,
+                "angular_velocity_rad_s": 0.0,
+                "mjd_days": 0.0,
+                "propellant_fraction": 0.0
+              }
+            },
+            "closed-reload": {
+              "exact_mechanism_trajectories": true,
+              "exact_saved_position_and_speed": true,
+              "maxima": {
+                "position_m": 0.0,
+                "velocity_m_s": 0.0,
+                "rotation_rad": 0.0,
+                "angular_velocity_rad_s": 0.0,
+                "mjd_days": 0.0,
+                "propellant_fraction": 0.0
+              }
+            }
+          }
+        }
+      }
+    },
+    "Release-automatic": {
+      "output": "out/phase6-dg-systems-hosted/Release-automatic-comparison.json",
+      "sha256": "972b939f2be4e35b30bc08a86303e6a6f49d2e4f20813b78df6f313c26d3190b",
+      "report": {
+        "status": "passed",
+        "cases": {
+          "dg_panel": {
+            "moving": {
+              "exact_mechanism_trajectories": true,
+              "exact_saved_position_and_speed": true,
+              "maxima": {
+                "position_m": 0.0,
+                "velocity_m_s": 0.0,
+                "rotation_rad": 0.0,
+                "angular_velocity_rad_s": 0.0,
+                "mjd_days": 0.0,
+                "propellant_fraction": 0.0
+              }
+            },
+            "resume": {
+              "exact_mechanism_trajectories": true,
+              "exact_saved_position_and_speed": true,
+              "maxima": {
+                "position_m": 0.0,
+                "velocity_m_s": 0.0,
+                "rotation_rad": 0.0,
+                "angular_velocity_rad_s": 0.0,
+                "mjd_days": 0.0,
+                "propellant_fraction": 0.0
+              }
+            },
+            "retract": {
+              "exact_mechanism_trajectories": true,
+              "exact_saved_position_and_speed": true,
+              "maxima": {
+                "position_m": 0.0,
+                "velocity_m_s": 0.0,
+                "rotation_rad": 1.197885481783886e-21,
+                "angular_velocity_rad_s": 6.216525091355929e-22,
+                "mjd_days": 0.0,
+                "propellant_fraction": 0.0
+              }
+            },
+            "closed-reload": {
+              "exact_mechanism_trajectories": true,
+              "exact_saved_position_and_speed": true,
+              "maxima": {
+                "position_m": 0.0,
+                "velocity_m_s": 0.0,
+                "rotation_rad": 0.0,
+                "angular_velocity_rad_s": 0.0,
+                "mjd_days": 0.0,
+                "propellant_fraction": 0.0
+              }
+            }
+          },
+          "dg_vc": {
+            "moving": {
+              "exact_mechanism_trajectories": true,
+              "exact_saved_position_and_speed": true,
+              "maxima": {
+                "position_m": 0.0,
+                "velocity_m_s": 0.0,
+                "rotation_rad": 0.0,
+                "angular_velocity_rad_s": 0.0,
+                "mjd_days": 0.0,
+                "propellant_fraction": 0.0
+              }
+            },
+            "resume": {
+              "exact_mechanism_trajectories": true,
+              "exact_saved_position_and_speed": true,
+              "maxima": {
+                "position_m": 0.0,
+                "velocity_m_s": 0.0,
+                "rotation_rad": 0.0,
+                "angular_velocity_rad_s": 0.0,
+                "mjd_days": 0.0,
+                "propellant_fraction": 0.0
+              }
+            },
+            "retract": {
+              "exact_mechanism_trajectories": true,
+              "exact_saved_position_and_speed": true,
+              "maxima": {
+                "position_m": 0.0,
+                "velocity_m_s": 0.0,
+                "rotation_rad": 1.197885481783886e-21,
+                "angular_velocity_rad_s": 6.216525091355929e-22,
+                "mjd_days": 0.0,
+                "propellant_fraction": 0.0
+              }
+            },
+            "closed-reload": {
+              "exact_mechanism_trajectories": true,
+              "exact_saved_position_and_speed": true,
+              "maxima": {
+                "position_m": 0.0,
+                "velocity_m_s": 0.0,
+                "rotation_rad": 0.0,
+                "angular_velocity_rad_s": 0.0,
+                "mjd_days": 0.0,
+                "propellant_fraction": 0.0
+              }
+            }
+          },
+          "dgs_panel": {
+            "moving": {
+              "exact_mechanism_trajectories": true,
+              "exact_saved_position_and_speed": true,
+              "maxima": {
+                "position_m": 0.0,
+                "velocity_m_s": 0.0,
+                "rotation_rad": 0.0,
+                "angular_velocity_rad_s": 0.0,
+                "mjd_days": 0.0,
+                "propellant_fraction": 0.0
+              }
+            },
+            "resume": {
+              "exact_mechanism_trajectories": true,
+              "exact_saved_position_and_speed": true,
+              "maxima": {
+                "position_m": 0.0,
+                "velocity_m_s": 0.0,
+                "rotation_rad": 0.0,
+                "angular_velocity_rad_s": 0.0,
+                "mjd_days": 0.0,
+                "propellant_fraction": 0.0
+              }
+            },
+            "retract": {
+              "exact_mechanism_trajectories": true,
+              "exact_saved_position_and_speed": true,
+              "maxima": {
+                "position_m": 0.0,
+                "velocity_m_s": 0.0,
+                "rotation_rad": 1.0587911840678754e-22,
+                "angular_velocity_rad_s": 9.474739198036461e-23,
+                "mjd_days": 0.0,
+                "propellant_fraction": 0.0
+              }
+            },
+            "closed-reload": {
+              "exact_mechanism_trajectories": true,
+              "exact_saved_position_and_speed": true,
+              "maxima": {
+                "position_m": 0.0,
+                "velocity_m_s": 0.0,
+                "rotation_rad": 0.0,
+                "angular_velocity_rad_s": 0.0,
+                "mjd_days": 0.0,
+                "propellant_fraction": 0.0
+              }
+            }
+          },
+          "dgs_vc": {
+            "moving": {
+              "exact_mechanism_trajectories": true,
+              "exact_saved_position_and_speed": true,
+              "maxima": {
+                "position_m": 0.0,
+                "velocity_m_s": 0.0,
+                "rotation_rad": 0.0,
+                "angular_velocity_rad_s": 0.0,
+                "mjd_days": 0.0,
+                "propellant_fraction": 0.0
+              }
+            },
+            "resume": {
+              "exact_mechanism_trajectories": true,
+              "exact_saved_position_and_speed": true,
+              "maxima": {
+                "position_m": 0.0,
+                "velocity_m_s": 0.0,
+                "rotation_rad": 0.0,
+                "angular_velocity_rad_s": 0.0,
+                "mjd_days": 0.0,
+                "propellant_fraction": 0.0
+              }
+            },
+            "retract": {
+              "exact_mechanism_trajectories": true,
+              "exact_saved_position_and_speed": true,
+              "maxima": {
+                "position_m": 0.0,
+                "velocity_m_s": 0.0,
+                "rotation_rad": 1.0587911840678754e-22,
+                "angular_velocity_rad_s": 9.474739198036461e-23,
+                "mjd_days": 0.0,
+                "propellant_fraction": 0.0
+              }
+            },
+            "closed-reload": {
+              "exact_mechanism_trajectories": true,
+              "exact_saved_position_and_speed": true,
+              "maxima": {
+                "position_m": 0.0,
+                "velocity_m_s": 0.0,
+                "rotation_rad": 0.0,
+                "angular_velocity_rad_s": 0.0,
+                "mjd_days": 0.0,
+                "propellant_fraction": 0.0
+              }
+            }
+          }
+        }
+      }
+    },
+    "Release-sse2": {
+      "output": "out/phase6-dg-systems-hosted/Release-sse2-comparison.json",
+      "sha256": "56ac527b4f53715f288b7f5f2801ddc67ecdcef473c5a78f82e1830153a617da",
+      "report": {
+        "status": "passed",
+        "cases": {
+          "dg_panel": {
+            "moving": {
+              "exact_mechanism_trajectories": true,
+              "exact_saved_position_and_speed": true,
+              "maxima": {
+                "position_m": 0.0,
+                "velocity_m_s": 0.0,
+                "rotation_rad": 0.0,
+                "angular_velocity_rad_s": 0.0,
+                "mjd_days": 0.0,
+                "propellant_fraction": 0.0
+              }
+            },
+            "resume": {
+              "exact_mechanism_trajectories": true,
+              "exact_saved_position_and_speed": true,
+              "maxima": {
+                "position_m": 0.0,
+                "velocity_m_s": 0.0,
+                "rotation_rad": 0.0,
+                "angular_velocity_rad_s": 0.0,
+                "mjd_days": 0.0,
+                "propellant_fraction": 0.0
+              }
+            },
+            "retract": {
+              "exact_mechanism_trajectories": true,
+              "exact_saved_position_and_speed": true,
+              "maxima": {
+                "position_m": 0.0,
+                "velocity_m_s": 0.0,
+                "rotation_rad": 1.1403530045093186e-21,
+                "angular_velocity_rad_s": 6.216525091355929e-22,
+                "mjd_days": 0.0,
+                "propellant_fraction": 0.0
+              }
+            },
+            "closed-reload": {
+              "exact_mechanism_trajectories": true,
+              "exact_saved_position_and_speed": true,
+              "maxima": {
+                "position_m": 0.0,
+                "velocity_m_s": 0.0,
+                "rotation_rad": 0.0,
+                "angular_velocity_rad_s": 0.0,
+                "mjd_days": 0.0,
+                "propellant_fraction": 0.0
+              }
+            }
+          },
+          "dg_vc": {
+            "moving": {
+              "exact_mechanism_trajectories": true,
+              "exact_saved_position_and_speed": true,
+              "maxima": {
+                "position_m": 0.0,
+                "velocity_m_s": 0.0,
+                "rotation_rad": 0.0,
+                "angular_velocity_rad_s": 0.0,
+                "mjd_days": 0.0,
+                "propellant_fraction": 0.0
+              }
+            },
+            "resume": {
+              "exact_mechanism_trajectories": true,
+              "exact_saved_position_and_speed": true,
+              "maxima": {
+                "position_m": 0.0,
+                "velocity_m_s": 0.0,
+                "rotation_rad": 0.0,
+                "angular_velocity_rad_s": 0.0,
+                "mjd_days": 0.0,
+                "propellant_fraction": 0.0
+              }
+            },
+            "retract": {
+              "exact_mechanism_trajectories": true,
+              "exact_saved_position_and_speed": true,
+              "maxima": {
+                "position_m": 0.0,
+                "velocity_m_s": 0.0,
+                "rotation_rad": 1.1403530045093186e-21,
+                "angular_velocity_rad_s": 6.216525091355929e-22,
+                "mjd_days": 0.0,
+                "propellant_fraction": 0.0
+              }
+            },
+            "closed-reload": {
+              "exact_mechanism_trajectories": true,
+              "exact_saved_position_and_speed": true,
+              "maxima": {
+                "position_m": 0.0,
+                "velocity_m_s": 0.0,
+                "rotation_rad": 0.0,
+                "angular_velocity_rad_s": 0.0,
+                "mjd_days": 0.0,
+                "propellant_fraction": 0.0
+              }
+            }
+          },
+          "dgs_panel": {
+            "moving": {
+              "exact_mechanism_trajectories": true,
+              "exact_saved_position_and_speed": true,
+              "maxima": {
+                "position_m": 0.0,
+                "velocity_m_s": 0.0,
+                "rotation_rad": 0.0,
+                "angular_velocity_rad_s": 0.0,
+                "mjd_days": 0.0,
+                "propellant_fraction": 0.0
+              }
+            },
+            "resume": {
+              "exact_mechanism_trajectories": true,
+              "exact_saved_position_and_speed": true,
+              "maxima": {
+                "position_m": 0.0,
+                "velocity_m_s": 0.0,
+                "rotation_rad": 0.0,
+                "angular_velocity_rad_s": 0.0,
+                "mjd_days": 0.0,
+                "propellant_fraction": 0.0
+              }
+            },
+            "retract": {
+              "exact_mechanism_trajectories": true,
+              "exact_saved_position_and_speed": true,
+              "maxima": {
+                "position_m": 0.0,
+                "velocity_m_s": 0.0,
+                "rotation_rad": 2.117582368135751e-22,
+                "angular_velocity_rad_s": 9.474739198036461e-23,
+                "mjd_days": 0.0,
+                "propellant_fraction": 0.0
+              }
+            },
+            "closed-reload": {
+              "exact_mechanism_trajectories": true,
+              "exact_saved_position_and_speed": true,
+              "maxima": {
+                "position_m": 0.0,
+                "velocity_m_s": 0.0,
+                "rotation_rad": 0.0,
+                "angular_velocity_rad_s": 0.0,
+                "mjd_days": 0.0,
+                "propellant_fraction": 0.0
+              }
+            }
+          },
+          "dgs_vc": {
+            "moving": {
+              "exact_mechanism_trajectories": true,
+              "exact_saved_position_and_speed": true,
+              "maxima": {
+                "position_m": 0.0,
+                "velocity_m_s": 0.0,
+                "rotation_rad": 0.0,
+                "angular_velocity_rad_s": 0.0,
+                "mjd_days": 0.0,
+                "propellant_fraction": 0.0
+              }
+            },
+            "resume": {
+              "exact_mechanism_trajectories": true,
+              "exact_saved_position_and_speed": true,
+              "maxima": {
+                "position_m": 0.0,
+                "velocity_m_s": 0.0,
+                "rotation_rad": 0.0,
+                "angular_velocity_rad_s": 0.0,
+                "mjd_days": 0.0,
+                "propellant_fraction": 0.0
+              }
+            },
+            "retract": {
+              "exact_mechanism_trajectories": true,
+              "exact_saved_position_and_speed": true,
+              "maxima": {
+                "position_m": 0.0,
+                "velocity_m_s": 0.0,
+                "rotation_rad": 2.117582368135751e-22,
+                "angular_velocity_rad_s": 9.474739198036461e-23,
+                "mjd_days": 0.0,
+                "propellant_fraction": 0.0
+              }
+            },
+            "closed-reload": {
+              "exact_mechanism_trajectories": true,
+              "exact_saved_position_and_speed": true,
+              "maxima": {
+                "position_m": 0.0,
+                "velocity_m_s": 0.0,
+                "rotation_rad": 0.0,
+                "angular_velocity_rad_s": 0.0,
+                "mjd_days": 0.0,
+                "propellant_fraction": 0.0
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "mechanisms": [
+    "AIRBRAKE",
+    "GEAR",
+    "AIRLOCK",
+    "IAIRLOCK",
+    "HATCH",
+    "RADIATOR",
+    "NOSECONE"
+  ],
+  "cases": 4,
+  "phases_per_case": 4,
+  "build_profile_pairs": 4,
+  "numerical_budgets_sha256": "825ed858e1a0ce93931edb212813468d112f53e85b94fcdd3c9b11d609041619",
+  "numerical_budgets_source": "Tests/Production/Cockpit/cases.json"
+}

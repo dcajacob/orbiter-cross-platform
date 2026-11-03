@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "status": "partial",
-  "scope": "Native mechanism and persistence gates pass; paired original Windows qualification is pending and the hardware Xlib leak gate remains failed",
+  "scope": "Native mechanism and persistence gates pass; real preserved-Windows comparisons pass all four build/profile pairs; isolated Xlib cleanup passes hardware lifetime checks; broader interactive Phase 6 acceptance remains open",
   "source_base": "c9d6c7855ac217a1367cef78a4adc17f8364161f",
   "native_runs": {
     "debug": {
@@ -575,5 +575,10 @@
     },
     "no_suppressions": true,
     "qualification": "Hardware leak gate remains failed; normal hardware systems and isolated software-driver sanitizer gates retain their recorded outcomes"
+  },
+  "follow_up": {
+    "windows_comparisons": "DGSystemsWindowsVerification.json",
+    "isolated_xlib_hardware_lifetime": "XlibLifetimeVerification.json",
+    "original_hardware_sanitizer_failure_retained": true
   }
 }

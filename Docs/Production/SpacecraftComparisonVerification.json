@@ -1,0 +1,584 @@
+{
+  "schema": 1,
+  "status": "passed",
+  "scope": "Local unchanged comparisons of completed real native/preserved-original Windows captures; hosted workflow remains failed on missing Pillow and archive path errors",
+  "capture_run": 41597414700,
+  "capture_source": "c9d6c7855ac217a1367cef78a4adc17f8364161f",
+  "original_application_source": "f725194209634f7fd5d1d44d426cfa9b5e303e37",
+  "archives": [
+    {
+      "id": 13215081291,
+      "name": "spacecraft-native-Debug-automatic",
+      "size": 21583551,
+      "digest": "sha256:595f5ecff33e16a3880964e0d5c0bae4d983d084b786d58b126b264f7aa3c582"
+    },
+    {
+      "id": 13214515785,
+      "name": "spacecraft-native-Release-automatic",
+      "size": 21584717,
+      "digest": "sha256:1b58062b8bd72cfd6c0d64c3a5c3beaec0e8b52bbc05be8cae2a2ebc7c1a8332"
+    },
+    {
+      "id": 13214472886,
+      "name": "spacecraft-native-Debug-sse2",
+      "size": 21583211,
+      "digest": "sha256:448a4f44063fd2c1f4098cc70e5d95a0664529c3e9e2c603a9a7c3fd6251d748"
+    },
+    {
+      "id": 13213900685,
+      "name": "spacecraft-original-Debug-sse2",
+      "size": 21232383,
+      "digest": "sha256:0a53f8efdef288cb8e7286b3656f2685d4f4f30ce63ad822985f72925df7e650"
+    },
+    {
+      "id": 13213840663,
+      "name": "spacecraft-original-Release-sse2",
+      "size": 21231555,
+      "digest": "sha256:7254129510736fcdfa639f6895335c82992412e88f2439550c9c01e40fe1af50"
+    },
+    {
+      "id": 13213340981,
+      "name": "spacecraft-original-Release-automatic",
+      "size": 21231737,
+      "digest": "sha256:213383f20c085ca287f505e1b75dcf527db7b4db4ef123d561aef54c1b1839bc"
+    },
+    {
+      "id": 13213311386,
+      "name": "spacecraft-original-Debug-automatic",
+      "size": 21232551,
+      "digest": "sha256:d5b37d5f4e1dc9a39afbb84fe6253285f64790e7f6cc46989abe72d7b2997893"
+    },
+    {
+      "id": 13213179896,
+      "name": "spacecraft-native-Release-sse2",
+      "size": 21584334,
+      "digest": "sha256:e90034c7a9b0a94c1cb12f228c6a574e5160a397c57a74bdc14e22690a6b699c"
+    }
+  ],
+  "comparisons": {
+    "Release-automatic-focus-bars-comparison.json": {
+      "sha256": "0c19cff7108c92e1f924ba03ee9a0ec9bd8c2fecc8826952d4eb87ae1b4836e9",
+      "results": {
+        "hidden": {
+          "20": 0.9998683509259165,
+          "50": 0.9998682719153522
+        },
+        "visible": {
+          "20": 0.999868912804098,
+          "50": 0.9998687304183819
+        },
+        "auto": {
+          "20": 0.999868912804098,
+          "50": 0.9998682719153522
+        },
+        "focus": {
+          "20": 0.9998163406070004,
+          "50": 0.9998687304183819
+        },
+        "menu-hidden": {
+          "20": 0.9998683508908807,
+          "50": 0.9998682719153491
+        },
+        "menu": {
+          "20": 0.9998683471255309,
+          "50": 0.9998163935160483
+        },
+        "menu-auto": {
+          "20": 0.9998683471255309,
+          "50": 0.9998682719153491
+        },
+        "options": {
+          "20": 0.9995245515610668,
+          "50": 0.9999660877854115
+        },
+        "function": {
+          "20": 0.9998772483424737,
+          "50": 0.9998682719153522
+        },
+        "recorder": {
+          "20": 0.9997493517145271,
+          "50": 0.9998682719153522
+        }
+      }
+    },
+    "Release-sse2-focus-bars-comparison.json": {
+      "sha256": "d8273743d4b1a958168ff687f60f42ae0f11e38dbb5d492d2e9355e4b5dea911",
+      "results": {
+        "hidden": {
+          "20": 0.9998683509259165,
+          "50": 0.9998682719153522
+        },
+        "visible": {
+          "20": 0.999868912804098,
+          "50": 0.9998687304183819
+        },
+        "auto": {
+          "20": 0.999868912804098,
+          "50": 0.9998682719153522
+        },
+        "focus": {
+          "20": 0.9998163406070016,
+          "50": 0.9998687304183819
+        },
+        "menu-hidden": {
+          "20": 0.9998683508908807,
+          "50": 0.9998682719153491
+        },
+        "menu": {
+          "20": 0.9998683471255309,
+          "50": 0.9998163935197052
+        },
+        "menu-auto": {
+          "20": 0.9998683471255309,
+          "50": 0.9998682719153491
+        },
+        "options": {
+          "20": 0.9995245515610561,
+          "50": 0.9999660877854115
+        },
+        "function": {
+          "20": 0.9998772483424737,
+          "50": 0.9998682719153522
+        },
+        "recorder": {
+          "20": 0.9997493517111349,
+          "50": 0.9998682719153522
+        }
+      }
+    },
+    "Release-automatic-recorded-flights-comparison.json": {
+      "sha256": "8cbfa33c3fceb25514f224292b1a1976fb63d6a0584fc63f63ba3c2ef510b160",
+      "results": {
+        "dg-stunts": {
+          "maxima": {
+            "position_m": 0.0,
+            "velocity_m_s": 1.0658141036401503e-14,
+            "angular_velocity_rad_s": 7.415985657152094e-16,
+            "rotation_rad": 3.3306690738754696e-16,
+            "mjd_days": 0.0,
+            "camera_direction": 0.0,
+            "aperture_rad": 0.0
+          },
+          "ssim": {
+            "20": 0.9986346229248407,
+            "50": 0.9991660153870612
+          }
+        },
+        "mojave": {
+          "maxima": {
+            "position_m": 0.0,
+            "velocity_m_s": 0.0,
+            "angular_velocity_rad_s": 6.866350197783356e-16,
+            "rotation_rad": 2.498001805406602e-16,
+            "mjd_days": 0.0,
+            "camera_direction": 0.0,
+            "aperture_rad": 0.0
+          },
+          "ssim": {
+            "20": 0.9977799980260817,
+            "50": 0.9972282773010525
+          }
+        },
+        "mojave-stock": {
+          "maxima": {
+            "position_m": 0.0,
+            "velocity_m_s": 0.0,
+            "angular_velocity_rad_s": 6.866350197783356e-16,
+            "rotation_rad": 2.498001805406602e-16,
+            "mjd_days": 0.0,
+            "camera_direction": 0.0,
+            "aperture_rad": 0.0
+          },
+          "ssim": {
+            "20": 0.9977799980260817,
+            "50": 0.9972282773010525
+          }
+        },
+        "orbit-1": {
+          "maxima": {
+            "position_m": 0.0,
+            "velocity_m_s": 3.6662903532026344e-12,
+            "angular_velocity_rad_s": 5.389157964038493e-16,
+            "rotation_rad": 2.5210253502251575e-16,
+            "mjd_days": 0.0,
+            "camera_direction": 1.9229626863835638e-16,
+            "aperture_rad": 0.0
+          },
+          "ssim": {
+            "20": 0.9999448820243843,
+            "50": 0.9999497806416537
+          }
+        },
+        "orbit-2": {
+          "maxima": {
+            "position_m": 0.0,
+            "velocity_m_s": 0.0,
+            "angular_velocity_rad_s": 0.0,
+            "rotation_rad": 0.0,
+            "mjd_days": 0.0,
+            "camera_direction": 0.0,
+            "aperture_rad": 0.0
+          },
+          "ssim": {
+            "20": 0.9999230652481356,
+            "50": 0.9999275297502828
+          }
+        }
+      }
+    },
+    "Debug-sse2-recorded-flights-comparison.json": {
+      "sha256": "e4cc4c7d21debcfdb5b0903c9a99e9d6ec301be743c9d7d1f9d577ea5657ebac",
+      "results": {
+        "dg-stunts": {
+          "maxima": {
+            "position_m": 0.0,
+            "velocity_m_s": 0.0,
+            "angular_velocity_rad_s": 0.0,
+            "rotation_rad": 0.0,
+            "mjd_days": 0.0,
+            "camera_direction": 0.0,
+            "aperture_rad": 0.0
+          },
+          "ssim": {
+            "20": 0.9986346229248407,
+            "50": 0.9991660153870612
+          }
+        },
+        "mojave": {
+          "maxima": {
+            "position_m": 0.0,
+            "velocity_m_s": 0.0,
+            "angular_velocity_rad_s": 0.0,
+            "rotation_rad": 0.0,
+            "mjd_days": 0.0,
+            "camera_direction": 0.0,
+            "aperture_rad": 0.0
+          },
+          "ssim": {
+            "20": 0.9977799980260817,
+            "50": 0.9972282773010525
+          }
+        },
+        "mojave-stock": {
+          "maxima": {
+            "position_m": 0.0,
+            "velocity_m_s": 0.0,
+            "angular_velocity_rad_s": 0.0,
+            "rotation_rad": 0.0,
+            "mjd_days": 0.0,
+            "camera_direction": 0.0,
+            "aperture_rad": 0.0
+          },
+          "ssim": {
+            "20": 0.9977799980260817,
+            "50": 0.9972282773010525
+          }
+        },
+        "orbit-1": {
+          "maxima": {
+            "position_m": 0.0,
+            "velocity_m_s": 0.0,
+            "angular_velocity_rad_s": 0.0,
+            "rotation_rad": 0.0,
+            "mjd_days": 0.0,
+            "camera_direction": 0.0,
+            "aperture_rad": 0.0
+          },
+          "ssim": {
+            "20": 0.9999448820243843,
+            "50": 0.9999497806416537
+          }
+        },
+        "orbit-2": {
+          "maxima": {
+            "position_m": 0.0,
+            "velocity_m_s": 0.0,
+            "angular_velocity_rad_s": 0.0,
+            "rotation_rad": 0.0,
+            "mjd_days": 0.0,
+            "camera_direction": 0.0,
+            "aperture_rad": 0.0
+          },
+          "ssim": {
+            "20": 0.9999230652481356,
+            "50": 0.9999275297502828
+          }
+        }
+      }
+    },
+    "Release-sse2-recorded-flights-comparison.json": {
+      "sha256": "e4cc4c7d21debcfdb5b0903c9a99e9d6ec301be743c9d7d1f9d577ea5657ebac",
+      "results": {
+        "dg-stunts": {
+          "maxima": {
+            "position_m": 0.0,
+            "velocity_m_s": 0.0,
+            "angular_velocity_rad_s": 0.0,
+            "rotation_rad": 0.0,
+            "mjd_days": 0.0,
+            "camera_direction": 0.0,
+            "aperture_rad": 0.0
+          },
+          "ssim": {
+            "20": 0.9986346229248407,
+            "50": 0.9991660153870612
+          }
+        },
+        "mojave": {
+          "maxima": {
+            "position_m": 0.0,
+            "velocity_m_s": 0.0,
+            "angular_velocity_rad_s": 0.0,
+            "rotation_rad": 0.0,
+            "mjd_days": 0.0,
+            "camera_direction": 0.0,
+            "aperture_rad": 0.0
+          },
+          "ssim": {
+            "20": 0.9977799980260817,
+            "50": 0.9972282773010525
+          }
+        },
+        "mojave-stock": {
+          "maxima": {
+            "position_m": 0.0,
+            "velocity_m_s": 0.0,
+            "angular_velocity_rad_s": 0.0,
+            "rotation_rad": 0.0,
+            "mjd_days": 0.0,
+            "camera_direction": 0.0,
+            "aperture_rad": 0.0
+          },
+          "ssim": {
+            "20": 0.9977799980260817,
+            "50": 0.9972282773010525
+          }
+        },
+        "orbit-1": {
+          "maxima": {
+            "position_m": 0.0,
+            "velocity_m_s": 0.0,
+            "angular_velocity_rad_s": 0.0,
+            "rotation_rad": 0.0,
+            "mjd_days": 0.0,
+            "camera_direction": 0.0,
+            "aperture_rad": 0.0
+          },
+          "ssim": {
+            "20": 0.9999448820243843,
+            "50": 0.9999497806416537
+          }
+        },
+        "orbit-2": {
+          "maxima": {
+            "position_m": 0.0,
+            "velocity_m_s": 0.0,
+            "angular_velocity_rad_s": 0.0,
+            "rotation_rad": 0.0,
+            "mjd_days": 0.0,
+            "camera_direction": 0.0,
+            "aperture_rad": 0.0
+          },
+          "ssim": {
+            "20": 0.9999230652481356,
+            "50": 0.9999275297502828
+          }
+        }
+      }
+    },
+    "Debug-sse2-focus-bars-comparison.json": {
+      "sha256": "ba6e0052249c4e21e705e9841dd0f65e96b83115a9b9c8ab1dedae45dca9c8ac",
+      "results": {
+        "hidden": {
+          "20": 0.9998683509259165,
+          "50": 0.9998682719153522
+        },
+        "visible": {
+          "20": 0.999868912804098,
+          "50": 0.9998687304183819
+        },
+        "auto": {
+          "20": 0.999868912804098,
+          "50": 0.9998682719153522
+        },
+        "focus": {
+          "20": 0.999816368985643,
+          "50": 0.9998687304183819
+        },
+        "menu-hidden": {
+          "20": 0.9998683508908807,
+          "50": 0.9998682719153491
+        },
+        "menu": {
+          "20": 0.9998683471255309,
+          "50": 0.9998164224927991
+        },
+        "menu-auto": {
+          "20": 0.9998683471255309,
+          "50": 0.9998682719153491
+        },
+        "options": {
+          "20": 0.9995245896202253,
+          "50": 0.9999660877854115
+        },
+        "function": {
+          "20": 0.9998772483424737,
+          "50": 0.9998682719153522
+        },
+        "recorder": {
+          "20": 0.9997493931324438,
+          "50": 0.9998682719153522
+        }
+      }
+    },
+    "Debug-automatic-recorded-flights-comparison.json": {
+      "sha256": "e4cc4c7d21debcfdb5b0903c9a99e9d6ec301be743c9d7d1f9d577ea5657ebac",
+      "results": {
+        "dg-stunts": {
+          "maxima": {
+            "position_m": 0.0,
+            "velocity_m_s": 0.0,
+            "angular_velocity_rad_s": 0.0,
+            "rotation_rad": 0.0,
+            "mjd_days": 0.0,
+            "camera_direction": 0.0,
+            "aperture_rad": 0.0
+          },
+          "ssim": {
+            "20": 0.9986346229248407,
+            "50": 0.9991660153870612
+          }
+        },
+        "mojave": {
+          "maxima": {
+            "position_m": 0.0,
+            "velocity_m_s": 0.0,
+            "angular_velocity_rad_s": 0.0,
+            "rotation_rad": 0.0,
+            "mjd_days": 0.0,
+            "camera_direction": 0.0,
+            "aperture_rad": 0.0
+          },
+          "ssim": {
+            "20": 0.9977799980260817,
+            "50": 0.9972282773010525
+          }
+        },
+        "mojave-stock": {
+          "maxima": {
+            "position_m": 0.0,
+            "velocity_m_s": 0.0,
+            "angular_velocity_rad_s": 0.0,
+            "rotation_rad": 0.0,
+            "mjd_days": 0.0,
+            "camera_direction": 0.0,
+            "aperture_rad": 0.0
+          },
+          "ssim": {
+            "20": 0.9977799980260817,
+            "50": 0.9972282773010525
+          }
+        },
+        "orbit-1": {
+          "maxima": {
+            "position_m": 0.0,
+            "velocity_m_s": 0.0,
+            "angular_velocity_rad_s": 0.0,
+            "rotation_rad": 0.0,
+            "mjd_days": 0.0,
+            "camera_direction": 0.0,
+            "aperture_rad": 0.0
+          },
+          "ssim": {
+            "20": 0.9999448820243843,
+            "50": 0.9999497806416537
+          }
+        },
+        "orbit-2": {
+          "maxima": {
+            "position_m": 0.0,
+            "velocity_m_s": 0.0,
+            "angular_velocity_rad_s": 0.0,
+            "rotation_rad": 0.0,
+            "mjd_days": 0.0,
+            "camera_direction": 0.0,
+            "aperture_rad": 0.0
+          },
+          "ssim": {
+            "20": 0.9999230652481356,
+            "50": 0.9999275297502828
+          }
+        }
+      }
+    },
+    "Debug-automatic-focus-bars-comparison.json": {
+      "sha256": "ba6e0052249c4e21e705e9841dd0f65e96b83115a9b9c8ab1dedae45dca9c8ac",
+      "results": {
+        "hidden": {
+          "20": 0.9998683509259165,
+          "50": 0.9998682719153522
+        },
+        "visible": {
+          "20": 0.999868912804098,
+          "50": 0.9998687304183819
+        },
+        "auto": {
+          "20": 0.999868912804098,
+          "50": 0.9998682719153522
+        },
+        "focus": {
+          "20": 0.999816368985643,
+          "50": 0.9998687304183819
+        },
+        "menu-hidden": {
+          "20": 0.9998683508908807,
+          "50": 0.9998682719153491
+        },
+        "menu": {
+          "20": 0.9998683471255309,
+          "50": 0.9998164224927991
+        },
+        "menu-auto": {
+          "20": 0.9998683471255309,
+          "50": 0.9998682719153491
+        },
+        "options": {
+          "20": 0.9995245896202253,
+          "50": 0.9999660877854115
+        },
+        "function": {
+          "20": 0.9998772483424737,
+          "50": 0.9998682719153522
+        },
+        "recorder": {
+          "20": 0.9997493931324438,
+          "50": 0.9998682719153522
+        }
+      }
+    }
+  },
+  "summary": {
+    "build_cpu_pairs": 4,
+    "recorded_flight_cases_per_pair": 5,
+    "focus_menu_cases_per_pair": 10,
+    "recorded_images": 40,
+    "recorded_ssim_min": 0.9972282773010525,
+    "focus_images": 80,
+    "focus_ssim_min": 0.9995245515610561,
+    "recorded_maxima": {
+      "position_m": 0,
+      "velocity_m_s": 3.6662903532026344e-12,
+      "angular_velocity_rad_s": 7.415985657152094e-16,
+      "rotation_rad": 3.3306690738754696e-16,
+      "mjd_days": 0,
+      "camera_direction": 1.9229626863835638e-16,
+      "aperture_rad": 0
+    },
+    "exact_all_focus_cockpit_samples": true
+  },
+  "repairs": {
+    "dependency_commit": "7334dddb1e7f1b8cd7ba3d57365e1b2d3ba0fd67",
+    "artifact_root_commit": "73067d5d9ce57b9212cbbe068c9a8d8fd92748da"
+  },
+  "raw_results": "out/phase6-spacecraft-qualified"
+}

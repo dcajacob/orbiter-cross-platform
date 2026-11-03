@@ -1,0 +1,84 @@
+{
+  "schema": 1,
+  "library": "libX11",
+  "version": "1.8.13",
+  "distribution_source": "2:1.8.13-1ubuntu0.1",
+  "scope": "Linux shared-library unload cleanup; default locale/input-method and thread-safety-constructor configuration",
+  "archives": {
+    "libx11_1.8.13-1ubuntu0.1.dsc": {
+      "url": "https://archive.ubuntu.com/ubuntu/pool/main/libx/libx11/libx11_1.8.13-1ubuntu0.1.dsc",
+      "sha256": "0fda3800214957dc0d12481ba887aa279524ed05877b6e0585d55cd1eeaec985",
+      "bytes": 2297
+    },
+    "libx11_1.8.13.orig.tar.gz": {
+      "url": "https://archive.ubuntu.com/ubuntu/pool/main/libx/libx11/libx11_1.8.13.orig.tar.gz",
+      "sha256": "acf0e7cd7541110e6330ecb539441a2d53061f386ec7be6906dfde0de2598470",
+      "bytes": 3217264
+    },
+    "libx11_1.8.13.orig.tar.gz.asc": {
+      "url": "https://archive.ubuntu.com/ubuntu/pool/main/libx/libx11/libx11_1.8.13.orig.tar.gz.asc",
+      "sha256": "391221d291778f72b600104fb7907e8fb0ee61813ca5ab443bf0a0dcc3a1ce65",
+      "bytes": 833
+    },
+    "libx11_1.8.13-1ubuntu0.1.diff.gz": {
+      "url": "https://archive.ubuntu.com/ubuntu/pool/main/libx/libx11/libx11_1.8.13-1ubuntu0.1.diff.gz",
+      "sha256": "33cef8a2f61600704330ded455cc4faa5d1ed71cd461b1c7b10c1b3a390b016f",
+      "bytes": 81337
+    }
+  },
+  "distribution_patches": [
+    {
+      "file": "003_recognize_glibc_2.3.2_locale_names.diff",
+      "sha256": "44f87e937a9f42791139306b4c50411793b95b6a80ab5afd3dc050cf09130326"
+    },
+    {
+      "file": "007_iso8859-15_Compose_fix.diff",
+      "sha256": "2e918473738c88ee98ffa6f95bff13e4511bb62b39b2ef39d65a0e63bd68d93a"
+    },
+    {
+      "file": "008_remove_ko_Compose.diff",
+      "sha256": "ee117f22b279e6ce7a23125f2c58a134ea916d80697762181f110bdf52b46a3c"
+    },
+    {
+      "file": "009_remove_th_Compose.diff",
+      "sha256": "092472080393a4f0c08f6702ed66f4cc7468a2f42728dcb8ae95ced767a53985"
+    },
+    {
+      "file": "015_russian_locale_alias.diff",
+      "sha256": "89ca0782a7d339109d451b9584f674cbd8542c3392a750447ea7c8770185674f"
+    },
+    {
+      "file": "CVE-2026-88806.patch",
+      "sha256": "3abf931bef5ad5dcb6da7b97b75d9649605b1b717f9a8dbfa2d3f31013ff3c9f"
+    },
+    {
+      "file": "CVE-2026-94283.patch",
+      "sha256": "99aed7093b84f8289d84f72be05f13282294ef9c28980ac079224d7b7daa4663"
+    },
+    {
+      "file": "CVE-2026-94284.patch",
+      "sha256": "573da2c6870018847c78b93528ac135678319d5f99a2ee32f211a08bd92b7b50"
+    },
+    {
+      "file": "CVE-2026-94285.patch",
+      "sha256": "7f7e7c1b3d772c310d8053de568a1fed3bdc9aafdf73c02505fa6c344d7352f0"
+    }
+  ],
+  "cleanup_patch": {
+    "file": "libx11-final-unload.patch",
+    "sha256": "6d56ea0e99009f2bc33cdbef280ab3b95777349036a370c620b6efd799599d5e",
+    "changed_files": [
+      "modules/im/ximcp/imInt.c",
+      "modules/im/ximcp/imLcIm.c",
+      "src/Quarks.c",
+      "src/Xrm.c",
+      "src/globals.c",
+      "src/xlibi18n/lcCT.c",
+      "src/xlibi18n/lcCharSet.c",
+      "src/xlibi18n/lcConv.c",
+      "src/xlibi18n/lcDB.c",
+      "src/xlibi18n/lcGeneric.c",
+      "src/xlibi18n/lcWrap.c"
+    ]
+  }
+}

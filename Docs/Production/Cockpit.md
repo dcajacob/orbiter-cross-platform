@@ -14,8 +14,10 @@ Gear, nose cone, radiator, both airlocks, hatch and airbrakes now pass a native
 keyboard and save/reload regression in both gliders and cockpit modes. Debug,
 Release and the unsuppressed sanitizer build each complete 16 fresh processes
 and 1,936 presentations, restoring moving systems and closed defaults through
-the original scenario readers. Paired original-Windows mechanism and physical
-state comparisons are prepared in CI and await hosted qualification.
+the original scenario readers. Real hosted original-Windows and native captures
+pass the unchanged mechanism/save and physical-state comparisons in all four
+Debug/Release automatic/SSE2 pairs. The capture workflow's later Help failure
+is recorded separately. [Windows systems comparisons](DGSystemsWindowsVerification.json)
 The Intel PTL laptop also completes the suite on the unmodified system driver
 and X11, with all 32 mechanism/physical trace files byte-identical to software
 Debug. This hardware result covers systems and lifecycle, with performance,
@@ -23,7 +25,12 @@ Wayland and controller qualification still open.
 Hardware sanitizer leak checking fails with 46,197 retained bytes in 791
 allocations per process. Loaded-library maps place the allocations in libX11
 resource/locale setup called by GLFW. All 24 presentations and context deletion
-finish in each failing checkpoint; hardware lifetime acceptance remains open.
+finish in each failing checkpoint. A checksum-pinned, isolated Xlib candidate
+now passes twelve standalone sanitizer cases, the full Intel systems suite,
+the stock menu and twenty GUI sessions. Its exported symbols and public headers
+are unchanged, and all 32 hardware mechanism/physical traces match the original
+system-Xlib run exactly. System libraries are unchanged; wider platform
+qualification remains open. [Xlib lifetime evidence](XlibLifetimeVerification.json)
 [Systems evidence](DGSystemsVerification.json)
 
 The native graphics leak now has an isolated source fix and a passing local
@@ -74,6 +81,13 @@ by fresh downloads and both comparisons. Native CI uses it for every build
 and CPU profile. The broader Phase 6 platform and image gates remain open.
 [Native numerical evidence](LuaNativeAlignment.json)
 [Published reference evidence](LuaPreservationVerification.json)
+
+Unchanged local comparisons of completed hosted recorded-flight and focus/menu
+captures also pass for all four build/profile pairs. The forty recorded-flight
+images have minimum SSIM 0.997228; the eighty focus/menu images have minimum
+SSIM 0.999524, with exact cockpit-state traces. The original hosted failures
+(missing Pillow and archive paths) remain recorded separately from these
+successful comparisons. [Spacecraft comparison evidence](SpacecraftComparisonVerification.json)
 
 The cockpit now draws the original target, time and frame-rate displays and
 opens the original spacecraft selection dialog on F3. A two-vessel run used
@@ -146,11 +160,19 @@ Playwright browser driver and retains the source manifest and screenshots.
 The equivalent Release flow passed 743 presentations, all three help launches,
 the same context checks and complete graphics shutdown.
 
-The desktop launcher receives a single encoded URL, without a command shell.
+The desktop launcher receives one encoded local launch-page URL, without a
+command shell. Its immutable user-cache page redirects to the full original
+topic/context URL: Ubuntu 24.04's generic `xdg-open` otherwise converts a file
+URL into a path and discards the query. Both the actual Ubuntu 24.04 launcher
+and the newer laptop launcher are exercised with a real browser. The complete
+software and Intel sanitizer menu flows pass; topic and current vessel/scenario
+context are checked at the browser's actual destination.
+[Help transport evidence](HelpLaunchVerification.json)
 It does not inherit simulation file descriptors or engine loader/preload paths.
 The help service polls child exits across simulation sessions, reports desktop
 launcher failures and never terminates the user's browser. A separate process
-test checks exact arguments, descriptor/environment isolation, missing launchers,
+test checks URL preservation, immutable cache reuse, escaped script content,
+cache-link rejection, descriptor/environment isolation, missing launchers,
 nonzero exits and child reaping. It passes address, undefined-behavior and leak
 checking without suppressions outside the ptrace-based execution sandbox
 (LeakSanitizer cannot operate under that sandbox). These Help checks do not close the existing

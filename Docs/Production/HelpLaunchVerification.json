@@ -1,0 +1,199 @@
+{
+  "schema": 1,
+  "status": "passed",
+  "scope": "Actual Ubuntu 24.04 and laptop desktop Help transport; real browser topic/context checks; full Intel/software stock menu sanitizer flows",
+  "source_base": "73067d5d9ce57b9212cbbe068c9a8d8fd92748da",
+  "source_sha256": {
+    "Src/Orbiter/Production/NativeHelp.cpp": "ba507f26bc4ce0ddf40ef04984b477e498018cc5bdada74cb9792854b0f845cc",
+    "Tests/Production/Help/browser.cjs": "a9113d7140c5b9801ba5854747af09afefe18f4422e3e677ab02c5eab71ea6e4",
+    "Tests/Production/Help/launch_browser.py": "45bddb3f82a82ee42e4024ed62bf5b76bfad6f2cba550ca81d18aa8e4eeaa7f1"
+  },
+  "ubuntu24_package": {
+    "output": "out/phase6-help-transport/xdg-utils_1.1.3-4.1ubuntu3_all.deb",
+    "sha256": "499ad8b146f8d6f092ada8f878e7c6d93239caf29ce92c1381fe94e314169986"
+  },
+  "ubuntu24_launcher": {
+    "output": "out/phase6-help-transport/ubuntu24/usr/bin/xdg-open",
+    "sha256": "faec92df30f89fa338d9fba723e010265ffd062b41decd7885b1ff8fd46cc529"
+  },
+  "newer_launcher": {
+    "output": "/usr/bin/xdg-open",
+    "sha256": "5afda3f0bda010c98ed4f5d84e305348e1b1e7fd624bca2bf0737b3348de62f9"
+  },
+  "newer_desktop_requests": {
+    "output": "out/phase6-help-transport/newer-desktop/requests.jsonl",
+    "sha256": "21b40b28d3b90c7411fbeca3e06096723d4882c6b73ad593bbeb7f85eededb00"
+  },
+  "launcher_sanitizer": {
+    "output": "out/phase6-help-transport/launcher-asan.log",
+    "sha256": "9547e6bb8fa8a70dffb31c728139f811aeb2f97ed0786ab1efbe120897986528"
+  },
+  "menu_runs": {
+    "intel": {
+      "output": "out/phase6-intel-menu-help-ubuntu24-close",
+      "menu": {
+        "recording": true,
+        "recording_overwrite_cancelled": true,
+        "recording_overwrite_confirmed": true,
+        "custom_functions": true,
+        "options": {
+          "refresh": 0.35,
+          "panel_scale": 1.1,
+          "limited_fuel": false,
+          "mfd_width_before": 346,
+          "mfd_width_after": 377,
+          "pages_visited": 10,
+          "keyboard_shortcuts": true,
+          "persisted": true,
+          "reloaded": true
+        },
+        "commands": [
+          "Ship",
+          "Camera",
+          "Speed",
+          "Pause",
+          "Function",
+          "Info",
+          "Options",
+          "Map",
+          "Record",
+          "Help",
+          "Save",
+          "Exit"
+        ],
+        "persisted_order": [
+          "Camera",
+          "Ship",
+          "Speed",
+          "Pause",
+          "Function",
+          "Info",
+          "Options",
+          "Map",
+          "Record",
+          "Help",
+          "Save",
+          "Exit"
+        ],
+        "focus": "DG2",
+        "warp": 10,
+        "quicksave": "cockpit 0001.scn",
+        "configuration_dialog": true,
+        "lifecycle": {
+          "rendered_frames": 1647,
+          "successful_presents": 1647,
+          "context_deleted": true
+        }
+      },
+      "help": {
+        "menu": true,
+        "keyboard": true,
+        "dialog": true,
+        "topics": [
+          "mainmenu.htm",
+          "mainmenu.htm",
+          "cam_mode.htm"
+        ],
+        "contexts": true,
+        "rendered": true,
+        "visible_missing_book": true,
+        "deduplicated": true,
+        "dismissed": true
+      },
+      "requests": {
+        "output": "out/phase6-intel-menu-help-ubuntu24-close/help/requests.jsonl",
+        "sha256": "6897b893e086b60d750c819cb5297f6a0e8d4efc6e572f3dea453559927a0b92"
+      },
+      "reload": {
+        "rendered_frames": 2,
+        "successful_presents": 2,
+        "context_deleted": true
+      }
+    },
+    "software": {
+      "output": "out/phase6-software-menu-help-ubuntu24",
+      "menu": {
+        "recording": true,
+        "recording_overwrite_cancelled": true,
+        "recording_overwrite_confirmed": true,
+        "custom_functions": true,
+        "options": {
+          "refresh": 0.35,
+          "panel_scale": 1.1,
+          "limited_fuel": false,
+          "mfd_width_before": 346,
+          "mfd_width_after": 377,
+          "pages_visited": 10,
+          "keyboard_shortcuts": true,
+          "persisted": true,
+          "reloaded": true
+        },
+        "commands": [
+          "Ship",
+          "Camera",
+          "Speed",
+          "Pause",
+          "Function",
+          "Info",
+          "Options",
+          "Map",
+          "Record",
+          "Help",
+          "Save",
+          "Exit"
+        ],
+        "persisted_order": [
+          "Camera",
+          "Ship",
+          "Speed",
+          "Pause",
+          "Function",
+          "Info",
+          "Options",
+          "Map",
+          "Record",
+          "Help",
+          "Save",
+          "Exit"
+        ],
+        "focus": "DG2",
+        "warp": 10,
+        "quicksave": "cockpit 0001.scn",
+        "configuration_dialog": true,
+        "lifecycle": {
+          "rendered_frames": 595,
+          "successful_presents": 595,
+          "context_deleted": true
+        }
+      },
+      "help": {
+        "menu": true,
+        "keyboard": true,
+        "dialog": true,
+        "topics": [
+          "mainmenu.htm",
+          "mainmenu.htm",
+          "cam_mode.htm"
+        ],
+        "contexts": true,
+        "rendered": true,
+        "visible_missing_book": true,
+        "deduplicated": true,
+        "dismissed": true
+      },
+      "requests": {
+        "output": "out/phase6-software-menu-help-ubuntu24/help/requests.jsonl",
+        "sha256": "15410e15f9a56eb05382f88c3775e7a305d9cfdd034e920f2cb4faa55d06e8d9"
+      },
+      "reload": {
+        "rendered_frames": 2,
+        "successful_presents": 2,
+        "context_deleted": true
+      }
+    }
+  },
+  "earlier_failed_run": {
+    "output": "out/phase6-intel-menu-help-ubuntu24",
+    "result": "All three Help requests rendered correctly; later MFD resize click failed. This run remains failed; explicit Options-close checks were added before the successful fresh run. Root cause of the missed click is not established."
+  }
+}

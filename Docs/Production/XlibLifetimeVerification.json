@@ -1,0 +1,598 @@
+{
+  "schema": 1,
+  "status": "passed",
+  "scope": "Isolated Linux Xlib unload cleanup and Intel X11 application lifetime; system libraries remain unchanged",
+  "source_base": "73067d5d9ce57b9212cbbe068c9a8d8fd92748da",
+  "source_lock_sha256": "03c7b1f6b6f524176374035faf04164c761365a0b846fbae953325fed3342a06",
+  "cleanup_patch_sha256": "6d56ea0e99009f2bc33cdbef280ab3b95777349036a370c620b6efd799599d5e",
+  "baseline": {
+    "output": "out/phase6-xlib-baseline-final/xlib-verification.json",
+    "sha256": "d7000be1cf82160b94a04f8654ce008536867940973f0180571dfb8297bef5a7",
+    "report": {
+      "status": "failed",
+      "library": "/home/dan/GIT/orbiter-cross-platform/out/phase6-xlib-baseline/install/lib/libX11.so.6.4.0",
+      "library_sha256": "8ca7b7168472ebdb855c0b5189cf03d0a25027e31fb67b0185999a23105443e0",
+      "fixture_sha256": "55dd16e86553776fa23db4556a3703d6ecf5236a19973bc252f8e88cdb54e25f",
+      "cases": {
+        "load-only": {
+          "exit_code": 0,
+          "log_sha256": "742b75d3546af72156a12c8a7a42380ad88852e46cc52889a83b6c6fa1070d57",
+          "library_unloaded": true,
+          "leaked_bytes": 0,
+          "leaked_allocations": 0
+        },
+        "initialize": {
+          "exit_code": 1,
+          "log_sha256": "3b297b50227e820c56eb0e51c0febb5baa332640225eb72002a3ec0e0bcd024b",
+          "library_unloaded": true,
+          "leaked_bytes": 12336,
+          "leaked_allocations": 3
+        },
+        "resources-C": {
+          "exit_code": 1,
+          "log_sha256": "d27657715275461aa536b97f3377fbe82c8b1e04c91cdac8bb2458f7972cc466",
+          "library_unloaded": true,
+          "leaked_bytes": 27334,
+          "leaked_allocations": 388
+        },
+        "resources-UTF8": {
+          "exit_code": 1,
+          "log_sha256": "8730838518b8344a48d8dcdd09a5ac7f61b23e0dc39397dcf62a7ec7f7024fc9",
+          "library_unloaded": true,
+          "leaked_bytes": 46180,
+          "leaked_allocations": 789
+        },
+        "pool": {
+          "exit_code": 1,
+          "log_sha256": "4710ee0092015af0771e9150f16df75f16d956d093dd94d2b80d1204d1aa6288",
+          "library_unloaded": true,
+          "leaked_bytes": 232897,
+          "leaked_allocations": 21
+        },
+        "threads": {
+          "exit_code": 1,
+          "log_sha256": "50ea95a51cf49683f309eeaa5bb524f20abda27b8ef6c3f97aaeb57e06505add",
+          "library_unloaded": true,
+          "leaked_bytes": 407556,
+          "leaked_allocations": 30
+        },
+        "owners": {
+          "exit_code": 1,
+          "log_sha256": "4ba11715ec07c6f78ea15c364659357e13dc996da32be927358feb7ebe233053",
+          "library_unloaded": true,
+          "leaked_bytes": 193093,
+          "leaked_allocations": 798
+        },
+        "reload": {
+          "exit_code": 1,
+          "log_sha256": "c0bb08943b608095086d9ef30aba93c3390219bc25b7f6f7c500d9be0e4a03a1",
+          "library_unloaded": true,
+          "leaked_bytes": 1108320,
+          "leaked_allocations": 18936
+        },
+        "compose-write": {
+          "exit_code": 1,
+          "log_sha256": "17c04e38eb0d3461eec0133e6d16fec7e24b3185761d039cf46208c71e5c9bc1",
+          "library_unloaded": true,
+          "leaked_bytes": 62737,
+          "leaked_allocations": 796
+        },
+        "compose-mapped": {
+          "exit_code": 1,
+          "log_sha256": "6c2a81cdc035c5366b8e5d93a5d59cd1800ff314489b664bf25b987e234e3cbc",
+          "library_unloaded": false,
+          "leaked_bytes": 46221,
+          "leaked_allocations": 791
+        },
+        "compose-invalidations": {
+          "exit_code": 1,
+          "log_sha256": "9381c573f3a288b7b4524768dade202a0c9ecaaf3a31e789541c2f7ea8890071",
+          "library_unloaded": true,
+          "leaked_bytes": 63001,
+          "leaked_allocations": 798
+        },
+        "compose-mixed": {
+          "exit_code": 1,
+          "log_sha256": "aaaba8b03d772a288f00166a558b69d12cf7bcf49cc858d1eee4fd9a841f52bd",
+          "library_unloaded": false,
+          "leaked_bytes": 0,
+          "leaked_allocations": 0
+        }
+      },
+      "failures": {
+        "initialize": "Xlib lifetime test failed; inspect initialize.log",
+        "resources-C": "Xlib lifetime test failed; inspect resources-C.log",
+        "resources-UTF8": "Xlib lifetime test failed; inspect resources-UTF8.log",
+        "pool": "Xlib lifetime test failed; inspect pool.log",
+        "threads": "Xlib lifetime test failed; inspect threads.log",
+        "owners": "Xlib lifetime test failed; inspect owners.log",
+        "reload": "Xlib lifetime test failed; inspect reload.log",
+        "compose-write": "Xlib lifetime test failed; inspect compose-write.log",
+        "compose-mapped": "Xlib lifetime test failed; inspect compose-mapped.log",
+        "compose-invalidations": "Xlib lifetime test failed; inspect compose-invalidations.log",
+        "compose-mixed": "Xlib lifetime test failed; inspect compose-mixed.log"
+      },
+      "build_command": [
+        "c++",
+        "-std=c++17",
+        "-g",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-fsanitize=address,undefined",
+        "-fno-omit-frame-pointer",
+        "-fno-gnu-unique",
+        "-pthread",
+        "/home/dan/GIT/orbiter-cross-platform/Tests/Production/XlibLifetime/Probe.cpp",
+        "-ldl",
+        "-o",
+        "/home/dan/GIT/orbiter-cross-platform/out/phase6-xlib-baseline-final/xlib-probe"
+      ],
+      "compose_files": {
+        "l4_030_1df0cf73_00280cc0": "f65329f3dc20c0046cb0ca1f0ae6e5d9a999d9cdc230635c913cfdbcf9632a9e"
+      },
+      "error": "Unsuppressed Xlib lifetime gate failed"
+    }
+  },
+  "candidate": {
+    "output": "out/phase6-xlib-verification-v2/xlib-verification.json",
+    "sha256": "aca2af5504974085a48cfc9685bbbdeb34a547f07d734544babe129cfe956991",
+    "report": {
+      "status": "passed",
+      "library": "/home/dan/GIT/orbiter-cross-platform/out/phase6-xlib-verified-v2/install/lib/libX11.so.6.4.0",
+      "library_sha256": "095d2860880ec63365fdf4365d9ffd9bc19a2e64791493ea479f85456717b14c",
+      "fixture_sha256": "55dd16e86553776fa23db4556a3703d6ecf5236a19973bc252f8e88cdb54e25f",
+      "cases": {
+        "load-only": {
+          "exit_code": 0,
+          "log_sha256": "989a0353764be52fc2b91e3a1872b750a0a12ef6f5386deca6f859eb6e5f570b",
+          "library_unloaded": true,
+          "leaked_bytes": 0,
+          "leaked_allocations": 0
+        },
+        "initialize": {
+          "exit_code": 0,
+          "log_sha256": "2352c46d000eb616244003c20fb6c8ccc9ac505deda32c2b07862c536eee4d37",
+          "library_unloaded": true,
+          "leaked_bytes": 0,
+          "leaked_allocations": 0
+        },
+        "resources-C": {
+          "exit_code": 0,
+          "log_sha256": "ad88ba35dd2b523b0f0348d30c83efdf81fecb4d72a5ce584a47475519457fef",
+          "library_unloaded": true,
+          "leaked_bytes": 0,
+          "leaked_allocations": 0
+        },
+        "resources-UTF8": {
+          "exit_code": 0,
+          "log_sha256": "934f1b0e04e2d36492522db8017a35eea0cbcf06a0e6d84a8cadd423ce585797",
+          "library_unloaded": true,
+          "leaked_bytes": 0,
+          "leaked_allocations": 0
+        },
+        "pool": {
+          "exit_code": 0,
+          "log_sha256": "f2a8abd952f822de22ad5eaad0f217dad72f113f0b4d4a95c5e4672838312155",
+          "library_unloaded": true,
+          "leaked_bytes": 0,
+          "leaked_allocations": 0
+        },
+        "threads": {
+          "exit_code": 0,
+          "log_sha256": "001af77e31f3c54c1c0f2249ecb00cf9f4350f634ce9cf4ea58117d99931b3ef",
+          "library_unloaded": true,
+          "leaked_bytes": 0,
+          "leaked_allocations": 0
+        },
+        "owners": {
+          "exit_code": 0,
+          "log_sha256": "ced19301cc959eecc455c0a96c014f54137ab22ff394e56b9bda29ca79600526",
+          "library_unloaded": true,
+          "leaked_bytes": 0,
+          "leaked_allocations": 0
+        },
+        "reload": {
+          "exit_code": 0,
+          "log_sha256": "6de4ca6b419b68738926a1a4306bf00ed6ece0e1a0930eecb9650f3ba2886c0b",
+          "library_unloaded": true,
+          "leaked_bytes": 0,
+          "leaked_allocations": 0
+        },
+        "compose-write": {
+          "exit_code": 0,
+          "log_sha256": "1de35864c6054231cea3ec75d2f3dfd412eace005be6bc87852bdf46e1d2a5b4",
+          "library_unloaded": true,
+          "leaked_bytes": 0,
+          "leaked_allocations": 0
+        },
+        "compose-mapped": {
+          "exit_code": 0,
+          "log_sha256": "9deb8f1958827ee1e8a6e61698bd500bb8a0f43a1da088219edb541baaf8f91d",
+          "library_unloaded": true,
+          "leaked_bytes": 0,
+          "leaked_allocations": 0
+        },
+        "compose-invalidations": {
+          "exit_code": 0,
+          "log_sha256": "1de35864c6054231cea3ec75d2f3dfd412eace005be6bc87852bdf46e1d2a5b4",
+          "library_unloaded": true,
+          "leaked_bytes": 0,
+          "leaked_allocations": 0
+        },
+        "compose-mixed": {
+          "exit_code": 0,
+          "log_sha256": "e2a2a2fbc3af9858b8f875e8904cec787798474e0c7cf0beb49f4c0a9a60e7b4",
+          "library_unloaded": true,
+          "leaked_bytes": 0,
+          "leaked_allocations": 0
+        }
+      },
+      "failures": {},
+      "build_command": [
+        "c++",
+        "-std=c++17",
+        "-g",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-fsanitize=address,undefined",
+        "-fno-omit-frame-pointer",
+        "-fno-gnu-unique",
+        "-pthread",
+        "/home/dan/GIT/orbiter-cross-platform/Tests/Production/XlibLifetime/Probe.cpp",
+        "-ldl",
+        "-o",
+        "/home/dan/GIT/orbiter-cross-platform/out/phase6-xlib-verification-v2/xlib-probe"
+      ],
+      "compose_files": {
+        "l4_030_4866b54b_00280cc0": "6dfcfde87bb994c80b22ce7f64a2ed3e37ea61a60415d1dc82ab43348f8013c0"
+      }
+    }
+  },
+  "conservation": {
+    "public_header_files_unchanged": 13,
+    "exported_symbols_unchanged": 1230,
+    "hardware_trace_files_exact": {
+      "dg_panel/closed-reload/flight-animations.csv": "3130f48a7e8f9db781283d7a96dd04dee6d02535bda1ec00628dfd8aaa087447",
+      "dg_panel/closed-reload/flight-state.csv": "c98ad1848c4e4e1afa5997e605f2100ab6422875fac18c7c927fd608e66bb5fa",
+      "dg_panel/moving/flight-animations.csv": "bbef1f944a4288385cf645d5b0996f629ae662db534d176744376ac41c83ce4c",
+      "dg_panel/moving/flight-state.csv": "c6ed3c2a130bb7bec493b7bf347a4c140992fda8b830ff84a83594e75f6acd6e",
+      "dg_panel/resume/flight-animations.csv": "648302faa448254bc333674a09a4e8b38c4d104b9d1bd7535060ccc50dd33dea",
+      "dg_panel/resume/flight-state.csv": "aab1173c6efbae22dda5de8f071134c1a74dba44a5e05e2efadce4eaaf8525ce",
+      "dg_panel/retract/flight-animations.csv": "3939a8e4242d73df3d7438a8c27e441e92d7aad1b05ec5a862179a24e9d0fe52",
+      "dg_panel/retract/flight-state.csv": "a4881ee10451a07ee1020a5b184307a833a316379e3627511d73d7bb202a2789",
+      "dg_vc/closed-reload/flight-animations.csv": "358f202cea01cdd8a46ed1de25affeb921bcb7bc14e0e391fb194d7d43babd60",
+      "dg_vc/closed-reload/flight-state.csv": "c98ad1848c4e4e1afa5997e605f2100ab6422875fac18c7c927fd608e66bb5fa",
+      "dg_vc/moving/flight-animations.csv": "7e7424be3d33283d1ee64776972d3ee7b9ffff89366510f9b95c8ec03be5be8e",
+      "dg_vc/moving/flight-state.csv": "c6ed3c2a130bb7bec493b7bf347a4c140992fda8b830ff84a83594e75f6acd6e",
+      "dg_vc/resume/flight-animations.csv": "1f30ba9524d229f8ce8f7ce1af4f539b4d543a06e2bb1c0e358a385123af168c",
+      "dg_vc/resume/flight-state.csv": "aab1173c6efbae22dda5de8f071134c1a74dba44a5e05e2efadce4eaaf8525ce",
+      "dg_vc/retract/flight-animations.csv": "79cccb29b47b8f886ab603b9db8aea894a8c0fe62d462d1c3d21ac0f057e9d9f",
+      "dg_vc/retract/flight-state.csv": "a4881ee10451a07ee1020a5b184307a833a316379e3627511d73d7bb202a2789",
+      "dgs_panel/closed-reload/flight-animations.csv": "cc4cbc7610c2d13e0a33342ddfe81e00abe92a65758f8ce0659b1567b83a944a",
+      "dgs_panel/closed-reload/flight-state.csv": "cf432c0a7b95fbfcf13bd34ab3f1b695b8fbcc2bcc71fc8d8355a58ce1bccf59",
+      "dgs_panel/moving/flight-animations.csv": "efb4862f7eaa1fcff184e82a4a610b34548a6db2b219171f0b4fa149e7530076",
+      "dgs_panel/moving/flight-state.csv": "49c59b9e4a5ff8a2690e66718215b5a3e698fe4949333604659248e9eb1ce916",
+      "dgs_panel/resume/flight-animations.csv": "fa4d944b6840a848c73123a633a3f3b01758b78028482b5ada526931b895fadd",
+      "dgs_panel/resume/flight-state.csv": "8bfd3a6e4a7080c8567ef204f376ce4e4348ed0451c17d4182fa252ad4073acc",
+      "dgs_panel/retract/flight-animations.csv": "24744f2cf338fe69cac580cba0a0f03bd89e93f85fe9e3b16ac37993bfa7295e",
+      "dgs_panel/retract/flight-state.csv": "b73e57eabd58f0b4f6fd0476fb3f87f65ac03971ed4790b96efe7eb698ad7801",
+      "dgs_vc/closed-reload/flight-animations.csv": "dcca9d71de016890c34f00992388868b5a7b8481c0e006387a049ef06ff96e2d",
+      "dgs_vc/closed-reload/flight-state.csv": "cf432c0a7b95fbfcf13bd34ab3f1b695b8fbcc2bcc71fc8d8355a58ce1bccf59",
+      "dgs_vc/moving/flight-animations.csv": "fb1cdcdc8f3fab5d240ccc9236fe0e1dffe4dc6c1296f8de704dbe42431a33e0",
+      "dgs_vc/moving/flight-state.csv": "49c59b9e4a5ff8a2690e66718215b5a3e698fe4949333604659248e9eb1ce916",
+      "dgs_vc/resume/flight-animations.csv": "3ce73f41388ae3b4b0744c53ec439559252aa42a29b62ead0f2d6bf6a1f194a0",
+      "dgs_vc/resume/flight-state.csv": "8bfd3a6e4a7080c8567ef204f376ce4e4348ed0451c17d4182fa252ad4073acc",
+      "dgs_vc/retract/flight-animations.csv": "5d6e0a816ce91094ac7f5786b1e9c40dd51a17c155d15dc22342f56b7a5bd2cd",
+      "dgs_vc/retract/flight-state.csv": "b73e57eabd58f0b4f6fd0476fb3f87f65ac03971ed4790b96efe7eb698ad7801"
+    }
+  },
+  "libraries": {
+    "baseline": "8ca7b7168472ebdb855c0b5189cf03d0a25027e31fb67b0185999a23105443e0",
+    "instrumented_candidate": "095d2860880ec63365fdf4365d9ffd9bc19a2e64791493ea479f85456717b14c",
+    "normal_candidate": "a63f211afb591944c59d18f3c4a3aff9a9ae071e0090c4afe2d6e07fd8453476"
+  },
+  "environment": {
+    "ASAN_OPTIONS": "detect_leaks=1:fast_unwind_on_malloc=0",
+    "LSAN_OPTIONS": "",
+    "UBSAN_OPTIONS": "halt_on_error=1:print_stacktrace=1",
+    "suppressions": []
+  },
+  "application_runs": {
+    "intel_systems": {
+      "output": "out/phase6-dg-systems-hardware-xlib-final",
+      "report_sha256": "fc92dfeb958f7e10f10493ed7f23fb2ac5b059155399da94ee5d0aa8cc59f268",
+      "fresh_processes": 16,
+      "successful_presents": 1936,
+      "all_contexts_deleted": true
+    },
+    "software_systems": {
+      "output": "out/phase6-dg-systems-combined-lifetime",
+      "report_sha256": "e6119bfd1c7e6f67568a82464faec9a37c0caf8f92a30c53e6fef29bab49629b",
+      "fresh_processes": 16,
+      "successful_presents": 1936,
+      "all_contexts_deleted": true
+    },
+    "intel_menu": {
+      "menu": {
+        "output": "out/phase6-intel-menu-xlib-focus/menu-verification.json",
+        "sha256": "304a399de4ae956680a819ad7f42ac4a84e90da51c2f5d6e3d3ac3ddafc12683",
+        "report": {
+          "recording": true,
+          "recording_overwrite_cancelled": true,
+          "recording_overwrite_confirmed": true,
+          "custom_functions": true,
+          "options": {
+            "refresh": 0.35,
+            "panel_scale": 1.1,
+            "limited_fuel": false,
+            "mfd_width_before": 346,
+            "mfd_width_after": 377,
+            "pages_visited": 10,
+            "keyboard_shortcuts": true,
+            "persisted": true,
+            "reloaded": true
+          },
+          "commands": [
+            "Ship",
+            "Camera",
+            "Speed",
+            "Pause",
+            "Function",
+            "Info",
+            "Options",
+            "Map",
+            "Record",
+            "Help",
+            "Save",
+            "Exit"
+          ],
+          "persisted_order": [
+            "Camera",
+            "Ship",
+            "Speed",
+            "Pause",
+            "Function",
+            "Info",
+            "Options",
+            "Map",
+            "Record",
+            "Help",
+            "Save",
+            "Exit"
+          ],
+          "focus": "DG2",
+          "warp": 10,
+          "quicksave": "cockpit 0001.scn",
+          "configuration_dialog": true,
+          "lifecycle": {
+            "rendered_frames": 1450,
+            "successful_presents": 1450,
+            "context_deleted": true
+          }
+        }
+      },
+      "help": {
+        "output": "out/phase6-intel-menu-xlib-focus/help-verification.json",
+        "sha256": "bf037cd22d3ac1ee37d42e385f16de15967b42523831b6ffac75f76cfb19f5d8",
+        "report": {
+          "menu": true,
+          "keyboard": true,
+          "dialog": true,
+          "topics": [
+            "mainmenu.htm",
+            "mainmenu.htm",
+            "cam_mode.htm"
+          ],
+          "contexts": true,
+          "rendered": true,
+          "visible_missing_book": true,
+          "deduplicated": true,
+          "dismissed": true
+        }
+      },
+      "reload": {
+        "output": "out/phase6-intel-menu-xlib-focus/options-reloaded/graphics-lifecycle.json",
+        "sha256": "352e8569dc85f4f5a65db29b411b85c8136e0713a444533ee4fc39408a4e99cb",
+        "report": {
+          "rendered_frames": 2,
+          "successful_presents": 2,
+          "context_deleted": true
+        }
+      }
+    },
+    "software_menu_ubuntu24_help": {
+      "menu": {
+        "output": "out/phase6-software-menu-help-ubuntu24/menu-verification.json",
+        "sha256": "7077cdd7e6dadc7ff1b261e80ee4e70c944c20043782183ed25e28419ee490f5",
+        "report": {
+          "recording": true,
+          "recording_overwrite_cancelled": true,
+          "recording_overwrite_confirmed": true,
+          "custom_functions": true,
+          "options": {
+            "refresh": 0.35,
+            "panel_scale": 1.1,
+            "limited_fuel": false,
+            "mfd_width_before": 346,
+            "mfd_width_after": 377,
+            "pages_visited": 10,
+            "keyboard_shortcuts": true,
+            "persisted": true,
+            "reloaded": true
+          },
+          "commands": [
+            "Ship",
+            "Camera",
+            "Speed",
+            "Pause",
+            "Function",
+            "Info",
+            "Options",
+            "Map",
+            "Record",
+            "Help",
+            "Save",
+            "Exit"
+          ],
+          "persisted_order": [
+            "Camera",
+            "Ship",
+            "Speed",
+            "Pause",
+            "Function",
+            "Info",
+            "Options",
+            "Map",
+            "Record",
+            "Help",
+            "Save",
+            "Exit"
+          ],
+          "focus": "DG2",
+          "warp": 10,
+          "quicksave": "cockpit 0001.scn",
+          "configuration_dialog": true,
+          "lifecycle": {
+            "rendered_frames": 595,
+            "successful_presents": 595,
+            "context_deleted": true
+          }
+        }
+      },
+      "help": {
+        "output": "out/phase6-software-menu-help-ubuntu24/help-verification.json",
+        "sha256": "bf037cd22d3ac1ee37d42e385f16de15967b42523831b6ffac75f76cfb19f5d8",
+        "report": {
+          "menu": true,
+          "keyboard": true,
+          "dialog": true,
+          "topics": [
+            "mainmenu.htm",
+            "mainmenu.htm",
+            "cam_mode.htm"
+          ],
+          "contexts": true,
+          "rendered": true,
+          "visible_missing_book": true,
+          "deduplicated": true,
+          "dismissed": true
+        }
+      },
+      "reload": {
+        "output": "out/phase6-software-menu-help-ubuntu24/options-reloaded/graphics-lifecycle.json",
+        "sha256": "352e8569dc85f4f5a65db29b411b85c8136e0713a444533ee4fc39408a4e99cb",
+        "report": {
+          "rendered_frames": 2,
+          "successful_presents": 2,
+          "context_deleted": true
+        }
+      }
+    },
+    "intel_twenty_gui_sessions": {
+      "output": "out/phase6-intel-ui-asan-cycles-xlib-final/verification.json",
+      "sha256": "d968228ebd8a2a4ecda89a000724cda3cffa95881275aab579411073e9e4b46f",
+      "report": {
+        "status": "passed",
+        "sessions": 20,
+        "successful_presents": 80,
+        "all_contexts_deleted": true
+      }
+    },
+    "intel_menu_ubuntu24_help": {
+      "menu": {
+        "output": "out/phase6-intel-menu-help-ubuntu24-close/menu-verification.json",
+        "sha256": "465a4687bf4b3146526a1696c6693b9f289916e8cdf1d3444c8a6f66f90943a3",
+        "report": {
+          "recording": true,
+          "recording_overwrite_cancelled": true,
+          "recording_overwrite_confirmed": true,
+          "custom_functions": true,
+          "options": {
+            "refresh": 0.35,
+            "panel_scale": 1.1,
+            "limited_fuel": false,
+            "mfd_width_before": 346,
+            "mfd_width_after": 377,
+            "pages_visited": 10,
+            "keyboard_shortcuts": true,
+            "persisted": true,
+            "reloaded": true
+          },
+          "commands": [
+            "Ship",
+            "Camera",
+            "Speed",
+            "Pause",
+            "Function",
+            "Info",
+            "Options",
+            "Map",
+            "Record",
+            "Help",
+            "Save",
+            "Exit"
+          ],
+          "persisted_order": [
+            "Camera",
+            "Ship",
+            "Speed",
+            "Pause",
+            "Function",
+            "Info",
+            "Options",
+            "Map",
+            "Record",
+            "Help",
+            "Save",
+            "Exit"
+          ],
+          "focus": "DG2",
+          "warp": 10,
+          "quicksave": "cockpit 0001.scn",
+          "configuration_dialog": true,
+          "lifecycle": {
+            "rendered_frames": 1647,
+            "successful_presents": 1647,
+            "context_deleted": true
+          }
+        }
+      },
+      "help": {
+        "output": "out/phase6-intel-menu-help-ubuntu24-close/help-verification.json",
+        "sha256": "bf037cd22d3ac1ee37d42e385f16de15967b42523831b6ffac75f76cfb19f5d8",
+        "report": {
+          "menu": true,
+          "keyboard": true,
+          "dialog": true,
+          "topics": [
+            "mainmenu.htm",
+            "mainmenu.htm",
+            "cam_mode.htm"
+          ],
+          "contexts": true,
+          "rendered": true,
+          "visible_missing_book": true,
+          "deduplicated": true,
+          "dismissed": true
+        }
+      },
+      "reload": {
+        "output": "out/phase6-intel-menu-help-ubuntu24-close/options-reloaded/graphics-lifecycle.json",
+        "sha256": "352e8569dc85f4f5a65db29b411b85c8136e0713a444533ee4fc39408a4e99cb",
+        "report": {
+          "rendered_frames": 2,
+          "successful_presents": 2,
+          "context_deleted": true
+        }
+      }
+    }
+  },
+  "remaining_scope": [
+    "Wider distributions and library configurations",
+    "Native Wayland graphics",
+    "Hardware controllers and performance",
+    "Broader Phase 6 interactive acceptance"
+  ]
+}

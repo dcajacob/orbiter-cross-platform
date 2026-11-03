@@ -1808,11 +1808,11 @@
     },
     "Src/Orbiter/Production/NativeHelp.cpp": {
       "original_sha256_lf": null,
-      "sha256_lf": "b55796f9cbb469e4d1046c84bc6f64072e0a1aad7cc0066612f2549cf183d5b9"
+      "sha256_lf": "ba507f26bc4ce0ddf40ef04984b477e498018cc5bdada74cb9792854b0f845cc"
     },
     "Src/Orbiter/Production/NativeHelp.h": {
       "original_sha256_lf": null,
-      "sha256_lf": "2e0ac57df1a65082a7b12961c9a0873e44a0fa0d7d79c6e5ef61646d9b76a626"
+      "sha256_lf": "3bd2aa9f366313a28f527028047eaf85290dbee41c5f0d246c3d449d52cfd23f"
     },
     "Src/Orbiter/Production/GuiNotifications.inc": {
       "original_sha256_lf": null,

@@ -7,7 +7,7 @@ sys.path[:0]=[str(HERE.parent/'Cockpit'),str(HERE.parent),str(HERE.parent/'Fligh
 from reference import fixture
 from keyboard_smoke import KeyEvent,Event,require,wait
 
-def verify_menu(out,click,advance,button,key,move,window,title,process):
+def verify_menu(out,click,advance,button,key,move,window,title,process,capture):
     def geometry(label):
         with (out/'menu-windows.csv').open() as stream:
             rows=list(csv.DictReader(stream))
@@ -64,8 +64,7 @@ def verify_menu(out,click,advance,button,key,move,window,title,process):
             dialog('##NOTIF0')
             require(not geometry('##NOTIF1'),'Repeated Help failure was not deduplicated')
             time.sleep(.6);advance() # Let the original half-second fade complete.
-            from PIL import ImageGrab
-            ImageGrab.grab(xdisplay=os.environ['DISPLAY']).save(out/'help-notification.png')
+            capture(out/'help-notification.png')
             notice=dialog('##NOTIF0')
             click(int(float(notice['x']))+135,int(float(notice['y']))+15)
             wait(lambda:not geometry('##NOTIF0'),'Help error dismissal did not expire the original notification')
@@ -127,6 +126,7 @@ def verify_menu(out,click,advance,button,key,move,window,title,process):
     for page in range(2,10):
         click(ox+80,oy+40+page*18)
     click(ox+int(float(options['width']))-12,oy+11)
+    wait(lambda:not geometry('Orbiter: Options'),'Options close button did not dismiss the dialog')
     move(1270,300)
     tap('F8');tap('F8')
     before_width=int(settings()['mfd_width'])
@@ -138,6 +138,7 @@ def verify_menu(out,click,advance,button,key,move,window,title,process):
          'Glass cockpit MFD option did not resize the actual render target')
     resized_width=int(settings()['mfd_width'])
     click(ox+int(float(options['width']))-12,oy+11)
+    wait(lambda:not geometry('Orbiter: Options'),'Resized Options dialog did not close')
     move(1270,300)
     key(window,'Control_L',True);tap('F9');key(window,'Control_L',False);advance()
     options=dialog('Orbiter: Options')
@@ -243,6 +244,7 @@ def main():
         (xdg_config/'mimeapps.list').write_text('[Default Applications]\ntext/html=orbiter-help-test.desktop\nx-scheme-handler/file=orbiter-help-test.desktop\n')
         launch_env.update(BROWSER=str(launcher),ORBITER_HELP_EVIDENCE=str(out/'help'),ORBITER_TEST_HELP_FAILURE='1',
             XDG_CURRENT_DESKTOP='X-Generic',XDG_CONFIG_HOME=str(xdg_config),XDG_DATA_HOME=str(app.parent),
+            XDG_CACHE_HOME=str(out/'xdg-cache'),
             PATH=str(binaries)+os.pathsep+os.environ['PATH'])
         selected=subprocess.check_output(['xdg-mime','query','default','text/html'],env=launch_env,text=True).strip()
         require(selected=='orbiter-help-test.desktop','Isolated desktop did not select the test browser')
@@ -263,6 +265,7 @@ def main():
     x.XSendEvent.argtypes=[C.c_void_p,C.c_ulong,C.c_int,C.c_long,C.POINTER(Event)]
     x.XWarpPointer.argtypes=[C.c_void_p,C.c_ulong,C.c_ulong,C.c_int,C.c_int,C.c_uint,C.c_uint,C.c_int,C.c_int]
     x.XFlush.argtypes=[C.c_void_p];x.XSetInputFocus.argtypes=[C.c_void_p,C.c_ulong,C.c_int,C.c_ulong];x.XCloseDisplay.argtypes=[C.c_void_p]
+    x.XGetInputFocus.argtypes=[C.c_void_p,C.POINTER(C.c_ulong),C.POINTER(C.c_int)]
     # KeyEvent's keycode occupies the identical unsigned-int button field in
     # XButtonEvent. Both are the full X11 event wire layout, not engine calls.
     def title(window):
@@ -288,6 +291,16 @@ def main():
         code=x.XKeysymToKeycode(display,x.XStringToKeysym(name.encode()));require(code,'Unknown keyboard test key')
         send(window,2 if down else 3,code)
     def button(window,px,py,down,number=1):
+        if down:
+            before,revert=C.c_ulong(),C.c_int()
+            x.XGetInputFocus(display,C.byref(before),C.byref(revert))
+            # Posted X11 button events do not perform a window manager's normal
+            # click-to-focus action after an external Help viewer takes focus.
+            x.XSetInputFocus(display,window,1,0)
+            after=C.c_ulong();x.XGetInputFocus(display,C.byref(after),C.byref(revert))
+            with (out/'mouse-focus.csv').open('a') as log:
+                if log.tell()==0:log.write('owned_window,focus_before,focus_after,x,y\n')
+                log.write(f'{window},{before.value},{after.value},{px},{py}\n')
         # GLFW reads the real server cursor; the event coordinates alone would
         # not test its framebuffer-coordinate conversion.
         x.XWarpPointer(display,0,window,0,0,0,0,px,py);x.XFlush(display);time.sleep(.05)
@@ -339,7 +352,9 @@ def main():
             if a.stock_menu:
                 def move(px,py):
                     x.XWarpPointer(display,0,window,0,0,0,0,px,py);x.XFlush(display);advance()
-                verify_menu(out,click,advance,button,key,move,window,title,process)
+                from window_capture import capture
+                verify_menu(out,click,advance,button,key,move,window,title,process,
+                            lambda path:capture(x,display,window,path))
                 return
             click(20,495)
             click(51,535)
@@ -382,6 +397,15 @@ def main():
             report=dict(status='passed',target='ISS',parameter_entry=True,parameter_cancel=True,text_captures_flight_key=True,flight_resumes_after_dialog=True,lifecycle=life)
             (out/'ui-verification.json').write_text(json.dumps(report,indent=2)+'\n')
             print(json.dumps(report,indent=2))
+        except Exception:
+            if process.poll() is None:
+                try:
+                    from window_capture import capture
+                    current=owned(process.pid)
+                    if current:capture(x,display,current,out/'failure-window.png')
+                except Exception as error:
+                    (out/'failure-capture.txt').write_text(str(error)+'\n')
+            raise
         finally:
             if process.poll() is None:
                 current=owned(process.pid)

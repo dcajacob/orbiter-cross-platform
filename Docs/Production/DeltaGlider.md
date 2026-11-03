@@ -12,10 +12,12 @@ in both cockpit modes deploy gear, nose cone, radiator, inner/outer airlocks,
 hatch and airbrakes. Each saves while all seven mechanisms are moving, reloads
 and completes the movement without further input, closes them with the original
 keys, then reloads the omitted closed defaults. Each full suite presents 1,936
-frames across 16 fresh application lifetimes. The paired preserved-Windows SDK
-observer and exact animation/save comparison are wired into CI; their first
-hosted qualification remains pending. Physical input and broader subsystem
-acceptance remain open.
+frames across 16 fresh application lifetimes. Real preserved-Windows and native
+hosted captures now pass the unchanged comparisons in all four Debug/Release
+automatic/SSE2 pairs: mechanism trajectories and saved positions/speeds match
+exactly, and physical state remains within the original budgets. The capture
+workflow's later Help failure is recorded separately. Physical input and broader
+subsystem acceptance remain open.
 The laptop's unmodified Intel PTL/Mesa 26.0.8 driver also passes all four cases
 in all four Debug/Release automatic/SSE2 configurations on X11. All 32 complete
 mechanism and physical-state trace files match software Debug byte for byte;
@@ -26,10 +28,15 @@ The unsuppressed hardware sanitizer run fails leak checking after each 24-frame
 checkpoint, despite successful rendering and context deletion: 46,197 bytes in
 791 allocations per process. A fresh process mapping and renderer debug symbols
 place the allocation paths in libX11, called by GLFW's `XrmInitialize` and
-`Xft.dpi` resource lookup. Hardware lifetime acceptance remains open; the clean
-software-driver result above retains its narrower scope.
+`Xft.dpi` resource lookup. An isolated source-built Xlib cleanup candidate now
+passes all twelve standalone sanitizer cases and the full Intel systems suite,
+with all 32 mechanism/physical traces unchanged. The Intel menu and twenty GUI
+sessions also pass unsuppressed teardown. The original system-Xlib failures
+remain failures; broader platform acceptance remains open.
 [Systems checks and commands](../../Tests/Production/DeltaGlider/Systems.md)
 [Local systems evidence](DGSystemsVerification.json)
+[Windows comparisons](DGSystemsWindowsVerification.json)
+[Xlib lifetime evidence](XlibLifetimeVerification.json)
 
 Both native vessels now load the stock Lua interpreter and LuaInline worker and
 fly with the original AAP in the 2D panel and virtual cockpit. In each 48-frame

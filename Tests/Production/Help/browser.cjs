@@ -17,7 +17,9 @@ fs.mkdirSync(out, {recursive:true});
         const errors = [];
         page.on('pageerror', error => errors.push(error.message));
         const requests = [];
-        if (single) requests.push(source);
+        // Desktop file handlers can receive either a file URL or an absolute
+        // path. Convert only the transport; never reconstruct a topic/context.
+        if (single) requests.push(path.isAbsolute(source) ? pathToFileURL(source).href : source);
         else {
             for (const line of fs.readFileSync(path.join(source, 'Help/catalog.tsv'), 'utf8').trim().split('\n')) {
                 const [key, viewer, topic] = line.split('\t');
@@ -29,7 +31,9 @@ fs.mkdirSync(out, {recursive:true});
             await page.goto(url);
             const frame = page.frameLocator('#page');
             await frame.locator('body').waitFor();
-            const topic = new URL(url).searchParams.get('topic');
+            const actualUrl = page.url();
+            const topic = new URL(actualUrl).searchParams.get('topic');
+            assert(topic, 'Desktop launch lost the requested help topic');
             const text = await frame.locator('body').innerText();
             // Atlantis' original landing page is only a heading and one link.
             assert(text.trim().length > 20, 'Original topic body did not load: '+url);
@@ -40,7 +44,7 @@ fs.mkdirSync(out, {recursive:true});
             if (single) {
                 const id=crypto.createHash('sha256').update(url).digest('hex').slice(0,16);
                 await page.screenshot({path:path.join(out,id+'.png')});
-                fs.writeFileSync(path.join(out,id+'.json'), JSON.stringify({url,topic,body:text.slice(0,250),errors},null,2));
+                fs.writeFileSync(path.join(out,id+'.json'), JSON.stringify({url:actualUrl,launch_url:url,topic,body:text.slice(0,250),errors},null,2));
             }
             results.push({topic, title:await page.title(), images:await frame.locator('img').count()});
         }

@@ -28,9 +28,15 @@ jobs:
       - name: Install native build and software OpenGL window dependencies
         run: >-
           sudo apt-get update && sudo apt-get install -y zlib1g-dev libgl1-mesa-dev
-          libxrandr-dev libxinerama-dev libxcursor-dev libxi-dev xvfb mesa-utils libmpfr-dev python3-pil
-      - name: Verify the X11 notification capture dependency
-        run: python3 -c "from PIL import ImageGrab"
+          libxrandr-dev libxinerama-dev libxcursor-dev libxi-dev xvfb mesa-utils libmpfr-dev
+      - uses: actions/cache@v6
+        with:
+          path: out/xlib-source-cache
+          key: xlib-lifetime-source-${{ hashFiles('Tests/Production/XlibLifetime/source.lock.json') }}
+      - name: Verify actual Xlib resource, locale and compose-cache teardown with sanitizers
+        run: |
+          python3 -B Tests/Production/XlibLifetime/build_xlib.py --cache out/xlib-source-cache --output out/xlib-cleanup --sanitize
+          xvfb-run -a env python3 -B Tests/Production/XlibLifetime/verify.py --library out/xlib-cleanup/install/lib/libX11.so.6 --output out/xlib-check --display
       - name: Verify native math against unchanged Windows primitives and independent MPFR
         shell: bash
         run: |
@@ -257,6 +263,11 @@ jobs:
           name: native-production-client-${{ matrix.configuration }}-${{ matrix.math_profile }}-x64
           retention-days: 90
           path: |
+            out/xlib-cleanup/xlib-build.json
+            out/xlib-cleanup/*.log
+            out/xlib-cleanup/install/lib/libX11.so.6.4.0
+            out/xlib-cleanup/install/share/orbiter-xlib-cleanup/**
+            out/xlib-check/**
             out/heading-check/*.json
             out/heading-check/*.log
             native-math-*.log
@@ -329,12 +340,16 @@ jobs:
             out/native-stock-menu/help-verification.json
             out/native-stock-menu/help-notification.png
             out/native-stock-menu/help/**
+            out/native-stock-menu/xdg-cache/orbiter/help-launch/*.html
             out/native-help-browser/**
             out/native-help-sources.json
             out/scene-resources/Help/manifest.json
             out/native-help-build.log
             out/native-stock-menu/custom-function-events.txt
             out/native-stock-menu/menu-windows.csv
+            out/native-stock-menu/mouse-focus.csv
+            out/native-stock-menu/failure-window.png
+            out/native-stock-menu/failure-capture.txt
             out/native-stock-menu/options-state.csv
             out/native-stock-menu/Orbiter.cfg
             out/native-stock-menu/options-reloaded/*.csv

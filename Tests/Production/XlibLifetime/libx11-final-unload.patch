@@ -1,0 +1,462 @@
+--- a/modules/im/ximcp/imInt.c
++++ b/modules/im/ximcp/imInt.c
+@@ -258,3 +258,14 @@
+     lcd->methods->unregister_callback = _XimUnRegisterIMInstantiateCallback;
+     return True;
+ }
++
++/* The registry's slots are reused while loaded; release its backing array only
++ * at final library unload, after applications have closed their input methods.
++ */
++_X_HIDDEN void _XFreeInputMethodCache(void);
++void _XFreeInputMethodCache(void)
++{
++    Xfree(_XimCurrentIMlist);
++    _XimCurrentIMlist = NULL;
++    _XimCurrentIMcount = 0;
++}
+--- a/modules/im/ximcp/imLcIm.c
++++ b/modules/im/ximcp/imLcIm.c
+@@ -87,6 +87,13 @@
+ };
+ 
+ static struct  _XimCacheStruct* _XimCache_mmap = NULL;
++typedef struct _XimOwnedComposeCache {
++    struct _XimCacheStruct *header;
++    DefTreeBase base;
++    Bool mapped;
++    struct _XimOwnedComposeCache *next;
++} XimOwnedComposeCache;
++static XimOwnedComposeCache *owned_compose_caches;
+ static DefTreeBase _XimCachedDefaultTreeBase;
+ static int     _XimCachedDefaultTreeRefcount = 0;
+ 
+@@ -124,10 +131,16 @@
+     if (!b) return;
+     if (b->tree == NULL) return;
+ #ifdef COMPOSECACHE
+-    if (b->tree == _XimCachedDefaultTreeBase.tree) {
+-        _XimCachedDefaultTreeRefcount--;
+-        /* No deleting, it's a cache after all. */
+-        return;
++    {
++        XimOwnedComposeCache *cache;
++        for (cache = owned_compose_caches; cache; cache = cache->next) {
++            if (b->tree == cache->base.tree) {
++                if (b->tree == _XimCachedDefaultTreeBase.tree)
++                    _XimCachedDefaultTreeRefcount--;
++                /* Earlier generations can still be borrowed by other IMs. */
++                return;
++            }
++        }
+     }
+ #endif
+     Xfree (b->tree);
+@@ -272,6 +285,7 @@
+     DTStructIndex size)
+ {
+     struct _XimCacheStruct* m;
++    XimOwnedComposeCache *owned;
+     int namelen = strlen (name) + 1;
+     int encodinglen = strlen (encoding) + 1;
+ 
+@@ -298,6 +312,11 @@
+ 	fprintf (stderr, "Enoding hash clash - expected %s, got %s\n",
+ 		 encoding, m->fname + namelen);
+         munmap (m, size);
++        return False;
++    }
++    owned = Xmalloc(sizeof(*owned));
++    if (!owned) {
++        munmap(m, size);
+         return False;
+     }
+     _XimCache_mmap    = m;
+@@ -311,6 +330,11 @@
+     _XimCachedDefaultTreeBase.utf8used = m->utf8used;
+     /* treesize etc. is ignored because only used during parsing */
+     _XimCachedDefaultTreeRefcount = 0;
++    owned->header = m;
++    owned->base = _XimCachedDefaultTreeBase;
++    owned->mapped = True;
++    owned->next = owned_compose_caches;
++    owned_compose_caches = owned;
+ /* fprintf (stderr, "read cached tree at %p: %s\n", (void *) m, name); */
+     return True;
+ }
+@@ -442,6 +466,7 @@
+     int   fd;
+     FILE *fp;
+     struct _XimCacheStruct *m;
++    XimOwnedComposeCache *owned;
+     int   msize = (sizeof(struct _XimCacheStruct)
+ 		   + strlen(name) + strlen(encoding) + 2
+ 		   + XIM_CACHE_TREE_ALIGNMENT-1) & -XIM_CACHE_TREE_ALIGNMENT;
+@@ -496,9 +521,19 @@
+     fwrite (im->private.local.base.utf8, 1,               m->utf8used, fp);
+     if (fclose (fp) != 0)
+ 	unlink (cachename);
++    owned = Xmalloc(sizeof(*owned));
++    if (!owned) {
++        Xfree(m);
++        return; /* The input method still owns and releases its parsed tree. */
++    }
+     _XimCache_mmap = m;
+     memcpy (&_XimCachedDefaultTreeBase, &im->private.local.base,
+ 	    sizeof (_XimCachedDefaultTreeBase));
++    owned->header = m;
++    owned->base = _XimCachedDefaultTreeBase;
++    owned->mapped = False;
++    owned->next = owned_compose_caches;
++    owned_compose_caches = owned;
+ /* fprintf (stderr, "wrote tree %s size %ld to %s\n", name, m->size, cachename); */
+ }
+ 
+@@ -708,3 +743,28 @@
+     _XimLocalIMFree(im);
+     return(False);
+ }
++
++/* Compose data stays shared across input methods until the final DSO unload. */
++_X_HIDDEN void _XFreeComposeCache(void);
++void _XFreeComposeCache(void)
++{
++#ifdef COMPOSECACHE
++    XimOwnedComposeCache *owned;
++    while ((owned = owned_compose_caches)) {
++        owned_compose_caches = owned->next;
++        if (owned->mapped)
++            munmap(owned->header, owned->header->size);
++        else {
++            Xfree(owned->base.tree);
++            Xfree(owned->base.mb);
++            Xfree(owned->base.wc);
++            Xfree(owned->base.utf8);
++            Xfree(owned->header);
++        }
++        Xfree(owned);
++    }
++    _XimCache_mmap = NULL;
++    memset(&_XimCachedDefaultTreeBase, 0, sizeof(_XimCachedDefaultTreeBase));
++    _XimCachedDefaultTreeRefcount = 0;
++#endif
++}
+--- a/src/Quarks.c
++++ b/src/Quarks.c
+@@ -114,14 +114,40 @@
+ static char *neverFreeTable = NULL;
+ static int  neverFreeTableSize = 0;
+ 
++/* Keep arena bases until the library's final unload. Returned pointers retain
++ * the original malloc alignment and remain valid for the entire loaded lifetime.
++ */
++typedef struct _PermAllocation {
++    char *base;
++    struct _PermAllocation *next;
++} PermAllocation;
++static PermAllocation *permAllocations;
++
++static char *tracked_permalloc(unsigned int length)
++{
++    char *base = Xmalloc(length);
++    PermAllocation *allocation;
++    if (!base)
++        return NULL;
++    allocation = Xmalloc(sizeof(*allocation));
++    if (!allocation) {
++        Xfree(base);
++        return NULL;
++    }
++    allocation->base = base;
++    allocation->next = permAllocations;
++    permAllocations = allocation;
++    return base;
++}
++
+ static char *permalloc(unsigned int length)
+ {
+     char *ret;
+ 
+     if (neverFreeTableSize < length) {
+ 	if (length >= NEVERFREETABLESIZE)
+-	    return Xmalloc(length);
+-	if (! (ret = Xmalloc(NEVERFREETABLESIZE)))
++	    return tracked_permalloc(length);
++	if (! (ret = tracked_permalloc(NEVERFREETABLESIZE)))
+ 	    return (char *) NULL;
+ 	neverFreeTableSize = NEVERFREETABLESIZE;
+ 	neverFreeTable = ret;
+@@ -407,3 +433,33 @@
+     _XUnlockMutex(_Xglobal_lock);
+     return s;
+ }
++
++/* Called only from the DSO destructor, after locale/resource cache teardown. */
++_X_HIDDEN void _XFreeQuarkCache(void);
++void _XFreeQuarkCache(void)
++{
++    PermAllocation *allocation;
++#ifdef PERMQ
++    XrmQuark q;
++    for (q = 1; q < nextQuark; ++q)
++        if (!ISPERM(q))
++            Xfree(NAME(q));
++    Xfree(permTable);
++    permTable = NULL;
++#endif
++    if (quarkTable != &zero)
++        Xfree(quarkTable);
++    Xfree(stringTable);
++    while ((allocation = permAllocations)) {
++        permAllocations = allocation->next;
++        Xfree(allocation->base);
++        Xfree(allocation);
++    }
++    quarkTable = &zero;
++    stringTable = NULL;
++    neverFreeTable = NULL;
++    neverFreeTableSize = 0;
++    nextQuark = 1;
++    quarkMask = 0;
++    nextUniq = -1;
++}
+--- a/src/Xrm.c
++++ b/src/Xrm.c
+@@ -2649,3 +2649,11 @@
+ 	Xfree(db);
+     }
+ }
++
++_X_HIDDEN void _XFreeResourceCache(void);
++void _XFreeResourceCache(void)
++{
++    Xfree(resourceQuarks);
++    resourceQuarks = NULL;
++    maxResourceQuark = -1;
++}
+--- a/src/globals.c
++++ b/src/globals.c
+@@ -77,9 +77,31 @@
+     XInitThreads();
+ }
+ 
++_X_HIDDEN void _XFreeLocaleCache(void);
++_X_HIDDEN void _XFreeInputMethodCache(void);
++_X_HIDDEN void _XFreeComposeCache(void);
++_X_HIDDEN void _XFreeConverterCache(void);
++_X_HIDDEN void _XFreeCompoundTextCache(void);
++_X_HIDDEN void _XFreeCharSetCache(void);
++_X_HIDDEN void _XFreeLocaleDatabaseCache(void);
++_X_HIDDEN void _XFreeResourceCache(void);
++_X_HIDDEN void _XFreeQuarkCache(void);
++
+ __attribute__((destructor)) static void
+ xlib_dtor(void)
+ {
++    /* The dynamic loader runs this only when the final library owner releases
++     * it (or at process exit). Keep cached names valid through locale teardown.
++     */
++    _XFreeInputMethodCache();
++    _XFreeComposeCache();
++    _XFreeLocaleCache();
++    _XFreeConverterCache();
++    _XFreeCompoundTextCache();
++    _XFreeCharSetCache();
++    _XFreeLocaleDatabaseCache();
++    _XFreeResourceCache();
++    _XFreeQuarkCache();
+     XFreeThreads();
+ }
+ #endif
+--- a/src/xlibi18n/lcCT.c
++++ b/src/xlibi18n/lcCT.c
+@@ -1301,3 +1301,15 @@
+ 
+     return True;
+ }
++
++_X_HIDDEN void _XFreeCompoundTextCache(void);
++void _XFreeCompoundTextCache(void)
++{
++    CTInfo current;
++    while ((current = ct_list)) {
++        ct_list = current->next;
++        Xfree((char *)current->ext_segment);
++        Xfree(current);
++    }
++    ct_list_end = NULL;
++}
+--- a/src/xlibi18n/lcCharSet.c
++++ b/src/xlibi18n/lcCharSet.c
+@@ -40,6 +40,38 @@
+ 
+ static XlcCharSetList charset_list = NULL;
+ 
++/* Track only records created here. Arbitrary externally registered charsets
++ * remain borrowed; the registry does not acquire their storage ownership.
++ */
++typedef struct _OwnedCharSet {
++    XlcCharSetRec charset;
++    const char *name_storage;
++    const char *encoding_storage;
++    struct _OwnedCharSet *next;
++} OwnedCharSet;
++static OwnedCharSet *owned_charsets;
++typedef struct _OwnedCharSetString {
++    char *value;
++    struct _OwnedCharSetString *next;
++} OwnedCharSetString;
++static OwnedCharSetString *owned_charset_strings;
++
++/* Resource definitions can replace a shared charset's strings. Preserve every
++ * version until unload, including pointers borrowed by previously loaded locales.
++ */
++_X_HIDDEN Bool _XlcOwnCharSetString(char *value);
++Bool _XlcOwnCharSetString(char *value)
++{
++    OwnedCharSetString *owned = Xmalloc(sizeof(*owned));
++    if (!owned)
++        return False;
++    owned->value = value;
++    owned->next = owned_charset_strings;
++    owned_charset_strings = owned;
++    return True;
++}
++
++
+ /* Returns the charset with the given name (including side suffix).
+    Returns NULL if not found. */
+ XlcCharSet
+@@ -176,7 +208,8 @@
+     const char *colon;
+     char *tmp;
+ 
+-    charset = Xcalloc(1, sizeof(XlcCharSetRec));
++    OwnedCharSet *owned = Xcalloc(1, sizeof(*owned));
++    charset = owned ? &owned->charset : NULL;
+     if (charset == NULL)
+ 	return (XlcCharSet) NULL;
+ 
+@@ -221,5 +254,33 @@
+         /* If ct_sequence is not usable in Compound Text, remove it. */
+         charset->ct_sequence = "";
+ 
++    owned->name_storage = charset->name;
++    owned->encoding_storage = charset->encoding_name;
++    owned->next = owned_charsets;
++    owned_charsets = owned;
+     return (XlcCharSet) charset;
+ }
++
++_X_HIDDEN void _XFreeCharSetCache(void);
++void _XFreeCharSetCache(void)
++{
++    XlcCharSetList current;
++    OwnedCharSet *owned;
++    OwnedCharSetString *string;
++    while ((current = charset_list)) {
++        charset_list = current->next;
++        Xfree(current);
++    }
++    while ((owned = owned_charsets)) {
++        owned_charsets = owned->next;
++        if (owned->encoding_storage != owned->name_storage)
++            Xfree((char *)owned->encoding_storage);
++        Xfree((char *)owned->name_storage);
++        Xfree(owned);
++    }
++    while ((string = owned_charset_strings)) {
++        owned_charset_strings = string->next;
++        Xfree(string->value);
++        Xfree(string);
++    }
++}
+--- a/src/xlibi18n/lcConv.c
++++ b/src/xlibi18n/lcConv.c
+@@ -352,3 +352,13 @@
+     if (conv->methods->reset)
+ 	(*conv->methods->reset)(conv);
+ }
++
++_X_HIDDEN void _XFreeConverterCache(void);
++void _XFreeConverterCache(void)
++{
++    XlcConverterList current;
++    while ((current = conv_list)) {
++        conv_list = current->next;
++        Xfree(current);
++    }
++}
+--- a/src/xlibi18n/lcDB.c
++++ b/src/xlibi18n/lcDB.c
+@@ -1328,3 +1328,17 @@
+ }
+ 
+ #endif	/* NOT_X_ENV */
++
++_X_HIDDEN void _XFreeLocaleDatabaseCache(void);
++void _XFreeLocaleDatabaseCache(void)
++{
++    XlcDatabaseList current;
++    while ((current = _db_list)) {
++        _db_list = current->next;
++        Xfree(current->lc_db);
++        DestroyDatabase(current->database);
++        Xfree(current);
++    }
++    Xfree(parse_info.buf);
++    parse_info.buf = NULL;
++}
+--- a/src/xlibi18n/lcGeneric.c
++++ b/src/xlibi18n/lcGeneric.c
+@@ -39,6 +39,7 @@
+ static XLCd create (const char *name, XLCdMethods methods);
+ static Bool initialize (XLCd lcd);
+ static void destroy (XLCd lcd);
++_X_HIDDEN Bool _XlcOwnCharSetString(char *value);
+ 
+ static XLCdPublicMethodsRec genericMethods = {
+     { NULL },                   /* use default methods */
+@@ -513,6 +514,10 @@
+             tmp = Xmalloc(strlen(value[0])+1);
+             if (tmp == NULL)
+                 return;
++            if (!_XlcOwnCharSetString(tmp)) {
++                Xfree(tmp);
++                return;
++            }
+             charsetd->ct_sequence = tmp;
+             string_to_encoding(value[0],tmp);
+         }
+@@ -527,6 +532,12 @@
+             }
+ */
+             tmp = strdup(value[0]);
++            if (!tmp)
++                return;
++            if (!_XlcOwnCharSetString(tmp)) {
++                Xfree(tmp);
++                return;
++            }
+             charsetd->encoding_name = tmp;
+             charsetd->xrm_encoding_name = XrmStringToQuark(tmp);
+         }
+--- a/src/xlibi18n/lcWrap.c
++++ b/src/xlibi18n/lcWrap.c
+@@ -618,3 +618,16 @@
+ 
+     return NULL;
+ }
++
++/* Locale descriptors are shared until final library unload, not display close. */
++_X_HIDDEN void _XFreeLocaleCache(void);
++void _XFreeLocaleCache(void)
++{
++    XLCdList current;
++    while ((current = lcd_list)) {
++        lcd_list = current->next;
++        _XlcDestroyLC(current->lcd);
++        Xfree(current);
++    }
++    _XlcDeInitLoader();
++}
