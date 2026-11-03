@@ -1,10 +1,5 @@
 name: Original Windows Fixed-Clock Cockpit UI Reference
 on:
-  push:
-    branches: ['codex/production-**']
-    paths:
-      - 'Tests/Production/CockpitUITiming/**'
-      - '.github/workflows/production-cockpit-ui-timing-reference.yml'
   workflow_dispatch:
 permissions:
   contents: read
