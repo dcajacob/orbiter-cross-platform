@@ -6,6 +6,8 @@
 #include "IconsFontAwesome6.h"
 #include "NativeInterpreterSdk.h"
 #include "Config.h"
+#include "Pane.h"
+#include "Mfd.h"
 #include "NativeCockpitUi.h"
 #include <memory>
 #include <fstream>
@@ -53,6 +55,9 @@ void ImGuiDialog::Display() {
 }
 void ImGuiDialog::Activate() {active=true;ImGui::SetWindowFocus(name.c_str());}
 namespace ImGui {
+#define ORBITER_WIDGET_EXPORT ORBITER_PRODUCTION_API
+#include "GuiOptionControls.inc"
+#undef ORBITER_WIDGET_EXPORT
     ORBITER_PRODUCTION_API ImTextureID GetImTextureID(SURFHANDLE surf) {
         auto* graphics=GetNativeRenderContext().graphics;
         return graphics && surf ? graphics->GuiTextureId(surf) : 0;
@@ -222,6 +227,7 @@ std::unique_ptr<InputBox> inputBox;
 std::ofstream uiEvidence;
 std::ofstream uiFrames;
 std::ofstream menuWindows;
+std::ofstream optionsState;
 ImGuiID replayClockHook=0;
 float replayClockStep=0;
 std::ofstream replayClockTrace;
@@ -265,6 +271,8 @@ void CreateCockpitGui() {
         if(std::filesystem::is_regular_file(context.evidence/"menu-evidence.enabled")) {
             menuWindows.open(context.evidence/"menu-windows.csv");
             menuWindows<<"frame,name,x,y,width,height\n";
+            optionsState.open(context.evidence/"options-state.csv");
+            optionsState<<"frame,refresh,size,panel_scale,limited_fuel,mouse_focus,joystick,deadzone,saturation,ignore_throttle,throttle_axis,rudder_axis,mfd_width,mfd_height\n";
         }
         CreateCockpitInfoBars();
         selection = std::make_unique<Select>();
@@ -309,6 +317,7 @@ void DestroyCockpitGui() {
         replayClockHook=0;
     }
     if(menuWindows.is_open())menuWindows.close();
+    if(optionsState.is_open())optionsState.close();
     if(uiEvidence.is_open())uiEvidence.close();
     if(uiFrames.is_open())uiFrames.close();
     if(replayClockTrace.is_open())replayClockTrace.close();
@@ -340,6 +349,18 @@ void BeginCockpitGuiFrame() {
                 <<','<<window->Size.x<<','<<window->Size.y<<'\n';
         }
         menuWindows.flush();
+    }
+    if(optionsState.is_open()) {
+        const auto& cfg=*context.configuration;
+        oapi::UInt32 width=0,height=0;
+        auto* instrument=context.cockpitPane ? context.cockpitPane->MFD(0) : nullptr;
+        if(instrument && instrument->Texture())context.graphics->clbkGetSurfaceSize(instrument->Texture(),&width,&height);
+        optionsState<<ImGui::GetFrameCount()<<','<<cfg.CfgLogicPrm.InstrUpdDT<<','<<cfg.CfgLogicPrm.MFDSize
+            <<','<<cfg.CfgLogicPrm.PanelScale<<','<<cfg.CfgLogicPrm.bLimitedFuel<<','<<cfg.CfgUIPrm.MouseFocusMode
+            <<','<<cfg.CfgJoystickPrm.Joy_idx<<','<<cfg.CfgJoystickPrm.Deadzone<<','<<cfg.CfgJoystickPrm.ThrottleSaturation
+            <<','<<cfg.CfgJoystickPrm.bThrottleIgnore<<','<<context.joystickThrottleAxis<<','<<context.joystickTwistAxis
+            <<','<<width<<','<<height<<'\n';
+        optionsState.flush();
     }
     if(uiFrames.is_open()){uiFrames<<ImGui::GetFrameCount()<<'\n';uiFrames.flush();}
 }

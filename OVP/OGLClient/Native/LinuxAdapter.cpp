@@ -30,6 +30,8 @@
 #include "Production/NativeModule.h"
 #include "Production/NativeAbi.h"
 #include "Production/FlightKeys.h"
+#include "Production/NativeJoystick.h"
+#include "Config.h"
 #include <algorithm>
 #include <cmath>
 #include <map>
@@ -141,6 +143,7 @@ const std::map<int,unsigned> keyCodes={
     {GLFW_KEY_KP_ENTER,OAPI_KEY_NUMPADENTER}};
 std::vector<FlightKeyEvent> keyEvents;
 bool guiInitialized=false;
+orbiter::production::NativeJoystickState cockpitJoystick;
 int joystickDevice=-1;float initialThrottle=0,lastThrottle=0;bool armed=false,throttleSeen=false;
 
 void error(int,const char* text) {std::cerr<<"GLFW: "<<text<<'\n';}
@@ -155,6 +158,7 @@ void OGLClient::Open()
     require(nativeWindow!=nullptr,"Native OpenGL window creation failed");
     glfwMakeContextCurrent(nativeWindow);glfwSwapInterval(1);
     require(gladLoadGLLoader(reinterpret_cast<GLADloadproc>(glfwGetProcAddress))!=0,"Native OpenGL function loading failed");
+    cockpitJoystick.Reset();
     scroll=0;dragging=false;keyEvents.clear();mouseEvents.clear();joystickDevice=-1;armed=false;throttleSeen=false;
     glfwSetKeyCallback(nativeWindow,[](GLFWwindow*,int key,int,int action,int) {
         if(action==GLFW_REPEAT)return;
@@ -203,6 +207,19 @@ RenderInput OGLClient::Poll()
     if(glfwGetWindowAttrib(nativeWindow,GLFW_FOCUSED) && !captureKeyboard) {
         for(auto pair:keyCodes)if(glfwGetKey(nativeWindow,pair.first)==GLFW_PRESS)input.flight.keys[pair.second]=char(0x80);
         input.flight.events.swap(keyEvents);
+#if ORBITER_BUILD_NATIVE_COCKPIT
+        auto& render=GetNativeRenderContext();
+        const auto& prm=render.configuration->CfgJoystickPrm;
+        int device=prm.Joy_idx>0 && prm.Joy_idx<=GLFW_JOYSTICK_LAST+1 ? int(prm.Joy_idx)-1 : -1;
+        if(device>=0 && !glfwJoystickPresent(device))device=-1;
+        int count=0,buttonsCount=0;
+        const float* axes=device>=0 ? glfwGetJoystickAxes(device,&count) : nullptr;
+        const auto* buttons=device>=0 ? glfwGetJoystickButtons(device,&buttonsCount) : nullptr;
+        cockpitJoystick.Poll(device,axes,count,render.joystickTwistAxis,
+            NativeThrottleAxis(prm.ThrottleAxis,render.joystickThrottleAxis),
+            prm.Deadzone,prm.ThrottleSaturation,prm.bThrottleIgnore,input.flight);
+        input.flight.alternate=buttonsCount>2 && buttons[2]==GLFW_PRESS;
+#else
         auto& device=joystickDevice;
         int selected=-1;for(int j=GLFW_JOYSTICK_1;j<=GLFW_JOYSTICK_LAST;++j)if(glfwJoystickPresent(j)){selected=j;break;}
         if(selected!=device){device=selected;armed=false;throttleSeen=false;initialThrottle=lastThrottle=0;}
@@ -217,12 +234,22 @@ RenderInput OGLClient::Poll()
                 if(armed && std::abs(axes[throttleAxis]-lastThrottle)>.001f){input.flight.throttle=std::clamp((1.-axes[throttleAxis])*.5,0.,1.);lastThrottle=axes[throttleAxis];}
             }
         }
+#endif
     } else keyEvents.clear();
     double x,y;glfwGetCursorPos(nativeWindow,&x,&y);
     bool down=glfwGetMouseButton(nativeWindow,GLFW_MOUSE_BUTTON_RIGHT)==GLFW_PRESS;
     if(down && dragging) {input.yaw=(x-lastX)*-0.005;input.pitch=(y-lastY)*-0.005;}
     dragging=down;lastX=x;lastY=y;input.zoom=scroll;scroll=0;
     return input;
+}
+std::vector<NativeJoystickDevice> OGLClient::Joysticks() const {
+    std::vector<NativeJoystickDevice> devices;
+    for(int id=GLFW_JOYSTICK_1;id<=GLFW_JOYSTICK_LAST;++id)if(glfwJoystickPresent(id)) {
+        int count=0;glfwGetJoystickAxes(id,&count);
+        const char* name=glfwGetJoystickName(id);
+        devices.push_back({unsigned(id+1),name ? name : "Joystick",count});
+    }
+    return devices;
 }
 void OGLClient::Status(const std::string& text) {glfwSetWindowTitle(nativeWindow,text.c_str());}
 void OGLClient::Resize(int width,int height) {clbkSetViewportSize(width,height);}

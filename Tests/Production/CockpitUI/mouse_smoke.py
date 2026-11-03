@@ -45,6 +45,36 @@ def verify_menu(out,click,advance,button,key,move,window,title,process):
     wait(lambda:' | DG2 | ' in title(window),'Menu ship selection did not change the focused vessel')
     command('Camera')
     dialog('Orbiter: Camera')
+    command('Options')
+    options=dialog('Orbiter: Options')
+    ox,oy=int(float(options['x'])),int(float(options['y']))
+    def settings():
+        with (out/'options-state.csv').open() as stream:return list(csv.DictReader(stream))[-1]
+    click(ox+480,oy+58)
+    wait(lambda:abs(float(settings()['refresh'])-.35)<1e-8,'MFD refresh option did not change')
+    click(ox+480,oy+202)
+    wait(lambda:abs(float(settings()['panel_scale'])-1.1)<1e-8,'Panel scale option did not change')
+    click(ox+40,oy+58)
+    click(ox+276,oy+58)
+    wait(lambda:settings()['limited_fuel']=='0','Limited-fuel option did not reach the live configuration')
+    for page in range(2,10):
+        click(ox+80,oy+40+page*18)
+    click(ox+int(float(options['width']))-12,oy+11)
+    move(1270,300)
+    tap('F8');tap('F8')
+    before_width=int(settings()['mfd_width'])
+    tap('F6')
+    options=dialog('Orbiter: Options')
+    click(ox+40,oy+40)
+    click(ox+480,oy+82)
+    wait(lambda:settings()['size']=='7' and int(settings()['mfd_width'])>before_width,
+         'Glass cockpit MFD option did not resize the actual render target')
+    resized_width=int(settings()['mfd_width'])
+    click(ox+int(float(options['width']))-12,oy+11)
+    move(1270,300)
+    key(window,'Control_L',True);tap('F9');key(window,'Control_L',False);advance()
+    options=dialog('Orbiter: Options')
+    click(ox+int(float(options['width']))-12,oy+11)
     command('Info')
     dialog('Object info')
     command('Map')
@@ -80,7 +110,23 @@ def verify_menu(out,click,advance,button,key,move,window,title,process):
     require(process.wait(timeout=15)==0,'Menu exit failed')
     life=json.loads((out/'graphics-lifecycle.json').read_text())
     require(life['successful_presents'] and life['context_deleted'],'Menu did not close the graphics context')
-    report=dict(commands=before_names,persisted_order=names,focus='DG2',warp=10,quicksave=save.name,configuration_dialog=True,lifecycle=life)
+    persisted=(out/'Orbiter.cfg').read_text()
+    require('InstrumentUpdateInterval = 0.35' in persisted and 'GenericMFDSize = 7' in persisted and 'UnlimitedFuel = TRUE' in persisted,
+            'Live options were not persisted at shutdown')
+    reloaded=out/'options-reloaded';reloaded.mkdir()
+    (reloaded/'menu-evidence.enabled').touch()
+    argv=json.loads((out/'invocation.json').read_text())
+    argv[argv.index('--scenario')+1]=str(save)
+    argv[argv.index('--evidence')+1]=str(reloaded)
+    argv+=['--frames','2']
+    with (reloaded/'console.log').open('w') as log:
+        subprocess.run(argv,stdout=log,stderr=subprocess.STDOUT,check=True,timeout=90)
+    with (reloaded/'options-state.csv').open() as stream:restored=list(csv.DictReader(stream))[-1]
+    require(restored['refresh']=='0.35' and restored['size']=='7' and restored['panel_scale']=='1.1'
+            and restored['limited_fuel']=='0' and int(restored['mfd_width'])==resized_width,
+            'Saved options did not restore the actual cockpit on the next launch')
+    report=dict(options=dict(refresh=.35,panel_scale=1.1,limited_fuel=False,mfd_width_before=before_width,mfd_width_after=resized_width,
+                             pages_visited=10,keyboard_shortcuts=True,persisted=True,reloaded=True),commands=before_names,persisted_order=names,focus='DG2',warp=10,quicksave=save.name,configuration_dialog=True,lifecycle=life)
     (out/'menu-verification.json').write_text(json.dumps(report,indent=2)+'\n')
     print(json.dumps(report,indent=2))
 

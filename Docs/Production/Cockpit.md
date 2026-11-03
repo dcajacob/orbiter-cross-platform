@@ -25,7 +25,7 @@ orientation matrix at tick 38. The paired workflow now also captures Windows
 with SSE2 selected. [Hosted spacecraft comparisons](https://github.com/dcajacob/orbiter-cross-platform/actions/runs/41563089040)
 
 The native cockpit now draws the original dynamic menu and stock PNG icons.
-Ship, Camera, Speed, Pause, Info, Map, Save and Exit are connected. In a local
+Ship, Camera, Speed, Pause, Info, Options, Map, Save and Exit are connected. In a local
 X11 flight, mouse clicks paused and resumed the DG, changed the clock to 10×,
 switched focus to DG-S, and opened the original camera, object information,
 map and menu configuration dialogs. The saved scenario contains the selected
@@ -33,7 +33,7 @@ DG-S and camera. F4 switched the menu between visible and auto-hide modes.
 Dragging Ship past Camera persisted their new order. Exit closed the graphics
 context after all 162 frame presentations. The sanitizer run completed 125
 frame presentations, with two 56-byte allocations originating in Mesa
-libgallium 26.0.8 at offsets `0xef1ba0` and `0xef1b89`. Function, Options,
+libgallium 26.0.8 at offsets `0xef1ba0` and `0xef1b89`. Function,
 Record and Help remain open.
 [Delta-glider flight evidence](DeltaGlider.md)
 
@@ -48,8 +48,48 @@ depended on the configured menu width. A separate `menu-hidden` case now uses
 the same eight items as `menu` and `menu-auto`. The twelve-item Windows case
 remains intact, and the exact strip comparison excludes no pixels. All seven
 cases pass locally in native Debug, including selection, reveal, retraction
-and complete graphics shutdown. Hosted verification of the corrected fixture
-remains required.
+and complete graphics shutdown. The corrected preserved-Windows fixtures pass
+in Debug and Release with both math profiles in
+[run 41578889992](https://github.com/dcajacob/orbiter-cross-platform/actions/runs/41578889992).
+The paired native comparison remains a separate gate.
+
+The original Options dialog now uses the live native world, configuration and
+cockpit. All ten pages open in the actual X11 mouse test. Debug and Release
+both changed the MFD refresh interval from 0.25 to 0.35 seconds, scaled the DG-S
+panel to 1.1, disabled fuel consumption, switched through the virtual and glass
+cockpits, and increased the glass MFD render target from 346 to 377 pixels.
+F6 opens Options and Ctrl-F9 opens its visual-helper page. F8, view/panel
+switching, camera lean/reset, HUD color and planetarium/label shortcuts route
+the original logical key bindings to the real cockpit and camera methods.
+The Windows Options pages and helper widgets retain their original bodies;
+`cockpit_source.py` checks the explicit service substitutions and shared widgets.
+An additional sixty-frame Options schedule clicks the same original controls
+on both hosts and captures full frames at ticks 20 and 50. Its native execution
+passes locally; the paired Windows state/image check is pending hosted CI.
+
+After Options has been opened, normal native session shutdown atomically saves
+the live settings to the explicit `--config` file, using the original Config
+writer plus native raw-axis assignments. Subsequent Debug and Release launches
+restored the selected settings and actual 377-pixel render target. The test
+archives the final config and read-only per-frame option/render-target records.
+The accepted Phase 5 external-view executable keeps its existing controls.
+The instrumented nine-command flow completed 336 frame presentations and
+destroyed its graphics context without address or undefined-behavior errors.
+LeakSanitizer still failed on the same two 56-byte Gallium allocations at
+`0xef1ba0` and `0xef1b89`; no suppressions were applied.
+
+The native joystick page enumerates real GLFW devices and their available raw
+axes. Device zero disables joystick input. Configured deadzone and throttle
+saturation now affect the sampled controls; throttle acquisition retains the
+original eight-count bins and movement threshold. Since GLFW does not expose
+DirectInput axis identities, native axis choices are numbered from one in the
+UI and stored as zero-based indices in `NativeJoystickThrottleAxis` and
+`NativeJoystickRudderAxis`. Explicit CLI assignments take precedence. A throttle
+value of -2 uses the existing config's conventional Z/slider positions (raw
+indices 2, 6 and 7); -1 selects keyboard-only throttle. The focused calibration
+test covers deadzone endpoints, saturation, acquisition, noise, disconnect,
+reconnection and reassignment. Physical controller acceptance remains pending.
+[DirectInput calibration semantics](https://learn.microsoft.com/en-us/previous-versions/windows/desktop/ee417908(v=vs.85))
 
 The pre-extraction reference gate is accepted in
 [run 41458001638](https://github.com/dcajacob/orbiter-cross-platform/actions/runs/41458001638).

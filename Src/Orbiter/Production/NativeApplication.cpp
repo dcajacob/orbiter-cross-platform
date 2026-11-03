@@ -113,6 +113,7 @@ struct Runtime final:BodyServices,RigidBodyServices,SurfaceServices,NavigationSe
 #endif
     std::unique_ptr<State> scenarioState;
     std::filesystem::path savePath;
+    std::filesystem::path optionsPath;
     Vessel* previousFocus=nullptr;
     struct AttachmentPair {Vessel* parent;ATTACHMENTHANDLE parentHandle,childHandle;};
     std::map<std::string,AttachmentPair> attachments;
@@ -397,9 +398,31 @@ struct Runtime final:BodyServices,RigidBodyServices,SurfaceServices,NavigationSe
                 if(code==OAPI_KEY_SPACE || keymap.IsLogicalKey(code,snapshot.keys.data(),OAPI_LKEY_Pause)) {running=!running;render.paused=!running;continue;}
                 if(keymap.IsLogicalKey(code,snapshot.keys.data(),OAPI_LKEY_Quicksave)) {savePending=true;continue;}
                 if(code==OAPI_KEY_F5 && !KEYMOD_CONTROL(snapshot.keys.data())) {reloadPending=true;continue;}
+#ifndef ORBITER_NATIVE_COCKPIT
                 if(code==OAPI_KEY_F6 && !KEYMOD_CONTROL(snapshot.keys.data())) {stepOnce=true;continue;}
+#endif
 #ifdef ORBITER_NATIVE_COCKPIT
                 if(HandleCockpitMenuKey(keymap,code,snapshot.keys.data()))continue;
+                if(keymap.IsLogicalKey(code,snapshot.keys.data(),OAPI_LKEY_TogglePlanetarium)) {settings.CfgVisHelpPrm.flagPlanetarium^=PLN_ENABLE;continue;}
+                if(keymap.IsLogicalKey(code,snapshot.keys.data(),OAPI_LKEY_ToggleLabels)) {settings.CfgVisHelpPrm.flagMarkers^=MKR_ENABLE;continue;}
+                if(keymap.IsLogicalKey(code,snapshot.keys.data(),OAPI_LKEY_ToggleCamInternal)) {
+                    SetView(render.focus,!render.camera->IsExternal());continue;
+                }
+                if(render.camera->IsInternal()) {
+                    if(keymap.IsLogicalKey(code,snapshot.keys.data(),OAPI_LKEY_TogglePanelMode)) {cockpit->TogglePanelMode();continue;}
+                    if(keymap.IsLogicalKey(code,snapshot.keys.data(),OAPI_LKEY_CockpitResetCam)) {render.camera->ResetCockpitDir();continue;}
+                    if(keymap.IsLogicalKey(code,snapshot.keys.data(),OAPI_LKEY_PanelSwitchLeft)) {cockpit->SwitchPanel(0);continue;}
+                    if(keymap.IsLogicalKey(code,snapshot.keys.data(),OAPI_LKEY_PanelSwitchRight)) {cockpit->SwitchPanel(1);continue;}
+                    if(keymap.IsLogicalKey(code,snapshot.keys.data(),OAPI_LKEY_PanelSwitchUp)) {cockpit->SwitchPanel(2);continue;}
+                    if(keymap.IsLogicalKey(code,snapshot.keys.data(),OAPI_LKEY_PanelSwitchDown)) {cockpit->SwitchPanel(3);continue;}
+                    if(keymap.IsLogicalKey(code,snapshot.keys.data(),OAPI_LKEY_CockpitDontLean)) {render.focus->LeanCamera(0);continue;}
+                    if(keymap.IsLogicalKey(code,snapshot.keys.data(),OAPI_LKEY_CockpitLeanForward)) {render.focus->LeanCamera(1);continue;}
+                    if(keymap.IsLogicalKey(code,snapshot.keys.data(),OAPI_LKEY_CockpitLeanLeft)) {render.focus->LeanCamera(2);continue;}
+                    if(keymap.IsLogicalKey(code,snapshot.keys.data(),OAPI_LKEY_CockpitLeanRight)) {render.focus->LeanCamera(3);continue;}
+                    if(keymap.IsLogicalKey(code,snapshot.keys.data(),OAPI_LKEY_HUDColour)) {cockpit->ToggleHUDColour();continue;}
+                } else if(keymap.IsLogicalKey(code,snapshot.keys.data(),OAPI_LKEY_ToggleTrackMode)) {
+                    render.camera->SetTrackMode(ExtCamMode((int(render.camera->GetExtMode())+1)%3));continue;
+                }
 #else
                 if(keymap.IsLogicalKey(code,snapshot.keys.data(),OAPI_LKEY_DlgSelectVessel)) {
                     const auto& list=system->GetVessels();auto it=std::find(list.begin(),list.end(),render.focus);auto start=std::size_t(it-list.begin());
@@ -426,6 +449,22 @@ struct Runtime final:BodyServices,RigidBodyServices,SurfaceServices,NavigationSe
     Runtime(Resources& data):resources(data),config(data.config),celestial(config,data.data,data.modules),world(*this) {}
     void Finish() {
         if(finished)return;
+#ifdef ORBITER_NATIVE_COCKPIT
+        if(render.optionsUsed) {
+            auto temporary=optionsPath;temporary+=".tmp";
+            try {
+                if(!settings.Write(temporary.string().c_str()))throw std::runtime_error("Cannot write cockpit options");
+                std::ofstream file(temporary,std::ios::app);file.exceptions(std::ios::badbit|std::ios::failbit);
+                file<<"\nNativeJoystickThrottleAxis = "<<render.joystickThrottleAxis
+                    <<"\nNativeJoystickRudderAxis = "<<render.joystickTwistAxis<<'\n';
+                file.close();std::filesystem::rename(temporary,optionsPath);
+            } catch(const std::exception& error) {
+                std::error_code ignored;std::filesystem::remove(temporary,ignored);
+                std::cerr<<"Cockpit options were not saved: "<<error.what()<<'\n';
+            }
+            render.optionsUsed=false;
+        }
+#endif
         if(playback && system)EndPlayback();
 #ifdef ORBITER_NATIVE_COCKPIT
         if(scenarioInterpreter) {oapiDelInterpreter(scenarioInterpreter);scenarioInterpreter=nullptr;}
@@ -465,6 +504,14 @@ struct Runtime final:BodyServices,RigidBodyServices,SurfaceServices,NavigationSe
     }
     void Initialize(const std::filesystem::path& master,const std::filesystem::path& scenario,const std::filesystem::path& evidence,double captureTime) {
         if(!settings.Load(master.string().c_str())) throw std::runtime_error("Cannot load explicit production configuration");
+#ifdef ORBITER_NATIVE_COCKPIT
+        optionsPath=master;
+        int axis;
+        if(render.joystickThrottleAxis==-2 && settings.GetInt("NativeJoystickThrottleAxis",axis) && axis>=-2 && axis<=15)
+            render.joystickThrottleAxis=axis;
+        if(render.joystickTwistAxis==-2)
+            render.joystickTwistAxis=settings.GetInt("NativeJoystickRudderAxis",axis) && axis>=-1 && axis<=15 ? axis : 2;
+#endif
         if(!settings.GetActiveModules().empty())unsupported("application plugins in this external-view host");
         scenarioState=std::make_unique<State>(51982.5);State& metadata=*scenarioState;if(!metadata.Read(scenario,51982.5))throw std::runtime_error("Cannot parse production scenario");
 #ifndef ORBITER_NATIVE_COCKPIT
@@ -956,8 +1003,16 @@ int main(int argc,char** argv) {
             Runtime application(resources);
             ++launches;
             const auto output=evidence.empty() || (sessions==1 && launches==1)?evidence:evidence/("session-"+std::to_string(launches));
+#ifdef ORBITER_NATIVE_COCKPIT
+            application.render.joystickThrottleAxis=integer("--joystick-throttle-axis",-2);
+#else
             application.render.joystickThrottleAxis=integer("--joystick-throttle-axis",-1);
+#endif
+#ifdef ORBITER_NATIVE_COCKPIT
+            application.render.joystickTwistAxis=integer("--joystick-twist-axis",-2);
+#else
             application.render.joystickTwistAxis=integer("--joystick-twist-axis",2);
+#endif
             if(application.render.joystickThrottleAxis>15 || application.render.joystickTwistAxis>15)throw std::runtime_error("Invalid joystick axis");
             if(arguments.count("--replay"))application.replay.Load(absolute("--replay"));
             application.savePath=save;application.Initialize(absolute("--config"),scenario,output,capture);
@@ -966,7 +1021,13 @@ int main(int argc,char** argv) {
             if(fixedUiClock)SetCockpitReplayClock(static_cast<float>(fixed));
 #endif
             application.time.SetFixedStep(fixed);application.running=startRunning;application.render.paused=!application.running;
-            std::cout<<"Production "<<application.render.focus->GetModuleInterface()->GetClassName()<<" flight. Space/Ctrl-P: pause. T/R: warp. Ctrl-S: save. F5: reload. F6: step. Escape: close.\n";
+            std::cout<<"Production "<<application.render.focus->GetModuleInterface()->GetClassName()<<" flight. Space/Ctrl-P: pause. T/R: warp. Ctrl-S: save. F5: reload. "
+#ifdef ORBITER_NATIVE_COCKPIT
+                <<"F6: options. F8: cockpit. "
+#else
+                <<"F6: step. "
+#endif
+                <<"Escape: close.\n";
             FlightClock clock(fixed);auto previous=std::chrono::steady_clock::now();
             int presented=0;bool reload=false;
             while(application.active && (!frames || presented<frames) && (!ticks || application.inputTick<unsigned(ticks))) {

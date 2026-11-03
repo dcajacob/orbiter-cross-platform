@@ -15,6 +15,7 @@ namespace orbiter::production {
 enum class RenderMouseAction {Move,LeftDown,LeftUp,RightDown,RightUp,Wheel};
 struct RenderMouseEvent {RenderMouseAction action;int x=0,y=0;double wheel=0;};
 struct RenderInput {FlightInput flight;std::vector<RenderMouseEvent> mouse;bool close=false;int width=0,height=0;double yaw=0,pitch=0,zoom=0;};
+struct NativeJoystickDevice {unsigned index;std::string name;int axes;};
 class ORBITER_PRODUCTION_API NativeGraphics {
 public:
     virtual ~NativeGraphics()=default;
@@ -48,6 +49,7 @@ public:
     virtual void clbkRender2DPanel(SURFHANDLE*,MESHHANDLE,MATRIX3*,float,bool=false)=0;
     SURFHANDLE clbkLoadTexture(const char* name,oapi::UInt32 flags) {return LoadTextureResource(name,flags);}
     virtual int DesktopHeight() const=0;
+    virtual std::vector<NativeJoystickDevice> Joysticks() const=0;
     virtual oapi::SdkPoint CursorPosition() const=0;
     virtual void Open()=0;
     virtual RenderInput Poll()=0;
@@ -104,6 +106,7 @@ struct NativeRenderContext {
     class NativeScriptHost* scripts=nullptr;
     NativeGraphics* graphics=nullptr;Pane* cockpitPane=nullptr;Select* cockpitSelect=nullptr;InputBox* cockpitInput=nullptr;HELPCONTEXT* cockpitHelp=nullptr;
     bool paused=true,showGrapple=false;
+    bool optionsUsed=false;
     int joystickThrottleAxis=-1,joystickTwistAxis=2;
     std::filesystem::path evidence;double captureTime=0;
 };

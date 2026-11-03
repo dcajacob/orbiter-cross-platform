@@ -71,6 +71,19 @@ def verify_focus_bars():
     dialog_manager=original('DlgMgr.cpp')
     equal(dialog_manager[dialog_manager.index('DLLEXPORT bool BeginAnimatedCombo'):dialog_manager.rindex('\n}')],
           widgets,'Original combo and collapsing-header drawing, animation and input')
+    option_widgets=current('Production/GuiOptionControls.inc').replace('ORBITER_WIDGET_EXPORT','DLLEXPORT')
+    expected=dialog_manager[dialog_manager.index('// Resettable slider'):dialog_manager.index('DLLEXPORT void PushFont')]
+    expected+=dialog_manager[dialog_manager.index('DLLEXPORT bool SliderEnum'):dialog_manager.index('// "Animated" widgets')]
+    equal(expected,option_widgets,'Original option slider and bounded input widgets')
+    before=original('DlgOptions.cpp');after=windows(current('DlgOptions.cpp'))
+    for adapter,expr in [('CockpitConfiguration()','g_pOrbiter->Cfg()'),('CockpitConfigPath(','g_pOrbiter->Cfg()->ConfigPath('),
+            ('CockpitWorld()','g_psys'),('OptionsChanged(OPTCAT','g_pOrbiter->OnOptionChanged(OPTCAT'),
+            ('auto &list =','std::vector<oapi::GraphicsClient::LABELLIST> &list ='),
+            ('auto* list =','oapi::GraphicsClient::LABELLIST* list ='),
+            ('const auto* lspec =','const oapi::GraphicsClient::LABELTYPE* lspec =')]:
+        after=after.replace(adapter,expr)
+    equal(before[before.index('DlgOptions::DlgOptions()'):],after[after.index('DlgOptions::DlgOptions()'):],
+          'Original option pages, settings and change notifications')
     before=original('DlgMap.cpp');after=windows(current('DlgMap.cpp'))
     for adapter,expr in [('CockpitWorld()','g_psys'),('CockpitTime()','td'),('CockpitConfiguration()','g_pOrbiter->Cfg()'),
             ('ComparePrefix','_strnicmp'),('CompareText','_stricmp'),('oapi::UInt32','DWORD'),

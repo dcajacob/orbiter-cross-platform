@@ -19,6 +19,7 @@
 #include "DlgCamera.h"
 #include "DlgInfo.h"
 #include "DlgMap.h"
+#include "DlgOptions.h"
 #endif
 #include "imgui.h"
 #include "imgui_internal.h"
@@ -90,6 +91,7 @@ std::unique_ptr<DlgTacc> timeAcceleration;
 std::unique_ptr<DlgCamera> cameraDialog;
 std::unique_ptr<DlgInfo> infoDialog;
 std::unique_ptr<DlgMap> mapDialog;
+std::unique_ptr<DlgOptions> optionsDialog;
 template<class T> void OpenMenuDialog(std::unique_ptr<T>& dialog) {
     if(!dialog)dialog=std::make_unique<T>();
     oapiOpenDialog(dialog.get());
@@ -107,6 +109,7 @@ const MenuCommand commands[]={
     {"Speed","MenuInfoBar/speed.png",3,OAPI_LKEY_DlgSimspeed,[](void*) {OpenMenuDialog(timeAcceleration);}},
     {"Pause","MenuInfoBar/pause.png",4,0,[](void*) {oapiSetPause(InfoRunning());}},
     {"Info","MenuInfoBar/info.png",6,OAPI_LKEY_DlgInfo,[](void*) {orbiter::production::OpenCockpitInfoDialog();}},
+    {"Options","MenuInfoBar/options.png",7,OAPI_LKEY_DlgOptions,[](void*) {OpenMenuDialog(optionsDialog);}},
     {"Map","MenuInfoBar/map.png",8,OAPI_LKEY_DlgMap,[](void*) {OpenMenuDialog(mapDialog);}},
     {"Save","MenuInfoBar/save.png",11,0,[](void*) {GetNativeRenderContext().scriptApplication->Quicksave();}},
     {"Exit","MenuInfoBar/exit.png",12,0,[](void*) {GetNativeRenderContext().scriptApplication->EndSession();}},
@@ -927,6 +930,9 @@ void MenuInfoBar::SyncPreferences()
 #ifndef _WIN32
 namespace orbiter::production {
 bool HandleCockpitMenuKey(const Keymap& keymap,oapi::UInt32 key,char* state) {
+    if(keymap.IsLogicalKey(key,state,OAPI_LKEY_DlgVisHelper)) {
+        OpenMenuDialog(optionsDialog);optionsDialog->SwitchPage("Visual helpers");return true;
+    }
     if(keymap.IsLogicalKey(key,state,OAPI_LKEY_MainMenu)) {
         auto& mode=InfoConfig().MenuMode;
         mode=mode==0 ? 2 : 0;
@@ -944,6 +950,7 @@ DlgInfo* OpenCockpitInfoDialog() {OpenMenuDialog(infoDialog);return infoDialog.g
 MenuInfoBar& CockpitMenuBar() {return *cockpitBars;}
 void CreateCockpitInfoBars() {cockpitBars=std::make_unique<MenuInfoBar>();}
 void DestroyCockpitInfoBars() {
+    optionsDialog.reset();
     mapDialog.reset();
     infoDialog.reset();
     cameraDialog.reset();

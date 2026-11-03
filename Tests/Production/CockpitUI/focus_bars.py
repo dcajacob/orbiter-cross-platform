@@ -29,7 +29,7 @@ def scenario():
 MENU_ITEMS=('Ship','Camera','Speed','Pause','Function','Info','Options','Map','Record','Help','Save','Exit')
 TESTED_MENU={'Ship','Camera','Speed','Pause','Info','Map','Save','Exit'}
 CASES=[('hidden',1,0),('visible',0,0),('auto',2,0),('focus',0,0),
-       ('menu-hidden',1,0),('menu',1,0),('menu-auto',1,0)]
+       ('menu-hidden',1,0),('menu',1,0),('menu-auto',1,0),('options',1,0)]
 
 def menu_preferences(path):
     path.parent.mkdir(parents=True,exist_ok=True)
@@ -40,6 +40,13 @@ def menu_preferences(path):
 
 
 def inputs(name):
+    if name=='options':
+        actions=[(3,'options_dialog',0,0)]
+        # Original Options window at (60,60): refresh, panel scale, vessel
+        # settings, unlimited fuel, then close. Exercise actual widgets.
+        for tick,x,y in [(8,540,118),(12,540,262),(24,100,118),(28,336,118),(40,740,71)]:
+            actions.extend([(tick,'move',x,y),(tick+1,'left_down',x,y),(tick+2,'left_up',x,y)])
+        return actions
     if name=='menu-auto':
         return [(0,'move',640,5),(23,'move',400,350)]
     if name=='menu':
@@ -81,8 +88,9 @@ def execute(args,name,mode,fps):
         (out/'instrument-evidence.enabled').touch()
         commands=['tick,phase,action,value','0,pre,mfd,0 1','0,pre,mfd,1 2','0,pre,hud,1']
         for t,event,x,y in actions:
-            if event=='focus_dialog':
-                commands.extend([f'{t},pre,key,61',f'{t+1},pre,key,-61'])
+            if event in ('focus_dialog','options_dialog'):
+                code=61 if event=='focus_dialog' else 64
+                commands.extend([f'{t},pre,key,{code}',f'{t+1},pre,key,{-code}'])
             else:
                 commands.append(f'{t},pre,ui,{event} {x} {y} -')
         (out/'replay.csv').write_text('\n'.join(commands)+'\n')
@@ -103,6 +111,10 @@ def execute(args,name,mode,fps):
     if name=='focus':
         require(states[20]['object']=='DG2' and states[50]['object']=='DG','Select or Previous failed')
     if name=='menu':require(states[50]['object']=='DG2','Visible menu failed to select DG-S')
+    if name=='options':
+        saved=(out/'Orbiter.cfg').read_text()
+        require(all(line in saved for line in ('InstrumentUpdateInterval = 0.35','PanelScale = 1.1','UnlimitedFuel = TRUE')),
+                'Original Options widgets did not persist their live settings')
     return changes
 
 

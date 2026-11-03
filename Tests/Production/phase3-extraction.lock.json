@@ -581,7 +581,7 @@
     },
     "Src/Orbiter/Production/CMakeLists.txt": {
       "original_sha256_lf": null,
-      "sha256_lf": "3b08e0a2556e51ca0fa5bcfb4ab4c425d82dc16ceb520bca6318a547cf5f9eb4",
+      "sha256_lf": "442277ef897249ad1f8766d39200a30ada1e3c09138b7e1bee2b69e4b4d44da0",
       "scope": "Original ten stock MFD declarations use exact platform SDK aliases; shared original conic geometry is moved without calculation or screen-mapping changes. Full native instrument runtime remains incomplete."
     },
     "Src/Orbiter/Production/CameraServices.cpp": {
@@ -741,7 +741,7 @@
     },
     "Src/Orbiter/Production/NativeApplication.cpp": {
       "original_sha256_lf": null,
-      "sha256_lf": "030dac7b07423b41114200c92492c1a0ef4d35f5ba7fead8a430354c43253ddb"
+      "sha256_lf": "6dced4e07fa8904cf724ea87365703bb13bece303541e970e7fff4004524665f"
     },
     "Src/Orbiter/Production/NativeBuild.h.in": {
       "sha256_lf": "f5fb21f83bb6be0c54839fce670e8410f6911eda86da2eef26e4221c1ae25d97",
@@ -785,7 +785,7 @@
     },
     "Src/Orbiter/Production/NativeGraphics.h": {
       "original_sha256_lf": null,
-      "sha256_lf": "ef31962332c8f7ae6d1e9264b4a71e370fa33ca737bdc090ebae5eba23297389",
+      "sha256_lf": "47923eb101dd6ab3f1380d8238eaa26cffffd87c52b5c4afdc1815bf606f89c3",
       "scope": "Original scheduler, stock MFDs and modern map compile natively with explicit original epoch/time, authoritative world/UI bindings and indexed map resources. Exact Windows calculations and callback order conserved. Native GDI/legacy map/custom-mode entry points fail explicitly until supported; native cockpit owner and DG runtime remain unfinished."
     },
     "Src/Orbiter/Production/NativeModule.cpp": {
@@ -1304,11 +1304,11 @@
     },
     "Src/Orbiter/Production/NativeCockpit.cmake": {
       "original_sha256_lf": null,
-      "sha256_lf": "f6a04e2aa3bfc63ff0de9290bd7852196b71c9da8a95e44ab8264f071812f5de"
+      "sha256_lf": "273390f2a653bf812474c4cc5d3e5998a325042c47987e3172a58ba677aaee49"
     },
     "Src/Orbiter/Production/NativeCockpitGui.cpp": {
       "original_sha256_lf": null,
-      "sha256_lf": "2f6ee1e64199466f2c9f1d67bdc16385f91e435de1b1f1aa9b5573dbab7ff5d0"
+      "sha256_lf": "974fccdbacd7f66170b9130d3bfe2a7c8d6b1fc5419a1e13796d9e6940c838b7"
     },
     "Src/Orbiter/Production/NativeCockpitProjection.cpp": {
       "original_sha256_lf": null,
@@ -1684,11 +1684,11 @@
     },
     "Src/Orbiter/DlgMgr.cpp": {
       "original_sha256_lf": "09b32684f728b22cce17f85bdaa24593e18adc52d8641bebd412a1881c87c8b0",
-      "sha256_lf": "fd89430504ca5c0606f44870648772a075b0a12513002fa32638c47e8d63edda"
+      "sha256_lf": "ff4dfd6a701a0e2e04548d549b74425aad0846fa3629342a280b7081ad2772a8"
     },
     "Src/Orbiter/MenuInfoBar.cpp": {
       "original_sha256_lf": "d0bb8b38f21893ecce434232ae8f05881c33831537c950c69400b92ddbd6ffe7",
-      "sha256_lf": "c6bd3f52d4de5191fb176c0e034b2cf505a1f03817acd6dae026ad0f001e3b81"
+      "sha256_lf": "6d0a4b2be2a07462fa92d1698ae1bb93c2da2d71e368a0d0b7a91e8bf9dfc925"
     },
     "Src/Orbiter/Production/GuiMenuButton.inc": {
       "original_sha256_lf": null,
@@ -1757,6 +1757,22 @@
     "Src/Orbiter/Production/GuiAnimatedControls.inc": {
       "original_sha256_lf": null,
       "sha256_lf": "9123fc10966342842591f1257d892dc000eab28f3bee6ce674ac09aece9025ba"
+    },
+    "Src/Orbiter/DlgOptions.cpp": {
+      "original_sha256_lf": "ebc0d48a8d65e0c862f988ba22d97d3d7acb3e1f6066ecf4427ca278769ee2e6",
+      "sha256_lf": "4deba25c121efa47fb5e47ebf0414f815d09712be46f574014ac55982ca3bb2a"
+    },
+    "Src/Orbiter/DlgOptions.h": {
+      "original_sha256_lf": "0512d288d03ba2e332164a932cb3c0b7ae7c5c895c2abc2844c373a5a6ae13e1",
+      "sha256_lf": "87b94550d9764560387a0e32b2d6c9baae266b3c5c5251963520974eab06caf2"
+    },
+    "Src/Orbiter/Production/GuiOptionControls.inc": {
+      "original_sha256_lf": null,
+      "sha256_lf": "fb5465938a51b98a583549c5f8d084c01d1dbf50ae45f546917c41fb40607bd3"
+    },
+    "Src/Orbiter/Production/NativeJoystick.h": {
+      "original_sha256_lf": null,
+      "sha256_lf": "aed39b549443e702e97fbe657ad06df682d39072dc32a7a03d5d8ff1ae11bf9b"
     }
   }
 }

@@ -6,12 +6,31 @@
 // ======================================================================
 
 #include "DlgOptions.h"
+#ifdef _WIN32
 #include "Orbiter.h"
 #include "OrbiterAPI.h"
+#else
+#include "Production/CockpitGuiExports.h"
+#include "Production/NativeJoystick.h"
+#endif
+#include "Production/CockpitServices.h"
+#include "Pane.h"
+#include "Config.h"
+#include "Star.h"
+#include "Planet.h"
 #include "Psys.h"
 
-extern Orbiter* g_pOrbiter;
-extern PlanetarySystem* g_psys;
+using namespace orbiter::production;
+namespace {
+void OptionsChanged(oapi::UInt32 category,oapi::UInt32 item) {
+#ifdef _WIN32
+    g_pOrbiter->OnOptionChanged(category,item);
+#else
+    CockpitWorld()->OptionChanged(category,item);
+    CockpitPane()->OptionChanged(category,item);
+#endif
+}
+}
 
 #include "IconsFontAwesome6.h"
 #include "imgui.h"
@@ -19,11 +38,14 @@ extern PlanetarySystem* g_psys;
 
 DlgOptions::DlgOptions(): ImGuiDialog(ICON_FA_LIST_CHECK " Orbiter: Options", {692,383})
 {
+#ifndef _WIN32
+    GetNativeRenderContext().optionsUsed=true;
+#endif
 	m_pathStarmap.clear();
 	m_pathBgImage.clear();
 	featuretarget = "Select...";
 
-	std::ifstream ifs(g_pOrbiter->Cfg()->ConfigPath("CSphere/bkgimage"));
+	std::ifstream ifs(CockpitConfigPath("CSphere/bkgimage"));
 	if (ifs) {
 		char* c;
 		char cbuf[256];
@@ -42,7 +64,7 @@ DlgOptions::DlgOptions(): ImGuiDialog(ICON_FA_LIST_CHECK " Orbiter: Options", {6
 				c = strtok(NULL, "\n");
 				std::string path(c);
 				m_pathStarmap.push_back(std::make_pair(label, path));
-				if(path == g_pOrbiter->Cfg()->CfgVisualPrm.StarImagePath) {
+				if(path == CockpitConfiguration()->CfgVisualPrm.StarImagePath) {
 					currentstarmap = label;
 				}
 			}
@@ -66,14 +88,14 @@ DlgOptions::DlgOptions(): ImGuiDialog(ICON_FA_LIST_CHECK " Orbiter: Options", {6
 				c = strtok(NULL, "\n");
 				std::string path(c);
 				m_pathBgImage.push_back(std::make_pair(label, path));
-				if(path == g_pOrbiter->Cfg()->CfgVisualPrm.CSphereBgPath) {
+				if(path == CockpitConfiguration()->CfgVisualPrm.CSphereBgPath) {
 					currentbgimage = label;
 				}
 			}
 		}
 	}
-	std::ifstream fcfg(g_pOrbiter->Cfg()->ConfigPath(g_psys->Name().c_str()));
-	g_psys->ScanLabelLists(fcfg);
+	std::ifstream fcfg(CockpitConfigPath(CockpitWorld()->Name().c_str()));
+	CockpitWorld()->ScanLabelLists(fcfg);
 }
 
 void DlgOptions::OnDraw()
@@ -109,16 +131,16 @@ void DlgOptions::OnDraw()
 
 void DlgOptions::DrawInstrument()
 {
-	CFG_INSTRUMENTPRM &instru = g_pOrbiter->Cfg()->CfgInstrumentPrm;
-	CFG_LOGICPRM &logic = g_pOrbiter->Cfg()->CfgLogicPrm;
+	CFG_INSTRUMENTPRM &instru = CockpitConfiguration()->CfgInstrumentPrm;
+	CFG_LOGICPRM &logic = CockpitConfiguration()->CfgLogicPrm;
 	
 	ImGui::SeparatorText("Multi-functional displays");
 	if(ImGui::InputDoubleEx("MFD refresh interval [s]", &logic.InstrUpdDT, 0.01, 2.0, 0.1, 0.5, "%.1f"))
-		g_pOrbiter->OnOptionChanged(OPTCAT_INSTRUMENT, OPTITEM_INSTRUMENT_MFDUPDATEINTERVAL);
+		OptionsChanged(OPTCAT_INSTRUMENT, OPTITEM_INSTRUMENT_MFDUPDATEINTERVAL);
 	if(ImGui::InputIntEx("Glass cockpit MFD size", &logic.MFDSize, 1, 10))
-		g_pOrbiter->OnOptionChanged(OPTCAT_INSTRUMENT, OPTITEM_INSTRUMENT_MFDGENERICSIZE);
+		OptionsChanged(OPTCAT_INSTRUMENT, OPTITEM_INSTRUMENT_MFDGENERICSIZE);
 	if(ImGui::Checkbox("Transparent glass cockpit MFD", &logic.bMfdTransparent))
-		g_pOrbiter->OnOptionChanged(OPTCAT_INSTRUMENT, OPTITEM_INSTRUMENT_MFDGENERICTRANSP);
+		OptionsChanged(OPTCAT_INSTRUMENT, OPTITEM_INSTRUMENT_MFDGENERICTRANSP);
 
 	char preview[64];
 	sprintf(preview, "%dx%d", instru.VCMFDSize, instru.VCMFDSize);
@@ -128,24 +150,24 @@ void DlgOptions::DrawInstrument()
 		changed |= ImGui::RadioButton("512x512", &instru.VCMFDSize, 512);
 		changed |= ImGui::RadioButton("1024x1024", &instru.VCMFDSize, 1024);
 		if(changed)
-			g_pOrbiter->OnOptionChanged(OPTCAT_INSTRUMENT, OPTITEM_INSTRUMENT_MFDVCSIZE);
+			OptionsChanged(OPTCAT_INSTRUMENT, OPTITEM_INSTRUMENT_MFDVCSIZE);
 		ImGui::EndAnimatedCombo();
 	}
 	ImGui::SeparatorText("Instrument panels");
 	if(ImGui::InputDoubleEx("Panel scroll speed", &logic.PanelScrollSpeed, -100.0, 100.0, 1.0, 15.0, "%.0f"))
-		g_pOrbiter->OnOptionChanged(OPTCAT_INSTRUMENT, OPTITEM_INSTRUMENT_PANELSCROLLSPEED);
+		OptionsChanged(OPTCAT_INSTRUMENT, OPTITEM_INSTRUMENT_PANELSCROLLSPEED);
 	if(ImGui::InputDoubleEx("2D panel scale", &logic.PanelScale, 0.25, 4.0, 0.1, 1.0, "%.2f"))
-		g_pOrbiter->OnOptionChanged(OPTCAT_INSTRUMENT, OPTITEM_INSTRUMENT_PANELSCALE);
+		OptionsChanged(OPTCAT_INSTRUMENT, OPTITEM_INSTRUMENT_PANELSCALE);
 
 }
 void DlgOptions::DrawVessel()
 {
-	CFG_LOGICPRM &logic = g_pOrbiter->Cfg()->CfgLogicPrm;
+	CFG_LOGICPRM &logic = CockpitConfiguration()->CfgLogicPrm;
 	ImGui::SeparatorText("Vessel settings");
 	if(ImGui::Checkbox("Limited fuel", &logic.bLimitedFuel))
-		g_pOrbiter->OnOptionChanged(OPTCAT_VESSEL, OPTITEM_VESSEL_LIMITEDFUEL);
+		OptionsChanged(OPTCAT_VESSEL, OPTITEM_VESSEL_LIMITEDFUEL);
 	if(ImGui::Checkbox("Auto-refuel on pad", &logic.bPadRefuel))
-		g_pOrbiter->OnOptionChanged(OPTCAT_VESSEL, OPTITEM_VESSEL_PADREFUEL);
+		OptionsChanged(OPTCAT_VESSEL, OPTITEM_VESSEL_PADREFUEL);
 	const char *fmodels[] = {	"Simple", "Realistic" };
 	ImGui::SliderEnum("Flight model", &logic.FlightModelLevel, fmodels, 2);
 
@@ -155,17 +177,18 @@ void DlgOptions::DrawVessel()
 void DlgOptions::DrawUI()
 {
 	ImGui::SeparatorText("Mouse focus behavior");
-	ImGui::RadioButton("Focus requires click", &g_pOrbiter->Cfg()->CfgUIPrm.MouseFocusMode, 0);
-	ImGui::RadioButton("Hybrid: Click required only for child windows", &g_pOrbiter->Cfg()->CfgUIPrm.MouseFocusMode, 1);
-	ImGui::RadioButton("Focus follows mouse", &g_pOrbiter->Cfg()->CfgUIPrm.MouseFocusMode, 2);
+	ImGui::RadioButton("Focus requires click", &CockpitConfiguration()->CfgUIPrm.MouseFocusMode, 0);
+	ImGui::RadioButton("Hybrid: Click required only for child windows", &CockpitConfiguration()->CfgUIPrm.MouseFocusMode, 1);
+	ImGui::RadioButton("Focus follows mouse", &CockpitConfiguration()->CfgUIPrm.MouseFocusMode, 2);
 }
 void DlgOptions::DrawJoystick()
 {
 	ImGui::SeparatorText("Joystick device");
+#ifdef _WIN32
 	DWORD ndev;
 	DIDEVICEINSTANCE* joylist;
 	g_pOrbiter->GetDInput()->GetJoysticks(&joylist, &ndev);
-	DWORD &jidx = g_pOrbiter->Cfg()->CfgJoystickPrm.Joy_idx;
+	DWORD &jidx = CockpitConfiguration()->CfgJoystickPrm.Joy_idx;
 
 	const char *preview = "<Disabled>";
 	if(jidx > 0 && jidx <= ndev) {
@@ -184,7 +207,7 @@ void DlgOptions::DrawJoystick()
 			selected = jidx == (i+1);
 			if(ImGui::Selectable(joylist[i].tszProductName, &selected)) {
 				jidx = i + 1;
-				g_pOrbiter->OnOptionChanged(OPTCAT_JOYSTICK, OPTITEM_JOYSTICK_DEVICE);
+				OptionsChanged(OPTCAT_JOYSTICK, OPTITEM_JOYSTICK_DEVICE);
 			}
 			if (selected) {
 				ImGui::SetItemDefaultFocus();
@@ -195,7 +218,7 @@ void DlgOptions::DrawJoystick()
 
 	ImGui::BeginDisabled(jidx == 0);
 		ImGui::SeparatorText("Main engine control");
-		DWORD &thaxis = g_pOrbiter->Cfg()->CfgJoystickPrm.ThrottleAxis;
+		DWORD &thaxis = CockpitConfiguration()->CfgJoystickPrm.ThrottleAxis;
 
 		const char* axis[] = { "<Keyboard only>", "Z-axis", "Slider 0", "Slider 1" };
 		preview = axis[thaxis];
@@ -205,7 +228,7 @@ void DlgOptions::DrawJoystick()
 				const bool is_selected = (thaxis == n);
 				if (ImGui::Selectable(axis[n], is_selected)) {
 					thaxis = n;
-					g_pOrbiter->OnOptionChanged(OPTCAT_JOYSTICK, OPTITEM_JOYSTICK_PARAM);
+					OptionsChanged(OPTCAT_JOYSTICK, OPTITEM_JOYSTICK_PARAM);
 				}
 
 				if (is_selected)
@@ -213,25 +236,72 @@ void DlgOptions::DrawJoystick()
 			}
 			ImGui::EndAnimatedCombo();
 		}
-		ImGui::Checkbox("Ignore throttle setting on launch", &g_pOrbiter->Cfg()->CfgJoystickPrm.bThrottleIgnore);
+#else
+    auto& prm=CockpitConfiguration()->CfgJoystickPrm;
+    auto& render=GetNativeRenderContext();
+    const auto devices=render.graphics->Joysticks();
+    const char* preview="<Disabled>";
+    int axisCount=0;
+    for(const auto& device:devices)if(device.index==prm.Joy_idx) {
+        preview=device.name.c_str();axisCount=device.axes;
+    }
+    if(prm.Joy_idx && !axisCount)preview="<Disconnected>";
+    if(ImGui::BeginAnimatedCombo("##joydev",preview)) {
+        if(ImGui::Selectable("<Disabled>",prm.Joy_idx==0))prm.Joy_idx=0;
+        for(const auto& device:devices) {
+            ImGui::PushID(int(device.index));
+            if(ImGui::Selectable(device.name.c_str(),device.index==prm.Joy_idx))prm.Joy_idx=device.index;
+            ImGui::PopID();
+        }
+        ImGui::EndAnimatedCombo();
+    }
+    ImGui::BeginDisabled(prm.Joy_idx==0);
+        ImGui::SeparatorText("Main engine control");
+        const int selected=NativeThrottleAxis(prm.ThrottleAxis,render.joystickThrottleAxis);
+        std::string axisName=selected<0 ? "<Keyboard only>" : "Axis "+std::to_string(selected+1);
+        if(ImGui::BeginAnimatedCombo("##joythaxis",axisName.c_str())) {
+            if(ImGui::Selectable("<Keyboard only>",selected<0)) {
+                render.joystickThrottleAxis=-1;prm.ThrottleAxis=0;
+            }
+            for(int axis=0;axis<axisCount;++axis) {
+                std::string name="Axis "+std::to_string(axis+1);
+                if(ImGui::Selectable(name.c_str(),selected==axis)) {
+                    render.joystickThrottleAxis=axis;prm.ThrottleAxis=1;
+                }
+            }
+            ImGui::EndAnimatedCombo();
+        }
+        // GLFW exposes ordered raw axes, not DirectInput Z/slider identities.
+        // Use the actual device axes for both throttle and rudder assignment.
+        std::string rudderName=render.joystickTwistAxis<0 ? "<Disabled>" : "Axis "+std::to_string(render.joystickTwistAxis+1);
+        if(ImGui::BeginAnimatedCombo("Rudder axis",rudderName.c_str())) {
+            if(ImGui::Selectable("<Disabled>",render.joystickTwistAxis<0))render.joystickTwistAxis=-1;
+            for(int axis=0;axis<axisCount;++axis) {
+                std::string name="Axis "+std::to_string(axis+1);
+                if(ImGui::Selectable(name.c_str(),render.joystickTwistAxis==axis))render.joystickTwistAxis=axis;
+            }
+            ImGui::EndAnimatedCombo();
+        }
+#endif
+		ImGui::Checkbox("Ignore throttle setting on launch", &CockpitConfiguration()->CfgJoystickPrm.bThrottleIgnore);
 
 		ImGui::SeparatorText("Calibration");
-		if(ImGui::SliderInt("Saturation", &g_pOrbiter->Cfg()->CfgJoystickPrm.ThrottleSaturation, 0, 10000))
-			g_pOrbiter->OnOptionChanged(OPTCAT_JOYSTICK, OPTITEM_JOYSTICK_PARAM);
-		if(ImGui::SliderInt("Deadzone", &g_pOrbiter->Cfg()->CfgJoystickPrm.Deadzone, 0, 10000))
-			g_pOrbiter->OnOptionChanged(OPTCAT_JOYSTICK, OPTITEM_JOYSTICK_PARAM);
+		if(ImGui::SliderInt("Saturation", &CockpitConfiguration()->CfgJoystickPrm.ThrottleSaturation, 0, 10000))
+			OptionsChanged(OPTCAT_JOYSTICK, OPTITEM_JOYSTICK_PARAM);
+		if(ImGui::SliderInt("Deadzone", &CockpitConfiguration()->CfgJoystickPrm.Deadzone, 0, 10000))
+			OptionsChanged(OPTCAT_JOYSTICK, OPTITEM_JOYSTICK_PARAM);
 
 	ImGui::EndDisabled();
 }
 void DlgOptions::DrawCelSphere()
 {
-	bool &bUseStarDots = g_pOrbiter->Cfg()->CfgVisualPrm.bUseStarDots;
+	bool &bUseStarDots = CockpitConfiguration()->CfgVisualPrm.bUseStarDots;
 	ImGui::SeparatorText("Celestial sphere");
 	if(ImGui::Checkbox("Background stars: show as pixels", &bUseStarDots))
-		g_pOrbiter->OnOptionChanged(OPTCAT_CELSPHERE, OPTITEM_CELSPHERE_ACTIVATESTARDOTS);
+		OptionsChanged(OPTCAT_CELSPHERE, OPTITEM_CELSPHERE_ACTIVATESTARDOTS);
 
 	ImGui::BeginDisabled(!bUseStarDots);
-		StarRenderPrm& prm =  g_pOrbiter->Cfg()->CfgVisualPrm.StarPrm;
+		StarRenderPrm& prm =  CockpitConfiguration()->CfgVisualPrm.StarPrm;
 		bool changed = false;
 		if(ImGui::SliderDouble("Max magnitude threshold", &prm.mag_hi, -2.0, 14.99, "%0.1f")) {
 			changed = true;
@@ -246,44 +316,44 @@ void DlgOptions::DrawCelSphere()
 		changed |= ImGui::SliderDouble("Min brightness", &prm.brt_min, 0.01, 1.0, "%0.2f");
 
 		if(changed)
-			g_pOrbiter->OnOptionChanged(OPTCAT_CELSPHERE, OPTITEM_CELSPHERE_STARDISPLAYPARAM);
+			OptionsChanged(OPTCAT_CELSPHERE, OPTITEM_CELSPHERE_STARDISPLAYPARAM);
 
 	ImGui::EndDisabled();
 
-	bool &bUseStarImage = g_pOrbiter->Cfg()->CfgVisualPrm.bUseStarImage;
+	bool &bUseStarImage = CockpitConfiguration()->CfgVisualPrm.bUseStarImage;
 	if(ImGui::Checkbox("Background stars: show as image", &bUseStarImage))
-		g_pOrbiter->OnOptionChanged(OPTCAT_CELSPHERE, OPTITEM_CELSPHERE_ACTIVATESTARIMAGE);
+		OptionsChanged(OPTCAT_CELSPHERE, OPTITEM_CELSPHERE_ACTIVATESTARIMAGE);
 
 	ImGui::BeginDisabled(!bUseStarImage);
 		if(ImGui::BeginAnimatedCombo("##celstarmap", currentstarmap.c_str())) {
 			for(const auto &starmap: m_pathStarmap) {
-				if(ImGui::Selectable(starmap.first.c_str(), starmap.second == g_pOrbiter->Cfg()->CfgVisualPrm.StarImagePath)) {
-					strcpy(g_pOrbiter->Cfg()->CfgVisualPrm.StarImagePath, starmap.second.c_str());
+				if(ImGui::Selectable(starmap.first.c_str(), starmap.second == CockpitConfiguration()->CfgVisualPrm.StarImagePath)) {
+					strcpy(CockpitConfiguration()->CfgVisualPrm.StarImagePath, starmap.second.c_str());
 					currentstarmap = starmap.second;
-					g_pOrbiter->OnOptionChanged(OPTCAT_CELSPHERE, OPTITEM_CELSPHERE_STARIMAGECHANGED);
+					OptionsChanged(OPTCAT_CELSPHERE, OPTITEM_CELSPHERE_STARIMAGECHANGED);
 				}
 			}
 			ImGui::EndAnimatedCombo();
 		}
 	ImGui::EndDisabled();
 
-	bool &bUseBgImage = g_pOrbiter->Cfg()->CfgVisualPrm.bUseBgImage;
+	bool &bUseBgImage = CockpitConfiguration()->CfgVisualPrm.bUseBgImage;
 	if(ImGui::Checkbox("Background map", &bUseBgImage))
-		g_pOrbiter->OnOptionChanged(OPTCAT_CELSPHERE, OPTITEM_CELSPHERE_ACTIVATEBGIMAGE);
+		OptionsChanged(OPTCAT_CELSPHERE, OPTITEM_CELSPHERE_ACTIVATEBGIMAGE);
 
 	ImGui::BeginDisabled(!bUseBgImage);
 		if(ImGui::BeginAnimatedCombo("##celbgimage", currentbgimage.c_str())) {
 			for(const auto &bgimage: m_pathBgImage) {
-				if(ImGui::Selectable(bgimage.first.c_str(), bgimage.second == g_pOrbiter->Cfg()->CfgVisualPrm.CSphereBgPath)) {
-					strcpy(g_pOrbiter->Cfg()->CfgVisualPrm.CSphereBgPath, bgimage.second.c_str());
+				if(ImGui::Selectable(bgimage.first.c_str(), bgimage.second == CockpitConfiguration()->CfgVisualPrm.CSphereBgPath)) {
+					strcpy(CockpitConfiguration()->CfgVisualPrm.CSphereBgPath, bgimage.second.c_str());
 					currentbgimage = bgimage.first;
-					g_pOrbiter->OnOptionChanged(OPTCAT_CELSPHERE, OPTITEM_CELSPHERE_BGIMAGECHANGED);
+					OptionsChanged(OPTCAT_CELSPHERE, OPTITEM_CELSPHERE_BGIMAGECHANGED);
 				}
 			}
 			ImGui::EndAnimatedCombo();
 		}
-		if(ImGui::SliderDouble("Brightness", &g_pOrbiter->Cfg()->CfgVisualPrm.CSphereBgIntens, 0.01, 1.0, "%.2f")) {
-			g_pOrbiter->OnOptionChanged(OPTCAT_CELSPHERE, OPTITEM_CELSPHERE_BGIMAGEBRIGHTNESS);
+		if(ImGui::SliderDouble("Brightness", &CockpitConfiguration()->CfgVisualPrm.CSphereBgIntens, 0.01, 1.0, "%.2f")) {
+			OptionsChanged(OPTCAT_CELSPHERE, OPTITEM_CELSPHERE_BGIMAGEBRIGHTNESS);
 		}
 
 	ImGui::EndDisabled();
@@ -296,7 +366,7 @@ void DlgOptions::DrawVisHelper()
 	ImGui::Text("sphere, labels for planetary surface features, as weel as coordinate");
 	ImGui::Text("axis and force vectors");
 
-	CFG_VISHELPPRM &prm = g_pOrbiter->Cfg()->CfgVisHelpPrm;
+	CFG_VISHELPPRM &prm = CockpitConfiguration()->CfgVisHelpPrm;
 	ImGui::CheckboxFlags("Planetarium mode (F9)",          &prm.flagPlanetarium, PLN_ENABLE);
 	ImGui::CheckboxFlags("Surface/object labels (Alt-F9)", &prm.flagMarkers,     MKR_ENABLE);
 	ImGui::CheckboxFlags("Body force vectors",             &prm.flagBodyForce,   BFV_ENABLE);
@@ -305,7 +375,7 @@ void DlgOptions::DrawVisHelper()
 void DlgOptions::DrawPlanetarium()
 {
 	bool changed = false;
-	CFG_VISHELPPRM &prm = g_pOrbiter->Cfg()->CfgVisHelpPrm;
+	CFG_VISHELPPRM &prm = CockpitConfiguration()->CfgVisHelpPrm;
 	changed |= ImGui::CheckboxFlags("Planetarium mode (F9)", &prm.flagPlanetarium, PLN_ENABLE);
 
 	ImGui::BeginDisabled(!(prm.flagPlanetarium & PLN_ENABLE));
@@ -332,7 +402,7 @@ void DlgOptions::DrawPlanetarium()
 
 			changed |= ImGui::CheckboxFlags("Show markers", &prm.flagPlanetarium, PLN_CCMARK);
 		
-			std::vector<oapi::GraphicsClient::LABELLIST> &list = g_psys->LabelList();
+			auto &list = CockpitWorld()->LabelList();
 			ImGui::BeginDisabled(!(prm.flagPlanetarium & PLN_CCMARK));
 				bool lblchanged = false;
 				for(auto &lbl: list) {
@@ -340,14 +410,14 @@ void DlgOptions::DrawPlanetarium()
 				}
 
 				if(lblchanged) {
-					std::ifstream fcfg(g_pOrbiter->Cfg()->ConfigPath(g_psys->Name().c_str()));
-					g_psys->ScanLabelLists(fcfg);
+					std::ifstream fcfg(CockpitConfigPath(CockpitWorld()->Name().c_str()));
+					CockpitWorld()->ScanLabelLists(fcfg);
 				}
 			ImGui::EndDisabled();
 		ImGui::EndChild();
 	ImGui::EndDisabled();
 	if(changed)
-		g_pOrbiter->OnOptionChanged(OPTCAT_PLANETARIUM, OPTITEM_PLANETARIUM_DISPFLAG);
+		OptionsChanged(OPTCAT_PLANETARIUM, OPTITEM_PLANETARIUM_DISPFLAG);
 }
 
 
@@ -385,7 +455,7 @@ void DlgOptions::AddCbodyNode(const CelestialBody *cbody) {
 void DlgOptions::DrawLabels()
 {
 	bool changed = false;
-	CFG_VISHELPPRM &prm = g_pOrbiter->Cfg()->CfgVisHelpPrm;
+	CFG_VISHELPPRM &prm = CockpitConfiguration()->CfgVisHelpPrm;
 	changed |= ImGui::CheckboxFlags("Surface and object labels (Alt-F9)", &prm.flagMarkers, MKR_ENABLE);
 
 	ImGui::BeginDisabled(!(prm.flagMarkers & MKR_ENABLE));
@@ -403,28 +473,28 @@ void DlgOptions::DrawLabels()
 			changed |= ImGui::CheckboxFlags("Features", &prm.flagMarkers, MKR_LMARK);
 			ImGui::BeginDisabled(!(prm.flagMarkers & MKR_LMARK));
 				if(ImGui::BeginAnimatedCombo("##featuretarget", featuretarget.c_str(), ImGuiComboFlags_HeightLarge)) {
-					for (int i = 0; i < g_psys->nStar(); i++)
-						AddCbodyNode (g_psys->GetStar(i));
+					for (int i = 0; i < CockpitWorld()->nStar(); i++)
+						AddCbodyNode (CockpitWorld()->GetStar(i));
 
 					ImGui::EndAnimatedCombo();
 				}
 
-				Planet* planet = g_psys->GetPlanet(featuretarget.c_str(), true);
+				Planet* planet = CockpitWorld()->GetPlanet(featuretarget.c_str(), true);
 				if (planet) {
 					ImGui::BeginChild("##labels", ImVec2(0,0), ImGuiChildFlags_Borders);
 					if (planet->LabelFormat() < 2) {
 						int nlist;
-						oapi::GraphicsClient::LABELLIST* list = planet->LabelList(&nlist);
+						auto* list = planet->LabelList(&nlist);
 						for(int i = 0; i < nlist; i++) {
 							if(ImGui::Selectable(list[i].name.c_str(), &list[i].active)) {
-								std::ifstream fcfg(g_pOrbiter->Cfg()->ConfigPath(planet->Name()));
+								std::ifstream fcfg(CockpitConfigPath(planet->Name()));
 								planet->ScanLabelLists(fcfg);
 							}
 						}
 					} else {
 						int nlabel = planet->NumLabelLegend();
 						if (nlabel) {
-							const oapi::GraphicsClient::LABELTYPE* lspec = planet->LabelLegend();
+							const auto* lspec = planet->LabelLegend();
 							for (int i = 0; i < nlabel; i++) {
 								if(ImGui::Selectable(lspec[i].name, lspec[i].active)) {
 									planet->SetLabelActive(i, !lspec[i].active);
@@ -439,14 +509,14 @@ void DlgOptions::DrawLabels()
 	ImGui::EndDisabled();
 
 	if(changed) {
-		if (g_psys) {
-			g_psys->ActivatePlanetLabels(prm.flagMarkers & MKR_ENABLE && prm.flagMarkers & MKR_LMARK);
+		if (CockpitWorld()) {
+			CockpitWorld()->ActivatePlanetLabels(prm.flagMarkers & MKR_ENABLE && prm.flagMarkers & MKR_LMARK);
 		}
 	}
 }
 void DlgOptions::DrawForces()
 {
-	CFG_VISHELPPRM &prm = g_pOrbiter->Cfg()->CfgVisHelpPrm;
+	CFG_VISHELPPRM &prm = CockpitConfiguration()->CfgVisHelpPrm;
 	ImGui::CheckboxFlags("Body force vectors", &prm.flagBodyForce, BFV_ENABLE);
 
 	ImGui::BeginDisabled(!(prm.flagBodyForce & BFV_ENABLE));
@@ -483,7 +553,7 @@ void DlgOptions::DrawForces()
 }
 void DlgOptions::DrawAxes()
 {
-	CFG_VISHELPPRM &prm = g_pOrbiter->Cfg()->CfgVisHelpPrm;
+	CFG_VISHELPPRM &prm = CockpitConfiguration()->CfgVisHelpPrm;
 	ImGui::CheckboxFlags("Object frame axis", &prm.flagFrameAxes, FAV_ENABLE);
 
 	ImGui::BeginDisabled(!(prm.flagFrameAxes & FAV_ENABLE));

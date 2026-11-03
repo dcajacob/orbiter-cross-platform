@@ -13,7 +13,12 @@
 #ifndef __DLGOPTIONS_H
 #define __DLGOPTIONS_H
 
+#ifdef _WIN32
 #include "OrbiterAPI.h"
+#else
+#include "NativeVesselAPI.h"
+#endif
+#include <vector>
 #include <string>
 
 class CelestialBody;

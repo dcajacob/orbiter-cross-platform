@@ -70,6 +70,8 @@ class Driver final : public oapi::Module {
             mouse(x, y, 0);
         } else if (action.event == "focus_dialog") {
             require(observeFocus && oapiSimulateBufferedKey(OAPI_KEY_F3), "Original F3 dispatch failed");
+        } else if (action.event == "options_dialog") {
+            require(observeFocus && oapiSimulateBufferedKey(OAPI_KEY_F6), "Original F6 dispatch failed");
         } else {
             require(false, "Unknown UI reference action");
         }
