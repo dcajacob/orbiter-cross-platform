@@ -1,0 +1,624 @@
+{
+  "schema": 1,
+  "status": "passed",
+  "scope": "Original DG/DG-S 1280x720 2D panel panning and seven mechanism mouse controls; complete Phase 6 remains in progress",
+  "source_worktree_base": "ec41653af0eee7003e0d8569428c5150d17c6a4c",
+  "sources_sha256": {
+    "Src/Orbiter/Panel2D.h": "bd41a6acd727e4f237de76dddd92808eea8c3c77a4384702b21fc3c26342d1b6",
+    "Src/Orbiter/Production/CockpitPanelInput.inc": "999bbec8974b8933abd4f391ade22de531b50500aa1349bec1acea670556bfa3",
+    "Src/Orbiter/Production/NativeApplication.cpp": "209164cf158c03f73b44317df9353680129716fcc7d0a5f9cf5c02126f49d8ec",
+    "Src/Orbiter/Production/NativeCockpitGui.cpp": "e1d9ca77108a876d847f878a8b5d78c78afdd7d7caf9dbc89c6f806da4b69318",
+    "Src/Orbiter/Production/NativeCockpitUi.h": "15a38caf0fd70d084fb3e7056ec5a6d01a19edb74db725f2c5e5d9392f4dbaf1",
+    "Src/Orbiter/Production/CMakeLists.txt": "147e617790b8e73133d903ebe0c045c6d8f66bbb5369f981da1054f72fa70926",
+    "Tests/Production/CockpitControls/mouse_smoke.py": "d586332862d0964ec77e37639f7d67e87c1b21a47c26aaf1502eb40a7a06fbd1",
+    "Tests/Production/DeltaGlider/window_panel.py": "e6d957ba687e35b50eea96af543e617371e97408ecc6859f0fa3b10878241895",
+    "Tests/Production/flight_source.py": "eb8496fc67586e3a9c624a88911049fa78a9645c52d3b212e195630c8cdb6e5e",
+    "Tests/Production/cockpit_source.py": "5ea4b496c3d67e86714ba9d9586f30abbb0aa6c12879f193d1a2eaf416b1261c",
+    "Tests/Production/Flight/keymap-dg-laptop.cfg": "17fc05bfbc339f72676725327407a922c85570e387fc45198f2cbab9bd463457",
+    ".github/workflows/native-production-client.yml": "534af75fe5d61cc19381705d85f471e2eee88d8f2eded48902e4ec9c46648757"
+  },
+  "original_key_source": {
+    "commit": "889360f0516001d3261c1cce471229995c4f6c9b",
+    "file": "Src/Orbiter/Orbiter.cpp",
+    "method": "Orbiter::KbdInputImmediate_System",
+    "extraction": "Src/Orbiter/Production/CockpitPanelInput.inc",
+    "conservation": "Exact original four key checks, directions and order; original Pane/Panel2D algorithms and Windows SDK layouts conserved"
+  },
+  "negative_baseline": {
+    "output": "out/phase6-panel-panning-negative",
+    "report_sha256": "8a55d0535acc51ac9b9e4b2cdd009bd6f01718d90c68adf37c827a6e88ed9ae0",
+    "held_down_samples": 918,
+    "unchanged_panel_origin_y": 338
+  },
+  "normal_profiles": {
+    "automatic-debug": {
+      "controls_dg_panel": {
+        "output": "out/phase6-panel-native-profiles/automatic-debug/controls_dg_panel",
+        "report_sha256": "3463472eded3e80bd6bb35e44724779e0a41fad25e99d5b10d6dc6bb1bafb0e4",
+        "panel_report_sha256": "279119d6e7fb643a32ab4a50c3189265b91b76a04f4e6191af3299ef3e480b73",
+        "invocation_sha256": "9bc1a0f5d25dd57fb847c177231ec8931e394aabc2af786244b9303b0cbf5518",
+        "engine_sha256": "362b19315ad1de61dd1de727ce56f0ec5d58f19e1a0d5c95cee668745b0035e2",
+        "engine_library_sha256": "d11d712d2b050a682020f6a045d94f53e923f743ae4f61d22941c53c94d53f44",
+        "renderer_module_sha256": "3e71ab3f31dd632ec4af531a9e3aec9e4419e74b560abe1712d2380bdb93f0b2",
+        "renderer": {
+          "vendor": "Intel",
+          "renderer": "Mesa Intel(R) Graphics (PTL)",
+          "version": "4.6 (Core Profile) Mesa 26.0.8-1ubuntu0.3",
+          "client_width": 1280,
+          "client_height": 720
+        },
+        "backend": "x11",
+        "lifecycle": {
+          "rendered_frames": 3045,
+          "successful_presents": 3045,
+          "context_deleted": true
+        },
+        "mechanism_click_pairs": 16,
+        "complete_saved_open_closed_stops": true,
+        "paused_panning": true,
+        "release_stops_panning": true,
+        "verified_focus_loss_stops_panning": true,
+        "focus_layout": {
+          "tick": "1351",
+          "mode": "2",
+          "panel_id": "0",
+          "scale": "1",
+          "x": "0",
+          "y": "368"
+        },
+        "focus_transfer": {
+          "destination": 35651585,
+          "held_input_tick": 1549,
+          "released_input_tick": 1565
+        },
+        "isolated_xlib_loaded": false,
+        "isolated_mesa_loaded": false
+      },
+      "controls_dgs_panel": {
+        "output": "out/phase6-panel-native-profiles/automatic-debug/controls_dgs_panel",
+        "report_sha256": "c5e352e3f795f3632a6ec789884b6eb3190d702967d76caa69ee2543e44dcf2e",
+        "panel_report_sha256": "4fe2c4069d56130639a5cd78c594a2d88cd5ebeb83dfb37bb61c5c7f17a562ca",
+        "invocation_sha256": "a2eb5883476cf052489982df1c8f57c0274f030b6c31aa70dc7d72a2dd71991d",
+        "engine_sha256": "362b19315ad1de61dd1de727ce56f0ec5d58f19e1a0d5c95cee668745b0035e2",
+        "engine_library_sha256": "d11d712d2b050a682020f6a045d94f53e923f743ae4f61d22941c53c94d53f44",
+        "renderer_module_sha256": "3e71ab3f31dd632ec4af531a9e3aec9e4419e74b560abe1712d2380bdb93f0b2",
+        "renderer": {
+          "vendor": "Intel",
+          "renderer": "Mesa Intel(R) Graphics (PTL)",
+          "version": "4.6 (Core Profile) Mesa 26.0.8-1ubuntu0.3",
+          "client_width": 1280,
+          "client_height": 720
+        },
+        "backend": "x11",
+        "lifecycle": {
+          "rendered_frames": 2987,
+          "successful_presents": 2987,
+          "context_deleted": true
+        },
+        "mechanism_click_pairs": 16,
+        "complete_saved_open_closed_stops": true,
+        "paused_panning": true,
+        "release_stops_panning": true,
+        "verified_focus_loss_stops_panning": true,
+        "focus_layout": {
+          "tick": "1321",
+          "mode": "2",
+          "panel_id": "0",
+          "scale": "1",
+          "x": "0",
+          "y": "368"
+        },
+        "focus_transfer": {
+          "destination": 35651585,
+          "held_input_tick": 1518,
+          "released_input_tick": 1534
+        },
+        "isolated_xlib_loaded": false,
+        "isolated_mesa_loaded": false
+      }
+    },
+    "automatic-release": {
+      "controls_dg_panel": {
+        "output": "out/phase6-panel-native-profiles/automatic-release/controls_dg_panel",
+        "report_sha256": "62fd4ca5394639e2ff758ef69265b972c19dba55ce118cc581f23cd0cf96c015",
+        "panel_report_sha256": "a8b159e117a02ef0956953d3ec6e020913b10850fdc1ee4b8f98a1674eafd498",
+        "invocation_sha256": "31bf8e9194af7581f6a394a604a465cecc1d2bb65b0addca52ac3694e589cce7",
+        "engine_sha256": "366977e08ebb0251b1607fd327fa32427d1c30a4f3754639d119bcb3023c8d65",
+        "engine_library_sha256": "f4ea7803b1f173c911d1d1cb82bd16f035ad7c9609ab316b427b62ce5a9f8024",
+        "renderer_module_sha256": "ebad84ea329fc691fc0cd437fba3ec898eb17475e3c212436aee5915ad9975a5",
+        "renderer": {
+          "vendor": "Intel",
+          "renderer": "Mesa Intel(R) Graphics (PTL)",
+          "version": "4.6 (Core Profile) Mesa 26.0.8-1ubuntu0.3",
+          "client_width": 1280,
+          "client_height": 720
+        },
+        "backend": "x11",
+        "lifecycle": {
+          "rendered_frames": 3048,
+          "successful_presents": 3048,
+          "context_deleted": true
+        },
+        "mechanism_click_pairs": 16,
+        "complete_saved_open_closed_stops": true,
+        "paused_panning": true,
+        "release_stops_panning": true,
+        "verified_focus_loss_stops_panning": true,
+        "focus_layout": {
+          "tick": "1350",
+          "mode": "2",
+          "panel_id": "0",
+          "scale": "1",
+          "x": "0",
+          "y": "368"
+        },
+        "focus_transfer": {
+          "destination": 35651585,
+          "held_input_tick": 1549,
+          "released_input_tick": 1565
+        },
+        "isolated_xlib_loaded": false,
+        "isolated_mesa_loaded": false
+      },
+      "controls_dgs_panel": {
+        "output": "out/phase6-panel-native-profiles/automatic-release/controls_dgs_panel",
+        "report_sha256": "27f4530dee250bcd671f6a5a5cc42c2404a3a7d5a6d90216aa13eea3914d2edc",
+        "panel_report_sha256": "76b1221c3d8e68ed9bed4278f20fd07bfaf2f27248cb06816e6742962993f9c6",
+        "invocation_sha256": "232589114f4a6df21f656b1c4f155bb3086bdaf302ca3e0f775f7b05960f108d",
+        "engine_sha256": "366977e08ebb0251b1607fd327fa32427d1c30a4f3754639d119bcb3023c8d65",
+        "engine_library_sha256": "f4ea7803b1f173c911d1d1cb82bd16f035ad7c9609ab316b427b62ce5a9f8024",
+        "renderer_module_sha256": "ebad84ea329fc691fc0cd437fba3ec898eb17475e3c212436aee5915ad9975a5",
+        "renderer": {
+          "vendor": "Intel",
+          "renderer": "Mesa Intel(R) Graphics (PTL)",
+          "version": "4.6 (Core Profile) Mesa 26.0.8-1ubuntu0.3",
+          "client_width": 1280,
+          "client_height": 720
+        },
+        "backend": "x11",
+        "lifecycle": {
+          "rendered_frames": 3064,
+          "successful_presents": 3064,
+          "context_deleted": true
+        },
+        "mechanism_click_pairs": 16,
+        "complete_saved_open_closed_stops": true,
+        "paused_panning": true,
+        "release_stops_panning": true,
+        "verified_focus_loss_stops_panning": true,
+        "focus_layout": {
+          "tick": "1365",
+          "mode": "2",
+          "panel_id": "0",
+          "scale": "1",
+          "x": "0",
+          "y": "368"
+        },
+        "focus_transfer": {
+          "destination": 35651585,
+          "held_input_tick": 1565,
+          "released_input_tick": 1580
+        },
+        "isolated_xlib_loaded": false,
+        "isolated_mesa_loaded": false
+      }
+    },
+    "sse2-debug": {
+      "controls_dg_panel": {
+        "output": "out/phase6-panel-native-profiles/sse2-debug/controls_dg_panel",
+        "report_sha256": "5c40f55fbdfd3661037845893f78f6d5377ecea13ab41f888853663e67bc9504",
+        "panel_report_sha256": "5f9b84bfd55f93d62c022b9fda181961b8fd67bcd8b2bec9fb078e74a7d076f4",
+        "invocation_sha256": "6edfeaaede5dbd30d97a8d712bdb0523d98f2f900dc811a9e188c44e71e3e7fe",
+        "engine_sha256": "4fc105caefacbf465fc97a00557292d65497a19010d8ae4ebf897ba7ac75047c",
+        "engine_library_sha256": "d6727828b646877eceef8b565a20d04db2d06d9ece0074f1902554ee1a2dcf82",
+        "renderer_module_sha256": "9af9fe93077a0e8754e7fc7af8d0c3b4b119463869b48ddffaf88aa1db5bcb32",
+        "renderer": {
+          "vendor": "Intel",
+          "renderer": "Mesa Intel(R) Graphics (PTL)",
+          "version": "4.6 (Core Profile) Mesa 26.0.8-1ubuntu0.3",
+          "client_width": 1280,
+          "client_height": 720
+        },
+        "backend": "x11",
+        "lifecycle": {
+          "rendered_frames": 2956,
+          "successful_presents": 2956,
+          "context_deleted": true
+        },
+        "mechanism_click_pairs": 16,
+        "complete_saved_open_closed_stops": true,
+        "paused_panning": true,
+        "release_stops_panning": true,
+        "verified_focus_loss_stops_panning": true,
+        "focus_layout": {
+          "tick": "1365",
+          "mode": "2",
+          "panel_id": "0",
+          "scale": "1",
+          "x": "0",
+          "y": "373"
+        },
+        "focus_transfer": {
+          "destination": 35651585,
+          "held_input_tick": 1565,
+          "released_input_tick": 1580
+        },
+        "isolated_xlib_loaded": false,
+        "isolated_mesa_loaded": false
+      },
+      "controls_dgs_panel": {
+        "output": "out/phase6-panel-native-profiles/sse2-debug/controls_dgs_panel",
+        "report_sha256": "4f794e11b00a34c10f3aa2284d8a69aeb1cbe632420a2b8505e2784faeaa7853",
+        "panel_report_sha256": "52a94ebe894cd3990a3744f55a1de9a1d05f24a45e76b8f13be10106c464c9bc",
+        "invocation_sha256": "92aa83a9fcdbae137c7d51a9c23a13a4bb8ddedba557c2154220610d522607df",
+        "engine_sha256": "4fc105caefacbf465fc97a00557292d65497a19010d8ae4ebf897ba7ac75047c",
+        "engine_library_sha256": "d6727828b646877eceef8b565a20d04db2d06d9ece0074f1902554ee1a2dcf82",
+        "renderer_module_sha256": "9af9fe93077a0e8754e7fc7af8d0c3b4b119463869b48ddffaf88aa1db5bcb32",
+        "renderer": {
+          "vendor": "Intel",
+          "renderer": "Mesa Intel(R) Graphics (PTL)",
+          "version": "4.6 (Core Profile) Mesa 26.0.8-1ubuntu0.3",
+          "client_width": 1280,
+          "client_height": 720
+        },
+        "backend": "x11",
+        "lifecycle": {
+          "rendered_frames": 2942,
+          "successful_presents": 2942,
+          "context_deleted": true
+        },
+        "mechanism_click_pairs": 16,
+        "complete_saved_open_closed_stops": true,
+        "paused_panning": true,
+        "release_stops_panning": true,
+        "verified_focus_loss_stops_panning": true,
+        "focus_layout": {
+          "tick": "1335",
+          "mode": "2",
+          "panel_id": "0",
+          "scale": "1",
+          "x": "0",
+          "y": "368"
+        },
+        "focus_transfer": {
+          "destination": 35651585,
+          "held_input_tick": 1534,
+          "released_input_tick": 1549
+        },
+        "isolated_xlib_loaded": false,
+        "isolated_mesa_loaded": false
+      }
+    },
+    "sse2-release": {
+      "controls_dg_panel": {
+        "output": "out/phase6-panel-native-profiles/sse2-release/controls_dg_panel",
+        "report_sha256": "fc6286f8a4452e7ee72c7ab7df3cb67c5e990e8969c2fd699cfb817e3f3f1da3",
+        "panel_report_sha256": "176ed273cb3c55d204f5fba20f6eea35c26da4627451883520a705be08a0722d",
+        "invocation_sha256": "b18e7cd42f9030cbe5d79584379e1913613217600f462ba5f235b8b734f9e0eb",
+        "engine_sha256": "134e7841c8e05d32fe9b558abd2cb2174a37656e76981f596072222d351cfd96",
+        "engine_library_sha256": "91970e7e4de3578633889cb34860b503426db4b3898cfc9ef82f16b812242a9d",
+        "renderer_module_sha256": "8134137441ca1fcdceafb8a6d19cd47beb1c6152837fa8161e3414e73a6b98f3",
+        "renderer": {
+          "vendor": "Intel",
+          "renderer": "Mesa Intel(R) Graphics (PTL)",
+          "version": "4.6 (Core Profile) Mesa 26.0.8-1ubuntu0.3",
+          "client_width": 1280,
+          "client_height": 720
+        },
+        "backend": "x11",
+        "lifecycle": {
+          "rendered_frames": 3117,
+          "successful_presents": 3117,
+          "context_deleted": true
+        },
+        "mechanism_click_pairs": 16,
+        "complete_saved_open_closed_stops": true,
+        "paused_panning": true,
+        "release_stops_panning": true,
+        "verified_focus_loss_stops_panning": true,
+        "focus_layout": {
+          "tick": "1350",
+          "mode": "2",
+          "panel_id": "0",
+          "scale": "1",
+          "x": "0",
+          "y": "388"
+        },
+        "focus_transfer": {
+          "destination": 35651585,
+          "held_input_tick": 1549,
+          "released_input_tick": 1565
+        },
+        "isolated_xlib_loaded": false,
+        "isolated_mesa_loaded": false
+      },
+      "controls_dgs_panel": {
+        "output": "out/phase6-panel-native-profiles/sse2-release/controls_dgs_panel",
+        "report_sha256": "0949b9cc831ae6adaba060f8d74b19127e013d5c30247a8e126611e32b0f0d1e",
+        "panel_report_sha256": "0fe752bf22d3c26d321e1a57a6c6d0ff77eb7253c0cd374ecf49bc7c8665a8f8",
+        "invocation_sha256": "67ef5c27b3a0484063955337ef872563e3b17f2d6a03d53abffcb054f45c233c",
+        "engine_sha256": "134e7841c8e05d32fe9b558abd2cb2174a37656e76981f596072222d351cfd96",
+        "engine_library_sha256": "91970e7e4de3578633889cb34860b503426db4b3898cfc9ef82f16b812242a9d",
+        "renderer_module_sha256": "8134137441ca1fcdceafb8a6d19cd47beb1c6152837fa8161e3414e73a6b98f3",
+        "renderer": {
+          "vendor": "Intel",
+          "renderer": "Mesa Intel(R) Graphics (PTL)",
+          "version": "4.6 (Core Profile) Mesa 26.0.8-1ubuntu0.3",
+          "client_width": 1280,
+          "client_height": 720
+        },
+        "backend": "x11",
+        "lifecycle": {
+          "rendered_frames": 3125,
+          "successful_presents": 3125,
+          "context_deleted": true
+        },
+        "mechanism_click_pairs": 16,
+        "complete_saved_open_closed_stops": true,
+        "paused_panning": true,
+        "release_stops_panning": true,
+        "verified_focus_loss_stops_panning": true,
+        "focus_layout": {
+          "tick": "1350",
+          "mode": "2",
+          "panel_id": "0",
+          "scale": "1",
+          "x": "0",
+          "y": "368"
+        },
+        "focus_transfer": {
+          "destination": 35651585,
+          "held_input_tick": 1549,
+          "released_input_tick": 1565
+        },
+        "isolated_xlib_loaded": false,
+        "isolated_mesa_loaded": false
+      }
+    }
+  },
+  "sanitizers": {
+    "intel": {
+      "controls_dg_panel": {
+        "output": "out/phase6-panel-intel-sanitizers-final/controls_dg_panel",
+        "report_sha256": "b0b25c05a2cf347ea92e962007f9f1df3b7fe93346ce17c4279218d44189cfe4",
+        "panel_report_sha256": "d56491aced1735611fe6a7603cde513cef37ffaca36229cd7dc4b8cb1cb1e30d",
+        "invocation_sha256": "2707b19147a06426558e7429c704d3ab717bd5e8ec99d40d554e23669eab0def",
+        "engine_sha256": "84bf7be2c7b4dc50dbb3fc4682218e62108134cf82dbb878d9cb92d875a37e36",
+        "engine_library_sha256": "8426c789a0e2a18851f9e6ac27c6dc443472aa38a8960a54aa0147dc75dbc949",
+        "renderer_module_sha256": "f683f37192c84a76d45ba84582ba02fba595e51ae8a509c48d446c741b6bae3c",
+        "renderer": {
+          "vendor": "Intel",
+          "renderer": "Mesa Intel(R) Graphics (PTL)",
+          "version": "4.6 (Core Profile) Mesa 26.0.8-1ubuntu0.3",
+          "client_width": 1280,
+          "client_height": 720
+        },
+        "backend": "x11",
+        "lifecycle": {
+          "rendered_frames": 2933,
+          "successful_presents": 2933,
+          "context_deleted": true
+        },
+        "mechanism_click_pairs": 16,
+        "complete_saved_open_closed_stops": true,
+        "paused_panning": true,
+        "release_stops_panning": true,
+        "verified_focus_loss_stops_panning": true,
+        "focus_layout": {
+          "tick": "1365",
+          "mode": "2",
+          "panel_id": "0",
+          "scale": "1",
+          "x": "0",
+          "y": "363"
+        },
+        "focus_transfer": {
+          "destination": 35651585,
+          "held_input_tick": 1565,
+          "released_input_tick": 1580
+        },
+        "isolated_xlib_loaded": true,
+        "isolated_mesa_loaded": false
+      },
+      "controls_dgs_panel": {
+        "output": "out/phase6-panel-intel-sanitizers-final/controls_dgs_panel",
+        "report_sha256": "5280a40a6edccb813850815f1910ab9e8a44ec6257c24c099895bc1a30710a6e",
+        "panel_report_sha256": "dc81ca031f70ef34de1fd89fe97a227aff9047dda0d52f35cc862d94468da8c4",
+        "invocation_sha256": "52e2c2a8d25fc3cf5731500ca055ae7a8c3368c912638ee596415b13f1de86f5",
+        "engine_sha256": "84bf7be2c7b4dc50dbb3fc4682218e62108134cf82dbb878d9cb92d875a37e36",
+        "engine_library_sha256": "8426c789a0e2a18851f9e6ac27c6dc443472aa38a8960a54aa0147dc75dbc949",
+        "renderer_module_sha256": "f683f37192c84a76d45ba84582ba02fba595e51ae8a509c48d446c741b6bae3c",
+        "renderer": {
+          "vendor": "Intel",
+          "renderer": "Mesa Intel(R) Graphics (PTL)",
+          "version": "4.6 (Core Profile) Mesa 26.0.8-1ubuntu0.3",
+          "client_width": 1280,
+          "client_height": 720
+        },
+        "backend": "x11",
+        "lifecycle": {
+          "rendered_frames": 2781,
+          "successful_presents": 2781,
+          "context_deleted": true
+        },
+        "mechanism_click_pairs": 16,
+        "complete_saved_open_closed_stops": true,
+        "paused_panning": true,
+        "release_stops_panning": true,
+        "verified_focus_loss_stops_panning": true,
+        "focus_layout": {
+          "tick": "1364",
+          "mode": "2",
+          "panel_id": "0",
+          "scale": "1",
+          "x": "0",
+          "y": "368"
+        },
+        "focus_transfer": {
+          "destination": 35651585,
+          "held_input_tick": 1565,
+          "released_input_tick": 1580
+        },
+        "isolated_xlib_loaded": true,
+        "isolated_mesa_loaded": false
+      }
+    },
+    "software": {
+      "controls_dg_panel": {
+        "output": "out/phase6-panel-software-sanitizers-final/controls_dg_panel",
+        "report_sha256": "d7b5c18a7e28ddf30ce1a2e2195957dfc3b3ecbcb700a639c6312781043331b1",
+        "panel_report_sha256": "cd2e2522d6df5c8376398900e29f1154326a038d0c59321ce045a0ebf055cf83",
+        "invocation_sha256": "a88b8588046fe0ce89d998d0c8ee8d6e57212dba2cff65f18710c89b2ce74b76",
+        "engine_sha256": "84bf7be2c7b4dc50dbb3fc4682218e62108134cf82dbb878d9cb92d875a37e36",
+        "engine_library_sha256": "8426c789a0e2a18851f9e6ac27c6dc443472aa38a8960a54aa0147dc75dbc949",
+        "renderer_module_sha256": "f683f37192c84a76d45ba84582ba02fba595e51ae8a509c48d446c741b6bae3c",
+        "renderer": {
+          "vendor": "Mesa",
+          "renderer": "llvmpipe (LLVM 21.1.8, 256 bits)",
+          "version": "4.5 (Core Profile) Mesa 26.0.8",
+          "client_width": 1280,
+          "client_height": 720
+        },
+        "backend": "x11",
+        "lifecycle": {
+          "rendered_frames": 924,
+          "successful_presents": 924,
+          "context_deleted": true
+        },
+        "mechanism_click_pairs": 16,
+        "complete_saved_open_closed_stops": true,
+        "paused_panning": true,
+        "release_stops_panning": true,
+        "verified_focus_loss_stops_panning": true,
+        "focus_layout": {
+          "tick": "1398",
+          "mode": "2",
+          "panel_id": "0",
+          "scale": "1",
+          "x": "0",
+          "y": "368"
+        },
+        "focus_transfer": {
+          "destination": 2097153,
+          "held_input_tick": 1596,
+          "released_input_tick": 1611
+        },
+        "isolated_xlib_loaded": true,
+        "isolated_mesa_loaded": true
+      },
+      "controls_dgs_panel": {
+        "output": "out/phase6-panel-software-sanitizers-final/controls_dgs_panel",
+        "report_sha256": "c68254e588d29a8d61bcb3478513e56cf989869e2de19b087474dc157ddef098",
+        "panel_report_sha256": "b179bd7cd6e117740340f45f4eb3413f6636bac60753e4d5599db825c789d3dd",
+        "invocation_sha256": "c56cdf3a011b4696bf416371f2a20f1e647bd3cb11f43cdf51ecde3c42e496d3",
+        "engine_sha256": "84bf7be2c7b4dc50dbb3fc4682218e62108134cf82dbb878d9cb92d875a37e36",
+        "engine_library_sha256": "8426c789a0e2a18851f9e6ac27c6dc443472aa38a8960a54aa0147dc75dbc949",
+        "renderer_module_sha256": "f683f37192c84a76d45ba84582ba02fba595e51ae8a509c48d446c741b6bae3c",
+        "renderer": {
+          "vendor": "Mesa",
+          "renderer": "llvmpipe (LLVM 21.1.8, 256 bits)",
+          "version": "4.5 (Core Profile) Mesa 26.0.8",
+          "client_width": 1280,
+          "client_height": 720
+        },
+        "backend": "x11",
+        "lifecycle": {
+          "rendered_frames": 839,
+          "successful_presents": 839,
+          "context_deleted": true
+        },
+        "mechanism_click_pairs": 16,
+        "complete_saved_open_closed_stops": true,
+        "paused_panning": true,
+        "release_stops_panning": true,
+        "verified_focus_loss_stops_panning": true,
+        "focus_layout": {
+          "tick": "1382",
+          "mode": "2",
+          "panel_id": "0",
+          "scale": "1",
+          "x": "0",
+          "y": "368"
+        },
+        "focus_transfer": {
+          "destination": 2097153,
+          "held_input_tick": 1580,
+          "released_input_tick": 1596
+        },
+        "isolated_xlib_loaded": true,
+        "isolated_mesa_loaded": true
+      }
+    }
+  },
+  "sanitizer_options": {
+    "ASAN_OPTIONS": "detect_leaks=1:fast_unwind_on_malloc=0",
+    "LSAN_OPTIONS": "",
+    "UBSAN_OPTIONS": "halt_on_error=1:print_stacktrace=1",
+    "suppressions": false,
+    "system_libraries_changed": false
+  },
+  "regressions": {
+    "generic": {
+      "output": "out/phase6-panel-regression-generic",
+      "report_sha256": "6f8a351f3f37cd9ab45813c86a0a7d458f1b60f89235ff530f0703a3086ac8f1",
+      "lifecycle": {
+        "rendered_frames": 147,
+        "successful_presents": 147,
+        "context_deleted": true
+      }
+    },
+    "vc": {
+      "output": "out/phase6-panel-regression-vc",
+      "report_sha256": "a15eb49f6a7930d604b3d07533af06a8736163f47e29e881fb0ce5cb52050298",
+      "lifecycle": {
+        "rendered_frames": 705,
+        "successful_presents": 705,
+        "context_deleted": true
+      }
+    }
+  },
+  "frozen_controls": {
+    "output": "out/phase6-panel-frozen-controls",
+    "report_sha256": "b5bb225d934bed21a35896bc12d3047dcbb6b66a07f2e8ecee3b4f247bf4ce6e",
+    "reference_run": 41482729373,
+    "cases": 5,
+    "fresh_processes": 10,
+    "identical_repeats": true,
+    "exact_original_discrete_inputs": true,
+    "all_physical_errors_zero": true,
+    "minimum_full_frame_ssim": 1.0,
+    "minimum_mfd_ssim": 1.0
+  },
+  "totals": {
+    "final_panel_processes": 12,
+    "mechanism_press_release_pairs": 192,
+    "regression_processes": 2,
+    "frozen_control_processes": 10,
+    "qualified_fresh_processes": 24,
+    "successful_presentations": 33213
+  },
+  "retained_probes": [
+    {
+      "output": "out/phase6-panel-mechanisms-first",
+      "status": "passed earlier driver before explicit panel focus probe"
+    },
+    {
+      "output": "out/phase6-panel-intel-dgs-focus",
+      "status": "failed test setup: RCS Alt modifier prevents an unmodified panel arrow match"
+    },
+    {
+      "output": "out/phase6-panel-software-sanitizers/controls_dg_panel",
+      "status": "failed same combined-modifier test setup"
+    }
+  ],
+  "source_audit": {
+    "explicit_extraction_files": 440,
+    "passed": true
+  },
+  "hosted_panel_qualification": "Pending the workflow for this push; earlier hosted evidence remains separate",
+  "remaining_gates": [
+    "VC mechanism mouse picking and camera interaction",
+    "Broader DG subsystem and interactive stock-scenario acceptance",
+    "Native Wayland, physical controller and wider hardware/performance qualification"
+  ]
+}

@@ -239,6 +239,13 @@ jobs:
             if [[ "$case" != controls_generic_orbit_surface ]]; then mechanisms=(--mechanisms); fi
             xvfb-run -a -s '-screen 0 1920x1080x24' env LIBGL_ALWAYS_SOFTWARE=1 GALLIUM_DRIVER=llvmpipe python3 -B Tests/Production/CockpitControls/mouse_smoke.py --case "$case" "${mechanisms[@]}" --frozen out/frozen-cockpit-controls --configuration ${{ matrix.configuration }} --executable out/native-cockpit-engine/orbiter-production --assets out/scene-resources --data out/data --modules out/native-cockpit-engine/NativeModules --planets out/planets --output "out/native-cockpit-mouse/$case"
           done 2>&1 | tee native-cockpit-mouse.log
+      - name: Pan DG and DG-S panels and mouse-operate all seven stock mechanisms
+        shell: bash
+        run: |
+          set -euo pipefail
+          for case in controls_dg_panel controls_dgs_panel; do
+            xvfb-run -a -s '-screen 0 1920x1080x24' env LIBGL_ALWAYS_SOFTWARE=1 GALLIUM_DRIVER=llvmpipe python3 -B Tests/Production/CockpitControls/mouse_smoke.py --case "$case" --panel-mechanisms --frozen out/frozen-cockpit-controls --configuration ${{ matrix.configuration }} --executable out/native-cockpit-engine/orbiter-production --assets out/scene-resources --data out/data --modules out/native-cockpit-engine/NativeModules --planets out/planets --output "out/native-cockpit-panel-mouse/$case"
+          done 2>&1 | tee native-cockpit-panel-mouse.log
       - name: Click the visible stock cockpit menu and change ship, warp, pause and save
         run: >-
           xvfb-run -a -s '-screen 0 1920x1080x24' env LIBGL_ALWAYS_SOFTWARE=1 GALLIUM_DRIVER=llvmpipe
@@ -307,6 +314,7 @@ jobs:
             out/native-cockpit-evidence/**
             out/native-cockpit-controls/**
             out/native-cockpit-mouse/**
+            out/native-cockpit-panel-mouse/**
             out/native-cockpit-ui/**
             out/native-cockpit-ui-window/**
             out/dg-mesh-resources.json

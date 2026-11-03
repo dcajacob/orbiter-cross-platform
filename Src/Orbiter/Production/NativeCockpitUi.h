@@ -7,6 +7,7 @@ class DlgInfo;
 class Keymap;
 namespace orbiter::production {
 ORBITER_PRODUCTION_API bool HandleCockpitMenuKey(const Keymap&,UInt32,char*);
+ORBITER_PRODUCTION_API void HandleCockpitPanelKeys(const Keymap&,char*);
 MenuInfoBar& CockpitMenuBar();
 DlgInfo* OpenCockpitInfoDialog();
 void CreateCockpitInfoBars();

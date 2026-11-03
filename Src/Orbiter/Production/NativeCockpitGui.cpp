@@ -9,6 +9,9 @@
 #include "NativeHelp.h"
 #include "Config.h"
 #include "Pane.h"
+#include "Panel2D.h"
+#include "Camera.h"
+#include "Keymap.h"
 #include "Mfd.h"
 #include "NativeCockpitUi.h"
 #include <memory>
@@ -234,12 +237,19 @@ std::ofstream uiEvidence;
 std::ofstream uiFrames;
 std::ofstream menuWindows;
 std::ofstream optionsState;
+std::ofstream panelLayout;
 ImGuiID replayClockHook=0;
 float replayClockStep=0;
 std::ofstream replayClockTrace;
 }
 
 namespace orbiter::production {
+void HandleCockpitPanelKeys(const Keymap& keymap,char* kstate) {
+    const auto& context=GetNativeRenderContext();
+    if(context.camera->IsExternal() || !context.cockpitPane)return;
+    auto* g_pane=context.cockpitPane;
+#include "CockpitPanelInput.inc"
+}
 void OpenCockpitFocusDialog() {
     if (!focusDialog) focusDialog=std::make_unique<DlgFocus>();
     oapiOpenDialog(focusDialog.get());
@@ -255,6 +265,11 @@ void CreateCockpitGui() {
         // The native client owns one render window, matching the reference client.
         io.IniFilename = nullptr;
         ImGuiSetStyle();
+        if(std::filesystem::is_regular_file(context.evidence/"panel-picking.enabled")) {
+            panelLayout.open(context.evidence/"panel-layout.csv");
+            panelLayout.precision(17);
+            panelLayout<<"tick,mode,panel_id,scale,x,y\n";
+        }
         const auto& fonts = context.configuration->CfgFontPrm;
         auto load = [&](const char* file, const ImFontConfig* options = nullptr) {
             auto path = context.programFiles->Resolve(file).string();
@@ -325,6 +340,7 @@ void DestroyCockpitGui() {
     }
     if(menuWindows.is_open())menuWindows.close();
     if(optionsState.is_open())optionsState.close();
+    if(panelLayout.is_open())panelLayout.close();
     if(uiEvidence.is_open())uiEvidence.close();
     if(uiFrames.is_open())uiFrames.close();
     if(replayClockTrace.is_open())replayClockTrace.close();
@@ -374,6 +390,15 @@ void BeginCockpitGuiFrame() {
     if(uiFrames.is_open()){uiFrames<<ImGui::GetFrameCount()<<'\n';uiFrames.flush();}
 }
 void ObserveCockpitGui(unsigned tick) {
+    if(panelLayout.is_open()) {
+        auto* pane=GetNativeRenderContext().cockpitPane;
+        auto* panel=pane ? pane->GetPanel2D() : nullptr;
+        if(panel) {
+            double x=0,y=0;panel->GetOrigin(x,y);
+            panelLayout<<tick<<','<<pane->GetPanelMode()<<','<<panel->GetId()<<','<<panel->GetActiveScale()<<','<<x<<','<<y<<'\n';
+            panelLayout.flush();
+        }
+    }
     if(!uiEvidence.is_open())return;
     const auto& io=ImGui::GetIO();
     bool found=false;

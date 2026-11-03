@@ -68,8 +68,8 @@ requires Alt for manual RCS and Alt+Shift for one-tenth thrust. Bare D retains
 the stock radiator function. Finalized samples verify full/precision thrust,
 bare-W neutrality, release/focus loss and no jets during bare mechanism keys.
 The accepted Phase 5 profile is unchanged. This profile can be selected with
-the native command's `--keymap` option. Mechanism mouse picking and broader
-subsystem interactions remain open.
+the native command's `--keymap` option. Virtual-cockpit mechanism picking and
+broader subsystem interactions remain open.
 [Real-key and profile evidence](DGWindowMechanismsVerification.json)
 
 The DG profile now also verifies F for RCS rotational/linear mode, Ctrl+F for
@@ -79,6 +79,27 @@ corrected profile passes twelve glider processes and the generic cockpit
 regression. Focus loss is measured against a separate owned window and cleared
 input, with all unexpected X11 protocol errors fatal.
 [Mode and focus-transfer evidence](DGModeBindingsVerification.json)
+
+The native host now routes held panel arrows through the four original
+`KbdInputImmediate_System` key checks and `Pane::ShiftPanel`. A failing baseline
+observed 918 held-Down input samples with no panel movement. The restored route
+exposes the main panel's lower gear, nose-cone and airbrake levers, preserves
+the original clamps, and works while simulation time is paused. A read-only
+engine getter and opt-in trace observe the original panel origin and scale;
+neither changes panel geometry or a public SDK layout.
+
+Real X11/GLFW tests operate all seven mechanisms through the original 2D
+panel hit testing in both gliders, including Ctrl+arrow selection of the
+overhead panel. They check sixteen press/release pairs, complete monotonic
+animation travel, original open/closed scenario states, key release and
+verified focus-loss release. No mechanism shortcut key is used. Both gliders
+pass in all four normal native build/profile combinations, and with
+unsuppressed ASan/UBSan/LSan on Intel and the isolated software graphics stack.
+The initial focus probe incorrectly combined the RCS Alt modifier with a panel
+arrow; its failed diagnostics are retained. The final test exercises the
+unmodified arrow separately. Hosted panel qualification, virtual-cockpit
+mechanism picks and broader systems/scenario acceptance remain open.
+[Panel panning and mouse-mechanism evidence](DGPanelMouseVerification.json)
 
 The native graphics leak now has an isolated source fix and a passing local
 sanitizer menu flow. Mesa's executable-code allocator retained two bookkeeping

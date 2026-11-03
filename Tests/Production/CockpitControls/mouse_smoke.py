@@ -25,10 +25,13 @@ def main():
     p.add_argument('--frozen',type=Path)
     p.add_argument('--configuration',choices=('Debug','Release'),default='Debug')
     p.add_argument('--mechanisms',action='store_true',help='Also operate and quicksave all seven DG mechanisms with real keys')
+    p.add_argument('--panel-mechanisms',action='store_true',help='Pan the original DG 2D panels and operate all seven mechanisms with real mouse input')
     for name in ('executable','assets','data','modules','planets','output'):p.add_argument('--'+name,type=Path,required=True)
     a=p.parse_args();out=a.output.resolve();require(not out.exists(),'Mouse output exists; replacement is forbidden');out.mkdir(parents=True)
     case=next(case for case in cases if case['id']==a.case)
     require(not a.mechanisms or case['cockpit']!=1,'Mechanism input requires a DG panel or VC')
+    require(not a.panel_mechanisms or case['cockpit']==2,'Panel mechanism input requires a DG 2D panel')
+    dg_input=a.mechanisms or a.panel_mechanisms
     points=[(85,136),(54,136)]
     reference=None
     if case['cockpit']!=1:
@@ -116,11 +119,12 @@ def main():
     (out/'cockpit.scn').write_text(text)
     (out/'Orbiter.cfg').write_text((ROOT/'Tests/Production/NativeScene/Orbiter.cfg').read_text()+'\nFPS = 0\nMenubarMode = 1\nInfobarMode = 1\nInstrumentUpdateInterval = 0.25\n')
     (out/'control-evidence.enabled').write_text('Actual owned X11 window mouse transport\n')
+    if a.panel_mechanisms:(out/'panel-picking.enabled').write_text('Read-only original panel geometry\n')
     argv=[str(a.executable.resolve())]
     for name in ('assets','data','modules','planets'):argv+=['--'+name,str(getattr(a,name).resolve())]
-    keymap=ROOT/'Tests/Production/Flight'/('keymap-dg-laptop.cfg' if a.mechanisms else 'keymap-laptop.cfg')
+    keymap=ROOT/'Tests/Production/Flight'/('keymap-dg-laptop.cfg' if dg_input else 'keymap-laptop.cfg')
     argv+=['--config',str(out/'Orbiter.cfg'),'--scenario',str(out/'cockpit.scn'),'--evidence',str(out),'--keymap',str(keymap),'--run']
-    if a.mechanisms:argv+=['--save',str(out/'current.scn')]
+    if dg_input:argv+=['--save',str(out/'current.scn')]
     (out/'invocation.json').write_text(json.dumps(argv,indent=2)+'\n')
     def latest_state():
         path=out/'cockpit-state.csv'
@@ -143,10 +147,10 @@ def main():
             sys.path.insert(0,str(HERE.parent/'DeltaGlider'))
             from window_keys import input_state
             def thrust(down):
-                if down and a.mechanisms:key(window,'Alt_L',True)
+                if down and dg_input:key(window,'Alt_L',True)
                 key(window,'w',down)
-                if not down and a.mechanisms:key(window,'Alt_L',False)
-            if a.mechanisms:
+                if not down and dg_input:key(window,'Alt_L',False)
+            if dg_input:
                 key(window,'w',True)
                 def bare_held():
                     state=input_state(out)
@@ -160,6 +164,11 @@ def main():
             # restore 1x before the separate manual-thrust/focus-loss checks.
             mechanisms=None
             bindings=None
+            panel_mechanisms=None
+            panel_points=[]
+            if a.panel_mechanisms:
+                from window_panel import operate
+                panel_mechanisms,panel_points=operate(out,window,key,button,title)
             if a.mechanisms:
                 from window_bindings import verify
                 bindings=verify(out,window,key)
@@ -171,7 +180,7 @@ def main():
                 require('RCS '+mode+' 0%' in title(window),'Releasing mode switch activated thrust')
                 thrust(True);wait(lambda:'RCS '+mode+' 100%' in title(window),'Clicked RCS mode did not accept held keyboard thrust')
                 time.sleep(.15);thrust(False);wait(lambda:'RCS '+mode+' 0%' in title(window),'Thrust persisted after release in clicked mode')
-            if a.mechanisms:
+            if dg_input:
                 key(window,'Shift_L',True);thrust(True)
                 wait(lambda:'RCS ROT 10%' in title(window),'DG Alt+Shift precision RCS did not select one-tenth thrust')
                 time.sleep(.15);thrust(False);key(window,'Shift_L',False)
@@ -179,7 +188,7 @@ def main():
             thrust(True);wait(lambda:'RCS ROT 100%' in title(window),'Focus-loss setup failed')
             def held_input():
                 state=input_state(out)
-                return state if state and state[1][0x11] and (state[1][0x38] if a.mechanisms else True) else None
+                return state if state and state[1][0x11] and (state[1][0x38] if dg_input else True) else None
             held_tick=wait(held_input,'Focus-loss setup key did not reach the engine')[0]
             before_focus=focused();require(before_focus==window,'Owned cockpit lost focus before the explicit transfer')
             # A root-window focus request can produce ancestor/pointer focus
@@ -202,8 +211,30 @@ def main():
             (out/'focus-transfer.json').write_text(json.dumps(focus_transfer,indent=2)+'\n')
             thrust(False);x.XSetInputFocus(display,window,1,0);x.XFlush(display);time.sleep(.2)
             require(focused()==window,'Owned cockpit did not regain focus')
-            x.XDestroyWindow(display,focus_sink);focus_sink=0;x.XFlush(display)
             require('RCS ROT 0%' in title(window),'Thrust reactivated on focus regain')
+            if panel_mechanisms:
+                # The original panel arrows require no modifier. Exercise this
+                # separately from Alt+W thrust so Alt cannot change the binding.
+                from window_panel import rows as panel_rows
+                key(window,'Up',True)
+                panning=wait(lambda:(state:=input_state(out)) and state[1][0xc8] and
+                             not (state[1][0x38] or state[1][0xb8]) and
+                             float(panel_rows(out/'panel-layout.csv')[-1]['y'])>360 and state,
+                             'Focus-loss setup did not hold an unmodified panning arrow')
+                x.XSetInputFocus(display,focus_sink,1,0);x.XSync(display,False)
+                wait(lambda:focused()==focus_sink,'Panel focus destination did not receive focus')
+                cleared=wait(lambda:(state:=input_state(out)) and state[0]>panning[0] and
+                             not state[1][0xc8] and state,'Focus loss did not clear the held panel arrow')
+                stopped=panel_rows(out/'panel-layout.csv')[-1]
+                wait(lambda:input_state(out)[0]>=cleared[0]+5,'No panel focus-release samples')
+                require(float(panel_rows(out/'panel-layout.csv')[-1]['y'])==float(stopped['y']),
+                        'Panel continued panning after verified focus loss')
+                key(window,'Up',False);x.XSetInputFocus(display,window,1,0);x.XFlush(display);time.sleep(.2)
+                require(focused()==window and float(panel_rows(out/'panel-layout.csv')[-1]['y'])==float(stopped['y']),
+                        'Panel panning reactivated on focus regain')
+                panel_mechanisms.update(focus_loss_stops_panning=True,focus_loss_layout=stopped,
+                    focus_transfer=dict(destination=focus_sink,held_input_tick=panning[0],released_input_tick=cleared[0]))
+            x.XDestroyWindow(display,focus_sink);focus_sink=0;x.XFlush(display)
             def left_mode():
                 row=latest_state()
                 return int(row['left_mfd']) if row else -1
@@ -224,6 +255,10 @@ def main():
             if mechanisms:
                 from window_keys import verify_completed
                 verify_completed(out,mechanisms)
+            if panel_mechanisms:
+                from window_panel import verify_completed
+                verify_completed(out,panel_mechanisms)
+            points=panel_points+points
             inputs=list(csv.DictReader((out/'control-inputs.csv').open()))
             require([(r['event'],int(r['x']),int(r['y'])) for r in inputs]==[(kind,px,py) for px,py in points for kind in ('left_down','left_up')],'Actual GLFW events or framebuffer coordinates differ')
             state=list(csv.DictReader((out/'cockpit-state.csv').open()));require({int(r['rcs_mode']) for r in state}==({0,1,2} if a.mechanisms else {1,2}),'Finalized actual vessel modes were not observed')
@@ -234,15 +269,15 @@ def main():
                 sample=keys.get(int(row['input_tick']))
                 if int(row['tick']) and sample is not None:
                     alt=bool(sample[0x38] or sample[0xb8])
-                    held=bool(sample[0x11]) and (alt if a.mechanisms else True)
+                    held=bool(sample[0x11]) and (alt if dg_input else True)
                     if not held:
                         require(float(row['rcs'])==0 and float(row['exhaust'])==0,'Finalized RCS jets persisted without the declared manual input');released+=1
-                    if a.mechanisms and sample[0x11] and not alt:bare+=1
-                    if a.mechanisms and held:
+                    if dg_input and sample[0x11] and not alt:bare+=1
+                    if dg_input and held:
                         if sample[0x2a] or sample[0x36]:precision+=float(row['rcs'])==.1
                         else:full+=float(row['rcs'])==1
-            if a.mechanisms:require(bare>=2,'Bare W neutrality was not observed in finalized vessel samples')
-            if a.mechanisms:require(full>=2 and precision>=2,'Full and one-tenth manual RCS were not observed in finalized samples')
+            if dg_input:require(bare>=2,'Bare W neutrality was not observed in finalized vessel samples')
+            if dg_input:require(full>=2 and precision>=2,'Full and one-tenth manual RCS were not observed in finalized samples')
             require(released>=10,'Insufficient finalized thrust-release samples')
             require(json.loads((out/'native-window.json').read_text())['backend']=='x11','Wrong actual window backend')
             life=json.loads((out/'graphics-lifecycle.json').read_text());require(life['context_deleted'] and life['successful_presents']>0,'Mouse session did not present/shut down normally')
@@ -253,9 +288,9 @@ def main():
                 driver_sha256=DRIVER_SHA256,
                 actual_rcs_mode_buttons=True,mfd_power_off_on=case['cockpit']==1,mfd_mode_surface_orbit=case['cockpit']==1,
                 momentary_keyboard_rcs=True,focus_loss_release=True,verified_focus_transfer=focus_transfer,finalized_release_samples=released,mouse_events=inputs,
-                lifecycle=life,screenshot_sha256=digest(out/'owned-cockpit.png'),mechanisms=mechanisms,keyboard_modes=bindings,
+                lifecycle=life,screenshot_sha256=digest(out/'owned-cockpit.png'),mechanisms=mechanisms,keyboard_modes=bindings,panel_mechanisms=panel_mechanisms,
                 keymap=keymap.relative_to(ROOT).as_posix(),keymap_sha256=digest(keymap))
-            if a.mechanisms:report.update(bare_key_neutrality_samples=bare,precision_rcs=True,full_rcs_samples=full,precision_rcs_samples=precision)
+            if dg_input:report.update(bare_key_neutrality_samples=bare,precision_rcs=True,full_rcs_samples=full,precision_rcs_samples=precision)
             (out/'mouse-verification.json').write_text(json.dumps(report,indent=2)+'\n');print(json.dumps(report,indent=2))
         finally:
             if focus_sink:x.XDestroyWindow(display,focus_sink);x.XFlush(display)

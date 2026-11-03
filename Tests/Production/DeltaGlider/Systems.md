@@ -30,9 +30,24 @@ There are 16 real application lifetimes and 1,936 presentations in the four-case
 suite. Inputs enter the native replay queue and follow the buffered vessel-key
 route. The separate `CockpitControls/mouse_smoke.py --mechanisms` flow exercises
 these keys through a real owned X11 window and GLFW, then verifies original
-animation trajectories and scenario writers. Mechanism mouse picking and wider
-DG subsystem acceptance remain separate gates. No production algorithm, accepted
+animation trajectories and scenario writers. The sibling `--panel-mechanisms`
+flow uses held arrows and Ctrl+arrows to expose/select the original 2D panels,
+then actual mouse presses to open and close all seven mechanisms. It verifies
+paused panning, original clamps, key/focus release, complete mechanism travel
+and both original scenario endpoints. Select `controls_dg_panel` or
+`controls_dgs_panel`; it uses no mechanism shortcut keys. VC mechanism mouse
+picking and wider DG subsystem acceptance remain separate gates. No production algorithm, accepted
 reference or numerical budget changes.
+
+```sh
+DISPLAY=:0 python3 -B Tests/Production/CockpitControls/mouse_smoke.py \
+  --case controls_dg_panel --panel-mechanisms \
+  --frozen out/frozen-cockpit-controls --configuration Debug \
+  --executable out/native-cockpit-engine/orbiter-production \
+  --assets out/scene-resources --data out/data \
+  --modules out/native-cockpit-engine/NativeModules --planets out/planets \
+  --output out/real-dg-panel-mouse
+```
 
 Run with an already built, matching engine/renderer and staged stock assets:
 

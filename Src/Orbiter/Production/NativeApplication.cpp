@@ -1073,6 +1073,7 @@ struct Runtime final:BodyServices,RigidBodyServices,SurfaceServices,NavigationSe
         time.BeginStep(dt,running);
 #endif
 #ifdef ORBITER_NATIVE_COCKPIT
+        HandleCockpitPanelKeys(controls.keymap,input.keys.data());
         if(running) {
             FlightInput snapshot=input;
             for (std::size_t i=0;i<simulatedKeys.size();++i) snapshot.keys[i]|=simulatedKeys[i];

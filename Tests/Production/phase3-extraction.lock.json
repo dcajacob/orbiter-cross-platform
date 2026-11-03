@@ -544,7 +544,7 @@
     },
     "Src/Orbiter/Panel2D.h": {
       "original_sha256_lf": "c8a36214609a549f7715a332f2c1a6b66eaf542ff5b0b5646f89cd119a4dff82",
-      "sha256_lf": "7a12b01515b80a715e941cd4ef7fdd7729ff9b157523ea8aca06fc5566bebade",
+      "sha256_lf": "bd41a6acd727e4f237de76dddd92808eea8c3c77a4384702b21fc3c26342d1b6",
       "scope": "Private cockpit graphics/configuration binding. Original algorithms and Windows pointer types conserved by cockpit_source.py; native instrumentation is not operational yet."
     },
     "Src/Orbiter/PhysicsConfig.h": {
@@ -581,7 +581,7 @@
     },
     "Src/Orbiter/Production/CMakeLists.txt": {
       "original_sha256_lf": null,
-      "sha256_lf": "961b84852ca1ccfdc01d133fd9c127e95374a693d46abd2f00134397a9f06738",
+      "sha256_lf": "147e617790b8e73133d903ebe0c045c6d8f66bbb5369f981da1054f72fa70926",
       "scope": "Original ten stock MFD declarations use exact platform SDK aliases; shared original conic geometry is moved without calculation or screen-mapping changes. Full native instrument runtime remains incomplete."
     },
     "Src/Orbiter/Production/CameraServices.cpp": {
@@ -741,7 +741,7 @@
     },
     "Src/Orbiter/Production/NativeApplication.cpp": {
       "original_sha256_lf": null,
-      "sha256_lf": "bbabf53b5f7af712c2b92e57066995be1623ba192cf1e4cd24158ca9a3930888"
+      "sha256_lf": "209164cf158c03f73b44317df9353680129716fcc7d0a5f9cf5c02126f49d8ec"
     },
     "Src/Orbiter/Production/NativeBuild.h.in": {
       "sha256_lf": "f5fb21f83bb6be0c54839fce670e8410f6911eda86da2eef26e4221c1ae25d97",
@@ -1308,7 +1308,7 @@
     },
     "Src/Orbiter/Production/NativeCockpitGui.cpp": {
       "original_sha256_lf": null,
-      "sha256_lf": "af79142360a51252efde8977b117ece6408f4561a08e85aba7090baa20875b17"
+      "sha256_lf": "e1d9ca77108a876d847f878a8b5d78c78afdd7d7caf9dbc89c6f806da4b69318"
     },
     "Src/Orbiter/Production/NativeCockpitProjection.cpp": {
       "original_sha256_lf": null,
@@ -1336,7 +1336,7 @@
     },
     "Src/Orbiter/Production/NativeCockpitUi.h": {
       "original_sha256_lf": null,
-      "sha256_lf": "9d6e1d32db89e0027b2461685bb2646251c617fc7189d0588d1e34afe0890e26"
+      "sha256_lf": "15a38caf0fd70d084fb3e7056ec5a6d01a19edb74db725f2c5e5d9392f4dbaf1"
     },
     "Src/Module/LuaScript/Native/CMakeLists.txt": {
       "original_sha256_lf": null,
@@ -1817,6 +1817,10 @@
     "Src/Orbiter/Production/GuiNotifications.inc": {
       "original_sha256_lf": null,
       "sha256_lf": "a14a9969c3cf8bf3138e73b3fb11d744e591f1d6ac0ed008cc9b4beade4bd6d8"
+    },
+    "Src/Orbiter/Production/CockpitPanelInput.inc": {
+      "original_sha256_lf": null,
+      "sha256_lf": "999bbec8974b8933abd4f391ade22de531b50500aa1349bec1acea670556bfa3"
     }
   }
 }

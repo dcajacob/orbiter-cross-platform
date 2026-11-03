@@ -21,6 +21,10 @@ def verify():
     actual=[line for line in read('Src/Orbiter/Production/FlightKeys.h').splitlines() if line.startswith('#define')]
     if expected!=actual:raise ValueError('Native key codes differ from Windows SDK')
     original=old('Src/Orbiter/Orbiter.cpp');current=read('Src/Orbiter/Production/FlightControls.cpp')
+    begin=original.index('\t\t// shift 2-D panels',original.index('void Orbiter::KbdInputImmediate_System'))
+    end=original.index('\n\t}',begin)
+    if read('Src/Orbiter/Production/CockpitPanelInput.inc').rstrip()!=original[begin:end]:
+        raise ValueError('Original immediate panel directions/key mapping/order changed')
     begin=original.index('\t// main/retro/hover thruster settings',original.index('void Orbiter::KbdInputImmediate_OnRunning'))
     end=original.index('\n\t// left/right MFD control',begin)
     cbegin=current.index('\t// main/retro/hover thruster settings');cend=current.index('\n    }\n\tif (bEnableAtt)',cbegin)

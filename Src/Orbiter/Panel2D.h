@@ -96,6 +96,8 @@ public:
 	 * \brief Return current panel scaling factor
 	 */
 	double GetActiveScale() const { return panelscale; }
+	// Read-only engine observation; no panel state or SDK layout changes.
+	void GetOrigin(double &x, double &y) const { x = x0; y = y0; }
 
 	/**
 	 * \brief Define an MFD display in the panel mesh.

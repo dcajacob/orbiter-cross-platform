@@ -261,6 +261,10 @@ namespace oapi {using CockpitClient=GraphicsClient;}
                 raise ValueError('Windows cockpit implementation lacks its explicit service include: '+name)
         original=subprocess.check_output(['git','-C',str(ROOT),'show',BASE+':'+path]).decode('cp1252').replace('\r\n','\n')
         current=view.replace('oapi::CockpitClient','oapi::GraphicsClient')
+        if name=='Panel2D.h':
+            observation='\t// Read-only engine observation; no panel state or SDK layout changes.\n\tvoid GetOrigin(double &x, double &y) const { x = x0; y = y0; }\n'
+            if current.count(observation)!=1:raise ValueError('Panel origin observation changed')
+            current=current.replace(observation,'',1)
         # Only the original known Elements call sites receive explicit time.
         current=current.replace('new Elements(orbiter::production::CockpitTime().MJD_ref)','new Elements()')
         import re

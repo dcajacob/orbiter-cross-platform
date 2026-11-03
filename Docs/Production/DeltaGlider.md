@@ -44,7 +44,7 @@ remain failures; broader platform acceptance remains open.
 Both gliders' RCS dials also pass actual GLFW/X11 clicks in panels and virtual
 cockpits, including held thrust, key release and thrust cancellation on window
 focus loss. All four native build/profile pairs and Intel/software sanitizer
-flows pass. Broader subsystem mouse controls remain open.
+flows pass. Broader virtual-cockpit subsystem mouse controls remain open.
 [Real-window input evidence](CockpitWindowInputVerification.json)
 
 The real-window flow now also deploys and retracts all seven mechanisms with
@@ -60,6 +60,17 @@ aerodynamic-control alias. The original key-map parser and control algorithms
 are unchanged. All twelve glider mode/profile cases pass, including confirmed
 focus transfer and thrust release, plus the generic cockpit regression.
 [Mode-binding follow-up](DGModeBindingsVerification.json)
+
+Both gliders now also pass real mouse operation of all seven mechanisms in
+their original 2D panels. Held arrow keys expose the lower main-panel levers;
+Ctrl+arrows select the overhead switches. The restored input route uses the
+four original system key checks and original panning/clamp implementation,
+including paused operation. The tests verify complete animation travel,
+original saved open/closed stops and cancellation on key release and measured
+focus loss. All four normal native build/profile pairs and Intel/software
+sanitizer runs pass. These checks preserve the frozen references and budgets;
+hosted panel qualification and VC mechanism picking remain open.
+[Panel mouse evidence](DGPanelMouseVerification.json)
 
 Both native vessels now load the stock Lua interpreter and LuaInline worker and
 fly with the original AAP in the 2D panel and virtual cockpit. In each 48-frame
