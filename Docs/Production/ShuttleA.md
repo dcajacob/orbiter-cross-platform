@@ -155,6 +155,13 @@ preload to GTK's sandboxed image helper; limiting the test preload to the
 observed process preserves the loaded instrumentation and normal helper startup.
 The failed baseline is retained. Production binaries are unchanged.
 
+The instrumented capture's runner incorrectly labeled its configuration as
+Release. Both retained CMake caches prove it is Debug automatic. Its clean
+sanitizer and behavior results are retained as smoke evidence and cannot qualify
+Release parity. The capture helper now checks the actual build type and SSE2
+selection before starting any native session; comparisons also verify every
+recorded runtime binary and the build identity.
+
 The [controls verification record](ShuttleAControlsVerification.json) identifies
 the captures and open gates. Its verified local evidence archive contains
 41,821,515 bytes and 1,456 members, SHA-256

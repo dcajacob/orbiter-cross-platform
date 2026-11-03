@@ -43,3 +43,12 @@ not qualify parity. Full-frame comparisons in the longer phases retain the
 existing stock-scene SSIM and numerical budgets. Mouse controls, pod operation,
 payload deployment/reload, the editor, physical-controller input and overall
 Phase 6 acceptance remain separate work.
+
+Native capture checks the actual CMake build type and SSE2 selection before
+starting a session. `compare.py` requires `--runtime-root` pointing to that
+complete retained build and rechecks all recorded binaries and its CMake identity.
+The original source is audited against its immutable producer commit; paired
+captures must have identical input, observer, scene, clock and budget protocol
+files. Provenance-checking changes do not replace the original observations.
+`Identity.Test.py` rejects a mislabeled real build, a wrong CPU profile and a
+modified copy of an actual engine while proving the retained builds unchanged.

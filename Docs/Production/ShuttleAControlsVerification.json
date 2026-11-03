@@ -84,7 +84,23 @@
         "resume": 1.0,
         "retract": 1.0
       }
-    }
+    },
+    "actual_configuration": "Debug",
+    "actual_math_profile": "automatic",
+    "capture_configuration_label": "Release",
+    "configuration_label_correct": false,
+    "qualified_for_release_parity": false,
+    "scope": "Sanitizer and behavioral smoke evidence; actual Debug build, not Release parity",
+    "build_caches": [
+      {
+        "path": "out/phase6-shuttle-a-mesh-asan-engine/CMakeCache.txt",
+        "sha256": "302237f340201e0495d704782cf540c72e011a39c27960d6389e926d77b093d4"
+      },
+      {
+        "path": "out/phase6-shuttle-a-mesh-asan-renderer/CMakeCache.txt",
+        "sha256": "0ece6065142c6b8c121af52db60b83d6377fae693b5102fdcf54fac279bc9792"
+      }
+    ]
   },
   "negative_controls": {
     "status": "passed",

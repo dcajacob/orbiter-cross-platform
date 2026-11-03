@@ -12,7 +12,7 @@ from behavior_suite import quaternion, quaternion_angle
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    for name in ('original', 'native', 'reference-audit', 'output'):
+    for name in ('original', 'native', 'reference-audit', 'runtime-root', 'output'):
         parser.add_argument('--'+name, type=Path, required=True)
     args = parser.parse_args()
     config = controls.settings()
@@ -24,7 +24,9 @@ def main():
         reports[0]['application_source'] == reports[1]['application_source'] == config['application_source'],
         'Controls comparison requires complete original/native captures')
     controls.require(all(set(r['cases']) == {c['id'] for c in config['cases']} for r in reports) and
-        all(reports[0][k] == reports[1][k] for k in ('configuration', 'math_profile', 'source_sha256_lf')),
+        all(reports[0][k] == reports[1][k] for k in ('configuration', 'math_profile')) and
+        all(reports[0]['source_sha256_lf'][name] == reports[1]['source_sha256_lf'][name]
+            for name in controls.PROTOCOL_FILES),
         'Controls matrix, profiles or observer protocol differ')
     profile = reports[0]['configuration']+'-'+reports[0]['math_profile']
     controls.require(audit['status'] == 'passed' and
@@ -32,6 +34,9 @@ def main():
         'Original controls capture has not passed the four-profile source/artifact audit')
     for name, checksum in reports[1]['source_sha256_lf'].items():
         controls.require(controls.source_digest(controls.ROOT/name) == checksum, 'Controls comparison source changed: '+name)
+    controls.verify_runtime(args.runtime_root, reports[1]['binary_sha256'])
+    identity = controls.native_build_identity(args.runtime_root, reports[1]['configuration'], reports[1]['math_profile'])
+    controls.require(identity == reports[1]['build_identity'], 'Actual controls build identity differs from capture')
     result = dict(status='failed', phase6_complete=False, profile=profile, cases={},
                   original_report_sha256=controls.digest(args.original/'controls-report.json'),
                   native_report_sha256=controls.digest(args.native/'controls-report.json'),

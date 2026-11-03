@@ -26,6 +26,32 @@ TRACE_FILES = ('stock-vessel-state.csv', 'stock-vessel-docks.csv',
 ERRORS = ('Lua error:', 'LuaCall (', 'runtime error:', 'ERROR: AddressSanitizer',
           'ERROR: LeakSanitizer', 'LeakSanitizer has encountered', 'AddressSanitizer:DEADLYSIGNAL',
           'Could not find a module', 'Orbiter native production:')
+PROTOCOL_FILES = ('Tests/Production/ShuttleA/Controls/cases.json',
+                  'Tests/Production/ShuttleA/Controls/Driver.cpp',
+                  'Tests/Production/ShuttleA/Controls/Observation.h',
+                  'Tests/Production/ShuttleA/Controls/NativeProbe.cpp',
+                  'Tests/Production/ShuttleA/cases.json',
+                  'Tests/Production/StockVessels/Observation.h',
+                  'Tests/Production/NativeScene/Orbiter.cfg')
+
+
+def native_build_identity(build, configuration, math_profile):
+    path = build/'CMakeCache.txt'
+    cache = dict(line.split('=', 1) for line in path.read_text().splitlines()
+                 if '=' in line and not line.startswith(('#', '//')))
+    actual = cache['CMAKE_BUILD_TYPE:STRING']
+    require(actual == configuration, 'Declared native configuration differs from actual build: '+actual)
+    require(cache['ORBITER_MATH_FORCE_SSE2:BOOL'] == ('ON' if math_profile == 'sse2' else 'OFF'),
+            'Declared native math profile differs from actual build')
+    return dict(configuration=actual, math_profile=math_profile, cmake_cache_sha256=digest(path),
+                c_flags=cache['CMAKE_C_FLAGS:STRING'], cxx_flags=cache['CMAKE_CXX_FLAGS:STRING'])
+
+
+def verify_runtime(root, hashes):
+    for name, checksum in hashes.items():
+        path = Path(name)
+        require(not path.is_absolute() and '..' not in path.parts, 'Invalid controls runtime path')
+        require(digest(root/path) == checksum, 'Controls runtime binary changed: '+name)
 
 
 def settings():
@@ -297,6 +323,7 @@ def run_case(args, config, case, repeat, probe, expected_modules):
 def capture(args):
     config = settings()
     require(not args.output.exists(), 'Controls output exists; replacement is forbidden')
+    build_identity = None
     if args.original:
         require(sys.platform == 'win32', 'Original capture requires native Windows')
         require((os.environ.get('ORBITER_TEST_OBSERVER_SSE2') == '1') == (args.math_profile == 'sse2'),
@@ -316,6 +343,7 @@ def capture(args):
             expected_modules.setdefault(Path(name).name.casefold(), set()).add(digest(path))
     else:
         require(args.assets and args.runtime_source_commit, 'Native capture requires assets and runtime source identity')
+        build_identity = native_build_identity(args.executable.parent, args.configuration, args.math_profile)
         require((args.assets/'Scenarios'/config['scenario']).read_bytes() == (ROOT/'Scenarios'/config['scenario']).read_bytes(),
                 'Native staged stock scenario differs')
         runtime = client = None
@@ -332,6 +360,7 @@ def capture(args):
     report = dict(status='running', phase6_complete=False, producer='preserved-original-windows' if args.original else 'native',
         configuration=args.configuration, math_profile=args.math_profile, application_source=config['application_source'],
         runtime_source_commit=args.runtime_source_commit, runtime=runtime, client=client,
+        build_identity=build_identity,
         producer_commit=subprocess.check_output(['git', '-C', str(ROOT), 'rev-parse', 'HEAD'], text=True).strip(),
         source_sha256_lf=source_hashes, binary_sha256=binary_hashes, cases={}, failures={})
     if args.sanitizer_runtime:
