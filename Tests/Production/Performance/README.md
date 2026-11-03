@@ -32,6 +32,9 @@ must match both the repository and staged assets. The native cockpit and MFD
 mode traces must remain active throughout each internal view. Original 2D panel
 draws are outside the existing per-object scene-mesh counter; the panel gate
 checks loaded stock meshes and complete actual cockpit/MFD traces instead.
+`cockpit-viewport.json` records the original `Pane::Width()` and `Height()`;
+both must equal the measured framebuffer dimensions. Framebuffer size alone
+cannot establish that the original cockpit was constructed at that size.
 
 `frame-times.enabled` enables an observation-only renderer trace. It timestamps
 entry to event polling, entry to `glfwSwapBuffers`, and return from that call.
@@ -52,16 +55,16 @@ benchmark or build competing for the GPU/CPU.
 ```sh
 python3 -B Tests/Production/Performance/run.py \
   --backend wayland \
-  --executable out/phase6-performance-runtime/orbiter-production \
+  --executable out/phase6-viewport-engine/orbiter-production \
   --assets out/phase6-dg-resources --data out/native-celestial-data \
-  --modules out/phase6-performance-runtime/NativeModules --planets out/archive-data \
+  --modules out/phase6-viewport-engine/NativeModules --planets out/archive-data \
   --output out/performance-wayland
 
 python3 -B Tests/Production/Performance/run.py \
   --backend x11 \
-  --executable out/phase6-performance-runtime/orbiter-production \
+  --executable out/phase6-viewport-engine/orbiter-production \
   --assets out/phase6-dg-resources --data out/native-celestial-data \
-  --modules out/phase6-performance-runtime/NativeModules --planets out/archive-data \
+  --modules out/phase6-viewport-engine/NativeModules --planets out/archive-data \
   --output out/performance-x11
 
 python3 -B Tests/Production/Performance/verify.py \
@@ -75,6 +78,11 @@ case selections. The audit rechecks artifacts and sources, independently
 recomputes every timing statistic and requires identical finalized physical
 traces across both repetitions and both desktop backends. Source and runtime
 hashes must remain stable while any benchmark process is live.
+
+`Gate.Test.py` rejects both a copied trace with median 16 ms/p95 51 ms and a
+copied capture with a 1280x720 original cockpit inside a 1920x1080 framebuffer.
+The source captures remain unchanged. `Window.Test.py` rejects zero and
+oversized configured dimensions before window or scene creation.
 
 Passing this gate does not complete Phase 6. Named scenario acceptance, physical
 input devices, hosted regressions, platform lifetime checks and durable evidence

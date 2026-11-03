@@ -45,7 +45,7 @@ def main():
                 priming=out/'window-priming.json'
                 result['runs'].append(dict(backend=backend,case=name,path=str(out),
                     cadence=recomputed['cadence'],poll_to_present=recomputed['poll_to_present'],
-                    swap=recomputed['swap'],window=recomputed['window'],renderer=recomputed['renderer'],
+                    swap=recomputed['swap'],window=recomputed['window'],cockpit_viewport=recomputed['cockpit_viewport'],renderer=recomputed['renderer'],
                     lifecycle=recomputed['lifecycle'],focused_frames=recomputed['focused_frames'],
                     host_before=recorded['host_before'],host_after=recorded['host_after'],
                     startup_priming=json.loads(priming.read_text()) if priming.exists() else None,

@@ -73,6 +73,9 @@ def audit(out, profile, backend, frames, warmup, samples, case):
             'Performance gate requires the real Intel GPU at the declared dimensions')
     settings = json.loads((out/'native-render-settings.json').read_text())
     require(settings==profile['settings'], 'Actual renderer quality differs from fixed medium profile')
+    pane = json.loads((out/'cockpit-viewport.json').read_text())
+    require(pane==dict(width=profile['width'],height=profile['height']),
+            'Original cockpit dimensions differ from actual framebuffer dimensions')
     cockpit = rows(out/'cockpit-state.csv')
     if case['internal']:
         require(len(cockpit)==frames+1 and all(int(r['cockpit'])==case['cockpit'] and
@@ -115,7 +118,7 @@ def audit(out, profile, backend, frames, warmup, samples, case):
     return dict(status='passed' if cadence_stats['median_ms']<=profile['median_ms_max'] and
                 cadence_stats['p95_ms']<=profile['p95_ms_max'] else 'failed',
                 cadence=cadence_stats, poll_to_present=statistics_ms(workload),
-                swap=statistics_ms(swapping), window=window, renderer=renderer, settings=settings, lifecycle=life,
+                swap=statistics_ms(swapping), window=window, cockpit_viewport=pane, renderer=renderer, settings=settings, lifecycle=life,
                 focused_frames=sum(r['focused']=='1' for r in selected),
                 elapsed_sample_seconds=sum(cadence)/1000)
 
@@ -154,7 +157,8 @@ def main():
         env['DISPLAY'] = a.display
     inputs = dict(executable=digest(a.executable), renderer=digest(a.modules/'Graphics/OGLClient.so'),
                   engine=digest(a.executable.parent/'liborbiter_production_vessels.so'))
-    sources = [Path(__file__), HERE/'cases.json', HERE/'medium.cfg', ROOT/'OVP/OGLClient/Native/LinuxAdapter.cpp']
+    sources = [Path(__file__), HERE/'cases.json', HERE/'medium.cfg', ROOT/'OVP/OGLClient/Native/LinuxAdapter.cpp',
+               ROOT/'Src/Orbiter/Production/NativeApplication.cpp']
     report = dict(status='pending', phase6_complete=False, smoke=a.smoke, backend=a.backend,
                   platform=platform.platform(), profile_sha256=digest(HERE/'cases.json'), inputs_sha256=inputs,
                   source_sha256={str(path.relative_to(ROOT)):digest(path) for path in sources},
@@ -196,7 +200,7 @@ def main():
                 result.update(scenario=case['scenario'], scenario_sha256=case['sha256'], host_before=before, host_after=host_state())
                 result['files_sha256']={file:digest(out/file) for file in ('frame-times.csv', 'native-window.json',
                     'native-render-settings.json', 'renderer-info.json', 'graphics-lifecycle.json', 'loaded-maps.txt',
-                    'cockpit-state.csv', 'flight-state.csv', 'object-draws-all.csv', 'visual-meshes.csv')}
+                    'cockpit-state.csv', 'cockpit-viewport.json', 'flight-state.csv', 'object-draws-all.csv', 'visual-meshes.csv')}
                 report['cases'][name]=result
                 (out/'performance.json').write_text(json.dumps(result, indent=2)+'\n')
                 print(json.dumps(dict(backend=a.backend, case=name, smoke=a.smoke, status=result['status'], cadence=result['cadence'])), flush=True)

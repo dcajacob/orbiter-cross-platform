@@ -1571,5 +1571,12 @@
     "run_id": 41629667322,
     "status": "all twelve jobs succeeded",
     "scope": "Earlier camera-key and panel/VC mechanism candidate; later camera mouse changes remain in the next full run"
+  },
+  "later_expanded_hosted_qualification": {
+    "source": "6ee325ec03700101a4691e9b399d08a0f6c4a465",
+    "run_id": 41639429419,
+    "url": "https://github.com/dcajacob/orbiter-cross-platform/actions/runs/41639429419",
+    "status": "all twelve jobs succeeded",
+    "scope": "Camera mouse/FOV and full VC camera original/native comparison in Debug/Release automatic/SSE2; later Wayland and viewport changes require their own hosted qualification"
   }
 }

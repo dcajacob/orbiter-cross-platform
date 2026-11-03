@@ -1,19 +1,20 @@
 {
-  "schema": 1,
+  "schema": 2,
   "date": "2026-11-03",
   "status": "passed",
   "phase6_complete": false,
   "scope": "Local Release automatic 1920x1080 medium throughput on the real Intel PTL Wayland and XWayland desktops; fixed unchanged stock exterior, 2D-panel and VC scenes, two repetitions each.",
-  "based_on_commit": "b4a1fd60dfccc6df0c5c579499fec170548433ba",
+  "based_on_commit": "2c00d29b9d982d4096947636dcd61a89006577a0",
   "source_sha256": {
     "OVP/OGLClient/Native/LinuxAdapter.cpp": "6b82718fc6e46dd83f74475de0f8024e2ba7f3421a19aac370f4efe50fcbd585",
-    "Tests/Production/Performance/Gate.Test.py": "4964b7e22677c76896ee4ff4a9c7b4565f73bf0dd062eb8dd441aaf531be1700",
-    "Tests/Production/Performance/README.md": "2c67d27fbe1d2b48598dd8f406ed4cff88e3712745dbb1753cecfd695c585109",
+    "Src/Orbiter/Production/NativeApplication.cpp": "4b2e5ca56846ebbffeb344defeb07f2c58d4970f42c39c40608954af0fb7fccc",
+    "Tests/Production/Performance/Gate.Test.py": "4ab83d8739472554bf278d60c4d06fc13f15344bae59cfc1db933ba1e76874ac",
+    "Tests/Production/Performance/README.md": "b215a670d6a96986261282b5c5e210ef99adbf351e62ab239947822ae9d1e70f",
     "Tests/Production/Performance/Window.Test.py": "baccf3586a90125f33dbf9cec27d012577510974534c526987203603818c42e4",
     "Tests/Production/Performance/cases.json": "d9a43ae998f1238a0d25d7c6fe285e9b2f139f04b16aa81840723feb115b0ddc",
     "Tests/Production/Performance/medium.cfg": "3af548a01110a2b825588a468a0c44c84e81aef2a36c07a3a10ac76aa8c9b4d7",
-    "Tests/Production/Performance/run.py": "57d903fc49406487b83e278d22573f8f01bd81c4d3704feb1e8d948df0f55bf5",
-    "Tests/Production/Performance/verify.py": "96c0526e71ea8d6a8bbd62d668a4a131d6238e9414529a2ec4eda221f73b57bd"
+    "Tests/Production/Performance/run.py": "9d8de63b8b0dd0b8a2fa83dcef1ac7a744e76c05a6fa3a42bb5e5c84a337e3a3",
+    "Tests/Production/Performance/verify.py": "401afd88730b0995acb7ea0c4756779d17443e45a532580903bf7fa04393d7eb"
   },
   "profile": {
     "path": "Tests/Production/Performance/cases.json",
@@ -24,8 +25,8 @@
     "sha256": "3af548a01110a2b825588a468a0c44c84e81aef2a36c07a3a10ac76aa8c9b4d7"
   },
   "qualification": {
-    "path": "out/phase6-performance-final-audit.json",
-    "sha256": "eb485e3b89b1d34ada97d73b13257892adec7046636a6f49256419b684952bfc"
+    "path": "out/phase6-viewport-performance-audit.json",
+    "sha256": "0d0f09726834e58e33fbf8c72f760df8301c89515f5f21a7fc01951f9d4fd339"
   },
   "method": {
     "primary": "Consecutive glfwSwapBuffers return timestamps from steady_clock; includes CSV write and loop overhead",
@@ -51,16 +52,16 @@
     "power": "AC online in every per-run before/after snapshot"
   },
   "inputs_sha256": {
-    "executable": "8e074c036edd6abe8f4fd75e870fbffc403f9a73b51f900a8282860abc7d1f2c",
-    "renderer": "a97b839a0e23cb2b5f47cc6ffd633f42c149014939f225457186be3154b34229",
-    "engine": "8770501b39a8fa20e2a1d28c803276aac69238bc286f0b73986efae75a2227c4"
+    "executable": "6f387a980277465856426b999e253bbc339088c33b7be728a689666626f4e313",
+    "renderer": "abf14ff11049c74cfc02b8f1d7b7469b30aca5634b06efa348c304384e6a9447",
+    "engine": "585279deab1f365149f75246df1269e586107e9589a0096f47c1e955618e05df"
   },
   "processes": 12,
   "scene_presents": 25920,
   "measured_intervals": 21600,
-  "worst_median_ms": 22.366083000000003,
-  "worst_p95_ms": 25.349346,
-  "maximum_single_interval_ms": 192.108683,
+  "worst_median_ms": 22.5570405,
+  "worst_p95_ms": 25.4407,
+  "maximum_single_interval_ms": 116.923831,
   "identical_physics_across_repetitions_and_backends": {
     "landed_exterior": "706932280f709a968b7ac7cb938bc0a45777636ba956513496940b246ed9b9f4",
     "orbit_panel": "74b3411d1ee5283394da321153be386bfef0ad4826ff7f9ce9e39cd5ff511fcb",
@@ -68,35 +69,35 @@
   },
   "runs": [
     {
-      "path": "out/phase6-performance-qualified/wayland/landed_exterior-1",
+      "path": "out/phase6-viewport-performance-qualified/wayland/landed_exterior-1",
       "backend": "wayland",
       "case": "landed_exterior-1",
       "cadence": {
         "samples": 1800,
-        "median_ms": 21.866083000000003,
-        "p95_ms": 24.304549,
-        "p99_ms": 25.757478,
-        "minimum_ms": 19.66547,
-        "maximum_ms": 42.4089,
-        "mean_ms": 22.13141885388889
+        "median_ms": 22.521324999999997,
+        "p95_ms": 25.300978,
+        "p99_ms": 26.699419,
+        "minimum_ms": 19.769348,
+        "maximum_ms": 43.651345,
+        "mean_ms": 22.78590283
       },
       "poll_to_present": {
         "samples": 1800,
-        "median_ms": 21.861376999999997,
-        "p95_ms": 24.299887,
-        "p99_ms": 25.751956,
-        "minimum_ms": 19.660724,
-        "maximum_ms": 42.403938,
-        "mean_ms": 22.12624610111111
+        "median_ms": 22.516601,
+        "p95_ms": 25.296128,
+        "p99_ms": 26.69332,
+        "minimum_ms": 19.765012,
+        "maximum_ms": 43.646079,
+        "mean_ms": 22.780456176666668
       },
       "swap": {
         "samples": 1800,
-        "median_ms": 0.1310675,
-        "p95_ms": 0.21527,
-        "p99_ms": 0.321875,
-        "minimum_ms": 0.075308,
-        "maximum_ms": 20.274434,
-        "mean_ms": 0.22409660611111112
+        "median_ms": 0.1374935,
+        "p95_ms": 0.277433,
+        "p99_ms": 0.368964,
+        "minimum_ms": 0.075759,
+        "maximum_ms": 20.306418,
+        "mean_ms": 0.25282702611111113
       },
       "window": {
         "backend": "wayland",
@@ -109,6 +110,10 @@
         "requested_width": 1920,
         "requested_height": 1080,
         "engineering_scale": 1
+      },
+      "cockpit_viewport": {
+        "width": 1920,
+        "height": 1080
       },
       "renderer": {
         "vendor": "Intel",
@@ -126,38 +131,38 @@
       "startup_priming": {
         "blank_presents_before_engine_scene": 3
       },
-      "report_sha256": "985c30fef25b275d22de39a69eff6843f13505d4df59e7df1e3d7ccd0fc348b7"
+      "report_sha256": "28cb0a8d9656d6fa344cec7bed01da5b9cf3533dad2216d6c4bd18bbb6ce47b4"
     },
     {
-      "path": "out/phase6-performance-qualified/wayland/landed_exterior-2",
+      "path": "out/phase6-viewport-performance-qualified/wayland/landed_exterior-2",
       "backend": "wayland",
       "case": "landed_exterior-2",
       "cadence": {
         "samples": 1800,
-        "median_ms": 22.366083000000003,
-        "p95_ms": 25.349346,
-        "p99_ms": 27.03182,
-        "minimum_ms": 12.96889,
-        "maximum_ms": 53.297013,
-        "mean_ms": 22.737239742222222
+        "median_ms": 22.402263,
+        "p95_ms": 25.191037,
+        "p99_ms": 27.197475,
+        "minimum_ms": 14.57243,
+        "maximum_ms": 52.623591,
+        "mean_ms": 22.670354452222224
       },
       "poll_to_present": {
         "samples": 1800,
-        "median_ms": 22.361417,
-        "p95_ms": 25.345123,
-        "p99_ms": 27.026909,
-        "minimum_ms": 12.961932,
-        "maximum_ms": 53.292416,
-        "mean_ms": 22.73217320222222
+        "median_ms": 22.397518499999997,
+        "p95_ms": 25.186898,
+        "p99_ms": 27.191888,
+        "minimum_ms": 14.554788,
+        "maximum_ms": 52.612172,
+        "mean_ms": 22.665204475555555
       },
       "swap": {
         "samples": 1800,
-        "median_ms": 0.136993,
-        "p95_ms": 0.276289,
-        "p99_ms": 0.407372,
-        "minimum_ms": 0.073473,
-        "maximum_ms": 20.286906,
-        "mean_ms": 0.24854873055555557
+        "median_ms": 0.127178,
+        "p95_ms": 0.206319,
+        "p99_ms": 0.297997,
+        "minimum_ms": 0.072296,
+        "maximum_ms": 20.338415,
+        "mean_ms": 0.21834256777777777
       },
       "window": {
         "backend": "wayland",
@@ -170,6 +175,10 @@
         "requested_width": 1920,
         "requested_height": 1080,
         "engineering_scale": 1
+      },
+      "cockpit_viewport": {
+        "width": 1920,
+        "height": 1080
       },
       "renderer": {
         "vendor": "Intel",
@@ -187,38 +196,38 @@
       "startup_priming": {
         "blank_presents_before_engine_scene": 3
       },
-      "report_sha256": "2b1ca84c6070b291889758393ce3dc469bd6e311fc6d9f4b542ed4879dc4e836"
+      "report_sha256": "3ac4468224dac031e9fc036b054fdcf6bd3efb36742dd17b8177a83e74b14f9f"
     },
     {
-      "path": "out/phase6-performance-qualified/wayland/orbit_panel-1",
+      "path": "out/phase6-viewport-performance-qualified/wayland/orbit_panel-1",
       "backend": "wayland",
       "case": "orbit_panel-1",
       "cadence": {
         "samples": 1800,
-        "median_ms": 19.0409875,
-        "p95_ms": 21.501339,
-        "p99_ms": 29.422821,
-        "minimum_ms": 7.09706,
-        "maximum_ms": 45.619762,
-        "mean_ms": 19.61446273388889
+        "median_ms": 18.839289,
+        "p95_ms": 21.168485,
+        "p99_ms": 28.313393,
+        "minimum_ms": 7.515387,
+        "maximum_ms": 43.466385,
+        "mean_ms": 19.35453955722222
       },
       "poll_to_present": {
         "samples": 1800,
-        "median_ms": 19.036144,
-        "p95_ms": 21.496818,
-        "p99_ms": 29.417428,
-        "minimum_ms": 7.08765,
-        "maximum_ms": 45.615213,
-        "mean_ms": 19.609339867777777
+        "median_ms": 18.832216,
+        "p95_ms": 21.163874,
+        "p99_ms": 28.308576,
+        "minimum_ms": 7.505451,
+        "maximum_ms": 43.460281,
+        "mean_ms": 19.349265385555555
       },
       "swap": {
         "samples": 1800,
-        "median_ms": 0.08934149999999999,
-        "p95_ms": 0.106918,
-        "p99_ms": 0.144201,
-        "minimum_ms": 0.063645,
-        "maximum_ms": 20.29959,
-        "mean_ms": 0.215577235
+        "median_ms": 0.0907105,
+        "p95_ms": 0.109918,
+        "p99_ms": 0.153269,
+        "minimum_ms": 0.062347,
+        "maximum_ms": 20.181062,
+        "mean_ms": 0.17495110777777778
       },
       "window": {
         "backend": "wayland",
@@ -231,6 +240,10 @@
         "requested_width": 1920,
         "requested_height": 1080,
         "engineering_scale": 1
+      },
+      "cockpit_viewport": {
+        "width": 1920,
+        "height": 1080
       },
       "renderer": {
         "vendor": "Intel",
@@ -248,38 +261,38 @@
       "startup_priming": {
         "blank_presents_before_engine_scene": 3
       },
-      "report_sha256": "a11965e99b8c0a3f78c33c0e664c3994a91667f170117c724a7c112cfbf854b4"
+      "report_sha256": "83beb7b6ed24681c702a8e6a3bca64379373d15955903ba8bb2ffeec123a6a35"
     },
     {
-      "path": "out/phase6-performance-qualified/wayland/orbit_panel-2",
+      "path": "out/phase6-viewport-performance-qualified/wayland/orbit_panel-2",
       "backend": "wayland",
       "case": "orbit_panel-2",
       "cadence": {
         "samples": 1800,
-        "median_ms": 18.816194,
-        "p95_ms": 21.073858,
-        "p99_ms": 28.035832,
-        "minimum_ms": 7.119362,
-        "maximum_ms": 39.868502,
-        "mean_ms": 19.290859393333335
+        "median_ms": 18.7342625,
+        "p95_ms": 21.079252,
+        "p99_ms": 27.36201,
+        "minimum_ms": 6.983196,
+        "maximum_ms": 40.104672,
+        "mean_ms": 19.196137943333333
       },
       "poll_to_present": {
         "samples": 1800,
-        "median_ms": 18.811647,
-        "p95_ms": 21.068702,
-        "p99_ms": 28.031204,
-        "minimum_ms": 7.113443,
-        "maximum_ms": 39.851781,
-        "mean_ms": 19.28565222888889
+        "median_ms": 18.729224000000002,
+        "p95_ms": 21.074163,
+        "p99_ms": 27.339026,
+        "minimum_ms": 6.976587,
+        "maximum_ms": 40.099814,
+        "mean_ms": 19.190982976666668
       },
       "swap": {
         "samples": 1800,
-        "median_ms": 0.0887445,
-        "p95_ms": 0.111642,
-        "p99_ms": 0.143394,
-        "minimum_ms": 0.062606,
-        "maximum_ms": 20.271638,
-        "mean_ms": 0.20796670666666667
+        "median_ms": 0.0903065,
+        "p95_ms": 0.109585,
+        "p99_ms": 0.146809,
+        "minimum_ms": 0.061919,
+        "maximum_ms": 20.30276,
+        "mean_ms": 0.21747203777777777
       },
       "window": {
         "backend": "wayland",
@@ -292,6 +305,10 @@
         "requested_width": 1920,
         "requested_height": 1080,
         "engineering_scale": 1
+      },
+      "cockpit_viewport": {
+        "width": 1920,
+        "height": 1080
       },
       "renderer": {
         "vendor": "Intel",
@@ -309,38 +326,38 @@
       "startup_priming": {
         "blank_presents_before_engine_scene": 3
       },
-      "report_sha256": "ccc19e67a76ed952215b604829be4f327b68530482360305a57acdcd754b31b5"
+      "report_sha256": "9a0014dd72a312fcb938f3da06faf82b9f943a3079a1d648811cc3bd13de4f73"
     },
     {
-      "path": "out/phase6-performance-qualified/wayland/landed_vc-1",
+      "path": "out/phase6-viewport-performance-qualified/wayland/landed_vc-1",
       "backend": "wayland",
       "case": "landed_vc-1",
       "cadence": {
         "samples": 1800,
-        "median_ms": 22.181868,
-        "p95_ms": 24.402936,
-        "p99_ms": 26.273782,
-        "minimum_ms": 11.20857,
-        "maximum_ms": 44.875373,
-        "mean_ms": 22.44818118222222
+        "median_ms": 22.32994,
+        "p95_ms": 25.270725,
+        "p99_ms": 27.126016,
+        "minimum_ms": 19.826158,
+        "maximum_ms": 62.865062,
+        "mean_ms": 22.65406864722222
       },
       "poll_to_present": {
         "samples": 1800,
-        "median_ms": 22.1777275,
-        "p95_ms": 24.397224,
-        "p99_ms": 26.268734,
-        "minimum_ms": 11.196697,
-        "maximum_ms": 44.869727,
-        "mean_ms": 22.44299342277778
+        "median_ms": 22.325502,
+        "p95_ms": 25.265784,
+        "p99_ms": 27.119801,
+        "minimum_ms": 19.821178,
+        "maximum_ms": 62.84278,
+        "mean_ms": 22.648779749444444
       },
       "swap": {
         "samples": 1800,
-        "median_ms": 0.1379015,
-        "p95_ms": 0.31283,
-        "p99_ms": 0.388055,
-        "minimum_ms": 0.096899,
-        "maximum_ms": 20.428388,
-        "mean_ms": 0.26108642
+        "median_ms": 0.128131,
+        "p95_ms": 0.285208,
+        "p99_ms": 0.385014,
+        "minimum_ms": 0.096192,
+        "maximum_ms": 20.399288,
+        "mean_ms": 0.23448306666666666
       },
       "window": {
         "backend": "wayland",
@@ -353,6 +370,10 @@
         "requested_width": 1920,
         "requested_height": 1080,
         "engineering_scale": 1
+      },
+      "cockpit_viewport": {
+        "width": 1920,
+        "height": 1080
       },
       "renderer": {
         "vendor": "Intel",
@@ -370,38 +391,38 @@
       "startup_priming": {
         "blank_presents_before_engine_scene": 3
       },
-      "report_sha256": "7653e3bf03eab1e1d7b74d1164a3a2da25023b62fb7ac12548c95f9b96ca7fd9"
+      "report_sha256": "2628e091a48e438898d1a7e2fd354545feb4a06d29add4c571f9a73675af4a14"
     },
     {
-      "path": "out/phase6-performance-qualified/wayland/landed_vc-2",
+      "path": "out/phase6-viewport-performance-qualified/wayland/landed_vc-2",
       "backend": "wayland",
       "case": "landed_vc-2",
       "cadence": {
         "samples": 1800,
-        "median_ms": 22.2460955,
-        "p95_ms": 24.520853,
-        "p99_ms": 26.207909,
-        "minimum_ms": 19.955645,
-        "maximum_ms": 42.768017,
-        "mean_ms": 22.473130890555556
+        "median_ms": 22.5570405,
+        "p95_ms": 25.4407,
+        "p99_ms": 28.101693,
+        "minimum_ms": 12.024731,
+        "maximum_ms": 43.245085,
+        "mean_ms": 22.90504563
       },
       "poll_to_present": {
         "samples": 1800,
-        "median_ms": 22.241491,
-        "p95_ms": 24.51615,
-        "p99_ms": 26.202721,
-        "minimum_ms": 19.951155,
-        "maximum_ms": 42.745863,
-        "mean_ms": 22.467923536666667
+        "median_ms": 22.551982000000002,
+        "p95_ms": 25.434476,
+        "p99_ms": 28.095663,
+        "minimum_ms": 12.018619,
+        "maximum_ms": 43.238747,
+        "mean_ms": 22.899637944444443
       },
       "swap": {
         "samples": 1800,
-        "median_ms": 0.14643,
-        "p95_ms": 0.29521,
-        "p99_ms": 0.394251,
-        "minimum_ms": 0.096603,
-        "maximum_ms": 20.229428,
-        "mean_ms": 0.25092931
+        "median_ms": 0.144463,
+        "p95_ms": 0.288328,
+        "p99_ms": 0.538405,
+        "minimum_ms": 0.094768,
+        "maximum_ms": 20.353722,
+        "mean_ms": 0.2597152022222222
       },
       "window": {
         "backend": "wayland",
@@ -414,6 +435,10 @@
         "requested_width": 1920,
         "requested_height": 1080,
         "engineering_scale": 1
+      },
+      "cockpit_viewport": {
+        "width": 1920,
+        "height": 1080
       },
       "renderer": {
         "vendor": "Intel",
@@ -431,38 +456,38 @@
       "startup_priming": {
         "blank_presents_before_engine_scene": 3
       },
-      "report_sha256": "85f3211e0ab04e15a92647d5dba1030021f88b5e89410bec17c16a6a05b9f5c7"
+      "report_sha256": "275db0293f0a2a15d8f2a69103b2c41d6af0ee4365c929401ebc4d285db936ea"
     },
     {
-      "path": "out/phase6-performance-qualified/x11/landed_exterior-1",
+      "path": "out/phase6-viewport-performance-qualified/x11/landed_exterior-1",
       "backend": "x11",
       "case": "landed_exterior-1",
       "cadence": {
         "samples": 1800,
-        "median_ms": 8.5200225,
-        "p95_ms": 11.739708,
-        "p99_ms": 14.327405,
-        "minimum_ms": 3.917032,
-        "maximum_ms": 139.122244,
-        "mean_ms": 8.937635509444444
+        "median_ms": 8.3598805,
+        "p95_ms": 11.111431,
+        "p99_ms": 14.609471,
+        "minimum_ms": 4.340276,
+        "maximum_ms": 98.253895,
+        "mean_ms": 8.786255418333333
       },
       "poll_to_present": {
         "samples": 1800,
-        "median_ms": 8.2408645,
-        "p95_ms": 11.185689,
-        "p99_ms": 13.869257,
-        "minimum_ms": 3.746016,
-        "maximum_ms": 138.865169,
-        "mean_ms": 8.577851875
+        "median_ms": 8.172658,
+        "p95_ms": 10.589157,
+        "p99_ms": 14.021986,
+        "minimum_ms": 4.10489,
+        "maximum_ms": 98.123751,
+        "mean_ms": 8.503116369444445
       },
       "swap": {
         "samples": 1800,
-        "median_ms": 0.9676370000000001,
-        "p95_ms": 3.996157,
-        "p99_ms": 4.927086,
-        "minimum_ms": 0.083176,
-        "maximum_ms": 134.374198,
-        "mean_ms": 1.6652120505555557
+        "median_ms": 2.791607,
+        "p95_ms": 4.571668,
+        "p99_ms": 7.633995,
+        "minimum_ms": 0.080007,
+        "maximum_ms": 94.263339,
+        "mean_ms": 2.677613256111111
       },
       "window": {
         "backend": "x11",
@@ -475,6 +500,10 @@
         "requested_width": 1920,
         "requested_height": 1080,
         "engineering_scale": 1
+      },
+      "cockpit_viewport": {
+        "width": 1920,
+        "height": 1080
       },
       "renderer": {
         "vendor": "Intel",
@@ -490,38 +519,38 @@
       },
       "focused_frames": 1800,
       "startup_priming": null,
-      "report_sha256": "ba7401d5812f0b6521c1cb446b3d715a5cc0554cea46bedce26f68b777b39a4f"
+      "report_sha256": "17a59f4a7f6f1573cb9eeee171672ee19938a34bf1b0bed3579b598311d11c32"
     },
     {
-      "path": "out/phase6-performance-qualified/x11/landed_exterior-2",
+      "path": "out/phase6-viewport-performance-qualified/x11/landed_exterior-2",
       "backend": "x11",
       "case": "landed_exterior-2",
       "cadence": {
         "samples": 1800,
-        "median_ms": 8.371787,
-        "p95_ms": 11.949346,
-        "p99_ms": 14.707141,
-        "minimum_ms": 4.467883,
-        "maximum_ms": 99.742234,
-        "mean_ms": 8.966568636111111
+        "median_ms": 8.4273,
+        "p95_ms": 11.256597,
+        "p99_ms": 14.509914,
+        "minimum_ms": 4.267379,
+        "maximum_ms": 89.552646,
+        "mean_ms": 8.777942285
       },
       "poll_to_present": {
         "samples": 1800,
-        "median_ms": 8.1817085,
-        "p95_ms": 11.457578,
-        "p99_ms": 14.459968,
-        "minimum_ms": 4.354714,
-        "maximum_ms": 99.537786,
-        "mean_ms": 8.71578052111111
+        "median_ms": 8.1731725,
+        "p95_ms": 10.76252,
+        "p99_ms": 14.245132,
+        "minimum_ms": 3.936732,
+        "maximum_ms": 89.406035,
+        "mean_ms": 8.432611363888888
       },
       "swap": {
         "samples": 1800,
-        "median_ms": 1.6625685,
-        "p95_ms": 3.742066,
-        "p99_ms": 4.379818,
-        "minimum_ms": 0.078494,
-        "maximum_ms": 91.887831,
-        "mean_ms": 1.83368425
+        "median_ms": 1.408464,
+        "p95_ms": 4.120057,
+        "p99_ms": 5.252081,
+        "minimum_ms": 0.080914,
+        "maximum_ms": 83.541042,
+        "mean_ms": 1.8899985216666666
       },
       "window": {
         "backend": "x11",
@@ -534,6 +563,10 @@
         "requested_width": 1920,
         "requested_height": 1080,
         "engineering_scale": 1
+      },
+      "cockpit_viewport": {
+        "width": 1920,
+        "height": 1080
       },
       "renderer": {
         "vendor": "Intel",
@@ -549,38 +582,38 @@
       },
       "focused_frames": 1800,
       "startup_priming": null,
-      "report_sha256": "8ffebd17b3d42aef05c389713fb7d41b381e478c32d12e8c6edb33070bce6b6c"
+      "report_sha256": "693d5c1cbc009351d9ce95b81a1af71ae69d5881bc0c5085aef87e623c24cf98"
     },
     {
-      "path": "out/phase6-performance-qualified/x11/orbit_panel-1",
+      "path": "out/phase6-viewport-performance-qualified/x11/orbit_panel-1",
       "backend": "x11",
       "case": "orbit_panel-1",
       "cadence": {
         "samples": 1800,
-        "median_ms": 8.475213499999999,
-        "p95_ms": 13.586594,
-        "p99_ms": 28.991223,
-        "minimum_ms": 1.572139,
-        "maximum_ms": 192.108683,
-        "mean_ms": 9.196923144444444
+        "median_ms": 8.547312,
+        "p95_ms": 15.200361,
+        "p99_ms": 29.526274,
+        "minimum_ms": 2.397894,
+        "maximum_ms": 96.975485,
+        "mean_ms": 9.408685213888889
       },
       "poll_to_present": {
         "samples": 1800,
-        "median_ms": 8.2372205,
-        "p95_ms": 12.981082,
-        "p99_ms": 28.596187,
-        "minimum_ms": 1.462218,
-        "maximum_ms": 191.695008,
-        "mean_ms": 8.847349739444445
+        "median_ms": 8.306018,
+        "p95_ms": 14.606473,
+        "p99_ms": 29.10282,
+        "minimum_ms": 1.933323,
+        "maximum_ms": 96.691635,
+        "mean_ms": 9.01450931
       },
       "swap": {
         "samples": 1800,
-        "median_ms": 6.035964,
-        "p95_ms": 8.338503,
-        "p99_ms": 12.794391,
-        "minimum_ms": 0.053711,
-        "maximum_ms": 188.821057,
-        "mean_ms": 5.823708954444444
+        "median_ms": 6.2022010000000005,
+        "p95_ms": 9.219013,
+        "p99_ms": 12.755084,
+        "minimum_ms": 0.050436,
+        "maximum_ms": 95.120793,
+        "mean_ms": 5.812317010555556
       },
       "window": {
         "backend": "x11",
@@ -593,6 +626,10 @@
         "requested_width": 1920,
         "requested_height": 1080,
         "engineering_scale": 1
+      },
+      "cockpit_viewport": {
+        "width": 1920,
+        "height": 1080
       },
       "renderer": {
         "vendor": "Intel",
@@ -608,38 +645,38 @@
       },
       "focused_frames": 1800,
       "startup_priming": null,
-      "report_sha256": "982ac85316c1863550dbc8277ef3b2ae41d4e2ee0adfd1a72d3284ef1de42c32"
+      "report_sha256": "b0c943b6a3bb7ea956cba0aa5765d60c645587e38dc70358037ca4dc56cd38da"
     },
     {
-      "path": "out/phase6-performance-qualified/x11/orbit_panel-2",
+      "path": "out/phase6-viewport-performance-qualified/x11/orbit_panel-2",
       "backend": "x11",
       "case": "orbit_panel-2",
       "cadence": {
         "samples": 1800,
-        "median_ms": 8.4908295,
-        "p95_ms": 14.126222,
-        "p99_ms": 30.481378,
-        "minimum_ms": 1.81342,
-        "maximum_ms": 178.928996,
-        "mean_ms": 9.43340070888889
+        "median_ms": 8.523263,
+        "p95_ms": 14.313238,
+        "p99_ms": 32.460906,
+        "minimum_ms": 1.651674,
+        "maximum_ms": 102.439175,
+        "mean_ms": 9.372678618333333
       },
       "poll_to_present": {
         "samples": 1800,
-        "median_ms": 8.249818,
-        "p95_ms": 13.638192,
-        "p99_ms": 30.032038,
-        "minimum_ms": 1.557262,
-        "maximum_ms": 178.188176,
-        "mean_ms": 9.066689752222223
+        "median_ms": 8.276335,
+        "p95_ms": 13.925264,
+        "p99_ms": 31.897565,
+        "minimum_ms": 1.450422,
+        "maximum_ms": 101.750005,
+        "mean_ms": 8.992665503333333
       },
       "swap": {
         "samples": 1800,
-        "median_ms": 6.019768,
-        "p95_ms": 8.707879,
-        "p99_ms": 12.425628,
-        "minimum_ms": 0.049064,
-        "maximum_ms": 173.266759,
-        "mean_ms": 5.750035613333333
+        "median_ms": 6.1280845,
+        "p95_ms": 8.927119,
+        "p99_ms": 12.905451,
+        "minimum_ms": 0.052639,
+        "maximum_ms": 99.363626,
+        "mean_ms": 5.793722694444445
       },
       "window": {
         "backend": "x11",
@@ -652,6 +689,10 @@
         "requested_width": 1920,
         "requested_height": 1080,
         "engineering_scale": 1
+      },
+      "cockpit_viewport": {
+        "width": 1920,
+        "height": 1080
       },
       "renderer": {
         "vendor": "Intel",
@@ -667,38 +708,38 @@
       },
       "focused_frames": 1800,
       "startup_priming": null,
-      "report_sha256": "239acf0bf977555b1e3457fd3a00b46f41375111519e5a15beb091fcfa3edd96"
+      "report_sha256": "41b7189ff710eaf97028410f8ec5e0419968978292657104593474ff5a18ceca"
     },
     {
-      "path": "out/phase6-performance-qualified/x11/landed_vc-1",
+      "path": "out/phase6-viewport-performance-qualified/x11/landed_vc-1",
       "backend": "x11",
       "case": "landed_vc-1",
       "cadence": {
         "samples": 1800,
-        "median_ms": 8.4618845,
-        "p95_ms": 11.639265,
-        "p99_ms": 13.912224,
-        "minimum_ms": 4.358348,
-        "maximum_ms": 86.976345,
-        "mean_ms": 8.949043423888888
+        "median_ms": 8.358756,
+        "p95_ms": 11.226812,
+        "p99_ms": 14.217099,
+        "minimum_ms": 3.874304,
+        "maximum_ms": 108.532946,
+        "mean_ms": 8.74210666
       },
       "poll_to_present": {
         "samples": 1800,
-        "median_ms": 8.2196275,
-        "p95_ms": 11.104871,
-        "p99_ms": 13.386803,
-        "minimum_ms": 4.18671,
-        "maximum_ms": 86.681776,
-        "mean_ms": 8.620182287777778
+        "median_ms": 8.152732,
+        "p95_ms": 10.723548,
+        "p99_ms": 13.692871,
+        "minimum_ms": 3.744382,
+        "maximum_ms": 108.328714,
+        "mean_ms": 8.462645978888888
       },
       "swap": {
         "samples": 1800,
-        "median_ms": 1.1429325000000001,
-        "p95_ms": 3.762506,
-        "p99_ms": 4.839564,
-        "minimum_ms": 0.090357,
-        "maximum_ms": 78.259407,
-        "mean_ms": 1.7365891016666666
+        "median_ms": 2.6150925000000003,
+        "p95_ms": 4.359298,
+        "p99_ms": 7.895871,
+        "minimum_ms": 0.101208,
+        "maximum_ms": 102.79888,
+        "mean_ms": 2.4751438333333335
       },
       "window": {
         "backend": "x11",
@@ -711,6 +752,10 @@
         "requested_width": 1920,
         "requested_height": 1080,
         "engineering_scale": 1
+      },
+      "cockpit_viewport": {
+        "width": 1920,
+        "height": 1080
       },
       "renderer": {
         "vendor": "Intel",
@@ -726,38 +771,38 @@
       },
       "focused_frames": 1800,
       "startup_priming": null,
-      "report_sha256": "58eca164b645bbaec4dee58867472f5eeaff0976509aa431c93493a807a31f2b"
+      "report_sha256": "63d1a6588355a12271fee7c127d90dde12a5e27c013c5db5fd259f97d227a289"
     },
     {
-      "path": "out/phase6-performance-qualified/x11/landed_vc-2",
+      "path": "out/phase6-viewport-performance-qualified/x11/landed_vc-2",
       "backend": "x11",
       "case": "landed_vc-2",
       "cadence": {
         "samples": 1800,
-        "median_ms": 8.7465835,
-        "p95_ms": 12.575169,
-        "p99_ms": 15.273859,
-        "minimum_ms": 4.75956,
-        "maximum_ms": 107.982475,
-        "mean_ms": 9.421289243333334
+        "median_ms": 8.459958,
+        "p95_ms": 11.795707,
+        "p99_ms": 14.706469,
+        "minimum_ms": 3.883484,
+        "maximum_ms": 116.923831,
+        "mean_ms": 8.98606643111111
       },
       "poll_to_present": {
         "samples": 1800,
-        "median_ms": 8.453672000000001,
-        "p95_ms": 12.030065,
-        "p99_ms": 14.816791,
-        "minimum_ms": 4.556907,
-        "maximum_ms": 107.478225,
-        "mean_ms": 9.07859184888889
+        "median_ms": 8.229504,
+        "p95_ms": 11.242583,
+        "p99_ms": 14.353771,
+        "minimum_ms": 3.575627,
+        "maximum_ms": 116.303855,
+        "mean_ms": 8.652204069444444
       },
       "swap": {
         "samples": 1800,
-        "median_ms": 0.494672,
-        "p95_ms": 3.825226,
-        "p99_ms": 5.234131,
-        "minimum_ms": 0.097401,
-        "maximum_ms": 95.57008,
-        "mean_ms": 1.4765013516666667
+        "median_ms": 1.1900625,
+        "p95_ms": 4.12812,
+        "p99_ms": 6.382927,
+        "minimum_ms": 0.097031,
+        "maximum_ms": 108.63729,
+        "mean_ms": 1.858687157222222
       },
       "window": {
         "backend": "x11",
@@ -770,6 +815,10 @@
         "requested_width": 1920,
         "requested_height": 1080,
         "engineering_scale": 1
+      },
+      "cockpit_viewport": {
+        "width": 1920,
+        "height": 1080
       },
       "renderer": {
         "vendor": "Intel",
@@ -785,44 +834,44 @@
       },
       "focused_frames": 1800,
       "startup_priming": null,
-      "report_sha256": "f5049aee88873121d42f2a9d309a7162b68f73f58c02ab494d8073b1e5789195"
+      "report_sha256": "0dd6fd2047030212ba4550d00d8d14f46a5921468787653a9878048fdaa4d324"
     }
   ],
   "loaded_runtime_libraries_sha256": {
     "/usr/lib/x86_64-linux-gnu/libgallium-26.0.8-1ubuntu0.3.so": "64c5508bb7167947f932c950d5e2d2c314f631fc3919de82f757c3769758b79f",
     "/usr/lib/x86_64-linux-gnu/libdrm_intel.so.1.131.0": "b4efda864f3ff03ec175787fc83c330981cf3a50704127debb782c325055054e",
     "/usr/lib/x86_64-linux-gnu/libdrm_amdgpu.so.1.131.0": "edc5af5a40623befde7f1214950cb0046e04e9a39f925e6959e71f01d2d34d9c",
-    "/usr/lib/x86_64-linux-gnu/libdrm.so.2.131.0": "c8be7d3863453898666977c12b0b392014a1c728d84215d885d574882d6e7b89",
     "/usr/lib/x86_64-linux-gnu/libEGL_mesa.so.0.0.0": "33928ce22aa227d807ee63b8dbe8d92c66cbbb2389c3825839f51945ad339b45",
-    "/usr/lib/x86_64-linux-gnu/libgbm.so.1.0.0": "fe7f42f2aada962b9838e6ed83711ed24c45d145d05231aa0b3c5dd9cf30771f",
-    "/usr/lib/x86_64-linux-gnu/libEGL.so.1.1.0": "6fa3af4903be9ce007f56f0a0cd2fff01d6500b5eecb59df13c93f17c2059341",
+    "/usr/lib/x86_64-linux-gnu/libdrm.so.2.131.0": "c8be7d3863453898666977c12b0b392014a1c728d84215d885d574882d6e7b89",
     "/usr/lib/x86_64-linux-gnu/libX11-xcb.so.1.0.0": "6a9047ac83e4e1afb8032e62332aa449e7c6307c731f621054c9c0573a460899",
-    "/usr/lib/x86_64-linux-gnu/libX11.so.6.4.0": "badd43566333da97d916ab365c61227751d49cd5c0df5d49dabdbd67b8c6fd19",
-    "/usr/lib/x86_64-linux-gnu/libxkbcommon.so.0.13.1": "8b7d244ea1df8b1c073069344f8c705bab90d6b6bcafb96f1c2eccc2312f4946",
-    "/usr/lib/x86_64-linux-gnu/libwayland-client.so.0.24.0": "f27b9eecd96d76ae49ec9f7d4da17dcc43df3411ef3d432ce56d710c8b62930c",
+    "/usr/lib/x86_64-linux-gnu/libEGL.so.1.1.0": "6fa3af4903be9ce007f56f0a0cd2fff01d6500b5eecb59df13c93f17c2059341",
+    "/usr/lib/x86_64-linux-gnu/libgbm.so.1.0.0": "fe7f42f2aada962b9838e6ed83711ed24c45d145d05231aa0b3c5dd9cf30771f",
     "/usr/lib/x86_64-linux-gnu/libGLdispatch.so.0.0.0": "8c3dbc80a9e435d15bb6394f609f90b823175a92e9ca41133294b5b8fcac50b2",
+    "/usr/lib/x86_64-linux-gnu/libX11.so.6.4.0": "badd43566333da97d916ab365c61227751d49cd5c0df5d49dabdbd67b8c6fd19",
     "/usr/lib/x86_64-linux-gnu/libdecor-0.so.0.200.5": "78665b57f55f602c782c01f4d7e92066a79b1418ba2ea338c3aafe7bcc348365",
-    "/usr/lib/x86_64-linux-gnu/libGLX.so.0.0.0": "0754505cc97c5c2251aebc10b5ab6ccbb9ad02d765bee07115bc9c09daf13002",
+    "/usr/lib/x86_64-linux-gnu/libxkbcommon.so.0.13.1": "8b7d244ea1df8b1c073069344f8c705bab90d6b6bcafb96f1c2eccc2312f4946",
     "/usr/lib/x86_64-linux-gnu/libwayland-egl.so.1.24.0": "876d46c04d35fde63a9ebf9ab7bf1f39b6d1c7f5c7bbc21c74c711fccc173ad0",
+    "/usr/lib/x86_64-linux-gnu/libwayland-client.so.0.24.0": "f27b9eecd96d76ae49ec9f7d4da17dcc43df3411ef3d432ce56d710c8b62930c",
     "/usr/lib/x86_64-linux-gnu/libwayland-cursor.so.0.24.0": "22ea2b5f2c5290a356bb73b3c1dab09535cd2126f1227a89cca148ccfc71422d",
+    "/usr/lib/x86_64-linux-gnu/libGLX.so.0.0.0": "0754505cc97c5c2251aebc10b5ab6ccbb9ad02d765bee07115bc9c09daf13002",
     "/usr/lib/x86_64-linux-gnu/libdecor/plugins-1/libdecor-gtk.so": "1714f558d95368c972c8440301fceb4d40d82b750a09a1fcdc6d8ee230c8a562",
     "/usr/lib/x86_64-linux-gnu/libGLX_mesa.so.0.0.0": "864200bd459ead8a3027bedb768e1f7189b1526fc93ab5280b3edcad0cfc11fe"
   },
   "gate_control": {
-    "path": "out/phase6-performance-gate-control.json",
-    "sha256": "46052df26cac3dcad97e1c2fc090051bf36cfa7da2fb4363c29380eb6be6a56f"
+    "path": "out/phase6-viewport-performance-controls.json",
+    "sha256": "570c54731a5433450b658921ae95dd9b2019b2824b4cd94b7bcf5dc418c59b96"
   },
   "invalid_window_dimensions": {
-    "path": "out/phase6-performance-window-validation-final/window-validation.json",
-    "sha256": "162144347786701c5c160279de07517449d14736b9d0f3076e358c4150ee5e97"
+    "path": "out/phase6-viewport-window-validation/window-validation.json",
+    "sha256": "af2ae47a9ea1bbcb7d4d8d5d015b915a3050ef9b09f56cda3ab0853d63439fbf"
   },
   "default_window_regression": {
     "capture": {
-      "path": "out/phase6-performance-regressions/camera/camera-report.json",
-      "sha256": "614f0aae21ea55f093c9d904c7b66e5d0084776bc29b190096df60d5ab7f7471"
+      "path": "out/phase6-viewport-regressions/camera/camera-report.json",
+      "sha256": "260bdc790cc9c88dad3d221177b7accecb546f25ba598224433f6f58e09738e9"
     },
     "comparison": {
-      "path": "out/phase6-performance-regressions/camera-comparison.json",
+      "path": "out/phase6-viewport-regressions/camera-comparison.json",
       "sha256": "c0b39805a7949abe35ed69b93331ede8e54fe9d7113074d7520f736a3cd67260"
     },
     "original_capture": {
@@ -844,8 +893,8 @@
   },
   "input_regressions": [
     {
-      "path": "out/phase6-performance-regressions/controls_dg_panel-1/wayland-input.json",
-      "sha256": "efbf55a83a97f43b106509cd66c9ca174b0a9cd3c1593031b7f2362a8da663d9",
+      "path": "out/phase6-viewport-regressions/controls_dg_panel-1/wayland-input.json",
+      "sha256": "c702963511e832d46be295ed349cb899b08f9184745c6d4243e3bfc1443b77ec",
       "case": "controls_dg_panel",
       "scale": 1,
       "renderer": {
@@ -856,8 +905,8 @@
         "client_height": 720
       },
       "lifecycle": {
-        "rendered_frames": 1212,
-        "successful_presents": 1212,
+        "rendered_frames": 1207,
+        "successful_presents": 1207,
         "context_deleted": true
       },
       "geometry": {
@@ -874,8 +923,8 @@
       }
     },
     {
-      "path": "out/phase6-performance-regressions/controls_dgs_vc-2/wayland-input.json",
-      "sha256": "ce60a2956285f93b9c24512281dfd2ceb01870eaef786a04eb7f5928553df197",
+      "path": "out/phase6-viewport-regressions/controls_dgs_vc-2/wayland-input.json",
+      "sha256": "4c3f0051a0ecad1ef5cf96bd6b41ae04a6ade360d8bc6ef3af4c37221b7a33f5",
       "case": "controls_dgs_vc",
       "scale": 2,
       "renderer": {
@@ -886,8 +935,8 @@
         "client_height": 720
       },
       "lifecycle": {
-        "rendered_frames": 1762,
-        "successful_presents": 1762,
+        "rendered_frames": 1816,
+        "successful_presents": 1816,
         "context_deleted": true
       },
       "geometry": {
@@ -910,10 +959,16 @@
     "log_sha256": "5034eb099d877a3749f72fe4d85d6bac71830dc862f900c4e3a624cd69e49b15"
   },
   "local_evidence_archive": {
-    "path": "out/phase6-performance-evidence-v1.tar.gz",
-    "bytes": 115326360,
-    "sha256": "620705bbd3965e7568954504274b2bccfcfcdbb7a9dd2e101af201f72d4a07eb",
-    "scope": "Qualified raw hardware metrics, source/profile, negative controls and frozen-reference regressions; local preservation bundle awaiting durable release storage"
+    "path": "out/phase6-performance-evidence-v2.tar.gz",
+    "bytes": 248544543,
+    "sha256": "08de806d5b2e1493b049625d0e373800b17fe3dab16ebc761380deb39c5cf6e2",
+    "scope": "Corrected actual original cockpit/camera 1920x1080 hardware matrix, complete camera/input regressions, stock corpus failures, source snapshot and freshly built matching binaries; local bundle awaiting durable release storage",
+    "previous_archive_preserved": {
+      "path": "out/phase6-performance-evidence-v1.tar.gz",
+      "bytes": 115326360,
+      "sha256": "620705bbd3965e7568954504274b2bccfcfcdbb7a9dd2e101af201f72d4a07eb",
+      "scope": "Qualified raw hardware metrics, source/profile, negative controls and frozen-reference regressions; local preservation bundle awaiting durable release storage"
+    }
   },
   "development_trials": [
     {
@@ -948,5 +1003,44 @@
     "Wayland input/lifetime sanitizer scope",
     "Durable release preservation of the prepared evidence archive",
     "Full Phase 6 acceptance audit"
-  ]
+  ],
+  "viewport_correction": {
+    "previous_commit": "2c00d29b9d982d4096947636dcd61a89006577a0",
+    "prior_renderer_only_qualification_superseded": true,
+    "original_windows_source": "f725194209634f7fd5d1d44d426cfa9b5e303e37",
+    "original_application": "Src/Orbiter/Orbiter.cpp:263,986",
+    "actual_original_pane_dimensions_checked": true,
+    "wrong_pane_negative_control_rejected": true,
+    "physical_traces_identical_to_previous_runtime": true,
+    "previous_archive": {
+      "path": "out/phase6-performance-evidence-v1.tar.gz",
+      "bytes": 115326360,
+      "sha256": "620705bbd3965e7568954504274b2bccfcfcdbb7a9dd2e101af201f72d4a07eb",
+      "scope": "Qualified raw hardware metrics, source/profile, negative controls and frozen-reference regressions; local preservation bundle awaiting durable release storage"
+    }
+  },
+  "stock_readiness": {
+    "path": "Docs/Production/StockScenarioReadiness.json",
+    "sha256": "608b9059abc26420d77ef1ee267282e4cac2bc496deee9dc4e34f86216368607"
+  },
+  "earlier_hosted_camera_regression": {
+    "source": "6ee325ec03700101a4691e9b399d08a0f6c4a465",
+    "run_id": 41639429419,
+    "status": "all twelve jobs succeeded",
+    "includes_current_viewport_fix": false
+  },
+  "runtime_files_sha256": {
+    "out/phase6-viewport-engine/orbiter-production": "6f387a980277465856426b999e253bbc339088c33b7be728a689666626f4e313",
+    "out/phase6-viewport-engine/liborbiter_production_boundary.so": "ab7ce8c2b71ae4a584da7bd73e0136aa780942ad745cf852334b28cc66b5e3ad",
+    "out/phase6-viewport-engine/liborbiter_production_vessels.so": "585279deab1f365149f75246df1269e586107e9589a0096f47c1e955618e05df",
+    "out/phase6-viewport-engine/NativeModules/Celbody/Earth/Atmosphere/EarthAtm2006.so": "466799c1debfa8f70ee182832e60117cb648f33e27926e10daa4413d92f86f11",
+    "out/phase6-viewport-engine/NativeModules/Celbody/Earth/Atmosphere/EarthAtmJ71G.so": "8e6028979dacd93c40cf699d8ac831ba26fed42437c64f3cfe5b407aae6432ab",
+    "out/phase6-viewport-engine/NativeModules/Celbody/Mars/Atmosphere/MarsAtm2006.so": "cc65c3d4720440a2c6cde7eaa75b22b61d4cd8f5baaca01674baf023380b1626",
+    "out/phase6-viewport-engine/NativeModules/Celbody/spice.so": "1f8cf06244b1f0913cb76d15a7b10e780a9e301aff09178aa27c39db3f71d0b6",
+    "out/phase6-viewport-engine/NativeModules/Graphics/OGLClient.so": "abf14ff11049c74cfc02b8f1d7b7469b30aca5634b06efa348c304384e6a9447",
+    "out/phase6-viewport-engine/NativeModules/Plugin/LuaInline.so": "101a72e5446654c0db8b1fc2da14608e83ab6d64e48c41c25a15114e2782c17d",
+    "out/phase6-viewport-engine/NativeModules/Plugin/LuaInterpreter.so": "86dc3811ef4a482c0d185d01598ff22bc943060c864a4f429bfd877298a019a6",
+    "out/phase6-viewport-engine/NativeModules/Vessel/DeltaGlider.so": "18a330b5137215a351e74b23a55b01319382d8705d92f8c948e7c9b6992b595b",
+    "out/phase6-viewport-engine/NativeModules/Vessel/ShuttlePB.so": "24b9c86e97beb46aa2153b78357f3ca7b6bd869320558eac5f23b4af20b7f591"
+  }
 }

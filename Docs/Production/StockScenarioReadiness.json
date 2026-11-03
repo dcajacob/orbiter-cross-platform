@@ -1,0 +1,257 @@
+{
+  "schema": 1,
+  "status": "audited-incomplete",
+  "phase6_complete": false,
+  "date": "2026-11-03",
+  "runtime_source_commit": "2c00d29b9d982d4096947636dcd61a89006577a0",
+  "scope": "All 157 unchanged stock-scenario startup attempts; failure-preserving readiness baseline, not complete acceptance",
+  "summary": {
+    "attempted": 157,
+    "passed": 37,
+    "failed": 120,
+    "inventory_ready": 45,
+    "source_metadata_mismatches": 7
+  },
+  "capture": {
+    "path": "out/phase6-stock-full-smoke/stock-scenarios.json",
+    "sha256": "23f6bad2f9a36f3908db523b5a9b200cf15d9938dfcef0a3e0884d3af3464e8f"
+  },
+  "audit": {
+    "path": "out/phase6-stock-full-audit.json",
+    "sha256": "2ec603fcb4de567213a4580e10c0aaf54337005bd477dfda478f1f6bead1c996"
+  },
+  "runtime_sha256": {
+    "executable": "8e074c036edd6abe8f4fd75e870fbffc403f9a73b51f900a8282860abc7d1f2c",
+    "renderer": "a97b839a0e23cb2b5f47cc6ffd633f42c149014939f225457186be3154b34229",
+    "vessels": "8770501b39a8fa20e2a1d28c803276aac69238bc286f0b73986efae75a2227c4"
+  },
+  "input_lock_sha256": "5f89334ecb213b56b1bda651acbed8c245f874f6d61ae9f7e9fdccfb3da2f11e",
+  "source_sha256": {
+    "Tests/Production/StockScenarios/Inventory.Test.py": "376e8e1f1b149ea66b94c178fd888f30ae0d0f6daf0df56c6a2fb2396af2017b",
+    "Tests/Production/StockScenarios/Manifest.Test.py": "5840efa345b8b47e8fe69827d6a02aa543495cb3d19175ea7a16fa61be2d60df",
+    "Tests/Production/StockScenarios/README.md": "b3753b3b0c2bbb52635b526e150e9f9b00904b2294ecbfbe8f2fb5ab27addc6b",
+    "Tests/Production/StockScenarios/inventory.py": "6b588cef69a070de53f2545adab19cab5956d73395ed6ae23d5268281f4e3b07",
+    "Tests/Production/StockScenarios/run.py": "fe778c15e282bca5206b2286e8d553e2dd4501f1902c35f2b76e3c8008c1294e",
+    "Tests/Production/StockScenarios/verify.py": "eb9148ba952aa080321bd3dcb1ee4a039b8bc088f0f68d3dc0be704d5641dc1e"
+  },
+  "controls": {
+    "phase6-stock-inventory-controls.json": {
+      "path": "out/phase6-stock-inventory-controls.json",
+      "sha256": "5e1306fcf9064fa850186280cf9bbbfe275aa0013df886aa7b33360039ad4c09"
+    },
+    "phase6-stock-manifest-control.json": {
+      "path": "out/phase6-stock-manifest-control.json",
+      "sha256": "dfacf28f8dd5473f0a72217ab9fb48292d728f0dfccb212b1ee686bffdd73920"
+    }
+  },
+  "failure_groups": {
+    "missing_dependencies": 112,
+    "unqualified_config_only_classes": 7,
+    "preserved_general_api_assertion": 1
+  },
+  "missing_classes_by_scenario": {
+    "ShuttleA": 85,
+    "Atlantis": 30,
+    "Atlantis_SRB": 6,
+    "Atlantis_Tank": 6,
+    "Carina": 8,
+    "Leonardo_mplm": 5,
+    "Dragonfly": 5,
+    "SolarSail": 1,
+    "Quadcopter": 1,
+    "HST": 4,
+    "LDEF": 2,
+    "ShuttleA_pl": 4
+  },
+  "metadata_discrepancies": [
+    "The Solar System/Eclipses/April 8 2005 Panama.scn",
+    "The Solar System/Eclipses/April 8 2005.scn",
+    "The Solar System/Jupiter flybys/Galileo's first Ganymede flyby.scn",
+    "The Solar System/Jupiter flybys/Galileo's first Io flyby.scn",
+    "The Solar System/Jupiter flybys/Galileo's second Ganymede flyby.scn",
+    "The Solar System/Jupiter flybys/Galileo's second Io flyby.scn",
+    "The Solar System/Jupiter flybys/Tour of Jupiter.scn"
+  ],
+  "config_only_runtime_failures": {
+    "Challenges/Challenge 2 - Lunar transfer.scn": [
+      "Orbiter native production: Unsupported stock vessel class or capabilities: Wheel; generic replacement is forbidden",
+      "process exit 1",
+      "Incomplete sixty-frame presentation or context deletion",
+      "Incomplete finalized all-vessel ticks"
+    ],
+    "Challenges/Challenge 3 - Advanced lunar transfer.scn": [
+      "Orbiter native production: Unsupported stock vessel class or capabilities: Wheel; generic replacement is forbidden",
+      "process exit 1",
+      "Incomplete sixty-frame presentation or context deletion",
+      "Incomplete finalized all-vessel ticks"
+    ],
+    "Delta-glider/DG and DG-S.scn": [
+      "Orbiter native production: Unsupported stock vessel class or capabilities: Mir; generic replacement is forbidden",
+      "process exit 1",
+      "Incomplete sixty-frame presentation or context deletion",
+      "Incomplete finalized all-vessel ticks"
+    ],
+    "Delta-glider/Venus takeoff.scn": [
+      "Orbiter native production: Unsupported stock vessel class or capabilities: Mir; generic replacement is forbidden",
+      "process exit 1",
+      "Incomplete sixty-frame presentation or context deletion",
+      "Incomplete finalized all-vessel ticks"
+    ],
+    "Navigation/TransX/Earth to Moon.scn": [
+      "Orbiter native production: Unsupported stock vessel class or capabilities: Wheel; generic replacement is forbidden",
+      "process exit 1",
+      "Incomplete sixty-frame presentation or context deletion",
+      "Incomplete finalized all-vessel ticks"
+    ],
+    "The Solar System/Venus.scn": [
+      "Orbiter native production: Unsupported stock vessel class or capabilities: Mir; generic replacement is forbidden",
+      "process exit 1",
+      "Incomplete sixty-frame presentation or context deletion",
+      "Incomplete finalized all-vessel ticks"
+    ],
+    "Views/Cloud microtexture.scn": [
+      "Orbiter native production: Unsupported stock vessel class or capabilities: Mir; generic replacement is forbidden",
+      "process exit 1",
+      "Incomplete sixty-frame presentation or context deletion",
+      "Incomplete finalized all-vessel ticks"
+    ]
+  },
+  "named_scenarios": {
+    "Delta-glider/Atmospheric autopilot.scn": {
+      "status": "failed",
+      "ships": {
+        "ISS": "ProjectAlpha_ISS",
+        "Mir": "Mir",
+        "Luna-OB1": "Wheel",
+        "GL-01S": "DG-S",
+        "SH-03": "ShuttleA",
+        "PB-01": "ShuttlePB",
+        "GL-02": "DeltaGlider",
+        "SH-01": "ShuttleA"
+      },
+      "dependency_problems": {
+        "ShuttleA": [
+          "missing class configuration: ShuttleA"
+        ]
+      },
+      "output": "027"
+    },
+    "Delta-glider/DG Mk4 in orbit.scn": {
+      "status": "failed",
+      "ships": {
+        "ISS": "ProjectAlpha_ISS",
+        "Mir": "Mir",
+        "Luna-OB1": "Wheel",
+        "GL-01": "DeltaGlider",
+        "SH-03": "ShuttleA",
+        "PB-01": "ShuttlePB",
+        "GL-02": "DeltaGlider",
+        "SH-01": "ShuttleA"
+      },
+      "dependency_problems": {
+        "ShuttleA": [
+          "missing class configuration: ShuttleA"
+        ]
+      },
+      "output": "030"
+    },
+    "Delta-glider/DG-S ready for takeoff.scn": {
+      "status": "failed",
+      "ships": {
+        "ISS": "ProjectAlpha_ISS",
+        "Mir": "Mir",
+        "Luna-OB1": "Wheel",
+        "GL-01S": "DG-S",
+        "SH-03": "ShuttleA",
+        "PB-01": "ShuttlePB",
+        "GL-02": "DeltaGlider",
+        "SH-01": "ShuttleA"
+      },
+      "dependency_problems": {
+        "ShuttleA": [
+          "missing class configuration: ShuttleA"
+        ]
+      },
+      "output": "032"
+    },
+    "Delta-glider/Docked at ISS.scn": {
+      "status": "failed",
+      "ships": {
+        "ISS": "ProjectAlpha_ISS",
+        "Mir": "Mir",
+        "Luna-OB1": "Wheel",
+        "GL-01": "DeltaGlider",
+        "GL-02": "DeltaGlider",
+        "SH-01": "ShuttleA"
+      },
+      "dependency_problems": {
+        "ShuttleA": [
+          "missing class configuration: ShuttleA"
+        ]
+      },
+      "output": "033"
+    },
+    "Delta-glider/Virtual cockpit.scn": {
+      "status": "failed",
+      "ships": {
+        "ISS": "ProjectAlpha_ISS",
+        "Mir": "Mir",
+        "Luna-OB1": "Wheel",
+        "GL-01S": "DG-S",
+        "SH-03": "ShuttleA",
+        "PB-01": "ShuttlePB",
+        "GL-02": "DeltaGlider",
+        "SH-01": "ShuttleA"
+      },
+      "dependency_problems": {
+        "ShuttleA": [
+          "missing class configuration: ShuttleA"
+        ]
+      },
+      "output": "041"
+    },
+    "Space Shuttle Atlantis/Atlantis ISS Resupply.scn": {
+      "status": "failed",
+      "ships": {
+        "ISS": "ProjectAlpha_ISS",
+        "STS-101": "Atlantis",
+        "Leonardo": "Leonardo_mplm"
+      },
+      "dependency_problems": {
+        "Atlantis": [
+          "missing class configuration: Atlantis"
+        ],
+        "Leonardo_mplm": [
+          "missing class configuration: Leonardo_mplm"
+        ]
+      },
+      "output": "096"
+    },
+    "Tutorials/DG to the moon.scn": {
+      "status": "failed",
+      "ships": {
+        "ISS": "ProjectAlpha_ISS",
+        "GL-01": "Deltaglider",
+        "SH-05": "ShuttleA",
+        "GL-17": "Deltaglider"
+      },
+      "dependency_problems": {
+        "ShuttleA": [
+          "missing class configuration: ShuttleA"
+        ]
+      },
+      "output": "147"
+    }
+  },
+  "preserved": {
+    "scenario_bytes": true,
+    "frozen_lock": true,
+    "original_generic_vessel_path": true,
+    "required_module_failure": true
+  },
+  "next_required": [
+    "Original Windows config-only station observations before host qualification",
+    "Source-built ShuttleA dependencies for unchanged DG acceptance scenarios",
+    "Remaining named scenario/module dependencies and physical interaction"
+  ]
+}

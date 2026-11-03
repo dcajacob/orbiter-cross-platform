@@ -20,6 +20,7 @@ def main():
     frames=profile['warmup_frames']+profile['sample_frames']
     source=a.capture/'frame-times.csv'
     before=digest(source)
+    pane_before=digest(a.capture/'cockpit-viewport.json')
     original=audit(a.capture,profile,'wayland',frames,profile['warmup_frames'],profile['sample_frames'],case)
     require(original['status']=='passed','Gate control requires a valid complete capture')
     with tempfile.TemporaryDirectory(prefix='orbiter-performance-gate-') as temporary:
@@ -39,12 +40,21 @@ def main():
         with (view/'frame-times.csv').open('w',newline='') as stream:
             writer=csv.DictWriter(stream,fieldnames=list(timings[0]));writer.writeheader();writer.writerows(timings)
         negative=audit(view,profile,'wayland',frames,warmup,profile['sample_frames'],case)
+        (view/'frame-times.csv').unlink();(view/'frame-times.csv').symlink_to(source.resolve())
+        (view/'cockpit-viewport.json').unlink()
+        (view/'cockpit-viewport.json').write_text('{"width":1280,"height":720}\n')
+        wrong_pane_rejected=False
+        try:audit(view,profile,'wayland',frames,warmup,profile['sample_frames'],case)
+        except RuntimeError as error:
+            wrong_pane_rejected='cockpit dimensions differ' in str(error)
     require(negative['cadence']['median_ms']==16 and negative['cadence']['p95_ms']==51 and
             negative['status']=='failed','Over-budget p95 was accepted despite a passing median')
     require(digest(source)==before,'Original performance capture changed')
+    require(wrong_pane_rejected and digest(a.capture/'cockpit-viewport.json')==pane_before,
+            'Framebuffer-only evidence hid an incorrectly sized original cockpit')
     result=dict(status='passed',source_sha256=digest(Path(__file__)),capture_sha256=before,
                 positive=original['cadence'],negative=negative['cadence'],
-                negative_rejected=True,original_capture_unchanged=True)
+                negative_rejected=True,wrong_cockpit_size_rejected=True,original_capture_unchanged=True)
     a.output.write_text(json.dumps(result,indent=2)+'\n')
     print('Median-only false pass rejected by the unchanged p95 gate')
 

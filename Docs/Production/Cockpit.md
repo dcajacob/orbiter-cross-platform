@@ -24,7 +24,11 @@ The subsequent expanded run at `d065f93b` also completes all twelve hosted jobs,
 including real panel/VC mechanism picks, camera-key separation, Lua/frozen
 control regressions and four paired spacecraft comparisons.
 [Expanded hosted run](https://github.com/dcajacob/orbiter-cross-platform/actions/runs/41629667322)
-The later camera mouse/FOV changes remain part of the next full hosted run.
+The later run at `6ee325ec`, including camera mouse/FOV changes and the complete
+VC camera comparison, also completes all twelve jobs across the four
+Debug/Release automatic/SSE2 pairs. Subsequent Wayland and viewport changes
+require their own current hosted qualification.
+[Camera mouse/FOV hosted run](https://github.com/dcajacob/orbiter-cross-platform/actions/runs/41639429419)
 
 Gear, nose cone, radiator, both airlocks, hatch and airbrakes now pass a native
 keyboard and save/reload regression in both gliders and cockpit modes. Debug,
@@ -231,11 +235,14 @@ the test module's destroy-listener cleanup.
 The real Intel laptop now also passes the fixed 1920x1080 medium performance
 gate on Wayland and XWayland: twelve fresh processes, 25,920 scene presentations
 and 21,600 measured intervals across unchanged stock exterior, 2D-panel and VC
-scenes. The worst median is 22.37 ms and worst p95 is 25.35 ms; every repetition
+scenes. The worst median is 22.56 ms and worst p95 is 25.44 ms; every repetition
 passes the unchanged 33/50 ms limits. Physics traces are byte-identical across
 both repetitions and both backends. Configured window dimensions now request
 framebuffer pixels and settle actual fractional Wayland scale before the
-original fixed-size cockpit is constructed. Default window policy is preserved.
+original fixed-size cockpit is constructed. Both that cockpit and the camera
+are initialized with the actual framebuffer dimensions. This complete rerun
+supersedes the earlier result whose renderer dimension check missed a fixed
+1280x720 cockpit. Default window policy is preserved.
 This remains a local hardware checkpoint within the ongoing Phase 6 acceptance.
 [Hardware results, full method and retained outliers](HardwarePerformance.md)
 

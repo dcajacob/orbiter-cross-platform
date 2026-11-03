@@ -56,6 +56,7 @@
 #include <iomanip>
 #include <iostream>
 #include <locale>
+#include <limits>
 #include <map>
 #include <memory>
 #include <stdexcept>
@@ -683,6 +684,10 @@ struct Runtime final:BodyServices,RigidBodyServices,SurfaceServices,NavigationSe
         render.lifetime=this;BindVesselObserver(VesselEvent,this);
         graphicsModule=std::make_unique<NativeModule>(resources.modules.Resolve("Graphics/OGLClient.so"),ORBITER_NATIVE_GRAPHICS,&render);
         render.graphics=static_cast<NativeGraphics*>(graphicsModule->Instance());render.graphics->Open();
+        UInt32 viewportWidth=0,viewportHeight=0;
+        render.graphics->clbkGetViewportSize(&viewportWidth,&viewportHeight);
+        if(!viewportWidth || !viewportHeight || viewportWidth>UInt32(std::numeric_limits<int>::max()) ||
+           viewportHeight>UInt32(std::numeric_limits<int>::max()))throw std::runtime_error("Native render viewport is invalid");
         MeshServices mesh;mesh.context=this;
         mesh.path=[](void* context,const char* name){return static_cast<Runtime*>(context)->resources.meshFiles.Resolve(std::string(name)+".msh");};
         mesh.loadTexture=[](void* context,const char* name,UInt32 flags) -> MeshSurface {
@@ -692,7 +697,11 @@ struct Runtime final:BodyServices,RigidBodyServices,SurfaceServices,NavigationSe
         mesh.releaseTexture=[](void* context,MeshSurface texture){if(texture)static_cast<Runtime*>(context)->render.graphics->ReleaseTextureResource(texture);};
         mesh.error=[](void*,const char* text){throw std::runtime_error(text);};mesh.allocation=[](void*,const char*,int){};BindMeshServices(mesh);
 #ifdef ORBITER_NATIVE_COCKPIT
-        cockpit=std::make_unique<Pane>(render.graphics,1280,720,32);render.cockpitPane=cockpit.get();
+        cockpit=std::make_unique<Pane>(render.graphics,int(viewportWidth),int(viewportHeight),32);render.cockpitPane=cockpit.get();
+        if(!evidence.empty()) {
+            std::ofstream viewport(evidence/"cockpit-viewport.json");viewport.exceptions(std::ios::badbit|std::ios::failbit);
+            viewport<<"{\"width\":"<<cockpit->Width()<<",\"height\":"<<cockpit->Height()<<"}\n";
+        }
         CreateCockpitGui();guiCreated=true;
         render.graphics->InitGui();
         static bool modesRegistered=false;if(!modesRegistered){Instrument::RegisterBuiltinModes();modesRegistered=true;}
@@ -717,7 +726,7 @@ struct Runtime final:BodyServices,RigidBodyServices,SurfaceServices,NavigationSe
         auto* focus=system->GetVessel(metadata.Focus());
         if(!focus)focus=system->GetVessel(oapi::UInt32(0));
         SetFocus(focus);
-        render.camera->ResizeViewport(1280,720);render.camera->InitState(scenario.string().c_str(),focus);
+        render.camera->ResizeViewport(int(viewportWidth),int(viewportHeight));render.camera->InitState(scenario.string().c_str(),focus);
 #ifndef ORBITER_NATIVE_COCKPIT
         if(!render.camera->IsExternal())unsupported("cockpits yet; select an external camera");
 #endif
