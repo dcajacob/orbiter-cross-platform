@@ -1,0 +1,16 @@
+{
+  "schema": 1,
+  "application_source": "f725194209634f7fd5d1d44d426cfa9b5e303e37",
+  "scenario": "Shuttle-A/ISS Approach.scn",
+  "sha256_lf": "f50e52d1b7d5490b375fca22359404c8d1e2922ac0f7c69a7afad8f464b464e3",
+  "focus": "SH-15",
+  "fixed_step": 0.25,
+  "animations": {"DOCKSTATE": 2, "AIRLOCK": 3, "IAIRLOCK": 4, "GEAR": 5},
+  "keys": [[4, 37, false], [6, 24, false], [8, 24, true], [10, 34, false]],
+  "phases": {"moving": 16, "resume": 96, "retract": 112, "restored": 4},
+  "cases": [
+    {"id": "shuttle_a_panel", "cockpit": 2},
+    {"id": "shuttle_a_vc", "cockpit": 3}
+  ],
+  "scope": "Ordinary buffered keys and fresh-process persistence in the complete stock six-vessel scene. The VC case uses the ordinary F8 command; the input scenario is unchanged. This does not qualify mouse controls, payload deployment or the editor."
+}

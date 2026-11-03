@@ -125,3 +125,22 @@ Three further verified local bundles preserve the evidence:
 
 Their paths and full indexes are recorded by the machine-readable qualification.
 They exclude asset/font collections. Remote preservation remains open.
+
+A separate [keyboard and persistence fixture](../../Tests/Production/ShuttleA/Controls/README.md)
+now operates the docking hatch, both airlocks and landing gear in the complete
+six-vessel ISS Approach scene. It uses ordinary buffered keys, including F8 to
+select the VC. Sixteen local Release automatic sessions pass with 912 presents
+and 5,568 finalized all-vessel rows. Both cockpit repetitions have exact state
+traces and byte-identical repeated complete frames. Fresh processes restore
+moving mechanisms, finish their motion without further input, return them to
+their original endpoints and restore those endpoints again. The exact observer
+sources are retained alongside this preliminary capture in
+`out/phase6-shuttle-a-controls-native-v2/observer-source`.
+
+Five negative controls reject a missing background station, missing attachment
+port, missing animation sample, wrong cockpit and forged saved position, with
+the original capture unchanged. The dedicated Windows workflow collects all
+four original build/CRT profiles with the preserved application, SDK and client.
+Those original captures, their artifact audit and native comparisons remain
+pending. The new fixture does not qualify mouse operation, pod controls,
+parachute deployment, the editor or overall Phase 6 acceptance.

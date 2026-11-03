@@ -1,5 +1,10 @@
 # Shuttle-A production port and original observations
 
+The additional [keyboard and persistence fixture](Controls/README.md) preserves
+the complete six-vessel ISS Approach scene, operates four mechanisms in the
+panel and VC, and reloads moving and endpoint states. Its original-Windows
+observations are separate from the pinned initial-scene references below.
+
 The native cockpit build compiles the original Shuttle-A vessel, all panel
 instruments, its Lua methods and the original parachute payload. Native module
 factories use the checked SDK build identity. Shared drawing resources are

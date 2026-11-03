@@ -1,0 +1,104 @@
+name: Preserved Windows Shuttle-A Controls
+on:
+  push:
+    branches: ['codex/production-**']
+    paths: ['Tests/Production/ShuttleA/Controls/**', '.github/workflows/original-shuttle-a-controls.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: original-shuttle-a-controls-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  original_controls:
+    name: Original Shuttle-A controls ${{ matrix.configuration }} ${{ matrix.math_profile }}
+    runs-on: windows-2022
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        configuration: [Debug, Release]
+        math_profile: [automatic, sse2]
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - uses: ilammy/msvc-dev-cmd@v1
+        with:
+          vsversion: '17.0'
+          arch: x64
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.14'
+      - uses: actions/cache@v6
+        with:
+          path: out/cockpit-cache
+          key: original-cockpit-control-runtime-${{ matrix.configuration }}-${{ hashFiles('Tests/Production/Cockpit/Reference/provenance.json') }}
+      - uses: actions/cache@v6
+        with:
+          path: out/data-cache/Orbiter-x64.zip
+          key: production-data-${{ hashFiles('Tests/Production/stock-data.lock.json') }}
+      - uses: actions/cache@v6
+        with:
+          path: out/planet-cache/Orbiter2016.zip
+          key: production-standard-planets-${{ hashFiles('Tests/Production/standard-planets.lock.json') }}
+      - uses: actions/cache@v6
+        with:
+          path: out/mesa-cache/*.pkg.tar.zst
+          key: mesa-ucrt64-${{ hashFiles('Tests/Production/mesa-ucrt64.lock.json') }}
+      - name: Stage unchanged application, SDK, client, data and software OpenGL
+        shell: pwsh
+        run: |
+          python -B Tests/Production/prepare_data.py --archive out/data-cache/Orbiter-x64.zip --destination out/production-data
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          python -B Tests/Production/prepare_data.py --lock Tests/Production/standard-planets.lock.json --archive out/planet-cache/Orbiter2016.zip --destination out/standard-planets
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          python -B Tests/Production/stage_mesa.py stage --cache out/mesa-cache --destination out/mesa-runtime
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          python -B Tests/Production/CockpitControls/prepare.py --configuration ${{ matrix.configuration }} --cache out/cockpit-cache --output out/shuttle-a-controls-runtime
+          exit $LASTEXITCODE
+      - name: Build only the public SDK controls observer
+        shell: pwsh
+        run: |
+          cmake -S Tests/Production/ShuttleA/Controls -B out/shuttle-a-controls-driver -G Ninja -DCMAKE_BUILD_TYPE=${{ matrix.configuration }} -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DORBITER_TEST_RUNTIME="$pwd/out/shuttle-a-controls-runtime"
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          cmake --build out/shuttle-a-controls-driver --parallel 2
+          exit $LASTEXITCODE
+      - name: Select original SSE2 CRT when requested
+        if: matrix.math_profile == 'sse2'
+        shell: pwsh
+        run: '"ORBITER_TEST_OBSERVER_SSE2=1" >> $env:GITHUB_ENV'
+      - name: Operate and reload original Shuttle-A mechanisms in the complete stock scene twice
+        run: >-
+          python -B Tests/Production/ShuttleA/Controls/capture.py --original
+          --executable out/shuttle-a-controls-runtime/Orbiter.exe --data out/production-data
+          --planets out/standard-planets --mesa out/mesa-runtime
+          --configuration ${{ matrix.configuration }} --math-profile ${{ matrix.math_profile }}
+          --output out/shuttle-a-controls-original
+      - name: Reject missing stations, ports, mechanism samples and forged saved positions
+        run: >-
+          python -B Tests/Production/ShuttleA/Controls/Gate.Test.py
+          --capture out/shuttle-a-controls-original/shuttle_a_panel-1/moving
+          --output out/shuttle-a-controls-gate
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: original-shuttle-a-controls-${{ matrix.configuration }}-${{ matrix.math_profile }}
+          retention-days: 90
+          path: |
+            out/shuttle-a-controls-original/controls-report.json
+            out/shuttle-a-controls-gate/verification.json
+            out/shuttle-a-controls-original/*/*/*.csv
+            out/shuttle-a-controls-original/*/*/*.scn
+            out/shuttle-a-controls-original/*/*/*.rgba
+            out/shuttle-a-controls-original/*/*/*.png
+            out/shuttle-a-controls-original/*/*/*.json
+            out/shuttle-a-controls-original/*/*/*.txt
+            out/shuttle-a-controls-original/*/*/*.log
+            out/shuttle-a-controls-original/*/*/Scenarios/Behavior.scn
+            out/shuttle-a-controls-original/*/*/Orbiter.cfg
+            out/shuttle-a-controls-runtime/control-reference-runtime.json
+            out/shuttle-a-controls-runtime/test-runtime.json
+            out/shuttle-a-controls-runtime/Modules/Plugin/ProductionCockpitDriver.dll
+            out/shuttle-a-controls-driver/CMakeCache.txt
+            out/shuttle-a-controls-driver/compile_commands.json
