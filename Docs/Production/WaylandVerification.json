@@ -1,0 +1,72 @@
+{
+  "schema": 1,
+  "status": "passed Release native Wayland camera rendering and X11 comparison; input and high-DPI qualification remain open",
+  "phase6_complete": false,
+  "source_worktree_base": "6ee325ec03700101a4691e9b399d08a0f6c4a465",
+  "configuration": "Release",
+  "math_profile": "automatic",
+  "camera_cases": 12,
+  "application_processes": 24,
+  "successful_presents": 1440,
+  "actual_backend": "wayland",
+  "display_environment": {
+    "DISPLAY": "unset",
+    "XDG_SESSION_TYPE": "wayland",
+    "WAYLAND_DISPLAY": "wayland-0",
+    "XDG_RUNTIME_DIR": "/run/user/1000",
+    "LIBGL_ALWAYS_SOFTWARE": "1",
+    "GALLIUM_DRIVER": "llvmpipe"
+  },
+  "runtime": {
+    "executable_sha256": "8e074c036edd6abe8f4fd75e870fbffc403f9a73b51f900a8282860abc7d1f2c",
+    "engine_library_sha256": "8770501b39a8fa20e2a1d28c803276aac69238bc286f0b73986efae75a2227c4",
+    "renderer_module_sha256": "1291f727600676ff08583472c951590581f44e230858a145c5b920770b452cc4"
+  },
+  "renderer": {
+    "vendor": "Mesa",
+    "renderer": "llvmpipe (LLVM 21.1.8, 256 bits)",
+    "version": "4.5 (Core Profile) Mesa 26.0.8-1ubuntu0.3",
+    "client_width": 1280,
+    "client_height": 720
+  },
+  "matching_sdk_sha256": "0928ab1ac3faae54fd56f143ad0d4f3b94c305994c79d1cca0e214350bf99c97",
+  "build": {
+    "engine_runtime": "out/phase6-wayland-runtime",
+    "renderer_build": "out/phase6-wayland-renderer",
+    "x11_and_wayland_enabled": true,
+    "system_packages_unmodified": true,
+    "cache_sha256": "f304e3078798ec892400937ac15903cf88a57f70ac6c344069bff1e7ca255f02",
+    "configure_log_sha256": "6f215eb4de2799b3f124b9f76fb82c53cce48a461bb29a5d82ec083b8bd4ad1a",
+    "build_log_sha256": "996d70bb3488088ae8ca6eee0932ec934eb1a258a00d2e1591198b767719642f"
+  },
+  "raw_report": {
+    "path": "out/phase6-wayland-camera-matrix/camera-report.json",
+    "sha256": "c5446cccaa735f5c7641ac2c526908f74a94c65b9895e3bedfe393aa5b77ab99"
+  },
+  "x11_comparison": {
+    "path": "out/phase6-wayland-x11-final-comparison.json",
+    "sha256": "d8af1f212256b1479ad98bd9afe19c6b5037e7a346c1d5a9a2a27c4d8ff3da51",
+    "full_frame_minimum_ssim": 1.0,
+    "mfd_surface_minimum_ssim": 1.0,
+    "on_screen_mfd_minimum_ssim": 1.0,
+    "maximum_camera_errors": {
+      "position_m": 0.0,
+      "rotation_rad": 0.0,
+      "aperture_rad": 0.0
+    }
+  },
+  "diagnostic": {
+    "initial_output": "out/phase6-wayland-headlook-smoke",
+    "initial_error": "GTK image-helper process inherited test LD_PRELOAD but could not find liborbiter_production_vessels.so",
+    "cause_verified_with_bwrap_version": true,
+    "test_environment_fix": "LD_LIBRARY_PATH set to the isolated matching engine runtime",
+    "production_code_changed": false,
+    "source_image_or_ui_data_unchanged": true
+  },
+  "scope": "Public SDK camera/MFD fixture and actual native Wayland surface/context/presentation. No targeted Wayland pointer, keyboard, scaling or controller acceptance claim.",
+  "sources_sha256": {
+    "Tests/Production/CockpitCameraBackends.py": "c9db3521d4582dc69a4304227003ab70f4a9dda7297fa2de48072d9c23518e10",
+    "OVP/OGLClient/Native/LinuxAdapter.cpp": "fb6fc7f9fc3e20e01b1e3beb254f7f690d86275018145f488e58c13e13fa3036",
+    "OVP/OGLClient/Native/CMakeLists.txt": "ceb21b6ef944cc065698a055364b2cd427b3d18f0a8db1b95bf984575bc8199b"
+  }
+}

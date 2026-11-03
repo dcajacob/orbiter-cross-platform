@@ -1,12 +1,12 @@
 {
   "schema": 1,
-  "status": "native repeatability passed; original Windows image parity pending",
+  "status": "passed original Windows/native camera, MFD and full-frame comparisons in all four profiles",
   "phase6_complete": false,
   "source_worktree_base": "149b46135dc02f4ce1fe24a3f6c2406690f57faa",
   "scope": "Both gliders, three VC poses, scenario-loaded and SDK-reopened MFDs, two repeats in four native profiles",
   "original_application_source": "f725194209634f7fd5d1d44d426cfa9b5e303e37",
   "sources_sha256_lf": {
-    "Tests/Production/CockpitCamera/run.py": "1490fe54831b9eed74852ca2dab48ff001cbc37d8411c64a0dc787fdb719d9c5",
+    "Tests/Production/CockpitCamera/run.py": "8b93bb1026678944672b5a9fb6783fc9dc88d1b539c069ffa3d1a74917a1f635",
     "Tests/Production/CockpitCamera/Driver.cpp": "a999bafcdbb30233ca54839a5da5b4cc2c786909be10a94f23f708f855756b59",
     "Tests/Production/CockpitCamera/Observation.h": "ad66da760a2a96be28b255e6222aff0c4572ea1180f5f86fde3d8424b9d21c45",
     "Tests/Production/CockpitCamera/cases.json": "e4913b9f0431335f1da7f53d3e4e4ab7ed85e3d80ac6f4320df6dc7723e0c17d",
@@ -15,7 +15,8 @@
     "Tests/Production/CockpitCamera/README.md": "bc1d95418cabc212edb852bf2dae935f4c49c1df3f75eef5ed4e252c82cb9337",
     "Tests/Production/CockpitCameraGate.Test.py": "2449d9dccd242694ac37d7a12bd66ea9a5c2164e4816b91974afa6bd80afcb89",
     ".github/workflows/native-production-client.yml": "5a06b1d6459312b4b3a3c100548124987e01c2866995b3f0e9bdb5710ff802bc",
-    ".github/workflows/original-cockpit-camera.yml": "e62a3d27c8d1334507942b4e5a633d7e966d9aeb31cfe53b11caf80ddbcf4292"
+    ".github/workflows/original-cockpit-camera.yml": "e62a3d27c8d1334507942b4e5a633d7e966d9aeb31cfe53b11caf80ddbcf4292",
+    "Tests/Production/CockpitCameraBackends.py": "c9db3521d4582dc69a4304227003ab70f4a9dda7297fa2de48072d9c23518e10"
   },
   "native_profiles": {
     "automatic-debug": {
@@ -1015,14 +1016,14 @@
     }
   },
   "windows_reference": {
-    "status": "in_progress",
-    "run_id": 41637754349,
-    "source": "149b46135dc02f4ce1fe24a3f6c2406690f57faa",
+    "status": "success",
+    "run_id": 41639429452,
+    "source": "6ee325ec03700101a4691e9b399d08a0f6c4a465",
     "verified_live_jobs": [
-      125923145321,
-      125923145328,
-      125923145464,
-      125923145529
+      125928857567,
+      125928858025,
+      125928858048,
+      125928858057
     ],
     "earlier_compile_failure": {
       "run_id": 41637215875,
@@ -1030,6 +1031,408 @@
       "job_id": 125921327778,
       "error": "C2872: Camera helper collided with SDK Camera class declaration",
       "fixed_by": "Fully qualified camera_fixture::Camera call; SDK unchanged"
+    },
+    "earlier_renderer_selection_failure": {
+      "run_id": 41637754349,
+      "source": "149b46135dc02f4ce1fe24a3f6c2406690f57faa",
+      "reason": "Preserved runner did not select llvmpipe; strict renderer validation rejected the default Windows backend",
+      "fix": "Match existing reference scripts: LIBGL_ALWAYS_SOFTWARE=true and GALLIUM_DRIVER=llvmpipe",
+      "failed_captures_not_accepted": true
+    },
+    "all_four_jobs_passed": true,
+    "paired_comparisons": {
+      "Debug-automatic": {
+        "native_profile": "automatic-debug",
+        "original_archive": {
+          "artifact_id": 13233257022,
+          "path": "out/phase6-headlook-original-cache/original-camera-Debug-automatic.zip",
+          "sha256": "e4c57e7157088dc8d37abc753e901acecc2b29bce663a44ab227a42acdfe6f5d",
+          "bytes": 97459889
+        },
+        "original_report": {
+          "path": "out/phase6-headlook-original/Debug-automatic/camera-original/camera-report.json",
+          "sha256": "7e6817e306eb9da42e504b80713c97624e6c68dee345ed53a87506c5bc9532d5"
+        },
+        "original_processes": 24,
+        "paired_report": {
+          "path": "out/phase6-headlook-Debug-automatic-comparison.json",
+          "sha256": "c0b39805a7949abe35ed69b93331ede8e54fe9d7113074d7520f736a3cd67260"
+        },
+        "full_frame_minimum_ssim": 1.0,
+        "direct_mfd_minimum_ssim": 1.0,
+        "on_screen_mfd_minimum_ssim": 1.0,
+        "camera_maxima": {
+          "position_m": 0.0,
+          "rotation_rad": 0.0,
+          "aperture_rad": 0.0
+        },
+        "runtime": {
+          "schema": 1,
+          "application_source": "f725194209634f7fd5d1d44d426cfa9b5e303e37",
+          "client_source": "68400a7d3750240afb53890e1da2306c71f6380e",
+          "reference_run": 41458001638,
+          "runtime_archive_sha256": "b7ddbfef253b29e246bd29b003c8f63d92dd5e2500066771ebc8852c8932cd06",
+          "runtime_payload_sha256": "8389f1546245a8a9d215062f9599131b466df81ce4288b8371ba8fca196da3ca",
+          "client_archive_sha256": "4de971bc585e2054950b31c4b0117b7dae4ba52e0e171ea5994eb6100fe26645",
+          "client_files_sha256": {
+            "Modules/OGLClient/ATTRIBUTION.md": "79b7b3cc419d310489e541194d97b08666bdc4b6383b27b5652904d2a8abd5bd",
+            "Modules/OGLClient/Cloud.fs": "eb25528320861565948b38b7c2ebd47297e66d486896306a33b60009aceade2f",
+            "Modules/OGLClient/Cloud.vs": "30901d7f63100b634cf3d2ef98747a8b17be8f682b5eeb0e99131906387b5697",
+            "Modules/OGLClient/Common.inc": "4e40e70a70c9f1a08e569adfc44097899e37d81c199ce1879b5b3d81083db2ec",
+            "Modules/OGLClient/Constellations.fs": "2ba545184b330f5fb721179c4ccae61502b43a6bb8a50a368c17ad1246508db9",
+            "Modules/OGLClient/dependencies.lock.json": "80d217de95a4a31f06b6df0f0f0f1544242c493a3382997690beac9c9f0800ce",
+            "Modules/OGLClient/Constellations.vs": "0ba5e9d65ea610d99cde8f6e388684a1c7064c7730e16f26cf0772e216e2724b",
+            "Modules/OGLClient/Ecliptic.fs": "4a93a93e3186fe19b0240644d83e458037dbfb1820b7aa332ddfcdf9fbd1028e",
+            "Modules/OGLClient/Ecliptic.vs": "0ba5e9d65ea610d99cde8f6e388684a1c7064c7730e16f26cf0772e216e2724b",
+            "Modules/OGLClient/Exhaust.fs": "26f78db654a4c6d4b34807d9e6fb7eb7595ebe3e12fa34abb7f5f9a9aa62d029",
+            "Modules/OGLClient/Exhaust.vs": "317ceafe9613196b863d436205ffb8c725ba572d0eff989628a6579faf44df71",
+            "Modules/OGLClient/GroundShadow.vs": "792c53dbc53f93d8a1df42726856224fee297c2ee2b3de4cddf3f897034d544c",
+            "Modules/OGLClient/GroundShadow.fs": "364b5d72032cf871b4bf6df7d0276b0f0892e2650a04a595a5ab75703d425da0",
+            "Modules/OGLClient/Haze.fs": "20ce2c36ec348c39d51238a8a1ff4e280c7657693d7ce2af3f65ead7c2a86160",
+            "Modules/OGLClient/Haze.vs": "7d8d6b0d92506aaaaebd807365e60614721c8367112d9b92bc0e73c06868b64a",
+            "Modules/OGLClient/Licenses/docs-FTL.TXT": "08c135755dd589039470f1fdbb400daaabaaa50d0b366d19cebff4d22986baa1",
+            "Modules/OGLClient/Licenses/fontstash.h": "785f7fa2521b47a5d1b8ebc6ed7e6f5d2c5f6c8fad0080b4605e2d63cacb46e0",
+            "Modules/OGLClient/Licenses/glm-src-copying.txt": "62d2d642c7d054d4fb4c9b42faad617d6c88fcd91e317f8035aa9f277cc159c3",
+            "Modules/OGLClient/Licenses/imgui-src-LICENSE.txt": "c80c5789748d955c4a650562baa0d750494e2c7128c2ca66aaebe2e3c4e198bf",
+            "Modules/OGLClient/Licenses/libnsbmp-src-COPYING": "bec1a28e7f95e0b2acc624bf9e6d8556451f454ea6a213f8c1bc0fe792c61ead",
+            "Modules/OGLClient/Licenses/nanovg-src-LICENSE.txt": "45185a6680ed83863bef33e1055f9fd76374df4b81c957802c19a286c982dfd2",
+            "Modules/OGLClient/Licenses/OGLPad.cpp": "5a03ccdf58dd89b7ed6f3fa8443abc570b173d453243dd6c907dec7a32642d62",
+            "Modules/OGLClient/Licenses/Orbiter-MIT.txt": "ffba1fe66f6c59cc8e01c014a4454901d1b6b3669b5e205bf54a2f57974bab7d",
+            "Modules/OGLClient/Licenses/Shadinclude.hpp": "4869d2bf086276f8a14b2a5944cb1e34cb248ac7d793b587f68509e99afb5023",
+            "Modules/OGLClient/Licenses/soil2-src-README.md": "11528c4876b9d4020cb481db340930821b2dc7158fd6dd2a8d8921a9965372a8",
+            "Modules/OGLClient/Licenses/stb_image_write.h": "cbd5f0ad7a9cf4468affb36354a1d2338034f2c12473cf1a8e32053cb6914a05",
+            "Modules/OGLClient/Licenses/stb_image.h": "4ef7dee427053e3090b188021eab75fc227644c39caad6e81259e7f0053b55b7",
+            "Modules/OGLClient/Licenses/zlib.h": "4ddc82b4af931ab55f44d977bde81bfbc4151b5dcdccc03142831a301b5ec3c8",
+            "Modules/OGLClient/LogDepth.inc": "fa35ccf810e1bf17c0542764c495dabbb497c085e20ca175fb3f5d1cf9c6726c",
+            "Modules/OGLClient/Mesh.fs": "b35400a6f0d4c17c5cf22bd54aa79262fa7ac15c00a974205ac92a06e81750bc",
+            "Modules/OGLClient/Mesh.vs": "930a4e26e6f2c2934c660eb79d815ce2fb0a017179e338f055e80efe1d92ff34",
+            "Modules/OGLClient/MeshUnlit.fs": "ca9e0b2501cebad726eaede37bc156e4d82ae1fba368a1a0ff4725bbfb34c00a",
+            "Modules/OGLClient/MeshUnlit.vs": "48c518f1bf4fe73eeeb96eb9f318c1583e450f67af1866cd53d87cc697120ce0",
+            "Modules/OGLClient/Overlay.fs": "7ecf7b1307f78531cf93ef028655b55dd3f5d3d419f37ec56e36159b4726983f",
+            "Modules/OGLClient/Overlay.vs": "2a1446e6009dbbd220fa909d3373d784f11a14d3b13fd11c695bd1532d86aac7",
+            "Modules/OGLClient/Particle.vs": "47a39c1c5930841da760e8fa007d1131be315ad4fd09220aede97e333aa68231",
+            "Modules/OGLClient/Particle.fs": "558e6cc9f62cf66fd66a0b71a79a1a933d3c45913d5b3bedf620108ad8b8be09",
+            "Modules/OGLClient/Ring.vs": "b7c6a413002b01dc55ab439a1965459561cc98a1d86e306a944a251f9ee7f691",
+            "Modules/OGLClient/Ring.fs": "62fe7dc50a7f8e77f8d149509ca1291f6fb7e84a88ce919283495af813664339",
+            "Modules/OGLClient/Spot.fs": "38bcc949bb6a654ce32c148bc84044dc26f5c324ea9bd060205a11e51ddf6f0b",
+            "Modules/OGLClient/Spot.vs": "112753669d70c08aea27c81df931fc5b1ad0628a607ad856ec7018e8a2f9c273",
+            "Modules/OGLClient/Stars.fs": "bc037a5f7706ec5b895a8e8a3d6b22c6e45086ca9b4f9f4d87af89df821d21a5",
+            "Modules/OGLClient/Stars.vs": "8d5130ebdf69840ccc7b7c0e22d90ef00382ca00103bac348408ccd50a423b7d",
+            "Modules/OGLClient/Tile.fs": "d8145397bb4c13244dbbc150b51a1a462e8b42502dc7754154a7a6300782e958",
+            "Modules/OGLClient/Types.inc": "a6f30552abb4ae13348a0e99f2f265150d45d41373c3c3603544ca877faba068",
+            "Modules/OGLClient/Tile.vs": "e0aecdff8d53a8fab078e6fe2ffcf78ce670e522debba7750261d2801e1c0c8e",
+            "Modules/OGLClient/Uniforms.inc": "2f4cb227de081cabfdcd45655987efe9235b9d2a169d65d7583ec50cba5d8c89",
+            "Modules/OGLClient/Untextured.fs": "11485b9057e7c1f08005858decfa3a772a738454c81e2b7e5957560e93afec9b",
+            "Modules/OGLClient/Untextured.vs": "cc02e7e9a410bdf5e3f4d45fca12267ca511d065b42c3032b1d3e8c0028a1acc",
+            "Modules/OGLClient/VesselShadow.fs": "364b5d72032cf871b4bf6df7d0276b0f0892e2650a04a595a5ab75703d425da0",
+            "Modules/OGLClient/VesselShadow.vs": "48bb3fb2e6f9d53a60d11959b4d0a579dee64d6b8f5b83f2effba64ee9c2c943",
+            "Modules/Plugin/OGLClient.dll": "7eec64c39e2fed0205f8fbcd3dd6f912453a6f9b85a6f3856ad8a7d33d15ad04"
+          },
+          "executed_application_sha256": "7f6466e70b0ceda6f9e8f9940ca8cd00596557f75ead52cdcd46dabc3b145560"
+        },
+        "sdk_observer_sha256": "21b3c235149a675ffda6325ec9fdccab24b0a44d7ea7bb4d9d3659bd9eda4f6d",
+        "renderer": {
+          "vendor": "Mesa",
+          "renderer": "llvmpipe (LLVM 23.1.4, 256 bits)",
+          "version": "4.6 (Core Profile) Mesa 26.2.6",
+          "client_width": 1280,
+          "client_height": 720
+        }
+      },
+      "Debug-sse2": {
+        "native_profile": "sse2-debug",
+        "original_archive": {
+          "artifact_id": 13232912049,
+          "path": "out/phase6-headlook-original-cache/original-camera-Debug-sse2.zip",
+          "sha256": "3ffdbe5e07c95c5d6e8c00ff131ebf872ba612dc35d1b3b92ca37088916b5c6c",
+          "bytes": 97459641
+        },
+        "original_report": {
+          "path": "out/phase6-headlook-original/Debug-sse2/camera-original/camera-report.json",
+          "sha256": "af414f2306e2374e253709dd811dba68e26ddd79f4e923895f2c80d78bcfddfa"
+        },
+        "original_processes": 24,
+        "paired_report": {
+          "path": "out/phase6-headlook-Debug-sse2-comparison.json",
+          "sha256": "74162d8213ef46e462f28e14ab61b6f5c8f3f1774a83237700ebc226e65f1d56"
+        },
+        "full_frame_minimum_ssim": 1.0,
+        "direct_mfd_minimum_ssim": 1.0,
+        "on_screen_mfd_minimum_ssim": 1.0,
+        "camera_maxima": {
+          "position_m": 0.0,
+          "rotation_rad": 0.0,
+          "aperture_rad": 0.0
+        },
+        "runtime": {
+          "schema": 1,
+          "application_source": "f725194209634f7fd5d1d44d426cfa9b5e303e37",
+          "client_source": "68400a7d3750240afb53890e1da2306c71f6380e",
+          "reference_run": 41458001638,
+          "runtime_archive_sha256": "b7ddbfef253b29e246bd29b003c8f63d92dd5e2500066771ebc8852c8932cd06",
+          "runtime_payload_sha256": "8389f1546245a8a9d215062f9599131b466df81ce4288b8371ba8fca196da3ca",
+          "client_archive_sha256": "4de971bc585e2054950b31c4b0117b7dae4ba52e0e171ea5994eb6100fe26645",
+          "client_files_sha256": {
+            "Modules/OGLClient/ATTRIBUTION.md": "79b7b3cc419d310489e541194d97b08666bdc4b6383b27b5652904d2a8abd5bd",
+            "Modules/OGLClient/Cloud.fs": "eb25528320861565948b38b7c2ebd47297e66d486896306a33b60009aceade2f",
+            "Modules/OGLClient/Cloud.vs": "30901d7f63100b634cf3d2ef98747a8b17be8f682b5eeb0e99131906387b5697",
+            "Modules/OGLClient/Common.inc": "4e40e70a70c9f1a08e569adfc44097899e37d81c199ce1879b5b3d81083db2ec",
+            "Modules/OGLClient/Constellations.fs": "2ba545184b330f5fb721179c4ccae61502b43a6bb8a50a368c17ad1246508db9",
+            "Modules/OGLClient/dependencies.lock.json": "80d217de95a4a31f06b6df0f0f0f1544242c493a3382997690beac9c9f0800ce",
+            "Modules/OGLClient/Constellations.vs": "0ba5e9d65ea610d99cde8f6e388684a1c7064c7730e16f26cf0772e216e2724b",
+            "Modules/OGLClient/Ecliptic.fs": "4a93a93e3186fe19b0240644d83e458037dbfb1820b7aa332ddfcdf9fbd1028e",
+            "Modules/OGLClient/Ecliptic.vs": "0ba5e9d65ea610d99cde8f6e388684a1c7064c7730e16f26cf0772e216e2724b",
+            "Modules/OGLClient/Exhaust.fs": "26f78db654a4c6d4b34807d9e6fb7eb7595ebe3e12fa34abb7f5f9a9aa62d029",
+            "Modules/OGLClient/Exhaust.vs": "317ceafe9613196b863d436205ffb8c725ba572d0eff989628a6579faf44df71",
+            "Modules/OGLClient/GroundShadow.vs": "792c53dbc53f93d8a1df42726856224fee297c2ee2b3de4cddf3f897034d544c",
+            "Modules/OGLClient/GroundShadow.fs": "364b5d72032cf871b4bf6df7d0276b0f0892e2650a04a595a5ab75703d425da0",
+            "Modules/OGLClient/Haze.fs": "20ce2c36ec348c39d51238a8a1ff4e280c7657693d7ce2af3f65ead7c2a86160",
+            "Modules/OGLClient/Haze.vs": "7d8d6b0d92506aaaaebd807365e60614721c8367112d9b92bc0e73c06868b64a",
+            "Modules/OGLClient/Licenses/docs-FTL.TXT": "08c135755dd589039470f1fdbb400daaabaaa50d0b366d19cebff4d22986baa1",
+            "Modules/OGLClient/Licenses/fontstash.h": "785f7fa2521b47a5d1b8ebc6ed7e6f5d2c5f6c8fad0080b4605e2d63cacb46e0",
+            "Modules/OGLClient/Licenses/glm-src-copying.txt": "62d2d642c7d054d4fb4c9b42faad617d6c88fcd91e317f8035aa9f277cc159c3",
+            "Modules/OGLClient/Licenses/imgui-src-LICENSE.txt": "c80c5789748d955c4a650562baa0d750494e2c7128c2ca66aaebe2e3c4e198bf",
+            "Modules/OGLClient/Licenses/libnsbmp-src-COPYING": "bec1a28e7f95e0b2acc624bf9e6d8556451f454ea6a213f8c1bc0fe792c61ead",
+            "Modules/OGLClient/Licenses/nanovg-src-LICENSE.txt": "45185a6680ed83863bef33e1055f9fd76374df4b81c957802c19a286c982dfd2",
+            "Modules/OGLClient/Licenses/OGLPad.cpp": "5a03ccdf58dd89b7ed6f3fa8443abc570b173d453243dd6c907dec7a32642d62",
+            "Modules/OGLClient/Licenses/Orbiter-MIT.txt": "ffba1fe66f6c59cc8e01c014a4454901d1b6b3669b5e205bf54a2f57974bab7d",
+            "Modules/OGLClient/Licenses/Shadinclude.hpp": "4869d2bf086276f8a14b2a5944cb1e34cb248ac7d793b587f68509e99afb5023",
+            "Modules/OGLClient/Licenses/soil2-src-README.md": "11528c4876b9d4020cb481db340930821b2dc7158fd6dd2a8d8921a9965372a8",
+            "Modules/OGLClient/Licenses/stb_image_write.h": "cbd5f0ad7a9cf4468affb36354a1d2338034f2c12473cf1a8e32053cb6914a05",
+            "Modules/OGLClient/Licenses/stb_image.h": "4ef7dee427053e3090b188021eab75fc227644c39caad6e81259e7f0053b55b7",
+            "Modules/OGLClient/Licenses/zlib.h": "4ddc82b4af931ab55f44d977bde81bfbc4151b5dcdccc03142831a301b5ec3c8",
+            "Modules/OGLClient/LogDepth.inc": "fa35ccf810e1bf17c0542764c495dabbb497c085e20ca175fb3f5d1cf9c6726c",
+            "Modules/OGLClient/Mesh.fs": "b35400a6f0d4c17c5cf22bd54aa79262fa7ac15c00a974205ac92a06e81750bc",
+            "Modules/OGLClient/Mesh.vs": "930a4e26e6f2c2934c660eb79d815ce2fb0a017179e338f055e80efe1d92ff34",
+            "Modules/OGLClient/MeshUnlit.fs": "ca9e0b2501cebad726eaede37bc156e4d82ae1fba368a1a0ff4725bbfb34c00a",
+            "Modules/OGLClient/MeshUnlit.vs": "48c518f1bf4fe73eeeb96eb9f318c1583e450f67af1866cd53d87cc697120ce0",
+            "Modules/OGLClient/Overlay.fs": "7ecf7b1307f78531cf93ef028655b55dd3f5d3d419f37ec56e36159b4726983f",
+            "Modules/OGLClient/Overlay.vs": "2a1446e6009dbbd220fa909d3373d784f11a14d3b13fd11c695bd1532d86aac7",
+            "Modules/OGLClient/Particle.vs": "47a39c1c5930841da760e8fa007d1131be315ad4fd09220aede97e333aa68231",
+            "Modules/OGLClient/Particle.fs": "558e6cc9f62cf66fd66a0b71a79a1a933d3c45913d5b3bedf620108ad8b8be09",
+            "Modules/OGLClient/Ring.vs": "b7c6a413002b01dc55ab439a1965459561cc98a1d86e306a944a251f9ee7f691",
+            "Modules/OGLClient/Ring.fs": "62fe7dc50a7f8e77f8d149509ca1291f6fb7e84a88ce919283495af813664339",
+            "Modules/OGLClient/Spot.fs": "38bcc949bb6a654ce32c148bc84044dc26f5c324ea9bd060205a11e51ddf6f0b",
+            "Modules/OGLClient/Spot.vs": "112753669d70c08aea27c81df931fc5b1ad0628a607ad856ec7018e8a2f9c273",
+            "Modules/OGLClient/Stars.fs": "bc037a5f7706ec5b895a8e8a3d6b22c6e45086ca9b4f9f4d87af89df821d21a5",
+            "Modules/OGLClient/Stars.vs": "8d5130ebdf69840ccc7b7c0e22d90ef00382ca00103bac348408ccd50a423b7d",
+            "Modules/OGLClient/Tile.fs": "d8145397bb4c13244dbbc150b51a1a462e8b42502dc7754154a7a6300782e958",
+            "Modules/OGLClient/Types.inc": "a6f30552abb4ae13348a0e99f2f265150d45d41373c3c3603544ca877faba068",
+            "Modules/OGLClient/Tile.vs": "e0aecdff8d53a8fab078e6fe2ffcf78ce670e522debba7750261d2801e1c0c8e",
+            "Modules/OGLClient/Uniforms.inc": "2f4cb227de081cabfdcd45655987efe9235b9d2a169d65d7583ec50cba5d8c89",
+            "Modules/OGLClient/Untextured.fs": "11485b9057e7c1f08005858decfa3a772a738454c81e2b7e5957560e93afec9b",
+            "Modules/OGLClient/Untextured.vs": "cc02e7e9a410bdf5e3f4d45fca12267ca511d065b42c3032b1d3e8c0028a1acc",
+            "Modules/OGLClient/VesselShadow.fs": "364b5d72032cf871b4bf6df7d0276b0f0892e2650a04a595a5ab75703d425da0",
+            "Modules/OGLClient/VesselShadow.vs": "48bb3fb2e6f9d53a60d11959b4d0a579dee64d6b8f5b83f2effba64ee9c2c943",
+            "Modules/Plugin/OGLClient.dll": "7eec64c39e2fed0205f8fbcd3dd6f912453a6f9b85a6f3856ad8a7d33d15ad04"
+          },
+          "executed_application_sha256": "7f6466e70b0ceda6f9e8f9940ca8cd00596557f75ead52cdcd46dabc3b145560"
+        },
+        "sdk_observer_sha256": "0b052360d634d733c3f0782cceff44f50f30a31fc0f60e35a21bd43275fce6c5",
+        "renderer": {
+          "vendor": "Mesa",
+          "renderer": "llvmpipe (LLVM 23.1.4, 256 bits)",
+          "version": "4.6 (Core Profile) Mesa 26.2.6",
+          "client_width": 1280,
+          "client_height": 720
+        }
+      },
+      "Release-automatic": {
+        "native_profile": "automatic-release",
+        "original_archive": {
+          "artifact_id": 13233411068,
+          "path": "out/phase6-headlook-original-cache/original-camera-Release-automatic.zip",
+          "sha256": "3b831ac08599690d95876844424adc4091078e1e01cb82984e0667be456d9585",
+          "bytes": 97438946
+        },
+        "original_report": {
+          "path": "out/phase6-headlook-original/Release-automatic/camera-original/camera-report.json",
+          "sha256": "f99f503fda978c998a54a8d58d07758f265f3c9751c2c4534699cf5dc02a1ca4"
+        },
+        "original_processes": 24,
+        "paired_report": {
+          "path": "out/phase6-headlook-Release-automatic-comparison.json",
+          "sha256": "c0b39805a7949abe35ed69b93331ede8e54fe9d7113074d7520f736a3cd67260"
+        },
+        "full_frame_minimum_ssim": 1.0,
+        "direct_mfd_minimum_ssim": 1.0,
+        "on_screen_mfd_minimum_ssim": 1.0,
+        "camera_maxima": {
+          "position_m": 0.0,
+          "rotation_rad": 0.0,
+          "aperture_rad": 0.0
+        },
+        "runtime": {
+          "schema": 1,
+          "application_source": "f725194209634f7fd5d1d44d426cfa9b5e303e37",
+          "client_source": "68400a7d3750240afb53890e1da2306c71f6380e",
+          "reference_run": 41458001638,
+          "runtime_archive_sha256": "d4156603f942806d39db87232ff6795695ce0dae720d3cd0388da56c1c9acea1",
+          "runtime_payload_sha256": "fb09c8069348758ee5c47626812fe6a87b502367c8eade47b8fa4422e92f29bf",
+          "client_archive_sha256": "40ccc0661900e2d4d417f8aa5765a72021294c1dfeb1a5ce5cdde681a60189fc",
+          "client_files_sha256": {
+            "Modules/OGLClient/ATTRIBUTION.md": "79b7b3cc419d310489e541194d97b08666bdc4b6383b27b5652904d2a8abd5bd",
+            "Modules/OGLClient/Cloud.fs": "eb25528320861565948b38b7c2ebd47297e66d486896306a33b60009aceade2f",
+            "Modules/OGLClient/Cloud.vs": "30901d7f63100b634cf3d2ef98747a8b17be8f682b5eeb0e99131906387b5697",
+            "Modules/OGLClient/Common.inc": "4e40e70a70c9f1a08e569adfc44097899e37d81c199ce1879b5b3d81083db2ec",
+            "Modules/OGLClient/Constellations.fs": "2ba545184b330f5fb721179c4ccae61502b43a6bb8a50a368c17ad1246508db9",
+            "Modules/OGLClient/Constellations.vs": "0ba5e9d65ea610d99cde8f6e388684a1c7064c7730e16f26cf0772e216e2724b",
+            "Modules/OGLClient/dependencies.lock.json": "80d217de95a4a31f06b6df0f0f0f1544242c493a3382997690beac9c9f0800ce",
+            "Modules/OGLClient/Ecliptic.fs": "4a93a93e3186fe19b0240644d83e458037dbfb1820b7aa332ddfcdf9fbd1028e",
+            "Modules/OGLClient/Ecliptic.vs": "0ba5e9d65ea610d99cde8f6e388684a1c7064c7730e16f26cf0772e216e2724b",
+            "Modules/OGLClient/Exhaust.fs": "26f78db654a4c6d4b34807d9e6fb7eb7595ebe3e12fa34abb7f5f9a9aa62d029",
+            "Modules/OGLClient/Exhaust.vs": "317ceafe9613196b863d436205ffb8c725ba572d0eff989628a6579faf44df71",
+            "Modules/OGLClient/GroundShadow.fs": "364b5d72032cf871b4bf6df7d0276b0f0892e2650a04a595a5ab75703d425da0",
+            "Modules/OGLClient/Haze.fs": "20ce2c36ec348c39d51238a8a1ff4e280c7657693d7ce2af3f65ead7c2a86160",
+            "Modules/OGLClient/GroundShadow.vs": "792c53dbc53f93d8a1df42726856224fee297c2ee2b3de4cddf3f897034d544c",
+            "Modules/OGLClient/Haze.vs": "7d8d6b0d92506aaaaebd807365e60614721c8367112d9b92bc0e73c06868b64a",
+            "Modules/OGLClient/Licenses/docs-FTL.TXT": "08c135755dd589039470f1fdbb400daaabaaa50d0b366d19cebff4d22986baa1",
+            "Modules/OGLClient/Licenses/fontstash.h": "785f7fa2521b47a5d1b8ebc6ed7e6f5d2c5f6c8fad0080b4605e2d63cacb46e0",
+            "Modules/OGLClient/Licenses/glm-src-copying.txt": "62d2d642c7d054d4fb4c9b42faad617d6c88fcd91e317f8035aa9f277cc159c3",
+            "Modules/OGLClient/Licenses/imgui-src-LICENSE.txt": "c80c5789748d955c4a650562baa0d750494e2c7128c2ca66aaebe2e3c4e198bf",
+            "Modules/OGLClient/Licenses/libnsbmp-src-COPYING": "bec1a28e7f95e0b2acc624bf9e6d8556451f454ea6a213f8c1bc0fe792c61ead",
+            "Modules/OGLClient/Licenses/OGLPad.cpp": "5a03ccdf58dd89b7ed6f3fa8443abc570b173d453243dd6c907dec7a32642d62",
+            "Modules/OGLClient/Licenses/nanovg-src-LICENSE.txt": "45185a6680ed83863bef33e1055f9fd76374df4b81c957802c19a286c982dfd2",
+            "Modules/OGLClient/Licenses/Orbiter-MIT.txt": "ffba1fe66f6c59cc8e01c014a4454901d1b6b3669b5e205bf54a2f57974bab7d",
+            "Modules/OGLClient/Licenses/Shadinclude.hpp": "4869d2bf086276f8a14b2a5944cb1e34cb248ac7d793b587f68509e99afb5023",
+            "Modules/OGLClient/Licenses/soil2-src-README.md": "11528c4876b9d4020cb481db340930821b2dc7158fd6dd2a8d8921a9965372a8",
+            "Modules/OGLClient/Licenses/stb_image.h": "4ef7dee427053e3090b188021eab75fc227644c39caad6e81259e7f0053b55b7",
+            "Modules/OGLClient/Licenses/stb_image_write.h": "cbd5f0ad7a9cf4468affb36354a1d2338034f2c12473cf1a8e32053cb6914a05",
+            "Modules/OGLClient/Licenses/zlib.h": "4ddc82b4af931ab55f44d977bde81bfbc4151b5dcdccc03142831a301b5ec3c8",
+            "Modules/OGLClient/LogDepth.inc": "fa35ccf810e1bf17c0542764c495dabbb497c085e20ca175fb3f5d1cf9c6726c",
+            "Modules/OGLClient/Mesh.fs": "b35400a6f0d4c17c5cf22bd54aa79262fa7ac15c00a974205ac92a06e81750bc",
+            "Modules/OGLClient/Mesh.vs": "930a4e26e6f2c2934c660eb79d815ce2fb0a017179e338f055e80efe1d92ff34",
+            "Modules/OGLClient/MeshUnlit.fs": "ca9e0b2501cebad726eaede37bc156e4d82ae1fba368a1a0ff4725bbfb34c00a",
+            "Modules/OGLClient/MeshUnlit.vs": "48c518f1bf4fe73eeeb96eb9f318c1583e450f67af1866cd53d87cc697120ce0",
+            "Modules/OGLClient/Overlay.fs": "7ecf7b1307f78531cf93ef028655b55dd3f5d3d419f37ec56e36159b4726983f",
+            "Modules/OGLClient/Overlay.vs": "2a1446e6009dbbd220fa909d3373d784f11a14d3b13fd11c695bd1532d86aac7",
+            "Modules/OGLClient/Particle.fs": "558e6cc9f62cf66fd66a0b71a79a1a933d3c45913d5b3bedf620108ad8b8be09",
+            "Modules/OGLClient/Ring.fs": "62fe7dc50a7f8e77f8d149509ca1291f6fb7e84a88ce919283495af813664339",
+            "Modules/OGLClient/Particle.vs": "47a39c1c5930841da760e8fa007d1131be315ad4fd09220aede97e333aa68231",
+            "Modules/OGLClient/Ring.vs": "b7c6a413002b01dc55ab439a1965459561cc98a1d86e306a944a251f9ee7f691",
+            "Modules/OGLClient/Spot.fs": "38bcc949bb6a654ce32c148bc84044dc26f5c324ea9bd060205a11e51ddf6f0b",
+            "Modules/OGLClient/Spot.vs": "112753669d70c08aea27c81df931fc5b1ad0628a607ad856ec7018e8a2f9c273",
+            "Modules/OGLClient/Stars.fs": "bc037a5f7706ec5b895a8e8a3d6b22c6e45086ca9b4f9f4d87af89df821d21a5",
+            "Modules/OGLClient/Stars.vs": "8d5130ebdf69840ccc7b7c0e22d90ef00382ca00103bac348408ccd50a423b7d",
+            "Modules/OGLClient/Tile.fs": "d8145397bb4c13244dbbc150b51a1a462e8b42502dc7754154a7a6300782e958",
+            "Modules/OGLClient/Tile.vs": "e0aecdff8d53a8fab078e6fe2ffcf78ce670e522debba7750261d2801e1c0c8e",
+            "Modules/OGLClient/Types.inc": "a6f30552abb4ae13348a0e99f2f265150d45d41373c3c3603544ca877faba068",
+            "Modules/OGLClient/Uniforms.inc": "2f4cb227de081cabfdcd45655987efe9235b9d2a169d65d7583ec50cba5d8c89",
+            "Modules/OGLClient/Untextured.fs": "11485b9057e7c1f08005858decfa3a772a738454c81e2b7e5957560e93afec9b",
+            "Modules/OGLClient/VesselShadow.fs": "364b5d72032cf871b4bf6df7d0276b0f0892e2650a04a595a5ab75703d425da0",
+            "Modules/OGLClient/Untextured.vs": "cc02e7e9a410bdf5e3f4d45fca12267ca511d065b42c3032b1d3e8c0028a1acc",
+            "Modules/OGLClient/VesselShadow.vs": "48bb3fb2e6f9d53a60d11959b4d0a579dee64d6b8f5b83f2effba64ee9c2c943",
+            "Modules/Plugin/OGLClient.dll": "e71a1daf9db30960bbadd9aae607e5c5248d0bd8c15a61b15e973c9bdca86c1a"
+          },
+          "executed_application_sha256": "cb197dff3fc478bf095b8cc321ec81ad2dc4b23671acd42314ee4e3705ea2a8b"
+        },
+        "sdk_observer_sha256": "97d8bc1f01ed0c71775c1149f0b4c3c8da3ebdb507fdf0a4ae851c4ef21a2a9b",
+        "renderer": {
+          "vendor": "Mesa",
+          "renderer": "llvmpipe (LLVM 23.1.4, 256 bits)",
+          "version": "4.6 (Core Profile) Mesa 26.2.6",
+          "client_width": 1280,
+          "client_height": 720
+        }
+      },
+      "Release-sse2": {
+        "native_profile": "sse2-release",
+        "original_archive": {
+          "artifact_id": 13233375448,
+          "path": "out/phase6-headlook-original-cache/original-camera-Release-sse2.zip",
+          "sha256": "4006723fb6b1df9d6bbb33809320033a404e195a0a71cf1d8e71fd95a4d2a4aa",
+          "bytes": 97438498
+        },
+        "original_report": {
+          "path": "out/phase6-headlook-original/Release-sse2/camera-original/camera-report.json",
+          "sha256": "affab097d7eee803da4f80c4bd3f77960a2e912626c148f751c6e36e342dde1f"
+        },
+        "original_processes": 24,
+        "paired_report": {
+          "path": "out/phase6-headlook-Release-sse2-comparison.json",
+          "sha256": "74162d8213ef46e462f28e14ab61b6f5c8f3f1774a83237700ebc226e65f1d56"
+        },
+        "full_frame_minimum_ssim": 1.0,
+        "direct_mfd_minimum_ssim": 1.0,
+        "on_screen_mfd_minimum_ssim": 1.0,
+        "camera_maxima": {
+          "position_m": 0.0,
+          "rotation_rad": 0.0,
+          "aperture_rad": 0.0
+        },
+        "runtime": {
+          "schema": 1,
+          "application_source": "f725194209634f7fd5d1d44d426cfa9b5e303e37",
+          "client_source": "68400a7d3750240afb53890e1da2306c71f6380e",
+          "reference_run": 41458001638,
+          "runtime_archive_sha256": "d4156603f942806d39db87232ff6795695ce0dae720d3cd0388da56c1c9acea1",
+          "runtime_payload_sha256": "fb09c8069348758ee5c47626812fe6a87b502367c8eade47b8fa4422e92f29bf",
+          "client_archive_sha256": "40ccc0661900e2d4d417f8aa5765a72021294c1dfeb1a5ce5cdde681a60189fc",
+          "client_files_sha256": {
+            "Modules/OGLClient/ATTRIBUTION.md": "79b7b3cc419d310489e541194d97b08666bdc4b6383b27b5652904d2a8abd5bd",
+            "Modules/OGLClient/Cloud.fs": "eb25528320861565948b38b7c2ebd47297e66d486896306a33b60009aceade2f",
+            "Modules/OGLClient/Cloud.vs": "30901d7f63100b634cf3d2ef98747a8b17be8f682b5eeb0e99131906387b5697",
+            "Modules/OGLClient/Common.inc": "4e40e70a70c9f1a08e569adfc44097899e37d81c199ce1879b5b3d81083db2ec",
+            "Modules/OGLClient/Constellations.fs": "2ba545184b330f5fb721179c4ccae61502b43a6bb8a50a368c17ad1246508db9",
+            "Modules/OGLClient/Constellations.vs": "0ba5e9d65ea610d99cde8f6e388684a1c7064c7730e16f26cf0772e216e2724b",
+            "Modules/OGLClient/dependencies.lock.json": "80d217de95a4a31f06b6df0f0f0f1544242c493a3382997690beac9c9f0800ce",
+            "Modules/OGLClient/Ecliptic.fs": "4a93a93e3186fe19b0240644d83e458037dbfb1820b7aa332ddfcdf9fbd1028e",
+            "Modules/OGLClient/Ecliptic.vs": "0ba5e9d65ea610d99cde8f6e388684a1c7064c7730e16f26cf0772e216e2724b",
+            "Modules/OGLClient/Exhaust.fs": "26f78db654a4c6d4b34807d9e6fb7eb7595ebe3e12fa34abb7f5f9a9aa62d029",
+            "Modules/OGLClient/Exhaust.vs": "317ceafe9613196b863d436205ffb8c725ba572d0eff989628a6579faf44df71",
+            "Modules/OGLClient/GroundShadow.fs": "364b5d72032cf871b4bf6df7d0276b0f0892e2650a04a595a5ab75703d425da0",
+            "Modules/OGLClient/Haze.fs": "20ce2c36ec348c39d51238a8a1ff4e280c7657693d7ce2af3f65ead7c2a86160",
+            "Modules/OGLClient/GroundShadow.vs": "792c53dbc53f93d8a1df42726856224fee297c2ee2b3de4cddf3f897034d544c",
+            "Modules/OGLClient/Haze.vs": "7d8d6b0d92506aaaaebd807365e60614721c8367112d9b92bc0e73c06868b64a",
+            "Modules/OGLClient/Licenses/docs-FTL.TXT": "08c135755dd589039470f1fdbb400daaabaaa50d0b366d19cebff4d22986baa1",
+            "Modules/OGLClient/Licenses/fontstash.h": "785f7fa2521b47a5d1b8ebc6ed7e6f5d2c5f6c8fad0080b4605e2d63cacb46e0",
+            "Modules/OGLClient/Licenses/glm-src-copying.txt": "62d2d642c7d054d4fb4c9b42faad617d6c88fcd91e317f8035aa9f277cc159c3",
+            "Modules/OGLClient/Licenses/imgui-src-LICENSE.txt": "c80c5789748d955c4a650562baa0d750494e2c7128c2ca66aaebe2e3c4e198bf",
+            "Modules/OGLClient/Licenses/libnsbmp-src-COPYING": "bec1a28e7f95e0b2acc624bf9e6d8556451f454ea6a213f8c1bc0fe792c61ead",
+            "Modules/OGLClient/Licenses/OGLPad.cpp": "5a03ccdf58dd89b7ed6f3fa8443abc570b173d453243dd6c907dec7a32642d62",
+            "Modules/OGLClient/Licenses/nanovg-src-LICENSE.txt": "45185a6680ed83863bef33e1055f9fd76374df4b81c957802c19a286c982dfd2",
+            "Modules/OGLClient/Licenses/Orbiter-MIT.txt": "ffba1fe66f6c59cc8e01c014a4454901d1b6b3669b5e205bf54a2f57974bab7d",
+            "Modules/OGLClient/Licenses/Shadinclude.hpp": "4869d2bf086276f8a14b2a5944cb1e34cb248ac7d793b587f68509e99afb5023",
+            "Modules/OGLClient/Licenses/soil2-src-README.md": "11528c4876b9d4020cb481db340930821b2dc7158fd6dd2a8d8921a9965372a8",
+            "Modules/OGLClient/Licenses/stb_image.h": "4ef7dee427053e3090b188021eab75fc227644c39caad6e81259e7f0053b55b7",
+            "Modules/OGLClient/Licenses/stb_image_write.h": "cbd5f0ad7a9cf4468affb36354a1d2338034f2c12473cf1a8e32053cb6914a05",
+            "Modules/OGLClient/Licenses/zlib.h": "4ddc82b4af931ab55f44d977bde81bfbc4151b5dcdccc03142831a301b5ec3c8",
+            "Modules/OGLClient/LogDepth.inc": "fa35ccf810e1bf17c0542764c495dabbb497c085e20ca175fb3f5d1cf9c6726c",
+            "Modules/OGLClient/Mesh.fs": "b35400a6f0d4c17c5cf22bd54aa79262fa7ac15c00a974205ac92a06e81750bc",
+            "Modules/OGLClient/Mesh.vs": "930a4e26e6f2c2934c660eb79d815ce2fb0a017179e338f055e80efe1d92ff34",
+            "Modules/OGLClient/MeshUnlit.fs": "ca9e0b2501cebad726eaede37bc156e4d82ae1fba368a1a0ff4725bbfb34c00a",
+            "Modules/OGLClient/MeshUnlit.vs": "48c518f1bf4fe73eeeb96eb9f318c1583e450f67af1866cd53d87cc697120ce0",
+            "Modules/OGLClient/Overlay.fs": "7ecf7b1307f78531cf93ef028655b55dd3f5d3d419f37ec56e36159b4726983f",
+            "Modules/OGLClient/Overlay.vs": "2a1446e6009dbbd220fa909d3373d784f11a14d3b13fd11c695bd1532d86aac7",
+            "Modules/OGLClient/Particle.fs": "558e6cc9f62cf66fd66a0b71a79a1a933d3c45913d5b3bedf620108ad8b8be09",
+            "Modules/OGLClient/Ring.fs": "62fe7dc50a7f8e77f8d149509ca1291f6fb7e84a88ce919283495af813664339",
+            "Modules/OGLClient/Particle.vs": "47a39c1c5930841da760e8fa007d1131be315ad4fd09220aede97e333aa68231",
+            "Modules/OGLClient/Ring.vs": "b7c6a413002b01dc55ab439a1965459561cc98a1d86e306a944a251f9ee7f691",
+            "Modules/OGLClient/Spot.fs": "38bcc949bb6a654ce32c148bc84044dc26f5c324ea9bd060205a11e51ddf6f0b",
+            "Modules/OGLClient/Spot.vs": "112753669d70c08aea27c81df931fc5b1ad0628a607ad856ec7018e8a2f9c273",
+            "Modules/OGLClient/Stars.fs": "bc037a5f7706ec5b895a8e8a3d6b22c6e45086ca9b4f9f4d87af89df821d21a5",
+            "Modules/OGLClient/Stars.vs": "8d5130ebdf69840ccc7b7c0e22d90ef00382ca00103bac348408ccd50a423b7d",
+            "Modules/OGLClient/Tile.fs": "d8145397bb4c13244dbbc150b51a1a462e8b42502dc7754154a7a6300782e958",
+            "Modules/OGLClient/Tile.vs": "e0aecdff8d53a8fab078e6fe2ffcf78ce670e522debba7750261d2801e1c0c8e",
+            "Modules/OGLClient/Types.inc": "a6f30552abb4ae13348a0e99f2f265150d45d41373c3c3603544ca877faba068",
+            "Modules/OGLClient/Uniforms.inc": "2f4cb227de081cabfdcd45655987efe9235b9d2a169d65d7583ec50cba5d8c89",
+            "Modules/OGLClient/Untextured.fs": "11485b9057e7c1f08005858decfa3a772a738454c81e2b7e5957560e93afec9b",
+            "Modules/OGLClient/VesselShadow.fs": "364b5d72032cf871b4bf6df7d0276b0f0892e2650a04a595a5ab75703d425da0",
+            "Modules/OGLClient/Untextured.vs": "cc02e7e9a410bdf5e3f4d45fca12267ca511d065b42c3032b1d3e8c0028a1acc",
+            "Modules/OGLClient/VesselShadow.vs": "48bb3fb2e6f9d53a60d11959b4d0a579dee64d6b8f5b83f2effba64ee9c2c943",
+            "Modules/Plugin/OGLClient.dll": "e71a1daf9db30960bbadd9aae607e5c5248d0bd8c15a61b15e973c9bdca86c1a"
+          },
+          "executed_application_sha256": "cb197dff3fc478bf095b8cc321ec81ad2dc4b23671acd42314ee4e3705ea2a8b"
+        },
+        "sdk_observer_sha256": "1af589973bf339e7828ea6d6d3c761ac020d94571d7de9688142ba88d9a17790",
+        "renderer": {
+          "vendor": "Mesa",
+          "renderer": "llvmpipe (LLVM 23.1.4, 256 bits)",
+          "version": "4.6 (Core Profile) Mesa 26.2.6",
+          "client_width": 1280,
+          "client_height": 720
+        }
+      }
     }
   },
   "stock_scenario_smoke": {
@@ -1142,9 +1545,31 @@
     "scope": "Bounded smoke coverage; broader interactive acceptance remains open. GeneralApiTest is not waived."
   },
   "remaining": [
-    "Original Windows camera captures and paired image/transform comparisons",
     "Current-source full hosted native/Windows qualification",
     "Broader interactive DG systems/scenarios",
     "Native Wayland, high-DPI and physical input qualification"
-  ]
+  ],
+  "paired_comparison_source": "6ee325ec03700101a4691e9b399d08a0f6c4a465",
+  "qualified_original_processes": 96,
+  "qualified_original_presentations": 5760,
+  "qualified_native_and_original_processes": 192,
+  "qualified_native_and_original_presentations": 11520,
+  "native_capture_review_sources_sha256_lf": {
+    "Tests/Production/CockpitCamera/run.py": "1490fe54831b9eed74852ca2dab48ff001cbc37d8411c64a0dc787fdb719d9c5",
+    "Tests/Production/CockpitCamera/Driver.cpp": "a999bafcdbb30233ca54839a5da5b4cc2c786909be10a94f23f708f855756b59",
+    "Tests/Production/CockpitCamera/Observation.h": "ad66da760a2a96be28b255e6222aff0c4572ea1180f5f86fde3d8424b9d21c45",
+    "Tests/Production/CockpitCamera/cases.json": "e4913b9f0431335f1da7f53d3e4e4ab7ed85e3d80ac6f4320df6dc7723e0c17d",
+    "Tests/Production/CockpitCamera/CMakeLists.txt": "332bbe8ec79002f783a676a4af0d313e078ac8b8ac6bdcfe2107947fcf154c75",
+    "Tests/Production/CockpitCamera/NativeProbe.cpp": "10ae32def1366f3fb517b9dea839f4d793ecc6a107c39ce26d404622db2d4bd1",
+    "Tests/Production/CockpitCamera/README.md": "bc1d95418cabc212edb852bf2dae935f4c49c1df3f75eef5ed4e252c82cb9337",
+    "Tests/Production/CockpitCameraGate.Test.py": "2449d9dccd242694ac37d7a12bd66ea9a5c2164e4816b91974afa6bd80afcb89",
+    ".github/workflows/native-production-client.yml": "5a06b1d6459312b4b3a3c100548124987e01c2866995b3f0e9bdb5710ff802bc",
+    ".github/workflows/original-cockpit-camera.yml": "e62a3d27c8d1334507942b4e5a633d7e966d9aeb31cfe53b11caf80ddbcf4292"
+  },
+  "earlier_expanded_hosted_qualification": {
+    "source": "d065f93b0692d2e0a09f6411474d12e8fff672d0",
+    "run_id": 41629667322,
+    "status": "all twelve jobs succeeded",
+    "scope": "Earlier camera-key and panel/VC mechanism candidate; later camera mouse changes remain in the next full run"
+  }
 }

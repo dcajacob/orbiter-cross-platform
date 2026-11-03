@@ -20,6 +20,12 @@ and saved positions/speeds match exactly. The subsequent expanded real-key and
 profile checks remain a separate hosted qualification.
 [Hosted qualification and verified comparison archives](HostedCockpitVerification.json)
 
+The subsequent expanded run at `d065f93b` also completes all twelve hosted jobs,
+including real panel/VC mechanism picks, camera-key separation, Lua/frozen
+control regressions and four paired spacecraft comparisons.
+[Expanded hosted run](https://github.com/dcajacob/orbiter-cross-platform/actions/runs/41629667322)
+The later camera mouse/FOV changes remain part of the next full hosted run.
+
 Gear, nose cone, radiator, both airlocks, hatch and airbrakes now pass a native
 keyboard and save/reload regression in both gliders and cockpit modes. Debug,
 Release and the unsuppressed sanitizer build each complete 16 fresh processes
@@ -155,20 +161,22 @@ profiles have exact physical states; the largest SSE2 rotation difference from
 the frozen reference is `5.69e-22` radians, within the existing gate.
 [Camera mouse and FOV evidence](CameraMouseVerification.json)
 
-Preserved-Windows comparisons at the turned view angles, Wayland/high-DPI input
-and physical-controller qualification remain open. The off-axis diagnostic
-confirms populated MFD surfaces on both
-scenario load and explicit mode reopening; it does not establish original
-Windows image parity at those angles.
+The preserved-Windows comparison now passes at forward, turned and centered
+downward VC angles, with scenario-loaded and explicitly reopened MFDs. Full
+frames, both MFD surfaces and their visible framebuffer regions have SSIM 1.0
+in all four Debug/Release automatic/SSE2 profiles; camera transforms are exact.
+The observed turned-view appearance matches the preserved graphics client, so
+this result requires no rendering change. Wayland/high-DPI input and physical
+controller qualification remain open.
 [VC mouse, camera and profile evidence](DGVCMouseVerification.json)
 
 The additional [VC camera fixture](../../Tests/Production/CockpitCamera/README.md)
-now captures both gliders at forward and turned angles, with scenario-loaded
+captures both gliders at forward, turned and centered downward angles, with scenario-loaded
 and SDK-reopened MFDs, twice per case. Its separate Windows job uses the exact
 preserved application/client and a new public SDK observation module. The
 native workflow captures matching transforms and images, and the paired job
 applies the existing physical, text, overlay, MFD and full-frame gates. This
-is a comparison in progress; native repeats alone do not close off-axis parity.
+has now passed all four paired comparisons against the preserved Windows app.
 The finalized twelve-case native matrix passes twice in all four profiles:
 96 application processes, 5,760 presentations, exact camera/state/drawing-value
 repeats and SSIM 1.0 for all repeated full frames and MFD surfaces. A negative
@@ -177,7 +185,18 @@ control passes whole-frame SSIM at 0.99756 but fails the on-screen MFD gate at
 the conversion between SDK top-origin coordinates and bottom-origin OpenGL
 readbacks. The current stock smoke sweep completes all 38 loadable scenarios;
 GeneralApiTest's known assertion remains a reported failure.
-[Native camera repeatability, gate controls and pending Windows comparison](CockpitCameraVerification.json)
+[Original Windows/native camera parity, gate controls and stock smoke evidence](CockpitCameraVerification.json)
+
+An isolated Release renderer also completes all twelve camera cases twice on
+the actual native Wayland compositor, with `DISPLAY` unset. All 24 processes
+present and tear down normally. Its camera/state traces, complete frames, MFD
+surfaces and on-screen MFD regions match the corresponding X11 captures exactly.
+The initial test probe's inherited preload prevented GTK's image helper from
+finding its engine dependency; an isolated test-library path resolves that
+failure. Production code and system packages are unchanged. This is camera
+rendering and lifecycle coverage; Wayland pointer/keyboard, high-DPI and
+controller qualification remain open.
+[Wayland evidence](WaylandVerification.json)
 
 The native graphics leak now has an isolated source fix and a passing local
 sanitizer menu flow. Mesa's executable-code allocator retained two bookkeeping
