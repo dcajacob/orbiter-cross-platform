@@ -742,7 +742,7 @@
     },
     "Src/Orbiter/Production/NativeApplication.cpp": {
       "original_sha256_lf": null,
-      "sha256_lf": "47ee4ad3bb8af3320b6ad1a25bfc1789ad3aff177e3c6ef352bc9be20f3632b1"
+      "sha256_lf": "1ce2f290d1830d83a764cd8835df7a698c85cbaa0e0d35279e2e69a62e8b9e34"
     },
     "Src/Orbiter/Production/NativeBuild.h.in": {
       "sha256_lf": "f5fb21f83bb6be0c54839fce670e8410f6911eda86da2eef26e4221c1ae25d97",

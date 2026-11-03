@@ -84,11 +84,32 @@ int ReadFlightStatus(const VESSEL& vessel) {
 }
 bool SupportedStockStation(const VESSEL& vessel,const char* type) {
     const bool mir=CompareText(type,"Mir")==0,wheel=CompareText(type,"Wheel")==0;
-    if((!mir && !wheel) || vessel.Version()!=0 || vessel.GetEnableFocus() || vessel.GetMeshCount()!=1 ||
+    const bool legacy=CompareText(type,"ISS")==0,module=CompareText(type,"Module1")==0;
+    if((!mir && !wheel && !legacy && !module) || vessel.Version()!=0 || vessel.GetEnableFocus()!=module || vessel.GetMeshCount()!=1 ||
        vessel.GetThrusterCount()!=0 || vessel.GetPropellantCount()!=0 || vessel.AttachmentCount(true)!=0 ||
-       vessel.AttachmentCount(false)!=0 || !vessel.GetTransponder() || vessel.GetFuelMass()!=0 ||
+       vessel.AttachmentCount(false)!=0 || bool(vessel.GetTransponder())!=!module || vessel.GetFuelMass()!=0 ||
        vessel.GetMass()!=vessel.GetEmptyMass())return false;
     VECTOR3 pmi{},cs{};vessel.GetPMI(pmi);vessel.GetCrossSections(cs);
+    const auto dock=[&](oapi::UInt index,const VECTOR3& position,const VECTOR3& direction,const VECTOR3& rotation) {
+        const auto handle=vessel.GetDockHandle(index);if(!handle)return false;
+        VECTOR3 p{},d{},r{};vessel.GetDockParams(handle,p,d,r);
+        return p.x==position.x && p.y==position.y && p.z==position.z &&
+               d.x==direction.x && d.y==direction.y && d.z==direction.z &&
+               r.x==rotation.x && r.y==rotation.y && r.z==rotation.z;
+    };
+    // Original ISS/Module1 capabilities and local ports are independently
+    // audited in LegacyStations/observations.lock.json. Native parity remains
+    // a separate gate; no declared module may fall back to a generic vessel.
+    if(legacy)
+        return vessel.GetEmptyMass()==450000 && vessel.GetSize()==55 && vessel.DockCount()==3 &&
+            pmi.x==395 && pmi.y==559 && pmi.z==290 && cs.x==897.2 && cs.y==3641.3 && cs.z==610.8 &&
+            dock(0,_V(13.67,5.56,0),_V(1,0,0),_V(0,1,0)) &&
+            dock(1,_V(-4.32,17.6,0),_V(0,1,0),_V(1,0,0)) &&
+            dock(2,_V(-36,4.21,0),_V(-1,0,0),_V(0,-1,0));
+    if(module)
+        return vessel.GetEmptyMass()==8000 && vessel.GetSize()==6 && vessel.DockCount()==2 &&
+            pmi.x==7.7 && pmi.y==7.7 && pmi.z==2.3 && cs.x==20 && cs.y==20 && cs.z==20 &&
+            dock(0,_V(0,0,5),_V(0,0,1),_V(0,1,0)) && dock(1,_V(0,0,-5),_V(0,0,-1),_V(0,1,0));
     // Explicit original configuration-defined classes, qualified against the
     // preserved Windows application. Required modules still use the loader.
     return (mir && vessel.GetEmptyMass()==124340 && vessel.GetSize()==40 && vessel.DockCount()==3 &&
