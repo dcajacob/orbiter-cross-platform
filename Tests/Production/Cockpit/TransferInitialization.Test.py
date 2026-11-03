@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Verify the exact constructor repair and reject missing or inverted initialization."""
+"""Verify exact Transfer MFD initialization/lifetime repairs and their negative controls."""
 import argparse
 import hashlib
 import json

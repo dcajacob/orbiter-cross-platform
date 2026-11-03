@@ -48,6 +48,11 @@ jobs:
           ctest --test-dir out/native-math --output-on-failure 2>&1 | tee native-math-verification.log
       - name: Check production HUD heading-marker scopes with unsuppressed sanitizers
         run: python3 -B Tests/Production/Cockpit/heading_tape_test.py --output out/heading-check
+      - name: Verify Transfer MFD input initialization and hypothetical rotation lifetime
+        run: >-
+          python3 -B Tests/Production/Cockpit/TransferInitialization.Test.py
+          --baseline 40a9b756598bf8486d373f469a86b6da31186d30
+          --output out/transfer-initialization-source-controls.json
       - name: Build the pinned native Lua library, interpreter worker and handoff test
         shell: bash
         run: |
@@ -358,6 +363,7 @@ jobs:
             out/xlib-check/**
             out/heading-check/*.json
             out/heading-check/*.log
+            out/transfer-initialization-source-controls.json
             native-math-*.log
             out/native-math/math-verification.json
             out/native-math/CMakeCache.txt
