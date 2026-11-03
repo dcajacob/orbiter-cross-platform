@@ -200,6 +200,13 @@ def restore_transfer_rotation_lifetime(current):
         raise ValueError('Transfer MFD hypothetical rotation lifetime changed')
     return current.replace(declaration,'\tMatrix rot2, *workr;\n',1).replace(assignment,'\t\tMatrix rot3 ('+expression+');',1)
 
+def restore_transfer_finite_indicators(current):
+    line='\t\t\tskp->Line (ICNTX, ICNTY, ICNTX+(int)(v.x*pixrad), ICNTY-(int)(v.z*pixrad));'
+    guarded='\t\t\tif (std::isfinite(v.x) && std::isfinite(v.z))\n\t'+line
+    if current.count(guarded)!=2 or current.count('#include <cmath>')!=1:
+        raise ValueError('Transfer MFD nonfinite indicator guards changed')
+    return current.replace(guarded,line).replace('#include <cmath>\n','',1)
+
 def verify():
     verify_focus_bars()
     original_dialogs = subprocess.check_output(['git','-C',str(ROOT),'show',BASE+':Src/Orbiter/DlgMgr.cpp']).decode().replace('\r\n','\n')
@@ -320,7 +327,7 @@ namespace oapi {using CockpitClient=GraphicsClient;}
             current=current.replace('orbiter::production::CockpitScreenHeight()','GetSystemMetrics(SM_CYSCREEN)')
         if name=='MfdHsi.cpp':current=current.replace('static const int arrowseg','static const INT arrowseg').replace('static const int narrowseg','static const INT narrowseg')
         if name=='MfdAlign.cpp':current=current.replace('saveprm = {0,0,0,false,0.0,0.0}','saveprm = {0,0,0,0.0,0.0,false}')
-        if name=='MfdTransfer.cpp':current=restore_transfer_rotation_lifetime(restore_transfer_initialization(current))
+        if name=='MfdTransfer.cpp':current=restore_transfer_finite_indicators(restore_transfer_rotation_lifetime(restore_transfer_initialization(current)))
         if name=='Mfd.cpp':
             current=current.replace('(long long)id + 1','(int64_t)id + 1').replace('#include <memory>','')
             # The scenario loader owns the instrument through ReadParams, including exceptions.

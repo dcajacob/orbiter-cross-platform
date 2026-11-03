@@ -9,6 +9,7 @@
 
 #include "Astro.h"
 #include "MfdTransfer.h"
+#include <cmath>
 #include "Pane.h"
 #include "Celbody.h"
 #include "Psys.h"
@@ -258,7 +259,8 @@ void Instrument_Transfer::UpdateDraw (oapi::Sketchpad *skp)
 			if (fabs (A*cosr + B*sinr + C) > fabs (-A*cosr + B*sinr + C)) rlng = Pi-rlng, cosr = -cosr;
 			Vector v(mul (*workr, Vector(cosr, 0.0, sinr)));
 			skp->SetPen (draw[2][1].solidpen);
-			skp->Line (ICNTX, ICNTY, ICNTX+(int)(v.x*pixrad), ICNTY-(int)(v.z*pixrad));
+			if (std::isfinite(v.x) && std::isfinite(v.z))
+				skp->Line (ICNTX, ICNTY, ICNTX+(int)(v.x*pixrad), ICNTY-(int)(v.z*pixrad));
 
 			// time from ref (current TrL or ejection point) to target orbit intersect
 			escal = sqrt ((1.0-workel->e)/(1.0+workel->e));
@@ -277,7 +279,8 @@ void Instrument_Transfer::UpdateDraw (oapi::Sketchpad *skp)
 			tlng = tanm + tgtel->omegab;
 			v.Set (mul (rot2, Vector (cos(tanm), 0.0, sin(tanm))));
 			skp->SetPen (draw[1][1].dashpen);
-			skp->Line (ICNTX, ICNTY, ICNTX+(int)(v.x*pixrad), ICNTY-(int)(v.z*pixrad));
+			if (std::isfinite(v.x) && std::isfinite(v.z))
+				skp->Line (ICNTX, ICNTY, ICNTX+(int)(v.x*pixrad), ICNTY-(int)(v.z*pixrad));
 		} else {
 			if (blink) skp->Text ((IW-cw*15)/2, IH/2, "No intersection", 15);
 		}
