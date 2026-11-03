@@ -41,6 +41,7 @@ class Driver final : public oapi::Module {
     std::ofstream playbackTrace;
     int left = 1;
     bool observeFocus = false;
+    int functionCommand = -1;
     bool initialized = false;
     bool started = false;
     int lastX = 0, lastY = 0;
@@ -72,6 +73,9 @@ class Driver final : public oapi::Module {
             require(observeFocus && oapiSimulateBufferedKey(OAPI_KEY_F3), "Original F3 dispatch failed");
         } else if (action.event == "options_dialog") {
             require(observeFocus && oapiSimulateBufferedKey(OAPI_KEY_F6), "Original F6 dispatch failed");
+        } else if (action.event == "function_dialog") {
+            DWORD control=OAPI_KEY_LCONTROL;
+            require(observeFocus && oapiSimulateBufferedKey(OAPI_KEY_F4,&control,1), "Original Ctrl-F4 dispatch failed");
         } else {
             require(false, "Unknown UI reference action");
         }
@@ -104,6 +108,13 @@ public:
             }
             std::ofstream("math-profile.txt")<<(_get_FMA3_enable()?"fma3":"sse2")<<'\n';
             observeFocus = bool(std::ifstream("focus-bars.enabled"));
+            if(std::ifstream("function-probe.enabled")) {
+                static char label[]="SDK function",description[]="Public SDK callback";
+                functionCommand=oapiRegisterCustomCmd(label,description,[](void*) {
+                    std::ofstream("custom-function-events.txt",std::ios::app)<<"invoked\n";
+                },nullptr);
+                std::ofstream("custom-function-events.txt")<<"registered\n";
+            }
             std::ifstream config("ui-case.txt");
             unsigned count = 0;
             std::ifstream playbackConfig("playback.enabled");
@@ -134,6 +145,10 @@ public:
         });
     }
     ~Driver() override {
+        if(functionCommand>=0)guarded([&] {
+            require(oapiUnregisterCustomCmd(functionCommand),"Original custom function teardown failed");
+            std::ofstream("custom-function-events.txt",std::ios::app)<<"unregistered\n";
+        });
         if (setter) setter(1, nullptr, std::numeric_limits<double>::quiet_NaN());
         if(previousFma>=0)_set_FMA3_enable(previousFma);
     }

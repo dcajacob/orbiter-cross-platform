@@ -29,7 +29,7 @@ def scenario():
 MENU_ITEMS=('Ship','Camera','Speed','Pause','Function','Info','Options','Map','Record','Help','Save','Exit')
 TESTED_MENU={'Ship','Camera','Speed','Pause','Info','Map','Save','Exit'}
 CASES=[('hidden',1,0),('visible',0,0),('auto',2,0),('focus',0,0),
-       ('menu-hidden',1,0),('menu',1,0),('menu-auto',1,0),('options',1,0)]
+       ('menu-hidden',1,0),('menu',1,0),('menu-auto',1,0),('options',1,0),('function',1,0)]
 
 def menu_preferences(path):
     path.parent.mkdir(parents=True,exist_ok=True)
@@ -40,6 +40,11 @@ def menu_preferences(path):
 
 
 def inputs(name):
+    if name=='function':
+        actions=[(3,'function_dialog',0,0)]
+        for tick,x,y in [(8,140,98),(40,388,71)]:
+            actions.extend([(tick,'move',x,y),(tick+1,'left_down',x,y),(tick+2,'left_up',x,y)])
+        return actions
     if name=='options':
         actions=[(3,'options_dialog',0,0)]
         # Original Options window at (60,60): refresh, panel scale, vessel
@@ -70,6 +75,7 @@ def execute(args,name,mode,fps):
     actions=inputs(name)
     if args.original:
         def configure(directory):
+            if name=='function':(directory/'function-probe.enabled').touch()
             if name.startswith('menu'):menu_preferences(directory/'Config/MenuInfoBar.cfg')
             master=directory/'Orbiter.cfg'
             master.write_text(master.read_text().replace('  ProductionBehaviorDriver','  ProductionCockpitDriver\n  OGLClient')+config)
@@ -82,13 +88,19 @@ def execute(args,name,mode,fps):
         require((out/'cockpit-complete.txt').read_text().strip()=='60','Incomplete original focus/info run')
     else:
         out.mkdir()
+        env=dict(os.environ)
+        if name=='function':
+            from custom_functions import build_probe
+            env.update(build_probe(args.executable.parent,out),ORBITER_TEST_SIMPLE_FUNCTION='1')
         if name.startswith('menu'):menu_preferences(out/'ScriptFiles/config/menuinfobar.cfg')
         (out/'flight.scn').write_text(scenario())
         (out/'Orbiter.cfg').write_text((HERE.parent/'NativeScene/Orbiter.cfg').read_text()+config)
         (out/'instrument-evidence.enabled').touch()
         commands=['tick,phase,action,value','0,pre,mfd,0 1','0,pre,mfd,1 2','0,pre,hud,1']
         for t,event,x,y in actions:
-            if event in ('focus_dialog','options_dialog'):
+            if event=='function_dialog':
+                commands.extend([f'{t},pre,key,29',f'{t},pre,key,62',f'{t+1},pre,key,-62',f'{t+1},pre,key,-29'])
+            elif event in ('focus_dialog','options_dialog'):
                 code=61 if event=='focus_dialog' else 64
                 commands.extend([f'{t},pre,key,{code}',f'{t+1},pre,key,{-code}'])
             else:
@@ -99,7 +111,7 @@ def execute(args,name,mode,fps):
                 '--assets',args.assets,'--data',args.data,'--planets',args.planets,'--modules',args.modules,
                 '--save',out/'saved.scn','--evidence',out,'--replay',out/'replay.csv','--frames','60',
                 '--frame-delay-ms','120','--fixed-step','0.25','--fixed-ui-clock','--run'],
-                cwd=out,stdout=log,stderr=subprocess.STDOUT,check=True,timeout=150)
+                cwd=out,env=env,stdout=log,stderr=subprocess.STDOUT,check=True,timeout=150)
     life=json.loads((out/'graphics-lifecycle.json').read_text())
     require(life['successful_presents']==60 and life['context_deleted'],'Incomplete cockpit renderer lifecycle')
     with (out/'cockpit-state.csv').open() as f: states=list(csv.DictReader(f))
@@ -115,6 +127,9 @@ def execute(args,name,mode,fps):
         saved=(out/'Orbiter.cfg').read_text()
         require(all(line in saved for line in ('InstrumentUpdateInterval = 0.35','PanelScale = 1.1','UnlimitedFuel = TRUE')),
                 'Original Options widgets did not persist their live settings')
+    if name=='function':
+        require((out/'custom-function-events.txt').read_text().splitlines()==['registered','invoked','unregistered'],
+                'Public SDK custom function dispatch or teardown differs')
     return changes
 
 

@@ -101,7 +101,7 @@
     },
     "Orbitersdk/include/NativeVesselAPI.h": {
       "original_sha256_lf": null,
-      "sha256_lf": "8eb37d843320ee44870667afc532517194141396f036668fabdd3fd0cb98366f",
+      "sha256_lf": "a3a9c04c8523c4d22ebfc8ffdf6b57e374dc27b43c05a2cc39b0c1f1caf7437a",
       "scope": "Portable cockpit/ImGui SDK data and original instrument declarations. Exact Windows scalar, callback, class, field order and packing conservation plus native header/layout compilation; runtime instrumentation remains incomplete."
     },
     "Orbitersdk/include/OrbiterAPI.h": {
@@ -516,7 +516,7 @@
       "original_sha256_lf": "bbc06fe202e61e5f402693795e81bba6424a8af06fbcf3ff8ea25169c449297c"
     },
     "Src/Orbiter/Orbiter.cpp": {
-      "sha256_lf": "823b4faa99dde39f9c0ef01e86c2c95c0108c763ad959e007155483925763506",
+      "sha256_lf": "668eb412deb602a7e57064af9987d4ba38eeb5b17ccb2a6a0227e8e63385fffb",
       "original_sha256_lf": "d9bcee218c141dc3896d599a3e25323f84d1259bc2aa209e752eb8c03ea4b298"
     },
     "Src/Orbiter/Orbiter.h": {
@@ -581,7 +581,7 @@
     },
     "Src/Orbiter/Production/CMakeLists.txt": {
       "original_sha256_lf": null,
-      "sha256_lf": "442277ef897249ad1f8766d39200a30ada1e3c09138b7e1bee2b69e4b4d44da0",
+      "sha256_lf": "5a22829d03c43906050f036c06a9a0aead3cc6d78355586b8177077b2bf6c7e8",
       "scope": "Original ten stock MFD declarations use exact platform SDK aliases; shared original conic geometry is moved without calculation or screen-mapping changes. Full native instrument runtime remains incomplete."
     },
     "Src/Orbiter/Production/CameraServices.cpp": {
@@ -785,7 +785,7 @@
     },
     "Src/Orbiter/Production/NativeGraphics.h": {
       "original_sha256_lf": null,
-      "sha256_lf": "47923eb101dd6ab3f1380d8238eaa26cffffd87c52b5c4afdc1815bf606f89c3",
+      "sha256_lf": "a1f42e68eb4d02b0c1932a1b09baae0aaef0144150eb8e2b11ecb97b962a4603",
       "scope": "Original scheduler, stock MFDs and modern map compile natively with explicit original epoch/time, authoritative world/UI bindings and indexed map resources. Exact Windows calculations and callback order conserved. Native GDI/legacy map/custom-mode entry points fail explicitly until supported; native cockpit owner and DG runtime remain unfinished."
     },
     "Src/Orbiter/Production/NativeModule.cpp": {
@@ -1304,7 +1304,7 @@
     },
     "Src/Orbiter/Production/NativeCockpit.cmake": {
       "original_sha256_lf": null,
-      "sha256_lf": "273390f2a653bf812474c4cc5d3e5998a325042c47987e3172a58ba677aaee49"
+      "sha256_lf": "80bf0ab4df43ad54d37e18432eb27aa56ab621c3f9d5856705452e4f4ca25fa1"
     },
     "Src/Orbiter/Production/NativeCockpitGui.cpp": {
       "original_sha256_lf": null,
@@ -1688,7 +1688,7 @@
     },
     "Src/Orbiter/MenuInfoBar.cpp": {
       "original_sha256_lf": "d0bb8b38f21893ecce434232ae8f05881c33831537c950c69400b92ddbd6ffe7",
-      "sha256_lf": "6d0a4b2be2a07462fa92d1698ae1bb93c2da2d71e368a0d0b7a91e8bf9dfc925"
+      "sha256_lf": "f225f3290ab74c355a9c3c1afd4af53bfbfa6c4a2b7138fccbc6a62e3a0e824b"
     },
     "Src/Orbiter/Production/GuiMenuButton.inc": {
       "original_sha256_lf": null,
@@ -1752,7 +1752,7 @@
     },
     "Src/Orbiter/MenuInfoBar.h": {
       "original_sha256_lf": "f1bb61e5ea855edc83b7d322f0f5fb7d2c9f167a3faa69fb8db624036d5f1833",
-      "sha256_lf": "bfc76cf36c09cfaea139ebbad21c2d2bdc315dc89b101de57a06ac71c31ba8a1"
+      "sha256_lf": "fc935c6fbeb554b68d8d93300cb1ac465e97dfbadb4aae5e8a0ab57aa10913c9"
     },
     "Src/Orbiter/Production/GuiAnimatedControls.inc": {
       "original_sha256_lf": null,
@@ -1773,6 +1773,22 @@
     "Src/Orbiter/Production/NativeJoystick.h": {
       "original_sha256_lf": null,
       "sha256_lf": "aed39b549443e702e97fbe657ad06df682d39072dc32a7a03d5d8ff1ae11bf9b"
+    },
+    "Src/Orbiter/DlgFunction.cpp": {
+      "original_sha256_lf": "d12c2115addaff8b1a7174b063e3f152141f5860e1444570453357364e261d41",
+      "sha256_lf": "6be5ba334acbeb19b53fc0cc6ab3668b487f2fb522b902e13a020c9885aae704"
+    },
+    "Src/Orbiter/DlgFunction.h": {
+      "original_sha256_lf": "1cd42866c1ce197e6c46e945ae15e4b7d2c79c5227d8519e0b455e272e969dc4",
+      "sha256_lf": "55248a7f655d10e9986742c1c55fa489f70a54d8d6d972969b343d99ffcb259e"
+    },
+    "Src/Orbiter/Production/CustomCommands.h": {
+      "original_sha256_lf": null,
+      "sha256_lf": "2384f39467d0e4c63a1a2133c78497fea8a05423cb5a9e8e2591fa4b11b58502"
+    },
+    "Src/Orbiter/Production/NativeCockpitCommands.cpp": {
+      "original_sha256_lf": null,
+      "sha256_lf": "7f7fdc5bab4b059b39e19bd5f0861d1cfa83a388abd0a13dffe181e5800ad4fb"
     }
   }
 }

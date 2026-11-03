@@ -136,12 +136,14 @@ jobs:
           cmake -S OVP/OGLClient/Native -B out/native-cockpit-renderer -G Ninja -DCMAKE_BUILD_TYPE=${{ matrix.configuration }} -DORBITER_ENGINE_BUILD="$PWD/out/native-cockpit-engine" -DORBITER_RENDERER_DEPENDENCIES="$PWD/out/ogl-dependencies" -DGLFW_BUILD_WAYLAND=OFF 2>&1 | tee native-cockpit-renderer-configure.log
           cmake --build out/native-cockpit-renderer --parallel 2 2>&1 | tee native-cockpit-renderer-build.log
           python3 -B Tests/Production/NativeScene/module_exports.py out/native-cockpit-engine/NativeModules/Graphics/OGLClient.so
-      - name: Verify native joystick calibration and throttle acquisition
+      - name: Verify native joystick calibration and custom function ownership
         shell: bash
         run: |
           set -euo pipefail
           c++ -std=c++17 -Wall -Wextra -Werror -I Src/Orbiter Tests/Production/Boundary/NativeJoystick.Test.cpp -o out/native-joystick-test
           out/native-joystick-test
+          c++ -std=c++17 -Wall -Wextra -Werror -I Src/Orbiter Tests/Production/Boundary/CustomCommands.Test.cpp -o out/native-custom-commands-test
+          out/native-custom-commands-test
       - name: Generate the original Delta-glider mesh headers and verify every group ID
         shell: bash
         run: |
@@ -197,7 +199,7 @@ jobs:
       - name: Click the visible stock cockpit menu and change ship, warp, pause and save
         run: >-
           xvfb-run -a -s '-screen 0 1920x1080x24' env LIBGL_ALWAYS_SOFTWARE=1 GALLIUM_DRIVER=llvmpipe
-          python3 -B Tests/Production/CockpitUI/mouse_smoke.py --stock-menu --executable out/native-cockpit-engine/orbiter-production
+          python3 -B Tests/Production/CockpitUI/mouse_smoke.py --stock-menu --function-probe --executable out/native-cockpit-engine/orbiter-production
           --assets out/scene-resources --data out/data --modules out/native-cockpit-engine/NativeModules --planets out/planets --output out/native-stock-menu
       - name: Verify original selection and input dialogs against frozen Windows
         shell: bash
@@ -272,6 +274,7 @@ jobs:
             out/native-recorded-flights/*/instrument-*.rgba
             out/native-recorded-flights/*/console.txt
             out/native-stock-menu/menu-verification.json
+            out/native-stock-menu/custom-function-events.txt
             out/native-stock-menu/menu-windows.csv
             out/native-stock-menu/options-state.csv
             out/native-stock-menu/Orbiter.cfg
@@ -285,6 +288,7 @@ jobs:
             out/native-stock-menu/ScriptFiles/config/*.cfg
             out/native-focus-bars/focus-bars-report.json
             out/native-focus-bars/options/Orbiter.cfg
+            out/native-focus-bars/function/custom-function-events.txt
             out/native-focus-bars/*/numerics.json
             out/native-focus-bars/*/cockpit-state.csv
             out/native-focus-bars/*/instrument-*.rgba
@@ -379,6 +383,7 @@ jobs:
             out/focus-bars-original/*/cockpit-failure.txt
             out/focus-bars-original/*/ui-inputs.csv
             out/focus-bars-original/options/Orbiter.cfg
+            out/focus-bars-original/function/custom-function-events.txt
             out/focus-original/control-reference-runtime.json
 
   compare_spacecraft:

@@ -1844,6 +1844,7 @@ bool Orbiter::UnregisterCustomCmd (int cmdId)
 		memcpy (tmp, customcmd, i*sizeof(CUSTOMCMD));
 		memcpy (tmp+i, customcmd+i+1, (ncustomcmd-i-1)*sizeof(CUSTOMCMD));
 	}
+	delete []customcmd[i].label;
 	delete []customcmd;
 	customcmd = tmp;
 	ncustomcmd--;

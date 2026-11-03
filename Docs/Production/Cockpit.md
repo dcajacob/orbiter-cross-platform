@@ -25,7 +25,7 @@ orientation matrix at tick 38. The paired workflow now also captures Windows
 with SSE2 selected. [Hosted spacecraft comparisons](https://github.com/dcajacob/orbiter-cross-platform/actions/runs/41563089040)
 
 The native cockpit now draws the original dynamic menu and stock PNG icons.
-Ship, Camera, Speed, Pause, Info, Options, Map, Save and Exit are connected. In a local
+Ship, Camera, Speed, Pause, Function, Info, Options, Map, Save and Exit are connected. In a local
 X11 flight, mouse clicks paused and resumed the DG, changed the clock to 10×,
 switched focus to DG-S, and opened the original camera, object information,
 map and menu configuration dialogs. The saved scenario contains the selected
@@ -33,7 +33,7 @@ DG-S and camera. F4 switched the menu between visible and auto-hide modes.
 Dragging Ship past Camera persisted their new order. Exit closed the graphics
 context after all 162 frame presentations. The sanitizer run completed 125
 frame presentations, with two 56-byte allocations originating in Mesa
-libgallium 26.0.8 at offsets `0xef1ba0` and `0xef1b89`. Function,
+libgallium 26.0.8 at offsets `0xef1ba0` and `0xef1b89`.
 Record and Help remain open.
 [Delta-glider flight evidence](DeltaGlider.md)
 
@@ -90,6 +90,29 @@ indices 2, 6 and 7); -1 selects keyboard-only throttle. The focused calibration
 test covers deadzone endpoints, saturation, acquisition, noise, disconnect,
 reconnection and reassignment. Physical controller acceptance remains pending.
 [DirectInput calibration semantics](https://learn.microsoft.com/en-us/previous-versions/windows/desktop/ee417908(v=vs.85))
+
+The Function menu and Ctrl-F4 now open the original custom-function dialog.
+Native modules register and unregister real callbacks through
+`oapiRegisterCustomCmd` and `oapiUnregisterCustomCmd`. The session owns each
+command's label and description. Drawing uses a stable snapshot and rechecks
+registration before dispatch, so callbacks can remove themselves or other
+entries. Unique widget IDs distinguish identical labels. Windows uses the same
+safe drawing path with its existing registry; unregistering a Windows command
+now also releases its allocated label. Original button and tooltip rendering
+is checked after these explicit lifetime adapters.
+
+An SDK-only test module registers two identically named functions. Actual X11
+clicks invoke both with their supplied contexts. The first unregisters itself,
+forces registry reallocation with 64 temporary registrations, removes those
+entries and installs a replacement. The second removes that replacement and
+itself, then installs a sentinel that is removed during module teardown.
+Debug completed 465 frame presentations and Release 474, with the complete
+10-command menu, Options persistence/reload and graphics shutdown passing.
+The isolated registry test passes address, undefined-behavior and leak checking.
+The instrumented graphical flow completed 421 presentations and teardown, with
+only the same two Gallium leaks totaling 112 bytes. A separate basic SDK
+callback schedule captures the original Windows and native Function dialogs;
+its paired state/image comparison is an additional hosted gate.
 
 The pre-extraction reference gate is accepted in
 [run 41458001638](https://github.com/dcajacob/orbiter-cross-platform/actions/runs/41458001638).

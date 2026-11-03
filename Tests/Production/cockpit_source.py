@@ -71,6 +71,21 @@ def verify_focus_bars():
     dialog_manager=original('DlgMgr.cpp')
     equal(dialog_manager[dialog_manager.index('DLLEXPORT bool BeginAnimatedCombo'):dialog_manager.rindex('\n}')],
           widgets,'Original combo and collapsing-header drawing, animation and input')
+    before=original('DlgFunction.cpp');after=windows(current('DlgFunction.cpp'))
+    for adapter,expr in [
+            ('for (const auto& command : CommandsForDisplay())','for (int i = 0; i < g_pOrbiter->ncustomcmd; i++)'),
+            ('if(!CommandPresent(command.id))continue;',''),('ImGui::PushID(command.id);',''),('ImGui::PopID();',''),
+            ('command.label.c_str()','g_pOrbiter->customcmd[i].label'),
+            ('command.description.c_str()','g_pOrbiter->customcmd[i].desc'),
+            ('InvokeCommand(command.id);','g_pOrbiter->customcmd[i].func (g_pOrbiter->customcmd[i].context);')]:
+        after=after.replace(adapter,expr)
+    equal(before[before.index('DlgFunction::DlgFunction()'):],after[after.index('DlgFunction::DlgFunction()'):],
+          'Original custom function buttons and tooltips with stable callback snapshots')
+    before=original('Orbiter.cpp');after=current('Orbiter.cpp')
+    start='DWORD Orbiter::RegisterCustomCmd';end='int Orbiter::RegisterMenuCmd'
+    equal(before[before.index(start):before.index(end)],
+          after[after.index(start):after.index(end)].replace('delete []customcmd[i].label;',''),
+          'Original Windows custom registration with removed-label ownership repaired')
     option_widgets=current('Production/GuiOptionControls.inc').replace('ORBITER_WIDGET_EXPORT','DLLEXPORT')
     expected=dialog_manager[dialog_manager.index('// Resettable slider'):dialog_manager.index('DLLEXPORT void PushFont')]
     expected+=dialog_manager[dialog_manager.index('DLLEXPORT bool SliderEnum'):dialog_manager.index('// "Animated" widgets')]

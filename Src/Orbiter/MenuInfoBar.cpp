@@ -20,6 +20,7 @@
 #include "DlgInfo.h"
 #include "DlgMap.h"
 #include "DlgOptions.h"
+#include "DlgFunction.h"
 #endif
 #include "imgui.h"
 #include "imgui_internal.h"
@@ -92,6 +93,7 @@ std::unique_ptr<DlgCamera> cameraDialog;
 std::unique_ptr<DlgInfo> infoDialog;
 std::unique_ptr<DlgMap> mapDialog;
 std::unique_ptr<DlgOptions> optionsDialog;
+std::unique_ptr<DlgFunction> functionDialog;
 template<class T> void OpenMenuDialog(std::unique_ptr<T>& dialog) {
     if(!dialog)dialog=std::make_unique<T>();
     oapiOpenDialog(dialog.get());
@@ -108,6 +110,7 @@ const MenuCommand commands[]={
     {"Camera","MenuInfoBar/camera.png",2,OAPI_LKEY_DlgCamera,[](void*) {OpenMenuDialog(cameraDialog);}},
     {"Speed","MenuInfoBar/speed.png",3,OAPI_LKEY_DlgSimspeed,[](void*) {OpenMenuDialog(timeAcceleration);}},
     {"Pause","MenuInfoBar/pause.png",4,0,[](void*) {oapiSetPause(InfoRunning());}},
+    {"Function","MenuInfoBar/function.png",5,OAPI_LKEY_DlgCustomCmd,[](void*) {OpenMenuDialog(functionDialog);}},
     {"Info","MenuInfoBar/info.png",6,OAPI_LKEY_DlgInfo,[](void*) {orbiter::production::OpenCockpitInfoDialog();}},
     {"Options","MenuInfoBar/options.png",7,OAPI_LKEY_DlgOptions,[](void*) {OpenMenuDialog(optionsDialog);}},
     {"Map","MenuInfoBar/map.png",8,OAPI_LKEY_DlgMap,[](void*) {OpenMenuDialog(mapDialog);}},
@@ -950,6 +953,7 @@ DlgInfo* OpenCockpitInfoDialog() {OpenMenuDialog(infoDialog);return infoDialog.g
 MenuInfoBar& CockpitMenuBar() {return *cockpitBars;}
 void CreateCockpitInfoBars() {cockpitBars=std::make_unique<MenuInfoBar>();}
 void DestroyCockpitInfoBars() {
+    functionDialog.reset();
     optionsDialog.reset();
     mapDialog.reset();
     infoDialog.reset();

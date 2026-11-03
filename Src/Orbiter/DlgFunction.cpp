@@ -6,11 +6,44 @@
 // ======================================================================
 
 #include "DlgFunction.h"
+#ifdef _WIN32
 #include "Orbiter.h"
+extern Orbiter* g_pOrbiter;
+#else
+#include "Production/NativeGraphics.h"
+#endif
+#include "Production/CustomCommands.h"
 #include "imgui.h"
 #include "IconsFontAwesome6.h"
 
-extern Orbiter *g_pOrbiter;
+namespace {
+#ifdef _WIN32
+std::vector<orbiter::production::CustomCommand> CommandsForDisplay() {
+    std::vector<orbiter::production::CustomCommand> commands;
+    for(DWORD i=0;i<g_pOrbiter->ncustomcmd;++i) {
+        const auto& entry=g_pOrbiter->customcmd[i];
+        commands.push_back({entry.id,entry.label,entry.desc ? entry.desc : "",entry.func,entry.context});
+    }
+    return commands;
+}
+bool CommandPresent(int id) {
+    for(DWORD i=0;i<g_pOrbiter->ncustomcmd;++i)if(g_pOrbiter->customcmd[i].id==id)return true;
+    return false;
+}
+void InvokeCommand(int id) {
+    for(DWORD i=0;i<g_pOrbiter->ncustomcmd;++i)if(g_pOrbiter->customcmd[i].id==id) {
+        const auto callback=g_pOrbiter->customcmd[i].func;
+        void* context=g_pOrbiter->customcmd[i].context;
+        callback(context);return;
+    }
+}
+#else
+auto& Commands() {return orbiter::production::GetNativeRenderContext().customCommands;}
+auto CommandsForDisplay() {return Commands().Snapshot();}
+bool CommandPresent(int id) {return Commands().Contains(id);}
+void InvokeCommand(int id) {Commands().Invoke(id);}
+#endif
+}
 
 DlgFunction::DlgFunction() : ImGuiDialog(ICON_FA_PUZZLE_PIECE " Orbiter: Custom functions", {340, 290}) {
 	SetHelp("html/orbiter.chm", "/customcmd.htm");
@@ -18,17 +51,20 @@ DlgFunction::DlgFunction() : ImGuiDialog(ICON_FA_PUZZLE_PIECE " Orbiter: Custom 
 
 void DlgFunction::OnDraw() {
 	ImVec2 button_sz(ImVec2(ImGui::GetContentRegionAvail().x, 20));
-    for (int i = 0; i < g_pOrbiter->ncustomcmd; i++) {
-	    if(ImGui::Button(g_pOrbiter->customcmd[i].label, button_sz)) {
-            g_pOrbiter->customcmd[i].func (g_pOrbiter->customcmd[i].context);
+    for (const auto& command : CommandsForDisplay()) {
+        if(!CommandPresent(command.id))continue;
+        ImGui::PushID(command.id);
+	    if(ImGui::Button(command.label.c_str(), button_sz)) {
+            InvokeCommand(command.id);
         }
         if (ImGui::IsItemHovered())
         {
             ImGui::BeginTooltip();
             ImGui::PushTextWrapPos(ImGui::GetFontSize() * 35.0f);
-            ImGui::TextUnformatted(g_pOrbiter->customcmd[i].desc);
+            ImGui::TextUnformatted(command.description.c_str());
             ImGui::PopTextWrapPos();
             ImGui::EndTooltip();
         }
+        ImGui::PopID();
     }
 }

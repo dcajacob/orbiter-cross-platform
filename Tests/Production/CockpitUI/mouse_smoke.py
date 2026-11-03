@@ -43,6 +43,20 @@ def verify_menu(out,click,advance,button,key,move,window,title,process):
     click(x+42,y+115)
     click(x+228,y+99)
     wait(lambda:' | DG2 | ' in title(window),'Menu ship selection did not change the focused vessel')
+    command('Function')
+    functions=dialog('Custom functions')
+    fx,fy=int(float(functions['x'])),int(float(functions['y']))
+    events=out/'custom-function-events.txt'
+    if events.exists():
+        click(fx+80,fy+38)
+        wait(lambda:'first:context:self-unregister:reallocate:replace' in events.read_text(),'First SDK function did not run')
+        click(fx+80,fy+38)
+        wait(lambda:'second:context:remove-other:self-unregister' in events.read_text(),'Second SDK function did not run')
+    click(fx+int(float(functions['width']))-12,fy+11)
+    move(1270,300)
+    key(window,'Control_L',True);tap('F4');key(window,'Control_L',False);advance()
+    functions=dialog('Custom functions')
+    click(int(float(functions['x']))+int(float(functions['width']))-12,int(float(functions['y']))+11)
     command('Camera')
     dialog('Orbiter: Camera')
     command('Options')
@@ -125,7 +139,10 @@ def verify_menu(out,click,advance,button,key,move,window,title,process):
     require(restored['refresh']=='0.35' and restored['size']=='7' and restored['panel_scale']=='1.1'
             and restored['limited_fuel']=='0' and int(restored['mfd_width'])==resized_width,
             'Saved options did not restore the actual cockpit on the next launch')
-    report=dict(options=dict(refresh=.35,panel_scale=1.1,limited_fuel=False,mfd_width_before=before_width,mfd_width_after=resized_width,
+    if events.exists():
+        require(events.read_text().splitlines()==['registered:duplicate-labels','first:context:self-unregister:reallocate:replace',
+                'second:context:remove-other:self-unregister','unregistered:teardown'],'Custom function callback/lifetime trace differs')
+    report=dict(custom_functions=events.exists(),options=dict(refresh=.35,panel_scale=1.1,limited_fuel=False,mfd_width_before=before_width,mfd_width_after=resized_width,
                              pages_visited=10,keyboard_shortcuts=True,persisted=True,reloaded=True),commands=before_names,persisted_order=names,focus='DG2',warp=10,quicksave=save.name,configuration_dialog=True,lifecycle=life)
     (out/'menu-verification.json').write_text(json.dumps(report,indent=2)+'\n')
     print(json.dumps(report,indent=2))
@@ -134,8 +151,14 @@ def verify_menu(out,click,advance,button,key,move,window,title,process):
 def main():
     p=argparse.ArgumentParser(description=__doc__)
     p.add_argument("--stock-menu",action="store_true")
+    p.add_argument("--function-probe",action="store_true")
     for name in ('executable','assets','data','modules','planets','output'):p.add_argument('--'+name,type=Path,required=True)
     a=p.parse_args();out=a.output.resolve();require(not out.exists(),'Mouse output exists; replacement is forbidden');out.mkdir(parents=True)
+    launch_env=dict(os.environ,XDG_SESSION_TYPE='x11')
+    if a.function_probe:
+        require(a.stock_menu,'Function probe requires the stock menu flow')
+        from custom_functions import build_probe
+        launch_env.update(build_probe(a.executable.resolve().parent,out))
     x=C.CDLL(ctypes.util.find_library('X11'))
     x.XOpenDisplay.argtypes=[C.c_char_p];x.XOpenDisplay.restype=C.c_void_p
     display=x.XOpenDisplay(None);require(display,'An owned X11 test display is required')
@@ -196,7 +219,7 @@ def main():
     argv+=['--config',str(out/'Orbiter.cfg'),'--scenario',str(out/'cockpit.scn'),'--evidence',str(out),'--keymap',str(ROOT/'Tests/Production/Flight/keymap-laptop.cfg'),'--save',str(out/'saved.scn'),'--run']
     (out/'invocation.json').write_text(json.dumps(argv,indent=2)+'\n')
     with (out/'console.log').open('w') as log:
-        process=subprocess.Popen(argv,stdout=log,stderr=subprocess.STDOUT,env={**os.environ,'XDG_SESSION_TYPE':'x11'})
+        process=subprocess.Popen(argv,stdout=log,stderr=subprocess.STDOUT,env=launch_env)
         try:
             window=wait(lambda:owned(process.pid),'Owned native cockpit did not initialize')
             x.XSetInputFocus(display,window,1,0);x.XFlush(display)

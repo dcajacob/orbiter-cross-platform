@@ -17,7 +17,6 @@
 #include "OrbiterAPI.h"
 #else
 #include "NativeVesselAPI.h"
-using CustomFunc = void (*)(void*);
 #endif
 
 // =======================================================================

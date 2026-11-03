@@ -39,6 +39,9 @@ struct VESSELPARAM;
 #define VMSG_LUAINSTANCE    0x0002
 OAPIFUNC void oapiOpenDialog(ImGuiDialog *dialog);
 OAPIFUNC void oapiCloseDialog(ImGuiDialog *dialog);
+using CustomFunc = void (*)(void*);
+OAPIFUNC oapi::UInt32 oapiRegisterCustomCmd(char* label,char* description,CustomFunc callback,void* context);
+OAPIFUNC bool oapiUnregisterCustomCmd(int id);
 OAPIFUNC OBJHANDLE oapiGetObjectByName (char *name);
 OAPIFUNC OBJHANDLE oapiGetGbodyParent (OBJHANDLE hBody);
 OAPIFUNC double oapiGetEmptyMass (OBJHANDLE hVessel);

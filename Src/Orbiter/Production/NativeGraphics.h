@@ -6,6 +6,7 @@
 #include "ResourceResolver.h"
 #include "SceneLabels.h"
 #include "FlightInput.h"
+#include "CustomCommands.h"
 #include <vector>
 class Config;class Camera;class PlanetarySystem;class MeshManager;class TimeData;class Vessel;class Pane;class Select;class InputBox;
 namespace oapi {class ParticleStream;}
@@ -95,6 +96,7 @@ public:
     virtual oapi::ParticleStream* Reentry(PARTICLESTREAMSPEC*,OBJHANDLE)=0;
 };
 struct NativeRenderContext {
+    CustomCommands customCommands;
     Config* configuration=nullptr;PlanetarySystem* world=nullptr;Camera* camera=nullptr;
     Vessel* focus=nullptr;TimeData* time=nullptr;MeshManager* meshes=nullptr;
     class VesselLifetimeServices* lifetime=nullptr;
