@@ -66,7 +66,8 @@ def with_sparse_mesh_slots(source):
     return source[:start]+copy+source[end:]
 
 def restore_startup_cleanup(source):
-    """Accept only class-name, unresolved dock/attachment-token and temporary-array cleanup."""
+    """Accept only the declared dock lifetime, class-name, token and temporary-array cleanup."""
+    source=restore_docking_cleanup(source)
     original='\tClearAttachments();'
     repaired=original+'\n\tdelete []attach_status.pname;\n\tattach_status.pname = nullptr;'
     if source.count(repaired)!=1:
@@ -87,6 +88,33 @@ def restore_startup_cleanup(source):
     if source.count(repaired)!=1:
         raise ValueError('Declared temporary scenario dock-record cleanup differs')
     return source.replace(repaired,original)
+
+def restore_docking_cleanup(source):
+    """Defer only port reclamation; retain every undock and NAV callback in order."""
+    original='''void Vessel::ClearDockDefinitions ()
+{
+	if (ndock) {
+		for (oapi::UInt32 i = 0; i < ndock; i++) {
+			if (dock[i]->mate && GetRigidBodyServices().World()->isVessel(dock[i]->mate)) Undock (i, 0, 0.0);
+			if (dock[i]->ids) {
+				GetRigidBodyServices().World()->BroadcastVessel (MSG_KILLNAVSENDER, dock[i]->ids);
+				delete dock[i]->ids;
+			}
+			delete dock[i];
+		}
+		delete []dock;
+		dock = NULL;
+		ndock = 0;
+	}
+}'''
+    repaired=original.replace('delete dock[i]->ids;', 'delete dock[i]->ids;\n\t\t\t\tdock[i]->ids = NULL;')
+    repaired=repaired.replace('\t\t\tdelete dock[i];\n','').replace('\t\tdelete []dock;',
+        '\t\t// Detach scans every port in the remaining superstructure. Keep the\n'
+        '\t\t// already detached ports alive until all ordered undock callbacks and\n'
+        '\t\t// navigation-source notifications have completed.\n'
+        '\t\tfor (oapi::UInt32 i = 0; i < ndock; i++) delete dock[i];\n\t\tdelete []dock;')
+    if source.count(repaired)!=1:raise ValueError('Declared ordered dock-port lifetime repair differs')
+    return source.replace(repaired,original,1)
 
 def restore_hull_transform_cleanup(source):
     cleanup="""// The SDK transform base has no virtual destructor. These copies

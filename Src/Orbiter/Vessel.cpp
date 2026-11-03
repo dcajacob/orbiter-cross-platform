@@ -2532,9 +2532,13 @@ void Vessel::ClearDockDefinitions ()
 			if (dock[i]->ids) {
 				GetRigidBodyServices().World()->BroadcastVessel (MSG_KILLNAVSENDER, dock[i]->ids);
 				delete dock[i]->ids;
+				dock[i]->ids = NULL;
 			}
-			delete dock[i];
 		}
+		// Detach scans every port in the remaining superstructure. Keep the
+		// already detached ports alive until all ordered undock callbacks and
+		// navigation-source notifications have completed.
+		for (oapi::UInt32 i = 0; i < ndock; i++) delete dock[i];
 		delete []dock;
 		dock = NULL;
 		ndock = 0;
