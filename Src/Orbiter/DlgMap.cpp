@@ -5,7 +5,18 @@
 // "Map" dialog
 // ======================================================================
 #include "DlgMap.h"
+#ifdef _WIN32
 #include "Orbiter.h"
+#else
+#include "Production/NativeCockpitUi.h"
+#include "Production/CockpitGuiExports.h"
+#endif
+#include "Production/CockpitServices.h"
+#include "Production/Text.h"
+#include "Base.h"
+#include "Vessel.h"
+#include "Star.h"
+#include "Nav.h"
 #include "Psys.h"
 #include "Celbody.h"
 #include "Psys.h"
@@ -13,9 +24,7 @@
 #include "IconsFontAwesome6.h"
 #include "DlgInfo.h"
 
-extern TimeData td;
-
-extern PlanetarySystem *g_psys;
+using namespace orbiter::production;
 
 DlgMap::DlgMap() : ImGuiDialog(ICON_FA_GLOBE " Orbiter: Map", {640, 400}) {
     planet = "Select...";
@@ -23,7 +32,7 @@ DlgMap::DlgMap() : ImGuiDialog(ICON_FA_GLOBE " Orbiter: Map", {640, 400}) {
 	searchbuf[0] = '\0';
 	selectionfilter = DISP_MOON | DISP_VESSEL | DISP_BASE;
 
-	prm = &g_pOrbiter->Cfg()->CfgMapPrm;
+	prm = &CockpitConfiguration()->CfgMapPrm;
 
 	SetHelp("html/orbiter.chm", "/map.htm");
 }
@@ -32,7 +41,7 @@ void DlgMap::Display() {
 	
 	bool visible = ImGui::Begin(name.c_str(), &active);
 	HandleHelpButton();
-	if(ImGui::MenuButton(ICON_FA_ARROW_ROTATE_LEFT, "Reset map", ImGui::GetFontSize()*1.5f)) {
+	if(ImGui::MenuButton(ICON_FA_ARROW_ROTATE_LEFT, "Reset map", ImGui::GetFontSize()*1.5f) && vectormap) {
 		Reset();
 	}
 	
@@ -89,15 +98,15 @@ void DlgMap::AddCbodyNode(const CelestialBody *cbody) {
 }
 
 void DlgMap::DrawTree() {
-    for (int i = 0; i < g_psys->nStar(); i++)
-        AddCbodyNode (g_psys->GetStar(i));
+    for (int i = 0; i < CockpitWorld()->nStar(); i++)
+        AddCbodyNode (CockpitWorld()->GetStar(i));
 }
 
 
 void DlgMap::SetBody(const char *body) {
     planet = body;
     if(vectormap) {
-        Planet *b = g_psys->GetPlanet (body);
+        Planet *b = CockpitWorld()->GetPlanet (body);
         if(b) {
             vectormap->SetCBody(b);
             vectormap->Update();
@@ -117,17 +126,17 @@ bool DlgMap::SetSelection(const char *name)
 	const int maxhit = 15;
 	const char *hitstr[maxhit];
 	int nhit = 0, len = strlen(name);
-	DWORD i;
+	oapi::UInt32 i;
 	VectorMap::OBJTYPE sel;
 	bool found_exact = false;
 
 	if ((selectionfilter & DISP_VESSEL) && (vectormap->GetDisplayFlags() & DISP_VESSEL)) { // search for vessel
-		for (i = 0; i < g_psys->nVessel(); i++) {
-			Vessel *v = g_psys->GetVessel(i);
-			if (!_strnicmp (v->Name(), name, len)) {
+		for (i = 0; i < CockpitWorld()->nVessel(); i++) {
+			Vessel *v = CockpitWorld()->GetVessel(i);
+			if (!ComparePrefix (v->Name(), name, len)) {
 				if (nhit < maxhit) hitstr[nhit] = v->Name();
 				nhit++;
-				if (!found_exact && !_stricmp (v->Name(), name)) {
+				if (!found_exact && !CompareText (v->Name(), name)) {
 					sel.type = DISP_VESSEL;
 					sel.obj = v;
 					found_exact = true;
@@ -140,10 +149,10 @@ bool DlgMap::SetSelection(const char *name)
 		if (planet) {
 			for (i = 0; i < planet->nBase(); i++) {
 				const Base *base = planet->GetBase(i);
-				if (!_strnicmp (base->Name(), name, len)) {
+				if (!ComparePrefix (base->Name(), name, len)) {
 					if (nhit < maxhit) hitstr[nhit] = base->Name();
 					nhit++;
-					if (!found_exact && !_stricmp (base->Name(), name)) {
+					if (!found_exact && !CompareText (base->Name(), name)) {
 						sel.type = DISP_BASE;
 						sel.obj = base;
 						found_exact = true;
@@ -159,10 +168,10 @@ bool DlgMap::SetSelection(const char *name)
 				const Nav *nav = planet->NavMgr().GetNav(i);
 				if (nav->Type() == TRANSMITTER_VOR) {
 					const Nav_VOR *vor = (const Nav_VOR*)nav;
-					if (!_strnicmp (vor->GetId(), name, len)) {
+					if (!ComparePrefix (vor->GetId(), name, len)) {
 						if (nhit < maxhit) hitstr[nhit] = vor->GetId();
 						nhit++;
-						if (!found_exact && !_stricmp (vor->GetId(), name)) {
+						if (!found_exact && !CompareText (vor->GetId(), name)) {
 							sel.type = DISP_NAVAID;
 							sel.obj = vor;
 							found_exact = true;
@@ -175,10 +184,10 @@ bool DlgMap::SetSelection(const char *name)
 	if ((selectionfilter & DISP_MOON) && vectormap->GetDisplayFlags() & DISP_MOON) { // search for moons
 		for (i = 0; i < vectormap->GetCBody()->nSecondary(); i++) {
 			const CelestialBody *moon = vectormap->GetCBody()->Secondary (i);
-			if (!_strnicmp (moon->Name(), name, len)) {
+			if (!ComparePrefix (moon->Name(), name, len)) {
 				if (nhit < maxhit) hitstr[nhit] = moon->Name();
 				nhit++;
-				if (!found_exact && !_stricmp (moon->Name(), name)) {
+				if (!found_exact && !CompareText (moon->Name(), name)) {
 					sel.type = DISP_MOON;
 					sel.obj = moon;
 					found_exact = true;
@@ -206,10 +215,10 @@ bool DlgMap::FindTarget(int mx, int my)
 		case DISP_VESSEL:
 		case DISP_BASE:
 		case DISP_MOON:
-			strcpy(searchbuf, ((Body*)obj.obj)->Name());
+			snprintf(searchbuf,sizeof(searchbuf),"%s",((Body*)obj.obj)->Name());
 			break;
 		case DISP_NAVAID:
-			strcpy(searchbuf, ((Nav*)obj.obj)->GetId());
+			snprintf(searchbuf,sizeof(searchbuf),"%s",((Nav*)obj.obj)->GetId());
 			break;
 		default:
 			strcpy (searchbuf, "");
@@ -225,7 +234,7 @@ void DlgMap::DrawMap() {
         static ImVec2 oldsz = sz;//ImVec2(512,256);
 
         if(!vectormap) {
-            Planet *earth = g_psys->GetPlanet ("Earth");
+            Planet *earth = CockpitWorld()->GetPlanet ("Earth");
             if(earth) {
                 planet = "Earth";
                 vectormap=std::make_unique<VectorMap>(earth);
@@ -247,9 +256,9 @@ void DlgMap::DrawMap() {
         }
 
         const double updDT = 1.0;
-        if (td.SysT1 > updTmax || td.SysT1 < updTmin) {
-            updTmax = td.SysT1 + updDT;
-            updTmin = td.SysT1 - updDT;
+        if (CockpitTime().SysT1 > updTmax || CockpitTime().SysT1 < updTmin) {
+            updTmax = CockpitTime().SysT1 + updDT;
+            updTmin = CockpitTime().SysT1 - updDT;
 
             vectormap->Update();
             vectormap->DrawMap ();
@@ -439,7 +448,11 @@ void DlgMap::DrawMenu() {
 	if(ImGui::Button(ICON_FA_CIRCLE_INFO)) {
 		VectorMap::OBJTYPE obj = vectormap->GetSelection ();
 		if (obj.type == DISP_BASE || obj.type == DISP_VESSEL || obj.type == DISP_MOON) {
-			DlgInfo *pInfo = g_pOrbiter->DlgMgr()->EnsureEntry<DlgInfo> ();
+			#ifdef _WIN32
+            DlgInfo *pInfo = g_pOrbiter->DlgMgr()->EnsureEntry<DlgInfo> ();
+#else
+            DlgInfo *pInfo = OpenCockpitInfoDialog();
+#endif
 			pInfo->SetBody ((Body*)obj.obj);
 		}
 	}

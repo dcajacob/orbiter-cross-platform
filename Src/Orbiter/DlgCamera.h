@@ -8,7 +8,12 @@
 #ifndef __DLGCAMERA_H
 #define __DLGCAMERA_H
 
+#ifdef _WIN32
 #include "DlgMgr.h"
+#else
+#include "NativeVesselAPI.h"
+#include "imgui.h"
+#endif
 #include "Camera.h"
 
 class CelestialBody;
@@ -56,20 +61,20 @@ private:
 	// Just a wrapper for the ImGui::BeginCombo that avoids the tabbing at the right
 	bool BeginWideCombo(const char* label, const char* preview_value, ImGuiComboFlags flags = 0);
 
-	static const DWORD OBJ_VESSEL   = 0x01;
-	static const DWORD OBJ_CELBODY  = 0x02;
-	static const DWORD OBJ_SURFBASE = 0x04;
-	static const DWORD OBJ_ALL = OBJ_VESSEL | OBJ_CELBODY | OBJ_SURFBASE;
+	static const oapi::UInt32 OBJ_VESSEL   = 0x01;
+	static const oapi::UInt32 OBJ_CELBODY  = 0x02;
+	static const oapi::UInt32 OBJ_SURFBASE = 0x04;
+	static const oapi::UInt32 OBJ_ALL = OBJ_VESSEL | OBJ_CELBODY | OBJ_SURFBASE;
 
-	static const DWORD SEL_NOCAT          = 0x01; // don't show type categories
-	static const DWORD SEL_ALLOPEN        = 0x02; // show all tree nodes open on start
-	static const DWORD SEL_EXCLUDE_CAMTGT = 0x04; // skip the current camera target in the list
+	static const oapi::UInt32 SEL_NOCAT          = 0x01; // don't show type categories
+	static const oapi::UInt32 SEL_ALLOPEN        = 0x02; // show all tree nodes open on start
+	static const oapi::UInt32 SEL_EXCLUDE_CAMTGT = 0x04; // skip the current camera target in the list
 
 	// Convenience function to open a combo box for selecting a simulation object from a list
 	// "body" contains a pointer to the selected object on exit. On call, should point to the current object, to initialise the combo preview
 	// "objtypes" are bitflags from the OBJ_XXX consts
 	// "selector_flags" are bitflags from the SEL_XXX consts
-	bool ObjectSelector(const char* label, const Body *body, DWORD objtypes, DWORD selector_flags = 0, ImGuiComboFlags flags = 0);
+	bool ObjectSelector(const char* label, const Body *body, oapi::UInt32 objtypes, oapi::UInt32 selector_flags = 0, ImGuiComboFlags flags = 0);
 
 	void Spacer() { ImGui::Dummy(ImVec2(0, 3)); }
 

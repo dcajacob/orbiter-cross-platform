@@ -188,6 +188,11 @@ jobs:
         run: |
           set -euo pipefail
           xvfb-run -a -s '-screen 0 1920x1080x24' env LIBGL_ALWAYS_SOFTWARE=1 GALLIUM_DRIVER=llvmpipe python3 -B Tests/Production/CockpitControls/mouse_smoke.py --executable out/native-cockpit-engine/orbiter-production --assets out/scene-resources --data out/data --modules out/native-cockpit-engine/NativeModules --planets out/planets --output out/native-cockpit-mouse 2>&1 | tee native-cockpit-mouse.log
+      - name: Click the visible stock cockpit menu and change ship, warp, pause and save
+        run: >-
+          xvfb-run -a -s '-screen 0 1920x1080x24' env LIBGL_ALWAYS_SOFTWARE=1 GALLIUM_DRIVER=llvmpipe
+          python3 -B Tests/Production/CockpitUI/mouse_smoke.py --stock-menu --executable out/native-cockpit-engine/orbiter-production
+          --assets out/scene-resources --data out/data --modules out/native-cockpit-engine/NativeModules --planets out/planets --output out/native-stock-menu
       - name: Verify original selection and input dialogs against frozen Windows
         shell: bash
         run: |
@@ -256,21 +261,32 @@ jobs:
           name: spacecraft-native-${{ matrix.configuration }}-${{ matrix.math_profile }}
           path: |
             out/native-recorded-flights/recorded-flights.json
+            out/native-recorded-flights/*/numerics.json
             out/native-recorded-flights/*/playback-state.csv
             out/native-recorded-flights/*/instrument-*.rgba
             out/native-recorded-flights/*/console.txt
+            out/native-stock-menu/menu-verification.json
+            out/native-stock-menu/menu-windows.csv
+            out/native-stock-menu/control-inputs.csv
+            out/native-stock-menu/console.log
+            out/native-stock-menu/numerics.json
+            out/native-stock-menu/graphics-lifecycle.json
+            out/native-stock-menu/Quicksave/*.scn
+            out/native-stock-menu/ScriptFiles/config/*.cfg
             out/native-focus-bars/focus-bars-report.json
+            out/native-focus-bars/*/numerics.json
             out/native-focus-bars/*/cockpit-state.csv
             out/native-focus-bars/*/instrument-*.rgba
 
   original_spacecraft:
-    name: Preserved Windows spacecraft observations ${{ matrix.configuration }}
+    name: Preserved Windows spacecraft observations ${{ matrix.configuration }} ${{ matrix.math_profile }}
     runs-on: windows-2022
     timeout-minutes: 40
     strategy:
       fail-fast: false
       matrix:
         configuration: [Debug, Release]
+        math_profile: [automatic, sse2]
     steps:
       - uses: actions/checkout@v7
         with:
@@ -317,6 +333,10 @@ jobs:
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           cmake --build out/focus-driver --parallel 2
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - name: Select the matching CRT profile for SSE2 observations
+        if: matrix.math_profile == 'sse2'
+        shell: pwsh
+        run: '"ORBITER_TEST_OBSERVER_SSE2=1" >> $env:GITHUB_ENV'
       - name: Observe spacecraft selection and info bars in the preserved original Windows app
         run: >-
           python -B Tests/Production/CockpitUI/focus_bars.py --original --executable out/focus-original/Orbiter.exe
@@ -330,10 +350,12 @@ jobs:
         uses: actions/upload-artifact@v7
         if: always()
         with:
-          name: spacecraft-original-${{ matrix.configuration }}
+          name: spacecraft-original-${{ matrix.configuration }}-${{ matrix.math_profile }}
           path: |
             out/focus-bars-original/general-api/general-api-result.json
             out/focus-bars-original/general-api/Orbiter.log
+            out/focus-bars-original/*/math-profile.txt
+            out/original-recorded-flights/*/math-profile.txt
             out/focus-bars-original/*/earth-obliquity.txt
             out/original-recorded-flights/recorded-flights.json
             out/original-recorded-flights/*/playback-state.csv
@@ -363,7 +385,7 @@ jobs:
           fetch-depth: 0
       - uses: actions/download-artifact@v8
         with:
-          name: spacecraft-original-${{ matrix.configuration }}
+          name: spacecraft-original-${{ matrix.configuration }}-${{ matrix.math_profile }}
           path: original
       - uses: actions/download-artifact@v8
         with:

@@ -9,8 +9,16 @@
 #define __MENUINFOBAR_H
 
 #define STRICT 1
+#include <memory>
+#include <string>
+#include <vector>
 
+#ifdef _WIN32
 #include "OrbiterAPI.h"
+#else
+#include "NativeVesselAPI.h"
+using CustomFunc = void (*)(void*);
+#endif
 
 // =======================================================================
 // class MenuInfoBar

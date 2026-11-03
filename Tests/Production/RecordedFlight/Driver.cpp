@@ -5,6 +5,7 @@
 #include "ApplicationObservation.h"
 #include "../../../Src/Orbiter/Production/PlaybackObservation.h"
 #include <cstdlib>
+#include <cmath>
 #include <fstream>
 #include <iomanip>
 #include <limits>
@@ -35,6 +36,7 @@ class Driver final : public oapi::Module {
     std::vector<Action> actions;
     std::ofstream state,inputs;
     HWND window = nullptr;
+    int previousFma = -1;
     unsigned frames = 0,totalFrames=60,stopPlaybackAt=0;
     std::ofstream playbackTrace;
     int left = 1;
@@ -93,6 +95,12 @@ class Driver final : public oapi::Module {
 public:
     explicit Driver(HINSTANCE instance) : Module(instance) {
         guarded([&] {
+            if(std::getenv("ORBITER_TEST_OBSERVER_SSE2")) {
+                previousFma=_get_FMA3_enable();
+                _set_FMA3_enable(0);
+                require(_get_FMA3_enable()==0,"Original SSE2 diagnostic profile was not selected");
+            }
+            std::ofstream("math-profile.txt")<<(_get_FMA3_enable()?"fma3":"sse2")<<'\n';
             observeFocus = bool(std::ifstream("focus-bars.enabled"));
             std::ifstream config("ui-case.txt");
             unsigned count = 0;
@@ -123,7 +131,10 @@ public:
             std::srand(0);
         });
     }
-    ~Driver() override { if (setter) setter(1, nullptr, std::numeric_limits<double>::quiet_NaN()); }
+    ~Driver() override {
+        if (setter) setter(1, nullptr, std::numeric_limits<double>::quiet_NaN());
+        if(previousFma>=0)_set_FMA3_enable(previousFma);
+    }
     void clbkSimulationStart(RenderMode mode) override {
         guarded([&] { require(mode != RENDER_NONE, "Original renderer required"); started = true; });
     }

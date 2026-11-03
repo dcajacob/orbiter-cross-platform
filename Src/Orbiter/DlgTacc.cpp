@@ -7,14 +7,30 @@
 #define IMGUI_DEFINE_MATH_OPERATORS
 
 #include "DlgTacc.h"
+#ifdef _WIN32
 #include "Orbiter.h"
+#else
+#include "Production/NativeGraphics.h"
+#include "Production/NativeInterpreterSdk.h"
+#endif
 #include "imgui.h"
 #include "imgui_internal.h"
 #include "IconsFontAwesome6.h"
 #include <algorithm>
 
+#ifdef _WIN32
 extern TimeData td;
 extern Orbiter *g_pOrbiter;
+static void SetDialogWarp(double warp) {g_pOrbiter->SetWarpFactor(warp);}
+static double DialogWarp() {return td.Warp();}
+static bool DialogRunning() {return g_pOrbiter->IsRunning();}
+static void ToggleDialogPause() {g_pOrbiter->TogglePause();}
+#else
+static void SetDialogWarp(double warp) {oapiSetTimeAcceleration(warp);}
+static double DialogWarp() {return oapiGetTimeAcceleration();}
+static bool DialogRunning() {return !orbiter::production::GetNativeRenderContext().paused;}
+static void ToggleDialogPause() {oapiSetPause(DialogRunning());}
+#endif
 
 // Snap to 1..9,10 per decade (1,2,3,...,9,10,20,30,...)
 static float SnapToDecimal(float v, float min_v, float max_v)
@@ -46,30 +62,30 @@ void DlgTacc::OnDraw() {
     const ImVec2 button_sz(ImVec2(50, 20));
 
     if(ImGui::Button("0.1x", button_sz)) {
-        g_pOrbiter->SetWarpFactor (0.1);
+        SetDialogWarp (0.1);
     }
     ImGui::SameLine();
     if(ImGui::Button("1x", button_sz)) {
-        g_pOrbiter->SetWarpFactor (1.0);
+        SetDialogWarp (1.0);
     }
     ImGui::SameLine();
     if(ImGui::Button("10x", button_sz)) {
-        g_pOrbiter->SetWarpFactor (10.0);
+        SetDialogWarp (10.0);
     }
     ImGui::SameLine();
     if(ImGui::Button("100x", button_sz)) {
-        g_pOrbiter->SetWarpFactor (100.0);
+        SetDialogWarp (100.0);
     }
     ImGui::SameLine();
     if(ImGui::Button("1000x", button_sz)) {
-        g_pOrbiter->SetWarpFactor (1000.0);
+        SetDialogWarp (1000.0);
     }
     ImGui::SameLine();
     if(ImGui::Button("10000x", button_sz)) {
-        g_pOrbiter->SetWarpFactor (10000.0);
+        SetDialogWarp (10000.0);
     }
 
-    float warp = td.Warp();
+    float warp = DialogWarp();
     ImGui::SetNextItemWidth(-FLT_MIN);
     ImGuiIO& io = ImGui::GetIO();
 
@@ -100,7 +116,7 @@ void DlgTacc::OnDraw() {
     if(active && !io.KeyShift)
         warp = SnapToDecimal(warp, warp_min, warp_max);
 
-    g_pOrbiter->SetWarpFactor(warp);
+    SetDialogWarp(warp);
 
     // Draw the snapped grabber while dragging
     if (dragging && !io.KeyShift)
@@ -136,7 +152,7 @@ void DlgTacc::OnDraw() {
     ImGui::NewLine(); 
 
     ImGui::SetCursorPosX((ImGui::GetWindowSize().x - button_sz.x) * 0.5f);
-    if(ImGui::Button(g_pOrbiter->IsRunning()?"Pause":"Resume", button_sz))
-        g_pOrbiter->TogglePause();
+    if(ImGui::Button(DialogRunning()?"Pause":"Resume", button_sz))
+        ToggleDialogPause();
 
 }

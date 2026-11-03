@@ -53,9 +53,16 @@ void ImGuiDialog::Display() {
 }
 void ImGuiDialog::Activate() {active=true;ImGui::SetWindowFocus(name.c_str());}
 namespace ImGui {
+    ORBITER_PRODUCTION_API ImTextureID GetImTextureID(SURFHANDLE surf) {
+        auto* graphics=GetNativeRenderContext().graphics;
+        return graphics && surf ? graphics->GuiTextureId(surf) : 0;
+    }
 #define ORBITER_MENU_EXPORT ORBITER_PRODUCTION_API
 #include "GuiMenuButton.inc"
 #undef ORBITER_MENU_EXPORT
+    ORBITER_PRODUCTION_API bool ImageButton(const char* id,SURFHANDLE surf,const ImVec2& size,const ImVec2& uv0,const ImVec2& uv1,const ImVec4& bg,const ImVec4& tint) {
+        return ImageButton(id,GetImTextureID(surf),size,uv0,uv1,bg,tint);
+    }
     ORBITER_PRODUCTION_API void PushFont(ImGuiFont font,float scale) {
         const auto index=static_cast<unsigned>(font);
         ImGui::PushFont(uiFonts[index<4 ? index : 0],ImGui::GetStyle().FontSizeBase*scale);
@@ -105,6 +112,9 @@ namespace ImGui {
 		ImGui::EndPopup();
 	}
 
+#define ORBITER_WIDGET_EXPORT ORBITER_PRODUCTION_API
+#include "GuiAnimatedControls.inc"
+#undef ORBITER_WIDGET_EXPORT
 }
 
 namespace {
@@ -211,6 +221,7 @@ std::unique_ptr<DlgFocus> focusDialog;
 std::unique_ptr<InputBox> inputBox;
 std::ofstream uiEvidence;
 std::ofstream uiFrames;
+std::ofstream menuWindows;
 ImGuiID replayClockHook=0;
 float replayClockStep=0;
 std::ofstream replayClockTrace;
@@ -251,6 +262,10 @@ void CreateCockpitGui() {
         uiFonts[static_cast<unsigned>(ImGuiFont::CONSOLE)]=load(fonts.ImGui_ConsoleFontFile);
         uiFonts[static_cast<unsigned>(ImGuiFont::MONO)]=load(fonts.ImGui_MonospacedFontFile);
         uiFonts[static_cast<unsigned>(ImGuiFont::MANUSCRIPT)]=load(fonts.ImGui_ManuscriptFontFile);
+        if(std::filesystem::is_regular_file(context.evidence/"menu-evidence.enabled")) {
+            menuWindows.open(context.evidence/"menu-windows.csv");
+            menuWindows<<"frame,name,x,y,width,height\n";
+        }
         CreateCockpitInfoBars();
         selection = std::make_unique<Select>();
         inputBox = std::make_unique<InputBox>();
@@ -293,11 +308,14 @@ void DestroyCockpitGui() {
         ImGui::RemoveContextHook(ImGui::GetCurrentContext(),replayClockHook);
         replayClockHook=0;
     }
+    if(menuWindows.is_open())menuWindows.close();
     if(uiEvidence.is_open())uiEvidence.close();
     if(uiFrames.is_open())uiFrames.close();
     if(replayClockTrace.is_open())replayClockTrace.close();
     inputBox.reset();
     selection.reset();
+    ImGui::g_stackHeaders.clear();
+    ImGui::g_headerStates.clear();
     ImGui::g_popupStates.clear();
     if (ImGui::GetCurrentContext()) ImGui::DestroyContext();
 }
@@ -315,6 +333,14 @@ void BeginCockpitGuiFrame() {
             dialog->Display();
     }
     ImGui::EndFrame();
+    if(menuWindows.is_open()) {
+        for(auto* window:GImGui->Windows) {
+            if(!window->Active || window->Hidden || window->Flags & ImGuiWindowFlags_ChildWindow)continue;
+            menuWindows<<ImGui::GetFrameCount()<<','<<window->Name<<','<<window->Pos.x<<','<<window->Pos.y
+                <<','<<window->Size.x<<','<<window->Size.y<<'\n';
+        }
+        menuWindows.flush();
+    }
     if(uiFrames.is_open()){uiFrames<<ImGui::GetFrameCount()<<'\n';uiFrames.flush();}
 }
 void ObserveCockpitGui(unsigned tick) {

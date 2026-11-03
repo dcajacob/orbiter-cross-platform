@@ -1,7 +1,14 @@
 // Licensed under the MIT License
 #pragma once
 #include "Export.h"
+#include "CoreTypes.h"
+class MenuInfoBar;
+class DlgInfo;
+class Keymap;
 namespace orbiter::production {
+ORBITER_PRODUCTION_API bool HandleCockpitMenuKey(const Keymap&,UInt32,char*);
+MenuInfoBar& CockpitMenuBar();
+DlgInfo* OpenCockpitInfoDialog();
 void CreateCockpitInfoBars();
 void DestroyCockpitInfoBars();
 ORBITER_PRODUCTION_API void OpenCockpitFocusDialog();

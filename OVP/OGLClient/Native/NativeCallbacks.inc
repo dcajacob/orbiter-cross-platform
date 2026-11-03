@@ -11,6 +11,7 @@ bool Present() override {return clbkDisplayFrame();}
 void CloseSession() override {clbkCloseSession(false);}
 void Close() override {clbkDestroyRenderWindow(false);}
 SURFHANDLE LoadTextureResource(const char* name,oapi::UInt32 flags) override {return LoadTexture(name,int(flags));}
+std::uint64_t GuiTextureId(SURFHANDLE surface) override {return surface ? static_cast<OGLTexture*>(surface)->m_TexId : 0;}
 bool ReleaseTextureResource(SURFHANDLE texture) override {return clbkReleaseSurface(texture);}
 void StoreMesh(MESHHANDLE mesh,const char* name) override {clbkStoreMeshPersistent(mesh,name);}
 void VisualEvent(OBJHANDLE object,VISHANDLE visual,oapi::UInt32 event,std::uintptr_t data) override {clbkVisEvent(object,visual,event,data);}

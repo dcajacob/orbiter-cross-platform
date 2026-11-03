@@ -27,7 +27,9 @@ The one-bit latitude difference carried into horizon airspeed, then into the
 elevator at tick 35. The native Release engine now uses the pinned SSE2
 arcsine for this equatorial conversion. The Jacchia-71 atmosphere uses the
 pinned exponential for air density. The exact original cross-build gate
-remains open. [Original Windows comparison](https://github.com/dcajacob/orbiter-cross-platform/actions/runs/41560881876)
+remains open. The separate SSE2 diagnostic passed all five schedules across
+original Debug and Release. [Paired CRT diagnostic](https://github.com/dcajacob/orbiter-cross-platform/actions/runs/41563089062)
+[Original Windows comparison](https://github.com/dcajacob/orbiter-cross-platform/actions/runs/41560881876)
 
 The native client flies all five original DG recorded scenarios from the stock
 position, attitude, control and system-event files. DG stunts draws the recorded
@@ -36,19 +38,28 @@ Glider in orbit 1 returns to free flight at tick 341, following the last recorde
 position at 85.00463713 seconds. In Glider in orbit 2 the pilot takes control
 with Ctrl+C at tick 91. The regression verifies the source files against the
 preserved Windows revision and records vessel, camera and control state. Hosted
-Windows comparisons also check the rendered frames.
+Windows comparisons also check the rendered frames. Both automatic-profile
+captures isolated an initial camera-direction mismatch in the two orbital
+recordings. The native cockpit now leaves the first camera update to the
+original simulation step. All five local Debug flights pass the comparison
+against original Windows Debug. The position, velocity, vessel rotation,
+angular velocity and MJD errors were zero at every sample. The initial camera
+directions passed in both orbital cases. The ten full frames had SSIM values
+from 0.99725 to 0.999999.
 [Recorded flight checks](../../Tests/Production/CockpitUI/recorded_flights.py)
 
 The local frozen instrument and RCS-switch comparisons passed for both gliders
 in both cockpit modes. An F3 dialog run switched from DG to DG-S and back
 through the original Select and Previous controls. The stock time and target
-bars render in visible and auto-hide modes. The native main menu, hosted
-platform qualification and full Phase 6 acceptance remain open.
+bars render in visible and auto-hide modes. The native menu supports eight stock commands. Full menu and platform
+qualification remain open.
 Of the 122 stock scenarios containing a DG or DG-S, 38 use only vessel classes
 this client can load. All 38 presented 60 frames and shut down. Thirty-seven
 completed without script errors. GeneralApiTest reached its Earth obliquity
 assertion, where the script expects a different value from the staged SPICE
-Earth configuration. The other 84 scenarios require additional vessel classes.
+Earth configuration. Both original Windows configurations also failed the stock
+planet-status test, with Earth obliquity measured at 23.439801090036248°.
+The other 84 scenarios require additional vessel classes.
 [Stock scenario census](../../Tests/Production/DeltaGlider/stock_scenarios.py)
 Sanitizer flights now finish without the previous aircraft initialization,
 light destruction, panel texture and virtual-cockpit vertex-buffer errors.

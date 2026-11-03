@@ -47,7 +47,44 @@ def verify_focus_bars():
             ('InfoCamera()','g_camera'),('InfoRecording()','g_pOrbiter->RecorderStatus() == 1'),
             ('InfoPlayback()','g_pOrbiter->IsPlayback()'),('InfoRunning()','g_pOrbiter->IsRunning()')]:
         new=new.replace(adapter,expression)
+    # The movable menu item owns one surface. Erasing an item releases the
+    # previous surface before transferring the next one into its slot.
+    new=new.replace('SURFHANDLE texture = nullptr;','SURFHANDLE texture;').replace('MenuItem& operator=(MenuItem&&','MenuItem& MenuItem::operator=(MenuItem&&')
+    new=new.replace('if (this == &other) return *this;','').replace('if (texture) oapiDestroySurface(texture);','')
+    new=new.replace('FILE_IN_ZEROONFAIL','FILE_IN').replace('if (!f) continue;','')
     equal(bars(old),new,'Original time, target, FPS, animation and menu rendering')
+    for filename,start,adapters in [
+        ('DlgCamera.cpp','DlgCamera::DlgCamera()',[
+            ('CockpitCamera()','g_camera'),('CockpitFocus()','g_focusobj'),('CockpitTime()','td'),
+            ('CockpitWorld()','g_psys'),('CockpitPane()','g_pane'),('SetCameraView','g_pOrbiter->SetView'),
+            ('oapi::UInt32','DWORD'),('ImGui::TextUnformatted(g_focusobj->Name())','ImGui::Text(g_focusobj->Name())')]),
+        ('DlgTacc.cpp','static float SnapToDecimal',[
+            ('SetDialogWarp','g_pOrbiter->SetWarpFactor'),('DialogWarp()','td.Warp()'),
+            ('DialogRunning()','g_pOrbiter->IsRunning()'),('ToggleDialogPause()','g_pOrbiter->TogglePause()')]),
+        ('DlgMenuCfg.cpp','DlgMenuCfg::DlgMenuCfg()',[
+            ('mib->GetPreferences()','g_pane->MIBar()->GetPreferences()'),('mib->SyncPreferences()','g_pane->MIBar()->SyncPreferences()')]),
+    ]:
+        before=original(filename);after=windows(current(filename))
+        for adapter,expr in adapters:after=after.replace(adapter,expr)
+        equal(before[before.index(start):],after[after.index(start):],'Original '+filename+' interactions')
+    widgets=current('Production/GuiAnimatedControls.inc').replace('ORBITER_WIDGET_EXPORT','DLLEXPORT')
+    dialog_manager=original('DlgMgr.cpp')
+    equal(dialog_manager[dialog_manager.index('DLLEXPORT bool BeginAnimatedCombo'):dialog_manager.rindex('\n}')],
+          widgets,'Original combo and collapsing-header drawing, animation and input')
+    before=original('DlgMap.cpp');after=windows(current('DlgMap.cpp'))
+    for adapter,expr in [('CockpitWorld()','g_psys'),('CockpitTime()','td'),('CockpitConfiguration()','g_pOrbiter->Cfg()'),
+            ('ComparePrefix','_strnicmp'),('CompareText','_stricmp'),('oapi::UInt32','DWORD'),
+            (' && vectormap)',' )'),('snprintf(searchbuf,sizeof(searchbuf),"%s",','strcpy(searchbuf,')]:
+        after=after.replace(adapter,expr)
+    equal(before[before.index('DlgMap::DlgMap()'):],after[after.index('DlgMap::DlgMap()'):],'Original map controls, selection, and drawing')
+    before=original('DlgInfo.cpp');after=windows(current('DlgInfo.cpp')).replace('CockpitWorld()','g_psys')
+    a=before.index('            strcpy (cbuf, "Generic");')
+    b=before.index('            ImGui::TableNextRow();',a)
+    after=after.replace('const auto& celestial=orbiter::production::GetCelestialServices();','const CELBODY *cb = cbody->GetModuleInterface();')
+    after=after.replace('const ATMCONST *ap = planet->AtmParams();','char cbuf[128];\n            const ATMCONST *ap = planet->AtmParams();')
+    after=after.replace('const char* model=celestial.AtmosphereName(*cbody);',before[a:b])
+    after=after.replace('model ? model : "Generic"','cbuf').replace('celestial.HasModule(*cbody) ?','cb ?')
+    equal(before[before.index('DlgInfo::DlgInfo()'):],after[after.index('DlgInfo::DlgInfo()'):],'Original object information display')
     old=original('DlgFocus.cpp')
     new=windows(current('DlgFocus.cpp'))
     for adapter,expression in [('FocusWorld()','g_psys'),('FocusCamera()','g_camera'),

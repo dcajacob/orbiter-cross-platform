@@ -12,15 +12,22 @@
 #include "Production/CockpitGuiExports.h"
 #include "Production/NativeCockpitUi.h"
 #include "Production/NativeGraphics.h"
+#include "Production/NativeInterpreterSdk.h"
+#include "Production/NativeRenderApi.h"
+#include "Keymap.h"
+#include "DlgTacc.h"
+#include "DlgCamera.h"
+#include "DlgInfo.h"
+#include "DlgMap.h"
 #endif
 #include "imgui.h"
 #include "imgui_internal.h"
 
 #include "Camera.h"
-#ifdef _WIN32
 #include "MenuInfoBar.h"
-#include "Dialogs.h"
 #include "DlgMenuCfg.h"
+#ifdef _WIN32
+#include "Dialogs.h"
 
 // =======================================================================
 // Externs
@@ -75,7 +82,38 @@ struct MovingAverage {
     }
 };
 
-#ifdef _WIN32
+#ifndef _WIN32
+namespace {
+std::unique_ptr<MenuInfoBar> cockpitBars;
+std::unique_ptr<DlgMenuCfg> menuPreferences;
+std::unique_ptr<DlgTacc> timeAcceleration;
+std::unique_ptr<DlgCamera> cameraDialog;
+std::unique_ptr<DlgInfo> infoDialog;
+std::unique_ptr<DlgMap> mapDialog;
+template<class T> void OpenMenuDialog(std::unique_ptr<T>& dialog) {
+    if(!dialog)dialog=std::make_unique<T>();
+    oapiOpenDialog(dialog.get());
+}
+struct MenuCommand {
+    const char* label;
+    const char* icon;
+    int id;
+    int shortcut;
+    CustomFunc invoke;
+};
+const MenuCommand commands[]={
+    {"Ship","MenuInfoBar/ship.png",1,OAPI_LKEY_DlgSelectVessel,[](void*) {orbiter::production::OpenCockpitFocusDialog();}},
+    {"Camera","MenuInfoBar/camera.png",2,OAPI_LKEY_DlgCamera,[](void*) {OpenMenuDialog(cameraDialog);}},
+    {"Speed","MenuInfoBar/speed.png",3,OAPI_LKEY_DlgSimspeed,[](void*) {OpenMenuDialog(timeAcceleration);}},
+    {"Pause","MenuInfoBar/pause.png",4,0,[](void*) {oapiSetPause(InfoRunning());}},
+    {"Info","MenuInfoBar/info.png",6,OAPI_LKEY_DlgInfo,[](void*) {orbiter::production::OpenCockpitInfoDialog();}},
+    {"Map","MenuInfoBar/map.png",8,OAPI_LKEY_DlgMap,[](void*) {OpenMenuDialog(mapDialog);}},
+    {"Save","MenuInfoBar/save.png",11,0,[](void*) {GetNativeRenderContext().scriptApplication->Quicksave();}},
+    {"Exit","MenuInfoBar/exit.png",12,0,[](void*) {GetNativeRenderContext().scriptApplication->EndSession();}},
+};
+
+}
+#endif
 class DynamicMenuBar: public ImGuiDialog
 {
 	static inline const float strength = 0.3f;
@@ -88,7 +126,7 @@ class DynamicMenuBar: public ImGuiDialog
 public:
 	struct MenuItem {
 		std::string label;
-		SURFHANDLE texture;
+		SURFHANDLE texture = nullptr;
 		CustomFunc func;
 		void *context;
 		ImTextureID texId;
@@ -102,7 +140,7 @@ public:
 			texture = oapiLoadTexture(path);
 			if(!texture) oapiAddNotification(OAPINOTIF_ERROR, "Cannot find menu item texture", path);
 			texId = ImGui::GetImTextureID(texture);
-			lastItemSize = g_pOrbiter->Cfg()->CfgUIPrm.MenuButtonSize;
+			lastItemSize = InfoConfig().MenuButtonSize;
 			dragging = false;
 			enabled = true;
 			animStateScroll = 0.0f;
@@ -119,7 +157,9 @@ public:
 		MenuItem(MenuItem&& other) noexcept {
 			*this = std::move(other);
 		}
-		MenuItem& MenuItem::operator=(MenuItem&& other) noexcept {
+		MenuItem& operator=(MenuItem&& other) noexcept {
+			if (this == &other) return *this;
+			if (texture) oapiDestroySurface(texture);
 			label = std::move(other.label);
 			texture = other.texture;
 			other.texture = NULL;
@@ -165,14 +205,14 @@ public:
 	float holePos;
 
 
-	DynamicMenuBar(): ImGuiDialog("DynamicMenu"), prm(g_pOrbiter->Cfg()->CfgUIPrm) {
+	DynamicMenuBar(): ImGuiDialog("DynamicMenu"), prm(InfoConfig()) {
 		animState = 0.0f;
 		isDragging = false;
 		oneDrag = false;
 		isDraggingOutside = false;
 		animStateSpacing = prm.MenuButtonSpacing;
 
-		FILEHANDLE f = oapiOpenFile("MenuInfoBar.cfg", FILE_IN, CONFIG);
+		FILEHANDLE f = oapiOpenFile("MenuInfoBar.cfg", FILE_IN_ZEROONFAIL, CONFIG);
 		if(f) {
 			for(int i = 1;;i++) {
 				char buf[64];
@@ -187,13 +227,18 @@ public:
 				preferedOrder.emplace_back(MenuInfoBar::MenuPreference{dst, state});
 			}
 
-			oapiCloseFile(f, FILE_IN);
+			oapiCloseFile(f, FILE_IN_ZEROONFAIL);
 		}
 
+#ifdef _WIN32
 		items.reserve(g_pOrbiter->menuitems.size());
 		for(auto &item: g_pOrbiter->menuitems) {
 			AddMenuItem(item.label.c_str(), item.imagepath.c_str(), item.id, item.func, item.context);
 		}
+#else
+        for(const auto& command:commands)
+            AddMenuItem(command.label,command.icon,command.id,command.invoke);
+#endif
 		// Save the current state if the file did not exist
 		if(!f) {
 			SavePreferedOrder();
@@ -259,6 +304,7 @@ public:
 			char buf[64];
 			i++;
 			preferedOrder.emplace_back(MenuInfoBar::MenuPreference{item.label, item.enabled});
+			if (!f) continue;
 			sprintf(buf, "MenuItem%d", i);
 			oapiWriteItem_string(f, buf, const_cast<char *>(item.label.c_str()));
 			sprintf(buf, "MenuItemEnabled%d", i);
@@ -365,7 +411,11 @@ public:
 
 			if(isHovering || isDragging) {
 				if(ImGui::IsMouseClicked(ImGuiMouseButton_Right)) {
+#ifdef _WIN32
 					g_pOrbiter->DlgMgr()->EnsureEntry<DlgMenuCfg> ();
+#else
+                    OpenMenuDialog(menuPreferences);
+#endif
 				}
 
 				// Lower the menu
@@ -547,8 +597,6 @@ public:
 	}
 };
 
-
-#endif
 
 class InfoFrameRate {
 	static const int HISTORY_SIZE = 64;
@@ -842,7 +890,6 @@ public:
 // class MenuInfoBar
 // =======================================================================
 
-#ifdef _WIN32
 MenuInfoBar::MenuInfoBar ()
 {
 	dynMenu  = std::make_unique<DynamicMenuBar>();
@@ -877,24 +924,32 @@ void MenuInfoBar::SyncPreferences()
 	return dynMenu->SyncPreferedOrder();
 }
 
-#else
+#ifndef _WIN32
 namespace orbiter::production {
-namespace {
-std::unique_ptr<InfoFrameRate> frameRate;
-std::unique_ptr<InfoTime> timeBar;
-std::unique_ptr<InfoTarget> targetBar;
+bool HandleCockpitMenuKey(const Keymap& keymap,oapi::UInt32 key,char* state) {
+    if(keymap.IsLogicalKey(key,state,OAPI_LKEY_MainMenu)) {
+        auto& mode=InfoConfig().MenuMode;
+        mode=mode==0 ? 2 : 0;
+        return true;
+    }
+    for(const auto& command:commands) {
+        if(command.shortcut && keymap.IsLogicalKey(key,state,command.shortcut)) {
+            command.invoke(nullptr);
+            return true;
+        }
+    }
+    return false;
 }
-void CreateCockpitInfoBars() {
-    frameRate=std::make_unique<InfoFrameRate>();
-    timeBar=std::make_unique<InfoTime>(frameRate.get());
-    targetBar=std::make_unique<InfoTarget>(frameRate.get());
-    oapiOpenDialog(timeBar.get());
-    oapiOpenDialog(targetBar.get());
-}
+DlgInfo* OpenCockpitInfoDialog() {OpenMenuDialog(infoDialog);return infoDialog.get();}
+MenuInfoBar& CockpitMenuBar() {return *cockpitBars;}
+void CreateCockpitInfoBars() {cockpitBars=std::make_unique<MenuInfoBar>();}
 void DestroyCockpitInfoBars() {
-    targetBar.reset();
-    timeBar.reset();
-    frameRate.reset();
+    mapDialog.reset();
+    infoDialog.reset();
+    cameraDialog.reset();
+    menuPreferences.reset();
+    timeAcceleration.reset();
+    cockpitBars.reset();
 }
 }
 #endif

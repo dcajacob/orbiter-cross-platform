@@ -7,8 +7,87 @@ sys.path[:0]=[str(HERE.parent/'Cockpit'),str(HERE.parent),str(HERE.parent/'Fligh
 from reference import fixture
 from keyboard_smoke import KeyEvent,Event,require,wait
 
+def verify_menu(out,click,advance,button,key,move,window,title,process):
+    def geometry(label):
+        with (out/'menu-windows.csv').open() as stream:
+            rows=list(csv.DictReader(stream))
+        return next((r for r in reversed(rows) if r.get('height') and label in r['name'] and r['frame']==rows[-1]['frame']),None)
+    def dialog(label):
+        return wait(lambda:geometry(label),'Missing stock dialog '+label)
+    cfg=out/'ScriptFiles/config/menuinfobar.cfg'
+    names=[v.split(' = ')[1] for v in cfg.read_text().splitlines() if 'Enabled' not in v]
+    bar=dialog('##MenuInfoBar')
+    move(640,360)
+    def tap(name):
+        key(window,name,True);advance();key(window,name,False);advance()
+    tap('F4')
+    wait(lambda:float(dialog('##MenuInfoBar')['y']) < -15,'F4 did not retract the menu')
+    tap('F4')
+    wait(lambda:float(dialog('##MenuInfoBar')['y']) == 0,'F4 did not show the menu')
+
+    def command(name):
+        # Stock sizes are 35 px, with an 18 px gap. Use the live menu's location.
+        x=int(float(bar['x']))+18+8+17+53*names.index(name)
+        click(x,25)
+    command('Pause')
+    wait(lambda:'PAUSED' in title(window),'Menu did not pause flight')
+    command('Pause')
+    wait(lambda:'RUNNING' in title(window),'Menu did not resume flight')
+    command('Speed')
+    speed=dialog('Time acceleration')
+    click(int(float(speed['x']))+150,int(float(speed['y']))+38)
+    wait(lambda:' | x10.000' in title(window),'Stock 10x speed button did not change the simulation clock')
+    command('Ship')
+    focus=dialog('Select spacecraft')
+    x,y=int(float(focus['x'])),int(float(focus['y']))
+    click(x+42,y+115)
+    click(x+228,y+99)
+    wait(lambda:' | DG2 | ' in title(window),'Menu ship selection did not change the focused vessel')
+    command('Camera')
+    dialog('Orbiter: Camera')
+    command('Info')
+    dialog('Object info')
+    command('Map')
+    dialog('Orbiter: Map')
+    button(window,640,24,True,3)
+    advance()
+    button(window,640,24,False,3)
+    advance()
+    dialog('Configure menu bars')
+    command('Save')
+    save=out/'Quicksave/cockpit 0001.scn'
+    wait(save.is_file,'Stock menu quicksave missing')
+    require('Ship DG2' in save.read_text() and 'BEGIN_CAMERA' in save.read_text(),'Quicksave lost the selected vessel or camera')
+    # Exit destroys the window, so release cannot wait for another GUI frame.
+    before_names=names[:]
+    start=int(float(bar['x']))+43+53*names.index('Ship')
+    button(window,start,25,True)
+    advance()
+    for offset in (8,18,30,44,57,68):
+        move(start+offset,25)
+    button(window,start+68,25,False)
+    advance()
+    def reordered():
+        saved=[v.split(' = ')[1] for v in cfg.read_text().splitlines() if 'Enabled' not in v]
+        return saved if len(saved)==len(names) and saved!=before_names else None
+    names=wait(reordered,'Dragging a stock menu item did not persist its new order')
+    require(sorted(names)==sorted(before_names),'Reordering lost a menu command')
+    (out/'loaded-maps.txt').write_text(Path(f'/proc/{process.pid}/maps').read_text())
+    exit_x=int(float(bar['x']))+43+53*names.index('Exit')
+    button(window,exit_x,25,True)
+    advance()
+    button(window,exit_x,25,False)
+    require(process.wait(timeout=15)==0,'Menu exit failed')
+    life=json.loads((out/'graphics-lifecycle.json').read_text())
+    require(life['successful_presents'] and life['context_deleted'],'Menu did not close the graphics context')
+    report=dict(commands=before_names,persisted_order=names,focus='DG2',warp=10,quicksave=save.name,configuration_dialog=True,lifecycle=life)
+    (out/'menu-verification.json').write_text(json.dumps(report,indent=2)+'\n')
+    print(json.dumps(report,indent=2))
+
+
 def main():
     p=argparse.ArgumentParser(description=__doc__)
+    p.add_argument("--stock-menu",action="store_true")
     for name in ('executable','assets','data','modules','planets','output'):p.add_argument('--'+name,type=Path,required=True)
     a=p.parse_args();out=a.output.resolve();require(not out.exists(),'Mouse output exists; replacement is forbidden');out.mkdir(parents=True)
     x=C.CDLL(ctypes.util.find_library('X11'))
@@ -57,8 +136,13 @@ def main():
     text=fixture(case);start=text.index('PB:ShuttlePB\n');end=text.index('\nEND\n',start)
     text=(text[:end]+'\n  RCSMODE 1'+text[end:]).replace('BEGIN_SHIPS',
         'BEGIN_MFD Left\n  TYPE Orbit\n  REF Earth\nEND_MFD\nBEGIN_MFD Right\n  TYPE OSync\n  TARGET ISS\n  LISTLEN 5\nEND_MFD\nBEGIN_SHIPS')
+    if a.stock_menu:
+        from focus_bars import scenario
+        text=scenario().replace('BEGIN_SHIPS','BEGIN_MFD Left\n  TYPE Orbit\n  REF Earth\nEND_MFD\nBEGIN_MFD Right\n  TYPE Surface\nEND_MFD\nBEGIN_SHIPS')
+        (out/'menu-evidence.enabled').touch()
+        (out/'instrument-evidence.enabled').touch()
     (out/'cockpit.scn').write_text(text)
-    (out/'Orbiter.cfg').write_text((ROOT/'Tests/Production/NativeScene/Orbiter.cfg').read_text()+'\nFPS = 0\nMenubarMode = 1\nInfobarMode = 1\nInstrumentUpdateInterval = 0.25\n')
+    (out/'Orbiter.cfg').write_text((ROOT/'Tests/Production/NativeScene/Orbiter.cfg').read_text()+f'\nFPS = 0\nMenubarMode = {0 if a.stock_menu else 1}\nInfobarMode = 1\nInstrumentUpdateInterval = 0.25\n')
     (out/'ui-evidence.enabled').write_text('UI popup observation\n')
     (out/'control-evidence.enabled').write_text('Actual owned X11 window mouse transport\n')
     argv=[str(a.executable.resolve())]
@@ -70,7 +154,7 @@ def main():
         try:
             window=wait(lambda:owned(process.pid),'Owned native cockpit did not initialize')
             x.XSetInputFocus(display,window,1,0);x.XFlush(display)
-            wait(lambda:'RCS ROT 0%' in title(window),'Original initial vessel RCS mode differs')
+            if not a.stock_menu:wait(lambda:'RCS ROT 0%' in title(window),'Original initial vessel RCS mode differs')
             def gui_frame():
                 path=out/'ui-frames.csv'
                 lines=path.read_text().splitlines() if path.exists() else []
@@ -88,6 +172,11 @@ def main():
                         return len(records)>before and records[-1].get('event')==event and records[-1].get('x')==str(px) and records[-1].get('y')==str(py)
                     wait(processed,'GLFW did not process the declared mouse event')
                     advance()
+            if a.stock_menu:
+                def move(px,py):
+                    x.XWarpPointer(display,0,window,0,0,0,0,px,py);x.XFlush(display);advance()
+                verify_menu(out,click,advance,button,key,move,window,title,process)
+                return
             click(20,495)
             click(51,535)
             # W is an actual RCS binding and must remain text while input owns focus.

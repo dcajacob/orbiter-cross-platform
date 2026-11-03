@@ -33,6 +33,13 @@ def stock(relative):
     return subprocess.check_output(['git','-C',str(ROOT),'show',PIN+':'+relative]).replace(b'\r\n',b'\n')
 
 
+def require_matching_math(original,native):
+    expected=(original/'math-profile.txt').read_text().strip()
+    actual=json.loads((native/'numerics.json').read_text())['math']
+    require(expected in ('sse2','fma3') and actual.endswith('-'+expected),
+            f'{native.name}: original CRT uses {expected}, native engine uses {actual}')
+
+
 def read_rows(directory):
     with (directory/'playback-state.csv').open() as stream:return list(csv.DictReader(stream))
 
@@ -146,9 +153,11 @@ def compare(original,native,budgets):
         for k in ('mass','fuel'):
             require(abs(float(a[k])-float(b[k]))<=max(budgets['propellant_absolute_kg'],abs(float(a[k]))*budgets['propellant_relative']),
                     'Original recording fuel or mass differs')
-        require(abs(float(a['aperture'])-float(b['aperture']))<=budgets['rotation_rad'] and
-                distance(vector(a,'cam_dx cam_dy cam_dz'),vector(b,'cam_dx cam_dy cam_dz'))<=budgets['rotation_rad'],
-                'Original recorded camera orientation differs')
+        direction_error=distance(vector(a,'cam_dx cam_dy cam_dz'),vector(b,'cam_dx cam_dy cam_dz'))
+        aperture_error=abs(float(a['aperture'])-float(b['aperture']))
+        for key,error in [('camera_direction',direction_error),('aperture_rad',aperture_error)]:
+            require(error<=budgets['rotation_rad'],f'{original.name} {key} differs at tick {a["tick"]}: {error}')
+            maxima[key]=max(maxima.get(key,0.),error)
     scores={tick:image_ssim((original/f'instrument-{tick}.rgba').read_bytes(),(native/f'instrument-{tick}.rgba').read_bytes(),1280,720)
             for tick in (20,50)}
     require(min(scores.values())>=.98,'Recorded flight frame differs from original Windows')
@@ -168,6 +177,7 @@ def main():
         results={}
         for name,*_ in CASES:
             require(original[name]['source_sha256']==native[name]['source_sha256'],'Recording input hashes differ')
+            require_matching_math(a.original/name,a.native/name)
             results[name]=compare(a.original/name,a.native/name,budgets)
         a.output.write_text(json.dumps(results,indent=2)+'\n')
         return

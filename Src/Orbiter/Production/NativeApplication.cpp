@@ -334,6 +334,22 @@ struct Runtime final:BodyServices,RigidBodyServices,SurfaceServices,NavigationSe
         SaveTo(savePath,desc.c_str(),0);
     }
 #ifdef ORBITER_NATIVE_COCKPIT
+    std::string quicksaveStem;
+    unsigned quicksaveIndex=0;
+    void Quicksave() override {
+        std::ostringstream name;
+        name<<quicksaveStem<<' '<<std::setfill('0')<<std::setw(4)<<++quicksaveIndex<<".scn";
+        const auto destination=render.scriptSaveDirectory/"Quicksave"/name.str();
+        char desc[128];
+        std::snprintf(desc,sizeof(desc),"Orbiter saved state at T = %0.0f",time.SimT0);
+        try {
+            SaveTo(destination,desc,0);
+            oapiAddNotification(OAPINOTIF_SUCCESS,"Scenario saved successfully",name.str().c_str());
+        } catch(const std::exception& error) {
+            oapiAddNotification(OAPINOTIF_ERROR,"Failed to save scenario",error.what());
+        }
+    }
+    void EndSession() override {active=false;}
     bool SaveScriptScenario(const char *name,const char *desc) override {
         SaveTo(name,desc,1);
         return true;
@@ -382,15 +398,15 @@ struct Runtime final:BodyServices,RigidBodyServices,SurfaceServices,NavigationSe
                 if(keymap.IsLogicalKey(code,snapshot.keys.data(),OAPI_LKEY_Quicksave)) {savePending=true;continue;}
                 if(code==OAPI_KEY_F5 && !KEYMOD_CONTROL(snapshot.keys.data())) {reloadPending=true;continue;}
                 if(code==OAPI_KEY_F6 && !KEYMOD_CONTROL(snapshot.keys.data())) {stepOnce=true;continue;}
-                if(keymap.IsLogicalKey(code,snapshot.keys.data(),OAPI_LKEY_DlgSelectVessel)) {
 #ifdef ORBITER_NATIVE_COCKPIT
-                    OpenCockpitFocusDialog();
+                if(HandleCockpitMenuKey(keymap,code,snapshot.keys.data()))continue;
 #else
+                if(keymap.IsLogicalKey(code,snapshot.keys.data(),OAPI_LKEY_DlgSelectVessel)) {
                     const auto& list=system->GetVessels();auto it=std::find(list.begin(),list.end(),render.focus);auto start=std::size_t(it-list.begin());
                     for(std::size_t i=1;i<=list.size();++i) {auto* next=list[(start+i)%list.size()];if(next->GetEnableFocus() && !next->KillPending()) {orbiter::production::SetFocusObject(*this,next);break;}}
-#endif
                     continue;
                 }
+#endif
                 if(playback && keymap.IsLogicalKey(code,snapshot.keys.data(),OAPI_LKEY_ToggleRecPlay)) {EndPlayback();continue;}
                 if(keymap.IsLogicalKey(code,snapshot.keys.data(),OAPI_LKEY_SelectPrevVessel)) {if(previousFocus)orbiter::production::SetFocusObject(*this,previousFocus);continue;}
                 if(keymap.IsLogicalKey(code,snapshot.keys.data(),OAPI_LKEY_Quit)) {active=false;continue;}
@@ -449,15 +465,12 @@ struct Runtime final:BodyServices,RigidBodyServices,SurfaceServices,NavigationSe
     }
     void Initialize(const std::filesystem::path& master,const std::filesystem::path& scenario,const std::filesystem::path& evidence,double captureTime) {
         if(!settings.Load(master.string().c_str())) throw std::runtime_error("Cannot load explicit production configuration");
-#ifdef ORBITER_NATIVE_COCKPIT
-        if(settings.CfgUIPrm.MenuMode!=1)
-            unsupported("visible main menu in the cockpit integration candidate; use MenubarMode = 1 until menu integration");
-#endif
         if(!settings.GetActiveModules().empty())unsupported("application plugins in this external-view host");
         scenarioState=std::make_unique<State>(51982.5);State& metadata=*scenarioState;if(!metadata.Read(scenario,51982.5))throw std::runtime_error("Cannot parse production scenario");
 #ifndef ORBITER_NATIVE_COCKPIT
         if(metadata.Script())unsupported("bundled Lua in the external-view build");
 #else
+        quicksaveStem=scenario.stem().string();
         std::string directory=metadata.PlaybackDir();
         std::replace(directory.begin(),directory.end(),'\\','/');
         playbackDirectory=std::filesystem::path(directory).filename().string();
@@ -570,7 +583,10 @@ struct Runtime final:BodyServices,RigidBodyServices,SurfaceServices,NavigationSe
 #ifdef ORBITER_NATIVE_COCKPIT
         cockpit->InitState(scenario.string().c_str());
 #endif
-        Commands("start");render.camera->Update();
+        Commands("start");
+#ifndef ORBITER_NATIVE_COCKPIT
+        render.camera->Update();
+#endif
         if(system->nGrav()!=41)throw std::runtime_error("This native scene requires the actual stock Sol world");
         WriteTrace();
     }

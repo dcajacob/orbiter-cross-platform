@@ -581,7 +581,7 @@
     },
     "Src/Orbiter/Production/CMakeLists.txt": {
       "original_sha256_lf": null,
-      "sha256_lf": "05db6dba19df9059785a62cc21095c8981baec8ee1bcce90b5da808975e9a776",
+      "sha256_lf": "3b08e0a2556e51ca0fa5bcfb4ab4c425d82dc16ceb520bca6318a547cf5f9eb4",
       "scope": "Original ten stock MFD declarations use exact platform SDK aliases; shared original conic geometry is moved without calculation or screen-mapping changes. Full native instrument runtime remains incomplete."
     },
     "Src/Orbiter/Production/CameraServices.cpp": {
@@ -597,7 +597,7 @@
       "original_sha256_lf": null
     },
     "Src/Orbiter/Production/CelestialServices.h": {
-      "sha256_lf": "b3b59a26cec3024c71e6812c2beaf353a3449225b0ea8c2271450d4c97a8be9e",
+      "sha256_lf": "7aad95d26c80802526b4ee047b693d3089c5fc7e0b61fe7e0e7065f9405876ba",
       "original_sha256_lf": null
     },
     "Src/Orbiter/Production/CockpitGraphics.h": {
@@ -741,7 +741,7 @@
     },
     "Src/Orbiter/Production/NativeApplication.cpp": {
       "original_sha256_lf": null,
-      "sha256_lf": "3c54cdcafb090eccc204ba6eaac19184601699d0e8ebd6e5dfa6a2a8a2a44d8a"
+      "sha256_lf": "030dac7b07423b41114200c92492c1a0ef4d35f5ba7fead8a430354c43253ddb"
     },
     "Src/Orbiter/Production/NativeBuild.h.in": {
       "sha256_lf": "f5fb21f83bb6be0c54839fce670e8410f6911eda86da2eef26e4221c1ae25d97",
@@ -764,11 +764,11 @@
       "original_sha256_lf": null
     },
     "Src/Orbiter/Production/NativeCelestialServices.cpp": {
-      "sha256_lf": "33e2e7a23dfef26db77a265e1774e3b98246d646250a8a2702f8f3c91cd5a7cd",
+      "sha256_lf": "d5687ce70066239eb1a97f1ef45fd79613d47271569b9042a0ed61abbfed90f3",
       "original_sha256_lf": null
     },
     "Src/Orbiter/Production/NativeCelestialServices.h": {
-      "sha256_lf": "8f56d7e6e09a4eefca06be461a388eb8620d0316a1a8273fe0b378a8c09d947e",
+      "sha256_lf": "1bf9abe0d7d2a8ce4d0bd427f05680ca4e957ac31c7ef09e96aa563ea6261d68",
       "original_sha256_lf": null
     },
     "Src/Orbiter/Production/NativeCockpitUnavailable.cpp": {
@@ -785,7 +785,7 @@
     },
     "Src/Orbiter/Production/NativeGraphics.h": {
       "original_sha256_lf": null,
-      "sha256_lf": "a07d65e3d92f8f574c43e7eae51aac2061e506e266ba9c9a08bc8a10c4fcf984",
+      "sha256_lf": "ef31962332c8f7ae6d1e9264b4a71e370fa33ca737bdc090ebae5eba23297389",
       "scope": "Original scheduler, stock MFDs and modern map compile natively with explicit original epoch/time, authoritative world/UI bindings and indexed map resources. Exact Windows calculations and callback order conserved. Native GDI/legacy map/custom-mode entry points fail explicitly until supported; native cockpit owner and DG runtime remain unfinished."
     },
     "Src/Orbiter/Production/NativeModule.cpp": {
@@ -983,7 +983,7 @@
       "sha256_lf": "b580a818e9aa69ebce5da6b3b4d9316b9cbb165250584e62a5eed9891a540854"
     },
     "Src/Orbiter/Production/WindowsCelestialServices.cpp": {
-      "sha256_lf": "b9c016c9b11784b31abc9153e0c7f00e5aaf403871487b9d11abd283d171e10c",
+      "sha256_lf": "779427cd09d307c8d8b52dadaa2bfd654390c88795c72caae3bb88d21ce47f78",
       "original_sha256_lf": null
     },
     "Src/Orbiter/Production/WindowsCelestialServices.h": {
@@ -1304,11 +1304,11 @@
     },
     "Src/Orbiter/Production/NativeCockpit.cmake": {
       "original_sha256_lf": null,
-      "sha256_lf": "0888f391531aec83f3d4a5f79d35d86ea64bf10750578b298812934354eaa8d5"
+      "sha256_lf": "f6a04e2aa3bfc63ff0de9290bd7852196b71c9da8a95e44ab8264f071812f5de"
     },
     "Src/Orbiter/Production/NativeCockpitGui.cpp": {
       "original_sha256_lf": null,
-      "sha256_lf": "d0c390cc912b14e47f197b28f8268a85044fe8f04d552dcb8d5ec9b877009bd7"
+      "sha256_lf": "2f6ee1e64199466f2c9f1d67bdc16385f91e435de1b1f1aa9b5573dbab7ff5d0"
     },
     "Src/Orbiter/Production/NativeCockpitProjection.cpp": {
       "original_sha256_lf": null,
@@ -1336,7 +1336,7 @@
     },
     "Src/Orbiter/Production/NativeCockpitUi.h": {
       "original_sha256_lf": null,
-      "sha256_lf": "be91465813edfcba5122bfc63904f1ec060cc6a9147e8848d5de8e81e2ee65b6"
+      "sha256_lf": "39eca197a5658ab5e2da496a256f6e9839d9fec34c6617742fbfb017e31e2498"
     },
     "Src/Module/LuaScript/Native/CMakeLists.txt": {
       "original_sha256_lf": null,
@@ -1656,7 +1656,7 @@
     },
     "Src/Orbiter/Production/NativeInterpreterSdk.h": {
       "original_sha256_lf": null,
-      "sha256_lf": "451c61ad9ff8e0361699abef7f9eb15c19b1db49f6188efce28dc1b77ae13686"
+      "sha256_lf": "49e74f00607a9bc603698de9c3c0fe83e0ca0eac43c7ac24126374a4ddd90b43"
     },
     "Src/Orbiter/Production/ScreenAnnotationMethods.inc": {
       "original_sha256_lf": null,
@@ -1684,11 +1684,11 @@
     },
     "Src/Orbiter/DlgMgr.cpp": {
       "original_sha256_lf": "09b32684f728b22cce17f85bdaa24593e18adc52d8641bebd412a1881c87c8b0",
-      "sha256_lf": "f995e33f750caee7d883cc722c65be9292afc1e6fc2e746312ffcbd751a616e2"
+      "sha256_lf": "fd89430504ca5c0606f44870648772a075b0a12513002fa32638c47e8d63edda"
     },
     "Src/Orbiter/MenuInfoBar.cpp": {
       "original_sha256_lf": "d0bb8b38f21893ecce434232ae8f05881c33831537c950c69400b92ddbd6ffe7",
-      "sha256_lf": "98d164319f937dd3d5ad97e2e80730b0272c1d91e58584de7574317d570812d6"
+      "sha256_lf": "c6bd3f52d4de5191fb176c0e034b2cf505a1f03817acd6dae026ad0f001e3b81"
     },
     "Src/Orbiter/Production/GuiMenuButton.inc": {
       "original_sha256_lf": null,
@@ -1709,6 +1709,54 @@
     "Src/Orbiter/Production/PlaybackObservation.h": {
       "original_sha256_lf": null,
       "sha256_lf": "df8b95964be8b4c19050aa20976aaa990abbf4ae731c6636b108586ec65536be"
+    },
+    "Src/Orbiter/DlgCamera.cpp": {
+      "original_sha256_lf": "2c69a7a8a069555af60db03bc8003821ae10a883130a1aec0e6cc78e2d052886",
+      "sha256_lf": "82f846144b9c2ef4027d38292df32e35f1208363f00e0cf275d6167c65aaf5c4"
+    },
+    "Src/Orbiter/DlgCamera.h": {
+      "original_sha256_lf": "761cf227e028e13de657dd858bdbc80b43aa3f72da62b538b391518c48a1ae5d",
+      "sha256_lf": "c5b6e158d38c9c7dbc0d2ea116891d2a2c397304af00885ca792baa289121e19"
+    },
+    "Src/Orbiter/DlgInfo.cpp": {
+      "original_sha256_lf": "2f67b238af8d1bd6fc52b02e4e9933fd7ed30ad1db427e2b851f79c9096cbb88",
+      "sha256_lf": "93ef743d8218cd6f53601b9a56f5002cb6fded75e6fb5b95ef5b6215136d4492"
+    },
+    "Src/Orbiter/DlgInfo.h": {
+      "original_sha256_lf": "23ff065e7dcf97ab06d641898c71bfc268b8a73a77f7af495e0874d1af91a13f",
+      "sha256_lf": "bb66281c56048bf367aac51bc6445fdf49091d703118550f575a79725d7f7f88"
+    },
+    "Src/Orbiter/DlgMap.cpp": {
+      "original_sha256_lf": "1df827f4403b47f48b287fa41691d8db02c0793eaf86621f706d8e2c54408ed6",
+      "sha256_lf": "967dc2aaa875b075e8f6770e2ec6fa5176be783b3e7212cdb93b90d8456d3258"
+    },
+    "Src/Orbiter/DlgMap.h": {
+      "original_sha256_lf": "0a5866e453bf73e923e461831bdaebe93b419521bc636c76b6b0d5af86eaab6d",
+      "sha256_lf": "8472080bf017a8a97118b92a2e31a27dccfd5370f399524f3faf41f6d6d3ebe5"
+    },
+    "Src/Orbiter/DlgMenuCfg.cpp": {
+      "original_sha256_lf": "57f3ddbd882898f37ae21e28adce71161f9d04482abc72fdc0a49a5cf88d9c41",
+      "sha256_lf": "d77686f02086650b0dfd3e1f32b86f8086a59139c50a9cce5a1277fbe00284cd"
+    },
+    "Src/Orbiter/DlgMenuCfg.h": {
+      "original_sha256_lf": "798c39729a650d1585ff9643917a62f06f033f7326c69375ee9dded291ce9ecd",
+      "sha256_lf": "86c77fe2eb37f152f75868b6c1a86d103cb9a30457cbf4c0d264325bbf0ec927"
+    },
+    "Src/Orbiter/DlgTacc.cpp": {
+      "original_sha256_lf": "57a17cf6434931e0f09d0b4795504abd27f1b874f8886a3db752eaf4346a5316",
+      "sha256_lf": "ff086adfe935cdc2c4bafb07bc75d46e808037a6fd88ba57c7c2c7c4f0f4544f"
+    },
+    "Src/Orbiter/DlgTacc.h": {
+      "original_sha256_lf": "fc1b6c47555263e372418916f0ab8c0584fb902b14fdfec50dec298b6ecc6dc8",
+      "sha256_lf": "02c5ee14379ac26f99d4d2b86097a093e0f2664456bf74065b15ae341d03ff37"
+    },
+    "Src/Orbiter/MenuInfoBar.h": {
+      "original_sha256_lf": "f1bb61e5ea855edc83b7d322f0f5fb7d2c9f167a3faa69fb8db624036d5f1833",
+      "sha256_lf": "bfc76cf36c09cfaea139ebbad21c2d2bdc315dc89b101de57a06ac71c31ba8a1"
+    },
+    "Src/Orbiter/Production/GuiAnimatedControls.inc": {
+      "original_sha256_lf": null,
+      "sha256_lf": "9123fc10966342842591f1257d892dc000eab28f3bee6ce674ac09aece9025ba"
     }
   }
 }

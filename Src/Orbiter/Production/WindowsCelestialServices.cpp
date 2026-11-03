@@ -91,6 +91,11 @@ public:
     { return body.module->clbkEphemeris(mjd,request,result); }
     int FastEphemeris(const CelestialBody& body, double seconds, int request, double* result) const override
     { return body.module->clbkFastEphemeris(seconds,request,result); }
+    const char* AtmosphereName(const CelestialBody& body) const override {
+        auto* cb=body.module;
+        auto* atmosphere=cb && cb->Version()>=2 ? static_cast<CELBODY2*>(cb)->GetAtmosphere() : nullptr;
+        return atmosphere ? atmosphere->clbkName() : nullptr;
+    }
     int AtmosphereModel(const CelestialBody& body,ATMCONST& atm) const override {
         auto* module=body.module; const auto& modIntf=body.modIntf;
         if (module) {

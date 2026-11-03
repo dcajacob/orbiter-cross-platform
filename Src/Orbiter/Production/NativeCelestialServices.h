@@ -20,6 +20,7 @@ public:
     bool HasEphemeris(const CelestialBody&) const override;
     int Ephemeris(const CelestialBody&,double,int,double*) const override;
     int FastEphemeris(const CelestialBody&,double,int,double*) const override;
+    const char* AtmosphereName(const CelestialBody&) const override;
     int AtmosphereModel(const CelestialBody&,ATMCONST&) const override;
     void AtmosphereParameters(const CelestialBody&,int,double,double,double,ATMPARAM&) const override;
     std::filesystem::path GravityModelPath(const char*) const override;

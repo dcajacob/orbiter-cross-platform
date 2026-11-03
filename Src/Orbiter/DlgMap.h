@@ -8,7 +8,13 @@
 #ifndef __DLGMAP_H
 #define __DLGMAP_H
 
+#ifdef _WIN32
 #include "DlgMgr.h"
+#else
+#include "NativeVesselAPI.h"
+#include <memory>
+#endif
+struct CFG_MAPPRM;
 #include "VectorMap.h"
 
 class CelestialBody;

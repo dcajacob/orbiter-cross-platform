@@ -8,7 +8,11 @@
 #ifndef __DLGTACC_H
 #define __DLGTACC_H
 
+#ifdef _WIN32
 #include "OrbiterAPI.h"
+#else
+#include "NativeVesselAPI.h"
+#endif
 
 class DlgTacc : public ImGuiDialog {
 public:

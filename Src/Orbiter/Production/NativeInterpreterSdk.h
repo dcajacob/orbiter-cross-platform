@@ -59,6 +59,8 @@ class ScriptApplication {
 public:
     virtual ~ScriptApplication() = default;
     virtual bool Jump(double mjd, int mode) = 0;
+    virtual void Quicksave() = 0;
+    virtual void EndSession() = 0;
     virtual void Pause(bool paused) = 0;
     virtual void SetScriptFOV(double aperture) = 0;
     virtual bool BufferedKey(oapi::UInt32 key, const oapi::UInt32 *modifiers, oapi::UInt32 count, bool runningOnly) = 0;

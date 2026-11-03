@@ -10,14 +10,24 @@
 #include "Astro.h"
 #include "Element.h"
 #include "imgui.h"
+#ifdef _WIN32
 #include "imgui_extras.h"
+#else
+#include "Production/CockpitGuiExports.h"
+#include "Production/CockpitNativeSupport.h"
+#endif
+#include "Production/CockpitServices.h"
+#include "Base.h"
+#include "Planet.h"
+#include "Star.h"
+#include "Vessel.h"
 #include "IconsFontAwesome6.h"
 
-extern PlanetarySystem *g_psys;
+using orbiter::production::CockpitWorld;
 
 DlgInfo::DlgInfo() : ImGuiDialog(ICON_FA_CIRCLE_INFO " Orbiter: Object info", {753,423}) {
 	SetHelp("html/orbiter.chm", "/objinfo.htm");
-	m_SelectedTarget = g_psys->GetStar(0)->Name();
+	m_SelectedTarget = CockpitWorld()->GetStar(0)->Name();
 }
 
 void DlgInfo::AddCbodyNode(const CelestialBody *cbody) {
@@ -43,18 +53,18 @@ void DlgInfo::AddCbodyNode(const CelestialBody *cbody) {
 }
 
 void DlgInfo::DrawTree() {
-    for (int i = 0; i < g_psys->nStar(); i++)
-        AddCbodyNode (g_psys->GetStar(i));
+    for (int i = 0; i < CockpitWorld()->nStar(); i++)
+        AddCbodyNode (CockpitWorld()->GetStar(i));
 
     if (ImGui::TreeNode("Spaceports")) {
-        for (int i = 0; i < g_psys->nGrav(); i++) {
-            Body *obj = g_psys->GetGravObj (i);
+        for (int i = 0; i < CockpitWorld()->nGrav(); i++) {
+            Body *obj = CockpitWorld()->GetGravObj (i);
             if (obj->Type() != OBJTP_PLANET) continue;
             Planet *planet = (Planet*)obj;
-            if (g_psys->nBase(planet) > 0) {
+            if (CockpitWorld()->nBase(planet) > 0) {
 				if(ImGui::TreeNode(planet->Name())) {
-					for (int j = 0; j < g_psys->nBase(planet); j++) {
-						const char *name = g_psys->GetBase (planet,j)->Name();
+					for (int j = 0; j < CockpitWorld()->nBase(planet); j++) {
+						const char *name = CockpitWorld()->GetBase (planet,j)->Name();
 						const bool is_selected = m_SelectedTarget == name;
 						ImGuiTreeNodeFlags node_flags = ImGuiTreeNodeFlags_Leaf | ImGuiTreeNodeFlags_NoTreePushOnOpen;
 						if(is_selected) node_flags |= ImGuiTreeNodeFlags_Selected;
@@ -69,8 +79,8 @@ void DlgInfo::DrawTree() {
         ImGui::TreePop();
     }
     if (ImGui::TreeNode("Vessels")) {
-        for (int i = 0; i < g_psys->nVessel(); i++) {
-            const char *name = g_psys->GetVessel(i)->Name();
+        for (int i = 0; i < CockpitWorld()->nVessel(); i++) {
+            const char *name = CockpitWorld()->GetVessel(i)->Name();
             const bool is_selected = m_SelectedTarget == name;
             ImGuiTreeNodeFlags node_flags = ImGuiTreeNodeFlags_Leaf | ImGuiTreeNodeFlags_NoTreePushOnOpen;
             if(is_selected) node_flags |= ImGuiTreeNodeFlags_Selected;
@@ -83,17 +93,17 @@ void DlgInfo::DrawTree() {
 }
 
 void DlgInfo::DrawInfo() {
-    Vessel *vessel = g_psys->GetVessel(m_SelectedTarget.c_str(), true);
+    Vessel *vessel = CockpitWorld()->GetVessel(m_SelectedTarget.c_str(), true);
     if(vessel) {
         DrawInfoVessel(vessel);
         return;
     }
-    CelestialBody *cb = g_psys->GetGravObj(m_SelectedTarget.c_str(), true);
+    CelestialBody *cb = CockpitWorld()->GetGravObj(m_SelectedTarget.c_str(), true);
     if(cb) {
         DrawInfoCelestialBody(cb);
         return;
     }
-    Base *base = g_psys->GetBase(m_SelectedTarget.c_str(), true);
+    Base *base = CockpitWorld()->GetBase(m_SelectedTarget.c_str(), true);
     if(base) {
         DrawInfoBase(base);
         return;
@@ -465,7 +475,7 @@ void DlgInfo::DrawInfoVessel(Vessel *vessel) {
                 const GFieldData &gfd = vessel->GetGFieldData();
                 for (int i = 0; i < gfd.ngrav; i++) {
                     if (i) strcat (cbuf, ", ");
-                    strcat (cbuf, g_psys->GetGravObj(gfd.gravidx[i])->Name());
+                    strcat (cbuf, CockpitWorld()->GetGravObj(gfd.gravidx[i])->Name());
                 }
                 ImGui::TableNextRow();
                     ImGui::TableSetColumnIndex(0);
@@ -484,7 +494,7 @@ void DlgInfo::DrawInfoVessel(Vessel *vessel) {
 void DlgInfo::DrawInfoCelestialBody(CelestialBody *cbody) {
     const Elements *el = nullptr;
     const Planet *planet = nullptr;
-    const CELBODY *cb = cbody->GetModuleInterface();
+    const auto& celestial=orbiter::production::GetCelestialServices();
 
     switch (cbody->Type()) {
     case OBJTP_PLANET:
@@ -513,7 +523,7 @@ void DlgInfo::DrawInfoCelestialBody(CelestialBody *cbody) {
                 ImGui::TableSetColumnIndex(0);
                 ImGui::TextUnformatted("Solar System");
                 ImGui::TableSetColumnIndex(1);
-                const char *psys_name = g_psys->Name().c_str();
+                const char *psys_name = CockpitWorld()->Name().c_str();
                 ImGui::TextUnformatted(psys_name ? psys_name : "N/A");
 
             ImGui::EndTable();
@@ -592,20 +602,14 @@ void DlgInfo::DrawInfoCelestialBody(CelestialBody *cbody) {
     if(planet && planet->AtmParams() && ImGui::BeginAnimatedCollapsingHeader("Atmosphere", ImGuiTreeNodeFlags_DefaultOpen)) {
         if (ImGui::BeginTable("table celbody Atmosphere", 2, flags))
         {
-            char cbuf[128];
             const ATMCONST *ap = planet->AtmParams();
-            strcpy (cbuf, "Generic");
-            if (cb && cb->Version() >= 2) {
-                CELBODY2 *cb2 = (CELBODY2*)cb;
-                ATMOSPHERE *atm = cb2->GetAtmosphere();
-                if (atm) strcpy (cbuf, atm->clbkName());
-            }
+            const char* model=celestial.AtmosphereName(*cbody);
 
             ImGui::TableNextRow();
                 ImGui::TableSetColumnIndex(0);
                 ImGui::TextUnformatted("Atmosphere Model");
                 ImGui::TableSetColumnIndex(1);
-                ImGui::TextUnformatted(cbuf);
+                ImGui::TextUnformatted(model ? model : "Generic");
 
             ImGui::TableNextRow();
                 ImGui::TableSetColumnIndex(0);
@@ -683,7 +687,7 @@ void DlgInfo::DrawInfoCelestialBody(CelestialBody *cbody) {
         if (ImGui::BeginTable("table celbody Geocentric Celestial Position", 2, flags))
         {
             char cbuf[128];
-            Planet *earth = g_psys->GetPlanet ("Earth");
+            Planet *earth = CockpitWorld()->GetPlanet ("Earth");
 			Vector p (cbody->GPos() - earth->GPos());
 			double r   = p.length();
 			double lng = atan2 (p.z, p.x);
@@ -761,7 +765,7 @@ void DlgInfo::DrawInfoCelestialBody(CelestialBody *cbody) {
                     char cbuf[128];
                     cbuf[0] = '\0';
                     for (int i = 0; i < gfd.ngrav; i++) {
-                        strcat (cbuf, g_psys->GetGravObj(gfd.gravidx[i])->Name());
+                        strcat (cbuf, CockpitWorld()->GetGravObj(gfd.gravidx[i])->Name());
                         if (i < gfd.ngrav-1) strcat (cbuf, ", ");
                     }
                     ImGui::TableNextRow();
@@ -776,7 +780,7 @@ void DlgInfo::DrawInfoCelestialBody(CelestialBody *cbody) {
                     ImGui::TableSetColumnIndex(0);
                     ImGui::TextUnformatted("Mode");
                     ImGui::TableSetColumnIndex(1);
-                    ImGui::Text("Analytic (%s)", cb ? "from module" : "2-body");
+                    ImGui::Text("Analytic (%s)", celestial.HasModule(*cbody) ? "from module" : "2-body");
             }
 
             ImGui::EndTable();

@@ -66,6 +66,7 @@ public:
     virtual void CloseSession()=0;
     virtual void Close()=0;
     virtual SURFHANDLE LoadTextureResource(const char*,oapi::UInt32)=0;
+    virtual std::uint64_t GuiTextureId(SURFHANDLE)=0;
     virtual bool ReleaseTextureResource(SURFHANDLE)=0;
     virtual void StoreMesh(MESHHANDLE,const char*)=0;
     virtual void VisualEvent(OBJHANDLE,VISHANDLE,oapi::UInt32,std::uintptr_t)=0;

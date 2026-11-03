@@ -8,7 +8,11 @@
 #ifndef __DLGMENUCFG_H
 #define __DLGMENUCFG_H
 
+#ifdef _WIN32
 #include "OrbiterAPI.h"
+#else
+#include "NativeVesselAPI.h"
+#endif
 
 class DlgMenuCfg: public ImGuiDialog {
 public:

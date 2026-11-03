@@ -24,7 +24,28 @@ def scenario():
     return dg.replace('END_SHIPS','DG2:DG-S\n'+ship+'\nEND\nEND_SHIPS')
 
 
+# Use the original preferences file to display the same eight commands on
+# both hosts. Windows also captures the stock configuration in the other cases.
+MENU_ITEMS=('Ship','Camera','Speed','Pause','Function','Info','Options','Map','Record','Help','Save','Exit')
+TESTED_MENU={'Ship','Camera','Speed','Pause','Info','Map','Save','Exit'}
+CASES=[('hidden',1,0),('visible',0,0),('auto',2,0),('focus',0,0),('menu',1,0),('menu-auto',1,0)]
+
+def menu_preferences(path):
+    path.parent.mkdir(parents=True,exist_ok=True)
+    # The staged stock configuration can be a hard link to the original data.
+    if path.exists():path.unlink()
+    path.write_text(''.join(f'MenuItem{i} = {label}\nMenuItemEnabled{i} = {"TRUE" if label in TESTED_MENU else "FALSE"}\n'
+                            for i,label in enumerate(MENU_ITEMS,1)))
+
+
 def inputs(name):
+    if name=='menu-auto':
+        return [(0,'move',640,5),(23,'move',400,350)]
+    if name=='menu':
+        actions=[(0,'move',400,350)]
+        for tick,x,y in [(24,463,25),(32,102,175),(40,288,159)]:
+            actions.extend([(tick,'move',x,y),(tick+1,'left_down',x,y),(tick+2,'left_up',x,y)])
+        return actions
     if name!='focus':
         return [(0,'move',400,5),(23,'move',400,350)]
     # Both hosts render the original 300x320 dialog at 1280x720.
@@ -36,10 +57,12 @@ def inputs(name):
 
 def execute(args,name,mode,fps):
     out=args.output/name
-    config=f'\nFPS = {fps}\nMenubarMode = 1\nInfobarMode = {mode}\nInstrumentUpdateInterval = 0.25\n'
+    menu_mode={'menu':0,'menu-auto':2}.get(name,1)
+    config=f'\nFPS = {fps}\nMenubarMode = {menu_mode}\nInfobarMode = {mode}\nInstrumentUpdateInterval = 0.25\n'
     actions=inputs(name)
     if args.original:
         def configure(directory):
+            if menu_mode!=1:menu_preferences(directory/'Config/MenuInfoBar.cfg')
             master=directory/'Orbiter.cfg'
             master.write_text(master.read_text().replace('  ProductionBehaviorDriver','  ProductionCockpitDriver\n  OGLClient')+config)
             (directory/'Scenarios/Behavior.scn').write_text(scenario())
@@ -51,6 +74,7 @@ def execute(args,name,mode,fps):
         require((out/'cockpit-complete.txt').read_text().strip()=='60','Incomplete original focus/info run')
     else:
         out.mkdir()
+        if menu_mode!=1:menu_preferences(out/'ScriptFiles/config/menuinfobar.cfg')
         (out/'flight.scn').write_text(scenario())
         (out/'Orbiter.cfg').write_text((HERE.parent/'NativeScene/Orbiter.cfg').read_text()+config)
         (out/'instrument-evidence.enabled').touch()
@@ -72,11 +96,12 @@ def execute(args,name,mode,fps):
     with (out/'cockpit-state.csv').open() as f: states=list(csv.DictReader(f))
     require([int(r['tick']) for r in states]==list(range(61)),'Missing finalized cockpit sample')
     changes=[r['object'] for i,r in enumerate(states) if i==0 or r['object']!=states[i-1]['object']]
-    require(changes==(['DG','DG2','DG'] if name=='focus' else ['DG']),'Incorrect spacecraft selection: '+str(changes))
+    require(changes=={'focus':['DG','DG2','DG'],'menu':['DG','DG2']}.get(name,['DG']),'Incorrect spacecraft selection: '+str(changes))
     require(all(r['cockpit']=='2' and r['class']==('DG-S' if r['object']=='DG2' else 'DeltaGlider') for r in states),
             'Missing real focused spacecraft or 2D panel')
     if name=='focus':
         require(states[20]['object']=='DG2' and states[50]['object']=='DG','Select or Previous failed')
+    if name=='menu':require(states[50]['object']=='DG2','Visible menu failed to select DG-S')
     return changes
 
 
@@ -119,7 +144,11 @@ def pixels(root,name,frame):
 
 def compare_case(original,native,name):
     with (original/name/'cockpit-state.csv').open() as source,(native/name/'cockpit-state.csv').open() as actual:
-        require(list(csv.DictReader(source))==list(csv.DictReader(actual)),name+' differs from original cockpit state')
+        expected=list(csv.DictReader(source));observed=list(csv.DictReader(actual))
+        require(len(expected)==len(observed),name+' cockpit sample count differs')
+        for left,right in zip(expected,observed):
+            for key,value in left.items():
+                require(value==right[key],f'{name} tick {left["tick"]} {key}: Windows {value}, native {right[key]}')
     scores={f:image_ssim(pixels(original,name,f),pixels(native,name,f),1280,720) for f in (20,50)}
     require(min(scores.values())>=.98,name+' differs from original rendered instruments')
     return scores
@@ -130,7 +159,11 @@ def main():
     if sys.argv[1:2]==['compare']:
         for key in ('original','native','output'):p.add_argument('--'+key,type=Path,required=True)
         a=p.parse_args(sys.argv[2:])
-        results={name:compare_case(a.original,a.native,name) for name in ('hidden','visible','auto','focus')}
+        from recorded_flights import require_matching_math
+        results={}
+        for name,*_ in CASES:
+            require_matching_math(a.original/name,a.native/name)
+            results[name]=compare_case(a.original,a.native,name)
         a.output.write_text(json.dumps(results,indent=2)+'\n')
         return
     for name in ('executable','data','planets','output'):p.add_argument('--'+name,type=Path,required=True)
@@ -147,7 +180,7 @@ def main():
     else:require(a.modules and a.assets,'Native runs require the real modules and resources')
     a.output.mkdir(parents=True,exist_ok=False)
     report={}
-    for name,mode,fps in [('hidden',1,0),('visible',0,0),('auto',2,0),('focus',0,0)]:
+    for name,mode,fps in CASES:
         report[name]=dict(focus=execute(a,name,mode,fps))
         if a.reference:
             report[name]['original_frame_ssim']=compare_case(a.reference,a.output,name)
@@ -160,6 +193,13 @@ def main():
                         for y in range(660,720)),'Missing time or target readout')
         auto=pixels(a.output,'auto',frame)
         require(auto==(visible if frame==20 else hidden),'Info bars failed to reveal or hide on pointer movement')
+    # The stock menu is drawn at the top of the bottom-up RGBA buffer.
+    def menu_strip(name,frame):
+        image=pixels(a.output,name,frame)
+        return b''.join(image[(y*1280+400)*4:(y*1280+900)*4] for y in range(665,720))
+    require(menu_strip('menu',20)!=menu_strip('hidden',20),'Missing visible stock menu')
+    require(menu_strip('menu-auto',20)!=menu_strip('hidden',20),'Stock menu did not reveal on hover')
+    require(menu_strip('menu-auto',50)==menu_strip('hidden',50),'Stock menu did not retract')
     if a.original:original_general_api(a,pin['application_source'])
     (a.output/'focus-bars-report.json').write_text(json.dumps(report,indent=2)+'\n')
     print(json.dumps(report,indent=2))

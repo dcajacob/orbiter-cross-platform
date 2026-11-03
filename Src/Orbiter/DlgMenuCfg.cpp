@@ -7,14 +7,28 @@
 
 #include "DlgMenuCfg.h"
 #include "MenuInfoBar.h"
+#ifdef _WIN32
 #include "Pane.h"
+#endif
 #include "imgui.h"
+#ifdef _WIN32
 #include "imgui_extras.h"
+#else
+#include "Production/CockpitGuiExports.h"
+#endif
+#ifdef _WIN32
 #include "Orbiter.h"
+#else
+#include "Production/NativeGraphics.h"
+#include "Production/NativeCockpitUi.h"
+#include "Config.h"
+#endif
 #include "IconsFontAwesome6.h"
 
+#ifdef _WIN32
 extern Orbiter *g_pOrbiter;
 extern Pane *g_pane;
+#endif
 
 DlgMenuCfg::DlgMenuCfg(): ImGuiDialog(ICON_FA_SLIDERS " Orbiter: Configure menu bars")
 {
@@ -25,8 +39,13 @@ void DlgMenuCfg::OnDraw()
 {
 	const char *modes[] = {"Show", "Hide", "Auto-hide"};
 
+#ifdef _WIN32
 	CFG_UIPRM &prm = g_pOrbiter->Cfg()->CfgUIPrm;
 	MenuInfoBar *mib = g_pane->MIBar();
+#else
+    auto& prm=orbiter::production::GetNativeRenderContext().configuration->CfgUIPrm;
+    auto* mib=&orbiter::production::CockpitMenuBar();
+#endif
 
 	if(ImGui::BeginTabBar("##MenuCfgTab")) {
 		if(ImGui::BeginTabItem("Appearance")) {
@@ -68,11 +87,11 @@ void DlgMenuCfg::OnDraw()
 		if(ImGui::BeginTabItem("Menu items")) {
 			ImGui::BeginChild("##Child");
 			bool changed = false;
-			for(auto &pref: g_pane->MIBar()->GetPreferences()) {
+			for(auto &pref: mib->GetPreferences()) {
 				changed |= ImGui::Checkbox(pref.label.c_str(), &pref.enabled);
 			}
 			if(changed)
-				g_pane->MIBar()->SyncPreferences();
+				mib->SyncPreferences();
 			ImGui::EndChild();
 			ImGui::EndTabItem();  
 		}

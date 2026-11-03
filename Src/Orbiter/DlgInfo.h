@@ -7,7 +7,11 @@
 
 #ifndef __DLGINFO_H
 #define __DLGINFO_H
+#ifdef _WIN32
 #include "OrbiterAPI.h"
+#else
+#include "NativeVesselAPI.h"
+#endif
 
 class CelestialBody;
 class Vessel;

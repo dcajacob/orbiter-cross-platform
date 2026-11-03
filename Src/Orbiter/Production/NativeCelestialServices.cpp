@@ -47,6 +47,10 @@ int NativeCelestialServices::Ephemeris(const CelestialBody& body,double time,int
 {return Interface(body).clbkEphemeris(time,request,result);}
 int NativeCelestialServices::FastEphemeris(const CelestialBody& body,double time,int request,double* result) const
 {return Interface(body).clbkFastEphemeris(time,request,result);}
+const char* NativeCelestialServices::AtmosphereName(const CelestialBody& body) const {
+    auto* atmosphere=HasModule(body) ? Interface(body).GetAtmosphere() : nullptr;
+    return atmosphere ? atmosphere->clbkName() : nullptr;
+}
 int NativeCelestialServices::AtmosphereModel(const CelestialBody& body,ATMCONST& result) const
 {
     if (!HasModule(body)) return 0;

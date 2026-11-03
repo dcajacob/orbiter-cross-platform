@@ -19,8 +19,22 @@ corners. The auto-hide capture matched the visible frame with the pointer over
 the bars and the hidden frame after it moved away. Native rendering checks,
 a preserved-Windows diagnostic and optional exact state/image comparison live
 in `Tests/Production/CockpitUI/focus_bars.py`. Windows comparison of this
-addition, the main menu and the original Windows cross-build control gate
-remain open.
+addition passed with the automatic CPU profile in both configurations. The
+forced-SSE2 capture first differed from the automatic Windows trace in the
+orientation matrix at tick 38. The paired workflow now also captures Windows
+with SSE2 selected. [Hosted spacecraft comparisons](https://github.com/dcajacob/orbiter-cross-platform/actions/runs/41563089040)
+
+The native cockpit now draws the original dynamic menu and stock PNG icons.
+Ship, Camera, Speed, Pause, Info, Map, Save and Exit are connected. In a local
+X11 flight, mouse clicks paused and resumed the DG, changed the clock to 10×,
+switched focus to DG-S, and opened the original camera, object information,
+map and menu configuration dialogs. The saved scenario contains the selected
+DG-S and camera. F4 switched the menu between visible and auto-hide modes.
+Dragging Ship past Camera persisted their new order. Exit closed the graphics
+context after all 162 frame presentations. The sanitizer run completed 125
+frame presentations, with two 56-byte allocations originating in Mesa
+libgallium 26.0.8 at offsets `0xef1ba0` and `0xef1b89`. Function, Options,
+Record and Help remain open.
 [Delta-glider flight evidence](DeltaGlider.md)
 
 The pre-extraction reference gate is accepted in
