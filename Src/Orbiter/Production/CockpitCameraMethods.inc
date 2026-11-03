@@ -23,13 +23,13 @@ void VESSEL::SetCameraCatchAngle (double cangle) const
 
 void VESSEL::TriggerPanelRedrawArea (int panel_id, int area_id)
 {
-	if (orbiter::production::CockpitPane() && vessel == orbiter::production::CockpitFocus())
+	if (orbiter::production::ActiveCockpitPane() && vessel == orbiter::production::CockpitFocus())
 		orbiter::production::CockpitPane()->TriggerPanelRedrawArea (panel_id, area_id);
 }
 
 void VESSEL::TriggerRedrawArea (int panel_id, int vc_id, int area_id)
 {
-	if (orbiter::production::CockpitPane() && vessel == orbiter::production::CockpitFocus())
+	if (orbiter::production::ActiveCockpitPane() && vessel == orbiter::production::CockpitFocus())
 		orbiter::production::CockpitPane()->TriggerRedrawArea (panel_id, vc_id, area_id);
 }
 

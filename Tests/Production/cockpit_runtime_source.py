@@ -11,6 +11,7 @@ def canonical(text):
     for a,b in [('oapi::CockpitClient','oapi::GraphicsClient'),('oapi::UInt32','DWORD'),('oapi::UInt ','UINT '),('oapi::SdkRectangle','RECT'),
         ('orbiter::production::CockpitGraphicsClient()','g_pOrbiter->GetGraphicsClient()'),
         ('orbiter::production::CockpitCamera()','g_camera'),('orbiter::production::CockpitFocus()','g_focusobj'),
+        ('orbiter::production::ActiveCockpitPane()','g_pane'),
         ('orbiter::production::CockpitPane()','g_pane')]:text=text.replace(a,b)
     return text
 def callbacks():
