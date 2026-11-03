@@ -1,0 +1,13 @@
+{
+  "schema": 1,
+  "application_source": "f725194209634f7fd5d1d44d426cfa9b5e303e37",
+  "scenario": "Tests/VesselApiTest.scn",
+  "scenario_sha256_lf": "767afa8100a43608c4771fe2dbe5cc3a11045a693a65f77955dd76f4132d3aaf",
+  "script": "Script/Tests/VesselApiTest.lua",
+  "script_sha256_lf": "e0697e564d224aaaf5e0e74a59c8c38375a95ec9e6a8cb19f2c69c139c3b6170",
+  "fixed_step": 0.25,
+  "frames": 60,
+  "repeats": 2,
+  "expected_exit_code": 0,
+  "acceptance": "Original intentional exit must be observed and pinned before changing stock-corpus termination policy. Ordinary stock scenarios retain the sixty-frame requirement."
+}

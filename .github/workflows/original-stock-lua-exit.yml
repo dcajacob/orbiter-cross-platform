@@ -1,0 +1,101 @@
+name: Preserved Windows Stock Lua Exit
+on:
+  push:
+    branches: ['codex/production-**']
+    paths: ['Tests/Production/NativeLua/StockExit/**', '.github/workflows/original-stock-lua-exit.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: original-stock-lua-exit-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  original_exit:
+    name: Original stock Lua exit ${{ matrix.configuration }} ${{ matrix.math_profile }}
+    runs-on: windows-2022
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        configuration: [Debug, Release]
+        math_profile: [automatic, sse2]
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - uses: ilammy/msvc-dev-cmd@v1
+        with:
+          vsversion: '17.0'
+          arch: x64
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.14'
+      - uses: actions/cache@v6
+        with:
+          path: out/cockpit-cache
+          key: original-cockpit-control-runtime-${{ matrix.configuration }}-${{ hashFiles('Tests/Production/Cockpit/Reference/provenance.json') }}
+      - uses: actions/cache@v6
+        with:
+          path: out/data-cache/Orbiter-x64.zip
+          key: production-data-${{ hashFiles('Tests/Production/stock-data.lock.json') }}
+      - uses: actions/cache@v6
+        with:
+          path: out/planet-cache/Orbiter2016.zip
+          key: production-standard-planets-${{ hashFiles('Tests/Production/standard-planets.lock.json') }}
+      - uses: actions/cache@v6
+        with:
+          path: out/mesa-cache/*.pkg.tar.zst
+          key: mesa-ucrt64-${{ hashFiles('Tests/Production/mesa-ucrt64.lock.json') }}
+      - name: Stage unchanged application, SDK, client, data and software OpenGL
+        shell: pwsh
+        run: |
+          python -B Tests/Production/prepare_data.py --archive out/data-cache/Orbiter-x64.zip --destination out/production-data
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          python -B Tests/Production/prepare_data.py --lock Tests/Production/standard-planets.lock.json --archive out/planet-cache/Orbiter2016.zip --destination out/standard-planets
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          python -B Tests/Production/stage_mesa.py stage --cache out/mesa-cache --destination out/mesa-runtime
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          python -B Tests/Production/CockpitControls/prepare.py --configuration ${{ matrix.configuration }} --cache out/cockpit-cache --output out/stock-exit-runtime
+          exit $LASTEXITCODE
+      - name: Build only the public SDK stock exit observer
+        shell: pwsh
+        run: |
+          cmake -S Tests/Production/NativeLua/StockExit -B out/stock-exit-driver -G Ninja -DCMAKE_BUILD_TYPE=${{ matrix.configuration }} -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DORBITER_TEST_RUNTIME="$pwd/out/stock-exit-runtime"
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          cmake --build out/stock-exit-driver --parallel 2
+          exit $LASTEXITCODE
+      - name: Select original SSE2 CRT when requested
+        if: matrix.math_profile == 'sse2'
+        shell: pwsh
+        run: '"ORBITER_TEST_OBSERVER_SSE2=1" >> $env:GITHUB_ENV'
+      - name: Observe intentional exit in the unchanged full vessel API scenario twice
+        run: >-
+          python -B Tests/Production/NativeLua/StockExit/capture.py --original
+          --executable out/stock-exit-runtime/Orbiter.exe --data out/production-data
+          --planets out/standard-planets --mesa out/mesa-runtime
+          --configuration ${{ matrix.configuration }} --math-profile ${{ matrix.math_profile }}
+          --output out/stock-exit-original
+      - name: Reject partial assertions, vessels, ports, altered scenarios and forged exit results
+        run: >-
+          python -B Tests/Production/NativeLua/StockExit/Gate.Test.py
+          --capture out/stock-exit-original/run-1 --host original-windows
+          --output out/stock-exit-original/gate-control.json
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: original-stock-lua-exit-${{ matrix.configuration }}-${{ matrix.math_profile }}
+          retention-days: 90
+          path: |
+            out/stock-exit-original/capture.json
+            out/stock-exit-original/gate-control.json
+            out/stock-exit-original/*/*.csv
+            out/stock-exit-original/*/*.json
+            out/stock-exit-original/*/*.txt
+            out/stock-exit-original/*/*.log
+            out/stock-exit-original/*/Scenarios/Behavior.scn
+            out/stock-exit-original/*/Orbiter.cfg
+            out/stock-exit-runtime/control-reference-runtime.json
+            out/stock-exit-runtime/test-runtime.json
+            out/stock-exit-runtime/Modules/Plugin/ProductionCockpitDriver.dll
+            out/stock-exit-driver/CMakeCache.txt
+            out/stock-exit-driver/compile_commands.json
