@@ -10,6 +10,19 @@ the native vessel and cockpit camera through five unchanged DG scenarios.
 The tutorial text is drawn and both automatic and pilot-commanded returns
 to free flight pass locally.
 
+The native graphics leak now has an isolated source fix and a passing local
+sanitizer menu flow. Mesa's executable-code allocator retained two bookkeeping
+objects (112 bytes) and a 10 MiB mapping after its last generated function was
+freed. A checksum-pinned Mesa 26.0.8 candidate releases both under the existing
+allocator mutex. The unpatched source reproduces the leak; the patched source
+passes standalone EGL teardown, overlapping live-code ownership, failed
+allocation cleanup and 4,000 concurrent allocations. The complete ASan
+menu/Help flow and fresh Options reload pass with the candidate explicitly
+selected, without suppressions. This is an isolated software-driver result;
+the system driver is unchanged and broader platform qualification remains open.
+[Reproduction, patch and build instructions](../../Tests/Production/GraphicsDriverLifetime/README.md)
+Earlier system-driver failures below are retained as historical evidence.
+
 The cockpit now draws the original target, time and frame-rate displays and
 opens the original spacecraft selection dialog on F3. A two-vessel run used
 the dialog to select DG-S and then return to DG. Both the control focus and the

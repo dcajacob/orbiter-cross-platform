@@ -1,0 +1,77 @@
+--- a/src/gallium/auxiliary/rtasm/rtasm_execmem.c
++++ b/src/gallium/auxiliary/rtasm/rtasm_execmem.c
+@@ -70,15 +70,42 @@
+ static int
+ init_heap(void)
+ {
++   if (exec_heap)
++      return 1;
++
++   exec_heap = u_mmInit(0, EXEC_HEAP_SIZE);
+    if (!exec_heap)
+-      exec_heap = u_mmInit( 0, EXEC_HEAP_SIZE );
+-
+-   if (!exec_mem)
+-      exec_mem = (unsigned char *) mmap(NULL, EXEC_HEAP_SIZE,
+-         PROT_EXEC | PROT_READ | PROT_WRITE,
+-         MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
+-
+-   return (exec_mem != MAP_FAILED);
++      return 0;
++
++   exec_mem = (unsigned char *) mmap(NULL, EXEC_HEAP_SIZE,
++      PROT_EXEC | PROT_READ | PROT_WRITE,
++      MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
++   if (exec_mem == MAP_FAILED) {
++      u_mmDestroy(exec_heap);
++      exec_heap = NULL;
++      exec_mem = NULL;
++      return 0;
++   }
++
++   return 1;
++}
++
++
++/* Called with exec_mutex held. u_mmFreeMem coalesces adjacent free blocks,
++ * so one free block means no generated function still owns this mapping.
++ * Keep the heap while any function is live, but release it when the last
++ * owner goes away instead of leaking it when the driver is unloaded.
++ */
++static void
++release_empty_heap(void)
++{
++   if (exec_heap && exec_heap->next == exec_heap->prev &&
++       exec_heap->next->free) {
++      munmap(exec_mem, EXEC_HEAP_SIZE);
++      u_mmDestroy(exec_heap);
++      exec_mem = NULL;
++      exec_heap = NULL;
++   }
+ }
+ 
+ 
+@@ -100,8 +127,10 @@
+ 
+    if (block)
+       addr = exec_mem + block->ofs;
+-   else
++   else {
+       debug_printf("rtasm_exec_malloc failed\n");
++      release_empty_heap();
++   }
+ 
+ bail:
+    simple_mtx_unlock(&exec_mutex);
+@@ -118,8 +147,10 @@
+    if (exec_heap) {
+       struct mem_block *block = u_mmFindBlock(exec_heap, (unsigned char *)addr - exec_mem);
+ 
+-      if (block)
++      if (block) {
+          u_mmFreeMem(block);
++         release_empty_heap();
++      }
+    }
+ 
+    simple_mtx_unlock(&exec_mutex);

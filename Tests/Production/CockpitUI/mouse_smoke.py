@@ -332,7 +332,10 @@ def main():
                         records=list(csv.DictReader((out/'control-inputs.csv').open()))
                         return len(records)>before and records[-1].get('event')==event and records[-1].get('x')==str(px) and records[-1].get('y')==str(py)
                     wait(processed,'GLFW did not process the declared mouse event')
-                    advance()
+                    # The ImGui backend queues both edges. Holding the button
+                    # for extra rendered frames can trigger its repeat timer
+                    # under sanitizers, turning a single click into two steps.
+                    if not down:advance()
             if a.stock_menu:
                 def move(px,py):
                     x.XWarpPointer(display,0,window,0,0,0,0,px,py);x.XFlush(display);advance()

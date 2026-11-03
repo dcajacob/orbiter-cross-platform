@@ -1,5 +1,6 @@
 """Build the test-only public-SDK custom function module against this engine."""
 from pathlib import Path
+import os
 import subprocess
 import shlex
 
@@ -23,4 +24,6 @@ def build_probe(build,output):
         runtime=Path(subprocess.check_output([compiler,'-print-file-name=libasan.so'],text=True).strip())
         if not runtime.is_file():raise ValueError('Cannot locate the matching address-sanitizer runtime')
         preload.insert(0,str(runtime.resolve()))
-    return dict(LD_PRELOAD=':'.join(preload),LD_LIBRARY_PATH=str(build))
+    libraries=[str(build)]
+    if os.environ.get('LD_LIBRARY_PATH'):libraries.append(os.environ['LD_LIBRARY_PATH'])
+    return dict(LD_PRELOAD=':'.join(preload),LD_LIBRARY_PATH=os.pathsep.join(libraries))
