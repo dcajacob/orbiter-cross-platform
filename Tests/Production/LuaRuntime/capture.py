@@ -44,7 +44,7 @@ def validate(directory,case):
     expected+=['sync_override','async_one','async_two']+[f'yield_{i}' for i in range(1,5)]+['yield_done']
     if case['target']=='DG':
         expected+=['aap_started']
-        if 'stock_atmosphere' in case:expected+=['aap_retargeted']
+        if 'stock_atmosphere' in case:expected+=['aap_retargeted','aap_slowed']
         expected+=['aap_stopped']
     expected+=['complete']
     require([row['event'] for row in events]==expected,'Original Lua event sequence differs')
@@ -62,9 +62,11 @@ def validate(directory,case):
             air=rows(directory/'lua-air.csv')
             require(len(air)==61 and all(float(r['density'])>0 and float(r['dynamic_pressure'])>0 for r in air),
                     'Original stock AAP fixture is not in atmospheric flight')
-            require(min(float(r['main']) for r in control[31:39]) < float(control[30]['main']) and
-                    max(float(r['main']) for r in control[40:46]) > min(float(r['main']) for r in control[31:39]),
-                    'Original speed controller did not reduce then restore actual thrust')
+            # Both original states reach idle at the low target. DG-S is already
+            # at idle before AAP starts. Retarget twice to exercise both directions.
+            require(all(float(r['main'])==0 for r in control[32:39]), 'Original low speed target did not idle main thrust')
+            require(all(float(r['main'])==1 for r in control[40:43]), 'Original high speed target did not engage full main thrust')
+            require(all(float(r['main'])==0 for r in control[44:46]), 'Original lower speed retarget did not return main thrust to idle')
         else:
             require(max(float(r['main']) for r in control[31:46]) > float(control[30]['main']), 'Original AAP did not apply main thrust')
         for key in ('elevator','aileron'):

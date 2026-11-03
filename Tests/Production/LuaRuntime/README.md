@@ -13,7 +13,7 @@ with the existing vessel states, instrument text, geometry and rendered images.
 The orbital fixtures isolate scheduling and SDK bindings. Two additional
 fixtures use the actual atmospheric vessel state blocks from Animated control
 surfaces and Cruising above Florida at the common reference epoch. They require
-positive density/dynamic pressure, speed-command retargeting and real control
+positive density/dynamic pressure, low/high/low speed-command retargeting and real control
 surface rundown. They are reduced fixtures, distinct from complete stock
 scenario acceptance.
 

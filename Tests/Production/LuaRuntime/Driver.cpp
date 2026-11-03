@@ -111,6 +111,8 @@ public:
         }
         if(frames==38 && profile=="atmosphere")
             require(oapiAsyncScriptCmd(script,"aap.spd(airspeed()+50); audit('aap_retargeted')"),"Original AAP speed retarget failed");
+        if(frames==42 && profile=="atmosphere")
+            require(oapiAsyncScriptCmd(script,"aap.spd(airspeed()-25); audit('aap_slowed')"),"Original AAP speed reduction failed");
         if(frames==45) {
             require(oapiDelInterpreter(secondary)==0,"Original secondary interpreter deletion failed");secondary=nullptr;
             if(target=="DG")require(oapiAsyncScriptCmd(script,"aap.alt(); aap.spd(); aap.bank(); audit('aap_stopped')"),"Original AAP stop failed");
