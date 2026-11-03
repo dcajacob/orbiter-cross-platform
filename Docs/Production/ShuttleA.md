@@ -144,3 +144,21 @@ four original build/CRT profiles with the preserved application, SDK and client.
 Those original captures, their artifact audit and native comparisons remain
 pending. The new fixture does not qualify mouse operation, pod controls,
 parachute deployment, the editor or overall Phase 6 acceptance.
+
+The observer sources matching pushed commit `8c5b87fb` also pass all sixteen
+sessions with the engine, renderer and observer instrumented: 912 presents,
+5,568 all-vessel rows, normal context deletion and zero ASan/UBSan/LSan findings.
+Actual Fontconfig, Mesa EGL and GDK candidate mappings are verified in every
+process. Both cockpit repetitions have exact state traces and byte-identical
+repeated full frames. The first instrumented observer incorrectly passed its
+preload to GTK's sandboxed image helper; limiting the test preload to the
+observed process preserves the loaded instrumentation and normal helper startup.
+The failed baseline is retained. Production binaries are unchanged.
+
+The [controls verification record](ShuttleAControlsVerification.json) identifies
+the captures and open gates. Its verified local evidence archive contains
+41,821,515 bytes and 1,456 members, SHA-256
+`cb76a3a6a12be7a0c1874b329fd95ff6d505b916cc570a8458e3940e742676fe`.
+It includes raw captures, observer sources and replay recipes, and refers to the
+previous archive for the matching retained runtime binaries. Asset/font
+collections are excluded. Remote preservation remains pending.

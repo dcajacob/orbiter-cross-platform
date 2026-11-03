@@ -1,0 +1,144 @@
+{
+  "schema": 1,
+  "phase6_complete": false,
+  "status": "local-controls-and-persistence-passed",
+  "runtime_code_commit": "09eeed2091b36b18681cd10616b608248008ddaa",
+  "instrumented_observer_source_matches_commit": "8c5b87fb3afbd8bdcec8097eb4dbd97d9c7f42ef",
+  "source_audit": "477 extraction files and all 40 original Shuttle-A implementation/header files pass; production code unchanged",
+  "fixture": {
+    "path": "Scenarios/Shuttle-A/ISS Approach.scn",
+    "sha256_lf": "f50e52d1b7d5490b375fca22359404c8d1e2922ac0f7c69a7afad8f464b464e3",
+    "vessels": 6,
+    "scenario_unchanged": true,
+    "mechanisms": [
+      "docking hatch",
+      "outer airlock",
+      "inner airlock",
+      "landing gear"
+    ],
+    "cockpits": [
+      "panel",
+      "VC via ordinary F8"
+    ],
+    "phases": {
+      "moving": 16,
+      "resume": 96,
+      "retract": 112,
+      "restored": 4
+    },
+    "fixed_step_seconds": 0.25
+  },
+  "preliminary_release": {
+    "status": "passed",
+    "processes": 16,
+    "presents": 912,
+    "finalized_all_vessel_rows": 5568,
+    "report": {
+      "path": "out/phase6-shuttle-a-controls-native-v2/capture/controls-report.json",
+      "sha256": "417ab2ae326005e6653dc7f88995bebe45d606d57b4aecf4ca3eaacf3e7b4a3e"
+    },
+    "observer_sources": "out/phase6-shuttle-a-controls-native-v2/observer-source",
+    "exact_repeated_state_traces": true,
+    "all_four_repeated_full_frame_pairs_byte_identical": true,
+    "repeat_ssim": {
+      "shuttle_a_panel": {
+        "resume": 1.0,
+        "retract": 1.0
+      },
+      "shuttle_a_vc": {
+        "resume": 1.0,
+        "retract": 1.0
+      }
+    }
+  },
+  "instrumented": {
+    "status": "passed",
+    "processes": 16,
+    "presents": 912,
+    "finalized_all_vessel_rows": 5568,
+    "sanitizer_findings": 0,
+    "engine_and_renderer_and_observer_instrumented": true,
+    "leak_detection_enabled": true,
+    "suppressions": [],
+    "sources_and_runtime_unchanged": true,
+    "report": {
+      "path": "out/phase6-shuttle-a-controls-asan-v2/capture/controls-report.json",
+      "sha256": "6d220edf780ef04636307f384f6ce31c723776220ec503425969ba8781321ad2"
+    },
+    "verification": {
+      "path": "out/phase6-shuttle-a-controls-asan-v2/verification.json",
+      "sha256": "79e683ecfed10f606cecdee54c75ed86ce0c17bbfa455934a0403c3e1478577b"
+    },
+    "actual_library_mappings": {
+      "path": "out/phase6-shuttle-a-controls-asan-v2/module-verification.json",
+      "sha256": "47da4df7bd2104fd2952800abe8a945e2c725a74d24683127832fbd1ed75157b"
+    },
+    "exact_repeated_state_traces": true,
+    "all_four_repeated_full_frame_pairs_byte_identical": true,
+    "repeat_ssim": {
+      "shuttle_a_panel": {
+        "resume": 1.0,
+        "retract": 1.0
+      },
+      "shuttle_a_vc": {
+        "resume": 1.0,
+        "retract": 1.0
+      }
+    }
+  },
+  "negative_controls": {
+    "status": "passed",
+    "verification": {
+      "path": "out/phase6-shuttle-a-controls-gate-v2/verification.json",
+      "sha256": "b4f4b5269f123fa49ff5b252a53d4aca454c8c500b328b6c420d4d061144b6b9"
+    },
+    "rejected": [
+      "missing background station",
+      "missing attachment port",
+      "missing mechanism sample",
+      "wrong cockpit",
+      "forged saved position"
+    ],
+    "original_capture_unchanged": true
+  },
+  "retained_failures": [
+    {
+      "path": "out/phase6-shuttle-a-controls-native-v1",
+      "reason": "Short fixture completed before the renderer wrote its tick-50 module list; observer now records actual mappings on its first update"
+    },
+    {
+      "path": "out/phase6-shuttle-a-controls-asan-v1",
+      "reason": "Application-specific preload inherited by GTK image helper; corrected observer limits the preload to its own already instrumented process"
+    }
+  ],
+  "original_windows": {
+    "application_source": "f725194209634f7fd5d1d44d426cfa9b5e303e37",
+    "producer_commit": "8c5b87fb3afbd8bdcec8097eb4dbd97d9c7f42ef",
+    "workflow": "https://github.com/dcajacob/orbiter-cross-platform/actions/runs/41710973164",
+    "status": "all-four-jobs-executing-at-checkpoint",
+    "artifacts_audited": false,
+    "native_comparison_qualified": false,
+    "frozen_initial_scene_references_unchanged": true
+  },
+  "archive": {
+    "status": "passed",
+    "path": "out/phase6-shuttle-a-controls-evidence-v1.tar.gz",
+    "bytes": 41821515,
+    "sha256": "cb76a3a6a12be7a0c1874b329fd95ff6d505b916cc570a8458e3940e742676fe",
+    "members": 1456,
+    "index_sha256": "19a851b173fef26275b1e70877e7532e5ee08b5462519d19a962ad8d6240bd37",
+    "font_and_asset_collections_included": false,
+    "remote_preservation": "pending"
+  },
+  "open_gates": {
+    "original_controls": "Four-profile artifact audit and native comparison pending",
+    "native_controls": "Debug/SSE2 profiles and wider input acceptance pending",
+    "mouse_and_pods": "Unverified",
+    "payload_deployment_and_reload": "Unverified",
+    "native_shuttle_a_editor": "Unimplemented",
+    "physical_controller": "Unavailable per user; unverified",
+    "stock_corpus": "Full admitted-corpus capture still running; no overall stock acceptance claimed",
+    "broader_phase6": "Current full hosted matrix, final hardware performance/input and wider lifetime acceptance remain open",
+    "remote_preservation": "Pending"
+  }
+}
