@@ -10,6 +10,14 @@ from frozen_controls import metadata
 from mesa_runtime import digest
 DRIVER_SHA256=digest(Path(__file__))
 
+class WindowAttributes(C.Structure):
+    _fields_=[('background_pixmap',C.c_ulong),('background_pixel',C.c_ulong),
+              ('border_pixmap',C.c_ulong),('border_pixel',C.c_ulong),
+              ('bit_gravity',C.c_int),('win_gravity',C.c_int),('backing_store',C.c_int),
+              ('backing_planes',C.c_ulong),('backing_pixel',C.c_ulong),('save_under',C.c_int),
+              ('event_mask',C.c_long),('do_not_propagate_mask',C.c_long),
+              ('override_redirect',C.c_int),('colormap',C.c_ulong),('cursor',C.c_ulong)]
+
 def main():
     p=argparse.ArgumentParser(description=__doc__)
     cases=json.loads((HERE/'cases.json').read_text())['cases']
@@ -53,11 +61,23 @@ def main():
     callback=C.CFUNCTYPE(C.c_int,C.c_void_p,C.POINTER(XError))
     @callback
     def xerror(display,event):
-        if event.contents.error_code!=3:x_errors.append(int(event.contents.error_code))
+        error=event.contents
+        if error.error_code!=3:x_errors.append(dict(code=int(error.error_code),request=int(error.request_code),
+                                                   minor=int(error.minor_code),resource=int(error.resourceid)))
         return 0
     x.XSetErrorHandler.argtypes=[callback];x.XSetErrorHandler(xerror)
     x.XWarpPointer.argtypes=[C.c_void_p,C.c_ulong,C.c_ulong,C.c_int,C.c_int,C.c_uint,C.c_uint,C.c_int,C.c_int]
     x.XFlush.argtypes=[C.c_void_p];x.XSetInputFocus.argtypes=[C.c_void_p,C.c_ulong,C.c_int,C.c_ulong];x.XCloseDisplay.argtypes=[C.c_void_p]
+    x.XGetInputFocus.argtypes=[C.c_void_p,C.POINTER(C.c_ulong),C.POINTER(C.c_int)]
+    x.XCreateSimpleWindow.argtypes=[C.c_void_p,C.c_ulong,C.c_int,C.c_int,C.c_uint,C.c_uint,C.c_uint,C.c_ulong,C.c_ulong]
+    x.XCreateSimpleWindow.restype=C.c_ulong
+    x.XStoreName.argtypes=[C.c_void_p,C.c_ulong,C.c_char_p]
+    x.XMapWindow.argtypes=[C.c_void_p,C.c_ulong];x.XDestroyWindow.argtypes=[C.c_void_p,C.c_ulong]
+    x.XChangeWindowAttributes.argtypes=[C.c_void_p,C.c_ulong,C.c_ulong,C.POINTER(WindowAttributes)]
+    x.XSync.argtypes=[C.c_void_p,C.c_int]
+    focus_sink=0
+    def focused():
+        target,revert=C.c_ulong(),C.c_int();x.XGetInputFocus(display,C.byref(target),C.byref(revert));return target.value
     # KeyEvent's keycode occupies the identical unsigned-int button field in
     # XButtonEvent. Both are the full X11 event wire layout, not engine calls.
     def title(window):
@@ -120,13 +140,13 @@ def main():
                 return row and int(row['tick'])>=2 and row['object']==case['target'] and int(row['cockpit'])==case['cockpit']
             wait(ready,'Requested real cockpit did not finish initialization')
             wait(lambda:'RCS ROT 0%' in title(window),'Original initial vessel RCS mode differs')
+            sys.path.insert(0,str(HERE.parent/'DeltaGlider'))
+            from window_keys import input_state
             def thrust(down):
                 if down and a.mechanisms:key(window,'Alt_L',True)
                 key(window,'w',down)
                 if not down and a.mechanisms:key(window,'Alt_L',False)
             if a.mechanisms:
-                sys.path.insert(0,str(HERE.parent/'DeltaGlider'))
-                from window_keys import input_state
                 key(window,'w',True)
                 def bare_held():
                     state=input_state(out)
@@ -139,7 +159,10 @@ def main():
             # Keep long mechanism travel in the stable initial fixture, then
             # restore 1x before the separate manual-thrust/focus-loss checks.
             mechanisms=None
+            bindings=None
             if a.mechanisms:
+                from window_bindings import verify
+                bindings=verify(out,window,key)
                 from window_keys import operate
                 mechanisms=operate(out,window,key,title)
             for (px,py),mode in zip(points,('LIN','ROT')):
@@ -154,9 +177,32 @@ def main():
                 time.sleep(.15);thrust(False);key(window,'Shift_L',False)
                 wait(lambda:'RCS ROT 0%' in title(window),'Precision RCS thrust persisted after release')
             thrust(True);wait(lambda:'RCS ROT 100%' in title(window),'Focus-loss setup failed')
-            x.XSetInputFocus(display,root,1,0);x.XFlush(display)
-            wait(lambda:'RCS ROT 0%' in title(window),'RCS stayed on after focus loss')
+            def held_input():
+                state=input_state(out)
+                return state if state and state[1][0x11] and (state[1][0x38] if a.mechanisms else True) else None
+            held_tick=wait(held_input,'Focus-loss setup key did not reach the engine')[0]
+            before_focus=focused();require(before_focus==window,'Owned cockpit lost focus before the explicit transfer')
+            # A root-window focus request can produce ancestor/pointer focus
+            # transitions. Transfer to a mapped sibling owned by this harness.
+            focus_sink=x.XCreateSimpleWindow(display,root,20,20,96,64,0,0,0)
+            require(focus_sink,'Cannot create an owned focus destination')
+            attributes=WindowAttributes();attributes.override_redirect=True
+            x.XChangeWindowAttributes(display,focus_sink,1<<9,C.byref(attributes))
+            x.XStoreName(display,focus_sink,b'Orbiter test input focus destination')
+            x.XMapWindow(display,focus_sink);x.XSync(display,False)
+            x.XSetInputFocus(display,focus_sink,1,0);x.XSync(display,False)
+            wait(lambda:focused()==focus_sink,'Owned focus destination did not receive keyboard focus')
+            wait(lambda:focused()==focus_sink and 'RCS ROT 0%' in title(window),'RCS stayed on after verified focus transfer')
+            def released_input():
+                state=input_state(out)
+                return state if state and state[0]>held_tick and not state[1][0x11] else None
+            released_tick=wait(released_input,'Focus loss did not clear the actual held input')[0]
+            focus_transfer=dict(owned_window=window,destination=focus_sink,focus_before=before_focus,
+                                focus_after=focused(),held_input_tick=held_tick,released_input_tick=released_tick)
+            (out/'focus-transfer.json').write_text(json.dumps(focus_transfer,indent=2)+'\n')
             thrust(False);x.XSetInputFocus(display,window,1,0);x.XFlush(display);time.sleep(.2)
+            require(focused()==window,'Owned cockpit did not regain focus')
+            x.XDestroyWindow(display,focus_sink);focus_sink=0;x.XFlush(display)
             require('RCS ROT 0%' in title(window),'Thrust reactivated on focus regain')
             def left_mode():
                 row=latest_state()
@@ -180,7 +226,7 @@ def main():
                 verify_completed(out,mechanisms)
             inputs=list(csv.DictReader((out/'control-inputs.csv').open()))
             require([(r['event'],int(r['x']),int(r['y'])) for r in inputs]==[(kind,px,py) for px,py in points for kind in ('left_down','left_up')],'Actual GLFW events or framebuffer coordinates differ')
-            state=list(csv.DictReader((out/'cockpit-state.csv').open()));require({int(r['rcs_mode']) for r in state}=={1,2},'Finalized actual vessel modes were not observed')
+            state=list(csv.DictReader((out/'cockpit-state.csv').open()));require({int(r['rcs_mode']) for r in state}==({0,1,2} if a.mechanisms else {1,2}),'Finalized actual vessel modes were not observed')
             require(all(int(r['cockpit'])==case['cockpit'] and r['object']==case['target'] and r['class']==case.get('class','ShuttlePB') for r in state),'Requested vessel class or panel/VC changed during real input')
             levels=list(csv.DictReader((out/'thrust-state.csv').open()))
             keys={int(r['tick']):bytes.fromhex(r['keys']) for r in csv.DictReader((out/'input-state.csv').open())};released=0;bare=0;full=0;precision=0
@@ -206,12 +252,13 @@ def main():
                 case=case['id'],cockpit=case['cockpit'],reference=reference,
                 driver_sha256=DRIVER_SHA256,
                 actual_rcs_mode_buttons=True,mfd_power_off_on=case['cockpit']==1,mfd_mode_surface_orbit=case['cockpit']==1,
-                momentary_keyboard_rcs=True,focus_loss_release=True,finalized_release_samples=released,mouse_events=inputs,
-                lifecycle=life,screenshot_sha256=digest(out/'owned-cockpit.png'),mechanisms=mechanisms,
+                momentary_keyboard_rcs=True,focus_loss_release=True,verified_focus_transfer=focus_transfer,finalized_release_samples=released,mouse_events=inputs,
+                lifecycle=life,screenshot_sha256=digest(out/'owned-cockpit.png'),mechanisms=mechanisms,keyboard_modes=bindings,
                 keymap=keymap.relative_to(ROOT).as_posix(),keymap_sha256=digest(keymap))
             if a.mechanisms:report.update(bare_key_neutrality_samples=bare,precision_rcs=True,full_rcs_samples=full,precision_rcs_samples=precision)
             (out/'mouse-verification.json').write_text(json.dumps(report,indent=2)+'\n');print(json.dumps(report,indent=2))
         finally:
+            if focus_sink:x.XDestroyWindow(display,focus_sink);x.XFlush(display)
             if process.poll() is None:
                 current=owned(process.pid)
                 if current:

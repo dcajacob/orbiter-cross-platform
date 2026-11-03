@@ -18,6 +18,9 @@ automatic/SSE2 pairs: mechanism trajectories and saved positions/speeds match
 exactly, and physical state remains within the original budgets. The capture
 workflow's later Help failure is recorded separately. Physical input and broader
 subsystem acceptance remain open.
+The subsequent complete hosted workflow at `334d0105` now passes all twelve
+native, preserved-Windows and paired-comparison jobs.
+[Hosted qualification](HostedCockpitVerification.json)
 The laptop's unmodified Intel PTL/Mesa 26.0.8 driver also passes all four cases
 in all four Debug/Release automatic/SSE2 configurations on X11. All 32 complete
 mechanism and physical-state trace files match software Debug byte for byte;
@@ -51,6 +54,12 @@ final normal build/profile cases pass. The DG laptop profile uses Alt for manual
 RCS, retaining bare D for the radiator, and verifies full/precision thrust and
 release without unintended jets from mechanism keys.
 [Real-key/profile evidence](DGWindowMechanismsVerification.json)
+
+F and Ctrl+F now independently select/enable RCS, while Alt+F retains the
+aerodynamic-control alias. The original key-map parser and control algorithms
+are unchanged. All twelve glider mode/profile cases pass, including confirmed
+focus transfer and thrust release, plus the generic cockpit regression.
+[Mode-binding follow-up](DGModeBindingsVerification.json)
 
 Both native vessels now load the stock Lua interpreter and LuaInline worker and
 fly with the original AAP in the 2D panel and virtual cockpit. In each 48-frame

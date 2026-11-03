@@ -1,0 +1,820 @@
+{
+  "schema": 1,
+  "status": "passed",
+  "scope": "Independent DG profile mode keys and explicit measured focus transfer; complete mechanism/manual-thrust checks retained",
+  "source_worktree_base": "6eb024a67669d947c243d755c1734f581e60db85",
+  "sources_sha256": {
+    "Tests/Production/CockpitControls/mouse_smoke.py": "6fe097ebf803fd898ae4e19654763dc31aa29c23ff745bc8469e30f307569577",
+    "Tests/Production/DeltaGlider/window_bindings.py": "c1930db04a2358975811e080cd2388a5ee91ec5510ee558fbb5a9c183343fc7f",
+    "Tests/Production/Flight/keymap-dg-laptop.cfg": "17fc05bfbc339f72676725327407a922c85570e387fc45198f2cbab9bd463457"
+  },
+  "runs": {
+    "software_sanitizers": {
+      "controls_dg_panel": {
+        "output": "out/phase6-software-mode-focus-final/controls_dg_panel",
+        "case": "controls_dg_panel",
+        "report_sha256": "26bd0ef4c0202f649c900b6d53e7ed8152cad72eaf44aeb5593198a494c4c5da",
+        "mode_report_sha256": "6bfcab952f453c32272d6fb0004beaa7e0f6e9fc3ad6646c35b09e63360570af",
+        "mode_samples": [
+          {
+            "shortcut": "Alt+F",
+            "tick": 213,
+            "aerodynamic_mode": 7,
+            "rcs_mode": 1
+          },
+          {
+            "shortcut": "Alt+F",
+            "tick": 320,
+            "aerodynamic_mode": 0,
+            "rcs_mode": 1
+          },
+          {
+            "shortcut": "F",
+            "tick": 426,
+            "aerodynamic_mode": 0,
+            "rcs_mode": 2
+          },
+          {
+            "shortcut": "F",
+            "tick": 533,
+            "aerodynamic_mode": 0,
+            "rcs_mode": 1
+          },
+          {
+            "shortcut": "Ctrl+F",
+            "tick": 640,
+            "aerodynamic_mode": 0,
+            "rcs_mode": 0
+          },
+          {
+            "shortcut": "Ctrl+F",
+            "tick": 746,
+            "aerodynamic_mode": 0,
+            "rcs_mode": 1
+          }
+        ],
+        "focus_transfer": {
+          "owned_window": 4194312,
+          "destination": 2097153,
+          "focus_before": 4194312,
+          "focus_after": 2097153,
+          "held_input_tick": 1735,
+          "released_input_tick": 1750
+        },
+        "lifecycle": {
+          "rendered_frames": 774,
+          "successful_presents": 774,
+          "context_deleted": true
+        },
+        "mechanism_trajectories": true,
+        "mechanism_key_order": true,
+        "full_rcs_samples": 23,
+        "precision_rcs_samples": 11,
+        "math": "amd-6121d02-fma3"
+      },
+      "controls_dg_vc": {
+        "output": "out/phase6-software-mode-focus-final/controls_dg_vc",
+        "case": "controls_dg_vc",
+        "report_sha256": "63657302c742b5d1c92b4183ddae087851453496a4a2f28e90b879edc7fd504e",
+        "mode_report_sha256": "6bfcab952f453c32272d6fb0004beaa7e0f6e9fc3ad6646c35b09e63360570af",
+        "mode_samples": [
+          {
+            "shortcut": "Alt+F",
+            "tick": 213,
+            "aerodynamic_mode": 7,
+            "rcs_mode": 1
+          },
+          {
+            "shortcut": "Alt+F",
+            "tick": 320,
+            "aerodynamic_mode": 0,
+            "rcs_mode": 1
+          },
+          {
+            "shortcut": "F",
+            "tick": 426,
+            "aerodynamic_mode": 0,
+            "rcs_mode": 2
+          },
+          {
+            "shortcut": "F",
+            "tick": 533,
+            "aerodynamic_mode": 0,
+            "rcs_mode": 1
+          },
+          {
+            "shortcut": "Ctrl+F",
+            "tick": 640,
+            "aerodynamic_mode": 0,
+            "rcs_mode": 0
+          },
+          {
+            "shortcut": "Ctrl+F",
+            "tick": 746,
+            "aerodynamic_mode": 0,
+            "rcs_mode": 1
+          }
+        ],
+        "focus_transfer": {
+          "owned_window": 4194312,
+          "destination": 2097153,
+          "focus_before": 4194312,
+          "focus_after": 2097153,
+          "held_input_tick": 3686,
+          "released_input_tick": 3702
+        },
+        "lifecycle": {
+          "rendered_frames": 145,
+          "successful_presents": 145,
+          "context_deleted": true
+        },
+        "mechanism_trajectories": true,
+        "mechanism_key_order": true,
+        "full_rcs_samples": 74,
+        "precision_rcs_samples": 22,
+        "math": "amd-6121d02-fma3"
+      },
+      "controls_dgs_panel": {
+        "output": "out/phase6-software-mode-focus-final/controls_dgs_panel",
+        "case": "controls_dgs_panel",
+        "report_sha256": "eccf49f5a452a6ed7d43503ee9d0fa1e358320b639bf73d1fa5924fffa441387",
+        "mode_report_sha256": "6bfcab952f453c32272d6fb0004beaa7e0f6e9fc3ad6646c35b09e63360570af",
+        "mode_samples": [
+          {
+            "shortcut": "Alt+F",
+            "tick": 213,
+            "aerodynamic_mode": 7,
+            "rcs_mode": 1
+          },
+          {
+            "shortcut": "Alt+F",
+            "tick": 320,
+            "aerodynamic_mode": 0,
+            "rcs_mode": 1
+          },
+          {
+            "shortcut": "F",
+            "tick": 426,
+            "aerodynamic_mode": 0,
+            "rcs_mode": 2
+          },
+          {
+            "shortcut": "F",
+            "tick": 533,
+            "aerodynamic_mode": 0,
+            "rcs_mode": 1
+          },
+          {
+            "shortcut": "Ctrl+F",
+            "tick": 640,
+            "aerodynamic_mode": 0,
+            "rcs_mode": 0
+          },
+          {
+            "shortcut": "Ctrl+F",
+            "tick": 746,
+            "aerodynamic_mode": 0,
+            "rcs_mode": 1
+          }
+        ],
+        "focus_transfer": {
+          "owned_window": 4194312,
+          "destination": 2097153,
+          "focus_before": 4194312,
+          "focus_after": 2097153,
+          "held_input_tick": 1735,
+          "released_input_tick": 1750
+        },
+        "lifecycle": {
+          "rendered_frames": 471,
+          "successful_presents": 471,
+          "context_deleted": true
+        },
+        "mechanism_trajectories": true,
+        "mechanism_key_order": true,
+        "full_rcs_samples": 21,
+        "precision_rcs_samples": 8,
+        "math": "amd-6121d02-fma3"
+      },
+      "controls_dgs_vc": {
+        "output": "out/phase6-software-mode-focus-final/controls_dgs_vc",
+        "case": "controls_dgs_vc",
+        "report_sha256": "27a8cd2baa16e255ca058aa70a16009df572259a3680fc7dac0efafe697d7c2e",
+        "mode_report_sha256": "2ade74f6dd026e759658944cb645385af04420f046730aec7e9276eaf735a9bb",
+        "mode_samples": [
+          {
+            "shortcut": "Alt+F",
+            "tick": 213,
+            "aerodynamic_mode": 7,
+            "rcs_mode": 1
+          },
+          {
+            "shortcut": "Alt+F",
+            "tick": 320,
+            "aerodynamic_mode": 0,
+            "rcs_mode": 1
+          },
+          {
+            "shortcut": "F",
+            "tick": 426,
+            "aerodynamic_mode": 0,
+            "rcs_mode": 2
+          },
+          {
+            "shortcut": "F",
+            "tick": 533,
+            "aerodynamic_mode": 0,
+            "rcs_mode": 1
+          },
+          {
+            "shortcut": "Ctrl+F",
+            "tick": 640,
+            "aerodynamic_mode": 0,
+            "rcs_mode": 0
+          },
+          {
+            "shortcut": "Ctrl+F",
+            "tick": 1065,
+            "aerodynamic_mode": 0,
+            "rcs_mode": 1
+          }
+        ],
+        "focus_transfer": {
+          "owned_window": 4194312,
+          "destination": 2097153,
+          "focus_before": 4194312,
+          "focus_after": 2097153,
+          "held_input_tick": 5483,
+          "released_input_tick": 5575
+        },
+        "lifecycle": {
+          "rendered_frames": 173,
+          "successful_presents": 173,
+          "context_deleted": true
+        },
+        "mechanism_trajectories": true,
+        "mechanism_key_order": true,
+        "full_rcs_samples": 617,
+        "precision_rcs_samples": 252,
+        "math": "amd-6121d02-fma3"
+      }
+    },
+    "intel_sanitizers": {
+      "controls_dg_panel": {
+        "output": "out/phase6-intel-mode-focus-final/controls_dg_panel",
+        "case": "controls_dg_panel",
+        "report_sha256": "f0f5da947d251a1ff32932ee14ab31d5ad22394c91a4fdbfb2b776cdb4942725",
+        "mode_report_sha256": "6bfcab952f453c32272d6fb0004beaa7e0f6e9fc3ad6646c35b09e63360570af",
+        "mode_samples": [
+          {
+            "shortcut": "Alt+F",
+            "tick": 213,
+            "aerodynamic_mode": 7,
+            "rcs_mode": 1
+          },
+          {
+            "shortcut": "Alt+F",
+            "tick": 320,
+            "aerodynamic_mode": 0,
+            "rcs_mode": 1
+          },
+          {
+            "shortcut": "F",
+            "tick": 426,
+            "aerodynamic_mode": 0,
+            "rcs_mode": 2
+          },
+          {
+            "shortcut": "F",
+            "tick": 533,
+            "aerodynamic_mode": 0,
+            "rcs_mode": 1
+          },
+          {
+            "shortcut": "Ctrl+F",
+            "tick": 640,
+            "aerodynamic_mode": 0,
+            "rcs_mode": 0
+          },
+          {
+            "shortcut": "Ctrl+F",
+            "tick": 746,
+            "aerodynamic_mode": 0,
+            "rcs_mode": 1
+          }
+        ],
+        "focus_transfer": {
+          "owned_window": 37748747,
+          "destination": 35651585,
+          "focus_before": 37748747,
+          "focus_after": 35651585,
+          "held_input_tick": 1735,
+          "released_input_tick": 1750
+        },
+        "lifecycle": {
+          "rendered_frames": 3082,
+          "successful_presents": 3082,
+          "context_deleted": true
+        },
+        "mechanism_trajectories": true,
+        "mechanism_key_order": true,
+        "full_rcs_samples": 23,
+        "precision_rcs_samples": 11,
+        "math": "amd-6121d02-fma3"
+      },
+      "controls_dg_vc": {
+        "output": "out/phase6-intel-mode-focus-final/controls_dg_vc",
+        "case": "controls_dg_vc",
+        "report_sha256": "4e038482ec39a083d56c213ddeadbc4fa94de954f25cfd1123c33778bf649723",
+        "mode_report_sha256": "6bfcab952f453c32272d6fb0004beaa7e0f6e9fc3ad6646c35b09e63360570af",
+        "mode_samples": [
+          {
+            "shortcut": "Alt+F",
+            "tick": 213,
+            "aerodynamic_mode": 7,
+            "rcs_mode": 1
+          },
+          {
+            "shortcut": "Alt+F",
+            "tick": 320,
+            "aerodynamic_mode": 0,
+            "rcs_mode": 1
+          },
+          {
+            "shortcut": "F",
+            "tick": 426,
+            "aerodynamic_mode": 0,
+            "rcs_mode": 2
+          },
+          {
+            "shortcut": "F",
+            "tick": 533,
+            "aerodynamic_mode": 0,
+            "rcs_mode": 1
+          },
+          {
+            "shortcut": "Ctrl+F",
+            "tick": 640,
+            "aerodynamic_mode": 0,
+            "rcs_mode": 0
+          },
+          {
+            "shortcut": "Ctrl+F",
+            "tick": 746,
+            "aerodynamic_mode": 0,
+            "rcs_mode": 1
+          }
+        ],
+        "focus_transfer": {
+          "owned_window": 37748747,
+          "destination": 35651585,
+          "focus_before": 37748747,
+          "focus_after": 35651585,
+          "held_input_tick": 1735,
+          "released_input_tick": 1750
+        },
+        "lifecycle": {
+          "rendered_frames": 1908,
+          "successful_presents": 1908,
+          "context_deleted": true
+        },
+        "mechanism_trajectories": true,
+        "mechanism_key_order": true,
+        "full_rcs_samples": 24,
+        "precision_rcs_samples": 11,
+        "math": "amd-6121d02-fma3"
+      },
+      "controls_dgs_panel": {
+        "output": "out/phase6-intel-mode-focus-final/controls_dgs_panel",
+        "case": "controls_dgs_panel",
+        "report_sha256": "2a6804206a42a3f1b52d889ccd4fd6dab45f9303bc02e6f48bb9efc21ca95010",
+        "mode_report_sha256": "6bfcab952f453c32272d6fb0004beaa7e0f6e9fc3ad6646c35b09e63360570af",
+        "mode_samples": [
+          {
+            "shortcut": "Alt+F",
+            "tick": 213,
+            "aerodynamic_mode": 7,
+            "rcs_mode": 1
+          },
+          {
+            "shortcut": "Alt+F",
+            "tick": 320,
+            "aerodynamic_mode": 0,
+            "rcs_mode": 1
+          },
+          {
+            "shortcut": "F",
+            "tick": 426,
+            "aerodynamic_mode": 0,
+            "rcs_mode": 2
+          },
+          {
+            "shortcut": "F",
+            "tick": 533,
+            "aerodynamic_mode": 0,
+            "rcs_mode": 1
+          },
+          {
+            "shortcut": "Ctrl+F",
+            "tick": 640,
+            "aerodynamic_mode": 0,
+            "rcs_mode": 0
+          },
+          {
+            "shortcut": "Ctrl+F",
+            "tick": 746,
+            "aerodynamic_mode": 0,
+            "rcs_mode": 1
+          }
+        ],
+        "focus_transfer": {
+          "owned_window": 37748747,
+          "destination": 35651585,
+          "focus_before": 37748747,
+          "focus_after": 35651585,
+          "held_input_tick": 1735,
+          "released_input_tick": 1750
+        },
+        "lifecycle": {
+          "rendered_frames": 2702,
+          "successful_presents": 2702,
+          "context_deleted": true
+        },
+        "mechanism_trajectories": true,
+        "mechanism_key_order": true,
+        "full_rcs_samples": 23,
+        "precision_rcs_samples": 11,
+        "math": "amd-6121d02-fma3"
+      },
+      "controls_dgs_vc": {
+        "output": "out/phase6-intel-mode-focus-final/controls_dgs_vc",
+        "case": "controls_dgs_vc",
+        "report_sha256": "6e6b96ab852b71b6ea2b50042619028b6ed1a28a8630a97fc1868c86d51f2da1",
+        "mode_report_sha256": "6bfcab952f453c32272d6fb0004beaa7e0f6e9fc3ad6646c35b09e63360570af",
+        "mode_samples": [
+          {
+            "shortcut": "Alt+F",
+            "tick": 213,
+            "aerodynamic_mode": 7,
+            "rcs_mode": 1
+          },
+          {
+            "shortcut": "Alt+F",
+            "tick": 320,
+            "aerodynamic_mode": 0,
+            "rcs_mode": 1
+          },
+          {
+            "shortcut": "F",
+            "tick": 426,
+            "aerodynamic_mode": 0,
+            "rcs_mode": 2
+          },
+          {
+            "shortcut": "F",
+            "tick": 533,
+            "aerodynamic_mode": 0,
+            "rcs_mode": 1
+          },
+          {
+            "shortcut": "Ctrl+F",
+            "tick": 640,
+            "aerodynamic_mode": 0,
+            "rcs_mode": 0
+          },
+          {
+            "shortcut": "Ctrl+F",
+            "tick": 746,
+            "aerodynamic_mode": 0,
+            "rcs_mode": 1
+          }
+        ],
+        "focus_transfer": {
+          "owned_window": 37748747,
+          "destination": 35651585,
+          "focus_before": 37748747,
+          "focus_after": 35651585,
+          "held_input_tick": 1735,
+          "released_input_tick": 1750
+        },
+        "lifecycle": {
+          "rendered_frames": 1527,
+          "successful_presents": 1527,
+          "context_deleted": true
+        },
+        "mechanism_trajectories": true,
+        "mechanism_key_order": true,
+        "full_rcs_samples": 24,
+        "precision_rcs_samples": 11,
+        "math": "amd-6121d02-fma3"
+      }
+    },
+    "native_build_profiles": {
+      "Debug-automatic": {
+        "output": "out/phase6-mode-focus-native-profiles/Debug-automatic",
+        "case": "controls_dg_panel",
+        "report_sha256": "f4c5ac1e859ad253d6846c1c6989f2540fe3add4337ea62d288b47ceffe53782",
+        "mode_report_sha256": "6bfcab952f453c32272d6fb0004beaa7e0f6e9fc3ad6646c35b09e63360570af",
+        "mode_samples": [
+          {
+            "shortcut": "Alt+F",
+            "tick": 213,
+            "aerodynamic_mode": 7,
+            "rcs_mode": 1
+          },
+          {
+            "shortcut": "Alt+F",
+            "tick": 320,
+            "aerodynamic_mode": 0,
+            "rcs_mode": 1
+          },
+          {
+            "shortcut": "F",
+            "tick": 426,
+            "aerodynamic_mode": 0,
+            "rcs_mode": 2
+          },
+          {
+            "shortcut": "F",
+            "tick": 533,
+            "aerodynamic_mode": 0,
+            "rcs_mode": 1
+          },
+          {
+            "shortcut": "Ctrl+F",
+            "tick": 640,
+            "aerodynamic_mode": 0,
+            "rcs_mode": 0
+          },
+          {
+            "shortcut": "Ctrl+F",
+            "tick": 746,
+            "aerodynamic_mode": 0,
+            "rcs_mode": 1
+          }
+        ],
+        "focus_transfer": {
+          "owned_window": 4194312,
+          "destination": 2097153,
+          "focus_before": 4194312,
+          "focus_after": 2097153,
+          "held_input_tick": 1719,
+          "released_input_tick": 1735
+        },
+        "lifecycle": {
+          "rendered_frames": 1500,
+          "successful_presents": 1500,
+          "context_deleted": true
+        },
+        "mechanism_trajectories": true,
+        "mechanism_key_order": true,
+        "full_rcs_samples": 24,
+        "precision_rcs_samples": 11,
+        "math": "amd-6121d02-fma3"
+      },
+      "Release-automatic": {
+        "output": "out/phase6-mode-focus-native-profiles/Release-automatic",
+        "case": "controls_dg_vc",
+        "report_sha256": "85009234ce2414edc7e109b283238293f8bfc29376296b025143372f03f5b20c",
+        "mode_report_sha256": "6bfcab952f453c32272d6fb0004beaa7e0f6e9fc3ad6646c35b09e63360570af",
+        "mode_samples": [
+          {
+            "shortcut": "Alt+F",
+            "tick": 213,
+            "aerodynamic_mode": 7,
+            "rcs_mode": 1
+          },
+          {
+            "shortcut": "Alt+F",
+            "tick": 320,
+            "aerodynamic_mode": 0,
+            "rcs_mode": 1
+          },
+          {
+            "shortcut": "F",
+            "tick": 426,
+            "aerodynamic_mode": 0,
+            "rcs_mode": 2
+          },
+          {
+            "shortcut": "F",
+            "tick": 533,
+            "aerodynamic_mode": 0,
+            "rcs_mode": 1
+          },
+          {
+            "shortcut": "Ctrl+F",
+            "tick": 640,
+            "aerodynamic_mode": 0,
+            "rcs_mode": 0
+          },
+          {
+            "shortcut": "Ctrl+F",
+            "tick": 746,
+            "aerodynamic_mode": 0,
+            "rcs_mode": 1
+          }
+        ],
+        "focus_transfer": {
+          "owned_window": 4194312,
+          "destination": 2097153,
+          "focus_before": 4194312,
+          "focus_after": 2097153,
+          "held_input_tick": 1735,
+          "released_input_tick": 1750
+        },
+        "lifecycle": {
+          "rendered_frames": 686,
+          "successful_presents": 686,
+          "context_deleted": true
+        },
+        "mechanism_trajectories": true,
+        "mechanism_key_order": true,
+        "full_rcs_samples": 29,
+        "precision_rcs_samples": 11,
+        "math": "amd-6121d02-fma3"
+      },
+      "Debug-sse2": {
+        "output": "out/phase6-mode-focus-native-profiles/Debug-sse2",
+        "case": "controls_dgs_panel",
+        "report_sha256": "68255bc5b9bfd1a58bc9e83be5ff34619fb55486d6de2a453c16dd65c8aec2ab",
+        "mode_report_sha256": "6bfcab952f453c32272d6fb0004beaa7e0f6e9fc3ad6646c35b09e63360570af",
+        "mode_samples": [
+          {
+            "shortcut": "Alt+F",
+            "tick": 213,
+            "aerodynamic_mode": 7,
+            "rcs_mode": 1
+          },
+          {
+            "shortcut": "Alt+F",
+            "tick": 320,
+            "aerodynamic_mode": 0,
+            "rcs_mode": 1
+          },
+          {
+            "shortcut": "F",
+            "tick": 426,
+            "aerodynamic_mode": 0,
+            "rcs_mode": 2
+          },
+          {
+            "shortcut": "F",
+            "tick": 533,
+            "aerodynamic_mode": 0,
+            "rcs_mode": 1
+          },
+          {
+            "shortcut": "Ctrl+F",
+            "tick": 640,
+            "aerodynamic_mode": 0,
+            "rcs_mode": 0
+          },
+          {
+            "shortcut": "Ctrl+F",
+            "tick": 746,
+            "aerodynamic_mode": 0,
+            "rcs_mode": 1
+          }
+        ],
+        "focus_transfer": {
+          "owned_window": 4194312,
+          "destination": 2097153,
+          "focus_before": 4194312,
+          "focus_after": 2097153,
+          "held_input_tick": 1735,
+          "released_input_tick": 1750
+        },
+        "lifecycle": {
+          "rendered_frames": 1342,
+          "successful_presents": 1342,
+          "context_deleted": true
+        },
+        "mechanism_trajectories": true,
+        "mechanism_key_order": true,
+        "full_rcs_samples": 24,
+        "precision_rcs_samples": 10,
+        "math": "amd-6121d02-sse2"
+      },
+      "Release-sse2": {
+        "output": "out/phase6-mode-focus-native-profiles/Release-sse2",
+        "case": "controls_dgs_vc",
+        "report_sha256": "46e74a18b8ecdecc10e87c844ea6a01b92556873e7673f849eab43e61659d327",
+        "mode_report_sha256": "6bfcab952f453c32272d6fb0004beaa7e0f6e9fc3ad6646c35b09e63360570af",
+        "mode_samples": [
+          {
+            "shortcut": "Alt+F",
+            "tick": 213,
+            "aerodynamic_mode": 7,
+            "rcs_mode": 1
+          },
+          {
+            "shortcut": "Alt+F",
+            "tick": 320,
+            "aerodynamic_mode": 0,
+            "rcs_mode": 1
+          },
+          {
+            "shortcut": "F",
+            "tick": 426,
+            "aerodynamic_mode": 0,
+            "rcs_mode": 2
+          },
+          {
+            "shortcut": "F",
+            "tick": 533,
+            "aerodynamic_mode": 0,
+            "rcs_mode": 1
+          },
+          {
+            "shortcut": "Ctrl+F",
+            "tick": 640,
+            "aerodynamic_mode": 0,
+            "rcs_mode": 0
+          },
+          {
+            "shortcut": "Ctrl+F",
+            "tick": 746,
+            "aerodynamic_mode": 0,
+            "rcs_mode": 1
+          }
+        ],
+        "focus_transfer": {
+          "owned_window": 4194312,
+          "destination": 2097153,
+          "focus_before": 4194312,
+          "focus_after": 2097153,
+          "held_input_tick": 1735,
+          "released_input_tick": 1750
+        },
+        "lifecycle": {
+          "rendered_frames": 588,
+          "successful_presents": 588,
+          "context_deleted": true
+        },
+        "mechanism_trajectories": true,
+        "mechanism_key_order": true,
+        "full_rcs_samples": 25,
+        "precision_rcs_samples": 10,
+        "math": "amd-6121d02-sse2"
+      }
+    }
+  },
+  "generic_regression": {
+    "output": "out/phase6-generic-focus-sink",
+    "report_sha256": "b0cb991fb688a46278571708c399e0e58d936d939612ee1f6607f199e5e6b356",
+    "lifecycle": {
+      "rendered_frames": 150,
+      "successful_presents": 150,
+      "context_deleted": true
+    },
+    "focus_transfer": {
+      "owned_window": 4194312,
+      "destination": 2097153,
+      "focus_before": 4194312,
+      "focus_after": 2097153,
+      "held_input_tick": 61,
+      "released_input_tick": 76
+    }
+  },
+  "failed_baseline": {
+    "output": "out/phase6-dg-mode-collision-baseline",
+    "status": "failed",
+    "log_sha256": "586f3bb8d7ff0a58ab7a22b1b87a3dc88802c7a3fa27f4933bcc9dd1a84ad86f",
+    "observed_aerodynamic_rcs_pairs": [
+      [
+        0,
+        1
+      ],
+      [
+        0,
+        2
+      ]
+    ],
+    "reason": "Alt+F matched RCSMode, consuming the key before the existing aerodynamic alias. Corrected profile uses F and Ctrl+F; the original key-map parser and default control code are unchanged."
+  },
+  "focus_diagnostics_retained": [
+    {
+      "output": "out/phase6-intel-keyboard-modes/controls_dgs_vc",
+      "status": "failed",
+      "reason": "Root-window focus request did not produce the required input release; actual destination was not checked."
+    },
+    {
+      "output": "out/phase6-intel-mode-focus-destination",
+      "status": "failed",
+      "reason": "The first managed-sink run recorded X11 BadMatch; that version did not record the request source. The final handler records request/resource, and final unmanaged-sink runs pass with all unexpected protocol errors fatal."
+    }
+  ],
+  "xlib_focus_attributes_layout": {
+    "size_bytes": 112,
+    "override_redirect_offset": 88,
+    "verified_against": "Installed X11/Xlib.h with a separate C++ layout executable"
+  },
+  "sanitizers": {
+    "ASAN_OPTIONS": "detect_leaks=1:fast_unwind_on_malloc=0",
+    "LSAN_OPTIONS": "",
+    "UBSAN_OPTIONS": "halt_on_error=1:print_stacktrace=1",
+    "suppressions": []
+  },
+  "final_fresh_processes": 13
+}

@@ -10,6 +10,16 @@ the native vessel and cockpit camera through five unchanged DG scenarios.
 The tutorial text is drawn and both automatic and pilot-commanded returns
 to free flight pass locally.
 
+The complete hosted native-client workflow now passes at `334d0105`: all four
+Linux Debug/Release automatic/SSE2 jobs, all four preserved Windows captures,
+and all four paired comparison jobs. Every required native step ran; the only
+skips select the forced CRT in automatic-profile Windows jobs. The forty
+recorded-flight frames have minimum SSIM 0.9972282773; eighty focus/menu frames
+have minimum SSIM 0.9995245516 with exact cockpit-state traces. DG mechanisms
+and saved positions/speeds match exactly. The subsequent expanded real-key and
+profile checks remain a separate hosted qualification.
+[Hosted qualification and verified comparison archives](HostedCockpitVerification.json)
+
 Gear, nose cone, radiator, both airlocks, hatch and airbrakes now pass a native
 keyboard and save/reload regression in both gliders and cockpit modes. Debug,
 Release and the unsuppressed sanitizer build each complete 16 fresh processes
@@ -61,6 +71,14 @@ The accepted Phase 5 profile is unchanged. This profile can be selected with
 the native command's `--keymap` option. Mechanism mouse picking and broader
 subsystem interactions remain open.
 [Real-key and profile evidence](DGWindowMechanismsVerification.json)
+
+The DG profile now also verifies F for RCS rotational/linear mode, Ctrl+F for
+enable/disable and Alt+F for aerodynamic controls without changing the other
+mode. The earlier Alt+F RCS assignment shadowed the aerodynamic alias; the
+corrected profile passes twelve glider processes and the generic cockpit
+regression. Focus loss is measured against a separate owned window and cleared
+input, with all unexpected X11 protocol errors fatal.
+[Mode and focus-transfer evidence](DGModeBindingsVerification.json)
 
 The native graphics leak now has an isolated source fix and a passing local
 sanitizer menu flow. Mesa's executable-code allocator retained two bookkeeping

@@ -83,6 +83,20 @@ D for the radiator. The older Phase 5 laptop map binds D to manual RCS and is
 unchanged. Tests verify Alt+W thrust, Alt+Shift+W precision thrust, bare-W
 neutrality, release/focus loss and no unintended jets during mechanism operation.
 
+The DG profile uses F for rotational/linear RCS, Ctrl+F for RCS enable/disable,
+and retains Alt+F for aerodynamic control surfaces. The mode probe verifies all
+three shortcuts independently and restores the initial modes before mechanism
+travel. Its failed baseline records that the earlier Alt+F RCS binding consumed
+the key before the aerodynamic alias. The original key-map parser and default
+control code are unchanged.
+
+Focus-loss checks transfer to a mapped, override-redirect window owned by the
+harness. The test records the actual focus destination and input ticks and
+requires zero thrust and cleared input before sending key-up events. This
+avoids relying on an unverified root-window focus request. Unexpected X11
+protocol errors remain fatal; disappearing-window `BadWindow` is the sole
+enumeration exception, matching the existing keyboard harness.
+
 Stage accepted references with `frozen_controls.py --cache <cache> --output
 <frozen>` (add `--offline` to require verified cached archives). Native scripts
 take `--executable`, `--assets`, `--data`, `--modules`, `--planets`, and `--output`;

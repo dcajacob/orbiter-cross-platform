@@ -1,0 +1,278 @@
+{
+  "schema": 1,
+  "status": "passed",
+  "scope": "All twelve jobs completed successfully: four native Linux Debug/Release automatic/SSE2 builds, four preserved Windows observations and four paired comparisons. Subsequent expanded keyboard/profile gates remain separate.",
+  "run_id": 41609896165,
+  "source": "334d01053d3096b5200f6d1b5943571936559a91",
+  "url": "https://github.com/dcajacob/orbiter-cross-platform/actions/runs/41609896165",
+  "workflow_conclusion": "success",
+  "comparison_archives": [
+    {
+      "id": 13223650483,
+      "name": "spacecraft-comparison-Debug-automatic",
+      "size": 1219,
+      "digest": "sha256:1de358d1a93ac8fb7a0274e7755a213d2d008640c4d1d16a424087e4a9aa94d6"
+    },
+    {
+      "id": 13223540743,
+      "name": "spacecraft-comparison-Release-automatic",
+      "size": 1443,
+      "digest": "sha256:e7e153f916670e9df65b31195f98b86221a36d73b67a098a6c6f78cf3472620c"
+    },
+    {
+      "id": 13223317489,
+      "name": "spacecraft-comparison-Release-sse2",
+      "size": 1303,
+      "digest": "sha256:8e39c88423bd3c6f5a8fb8e7f34ce89007e58f6ec3a00ece86cb26bd98d4e2fe"
+    },
+    {
+      "id": 13222697076,
+      "name": "spacecraft-comparison-Debug-sse2",
+      "size": 1221,
+      "digest": "sha256:17c0f174a9998acee2accf9acbe4f839df0db24660fbd9628125e88817f5c060"
+    }
+  ],
+  "job_manifest_sha256": "9b0693fdc05b37d082d729bcd46bc156c4b2c32d7f3fcf0584f10b2aedffaf00",
+  "jobs": [
+    {
+      "id": 125831254219,
+      "name": "Real native client Ubuntu 24.04 Debug automatic x64",
+      "conclusion": "success",
+      "started": "2026-11-03T09:23:24Z",
+      "completed": "2026-11-03T10:17:24Z",
+      "step_count": 51,
+      "intentional_skips": []
+    },
+    {
+      "id": 125831254473,
+      "name": "Real native client Ubuntu 24.04 Debug sse2 x64",
+      "conclusion": "success",
+      "started": "2026-11-03T09:23:24Z",
+      "completed": "2026-11-03T10:11:28Z",
+      "step_count": 51,
+      "intentional_skips": []
+    },
+    {
+      "id": 125831254479,
+      "name": "Preserved Windows spacecraft observations Debug automatic",
+      "conclusion": "success",
+      "started": "2026-11-03T09:23:23Z",
+      "completed": "2026-11-03T09:39:45Z",
+      "step_count": 23,
+      "intentional_skips": [
+        "Select the matching CRT profile for SSE2 observations"
+      ]
+    },
+    {
+      "id": 125831254524,
+      "name": "Real native client Ubuntu 24.04 Release sse2 x64",
+      "conclusion": "success",
+      "started": "2026-11-03T09:23:24Z",
+      "completed": "2026-11-03T10:17:20Z",
+      "step_count": 51,
+      "intentional_skips": []
+    },
+    {
+      "id": 125831254538,
+      "name": "Real native client Ubuntu 24.04 Release automatic x64",
+      "conclusion": "success",
+      "started": "2026-11-03T09:23:25Z",
+      "completed": "2026-11-03T10:17:16Z",
+      "step_count": 51,
+      "intentional_skips": []
+    },
+    {
+      "id": 125831254868,
+      "name": "Preserved Windows spacecraft observations Release sse2",
+      "conclusion": "success",
+      "started": "2026-11-03T09:23:25Z",
+      "completed": "2026-11-03T09:41:48Z",
+      "step_count": 23,
+      "intentional_skips": []
+    },
+    {
+      "id": 125831255079,
+      "name": "Preserved Windows spacecraft observations Debug sse2",
+      "conclusion": "success",
+      "started": "2026-11-03T09:23:24Z",
+      "completed": "2026-11-03T09:42:23Z",
+      "step_count": 23,
+      "intentional_skips": []
+    },
+    {
+      "id": 125831255986,
+      "name": "Preserved Windows spacecraft observations Release automatic",
+      "conclusion": "success",
+      "started": "2026-11-03T09:23:24Z",
+      "completed": "2026-11-03T09:41:40Z",
+      "step_count": 23,
+      "intentional_skips": [
+        "Select the matching CRT profile for SSE2 observations"
+      ]
+    },
+    {
+      "id": 125856235622,
+      "name": "Compare native and original spacecraft Debug sse2",
+      "conclusion": "success",
+      "started": "2026-11-03T10:17:27Z",
+      "completed": "2026-11-03T10:29:32Z",
+      "step_count": 10,
+      "intentional_skips": []
+    },
+    {
+      "id": 125856235664,
+      "name": "Compare native and original spacecraft Debug automatic",
+      "conclusion": "success",
+      "started": "2026-11-03T10:17:26Z",
+      "completed": "2026-11-03T10:29:45Z",
+      "step_count": 10,
+      "intentional_skips": []
+    },
+    {
+      "id": 125856235725,
+      "name": "Compare native and original spacecraft Release sse2",
+      "conclusion": "success",
+      "started": "2026-11-03T10:17:27Z",
+      "completed": "2026-11-03T10:32:50Z",
+      "step_count": 10,
+      "intentional_skips": []
+    },
+    {
+      "id": 125856235761,
+      "name": "Compare native and original spacecraft Release automatic",
+      "conclusion": "success",
+      "started": "2026-11-03T10:17:27Z",
+      "completed": "2026-11-03T10:29:34Z",
+      "step_count": 10,
+      "intentional_skips": []
+    }
+  ],
+  "native_required_checks": [
+    "Verify actual Xlib resource, locale and compose-cache teardown with sanitizers",
+    "Verify native math against unchanged Windows primitives and independent MPFR",
+    "Verify original data and planetary archives",
+    "Verify real instrument render targets and negative-height font glyph pixels",
+    "Verify flyable stock ShuttlePB, timing, docking and persistence",
+    "Verify focused deletion, camera fallback, simultaneous deletion and twenty live object cycles",
+    "Exercise actual keyboard control and in-process reload in an owned X11 window",
+    "Verify controlled upright takeoff and landing against the additional frozen original Windows reference",
+    "Verify atmosphere, control surfaces, ground contact and actual landed persistence",
+    "Verify native joystick calibration and custom function ownership",
+    "Build and validate original Help books and browser navigation",
+    "Exercise stock VC mesh edits and registered MFD2 drawing, input and lifetime",
+    "Fly both stock DeltaGliders with the original Lua autopilot in the panel and VC",
+    "Verify and stage the immutable original Lua reference",
+    "Compare original Lua scheduling, isolation, AAP controls and finalized states",
+    "Fly stock DG recordings, finish one naturally and release another with Ctrl+C",
+    "Verify all ten original native stock MFD modes and HUD against frozen Windows",
+    "Verify original native RCS hit testing against frozen Windows mouse inputs",
+    "Verify real GLFW mouse clicks and momentary keyboard thrust in an owned X11 cockpit",
+    "Click the visible stock cockpit menu and change ship, warp, pause and save",
+    "Record and replay stock vessels and commit playback editor changes",
+    "Verify original selection and input dialogs against frozen Windows",
+    "Verify actual dialog typing, parameter cancellation and flight input capture"
+  ],
+  "comparisons": {
+    "spacecraft-comparison-Debug-automatic": {
+      "recorded_flight_cases": 5,
+      "recorded_images": 10,
+      "recorded_minimum_ssim": 0.9972282773010525,
+      "recorded_maxima": {
+        "position_m": 0,
+        "velocity_m_s": 0,
+        "angular_velocity_rad_s": 0,
+        "rotation_rad": 0,
+        "mjd_days": 0,
+        "camera_direction": 0,
+        "aperture_rad": 0
+      },
+      "focus_cases": 10,
+      "focus_images": 20,
+      "focus_minimum_ssim": 0.9995245896202253,
+      "dg_system_cases": 4,
+      "dg_phases_per_case": 4,
+      "exact_mechanism_and_saved_state": true,
+      "files_sha256": {
+        "dg-systems-comparison.json": "29e1651647be9861bfa064737b0342889af66b4ce0eb78d2266e2dc2bb174b6b",
+        "focus-comparison.json": "ba6e0052249c4e21e705e9841dd0f65e96b83115a9b9c8ab1dedae45dca9c8ac",
+        "recorded-comparison.json": "e4cc4c7d21debcfdb5b0903c9a99e9d6ec301be743c9d7d1f9d577ea5657ebac"
+      }
+    },
+    "spacecraft-comparison-Release-automatic": {
+      "recorded_flight_cases": 5,
+      "recorded_images": 10,
+      "recorded_minimum_ssim": 0.9972282773010525,
+      "recorded_maxima": {
+        "position_m": 0,
+        "velocity_m_s": 3.6662903532026344e-12,
+        "angular_velocity_rad_s": 7.415985657152094e-16,
+        "rotation_rad": 3.3306690738754696e-16,
+        "mjd_days": 0,
+        "camera_direction": 1.9229626863835638e-16,
+        "aperture_rad": 0
+      },
+      "focus_cases": 10,
+      "focus_images": 20,
+      "focus_minimum_ssim": 0.9995245896202253,
+      "dg_system_cases": 4,
+      "dg_phases_per_case": 4,
+      "exact_mechanism_and_saved_state": true,
+      "files_sha256": {
+        "dg-systems-comparison.json": "972b939f2be4e35b30bc08a86303e6a6f49d2e4f20813b78df6f313c26d3190b",
+        "focus-comparison.json": "ba6e0052249c4e21e705e9841dd0f65e96b83115a9b9c8ab1dedae45dca9c8ac",
+        "recorded-comparison.json": "8cbfa33c3fceb25514f224292b1a1976fb63d6a0584fc63f63ba3c2ef510b160"
+      }
+    },
+    "spacecraft-comparison-Release-sse2": {
+      "recorded_flight_cases": 5,
+      "recorded_images": 10,
+      "recorded_minimum_ssim": 0.9972282773010525,
+      "recorded_maxima": {
+        "position_m": 0,
+        "velocity_m_s": 0,
+        "angular_velocity_rad_s": 0,
+        "rotation_rad": 0,
+        "mjd_days": 0,
+        "camera_direction": 0,
+        "aperture_rad": 0
+      },
+      "focus_cases": 10,
+      "focus_images": 20,
+      "focus_minimum_ssim": 0.9995245896202253,
+      "dg_system_cases": 4,
+      "dg_phases_per_case": 4,
+      "exact_mechanism_and_saved_state": true,
+      "files_sha256": {
+        "dg-systems-comparison.json": "56ac527b4f53715f288b7f5f2801ddc67ecdcef473c5a78f82e1830153a617da",
+        "focus-comparison.json": "ba6e0052249c4e21e705e9841dd0f65e96b83115a9b9c8ab1dedae45dca9c8ac",
+        "recorded-comparison.json": "e4cc4c7d21debcfdb5b0903c9a99e9d6ec301be743c9d7d1f9d577ea5657ebac"
+      }
+    },
+    "spacecraft-comparison-Debug-sse2": {
+      "recorded_flight_cases": 5,
+      "recorded_images": 10,
+      "recorded_minimum_ssim": 0.9972282773010525,
+      "recorded_maxima": {
+        "position_m": 0,
+        "velocity_m_s": 0,
+        "angular_velocity_rad_s": 0,
+        "rotation_rad": 0,
+        "mjd_days": 0,
+        "camera_direction": 0,
+        "aperture_rad": 0
+      },
+      "focus_cases": 10,
+      "focus_images": 20,
+      "focus_minimum_ssim": 0.9995245515610561,
+      "dg_system_cases": 4,
+      "dg_phases_per_case": 4,
+      "exact_mechanism_and_saved_state": true,
+      "files_sha256": {
+        "dg-systems-comparison.json": "29e1651647be9861bfa064737b0342889af66b4ce0eb78d2266e2dc2bb174b6b",
+        "focus-comparison.json": "d8273743d4b1a958168ff687f60f42ae0f11e38dbb5d492d2e9355e4b5dea911",
+        "recorded-comparison.json": "e4cc4c7d21debcfdb5b0903c9a99e9d6ec301be743c9d7d1f9d577ea5657ebac"
+      }
+    }
+  },
+  "no_unexpected_skipped_or_failed_steps": true
+}
