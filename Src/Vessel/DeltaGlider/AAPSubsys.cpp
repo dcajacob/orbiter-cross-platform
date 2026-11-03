@@ -22,6 +22,7 @@
 #include "AAPSubsys.h"
 #include "InstrHsi.h"
 #include "meshres_p0.h"
+#include <string>
 
 using std::min;
 using std::max;
@@ -30,7 +31,7 @@ static const float texw = (float)PANEL2D_TEXW; // texture width
 static const float texh = (float)PANEL2D_TEXH; // texture height
 static const int xofs = 742;
 static const int yofs = 400;
-static const WORD idx_bb[6] = {0,1,2,3,2,1};
+static const oapi::UInt16 idx_bb[6] = {0,1,2,3,2,1};
 
 // ==============================================================
 // Atmospheric autopilot subsystem
@@ -44,7 +45,7 @@ AAPSubsystem::AAPSubsystem (DGSubsystem *parent)
 
 // --------------------------------------------------------------
 
-bool AAPSubsystem::clbkLoadPanel2D (int panelid, PANELHANDLE hPanel, DWORD viewW, DWORD viewH)
+bool AAPSubsystem::clbkLoadPanel2D (int panelid, PANELHANDLE hPanel, oapi::UInt32 viewW, oapi::UInt32 viewH)
 {
 	if (panelid != 0) return false;
 
@@ -64,7 +65,7 @@ void AAPSubsystem::clbkSaveState (FILEHANDLE scn)
 
 bool AAPSubsystem::clbkParseScenarioLine (const char *line)
 {
-	if (!_strnicmp (line, "AAP", 3)) {
+	if (!dg::ComparePrefix (line, "AAP", 3)) {
 		aap->SetState (line);
 		return true;
 	} else
@@ -88,9 +89,13 @@ AAP::AAP (AAPSubsystem *_subsys)
 	hsi = NULL;
 	oapiExecScriptCmd (hAAP, "run('dg/aap')"); // load the autopilot code
 
-	char setVesselCmd[256];
-	sprintf_s(setVesselCmd,256,"setvessel(vessel.get_interface('%s'))",vessel->GetName());
-	oapiAsyncScriptCmd (hAAP, setVesselCmd); // set autopilot vessel
+	std::string setVesselCmd = "setvessel(vessel.get_interface('";
+	for (const char *c = vessel->GetName(); *c; ++c) {
+		if (*c == '\'' || *c == '\\') setVesselCmd += '\\';
+		setVesselCmd += *c;
+	}
+	setVesselCmd += "'))";
+	oapiAsyncScriptCmd (hAAP, setVesselCmd.c_str()); // set autopilot vessel
 
 	active_block = -1;
 	for (i = 0; i < 3; i++) {

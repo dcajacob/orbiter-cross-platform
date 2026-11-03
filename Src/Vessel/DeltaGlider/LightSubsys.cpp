@@ -50,7 +50,7 @@ InstrumentLight::InstrumentLight (LightCtrlSubsystem *_subsys)
 	ELID_DIAL = AddElement (dial = new InstrumentBrightnessDial (this));
 
 	// Instrument brightness dial animation
-	static UINT InstrBDialGrp = GRP_INSTR_BRIGHTNESS_VC;
+	static oapi::UInt InstrBDialGrp = GRP_INSTR_BRIGHTNESS_VC;
 	static MGROUP_ROTATE InstrBDialTransform (1, &InstrBDialGrp, 1,
 		VC_INSTR_BRIGHTNESS_ref, VC_INSTR_BRIGHTNESS_axis, (float)(-280*RAD));
 	anim_dial = DG()->CreateAnimation (0.5);
@@ -87,7 +87,7 @@ void InstrumentLight::SetLight (bool on, bool force)
 			mat.emissive.b *= scale;
 		}
 		oapiSetMaterial (DG()->vcmesh, 11, on ? &mat : &norm);
-		GROUPEDITSPEC ges = {(DWORD)(on ? GRPEDIT_ADDUSERFLAG : GRPEDIT_DELUSERFLAG), 0x18, 0,0,0};
+		GROUPEDITSPEC ges = {(oapi::UInt32)(on ? GRPEDIT_ADDUSERFLAG : GRPEDIT_DELUSERFLAG), 0x18, 0,0,0};
 		oapiEditMeshGroup (DG()->vcmesh, GRP_LIT_LABELS_VC, &ges);
 	}
 }
@@ -118,7 +118,7 @@ void InstrumentLight::clbkSaveState (FILEHANDLE scn)
 
 bool InstrumentLight::clbkParseScenarioLine (const char *line)
 {
-	if (!strnicmp (line, "INSTRLIGHT", 10)) {
+	if (!dg::ComparePrefix (line, "INSTRLIGHT", 10)) {
 		int lon;
 		sscanf (line+10, "%d%d%lf", &lon, &light_col, &brightness);
 		light_on = (lon != 0);
@@ -210,7 +210,7 @@ CockpitLight::CockpitLight (LightCtrlSubsystem *_subsys)
 	ELID_DIAL = AddElement (dial = new CockpitBrightnessDial (this));
 
 	// Floodlight brightness dial animation
-	static UINT FloodBDialGrp = GRP_FLOOD_BRIGHTNESS_VC;
+	static oapi::UInt FloodBDialGrp = GRP_FLOOD_BRIGHTNESS_VC;
 	static MGROUP_ROTATE FloodBDialTransform (1, &FloodBDialGrp, 1,
 		VC_FLOOD_BRIGHTNESS_ref, VC_FLOOD_BRIGHTNESS_axis, (float)(-280*RAD));
 	anim_dial = DG()->CreateAnimation (0.5);
@@ -272,7 +272,7 @@ void CockpitLight::clbkSaveState (FILEHANDLE scn)
 
 bool CockpitLight::clbkParseScenarioLine (const char *line)
 {
-	if (!strnicmp (line, "FLOODLIGHT", 10)) {
+	if (!dg::ComparePrefix (line, "FLOODLIGHT", 10)) {
 		sscanf (line+10, "%d%lf", &light_mode, &brightness);
 		light_mode = max (0, min (2, light_mode));
 		brightness = max (0.0, min (1.0, brightness));
@@ -402,7 +402,7 @@ void LandDockLight::clbkSaveState (FILEHANDLE scn)
 
 bool LandDockLight::clbkParseScenarioLine (const char *line)
 {
-	if (!strnicmp (line, "LANDDOCKLIGHT", 13)) {
+	if (!dg::ComparePrefix (line, "LANDDOCKLIGHT", 13)) {
 		sscanf (line+13, "%d", &light_mode);
 		light_mode = max (0, min (2, light_mode));
 		return true;
@@ -412,7 +412,7 @@ bool LandDockLight::clbkParseScenarioLine (const char *line)
 
 // --------------------------------------------------------------
 
-bool LandDockLight::clbkLoadPanel2D (int panelid, PANELHANDLE hPanel, DWORD viewW, DWORD viewH)
+bool LandDockLight::clbkLoadPanel2D (int panelid, PANELHANDLE hPanel, oapi::UInt32 viewW, oapi::UInt32 viewH)
 {
 	if (panelid != 1) return false;
 
@@ -527,7 +527,7 @@ void StrobeLight::clbkSaveState (FILEHANDLE scn)
 
 bool StrobeLight::clbkParseScenarioLine (const char *line)
 {
-	if (!strnicmp (line, "STROBELIGHT", 11)) {
+	if (!dg::ComparePrefix (line, "STROBELIGHT", 11)) {
 		int mode;
 		sscanf (line+11, "%d", &mode);
 		light_on = (mode != 0);
@@ -538,7 +538,7 @@ bool StrobeLight::clbkParseScenarioLine (const char *line)
 
 // --------------------------------------------------------------
 
-bool StrobeLight::clbkLoadPanel2D (int panelid, PANELHANDLE hPanel, DWORD viewW, DWORD viewH)
+bool StrobeLight::clbkLoadPanel2D (int panelid, PANELHANDLE hPanel, oapi::UInt32 viewW, oapi::UInt32 viewH)
 {
 	if (panelid != 1) return false;
 
@@ -653,7 +653,7 @@ void NavLight::clbkSaveState (FILEHANDLE scn)
 
 bool NavLight::clbkParseScenarioLine (const char *line)
 {
-	if (!strnicmp (line, "NAVLIGHT", 8)) {
+	if (!dg::ComparePrefix (line, "NAVLIGHT", 8)) {
 		int mode;
 		sscanf (line+8, "%d", &mode);
 		light_on = (mode != 0);
@@ -664,7 +664,7 @@ bool NavLight::clbkParseScenarioLine (const char *line)
 
 // --------------------------------------------------------------
 
-bool NavLight::clbkLoadPanel2D (int panelid, PANELHANDLE hPanel, DWORD viewW, DWORD viewH)
+bool NavLight::clbkLoadPanel2D (int panelid, PANELHANDLE hPanel, oapi::UInt32 viewW, oapi::UInt32 viewH)
 {
 	if (panelid != 1) return false;
 

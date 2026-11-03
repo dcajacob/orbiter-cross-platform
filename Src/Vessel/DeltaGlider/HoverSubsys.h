@@ -21,6 +21,9 @@
 // Hover control subsystem
 // ==============================================================
 
+class HoverHoldAltIndicator;
+class HoverThrottle;
+
 class HoverAttitudeComponent;
 class HoverHoldComponent;
 class HoverManualComponent;
@@ -81,7 +84,7 @@ public:
 	void clbkSaveState (FILEHANDLE scn);
 	bool clbkParseScenarioLine (const char *line);
 	void clbkPostStep (double simt, double simdt, double mjd);
-	bool clbkLoadPanel2D (int panelid, PANELHANDLE hPanel, DWORD viewW, DWORD viewH);
+	bool clbkLoadPanel2D (int panelid, PANELHANDLE hPanel, oapi::UInt32 viewW, oapi::UInt32 viewH);
 	bool clbkLoadVC (int vcid);
 
 private:
@@ -131,7 +134,7 @@ public:
 	void clbkSaveState (FILEHANDLE scn);
 	bool clbkParseScenarioLine (const char *line);
 	void clbkPostStep (double simt, double simdt, double mjd);
-	bool clbkLoadPanel2D (int panelid, PANELHANDLE hPanel, DWORD viewW, DWORD viewH);
+	bool clbkLoadPanel2D (int panelid, PANELHANDLE hPanel, oapi::UInt32 viewW, oapi::UInt32 viewH);
 	bool clbkLoadVC (int vcid);
 
 protected:
@@ -169,13 +172,13 @@ class HoverManualComponent: public HoverSubsystemComponent {
 
 public:
 	HoverManualComponent (HoverSubsystem *_subsys);
-	bool clbkLoadPanel2D (int panelid, PANELHANDLE hPanel, DWORD viewW, DWORD viewH);
+	bool clbkLoadPanel2D (int panelid, PANELHANDLE hPanel, oapi::UInt32 viewW, oapi::UInt32 viewH);
 	bool clbkLoadVC (int vcid);
 
 private:
 	HoverThrottle *throttle;
 	int ELID_THROTTLE;          // hover throttle panel ID
-	UINT anim_hoverthrottle;    // VC hover throttle animation ID
+	oapi::UInt anim_hoverthrottle;    // VC hover throttle animation ID
 };
 
 
@@ -212,7 +215,7 @@ private:
 	int pofs_cur, pofs_cmd;
 	int rofs_cur, rofs_cmd;
 	GROUPREQUESTSPEC vc_grp; ///< Buffered VC vertex data
-	WORD vperm[8];
+	oapi::UInt16 vperm[8];
 };
 
 // ==============================================================
@@ -267,8 +270,8 @@ public:
 	HoverAltModeButtons (HoverHoldComponent *hhac);
 	~HoverAltModeButtons();
 	void DefineAnimation2D (int meshgrp, int vofs);
-	void DefineAnimationsVC (const VECTOR3 &axis, DWORD meshgrp, DWORD meshgrp_label,
-		DWORD vofs[2], DWORD vofs_label[2]);
+	void DefineAnimationsVC (const VECTOR3 &axis, oapi::UInt32 meshgrp, oapi::UInt32 meshgrp_label,
+		oapi::UInt32 vofs[2], oapi::UInt32 vofs_label[2]);
 	bool Redraw2D (SURFHANDLE hSurf);
 	bool RedrawVC (DEVMESHHANDLE hMesh, SURFHANDLE surf);
 	bool ProcessMouse2D (int event, int mx, int my);
@@ -351,7 +354,7 @@ public:
 private:
 	HoverManualComponent *ctrl;
 	float ppos;
-	UINT sliderpos;
+	oapi::UInt sliderpos;
 };
 
 #endif // !__HOVERSUBSYS_H

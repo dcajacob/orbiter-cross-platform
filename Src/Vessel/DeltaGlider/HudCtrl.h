@@ -43,11 +43,11 @@ public:
 	void RevertHud ();
 	void ModHUDBrightness (bool increase);
 	void clbkPostStep (double simt, double simdt, double mjd);
-	bool clbkLoadPanel2D (int panelid, PANELHANDLE hPanel, DWORD viewW, DWORD viewH);
+	bool clbkLoadPanel2D (int panelid, PANELHANDLE hPanel, oapi::UInt32 viewW, oapi::UInt32 viewH);
 	bool clbkLoadVC (int vcid);
 	void clbkReset2D(int panelid, MESHHANDLE hMesh);
 	void clbkResetVC (int vcid, DEVMESHHANDLE hMesh);
-	int clbkConsumeBufferedKey (DWORD key, bool down, char *kstate);
+	int clbkConsumeBufferedKey (oapi::UInt32 key, bool down, char *kstate);
 
 private:
 	int last_mode;
@@ -64,8 +64,8 @@ private:
 	int ELID_HUDCOLOUR;            // element ID: colour button
 	int ELID_HUDRETRACT;           // element ID: HUD extend/retract switch
 
-	UINT anim_vc_hudbdial;         // VC HUD brightness dial
-	UINT anim_vc_hud;              // VC HUD folding away
+	oapi::UInt anim_vc_hudbdial;         // VC HUD brightness dial
+	oapi::UInt anim_vc_hud;              // VC HUD folding away
 };
 
 // ==============================================================
@@ -75,12 +75,12 @@ class HUDModeButtons: public PanelElement {
 public:
 	HUDModeButtons (HUDControl *hc);
 	~HUDModeButtons ();
-	void DefineAnimationsVC (const VECTOR3 &axis, DWORD meshgrp, DWORD meshgrp_label,
-		DWORD vofs[3], DWORD vofs_label[3]);
+	void DefineAnimationsVC (const VECTOR3 &axis, oapi::UInt32 meshgrp, oapi::UInt32 meshgrp_label,
+		oapi::UInt32 vofs[3], oapi::UInt32 vofs_label[3]);
 	void SetMode (int mode);
 	void Reset2D (int panelid, MESHHANDLE hMesh);
 	void ResetVC (DEVMESHHANDLE hMesh);
-	void LoadPanel2D(int panelid, PANELHANDLE hPanel, DWORD viewW, DWORD viewH);
+	void LoadPanel2D(int panelid, PANELHANDLE hPanel, oapi::UInt32 viewW, oapi::UInt32 viewH);
 	void LoadVC (int vcid);
 	bool Redraw2D (SURFHANDLE surf);
 	bool RedrawVC (DEVMESHHANDLE hMesh, SURFHANDLE surf);

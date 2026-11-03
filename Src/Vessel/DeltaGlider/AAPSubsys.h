@@ -22,7 +22,6 @@
 #ifndef __AAPSUBSYS_H
 #define __AAPSUBSYS_H
 
-#include "Orbitersdk.h"
 #include "DeltaGlider.h"
 #include "DGSubsys.h"
 
@@ -36,7 +35,7 @@ class AAP;
 class AAPSubsystem: public DGSubsystem {
 public:
 	AAPSubsystem (DGSubsystem *parent);
-	bool clbkLoadPanel2D (int panelid, PANELHANDLE hPanel, DWORD viewW, DWORD viewH);
+	bool clbkLoadPanel2D (int panelid, PANELHANDLE hPanel, oapi::UInt32 viewW, oapi::UInt32 viewH);
 	void clbkSaveState (FILEHANDLE scn);
 	bool clbkParseScenarioLine (const char *line);
 	void AttachHSI (InstrHSI *_hsi);

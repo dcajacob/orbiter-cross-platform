@@ -93,3 +93,15 @@ the stock strict-mode script, preserved Lua multiple returns, and rejected a
 missing stock file and an attempted traversal. The DG Lua source compiles as a
 native object. Running AAP jobs against a live native DG still requires the full
 Orbiter interpreter and the stock vessel module.
+
+The native cockpit build compiles the 15 original DG subsystem sources used
+by the Windows vessel, including the DG-S scramjet and the AAP panel. A local
+relocatable link of those objects and the stock instruments left four Orbiter
+script calls and five methods on the main DeltaGlider class to resolve. The
+subsystem archive alone does not load a vessel or execute its autopilot.
+
+The shared panel, VC and HUD SDK functions call the original Pane, and the
+scenario SDK shares the original readers, writers and floating-point format
+with Windows. A 60-frame ShuttlePB run exercised HUD mode switching, docking
+receiver selection, brightness and subsystem scenario round trips. DG panel
+click areas and VC rendering still need verification on the actual DG vessels.

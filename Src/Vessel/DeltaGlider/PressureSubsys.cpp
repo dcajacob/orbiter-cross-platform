@@ -216,7 +216,7 @@ void PressureSubsystem::clbkPostStep (double simt, double simdt, double mjd)
 
 // --------------------------------------------------------------
 
-bool PressureSubsystem::clbkLoadPanel2D (int panelid, PANELHANDLE hPanel, DWORD viewW, DWORD viewH)
+bool PressureSubsystem::clbkLoadPanel2D (int panelid, PANELHANDLE hPanel, oapi::UInt32 viewW, oapi::UInt32 viewH)
 {
 	bool res = DGSubsystem::clbkLoadPanel2D (panelid, hPanel, viewW, viewH);
 
@@ -286,10 +286,10 @@ AirlockCtrl::AirlockCtrl (PressureSubsystem *_subsys)
 	ELID_ISWITCH = AddElement (isw = new InnerLockSwitch (this));
 
 	// Outer airlock animation
-	static UINT OLockGrp[2] = {GRP_OLock1,GRP_OLock2};
+	static oapi::UInt OLockGrp[2] = {GRP_OLock1,GRP_OLock2};
 	static MGROUP_ROTATE OLock (0, OLockGrp, 2,
 		_V(0,-0.080,9.851), _V(1,0,0), (float)(110*RAD));
-	static UINT VCOLockGrp[1] = {13};
+	static oapi::UInt VCOLockGrp[1] = {13};
 	static MGROUP_ROTATE VCOLock (1, VCOLockGrp, 1,
 		_V(0,-0.080,9.851), _V(1,0,0), (float)(110*RAD));
 	anim_olock = DG()->CreateAnimation (0);
@@ -297,11 +297,11 @@ AirlockCtrl::AirlockCtrl (PressureSubsystem *_subsys)
 	DG()->AddAnimationComponent (anim_olock, 0, 1, &VCOLock);
 
 	// Inner airlock animation
-	static UINT ILockGrp[2] = {GRP_ILock1,GRP_ILock2};
+	static oapi::UInt ILockGrp[2] = {GRP_ILock1,GRP_ILock2};
 	static MGROUP_ROTATE ILock (0, ILockGrp, 2,
 		_V(0,-0.573,7.800), _V(1,0,0), (float)(85*RAD));
 	// virtual cockpit mesh animation (inner airlock visible from cockpit)
-	static UINT VCILockGrp[4] = {GRP_ILOCK1_VC,GRP_ILOCK2_VC,GRP_ILOCK3_VC,GRP_ILOCK_GLASS_VC};
+	static oapi::UInt VCILockGrp[4] = {GRP_ILOCK1_VC,GRP_ILOCK2_VC,GRP_ILOCK3_VC,GRP_ILOCK_GLASS_VC};
 	static MGROUP_ROTATE VCILock (1, VCILockGrp, 4,
 		_V(0,-0.573,7.800), _V(1,0,0), (float)(85*RAD));
 	anim_ilock = DG()->CreateAnimation (0);
@@ -416,7 +416,7 @@ void AirlockCtrl::clbkPostStep (double simt, double simdt, double mjd)
 
 // --------------------------------------------------------------
 
-bool AirlockCtrl::clbkLoadPanel2D (int panelid, PANELHANDLE hPanel, DWORD viewW, DWORD viewH)
+bool AirlockCtrl::clbkLoadPanel2D (int panelid, PANELHANDLE hPanel, oapi::UInt32 viewW, oapi::UInt32 viewH)
 {
 	if (panelid != 1) return false;
 
@@ -456,12 +456,12 @@ bool AirlockCtrl::clbkLoadVC (int vcid)
 
 bool AirlockCtrl::clbkPlaybackEvent (double simt, double event_t, const char *event_type, const char *event)
 {
-	if (!_stricmp (event_type, "OLOCK")) {
-		if (!_stricmp (event, "CLOSE")) CloseOuterLock();
+	if (!dg::CompareText (event_type, "OLOCK")) {
+		if (!dg::CompareText (event, "CLOSE")) CloseOuterLock();
 		else                            OpenOuterLock();
 		return true;
-	} else if (!_stricmp (event_type, "ILOCK")) {
-		if (!_stricmp (event, "CLOSE")) CloseInnerLock();
+	} else if (!dg::CompareText (event_type, "ILOCK")) {
+		if (!dg::CompareText (event, "CLOSE")) CloseInnerLock();
 		else                            OpenInnerLock();
 		return true;
 	}
@@ -470,7 +470,7 @@ bool AirlockCtrl::clbkPlaybackEvent (double simt, double event_t, const char *ev
 
 // --------------------------------------------------------------
 
-int AirlockCtrl::clbkConsumeBufferedKey (DWORD key, bool down, char *kstate)
+int AirlockCtrl::clbkConsumeBufferedKey (oapi::UInt32 key, bool down, char *kstate)
 {
 	if (KEYMOD_ALT(kstate) || KEYMOD_SHIFT(kstate))
 		return 0;
@@ -595,20 +595,20 @@ TophatchCtrl::TophatchCtrl (PressureSubsystem *_subsys)
 	ELID_SWITCH = AddElement (sw = new HatchCtrlSwitch (this));
 
 	// Top hatch animation
-	static UINT HatchGrp[2] = {GRP_Hatch1,GRP_Hatch2};
+	static oapi::UInt HatchGrp[2] = {GRP_Hatch1,GRP_Hatch2};
 	static MGROUP_ROTATE Hatch (0, HatchGrp, 2,
 		_V(0,2.069,5.038), _V(1,0,0), (float)(110*RAD));
-	static UINT VCHatchGrp[1] = {GRP_HATCH_VC};
+	static oapi::UInt VCHatchGrp[1] = {GRP_HATCH_VC};
 	static MGROUP_ROTATE VCHatch (1, VCHatchGrp, 1,
 		_V(0,2.069,5.038), _V(1,0,0), (float)(110*RAD));
-	static UINT RearLadderGrp[2] = {GRP_RearLadder1,GRP_RearLadder2};
+	static oapi::UInt RearLadderGrp[2] = {GRP_RearLadder1,GRP_RearLadder2};
 	static MGROUP_ROTATE RearLadder1 (0, RearLadderGrp, 2,
 		_V(0,1.7621,4.0959), _V(1,0,0), (float)(-20*RAD));
 	static MGROUP_ROTATE RearLadder2 (0, RearLadderGrp+1, 1,
 		_V(0,1.1173,4.1894), _V(1,0,0), (float)(180*RAD));
 
 	// virtual cockpit ladder animation
-	static UINT VCRearLadderGrp[2] = {GRP_LADDER1_VC,GRP_LADDER2_VC};
+	static oapi::UInt VCRearLadderGrp[2] = {GRP_LADDER1_VC,GRP_LADDER2_VC};
 	static MGROUP_ROTATE VCRearLadder1 (1, VCRearLadderGrp, 2,
 		_V(0,1.7621,4.0959), _V(1,0,0), (float)(-20*RAD));
 	static MGROUP_ROTATE VCRearLadder2 (1, VCRearLadderGrp+1, 1,
@@ -718,7 +718,7 @@ void TophatchCtrl::clbkPostStep (double simt, double simdt, double mjd)
 				hatch_state.SetState (0.2, 0.0);
 				DG()->SetAnimation(anim_hatch, 0.2);
 			} else {                 // tear off hatch
-				static UINT HatchGrp[2] = {12,88};
+				static oapi::UInt HatchGrp[2] = {12,88};
 				GROUPEDITSPEC ges;
 				ges.flags = GRPEDIT_SETUSERFLAG;
 				ges.UsrFlag = 3;
@@ -731,7 +731,7 @@ void TophatchCtrl::clbkPostStep (double simt, double simdt, double mjd)
 
 // --------------------------------------------------------------
 
-bool TophatchCtrl::clbkLoadPanel2D (int panelid, PANELHANDLE hPanel, DWORD viewW, DWORD viewH)
+bool TophatchCtrl::clbkLoadPanel2D (int panelid, PANELHANDLE hPanel, oapi::UInt32 viewW, oapi::UInt32 viewH)
 {
 	if (panelid != 1) return false;
 
@@ -761,8 +761,8 @@ bool TophatchCtrl::clbkLoadVC (int vcid)
 
 bool TophatchCtrl::clbkPlaybackEvent (double simt, double event_t, const char *event_type, const char *event)
 {
-	if (!_stricmp (event_type, "HATCH")) {
-		if (!_stricmp (event, "CLOSE")) CloseHatch();
+	if (!dg::CompareText (event_type, "HATCH")) {
+		if (!dg::CompareText (event, "CLOSE")) CloseHatch();
 		else                            OpenHatch();
 		return true;
 	}
@@ -771,7 +771,7 @@ bool TophatchCtrl::clbkPlaybackEvent (double simt, double event_t, const char *e
 
 // --------------------------------------------------------------
 
-int TophatchCtrl::clbkConsumeBufferedKey(DWORD key, bool down, char *kstate)
+int TophatchCtrl::clbkConsumeBufferedKey(oapi::UInt32 key, bool down, char *kstate)
 {
 	if (KEYMOD_ALT(kstate) || KEYMOD_SHIFT(kstate))
 		return 0;
@@ -790,7 +790,7 @@ void TophatchCtrl::RepairDamage ()
 	if (hatchfail) {
 		hatch_state.SetState (0.0, 0.0);
 		DG()->SetAnimation (anim_hatch, 0.0);
-		static UINT HatchGrp[2] = {12,88};
+		static oapi::UInt HatchGrp[2] = {12,88};
 		GROUPEDITSPEC ges;
 		ges.flags = GRPEDIT_SETUSERFLAG;
 		ges.UsrFlag = 0;

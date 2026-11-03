@@ -11,7 +11,7 @@ endif()
 FetchContent_Declare(native_imgui URL "${_ui_url}" URL_HASH "SHA256=${_ui_hash}" DOWNLOAD_EXTRACT_TIMESTAMP TRUE SOURCE_SUBDIR no-build)
 FetchContent_MakeAvailable(native_imgui)
 target_sources(orbiter_production_vessels PRIVATE
-    NativeCockpitProjection.cpp NativeCockpitMfd.cpp NativeCockpitGui.cpp NativeCockpitVessel.cpp ../Astro.cpp
+    NativeCockpitProjection.cpp NativeCockpitMfd.cpp NativeCockpitGui.cpp NativeCockpitVessel.cpp ../CockpitSdk.cpp ../Astro.cpp
     ../Pane.cpp ../hud.cpp ../Defpanel.cpp ../Panel2D.cpp ../VCockpit.cpp ../Select.cpp
     ../Mfd.cpp ../MfdUser.cpp ../VectorMap.cpp ../MfdOrbit.cpp ../MfdSurface.cpp ../MfdMap.cpp ../MfdHsi.cpp
     ../MfdLanding.cpp ../MfdDocking.cpp ../MfdAlign.cpp ../MfdSync.cpp ../MfdTransfer.cpp ../MfdComms.cpp
@@ -49,3 +49,26 @@ target_include_directories(native_dg_instruments PRIVATE "${_dg_header_dir}")
 target_link_libraries(native_dg_instruments PRIVATE orbiter_production_vessels)
 set_target_properties(native_dg_instruments PROPERTIES POSITION_INDEPENDENT_CODE ON)
 add_dependencies(native_dg_instruments native_dg_mesh_resources)
+
+# Compiled into the stock vessel once its main module and interpreter are linked.
+add_library(native_dg_subsystems STATIC
+    "${_dg_source}/AAPSubsys.cpp"
+    "${_dg_source}/AerodynSubsys.cpp"
+    "${_dg_source}/AvionicsSubsys.cpp"
+    "${_dg_source}/DockingSubsys.cpp"
+    "${_dg_source}/FailureSubsys.cpp"
+    "${_dg_source}/GearSubsys.cpp"
+    "${_dg_source}/HoverSubsys.cpp"
+    "${_dg_source}/HudCtrl.cpp"
+    "${_dg_source}/LightSubsys.cpp"
+    "${_dg_source}/MainRetroSubsys.cpp"
+    "${_dg_source}/MfdSubsys.cpp"
+    "${_dg_source}/PressureSubsys.cpp"
+    "${_dg_source}/RcsSubsys.cpp"
+    "${_dg_source}/ScramSubsys.cpp"
+    "${_dg_source}/ThermalSubsys.cpp"
+)
+target_include_directories(native_dg_subsystems PRIVATE "${_dg_header_dir}")
+target_link_libraries(native_dg_subsystems PRIVATE native_dg_instruments orbiter_production_vessels)
+set_target_properties(native_dg_subsystems PROPERTIES POSITION_INDEPENDENT_CODE ON)
+add_dependencies(native_dg_subsystems native_dg_mesh_resources)

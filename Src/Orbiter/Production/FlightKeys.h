@@ -105,6 +105,7 @@
 #define OAPI_KEY_INSERT         0xD2  ///< Insert on cursor keypad
 #define OAPI_KEY_DELETE         0xD3  ///< Delete on cursor keypad
 #define KEYDOWN(buf,key) (buf[key] & 0x80)
+#define RESETKEY(buf,key) (buf[key] = 0)
 #define KEYMOD_LSHIFT(buf)   (KEYDOWN(buf,OAPI_KEY_LSHIFT))
 #define KEYMOD_RSHIFT(buf)   (KEYDOWN(buf,OAPI_KEY_RSHIFT))
 #define KEYMOD_SHIFT(buf)    (KEYMOD_LSHIFT(buf) || KEYMOD_RSHIFT(buf))

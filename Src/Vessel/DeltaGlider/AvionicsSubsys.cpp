@@ -45,7 +45,7 @@ AvionicsSubsystem::AvionicsSubsystem (DeltaGlider *v)
 
 // --------------------------------------------------------------
 
-bool AvionicsSubsystem::clbkLoadPanel2D (int panelid, PANELHANDLE hPanel, DWORD viewW, DWORD viewH)
+bool AvionicsSubsystem::clbkLoadPanel2D (int panelid, PANELHANDLE hPanel, oapi::UInt32 viewW, oapi::UInt32 viewH)
 {
 	DGSubsystem::clbkLoadPanel2D (panelid, hPanel, viewW, viewH);
 

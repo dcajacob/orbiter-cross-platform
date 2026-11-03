@@ -7,15 +7,19 @@
 #include "FlightControls.h"
 #include "NativeParticle.h"
 #include "RigidBodyServices.h"
+#include "Random.h"
 #include "GeometryConversions.h"
 #include "SurfaceServices.h"
 #include <fstream>
 #include <stdexcept>
 using namespace orbiter::production;
-void oapiWriteScenario_string(FILEHANDLE file, char *item, char *value)
+double oapiRand()
 {
-    auto &stream = *static_cast<std::ofstream*>(file);
-    stream << "  " << item << ' ' << value << std::endl;
+    return rand1();
+}
+void oapiParticleSetLevelRef(PSTREAM_HANDLE ph, double *lvl)
+{
+    static_cast<oapi::ParticleStream*>(ph)->SetLevelPtr(lvl);
 }
 namespace {
 [[noreturn]] void unavailable(const char* feature)

@@ -45,12 +45,6 @@ extern char DBG_MSG[256];
 // API interface functions
 // ------------------------------------------------------------------------------
 
-DLLEXPORT void FormatValue (char *cbuf, int n, double f, int precision)
-{
-	char *s = FloatStr (f, precision);
-	strncpy (cbuf, s, n);
-}
-
 DLLEXPORT HINSTANCE oapiGetOrbiterInstance ()
 {
 	return g_pOrbiter->GetInstance();
@@ -1207,56 +1201,6 @@ DLLEXPORT bool oapiSetMeshProperty (DEVMESHHANDLE hMesh, DWORD property, DWORD v
 	return (gc ? gc->clbkSetMeshProperty (hMesh, property, value) : false);
 }
 
-DLLEXPORT bool oapiSetHUDMode (int mode)
-{
-	return (g_pane ? g_pane->SetHUDMode (mode) : false);
-}
-
-DLLEXPORT bool oapiSetHUDMode (int mode, const HUDPARAM *prm)
-{
-	return (g_pane ? g_pane->SetHUDMode (mode, prm) : false);
-}
-
-DLLEXPORT int oapiGetHUDMode ()
-{
-	return (g_pane ? g_pane->GetHUDMode () : 0);
-}
-
-DLLEXPORT int oapiGetHUDMode (HUDPARAM *prm)
-{
-	return (g_pane ? g_pane->GetHUDMode (prm) : 0);
-}
-
-DLLEXPORT void oapiToggleHUDColour ()
-{
-	if (g_pane) g_pane->ToggleHUDColour ();
-}
-
-DLLEXPORT double oapiGetHUDIntensity ()
-{
-	return (g_pane ? g_pane->HudIntens() : 0.0);
-}
-
-DLLEXPORT void oapiSetHUDIntensity (double val)
-{
-	if (g_pane) g_pane->SetHUDIntens (val);
-}
-
-DLLEXPORT void oapiIncHUDIntensity ()
-{
-	if (g_pane) g_pane->IncHUDIntens ();
-}
-
-DLLEXPORT void oapiDecHUDIntensity ()
-{
-	if (g_pane) g_pane->DecHUDIntens ();
-}
-
-DLLEXPORT void oapiRenderHUD (MESHHANDLE hMesh, SURFHANDLE *hTex)
-{
-	if (g_pane) g_pane->RenderCustomHUD (hMesh, hTex);
-}
-
 DLLEXPORT void oapiOpenMFD (int mode, int mfd)
 {
 	if (g_pane) g_pane->OpenMFD (mfd, mode);
@@ -1326,11 +1270,6 @@ DLLEXPORT void oapiRegisterMFD (int mfd, const MFDSPEC &spec)
 	g_pane->RegisterMFD (mfd, spec);
 }
 
-DLLEXPORT void oapiRegisterMFD (int mfd, const EXTMFDSPEC *spec)
-{
-	g_pane->RegisterMFD (mfd, spec);
-}
-
 DLLEXPORT void oapiRegisterExternMFD (ExternMFD *emfd, const MFDSPEC &spec)
 {
 	if (g_pane)
@@ -1380,16 +1319,6 @@ DLLEXPORT void oapiRegisterPanelArea (int id, const RECT &pos, int draw_event, i
 	g_pane->RegisterPanelArea (id, pos, draw_event, mouse_event, bkmode);
 }
 
-DLLEXPORT void oapiSetPanelNeighbours (int left, int right, int top, int bottom)
-{
-	g_pane->SetPanelNeighbours (left, right, top, bottom);
-}
-
-DLLEXPORT void oapiVCSetNeighbours (int left, int right, int top, int bottom)
-{
-	g_pane->SetVCNeighbours (left, right, top, bottom);
-}
-
 DLLEXPORT void oapiTriggerRedrawArea (int panel_id, int vc_id, int area_id)
 {
 	static bool bwarn = true;
@@ -1410,66 +1339,6 @@ DLLEXPORT void oapiTriggerPanelRedrawArea (int panel_id, int area_id)
 	}
 	if (g_pane)
 		g_pane->TriggerPanelRedrawArea (panel_id, area_id);
-}
-
-DLLEXPORT bool oapiBltPanelAreaBackground (int area_id, SURFHANDLE surf)
-{
-	if (g_pane)
-		return g_pane->BltPanelAreaBackground (area_id, surf);
-	else
-		return false;
-}
-
-DLLEXPORT void oapiSetDefNavDisplay (int mode)
-{
-	DefaultPanel *defpanel = g_pane->GetDefaultPanel();
-	if (defpanel) defpanel->SetNavDisplayMode (mode);
-}
-
-DLLEXPORT void oapiSetDefRCSDisplay (int mode)
-{
-	DefaultPanel *defpanel = g_pane->GetDefaultPanel();
-	if (defpanel) defpanel->SetRCSDisplayMode (mode);
-}
-
-DLLEXPORT int oapiSwitchPanel (int direction)
-{
-	return g_pane->SwitchPanel (direction);
-}
-
-DLLEXPORT int oapiSetPanel (int panel_id)
-{
-	return g_pane->SelectPanel (panel_id);
-}
-
-DLLEXPORT void oapiSetPanelBlink (VECTOR3 v[4])
-{
-	g_pane->SetPanel2DBlink (v);
-}
-
-DLLEXPORT void oapiVCTriggerRedrawArea (int vc_id, int area_id)
-{
-	g_pane->TriggerVCRedrawArea (vc_id, area_id);
-}
-
-DLLEXPORT void oapiVCRegisterArea (int id, const RECT &tgtrect, int draw_event, int mouse_event, int bkmode, SURFHANDLE tgt)
-{
-	g_pane->RegisterVCArea (id, tgtrect, draw_event, mouse_event, bkmode, tgt);
-}
-
-DLLEXPORT void oapiVCRegisterArea (int id, int draw_event, int mouse_event)
-{
-	g_pane->RegisterVCArea (id, _R(0,0,0,0), draw_event, mouse_event, PANEL_MAP_NONE, NULL);
-}
-
-DLLEXPORT void oapiVCSetAreaClickmode_Spherical (int id, const VECTOR3 &cnt, double rad)
-{
-	g_pane->SetVCAreaClickmode_Spherical (id, Vector(cnt.x, cnt.y, cnt.z), rad);
-}
-
-DLLEXPORT void oapiVCSetAreaClickmode_Quadrilateral (int id, const VECTOR3 &p1, const VECTOR3 &p2, const VECTOR3 &p3, const VECTOR3 &p4)
-{
-	g_pane->SetVCAreaClickmode_Quadrilateral (id, Vector(p1.x, p1.y, p1.z), Vector(p2.x,p2.y,p2.z), Vector(p3.x,p3.y,p3.z), Vector(p4.x,p4.y,p4.z));
 }
 
 DLLEXPORT oapi::Sketchpad *oapiGetSketchpad (SURFHANDLE surf)
@@ -1956,102 +1825,6 @@ DLLEXPORT void __writeLogError(const char *func, const char *file, int line, con
 	LogOut_ErrorVA(func, file, line, format, ap);
 	va_end(ap);
 #endif
-}
-
-DLLEXPORT void oapiWriteScenario_string (FILEHANDLE file, char *item, char *string)
-{
-	ofstream &ofs = *(ofstream*)file;
-	ofs << "  " << item << ' ' << string << endl;
-}
-
-DLLEXPORT void oapiWriteScenario_int (FILEHANDLE file, char *item, int i)
-{
-	ofstream &ofs = *(ofstream*)file;
-	ofs << "  " << item << ' ' << i << endl;
-}
-
-DLLEXPORT void oapiWriteScenario_float (FILEHANDLE file, char *item, double d)
-{
-	ofstream &ofs = *(ofstream*)file;
-	FltFormat f{ 6 }; // default precision: 6
-	ofs << "  " << item << ' ' << f(d) << endl;
-}
-
-DLLEXPORT void oapiWriteScenario_vec (FILEHANDLE file, char *item, const VECTOR3 &vec)
-{
-	ofstream &ofs = *(ofstream*)file;
-	FltFormat f{ 6 }; // default precision: 6
-	ofs << "  " << item << ' ' << f(vec.x) << ' ' << f(vec.y) << ' ' << f(vec.z) << endl;
-}
-
-DLLEXPORT bool oapiReadScenario_nextline (FILEHANDLE file, char *&line)
-{
-	ifstream &ifs = *(ifstream*)file;
-	char *cbuf = readline(ifs);
-	if (!cbuf) return false;
-	line = trim_string (cbuf);
-	if (!_stricmp (line, "END")) return false;
-	return true;
-}
-
-DLLEXPORT void oapiWriteItem_string (FILEHANDLE file, char *item, char *string)
-{
-	ofstream &ofs = *(ofstream*)file;
-	ofs << item << " = " << string << endl;
-}
-
-DLLEXPORT void oapiWriteItem_float (FILEHANDLE file, char *item, double d)
-{
-	ofstream &ofs = *(ofstream*)file;
-	ofs << item << " = " << d << endl;
-}
-
-DLLEXPORT void oapiWriteItem_int (FILEHANDLE file, char *item, int i)
-{
-	ofstream &ofs = *(ofstream*)file;
-	ofs << item << " = " << i << endl;
-}
-
-DLLEXPORT void oapiWriteItem_bool (FILEHANDLE file, char *item, bool b)
-{
-	ofstream &ofs = *(ofstream*)file;
-	ofs << item << " = " << (b ? "TRUE":"FALSE") << endl;
-}
-
-DLLEXPORT void oapiWriteItem_vec (FILEHANDLE file, char *item, const VECTOR3 &vec)
-{
-	ofstream &ofs = *(ofstream*)file;
-	ofs << item << " = " << vec.x << ' ' << vec.y << ' ' << vec.z << endl;
-}
-
-DLLEXPORT bool oapiReadItem_string (FILEHANDLE f, char *item, char *string)
-{
-	return GetItemString (*(ifstream*)f, item, string);
-}
-
-DLLEXPORT bool oapiReadItem_float (FILEHANDLE f, char *item, double &val)
-{
-	return GetItemReal (*(ifstream*)f, item, val);
-}
-
-DLLEXPORT bool oapiReadItem_int (FILEHANDLE f, char *item, int &val)
-{
-	return GetItemInt (*(ifstream*)f, item, val);
-}
-
-DLLEXPORT bool oapiReadItem_bool (FILEHANDLE f, char *item, bool &val)
-{
-	return GetItemBool (*(ifstream*)f, item, val);
-}
-
-DLLEXPORT bool oapiReadItem_vec (FILEHANDLE f, char *item, VECTOR3 &val)
-{
-	Vector vec;
-	bool res = GetItemVector (*(ifstream*)f, item, vec);
-	val.x = vec.x;
-	val.y = vec.y;
-	val.z = vec.z;
-	return res;
 }
 
 DLLEXPORT void oapiOpenInputBox (char *title, bool (*Clbk)(void*,char*,void*), char *buf, int vislen, void *usrdata)

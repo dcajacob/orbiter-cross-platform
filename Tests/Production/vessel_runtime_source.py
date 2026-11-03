@@ -138,7 +138,31 @@ def previous_files():
         moved.append(body)
     equal('\n'.join(moved),implementation,'Shared flight SDK calculations and service delegates')
     for start,end in reversed(spans):remaining=remaining[:start]+remaining[end:]
+    panel=raw('Src/Orbiter/CockpitSdk.cpp').split('bool oapiSetHUDMode',1)[1]
+    panel=aliases('bool oapiSetHUDMode'+panel)
+    panel=panel.replace('Pane *pane = orbiter::production::ActiveCockpitPane();','')
+    panel=re.sub(r'\bpane\b','g_pane',panel).replace('orbiter::production::CockpitPane()','g_pane')
+    for method in re.finditer(r'^([^\n]+\([^\n]*\)\n\{.*?^\})',panel,re.M|re.S):
+        signature=method[1].splitlines()[0]
+        start=remaining.index('DLLEXPORT '+signature+'\n')
+        end=remaining.index('\n}',start)+2
+        equal(remaining[start:end], 'DLLEXPORT '+method[1], 'Shared cockpit SDK: '+signature)
+        remaining=remaining[:start]+remaining[end:]
+    scenario=raw('Src/Orbiter/ScenarioSdk.cpp')
+    begin=remaining.index('DLLEXPORT void oapiWriteScenario_string')
+    end=remaining.index('DLLEXPORT void oapiOpenInputBox',begin)
+    original=remaining[begin:end].replace('DLLEXPORT ','').replace('_stricmp (line, "END")','orbiter::production::CompareText(line, "END")')
+    equal(original,scenario[scenario.index('void oapiWriteScenario_string'):],'Original scenario and item readers/writers')
+    remaining=remaining[:begin]+remaining[end:]
     equal(remaining,raw(path),path);result[path]=old(path)
+    fmt='// Floating point output stream formatter'
+    for utility in ('Src/Orbiter/Util.h','Src/Orbiter/Util.cpp'):
+        source=old(utility)
+        start=source.index(fmt)
+        if utility.endswith('.cpp'):start=source.rindex('// ----',0,start)
+        end=source.index('// Convert a CSS color',start) if utility.endswith('.h') else len(source)
+        if source[start:end].strip() not in scenario:raise ValueError('Original floating-point formatter differs: '+utility)
+        equal(source[:start]+source[end:],raw(utility),utility);result[utility]=source
     # Preserve stock module capabilities, force-coefficient tables and animation
     # associations. Only exact Windows scalar aliases and its native entry differ.
     path='Src/Vessel/ShuttlePB/ShuttlePB.cpp';s=aliases(raw(path))

@@ -13,6 +13,7 @@
 #define __DGSUBSYS_H
 
 #include "DeltaGlider.h"
+#include "DGPlatform.h"
 #include "../Common/Instrument.h"
 
 // ==============================================================

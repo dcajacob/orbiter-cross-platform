@@ -249,7 +249,7 @@ void HoverAttitudeComponent::clbkSaveState (FILEHANDLE scn)
 
 bool HoverAttitudeComponent::clbkParseScenarioLine (const char *line)
 {
-	if (!_strnicmp (line, "HOVERMODE", 9)) {
+	if (!dg::ComparePrefix (line, "HOVERMODE", 9)) {
 		double ph, rh;
 		int n = sscanf (line+9, "%d%lf%lf", &mode, &ph, &rh);
 		if (mode == 2 && n == 3) // copy manual settings
@@ -269,7 +269,7 @@ void HoverAttitudeComponent::clbkPostStep (double simt, double simdt, double mjd
 
 // --------------------------------------------------------------
 
-bool HoverAttitudeComponent::clbkLoadPanel2D (int panelid, PANELHANDLE hPanel, DWORD viewW, DWORD viewH)
+bool HoverAttitudeComponent::clbkLoadPanel2D (int panelid, PANELHANDLE hPanel, oapi::UInt32 viewW, oapi::UInt32 viewH)
 {
 	if (panelid != 0) return false;
 
@@ -460,7 +460,7 @@ void HoverHoldComponent::clbkSaveState (FILEHANDLE scn)
 
 bool HoverHoldComponent::clbkParseScenarioLine (const char *line)
 {
-	if (!_strnicmp (line, "HOVERHOLD", 9)) {
+	if (!dg::ComparePrefix (line, "HOVERHOLD", 9)) {
 		int iact, imode;
 		double alt, vspd;
 		int n = sscanf (line+9, "%d%d%lf%lf", &iact, &imode, &alt, &vspd);
@@ -486,7 +486,7 @@ void HoverHoldComponent::clbkPostStep (double simt, double simdt, double mjd)
 
 // --------------------------------------------------------------
 
-bool HoverHoldComponent::clbkLoadPanel2D (int panelid, PANELHANDLE hPanel, DWORD viewW, DWORD viewH)
+bool HoverHoldComponent::clbkLoadPanel2D (int panelid, PANELHANDLE hPanel, oapi::UInt32 viewW, oapi::UInt32 viewH)
 {
 	if (panelid != 0) return false;
 
@@ -541,8 +541,8 @@ bool HoverHoldComponent::clbkLoadVC (int vcid)
 		oapiVCRegisterArea (ELID_MODEBUTTONS, PANEL_REDRAW_USER | PANEL_REDRAW_MOUSE, PANEL_MOUSE_LBDOWN | PANEL_MOUSE_LBUP);
 		oapiVCSetAreaClickmode_Quadrilateral (ELID_MODEBUTTONS, VC_HOVERMODE_BUTTONS_mousearea[0], VC_HOVERMODE_BUTTONS_mousearea[1], VC_HOVERMODE_BUTTONS_mousearea[2], VC_HOVERMODE_BUTTONS_mousearea[3]);
 		{
-			static DWORD hoverbtn_vofs[2] = {VC_BTN_HOVERMODE_1_vofs,VC_BTN_HOVERMODE_2_vofs};
-			static DWORD hoverbtn_label_vofs[2] = {VC_BTN_HOVERMODE_1_LABEL_vofs, VC_BTN_HOVERMODE_2_LABEL_vofs};
+			static oapi::UInt32 hoverbtn_vofs[2] = {VC_BTN_HOVERMODE_1_vofs,VC_BTN_HOVERMODE_2_vofs};
+			static oapi::UInt32 hoverbtn_label_vofs[2] = {VC_BTN_HOVERMODE_1_LABEL_vofs, VC_BTN_HOVERMODE_2_LABEL_vofs};
 			modebuttons->DefineAnimationsVC (VC_BTN_HOVERMODE_1_axis, GRP_BUTTON3_VC, GRP_LIT_SURF_VC, hoverbtn_vofs, hoverbtn_label_vofs);
 		}
 
@@ -562,7 +562,7 @@ HoverManualComponent::HoverManualComponent (HoverSubsystem *_subsys)
 	ELID_THROTTLE = AddElement (throttle = new HoverThrottle (this));
 
 	// Hover throttle VC animation
-	static UINT HoverThrottleGrp[2] = {GRP_THROTTLE_HOVER_1_VC,GRP_THROTTLE_HOVER_2_VC};
+	static oapi::UInt HoverThrottleGrp[2] = {GRP_THROTTLE_HOVER_1_VC,GRP_THROTTLE_HOVER_2_VC};
 	static MGROUP_ROTATE HoverThrottle (1, HoverThrottleGrp, 2,
 		_V(-0.41,0.85,6.9226), _V(1,0,0), (float)(50*RAD));
 	anim_hoverthrottle = DG()->CreateAnimation (0);
@@ -572,7 +572,7 @@ HoverManualComponent::HoverManualComponent (HoverSubsystem *_subsys)
 
 // --------------------------------------------------------------
 
-bool HoverManualComponent::clbkLoadPanel2D (int panelid, PANELHANDLE hPanel, DWORD viewW, DWORD viewH)
+bool HoverManualComponent::clbkLoadPanel2D (int panelid, PANELHANDLE hPanel, oapi::UInt32 viewW, oapi::UInt32 viewH)
 {
 	if (panelid != 0) return false;
 
@@ -682,7 +682,7 @@ HoverDisp::HoverDisp (HoverAttitudeComponent *_ctrl)
 	pofs_cmd = rofs_cmd = 0;
 	memset (&vc_grp, 0, sizeof(GROUPREQUESTSPEC));
 	for (int i = 0; i < 8; i++)
-		vperm[i] = (WORD)(i+VC_HOVER_INDICATOR_vofs);
+		vperm[i] = (oapi::UInt16)(i+VC_HOVER_INDICATOR_vofs);
 }
 
 // --------------------------------------------------------------
@@ -940,8 +940,8 @@ void HoverAltModeButtons::Reset2D (int panelid, MESHHANDLE hMesh)
 
 // --------------------------------------------------------------
 
-void HoverAltModeButtons::DefineAnimationsVC (const VECTOR3 &axis, DWORD meshgrp, DWORD meshgrp_label,
-	DWORD vofs[2], DWORD vofs_label[2])
+void HoverAltModeButtons::DefineAnimationsVC (const VECTOR3 &axis, oapi::UInt32 meshgrp, oapi::UInt32 meshgrp_label,
+	oapi::UInt32 vofs[2], oapi::UInt32 vofs_label[2])
 {
 	for (int i = 0; i < 2; i++) 
 		btn[i]->DefineAnimationVC (axis, meshgrp, meshgrp_label, vofs[i], vofs_label[i]);
@@ -1230,7 +1230,7 @@ void HoverThrottle::Reset2D (int panelid, MESHHANDLE hMesh)
 
 void HoverThrottle::ResetVC (DEVMESHHANDLE hMesh)
 {
-	sliderpos = (UINT)-1;
+	sliderpos = (oapi::UInt)-1;
 }
 
 // --------------------------------------------------------------
@@ -1289,7 +1289,7 @@ bool HoverThrottle::RedrawVC (DEVMESHHANDLE hMesh, SURFHANDLE surf)
 {
 	DeltaGlider *dg = ctrl->DG();
 	double level = dg->GetHoverThrusterLevel (0);
-	UINT pos = (UINT)(level*500.0);
+	oapi::UInt pos = (oapi::UInt)(level*500.0);
 	if (pos != sliderpos) {
 		dg->SetAnimation (ctrl->anim_hoverthrottle, level);
 		sliderpos = pos;

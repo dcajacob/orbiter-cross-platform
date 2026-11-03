@@ -60,6 +60,7 @@ inline int CockpitScreenHeight() {return GetSystemMetrics(SM_CYSCREEN);}
 inline TimeData& CockpitTime() {return td;}
 inline PlanetarySystem* CockpitWorld() {return g_psys;}
 inline Vessel* CockpitFocus() {return g_focusobj;}
+inline Pane* ActiveCockpitPane() {return g_pane;}
 inline Pane* CockpitPane() {return g_pane;}
 inline Select* CockpitSelect() {return g_select;}
 inline InputBox* CockpitInput() {return g_input;}

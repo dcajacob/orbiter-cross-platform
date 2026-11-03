@@ -578,6 +578,8 @@ namespace orbiter::production {
 namespace {NativeRenderContext* current=nullptr;}
 NativeRenderContext* BindNativeRenderContext(NativeRenderContext* next)
 {auto* old=current;current=next;return old;}
+Pane* ActiveCockpitPane()
+{return current ? current->cockpitPane : nullptr;}
 NativeRenderContext& GetNativeRenderContext()
 {if(!current) throw std::logic_error("Native production render context is unbound");return *current;}
 const void* RenderConfig(oapi::UInt32 id) {return GetNativeRenderContext().configuration->GetParam(id);}

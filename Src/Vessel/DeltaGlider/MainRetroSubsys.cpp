@@ -95,14 +95,14 @@ MainRetroThrottle::MainRetroThrottle (MainRetroSubsystem *_subsys)
 	ELID_LEVERS = AddElement (levers = new MainRetroThrottleLevers (this));
 
 	// VC animation: Left main engine throttle
-	static UINT MainThrottleLGrp[2] = {GRP_THROTTLE_MAIN_L1_VC,GRP_THROTTLE_MAIN_L2_VC};
+	static oapi::UInt MainThrottleLGrp[2] = {GRP_THROTTLE_MAIN_L1_VC,GRP_THROTTLE_MAIN_L2_VC};
 	static MGROUP_ROTATE MainThrottleL (1, MainThrottleLGrp, 2,
 		_V(0,0.72,6.9856), _V(1,0,0), (float)(50*RAD));
 	anim_lever[0] = DG()->CreateAnimation (0.4);
 	DG()->AddAnimationComponent (anim_lever[0], 0, 1, &MainThrottleL);
 
 	// VC animation: Right main engine throttle
-	static UINT MainThrottleRGrp[2] = {GRP_THROTTLE_MAIN_R1_VC,GRP_THROTTLE_MAIN_R2_VC};
+	static oapi::UInt MainThrottleRGrp[2] = {GRP_THROTTLE_MAIN_R1_VC,GRP_THROTTLE_MAIN_R2_VC};
 	static MGROUP_ROTATE MainThrottleR (1, MainThrottleRGrp, 2,
 		_V(0,0.72,6.9856), _V(1,0,0), (float)(50*RAD));
 	anim_lever[1] = DG()->CreateAnimation (0.4);
@@ -111,7 +111,7 @@ MainRetroThrottle::MainRetroThrottle (MainRetroSubsystem *_subsys)
 
 // --------------------------------------------------------------
 
-bool MainRetroThrottle::clbkLoadPanel2D (int panelid, PANELHANDLE hPanel, DWORD viewW, DWORD viewH)
+bool MainRetroThrottle::clbkLoadPanel2D (int panelid, PANELHANDLE hPanel, oapi::UInt32 viewW, oapi::UInt32 viewH)
 {
 	if (panelid != 0) return false;
 
@@ -157,7 +157,7 @@ void MainRetroThrottleLevers::Reset2D (int panelid, MESHHANDLE hMesh)
 void MainRetroThrottleLevers::ResetVC (DEVMESHHANDLE hMesh)
 {
 	for (int i = 0; i < 2; i++)
-		sliderpos[i] = (UINT)-1;
+		sliderpos[i] = (oapi::UInt)-1;
 }
 
 // --------------------------------------------------------------
@@ -194,15 +194,15 @@ bool MainRetroThrottleLevers::Redraw2D (SURFHANDLE surf)
 
 bool MainRetroThrottleLevers::RedrawVC (DEVMESHHANDLE hMesh, SURFHANDLE hSurf)
 {
-	UINT i, pos;
+	oapi::UInt i, pos;
 
 	DeltaGlider *dg = component->DG();
 	for (i = 0; i < 2; i++) {
 		double level = dg->GetMainThrusterLevel(i);
-		if (level > 0) pos = 150 + (UINT)(level*300.0);
+		if (level > 0) pos = 150 + (oapi::UInt)(level*300.0);
 		else {
 			level = dg->GetRetroThrusterLevel(i);
-			pos = 150 - (UINT)(level*150.0);
+			pos = 150 - (oapi::UInt)(level*150.0);
 		}
 		if (pos != sliderpos[i]) {
 			dg->SetAnimation (component->anim_lever[i], (sliderpos[i] = pos)/450.0);
@@ -439,7 +439,7 @@ void GimbalControl::clbkSaveState (FILEHANDLE scn)
 
 bool GimbalControl::clbkParseScenarioLine (const char *line)
 {
-	if (!_strnicmp (line, "MGIMBALMODE", 11)) {
+	if (!dg::ComparePrefix (line, "MGIMBALMODE", 11)) {
 		double pg[2], yg[2];
 		int n = sscanf (line+11, "%d%lf%lf%lf%lf", &mode, pg+0, pg+1, yg+0, yg+1);
 		if (mode ==2 && n == 5) // copy manual settings
@@ -460,7 +460,7 @@ void GimbalControl::clbkPostStep (double simt, double simdt, double mjd)
 
 // --------------------------------------------------------------
 
-bool GimbalControl::clbkLoadPanel2D (int panelid, PANELHANDLE hPanel, DWORD viewW, DWORD viewH)
+bool GimbalControl::clbkLoadPanel2D (int panelid, PANELHANDLE hPanel, oapi::UInt32 viewW, oapi::UInt32 viewH)
 {
 	if (panelid != 0) return false;
 
@@ -588,7 +588,7 @@ MainGimbalDisp::MainGimbalDisp (GimbalControl *gc)
 	}
 	memset (&vc_grp, 0, sizeof(GROUPREQUESTSPEC));
 	for (int i = 0; i < 16; i++)
-		vperm[i] = (WORD)(i+VC_GIMBAL_INDICATOR_LEFT_vofs);
+		vperm[i] = (oapi::UInt16)(i+VC_GIMBAL_INDICATOR_LEFT_vofs);
 }
 
 // --------------------------------------------------------------
@@ -843,7 +843,7 @@ YMainGimbalCtrl::YMainGimbalCtrl (GimbalControl *gc)
 	for (i = 0; i < 2; i++)
 		vc_state[i] = 0;
 	for (i = 0; i < nvtx_per_switch*2; i++)
-		vperm[i] = (WORD)(i+VC_GIMBAL_YSWITCH_vofs);
+		vperm[i] = (oapi::UInt16)(i+VC_GIMBAL_YSWITCH_vofs);
 }
 
 // --------------------------------------------------------------
@@ -973,16 +973,16 @@ RetroCoverControl::RetroCoverControl (MainRetroSubsystem *_subsys)
 	ELID_INDICATOR = AddElement (indicator = new RetroCoverIndicator(this));
 
 	// Retro cover animation
-	static UINT RCoverTLGrp[2] = {GRP_RCoverTL1,GRP_RCoverTL2};
+	static oapi::UInt RCoverTLGrp[2] = {GRP_RCoverTL1,GRP_RCoverTL2};
 	static MGROUP_ROTATE RCoverTL (0, RCoverTLGrp, 2,
 		_V(-2.156,-0.49,6.886), _V(-0.423,0.23,-0.877), (float)( 70*RAD));
-	static UINT RCoverBLGrp[2] = {GRP_RCoverBL1,GRP_RCoverBL2};
+	static oapi::UInt RCoverBLGrp[2] = {GRP_RCoverBL1,GRP_RCoverBL2};
 	static MGROUP_ROTATE RCoverBL (0, RCoverBLGrp, 2,
 		_V(-2.156,-0.49,6.886), _V(-0.434,-0.037,-0.9), (float)(-70*RAD));
-	static UINT RCoverTRGrp[2] = {GRP_RCoverTR1,GRP_RCoverTR2};
+	static oapi::UInt RCoverTRGrp[2] = {GRP_RCoverTR1,GRP_RCoverTR2};
 	static MGROUP_ROTATE RCoverTR (0, RCoverTRGrp, 2,
 		_V( 2.156,-0.49,6.886), _V( 0.423,0.23,-0.877), (float)(-70*RAD));
-	static UINT RCoverBRGrp[2] = {GRP_RCoverBR1,GRP_RCoverBR2};
+	static oapi::UInt RCoverBRGrp[2] = {GRP_RCoverBR1,GRP_RCoverBR2};
 	static MGROUP_ROTATE RCoverBR (0, RCoverBRGrp, 2,
 		_V( 2.156,-0.49,6.886), _V( 0.434,-0.037,-0.9), (float)( 70*RAD));
 	anim_rcover = DG()->CreateAnimation (0);
@@ -1051,7 +1051,7 @@ void RetroCoverControl::clbkPostStep (double simt, double simdt, double mjd)
 
 // --------------------------------------------------------------
 
-bool RetroCoverControl::clbkLoadPanel2D (int panelid, PANELHANDLE hPanel, DWORD viewW, DWORD viewH)
+bool RetroCoverControl::clbkLoadPanel2D (int panelid, PANELHANDLE hPanel, oapi::UInt32 viewW, oapi::UInt32 viewH)
 {
 	if (panelid != 0) return false;
 
@@ -1088,8 +1088,8 @@ bool RetroCoverControl::clbkLoadVC (int vcid)
 
 bool RetroCoverControl::clbkPlaybackEvent (double simt, double event_t, const char *event_type, const char *event)
 {
-	if (!_stricmp (event_type, "RCOVER")) {
-		if (!_stricmp (event, "CLOSE")) CloseRetroCover();
+	if (!dg::CompareText (event_type, "RCOVER")) {
+		if (!dg::CompareText (event, "CLOSE")) CloseRetroCover();
 		else                            OpenRetroCover();
 		return true;
 	}
@@ -1184,12 +1184,12 @@ bool RetroCoverIndicator::RedrawVC (DEVMESHHANDLE hMesh, SURFHANDLE surf)
 	bool showlights = (state.State() == 1.0 || (state.Speed() && modf(oapiGetSimTime()*1.7, &d) < 0.5));
 	if (showlights != vlight_VC) {
 		GROUPEDITSPEC ges;
-		static const WORD vtxofs = VC_RCOVER_INDICATOR_vofs;
-		static const DWORD nvtx = 4;
-		static WORD vidx[nvtx] = {vtxofs,vtxofs+1,vtxofs+2,vtxofs+3};
+		static const oapi::UInt16 vtxofs = VC_RCOVER_INDICATOR_vofs;
+		static const oapi::UInt32 nvtx = 4;
+		static oapi::UInt16 vidx[nvtx] = {vtxofs,vtxofs+1,vtxofs+2,vtxofs+3};
 		static const float u[2] = {0.0586f,0.0713f};
 		NTVERTEX vtx[nvtx];
-		for (DWORD i = 0; i < nvtx; i++)
+		for (oapi::UInt32 i = 0; i < nvtx; i++)
 			vtx[i].tu = u[showlights ? 1:0];
 		ges.flags = GRPEDIT_VTXTEXU;
 		ges.Vtx = vtx;

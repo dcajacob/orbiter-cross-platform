@@ -36,7 +36,7 @@ AerodynCtrlSubsystem::AerodynCtrlSubsystem (DeltaGlider *v)
 
 // --------------------------------------------------------------
 
-void AerodynCtrlSubsystem::SetMode (DWORD mode)
+void AerodynCtrlSubsystem::SetMode (oapi::UInt32 mode)
 {
 	selector->SetMode (mode);
 }
@@ -74,9 +74,9 @@ AerodynSelector::AerodynSelector (AerodynCtrlSubsystem *_subsys)
 
 // --------------------------------------------------------------
 
-void AerodynSelector::SetMode (DWORD mode)
+void AerodynSelector::SetMode (oapi::UInt32 mode)
 {
-	DWORD curmode = DG()->GetADCtrlMode();
+	oapi::UInt32 curmode = DG()->GetADCtrlMode();
 	if (curmode != mode) DG()->SetADCtrlMode (mode);
 	DG()->TriggerRedrawArea (0, 0, ELID_DIAL);
 
@@ -84,7 +84,7 @@ void AerodynSelector::SetMode (DWORD mode)
 
 // --------------------------------------------------------------
 
-DWORD AerodynSelector::GetMode () const
+oapi::UInt32 AerodynSelector::GetMode () const
 {
 	return DG()->GetADCtrlMode();
 }
@@ -93,7 +93,7 @@ DWORD AerodynSelector::GetMode () const
 
 bool AerodynSelector::IncMode ()
 {
-	DWORD mode = DG()->GetADCtrlMode();
+	oapi::UInt32 mode = DG()->GetADCtrlMode();
 	if (mode <= 1) {
 		DG()->SetADCtrlMode (mode ? 7 : 1);
 		return true;
@@ -104,7 +104,7 @@ bool AerodynSelector::IncMode ()
 
 bool AerodynSelector::DecMode ()
 {
-	DWORD mode = min (DG()->GetADCtrlMode(),(DWORD)2);
+	oapi::UInt32 mode = min (DG()->GetADCtrlMode(),(oapi::UInt32)2);
 	if (mode) {
 		DG()->SetADCtrlMode (mode-1);
 		return true;
@@ -113,7 +113,7 @@ bool AerodynSelector::DecMode ()
 
 // --------------------------------------------------------------
 
-bool AerodynSelector::clbkLoadPanel2D (int panelid, PANELHANDLE hPanel, DWORD viewW, DWORD viewH)
+bool AerodynSelector::clbkLoadPanel2D (int panelid, PANELHANDLE hPanel, oapi::UInt32 viewW, oapi::UInt32 viewH)
 {
 	if (panelid != 0) return false;
 
@@ -158,7 +158,7 @@ void AerodynSelectorDial::Reset2D (int panelid, MESHHANDLE hMesh)
 void AerodynSelectorDial::ResetVC (DEVMESHHANDLE hMesh)
 {
 	DGDial1::ResetVC (hMesh);
-	DWORD mode = vessel->GetADCtrlMode();
+	oapi::UInt32 mode = vessel->GetADCtrlMode();
 	SetPosition (mode == 0 ? 0 : mode == 7 ? 1 : 2);
 }
 
@@ -175,7 +175,7 @@ bool AerodynSelectorDial::Redraw2D (SURFHANDLE surf)
 	static const float tx_dy = 43.0f;              // texture block height
 	static float tu[4] = {tx_x0/texw,(tx_x0+tx_dx)/texw,tx_x0/texw,(tx_x0+tx_dx)/texw};
 
-	float dtu = (float)(min(vessel->GetADCtrlMode(),(DWORD)2)*40.0)/texw;
+	float dtu = (float)(min(vessel->GetADCtrlMode(),(oapi::UInt32)2)*40.0)/texw;
 	for (int i = 0; i < 4; i++)
 		grp->Vtx[vtxofs+i].tu = tu[i]+dtu;
 	return false;
@@ -185,7 +185,7 @@ bool AerodynSelectorDial::Redraw2D (SURFHANDLE surf)
 
 bool AerodynSelectorDial::RedrawVC (DEVMESHHANDLE hMesh, SURFHANDLE surf)
 {
-	DWORD mode = component->GetMode();
+	oapi::UInt32 mode = component->GetMode();
 	SetPosition(mode == 0 ? 0 : mode == 7 ? 1 : 2);
 	return DGDial1::RedrawVC (hMesh, surf);
 }
@@ -222,12 +222,12 @@ Airbrake::Airbrake (AerodynCtrlSubsystem *_subsys)
 	ELID_LEVER = AddElement (lever = new AirbrakeLever (this));
 
 	// Airbrake animation
-	static UINT RRudderGrp[2] = {GRP_RRudder1,GRP_RRudder2};
-	static UINT LRudderGrp[2] = {GRP_LRudder1,GRP_LRudder2};
-	static UINT UpperBrakeGrp[4] = {GRP_RUAileron1,GRP_LUAileron1,GRP_LUAileron2,GRP_RUAileron2};
+	static oapi::UInt RRudderGrp[2] = {GRP_RRudder1,GRP_RRudder2};
+	static oapi::UInt LRudderGrp[2] = {GRP_LRudder1,GRP_LRudder2};
+	static oapi::UInt UpperBrakeGrp[4] = {GRP_RUAileron1,GRP_LUAileron1,GRP_LUAileron2,GRP_RUAileron2};
 	static MGROUP_ROTATE UpperBrake (0, UpperBrakeGrp, 4,
 		_V(0,-0.4,-6.0), _V(1,0,0), (float)(50*RAD));
-	static UINT LowerBrakeGrp[4] = {GRP_LLAileron1,GRP_RLAileron1,GRP_LLAileron2,GRP_RLAileron2};
+	static oapi::UInt LowerBrakeGrp[4] = {GRP_LLAileron1,GRP_RLAileron1,GRP_LLAileron2,GRP_RLAileron2};
 	static MGROUP_ROTATE LowerBrake (0, LowerBrakeGrp, 4,
 		_V(0,-0.4,-6.0), _V(1,0,0), (float)(-50*RAD));
 	static MGROUP_ROTATE RRudderBrake (0, RRudderGrp, 2,
@@ -242,7 +242,7 @@ Airbrake::Airbrake (AerodynCtrlSubsystem *_subsys)
 	DG()->AddAnimationComponent (anim_brake, 0, 1, &LRudderBrake);
 
 	// Airbrake lever animation
-	static UINT AirbrakeLeverGrp = GRP_AIRBRAKE_LEVER_VC;
+	static oapi::UInt AirbrakeLeverGrp = GRP_AIRBRAKE_LEVER_VC;
 	static MGROUP_ROTATE AirbrakeLeverTransform (1, &AirbrakeLeverGrp, 1,
 		VC_AIRBRAKELEVER_ref, VC_AIRBRAKELEVER_axis, (float)(-40*RAD));
 	anim_airbrakelever = DG()->CreateAnimation(0.8);
@@ -301,7 +301,7 @@ void Airbrake::clbkPostStep (double simt, double simdt, double mjd)
 
 // --------------------------------------------------------------
 
-bool Airbrake::clbkLoadPanel2D (int panelid, PANELHANDLE hPanel, DWORD viewW, DWORD viewH)
+bool Airbrake::clbkLoadPanel2D (int panelid, PANELHANDLE hPanel, oapi::UInt32 viewW, oapi::UInt32 viewH)
 {
 	if (panelid != 0) return false;
 
@@ -365,8 +365,8 @@ void Airbrake::clbkPostCreation ()
 
 bool Airbrake::clbkPlaybackEvent (double simt, double event_t, const char *event_type, const char *event)
 {
-	if (!_stricmp (event_type, "AIRBRAKE")) {
-		if (!_stricmp (event, "CLOSE")) Retract();
+	if (!dg::CompareText (event_type, "AIRBRAKE")) {
+		if (!dg::CompareText (event, "CLOSE")) Retract();
 		else                            Extend();
 		return true;
 	}
@@ -375,7 +375,7 @@ bool Airbrake::clbkPlaybackEvent (double simt, double event_t, const char *event
 
 // --------------------------------------------------------------
 
-int Airbrake::clbkConsumeBufferedKey (DWORD key, bool down, char *kstate)
+int Airbrake::clbkConsumeBufferedKey (oapi::UInt32 key, bool down, char *kstate)
 {
 	if (KEYMOD_ALT(kstate) || KEYMOD_SHIFT(kstate))
 		return 0;
@@ -462,7 +462,7 @@ ElevatorTrim::ElevatorTrim (AerodynCtrlSubsystem *_subsys)
 	ELID_TRIMWHEEL = AddElement (trimwheel = new ElevatorTrimWheel (this));
 
 	// Trim wheel animation
-	static UINT TrimWheelGrp = GRP_ETRIM_WHEEL_VC;
+	static oapi::UInt TrimWheelGrp = GRP_ETRIM_WHEEL_VC;
 	static MGROUP_ROTATE TrimWheelTransform (1, &TrimWheelGrp, 1,
 		VC_ETRIMWHEEL_ref, VC_ETRIMWHEEL_axis, (float)(PI*0.06));
 	anim_vc_trimwheel = DG()->CreateAnimation (0.5);
@@ -481,7 +481,7 @@ void ElevatorTrim::clbkSaveState (FILEHANDLE scn)
 
 bool ElevatorTrim::clbkParseScenarioLine (const char *line)
 {
-	if (!_strnicmp (line, "TRIM", 4)) {
+	if (!dg::ComparePrefix (line, "TRIM", 4)) {
 		double trim;
 		sscanf (line+4, "%lf", &trim);
 		DG()->SetControlSurfaceLevel (AIRCTRL_ELEVATORTRIM, trim, true);
@@ -492,7 +492,7 @@ bool ElevatorTrim::clbkParseScenarioLine (const char *line)
 
 // --------------------------------------------------------------
 
-bool ElevatorTrim::clbkLoadPanel2D (int panelid, PANELHANDLE hPanel, DWORD viewW, DWORD viewH)
+bool ElevatorTrim::clbkLoadPanel2D (int panelid, PANELHANDLE hPanel, oapi::UInt32 viewW, oapi::UInt32 viewH)
 {
 	if (panelid != 0) return false;
 
@@ -566,8 +566,8 @@ bool ElevatorTrimWheel::RedrawVC (DEVMESHHANDLE hMesh, SURFHANDLE surf)
 
 	double level = vessel->GetControlSurfaceLevel (AIRCTRL_ELEVATORTRIM);
 	if (level != trimposVC) {
-		const DWORD nvtx = 3;
-		WORD vidx[3] = {VC_ETRIMSCALE_vofs,VC_ETRIMSCALE_vofs+1,VC_ETRIMSCALE_vofs+2};
+		const oapi::UInt32 nvtx = 3;
+		oapi::UInt16 vidx[3] = {VC_ETRIMSCALE_vofs,VC_ETRIMSCALE_vofs+1,VC_ETRIMSCALE_vofs+2};
 		NTVERTEX vtx[nvtx];
 		GROUPEDITSPEC ges;
 		ges.flags = GRPEDIT_VTXCRDY|GRPEDIT_VTXCRDZ;
@@ -580,7 +580,7 @@ bool ElevatorTrimWheel::RedrawVC (DEVMESHHANDLE hMesh, SURFHANDLE surf)
 		static const double z0[3] = {VC_ETRIMSCALE_ref[0].z,VC_ETRIMSCALE_ref[1].z,VC_ETRIMSCALE_ref[2].z};
 		static double range = 0.032;
 		static double dy = -range*cos(tilt), dz = -range*sin(tilt);
-		for (DWORD i = 0; i < nvtx; i++) {
+		for (oapi::UInt32 i = 0; i < nvtx; i++) {
 			vtx[i].y = (float)(y0[i] + level*dy);
 			vtx[i].z = (float)(z0[i] + level*dz);
 		}

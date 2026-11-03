@@ -19,6 +19,8 @@
 // Reaction control subsystem
 // ==============================================================
 
+class RcsModeDial;
+
 class RcsModeSelector;
 class RcsProgButtons;
 
@@ -29,7 +31,7 @@ public:
 
 	void SetMode (int mode);
 	void SetProg (int prog, bool active);
-	bool clbkLoadPanel2D (int panelid, PANELHANDLE hPanel, DWORD viewW, DWORD viewH);
+	bool clbkLoadPanel2D (int panelid, PANELHANDLE hPanel, oapi::UInt32 viewW, oapi::UInt32 viewH);
 	bool clbkLoadVC (int vcid);
 
 private:
@@ -51,7 +53,7 @@ public:
 	void SetMode (int mode);
 	bool IncMode ();
 	bool DecMode ();
-	bool clbkLoadPanel2D (int panelid, PANELHANDLE hPanel, DWORD viewW, DWORD viewH);
+	bool clbkLoadPanel2D (int panelid, PANELHANDLE hPanel, oapi::UInt32 viewW, oapi::UInt32 viewH);
 	bool clbkLoadVC (int vcid);
 
 public:
@@ -87,8 +89,8 @@ public:
 	RcsProgButtons (RcsSubsystem *_subsys);
 	~RcsProgButtons ();
 	void SetMode (int mode, bool active);
-	void DefineAnimationsVC (const VECTOR3 &axis, DWORD meshgrp, DWORD meshgrp_label,
-		DWORD vofs[6], DWORD vofs_label[6]);
+	void DefineAnimationsVC (const VECTOR3 &axis, oapi::UInt32 meshgrp, oapi::UInt32 meshgrp_label,
+		oapi::UInt32 vofs[6], oapi::UInt32 vofs_label[6]);
 	void Reset2D (int panelid, MESHHANDLE hMesh);
 	void ResetVC (DEVMESHHANDLE hMesh);
 	bool Redraw2D (SURFHANDLE surf);

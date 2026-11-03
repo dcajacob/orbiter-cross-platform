@@ -28,6 +28,18 @@ void exercise(VESSEL &vessel, VISHANDLE visual)
     char name[] = "PB";
     require(oapiGetObjectByName(name) == object && oapiGetFocusObject() == object, "Stock focus lookup differs");
     require(oapiCockpitMode() == COCKPIT_GENERIC, "Stock generic cockpit mode unavailable");
+    HUDPARAM originalHud{}, docking{}, observed{};
+    const int originalMode = oapiGetHUDMode(&originalHud);
+    const double originalBrightness = oapiGetHUDIntensity();
+    oapiSetHUDMode(HUD_SURFACE);
+    require(oapiGetHUDMode() == HUD_SURFACE && !oapiSetHUDMode(HUD_SURFACE), "Surface HUD mode differs");
+    docking.HUDdocking.NavIdx = 1;
+    require(oapiSetHUDMode(HUD_DOCKING, &docking) && oapiGetHUDMode(&observed) == HUD_DOCKING &&
+            observed.HUDdocking.NavIdx == 1, "Docking HUD receiver differs");
+    oapiSetHUDIntensity(0.375);
+    require(oapiGetHUDIntensity() == 0.375, "HUD brightness control differs");
+    oapiSetHUDMode(originalMode, &originalHud);
+    oapiSetHUDIntensity(originalBrightness);
     require(std::abs(oapiTime2MJD(oapiGetSimTime()) - oapiGetSimMJD()) <= 1e-10, "Simulation clocks disagree");
     double valueRead;
     require(oapiGetPitch(object, &valueRead) && valueRead == vessel.GetPitch() &&
@@ -62,6 +74,21 @@ void exercise(VESSEL &vessel, VISHANDLE visual)
             restored.State() == gear.State() && restored.Speed() == gear.Speed(), "Stock animation scenario round trip failed");
     restored.Close();
     require(restored.Process(0.25) && restored.IsClosed() && !restored.IsActive(), "Restored actuator did not close");
+
+    const auto systemState = GetNativeRenderContext().evidence / "subsystems.scn";
+    {
+        std::ofstream stream(systemState);
+        stream.exceptions(std::ios::badbit | std::ios::failbit);
+        char hover[] = "HOVERHOLD", trim[] = "TRIM";
+        oapiWriteScenario_int(&stream, hover, 2);
+        oapiWriteScenario_float(&stream, trim, -0.1250004);
+        stream << "  END\n";
+    }
+    std::ifstream state(systemState);
+    char *entry;
+    require(oapiReadScenario_nextline(&state, entry) && !std::strcmp(entry, "HOVERHOLD 2") &&
+            oapiReadScenario_nextline(&state, entry) && !std::strcmp(entry, "TRIM -0.125") &&
+            !oapiReadScenario_nextline(&state, entry), "Stock subsystem scenario formatting or terminator differs");
 
     auto mesh = oapiLoadMeshGlobal("DG\\deltaglider_vc");
     require(mesh && oapiMeshGroupCount(mesh) == NGRP_VC, "Stock DG virtual cockpit template missing");

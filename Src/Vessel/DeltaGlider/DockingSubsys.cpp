@@ -92,25 +92,25 @@ NoseconeCtrl::NoseconeCtrl (DockingCtrlSubsystem *_subsys)
 	ELID_INDICATOR = AddElement (indicator = new NoseconeIndicator (this));
 
 	// Nosecone animation
-	static UINT NConeTLGrp[2] = {GRP_NConeTL1,GRP_NConeTL2};
+	static oapi::UInt NConeTLGrp[2] = {GRP_NConeTL1,GRP_NConeTL2};
 	static MGROUP_ROTATE NConeTL (0, NConeTLGrp, 2,
 		_V(-0.424,-0.066,9.838), _V(-0.707,-0.707,0), (float)(150*RAD));
-	static UINT NConeTRGrp[2] = {GRP_NConeTR1,GRP_NConeTR2};
+	static oapi::UInt NConeTRGrp[2] = {GRP_NConeTR1,GRP_NConeTR2};
 	static MGROUP_ROTATE NConeTR (0, NConeTRGrp, 2,
 		_V( 0.424,-0.066,9.838), _V(-0.707, 0.707,0), (float)(150*RAD));
-	static UINT NConeBLGrp[2] = {GRP_NConeBL1,GRP_NConeBL2};
+	static oapi::UInt NConeBLGrp[2] = {GRP_NConeBL1,GRP_NConeBL2};
 	static MGROUP_ROTATE NConeBL (0, NConeBLGrp, 2,
 		_V(-0.424,-0.914,9.838), _V( 0.707,-0.707,0), (float)(150*RAD));
-	static UINT NConeBRGrp[2] = {GRP_NConeBR1,GRP_NConeBR2};
+	static oapi::UInt NConeBRGrp[2] = {GRP_NConeBR1,GRP_NConeBR2};
 	static MGROUP_ROTATE NConeBR (0, NConeBRGrp, 2,
 		_V( 0.424,-0.914,9.838), _V( 0.707, 0.707,0), (float)(150*RAD));
-	static UINT NConeDockGrp[1] = {GRP_NConeDock};
+	static oapi::UInt NConeDockGrp[1] = {GRP_NConeDock};
 	static MGROUP_TRANSLATE NConeDock (0, NConeDockGrp, 1, _V(0,0,0.06));
 	// virtual cockpit mesh animation (nose cone visible from cockpit)
-	static UINT VCNConeTLGrp[1] = {GRP_NOSECONE_L_VC};
+	static oapi::UInt VCNConeTLGrp[1] = {GRP_NOSECONE_L_VC};
 	static MGROUP_ROTATE VCNConeTL (1, VCNConeTLGrp, 1,
 		_V(-0.424,-0.066,9.838), _V(-0.707,-0.707,0), (float)(150*RAD));
-	static UINT VCNConeTRGrp[1] = {GRP_NOSECONE_R_VC};
+	static oapi::UInt VCNConeTRGrp[1] = {GRP_NOSECONE_R_VC};
 	static MGROUP_ROTATE VCNConeTR (1, VCNConeTRGrp, 1,
 		_V( 0.424,-0.066,9.838), _V(-0.707, 0.707,0), (float)(150*RAD));
 	anim_nose = DG()->CreateAnimation (0);
@@ -123,7 +123,7 @@ NoseconeCtrl::NoseconeCtrl (DockingCtrlSubsystem *_subsys)
 	DG()->AddAnimationComponent (anim_nose, 0.8, 1, &NConeDock);
 
 	// Nosecone lever VC animatuion
-	static UINT NoseconeLeverGrp = GRP_NOSECONE_LEVER_VC;
+	static oapi::UInt NoseconeLeverGrp = GRP_NOSECONE_LEVER_VC;
 	static MGROUP_ROTATE NoseconeLeverTransform (1, &NoseconeLeverGrp, 1,
 		VC_NCONELEVER_ref, VC_NCONELEVER_axis, (float)(-70*RAD));
 	anim_noselever = DG()->CreateAnimation (0.5);
@@ -194,7 +194,7 @@ void NoseconeCtrl::clbkPostStep (double simt, double simdt, double mjd)
 
 // --------------------------------------------------------------
 
-bool NoseconeCtrl::clbkLoadPanel2D (int panelid, PANELHANDLE hPanel, DWORD viewW, DWORD viewH)
+bool NoseconeCtrl::clbkLoadPanel2D (int panelid, PANELHANDLE hPanel, oapi::UInt32 viewW, oapi::UInt32 viewH)
 {
 	if (panelid != 0) return false;
 
@@ -255,8 +255,8 @@ void NoseconeCtrl::clbkPostCreation ()
 
 bool NoseconeCtrl::clbkPlaybackEvent (double simt, double event_t, const char *event_type, const char *event)
 {
-	if (!_stricmp (event_type, "NOSECONE")) {
-		if (!_stricmp (event, "CLOSE")) CloseNcone();
+	if (!dg::CompareText (event_type, "NOSECONE")) {
+		if (!dg::CompareText (event, "CLOSE")) CloseNcone();
 		else                            OpenNcone();
 		return true;
 	}
@@ -265,7 +265,7 @@ bool NoseconeCtrl::clbkPlaybackEvent (double simt, double event_t, const char *e
 
 // --------------------------------------------------------------
 
-int NoseconeCtrl::clbkConsumeBufferedKey (DWORD key, bool down, char *kstate)
+int NoseconeCtrl::clbkConsumeBufferedKey (oapi::UInt32 key, bool down, char *kstate)
 {
 	if (KEYMOD_ALT(kstate) || KEYMOD_CONTROL(kstate) || KEYMOD_SHIFT(kstate))
 		return 0;
@@ -336,7 +336,7 @@ bool NoseconeLever::ProcessMouseVC (int event, VECTOR3 &p)
 NoseconeIndicator::NoseconeIndicator (NoseconeCtrl *comp)
 : PanelElement(comp->DG()), component(comp)
 {
-	tofs = (double)rand()/(double)RAND_MAX;
+	tofs = dg::RandomLampPhase();
 	light = true;
 }
 
@@ -385,12 +385,12 @@ bool NoseconeIndicator::RedrawVC (DEVMESHHANDLE hMesh, SURFHANDLE surf)
                        (modf (oapiGetSimTime()+tofs, &d) < 0.5));
 	if (showlights != light) {
 		GROUPEDITSPEC ges;
-		static WORD vtxofs = VC_NCONE_INDICATOR_vofs;
-		static const DWORD nvtx = 2;
-		static WORD vidx[nvtx] = {vtxofs,WORD(vtxofs+1)};
+		static oapi::UInt16 vtxofs = VC_NCONE_INDICATOR_vofs;
+		static const oapi::UInt32 nvtx = 2;
+		static oapi::UInt16 vidx[nvtx] = {vtxofs,oapi::UInt16(vtxofs+1)};
 		static float v[2] = {0.2427f,0.3003f};
 		NTVERTEX vtx[nvtx];
-		for (DWORD i = 0; i < nvtx; i++)
+		for (oapi::UInt32 i = 0; i < nvtx; i++)
 			vtx[i].tv = v[showlights ? 1:0];
 		ges.flags = GRPEDIT_VTXTEXV;
 		ges.Vtx = vtx;
@@ -414,7 +414,7 @@ UndockCtrl::UndockCtrl (DockingCtrlSubsystem *_subsys)
 	ELID_LEVER = AddElement (lever = new UndockLever (this));
 
 	// Undock lever animation
-	static UINT UndockLeverGrp = GRP_UNDOCK_LEVER_VC;
+	static oapi::UInt UndockLeverGrp = GRP_UNDOCK_LEVER_VC;
 	static MGROUP_ROTATE UndockLeverTransform (1, &UndockLeverGrp, 1,
 		VC_UNDOCKLEVER_ref, VC_UNDOCKLEVER_axis, (float)(-90*RAD));
 	anim_undocklever = DG()->CreateAnimation (0);
@@ -447,7 +447,7 @@ void UndockCtrl::clbkPostStep (double simt, double simdt, double mjd)
 
 // --------------------------------------------------------------
 
-bool UndockCtrl::clbkLoadPanel2D (int panelid, PANELHANDLE hPanel, DWORD viewW, DWORD viewH)
+bool UndockCtrl::clbkLoadPanel2D (int panelid, PANELHANDLE hPanel, oapi::UInt32 viewW, oapi::UInt32 viewH)
 {
 	if (panelid != 0) return false;
 
@@ -534,7 +534,7 @@ EscapeLadderCtrl::EscapeLadderCtrl (DockingCtrlSubsystem *_subsys)
 	ELID_INDICATOR = AddElement (indicator = new LadderIndicator (this));
 
 	// Escape ladder animation
-	static UINT LadderGrp[2] = {GRP_Ladder1,GRP_Ladder2};
+	static oapi::UInt LadderGrp[2] = {GRP_Ladder1,GRP_Ladder2};
 	static MGROUP_TRANSLATE Ladder1 (0, LadderGrp, 2, _V(0,0,1.1));
 	static MGROUP_ROTATE Ladder2 (0, LadderGrp, 2,
 		_V(0,-1.05,9.85), _V(1,0,0), (float)(80*RAD));
@@ -601,8 +601,8 @@ bool EscapeLadderCtrl::clbkParseScenarioLine (const char *line)
 
 bool EscapeLadderCtrl::clbkPlaybackEvent (double simt, double event_t, const char *event_type, const char *event)
 {
-	if (!_stricmp (event_type, "LADDER")) {
-		if (!_stricmp (event, "CLOSE")) RetractLadder();
+	if (!dg::CompareText (event_type, "LADDER")) {
+		if (!dg::CompareText (event, "CLOSE")) RetractLadder();
 		else                            ExtendLadder();
 		return true;
 	}
@@ -611,7 +611,7 @@ bool EscapeLadderCtrl::clbkPlaybackEvent (double simt, double event_t, const cha
 
 // --------------------------------------------------------------
 
-bool EscapeLadderCtrl::clbkLoadPanel2D (int panelid, PANELHANDLE hPanel, DWORD viewW, DWORD viewH)
+bool EscapeLadderCtrl::clbkLoadPanel2D (int panelid, PANELHANDLE hPanel, oapi::UInt32 viewW, oapi::UInt32 viewH)
 {
 	if (panelid != 0) return false;
 
@@ -726,12 +726,12 @@ bool LadderIndicator::RedrawVC (DEVMESHHANDLE hMesh, SURFHANDLE surf)
 	bool showlights = (state.State() == 1.0 || (state.Speed() && modf(oapiGetSimTime()*1.7, &d) < 0.5));
 	if (showlights != vlight_VC) {
 		GROUPEDITSPEC ges;
-		static const WORD vtxofs = VC_ELADDER_INDICATOR_vofs;
-		static const DWORD nvtx = 4;
-		static WORD vidx[nvtx] = {vtxofs,vtxofs+1,vtxofs+2,vtxofs+3};
+		static const oapi::UInt16 vtxofs = VC_ELADDER_INDICATOR_vofs;
+		static const oapi::UInt32 nvtx = 4;
+		static oapi::UInt16 vidx[nvtx] = {vtxofs,vtxofs+1,vtxofs+2,vtxofs+3};
 		static const float u[2] = {0.0586f,0.0713f};
 		NTVERTEX vtx[nvtx];
-		for (DWORD i = 0; i < nvtx; i++)
+		for (oapi::UInt32 i = 0; i < nvtx; i++)
 			vtx[i].tu = u[showlights ? 1:0];
 		ges.flags = GRPEDIT_VTXTEXU;
 		ges.Vtx = vtx;
@@ -793,7 +793,7 @@ void DocksealCtrl::clbkPostCreation ()
 
 // --------------------------------------------------------------
 
-bool DocksealCtrl::clbkLoadPanel2D (int panelid, PANELHANDLE hPanel, DWORD viewW, DWORD viewH)
+bool DocksealCtrl::clbkLoadPanel2D (int panelid, PANELHANDLE hPanel, oapi::UInt32 viewW, oapi::UInt32 viewH)
 {
 	if (panelid != 0) return false;
 
@@ -875,12 +875,12 @@ bool DocksealIndicator::RedrawVC (DEVMESHHANDLE hMesh, SURFHANDLE surf)
 	}
 	if (showlights != vlight_VC) {
 		GROUPEDITSPEC ges;
-		static const WORD vtxofs = VC_SEAL_INDICATOR_vofs;
-		static const DWORD nvtx = 4;
-		static WORD vidx[nvtx] = {vtxofs,vtxofs+1,vtxofs+2,vtxofs+3};
+		static const oapi::UInt16 vtxofs = VC_SEAL_INDICATOR_vofs;
+		static const oapi::UInt32 nvtx = 4;
+		static oapi::UInt16 vidx[nvtx] = {vtxofs,vtxofs+1,vtxofs+2,vtxofs+3};
 		static const float u[2] = {0.0586f,0.0713f};
 		NTVERTEX vtx[nvtx];
-		for (DWORD i = 0; i < nvtx; i++)
+		for (oapi::UInt32 i = 0; i < nvtx; i++)
 			vtx[i].tu = u[showlights ? 1:0];
 		ges.flags = GRPEDIT_VTXTEXU;
 		ges.Vtx = vtx;

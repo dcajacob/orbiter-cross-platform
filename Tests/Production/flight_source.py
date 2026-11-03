@@ -17,7 +17,7 @@ def verify():
         current=current.replace('orbiter::production::UInt32','DWORD').replace('orbiter::production::UInt16','WORD')
         if current.rstrip()!=original.rstrip():raise ValueError('Key mapping formula/default/layout changed: '+name)
     api=read('Orbitersdk/include/OrbiterAPI.h')
-    expected=[line for line in api.splitlines() if re.match(r'#define (?:OAPI_KEY_|OAPI_LKEY_|KEYDOWN|KEYMOD_|LKEY_COUNT)',line)]
+    expected=[line for line in api.splitlines() if re.match(r'#define (?:OAPI_KEY_|OAPI_LKEY_|KEYDOWN|RESETKEY|KEYMOD_|LKEY_COUNT)',line)]
     actual=[line for line in read('Src/Orbiter/Production/FlightKeys.h').splitlines() if line.startswith('#define')]
     if expected!=actual:raise ValueError('Native key codes differ from Windows SDK')
     original=old('Src/Orbiter/Orbiter.cpp');current=read('Src/Orbiter/Production/FlightControls.cpp')

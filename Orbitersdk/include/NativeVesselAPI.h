@@ -92,6 +92,35 @@ OAPIFUNC VESSEL* oapiGetFocusInterface();
 OAPIFUNC OBJHANDLE oapiGetVesselByName(char*);
 OAPIFUNC OBJHANDLE oapiGetVesselByIndex(int);
 OAPIFUNC oapi::UInt32 oapiGetVesselCount();
+inline oapi::SdkRectangle _R(int left, int top, int right, int bottom)
+{
+    return {left, top, right, bottom};
+}
+OAPIFUNC void FormatValue(char *cbuf, int n, double f, int precision=4);
+OAPIFUNC bool oapiSetHUDMode (int mode);
+OAPIFUNC bool oapiSetHUDMode (int mode, const HUDPARAM *prm);
+OAPIFUNC int oapiGetHUDMode ();
+OAPIFUNC int oapiGetHUDMode (HUDPARAM *prm);
+OAPIFUNC void oapiToggleHUDColour ();
+OAPIFUNC double oapiGetHUDIntensity ();
+OAPIFUNC void oapiSetHUDIntensity (double val);
+OAPIFUNC void oapiIncHUDIntensity ();
+OAPIFUNC void oapiDecHUDIntensity ();
+OAPIFUNC void oapiRenderHUD (MESHHANDLE hMesh, SURFHANDLE *hTex);
+OAPIFUNC void oapiRegisterMFD (int mfd, const EXTMFDSPEC *spec);
+OAPIFUNC void oapiSetPanelNeighbours (int left, int right, int top, int bottom);
+OAPIFUNC void oapiVCSetNeighbours (int left, int right, int top, int bottom);
+OAPIFUNC bool oapiBltPanelAreaBackground (int area_id, SURFHANDLE surf);
+OAPIFUNC void oapiSetDefNavDisplay (int mode);
+OAPIFUNC void oapiSetDefRCSDisplay (int mode);
+OAPIFUNC int oapiSwitchPanel (int direction);
+OAPIFUNC int oapiSetPanel (int panel_id);
+OAPIFUNC void oapiSetPanelBlink (VECTOR3 v[4]);
+OAPIFUNC void oapiVCTriggerRedrawArea (int vc_id, int area_id);
+OAPIFUNC void oapiVCRegisterArea (int id, const oapi::SdkRectangle &tgtrect, int draw_event, int mouse_event, int bkmode, SURFHANDLE tgt);
+OAPIFUNC void oapiVCRegisterArea (int id, int draw_event, int mouse_event);
+OAPIFUNC void oapiVCSetAreaClickmode_Spherical (int id, const VECTOR3 &cnt, double rad);
+OAPIFUNC void oapiVCSetAreaClickmode_Quadrilateral (int id, const VECTOR3 &p1, const VECTOR3 &p2, const VECTOR3 &p3, const VECTOR3 &p4);
 OAPIFUNC void oapiOpenMFD (int mode, int mfd);
 OAPIFUNC void oapiToggleMFD_on (int mfd);
 OAPIFUNC int oapiRegisterMFDMode (MFDMODESPECEX &spec);
@@ -108,7 +137,27 @@ OAPIFUNC void oapiDisableMFDMode (int mode);
 OAPIFUNC int oapiGetMFDModeSpecEx (char *name, MFDMODESPECEX **spec=nullptr);
 OAPIFUNC void oapiVCRegisterMFD (int mfd, const VCMFDSPEC *spec);
 OAPIFUNC void oapiVCRegisterHUD (const VCHUDSPEC *spec);
-OAPIFUNC void oapiWriteScenario_string(FILEHANDLE,char*,char*);
+OAPIFUNC void oapiWriteScenario_string (FILEHANDLE file, char *item, char *string);
+OAPIFUNC void oapiWriteScenario_int (FILEHANDLE file, char *item, int i);
+OAPIFUNC void oapiWriteScenario_float (FILEHANDLE file, char *item, double d);
+OAPIFUNC void oapiWriteScenario_vec (FILEHANDLE file, char *item, const VECTOR3 &vec);
+OAPIFUNC bool oapiReadScenario_nextline (FILEHANDLE file, char *&line);
+OAPIFUNC void oapiWriteItem_string (FILEHANDLE file, char *item, char *string);
+OAPIFUNC void oapiWriteItem_float (FILEHANDLE file, char *item, double d);
+OAPIFUNC void oapiWriteItem_int (FILEHANDLE file, char *item, int i);
+OAPIFUNC void oapiWriteItem_bool (FILEHANDLE file, char *item, bool b);
+OAPIFUNC void oapiWriteItem_vec (FILEHANDLE file, char *item, const VECTOR3 &vec);
+OAPIFUNC bool oapiReadItem_string (FILEHANDLE f, char *item, char *string);
+OAPIFUNC bool oapiReadItem_float (FILEHANDLE f, char *item, double &val);
+OAPIFUNC bool oapiReadItem_int (FILEHANDLE f, char *item, int &val);
+OAPIFUNC bool oapiReadItem_bool (FILEHANDLE f, char *item, bool &val);
+OAPIFUNC bool oapiReadItem_vec (FILEHANDLE f, char *item, VECTOR3 &val);
+OAPIFUNC double oapiRand();
+OAPIFUNC void oapiParticleSetLevelRef(PSTREAM_HANDLE ph, double *lvl);
+OAPIFUNC INTERPRETERHANDLE oapiCreateInterpreter();
+OAPIFUNC int oapiDelInterpreter(INTERPRETERHANDLE hInterp);
+OAPIFUNC bool oapiExecScriptCmd(INTERPRETERHANDLE hInterp, const char *cmd);
+OAPIFUNC bool oapiAsyncScriptCmd(INTERPRETERHANDLE hInterp, const char *cmd);
 #ifdef ORBITER_NATIVE_OWNS_OAPIFUNC
 #undef OAPIFUNC
 #undef ORBITER_NATIVE_OWNS_OAPIFUNC

@@ -98,7 +98,7 @@ void MfdSubsystem::ModeChanged ()
 
 // --------------------------------------------------------------
 
-bool MfdSubsystem::clbkLoadPanel2D (int panelid, PANELHANDLE hPanel, DWORD viewW, DWORD viewH)
+bool MfdSubsystem::clbkLoadPanel2D (int panelid, PANELHANDLE hPanel, oapi::UInt32 viewW, oapi::UInt32 viewH)
 {
 	if (panelid != 0) return false;
 
@@ -137,11 +137,11 @@ bool MfdSubsystem::clbkLoadVC (int vcid)
 // MfdButtonGrp: row/column group of MFD buttons
 // ==============================================================
 
-MfdButtonGrp::MfdButtonGrp (MfdSubsystem *_subsys, DWORD _nbtn)
+MfdButtonGrp::MfdButtonGrp (MfdSubsystem *_subsys, oapi::UInt32 _nbtn)
 : PanelElement(_subsys->DG()), subsys(_subsys), nbtn(_nbtn)
 {
 	ispushed = new bool[nbtn];
-	for (DWORD i = 0; i < nbtn; i++)
+	for (oapi::UInt32 i = 0; i < nbtn; i++)
 		ispushed[i] = false;
 	pending_action = 0;
 }
@@ -166,7 +166,7 @@ void MfdButtonGrp::PushButtonVC (DEVMESHHANDLE hMesh, int meshgrp, int btn, bool
 	static const float dz_down = (float)( depth*cos(tilt));
 	static const float dy_down = (float)(-depth*sin(tilt));
 	NTVERTEX dvtx[nvtx_per_button];
-	WORD vofs[nvtx_per_button];
+	oapi::UInt16 vofs[nvtx_per_button];
 	float dz = (down ? dz_down : -dz_down);
 	float dy = (down ? dy_down : -dy_down);
 	for (int i = 0; i < nvtx_per_button; i++) {

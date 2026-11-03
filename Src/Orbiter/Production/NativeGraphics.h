@@ -99,6 +99,7 @@ struct NativeRenderContext {
     std::filesystem::path evidence;double captureTime=0;
 };
 ORBITER_PRODUCTION_API NativeRenderContext* BindNativeRenderContext(NativeRenderContext*);
+ORBITER_PRODUCTION_API Pane* ActiveCockpitPane();
 ORBITER_PRODUCTION_API NativeRenderContext& GetNativeRenderContext();
 ORBITER_PRODUCTION_API SURFHANDLE RenderCockpitMfd(int);
 ORBITER_PRODUCTION_API SURFHANDLE RenderCockpitVcMfd(int,const VCMFDSPEC**);

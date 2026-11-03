@@ -101,7 +101,7 @@
     },
     "Orbitersdk/include/NativeVesselAPI.h": {
       "original_sha256_lf": null,
-      "sha256_lf": "57a9203c436c35498a5daba2bd5ecce00c226d8961435dd59f42a04c52d3d55a",
+      "sha256_lf": "561b60c46baa778231979b8c69bdc5e57bddd64614f79d2c2f756c2100a7440a",
       "scope": "Portable cockpit/ImGui SDK data and original instrument declarations. Exact Windows scalar, callback, class, field order and packing conservation plus native header/layout compilation; runtime instrumentation remains incomplete."
     },
     "Orbitersdk/include/OrbiterAPI.h": {
@@ -273,7 +273,7 @@
       "original_sha256_lf": "8899635492ca087f2ad7532555b4bbdf557bb4ca4c736136adec4d68936325d5"
     },
     "Src/Orbiter/CMakeLists.txt": {
-      "sha256_lf": "4be151c716ddd0b9fde3fac5c89fe9a97766074a43cd2103f2f90536c772e010",
+      "sha256_lf": "0e6b392a907e7b8a3c38eee7141d720b02bcabdb0b442712d7e1efeaed8ff169",
       "original_sha256_lf": "4ba30d001a975912a85b238851629fb999e483d8b2ba1974eb9bef9e9beb60ac"
     },
     "Src/Orbiter/CamAPI.cpp": {
@@ -524,7 +524,7 @@
       "original_sha256_lf": "32db52be7f0355c383d7ae8f4fd033170e3c13c272bd11a4c0be9453d25dd297"
     },
     "Src/Orbiter/OrbiterAPI.cpp": {
-      "sha256_lf": "588b5abcc1517395576fbfa634c50b5b17ab6a67074987d7b5e0fb0521cfa329",
+      "sha256_lf": "2bdbd7e4b6701c33c9dccc7864d1096a011897dc947d9a07a8744bdb9eda1d9f",
       "original_sha256_lf": "6ab4e355f274bda7296d794e45e38ad9f1cc5a051dd1d40eea14b55d6412dbb2"
     },
     "Src/Orbiter/Pane.cpp": {
@@ -581,7 +581,7 @@
     },
     "Src/Orbiter/Production/CMakeLists.txt": {
       "original_sha256_lf": null,
-      "sha256_lf": "39edb6dd333997f29391225b9a20583c7f5aaeff0b1304171ff2097846908106",
+      "sha256_lf": "66da254340442a87e8418649f0c94a417fb624667eaa0796ac5df7dff18c5946",
       "scope": "Original ten stock MFD declarations use exact platform SDK aliases; shared original conic geometry is moved without calculation or screen-mapping changes. Full native instrument runtime remains incomplete."
     },
     "Src/Orbiter/Production/CameraServices.cpp": {
@@ -612,7 +612,7 @@
     },
     "Src/Orbiter/Production/CockpitServices.h": {
       "original_sha256_lf": null,
-      "sha256_lf": "d993f13b44d6e3ace02012b6434d88805e187e0fcad952828a56b75e93e5370c",
+      "sha256_lf": "ab07cb3d14f324ad426f142b9166e41a79c45e4dd1eb8ca9a8c3d7be2a709c22",
       "scope": "Original scheduler, stock MFDs and modern map compile natively with explicit original epoch/time, authoritative world/UI bindings and indexed map resources. Exact Windows calculations and callback order conserved. Native GDI/legacy map/custom-mode entry points fail explicitly until supported; native cockpit owner and DG runtime remain unfinished."
     },
     "Src/Orbiter/Production/ConfigurationTypes.h": {
@@ -657,7 +657,7 @@
     },
     "Src/Orbiter/Production/FlightKeys.h": {
       "original_sha256_lf": null,
-      "sha256_lf": "56bbd6196954cf558cee707f33511257c81db237683cd4179886951254ad4e83"
+      "sha256_lf": "b5a3082b529ea4c3108bf6e9182211a5cbd345c59db0358a27dce4ed174aa247"
     },
     "Src/Orbiter/Production/FlightReplay.h": {
       "original_sha256_lf": null,
@@ -785,7 +785,7 @@
     },
     "Src/Orbiter/Production/NativeGraphics.h": {
       "original_sha256_lf": null,
-      "sha256_lf": "e1070e8fa7f21271ece62ce2c4de9af607e9726d437c288620bab36492fc4382",
+      "sha256_lf": "3d5db52fe598dcf693e36fcb5e674c3a2b53305bc93bc892b9fd6a7ce96110cf",
       "scope": "Original scheduler, stock MFDs and modern map compile natively with explicit original epoch/time, authoritative world/UI bindings and indexed map resources. Exact Windows calculations and callback order conserved. Native GDI/legacy map/custom-mode entry points fail explicitly until supported; native cockpit owner and DG runtime remain unfinished."
     },
     "Src/Orbiter/Production/NativeModule.cpp": {
@@ -810,7 +810,7 @@
     },
     "Src/Orbiter/Production/NativeRenderApi.cpp": {
       "original_sha256_lf": null,
-      "sha256_lf": "0059520c5aedabdbb17033398da9e5b40e6a296834ec95affcba167b88e6c029",
+      "sha256_lf": "9db4d138f8bacf0bd75dac25f8536abeb0fb0ce417e12ea31d1aa32d4181142c",
       "scope": "Original scheduler, stock MFDs and modern map compile natively with explicit original epoch/time, authoritative world/UI bindings and indexed map resources. Exact Windows calculations and callback order conserved. Native GDI/legacy map/custom-mode entry points fail explicitly until supported; native cockpit owner and DG runtime remain unfinished."
     },
     "Src/Orbiter/Production/NativeRenderApi.h": {
@@ -820,7 +820,7 @@
     },
     "Src/Orbiter/Production/NativeVesselApplication.cpp": {
       "original_sha256_lf": null,
-      "sha256_lf": "130e848d8723df61d6d8d581d992ac2b508205264363c0a96dc6b57a2be17cf9"
+      "sha256_lf": "fd3efcd70f31ca5707804ab742289f0e83850cd63bde1375eb3f6265f87010b4"
     },
     "Src/Orbiter/Production/NativeVesselFactory.h": {
       "original_sha256_lf": null,
@@ -840,7 +840,7 @@
     },
     "Src/Orbiter/Production/NativeVessels.cmake": {
       "original_sha256_lf": null,
-      "sha256_lf": "c20eabdd19d71e292f22b01ec7a7818dfbb448e29214e4ef3c11aea44d7c24f1"
+      "sha256_lf": "4dbf033a09589d28468350b07064bdcf10556d6693dec62c11cd1c74b22d1904"
     },
     "Src/Orbiter/Production/NativeWorldVesselServices.cpp": {
       "original_sha256_lf": null,
@@ -1160,11 +1160,11 @@
       "original_sha256_lf": "c04b5e9fc90a6377ea21652bc4df7be75cf0a27fcf2afcd6e11f79400e01b061"
     },
     "Src/Orbiter/Util.cpp": {
-      "sha256_lf": "7b6a4d1481362fb76a445d4e7d5c3026bc4bd6ea504e284761c84cd765a06dbe",
+      "sha256_lf": "e792789c112af182634d5ae4d127450fe9fe8caa378d67d70feb60cac9fad8ef",
       "original_sha256_lf": "ab2627599b997f2cf56f6536801ecd59e1374181bfa14a6416a6dbbac00198e2"
     },
     "Src/Orbiter/Util.h": {
-      "sha256_lf": "078d2f745c5a98fc2a142dfc72a313deb80365f79ec440e871cd10ae7ff0785d",
+      "sha256_lf": "42cd968a3018ddb2c5bee2316745c78d3b9c2b4311b8bb0a412149ef67ed09d3",
       "original_sha256_lf": "61c1826a9ce3c62e3d02f54c36629470f6ffeb0abad2d9b5eb95bc0c0a6bfb8e"
     },
     "Src/Orbiter/VCockpit.cpp": {
@@ -1304,7 +1304,7 @@
     },
     "Src/Orbiter/Production/NativeCockpit.cmake": {
       "original_sha256_lf": null,
-      "sha256_lf": "50377dc1fceb963f84acf0035e75d119afc841b3e758e8c1e9a08addbc57a479"
+      "sha256_lf": "25a273853e2e67d4b8c42ca2cf401ece54b7d0714c34addebcbcdc12ba08b5f0"
     },
     "Src/Orbiter/Production/NativeCockpitGui.cpp": {
       "original_sha256_lf": null,
@@ -1352,7 +1352,7 @@
     },
     "Src/Vessel/DeltaGlider/DGSubsys.h": {
       "original_sha256_lf": "f2e18e91c273cd387d4ff1dbdd625fa3f01f14d0a9620eceaaa64219f77479b2",
-      "sha256_lf": "f15ca321d250117d6b5ed11728cf717aa48bd4e85c3efc6b909db03c93e94754"
+      "sha256_lf": "e363538bad5ca0a3ea7e0daf132753acf5ce1e18cf2fb4c77cf7ce0be111274b"
     },
     "Src/Vessel/DeltaGlider/DGSwitches.cpp": {
       "original_sha256_lf": "7bf9c6bc49811ebb0abc3f5abe6f7d1ed1b1cdb9ad781bfb5a9abce200fcc993",
@@ -1513,6 +1513,110 @@
     "Src/Orbiter/FlightSdk.cpp": {
       "original_sha256_lf": null,
       "sha256_lf": "b671cad5dbc94afa1653e3a91d049b347f012ce97bd50a85e418df0ee82746ac"
+    },
+    "Src/Vessel/DeltaGlider/AAPSubsys.cpp": {
+      "original_sha256_lf": "7d29f763c3665e83236d9240ca3bb6c433af22008989751750d1842ca75636d6",
+      "sha256_lf": "b55c5516887192ddce4abc889ee0afbb282c5ccc81888383bf94c8e05303c7ee"
+    },
+    "Src/Vessel/DeltaGlider/AAPSubsys.h": {
+      "original_sha256_lf": "f81f0296deb1b0fff61470ef310d6a6b94f7cb7d3fdd4830501e04965205b752",
+      "sha256_lf": "57524153391974c791ef553c2a069bab31948c347990618e82ebb1520f178e8e"
+    },
+    "Src/Vessel/DeltaGlider/AerodynSubsys.cpp": {
+      "original_sha256_lf": "8c572053594a85c6fc97e25127207c6afd034fcd8c6f9a5e1d53a6ec7e87e557",
+      "sha256_lf": "4f3e2c8488f240b6f5514b395d7a0bde662890b7855ade427e626c440dbf8fd8"
+    },
+    "Src/Vessel/DeltaGlider/AvionicsSubsys.cpp": {
+      "original_sha256_lf": "878f3fc6a524684ee3d393cac2de77a36915917043ff466fd0dba1e159e068a6",
+      "sha256_lf": "0f558dfd8e7c56f4a0d8ef4ef0b69b09ecd6f5bc778bcfc65e769c6ac26ef85b"
+    },
+    "Src/Vessel/DeltaGlider/AvionicsSubsys.h": {
+      "original_sha256_lf": "d58df9277d86872e15ba605dad46598bbf79b29ed341397f0977f21ea56828ee",
+      "sha256_lf": "52137711beac69261cc17ed34bedf127e16031f597434c2afd6b460636413aa5"
+    },
+    "Src/Vessel/DeltaGlider/DockingSubsys.cpp": {
+      "original_sha256_lf": "b39dc2e936b1df9350d8d2d9d1351ade1637d28a424ce428d18cd77dfc1ab625",
+      "sha256_lf": "c71c26d783b656d2fb53932ebb66d8f3c4f90aefd3ec989335695d7069cae48e"
+    },
+    "Src/Vessel/DeltaGlider/FailureSubsys.cpp": {
+      "original_sha256_lf": "a4af6122f7aca08902b0a8c459c9c91043a0ae286f3fcf0eb691f22d264215ed",
+      "sha256_lf": "c574c4743c3f1ca1eac6d00043c54f4f69f951f0401eeb75042bf90de182bef2"
+    },
+    "Src/Vessel/DeltaGlider/FailureSubsys.h": {
+      "original_sha256_lf": "392740ffe3a37745a68792bfbb3a427961199ec86a58f808c529c5ea0978cd6b",
+      "sha256_lf": "68bf893ee68159a742523e42924ec43799d0cdcee55513a81882a170dc0e0ea2"
+    },
+    "Src/Vessel/DeltaGlider/GearSubsys.cpp": {
+      "original_sha256_lf": "82bfe19780427c194b50e24825cd5dc95bb0e38c49fdd8eb4323694c8ba334fb",
+      "sha256_lf": "6acf27d7fa9e46a7adba3846ecb6a4f8e17b30624b759d92bfa5379c790380b2"
+    },
+    "Src/Vessel/DeltaGlider/HoverSubsys.cpp": {
+      "original_sha256_lf": "3c9d1c56e78a20a4abec6cb412f86fa9060e7bb247ee1a0e11f71db990d754ba",
+      "sha256_lf": "1078b02a60eeb6e04779ea9e440a2517c0cc33a4f2bbf18ce57b8641532ddd64"
+    },
+    "Src/Vessel/DeltaGlider/HoverSubsys.h": {
+      "original_sha256_lf": "a4a0fd7ef413684b269fe3b8b44461d04c418cfd50814c61964d80339508587a",
+      "sha256_lf": "99791fe1525f5112664094be323bb78ab4e3710eb1f8f11368258adcc361782e"
+    },
+    "Src/Vessel/DeltaGlider/HudCtrl.cpp": {
+      "original_sha256_lf": "c1843800992581cf714bdd700fad5a84d2d29b6de9fec9a0903b737ed4ab02ee",
+      "sha256_lf": "ad725272bbf41a361ebc9d801f21317f302679e632955a15acfe7cfa3e763d4a"
+    },
+    "Src/Vessel/DeltaGlider/HudCtrl.h": {
+      "original_sha256_lf": "c389595c76f2071ae36dd2e37e5a7050c16983118fdcdd057827c4219289e81a",
+      "sha256_lf": "b4a83858ffd0f962eb4ee9ae9e1461c2120ddcd7b018858f4312a9dcda541154"
+    },
+    "Src/Vessel/DeltaGlider/LightSubsys.cpp": {
+      "original_sha256_lf": "ab49759615d5ac1cbfa72c9774c487cbccf2dee91c22f80515e120aa2f0842c6",
+      "sha256_lf": "cdd388eb7af413e952c0899fd39e3e63c9d868b22c962a4ecbf2a439e3c80dbb"
+    },
+    "Src/Vessel/DeltaGlider/LightSubsys.h": {
+      "original_sha256_lf": "862fc8d10789b68b168b5109fc3e2496b40402d123778d68962a22dcb87fb7ab",
+      "sha256_lf": "71a9aea36781037c02c832a06c44720a909a154fa973bffc8b28a920d7864216"
+    },
+    "Src/Vessel/DeltaGlider/MainRetroSubsys.cpp": {
+      "original_sha256_lf": "d8ce4b3045b1027676ff44fb89523942322acf399705379ca3ca1529186794cd",
+      "sha256_lf": "2699b7b24f2777354483ca69e411045394ce19e4f025141538f6e3fefd99fde5"
+    },
+    "Src/Vessel/DeltaGlider/MfdSubsys.cpp": {
+      "original_sha256_lf": "c849bbfbf771ddc4487fb1ee9769d01a18c73f47374e3c8e9f543f7f97a6271e",
+      "sha256_lf": "dff545fbbf0cf4a22adf1e71bf718da0b3724a4ec5d279c8cf6f4a9d05343a88"
+    },
+    "Src/Vessel/DeltaGlider/MfdSubsys.h": {
+      "original_sha256_lf": "d34179faaf6ea3728acda7c81c73be6893ed745b8403c104386e43c8687a9066",
+      "sha256_lf": "b8f291f6f2d8b4cfe98fb9630c3251e8265241d02fdf150df32580a72cd1e1d2"
+    },
+    "Src/Vessel/DeltaGlider/PressureSubsys.cpp": {
+      "original_sha256_lf": "17282f6ea098cf4e144d40725da4f024eeec1f14d9b5a2f27c5dab5386755ebd",
+      "sha256_lf": "fb144ae1b564a96714b631a5cad6344c6720cd110812e2322d6ee53290c67494"
+    },
+    "Src/Vessel/DeltaGlider/RcsSubsys.cpp": {
+      "original_sha256_lf": "38c1b5737a891f06329883fe3e8a7d74efcdaf8e5fa635d0bdf0b4ba5eb1131c",
+      "sha256_lf": "2d8672538b3f294ed62301b52fcd8d9c9290ecc1e3e17d4c1cf66051f87f04fd"
+    },
+    "Src/Vessel/DeltaGlider/RcsSubsys.h": {
+      "original_sha256_lf": "7ad39d9317bd5a667962ac43698eb54224648331a6d3bbb121066be508548cb1",
+      "sha256_lf": "93e80d7ce080985be33474243f718152f7db8e40c28b644cf4f312e9f02aa15a"
+    },
+    "Src/Vessel/DeltaGlider/ScramSubsys.cpp": {
+      "original_sha256_lf": "91a325386d38020cd9537b38cc2cae3fe49dbf9d5fb8bdc68d86f6c18577ef52",
+      "sha256_lf": "0f41fb8e8b6dbd8d816fb8a1b4a887280e20e4fa3188ede9f276df8e12b7187f"
+    },
+    "Src/Vessel/DeltaGlider/ThermalSubsys.cpp": {
+      "original_sha256_lf": "6bfc95b77e8599abaf8e3fccb28c004eeddfc2fc6718d2a97eaf5e625b55944d",
+      "sha256_lf": "7e37de603f3e4dc6fbe13307a80906f0c84f221b9dd5407e4b868b4391019b27"
+    },
+    "Src/Orbiter/CockpitSdk.cpp": {
+      "original_sha256_lf": null,
+      "sha256_lf": "e84b78f540b5f14ff8c944546799e4ed9200a6b8178894f9b8f1ac3044764b17"
+    },
+    "Src/Orbiter/ScenarioSdk.cpp": {
+      "original_sha256_lf": null,
+      "sha256_lf": "038e05f02a95cbe613b058348c863cd62370f0cfe5e1975d87ff3a7922c1cd53"
+    },
+    "Src/Vessel/DeltaGlider/DGPlatform.h": {
+      "original_sha256_lf": null,
+      "sha256_lf": "b9e4103d4e5fb4a1c22a2b78c752e7f831338027b5e7663f00669b7096ab8f87"
     }
   }
 }

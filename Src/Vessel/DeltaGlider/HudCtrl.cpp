@@ -33,15 +33,15 @@ HUDControl::HUDControl (DeltaGlider *vessel)
 	ELID_HUDRETRACT    = AddElement (updownswitch = new HUDUpDownSwitch (this));
 
 	// HUD brightness dial animation
-	static UINT HudBDialGrp = GRP_HUD_BRIGHTNESS_VC;
+	static oapi::UInt HudBDialGrp = GRP_HUD_BRIGHTNESS_VC;
 	static MGROUP_ROTATE HudBDialTransform (1, &HudBDialGrp, 1,
 		VC_HUD_BRIGHTNESS_ref, VC_HUD_BRIGHTNESS_axis, (float)(-280*RAD));
 	anim_vc_hudbdial = DG()->CreateAnimation (0.5);
 	DG()->AddAnimationComponent (anim_vc_hudbdial, 0, 1, &HudBDialTransform);
 
 	// Fold up HUD animation
-	static UINT HudGrp1[2] = {GRP_HUD_FRAME_VC, GRP_HUD_PANE_VC};
-	static UINT HudGrp2[3] = {GRP_HUD_FRAME_VC, GRP_HUD_PANE_VC, GRP_HUD_RAIL_VC};
+	static oapi::UInt HudGrp1[2] = {GRP_HUD_FRAME_VC, GRP_HUD_PANE_VC};
+	static oapi::UInt HudGrp2[3] = {GRP_HUD_FRAME_VC, GRP_HUD_PANE_VC, GRP_HUD_RAIL_VC};
 	static MGROUP_ROTATE HudTransform1 (1, HudGrp1, 2,
 		_V(0,1.5836,7.1280), _V(1,0,0), (float)(-62*RAD));
 	static MGROUP_ROTATE HudTransform2 (1, HudGrp2, 3,
@@ -165,7 +165,7 @@ void HUDControl::clbkPostStep (double simt, double simdt, double mjd)
 
 // --------------------------------------------------------------
 
-bool HUDControl::clbkLoadPanel2D (int panelid, PANELHANDLE hPanel, DWORD viewW, DWORD viewH)
+bool HUDControl::clbkLoadPanel2D (int panelid, PANELHANDLE hPanel, oapi::UInt32 viewW, oapi::UInt32 viewH)
 {
 	if (panelid != 0) return false;
 
@@ -188,8 +188,8 @@ bool HUDControl::clbkLoadVC (int vcid)
 	oapiVCRegisterArea (ELID_MODEBUTTONS, PANEL_REDRAW_USER | PANEL_REDRAW_MOUSE, PANEL_MOUSE_LBDOWN | PANEL_MOUSE_LBUP);
 	oapiVCSetAreaClickmode_Quadrilateral (ELID_MODEBUTTONS, VC_HUD_BUTTONS_mousearea[0], VC_HUD_BUTTONS_mousearea[1], VC_HUD_BUTTONS_mousearea[2], VC_HUD_BUTTONS_mousearea[3]);
 	{
-		static DWORD hudbtn_vofs[3] = {VC_BTN_HUDMODE_1_vofs,VC_BTN_HUDMODE_2_vofs,VC_BTN_HUDMODE_3_vofs};
-		static DWORD hudbtn_label_vofs[3] = {VC_BTN_HUDMODE_1_LABEL_vofs, VC_BTN_HUDMODE_2_LABEL_vofs, VC_BTN_HUDMODE_3_LABEL_vofs};
+		static oapi::UInt32 hudbtn_vofs[3] = {VC_BTN_HUDMODE_1_vofs,VC_BTN_HUDMODE_2_vofs,VC_BTN_HUDMODE_3_vofs};
+		static oapi::UInt32 hudbtn_label_vofs[3] = {VC_BTN_HUDMODE_1_LABEL_vofs, VC_BTN_HUDMODE_2_LABEL_vofs, VC_BTN_HUDMODE_3_LABEL_vofs};
 		modebuttons->DefineAnimationsVC (VC_BTN_HUDMODE_1_axis, GRP_BUTTON3_VC, GRP_LIT_SURF_VC, hudbtn_vofs, hudbtn_label_vofs);
 	}
 
@@ -240,7 +240,7 @@ void HUDControl::clbkResetVC (int vcid, DEVMESHHANDLE hMesh)
 
 // --------------------------------------------------------------
 
-int HUDControl::clbkConsumeBufferedKey (DWORD key, bool down, char *kstate)
+int HUDControl::clbkConsumeBufferedKey (oapi::UInt32 key, bool down, char *kstate)
 {
 	if (KEYMOD_ALT(kstate) || KEYMOD_SHIFT(kstate))
 		return 0;
@@ -275,8 +275,8 @@ HUDModeButtons::~HUDModeButtons ()
 
 // --------------------------------------------------------------
 
-void HUDModeButtons::DefineAnimationsVC (const VECTOR3 &axis, DWORD meshgrp, DWORD meshgrp_label,
-	DWORD vofs[3], DWORD vofs_label[3])
+void HUDModeButtons::DefineAnimationsVC (const VECTOR3 &axis, oapi::UInt32 meshgrp, oapi::UInt32 meshgrp_label,
+	oapi::UInt32 vofs[3], oapi::UInt32 vofs_label[3])
 {
 	for (int i = 0; i < 3; i++) 
 		btn[i]->DefineAnimationVC (axis, meshgrp, meshgrp_label, vofs[i], vofs_label[i]);
@@ -300,7 +300,7 @@ void HUDModeButtons::ResetVC (DEVMESHHANDLE hMesh)
 
 // --------------------------------------------------------------
 
-void HUDModeButtons::LoadPanel2D(int panelid, PANELHANDLE hPanel, DWORD viewW, DWORD viewH)
+void HUDModeButtons::LoadPanel2D(int panelid, PANELHANDLE hPanel, oapi::UInt32 viewW, oapi::UInt32 viewH)
 {
 	SetMode(ctrl->GetHUDMode());
 }

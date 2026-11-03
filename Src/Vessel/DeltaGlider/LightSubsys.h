@@ -20,6 +20,14 @@
 // Light control subsystem
 // ==============================================================
 
+class InstrumentLightSwitch;
+class InstrumentBrightnessDial;
+class CockpitLightSwitch;
+class CockpitBrightnessDial;
+class LandDockLightSwitch;
+class StrobeLightSwitch;
+class NavLightSwitch;
+
 class InstrumentLight;
 class CockpitLight;
 class LandDockLight;
@@ -70,7 +78,7 @@ private:
 	InstrumentBrightnessDial *dial;
 	int ELID_SWITCH;
 	int ELID_DIAL;
-	UINT anim_dial;                    // VC instrument brightness dial
+	oapi::UInt anim_dial;                    // VC instrument brightness dial
 };
 
 // ==============================================================
@@ -123,7 +131,7 @@ private:
 	CockpitBrightnessDial *dial;
 	int ELID_SWITCH;
 	int ELID_DIAL;
-	UINT anim_dial;                  // VC floodlight brightness dial
+	oapi::UInt anim_dial;                  // VC floodlight brightness dial
 };
 
 // ==============================================================
@@ -162,7 +170,7 @@ public:
 	inline int GetLight () const { return light_mode; }
 	void clbkSaveState (FILEHANDLE scn);
 	bool clbkParseScenarioLine (const char *line);
-	bool clbkLoadPanel2D (int panelid, PANELHANDLE hPanel, DWORD viewW, DWORD viewH);
+	bool clbkLoadPanel2D (int panelid, PANELHANDLE hPanel, oapi::UInt32 viewW, oapi::UInt32 viewH);
 	bool clbkLoadVC (int vcid);
 	void clbkResetVC (int vcid, DEVMESHHANDLE hMesh);
 
@@ -200,7 +208,7 @@ public:
 	inline bool GetLight () const { return light_on; }
 	void clbkSaveState (FILEHANDLE scn);
 	bool clbkParseScenarioLine (const char *line);
-	bool clbkLoadPanel2D (int panelid, PANELHANDLE hPanel, DWORD viewW, DWORD viewH);
+	bool clbkLoadPanel2D (int panelid, PANELHANDLE hPanel, oapi::UInt32 viewW, oapi::UInt32 viewH);
 	bool clbkLoadVC (int vcid);
 	void clbkResetVC (int vcid, DEVMESHHANDLE hMesh);
 
@@ -237,7 +245,7 @@ public:
 	void SetLight (bool on);
 	void clbkSaveState (FILEHANDLE scn);
 	bool clbkParseScenarioLine (const char *line);
-	bool clbkLoadPanel2D (int panelid, PANELHANDLE hPanel, DWORD viewW, DWORD viewH);
+	bool clbkLoadPanel2D (int panelid, PANELHANDLE hPanel, oapi::UInt32 viewW, oapi::UInt32 viewH);
 	bool clbkLoadVC (int vcid);
 	void clbkResetVC (int vcid, DEVMESHHANDLE hMesh);
 

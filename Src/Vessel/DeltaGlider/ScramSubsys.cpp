@@ -31,7 +31,7 @@ Scramjet::Scramjet (VESSEL *v)
 Scramjet::~Scramjet ()
 {
 	if (nthdef) {  // delete list of thruster definitions
-		for (UINT i = 0; i < nthdef; i++)
+		for (oapi::UInt i = 0; i < nthdef; i++)
 			delete thdef[i];
 		delete []thdef;
 	}
@@ -88,7 +88,7 @@ void Scramjet::Thrust (double *F) const
 		precov = max (0.0, 1.0-0.075*pow (max(M,1.0)-1.0, 1.35)); // pressure recovery
 		dmafac = dma_scale*precov*pd;
 
-		for (UINT i = 0; i < nthdef; i++) {
+		for (oapi::UInt i = 0; i < nthdef; i++) {
 			Tb0 = thdef[i]->Tb_max;                        // max burner temperature
 			if (Tb0 > Td) {                                // we are within operational range
 				lvl  = vessel->GetThrusterLevel (thdef[i]->th); // throttle level
@@ -123,7 +123,7 @@ void Scramjet::Thrust (double *F) const
 
 	} else {   // no atmospheric parameters
 
-		for (UINT i = 0; i < nthdef; i++) {
+		for (oapi::UInt i = 0; i < nthdef; i++) {
 			thdef[i]->F = F[i] = 0.0;
 			thdef[i]->dmf = 0.0;
 		}
@@ -133,7 +133,7 @@ void Scramjet::Thrust (double *F) const
 
 // --------------------------------------------------------------
 
-double Scramjet::TSFC (UINT idx) const
+double Scramjet::TSFC (oapi::UInt idx) const
 {
 	const double eps = 1e-5;
 	return thdef[idx]->dmf/(thdef[idx]->F+eps);
@@ -258,14 +258,14 @@ ScramThrottle::ScramThrottle (DGSubsystem *_subsys)
 	ELID_LEVER = AddElement (lever = new ScramThrottleLever (this));
 
 	// VC animation: Left scram engine throttle
-	static UINT ScramThrottleLGrp[2] = {GRP_THROTTLE_SCRAM_L1_VC,GRP_THROTTLE_SCRAM_L2_VC};
+	static oapi::UInt ScramThrottleLGrp[2] = {GRP_THROTTLE_SCRAM_L1_VC,GRP_THROTTLE_SCRAM_L2_VC};
 	static MGROUP_ROTATE ScramThrottleL (1, ScramThrottleLGrp, 2,
 		_V(0,0.7849,6.96), _V(1,0,0), (float)(30*RAD));
 	anim_lever[0] = DG()->CreateAnimation (0);
 	DG()->AddAnimationComponent (anim_lever[0], 0, 1, &ScramThrottleL);
 
 	// VC animation: Right scram engine throttle
-	static UINT ScramThrottleRGrp[2] = {GRP_THROTTLE_SCRAM_R1_VC,GRP_THROTTLE_SCRAM_R2_VC};
+	static oapi::UInt ScramThrottleRGrp[2] = {GRP_THROTTLE_SCRAM_R1_VC,GRP_THROTTLE_SCRAM_R2_VC};
 	static MGROUP_ROTATE ScramThrottleR (1, ScramThrottleRGrp, 2,
 		_V(0,0.7849,6.96), _V(1,0,0), (float)(30*RAD));
 	anim_lever[1] =  DG()->CreateAnimation (0);
@@ -274,7 +274,7 @@ ScramThrottle::ScramThrottle (DGSubsystem *_subsys)
 
 // --------------------------------------------------------------
 
-bool ScramThrottle::clbkLoadPanel2D (int panelid, PANELHANDLE hPanel, DWORD viewW, DWORD viewH)
+bool ScramThrottle::clbkLoadPanel2D (int panelid, PANELHANDLE hPanel, oapi::UInt32 viewW, oapi::UInt32 viewH)
 {
 	if (panelid != 0) return false;
 
@@ -318,7 +318,7 @@ void ScramThrottleLever::Reset2D (int panelid, MESHHANDLE hMesh)
 void ScramThrottleLever::ResetVC (DEVMESHHANDLE hMesh)
 {
 	for (int i = 0; i < 2; i++)
-		sliderpos[i] = (UINT)-1;
+		sliderpos[i] = (oapi::UInt)-1;
 }
 
 // --------------------------------------------------------------
@@ -362,11 +362,11 @@ bool ScramThrottleLever::ProcessMouse2D (int event, int mx, int my)
 
 bool ScramThrottleLever::RedrawVC (DEVMESHHANDLE hMesh, SURFHANDLE hSurf)
 {
-	UINT i, pos;
+	oapi::UInt i, pos;
 
 	for (i = 0; i < 2; i++) {
 		double level = ((ScramSubsystem*)component->Parent())->GetThrusterLevel (i);
-		UINT pos = (UINT)(level*500.0);
+		oapi::UInt pos = (oapi::UInt)(level*500.0);
 		if (pos != sliderpos[i]) {
 			component->DG()->SetAnimation (component->anim_lever[i], level);
 			sliderpos[i] = pos;

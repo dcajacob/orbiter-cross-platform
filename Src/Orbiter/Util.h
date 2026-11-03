@@ -39,22 +39,6 @@ bool iequal(const std::string& s1, const std::string& s2);
 RECT GetClientPos (HWND hWnd, HWND hChild);
 void SetClientPos (HWND hWnd, HWND hChild, RECT &r);
 
-// Floating point output stream formatter
-struct FltFormatter
-{
-	int precision;
-	double value;
-	FltFormatter (int precision, double value);
-	friend std::ostream& operator<< (std::ostream& os, const FltFormatter& v);
-};
-
-struct FltFormat
-{
-	int precision;
-	FltFormat (int precision = 6);
-	FltFormatter operator() (double value) const;
-};
-
 // Convert a CSS color string to a DWORD (in 0xbbggrr format)
 DWORD GetCSSColor(const char *col);
 

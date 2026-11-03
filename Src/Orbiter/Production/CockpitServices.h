@@ -74,6 +74,9 @@ inline Vessel* CockpitFocus() {
     return GetCameraServices().Focus();
 #endif
 }
+#ifdef _WIN32
+inline Pane* ActiveCockpitPane() { return g_pane; }
+#endif
 inline Pane* CockpitPane() {
 #ifdef _WIN32
     return g_pane;

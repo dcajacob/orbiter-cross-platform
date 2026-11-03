@@ -214,7 +214,7 @@ void ThermalSubsystem::clbkSaveState (FILEHANDLE scn)
 
 bool ThermalSubsystem::clbkParseScenarioLine (const char *line)
 {
-	if (!_strnicmp(line, "COMPARTMENT_TEMP", 16)) {
+	if (!dg::ComparePrefix(line, "COMPARTMENT_TEMP", 16)) {
 		sscanf(line+16, "%lf%lf%lf%lf%lf%lf%lf%lf%lf%lf%lf%lf%lf",
 			&cprm[0].T, &cprm[1].T, &cprm[2].T, &cprm[3].T, &cprm[4].T, &cprm[5].T,
 			&cprm[6].T, &cprm[7].T, &cprm[8].T, &cprm[9].T, &cprm[10].T, &cprm[11].T,
@@ -514,14 +514,14 @@ CoolantLoop::CoolantLoop (ThermalSubsystem *_subsys)
 	ELID_DISPLAY = AddElement (disp = new CoolantLoopDisplay (this, g_Param.surf));
 
 	// pump dial animation
-	static UINT PumpDialGrp = GRP_COOLING_PUMP_DIAL_VC;
+	static oapi::UInt PumpDialGrp = GRP_COOLING_PUMP_DIAL_VC;
 	static MGROUP_ROTATE PumpDialTransform (1, &PumpDialGrp, 1,
 		VC_COOLING_PUMP_DIAL_ref, VC_COOLING_PUMP_DIAL_axis, (float)(-280*RAD));
 	anim_vc_pumpdial = DG()->CreateAnimation (0.5);
 	DG()->AddAnimationComponent (anim_vc_pumpdial, 0, 1, &PumpDialTransform);
 
 	// reference temperature dial animation
-	static UINT ReftempDialGrp = GRP_COOLING_REFTEMP_DIAL_VC;
+	static oapi::UInt ReftempDialGrp = GRP_COOLING_REFTEMP_DIAL_VC;
 	static MGROUP_ROTATE ReftempDialTransform (1, &ReftempDialGrp, 1,
 		VC_COOLING_REFTEMP_DIAL_ref, VC_COOLING_REFTEMP_DIAL_axis, (float)(-280*RAD));
 	anim_vc_reftempdial = DG()->CreateAnimation (0.5);
@@ -673,7 +673,7 @@ void CoolantLoop::clbkPreStep (double simt, double simdt, double mjd)
 
 // --------------------------------------------------------------
 
-bool CoolantLoop::clbkLoadPanel2D (int panelid, PANELHANDLE hPanel, DWORD viewW, DWORD viewH)
+bool CoolantLoop::clbkLoadPanel2D (int panelid, PANELHANDLE hPanel, oapi::UInt32 viewW, oapi::UInt32 viewH)
 {
 	bool res = DGSubsystem::clbkLoadPanel2D (panelid, hPanel, viewW, viewH);
 
@@ -731,7 +731,7 @@ void CoolantLoop::clbkSaveState (FILEHANDLE scn)
 
 bool CoolantLoop::clbkParseScenarioLine (const char *line)
 {
-	if (!_strnicmp(line, "COOLANT_STATE", 13)) {
+	if (!dg::ComparePrefix(line, "COOLANT_STATE", 13)) {
 		int i;
 		double rate, temp;
 		sscanf(line+13, "%d%lf%lf", &i, &rate, &temp);
@@ -1007,34 +1007,34 @@ RadiatorControl::RadiatorControl (ThermalSubsystem *_subsys)
 	ELID_SWITCH = AddElement (sw = new RadiatorSwitch (this));
 
 	// Radiator animation
-	static UINT RaddoorGrp[3] = {GRP_Raddoor1,GRP_Raddoor2,GRP_Radiator4};
+	static oapi::UInt RaddoorGrp[3] = {GRP_Raddoor1,GRP_Raddoor2,GRP_Radiator4};
 	static MGROUP_ROTATE Raddoor (0, RaddoorGrp, 3,
 		_V(0,1.481,-3.986), _V(1,0,0), (float)(175*RAD));
-	static UINT FRadiatorGrp[1] = {GRP_Radiator4};
+	static oapi::UInt FRadiatorGrp[1] = {GRP_Radiator4};
 	static MGROUP_ROTATE FRadiator (0, FRadiatorGrp, 1,
 		_V(0,1.91,-2.965), _V(1,0,0), (float)(185*RAD));
-	static UINT RadiatorGrp[7] = {GRP_Radiator1,GRP_Radiator1a,GRP_Radiator1b,
+	static oapi::UInt RadiatorGrp[7] = {GRP_Radiator1,GRP_Radiator1a,GRP_Radiator1b,
 		GRP_Radiator2,GRP_Radiator2a,GRP_Radiator2b,GRP_Radiator3};
 	static MGROUP_TRANSLATE Radiator (0, RadiatorGrp, 7,
 		_V(0,0.584,-0.157));
-	static UINT LRadiatorGrp[3] = {GRP_Radiator1,GRP_Radiator1a,GRP_Radiator1b};
+	static oapi::UInt LRadiatorGrp[3] = {GRP_Radiator1,GRP_Radiator1a,GRP_Radiator1b};
 	static MGROUP_ROTATE LRadiator (0, LRadiatorGrp, 3,
 		_V(-0.88,1.94,-4.211), _V(0,0.260,0.966), (float)(145*RAD));
-	static UINT RRadiatorGrp[3] = {GRP_Radiator2,GRP_Radiator2a,GRP_Radiator2b};
+	static oapi::UInt RRadiatorGrp[3] = {GRP_Radiator2,GRP_Radiator2a,GRP_Radiator2b};
 	static MGROUP_ROTATE RRadiator (0, RRadiatorGrp, 3,
 		_V(0.93,1.91,-4.211), _V(0,0.260,0.966), (float)(-145*RAD));
 	static VECTOR3 axis1 = {cos(145*RAD),sin(145*RAD)*cos(0.26292),sin(145*RAD)*sin(-0.26292)};
-	static UINT LaRadiatorGrp[1] = {GRP_Radiator1a};
+	static oapi::UInt LaRadiatorGrp[1] = {GRP_Radiator1a};
 	static MGROUP_ROTATE LaRadiator (0, LaRadiatorGrp, 1,
 		_V(-0.91, 1.86, -5.055), axis1, (float)(180*RAD));
-	static UINT LbRadiatorGrp[1] = {GRP_Radiator1b};
+	static oapi::UInt LbRadiatorGrp[1] = {GRP_Radiator1b};
 	static MGROUP_ROTATE LbRadiator (0, LbRadiatorGrp, 1,
 		_V(-0.91, 2.075, -4.315), axis1, (float)(-180*RAD));
 	static VECTOR3 axis2 = {cos(-145*RAD),sin(-145*RAD)*cos(0.26292),sin(-145*RAD)*sin(-0.26292)};
-	static UINT RaRadiatorGrp[1] = {GRP_Radiator2a};
+	static oapi::UInt RaRadiatorGrp[1] = {GRP_Radiator2a};
 	static MGROUP_ROTATE RaRadiator (0, RaRadiatorGrp, 1,
 		_V(0.91, 1.675, -5.01), axis2, (float)(180*RAD));
-	static UINT RbRadiatorGrp[1] = {GRP_Radiator2b};
+	static oapi::UInt RbRadiatorGrp[1] = {GRP_Radiator2b};
 	static MGROUP_ROTATE RbRadiator (0, RbRadiatorGrp, 1,
 		_V(0.91, 1.89, -4.27), axis2, (float)(-180*RAD));
 	anim_radiator = DG()->CreateAnimation (0);
@@ -1122,7 +1122,7 @@ void RadiatorControl::clbkPostStep (double simt, double simdt, double mjd)
 
 // --------------------------------------------------------------
 
-bool RadiatorControl::clbkLoadPanel2D (int panelid, PANELHANDLE hPanel, DWORD viewW, DWORD viewH)
+bool RadiatorControl::clbkLoadPanel2D (int panelid, PANELHANDLE hPanel, oapi::UInt32 viewW, oapi::UInt32 viewH)
 {
 	bool res = DGSubsystem::clbkLoadPanel2D (panelid, hPanel, viewW, viewH);
 
@@ -1163,8 +1163,8 @@ void RadiatorControl::clbkResetVC (int vcid, DEVMESHHANDLE hMesh)
 
 bool RadiatorControl::clbkPlaybackEvent (double simt, double event_t, const char *event_type, const char *event)
 {
-	if (!_stricmp (event_type, "RADIATOR")) {
-		if (!_stricmp (event, "CLOSE")) CloseRadiator();
+	if (!dg::CompareText (event_type, "RADIATOR")) {
+		if (!dg::CompareText (event, "CLOSE")) CloseRadiator();
 		else                            OpenRadiator();
 		return true;
 	}
@@ -1173,7 +1173,7 @@ bool RadiatorControl::clbkPlaybackEvent (double simt, double event_t, const char
 
 // --------------------------------------------------------------
 
-int RadiatorControl::clbkConsumeBufferedKey (DWORD key, bool down, char *kstate)
+int RadiatorControl::clbkConsumeBufferedKey (oapi::UInt32 key, bool down, char *kstate)
 {
 	if (KEYMOD_ALT(kstate) || KEYMOD_CONTROL(kstate) || KEYMOD_SHIFT(kstate))
 		return 0;
