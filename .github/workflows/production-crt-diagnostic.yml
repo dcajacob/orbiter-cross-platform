@@ -24,7 +24,6 @@ jobs:
       - uses: actions/checkout@v7
       - uses: ilammy/msvc-dev-cmd@v1
         with:
-          vsversion: '17.0'
           arch: x64
       - name: Observe Debug, Release and installed SDK CRTs on one host
         run: python -B Tests/Production/CrtDiagnostic/capture.py --output out/crt-diagnostic

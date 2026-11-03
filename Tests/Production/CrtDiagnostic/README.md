@@ -12,6 +12,8 @@ python -B Tests/Production/CrtDiagnostic/capture.py --output out/crt-diagnostic
 ```
 
 The workflow runs both builds on each Windows Server 2022 and 2025 host. It
+uses each image's installed Visual Studio (the 2025 runner now supplies 2026),
+and records the compiler rather than assuming both images carry VS 2022. It
 records the actual export owner, file/product versions, SHA256, compiler,
 CPU, rounding state and FMA3 state. A fixed corpus includes the exact recorded
 input, its neighbours, endpoints, signed zero, subnormals and a uniform grid.
@@ -37,3 +39,15 @@ and that modern Windows uses its system copy even when a newer application-local
 copy is present: [Universal CRT deployment](https://learn.microsoft.com/en-us/cpp/windows/universal-crt-deployment).
 The diagnostic measures the actual providers instead of inferring them from
 the installed compiler or SDK version.
+
+## First Windows Server 2022 capture
+
+[Run 41587424541](https://github.com/dcajacob/orbiter-cross-platform/actions/runs/41587424541)
+captured Debug product version `10.0.26100.7705` and Release product version
+`10.0.20348.5756`. Their hashes match the providers recorded in the original
+simulator's paired run. With default dispatch, 115 of 8,517 inputs differ by
+one ULP; the forced-SSE2 captures agree throughout. Both the Debug and Release
+SDK `10.0.26100.7705` exports return the newer result for the flight's critical
+input, while the older installed SDK versions return the system Release result.
+This demonstrates a runtime-version difference, rather than an intrinsic
+Debug-versus-Release compiler difference. It does not prove full-flight parity.

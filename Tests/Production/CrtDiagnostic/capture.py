@@ -157,6 +157,16 @@ def main():
                     report['comparisons'][target + '-vs-Release-' + profile] = compare(captures[target + '-' + profile], captures['Release-' + profile])
         for profile in PROFILES:
             report['comparisons']['Debug-vs-Release-' + profile] = compare(captures['Debug-' + profile], captures['Release-' + profile])
+        # Compare actual co-version providers directly, rather than inferring
+        # equivalence from their separate difference counts against the OS CRT.
+        for i, (left, _, _) in enumerate(targets):
+            for right, _, _ in targets[i + 1:]:
+                a = report['captures'][left + '-default']['exported_provider']
+                b = report['captures'][right + '-default']['exported_provider']
+                if a['product_version'] == b['product_version']:
+                    for profile in PROFILES:
+                        report['comparisons']['same-version-' + left + '-vs-' + right + '-' + profile] = compare(
+                            captures[left + '-' + profile], captures[right + '-' + profile])
         report['status'] = 'observed'
         print(json.dumps(report['comparisons'], indent=2))
     except Exception as error:
