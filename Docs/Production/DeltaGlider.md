@@ -19,15 +19,15 @@ shutdown and Lua errors.
 
 Across five Lua schedules, native Debug and Release each reproduce their
 corresponding original Windows build at all 61 samples, including events,
-controls, air data and cockpit state. The original Windows builds disagree with
-each other. At tick 34 of the atmospheric DG flight, both passed the same
+controls, air data and cockpit state. On Windows 2022, the original builds
+disagree with each other. At tick 34 of the atmospheric DG flight, both passed the same
 planet-local coordinate ratio (`0x1.e92199644661ep-2`) to arcsine. Debug
 returned `0x1.fdf30f8d54923p-2` and Release returned `0x1.fdf30f8d54924p-2`.
 The one-bit latitude difference carried into horizon airspeed, then into the
-elevator at tick 35. The native Release engine now uses the pinned SSE2
-arcsine for this equatorial conversion. The Jacchia-71 atmosphere uses the
-pinned exponential for air density. The exact original cross-build gate
-remains open. The separate SSE2 diagnostic passed all five schedules across
+elevator at tick 35. The earlier native Release adapter used SSE2 for this
+equatorial conversion to match that runtime. The Jacchia-71 atmosphere uses
+the pinned exponential for air density. The Windows 2022 default cross-build
+gate remains failed. The separate SSE2 diagnostic passed all five schedules across
 original Debug and Release. [Paired CRT diagnostic](https://github.com/dcajacob/orbiter-cross-platform/actions/runs/41563089062)
 [Original Windows comparison](https://github.com/dcajacob/orbiter-cross-platform/actions/runs/41560881876)
 
@@ -37,21 +37,36 @@ including installed SDK providers, with 8,517 arcsine inputs and repeated fresh
 processes. Its results diagnose runtime provisioning; they do not replace the
 original simulator cross-build gate or change the native math profile.
 
-The subsequent Windows 2025 capture has identical Debug/Release traces for
-four completed cases, including both atmospheric flights. Its Release orbital
-DG case fails because several `proc.skip()` iterations resume within one
+The first Windows 2025 capture had identical Debug/Release traces for four
+completed cases, including both atmospheric flights. Its Release orbital DG
+case failed because several `proc.skip()` iterations resumed within one
 simulation frame. The current native Debug client matches Windows 2025 Debug
 exactly in all five shared schedules. A controlled Win32 reproduction confirms
 that the preserved two-mutex handoff permits repeated worker turns while the
 simulator is descheduled between release and wait. The native explicit-turn
 handoff preserves one turn per frame in that reproduction on both Windows
-hosts. Full original captures with wall-clock/thread observations are running
-to investigate the simulator failure; the reference set remains unaccepted.
-The completed timed Windows 2025 Debug capture passes, and all 120 deterministic
-event/control/atmosphere/controller/horizon/cockpit CSVs are byte-identical to
-the prior capture across both repeats and both math profiles. Release remains
-a separate required gate.
+hosts. The subsequent timed capture passes all five cases twice in both builds
+and both math profiles. All 120 deterministic Debug trace CSVs remain identical
+to the earlier Debug capture. The hosted default and SSE2 comparisons both
+pass: all physical-state errors are zero, Lua/control traces are exact and all
+frame/MFD SSIM values are 1.0. Cross-build byte checks also match all 260 trace
+and image files. Windows 2022's separate default comparison still fails on the
+known CRT-family difference. The passing Windows 2025 reference candidate
+still needs durable preservation.
 [Protocol evidence](LuaHandoffVerification.json)
+
+Native latitude now uses the selected CPU path in both build configurations,
+matching the qualified 26100-family Windows CRTs. Debug and Release both match
+all five original Windows 2025 schedules exactly for events, controls,
+atmosphere and cockpit state. The 40 compared native trace files match their
+original counterparts after CRLF-to-LF normalization. All four Debug/Release automatic/SSE2
+math configurations pass the unchanged 28,800-sample Windows primitive corpus
+per exercised CPU path and 7,698 independent MPFR checks per path. Vendor
+mathematical sources and frozen numerical budgets are unchanged. The native
+comparison selects the requested original profile explicitly and rejects failed
+captures before running. Native image comparisons, full SSE2 simulator parity
+and the broader platform gates remain separate.
+[Native numerical alignment](LuaNativeAlignment.json)
 
 The native client flies all five original DG recorded scenarios from the stock
 position, attitude, control and system-event files. DG stunts draws the recorded
@@ -87,6 +102,12 @@ Earth configuration. Both original Windows configurations also failed the stock
 planet-status test, with Earth obliquity measured at 23.439801090036248°.
 The other 84 scenarios require additional vessel classes.
 [Stock scenario census](../../Tests/Production/DeltaGlider/stock_scenarios.py)
+The expanded sanitizer census completes all 38 loadable scenarios and cleanly
+destroys every graphics context across 2,280 presentations. It exposed and
+fixed a heading-marker use-after-scope in Geostationary orbit. The strict
+census still fails on GeneralApiTest's original assertion; its Lua error is
+now detected in both normal and sanitizer log formats.
+[HUD and stock sanitizer evidence](HudHeadingVerification.json)
 Sanitizer flights now finish without the previous aircraft initialization,
 light destruction, panel texture and virtual-cockpit vertex-buffer errors.
 Earlier system-driver runs reported two 56-byte allocations per flight. Loader

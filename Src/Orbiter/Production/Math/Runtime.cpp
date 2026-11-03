@@ -34,14 +34,12 @@ double __wrap_atan2(double y,double x) noexcept {Fma();return aw_atan2(y,x);}
 void __wrap_sincos(double x,double* s,double* c) noexcept {Fma();*s=orbiter_math_sin_value(x);*c=aw_cos(x);}
 }
 namespace orbiter::production {
-// The original Windows Release runtime rounds the equatorial latitude with
-// the SSE2 polynomial even when its CRT FMA3 switch is enabled (run 41560881876).
+// The qualified Windows 26100 CRT family uses the selected CPU path for
+// equatorial latitude in both builds (run 41590681453). Older Windows 2022
+// Release CRTs used SSE2 here even with FMA3 enabled; keep that host diagnostic
+// separate from the current cross-build reference profile.
 double ReferenceLatitudeAsin(double x) noexcept {
-#if ORBITER_MATH_RELEASE_LATITUDE
-    return orbiter_asin_sse2(x);
-#else
     return __wrap_asin(x);
-#endif
 }
 const char* ReferenceMathProfile() noexcept {return Fma()?"amd-6121d02-fma3":"amd-6121d02-sse2";}
 }

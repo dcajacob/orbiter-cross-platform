@@ -20,10 +20,11 @@ def main():
     for name in ('probe_profile','oracle_version','oracle_module'):getattr(lib,name).restype=C.c_char_p
     profile=lib.probe_profile().decode();oracle=Path(lib.oracle_module().decode()).resolve()
     # The original stored SurfParam and CRT asin use this exact input at tick
-    # 34 in the atmospheric DG. Source run 41560881876, same Windows host.
+    # 34 in the atmospheric DG. Qualified Windows 26100-family Debug/Release
+    # providers agree in both CPU profiles (run 41590681453).
     lib.probe_latitude.argtypes=[C.c_double];lib.probe_latitude.restype=C.c_double
     latitude=lib.probe_latitude(float.fromhex('0x1.e92199644661ep-2'))
-    expected_latitude='0x1.fdf30f8d54924p-2' if lib.probe_release_latitude() or profile.endswith('sse2') else '0x1.fdf30f8d54923p-2'
+    expected_latitude='0x1.fdf30f8d54924p-2' if profile.endswith('sse2') else '0x1.fdf30f8d54923p-2'
     require(latitude.hex()==expected_latitude,'Equatorial latitude differs from its original CRT profile')
     rng=random.Random(0x4f524249544552);samples=[]
     values=[0.,-0.,math.ulp(0.),-math.ulp(0.),1.,-1.,float.fromhex('0x1.fffffffffffffp+1023')]

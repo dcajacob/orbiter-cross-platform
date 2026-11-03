@@ -19,9 +19,19 @@ def main():
     for key in ('assets','build','data','planets','output'):
         parser.add_argument('--'+key,type=Path,required=True)
     parser.add_argument('--original',type=Path,help='Original Windows capture ZIP for diagnostic comparison')
+    parser.add_argument('--original-profile',choices=('original-default','diagnostic-sse2'),default='original-default')
     args=parser.parse_args()
     output=args.output.resolve()
     output.mkdir(parents=True,exist_ok=False)
+    original_directory='diagnostic-sse2' if args.original_profile=='diagnostic-sse2' else 'control-reference'
+    if args.original:
+        with zipfile.ZipFile(args.original) as archive:
+            original_report=json.loads(archive.read('out/'+original_directory+'/lua-report.json'))
+        if (original_report['status']!='passed' or original_report['math_profile']!=args.original_profile or
+                original_report['runtime']['application_source']!=settings()['application_source']):
+            raise ValueError('Original Lua capture failed, has the wrong profile, or uses a different application')
+        (output/'original-capture.json').write_text(json.dumps({key:original_report[key] for key in
+            ('status','source','configuration','math_profile','host')},indent=2)+'\n')
     build=args.build.resolve()
     compiler=next(line.split('=',1)[1] for line in (build/'CMakeCache.txt').read_text().splitlines()
                   if line.startswith('CMAKE_CXX_COMPILER:FILEPATH='))
@@ -50,7 +60,7 @@ def main():
             with zipfile.ZipFile(args.original) as z:
                 suffix='/'+case['id']+'-1/'
                 def original(name):
-                    key=next(key for key in z.namelist() if key.endswith(suffix+name))
+                    key='out/'+original_directory+suffix+name
                     return z.read(key).decode().splitlines()
                 if original('lua-events.csv')!=(out/'lua-events.csv').read_text().splitlines():
                     raise ValueError('Original Windows Lua event timing differs: '+case['id'])

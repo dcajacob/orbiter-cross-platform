@@ -115,5 +115,276 @@
       }
     ],
     "scope": "Timing observations preserve all recorded default/SSE2 Debug traces; the Release gate remains separate."
+  },
+  "windows2025_pair": {
+    "status": "passed",
+    "reference_preservation": "pending",
+    "source": "739fdf943cf63dc4e05647cf64b0cde0ace22195",
+    "capture_job": 125766447307,
+    "comparison_job": 125772368137,
+    "artifacts": {
+      "debug": {
+        "id": 13210551295,
+        "sha256": "7cc4f857d62be1114220deda0c186c2e6bf1a914f82caaa3450140da3b81744e"
+      },
+      "release": {
+        "id": 13211325218,
+        "sha256": "3c85b03e26193ab6c5621b49fc7e8b61cc9e0cfb6d3571046be06244c170f746"
+      }
+    },
+    "comparisons": {
+      "control-reference": {
+        "status": "passed",
+        "math_profile": "original-default",
+        "cases": {
+          "lua_pb": {
+            "maxima": {
+              "position_m": 0.0,
+              "velocity_m_s": 0.0,
+              "rotation_rad": 0.0,
+              "angular_velocity_rad_s": 0.0,
+              "mjd_days": 0.0,
+              "propellant_fraction": 0.0
+            },
+            "identical_display_text": true,
+            "identical_hud_atlas_updates": true,
+            "overlay_pixel_error": 0.0,
+            "ssim": {
+              "20": 1.0,
+              "50": 1.0
+            }
+          },
+          "lua_dg": {
+            "maxima": {
+              "position_m": 0.0,
+              "velocity_m_s": 0.0,
+              "rotation_rad": 0.0,
+              "angular_velocity_rad_s": 0.0,
+              "mjd_days": 0.0,
+              "propellant_fraction": 0.0
+            },
+            "identical_display_text": true,
+            "identical_hud_atlas_updates": true,
+            "overlay_pixel_error": 0.0,
+            "ssim": {
+              "20": 1.0,
+              "50": 1.0
+            }
+          },
+          "lua_dgs": {
+            "maxima": {
+              "position_m": 0.0,
+              "velocity_m_s": 0.0,
+              "rotation_rad": 0.0,
+              "angular_velocity_rad_s": 0.0,
+              "mjd_days": 0.0,
+              "propellant_fraction": 0.0
+            },
+            "identical_display_text": true,
+            "identical_hud_atlas_updates": true,
+            "overlay_pixel_error": 0.0,
+            "ssim": {
+              "20": 1.0,
+              "50": 1.0
+            }
+          },
+          "lua_dg_atmosphere": {
+            "maxima": {
+              "position_m": 0.0,
+              "velocity_m_s": 0.0,
+              "rotation_rad": 0.0,
+              "angular_velocity_rad_s": 0.0,
+              "mjd_days": 0.0,
+              "propellant_fraction": 0.0
+            },
+            "identical_display_text": true,
+            "identical_hud_atlas_updates": true,
+            "overlay_pixel_error": 0.0,
+            "ssim": {
+              "20": 1.0,
+              "50": 1.0
+            }
+          },
+          "lua_dgs_atmosphere": {
+            "maxima": {
+              "position_m": 0.0,
+              "velocity_m_s": 0.0,
+              "rotation_rad": 0.0,
+              "angular_velocity_rad_s": 0.0,
+              "mjd_days": 0.0,
+              "propellant_fraction": 0.0
+            },
+            "identical_display_text": true,
+            "identical_hud_atlas_updates": true,
+            "overlay_pixel_error": 0.0,
+            "ssim": {
+              "20": 1.0,
+              "50": 1.0
+            }
+          }
+        },
+        "mfd_images": {
+          "lua_pb": {
+            "mfd-0-20": 1.0,
+            "mfd-1-20": 1.0,
+            "mfd-0-50": 1.0,
+            "mfd-1-50": 1.0
+          },
+          "lua_dg": {
+            "mfd-0-20": 1.0,
+            "mfd-1-20": 1.0,
+            "mfd-0-50": 1.0,
+            "mfd-1-50": 1.0
+          },
+          "lua_dgs": {
+            "mfd-0-20": 1.0,
+            "mfd-1-20": 1.0,
+            "mfd-0-50": 1.0,
+            "mfd-1-50": 1.0
+          },
+          "lua_dg_atmosphere": {
+            "mfd-0-20": 1.0,
+            "mfd-1-20": 1.0,
+            "mfd-0-50": 1.0,
+            "mfd-1-50": 1.0
+          },
+          "lua_dgs_atmosphere": {
+            "mfd-0-20": 1.0,
+            "mfd-1-20": 1.0,
+            "mfd-0-50": 1.0,
+            "mfd-1-50": 1.0
+          }
+        },
+        "exact_lua_execution": true
+      },
+      "diagnostic-sse2": {
+        "status": "passed",
+        "math_profile": "diagnostic-sse2",
+        "cases": {
+          "lua_pb": {
+            "maxima": {
+              "position_m": 0.0,
+              "velocity_m_s": 0.0,
+              "rotation_rad": 0.0,
+              "angular_velocity_rad_s": 0.0,
+              "mjd_days": 0.0,
+              "propellant_fraction": 0.0
+            },
+            "identical_display_text": true,
+            "identical_hud_atlas_updates": true,
+            "overlay_pixel_error": 0.0,
+            "ssim": {
+              "20": 1.0,
+              "50": 1.0
+            }
+          },
+          "lua_dg": {
+            "maxima": {
+              "position_m": 0.0,
+              "velocity_m_s": 0.0,
+              "rotation_rad": 0.0,
+              "angular_velocity_rad_s": 0.0,
+              "mjd_days": 0.0,
+              "propellant_fraction": 0.0
+            },
+            "identical_display_text": true,
+            "identical_hud_atlas_updates": true,
+            "overlay_pixel_error": 0.0,
+            "ssim": {
+              "20": 1.0,
+              "50": 1.0
+            }
+          },
+          "lua_dgs": {
+            "maxima": {
+              "position_m": 0.0,
+              "velocity_m_s": 0.0,
+              "rotation_rad": 0.0,
+              "angular_velocity_rad_s": 0.0,
+              "mjd_days": 0.0,
+              "propellant_fraction": 0.0
+            },
+            "identical_display_text": true,
+            "identical_hud_atlas_updates": true,
+            "overlay_pixel_error": 0.0,
+            "ssim": {
+              "20": 1.0,
+              "50": 1.0
+            }
+          },
+          "lua_dg_atmosphere": {
+            "maxima": {
+              "position_m": 0.0,
+              "velocity_m_s": 0.0,
+              "rotation_rad": 0.0,
+              "angular_velocity_rad_s": 0.0,
+              "mjd_days": 0.0,
+              "propellant_fraction": 0.0
+            },
+            "identical_display_text": true,
+            "identical_hud_atlas_updates": true,
+            "overlay_pixel_error": 0.0,
+            "ssim": {
+              "20": 1.0,
+              "50": 1.0
+            }
+          },
+          "lua_dgs_atmosphere": {
+            "maxima": {
+              "position_m": 0.0,
+              "velocity_m_s": 0.0,
+              "rotation_rad": 0.0,
+              "angular_velocity_rad_s": 0.0,
+              "mjd_days": 0.0,
+              "propellant_fraction": 0.0
+            },
+            "identical_display_text": true,
+            "identical_hud_atlas_updates": true,
+            "overlay_pixel_error": 0.0,
+            "ssim": {
+              "20": 1.0,
+              "50": 1.0
+            }
+          }
+        },
+        "mfd_images": {
+          "lua_pb": {
+            "mfd-0-20": 1.0,
+            "mfd-1-20": 1.0,
+            "mfd-0-50": 1.0,
+            "mfd-1-50": 1.0
+          },
+          "lua_dg": {
+            "mfd-0-20": 1.0,
+            "mfd-1-20": 1.0,
+            "mfd-0-50": 1.0,
+            "mfd-1-50": 1.0
+          },
+          "lua_dgs": {
+            "mfd-0-20": 1.0,
+            "mfd-1-20": 1.0,
+            "mfd-0-50": 1.0,
+            "mfd-1-50": 1.0
+          },
+          "lua_dg_atmosphere": {
+            "mfd-0-20": 1.0,
+            "mfd-1-20": 1.0,
+            "mfd-0-50": 1.0,
+            "mfd-1-50": 1.0
+          },
+          "lua_dgs_atmosphere": {
+            "mfd-0-20": 1.0,
+            "mfd-1-20": 1.0,
+            "mfd-0-50": 1.0,
+            "mfd-1-50": 1.0
+          }
+        },
+        "exact_lua_execution": true
+      }
+    },
+    "identical_trace_and_image_files": 260,
+    "identical_index_sha256": "4528821625ea7234f63fb67405fec3b150fd675e94e3c35f544de0974857050d",
+    "scope": "Passing original Windows 2025 Debug/Release default and SSE2 candidate. The native automatic-profile alignment is recorded separately; legacy Windows 2022 default failure remains visible.",
+    "native_alignment_report": "LuaNativeAlignment.json"
   }
 }

@@ -673,7 +673,7 @@
     },
     "Src/Orbiter/Production/Math/CMakeLists.txt": {
       "original_sha256_lf": null,
-      "sha256_lf": "3a7f87512499f2ff8f2ae328207a04cbb624f157f4d5265897d08d3b39b834c7"
+      "sha256_lf": "1f38670991a7f05dde62778eb4cb1acddafb9c0b3d3c45d0e4267448539a9b04"
     },
     "Src/Orbiter/Production/Math/NativeError.cpp": {
       "original_sha256_lf": null,
@@ -685,7 +685,7 @@
     },
     "Src/Orbiter/Production/Math/Runtime.cpp": {
       "original_sha256_lf": null,
-      "sha256_lf": "bff0fda8a36a5548b8fa870819b4848a28cf602675ec43310d1286c8b412409a"
+      "sha256_lf": "b2b04979018ceb6a10b8774369bca651f5a86dce8aaf98b0e8d75ef45241e7f1"
     },
     "Src/Orbiter/Production/Math/Runtime.h": {
       "original_sha256_lf": null,

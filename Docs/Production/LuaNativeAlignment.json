@@ -1,0 +1,365 @@
+{
+  "schema": 1,
+  "status": "passed",
+  "scope": "Native Debug/Release automatic-profile Lua event/control/air/cockpit-state parity with the qualified Windows 2025 candidate. Native image acceptance, full SSE2 simulator comparisons and reference preservation remain separate.",
+  "source_base": "3f59b27d",
+  "source_sha256": {
+    "Src/Orbiter/Production/Math/Runtime.cpp": "b2b04979018ceb6a10b8774369bca651f5a86dce8aaf98b0e8d75ef45241e7f1",
+    "Src/Orbiter/Production/Math/CMakeLists.txt": "1f38670991a7f05dde62778eb4cb1acddafb9c0b3d3c45d0e4267448539a9b04",
+    "Tests/Production/Math/Probe.cpp": "9038db53fad84832ed92a94a9c02061389228e6cf34c60043a7e1a85e4fc2ca4",
+    "Tests/Production/Math/verify.py": "1d7167feeb6ddc9541282f5b684b6ef65283ac8b66cfb27675ad9cc5fc762c97",
+    "Tests/Production/LuaRuntime/native_schedule.py": "0bafc1595703a898a1a7bf5c33151f0455e403dad7adc6905dc983f3dc780117"
+  },
+  "reference_evidence": "LuaHandoffVerification.json",
+  "math": {
+    "phase6-math-26100-debug-automatic": {
+      "status": "passed",
+      "automatic_profile": "amd-6121d02-fma3",
+      "equatorial_latitude_hex": "0x1.fdf30f8d54923p-2",
+      "probe_sha256": "489f8bbb104a53b25a6f2474cabd0b56b24707c61e26215ec8b0d7ba4be93448",
+      "oracle": {
+        "version": "4.2.2",
+        "path": "/usr/lib/x86_64-linux-gnu/libmpfr.so.6.2.2",
+        "sha256": "1aed080b3143049fbe016cd82cdc5fb47db386386556cc1bb37cfccc133c0fae",
+        "precision_bits": [
+          256,
+          512
+        ]
+      },
+      "maximum_allowed_ulps": 1,
+      "profiles": [
+        {
+          "profile": "automatic",
+          "windows_samples_exact": 28800,
+          "mpfr_samples": 7698,
+          "maximum_ulps": {
+            "sin": 1,
+            "cos": 1,
+            "asin": 1,
+            "atan2": 0,
+            "exp": 1
+          },
+          "edge_cases": "passed"
+        },
+        {
+          "profile": "sse2",
+          "windows_samples_exact": 28800,
+          "mpfr_samples": 7698,
+          "maximum_ulps": {
+            "sin": 1,
+            "cos": 1,
+            "asin": 1,
+            "atan2": 0,
+            "exp": 1
+          },
+          "edge_cases": "passed"
+        }
+      ]
+    },
+    "phase6-math-26100-debug-sse2": {
+      "status": "passed",
+      "automatic_profile": "amd-6121d02-sse2",
+      "equatorial_latitude_hex": "0x1.fdf30f8d54924p-2",
+      "probe_sha256": "4bcd972a79890f53870dfd6cc5a62c98f1cff40fe9645b9db5fffc1c2776f8f3",
+      "oracle": {
+        "version": "4.2.2",
+        "path": "/usr/lib/x86_64-linux-gnu/libmpfr.so.6.2.2",
+        "sha256": "1aed080b3143049fbe016cd82cdc5fb47db386386556cc1bb37cfccc133c0fae",
+        "precision_bits": [
+          256,
+          512
+        ]
+      },
+      "maximum_allowed_ulps": 1,
+      "profiles": [
+        {
+          "profile": "automatic",
+          "windows_samples_exact": 28800,
+          "mpfr_samples": 7698,
+          "maximum_ulps": {
+            "sin": 1,
+            "cos": 1,
+            "asin": 1,
+            "atan2": 0,
+            "exp": 1
+          },
+          "edge_cases": "passed"
+        },
+        {
+          "profile": "fma3",
+          "windows_samples_exact": 28800,
+          "mpfr_samples": 7698,
+          "maximum_ulps": {
+            "sin": 1,
+            "cos": 1,
+            "asin": 1,
+            "atan2": 0,
+            "exp": 1
+          },
+          "edge_cases": "passed"
+        }
+      ]
+    },
+    "phase6-math-26100-release-automatic": {
+      "status": "passed",
+      "automatic_profile": "amd-6121d02-fma3",
+      "equatorial_latitude_hex": "0x1.fdf30f8d54923p-2",
+      "probe_sha256": "c211a5d09b34ce68c0bab0e890413ccfe1865d5e2fed98cceaeab0f58fdcaed2",
+      "oracle": {
+        "version": "4.2.2",
+        "path": "/usr/lib/x86_64-linux-gnu/libmpfr.so.6.2.2",
+        "sha256": "1aed080b3143049fbe016cd82cdc5fb47db386386556cc1bb37cfccc133c0fae",
+        "precision_bits": [
+          256,
+          512
+        ]
+      },
+      "maximum_allowed_ulps": 1,
+      "profiles": [
+        {
+          "profile": "automatic",
+          "windows_samples_exact": 28800,
+          "mpfr_samples": 7698,
+          "maximum_ulps": {
+            "sin": 1,
+            "cos": 1,
+            "asin": 1,
+            "atan2": 0,
+            "exp": 1
+          },
+          "edge_cases": "passed"
+        },
+        {
+          "profile": "sse2",
+          "windows_samples_exact": 28800,
+          "mpfr_samples": 7698,
+          "maximum_ulps": {
+            "sin": 1,
+            "cos": 1,
+            "asin": 1,
+            "atan2": 0,
+            "exp": 1
+          },
+          "edge_cases": "passed"
+        }
+      ]
+    },
+    "phase6-math-26100-release-sse2": {
+      "status": "passed",
+      "automatic_profile": "amd-6121d02-sse2",
+      "equatorial_latitude_hex": "0x1.fdf30f8d54924p-2",
+      "probe_sha256": "dc20a37379c331330435d356b2f840b29b7bca17248d2b956bbd9523ade4c234",
+      "oracle": {
+        "version": "4.2.2",
+        "path": "/usr/lib/x86_64-linux-gnu/libmpfr.so.6.2.2",
+        "sha256": "1aed080b3143049fbe016cd82cdc5fb47db386386556cc1bb37cfccc133c0fae",
+        "precision_bits": [
+          256,
+          512
+        ]
+      },
+      "maximum_allowed_ulps": 1,
+      "profiles": [
+        {
+          "profile": "automatic",
+          "windows_samples_exact": 28800,
+          "mpfr_samples": 7698,
+          "maximum_ulps": {
+            "sin": 1,
+            "cos": 1,
+            "asin": 1,
+            "atan2": 0,
+            "exp": 1
+          },
+          "edge_cases": "passed"
+        },
+        {
+          "profile": "fma3",
+          "windows_samples_exact": 28800,
+          "mpfr_samples": 7698,
+          "maximum_ulps": {
+            "sin": 1,
+            "cos": 1,
+            "asin": 1,
+            "atan2": 0,
+            "exp": 1
+          },
+          "edge_cases": "passed"
+        }
+      ]
+    }
+  },
+  "native": {
+    "debug": {
+      "exit_code": 0,
+      "cases": {
+        "lua_pb": {
+          "events": 10,
+          "environment_isolation": true,
+          "frame_yielding": true,
+          "aap_controls": false,
+          "original_events_identical": true,
+          "original_controls_identical": true,
+          "original_air_identical": true,
+          "original_state_identical": true,
+          "first_control_difference": null,
+          "control_differences": 0
+        },
+        "lua_dg": {
+          "events": 13,
+          "environment_isolation": true,
+          "frame_yielding": true,
+          "aap_controls": true,
+          "original_events_identical": true,
+          "original_controls_identical": true,
+          "original_air_identical": true,
+          "original_state_identical": true,
+          "first_control_difference": null,
+          "control_differences": 0
+        },
+        "lua_dgs": {
+          "events": 13,
+          "environment_isolation": true,
+          "frame_yielding": true,
+          "aap_controls": true,
+          "original_events_identical": true,
+          "original_controls_identical": true,
+          "original_air_identical": true,
+          "original_state_identical": true,
+          "first_control_difference": null,
+          "control_differences": 0
+        },
+        "lua_dg_atmosphere": {
+          "events": 15,
+          "environment_isolation": true,
+          "frame_yielding": true,
+          "aap_controls": true,
+          "original_events_identical": true,
+          "original_controls_identical": true,
+          "original_air_identical": true,
+          "original_state_identical": true,
+          "first_control_difference": null,
+          "control_differences": 0
+        },
+        "lua_dgs_atmosphere": {
+          "events": 15,
+          "environment_isolation": true,
+          "frame_yielding": true,
+          "aap_controls": true,
+          "original_events_identical": true,
+          "original_controls_identical": true,
+          "original_air_identical": true,
+          "original_state_identical": true,
+          "first_control_difference": null,
+          "control_differences": 0
+        }
+      },
+      "profiles": {
+        "lua_pb": "amd-6121d02-fma3",
+        "lua_dg": "amd-6121d02-fma3",
+        "lua_dgs": "amd-6121d02-fma3",
+        "lua_dg_atmosphere": "amd-6121d02-fma3",
+        "lua_dgs_atmosphere": "amd-6121d02-fma3"
+      },
+      "original_capture": {
+        "status": "passed",
+        "source": "739fdf943cf63dc4e05647cf64b0cde0ace22195",
+        "configuration": "Debug",
+        "math_profile": "original-default",
+        "host": {
+          "platform": "Windows-2025Server-10.0.26100-SP0",
+          "image_os": "win25-vs2026",
+          "image_version": "20261030.294.1"
+        }
+      },
+      "report_sha256": "cc8ac3e945ed75977c5c3e27196ab790680c69cf0752bc483e2679a2f3b59386"
+    },
+    "release": {
+      "exit_code": 0,
+      "cases": {
+        "lua_pb": {
+          "events": 10,
+          "environment_isolation": true,
+          "frame_yielding": true,
+          "aap_controls": false,
+          "original_events_identical": true,
+          "original_controls_identical": true,
+          "original_air_identical": true,
+          "original_state_identical": true,
+          "first_control_difference": null,
+          "control_differences": 0
+        },
+        "lua_dg": {
+          "events": 13,
+          "environment_isolation": true,
+          "frame_yielding": true,
+          "aap_controls": true,
+          "original_events_identical": true,
+          "original_controls_identical": true,
+          "original_air_identical": true,
+          "original_state_identical": true,
+          "first_control_difference": null,
+          "control_differences": 0
+        },
+        "lua_dgs": {
+          "events": 13,
+          "environment_isolation": true,
+          "frame_yielding": true,
+          "aap_controls": true,
+          "original_events_identical": true,
+          "original_controls_identical": true,
+          "original_air_identical": true,
+          "original_state_identical": true,
+          "first_control_difference": null,
+          "control_differences": 0
+        },
+        "lua_dg_atmosphere": {
+          "events": 15,
+          "environment_isolation": true,
+          "frame_yielding": true,
+          "aap_controls": true,
+          "original_events_identical": true,
+          "original_controls_identical": true,
+          "original_air_identical": true,
+          "original_state_identical": true,
+          "first_control_difference": null,
+          "control_differences": 0
+        },
+        "lua_dgs_atmosphere": {
+          "events": 15,
+          "environment_isolation": true,
+          "frame_yielding": true,
+          "aap_controls": true,
+          "original_events_identical": true,
+          "original_controls_identical": true,
+          "original_air_identical": true,
+          "original_state_identical": true,
+          "first_control_difference": null,
+          "control_differences": 0
+        }
+      },
+      "profiles": {
+        "lua_pb": "amd-6121d02-fma3",
+        "lua_dg": "amd-6121d02-fma3",
+        "lua_dgs": "amd-6121d02-fma3",
+        "lua_dg_atmosphere": "amd-6121d02-fma3",
+        "lua_dgs_atmosphere": "amd-6121d02-fma3"
+      },
+      "original_capture": {
+        "status": "passed",
+        "source": "739fdf943cf63dc4e05647cf64b0cde0ace22195",
+        "configuration": "Release",
+        "math_profile": "original-default",
+        "host": {
+          "platform": "Windows-2025Server-10.0.26100-SP0",
+          "image_os": "win25-vs2026",
+          "image_version": "20261030.294.1"
+        }
+      },
+      "report_sha256": "cc8ac3e945ed75977c5c3e27196ab790680c69cf0752bc483e2679a2f3b59386"
+    }
+  },
+  "failed_original_rejected": true,
+  "identical_lf_normalized_native_trace_files": 40,
+  "identical_lf_normalized_native_index_sha256": "241fc95deee0cf6044095bcab02deb07505855bceb6421144a329f82ce50a067"
+}
