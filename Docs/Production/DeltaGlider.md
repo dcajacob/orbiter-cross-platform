@@ -69,3 +69,11 @@ aileron difference was 2.43e-16. The other four cases had identical control
 traces. The next capture uses one Windows host and records the stock script's
 intermediates without advancing the interpreter or changing its arithmetic.
 The exact cross-build check remains in force.
+
+The native Lua build also compiles the complete original `lua_vessel_mtd.cpp`,
+including the vessel method registration table and the Lua vessel MFD2
+callbacks. The source check compares every method body and registration with
+the historical Windows source after accounting for SDK type names and the
+case-insensitive string comparison. Its vessel and MFD method symbols are
+available from the native cockpit engine. Executing the bindings still
+requires the remaining interpreter implementation and module loader.

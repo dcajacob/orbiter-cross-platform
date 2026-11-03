@@ -46,6 +46,13 @@ target_include_directories(native_lua_inline_worker PRIVATE
 target_link_libraries(native_lua_inline_worker PRIVATE lua Threads::Threads)
 set_target_properties(native_lua_inline_worker PROPERTIES POSITION_INDEPENDENT_CODE ON)
 
+add_library(native_lua_vessel_bindings OBJECT ../LuaInterpreter/lua_vessel_mtd.cpp)
+target_compile_features(native_lua_vessel_bindings PRIVATE cxx_std_17)
+target_include_directories(native_lua_vessel_bindings PRIVATE
+    "${ORBITER_SOURCE_ROOT}/Orbitersdk/include" "${ORBITER_SOURCE_ROOT}/Src/Orbiter")
+target_link_libraries(native_lua_vessel_bindings PRIVATE lua)
+set_target_properties(native_lua_vessel_bindings PROPERTIES POSITION_INDEPENDENT_CODE ON)
+
 include(CTest)
 if(BUILD_TESTING)
     add_executable(interpreter_handoff_check "${ORBITER_SOURCE_ROOT}/Tests/Production/NativeLua/ExecutionHandoff.Test.cpp")

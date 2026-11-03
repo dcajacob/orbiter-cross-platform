@@ -56,6 +56,19 @@ def verify():
         repaired=repaired.replace(b'(oapi::UInt32)(isScram ? 3 : 0)', b'(DWORD)(isScram ? 3 : 0)')
         if repaired.count(added)!=1 or repaired.replace(added,b'',1)!=git('show',CAPTURE+':'+name).replace(b'\r\n',b'\n'):
             raise ValueError('DG pre-reference repair exceeds sample-time initialization')
+    if 'Src/Module/LuaScript/LuaInterpreter/lua_vessel_mtd.cpp' in declared:
+        name='Src/Module/LuaScript/LuaInterpreter/lua_vessel_mtd.cpp'
+        from vessel_runtime_source import equal
+        current=(ROOT/name).read_bytes().decode('cp1252').replace('\r\n','\n')
+        current=current.replace('#ifndef _WIN32\n#include "Production/NavigationData.h"\n#include "Production/Text.h"\n#endif','')
+        original_test='\t\t\tif (!_stricmp (framestr, "equ")) frame = FRAME_EQU;'
+        native_test='\t\t\tif (!orbiter::production::CompareText(framestr, "equ")) frame = FRAME_EQU;'
+        current=current.replace('#ifdef _WIN32\n'+original_test+'\n#else\n'+native_test+'\n#endif',original_test)
+        for portable,legacy in [('oapi::CockpitMessageResult','OAPI_MSGTYPE'),('oapi::CockpitSignedParam','LPARAM'),
+                                ('oapi::CockpitUnsignedParam','WPARAM'),('oapi::UInt32','DWORD'),('oapi::UInt','UINT'),
+                                ('oapi::SdkRectangle','RECT'),('"MFDAPI.h"','"MfdApi.h"')]:
+            current=current.replace(portable,legacy)
+        equal(git('show',CAPTURE+':'+name).decode('cp1252'),current,'Complete original Lua vessel registrations and SDK method bodies')
     if 'Src/Vessel/DeltaGlider/DGSwitches.cpp' in declared:
         from DeltaGlider.instrument_source import verify as verify_instruments
         verify_instruments()

@@ -44,4 +44,17 @@ typedef struct {
 	float power;       ///< specular power
 } MATERIAL;
 
+enum MatProp {
+	Diffuse,			///< Material Diffuse color or Albedo depending on shader used. [.rgba]
+	Ambient,			///< Ambient color or Ambien occlusion [.rgb]
+	Specular,			///< Specular color [.rgb] power in [.a]
+	Light,				///< DX7 Style emission (color is added in light that lits the diffuse texture) (i.e. light map) [.rgb]
+	Emission,			///< Still in a development currently: output = max(diffuse*light, emission) [.rgb]
+	Reflect,			///< Reflectivity [.rgb]
+	Smooth,				///< Smoothness in [.r] (1 = smooth, 0 = rough)
+	Metal,				///< Meralness in [.r]  (1 = metal, 0 = non-metal)
+	Fresnel,			///< Fresnel terms for fresnel effect. Used in older 2nd generation shader.
+	SpecialFX			///< Heat map effect control variable in [.r] (i.e. average part temperature)
+};
+
 #endif

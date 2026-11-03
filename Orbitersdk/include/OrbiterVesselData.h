@@ -218,4 +218,8 @@ enum AltitudeMode {
 	ALTMODE_GROUND    ///< altitude over ground
 };
 
+#define RCS_NONE                 0 ///< None (RCS off)
+#define RCS_ROT                  1 ///< Rotational mode
+#define RCS_LIN                  2 ///< Linear (translational) mode
+
 #endif

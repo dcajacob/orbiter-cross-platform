@@ -6,6 +6,10 @@
 #include "Interpreter.h"
 #include "VesselAPI.h"
 #include "MFDAPI.h"
+#ifndef _WIN32
+#include "Production/NavigationData.h"
+#include "Production/Text.h"
+#endif
 
 
 /*
@@ -14,10 +18,10 @@ VesselMFD: Class instantiated for MFDs declared inside Lua Vessel modules
 class VesselMFD : public MFD2
 {
 public:
-	VesselMFD(DWORD w, DWORD h, VESSEL* vessel, VesselMFDContext* ctx);
+	VesselMFD(oapi::UInt32 w, oapi::UInt32 h, VESSEL* vessel, VesselMFDContext* ctx);
 	virtual ~VesselMFD();
 	bool ConsumeButton(int bt, int event) override;
-	bool ConsumeKeyBuffered(DWORD key) override;
+	bool ConsumeKeyBuffered(oapi::UInt32 key) override;
 	bool ConsumeKeyImmediate(char* kstate) override;
 	char* ButtonLabel(int bt) override;
 	int ButtonMenu(const MFDBUTTONMENU** menu) const override;
@@ -124,7 +128,7 @@ int Interpreter::lua_get_vesselstatus_version (lua_State *L, int idx) // Returns
 
 	// Very crude and simple check
 	lua_getfield(L, idx, "version");
-	DWORD version = lua_tointeger(L, -1);
+	oapi::UInt32 version = lua_tointeger(L, -1);
 
 	return (version > 0 && version <= 2) ? version : 0;
 }
@@ -169,7 +173,7 @@ void Interpreter::lua_push_vessel_status (lua_State *L, const VESSELSTATUS2 &vs)
 
 	// Fuel list
 	lua_createtable(L, vs.nfuel, 0);
-	for (DWORD i = 0; i < vs.nfuel; ++i) {
+	for (oapi::UInt32 i = 0; i < vs.nfuel; ++i) {
 		lua_pushnumber(L, i + 1);  // Put key of the Nth child table on-top of Lua VM stack
 
 		lua_createtable(L, 0, 2);  // Create Nth child table of size 2 non-array elements
@@ -184,7 +188,7 @@ void Interpreter::lua_push_vessel_status (lua_State *L, const VESSELSTATUS2 &vs)
 
 	// Thruster list
 	lua_createtable(L, vs.nthruster, 0);
-	for (DWORD i = 0; i < vs.nthruster; ++i) {
+	for (oapi::UInt32 i = 0; i < vs.nthruster; ++i) {
 		lua_pushnumber(L, i + 1);
 		lua_createtable(L, 0, 2);
 		lua_pushinteger(L, vs.thruster[i].idx);
@@ -197,7 +201,7 @@ void Interpreter::lua_push_vessel_status (lua_State *L, const VESSELSTATUS2 &vs)
 
 	// Dock info list
 	lua_createtable(L, vs.ndockinfo, 0);
-	for (DWORD i = 0; i < vs.ndockinfo; ++i) {
+	for (oapi::UInt32 i = 0; i < vs.ndockinfo; ++i) {
 		lua_pushnumber(L, i + 1);
 		lua_createtable(L, 0, 3);
 		lua_pushinteger(L, vs.dockinfo[i].idx);
@@ -1344,7 +1348,7 @@ int Interpreter::v_get_touchdownpoints (lua_State *L)
 
 	if (lua_gettop(L) >= 2) // new API
 	{
-		DWORD idx = luamtd_tointeger_safe(L, 2, funcname);
+		oapi::UInt32 idx = luamtd_tointeger_safe(L, 2, funcname);
 		TOUCHDOWNVTX tdvtx;
 		if (v->GetTouchdownPoint(tdvtx, idx)) {
 			lua_pushtouchdownvtx(L, tdvtx);
@@ -1399,7 +1403,7 @@ int Interpreter::v_set_touchdownpoints (lua_State *L)
 	{
 		AssertPrmType(L, -1, PRMTP_TABLE, funcname);
 		TOUCHDOWNVTX *tdvtx;
-		DWORD ntdvtx, nbuf;
+		oapi::UInt32 ntdvtx, nbuf;
 
 		ntdvtx = nbuf = 0;
 		lua_pushnil(L);
@@ -1828,7 +1832,7 @@ int Interpreter::v_get_status(lua_State* L)
 	VESSEL* v = lua_tovessel_safe(L, 1, funcname);
 
 	// For version 2 (or greater) the caller has to set version number as 1st parameter
-	DWORD version = (lua_gettop(L) >= 2) ? lua_tointeger(L, 2) : 2; // default to version 2
+	oapi::UInt32 version = (lua_gettop(L) >= 2) ? lua_tointeger(L, 2) : 2; // default to version 2
 	ASSERT_SYNTAX((version > 0 && version <= 2), "Invalid version");
 
 	if (version == 1)
@@ -1874,7 +1878,7 @@ int Interpreter::v_get_rawstatus(lua_State* L)
 	VESSEL* v = lua_tovessel_safe(L, 1, funcname);
 
 	// For version 2 (or greater) the caller has to set version number as 1st parameter
-	DWORD version = (lua_gettop(L) >= 2) ? lua_tointeger(L, 2) : 2; // default to version 2
+	oapi::UInt32 version = (lua_gettop(L) >= 2) ? lua_tointeger(L, 2) : 2; // default to version 2
 	ASSERT_SYNTAX((version > 0 && version <= 2), "Invalid version");
 
 	if (version == 1)
@@ -2363,7 +2367,7 @@ int Interpreter::v_is_landed (lua_State *L)
 	static const char *funcname = "is_landed";
 	AssertMtdMinPrmCount(L, 1, funcname);
 	VESSEL *v = lua_tovessel_safe(L, 1, funcname);
-	DWORD status = v->GetFlightStatus();
+	oapi::UInt32 status = v->GetFlightStatus();
 	if (status & 1) {
 		OBJHANDLE hBody = v->GetSurfaceRef ();
 		lua_pushlightuserdata (L, hBody);
@@ -2830,7 +2834,11 @@ int Interpreter::v_set_elements (lua_State *L)
 		lua_getfield (L, 3, "frame");
 		if (lua_isstring (L, -1)) {
 			const char *framestr = lua_tostring (L, -1);
+#ifdef _WIN32
 			if (!_stricmp (framestr, "equ")) frame = FRAME_EQU;
+#else
+			if (!orbiter::production::CompareText(framestr, "equ")) frame = FRAME_EQU;
+#endif
 		}
 		lua_pop (L, 1);
 	}
@@ -3668,7 +3676,7 @@ int Interpreter::v_edit_airfoil (lua_State *L)
 	// @todo: better check for nil ... (optionals) ... and build 'flag' based on that
 
 	AIRFOILHANDLE hAirfoil = (AIRFOILHANDLE)luamtd_tolightuserdata_safe(L, 2, funcname);
-	DWORD flag = luamtd_tointeger_safe(L, 3, funcname);
+	oapi::UInt32 flag = luamtd_tointeger_safe(L, 3, funcname);
 	VECTOR3 ref = luamtd_tovector_safe(L, 4, funcname);
 	double c = luamtd_tonumber_safe(L, 6, funcname),
 	       S = luamtd_tonumber_safe(L, 7, funcname),
@@ -3788,13 +3796,13 @@ int Interpreter::v_create_controlsurface (lua_State *L)
 	VECTOR3 ref = luamtd_tovector_safe(L, 5, funcname);
 	int axis = AIRCTRL_AXIS_AUTO;
 	double delay = 1.0;
-	UINT anim = (UINT)-1;
+	oapi::UInt anim = (oapi::UInt)-1;
 	if (lua_gettop(L) >= 6) {
 		axis = (int)luamtd_tointeger_safe(L, 6, funcname);
 		if (lua_gettop(L) >= 7) {
 			delay = luamtd_tonumber_safe(L, 7, funcname);
 			if (lua_gettop(L) >= 8) {
-				anim = (UINT)luamtd_tointeger_safe(L, 8, funcname);
+				anim = (oapi::UInt)luamtd_tointeger_safe(L, 8, funcname);
 			}
 		}
 	}
@@ -4746,7 +4754,7 @@ int Interpreter::v_get_propellantcount (lua_State *L)
 	static const char *funcname = "get_propellantcount";
 	AssertMtdMinPrmCount(L, 1, funcname);
 	VESSEL *v = lua_tovessel_safe(L, 1, funcname);
-	DWORD n = v->GetPropellantCount();
+	oapi::UInt32 n = v->GetPropellantCount();
 	lua_pushnumber (L, n);
 	return 1;
 }
@@ -5109,7 +5117,7 @@ int Interpreter::v_get_thrustercount (lua_State *L)
 	static const char *funcname = "get_thrustercount";
 	AssertMtdMinPrmCount(L, 1, funcname);
 	VESSEL *v = lua_tovessel_safe(L, 1, funcname);
-	DWORD count = v->GetThrusterCount();
+	oapi::UInt32 count = v->GetThrusterCount();
 	lua_pushnumber(L, count);
 	return 1;
 }
@@ -6284,7 +6292,7 @@ int Interpreter::v_dockingstatus (lua_State *L)
 	static const char *funcname = "dockingstatus";
 	AssertMtdMinPrmCount(L, 2, funcname);
 	VESSEL *v = lua_tovessel_safe(L, 1, funcname);
-	UINT port = luamtd_tointeger_safe(L, 2, funcname);
+	oapi::UInt port = luamtd_tointeger_safe(L, 2, funcname);
 	lua_pushinteger(L, v->DockingStatus(port));
 	return 1;
 }
@@ -6303,7 +6311,7 @@ int Interpreter::v_undock(lua_State* L)
 	static const char* funcname = "undock";
 	AssertMtdMinPrmCount(L, 2, funcname);
 	VESSEL* v = lua_tovessel_safe(L, 1, funcname);
-	UINT idx = (UINT)luamtd_tointeger_safe(L, 2, funcname);
+	oapi::UInt idx = (oapi::UInt)luamtd_tointeger_safe(L, 2, funcname);
 	v->Undock(idx);
 	return 0;
 }
@@ -6388,14 +6396,14 @@ following settings are supported:
 	int ret;
 	if(lua_isnumber(L, 3)) {
 		OBJHANDLE target = (OBJHANDLE)luamtd_tolightuserdata_safe(L, 2, funcname);
-		UINT n = (UINT)luamtd_tointeger_safe(L, 3, funcname);
-		UINT tgtn = (UINT)luamtd_tointeger_safe(L, 4, funcname);
-		UINT mode = (UINT)luamtd_tointeger_safe(L, 5, funcname);
+		oapi::UInt n = (oapi::UInt)luamtd_tointeger_safe(L, 3, funcname);
+		oapi::UInt tgtn = (oapi::UInt)luamtd_tointeger_safe(L, 4, funcname);
+		oapi::UInt mode = (oapi::UInt)luamtd_tointeger_safe(L, 5, funcname);
 		ret = v->Dock(target, n, tgtn, mode);
 	} else {
 		DOCKHANDLE source = (DOCKHANDLE)luamtd_tolightuserdata_safe(L, 2, funcname);
 		DOCKHANDLE target = (DOCKHANDLE)luamtd_tolightuserdata_safe(L, 3, funcname);
-		UINT mode = (UINT)luamtd_tointeger_safe(L, 4, funcname);
+		oapi::UInt mode = (oapi::UInt)luamtd_tointeger_safe(L, 4, funcname);
 		ret = v->Dock(source, target, mode);
 	}
 	lua_pushinteger(L, ret);
@@ -6759,7 +6767,7 @@ int Interpreter::v_get_attachmenthandle (lua_State *L)
 	AssertMtdMinPrmCount(L, 3, funcname);
 	VESSEL *v = lua_tovessel_safe(L, 1, funcname);
 	bool toparent = luamtd_toboolean_safe(L, 2, funcname);
-	DWORD idx = (DWORD)luamtd_tointeger_safe(L, 3, funcname);
+	oapi::UInt32 idx = (oapi::UInt32)luamtd_tointeger_safe(L, 3, funcname);
 	ATTACHMENTHANDLE hAttachment = v->GetAttachmentHandle (toparent, idx);
 	if (hAttachment) lua_pushlightuserdata (L, hAttachment);
 	else lua_pushnil (L);
@@ -6902,7 +6910,7 @@ int Interpreter::v_set_transponderchannel (lua_State *L)
 	static const char *funcname = "set_transponderchannel";
 	AssertMtdMinPrmCount(L, 2, funcname);
 	VESSEL *v = lua_tovessel_safe(L, 1, funcname);
-	DWORD ch = (DWORD)luamtd_tointeger_safe(L, 2, funcname);
+	oapi::UInt32 ch = (oapi::UInt32)luamtd_tointeger_safe(L, 2, funcname);
 	ASSERT_SYNTAX(ch < 640, "Argument 1: out of range");
 	v->SetTransponderChannel (ch);
 	return 0;
@@ -6984,7 +6992,7 @@ int Interpreter::v_set_idschannel (lua_State *L)
 	AssertMtdMinPrmCount(L, 3, funcname);
 	VESSEL *v = lua_tovessel_safe(L, 1, funcname);
 	DOCKHANDLE hDock = (DOCKHANDLE)luamtd_tolightuserdata_safe(L, 2, funcname);
-	DWORD ch = (DWORD)luamtd_tointeger_safe(L, 3, funcname);
+	oapi::UInt32 ch = (oapi::UInt32)luamtd_tointeger_safe(L, 3, funcname);
 	ASSERT_SYNTAX(ch < 640, "Argument 2: out of range");
 	v->SetIDSChannel (hDock, ch);
 	return 0;
@@ -7010,7 +7018,7 @@ int Interpreter::v_init_navradios (lua_State *L)
 	static const char *funcname = "init_navradios";
 	AssertMtdMinPrmCount(L, 2, funcname);
 	VESSEL *v = lua_tovessel_safe(L, 1, funcname);
-	DWORD nnav = (DWORD)luamtd_tointeger_safe(L, 2, funcname);
+	oapi::UInt32 nnav = (oapi::UInt32)luamtd_tointeger_safe(L, 2, funcname);
 	ASSERT_SYNTAX(nnav < 100, "Argument 1: out of range"); // sanity check
 	v->InitNavRadios (nnav);
 	return 0;
@@ -7048,8 +7056,8 @@ int Interpreter::v_set_navchannel (lua_State *L)
 	static const char *funcname = "set_navchannel";
 	AssertMtdMinPrmCount(L, 3, funcname);
 	VESSEL *v = lua_tovessel_safe(L, 1, funcname);
-	DWORD n = (DWORD)lua_tointeger_safe(L, 2, funcname);
-	DWORD ch = (DWORD)lua_tointeger_safe(L, 3, funcname);
+	oapi::UInt32 n = (oapi::UInt32)lua_tointeger_safe(L, 2, funcname);
+	oapi::UInt32 ch = (oapi::UInt32)lua_tointeger_safe(L, 3, funcname);
 	ASSERT_SYNTAX(ch < 640, "Argument 2: out of range");
 	v->SetNavChannel (n, ch);
 	return 0;
@@ -7070,8 +7078,8 @@ int Interpreter::v_get_navchannel (lua_State *L)
 	static const char *funcname = "get_navchannel";
 	AssertMtdMinPrmCount(L, 2, funcname);
 	VESSEL *v = lua_tovessel_safe(L, 1, funcname);
-	DWORD n = (DWORD)lua_tointeger_safe(L, 2, funcname);
-	DWORD ch = v->GetNavChannel (n);
+	oapi::UInt32 n = (oapi::UInt32)lua_tointeger_safe(L, 2, funcname);
+	oapi::UInt32 ch = v->GetNavChannel (n);
 	lua_pushnumber (L, ch);
 	return 1;
 }
@@ -7098,7 +7106,7 @@ int Interpreter::v_get_navsource (lua_State *L)
 	static const char *funcname = "get_navsource";
 	AssertMtdMinPrmCount(L, 2, funcname);
 	VESSEL *v = lua_tovessel_safe(L, 1, funcname);
-	DWORD n = (DWORD)lua_tointeger_safe(L, 2, funcname);
+	oapi::UInt32 n = (oapi::UInt32)lua_tointeger_safe(L, 2, funcname);
 	NAVHANDLE hNav = v->GetNavSource (n);
 	if (hNav) lua_pushlightuserdata(L,hNav);
 	else      lua_pushnil (L);
@@ -7396,7 +7404,7 @@ int Interpreter::v_get_lightemitter (lua_State *L)
 	static const char *funcname = "get_lightemitter";
 	AssertMtdMinPrmCount(L, 2, funcname);
 	VESSEL *v = lua_tovessel_safe(L, 1, funcname);
-	DWORD idx = (DWORD)luamtd_tointeger_safe(L, 2, funcname);
+	oapi::UInt32 idx = (oapi::UInt32)luamtd_tointeger_safe(L, 2, funcname);
 	const LightEmitter *le = v->GetLightEmitter (idx);
 	if (le) lua_pushlightemitter (L, le);
 	else    lua_pushnil (L);
@@ -7415,7 +7423,7 @@ int Interpreter::v_get_lightemittercount (lua_State *L)
 	static const char *funcname = "get_lightemittercount";
 	AssertMtdMinPrmCount(L, 1, funcname);
 	VESSEL *v = lua_tovessel_safe(L, 1, funcname);
-	DWORD n = v->LightEmitterCount();
+	oapi::UInt32 n = v->LightEmitterCount();
 	lua_pushinteger (L, n);
 	return 1;
 }
@@ -7499,7 +7507,7 @@ int Interpreter::v_add_mesh (lua_State *L)
 	static const char *funcname = "add_mesh";
 	AssertMtdMinPrmCount(L, 2, funcname);
 	VESSEL *v = lua_tovessel_safe(L, 1, funcname);
-	UINT midx;
+	oapi::UInt midx;
 	VECTOR3 ofs, *pofs = 0;
 	if (lua_gettop(L) >= 3) {
 		ofs = luamtd_tovector_safe(L, 3, funcname);
@@ -7550,7 +7558,7 @@ int Interpreter::v_insert_mesh (lua_State *L)
 	static const char *funcname = "insert_mesh";
 	AssertMtdMinPrmCount(L, 3, funcname);
 	VESSEL *v = lua_tovessel_safe(L, 1, funcname);
-	UINT midx, idx = (UINT)lua_tointeger_safe(L, 3, funcname);
+	oapi::UInt midx, idx = (oapi::UInt)lua_tointeger_safe(L, 3, funcname);
 	VECTOR3 ofs, *pofs = 0;
 	if (lua_gettop(L) >= 4) {
 		ofs = luamtd_tovector_safe(L, 4, funcname);
@@ -7597,7 +7605,7 @@ int Interpreter::v_del_mesh (lua_State *L)
 	AssertMtdMinPrmCount(L, 2, funcname);
 	VESSEL *v = lua_tovessel_safe(L, 1, funcname);
 	ASSERT_MTDNUMBER(L,2);
-	UINT idx = (UINT)luamtd_tointeger_safe(L, 2, funcname);
+	oapi::UInt idx = (oapi::UInt)luamtd_tointeger_safe(L, 2, funcname);
 	bool retain_anim = false;
 	if (lua_gettop(L) >= 3) {
 		retain_anim = luamtd_toboolean_safe(L, 3, funcname);
@@ -7645,7 +7653,7 @@ int Interpreter::v_get_meshcount (lua_State *L)
 	static const char *funcname = "get_meshcount";
 	AssertMtdMinPrmCount(L, 1, funcname);
 	VESSEL *v = lua_tovessel_safe(L, 1, funcname);
-	UINT count = v->GetMeshCount();
+	oapi::UInt count = v->GetMeshCount();
 	lua_pushnumber (L, count);
 	return 1;
 }
@@ -7672,7 +7680,7 @@ int Interpreter::v_shift_mesh (lua_State *L)
 	AssertMtdMinPrmCount(L, 3, funcname);
 	VESSEL *v = lua_tovessel_safe(L, 1, funcname);
 	ASSERT_MTDNUMBER(L,2);
-	UINT idx = (UINT)luamtd_tointeger_safe(L, 2, funcname);
+	oapi::UInt idx = (oapi::UInt)luamtd_tointeger_safe(L, 2, funcname);
 	VECTOR3 ofs = luamtd_tovector_safe(L, 3, funcname);
 	bool ok = v->ShiftMesh (idx, ofs);
 	lua_pushboolean (L,ok);
@@ -7712,7 +7720,7 @@ int Interpreter::v_get_meshoffset(lua_State* L)
 	static const char* funcname = "get_meshoffset";
 	AssertMtdMinPrmCount(L, 2, funcname);
 	VESSEL* v = lua_tovessel_safe(L, 1, funcname);
-	UINT idx = (UINT)luamtd_tointeger_safe(L, 2, funcname);
+	oapi::UInt idx = (oapi::UInt)luamtd_tointeger_safe(L, 2, funcname);
 	VECTOR3 ofs;
 	bool ok = v->GetMeshOffset(idx, ofs);
 	if (ok) lua_pushvector(L, ofs);
@@ -7741,7 +7749,7 @@ int Interpreter::v_get_devmesh(lua_State* L)
 	AssertMtdMinPrmCount(L, 3, funcname);
 	VESSEL* v = lua_tovessel_safe(L, 1, funcname);
 	VISHANDLE h = (VISHANDLE)lua_tolightuserdata_safe(L, 2, funcname);
-	UINT idx = (UINT)luamtd_tointeger_safe(L, 3, funcname);
+	oapi::UInt idx = (oapi::UInt)luamtd_tointeger_safe(L, 3, funcname);
 	DEVMESHHANDLE hDM = v->GetDevMesh(h, idx);
 	if (hDM) lua_pushdevmeshhandle(L, hDM);
 	else lua_pushnil(L);
@@ -7786,8 +7794,8 @@ int Interpreter::v_set_mesh_visibility_mode(lua_State* L)
 	static const char* funcname = "set_mesh_visibility_mode";
 	AssertMtdMinPrmCount(L, 3, funcname);
 	VESSEL* v = lua_tovessel_safe(L, 1, funcname);
-	UINT idx = (UINT)luamtd_tointeger_safe(L, 2, funcname);
-	UINT mode = (UINT)luamtd_tointeger_safe(L, 3, funcname);
+	oapi::UInt idx = (oapi::UInt)luamtd_tointeger_safe(L, 2, funcname);
+	oapi::UInt mode = (oapi::UInt)luamtd_tointeger_safe(L, 3, funcname);
 	v->SetMeshVisibilityMode(idx, mode);
 	return 0;
 }
@@ -7820,7 +7828,7 @@ int Interpreter::v_create_animation (lua_State *L)
 	AssertMtdMinPrmCount(L, 2, funcname);
 	VESSEL *v = lua_tovessel_safe(L, 1, funcname);
 	double istate = luamtd_tonumber_safe(L, 2, funcname);
-	UINT anim = v->CreateAnimation (istate);
+	oapi::UInt anim = v->CreateAnimation (istate);
 	lua_pushnumber (L, anim);
 	return 1;
 }
@@ -7846,7 +7854,7 @@ int Interpreter::v_del_animation (lua_State *L)
 	static const char *funcname = "del_animation";
 	AssertMtdMinPrmCount(L, 2, funcname);
 	VESSEL *v = lua_tovessel_safe(L, 1, funcname);
-	UINT anim = (UINT)luamtd_tointeger_safe(L, 2, funcname);
+	oapi::UInt anim = (oapi::UInt)luamtd_tointeger_safe(L, 2, funcname);
 	bool ok = v->DelAnimation (anim);
 	lua_pushboolean (L,ok);
 	return 1;
@@ -7871,7 +7879,7 @@ int Interpreter::v_set_animation (lua_State *L)
 	static const char *funcname = "set_animation";
 	AssertMtdMinPrmCount(L, 3, funcname);
 	VESSEL *v = lua_tovessel_safe(L, 1, funcname);
-	UINT anim = (UINT)luamtd_tointeger_safe(L, 2, funcname);
+	oapi::UInt anim = (oapi::UInt)luamtd_tointeger_safe(L, 2, funcname);
 	double state = luamtd_tonumber_safe(L, 3, funcname);
 	bool ok = v->SetAnimation (anim, state);
 	lua_pushboolean (L,ok);
@@ -7890,7 +7898,7 @@ int Interpreter::v_get_animation (lua_State *L)
 	static const char *funcname = "get_animation";
 	AssertMtdMinPrmCount(L, 2, funcname);
 	VESSEL *v = lua_tovessel_safe(L, 1, funcname);
-	UINT anim = luamtd_tointeger_safe(L, 2, funcname);
+	oapi::UInt anim = luamtd_tointeger_safe(L, 2, funcname);
 	lua_pushnumber(L, v->GetAnimation(anim));
 	return 1;
 }
@@ -7926,7 +7934,7 @@ int Interpreter::v_add_animationcomponent (lua_State *L)
 	static const char *funcname = "add_animationcomponent";
 	AssertMtdMinPrmCount(L, 5, funcname);
 	VESSEL *v = lua_tovessel_safe(L, 1, funcname);
-	UINT anim = (UINT)luamtd_tointeger_safe(L, 2, funcname);
+	oapi::UInt anim = (oapi::UInt)luamtd_tointeger_safe(L, 2, funcname);
 	double state0 = luamtd_tonumber_safe(L, 3, funcname);
 	double state1 = luamtd_tonumber_safe(L, 4, funcname);
 	MGROUP_TRANSFORM *trans = (MGROUP_TRANSFORM*)luamtd_tolightuserdata_safe(L, 5, funcname);
@@ -7963,7 +7971,7 @@ int Interpreter::v_del_animationcomponent (lua_State *L)
 	static const char *funcname = "del_animationcomponent";
 	AssertMtdMinPrmCount(L, 3, funcname);
 	VESSEL *v = lua_tovessel_safe(L, 1, funcname);
-	UINT anim = luamtd_tointeger_safe(L, 2, funcname);
+	oapi::UInt anim = luamtd_tointeger_safe(L, 2, funcname);
 	ANIMATIONCOMPONENT_HANDLE hAC = (ANIMATIONCOMPONENT_HANDLE)luamtd_tolightuserdata_safe(L, 3, funcname);
 	lua_pushboolean(L, v->DelAnimationComponent(anim, hAC));
 	return 1;
@@ -8515,10 +8523,10 @@ int Interpreter::v_set_panelbackground(lua_State* L)
 	}
 	
 	MESHHANDLE hMesh = lua_tomeshhandle(L, 4);
-	DWORD width = luaL_checkinteger(L, 5);
-	DWORD height = luaL_checkinteger(L, 6);
-	DWORD baseline =  luaL_checkinteger(L, 7);
-	DWORD scrollflag =  luaL_checkinteger(L, 8);
+	oapi::UInt32 width = luaL_checkinteger(L, 5);
+	oapi::UInt32 height = luaL_checkinteger(L, 6);
+	oapi::UInt32 baseline =  luaL_checkinteger(L, 7);
+	oapi::UInt32 scrollflag =  luaL_checkinteger(L, 8);
 	VESSEL3* v3 = (VESSEL3*)v;
 	v3->SetPanelBackground(hPanel, hSurf, nsurf, hMesh, width, height, baseline, scrollflag);
 	return 0;
@@ -8632,26 +8640,26 @@ int Interpreter::v_register_panelarea(lua_State* L)
 
 	PANELHANDLE hPanel = lua_touserdata(L, 2);
 	int id = luaL_checkinteger(L, 3);
-	RECT pos = lua_torect(L, 4);
+	oapi::SdkRectangle pos = lua_torect(L, 4);
 
 	if(lua_istable(L, 5)) {
-		//int RegisterPanelArea (PANELHANDLE hPanel, int id, const RECT &pos, const RECT &texpos, int draw_event, int mouse_event, int bkmode);
-		RECT texpos = lua_torect(L, 5);
+		//int RegisterPanelArea (PANELHANDLE hPanel, int id, const oapi::SdkRectangle &pos, const oapi::SdkRectangle &texpos, int draw_event, int mouse_event, int bkmode);
+		oapi::SdkRectangle texpos = lua_torect(L, 5);
 		int draw_event = luaL_checkinteger(L, 6);
 		int mouse_event = luaL_checkinteger(L, 7);
 		int bkmode = luaL_checkinteger(L, 8);
 		v4->RegisterPanelArea (hPanel, id, pos, texpos, draw_event, mouse_event, bkmode);
 	} else {
 		if(lua_istable(L, 6)) {
-			//int RegisterPanelArea (PANELHANDLE hPanel, int id, const RECT &pos, int texidx, const RECT &texpos, int draw_event, int mouse_event, int bkmode);
+			//int RegisterPanelArea (PANELHANDLE hPanel, int id, const oapi::SdkRectangle &pos, int texidx, const oapi::SdkRectangle &texpos, int draw_event, int mouse_event, int bkmode);
 			int texidx = luaL_checkinteger(L, 5);
-			RECT texpos = lua_torect(L, 6);
+			oapi::SdkRectangle texpos = lua_torect(L, 6);
 			int draw_event = luaL_checkinteger(L, 7);
 			int mouse_event = luaL_checkinteger(L, 8);
 			int bkmode = luaL_checkinteger(L, 9);
 			v4->RegisterPanelArea(hPanel, id, pos, texidx, texpos, draw_event, mouse_event, bkmode);
 		} else {
-			//int RegisterPanelArea (PANELHANDLE hPanel, int id, const RECT &pos, int draw_event, int mouse_event, SURFHANDLE surf = NULL, void *context = NULL);
+			//int RegisterPanelArea (PANELHANDLE hPanel, int id, const oapi::SdkRectangle &pos, int draw_event, int mouse_event, SURFHANDLE surf = NULL, void *context = NULL);
 			int draw_event = luaL_checkinteger(L, 5);
 			int mouse_event = luaL_checkinteger(L, 6);
 
@@ -8787,7 +8795,7 @@ int Interpreter::v_add_exhaust (lua_State *L)
 	if (lua_gettop(L) >= idx)
 		tex = (SURFHANDLE)luamtd_tolightuserdata_safe(L, idx++, funcname);
 
-	UINT exh;
+	oapi::UInt exh;
 	if (do_posdir)
 		exh = v->AddExhaust (ht, lscale, wscale, pos, dir, tex);
 	else if (do_lofs)
@@ -8811,7 +8819,7 @@ int Interpreter::v_del_exhaust (lua_State *L)
 	static const char *funcname = "del_exhaust";
 	AssertMtdMinPrmCount(L, 2, funcname);
 	VESSEL *v = lua_tovessel_safe(L, 1, funcname);
-	UINT idx = (UINT)luamtd_tointeger_safe(L, 2, funcname);
+	oapi::UInt idx = (oapi::UInt)luamtd_tointeger_safe(L, 2, funcname);
 	bool ok = v->DelExhaust (idx);
 	lua_pushboolean (L,ok);
 	return 1;
@@ -8829,7 +8837,7 @@ int Interpreter::v_get_exhaustcount (lua_State *L)
 	static const char *funcname = "get_exhaustcount";
 	AssertMtdMinPrmCount(L, 1, funcname);
 	VESSEL *v = lua_tovessel_safe(L, 1, funcname);
-	DWORD count = v->GetExhaustCount();
+	oapi::UInt32 count = v->GetExhaustCount();
 	lua_pushnumber (L, count);
 	return 1;
 }
@@ -8879,7 +8887,7 @@ int Interpreter::v_add_exhauststream(lua_State* L)
 	AssertMtdPrmType(L, idx, PRMTP_TABLE, funcname);
 
 	lua_getfield(L, idx, "flags");
-	pss.flags = (lua_isnumber(L, -1) ? (DWORD)(lua_tonumber(L, -1) + 0.5) : 0);
+	pss.flags = (lua_isnumber(L, -1) ? (oapi::UInt32)(lua_tonumber(L, -1) + 0.5) : 0);
 	lua_pop(L, 1);
 
 	lua_getfield(L, idx, "srcsize");
@@ -9002,7 +9010,7 @@ int Interpreter::v_add_reentrystream(lua_State* L)
 	AssertMtdPrmType(L, idx, PRMTP_TABLE, funcname);
 
 	lua_getfield(L, idx, "flags");
-	pss.flags = (lua_isnumber(L, -1) ? (DWORD)(lua_tonumber(L, -1) + 0.5) : 0);
+	pss.flags = (lua_isnumber(L, -1) ? (oapi::UInt32)(lua_tonumber(L, -1) + 0.5) : 0);
 	lua_pop(L, 1);
 
 	lua_getfield(L, idx, "srcsize");
@@ -9110,7 +9118,7 @@ int Interpreter::v_add_particlestream(lua_State* L)
 	AssertMtdPrmType(L, idx, PRMTP_TABLE, funcname);
 
 	lua_getfield(L, idx, "flags");
-	pss.flags = (lua_isnumber(L, -1) ? (DWORD)(lua_tonumber(L, -1) + 0.5) : 0);
+	pss.flags = (lua_isnumber(L, -1) ? (oapi::UInt32)(lua_tonumber(L, -1) + 0.5) : 0);
 	lua_pop(L, 1);
 
 	lua_getfield(L, idx, "srcsize");
@@ -9553,8 +9561,8 @@ oapi::CockpitMessageResult Interpreter::MsgProcMFD(oapi::UInt msg, oapi::UInt mf
 		case OAPI_MSG_MFD_OPENEDEX:
 		{
 			MFDMODEOPENSPEC* ospec = (MFDMODEOPENSPEC*)wparam;
-			DWORD w = ospec->w;
-			DWORD h = ospec->h;
+			oapi::UInt32 w = ospec->w;
+			oapi::UInt32 h = ospec->h;
 			VesselMFDContext* ctx = (VesselMFDContext*)ospec->spec->context;
 			VESSEL* vessel = (VESSEL*)lparam;
 			VesselMFD* vmfd = new VesselMFD(w, h, vessel, ctx);
@@ -9575,7 +9583,7 @@ oapi::CockpitMessageResult Interpreter::MsgProcMFD(oapi::UInt msg, oapi::UInt mf
 			} else {
 				vmfd->mfd_ref = luaL_ref(L, LUA_REGISTRYINDEX);
 			}
-			return (OAPI_MSGTYPE)(vmfd);
+			return (oapi::CockpitMessageResult)(vmfd);
 		}
 	}
 	return 0;
@@ -9770,7 +9778,7 @@ int Interpreter::v_send_bufferedkey (lua_State *L)
 }
 
 
-VesselMFD::VesselMFD(DWORD w, DWORD h, VESSEL* vessel, VesselMFDContext* ctx) : MFD2(w, h, vessel) {
+VesselMFD::VesselMFD(oapi::UInt32 w, oapi::UInt32 h, VESSEL* vessel, VesselMFDContext* ctx) : MFD2(w, h, vessel) {
 	L = ctx->L;
 	mfd_ref = LUA_REFNIL;
 }
@@ -9801,7 +9809,7 @@ bool VesselMFD::ConsumeButton(int bt, int event) {
 	lua_pop(L, 1);
 	return consumed;
 }
-bool VesselMFD::ConsumeKeyBuffered(DWORD key) {
+bool VesselMFD::ConsumeKeyBuffered(oapi::UInt32 key) {
 	lua_rawgeti(L, LUA_REGISTRYINDEX, mfd_ref);
 	lua_getfield(L, -1, "consumekeybuffered");
 	bool consumed = false;

@@ -63,6 +63,16 @@ def restore_api(actual):
         if header.split('#define ORBITER_MFD_MESSAGES_H\n',1)[1].split('\n#endif',1)[0]!=messages:
             raise ValueError('Original MFD message identities changed')
         text=text.replace('#include "OrbiterMfdMessages.h"',messages)
+    for start,end,filename in [('enum MatProp {','\n};','OrbiterMeshData.h'),
+                               ('#define RCS_NONE ','///< Linear (translational) mode','OrbiterVesselData.h')]:
+        a=source.index(start);b=source.index(end,a)+len(end)
+        block=source[a:b]
+        header=(ROOT/'Orbitersdk/include'/filename).read_text()
+        if '\n'.join(line.rstrip() for line in block.splitlines()) not in header:
+            raise ValueError('Original SDK values changed: '+filename)
+        before=source[a-120:a]
+        if text.count(before)!=1:raise ValueError('Moved SDK values have ambiguous context: '+filename)
+        text=text.replace(before,before+block,1)
     for a,b,replacement in sorted(ranges(source),reverse=True):
         following=source[b:b+512];needle=replacement+following
         if text.count(needle)!=1:raise ValueError('Cockpit SDK extraction anchor differs')
