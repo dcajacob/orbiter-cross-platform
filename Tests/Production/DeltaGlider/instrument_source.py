@@ -17,6 +17,12 @@ def verify():
             for portable, old in ((b'oapi::UInt32', b'DWORD'), (b'oapi::UInt16', b'WORD'), (b'oapi::UInt', b'UINT')):
                 source = re.sub(rb'\b' + portable + rb'\b', old, source)
             source = source.replace(b'../Common/Instrument.h', b'..\\Common\\Instrument.h')
+            if stem == 'MomentInd':
+                # The 63 temporary VC vertices now have automatic storage.
+                original = original.replace(b'int nvtx;', b'static constexpr int nvtx = 7*3*3;')
+                original = original.replace(b'\tnvtx = 7*3*3;\n', b'')
+                original = original.replace(b'static NTVERTEX *vtx = 0;\n\tif (!vtx) vtx = new NTVERTEX[nvtx];',
+                                            b'NTVERTEX vtx[nvtx];')
             if source != original.replace(b'\r\n', b'\n'):
                 raise ValueError('Stock DG instrument changed beyond SDK type and path spellings: ' + name)
     verify_subsystems()
@@ -45,6 +51,11 @@ def verify_subsystems():
             if suffix == 'h':
                 original = re.sub(r'^class \w+;\s*', '', original, flags=re.M)
                 source = re.sub(r'^class \w+;\s*', '', source, flags=re.M)
+            if stem == 'DockingSubsys':
+                original = original.replace('isDocked = false;\n\tdockTime', 'isDocked = false;\n\tisSealing = false;\n\tdockTime')
+            if stem == 'HoverSubsys':
+                original = original.replace('ctrl(hhac), bsrc(blitsrc)\n{\n\tbtgt = 0;',
+                    'ctrl(hhac), btgt(0), bsrc(blitsrc), holdmode_disp(HoverHoldComponent::HOLD_NONE), hold_disp(false), holdstr("         ")\n{')
             if stem == 'AAPSubsys':
                 original = original.replace('#include "Orbitersdk.h"', '')
                 source = source.replace('#include <string>', '')

@@ -4,6 +4,38 @@ Phase 6 requires the original Delta-glider and DG-S source modules, systems,
 meshes, 2D and virtual cockpits, and Lua-backed AAP. Native vessel execution
 and cockpit acceptance are still in progress.
 
+## Current flight evidence
+
+Both native vessels now load the stock Lua interpreter and LuaInline worker and
+fly with the original AAP in the 2D panel and virtual cockpit. In each 48-frame
+atmospheric flight the autopilot drives elevator, aileron and main thrust,
+responds to speed retargeting, and operates the gear and nose cone. The native
+runner also loads four unchanged 60-frame stock scenarios: Venus descent,
+Earth views, The Alps in 3D and DG ISS Approach. Earth views engages its
+scripted time acceleration. The runner checks focus, frame presentation,
+shutdown and Lua errors.
+
+All five native command schedules reproduce the original Windows Debug Lua
+events, control levels, air data and cockpit state at all 61 samples. DG-S
+initially differed in air density on tick 5. The Jacchia-71 atmosphere now
+uses the exponential from the same pinned AMD math sources as the engine's
+trigonometry. Both exponential CPU paths also passed the independent MPFR test.
+The original Windows Debug and Release atmospheric DG captures still disagree
+in latitude and horizon airspeed at tick 34. The exact cross-build reference
+gate remains open.
+
+The local frozen instrument and RCS-switch comparisons passed for both gliders
+in both cockpit modes. Native visible menu and info bars, broader focus
+behavior, hosted platform qualification and full Phase 6 acceptance remain open.
+A separate stock GeneralApiTest run reached its Earth obliquity assertion, where
+the script expects a different value from the staged SPICE Earth configuration.
+Sanitizer flights now finish without the previous aircraft initialization,
+light destruction, panel texture and virtual-cockpit vertex-buffer errors.
+LeakSanitizer still reports two 56-byte allocations per flight. Loader maps
+place both allocation sites in Mesa libgallium 26.0.8.
+
+## Earlier integration milestones
+
 The native `meshc` target uses the shared production CPU mesh reader and the
 original resource-name scan to generate `meshres.h`, `meshres_vc.h`,
 `meshres_p0.h` and `meshres_p1.h`. Build `native_dg_mesh_resources` in the

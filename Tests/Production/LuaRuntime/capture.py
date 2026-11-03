@@ -37,7 +37,7 @@ def lua_fixture(case):
     return scenario[:start]+'DG:'+case['class']+'\n'+body+scenario[end:]
 
 
-def validate(directory,case):
+def validate(directory,case,*,original_intermediates=True):
     events=rows(directory/'lua-events.csv')
     expected=['sync_initial']
     if case['target']=='DG':expected+=['aap_loaded']
@@ -55,10 +55,11 @@ def validate(directory,case):
     control=rows(directory/'lua-controls.csv')
     require([int(row['tick']) for row in control]==list(range(61)),'Incomplete original AAP controls')
     if case['target']=='DG':
-        controller=rows(directory/'lua-controller.csv')
-        require([int(r['tick']) for r in controller]==list(range(31,47)), 'Incomplete original AAP intermediates')
-        horizon=rows(directory/'lua-horizon.csv')
-        require([int(r['tick']) for r in horizon]==list(range(31,47)), 'Incomplete pre-Lua horizon observations')
+        if original_intermediates:
+            controller=rows(directory/'lua-controller.csv')
+            require([int(r['tick']) for r in controller]==list(range(31,47)), 'Incomplete original AAP intermediates')
+            horizon=rows(directory/'lua-horizon.csv')
+            require([int(r['tick']) for r in horizon]==list(range(31,47)), 'Incomplete pre-Lua horizon observations')
         require(any(abs(float(row['elevator']))>0 or abs(float(row['aileron']))>0 for row in control if 31<=int(row['tick'])<=45),'Original AAP did not actuate stock control surfaces')
         # The post-step stop clears the demands. Actual stock surfaces slew
         # back from saturation by 0.25 per subsequent quarter-second frame.

@@ -113,7 +113,15 @@ def previous_files():
         a,b=span(s,'Vessel::'+name);lights.append(s[a:b]);s=s[:a]+s[b:]
     equal(s,restore_cockpit(path,raw(path)),path);result[path]=old(path)
     light=raw('Src/Orbiter/VesselLights.cpp');a,b=span(light,'Vessel::'+LIGHTS[0])
-    equal('\n\n'.join(lights),aliases(light[a:]),'Original vessel light ownership/events')
+    # Release SDK lights through the concrete type allocated by the vessel.
+    light=light[a:]
+    helper_start=light.index('// Vessel emitters')
+    helper_end=light.index('bool Vessel::DelLightEmitter',helper_start)
+    helper=light[helper_start:helper_end]
+    assert 'delete static_cast<SpotLight*>(light);' in helper and 'delete static_cast<PointLight*>(light);' in helper
+    light=(light[:helper_start]+light[helper_end:]).replace('DeleteVesselLight (le);','delete le;')
+    light=light.replace('DeleteVesselLight (emitter[i]);','delete emitter[i];').replace('emitter = nullptr;', '')
+    equal('\n\n'.join(lights),aliases(light),'Original vessel light ownership/events')
     path='Src/Orbiter/LightEmitter.cpp';s=raw(path).replace('#ifdef _WIN32\n#define OAPI_IMPLEMENTATION\n#include "OrbiterAPI.h"\n#else\n#include "NativeVesselAPI.h"\n#endif','#define OAPI_IMPLEMENTATION\n#include "OrbiterAPI.h"')
     equal(old(path),s,path);result[path]=old(path)
     path='Src/Orbiter/OrbiterAPI.cpp';s=old(path);a=s.index('DLLEXPORT double oapiGetInducedDrag');b=s.index('// ===========================================================================',a)

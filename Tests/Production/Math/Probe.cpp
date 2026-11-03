@@ -10,6 +10,7 @@
 #include <dlfcn.h>
 extern "C" {
 extern int __use_fma3_lib;
+double aw_exp(double);double __wrap_exp(double);
 double aw_sin(double);double aw_cos(double);double aw_atan2(double,double);
 double orbiter_math_sin_value(double);
 double orbiter_asin_fma(double);double orbiter_asin_sse2(double);
@@ -27,12 +28,12 @@ double probe_value(int function,double x,double y) {
     if(mode==-1) {
         switch(function) {
         case 0:return __wrap_sin(x);case 1:return __wrap_cos(x);
-        case 2:return __wrap_asin(x);case 3:return __wrap_atan2(x,y);
+        case 2:return __wrap_asin(x);case 3:return __wrap_atan2(x,y);case 4:return __wrap_exp(x);
         }
     } else {
         switch(function) {
         case 0:return orbiter_math_sin_value(x);case 1:return aw_cos(x);
-        case 2:return mode?orbiter_asin_fma(x):orbiter_asin_sse2(x);case 3:return aw_atan2(x,y);
+        case 2:return mode?orbiter_asin_fma(x):orbiter_asin_sse2(x);case 3:return aw_atan2(x,y);case 4:return aw_exp(x);
         }
     }
     std::abort();
@@ -53,6 +54,7 @@ double oracle_value(int function,double x,double y,unsigned precision) {
     case 1:mpfr_cos(out,a,MPFR_RNDN);break;
     case 2:mpfr_asin(out,a,MPFR_RNDN);break;
     case 3:mpfr_atan2(out,a,b,MPFR_RNDN);break;
+    case 4:mpfr_exp(out,a,MPFR_RNDN);break;
     default:std::abort();
     }
     const auto value=mpfr_get_d(out,MPFR_RNDN);

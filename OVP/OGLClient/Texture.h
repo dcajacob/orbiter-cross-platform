@@ -32,7 +32,8 @@ struct OGLTexture
 	int m_Width;
 	int m_Height;
 	bool Release();
-	void AddRef() {m_RefCnt++;}
+	// Cached textures have a single owner in the texture repository.
+	void AddRef() {if (!m_InCache) ++m_RefCnt;}
 	void InitSize();
 	void MakeRenderable();
 	uint32_t m_colorkey;

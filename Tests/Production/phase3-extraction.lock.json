@@ -12,7 +12,7 @@
   "files": {
     "Extern/ReferenceMath/README.md": {
       "original_sha256_lf": null,
-      "sha256_lf": "5f38a29d5df313f5e72b3beaa22d5441a9591dfaefedee53a1642820f3f5aeee"
+      "sha256_lf": "e519b33344c636fad25db3b65f121fd18510f0fbce09d611c08e2119d0df7df4"
     },
     "Extern/ReferenceMath/amd/L2_by_pi_bits.asm": {
       "original_sha256_lf": null,
@@ -72,7 +72,7 @@
     },
     "Extern/ReferenceMath/sources.lock.json": {
       "original_sha256_lf": null,
-      "sha256_lf": "646cbaaaeb793548b980bbff1cebc65d732153d4d258046df3410a679a8d4d6e"
+      "sha256_lf": "557571e7737ccac7ebeb6ee0883201d44b3610723fab982f645ead56e88b2caf"
     },
     "Orbitersdk/include/CamAPI.h": {
       "original_sha256_lf": "ed6d5c3035d3c2e010c78a995efcc6b41bbdd3a030be9c0700264745d5c8326b",
@@ -581,7 +581,7 @@
     },
     "Src/Orbiter/Production/CMakeLists.txt": {
       "original_sha256_lf": null,
-      "sha256_lf": "6c257663c21dcde824e900d1f0d2fbe3f8c80a62b33d795ba226b24d99efa389",
+      "sha256_lf": "5170c346c493c9bbcf71e3649b61416fd60378abc36e3701527693c335a6d6a0",
       "scope": "Original ten stock MFD declarations use exact platform SDK aliases; shared original conic geometry is moved without calculation or screen-mapping changes. Full native instrument runtime remains incomplete."
     },
     "Src/Orbiter/Production/CameraServices.cpp": {
@@ -673,11 +673,11 @@
     },
     "Src/Orbiter/Production/Math/CMakeLists.txt": {
       "original_sha256_lf": null,
-      "sha256_lf": "fd2649774d9adab7de1bcca9bd7df7711c423cbd01e9ce27c3d4587e1679ba02"
+      "sha256_lf": "1f38670991a7f05dde62778eb4cb1acddafb9c0b3d3c45d0e4267448539a9b04"
     },
     "Src/Orbiter/Production/Math/NativeError.cpp": {
       "original_sha256_lf": null,
-      "sha256_lf": "745ecc29959f952f52730dc301291da5e01ac409fc7238fbfeb0f9237be9f224"
+      "sha256_lf": "473c5eca2437ca188fcb8ba26764190d5b8e770d86a17d9fc54de32690037eb0"
     },
     "Src/Orbiter/Production/Math/NativeError.h": {
       "original_sha256_lf": null,
@@ -685,7 +685,7 @@
     },
     "Src/Orbiter/Production/Math/Runtime.cpp": {
       "original_sha256_lf": null,
-      "sha256_lf": "f40f7df1a346e7aa743fa392138d6dfef97060b4545e65cc97e0ab182e590295"
+      "sha256_lf": "6b37e4abe33004fa156772becf8508bf9c16b2608d8cdfc0c851d52430612b04"
     },
     "Src/Orbiter/Production/Math/Runtime.h": {
       "original_sha256_lf": null,
@@ -693,7 +693,7 @@
     },
     "Src/Orbiter/Production/Math/prepare.py": {
       "original_sha256_lf": null,
-      "sha256_lf": "5d57d5795a475187fccc9f24b91b09fd3be0a4dd870d4fec9f1ff5d4e1cacf1b"
+      "sha256_lf": "ee6194b9bacaff55a08d89aecd3eb164fcdf70093de0e716b9c2d91ac5aa139c"
     },
     "Src/Orbiter/Production/MathObservation.h": {
       "original_sha256_lf": null,
@@ -741,7 +741,7 @@
     },
     "Src/Orbiter/Production/NativeApplication.cpp": {
       "original_sha256_lf": null,
-      "sha256_lf": "e5f3ab1785278743bd27dff08a3d3b19025b928cccde6d6c39a50cdf04616a20"
+      "sha256_lf": "b05c1d177f02306a6bb432340662cd21b2db5020cedfaad4cc037c46144ad310"
     },
     "Src/Orbiter/Production/NativeBuild.h.in": {
       "sha256_lf": "f5fb21f83bb6be0c54839fce670e8410f6911eda86da2eef26e4221c1ae25d97",
@@ -760,7 +760,7 @@
       "original_sha256_lf": null
     },
     "Src/Orbiter/Production/NativeCelestialModules.cmake": {
-      "sha256_lf": "459a17a88d8d49827ab1307ba2987940a2d41b2f6a942d5416b135f5ac021a50",
+      "sha256_lf": "2aad4e5ed97b5446d5c054e61eff9b49ceabe7a2fa370da68331649c1b52b14b",
       "original_sha256_lf": null
     },
     "Src/Orbiter/Production/NativeCelestialServices.cpp": {
@@ -785,7 +785,7 @@
     },
     "Src/Orbiter/Production/NativeGraphics.h": {
       "original_sha256_lf": null,
-      "sha256_lf": "35c7438b6b9758c38355b5a5cbe7e7310b54bd39bf5b317539f8f63e13d31eeb",
+      "sha256_lf": "a07d65e3d92f8f574c43e7eae51aac2061e506e266ba9c9a08bc8a10c4fcf984",
       "scope": "Original scheduler, stock MFDs and modern map compile natively with explicit original epoch/time, authoritative world/UI bindings and indexed map resources. Exact Windows calculations and callback order conserved. Native GDI/legacy map/custom-mode entry points fail explicitly until supported; native cockpit owner and DG runtime remain unfinished."
     },
     "Src/Orbiter/Production/NativeModule.cpp": {
@@ -810,12 +810,12 @@
     },
     "Src/Orbiter/Production/NativeRenderApi.cpp": {
       "original_sha256_lf": null,
-      "sha256_lf": "8c5dda172dabd594bd8fd29196f0c16f37463e59e19290d2a593de54ad83b569",
+      "sha256_lf": "771c64dfdb9fcbd7a12876e73dc1e7c5e141b9d23edc9ad55aff7080025f4d35",
       "scope": "Original scheduler, stock MFDs and modern map compile natively with explicit original epoch/time, authoritative world/UI bindings and indexed map resources. Exact Windows calculations and callback order conserved. Native GDI/legacy map/custom-mode entry points fail explicitly until supported; native cockpit owner and DG runtime remain unfinished."
     },
     "Src/Orbiter/Production/NativeRenderApi.h": {
       "original_sha256_lf": null,
-      "sha256_lf": "b7c7499822c5b2a2b24cf5273a2c538bd52628af998dab47789f1552bf0ec1bd",
+      "sha256_lf": "51ae060234a3ab347d6edb1f54cd55bc953c897ba969946ca65013d71eb305fc",
       "scope": "Original scheduler, stock MFDs and modern map compile natively with explicit original epoch/time, authoritative world/UI bindings and indexed map resources. Exact Windows calculations and callback order conserved. Native GDI/legacy map/custom-mode entry points fail explicitly until supported; native cockpit owner and DG runtime remain unfinished."
     },
     "Src/Orbiter/Production/NativeVesselApplication.cpp": {
@@ -1209,7 +1209,7 @@
     },
     "Src/Orbiter/VesselLights.cpp": {
       "original_sha256_lf": null,
-      "sha256_lf": "25d55b7c60773641b4ae3551b5b6ddee6fb62bd98fbb151891b9aa1e72a92b09"
+      "sha256_lf": "668a6f8a0753f432d4f1cae73d23107194473225a30fcb5c39da8edabc1ef9fa"
     },
     "Src/Orbiter/VesselPorts.h": {
       "sha256_lf": "8439eda1f0a4df00ec92d1a58ed0090271431d567249f992366d39b189c4f086",
@@ -1304,7 +1304,7 @@
     },
     "Src/Orbiter/Production/NativeCockpit.cmake": {
       "original_sha256_lf": null,
-      "sha256_lf": "7dbc749893e44662dca194d1f378048470eda42fff2f2da03cbb29501cb49419"
+      "sha256_lf": "6dbb5b130d869a9d9300fec9ab10e26881edeea39419139a9facfcf801519007"
     },
     "Src/Orbiter/Production/NativeCockpitGui.cpp": {
       "original_sha256_lf": null,
@@ -1400,11 +1400,11 @@
     },
     "Src/Vessel/DeltaGlider/MomentInd.cpp": {
       "original_sha256_lf": "99422492b6d4e451716645bd96d4ca7b7034c7d17355e89c2cb53e31598b7aa9",
-      "sha256_lf": "b711c9244354a477bc7a36d1ef9611f55fb300916f4896b77515b41f3b06cd57"
+      "sha256_lf": "4226953bb0aa40fcdb141cfe2437df9c6ea219722101c28e6e6e1b38b9ac49b2"
     },
     "Src/Vessel/DeltaGlider/MomentInd.h": {
       "original_sha256_lf": "f647dab85e1efc262c1b83f09d912dfe43cb949dc1e056bb7543adb052e608ad",
-      "sha256_lf": "112fb6df25615f0cf6ef62fe1474ba2b3ac37a59983edb7b9d815130469d77c2"
+      "sha256_lf": "005070ea23dcb984502f41167b001b01174197c5c4607f4ceb0407371261926d"
     },
     "Src/Vessel/DeltaGlider/ScramSubsys.h": {
       "original_sha256_lf": "df5e4e4b970574f5c19224e9466688967bbbbfb2f295024a5fd5853082e807b8",
@@ -1428,7 +1428,7 @@
     },
     "Src/Module/LuaScript/LuaInterpreter/Interpreter.cpp": {
       "original_sha256_lf": "5feef015089ca4cb3abc2d7197877352e64ade7ca3c98e5c066cd5a252fd74ee",
-      "sha256_lf": "739f730c63b0b5c7a6bb84744392c19a4b759cac11036ed1476e6d7b46d7a9f0"
+      "sha256_lf": "7e6f1d03d84cc9c5947ffadd39ef50dd2df5a2af781531244eed1c6156ed3354"
     },
     "Src/Module/LuaScript/LuaInterpreter/Interpreter.h": {
       "original_sha256_lf": "0fb3247edcc0c088756b20e4e77fca5086b122720e70251c32efbf83f8ab07b0",
@@ -1436,7 +1436,7 @@
     },
     "Src/Module/LuaScript/LuaInterpreter/lua_vessel_mtd.cpp": {
       "original_sha256_lf": "8649b937f2d189207143af45ff0d7d9f585095c2acfcbbdd8c92c308a8808e29",
-      "sha256_lf": "ec8457890e0e54751c531d816464abd4c9fcd8026803779215273c77c0ec28bb"
+      "sha256_lf": "338f220cc32c7fcb1a94d8ae92423944e6cbdbf231d52715dbafc6d8c5dba708"
     },
     "Src/Module/LuaScript/LuaInline/InlineEnvironment.cpp": {
       "original_sha256_lf": null,
@@ -1536,7 +1536,7 @@
     },
     "Src/Vessel/DeltaGlider/DockingSubsys.cpp": {
       "original_sha256_lf": "b39dc2e936b1df9350d8d2d9d1351ade1637d28a424ce428d18cd77dfc1ab625",
-      "sha256_lf": "c71c26d783b656d2fb53932ebb66d8f3c4f90aefd3ec989335695d7069cae48e"
+      "sha256_lf": "4a5baf5df8c38fc2404490fb1a450fb3ab67e941a732435389f6758da6d2b2ad"
     },
     "Src/Vessel/DeltaGlider/FailureSubsys.cpp": {
       "original_sha256_lf": "a4af6122f7aca08902b0a8c459c9c91043a0ae286f3fcf0eb691f22d264215ed",
@@ -1552,7 +1552,7 @@
     },
     "Src/Vessel/DeltaGlider/HoverSubsys.cpp": {
       "original_sha256_lf": "3c9d1c56e78a20a4abec6cb412f86fa9060e7bb247ee1a0e11f71db990d754ba",
-      "sha256_lf": "1078b02a60eeb6e04779ea9e440a2517c0cc33a4f2bbf18ce57b8641532ddd64"
+      "sha256_lf": "18c0fb54e397f06f571c0dbf7b8c581a85bac40eddc5e5d42c0feae4f4481415"
     },
     "Src/Vessel/DeltaGlider/HoverSubsys.h": {
       "original_sha256_lf": "a4a0fd7ef413684b269fe3b8b44461d04c418cfd50814c61964d80339508587a",
@@ -1637,6 +1637,42 @@
     "Src/Vessel/DeltaGlider/NativeDeltaGliderFactory.inc": {
       "original_sha256_lf": null,
       "sha256_lf": "05747a44e339876a9337f0845cf78789816f507f34ca47987186e27d549f8e20"
+    },
+    "Src/Orbiter/GraphicsAPI.cpp": {
+      "original_sha256_lf": "1be896978f1614797908d9143d7be3af5b8aa78759b528dcfb57abcf26c006dd",
+      "sha256_lf": "337e3c7080b8f29e9a4c15708a3c9691f9729a57092e4c105b7d098be7f90367"
+    },
+    "Src/Orbiter/Production/NativeAnnotations.cpp": {
+      "original_sha256_lf": null,
+      "sha256_lf": "3d1987163d8a3fe625b8b874ecc3b8ddd51d967052ca389094b12e6fa0300afc"
+    },
+    "Src/Orbiter/Production/NativeAnnotations.h": {
+      "original_sha256_lf": null,
+      "sha256_lf": "07c42676a2e527a62c94e0e9a5c2ba52651912c3107ec62abe2c77b83bbb09c1"
+    },
+    "Src/Orbiter/Production/NativeInterpreterSdk.cpp": {
+      "original_sha256_lf": null,
+      "sha256_lf": "d5898f61f7969d0077e199e6dc3c7622322fd80e59d8f331b83e6e3d4949a315"
+    },
+    "Src/Orbiter/Production/NativeInterpreterSdk.h": {
+      "original_sha256_lf": null,
+      "sha256_lf": "451c61ad9ff8e0361699abef7f9eb15c19b1db49f6188efce28dc1b77ae13686"
+    },
+    "Src/Orbiter/Production/ScreenAnnotationMethods.inc": {
+      "original_sha256_lf": null,
+      "sha256_lf": "3cdcc1aedc6d440537f278f4234bd548eda3d81c465188c4be23350b31c4db8b"
+    },
+    "Extern/ReferenceMath/amd/exp.asm": {
+      "original_sha256_lf": null,
+      "sha256_lf": "be54e46e6cf16d3840f6ad88d3ce7987c77a9ba8ca436b686848f6111d6db1ac"
+    },
+    "Extern/ReferenceMath/amd/two_to_jby64_head_tail_table.asm": {
+      "original_sha256_lf": null,
+      "sha256_lf": "4f976db10ef772f2b06d80ac906e7503ecc951db96c42f39ae0f2a507a7ac4b7"
+    },
+    "Extern/ReferenceMath/amd/two_to_jby64_table.asm": {
+      "original_sha256_lf": null,
+      "sha256_lf": "54e46ac4bb240addae9f61214e641e48cbfe27c1d6dbc3d03e3d0ceaf5270f0a"
     }
   }
 }

@@ -20,6 +20,7 @@
 #ifdef ORBITER_NATIVE_COCKPIT
 #include "Pane.h"
 #include "VCockpit.h"
+#include "NativeAnnotations.h"
 #endif
 #include <cstring>
 #include <iostream>
@@ -73,6 +74,7 @@ void orbiter::production::RenderCockpitOverlay() {
 #ifdef ORBITER_NATIVE_COCKPIT
     auto* pane=GetNativeRenderContext().cockpitPane;
     if(!pane)throw std::logic_error("Native cockpit pane is not bound");pane->Render();
+    if(auto *notes=GetNativeRenderContext().annotations)notes->Render();
 #else
     throw std::runtime_error("Native cockpit overlay service is unavailable in this build");
 #endif
@@ -600,7 +602,7 @@ int oapiSetMaterial (DEVMESHHANDLE hMesh, oapi::UInt32 matidx, const MATERIAL *m
 
 oapi::Font* oapiCreateFont(int height,bool prop,const char* face,FontStyle style,int orientation)
 {return GetNativeRenderContext().graphics->CreateFontResource(height,prop,face,style,orientation);}
-void oapiAddNotification(NativeNotification type,const char* title,const char* message)
+void oapiAddNotification(int type,const char* title,const char* message)
 {std::clog<<title<<": "<<message<<'\n';}
 namespace orbiter::production {
 namespace {NativeRenderContext* current=nullptr;}

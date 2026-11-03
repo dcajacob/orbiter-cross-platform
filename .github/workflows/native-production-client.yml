@@ -149,6 +149,16 @@ jobs:
           xvfb-run -a -s '-screen 0 1920x1080x24' env LIBGL_ALWAYS_SOFTWARE=1 GALLIUM_DRIVER=llvmpipe
           python3 -B Tests/Production/DeltaGlider/visual_mesh.py --build out/native-cockpit-engine
           --assets out/scene-resources --data out/data --planets out/planets --output out/native-dg-visual
+      - name: Fly both stock DeltaGliders with the original Lua autopilot in the panel and VC
+        run: >-
+          xvfb-run -a -s '-screen 0 1920x1080x24' env LIBGL_ALWAYS_SOFTWARE=1 GALLIUM_DRIVER=llvmpipe
+          python3 -B Tests/Production/LuaRuntime/native_flight.py --build out/native-cockpit-engine
+          --assets out/scene-resources --data out/data --planets out/planets --output out/native-lua-flight
+      - name: Check synchronous commands, asynchronous worker timing, isolation and AAP controls
+        run: >-
+          xvfb-run -a -s '-screen 0 1920x1080x24' env LIBGL_ALWAYS_SOFTWARE=1 GALLIUM_DRIVER=llvmpipe
+          python3 -B Tests/Production/LuaRuntime/native_schedule.py --build out/native-cockpit-engine
+          --assets out/scene-resources --data out/data --planets out/planets --output out/native-lua-schedule
       - name: Verify all ten original native stock MFD modes and HUD against frozen Windows
         shell: bash
         run: |
@@ -204,6 +214,15 @@ jobs:
             out/native-keyboard-evidence/**
             out/native-ground-evidence/**
             out/native-controlled-landing/**
+            out/native-lua-schedule/lua-schedule-report.json
+            out/native-lua-schedule/*/lua-events.csv
+            out/native-lua-schedule/*/lua-controls.csv
+            out/native-lua-schedule/*/lua-air.csv
+            out/native-lua-flight/flight-report.json
+            out/native-lua-flight/*/lua-flight.csv
+            out/native-lua-flight/*/saved.scn
+            out/native-lua-flight/*/console.txt
+            out/native-lua-flight/*/graphics-lifecycle.json
             out/native-cockpit-evidence/**
             out/native-cockpit-controls/**
             out/native-cockpit-mouse/**

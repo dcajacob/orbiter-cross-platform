@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Run the original stock glass cockpit in the native production engine."""
+"""Run the original stock glass, panel and virtual cockpits in the native production engine."""
 import argparse,csv,json,math,subprocess,sys
 from pathlib import Path
 HERE=Path(__file__).resolve().parent
@@ -23,14 +23,14 @@ def main():
     for name,checksum in pins['reference_files_sha256'][a.configuration].items():
         require(digest(a.frozen/a.configuration/name)==checksum,'Frozen cockpit file differs: '+name)
     settings=json.loads((HERE/'cases.json').read_text())
-    supported={c['id'] for c in settings['cases'] if c['cockpit']==1}
+    supported={c['id'] for c in settings['cases']}
     require(not a.case or set(a.case)<=supported,'Requested native cockpit case is unsupported')
-    settings['cases']=[c for c in settings['cases'] if c['cockpit']==1 and (not a.case or c['id'] in a.case)]
-    require(settings['cases'],'No supported native glass cockpit cases selected')
+    settings['cases']=[c for c in settings['cases'] if not a.case or c['id'] in a.case]
+    require(settings['cases'],'No native cockpit cases selected')
     require(not a.output.exists(),'Candidate output exists; replacement is forbidden')
     output=a.output.resolve();output.mkdir(parents=True)
     report=dict(status='pending',reference_run=pins['run_id'],configuration=a.configuration,
-        scope='Original stock glass cockpit only; DG/DG-S and native selection controls remain separate gates',cases={})
+        scope='Stock PB glass and DG/DG-S 2D and virtual cockpit rendering',cases={})
     try:
         for case in settings['cases']:
             name=case['id'];runs=[]

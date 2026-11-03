@@ -48,6 +48,13 @@ double orbiter_math_error(char*,int,unsigned long value,int,int flags,int error,
     if(raised)std::feraiseexcept(raised);
     double result;std::memcpy(&result,&value,sizeof(result));return result;
 }
+// The original x86-64 assembly passes this private helper its third argument in R8D.
+__attribute__((ms_abi)) double _exp_special(double x,double y,unsigned code) {
+    unsigned long bits;
+    std::memcpy(&bits,&y,sizeof(bits));
+    int flags=code==2 ? 16|2 : code==3 ? 16|1 : 0;
+    return orbiter_math_error(nullptr,0,bits,0,flags,code==1 ? EDOM : ERANGE,x,0.,1);
+}
 double _cos_special(double x) {return Special(x);}
 double _sin_special(double x) {return Special(x);}
 }

@@ -803,7 +803,7 @@ int OGLClient::EditMeshGroup (DEVMESHHANDLE hMesh, int grpidx, GROUPEDITSPEC *ge
  */
 void OGLClient::clbkIncrSurfaceRef (SURFHANDLE surf)
 {
-	((OGLTexture *)surf)->m_RefCnt++;
+	((OGLTexture *)surf)->AddRef();
 }
 
 /**

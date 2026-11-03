@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Compare native original glass-cockpit hit testing with frozen Windows clicks."""
+"""Compare native stock cockpit hit testing with frozen Windows clicks."""
 import argparse,csv,json,math,subprocess,sys
 from pathlib import Path
 HERE=Path(__file__).resolve().parent;ROOT=HERE.parents[2]
@@ -16,32 +16,39 @@ def main():
     p=argparse.ArgumentParser(description=__doc__)
     for name in ('executable','assets','data','modules','planets','frozen','output'):p.add_argument('--'+name,type=Path,required=True)
     p.add_argument('--configuration',choices=('Debug','Release'),required=True)
+    p.add_argument('--case',action='append')
     a=p.parse_args();config=settings();pins=metadata()
     require(json.loads((a.frozen/'provenance.json').read_text())==pins,'Staged original controls differ')
     for name,checksum in pins['reference_files_sha256'][a.configuration].items():
         require(digest(a.frozen/a.configuration/name)==checksum,'Frozen original control file differs: '+name)
-    # Real DG/DG-S modules and panel/VC controls have separate, unfinished gates.
-    config['cases']=[c for c in config['cases'] if c['cockpit']==1]
-    require(len(config['cases'])==1,'Native glass control case is missing')
+    ids={c['id'] for c in config['cases']}
+    require(not a.case or set(a.case)<=ids,'Unknown native cockpit control case')
+    config['cases']=[c for c in config['cases'] if not a.case or c['id'] in a.case]
     require(not a.output.exists(),'Candidate output exists; replacement is forbidden')
     output=a.output.resolve();output.mkdir(parents=True)
     report=dict(status='pending',reference_run=pins['run_id'],configuration=a.configuration,
-        scope='Original native glass Pane hit testing; replay dispatch, not an OS window transport test',cases={})
+        scope='Stock generic, panel and VC hit testing with recorded Windows screen coordinates',cases={})
     try:
         for case in config['cases']:
             name=case['id'];runs=[]
             for repeat in (1,2):
                 directory=output/(name+'-'+str(repeat));directory.mkdir();runs.append(directory)
-                text=fixture(case);start=text.index('PB:ShuttlePB\n');end=text.index('\nEND\n',start)
-                (directory/'cockpit.scn').write_text(text[:end]+'\n  RCSMODE 1'+text[end:])
+                text=fixture(case)
+                if case['cockpit']==1:
+                    start=text.index('PB:ShuttlePB\n');end=text.index('\nEND\n',start)
+                    text=text[:end]+'\n  RCSMODE 1'+text[end:]
+                (directory/'cockpit.scn').write_text(text)
                 (directory/'Orbiter.cfg').write_text((ROOT/'Tests/Production/NativeScene/Orbiter.cfg').read_text()+
                     '\nFPS = 0\nMenubarMode = 1\nInfobarMode = 1\nInstrumentUpdateInterval = 0.25\n')
                 for marker in ('instrument-evidence.enabled','control-evidence.enabled'):
                     (directory/marker).write_text('Original native cockpit controls; unchanged frozen budgets.\n')
                 replay=['tick,phase,action,value',f"0,pre,mfd,0 {case['left']}",f"0,pre,mfd,1 {case['right']}",f"0,pre,hud,{case['hud']}"]
-                for action in case['actions']:
-                    require(action['coordinates']=='pixel','Native glass controls require original pixel coordinates')
-                    x,y=action['point'][:2];replay.append(f"{action['tick']},pre,mouse,{action['event']} {x} {y}")
+                original=a.frozen/a.configuration/(name+'-1')
+                clicks=[r for r in csv.DictReader((original/'control-inputs.csv').read_text().splitlines()) if r['event']!='move']
+                require(len(clicks)==len(case['actions']),'Incomplete original click schedule')
+                for action,click in zip(case['actions'],clicks):
+                    require(int(click['tick'])==action['tick'] and click['event']==action['event'],'Frozen click schedule differs')
+                    replay.append(f"{click['tick']},pre,mouse,{click['event']} {click['x']} {click['y']}")
                 (directory/'replay.csv').write_text('\n'.join(replay)+'\n')
                 command=[str(a.executable.resolve())]
                 for key in ('assets','data','modules','planets'):command+=['--'+key,str(getattr(a,key).resolve())]
@@ -73,8 +80,8 @@ def main():
             for frame in (20,50):
                 for stem in (f'instrument-{frame}',f'mfd-0-{frame}',f'mfd-1-{frame}'):
                     require((runs[0]/(stem+'.rgba')).read_bytes()==(runs[1]/(stem+'.rgba')).read_bytes(),'Native control image repeat differs')
-            report['cases'][name]=dict(comparison=compare(a.frozen/a.configuration,output,config)[name],
-                mfd_images=mfd_images(a.frozen/a.configuration,output,config)[name],identical_repeats=True,
+            report['cases'][name]=dict(comparison=compare(a.frozen/a.configuration,output,{**config,'cases':[case]})[name],
+                mfd_images=mfd_images(a.frozen/a.configuration,output,{**config,'cases':[case]})[name],identical_repeats=True,
                 exact_original_discrete_inputs=True,actual_vessel_rcs_modes_verified=True)
         report['status']='passed';print(json.dumps(report,indent=2))
     except Exception as error:report.update(status='failed',error=str(error));raise

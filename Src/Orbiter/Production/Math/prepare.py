@@ -8,13 +8,16 @@ No Windows window, operating-system or public SDK emulation is involved.
 import argparse,hashlib,json,re
 from pathlib import Path
 
-ASSEMBLY=('cos','sin','remainder_piby2_forAsm','remainder_piby2_forFMA3','Lsincos_array','L2_by_pi_bits')
+ASSEMBLY=('cos','sin','remainder_piby2_forAsm','remainder_piby2_forFMA3','Lsincos_array','L2_by_pi_bits',
+          'exp','two_to_jby64_table','two_to_jby64_head_tail_table')
 
 def assembly(text):
     aliases=dict(re.findall(r'(?im)^\s*(\w+)\s+TEXTEQU\s*<([^>]+)>',text))
     for a,b in aliases.items():text=re.sub(r'\b'+a+r'\b',b,text)
     text=re.sub(r'\bcos\b','aw_cos',text);text=re.sub(r'\bsin\b','aw_sin',text)
-    memory=set(re.findall(r'(?im)^\s*(\w+)\s+(?:DQ|DD|DB)\s',text))|{'__Lcosarray','__Lsinarray','__use_fma3_lib','__L_2_by_pi_bits'}
+    text=re.sub(r'\bexp\b','aw_exp',text)
+    memory=set(re.findall(r'(?im)^\s*(\w+)\s+(?:DQ|DD|DB)\s',text))|{'__Lcosarray','__Lsinarray','__use_fma3_lib','__L_2_by_pi_bits',
+        '__two_to_jby64_table','__two_to_jby64_head_table','__two_to_jby64_tail_table'}
     result=['.intel_syntax noprefix'];frame=None;function=False;equates={}
     for original in text.splitlines():
         code,_,comment=original.partition(';');s=code.strip()

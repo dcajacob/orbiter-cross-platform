@@ -3,7 +3,7 @@
 import argparse,csv,ctypes as C,errno,gzip,hashlib,json,math,random,struct
 from pathlib import Path
 HERE=Path(__file__).resolve().parent
-FUNCTIONS=('sin','cos','asin','atan2')
+FUNCTIONS=('sin','cos','asin','atan2','exp')
 def sha(path):return hashlib.sha256(path.read_bytes()).hexdigest()
 def bits(x):return struct.unpack('>Q',struct.pack('>d',x))[0]
 def ordered(x):
@@ -32,6 +32,8 @@ def main():
     samples.extend((2,rng.uniform(-1,1),0.) for i in range(1500))
     samples.extend((3,x,y) for x in (0.,-0.,1.,-1.,1e308,-1e308,math.ulp(0.)) for y in (0.,-0.,1.,-1.,1e308,-1e308,math.ulp(0.)))
     samples.extend((3,rng.choice(values),rng.choice(values)) for i in range(1500))
+    samples.extend((4,rng.uniform(-744.,709.),0.) for i in range(1500))
+    samples.extend((4,x,0.) for x in (0.,-0.,-745.,-744.,-709.,709.,float.fromhex('-0x1.1f77269225794p-1')))
     expected=[]
     for f,x,y in samples:
         low=lib.oracle_value(f,x,y,256);high=lib.oracle_value(f,x,y,512)
@@ -64,7 +66,11 @@ def main():
         for f,x in ((0,math.inf),(1,-math.inf),(2,1.01)):
             lib.probe_clear();got=lib.probe_value(f,x,0.)
             require(math.isnan(got) and lib.probe_invalid() and lib.probe_errno()==errno.EDOM,'Incomplete native domain error handling')
-        for f in (0,1,2):
+        for x,target in ((math.inf,math.inf),(-math.inf,0.),(710.,math.inf),(-800.,0.)):
+            lib.probe_clear()
+            require(lib.probe_value(4,x,0.)==target,'Incorrect exponential range result')
+            require(lib.probe_errno()==(errno.ERANGE if math.isfinite(x) else 0),'Incorrect exponential range errno')
+        for f in (0,1,2,4):
             for nan,invalid in ((0x7ff8000000000042,False),(0x7ff0000000000042,True)):
                 lib.probe_clear();got=lib.probe_bits(f,nan,0)
                 require(bits(got)==0x7ff8000000000042 and bool(lib.probe_invalid())==invalid,'NaN payload/exception propagation failed')

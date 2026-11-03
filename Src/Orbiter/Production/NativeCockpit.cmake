@@ -11,7 +11,7 @@ endif()
 FetchContent_Declare(native_imgui URL "${_ui_url}" URL_HASH "SHA256=${_ui_hash}" DOWNLOAD_EXTRACT_TIMESTAMP TRUE SOURCE_SUBDIR no-build)
 FetchContent_MakeAvailable(native_imgui)
 target_sources(orbiter_production_vessels PRIVATE
-    NativeScript.cpp NativeCockpitProjection.cpp NativeCockpitMfd.cpp NativeCockpitGui.cpp NativeCockpitVessel.cpp ../CockpitSdk.cpp ../Astro.cpp
+    NativeAnnotations.cpp NativeScript.cpp NativeInterpreterSdk.cpp NativeCockpitProjection.cpp NativeCockpitMfd.cpp NativeCockpitGui.cpp NativeCockpitVessel.cpp ../CockpitSdk.cpp ../Astro.cpp
     ../Pane.cpp ../hud.cpp ../Defpanel.cpp ../Panel2D.cpp ../VCockpit.cpp ../Select.cpp
     ../Mfd.cpp ../MfdUser.cpp ../VectorMap.cpp ../MfdOrbit.cpp ../MfdSurface.cpp ../MfdMap.cpp ../MfdHsi.cpp
     ../MfdLanding.cpp ../MfdDocking.cpp ../MfdAlign.cpp ../MfdSync.cpp ../MfdTransfer.cpp ../MfdComms.cpp
@@ -91,3 +91,26 @@ add_library(native_lua_inline_list OBJECT ../../Module/LuaScript/LuaInline/LuaIn
 target_include_directories(native_lua_inline_list PRIVATE "${CMAKE_CURRENT_LIST_DIR}/../../Module/LuaScript/LuaInterpreter")
 target_link_libraries(native_lua_inline_list PRIVATE lua orbiter_production_vessels)
 set_target_properties(native_lua_inline_list PROPERTIES POSITION_INDEPENDENT_CODE ON)
+
+add_library(native_lua_interpreter_core OBJECT ../../Module/LuaScript/LuaInterpreter/Interpreter.cpp)
+target_link_libraries(native_lua_interpreter_core PRIVATE lua orbiter_production_vessels)
+set_target_properties(native_lua_interpreter_core PROPERTIES POSITION_INDEPENDENT_CODE ON)
+
+target_link_libraries(orbiter_production_vessels PRIVATE ${_archive_zlib})
+target_include_directories(orbiter_production_vessels PRIVATE ${_archive_zlib_includes})
+
+add_library(native_lua_interpreter SHARED
+    $<TARGET_OBJECTS:native_lua_interpreter_core> $<TARGET_OBJECTS:native_lua_vessel_bindings>
+    ../../Module/LuaScript/LuaInterpreter/InterpreterExecution.cpp)
+target_link_libraries(native_lua_interpreter PRIVATE native_lua_script_files lua orbiter_production_vessels)
+target_link_options(native_lua_interpreter PRIVATE -Wl,--no-undefined)
+set_target_properties(native_lua_interpreter PROPERTIES PREFIX "" OUTPUT_NAME LuaInterpreter
+    LIBRARY_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/NativeModules/Plugin")
+
+add_library(native_lua_inline MODULE $<TARGET_OBJECTS:native_lua_inline_list>
+    ../../Module/LuaScript/LuaInline/InlineEnvironment.cpp)
+target_include_directories(native_lua_inline PRIVATE "${CMAKE_CURRENT_LIST_DIR}/../../Module/LuaScript/LuaInterpreter")
+target_link_libraries(native_lua_inline PRIVATE native_lua_interpreter lua orbiter_production_vessels)
+target_link_options(native_lua_inline PRIVATE -Wl,--no-undefined)
+set_target_properties(native_lua_inline PROPERTIES PREFIX "" OUTPUT_NAME LuaInline
+    LIBRARY_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/NativeModules/Plugin")

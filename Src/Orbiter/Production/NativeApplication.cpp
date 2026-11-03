@@ -37,7 +37,9 @@
 #include "Pane.h"
 #include "Select.h"
 #include "NativeCockpitUi.h"
+#include "NativeAnnotations.h"
 #include "NativeScript.h"
+#include "NativeInterpreterSdk.h"
 #include "CockpitSystemClock.h"
 #include "CockpitServices.h"
 #endif
@@ -78,7 +80,11 @@ int ReadFlightStatus(const VESSEL& vessel) {
     VESSELSTATUS2 status{};status.version=2;vessel.GetStatusEx(&status);return status.status;
 }
 struct Runtime final:BodyServices,RigidBodyServices,SurfaceServices,NavigationServices,VesselServices,
-    CameraServices,WorldFactory,SessionServices,VesselLifetimeServices {
+    CameraServices,WorldFactory,SessionServices,VesselLifetimeServices
+#ifdef ORBITER_NATIVE_COCKPIT
+    , ScriptApplication
+#endif
+{
     Resources& resources;const ResourceResolver& config;Config settings;TimeData time;CFG_PHYSICSPRM physics{};
     PlanetarySystem* system=nullptr;NativeRenderContext render;bool updating=false,force=true,running=false,playback=false,active=true;
     MeshManager meshes;NativeCelestialServices celestial;std::unique_ptr<NativeElevationServices> terrain;
@@ -87,7 +93,10 @@ struct Runtime final:BodyServices,RigidBodyServices,SurfaceServices,NavigationSe
     unsigned pendingCockpitRedraw=0,inputTick=0,completedTicks=0,observationTick=0;
     FlightControls controls;FlightReplay replay;FlightInput input;
 #ifdef ORBITER_NATIVE_COCKPIT
+    NativeAnnotations annotations;
     NativeScriptHost scripts{resources.modules};
+    std::array<char,256> simulatedKeys{};
+    TimeJumpData scriptJump{};
     INTERPRETERHANDLE scenarioInterpreter=nullptr;
     std::unique_ptr<Pane> cockpit;
     bool instrumentResources=false,cockpitObserved=false,guiCreated=false;
@@ -301,20 +310,59 @@ struct Runtime final:BodyServices,RigidBodyServices,SurfaceServices,NavigationSe
             } else throw std::runtime_error("Unknown flight replay command: "+command.action);
         }
     }
-    void Save() {
-        if(savePath.empty())throw std::runtime_error("No explicit user save path");
-        std::filesystem::create_directories(savePath.parent_path());auto temporary=savePath;temporary+=".tmp";
+    void SaveTo(const std::filesystem::path& destination,const char *description,int format) {
+        if(destination.empty())throw std::runtime_error("No explicit user save path");
+        std::filesystem::create_directories(destination.parent_path());auto temporary=destination;temporary+=".tmp";
         try {
             std::ofstream file(temporary);file.exceptions(std::ios::badbit|std::ios::failbit);file.imbue(std::locale::classic());
-            scenarioState->Update(time.MJD0,render.focus->Name());scenarioState->Write(file,"Native production ShuttlePB flight");
+            scenarioState->Update(time.MJD0,render.focus->Name());scenarioState->Write(file,description,format);
             render.camera->Write(file);
 #ifdef ORBITER_NATIVE_COCKPIT
             if(cockpit)cockpit->Write(file);
 #endif
-            system->Write(file);file.close();std::filesystem::rename(temporary,savePath);
+            system->Write(file);file.close();std::filesystem::rename(temporary,destination);
         } catch(...) {std::error_code ignored;std::filesystem::remove(temporary,ignored);throw;}
-        std::cout<<"Saved finalized production scenario: "<<savePath<<'\n';
+        std::cout<<"Saved finalized production scenario: "<<destination<<'\n';
     }
+    void Save() {
+        std::string desc=std::string("Native production ")+render.focus->GetModuleInterface()->GetClassName()+" flight";
+        SaveTo(savePath,desc.c_str(),0);
+    }
+#ifdef ORBITER_NATIVE_COCKPIT
+    bool SaveScriptScenario(const char *name,const char *desc) override {
+        SaveTo(name,desc,1);
+        return true;
+    }
+    bool Jump(double mjd,int mode) override {
+        if (!std::isfinite(mjd)) return false;
+        scriptJump={time.JumpTo(mjd),mode};
+        system->Timejump(scriptJump);
+        render.camera->Update();
+        if (cockpit) cockpit->Timejump();
+        return true;
+    }
+    void Pause(bool pause) override { running=!pause; render.paused=pause; }
+    void SetScriptFOV(double value) override {
+        if (render.camera->Aperture()!=value) {render.camera->SetAperture(value,false);force=true;}
+    }
+    bool BufferedKey(oapi::UInt32 key,const oapi::UInt32 *modifiers,oapi::UInt32 count,bool runningOnly) override {
+        if ((runningOnly && !running) || key>=256 || (count && !modifiers)) return false;
+        FlightInput event;
+        for (oapi::UInt32 i=0;i<count;++i) {
+            if (modifiers[i]>=event.keys.size()) return false;
+            event.keys[modifiers[i]]=char(0x80);
+        }
+        event.events.push_back({key,true});
+        Buffered(event);
+        return true;
+    }
+    bool ImmediateKeys(const char *keys,bool runningOnly) override {
+        if ((runningOnly && !running) || !keys) return false;
+        for (std::size_t i=0;i<simulatedKeys.size();++i) simulatedKeys[i]|=keys[i];
+        return true;
+    }
+    const char *KeyState() const override {return input.keys.data();}
+#endif
     void Buffered(FlightInput& snapshot) {
         for(auto event:snapshot.events) {
             if(inputEvents.is_open()) {
@@ -356,6 +404,7 @@ struct Runtime final:BodyServices,RigidBodyServices,SurfaceServices,NavigationSe
 #endif
         if(render.graphics)render.graphics->CloseSession();
 #ifdef ORBITER_NATIVE_COCKPIT
+        annotations.Clear();
         if (guiCreated) {
             render.graphics->ShutdownGui();
             DestroyCockpitGui();
@@ -397,7 +446,7 @@ struct Runtime final:BodyServices,RigidBodyServices,SurfaceServices,NavigationSe
 #ifndef ORBITER_NATIVE_COCKPIT
         if(metadata.Script())unsupported("bundled Lua in the external-view build");
 #else
-        render.scripts=&scripts;
+        render.annotations=&annotations;render.scripts=&scripts;render.scriptApplication=this;render.scriptSaveDirectory=savePath.parent_path();
 #endif
         if(!std::isfinite(metadata.Mjd()))throw std::runtime_error("Scenario epoch must be finite");
         time.Reset(metadata.Mjd());physics=settings.CfgPhysicsPrm;BindFlightControls(&controls);
@@ -473,7 +522,12 @@ struct Runtime final:BodyServices,RigidBodyServices,SurfaceServices,NavigationSe
             auto* vessel=body->GetModuleInterface();const std::string type=vessel->GetClassName();
             const bool pb=type=="ShuttlePB" && vessel->Version()==2 && vessel->GetMeshCount()==1 && vessel->GetThrusterCount()==16 && vessel->GetPropellantCount()==1;
             const bool iss=type=="ProjectAlpha_ISS" && vessel->Version()==0 && vessel->GetMeshCount()==1;
-            if(!pb && !iss)throw std::runtime_error("Required actual stock ISS/native ShuttlePB module and capabilities are missing or unsupported; generic replacement is forbidden");
+#ifdef ORBITER_NATIVE_COCKPIT
+            if ((type=="DeltaGlider" || type=="DG-S") && vessel->Version()==3 && vessel->GetMeshCount()==2 &&
+                vessel->GetThrusterCount()==(type=="DG-S" ? 23 : 21) && vessel->GetPropellantCount()==(type=="DG-S" ? 3 : 2))
+                continue;
+#endif
+            if(!pb && !iss)throw std::runtime_error("Unsupported stock vessel class or capabilities: "+type);
         }
         auto* focus=system->GetVessel(metadata.Focus(),true);if(!focus)throw std::runtime_error("Required production focus vessel is missing");
         SetFocus(focus);
@@ -562,7 +616,13 @@ struct Runtime final:BodyServices,RigidBodyServices,SurfaceServices,NavigationSe
         if(!std::isfinite(warp) || warp<=0)throw std::runtime_error("Invalid time acceleration");
         time.SetWarp(std::clamp(warp,.1,100000.));
     }
-    double TimejumpDelta() const override {unsupported("time jumps in this scene host");}
+    double TimejumpDelta() const override {
+#ifdef ORBITER_NATIVE_COCKPIT
+        return scriptJump.dt;
+#else
+        unsupported("time jumps in this scene host");
+#endif
+    }
     void RedrawCockpitAreas(int flags) override {
         pendingCockpitRedraw|=unsigned(flags);
 #ifdef ORBITER_NATIVE_COCKPIT
@@ -696,7 +756,8 @@ struct Runtime final:BodyServices,RigidBodyServices,SurfaceServices,NavigationSe
                 if(vessel==render.focus) {
                     MATRIX3 er{},ob{};for(unsigned i=0;i<9;++i){er.data[i]=earth->GRot().data[i];ob.data[i]=earth->RotObliq().data[i];}
                     math_observation::Row(mathTrace,completedTicks,time.SimT0,*v,MakeVECTOR3(earth->GPos()),er,ob,earth->Rotation());
-                    contact_observation::Row(contactTrace,completedTicks,time.SimT0,*v);
+                    if (std::string(v->GetClassName())=="ShuttlePB")
+                        contact_observation::Row(contactTrace,completedTicks,time.SimT0,*v);
                 }
             }
         }
@@ -751,7 +812,16 @@ struct Runtime final:BodyServices,RigidBodyServices,SurfaceServices,NavigationSe
 #else
         time.BeginStep(dt,running);
 #endif
+#ifdef ORBITER_NATIVE_COCKPIT
+        if(running) {
+            FlightInput snapshot=input;
+            for (std::size_t i=0;i<simulatedKeys.size();++i) snapshot.keys[i]|=simulatedKeys[i];
+            simulatedKeys.fill(0);
+            controls.Immediate(*render.focus,time,snapshot);
+        }
+#else
         if(running)controls.Immediate(*render.focus,time,input);
+#endif
         Session::UpdateWorld(*this,time,running,playback,updating,force);
         Session::EndTimeStep(*this,time,running,active,force);
         if(!wasRunning)running=false;
@@ -809,7 +879,7 @@ int main(int argc,char** argv) {
             if(fixedUiClock)SetCockpitReplayClock(static_cast<float>(fixed));
 #endif
             application.time.SetFixedStep(fixed);application.running=startRunning;application.render.paused=!application.running;
-            std::cout<<"Production ShuttlePB flight. Space/Ctrl-P: pause. T/R: warp. Ctrl-S: save. F5: reload. F6: step. Escape: close.\n";
+            std::cout<<"Production "<<application.render.focus->GetModuleInterface()->GetClassName()<<" flight. Space/Ctrl-P: pause. T/R: warp. Ctrl-S: save. F5: reload. F6: step. Escape: close.\n";
             FlightClock clock(fixed);auto previous=std::chrono::steady_clock::now();
             int presented=0;bool reload=false;
             while(application.active && (!frames || presented<frames) && (!ticks || application.inputTick<unsigned(ticks))) {

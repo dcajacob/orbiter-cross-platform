@@ -30,7 +30,6 @@ AngRateIndicator::AngRateIndicator (VESSEL3 *v, SURFHANDLE blitsrc)
 : PanelElement(v), bsrc(blitsrc),
   xcnt(xcnt_2D), ycnt(ycnt_2D), zcnt(zcnt_2D)
 {
-	nvtx = 7*3*3;
 	vtxbuf_2D = 0;
 	vtxbuf_VC = 0;
 	vtx0 = &vtxbuf_2D;
@@ -161,8 +160,7 @@ bool AngRateIndicator::RedrawVC (DEVMESHHANDLE hMesh, SURFHANDLE surf)
 	if (t < upt && t > upt-1.0) return false;
 	upt = t + 0.1;
 
-	static NTVERTEX *vtx = 0;
-	if (!vtx) vtx = new NTVERTEX[nvtx];
+	NTVERTEX vtx[nvtx];
 	memcpy (vtx, *vtx0, nvtx*sizeof(NTVERTEX));
 
 	int axis;

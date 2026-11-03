@@ -1,10 +1,12 @@
 # Phase 6 cockpit and instrument integration
 
-Phase 6 is in progress. Phase 5 remains accepted; the prepared laptop preview is
-still the verified production ShuttlePB/ISS external-view build. A separate
-native glass-cockpit candidate passes hosted Windows/Linux instrument comparisons
-described below. Native glass RCS buttons also pass local control comparisons.
-Selection/input dialogs, DG/DG-S and their 2D/virtual cockpits remain unfinished.
+Phase 6 is in progress. The accepted Phase 5 laptop preview runs the production
+ShuttlePB/ISS external view. In the separate Phase 6 candidate, both stock
+Delta-gliders fly with the original Lua autopilot in the 2D panel and virtual
+cockpit. Local instrument rendering and real RCS-switch clicks pass the frozen
+Windows comparisons for both gliders. The visible menu, broader focus behavior,
+original Windows cross-build control parity and hosted validation are still open.
+[Delta-glider flight evidence](DeltaGlider.md)
 
 The pre-extraction reference gate is accepted in
 [run 41458001638](https://github.com/dcajacob/orbiter-cross-platform/actions/runs/41458001638).

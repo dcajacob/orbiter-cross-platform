@@ -2,7 +2,7 @@
 #include "Runtime.h"
 extern "C" {
 int __use_fma3_lib=0;
-double aw_sin(double);double aw_cos(double);double aw_atan2(double,double);
+double aw_exp(double);double aw_sin(double);double aw_cos(double);double aw_atan2(double,double);
 double orbiter_asin_fma(double);double orbiter_asin_sse2(double);
 }
 namespace {
@@ -27,6 +27,7 @@ double orbiter_math_sin_value(double x) noexcept {return x==0.?x:aw_sin(x);}
 // Linker wrapping applies only to targets using this internal numerical SDK.
 // Ordinary process/libc/OpenGL symbols are never replaced or intercepted.
 double __wrap_sin(double x) noexcept {Fma();return orbiter_math_sin_value(x);}
+double __wrap_exp(double x) noexcept {Fma();return aw_exp(x);}
 double __wrap_cos(double x) noexcept {Fma();return aw_cos(x);}
 double __wrap_asin(double x) noexcept {return Fma()?orbiter_asin_fma(x):orbiter_asin_sse2(x);}
 double __wrap_atan2(double y,double x) noexcept {Fma();return aw_atan2(y,x);}

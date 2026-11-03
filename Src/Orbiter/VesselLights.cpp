@@ -34,6 +34,16 @@ LightEmitter *Vessel::AddSpotLight (const VECTOR3 &pos, const VECTOR3 &dir, doub
 	return pl;
 }
 
+// Vessel emitters are allocated as one of these two concrete SDK types.
+// Their public base has no virtual destructor.
+static void DeleteVesselLight (LightEmitter *light)
+{
+	if (light->GetType() == LightEmitter::LT_SPOT)
+		delete static_cast<SpotLight*>(light);
+	else
+		delete static_cast<PointLight*>(light);
+}
+
 bool Vessel::DelLightEmitter (LightEmitter *le)
 {
 	oapi::UInt32 i, j, k;
@@ -47,7 +57,7 @@ bool Vessel::DelLightEmitter (LightEmitter *le)
 			} else tmp = NULL;
 			delete []emitter;
 			emitter = tmp;
-			delete le;
+			DeleteVesselLight (le);
 			nemitter--;
 			return true;
 		}
@@ -59,9 +69,10 @@ void Vessel::ClearLightEmitters ()
 {
 	if (!nemitter) return; // nothing to do
 	for (oapi::UInt32 i = 0; i < nemitter; i++) {
-		if (emitter[i]) delete emitter[i];
+		if (emitter[i]) DeleteVesselLight (emitter[i]);
 	}
 	delete []emitter;
+	emitter = nullptr;
 	nemitter = 0;
 }
 

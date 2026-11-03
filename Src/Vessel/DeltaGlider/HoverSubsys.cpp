@@ -1108,9 +1108,9 @@ bool HoverAltResetBtn::ProcessMouseVC (int event, VECTOR3 &p)
 // ==============================================================
 
 HoverHoldAltIndicator::HoverHoldAltIndicator (HoverHoldComponent *hhac, SURFHANDLE blitsrc)
-: PanelElement (hhac->DG()), ctrl(hhac), bsrc(blitsrc)
+: PanelElement (hhac->DG()), ctrl(hhac), btgt(0), bsrc(blitsrc),
+  holdmode_disp(HoverHoldComponent::HOLD_NONE), hold_disp(false), holdstr("         ")
 {
-	btgt = 0;
 }
 
 // --------------------------------------------------------------

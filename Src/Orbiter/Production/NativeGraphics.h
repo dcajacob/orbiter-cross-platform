@@ -82,6 +82,10 @@ public:
     virtual MESHHANDLE clbkGetMesh(VISHANDLE,oapi::UInt)=0;
     virtual int EditMeshGroup(DEVMESHHANDLE,int,GROUPEDITSPEC*)=0;
     virtual bool SetMeshTexture(DEVMESHHANDLE,int,SURFHANDLE)=0;
+    virtual bool clbkSaveSurfaceToImage(SURFHANDLE,const char*,oapi::ImageFileFormat,float)=0;
+    virtual bool SetMeshProperty(DEVMESHHANDLE,int,int)=0;
+    // The original GraphicsClient reports unsupported extended material properties as 2.
+    virtual int clbkSetMeshMaterialEx(DEVMESHHANDLE,oapi::UInt32,MatProp,const oapi::FVECTOR4*) { return 2; }
     virtual int SetMeshMaterial(DEVMESHHANDLE,int,const MATERIAL*)=0;
     virtual oapi::ParticleStream* Exhaust(PARTICLESTREAMSPEC*,OBJHANDLE,const double*,const VECTOR3*,const VECTOR3*)=0;
     virtual oapi::ParticleStream* Exhaust(PARTICLESTREAMSPEC*,OBJHANDLE,const double*,const VECTOR3&,const VECTOR3&)=0;
@@ -93,6 +97,9 @@ struct NativeRenderContext {
     class VesselLifetimeServices* lifetime=nullptr;
     const ResourceResolver *textures=nullptr,*highTextures=nullptr,*planetTextures=nullptr,*meshFiles=nullptr,*programFiles=nullptr;
     const ResourceResolver* configurationFiles=nullptr;
+    class NativeAnnotations* annotations=nullptr;
+    class ScriptApplication* scriptApplication=nullptr;
+    std::filesystem::path scriptSaveDirectory;
     class NativeScriptHost* scripts=nullptr;
     NativeGraphics* graphics=nullptr;Pane* cockpitPane=nullptr;Select* cockpitSelect=nullptr;InputBox* cockpitInput=nullptr;HELPCONTEXT* cockpitHelp=nullptr;
     bool paused=true,showGrapple=false;

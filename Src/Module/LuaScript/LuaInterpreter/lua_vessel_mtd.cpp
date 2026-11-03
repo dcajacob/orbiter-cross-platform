@@ -43,7 +43,7 @@ Vessel class: Lua access to VESSEL objects
 /// @lookup types
 
 // A placeholder flag for "focus vessel" where usually a vessel pointer would be expected
-VESSEL *vfocus = (VESSEL*)0x1;
+static VESSEL *vfocus = (VESSEL*)0x1;
 
 VESSEL *Interpreter::lua_tovessel (lua_State *L, int idx)
 {

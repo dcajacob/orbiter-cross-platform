@@ -35,7 +35,7 @@ protected:
 private:
 	double upt;
 	NTVERTEX **vtx0, *vtxbuf_2D, *vtxbuf_VC;
-	int nvtx;
+	static constexpr int nvtx = 7*3*3;
 	double w0_2D, w0_VC, cost_2D, sint_2D, cost_VC, sint_VC;
 	double *w0, *cost, *sint;
 	double xcnt_2D[3], ycnt_2D[3], zcnt_2D[3];

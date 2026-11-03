@@ -23,6 +23,7 @@ add_library(orbiter_reference_math STATIC Runtime.cpp NativeError.cpp
     "${_math_generated}/cos.s" "${_math_generated}/sin.s"
     "${_math_generated}/remainder_piby2_forAsm.s" "${_math_generated}/remainder_piby2_forFMA3.s"
     "${_math_generated}/Lsincos_array.s" "${_math_generated}/L2_by_pi_bits.s"
+    "${_math_generated}/exp.s" "${_math_generated}/two_to_jby64_table.s" "${_math_generated}/two_to_jby64_head_tail_table.s"
     "${_math_generated}/atan2.c" "${_math_generated}/asin_fma.c" "${_math_generated}/asin_sse2.c")
 set_target_properties(orbiter_reference_math PROPERTIES POSITION_INDEPENDENT_CODE ON
     C_VISIBILITY_PRESET hidden CXX_VISIBILITY_PRESET hidden)

@@ -27,6 +27,17 @@ class Driver final:public oapi::Module {
     bool started=false,initialized=false;
     std::ofstream air,controller,horizon;
     template<class F>void guarded(F action){try{action();}catch(const std::exception& e){std::ofstream("cockpit-failure.txt")<<e.what()<<'\n';std::exit(42);}}
+    void recordLibraries() {
+        std::ofstream loaded("lua-loaded.txt");
+        for(const auto* name:{"LuaInline.dll","LuaInterpreter.dll","lua.dll"}) {
+            auto library=GetModuleHandleA(name);
+            wchar_t path[32768];
+            auto count=library ? GetModuleFileNameW(library,path,32768) : 0;
+            require(count>0 && count<32768 && std::filesystem::equivalent(path,std::filesystem::current_path()/name),
+                    "Original app-local Lua module missing");
+            loaded<<name<<'\n';
+        }
+    }
     void sampleController() {
         if (target!="DG" || frames<31 || frames>46) return;
         // The original script stores these intermediates in globals. Observe
@@ -64,9 +75,15 @@ class Driver final:public oapi::Module {
         require(ref!=nullptr,"Missing original surface reference");
         MATRIX3 rot;
         oapiGetRotationMatrix(ref,&rot);
+        // Reconstruct the latitude input independently using public SDK coordinates.
+        VECTOR3 globalPosition{},planetLocal{};
+        v->GetGlobalPos(globalPosition);
+        oapiGlobalToLocal(ref,&globalPosition,&planetLocal);
+        const double asinInput=planetLocal.y/rad;
         horizon<<tick;
         for(double value:{global.x,global.y,global.z,local.x,local.y,local.z,horizontal.x,horizontal.y,horizontal.z,
-                          lng,lat,rad,rot.m11,rot.m12,rot.m13,rot.m21,rot.m22,rot.m23,rot.m31,rot.m32,rot.m33})
+                          lng,lat,rad,rot.m11,rot.m12,rot.m13,rot.m21,rot.m22,rot.m23,rot.m31,rot.m32,rot.m33,
+                          planetLocal.x,planetLocal.y,planetLocal.z,asinInput,std::asin(asinInput)})
             horizon<<','<<value;
         horizon<<'\n';
     }
@@ -85,7 +102,7 @@ public:
         std::ifstream input("cockpit-case.txt");require(bool(input>>target>>total>>cockpit>>left>>right>>hud>>profile),"Invalid cockpit fixture controls");
         require(total==60 && cockpit>=1 && cockpit<=3 && left>=1 && left<=10 && right>=1 && right<=10,"Unsupported cockpit control schedule");
         for(auto* stream:{&state,&events,&controls,&air,&controller,&horizon}){stream->imbue(std::locale::classic());stream->exceptions(std::ios::badbit|std::ios::failbit);}
-        horizon.open("lua-horizon.csv");horizon<<std::setprecision(17)<<"tick,global_x,global_y,global_z,ref_x,ref_y,ref_z,horizon_x,horizon_y,horizon_z,lng,lat,rad,m11,m12,m13,m21,m22,m23,m31,m32,m33\n";
+        horizon.open("lua-horizon.csv");horizon<<std::setprecision(17)<<"tick,global_x,global_y,global_z,ref_x,ref_y,ref_z,horizon_x,horizon_y,horizon_z,lng,lat,rad,m11,m12,m13,m21,m22,m23,m31,m32,m33,position_local_x,position_local_y,position_local_z,reconstructed_asin_input,reconstructed_latitude\n";
         controller.open("lua-controller.csv");controller<<std::setprecision(17)<<"tick,alt,sl,dslope,delev,elev,dbnk,rate,dail,ail,thrott,dthrott,xz,as_x,as_y,as_z\n";
         std::ofstream("math-host.txt")<<"fma3_enabled="<<_get_FMA3_enable()<<'\n';
         air.open("lua-air.csv");air<<std::setprecision(17)<<"tick,density,dynamic_pressure,airspeed\n";
@@ -111,62 +128,7 @@ public:
             require(oapiCameraInternal() && oapiCockpitMode()==cockpit,"Scenario cockpit failed to initialize");
             oapiOpenMFD(left,0);oapiOpenMFD(right,1);oapiSetHUDMode(hud);initialized=true;snapshot();
         }
-        if(frames==0) {
-            script=oapiCreateInterpreter();require(script!=nullptr,"Original Lua interpreter creation failed");
-            require(oapiGetLua(script)!=nullptr,"Original Lua state missing");
-            std::ofstream loaded("lua-loaded.txt");
-            for(const auto* name:{"LuaInline.dll","LuaInterpreter.dll","lua.dll"}) {
-                auto library=GetModuleHandleA(name);
-                wchar_t path[32768];
-                auto count=library ? GetModuleFileNameW(library,path,32768) : 0;
-                require(count>0 && count<32768 && std::filesystem::equivalent(path,std::filesystem::current_path()/name),
-                        "Original app-local Lua module missing");
-                loaded<<name<<'\n';
-            }
-            const char* setup=R"lua(
-                audit_count=0
-                function audit(event)
-                    local file=assert(io.open('lua-events.csv','a'))
-                    file:write(string.format('%s,%.17g,%.17g\n',event,oapi.get_simtime(),oapi.get_simstep()))
-                    file:close()
-                    audit_count=audit_count+1
-                end
-                audit('sync_initial')
-            )lua";
-            std::ofstream("lua-events.csv")<<"event,seconds,step\n";
-            require(oapiExecScriptCmd(script,setup),"Synchronous original Lua setup failed");
-            if(target=="DG") {
-                require(oapiExecScriptCmd(script,"run('dg/aap'); setvessel(vessel.get_interface('DG')); assert(v~=nil); audit('aap_loaded')"),"Original DG AAP script failed");
-            }
-        }
-        if(frames==10) {
-            require(oapiAsyncScriptCmd(script,"audit('async_one')"),"First original asynchronous command failed");
-            require(oapiAsyncScriptCmd(script,"audit('async_two')"),"Second original asynchronous command failed");
-            require(oapiExecScriptCmd(script,"audit('sync_override')"),"Original synchronous override failed");
-        }
-        if(frames==20) {
-            require(oapiAsyncScriptCmd(script,"for i=1,4 do audit('yield_'..i); proc.skip() end; audit('yield_done')"),"Original yielding command failed");
-        }
-        if(frames==30) {
-            secondary=oapiCreateInterpreter();require(secondary!=nullptr,"Second original interpreter missing");
-            require(oapiExecScriptCmd(secondary,"assert(audit_count==nil); local f=assert(io.open('lua-isolation.txt','w')); f:write('isolated'); f:close()"),"Original interpreter isolation failed");
-            if(target=="DG") {
-                const char* start=profile=="atmosphere" ?
-                    "aap.alt(altitude()+500); aap.spd(airspeed()-25); aap.bank(5); audit('aap_started')" :
-                    "aap.alt(20000); aap.spd(9000); aap.bank(5); audit('aap_started')";
-                require(oapiAsyncScriptCmd(script,start),"Original AAP activation failed");
-            }
-        }
-        if(frames==38 && profile=="atmosphere")
-            require(oapiAsyncScriptCmd(script,"aap.spd(airspeed()+50); audit('aap_retargeted')"),"Original AAP speed retarget failed");
-        if(frames==42 && profile=="atmosphere")
-            require(oapiAsyncScriptCmd(script,"aap.spd(airspeed()-25); audit('aap_slowed')"),"Original AAP speed reduction failed");
-        if(frames==45) {
-            require(oapiDelInterpreter(secondary)==0,"Original secondary interpreter deletion failed");secondary=nullptr;
-            if(target=="DG")require(oapiAsyncScriptCmd(script,"aap.alt(); aap.spd(); aap.bank(); audit('aap_stopped')"),"Original AAP stop failed");
-        }
-        if(frames==54)require(oapiExecScriptCmd(script,"audit('complete')"),"Original Lua completion failed");
-        if(frames==55) {require(oapiDelInterpreter(script)==0,"Original interpreter deletion failed");script=nullptr;}
+#include "ScriptSchedule.inc"
 
     });}
     void core(const char* phase,const char* object,double seconds,double mjd,int running){guarded([&]{

@@ -59,6 +59,18 @@
     "sincos_special.c": {
       "upstream_sha256": "575b7b287f8f54b19236397fefb00fb6786654b1c1e16866290747f89de6e1df",
       "sha256_lf": "575b7b287f8f54b19236397fefb00fb6786654b1c1e16866290747f89de6e1df"
+    },
+    "exp.asm": {
+      "upstream_sha256": "be54e46e6cf16d3840f6ad88d3ce7987c77a9ba8ca436b686848f6111d6db1ac",
+      "sha256_lf": "be54e46e6cf16d3840f6ad88d3ce7987c77a9ba8ca436b686848f6111d6db1ac"
+    },
+    "two_to_jby64_table.asm": {
+      "upstream_sha256": "54e46ac4bb240addae9f61214e641e48cbfe27c1d6dbc3d03e3d0ceaf5270f0a",
+      "sha256_lf": "54e46ac4bb240addae9f61214e641e48cbfe27c1d6dbc3d03e3d0ceaf5270f0a"
+    },
+    "two_to_jby64_head_tail_table.asm": {
+      "upstream_sha256": "4f976db10ef772f2b06d80ac906e7503ecc951db96c42f39ae0f2a507a7ac4b7",
+      "sha256_lf": "4f976db10ef772f2b06d80ac906e7503ecc951db96c42f39ae0f2a507a7ac4b7"
     }
   }
 }
