@@ -75,6 +75,13 @@ Sanitizer flights now finish without the previous aircraft initialization,
 light destruction, panel texture and virtual-cockpit vertex-buffer errors.
 LeakSanitizer still reports two 56-byte allocations per flight. Loader maps
 place both allocation sites in Mesa libgallium 26.0.8.
+Matching driver debug symbols now identify `u_mmInit`, reached from
+`rtasm_exec_malloc` during mipmap generation. A
+[standalone EGL reproduction](../../Tests/Production/GraphicsDriverLifetime/README.md)
+reproduces the same 112 bytes without Orbiter, X11 or GLFW; its no-mipmap control
+is clean. The driver retains its global executable-memory heap across context
+destruction and never releases it on library unload. This identifies the cause;
+the unsuppressed lifetime gate still requires a cleanup fix.
 
 ## Earlier integration milestones
 
