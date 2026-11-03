@@ -218,6 +218,8 @@ Vessel::~Vessel ()
 	ClearVariableDragElements();
 	ClearBeacons();
 	ClearAttachments();
+	delete []attach_status.pname;
+	attach_status.pname = nullptr;
 	ClearAnimSeqs(); // obsolete
 	ClearAnimations (false);
 	ClearTouchdownPoints();

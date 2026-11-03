@@ -66,7 +66,12 @@ def with_sparse_mesh_slots(source):
     return source[:start]+copy+source[end:]
 
 def restore_startup_cleanup(source):
-    """Accept only class-name, unresolved dock-token and temporary-array cleanup."""
+    """Accept only class-name, unresolved dock/attachment-token and temporary-array cleanup."""
+    original='\tClearAttachments();'
+    repaired=original+'\n\tdelete []attach_status.pname;\n\tattach_status.pname = nullptr;'
+    if source.count(repaired)!=1:
+        raise ValueError('Declared unresolved attachment-name cleanup differs')
+    source=source.replace(repaired,original,1)
     original='\tif (!OpenConfigFile (classf))\n\t\tGetVesselServices().Fatal("Vessel initialization failed"); // PANIC!'
     repaired='\tif (!OpenConfigFile (classf)) {\n\t\tdelete []classname;\n\t\tclassname = nullptr;\n\t\tGetVesselServices().Fatal("Vessel initialization failed"); // PANIC!\n\t}'
     if source.count(repaired)!=3:
