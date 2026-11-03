@@ -28,7 +28,8 @@ def main():
                 for key in ('elevator','aileron','main'):
                     if x[key]!=y[key]:
                         differences.append(dict(tick=int(x['tick']),control=key,debug=x[key],release=y[key]))
-            divergence[case['id']]=dict(controls=differences,controller_inputs={build:rows(d/'lua-controller.csv') for build,d in zip(('Debug','Release'),directories)})
+            divergence[case['id']]=dict(controls=differences,controller_inputs={build:rows(d/'lua-controller.csv') for build,d in zip(('Debug','Release'),directories)},
+                pre_lua_horizon={build:rows(d/'lua-horizon.csv') for build,d in zip(('Debug','Release'),directories)})
     report=dict(status='failed' if divergence else 'passed',cases=results,mfd_images=mfd_images(args.debug,args.release,config),exact_lua_execution=not divergence)
     if divergence:report['cross_build_differences']=divergence
     args.output.write_text(json.dumps(report,indent=2)+'\n')

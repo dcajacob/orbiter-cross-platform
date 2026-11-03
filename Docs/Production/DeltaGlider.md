@@ -105,3 +105,23 @@ scenario SDK shares the original readers, writers and floating-point format
 with Windows. A 60-frame ShuttlePB run exercised HUD mode switching, docking
 receiver selection, brightness and subsystem scenario round trips. DG panel
 click areas and VC rendering still need verification on the actual DG vessels.
+
+The cockpit engine now builds the original main vessel class, DG Lua callbacks,
+stock instruments and 15 subsystems into `NativeModules/Vessel/DeltaGlider.so`.
+The shared module links with `--no-undefined`. Native DG and DG-S activation
+from their original atmospheric scenario states reaches the AAP constructor.
+Both launches currently stop on the missing `Plugin/LuaInline.so`. The engine
+loads that provider on demand and dispatches script work after vessel post-step
+callbacks. The original LuaInline environment list and module entry compile.
+Finishing the main interpreter library is required before either flight can run.
+The native scenario reader also bounds skin names and validates passenger seat
+numbers. The Windows scenario editor pages remain in the Windows build.
+
+The paired Windows capture at 1f71edba traced the first controller difference
+to the vertical component of the horizon airspeed vector supplied to Lua.
+At tick 34 Debug returned 29.924461703343582 m/s and Release returned
+29.92446170334356 m/s. The horizontal components and `xz` were identical.
+The next capture records Earth rotation, equatorial position and velocities
+in global, planet-local and horizon frames immediately before Lua runs.
+The exact cross-build control requirement is still open.
+[Paired original Windows capture](https://github.com/dcajacob/orbiter-cross-platform/actions/runs/41555762691)

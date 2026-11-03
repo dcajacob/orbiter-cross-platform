@@ -57,6 +57,8 @@ def validate(directory,case):
     if case['target']=='DG':
         controller=rows(directory/'lua-controller.csv')
         require([int(r['tick']) for r in controller]==list(range(31,47)), 'Incomplete original AAP intermediates')
+        horizon=rows(directory/'lua-horizon.csv')
+        require([int(r['tick']) for r in horizon]==list(range(31,47)), 'Incomplete pre-Lua horizon observations')
         require(any(abs(float(row['elevator']))>0 or abs(float(row['aileron']))>0 for row in control if 31<=int(row['tick'])<=45),'Original AAP did not actuate stock control surfaces')
         # The post-step stop clears the demands. Actual stock surfaces slew
         # back from saturation by 0.25 per subsequent quarter-second frame.
@@ -117,7 +119,7 @@ def main():
                 if case['target']=='DG':
                     observed['aap_script_sha256']=digest(directory/'Script/DG/aap.lua')
                 observations.append(observed);directories.append(directory)
-            for name in ('cockpit-state.csv','instrument-text.csv','instrument-geometry.csv','instrument-self-blits.csv','lua-events.csv','lua-controls.csv','lua-air.csv','lua-controller.csv'):
+            for name in ('cockpit-state.csv','instrument-text.csv','instrument-geometry.csv','instrument-self-blits.csv','lua-events.csv','lua-controls.csv','lua-air.csv','lua-controller.csv','lua-horizon.csv'):
                 require((directories[0]/name).read_bytes()==(directories[1]/name).read_bytes(),'Original Lua repeat differs: '+name)
             similarity={str(f):image_ssim((directories[0]/f'instrument-{f}.rgba').read_bytes(),(directories[1]/f'instrument-{f}.rgba').read_bytes(),1280,720) for f in (20,50)}
             require(min(similarity.values())>=.98,'Original Lua image repeat exceeds budget')

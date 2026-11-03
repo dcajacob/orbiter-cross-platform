@@ -25,7 +25,7 @@ class Driver final:public oapi::Module {
     std::string target,profile;
     unsigned frames=0,total=0;int cockpit=0,left=0,right=0,hud=0;
     bool started=false,initialized=false;
-    std::ofstream air,controller;
+    std::ofstream air,controller,horizon;
     template<class F>void guarded(F action){try{action();}catch(const std::exception& e){std::ofstream("cockpit-failure.txt")<<e.what()<<'\n';std::exit(42);}}
     void sampleController() {
         if (target!="DG" || frames<31 || frames>46) return;
@@ -54,6 +54,22 @@ class Driver final:public oapi::Module {
         pop(L,-2);
         controller<<'\n';controller.flush();
     }
+    void sampleHorizon(unsigned tick) {
+        auto *v=oapiGetFocusInterface();
+        VECTOR3 global{},local{},horizontal{};
+        require(v && v->GetAirspeedVector(FRAME_GLOBAL,global) && v->GetAirspeedVector(FRAME_REFLOCAL,local) &&
+                v->GetAirspeedVector(FRAME_HORIZON,horizontal),"Missing original horizon velocity");
+        double lng,lat,rad;
+        OBJHANDLE ref=v->GetEquPos(lng,lat,rad);
+        require(ref!=nullptr,"Missing original surface reference");
+        MATRIX3 rot;
+        oapiGetRotationMatrix(ref,&rot);
+        horizon<<tick;
+        for(double value:{global.x,global.y,global.z,local.x,local.y,local.z,horizontal.x,horizontal.y,horizontal.z,
+                          lng,lat,rad,rot.m11,rot.m12,rot.m13,rot.m21,rot.m22,rot.m23,rot.m31,rot.m32,rot.m33})
+            horizon<<','<<value;
+        horizon<<'\n';
+    }
     void snapshot(){
         auto* v=oapiGetFocusInterface();require(v && target==v->GetName(),"Cockpit focus differs from required real vessel");
         VECTOR3 p{},velocity{},omega{};MATRIX3 rotation{};v->GetGlobalPos(p);v->GetGlobalVel(velocity);v->GetAngularVel(omega);v->GetRotationMatrix(rotation);
@@ -68,7 +84,8 @@ public:
     explicit Driver(HINSTANCE instance):Module(instance){guarded([&]{
         std::ifstream input("cockpit-case.txt");require(bool(input>>target>>total>>cockpit>>left>>right>>hud>>profile),"Invalid cockpit fixture controls");
         require(total==60 && cockpit>=1 && cockpit<=3 && left>=1 && left<=10 && right>=1 && right<=10,"Unsupported cockpit control schedule");
-        for(auto* stream:{&state,&events,&controls,&air,&controller}){stream->imbue(std::locale::classic());stream->exceptions(std::ios::badbit|std::ios::failbit);}
+        for(auto* stream:{&state,&events,&controls,&air,&controller,&horizon}){stream->imbue(std::locale::classic());stream->exceptions(std::ios::badbit|std::ios::failbit);}
+        horizon.open("lua-horizon.csv");horizon<<std::setprecision(17)<<"tick,global_x,global_y,global_z,ref_x,ref_y,ref_z,horizon_x,horizon_y,horizon_z,lng,lat,rad,m11,m12,m13,m21,m22,m23,m31,m32,m33\n";
         controller.open("lua-controller.csv");controller<<std::setprecision(17)<<"tick,alt,sl,dslope,delev,elev,dbnk,rate,dail,ail,thrott,dthrott,xz,as_x,as_y,as_z\n";
         std::ofstream("math-host.txt")<<"fma3_enabled="<<_get_FMA3_enable()<<'\n';
         air.open("lua-air.csv");air<<std::setprecision(17)<<"tick,density,dynamic_pressure,airspeed\n";
@@ -154,6 +171,8 @@ public:
     });}
     void core(const char* phase,const char* object,double seconds,double mjd,int running){guarded([&]{
         events<<frames<<','<<seconds<<','<<mjd<<','<<phase<<','<<object<<','<<running<<'\n';
+        if (target=="DG" && object && target==object && frames>=30 && frames<46 && std::string(phase)=="vessel.post.after")
+            sampleHorizon(frames+1);
         if(started && std::string(phase)=="app.frame.end"){
             require(initialized,"Original frame completed before cockpit setup");
             require(running!=0,"Unexpected paused reference frame");++frames;snapshot();
