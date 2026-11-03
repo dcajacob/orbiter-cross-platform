@@ -154,6 +154,8 @@ jobs:
           cmake -S OVP/OGLClient/Native -B out/native-cockpit-renderer -G Ninja -DCMAKE_BUILD_TYPE=${{ matrix.configuration }} -DORBITER_ENGINE_BUILD="$PWD/out/native-cockpit-engine" -DORBITER_RENDERER_DEPENDENCIES="$PWD/out/ogl-dependencies" -DGLFW_BUILD_WAYLAND=OFF 2>&1 | tee native-cockpit-renderer-configure.log
           cmake --build out/native-cockpit-renderer --parallel 2 2>&1 | tee native-cockpit-renderer-build.log
           python3 -B Tests/Production/NativeScene/module_exports.py out/native-cockpit-engine/NativeModules/Graphics/OGLClient.so
+      - name: Stage the original manuscript font before all cockpit scenarios
+        run: python3 -B Tests/Production/CockpitUI/prepare_fonts.py --assets out/scene-resources
       - name: Observe the unchanged full vessel API script and its intentional process exit twice
         run: >-
           xvfb-run -a -s '-screen 0 1920x1080x24' env LIBGL_ALWAYS_SOFTWARE=1 GALLIUM_DRIVER=llvmpipe
@@ -193,8 +195,6 @@ jobs:
           set -euo pipefail
           cmake --build out/native-cockpit-engine --target native_dg_mesh_resources --parallel 2
           python3 -B Tests/Production/DeltaGlider/mesh_resources.py --headers out/native-cockpit-engine/native-dg-include --output out/dg-mesh-resources.json
-      - name: Stage the original manuscript font for disposable cockpit tests
-        run: python3 -B Tests/Production/CockpitUI/prepare_fonts.py --assets out/scene-resources
       - name: Exercise stock VC mesh edits and registered MFD2 drawing, input and lifetime
         run: >-
           xvfb-run -a -s '-screen 0 1920x1080x24' env LIBGL_ALWAYS_SOFTWARE=1 GALLIUM_DRIVER=llvmpipe
