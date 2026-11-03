@@ -22,9 +22,12 @@ policy. This fixture currently changes no stock-corpus acceptance rule. All
 ordinary scenarios retain their sixty-frame requirement; a missing dependency,
 failed assertion, partial trace or early shutdown cannot become a pass.
 
-`Gate.Test.py` damages copied real captures in eleven ways, including a missing
+`Gate.Test.py` damages copied real captures in twelve ways, including a missing
 background ship, docking port or final tick, a forged completion log, a changed
 scenario and an incorrect exit code. The owning capture remains unchanged.
+The independent verifier checks the frozen LF identity of Windows scenario
+text and its actual pre-execution raw hash, allowing cross-platform audits
+while rejecting even a later line-ending rewrite.
 
 The preserved client's separate image probe requires a render at exactly
 12.5 simulation seconds. The unchanged API script selects time acceleration 10,

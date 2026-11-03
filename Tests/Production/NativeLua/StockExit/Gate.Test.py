@@ -32,7 +32,7 @@ def main():
 
     mutations = ['missing_background_ship', 'missing_docking_port', 'missing_last_tick', 'nonfinite_state',
                  'duplicate_docking_port', 'missing_assertion', 'forged_completion', 'wrong_scenario', 'wrong_exit_code',
-                 'incomplete_teardown', 'wrong_renderer']
+                 'incomplete_teardown', 'wrong_renderer', 'scenario_line_endings_rewritten']
     for label in mutations:
         with tempfile.TemporaryDirectory(prefix='orbiter-stock-exit-gate-') as temporary:
             view = Path(temporary)
@@ -68,6 +68,11 @@ def main():
             elif label == 'wrong_scenario':
                 name = 'Scenarios/Behavior.scn' if args.host == 'original-windows' else 'flight.scn'
                 change(view, name, (args.capture/name).read_bytes()+b'\n; changed test scenario\n')
+            elif label == 'scenario_line_endings_rewritten':
+                name = 'Scenarios/Behavior.scn' if args.host == 'original-windows' else 'flight.scn'
+                before_source = (args.capture/name).read_bytes()
+                rewritten = before_source.replace(b'\r\n', b'\n') if b'\r\n' in before_source else before_source.replace(b'\n', b'\r\n')
+                change(view, name, rewritten)
             elif label == 'wrong_exit_code': code = 7
             elif label == 'wrong_renderer':
                 name = 'stock-exit-renderer.json' if args.host == 'original-windows' else 'renderer-info.json'
@@ -83,7 +88,7 @@ def main():
     require(before == {p.name: digest(p) for p in args.capture.iterdir() if p.is_file()}, 'Original exit capture changed')
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(json.dumps(dict(status='passed', controls=rejected, original_capture_unchanged=True), indent=2)+'\n')
-    print('Eleven damaged exit captures rejected; original complete capture unchanged')
+    print('Twelve damaged exit captures rejected; original complete capture unchanged')
 
 
 if __name__ == '__main__': main()

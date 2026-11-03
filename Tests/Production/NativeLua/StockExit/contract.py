@@ -83,7 +83,15 @@ def inspect(out, config, host, returncode):
     require(returncode == config['expected_exit_code'], 'Stock script did not return the original exit code')
     require(not (out/'stock-exit-failure.txt').exists(), 'Stock exit observer failed')
     scenario = out/('Scenarios/Behavior.scn' if host == 'original-windows' else 'flight.scn')
-    require(scenario.read_bytes() == (ROOT/'Scenarios'/config['scenario']).read_bytes(), 'Stock scenario bytes changed')
+    if host == 'original-windows':
+        # Windows checkout line endings differ from the Linux verifier. The
+        # frozen LF identity and the actual pre-execution raw hash both hold.
+        require(sha_lf(scenario) == config['scenario_sha256_lf'], 'Stock scenario bytes changed')
+        invocation = json.loads((out/'invocation.json').read_text())
+        require(digest(scenario) == invocation['input_sha256']['Scenarios/Behavior.scn'],
+                'Executed original scenario changed after staging')
+    else:
+        require(scenario.read_bytes() == (ROOT/'Scenarios'/config['scenario']).read_bytes(), 'Stock scenario bytes changed')
     text = (out/('Orbiter.log' if host == 'original-windows' else 'console.txt')).read_text(errors='replace')
     require(not any(marker in text for marker in ERRORS), 'Stock assertion, Lua, runtime or sanitizer error')
     events = expected_events(config)
