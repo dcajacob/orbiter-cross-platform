@@ -581,7 +581,7 @@
     },
     "Src/Orbiter/Production/CMakeLists.txt": {
       "original_sha256_lf": null,
-      "sha256_lf": "147e617790b8e73133d903ebe0c045c6d8f66bbb5369f981da1054f72fa70926",
+      "sha256_lf": "24bc3a307d9b668ac035cde9c353cdba02b05aa11017093896e0c481cf70fc22",
       "scope": "Original ten stock MFD declarations use exact platform SDK aliases; shared original conic geometry is moved without calculation or screen-mapping changes. Full native instrument runtime remains incomplete."
     },
     "Src/Orbiter/Production/CameraServices.cpp": {
@@ -741,7 +741,7 @@
     },
     "Src/Orbiter/Production/NativeApplication.cpp": {
       "original_sha256_lf": null,
-      "sha256_lf": "209164cf158c03f73b44317df9353680129716fcc7d0a5f9cf5c02126f49d8ec"
+      "sha256_lf": "15a69a7c2021e9a999c52e2b564c8830acbc772859ad927832865865bfe75e7f"
     },
     "Src/Orbiter/Production/NativeBuild.h.in": {
       "sha256_lf": "f5fb21f83bb6be0c54839fce670e8410f6911eda86da2eef26e4221c1ae25d97",
@@ -1308,7 +1308,7 @@
     },
     "Src/Orbiter/Production/NativeCockpitGui.cpp": {
       "original_sha256_lf": null,
-      "sha256_lf": "e1d9ca77108a876d847f878a8b5d78c78afdd7d7caf9dbc89c6f806da4b69318"
+      "sha256_lf": "ec6f0615629172fee6cd653ad1eadc4b27c9f5234c2d379b84c024c716c6f6ea"
     },
     "Src/Orbiter/Production/NativeCockpitProjection.cpp": {
       "original_sha256_lf": null,
@@ -1336,7 +1336,7 @@
     },
     "Src/Orbiter/Production/NativeCockpitUi.h": {
       "original_sha256_lf": null,
-      "sha256_lf": "15a38caf0fd70d084fb3e7056ec5a6d01a19edb74db725f2c5e5d9392f4dbaf1"
+      "sha256_lf": "e9b23611b507d05ad02ba66b0fb73406ee21349eea6db1c16f61a6f619e77524"
     },
     "Src/Module/LuaScript/Native/CMakeLists.txt": {
       "original_sha256_lf": null,
@@ -1821,6 +1821,16 @@
     "Src/Orbiter/Production/CockpitPanelInput.inc": {
       "original_sha256_lf": null,
       "sha256_lf": "999bbec8974b8933abd4f391ade22de531b50500aa1349bec1acea670556bfa3"
+    },
+    "Src/Orbiter/Production/CockpitSystemInput.inc": {
+      "original_sha256_lf": null,
+      "sha256_lf": "92ef79dc3bb969a1d03b60c7574ec7ed547e59f909e13dba4bd4b1782f0edde2",
+      "scope": "Verbatim Orbiter::KbdInputImmediate_System from the preserved production source, with its existing panel block included separately. flight_source.py checks the expanded complete body."
+    },
+    "Src/Orbiter/Production/CockpitFovInput.inc": {
+      "original_sha256_lf": null,
+      "sha256_lf": "f43afd96c1513a8f6e5794d28413fe60abdcca9d3a9a320ef95185aaea8ba2d3",
+      "scope": "Verbatim Orbiter::IncFOV body and forced-refresh flag assignment, checked by flight_source.py. The native host supplies its actual camera/time/force bindings."
     }
   }
 }

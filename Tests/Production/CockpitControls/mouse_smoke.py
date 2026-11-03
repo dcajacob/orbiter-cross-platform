@@ -26,12 +26,16 @@ def main():
     p.add_argument('--configuration',choices=('Debug','Release'),default='Debug')
     p.add_argument('--mechanisms',action='store_true',help='Also operate and quicksave all seven DG mechanisms with real keys')
     p.add_argument('--panel-mechanisms',action='store_true',help='Pan the original DG 2D panels and operate all seven mechanisms with real mouse input')
+    p.add_argument('--vc-mechanisms',action='store_true',help='Aim the original VC camera and operate all seven mechanisms with real mouse input')
     for name in ('executable','assets','data','modules','planets','output'):p.add_argument('--'+name,type=Path,required=True)
     a=p.parse_args();out=a.output.resolve();require(not out.exists(),'Mouse output exists; replacement is forbidden');out.mkdir(parents=True)
+    (out/'mouse-driver.py').write_bytes(Path(__file__).read_bytes())
     case=next(case for case in cases if case['id']==a.case)
     require(not a.mechanisms or case['cockpit']!=1,'Mechanism input requires a DG panel or VC')
     require(not a.panel_mechanisms or case['cockpit']==2,'Panel mechanism input requires a DG 2D panel')
-    dg_input=a.mechanisms or a.panel_mechanisms
+    require(not a.vc_mechanisms or case['cockpit']==3,'VC mechanism input requires a DG virtual cockpit')
+    require(sum((a.mechanisms,a.panel_mechanisms,a.vc_mechanisms))<=1,'Select one mechanism transport per session')
+    dg_input=a.mechanisms or a.panel_mechanisms or a.vc_mechanisms
     points=[(85,136),(54,136)]
     reference=None
     if case['cockpit']!=1:
@@ -120,6 +124,7 @@ def main():
     (out/'Orbiter.cfg').write_text((ROOT/'Tests/Production/NativeScene/Orbiter.cfg').read_text()+'\nFPS = 0\nMenubarMode = 1\nInfobarMode = 1\nInstrumentUpdateInterval = 0.25\n')
     (out/'control-evidence.enabled').write_text('Actual owned X11 window mouse transport\n')
     if a.panel_mechanisms:(out/'panel-picking.enabled').write_text('Read-only original panel geometry\n')
+    if a.vc_mechanisms:(out/'vc-picking.enabled').write_text('Read-only original VC camera geometry\n')
     argv=[str(a.executable.resolve())]
     for name in ('assets','data','modules','planets'):argv+=['--'+name,str(getattr(a,name).resolve())]
     keymap=ROOT/'Tests/Production/Flight'/('keymap-dg-laptop.cfg' if dg_input else 'keymap-laptop.cfg')
@@ -165,10 +170,18 @@ def main():
             mechanisms=None
             bindings=None
             panel_mechanisms=None
+            vc_mechanisms=None
             panel_points=[]
+            vc_points=[]
             if a.panel_mechanisms:
                 from window_panel import operate
                 panel_mechanisms,panel_points=operate(out,window,key,button,title)
+            if a.vc_mechanisms:
+                from window_vc import operate
+                sys.path.insert(0,str(HERE.parent/'CockpitUI'))
+                from window_capture import capture
+                vc_mechanisms,vc_points=operate(out,window,key,button,title,
+                    lambda name:capture(x,display,window,out/name))
             if a.mechanisms:
                 from window_bindings import verify
                 bindings=verify(out,window,key)
@@ -234,7 +247,14 @@ def main():
                         'Panel panning reactivated on focus regain')
                 panel_mechanisms.update(focus_loss_stops_panning=True,focus_loss_layout=stopped,
                     focus_transfer=dict(destination=focus_sink,held_input_tick=panning[0],released_input_tick=cleared[0]))
+            if vc_mechanisms:
+                from window_vc import verify_focus
+                def transfer(target):x.XSetInputFocus(display,target,1,0);x.XSync(display,False)
+                vc_mechanisms['camera_focus']=verify_focus(out,window,focus_sink,key,transfer,focused)
             x.XDestroyWindow(display,focus_sink);focus_sink=0;x.XFlush(display)
+            if vc_mechanisms:
+                from window_vc import verify_camera_keys
+                vc_mechanisms['camera_keys']=verify_camera_keys(out,window,key,title)
             def left_mode():
                 row=latest_state()
                 return int(row['left_mfd']) if row else -1
@@ -258,7 +278,10 @@ def main():
             if panel_mechanisms:
                 from window_panel import verify_completed
                 verify_completed(out,panel_mechanisms)
-            points=panel_points+points
+            if vc_mechanisms:
+                from window_vc import verify_completed
+                verify_completed(out,vc_mechanisms)
+            points=panel_points+vc_points+points
             inputs=list(csv.DictReader((out/'control-inputs.csv').open()))
             require([(r['event'],int(r['x']),int(r['y'])) for r in inputs]==[(kind,px,py) for px,py in points for kind in ('left_down','left_up')],'Actual GLFW events or framebuffer coordinates differ')
             state=list(csv.DictReader((out/'cockpit-state.csv').open()));require({int(r['rcs_mode']) for r in state}==({0,1,2} if a.mechanisms else {1,2}),'Finalized actual vessel modes were not observed')
@@ -288,7 +311,7 @@ def main():
                 driver_sha256=DRIVER_SHA256,
                 actual_rcs_mode_buttons=True,mfd_power_off_on=case['cockpit']==1,mfd_mode_surface_orbit=case['cockpit']==1,
                 momentary_keyboard_rcs=True,focus_loss_release=True,verified_focus_transfer=focus_transfer,finalized_release_samples=released,mouse_events=inputs,
-                lifecycle=life,screenshot_sha256=digest(out/'owned-cockpit.png'),mechanisms=mechanisms,keyboard_modes=bindings,panel_mechanisms=panel_mechanisms,
+                lifecycle=life,screenshot_sha256=digest(out/'owned-cockpit.png'),mechanisms=mechanisms,keyboard_modes=bindings,panel_mechanisms=panel_mechanisms,vc_mechanisms=vc_mechanisms,
                 keymap=keymap.relative_to(ROOT).as_posix(),keymap_sha256=digest(keymap))
             if dg_input:report.update(bare_key_neutrality_samples=bare,precision_rcs=True,full_rcs_samples=full,precision_rcs_samples=precision)
             (out/'mouse-verification.json').write_text(json.dumps(report,indent=2)+'\n');print(json.dumps(report,indent=2))

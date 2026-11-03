@@ -36,8 +36,17 @@ then actual mouse presses to open and close all seven mechanisms. It verifies
 paused panning, original clamps, key/focus release, complete mechanism travel
 and both original scenario endpoints. Select `controls_dg_panel` or
 `controls_dgs_panel`; it uses no mechanism shortcut keys. VC mechanism mouse
-picking and wider DG subsystem acceptance remain separate gates. No production algorithm, accepted
+picking is covered by the sibling `--vc-mechanisms` flow, which uses real
+Alt+arrow camera keys and observed projection of the original control quads.
+It also checks Home, FOV/external camera keys, paused movement and focus release.
+Wider DG subsystem acceptance remains separate. No production algorithm, accepted
 reference or numerical budget changes.
+
+The DG profile uses Alt+PageUp/PageDown for main thrust and Alt+Home/End for
+hover, preserving the bare camera bindings. `thrust_profile.py` runs both
+gliders in both cockpit modes through native replay input, checks independent
+monotonic engine controls, original latched release and fully closed zero
+stops, and verifies that bare camera keys do not fire engines.
 
 ```sh
 DISPLAY=:0 python3 -B Tests/Production/CockpitControls/mouse_smoke.py \
@@ -47,6 +56,17 @@ DISPLAY=:0 python3 -B Tests/Production/CockpitControls/mouse_smoke.py \
   --assets out/scene-resources --data out/data \
   --modules out/native-cockpit-engine/NativeModules --planets out/planets \
   --output out/real-dg-panel-mouse
+```
+
+For VC picking, select `--case controls_dg_vc --vc-mechanisms` or
+`--case controls_dgs_vc --vc-mechanisms` with the same paths and a new output.
+Run the separate engine-binding checks with:
+
+```sh
+xvfb-run -a env LIBGL_ALWAYS_SOFTWARE=1 GALLIUM_DRIVER=llvmpipe \
+  python3 -B Tests/Production/DeltaGlider/thrust_profile.py \
+  --build out/native-cockpit-engine --assets out/scene-resources \
+  --data out/data --planets out/planets --output out/native-dg-keymap
 ```
 
 Run with an already built, matching engine/renderer and staged stock assets:

@@ -69,8 +69,22 @@ including paused operation. The tests verify complete animation travel,
 original saved open/closed stops and cancellation on key release and measured
 focus loss. All four normal native build/profile pairs and Intel/software
 sanitizer runs pass. These checks preserve the frozen references and budgets;
-hosted panel qualification and VC mechanism picking remain open.
+hosted qualification and broader interactive systems acceptance remain open.
 [Panel mouse evidence](DGPanelMouseVerification.json)
+
+VC mechanism picking now passes the same complete open/close/save checks in
+both gliders, using real camera keys and mouse presses through original hit
+testing. The complete original system camera/panel/FOV keyboard body is shared
+with the native host. Paused movement, Home, continuous FOV, external distance
+and rotation, and measured camera focus-loss release are checked as well.
+The DG profile reserves bare Home/PageUp/PageDown for camera controls and uses
+Alt+Home/End and Alt+PageUp/PageDown for hover/main thrust. A failed probe caught
+the former Home/hover collision; four further real-vessel cases verify the
+modified thrust bindings. Normal native profiles and Intel/software sanitizer
+flows pass; all twenty Lua schedules remain exact against original Windows.
+Mouse camera input, remaining FOV shortcuts, off-axis original image comparisons, wider systems
+and physical-controller acceptance remain open.
+[VC camera and mouse evidence](DGVCMouseVerification.json)
 
 Both native vessels now load the stock Lua interpreter and LuaInline worker and
 fly with the original AAP in the 2D panel and virtual cockpit. In each 48-frame

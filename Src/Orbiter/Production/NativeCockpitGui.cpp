@@ -12,6 +12,8 @@
 #include "Panel2D.h"
 #include "Camera.h"
 #include "Keymap.h"
+#include "Vessel.h"
+#include "TimeData.h"
 #include "Mfd.h"
 #include "NativeCockpitUi.h"
 #include <memory>
@@ -238,17 +240,24 @@ std::ofstream uiFrames;
 std::ofstream menuWindows;
 std::ofstream optionsState;
 std::ofstream panelLayout;
+std::ofstream cameraLayout;
 ImGuiID replayClockHook=0;
 float replayClockStep=0;
 std::ofstream replayClockTrace;
 }
 
 namespace orbiter::production {
-void HandleCockpitPanelKeys(const Keymap& keymap,char* kstate) {
+void HandleCockpitSystemKeys(const Keymap& keymap,char* kstate,bool& g_bForceUpdate) {
     const auto& context=GetNativeRenderContext();
-    if(context.camera->IsExternal() || !context.cockpitPane)return;
+    auto* g_camera=context.camera;
     auto* g_pane=context.cockpitPane;
-#include "CockpitPanelInput.inc"
+    auto& td=*context.time;
+    auto IncFOV=[&](double dfov) {
+#include "CockpitFovInput.inc"
+    };
+    using std::min;
+    using std::max;
+#include "CockpitSystemInput.inc"
 }
 void OpenCockpitFocusDialog() {
     if (!focusDialog) focusDialog=std::make_unique<DlgFocus>();
@@ -269,6 +278,11 @@ void CreateCockpitGui() {
             panelLayout.open(context.evidence/"panel-layout.csv");
             panelLayout.precision(17);
             panelLayout<<"tick,mode,panel_id,scale,x,y\n";
+        }
+        if(std::filesystem::is_regular_file(context.evidence/"vc-picking.enabled")) {
+            cameraLayout.open(context.evidence/"cockpit-camera.csv");
+            cameraLayout.precision(17);
+            cameraLayout<<"tick,mode,internal,distance,phi,theta,aperture,x,y,z,m11,m12,m13,m21,m22,m23,m31,m32,m33\n";
         }
         const auto& fonts = context.configuration->CfgFontPrm;
         auto load = [&](const char* file, const ImFontConfig* options = nullptr) {
@@ -341,6 +355,7 @@ void DestroyCockpitGui() {
     if(menuWindows.is_open())menuWindows.close();
     if(optionsState.is_open())optionsState.close();
     if(panelLayout.is_open())panelLayout.close();
+    if(cameraLayout.is_open())cameraLayout.close();
     if(uiEvidence.is_open())uiEvidence.close();
     if(uiFrames.is_open())uiFrames.close();
     if(replayClockTrace.is_open())replayClockTrace.close();
@@ -390,6 +405,17 @@ void BeginCockpitGuiFrame() {
     if(uiFrames.is_open()){uiFrames<<ImGui::GetFrameCount()<<'\n';uiFrames.flush();}
 }
 void ObserveCockpitGui(unsigned tick) {
+    if(cameraLayout.is_open()) {
+        const auto& context=GetNativeRenderContext();
+        const auto& camera=*context.camera;
+        const auto& vessel=*context.focus;
+        const Vector position=tmul(vessel.GRot(),camera.GPos()-vessel.GPos());
+        const Matrix rotation=transp(vessel.GRot())*camera.GRot();
+        cameraLayout<<tick<<','<<context.cockpitPane->GetPanelMode()<<','<<camera.IsInternal()<<','<<camera.Distance()<<','<<camera.Phi()<<','<<camera.Theta()<<','<<camera.Aperture();
+        for(double value:{position.x,position.y,position.z})cameraLayout<<','<<value;
+        for(double value:rotation.data)cameraLayout<<','<<value;
+        cameraLayout<<'\n';cameraLayout.flush();
+    }
     if(panelLayout.is_open()) {
         auto* pane=GetNativeRenderContext().cockpitPane;
         auto* panel=pane ? pane->GetPanel2D() : nullptr;

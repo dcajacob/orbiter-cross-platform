@@ -1073,10 +1073,10 @@ struct Runtime final:BodyServices,RigidBodyServices,SurfaceServices,NavigationSe
         time.BeginStep(dt,running);
 #endif
 #ifdef ORBITER_NATIVE_COCKPIT
-        HandleCockpitPanelKeys(controls.keymap,input.keys.data());
+        FlightInput snapshot=input;
+        for (std::size_t i=0;i<simulatedKeys.size();++i) snapshot.keys[i]|=simulatedKeys[i];
+        HandleCockpitSystemKeys(controls.keymap,snapshot.keys.data(),force);
         if(running) {
-            FlightInput snapshot=input;
-            for (std::size_t i=0;i<simulatedKeys.size();++i) snapshot.keys[i]|=simulatedKeys[i];
             simulatedKeys.fill(0);
             controls.Immediate(*render.focus,time,snapshot);
         }

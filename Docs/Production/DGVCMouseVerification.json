@@ -1,0 +1,983 @@
+{
+  "schema": 1,
+  "status": "passed",
+  "scope": "Original immediate system keyboard camera/panel/FOV route, seven DG/DG-S VC mechanism mouse controls and camera/engine key separation; full Phase 6 remains in progress",
+  "source_worktree_base": "db0c0b268d1e780d4a07c4e189fbc6ff7173d93a",
+  "sources_sha256": {
+    "Src/Orbiter/Production/NativeApplication.cpp": "15a69a7c2021e9a999c52e2b564c8830acbc772859ad927832865865bfe75e7f",
+    "Src/Orbiter/Production/NativeCockpitGui.cpp": "ec6f0615629172fee6cd653ad1eadc4b27c9f5234c2d379b84c024c716c6f6ea",
+    "Src/Orbiter/Production/NativeCockpitUi.h": "e9b23611b507d05ad02ba66b0fb73406ee21349eea6db1c16f61a6f619e77524",
+    "Src/Orbiter/Production/CMakeLists.txt": "24bc3a307d9b668ac035cde9c353cdba02b05aa11017093896e0c481cf70fc22",
+    "Src/Orbiter/Production/CockpitSystemInput.inc": "92ef79dc3bb969a1d03b60c7574ec7ed547e59f909e13dba4bd4b1782f0edde2",
+    "Src/Orbiter/Production/CockpitFovInput.inc": "f43afd96c1513a8f6e5794d28413fe60abdcca9d3a9a320ef95185aaea8ba2d3",
+    "Src/Orbiter/Production/CockpitPanelInput.inc": "999bbec8974b8933abd4f391ade22de531b50500aa1349bec1acea670556bfa3",
+    "Tests/Production/flight_source.py": "7c11befeb35e08dcd958695db6a2e9cd757970174f5cb25e9f8335249c9f7edd",
+    "Tests/Production/phase3-extraction.lock.json": "f397f6b86ccdd5cb5f41501dfc5c49d477506bf87cd1574007365c803afdaeff",
+    "Tests/Production/CockpitControls/mouse_smoke.py": "cf16f513f4466ec7e307eccad82d2468e569e9df5c92a464210c13797a4c4c88",
+    "Tests/Production/DeltaGlider/window_vc.py": "113fb47dddbf0f9742eb13caa496f64ced25626f022a7259edc9bd7e56a44513",
+    "Tests/Production/DeltaGlider/thrust_profile.py": "23b25dd56ff9937f9d4cdcba3da260ceba1a08fe468bd30d90b7eca7133dd39b",
+    "Tests/Production/Flight/keymap-dg-laptop.cfg": "2893d9be8c42beeb121d795b21889b53922d982c38b19595961229872dc20139",
+    "Src/Vessel/DeltaGlider/dg_vc_anim.h": "87f0faec29597a1ceaeea37865512ffa4ee84d370a195ecef771fb76db715c78",
+    ".github/workflows/native-production-client.yml": "ecc1be736448940db537db3fd645c2d7f4dfa682fb480bca6385e8396c68d074"
+  },
+  "original_key_source": {
+    "audited_commit": "889360f0516001d3261c1cce471229995c4f6c9b",
+    "also_verified_actual_preserved_windows_source": "f725194209634f7fd5d1d44d426cfa9b5e303e37",
+    "file": "Src/Orbiter/Orbiter.cpp",
+    "method": "Orbiter::KbdInputImmediate_System",
+    "fov_method": "Orbiter::IncFOV",
+    "complete_bodies_and_original_panel_block_conserved": true,
+    "original_vc_quads_unchanged": true,
+    "simulated_key_clearing_point_unchanged": true
+  },
+  "negative_camera_baseline": {
+    "output": "out/phase6-vc-camera-negative",
+    "report_sha256": "a012b61f85b72143df2edc856893bcefcc18f43403ba44af6d8678ea7611faa8",
+    "held_alt_down_samples": 45,
+    "unchanged_camera_theta": 0
+  },
+  "normal_profiles": {
+    "automatic-debug": {
+      "controls_dg_vc": {
+        "output": "out/phase6-vc-native-profiles/automatic-debug/controls_dg_vc",
+        "report_sha256": "2c055f186d78c4ef367b3adb494d6b399c728a8a6f3de75394c1b76ced9dbc65",
+        "vc_report_sha256": "52220a0f647774cb918b393a5f9b661542360622939d20e194e04c0838356835",
+        "camera_keys_report_sha256": "f60d565bc5dc569e25c548fd9aabd7c6d2e847df5b652f6a4dc83cdf6f662a2e",
+        "camera_focus_report_sha256": "a7db342c1ca0fc28a5f4aa7c0b4bd38d800ca29ae873d51f4bef817b13c56e51",
+        "engine_sha256": "0862eeabd1826ae4414a85809a9d419d19f419e74477a26f821df3b24b3dbcda",
+        "engine_library_sha256": "d18cf0d4e3de51c31e29fcf3dc1ed04d2c568fa73123261467d1ede269f8f538",
+        "renderer_module_sha256": "d8af5f7d995b0e93ab846cf7f0f6dc59ab36d3f78228c3ab8ba4ff3ea67f65af",
+        "renderer": {
+          "vendor": "Intel",
+          "renderer": "Mesa Intel(R) Graphics (PTL)",
+          "version": "4.6 (Core Profile) Mesa 26.0.8-1ubuntu0.3",
+          "client_width": 1280,
+          "client_height": 720
+        },
+        "backend": "x11",
+        "lifecycle": {
+          "rendered_frames": 15055,
+          "successful_presents": 15055,
+          "context_deleted": true
+        },
+        "mechanism_click_pairs": 16,
+        "owned_control_screenshots": 7,
+        "complete_original_saved_stops": true,
+        "paused_camera_controls": true,
+        "verified_camera_focus_release": true,
+        "bare_camera_keys_engine_neutral": true,
+        "isolated_xlib_loaded": false,
+        "isolated_mesa_loaded": false
+      },
+      "controls_dgs_vc": {
+        "output": "out/phase6-vc-native-profiles/automatic-debug/controls_dgs_vc",
+        "report_sha256": "7fb8194eaaee41565be10e72e0a14b133de6034e339e44282c6fce5d94645eea",
+        "vc_report_sha256": "2630faea2563850eb60ae57505733cb2cfb66962564d10914d8d2167c3796449",
+        "camera_keys_report_sha256": "1861cf28fafe4b96b58a94a2490462756155a720112152e1b004477eedc0f42f",
+        "camera_focus_report_sha256": "65338653306a92b895ef8afafb23c192e425dd20ea1fe098c97024e7f433c7d8",
+        "engine_sha256": "0862eeabd1826ae4414a85809a9d419d19f419e74477a26f821df3b24b3dbcda",
+        "engine_library_sha256": "d18cf0d4e3de51c31e29fcf3dc1ed04d2c568fa73123261467d1ede269f8f538",
+        "renderer_module_sha256": "d8af5f7d995b0e93ab846cf7f0f6dc59ab36d3f78228c3ab8ba4ff3ea67f65af",
+        "renderer": {
+          "vendor": "Intel",
+          "renderer": "Mesa Intel(R) Graphics (PTL)",
+          "version": "4.6 (Core Profile) Mesa 26.0.8-1ubuntu0.3",
+          "client_width": 1280,
+          "client_height": 720
+        },
+        "backend": "x11",
+        "lifecycle": {
+          "rendered_frames": 14837,
+          "successful_presents": 14837,
+          "context_deleted": true
+        },
+        "mechanism_click_pairs": 16,
+        "owned_control_screenshots": 7,
+        "complete_original_saved_stops": true,
+        "paused_camera_controls": true,
+        "verified_camera_focus_release": true,
+        "bare_camera_keys_engine_neutral": true,
+        "isolated_xlib_loaded": false,
+        "isolated_mesa_loaded": false
+      }
+    },
+    "automatic-release": {
+      "controls_dg_vc": {
+        "output": "out/phase6-vc-native-profiles/automatic-release/controls_dg_vc",
+        "report_sha256": "5ca27228e7981af636b8b262a64cc234f889b0b059da0dcd9023dcc4f6cb899a",
+        "vc_report_sha256": "e3f3c8e8c4fc8d7cc245dfe67ad95d1579675db0a470da7667f5f46675dd7533",
+        "camera_keys_report_sha256": "889dbe9c2c927ff88c608b3d3b7a9b0731f8d13e93a4afb1a1805ca7e30e4bb5",
+        "camera_focus_report_sha256": "8cc2c2ec30f069cc542545abc28d66774b516758d2414501f245affdcaf13b1d",
+        "engine_sha256": "5d8d3167a0ec363c3163191815beab58c4a8be7da807604c1e8eaa34a9b2f7fd",
+        "engine_library_sha256": "ff1a22e9e8b40daab3df5f3a3b9de44af0d2d7d18d8831501cc2f7d86af57291",
+        "renderer_module_sha256": "1172be59b02b5b052ed9f84f2da60b3bfcd2103e6ac71e69980dee7ed60157ee",
+        "renderer": {
+          "vendor": "Intel",
+          "renderer": "Mesa Intel(R) Graphics (PTL)",
+          "version": "4.6 (Core Profile) Mesa 26.0.8-1ubuntu0.3",
+          "client_width": 1280,
+          "client_height": 720
+        },
+        "backend": "x11",
+        "lifecycle": {
+          "rendered_frames": 15053,
+          "successful_presents": 15053,
+          "context_deleted": true
+        },
+        "mechanism_click_pairs": 16,
+        "owned_control_screenshots": 7,
+        "complete_original_saved_stops": true,
+        "paused_camera_controls": true,
+        "verified_camera_focus_release": true,
+        "bare_camera_keys_engine_neutral": true,
+        "isolated_xlib_loaded": false,
+        "isolated_mesa_loaded": false
+      },
+      "controls_dgs_vc": {
+        "output": "out/phase6-vc-native-profiles/automatic-release/controls_dgs_vc",
+        "report_sha256": "9d618caaf746034710c363bb55994bd7e09119c9ea2c99904000c5c80fdb19f2",
+        "vc_report_sha256": "2cab9917b6c8fd9f010cfa1af788d6484e4a0df08670716d796f8e99edbe7957",
+        "camera_keys_report_sha256": "b257717aa41cb5868a12492c72525e95e76caa094ecd41f2e89a7064874924cc",
+        "camera_focus_report_sha256": "6a19b76631b2faa56af6051a2bcce8f755fc2e6025e7030f28921ba620519376",
+        "engine_sha256": "5d8d3167a0ec363c3163191815beab58c4a8be7da807604c1e8eaa34a9b2f7fd",
+        "engine_library_sha256": "ff1a22e9e8b40daab3df5f3a3b9de44af0d2d7d18d8831501cc2f7d86af57291",
+        "renderer_module_sha256": "1172be59b02b5b052ed9f84f2da60b3bfcd2103e6ac71e69980dee7ed60157ee",
+        "renderer": {
+          "vendor": "Intel",
+          "renderer": "Mesa Intel(R) Graphics (PTL)",
+          "version": "4.6 (Core Profile) Mesa 26.0.8-1ubuntu0.3",
+          "client_width": 1280,
+          "client_height": 720
+        },
+        "backend": "x11",
+        "lifecycle": {
+          "rendered_frames": 13650,
+          "successful_presents": 13650,
+          "context_deleted": true
+        },
+        "mechanism_click_pairs": 16,
+        "owned_control_screenshots": 7,
+        "complete_original_saved_stops": true,
+        "paused_camera_controls": true,
+        "verified_camera_focus_release": true,
+        "bare_camera_keys_engine_neutral": true,
+        "isolated_xlib_loaded": false,
+        "isolated_mesa_loaded": false
+      }
+    },
+    "sse2-debug": {
+      "controls_dg_vc": {
+        "output": "out/phase6-vc-native-profiles/sse2-debug/controls_dg_vc",
+        "report_sha256": "f00b1bee160bdca69776169c50ec130317e11acb6542d2e362986c05d1f53950",
+        "vc_report_sha256": "34cf37e17331ea246c69e1f7c965285754aed23f65beb9ed6f5d9e981c9a74a5",
+        "camera_keys_report_sha256": "554e37c1dcc2e66838708c94208b76124936577314abeee13165bef1c51a6303",
+        "camera_focus_report_sha256": "d8b8af432f5c124ad2b585f1162dcf7c55b51eec4c870cd90f7690b89dff816f",
+        "engine_sha256": "a1b86798935b63643f43d8e0b79b226684522063ce865a79b3e0e39306b10018",
+        "engine_library_sha256": "00f4c435a487f59cb9698a8f4486f9a08798434cc3c39ecde47828fb7dca5435",
+        "renderer_module_sha256": "30851d8d49e272ab307e520e9a6caae84703e1fbe54415b93c4c3c2b41acba9e",
+        "renderer": {
+          "vendor": "Intel",
+          "renderer": "Mesa Intel(R) Graphics (PTL)",
+          "version": "4.6 (Core Profile) Mesa 26.0.8-1ubuntu0.3",
+          "client_width": 1280,
+          "client_height": 720
+        },
+        "backend": "x11",
+        "lifecycle": {
+          "rendered_frames": 15100,
+          "successful_presents": 15100,
+          "context_deleted": true
+        },
+        "mechanism_click_pairs": 16,
+        "owned_control_screenshots": 7,
+        "complete_original_saved_stops": true,
+        "paused_camera_controls": true,
+        "verified_camera_focus_release": true,
+        "bare_camera_keys_engine_neutral": true,
+        "isolated_xlib_loaded": false,
+        "isolated_mesa_loaded": false
+      },
+      "controls_dgs_vc": {
+        "output": "out/phase6-vc-native-profiles/sse2-debug/controls_dgs_vc",
+        "report_sha256": "ad4595edc910828b8da9684fb97135fd30d20e09810fb11786bad27f6b8ce15d",
+        "vc_report_sha256": "8cdaa43d1ddb5f579724058007bf6fe4c30b304253b161b8d418fe8c48d50e0d",
+        "camera_keys_report_sha256": "8b39042fa65d6769ca26e7740960cfc79c8618e3613bef4bdc3a501f53a5bb4b",
+        "camera_focus_report_sha256": "41a846b62dc43c24148b1ab22ff4a52d133e967d5bb739ea280fe67f93e3ddd4",
+        "engine_sha256": "a1b86798935b63643f43d8e0b79b226684522063ce865a79b3e0e39306b10018",
+        "engine_library_sha256": "00f4c435a487f59cb9698a8f4486f9a08798434cc3c39ecde47828fb7dca5435",
+        "renderer_module_sha256": "30851d8d49e272ab307e520e9a6caae84703e1fbe54415b93c4c3c2b41acba9e",
+        "renderer": {
+          "vendor": "Intel",
+          "renderer": "Mesa Intel(R) Graphics (PTL)",
+          "version": "4.6 (Core Profile) Mesa 26.0.8-1ubuntu0.3",
+          "client_width": 1280,
+          "client_height": 720
+        },
+        "backend": "x11",
+        "lifecycle": {
+          "rendered_frames": 14805,
+          "successful_presents": 14805,
+          "context_deleted": true
+        },
+        "mechanism_click_pairs": 16,
+        "owned_control_screenshots": 7,
+        "complete_original_saved_stops": true,
+        "paused_camera_controls": true,
+        "verified_camera_focus_release": true,
+        "bare_camera_keys_engine_neutral": true,
+        "isolated_xlib_loaded": false,
+        "isolated_mesa_loaded": false
+      }
+    },
+    "sse2-release": {
+      "controls_dg_vc": {
+        "output": "out/phase6-vc-native-profiles/sse2-release/controls_dg_vc",
+        "report_sha256": "a0d84deb3e3eb9a9da5370ab0d5a4cc698c49159e3897a37b5de5eaecb5e8104",
+        "vc_report_sha256": "6559e1c963a632ddfe47f1d65224ef8353bb178e90db4c6aa0e9c9e61995c9f7",
+        "camera_keys_report_sha256": "f9a510909da4530ed5cac7ce5070af944b220e865bc6ded279ce442034f86c98",
+        "camera_focus_report_sha256": "f95d8a7493b37da18dabf35e7f575730eaf9619e16d6feb90af4b50865dede98",
+        "engine_sha256": "0219d5c31b2d4cc5f8266378bf52a41313b72aa19039b829ab70540d748ecfe8",
+        "engine_library_sha256": "44f417547331b70d68497f61556e97d258bf3081b14ccbbfabee430197ce53e0",
+        "renderer_module_sha256": "783f576dfaf0106a284b337b444c0aeb0920b078c2ffa0b0599fafdf4a9c18e3",
+        "renderer": {
+          "vendor": "Intel",
+          "renderer": "Mesa Intel(R) Graphics (PTL)",
+          "version": "4.6 (Core Profile) Mesa 26.0.8-1ubuntu0.3",
+          "client_width": 1280,
+          "client_height": 720
+        },
+        "backend": "x11",
+        "lifecycle": {
+          "rendered_frames": 14255,
+          "successful_presents": 14255,
+          "context_deleted": true
+        },
+        "mechanism_click_pairs": 16,
+        "owned_control_screenshots": 7,
+        "complete_original_saved_stops": true,
+        "paused_camera_controls": true,
+        "verified_camera_focus_release": true,
+        "bare_camera_keys_engine_neutral": true,
+        "isolated_xlib_loaded": false,
+        "isolated_mesa_loaded": false
+      },
+      "controls_dgs_vc": {
+        "output": "out/phase6-vc-native-profiles/sse2-release/controls_dgs_vc",
+        "report_sha256": "508e22ca81f23970e7ae9703865d7d1e47e15fa898a319ddee84a78262d39e47",
+        "vc_report_sha256": "c572bca4eb79153856c249be6874f8915f578dc586934a9d2179b2ecd25b5095",
+        "camera_keys_report_sha256": "df5f2477c519ac3787a5e3913bd5788d692f0497adacd48bd33a1ae74d015023",
+        "camera_focus_report_sha256": "9d00fef44d3a712b89d1e4eca1efb7b940aa788835aeee72293e49ff795025b7",
+        "engine_sha256": "0219d5c31b2d4cc5f8266378bf52a41313b72aa19039b829ab70540d748ecfe8",
+        "engine_library_sha256": "44f417547331b70d68497f61556e97d258bf3081b14ccbbfabee430197ce53e0",
+        "renderer_module_sha256": "783f576dfaf0106a284b337b444c0aeb0920b078c2ffa0b0599fafdf4a9c18e3",
+        "renderer": {
+          "vendor": "Intel",
+          "renderer": "Mesa Intel(R) Graphics (PTL)",
+          "version": "4.6 (Core Profile) Mesa 26.0.8-1ubuntu0.3",
+          "client_width": 1280,
+          "client_height": 720
+        },
+        "backend": "x11",
+        "lifecycle": {
+          "rendered_frames": 13982,
+          "successful_presents": 13982,
+          "context_deleted": true
+        },
+        "mechanism_click_pairs": 16,
+        "owned_control_screenshots": 7,
+        "complete_original_saved_stops": true,
+        "paused_camera_controls": true,
+        "verified_camera_focus_release": true,
+        "bare_camera_keys_engine_neutral": true,
+        "isolated_xlib_loaded": false,
+        "isolated_mesa_loaded": false
+      }
+    }
+  },
+  "sanitizers": {
+    "intel": {
+      "controls_dg_vc": {
+        "output": "out/phase6-vc-intel-sanitizers/controls_dg_vc",
+        "report_sha256": "838c2d15fb30ec8ea2df33133cd51a6c76314d549bff577475b9b3afc9d2181c",
+        "vc_report_sha256": "bb69826f387e7dbdd6083e384f268ef7c85165f037e9b6e4e8c785f86aac0f3d",
+        "camera_keys_report_sha256": "dc3485d35f1aea679639747fff6aaec3fc41422291507d172bca44ed9bc49087",
+        "camera_focus_report_sha256": "5c6af66b6e1f24738ebbf6d420a192e9713abc6c869ab58f331c9461546f11b5",
+        "engine_sha256": "e1b3d7b0b0dbe9159a190d5f236c3cc25b3497f51d5b2ab5dee99c25100bfbca",
+        "engine_library_sha256": "2f3fb6803d6fae17923ab93035d6086e32b6254708093d653d9143398de3aa48",
+        "renderer_module_sha256": "c8849db57c60ee1617c51c2685ba96055536330434d137c3cbe807301d2faa80",
+        "renderer": {
+          "vendor": "Intel",
+          "renderer": "Mesa Intel(R) Graphics (PTL)",
+          "version": "4.6 (Core Profile) Mesa 26.0.8-1ubuntu0.3",
+          "client_width": 1280,
+          "client_height": 720
+        },
+        "backend": "x11",
+        "lifecycle": {
+          "rendered_frames": 14186,
+          "successful_presents": 14186,
+          "context_deleted": true
+        },
+        "mechanism_click_pairs": 16,
+        "owned_control_screenshots": 7,
+        "complete_original_saved_stops": true,
+        "paused_camera_controls": true,
+        "verified_camera_focus_release": true,
+        "bare_camera_keys_engine_neutral": true,
+        "isolated_xlib_loaded": true,
+        "isolated_mesa_loaded": false
+      },
+      "controls_dgs_vc": {
+        "output": "out/phase6-vc-intel-sanitizers/controls_dgs_vc",
+        "report_sha256": "f58cf590172135298b2d009bc3b446cfb942f868df5405a8a26fd43f3cbdcdfc",
+        "vc_report_sha256": "18fc288f227700b68c662c4c58ff08427a01906231f7494b25ce5e0f316e442b",
+        "camera_keys_report_sha256": "6ba2769f36924bab3360f40cc04ffa69c3d1cc3841c76cb1eb5fcc3e56a78b53",
+        "camera_focus_report_sha256": "d53e1d4cf91a366abb593a2031105c6a1e798d1baa90078c9cb6b8738c7d5598",
+        "engine_sha256": "e1b3d7b0b0dbe9159a190d5f236c3cc25b3497f51d5b2ab5dee99c25100bfbca",
+        "engine_library_sha256": "2f3fb6803d6fae17923ab93035d6086e32b6254708093d653d9143398de3aa48",
+        "renderer_module_sha256": "c8849db57c60ee1617c51c2685ba96055536330434d137c3cbe807301d2faa80",
+        "renderer": {
+          "vendor": "Intel",
+          "renderer": "Mesa Intel(R) Graphics (PTL)",
+          "version": "4.6 (Core Profile) Mesa 26.0.8-1ubuntu0.3",
+          "client_width": 1280,
+          "client_height": 720
+        },
+        "backend": "x11",
+        "lifecycle": {
+          "rendered_frames": 10908,
+          "successful_presents": 10908,
+          "context_deleted": true
+        },
+        "mechanism_click_pairs": 16,
+        "owned_control_screenshots": 7,
+        "complete_original_saved_stops": true,
+        "paused_camera_controls": true,
+        "verified_camera_focus_release": true,
+        "bare_camera_keys_engine_neutral": true,
+        "isolated_xlib_loaded": true,
+        "isolated_mesa_loaded": false
+      }
+    },
+    "software": {
+      "controls_dg_vc": {
+        "output": "out/phase6-vc-software-sanitizers/controls_dg_vc",
+        "report_sha256": "d15fd6a777cc75d09dfb9e5e2f07d80a7f2f91984674282c60831ab23e9593ef",
+        "vc_report_sha256": "fcb5a317de2312dcd1ab1615567d8dd968eaacb0df6b073f6707841602868b02",
+        "camera_keys_report_sha256": "987fc3c1311f27f27fab74761ed521084ba1d92135c38db613de1589e0d2c4ef",
+        "camera_focus_report_sha256": "0b2c6974357ac7023623bc57fbc2e0cf59ef8831507547abb60ddd3e4eeb194d",
+        "engine_sha256": "e1b3d7b0b0dbe9159a190d5f236c3cc25b3497f51d5b2ab5dee99c25100bfbca",
+        "engine_library_sha256": "2f3fb6803d6fae17923ab93035d6086e32b6254708093d653d9143398de3aa48",
+        "renderer_module_sha256": "c8849db57c60ee1617c51c2685ba96055536330434d137c3cbe807301d2faa80",
+        "renderer": {
+          "vendor": "Mesa",
+          "renderer": "llvmpipe (LLVM 21.1.8, 256 bits)",
+          "version": "4.5 (Core Profile) Mesa 26.0.8",
+          "client_width": 1280,
+          "client_height": 720
+        },
+        "backend": "x11",
+        "lifecycle": {
+          "rendered_frames": 885,
+          "successful_presents": 885,
+          "context_deleted": true
+        },
+        "mechanism_click_pairs": 16,
+        "owned_control_screenshots": 7,
+        "complete_original_saved_stops": true,
+        "paused_camera_controls": true,
+        "verified_camera_focus_release": true,
+        "bare_camera_keys_engine_neutral": true,
+        "isolated_xlib_loaded": true,
+        "isolated_mesa_loaded": true
+      },
+      "controls_dgs_vc": {
+        "output": "out/phase6-vc-software-sanitizers/controls_dgs_vc",
+        "report_sha256": "543dba635350161dd1c477c8f5ff53f0036370af2cb61204b00873d7abf59258",
+        "vc_report_sha256": "74d0444d65b116c2a64921a04964dae5a79212e6663d9a89091a5ebf02ad7b50",
+        "camera_keys_report_sha256": "0d820040adaaf57b7a9d8dae7165c468abed008525a937c5be9069952ea3bbc5",
+        "camera_focus_report_sha256": "f04f935b3b99325c549a4bbffb15b089f154c14ef5b9334cd8529bd1a0b36f1a",
+        "engine_sha256": "e1b3d7b0b0dbe9159a190d5f236c3cc25b3497f51d5b2ab5dee99c25100bfbca",
+        "engine_library_sha256": "2f3fb6803d6fae17923ab93035d6086e32b6254708093d653d9143398de3aa48",
+        "renderer_module_sha256": "c8849db57c60ee1617c51c2685ba96055536330434d137c3cbe807301d2faa80",
+        "renderer": {
+          "vendor": "Mesa",
+          "renderer": "llvmpipe (LLVM 21.1.8, 256 bits)",
+          "version": "4.5 (Core Profile) Mesa 26.0.8",
+          "client_width": 1280,
+          "client_height": 720
+        },
+        "backend": "x11",
+        "lifecycle": {
+          "rendered_frames": 961,
+          "successful_presents": 961,
+          "context_deleted": true
+        },
+        "mechanism_click_pairs": 16,
+        "owned_control_screenshots": 7,
+        "complete_original_saved_stops": true,
+        "paused_camera_controls": true,
+        "verified_camera_focus_release": true,
+        "bare_camera_keys_engine_neutral": true,
+        "isolated_xlib_loaded": true,
+        "isolated_mesa_loaded": true
+      }
+    }
+  },
+  "sanitizer_options": {
+    "ASAN_OPTIONS": "detect_leaks=1:fast_unwind_on_malloc=0",
+    "LSAN_OPTIONS": "",
+    "UBSAN_OPTIONS": "halt_on_error=1:print_stacktrace=1",
+    "suppressions": false,
+    "system_libraries_modified": false
+  },
+  "modified_engine_profile": {
+    "output": "out/phase6-vc-thrust-profile-final",
+    "report_sha256": "361a051dae07b2c723f45b47294b267ee82a0d4435eac9561080834e9bff6533",
+    "transport": "Native replay input queue, original key map and real stock vessel immediate controls",
+    "cases": {
+      "controls_dg_panel": {
+        "status": "passed",
+        "curves": {
+          "main_increase": {
+            "samples": 20,
+            "first": 0.0033333333333333335,
+            "last": 0.06666666666666667,
+            "maximum": 0.06666666666666667
+          },
+          "main_decrease": {
+            "samples": 25,
+            "first": 0.06333333333333334,
+            "last": 0.0,
+            "maximum": 0.06333333333333334
+          },
+          "hover_increase": {
+            "samples": 20,
+            "first": 0.0033333333333333335,
+            "last": 0.06666666666666667,
+            "maximum": 0.06666666666666667
+          },
+          "hover_decrease": {
+            "samples": 25,
+            "first": 0.06333333333333334,
+            "last": 0.0,
+            "maximum": 0.06333333333333334
+          }
+        },
+        "bare_camera_engine_neutrality": true,
+        "no_rcs": true,
+        "original_latched_release": true,
+        "lifecycle": {
+          "rendered_frames": 150,
+          "successful_presents": 150,
+          "context_deleted": true
+        },
+        "input_sha256": "79d6574a55b006a654df4f53220b37b3de301723cf72363c8d1df96172b50053",
+        "thrust_sha256": "65e0d3c7bb252dfa48e563b1aa2c4f97913082955ab9581be3bd8e8ebbb3ccaa"
+      },
+      "controls_dg_vc": {
+        "status": "passed",
+        "curves": {
+          "main_increase": {
+            "samples": 20,
+            "first": 0.0033333333333333335,
+            "last": 0.06666666666666667,
+            "maximum": 0.06666666666666667
+          },
+          "main_decrease": {
+            "samples": 25,
+            "first": 0.06333333333333334,
+            "last": 0.0,
+            "maximum": 0.06333333333333334
+          },
+          "hover_increase": {
+            "samples": 20,
+            "first": 0.0033333333333333335,
+            "last": 0.06666666666666667,
+            "maximum": 0.06666666666666667
+          },
+          "hover_decrease": {
+            "samples": 25,
+            "first": 0.06333333333333334,
+            "last": 0.0,
+            "maximum": 0.06333333333333334
+          }
+        },
+        "bare_camera_engine_neutrality": true,
+        "no_rcs": true,
+        "original_latched_release": true,
+        "lifecycle": {
+          "rendered_frames": 150,
+          "successful_presents": 150,
+          "context_deleted": true
+        },
+        "input_sha256": "79d6574a55b006a654df4f53220b37b3de301723cf72363c8d1df96172b50053",
+        "thrust_sha256": "65e0d3c7bb252dfa48e563b1aa2c4f97913082955ab9581be3bd8e8ebbb3ccaa"
+      },
+      "controls_dgs_panel": {
+        "status": "passed",
+        "curves": {
+          "main_increase": {
+            "samples": 20,
+            "first": 0.0033333333333333335,
+            "last": 0.06666666666666667,
+            "maximum": 0.06666666666666667
+          },
+          "main_decrease": {
+            "samples": 25,
+            "first": 0.06333333333333334,
+            "last": 0.0,
+            "maximum": 0.06333333333333334
+          },
+          "hover_increase": {
+            "samples": 20,
+            "first": 0.0033333333333333335,
+            "last": 0.06666666666666667,
+            "maximum": 0.06666666666666667
+          },
+          "hover_decrease": {
+            "samples": 25,
+            "first": 0.06333333333333334,
+            "last": 0.0,
+            "maximum": 0.06333333333333334
+          }
+        },
+        "bare_camera_engine_neutrality": true,
+        "no_rcs": true,
+        "original_latched_release": true,
+        "lifecycle": {
+          "rendered_frames": 150,
+          "successful_presents": 150,
+          "context_deleted": true
+        },
+        "input_sha256": "79d6574a55b006a654df4f53220b37b3de301723cf72363c8d1df96172b50053",
+        "thrust_sha256": "65e0d3c7bb252dfa48e563b1aa2c4f97913082955ab9581be3bd8e8ebbb3ccaa"
+      },
+      "controls_dgs_vc": {
+        "status": "passed",
+        "curves": {
+          "main_increase": {
+            "samples": 20,
+            "first": 0.0033333333333333335,
+            "last": 0.06666666666666667,
+            "maximum": 0.06666666666666667
+          },
+          "main_decrease": {
+            "samples": 25,
+            "first": 0.06333333333333334,
+            "last": 0.0,
+            "maximum": 0.06333333333333334
+          },
+          "hover_increase": {
+            "samples": 20,
+            "first": 0.0033333333333333335,
+            "last": 0.06666666666666667,
+            "maximum": 0.06666666666666667
+          },
+          "hover_decrease": {
+            "samples": 25,
+            "first": 0.06333333333333334,
+            "last": 0.0,
+            "maximum": 0.06333333333333334
+          }
+        },
+        "bare_camera_engine_neutrality": true,
+        "no_rcs": true,
+        "original_latched_release": true,
+        "lifecycle": {
+          "rendered_frames": 150,
+          "successful_presents": 150,
+          "context_deleted": true
+        },
+        "input_sha256": "79d6574a55b006a654df4f53220b37b3de301723cf72363c8d1df96172b50053",
+        "thrust_sha256": "65e0d3c7bb252dfa48e563b1aa2c4f97913082955ab9581be3bd8e8ebbb3ccaa"
+      }
+    }
+  },
+  "lua_original_comparisons": {
+    "automatic-debug": {
+      "output": "out/phase6-vc-lua-regression/automatic-debug",
+      "report_sha256": "89ac7ca97fe630e309a171026bfb83469230984fe6a55052793f2d2bac612df9",
+      "cases": 5,
+      "exact_original_events_controls_air_and_state": true,
+      "original_capture": {
+        "selection": "automatic",
+        "profiles": {
+          "original-default": {
+            "status": "passed",
+            "source": "739fdf943cf63dc4e05647cf64b0cde0ace22195",
+            "configuration": "Debug",
+            "math_profile": "original-default",
+            "host": {
+              "platform": "Windows-2025Server-10.0.26100-SP0",
+              "image_os": "win25-vs2026",
+              "image_version": "20261030.294.1"
+            }
+          },
+          "diagnostic-sse2": {
+            "status": "passed",
+            "source": "739fdf943cf63dc4e05647cf64b0cde0ace22195",
+            "configuration": "Debug",
+            "math_profile": "diagnostic-sse2",
+            "host": {
+              "platform": "Windows-2025Server-10.0.26100-SP0",
+              "image_os": "win25-vs2026",
+              "image_version": "20261030.294.1"
+            }
+          }
+        },
+        "selected_profiles": {
+          "lua_pb": "original-default",
+          "lua_dg": "original-default",
+          "lua_dgs": "original-default",
+          "lua_dg_atmosphere": "original-default",
+          "lua_dgs_atmosphere": "original-default"
+        }
+      }
+    },
+    "automatic-release": {
+      "output": "out/phase6-vc-lua-regression/automatic-release",
+      "report_sha256": "89ac7ca97fe630e309a171026bfb83469230984fe6a55052793f2d2bac612df9",
+      "cases": 5,
+      "exact_original_events_controls_air_and_state": true,
+      "original_capture": {
+        "selection": "automatic",
+        "profiles": {
+          "original-default": {
+            "status": "passed",
+            "source": "739fdf943cf63dc4e05647cf64b0cde0ace22195",
+            "configuration": "Release",
+            "math_profile": "original-default",
+            "host": {
+              "platform": "Windows-2025Server-10.0.26100-SP0",
+              "image_os": "win25-vs2026",
+              "image_version": "20261030.294.1"
+            }
+          },
+          "diagnostic-sse2": {
+            "status": "passed",
+            "source": "739fdf943cf63dc4e05647cf64b0cde0ace22195",
+            "configuration": "Release",
+            "math_profile": "diagnostic-sse2",
+            "host": {
+              "platform": "Windows-2025Server-10.0.26100-SP0",
+              "image_os": "win25-vs2026",
+              "image_version": "20261030.294.1"
+            }
+          }
+        },
+        "selected_profiles": {
+          "lua_pb": "original-default",
+          "lua_dg": "original-default",
+          "lua_dgs": "original-default",
+          "lua_dg_atmosphere": "original-default",
+          "lua_dgs_atmosphere": "original-default"
+        }
+      }
+    },
+    "sse2-debug": {
+      "output": "out/phase6-vc-lua-regression/sse2-debug",
+      "report_sha256": "dbc2d944390a9593e76cc632970050879f30a2323186984f5a7be304e61993a0",
+      "cases": 5,
+      "exact_original_events_controls_air_and_state": true,
+      "original_capture": {
+        "selection": "automatic",
+        "profiles": {
+          "original-default": {
+            "status": "passed",
+            "source": "739fdf943cf63dc4e05647cf64b0cde0ace22195",
+            "configuration": "Debug",
+            "math_profile": "original-default",
+            "host": {
+              "platform": "Windows-2025Server-10.0.26100-SP0",
+              "image_os": "win25-vs2026",
+              "image_version": "20261030.294.1"
+            }
+          },
+          "diagnostic-sse2": {
+            "status": "passed",
+            "source": "739fdf943cf63dc4e05647cf64b0cde0ace22195",
+            "configuration": "Debug",
+            "math_profile": "diagnostic-sse2",
+            "host": {
+              "platform": "Windows-2025Server-10.0.26100-SP0",
+              "image_os": "win25-vs2026",
+              "image_version": "20261030.294.1"
+            }
+          }
+        },
+        "selected_profiles": {
+          "lua_pb": "diagnostic-sse2",
+          "lua_dg": "diagnostic-sse2",
+          "lua_dgs": "diagnostic-sse2",
+          "lua_dg_atmosphere": "diagnostic-sse2",
+          "lua_dgs_atmosphere": "diagnostic-sse2"
+        }
+      }
+    },
+    "sse2-release": {
+      "output": "out/phase6-vc-lua-regression/sse2-release",
+      "report_sha256": "dbc2d944390a9593e76cc632970050879f30a2323186984f5a7be304e61993a0",
+      "cases": 5,
+      "exact_original_events_controls_air_and_state": true,
+      "original_capture": {
+        "selection": "automatic",
+        "profiles": {
+          "original-default": {
+            "status": "passed",
+            "source": "739fdf943cf63dc4e05647cf64b0cde0ace22195",
+            "configuration": "Release",
+            "math_profile": "original-default",
+            "host": {
+              "platform": "Windows-2025Server-10.0.26100-SP0",
+              "image_os": "win25-vs2026",
+              "image_version": "20261030.294.1"
+            }
+          },
+          "diagnostic-sse2": {
+            "status": "passed",
+            "source": "739fdf943cf63dc4e05647cf64b0cde0ace22195",
+            "configuration": "Release",
+            "math_profile": "diagnostic-sse2",
+            "host": {
+              "platform": "Windows-2025Server-10.0.26100-SP0",
+              "image_os": "win25-vs2026",
+              "image_version": "20261030.294.1"
+            }
+          }
+        },
+        "selected_profiles": {
+          "lua_pb": "diagnostic-sse2",
+          "lua_dg": "diagnostic-sse2",
+          "lua_dgs": "diagnostic-sse2",
+          "lua_dg_atmosphere": "diagnostic-sse2",
+          "lua_dgs_atmosphere": "diagnostic-sse2"
+        }
+      }
+    }
+  },
+  "frozen_control_comparisons": {
+    "automatic-debug": {
+      "output": "out/phase6-vc-frozen-controls/automatic-debug",
+      "report_sha256": "b5bb225d934bed21a35896bc12d3047dcbb6b66a07f2e8ecee3b4f247bf4ce6e",
+      "reference_run": 41482729373,
+      "cases": 5,
+      "fresh_processes": 10,
+      "all_physical_errors_zero": true,
+      "minimum_full_frame_ssim": 1.0,
+      "minimum_mfd_ssim": 1.0,
+      "exact_original_input_and_repeat_traces": true
+    },
+    "automatic-release": {
+      "output": "out/phase6-vc-frozen-controls/automatic-release",
+      "report_sha256": "5835096116489ac12a54ed63c5648f69695ed714d02fa355d36428dc4a78e67c",
+      "reference_run": 41482729373,
+      "cases": 5,
+      "fresh_processes": 10,
+      "all_physical_errors_zero": true,
+      "minimum_full_frame_ssim": 1.0,
+      "minimum_mfd_ssim": 1.0,
+      "exact_original_input_and_repeat_traces": true
+    },
+    "sse2-debug": {
+      "output": "out/phase6-vc-frozen-controls/sse2-debug",
+      "report_sha256": "15fd6b966f5af61c8b32e3943d8836740afa9019f4ce4e82871d5e0366660232",
+      "reference_run": 41482729373,
+      "cases": 5,
+      "fresh_processes": 10,
+      "all_physical_errors_zero": false,
+      "minimum_full_frame_ssim": 1.0,
+      "minimum_mfd_ssim": 1.0,
+      "exact_original_input_and_repeat_traces": true
+    },
+    "sse2-release": {
+      "output": "out/phase6-vc-frozen-controls/sse2-release",
+      "report_sha256": "d2b8f04c26f00ddce363202e146efe3db227276b770c68852e240571bb2234d0",
+      "reference_run": 41482729373,
+      "cases": 5,
+      "fresh_processes": 10,
+      "all_physical_errors_zero": false,
+      "minimum_full_frame_ssim": 1.0,
+      "minimum_mfd_ssim": 1.0,
+      "exact_original_input_and_repeat_traces": true
+    }
+  },
+  "interactive_regressions": {
+    "panel": {
+      "output": "out/phase6-vc-regression-panel",
+      "report_sha256": "a20f1c8849da581c8af32a1708ac98bba6059b80bc51e8c0d2ac263768169c0f",
+      "lifecycle": {
+        "rendered_frames": 855,
+        "successful_presents": 855,
+        "context_deleted": true
+      },
+      "sanitizers": true
+    },
+    "keys": {
+      "output": "out/phase6-vc-regression-keys",
+      "report_sha256": "c3252e2ddc7b7e755874bc265da86ab198647df8b7e6e459d1e1ad3358653a8a",
+      "lifecycle": {
+        "rendered_frames": 205,
+        "successful_presents": 205,
+        "context_deleted": true
+      },
+      "sanitizers": true
+    },
+    "generic": {
+      "output": "out/phase6-vc-regression-generic",
+      "report_sha256": "4508835cd26b56f8d5cb7ad3204505b7f5e13d98358798e876548c65ee6df510",
+      "lifecycle": {
+        "rendered_frames": 145,
+        "successful_presents": 145,
+        "context_deleted": true
+      },
+      "sanitizers": false
+    }
+  },
+  "native_offaxis_diagnostic": {
+    "status": "native observations only; original Windows comparison remains open",
+    "probe_source_sha256": "2ae028bb835e8b0a0eafbb1622f72090746d20b2a1e97dc0c9bf5e961d798d7c",
+    "cases": {
+      "forward-scenario": {
+        "output": "out/phase6-vc-offaxis-probe/forward-scenario",
+        "mfds": {
+          "mfd-0-50.json": {
+            "width": 512,
+            "height": 512,
+            "colored_pixels": 14238,
+            "nonwhite_pixels": 262016
+          },
+          "mfd-1-50.json": {
+            "width": 512,
+            "height": 512,
+            "colored_pixels": 122639,
+            "nonwhite_pixels": 261292
+          }
+        },
+        "framebuffer_sha256": "89e6e7e27057d5dc12c6cc579276d9155568dbb526afb1f27ce51611eb07d94b",
+        "lifecycle": {
+          "rendered_frames": 60,
+          "successful_presents": 60,
+          "context_deleted": true
+        }
+      },
+      "down-scenario": {
+        "output": "out/phase6-vc-offaxis-probe/down-scenario",
+        "mfds": {
+          "mfd-0-50.json": {
+            "width": 512,
+            "height": 512,
+            "colored_pixels": 14238,
+            "nonwhite_pixels": 262016
+          },
+          "mfd-1-50.json": {
+            "width": 512,
+            "height": 512,
+            "colored_pixels": 122639,
+            "nonwhite_pixels": 261292
+          }
+        },
+        "framebuffer_sha256": "718b4eaad3bc2cbcb18812b7a77b353236b225211be7cef764c193aad3b240b7",
+        "lifecycle": {
+          "rendered_frames": 60,
+          "successful_presents": 60,
+          "context_deleted": true
+        }
+      },
+      "forward-reopened": {
+        "output": "out/phase6-vc-offaxis-probe/forward-reopened",
+        "mfds": {
+          "mfd-0-50.json": {
+            "width": 512,
+            "height": 512,
+            "colored_pixels": 14216,
+            "nonwhite_pixels": 262019
+          },
+          "mfd-1-50.json": {
+            "width": 512,
+            "height": 512,
+            "colored_pixels": 122639,
+            "nonwhite_pixels": 261292
+          }
+        },
+        "framebuffer_sha256": "89e6e7e27057d5dc12c6cc579276d9155568dbb526afb1f27ce51611eb07d94b",
+        "lifecycle": {
+          "rendered_frames": 60,
+          "successful_presents": 60,
+          "context_deleted": true
+        }
+      },
+      "down-reopened": {
+        "output": "out/phase6-vc-offaxis-probe/down-reopened",
+        "mfds": {
+          "mfd-0-50.json": {
+            "width": 512,
+            "height": 512,
+            "colored_pixels": 14216,
+            "nonwhite_pixels": 262019
+          },
+          "mfd-1-50.json": {
+            "width": 512,
+            "height": 512,
+            "colored_pixels": 122639,
+            "nonwhite_pixels": 261292
+          }
+        },
+        "framebuffer_sha256": "277e6b2fdcc53cae5a2dd8f332f23610c5d445fc19d60d4832aad81aced3b044",
+        "lifecycle": {
+          "rendered_frames": 60,
+          "successful_presents": 60,
+          "context_deleted": true
+        }
+      }
+    }
+  },
+  "totals": {
+    "final_vc_processes": 12,
+    "mechanism_press_release_pairs": 192,
+    "owned_control_screenshots": 84,
+    "engine_profile_processes": 4,
+    "lua_processes": 20,
+    "frozen_control_processes": 40,
+    "interactive_regression_processes": 3,
+    "qualified_fresh_processes": 79,
+    "successful_presentations": 149082
+  },
+  "retained_probes": [
+    {
+      "output": "out/phase6-vc-picking-first",
+      "status": "failed test timing: pulses measured after late observation overshot the original camera"
+    },
+    {
+      "output": "out/phase6-vc-picking-pulses",
+      "status": "failed engine-neutrality check: bare Home increased hover thrust in the prior DG profile; all seven mechanism mouse round trips completed"
+    },
+    {
+      "output": "out/phase6-vc-picking-profile-fixed",
+      "status": "passed preceding driver before the additional explicit bare-camera-key checks"
+    },
+    {
+      "output": "out/phase6-vc-thrust-profile",
+      "status": "failed test row-count assertion: the trace includes the required initial state plus 150 finalized samples"
+    }
+  ],
+  "source_audit": {
+    "explicit_extraction_files": 442,
+    "passed": true
+  },
+  "hosted_qualification": "New VC/camera/profile steps added to all four native jobs; qualification of this source remains pending",
+  "remaining_gates": [
+    "Original mouse camera rotation/zoom and remaining step-FOV keyboard shortcuts",
+    "Off-axis preserved-Windows camera/frame comparisons",
+    "Broader DG systems and interactive stock-scenario acceptance",
+    "Native Wayland/high-DPI, physical-controller and wider hardware/performance qualification"
+  ],
+  "hosted_runtime_headroom": {
+    "prior_run": 41615776686,
+    "prior_source": "6eb024a67669d947c243d755c1734f581e60db85",
+    "prior_native_and_windows_capture_jobs_successful": 8,
+    "slowest_native_minutes": 55.68333333333333,
+    "new_native_timeout_minutes": 90,
+    "numerical_and_image_budgets_unchanged": true
+  }
+}

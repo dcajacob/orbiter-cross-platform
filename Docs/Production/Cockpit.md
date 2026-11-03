@@ -68,8 +68,7 @@ requires Alt for manual RCS and Alt+Shift for one-tenth thrust. Bare D retains
 the stock radiator function. Finalized samples verify full/precision thrust,
 bare-W neutrality, release/focus loss and no jets during bare mechanism keys.
 The accepted Phase 5 profile is unchanged. This profile can be selected with
-the native command's `--keymap` option. Virtual-cockpit mechanism picking and
-broader subsystem interactions remain open.
+the native command's `--keymap` option. Broader subsystem interactions remain open.
 [Real-key and profile evidence](DGWindowMechanismsVerification.json)
 
 The DG profile now also verifies F for RCS rotational/linear mode, Ctrl+F for
@@ -100,6 +99,41 @@ arrow; its failed diagnostics are retained. The final test exercises the
 unmodified arrow separately. Hosted panel qualification, virtual-cockpit
 mechanism picks and broader systems/scenario acceptance remain open.
 [Panel panning and mouse-mechanism evidence](DGPanelMouseVerification.json)
+
+The complete original `KbdInputImmediate_System` body now runs in the native
+cockpit host, including camera rotation, external distance and continuous FOV
+controls. Its original smoothing, panel checks, direction/order and FOV refresh
+body are checked verbatim against the preserved source. The system handler
+reads the merged physical/simulated snapshot before running-only flight input;
+the existing simulated-key clearing point is unchanged. All twenty original
+Lua schedules across Debug/Release automatic/SSE2 still match exactly for
+events, controls, air data and finalized state.
+
+Both gliders now also complete seven-mechanism VC mouse round trips. The driver
+uses actual Alt+arrow keys to aim the camera, projects points from the stock
+control quads through the observed camera, and delivers real window presses
+through GLFW and original Pane/VC hit testing. It checks every intermediate
+animation, saved open/closed stops, paused camera movement, Home recentering,
+FOV/external camera controls and focus-loss deceleration/release. Seven owned
+window captures per case show the selected controls. Both gliders pass all four
+normal native profiles and Intel/software ASan/UBSan/LSan. Forty further frozen
+control processes preserve the original input, state and image comparisons.
+
+The new view tests exposed an additional DG profile collision: Home also
+increased hover thrust, and PageUp/PageDown overlapped external camera distance
+and main thrust. The DG profile now uses Alt+Home/End for hover and
+Alt+PageUp/PageDown for main thrust. Bare camera keys remain engine-neutral.
+Four real-vessel replay cases verify both modified engine groups, original
+latched release, independent controls and zero stops. The accepted Phase 5
+external-view profile remains unchanged. An earlier failed picking probe and
+the camera-key/no-movement baseline remain recorded as failures.
+
+Mouse camera rotation/zoom and step-FOV shortcuts, preserved-Windows comparisons at the turned
+view angles, Wayland/high-DPI input and physical-controller qualification
+remain open. The off-axis diagnostic confirms populated MFD surfaces on both
+scenario load and explicit mode reopening; it does not establish original
+Windows image parity at those angles.
+[VC mouse, camera and profile evidence](DGVCMouseVerification.json)
 
 The native graphics leak now has an isolated source fix and a passing local
 sanitizer menu flow. Mesa's executable-code allocator retained two bookkeeping

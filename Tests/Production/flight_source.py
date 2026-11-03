@@ -6,6 +6,13 @@ ROOT=Path(__file__).resolve().parents[2]
 BASE='889360f0516001d3261c1cce471229995c4f6c9b'
 def old(name):return subprocess.check_output(['git','-C',str(ROOT),'show',BASE+':'+name]).decode().replace('\r\n','\n')
 def read(name):return (ROOT/name).read_text()
+def body(source,name):
+    begin=source.index('{',source.index(name));end=begin+1;depth=1
+    while depth:
+        if source[end]=='{':depth+=1
+        elif source[end]=='}':depth-=1
+        end+=1
+    return source[begin+1:end-1]
 def verify():
     for name in ('Src/Orbiter/Keymap.cpp','Src/Orbiter/Keymap.h'):
         original=old(name);current=read(name)
@@ -25,6 +32,12 @@ def verify():
     end=original.index('\n\t}',begin)
     if read('Src/Orbiter/Production/CockpitPanelInput.inc').rstrip()!=original[begin:end]:
         raise ValueError('Original immediate panel directions/key mapping/order changed')
+    system=read('Src/Orbiter/Production/CockpitSystemInput.inc')
+    system=system.replace('#include "CockpitPanelInput.inc"',read('Src/Orbiter/Production/CockpitPanelInput.inc').rstrip())
+    if system!=body(original,'void Orbiter::KbdInputImmediate_System'):
+        raise ValueError('Original complete system camera/panel/FOV input changed')
+    if read('Src/Orbiter/Production/CockpitFovInput.inc')!=body(original,'VOID Orbiter::IncFOV'):
+        raise ValueError('Original FOV update and forced refresh changed')
     begin=original.index('\t// main/retro/hover thruster settings',original.index('void Orbiter::KbdInputImmediate_OnRunning'))
     end=original.index('\n\t// left/right MFD control',begin)
     cbegin=current.index('\t// main/retro/hover thruster settings');cend=current.index('\n    }\n\tif (bEnableAtt)',cbegin)
@@ -42,4 +55,4 @@ def verify():
     begin=original.index('\t\tcase OAPI_KEY_DIVIDE:');end=original.index('\n\t\t}',begin)
     begin2=current.index('\t\tcase OAPI_KEY_DIVIDE:');end2=current.index('\n\t\t}',begin2)
     if current[begin2:end2].replace('vessel.','')!=original[begin:end]:raise ValueError('Original aerodynamic mode command changed')
-if __name__=='__main__':verify();print('Original key map, SDK key codes and flight controls conserved')
+if __name__=='__main__':verify();print('Original key map, SDK key codes, complete system camera/panel/FOV input and flight controls conserved')
