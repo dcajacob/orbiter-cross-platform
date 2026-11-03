@@ -34,7 +34,7 @@ class Driver final : public oapi::Module {
     struct Action { unsigned tick; std::string event; int x, y; std::string text; };
     SetObserver setter = nullptr;
     std::vector<Action> actions;
-    std::ofstream state, events, inputs, ui, callbacks;
+    std::ofstream state, events, inputs, ui, callbacks, clockTrace;
     HWND window = nullptr;
     ImGuiID clockHook = 0;
     ImGuiContext* clockOwner = nullptr;
@@ -171,7 +171,14 @@ public:
                 IMGUI_CHECKVERSION();
                 ImGuiContextHook hook;
                 hook.Type = ImGuiContextHookType_NewFramePre;
-                hook.Callback = [](ImGuiContext*, ImGuiContextHook*) { ImGui::GetIO().DeltaTime = 0.25f; };
+                clockTrace.exceptions(std::ios::badbit | std::ios::failbit);
+                clockTrace.open("ui-clock-trace.csv");
+                clockTrace << "frame,delta\n";
+                hook.UserData = this;
+                hook.Callback = [](ImGuiContext* context, ImGuiContextHook* installed) {
+                    context->IO.DeltaTime = 0.25f;
+                    static_cast<Driver*>(installed->UserData)->clockTrace << context->FrameCount << ',' << context->IO.DeltaTime << '\n';
+                };
                 clockOwner = ImGui::GetCurrentContext();
                 clockHook = ImGui::AddContextHook(clockOwner, &hook);
                 std::ofstream("ui-clock.json") << "{\"seconds_per_frame\":0.25,\"scope\":\"test-only ImGui frame clock\"}\n";
@@ -201,7 +208,7 @@ public:
             // The original close path normally destroys the context before this callback.
             if (clockOwner && ImGui::GetCurrentContext() == clockOwner)
                 ImGui::RemoveContextHook(clockOwner,clockHook);
-            clockOwner=nullptr; clockHook=0; started = false; events.flush(); std::ofstream("cockpit-complete.txt") << frames << '\n'; });
+            clockOwner=nullptr; clockHook=0; clockTrace.flush(); started = false; events.flush(); std::ofstream("cockpit-complete.txt") << frames << '\n'; });
     }
 };
 void observe(const char* phase, const char* object, double seconds, double mjd, int running) {

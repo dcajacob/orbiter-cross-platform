@@ -5,6 +5,7 @@
 #include "ApplicationObservation.h"
 #include <cstdlib>
 #include <fstream>
+#include <filesystem>
 #include <iomanip>
 #include <limits>
 #include <locale>
@@ -20,9 +21,10 @@ class Driver final:public oapi::Module {
     SetObserver setter=nullptr;
     std::ofstream state,events,controls;
     INTERPRETERHANDLE script=nullptr,secondary=nullptr;
-    std::string target;
+    std::string target,profile;
     unsigned frames=0,total=0;int cockpit=0,left=0,right=0,hud=0;
     bool started=false,initialized=false;
+    std::ofstream air;
     template<class F>void guarded(F action){try{action();}catch(const std::exception& e){std::ofstream("cockpit-failure.txt")<<e.what()<<'\n';std::exit(42);}}
     void snapshot(){
         auto* v=oapiGetFocusInterface();require(v && target==v->GetName(),"Cockpit focus differs from required real vessel");
@@ -30,13 +32,15 @@ class Driver final:public oapi::Module {
         state<<frames<<','<<oapiGetSimTime()<<','<<oapiGetSimMJD()<<','<<v->GetName()<<','<<v->GetClassName()<<','<<oapiCockpitMode()<<','<<oapiGetHUDMode()<<','<<oapiGetMFDMode(0)<<','<<oapiGetMFDMode(1);
         for(double value:{p.x,p.y,p.z,velocity.x,velocity.y,velocity.z,rotation.m11,rotation.m12,rotation.m13,rotation.m21,rotation.m22,rotation.m23,rotation.m31,rotation.m32,rotation.m33,omega.x,omega.y,omega.z,v->GetMass(),v->GetFuelMass()})state<<','<<value;
         state<<','<<v->GetMeshCount()<<','<<v->GetThrusterCount()<<'\n';state.flush();
+        air<<frames<<','<<v->GetAtmDensity()<<','<<v->GetDynPressure()<<','<<v->GetAirspeed()<<'\n';air.flush();
         controls<<frames<<','<<v->GetControlSurfaceLevel(AIRCTRL_ELEVATOR)<<','<<v->GetControlSurfaceLevel(AIRCTRL_AILERON)<<','<<v->GetThrusterGroupLevel(THGROUP_MAIN)<<'\n';controls.flush();
     }
 public:
     explicit Driver(HINSTANCE instance):Module(instance){guarded([&]{
-        std::ifstream input("cockpit-case.txt");require(bool(input>>target>>total>>cockpit>>left>>right>>hud),"Invalid cockpit fixture controls");
+        std::ifstream input("cockpit-case.txt");require(bool(input>>target>>total>>cockpit>>left>>right>>hud>>profile),"Invalid cockpit fixture controls");
         require(total==60 && cockpit>=1 && cockpit<=3 && left>=1 && left<=10 && right>=1 && right<=10,"Unsupported cockpit control schedule");
-        for(auto* stream:{&state,&events,&controls}){stream->imbue(std::locale::classic());stream->exceptions(std::ios::badbit|std::ios::failbit);}
+        for(auto* stream:{&state,&events,&controls,&air}){stream->imbue(std::locale::classic());stream->exceptions(std::ios::badbit|std::ios::failbit);}
+        air.open("lua-air.csv");air<<std::setprecision(17)<<"tick,density,dynamic_pressure,airspeed\n";
         controls.open("lua-controls.csv");controls<<std::setprecision(17)<<"tick,elevator,aileron,main\n";
         state.open("cockpit-state.csv");events.open("cockpit-events.csv");state<<std::setprecision(17);events<<std::setprecision(17);
         state<<"tick,seconds,mjd,object,class,cockpit,hud,left_mfd,right_mfd,x,y,z,vx,vy,vz,m11,m12,m13,m21,m22,m23,m31,m32,m33,wx,wy,wz,mass,fuel,meshes,thrusters\n";
@@ -62,6 +66,15 @@ public:
         if(frames==0) {
             script=oapiCreateInterpreter();require(script!=nullptr,"Original Lua interpreter creation failed");
             require(oapiGetLua(script)!=nullptr,"Original Lua state missing");
+            std::ofstream loaded("lua-loaded.txt");
+            for(const auto* name:{"LuaInline.dll","LuaInterpreter.dll","lua.dll"}) {
+                auto library=GetModuleHandleA(name);
+                wchar_t path[32768];
+                auto count=library ? GetModuleFileNameW(library,path,32768) : 0;
+                require(count>0 && count<32768 && std::filesystem::equivalent(path,std::filesystem::current_path()/name),
+                        "Original app-local Lua module missing");
+                loaded<<name<<'\n';
+            }
             const char* setup=R"lua(
                 audit_count=0
                 function audit(event)
@@ -89,8 +102,15 @@ public:
         if(frames==30) {
             secondary=oapiCreateInterpreter();require(secondary!=nullptr,"Second original interpreter missing");
             require(oapiExecScriptCmd(secondary,"assert(audit_count==nil); local f=assert(io.open('lua-isolation.txt','w')); f:write('isolated'); f:close()"),"Original interpreter isolation failed");
-            if(target=="DG")require(oapiAsyncScriptCmd(script,"aap.alt(20000); aap.spd(100); aap.bank(5); audit('aap_started')"),"Original AAP activation failed");
+            if(target=="DG") {
+                const char* start=profile=="atmosphere" ?
+                    "aap.alt(altitude()+500); aap.spd(airspeed()-25); aap.bank(5); audit('aap_started')" :
+                    "aap.alt(20000); aap.spd(9000); aap.bank(5); audit('aap_started')";
+                require(oapiAsyncScriptCmd(script,start),"Original AAP activation failed");
+            }
         }
+        if(frames==38 && profile=="atmosphere")
+            require(oapiAsyncScriptCmd(script,"aap.spd(airspeed()+50); audit('aap_retargeted')"),"Original AAP speed retarget failed");
         if(frames==45) {
             require(oapiDelInterpreter(secondary)==0,"Original secondary interpreter deletion failed");secondary=nullptr;
             if(target=="DG")require(oapiAsyncScriptCmd(script,"aap.alt(); aap.spd(); aap.bank(); audit('aap_stopped')"),"Original AAP stop failed");

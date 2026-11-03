@@ -23,6 +23,10 @@ def settings():
 
 def validate(directory, case):
     require(json.loads((directory/'ui-clock.json').read_text())['seconds_per_frame'] == .25, 'Original UI clock fixture differs')
+    frames = rows(directory/'ui-clock-trace.csv')
+    require(len(frames)==60 and all(float(row['delta'])==.25 for row in frames), 'Original GUI did not run sixty fixed-clock frames')
+    numbers=[int(row['frame']) for row in frames]
+    require(numbers==list(range(numbers[0],numbers[0]+60)), 'Original GUI frame sequence differs')
     ui = rows(directory/'ui-state.csv')
     require({int(row['tick']) for row in ui} == set(range(61)), 'Incomplete UI observations')
     require(any(row['popup_hex'] for row in ui if int(row['tick']) == 20), 'No original popup at capture 20')

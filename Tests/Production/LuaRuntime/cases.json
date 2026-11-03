@@ -44,6 +44,30 @@
       "left": 1,
       "right": 2,
       "hud": 1
+    },
+    {
+      "id": "lua_dg_atmosphere",
+      "fixture": "dg_orbit",
+      "target": "DG",
+      "class": "DeltaGlider",
+      "cockpit": 2,
+      "left": 1,
+      "right": 2,
+      "hud": 1,
+      "stock_atmosphere": "Scenarios/Delta-glider/Animated control surfaces.scn",
+      "stock_ship": "GL-01"
+    },
+    {
+      "id": "lua_dgs_atmosphere",
+      "fixture": "dg_orbit",
+      "target": "DG",
+      "class": "DG-S",
+      "cockpit": 2,
+      "left": 1,
+      "right": 2,
+      "hud": 1,
+      "stock_atmosphere": "Scenarios/2024 Edition/Cruising above Florida.scn",
+      "stock_ship": "GL-01S"
     }
   ],
   "runtime_recipe": "Complete application/SDK rebuilt from the pinned source with the isolated DG sample-time initialization repair; no cockpit extraction."
