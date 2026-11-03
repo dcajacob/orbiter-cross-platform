@@ -13,9 +13,23 @@ void event(const char* name)
     std::ofstream(orbiter::production::GetNativeRenderContext().evidence / "custom-mfd-events.txt",
                   std::ios::app) << name << '\n';
 }
-class ProbeMFD final : public MFD2 {
+class ProbeDialog final : public ImGuiDialog {
+    int frames = 0;
 public:
-    using MFD2::MFD2;
+    ProbeDialog(): ImGuiDialog("Native vessel dialog") {}
+    void OnDraw() override {
+        std::ofstream(orbiter::production::GetNativeRenderContext().evidence / "module-dialog.txt",
+                      std::ios::app) << ++frames << ',' << oapiGetSimTime() << '\n';
+        if (frames == 2) oapiCloseDialog(this);
+    }
+};
+class ProbeMFD final : public MFD2 {
+    ProbeDialog dialog;
+public:
+    ProbeMFD(oapi::UInt32 w, oapi::UInt32 h, VESSEL *v): MFD2(w,h,v) {
+        oapiOpenDialog(&dialog);
+        oapiOpenDialog(&dialog);
+    }
     ~ProbeMFD() override { event("destroy"); }
     char* ButtonLabel(int button) override {
         static char label[] = "TST";

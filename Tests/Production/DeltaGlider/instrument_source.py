@@ -20,6 +20,7 @@ def verify():
             if source != original.replace(b'\r\n', b'\n'):
                 raise ValueError('Stock DG instrument changed beyond SDK type and path spellings: ' + name)
     verify_subsystems()
+    verify_vessel()
     print('Original DG fuel, attitude, AOA, HSI, vertical speed, angular rate and cockpit switch algorithms conserved')
 
 
@@ -59,3 +60,28 @@ def verify_subsystems():
             if tokens(original) != tokens(source):
                 raise ValueError('Stock DG flight or control behavior differs: ' + name)
     print('All 15 stock DG and DG-S subsystem implementations conserved through SDK and platform bindings')
+
+
+def verify_vessel():
+    from vessel_runtime_source import aliases, equal
+    name = 'Src/Vessel/DeltaGlider/DeltaGlider.cpp'
+    original = subprocess.check_output(['git', '-C', str(ROOT), 'show', BASE + ':' + name]).decode('cp1252')
+    source = aliases((ROOT / name).read_bytes().decode('cp1252'))
+    first = 'static const DWORD ntdvtx_geardown'
+    last = '// API callback interface'
+    actual = source[source.index(first):source.index(last)]
+    expected = original[original.index(first):original.index(last)]
+    actual = actual.replace('dg::RandomInteger()', 'rand()').replace('dg::ComparePrefix', '_strnicmp')
+    # Signed scan count/seat numbers and bounded skin input preserve valid state.
+    expected = expected.replace('DWORD i, res, pi[4];','int i, res, pi[4];')
+    expected = expected.replace('if (pi[i]-1 < 4)','if (pi[i] >= 1 && pi[i] <= 4)')
+    expected = expected.replace('sscanf (line+4, "%s", skinpath);','if (sscanf (line+4, "%31s", skinpath) != 1) continue;')
+    equal(expected, actual, 'Stock DeltaGlider flight, animations, panel, VC, UI and callbacks')
+    entry = 'DLLCLBK VESSEL *ovcInit'
+    end = '// Scenario editor interface'
+    equal(original[original.index(entry):original.index(end)], source[source.index(entry):source.index(end)],
+          'Stock DG vessel creation and release')
+    editor = 'DeltaGlider *GetDG (HWND'
+    equal(original[original.index(editor):], source[source.index(editor):source.rindex('#else')],
+          'Stock Windows DG scenario editor')
+    print('Stock DeltaGlider and DG-S main vessel flight and cockpit implementations conserved')

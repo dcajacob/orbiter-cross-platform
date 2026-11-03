@@ -185,6 +185,34 @@ namespace {char debugMessage[1024]{};void RenderLog(const char* text) {std::clog
 #endif
 }
 
+void oapiCameraSetCockpitDir(double polar, double azimuth, bool)
+{
+    GetNativeRenderContext().camera->SetCockpitDir(polar, azimuth);
+}
+
+SURFHANDLE oapiLoadTexture(const char *fname, bool dynamic)
+{
+    auto *client = GetNativeRenderContext().graphics;
+    return client ? client->clbkLoadTexture(fname, 8 & (dynamic ? 3 : 0)) : nullptr;
+}
+
+void oapiReleaseTexture(SURFHANDLE texture)
+{
+    if (auto *client = GetNativeRenderContext().graphics) client->ReleaseTextureResource(texture);
+}
+
+SURFHANDLE oapiCreateSurfaceEx(int width, int height, oapi::UInt32 attrib)
+{
+    auto *client = GetNativeRenderContext().graphics;
+    return client ? client->clbkCreateSurfaceEx(width, height, attrib) : nullptr;
+}
+
+SURFHANDLE oapiRegisterParticleTexture(char *name)
+{
+    auto *client = GetNativeRenderContext().graphics;
+    return client ? client->clbkLoadTexture((std::string(name) + ".dds").c_str(), 0x8) : nullptr;
+}
+
  oapi::Font *oapiCreateFont (int height, bool prop, char *face, FontStyle style)
 {
 	NativeGraphics *gc = GetNativeRenderContext().graphics;

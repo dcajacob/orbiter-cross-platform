@@ -22,13 +22,10 @@
 #include "DockingSubsys.h"
 #include "AvionicsSubsys.h"
 #include "MfdSubsys.h"
-#include "ScnEditorAPI.h"
 #include "PressureSubsys.h"
 #include "ThermalSubsys.h"
 #include "LightSubsys.h"
 #include "FailureSubsys.h"
-#include "DlgCtrl.h"
-#include "resource.h"
 #include "meshres.h"
 #include "meshres_vc.h"
 #include "meshres_p0.h"
@@ -36,7 +33,14 @@
 #include <stdio.h>
 #include <math.h>
 #include <time.h>
-#include "OrbiterSDK.h"
+#ifdef _WIN32
+#include "ScnEditorAPI.h"
+#include "DlgCtrl.h"
+#include "resource.h"
+#include "Orbitersdk.h"
+#else
+#define DLLCLBK static
+#endif
 #include <imgui.h>
 
 using std::min;
@@ -48,6 +52,7 @@ using std::max;
 
 GDIParams g_Param;
 
+#ifdef _WIN32
 static HELPCONTEXT g_hc = {
 	(char*)"html/vessels/deltaglider.chm",
 	0,
@@ -55,7 +60,9 @@ static HELPCONTEXT g_hc = {
 	(char*)"html/vessels/deltaglider.chm::/deltaglider.hhk"
 };
 
-static const DWORD ntdvtx_geardown = 13;
+#endif
+
+static const oapi::UInt32 ntdvtx_geardown = 13;
 static TOUCHDOWNVTX tdvtx_geardown[ntdvtx_geardown] = {
 	{_V( 0   ,-2.57,10   ), 1e6, 1e5, 1.6, 0.1},
 	{_V(-3.5 ,-2.57,-1   ), 1e6, 1e5, 3.0, 0.2},
@@ -72,7 +79,7 @@ static TOUCHDOWNVTX tdvtx_geardown[ntdvtx_geardown] = {
 	{_V( 0   ,-0.6 ,10.65), 1e7, 1e5, 3.0}
 };
 
-static const DWORD ntdvtx_gearup = 13;
+static const oapi::UInt32 ntdvtx_gearup = 13;
 static TOUCHDOWNVTX tdvtx_gearup[ntdvtx_gearup] = {
 	{_V( 0   ,-1.5 ,9),     1e7, 1e5, 3.0, 3.0},
 	{_V(-6   ,-0.8 ,-5),    1e7, 1e5, 3.0, 3.0},
@@ -92,7 +99,7 @@ static TOUCHDOWNVTX tdvtx_gearup[ntdvtx_gearup] = {
 // ==============================================================
 // Local prototypes
 
-//INT_PTR CALLBACK Damage_DlgProc (HWND, UINT, WPARAM, LPARAM);
+//INT_PTR CALLBACK Damage_DlgProc (HWND, oapi::UInt, WPARAM, LPARAM);
 //void UpdateDamageDialog (DeltaGlider *dg, HWND hWnd = 0);
 
 // ==============================================================
@@ -339,7 +346,7 @@ DeltaGlider::DeltaGlider (OBJHANDLE hObj, int fmodel)
 // --------------------------------------------------------------
 DeltaGlider::~DeltaGlider ()
 {
-	DWORD i;
+	oapi::UInt32 i;
 
 	if (insignia_tex) oapiDestroySurface(insignia_tex);
 
@@ -366,10 +373,10 @@ void DeltaGlider::SetEmptyMass () const
 void DeltaGlider::DefineAnimations ()
 {
 	// ***** Rudder animation *****
-	static UINT RRudderGrp[2] = {GRP_RRudder1,GRP_RRudder2};
+	static oapi::UInt RRudderGrp[2] = {GRP_RRudder1,GRP_RRudder2};
 	static MGROUP_ROTATE RRudder (0, RRudderGrp, 2,
 		_V( 8.668,0.958,-6.204), _V( 0.143,0.975,-0.172), (float)(-60*RAD));
-	static UINT LRudderGrp[2] = {GRP_LRudder1,GRP_LRudder2};
+	static oapi::UInt LRudderGrp[2] = {GRP_LRudder1,GRP_LRudder2};
 	static MGROUP_ROTATE LRudder (0, LRudderGrp, 2,
 		_V(-8.668,0.958,-6.204), _V(-0.143,0.975,-0.172), (float)(-60*RAD));
 	anim_rudder = CreateAnimation (0.5);
@@ -377,7 +384,7 @@ void DeltaGlider::DefineAnimations ()
 	AddAnimationComponent (anim_rudder, 0, 1, &LRudder);
 
 	// ***** Elevator animation *****
-	static UINT ElevatorGrp[8] = {GRP_LUAileron1,GRP_LUAileron2,GRP_LLAileron1,GRP_LLAileron2,GRP_RUAileron1,GRP_RUAileron2,GRP_RLAileron1,GRP_RLAileron2};
+	static oapi::UInt ElevatorGrp[8] = {GRP_LUAileron1,GRP_LUAileron2,GRP_LLAileron1,GRP_LLAileron2,GRP_RUAileron1,GRP_RUAileron2,GRP_RLAileron1,GRP_RLAileron2};
 	static MGROUP_ROTATE Elevator (0, ElevatorGrp, 8,
 		_V(0,-0.4,-6.0), _V(1,0,0), (float)(40*RAD));
 	anim_elevator = CreateAnimation (0.5);
@@ -390,13 +397,13 @@ void DeltaGlider::DefineAnimations ()
 	AddAnimationComponent (anim_elevatortrim, 0, 1, &ElevatorTrim);
 
 	// ***** Aileron animation *****
-	static UINT LAileronGrp[4] = {GRP_LUAileron1,GRP_LUAileron2,GRP_LLAileron1,GRP_LLAileron2};
+	static oapi::UInt LAileronGrp[4] = {GRP_LUAileron1,GRP_LUAileron2,GRP_LLAileron1,GRP_LLAileron2};
 	static MGROUP_ROTATE LAileron (0, LAileronGrp, 4,
 		_V(0,-0.4,-6.0), _V(1,0,0), (float)(-20*RAD));
 	anim_laileron = CreateAnimation (0.5);
 	AddAnimationComponent (anim_laileron, 0, 1, &LAileron);
 
-	static UINT RAileronGrp[4] = {GRP_RUAileron1,GRP_RUAileron2,GRP_RLAileron1,GRP_RLAileron2};
+	static oapi::UInt RAileronGrp[4] = {GRP_RUAileron1,GRP_RUAileron2,GRP_RLAileron1,GRP_RLAileron2};
 	static MGROUP_ROTATE RAileron (0, RAileronGrp, 4,
 		_V(0,-0.4,-6.0), _V(1,0,0), (float)(20*RAD));
 	anim_raileron = CreateAnimation (0.5);
@@ -468,7 +475,7 @@ void DeltaGlider::InitPanel (int panel)
 
 	switch (panel) {
 	case 0: // main panel
-		for (DWORD i = 0; i < 2; i++)
+		for (oapi::UInt32 i = 0; i < 2; i++)
 			mainflowidx[i] = retroflowidx[i] = scTSFCidx[i] = scflowidx[i] = -1;
 		hoverflowidx = mainTSFCidx = -1;
 		break;
@@ -545,19 +552,19 @@ void DeltaGlider::clbkRenderHUD (int mode, const HUDPAINTSPEC *hps, SURFHANDLE h
 
 	static float texw = 512.0f, texh = 256.0f;
 	float cx = (float)hps->CX, cy = (float)hps->CY;
-	DWORD i, nvtx = 0, nidx = 0;
+	oapi::UInt32 i, nvtx = 0, nidx = 0;
 	static NTVERTEX vtx[12+16+4];
-	static WORD idx[18+36+6];
+	static oapi::UInt16 idx[18+36+6];
 	static float scl = 0;
 	static NTVERTEX vgear[12];
 	static NTVERTEX vnose[16];
 	static NTVERTEX vbrk[4];
-	static WORD igear[18] = {
+	static oapi::UInt16 igear[18] = {
 		0,3,1, 3,0,2,
 		4,7,5, 7,4,6,
 		8,11,9, 11,8,10
 	};
-	static WORD inose[36] = {
+	static oapi::UInt16 inose[36] = {
 		0,1,2, 2,3,0,
 		0,6,1, 6,7,1,
 		1,8,2, 8,9,2,
@@ -565,7 +572,7 @@ void DeltaGlider::clbkRenderHUD (int mode, const HUDPAINTSPEC *hps, SURFHANDLE h
 		3,4,0, 0,4,5,
 		12,15,13, 12,14,15
 	};
-	static WORD ibrk[6] = {
+	static oapi::UInt16 ibrk[6] = {
 		0,3,1, 0,2,3
 	};
 
@@ -700,7 +707,7 @@ void DeltaGlider::TestDamage ()
 		double p = 1.0 - exp (-alpha*dt); // probability of failure
 		if (oapiRand() < p) {
 			// simulate structural failure by distorting the airfoil definition
-			int rfail = rand();
+			int rfail = dg::RandomInteger();
 			switch (rfail & 3) {
 			case 0: // fail left wing
 				lwingstatus *= exp (-alpha*oapiRand());
@@ -870,7 +877,7 @@ void DeltaGlider::UpdateStatusIndicators ()
 	double d;
 
 	static NTVERTEX vtx[16];
-	static WORD vidx[16] = {0,1,4,5,20,21,8,9,24,25,16,17,12,13,28,29};
+	static oapi::UInt16 vidx[16] = {0,1,4,5,20,21,8,9,24,25,16,17,12,13,28,29};
 	GROUPEDITSPEC ges;
 	ges.flags = GRPEDIT_VTXTEXU;
 	ges.nVtx = 16;
@@ -922,7 +929,7 @@ void DeltaGlider::SetPassengerVisuals ()
 	static int vcpsngridx[4] = {GRP_PASSENGER1_VC, GRP_PASSENGER2_VC, GRP_PASSENGER3_VC, GRP_PASSENGER4_VC};
 	static int vcvisoridx[4] = {GRP_PASSENGER1_VISOR_VC, GRP_PASSENGER2_VISOR_VC, GRP_PASSENGER3_VISOR_VC, GRP_PASSENGER4_VISOR_VC};
 
-	for (DWORD i = 0; i < 4; i++) {
+	for (oapi::UInt32 i = 0; i < 4; i++) {
 		if (psngr[i]) {
 			ges.flags = GRPEDIT_SETUSERFLAG;
 			ges.UsrFlag = 1;
@@ -937,7 +944,7 @@ void DeltaGlider::SetPassengerVisuals ()
 	}
 }
 
-static UINT AileronGrp[8] = {GRP_RUAileron1,GRP_LUAileron1,GRP_LUAileron2,GRP_RUAileron2,GRP_LLAileron1,GRP_RLAileron1,GRP_LLAileron2,GRP_RLAileron2};
+static oapi::UInt AileronGrp[8] = {GRP_RUAileron1,GRP_LUAileron1,GRP_LUAileron2,GRP_RUAileron2,GRP_LLAileron1,GRP_RLAileron1,GRP_LLAileron2,GRP_RLAileron2};
 
 void DeltaGlider::SetDamageVisuals ()
 {
@@ -1084,7 +1091,7 @@ void DeltaGlider::clbkSetClassCaps (FILEHANDLE cfg)
 	AddExhaustStream (th_main[1], _V( 1,0,-15), &contrail);
 	AddExhaustStream (th_main[0], _V(-1,0,-10), &exhaust_main);
 	AddExhaustStream (th_main[1], _V( 1,0,-10), &exhaust_main);
-	//DWORD i = GetGroupThrusterCount (THGROUP_MAIN);
+	//oapi::UInt32 i = GetGroupThrusterCount (THGROUP_MAIN);
 
 	// retro thrusters
 	// note that we have to tilt retros slightly downwards to avoid inducing
@@ -1239,15 +1246,15 @@ void DeltaGlider::clbkLoadStateEx (FILEHANDLE scn, void *vs)
     char *line;
 
 	while (oapiReadScenario_nextline (scn, line)) {
-		if (!_strnicmp (line, "TANKCONFIG", 10)) {
+		if (!dg::ComparePrefix (line, "TANKCONFIG", 10)) {
 			if (ssys_scram) sscanf (line+10, "%d", &tankconfig);
-		} else if (!_strnicmp (line, "PSNGR", 5)) {
-			DWORD i, res, pi[4];
+		} else if (!dg::ComparePrefix (line, "PSNGR", 5)) {
+			int i, res, pi[4];
 			res = sscanf (line+5, "%d%d%d%d", pi+0, pi+1, pi+2, pi+3);
 			for (i = 0; i < res; i++)
-				if (pi[i]-1 < 4) psngr[pi[i]-1] = true;
-		} else if (!_strnicmp (line, "SKIN", 4)) {
-			sscanf (line+4, "%s", skinpath);
+				if (pi[i] >= 1 && pi[i] <= 4) psngr[pi[i]-1] = true;
+		} else if (!dg::ComparePrefix (line, "SKIN", 4)) {
+			if (sscanf (line+4, "%31s", skinpath) != 1) continue;
 			char fname[256];
 			strcpy (fname, "DG\\Skins\\");
 			strcat (fname, skinpath);
@@ -1260,7 +1267,7 @@ void DeltaGlider::clbkLoadStateEx (FILEHANDLE scn, void *vs)
 				oapiReleaseTexture (skin[2]);
 				skin[2] = NULL;
 			}
-		} else if (!_strnicmp (line, "PANELCOL", 8)) {
+		} else if (!dg::ComparePrefix (line, "PANELCOL", 8)) {
 			sscanf (line+8, "%d", &panelcol);
         } else {
 			// offer the line to all subsystems
@@ -1360,7 +1367,7 @@ void DeltaGlider::clbkVisualCreated (VISHANDLE vis, int refcount)
 			GRP_SCRAM_TEMP_VC,GRP_SCRAM_GIMBAL_INDICATOR_VC,
 			GRP_THROTTLE_SCRAM_L1_VC,GRP_THROTTLE_SCRAM_R1_VC,
 			GRP_THROTTLE_SCRAM_L2_VC,GRP_THROTTLE_SCRAM_R2_VC};
-		for (DWORD i = 0; i < 11; i++)
+		for (oapi::UInt32 i = 0; i < 11; i++)
 			oapiEditMeshGroup (vcmesh, vcscramidx[i], &ges);
 	}
 
@@ -1405,7 +1412,7 @@ void DeltaGlider::clbkRCSMode (int mode)
 // --------------------------------------------------------------
 // Respond to control surface mode change
 // --------------------------------------------------------------
-void DeltaGlider::clbkADCtrlMode (DWORD mode)
+void DeltaGlider::clbkADCtrlMode (oapi::UInt32 mode)
 {
 	ssys_aerodyn->SetMode (mode);
 }
@@ -1476,7 +1483,7 @@ bool DeltaGlider::clbkLoadGenericCockpit ()
 // Load 2-D instrument panel mode
 // --------------------------------------------------------------
 
-bool DeltaGlider::clbkLoadPanel2D (int id, PANELHANDLE hPanel, DWORD viewW, DWORD viewH)
+bool DeltaGlider::clbkLoadPanel2D (int id, PANELHANDLE hPanel, oapi::UInt32 viewW, oapi::UInt32 viewH)
 {
 	// set up subsystem panel elements
 	ComponentVessel::clbkLoadPanel2D (id, hPanel, viewW, viewH);
@@ -1501,7 +1508,7 @@ bool DeltaGlider::clbkLoadPanel2D (int id, PANELHANDLE hPanel, DWORD viewW, DWOR
 	}
 }
 
-void DeltaGlider::SetPanelScale (PANELHANDLE hPanel, DWORD viewW, DWORD viewH)
+void DeltaGlider::SetPanelScale (PANELHANDLE hPanel, oapi::UInt32 viewW, oapi::UInt32 viewH)
 {
 	double defscale = (double)viewW/PANEL2D_WIDTH;
 	double extscale = max (defscale, 1.0);
@@ -1513,7 +1520,7 @@ void DeltaGlider::DefinePanelMain (PANELHANDLE hPanel)
 	hPanelMesh = panelmesh0;
 	SURFHANDLE panel2dtex = oapiGetTextureHandle(hPanelMesh,1);
 
-	const DWORD panelw = PANEL2D_WIDTH, panelh = 572;
+	const oapi::UInt32 panelw = PANEL2D_WIDTH, panelh = 572;
 
 	SetPanelBackground (hPanel, 0, 0, hPanelMesh, panelw, panelh, 190,
 		PANEL_ATTACH_BOTTOM | PANEL_MOVEOUT_BOTTOM);
@@ -1532,7 +1539,7 @@ void DeltaGlider::DefinePanelMain (PANELHANDLE hPanel)
 void DeltaGlider::DefinePanelOverhead (PANELHANDLE hPanel)
 {
 	hPanelMesh = panelmesh1;
-	const DWORD panelw = PANEL2D_WIDTH, panelh = 283;
+	const oapi::UInt32 panelw = PANEL2D_WIDTH, panelh = 283;
 
 	SetPanelBackground (hPanel, 0, 0, hPanelMesh, panelw, panelh, 0,
 		PANEL_ATTACH_TOP | PANEL_MOVEOUT_TOP);
@@ -1689,7 +1696,7 @@ bool DeltaGlider::clbkVCRedrawEvent (int id, int event, SURFHANDLE surf)
 // --------------------------------------------------------------
 // Process buffered key events
 // --------------------------------------------------------------
-int DeltaGlider::clbkConsumeBufferedKey (DWORD key, bool down, char *kstate)
+int DeltaGlider::clbkConsumeBufferedKey (oapi::UInt32 key, bool down, char *kstate)
 {
 	if (!down) return 0; // only process keydown events
 	if (Playback()) return 0; // don't allow manual user input during a playback
@@ -1723,30 +1730,38 @@ int DeltaGlider::clbkGeneric (int msgid, int prm, void *context)
 // --------------------------------------------------------------
 // Module initialisation
 // --------------------------------------------------------------
+static void InitDrawingResources ()
+{
+	// PS_SOLID is 0. The stock RGB colours are packed in 0x00bbggrr order.
+	g_Param.pen[0] = oapiCreatePen (0, 1, 0x00e0e0e0);
+	g_Param.pen[1] = oapiCreatePen (0, 3, 0x00a4a4a4);
+	g_Param.surf = oapiLoadTexture ("DG\\blitsrc1.dds", true);
+}
+
+static void ReleaseDrawingResources ()
+{
+	for (auto &pen : g_Param.pen) {
+		if (pen) oapiReleasePen(pen);
+		pen = nullptr;
+	}
+	if (g_Param.surf) oapiReleaseTexture(g_Param.surf);
+	g_Param.surf = nullptr;
+}
+
+#ifdef _WIN32
 DLLCLBK void InitModule (HINSTANCE hModule)
 {
 	g_Param.hDLL = hModule;
 	oapiRegisterCustomControls (hModule);
-
-	// allocate SketchPad resources
-	g_Param.pen[0] = oapiCreatePen (PS_SOLID, 1, RGB(224,224,224));
-	g_Param.pen[1] = oapiCreatePen (PS_SOLID, 3, RGB(164,164,164));
-	g_Param.surf = oapiLoadTexture ("DG\\blitsrc1.dds", true);
+	InitDrawingResources();
 }
 
-// --------------------------------------------------------------
-// Module cleanup
-// --------------------------------------------------------------
 DLLCLBK void ExitModule (HINSTANCE hModule)
 {
 	oapiUnregisterCustomControls (hModule);
-
-	int i;
-
-	// deallocate SketchPad resources
-	for (i = 0; i < 2; i++) oapiReleasePen(g_Param.pen[i]);
-	oapiReleaseTexture (g_Param.surf);
+	ReleaseDrawingResources();
 }
+#endif
 
 // --------------------------------------------------------------
 // Vessel initialisation
@@ -1773,6 +1788,7 @@ DLLCLBK void ovcExit (VESSEL *vessel)
 // Scenario editor interface
 // ==============================================================
 
+#ifdef _WIN32
 DeltaGlider *GetDG (HWND hDlg)
 {
 	// retrieve DG interface from scenario editor
@@ -2004,4 +2020,8 @@ void UpdateDamageDialog (DeltaGlider *dg, HWND hWnd)
 	snprintf (cbuf, sizeof(cbuf) - 1, "%0.0f %%", dg->rwingstatus*100.0);
 	SetWindowText (GetDlgItem (hWnd, IDC_RIGHTWING_STATUS), cbuf);
 }
+#endif
+
+#else
+#include "NativeDeltaGliderFactory.inc"
 #endif

@@ -11,7 +11,7 @@ endif()
 FetchContent_Declare(native_imgui URL "${_ui_url}" URL_HASH "SHA256=${_ui_hash}" DOWNLOAD_EXTRACT_TIMESTAMP TRUE SOURCE_SUBDIR no-build)
 FetchContent_MakeAvailable(native_imgui)
 target_sources(orbiter_production_vessels PRIVATE
-    NativeCockpitProjection.cpp NativeCockpitMfd.cpp NativeCockpitGui.cpp NativeCockpitVessel.cpp ../CockpitSdk.cpp ../Astro.cpp
+    NativeScript.cpp NativeCockpitProjection.cpp NativeCockpitMfd.cpp NativeCockpitGui.cpp NativeCockpitVessel.cpp ../CockpitSdk.cpp ../Astro.cpp
     ../Pane.cpp ../hud.cpp ../Defpanel.cpp ../Panel2D.cpp ../VCockpit.cpp ../Select.cpp
     ../Mfd.cpp ../MfdUser.cpp ../VectorMap.cpp ../MfdOrbit.cpp ../MfdSurface.cpp ../MfdMap.cpp ../MfdHsi.cpp
     ../MfdLanding.cpp ../MfdDocking.cpp ../MfdAlign.cpp ../MfdSync.cpp ../MfdTransfer.cpp ../MfdComms.cpp
@@ -72,3 +72,22 @@ target_include_directories(native_dg_subsystems PRIVATE "${_dg_header_dir}")
 target_link_libraries(native_dg_subsystems PRIVATE native_dg_instruments orbiter_production_vessels)
 set_target_properties(native_dg_subsystems PROPERTIES POSITION_INDEPENDENT_CODE ON)
 add_dependencies(native_dg_subsystems native_dg_mesh_resources)
+
+add_library(native_dg_vessel OBJECT "${_dg_source}/DeltaGlider.cpp")
+target_include_directories(native_dg_vessel PRIVATE "${_dg_header_dir}" "${native_imgui_SOURCE_DIR}")
+target_link_libraries(native_dg_vessel PRIVATE native_dg_subsystems orbiter_production_vessels)
+set_target_properties(native_dg_vessel PROPERTIES POSITION_INDEPENDENT_CODE ON)
+add_dependencies(native_dg_vessel native_dg_mesh_resources)
+
+add_subdirectory("${CMAKE_CURRENT_LIST_DIR}/../../Module/LuaScript/Native" "${PROJECT_BINARY_DIR}/native-lua")
+add_library(native_deltaglider MODULE
+    $<TARGET_OBJECTS:native_dg_vessel> $<TARGET_OBJECTS:native_dg_lua_bindings>)
+target_link_libraries(native_deltaglider PRIVATE native_dg_subsystems native_lua_script_files lua orbiter_production_vessels)
+target_link_options(native_deltaglider PRIVATE -Wl,--no-undefined)
+set_target_properties(native_deltaglider PROPERTIES PREFIX "" OUTPUT_NAME DeltaGlider
+    LIBRARY_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/NativeModules/Vessel")
+
+add_library(native_lua_inline_list OBJECT ../../Module/LuaScript/LuaInline/LuaInline.cpp)
+target_include_directories(native_lua_inline_list PRIVATE "${CMAKE_CURRENT_LIST_DIR}/../../Module/LuaScript/LuaInterpreter")
+target_link_libraries(native_lua_inline_list PRIVATE lua orbiter_production_vessels)
+set_target_properties(native_lua_inline_list PROPERTIES POSITION_INDEPENDENT_CODE ON)

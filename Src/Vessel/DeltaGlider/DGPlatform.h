@@ -4,6 +4,7 @@
 #include <cstdlib>
 #include <cstring>
 namespace dg {
+inline int RandomInteger() { return std::rand(); }
 inline int CompareText(const char *a, const char *b) { return _stricmp(a, b); }
 inline int ComparePrefix(const char *a, const char *b, std::size_t n) { return _strnicmp(a, b, n); }
 inline double RandomLampPhase() { return (double)std::rand()/(double)RAND_MAX; }
@@ -13,6 +14,7 @@ inline double RandomLampPhase() { return (double)std::rand()/(double)RAND_MAX; }
 #include "Production/Random.h"
 #include "Production/Text.h"
 namespace dg {
+using orbiter::production::RandomInteger;
 using orbiter::production::CompareText;
 using orbiter::production::ComparePrefix;
 inline double RandomLampPhase()

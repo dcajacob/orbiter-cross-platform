@@ -10,9 +10,26 @@
 #include "NativeGraphics.h"
 #include "imgui_internal.h"
 #include <unordered_map>
+#include <algorithm>
+#include <vector>
 #include <stdexcept>
 using namespace orbiter::production;
+namespace {
+std::vector<ImGuiDialog*> moduleDialogs;
+}
+
+void oapiOpenDialog(ImGuiDialog *dialog) {
+    if (std::find(moduleDialogs.begin(), moduleDialogs.end(), dialog) == moduleDialogs.end())
+        moduleDialogs.push_back(dialog);
+    dialog->Activate();
+}
+
+void oapiCloseDialog(ImGuiDialog *dialog) {
+    moduleDialogs.erase(std::remove(moduleDialogs.begin(), moduleDialogs.end(), dialog), moduleDialogs.end());
+}
+
 ImGuiDialog::~ImGuiDialog() {
+    oapiCloseDialog(this);
     auto& context=GetNativeRenderContext();
     if(context.cockpitSelect==this)context.cockpitSelect=nullptr;
     if(context.cockpitInput==this)context.cockpitInput=nullptr;
@@ -247,6 +264,7 @@ void SetCockpitReplayClock(float seconds) {
     }
 }
 void DestroyCockpitGui() {
+    moduleDialogs.clear();
     if(replayClockHook) {
         ImGui::RemoveContextHook(ImGui::GetCurrentContext(),replayClockHook);
         replayClockHook=0;
@@ -266,6 +284,12 @@ void BeginCockpitGuiFrame() {
         ImGui::SetWindowFocus(static_cast<const char*>(nullptr));
     if (selection->IsActive()) selection->Display();
     if (inputBox->IsActive()) inputBox->Display();
+    // A dialog may close or destroy another dialog during its draw callback.
+    const auto pending = moduleDialogs;
+    for (auto *dialog : pending) {
+        if (std::find(moduleDialogs.begin(), moduleDialogs.end(), dialog) != moduleDialogs.end() && dialog->IsActive())
+            dialog->Display();
+    }
     ImGui::EndFrame();
     if(uiFrames.is_open()){uiFrames<<ImGui::GetFrameCount()<<'\n';uiFrames.flush();}
 }

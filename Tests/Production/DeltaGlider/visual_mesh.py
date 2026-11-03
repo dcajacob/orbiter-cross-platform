@@ -51,6 +51,9 @@ def main():
     if life != dict(rendered_frames=60, successful_presents=60, context_deleted=True):
         raise ValueError('Incomplete renderer lifecycle after stock VC mesh deletion')
     events = (output / 'custom-mfd-events.txt').read_text().splitlines()
+    dialogs = list(csv.reader((output / 'module-dialog.txt').read_text().splitlines()))
+    if [r[0] for r in dialogs] != ['1','2'] or float(dialogs[1][1]) <= float(dialogs[0][1]):
+        raise ValueError('Module dialog registration, drawing or close differs')
     if 'draw' not in events or [e for e in events if e!='draw'] != ['open_extended','open_packed','recall','button','key','save','store','close','destroy']:
         raise ValueError('Custom MFD lifecycle or input differs: '+str(events))
     if 'TYPE User\n  MODE SDK Probe\n  PROBE saved' not in (output / 'saved.scn').read_text():

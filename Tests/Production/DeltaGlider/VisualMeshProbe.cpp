@@ -28,6 +28,12 @@ void exercise(VESSEL &vessel, VISHANDLE visual)
     char name[] = "PB";
     require(oapiGetObjectByName(name) == object && oapiGetFocusObject() == object, "Stock focus lookup differs");
     require(oapiCockpitMode() == COCKPIT_GENERIC, "Stock generic cockpit mode unavailable");
+    auto stockTexture = oapiLoadTexture("DG\\blitsrc1.dds", true);
+    auto target = oapiCreateSurfaceEx(256, 256, OAPISURFACE_TEXTURE | OAPISURFACE_RENDERTARGET);
+    require(stockTexture && target, "Stock DG module drawing resources unavailable");
+    oapiBlt(target, stockTexture, 0, 0, 0, 0, 16, 16);
+    oapiDestroySurface(target);
+    oapiReleaseTexture(stockTexture);
     HUDPARAM originalHud{}, docking{}, observed{};
     const int originalMode = oapiGetHUDMode(&originalHud);
     const double originalBrightness = oapiGetHUDIntensity();

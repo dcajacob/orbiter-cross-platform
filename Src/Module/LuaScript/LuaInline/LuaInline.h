@@ -28,17 +28,28 @@
 // ==============================================================
 // class InterpreterList: interface
 
-class InterpreterList: public oapi::Module {
+class InterpreterList
+#ifdef _WIN32
+    : public oapi::Module
+#endif
+{
 public:
 	using Environment = InlineEnvironment;
 
+#ifdef _WIN32
 	InterpreterList (HINSTANCE hDLL);
-	~InterpreterList ();
 
 	void clbkSimulationEnd () override;
 	void clbkPostStep (double simt, double simdt, double mjd) override;
 	void clbkSimulationStart (RenderMode mode) override;
 	void clbkDeleteVessel (OBJHANDLE hVessel) override;
+#else
+    InterpreterList ();
+    void clbkSimulationEnd ();
+    void clbkPostStep (double simt, double simdt, double mjd);
+    void clbkDeleteVessel (OBJHANDLE hVessel);
+#endif
+    ~InterpreterList ();
 	
 	Environment *AddInterpreter ();
 	int DelInterpreter (Environment *env);
@@ -46,8 +57,8 @@ public:
 private:
 
 	Environment **list;     // interpreter list
-	DWORD nlist;            // list size
-	DWORD nbuf;             // buffer size
+	oapi::UInt32 nlist;            // list size
+	oapi::UInt32 nbuf;             // buffer size
 };
 
 #endif // !__LUAINLINE_H

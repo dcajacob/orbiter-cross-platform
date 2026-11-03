@@ -32,6 +32,13 @@ struct VESSELPARAM;
 #include "OrbiterLightData.h"
 #include "OrbiterCameraData.h"
 #include "VesselAPI.h"
+#define BEACONSHAPE_COMPACT 0
+#define BEACONSHAPE_DIFFUSE 1
+#define BEACONSHAPE_STAR    2
+#define VMSG_LUAINTERPRETER 0x0001
+#define VMSG_LUAINSTANCE    0x0002
+OAPIFUNC void oapiOpenDialog(ImGuiDialog *dialog);
+OAPIFUNC void oapiCloseDialog(ImGuiDialog *dialog);
 OAPIFUNC OBJHANDLE oapiGetObjectByName (char *name);
 OAPIFUNC OBJHANDLE oapiGetGbodyParent (OBJHANDLE hBody);
 OAPIFUNC double oapiGetEmptyMass (OBJHANDLE hVessel);
@@ -154,6 +161,8 @@ OAPIFUNC bool oapiReadItem_bool (FILEHANDLE f, char *item, bool &val);
 OAPIFUNC bool oapiReadItem_vec (FILEHANDLE f, char *item, VECTOR3 &val);
 OAPIFUNC double oapiRand();
 OAPIFUNC void oapiParticleSetLevelRef(PSTREAM_HANDLE ph, double *lvl);
+struct lua_State;
+OAPIFUNC lua_State *oapiGetLua(INTERPRETERHANDLE hInterp);
 OAPIFUNC INTERPRETERHANDLE oapiCreateInterpreter();
 OAPIFUNC int oapiDelInterpreter(INTERPRETERHANDLE hInterp);
 OAPIFUNC bool oapiExecScriptCmd(INTERPRETERHANDLE hInterp, const char *cmd);

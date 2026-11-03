@@ -37,6 +37,7 @@
 #include "Pane.h"
 #include "Select.h"
 #include "NativeCockpitUi.h"
+#include "NativeScript.h"
 #include "CockpitSystemClock.h"
 #include "CockpitServices.h"
 #endif
@@ -86,6 +87,8 @@ struct Runtime final:BodyServices,RigidBodyServices,SurfaceServices,NavigationSe
     unsigned pendingCockpitRedraw=0,inputTick=0,completedTicks=0,observationTick=0;
     FlightControls controls;FlightReplay replay;FlightInput input;
 #ifdef ORBITER_NATIVE_COCKPIT
+    NativeScriptHost scripts{resources.modules};
+    INTERPRETERHANDLE scenarioInterpreter=nullptr;
     std::unique_ptr<Pane> cockpit;
     bool instrumentResources=false,cockpitObserved=false,guiCreated=false;
     std::ofstream cockpitState;
@@ -348,6 +351,9 @@ struct Runtime final:BodyServices,RigidBodyServices,SurfaceServices,NavigationSe
     Runtime(Resources& data):resources(data),config(data.config),celestial(config,data.data,data.modules),world(*this) {}
     void Finish() {
         if(finished)return;
+#ifdef ORBITER_NATIVE_COCKPIT
+        if(scenarioInterpreter) {oapiDelInterpreter(scenarioInterpreter);scenarioInterpreter=nullptr;}
+#endif
         if(render.graphics)render.graphics->CloseSession();
 #ifdef ORBITER_NATIVE_COCKPIT
         if (guiCreated) {
@@ -364,6 +370,9 @@ struct Runtime final:BodyServices,RigidBodyServices,SurfaceServices,NavigationSe
         world.Reset();meshes.Flush();
 #endif
         if(render.graphics)render.graphics->Close();graphicsModule.reset();render.graphics=nullptr;
+#ifdef ORBITER_NATIVE_COCKPIT
+        scripts.End();render.scripts=nullptr;
+#endif
 #ifdef ORBITER_NATIVE_COCKPIT
         if(cockpitState.is_open())cockpitState.close();
         if(cockpitMouse.is_open())cockpitMouse.close();
@@ -385,7 +394,11 @@ struct Runtime final:BodyServices,RigidBodyServices,SurfaceServices,NavigationSe
 #endif
         if(!settings.GetActiveModules().empty())unsupported("application plugins in this external-view host");
         scenarioState=std::make_unique<State>(51982.5);State& metadata=*scenarioState;if(!metadata.Read(scenario,51982.5))throw std::runtime_error("Cannot parse production scenario");
-        if(metadata.Script())unsupported("bundled Lua yet");
+#ifndef ORBITER_NATIVE_COCKPIT
+        if(metadata.Script())unsupported("bundled Lua in the external-view build");
+#else
+        render.scripts=&scripts;
+#endif
         if(!std::isfinite(metadata.Mjd()))throw std::runtime_error("Scenario epoch must be finite");
         time.Reset(metadata.Mjd());physics=settings.CfgPhysicsPrm;BindFlightControls(&controls);
         BindBodyServices(this);BindRigidBodyServices(this);BindCelestialServices(&celestial);BindSurfaceServices(this);
@@ -467,6 +480,9 @@ struct Runtime final:BodyServices,RigidBodyServices,SurfaceServices,NavigationSe
         render.camera->ResizeViewport(1280,720);render.camera->InitState(scenario.string().c_str(),focus);
 #ifndef ORBITER_NATIVE_COCKPIT
         if(!render.camera->IsExternal())unsupported("cockpits yet; select an external camera");
+#endif
+#ifdef ORBITER_NATIVE_COCKPIT
+        if(metadata.Script()) scenarioInterpreter=scripts.Load().run(metadata.Script());
 #endif
         render.graphics->PostCreation();system->PostCreation();
 #ifdef ORBITER_NATIVE_COCKPIT
@@ -586,7 +602,12 @@ struct Runtime final:BodyServices,RigidBodyServices,SurfaceServices,NavigationSe
     void ModuleNewVessel(Vessel* vessel) override {LifetimeEvent("module.create",vessel->Name());}
     void GraphicsNewVessel(Vessel* vessel) override {render.graphics->NewVessel(vessel);LifetimeEvent("graphics.create",vessel->Name());}
     void DialogNewVessel(Vessel*) override {} // No dialogs are instantiated.
-    void ModuleDeleteVessel(Vessel* vessel) override {LifetimeEvent("module.delete",vessel->Name());}
+    void ModuleDeleteVessel(Vessel* vessel) override {
+#ifdef ORBITER_NATIVE_COCKPIT
+        scripts.DeleteVessel(vessel);
+#endif
+        LifetimeEvent("module.delete",vessel->Name());
+    }
     void GraphicsDeleteVessel(Vessel* vessel) override {render.graphics->DeleteVessel(vessel);for(auto it=attachments.begin();it!=attachments.end();)if(it->first==vessel->Name() || it->second.parent==vessel)it=attachments.erase(it);else ++it;LifetimeEvent("graphics.delete",vessel->Name());}
     void PaneDeleteVessel(Vessel* vessel) override {
 #ifdef ORBITER_NATIVE_COCKPIT
@@ -627,7 +648,13 @@ struct Runtime final:BodyServices,RigidBodyServices,SurfaceServices,NavigationSe
     void PlaybackStep() override {unsupported("playback yet");}
     void UpdateBodies(bool update) override {system->Update(update);}
     void UpdateDialogs() override {} // No dialogs are instantiated in external-view scope.
-    void ModulePostStep() override {for(UInt32 i=0;i<system->nVessel();++i)system->GetVessel(i)->ModulePostStep(time.SimT1,time.SimDT,time.MJD1);LifetimeEvent("module.post");}
+    void ModulePostStep() override {
+        for(UInt32 i=0;i<system->nVessel();++i)system->GetVessel(i)->ModulePostStep(time.SimT1,time.SimDT,time.MJD1);
+#ifdef ORBITER_NATIVE_COCKPIT
+        scripts.PostStep(time.SimT1,time.SimDT,time.MJD1);
+#endif
+        LifetimeEvent("module.post");
+    }
     bool DeletePendingVessels() override {return orbiter::production::KillVessels(*this);}
     void NoVessels() override {active=false;}
     void FinaliseBodies() override {system->FinaliseUpdate();}

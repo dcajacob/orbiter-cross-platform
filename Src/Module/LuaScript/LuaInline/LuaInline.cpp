@@ -21,14 +21,22 @@
 // ==============================================================
 
 #define STRICT
+#ifdef _WIN32
 #define ORBITER_MODULE
-#include "orbitersdk.h"
+#include "Orbitersdk.h"
+#else
+#define DLLCLBK static
+#endif
 #include "LuaInline.h"
 
 // ==============================================================
 // class InterpreterList: implementation
 
+#ifdef _WIN32
 InterpreterList::InterpreterList (HINSTANCE hDLL): Module (hDLL)
+#else
+InterpreterList::InterpreterList ()
+#endif
 {
 	list = nullptr;
 	nlist = nbuf = 0;
@@ -40,9 +48,12 @@ InterpreterList::~InterpreterList ()
 	delete []list;
 }
 
+#ifdef _WIN32
 void InterpreterList::clbkSimulationStart (RenderMode mode)
 {
 }
+
+#endif
 
 void InterpreterList::clbkSimulationEnd ()
 {
@@ -51,7 +62,7 @@ void InterpreterList::clbkSimulationEnd ()
 
 void InterpreterList::clbkPostStep (double simt, double simdt, double mjd)
 {
-	DWORD i;
+	oapi::UInt32 i;
 	for (i = 0; i < nlist; i++) // prune all finished interpreters
 		if (!list[i]->interp) DelInterpreter (list[i--]);
 
@@ -87,7 +98,7 @@ InterpreterList::Environment *InterpreterList::AddInterpreter ()
 int InterpreterList::DelInterpreter (InterpreterList::Environment *env)
 {
 	// remove interpreter from list
-	DWORD i, j;
+	oapi::UInt32 i, j;
 	for (i = 0; i < nlist; i++)
 		if (list[i] == env) break;
 	if (i == nlist) return 2; // interpreter not found
@@ -105,6 +116,7 @@ int InterpreterList::DelInterpreter (InterpreterList::Environment *env)
 
 static InterpreterList *g_IList = nullptr;
 
+#ifdef _WIN32
 DLLCLBK void InitModule (HINSTANCE hDLL)
 {
 	g_IList = new InterpreterList (hDLL);
@@ -118,6 +130,8 @@ DLLCLBK void ExitModule (HINSTANCE hDLL)
 		g_IList = nullptr;
 	}
 }
+
+#endif
 
 // interpreter-specific callback functions
 DLLCLBK INTERPRETERHANDLE opcNewInterpreter ()
@@ -194,3 +208,7 @@ DLLCLBK lua_State *opcGetLua (INTERPRETERHANDLE hInterp)
 	return env->interp->GetState();
 }
 
+
+#ifndef _WIN32
+#include "NativeLuaInlineFactory.inc"
+#endif

@@ -93,6 +93,7 @@ struct NativeRenderContext {
     class VesselLifetimeServices* lifetime=nullptr;
     const ResourceResolver *textures=nullptr,*highTextures=nullptr,*planetTextures=nullptr,*meshFiles=nullptr,*programFiles=nullptr;
     const ResourceResolver* configurationFiles=nullptr;
+    class NativeScriptHost* scripts=nullptr;
     NativeGraphics* graphics=nullptr;Pane* cockpitPane=nullptr;Select* cockpitSelect=nullptr;InputBox* cockpitInput=nullptr;HELPCONTEXT* cockpitHelp=nullptr;
     bool paused=true,showGrapple=false;
     int joystickThrottleAxis=-1,joystickTwistAxis=2;
