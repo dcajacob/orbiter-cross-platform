@@ -1,9 +1,12 @@
 #!/usr/bin/env python3
 """Compare complete Shuttle-A controls captures with audited original Windows runs."""
 import argparse
+import hashlib
 import json
 import math
 from pathlib import Path
+import re
+import subprocess
 
 import capture as controls
 from verify_original import compare_state
@@ -33,7 +36,13 @@ def main():
         audit['profiles'][profile]['capture_sha256'] == controls.digest(args.original/'controls-report.json'),
         'Original controls capture has not passed the four-profile source/artifact audit')
     for name, checksum in reports[1]['source_sha256_lf'].items():
-        controls.require(controls.source_digest(controls.ROOT/name) == checksum, 'Controls comparison source changed: '+name)
+        path = Path(name)
+        controls.require(not path.is_absolute() and '..' not in path.parts, 'Invalid recorded controls source path')
+        producer = reports[1]['producer_commit']
+        controls.require(re.fullmatch('[0-9a-f]{40}', producer), 'Native producer must be an immutable commit')
+        source = subprocess.check_output(['git', '-C', str(controls.ROOT), 'show', producer+':'+name])
+        controls.require(hashlib.sha256(source.replace(b'\r\n', b'\n')).hexdigest() == checksum,
+                         'Native observer source differs from recorded producer: '+name)
     controls.verify_runtime(args.runtime_root, reports[1]['binary_sha256'])
     identity = controls.native_build_identity(args.runtime_root, reports[1]['configuration'], reports[1]['math_profile'])
     controls.require(identity == reports[1]['build_identity'], 'Actual controls build identity differs from capture')
@@ -48,6 +57,9 @@ def main():
                 phases = {}
                 for phase in config['phases']:
                     paths = [p/(case['id']+'-'+str(repeat))/phase for p in (args.original, args.native)]
+                    original_phase, native_phase = [r['cases'][case['id']]['runs'][repeat-1][phase] for r in reports]
+                    controls.require(native_phase['actual_math'].endswith('-'+original_phase['actual_math']),
+                                     'Actual original/native CRT math profiles differ')
                     for path, report in zip(paths, reports):
                         recorded = report['cases'][case['id']]['runs'][repeat-1][phase]
                         for name, checksum in recorded['files_sha256'].items():

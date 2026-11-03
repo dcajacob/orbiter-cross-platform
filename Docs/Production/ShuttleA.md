@@ -141,9 +141,11 @@ Five negative controls reject a missing background station, missing attachment
 port, missing animation sample, wrong cockpit and forged saved position, with
 the original capture unchanged. The dedicated Windows workflow collects all
 four original build/CRT profiles with the preserved application, SDK and client.
-All four original profiles and their artifact audit now pass. The corrected
-Release automatic comparison also passes; the other native profiles remain
-pending. The new fixture does not qualify mouse operation, pod controls,
+All four original profiles and their artifact audit now pass. All four native
+Debug/Release automatic/SSE2 profiles also pass the controls comparison:
+64 sessions, 3,648 presents and 22,272 finalized all-vessel rows. All 32 compared
+complete frames are byte-identical to Windows. The new fixture does not qualify
+mouse operation, pod controls,
 parachute deployment, the editor or overall Phase 6 acceptance.
 
 The observer sources matching pushed commit `8c5b87fb` also pass all sixteen
@@ -203,3 +205,27 @@ members, SHA-256
 It retains both source captures, the derived provenance, failed cases and
 independent audit, with replay recipes and the matching runtime archive
 reference. Asset/font collections are excluded; remote preservation remains open.
+
+The corrected controls comparisons verify actual CRT math selection for every
+session, the recorded observer's immutable producer source, every runtime
+binary and the actual build configuration. Separate copied-report controls
+reject forged math/source identities and retain the original capture unchanged.
+The hosted four-profile workflow now runs these controls and persistence cases
+alongside the initial-scene comparison, using the pinned originals.
+
+The [durable original-controls release](https://github.com/dcajacob/orbiter-cross-platform/releases/tag/phase6-shuttle-a-controls-original-v1)
+now preserves all four pinned ZIPs. The workflow verifies their remote bytes
+before publication; independent anonymous downloads match all four hashes,
+and a fresh tokenless helper invocation re-audits all 64 sessions. Release asset
+identities are pinned without replacing the original observations. Other local
+evidence bundles still need remote preservation.
+
+The verified four-profile native controls bundle is
+`out/phase6-shuttle-a-controls-parity-evidence-v2.tar.gz`: 127,632,041 bytes,
+2,781 members, SHA-256
+`4ed09506fc0a9ae214a4e4685ecf7720343e38ae5be92d0b8261db62b7627233`.
+It retains all 64 native captures, comparisons, source snapshots, identity
+controls, the failed desktop-GVFS startup, three fresh coherent runtimes and
+build logs. It references the existing bundle for the retained Release automatic
+runtime. A private D-Bus session resolves the startup timeout. Asset/font
+collections are excluded.

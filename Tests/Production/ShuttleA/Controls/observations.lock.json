@@ -32,5 +32,36 @@
       "bytes": 18948344,
       "sha256": "bc8add3e28a5a18524c8a1c98e4a1db5bdaf1a52010473aa7a34ea675712435d"
     }
-  ]
+  ],
+  "durable_release": {
+    "id": 433202074,
+    "tag": "phase6-shuttle-a-controls-original-v1",
+    "url": "https://github.com/dcajacob/orbiter-cross-platform/releases/tag/phase6-shuttle-a-controls-original-v1",
+    "assets": [
+      {
+        "id": 707046889,
+        "name": "original-shuttle-a-controls-Debug-automatic.zip",
+        "bytes": 18989673,
+        "sha256": "0e763163735cce4bfb6619d79c3e264a1663b8cf5643597581413b2a92d726dc"
+      },
+      {
+        "id": 707046595,
+        "name": "original-shuttle-a-controls-Debug-sse2.zip",
+        "bytes": 18989715,
+        "sha256": "6cebe7e3148337197fda5364c0100de4f8ded1143ad712a1893662a43bc15d18"
+      },
+      {
+        "id": 707047071,
+        "name": "original-shuttle-a-controls-Release-automatic.zip",
+        "bytes": 18948344,
+        "sha256": "bc8add3e28a5a18524c8a1c98e4a1db5bdaf1a52010473aa7a34ea675712435d"
+      },
+      {
+        "id": 707046737,
+        "name": "original-shuttle-a-controls-Release-sse2.zip",
+        "bytes": 18948110,
+        "sha256": "739c1709c8b697628a129884b6a01f4baad5759e4e8020f907110978246c3ae5"
+      }
+    ]
+  }
 }

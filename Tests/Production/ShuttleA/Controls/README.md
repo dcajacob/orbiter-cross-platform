@@ -64,9 +64,21 @@ python3 -B Tests/Production/ShuttleA/Controls/frozen_original.py --offline \
   --output out/shuttle-a-controls-reference --audit out/shuttle-a-controls-reference-audit.json
 ```
 
-Missing archives can be obtained using the read-only Actions token in CI. The
-helper removes authorization on redirects away from the GitHub API and verifies
+Missing archives now use the [durable public release](https://github.com/dcajacob/orbiter-cross-platform/releases/tag/phase6-shuttle-a-controls-original-v1),
+with no token required. The helper removes authorization on redirects away from the GitHub API and verifies
 size, SHA-256 and safe ZIP paths before auditing. A damaged cache is rejected;
-it never selects a replacement run. The corrected local Release automatic
-profile passes all sixteen sessions against these audited originals. Remaining
-native profiles and wider interactive acceptance are still separate gates.
+it never selects a replacement run. All four local native profiles pass against
+these originals: 64 sessions, 3,648 presents and 32 byte-identical complete
+frames. Current hosted and wider interactive acceptance remain separate gates.
+
+Comparison verifies the actual CRT implementation in every phase and checks
+observer source bytes against the recorded immutable producer. This allows
+provenance-verifier maintenance while retaining the original input/observation
+protocol. `ComparisonIdentity.Test.py` rejects forged implementation/source
+records in copied views and proves the original capture unchanged.
+
+The preservation workflow publishes only these four previously audited ZIPs,
+verifying their uploaded and downloaded bytes before publication. It never moves
+the source tag or overwrites an existing asset. Their exact release asset IDs,
+sizes and SHA-256 identities are recorded in the lock. Anonymous fresh-cache
+downloads and a complete source/artifact re-audit pass independently.

@@ -53,11 +53,17 @@ def main():
         archive=a.cache/(item['name']+'.zip')
         if not archive.exists():
             require(not a.offline,'Pinned original archive unavailable offline: '+item['name'])
-            token=os.environ.get('GITHUB_TOKEN')
-            require(bool(token),'GITHUB_TOKEN is required to read pinned Actions artifacts')
-            url='https://api.github.com/repos/'+pins['repository']+'/actions/artifacts/'+str(item['id'])+'/zip'
-            request=urllib.request.Request(url,headers={'Authorization':'Bearer '+token,
-                'Accept':'application/vnd.github+json','X-GitHub-Api-Version':'2022-11-28'})
+            release=pins.get('durable_release')
+            if release:
+                require(release['tag']=='phase6-shuttle-a-controls-original-v1','Unexpected original release tag')
+                url='https://github.com/'+pins['repository']+'/releases/download/'+release['tag']+'/'+urllib.parse.quote(item['name']+'.zip')
+                request=urllib.request.Request(url)
+            else:
+                token=os.environ.get('GITHUB_TOKEN')
+                require(bool(token),'GITHUB_TOKEN is required to read pinned Actions artifacts')
+                url='https://api.github.com/repos/'+pins['repository']+'/actions/artifacts/'+str(item['id'])+'/zip'
+                request=urllib.request.Request(url,headers={'Authorization':'Bearer '+token,
+                    'Accept':'application/vnd.github+json','X-GitHub-Api-Version':'2022-11-28'})
             temporary=archive.with_suffix('.partial')
             try:
                 with urllib.request.build_opener(ArtifactRedirect()).open(request,timeout=180) as incoming,temporary.open('xb') as target:
