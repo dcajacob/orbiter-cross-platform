@@ -87,7 +87,7 @@ DLLCLBK void ExitModule (HINSTANCE hDLL)
 
 #endif
 
-OGLClient::OGLClient (RendererModuleContext hInstance):RendererHost(hInstance)
+OGLClient::OGLClient (RendererModuleContext hInstance):RendererHost(hInstance),mRenderContext{}
 {
 }
 

@@ -507,7 +507,8 @@ UI and stored as zero-based indices in `NativeJoystickThrottleAxis` and
 value of -2 uses the existing config's conventional Z/slider positions (raw
 indices 2, 6 and 7); -1 selects keyboard-only throttle. The focused calibration
 test covers deadzone endpoints, saturation, acquisition, noise, disconnect,
-reconnection and reassignment. Physical controller acceptance remains pending.
+reconnection and reassignment. The user confirms no physical controller is
+available; physical-controller acceptance remains unverified.
 [DirectInput calibration semantics](https://learn.microsoft.com/en-us/previous-versions/windows/desktop/ee417908(v=vs.85))
 
 The Record menu and Ctrl-F5 now open the original recorder/player. REC starts

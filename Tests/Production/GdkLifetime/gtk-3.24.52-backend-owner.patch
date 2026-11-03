@@ -1,0 +1,24 @@
+--- a/gdk/gdkdisplaymanager.c
++++ b/gdk/gdkdisplaymanager.c
+@@ -208,6 +208,8 @@
+ }
+ 
+ static const gchar *allowed_backends;
++/* The default "*" below is borrowed; only setter copies are owned here. */
++static gchar *owned_allowed_backends;
+ 
+ /**
+  * gdk_set_allowed_backends:
+@@ -246,7 +248,11 @@
+ void
+ gdk_set_allowed_backends (const gchar *backends)
+ {
+-  allowed_backends = g_strdup (backends);
++  gchar *replacement = g_strdup (backends);
++
++  g_free (owned_allowed_backends);
++  owned_allowed_backends = replacement;
++  allowed_backends = replacement;
+ }
+ 
+ typedef struct _GdkBackend GdkBackend;

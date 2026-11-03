@@ -1,0 +1,39 @@
+{
+  "schema": 1,
+  "package": "gtk+3.0",
+  "version": "3.24.52-0ubuntu1",
+  "source_directory": "gtk-3.24.52",
+  "dsc": {
+    "name": "gtk+3.0_3.24.52-0ubuntu1.dsc",
+    "url": "https://archive.ubuntu.com/ubuntu/pool/main/g/gtk+3.0/gtk+3.0_3.24.52-0ubuntu1.dsc",
+    "sha256": "e728d7ed6115281cf76129a96f92e309d69eeafb696a88cf3a9884a0b1fa3dc1"
+  },
+  "sources": [
+    {
+      "name": "gtk+3.0_3.24.52.orig.tar.xz",
+      "size_bytes": 13578032,
+      "sha256": "80931fa472a77b9a164f6740e3c0b444fac6770054632d35a7ff9d679e5e7b9f",
+      "url": "https://archive.ubuntu.com/ubuntu/pool/main/g/gtk+3.0/gtk+3.0_3.24.52.orig.tar.xz"
+    },
+    {
+      "name": "gtk+3.0_3.24.52-0ubuntu1.debian.tar.xz",
+      "size_bytes": 3943272,
+      "sha256": "f8ad3b251e5b17c2579f5ea5eda842c8f18e258a09dc2974c6f459d4eafd3d39",
+      "url": "https://archive.ubuntu.com/ubuntu/pool/main/g/gtk+3.0/gtk+3.0_3.24.52-0ubuntu1.debian.tar.xz"
+    }
+  ],
+  "ownership_patch": "gtk-3.24.52-backend-owner.patch",
+  "ownership_patch_sha256": "742d8b27375b39f3815e2f8facfc3f928ef7c155b793402c8db441e77cabe4a0",
+  "before_sha256": {
+    "gdk/gdkdisplaymanager.c": "9f0a7561bf3569bd93f57d20d45c28c7387d8e1e9c3b50cc52fa48ee44092a4b"
+  },
+  "after_sha256": {
+    "gdk/gdkdisplaymanager.c": "6300826d3e38ae4dca1ec1c04805682a47be8005c1d1e94841035ba3f3f595a8"
+  },
+  "backends": [
+    "broadway",
+    "wayland",
+    "x11"
+  ],
+  "public_headers_and_backend_policy_unchanged": true
+}

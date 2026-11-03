@@ -406,7 +406,7 @@ bool OGLMesh::CopyMaterial (OGLMaterial *mat7, MATERIAL *mat)
 void OGLMesh::DeleteGroup (GROUPREC *grp)
 {
 	delete []grp->Idx;
-	if (grp->nVtx) delete[] grp->Vtx;
+	delete[] grp->Vtx;
 	delete grp;
 }
 
