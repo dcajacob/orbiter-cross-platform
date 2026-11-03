@@ -33,10 +33,10 @@ PayloadRelease::PayloadRelease (ShuttleA *v, MESHHANDLE hMesh)
 
 // --------------------------------------------------------------
 
-void PayloadRelease::AddMeshData2D (MESHHANDLE hMesh, DWORD grpidx)
+void PayloadRelease::AddMeshData2D (MESHHANDLE hMesh, oapi::UInt32 grpidx)
 {
-	static const DWORD nvtx = 4*6;
-	static const DWORD nidx = 6*6;
+	static const oapi::UInt32 nvtx = 4*6;
+	static const oapi::UInt32 nidx = 6*6;
 	static NTVERTEX vtx[nvtx];
 	int i, j, ofs;
 	float x0, y0;
@@ -51,7 +51,7 @@ void PayloadRelease::AddMeshData2D (MESHHANDLE hMesh, DWORD grpidx)
 			vtx[ofs+2].tv = vtx[ofs+3].tv = tx_dy/texh + (vtx[ofs].tv = vtx[ofs+1].tv = tx_y0/texh);
 		}
 	}
-	static WORD idx[nidx];
+	static oapi::UInt16 idx[nidx];
 	for (i = j = 0; i < 6; i++) {
 		ofs = i*4;
 		idx[j++] = ofs;

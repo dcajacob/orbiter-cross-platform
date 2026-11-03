@@ -30,14 +30,14 @@ InstrSpd::InstrSpd (VESSEL3 *v): PanelElement (v)
 
 // ==============================================================
 
-void InstrSpd::AddMeshData2D (MESHHANDLE hMesh, DWORD grpidx)
+void InstrSpd::AddMeshData2D (MESHHANDLE hMesh, oapi::UInt32 grpidx)
 {
-	const DWORD texw = PANELEL_TEXW, texh = PANELEL_TEXH;
+	const oapi::UInt32 texw = PANELEL_TEXW, texh = PANELEL_TEXH;
 	const float tapex0 = 68.0f, tapew = 32.0f;
 	const float tapey0 = (float)(texh-422), tapeh = 333.0f;
 
-	const DWORD NVTX = 22;
-	const DWORD NIDX = 30;
+	const oapi::UInt32 NVTX = 22;
+	const oapi::UInt32 NIDX = 30;
 
 	static NTVERTEX VTX[NVTX] = {
 		// Spd tape
@@ -66,7 +66,7 @@ void InstrSpd::AddMeshData2D (MESHHANDLE hMesh, DWORD grpidx)
 		{stape_xcnt+ 5,stape_ycnt   ,0,  0,0,0,  65.0f/(float)texw, (float)(texh-12.5f)/(float)texh},
 		{stape_xcnt+16,stape_ycnt+11,0,  0,0,0,  77.5f/(float)texw, (float)(texh)/(float)texh}
 	};
-	static WORD IDX[NIDX] = {
+	static oapi::UInt16 IDX[NIDX] = {
 		0,1,2, 3,2,1,
 		4,5,6, 7,6,5,
 		8,9,10, 11,10,9,
@@ -188,14 +188,14 @@ InstrAlt::InstrAlt (VESSEL3 *v): PanelElement (v)
 
 // ==============================================================
 
-void InstrAlt::AddMeshData2D (MESHHANDLE hMesh, DWORD grpidx)
+void InstrAlt::AddMeshData2D (MESHHANDLE hMesh, oapi::UInt32 grpidx)
 {
-	const DWORD texw = PANELEL_TEXW, texh = PANELEL_TEXH;
+	const oapi::UInt32 texw = PANELEL_TEXW, texh = PANELEL_TEXH;
 	const float tapex0 = 34.0f, tapew = 32.0f;
 	const float tapey0 = (float)(texh-422), tapeh = 333.0f;
 
-	const DWORD NVTX = 22;
-	const DWORD NIDX = 30;
+	const oapi::UInt32 NVTX = 22;
+	const oapi::UInt32 NIDX = 30;
 
 	static NTVERTEX VTX[NVTX] = {
 		// VS tape
@@ -224,7 +224,7 @@ void InstrAlt::AddMeshData2D (MESHHANDLE hMesh, DWORD grpidx)
 		{atape_xcnt+ 5,atape_ycnt   ,0,  0,0,0,  65.0f/(float)texw, (float)(texh-12.5f)/(float)texh},
 		{atape_xcnt+16,atape_ycnt+11,0,  0,0,0,  77.5f/(float)texw, (float)(texh)/(float)texh}
 	};
-	static WORD IDX[NIDX] = {
+	static oapi::UInt16 IDX[NIDX] = {
 		0,1,2, 3,2,1,
 		4,5,6, 7,6,5,
 		8,9,10, 11,10,9,
@@ -344,14 +344,14 @@ InstrVS::InstrVS (VESSEL3 *v): PanelElement (v)
 
 // ==============================================================
 
-void InstrVS::AddMeshData2D (MESHHANDLE hMesh, DWORD grpidx)
+void InstrVS::AddMeshData2D (MESHHANDLE hMesh, oapi::UInt32 grpidx)
 {
-	const DWORD texw = PANELEL_TEXW, texh = PANELEL_TEXH;
+	const oapi::UInt32 texw = PANELEL_TEXW, texh = PANELEL_TEXH;
 	const float tapex0 = 0.0f, tapew = 32.0f;
 	const float tapey0 = (float)(texh-422), tapeh = 333.0f;
 
-	const DWORD NVTX = 18;
-	const DWORD NIDX = 24;
+	const oapi::UInt32 NVTX = 18;
+	const oapi::UInt32 NIDX = 24;
 
 	static NTVERTEX VTX[NVTX] = {
 		// VS tape
@@ -376,7 +376,7 @@ void InstrVS::AddMeshData2D (MESHHANDLE hMesh, DWORD grpidx)
 		{vtape_xcnt+ 5,vtape_ycnt   ,0,  0,0,0,  65.0f/(float)texw, (float)(texh-12.5f)/(float)texh},
 		{vtape_xcnt+16,vtape_ycnt+11,0,  0,0,0,  77.5f/(float)texw, (float)(texh)/(float)texh}
 	};
-	static WORD IDX[NIDX] = {
+	static oapi::UInt16 IDX[NIDX] = {
 		0,1,2, 3,2,1,
 		4,5,6, 7,6,5,
 		8,9,10, 11,10,9,
@@ -510,14 +510,14 @@ InstrVAcc::InstrVAcc (VESSEL3 *v): PanelElement (v)
 
 // ==============================================================
 
-void InstrVAcc::AddMeshData2D (MESHHANDLE hMesh, DWORD grpidx)
+void InstrVAcc::AddMeshData2D (MESHHANDLE hMesh, oapi::UInt32 grpidx)
 {
-	const DWORD texw = PANELEL_TEXW, texh = PANELEL_TEXH;
+	const oapi::UInt32 texw = PANELEL_TEXW, texh = PANELEL_TEXH;
 	const float tapex0 = 0.0f, tapew = 32.0f;
 	const float tapey0 = (float)(texh-422), tapeh = 333.0f;
 
-	const DWORD NVTX = 3;
-	const DWORD NIDX = 3;
+	const oapi::UInt32 NVTX = 3;
+	const oapi::UInt32 NIDX = 3;
 
 	static NTVERTEX VTX[NVTX] = {
 		// VAcc needle
@@ -525,7 +525,7 @@ void InstrVAcc::AddMeshData2D (MESHHANDLE hMesh, DWORD grpidx)
 		{vtape_xcnt+31,vtape_ycnt-6,0,  0,0,0,  71.5f/(float)texw, (texh-1.0f)/(float)texh},
 		{vtape_xcnt+31,vtape_ycnt+6,0,  0,0,0,  61.5f/(float)texw, (texh-1.0f)/(float)texh},
 	};
-	static WORD IDX[NIDX] = {
+	static oapi::UInt16 IDX[NIDX] = {
 		0,1,2
 	};
 

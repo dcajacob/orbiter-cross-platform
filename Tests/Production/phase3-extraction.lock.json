@@ -582,7 +582,7 @@
     },
     "Src/Orbiter/Production/CMakeLists.txt": {
       "original_sha256_lf": null,
-      "sha256_lf": "6c591a77344ee8e9ffdcd37202cc8b3a7748b02355f2771d019ef7b3b4142730",
+      "sha256_lf": "a9dc6375cb470b7b84963d041c9035d9ee39ddf41b4113cd80c32e388e76c3f3",
       "scope": "Original ten stock MFD declarations use exact platform SDK aliases; shared original conic geometry is moved without calculation or screen-mapping changes. Full native instrument runtime remains incomplete."
     },
     "Src/Orbiter/Production/CameraServices.cpp": {
@@ -786,7 +786,7 @@
     },
     "Src/Orbiter/Production/NativeGraphics.h": {
       "original_sha256_lf": null,
-      "sha256_lf": "580be8bb0ac0ca79b7e35b2f47cb4359e180b7b4496e4bcdcd4df3fa04bf87be",
+      "sha256_lf": "478c44702e939930a63113756fe071d7c2c510bbbc99dc106031db8d6c986336",
       "scope": "Original scheduler, stock MFDs and modern map compile natively with explicit original epoch/time, authoritative world/UI bindings and indexed map resources. Exact Windows calculations and callback order conserved. Native GDI/legacy map/custom-mode entry points fail explicitly until supported; native cockpit owner and DG runtime remain unfinished."
     },
     "Src/Orbiter/Production/NativeModule.cpp": {
@@ -811,12 +811,12 @@
     },
     "Src/Orbiter/Production/NativeRenderApi.cpp": {
       "original_sha256_lf": null,
-      "sha256_lf": "7e245745f3eabbe0fd610695cb26de12f9ad6bfe4ad5d0f6c3e79ac13d7e7c1b",
+      "sha256_lf": "cc5177057e231ffccddb1f022e9e7d6402e3f53fd119d5db6553e661cbcda120",
       "scope": "Original scheduler, stock MFDs and modern map compile natively with explicit original epoch/time, authoritative world/UI bindings and indexed map resources. Exact Windows calculations and callback order conserved. Native GDI/legacy map/custom-mode entry points fail explicitly until supported; native cockpit owner and DG runtime remain unfinished."
     },
     "Src/Orbiter/Production/NativeRenderApi.h": {
       "original_sha256_lf": null,
-      "sha256_lf": "51ae060234a3ab347d6edb1f54cd55bc953c897ba969946ca65013d71eb305fc",
+      "sha256_lf": "17b903df8b97e883b60f51a9773924e65cc7fea3515b48e9564d8e5faea8fcc8",
       "scope": "Original scheduler, stock MFDs and modern map compile natively with explicit original epoch/time, authoritative world/UI bindings and indexed map resources. Exact Windows calculations and callback order conserved. Native GDI/legacy map/custom-mode entry points fail explicitly until supported; native cockpit owner and DG runtime remain unfinished."
     },
     "Src/Orbiter/Production/NativeVesselApplication.cpp": {
@@ -1305,7 +1305,7 @@
     },
     "Src/Orbiter/Production/NativeCockpit.cmake": {
       "original_sha256_lf": null,
-      "sha256_lf": "e521e44bb7f3b989a571eea341dbc12f11c28bd77a54e30fca546cbdfc780da8"
+      "sha256_lf": "54b3f967caeb4cc4a5ed0ca1b5beb2359ec0a51498aa1154654df50440e3d128"
     },
     "Src/Orbiter/Production/NativeCockpitGui.cpp": {
       "original_sha256_lf": null,
@@ -1841,6 +1841,138 @@
     "Src/Module/LuaScript/Native/UpvalueGuards.cmake": {
       "original_sha256_lf": null,
       "sha256_lf": "492fb913f7a9d8a72895f355e2ca863d6d8dc96f45bdc61858cfdfd5f3acb2fe"
+    },
+    "Src/Vessel/ShuttleA/InstrVs.cpp": {
+      "original_sha256_lf": "4036cbe51e885991812b11c5d67defe6e5a597d1baea9b8c5cb3af52dcc5fc16",
+      "sha256_lf": "7b389a7f77a6a4b996610c7010548317fdadbc1348ae8774e03e6d65e479b943"
+    },
+    "Src/Vessel/ShuttleA/InstrVs.h": {
+      "original_sha256_lf": "4ae0dd3550664e3ca2dfea0bbd23251b79bb4972f0c67b0fe4d8a00296f7dcec",
+      "sha256_lf": "7873f952628d7650bd1004f50d280bdf0c2ab9eeb46ac3ae7ba35e81059c440a"
+    },
+    "Src/Vessel/ShuttleA/NativeShuttleAFactory.inc": {
+      "original_sha256_lf": null,
+      "sha256_lf": "6fbe089210dc18009c63827c206ef0a6be6aed4e29436160eace482a91d48f4e"
+    },
+    "Src/Vessel/ShuttleA/ShuttleA.cpp": {
+      "original_sha256_lf": "3b7763d952097bca0188e4a1cd1d0447ca4b1267f8ad67730e7657e4c3a1868f",
+      "sha256_lf": "2860b5cadb9ce9ed719795f50dbc3a91c456cf4e7f42f1654066852c67460378"
+    },
+    "Src/Vessel/ShuttleA/ShuttleA.h": {
+      "original_sha256_lf": "e4bfc1424df53a5e879a5337f63c4d82106d871e16a6e68431cec9b3237e4a33",
+      "sha256_lf": "353cc1cfd3efae38a497eb6cfa5c2c60e3fcb6a45bc409f4e6d1008f757e340b"
+    },
+    "Src/Vessel/ShuttleA/ShuttleALua.cpp": {
+      "original_sha256_lf": "a1e381c3427244a95446c1446d869de0742f7fb8a5401e0b8bbaf672379d1128",
+      "sha256_lf": "dfaab070297d0d05ecc4162f47ec0123e538d31dd98a7653738eefa27f57780c"
+    },
+    "Src/Vessel/ShuttleA/ShuttleAPlatform.h": {
+      "original_sha256_lf": null,
+      "sha256_lf": "a316430fe8b02dfa907752a0db6439bcb200d46194a2ce252b4e0e914db82a35"
+    },
+    "Src/Vessel/ShuttleA/ShuttleA_PL/NativeShuttleAPayloadFactory.inc": {
+      "original_sha256_lf": null,
+      "sha256_lf": "a5a291831e380a3cb018904a3908d5f4a9937386855b58007f6b73afcf4fd8be"
+    },
+    "Src/Vessel/ShuttleA/ShuttleA_PL/ShuttleA_pl.cpp": {
+      "original_sha256_lf": "885cd568e769004502e648f1e340de737364eda576891a463e2e812997873283",
+      "sha256_lf": "33c09b145ed6f21250352348c588792f96f7364a5cd3305e9d3e8d60d4a53026"
+    },
+    "Src/Vessel/ShuttleA/ShuttleA_PL/ShuttleA_pl.h": {
+      "original_sha256_lf": "f41ffa8a28625b7a4cf5bd20da6121b8d9c53ab5dbe7ff4c70266a53eef27791",
+      "sha256_lf": "e56e5dce16a6636547619f832c2bda7b54c35d2fd310edbe6ce91d2604c32d25"
+    },
+    "Src/Vessel/ShuttleA/adiball.cpp": {
+      "original_sha256_lf": "e97c740e09371456fdff44d72a5857d8726b73b0349b38856bbafc6e7d3bb2da",
+      "sha256_lf": "4a38d19bc215c27b5c64c51d2f13778b40f6672c853da62c19c6de30e8a111fb"
+    },
+    "Src/Vessel/ShuttleA/adiball.h": {
+      "original_sha256_lf": "16d4927d800d370b08279d8b99ad930e08171792855048e12e4ef60c4515602c",
+      "sha256_lf": "c7431f5c084bfc20b849ffa177ffdaf72c5ab8bb4c7dcda943026b5a56bf8dd6"
+    },
+    "Src/Vessel/ShuttleA/adictrl.cpp": {
+      "original_sha256_lf": "afd0f25436243ec9a24b0b9c5b35e7f5717777967c7a586f65e1addcc208b54e",
+      "sha256_lf": "fb2ac32d49e753b0dd12ab89831218746706837b78523185dbb52f61c9ea8655"
+    },
+    "Src/Vessel/ShuttleA/adictrl.h": {
+      "original_sha256_lf": "01f902161b00527753ec368e9662818b9d1f6773ec92b298258d6f502d9424a0",
+      "sha256_lf": "ffe27d1ae30e131e23378ef0d494993fdf1580da4d93edc77ca8e5618b09d2f5"
+    },
+    "Src/Vessel/ShuttleA/attref.h": {
+      "original_sha256_lf": "05c446cdb8c12384d6f6f81f8e0ee1d670bc01eaf4cf624cbc3f2c86ebbe4ebb",
+      "sha256_lf": "af30e0aa4f38343f0d5cf3bcd44449e22b38eebc3183226c39854e0c34ed6452"
+    },
+    "Src/Vessel/ShuttleA/auxpodctrl.cpp": {
+      "original_sha256_lf": "7b82e438cab61500c621a10bcda4022a49fee32d7ed27ff18fb980db00de9137",
+      "sha256_lf": "a4973e4c6a5f01b371a0e4e2a42dab6bb23834e93a951951a9f39336ed32fb69"
+    },
+    "Src/Vessel/ShuttleA/auxpodctrl.h": {
+      "original_sha256_lf": "4a4532f5a4445eb435621c795098479b0571f8d865ec35cc7a74e7bb746b9d91",
+      "sha256_lf": "97ee48bf1322046f25b9223dee1f973581d7bda121fc4069e23f34b45ce87d08"
+    },
+    "Src/Vessel/ShuttleA/hudbutton.cpp": {
+      "original_sha256_lf": "9a52743b877bd55d49901ca1ab57ce3ac81d5d5f29579edb5b46bc3fa075470a",
+      "sha256_lf": "2118ca505d1d2b7265a48aaec013638c3de49336ed7d2d4c49929723d549aff7"
+    },
+    "Src/Vessel/ShuttleA/hudbutton.h": {
+      "original_sha256_lf": "9c3953925412a97659b6af2856a8e205c4c3bd7b77f9bf6f89de31796aaa0bfc",
+      "sha256_lf": "79dcb79b9e71dd002d513c83af862df458057a88dbfc3761c34d1127505a9a89"
+    },
+    "Src/Vessel/ShuttleA/mfdbutton.cpp": {
+      "original_sha256_lf": "fa3fc6cc6b59137267cc5c920524217dd32f587a050a6ea91170fb04bbb3ed77",
+      "sha256_lf": "eceffb7a1200685184cb1ec1eada657a8cb3c991662f84a645df727eaa7a3751"
+    },
+    "Src/Vessel/ShuttleA/mfdbutton.h": {
+      "original_sha256_lf": "910220661609014433ffa7fc2a00da4dd16a4be860b11ee1c119703689d92ddb",
+      "sha256_lf": "f766fb61074db236bc3270437655ff0b92a632cb9f5436f970e826fb4d253cdc"
+    },
+    "Src/Vessel/ShuttleA/navbutton.cpp": {
+      "original_sha256_lf": "aa035abf89d339639249e2d34ac65c7f8a4e291db48de9aff2ca176169e9ff02",
+      "sha256_lf": "7a6078b4639491e7c989c0dead2a03ab71da4126e51937b33536a3f44d6fb2eb"
+    },
+    "Src/Vessel/ShuttleA/navbutton.h": {
+      "original_sha256_lf": "5f79bb235dad52dabe68e89a2cb2615b6ba3dacfbb6afa37a14e5952467ea20d",
+      "sha256_lf": "ea2b662a0da3457a8a17a0412d858a5c373a2a47a661033959b4a20a235770da"
+    },
+    "Src/Vessel/ShuttleA/needlepair.cpp": {
+      "original_sha256_lf": "29140bce186f2d5a96072c3d37e8fe6af233653672a530b9103b834e82aabd7f",
+      "sha256_lf": "d9efe47cd5b79d1639254d96eaab70578d61971bb46eebf8ea39741cac39ba29"
+    },
+    "Src/Vessel/ShuttleA/needlepair.h": {
+      "original_sha256_lf": "d9a4019b7648aef39562774f230de1637bcaf128774d39cba6ad121223681698",
+      "sha256_lf": "fe35411f929b6cb7d62fe62eacd679ddc00779f7d96f10f14ba57352545cf1b3"
+    },
+    "Src/Vessel/ShuttleA/paneltext.cpp": {
+      "original_sha256_lf": "f4b023033a979d8bcd1bbf77dbc1d0c6c82274e7195e8a8df34ffac6213b4818",
+      "sha256_lf": "98883371642706c7a21564aa13b71515801f951ad0946a9944f3e3622bef352c"
+    },
+    "Src/Vessel/ShuttleA/paneltext.h": {
+      "original_sha256_lf": "49fe8b9327b3e48592f194904ccf0553cfe42826775bed05535478c2a5d2a4bb",
+      "sha256_lf": "3b8b4e6e4a2ad68ebbd7dd7a3d196cc2204854dffe4776c520b0301ab05a278a"
+    },
+    "Src/Vessel/ShuttleA/payloadctrl.cpp": {
+      "original_sha256_lf": "03ab248cc41ab181372598575f6c5df55fc7d8bf079e6ed5f49d258350ac1c3c",
+      "sha256_lf": "2f1fdfb42c6b836eac027a1139d25bd21b5361e3db38856a5f83baebe7adee34"
+    },
+    "Src/Vessel/ShuttleA/payloadctrl.h": {
+      "original_sha256_lf": "1f0eeca0fe4267f65ab6145ea041ee93f114425c7a04a5d6f6c0ef9fca2ec4a1",
+      "sha256_lf": "844a522bd5dc1b56eee3fea6f22d5653f8b97db3596d4acf4d6a8df7939cec40"
+    },
+    "Src/Vessel/ShuttleA/sliderpair.cpp": {
+      "original_sha256_lf": "79250d512fcd0d9c63394a2751ace74b77f204a693dfbccfcab201b7c8914511",
+      "sha256_lf": "c5285e4dbc828ab6b7677b19d87c7c41a84e1d4dddf584100ce5c2ee37840222"
+    },
+    "Src/Vessel/ShuttleA/sliderpair.h": {
+      "original_sha256_lf": "0e6e2abb4093658f8c3bfc8c09c5b3796da7f43edfa104cd1e7898000ee42d44",
+      "sha256_lf": "3bf8ed2fccd81d9516443b7d2b2dc44a2c2672344b4e817c608d9d72fb32ba5c"
+    },
+    "Src/Vessel/ShuttleA/switches.cpp": {
+      "original_sha256_lf": "eea5b810627be893856f3f0061e28bedcdb65dcae30965dbd664dbec82faad1b",
+      "sha256_lf": "5fccdc9d1f6f7aff1068bdf6b883e5c052e76e4990b3b4e93d8af25d8bfc62cb"
+    },
+    "Src/Vessel/ShuttleA/switches.h": {
+      "original_sha256_lf": "e8f1e7d9a5f55b065bb691df9dd063fef897a1a9cddf2ce9b7f3f79f46920a61",
+      "sha256_lf": "28d7680ff429220a06e366325154754d9a72ce4f89a49f7b46ba34ae34a29d8a"
     }
   }
 }

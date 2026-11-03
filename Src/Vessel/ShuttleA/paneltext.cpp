@@ -54,7 +54,7 @@ int small_font_width[256] = {   // character widths in texture
 int small_font_ypos[2] = {35,43};
 int small_font_height = 8;
 
-void BltStr (SURFHANDLE tgt, SURFHANDLE src, int x, int y, const char *newstr, char *oldstr, DWORD style)
+void BltStr (SURFHANDLE tgt, SURFHANDLE src, int x, int y, const char *newstr, char *oldstr, oapi::UInt32 style)
 {
 	if (newstr && oldstr && !strcmp (newstr, oldstr)) return; // nothing to do
 	int w;

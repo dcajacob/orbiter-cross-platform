@@ -39,6 +39,9 @@ def verify():
     if ledger['observed_source'] != CAPTURE or ledger['production_source'] != BASE:
         raise ValueError('extraction baseline identity changed')
     declared = ledger['files']
+    if 'Src/Vessel/ShuttleA/ShuttleA.cpp' in declared:
+        from ShuttleA.source_audit import verify as verify_shuttle_a
+        verify_shuttle_a()
     if 'Src/Orbiter/Production/CockpitVesselMethods.inc' in declared:
         from cockpit_runtime_source import verify as verify_cockpit_runtime
         verify_cockpit_runtime()

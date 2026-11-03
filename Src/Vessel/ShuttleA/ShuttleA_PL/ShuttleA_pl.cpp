@@ -14,6 +14,9 @@
 #include "ShuttleA_pl.h"
 #include <math.h>
 #include <stdio.h>
+#ifndef _WIN32
+#define DLLCLBK static
+#endif
 
 
 //Payload parachute airfoil definitions
@@ -136,9 +139,9 @@ void ShuttleA_PL::clbkLoadStateEx (FILEHANDLE scn, void *vs)
 	char *line;
 
 	while (oapiReadScenario_nextline (scn, line)) {
-		if (!_strnicmp (line, "PARACHUTE", 9)) {
+		if (!shuttlea::ComparePrefix (line, "PARACHUTE", 9)) {
 			sscanf (line+9, "%d", &Parachute_mode);
-		} else if (!_strnicmp (line, "TIMER", 5)) {
+		} else if (!shuttlea::ComparePrefix (line, "TIMER", 5)) {
 			sscanf (line+5, "%lf", &timer);
 		
 		} else {
@@ -290,6 +293,7 @@ void ShuttleA_PL::clbkPostStep(double simt,double simdt,double mjd)
 // --------------------------------------------------------------
 // Module initialisation
 // --------------------------------------------------------------
+#ifdef _WIN32
 DLLCLBK void InitModule (HINSTANCE hModule)
 {
    
@@ -307,6 +311,7 @@ DLLCLBK void ExitModule (HINSTANCE hModule)
 // --------------------------------------------------------------
 // Vessel initialisation
 // --------------------------------------------------------------
+#endif
 DLLCLBK VESSEL *ovcInit (OBJHANDLE hvessel, int flightmodel)
 {
 	return new ShuttleA_PL (hvessel, flightmodel);
@@ -319,3 +324,7 @@ DLLCLBK void ovcExit (VESSEL *vessel)
 {
 	if (vessel) delete (ShuttleA_PL*)vessel;
 }
+
+#ifndef _WIN32
+#include "NativeShuttleAPayloadFactory.inc"
+#endif

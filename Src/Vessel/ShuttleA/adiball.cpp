@@ -85,18 +85,18 @@ ADIBall::~ADIBall ()
 
 // ==============================================================
 
-void ADIBall::AddMeshData2D (MESHHANDLE hMesh, DWORD grpidx_ball, DWORD grpidx_ind)
+void ADIBall::AddMeshData2D (MESHHANDLE hMesh, oapi::UInt32 grpidx_ball, oapi::UInt32 grpidx_ind)
 {
 	// We need two separate mesh groups for the ball and indicators, because the ball is typically
 	// rendered below the panel mesh, and the indicators above it
 
-	static const DWORD nvtx_rect = 4;
-	static const DWORD nidx_rect = 6;
-	static const WORD idx_rect[nidx_rect] = { 0,1,2,  3,2,1 };
+	static const oapi::UInt32 nvtx_rect = 4;
+	static const oapi::UInt32 nidx_rect = 6;
+	static const oapi::UInt16 idx_rect[nidx_rect] = { 0,1,2,  3,2,1 };
 
-	DWORD i, nidx;
+	oapi::UInt32 i, nidx;
 	NTVERTEX *vtx;
-	WORD *idx;
+	oapi::UInt16 *idx;
 
 	// ball mesh
 	MakeBall (6, rad, vtx, nballvtx, idx, nidx);
@@ -203,7 +203,7 @@ void ADIBall::SetLayout (int _layout)
 
 	if (ballvtx0) {
 		float dtu = (layout ? tx_dx : -tx_dx)/texw;
-		for (DWORD i = 0; i < nballvtx; i++)
+		for (oapi::UInt32 i = 0; i < nballvtx; i++)
 			ballgrp->Vtx[ballofs+i].tu += dtu;
 	}
 
@@ -243,7 +243,7 @@ bool ADIBall::Redraw2D (SURFHANDLE surf)
 	tht_curr = tht;
 	phi_curr = phi;
 
-	DWORD i;
+	oapi::UInt32 i;
 
 	double sinp = sin(phi), cosp = cos(phi);
 	double sint = sin(tht), cost = cos(tht);
@@ -380,7 +380,7 @@ bool ADIBall::Redraw2D (SURFHANDLE surf)
 
 // ==============================================================
 
-void ADIBall::MakeBall (int res, double rad, NTVERTEX *&vtx, DWORD &nvtx, WORD *&idx, DWORD &nidx)
+void ADIBall::MakeBall (int res, double rad, NTVERTEX *&vtx, oapi::UInt32 &nvtx, oapi::UInt16 *&idx, oapi::UInt32 &nidx)
 {
 	int i, j, k;
 	nvtx = (res*2+1) * (res*4+1);
@@ -408,7 +408,7 @@ void ADIBall::MakeBall (int res, double rad, NTVERTEX *&vtx, DWORD &nvtx, WORD *
 
 	int nrow = res*4+1;
 	nidx = res*2 * res*4 * 6;
-	idx = new WORD[nidx];
+	idx = new oapi::UInt16[nidx];
 	for (j = k = 0; j < res*2; j++) {
 		for (i = 0; i < res*4; i++) {
 			idx[k++] = j*nrow+i;

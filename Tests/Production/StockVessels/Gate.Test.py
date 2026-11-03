@@ -6,6 +6,7 @@ import json
 from pathlib import Path
 import tempfile
 
+from original import select_suite,settings_path
 from original import HERE,digest,inspect_trace,require,rows,settings,source_digest
 
 
@@ -16,15 +17,16 @@ def write(path,samples):
 
 def main():
     p=argparse.ArgumentParser(description=__doc__)
+    p.add_argument('--suite',choices=('stations','shuttle-a'),default='stations')
     p.add_argument('--capture',type=Path,required=True);p.add_argument('--output',type=Path,required=True)
-    a=p.parse_args();require(not a.output.exists(),'Station gate-control output exists')
+    a=p.parse_args();select_suite(a.suite);require(not a.output.exists(),'Station gate-control output exists')
     config=settings();case=config['cases'][0]
     require(a.capture.name==case['id']+'-1','Control requires the first real original station capture')
     names=('stock-vessel-state.csv','stock-vessel-docks.csv')
     before={name:digest(a.capture/name) for name in names}
     inspect_trace(a.capture,case,config)
     state,docks=[rows(a.capture/name) for name in names]
-    station=next(r for r in state if r['tick']=='30' and r['focus']=='0' and r['class'].lower() in ('mir','wheel'))
+    station=next(r for r in state if r['tick']=='30' and r['focus']=='0' and (r['class'].lower() in ('mir','wheel') if a.suite=='stations' else int(r['docks'])>0))
     port=next(r for r in docks if r['tick']=='30' and r['object']==station['object'])
     rejected=[]
     with tempfile.TemporaryDirectory(prefix='orbiter-station-gate-') as temporary:

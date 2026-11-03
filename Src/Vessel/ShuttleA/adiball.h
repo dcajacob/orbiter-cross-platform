@@ -13,7 +13,7 @@
 #define __ADIBALL_H
 
 #include "ShuttleA.h"
-#include "..\Common\Instrument.h"
+#include "../Common/Instrument.h"
 
 // ==============================================================
 
@@ -21,13 +21,13 @@ class ADIBall: public PanelElement {
 public:
 	ADIBall (VESSEL3 *v, AttitudeReference *attref);
 	~ADIBall ();
-	void AddMeshData2D (MESHHANDLE hMesh, DWORD grpidx_ball, DWORD grpidx_ind);
+	void AddMeshData2D (MESHHANDLE hMesh, oapi::UInt32 grpidx_ball, oapi::UInt32 grpidx_ind);
 	void SetLayout (int _layout);
 	inline void SetRateMode (bool local) { rate_local = local; }
 	bool Redraw2D (SURFHANDLE surf);
 	
 protected:
-	void MakeBall (int res, double rad, NTVERTEX *&vtx, DWORD &nvtx, WORD *&idx, DWORD &nidx);
+	void MakeBall (int res, double rad, NTVERTEX *&vtx, oapi::UInt32 &nvtx, oapi::UInt16 *&idx, oapi::UInt32 &nidx);
 
 private:
 	int layout;           // 0: pitch range=-90..90, 1: pitch range=0..360
@@ -37,11 +37,11 @@ private:
 	VECTOR3 *ballvtx0;    // untransformed ball vertex coordinates
 	MESHGROUP *ballgrp;
 	MESHGROUP *indgrp;
-	DWORD nballvtx;
-	DWORD ballofs;
-	DWORD rollindofs;
-	DWORD prateofs, brateofs, yrateofs;
-	DWORD yeofs, peofs, tfofs;
+	oapi::UInt32 nballvtx;
+	oapi::UInt32 ballofs;
+	oapi::UInt32 rollindofs;
+	oapi::UInt32 prateofs, brateofs, yrateofs;
+	oapi::UInt32 yeofs, peofs, tfofs;
 
 	VECTOR3 peuler;
 	VECTOR3 vrot;

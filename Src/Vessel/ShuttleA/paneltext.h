@@ -12,7 +12,7 @@
 #ifndef __PANELTEXT_H
 #define __PANELTEXT_H
 
-#include "Orbitersdk.h"
+#include "ShuttleAPlatform.h"
 
 #ifndef __PANELTEXT_CPP
 extern int small_font_xpos[256];
@@ -21,8 +21,8 @@ extern int small_font_ypos[2];
 extern int small_font_height;
 #endif
 
-const DWORD ALIGN_RIGHT = 0x0001;
+const oapi::UInt32 ALIGN_RIGHT = 0x0001;
 
-void BltStr (SURFHANDLE tgt, SURFHANDLE src, int x, int y, const char *newstr, char *oldstr, DWORD style = 0);
+void BltStr (SURFHANDLE tgt, SURFHANDLE src, int x, int y, const char *newstr, char *oldstr, oapi::UInt32 style = 0);
 
 #endif // !__PANELTEXT_H

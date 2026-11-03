@@ -27,6 +27,22 @@
 #include <stdexcept>
 using namespace orbiter::production;
 using std::ifstream;
+void oapiTriggerRedrawArea(int panel,int vc,int area)
+{
+#ifdef ORBITER_NATIVE_COCKPIT
+    if(auto* pane=ActiveCockpitPane())pane->TriggerRedrawArea(panel,vc,area);
+#else
+    throw std::runtime_error("Native panel redraw requires the cockpit build");
+#endif
+}
+void oapiTriggerPanelRedrawArea(int panel,int area)
+{
+#ifdef ORBITER_NATIVE_COCKPIT
+    if(auto* pane=ActiveCockpitPane())pane->TriggerPanelRedrawArea(panel,area);
+#else
+    throw std::runtime_error("Native panel redraw requires the cockpit build");
+#endif
+}
 void oapiGetNavPos(NAVHANDLE handle, VECTOR3 *position)
 {
     Vector p;
@@ -90,6 +106,11 @@ bool oapiAddMeshGroupBlock(MESHHANDLE mesh, oapi::UInt32 group, const NTVERTEX *
                            const oapi::UInt16 *indices, oapi::UInt32 ni)
 {
     return static_cast<Mesh*>(mesh)->AddGroupBlock(group, vertices, nv, indices, ni);
+}
+oapi::UInt32 oapiAddMeshGroup(MESHHANDLE mesh,MESHGROUP* group)
+{
+    return static_cast<Mesh*>(mesh)->AddGroup(group->Vtx,group->nVtx,group->Idx,group->nIdx,
+        group->MtrlIdx,group->TexIdx,group->zBias,0,true);
 }
 namespace {
 Vessel* liveVessel(OBJHANDLE handle) {
@@ -201,6 +222,16 @@ SURFHANDLE oapiLoadTexture(const char *fname, bool dynamic)
 void oapiReleaseTexture(SURFHANDLE texture)
 {
     if (auto *client = GetNativeRenderContext().graphics) client->ReleaseTextureResource(texture);
+}
+SURFHANDLE oapiLoadSurfaceEx(const char* name,oapi::UInt32 attributes,bool path)
+{
+    auto* client=GetNativeRenderContext().graphics;
+    return client ? client->clbkLoadSurface(name,attributes,path) : nullptr;
+}
+SURFHANDLE oapiCreateTextureSurface(int width,int height)
+{
+    auto* client=GetNativeRenderContext().graphics;
+    return client ? client->clbkCreateTexture(width,height) : nullptr;
 }
 
 SURFHANDLE oapiCreateSurfaceEx(int width, int height, oapi::UInt32 attrib)
@@ -685,4 +716,11 @@ void oapiClearSurface(SURFHANDLE surface,oapi::UInt32 color) {
     if(!surface)return;
     if(auto* graphics=GetNativeRenderContext().graphics)
         if(!graphics->clbkFillSurface(surface,color))throw std::runtime_error("Native oapiClearSurface: graphics fill failed");
+}
+void oapiColourFill(SURFHANDLE target,oapi::UInt32 color,int x,int y,int width,int height) {
+    if(!target)return;
+    if(auto* graphics=GetNativeRenderContext().graphics) {
+        if(width && height)graphics->clbkFillSurface(target,x,y,width,height,color);
+        else graphics->clbkFillSurface(target,color);
+    }
 }

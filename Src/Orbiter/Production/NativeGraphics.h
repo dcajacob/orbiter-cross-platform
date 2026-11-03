@@ -37,6 +37,7 @@ public:
     virtual SURFHANDLE clbkCreateSurfaceEx(oapi::UInt32,oapi::UInt32,oapi::UInt32)=0;
     virtual oapi::UInt32 clbkGetDeviceColour(std::uint8_t,std::uint8_t,std::uint8_t)=0;
     virtual bool clbkFillSurface(SURFHANDLE,oapi::UInt32) const=0;
+    virtual bool clbkFillSurface(SURFHANDLE,oapi::UInt32,oapi::UInt32,oapi::UInt32,oapi::UInt32,oapi::UInt32) const=0;
     virtual bool clbkBlt(SURFHANDLE,oapi::UInt32,oapi::UInt32,SURFHANDLE,oapi::UInt32=0) const=0;
     virtual bool clbkBlt(SURFHANDLE,oapi::UInt32,oapi::UInt32,SURFHANDLE,oapi::UInt32,oapi::UInt32,oapi::UInt32,oapi::UInt32,oapi::UInt32=0) const=0;
     virtual bool clbkGetRenderParam(oapi::UInt32,oapi::UInt32*) const=0;

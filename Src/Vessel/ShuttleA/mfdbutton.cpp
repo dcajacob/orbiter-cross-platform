@@ -65,7 +65,7 @@ const int lbly[6] = {PANEL2D_MAINH-272, PANEL2D_MAINH-234, PANEL2D_MAINH-196, PA
 
 // ==============================================================
 
-MFDButtonCol::MFDButtonCol (VESSEL3 *v, DWORD _mfdid, DWORD _lr): PanelElement (v)
+MFDButtonCol::MFDButtonCol (VESSEL3 *v, oapi::UInt32 _mfdid, oapi::UInt32 _lr): PanelElement (v)
 {
 	mfdid = _mfdid;
 	lr = _lr;
@@ -74,17 +74,17 @@ MFDButtonCol::MFDButtonCol (VESSEL3 *v, DWORD _mfdid, DWORD _lr): PanelElement (
 
 // ==============================================================
 
-void MFDButtonCol::AddMeshData2D (MESHHANDLE hMesh, DWORD grpidx)
+void MFDButtonCol::AddMeshData2D (MESHHANDLE hMesh, oapi::UInt32 grpidx)
 {
-	static const DWORD nbtn = 6;
-	static const DWORD nvtx = 4*nbtn;
-	static const DWORD nidx = 6*nbtn;
-	static const WORD base_idx[6] = { 0,1,2, 3,2,1 };
+	static const oapi::UInt32 nbtn = 6;
+	static const oapi::UInt32 nvtx = 4*nbtn;
+	static const oapi::UInt32 nidx = 6*nbtn;
+	static const oapi::UInt16 base_idx[6] = { 0,1,2, 3,2,1 };
 
-	DWORD btn, i;
+	oapi::UInt32 btn, i;
 	int x0 = lblx[mfdid][lr]-15;
 	NTVERTEX vtx[nvtx];
-	WORD idx[nidx];
+	oapi::UInt16 idx[nidx];
 	memset (vtx, 0, nvtx*sizeof(NTVERTEX));
 	for (btn = 0; btn < nbtn; btn++) {
 		for (i = 0; i < 4; i++) {
@@ -94,7 +94,7 @@ void MFDButtonCol::AddMeshData2D (MESHHANDLE hMesh, DWORD grpidx)
 			vtx[btn*4+i].tv = (float)(PANELEL_TEXH - MFD_font_height*(24-mfdid*12-lr*6-btn-(i/2?1:0)))/(float)PANELEL_TEXH;
 		}
 		for (i = 0; i < 6; i++)
-			idx[btn*6+i] = (WORD)btn*4 + base_idx[i];
+			idx[btn*6+i] = (oapi::UInt16)btn*4 + base_idx[i];
 	}
 	AddGeometry (hMesh, grpidx, vtx, nvtx, idx, nidx);
 }
@@ -146,7 +146,7 @@ bool MFDButtonCol::ProcessMouse2D (int event, int mx, int my)
 // ==============================================================
 // ==============================================================
 
-MFDButtonRow::MFDButtonRow (VESSEL3 *v, DWORD _mfdid): PanelElement (v)
+MFDButtonRow::MFDButtonRow (VESSEL3 *v, oapi::UInt32 _mfdid): PanelElement (v)
 {
 	mfdid = _mfdid;
 }

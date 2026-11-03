@@ -13,8 +13,12 @@
 #define ORBITER_MODULE
 
 #include "ShuttleA.h"
+#ifdef _WIN32
 #include "ScnEditorAPI.h"
 #include "DlgCtrl.h"
+#else
+#define DLLCLBK static
+#endif
 #include "attref.h"
 #include "mfdbutton.h"
 #include "navbutton.h"
@@ -30,7 +34,9 @@
 #include "adictrl.h"
 #include "auxpodctrl.h"
 #include "InstrVs.h"
+#ifdef _WIN32
 #include "resource.h"
+#endif
 #include "meshres.h"
 #include <math.h>
 #include <stdio.h>
@@ -38,7 +44,12 @@
 using std::min;
 using std::max;
 
+#ifdef _WIN32
 #define LOADBMP(id) (LoadBitmap (g_Param.hDLL, MAKEINTRESOURCE (id)))
+#define SHUTTLEA_BITMAP(id, name) oapiCreateSurface (LOADBMP (id))
+#else
+#define SHUTTLEA_BITMAP(id, name) oapiLoadSurfaceEx("ShuttleA/Bitmaps/" name, OAPISURFACE_NOMIPMAPS)
+#endif
 
 // ==============================================================
 // Global parameters
@@ -75,7 +86,7 @@ void Shuttle_MomentCoeff (double aoa,double M,double Re,double *cl,double *cm,do
 	const int nabsc = 7;
 	static const double AOA[nabsc] = {-180*RAD, -90*RAD,-30*RAD, 0*RAD, 60*RAD,90*RAD,180*RAD};
 	static const double CL[nabsc]  = {       0,      0,   -0.004,     0,     0.008,     0,      0};
-	static const double CM[nabsc]  = {       0,      0,   0.0014,  0,-0.0012,     0,      0};	
+	static const double CM[nabsc]  = {       0,      0,   0.0014,  0,-0.0012,     0,      0};
 	int i;
 	for (i = 0; i < nabsc-1 && AOA[i+1] < aoa; i++);
 	if (i < nabsc - 1) {
@@ -155,10 +166,10 @@ ShuttleA::~ShuttleA ()
 // --------------------------------------------------------------
 void ShuttleA::DefineAnimations ()
 {
-	static UINT LeftPodGrp[4] = {4,5,7,9};
+	static oapi::UInt LeftPodGrp[4] = {4,5,7,9};
 	static MGROUP_ROTATE leftpod(0,LeftPodGrp,4,_V(0,0,0),_V(1,0,0),(float)PI);
-	
-	static UINT RightPodGrp[4] = {6,8,10,11};
+
+	static oapi::UInt RightPodGrp[4] = {6,8,10,11};
 	static MGROUP_ROTATE rightpod(0,RightPodGrp,4,_V(0,0,0),_V(1,0,0),(float)PI);
 
 	// Register animation for hover/retro pods
@@ -167,36 +178,36 @@ void ShuttleA::DefineAnimations ()
 	anim_pod[1] = CreateAnimation (0);
 	AddAnimationComponent (anim_pod[1], 0.0f,1.0f,&rightpod);
 
-	static UINT UpperDockHatch = 19;
+	static oapi::UInt UpperDockHatch = 19;
 	static MGROUP_ROTATE upperhatch(0,&UpperDockHatch,1,_V(0,0.554f,18.677401f),_V(-1,0,0),(float)PI);
-	static UINT LowerDockHatch = 18;
+	static oapi::UInt LowerDockHatch = 18;
 	static MGROUP_ROTATE lowerhatch(0,&LowerDockHatch,1,_V(0,-0.554f,18.677401f),_V(1,0,0),(float)PI);
 	anim_dock = CreateAnimation (0);
 	AddAnimationComponent (anim_dock,0.0f,1.0f, &upperhatch);
 	AddAnimationComponent (anim_dock,0.2f,1.0f, &lowerhatch);
 
 	// outer airlock
-	static UINT OuterAirlock_groups = GRP_Docking_Hatch;
+	static oapi::UInt OuterAirlock_groups = GRP_Docking_Hatch;
 	static MGROUP_ROTATE OuterAirlock_anim(0, &OuterAirlock_groups, 1, _V(0.498895f, 0.0f, 18.6131f), _V(0, -1, 0), (float)(0.51f*PI));
 	anim_lock[0] = CreateAnimation (0);
 	AddAnimationComponent (anim_lock[0], 0.0f ,1.0f, &OuterAirlock_anim);
-	
+
 	// inner airlock
-	static UINT InnerAirlock_groups = GRP_Airlock_Hatch;
+	static oapi::UInt InnerAirlock_groups = GRP_Airlock_Hatch;
 	static MGROUP_ROTATE InnerAirlock_anim(0, &InnerAirlock_groups, 1, _V(-0.4102f, 0.0f, 16.5474f), _V(0, -1, 0), (float)(0.55f * PI));
 	anim_lock[1] = CreateAnimation (0);
 	AddAnimationComponent(anim_lock[1], 0.0f, 1.0f, &InnerAirlock_anim);
 
 	//Gear animation
-	static UINT GEAR_left_leg[3]={30,32,34};
-	static UINT GEAR_right_leg[3]={31,33,35};
+	static oapi::UInt GEAR_left_leg[3]={30,32,34};
+	static oapi::UInt GEAR_right_leg[3]={31,33,35};
 
-	static UINT GEAR_left_leg_front_p1=38;
-	static UINT GEAR_left_leg_front_p2=25;
-	static UINT GEAR_left_leg_mid_p1=40;
-	static UINT GEAR_left_leg_mid_p2=27;
-	static UINT GEAR_left_leg_back_p1=36;
-	static UINT GEAR_left_leg_back_p2=23;
+	static oapi::UInt GEAR_left_leg_front_p1=38;
+	static oapi::UInt GEAR_left_leg_front_p2=25;
+	static oapi::UInt GEAR_left_leg_mid_p1=40;
+	static oapi::UInt GEAR_left_leg_mid_p2=27;
+	static oapi::UInt GEAR_left_leg_back_p1=36;
+	static oapi::UInt GEAR_left_leg_back_p2=23;
 
 	static MGROUP_TRANSLATE MGEAR_left_leg_first (0, GEAR_left_leg, 3, _V(-0.194,0.224,0.0));
 	static MGROUP_TRANSLATE MGEAR_left_leg_second (0, GEAR_left_leg, 3, _V(-0.091,0.331,0.0));
@@ -210,12 +221,12 @@ void ShuttleA::DefineAnimations ()
 	static MGROUP_ROTATE MGEAR_left_leg_back_p1(0,&GEAR_left_leg_back_p1,1,_V(-2.49f,-1.942f,0.0f),_V(0,0,-1),0.9948f);
 	static MGROUP_ROTATE MGEAR_left_leg_back_p2(0,&GEAR_left_leg_back_p2,1,_V(-1.947f,-1.718f,0.0f),_V(0,0,-1),0.5235f);
 
-	static UINT GEAR_right_leg_front_p1=39;
-	static UINT GEAR_right_leg_front_p2=26;
-	static UINT GEAR_right_leg_mid_p1=41;
-	static UINT GEAR_right_leg_mid_p2=28;
-	static UINT GEAR_right_leg_back_p1=37;
-	static UINT GEAR_right_leg_back_p2=24;
+	static oapi::UInt GEAR_right_leg_front_p1=39;
+	static oapi::UInt GEAR_right_leg_front_p2=26;
+	static oapi::UInt GEAR_right_leg_mid_p1=41;
+	static oapi::UInt GEAR_right_leg_mid_p2=28;
+	static oapi::UInt GEAR_right_leg_back_p1=37;
+	static oapi::UInt GEAR_right_leg_back_p2=24;
 
 	static MGROUP_ROTATE MGEAR_right_leg_front_p1(0,&GEAR_right_leg_front_p1,1,_V(1.655f,-1.942f,0.0f),_V(0,0,1),0.9948f);
 	static MGROUP_ROTATE MGEAR_right_leg_front_p2(0,&GEAR_right_leg_front_p2,1,_V(1.112f,-1.718f,0.0f),_V(0,0,1),0.5235f);
@@ -246,19 +257,19 @@ void ShuttleA::DefineAnimations ()
 	//********** VC animations ************
 
 	//auxiliary thrusters
-	static UINT POD_thruster_left[1] = {22};
-	static UINT POD_thruster_right[1] = {30};
+	static oapi::UInt POD_thruster_left[1] = {22};
+	static oapi::UInt POD_thruster_right[1] = {30};
 	static MGROUP_TRANSLATE MPOD_thruster_left (1, POD_thruster_left, 1, _V(0,0.05,0.023));
 	static MGROUP_TRANSLATE MPOD_thruster_right (1, POD_thruster_right, 1, _V(0,0.05,0.023));
-	
+
 	anim_pod_thrust_left = CreateAnimation (0);
 	AddAnimationComponent (anim_pod_thrust_left, 0, 1.0, &MPOD_thruster_left);
 	anim_pod_thrust_right = CreateAnimation (0);
 	AddAnimationComponent (anim_pod_thrust_right, 0, 1.0, &MPOD_thruster_right);
-	
+
 	//hover thrusters
-	static UINT HOVER_thruster_left[1]={31};
-	static UINT HOVER_thruster_right[1]={32};
+	static oapi::UInt HOVER_thruster_left[1]={31};
+	static oapi::UInt HOVER_thruster_right[1]={32};
 	static MGROUP_TRANSLATE MHOVER_thruster_left(1,HOVER_thruster_left,1,_V(0,0.085,0.037));
 	static MGROUP_TRANSLATE MHOVER_thruster_right(1,HOVER_thruster_right,1,_V(0,0.085,0.037));
 
@@ -268,53 +279,53 @@ void ShuttleA::DefineAnimations ()
 	AddAnimationComponent (anim_hover_thrust_right, 0, 1.0, &MHOVER_thruster_right);
 
 	//main thrusters
-	static UINT MAIN_thruster_left[1]={27};
-	static UINT MAIN_thruster_right[1]={28};
+	static oapi::UInt MAIN_thruster_left[1]={27};
+	static oapi::UInt MAIN_thruster_right[1]={28};
 	static MGROUP_TRANSLATE MMAIN_thruster_left (1,MAIN_thruster_left,1,_V(0,0.085,0.037));
 	static MGROUP_TRANSLATE MMAIN_thruster_right (1,MAIN_thruster_right,1,_V(0,0.085,0.037));
-	
+
 	anim_main_thrust_left = CreateAnimation (0);
 	AddAnimationComponent (anim_main_thrust_left, 0, 1.0, &MMAIN_thruster_left);
 	anim_main_thrust_right = CreateAnimation (0);
 	AddAnimationComponent (anim_main_thrust_right, 0, 1.0, &MMAIN_thruster_right);
-	
+
 	// POD angle switch
-	static UINT POD_angle_switch[2]={34,35};
+	static oapi::UInt POD_angle_switch[2]={34,35};
 	static MGROUP_ROTATE MPOD_angle_switch(1,POD_angle_switch,2,_V(-0.596666398f,1.98931781f,16.28778112f),//added 0.10 to Z
 															    _V(0.996194179f,0.036831321f,-0.078997542f),1.570796327f);
 	anim_pod_angle= CreateAnimation(0.5);
 	AddAnimationComponent(anim_pod_angle,0.0f,1.0f,&MPOD_angle_switch);
 
 	// RCS mode switch
-	static UINT RCS_mode_switch=33;
+	static oapi::UInt RCS_mode_switch=33;
 	static MGROUP_ROTATE MRCS_mode_switch(1,&RCS_mode_switch,1,_V(-0.479842445f,2.100993049f,16.32856942f),//added 0.10 to Z
 																_V(0.996194179f,0.036831321f,-0.078997542f),1.570796327f);
 	anim_rcs_mode= CreateAnimation(0.5);
 	AddAnimationComponent(anim_rcs_mode,0.0f,1.0f,&MRCS_mode_switch);
 
 	//DOCK port switch
-	static UINT DOCK_switch=39;		
+	static oapi::UInt DOCK_switch=39;
 	static MGROUP_ROTATE MDOCK_switch (1,&DOCK_switch,1,_V(-0.212890075f,2.608840923f,16.09495988f),
 														_V(0.0f,0.061554834f,-0.998103703f),1.570796327f/2.0f);
 	anim_dock_switch= CreateAnimation(0.5);
 	AddAnimationComponent(anim_dock_switch,0.0f,1.0f,&MDOCK_switch);
 
 	//AIRLOCK switch
-	static UINT AIRLOCK_switch=41;
+	static oapi::UInt AIRLOCK_switch=41;
 	static MGROUP_ROTATE MAIRLOCK_switch (1,&AIRLOCK_switch,1,_V(-0.243815575f,2.639114618f,16.09778152f),
 														_V(0.0f,0.061554834f,-0.998103703f),1.570796327f/2.0f);
 	anim_airlock_switch = CreateAnimation(0.5);
 	AddAnimationComponent(anim_airlock_switch,0.0f,1.0f,&MAIRLOCK_switch);
 
 	//GEAR switch
-	static UINT GEAR_switch=49;
+	static oapi::UInt GEAR_switch=49;
 	static MGROUP_ROTATE MGEAR_switch (1, &GEAR_switch,1, _V(-0.212890075f,2.610353215f,16.07043827f),
 														_V(0.0f,0.061554834f,-0.998103703f),1.570796327f/2.0f);
 	anim_gear_switch = CreateAnimation(0.5);
 	AddAnimationComponent(anim_gear_switch,0.0f,1.0f,&MGEAR_switch);
 
 	//CARGO ARM switch
-	static UINT CARGO_switch=54;
+	static oapi::UInt CARGO_switch=54;
 	static MGROUP_ROTATE MCARGO_switch (1, &CARGO_switch,1, _V(-0.212890075f,2.616076201f,15.97764079f),
 														_V(0.0f,0.061554834f,-0.998103703f),1.570796327f/2.0f);
 	anim_cargo_switch = CreateAnimation(0.5);
@@ -322,7 +333,7 @@ void ShuttleA::DefineAnimations ()
 }
 
 // --------------------------------------------------------------
-// 
+//
 // --------------------------------------------------------------
 void ShuttleA::ReleaseSurfaces ()
 {
@@ -334,7 +345,7 @@ void ShuttleA::ReleaseSurfaces ()
 }
 
 // --------------------------------------------------------------
-// 
+//
 // --------------------------------------------------------------
 void ShuttleA::InitPanel (int panel)
 {
@@ -342,45 +353,45 @@ void ShuttleA::InitPanel (int panel)
 
 	switch (panel) {
 	case -1: //VC resources
-		srf[2] = oapiCreateSurface (LOADBMP (IDB_BUTTON1));
-		srf[3] = oapiCreateSurface (LOADBMP (IDB_INDICATOR1));
-		srf[4] = oapiCreateSurface (LOADBMP (IDB_INDICATOR2));
-		srf[5] = oapiCreateSurface (LOADBMP (IDB_BUTTON3)); 
+		srf[2] = SHUTTLEA_BITMAP (IDB_BUTTON1, "button1.bmp");
+		srf[3] = SHUTTLEA_BITMAP (IDB_INDICATOR1, "indicator1.bmp");
+		srf[4] = SHUTTLEA_BITMAP (IDB_INDICATOR2, "indicator2.bmp");
+		srf[5] = SHUTTLEA_BITMAP (IDB_BUTTON3, "button3.bmp");
 
 		break;
 	case 0:
-		srf[0] = oapiCreateSurface (LOADBMP (IDB_SLIDER1));
-		srf[1] = oapiCreateSurface (LOADBMP (IDB_SWITCH1));
-		srf[2] = oapiCreateSurface (LOADBMP (IDB_BUTTON1));
-		
+		srf[0] = SHUTTLEA_BITMAP (IDB_SLIDER1, "slider1.bmp");
+		srf[1] = SHUTTLEA_BITMAP (IDB_SWITCH1, "switch1.bmp");
+		srf[2] = SHUTTLEA_BITMAP (IDB_BUTTON1, "button1.bmp");
+
 		for (i = 0; i < 2; i++) {
 			sliderpos_main[i] = sliderpos_hovr[i] =
-			sliderpos_retro[i] = sliderpos_auxhovr[i] = 
-			sliderpos_pod[i] = (UINT)-1;
+			sliderpos_retro[i] = sliderpos_auxhovr[i] =
+			sliderpos_pod[i] = (oapi::UInt)-1;
 			podswitch[i] = 0;
 		}
 		break;
 	case 1:
-		srf[0] = oapiCreateSurface (LOADBMP (IDB_SWITCH2));
-		srf[1] = oapiCreateSurface (LOADBMP (IDB_SWITCH3));
-		srf[2] = oapiCreateSurface (LOADBMP (IDB_SWITCH4));
-		srf[3] = oapiCreateSurface (LOADBMP (IDB_INDICATOR1));
-		srf[4] = oapiCreateSurface (LOADBMP (IDB_INDICATOR2));
-		srf[5] = oapiCreateSurface (LOADBMP (IDB_BUTTON3));
+		srf[0] = SHUTTLEA_BITMAP (IDB_SWITCH2, "switch2.bmp");
+		srf[1] = SHUTTLEA_BITMAP (IDB_SWITCH3, "switch3.bmp");
+		srf[2] = SHUTTLEA_BITMAP (IDB_SWITCH4, "switch4.bmp");
+		srf[3] = SHUTTLEA_BITMAP (IDB_INDICATOR1, "indicator1.bmp");
+		srf[4] = SHUTTLEA_BITMAP (IDB_INDICATOR2, "indicator2.bmp");
+		srf[5] = SHUTTLEA_BITMAP (IDB_BUTTON3, "button3.bmp");
 		break;
 	}
 }
 
 // --------------------------------------------------------------
-// 
+//
 // --------------------------------------------------------------
-bool ShuttleA::RotatePods (UINT which, UINT mode)
+bool ShuttleA::RotatePods (oapi::UInt which, oapi::UInt mode)
 {
 	if (Playback())
 		return false;  // disable during playback
 
 	bool modified = false;
-	UINT pod, p0 = (which & 1 ? 0 : 1), p1 = (which & 2 ? 1 : 0);
+	oapi::UInt pod, p0 = (which & 1 ? 0 : 1), p1 = (which & 2 ? 1 : 0);
 
 	for (pod = p0; pod <= p1; pod++) {
 		if (mode) {
@@ -412,9 +423,9 @@ bool ShuttleA::RotatePods (UINT which, UINT mode)
 }
 
 // --------------------------------------------------------------
-// 
+//
 // --------------------------------------------------------------
-void ShuttleA::CommandPodAngle (UINT which, double angle)
+void ShuttleA::CommandPodAngle (oapi::UInt which, double angle)
 {
 	for (int i = 0; i < 2; i++) {
 		if (which & (1<<i))
@@ -428,9 +439,9 @@ void ShuttleA::CommandPodAngle (UINT which, double angle)
 }
 
 // --------------------------------------------------------------
-// 
+//
 // --------------------------------------------------------------
-void ShuttleA::SetPodAngle (UINT which, double angle)
+void ShuttleA::SetPodAngle (oapi::UInt which, double angle)
 {
 	for (int i = 0; i < 2; i++) {
 		if (which & (1<<i)) {
@@ -444,7 +455,7 @@ void ShuttleA::SetPodAngle (UINT which, double angle)
 }
 
 // --------------------------------------------------------------
-// 
+//
 // --------------------------------------------------------------
 void ShuttleA::ActivateDockingPort (DoorStatus action)
 {
@@ -460,7 +471,7 @@ void ShuttleA::ActivateDockingPort (DoorStatus action)
 }
 
 // --------------------------------------------------------------
-// 
+//
 // --------------------------------------------------------------
 void ShuttleA::RevertDockingPort ()
 {
@@ -469,7 +480,7 @@ void ShuttleA::RevertDockingPort ()
 }
 
 // --------------------------------------------------------------
-// 
+//
 // --------------------------------------------------------------
 void ShuttleA::ActivateAirlock (int which, DoorStatus action)
 {
@@ -485,7 +496,7 @@ void ShuttleA::ActivateAirlock (int which, DoorStatus action)
 }
 
 // --------------------------------------------------------------
-// 
+//
 // --------------------------------------------------------------
 void ShuttleA::RevertAirlock (int which)
 {
@@ -494,7 +505,7 @@ void ShuttleA::RevertAirlock (int which)
 }
 
 // --------------------------------------------------------------
-// 
+//
 // --------------------------------------------------------------
 void ShuttleA::ActivateLandingGear (DoorStatus action)
 {
@@ -510,7 +521,7 @@ void ShuttleA::ActivateLandingGear (DoorStatus action)
 }
 
 // --------------------------------------------------------------
-// 
+//
 // --------------------------------------------------------------
 void ShuttleA::RevertLandingGear ()
 {
@@ -519,7 +530,7 @@ void ShuttleA::RevertLandingGear ()
 }
 
 // --------------------------------------------------------------
-// 
+//
 // --------------------------------------------------------------
 void ShuttleA::ActivateCargo (int status)
 {
@@ -528,7 +539,7 @@ void ShuttleA::ActivateCargo (int status)
 	for (int i=0;i<6;i++)
 		if (GetAttachmentStatus (payload_attachment[i]))
 			cargo_open[i]=0;
-		else 
+		else
 			cargo_open[i]=1;
 
 	oapiTriggerRedrawArea(1,0,AID_CARGOARMINDICATOR);
@@ -538,7 +549,7 @@ void ShuttleA::ActivateCargo (int status)
 }
 
 // --------------------------------------------------------------
-// 
+//
 // --------------------------------------------------------------
 bool ShuttleA::SetADILayout (int layout)
 {
@@ -550,7 +561,7 @@ bool ShuttleA::SetADILayout (int layout)
 }
 
 // --------------------------------------------------------------
-// 
+//
 // --------------------------------------------------------------
 bool ShuttleA::SetAttrefMode (int mode)
 {
@@ -609,7 +620,7 @@ bool ShuttleA::SetAtttgtFrameMode (int mode)
 }
 
 // --------------------------------------------------------------
-// 
+//
 // --------------------------------------------------------------
 bool ShuttleA::ToggleGrapple (int grapple)
 {
@@ -637,21 +648,21 @@ bool ShuttleA::ToggleGrapple (int grapple)
 		GlobalRot(dir,gdir);
 		// Search the complete vessel list for a grappling candidate.
 		// Not very scalable ...
-		for (DWORD i = 0; i < oapiGetVesselCount(); i++) {
+		for (oapi::UInt32 i = 0; i < oapiGetVesselCount(); i++) {
 			OBJHANDLE hV = oapiGetVesselByIndex (i);
 			if (hV == GetHandle()) continue; // we don't want to grapple ourselves ...
 			oapiGetGlobalPos (hV, &gpos);
 			if (dist (gpos, grms) < oapiGetSize (hV)) { // in range
 				VESSEL *v = oapiGetVesselInterface (hV);
-				DWORD nAttach = v->AttachmentCount (true);
-				for (DWORD j = 0; j < nAttach; j++) { // now scan all attachment points of the candidate
+				oapi::UInt32 nAttach = v->AttachmentCount (true);
+				for (oapi::UInt32 j = 0; j < nAttach; j++) { // now scan all attachment points of the candidate
 					ATTACHMENTHANDLE hAtt = v->GetAttachmentHandle (true, j);
 					const char *id = v->GetAttachmentId (hAtt);
 					if (strncmp (id, "SH", 2)) continue; // attachment point not compatible
 					v->GetAttachmentParams (hAtt, pos, dir, rot);
 					v->Local2Global (pos, gpos);
 					if (dist (gpos, grms) < MAX_GRAPPLING_DIST) { // found one!
-						
+
 						// check if the attachment points are pointing the right way
 						v->GlobalRot(rot,gcrot);
 						v->GlobalRot(dir,gcdir); //should be normal by now
@@ -673,7 +684,7 @@ bool ShuttleA::ToggleGrapple (int grapple)
 
 
 // --------------------------------------------------------------
-// 
+//
 // --------------------------------------------------------------
 void ShuttleA::ComputePayloadMass()
 {
@@ -695,13 +706,13 @@ void ShuttleA::ComputePayloadMass()
 }
 
 // --------------------------------------------------------------
-// 
+//
 // --------------------------------------------------------------
 void ShuttleA::RedrawPanel_MFDButton (SURFHANDLE surf, int mfd, int side)
 {
 	oapi::Sketchpad* pSkp = oapiGetSketchpad(surf);
 	pSkp->SetFont(g_Param.pFont[0]);
-	pSkp->SetTextColor(RGB(0, 200, 0));
+	pSkp->SetTextColor(0x0000c800);
 	pSkp->SetTextAlign(oapi::Sketchpad::CENTER);
 	pSkp->SetBackgroundMode(oapi::Sketchpad::BK_TRANSPARENT);
 	const char *label;
@@ -714,17 +725,17 @@ void ShuttleA::RedrawPanel_MFDButton (SURFHANDLE surf, int mfd, int side)
 }
 
 // --------------------------------------------------------------
-// 
+//
 // --------------------------------------------------------------
 void ShuttleA::RedrawPanel_Navmode (SURFHANDLE surf)
 {
-	for (DWORD i = NAVMODE_KILLROT; i < NAVMODE_HOLDALT; i++)
+	for (oapi::UInt32 i = NAVMODE_KILLROT; i < NAVMODE_HOLDALT; i++)
 		if (GetNavmodeState (i))
 			oapiBlt (surf, srf[2], (6-i)*44, 0, (i-1)*42, 0, 42, 31);
 }
 
 // --------------------------------------------------------------
-// 
+//
 // --------------------------------------------------------------
 bool ShuttleA::RedrawPanel_EngineIndicator (SURFHANDLE surf)
 {
@@ -738,7 +749,7 @@ bool ShuttleA::RedrawPanel_EngineIndicator (SURFHANDLE surf)
 	const int txty1a = 101, txty1b = 113;
 	const int txty2a = 168, txty2b = 180;
 
-	UINT i;
+	oapi::UInt i;
 	double level, th, angle, dx, dy;
 	char cbuf[16];
 	double m = GetMass();
@@ -746,7 +757,7 @@ bool ShuttleA::RedrawPanel_EngineIndicator (SURFHANDLE surf)
 	oapi::Sketchpad* pSkp = oapiGetSketchpad(surf);
 	pSkp->SetFont(g_Param.pFont[0]);
 	pSkp->SetPen(g_Param.pPen[0]);
-	pSkp->SetTextColor(RGB(120, 220, 120));
+	pSkp->SetTextColor(0x0078dc78);
 	pSkp->SetTextAlign(oapi::Sketchpad::RIGHT);
 	pSkp->SetBackgroundMode(oapi::Sketchpad::BK_TRANSPARENT);
 
@@ -787,7 +798,7 @@ bool ShuttleA::RedrawPanel_EngineIndicator (SURFHANDLE surf)
 }
 
 // --------------------------------------------------------------
-// 
+//
 // --------------------------------------------------------------
 bool ShuttleA::RedrawPanel_PodangleIndicator (SURFHANDLE surf)
 {
@@ -798,7 +809,7 @@ bool ShuttleA::RedrawPanel_PodangleIndicator (SURFHANDLE surf)
 	const double rad = 24.0, radi = 29.0, radw = 36.0;
 	const double da = 0.1;
 
-	UINT i;
+	oapi::UInt i;
 	int x, y, ia;
 	double angle, angle1, angle2;
 	char cbuf[16];
@@ -822,7 +833,7 @@ bool ShuttleA::RedrawPanel_PodangleIndicator (SURFHANDLE surf)
 		if      (ia < 90) sprintf (cbuf, "%02dR", ia);
 		else if (ia > 90) sprintf (cbuf, "%02dF", 180-ia);
 		else              sprintf (cbuf, "90");
-		pSkp->SetTextColor(RGB(220, 220, 120));
+		pSkp->SetTextColor(0x0078dcdc);
 		pSkp->Text(txtx[i] - 27, txty, cbuf, strlen(cbuf));
 
 		// draw pod status indicator
@@ -833,7 +844,7 @@ bool ShuttleA::RedrawPanel_PodangleIndicator (SURFHANDLE surf)
 		if      (ia < 90) sprintf (cbuf, "%02dR", ia);
 		else if (ia > 90) sprintf (cbuf, "%02dF", 180-ia);
 		else              sprintf (cbuf, "90");
-		pSkp->SetTextColor(RGB(120, 220, 120));
+		pSkp->SetTextColor(0x0078dc78);
 		pSkp->Text(txtx[i], txty, cbuf, strlen(cbuf));
 	}
 	oapiReleaseSketchpad(pSkp);
@@ -841,7 +852,7 @@ bool ShuttleA::RedrawPanel_PodangleIndicator (SURFHANDLE surf)
 }
 
 // --------------------------------------------------------------
-// 
+//
 // --------------------------------------------------------------
 void ShuttleA::RedrawPanel_Fuelstatus (SURFHANDLE surf, int part)
 {
@@ -849,14 +860,14 @@ void ShuttleA::RedrawPanel_Fuelstatus (SURFHANDLE surf, int part)
 
 	char cbuf[20];
 	double m, m0, rate, lvl;
-	
+
 	oapi::Sketchpad *pSkp = oapiGetSketchpad(surf);
 
 	pSkp->SetFont(g_Param.pFont[0]);
 	pSkp->SetBrush(g_Param.pBrush[1]);
 	pSkp->SetPen(g_Param.pPen[2]);
 
-	pSkp->SetTextColor(RGB(224,224,224));
+	pSkp->SetTextColor(0x00e0e0e0);
 	pSkp->SetBackgroundMode(Sketchpad::BK_TRANSPARENT);
 	pSkp->SetTextAlign(Sketchpad::RIGHT, Sketchpad::TOP);
 
@@ -958,20 +969,20 @@ void ShuttleA::RedrawPanel_Fuelstatus (SURFHANDLE surf, int part)
 		pSkp->SetBrush(g_Param.pBrush[1]);
 		pSkp->Rectangle (21, 30, 42, 39); pSkp->Text (42, 28, cbuf, strlen(cbuf));
 		break;
-	} 
+	}
 	oapiReleaseSketchpad(pSkp);
 }
 
 // --------------------------------------------------------------
-// 
+//
 // --------------------------------------------------------------
 void ShuttleA::RedrawPanel_CargoOpen(SURFHANDLE surf)
 {
 	int mx,my;
-	
+
 	for (int i=0;i<6;i++)
 		if (cargo_open[i])
-		{	
+		{
 			mx = (i>2?0:45);
 			my = (i % 3)*44;
 			oapiBlt (surf, srf[5], mx, my, 0, 0, 38, 42);
@@ -986,27 +997,27 @@ void ShuttleA::RedrawPanel_CargoOpen(SURFHANDLE surf)
 
 
 // --------------------------------------------------------------
-// 
+//
 // --------------------------------------------------------------
 void ShuttleA::RedrawVC_ThPOD ()
 {
 
 		double level = GetThrusterLevel (th_pod[1]);
-		UINT pos = (UINT)((1.0-level)*90.0);
-		
+		oapi::UInt pos = (oapi::UInt)((1.0-level)*90.0);
+
 		if (pos != sliderpos_pod_v[0]) {
 			SetAnimation (anim_pod_thrust_right, level);
 			sliderpos_pod_v[0] = pos;
 								};
 
 		level = GetThrusterLevel (th_pod[0]);
-		pos = (UINT)((1.0-level)*90.0);
-		
+		pos = (oapi::UInt)((1.0-level)*90.0);
+
 		if (pos != sliderpos_pod_v[1]) {
 			SetAnimation (anim_pod_thrust_left, level);
 			sliderpos_pod_v[1] = pos;
 								};
-	
+
 };
 
 // --------------------------------------------------------------
@@ -1016,40 +1027,40 @@ void ShuttleA::RedrawVC_ThHover()
 {
 
 		double level = GetThrusterLevel (th_hover[0]);
-		UINT pos = (UINT)((1.0-level)*90.0);
-		
+		oapi::UInt pos = (oapi::UInt)((1.0-level)*90.0);
+
 		if (pos != sliderpos_hovr_v[0]) {
 			SetAnimation (anim_hover_thrust_left, level);
 			sliderpos_hovr_v[0] = pos;
 								};
 
 		level = GetThrusterLevel (th_hover[1]);
-		pos = (UINT)((1.0-level)*90.0);
-		
+		pos = (oapi::UInt)((1.0-level)*90.0);
+
 		if (pos != sliderpos_hovr_v[1]) {
 			SetAnimation (anim_hover_thrust_right, level);
 			sliderpos_hovr_v[1] = pos;
 								};
-	
-	
+
+
 };
 
 // --------------------------------------------------------------
-// 
+//
 // --------------------------------------------------------------
 void ShuttleA::RedrawVC_ThMain()
 {
 		double level = GetThrusterLevel (th_main[0]);
-		UINT pos = (UINT)((1.0-level)*90.0);
-		
+		oapi::UInt pos = (oapi::UInt)((1.0-level)*90.0);
+
 		if (pos != sliderpos_main_v[0]) {
 			SetAnimation (anim_main_thrust_left, level);
 			sliderpos_main_v[0] = pos;
 								};
 
 		level = GetThrusterLevel (th_main[1]);
-		pos = (UINT)((1.0-level)*90.0);
-		
+		pos = (oapi::UInt)((1.0-level)*90.0);
+
 		if (pos != sliderpos_main_v[1]) {
 			SetAnimation (anim_main_thrust_right, level);
 			sliderpos_main_v[1] = pos;
@@ -1212,7 +1223,7 @@ void ShuttleA::clbkSetClassCaps (FILEHANDLE cfg)
 
 	// ************************ Attachment points ****************************
 	char attach_id[8]={"SH"};
-	
+
 	payload_attachment[0]  = CreateAttachment (false,_V(1.76f,0.0f, 6.28f),_V(0.0f,0.0f,-1.0f),_V(0.0f,1.0f,0.0f),attach_id);
 	payload_attachment[1]  = CreateAttachment (false,_V(1.76f,0.0f,-1.28f),_V(0.0f,0.0f,-1.0f),_V(0.0f,1.0f,0.0f),attach_id);
 	payload_attachment[2]  = CreateAttachment (false,_V(1.76f,0.0f,-6.600f),_V(0.0f,0.0f,-1.0f),_V(0.0f,1.0f,0.0f),attach_id);
@@ -1293,25 +1304,25 @@ void ShuttleA::clbkLoadStateEx (FILEHANDLE scn, void *vs)
 	char *line;
 
 	while (oapiReadScenario_nextline (scn, line)) {
-		if (!_strnicmp (line, "PODANGLE", 8)) {
+		if (!shuttlea::ComparePrefix (line, "PODANGLE", 8)) {
 			sscanf (line+8, "%lf%lf", pod_angle+0, pod_angle+1);
-		} else if (!_strnicmp (line, "DOCKSTATE", 9)) {
+		} else if (!shuttlea::ComparePrefix (line, "DOCKSTATE", 9)) {
 			sscanf (line+9, "%d%lf", &dock_status, &dock_proc);
-		} else if (!_strnicmp (line, "AIRLOCK", 7)) {
+		} else if (!shuttlea::ComparePrefix (line, "AIRLOCK", 7)) {
 			sscanf (line+7, "%d%lf", &lock_status[0], &lock_proc[0]);
-		} else if (!_strnicmp (line, "IAIRLOCK", 8)) {
+		} else if (!shuttlea::ComparePrefix (line, "IAIRLOCK", 8)) {
 			sscanf (line+8, "%d%lf", &lock_status[1], &lock_proc[1]);
-		} else if (!_strnicmp (line, "GEAR", 4)) {
+		} else if (!shuttlea::ComparePrefix (line, "GEAR", 4)) {
 			sscanf (line+4, "%d%lf", &gear_status, &gear_proc);
-		} else if (!_strnicmp (line, "PAYLOAD MASS", 12)) {
+		} else if (!shuttlea::ComparePrefix (line, "PAYLOAD MASS", 12)) {
 			sscanf (line+12, "%lf%d", &payload_mass,&cargo_arm_status);
-		} else if (!_strnicmp (line, "ATTREF", 6)) {
+		} else if (!shuttlea::ComparePrefix (line, "ATTREF", 6)) {
 			int mode, tgtmode, navid;
 			sscanf (line+6, "%d%d%d", &mode, &tgtmode, &navid);
 			attref->SetMode (mode);
 			attref->SetTgtmode (tgtmode);
 			attref->SetNavid (navid);
-		} else if (!_strnicmp (line, "ADI_LAYOUT", 10)) {
+		} else if (!shuttlea::ComparePrefix (line, "ADI_LAYOUT", 10)) {
 			int layout = 0;
 			if (sscanf (line+10, "%d", &layout) && layout >= 0 && layout <= 1)
 				adi_layout = layout;
@@ -1374,33 +1385,33 @@ void ShuttleA::clbkSaveState (FILEHANDLE scn)
 // --------------------------------------------------------------
 bool ShuttleA::clbkPlaybackEvent (double simt, double event_t, const char *event_type, const char *event)
 {
-	if (!_stricmp (event_type, "DOCK")) {
-		ActivateDockingPort (!_stricmp (event, "CLOSE") ? DOOR_CLOSING : DOOR_OPENING);
+	if (!shuttlea::CompareText (event_type, "DOCK")) {
+		ActivateDockingPort (!shuttlea::CompareText (event, "CLOSE") ? DOOR_CLOSING : DOOR_OPENING);
 		return true;
-	} else if (!_stricmp (event_type, "AIRLOCK")) {
-		ActivateAirlock (0, !_stricmp (event, "CLOSE") ? DOOR_CLOSING : DOOR_OPENING);
+	} else if (!shuttlea::CompareText (event_type, "AIRLOCK")) {
+		ActivateAirlock (0, !shuttlea::CompareText (event, "CLOSE") ? DOOR_CLOSING : DOOR_OPENING);
 		return true;
-	} else if (!_stricmp (event_type, "IAIRLOCK")) {
-		ActivateAirlock (1, !_stricmp (event, "CLOSE") ? DOOR_CLOSING : DOOR_OPENING);
+	} else if (!shuttlea::CompareText (event_type, "IAIRLOCK")) {
+		ActivateAirlock (1, !shuttlea::CompareText (event, "CLOSE") ? DOOR_CLOSING : DOOR_OPENING);
 		return true;
-	} else if (!_stricmp (event_type, "GEAR")) {
-		ActivateLandingGear (!_stricmp (event, "UP") ? DOOR_CLOSING : DOOR_OPENING);
+	} else if (!shuttlea::CompareText (event_type, "GEAR")) {
+		ActivateLandingGear (!shuttlea::CompareText (event, "UP") ? DOOR_CLOSING : DOOR_OPENING);
 		return true;
-	} else if (!_stricmp (event_type, "POD")) {
-		UINT which;
+	} else if (!shuttlea::CompareText (event_type, "POD")) {
+		oapi::UInt which;
 		double angle;
 		char action[256];
 		sscanf (event, "%d %s %lf", &which, action, &angle);
-		if (!_stricmp (action, "SET")) CommandPodAngle (which, angle);
-		else if (!_stricmp (action, "FWD")) CommandPodAngle (which, PI);
-		else if (!_stricmp (action, "BACK")) CommandPodAngle (which, 0);
+		if (!shuttlea::CompareText (action, "SET")) CommandPodAngle (which, angle);
+		else if (!shuttlea::CompareText (action, "FWD")) CommandPodAngle (which, PI);
+		else if (!shuttlea::CompareText (action, "BACK")) CommandPodAngle (which, 0);
 		return true;
-	} else if (!_stricmp (event_type, "CARGO")) {
-		if (!_strnicmp (event, "ARM", 3))
+	} else if (!shuttlea::CompareText (event_type, "CARGO")) {
+		if (!shuttlea::ComparePrefix (event, "ARM", 3))
 			ActivateCargo (1);
-		else if (!_strnicmp (event, "DISARM", 6))
+		else if (!shuttlea::ComparePrefix (event, "DISARM", 6))
 			ActivateCargo (0);
-		else if (!_strnicmp (event, "GRAPPLE", 7)) {
+		else if (!shuttlea::ComparePrefix (event, "GRAPPLE", 7)) {
 			int grapple;
 			sscanf (event+7, "%d", &grapple);
 			ToggleGrapple (grapple);
@@ -1415,7 +1426,7 @@ bool ShuttleA::clbkPlaybackEvent (double simt, double event_t, const char *event
 // --------------------------------------------------------------
 void ShuttleA::clbkPostCreation ()
 {
-	UINT i;
+	oapi::UInt i;
 	for (i = 0; i < 2; i++) {
 		pod_angle_request[i] = pod_angle[i];
 		double sina = sin(pod_angle[i]), cosa = cos(pod_angle[i]);
@@ -1580,7 +1591,7 @@ void ShuttleA::clbkNavMode (int mode, bool active)
 // --------------------------------------------------------------
 // Load a 2-D instrument panel
 // --------------------------------------------------------------
-bool ShuttleA::clbkLoadPanel2D (int id, PANELHANDLE hPanel, DWORD viewW, DWORD viewH)
+bool ShuttleA::clbkLoadPanel2D (int id, PANELHANDLE hPanel, oapi::UInt32 viewW, oapi::UInt32 viewH)
 {
 	switch (id) {
 	case 0:
@@ -1614,7 +1625,7 @@ void ShuttleA::DefineMainPanel (PANELHANDLE hPanel)
 		{panelW,panelH,0,   0,0,0,   panelW/texW, 1.0f},
 		{panelW,     0,0,   0,0,0,   panelW/texW, 1.0f - panelH/texH}
 	};
-	static WORD IDX[6] = {
+	static oapi::UInt16 IDX[6] = {
 		0,2,1,
 		2,0,3
 	};
@@ -1629,13 +1640,13 @@ void ShuttleA::DefineMainPanel (PANELHANDLE hPanel)
 		 {RMFD_X,    344,0,  0,0,0,  0,1},
 		 {RMFD_X+260,344,0,  0,0,0,  1,1}}
 	};
-	static WORD IDX_MFD[6] = {
+	static oapi::UInt16 IDX_MFD[6] = {
 		0,1,2,
 		3,2,1
 	};
 
 	int i;
-	DWORD panel_grp, back_grp0, back_grp1, back_grp2, frnt_grp0, frnt_grp1, frnt_grp2, lmfd_grp, rmfd_grp;
+	oapi::UInt32 panel_grp, back_grp0, back_grp1, back_grp2, frnt_grp0, frnt_grp1, frnt_grp2, lmfd_grp, rmfd_grp;
 
 	if (hPanelMesh0) oapiDeleteMesh(hPanelMesh0);
 	hPanelMesh0 = oapiCreateMesh(0,0);
@@ -1729,7 +1740,7 @@ void ShuttleA::DefineOverheadPanel (PANELHANDLE hPanel)
 		pel[i]->Reset2D(1);
 }
 
-void ShuttleA::ScalePanel (PANELHANDLE hPanel, DWORD viewW, DWORD viewH)
+void ShuttleA::ScalePanel (PANELHANDLE hPanel, oapi::UInt32 viewW, oapi::UInt32 viewH)
 {
 	double defscale = (double)viewW/(double)PANEL2D_MAINW;
 	double magscale = max (defscale, 1.0);
@@ -1772,7 +1783,7 @@ bool ShuttleA::clbkPanelRedrawEvent (int id, int event, SURFHANDLE surf, void *c
 // --------------------------------------------------------------
 // Respond to buffered keyboard events
 // --------------------------------------------------------------
-int ShuttleA::clbkConsumeBufferedKey (DWORD key, bool down, char *kstate)
+int ShuttleA::clbkConsumeBufferedKey (oapi::UInt32 key, bool down, char *kstate)
 {
 	if (!down) return 0;       // only process keydown events
 	if (Playback()) return 0;  // don't allow manual user input during a playback
@@ -1812,14 +1823,14 @@ int ShuttleA::clbkConsumeDirectKey(char *kstate)
 				 oapiTriggerPanelRedrawArea (0, AID_ENGINEPODLEVEL);
 				 return 1;
 				}
-		
+
 		if (KEYDOWN (kstate, OAPI_KEY_NUMPAD0))
 				{
 				 IncThrusterGroupLevel(thg_pod,0.01);
 				 oapiTriggerPanelRedrawArea (0, AID_ENGINEPODLEVEL);
 				 return 1;
 				}
-			
+
 		}
 
 	return 0;
@@ -1904,13 +1915,13 @@ void ShuttleA::clbkRenderHUD (int mode, const HUDPAINTSPEC *hps, SURFHANDLE hTex
 
 	static float texw = 512.0f, texh = 256.0f;
 	float cx = (float)hps->CX, cy = (float)hps->CY;
-	DWORD i, nvtx = 0, nidx = 0;
+	oapi::UInt32 i, nvtx = 0, nidx = 0;
 	static NTVERTEX vtx[24+12];
-	static WORD idx[36+30];
+	static oapi::UInt16 idx[36+30];
 	static float scl = 0;
 	static NTVERTEX vgear[24];
 	static NTVERTEX vnose[12];
-	static WORD igear[36] = {
+	static oapi::UInt16 igear[36] = {
 		 0, 3, 1,  2, 3, 0,
 		 4, 7, 5,  6, 7, 4,
 		 8,11, 9, 10,11, 8,
@@ -1918,7 +1929,7 @@ void ShuttleA::clbkRenderHUD (int mode, const HUDPAINTSPEC *hps, SURFHANDLE hTex
 		16,19,17, 18,19,16,
 		20,23,21, 22,23,20
 	};
-	static WORD inose[30] = {
+	static oapi::UInt16 inose[30] = {
 		0,1,2, 2,3,0,
 		0,6,1, 6,7,1,
 		1,8,2, 8,9,2,
@@ -1983,7 +1994,7 @@ void ShuttleA::clbkRenderHUD (int mode, const HUDPAINTSPEC *hps, SURFHANDLE hTex
 bool ShuttleA::clbkLoadVC (int id)
 {
 	static VCMFDSPEC mfds_left  = {1, 23};
-	static VCMFDSPEC mfds_right = {1, 24}; 
+	static VCMFDSPEC mfds_right = {1, 24};
 	static VCHUDSPEC hud_pilot  = {1, 52,{-0.600,2.441,16.5381},0.38};
 	ReleaseSurfaces();
 
@@ -1993,7 +2004,7 @@ bool ShuttleA::clbkLoadVC (int id)
 		oapiVCRegisterMFD (MFD_LEFT, &mfds_left);
 		oapiVCRegisterMFD (MFD_RIGHT, &mfds_right);
 		oapiVCRegisterHUD (&hud_pilot);
-		
+
 		oapiVCRegisterArea (AID_ENGINEPODLEVEL, PANEL_REDRAW_ALWAYS, PANEL_MOUSE_LBDOWN|PANEL_MOUSE_LBPRESSED);
 		oapiVCSetAreaClickmode_Quadrilateral (AID_ENGINEPODLEVEL,
 					_V(-0.662748635f,2.000830898f,16.28952821f),
@@ -2020,7 +2031,7 @@ bool ShuttleA::clbkLoadVC (int id)
 
 		tex1 = oapiGetTextureHandle (vcmesh_tpl,11); //podangle tex
 		oapiVCRegisterArea (AID_PODANGLEINDICATOR, _R( 0,0, 150,51), PANEL_REDRAW_ALWAYS, PANEL_MOUSE_IGNORE, PANEL_MAP_BACKGROUND, tex1);
-		
+
 		tex1 = oapiGetTextureHandle (vcmesh_tpl,12); //navmode tex
 		oapiVCRegisterArea (AID_NAVMODE, _R( 0,0, 262,32), PANEL_REDRAW_MOUSE|PANEL_REDRAW_USER, PANEL_MOUSE_LBDOWN, PANEL_MAP_BACKGROUND, tex1);
 		oapiVCSetAreaClickmode_Quadrilateral (AID_NAVMODE,
@@ -2028,7 +2039,7 @@ bool ShuttleA::clbkLoadVC (int id)
 					_V(-0.689299533f,2.129213263f,16.35194677f),
 					_V(-0.843884764f,2.106857749f,16.35644716f),
 					_V(-0.689299533f,2.112573079f,16.34418865f));
-		
+
 		oapiVCRegisterArea (AID_PODANGLEPRESET, PANEL_REDRAW_NEVER, PANEL_MOUSE_LBDOWN);
 		oapiVCSetAreaClickmode_Quadrilateral (AID_PODANGLEPRESET,
 					_V(-0.553004921f,2.007572246f,16.28207691f),
@@ -2050,15 +2061,15 @@ bool ShuttleA::clbkLoadVC (int id)
 					_V(-0.485742645f,2.088965745f,16.31353154f),
 					_V(-0.473942246f,2.089402029f,16.31259578f));
 
-		// MFD1  buttons 
+		// MFD1  buttons
 		tex1 = oapiGetTextureHandle (vcmesh_tpl,13); //mfd buttons tex
-		oapiVCRegisterArea (AID_MFD1_LBUTTONS, _R( 8 ,9, 32,218), PANEL_REDRAW_MOUSE|PANEL_REDRAW_USER,PANEL_MOUSE_LBDOWN|PANEL_MOUSE_LBUP|PANEL_MOUSE_LBPRESSED|PANEL_MOUSE_ONREPLAY, PANEL_MAP_BACKGROUND, tex1);		
+		oapiVCRegisterArea (AID_MFD1_LBUTTONS, _R( 8 ,9, 32,218), PANEL_REDRAW_MOUSE|PANEL_REDRAW_USER,PANEL_MOUSE_LBDOWN|PANEL_MOUSE_LBUP|PANEL_MOUSE_LBPRESSED|PANEL_MOUSE_ONREPLAY, PANEL_MAP_BACKGROUND, tex1);
 		oapiVCSetAreaClickmode_Quadrilateral(AID_MFD1_LBUTTONS,
 							_V(-0.873975f, 2.07783f, 16.3458f),
 							_V(-0.898166f, 2.07693f, 16.3477f),
 							_V(-0.873975f, 1.95705f, 16.2895f),
 							_V(-0.898166f, 1.95616f, 16.2914f));
-	
+
 		oapiVCRegisterArea (AID_MFD1_RBUTTONS, _R( 49,9, 73,218), PANEL_REDRAW_MOUSE|PANEL_REDRAW_USER,PANEL_MOUSE_LBDOWN|PANEL_MOUSE_LBUP|PANEL_MOUSE_LBPRESSED|PANEL_MOUSE_ONREPLAY, PANEL_MAP_BACKGROUND, tex1);
 		oapiVCSetAreaClickmode_Quadrilateral(AID_MFD1_RBUTTONS,
 							_V(-0.691069f, 2.08459f, 16.3313f),
@@ -2072,15 +2083,15 @@ bool ShuttleA::clbkLoadVC (int id)
 					_V(-0.755381769f,1.948559073f,16.27410013f),
 					_V(-0.833854424f,1.935458958f,16.27556799f),
 					_V(-0.755381769f,1.938360251f,16.26934516f));
-		
-		//MFD2 buttons 
-		oapiVCRegisterArea (AID_MFD2_LBUTTONS, _R(90 ,9,114,218), PANEL_REDRAW_MOUSE|PANEL_REDRAW_USER,PANEL_MOUSE_LBDOWN|PANEL_MOUSE_LBUP|PANEL_MOUSE_LBPRESSED|PANEL_MOUSE_ONREPLAY, PANEL_MAP_BACKGROUND, tex1);		
+
+		//MFD2 buttons
+		oapiVCRegisterArea (AID_MFD2_LBUTTONS, _R(90 ,9,114,218), PANEL_REDRAW_MOUSE|PANEL_REDRAW_USER,PANEL_MOUSE_LBDOWN|PANEL_MOUSE_LBUP|PANEL_MOUSE_LBPRESSED|PANEL_MOUSE_ONREPLAY, PANEL_MAP_BACKGROUND, tex1);
 		oapiVCSetAreaClickmode_Quadrilateral(AID_MFD2_LBUTTONS,
 							_V(-0.424380f, 2.09445f, 16.3101f),
 							_V(-0.448571f, 2.09356f, 16.3120f),
 							_V(-0.424380f, 1.97367f, 16.2538f),
 							_V(-0.448571f, 1.97278f, 16.2557f));
-	
+
 		oapiVCRegisterArea (AID_MFD2_RBUTTONS, _R( 131,9, 155,218), PANEL_REDRAW_MOUSE|PANEL_REDRAW_USER,PANEL_MOUSE_LBDOWN|PANEL_MOUSE_LBUP|PANEL_MOUSE_LBPRESSED|PANEL_MOUSE_ONREPLAY, PANEL_MAP_BACKGROUND, tex1);
 		oapiVCSetAreaClickmode_Quadrilateral(AID_MFD2_RBUTTONS,
 							_V(-0.241474f, 2.10121f, 16.2956f),
@@ -2094,8 +2105,8 @@ bool ShuttleA::clbkLoadVC (int id)
 					_V(-0.305786556f,2.018859532f,16.26347371f),
 					_V(-0.384259211f,1.952081406f,16.23991538f),
 					_V(-0.305786556f,1.954982699f,16.23369255f));
-			
-		
+
+
 		//OVERHEAD Panel
 		tex1 = oapiGetTextureHandle (vcmesh_tpl,14); //fuel management tex
 		oapiVCRegisterArea (AID_FUELSTATUS1,_R( 127,  77, 147, 232), PANEL_REDRAW_ALWAYS, PANEL_MOUSE_IGNORE, PANEL_MAP_CURRENT,tex1);
@@ -2130,7 +2141,7 @@ bool ShuttleA::clbkLoadVC (int id)
 						_V(-0.209934233f,2.593845706f,16.06314928f));
 
 		tex1 = oapiGetTextureHandle (vcmesh_tpl,16); //cargo tex
-		oapiVCRegisterArea(AID_CARGO_OPEN, _R( 0,  25, 84, 156), PANEL_REDRAW_MOUSE, PANEL_MOUSE_LBDOWN,PANEL_MAP_BACKGROUND,tex1);					
+		oapiVCRegisterArea(AID_CARGO_OPEN, _R( 0,  25, 84, 156), PANEL_REDRAW_MOUSE, PANEL_MOUSE_LBDOWN,PANEL_MAP_BACKGROUND,tex1);
 		oapiVCSetAreaClickmode_Quadrilateral(AID_CARGO_OPEN,
 						_V(-0.250824617f,2.635761492f,16.03627884f),
 						_V(-0.250824617f,2.638222672f,15.99637112f),
@@ -2145,7 +2156,7 @@ bool ShuttleA::clbkLoadVC (int id)
 						_V(-0.209934233f,2.599568692f,15.9703518f));
 
 
-		
+
 	};
 
 	InitPanel(-1);// VC is -1
@@ -2162,7 +2173,7 @@ bool ShuttleA::clbkVCMouseEvent (int id, int event, VECTOR3 &p)
 	int mode,pmode;
 	int mfd;
 	int mx,my;
-	
+
 	switch (id) {
 	case AID_MFD1_LBUTTONS:
 	case AID_MFD1_RBUTTONS:
@@ -2185,7 +2196,7 @@ bool ShuttleA::clbkVCMouseEvent (int id, int event, VECTOR3 &p)
 		else if (mx >= 100)           oapiSendMFDKey (mfd, OAPI_KEY_GRAVE);
 		return true;
 	case AID_ENGINEPODLEVEL: //engine pog thruster
-		
+
 		if (p.x<  0.2) ctrl = 2;  // left engine
 				else if (p.x >0.8) ctrl = 1;  // right engine
 				else               ctrl = 3;  // both
@@ -2215,7 +2226,7 @@ bool ShuttleA::clbkVCMouseEvent (int id, int event, VECTOR3 &p)
 			if (th_level>1.0f)  th_level=1.0f;
 			if (ctrl & 1)	SetThrusterLevel (th_main[0], th_level);
 			if (ctrl & 2)   SetThrusterLevel (th_main[1], th_level);
-			
+
 			return true;
 	case AID_NAVMODE:
 		ctrl =(int)(p.x*262.0f);
@@ -2232,7 +2243,7 @@ bool ShuttleA::clbkVCMouseEvent (int id, int event, VECTOR3 &p)
 		CommandPodAngle (3, (2-mode)*0.5*PI);
 		return true;
 	case AID_PODANGLESWITCH:
-	
+
 		ctrl=3; // always both from VC !? ?
 		//pmode = podswitch[0];
 		my=(int)(p.y*44.0f);
@@ -2375,9 +2386,9 @@ bool ShuttleA::clbkVCRedrawEvent (int id, int event, SURFHANDLE surf)
 		SetAnimation (anim_cargo_switch,cargo_arm_status == 1 ? 0.0:1.0);
 		return false;
 	case AID_CARGOARMINDICATOR:
-		oapiBlt (surf, srf[4], 0, 0, 0,  cargo_arm_status == 1? 16:0, 34, 8); 
+		oapiBlt (surf, srf[4], 0, 0, 0,  cargo_arm_status == 1? 16:0, 34, 8);
 		 return true;
-		
+
 
 	}
 return false;
@@ -2432,18 +2443,15 @@ void ShuttleA::PaintMarkings (SURFHANDLE tex)
 // --------------------------------------------------------------
 // Module initialisation
 // --------------------------------------------------------------
-DLLCLBK void InitModule (HINSTANCE hModule)
+static void InitDrawingResources ()
 {
-	g_Param.hDLL = hModule;
-	oapiRegisterCustomControls (hModule);
-
 	// allocate Sketchpad resources
 	g_Param.pFont[0] = oapiCreateFont(-10, false, (char*)"Arial");
-	g_Param.pPen[0] = oapiCreatePen(1, 3, RGB(120, 220, 120));
-	g_Param.pPen[1] = oapiCreatePen(1, 1, RGB(220, 220, 120));
-	g_Param.pPen[2] = oapiCreatePen(1, 1, RGB(0, 0, 0));
-	g_Param.pBrush[0] = oapiCreateBrush(RGB(0, 96, 0));
-	g_Param.pBrush[1] = oapiCreateBrush(RGB(0, 0, 0));
+	g_Param.pPen[0] = oapiCreatePen(1, 3, 0x0078dc78);
+	g_Param.pPen[1] = oapiCreatePen(1, 1, 0x0078dcdc);
+	g_Param.pPen[2] = oapiCreatePen(1, 1, 0x00000000);
+	g_Param.pBrush[0] = oapiCreateBrush(0x00006000);
+	g_Param.pBrush[1] = oapiCreateBrush(0x00000000);
 
 	// load 2D panel texture
 	ShuttleA::panel2dtex = oapiLoadTexture ("ShuttleA\\panel2d.dds");
@@ -2454,7 +2462,7 @@ DLLCLBK void InitModule (HINSTANCE hModule)
 // --------------------------------------------------------------
 // Module cleanup
 // --------------------------------------------------------------
-DLLCLBK void ExitModule (HINSTANCE hModule)
+static void ReleaseDrawingResources ()
 {
 	int i;
 	// deallocate Sketchpad resources
@@ -2466,8 +2474,29 @@ DLLCLBK void ExitModule (HINSTANCE hModule)
 	oapiDestroySurface (ShuttleA::panel2dtex);
 	oapiDestroySurface (ShuttleA::paneleltex);
 	oapiDestroySurface (ShuttleA::aditex);
+
+#ifndef _WIN32
+	for (auto &font : g_Param.pFont) font = nullptr;
+	for (auto &pen : g_Param.pPen) pen = nullptr;
+	for (auto &brush : g_Param.pBrush) brush = nullptr;
+	ShuttleA::panel2dtex = ShuttleA::paneleltex = ShuttleA::aditex = nullptr;
+#endif
+}
+
+#ifdef _WIN32
+DLLCLBK void InitModule (HINSTANCE hModule)
+{
+	g_Param.hDLL = hModule;
+	oapiRegisterCustomControls (hModule);
+	InitDrawingResources();
+}
+
+DLLCLBK void ExitModule (HINSTANCE hModule)
+{
+	ReleaseDrawingResources();
 	oapiUnregisterCustomControls (g_Param.hDLL);
 }
+#endif
 
 // --------------------------------------------------------------
 // Vessel initialisation
@@ -2489,6 +2518,7 @@ DLLCLBK void ovcExit (VESSEL *vessel)
 // Scenario editor interface
 // ==============================================================
 
+#ifdef _WIN32
 ShuttleA *GetV (HWND hDlg)
 {
 	// retrieve DG interface from scenario editor
@@ -2523,7 +2553,7 @@ void InitEdPg1 (HWND hDlg, OBJHANDLE hVessel)
 // --------------------------------------------------------------
 // Message procedure for editor page 1 (animation settings)
 // --------------------------------------------------------------
-INT_PTR CALLBACK EdPg1Proc (HWND hTab, UINT uMsg, WPARAM wParam, LPARAM lParam)
+INT_PTR CALLBACK EdPg1Proc (HWND hTab, oapi::UInt uMsg, WPARAM wParam, LPARAM lParam)
 {
 	switch (uMsg) {
 	case WM_INITDIALOG:
@@ -2610,3 +2640,7 @@ DLLCLBK void secInit (HWND hEditor, OBJHANDLE hVessel)
 	EditorPageSpec eps1 = {"Animations", g_Param.hDLL, IDD_EDITOR_PG1, EdPg1Proc};
 	SendMessage (hEditor, WM_SCNEDITOR, SE_ADDPAGEBUTTON, (LPARAM)&eps1);
 }
+
+#else
+#include "NativeShuttleAFactory.inc"
+#endif

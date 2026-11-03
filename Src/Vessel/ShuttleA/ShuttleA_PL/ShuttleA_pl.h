@@ -12,7 +12,7 @@
 #ifndef __SHUTTLEA_PL_H
 #define __SHUTTLEA_PL_H
 
-#include "orbitersdk.h"
+#include "../ShuttleAPlatform.h"
 
 // ==========================================================
 // Some vessel class caps

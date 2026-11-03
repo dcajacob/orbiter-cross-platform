@@ -87,6 +87,38 @@ target_link_options(native_deltaglider PRIVATE -Wl,--no-undefined)
 set_target_properties(native_deltaglider PROPERTIES PREFIX "" OUTPUT_NAME DeltaGlider
     LIBRARY_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/NativeModules/Vessel")
 
+# Compile the original Shuttle-A vessel, instruments, Lua bindings and payload.
+# Both factories use the same checked native SDK ABI as the stock DG module.
+set(_shuttle_a_source "${CMAKE_CURRENT_LIST_DIR}/../../Vessel/ShuttleA")
+set(_shuttle_a_header_dir "${PROJECT_BINARY_DIR}/native-shuttle-a-include")
+file(MAKE_DIRECTORY "${_shuttle_a_header_dir}")
+add_custom_command(OUTPUT "${_shuttle_a_header_dir}/meshres.h"
+    COMMAND meshc /I "${_shuttle_a_source}/Meshes/ShuttleA.msh" /P - /O "${_shuttle_a_header_dir}/meshres.h"
+    DEPENDS meshc "${_shuttle_a_source}/Meshes/ShuttleA.msh" VERBATIM)
+add_library(native_shuttle_a MODULE
+    "${_shuttle_a_header_dir}/meshres.h"
+    "${_shuttle_a_source}/adiball.cpp" "${_shuttle_a_source}/adictrl.cpp"
+    "${_shuttle_a_source}/airlockswitch.cpp" "${_shuttle_a_source}/attref.cpp"
+    "${_shuttle_a_source}/auxpodctrl.cpp" "${_shuttle_a_source}/dockcvrswitch.cpp"
+    "${_shuttle_a_source}/gearswitch.cpp" "${_shuttle_a_source}/hudbutton.cpp"
+    "${_shuttle_a_source}/InstrVs.cpp" "${_shuttle_a_source}/mfdbutton.cpp"
+    "${_shuttle_a_source}/navbutton.cpp" "${_shuttle_a_source}/needlepair.cpp"
+    "${_shuttle_a_source}/paneltext.cpp" "${_shuttle_a_source}/payloadctrl.cpp"
+    "${_shuttle_a_source}/rcsswitch.cpp" "${_shuttle_a_source}/ShuttleA.cpp"
+    "${_shuttle_a_source}/ShuttleALua.cpp" "${_shuttle_a_source}/sliderpair.cpp"
+    "${_shuttle_a_source}/switches.cpp" "${_shuttle_a_source}/../Common/Instrument.cpp")
+target_include_directories(native_shuttle_a PRIVATE "${_shuttle_a_header_dir}")
+target_link_libraries(native_shuttle_a PRIVATE lua orbiter_production_vessels)
+target_link_options(native_shuttle_a PRIVATE -Wl,--no-undefined)
+set_target_properties(native_shuttle_a PROPERTIES PREFIX "" OUTPUT_NAME ShuttleA
+    LIBRARY_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/NativeModules/Vessel")
+
+add_library(native_shuttle_a_payload MODULE "${_shuttle_a_source}/ShuttleA_PL/ShuttleA_pl.cpp")
+target_link_libraries(native_shuttle_a_payload PRIVATE orbiter_production_vessels)
+target_link_options(native_shuttle_a_payload PRIVATE -Wl,--no-undefined)
+set_target_properties(native_shuttle_a_payload PROPERTIES PREFIX "" OUTPUT_NAME ShuttleA_PL
+    LIBRARY_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/NativeModules/Vessel")
+
 add_library(native_lua_inline_list OBJECT ../../Module/LuaScript/LuaInline/LuaInline.cpp)
 target_include_directories(native_lua_inline_list PRIVATE "${CMAKE_CURRENT_LIST_DIR}/../../Module/LuaScript/LuaInterpreter")
 target_link_libraries(native_lua_inline_list PRIVATE lua orbiter_production_vessels)

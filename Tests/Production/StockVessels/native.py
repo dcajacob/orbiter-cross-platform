@@ -6,6 +6,7 @@ import os
 from pathlib import Path
 import subprocess
 
+from original import select_suite,settings_path
 from original import HERE,ROOT,digest,inspect_trace,require,rows,settings,source_digest,png
 
 
@@ -48,23 +49,24 @@ def inspect(out,case,config):
 
 def main():
     p=argparse.ArgumentParser(description=__doc__)
+    p.add_argument('--suite',choices=('stations','shuttle-a'),default='stations')
     for name in ('executable','assets','data','modules','planets','output'):p.add_argument('--'+name,type=Path,required=True)
     p.add_argument('--configuration',choices=('Debug','Release'),required=True)
     p.add_argument('--math-profile',choices=('automatic','sse2'),required=True)
-    a=p.parse_args()
+    a=p.parse_args();select_suite(a.suite)
     for name in ('executable','assets','data','modules','planets','output'):setattr(a,name,getattr(a,name).resolve())
     config=settings();require(not a.output.exists(),'Native station output exists; replacement is forbidden')
     a.output.mkdir(parents=True)
     binaries=dict(executable=digest(a.executable),engine=digest(a.executable.parent/'liborbiter_production_vessels.so'),
                   renderer=digest(a.modules/'Graphics/OGLClient.so'))
     probe=build_probe(a.executable.parent,a.output)
-    sources=[Path(__file__),HERE/'NativeProbe.cpp',HERE/'Observation.h',HERE/'cases.json',HERE/'original.py',
+    sources=[Path(__file__),HERE/'NativeProbe.cpp',HERE/'Observation.h',settings_path(),HERE/'original.py',
              HERE.parent/'StockScenarios/inventory.py',HERE.parent/'NativeScene/Orbiter.cfg',
              ROOT/'Src/Orbiter/Production/NativeApplication.cpp']
     runtime_files=[a.executable,*a.executable.parent.rglob('*.so')]
     report=dict(status='running',phase6_complete=False,host='native-linux',configuration=a.configuration,
         math_profile=a.math_profile,original_application_source=config['application_source'],
-        binary_sha256=binaries,producer_sha256=digest(probe),settings_sha256_lf=source_digest(HERE/'cases.json'),
+        binary_sha256=binaries,producer_sha256=digest(probe),settings_sha256_lf=source_digest(settings_path()),
         runtime_files_sha256={str(path.relative_to(ROOT)):digest(path) for path in runtime_files},
         source_sha256={str(path.relative_to(ROOT)):digest(path) for path in sources},cases={},failures={})
     manifest=a.output/'stock-vessels.json'
@@ -107,7 +109,7 @@ def main():
             'Native station binaries or sources changed while captures were live')
     require(all(digest(ROOT/name)==checksum for name,checksum in report['runtime_files_sha256'].items()),
             'Native station module/library changed during capture')
-    report['status']='passed' if not report['failures'] and len(report['cases'])==7 else 'failed';save()
+    report['status']='passed' if not report['failures'] and len(report['cases'])==len(config['cases']) else 'failed';save()
     require(report['status']=='passed','Native station capture failed; qualification is incomplete')
 
 

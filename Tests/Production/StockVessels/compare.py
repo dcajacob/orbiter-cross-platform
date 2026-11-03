@@ -6,6 +6,7 @@ import math
 from pathlib import Path
 import sys
 
+from original import select_suite,settings_path
 from original import HERE,ROOT,digest,image_ssim,require,rows,settings,source_digest
 # The original capture helper also imports cockpit tooling. Select this
 # fixture's native observer rather than the separate Cockpit/native.py.
@@ -35,10 +36,11 @@ def geometry(path):
 
 def main():
     p=argparse.ArgumentParser(description=__doc__)
+    p.add_argument('--suite',choices=('stations','shuttle-a'),default='stations')
     for name in ('original','native','reference-audit','output'):p.add_argument('--'+name,type=Path,required=True)
     p.add_argument('--runtime-root',type=Path,default=ROOT,
                    help='Root containing the recorded out/... binaries; useful for verified CI archives')
-    a=p.parse_args();require(not a.output.exists(),'Stock comparison output exists')
+    a=p.parse_args();select_suite(a.suite);require(not a.output.exists(),'Stock comparison output exists')
     config=settings();original=json.loads((a.original/'stock-vessels.json').read_text())
     native=json.loads((a.native/'stock-vessels.json').read_text())
     audit=json.loads(a.reference_audit.read_text());names={c['id'] for c in config['cases']}
@@ -49,7 +51,7 @@ def main():
             'Original/native station build or numerical profiles differ')
     profile=original['configuration']+'-'+original['math_profile']
     require(audit['profiles'][profile]['capture_sha256']==digest(a.original/'stock-vessels.json') and
-            original['settings_sha256_lf']==native['settings_sha256_lf']==source_digest(HERE/'cases.json') and
+            original['settings_sha256_lf']==native['settings_sha256_lf']==source_digest(settings_path()) and
             original['source_sha256_lf']['Observation.h']==source_digest(HERE/'Observation.h'),
             'Audited original station source/protocol differs')
     for name,checksum in native['source_sha256'].items():
@@ -92,7 +94,8 @@ def main():
                     projected_landmarks=list(points[0]),
                     visible_landmarks=[name for name,point in points[0].items() if 0<=point[0]<1280 and 0<=point[1]<720]))
             result['cases'][case['id']]=dict(scenario=case['scenario'],repetitions=compared)
-        result.update(status='passed',compared_processes=14,compared_scene_presents=840,
+        processes=len(config['cases'])*2
+        result.update(status='passed',compared_processes=processes,compared_scene_presents=processes*config['frames'],
                       every_declared_vessel_and_docking_port=True,full_frame_without_masks=True,
                       frozen_references_and_budgets_unchanged=True)
     except BaseException as error:

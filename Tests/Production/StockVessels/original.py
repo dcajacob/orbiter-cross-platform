@@ -25,14 +25,28 @@ def source_digest(path):
     return hashlib.sha256(path.read_bytes().replace(b'\r\n',b'\n')).hexdigest()
 
 
+_suite='stations'
+
+
+def select_suite(name):
+    global _suite
+    require(name in ('stations','shuttle-a'),'Unknown stock observation suite')
+    _suite=name
+
+
+def settings_path():
+    return HERE/'cases.json' if _suite=='stations' else HERE.parent/'ShuttleA/cases.json'
+
+
 def settings():
-    value=json.loads((HERE/'cases.json').read_text())
+    value=json.loads(settings_path().read_text())
     existing=json.loads((HERE.parent/'Cockpit/cases.json').read_text())
     for key in ('application_source','frames','fixed_step','epoch','image_ssim_minimum','budgets'):
         require(value[key]==existing[key],'Original station source/clock/budget differs: '+key)
-    require(len(value['cases'])==7 and len({c['id'] for c in value['cases']})==7,
+    count=7 if _suite=='stations' else 10
+    require(len(value['cases'])==count and len({c['id'] for c in value['cases']})==count,
             'Incomplete original station matrix')
-    paths=dict(value['station_files_sha256_lf'])
+    paths={**value['station_files_sha256_lf'],**value.get('source_resources_sha256_lf',{})}
     paths.update({'Scenarios/'+c['scenario']:c['sha256_lf'] for c in value['cases']})
     for path,checksum in paths.items():
         original=subprocess.check_output(['git','-C',str(ROOT),'show',value['application_source']+':'+path])
@@ -75,8 +89,9 @@ def inspect_trace(out,case,config):
                 'Nonfinite original docking port')
     require(dock_keys=={(int(r['tick']),r['object'],i) for r in state for i in range(int(r['docks']))},
             'Incomplete original docking-port observations')
-    stations=[r for r in state if r['class'].lower() in ('mir','wheel')]
-    require(stations and all(r['version']=='0' and r['enable_focus']=='0' and r['meshes']=='1' and
+    stations=[r for r in state if r['class'].lower() in config.get('observed_classes',('mir','wheel'))]
+    require(stations,'Required original stock classes were not observed')
+    require(config.get('suite')=='shuttle-a' or all(r['version']=='0' and r['enable_focus']=='0' and r['meshes']=='1' and
             r['thrusters']=='0' and r['propellants']=='0' and r['docks']==('3' if r['class'].lower()=='mir' else '2')
             for r in stations),'Original configuration-defined station capabilities differ')
     return state,stations,groups
@@ -167,7 +182,7 @@ def capture(a):
     a.output.mkdir(parents=True)
     report=dict(status='running',phase6_complete=False,host='original-windows',configuration=a.configuration,
         math_profile=a.math_profile,application_source=config['application_source'],runtime=runtime,
-        binary_sha256=binary_hashes,settings_sha256_lf=source_digest(HERE/'cases.json'),
+        binary_sha256=binary_hashes,settings_sha256_lf=source_digest(settings_path()),
         source_sha256_lf={p.name:source_digest(p) for p in HERE.iterdir() if p.is_file()},cases={},failures={})
     manifest=a.output/'stock-vessels.json'
     def save():manifest.write_text(json.dumps(report,indent=2)+'\n')
@@ -208,19 +223,20 @@ def capture(a):
         save()
     require(binary_hashes==dict(application=digest(a.executable),observer=digest(producer)),
             'Original station application/observer changed during capture')
-    report['status']='passed' if not report['failures'] and len(report['cases'])==7 else 'failed';save()
+    report['status']='passed' if not report['failures'] and len(report['cases'])==len(config['cases']) else 'failed';save()
     require(report['status']=='passed','Original station observation failed; native qualification remains forbidden')
 
 
 if __name__=='__main__':
     p=argparse.ArgumentParser(description=__doc__)
     p.add_argument('--verify-inputs',action='store_true')
+    p.add_argument('--suite',choices=('stations','shuttle-a'),default='stations')
     for name in ('executable','data','planets','mesa','output'):p.add_argument('--'+name,type=Path)
     p.add_argument('--configuration',choices=('Debug','Release'))
     p.add_argument('--math-profile',choices=('automatic','sse2'))
-    a=p.parse_args()
+    a=p.parse_args();select_suite(a.suite)
     if a.verify_inputs:
-        value=settings();print('Verified seven scenarios and four station resources against '+value['application_source'])
+        value=settings();print('Verified',len(value['cases']),'complete scenarios and locked resources against',value['application_source'])
     else:
         require(all(getattr(a,name) is not None for name in
                     ('executable','data','planets','mesa','output','configuration','math_profile')),'Missing original capture arguments')

@@ -1,0 +1,125 @@
+{
+  "schema": 1,
+  "scope": "Additional original Windows observations for all six unchanged Shuttle-A scenarios and four complete DG scenes containing Shuttle-A; native capability qualification remains pending.",
+  "application_source": "f725194209634f7fd5d1d44d426cfa9b5e303e37",
+  "frames": 60,
+  "fixed_step": 0.25,
+  "epoch": 51982.5,
+  "image_ssim_minimum": 0.98,
+  "budgets": {
+    "position_m": 0.01,
+    "velocity_m_s": 1e-05,
+    "rotation_rad": 1e-08,
+    "angular_velocity_rad_s": 1e-10,
+    "mjd_days": 1e-10,
+    "propellant_relative": 1e-08,
+    "propellant_absolute_kg": 1e-08
+  },
+  "station_files_sha256_lf": {
+    "Config/Vessels/Mir.cfg": "91efb778a451c45f8b3830b45720711cd1d9504877bacadd3dc1b6796db77f0e",
+    "Config/Vessels/Wheel.cfg": "0b0d93aeaa28724444cd1f7110a864fecf4d3276cc5b627bfabd0b835be84e3a",
+    "Meshes/Mir.msh": "63deca3871829f6cd0c329579b9eb2af975b6fa89faa4cb98d61f631a98b1e8e",
+    "Meshes/Wheel.msh": "f1af0488dad03b9444e3e1a6a04d015b51c0a230a0b60d7933624e53a36f310c"
+  },
+  "cases": [
+    {
+      "id": "shuttle_a_1",
+      "scenario": "Shuttle-A/ISS Approach.scn",
+      "sha256_lf": "f50e52d1b7d5490b375fca22359404c8d1e2922ac0f7c69a7afad8f464b464e3"
+    },
+    {
+      "id": "shuttle_a_2",
+      "scenario": "Shuttle-A/Olympus spaceport on Mars.scn",
+      "sha256_lf": "fbc1b5b9e1ed33882b68549a12d2d67d642edc38f07034b0331f6b178b2211b6"
+    },
+    {
+      "id": "shuttle_a_3",
+      "scenario": "Shuttle-A/Shuttle-A Docked at ISS.scn",
+      "sha256_lf": "2ac9355654172c7267b4afcc54555958dff4d5404d9a355485c52939234202a1"
+    },
+    {
+      "id": "shuttle_a_4",
+      "scenario": "Shuttle-A/Shuttle-A Drop.scn",
+      "sha256_lf": "c941cc719fc69dc3f6859de06096d03f288471402ff9c249a43678bd893a5516"
+    },
+    {
+      "id": "shuttle_a_5",
+      "scenario": "Shuttle-A/Shuttle-A Launch.scn",
+      "sha256_lf": "8b851d8a11517561519ab7520d57b77a4bde0e3fe85d3cbb01792c88ce7ccd8b"
+    },
+    {
+      "id": "shuttle_a_6",
+      "scenario": "Shuttle-A/Shuttle-A Moon.scn",
+      "sha256_lf": "262153a236b82801771d20843b92e4393e052ac8e2f8189cf7bacbeca40be17e"
+    },
+    {
+      "id": "shuttle_a_7",
+      "scenario": "Delta-glider/DG Mk4 in orbit.scn",
+      "sha256_lf": "fc76ff6089ef242c2f92c680192748e95175483f8eb33832e50b83cf0dda6155"
+    },
+    {
+      "id": "shuttle_a_8",
+      "scenario": "Delta-glider/Virtual cockpit.scn",
+      "sha256_lf": "ec7f27ce984da5d496e31897e9775587acfdfd90e36f5a0a9755f508051b3468"
+    },
+    {
+      "id": "shuttle_a_9",
+      "scenario": "Delta-glider/DG-S ready for takeoff.scn",
+      "sha256_lf": "f66b4eac65bff2942b04d0386e6a68723a509fa1e79ff607df358ffcde69c14e"
+    },
+    {
+      "id": "shuttle_a_10",
+      "scenario": "Delta-glider/Docked at ISS.scn",
+      "sha256_lf": "f62ea64c6dc1f84f1d45671e730ba8623b58727274442ebdb7fff42dd318d3ac"
+    }
+  ],
+  "suite": "shuttle-a",
+  "observed_classes": [
+    "shuttlea",
+    "shuttlea_pl"
+  ],
+  "source_resources_sha256_lf": {
+    "Src/Vessel/ShuttleA/Bitmaps/FuelMgmt.bmp": "3364115180dec7d7caf23d5a80447bede19a0b0a3553048376ba2b426cfbca94",
+    "Src/Vessel/ShuttleA/Bitmaps/button1.bmp": "b5f6e1b9621bc4bcc6b3da00217c1384213137c5e9393910b9b1b04f7c745bd8",
+    "Src/Vessel/ShuttleA/Bitmaps/button2.bmp": "e668962583ab4bf26aab2594300cd712691cce6f70fd9d8670aa45afe4de99fd",
+    "Src/Vessel/ShuttleA/Bitmaps/button3.bmp": "caee280a69c52968233feaf4527872b2cfc2fb3cae0fa49fb32e496c74bcbfe0",
+    "Src/Vessel/ShuttleA/Bitmaps/indicator1.bmp": "064e973f2713cff6519511518305b0b5d8cf42d3a479b3e40a657b9b7c3adc4d",
+    "Src/Vessel/ShuttleA/Bitmaps/indicator2.bmp": "30d273c2a2d1c38cc10d8ad6cee56c4b66e7544bfbe4979f9034b40ecf571d09",
+    "Src/Vessel/ShuttleA/Bitmaps/panel1.bmp": "128ce7fa6fbad5569d4186d7345d5454c3075b302c1b6ca6b46d9c3917fa7c9c",
+    "Src/Vessel/ShuttleA/Bitmaps/panel2.bmp": "d36f068c28d517c459f8071abcd7f4fe9683be70328f525075c2a38c12d1aff6",
+    "Src/Vessel/ShuttleA/Bitmaps/slider1.bmp": "c56732bd30e89247eb1d0bb717148b27c6ee4ceadef7c625d861ebe8047cfeb9",
+    "Src/Vessel/ShuttleA/Bitmaps/switch1.bmp": "199e32a109a8cd690df07f849c1ed8d6e5a9dde8f1504c32eac38dd196774d61",
+    "Src/Vessel/ShuttleA/Bitmaps/switch2.bmp": "60abe237da0eb1c83ca7b943b10ae68579e8c9bde38e8d27aed8ebf638823eb6",
+    "Src/Vessel/ShuttleA/Bitmaps/switch3.bmp": "49aff473eb8e72c2bcfab3bf54b5fc0c48b61f6403a5e12785ac53a78a077773",
+    "Src/Vessel/ShuttleA/Bitmaps/switch4.bmp": "234e43361a9195cbd7d55c9d559638ccfbd1f23bdc18955a07f6961350d854c0",
+    "Src/Vessel/ShuttleA/Config/ShuttleA.cfg": "ae5718da9614575c07163580ad7b197f27752ecf85bd466b57b7e6c4f4aa29eb",
+    "Src/Vessel/ShuttleA/Meshes/ShuttleA.msh": "54045568f95281b84218bcc1f6dc7fcd54f5d7c1b4346016fadadfd17d77c38c",
+    "Src/Vessel/ShuttleA/Meshes/ShuttleA_2dpanel1.msh": "63741b4262829d7a1ba7e0b8423b6f18c47f9c09922470abd2a1f81844128658",
+    "Src/Vessel/ShuttleA/Meshes/ShuttleA_vc.msh": "0ad433cd77c715007ab26e264dc3beef2b2445ec5c585049ee7748ffe95daa9f",
+    "Src/Vessel/ShuttleA/Script/adi.lua": "ce4d01ad72b910f77a305aa87aaff11e911d48332df6cd7582edec8ba7047765",
+    "Src/Vessel/ShuttleA/ShuttleA_PL/Config/ShuttleA_pl.cfg": "1508211ee4080aacb3220e907b539f394e1d68dfc7e61b97e63c9129cf330328",
+    "Src/Vessel/ShuttleA/ShuttleA_PL/Meshes/ShuttleA_chmain.msh": "f0acceb4790f18c0f7a20f2812fcc43cfa00dae19fb25eb1ff37ae827e709b50",
+    "Src/Vessel/ShuttleA/ShuttleA_PL/Meshes/ShuttleA_chpr.msh": "34e7ab6b06b4de80c3c2ad006455ca059e990e5b5dae4635ae8c5be738e0eed7",
+    "Src/Vessel/ShuttleA/ShuttleA_PL/Meshes/ShuttleA_pl.msh": "2022e7c4af12b5e5907afbd5d7a5279ffe00aa2420121ef66d00792c722ed20b",
+    "Src/Vessel/ShuttleA/ShuttleA_PL/Textures/Sh_para.dds": "31d958320a3af28bdbbac1e9861730446baa93e4f8b58c804c196636e6a4e226",
+    "Src/Vessel/ShuttleA/ShuttleA_PL/Textures/sha1cp1.dds": "86175a49a2eff22d313fb683558087b268f6a145d579858fd2c420d4630d34c7",
+    "Src/Vessel/ShuttleA/Textures/CargoCnt.dds": "6e49346d4a451453d5ad3ee645ebeba7e1633ab33435e52c404bfabc608a1a21",
+    "Src/Vessel/ShuttleA/Textures/FuelMgmt.dds": "4a099b629f6541ac76d463635e7edbb0ed3bf806d700c63c36bf7600d7b6c610",
+    "Src/Vessel/ShuttleA/Textures/Indicator.dds": "ebe8bbb68ba027b15ac377cbbab6da82595565a8d11173a9d79a6f8b1c9360f9",
+    "Src/Vessel/ShuttleA/Textures/MFD_buttons.dds": "2416ac86a3828e69d0f6de4f41c821efc4a162111d48ee59a8ccb74d610e9489",
+    "Src/Vessel/ShuttleA/Textures/NavMode.dds": "f56959aaf6e808250f6b4495fbae4de34e2da62671e26c3817f5f4b84759701f",
+    "Src/Vessel/ShuttleA/Textures/PodAngle.dds": "64bdcaa2fc87f553ecfba290f8ac19e6fcb1b296a60a41292d53a19d351c07ba",
+    "Src/Vessel/ShuttleA/Textures/Thrust.dds": "4eefab57cf80ce696f2aedb99594fee768fbec667244b0d1094785a0137a3259",
+    "Src/Vessel/ShuttleA/Textures/panel1.dds": "68644d32a31c934d627b5af0d4b55c057ea76bb918f4475cfc99b409dc1f56ed",
+    "Src/Vessel/ShuttleA/Textures/panel2.dds": "27470254bdcd4f904c80f2ecb31600629afabbef2e4a5488f26027ba43f58d94",
+    "Src/Vessel/ShuttleA/Textures/panel2d.dds": "9da7bb1ba8a671a5eaa3e8a1d87e25b0569fa00d1d663c443e69639219e0c48a",
+    "Src/Vessel/ShuttleA/Textures/panel_el.dds": "92dc2721dfd39480b87af33a6abd800972a8ac6f78b4302627dfde0c97bd3df4",
+    "Src/Vessel/ShuttleA/Textures/sha1ft1.dds": "93c0c6bd03137ada3aff06807af6fac005bb678befee4a6cb8de997d5cabe4d6",
+    "Src/Vessel/ShuttleA/Textures/sha1tx1.dds": "8a2b3e8b2ecfc1baeaf8c1f6de783d76d5b0722e0386e6639f3064e2308ccf96",
+    "Src/Vessel/ShuttleA/Textures/sha1tx2.dds": "48c29e52a797632f662ed5bedebd2573c19a5d9b3e22a66bcbaa772ca0b0e926",
+    "Src/Vessel/ShuttleA/Textures/sha1tx3.dds": "c5e94dd792c4831c6f06d3144689ab58062322a765944ca1cf84de484d090a86",
+    "Src/Vessel/ShuttleA/Textures/sha1tx4.dds": "8852ea1ee1315d4edfa64cbf570731df88bcfec50c6553e23c56233a8d3409c6",
+    "Src/Vessel/ShuttleA/Textures/sha1tx5.dds": "deddd036e7d9ba5729d8860b08a693291662a0693bf4d2d77787573c19bf2cbd",
+    "Src/Vessel/ShuttleA/Thumbnail/Shuttle-A.bmp": "9c9897bd3e92c1ea6918970f13ffa400357f1074336c42cc6d36feb0804c810d"
+  }
+}

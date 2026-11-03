@@ -12,7 +12,7 @@
 #ifndef __SHUTTLEA_H
 #define __SHUTTLEA_H
 
-#include "orbitersdk.h"
+#include "ShuttleAPlatform.h"
 
 // ==========================================================
 // Some vessel class caps
@@ -75,27 +75,27 @@ const double MAX_GRAPPLING_DIST = 0.6f;
 const double MAX_GRAPPLING_ANG  = 0.9f; //(cos(angle)>0.9f)
 
 
-const DWORD PANEL2D_TEXW  = 2048;
-const DWORD PANEL2D_TEXH  = 1024;
-const DWORD PANELEL_TEXW  =  512;
-const DWORD PANELEL_TEXH  =  512;
-const DWORD PANEL2D_MAINW = 1280;
-const DWORD PANEL2D_MAINH  = 382;
-const DWORD PANEL2D_OVRHW = 1280;
-const DWORD PANEL2D_OVRHH =  299;
+const oapi::UInt32 PANEL2D_TEXW  = 2048;
+const oapi::UInt32 PANEL2D_TEXH  = 1024;
+const oapi::UInt32 PANELEL_TEXW  =  512;
+const oapi::UInt32 PANELEL_TEXH  =  512;
+const oapi::UInt32 PANEL2D_MAINW = 1280;
+const oapi::UInt32 PANEL2D_MAINH  = 382;
+const oapi::UInt32 PANEL2D_OVRHW = 1280;
+const oapi::UInt32 PANEL2D_OVRHH =  299;
 
-const DWORD LMFD_X     =  56;  // left MFD reference x-pos
-const DWORD RMFD_X     = 966;  // right MFD reference x-pos
-const DWORD NAVBTN_X   = 105;  // navigation button reference x-pos
-const DWORD HUDBTN_X   = 912;  // HUD button reference x-pos
-const DWORD THROTTLE_X = 521;  // Throttle block reference x-pos
-const DWORD THROTTLE_Y = 244;  // Throttle block reference y-pos
-const DWORD ADIBALL_X  = 733;  // ADI ball reference x-pos
-const DWORD ADIBALL_Y  =  29;  // ADI ball reference y-pos
-const DWORD ADICTRL_X  = 733;  // ADI control panel reference x-pos
-const DWORD ADICTRL_Y  = 200;  // ADI control panel reference y-pos
-const DWORD PODCTRL_X  = 379;  // Aux thruster pod panel reference x-pos
-const DWORD PODCTRL_Y  = 255;  // Aux thruster pod panel reference y-pos
+const oapi::UInt32 LMFD_X     =  56;  // left MFD reference x-pos
+const oapi::UInt32 RMFD_X     = 966;  // right MFD reference x-pos
+const oapi::UInt32 NAVBTN_X   = 105;  // navigation button reference x-pos
+const oapi::UInt32 HUDBTN_X   = 912;  // HUD button reference x-pos
+const oapi::UInt32 THROTTLE_X = 521;  // Throttle block reference x-pos
+const oapi::UInt32 THROTTLE_Y = 244;  // Throttle block reference y-pos
+const oapi::UInt32 ADIBALL_X  = 733;  // ADI ball reference x-pos
+const oapi::UInt32 ADIBALL_Y  =  29;  // ADI ball reference y-pos
+const oapi::UInt32 ADICTRL_X  = 733;  // ADI control panel reference x-pos
+const oapi::UInt32 ADICTRL_Y  = 200;  // ADI control panel reference y-pos
+const oapi::UInt32 PODCTRL_X  = 379;  // Aux thruster pod panel reference x-pos
+const oapi::UInt32 PODCTRL_Y  = 255;  // Aux thruster pod panel reference y-pos
 
 class PanelElement;
 class ADIBall;
@@ -115,10 +115,10 @@ public:
 	~ShuttleA ();
 	void ReleaseSurfaces ();
 	void InitPanel (int panel);
-	bool RotatePods (UINT which, UINT mode);
-	void SetPodAngle (UINT which, double angle);
-	void CommandPodAngle (UINT which, double angle);
-	inline double GetPodAngle (UINT which) { return pod_angle[which]; }
+	bool RotatePods (oapi::UInt which, oapi::UInt mode);
+	void SetPodAngle (oapi::UInt which, double angle);
+	void CommandPodAngle (oapi::UInt which, double angle);
+	inline double GetPodAngle (oapi::UInt which) { return pod_angle[which]; }
 
 	void RedrawPanel_MFDButton (SURFHANDLE surf, int mfd, int side);
 	void RedrawPanel_Navmode (SURFHANDLE surf);
@@ -132,7 +132,7 @@ public:
 	PROPELLANT_HANDLE ph_main, ph_rcs;
 	THRUSTER_HANDLE th_main[2], th_hover[2], th_pod[2];
 	MESHHANDLE vcmesh_tpl,exmesh_tpl;
-	UINT podswitch[2];
+	oapi::UInt podswitch[2];
 	double dock_proc, lock_proc[2], gear_proc;
 	enum DoorStatus { DOOR_CLOSED, DOOR_OPEN, DOOR_CLOSING, DOOR_OPENING }
 		dock_status, lock_status[2], gear_status;
@@ -177,10 +177,10 @@ public:
 	void clbkNavMode (int mode, bool active);
 	void clbkHUDMode (int mode);
 	void clbkRCSMode (int mode);
-	int  clbkConsumeBufferedKey (DWORD key, bool down, char *kstate);
+	int  clbkConsumeBufferedKey (oapi::UInt32 key, bool down, char *kstate);
 	int  clbkConsumeDirectKey (char *kstate);
 	int  clbkGeneric (int msgid, int prm, void *context);
-	bool clbkLoadPanel2D (int id, PANELHANDLE hPanel, DWORD viewW, DWORD viewH);
+	bool clbkLoadPanel2D (int id, PANELHANDLE hPanel, oapi::UInt32 viewW, oapi::UInt32 viewH);
 	bool clbkPanelMouseEvent (int id, int event, int mx, int my, void *context);
 	bool clbkPanelRedrawEvent (int id, int event, SURFHANDLE surf, void *context);
 	bool clbkDrawHUD (int mode, const HUDPAINTSPEC *hps, oapi::Sketchpad *skp);
@@ -193,7 +193,7 @@ public:
 private:
 	void DefineMainPanel (PANELHANDLE hPanel);
 	void DefineOverheadPanel (PANELHANDLE hPanel);
-	void ScalePanel (PANELHANDLE hPanel, DWORD viewW, DWORD viewH);
+	void ScalePanel (PANELHANDLE hPanel, oapi::UInt32 viewW, oapi::UInt32 viewH);
 	void DefineAnimations ();
 	double payload_mass;
 	void ComputePayloadMass();
@@ -214,31 +214,31 @@ private:
 	int npel;
 	int adi_layout; // (0=standard (yaw-major), 1=pitch-major
 
-	UINT anim_pod[2], anim_dock;
-	UINT anim_lock[2]; // 0=outer, 1=inner
-	UINT sliderpos_main[2], sliderpos_hovr[2];
-	UINT sliderpos_retro[2], sliderpos_auxhovr[2], sliderpos_pod[2];
-    UINT anim_gear;
+	oapi::UInt anim_pod[2], anim_dock;
+	oapi::UInt anim_lock[2]; // 0=outer, 1=inner
+	oapi::UInt sliderpos_main[2], sliderpos_hovr[2];
+	oapi::UInt sliderpos_retro[2], sliderpos_auxhovr[2], sliderpos_pod[2];
+    oapi::UInt anim_gear;
 
-	UINT sliderpos_main_v[2], sliderpos_hovr_v[2];
-	UINT sliderpos_retro_v[2], sliderpos_auxhovr_v[2], sliderpos_pod_v[2];
+	oapi::UInt sliderpos_main_v[2], sliderpos_hovr_v[2];
+	oapi::UInt sliderpos_retro_v[2], sliderpos_auxhovr_v[2], sliderpos_pod_v[2];
 
-	UINT anim_pod_thrust_left;      // VC pod thruster animation
-	UINT anim_pod_thrust_right;      // VC pod thruster animation
+	oapi::UInt anim_pod_thrust_left;      // VC pod thruster animation
+	oapi::UInt anim_pod_thrust_right;      // VC pod thruster animation
 
-	UINT anim_main_thrust_left;
-	UINT anim_main_thrust_right;
+	oapi::UInt anim_main_thrust_left;
+	oapi::UInt anim_main_thrust_right;
 
-	UINT anim_hover_thrust_left;
-	UINT anim_hover_thrust_right;
+	oapi::UInt anim_hover_thrust_left;
+	oapi::UInt anim_hover_thrust_right;
 
-    UINT anim_pod_angle;
-	UINT anim_rcs_mode;
+    oapi::UInt anim_pod_angle;
+	oapi::UInt anim_rcs_mode;
 
-	UINT anim_dock_switch;
-	UINT anim_airlock_switch;
-	UINT anim_gear_switch;
-	UINT anim_cargo_switch;
+	oapi::UInt anim_dock_switch;
+	oapi::UInt anim_airlock_switch;
+	oapi::UInt anim_gear_switch;
+	oapi::UInt anim_cargo_switch;
 
 	MESHHANDLE hPanelMesh0; // mesh for 2D main panel
 	MESHHANDLE hPanelMesh1; // mesh for 2D overhead panel
@@ -249,7 +249,10 @@ private:
 };
 
 typedef struct {
+
+#ifdef _WIN32
 	HINSTANCE hDLL;
+#endif
 	oapi::Font* pFont[1];
 	oapi::Pen* pPen[3];
 	oapi::Brush* pBrush[2];

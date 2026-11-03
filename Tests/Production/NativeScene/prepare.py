@@ -20,6 +20,7 @@ def main():
     parser=argparse.ArgumentParser(description=__doc__)
     for name in ('data','planets','destination'):parser.add_argument('--'+name,type=Path,required=True)
     parser.add_argument('--delta-glider',action='store_true',help='Include the stock DG and DG-S installation resources and scenarios')
+    parser.add_argument('--shuttle-a',action='store_true',help='Include the original Shuttle-A and payload installation resources')
     args=parser.parse_args();destination=args.destination.resolve();destination.mkdir(parents=True,exist_ok=True)
     inputs={}
     for lock,base in [('stock-data.lock.json',args.data),('standard-planets.lock.json',args.planets)]:
@@ -58,6 +59,14 @@ def main():
                             ('Textures','Textures/DG'),('Textures2','Textures2/DG'),
                             ('Script','Script/DG'),('Thumbnail','Images/Vessels/Default')):
             overlay(source/name,Path(target))
+    if args.shuttle_a:
+        source=ROOT/'Src/Vessel/ShuttleA'
+        for name,target in (('Config','Config/Vessels'),('Meshes','Meshes/ShuttleA'),
+                            ('Textures','Textures/ShuttleA'),('Script','Script/ShuttleA'),
+                            ('Thumbnail','Images/Vessels/Default'),('Bitmaps','Textures/ShuttleA/Bitmaps'),
+                            ('ShuttleA_PL/Config','Config/Vessels'),('ShuttleA_PL/Meshes','Meshes/ShuttleA'),
+                            ('ShuttleA_PL/Textures','Textures/ShuttleA')):
+            overlay(source/name,Path(target))
     for name in ('Textures','Textures2','Fonts'):
         overlay(args.data/name,Path(name))
     overlay(ROOT/'OVP/OGLClient/shaders',Path('Modules/OGLClient'))
@@ -72,6 +81,7 @@ def main():
         sources[relative]=dict(source=str(source.resolve()),sha256=digest(target))
     scope='original stock Sol/ISS/ShuttlePB external view'
     if args.delta_glider:scope+=' with DG/DG-S vessel resources and stock scenarios'
+    if args.shuttle_a:scope+=' with Shuttle-A and payload resources'
     (destination/'resources.json').write_text(json.dumps(dict(scope=scope,
         source_resources=sources,locked_data=inputs,excluded='Fonts/architext.regular.ttf'),indent=2)+'\n')
     print('Verified and staged',len(sources),'original source/data resources; planetary archives remain at',args.planets.resolve())

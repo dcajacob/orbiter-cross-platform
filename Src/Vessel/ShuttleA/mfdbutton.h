@@ -13,32 +13,32 @@
 #define __MFDBUTTON_H
 
 #include "ShuttleA.h"
-#include "..\Common\Instrument.h"
+#include "../Common/Instrument.h"
 
 // ==============================================================
 
 class MFDButtonCol: public PanelElement {
 public:
-	MFDButtonCol (VESSEL3 *v, DWORD _mfdid, DWORD _lr);
-	void AddMeshData2D (MESHHANDLE hMesh, DWORD grpidx);
+	MFDButtonCol (VESSEL3 *v, oapi::UInt32 _mfdid, oapi::UInt32 _lr);
+	void AddMeshData2D (MESHHANDLE hMesh, oapi::UInt32 grpidx);
 	bool Redraw2D (SURFHANDLE surf);
 	bool ProcessMouse2D (int event, int mx, int my);
 
 private:
-	DWORD mfdid;
-	DWORD lr;
-	DWORD xcnt;
+	oapi::UInt32 mfdid;
+	oapi::UInt32 lr;
+	oapi::UInt32 xcnt;
 };
 
 // ==============================================================
 
 class MFDButtonRow: public PanelElement {
 public:
-	MFDButtonRow (VESSEL3 *v, DWORD _mfdid);
+	MFDButtonRow (VESSEL3 *v, oapi::UInt32 _mfdid);
 	bool ProcessMouse2D (int event, int mx, int my);
 
 private:
-	DWORD mfdid;
+	oapi::UInt32 mfdid;
 };
 
 #endif // !__MFDBUTTON_H

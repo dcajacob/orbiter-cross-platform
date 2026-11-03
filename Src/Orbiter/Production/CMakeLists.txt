@@ -78,6 +78,17 @@ if(ORBITER_BUILD_NATIVE_VESSELS)
         FlightControls.cpp ../Keymap.cpp NativeApplication.cpp CockpitFovInput.inc NativeRenderApi.cpp NativeParticle.cpp NativeVesselObservation.cpp NativeObservation/ApplicationObservation.h ../CelSphereAPI.cpp ../DrawAPI.cpp ../Camera.cpp ../CameraControl.cpp NativeCameraProjection.cpp NativeVessels.cmake ../../Vessel/ShuttlePB/ShuttlePB.cpp ../../Vessel/ShuttlePB/NativeShuttlePBFactory.inc)
 endif()
 if(ORBITER_BUILD_NATIVE_COCKPIT)
+    file(GLOB _shuttle_a_sources CONFIGURE_DEPENDS
+        "${CMAKE_CURRENT_SOURCE_DIR}/../../Vessel/ShuttleA/*.cpp"
+        "${CMAKE_CURRENT_SOURCE_DIR}/../../Vessel/ShuttleA/*.h"
+        "${CMAKE_CURRENT_SOURCE_DIR}/../../Vessel/ShuttleA/*.inc"
+        "${CMAKE_CURRENT_SOURCE_DIR}/../../Vessel/ShuttleA/ShuttleA_PL/*.cpp"
+        "${CMAKE_CURRENT_SOURCE_DIR}/../../Vessel/ShuttleA/ShuttleA_PL/*.h"
+        "${CMAKE_CURRENT_SOURCE_DIR}/../../Vessel/ShuttleA/ShuttleA_PL/*.inc")
+    list(APPEND _native_sources ${_shuttle_a_sources}
+        "${CMAKE_CURRENT_SOURCE_DIR}/../../Vessel/ShuttleA/Meshes/ShuttleA.msh"
+        "${CMAKE_CURRENT_SOURCE_DIR}/../../Vessel/Common/Instrument.cpp"
+        "${CMAKE_CURRENT_SOURCE_DIR}/../../Vessel/Common/Instrument.h")
     list(APPEND _native_sources
         ../../Module/LuaScript/Native/CMakeLists.txt ../../Module/LuaScript/Native/UpvalueGuards.cmake
         ../../../Tests/Production/NativeLua/upvalue-source.lock.json

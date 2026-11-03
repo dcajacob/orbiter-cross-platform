@@ -8,6 +8,7 @@ from pathlib import Path
 import re
 import subprocess
 
+from original import select_suite,settings_path
 from original import HERE,ROOT,digest,image_ssim,inspect_trace,require,rows,settings,source_digest
 from behavior_suite import quaternion,quaternion_angle
 
@@ -49,9 +50,10 @@ def compare_state(left,right,config):
 
 def main():
     p=argparse.ArgumentParser(description=__doc__)
+    p.add_argument('--suite',choices=('stations','shuttle-a'),default='stations')
     for name in ('artifacts','download-manifest','output'):p.add_argument('--'+name,type=Path,required=True)
     p.add_argument('--producer-commit',required=True)
-    a=p.parse_args();require(not a.output.exists(),'Original station audit output exists')
+    a=p.parse_args();select_suite(a.suite);require(not a.output.exists(),'Original station audit output exists')
     require(re.fullmatch('[0-9a-f]{40}',a.producer_commit),'Original station producer must be an immutable commit')
     config=settings();downloads=json.loads(a.download_manifest.read_text())
     require(downloads['status']=='passed' and downloads['source_commit']==a.producer_commit and
@@ -65,14 +67,14 @@ def main():
         for configuration in ('Debug','Release'):
             for math_profile in ('automatic','sse2'):
                 profile=configuration+'-'+math_profile
-                item=next(i for i in downloads['artifacts'] if i['name']=='original-stations-'+profile)
+                item=next(i for i in downloads['artifacts'] if i['name']==('original-stations-' if a.suite=='stations' else 'original-shuttle-a-')+profile)
                 require(digest(ROOT/item['path'])==item['sha256'],'Downloaded original station archive changed')
-                base=a.artifacts/profile;capture=base/'stations-original'
+                base=a.artifacts/profile;capture=base/('stations-original' if a.suite=='stations' else 'shuttle-a-original')
                 report=json.loads((capture/'stock-vessels.json').read_text())
                 require(report['status']=='passed' and not report['failures'] and set(report['cases'])==names and
                         report['configuration']==configuration and report['math_profile']==math_profile and
                         report['application_source']==config['application_source'] and
-                        report['settings_sha256_lf']==source_digest(HERE/'cases.json'),
+                        report['settings_sha256_lf']==source_digest(settings_path()),
                         'Original station capture is failed, incomplete or mismatched')
                 for name,checksum in report['source_sha256_lf'].items():
                     require(Path(name).name==name,'Invalid original observer source path')
@@ -125,7 +127,7 @@ def main():
                 require(control['status']=='passed' and control['missing_nonfocus_station_rejected'] and
                         control['missing_port_rejected'] and control['original_capture_unchanged'] and
                         control['source_sha256_lf']==report['source_sha256_lf']['Gate.Test.py'] and
-                        all(digest(capture/'stations_1-1'/name)==checksum for name,checksum in control['capture_sha256'].items()),
+                        all(digest(capture/(config['cases'][0]['id']+'-1')/name)==checksum for name,checksum in control['capture_sha256'].items()),
                         'Original station negative controls differ or fail')
                 result['profiles'][profile]=dict(capture_sha256=digest(capture/'stock-vessels.json'),
                     observer_sha256=report['binary_sha256']['observer'],cases=cases,
@@ -133,13 +135,14 @@ def main():
         for math_profile in ('automatic','sse2'):
             pairs={}
             for case in config['cases']:
-                paths=[a.artifacts/(c+'-'+math_profile)/'stations-original'/(case['id']+'-1') for c in ('Debug','Release')]
+                paths=[a.artifacts/(c+'-'+math_profile)/('stations-original' if a.suite=='stations' else 'shuttle-a-original')/(case['id']+'-1') for c in ('Debug','Release')]
                 errors=compare_state(*paths,config)
                 similarity=image_ssim((paths[0]/'scene.rgba').read_bytes(),(paths[1]/'scene.rgba').read_bytes(),1280,720)
                 require(similarity>=config['image_ssim_minimum'],'Original station Debug/Release image gate fails')
                 pairs[case['id']]=dict(maxima=errors,ssim=similarity)
             result['build_comparisons'][math_profile]=pairs
-        result.update(status='passed',processes=56,scene_presents=3360,finalized_all_vessel_samples=total_samples,
+        processes=len(config['cases'])*2*4
+        result.update(status='passed',processes=processes,scene_presents=processes*config['frames'],finalized_all_vessel_samples=total_samples,
                       frozen_references_unchanged=True,native_station_support_qualified=False)
     except BaseException as error:
         result['error']=str(error);raise
