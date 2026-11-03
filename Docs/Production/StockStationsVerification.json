@@ -1,0 +1,864 @@
+{
+  "schema": 1,
+  "date": "2026-11-03",
+  "status": "local-release-automatic-passed",
+  "phase6_complete": false,
+  "scope": "Seven complete unchanged Mir/Wheel scenarios; original Windows all four profiles, native local Release automatic only",
+  "source_worktree_base": "c3d5639c07349504b5d9948c45cd2a39788d45e5",
+  "original_application_source": "f725194209634f7fd5d1d44d426cfa9b5e303e37",
+  "original_producer_commit": "c3d5639c07349504b5d9948c45cd2a39788d45e5",
+  "original_run_id": 41658484386,
+  "source_sha256": {
+    "Src/Orbiter/Production/NativeApplication.cpp": "fbe90b83d7901d73f1e9cc1abc9af5fc4903ea3cd5fe14b7db92ffc1c4ca7ba5",
+    "Tests/Production/phase3-extraction.lock.json": "dc092156c2369eaacffddba1b022f8f24ef462f71c4951ae18a7b4ebab483096",
+    "Tests/Production/StockVessels/CMakeLists.txt": "e1fdca0c8dd20ea14578a87d75b433734fa8de0d91f5f7a656efe17960db4bf0",
+    "Tests/Production/StockVessels/Driver.cpp": "eb3545a5bba2a2a8695dbf88cd36745213f967600c2d3823242d43fc5d34c0f1",
+    "Tests/Production/StockVessels/Gate.Test.py": "35cf65d4908197d86abef065f922cb2b4c2dd1aa7a7afe87330d18af3c76b465",
+    "Tests/Production/StockVessels/NativeProbe.cpp": "910401ae2ff638228063faa67b88defa4b006fc8b6e115e1be9d040939dc9e8d",
+    "Tests/Production/StockVessels/Observation.h": "7caa93f8d41f2212904a74fcfb0211913f6f03fe3c350f7c13bd2b57a2fea042",
+    "Tests/Production/StockVessels/Policy.Test.py": "257e80db414fbf36e723b9c3d20ff4f8eb63f4eba327dfe9de1ee3200b3ece59",
+    "Tests/Production/StockVessels/README.md": "4180d8be6720e474d4e4848f29ab4d095701277a5fb8392baa2700c052263607",
+    "Tests/Production/StockVessels/cases.json": "e645394e92d2e633108043688701df1ed41c2456483c6d9bc7d8413dff8162f5",
+    "Tests/Production/StockVessels/compare.py": "ee3d02a16d60246f20d1ee5bcc65e0b2a535df2a3ad4f51c35106dd4b93690a4",
+    "Tests/Production/StockVessels/native.py": "dbd2e74b6ec2767c83d1a5b77c02e5a0edde5ea5dfc0420571a37c7e1148241f",
+    "Tests/Production/StockVessels/original.py": "08ee9b2c393de4a1870a1d9161c087f4ea286e6521703aa131d4b90d4187fb1a",
+    "Tests/Production/StockVessels/verify_original.py": "c7c9a55629a1ab7027ad2ad648bcbba718cf2008903e38d8d2ab38b4fffc0f3a"
+  },
+  "original_archives": {
+    "path": "out/phase6-stations-download-manifest.json",
+    "sha256": "4fc6751358e89f63c17c967975c22dfb7e7f03c99152f6f3a6effbe1ca27bdd5"
+  },
+  "original_audit": {
+    "path": "out/phase6-stations-original-audit-cross-platform.json",
+    "sha256": "f144ba5bf20a50f9b3aacde182c3c701d3a3d67552e3590ca6bea9920cf0fd37"
+  },
+  "native_capture": {
+    "path": "out/phase6-base-stations-native-release/stock-vessels.json",
+    "sha256": "dd0c1bb80279e790d0c03f758f625d276a89b3d7e89394d6dc77e83bf88bec48"
+  },
+  "native_comparison": {
+    "path": "out/phase6-base-stations-comparison.json",
+    "sha256": "b18cbb3e57e895bd7943ee031004e3f3097f4f7fe83a8bd212d443f2f4f9438b"
+  },
+  "policy_controls": {
+    "path": "out/phase6-base-stations-policy-controls/policy-controls.json",
+    "sha256": "410aa891c4876b87572852c4401523c210047294a2d3b0e88ae63f12141a4388"
+  },
+  "in_process_lifetime": {
+    "path": "out/phase6-base-stations-lifetime/lifetime.json",
+    "sha256": "b753315c80ac23c1b58ab4621833de02e737ac16902814e9173bd0db5a67bf6d"
+  },
+  "source_audit": {
+    "status": "passed",
+    "extraction_files": 443,
+    "log_sha256": "5034eb099d877a3749f72fe4d85d6bac71830dc862f900c4e3a624cd69e49b15"
+  },
+  "original_processes": 56,
+  "original_scene_presents": 3360,
+  "original_finalized_all_vessel_samples": 11224,
+  "native_processes": 14,
+  "native_scene_presents": 840,
+  "native_finalized_all_vessel_samples": 2806,
+  "native_binary_sha256": {
+    "executable": "edff787c35b5bd1a316ae5aba68709697097441f048279a66625fcafccb03d8a",
+    "engine": "5ac0a19b049af75b9911a037ff4d62b9c6a3bbdae1612162cc6db39a8979a817",
+    "renderer": "f75adfeffa5d3c0375e9047c0010804b4f22c7f0fbd6cf0cf7d8f4366fa19f24"
+  },
+  "native_runtime_files_sha256": {
+    "out/phase6-base-stations-engine/orbiter-production": "edff787c35b5bd1a316ae5aba68709697097441f048279a66625fcafccb03d8a",
+    "out/phase6-base-stations-engine/liborbiter_production_vessels.so": "5ac0a19b049af75b9911a037ff4d62b9c6a3bbdae1612162cc6db39a8979a817",
+    "out/phase6-base-stations-engine/liborbiter_production_boundary.so": "cb6df1012e26acdcf76a63c604ddcc6b86c4e5c062e3d50907fd904595e018dd",
+    "out/phase6-base-stations-engine/native-lua/liblua.so": "1989f4c79053696915898fdaa07a308b19f6e661057a9450bfaaa7adf15934ff",
+    "out/phase6-base-stations-engine/native-lua/doc-tools/lfs.so": "47848b81f6c4834bfd7221353a9e6e6be2b497e0f1528ef15bedf60cb3eabaf4",
+    "out/phase6-base-stations-engine/NativeModules/Graphics/OGLClient.so": "f75adfeffa5d3c0375e9047c0010804b4f22c7f0fbd6cf0cf7d8f4366fa19f24",
+    "out/phase6-base-stations-engine/NativeModules/Plugin/LuaInterpreter.so": "c064dce2985889b5b9236f7b45871ca347c7ec5e1e09aa53c8eb3fa0d2905506",
+    "out/phase6-base-stations-engine/NativeModules/Plugin/LuaInline.so": "7340bf69c14fefee7709b73d4cb0860876d7adce23c6682084161027b3c2d6c1",
+    "out/phase6-base-stations-engine/NativeModules/Celbody/spice.so": "fbb73f39e251b110f2bbda9126871c8f54f180fd21faa09bd09cabd23f2e1840",
+    "out/phase6-base-stations-engine/NativeModules/Vessel/ShuttlePB.so": "a6407d4d6dc42a298a26f02c13e013d535a14c659e646f0decd1b97691ebcaa5",
+    "out/phase6-base-stations-engine/NativeModules/Vessel/DeltaGlider.so": "139cd31de6542e57a099a0c443c9ca73d2f5c8c6fb63a3bdcbf0afebe8da14e7",
+    "out/phase6-base-stations-engine/NativeModules/Celbody/Earth/Atmosphere/EarthAtm2006.so": "988ef6b7051aa3703d3a5063447964a849e31d7361323a0088aca67eb898296c",
+    "out/phase6-base-stations-engine/NativeModules/Celbody/Earth/Atmosphere/EarthAtmJ71G.so": "f8a0159705ff38134527747d3b15cd65f0b6b7a214131f0d5ecb727b46ff464b",
+    "out/phase6-base-stations-engine/NativeModules/Celbody/Mars/Atmosphere/MarsAtm2006.so": "74645d08241ad08167c69bdba67f94812d4a112029ba143db9f655adb3055d22"
+  },
+  "maxima": {
+    "position_m": 0.0,
+    "velocity_m_s": 1.8202679311457755e-11,
+    "rotation_rad": 0.0,
+    "angular_velocity_rad_s": 0.0,
+    "mjd_days": 0.0,
+    "mass_fraction_of_budget": 0.0,
+    "fuel_fraction_of_budget": 0.0
+  },
+  "minimum_full_frame_ssim": 0.9846069047379694,
+  "maximum_projected_error_px": 0.0,
+  "cases": {
+    "stations_1": {
+      "scenario": "Challenges/Challenge 2 - Lunar transfer.scn",
+      "repetitions": [
+        {
+          "maxima": {
+            "position_m": 0.0,
+            "velocity_m_s": 0.0,
+            "rotation_rad": 0.0,
+            "angular_velocity_rad_s": 0.0,
+            "mjd_days": 0.0,
+            "mass_fraction_of_budget": 0.0,
+            "fuel_fraction_of_budget": 0.0
+          },
+          "ssim": 0.9998835893704981,
+          "landmark_maximum_px": 0.0,
+          "camera_position_m": 0.0,
+          "camera_rotation_rad": 0.0,
+          "projected_landmarks": [
+            "Venus",
+            "Vesta",
+            "Jupiter",
+            "Io",
+            "Europa",
+            "Ganymede",
+            "Callisto",
+            "Amalthea",
+            "Himalia",
+            "Saturn",
+            "Mimas",
+            "Enceladus",
+            "Tethys",
+            "Dione",
+            "Rhea",
+            "Titan",
+            "Hyperion",
+            "Iapetus",
+            "Phoebe"
+          ],
+          "visible_landmarks": [
+            "Jupiter",
+            "Io",
+            "Europa",
+            "Ganymede",
+            "Callisto",
+            "Amalthea",
+            "Himalia",
+            "Saturn",
+            "Mimas",
+            "Enceladus",
+            "Tethys",
+            "Dione",
+            "Rhea",
+            "Titan",
+            "Hyperion",
+            "Iapetus",
+            "Phoebe"
+          ]
+        },
+        {
+          "maxima": {
+            "position_m": 0.0,
+            "velocity_m_s": 0.0,
+            "rotation_rad": 0.0,
+            "angular_velocity_rad_s": 0.0,
+            "mjd_days": 0.0,
+            "mass_fraction_of_budget": 0.0,
+            "fuel_fraction_of_budget": 0.0
+          },
+          "ssim": 0.9998835893704981,
+          "landmark_maximum_px": 0.0,
+          "camera_position_m": 0.0,
+          "camera_rotation_rad": 0.0,
+          "projected_landmarks": [
+            "Venus",
+            "Vesta",
+            "Jupiter",
+            "Io",
+            "Europa",
+            "Ganymede",
+            "Callisto",
+            "Amalthea",
+            "Himalia",
+            "Saturn",
+            "Mimas",
+            "Enceladus",
+            "Tethys",
+            "Dione",
+            "Rhea",
+            "Titan",
+            "Hyperion",
+            "Iapetus",
+            "Phoebe"
+          ],
+          "visible_landmarks": [
+            "Jupiter",
+            "Io",
+            "Europa",
+            "Ganymede",
+            "Callisto",
+            "Amalthea",
+            "Himalia",
+            "Saturn",
+            "Mimas",
+            "Enceladus",
+            "Tethys",
+            "Dione",
+            "Rhea",
+            "Titan",
+            "Hyperion",
+            "Iapetus",
+            "Phoebe"
+          ]
+        }
+      ]
+    },
+    "stations_2": {
+      "scenario": "Challenges/Challenge 3 - Advanced lunar transfer.scn",
+      "repetitions": [
+        {
+          "maxima": {
+            "position_m": 0.0,
+            "velocity_m_s": 0.0,
+            "rotation_rad": 0.0,
+            "angular_velocity_rad_s": 0.0,
+            "mjd_days": 0.0,
+            "mass_fraction_of_budget": 0.0,
+            "fuel_fraction_of_budget": 0.0
+          },
+          "ssim": 1.0,
+          "landmark_maximum_px": 0.0,
+          "camera_position_m": 0.0,
+          "camera_rotation_rad": 0.0,
+          "projected_landmarks": [
+            "Venus",
+            "Vesta",
+            "Jupiter",
+            "Io",
+            "Europa",
+            "Ganymede",
+            "Callisto",
+            "Amalthea",
+            "Himalia",
+            "Saturn",
+            "Mimas",
+            "Enceladus",
+            "Tethys",
+            "Dione",
+            "Rhea",
+            "Titan",
+            "Hyperion",
+            "Iapetus",
+            "Phoebe"
+          ],
+          "visible_landmarks": [
+            "Jupiter",
+            "Io",
+            "Europa",
+            "Ganymede",
+            "Callisto",
+            "Amalthea",
+            "Himalia",
+            "Saturn",
+            "Mimas",
+            "Enceladus",
+            "Tethys",
+            "Dione",
+            "Rhea",
+            "Titan",
+            "Hyperion",
+            "Iapetus",
+            "Phoebe"
+          ]
+        },
+        {
+          "maxima": {
+            "position_m": 0.0,
+            "velocity_m_s": 0.0,
+            "rotation_rad": 0.0,
+            "angular_velocity_rad_s": 0.0,
+            "mjd_days": 0.0,
+            "mass_fraction_of_budget": 0.0,
+            "fuel_fraction_of_budget": 0.0
+          },
+          "ssim": 1.0,
+          "landmark_maximum_px": 0.0,
+          "camera_position_m": 0.0,
+          "camera_rotation_rad": 0.0,
+          "projected_landmarks": [
+            "Venus",
+            "Vesta",
+            "Jupiter",
+            "Io",
+            "Europa",
+            "Ganymede",
+            "Callisto",
+            "Amalthea",
+            "Himalia",
+            "Saturn",
+            "Mimas",
+            "Enceladus",
+            "Tethys",
+            "Dione",
+            "Rhea",
+            "Titan",
+            "Hyperion",
+            "Iapetus",
+            "Phoebe"
+          ],
+          "visible_landmarks": [
+            "Jupiter",
+            "Io",
+            "Europa",
+            "Ganymede",
+            "Callisto",
+            "Amalthea",
+            "Himalia",
+            "Saturn",
+            "Mimas",
+            "Enceladus",
+            "Tethys",
+            "Dione",
+            "Rhea",
+            "Titan",
+            "Hyperion",
+            "Iapetus",
+            "Phoebe"
+          ]
+        }
+      ]
+    },
+    "stations_3": {
+      "scenario": "Delta-glider/DG and DG-S.scn",
+      "repetitions": [
+        {
+          "maxima": {
+            "position_m": 0.0,
+            "velocity_m_s": 0.0,
+            "rotation_rad": 0.0,
+            "angular_velocity_rad_s": 0.0,
+            "mjd_days": 0.0,
+            "mass_fraction_of_budget": 0.0,
+            "fuel_fraction_of_budget": 0.0
+          },
+          "ssim": 1.0,
+          "landmark_maximum_px": 0.0,
+          "camera_position_m": 0.0,
+          "camera_rotation_rad": 0.0,
+          "projected_landmarks": [
+            "Sun",
+            "Mercury",
+            "Venus",
+            "Earth",
+            "Vesta",
+            "Jupiter",
+            "Io",
+            "Europa",
+            "Ganymede",
+            "Callisto",
+            "Amalthea",
+            "Himalia",
+            "Saturn",
+            "Mimas",
+            "Enceladus",
+            "Tethys",
+            "Dione",
+            "Rhea",
+            "Titan",
+            "Hyperion",
+            "Iapetus",
+            "Phoebe",
+            "ISS",
+            "GL-01S",
+            "GL-01"
+          ],
+          "visible_landmarks": [
+            "GL-01S",
+            "GL-01"
+          ]
+        },
+        {
+          "maxima": {
+            "position_m": 0.0,
+            "velocity_m_s": 0.0,
+            "rotation_rad": 0.0,
+            "angular_velocity_rad_s": 0.0,
+            "mjd_days": 0.0,
+            "mass_fraction_of_budget": 0.0,
+            "fuel_fraction_of_budget": 0.0
+          },
+          "ssim": 1.0,
+          "landmark_maximum_px": 0.0,
+          "camera_position_m": 0.0,
+          "camera_rotation_rad": 0.0,
+          "projected_landmarks": [
+            "Sun",
+            "Mercury",
+            "Venus",
+            "Earth",
+            "Vesta",
+            "Jupiter",
+            "Io",
+            "Europa",
+            "Ganymede",
+            "Callisto",
+            "Amalthea",
+            "Himalia",
+            "Saturn",
+            "Mimas",
+            "Enceladus",
+            "Tethys",
+            "Dione",
+            "Rhea",
+            "Titan",
+            "Hyperion",
+            "Iapetus",
+            "Phoebe",
+            "ISS",
+            "GL-01S",
+            "GL-01"
+          ],
+          "visible_landmarks": [
+            "GL-01S",
+            "GL-01"
+          ]
+        }
+      ]
+    },
+    "stations_4": {
+      "scenario": "Delta-glider/Venus takeoff.scn",
+      "repetitions": [
+        {
+          "maxima": {
+            "position_m": 0.0,
+            "velocity_m_s": 1.8202679311457755e-11,
+            "rotation_rad": 0.0,
+            "angular_velocity_rad_s": 0.0,
+            "mjd_days": 0.0,
+            "mass_fraction_of_budget": 0.0,
+            "fuel_fraction_of_budget": 0.0
+          },
+          "ssim": 0.9996464233749696,
+          "landmark_maximum_px": 0.0,
+          "camera_position_m": 0.0,
+          "camera_rotation_rad": 0.0,
+          "projected_landmarks": [
+            "Sun",
+            "Mercury",
+            "Vesta",
+            "Ceres",
+            "Saturn",
+            "Mimas",
+            "Enceladus",
+            "Tethys",
+            "Dione",
+            "Rhea",
+            "Titan",
+            "Hyperion",
+            "Iapetus",
+            "Phoebe",
+            "Uranus",
+            "Miranda",
+            "Ariel",
+            "Umbriel",
+            "Titania",
+            "Oberon",
+            "Neptune",
+            "Triton",
+            "Proteus",
+            "Nereid",
+            "Pluto",
+            "Charon",
+            "Nix",
+            "Hydra"
+          ],
+          "visible_landmarks": [
+            "Sun",
+            "Vesta",
+            "Uranus",
+            "Miranda",
+            "Ariel",
+            "Umbriel",
+            "Titania",
+            "Oberon"
+          ]
+        },
+        {
+          "maxima": {
+            "position_m": 0.0,
+            "velocity_m_s": 1.8202679311457755e-11,
+            "rotation_rad": 0.0,
+            "angular_velocity_rad_s": 0.0,
+            "mjd_days": 0.0,
+            "mass_fraction_of_budget": 0.0,
+            "fuel_fraction_of_budget": 0.0
+          },
+          "ssim": 0.9996464233749696,
+          "landmark_maximum_px": 0.0,
+          "camera_position_m": 0.0,
+          "camera_rotation_rad": 0.0,
+          "projected_landmarks": [
+            "Sun",
+            "Mercury",
+            "Vesta",
+            "Ceres",
+            "Saturn",
+            "Mimas",
+            "Enceladus",
+            "Tethys",
+            "Dione",
+            "Rhea",
+            "Titan",
+            "Hyperion",
+            "Iapetus",
+            "Phoebe",
+            "Uranus",
+            "Miranda",
+            "Ariel",
+            "Umbriel",
+            "Titania",
+            "Oberon",
+            "Neptune",
+            "Triton",
+            "Proteus",
+            "Nereid",
+            "Pluto",
+            "Charon",
+            "Nix",
+            "Hydra"
+          ],
+          "visible_landmarks": [
+            "Sun",
+            "Vesta",
+            "Uranus",
+            "Miranda",
+            "Ariel",
+            "Umbriel",
+            "Titania",
+            "Oberon"
+          ]
+        }
+      ]
+    },
+    "stations_5": {
+      "scenario": "Navigation/TransX/Earth to Moon.scn",
+      "repetitions": [
+        {
+          "maxima": {
+            "position_m": 0.0,
+            "velocity_m_s": 0.0,
+            "rotation_rad": 0.0,
+            "angular_velocity_rad_s": 0.0,
+            "mjd_days": 0.0,
+            "mass_fraction_of_budget": 0.0,
+            "fuel_fraction_of_budget": 0.0
+          },
+          "ssim": 1.0,
+          "landmark_maximum_px": 0.0,
+          "camera_position_m": 0.0,
+          "camera_rotation_rad": 0.0,
+          "projected_landmarks": [
+            "Earth",
+            "Moon",
+            "Ceres",
+            "Jupiter",
+            "Io",
+            "Europa",
+            "Ganymede",
+            "Callisto",
+            "Amalthea",
+            "Himalia",
+            "Saturn",
+            "Mimas",
+            "Enceladus",
+            "Tethys",
+            "Dione",
+            "Rhea",
+            "Titan",
+            "Hyperion",
+            "Iapetus",
+            "Phoebe",
+            "Uranus",
+            "Miranda",
+            "Ariel",
+            "Umbriel",
+            "Titania",
+            "Oberon",
+            "Neptune",
+            "Triton",
+            "Proteus",
+            "Nereid",
+            "Pluto",
+            "Charon",
+            "Nix",
+            "Hydra",
+            "GL-01",
+            "Luna-OB1"
+          ],
+          "visible_landmarks": [
+            "GL-01"
+          ]
+        },
+        {
+          "maxima": {
+            "position_m": 0.0,
+            "velocity_m_s": 0.0,
+            "rotation_rad": 0.0,
+            "angular_velocity_rad_s": 0.0,
+            "mjd_days": 0.0,
+            "mass_fraction_of_budget": 0.0,
+            "fuel_fraction_of_budget": 0.0
+          },
+          "ssim": 1.0,
+          "landmark_maximum_px": 0.0,
+          "camera_position_m": 0.0,
+          "camera_rotation_rad": 0.0,
+          "projected_landmarks": [
+            "Earth",
+            "Moon",
+            "Ceres",
+            "Jupiter",
+            "Io",
+            "Europa",
+            "Ganymede",
+            "Callisto",
+            "Amalthea",
+            "Himalia",
+            "Saturn",
+            "Mimas",
+            "Enceladus",
+            "Tethys",
+            "Dione",
+            "Rhea",
+            "Titan",
+            "Hyperion",
+            "Iapetus",
+            "Phoebe",
+            "Uranus",
+            "Miranda",
+            "Ariel",
+            "Umbriel",
+            "Titania",
+            "Oberon",
+            "Neptune",
+            "Triton",
+            "Proteus",
+            "Nereid",
+            "Pluto",
+            "Charon",
+            "Nix",
+            "Hydra",
+            "GL-01",
+            "Luna-OB1"
+          ],
+          "visible_landmarks": [
+            "GL-01"
+          ]
+        }
+      ]
+    },
+    "stations_6": {
+      "scenario": "The Solar System/Venus.scn",
+      "repetitions": [
+        {
+          "maxima": {
+            "position_m": 0.0,
+            "velocity_m_s": 1.8202679311457755e-11,
+            "rotation_rad": 0.0,
+            "angular_velocity_rad_s": 0.0,
+            "mjd_days": 0.0,
+            "mass_fraction_of_budget": 0.0,
+            "fuel_fraction_of_budget": 0.0
+          },
+          "ssim": 0.9846069047379694,
+          "landmark_maximum_px": 0.0,
+          "camera_position_m": 0.0,
+          "camera_rotation_rad": 0.0,
+          "projected_landmarks": [
+            "Mercury",
+            "Venus",
+            "Earth",
+            "Moon",
+            "Mars",
+            "Phobos",
+            "Deimos",
+            "Ceres",
+            "Uranus",
+            "Miranda",
+            "Ariel",
+            "Umbriel",
+            "Titania",
+            "Oberon",
+            "Neptune",
+            "Triton",
+            "Proteus",
+            "Nereid",
+            "Pluto",
+            "Charon",
+            "Nix",
+            "Hydra",
+            "ISS",
+            "Mir",
+            "Luna-OB1"
+          ],
+          "visible_landmarks": []
+        },
+        {
+          "maxima": {
+            "position_m": 0.0,
+            "velocity_m_s": 1.8202679311457755e-11,
+            "rotation_rad": 0.0,
+            "angular_velocity_rad_s": 0.0,
+            "mjd_days": 0.0,
+            "mass_fraction_of_budget": 0.0,
+            "fuel_fraction_of_budget": 0.0
+          },
+          "ssim": 0.9846069047379694,
+          "landmark_maximum_px": 0.0,
+          "camera_position_m": 0.0,
+          "camera_rotation_rad": 0.0,
+          "projected_landmarks": [
+            "Mercury",
+            "Venus",
+            "Earth",
+            "Moon",
+            "Mars",
+            "Phobos",
+            "Deimos",
+            "Ceres",
+            "Uranus",
+            "Miranda",
+            "Ariel",
+            "Umbriel",
+            "Titania",
+            "Oberon",
+            "Neptune",
+            "Triton",
+            "Proteus",
+            "Nereid",
+            "Pluto",
+            "Charon",
+            "Nix",
+            "Hydra",
+            "ISS",
+            "Mir",
+            "Luna-OB1"
+          ],
+          "visible_landmarks": []
+        }
+      ]
+    },
+    "stations_7": {
+      "scenario": "Views/Cloud microtexture.scn",
+      "repetitions": [
+        {
+          "maxima": {
+            "position_m": 0.0,
+            "velocity_m_s": 0.0,
+            "rotation_rad": 0.0,
+            "angular_velocity_rad_s": 0.0,
+            "mjd_days": 0.0,
+            "mass_fraction_of_budget": 0.0,
+            "fuel_fraction_of_budget": 0.0
+          },
+          "ssim": 1.0,
+          "landmark_maximum_px": 0.0,
+          "camera_position_m": 0.0,
+          "camera_rotation_rad": 0.0,
+          "projected_landmarks": [
+            "Earth",
+            "Moon",
+            "Mars",
+            "Phobos",
+            "Deimos",
+            "ISS",
+            "Mir",
+            "Luna-OB1",
+            "GL-01"
+          ],
+          "visible_landmarks": [
+            "GL-01"
+          ]
+        },
+        {
+          "maxima": {
+            "position_m": 0.0,
+            "velocity_m_s": 0.0,
+            "rotation_rad": 0.0,
+            "angular_velocity_rad_s": 0.0,
+            "mjd_days": 0.0,
+            "mass_fraction_of_budget": 0.0,
+            "fuel_fraction_of_budget": 0.0
+          },
+          "ssim": 1.0,
+          "landmark_maximum_px": 0.0,
+          "camera_position_m": 0.0,
+          "camera_rotation_rad": 0.0,
+          "projected_landmarks": [
+            "Earth",
+            "Moon",
+            "Mars",
+            "Phobos",
+            "Deimos",
+            "ISS",
+            "Mir",
+            "Luna-OB1",
+            "GL-01"
+          ],
+          "visible_landmarks": [
+            "GL-01"
+          ]
+        }
+      ]
+    }
+  },
+  "base_resource_correction": {
+    "original_source_locations": [
+      "Src/Orbiter/Orbiter.cpp:762",
+      "Src/Orbiter/Orbiter.cpp:925"
+    ],
+    "initial_omission_ssim": 0.9640255600490308,
+    "ground_frame_now_byte_identical": true,
+    "original_generic_nullable_slots_preserved": true,
+    "required_mesh_and_application_surface_checks_preserved": true,
+    "normal_build_context_cycles": 20,
+    "sanitizer_qualification_claimed": false
+  },
+  "negative_controls": {
+    "cases": 5,
+    "all_rejected_before_scene": true,
+    "normal_context_deletion": true,
+    "required_module_fallback_rejected": true,
+    "arbitrary_config_only_class_rejected": true,
+    "source_assets_unchanged": true
+  },
+  "development_failures_retained": [
+    "out/phase6-stations-native-release",
+    "out/phase6-stations-native-release-final"
+  ],
+  "lua_c_sanitizer": {
+    "status": "unresolved-in-production",
+    "failure": {
+      "path": "out/phase6-wayland-asan-system-dg-panel-1/console.log",
+      "sha256": "8d50753a8ca69afe63505b71e14c5b08ec84b05f6ef14816fdbccf601ef2ac87"
+    },
+    "runtime_snapshot": {
+      "path": "out/phase6-wayland-asan-build-snapshot.json",
+      "sha256": "0ce1fc28a5bd760df9f6a0a49dc24ca8e05f62f59bf248f4e33c5539d8a74bef"
+    },
+    "isolated_prototype": {
+      "path": "out/phase6-lua-upvalue-repro/prototype-verification.json",
+      "sha256": "1b21c48d744a7c31ca1d416f892efff82b7717cca3b2ee96c0b5ef9405467e75"
+    },
+    "production_dependency_unchanged": true
+  },
+  "preserved": {
+    "original_algorithms_and_call_order": true,
+    "windows_sdk_types_and_layouts": true,
+    "frozen_references_and_budgets": true,
+    "accepted_phase5_binaries": true
+  },
+  "remaining": [
+    "Current four-profile hosted native qualification of these scenarios",
+    "Complete full-corpus and named-scenario module dependencies; existing failure handling crashes",
+    "Performance requalification after restoring original base textures, now running",
+    "Adopt and qualify the tested Lua guard prototype, then complete Wayland C/C++ sanitizer coverage",
+    "Physical controller and broader interactive acceptance",
+    "Durable versioned evidence preservation",
+    "Full Phase 6 acceptance audit"
+  ]
+}

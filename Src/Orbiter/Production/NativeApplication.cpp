@@ -82,6 +82,20 @@ double RcsLevel(const VESSEL& vessel) {
 int ReadFlightStatus(const VESSEL& vessel) {
     VESSELSTATUS2 status{};status.version=2;vessel.GetStatusEx(&status);return status.status;
 }
+bool SupportedStockStation(const VESSEL& vessel,const char* type) {
+    const bool mir=CompareText(type,"Mir")==0,wheel=CompareText(type,"Wheel")==0;
+    if((!mir && !wheel) || vessel.Version()!=0 || vessel.GetEnableFocus() || vessel.GetMeshCount()!=1 ||
+       vessel.GetThrusterCount()!=0 || vessel.GetPropellantCount()!=0 || vessel.AttachmentCount(true)!=0 ||
+       vessel.AttachmentCount(false)!=0 || !vessel.GetTransponder() || vessel.GetFuelMass()!=0 ||
+       vessel.GetMass()!=vessel.GetEmptyMass())return false;
+    VECTOR3 pmi{},cs{};vessel.GetPMI(pmi);vessel.GetCrossSections(cs);
+    // Explicit original configuration-defined classes, qualified against the
+    // preserved Windows application. Required modules still use the loader.
+    return (mir && vessel.GetEmptyMass()==124340 && vessel.GetSize()==40 && vessel.DockCount()==3 &&
+            pmi.x==86.1 && pmi.y==79.6 && pmi.z==37 && cs.x==186.8 && cs.y==272.9 && cs.z==341.1) ||
+           (wheel && vessel.GetEmptyMass()==1e6 && vessel.GetSize()==250 && vessel.DockCount()==2 &&
+            pmi.x==26000 && pmi.y==26000 && pmi.z==52800 && cs.x==20 && cs.y==20 && cs.z==20);
+}
 struct Runtime final:BodyServices,RigidBodyServices,SurfaceServices,NavigationServices,VesselServices,
     CameraServices,WorldFactory,SessionServices,VesselLifetimeServices
 #ifdef ORBITER_NATIVE_COCKPIT
@@ -123,7 +137,7 @@ struct Runtime final:BodyServices,RigidBodyServices,SurfaceServices,NavigationSe
     struct AttachmentPair {Vessel* parent;ATTACHMENTHANDLE parentHandle,childHandle;};
     std::map<std::string,AttachmentPair> attachments;
     std::ofstream vesselCallbacks,lifetimeEvents;
-    bool savePending=false,reloadPending=false,stepOnce=false,finished=false;
+    bool savePending=false,reloadPending=false,stepOnce=false,finished=false,baseResources=false;
     std::string testCase;
 #ifdef ORBITER_NATIVE_COCKPIT
     static const char* MouseName(RenderMouseAction action) {
@@ -570,6 +584,7 @@ struct Runtime final:BodyServices,RigidBodyServices,SurfaceServices,NavigationSe
         if(scenarioInterpreter) {oapiDelInterpreter(scenarioInterpreter);scenarioInterpreter=nullptr;}
 #endif
         if(render.graphics)render.graphics->CloseSession();
+        if(baseResources){Base::DestroyStaticDeviceObjects();baseResources=false;}
 #ifdef ORBITER_NATIVE_COCKPIT
         annotations.Clear();
         if (guiCreated) {
@@ -707,6 +722,7 @@ struct Runtime final:BodyServices,RigidBodyServices,SurfaceServices,NavigationSe
         static bool modesRegistered=false;if(!modesRegistered){Instrument::RegisterBuiltinModes();modesRegistered=true;}
         Instrument::GlobalInit(render.graphics);instrumentResources=true;
 #endif
+        Base::CreateStaticDeviceObjects();baseResources=true;
         RigidBody::GlobalSetup();
         if(!world.Initialize(metadata.Solsys()))throw std::runtime_error("Production solar system contains no objects");
         system->InitState(scenario.string().c_str());
@@ -721,7 +737,8 @@ struct Runtime final:BodyServices,RigidBodyServices,SurfaceServices,NavigationSe
                 vessel->GetThrusterCount()==(scram ? 23 : 21) && vessel->GetPropellantCount()==(scram ? 3 : 2))
                 continue;
 #endif
-            if(!pb && !iss)throw std::runtime_error(std::string("Unsupported stock vessel class or capabilities: ")+type+"; generic replacement is forbidden");
+            if(!pb && !iss && !SupportedStockStation(*vessel,type))
+                throw std::runtime_error(std::string("Unsupported stock vessel class or capabilities: ")+type+"; generic replacement is forbidden");
         }
         auto* focus=system->GetVessel(metadata.Focus());
         if(!focus)focus=system->GetVessel(oapi::UInt32(0));
@@ -790,7 +807,13 @@ struct Runtime final:BodyServices,RigidBodyServices,SurfaceServices,NavigationSe
     }
     void DeallocationProgress() override {}
     bool HasGraphics() const override {return render.graphics!=nullptr;}
-    SURFHANDLE LoadTexture(const char* name,bool) override {auto result=render.graphics->LoadTextureResource(name,0);if(!result) throw std::runtime_error(std::string("Required engine texture failed: ")+name);return result;}
+    SURFHANDLE LoadTexture(const char* name,bool applicationSurface) override {
+        auto result=render.graphics->LoadTextureResource(name,0);
+        // Original generic base slots may have no day/night texture. Mesh
+        // textures and required application surfaces retain their own checks.
+        if(!result && applicationSurface)throw std::runtime_error(std::string("Required engine texture failed: ")+name);
+        return result;
+    }
     void ReleaseTexture(SURFHANDLE texture,bool) override {if(texture && !render.graphics->ReleaseTextureResource(texture)) throw std::runtime_error("Texture release failed");}
     VesselBase* VesselState(Vessel* vessel) const override {return vessel;}
     void Refuel(VesselBase& vessel) override {vessel.Refuel();}
