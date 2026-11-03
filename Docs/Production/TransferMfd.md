@@ -49,7 +49,8 @@ collections are excluded; remote preservation remains open.
 
 The historical admitted-corpus result remains 112 passed and 45 failed out of
 157. These two targeted reruns resolve the Transfer MFD finding locally; they do
-not replace that full-corpus result or complete Phase 6. Current hosted checks,
-the Lua explicit-exit lifetime defect, other stock dependencies and modules,
-final hardware checks and remote preservation remain open. A physical
+not replace that full-corpus result or complete Phase 6. The
+[Lua explicit-exit finding](LuaProcessExit.md) is separately verified locally.
+Current hosted checks, other stock dependencies and modules, final hardware
+checks and remote preservation remain open. A physical
 controller remains unavailable and unverified.

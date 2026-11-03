@@ -74,7 +74,9 @@
       "historical_corpus_result_replaced": false
     },
     "lua_explicit_exit": {
-      "status": "open"
+      "status": "targeted-native-verification-passed",
+      "record": "Docs/Production/LuaProcessExitVerification.json",
+      "historical_corpus_result_replaced": false
     }
   }
 }

@@ -1,0 +1,621 @@
+{
+  "schema": 1,
+  "status": "targeted-native-verification-passed",
+  "phase6_complete": false,
+  "source_commit": "b1e3f1d60485149f5df63b5e89b531cb8ed0d8cf",
+  "runtime_verification": {
+    "path": "out/phase6-lua-exit-verification-v1/verification.json",
+    "sha256": "1e9a370ca0c3aff565919c130e4e7e448570440ebe69d6c1e0cc9559fa8131de"
+  },
+  "protected_files": 535,
+  "sources_and_binaries_unchanged": true,
+  "repaired_processes": 16,
+  "expected_defect_baselines": 1,
+  "repaired_presentations": 82,
+  "processes": {
+    "baseline/unchanged-vessel-api": {
+      "status": "expected-defect-reproduced",
+      "returncode": 1
+    },
+    "fixed/async-zero": {
+      "status": "passed",
+      "returncode": 0,
+      "lifecycle": {
+        "rendered_frames": 4,
+        "successful_presents": 4,
+        "context_deleted": true
+      },
+      "finalized_ticks": 5,
+      "initial_vessels": [
+        [
+          "GL-01",
+          "deltaglider"
+        ],
+        [
+          "GL-02",
+          "deltaglider"
+        ],
+        [
+          "SH-01",
+          "shuttlea"
+        ],
+        [
+          "SH-02",
+          "shuttlea"
+        ]
+      ],
+      "save_unchanged": true
+    },
+    "fixed/async-seven": {
+      "status": "passed",
+      "returncode": 7,
+      "lifecycle": {
+        "rendered_frames": 4,
+        "successful_presents": 4,
+        "context_deleted": true
+      },
+      "finalized_ticks": 5,
+      "initial_vessels": [
+        [
+          "GL-01",
+          "deltaglider"
+        ],
+        [
+          "GL-02",
+          "deltaglider"
+        ],
+        [
+          "SH-01",
+          "shuttlea"
+        ],
+        [
+          "SH-02",
+          "shuttlea"
+        ]
+      ],
+      "save_unchanged": true
+    },
+    "fixed/sync-seven": {
+      "status": "passed",
+      "returncode": 7,
+      "lifecycle": {
+        "rendered_frames": 4,
+        "successful_presents": 4,
+        "context_deleted": true
+      },
+      "finalized_ticks": 5,
+      "initial_vessels": [
+        [
+          "GL-01",
+          "deltaglider"
+        ],
+        [
+          "GL-02",
+          "deltaglider"
+        ],
+        [
+          "SH-01",
+          "shuttlea"
+        ],
+        [
+          "SH-02",
+          "shuttlea"
+        ]
+      ],
+      "save_unchanged": true
+    },
+    "fixed/direct-seven": {
+      "status": "passed",
+      "returncode": 7,
+      "lifecycle": {
+        "rendered_frames": 4,
+        "successful_presents": 4,
+        "context_deleted": true
+      },
+      "finalized_ticks": 5,
+      "initial_vessels": [
+        [
+          "GL-01",
+          "deltaglider"
+        ],
+        [
+          "GL-02",
+          "deltaglider"
+        ],
+        [
+          "SH-01",
+          "shuttlea"
+        ],
+        [
+          "SH-02",
+          "shuttlea"
+        ]
+      ],
+      "save_unchanged": true
+    },
+    "fixed/protected-zero": {
+      "status": "passed",
+      "returncode": 0,
+      "lifecycle": {
+        "rendered_frames": 4,
+        "successful_presents": 4,
+        "context_deleted": true
+      },
+      "finalized_ticks": 5,
+      "initial_vessels": [
+        [
+          "GL-01",
+          "deltaglider"
+        ],
+        [
+          "GL-02",
+          "deltaglider"
+        ],
+        [
+          "SH-01",
+          "shuttlea"
+        ],
+        [
+          "SH-02",
+          "shuttlea"
+        ]
+      ],
+      "save_unchanged": true
+    },
+    "fixed/nested-coroutine-seven": {
+      "status": "passed",
+      "returncode": 7,
+      "lifecycle": {
+        "rendered_frames": 4,
+        "successful_presents": 4,
+        "context_deleted": true
+      },
+      "finalized_ticks": 5,
+      "initial_vessels": [
+        [
+          "GL-01",
+          "deltaglider"
+        ],
+        [
+          "GL-02",
+          "deltaglider"
+        ],
+        [
+          "SH-01",
+          "shuttlea"
+        ],
+        [
+          "SH-02",
+          "shuttlea"
+        ]
+      ],
+      "save_unchanged": true
+    },
+    "fixed/cross-vm-zero": {
+      "status": "passed",
+      "returncode": 0,
+      "lifecycle": {
+        "rendered_frames": 4,
+        "successful_presents": 4,
+        "context_deleted": true
+      },
+      "finalized_ticks": 5,
+      "initial_vessels": [
+        [
+          "GL-01",
+          "deltaglider"
+        ],
+        [
+          "GL-02",
+          "deltaglider"
+        ],
+        [
+          "SH-01",
+          "shuttlea"
+        ],
+        [
+          "SH-02",
+          "shuttlea"
+        ]
+      ],
+      "save_unchanged": true
+    },
+    "fixed/unchanged-vessel-api": {
+      "status": "passed",
+      "returncode": 0,
+      "lifecycle": {
+        "rendered_frames": 13,
+        "successful_presents": 13,
+        "context_deleted": true
+      },
+      "finalized_ticks": 14,
+      "initial_vessels": [
+        [
+          "GL-01",
+          "deltaglider"
+        ],
+        [
+          "GL-02",
+          "deltaglider"
+        ],
+        [
+          "ISS",
+          "projectalpha_iss"
+        ],
+        [
+          "Luna-OB1",
+          "wheel"
+        ],
+        [
+          "Mir",
+          "mir"
+        ],
+        [
+          "PB-01",
+          "shuttlepb"
+        ],
+        [
+          "SH-01",
+          "shuttlea"
+        ],
+        [
+          "SH-03",
+          "shuttlea"
+        ]
+      ],
+      "save_unchanged": true
+    },
+    "sanitized/async-zero": {
+      "status": "passed",
+      "returncode": 0,
+      "lifecycle": {
+        "rendered_frames": 4,
+        "successful_presents": 4,
+        "context_deleted": true
+      },
+      "finalized_ticks": 5,
+      "initial_vessels": [
+        [
+          "GL-01",
+          "deltaglider"
+        ],
+        [
+          "GL-02",
+          "deltaglider"
+        ],
+        [
+          "SH-01",
+          "shuttlea"
+        ],
+        [
+          "SH-02",
+          "shuttlea"
+        ]
+      ],
+      "save_unchanged": true
+    },
+    "sanitized/async-seven": {
+      "status": "passed",
+      "returncode": 7,
+      "lifecycle": {
+        "rendered_frames": 4,
+        "successful_presents": 4,
+        "context_deleted": true
+      },
+      "finalized_ticks": 5,
+      "initial_vessels": [
+        [
+          "GL-01",
+          "deltaglider"
+        ],
+        [
+          "GL-02",
+          "deltaglider"
+        ],
+        [
+          "SH-01",
+          "shuttlea"
+        ],
+        [
+          "SH-02",
+          "shuttlea"
+        ]
+      ],
+      "save_unchanged": true
+    },
+    "sanitized/sync-seven": {
+      "status": "passed",
+      "returncode": 7,
+      "lifecycle": {
+        "rendered_frames": 4,
+        "successful_presents": 4,
+        "context_deleted": true
+      },
+      "finalized_ticks": 5,
+      "initial_vessels": [
+        [
+          "GL-01",
+          "deltaglider"
+        ],
+        [
+          "GL-02",
+          "deltaglider"
+        ],
+        [
+          "SH-01",
+          "shuttlea"
+        ],
+        [
+          "SH-02",
+          "shuttlea"
+        ]
+      ],
+      "save_unchanged": true
+    },
+    "sanitized/direct-seven": {
+      "status": "passed",
+      "returncode": 7,
+      "lifecycle": {
+        "rendered_frames": 4,
+        "successful_presents": 4,
+        "context_deleted": true
+      },
+      "finalized_ticks": 5,
+      "initial_vessels": [
+        [
+          "GL-01",
+          "deltaglider"
+        ],
+        [
+          "GL-02",
+          "deltaglider"
+        ],
+        [
+          "SH-01",
+          "shuttlea"
+        ],
+        [
+          "SH-02",
+          "shuttlea"
+        ]
+      ],
+      "save_unchanged": true
+    },
+    "sanitized/protected-zero": {
+      "status": "passed",
+      "returncode": 0,
+      "lifecycle": {
+        "rendered_frames": 4,
+        "successful_presents": 4,
+        "context_deleted": true
+      },
+      "finalized_ticks": 5,
+      "initial_vessels": [
+        [
+          "GL-01",
+          "deltaglider"
+        ],
+        [
+          "GL-02",
+          "deltaglider"
+        ],
+        [
+          "SH-01",
+          "shuttlea"
+        ],
+        [
+          "SH-02",
+          "shuttlea"
+        ]
+      ],
+      "save_unchanged": true
+    },
+    "sanitized/nested-coroutine-seven": {
+      "status": "passed",
+      "returncode": 7,
+      "lifecycle": {
+        "rendered_frames": 4,
+        "successful_presents": 4,
+        "context_deleted": true
+      },
+      "finalized_ticks": 5,
+      "initial_vessels": [
+        [
+          "GL-01",
+          "deltaglider"
+        ],
+        [
+          "GL-02",
+          "deltaglider"
+        ],
+        [
+          "SH-01",
+          "shuttlea"
+        ],
+        [
+          "SH-02",
+          "shuttlea"
+        ]
+      ],
+      "save_unchanged": true
+    },
+    "sanitized/cross-vm-zero": {
+      "status": "passed",
+      "returncode": 0,
+      "lifecycle": {
+        "rendered_frames": 4,
+        "successful_presents": 4,
+        "context_deleted": true
+      },
+      "finalized_ticks": 5,
+      "initial_vessels": [
+        [
+          "GL-01",
+          "deltaglider"
+        ],
+        [
+          "GL-02",
+          "deltaglider"
+        ],
+        [
+          "SH-01",
+          "shuttlea"
+        ],
+        [
+          "SH-02",
+          "shuttlea"
+        ]
+      ],
+      "save_unchanged": true
+    },
+    "sanitized/unchanged-vessel-api": {
+      "status": "passed",
+      "returncode": 0,
+      "lifecycle": {
+        "rendered_frames": 13,
+        "successful_presents": 13,
+        "context_deleted": true
+      },
+      "finalized_ticks": 14,
+      "initial_vessels": [
+        [
+          "GL-01",
+          "deltaglider"
+        ],
+        [
+          "GL-02",
+          "deltaglider"
+        ],
+        [
+          "ISS",
+          "projectalpha_iss"
+        ],
+        [
+          "Luna-OB1",
+          "wheel"
+        ],
+        [
+          "Mir",
+          "mir"
+        ],
+        [
+          "PB-01",
+          "shuttlepb"
+        ],
+        [
+          "SH-01",
+          "shuttlea"
+        ],
+        [
+          "SH-03",
+          "shuttlea"
+        ]
+      ],
+      "save_unchanged": true
+    }
+  },
+  "baseline_diagnostic": {
+    "unchanged_script_assertions": "all passed",
+    "leaked_bytes": 15264,
+    "leaked_allocations": 76,
+    "process_exit": 1,
+    "normal_graphics_teardown": false,
+    "retained_runtime_source": "71a86988eaf25da1fc67778b0d1f1f7dab3aec75"
+  },
+  "profiles_identity_audit": {
+    "path": "out/phase6-lua-exit-build-identity-audit.json",
+    "sha256": "f94a25ef2532b5fa842128a83a515dfbe0c5f77f18ae07c2adde524f9ff7acc2"
+  },
+  "standalone_tests": {
+    "status": "passed",
+    "tests": 5,
+    "lua_cancellation_cases": 9,
+    "configuration": "Debug",
+    "instrumentation": [
+      "address",
+      "undefined"
+    ],
+    "leak_detection": true,
+    "suppressions": false,
+    "log": {
+      "path": "out/phase6-lua-exit-cancellation-ctest-v2.log",
+      "sha256": "b39f33679e52021ee6d7fc14804ac548ba1ac0abc2b77abe488d153f933d4401"
+    },
+    "initial_failed_cancellation_log": {
+      "path": "out/phase6-lua-exit-cancellation-ctest.log",
+      "sha256": "80b6c873167362342fb43aab1e44b95b7fd6bc7a1019c7c6298fb94e25d96449"
+    }
+  },
+  "source_conservation": {
+    "files": 479,
+    "status": "passed",
+    "log": {
+      "path": "out/phase6-lua-exit-source-audit-v1.log",
+      "sha256": "d8f58261d0f326501a39483d3252784afa21b4ea3f7069e3560682f40dd2e2d3"
+    },
+    "windows_exit_body": "unchanged",
+    "windows_sdk_layouts": "unchanged",
+    "pinned_lua_sources": "no exit-related edits"
+  },
+  "build_records": [
+    {
+      "path": "out/phase6-lua-exit-build-normal/build.json",
+      "sha256": "3fd9b5975b0aaf9d7ef45b2b1e59065026de8aec9b35e9299fad7e1f5a75d4a5"
+    },
+    {
+      "path": "out/phase6-lua-exit-build-asan/build.json",
+      "sha256": "58a83da65750f01a45dbb2f20b0791e6aefe5b1e65cb6ca95e45f84a13ff54f5"
+    }
+  ],
+  "ordinary_scenes": {
+    "status": "passed",
+    "processes": 6,
+    "presentations": 360,
+    "record": {
+      "path": "out/phase6-lua-exit-ordinary-scenes/verification.json",
+      "sha256": "45fea79a5062cb35d520d2d9555560377c8e5ad31a46db34cab5b09bad19f0d5"
+    },
+    "cases": {
+      "Navigation/Lunar transfer/Lunar transfer 1.scn": {
+        "all_vessel_states_byte_identical": true,
+        "ssim": 1.0,
+        "frames_byte_identical": true
+      },
+      "Navigation/Lunar transfer/Lunar transfer 2.scn": {
+        "all_vessel_states_byte_identical": true,
+        "ssim": 1.0,
+        "frames_byte_identical": true
+      }
+    },
+    "sources_and_binaries_unchanged": true
+  },
+  "historical_corpus": {
+    "attempted": 157,
+    "passed": 112,
+    "failed": 45,
+    "replaced_by_targeted_runs": false
+  },
+  "hosted_checks": {
+    "source_commit": "b1e3f1d60485149f5df63b5e89b531cb8ed0d8cf",
+    "native_run": 41722199677,
+    "status": "pending-at-local-checkpoint",
+    "current_green_claim": false
+  },
+  "physical_controller": "Unavailable per user; unverified",
+  "archive": {
+    "status": "passed",
+    "path": "out/phase6-lua-process-exit-evidence-v1.tar.gz",
+    "bytes": 56118791,
+    "sha256": "2939629a1d6b177cc5eef565e436c8ae783032f7a4151082c4262ba9551fdaf5",
+    "members": 1404,
+    "index_sha256": "de89cd44e53a4e1500a01d6f83c5f9753f2886559ddb8c8ac1f59d36eccf1893",
+    "all_payload_hashes_verified": true,
+    "remote_preservation": "pending",
+    "font_and_asset_collections_included": false
+  },
+  "qualification": "Targeted native explicit-exit behavior, ordinary-scene regression and unsuppressed sanitizer verification. Full stock compatibility and current hosted qualification remain incomplete.",
+  "committed_owning_source_audit": {
+    "path": "out/phase6-lua-exit-archive-inputs-v1/qualification.json",
+    "sha256": "fed6454ec3850e1f5c14b20a73b552e6728b64d2beac323fbefb8928ed632a08"
+  }
+}

@@ -204,7 +204,11 @@ matrix lifetime and nonfinite indicator conversion. Both unchanged lunar-transfe
 scenes now pass baseline, repaired Release and repaired instrumented Debug runs:
 six clean process exits and 360 presents, with byte-identical all-vessel physical
 states against the retained native baseline. The historical 112/45 corpus result
-is retained; the Lua explicit-exit cleanup defect remains open.
+is retained. The [Lua explicit-exit follow-up](LuaProcessExit.md) now passes
+16 repaired-process cases, including the unchanged full vessel API scene, with
+zero sanitizer findings and normal context deletion. Its retained failing
+baseline still reproduces the original leak. Six ordinary full-scene regression
+runs retain byte-identical vessel states and frames against the previous runtime.
 
 The verified local admitted-corpus bundle contains 34,805,441 bytes and 8,522
 members, SHA-256
