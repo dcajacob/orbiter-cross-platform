@@ -11,9 +11,9 @@ endif()
 FetchContent_Declare(native_imgui URL "${_ui_url}" URL_HASH "SHA256=${_ui_hash}" DOWNLOAD_EXTRACT_TIMESTAMP TRUE SOURCE_SUBDIR no-build)
 FetchContent_MakeAvailable(native_imgui)
 target_sources(orbiter_production_vessels PRIVATE
-    NativeCockpitProjection.cpp NativeCockpitGui.cpp NativeCockpitVessel.cpp ../Astro.cpp
+    NativeCockpitProjection.cpp NativeCockpitMfd.cpp NativeCockpitGui.cpp NativeCockpitVessel.cpp ../Astro.cpp
     ../Pane.cpp ../hud.cpp ../Defpanel.cpp ../Panel2D.cpp ../VCockpit.cpp ../Select.cpp
-    ../Mfd.cpp ../VectorMap.cpp ../MfdOrbit.cpp ../MfdSurface.cpp ../MfdMap.cpp ../MfdHsi.cpp
+    ../Mfd.cpp ../MfdUser.cpp ../VectorMap.cpp ../MfdOrbit.cpp ../MfdSurface.cpp ../MfdMap.cpp ../MfdHsi.cpp
     ../MfdLanding.cpp ../MfdDocking.cpp ../MfdAlign.cpp ../MfdSync.cpp ../MfdTransfer.cpp ../MfdComms.cpp
     "${native_imgui_SOURCE_DIR}/imgui.cpp" "${native_imgui_SOURCE_DIR}/imgui_draw.cpp"
     "${native_imgui_SOURCE_DIR}/imgui_tables.cpp" "${native_imgui_SOURCE_DIR}/imgui_widgets.cpp")

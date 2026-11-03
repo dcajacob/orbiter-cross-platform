@@ -79,10 +79,10 @@ if(ORBITER_BUILD_NATIVE_VESSELS)
 endif()
 if(ORBITER_BUILD_NATIVE_COCKPIT)
     list(APPEND _native_sources
-        NativeCockpit.cmake NativeCockpitProjection.cpp NativeCockpitGui.cpp NativeCockpitVessel.cpp
+        NativeCockpit.cmake NativeCockpitMfd.cpp NativeCockpitProjection.cpp NativeCockpitGui.cpp NativeCockpitVessel.cpp
         CockpitVesselMethods.inc CockpitCameraMethods.inc CockpitPanelMethods.inc
         ../Pane.cpp ../hud.cpp ../Defpanel.cpp ../Panel2D.cpp ../VCockpit.cpp ../Select.cpp ../Astro.cpp
-        ../Mfd.cpp ../VectorMap.cpp ../MfdOrbit.cpp ../MfdSurface.cpp ../MfdMap.cpp ../MfdHsi.cpp
+        ../Mfd.cpp ../MfdUser.cpp ../VectorMap.cpp ../MfdOrbit.cpp ../MfdSurface.cpp ../MfdMap.cpp ../MfdHsi.cpp
         ../MfdLanding.cpp ../MfdDocking.cpp ../MfdAlign.cpp ../MfdSync.cpp ../MfdTransfer.cpp ../MfdComms.cpp
         ../../../OVP/OGLClient/dependencies.lock.json)
 endif()

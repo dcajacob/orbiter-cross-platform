@@ -23,9 +23,8 @@
 #include "MfdAlign.h"
 #include "MfdSync.h"
 #include "MfdTransfer.h"
-#ifdef _WIN32
 #include "MfdUser.h"
-#endif
+#include <memory>
 #ifdef _WIN32
 #include "Log.h"
 #endif
@@ -113,25 +112,14 @@ throw std::runtime_error("Native instrument mode requires a Windows legacy/custo
 	case MFD_OSYNC:       TRACENEW return new Instrument_OSync       (_pane, _id, spec, _vessel, restore);
 	case MFD_TRANSFER:    TRACENEW return new Instrument_Transfer    (_pane, _id, spec, _vessel);
 	case MFD_COMMS:       TRACENEW return new Instrument_Comms       (_pane, _id, spec, _vessel);
-	case MFD_USERTYPE:    TRACENEW
-#ifdef _WIN32
-return new Instrument_User        (_pane, _id, spec, _vessel);
-#else
-throw std::runtime_error("Native instrument mode requires a Windows legacy/custom MFD adapter");
-#endif
- // generic user type
+	case MFD_USERTYPE:    TRACENEW return new Instrument_User (_pane, _id, spec, _vessel); // generic user type
 	}
 
 	// check for specific user-defined mode
 	for (i = BUILTIN_MFD_MODES; i < nGlobalModes; i++)
 		if (type == GlobalMode[i].id) {
 			TRACENEW
-#ifdef _WIN32
-return new Instrument_User (_pane, _id, spec, _vessel, type, GlobalMode[i]);
-#else
-throw std::runtime_error("Native instrument mode requires a Windows legacy/custom MFD adapter");
-#endif
-
+			return new Instrument_User (_pane, _id, spec, _vessel, type, GlobalMode[i]);
 		}
 
 	// check for vessel-specific modes
@@ -139,13 +127,7 @@ throw std::runtime_error("Native instrument mode requires a Windows legacy/custo
 	oapi::UInt32 nmode = _vessel->GetMFDModes (&mlist);
 	for (i = 0; i < nmode; i++)
 		if (type == mlist[i].id) {
-
-#ifdef _WIN32
-return new Instrument_User (_pane, _id, spec, _vessel, type, mlist[i]);
-#else
-throw std::runtime_error("Native instrument mode requires a Windows legacy/custom MFD adapter");
-#endif
-
+			return new Instrument_User (_pane, _id, spec, _vessel, type, mlist[i]);
 		}
 
 	// nothing found
@@ -181,13 +163,9 @@ Instrument *Instrument::Create (ifstream &ifs, Pane *_pane,
 			else if (!orbiter::production::ComparePrefix (pc, "User", 4))     instr = Create (MFD_USERTYPE, _pane, _id, spec, _vessel);
 		}
 	}
-	if (instr) {
-		if (!instr->ReadParams (ifs)) { // problem during initialisation
-			delete instr;
-			instr = 0;
-		}
-	}
-	return instr;
+	std::unique_ptr<Instrument> owner(instr);
+	if (owner && owner->ReadParams(ifs)) return owner.release();
+	return nullptr;
 }
 
 void Instrument::GlobalInit (oapi::CockpitClient *gc)

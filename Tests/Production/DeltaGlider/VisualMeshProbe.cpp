@@ -10,6 +10,8 @@
 #include <fstream>
 #include <stdexcept>
 
+void OpenCustomMFDProbe();
+
 using namespace orbiter::production;
 
 namespace {
@@ -101,6 +103,9 @@ void orbiter::production::RenderRegisterVisual(OBJHANDLE object, VISHANDLE visua
     original(object, visual);
     if (oapiGetObjectType(object) == OBJTP_VESSEL) {
         auto *vessel = oapiGetVesselInterface(object);
-        if (!std::strcmp(vessel->GetClassName(), "ShuttlePB")) exercise(*vessel, visual);
+        if (!std::strcmp(vessel->GetClassName(), "ShuttlePB")) {
+            exercise(*vessel, visual);
+            OpenCustomMFDProbe();
+        }
     }
 }

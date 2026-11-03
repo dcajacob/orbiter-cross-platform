@@ -145,7 +145,14 @@ namespace oapi {using CockpitClient=GraphicsClient;}
             current=current.replace('orbiter::production::CockpitScreenHeight()','GetSystemMetrics(SM_CYSCREEN)')
         if name=='MfdHsi.cpp':current=current.replace('static const int arrowseg','static const INT arrowseg').replace('static const int narrowseg','static const INT narrowseg')
         if name=='MfdAlign.cpp':current=current.replace('saveprm = {0,0,0,false,0.0,0.0}','saveprm = {0,0,0,0.0,0.0,false}')
-        if name=='Mfd.cpp':current=current.replace('(long long)id + 1','(int64_t)id + 1')
+        if name=='Mfd.cpp':
+            current=current.replace('(long long)id + 1','(int64_t)id + 1').replace('#include <memory>','')
+            # The scenario loader owns the instrument through ReadParams, including exceptions.
+            owned='std::unique_ptr<Instrument> owner(instr);\n\tif (owner && owner->ReadParams(ifs)) return owner.release();\n\treturn nullptr;'
+            start=original.index('if (instr) {\n\t\tif (!instr->ReadParams')
+            end=original.index('\n}',start)
+            if current.count(owned)!=1:raise ValueError('Scenario MFD ownership changed')
+            current=current.replace(owned,original[start:end])
         current=restore_geometry(name,current,original)
         equal(original.replace('COLORREF','DWORD'),current.replace('COLORREF','DWORD'),'Original cockpit calculations, declarations and call order: '+name)
     print('Original Pane, HUD, MFD and panel algorithms conserved; Windows graphics pointer types unchanged')

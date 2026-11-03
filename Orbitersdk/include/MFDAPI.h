@@ -16,9 +16,17 @@
 #define __MFDAPI_H
 
 #ifndef SKIP_MFD_API
+#ifdef _WIN32
 #include "OrbiterAPI.h"
+#else
+#include "NativeVesselAPI.h"
+#include "OrbiterMfdMessages.h"
+#include "DrawAPI.h"
+#define OAPIFUNC __attribute__((visibility("default")))
+#endif
 
 class Instrument;
+class Instrument_User;
 
 // ======================================================================
 // class MFD
@@ -53,7 +61,7 @@ public:
  	 *	module should respond by creating the MFD mode and returning a pointer to
 	 *	it. Orbiter will automatically destroy the MFD mode when it is turned off.
 	 */
-	MFD (DWORD w, DWORD h, VESSEL *vessel);
+	MFD (oapi::UInt32 w, oapi::UInt32 h, VESSEL *vessel);
 
 	/**
 	 * \brief MFD destructor.
@@ -69,7 +77,7 @@ public:
 	 * \deprecated This method is deprecated. %MFD implementations should derive from MFD2
 	 *   and use the device-independent \ref MFD2::Update(oapi::Sketchpad*) method instead.
 	 */
-	virtual void Update (HDC hDC) = 0;
+	virtual void Update (oapi::SdkDrawContext hDC) = 0;
 
 	/**	
 	 * \brief Force a display update in the next frame.
@@ -107,7 +115,7 @@ public:
 	 * \deprecated This method is deprecated. %MFD implementations should derive from MFD2
 	 *   and use the device-independent \ref MFD2::Title method instead.
 	 */
-	void Title (HDC hDC, const char *title) const;
+	void Title (oapi::SdkDrawContext hDC, const char *title) const;
 
 	/**
 	 * \brief Selects a predefined pen into the device context.
@@ -127,7 +135,9 @@ public:
 	 * \deprecated This method is deprecated. %MFD implementations should derive from MFD2
 	 *   and use the device-independent \ref MFD2::GetDefaultPen method instead.
 	 */
-	HPEN SelectDefaultPen (HDC hDC, DWORD i) const;
+#ifdef _WIN32
+	HPEN SelectDefaultPen (oapi::SdkDrawContext hDC, oapi::UInt32 i) const;
+#endif
 
 	/**
 	 * \brief Selects a predefined MFD font into the device context
@@ -146,14 +156,14 @@ public:
 	 * \deprecated This method is deprecated. %MFD implementations should derive from MFD2
 	 *   and use the device-independent \ref MFD2::GetDefaultFont method instead.
 	 */
-	HFONT SelectDefaultFont (HDC hDC, DWORD i) const;
+	oapi::SdkFont SelectDefaultFont (oapi::SdkDrawContext hDC, oapi::UInt32 i) const;
 
 	/** 
 	 * \brief MFD keyboard handler for buffered keys.
 	 * \param key key code (<i>see OAPI_KEY_xxx constants in orbitersdk.h</i>)
 	 * \return The function should return true if it recognises and processes the key, false otherwise.
 	 */ 
-	virtual bool ConsumeKeyBuffered (DWORD key) { return false; }
+	virtual bool ConsumeKeyBuffered (oapi::UInt32 key) { return false; }
 
 	/**
 	 * \brief MFD keyboard handler for immediate (unbuffered) keys.
@@ -257,8 +267,8 @@ public:
 	virtual void RecallStatus () {}
 
 protected:
-	DWORD W, H;   //!< width and height of MFD display area (pixel)
-	DWORD cw, ch; //!< character width, height of standard MFD font 0 (pixel)
+	oapi::UInt32 W, H;   //!< width and height of MFD display area (pixel)
+	oapi::UInt32 cw, ch; //!< character width, height of standard MFD font 0 (pixel)
 	VESSEL *pV;   //!< pointer to vessel interface
 
 private:
@@ -293,7 +303,7 @@ public:
  	 *	module should respond by creating the MFD mode and returning a pointer to
 	 *	it. Orbiter will automatically destroy the MFD mode when it is turned off.
 	 */
-	MFD2 (DWORD w, DWORD h, VESSEL *vessel): MFD (w, h, vessel) {}
+	MFD2 (oapi::UInt32 w, oapi::UInt32 h, VESSEL *vessel): MFD (w, h, vessel) {}
 
 	/**
 	 * \brief MFD destructor.
@@ -305,20 +315,20 @@ public:
 	 * \return MFD display width [pixel]
 	 * \sa GetHeight
 	 */
-	inline DWORD GetWidth() const { return W; }
+	inline oapi::UInt32 GetWidth() const { return W; }
 
 	/**
 	 * \brief Returns the MFD display height.
 	 * \return MFD display height [pixel]
 	 * \sa GetWidth
 	 */
-	inline DWORD GetHeight() const { return H; }
+	inline oapi::UInt32 GetHeight() const { return H; }
 
 	/**
 	 * \brief Dummy implementation of GDI-specific base class method.
 	 * \note Derived classes should overload the \ref Update(oapi::Sketchpad*) method instead.
 	 */
-	void Update (HDC hDC) {}
+	void Update (oapi::SdkDrawContext hDC) {}
 
 	/**
 	 * \brief Callback function: Orbiter calls this method when the MFD needs to update its display.
@@ -365,7 +375,7 @@ public:
 	 *   of drawing resources.
 	 * \sa oapi::Sketchpad::SetPen
 	 */
-	oapi::Pen *GetDefaultPen (DWORD colidx, DWORD intens=0, DWORD style=1) const;
+	oapi::Pen *GetDefaultPen (oapi::UInt32 colidx, oapi::UInt32 intens=0, oapi::UInt32 style=1) const;
 
 	/**
 	 * \brief Returns a predefined MFD font resource.
@@ -382,7 +392,7 @@ public:
 	 *   provide a consistent MFD look.
 	 * \note Default fonts are scaled automatically according to the MFD display size.
 	 */
-	oapi::Font *GetDefaultFont (DWORD fontidx) const;
+	oapi::Font *GetDefaultFont (oapi::UInt32 fontidx) const;
 
 	/**
 	 * \brief Returns the colour value for a specified colour index and intensity.
@@ -402,7 +412,7 @@ public:
 	 *   pen or brush colours for particular display elements.
 	 * \sa oapi::Sketchpad::SetTextColor
 	 */
-	DWORD GetDefaultColour (DWORD colidx, DWORD intens=0) const;
+	oapi::UInt32 GetDefaultColour (oapi::UInt32 colidx, oapi::UInt32 intens=0) const;
 };
 
 
@@ -416,6 +426,7 @@ public:
  * This class is derived from MFD and provides a template for MFD modes containing 2D
  * graphs. An example is the ascent profile recorder in the samples\\CustomMFD folder.
  */
+#ifdef _WIN32
 class OAPIFUNC GraphMFD: public MFD {
 public:
 	/**
@@ -424,7 +435,7 @@ public:
 	 * \param h height of the MFD display (pixel)
 	 * \param vessel pointer to VESSEL interface associated with the MFD
 	 */
-	GraphMFD (DWORD w, DWORD h, VESSEL *vessel);
+	GraphMFD (oapi::UInt32 w, oapi::UInt32 h, VESSEL *vessel);
 
 	virtual ~GraphMFD ();
 
@@ -505,7 +516,7 @@ public:
 	 * \note This function should be called from Update to paint the graph(s) into the
 	 *   provided device context.
 	 */
-	void Plot (HDC hDC, int g, int h0, int h1, const char *title = 0);
+	void Plot (oapi::SdkDrawContext hDC, int g, int h0, int h1, const char *title = 0);
 
 	/**
 	 * \brief Determines the range of an array of data.
@@ -635,7 +646,7 @@ public:
 	bool ProcessButton (int bt, int event);
 
    /*! \b TODO */
-	bool SendKey (DWORD key);
+	bool SendKey (oapi::UInt32 key);
 
    /*! \b TODO */
 	bool Resize (const MFDSPEC &spec);
@@ -673,6 +684,10 @@ public:
 	Instrument *instr; // reserved
 };
 
+#endif // _WIN32
+#ifndef _WIN32
+#undef OAPIFUNC
+#endif
 #endif // !SKIP_MFD_API
 #endif // !__MFDAPI_H
 

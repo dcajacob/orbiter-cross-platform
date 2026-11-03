@@ -3,6 +3,7 @@
 
 #define OAPI_IMPLEMENTATION
 
+#ifdef _WIN32
 #include "Orbiter.h"
 #include "MfdUser.h"
 #include "Config.h"
@@ -30,37 +31,37 @@ extern TimeData td;
 extern char Key2Char[256];
 extern char DBG_MSG[256];
 
+#else
+#include "Production/CockpitNativeSupport.h"
+#include "MfdUser.h"
+using namespace std;
+extern char Key2Char[256];
+#endif
+#include <stdexcept>
+
 // =======================================================================
 // class Instrument_User
 // user-defined MFD mode (implemented in module)
 
-Instrument_User::Instrument_User (Pane *_pane, INT_PTR _id, const Spec &spec, Vessel *_vessel,
+Instrument_User::Instrument_User (Pane *_pane, std::intptr_t _id, const Spec &spec, Vessel *_vessel,
 	int _type, const MFDMODE &mode)
 : Instrument (_pane, _id, spec, _vessel, true)
 {
 	type = _type;
-	msgproc = mode.spec->msgproc;
-	name = mode.spec->name;
-	selkey = Key2Char[mode.spec->key];
-	MFDMODEOPENSPEC ospec = {IW, IH, mode.spec};
-	mfd = (MFD*)msgproc (OAPI_MSG_MFD_OPENEDEX, _id, (WPARAM)&ospec, (LPARAM)vessel->GetModuleInterface());
-	if (!mfd)
-		mfd = (MFD*)msgproc (OAPI_MSG_MFD_OPENED, _id, MAKEWPARAM(IW, IH), (LPARAM)vessel->GetModuleInterface());
+	if (!OpenMode(mode.spec))
+		throw std::runtime_error("MFD mode declined both open messages");
 	try {
-		mfd2 = dynamic_cast<MFD2*>(mfd); // will return 0 if not an MFD2 instance
+		use_skp_interface = (mfd2 != 0);
+		AllocSurface (IW, IH);
+		mfd->RecallStatus();
+	} catch (...) {
+		msgproc(OAPI_MSG_MFD_CLOSED, id, 0, 0);
+		delete mfd;
+		throw;
 	}
-	catch(...) {
-		mfd2 = 0;
-	}
-	mfd->instr = this;
-	mfd->cw = cw;
-	mfd->ch = ch;
-	use_skp_interface = (mfd2 != 0);
-	AllocSurface (IW, IH);
-	mfd->RecallStatus();
 }
 
-Instrument_User::Instrument_User (Pane *_pane, INT_PTR _id, const Spec &spec, Vessel *_vessel)
+Instrument_User::Instrument_User (Pane *_pane, std::intptr_t _id, const Spec &spec, Vessel *_vessel)
 : Instrument (_pane, _id, spec, _vessel, true)
 {
 	type    = MFD_USERTYPE; // generic
@@ -82,14 +83,48 @@ void Instrument_User::UpdateDraw (oapi::Sketchpad *skp)
 	if (mfd2) {
 		mfd2->Update (skp);
 	} else if (mfd) {
-		HDC hDC = skp->GetDC ();
+		oapi::SdkDrawContext hDC = skp->GetDC ();
 		if (hDC) mfd->Update (hDC); // this should directly use skp
 	}
 }
 
-void Instrument_User::UpdateDraw (HDC hDC)
+void Instrument_User::UpdateDraw (oapi::SdkDrawContext hDC)
 {
 	if (hDC && mfd) mfd->Update (hDC);
+}
+
+bool Instrument_User::OpenMode(MFDMODESPECEX *spec)
+{
+	msgproc = spec->msgproc;
+	name = spec->name;
+	selkey = Key2Char[spec->key];
+	MFDMODEOPENSPEC ospec = {IW, IH, spec};
+	mfd = (MFD*)msgproc (OAPI_MSG_MFD_OPENEDEX, id, (oapi::CockpitUnsignedParam)&ospec, (oapi::CockpitSignedParam)vessel->GetModuleInterface());
+	if (!mfd) {
+		const auto dimensions = oapi::CockpitUnsignedParam(oapi::UInt16(IW)) |
+		                        (oapi::CockpitUnsignedParam(oapi::UInt16(IH)) << 16);
+		mfd = (MFD*)msgproc (OAPI_MSG_MFD_OPENED, id, dimensions, (oapi::CockpitSignedParam)vessel->GetModuleInterface());
+	}
+	try {
+		mfd2 = dynamic_cast<MFD2*>(mfd); // will return 0 if not an MFD2 instance
+	}
+	catch(...) {
+		mfd2 = 0;
+	}
+	if (!mfd) { msgproc = nullptr; return false; }
+#ifndef _WIN32
+	if (!mfd2) {
+		msgproc(OAPI_MSG_MFD_CLOSED, id, 0, 0);
+		msgproc = nullptr;
+		delete mfd;
+		mfd = nullptr;
+		throw std::runtime_error("Native custom MFD mode must implement Sketchpad drawing through MFD2");
+	}
+#endif
+	mfd->instr = this;
+	mfd->cw = cw;
+	mfd->ch = ch;
+	return true;
 }
 
 bool Instrument_User::ReadParams (ifstream &ifs)
@@ -98,7 +133,11 @@ bool Instrument_User::ReadParams (ifstream &ifs)
 	MFDMODESPECEX *spec;
 	if (!ifs.getline (cbuf, 256)) return false;
 	pc = trim_string (cbuf);
+#ifdef _WIN32
 	if (_strnicmp (pc, "MODE", 4)) return false;
+#else
+	if (orbiter::production::ComparePrefix(pc, "MODE", 4)) return false;
+#endif
 	modestr = trim_string (pc+4);
 	int tp = ModeFromName (modestr, &spec);
 	if (tp <= BUILTIN_MFD_MODES)
@@ -106,22 +145,7 @@ bool Instrument_User::ReadParams (ifstream &ifs)
 	if (tp <= BUILTIN_MFD_MODES) return false;
 	if (mfd) delete mfd;
 	type = tp;
-	msgproc = spec->msgproc;
-	name = spec->name;
-	selkey = Key2Char[spec->key];
-	MFDMODEOPENSPEC ospec = {IW, IH, spec};
-	mfd = (MFD*)msgproc (OAPI_MSG_MFD_OPENEDEX, id, (WPARAM)&ospec, (LPARAM)vessel->GetModuleInterface());
-	if (!mfd)
-		mfd = (MFD*)msgproc (OAPI_MSG_MFD_OPENED, id, MAKEWPARAM(IW, IH), (LPARAM)vessel->GetModuleInterface());
-	try {
-		mfd2 = dynamic_cast<MFD2*>(mfd); // will return 0 if not an MFD2 instance
-	}
-	catch(...) {
-		mfd2 = 0;
-	}
-	mfd->instr = this;
-	mfd->cw = cw;
-	mfd->ch = ch;
+	if (!OpenMode(spec)) return false;
 	mfd->ReadStatus ((FILEHANDLE)&ifs);
 	use_skp_interface = (mfd2 != 0);
 	AllocSurface (IW, IH);
@@ -146,7 +170,7 @@ void Instrument_User::WriteParams (ostream &ofs) const
 // See MFDAPI.h for interface
 // =======================================================================
 
-MFD::MFD (DWORD w, DWORD h, VESSEL *vessel)
+MFD::MFD (oapi::UInt32 w, oapi::UInt32 h, VESSEL *vessel)
 {
 	instr = 0;
 	W = w, H = h;
@@ -156,7 +180,7 @@ MFD::MFD (DWORD w, DWORD h, VESSEL *vessel)
 MFD::~MFD ()
 {}
 
-void MFD::Title (HDC hDC, const char *title) const
+void MFD::Title (oapi::SdkDrawContext hDC, const char *title) const
 {
 	// GDI legacy code
 	instr->DisplayTitle (hDC, title);
@@ -172,13 +196,16 @@ void MFD::InvalidateButtons ()
 	instr->RepaintButtons ();
 }
 
-HPEN MFD::SelectDefaultPen (HDC hDC, DWORD i) const
+#ifdef _WIN32
+HPEN MFD::SelectDefaultPen (oapi::SdkDrawContext hDC, oapi::UInt32 i) const
 {
 	// GDI legacy code
 	return instr->SelectDefaultPen (hDC, i);
 }
 
-HFONT MFD::SelectDefaultFont (HDC hDC, DWORD i) const
+#endif
+
+oapi::SdkFont MFD::SelectDefaultFont (oapi::SdkDrawContext hDC, oapi::UInt32 i) const
 {
 	// GDI legacy code
 	return instr->SelectDefaultFont (hDC, i);
@@ -201,17 +228,17 @@ void MFD2::Title (oapi::Sketchpad *skp, const char *title) const
 	instr->DisplayTitle (skp, title);
 }
 
-oapi::Pen *MFD2::GetDefaultPen (DWORD colidx, DWORD intens, DWORD style) const
+oapi::Pen *MFD2::GetDefaultPen (oapi::UInt32 colidx, oapi::UInt32 intens, oapi::UInt32 style) const
 {
 	return instr->GetDefaultPen (colidx, intens, style);
 }
 
-oapi::Font *MFD2::GetDefaultFont (DWORD fontidx) const
+oapi::Font *MFD2::GetDefaultFont (oapi::UInt32 fontidx) const
 {
 	return instr->GetDefaultFont (fontidx);
 }
 
-DWORD MFD2::GetDefaultColour (DWORD colidx, DWORD intens) const
+oapi::UInt32 MFD2::GetDefaultColour (oapi::UInt32 colidx, oapi::UInt32 intens) const
 {
 	return instr->GetDefaultColour (colidx, intens);
 }
@@ -223,7 +250,8 @@ DWORD MFD2::GetDefaultColour (DWORD colidx, DWORD intens) const
 // See orbitersdk.h for interface
 // =======================================================================
 
-GraphMFD::GraphMFD (DWORD w, DWORD h, VESSEL *vessel)
+#ifdef _WIN32
+GraphMFD::GraphMFD (oapi::UInt32 w, oapi::UInt32 h, VESSEL *vessel)
 : MFD (w, h, vessel)
 {
 	ngraph  = 0;
@@ -357,7 +385,7 @@ void GraphMFD::SetAxisTitle (int g, int axis, char *title)
 		strncpy (graph[g].absc_title, title, 63);
 }
 
-void GraphMFD::Plot (HDC hDC, int g, int h0, int h1, const char *title)
+void GraphMFD::Plot (oapi::SdkDrawContext hDC, int g, int h0, int h1, const char *title)
 {
 	GRAPH &gf = graph[g];
 	char cbuf[64];
@@ -517,4 +545,4 @@ void GraphMFD::FindRange (float *d, int ndata, float &dmin, float &dmax) const
 		else if (d[i] > dmax) dmax = d[i];
 	}
 }
-
+#endif

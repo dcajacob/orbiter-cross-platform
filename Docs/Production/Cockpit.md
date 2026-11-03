@@ -504,3 +504,14 @@ popup states. Popup crop SSIM was 0.99555, 0.99556 and 0.99551 respectively.
 Full-frame SSIM against the timed originals was at least 0.99994, with zero
 projected geometry error. The comparison includes the caret. Hosted native
 Debug/Release and both math configurations are separate acceptance checks.
+
+The native cockpit also runs the original `Instrument_User` and `MFD2`
+Sketchpad path needed by Lua vessel modes. A local integration probe registered
+a mode, received the extended-open notification and the packed-dimension
+fallback, restored its default status, and consumed a public SDK button event
+and buffered key. It drew its title and text 30 times through Sketchpad. The
+captured 346 by 346 left display contained 1,518 colored pixels at frame 20.
+The saved scenario contained the mode's custom status line. Shutdown called
+store, close and destruction in order. The original Windows SDK declarations
+and virtual method order are checked against f7251942. The native Lua vessel
+bindings and full stock vessel runs are still separate gates.

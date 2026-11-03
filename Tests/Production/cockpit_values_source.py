@@ -56,6 +56,13 @@ def restore_api(actual):
     binary=isinstance(actual,bytes);text=actual.decode('cp1252') if binary else actual;text=text.replace('\r\n','\n')
     if '#include "OrbiterCockpitData.h"' not in text:return actual
     verify_values();source=original()
+    if '#include "OrbiterMfdMessages.h"' in text:
+        start=source.index('// Custom MFD message identifiers')
+        messages=source[start:source.index('\n\n',start)]
+        header=(ROOT/'Orbitersdk/include/OrbiterMfdMessages.h').read_text()
+        if header.split('#define ORBITER_MFD_MESSAGES_H\n',1)[1].split('\n#endif',1)[0]!=messages:
+            raise ValueError('Original MFD message identities changed')
+        text=text.replace('#include "OrbiterMfdMessages.h"',messages)
     for a,b,replacement in sorted(ranges(source),reverse=True):
         following=source[b:b+512];needle=replacement+following
         if text.count(needle)!=1:raise ValueError('Cockpit SDK extraction anchor differs')
@@ -66,5 +73,11 @@ def restore_api(actual):
 
 def verify():
     restore_api((ROOT/'Orbitersdk/include/OrbiterAPI.h').read_bytes())
+    name='Orbitersdk/include/MFDAPI.h'
+    sdk=windows((ROOT/name).read_text()).replace('class Instrument_User;','',1)
+    for portable,original_type in [('oapi::UInt32','DWORD'),('oapi::SdkFont','HFONT'),('oapi::SdkDrawContext','HDC')]:
+        sdk=sdk.replace(portable,original_type)
+    equal(subprocess.check_output(['git','-C',str(ROOT),'show',BASE+':'+name]).decode('cp1252'),sdk,'Original Windows MFD and MFD2 SDK interfaces')
+
     print('Original Windows cockpit SDK records, message types, packing and mode constants conserved')
 if __name__=='__main__':verify()

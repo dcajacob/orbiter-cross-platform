@@ -144,7 +144,7 @@ jobs:
           python3 -B Tests/Production/DeltaGlider/mesh_resources.py --headers out/native-cockpit-engine/native-dg-include --output out/dg-mesh-resources.json
       - name: Stage the original manuscript font for disposable cockpit tests
         run: python3 -B Tests/Production/CockpitUI/prepare_fonts.py --assets out/scene-resources
-      - name: Exercise stock VC mesh edits, instance isolation and slot reuse on a live visual
+      - name: Exercise stock VC mesh edits and registered MFD2 drawing, input and lifetime
         run: >-
           xvfb-run -a -s '-screen 0 1920x1080x24' env LIBGL_ALWAYS_SOFTWARE=1 GALLIUM_DRIVER=llvmpipe
           python3 -B Tests/Production/DeltaGlider/visual_mesh.py --build out/native-cockpit-engine
@@ -191,6 +191,10 @@ jobs:
             out/renderer-probe/report.json
             out/native-dg-visual/*.json
             out/native-dg-visual/console.txt
+            out/native-dg-visual/custom-mfd-events.txt
+            out/native-dg-visual/saved.scn
+            out/native-dg-visual/instrument-text.csv
+            out/native-dg-visual/mfd-0-20.rgba
             out/native-engine/CMakeCache.txt
             out/native-renderer/CMakeCache.txt
             out/native-engine/native-sdk/OrbiterNativeBuild.h

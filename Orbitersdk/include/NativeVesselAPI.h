@@ -44,6 +44,22 @@ OAPIFUNC VESSEL* oapiGetFocusInterface();
 OAPIFUNC OBJHANDLE oapiGetVesselByName(char*);
 OAPIFUNC OBJHANDLE oapiGetVesselByIndex(int);
 OAPIFUNC oapi::UInt32 oapiGetVesselCount();
+OAPIFUNC void oapiOpenMFD (int mode, int mfd);
+OAPIFUNC void oapiToggleMFD_on (int mfd);
+OAPIFUNC int oapiRegisterMFDMode (MFDMODESPECEX &spec);
+OAPIFUNC bool oapiUnregisterMFDMode (int mode);
+OAPIFUNC int oapiGetMFDMode (int mfd);
+OAPIFUNC double oapiSetMFDRefreshIntervalMultiplier (int mfd, double multiplier=1.0);
+OAPIFUNC int oapiBroadcastMFDMessage (int mfdmode, int msg, void *data);
+OAPIFUNC int oapiSendMFDKey (int mfd, oapi::UInt32 key);
+OAPIFUNC void oapiRefreshMFDButtons (int mfd, OBJHANDLE hVessel);
+OAPIFUNC bool oapiProcessMFDButton (int mfd, int bt, int event);
+OAPIFUNC const char *oapiMFDButtonLabel (int mfd, int bt);
+OAPIFUNC void oapiRegisterMFD (int mfd, const MFDSPEC &spec);
+OAPIFUNC void oapiDisableMFDMode (int mode);
+OAPIFUNC int oapiGetMFDModeSpecEx (char *name, MFDMODESPECEX **spec=nullptr);
+OAPIFUNC void oapiVCRegisterMFD (int mfd, const VCMFDSPEC *spec);
+OAPIFUNC void oapiVCRegisterHUD (const VCHUDSPEC *spec);
 OAPIFUNC void oapiWriteScenario_string(FILEHANDLE,char*,char*);
 #ifdef ORBITER_NATIVE_OWNS_OAPIFUNC
 #undef OAPIFUNC
