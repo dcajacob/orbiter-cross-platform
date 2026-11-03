@@ -134,7 +134,7 @@ target_include_directories(orbiter_production_vessels PRIVATE ${_archive_zlib_in
 add_library(native_lua_interpreter SHARED
     $<TARGET_OBJECTS:native_lua_interpreter_core> $<TARGET_OBJECTS:native_lua_vessel_bindings>
     ../../Module/LuaScript/LuaInterpreter/InterpreterExecution.cpp)
-target_link_libraries(native_lua_interpreter PRIVATE native_lua_script_files lua orbiter_production_vessels)
+target_link_libraries(native_lua_interpreter PRIVATE native_lua_script_files native_lua_exit lua orbiter_production_vessels)
 target_link_options(native_lua_interpreter PRIVATE -Wl,--no-undefined)
 set_target_properties(native_lua_interpreter PROPERTIES PREFIX "" OUTPUT_NAME LuaInterpreter
     LIBRARY_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/NativeModules/Plugin")

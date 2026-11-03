@@ -6,11 +6,24 @@
 #include "Interpreter.h"
 #ifndef _WIN32
 #include "../Native/ScriptFiles.h"
+#include "../Native/ScriptExit.h"
 #include "Production/NativeGraphics.h"
 #include "Production/NativeInterpreterSdk.h"
 #include "Production/FlightKeys.h"
 #include "Production/Text.h"
 #include <stdexcept>
+#endif
+
+#ifndef _WIN32
+// A native exit crosses to C++ only after the outer protected Lua call has
+// returned. Nested callbacks propagate cancellation through their caller's VM.
+struct NativeLuaCall {
+	lua_State *state;
+	NativeLuaCall *previous;
+};
+static thread_local NativeLuaCall *nativeLuaCall = nullptr;
+static thread_local bool nativeExitPending = false;
+static thread_local int nativeExitCode = 0;
 #endif
 #include "VesselAPI.h"
 #include "MFDAPI.h"
@@ -114,8 +127,24 @@ int Interpreter::LuaCall(lua_State *L, int narg, int nres)
 	int base = lua_gettop(L) - narg;
 	lua_pushcfunction(L, traceback);
 	lua_insert(L, base);
+#ifndef _WIN32
+	NativeLuaCall call{L, nativeLuaCall};
+	nativeLuaCall = &call;
+#endif
 	int res = lua_pcall(L, narg, nres, base);
 	lua_remove(L, base);
+#ifndef _WIN32
+	nativeLuaCall = call.previous;
+	if (nativeExitPending) {
+		orbiter_native_lua_cancel(L, 0);
+		if (nativeLuaCall) {
+			orbiter_native_lua_cancel(nativeLuaCall->state, 1);
+			return res;
+		}
+		nativeExitPending = false;
+		throw orbiter::production::ScriptProcessExit{nativeExitCode};
+	}
+#endif
 	if(res != 0) {
 		const char *msg = lua_tostring(L, -1);
 		// Lua "threads" that are terminated when the scenario ends generate "Lua thread terminated" errors
@@ -3880,8 +3909,16 @@ Do not use it in published modules!
 int Interpreter::oapiExit(lua_State* L)
 {
 	auto code = lua_tointeger(L, 1);
+#ifdef _WIN32
 	exit(code);
 	return 0; // compiler warnings
+#else
+	if (!nativeExitPending) nativeExitCode = static_cast<int>(code);
+	nativeExitPending = true;
+	GetInterpreter(L)->Terminate();
+	orbiter_native_lua_cancel(L, 1);
+	return luaL_error(L, "Lua thread terminated by oapi.exit");
+#endif
 }
 
 static bool bInputClosed;

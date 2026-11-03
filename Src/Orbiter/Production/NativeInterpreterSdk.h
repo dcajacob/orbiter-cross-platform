@@ -5,6 +5,7 @@
 #include "NativeVesselAPI.h"
 #include <vector>
 #include <filesystem>
+#include <exception>
 typedef enum { FILE_IN, FILE_OUT, FILE_APP, FILE_IN_ZEROONFAIL } FileAccessMode;
 typedef enum { ROOT, CONFIG, SCENARIOS, TEXTURES, TEXTURES2, MESHES, MODULES } PathRoot;
 #define USRINPUT_NEEDANSWER 1
@@ -56,6 +57,15 @@ ORBITER_PRODUCTION_API void oapiAnnotationSetText (NOTEHANDLE hNote, char *note)
 ORBITER_PRODUCTION_API bool       oapiAcceptDelayedKey (char key, double interval);
 ORBITER_PRODUCTION_API int oapiEditMeshGroup(MESHHANDLE mesh, oapi::UInt32 idx, GROUPEDITSPEC *edit);
 namespace orbiter::production {
+// Internal native control flow, transported from a Lua worker by its existing
+// exception handoff. The application catches it after Runtime has torn down.
+class ORBITER_PRODUCTION_API ScriptProcessExit final : public std::exception {
+public:
+    explicit ScriptProcessExit(int code) noexcept : code(code) {}
+    ~ScriptProcessExit() override;
+    const char *what() const noexcept override;
+    int code;
+};
 class ScriptApplication {
 public:
     virtual ~ScriptApplication() = default;

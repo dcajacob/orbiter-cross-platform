@@ -1276,5 +1276,9 @@ int main(int argc,char** argv) {
             if(reload) {startRunning=application.running;--session;continue;}
         }
         return 0;
-    } catch(const std::exception& error) {std::cerr<<"Orbiter native production: "<<error.what()<<'\n';return 1;}
+    }
+#ifdef ORBITER_NATIVE_COCKPIT
+    catch(const ScriptProcessExit& exit) {return exit.code;}
+#endif
+    catch(const std::exception& error) {std::cerr<<"Orbiter native production: "<<error.what()<<'\n';return 1;}
 }

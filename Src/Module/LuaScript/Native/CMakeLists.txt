@@ -60,6 +60,12 @@ set_target_properties(native_doc_lfs PROPERTIES PREFIX "" OUTPUT_NAME lfs
     LIBRARY_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/doc-tools")
 
 find_package(Threads REQUIRED)
+add_library(native_lua_exit STATIC ScriptExit.c)
+target_include_directories(native_lua_exit PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}"
+    PRIVATE "${original_lua_source_SOURCE_DIR}")
+target_link_libraries(native_lua_exit PUBLIC lua)
+set_target_properties(native_lua_exit PROPERTIES POSITION_INDEPENDENT_CODE ON)
+
 add_library(native_lua_inline_worker OBJECT
     ../LuaInterpreter/InterpreterExecution.cpp ../LuaInline/InlineEnvironment.cpp)
 target_compile_features(native_lua_inline_worker PRIVATE cxx_std_17)
@@ -90,6 +96,10 @@ set_target_properties(native_dg_lua_bindings PROPERTIES POSITION_INDEPENDENT_COD
 
 include(CTest)
 if(BUILD_TESTING)
+    add_executable(lua_script_exit_check "${ORBITER_SOURCE_ROOT}/Tests/Production/NativeLua/ScriptExit.Test.c")
+    target_link_libraries(lua_script_exit_check PRIVATE native_lua_exit)
+    add_test(NAME native_lua_process_exit_cancellation COMMAND lua_script_exit_check)
+    set_tests_properties(native_lua_process_exit_cancellation PROPERTIES TIMEOUT 30)
     add_test(NAME native_lua_upvalue_lifetime COMMAND lua-exe
         "${ORBITER_SOURCE_ROOT}/Tests/Production/NativeLua/Upvalues.Test.lua")
     find_package(Python3 REQUIRED COMPONENTS Interpreter)

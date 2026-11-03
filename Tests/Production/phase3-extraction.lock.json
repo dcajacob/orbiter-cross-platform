@@ -582,7 +582,7 @@
     },
     "Src/Orbiter/Production/CMakeLists.txt": {
       "original_sha256_lf": null,
-      "sha256_lf": "a9dc6375cb470b7b84963d041c9035d9ee39ddf41b4113cd80c32e388e76c3f3",
+      "sha256_lf": "73d8aed1af87f4858349718abf628f366729164cc2f7df540964ac4d2efbafc7",
       "scope": "Original ten stock MFD declarations use exact platform SDK aliases; shared original conic geometry is moved without calculation or screen-mapping changes. Full native instrument runtime remains incomplete."
     },
     "Src/Orbiter/Production/CameraServices.cpp": {
@@ -742,7 +742,7 @@
     },
     "Src/Orbiter/Production/NativeApplication.cpp": {
       "original_sha256_lf": null,
-      "sha256_lf": "7838dcbd4993e03d3b8f90f9c0b4ceae8cf6bd6590fa1950022adc54b2342b9b"
+      "sha256_lf": "47ee4ad3bb8af3320b6ad1a25bfc1789ad3aff177e3c6ef352bc9be20f3632b1"
     },
     "Src/Orbiter/Production/NativeBuild.h.in": {
       "sha256_lf": "f5fb21f83bb6be0c54839fce670e8410f6911eda86da2eef26e4221c1ae25d97",
@@ -1305,7 +1305,7 @@
     },
     "Src/Orbiter/Production/NativeCockpit.cmake": {
       "original_sha256_lf": null,
-      "sha256_lf": "54b3f967caeb4cc4a5ed0ca1b5beb2359ec0a51498aa1154654df50440e3d128"
+      "sha256_lf": "22bae802d1f1bd9ec538f28f4fcf0f43a4137ca739d3bb4491103ecf503c249e"
     },
     "Src/Orbiter/Production/NativeCockpitGui.cpp": {
       "original_sha256_lf": null,
@@ -1341,7 +1341,7 @@
     },
     "Src/Module/LuaScript/Native/CMakeLists.txt": {
       "original_sha256_lf": null,
-      "sha256_lf": "5c2a89da05720ce3eadc0a2f657e485427c7bbf7518df175eb8d4c29fb7e5d9d"
+      "sha256_lf": "909a86dbd7dde086588a60ed8224960108881db6d02387def5e66c8b874a0bcf"
     },
     "Src/Vessel/Common/Instrument.cpp": {
       "original_sha256_lf": "a358cf68cc90de24b398d431ef38f559c91c12ca6d577cc9dd1e2954b37bd869",
@@ -1429,7 +1429,7 @@
     },
     "Src/Module/LuaScript/LuaInterpreter/Interpreter.cpp": {
       "original_sha256_lf": "5feef015089ca4cb3abc2d7197877352e64ade7ca3c98e5c066cd5a252fd74ee",
-      "sha256_lf": "0047a391332f904800552f39be49026f89def7275d08afd67fbcc018f2d6e0f3"
+      "sha256_lf": "bfd04ba44b719fc370600a79c6b132493f78d246633d6a9a49ae96fe4c2ac899"
     },
     "Src/Module/LuaScript/LuaInterpreter/Interpreter.h": {
       "original_sha256_lf": "0fb3247edcc0c088756b20e4e77fca5086b122720e70251c32efbf83f8ab07b0",
@@ -1653,11 +1653,11 @@
     },
     "Src/Orbiter/Production/NativeInterpreterSdk.cpp": {
       "original_sha256_lf": null,
-      "sha256_lf": "7add956c7e1f56d260833130756e310c92f8ce6bc7b1c5e54c087dc8999e89da"
+      "sha256_lf": "44800650a8ec45cc24958a7654c2853b681b76f506bef278e52ba540a650c3ab"
     },
     "Src/Orbiter/Production/NativeInterpreterSdk.h": {
       "original_sha256_lf": null,
-      "sha256_lf": "06e867a6c0d2079fb82b75ac73807977874aab70b648766123433008809b6034"
+      "sha256_lf": "15ecd51771c9515329f4b8aee426e0b3c76858db74044ffc12ddffd1c02bf7da"
     },
     "Src/Orbiter/Production/ScreenAnnotationMethods.inc": {
       "original_sha256_lf": null,
@@ -1973,6 +1973,14 @@
     "Src/Vessel/ShuttleA/switches.h": {
       "original_sha256_lf": "e8f1e7d9a5f55b065bb691df9dd063fef897a1a9cddf2ce9b7f3f79f46920a61",
       "sha256_lf": "28d7680ff429220a06e366325154754d9a72ce4f89a49f7b46ba34ae34a29d8a"
+    },
+    "Src/Module/LuaScript/Native/ScriptExit.c": {
+      "original_sha256_lf": null,
+      "sha256_lf": "36d16b74991d9092e0270503af6ee167b7d0d64d1454bd3dc6c20be6482d515b"
+    },
+    "Src/Module/LuaScript/Native/ScriptExit.h": {
+      "original_sha256_lf": null,
+      "sha256_lf": "bf00a8c47b47fb42e279de508d514dbdedbdb7d4f97f01c9c83fa81e140fb2ad"
     }
   }
 }

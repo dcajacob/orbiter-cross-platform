@@ -22,6 +22,11 @@
 #include <zlib.h>
 
 using namespace orbiter::production;
+// Anchor the exception's type and destructor in the engine library, which
+// remains loaded while the Lua modules unload during application teardown.
+ScriptProcessExit::~ScriptProcessExit() = default;
+const char *ScriptProcessExit::what() const noexcept { return "Lua requested process exit"; }
+
 namespace {
 NativeRenderContext& context() { return GetNativeRenderContext(); }
 ScriptApplication& application()
