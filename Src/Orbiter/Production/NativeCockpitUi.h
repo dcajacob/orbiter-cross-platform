@@ -2,6 +2,9 @@
 #pragma once
 #include "Export.h"
 namespace orbiter::production {
+void CreateCockpitInfoBars();
+void DestroyCockpitInfoBars();
+ORBITER_PRODUCTION_API void OpenCockpitFocusDialog();
 ORBITER_PRODUCTION_API void CreateCockpitGui();
 ORBITER_PRODUCTION_API void SetCockpitReplayClock(float seconds);
 ORBITER_PRODUCTION_API void DestroyCockpitGui();

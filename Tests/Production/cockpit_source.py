@@ -31,7 +31,39 @@ def restore_geometry(name,current,original):
         current=current.replace('#endif // !__MFD_H',declarations+'#endif // !__MFD_H',1)
     return current
 
+def verify_focus_bars():
+    def original(file):
+        return subprocess.check_output(['git','-C',str(ROOT),'show',BASE+':Src/Orbiter/'+file]).decode('utf-8')
+    def current(file):
+        return (ROOT/'Src/Orbiter'/file).read_text()
+    # Compare the actual original dialog/widget code after resolving the owning
+    # application's read-only state and its real focus setter.
+    old=original('MenuInfoBar.cpp')
+    new=windows(current('MenuInfoBar.cpp'))
+    def bars(s):
+        return s[s.index('const ImGuiWindowFlags INFOFLAGS'):s.index('MenuInfoBar::MenuInfoBar')]
+    new=bars(new)
+    for adapter,expression in [('InfoClock()','td'),('InfoConfig()','g_pOrbiter->Cfg()->CfgUIPrm'),
+            ('InfoCamera()','g_camera'),('InfoRecording()','g_pOrbiter->RecorderStatus() == 1'),
+            ('InfoPlayback()','g_pOrbiter->IsPlayback()'),('InfoRunning()','g_pOrbiter->IsRunning()')]:
+        new=new.replace(adapter,expression)
+    equal(bars(old),new,'Original time, target, FPS, animation and menu rendering')
+    old=original('DlgFocus.cpp')
+    new=windows(current('DlgFocus.cpp'))
+    for adapter,expression in [('FocusWorld()','g_psys'),('FocusCamera()','g_camera'),
+            ('SelectFocus (','g_pOrbiter->SetFocusObject ('),('PriorFocus()','g_pfocusobj'),
+            ('snprintf(cbuf,sizeof(cbuf),','sprintf(cbuf,')]:
+        new=new.replace(adapter,expression)
+    equal(old[old.index('DlgFocus::DlgFocus()'):],new[new.index('DlgFocus::DlgFocus()'):],
+          'Original four spacecraft selection tabs and focus actions')
+    button=current('Production/GuiMenuButton.inc').replace('ORBITER_MENU_EXPORT','DLLEXPORT')
+    old=original('DlgMgr.cpp')
+    equal(old[old.index('DLLEXPORT bool MenuButton'):old.index('DLLEXPORT ImTextureID GetImTextureID')],
+          button,'Original title bar button placement and input')
+    print('Verified original info bars, spacecraft selector and title bar button')
+
 def verify():
+    verify_focus_bars()
     original_dialogs = subprocess.check_output(['git','-C',str(ROOT),'show',BASE+':Src/Orbiter/DlgMgr.cpp']).decode().replace('\r\n','\n')
     style = original_dialogs[original_dialogs.index('static void ApplyGlowTheme'):original_dialogs.index('void DialogManager::InitImGui()')]
     native_dialogs = raw('Src/Orbiter/Production/NativeCockpitGui.cpp')

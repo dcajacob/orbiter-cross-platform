@@ -25,8 +25,10 @@ in latitude and horizon airspeed at tick 34. The exact cross-build reference
 gate remains open.
 
 The local frozen instrument and RCS-switch comparisons passed for both gliders
-in both cockpit modes. Native visible menu and info bars, broader focus
-behavior, hosted platform qualification and full Phase 6 acceptance remain open.
+in both cockpit modes. An F3 dialog run switched from DG to DG-S and back
+through the original Select and Previous controls. The stock time and target
+bars render in visible and auto-hide modes. The native main menu, hosted
+platform qualification and full Phase 6 acceptance remain open.
 A separate stock GeneralApiTest run reached its Earth obliquity assertion, where
 the script expects a different value from the staged SPICE Earth configuration.
 Sanitizer flights now finish without the previous aircraft initialization,

@@ -4,8 +4,20 @@ Phase 6 is in progress. The accepted Phase 5 laptop preview runs the production
 ShuttlePB/ISS external view. In the separate Phase 6 candidate, both stock
 Delta-gliders fly with the original Lua autopilot in the 2D panel and virtual
 cockpit. Local instrument rendering and real RCS-switch clicks pass the frozen
-Windows comparisons for both gliders. The visible menu, broader focus behavior,
-original Windows cross-build control parity and hosted validation are still open.
+Windows comparisons for both gliders. All nine frozen instrument cases and five
+RCS-click cases passed locally in Debug.
+
+The cockpit now draws the original target, time and frame-rate displays and
+opens the original spacecraft selection dialog on F3. A two-vessel run used
+the dialog to select DG-S and then return to DG. Both the control focus and the
+internal camera followed each selection. With info bars visible, the target
+name, camera mode, field of view, MJD and simulation time appeared in the upper
+corners. The auto-hide capture matched the visible frame with the pointer over
+the bars and the hidden frame after it moved away. Native rendering checks,
+a preserved-Windows diagnostic and optional exact state/image comparison live
+in `Tests/Production/CockpitUI/focus_bars.py`. Windows comparison of this
+addition, the main menu and the original Windows cross-build control gate
+remain open.
 [Delta-glider flight evidence](DeltaGlider.md)
 
 The pre-extraction reference gate is accepted in

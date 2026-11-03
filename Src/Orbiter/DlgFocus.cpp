@@ -7,17 +7,35 @@
 
 #include "DlgFocus.h"
 #include "Psys.h"
+#ifdef _WIN32
 #include "OrbiterAPI.h"
 #include "Orbiter.h"
+#else
+#include "Vessel.h"
+#include "Production/NativeGraphics.h"
+#include "Production/VesselLifetime.h"
+#endif
 #include "Camera.h"
 #include "imgui.h"
 #include <map>
 #include "IconsFontAwesome6.h"
 
+#ifdef _WIN32
 extern Camera *g_camera;
 extern PlanetarySystem *g_psys;
 extern Orbiter *g_pOrbiter;
-extern Vessel *g_focusobj, *g_pfocusobj;
+extern Vessel *g_pfocusobj;
+static PlanetarySystem* FocusWorld() { return g_psys; }
+static Camera* FocusCamera() { return g_camera; }
+static Vessel* PriorFocus() { return g_pfocusobj; }
+static void SelectFocus(Vessel* vessel) { g_pOrbiter->SetFocusObject(vessel); }
+#else
+using orbiter::production::GetNativeRenderContext;
+static PlanetarySystem* FocusWorld() { return GetNativeRenderContext().world; }
+static Camera* FocusCamera() { return GetNativeRenderContext().camera; }
+static Vessel* PriorFocus() { return GetNativeRenderContext().lifetime->PreviousFocus(); }
+static void SelectFocus(Vessel* vessel) { oapiSetFocusObject(vessel); }
+#endif
 
 DlgFocus::DlgFocus() : ImGuiDialog(ICON_FA_ROCKET " Orbiter: Select spacecraft", {300, 320}) {
 	SetHelp("html/orbiter.chm", "/selvessel.htm");
@@ -50,8 +68,8 @@ void DlgFocus::DrawAll() {
     ImGui::BeginChild("ChildL", ImVec2(150, 0), 0, window_flags);
     ImGui::SeparatorText("Available targets");
 	ImGui::BeginChild("ChildL_inner");
-    for (int i = 0; i < g_psys->nVessel(); i++) {
-        Vessel *vessel = g_psys->GetVessel(i);
+    for (int i = 0; i < FocusWorld()->nVessel(); i++) {
+        Vessel *vessel = FocusWorld()->GetVessel(i);
         if (vessel->GetEnableFocus()) {
             std::string name = vessel->Name();
             const bool is_selected = m_SelectedShip == name;
@@ -72,15 +90,15 @@ void DlgFocus::DrawAll() {
     ImGui::TextUnformatted(m_SelectedShip.c_str());
     ImVec2 button_sz(ImVec2(ImGui::GetContentRegionAvail().x, 20));
     if(ImGui::Button("Select", button_sz)) {
-        Vessel *vessel = g_psys->GetVessel (m_SelectedShip.c_str(), true);
+        Vessel *vessel = FocusWorld()->GetVessel (m_SelectedShip.c_str(), true);
         if (vessel) {
-            g_pOrbiter->SetFocusObject (vessel);
+            SelectFocus (vessel);
         }
     }
     if(ImGui::Button("Previous", button_sz)) {
-        if (g_pfocusobj) {
-            g_pOrbiter->SetFocusObject (g_pfocusobj);
-			m_SelectedShip = g_pfocusobj->Name();
+        if (PriorFocus()) {
+            SelectFocus (PriorFocus());
+			m_SelectedShip = PriorFocus()->Name();
         }
     }
     ImGui::EndChild();
@@ -91,9 +109,9 @@ void DlgFocus::DrawNearby() {
     ImGui::SeparatorText("Available targets");
 	ImGui::BeginChild("ChildL_inner");
 
-    const Vector &campos = g_camera->GPos();
-    for (int i = 0; i < g_psys->nVessel(); i++) {
-        Vessel *vessel = g_psys->GetVessel(i);
+    const Vector &campos = FocusCamera()->GPos();
+    for (int i = 0; i < FocusWorld()->nVessel(); i++) {
+        Vessel *vessel = FocusWorld()->GetVessel(i);
         if (vessel->GetEnableFocus()) {
             double dst = campos.dist (vessel->GPos());
 			if (dst <= m_Range * 1000.0f) {
@@ -102,7 +120,7 @@ void DlgFocus::DrawNearby() {
                 ImGuiTreeNodeFlags node_flags = ImGuiTreeNodeFlags_Leaf | ImGuiTreeNodeFlags_NoTreePushOnOpen;
                 if(is_selected) node_flags |= ImGuiTreeNodeFlags_Selected;
                 char cbuf[128];
-                sprintf(cbuf,"%s (%.1fkm)", vessel->Name(), dst/1000.0f);
+                snprintf(cbuf,sizeof(cbuf),"%s (%.1fkm)", vessel->Name(), dst/1000.0f);
                 ImGui::TreeNodeEx(cbuf, node_flags);
                 if (ImGui::IsItemClicked() && !ImGui::IsItemToggledOpen()) {
                     m_SelectedShip = vessel->Name();
@@ -119,15 +137,15 @@ void DlgFocus::DrawNearby() {
     ImGui::TextUnformatted(m_SelectedShip.c_str());
     ImVec2 button_sz(ImVec2(ImGui::GetContentRegionAvail().x, 20));
     if(ImGui::Button("Select", button_sz)) {
-        Vessel *vessel = g_psys->GetVessel (m_SelectedShip.c_str(), true);
+        Vessel *vessel = FocusWorld()->GetVessel (m_SelectedShip.c_str(), true);
         if (vessel) {
-            g_pOrbiter->SetFocusObject (vessel);
+            SelectFocus (vessel);
         }
     }
     if(ImGui::Button("Previous", button_sz)) {
-        if (g_pfocusobj) {
-            g_pOrbiter->SetFocusObject (g_pfocusobj);
-			m_SelectedShip = g_pfocusobj->Name();
+        if (PriorFocus()) {
+            SelectFocus (PriorFocus());
+			m_SelectedShip = PriorFocus()->Name();
         }
     }
 
@@ -139,8 +157,8 @@ void DlgFocus::DrawNearby() {
 }
 void DlgFocus::DrawLocation() {
     std::map<const char *, std::vector<Vessel *>> vesselMap; 
-	for (int i = 0; i < g_psys->nVessel(); i++) {
-		Vessel *vessel = g_psys->GetVessel(i);
+	for (int i = 0; i < FocusWorld()->nVessel(); i++) {
+		Vessel *vessel = FocusWorld()->GetVessel(i);
 		if (vessel->GetEnableFocus()) {
 			const CelestialBody *ref = vessel->ElRef();
             vesselMap[ref->Name()].push_back(vessel);
@@ -175,15 +193,15 @@ void DlgFocus::DrawLocation() {
     ImGui::TextUnformatted(m_SelectedShip.c_str());
     ImVec2 button_sz(ImVec2(ImGui::GetContentRegionAvail().x, 20));
     if(ImGui::Button("Select", button_sz)) {
-        Vessel *vessel = g_psys->GetVessel (m_SelectedShip.c_str(), true);
+        Vessel *vessel = FocusWorld()->GetVessel (m_SelectedShip.c_str(), true);
         if (vessel) {
-            g_pOrbiter->SetFocusObject (vessel);
+            SelectFocus (vessel);
         }
     }
     if(ImGui::Button("Previous", button_sz)) {
-        if (g_pfocusobj) {
-            g_pOrbiter->SetFocusObject (g_pfocusobj);
-			m_SelectedShip = g_pfocusobj->Name();
+        if (PriorFocus()) {
+            SelectFocus (PriorFocus());
+			m_SelectedShip = PriorFocus()->Name();
         }
     }
 
@@ -191,8 +209,8 @@ void DlgFocus::DrawLocation() {
 }
 void DlgFocus::DrawClass() {
     std::map<std::string, std::vector<Vessel *>> vesselMap; 
-	for (int i = 0; i < g_psys->nVessel(); i++) {
-		Vessel *vessel = g_psys->GetVessel(i);
+	for (int i = 0; i < FocusWorld()->nVessel(); i++) {
+		Vessel *vessel = FocusWorld()->GetVessel(i);
 		if (vessel->GetEnableFocus()) {
             vesselMap[vessel->ClassName()].push_back(vessel);
         }
@@ -226,15 +244,15 @@ void DlgFocus::DrawClass() {
     ImGui::TextUnformatted(m_SelectedShip.c_str());
     ImVec2 button_sz(ImVec2(ImGui::GetContentRegionAvail().x, 20));
     if(ImGui::Button("Select", button_sz)) {
-        Vessel *vessel = g_psys->GetVessel (m_SelectedShip.c_str(), true);
+        Vessel *vessel = FocusWorld()->GetVessel (m_SelectedShip.c_str(), true);
         if (vessel) {
-            g_pOrbiter->SetFocusObject (vessel);
+            SelectFocus (vessel);
         }
     }
     if(ImGui::Button("Previous", button_sz)) {
-        if (g_pfocusobj) {
-            g_pOrbiter->SetFocusObject (g_pfocusobj);
-			m_SelectedShip = g_pfocusobj->Name();
+        if (PriorFocus()) {
+            SelectFocus (PriorFocus());
+			m_SelectedShip = PriorFocus()->Name();
         }
     }
 

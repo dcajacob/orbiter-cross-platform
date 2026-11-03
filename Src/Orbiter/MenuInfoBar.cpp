@@ -2,12 +2,23 @@
 // Licensed under the MIT License
 #define IMGUI_DEFINE_MATH_OPERATORS
 #include "Astro.h"
+#ifdef _WIN32
 #include "OrbiterAPI.h"
+#else
+#include "NativeVesselAPI.h"
+#include "Config.h"
+#include "TimeData.h"
+#include "Body.h"
+#include "Production/CockpitGuiExports.h"
+#include "Production/NativeCockpitUi.h"
+#include "Production/NativeGraphics.h"
+#endif
 #include "imgui.h"
 #include "imgui_internal.h"
 
-#include "MenuInfoBar.h"
 #include "Camera.h"
+#ifdef _WIN32
+#include "MenuInfoBar.h"
 #include "Dialogs.h"
 #include "DlgMenuCfg.h"
 
@@ -17,6 +28,21 @@
 extern Orbiter *g_pOrbiter;
 extern Camera *g_camera;
 extern TimeData td;
+static const TimeData& InfoClock() { return td; }
+static Camera* InfoCamera() { return g_camera; }
+static CFG_UIPRM& InfoConfig() { return g_pOrbiter->Cfg()->CfgUIPrm; }
+static bool InfoRecording() { return g_pOrbiter->RecorderStatus() == 1; }
+static bool InfoPlayback() { return g_pOrbiter->IsPlayback(); }
+static bool InfoRunning() { return g_pOrbiter->IsRunning(); }
+#else
+using orbiter::production::GetNativeRenderContext;
+static const TimeData& InfoClock() { return *GetNativeRenderContext().time; }
+static Camera* InfoCamera() { return GetNativeRenderContext().camera; }
+static CFG_UIPRM& InfoConfig() { return GetNativeRenderContext().configuration->CfgUIPrm; }
+static bool InfoRecording() { return oapiGetFocusInterface()->Recording(); }
+static bool InfoPlayback() { return oapiGetFocusInterface()->Playback(); }
+static bool InfoRunning() { return !GetNativeRenderContext().paused; }
+#endif
 
 const ImGuiWindowFlags INFOFLAGS = ImGuiWindowFlags_NoTitleBar |
 	ImGuiWindowFlags_NoInputs |
@@ -49,6 +75,7 @@ struct MovingAverage {
     }
 };
 
+#ifdef _WIN32
 class DynamicMenuBar: public ImGuiDialog
 {
 	static inline const float strength = 0.3f;
@@ -521,6 +548,8 @@ public:
 };
 
 
+#endif
+
 class InfoFrameRate {
 	static const int HISTORY_SIZE = 64;
 	float history[HISTORY_SIZE];
@@ -536,7 +565,7 @@ public:
 		fpsMax = 0.0f;
 	}
 	void Update() {
-		int offset = ((int)td.SysT0) % HISTORY_SIZE;
+		int offset = ((int)InfoClock().SysT0) % HISTORY_SIZE;
 		if(offset != historyOffset) {
 			historyOffset = offset;
 			history[historyOffset] = 0.0f;
@@ -564,7 +593,7 @@ public:
 
 		ImGui::TextColored(white, "%s", "F/s");
 		char buf[64];
-		snprintf(buf, 64, "%.0f", td.FPS());
+		snprintf(buf, 64, "%.0f", InfoClock().FPS());
 		buf[63] = '\n';
 		// Right align
 		ImGui::SameLine();
@@ -576,7 +605,7 @@ public:
 		ImGui::TextColored(white, "%s", buf);
 
 		ImGui::TextColored(white, "%s", "ΔT/F");
-		float simdt = dtavg.add(td.SimDT);
+		float simdt = dtavg.add(InfoClock().SimDT);
 		snprintf(buf, 64, "%0.*fs", simdt < 1e-1 ? 3 : simdt < 1 ? 2 : simdt < 10 ? 1 : 0, simdt);
 		buf[63] = '\n';
 		// Right align
@@ -611,7 +640,7 @@ public:
 const float OPACITY_NONE = 0.001f;
 void AnimateOpacity(float &animStateOpacity)
 {
-	CFG_UIPRM &prm = g_pOrbiter->Cfg()->CfgUIPrm;
+	CFG_UIPRM &prm = InfoConfig();
 	if(prm.InfoMode == 0) { // show
 		animStateOpacity = 1.0f;
 		return;
@@ -648,7 +677,7 @@ public:
 		drawList->AddRect(pos, endpos, ImGui::ColorConvertFloat4ToU32(ImVec4(0.75,0.75,0.75,alpha)));
 		switch(type) {
 		case 0: // REC
-			if(fmod (td.SysT1, 1.0) < 0.5) {
+			if(fmod (InfoClock().SysT1, 1.0) < 0.5) {
 				ImVec2 center = (pos + endpos)/2.0;
 				drawList->AddCircleFilled(center, size.y/4.0, ImGui::ColorConvertFloat4ToU32(ImVec4(1.0,0.0,0.0,alpha)));
 			}
@@ -675,7 +704,7 @@ public:
 				p3.x += size.x/4.5f*1.5f;
 				drawList->AddTriangleFilled(p1, p2, p3, ImGui::ColorConvertFloat4ToU32(ImVec4(1.0,1.0,1.0,alpha)));
 				char buf[64];
-				sprintf(buf, "%0.*fx", td.Warp() < 9.99 ? 1:0, td.Warp());
+				sprintf(buf, "%0.*fx", InfoClock().Warp() < 9.99 ? 1:0, InfoClock().Warp());
 				drawList->AddText(pos + ImVec2(size.x + 2,0), ImGui::ColorConvertFloat4ToU32(ImVec4(1.0,1.0,1.0,alpha)), buf);
 			}
 			break;
@@ -691,7 +720,7 @@ public:
 	}
 
 	void Display() {
-		CFG_UIPRM &prm = g_pOrbiter->Cfg()->CfgUIPrm;
+		CFG_UIPRM &prm = InfoConfig();
 		if(prm.InfoMode == 1)
 			return;
 		ImGuiViewport *viewport = ImGui::GetMainViewport();
@@ -709,26 +738,26 @@ public:
 			ImVec4 red{1,0,0,1};
 			ImVec4 yellow{1,1,0,1};
 			ImGui::PushFont(ImGuiFont::MONO);
-			ImGui::TextColored(white, DateStr (td.MJD1));
-			ImGui::TextColored(white, "MJD %0.4f", td.MJD1);
+			ImGui::TextColored(white, DateStr (InfoClock().MJD1));
+			ImGui::TextColored(white, "MJD %0.4f", InfoClock().MJD1);
 
-			if(g_pOrbiter->RecorderStatus() == 1) {
+			if(InfoRecording()) {
 				ImGui::SameLine();
 				DrawSymbol(0);
-			} else if(g_pOrbiter->IsPlayback()) {
+			} else if(InfoPlayback()) {
 				ImGui::SameLine();
 				DrawSymbol(3);
 			}
-			if(td.SimT1 < 1e7) {
-				ImGui::TextColored(white, "Sim % 9.0fs", td.SimT1);
+			if(InfoClock().SimT1 < 1e7) {
+				ImGui::TextColored(white, "Sim % 9.0fs", InfoClock().SimT1);
 			} else {
-				ImGui::TextColored(white, "Sim ..%07.0fs", fmod (td.SimT1, 1e7));
+				ImGui::TextColored(white, "Sim ..%07.0fs", fmod (InfoClock().SimT1, 1e7));
 			}
 
-			if(!g_pOrbiter->IsRunning()) {
+			if(!InfoRunning()) {
 				ImGui::SameLine();
 				DrawSymbol(1);
-			} else if(td.Warp() != 1.0 || prm.bWarpAlways) {
+			} else if(InfoClock().Warp() != 1.0 || prm.bWarpAlways) {
 				ImGui::SameLine();
 				DrawSymbol(2);
 			}
@@ -754,7 +783,7 @@ public:
 	InfoTarget(InfoFrameRate *fps_):ImGuiDialog("InfoTarget"),fps(fps_),animStateOpacity(OPACITY_NONE) {}
 	void OnDraw() {}
 	void Display() {
-		CFG_UIPRM &prm = g_pOrbiter->Cfg()->CfgUIPrm;
+		CFG_UIPRM &prm = InfoConfig();
 		if(prm.InfoMode == 1) {
 			animStateOpacity = OPACITY_NONE;
 			return;
@@ -772,28 +801,28 @@ public:
 			ImVec4 white{1,1,1,1};
 			ImGui::PushFont(ImGuiFont::MONO);
 
-			Body *tgt = g_camera->Target();
+			Body *tgt = InfoCamera()->Target();
 			ImGui::TextColored(white, "Tgt %s", tgt->Name());
 
-			if (g_camera->IsExternal()) {
-				switch (g_camera->GetExtMode()) {
+			if (InfoCamera()->IsExternal()) {
+				switch (InfoCamera()->GetExtMode()) {
 					case CAMERA_TARGETRELATIVE:   ImGui::TextColored(white, "Cam track (rel-pos)"); break;
 					case CAMERA_ABSDIRECTION:     ImGui::TextColored(white, "Cam track (abs-dir)"); break;
 					case CAMERA_GLOBALFRAME:      ImGui::TextColored(white, "Cam track (global frame)"); break;
-					case CAMERA_TARGETTOOBJECT:   ImGui::TextColored(white, "Cam target to %s", g_camera->GetDirRef()->Name()); break;
-					case CAMERA_TARGETFROMOBJECT: ImGui::TextColored(white, "Cam target from %s", g_camera->GetDirRef()->Name()); break;
-					case CAMERA_GROUNDOBSERVER:   ImGui::TextColored(white, "Cam ground %s", g_camera->GroundObserver_TargetLock() ? "(tgt-lock)" : "(free)"); break;
+					case CAMERA_TARGETTOOBJECT:   ImGui::TextColored(white, "Cam target to %s", InfoCamera()->GetDirRef()->Name()); break;
+					case CAMERA_TARGETFROMOBJECT: ImGui::TextColored(white, "Cam target from %s", InfoCamera()->GetDirRef()->Name()); break;
+					case CAMERA_GROUNDOBSERVER:   ImGui::TextColored(white, "Cam ground %s", InfoCamera()->GroundObserver_TargetLock() ? "(tgt-lock)" : "(free)"); break;
 				}
 			} else {
 				ImGui::TextColored(white, "Cam Cockpit");
 			}
-			ImGui::TextColored(white, "FoV % 0.0f°", 2.0*Deg(g_camera->Aperture()));
-			if (g_camera->IsExternal()) {
+			ImGui::TextColored(white, "FoV % 0.0f°", 2.0*Deg(InfoCamera()->Aperture()));
+			if (InfoCamera()->IsExternal()) {
 				ImGui::SameLine();
-				ImGui::TextColored(white, "   Dst %s", DistStr (g_camera->Distance())+1);
+				ImGui::TextColored(white, "   Dst %s", DistStr (InfoCamera()->Distance())+1);
 			} else {
 				ImGui::SameLine();
-				ImGui::TextColored(ImVec4(0,0,0,0), "   Dst %s", DistStr (g_camera->Distance())+1);
+				ImGui::TextColored(ImVec4(0,0,0,0), "   Dst %s", DistStr (InfoCamera()->Distance())+1);
 			}
 
 			if(prm.FPS == 1)
@@ -813,6 +842,7 @@ public:
 // class MenuInfoBar
 // =======================================================================
 
+#ifdef _WIN32
 MenuInfoBar::MenuInfoBar ()
 {
 	dynMenu  = std::make_unique<DynamicMenuBar>();
@@ -846,3 +876,25 @@ void MenuInfoBar::SyncPreferences()
 {
 	return dynMenu->SyncPreferedOrder();
 }
+
+#else
+namespace orbiter::production {
+namespace {
+std::unique_ptr<InfoFrameRate> frameRate;
+std::unique_ptr<InfoTime> timeBar;
+std::unique_ptr<InfoTarget> targetBar;
+}
+void CreateCockpitInfoBars() {
+    frameRate=std::make_unique<InfoFrameRate>();
+    timeBar=std::make_unique<InfoTime>(frameRate.get());
+    targetBar=std::make_unique<InfoTarget>(frameRate.get());
+    oapiOpenDialog(timeBar.get());
+    oapiOpenDialog(targetBar.get());
+}
+void DestroyCockpitInfoBars() {
+    targetBar.reset();
+    timeBar.reset();
+    frameRate.reset();
+}
+}
+#endif

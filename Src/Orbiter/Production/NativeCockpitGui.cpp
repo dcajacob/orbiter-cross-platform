@@ -2,6 +2,9 @@
 // Licensed under the MIT License
 // Native dialog services surrounding the original Select/InputBox algorithms.
 #include "Select.h"
+#include "DlgFocus.h"
+#include "IconsFontAwesome6.h"
+#include "NativeInterpreterSdk.h"
 #include "Config.h"
 #include "NativeCockpitUi.h"
 #include <memory>
@@ -16,6 +19,7 @@
 using namespace orbiter::production;
 namespace {
 std::vector<ImGuiDialog*> moduleDialogs;
+ImFont *uiFonts[4]{};
 }
 
 void oapiOpenDialog(ImGuiDialog *dialog) {
@@ -36,7 +40,10 @@ ImGuiDialog::~ImGuiDialog() {
 }
 bool ImGuiDialog::HandleHelpButton() {
     if(helpfile.empty())return false;
-    if(ImGui::Button("Help"))throw std::runtime_error("Native compiled-help viewer is unavailable");
+    HELPCONTEXT help{};
+    help.helpfile=const_cast<char*>(helpfile.c_str());
+    help.topic=helptopic.empty() ? nullptr : const_cast<char*>(helptopic.c_str());
+    if(ImGui::MenuButton(ICON_FA_CIRCLE_QUESTION,"Help"))oapiOpenHelp(&help);
     return true;
 }
 void ImGuiDialog::Display() {
@@ -46,6 +53,13 @@ void ImGuiDialog::Display() {
 }
 void ImGuiDialog::Activate() {active=true;ImGui::SetWindowFocus(name.c_str());}
 namespace ImGui {
+#define ORBITER_MENU_EXPORT ORBITER_PRODUCTION_API
+#include "GuiMenuButton.inc"
+#undef ORBITER_MENU_EXPORT
+    ORBITER_PRODUCTION_API void PushFont(ImGuiFont font,float scale) {
+        const auto index=static_cast<unsigned>(font);
+        ImGui::PushFont(uiFonts[index<4 ? index : 0],ImGui::GetStyle().FontSizeBase*scale);
+    }
 	struct FadingState
 	{
 		enum State { Closed, Opening, Open } state = Closed;
@@ -193,6 +207,7 @@ static void ImGuiSetStyle()
 
 
 std::unique_ptr<Select> selection;
+std::unique_ptr<DlgFocus> focusDialog;
 std::unique_ptr<InputBox> inputBox;
 std::ofstream uiEvidence;
 std::ofstream uiFrames;
@@ -202,6 +217,10 @@ std::ofstream replayClockTrace;
 }
 
 namespace orbiter::production {
+void OpenCockpitFocusDialog() {
+    if (!focusDialog) focusDialog=std::make_unique<DlgFocus>();
+    oapiOpenDialog(focusDialog.get());
+}
 void CreateCockpitGui() {
     if (ImGui::GetCurrentContext()) throw std::logic_error("A cockpit GUI context already exists");
     IMGUI_CHECKVERSION();
@@ -216,10 +235,12 @@ void CreateCockpitGui() {
         const auto& fonts = context.configuration->CfgFontPrm;
         auto load = [&](const char* file, const ImFontConfig* options = nullptr) {
             auto path = context.programFiles->Resolve(file).string();
-            if (!io.Fonts->AddFontFromFileTTF(path.c_str(), fonts.ImGui_FontSize, options))
+            auto *font=io.Fonts->AddFontFromFileTTF(path.c_str(), fonts.ImGui_FontSize, options);
+            if (!font)
                 throw std::runtime_error("Cannot load original cockpit font: " + path);
+            return font;
         };
-        load(fonts.ImGui_DefaultFontFile);
+        uiFonts[static_cast<unsigned>(ImGuiFont::DEFAULT)]=load(fonts.ImGui_DefaultFontFile);
         ImFontConfig icons;
         icons.MergeMode = true;
         icons.PixelSnapH = true;
@@ -227,9 +248,10 @@ void CreateCockpitGui() {
         // so destroying the GUI releases it instead of cloning and leaking it.
         icons.FontDataOwnedByAtlas = true;
         load("Fonts/fa-solid-900.ttf", &icons);
-        load(fonts.ImGui_ConsoleFontFile);
-        load(fonts.ImGui_MonospacedFontFile);
-        load(fonts.ImGui_ManuscriptFontFile);
+        uiFonts[static_cast<unsigned>(ImGuiFont::CONSOLE)]=load(fonts.ImGui_ConsoleFontFile);
+        uiFonts[static_cast<unsigned>(ImGuiFont::MONO)]=load(fonts.ImGui_MonospacedFontFile);
+        uiFonts[static_cast<unsigned>(ImGuiFont::MANUSCRIPT)]=load(fonts.ImGui_ManuscriptFontFile);
+        CreateCockpitInfoBars();
         selection = std::make_unique<Select>();
         inputBox = std::make_unique<InputBox>();
         context.cockpitSelect = selection.get();
@@ -264,6 +286,8 @@ void SetCockpitReplayClock(float seconds) {
     }
 }
 void DestroyCockpitGui() {
+    focusDialog.reset();
+    DestroyCockpitInfoBars();
     moduleDialogs.clear();
     if(replayClockHook) {
         ImGui::RemoveContextHook(ImGui::GetCurrentContext(),replayClockHook);

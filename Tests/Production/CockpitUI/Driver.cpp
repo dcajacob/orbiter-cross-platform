@@ -38,6 +38,7 @@ class Driver final : public oapi::Module {
     HWND window = nullptr;
     unsigned frames = 0;
     int left = 1;
+    bool observeFocus = false;
     bool initialized = false;
     bool started = false;
     int lastX = 0, lastY = 0;
@@ -99,6 +100,8 @@ class Driver final : public oapi::Module {
             LPARAM flags = 1 | (scan << 16);
             if (action.event == "key_up") flags |= LPARAM(3) << 30;
             SendMessageW(window, action.event == "key_down" ? WM_KEYDOWN : WM_KEYUP, x, flags);
+        } else if (action.event == "focus_dialog") {
+            require(observeFocus && oapiSimulateBufferedKey(OAPI_KEY_F3), "Original F3 dispatch failed");
         } else if (action.event == "open_input") {
             oapiOpenInputBoxEx("Reference input cancellation", enter, cancel, nullptr, 20, this);
         } else {
@@ -109,11 +112,11 @@ class Driver final : public oapi::Module {
     }
     void snapshot() {
         auto* vessel = oapiGetFocusInterface();
-        require(vessel && std::string(vessel->GetName()) == "PB", "Original reference focus changed");
+        require(vessel && (observeFocus || std::string(vessel->GetName()) == "PB"), "Original reference focus changed");
         VECTOR3 p{}, v{}, w{}; MATRIX3 r{};
         vessel->GetGlobalPos(p); vessel->GetGlobalVel(v); vessel->GetAngularVel(w); vessel->GetRotationMatrix(r);
         state << frames << ',' << oapiGetSimTime() << ',' << oapiGetSimMJD()
-              << ",PB," << vessel->GetClassName() << ',' << oapiCockpitMode() << ',' << oapiGetHUDMode()
+              << ',' << vessel->GetName() << ',' << vessel->GetClassName() << ',' << oapiCockpitMode() << ',' << oapiGetHUDMode()
               << ',' << oapiGetMFDMode(0) << ',' << oapiGetMFDMode(1);
         for (double value : {p.x,p.y,p.z,v.x,v.y,v.z,r.m11,r.m12,r.m13,r.m21,r.m22,r.m23,r.m31,r.m32,r.m33,w.x,w.y,w.z,vessel->GetMass(),vessel->GetFuelMass()}) state << ',' << value;
         state << ',' << vessel->GetMeshCount() << ',' << vessel->GetThrusterCount() << '\n';
@@ -132,6 +135,7 @@ class Driver final : public oapi::Module {
 public:
     explicit Driver(HINSTANCE instance) : Module(instance) {
         guarded([&] {
+            observeFocus = bool(std::ifstream("focus-bars.enabled"));
             std::ifstream config("ui-case.txt");
             unsigned count = 0;
             require(bool(config >> left >> count) && count > 0 && count < 32, "Invalid UI schedule");
@@ -170,7 +174,13 @@ public:
                 window = FindWindowA("Orbiter Render Window", nullptr);
                 DWORD process = 0;
                 require(window && GetWindowThreadProcessId(window, &process) && process == GetCurrentProcessId(), "Owned original render window missing");
-                require(oapiCameraInternal() && oapiCockpitMode() == 1, "Original glass cockpit missing");
+                require(oapiCameraInternal() && oapiCockpitMode() == (observeFocus ? 2 : 1), "Required original cockpit missing");
+                if (observeFocus) {
+                    char earthName[]="Earth";
+                    auto earth=oapiGetGbodyByName(earthName);
+                    require(earth!=nullptr,"Original Earth missing");
+                    std::ofstream("earth-obliquity.txt")<<std::setprecision(17)<<oapiGetPlanetObliquity(earth)<<'\n';
+                }
                 oapiOpenMFD(left, 0); oapiOpenMFD(2, 1); oapiSetHUDMode(1);
                 mouse(640, 360, 0);
                 initialized = true; snapshot();

@@ -159,6 +159,12 @@ jobs:
           xvfb-run -a -s '-screen 0 1920x1080x24' env LIBGL_ALWAYS_SOFTWARE=1 GALLIUM_DRIVER=llvmpipe
           python3 -B Tests/Production/LuaRuntime/native_schedule.py --build out/native-cockpit-engine
           --assets out/scene-resources --data out/data --planets out/planets --output out/native-lua-schedule
+      - name: Operate spacecraft selection and visible and auto-hidden cockpit info bars
+        run: >-
+          xvfb-run -a -s '-screen 0 1920x1080x24' env LIBGL_ALWAYS_SOFTWARE=1 GALLIUM_DRIVER=llvmpipe
+          python3 -B Tests/Production/CockpitUI/focus_bars.py --executable out/native-cockpit-engine/orbiter-production
+          --modules out/native-cockpit-engine/NativeModules --assets out/scene-resources --data out/data
+          --planets out/planets --output out/native-focus-bars
       - name: Verify all ten original native stock MFD modes and HUD against frozen Windows
         shell: bash
         run: |
@@ -218,6 +224,9 @@ jobs:
             out/native-lua-schedule/*/lua-events.csv
             out/native-lua-schedule/*/lua-controls.csv
             out/native-lua-schedule/*/lua-air.csv
+            out/native-focus-bars/focus-bars-report.json
+            out/native-focus-bars/*/cockpit-state.csv
+            out/native-focus-bars/*/instrument-*.rgba
             out/native-lua-flight/flight-report.json
             out/native-lua-flight/*/lua-flight.csv
             out/native-lua-flight/*/saved.scn

@@ -8,7 +8,11 @@
 #ifndef __DLGFOCUS_H
 #define __DLGFOCUS_H
 
+#ifdef _WIN32
 #include "OrbiterAPI.h"
+#else
+#include "NativeVesselAPI.h"
+#endif
 
 class DlgFocus : public ImGuiDialog {
 public:
