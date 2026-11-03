@@ -1,0 +1,61 @@
+{
+  "schema": 1,
+  "scope": "Additional original Windows observations before qualifying the configuration-defined Mir and Wheel; seven unchanged stock scenarios, not complete Phase 6 acceptance",
+  "application_source": "f725194209634f7fd5d1d44d426cfa9b5e303e37",
+  "frames": 60,
+  "fixed_step": 0.25,
+  "epoch": 51982.5,
+  "image_ssim_minimum": 0.98,
+  "budgets": {
+    "position_m": 0.01,
+    "velocity_m_s": 1e-05,
+    "rotation_rad": 1e-08,
+    "angular_velocity_rad_s": 1e-10,
+    "mjd_days": 1e-10,
+    "propellant_relative": 1e-08,
+    "propellant_absolute_kg": 1e-08
+  },
+  "station_files_sha256_lf": {
+    "Config/Vessels/Mir.cfg": "91efb778a451c45f8b3830b45720711cd1d9504877bacadd3dc1b6796db77f0e",
+    "Config/Vessels/Wheel.cfg": "0b0d93aeaa28724444cd1f7110a864fecf4d3276cc5b627bfabd0b835be84e3a",
+    "Meshes/Mir.msh": "63deca3871829f6cd0c329579b9eb2af975b6fa89faa4cb98d61f631a98b1e8e",
+    "Meshes/Wheel.msh": "f1af0488dad03b9444e3e1a6a04d015b51c0a230a0b60d7933624e53a36f310c"
+  },
+  "cases": [
+    {
+      "id": "stations_1",
+      "scenario": "Challenges/Challenge 2 - Lunar transfer.scn",
+      "sha256_lf": "947d26ac55a65b1645d4e244fd5b262216a55b23a5dbd294b29c2f424e761937"
+    },
+    {
+      "id": "stations_2",
+      "scenario": "Challenges/Challenge 3 - Advanced lunar transfer.scn",
+      "sha256_lf": "9b43f3db96fd5c7715e9031b49dc0a3d31ba95181e467b8ba2df25c1e14d3275"
+    },
+    {
+      "id": "stations_3",
+      "scenario": "Delta-glider/DG and DG-S.scn",
+      "sha256_lf": "554921b034106f77388fb6a83e37468dd1354c7a39858de93df2b129bb903daa"
+    },
+    {
+      "id": "stations_4",
+      "scenario": "Delta-glider/Venus takeoff.scn",
+      "sha256_lf": "7182844e9f88ed822ae6d56247a970270edd20e57eb47ab63f2b99b389561c73"
+    },
+    {
+      "id": "stations_5",
+      "scenario": "Navigation/TransX/Earth to Moon.scn",
+      "sha256_lf": "dba8d0c62ee227d789ad36fa007838ba80c7647b8dd474580f2e674e1f4c1338"
+    },
+    {
+      "id": "stations_6",
+      "scenario": "The Solar System/Venus.scn",
+      "sha256_lf": "75c6f2c69cd9aadd835dcf8c88525962e056eb694cf41acdda9041f86ebf3344"
+    },
+    {
+      "id": "stations_7",
+      "scenario": "Views/Cloud microtexture.scn",
+      "sha256_lf": "ecc301e7962594669501306c32b575524210ef525e682fa08250b32ff541ff03"
+    }
+  ]
+}
