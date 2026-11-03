@@ -1,0 +1,62 @@
+{
+  "schema": 1,
+  "width": 1920,
+  "height": 1080,
+  "warmup_frames": 360,
+  "sample_frames": 1800,
+  "repeats": 2,
+  "fixed_step": 0.016666666666666666,
+  "median_ms_max": 33,
+  "p95_ms_max": 50,
+  "percentile": "nearest rank: sorted[ceil(p*N)-1]",
+  "quality": "medium",
+  "quality_definition": "Original default visual features, 64-segment planetary patch grid (middle of the supported 32/64/128 choices), maximum surface level 18 and zero resolution bias; no reductions after timing.",
+  "cases": [
+    {
+      "id": "landed_exterior",
+      "scenario": "Antelope Valley scenery/DG at Edwards AFB.scn",
+      "sha256": "9fd90b6bc056bc399f8b5e720838e91db802f5a5ef35810ee2dd0976bd23ce9a",
+      "cockpit": 3,
+      "internal": false,
+      "class": "DG-S"
+    },
+    {
+      "id": "orbit_panel",
+      "scenario": "Navigation/Special orbits/Geostationary orbit.scn",
+      "sha256": "5346fa7d44565325f7c98beddaa70f858a181ece8c1e8bea7b694c1c5a41bc97",
+      "cockpit": 2,
+      "internal": true,
+      "class": "DeltaGlider",
+      "left_mfd": 1,
+      "right_mfd": 3
+    },
+    {
+      "id": "landed_vc",
+      "scenario": "Antelope Valley scenery/Mojave spaceport.scn",
+      "sha256": "5af1869a9eb6bbbf6cbea7e4095bcf79f8585e433971241464310ed53ab9aa76",
+      "cockpit": 3,
+      "internal": true,
+      "class": "DG-S",
+      "left_mfd": 4,
+      "right_mfd": 2
+    }
+  ],
+  "settings": {
+    "swap_interval": 1,
+    "planet_max_level": 18,
+    "patch_grid_power": 5,
+    "resolution_bias": 0,
+    "clouds": 1,
+    "cloud_shadows": 0,
+    "vessel_shadows": 1,
+    "night_lights": 1,
+    "water_reflection": 1,
+    "specular_ripples": 0,
+    "haze": 1,
+    "fog": 1,
+    "specular": 1,
+    "particle_streams": 1,
+    "local_lights": 0,
+    "elevation_mode": 2
+  }
+}

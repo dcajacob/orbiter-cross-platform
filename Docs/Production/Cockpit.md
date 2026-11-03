@@ -228,6 +228,17 @@ the test module's destroy-listener cleanup.
 [Wayland input and scale evidence](WaylandInputVerification.json)
 [Reproduction and scope](../../Tests/Production/WaylandInput/README.md)
 
+The real Intel laptop now also passes the fixed 1920x1080 medium performance
+gate on Wayland and XWayland: twelve fresh processes, 25,920 scene presentations
+and 21,600 measured intervals across unchanged stock exterior, 2D-panel and VC
+scenes. The worst median is 22.37 ms and worst p95 is 25.35 ms; every repetition
+passes the unchanged 33/50 ms limits. Physics traces are byte-identical across
+both repetitions and both backends. Configured window dimensions now request
+framebuffer pixels and settle actual fractional Wayland scale before the
+original fixed-size cockpit is constructed. Default window policy is preserved.
+This remains a local hardware checkpoint within the ongoing Phase 6 acceptance.
+[Hardware results, full method and retained outliers](HardwarePerformance.md)
+
 The native graphics leak now has an isolated source fix and a passing local
 sanitizer menu flow. Mesa's executable-code allocator retained two bookkeeping
 objects (112 bytes) and a 10 MiB mapping after its last generated function was

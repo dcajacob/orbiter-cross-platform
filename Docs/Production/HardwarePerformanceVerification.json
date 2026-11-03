@@ -1,0 +1,952 @@
+{
+  "schema": 1,
+  "date": "2026-11-03",
+  "status": "passed",
+  "phase6_complete": false,
+  "scope": "Local Release automatic 1920x1080 medium throughput on the real Intel PTL Wayland and XWayland desktops; fixed unchanged stock exterior, 2D-panel and VC scenes, two repetitions each.",
+  "based_on_commit": "b4a1fd60dfccc6df0c5c579499fec170548433ba",
+  "source_sha256": {
+    "OVP/OGLClient/Native/LinuxAdapter.cpp": "6b82718fc6e46dd83f74475de0f8024e2ba7f3421a19aac370f4efe50fcbd585",
+    "Tests/Production/Performance/Gate.Test.py": "4964b7e22677c76896ee4ff4a9c7b4565f73bf0dd062eb8dd441aaf531be1700",
+    "Tests/Production/Performance/README.md": "2c67d27fbe1d2b48598dd8f406ed4cff88e3712745dbb1753cecfd695c585109",
+    "Tests/Production/Performance/Window.Test.py": "baccf3586a90125f33dbf9cec27d012577510974534c526987203603818c42e4",
+    "Tests/Production/Performance/cases.json": "d9a43ae998f1238a0d25d7c6fe285e9b2f139f04b16aa81840723feb115b0ddc",
+    "Tests/Production/Performance/medium.cfg": "3af548a01110a2b825588a468a0c44c84e81aef2a36c07a3a10ac76aa8c9b4d7",
+    "Tests/Production/Performance/run.py": "57d903fc49406487b83e278d22573f8f01bd81c4d3704feb1e8d948df0f55bf5",
+    "Tests/Production/Performance/verify.py": "96c0526e71ea8d6a8bbd62d668a4a131d6238e9414529a2ec4eda221f73b57bd"
+  },
+  "profile": {
+    "path": "Tests/Production/Performance/cases.json",
+    "sha256": "d9a43ae998f1238a0d25d7c6fe285e9b2f139f04b16aa81840723feb115b0ddc"
+  },
+  "configuration": {
+    "path": "Tests/Production/Performance/medium.cfg",
+    "sha256": "3af548a01110a2b825588a468a0c44c84e81aef2a36c07a3a10ac76aa8c9b4d7"
+  },
+  "qualification": {
+    "path": "out/phase6-performance-final-audit.json",
+    "sha256": "eb485e3b89b1d34ada97d73b13257892adec7046636a6f49256419b684952bfc"
+  },
+  "method": {
+    "primary": "Consecutive glfwSwapBuffers return timestamps from steady_clock; includes CSV write and loop overhead",
+    "workload": "One original fixed 1/60-second physics tick per rendered frame, original physics defaults",
+    "warmup_frames": 360,
+    "sample_frames_per_run": 1800,
+    "repetitions_per_case_backend": 2,
+    "percentile": "Nearest rank sorted[ceil(0.95*N)-1]",
+    "every_declared_interval_retained": true,
+    "limits": {
+      "median_ms": 33,
+      "p95_ms": 50
+    },
+    "physical_display_latency_measured": false,
+    "private_compositor_or_virtual_display_used": false,
+    "system_or_power_settings_changed": false
+  },
+  "host": {
+    "platform": "Linux-7.0.0-42-generic-x86_64-with-glibc2.43",
+    "cpu": "Intel(R) Core(TM) Ultra X9 388H",
+    "gpu": "Intel PTL",
+    "mesa": "26.0.8-1ubuntu0.3",
+    "power": "AC online in every per-run before/after snapshot"
+  },
+  "inputs_sha256": {
+    "executable": "8e074c036edd6abe8f4fd75e870fbffc403f9a73b51f900a8282860abc7d1f2c",
+    "renderer": "a97b839a0e23cb2b5f47cc6ffd633f42c149014939f225457186be3154b34229",
+    "engine": "8770501b39a8fa20e2a1d28c803276aac69238bc286f0b73986efae75a2227c4"
+  },
+  "processes": 12,
+  "scene_presents": 25920,
+  "measured_intervals": 21600,
+  "worst_median_ms": 22.366083000000003,
+  "worst_p95_ms": 25.349346,
+  "maximum_single_interval_ms": 192.108683,
+  "identical_physics_across_repetitions_and_backends": {
+    "landed_exterior": "706932280f709a968b7ac7cb938bc0a45777636ba956513496940b246ed9b9f4",
+    "orbit_panel": "74b3411d1ee5283394da321153be386bfef0ad4826ff7f9ce9e39cd5ff511fcb",
+    "landed_vc": "0ee626df96090182ed3cd7a784f2882a736c6e78b5da169bbd7d61618fcd105e"
+  },
+  "runs": [
+    {
+      "path": "out/phase6-performance-qualified/wayland/landed_exterior-1",
+      "backend": "wayland",
+      "case": "landed_exterior-1",
+      "cadence": {
+        "samples": 1800,
+        "median_ms": 21.866083000000003,
+        "p95_ms": 24.304549,
+        "p99_ms": 25.757478,
+        "minimum_ms": 19.66547,
+        "maximum_ms": 42.4089,
+        "mean_ms": 22.13141885388889
+      },
+      "poll_to_present": {
+        "samples": 1800,
+        "median_ms": 21.861376999999997,
+        "p95_ms": 24.299887,
+        "p99_ms": 25.751956,
+        "minimum_ms": 19.660724,
+        "maximum_ms": 42.403938,
+        "mean_ms": 22.12624610111111
+      },
+      "swap": {
+        "samples": 1800,
+        "median_ms": 0.1310675,
+        "p95_ms": 0.21527,
+        "p99_ms": 0.321875,
+        "minimum_ms": 0.075308,
+        "maximum_ms": 20.274434,
+        "mean_ms": 0.22409660611111112
+      },
+      "window": {
+        "backend": "wayland",
+        "logical_width": 1536,
+        "logical_height": 864,
+        "framebuffer_width": 1920,
+        "framebuffer_height": 1080,
+        "content_scale_x": 1.25,
+        "content_scale_y": 1.25,
+        "requested_width": 1920,
+        "requested_height": 1080,
+        "engineering_scale": 1
+      },
+      "renderer": {
+        "vendor": "Intel",
+        "renderer": "Mesa Intel(R) Graphics (PTL)",
+        "version": "4.6 (Core Profile) Mesa 26.0.8-1ubuntu0.3",
+        "client_width": 1920,
+        "client_height": 1080
+      },
+      "lifecycle": {
+        "rendered_frames": 2160,
+        "successful_presents": 2160,
+        "context_deleted": true
+      },
+      "focused_frames": 1800,
+      "startup_priming": {
+        "blank_presents_before_engine_scene": 3
+      },
+      "report_sha256": "985c30fef25b275d22de39a69eff6843f13505d4df59e7df1e3d7ccd0fc348b7"
+    },
+    {
+      "path": "out/phase6-performance-qualified/wayland/landed_exterior-2",
+      "backend": "wayland",
+      "case": "landed_exterior-2",
+      "cadence": {
+        "samples": 1800,
+        "median_ms": 22.366083000000003,
+        "p95_ms": 25.349346,
+        "p99_ms": 27.03182,
+        "minimum_ms": 12.96889,
+        "maximum_ms": 53.297013,
+        "mean_ms": 22.737239742222222
+      },
+      "poll_to_present": {
+        "samples": 1800,
+        "median_ms": 22.361417,
+        "p95_ms": 25.345123,
+        "p99_ms": 27.026909,
+        "minimum_ms": 12.961932,
+        "maximum_ms": 53.292416,
+        "mean_ms": 22.73217320222222
+      },
+      "swap": {
+        "samples": 1800,
+        "median_ms": 0.136993,
+        "p95_ms": 0.276289,
+        "p99_ms": 0.407372,
+        "minimum_ms": 0.073473,
+        "maximum_ms": 20.286906,
+        "mean_ms": 0.24854873055555557
+      },
+      "window": {
+        "backend": "wayland",
+        "logical_width": 1536,
+        "logical_height": 864,
+        "framebuffer_width": 1920,
+        "framebuffer_height": 1080,
+        "content_scale_x": 1.25,
+        "content_scale_y": 1.25,
+        "requested_width": 1920,
+        "requested_height": 1080,
+        "engineering_scale": 1
+      },
+      "renderer": {
+        "vendor": "Intel",
+        "renderer": "Mesa Intel(R) Graphics (PTL)",
+        "version": "4.6 (Core Profile) Mesa 26.0.8-1ubuntu0.3",
+        "client_width": 1920,
+        "client_height": 1080
+      },
+      "lifecycle": {
+        "rendered_frames": 2160,
+        "successful_presents": 2160,
+        "context_deleted": true
+      },
+      "focused_frames": 1800,
+      "startup_priming": {
+        "blank_presents_before_engine_scene": 3
+      },
+      "report_sha256": "2b1ca84c6070b291889758393ce3dc469bd6e311fc6d9f4b542ed4879dc4e836"
+    },
+    {
+      "path": "out/phase6-performance-qualified/wayland/orbit_panel-1",
+      "backend": "wayland",
+      "case": "orbit_panel-1",
+      "cadence": {
+        "samples": 1800,
+        "median_ms": 19.0409875,
+        "p95_ms": 21.501339,
+        "p99_ms": 29.422821,
+        "minimum_ms": 7.09706,
+        "maximum_ms": 45.619762,
+        "mean_ms": 19.61446273388889
+      },
+      "poll_to_present": {
+        "samples": 1800,
+        "median_ms": 19.036144,
+        "p95_ms": 21.496818,
+        "p99_ms": 29.417428,
+        "minimum_ms": 7.08765,
+        "maximum_ms": 45.615213,
+        "mean_ms": 19.609339867777777
+      },
+      "swap": {
+        "samples": 1800,
+        "median_ms": 0.08934149999999999,
+        "p95_ms": 0.106918,
+        "p99_ms": 0.144201,
+        "minimum_ms": 0.063645,
+        "maximum_ms": 20.29959,
+        "mean_ms": 0.215577235
+      },
+      "window": {
+        "backend": "wayland",
+        "logical_width": 1536,
+        "logical_height": 864,
+        "framebuffer_width": 1920,
+        "framebuffer_height": 1080,
+        "content_scale_x": 1.25,
+        "content_scale_y": 1.25,
+        "requested_width": 1920,
+        "requested_height": 1080,
+        "engineering_scale": 1
+      },
+      "renderer": {
+        "vendor": "Intel",
+        "renderer": "Mesa Intel(R) Graphics (PTL)",
+        "version": "4.6 (Core Profile) Mesa 26.0.8-1ubuntu0.3",
+        "client_width": 1920,
+        "client_height": 1080
+      },
+      "lifecycle": {
+        "rendered_frames": 2160,
+        "successful_presents": 2160,
+        "context_deleted": true
+      },
+      "focused_frames": 1800,
+      "startup_priming": {
+        "blank_presents_before_engine_scene": 3
+      },
+      "report_sha256": "a11965e99b8c0a3f78c33c0e664c3994a91667f170117c724a7c112cfbf854b4"
+    },
+    {
+      "path": "out/phase6-performance-qualified/wayland/orbit_panel-2",
+      "backend": "wayland",
+      "case": "orbit_panel-2",
+      "cadence": {
+        "samples": 1800,
+        "median_ms": 18.816194,
+        "p95_ms": 21.073858,
+        "p99_ms": 28.035832,
+        "minimum_ms": 7.119362,
+        "maximum_ms": 39.868502,
+        "mean_ms": 19.290859393333335
+      },
+      "poll_to_present": {
+        "samples": 1800,
+        "median_ms": 18.811647,
+        "p95_ms": 21.068702,
+        "p99_ms": 28.031204,
+        "minimum_ms": 7.113443,
+        "maximum_ms": 39.851781,
+        "mean_ms": 19.28565222888889
+      },
+      "swap": {
+        "samples": 1800,
+        "median_ms": 0.0887445,
+        "p95_ms": 0.111642,
+        "p99_ms": 0.143394,
+        "minimum_ms": 0.062606,
+        "maximum_ms": 20.271638,
+        "mean_ms": 0.20796670666666667
+      },
+      "window": {
+        "backend": "wayland",
+        "logical_width": 1536,
+        "logical_height": 864,
+        "framebuffer_width": 1920,
+        "framebuffer_height": 1080,
+        "content_scale_x": 1.25,
+        "content_scale_y": 1.25,
+        "requested_width": 1920,
+        "requested_height": 1080,
+        "engineering_scale": 1
+      },
+      "renderer": {
+        "vendor": "Intel",
+        "renderer": "Mesa Intel(R) Graphics (PTL)",
+        "version": "4.6 (Core Profile) Mesa 26.0.8-1ubuntu0.3",
+        "client_width": 1920,
+        "client_height": 1080
+      },
+      "lifecycle": {
+        "rendered_frames": 2160,
+        "successful_presents": 2160,
+        "context_deleted": true
+      },
+      "focused_frames": 1800,
+      "startup_priming": {
+        "blank_presents_before_engine_scene": 3
+      },
+      "report_sha256": "ccc19e67a76ed952215b604829be4f327b68530482360305a57acdcd754b31b5"
+    },
+    {
+      "path": "out/phase6-performance-qualified/wayland/landed_vc-1",
+      "backend": "wayland",
+      "case": "landed_vc-1",
+      "cadence": {
+        "samples": 1800,
+        "median_ms": 22.181868,
+        "p95_ms": 24.402936,
+        "p99_ms": 26.273782,
+        "minimum_ms": 11.20857,
+        "maximum_ms": 44.875373,
+        "mean_ms": 22.44818118222222
+      },
+      "poll_to_present": {
+        "samples": 1800,
+        "median_ms": 22.1777275,
+        "p95_ms": 24.397224,
+        "p99_ms": 26.268734,
+        "minimum_ms": 11.196697,
+        "maximum_ms": 44.869727,
+        "mean_ms": 22.44299342277778
+      },
+      "swap": {
+        "samples": 1800,
+        "median_ms": 0.1379015,
+        "p95_ms": 0.31283,
+        "p99_ms": 0.388055,
+        "minimum_ms": 0.096899,
+        "maximum_ms": 20.428388,
+        "mean_ms": 0.26108642
+      },
+      "window": {
+        "backend": "wayland",
+        "logical_width": 1536,
+        "logical_height": 864,
+        "framebuffer_width": 1920,
+        "framebuffer_height": 1080,
+        "content_scale_x": 1.25,
+        "content_scale_y": 1.25,
+        "requested_width": 1920,
+        "requested_height": 1080,
+        "engineering_scale": 1
+      },
+      "renderer": {
+        "vendor": "Intel",
+        "renderer": "Mesa Intel(R) Graphics (PTL)",
+        "version": "4.6 (Core Profile) Mesa 26.0.8-1ubuntu0.3",
+        "client_width": 1920,
+        "client_height": 1080
+      },
+      "lifecycle": {
+        "rendered_frames": 2160,
+        "successful_presents": 2160,
+        "context_deleted": true
+      },
+      "focused_frames": 1800,
+      "startup_priming": {
+        "blank_presents_before_engine_scene": 3
+      },
+      "report_sha256": "7653e3bf03eab1e1d7b74d1164a3a2da25023b62fb7ac12548c95f9b96ca7fd9"
+    },
+    {
+      "path": "out/phase6-performance-qualified/wayland/landed_vc-2",
+      "backend": "wayland",
+      "case": "landed_vc-2",
+      "cadence": {
+        "samples": 1800,
+        "median_ms": 22.2460955,
+        "p95_ms": 24.520853,
+        "p99_ms": 26.207909,
+        "minimum_ms": 19.955645,
+        "maximum_ms": 42.768017,
+        "mean_ms": 22.473130890555556
+      },
+      "poll_to_present": {
+        "samples": 1800,
+        "median_ms": 22.241491,
+        "p95_ms": 24.51615,
+        "p99_ms": 26.202721,
+        "minimum_ms": 19.951155,
+        "maximum_ms": 42.745863,
+        "mean_ms": 22.467923536666667
+      },
+      "swap": {
+        "samples": 1800,
+        "median_ms": 0.14643,
+        "p95_ms": 0.29521,
+        "p99_ms": 0.394251,
+        "minimum_ms": 0.096603,
+        "maximum_ms": 20.229428,
+        "mean_ms": 0.25092931
+      },
+      "window": {
+        "backend": "wayland",
+        "logical_width": 1536,
+        "logical_height": 864,
+        "framebuffer_width": 1920,
+        "framebuffer_height": 1080,
+        "content_scale_x": 1.25,
+        "content_scale_y": 1.25,
+        "requested_width": 1920,
+        "requested_height": 1080,
+        "engineering_scale": 1
+      },
+      "renderer": {
+        "vendor": "Intel",
+        "renderer": "Mesa Intel(R) Graphics (PTL)",
+        "version": "4.6 (Core Profile) Mesa 26.0.8-1ubuntu0.3",
+        "client_width": 1920,
+        "client_height": 1080
+      },
+      "lifecycle": {
+        "rendered_frames": 2160,
+        "successful_presents": 2160,
+        "context_deleted": true
+      },
+      "focused_frames": 1800,
+      "startup_priming": {
+        "blank_presents_before_engine_scene": 3
+      },
+      "report_sha256": "85f3211e0ab04e15a92647d5dba1030021f88b5e89410bec17c16a6a05b9f5c7"
+    },
+    {
+      "path": "out/phase6-performance-qualified/x11/landed_exterior-1",
+      "backend": "x11",
+      "case": "landed_exterior-1",
+      "cadence": {
+        "samples": 1800,
+        "median_ms": 8.5200225,
+        "p95_ms": 11.739708,
+        "p99_ms": 14.327405,
+        "minimum_ms": 3.917032,
+        "maximum_ms": 139.122244,
+        "mean_ms": 8.937635509444444
+      },
+      "poll_to_present": {
+        "samples": 1800,
+        "median_ms": 8.2408645,
+        "p95_ms": 11.185689,
+        "p99_ms": 13.869257,
+        "minimum_ms": 3.746016,
+        "maximum_ms": 138.865169,
+        "mean_ms": 8.577851875
+      },
+      "swap": {
+        "samples": 1800,
+        "median_ms": 0.9676370000000001,
+        "p95_ms": 3.996157,
+        "p99_ms": 4.927086,
+        "minimum_ms": 0.083176,
+        "maximum_ms": 134.374198,
+        "mean_ms": 1.6652120505555557
+      },
+      "window": {
+        "backend": "x11",
+        "logical_width": 1920,
+        "logical_height": 1080,
+        "framebuffer_width": 1920,
+        "framebuffer_height": 1080,
+        "content_scale_x": 2,
+        "content_scale_y": 2,
+        "requested_width": 1920,
+        "requested_height": 1080,
+        "engineering_scale": 1
+      },
+      "renderer": {
+        "vendor": "Intel",
+        "renderer": "Mesa Intel(R) Graphics (PTL)",
+        "version": "4.6 (Core Profile) Mesa 26.0.8-1ubuntu0.3",
+        "client_width": 1920,
+        "client_height": 1080
+      },
+      "lifecycle": {
+        "rendered_frames": 2160,
+        "successful_presents": 2160,
+        "context_deleted": true
+      },
+      "focused_frames": 1800,
+      "startup_priming": null,
+      "report_sha256": "ba7401d5812f0b6521c1cb446b3d715a5cc0554cea46bedce26f68b777b39a4f"
+    },
+    {
+      "path": "out/phase6-performance-qualified/x11/landed_exterior-2",
+      "backend": "x11",
+      "case": "landed_exterior-2",
+      "cadence": {
+        "samples": 1800,
+        "median_ms": 8.371787,
+        "p95_ms": 11.949346,
+        "p99_ms": 14.707141,
+        "minimum_ms": 4.467883,
+        "maximum_ms": 99.742234,
+        "mean_ms": 8.966568636111111
+      },
+      "poll_to_present": {
+        "samples": 1800,
+        "median_ms": 8.1817085,
+        "p95_ms": 11.457578,
+        "p99_ms": 14.459968,
+        "minimum_ms": 4.354714,
+        "maximum_ms": 99.537786,
+        "mean_ms": 8.71578052111111
+      },
+      "swap": {
+        "samples": 1800,
+        "median_ms": 1.6625685,
+        "p95_ms": 3.742066,
+        "p99_ms": 4.379818,
+        "minimum_ms": 0.078494,
+        "maximum_ms": 91.887831,
+        "mean_ms": 1.83368425
+      },
+      "window": {
+        "backend": "x11",
+        "logical_width": 1920,
+        "logical_height": 1080,
+        "framebuffer_width": 1920,
+        "framebuffer_height": 1080,
+        "content_scale_x": 2,
+        "content_scale_y": 2,
+        "requested_width": 1920,
+        "requested_height": 1080,
+        "engineering_scale": 1
+      },
+      "renderer": {
+        "vendor": "Intel",
+        "renderer": "Mesa Intel(R) Graphics (PTL)",
+        "version": "4.6 (Core Profile) Mesa 26.0.8-1ubuntu0.3",
+        "client_width": 1920,
+        "client_height": 1080
+      },
+      "lifecycle": {
+        "rendered_frames": 2160,
+        "successful_presents": 2160,
+        "context_deleted": true
+      },
+      "focused_frames": 1800,
+      "startup_priming": null,
+      "report_sha256": "8ffebd17b3d42aef05c389713fb7d41b381e478c32d12e8c6edb33070bce6b6c"
+    },
+    {
+      "path": "out/phase6-performance-qualified/x11/orbit_panel-1",
+      "backend": "x11",
+      "case": "orbit_panel-1",
+      "cadence": {
+        "samples": 1800,
+        "median_ms": 8.475213499999999,
+        "p95_ms": 13.586594,
+        "p99_ms": 28.991223,
+        "minimum_ms": 1.572139,
+        "maximum_ms": 192.108683,
+        "mean_ms": 9.196923144444444
+      },
+      "poll_to_present": {
+        "samples": 1800,
+        "median_ms": 8.2372205,
+        "p95_ms": 12.981082,
+        "p99_ms": 28.596187,
+        "minimum_ms": 1.462218,
+        "maximum_ms": 191.695008,
+        "mean_ms": 8.847349739444445
+      },
+      "swap": {
+        "samples": 1800,
+        "median_ms": 6.035964,
+        "p95_ms": 8.338503,
+        "p99_ms": 12.794391,
+        "minimum_ms": 0.053711,
+        "maximum_ms": 188.821057,
+        "mean_ms": 5.823708954444444
+      },
+      "window": {
+        "backend": "x11",
+        "logical_width": 1920,
+        "logical_height": 1080,
+        "framebuffer_width": 1920,
+        "framebuffer_height": 1080,
+        "content_scale_x": 2,
+        "content_scale_y": 2,
+        "requested_width": 1920,
+        "requested_height": 1080,
+        "engineering_scale": 1
+      },
+      "renderer": {
+        "vendor": "Intel",
+        "renderer": "Mesa Intel(R) Graphics (PTL)",
+        "version": "4.6 (Core Profile) Mesa 26.0.8-1ubuntu0.3",
+        "client_width": 1920,
+        "client_height": 1080
+      },
+      "lifecycle": {
+        "rendered_frames": 2160,
+        "successful_presents": 2160,
+        "context_deleted": true
+      },
+      "focused_frames": 1800,
+      "startup_priming": null,
+      "report_sha256": "982ac85316c1863550dbc8277ef3b2ae41d4e2ee0adfd1a72d3284ef1de42c32"
+    },
+    {
+      "path": "out/phase6-performance-qualified/x11/orbit_panel-2",
+      "backend": "x11",
+      "case": "orbit_panel-2",
+      "cadence": {
+        "samples": 1800,
+        "median_ms": 8.4908295,
+        "p95_ms": 14.126222,
+        "p99_ms": 30.481378,
+        "minimum_ms": 1.81342,
+        "maximum_ms": 178.928996,
+        "mean_ms": 9.43340070888889
+      },
+      "poll_to_present": {
+        "samples": 1800,
+        "median_ms": 8.249818,
+        "p95_ms": 13.638192,
+        "p99_ms": 30.032038,
+        "minimum_ms": 1.557262,
+        "maximum_ms": 178.188176,
+        "mean_ms": 9.066689752222223
+      },
+      "swap": {
+        "samples": 1800,
+        "median_ms": 6.019768,
+        "p95_ms": 8.707879,
+        "p99_ms": 12.425628,
+        "minimum_ms": 0.049064,
+        "maximum_ms": 173.266759,
+        "mean_ms": 5.750035613333333
+      },
+      "window": {
+        "backend": "x11",
+        "logical_width": 1920,
+        "logical_height": 1080,
+        "framebuffer_width": 1920,
+        "framebuffer_height": 1080,
+        "content_scale_x": 2,
+        "content_scale_y": 2,
+        "requested_width": 1920,
+        "requested_height": 1080,
+        "engineering_scale": 1
+      },
+      "renderer": {
+        "vendor": "Intel",
+        "renderer": "Mesa Intel(R) Graphics (PTL)",
+        "version": "4.6 (Core Profile) Mesa 26.0.8-1ubuntu0.3",
+        "client_width": 1920,
+        "client_height": 1080
+      },
+      "lifecycle": {
+        "rendered_frames": 2160,
+        "successful_presents": 2160,
+        "context_deleted": true
+      },
+      "focused_frames": 1800,
+      "startup_priming": null,
+      "report_sha256": "239acf0bf977555b1e3457fd3a00b46f41375111519e5a15beb091fcfa3edd96"
+    },
+    {
+      "path": "out/phase6-performance-qualified/x11/landed_vc-1",
+      "backend": "x11",
+      "case": "landed_vc-1",
+      "cadence": {
+        "samples": 1800,
+        "median_ms": 8.4618845,
+        "p95_ms": 11.639265,
+        "p99_ms": 13.912224,
+        "minimum_ms": 4.358348,
+        "maximum_ms": 86.976345,
+        "mean_ms": 8.949043423888888
+      },
+      "poll_to_present": {
+        "samples": 1800,
+        "median_ms": 8.2196275,
+        "p95_ms": 11.104871,
+        "p99_ms": 13.386803,
+        "minimum_ms": 4.18671,
+        "maximum_ms": 86.681776,
+        "mean_ms": 8.620182287777778
+      },
+      "swap": {
+        "samples": 1800,
+        "median_ms": 1.1429325000000001,
+        "p95_ms": 3.762506,
+        "p99_ms": 4.839564,
+        "minimum_ms": 0.090357,
+        "maximum_ms": 78.259407,
+        "mean_ms": 1.7365891016666666
+      },
+      "window": {
+        "backend": "x11",
+        "logical_width": 1920,
+        "logical_height": 1080,
+        "framebuffer_width": 1920,
+        "framebuffer_height": 1080,
+        "content_scale_x": 2,
+        "content_scale_y": 2,
+        "requested_width": 1920,
+        "requested_height": 1080,
+        "engineering_scale": 1
+      },
+      "renderer": {
+        "vendor": "Intel",
+        "renderer": "Mesa Intel(R) Graphics (PTL)",
+        "version": "4.6 (Core Profile) Mesa 26.0.8-1ubuntu0.3",
+        "client_width": 1920,
+        "client_height": 1080
+      },
+      "lifecycle": {
+        "rendered_frames": 2160,
+        "successful_presents": 2160,
+        "context_deleted": true
+      },
+      "focused_frames": 1800,
+      "startup_priming": null,
+      "report_sha256": "58eca164b645bbaec4dee58867472f5eeaff0976509aa431c93493a807a31f2b"
+    },
+    {
+      "path": "out/phase6-performance-qualified/x11/landed_vc-2",
+      "backend": "x11",
+      "case": "landed_vc-2",
+      "cadence": {
+        "samples": 1800,
+        "median_ms": 8.7465835,
+        "p95_ms": 12.575169,
+        "p99_ms": 15.273859,
+        "minimum_ms": 4.75956,
+        "maximum_ms": 107.982475,
+        "mean_ms": 9.421289243333334
+      },
+      "poll_to_present": {
+        "samples": 1800,
+        "median_ms": 8.453672000000001,
+        "p95_ms": 12.030065,
+        "p99_ms": 14.816791,
+        "minimum_ms": 4.556907,
+        "maximum_ms": 107.478225,
+        "mean_ms": 9.07859184888889
+      },
+      "swap": {
+        "samples": 1800,
+        "median_ms": 0.494672,
+        "p95_ms": 3.825226,
+        "p99_ms": 5.234131,
+        "minimum_ms": 0.097401,
+        "maximum_ms": 95.57008,
+        "mean_ms": 1.4765013516666667
+      },
+      "window": {
+        "backend": "x11",
+        "logical_width": 1920,
+        "logical_height": 1080,
+        "framebuffer_width": 1920,
+        "framebuffer_height": 1080,
+        "content_scale_x": 2,
+        "content_scale_y": 2,
+        "requested_width": 1920,
+        "requested_height": 1080,
+        "engineering_scale": 1
+      },
+      "renderer": {
+        "vendor": "Intel",
+        "renderer": "Mesa Intel(R) Graphics (PTL)",
+        "version": "4.6 (Core Profile) Mesa 26.0.8-1ubuntu0.3",
+        "client_width": 1920,
+        "client_height": 1080
+      },
+      "lifecycle": {
+        "rendered_frames": 2160,
+        "successful_presents": 2160,
+        "context_deleted": true
+      },
+      "focused_frames": 1800,
+      "startup_priming": null,
+      "report_sha256": "f5049aee88873121d42f2a9d309a7162b68f73f58c02ab494d8073b1e5789195"
+    }
+  ],
+  "loaded_runtime_libraries_sha256": {
+    "/usr/lib/x86_64-linux-gnu/libgallium-26.0.8-1ubuntu0.3.so": "64c5508bb7167947f932c950d5e2d2c314f631fc3919de82f757c3769758b79f",
+    "/usr/lib/x86_64-linux-gnu/libdrm_intel.so.1.131.0": "b4efda864f3ff03ec175787fc83c330981cf3a50704127debb782c325055054e",
+    "/usr/lib/x86_64-linux-gnu/libdrm_amdgpu.so.1.131.0": "edc5af5a40623befde7f1214950cb0046e04e9a39f925e6959e71f01d2d34d9c",
+    "/usr/lib/x86_64-linux-gnu/libdrm.so.2.131.0": "c8be7d3863453898666977c12b0b392014a1c728d84215d885d574882d6e7b89",
+    "/usr/lib/x86_64-linux-gnu/libEGL_mesa.so.0.0.0": "33928ce22aa227d807ee63b8dbe8d92c66cbbb2389c3825839f51945ad339b45",
+    "/usr/lib/x86_64-linux-gnu/libgbm.so.1.0.0": "fe7f42f2aada962b9838e6ed83711ed24c45d145d05231aa0b3c5dd9cf30771f",
+    "/usr/lib/x86_64-linux-gnu/libEGL.so.1.1.0": "6fa3af4903be9ce007f56f0a0cd2fff01d6500b5eecb59df13c93f17c2059341",
+    "/usr/lib/x86_64-linux-gnu/libX11-xcb.so.1.0.0": "6a9047ac83e4e1afb8032e62332aa449e7c6307c731f621054c9c0573a460899",
+    "/usr/lib/x86_64-linux-gnu/libX11.so.6.4.0": "badd43566333da97d916ab365c61227751d49cd5c0df5d49dabdbd67b8c6fd19",
+    "/usr/lib/x86_64-linux-gnu/libxkbcommon.so.0.13.1": "8b7d244ea1df8b1c073069344f8c705bab90d6b6bcafb96f1c2eccc2312f4946",
+    "/usr/lib/x86_64-linux-gnu/libwayland-client.so.0.24.0": "f27b9eecd96d76ae49ec9f7d4da17dcc43df3411ef3d432ce56d710c8b62930c",
+    "/usr/lib/x86_64-linux-gnu/libGLdispatch.so.0.0.0": "8c3dbc80a9e435d15bb6394f609f90b823175a92e9ca41133294b5b8fcac50b2",
+    "/usr/lib/x86_64-linux-gnu/libdecor-0.so.0.200.5": "78665b57f55f602c782c01f4d7e92066a79b1418ba2ea338c3aafe7bcc348365",
+    "/usr/lib/x86_64-linux-gnu/libGLX.so.0.0.0": "0754505cc97c5c2251aebc10b5ab6ccbb9ad02d765bee07115bc9c09daf13002",
+    "/usr/lib/x86_64-linux-gnu/libwayland-egl.so.1.24.0": "876d46c04d35fde63a9ebf9ab7bf1f39b6d1c7f5c7bbc21c74c711fccc173ad0",
+    "/usr/lib/x86_64-linux-gnu/libwayland-cursor.so.0.24.0": "22ea2b5f2c5290a356bb73b3c1dab09535cd2126f1227a89cca148ccfc71422d",
+    "/usr/lib/x86_64-linux-gnu/libdecor/plugins-1/libdecor-gtk.so": "1714f558d95368c972c8440301fceb4d40d82b750a09a1fcdc6d8ee230c8a562",
+    "/usr/lib/x86_64-linux-gnu/libGLX_mesa.so.0.0.0": "864200bd459ead8a3027bedb768e1f7189b1526fc93ab5280b3edcad0cfc11fe"
+  },
+  "gate_control": {
+    "path": "out/phase6-performance-gate-control.json",
+    "sha256": "46052df26cac3dcad97e1c2fc090051bf36cfa7da2fb4363c29380eb6be6a56f"
+  },
+  "invalid_window_dimensions": {
+    "path": "out/phase6-performance-window-validation-final/window-validation.json",
+    "sha256": "162144347786701c5c160279de07517449d14736b9d0f3076e358c4150ee5e97"
+  },
+  "default_window_regression": {
+    "capture": {
+      "path": "out/phase6-performance-regressions/camera/camera-report.json",
+      "sha256": "614f0aae21ea55f093c9d904c7b66e5d0084776bc29b190096df60d5ab7f7471"
+    },
+    "comparison": {
+      "path": "out/phase6-performance-regressions/camera-comparison.json",
+      "sha256": "c0b39805a7949abe35ed69b93331ede8e54fe9d7113074d7520f736a3cd67260"
+    },
+    "original_capture": {
+      "path": "out/phase6-headlook-original/Release-automatic/camera-original/camera-report.json",
+      "sha256": "f99f503fda978c998a54a8d58d07758f265f3c9751c2c4534699cf5dc02a1ca4"
+    },
+    "original_source": "f725194209634f7fd5d1d44d426cfa9b5e303e37",
+    "cases": 12,
+    "processes": 24,
+    "presents": 1440,
+    "full_frame_ssim_min": 1.0,
+    "direct_mfd_ssim_min": 1.0,
+    "screen_mfd_ssim_min": 1.0,
+    "camera_maxima": {
+      "position_m": 0.0,
+      "rotation_rad": 0.0,
+      "aperture_rad": 0.0
+    }
+  },
+  "input_regressions": [
+    {
+      "path": "out/phase6-performance-regressions/controls_dg_panel-1/wayland-input.json",
+      "sha256": "efbf55a83a97f43b106509cd66c9ca174b0a9cd3c1593031b7f2362a8da663d9",
+      "case": "controls_dg_panel",
+      "scale": 1,
+      "renderer": {
+        "vendor": "Mesa",
+        "renderer": "llvmpipe (LLVM 21.1.8, 256 bits)",
+        "version": "4.5 (Core Profile) Mesa 26.0.8-1ubuntu0.3",
+        "client_width": 1280,
+        "client_height": 720
+      },
+      "lifecycle": {
+        "rendered_frames": 1212,
+        "successful_presents": 1212,
+        "context_deleted": true
+      },
+      "geometry": {
+        "backend": "wayland",
+        "logical_width": 1280,
+        "logical_height": 720,
+        "framebuffer_width": 1280,
+        "framebuffer_height": 720,
+        "content_scale_x": 1,
+        "content_scale_y": 1,
+        "requested_width": 1280,
+        "requested_height": 720,
+        "engineering_scale": 1
+      }
+    },
+    {
+      "path": "out/phase6-performance-regressions/controls_dgs_vc-2/wayland-input.json",
+      "sha256": "ce60a2956285f93b9c24512281dfd2ceb01870eaef786a04eb7f5928553df197",
+      "case": "controls_dgs_vc",
+      "scale": 2,
+      "renderer": {
+        "vendor": "Intel",
+        "renderer": "Mesa Intel(R) Graphics (PTL)",
+        "version": "4.6 (Core Profile) Mesa 26.0.8-1ubuntu0.3",
+        "client_width": 1280,
+        "client_height": 720
+      },
+      "lifecycle": {
+        "rendered_frames": 1762,
+        "successful_presents": 1762,
+        "context_deleted": true
+      },
+      "geometry": {
+        "backend": "wayland",
+        "logical_width": 640,
+        "logical_height": 360,
+        "framebuffer_width": 1280,
+        "framebuffer_height": 720,
+        "content_scale_x": 2,
+        "content_scale_y": 2,
+        "requested_width": 1280,
+        "requested_height": 720,
+        "engineering_scale": 2
+      }
+    }
+  ],
+  "source_audit": {
+    "status": "passed",
+    "explicit_extraction_files": 443,
+    "log_sha256": "5034eb099d877a3749f72fe4d85d6bac71830dc862f900c4e3a624cd69e49b15"
+  },
+  "local_evidence_archive": {
+    "path": "out/phase6-performance-evidence-v1.tar.gz",
+    "bytes": 115326360,
+    "sha256": "620705bbd3965e7568954504274b2bccfcfcdbb7a9dd2e101af201f72d4a07eb",
+    "scope": "Qualified raw hardware metrics, source/profile, negative controls and frozen-reference regressions; local preservation bundle awaiting durable release storage"
+  },
+  "development_trials": [
+    {
+      "path": "out/phase6-performance-wayland-smoke",
+      "result": "Rejected actual 1469x891 viewport; explicit physical-pixel window sizing and entered-surface fractional feedback corrected startup"
+    },
+    {
+      "path": "out/phase6-performance-x11-smoke",
+      "result": "Rejected checker assumption that X11 font DPI multiplies framebuffer dimensions; now validates actual X11 client pixels independently"
+    },
+    {
+      "path": "out/phase6-performance-x11-smoke-2",
+      "result": "Rejected unsuitable per-object mesh counter for an original 2D panel; full live cockpit/MFD trace and loaded stock mesh checks cover that separate rendering path"
+    },
+    {
+      "path": "out/phase6-performance-x11-smoke-3",
+      "result": "All three smoke workloads passed; smoke-only results excluded from full qualification"
+    }
+  ],
+  "preserved": {
+    "frozen_reference_bytes": true,
+    "numerical_and_image_budgets": true,
+    "accepted_phase5_binaries_and_profile": true,
+    "default_window_policy": true,
+    "original_physics_calculations_and_order": true,
+    "windows_sdk_types_and_layouts": true
+  },
+  "remaining": [
+    "Physical input-device acceptance; controller information requested from user",
+    "Complete named unchanged scenario acceptance and remaining vessel dependencies",
+    "Current complete hosted qualification",
+    "Wayland input/lifetime sanitizer scope",
+    "Durable release preservation of the prepared evidence archive",
+    "Full Phase 6 acceptance audit"
+  ]
+}

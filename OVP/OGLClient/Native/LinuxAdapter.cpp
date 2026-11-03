@@ -147,6 +147,10 @@ bool guiInitialized=false;
 orbiter::production::NativeJoystickState cockpitJoystick;
 int joystickDevice=-1;float initialThrottle=0,lastThrottle=0;bool armed=false,throttleSeen=false;
 int engineeringWindowScale=1;
+int requestedWindowWidth=1280,requestedWindowHeight=720;
+std::ofstream frameTimes;
+std::chrono::steady_clock::time_point frameStart;
+unsigned timingFrame=0;
 
 void recordWindowGeometry(GLFWwindow* window) {
     const auto& evidence=GetNativeRenderContext().evidence;
@@ -161,6 +165,7 @@ void recordWindowGeometry(GLFWwindow* window) {
             <<"\",\"logical_width\":"<<logicalWidth<<",\"logical_height\":"<<logicalHeight
             <<",\"framebuffer_width\":"<<width<<",\"framebuffer_height\":"<<height
             <<",\"content_scale_x\":"<<scaleX<<",\"content_scale_y\":"<<scaleY
+            <<",\"requested_width\":"<<requestedWindowWidth<<",\"requested_height\":"<<requestedWindowHeight
             <<",\"engineering_scale\":"<<engineeringWindowScale<<"}\n";
     }
     std::filesystem::rename(temporary,evidence/"native-window.json");
@@ -178,28 +183,57 @@ void OGLClient::Open()
     // Normal sessions retain the established window policy.
     const auto scaleMarker=GetNativeRenderContext().evidence/"window-scale.enabled";
     engineeringWindowScale=1;
+    requestedWindowWidth=1280;requestedWindowHeight=720;
+    auto* configuration=GetNativeRenderContext().configuration;
+    require(configuration,"Native window requires production configuration");
+    const bool configuredWidth=configuration->GetInt("WindowWidth",requestedWindowWidth);
+    const bool configuredHeight=configuration->GetInt("WindowHeight",requestedWindowHeight);
+    require(requestedWindowWidth>=320 && requestedWindowWidth<=16384 && requestedWindowHeight>=200 && requestedWindowHeight<=16384,
+        "Native window dimensions are outside the supported range");
     if(!GetNativeRenderContext().evidence.empty() && std::filesystem::is_regular_file(scaleMarker)) {
         std::ifstream marker(scaleMarker);marker>>engineeringWindowScale;
         require(marker && engineeringWindowScale==2,"Engineering window scale must be 2");
+        require(requestedWindowWidth==1280 && requestedWindowHeight==720,"Engineering scale fixture requires the accepted 1280x720 viewport");
     }
-    glfwWindowHint(GLFW_SCALE_FRAMEBUFFER,engineeringWindowScale==2?GLFW_TRUE:GLFW_FALSE);
-    nativeWindow=glfwCreateWindow(1280/engineeringWindowScale,720/engineeringWindowScale,"Orbiter: native production engine / Sol / ShuttlePB",nullptr,nullptr);
+    const bool scaledWindow=glfwGetPlatform()==GLFW_PLATFORM_WAYLAND && (configuredWidth || configuredHeight);
+    float scaleX=1,scaleY=1;
+    if(scaledWindow) {
+        auto* monitor=glfwGetPrimaryMonitor();require(monitor,"Configured native window requires a primary display");
+        glfwGetMonitorContentScale(monitor,&scaleX,&scaleY);
+        require(std::isfinite(scaleX) && std::isfinite(scaleY) && scaleX>=1 && scaleY>=1,"Native display scale is invalid");
+    }
+    if(engineeringWindowScale==2)scaleX=scaleY=2;
+    glfwWindowHint(GLFW_SCALE_FRAMEBUFFER,scaledWindow || engineeringWindowScale==2?GLFW_TRUE:GLFW_FALSE);
+    nativeWindow=glfwCreateWindow(int(std::lround(requestedWindowWidth/scaleX)),int(std::lround(requestedWindowHeight/scaleY)),"Orbiter: native production engine / Sol / ShuttlePB",nullptr,nullptr);
     require(nativeWindow!=nullptr,"Native OpenGL window creation failed");
     glfwMakeContextCurrent(nativeWindow);glfwSwapInterval(1);
     require(gladLoadGLLoader(reinterpret_cast<GLADloadproc>(glfwGetProcAddress))!=0,"Native OpenGL function loading failed");
-    if(engineeringWindowScale==2) {
+    if(scaledWindow || engineeringWindowScale==2) {
         // Wayland announces the entered output's scale after the first buffer
         // commit. Settle it before constructing the original fixed-size Pane.
         const auto deadline=std::chrono::steady_clock::now()+std::chrono::seconds(5);
         int width=0,height=0;unsigned primingPresents=0;
         for(;;) {
             glfwGetFramebufferSize(nativeWindow,&width,&height);
-            if(width==1280 && height==720)break;
-            require(std::chrono::steady_clock::now()<deadline,"Engineering window did not enter a 2x output");
+            if(width==requestedWindowWidth && height==requestedWindowHeight)break;
+            require(std::chrono::steady_clock::now()<deadline,engineeringWindowScale==2?
+                "Engineering window did not enter a 2x output":"Configured native framebuffer dimensions are unavailable");
+            if(scaledWindow && engineeringWindowScale!=2 && primingPresents) {
+                // Fractional-scale feedback can differ from the output's
+                // integer scale. Use the entered surface's actual content scale.
+                glfwGetWindowContentScale(nativeWindow,&scaleX,&scaleY);
+                require(std::isfinite(scaleX) && std::isfinite(scaleY) && scaleX>=1 && scaleY>=1,"Native window scale is invalid");
+                int logicalWidth=0,logicalHeight=0;glfwGetWindowSize(nativeWindow,&logicalWidth,&logicalHeight);
+                const int desiredWidth=int(std::lround(requestedWindowWidth/scaleX));
+                const int desiredHeight=int(std::lround(requestedWindowHeight/scaleY));
+                if(logicalWidth!=desiredWidth || logicalHeight!=desiredHeight)glfwSetWindowSize(nativeWindow,desiredWidth,desiredHeight);
+            }
             glClear(GL_COLOR_BUFFER_BIT);glfwSwapBuffers(nativeWindow);++primingPresents;glfwPollEvents();
         }
-        std::ofstream priming(GetNativeRenderContext().evidence/"engineering-window-priming.json");
-        priming<<"{\"blank_presents_before_engine_scene\":"<<primingPresents<<"}\n";
+        if(!GetNativeRenderContext().evidence.empty()) {
+            std::ofstream priming(GetNativeRenderContext().evidence/(engineeringWindowScale==2?"engineering-window-priming.json":"window-priming.json"));
+            priming<<"{\"blank_presents_before_engine_scene\":"<<primingPresents<<"}\n";
+        }
     }
     cockpitJoystick.Reset();
     scroll=0;dragging=false;keyEvents.clear();mouseEvents.clear();joystickDevice=-1;armed=false;throttleSeen=false;
@@ -221,6 +255,28 @@ void OGLClient::Open()
     int width,height;glfwGetFramebufferSize(nativeWindow,&width,&height);m_width=width;m_height=height;
     Evidence::Begin();
     recordWindowGeometry(nativeWindow);
+    if(!GetNativeRenderContext().evidence.empty()) {
+        const auto& visual=configuration->CfgVisualPrm;
+        const auto& planet=configuration->CfgPRenderPrm;
+        std::ofstream settings(GetNativeRenderContext().evidence/"native-render-settings.json");
+        settings.exceptions(std::ios::badbit|std::ios::failbit);
+        settings<<"{\"swap_interval\":1,\"planet_max_level\":"<<visual.PlanetMaxLevel
+            <<",\"patch_grid_power\":"<<planet.PatchRes<<",\"resolution_bias\":"<<planet.ResolutionBias
+            <<",\"clouds\":"<<visual.bClouds<<",\"cloud_shadows\":"<<visual.bCloudShadows
+            <<",\"vessel_shadows\":"<<visual.bVesselShadows<<",\"night_lights\":"<<visual.bNightlights
+            <<",\"water_reflection\":"<<visual.bWaterreflect<<",\"specular_ripples\":"<<visual.bSpecularRipple
+            <<",\"haze\":"<<visual.bHaze<<",\"fog\":"<<visual.bFog<<",\"specular\":"<<visual.bSpecular
+            <<",\"particle_streams\":"<<visual.bParticleStreams<<",\"local_lights\":"<<visual.bLocalLight
+            <<",\"elevation_mode\":"<<visual.ElevMode<<"}\n";
+    }
+    if(frameTimes.is_open())frameTimes.close();
+    timingFrame=0;
+    if(!GetNativeRenderContext().evidence.empty() &&
+       std::filesystem::is_regular_file(GetNativeRenderContext().evidence/"frame-times.enabled")) {
+        frameTimes.open(GetNativeRenderContext().evidence/"frame-times.csv");
+        frameTimes.exceptions(std::ios::badbit|std::ios::failbit);
+        frameTimes<<"frame,loop_start_ns,swap_start_ns,present_end_ns,framebuffer_width,framebuffer_height,visible,iconified,focused\n";
+    }
     glfwSetFramebufferSizeCallback(nativeWindow,[](GLFWwindow* window,int,int){recordWindowGeometry(window);});
     glfwSetWindowContentScaleCallback(nativeWindow,[](GLFWwindow* window,float,float){recordWindowGeometry(window);});
     Renderer::GlobalInit(m_width,m_height);
@@ -237,6 +293,7 @@ void OGLClient::Open()
 }
 RenderInput OGLClient::Poll()
 {
+    if(frameTimes.is_open())frameStart=std::chrono::steady_clock::now();
     glfwPollEvents();RenderInput input;
     input.mouse.swap(mouseEvents);
     input.close=glfwWindowShouldClose(nativeWindow);
@@ -297,7 +354,20 @@ void OGLClient::Status(const std::string& text) {glfwSetWindowTitle(nativeWindow
 void OGLClient::Resize(int width,int height) {clbkSetViewportSize(width,height);}
 void OGLClient::clbkMakeContextCurrent(bool current) {glfwMakeContextCurrent(current?nativeWindow:nullptr);}
 bool OGLClient::clbkDisplayFrame()
-{Evidence::Frame();glfwSwapBuffers(nativeWindow);Evidence::Presented();return true;}
+{
+    Evidence::Frame();
+    const auto swapStart=frameTimes.is_open()?std::chrono::steady_clock::now():std::chrono::steady_clock::time_point{};
+    glfwSwapBuffers(nativeWindow);Evidence::Presented();
+    if(frameTimes.is_open()) {
+        const auto end=std::chrono::steady_clock::now();
+        const auto ns=[](auto t){return std::chrono::duration_cast<std::chrono::nanoseconds>(t.time_since_epoch()).count();};
+        int width=0,height=0;glfwGetFramebufferSize(nativeWindow,&width,&height);
+        frameTimes<<++timingFrame<<','<<ns(frameStart)<<','<<ns(swapStart)<<','<<ns(end)<<','<<width<<','<<height
+            <<','<<glfwGetWindowAttrib(nativeWindow,GLFW_VISIBLE)<<','<<glfwGetWindowAttrib(nativeWindow,GLFW_ICONIFIED)
+            <<','<<glfwGetWindowAttrib(nativeWindow,GLFW_FOCUSED)<<'\n';
+    }
+    return true;
+}
 void OGLClient::clbkDestroyRenderWindow(bool)
 {
     if(!nativeWindow) return;
@@ -309,6 +379,7 @@ void OGLClient::clbkDestroyRenderWindow(bool)
     }
     ReleaseOverlayBuffers();mTextureManager.reset();Renderer::GlobalExit();
     glfwDestroyWindow(nativeWindow);nativeWindow=nullptr;Evidence::End(true);glfwTerminate();
+    if(frameTimes.is_open())frameTimes.close();
 }
 bool RendererResolveFilePath(const std::string& input,std::string& resolved)
 {
