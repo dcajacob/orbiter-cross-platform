@@ -4,6 +4,7 @@ on:
     branches: ['codex/production-**']
     paths:
       - 'Tests/Production/LuaRuntime/**'
+      - '.github/actions/capture-original-lua/**'
       - '.github/workflows/production-lua-reference.yml'
   workflow_dispatch:
 permissions:
@@ -13,13 +14,9 @@ concurrency:
   cancel-in-progress: true
 jobs:
   capture:
-    name: Original Lua and AAP ${{ matrix.configuration }} x64
+    name: Original Lua and AAP Debug and Release on the same Windows host
     runs-on: windows-2022
-    timeout-minutes: 40
-    strategy:
-      fail-fast: false
-      matrix:
-        configuration: [Debug, Release]
+    timeout-minutes: 60
     steps:
       - uses: actions/checkout@v7
         with:
@@ -28,21 +25,6 @@ jobs:
         with:
           vsversion: '17.0'
           arch: x64
-      - uses: actions/cache@v6
-        with:
-          path: out/cockpit-cache
-          key: original-cockpit-control-runtime-${{ matrix.configuration }}-${{ hashFiles('Tests/Production/Cockpit/Reference/provenance.json') }}
-      - name: Verify and stage exact archived original application, SDK and real client
-        run: >-
-          python -B Tests/Production/CockpitControls/prepare.py --configuration ${{ matrix.configuration }}
-          --cache out/cockpit-cache --output out/original-app
-      - name: Build only the additional SDK control/observation driver
-        shell: pwsh
-        run: |
-          cmake -S Tests/Production/LuaRuntime -B out/control-driver -G Ninja -DCMAKE_BUILD_TYPE=${{ matrix.configuration }} -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DORBITER_TEST_RUNTIME="$pwd/out/original-app" 2>&1 | Tee-Object control-configure.log
-          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-          cmake --build out/control-driver --parallel 2 2>&1 | Tee-Object control-build.log
-          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
       - uses: actions/cache@v6
         with:
           path: out/data-cache/Orbiter-x64.zip
@@ -66,29 +48,15 @@ jobs:
         with:
           python-version: '3.14'
       - run: python -B Tests/Production/stage_mesa.py stage --cache out/mesa-cache --destination out/mesa
-      - name: Capture original Lua scheduling and stock DG/DG-S AAP twice
-        run: >-
-          python -B Tests/Production/LuaRuntime/capture.py --orbiter out/original-app/Orbiter.exe
-          --data out/data --planets out/planets --mesa out/mesa --configuration ${{ matrix.configuration }} --output out/control-reference
-      - uses: actions/upload-artifact@v7
-        if: always()
+      - name: Observe stock Lua and AAP in Debug
+        uses: ./.github/actions/capture-original-lua
         with:
-          name: original-lua-aap-${{ matrix.configuration }}
-          retention-days: 90
-          path: |
-            control-*.log
-            out/control-reference/**/*.json
-            out/control-reference/**/*.csv
-            out/control-reference/**/*.txt
-            out/control-reference/**/*.log
-            out/control-reference/**/*.png
-            out/control-reference/**/*.rgba
-            out/control-reference/**/*.scn
-            out/control-reference/**/Orbiter.cfg
-            out/original-app/control-reference-runtime.json
-            out/original-app/Modules/Plugin/ProductionCockpitDriver.dll
-            out/control-driver/CMakeCache.txt
-            out/control-driver/compile_commands.json
+          configuration: Debug
+      - name: Observe stock Lua and AAP in Release
+        if: ${{ !cancelled() }}
+        uses: ./.github/actions/capture-original-lua
+        with:
+          configuration: Release
   compare:
     name: Original Lua and AAP Debug/Release parity
     needs: capture

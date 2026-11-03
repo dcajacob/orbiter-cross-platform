@@ -4,6 +4,7 @@
 #include "Orbitersdk.h"
 #include "ApplicationObservation.h"
 #include <cstdlib>
+#include <cmath>
 #include <fstream>
 #include <filesystem>
 #include <iomanip>
@@ -24,8 +25,27 @@ class Driver final:public oapi::Module {
     std::string target,profile;
     unsigned frames=0,total=0;int cockpit=0,left=0,right=0,hud=0;
     bool started=false,initialized=false;
-    std::ofstream air;
+    std::ofstream air,controller;
     template<class F>void guarded(F action){try{action();}catch(const std::exception& e){std::ofstream("cockpit-failure.txt")<<e.what()<<'\n';std::exit(42);}}
+    void sampleController() {
+        if (target!="DG" || frames<31 || frames>46) return;
+        // The original script stores these intermediates in globals. Observe
+        // them after the worker has yielded, without running an extra chunk.
+        auto* L=oapiGetLua(script);
+        static auto module=GetModuleHandleA("lua.dll");
+        static auto field=reinterpret_cast<decltype(&lua_getfield)>(GetProcAddress(module,"lua_getfield"));
+        static auto numeric=reinterpret_cast<decltype(&lua_type)>(GetProcAddress(module,"lua_type"));
+        static auto number=reinterpret_cast<decltype(&lua_tonumber)>(GetProcAddress(module,"lua_tonumber"));
+        static auto pop=reinterpret_cast<decltype(&lua_settop)>(GetProcAddress(module,"lua_settop"));
+        require(L && field && numeric && number && pop,"Original Lua observation functions unavailable");
+        controller<<frames;
+        for(const auto* name:{"alt","sl","dslope","delev","elev","dbnk","rate","dail","ail","thrott","dthrott"}) {
+            field(L,LUA_GLOBALSINDEX,name);
+            require(numeric(L,-1)==LUA_TNUMBER,"Missing original AAP intermediate");
+            controller<<','<<number(L,-1);pop(L,-2);
+        }
+        controller<<'\n';controller.flush();
+    }
     void snapshot(){
         auto* v=oapiGetFocusInterface();require(v && target==v->GetName(),"Cockpit focus differs from required real vessel");
         VECTOR3 p{},velocity{},omega{};MATRIX3 rotation{};v->GetGlobalPos(p);v->GetGlobalVel(velocity);v->GetAngularVel(omega);v->GetRotationMatrix(rotation);
@@ -34,12 +54,15 @@ class Driver final:public oapi::Module {
         state<<','<<v->GetMeshCount()<<','<<v->GetThrusterCount()<<'\n';state.flush();
         air<<frames<<','<<v->GetAtmDensity()<<','<<v->GetDynPressure()<<','<<v->GetAirspeed()<<'\n';air.flush();
         controls<<frames<<','<<v->GetControlSurfaceLevel(AIRCTRL_ELEVATOR)<<','<<v->GetControlSurfaceLevel(AIRCTRL_AILERON)<<','<<v->GetThrusterGroupLevel(THGROUP_MAIN)<<'\n';controls.flush();
+        sampleController();
     }
 public:
     explicit Driver(HINSTANCE instance):Module(instance){guarded([&]{
         std::ifstream input("cockpit-case.txt");require(bool(input>>target>>total>>cockpit>>left>>right>>hud>>profile),"Invalid cockpit fixture controls");
         require(total==60 && cockpit>=1 && cockpit<=3 && left>=1 && left<=10 && right>=1 && right<=10,"Unsupported cockpit control schedule");
-        for(auto* stream:{&state,&events,&controls,&air}){stream->imbue(std::locale::classic());stream->exceptions(std::ios::badbit|std::ios::failbit);}
+        for(auto* stream:{&state,&events,&controls,&air,&controller}){stream->imbue(std::locale::classic());stream->exceptions(std::ios::badbit|std::ios::failbit);}
+        controller.open("lua-controller.csv");controller<<std::setprecision(17)<<"tick,alt,sl,dslope,delev,elev,dbnk,rate,dail,ail,thrott,dthrott\n";
+        std::ofstream("math-host.txt")<<"fma3_enabled="<<_get_FMA3_enable()<<'\n';
         air.open("lua-air.csv");air<<std::setprecision(17)<<"tick,density,dynamic_pressure,airspeed\n";
         controls.open("lua-controls.csv");controls<<std::setprecision(17)<<"tick,elevator,aileron,main\n";
         state.open("cockpit-state.csv");events.open("cockpit-events.csv");state<<std::setprecision(17);events<<std::setprecision(17);

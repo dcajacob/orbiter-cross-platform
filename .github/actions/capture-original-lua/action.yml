@@ -1,0 +1,51 @@
+name: Capture original Lua runtime
+description: Stage, exercise and archive one original Windows configuration on the current worker
+inputs:
+  configuration:
+    description: Original Windows Debug or Release configuration
+    required: true
+runs:
+  using: composite
+  steps:
+    - uses: actions/cache@v6
+      with:
+        path: out/cockpit-cache
+        key: original-cockpit-control-runtime-${{ inputs.configuration }}-${{ hashFiles('Tests/Production/Cockpit/Reference/provenance.json') }}
+    - name: Build the observer and run twice on the verified original runtime
+      shell: pwsh
+      env:
+        BUILD: ${{ inputs.configuration }}
+      run: |
+        if ($env:BUILD -notin @('Debug','Release')) { throw 'Unknown capture configuration' }
+        $root = $env:GITHUB_WORKSPACE
+        $stage = New-Item -ItemType Directory -Path "out/pair-$env:BUILD"
+        Set-Location $stage.FullName
+        Get-CimInstance Win32_Processor | Select-Object Manufacturer, Name, Architecture | ConvertTo-Json | Set-Content cpu.json
+        python -B "$root/Tests/Production/CockpitControls/prepare.py" --configuration $env:BUILD --cache "$root/out/cockpit-cache" --output out/original-app
+        if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+        cmake -S "$root/Tests/Production/LuaRuntime" -B out/control-driver -G Ninja -DCMAKE_BUILD_TYPE=$env:BUILD -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DORBITER_TEST_RUNTIME="$pwd/out/original-app" 2>&1 | Tee-Object control-configure.log
+        if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+        cmake --build out/control-driver --parallel 2 2>&1 | Tee-Object control-build.log
+        if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+        python -B "$root/Tests/Production/LuaRuntime/capture.py" --orbiter out/original-app/Orbiter.exe --data "$root/out/data" --planets "$root/out/planets" --mesa "$root/out/mesa" --configuration $env:BUILD --output out/control-reference
+        exit $LASTEXITCODE
+    - uses: actions/upload-artifact@v7
+      if: always()
+      with:
+        name: original-lua-aap-${{ inputs.configuration }}
+        retention-days: 90
+        path: |
+          out/pair-${{ inputs.configuration }}/cpu.json
+          out/pair-${{ inputs.configuration }}/control-*.log
+          out/pair-${{ inputs.configuration }}/out/control-reference/**/*.json
+          out/pair-${{ inputs.configuration }}/out/control-reference/**/*.csv
+          out/pair-${{ inputs.configuration }}/out/control-reference/**/*.txt
+          out/pair-${{ inputs.configuration }}/out/control-reference/**/*.log
+          out/pair-${{ inputs.configuration }}/out/control-reference/**/*.png
+          out/pair-${{ inputs.configuration }}/out/control-reference/**/*.rgba
+          out/pair-${{ inputs.configuration }}/out/control-reference/**/*.scn
+          out/pair-${{ inputs.configuration }}/out/control-reference/**/Orbiter.cfg
+          out/pair-${{ inputs.configuration }}/out/original-app/control-reference-runtime.json
+          out/pair-${{ inputs.configuration }}/out/original-app/Modules/Plugin/ProductionCockpitDriver.dll
+          out/pair-${{ inputs.configuration }}/out/control-driver/CMakeCache.txt
+          out/pair-${{ inputs.configuration }}/out/control-driver/compile_commands.json
