@@ -39,11 +39,19 @@ class Driver final:public oapi::Module {
         static auto pop=reinterpret_cast<decltype(&lua_settop)>(GetProcAddress(module,"lua_settop"));
         require(L && field && numeric && number && pop,"Original Lua observation functions unavailable");
         controller<<frames;
-        for(const auto* name:{"alt","sl","dslope","delev","elev","dbnk","rate","dail","ail","thrott","dthrott"}) {
+        for(const auto* name:{"alt","sl","dslope","delev","elev","dbnk","rate","dail","ail","thrott","dthrott","xz"}) {
             field(L,LUA_GLOBALSINDEX,name);
             require(numeric(L,-1)==LUA_TNUMBER,"Missing original AAP intermediate");
             controller<<','<<number(L,-1);pop(L,-2);
         }
+        field(L,LUA_GLOBALSINDEX,"as");
+        require(numeric(L,-1)==LUA_TTABLE,"Missing original AAP horizon airspeed vector");
+        for (const auto* component:{"x","y","z"}) {
+            field(L,-1,component);
+            require(numeric(L,-1)==LUA_TNUMBER,"Missing original AAP horizon airspeed component");
+            controller<<','<<number(L,-1);pop(L,-2);
+        }
+        pop(L,-2);
         controller<<'\n';controller.flush();
     }
     void snapshot(){
@@ -61,7 +69,7 @@ public:
         std::ifstream input("cockpit-case.txt");require(bool(input>>target>>total>>cockpit>>left>>right>>hud>>profile),"Invalid cockpit fixture controls");
         require(total==60 && cockpit>=1 && cockpit<=3 && left>=1 && left<=10 && right>=1 && right<=10,"Unsupported cockpit control schedule");
         for(auto* stream:{&state,&events,&controls,&air,&controller}){stream->imbue(std::locale::classic());stream->exceptions(std::ios::badbit|std::ios::failbit);}
-        controller.open("lua-controller.csv");controller<<std::setprecision(17)<<"tick,alt,sl,dslope,delev,elev,dbnk,rate,dail,ail,thrott,dthrott\n";
+        controller.open("lua-controller.csv");controller<<std::setprecision(17)<<"tick,alt,sl,dslope,delev,elev,dbnk,rate,dail,ail,thrott,dthrott,xz,as_x,as_y,as_z\n";
         std::ofstream("math-host.txt")<<"fma3_enabled="<<_get_FMA3_enable()<<'\n';
         air.open("lua-air.csv");air<<std::setprecision(17)<<"tick,density,dynamic_pressure,airspeed\n";
         controls.open("lua-controls.csv");controls<<std::setprecision(17)<<"tick,elevator,aileron,main\n";
