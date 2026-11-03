@@ -267,6 +267,14 @@ jobs:
           for case in controls_generic_orbit_surface controls_dg_panel controls_dg_vc controls_dgs_panel controls_dgs_vc; do
             xvfb-run -a -s '-screen 0 1920x1080x24' env LIBGL_ALWAYS_SOFTWARE=1 GALLIUM_DRIVER=llvmpipe python3 -B Tests/Production/CockpitControls/mouse_smoke.py --case "$case" --camera-mouse --frozen out/frozen-cockpit-controls --configuration ${{ matrix.configuration }} --executable out/native-cockpit-engine/orbiter-production --assets out/scene-resources --data out/data --modules out/native-cockpit-engine/NativeModules --planets out/planets --output "out/native-cockpit-camera-mouse/$case"
           done 2>&1 | tee native-cockpit-camera-mouse.log
+      - name: Capture both gliders at original forward and turned VC camera angles
+        run: >-
+          xvfb-run -a -s '-screen 0 1920x1080x24' env LIBGL_ALWAYS_SOFTWARE=1 GALLIUM_DRIVER=llvmpipe
+          python3 -B Tests/Production/CockpitCamera/run.py capture
+          --executable out/native-cockpit-engine/orbiter-production --assets out/scene-resources
+          --data out/data --modules out/native-cockpit-engine/NativeModules --planets out/planets
+          --configuration ${{ matrix.configuration }} --math-profile ${{ matrix.math_profile }}
+          --output out/native-cockpit-camera
       - name: Click the visible stock cockpit menu and change ship, warp, pause and save
         run: >-
           xvfb-run -a -s '-screen 0 1920x1080x24' env LIBGL_ALWAYS_SOFTWARE=1 GALLIUM_DRIVER=llvmpipe
@@ -339,6 +347,7 @@ jobs:
             out/native-cockpit-panel-mouse/**
             out/native-cockpit-vc-mouse/**
             out/native-cockpit-camera-mouse/**
+            out/native-cockpit-camera/**
             out/native-cockpit-ui/**
             out/native-cockpit-ui-window/**
             out/dg-mesh-resources.json
@@ -357,6 +366,7 @@ jobs:
           name: spacecraft-native-${{ matrix.configuration }}-${{ matrix.math_profile }}
           path: |
             out/native-dg-systems/**
+            out/native-cockpit-camera/**
             out/native-recorded-flights/recorded-flights.json
             out/native-recorded-flights/*/numerics.json
             out/native-recorded-flights/*/playback-state.csv
@@ -487,12 +497,41 @@ jobs:
         run: >-
           python -B Tests/Production/DeltaGlider/systems.py --original --executable out/focus-original/Orbiter.exe
           --data out/production-data --planets out/standard-planets --mesa out/mesa-runtime --output out/original-dg-systems
+      - name: Build the VC camera observer against the preserved original SDK
+        id: camera_observer
+        if: ${{ !cancelled() && steps.preserved_cockpit.outcome == 'success' }}
+        shell: pwsh
+        run: |
+          cmake -S Tests/Production/CockpitCamera -B out/camera-observer -G Ninja -DCMAKE_BUILD_TYPE=${{ matrix.configuration }} -DORBITER_TEST_RUNTIME="$pwd/out/focus-original"
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          cmake --build out/camera-observer --parallel 2
+          exit $LASTEXITCODE
+      - name: Capture original forward and turned VC views with scenario and reopened MFDs
+        if: ${{ !cancelled() && steps.camera_observer.outcome == 'success' }}
+        run: >-
+          python -B Tests/Production/CockpitCamera/run.py capture --original
+          --executable out/focus-original/Orbiter.exe --data out/production-data
+          --planets out/standard-planets --mesa out/mesa-runtime
+          --configuration ${{ matrix.configuration }} --math-profile ${{ matrix.math_profile }}
+          --output out/original-cockpit-camera
       - name: Archive original spacecraft observations
         uses: actions/upload-artifact@v7
         if: always()
         with:
           name: spacecraft-original-${{ matrix.configuration }}-${{ matrix.math_profile }}
           path: |
+            out/original-cockpit-camera/camera-report.json
+            out/original-cockpit-camera/*/*.csv
+            out/original-cockpit-camera/*/*.rgba
+            out/original-cockpit-camera/*/*.png
+            out/original-cockpit-camera/*/*.json
+            out/original-cockpit-camera/*/headlook.txt
+            out/original-cockpit-camera/*/console.txt
+            out/original-cockpit-camera/*/Orbiter.log
+            out/original-cockpit-camera/*/cockpit-*.txt
+            out/original-cockpit-camera/*/math-profile.txt
+            out/original-cockpit-camera/*/renderer-modules.txt
+            out/original-cockpit-camera/*/Scenarios/Behavior.scn
             out/original-dg-systems/systems-report.json
             out/original-dg-systems/*/*/flight.scn
             out/original-dg-systems/*/*/saved.scn
@@ -572,6 +611,12 @@ jobs:
         run: >-
           python3 -B Tests/Production/DeltaGlider/systems.py compare --original original/original-dg-systems
           --native native/native-dg-systems --output dg-systems-comparison.json
+      - name: Compare actual VC camera transforms, MFD surfaces and complete off-axis frames
+        if: ${{ !cancelled() }}
+        run: >-
+          python3 -B Tests/Production/CockpitCamera/run.py compare
+          --original original/original-cockpit-camera --native native/native-cockpit-camera
+          --output camera-comparison.json
       - uses: actions/upload-artifact@v7
         if: always()
         with:

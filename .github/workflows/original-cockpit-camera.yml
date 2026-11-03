@@ -1,0 +1,98 @@
+name: Preserved Windows VC Camera Reference
+on:
+  push:
+    branches: ['codex/production-**']
+    paths: ['Tests/Production/CockpitCamera/**', '.github/workflows/original-cockpit-camera.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: original-cockpit-camera-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  original_camera:
+    name: Original VC camera ${{ matrix.configuration }} ${{ matrix.math_profile }}
+    runs-on: windows-2022
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        configuration: [Debug, Release]
+        math_profile: [automatic, sse2]
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - uses: ilammy/msvc-dev-cmd@v1
+        with:
+          vsversion: '17.0'
+          arch: x64
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.14'
+      - uses: actions/cache@v6
+        with:
+          path: out/cockpit-cache
+          key: original-cockpit-control-runtime-${{ matrix.configuration }}-${{ hashFiles('Tests/Production/Cockpit/Reference/provenance.json') }}
+      - uses: actions/cache@v6
+        with:
+          path: out/data-cache/Orbiter-x64.zip
+          key: production-data-${{ hashFiles('Tests/Production/stock-data.lock.json') }}
+      - uses: actions/cache@v6
+        with:
+          path: out/planet-cache/Orbiter2016.zip
+          key: production-standard-planets-${{ hashFiles('Tests/Production/standard-planets.lock.json') }}
+      - uses: actions/cache@v6
+        with:
+          path: out/mesa-cache/*.pkg.tar.zst
+          key: mesa-ucrt64-${{ hashFiles('Tests/Production/mesa-ucrt64.lock.json') }}
+      - name: Stage unchanged application, client, SDK, data and software OpenGL
+        shell: pwsh
+        run: |
+          python -B Tests/Production/prepare_data.py --archive out/data-cache/Orbiter-x64.zip --destination out/production-data
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          python -B Tests/Production/prepare_data.py --lock Tests/Production/standard-planets.lock.json --archive out/planet-cache/Orbiter2016.zip --destination out/standard-planets
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          python -B Tests/Production/stage_mesa.py stage --cache out/mesa-cache --destination out/mesa-runtime
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          python -B Tests/Production/CockpitControls/prepare.py --configuration ${{ matrix.configuration }} --cache out/cockpit-cache --output out/camera-original-runtime
+          exit $LASTEXITCODE
+      - name: Build only the public SDK observation module
+        shell: pwsh
+        run: |
+          cmake -S Tests/Production/CockpitCamera -B out/camera-driver -G Ninja -DCMAKE_BUILD_TYPE=${{ matrix.configuration }} -DORBITER_TEST_RUNTIME="$pwd/out/camera-original-runtime"
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          cmake --build out/camera-driver --parallel 2
+          exit $LASTEXITCODE
+      - name: Select original SSE2 CRT when required
+        if: matrix.math_profile == 'sse2'
+        shell: pwsh
+        run: '"ORBITER_TEST_OBSERVER_SSE2=1" >> $env:GITHUB_ENV'
+      - name: Capture both gliders at forward and turned VC angles twice
+        run: >-
+          python -B Tests/Production/CockpitCamera/run.py capture --original
+          --executable out/camera-original-runtime/Orbiter.exe --data out/production-data
+          --planets out/standard-planets --mesa out/mesa-runtime
+          --configuration ${{ matrix.configuration }} --math-profile ${{ matrix.math_profile }}
+          --output out/camera-original
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: original-camera-${{ matrix.configuration }}-${{ matrix.math_profile }}
+          retention-days: 90
+          path: |
+            out/camera-original/camera-report.json
+            out/camera-original/*/*.csv
+            out/camera-original/*/*.rgba
+            out/camera-original/*/*.png
+            out/camera-original/*/*.json
+            out/camera-original/*/headlook.txt
+            out/camera-original/*/console.txt
+            out/camera-original/*/Orbiter.log
+            out/camera-original/*/cockpit-*.txt
+            out/camera-original/*/math-profile.txt
+            out/camera-original/*/renderer-modules.txt
+            out/camera-original/*/Scenarios/Behavior.scn
+            out/camera-original-runtime/control-reference-runtime.json
+            out/camera-original-runtime/test-runtime.json
+            out/camera-original-runtime/Modules/Plugin/ProductionCockpitDriver.dll

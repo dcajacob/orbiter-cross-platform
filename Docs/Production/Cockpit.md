@@ -162,6 +162,14 @@ scenario load and explicit mode reopening; it does not establish original
 Windows image parity at those angles.
 [VC mouse, camera and profile evidence](DGVCMouseVerification.json)
 
+The additional [VC camera fixture](../../Tests/Production/CockpitCamera/README.md)
+now captures both gliders at forward and turned angles, with scenario-loaded
+and SDK-reopened MFDs, twice per case. Its separate Windows job uses the exact
+preserved application/client and a new public SDK observation module. The
+native workflow captures matching transforms and images, and the paired job
+applies the existing physical, text, overlay, MFD and full-frame gates. This
+is a comparison in progress; native repeats alone do not close off-axis parity.
+
 The native graphics leak now has an isolated source fix and a passing local
 sanitizer menu flow. Mesa's executable-code allocator retained two bookkeeping
 objects (112 bytes) and a 10 MiB mapping after its last generated function was
