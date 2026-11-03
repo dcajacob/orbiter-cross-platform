@@ -1,0 +1,410 @@
+{
+  "schema": 1,
+  "scope": "Diagnostic evidence; original Windows Lua/AAP references remain unaccepted",
+  "run": 41588025808,
+  "source": "090c7f0822befdf3af362d87b3b9bbd4738c3de5",
+  "hosts": {
+    "2022": {
+      "debug": {
+        "capture_status": "passed",
+        "failures": {},
+        "host": {
+          "platform": "Windows-2022Server-10.0.20348-SP0",
+          "image_os": "win22",
+          "image_version": "20261026.347.1"
+        },
+        "archive_sha256": "53561b1328bd8b626c744ebe6adb6a0b25d78f1401d8f4892175d9a466d47523",
+        "application_source": "f725194209634f7fd5d1d44d426cfa9b5e303e37",
+        "runtime_payload_sha256": "8389f1546245a8a9d215062f9599131b466df81ce4288b8371ba8fca196da3ca",
+        "asin_runtime": {
+          "path": "C:\\Windows\\SYSTEM32\\ucrtbased.dll",
+          "sha256": "3bd8c11641a5e98d1edff2cb36c9b5f021b94bd05929b8295380786c5458ba46",
+          "fma3_enabled": "1",
+          "input": "0x1.e92199644661ep-2",
+          "linked_asin": "0x1.fdf30f8d54923p-2",
+          "exported_asin": "0x1.fdf30f8d54923p-2"
+        },
+        "lua_modules": {
+          "LuaInline.dll": "1c514434bd3c1b97e87bc1c87cb203da43575eab9381906994f2f88be10eb2b5",
+          "LuaInterpreter.dll": "ea4ff96f07ffef5e0545b7414b7bd9af600c48a03bbb63193823689290a99542",
+          "lua.dll": "fc2577a1a17aac10e9c516ff29be3bbb450f99361624706f06dc2969e36f2e8f"
+        }
+      },
+      "release": {
+        "capture_status": "passed",
+        "failures": {},
+        "host": {
+          "platform": "Windows-2022Server-10.0.20348-SP0",
+          "image_os": "win22",
+          "image_version": "20261026.347.1"
+        },
+        "archive_sha256": "ca0e378663b212a159252f504596267a47f813c8a258d8412d2936156b4db515",
+        "application_source": "f725194209634f7fd5d1d44d426cfa9b5e303e37",
+        "runtime_payload_sha256": "fb09c8069348758ee5c47626812fe6a87b502367c8eade47b8fa4422e92f29bf",
+        "asin_runtime": {
+          "path": "C:\\Windows\\System32\\ucrtbase.dll",
+          "sha256": "d06d0a421398fb663c6c49586e09774143460fdb1dce489aa9844846b9398555",
+          "fma3_enabled": "1",
+          "input": "0x1.e92199644661ep-2",
+          "linked_asin": "0x1.fdf30f8d54924p-2",
+          "exported_asin": "0x1.fdf30f8d54924p-2"
+        },
+        "lua_modules": {
+          "LuaInline.dll": "0a8ee15b6d2b3f60e436b7e8bfdc17dc861aba7ecdc680cdaba1ebe4ebe45225",
+          "LuaInterpreter.dll": "dbe6746b02d5e0cd3be3ca4d7611f499b97777493f466df19880bb7c9d6d3088",
+          "lua.dll": "bc32cf7a7dce000de0088e8b639315d07b367cd7e86b5dd14ba4fa1a8adec06b"
+        }
+      },
+      "comparisons": {
+        "control-reference": {
+          "status": "failed",
+          "exact_lua_execution": false,
+          "control_differences": {
+            "lua_dg_atmosphere": {
+              "count": 21,
+              "first": {
+                "tick": 35,
+                "control": "elevator",
+                "debug": "-0.0024659457306691647",
+                "release": "-0.0024659457306684535"
+              }
+            }
+          }
+        },
+        "diagnostic-sse2": {
+          "status": "passed",
+          "exact_lua_execution": true
+        }
+      }
+    },
+    "2025": {
+      "debug": {
+        "capture_status": "passed",
+        "failures": {},
+        "host": {
+          "platform": "Windows-2025Server-10.0.26100-SP0",
+          "image_os": "win25-vs2026",
+          "image_version": "20261030.294.1"
+        },
+        "archive_sha256": "555df8209c3d5101c9642154331b21d3ce5287036d202954b3184708fc4bee16",
+        "application_source": "f725194209634f7fd5d1d44d426cfa9b5e303e37",
+        "runtime_payload_sha256": "8389f1546245a8a9d215062f9599131b466df81ce4288b8371ba8fca196da3ca",
+        "asin_runtime": {
+          "path": "C:\\Windows\\SYSTEM32\\ucrtbased.dll",
+          "sha256": "2ca9ad1c1e81ec2872bd4e9dade6294d8cd0e880e01227446b84fa607997f1bd",
+          "fma3_enabled": "1",
+          "input": "0x1.e92199644661ep-2",
+          "linked_asin": "0x1.fdf30f8d54923p-2",
+          "exported_asin": "0x1.fdf30f8d54923p-2"
+        },
+        "lua_modules": {
+          "LuaInline.dll": "1c514434bd3c1b97e87bc1c87cb203da43575eab9381906994f2f88be10eb2b5",
+          "LuaInterpreter.dll": "ea4ff96f07ffef5e0545b7414b7bd9af600c48a03bbb63193823689290a99542",
+          "lua.dll": "fc2577a1a17aac10e9c516ff29be3bbb450f99361624706f06dc2969e36f2e8f"
+        }
+      },
+      "release": {
+        "capture_status": "failed",
+        "failures": {
+          "lua_dg": "Original proc.skip did not yield exactly one frame"
+        },
+        "host": {
+          "platform": "Windows-2025Server-10.0.26100-SP0",
+          "image_os": "win25-vs2026",
+          "image_version": "20261030.294.1"
+        },
+        "archive_sha256": "0c41e3d5cad3f60b461b4e2bccc7c1253b835339fc8c2ddacc3da3f0fc49b0b0",
+        "application_source": "f725194209634f7fd5d1d44d426cfa9b5e303e37",
+        "runtime_payload_sha256": "fb09c8069348758ee5c47626812fe6a87b502367c8eade47b8fa4422e92f29bf",
+        "asin_runtime": {
+          "path": "C:\\Windows\\System32\\ucrtbase.dll",
+          "sha256": "9601850e2ede2cd86b441223557cae0fa7f5e33b1dd9d481c58c8cc2d688bdc3",
+          "fma3_enabled": "1",
+          "input": "0x1.e92199644661ep-2",
+          "linked_asin": "0x1.fdf30f8d54923p-2",
+          "exported_asin": "0x1.fdf30f8d54923p-2"
+        },
+        "lua_modules": {
+          "LuaInline.dll": "0a8ee15b6d2b3f60e436b7e8bfdc17dc861aba7ecdc680cdaba1ebe4ebe45225",
+          "LuaInterpreter.dll": "dbe6746b02d5e0cd3be3ca4d7611f499b97777493f466df19880bb7c9d6d3088",
+          "lua.dll": "bc32cf7a7dce000de0088e8b639315d07b367cd7e86b5dd14ba4fa1a8adec06b"
+        }
+      },
+      "comparisons": {
+        "control-reference": {
+          "status": "failed",
+          "error": "Failed Lua captures cannot be accepted"
+        },
+        "diagnostic-sse2": {
+          "status": "failed",
+          "error": "[Errno 2] No such file or directory: 'out/phase6-lua-host-comparison/2025-release/out/diagnostic-sse2/lua-report.json'"
+        }
+      },
+      "orbital_dg_yields": {
+        "debug": [
+          {
+            "event": "sync_initial",
+            "seconds": "0",
+            "step": "0.25"
+          },
+          {
+            "event": "aap_loaded",
+            "seconds": "0",
+            "step": "0.25"
+          },
+          {
+            "event": "sync_override",
+            "seconds": "2.5",
+            "step": "0.25"
+          },
+          {
+            "event": "async_one",
+            "seconds": "2.5",
+            "step": "0.25"
+          },
+          {
+            "event": "async_two",
+            "seconds": "2.5",
+            "step": "0.25"
+          },
+          {
+            "event": "yield_1",
+            "seconds": "5",
+            "step": "0.25"
+          },
+          {
+            "event": "yield_2",
+            "seconds": "5.25",
+            "step": "0.25"
+          },
+          {
+            "event": "yield_3",
+            "seconds": "5.5",
+            "step": "0.25"
+          },
+          {
+            "event": "yield_4",
+            "seconds": "5.75",
+            "step": "0.25"
+          },
+          {
+            "event": "yield_done",
+            "seconds": "6",
+            "step": "0.25"
+          },
+          {
+            "event": "aap_started",
+            "seconds": "7.5",
+            "step": "0.25"
+          },
+          {
+            "event": "aap_stopped",
+            "seconds": "11.25",
+            "step": "0.25"
+          },
+          {
+            "event": "complete",
+            "seconds": "13.5",
+            "step": "0.25"
+          }
+        ],
+        "release": [
+          {
+            "event": "sync_initial",
+            "seconds": "0",
+            "step": "0.25"
+          },
+          {
+            "event": "aap_loaded",
+            "seconds": "0",
+            "step": "0.25"
+          },
+          {
+            "event": "sync_override",
+            "seconds": "2.5",
+            "step": "0.25"
+          },
+          {
+            "event": "async_one",
+            "seconds": "2.5",
+            "step": "0.25"
+          },
+          {
+            "event": "async_two",
+            "seconds": "2.5",
+            "step": "0.25"
+          },
+          {
+            "event": "yield_1",
+            "seconds": "5",
+            "step": "0.25"
+          },
+          {
+            "event": "yield_2",
+            "seconds": "5.25",
+            "step": "0.25"
+          },
+          {
+            "event": "yield_3",
+            "seconds": "5.5",
+            "step": "0.25"
+          },
+          {
+            "event": "yield_4",
+            "seconds": "5.5",
+            "step": "0.25"
+          },
+          {
+            "event": "yield_done",
+            "seconds": "5.5",
+            "step": "0.25"
+          },
+          {
+            "event": "aap_started",
+            "seconds": "7.5",
+            "step": "0.25"
+          },
+          {
+            "event": "aap_stopped",
+            "seconds": "11.25",
+            "step": "0.25"
+          },
+          {
+            "event": "complete",
+            "seconds": "13.5",
+            "step": "0.25"
+          }
+        ]
+      },
+      "completed_case_exact_traces": {
+        "lua_pb": {
+          "1/lua-events.csv": "35cfdfa8f09f800d8c3d5a490a9b88e67a33bc753e0a6fed0afe068858f2c3e3",
+          "1/lua-controls.csv": "27e60d3b52a3ae2be63076b583893fbb4dd497767da1c81d43db0db774f12200",
+          "1/lua-air.csv": "aa3c3a2522474859b06b80484ca8ec044a69e3c4c5ffbb9509745fd472d26e63",
+          "1/lua-controller.csv": "8349238c1be25f68bf981bf0992d3d90595bdc27df83e17c282b59f7bf11c63e",
+          "1/lua-horizon.csv": "cfcad67d22af4a34d39cffedf4e1a0fa6ec38b7459efe3357741be6663b38f27",
+          "1/cockpit-state.csv": "5faecc97a4925d11ebcd31139464a1c7ec83c19a9ae80998c6e8865be9ecd350",
+          "2/lua-events.csv": "35cfdfa8f09f800d8c3d5a490a9b88e67a33bc753e0a6fed0afe068858f2c3e3",
+          "2/lua-controls.csv": "27e60d3b52a3ae2be63076b583893fbb4dd497767da1c81d43db0db774f12200",
+          "2/lua-air.csv": "aa3c3a2522474859b06b80484ca8ec044a69e3c4c5ffbb9509745fd472d26e63",
+          "2/lua-controller.csv": "8349238c1be25f68bf981bf0992d3d90595bdc27df83e17c282b59f7bf11c63e",
+          "2/lua-horizon.csv": "cfcad67d22af4a34d39cffedf4e1a0fa6ec38b7459efe3357741be6663b38f27",
+          "2/cockpit-state.csv": "5faecc97a4925d11ebcd31139464a1c7ec83c19a9ae80998c6e8865be9ecd350"
+        },
+        "lua_dgs": {
+          "1/lua-events.csv": "7a889a47f749f8eee4f01d9f413053871095dca7075d021039abab5d4e3f9644",
+          "1/lua-controls.csv": "ab29bb50126034907b5aaa49da1e881fab03f6f7c97d7ab09b494156209378d0",
+          "1/lua-air.csv": "8b875911b6905f72f86a1c0d36802f2703fc2dfcaa99e7ff792e02a0966dc2bd",
+          "1/lua-controller.csv": "54512f11c8fa6262efadb7e5ee1b526d8720c9581690fce270d23fb7aa7bba8f",
+          "1/lua-horizon.csv": "f1f0ef46ae3a1a271ac8fa1c132ed1c49e26b9dd025e90e62ef16c167260d145",
+          "1/cockpit-state.csv": "8c8a92c7256902a4b77db908de2d645ed0a4756fd1cc9bd263d3d3728ee42bc5",
+          "2/lua-events.csv": "7a889a47f749f8eee4f01d9f413053871095dca7075d021039abab5d4e3f9644",
+          "2/lua-controls.csv": "ab29bb50126034907b5aaa49da1e881fab03f6f7c97d7ab09b494156209378d0",
+          "2/lua-air.csv": "8b875911b6905f72f86a1c0d36802f2703fc2dfcaa99e7ff792e02a0966dc2bd",
+          "2/lua-controller.csv": "54512f11c8fa6262efadb7e5ee1b526d8720c9581690fce270d23fb7aa7bba8f",
+          "2/lua-horizon.csv": "f1f0ef46ae3a1a271ac8fa1c132ed1c49e26b9dd025e90e62ef16c167260d145",
+          "2/cockpit-state.csv": "8c8a92c7256902a4b77db908de2d645ed0a4756fd1cc9bd263d3d3728ee42bc5"
+        },
+        "lua_dg_atmosphere": {
+          "1/lua-events.csv": "6c98fdacf33adeae7f7c9685ec290a3439a66a2a2ece6af471fa267546b5a348",
+          "1/lua-controls.csv": "3578b4d5ac86ec9bc1de3817c29612d3e492e2449617a32cd0fe01c29d2e4195",
+          "1/lua-air.csv": "d776338331806515561a8345a6bdb22615eff63834b11b13a5313d2fe68a2228",
+          "1/lua-controller.csv": "38aad2446d02947fbb41939c2498767a7aa8c8107ac2a3a3ae74e4a1da34e4b0",
+          "1/lua-horizon.csv": "6a67fd9290df2c70116138c67703f9a7787aac1fb1f755543bbef80a779db0ea",
+          "1/cockpit-state.csv": "ee3994746f89d7387d1ac1f205cc03d85183483dd848f9bc4af445e8766a85cf",
+          "2/lua-events.csv": "6c98fdacf33adeae7f7c9685ec290a3439a66a2a2ece6af471fa267546b5a348",
+          "2/lua-controls.csv": "3578b4d5ac86ec9bc1de3817c29612d3e492e2449617a32cd0fe01c29d2e4195",
+          "2/lua-air.csv": "d776338331806515561a8345a6bdb22615eff63834b11b13a5313d2fe68a2228",
+          "2/lua-controller.csv": "38aad2446d02947fbb41939c2498767a7aa8c8107ac2a3a3ae74e4a1da34e4b0",
+          "2/lua-horizon.csv": "6a67fd9290df2c70116138c67703f9a7787aac1fb1f755543bbef80a779db0ea",
+          "2/cockpit-state.csv": "ee3994746f89d7387d1ac1f205cc03d85183483dd848f9bc4af445e8766a85cf"
+        },
+        "lua_dgs_atmosphere": {
+          "1/lua-events.csv": "6c98fdacf33adeae7f7c9685ec290a3439a66a2a2ece6af471fa267546b5a348",
+          "1/lua-controls.csv": "4a6e7fd6d757ec7a5c10804236873e7887f5c528778a69275de49a7cebb89950",
+          "1/lua-air.csv": "6ac4e004fdf731958ccc524e23b2bc1887f5ed5177a80a01245290b6f5b4d0e9",
+          "1/lua-controller.csv": "47d733ac17dd15fc60fd272bfa67c041ed0ad59abc82408edad515bca82e689a",
+          "1/lua-horizon.csv": "60f861faa556b4e4f74a77ab76d0186a33c1aa5d49012c2cc877b20527b66df6",
+          "1/cockpit-state.csv": "915204e0660fc7a32a2547895636cdc04969cff428c2209d9fd2ca5ba6b6280f",
+          "2/lua-events.csv": "6c98fdacf33adeae7f7c9685ec290a3439a66a2a2ece6af471fa267546b5a348",
+          "2/lua-controls.csv": "4a6e7fd6d757ec7a5c10804236873e7887f5c528778a69275de49a7cebb89950",
+          "2/lua-air.csv": "6ac4e004fdf731958ccc524e23b2bc1887f5ed5177a80a01245290b6f5b4d0e9",
+          "2/lua-controller.csv": "47d733ac17dd15fc60fd272bfa67c041ed0ad59abc82408edad515bca82e689a",
+          "2/lua-horizon.csv": "60f861faa556b4e4f74a77ab76d0186a33c1aa5d49012c2cc877b20527b66df6",
+          "2/cockpit-state.csv": "915204e0660fc7a32a2547895636cdc04969cff428c2209d9fd2ca5ba6b6280f"
+        }
+      }
+    }
+  },
+  "hypothesis": "The original two-mutex protocol may allow worker reacquisition when the simulator is descheduled between EndExec and WaitExec; controlled Win32 reproduction and timing observations are pending.",
+  "native_debug": {
+    "status": "passed",
+    "comparison": "Exact event, control, atmosphere and cockpit-state traces against Windows 2025 Debug for all five cases",
+    "report": {
+      "lua_pb": {
+        "events": 10,
+        "environment_isolation": true,
+        "frame_yielding": true,
+        "aap_controls": false,
+        "original_events_identical": true,
+        "original_controls_identical": true,
+        "original_air_identical": true,
+        "original_state_identical": true,
+        "first_control_difference": null,
+        "control_differences": 0
+      },
+      "lua_dg": {
+        "events": 13,
+        "environment_isolation": true,
+        "frame_yielding": true,
+        "aap_controls": true,
+        "original_events_identical": true,
+        "original_controls_identical": true,
+        "original_air_identical": true,
+        "original_state_identical": true,
+        "first_control_difference": null,
+        "control_differences": 0
+      },
+      "lua_dgs": {
+        "events": 13,
+        "environment_isolation": true,
+        "frame_yielding": true,
+        "aap_controls": true,
+        "original_events_identical": true,
+        "original_controls_identical": true,
+        "original_air_identical": true,
+        "original_state_identical": true,
+        "first_control_difference": null,
+        "control_differences": 0
+      },
+      "lua_dg_atmosphere": {
+        "events": 15,
+        "environment_isolation": true,
+        "frame_yielding": true,
+        "aap_controls": true,
+        "original_events_identical": true,
+        "original_controls_identical": true,
+        "original_air_identical": true,
+        "original_state_identical": true,
+        "first_control_difference": null,
+        "control_differences": 0
+      },
+      "lua_dgs_atmosphere": {
+        "events": 15,
+        "environment_isolation": true,
+        "frame_yielding": true,
+        "aap_controls": true,
+        "original_events_identical": true,
+        "original_controls_identical": true,
+        "original_air_identical": true,
+        "original_state_identical": true,
+        "first_control_difference": null,
+        "control_differences": 0
+      }
+    },
+    "report_sha256": "cc8ac3e945ed75977c5c3e27196ab790680c69cf0752bc483e2679a2f3b59386",
+    "schedule_sha256": "2a8f956c0b4f9c77c1fa8b22d21af615c6a28b05ea1642c81384c1d8b2df2252",
+    "build": "out/phase6-cockpit-engine",
+    "evidence": "out/phase6-lua-timing-native-debug/lua-schedule-report.json"
+  }
+}

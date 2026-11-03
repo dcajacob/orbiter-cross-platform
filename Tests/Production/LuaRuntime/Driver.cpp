@@ -13,6 +13,7 @@
 #include <locale>
 #include <stdexcept>
 #include <string>
+#include "TimingProbe.h"
 namespace {
 using SetObserver=int(*)(unsigned,OrbiterTestObserver,double);
 class Driver;
@@ -30,6 +31,7 @@ class Driver final:public oapi::Module {
     std::ofstream air,controller,horizon;
     template<class F>void guarded(F action){try{action();}catch(const std::exception& e){std::ofstream("cockpit-failure.txt")<<e.what()<<'\n';std::exit(42);}}
     void recordLibraries() {
+        timing_probe::install(oapiGetLua(script));
         std::ofstream loaded("lua-loaded.txt");
         for(const auto* name:{"LuaInline.dll","LuaInterpreter.dll","lua.dll"}) {
             auto library=GetModuleHandleA(name);
@@ -148,6 +150,7 @@ public:
         started=true;
     });}
     void clbkPreStep(double,double,double)override{guarded([&]{
+        timing_probe::record("main","pre.begin",static_cast<int>(frames),oapiGetSimTime());
         // The stock MFD scheduler limits real-time refresh to 10Hz. Pace these
         // software-rendered fixtures above that bound without altering clocks,
         // calculations, integrators or the original instrumentation scheduler.
@@ -159,9 +162,12 @@ public:
             oapiOpenMFD(left,0);oapiOpenMFD(right,1);oapiSetHUDMode(hud);initialized=true;snapshot();
         }
 #include "ScriptSchedule.inc"
-
+        timing_probe::record("main","pre.end",static_cast<int>(frames),oapiGetSimTime());
     });}
     void core(const char* phase,const char* object,double seconds,double mjd,int running){guarded([&]{
+        if(std::string(phase)=="world.update.before" || std::string(phase)=="world.update.after" ||
+           std::string(phase)=="app.frame.end")
+            timing_probe::record("main",phase,static_cast<int>(frames),seconds);
         events<<frames<<','<<seconds<<','<<mjd<<','<<phase<<','<<object<<','<<running<<'\n';
         if (target=="DG" && object && target==object && frames>=30 && frames<46 && std::string(phase)=="vessel.post.after")
             sampleHorizon(frames+1);

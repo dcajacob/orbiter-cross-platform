@@ -32,6 +32,19 @@ jobs:
       - uses: ilammy/msvc-dev-cmd@v1
         with:
           arch: x64
+      - name: Diagnose interpreter handoff with controlled simulator preemption
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Path out/handoff-diagnostic
+          cl.exe /nologo /EHsc /std:c++17 /W4 /WX Tests/Production/LuaRuntime/HandoffDiagnostic.cpp /Feout/handoff-diagnostic/probe.exe /Foout/handoff-diagnostic/probe.obj
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          & out/handoff-diagnostic/probe.exe | Tee-Object out/handoff-diagnostic/result.json
+          exit $LASTEXITCODE
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: lua-handoff-${{ matrix.os }}
+          path: out/handoff-diagnostic
       - uses: actions/cache@v6
         with:
           path: out/data-cache/Orbiter-x64.zip
@@ -69,6 +82,7 @@ jobs:
   compare:
     name: Original Lua and AAP Debug/Release parity on ${{ matrix.os }}
     needs: capture
+    if: ${{ !cancelled() }}
     runs-on: ubuntu-24.04
     timeout-minutes: 10
     strategy:

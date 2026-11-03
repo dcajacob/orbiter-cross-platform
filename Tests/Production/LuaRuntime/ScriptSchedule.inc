@@ -9,6 +9,7 @@
                     local file=assert(io.open('lua-events.csv','a'))
                     file:write(string.format('%s,%.17g,%.17g\n',event,oapi.get_simtime(),oapi.get_simstep()))
                     file:close()
+                    if _reference_timing then _reference_timing(event) end
                     audit_count=audit_count+1
                 end
                 audit('sync_initial')
