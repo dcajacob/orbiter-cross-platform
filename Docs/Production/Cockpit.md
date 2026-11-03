@@ -44,6 +44,24 @@ at tick zero before cockpit setup finished. The final driver waits for finalized
 cockpit state. Other panel/VC controls and physical joystick hardware remain
 separate gates. [Real-window input evidence](CockpitWindowInputVerification.json)
 
+All seven mechanisms now also complete real X11/GLFW key round trips in both
+gliders' panels and VCs. The checker verifies exact key order/modifiers, every
+intermediate animation trajectory, deployed/retracted stops and original saved
+positions/speeds. Final Intel and software sanitizer runs pass all eight cases;
+the final sequence also passes a representative case in every normal native
+build/profile, following the complete twenty-case input/profile matrix.
+Mechanism travel runs before deliberate rotational thrust, with T/R restoring
+the normal 1x rate before the manual-thrust tests.
+
+The separate [DG laptop profile](../../Tests/Production/Flight/keymap-dg-laptop.cfg)
+requires Alt for manual RCS and Alt+Shift for one-tenth thrust. Bare D retains
+the stock radiator function. Finalized samples verify full/precision thrust,
+bare-W neutrality, release/focus loss and no jets during bare mechanism keys.
+The accepted Phase 5 profile is unchanged. This profile can be selected with
+the native command's `--keymap` option. Mechanism mouse picking and broader
+subsystem interactions remain open.
+[Real-key and profile evidence](DGWindowMechanismsVerification.json)
+
 The native graphics leak now has an isolated source fix and a passing local
 sanitizer menu flow. Mesa's executable-code allocator retained two bookkeeping
 objects (112 bytes) and a 10 MiB mapping after its last generated function was

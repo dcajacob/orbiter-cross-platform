@@ -235,7 +235,9 @@ jobs:
         run: |
           set -euo pipefail
           for case in controls_generic_orbit_surface controls_dg_panel controls_dg_vc controls_dgs_panel controls_dgs_vc; do
-            xvfb-run -a -s '-screen 0 1920x1080x24' env LIBGL_ALWAYS_SOFTWARE=1 GALLIUM_DRIVER=llvmpipe python3 -B Tests/Production/CockpitControls/mouse_smoke.py --case "$case" --frozen out/frozen-cockpit-controls --configuration ${{ matrix.configuration }} --executable out/native-cockpit-engine/orbiter-production --assets out/scene-resources --data out/data --modules out/native-cockpit-engine/NativeModules --planets out/planets --output "out/native-cockpit-mouse/$case"
+            mechanisms=()
+            if [[ "$case" != controls_generic_orbit_surface ]]; then mechanisms=(--mechanisms); fi
+            xvfb-run -a -s '-screen 0 1920x1080x24' env LIBGL_ALWAYS_SOFTWARE=1 GALLIUM_DRIVER=llvmpipe python3 -B Tests/Production/CockpitControls/mouse_smoke.py --case "$case" "${mechanisms[@]}" --frozen out/frozen-cockpit-controls --configuration ${{ matrix.configuration }} --executable out/native-cockpit-engine/orbiter-production --assets out/scene-resources --data out/data --modules out/native-cockpit-engine/NativeModules --planets out/planets --output "out/native-cockpit-mouse/$case"
           done 2>&1 | tee native-cockpit-mouse.log
       - name: Click the visible stock cockpit menu and change ship, warp, pause and save
         run: >-

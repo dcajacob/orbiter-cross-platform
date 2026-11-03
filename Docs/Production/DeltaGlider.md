@@ -44,6 +44,14 @@ focus loss. All four native build/profile pairs and Intel/software sanitizer
 flows pass. Broader subsystem mouse controls remain open.
 [Real-window input evidence](CockpitWindowInputVerification.json)
 
+The real-window flow now also deploys and retracts all seven mechanisms with
+the stock keys, checks complete monotonic trajectories, and saves both stops
+through the original writers. Intel/software sanitizer cases and representative
+final normal build/profile cases pass. The DG laptop profile uses Alt for manual
+RCS, retaining bare D for the radiator, and verifies full/precision thrust and
+release without unintended jets from mechanism keys.
+[Real-key/profile evidence](DGWindowMechanismsVerification.json)
+
 Both native vessels now load the stock Lua interpreter and LuaInline worker and
 fly with the original AAP in the 2D panel and virtual cockpit. In each 48-frame
 atmospheric flight the autopilot drives elevator, aileron and main thrust,

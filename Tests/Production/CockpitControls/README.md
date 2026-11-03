@@ -66,6 +66,23 @@ Current regression entry points are separate from the frozen producer:
   run retains an owned-window screenshot, library maps, inputs, state, lifecycle
   and verification report. This test is not a frozen numerical replay.
 
+For DG cases, `--mechanisms` also sends the seven stock mechanism keys through
+GLFW, observes full monotonic deployment and retraction (including intermediate
+positions), and saves both endpoints with Ctrl+S through the native explicit
+save path. It verifies the finalized key order/control modifiers and original
+scenario positions/speeds. The T key selects the normal 10x acceleration while
+waiting for the radiator's full travel, then R restores 1x. Mechanism checks run
+in the stable initial fixture before the separate deliberate thrust checks.
+Each modifier/key transition waits for
+the engine's actual input snapshot; physics ticks alone can advance between
+GLFW polls. Native CI enables this in all four DG/DG-S panel/VC cases.
+
+This mode uses `Flight/keymap-dg-laptop.cfg`: hold Alt for manual RCS and add
+Shift for one-tenth thrust. Bare DG keys retain their vessel functions, including
+D for the radiator. The older Phase 5 laptop map binds D to manual RCS and is
+unchanged. Tests verify Alt+W thrust, Alt+Shift+W precision thrust, bare-W
+neutrality, release/focus loss and no unintended jets during mechanism operation.
+
 Stage accepted references with `frozen_controls.py --cache <cache> --output
 <frozen>` (add `--offline` to require verified cached archives). Native scripts
 take `--executable`, `--assets`, `--data`, `--modules`, `--planets`, and `--output`;
@@ -81,7 +98,7 @@ native engine/renderer:
 ```sh
 xvfb-run -a env LIBGL_ALWAYS_SOFTWARE=1 GALLIUM_DRIVER=llvmpipe \
   python3 -B Tests/Production/CockpitControls/mouse_smoke.py \
-  --case controls_dg_vc --frozen out/frozen-cockpit-controls \
+  --case controls_dg_vc --mechanisms --frozen out/frozen-cockpit-controls \
   --configuration Debug --executable out/native-cockpit-engine/orbiter-production \
   --modules out/native-cockpit-engine/NativeModules --assets out/scene-resources \
   --data out/data --planets out/planets --output out/dg-vc-window-input

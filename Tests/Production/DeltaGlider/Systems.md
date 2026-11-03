@@ -28,9 +28,11 @@ equal the parsed saved value exactly.
 
 There are 16 real application lifetimes and 1,936 presentations in the four-case
 suite. Inputs enter the native replay queue and follow the buffered vessel-key
-route. Physical keyboard delivery, panel/VC mouse picking and wider DG subsystem
-acceptance remain separate gates. No production algorithm, accepted reference or
-numerical budget changes.
+route. The separate `CockpitControls/mouse_smoke.py --mechanisms` flow exercises
+these keys through a real owned X11 window and GLFW, then verifies original
+animation trajectories and scenario writers. Mechanism mouse picking and wider
+DG subsystem acceptance remain separate gates. No production algorithm, accepted
+reference or numerical budget changes.
 
 Run with an already built, matching engine/renderer and staged stock assets:
 

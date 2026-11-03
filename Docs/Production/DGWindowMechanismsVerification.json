@@ -1,0 +1,483 @@
+{
+  "schema": 1,
+  "status": "passed",
+  "scope": "Final stable-fixture owned X11/GLFW mechanism keys, DG laptop profile and original scenario writers; separate preceding complete build/profile matrix",
+  "source_worktree_base": "8507af21f4ce098eba0b8fb0237c9c05047dcdfb",
+  "sources_sha256": {
+    "Tests/Production/CockpitControls/mouse_smoke.py": "85740e7b546c626656b3f186f5fbc17eddc75fce7d2b75b7f09dffc6dab21c2a",
+    "Tests/Production/DeltaGlider/window_keys.py": "080f7be357f4fe92d52763ccbf770ed53ef10c90cbffed8635541f4b2835031a",
+    "Tests/Production/Flight/keymap-dg-laptop.cfg": "8f6a91e3f207fc2c316df35273839e2d72b64cc1b6a5178afee2ba4a855e67ce"
+  },
+  "final_sequence_fresh_processes": 12,
+  "mechanisms": [
+    "AIRBRAKE",
+    "GEAR",
+    "AIRLOCK",
+    "IAIRLOCK",
+    "HATCH",
+    "RADIATOR",
+    "NOSECONE"
+  ],
+  "final_sequences": {
+    "intel_sanitizers": {
+      "controls_dg_panel": {
+        "output": "out/phase6-intel-window-mechanisms-stable/controls_dg_panel",
+        "case": "controls_dg_panel",
+        "verification_sha256": "920e2060607ebe74900f6d35699f9479e94f4620f906dc173e99d21d51b86a76",
+        "driver_sha256": "85740e7b546c626656b3f186f5fbc17eddc75fce7d2b75b7f09dffc6dab21c2a",
+        "helper_sha256": "080f7be357f4fe92d52763ccbf770ed53ef10c90cbffed8635541f4b2835031a",
+        "application_sha256": "e60fa2502345a1ca2aee168c9c4f1c7a754afdfb7d2b8161aec3a4e702fde2ec",
+        "sdk_header_sha256": "67c1909e4414cc8fa8979d720ad70e6080f87396fea33d5c8183337c6058eba8",
+        "math": "amd-6121d02-fma3",
+        "renderer": {
+          "vendor": "Intel",
+          "renderer": "Mesa Intel(R) Graphics (PTL)",
+          "version": "4.6 (Core Profile) Mesa 26.0.8-1ubuntu0.3",
+          "client_width": 1280,
+          "client_height": 720
+        },
+        "lifecycle": {
+          "rendered_frames": 1871,
+          "successful_presents": 1871,
+          "context_deleted": true
+        },
+        "bare_key_neutrality_samples": 39,
+        "full_rcs_samples": 24,
+        "precision_rcs_samples": 11,
+        "mechanism_input_sha256": "4f1a6769a43f5000486b998468b5798f2eecc90f4393e9a800a1a9e5eef612c5",
+        "mechanism_animations_sha256": "458aebec73a0db8aade9f2affb84be00a3ed0d6c1f8b05975c3e05fd85ee1f7c",
+        "opened_scenario_sha256": "633964d748a81e3937d9117bbcf3e9bc8151f04e1f72b603086d2d2562278f80",
+        "closed_scenario_sha256": "b5eec8a211c48f4b1f4c5c5fac8530af1c6c5bd38bee6f9b14557e9426b45e78"
+      },
+      "controls_dg_vc": {
+        "output": "out/phase6-intel-window-mechanisms-stable/controls_dg_vc",
+        "case": "controls_dg_vc",
+        "verification_sha256": "ac69e49ffe6e9a057426af2145bbc0e157fc85fd26450366d26928c01d7455cd",
+        "driver_sha256": "85740e7b546c626656b3f186f5fbc17eddc75fce7d2b75b7f09dffc6dab21c2a",
+        "helper_sha256": "080f7be357f4fe92d52763ccbf770ed53ef10c90cbffed8635541f4b2835031a",
+        "application_sha256": "e60fa2502345a1ca2aee168c9c4f1c7a754afdfb7d2b8161aec3a4e702fde2ec",
+        "sdk_header_sha256": "67c1909e4414cc8fa8979d720ad70e6080f87396fea33d5c8183337c6058eba8",
+        "math": "amd-6121d02-fma3",
+        "renderer": {
+          "vendor": "Intel",
+          "renderer": "Mesa Intel(R) Graphics (PTL)",
+          "version": "4.6 (Core Profile) Mesa 26.0.8-1ubuntu0.3",
+          "client_width": 1280,
+          "client_height": 720
+        },
+        "lifecycle": {
+          "rendered_frames": 1680,
+          "successful_presents": 1680,
+          "context_deleted": true
+        },
+        "bare_key_neutrality_samples": 38,
+        "full_rcs_samples": 22,
+        "precision_rcs_samples": 11,
+        "mechanism_input_sha256": "c9e51c3c598be01112b86629861b22a435de2efa77d0e026e094380de9e90377",
+        "mechanism_animations_sha256": "acc5411b6a6debbfdc59b4f3db54bd051599436da16b09eacdd9918126026911",
+        "opened_scenario_sha256": "a2e4c1ebb3850f7dae0918428df6529573731cf4babb01ec27892d7d222d3771",
+        "closed_scenario_sha256": "2527d4d127bd5d67325e6ae591809822413c2244dd6f856ee9bfe11467262df6"
+      },
+      "controls_dgs_panel": {
+        "output": "out/phase6-intel-window-mechanisms-stable/controls_dgs_panel",
+        "case": "controls_dgs_panel",
+        "verification_sha256": "59c5b2733363c536e82750c561d99863f8c70bed6d2acbabd92656134cdc63c0",
+        "driver_sha256": "85740e7b546c626656b3f186f5fbc17eddc75fce7d2b75b7f09dffc6dab21c2a",
+        "helper_sha256": "080f7be357f4fe92d52763ccbf770ed53ef10c90cbffed8635541f4b2835031a",
+        "application_sha256": "e60fa2502345a1ca2aee168c9c4f1c7a754afdfb7d2b8161aec3a4e702fde2ec",
+        "sdk_header_sha256": "67c1909e4414cc8fa8979d720ad70e6080f87396fea33d5c8183337c6058eba8",
+        "math": "amd-6121d02-fma3",
+        "renderer": {
+          "vendor": "Intel",
+          "renderer": "Mesa Intel(R) Graphics (PTL)",
+          "version": "4.6 (Core Profile) Mesa 26.0.8-1ubuntu0.3",
+          "client_width": 1280,
+          "client_height": 720
+        },
+        "lifecycle": {
+          "rendered_frames": 1890,
+          "successful_presents": 1890,
+          "context_deleted": true
+        },
+        "bare_key_neutrality_samples": 46,
+        "full_rcs_samples": 24,
+        "precision_rcs_samples": 11,
+        "mechanism_input_sha256": "5d88e9f415c7a42c7ad5ab7f7ed24dcd87f7b4807e1d35dfc51b3bbc9dc0bc9a",
+        "mechanism_animations_sha256": "1dae2c91321f8c0d2154afbf7fe411f39e8dafa407b9154117cf176ead966606",
+        "opened_scenario_sha256": "f17f9b884e3d6d439616d71571793b36f758569ead0f3ad7df37e0739266479b",
+        "closed_scenario_sha256": "2e23db6da8c3eb5f2f6490d7649d3a56c0a08b2504b5f3be3c5bc7b6f5c41cd3"
+      },
+      "controls_dgs_vc": {
+        "output": "out/phase6-intel-window-mechanisms-stable/controls_dgs_vc",
+        "case": "controls_dgs_vc",
+        "verification_sha256": "e49636791aed6596d926d1200c21ee8369633eecfe212904644af21ce787fddf",
+        "driver_sha256": "85740e7b546c626656b3f186f5fbc17eddc75fce7d2b75b7f09dffc6dab21c2a",
+        "helper_sha256": "080f7be357f4fe92d52763ccbf770ed53ef10c90cbffed8635541f4b2835031a",
+        "application_sha256": "e60fa2502345a1ca2aee168c9c4f1c7a754afdfb7d2b8161aec3a4e702fde2ec",
+        "sdk_header_sha256": "67c1909e4414cc8fa8979d720ad70e6080f87396fea33d5c8183337c6058eba8",
+        "math": "amd-6121d02-fma3",
+        "renderer": {
+          "vendor": "Intel",
+          "renderer": "Mesa Intel(R) Graphics (PTL)",
+          "version": "4.6 (Core Profile) Mesa 26.0.8-1ubuntu0.3",
+          "client_width": 1280,
+          "client_height": 720
+        },
+        "lifecycle": {
+          "rendered_frames": 1574,
+          "successful_presents": 1574,
+          "context_deleted": true
+        },
+        "bare_key_neutrality_samples": 38,
+        "full_rcs_samples": 25,
+        "precision_rcs_samples": 11,
+        "mechanism_input_sha256": "b378eafceecd8860cd0623e56d88d61bb141afb93d87bb1de26a1cb647d788b5",
+        "mechanism_animations_sha256": "d3f4d869f78abb60d4b56e1f3b74be22a71212578c364fe981f7ba3e27b7f29d",
+        "opened_scenario_sha256": "71821700aa4a7ac62c3a4a275f260cb8848851a55bd36942ab326a926cc47a6b",
+        "closed_scenario_sha256": "672eaac901e6944d35676b996d33a30ab07af8ab6f9419b7562acfac8038163f"
+      }
+    },
+    "software_sanitizers": {
+      "controls_dg_panel": {
+        "output": "out/phase6-software-window-mechanisms-stable/controls_dg_panel",
+        "case": "controls_dg_panel",
+        "verification_sha256": "52acebf6f06c463d6036dce648ebe8228eaf95267e51b69d83a4b2d379c5790f",
+        "driver_sha256": "85740e7b546c626656b3f186f5fbc17eddc75fce7d2b75b7f09dffc6dab21c2a",
+        "helper_sha256": "080f7be357f4fe92d52763ccbf770ed53ef10c90cbffed8635541f4b2835031a",
+        "application_sha256": "e60fa2502345a1ca2aee168c9c4f1c7a754afdfb7d2b8161aec3a4e702fde2ec",
+        "sdk_header_sha256": "67c1909e4414cc8fa8979d720ad70e6080f87396fea33d5c8183337c6058eba8",
+        "math": "amd-6121d02-fma3",
+        "renderer": {
+          "vendor": "Mesa",
+          "renderer": "llvmpipe (LLVM 21.1.8, 256 bits)",
+          "version": "4.5 (Core Profile) Mesa 26.0.8",
+          "client_width": 1280,
+          "client_height": 720
+        },
+        "lifecycle": {
+          "rendered_frames": 561,
+          "successful_presents": 561,
+          "context_deleted": true
+        },
+        "bare_key_neutrality_samples": 45,
+        "full_rcs_samples": 20,
+        "precision_rcs_samples": 10,
+        "mechanism_input_sha256": "9930aa169d4927be63e8986fd903c8b9b5d6d38c2c05fcff8e01695399aaa35d",
+        "mechanism_animations_sha256": "1fe8cab76352e992986d5a72f1e9617af81fa4db43c034e9822d4726503cce5b",
+        "opened_scenario_sha256": "0e8c65e5c64351d549fec2642c36ac1230e04c35e74d0117de0bb726b5880bee",
+        "closed_scenario_sha256": "ca9638ae88c6ecdc32d6bf9f3370276cd024e6aceed7e70d1feec544d4450ee2"
+      },
+      "controls_dg_vc": {
+        "output": "out/phase6-software-window-mechanisms-stable/controls_dg_vc",
+        "case": "controls_dg_vc",
+        "verification_sha256": "3e8ce71635b2ecedf3335f1d960a4832eff9c6ee7176910a98502fed00330266",
+        "driver_sha256": "85740e7b546c626656b3f186f5fbc17eddc75fce7d2b75b7f09dffc6dab21c2a",
+        "helper_sha256": "080f7be357f4fe92d52763ccbf770ed53ef10c90cbffed8635541f4b2835031a",
+        "application_sha256": "e60fa2502345a1ca2aee168c9c4f1c7a754afdfb7d2b8161aec3a4e702fde2ec",
+        "sdk_header_sha256": "67c1909e4414cc8fa8979d720ad70e6080f87396fea33d5c8183337c6058eba8",
+        "math": "amd-6121d02-fma3",
+        "renderer": {
+          "vendor": "Mesa",
+          "renderer": "llvmpipe (LLVM 21.1.8, 256 bits)",
+          "version": "4.5 (Core Profile) Mesa 26.0.8",
+          "client_width": 1280,
+          "client_height": 720
+        },
+        "lifecycle": {
+          "rendered_frames": 191,
+          "successful_presents": 191,
+          "context_deleted": true
+        },
+        "bare_key_neutrality_samples": 20,
+        "full_rcs_samples": 35,
+        "precision_rcs_samples": 12,
+        "mechanism_input_sha256": "357eb42a120632e31fae00f443b2dc1e3db8ce7acc5b4e1c7ed023291c0319d7",
+        "mechanism_animations_sha256": "9b7bdb2ac8730128d33ceb9edf6c91269e730a6d10e55959947f6e89ad722a8a",
+        "opened_scenario_sha256": "6de7c95e0f1e949f1eb59b3042ee26ee069f1956634a83c10359951b5e0f6c92",
+        "closed_scenario_sha256": "de045d9277cedf50427eb4ce00dc4c08b8f6fee5317ecc02406c6430a3374746"
+      },
+      "controls_dgs_panel": {
+        "output": "out/phase6-software-window-mechanisms-stable/controls_dgs_panel",
+        "case": "controls_dgs_panel",
+        "verification_sha256": "8bbe873e6724c3cd97837b7108fb782b08e649f9a5ee5f0c7d58f59ffe639120",
+        "driver_sha256": "85740e7b546c626656b3f186f5fbc17eddc75fce7d2b75b7f09dffc6dab21c2a",
+        "helper_sha256": "080f7be357f4fe92d52763ccbf770ed53ef10c90cbffed8635541f4b2835031a",
+        "application_sha256": "e60fa2502345a1ca2aee168c9c4f1c7a754afdfb7d2b8161aec3a4e702fde2ec",
+        "sdk_header_sha256": "67c1909e4414cc8fa8979d720ad70e6080f87396fea33d5c8183337c6058eba8",
+        "math": "amd-6121d02-fma3",
+        "renderer": {
+          "vendor": "Mesa",
+          "renderer": "llvmpipe (LLVM 21.1.8, 256 bits)",
+          "version": "4.5 (Core Profile) Mesa 26.0.8",
+          "client_width": 1280,
+          "client_height": 720
+        },
+        "lifecycle": {
+          "rendered_frames": 565,
+          "successful_presents": 565,
+          "context_deleted": true
+        },
+        "bare_key_neutrality_samples": 45,
+        "full_rcs_samples": 23,
+        "precision_rcs_samples": 10,
+        "mechanism_input_sha256": "04cc26803906098a0f0008792359a3f72fe4e9e227d3ff0a429b6d9a70f85ec3",
+        "mechanism_animations_sha256": "ce3c9055005f797558fefde615af5ee0f49561eb0e4d7224dbb1ba000196a6e2",
+        "opened_scenario_sha256": "1212fd7688f492e1ecb6e038f03a304eec81afefbed4bf547fa51f976c421764",
+        "closed_scenario_sha256": "a2e1343b532ed969bfed96e2c1c6c065ef19d6583a872c614835b92929fca40f"
+      },
+      "controls_dgs_vc": {
+        "output": "out/phase6-software-window-mechanisms-stable/controls_dgs_vc",
+        "case": "controls_dgs_vc",
+        "verification_sha256": "209dcd3a3e4082b47b8735ce76996a79c25625ef0bf58d9d98464cf017dbb343",
+        "driver_sha256": "85740e7b546c626656b3f186f5fbc17eddc75fce7d2b75b7f09dffc6dab21c2a",
+        "helper_sha256": "080f7be357f4fe92d52763ccbf770ed53ef10c90cbffed8635541f4b2835031a",
+        "application_sha256": "e60fa2502345a1ca2aee168c9c4f1c7a754afdfb7d2b8161aec3a4e702fde2ec",
+        "sdk_header_sha256": "67c1909e4414cc8fa8979d720ad70e6080f87396fea33d5c8183337c6058eba8",
+        "math": "amd-6121d02-fma3",
+        "renderer": {
+          "vendor": "Mesa",
+          "renderer": "llvmpipe (LLVM 21.1.8, 256 bits)",
+          "version": "4.5 (Core Profile) Mesa 26.0.8",
+          "client_width": 1280,
+          "client_height": 720
+        },
+        "lifecycle": {
+          "rendered_frames": 173,
+          "successful_presents": 173,
+          "context_deleted": true
+        },
+        "bare_key_neutrality_samples": 21,
+        "full_rcs_samples": 37,
+        "precision_rcs_samples": 17,
+        "mechanism_input_sha256": "7c662c7a7d2fdfc1880b6c3743a256d8a2c3bee8ff8d47b084e7005363da6933",
+        "mechanism_animations_sha256": "0a0a86b7cb2dd5cc65e793299fb0ca8f154abef05615a35c7ef0c22514e0a898",
+        "opened_scenario_sha256": "0f920b5ce80a7d0547da073a9ee2adc583baedff78c5fe13bfc6e199e15e3c15",
+        "closed_scenario_sha256": "bc55f32ee4bcc07537ee18698bb1e1b72e0f374b25d80dbc86d4ad9d5f87d5b7"
+      }
+    },
+    "representative_native_profiles": {
+      "Debug-automatic": {
+        "output": "out/phase6-window-mechanisms-stable-profiles/Debug-automatic",
+        "case": "controls_dg_panel",
+        "verification_sha256": "af474f0060ec3b841a5faf08b7ff4ec03446bc07275e5ca417088f94c4330a36",
+        "driver_sha256": "85740e7b546c626656b3f186f5fbc17eddc75fce7d2b75b7f09dffc6dab21c2a",
+        "helper_sha256": "080f7be357f4fe92d52763ccbf770ed53ef10c90cbffed8635541f4b2835031a",
+        "application_sha256": "2b3cb152a179acbe1749d22d8b862d8800eee3eb89bdf992d77867e5cea7c6b4",
+        "sdk_header_sha256": "af8af6768321a1af9f6c0d3f136f2c008a8d2ac898ebaa135823440d36976553",
+        "math": "amd-6121d02-fma3",
+        "renderer": {
+          "vendor": "Mesa",
+          "renderer": "llvmpipe (LLVM 21.1.8, 256 bits)",
+          "version": "4.5 (Core Profile) Mesa 26.0.8",
+          "client_width": 1280,
+          "client_height": 720
+        },
+        "lifecycle": {
+          "rendered_frames": 982,
+          "successful_presents": 982,
+          "context_deleted": true
+        },
+        "bare_key_neutrality_samples": 30,
+        "full_rcs_samples": 23,
+        "precision_rcs_samples": 10,
+        "mechanism_input_sha256": "c7112609ba31bf41af4f0cc59eb0effa318d5eecc58970bc7cf59159bdbcd066",
+        "mechanism_animations_sha256": "2c0e225ba7063a4bc60344f6218343ac3861a2f967ba3be515a54979a6869d32",
+        "opened_scenario_sha256": "a2f59aa840824f9f7403af205a69e42ea5517199d1fd79dd5929fb606ae745bc",
+        "closed_scenario_sha256": "e36d3b1490d4725a9f82c5202379f7509194e87ca8353f45a546d902f5860ed6"
+      },
+      "Release-automatic": {
+        "output": "out/phase6-window-mechanisms-stable-profiles/Release-automatic",
+        "case": "controls_dg_vc",
+        "verification_sha256": "56cbe8db8da1e957d8902a94ce520dafda3c861a02f61356dbc339f336f69eb9",
+        "driver_sha256": "85740e7b546c626656b3f186f5fbc17eddc75fce7d2b75b7f09dffc6dab21c2a",
+        "helper_sha256": "080f7be357f4fe92d52763ccbf770ed53ef10c90cbffed8635541f4b2835031a",
+        "application_sha256": "6073c21ac4f0774eddf28f7eb268bc02043e84fc7b229b373a9837a13184d2bf",
+        "sdk_header_sha256": "d3e0546f86ba2981ef7c13de325f1fbc8d62257adc04b7c07bd453618262047f",
+        "math": "amd-6121d02-fma3",
+        "renderer": {
+          "vendor": "Mesa",
+          "renderer": "llvmpipe (LLVM 21.1.8, 256 bits)",
+          "version": "4.5 (Core Profile) Mesa 26.0.8",
+          "client_width": 1280,
+          "client_height": 720
+        },
+        "lifecycle": {
+          "rendered_frames": 500,
+          "successful_presents": 500,
+          "context_deleted": true
+        },
+        "bare_key_neutrality_samples": 30,
+        "full_rcs_samples": 21,
+        "precision_rcs_samples": 11,
+        "mechanism_input_sha256": "3a1892ca048c1680cdae71895444492c1bfc8c265ca32f7751acd108ce2971c0",
+        "mechanism_animations_sha256": "95e07b675f92cb2cfb36c0ff6e5509e0da267e1e6ed4b53016091baa19f39152",
+        "opened_scenario_sha256": "1ab4329ba0ca25c84717207d27fba3958f6d6f178091f0bbe3d34a705c03a400",
+        "closed_scenario_sha256": "f6ae0b2ce4d45c9fd51d0d4127726e567862f69dda8dee80e14f4bd43cb09479"
+      },
+      "Debug-sse2": {
+        "output": "out/phase6-window-mechanisms-stable-profiles/Debug-sse2",
+        "case": "controls_dgs_panel",
+        "verification_sha256": "ac1ad39b17750a9ca3bb671a8eba9b9f71b2881c53d7ec8e3dedfd0e5d2bc3c7",
+        "driver_sha256": "85740e7b546c626656b3f186f5fbc17eddc75fce7d2b75b7f09dffc6dab21c2a",
+        "helper_sha256": "080f7be357f4fe92d52763ccbf770ed53ef10c90cbffed8635541f4b2835031a",
+        "application_sha256": "36e48424b5cc8b42a59961d0949fc39f9e9545975c3ef82c1f18306ae76074ad",
+        "sdk_header_sha256": "87edde5e17620cb82d66d1d087ddafb8bb90cb74cc4ee207052f4794fbc3a395",
+        "math": "amd-6121d02-sse2",
+        "renderer": {
+          "vendor": "Mesa",
+          "renderer": "llvmpipe (LLVM 21.1.8, 256 bits)",
+          "version": "4.5 (Core Profile) Mesa 26.0.8",
+          "client_width": 1280,
+          "client_height": 720
+        },
+        "lifecycle": {
+          "rendered_frames": 894,
+          "successful_presents": 894,
+          "context_deleted": true
+        },
+        "bare_key_neutrality_samples": 31,
+        "full_rcs_samples": 24,
+        "precision_rcs_samples": 11,
+        "mechanism_input_sha256": "0877a2f1b8d98bbcde45121a8f922c6f52b8f349b60afb6881f3eef1f83d750d",
+        "mechanism_animations_sha256": "d127133aa43853c1da64c0d6a56867e6d1e34cde7322ac02ee2e6f7a3d76add3",
+        "opened_scenario_sha256": "995028047e61edd7122a6ed3c66f18c541f195a9b8a2ff5da453a9c4f64e0244",
+        "closed_scenario_sha256": "8c2b99def1a292a3837d49dfdfb1fd496c9aae6f6acebb859a1ad808eb317ed0"
+      },
+      "Release-sse2": {
+        "output": "out/phase6-window-mechanisms-stable-profiles/Release-sse2",
+        "case": "controls_dgs_vc",
+        "verification_sha256": "8afca609515644f2d074382cadf09ae918169e25da9fb50c4aa947f5b54105b1",
+        "driver_sha256": "85740e7b546c626656b3f186f5fbc17eddc75fce7d2b75b7f09dffc6dab21c2a",
+        "helper_sha256": "080f7be357f4fe92d52763ccbf770ed53ef10c90cbffed8635541f4b2835031a",
+        "application_sha256": "b33a8b28220865283cb6c8d57444a81ca75f973d60f8280c857aa56e34073906",
+        "sdk_header_sha256": "2067f6a476d48410f274c6ff051b5b986da90a895a19b491db9b5e22fdc11d4d",
+        "math": "amd-6121d02-sse2",
+        "renderer": {
+          "vendor": "Mesa",
+          "renderer": "llvmpipe (LLVM 21.1.8, 256 bits)",
+          "version": "4.5 (Core Profile) Mesa 26.0.8",
+          "client_width": 1280,
+          "client_height": 720
+        },
+        "lifecycle": {
+          "rendered_frames": 383,
+          "successful_presents": 383,
+          "context_deleted": true
+        },
+        "bare_key_neutrality_samples": 30,
+        "full_rcs_samples": 26,
+        "precision_rcs_samples": 12,
+        "mechanism_input_sha256": "81fa9f259c65b9425e9e3f00927298ca1f48ebaa4ca2903c23b6343a709ed018",
+        "mechanism_animations_sha256": "79097661278bea0af8977cf85bb8b9c641682baddd842bbd252bdfc39e922c38",
+        "opened_scenario_sha256": "992c440389ebb0b0581973b84ef38479e230908f6c06b860529d428d4178137e",
+        "closed_scenario_sha256": "37858948d39c47d3449bb87895a62bec0354f2c0eae012fe860e6e031da6eb10"
+      }
+    }
+  },
+  "preceding_complete_matrix": {
+    "status": "passed",
+    "fresh_processes": 20,
+    "output": "out/phase6-window-mechanisms-matrix",
+    "verification_sha256": "e8f1f596daab690e516fe7ff32a5e95d3867b8473bf7a318dd3f9fb0cffffa63",
+    "configurations": {
+      "Debug-automatic": {
+        "cases": [
+          "controls_generic_orbit_surface",
+          "controls_dg_panel",
+          "controls_dg_vc",
+          "controls_dgs_panel",
+          "controls_dgs_vc"
+        ],
+        "verification_sha256": "1d7b938e9555d31d5134d9ed1d22bd743be275e71e1b774bd284f506047fc2cd",
+        "driver_versions": [
+          "2fab9abc7bb8f89576d82237274d18e9ea953d60fa2875879ec07ae45f030cf3"
+        ],
+        "helper_versions": [
+          "46dae6e47f4446c141c7e2896224a379682a41293744ef4cd48bd29de2882cd4"
+        ]
+      },
+      "Release-automatic": {
+        "cases": [
+          "controls_generic_orbit_surface",
+          "controls_dg_panel",
+          "controls_dg_vc",
+          "controls_dgs_panel",
+          "controls_dgs_vc"
+        ],
+        "verification_sha256": "45b4d90bb2e38c66cc4dabcb54f983b9f67c46b662deeef0f18380a01c54e14e",
+        "driver_versions": [
+          "2fab9abc7bb8f89576d82237274d18e9ea953d60fa2875879ec07ae45f030cf3"
+        ],
+        "helper_versions": [
+          "46dae6e47f4446c141c7e2896224a379682a41293744ef4cd48bd29de2882cd4"
+        ]
+      },
+      "Debug-sse2": {
+        "cases": [
+          "controls_generic_orbit_surface",
+          "controls_dg_panel",
+          "controls_dg_vc",
+          "controls_dgs_panel",
+          "controls_dgs_vc"
+        ],
+        "verification_sha256": "b392fd52b7e6b3796b0286544587091110309380dec2e7a0d0269a194c061c2e",
+        "driver_versions": [
+          "2fab9abc7bb8f89576d82237274d18e9ea953d60fa2875879ec07ae45f030cf3",
+          "a6605bc1c50579f6da76be4c20194cee9f5d3718e47401daa6793e9726fccd41"
+        ],
+        "helper_versions": [
+          "1fb65ee28eaa61b952455084676c630f2a557cdcdfe4f292f372992b37cd80f1",
+          "46dae6e47f4446c141c7e2896224a379682a41293744ef4cd48bd29de2882cd4"
+        ]
+      },
+      "Release-sse2": {
+        "cases": [
+          "controls_generic_orbit_surface",
+          "controls_dg_panel",
+          "controls_dg_vc",
+          "controls_dgs_panel",
+          "controls_dgs_vc"
+        ],
+        "verification_sha256": "324f7b29c1a8b2272de632aa1b7f0f72ccf92e46a7d0d6075decf008dcaf29ae",
+        "driver_versions": [
+          "a6605bc1c50579f6da76be4c20194cee9f5d3718e47401daa6793e9726fccd41"
+        ],
+        "helper_versions": [
+          "1fb65ee28eaa61b952455084676c630f2a557cdcdfe4f292f372992b37cd80f1"
+        ]
+      }
+    },
+    "scope": "Same DG profile, precision/full thrust, seven real mechanism keys, trajectories and both saved endpoints; completed before moving mechanism travel ahead of deliberate rotational thrust and restoring 1x. Test waits evolved during the run; per-case versions are recorded."
+  },
+  "sanitizer_environment": {
+    "ASAN_OPTIONS": "detect_leaks=1:fast_unwind_on_malloc=0",
+    "LSAN_OPTIONS": "",
+    "UBSAN_OPTIONS": "halt_on_error=1:print_stacktrace=1",
+    "suppressions": [],
+    "xlib_candidate": "out/phase6-xlib-verified-normal/install/lib",
+    "software_mesa_candidate": "out/phase6-mesa-verified/install/lib/x86_64-linux-gnu"
+  },
+  "failed_diagnostics_retained": [
+    {
+      "output": "out/phase6-window-mechanisms-probe",
+      "reason": "Test looked for the menu Quicksave folder; Ctrl+S correctly wrote the explicit native save path."
+    },
+    {
+      "output": "out/phase6-window-mechanisms-save-path",
+      "reason": "The older Phase 5 laptop profile maps bare D to manual RCS and DG maps it to the radiator; the separate DG profile requires Alt for manual RCS."
+    },
+    {
+      "output": "out/phase6-software-window-mechanisms-delivered/controls_dg_vc",
+      "reason": "Bare-W test did not observe enough real held-key samples; final waits observe the input snapshot."
+    },
+    {
+      "output": "out/phase6-software-window-mechanisms-confirmed/controls_dgs_vc",
+      "reason": "150-second timeout with mechanism travel after deliberate rotational thrust at 10x; diagnostic watchdog run completed. Final ordering keeps mechanism travel in the stable fixture and restores 1x before thrust."
+    }
+  ],
+  "remaining_scope": [
+    "Mechanism mouse picking and wider subsystem interactions",
+    "Full final hosted matrix qualification",
+    "Physical controllers, native Wayland and broader release hardware coverage"
+  ]
+}
