@@ -73,7 +73,7 @@ list(APPEND _native_sources ${_native_headers} "${CMAKE_CURRENT_LIST_FILE}" "${C
 if(ORBITER_BUILD_NATIVE_VESSELS)
     list(APPEND _native_sources
         ../Vessel.cpp ../VesselSdk.cpp ../Vesselstatus.cpp ../SuperVessel.cpp
-        ../VesselLights.cpp ../LightEmitter.cpp ../VesselFlightMath.cpp ../VesselRecorder.cpp ../CollisionCore.cpp
+        ../VesselLights.cpp ../LightEmitter.cpp ../VesselFlightMath.cpp ../FlightSdk.cpp ../VesselRecorder.cpp ../CollisionCore.cpp
         NativeCockpitUnavailable.cpp NativeVesselApplication.cpp NativeVesselModule.cpp NativeWorldVesselServices.cpp
         FlightControls.cpp ../Keymap.cpp NativeApplication.cpp NativeRenderApi.cpp NativeParticle.cpp NativeVesselObservation.cpp NativeObservation/ApplicationObservation.h ../CelSphereAPI.cpp ../DrawAPI.cpp ../Camera.cpp ../CameraControl.cpp NativeCameraProjection.cpp NativeVessels.cmake ../../Vessel/ShuttlePB/ShuttlePB.cpp ../../Vessel/ShuttlePB/NativeShuttlePBFactory.inc)
 endif()

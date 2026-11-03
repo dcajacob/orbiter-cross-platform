@@ -6,7 +6,7 @@ endif()
 add_library(orbiter_production_vessels SHARED
     NativeVesselObservation.cpp
     FlightControls.cpp ../Keymap.cpp NativeRenderApi.cpp NativeParticle.cpp ../CelSphereAPI.cpp ../DrawAPI.cpp ../Camera.cpp ../CameraControl.cpp NativeCameraProjection.cpp ../Vessel.cpp ../VesselSdk.cpp ../Vesselstatus.cpp ../SuperVessel.cpp
-    ../VesselLights.cpp ../LightEmitter.cpp ../VesselFlightMath.cpp ../VesselRecorder.cpp ../CollisionCore.cpp
+    ../VesselLights.cpp ../LightEmitter.cpp ../VesselFlightMath.cpp ../FlightSdk.cpp ../VesselRecorder.cpp ../CollisionCore.cpp
     NativeCockpitUnavailable.cpp NativeVesselApplication.cpp NativeVesselModule.cpp NativeWorldVesselServices.cpp)
 target_link_libraries(orbiter_production_vessels PUBLIC orbiter_production_boundary)
 target_compile_features(orbiter_production_vessels PUBLIC cxx_std_17)

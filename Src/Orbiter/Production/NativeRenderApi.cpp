@@ -177,7 +177,12 @@ namespace {char debugMessage[1024]{};void RenderLog(const char* text) {std::clog
 
  int oapiCockpitMode ()
 {
-	return 0 /* explicit external view; no cockpit active */;
+#ifdef ORBITER_NATIVE_COCKPIT
+	auto *pane = GetNativeRenderContext().cockpitPane;
+	return pane ? pane->GetPanelMode() : 0;
+#else
+	return 0;
+#endif
 }
 
  oapi::Font *oapiCreateFont (int height, bool prop, char *face, FontStyle style)

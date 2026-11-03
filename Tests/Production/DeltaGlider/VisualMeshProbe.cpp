@@ -5,6 +5,8 @@
 #include "NativeVesselAPI.h"
 #include "Instrument.h"
 #include "meshres_vc.h"
+#include "OrbiterCameraData.h"
+#include <cmath>
 #include <cstring>
 #include <dlfcn.h>
 #include <fstream>
@@ -22,6 +24,27 @@ void require(bool condition, const char *message)
 
 void exercise(VESSEL &vessel, VISHANDLE visual)
 {
+    auto object = vessel.GetHandle();
+    char name[] = "PB";
+    require(oapiGetObjectByName(name) == object && oapiGetFocusObject() == object, "Stock focus lookup differs");
+    require(oapiCockpitMode() == COCKPIT_GENERIC, "Stock generic cockpit mode unavailable");
+    require(std::abs(oapiTime2MJD(oapiGetSimTime()) - oapiGetSimMJD()) <= 1e-10, "Simulation clocks disagree");
+    double valueRead;
+    require(oapiGetPitch(object, &valueRead) && valueRead == vessel.GetPitch() &&
+            oapiGetBank(object, &valueRead) && valueRead == vessel.GetBank() &&
+            oapiGetAltitude(object, &valueRead) && valueRead == vessel.GetAltitude(), "Stock flight attitude or altitude differs");
+    auto tank = oapiGetPropellantHandle(object, 0);
+    require(tank && tank == vessel.GetPropellantHandleByIndex(0) &&
+            oapiGetPropellantMass(tank) == vessel.GetPropellantMass(tank) &&
+            oapiGetEmptyMass(object) == vessel.GetEmptyMass() &&
+            !oapiGetPropellantHandle(object, vessel.GetPropellantCount()), "Stock propellant lookup differs");
+    for (auto frame : {FRAME_GLOBAL, FRAME_LOCAL, FRAME_REFLOCAL, FRAME_HORIZON}) {
+        VECTOR3 sdk{}, api{};
+        require(oapiGetGroundspeedVector(object, frame, &sdk) && vessel.GetGroundspeedVector(frame, api) &&
+                sdk.x == api.x && sdk.y == api.y && sdk.z == api.z, "Stock ground velocity differs");
+        require(oapiGetAirspeedVector(nullptr, frame, &sdk) && vessel.GetAirspeedVector(frame, api) &&
+                sdk.x == api.x && sdk.y == api.y && sdk.z == api.z, "Stock focus air velocity differs");
+    }
     AnimState2 gear(0.5);
     gear.Open();
     require(gear.Process(0.25) && gear.State() == 0.125, "Stock animation state did not advance");

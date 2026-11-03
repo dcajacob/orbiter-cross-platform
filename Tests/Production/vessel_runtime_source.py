@@ -118,7 +118,27 @@ def previous_files():
     equal(old(path),s,path);result[path]=old(path)
     path='Src/Orbiter/OrbiterAPI.cpp';s=old(path);a=s.index('DLLEXPORT double oapiGetInducedDrag');b=s.index('// ===========================================================================',a)
     math=raw('Src/Orbiter/VesselFlightMath.cpp');math=math[math.index('ORBITER_FLIGHT_EXPORT double oapiGetInducedDrag'):].replace('ORBITER_FLIGHT_EXPORT double','DLLEXPORT double')
-    equal(s[a:b],math,'Original aerodynamic helper formulas');equal(s[:a]+s[b:],raw(path),path);result[path]=old(path)
+    equal(s[a:b],math,'Original aerodynamic helper formulas')
+    remaining=s[:a]+s[b:]
+    flight=raw('Src/Orbiter/FlightSdk.cpp')
+    implementation=flight[flight.index('OBJHANDLE oapiGetObjectByName'):]
+    names=set(re.findall(r'^.*?\b(oapi\w+) ?\([^)]*\)\n\{',implementation,re.M))
+    moved=[];spans=[]
+    for match in re.finditer(r'^DLLEXPORT [^\n]*?\b(oapi\w+) ?\([^)]*\)\s*\{',remaining,re.M):
+        if match[1] not in names:continue
+        end=remaining.index('\n}',match.end())+2
+        body=remaining[match.start():end]
+        if 'LOGOUT_OBSOLETE' in body:continue
+        spans.append((match.start(),end))
+        body=body.removeprefix('DLLEXPORT ')
+        for before,after in [('DWORD','oapi::UInt32'),('UINT','oapi::UInt'),('BOOL','int'),('TRUE','true'),('FALSE','false'),
+                             ('g_focusobj','orbiter::production::CockpitFocus()'),('g_psys','orbiter::production::CockpitWorld()'),
+                             ('td','orbiter::production::CockpitTime()')]:
+            body=re.sub(r'\b'+before+r'\b',after,body)
+        moved.append(body)
+    equal('\n'.join(moved),implementation,'Shared flight SDK calculations and service delegates')
+    for start,end in reversed(spans):remaining=remaining[:start]+remaining[end:]
+    equal(remaining,raw(path),path);result[path]=old(path)
     # Preserve stock module capabilities, force-coefficient tables and animation
     # associations. Only exact Windows scalar aliases and its native entry differ.
     path='Src/Vessel/ShuttlePB/ShuttlePB.cpp';s=aliases(raw(path))

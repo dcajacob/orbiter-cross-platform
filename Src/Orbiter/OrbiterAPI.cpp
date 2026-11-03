@@ -91,11 +91,6 @@ DLLEXPORT void oapiRegisterModule (oapi::Module *module)
 	g_pOrbiter->register_module = module;
 }
 
-DLLEXPORT OBJHANDLE oapiGetObjectByName (char *name)
-{
-	return (OBJHANDLE)(g_psys ? g_psys->GetObj (name, true) : 0);
-}
-
 DLLEXPORT OBJHANDLE oapiGetObjectByIndex (int index)
 {
 	return (OBJHANDLE)(g_psys ? g_psys->GetObj (index) : 0);
@@ -225,11 +220,6 @@ DLLEXPORT OBJHANDLE oapiGetGbodyByIndex (int index)
 	return (g_psys ? g_psys->GetGravObj (index) : 0);
 }
 
-DLLEXPORT OBJHANDLE oapiGetGbodyParent (OBJHANDLE hBody)
-{
-	return (OBJHANDLE)((CelestialBody*)hBody)->Primary();
-}
-
 DLLEXPORT OBJHANDLE oapiGetGbodyChild (OBJHANDLE hBody, DWORD index)
 {
 	CelestialBody* cbody = (CelestialBody*)hBody;
@@ -339,121 +329,11 @@ DLLEXPORT double oapiGetMass (OBJHANDLE hObj)
 	return ((Body*)hObj)->Mass();
 }
 
-DLLEXPORT double oapiGetEmptyMass (OBJHANDLE hVessel)
-{
-	return ((Vessel*)hVessel)->EmptyMass();
-}
-
-DLLEXPORT double oapiGetFuelMass (OBJHANDLE hVessel)
-{
-	return ((Vessel*)hVessel)->FuelMass();
-}
-
-DLLEXPORT double oapiGetMaxFuelMass (OBJHANDLE hVessel)
-{
-	return (((Vessel*)hVessel)->ntank ? ((Vessel*)hVessel)->tank[0]->maxmass : 0.0);
-}
-
-DLLEXPORT double oapiGetPropellantMaxMass (PROPELLANT_HANDLE ph)
-{
-	return ((TankSpec*)ph)->maxmass;
-}
-
-DLLEXPORT double oapiGetPropellantMass (PROPELLANT_HANDLE ph)
-{
-	return ((TankSpec*)ph)->mass;
-}
-
-DLLEXPORT PROPELLANT_HANDLE oapiGetPropellantHandle (OBJHANDLE hVessel, DWORD idx)
-{
-	Vessel *vessel = (Vessel*)hVessel;
-	return (idx < vessel->ntank ? (PROPELLANT_HANDLE)vessel->tank[idx] : 0);
-}
-
-DLLEXPORT DOCKHANDLE oapiGetDockHandle (OBJHANDLE hVessel, UINT n)
-{
-	Vessel *vessel = (Vessel*)hVessel;
-	if (n < vessel->nDock()) return (DOCKHANDLE)vessel->GetDockParams(n);
-	else return 0;
-}
-
-DLLEXPORT OBJHANDLE oapiGetDockStatus (DOCKHANDLE dock)
-{
-	return (OBJHANDLE)((PortSpec*)dock)->mate;
-}
-
-DLLEXPORT void oapiSetAutoCapture(DOCKHANDLE hDock, bool enable)
-{
-	((PortSpec*)hDock)->autodock = enable;
-}
-
-DLLEXPORT OBJHANDLE oapiGetDockOwner(DOCKHANDLE hDock)
-{
-	return (OBJHANDLE)((PortSpec*)hDock)->owner;
-}
-
-DLLEXPORT void oapiSetEmptyMass (OBJHANDLE hVessel, double mass)
-{
-	if ((Vessel*)hVessel) ((Vessel*)hVessel)->SetEmptyMass (mass);
-}
-
 DLLEXPORT void oapiGetGlobalPos (OBJHANDLE hObj, VECTOR3 *pos)
 {
 	if (((Body*)hObj)->s0) {
 		Vector gp(((Body*)hObj)->GPos());
 		pos->x = gp.x, pos->y = gp.y, pos->z = gp.z;
-	}
-}
-
-DLLEXPORT void oapiGetGlobalVel (OBJHANDLE hObj, VECTOR3 *vel)
-{
-	if (((Body*)hObj)->s0) {
-		Vector gv(((Body*)hObj)->GVel());
-		vel->x = gv.x, vel->y = gv.y, vel->z = gv.z;
-	}
-}
-
-DLLEXPORT void oapiGetFocusGlobalPos (VECTOR3 *pos)
-{
-	Vector gp(g_focusobj->GPos());
-	pos->x = gp.x, pos->y = gp.y, pos->z = gp.z;
-}
-
-DLLEXPORT void oapiGetFocusGlobalVel (VECTOR3 *vel)
-{
-	Vector gv(g_focusobj->GVel());
-	vel->x = gv.x, vel->y = gv.y, vel->z = gv.z;
-}
-
-DLLEXPORT void oapiGetRelativePos (OBJHANDLE hObj, OBJHANDLE hRef, VECTOR3 *pos)
-{
-	if (((Body*)hObj)->s0 && ((Body*)hRef)->s0) {
-		Vector dp(((Body*)hObj)->GPos()-((Body*)hRef)->GPos());
-		pos->x = dp.x, pos->y = dp.y, pos->z = dp.z;
-	}
-}
-
-DLLEXPORT void oapiGetRelativeVel (OBJHANDLE hObj, OBJHANDLE hRef, VECTOR3 *vel)
-{
-	if (((Body*)hObj)->s0 && ((Body*)hRef)->s0) {
-		Vector dv(((Body*)hObj)->GVel() - ((Body*)hRef)->GVel());
-		vel->x = dv.x, vel->y = dv.y, vel->z = dv.z;
-	}
-}
-
-DLLEXPORT void oapiGetFocusRelativePos (OBJHANDLE hRef, VECTOR3 *pos)
-{
-	if (((Body*)hRef)->s0) {
-		Vector dp(g_focusobj->GPos() - ((Body*)hRef)->GPos());
-		pos->x = dp.x, pos->y = dp.y, pos->z = dp.z;
-	}
-}
-
-DLLEXPORT void oapiGetFocusRelativeVel (OBJHANDLE hRef, VECTOR3 *vel)
-{
-	if (((Body*)hRef)->s0) {
-		Vector dv(g_focusobj->GVel() - ((Body*)hRef)->GVel());
-		vel->x = dv.x, vel->y = dv.y, vel->z = dv.z;
 	}
 }
 
@@ -470,15 +350,6 @@ DLLEXPORT void oapiGetRotationMatrix (OBJHANDLE hObj, MATRIX3 *mat)
 	if (((Body*)hObj)->s0) {
 		const Matrix& m = ((Body*)hObj)->GRot();
 		for (int i = 0; i < 9; i++) mat->data[i] = m.data[i];
-	}
-}
-
-DLLEXPORT void oapiGlobalToLocal (OBJHANDLE hObj, const VECTOR3 *glob, VECTOR3 *loc)
-{
-	if (((Body*)hObj)->s0) {
-		Vector vloc;
-		((Body*)hObj)->GlobalToLocal(Vector(glob->x, glob->y, glob->z), vloc);
-		loc->x = vloc.x, loc->y = vloc.y, loc->z = vloc.z;
 	}
 }
 
@@ -508,120 +379,11 @@ DLLEXPORT void oapiLocalToEqu (OBJHANDLE hObj, const VECTOR3 &loc, double *lng, 
 	}
 }
 
-DLLEXPORT void oapiEquToGlobal (OBJHANDLE hObj, double lng, double lat, double rad, VECTOR3 *glob)
-{
-	if (((Body*)hObj)->s0) {
-		Vector vglob;
-		((Body*)hObj)->EquatorialToGlobal(lng, lat, rad, vglob);
-		glob->x = vglob.x, glob->y = vglob.y, glob->z = vglob.z;
-	}
-}
-
 DLLEXPORT void oapiGlobalToEqu (OBJHANDLE hObj, const VECTOR3 &glob, double *lng, double *lat, double *rad)
 {
 	if (((Body*)hObj)->s0) {
 		Vector vglob(glob.x, glob.y, glob.z);
 		((Body*)hObj)->GlobalToEquatorial(vglob, *lng, *lat, *rad);
-	}
-}
-
-DLLEXPORT double oapiOrthodome (double lng1, double lat1, double lng2, double lat2)
-{
-	return Orthodome (lng1, lat1, lng2, lat2);
-}
-
-DLLEXPORT BOOL oapiGetAltitude (OBJHANDLE hVessel, double *alt)
-{
-	if ((Vessel*)hVessel) {
-		const SurfParam *sp = ((Vessel*)hVessel)->GetSurfParam();
-		if (sp) {
-			*alt = sp->alt0;
-			return TRUE;
-		}
-		else {
-			return FALSE;
-		}
-	} else {
-		return FALSE;
-	}
-}
-
-DLLEXPORT BOOL oapiGetAltitude (OBJHANDLE hVessel, AltitudeMode mode, double *alt)
-{
-	if ((Vessel*)hVessel) {
-		const SurfParam* sp = ((Vessel*)hVessel)->GetSurfParam();
-		if (sp) {
-			*alt = (mode == ALTMODE_MEANRAD ? sp->alt0 : sp->alt);
-			return TRUE;
-		}
-		else {
-			return FALSE;
-		}
-	} else {
-		return FALSE;
-	}
-}
-
-DLLEXPORT BOOL oapiGetPitch (OBJHANDLE hVessel, double *pitch)
-{
-	if ((Vessel*)hVessel) {
-		const SurfParam *sp = ((Vessel*)hVessel)->GetSurfParam();
-		if (sp) {
-			*pitch = sp->pitch;
-			return TRUE;
-		} else {
-			return FALSE;
-		}
-	} else {
-		return FALSE;
-	}
-}
-
-DLLEXPORT BOOL oapiGetBank (OBJHANDLE hVessel, double *bank)
-{
-	if ((Vessel*)hVessel) {
-		const SurfParam *sp = ((Vessel*)hVessel)->GetSurfParam();
-		if (sp) {
-			*bank = sp->bank;
-			return TRUE;
-		}
-		else {
-			return FALSE;
-		}
-	} else {
-		return FALSE;
-	}
-}
-
-DLLEXPORT BOOL oapiGetHeading (OBJHANDLE hVessel, double *heading)
-{
-	if ((Vessel*)hVessel) {
-		const SurfParam *sp = ((Vessel*)hVessel)->GetSurfParam();
-		if (sp) {
-			*heading = sp->dir;
-			return TRUE;
-		} else {
-			return FALSE;
-		}
-	} else {
-		return FALSE;
-	}
-}
-
-DLLEXPORT BOOL oapiGetEquPos (OBJHANDLE hVessel, double *longitude, double *latitude, double *radius)
-{
-	if ((Vessel*)hVessel) {
-		const SurfParam *sp = ((Vessel*)hVessel)->GetSurfParam();
-		if (sp) {
-			*longitude = sp->lng;
-			*latitude  = sp->lat;
-			*radius    = sp->rad;
-			return TRUE;
-		} else {
-			return FALSE;
-		}
-	} else {
-		return FALSE;
 	}
 }
 
@@ -679,92 +441,6 @@ DLLEXPORT BOOL oapiGetFocusEquPos (double *longitude, double *latitude, double *
 		return TRUE;
 	} else {
 		return FALSE;
-	}
-}
-
-DLLEXPORT BOOL oapiGetGroundspeed (OBJHANDLE hVessel, double *groundspeed)
-{
-	Vessel *v = (hVessel ? (Vessel*)hVessel : g_focusobj);
-	const SurfParam *sp = v->GetSurfParam();
-	if (sp) {
-		*groundspeed = sp->groundspd;
-		return TRUE;
-	} else {
-		return FALSE;
-	}
-}
-
-DLLEXPORT bool oapiGetGroundspeedVector (OBJHANDLE hVessel, REFFRAME frame, VECTOR3 *vel)
-{
-	Vessel *v = (hVessel ? (Vessel*)hVessel : g_focusobj);
-	const SurfParam *sp = v->GetSurfParam();
-	if (sp) {
-		switch (frame) {
-		case FRAME_GLOBAL:
-			vel->x = sp->groundvel_glob.x, vel->y = sp->groundvel_glob.y, vel->z = sp->groundvel_glob.z;
-			return true;
-		case FRAME_LOCAL:
-			vel->x = sp->groundvel_ship.x, vel->y = sp->groundvel_ship.y, vel->z = sp->groundvel_ship.z;
-			return true;
-		case FRAME_REFLOCAL: {
-			Vector hvel (tmul (sp->ref->GRot(), sp->groundvel_glob));
-			vel->x = hvel.x, vel->y = hvel.y, vel->z = hvel.z;
-			} return true;
-		case FRAME_HORIZON: {
-			Vector hvel (tmul (sp->ref->GRot(), sp->groundvel_glob));
-			hvel.Set (mul (sp->L2H, hvel));
-			vel->x = hvel.x, vel->y = hvel.y, vel->z = hvel.z;
-			} return true;
-		default:
-			vel->x = vel->y = vel->z = 0.0;
-			return false;
-		}
-	} else {
-		vel->x = vel->y = vel->z = 0.0;
-		return false;
-	}
-}
-
-DLLEXPORT BOOL oapiGetAirspeed (OBJHANDLE hVessel, double *airspeed)
-{
-	Vessel *v = (hVessel ? (Vessel*)hVessel : g_focusobj);
-	const SurfParam *sp = v->GetSurfParam();
-	if (sp) {
-		*airspeed = sp->airspd;
-		return TRUE;
-	} else {
-		return FALSE;
-	}
-}
-
-DLLEXPORT bool oapiGetAirspeedVector (OBJHANDLE hVessel, REFFRAME frame, VECTOR3 *vel)
-{
-	Vessel *v = (hVessel ? (Vessel*)hVessel : g_focusobj);
-	const SurfParam *sp = v->GetSurfParam();
-	if (sp) {
-		switch (frame) {
-		case FRAME_GLOBAL:
-			vel->x = sp->airvel_glob.x, vel->y = sp->airvel_glob.y, vel->z = sp->airvel_glob.z;
-			return true;
-		case FRAME_LOCAL:
-			vel->x = sp->airvel_ship.x, vel->y = sp->airvel_ship.y, vel->z = sp->airvel_ship.z;
-			return true;
-		case FRAME_REFLOCAL: {
-			Vector hvel (tmul (sp->ref->GRot(), sp->airvel_glob));
-			vel->x = hvel.x, vel->y = hvel.y, vel->z = hvel.z;
-			} return true;
-		case FRAME_HORIZON: {
-			Vector hvel (tmul (sp->ref->GRot(), sp->airvel_glob));
-			hvel.Set (mul (sp->L2H, hvel));
-			vel->x = hvel.x, vel->y = hvel.y, vel->z = hvel.z;
-			} return true;
-		default:
-			vel->x = vel->y = vel->z = 0.0;
-			return false;
-		}
-	} else {
-		vel->x = vel->y = vel->z = 0.0;
-		return false;
 	}
 }
 
@@ -832,20 +508,6 @@ DLLEXPORT BOOL oapiGetFocusShipAirspeedVector (VECTOR3 *speedvec)
 	}
 }
 
-DLLEXPORT void oapiGetAtm (OBJHANDLE hVessel, ATMPARAM *prm, OBJHANDLE *hAtmRef)
-{
-	Vessel *v = (hVessel ? (Vessel*)hVessel : g_focusobj);
-	bool bAtm;
-
-	if (!(bAtm = v->AtmPressureAndDensity (prm->p, prm->rho)))
-		prm->p = prm->rho = 0.0;
-	if (!v->AtmTemperature (prm->T))
-		prm->T = 0.0;
-
-	if (hAtmRef)
-		*hAtmRef = (bAtm ? (OBJHANDLE)v->ProxyBody() : NULL);
-}
-
 DLLEXPORT void oapiGetAtmPressureDensity (OBJHANDLE hVessel, double *pressure, double *density)
 {
 	static bool bWarning = true;
@@ -866,11 +528,6 @@ DLLEXPORT void oapiGetFocusAtmPressureDensity (double *pressure, double *density
 	}
 	if (!g_focusobj->AtmPressureAndDensity (*pressure, *density))
 		*pressure = *density = 0.0;
-}
-
-DLLEXPORT VECTOR3 oapiGetGroundVector (OBJHANDLE hPlanet, double lng, double lat, int frame)
-{
-	return MakeVECTOR3 (((Planet*)hPlanet)->GroundVelocity (lng, lat, 0, frame));
 }
 
 DLLEXPORT VECTOR3 oapiGetWindVector (OBJHANDLE hPlanet, double lng, double lat, double alt, int frame, double *windspeed)
@@ -984,16 +641,6 @@ DLLEXPORT double oapiGetSysTime ()
 	return td.SysT0;
 }
 
-DLLEXPORT double oapiGetSysStep ()
-{
-	return td.SysDT;
-}
-
-DLLEXPORT double oapiGetSimMJD ()
-{
-	return td.MJD0;
-}
-
 DLLEXPORT double oapiGetSysMJD ()
 {
 	return MJD (time (NULL)) + UTC_CT_diff*day;
@@ -1007,16 +654,6 @@ DLLEXPORT bool oapiSetSimMJD (double mjd, int pmode)
 DLLEXPORT double oapiGetFrameRate ()
 {
 	return td.FPS();
-}
-
-DLLEXPORT double oapiTime2MJD (double t)
-{
-	return td.MJD_ref + Day(t);
-}
-
-DLLEXPORT double oapiGetTimeAcceleration ()
-{
-	return td.Warp();
 }
 
 DLLEXPORT void oapiSetTimeAcceleration (double warp)
@@ -1150,11 +787,6 @@ DLLEXPORT int oapiCockpitMode ()
 
 // Functions for planetary bodies
 
-DLLEXPORT double oapiGetPlanetPeriod (OBJHANDLE hPlanet)
-{
-	return ((Planet*)hPlanet)->RotT();
-}
-
 DLLEXPORT double oapiGetPlanetObliquity (OBJHANDLE hPlanet)
 {
 	return ((Planet*)hPlanet)->Obliquity();
@@ -1163,17 +795,6 @@ DLLEXPORT double oapiGetPlanetObliquity (OBJHANDLE hPlanet)
 DLLEXPORT double oapiGetPlanetTheta (OBJHANDLE hPlanet)
 {
 	return ((Planet*)hPlanet)->EqLng();
-}
-
-DLLEXPORT void oapiGetPlanetObliquityMatrix (OBJHANDLE hPlanet, MATRIX3 *mat)
-{
-	const Matrix m = ((CelestialBody*)hPlanet)->RotObliq();
-	for (int i = 0; i < 9; i++) mat->data[i] = m.data[i];
-}
-
-DLLEXPORT double oapiGetPlanetCurrentRotation (OBJHANDLE hPlanet)
-{
-	return ((CelestialBody*)hPlanet)->Rotation();
 }
 
 DLLEXPORT bool oapiPlanetHasAtmosphere (OBJHANDLE hPlanet)
@@ -1197,17 +818,6 @@ DLLEXPORT void oapiGetPlanetAtmParams (OBJHANDLE hPlanet, double alt, double lng
 DLLEXPORT const ATMCONST *oapiGetPlanetAtmConstants (OBJHANDLE hPlanet)
 {
 	return ((Planet*)hPlanet)->AtmParams ();
-}
-
-DLLEXPORT DWORD oapiGetPlanetJCoeffCount (OBJHANDLE hPlanet)
-{
-	return ((CelestialBody*)hPlanet)->nJcoeff();
-}
-
-DLLEXPORT double oapiGetPlanetJCoeff (OBJHANDLE hPlanet, DWORD n)
-{
-	CelestialBody *cb = (CelestialBody*)hPlanet;
-	return (n < cb->nJcoeff() ? cb->Jcoeff(n) : 0.0);
 }
 
 // Elevation support interface
@@ -1302,24 +912,9 @@ DLLEXPORT void oapiGetNavPos (NAVHANDLE hNav, VECTOR3 *gpos)
 	gpos->z = p.z;
 }
 
-DLLEXPORT DWORD oapiGetNavChannel (NAVHANDLE hNav)
-{
-	return ((Nav*)hNav)->GetStep();
-}
-
 DLLEXPORT float oapiGetNavFreq (NAVHANDLE hNav)
 {
 	return ((Nav*)hNav)->GetFreq();
-}
-
-DLLEXPORT double oapiGetNavSignal (NAVHANDLE hNav, const VECTOR3 &gpos)
-{
-	return ((Nav*)hNav)->FieldStrength (MakeVector(gpos));
-}
-
-DLLEXPORT float oapiGetNavRange (NAVHANDLE hNav)
-{
-	return ((Nav*)hNav)->GetRange();
 }
 
 DLLEXPORT DWORD oapiGetNavType (NAVHANDLE hNav)
@@ -1332,11 +927,6 @@ DLLEXPORT int oapiGetNavData (NAVHANDLE hNav, NAVDATA *data)
 	Nav *nav = (Nav*)hNav;
 	nav->GetData (data);
 	return 0;
-}
-
-DLLEXPORT int oapiGetNavDescr (NAVHANDLE hNav, char *descr, int maxlen)
-{
-	return ((Nav*)hNav)->IdString (descr, maxlen);
 }
 
 DLLEXPORT bool oapiNavInRange (NAVHANDLE hNav, const VECTOR3 &gpos)
