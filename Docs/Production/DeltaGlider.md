@@ -21,3 +21,25 @@ SHA256 18fdf2dd3756c0941d227c0eae0cf1f972b350d0ca7fce0052db9920eb06280b.
 The source header matches the existing dependency notice hash. The local Linux
 build reports Lua 5.1. Orbiter's `LuaInterpreter`, `LuaInline`, stock resource
 resolution, scheduling and SDK services still need native integration.
+
+The optional `--delta-glider` profile of `Tests/Production/NativeScene/prepare.py`
+stages the stock DG/DG-S configuration, meshes, both texture sets, scripts and
+scenarios in their original installation paths. The production resolver opens
+the original files on Linux, including the mixed-case texture names in the VC
+mesh. The disposable manuscript font is staged separately for cockpit tests.
+
+`Tests/Production/DeltaGlider/visual_mesh.py` runs the native application with
+a test observer on its real ShuttlePB visual. It adds the stock 133-group DG VC,
+retrieves the per-visual device mesh through the original shared
+`VESSEL::GetDevMesh` callback, edits the horizon group's texture coordinates
+and reads the vertex back. The CPU template retains its original coordinate.
+The probe also selects panel material 14 and texture 17, rejects out-of-range
+indices, deletes the mesh and reuses its slot. A local 60-frame run completed
+all presents and destroyed the graphics context.
+
+This test exposed a crash in `Vessel::GetMeshName` after deletion. The shared
+vessel SDK now handles empty mesh slots on name, visibility, offset and copy
+queries. Copying an empty slot no longer allocates a mesh. The observations
+skip deleted slots and still require identified assets for populated entries.
+This verifies stock VC mesh services on a live visual. Verification of the
+complete stock DG and DG-S vessel modules and their panel callbacks is pending.

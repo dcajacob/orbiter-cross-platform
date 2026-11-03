@@ -79,6 +79,10 @@ public:
     virtual void ReleaseSketchpadResource(oapi::Sketchpad*)=0;
     virtual SURFHANDLE CreateSurfaceResource(int,int)=0;
     virtual int MeshGroup(DEVMESHHANDLE,oapi::UInt32,GROUPREQUESTSPEC*)=0;
+    virtual MESHHANDLE clbkGetMesh(VISHANDLE,oapi::UInt)=0;
+    virtual int EditMeshGroup(DEVMESHHANDLE,int,GROUPEDITSPEC*)=0;
+    virtual bool SetMeshTexture(DEVMESHHANDLE,int,SURFHANDLE)=0;
+    virtual int SetMeshMaterial(DEVMESHHANDLE,int,const MATERIAL*)=0;
     virtual oapi::ParticleStream* Exhaust(PARTICLESTREAMSPEC*,OBJHANDLE,const double*,const VECTOR3*,const VECTOR3*)=0;
     virtual oapi::ParticleStream* Exhaust(PARTICLESTREAMSPEC*,OBJHANDLE,const double*,const VECTOR3&,const VECTOR3&)=0;
     virtual oapi::ParticleStream* Reentry(PARTICLESTREAMSPEC*,OBJHANDLE)=0;

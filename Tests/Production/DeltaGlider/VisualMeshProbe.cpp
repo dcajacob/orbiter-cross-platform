@@ -1,0 +1,87 @@
+// Licensed under the MIT License
+// Test observer for the native renderer. Forward the real registration before
+// exercising the SDK on a live visual in the stock ShuttlePB scene.
+#include "Production/NativeGraphics.h"
+#include "NativeVesselAPI.h"
+#include "meshres_vc.h"
+#include <cstring>
+#include <dlfcn.h>
+#include <fstream>
+#include <stdexcept>
+
+using namespace orbiter::production;
+
+namespace {
+void require(bool condition, const char *message)
+{
+    if (!condition) throw std::runtime_error(message);
+}
+
+void exercise(VESSEL &vessel, VISHANDLE visual)
+{
+    auto mesh = oapiLoadMeshGlobal("DG\\deltaglider_vc");
+    require(mesh && oapiMeshGroupCount(mesh) == NGRP_VC, "Stock DG virtual cockpit template missing");
+    auto index = vessel.AddMesh(mesh);
+    auto device = vessel.GetDevMesh(visual, index);
+    require(device && !vessel.GetDevMesh(visual, index + 1), "Visual mesh lookup failed");
+
+    auto *group = oapiMeshGroup(mesh, GRP_HORIZON_VC);
+    require(group && group->nVtx > 1, "Stock horizon group missing");
+    oapi::UInt16 vertex = 1;
+    NTVERTEX value{};
+    GROUPREQUESTSPEC request{};
+    request.Vtx = &value;
+    request.nVtx = 1;
+    request.VtxPerm = &vertex;
+    require(oapiGetMeshGroup(device, GRP_HORIZON_VC, &request) == 0 &&
+            value.tu == group->Vtx[vertex].tu, "Stock horizon vertex read failed");
+    const auto before = value;
+    value.tu += 0.125f;
+    GROUPEDITSPEC edit{};
+    edit.flags = GRPEDIT_VTXTEXU;
+    edit.Vtx = &value;
+    edit.nVtx = 1;
+    edit.vIdx = &vertex;
+    require(oapiEditMeshGroup(device, GRP_HORIZON_VC, &edit) == 0, "Stock horizon vertex edit failed");
+    value = {};
+    require(oapiGetMeshGroup(device, GRP_HORIZON_VC, &request) == 0 &&
+            value.tu == before.tu + 0.125f && value.tv == before.tv && group->Vtx[vertex].tu == before.tu,
+            "Visual edit changed the wrong attribute or shared template");
+    require(oapiEditMeshGroup(device, ~0u, &edit) == 1 && oapiGetMeshGroup(device, ~0u, &request) == 1,
+            "Invalid mesh group index accepted");
+    value = before;
+    require(oapiEditMeshGroup(device, GRP_HORIZON_VC, &edit) == 0, "Stock horizon restore failed");
+    const auto *material = oapiMeshMaterial(mesh, 14);
+    require(oapiSetMaterial(device, 14, material) == 0 && oapiSetMaterial(device, NMAT_VC, material) == 4,
+            "Stock panel material selection failed");
+    require(oapiSetTexture(device, 17, oapiGetTextureHandle(mesh, 17)) && !oapiSetTexture(device, ~0u, nullptr),
+            "Stock VC texture selection failed");
+
+    require(vessel.DelMesh(index), "VC instance deletion failed");
+    VECTOR3 offset{};
+    vessel.SetMeshVisibilityMode(index, MESHVIS_ALWAYS);
+    require(!vessel.GetMeshName(index) && !vessel.GetMeshTemplate(index) && !vessel.CopyMeshFromTemplate(index) &&
+            !vessel.GetDevMesh(visual, index) && !vessel.GetMeshOffset(index, offset) && !vessel.GetMeshVisibilityMode(index),
+            "Deleted mesh slot still accessible");
+    auto reused = vessel.AddMesh(mesh);
+    require(reused == index && vessel.GetDevMesh(visual, reused) && vessel.DelMesh(reused), "Mesh slot reuse failed");
+    std::ofstream report(GetNativeRenderContext().evidence / "stock-vc-mesh.json");
+    report.exceptions(std::ios::badbit | std::ios::failbit);
+    report << "{\"stock_groups\":" << NGRP_VC << ",\"horizon_group\":" << GRP_HORIZON_VC
+           << ",\"instance_edit\":true,\"template_isolated\":true,\"slot_reused\":true}\n";
+}
+}
+
+void orbiter::production::RenderRegisterVisual(OBJHANDLE object, VISHANDLE visual)
+{
+    // This module is preloaded only in the test process. Linux uses the Itanium
+    // C++ ABI for the existing native renderer registration function.
+    auto original = reinterpret_cast<decltype(&RenderRegisterVisual)>(
+        dlsym(RTLD_NEXT, "_ZN7orbiter10production20RenderRegisterVisualEPvS1_"));
+    require(original, "Production renderer registration function unavailable");
+    original(object, visual);
+    if (oapiGetObjectType(object) == OBJTP_VESSEL) {
+        auto *vessel = oapiGetVesselInterface(object);
+        if (!std::strcmp(vessel->GetClassName(), "ShuttlePB")) exercise(*vessel, visual);
+    }
+}

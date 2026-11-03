@@ -1452,7 +1452,7 @@ void VESSEL::ShiftMeshes (const VECTOR3 &ofs) const
 
 bool VESSEL::GetMeshOffset (oapi::UInt idx, VECTOR3 &ofs) const
 {
-	if (idx >= vessel->nmesh) return false;
+	if (idx >= vessel->nmesh || !vessel->meshlist[idx]) return false;
 	memcpy (&ofs, &vessel->meshlist[idx]->meshofs, sizeof(VECTOR3));
 	return true;
 }
@@ -1486,7 +1486,7 @@ MESHHANDLE VESSEL::CopyMeshFromTemplate (oapi::UInt idx) const
 
 oapi::UInt16 VESSEL::GetMeshVisibilityMode (oapi::UInt idx) const
 {
-	return (idx < vessel->nmesh ? vessel->meshlist[idx]->vismode : 0);
+	return (idx < vessel->nmesh && vessel->meshlist[idx] ? vessel->meshlist[idx]->vismode : 0);
 }
 
 void VESSEL::SetMeshVisibilityMode (oapi::UInt idx, oapi::UInt16 mode) const

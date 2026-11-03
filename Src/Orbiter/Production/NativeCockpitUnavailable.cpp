@@ -50,8 +50,6 @@ void VESSEL3::clbkRenderHUD (int mode, const HUDPAINTSPEC *hps, SURFHANDLE hDefa
 int VESSEL4::RegisterPanelArea (PANELHANDLE hPanel, int id, const oapi::SdkRectangle &pos, int texidx, const oapi::SdkRectangle &texpos, int draw_event, int mouse_event, int bkmode)
 {throw std::runtime_error("Native cockpit service unavailable: VESSEL4::RegisterPanelArea");}
 #else
-DEVMESHHANDLE VESSEL::GetDevMesh (VISHANDLE vis, oapi::UInt idx) const
-{throw std::runtime_error("Native cockpit service unavailable: VESSEL::GetDevMesh");}
 void VESSEL2::clbkDrawHUD (int mode, const HUDPAINTSPEC *hps, oapi::SdkDrawContext hDC)
 {throw std::runtime_error("Native cockpit service unavailable: VESSEL2::clbkDrawHUD");}
 #endif

@@ -51,12 +51,6 @@ extern char DBG_MSG[256];
 
 #include "Production/CockpitCameraMethods.inc"
 
-DEVMESHHANDLE VESSEL::GetDevMesh (VISHANDLE vis, UINT idx) const
-{
-	oapi::GraphicsClient *gc = g_pOrbiter->GetGraphicsClient();
-	return (gc ? (DEVMESHHANDLE)gc->clbkGetMesh (vis, idx) : NULL);
-}
-
 void VESSEL2::clbkDrawHUD (int mode, const HUDPAINTSPEC *hps, HDC hDC)
 {
 	if (vessel->hudskp && vessel->hudskp->GetDC() == hDC)

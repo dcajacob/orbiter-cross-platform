@@ -3243,16 +3243,17 @@ const MESHHANDLE Vessel::GetMeshTemplate (oapi::UInt idx) const
 
 const char *Vessel::GetMeshName (oapi::UInt idx) const
 {
-	if (idx < nmesh && meshlist[idx]->meshname[0]) return meshlist[idx]->meshname;
+	if (idx < nmesh && meshlist[idx] && meshlist[idx]->meshname[0]) return meshlist[idx]->meshname;
 	else return NULL;
 }
 
 Mesh *Vessel::CopyMeshFromTemplate (oapi::UInt idx)
 {
 	if (idx >= nmesh) return 0; // out of range check
-	Mesh *mesh = new Mesh; GetRigidBodyServices().TraceAllocation(__FILE__,__LINE__);
+	Mesh *mesh = nullptr;
 	MeshList *meshrec = meshlist[idx];
 	if (meshrec) {
+		mesh = new Mesh; GetRigidBodyServices().TraceAllocation(__FILE__,__LINE__);
 		if (meshrec->hMesh) { // copy from preloaded mesh
 			mesh->Set (*(Mesh*)meshrec->hMesh);
 		} else {                    // load from file
@@ -3260,13 +3261,13 @@ Mesh *Vessel::CopyMeshFromTemplate (oapi::UInt idx)
 				delete mesh; mesh = 0;
 			}
 		}
-	} else mesh = 0;
+	}
 	return mesh;
 }
 
 void Vessel::SetMeshVisibilityMode (oapi::UInt meshidx, oapi::UInt16 mode)
 {
-	if (meshidx < nmesh) {
+	if (meshidx < nmesh && meshlist[meshidx]) {
 		meshlist[meshidx]->vismode = mode;
 		if (mode & MESHVIS_EXTPASS) extpassmesh = true;
 		BroadcastVisMsg (EVENT_VESSEL_MESHVISMODE, meshidx);

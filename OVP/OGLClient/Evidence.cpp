@@ -121,6 +121,7 @@ void Frame() {
             for(UINT j=0;j<v->GetMeshCount();++j) {
                 struct OwnedMesh { MESHHANDLE value=nullptr;~OwnedMesh(){if(value)oapiDeleteMesh(value);} } owned;
                 auto mesh=v->GetMeshTemplate(j);const char *meshName=v->GetMeshName(j);
+                if(!mesh && !meshName)continue; // deleted vessel mesh slot
                 if(mesh && !meshName)meshName=g_client->GetMeshManager()->GetMeshName(mesh);
                 // Config-driven preloads bypass clbkStoreMeshPersistent, but the
                 // current engine retains their parser-assigned filename.

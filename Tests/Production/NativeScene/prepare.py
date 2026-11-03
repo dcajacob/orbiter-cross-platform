@@ -19,6 +19,7 @@ def digest(path):
 def main():
     parser=argparse.ArgumentParser(description=__doc__)
     for name in ('data','planets','destination'):parser.add_argument('--'+name,type=Path,required=True)
+    parser.add_argument('--delta-glider',action='store_true',help='Include the stock DG and DG-S installation resources and scenarios')
     args=parser.parse_args();destination=args.destination.resolve();destination.mkdir(parents=True,exist_ok=True)
     inputs={}
     for lock,base in [('stock-data.lock.json',args.data),('standard-planets.lock.json',args.planets)]:
@@ -48,6 +49,14 @@ def main():
         overlay(source/'Config',Path('Config/Vessels'))
         overlay(source/'Meshes',Path('Meshes/ISS') if name=='ISS' else Path('Meshes'))
         overlay(source/'Textures',Path('Textures/ISS') if name=='ISS' else Path('Textures'))
+    if args.delta_glider:
+        overlay(ROOT/'Script',Path('Script'))
+        overlay(ROOT/'Scenarios',Path('Scenarios'))
+        source=ROOT/'Src/Vessel/DeltaGlider'
+        for name,target in (('Config','Config/Vessels'),('Meshes','Meshes/DG'),
+                            ('Textures','Textures/DG'),('Textures2','Textures2/DG'),
+                            ('Script','Script/DG'),('Thumbnail','Images/Vessels/Default')):
+            overlay(source/name,Path(target))
     for name in ('Textures','Textures2','Fonts'):
         overlay(args.data/name,Path(name))
     overlay(ROOT/'OVP/OGLClient/shaders',Path('Modules/OGLClient'))
@@ -60,7 +69,9 @@ def main():
             try:os.link(source,target)
             except OSError:shutil.copy2(source,target)
         sources[relative]=dict(source=str(source.resolve()),sha256=digest(target))
-    (destination/'resources.json').write_text(json.dumps(dict(scope='original stock Sol/ISS/ShuttlePB external view',
+    scope='original stock Sol/ISS/ShuttlePB external view'
+    if args.delta_glider:scope+=' with DG/DG-S vessel resources and stock scenarios'
+    (destination/'resources.json').write_text(json.dumps(dict(scope=scope,
         source_resources=sources,locked_data=inputs,excluded='Fonts/architext.regular.ttf'),indent=2)+'\n')
     print('Verified and staged',len(sources),'original source/data resources; planetary archives remain at',args.planets.resolve())
 if __name__=='__main__':main()

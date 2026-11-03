@@ -14,6 +14,9 @@ def verify():
     for name in FILES:
         path='Src/Orbiter/'+name
         original=subprocess.check_output(['git','-C',str(ROOT),'show',BEFORE+':'+path]).replace(b'\r\n',b'\n').decode('cp1252')
+        if name=='Vessel.cpp':
+            from vessel_runtime_source import with_sparse_mesh_slots
+            original=with_sparse_mesh_slots(original)
         actual=(ROOT/path).read_bytes().replace(b'\r\n',b'\n').decode('cp1252')
         if actual.count(include)!=1:raise ValueError('Unexpected random-service include: '+path)
         if canonical(actual.replace(include,''))!=original:raise ValueError('Numerical code changed beyond explicit RNG bindings: '+path)

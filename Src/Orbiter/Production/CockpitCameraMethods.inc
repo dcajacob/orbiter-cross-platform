@@ -33,3 +33,8 @@ void VESSEL::TriggerRedrawArea (int panel_id, int vc_id, int area_id)
 		orbiter::production::CockpitPane()->TriggerRedrawArea (panel_id, vc_id, area_id);
 }
 
+DEVMESHHANDLE VESSEL::GetDevMesh (VISHANDLE vis, oapi::UInt idx) const
+{
+	oapi::CockpitClient *gc = orbiter::production::CockpitGraphicsClient();
+	return (gc ? (DEVMESHHANDLE)gc->clbkGetMesh (vis, idx) : NULL);
+}

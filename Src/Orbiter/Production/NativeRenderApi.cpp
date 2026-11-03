@@ -266,6 +266,24 @@ namespace {char debugMessage[1024]{};void RenderLog(const char* text) {std::clog
 	return (gc ? gc->MeshGroup (hMesh, grpidx, grs) : -1);
 }
 
+int oapiEditMeshGroup (DEVMESHHANDLE hMesh, oapi::UInt32 grpidx, GROUPEDITSPEC *ges)
+{
+    auto *gc = GetNativeRenderContext().graphics;
+    return gc ? gc->EditMeshGroup(hMesh, static_cast<int>(grpidx), ges) : -1;
+}
+
+bool oapiSetTexture (DEVMESHHANDLE hMesh, oapi::UInt32 texidx, SURFHANDLE tex)
+{
+    auto *gc = GetNativeRenderContext().graphics;
+    return gc && gc->SetMeshTexture(hMesh, static_cast<int>(texidx), tex);
+}
+
+int oapiSetMaterial (DEVMESHHANDLE hMesh, oapi::UInt32 matidx, const MATERIAL *mat)
+{
+    auto *gc = GetNativeRenderContext().graphics;
+    return gc ? gc->SetMeshMaterial(hMesh, static_cast<int>(matidx), mat) : 1;
+}
+
  OBJHANDLE oapiGetObjectByIndex (int index)
 {
 	return (OBJHANDLE)(GetNativeRenderContext().world ? GetNativeRenderContext().world->GetObj (index) : 0);

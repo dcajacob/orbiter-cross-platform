@@ -413,7 +413,7 @@ void OGLMesh::DeleteGroup (GROUPREC *grp)
 int OGLMesh::GetGroup (int grp, GROUPREQUESTSPEC *grs)
 {
 	static NTVERTEX zero = {0,0,0, 0,0,0, 0,0};
-	if (grp >= nGrp) return 1;
+	if (grp < 0 || grp >= nGrp) return 1;
 	GROUPREC *g = Grp[grp];
 	int nv = g->nVtx;
 	uint32_t ni = g->nIdx;
@@ -478,7 +478,7 @@ int OGLMesh::GetGroup (int grp, GROUPREQUESTSPEC *grs)
 
 int OGLMesh::EditGroup (int grp, GROUPEDITSPEC *ges)
 {
-	if (grp >= nGrp) return 1;
+	if (grp < 0 || grp >= nGrp) return 1;
 	GROUPREC *g = Grp[grp];
 	int i, vi;
 
@@ -536,7 +536,7 @@ void OGLMesh::ClearGroups ()
 
 bool OGLMesh::SetTexture (int texidx, SURFHANDLE tex)
 {
-	if (texidx >= nTex) return false;
+	if (texidx < 0 || texidx >= nTex) return false;
 	// do we need to release the previous texture here?
 	Tex[texidx] = (OGLTexture *)tex;
 	return true;

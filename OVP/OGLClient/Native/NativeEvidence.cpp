@@ -61,6 +61,7 @@ void Visual(const char *event,OBJHANDLE object) {
             struct OwnedMesh {MESHHANDLE value=nullptr;~OwnedMesh(){if(value)oapiDeleteMesh(value);}} owned;
             auto mesh=vessel->GetMeshTemplate(i);
             const char* meshName=vessel->GetMeshName(i);
+            if(!mesh && !meshName)continue; // deleted vessel mesh slot
             if(!mesh)mesh=owned.value=vessel->CopyMeshFromTemplate(i);
             if(mesh && !meshName)meshName=oapiGetMeshFilename(mesh);
             if(!mesh)throw std::runtime_error("Lifecycle visual stock mesh is unavailable");
@@ -104,6 +105,7 @@ void Frame() {
             for(oapi::UInt j=0;j<v->GetMeshCount();++j) {
                 struct OwnedMesh { MESHHANDLE value=nullptr;~OwnedMesh(){if(value)oapiDeleteMesh(value);} } owned;
                 auto mesh=v->GetMeshTemplate(j);const char *meshName=v->GetMeshName(j);
+                if(!mesh && !meshName)continue; // deleted vessel mesh slot
                 if(mesh && !meshName)meshName=g_client->GetMeshManager()->GetMeshName(mesh);
                 // Config-driven preloads bypass clbkStoreMeshPersistent, but the
                 // current engine retains their parser-assigned filename.

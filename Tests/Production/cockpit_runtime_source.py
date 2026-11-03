@@ -8,7 +8,7 @@ BASE='f725194209634f7fd5d1d44d426cfa9b5e303e37'
 def original(name):return subprocess.check_output(['git','-C',str(ROOT),'show',BASE+':'+name]).decode('cp1252').replace('\r\n','\n')
 def raw(name):return (ROOT/name).read_text()
 def canonical(text):
-    for a,b in [('oapi::CockpitClient','oapi::GraphicsClient'),('oapi::UInt32','DWORD'),('oapi::SdkRectangle','RECT'),
+    for a,b in [('oapi::CockpitClient','oapi::GraphicsClient'),('oapi::UInt32','DWORD'),('oapi::UInt ','UINT '),('oapi::SdkRectangle','RECT'),
         ('orbiter::production::CockpitGraphicsClient()','g_pOrbiter->GetGraphicsClient()'),
         ('orbiter::production::CockpitCamera()','g_camera'),('orbiter::production::CockpitFocus()','g_focusobj'),
         ('orbiter::production::CockpitPane()','g_pane')]:text=text.replace(a,b)
@@ -17,7 +17,7 @@ def callbacks():
     vessel=original('Src/Orbiter/VesselApplication.cpp');sdk=original('Src/Orbiter/VesselSdkApplication.cpp')
     expected={
         'CockpitVesselMethods.inc':vessel[vessel.index('void Vessel::DrawHUD'):vessel.index('bool Vessel::LoadModule')],
-        'CockpitCameraMethods.inc':sdk[sdk.index('void VESSEL::SetCameraDefaultDirection'):sdk.index('DEVMESHHANDLE VESSEL::GetDevMesh')],
+        'CockpitCameraMethods.inc':sdk[sdk.index('void VESSEL::SetCameraDefaultDirection'):sdk.index('void VESSEL2::clbkDrawHUD')],
         'CockpitPanelMethods.inc':sdk[sdk.index('int VESSEL3::SetPanelBackground'):]}
     bodies={}
     for name,old in expected.items():

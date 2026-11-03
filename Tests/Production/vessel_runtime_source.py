@@ -56,6 +56,15 @@ GUI=('VESSEL::SetCameraDefaultDirection','VESSEL::SetCameraCatchAngle','VESSEL::
      'VESSEL3::clbkDrawHUD','VESSEL3::clbkRenderHUD','VESSEL4::RegisterPanelArea')
 LIGHTS=('AddPointLight','AddSpotLight','DelLightEmitter','ClearLightEmitters','LightEmitterState','ShiftLightEmitters')
 
+def with_sparse_mesh_slots(source):
+    """Apply only the deleted-slot lookup and allocation corrections to an original vessel source."""
+    source=source.replace('idx < nmesh && meshlist[idx]->meshname','idx < nmesh && meshlist[idx] && meshlist[idx]->meshname')
+    source=source.replace('if (meshidx < nmesh) {','if (meshidx < nmesh && meshlist[meshidx]) {')
+    start,end=span(source,'Vessel::CopyMeshFromTemplate')
+    copy=source[start:end].replace('Mesh *mesh = new Mesh; GetRigidBodyServices().TraceAllocation(__FILE__,__LINE__);','Mesh *mesh = nullptr;')
+    copy=copy.replace('if (meshrec) {','if (meshrec) {\n\t\tmesh = new Mesh; GetRigidBodyServices().TraceAllocation(__FILE__,__LINE__);').replace('} else mesh = 0;','}')
+    return source[:start]+copy+source[end:]
+
 @functools.lru_cache(maxsize=1)
 def previous_files():
     from random_source import canonical as random_bindings
@@ -69,7 +78,8 @@ def previous_files():
             current=current.replace('\t\tdelete []A->comp;','\t\tdelete A->comp;',1)
             # Bulk exhaust cleanup must free owned constant fields like DelExhaust.
             current=current.replace('\t\tfor (i = 0; i < nexhaust; i++) {\n\t\t\tif (exhaust[i]->level && (exhaust[i]->flags & EXHAUST_CONSTANTLEVEL))\n\t\t\t\tdelete exhaust[i]->level;\n\t\t\tif (exhaust[i]->lpos && (exhaust[i]->flags & EXHAUST_CONSTANTPOS))\n\t\t\t\tdelete exhaust[i]->lpos;\n\t\t\tif (exhaust[i]->ldir && (exhaust[i]->flags & EXHAUST_CONSTANTDIR))\n\t\t\t\tdelete exhaust[i]->ldir;\n\t\t\tdelete exhaust[i];\n\t\t}', '\t\tfor (i = 0; i < nexhaust; i++)\n\t\t\tdelete exhaust[i];')
-        equal(old(path),current,path);result[path]=old(path)
+        expected=with_sparse_mesh_slots(old(path)) if name=='Vessel.cpp' else old(path)
+        equal(expected,current,path);result[path]=old(path)
     path='Src/Orbiter/Vessel.h'
     s=raw(path).replace('#ifndef _WIN32\n\tstatic void ReleaseNativeInterface(VESSEL* interface);\n#endif\n','')
     equal(old(path),s,path);result[path]=old(path)
@@ -89,6 +99,8 @@ def previous_files():
                 ('GetVesselServices().NotifyJump (*vessel, gdr)','g_pOrbiter->NotifyObjectJump (vessel, gdr)'),
                 ('GetVesselServices().ShiftCockpit (*vessel, vs);','if ((g_pane) && (g_focusobj == vessel)) g_pane->ShiftVC (vs);')]:current=current.replace(a,b)
     current=re.sub(r'GetVesselServices\(\).Check\(bool\((.*?)\), ("[^"\n]*")\);',r'dCHECK(\1, \2)',current)
+    common=common.replace('if (idx >= vessel->nmesh) return false;\n\tmemcpy (&ofs','if (idx >= vessel->nmesh || !vessel->meshlist[idx]) return false;\n\tmemcpy (&ofs')
+    common=common.replace('idx < vessel->nmesh ? vessel->meshlist[idx]->vismode','idx < vessel->nmesh && vessel->meshlist[idx] ? vessel->meshlist[idx]->vismode')
     equal(common,current,'Complete production SDK vessel calculations/delegates')
     from cockpit_runtime_source import restore as restore_cockpit
     application=restore_cockpit('Src/Orbiter/VesselSdkApplication.cpp',raw('Src/Orbiter/VesselSdkApplication.cpp'))
