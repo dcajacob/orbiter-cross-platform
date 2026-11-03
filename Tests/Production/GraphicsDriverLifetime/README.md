@@ -56,6 +56,12 @@ Mesa X11/XCB, DRM, GLVND, zlib and zstd development dependencies available.
 The verified local toolchain used GCC 15.2, Meson 1.10.1 and LLVM 21.1.8.
 Dependencies must be provisioned separately; the builder does not install them.
 
+The default build supports X11. Add `--wayland` for X11 and native Wayland EGL
+support together; this also requires Wayland client/server, EGL backend and
+protocol development dependencies. The earlier X11-only prefix cannot serve
+a native Wayland EGL display. Each platform configuration needs its own
+runtime qualification and remains in a separate output directory.
+
 ```sh
 python3 -B Tests/Production/GraphicsDriverLifetime/build_driver.py \
   --cache out/mesa-source-cache --output out/mesa-cleanup --jobs 4

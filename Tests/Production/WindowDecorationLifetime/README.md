@@ -32,3 +32,10 @@ unchanged. The full instrumented simulator's exit remains a failed gate.
 `out/phase6-window-decoration-capture-final/` retains the two process logs,
 loaded maps and a hash manifest. The integrated application evidence is linked
 from [RendererDefinedBehavior.md](../../../Docs/Production/RendererDefinedBehavior.md).
+
+Subsequent [Fontconfig ownership controls](../FontConfigLifetime/README.md) show
+why the retained owner's encoded table is misreported and verify a tracing
+compatible representation. The original and candidate still report identical
+genuinely lost allocations. The unchanged GTK window is clean with that
+explicitly selected candidate, without changing its decoration preference or
+resetting the shared Pango map. Historical system-library reports remain here.

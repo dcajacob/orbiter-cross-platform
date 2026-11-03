@@ -1,0 +1,36 @@
+{
+  "schema": 1,
+  "package": "fontconfig",
+  "version": "2.17.1-3ubuntu1",
+  "source_directory": "fontconfig-2.17.1-6d0a98982ec351c165c9224c8b7dbdfca3010e47",
+  "dsc": {
+    "name": "fontconfig_2.17.1-3ubuntu1.dsc",
+    "url": "https://archive.ubuntu.com/ubuntu/pool/main/f/fontconfig/fontconfig_2.17.1-3ubuntu1.dsc",
+    "sha256": "1e0f7507102b7f8287052b0757f43017795d0e27c0b75d85cc41d9c523ff11c2"
+  },
+  "sources": [
+    {
+      "name": "fontconfig_2.17.1.orig.tar.gz",
+      "sha256": "f07504cef87f171ee1748352e2df9b9f125352f620fa0d03a9284306ea2c40a4",
+      "size_bytes": 622045,
+      "url": "https://archive.ubuntu.com/ubuntu/pool/main/f/fontconfig/fontconfig_2.17.1.orig.tar.gz"
+    },
+    {
+      "name": "fontconfig_2.17.1-3ubuntu1.debian.tar.xz",
+      "sha256": "3125c7ad526f1c9791ddd58b9194af84cd05154446692168cd546e9a52d955b7",
+      "size_bytes": 31920,
+      "url": "https://archive.ubuntu.com/ubuntu/pool/main/f/fontconfig/fontconfig_2.17.1-3ubuntu1.debian.tar.xz"
+    }
+  ],
+  "heap_pointer_patch": "fontconfig-2.17.1-heap-pointers.patch",
+  "heap_pointer_patch_sha256": "22ae105861dbd538ff0e3ff5ca3c0278e7196ee0ef17eec2ad34f9fa3272bca7",
+  "before_sha256": {
+    "src/fcint.h": "868c27716c7e1abf0af5e1c7ea70579b9a302fa27389dcae5393e85b0eaf40e2",
+    "src/fcpat.c": "21eda0cf87fcfe50f60394fd022fd5d5e81c7aff102a54e2544013af42e2364a"
+  },
+  "after_sha256": {
+    "src/fcint.h": "ce7e93f6e69687c1d98b3133eaa36591c1614593b6b244b30ffcf0df5c834cc7",
+    "src/fcpat.c": "78c1f4d3c8831d5fe58d6687bf25728d7479b35e0531cce7a17601ef617360c0"
+  },
+  "serialized_cache_layout_and_offset_writes_unchanged": true
+}

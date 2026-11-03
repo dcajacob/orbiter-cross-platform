@@ -24,6 +24,8 @@ def main():
     parser.add_argument('--output', type=Path, required=True)
     parser.add_argument('--jobs', type=int, default=4)
     parser.add_argument('--meson', default='meson')
+    parser.add_argument('--wayland', action='store_true',
+                        help='Build Wayland EGL support alongside X11; requires Wayland development dependencies')
     args = parser.parse_args()
     if sys.platform != 'linux' or platform.machine() != 'x86_64':
         raise ValueError('This qualification driver targets native Linux x86-64')
@@ -41,7 +43,8 @@ def main():
         raise ValueError('Build output already exists; replacement is forbidden')
     cache.mkdir(parents=True, exist_ok=True)
     output.mkdir(parents=True)
-    report = dict(status='building', source_lock=lock, commands=[])
+    platforms = ['x11', 'wayland'] if args.wayland else ['x11']
+    report = dict(status='building', source_lock=lock, platforms=platforms, commands=[])
     try:
         archives = []
         for entry in lock['sources']:
@@ -82,7 +85,7 @@ def main():
         build, prefix = output / 'build', output / 'install'
         run([meson, 'setup', str(build), str(source), '--prefix', str(prefix),
              '--libdir', 'lib/x86_64-linux-gnu', '--buildtype=debugoptimized',
-             '-Dplatforms=x11', '-Dgallium-drivers=llvmpipe', '-Dvulkan-drivers=[]',
+             '-Dplatforms='+','.join(platforms), '-Dgallium-drivers=llvmpipe', '-Dvulkan-drivers=[]',
              '-Dglx=dri', '-Degl=enabled', '-Dgbm=disabled', '-Dglvnd=enabled',
              '-Dgles1=disabled', '-Dgles2=enabled', '-Dgallium-va=disabled',
              '-Dllvm=enabled', '-Dshared-llvm=enabled', '-Dvalgrind=disabled',

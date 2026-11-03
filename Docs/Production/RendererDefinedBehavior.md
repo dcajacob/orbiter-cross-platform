@@ -55,3 +55,9 @@ all six fresh engine/module sets, exact intermediate sources, original Lua
 ZIPs and camera observations, normal regressions and sanitizer failures. Every
 archive payload hash was rechecked after compression. Remote preservation
 remains open. Phase 6 remains in progress.
+
+Subsequent ownership controls distinguish the Fontconfig encoding false
+positive from genuine lost allocations, and a renderer fix balances GLFW on
+failed initialization. All sixteen scoped C/C++ sanitizer input flows now pass
+with explicitly selected, verified library candidates.
+[Updated qualification and remaining scope](WindowingLifetime.md)

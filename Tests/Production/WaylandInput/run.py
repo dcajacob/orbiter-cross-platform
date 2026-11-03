@@ -102,6 +102,8 @@ def main():
     p.add_argument('--configuration', choices=('Debug', 'Release'), default='Release')
     p.add_argument('--scale', type=int, choices=(1, 2), default=1)
     p.add_argument('--renderer', choices=('llvmpipe', 'default'), default='llvmpipe')
+    p.add_argument('--library-directory', type=Path, action='append', default=[],
+                   help='Explicit isolated application library directory; record hashes and verify actual loading')
     p.add_argument('--camera-check', choices=('all', 'drag', 'wheel', 'step'), default='all')
     a = p.parse_args()
     tools_manifest = json.loads((a.dependencies/'test-tools.json').read_text())
@@ -111,6 +113,20 @@ def main():
         require(digest(HERE/name)==checksum, 'Private test tool source changed: '+name)
     for name, checksum in tools_manifest['outputs_sha256'].items():
         require(digest(a.dependencies/name)==checksum, 'Private test tool binary changed: '+name)
+    library_directories = [path.resolve(strict=True) for path in a.library_directory]
+    require(len(set(library_directories))==len(library_directories), 'Duplicate runtime library directory')
+    library_files = {}
+    for directory in library_directories:
+        require(directory.is_dir() and ':' not in str(directory), 'Invalid runtime library directory')
+        files = []
+        for path in directory.glob('*.so*'):
+            if path.is_file():
+                with path.open('rb') as stream:
+                    if stream.read(4)==b'\x7fELF':
+                        files.append(path.resolve())
+        require(files, 'Runtime library directory contains no ELF libraries: '+str(directory))
+        library_files[str(directory)] = sorted(set(files))
+    library_hashes = {str(path):digest(path) for files in library_files.values() for path in files}
     out = a.output.resolve()
     out.mkdir(parents=True, exist_ok=False)
     case = next(c for c in cases if c['id']==a.case)
@@ -138,20 +154,24 @@ def main():
     argv += ['--config', str(out/'Orbiter.cfg'), '--scenario', str(out/'cockpit.scn'),
              '--evidence', str(out), '--keymap', str(ROOT/'Tests/Production/Flight/keymap-dg-laptop.cfg'), '--run']
     (out/'invocation.json').write_text(json.dumps(argv, indent=2)+'\n')
-    report = dict(status='failed', case=case['id'], scale=a.scale, phase6_complete=False)
+    report = dict(status='failed', case=case['id'], scale=a.scale, phase6_complete=False,
+                  runtime_libraries=dict(directories=list(library_files), files_sha256=library_hashes))
     inputs_sha256 = dict(executable=digest(a.executable), renderer=digest(a.modules/'Graphics/OGLClient.so'))
     try:
         with Compositor(a.dependencies, out/'compositor', a.scale,
                         'pixman' if a.renderer=='llvmpipe' else 'gl') as compositor:
             environment = dict(compositor.environment, LP_NUM_THREADS='2',
-                               LD_LIBRARY_PATH=str(a.executable.resolve().parent))
+                               LD_LIBRARY_PATH=':'.join(map(str,[a.executable.resolve().parent,*library_directories])))
             if a.renderer=='llvmpipe':
                 environment.update(LIBGL_ALWAYS_SOFTWARE='1', GALLIUM_DRIVER='llvmpipe')
             else:
                 for name in ('LIBGL_ALWAYS_SOFTWARE', 'GALLIUM_DRIVER'):
                     environment.pop(name, None)
             with (out/'focus-sink.log').open('w') as sink_log, (out/'console.log').open('w') as log:
-                sink = subprocess.Popen([str(a.dependencies.resolve()/'focus-sink')], env=environment,
+                # Isolated application libraries can be instrumented. Keep the
+                # independent, preverified focus client on its normal runtime.
+                sink_environment = dict(environment, LD_LIBRARY_PATH=str(a.executable.resolve().parent))
+                sink = subprocess.Popen([str(a.dependencies.resolve()/'focus-sink')], env=sink_environment,
                                         stdout=sink_log, stderr=subprocess.STDOUT)
                 process = None
                 try:
@@ -228,7 +248,14 @@ def main():
                     camera = verify(out, process.pid, sink.pid, t.key, t.button, None, None, None,
                                     t.focused, t.transfer, points[0], case['cockpit'], a.camera_check, transport=t)
                     shutdown = arm_shutdown(out, process.pid, t.button)
-                    (out/'loaded-maps.txt').write_text(Path(f'/proc/{process.pid}/maps').read_text())
+                    loaded_maps = Path(f'/proc/{process.pid}/maps').read_text()
+                    (out/'loaded-maps.txt').write_text(loaded_maps)
+                    mapped_files = {line.split(maxsplit=5)[5] for line in loaded_maps.splitlines()
+                                    if len(line.split(maxsplit=5))==6 and line.split(maxsplit=5)[5].startswith('/')}
+                    for directory, files in library_files.items():
+                        require(any(str(path) in mapped_files for path in files),
+                                'Requested runtime library directory did not load: '+directory)
+                    report['runtime_libraries']['loaded_files'] = sorted(set(library_hashes)&mapped_files)
                     t.key(process.pid, 'Escape', True)
                     require(process.wait(timeout=20)==0, 'Actual Wayland Orbiter session failed')
                     camera['shutdown'] = verify_shutdown(out, shutdown)
@@ -244,6 +271,8 @@ def main():
                     require(digest(a.executable)==inputs_sha256['executable'] and
                             digest(a.modules/'Graphics/OGLClient.so')==inputs_sha256['renderer'],
                             'Application binaries changed during input session')
+                    require(all(digest(Path(path))==checksum for path,checksum in library_hashes.items()),
+                            'Isolated runtime libraries changed during input session')
                     renderer = json.loads((out/'renderer-info.json').read_text())
                     require(('llvmpipe' in renderer['renderer'].lower()) == (a.renderer=='llvmpipe'),
                             'Actual OpenGL renderer differs from requested driver')

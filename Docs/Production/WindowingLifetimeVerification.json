@@ -1,0 +1,415 @@
+{
+  "schema": 1,
+  "status": "local-windowing-lifetime-qualification-passed",
+  "phase6_complete": false,
+  "source_base": "4863a7696a6ba656272150f350d795c97e0b6982",
+  "source_changes_uncommitted_at_capture": true,
+  "source_sha256": {
+    "OVP/OGLClient/Native/LinuxAdapter.cpp": "f88b0ae33d7c7d65e54cdd39526d0386baef40e8b4da4bb1c103d0ce90db20f5",
+    "Tests/Production/FontConfigLifetime/Data.Test.c": "30ea54d4c95587d0ab03823c131a62deb42fee726e724ecced50265ac07042b5",
+    "Tests/Production/FontConfigLifetime/Ownership.Test.c": "35decac50f0d57aaa0ac7ab8c0e6a2cd2e8598b74219567ea1f8456edf0d2fce",
+    "Tests/Production/FontConfigLifetime/README.md": "c1676e890df7953029a96738cf417cc1ece75e19de03fdf04ee824771dc3d451",
+    "Tests/Production/FontConfigLifetime/build.py": "0eb004f031551d39d1db07f8258718d95821620349623303c404ed93ec8f4369",
+    "Tests/Production/FontConfigLifetime/fontconfig-2.17.1-heap-pointers.patch": "22ae105861dbd538ff0e3ff5ca3c0278e7196ee0ef17eec2ad34f9fa3272bca7",
+    "Tests/Production/FontConfigLifetime/qualify.py": "8c5d178a8441d0652a6d63cb72b83399e03f8f4204bc1944fd2ecff95121cd9e",
+    "Tests/Production/FontConfigLifetime/source.lock.json": "ed4fd38dbf5635195f6bbd0b0ce62aa137dd2aad6f4d8dce66459275d73ef220",
+    "Tests/Production/GraphicsDriverLifetime/README.md": "16e8d0c369c74edcf9b03855b5512b9783fb5aaea72c39e2fa96dd34014ade42",
+    "Tests/Production/GraphicsDriverLifetime/build_driver.py": "0f21f1396bf19eb242ae25adeb45cc23d797bf256039b8ed0f43b10246b69c86",
+    "Tests/Production/WaylandInput/initialization.py": "d9d7e158c9a289e85f2ececf7dc02b5a99e7980181315ecef3458bbce795af49",
+    "Tests/Production/WaylandInput/run.py": "ce2a9a298d21d7fce81d49c54626b7fa6410066b2321aac1b799e3326e649223",
+    "Tests/Production/WindowDecorationLifetime/README.md": "ea555e6db8f52372f9dd2c016ca4fa20621d5fc9aed8a58793f698e03649354b"
+  },
+  "instrumentation": {
+    "compiled_engine_and_renderer_c_and_cxx": true,
+    "fontconfig_candidate": true,
+    "prebuilt_cspice_and_system_libraries_instrumented": false,
+    "asan_options": "detect_leaks=1:fast_unwind_on_malloc=0",
+    "lsan_options": "",
+    "ubsan_options": "halt_on_error=1:print_stacktrace=1",
+    "suppressions_used": false
+  },
+  "fontconfig": {
+    "status": "qualified-opt-in-candidate",
+    "package": "2.17.1-3ubuntu1",
+    "source_lock": {
+      "path": "Tests/Production/FontConfigLifetime/source.lock.json",
+      "sha256": "ed4fd38dbf5635195f6bbd0b0ce62aa137dd2aad6f4d8dce66459275d73ef220"
+    },
+    "patch": {
+      "path": "Tests/Production/FontConfigLifetime/fontconfig-2.17.1-heap-pointers.patch",
+      "sha256": "22ae105861dbd538ff0e3ff5ca3c0278e7196ee0ef17eec2ad34f9fa3272bca7"
+    },
+    "ownership": {
+      "baseline": {
+        "retained": {
+          "returncode": 1,
+          "bytes": 2968,
+          "allocations": 81
+        },
+        "released": {
+          "returncode": 0,
+          "bytes": 0,
+          "allocations": 0
+        },
+        "lost": {
+          "returncode": 1,
+          "bytes": 2992,
+          "allocations": 82
+        }
+      },
+      "candidate": {
+        "retained": {
+          "returncode": 0,
+          "bytes": 0,
+          "allocations": 0
+        },
+        "released": {
+          "returncode": 0,
+          "bytes": 0,
+          "allocations": 0
+        },
+        "lost": {
+          "returncode": 1,
+          "bytes": 2992,
+          "allocations": 82
+        }
+      }
+    },
+    "font_metadata": {
+      "baseline": {
+        "sha256": "a0635d71a83fba802a517376ab67402e5510da2fd399de3478291a98e333b087"
+      },
+      "candidate": {
+        "sha256": "a0635d71a83fba802a517376ab67402e5510da2fd399de3478291a98e333b087"
+      },
+      "system": {
+        "sha256": "a0635d71a83fba802a517376ab67402e5510da2fd399de3478291a98e333b087"
+      }
+    },
+    "selected_fields": 17,
+    "system_fonts": 535,
+    "matching_queries": 14,
+    "serialized_cache_bytes_identical": true,
+    "cross_readers_without_rebuild": true,
+    "cache_scope": "One original 4x6 PCF fixture, two baseline cache rebuilds and one candidate cache rebuild",
+    "dynamic_symbol_names_and_types_identical": true,
+    "configured_upstream_tests_passed": 14,
+    "replay_libraries_sha256": {
+      "out/phase6-fontconfig-baseline-replay/install/lib/x86_64-linux-gnu/libfontconfig.so.1.16.0": "d0e5166f6c92355918931494b131dc9af404e4c9d8ac4910d92c45913df65add",
+      "out/phase6-fontconfig-replay/install/lib/x86_64-linux-gnu/libfontconfig.so.1.16.0": "43ad51690ed74580bebe809babbc70e5522dd4559b7496ee235a483713f2fdde"
+    },
+    "gtk_decoration_and_pango_cache_policy_unchanged": true,
+    "system_installation_modified": false
+  },
+  "wayland_input": {
+    "status": "passed",
+    "successful_cases": 16,
+    "successful_presents": 14808,
+    "original_rcs_reference_used": true,
+    "keyboard_focus_camera_and_held_button_shutdown": true,
+    "matrices": {
+      "default": {
+        "status": "passed",
+        "actual_renderer": "Intel PTL",
+        "cases": {
+          "controls_dg_panel-1": {
+            "presents": 1545,
+            "report_sha256": "9861391e14080673941e673c4ed208e2c185e96d087c66395d6920186bbe96f0",
+            "original_reference": {
+              "run": 41482729373,
+              "file": "Debug/controls_dg_panel-1/control-inputs.csv",
+              "sha256": "f9677634e0bfe94791283701fddea6c07c4ab033825cc2f703583075fb7f5fbc"
+            }
+          },
+          "controls_dg_panel-2": {
+            "presents": 1569,
+            "report_sha256": "635ec98f69ba0e64f5c186e9275b1059c603db07c03648fa19ee0c0562c6f65b",
+            "original_reference": {
+              "run": 41482729373,
+              "file": "Debug/controls_dg_panel-1/control-inputs.csv",
+              "sha256": "f9677634e0bfe94791283701fddea6c07c4ab033825cc2f703583075fb7f5fbc"
+            }
+          },
+          "controls_dgs_panel-1": {
+            "presents": 1589,
+            "report_sha256": "ab0a0444aca7020d08364c287218c12835e8ab3f532b277c1b65dae5ff7ea02f",
+            "original_reference": {
+              "run": 41482729373,
+              "file": "Debug/controls_dgs_panel-1/control-inputs.csv",
+              "sha256": "f9677634e0bfe94791283701fddea6c07c4ab033825cc2f703583075fb7f5fbc"
+            }
+          },
+          "controls_dgs_panel-2": {
+            "presents": 1438,
+            "report_sha256": "4edab3c6e5f0e2ddbe8b4c1846c119457b466578c0916b4deb97cb2e596e43b3",
+            "original_reference": {
+              "run": 41482729373,
+              "file": "Debug/controls_dgs_panel-1/control-inputs.csv",
+              "sha256": "f9677634e0bfe94791283701fddea6c07c4ab033825cc2f703583075fb7f5fbc"
+            }
+          },
+          "controls_dg_vc-1": {
+            "presents": 1322,
+            "report_sha256": "1ea7111a46e3e6703e776f9a90440e016eca0dcf30fed5d91a89f2a1fb713f5e",
+            "original_reference": {
+              "run": 41482729373,
+              "file": "Debug/controls_dg_vc-1/control-inputs.csv",
+              "sha256": "0a338f670722f1805d6f84d57633c688751e3d0b8bee4cfef5eb6313d1ca7ddc"
+            }
+          },
+          "controls_dg_vc-2": {
+            "presents": 1356,
+            "report_sha256": "186972dd6a7f59178d9dbcee4ea35d3baaffecd67d966c14026363493bce2cb2",
+            "original_reference": {
+              "run": 41482729373,
+              "file": "Debug/controls_dg_vc-1/control-inputs.csv",
+              "sha256": "0a338f670722f1805d6f84d57633c688751e3d0b8bee4cfef5eb6313d1ca7ddc"
+            }
+          },
+          "controls_dgs_vc-1": {
+            "presents": 1263,
+            "report_sha256": "08213a895e7c4f3902a15dc018fff0e2e979ce72584c99e0ae7554bf7fd924a0",
+            "original_reference": {
+              "run": 41482729373,
+              "file": "Debug/controls_dgs_vc-1/control-inputs.csv",
+              "sha256": "0a338f670722f1805d6f84d57633c688751e3d0b8bee4cfef5eb6313d1ca7ddc"
+            }
+          },
+          "controls_dgs_vc-2": {
+            "presents": 1330,
+            "report_sha256": "0d83a95da5213fbac11c6790dcd7549b4324ae5ef22206536579d114809e2eeb",
+            "original_reference": {
+              "run": 41482729373,
+              "file": "Debug/controls_dgs_vc-1/control-inputs.csv",
+              "sha256": "0a338f670722f1805d6f84d57633c688751e3d0b8bee4cfef5eb6313d1ca7ddc"
+            }
+          }
+        },
+        "successful_presents": 11412,
+        "evidence": {
+          "path": "out/phase6-fontconfig-input-matrix-default/verification.json",
+          "sha256": "a3456789523759ea2769d0f787e50e42b7985f10b60d38fbdd635b699ac85d59"
+        }
+      },
+      "llvmpipe": {
+        "status": "passed",
+        "actual_renderer": "llvmpipe",
+        "cases": {
+          "controls_dg_panel-1": {
+            "presents": 568,
+            "report_sha256": "07d0a69a899997a93f04a41c107bba9b4f1294e056853b5832de0ff2efa30b22",
+            "original_reference": {
+              "run": 41482729373,
+              "file": "Debug/controls_dg_panel-1/control-inputs.csv",
+              "sha256": "f9677634e0bfe94791283701fddea6c07c4ab033825cc2f703583075fb7f5fbc"
+            }
+          },
+          "controls_dg_panel-2": {
+            "presents": 602,
+            "report_sha256": "06141210cae32a66d4a7cae175f9ceb830a8195ec35ba8ef17fd583ba522de0f",
+            "original_reference": {
+              "run": 41482729373,
+              "file": "Debug/controls_dg_panel-1/control-inputs.csv",
+              "sha256": "f9677634e0bfe94791283701fddea6c07c4ab033825cc2f703583075fb7f5fbc"
+            }
+          },
+          "controls_dgs_panel-1": {
+            "presents": 610,
+            "report_sha256": "d244b753704dd9d1b317b1c0af7574dc77f36b100ec532df5d4089bccee0bde0",
+            "original_reference": {
+              "run": 41482729373,
+              "file": "Debug/controls_dgs_panel-1/control-inputs.csv",
+              "sha256": "f9677634e0bfe94791283701fddea6c07c4ab033825cc2f703583075fb7f5fbc"
+            }
+          },
+          "controls_dgs_panel-2": {
+            "presents": 590,
+            "report_sha256": "c16349e71e61122ec45c5013a75b7e5b334ae3d491b8f940b89c77b8a0a8c709",
+            "original_reference": {
+              "run": 41482729373,
+              "file": "Debug/controls_dgs_panel-1/control-inputs.csv",
+              "sha256": "f9677634e0bfe94791283701fddea6c07c4ab033825cc2f703583075fb7f5fbc"
+            }
+          },
+          "controls_dg_vc-1": {
+            "presents": 258,
+            "report_sha256": "5a348df27795a5c7074b008243066da7e057bfd194cfc816de43e91ee83310ad",
+            "original_reference": {
+              "run": 41482729373,
+              "file": "Debug/controls_dg_vc-1/control-inputs.csv",
+              "sha256": "0a338f670722f1805d6f84d57633c688751e3d0b8bee4cfef5eb6313d1ca7ddc"
+            }
+          },
+          "controls_dg_vc-2": {
+            "presents": 254,
+            "report_sha256": "67794827aee2295f752f37450bf8598b62daaeaa2c519096c5a6e9b97b466b77",
+            "original_reference": {
+              "run": 41482729373,
+              "file": "Debug/controls_dg_vc-1/control-inputs.csv",
+              "sha256": "0a338f670722f1805d6f84d57633c688751e3d0b8bee4cfef5eb6313d1ca7ddc"
+            }
+          },
+          "controls_dgs_vc-1": {
+            "presents": 240,
+            "report_sha256": "3f70027b490db843468abbed2431e5d8b3ed33f91fa4e68c10ac69d8f117b64d",
+            "original_reference": {
+              "run": 41482729373,
+              "file": "Debug/controls_dgs_vc-1/control-inputs.csv",
+              "sha256": "0a338f670722f1805d6f84d57633c688751e3d0b8bee4cfef5eb6313d1ca7ddc"
+            }
+          },
+          "controls_dgs_vc-2": {
+            "presents": 274,
+            "report_sha256": "ee3ec85b72f3eee6a79fe51d88f4db0eda06449274db265d6a4288052b954856",
+            "original_reference": {
+              "run": 41482729373,
+              "file": "Debug/controls_dgs_vc-1/control-inputs.csv",
+              "sha256": "0a338f670722f1805d6f84d57633c688751e3d0b8bee4cfef5eb6313d1ca7ddc"
+            }
+          }
+        },
+        "successful_presents": 3396,
+        "evidence": {
+          "path": "out/phase6-fontconfig-input-matrix-llvmpipe/verification.json",
+          "sha256": "426731e55b1450920c508897b521ee03a26e453e6292b566af339713aca2dc16"
+        }
+      }
+    },
+    "runtime_files_sha256": {
+      "out/phase6-glfw-cleanup-asan-engine/orbiter-production": "12bbcd56db31d907e1686cea38e14ca35d5a0416f7170eaca52dff8ad035002f",
+      "out/phase6-glfw-cleanup-asan-engine/NativeModules/Celbody/Earth/Atmosphere/EarthAtm2006.so": "69ca71e41b7416236636bb62a9c7abbbe9ede84ea55a7d35802a79aa2e2f6159",
+      "out/phase6-glfw-cleanup-asan-engine/NativeModules/Celbody/Earth/Atmosphere/EarthAtmJ71G.so": "3fde1b3ee4f8e87e741e7643600730e9f4e0f4baa5a974b11e2ffcd22c25eac9",
+      "out/phase6-glfw-cleanup-asan-engine/NativeModules/Celbody/Mars/Atmosphere/MarsAtm2006.so": "5a8521359815e4360a113b1b21bf78452502978561ae0be1b16f4e2b415dd740",
+      "out/phase6-glfw-cleanup-asan-engine/NativeModules/Celbody/spice.so": "29fc4b0ddfe48bc18e4afd02c9dae8af19ae511a82c15a393c7cac42aaac5096",
+      "out/phase6-glfw-cleanup-asan-engine/NativeModules/Graphics/OGLClient.so": "e97fb169cc9f84beb2db6882f1e53273fec17d33cc68df25c8d00945e04f4353",
+      "out/phase6-glfw-cleanup-asan-engine/NativeModules/Plugin/LuaInline.so": "ccdeb082ebf9a48c8670650cf561a0b87173bb21ccf39a31fc34c4a23315262d",
+      "out/phase6-glfw-cleanup-asan-engine/NativeModules/Plugin/LuaInterpreter.so": "f68f26728125b6868587e6a4467b34dab79047b4c53c5e540082d1ac3c0f0ddb",
+      "out/phase6-glfw-cleanup-asan-engine/NativeModules/Vessel/DeltaGlider.so": "cac690cd056c5427936b3d40a8f3849774aad7d815e064192e9f22c7e79887cf",
+      "out/phase6-glfw-cleanup-asan-engine/NativeModules/Vessel/ShuttlePB.so": "24c09ccd02835dfd5d0bff538fe47f9bd2d6dd07b3c62178c45ab218895a3223",
+      "out/phase6-glfw-cleanup-asan-engine/liborbiter_production_boundary.so": "520ed8c65d8178916c5f24087443512a95ecb87895f4fd06a7e0f9e3bbe9aff4",
+      "out/phase6-glfw-cleanup-asan-engine/liborbiter_production_vessels.so": "ddf63286cd8c8a603945e63ff4aa3c593ce8c82131022db03a1e25149eb397c6",
+      "out/phase6-glfw-cleanup-asan-engine/native-lua/doc-tools/lfs.so": "1fd71e63ed1b58ae489725c373db7a6f1f7cac0ddfa7739fcdc0504e06dd17b7",
+      "out/phase6-glfw-cleanup-asan-engine/native-lua/liblua.so": "9b3c590acc14266f22254779006299d05ccc200c0242681da3969a2cb1e4db99",
+      "out/phase6-fontconfig-heap-pointers/build/libfontconfig.so.1.16.0": "9da57ca56925c2cb0a5635eb5e7a6fbbb53ed45b70ddeccca74ed04b53009fe1",
+      "out/phase6-mesa-wayland-verified/install/lib/x86_64-linux-gnu/libEGL_mesa.so.0.0.0": "93505abee4a24527ddba5d7767c11ed8a0fdfec6918a46084354c65dde5406c5",
+      "out/phase6-mesa-wayland-verified/install/lib/x86_64-linux-gnu/libGLX_mesa.so.0.0.0": "7606b7cbe39050fc172ad025ddaec4c901dd53435e940ecebd0e53f4f990715f",
+      "out/phase6-mesa-wayland-verified/install/lib/x86_64-linux-gnu/libgallium-26.0.8.so": "522b616abec0b55c6d2036e8b86a2c843b41299177506f28621ecc4164f1ef1d"
+    }
+  },
+  "initialization": {
+    "status": "passed",
+    "paired_original_failures_reproduced": true,
+    "cases": {
+      "width-zero": {
+        "status": "passed",
+        "returncode": 1,
+        "expected_rejection": "Native window dimensions are outside the supported range",
+        "console_sha256": "065c1cb79473954dcc422a96caedcb78d83198821dcd019e90c770f1a31f5e12"
+      },
+      "width-too-large": {
+        "status": "passed",
+        "returncode": 1,
+        "expected_rejection": "Native window dimensions are outside the supported range",
+        "console_sha256": "065c1cb79473954dcc422a96caedcb78d83198821dcd019e90c770f1a31f5e12"
+      },
+      "unsupported-egl": {
+        "status": "passed",
+        "returncode": 1,
+        "expected_rejection": "Native OpenGL window creation failed",
+        "console_sha256": "42708b984d96a7cefa8a6e30f2d26190940a7a996743ba4bc79c9e6f709e0783"
+      }
+    },
+    "normal_window_destruction_sequence_unchanged": true,
+    "public_class_or_sdk_layout_changed": false
+  },
+  "system_mesa_negative_control": {
+    "status": "expected-system-driver-leak-reproduced",
+    "leaked_bytes": 112,
+    "leaked_allocations": 2,
+    "allocation_addresses_mapped_to_system_gallium": true,
+    "context_deleted": true
+  },
+  "original_references_and_budgets_unchanged": true,
+  "scope": {
+    "host": "Ubuntu 26.04.1 x86-64 / GCC 15.2 / glibc 2.43",
+    "system_intel": "Mesa 26.0.8-1ubuntu0.3 / Intel PTL",
+    "software": "Mesa 26.0.8-1ubuntu0.3 locked source with executable-heap cleanup, X11 and Wayland",
+    "automatic_global_library_selection": false,
+    "engine_and_non_renderer_modules": "Exact copied binaries and SDK header; fresh matching renderer builds",
+    "library_selection": "Explicit application-only directories, ELF hashes, actual mapped paths, post-run stability"
+  },
+  "evidence": [
+    {
+      "path": "out/phase6-fontconfig-replay-qualification/verification.json",
+      "sha256": "74980914c163aea78183e7f8f618ee2d55d3ac46aaf0df1cd6ff559c074e31ad"
+    },
+    {
+      "path": "out/phase6-fontconfig-replay/build.json",
+      "sha256": "719121761b0c07a00c20ec38f7c3b46f303b28f4e3ea60337fc187c6dd76d8a8"
+    },
+    {
+      "path": "out/phase6-fontconfig-baseline-replay/build.json",
+      "sha256": "7406e1095f09b2cf8fab4833cf9352b49a24c5adc90e98050b46e9e91a278585"
+    },
+    {
+      "path": "out/phase6-fontconfig-heap-pointers/build/meson-logs/testlog.json",
+      "sha256": "6c043449c4ffaf96b111c2cb94ceadeafa56643e797d2cd93857ef2f1fdc9412"
+    },
+    {
+      "path": "out/phase6-fontconfig-window-trial-v2/results.json",
+      "sha256": "3b03c7aaa6597bbec3276983535c73cb022d52d308638aae7bc9bed5a45b99cc"
+    },
+    {
+      "path": "out/phase6-glfw-init-failure-controls/verification.json",
+      "sha256": "e31bfeb8daeb001f389dda1e2db62a7ed6e9b6ee225dd5c8ea6c24b5b003230e"
+    },
+    {
+      "path": "out/phase6-glfw-init-regression/verification.json",
+      "sha256": "7f19056c4d6a4416dc07a5c62b635ddbc5f93f5c646f34c6aaec29ed59fcdd14"
+    },
+    {
+      "path": "out/phase6-fontconfig-system-mesa-negative/negative-control-verification.json",
+      "sha256": "ee2b4269a76996b7da23e0f0bd80c10c0212a0d041497e4f2e52697e0c635606"
+    },
+    {
+      "path": "out/phase6-mesa-wayland-verified/driver-build.json",
+      "sha256": "038b289396d59c949beb4553fa4dc0f5ee05ca0e5814a02fe72912f198c58869"
+    },
+    {
+      "path": "out/phase6-mesa-wayland-invocation.json",
+      "sha256": "7f5574c0e0ae563ed4dc5f39691dfdb276c6e8a0b2f96cb46d9ae1aac616ec7c"
+    },
+    {
+      "path": "out/phase6-libdecor-fontmap-trial/results.json",
+      "sha256": "fc3db407dff50ec5d5bd191c4b42772b70e25ae6e253cdf95e8f3a9651b54022"
+    },
+    {
+      "path": "out/phase6-glfw-cleanup-engine/runtime-copy.json",
+      "sha256": "13853d31403a8f8a42cb0a5ad8691bf865601b0ebc200064446285179ad33eca"
+    },
+    {
+      "path": "out/phase6-glfw-cleanup-asan-engine/runtime-copy.json",
+      "sha256": "0e80748c499c8852925c801842266d314c22e77c028352a3478586cbdef27372"
+    }
+  ],
+  "remaining_phase6_work": [
+    "Current-source hosted four-profile qualification",
+    "All unchanged stock scenarios and named modules",
+    "Stock failure-path crashes",
+    "Physical controllers",
+    "Remote durable evidence publication"
+  ],
+  "local_evidence_archive": {
+    "schema": 1,
+    "status": "preserved-locally",
+    "phase6_complete": false,
+    "path": "out/phase6-windowing-lifetime-evidence-v1.tar.gz",
+    "size_bytes": 166185816,
+    "sha256": "8594524153e3deaf3b528031e734a1ff0acb0bf80ea4f2e6109fed38eaf9b243",
+    "members": 4465,
+    "source_base": "4863a7696a6ba656272150f350d795c97e0b6982",
+    "index_sha256": "edfbd04e8672678edbf02d093aca5d1f595082c8da54658a0e1adbcc92ad978d",
+    "all_archive_payload_hashes_verified": true,
+    "remote_publication_complete": false
+  }
+}

@@ -1,0 +1,33 @@
+--- a/src/fcint.h
++++ b/src/fcint.h
+@@ -235,7 +235,9 @@
+     FcRef    ref;
+ };
+ 
+-#define FcPatternElts(p)     FcOffsetMember (p, elts_offset, FcPatternElt)
++/* Serialized patterns retain relocatable offsets. Heap patterns keep their
++ * element-table pointer visible to conservative memory ownership tracing. */
++#define FcPatternElts(p)     (FcRefIsConst (&(p)->ref) ? FcOffsetMember (p, elts_offset, FcPatternElt) : (FcPatternElt *)(p)->elts_offset)
+ 
+ #define FcFontSetFonts(fs)   FcPointerMember (fs, fonts, FcPattern *)
+ 
+--- a/src/fcpat.c
++++ b/src/fcpat.c
+@@ -37,7 +37,7 @@
+     memset (p, 0, sizeof (FcPattern));
+     p->num = 0;
+     p->size = 0;
+-    p->elts_offset = FcPtrToOffset (p, NULL);
++    p->elts_offset = 0;
+     FcRefInit (&p->ref, 1);
+     return p;
+ }
+@@ -506,7 +506,7 @@
+ 		e = (FcPatternElt *)malloc (s * sizeof (FcPatternElt));
+ 	    if (!e)
+ 		return FcFalse;
+-	    p->elts_offset = FcPtrToOffset (p, e);
++	    p->elts_offset = (intptr_t)e;
+ 	    while (p->size < s) {
+ 		e[p->size].object = 0;
+ 		e[p->size].values = NULL;

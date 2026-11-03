@@ -144,6 +144,7 @@ const std::map<int,unsigned> keyCodes={
     {GLFW_KEY_KP_ENTER,OAPI_KEY_NUMPADENTER}};
 std::vector<FlightKeyEvent> keyEvents;
 bool guiInitialized=false;
+bool glfwInitialized=false;
 orbiter::production::NativeJoystickState cockpitJoystick;
 int joystickDevice=-1;float initialThrottle=0,lastThrottle=0;bool armed=false,throttleSeen=false;
 int engineeringWindowScale=1;
@@ -176,6 +177,7 @@ void error(int,const char* text) {std::cerr<<"GLFW: "<<text<<'\n';}
 void OGLClient::Open()
 {
     glfwSetErrorCallback(error);require(glfwInit()==GLFW_TRUE,"GLFW initialization failed");
+    glfwInitialized=true;
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR,3);glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR,3);
     glfwWindowHint(GLFW_OPENGL_PROFILE,GLFW_OPENGL_CORE_PROFILE);
     // The opt-in engineering fixture retains the accepted 1280x720 physical
@@ -370,7 +372,10 @@ bool OGLClient::clbkDisplayFrame()
 }
 void OGLClient::clbkDestroyRenderWindow(bool)
 {
-    if(!nativeWindow) return;
+    if(!nativeWindow) {
+        if(glfwInitialized) {glfwTerminate();glfwInitialized=false;}
+        return;
+    }
     SetCameraRotation(false);
     glfwMakeContextCurrent(nativeWindow);mScene.reset();mMeshManager.reset();
     if(mResources) {
@@ -378,7 +383,7 @@ void OGLClient::clbkDestroyRenderWindow(bool)
         TileManager2Base::GlobalExit();TileManager::GlobalExit();vObject::GlobalExit();mResources=false;
     }
     ReleaseOverlayBuffers();mTextureManager.reset();Renderer::GlobalExit();
-    glfwDestroyWindow(nativeWindow);nativeWindow=nullptr;Evidence::End(true);glfwTerminate();
+    glfwDestroyWindow(nativeWindow);nativeWindow=nullptr;Evidence::End(true);glfwTerminate();glfwInitialized=false;
     if(frameTimes.is_open())frameTimes.close();
 }
 bool RendererResolveFilePath(const std::string& input,std::string& resolved)

@@ -272,6 +272,14 @@ allocations. A minimal GLFW window isolates the decoration leak. Broader
 sanitizer qualification remains open. [Lua fix](LuaUpvalueLifetime.md),
 [renderer repairs and retained failures](RendererDefinedBehavior.md)
 
+The subsequent ownership controls identify the Fontconfig report as an
+offset-encoding false positive. An isolated pointer-compatible Fontconfig build
+and Wayland-capable Mesa cleanup candidate now pass all sixteen fully
+instrumented panel/VC input flows at 1x/2x on Intel and llvmpipe, with 14,808
+presentations and clean exits. Genuine lost-allocation controls still fail as
+required. Renderer initialization also releases GLFW when no window was created.
+[Current windowing lifetime scope and evidence](WindowingLifetime.md)
+
 The native graphics leak now has an isolated source fix and a passing local
 sanitizer menu flow. Mesa's executable-code allocator retained two bookkeeping
 objects (112 bytes) and a 10 MiB mapping after its last generated function was
