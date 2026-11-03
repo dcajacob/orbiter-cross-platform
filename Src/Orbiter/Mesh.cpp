@@ -242,9 +242,9 @@ bool Mesh::AddGroupBlock (UInt32 grp, const NTVERTEX *vtx, UInt32 nvtx, const UI
 	NTVERTEX *v = new NTVERTEX[g->nVtx+nvtx];
 	if (g->nVtx) {
 		memcpy (v, g->Vtx, g->nVtx*sizeof(NTVERTEX));
-		delete []g->Vtx;
-		g->Vtx = NULL;
 	}
+	delete []g->Vtx;
+	g->Vtx = NULL;
 	if (nvtx) {
 		memcpy (v+g->nVtx, vtx, nvtx*sizeof(NTVERTEX));
 	}
@@ -254,9 +254,9 @@ bool Mesh::AddGroupBlock (UInt32 grp, const NTVERTEX *vtx, UInt32 nvtx, const UI
 	UInt16 *i = new UInt16[g->nIdx+nidx];
 	if (g->nIdx) {
 		memcpy (i, g->Idx, g->nIdx*sizeof(UInt16));
-		delete []g->Idx;
-		g->Idx = NULL;
 	}
+	delete []g->Idx;
+	g->Idx = NULL;
 	if (nidx) {
 		for (UInt32 j = 0; j < nidx; j++)
 			i[g->nIdx+j] = idx[j] + vofs;

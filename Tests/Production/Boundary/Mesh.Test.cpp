@@ -103,6 +103,28 @@ int main(int argc,char** argv)
                 "Production mesh transform or normals changed");
             mesh.AddTexture(&env.textureToken);
         }
+        {
+            // Empty panel groups own zero-length arrays too. Replacing those
+            // buffers must release them, including empty-to-empty appends.
+            const NTVERTEX vertices[3]{{0,0,0,0,0,1,0,0},{1,0,0,0,0,1,1,0},{0,1,0,0,0,1,0,1}};
+            const UInt16 indices[3]{0,1,2};
+            for(unsigned pass=0;pass<4;++pass) {
+                Mesh mesh;
+                const auto group=mesh.AddGroup(nullptr,0,nullptr,0,0,0,0,0,true);
+                for(unsigned repeat=0;repeat<3;++repeat)
+                    require(mesh.AddGroupBlock(group,nullptr,0,nullptr,0),"Empty group append failed");
+                require(mesh.AddGroupBlock(group,vertices,3,indices,3) &&
+                        mesh.AddGroupBlock(group,vertices,3,indices,3),"Panel geometry append failed");
+                const auto* got=mesh.GetGroup(group);
+                require(got->nVtx==6 && got->nIdx==6,"Panel geometry counts changed");
+                for(unsigned i=0;i<6;++i) {
+                    require(got->Idx[i]==i,"Panel index offsets changed");
+                    require(got->Vtx[i].x==vertices[i%3].x && got->Vtx[i].y==vertices[i%3].y &&
+                            got->Vtx[i].z==vertices[i%3].z && got->Vtx[i].nz==1,
+                            "Panel vertices changed while replacing owned arrays");
+                }
+            }
+        }
         require(env.releases==1 && env.allocations>0,"Host resource lifetime callbacks were not routed");
         std::cout<<"Original production Mesh: stock data, copies, edits, transforms, materials, cache and host resources passed\n";
         return 0;
