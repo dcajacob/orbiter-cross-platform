@@ -28,7 +28,8 @@ def scenario():
 # both hosts. Windows also captures the stock configuration in the other cases.
 MENU_ITEMS=('Ship','Camera','Speed','Pause','Function','Info','Options','Map','Record','Help','Save','Exit')
 TESTED_MENU={'Ship','Camera','Speed','Pause','Info','Map','Save','Exit'}
-CASES=[('hidden',1,0),('visible',0,0),('auto',2,0),('focus',0,0),('menu',1,0),('menu-auto',1,0)]
+CASES=[('hidden',1,0),('visible',0,0),('auto',2,0),('focus',0,0),
+       ('menu-hidden',1,0),('menu',1,0),('menu-auto',1,0)]
 
 def menu_preferences(path):
     path.parent.mkdir(parents=True,exist_ok=True)
@@ -62,7 +63,7 @@ def execute(args,name,mode,fps):
     actions=inputs(name)
     if args.original:
         def configure(directory):
-            if menu_mode!=1:menu_preferences(directory/'Config/MenuInfoBar.cfg')
+            if name.startswith('menu'):menu_preferences(directory/'Config/MenuInfoBar.cfg')
             master=directory/'Orbiter.cfg'
             master.write_text(master.read_text().replace('  ProductionBehaviorDriver','  ProductionCockpitDriver\n  OGLClient')+config)
             (directory/'Scenarios/Behavior.scn').write_text(scenario())
@@ -74,7 +75,7 @@ def execute(args,name,mode,fps):
         require((out/'cockpit-complete.txt').read_text().strip()=='60','Incomplete original focus/info run')
     else:
         out.mkdir()
-        if menu_mode!=1:menu_preferences(out/'ScriptFiles/config/menuinfobar.cfg')
+        if name.startswith('menu'):menu_preferences(out/'ScriptFiles/config/menuinfobar.cfg')
         (out/'flight.scn').write_text(scenario())
         (out/'Orbiter.cfg').write_text((HERE.parent/'NativeScene/Orbiter.cfg').read_text()+config)
         (out/'instrument-evidence.enabled').touch()
@@ -197,9 +198,14 @@ def main():
     def menu_strip(name,frame):
         image=pixels(a.output,name,frame)
         return b''.join(image[(y*1280+400)*4:(y*1280+900)*4] for y in range(665,720))
-    require(menu_strip('menu',20)!=menu_strip('hidden',20),'Missing visible stock menu')
-    require(menu_strip('menu-auto',20)!=menu_strip('hidden',20),'Stock menu did not reveal on hover')
-    require(menu_strip('menu-auto',50)==menu_strip('hidden',50),'Stock menu did not retract')
+    # Compare the same menu item configuration. The original Windows renderer
+    # leaves a few edge pixels on the top row even when the menu is hidden;
+    # their locations depend on the width of the configured menu. Keep the
+    # stock twelve-item hidden case above, and use a separate eight-item hidden
+    # case for the exact reveal/retract check. No pixels are excluded.
+    require(menu_strip('menu',20)!=menu_strip('menu-hidden',20),'Missing visible stock menu')
+    require(menu_strip('menu-auto',20)!=menu_strip('menu-hidden',20),'Stock menu did not reveal on hover')
+    require(menu_strip('menu-auto',50)==menu_strip('menu-hidden',50),'Stock menu did not retract')
     if a.original:original_general_api(a,pin['application_source'])
     (a.output/'focus-bars-report.json').write_text(json.dumps(report,indent=2)+'\n')
     print(json.dumps(report,indent=2))

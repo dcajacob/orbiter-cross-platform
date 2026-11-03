@@ -37,6 +37,20 @@ libgallium 26.0.8 at offsets `0xef1ba0` and `0xef1b89`. Function, Options,
 Record and Help remain open.
 [Delta-glider flight evidence](DeltaGlider.md)
 
+The Windows Debug and Release client regressions and their final comparison
+passed at `607de492` in
+[run 41574333629](https://github.com/dcajacob/orbiter-cross-platform/actions/runs/41574333629).
+The additional preserved-Windows menu capture exposed a fixture mismatch:
+the auto-hide check compared an eight-item menu with the original twelve-item
+hidden menu. The Debug capture differed at 18 pixels on the topmost row;
+the menu had retracted, but the original renderer's remaining edge pixels
+depended on the configured menu width. A separate `menu-hidden` case now uses
+the same eight items as `menu` and `menu-auto`. The twelve-item Windows case
+remains intact, and the exact strip comparison excludes no pixels. All seven
+cases pass locally in native Debug, including selection, reveal, retraction
+and complete graphics shutdown. Hosted verification of the corrected fixture
+remains required.
+
 The pre-extraction reference gate is accepted in
 [run 41458001638](https://github.com/dcajacob/orbiter-cross-platform/actions/runs/41458001638).
 All nine cases run twice in both MSVC configurations. All state and projected
