@@ -2,7 +2,7 @@ name: Preserved Windows Shuttle-A Reference
 on:
   push:
     branches: ['codex/production-**']
-    paths: ['Tests/Production/ShuttleA/**', 'Tests/Production/StockVessels/**', '.github/workflows/original-shuttle-a.yml']
+    paths: ['Tests/Production/ShuttleA/cases.json', 'Tests/Production/StockVessels/**', '.github/workflows/original-shuttle-a.yml']
   workflow_dispatch:
 permissions:
   contents: read

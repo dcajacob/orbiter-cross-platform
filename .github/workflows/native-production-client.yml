@@ -2,7 +2,7 @@ name: Native Production OpenGL External View
 on:
   push:
     branches: ['codex/production-**']
-    paths: ['Src/Orbiter/**', 'Src/Celbody/**', 'Src/Vessel/ShuttlePB/**', 'Src/Vessel/DeltaGlider/**', 'Src/Vessel/Common/**', 'Src/Vessel/ShuttleA/Help/**', 'Src/Vessel/ShuttleA/ShuttleALua.cpp', 'Src/Vessel/Atlantis/Help/**', 'Src/Plugin/ScnEditor/Help/**', 'Src/Module/LuaScript/**', 'Extern/Lua/**', 'Extern/ReferenceMath/**', 'Extern/ldoc/**', 'Extern/Penlight/**', 'Extern/luafilesystem/**', 'OVP/OGLClient/**', 'Orbitersdk/**', 'Html/**', 'Tests/Production/**', '.github/workflows/native-production-client.yml']
+    paths: ['Src/Orbiter/**', 'Src/Celbody/**', 'Src/Vessel/ShuttlePB/**', 'Src/Vessel/DeltaGlider/**', 'Src/Vessel/Common/**', 'Src/Vessel/ShuttleA/**', 'Src/Vessel/Atlantis/Help/**', 'Src/Plugin/ScnEditor/Help/**', 'Src/Module/LuaScript/**', 'Extern/Lua/**', 'Extern/ReferenceMath/**', 'Extern/ldoc/**', 'Extern/Penlight/**', 'Extern/luafilesystem/**', 'OVP/OGLClient/**', 'Orbitersdk/**', 'Html/**', 'Tests/Production/**', '.github/workflows/native-production-client.yml']
   workflow_dispatch:
 permissions:
   contents: read
@@ -85,7 +85,7 @@ jobs:
         run: |
           python3 -B Tests/Production/prepare_native_data.py --archive out/data-cache/production-stock-data-v1.zip --destination out/data --group all
           python3 -B Tests/Production/prepare_data.py --lock Tests/Production/standard-planets.lock.json --archive out/planet-cache/Orbiter2016.zip --destination out/planets
-          python3 -B Tests/Production/NativeScene/prepare.py --delta-glider --data out/data --planets out/planets --destination out/scene-resources
+          python3 -B Tests/Production/NativeScene/prepare.py --delta-glider --shuttle-a --data out/data --planets out/planets --destination out/scene-resources
       - name: Run real software-rendered native application twice against frozen Windows
         shell: bash
         run: |
@@ -294,6 +294,21 @@ jobs:
           --data out/data --modules out/native-cockpit-engine/NativeModules --planets out/planets
           --configuration ${{ matrix.configuration }} --math-profile ${{ matrix.math_profile }}
           --output out/native-stock-stations
+      - name: Reject missing, foreign and generic Shuttle-A module substitutes
+        run: >-
+          xvfb-run -a -s '-screen 0 1920x1080x24' env LIBGL_ALWAYS_SOFTWARE=1 GALLIUM_DRIVER=llvmpipe
+          python3 -B Tests/Production/StockScenarios/ShuttleAPolicy.Test.py
+          --executable out/native-cockpit-engine/orbiter-production --assets out/scene-resources
+          --data out/data --modules out/native-cockpit-engine/NativeModules --planets out/planets
+          --output out/native-shuttle-a-policy
+      - name: Capture all ships in ten unchanged Shuttle-A and DG scenarios
+        run: >-
+          xvfb-run -a -s '-screen 0 1920x1080x24' env LIBGL_ALWAYS_SOFTWARE=1 GALLIUM_DRIVER=llvmpipe
+          python3 -B Tests/Production/StockVessels/native.py --suite shuttle-a
+          --executable out/native-cockpit-engine/orbiter-production --assets out/scene-resources
+          --data out/data --modules out/native-cockpit-engine/NativeModules --planets out/planets
+          --configuration ${{ matrix.configuration }} --math-profile ${{ matrix.math_profile }}
+          --output out/native-shuttle-a
       - name: Click the visible stock cockpit menu and change ship, warp, pause and save
         run: >-
           xvfb-run -a -s '-screen 0 1920x1080x24' env LIBGL_ALWAYS_SOFTWARE=1 GALLIUM_DRIVER=llvmpipe
@@ -374,6 +389,8 @@ jobs:
             out/native-cockpit-camera-mouse/**
             out/native-cockpit-camera/**
             out/native-stock-stations/**
+            out/native-shuttle-a/**
+            out/native-shuttle-a-policy/**
             out/native-cockpit-engine/orbiter-production
             out/native-cockpit-engine/**/*.so
             out/camera-gate-check.json
@@ -651,3 +668,52 @@ jobs:
         with:
           name: spacecraft-comparison-${{ matrix.configuration }}-${{ matrix.math_profile }}
           path: '*-comparison.json'
+
+  compare_shuttle_a:
+    name: Compare original and native Shuttle-A ${{ matrix.configuration }} ${{ matrix.math_profile }}
+    needs: [native]
+    if: ${{ !cancelled() }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    permissions:
+      contents: read
+      actions: read
+    strategy:
+      fail-fast: false
+      matrix:
+        configuration: [Debug, Release]
+        math_profile: [automatic, sse2]
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - uses: actions/cache@v6
+        with:
+          path: out/shuttle-a-original-cache/*.zip
+          key: shuttle-a-original-${{ hashFiles('Tests/Production/ShuttleA/observations.lock.json') }}
+      - uses: actions/download-artifact@v8
+        with:
+          name: native-production-client-${{ matrix.configuration }}-${{ matrix.math_profile }}-x64
+          path: runtime
+      - name: Verify and audit the pinned original Windows observations
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: >-
+          python3 -B Tests/Production/ShuttleA/frozen_original.py
+          --cache out/shuttle-a-original-cache --output out/shuttle-a-original
+          --audit out/shuttle-a-original-audit.json
+      - name: Compare every vessel, docking port, camera and full framebuffer
+        run: >-
+          python3 -B Tests/Production/StockVessels/compare.py --suite shuttle-a
+          --original out/shuttle-a-original/${{ matrix.configuration }}-${{ matrix.math_profile }}/shuttle-a-original
+          --native runtime/out/native-shuttle-a --runtime-root runtime
+          --reference-audit out/shuttle-a-original-audit.json --output shuttle-a-comparison.json
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: shuttle-a-comparison-${{ matrix.configuration }}-${{ matrix.math_profile }}
+          retention-days: 90
+          path: |
+            shuttle-a-comparison.json
+            out/shuttle-a-original-audit.json
+            out/shuttle-a-original/downloads.json

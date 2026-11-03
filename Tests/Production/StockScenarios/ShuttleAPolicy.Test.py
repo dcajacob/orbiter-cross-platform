@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Reject missing modules, foreign factories, generic fallbacks and class clones."""
 import argparse
+from contextlib import nullcontext
 import hashlib
 import json
 import os
@@ -8,6 +9,7 @@ from pathlib import Path
 import shutil
 import subprocess
 import sys
+from types import SimpleNamespace
 
 ROOT=Path(__file__).resolve().parents[3]
 sys.path.insert(0,str(ROOT/'Tests/Production/WaylandInput'))
@@ -24,10 +26,14 @@ def require(ok,message):
 
 def main():
     p=argparse.ArgumentParser(description=__doc__)
-    for name in ('dependencies','executable','assets','data','modules','planets','output'):
+    for name in ('executable','assets','data','modules','planets','output'):
         p.add_argument('--'+name,type=Path,required=True)
+    p.add_argument('--dependencies',type=Path,help='Owned Wayland test tools; omit only inside an already owned test display')
     a=p.parse_args()
-    for name in vars(a):setattr(a,name,getattr(a,name).resolve())
+    for name,value in vars(a).items():
+        if value is not None:setattr(a,name,value.resolve())
+    require(a.dependencies is not None or os.environ.get('DISPLAY') or os.environ.get('WAYLAND_DISPLAY'),
+            'An owned test display is required')
     require(not a.output.exists(),'Shuttle-A policy-control output exists')
     a.output.mkdir(parents=True)
     suite=json.loads((ROOT/'Tests/Production/ShuttleA/cases.json').read_text())
@@ -59,7 +65,9 @@ def main():
               ('unqualified_shuttle_clone',0,b'Phase6ShuttleClone'),
               ('unqualified_payload_clone',1,b'Phase6PayloadClone')]
     try:
-        with Compositor(a.dependencies,a.output/'compositor') as compositor:
+        display=(Compositor(a.dependencies,a.output/'compositor') if a.dependencies is not None else
+                 nullcontext(SimpleNamespace(environment=dict(os.environ))))
+        with display as compositor:
             env=dict(compositor.environment,LIBGL_ALWAYS_SOFTWARE='1',GALLIUM_DRIVER='llvmpipe',
                      LP_NUM_THREADS='2',LD_LIBRARY_PATH=str(a.executable.parent))
             for name in ('LD_PRELOAD','ASAN_OPTIONS','LSAN_OPTIONS','UBSAN_OPTIONS'):env.pop(name,None)

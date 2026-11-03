@@ -4,8 +4,9 @@ The native cockpit build compiles the original Shuttle-A vessel, all panel
 instruments, its Lua methods and the original parachute payload. Native module
 factories use the checked SDK build identity. Shared drawing resources are
 created for the first ship and released after the last ship is destroyed.
-The native application still rejects Shuttle-A at its capability gate until
-original Windows observations and native comparisons qualify it.
+The comparison candidate admits only the initial capabilities observed in the
+audited Windows matrix. Native support remains unqualified until its state,
+image, input and lifetime gates pass.
 
 `source_audit.py` compares all 40 original source/header files against the
 preserved application revision, allowing only declared platform adaptations.
@@ -35,7 +36,31 @@ python3 -B Tests/Production/NativeScene/prepare.py --delta-glider --shuttle-a \
 python3 -B Tests/Production/CockpitUI/prepare_fonts.py --assets out/shuttle-a-resources
 ```
 
+The four original profiles are now audited at producer `778b6c58`: 80 sessions,
+4,800 presentations and 38,552 finalized all-vessel samples. Their exact archive
+identities are pinned in `observations.lock.json`; there is no automatic refresh.
+Stage and re-audit an existing cache with:
+
+```sh
+python3 -B Tests/Production/ShuttleA/frozen_original.py --offline \
+  --cache out/phase6-shuttle-a-original-cache --output out/shuttle-a-original \
+  --audit out/shuttle-a-original-audit.json
+```
+
+CI can obtain missing pinned Actions artifacts using its read-only
+`GITHUB_TOKEN`. The helper strips authorization on redirects away from the API,
+checks archive size and SHA-256 before extracting, and rejects unsafe paths.
+An expired artifact is an error; it never selects a newer capture.
+
 Capture success is not native qualification. Audit all four original profiles,
 then compare the matching native captures with `StockVessels/compare.py --suite
 shuttle-a`. Required-module failures must remain failures. The complete stock
 corpus, hardware input/performance and lifetime gates remain separate.
+
+The native workflow now captures all twenty sessions per build/CPU profile and
+compares them against these exact original observations in four separate jobs.
+`StockScenarios/ShuttleAPolicy.Test.py` checks missing modules, foreign factories,
+generic fallbacks and unqualified class clones. It uses disposable resources
+and must reject all eight variants before presentation without changing the
+protected configurations. Use `--dependencies` for an owned Wayland compositor,
+or run inside an already owned CI display such as `xvfb-run`.

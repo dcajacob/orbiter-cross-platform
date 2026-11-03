@@ -1,0 +1,36 @@
+{
+  "schema": 1,
+  "status": "audited-original-observations",
+  "automatic_refresh": false,
+  "repository": "dcajacob/orbiter-cross-platform",
+  "run_id": 41699732070,
+  "producer_commit": "778b6c5848e86ca4cc2d277c20b623b1e056b075",
+  "original_application": "f725194209634f7fd5d1d44d426cfa9b5e303e37",
+  "cases_sha256_lf": "818a213d5be809712e91a01d2927e478f870919209cbf3f9797cfe7f398bfa49",
+  "artifacts": [
+    {
+      "id": 13264840382,
+      "name": "original-shuttle-a-Release-sse2",
+      "bytes": 35002746,
+      "sha256": "e421544fb96d1885ebd948470ce30ac1390df9920bd2258a009386a5b039c476"
+    },
+    {
+      "id": 13264520288,
+      "name": "original-shuttle-a-Release-automatic",
+      "bytes": 35002415,
+      "sha256": "0658ad1e4367ce5d391dbafea3980f795c97ddcc9327513308685aba9d579b77"
+    },
+    {
+      "id": 13263014469,
+      "name": "original-shuttle-a-Debug-sse2",
+      "bytes": 35021262,
+      "sha256": "621a6d7365bfaa1e08456e35b1e61c3a930a08742fb69d18bde213615ff6c277"
+    },
+    {
+      "id": 13262664115,
+      "name": "original-shuttle-a-Debug-automatic",
+      "bytes": 35021561,
+      "sha256": "f66543847ce3765e061272ac1f937c24f2c2663d0d1cd31665bd5e7d59b0140d"
+    }
+  ]
+}
