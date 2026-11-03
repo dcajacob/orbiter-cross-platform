@@ -19,6 +19,13 @@
 // Thermal control subsystem
 // ==============================================================
 
+class CoolantLoop;
+class CoolantLoopDisplay;
+class CoolantPumpSwitch;
+class CoolantPumpDial;
+class CoolantReftempDial;
+class RadiatorSwitch;
+
 class RadiatorControl;
 
 class ThermalSubsystem: public DGSubsystem {
@@ -125,7 +132,7 @@ public:
 	void SetReftemp (double temp);
 	void IncReftemp (bool increase);
 	void clbkPreStep (double simt, double simdt, double mjd);
-	bool clbkLoadPanel2D (int panelid, PANELHANDLE hPanel, DWORD viewW, DWORD viewH);
+	bool clbkLoadPanel2D (int panelid, PANELHANDLE hPanel, oapi::UInt32 viewW, oapi::UInt32 viewH);
 	bool clbkLoadVC (int vcid);
 	void clbkSaveState (FILEHANDLE scn);
 	bool clbkParseScenarioLine (const char *line);
@@ -178,8 +185,8 @@ private:
 	int ELID_PUMPSWITCH;
 	int ELID_PUMPDIAL;
 	int ELID_REFTEMPDIAL;
-	UINT anim_vc_pumpdial;
-	UINT anim_vc_reftempdial;
+	oapi::UInt anim_vc_pumpdial;
+	oapi::UInt anim_vc_reftempdial;
 };
 
 // ==============================================================
@@ -255,18 +262,18 @@ public:
 	void clbkSaveState (FILEHANDLE scn);
 	bool clbkParseScenarioLine (const char *line);
 	void clbkPostStep (double simt, double simdt, double mjd);
-	bool clbkLoadPanel2D (int panelid, PANELHANDLE hPanel, DWORD viewW, DWORD viewH);
+	bool clbkLoadPanel2D (int panelid, PANELHANDLE hPanel, oapi::UInt32 viewW, oapi::UInt32 viewH);
 	bool clbkLoadVC (int vcid);
 	void clbkResetVC (int vcid, DEVMESHHANDLE hMesh);
 	bool clbkPlaybackEvent (double simt, double event_t, const char *event_type, const char *event);
-	int clbkConsumeBufferedKey (DWORD key, bool down, char *kstate);
+	int clbkConsumeBufferedKey (oapi::UInt32 key, bool down, char *kstate);
 
 private:
 	bool radiator_extend;
 	AnimState2 radiator_state;
 	RadiatorSwitch *sw;
 	int ELID_SWITCH;
-	UINT anim_radiator;         // handle for radiator animation
+	oapi::UInt anim_radiator;         // handle for radiator animation
 };
 
 // ==============================================================

@@ -18,6 +18,10 @@
 
 // ==============================================================
 
+class OuterLockSwitch;
+class InnerLockSwitch;
+class HatchCtrlSwitch;
+
 class AirlockCtrl;
 class TophatchCtrl;
 class PValveSwitch;
@@ -48,7 +52,7 @@ public:
 	const AnimState2 &HatchState() const;
 	void RepairDamage ();
 	void clbkPostStep (double simt, double simdt, double mjd);
-	bool clbkLoadPanel2D (int panelid, PANELHANDLE hPanel, DWORD viewW, DWORD viewH);
+	bool clbkLoadPanel2D (int panelid, PANELHANDLE hPanel, oapi::UInt32 viewW, oapi::UInt32 viewH);
 	bool clbkLoadVC (int vcid);     // create the VC elements for this module
 
 private:
@@ -93,10 +97,10 @@ public:
 	bool clbkParseScenarioLine (const char *line);
 	void clbkPostCreation ();
 	void clbkPostStep (double simt, double simdt, double mjd);
-	bool clbkLoadPanel2D (int panelid, PANELHANDLE hPanel, DWORD viewW, DWORD viewH);
+	bool clbkLoadPanel2D (int panelid, PANELHANDLE hPanel, oapi::UInt32 viewW, oapi::UInt32 viewH);
 	bool clbkLoadVC (int vcid);
 	bool clbkPlaybackEvent (double simt, double event_t, const char *event_type, const char *event);
-	int clbkConsumeBufferedKey (DWORD key, bool down, char *kstate);
+	int clbkConsumeBufferedKey (oapi::UInt32 key, bool down, char *kstate);
 
 private:
 	AnimState2 ostate, istate;
@@ -107,8 +111,8 @@ private:
 	int ELID_OSWITCH;
 	int ELID_ISWITCH;
 
-	UINT anim_olock;            // handle for outer airlock animation
-	UINT anim_ilock;            // handle for inner airlock animation
+	oapi::UInt anim_olock;            // handle for outer airlock animation
+	oapi::UInt anim_ilock;            // handle for inner airlock animation
 };
 
 // ==============================================================
@@ -159,10 +163,10 @@ public:
 	bool clbkParseScenarioLine (const char *line);
 	void clbkPostCreation ();
 	void clbkPostStep (double simt, double simdt, double mjd);
-	bool clbkLoadPanel2D (int panelid, PANELHANDLE hPanel, DWORD viewW, DWORD viewH);
+	bool clbkLoadPanel2D (int panelid, PANELHANDLE hPanel, oapi::UInt32 viewW, oapi::UInt32 viewH);
 	bool clbkLoadVC (int vcid);     // create the VC elements for this module
 	bool clbkPlaybackEvent (double simt, double event_t, const char *event_type, const char *event);
-	int clbkConsumeBufferedKey(DWORD key, bool down, char *kstate);
+	int clbkConsumeBufferedKey(oapi::UInt32 key, bool down, char *kstate);
 
 private:
 	AnimState2 hatch_state;
@@ -170,7 +174,7 @@ private:
 	int ELID_SWITCH;
 	PSTREAM_HANDLE hatch_vent;
 	double hatch_vent_t;
-	UINT anim_hatch;            // handle for top hatch animation
+	oapi::UInt anim_hatch;            // handle for top hatch animation
 	int hatchfail;
 };
 

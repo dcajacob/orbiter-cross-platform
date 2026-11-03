@@ -20,6 +20,10 @@
 // Aerodynamic control subsystem
 // ==============================================================
 
+class AerodynSelectorDial;
+class AirbrakeLever;
+class ElevatorTrimWheel;
+
 class AerodynSelector;
 class Airbrake;
 class ElevatorTrim;
@@ -28,7 +32,7 @@ class AerodynCtrlSubsystem: public DGSubsystem {
 public:
 	AerodynCtrlSubsystem (DeltaGlider *v);
 	Airbrake *AirbrakeSubsys() { return airbrake; }
-	void SetMode (DWORD mode);
+	void SetMode (oapi::UInt32 mode);
 	void ExtendAirbrake ();
 	void RetractAirbrake ();
 	const AnimState2 &AirbrakeState() const;
@@ -48,10 +52,10 @@ class AerodynSelector: public DGSubsystem {
 
 public:
 	AerodynSelector (AerodynCtrlSubsystem *_subsys);
-	bool clbkLoadPanel2D (int panelid, PANELHANDLE hPanel, DWORD viewW, DWORD viewH);
+	bool clbkLoadPanel2D (int panelid, PANELHANDLE hPanel, oapi::UInt32 viewW, oapi::UInt32 viewH);
 	bool clbkLoadVC (int vcid);
-	void SetMode (DWORD mode);
-	DWORD GetMode () const;
+	void SetMode (oapi::UInt32 mode);
+	oapi::UInt32 GetMode () const;
 protected:
 	bool IncMode();
 	bool DecMode();
@@ -91,20 +95,20 @@ public:
 	inline const AnimState2 &State() const { return brake_state; }
 	inline int TargetState() const { return airbrake_tgt; } // 0,1,2
 	void clbkPostStep (double simt, double simdt, double mjd);
-	bool clbkLoadPanel2D (int panelid, PANELHANDLE hPanel, DWORD viewW, DWORD viewH);
+	bool clbkLoadPanel2D (int panelid, PANELHANDLE hPanel, oapi::UInt32 viewW, oapi::UInt32 viewH);
 	bool clbkLoadVC (int vcid);
 	void clbkSaveState (FILEHANDLE scn);
 	bool clbkParseScenarioLine (const char *line);
 	void clbkPostCreation ();
 	bool clbkPlaybackEvent (double simt, double event_t, const char *event_type, const char *event);
-	int clbkConsumeBufferedKey (DWORD key, bool down, char *kstate);
+	int clbkConsumeBufferedKey (oapi::UInt32 key, bool down, char *kstate);
 
 private:
 	AirbrakeLever *lever;
 	int ELID_LEVER;
 	int airbrake_tgt;
-	UINT anim_brake;            // handle for airbrake animation
-	UINT anim_airbrakelever;    // VC airbrake lever
+	oapi::UInt anim_brake;            // handle for airbrake animation
+	oapi::UInt anim_airbrakelever;    // VC airbrake lever
 	AnimState2 brake_state, lever_state;
 };
 
@@ -135,13 +139,13 @@ public:
 	ElevatorTrim (AerodynCtrlSubsystem *_subsys);
 	void clbkSaveState (FILEHANDLE scn);
 	bool clbkParseScenarioLine (const char *line);
-	bool clbkLoadPanel2D (int panelid, PANELHANDLE hPanel, DWORD viewW, DWORD viewH);
+	bool clbkLoadPanel2D (int panelid, PANELHANDLE hPanel, oapi::UInt32 viewW, oapi::UInt32 viewH);
 	bool clbkLoadVC (int vcid);
 
 private:
 	ElevatorTrimWheel *trimwheel;
 	int ELID_TRIMWHEEL;
-	UINT anim_vc_trimwheel;     // VC elevator trim wheel
+	oapi::UInt anim_vc_trimwheel;     // VC elevator trim wheel
 };
 
 // ==============================================================

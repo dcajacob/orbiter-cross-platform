@@ -4,6 +4,11 @@
 #define INTERPRETER_IMPLEMENTATION
 
 #include "Interpreter.h"
+#ifndef _WIN32
+#include "../Native/ScriptFiles.h"
+#include "Production/NativeGraphics.h"
+#include <stdexcept>
+#endif
 #include "VesselAPI.h"
 #include "MFDAPI.h"
 #include "DrawAPI.h"
@@ -123,6 +128,11 @@ Interpreter::~Interpreter ()
 void Interpreter::Initialise ()
 {
 	luaL_openlibs (L);    // load the default libraries
+#ifndef _WIN32
+	const auto* files = orbiter::production::GetNativeRenderContext().programFiles;
+	if (!files) throw std::logic_error("Missing native Orbiter script resources");
+	orbiter::script::InstallFileAccess(L, *files);
+#endif
 	LoadAPI ();           // load default set of API interface functions
 	LoadVesselAPI ();     // load vessel-specific part of API
 	LoadLightEmitterMethods (); // load light source methods
@@ -1652,7 +1662,11 @@ void Interpreter::LoadVesselStatusAPI()
 
 void Interpreter::LoadStartupScript ()
 {
+#ifdef _WIN32
 	luaL_dofile (L, "./Script/oapi_init.lua");
+#else
+	orbiter::script::RequireStockFile(L, "./Script/oapi_init.lua");
+#endif
 }
 
 bool Interpreter::InitialiseVessel (lua_State *L, VESSEL *v)

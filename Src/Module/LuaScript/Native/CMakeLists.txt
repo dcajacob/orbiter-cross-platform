@@ -53,6 +53,19 @@ target_include_directories(native_lua_vessel_bindings PRIVATE
 target_link_libraries(native_lua_vessel_bindings PRIVATE lua)
 set_target_properties(native_lua_vessel_bindings PROPERTIES POSITION_INDEPENDENT_CODE ON)
 
+add_library(native_lua_script_files STATIC ScriptFiles.cpp)
+target_compile_features(native_lua_script_files PUBLIC cxx_std_17)
+target_include_directories(native_lua_script_files PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}" "${ORBITER_SOURCE_ROOT}/Src/Orbiter")
+target_link_libraries(native_lua_script_files PUBLIC lua)
+set_target_properties(native_lua_script_files PROPERTIES POSITION_INDEPENDENT_CODE ON)
+
+add_library(native_dg_lua_bindings OBJECT "${ORBITER_SOURCE_ROOT}/Src/Vessel/DeltaGlider/DGLua.cpp")
+target_compile_features(native_dg_lua_bindings PRIVATE cxx_std_17)
+target_include_directories(native_dg_lua_bindings PRIVATE
+    "${ORBITER_SOURCE_ROOT}/Orbitersdk/include" "${ORBITER_SOURCE_ROOT}/Src/Orbiter")
+target_link_libraries(native_dg_lua_bindings PRIVATE lua)
+set_target_properties(native_dg_lua_bindings PROPERTIES POSITION_INDEPENDENT_CODE ON)
+
 include(CTest)
 if(BUILD_TESTING)
     add_executable(interpreter_handoff_check "${ORBITER_SOURCE_ROOT}/Tests/Production/NativeLua/ExecutionHandoff.Test.cpp")
@@ -62,4 +75,18 @@ if(BUILD_TESTING)
     target_link_libraries(interpreter_handoff_check PRIVATE lua Threads::Threads)
     add_test(NAME native_lua_thread_handoff COMMAND interpreter_handoff_check)
     set_tests_properties(native_lua_thread_handoff PROPERTIES TIMEOUT 30)
+
+    add_executable(lua_script_files_check "${ORBITER_SOURCE_ROOT}/Tests/Production/NativeLua/ScriptFiles.Test.cpp"
+        "${ORBITER_SOURCE_ROOT}/Src/Orbiter/Production/ResourceResolver.cpp")
+    target_link_libraries(lua_script_files_check PRIVATE native_lua_script_files)
+    set(fixture "${PROJECT_BINARY_DIR}/script-file-test")
+    file(MAKE_DIRECTORY "${fixture}/assets/Script/DG")
+    configure_file("${ORBITER_SOURCE_ROOT}/Src/Vessel/DeltaGlider/Script/aap.lua" "${fixture}/assets/Script/DG/aap.lua" COPYONLY)
+    configure_file("${ORBITER_SOURCE_ROOT}/Script/oapi_init.lua" "${fixture}/assets/Script/oapi_init.lua" COPYONLY)
+    configure_file("${ORBITER_SOURCE_ROOT}/Script/strict.lua" "${fixture}/assets/Script/strict.lua" COPYONLY)
+    file(WRITE "${fixture}/assets/Script/DG/returns.lua" "return 'first', 2\n")
+    file(WRITE "${fixture}/user.lua" "user_script_loaded = true\n")
+    add_test(NAME native_lua_stock_script_paths COMMAND lua_script_files_check "${fixture}/assets")
+    set_tests_properties(native_lua_stock_script_paths PROPERTIES WORKING_DIRECTORY "${fixture}")
+
 endif()

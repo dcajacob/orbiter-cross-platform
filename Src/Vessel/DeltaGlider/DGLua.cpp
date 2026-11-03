@@ -9,6 +9,9 @@
 #include "PressureSubsys.h"
 #include "ThermalSubsys.h"
 #include <stdio.h>
+#ifndef _WIN32
+#include "../../Module/LuaScript/Native/ScriptFiles.h"
+#endif
 
 extern "C" {
 #include <lua/lua.h>
@@ -20,14 +23,14 @@ extern "C" {
 // API function prototypes
 
 DeltaGlider *lua_toDG (lua_State *L, int idx = 1);
-int dgGear (lua_State *L);
-int dgNosecone (lua_State *L);
-int dgHatch (lua_State *L);
-int dgRetro (lua_State *L);
-int dgOLock (lua_State *L);
-int dgILock (lua_State *L);
-int dgRadiator (lua_State *L);
-int dgABrake (lua_State *L);
+static int dgGear (lua_State *L);
+static int dgNosecone (lua_State *L);
+static int dgHatch (lua_State *L);
+static int dgRetro (lua_State *L);
+static int dgOLock (lua_State *L);
+static int dgILock (lua_State *L);
+static int dgRadiator (lua_State *L);
+static int dgABrake (lua_State *L);
 
 // ==========================================================================
 // API initialisation
@@ -37,7 +40,11 @@ int DeltaGlider::Lua_InitInterpreter (void *context)
 	lua_State *L = (lua_State*)context;
 
 	// load atmospheric autopilot
+#ifdef _WIN32
 	luaL_dofile (L, "Script\\dg\\aap.lua");
+#else
+	orbiter::script::RequireStockFile(L, "Script\\dg\\aap.lua");
+#endif
 
 	return 0;
 }

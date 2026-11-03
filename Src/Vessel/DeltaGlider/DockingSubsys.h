@@ -20,6 +20,13 @@
 // Docking control subsystem
 // ==============================================================
 
+class NoseconeLever;
+class NoseconeIndicator;
+class UndockLever;
+class LadderSwitch;
+class LadderIndicator;
+class DocksealIndicator;
+
 class NoseconeCtrl;
 class UndockCtrl;
 class EscapeLadderCtrl;
@@ -61,13 +68,13 @@ public:
 	void CloseNcone();
 	void RevertNcone ();
 	void clbkPostStep (double simt, double simdt, double mjd);
-	bool clbkLoadPanel2D (int panelid, PANELHANDLE hPanel, DWORD viewW, DWORD viewH);
+	bool clbkLoadPanel2D (int panelid, PANELHANDLE hPanel, oapi::UInt32 viewW, oapi::UInt32 viewH);
 	bool clbkLoadVC (int vcid);
 	void clbkSaveState (FILEHANDLE scn);
 	bool clbkParseScenarioLine (const char *line);
 	void clbkPostCreation ();
 	bool clbkPlaybackEvent (double simt, double event_t, const char *event_type, const char *event);
-	int clbkConsumeBufferedKey (DWORD key, bool down, char *kstate);
+	int clbkConsumeBufferedKey (oapi::UInt32 key, bool down, char *kstate);
 
 private:
 	NoseconeLever *lever;
@@ -76,8 +83,8 @@ private:
 	int ELID_LEVER;
 	int ELID_INDICATOR;
 
-	UINT anim_nose;             // handle for nose cone animation
-	UINT anim_noselever;        // handle for nose cone lever animation
+	oapi::UInt anim_nose;             // handle for nose cone animation
+	oapi::UInt anim_noselever;        // handle for nose cone lever animation
 
 	AnimState2 ncone_state, nlever_state;
 };
@@ -125,13 +132,13 @@ public:
 	void PullLever ();
 	void ReleaseLever ();
 	void clbkPostStep (double simt, double simdt, double mjd);
-	bool clbkLoadPanel2D (int panelid, PANELHANDLE hPanel, DWORD viewW, DWORD viewH);
+	bool clbkLoadPanel2D (int panelid, PANELHANDLE hPanel, oapi::UInt32 viewW, oapi::UInt32 viewH);
 	bool clbkLoadVC (int vcid);
 
 private:
 	UndockLever *lever;
 	int ELID_LEVER;
-	UINT anim_undocklever;      // handle for undock lever animation
+	oapi::UInt anim_undocklever;      // handle for undock lever animation
 	AnimState2 undock_state;
 };
 
@@ -169,7 +176,7 @@ public:
 	void clbkSaveState (FILEHANDLE scn);
 	bool clbkParseScenarioLine (const char *line);
 	bool clbkPlaybackEvent (double simt, double event_t, const char *event_type, const char *event);
-	bool clbkLoadPanel2D (int panelid, PANELHANDLE hPanel, DWORD viewW, DWORD viewH);
+	bool clbkLoadPanel2D (int panelid, PANELHANDLE hPanel, oapi::UInt32 viewW, oapi::UInt32 viewH);
 	bool clbkLoadVC (int vcid);
 
 private:
@@ -177,7 +184,7 @@ private:
 	LadderIndicator *indicator;
 	int ELID_SWITCH;
 	int ELID_INDICATOR;
-	UINT anim_ladder;           // handle for front escape ladder animation
+	oapi::UInt anim_ladder;           // handle for front escape ladder animation
 	AnimState2 ladder_state;
 };
 
@@ -220,7 +227,7 @@ class DocksealCtrl: public DGSubsystem {
 public:
 	DocksealCtrl (DockingCtrlSubsystem *_subsys);
 	void SetDockStatus (bool docked);
-	bool clbkLoadPanel2D (int panelid, PANELHANDLE hPanel, DWORD viewW, DWORD viewH);
+	bool clbkLoadPanel2D (int panelid, PANELHANDLE hPanel, oapi::UInt32 viewW, oapi::UInt32 viewH);
 	bool clbkLoadVC (int vcid);
 	void clbkPostStep (double simt, double simdt, double mjd);
 	void clbkPostCreation ();

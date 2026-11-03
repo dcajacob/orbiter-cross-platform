@@ -66,9 +66,15 @@ The five-case Windows Lua capture at ece22d20 passed both repeats in each
 configuration. The cross-build check remained open. In atmospheric DG flight
 the largest Debug/Release elevator difference was 7.12e-16 and the largest
 aileron difference was 2.43e-16. The other four cases had identical control
-traces. The next capture uses one Windows host and records the stock script's
-intermediates without advancing the interpreter or changing its arithmetic.
-The exact cross-build check remains in force.
+traces. [Paired Windows run 41553783639](https://github.com/dcajacob/orbiter-cross-platform/actions/runs/41553783639)
+repeated both configurations on the same Intel Xeon host with FMA3 enabled.
+Both builds passed all five cases twice. The Lua event streams were identical.
+The first recorded controller difference was in the stock DG flight-path
+slope at tick 34. Debug returned 0.095827486401893064 and Release returned
+0.095827486401892994. The first finalized elevator difference followed at tick
+35. The added diagnostics left every Debug vessel-state and control trace
+byte-identical to the previous run. The exact cross-build control check remains
+open and the Lua references have not been frozen.
 
 The native Lua build also compiles the complete original `lua_vessel_mtd.cpp`,
 including the vessel method registration table and the Lua vessel MFD2
@@ -77,3 +83,13 @@ the historical Windows source after accounting for SDK type names and the
 case-insensitive string comparison. Its vessel and MFD method symbols are
 available from the native cockpit engine. Executing the bindings still
 requires the remaining interpreter implementation and module loader.
+
+Both the native interpreter startup and the stock DG Lua initialization callback
+now address files through the production resource index. Lua's `dofile` and
+`loadfile` resolve the original `Script` directory case-insensitively and accept
+backslashes. Other paths retain the Lua library's normal behavior. Local tests
+with the pinned Lua VM compiled the original startup and AAP files, executed
+the stock strict-mode script, preserved Lua multiple returns, and rejected a
+missing stock file and an attempted traversal. The DG Lua source compiles as a
+native object. Running AAP jobs against a live native DG still requires the full
+Orbiter interpreter and the stock vessel module.

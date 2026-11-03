@@ -21,6 +21,10 @@
 // Main and retro engine control subsystem
 // ==============================================================
 
+class MainRetroThrottleLevers;
+class RetroCoverSwitch;
+class RetroCoverIndicator;
+
 class MainRetroSubsystemComponent;
 class MainRetroThrottle;
 class GimbalControl;
@@ -51,13 +55,13 @@ class MainRetroThrottle: public DGSubsystem {
 
 public:
 	MainRetroThrottle (MainRetroSubsystem *_subsys);
-	bool clbkLoadPanel2D (int panelid, PANELHANDLE hPanel, DWORD viewW, DWORD viewH);
+	bool clbkLoadPanel2D (int panelid, PANELHANDLE hPanel, oapi::UInt32 viewW, oapi::UInt32 viewH);
 	bool clbkLoadVC (int vcid);
 
 private:
 	MainRetroThrottleLevers *levers; 
 	int ELID_LEVERS;
-	UINT anim_lever[2];    // VC main/retro throttle lever animation ID
+	oapi::UInt anim_lever[2];    // VC main/retro throttle lever animation ID
 };
 
 // ==============================================================
@@ -75,7 +79,7 @@ public:
 private:
 	MainRetroThrottle *component;
 	float ppos[2];
-	UINT sliderpos[2];
+	oapi::UInt sliderpos[2];
 };
 
 
@@ -109,7 +113,7 @@ public:
 	void clbkSaveState (FILEHANDLE scn);
 	bool clbkParseScenarioLine (const char *line);
 	void clbkPostStep (double simt, double simdt, double mjd);
-	bool clbkLoadPanel2D (int panelid, PANELHANDLE hPanel, DWORD viewW, DWORD viewH);
+	bool clbkLoadPanel2D (int panelid, PANELHANDLE hPanel, oapi::UInt32 viewW, oapi::UInt32 viewH);
 	bool clbkLoadVC (int vcid);
 
 private:
@@ -161,7 +165,7 @@ private:
 	int pofs_cur[2], pofs_cmd[2];
 	int yofs_cur[2], yofs_cmd[2];
 	GROUPREQUESTSPEC vc_grp; ///< Buffered VC vertex data
-	WORD vperm[16];
+	oapi::UInt16 vperm[16];
 };
 
 // ==============================================================
@@ -200,7 +204,7 @@ private:
 	int vc_state[2];
 	static const int nvtx_per_switch = 28;
 	NTVERTEX vtx0[nvtx_per_switch*2];
-	WORD vperm[nvtx_per_switch*2];
+	oapi::UInt16 vperm[nvtx_per_switch*2];
 };
 
 
@@ -221,7 +225,7 @@ public:
 	void clbkSaveState (FILEHANDLE scn);
 	bool clbkParseScenarioLine (const char *line);
 	void clbkPostStep (double simt, double simdt, double mjd);
-	bool clbkLoadPanel2D (int panelid, PANELHANDLE hPanel, DWORD viewW, DWORD viewH);
+	bool clbkLoadPanel2D (int panelid, PANELHANDLE hPanel, oapi::UInt32 viewW, oapi::UInt32 viewH);
 	bool clbkLoadVC (int vcid);
 	bool clbkPlaybackEvent (double simt, double event_t, const char *event_type, const char *event);
 
@@ -231,7 +235,7 @@ private:
 	RetroCoverIndicator *indicator;
 	int ELID_SWITCH;
 	int ELID_INDICATOR;
-	UINT anim_rcover;           // handle for retro cover animation
+	oapi::UInt anim_rcover;           // handle for retro cover animation
 };
 
 // ==============================================================

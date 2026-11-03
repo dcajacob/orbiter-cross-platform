@@ -1340,7 +1340,7 @@
     },
     "Src/Module/LuaScript/Native/CMakeLists.txt": {
       "original_sha256_lf": null,
-      "sha256_lf": "929ba261f8fef756cc98defa07380edccb61df414c8ab0e57c326bc5025b9436"
+      "sha256_lf": "1f4861319dd80953e1f454250781d1b2bb01988140d6867603dcd185c3ef89cc"
     },
     "Src/Vessel/Common/Instrument.cpp": {
       "original_sha256_lf": "a358cf68cc90de24b398d431ef38f559c91c12ca6d577cc9dd1e2954b37bd869",
@@ -1428,7 +1428,7 @@
     },
     "Src/Module/LuaScript/LuaInterpreter/Interpreter.cpp": {
       "original_sha256_lf": "5feef015089ca4cb3abc2d7197877352e64ade7ca3c98e5c066cd5a252fd74ee",
-      "sha256_lf": "6ecf01178ea800c96b5fc7f4cb8aca9661ab9570f6312dba67a0a22c71132ce2"
+      "sha256_lf": "739f730c63b0b5c7a6bb84744392c19a4b759cac11036ed1476e6d7b46d7a9f0"
     },
     "Src/Module/LuaScript/LuaInterpreter/Interpreter.h": {
       "original_sha256_lf": "0fb3247edcc0c088756b20e4e77fca5086b122720e70251c32efbf83f8ab07b0",
@@ -1473,6 +1473,42 @@
     "Src/Orbiter/Production/NativeCockpitMfd.cpp": {
       "original_sha256_lf": null,
       "sha256_lf": "e6cfd7a19d290fb66534e585ac944e9b11476547a9efae005bf5ba3f361c58c8"
+    },
+    "Src/Vessel/DeltaGlider/AerodynSubsys.h": {
+      "original_sha256_lf": "959184983d331d5c4abe80cdf16ee024fe704e54ee4589cbe93b0617dff24cd3",
+      "sha256_lf": "975e0c2e6a38a12ccc120f36d64b10c4651205816e61173e3e311eb054b989e0"
+    },
+    "Src/Vessel/DeltaGlider/DGLua.cpp": {
+      "original_sha256_lf": "5234dc672af4c69c5f4a785bdd5951e60052ccaad01f3b8c3eb9cc19cac040b7",
+      "sha256_lf": "ecdaca2495833297b361757be0618c4d75a40a2cf2532f5be995a4e82f32bcb9"
+    },
+    "Src/Vessel/DeltaGlider/DockingSubsys.h": {
+      "original_sha256_lf": "3fccea06364b7bda874307e83b7fbc9306d4f1407a757f9b263d93aa54599b8c",
+      "sha256_lf": "152dcf0380cb399638e24deb3f73fac903322b4d086daf9a17705ba36d1d018d"
+    },
+    "Src/Vessel/DeltaGlider/GearSubsys.h": {
+      "original_sha256_lf": "a1b513dc0b8a80b9b11249dca9aff57fc47d64b25e38572f16822ee1bc439c26",
+      "sha256_lf": "91b054a32bccc0521b29871e7f26225771a89dbee72fd5d011d0a1bbf765dc51"
+    },
+    "Src/Vessel/DeltaGlider/MainRetroSubsys.h": {
+      "original_sha256_lf": "d87a186a75e24c3a74851d40832ba4bd3a353f3f9c1f10fbef6076d80d2f95a1",
+      "sha256_lf": "5861490fc05123e6b5f9e11538a412585c1e8fd86ad98acbc5214dd5013c304e"
+    },
+    "Src/Vessel/DeltaGlider/PressureSubsys.h": {
+      "original_sha256_lf": "44e8e155e034e1d398aa4277bce0dd9f8e895b68765c1be5682bd65100fa748a",
+      "sha256_lf": "70c142978079a1f26eacd507466fd658ab973ed793dd963512d50401a4c27d77"
+    },
+    "Src/Vessel/DeltaGlider/ThermalSubsys.h": {
+      "original_sha256_lf": "9fd68c9ce14ca6a4db404d85a85545b4e67aa71a143c981f37993f828840eacc",
+      "sha256_lf": "b091222bfe9a9d032182b8dcb2f3d8876eee2c67bb701f9f2db6628e8af0075b"
+    },
+    "Src/Module/LuaScript/Native/ScriptFiles.cpp": {
+      "original_sha256_lf": null,
+      "sha256_lf": "708787d6c1d6ac13d24284b4c488ce40395eab74360617c8ab7ca08e067d5fc9"
+    },
+    "Src/Module/LuaScript/Native/ScriptFiles.h": {
+      "original_sha256_lf": null,
+      "sha256_lf": "1f96dc9f92858bd6163e90a2643e0d31b5b4d52ba5ac87480f006d54ff751b6a"
     }
   }
 }
