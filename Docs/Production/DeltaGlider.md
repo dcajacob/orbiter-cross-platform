@@ -47,6 +47,10 @@ simulator is descheduled between release and wait. The native explicit-turn
 handoff preserves one turn per frame in that reproduction on both Windows
 hosts. Full original captures with wall-clock/thread observations are running
 to investigate the simulator failure; the reference set remains unaccepted.
+The completed timed Windows 2025 Debug capture passes, and all 120 deterministic
+event/control/atmosphere/controller/horizon/cockpit CSVs are byte-identical to
+the prior capture across both repeats and both math profiles. Release remains
+a separate required gate.
 [Protocol evidence](LuaHandoffVerification.json)
 
 The native client flies all five original DG recorded scenarios from the stock

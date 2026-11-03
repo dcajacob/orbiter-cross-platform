@@ -59,5 +59,61 @@
   "source_files_sha256": {
     "Tests/Production/LuaRuntime/HandoffDiagnostic.cpp": "801240b584aa7f340ab6e7ae79e72ae5610b46323513a88e547c6fc2b3e2c6b5",
     "Src/Module/LuaScript/Native/ExecutionHandoff.h": "294bc00deb2d2deee5f3019c4469b0593361a5bc691eec9e9510c8c20686d90e"
+  },
+  "timed_windows2025_debug": {
+    "artifact": 13210551295,
+    "archive_sha256": "7cc4f857d62be1114220deda0c186c2e6bf1a914f82caaa3450140da3b81744e",
+    "capture_status": "passed",
+    "unchanged_deterministic_trace_files": 120,
+    "timing_file": "out/control-reference/lua_dg-1/lua-timing.csv",
+    "timing_sha256": "bdea56d9e53f048eff135ee0d233350b993226ec895835f2292bbd1e1f9b0a73",
+    "orbital_dg_yields": [
+      {
+        "source": "lua",
+        "event": "yield_1",
+        "counter": "3445088030",
+        "frequency": "10000000",
+        "thread": "8640",
+        "frame": "-1",
+        "seconds": "5"
+      },
+      {
+        "source": "lua",
+        "event": "yield_2",
+        "counter": "3446927713",
+        "frequency": "10000000",
+        "thread": "8640",
+        "frame": "-1",
+        "seconds": "5.25"
+      },
+      {
+        "source": "lua",
+        "event": "yield_3",
+        "counter": "3448753568",
+        "frequency": "10000000",
+        "thread": "8640",
+        "frame": "-1",
+        "seconds": "5.5"
+      },
+      {
+        "source": "lua",
+        "event": "yield_4",
+        "counter": "3450573626",
+        "frequency": "10000000",
+        "thread": "8640",
+        "frame": "-1",
+        "seconds": "5.75"
+      },
+      {
+        "source": "lua",
+        "event": "yield_done",
+        "counter": "3452394336",
+        "frequency": "10000000",
+        "thread": "8640",
+        "frame": "-1",
+        "seconds": "6"
+      }
+    ],
+    "scope": "Timing observations preserve all recorded default/SSE2 Debug traces; the Release gate remains separate."
   }
 }
