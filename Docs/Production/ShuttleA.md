@@ -191,13 +191,20 @@ The independent verifier rechecks all 157 cases. There are no signal-terminated
 scenario processes, 119 complete dependency inventories and seven frozen
 metadata discrepancies.
 
-Two sanitizer diagnostics remain: Transfer MFD reads its uninitialized
+That historical sweep records two sanitizer diagnostics: Transfer MFD reads its uninitialized
 `dv_manip` boolean when a hypothetical orbit is restored; the unchanged vessel
 API script passes its assertions and then calls `oapi.exit(0)`, skipping normal
 graphics teardown and leaving 15,264 bytes in 76 EGL allocations. Four other
 inventory-ready failures reject unqualified legacy ISS capabilities, and the
 original GeneralApiTest assertion remains failed. The other 38 failures have
 incomplete dependencies. These results preserve the full acceptance scope.
+
+The [Transfer MFD follow-up](TransferMfd.md) repairs initialization, a rotation
+matrix lifetime and nonfinite indicator conversion. Both unchanged lunar-transfer
+scenes now pass baseline, repaired Release and repaired instrumented Debug runs:
+six clean process exits and 360 presents, with byte-identical all-vessel physical
+states against the retained native baseline. The historical 112/45 corpus result
+is retained; the Lua explicit-exit cleanup defect remains open.
 
 The verified local admitted-corpus bundle contains 34,805,441 bytes and 8,522
 members, SHA-256

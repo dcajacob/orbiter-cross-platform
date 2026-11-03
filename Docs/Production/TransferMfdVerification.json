@@ -1,0 +1,279 @@
+{
+  "schema": 1,
+  "status": "targeted-native-verification-passed",
+  "phase6_complete": false,
+  "source_commit": "71a86988eaf25da1fc67778b0d1f1f7dab3aec75",
+  "repairs": [
+    "Initialize existing dv_manip boolean to false",
+    "Extend unchanged hypothetical rotation matrix lifetime through use",
+    "Skip nonfinite projected indicator coordinates before integer conversion"
+  ],
+  "source_controls": {
+    "path": "out/phase6-transfer-indicator-source-controls.json",
+    "sha256": "3e5f066c35e13bcb7d54d0fd3e77e838fa5676deac18f78b8b07c92214242409"
+  },
+  "source_conservation_files": 477,
+  "profiles": {
+    "baseline": {
+      "configuration": "Release",
+      "math": "automatic",
+      "runtime_source_commit": "09eeed2091b36b18681cd10616b608248008ddaa",
+      "root": "out/phase6-shuttle-a-mesh-engine"
+    },
+    "fixed": {
+      "configuration": "Release",
+      "math": "automatic",
+      "root": "out/phase6-transfer-indicators-engine"
+    },
+    "sanitized": {
+      "configuration": "Debug",
+      "math": "automatic",
+      "instrumentation": [
+        "address",
+        "undefined"
+      ],
+      "leak_detection": true,
+      "leak_suppressions": false,
+      "root": "out/phase6-transfer-indicators-asan-engine"
+    }
+  },
+  "runtime_verification": {
+    "path": "out/phase6-transfer-indicators-verification-v3/verification.json",
+    "sha256": "763e8e40c2c2253cb017595d7b2e0a0862b5c863bacad15d6835a93c0b68ea8b"
+  },
+  "processes": {
+    "baseline-1": {
+      "status": "passed",
+      "returncode": 0,
+      "lifecycle": {
+        "rendered_frames": 60,
+        "successful_presents": 60,
+        "context_deleted": true
+      },
+      "finalized_ticks": 61,
+      "declared_vessels": 4,
+      "observed_vessels": [
+        [
+          "GL-01",
+          "DeltaGlider"
+        ],
+        [
+          "GL-02",
+          "DeltaGlider"
+        ],
+        [
+          "SH-01",
+          "ShuttleA"
+        ],
+        [
+          "SH-02",
+          "ShuttleA"
+        ]
+      ]
+    },
+    "fixed-1": {
+      "status": "passed",
+      "returncode": 0,
+      "lifecycle": {
+        "rendered_frames": 60,
+        "successful_presents": 60,
+        "context_deleted": true
+      },
+      "finalized_ticks": 61,
+      "declared_vessels": 4,
+      "observed_vessels": [
+        [
+          "GL-01",
+          "DeltaGlider"
+        ],
+        [
+          "GL-02",
+          "DeltaGlider"
+        ],
+        [
+          "SH-01",
+          "ShuttleA"
+        ],
+        [
+          "SH-02",
+          "ShuttleA"
+        ]
+      ]
+    },
+    "sanitized-1": {
+      "status": "passed",
+      "returncode": 0,
+      "lifecycle": {
+        "rendered_frames": 60,
+        "successful_presents": 60,
+        "context_deleted": true
+      },
+      "finalized_ticks": 61,
+      "declared_vessels": 4,
+      "observed_vessels": [
+        [
+          "GL-01",
+          "DeltaGlider"
+        ],
+        [
+          "GL-02",
+          "DeltaGlider"
+        ],
+        [
+          "SH-01",
+          "ShuttleA"
+        ],
+        [
+          "SH-02",
+          "ShuttleA"
+        ]
+      ]
+    },
+    "baseline-2": {
+      "status": "passed",
+      "returncode": 0,
+      "lifecycle": {
+        "rendered_frames": 60,
+        "successful_presents": 60,
+        "context_deleted": true
+      },
+      "finalized_ticks": 61,
+      "declared_vessels": 4,
+      "observed_vessels": [
+        [
+          "GL-01",
+          "DeltaGlider"
+        ],
+        [
+          "GL-02",
+          "DeltaGlider"
+        ],
+        [
+          "SH-01",
+          "ShuttleA"
+        ],
+        [
+          "SH-02",
+          "ShuttleA"
+        ]
+      ]
+    },
+    "fixed-2": {
+      "status": "passed",
+      "returncode": 0,
+      "lifecycle": {
+        "rendered_frames": 60,
+        "successful_presents": 60,
+        "context_deleted": true
+      },
+      "finalized_ticks": 61,
+      "declared_vessels": 4,
+      "observed_vessels": [
+        [
+          "GL-01",
+          "DeltaGlider"
+        ],
+        [
+          "GL-02",
+          "DeltaGlider"
+        ],
+        [
+          "SH-01",
+          "ShuttleA"
+        ],
+        [
+          "SH-02",
+          "ShuttleA"
+        ]
+      ]
+    },
+    "sanitized-2": {
+      "status": "passed",
+      "returncode": 0,
+      "lifecycle": {
+        "rendered_frames": 60,
+        "successful_presents": 60,
+        "context_deleted": true
+      },
+      "finalized_ticks": 61,
+      "declared_vessels": 4,
+      "observed_vessels": [
+        [
+          "GL-01",
+          "DeltaGlider"
+        ],
+        [
+          "GL-02",
+          "DeltaGlider"
+        ],
+        [
+          "SH-01",
+          "ShuttleA"
+        ],
+        [
+          "SH-02",
+          "ShuttleA"
+        ]
+      ]
+    }
+  },
+  "cases": {
+    "Navigation/Lunar transfer/Lunar transfer 1.scn": {
+      "all_vessel_states_byte_identical": true,
+      "ssim": 0.9988710379718454,
+      "frames_byte_identical": false
+    },
+    "Navigation/Lunar transfer/Lunar transfer 2.scn": {
+      "all_vessel_states_byte_identical": true,
+      "ssim": 1.0,
+      "frames_byte_identical": true
+    }
+  },
+  "protected_files": 531,
+  "sources_and_binaries_unchanged": true,
+  "build_records": [
+    {
+      "path": "out/phase6-transfer-indicators-build-normal/build.json",
+      "sha256": "7639c7ab095bf7cb1f4518a600cc8d76abaa01176ea3cacb97a5f99e3b811205"
+    },
+    {
+      "path": "out/phase6-transfer-indicators-build-asan/build.json",
+      "sha256": "291dbb99271167ad5170e543e86b708a9ddd31d88e991cf19f438e7f54c8914e"
+    }
+  ],
+  "failed_predecessors": [
+    {
+      "path": "out/phase6-shuttle-a-mesh-complete-corpus/capture/064",
+      "diagnostic": "UBSan invalid boolean value 190"
+    },
+    {
+      "path": "out/phase6-transfer-initialization-verification",
+      "diagnostic": "ASan stack-use-after-scope in mul(Matrix const&, Vector const&) through MfdTransfer.cpp"
+    },
+    {
+      "path": "out/phase6-transfer-scope-verification",
+      "diagnostic": "UBSan signed pixel-coordinate subtraction overflow following nonfinite projection"
+    }
+  ],
+  "interrupted_attempts": [
+    "out/phase6-transfer-indicators-verification",
+    "out/phase6-transfer-indicators-verification-v2"
+  ],
+  "qualification": "Targeted native runtime and sanitizer verification, all ships retained. No new Windows parity or full-corpus acceptance claim. Historical corpus remains 112 passed and 45 failed.",
+  "physical_controller": "Unavailable per user; unverified",
+  "archive": {
+    "status": "passed",
+    "path": "out/phase6-transfer-mfd-evidence-v1.tar.gz",
+    "bytes": 160365894,
+    "sha256": "ba63294b0cc68b3a64c62063f19d04b96e26c105d96ac24807a718d14c74fa4f",
+    "members": 1402,
+    "index_sha256": "750fa3c2c66dd3679a60c74530b0cfd2bd25a1f01729f3d16657796234e60966",
+    "all_payload_hashes_verified": true,
+    "font_and_asset_collections_included": false,
+    "remote_preservation": "pending"
+  },
+  "source_conservation_audit": {
+    "path": "out/phase6-transfer-indicators-source-audit.log",
+    "sha256": "b1ae98116908d40df6fc294b929d85f03a5bc29d2e132cff9c3facce06c3eccf"
+  }
+}

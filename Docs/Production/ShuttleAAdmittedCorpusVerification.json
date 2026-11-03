@@ -66,5 +66,15 @@
     "index_sha256": "a21fe5bb89533be57e8359df864efcb2f87c34d1c613dc073086f273124025ff",
     "remote_preservation": "pending",
     "font_and_asset_collections_included": false
+  },
+  "follow_up": {
+    "transfer_mfd": {
+      "status": "targeted-native-verification-passed",
+      "record": "Docs/Production/TransferMfdVerification.json",
+      "historical_corpus_result_replaced": false
+    },
+    "lua_explicit_exit": {
+      "status": "open"
+    }
   }
 }
