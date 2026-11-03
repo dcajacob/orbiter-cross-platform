@@ -8,7 +8,8 @@ permissions:
   contents: read
 concurrency:
   group: native-production-client-${{ github.ref }}
-  cancel-in-progress: true
+  # Let the active reference qualification finish when the next Phase 6 patch arrives.
+  cancel-in-progress: false
 
 jobs:
   native:
@@ -177,6 +178,11 @@ jobs:
           xvfb-run -a -s '-screen 0 1920x1080x24' env LIBGL_ALWAYS_SOFTWARE=1 GALLIUM_DRIVER=llvmpipe
           python3 -B Tests/Production/LuaRuntime/native_flight.py --build out/native-cockpit-engine
           --assets out/scene-resources --data out/data --planets out/planets --output out/native-lua-flight
+      - name: Operate DG systems and reload moving, deployed and closed mechanisms
+        run: >-
+          xvfb-run -a -s '-screen 0 1920x1080x24' env LIBGL_ALWAYS_SOFTWARE=1 GALLIUM_DRIVER=llvmpipe
+          python3 -B Tests/Production/DeltaGlider/systems.py --build out/native-cockpit-engine
+          --assets out/scene-resources --data out/data --planets out/planets --output out/native-dg-systems
       - uses: actions/cache@v6
         with:
           path: out/original-lua-cache
@@ -280,6 +286,7 @@ jobs:
             out/native-lua-flight/*/saved.scn
             out/native-lua-flight/*/console.txt
             out/native-lua-flight/*/graphics-lifecycle.json
+            out/native-dg-systems/**
             out/native-cockpit-evidence/**
             out/native-cockpit-controls/**
             out/native-cockpit-mouse/**
@@ -300,6 +307,7 @@ jobs:
         with:
           name: spacecraft-native-${{ matrix.configuration }}-${{ matrix.math_profile }}
           path: |
+            out/native-dg-systems/**
             out/native-recorded-flights/recorded-flights.json
             out/native-recorded-flights/*/numerics.json
             out/native-recorded-flights/*/playback-state.csv
@@ -412,12 +420,46 @@ jobs:
         run: >-
           python -B Tests/Production/CockpitUI/recorded_flights.py --original --executable out/focus-original/Orbiter.exe
           --data out/production-data --planets out/standard-planets --mesa out/mesa-runtime --output out/original-recorded-flights
+      - name: Build the DG systems observer against the preserved original SDK
+        id: systems_observer
+        if: ${{ !cancelled() && steps.preserved_cockpit.outcome == 'success' }}
+        shell: pwsh
+        run: |
+          cmake -S Tests/Production/DeltaGlider/SystemsObserver -B out/systems-observer -G Ninja -DCMAKE_BUILD_TYPE=${{ matrix.configuration }} -DORBITER_TEST_RUNTIME="$pwd/out/focus-original"
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          cmake --build out/systems-observer --parallel 2
+          exit $LASTEXITCODE
+      - name: Operate and reload DG systems in the preserved original Windows application
+        if: ${{ !cancelled() && steps.systems_observer.outcome == 'success' }}
+        run: >-
+          python -B Tests/Production/DeltaGlider/systems.py --original --executable out/focus-original/Orbiter.exe
+          --data out/production-data --planets out/standard-planets --mesa out/mesa-runtime --output out/original-dg-systems
       - name: Archive original spacecraft observations
         uses: actions/upload-artifact@v7
         if: always()
         with:
           name: spacecraft-original-${{ matrix.configuration }}-${{ matrix.math_profile }}
           path: |
+            out/original-dg-systems/systems-report.json
+            out/original-dg-systems/*/*/flight.scn
+            out/original-dg-systems/*/*/saved.scn
+            out/original-dg-systems/*/*/systems-case.txt
+            out/original-dg-systems/*/*/system-inputs.csv
+            out/original-dg-systems/*/*/flight-animations.csv
+            out/original-dg-systems/*/*/cockpit-state.csv
+            out/original-dg-systems/*/*/console.log
+            out/original-dg-systems/*/*/console.txt
+            out/original-dg-systems/*/*/Orbiter.log
+            out/original-dg-systems/*/*/graphics-lifecycle.json
+            out/original-dg-systems/*/*/graphics-errors.txt
+            out/original-dg-systems/*/*/numerics.json
+            out/original-dg-systems/*/*/math-profile.txt
+            out/original-dg-systems/*/*/invocation.json
+            out/original-dg-systems/*/*/cockpit-failure.txt
+            out/original-dg-systems/*/*/cockpit-complete.txt
+            out/original-dg-systems/*/*/renderer-info.json
+            out/original-dg-systems/*/*/renderer-modules.txt
+            out/original-dg-systems/*/*/mesa-bindings.json
             out/focus-bars-original/general-api/general-api-result.json
             out/focus-bars-original/general-api/Orbiter.log
             out/focus-bars-original/*/math-profile.txt
@@ -472,6 +514,11 @@ jobs:
         run: >-
           python3 -B Tests/Production/CockpitUI/focus_bars.py compare --original original/focus-bars-original
           --native native/native-focus-bars --output focus-comparison.json
+      - name: Compare original and native DG systems, animations and save/reload trajectories
+        if: ${{ !cancelled() }}
+        run: >-
+          python3 -B Tests/Production/DeltaGlider/systems.py compare --original original/original-dg-systems
+          --native native/native-dg-systems --output dg-systems-comparison.json
       - uses: actions/upload-artifact@v7
         if: always()
         with:

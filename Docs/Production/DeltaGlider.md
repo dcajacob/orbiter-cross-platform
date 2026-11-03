@@ -6,6 +6,31 @@ and cockpit acceptance are still in progress.
 
 ## Current flight evidence
 
+The native keyboard systems regression passes in Debug, Release and the
+unsuppressed ASan/UBSan/LSan build with the isolated Mesa candidate. Both gliders
+in both cockpit modes deploy gear, nose cone, radiator, inner/outer airlocks,
+hatch and airbrakes. Each saves while all seven mechanisms are moving, reloads
+and completes the movement without further input, closes them with the original
+keys, then reloads the omitted closed defaults. Each full suite presents 1,936
+frames across 16 fresh application lifetimes. The paired preserved-Windows SDK
+observer and exact animation/save comparison are wired into CI; their first
+hosted qualification remains pending. Physical input and broader subsystem
+acceptance remain open.
+The laptop's unmodified Intel PTL/Mesa 26.0.8 driver also passes all four cases
+in all four Debug/Release automatic/SSE2 configurations on X11. All 32 complete
+mechanism and physical-state trace files match software Debug byte for byte;
+hardware Release matches software Release, and hardware SSE2 Debug/Release
+traces are byte-identical. This establishes the systems/lifecycle result on that GPU;
+hardware performance, Wayland and controller qualification remain open.
+The unsuppressed hardware sanitizer run fails leak checking after each 24-frame
+checkpoint, despite successful rendering and context deletion: 46,197 bytes in
+791 allocations per process. A fresh process mapping and renderer debug symbols
+place the allocation paths in libX11, called by GLFW's `XrmInitialize` and
+`Xft.dpi` resource lookup. Hardware lifetime acceptance remains open; the clean
+software-driver result above retains its narrower scope.
+[Systems checks and commands](../../Tests/Production/DeltaGlider/Systems.md)
+[Local systems evidence](DGSystemsVerification.json)
+
 Both native vessels now load the stock Lua interpreter and LuaInline worker and
 fly with the original AAP in the 2D panel and virtual cockpit. In each 48-frame
 atmospheric flight the autopilot drives elevator, aileron and main thrust,

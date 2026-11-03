@@ -10,6 +10,22 @@ the native vessel and cockpit camera through five unchanged DG scenarios.
 The tutorial text is drawn and both automatic and pilot-commanded returns
 to free flight pass locally.
 
+Gear, nose cone, radiator, both airlocks, hatch and airbrakes now pass a native
+keyboard and save/reload regression in both gliders and cockpit modes. Debug,
+Release and the unsuppressed sanitizer build each complete 16 fresh processes
+and 1,936 presentations, restoring moving systems and closed defaults through
+the original scenario readers. Paired original-Windows mechanism and physical
+state comparisons are prepared in CI and await hosted qualification.
+The Intel PTL laptop also completes the suite on the unmodified system driver
+and X11, with all 32 mechanism/physical trace files byte-identical to software
+Debug. This hardware result covers systems and lifecycle, with performance,
+Wayland and controller qualification still open.
+Hardware sanitizer leak checking fails with 46,197 retained bytes in 791
+allocations per process. Loaded-library maps place the allocations in libX11
+resource/locale setup called by GLFW. All 24 presentations and context deletion
+finish in each failing checkpoint; hardware lifetime acceptance remains open.
+[Systems evidence](DGSystemsVerification.json)
+
 The native graphics leak now has an isolated source fix and a passing local
 sanitizer menu flow. Mesa's executable-code allocator retained two bookkeeping
 objects (112 bytes) and a 10 MiB mapping after its last generated function was

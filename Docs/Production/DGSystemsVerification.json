@@ -1,0 +1,579 @@
+{
+  "schema": 1,
+  "status": "partial",
+  "scope": "Native mechanism and persistence gates pass; paired original Windows qualification is pending and the hardware Xlib leak gate remains failed",
+  "source_base": "c9d6c7855ac217a1367cef78a4adc17f8364161f",
+  "native_runs": {
+    "debug": {
+      "status": "passed",
+      "output": "out/phase6-dg-systems-debug",
+      "report_sha256": "f7cae2b27230d6c96d25279dc9c581f30e4154ea684b09194bbee75530d4bfdb",
+      "cases": [
+        "dg_panel",
+        "dg_vc",
+        "dgs_panel",
+        "dgs_vc"
+      ],
+      "fresh_application_lifetimes": 16,
+      "presentations": 1936,
+      "all_contexts_deleted": true,
+      "actual_math": [
+        "amd-6121d02-fma3"
+      ],
+      "mechanisms": [
+        "AIRBRAKE",
+        "GEAR",
+        "AIRLOCK",
+        "IAIRLOCK",
+        "HATCH",
+        "RADIATOR",
+        "NOSECONE"
+      ],
+      "saved_moving": {
+        "AIRBRAKE": [
+          0.525,
+          0.3
+        ],
+        "GEAR": [
+          0.7125,
+          0.15
+        ],
+        "AIRLOCK": [
+          0.325,
+          0.1
+        ],
+        "IAIRLOCK": [
+          0.275,
+          0.1
+        ],
+        "HATCH": [
+          0.3375,
+          0.15
+        ],
+        "RADIATOR": [
+          0.075,
+          0.02
+        ],
+        "NOSECONE": [
+          0.2125,
+          0.05
+        ]
+      },
+      "saved_deployed": {
+        "AIRBRAKE": [
+          1.0,
+          0.0
+        ],
+        "GEAR": [
+          1.0,
+          0.0
+        ],
+        "AIRLOCK": [
+          1.0,
+          0.0
+        ],
+        "IAIRLOCK": [
+          1.0,
+          0.0
+        ],
+        "HATCH": [
+          1.0,
+          0.0
+        ],
+        "RADIATOR": [
+          1.0,
+          0.0
+        ],
+        "NOSECONE": [
+          1.0,
+          0.0
+        ]
+      },
+      "saved_closed": {
+        "AIRBRAKE": [
+          0.0,
+          0.0
+        ],
+        "GEAR": [
+          0.0,
+          0.0
+        ],
+        "AIRLOCK": [
+          0.0,
+          0.0
+        ],
+        "IAIRLOCK": [
+          0.0,
+          0.0
+        ],
+        "HATCH": [
+          0.0,
+          0.0
+        ],
+        "RADIATOR": [
+          0.0,
+          0.0
+        ],
+        "NOSECONE": [
+          0.0,
+          0.0
+        ]
+      },
+      "runtime_sha256": {
+        "out/phase6-cockpit-engine/orbiter-production": "056483149377b4c9657681651d341915693661019f081af0efbf794a9e5282b8",
+        "out/phase6-cockpit-engine/liborbiter_production_boundary.so": "f81cba8f1397ebc5d0ace4bc80fc009efcc44b3272889a511bc9efd3f70c1494",
+        "out/phase6-cockpit-engine/liborbiter_production_vessels.so": "d6ee6c63a56409112c0d9e02709aafcb1408dfa69382aa2b03b39fa605ab7a34",
+        "out/phase6-cockpit-engine/NativeModules/Graphics/OGLClient.so": "1ec8f25fc7a6a023d97bab4f15245f5b017cd26d86efd100f2d956311262e222",
+        "out/phase6-cockpit-engine/NativeModules/Vessel/DeltaGlider.so": "3e663780f7a03683a9de78df16e2c89a3b55778c70393dc8150d8f4c4245202e",
+        "out/phase6-cockpit-engine/native-sdk/OrbiterNativeBuild.h": "f9e5f8145c5d98274bf4191015df5148f8a476c851430323d0fe9404c306d15e"
+      }
+    },
+    "release": {
+      "status": "passed",
+      "output": "out/phase6-dg-systems-release",
+      "report_sha256": "2a680300cc83f055db3a1d96b0aa2aa3e2699b251c48211581243b2dae080a7f",
+      "cases": [
+        "dg_panel",
+        "dg_vc",
+        "dgs_panel",
+        "dgs_vc"
+      ],
+      "fresh_application_lifetimes": 16,
+      "presentations": 1936,
+      "all_contexts_deleted": true,
+      "actual_math": [
+        "amd-6121d02-fma3"
+      ],
+      "mechanisms": [
+        "AIRBRAKE",
+        "GEAR",
+        "AIRLOCK",
+        "IAIRLOCK",
+        "HATCH",
+        "RADIATOR",
+        "NOSECONE"
+      ],
+      "saved_moving": {
+        "AIRBRAKE": [
+          0.525,
+          0.3
+        ],
+        "GEAR": [
+          0.7125,
+          0.15
+        ],
+        "AIRLOCK": [
+          0.325,
+          0.1
+        ],
+        "IAIRLOCK": [
+          0.275,
+          0.1
+        ],
+        "HATCH": [
+          0.3375,
+          0.15
+        ],
+        "RADIATOR": [
+          0.075,
+          0.02
+        ],
+        "NOSECONE": [
+          0.2125,
+          0.05
+        ]
+      },
+      "saved_deployed": {
+        "AIRBRAKE": [
+          1.0,
+          0.0
+        ],
+        "GEAR": [
+          1.0,
+          0.0
+        ],
+        "AIRLOCK": [
+          1.0,
+          0.0
+        ],
+        "IAIRLOCK": [
+          1.0,
+          0.0
+        ],
+        "HATCH": [
+          1.0,
+          0.0
+        ],
+        "RADIATOR": [
+          1.0,
+          0.0
+        ],
+        "NOSECONE": [
+          1.0,
+          0.0
+        ]
+      },
+      "saved_closed": {
+        "AIRBRAKE": [
+          0.0,
+          0.0
+        ],
+        "GEAR": [
+          0.0,
+          0.0
+        ],
+        "AIRLOCK": [
+          0.0,
+          0.0
+        ],
+        "IAIRLOCK": [
+          0.0,
+          0.0
+        ],
+        "HATCH": [
+          0.0,
+          0.0
+        ],
+        "RADIATOR": [
+          0.0,
+          0.0
+        ],
+        "NOSECONE": [
+          0.0,
+          0.0
+        ]
+      },
+      "runtime_sha256": {
+        "out/phase6-release-engine/orbiter-production": "6073c21ac4f0774eddf28f7eb268bc02043e84fc7b229b373a9837a13184d2bf",
+        "out/phase6-release-engine/liborbiter_production_boundary.so": "d634343275639f66b4108a18512992da70e28fa2582e2dde6c32b3ab5bd37cfb",
+        "out/phase6-release-engine/liborbiter_production_vessels.so": "569e0d61d7d9f94eb3b6db09c896a3b6e877b3fd08d39b06eadd14232e2f4299",
+        "out/phase6-release-engine/NativeModules/Graphics/OGLClient.so": "3eded873c60b61276672f12b360ef3c85c60826468c6d83f31c34003d8e1d5e8",
+        "out/phase6-release-engine/NativeModules/Vessel/DeltaGlider.so": "37355cc30426db6222479e2c63d50b3321d5b5f19d6730bbf530862a72e1dee8",
+        "out/phase6-release-engine/native-sdk/OrbiterNativeBuild.h": "d3e0546f86ba2981ef7c13de325f1fbc8d62257adc04b7c07bd453618262047f"
+      }
+    },
+    "asan": {
+      "status": "passed",
+      "output": "out/phase6-dg-systems-asan",
+      "report_sha256": "c84b8180ac7d1c3b1c751ced103d8e4e2fbe4162816859aa61f67c2158dc5908",
+      "cases": [
+        "dg_panel",
+        "dg_vc",
+        "dgs_panel",
+        "dgs_vc"
+      ],
+      "fresh_application_lifetimes": 16,
+      "presentations": 1936,
+      "all_contexts_deleted": true,
+      "actual_math": [
+        "amd-6121d02-fma3"
+      ],
+      "mechanisms": [
+        "AIRBRAKE",
+        "GEAR",
+        "AIRLOCK",
+        "IAIRLOCK",
+        "HATCH",
+        "RADIATOR",
+        "NOSECONE"
+      ],
+      "saved_moving": {
+        "AIRBRAKE": [
+          0.525,
+          0.3
+        ],
+        "GEAR": [
+          0.7125,
+          0.15
+        ],
+        "AIRLOCK": [
+          0.325,
+          0.1
+        ],
+        "IAIRLOCK": [
+          0.275,
+          0.1
+        ],
+        "HATCH": [
+          0.3375,
+          0.15
+        ],
+        "RADIATOR": [
+          0.075,
+          0.02
+        ],
+        "NOSECONE": [
+          0.2125,
+          0.05
+        ]
+      },
+      "saved_deployed": {
+        "AIRBRAKE": [
+          1.0,
+          0.0
+        ],
+        "GEAR": [
+          1.0,
+          0.0
+        ],
+        "AIRLOCK": [
+          1.0,
+          0.0
+        ],
+        "IAIRLOCK": [
+          1.0,
+          0.0
+        ],
+        "HATCH": [
+          1.0,
+          0.0
+        ],
+        "RADIATOR": [
+          1.0,
+          0.0
+        ],
+        "NOSECONE": [
+          1.0,
+          0.0
+        ]
+      },
+      "saved_closed": {
+        "AIRBRAKE": [
+          0.0,
+          0.0
+        ],
+        "GEAR": [
+          0.0,
+          0.0
+        ],
+        "AIRLOCK": [
+          0.0,
+          0.0
+        ],
+        "IAIRLOCK": [
+          0.0,
+          0.0
+        ],
+        "HATCH": [
+          0.0,
+          0.0
+        ],
+        "RADIATOR": [
+          0.0,
+          0.0
+        ],
+        "NOSECONE": [
+          0.0,
+          0.0
+        ]
+      },
+      "runtime_sha256": {
+        "out/phase6-cockpit-asan/orbiter-production": "bd23e0c0b119f45321749c42aa2fdba7ea363548dafa27ea3dbe7cd1d230eb5f",
+        "out/phase6-cockpit-asan/liborbiter_production_boundary.so": "08a823b010875fc95e4c0ea6af613328f13c29364a6134e5c9aaed9b07e927f6",
+        "out/phase6-cockpit-asan/liborbiter_production_vessels.so": "ec03c53f555c3283df1f802550e73b9a5d9f895273f990d0c2475a40f9b304ad",
+        "out/phase6-cockpit-asan/NativeModules/Graphics/OGLClient.so": "cc8c7cb60f4acbda27751ea8b8f558bc235fb3e438f40054848a55961bdb3e9e",
+        "out/phase6-cockpit-asan/NativeModules/Vessel/DeltaGlider.so": "a0873fb0ce072c48472563af958f72192919b57c6970f0c290d8acb4acdd9a4c",
+        "out/phase6-cockpit-asan/native-sdk/OrbiterNativeBuild.h": "b022f0879845aade15e129319550b63e2bc51e1fe5bffa11b098c952655084a1"
+      }
+    }
+  },
+  "sanitizer_environment": {
+    "ASAN_OPTIONS": "detect_leaks=1:fast_unwind_on_malloc=0",
+    "LSAN_OPTIONS": "",
+    "UBSAN_OPTIONS": "halt_on_error=1:print_stacktrace=1",
+    "LD_LIBRARY_PATH": "out/phase6-mesa-verified/install/lib/x86_64-linux-gnu",
+    "DISPLAY": ":102",
+    "LIBGL_ALWAYS_SOFTWARE": "1",
+    "GALLIUM_DRIVER": "llvmpipe"
+  },
+  "paired_windows_ci": {
+    "status": "pending",
+    "application_source": "f725194209634f7fd5d1d44d426cfa9b5e303e37",
+    "workflow": ".github/workflows/native-production-client.yml",
+    "configurations": [
+      "Debug",
+      "Release"
+    ],
+    "math_profiles": [
+      "automatic",
+      "sse2"
+    ],
+    "mechanism_comparison": "exact animation samples and saved position/speed; unchanged Cockpit/cases.json physical-state budgets"
+  },
+  "limitations": [
+    "Buffered replay input; physical keyboard/controller delivery is a separate gate",
+    "Seven mechanisms; broader DG subsystem and panel/VC mouse acceptance remain open",
+    "Isolated source-built llvmpipe lifetime result; system Mesa and hardware qualification remain separate"
+  ],
+  "regression_contracts": {
+    "wrong_producer_rejected": true,
+    "eight_original_dispatches_match_native_consumption_boundaries": true,
+    "source_conservation_files": 439
+  },
+  "native_adapter_followup": {
+    "status": "passed",
+    "case": "dg_panel",
+    "presentations": 484,
+    "fresh_application_lifetimes": 4,
+    "report_sha256": "e0f50953d1f38205d72b7ebec2ed2fb67da60b0e0ea740c909f51b875a828dbe"
+  },
+  "hardware_run": {
+    "status": "passed",
+    "output": "out/phase6-dg-systems-hardware",
+    "report_sha256": "97acbeadd51b3541d1dc9362814c14176e6788de1238caf810b5874dcd174120",
+    "fresh_application_lifetimes": 16,
+    "presentations": 1936,
+    "renderer": {
+      "vendor": "Intel",
+      "renderer": "Mesa Intel(R) Graphics (PTL)",
+      "version": "4.6 (Core Profile) Mesa 26.0.8-1ubuntu0.3",
+      "client_width": 1280,
+      "client_height": 720
+    },
+    "window_backend": "x11",
+    "driver": "Unmodified system Mesa; software-driver overrides unset",
+    "all_contexts_deleted": true,
+    "byte_identical_to_software_debug": [
+      "dg_panel/moving/flight-animations.csv",
+      "dg_panel/moving/cockpit-state.csv",
+      "dg_panel/resume/flight-animations.csv",
+      "dg_panel/resume/cockpit-state.csv",
+      "dg_panel/retract/flight-animations.csv",
+      "dg_panel/retract/cockpit-state.csv",
+      "dg_panel/closed-reload/flight-animations.csv",
+      "dg_panel/closed-reload/cockpit-state.csv",
+      "dg_vc/moving/flight-animations.csv",
+      "dg_vc/moving/cockpit-state.csv",
+      "dg_vc/resume/flight-animations.csv",
+      "dg_vc/resume/cockpit-state.csv",
+      "dg_vc/retract/flight-animations.csv",
+      "dg_vc/retract/cockpit-state.csv",
+      "dg_vc/closed-reload/flight-animations.csv",
+      "dg_vc/closed-reload/cockpit-state.csv",
+      "dgs_panel/moving/flight-animations.csv",
+      "dgs_panel/moving/cockpit-state.csv",
+      "dgs_panel/resume/flight-animations.csv",
+      "dgs_panel/resume/cockpit-state.csv",
+      "dgs_panel/retract/flight-animations.csv",
+      "dgs_panel/retract/cockpit-state.csv",
+      "dgs_panel/closed-reload/flight-animations.csv",
+      "dgs_panel/closed-reload/cockpit-state.csv",
+      "dgs_vc/moving/flight-animations.csv",
+      "dgs_vc/moving/cockpit-state.csv",
+      "dgs_vc/resume/flight-animations.csv",
+      "dgs_vc/resume/cockpit-state.csv",
+      "dgs_vc/retract/flight-animations.csv",
+      "dgs_vc/retract/cockpit-state.csv",
+      "dgs_vc/closed-reload/flight-animations.csv",
+      "dgs_vc/closed-reload/cockpit-state.csv"
+    ],
+    "sanitizers": false,
+    "qualification_scope": "Mechanism control, persistence, finite state and rendering lifecycle; broader hardware performance and Wayland acceptance remain open"
+  },
+  "additional_hardware_configurations": {
+    "release": {
+      "status": "passed",
+      "output": "out/phase6-dg-systems-hardware-release",
+      "report_sha256": "ad9bbd8b49832d42f41a1a6726126c5b0a6449a800ab1bdb80827e1c0d640ee2",
+      "fresh_application_lifetimes": 16,
+      "presentations": 1936,
+      "all_contexts_deleted": true,
+      "actual_math": [
+        "amd-6121d02-fma3"
+      ]
+    },
+    "debug-sse2": {
+      "status": "passed",
+      "output": "out/phase6-dg-systems-hardware-debug-sse2",
+      "report_sha256": "0c3028e032e5ff84eb4f5ece42b14de848164195e9b3e7ae333724fc5d591535",
+      "fresh_application_lifetimes": 16,
+      "presentations": 1936,
+      "all_contexts_deleted": true,
+      "actual_math": [
+        "amd-6121d02-sse2"
+      ]
+    },
+    "release-sse2": {
+      "status": "passed",
+      "output": "out/phase6-dg-systems-hardware-release-sse2",
+      "report_sha256": "0426da226efbd51faf028235029db11c7c44c09d167a7936d563b720ca81ec27",
+      "fresh_application_lifetimes": 16,
+      "presentations": 1936,
+      "all_contexts_deleted": true,
+      "actual_math": [
+        "amd-6121d02-sse2"
+      ]
+    }
+  },
+  "hardware_trace_checks": {
+    "automatic_release_matches_software_release_bytes": true,
+    "sse2_debug_matches_sse2_release_bytes": true,
+    "files_per_pair": 32
+  },
+  "hardware_sanitizer": {
+    "status": "failed",
+    "output": "out/phase6-dg-systems-hardware-asan",
+    "report_sha256": "dd4a0e17a33cdd96009d86a3769d65b79129fac363bcaa362b1fc64ff0bcfdfc",
+    "cases": {
+      "dg_panel": {
+        "status": "failed",
+        "leaked_bytes": 46197,
+        "allocations": 791,
+        "lifecycle": {
+          "rendered_frames": 24,
+          "successful_presents": 24,
+          "context_deleted": true
+        },
+        "console_sha256": "f2102b8a324a1993b79d342ee685fdcc92f5fba7a717bbddd410e6ca2b80f09e"
+      },
+      "dg_vc": {
+        "status": "failed",
+        "leaked_bytes": 46197,
+        "allocations": 791,
+        "lifecycle": {
+          "rendered_frames": 24,
+          "successful_presents": 24,
+          "context_deleted": true
+        },
+        "console_sha256": "357e45802fdb1cf5191543f0801b23c60fb85ba0b4448dd023be52adb12c3298"
+      },
+      "dgs_panel": {
+        "status": "failed",
+        "leaked_bytes": 46197,
+        "allocations": 791,
+        "lifecycle": {
+          "rendered_frames": 24,
+          "successful_presents": 24,
+          "context_deleted": true
+        },
+        "console_sha256": "57b8168d275ea33f7bbabcc071274bbceb477edb0aa9a957c3d9d10da67c3464"
+      },
+      "dgs_vc": {
+        "status": "failed",
+        "leaked_bytes": 46197,
+        "allocations": 791,
+        "lifecycle": {
+          "rendered_frames": 24,
+          "successful_presents": 24,
+          "context_deleted": true
+        },
+        "console_sha256": "48127f04fb65f257674a658e1edf912560de891be8a24768518c254472602649"
+      }
+    },
+    "diagnostic_output": "out/phase6-intel-lifetime-maps",
+    "allocation_libraries": [
+      "/usr/lib/x86_64-linux-gnu/libX11.so.6.4.0"
+    ],
+    "symbolized_callers": [
+      "_glfwConnectX11: XrmInitialize (x11_init.c:1290)",
+      "getSystemContentScale: XrmGetStringDatabase (x11_init.c:1006)"
+    ],
+    "diagnostic_sha256": {
+      "console.log": "340b7117cca107cfae1fa79740b96e5b002d168fe7fed9b2a331b67e3b68d4b2",
+      "loaded-maps.txt": "e01017c08d020134cc010afbfe663bf5016d12765da1acffcf5b6f2036539388",
+      "allocation-frames.json": "30feba8bc8ae4da3cba3aa69040aa20828d6131b5cf8adf2de623d1c6d8c175c"
+    },
+    "no_suppressions": true,
+    "qualification": "Hardware leak gate remains failed; normal hardware systems and isolated software-driver sanitizer gates retain their recorded outcomes"
+  }
+}
