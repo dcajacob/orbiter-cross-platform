@@ -524,17 +524,19 @@ struct Runtime final:BodyServices,RigidBodyServices,SurfaceServices,NavigationSe
         system->InitState(scenario.string().c_str());
         if(!system->nVessel())throw std::runtime_error("Native production session requires a live stock vessel");
         for(auto* body:system->GetVessels()) {
-            auto* vessel=body->GetModuleInterface();const std::string type=vessel->GetClassName();
-            const bool pb=type=="ShuttlePB" && vessel->Version()==2 && vessel->GetMeshCount()==1 && vessel->GetThrusterCount()==16 && vessel->GetPropellantCount()==1;
-            const bool iss=type=="ProjectAlpha_ISS" && vessel->Version()==0 && vessel->GetMeshCount()==1;
+            auto* vessel=body->GetModuleInterface();const char* type=vessel->GetClassName();
+            const bool pb=CompareText(type,"ShuttlePB")==0 && vessel->Version()==2 && vessel->GetMeshCount()==1 && vessel->GetThrusterCount()==16 && vessel->GetPropellantCount()==1;
+            const bool iss=CompareText(type,"ProjectAlpha_ISS")==0 && vessel->Version()==0 && vessel->GetMeshCount()==1;
 #ifdef ORBITER_NATIVE_COCKPIT
-            if ((type=="DeltaGlider" || type=="DG-S") && vessel->Version()==3 && vessel->GetMeshCount()==2 &&
-                vessel->GetThrusterCount()==(type=="DG-S" ? 23 : 21) && vessel->GetPropellantCount()==(type=="DG-S" ? 3 : 2))
+            const bool scram=CompareText(type,"DG-S")==0;
+            if ((CompareText(type,"DeltaGlider")==0 || scram) && vessel->Version()==3 && vessel->GetMeshCount()==2 &&
+                vessel->GetThrusterCount()==(scram ? 23 : 21) && vessel->GetPropellantCount()==(scram ? 3 : 2))
                 continue;
 #endif
-            if(!pb && !iss)throw std::runtime_error("Unsupported stock vessel class or capabilities: "+type+"; generic replacement is forbidden");
+            if(!pb && !iss)throw std::runtime_error(std::string("Unsupported stock vessel class or capabilities: ")+type+"; generic replacement is forbidden");
         }
-        auto* focus=system->GetVessel(metadata.Focus(),true);if(!focus)throw std::runtime_error("Required production focus vessel is missing");
+        auto* focus=system->GetVessel(metadata.Focus());
+        if(!focus)focus=system->GetVessel(oapi::UInt32(0));
         SetFocus(focus);
         render.camera->ResizeViewport(1280,720);render.camera->InitState(scenario.string().c_str(),focus);
 #ifndef ORBITER_NATIVE_COCKPIT
@@ -761,7 +763,7 @@ struct Runtime final:BodyServices,RigidBodyServices,SurfaceServices,NavigationSe
                 if(vessel==render.focus) {
                     MATRIX3 er{},ob{};for(unsigned i=0;i<9;++i){er.data[i]=earth->GRot().data[i];ob.data[i]=earth->RotObliq().data[i];}
                     math_observation::Row(mathTrace,completedTicks,time.SimT0,*v,MakeVECTOR3(earth->GPos()),er,ob,earth->Rotation());
-                    if (std::string(v->GetClassName())=="ShuttlePB")
+                    if (CompareText(v->GetClassName(),"ShuttlePB")==0)
                         contact_observation::Row(contactTrace,completedTicks,time.SimT0,*v);
                 }
             }

@@ -108,7 +108,9 @@ def main():
                 results.append(run_case(args.output,assets,case,mode,args))
                 print('Passed',results[-1],flush=True)
     for name,focus in (('Delta-glider/Venus descent.scn','GL-01'),('2024 Edition/Earth views.scn','GL-01S'),
-                       ('2024 Edition/The Alps in 3D.scn','GL-01S'),('Demo/DG ISS Approach.scn','DG-01')):
+                       ('2024 Edition/The Alps in 3D.scn','GL-01S'),('Demo/DG ISS Approach.scn','DG-01'),
+                       ('Challenges/Challenge 4 - Entry and landing.scn','GL-1'),
+                       ("The Solar System/Jupiter flybys/Galileo's first Ganymede flyby.scn",'Galileo')):
         results.append(run_stock_scenario(args,name,focus))
         print('Passed',results[-1],flush=True)
     (args.output/'flight-report.json').write_text(json.dumps(results,indent=2)+'\n')

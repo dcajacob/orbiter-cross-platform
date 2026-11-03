@@ -2,6 +2,7 @@
 // Recorded SDK inputs and read-only observations of the original Windows app.
 #define ORBITER_MODULE
 #include "Orbitersdk.h"
+#include "Vessel.h" // exact internal header from the preserved runtime commit
 #include "ApplicationObservation.h"
 #include <cstdlib>
 #include <cmath>
@@ -80,10 +81,17 @@ class Driver final:public oapi::Module {
         v->GetGlobalPos(globalPosition);
         oapiGlobalToLocal(ref,&globalPosition,&planetLocal);
         const double asinInput=planetLocal.y/rad;
+        const auto* surface=static_cast<const Vessel*>(v->GetHandle())->GetSurfParam();
+        require(surface && static_cast<const void*>(surface->ref)==static_cast<const void*>(ref) &&
+                surface->lng==lng && surface->lat==lat && surface->rad==rad,
+                "Original surface parameters do not match their public SDK values");
+        const double surfaceAsinInput=surface->ploc.y/surface->rad;
         horizon<<tick;
         for(double value:{global.x,global.y,global.z,local.x,local.y,local.z,horizontal.x,horizontal.y,horizontal.z,
                           lng,lat,rad,rot.m11,rot.m12,rot.m13,rot.m21,rot.m22,rot.m23,rot.m31,rot.m32,rot.m33,
-                          planetLocal.x,planetLocal.y,planetLocal.z,asinInput,std::asin(asinInput)})
+                          planetLocal.x,planetLocal.y,planetLocal.z,asinInput,std::asin(asinInput),
+                          surface->ploc.x,surface->ploc.y,surface->ploc.z,surfaceAsinInput,
+                          std::asin(surfaceAsinInput),surface->slat,surface->clat})
             horizon<<','<<value;
         horizon<<'\n';
     }
@@ -102,7 +110,7 @@ public:
         std::ifstream input("cockpit-case.txt");require(bool(input>>target>>total>>cockpit>>left>>right>>hud>>profile),"Invalid cockpit fixture controls");
         require(total==60 && cockpit>=1 && cockpit<=3 && left>=1 && left<=10 && right>=1 && right<=10,"Unsupported cockpit control schedule");
         for(auto* stream:{&state,&events,&controls,&air,&controller,&horizon}){stream->imbue(std::locale::classic());stream->exceptions(std::ios::badbit|std::ios::failbit);}
-        horizon.open("lua-horizon.csv");horizon<<std::setprecision(17)<<"tick,global_x,global_y,global_z,ref_x,ref_y,ref_z,horizon_x,horizon_y,horizon_z,lng,lat,rad,m11,m12,m13,m21,m22,m23,m31,m32,m33,position_local_x,position_local_y,position_local_z,reconstructed_asin_input,reconstructed_latitude\n";
+        horizon.open("lua-horizon.csv");horizon<<std::setprecision(17)<<"tick,global_x,global_y,global_z,ref_x,ref_y,ref_z,horizon_x,horizon_y,horizon_z,lng,lat,rad,m11,m12,m13,m21,m22,m23,m31,m32,m33,position_local_x,position_local_y,position_local_z,reconstructed_asin_input,reconstructed_latitude,actual_local_x,actual_local_y,actual_local_z,actual_asin_input,probe_asin_of_actual_input,actual_slat,actual_clat\n";
         controller.open("lua-controller.csv");controller<<std::setprecision(17)<<"tick,alt,sl,dslope,delev,elev,dbnk,rate,dail,ail,thrott,dthrott,xz,as_x,as_y,as_z\n";
         std::ofstream("math-host.txt")<<"fma3_enabled="<<_get_FMA3_enable()<<'\n';
         air.open("lua-air.csv");air<<std::setprecision(17)<<"tick,density,dynamic_pressure,airspeed\n";

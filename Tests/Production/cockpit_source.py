@@ -35,7 +35,7 @@ def verify_focus_bars():
     def original(file):
         return subprocess.check_output(['git','-C',str(ROOT),'show',BASE+':Src/Orbiter/'+file]).decode('utf-8')
     def current(file):
-        return (ROOT/'Src/Orbiter'/file).read_text()
+        return (ROOT/'Src/Orbiter'/file).read_bytes().decode('utf-8')
     # Compare the actual original dialog/widget code after resolving the owning
     # application's read-only state and its real focus setter.
     old=original('MenuInfoBar.cpp')

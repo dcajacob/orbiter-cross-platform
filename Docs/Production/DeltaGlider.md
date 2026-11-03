@@ -10,9 +10,11 @@ Both native vessels now load the stock Lua interpreter and LuaInline worker and
 fly with the original AAP in the 2D panel and virtual cockpit. In each 48-frame
 atmospheric flight the autopilot drives elevator, aileron and main thrust,
 responds to speed retargeting, and operates the gear and nose cone. The native
-runner also loads four unchanged 60-frame stock scenarios: Venus descent,
-Earth views, The Alps in 3D and DG ISS Approach. Earth views engages its
-scripted time acceleration. The runner checks focus, frame presentation,
+runner also loads unchanged 60-frame stock scenarios including Venus descent,
+Earth views, The Alps in 3D and DG ISS Approach. The entry-and-landing challenge
+uses the original mixed-case vessel class. Galileo's first Ganymede flyby names
+a missing focus target and relies on Orbiter's fallback to the first vessel.
+Earth views engages its scripted time acceleration. The runner checks focus, frame presentation,
 shutdown and Lua errors.
 
 All five native command schedules reproduce the original Windows Debug Lua
@@ -22,7 +24,14 @@ uses the exponential from the same pinned AMD math sources as the engine's
 trigonometry. Both exponential CPU paths also passed the independent MPFR test.
 The original Windows Debug and Release atmospheric DG captures still disagree
 in latitude and horizon airspeed at tick 34. The exact cross-build reference
-gate remains open.
+gate remains open. Native Debug and native Release both reproduce the original
+Windows Debug traces in all five schedules. Against original Windows Release,
+native atmospheric DG first differs in elevator at tick 35 and DG-S first
+differs in angular velocity at tick 48. Air data remains identical. The public
+SDK coordinates reconstructed after the vessel step reproduce neither build's
+stored latitude. The original capture driver now uses the matching historical
+internal headers to read the stored planet-local position and checks its
+latitude, longitude, radius and reference against the public SDK.
 
 The local frozen instrument and RCS-switch comparisons passed for both gliders
 in both cockpit modes. An F3 dialog run switched from DG to DG-S and back
