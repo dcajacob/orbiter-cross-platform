@@ -4,7 +4,7 @@ The local Release automatic renderer passes the fixed 1920x1080 medium gate on
 the laptop's real Wayland and XWayland desktops. Twelve fresh application
 processes complete 25,920 scene presentations. The audit retains all 21,600
 declared measured intervals: every run has median at most 33 ms and p95 at most
-50 ms. The worst median is 22.56 ms and worst p95 is 25.44 ms. The original
+50 ms. The worst median is 22.64 ms and worst p95 is 25.31 ms. The original
 cockpit and camera now use the actual 1920x1080 framebuffer dimensions.
 
 Each row below reports the worse result of two repetitions. The maximum column
@@ -13,12 +13,12 @@ acceptance limit. No outliers are removed.
 
 | Desktop | Unchanged stock scene | Median ms | p95 ms | Maximum ms |
 | --- | --- | ---: | ---: | ---: |
-| Wayland | Edwards AFB exterior | 22.52 | 25.30 | 52.62 |
-| Wayland | Geostationary 2D panel | 18.84 | 21.17 | 43.47 |
-| Wayland | Mojave virtual cockpit | 22.56 | 25.44 | 62.87 |
-| XWayland | Edwards AFB exterior | 8.43 | 11.26 | 98.25 |
-| XWayland | Geostationary 2D panel | 8.55 | 15.20 | 102.44 |
-| XWayland | Mojave virtual cockpit | 8.46 | 11.80 | 116.92 |
+| Wayland | Edwards AFB exterior | 22.64 | 25.31 | 43.47 |
+| Wayland | Geostationary 2D panel | 18.92 | 21.41 | 41.22 |
+| Wayland | Mojave virtual cockpit | 22.48 | 24.98 | 47.67 |
+| XWayland | Edwards AFB exterior | 8.46 | 11.26 | 127.95 |
+| XWayland | Geostationary 2D panel | 8.59 | 15.16 | 102.93 |
+| XWayland | Mojave virtual cockpit | 8.50 | 11.63 | 98.18 |
 
 The profile was fixed before the full measurement: 360 warmup frames followed
 by 1,800 measured intervals, two fresh-process repetitions per scenario and
@@ -29,6 +29,9 @@ features. Original physics defaults and one original 1/60-second tick per
 rendered frame are retained. All finalized physical traces are byte-identical
 across both repetitions and both desktop backends.
 They also remain byte-identical to the preceding runtime's physical traces.
+The complete matrix is repeated after `9418ae29` restores the original shared
+base-texture initialization and cleanup. The viewport-correct `c079e79e` captures
+and their evidence bundle remain preserved as an earlier qualification.
 
 The primary metric is consecutive `glfwSwapBuffers` return cadence. It includes
 polling, original physics, GUI, rendering, swapping, application bookkeeping and

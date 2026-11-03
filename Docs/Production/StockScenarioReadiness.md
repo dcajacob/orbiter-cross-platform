@@ -1,7 +1,7 @@
 # Complete stock-scenario readiness baseline
 
 All **157 unchanged locked scenarios** were attempted on the Release automatic
-runtime from `2c00d29b`. The audited result is **37 passed and 120 failed**.
+runtime from `9418ae29`. The audited result is **44 passed and 113 failed**.
 This is an initialization/readiness baseline, not full corpus acceptance.
 Every failure is retained; none is converted into a pass because it was expected.
 
@@ -12,20 +12,26 @@ control removes a non-focus ship at tick 30 from a copied real capture: the gate
 rejects it despite normal presentation and teardown. Original captures remain
 unchanged.
 
-The failures identify three separate prerequisites:
+The failures retain two prerequisite groups:
 
 | Cause | Scenarios | Evidence |
 | --- | ---: | --- |
 | Missing staged vessel configurations and corresponding source modules | 112 | Actual startup failures and the configuration/module inventory |
-| Mir/Wheel rejected by the current host capability guard | 7 | Their original configuration-defined vessels load, then the explicit host restriction rejects them |
 | GeneralApiTest Earth-obliquity assertion | 1 | Sixty frames complete, but the same stock assertion previously failed in all four preserved Windows profiles |
 
 Mir and Wheel intentionally declare no Module entry. The existing original
 base VESSEL configuration path handles their meshes, mass, inertia and docking
-data. They require qualification and an explicit host policy change, not a fake
-module or a generic replacement for a missing DLL. Declared modules remain
-mandatory. The preflight's 45 file-ready scenarios are not 45 runtime passes;
-only the actual 37 complete cleanly.
+data. Their additional Windows observations and local Release automatic native
+comparisons now pass. The host admits their explicit observed capabilities;
+declared modules remain mandatory. This makes seven formerly rejected scenarios
+pass, improving the previous `2c00d29b` baseline from 37/120 to 44/113. The
+preflight's 45 file-ready scenarios are not 45 runtime passes: GeneralApiTest
+still fails its assertion. [Station qualification](StockStations.md)
+
+Twenty-five dependency-incomplete scenarios terminate by signal. They are the
+same 25 cases as in the preceding runtime, and all remain failures. Dependency
+inventory does not establish their crash causes or excuse the missing graceful
+failure behavior. Further module and failure-handling work is required.
 
 ShuttleA configuration/module dependencies affect 85 scenarios. Atlantis affects
 30. Other missing classes include Carina, Atlantis tank/SRB, Leonardo MPLM,
@@ -36,11 +42,11 @@ The named acceptance scenarios remain intact:
 
 | Named unchanged scenario | Missing staged dependency |
 | --- | --- |
-| DG Mk4 in orbit, with all eight objects | ShuttleA; Mir/Wheel qualification is also required |
-| Virtual cockpit | ShuttleA; Mir/Wheel qualification is also required |
-| DG-S ready for takeoff | ShuttleA; Mir/Wheel qualification is also required |
-| Docked at ISS | ShuttleA; Mir/Wheel qualification is also required |
-| Atmospheric autopilot | ShuttleA; Mir/Wheel qualification is also required |
+| DG Mk4 in orbit, with all eight objects | ShuttleA |
+| Virtual cockpit | ShuttleA |
+| DG-S ready for takeoff | ShuttleA |
+| Docked at ISS | ShuttleA |
+| Atmospheric autopilot | ShuttleA |
 | DG to the moon tutorial | ShuttleA |
 | Atlantis ISS Resupply | Atlantis and Leonardo MPLM |
 

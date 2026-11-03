@@ -17,9 +17,9 @@
     "Tests/Production/StockVessels/NativeProbe.cpp": "910401ae2ff638228063faa67b88defa4b006fc8b6e115e1be9d040939dc9e8d",
     "Tests/Production/StockVessels/Observation.h": "7caa93f8d41f2212904a74fcfb0211913f6f03fe3c350f7c13bd2b57a2fea042",
     "Tests/Production/StockVessels/Policy.Test.py": "257e80db414fbf36e723b9c3d20ff4f8eb63f4eba327dfe9de1ee3200b3ece59",
-    "Tests/Production/StockVessels/README.md": "4180d8be6720e474d4e4848f29ab4d095701277a5fb8392baa2700c052263607",
+    "Tests/Production/StockVessels/README.md": "6091146789aee46a209530822386d45b9dfccfe88f67cbb7ec4541026c6b6d70",
     "Tests/Production/StockVessels/cases.json": "e645394e92d2e633108043688701df1ed41c2456483c6d9bc7d8413dff8162f5",
-    "Tests/Production/StockVessels/compare.py": "ee3d02a16d60246f20d1ee5bcc65e0b2a535df2a3ad4f51c35106dd4b93690a4",
+    "Tests/Production/StockVessels/compare.py": "cac29e9051d6a078cb72d9a4489f479826725893899c7533751154979e283676",
     "Tests/Production/StockVessels/native.py": "dbd2e74b6ec2767c83d1a5b77c02e5a0edde5ea5dfc0420571a37c7e1148241f",
     "Tests/Production/StockVessels/original.py": "08ee9b2c393de4a1870a1d9161c087f4ea286e6521703aa131d4b90d4187fb1a",
     "Tests/Production/StockVessels/verify_original.py": "c7c9a55629a1ab7027ad2ad648bcbba718cf2008903e38d8d2ab38b4fffc0f3a"
@@ -37,8 +37,8 @@
     "sha256": "dd0c1bb80279e790d0c03f758f625d276a89b3d7e89394d6dc77e83bf88bec48"
   },
   "native_comparison": {
-    "path": "out/phase6-base-stations-comparison.json",
-    "sha256": "b18cbb3e57e895bd7943ee031004e3f3097f4f7fe83a8bd212d443f2f4f9438b"
+    "path": "out/phase6-base-stations-comparison-final.json",
+    "sha256": "6e7e758e62fc17d89ac07ec612b4265e62bf40e04330dc3b094870e8d5841339"
   },
   "policy_controls": {
     "path": "out/phase6-base-stations-policy-controls/policy-controls.json",
@@ -855,10 +855,28 @@
   "remaining": [
     "Current four-profile hosted native qualification of these scenarios",
     "Complete full-corpus and named-scenario module dependencies; existing failure handling crashes",
-    "Performance requalification after restoring original base textures, now running",
     "Adopt and qualify the tested Lua guard prototype, then complete Wayland C/C++ sanitizer coverage",
     "Physical controller and broader interactive acceptance",
     "Durable versioned evidence preservation",
     "Full Phase 6 acceptance audit"
-  ]
+  ],
+  "native_source_commit": "9418ae293fc7c4cbee49538163e14d97ec3e5a1c",
+  "full_stock_sweep": {
+    "path": "out/phase6-base-stock-full-audit.json",
+    "sha256": "cc98d93b078260519896c1d82b63b4fcb094833737fb4ba5f69a229f8c1d078a"
+  },
+  "full_stock_summary": {
+    "attempted": 157,
+    "passed": 44,
+    "failed": 113,
+    "signal_failures_retained": 25
+  },
+  "requalified_hardware_performance": {
+    "path": "out/phase6-base-performance-audit.json",
+    "sha256": "ebe4361cd66a364418e6f6dc3f79e12b18711da72fafe483b1bea5d1de6fc474"
+  },
+  "hosted_native_capture_workflow": {
+    "path": ".github/workflows/native-production-client.yml",
+    "sha256": "57944d08f5c40d6f465c5a4dfa25801661310e6cc138f31fe9733a21662a7e79"
+  }
 }

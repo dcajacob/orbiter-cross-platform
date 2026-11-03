@@ -36,6 +36,8 @@ def geometry(path):
 def main():
     p=argparse.ArgumentParser(description=__doc__)
     for name in ('original','native','reference-audit','output'):p.add_argument('--'+name,type=Path,required=True)
+    p.add_argument('--runtime-root',type=Path,default=ROOT,
+                   help='Root containing the recorded out/... binaries; useful for verified CI archives')
     a=p.parse_args();require(not a.output.exists(),'Stock comparison output exists')
     config=settings();original=json.loads((a.original/'stock-vessels.json').read_text())
     native=json.loads((a.native/'stock-vessels.json').read_text())
@@ -53,7 +55,9 @@ def main():
     for name,checksum in native['source_sha256'].items():
         require(digest(ROOT/name)==checksum,'Native station observer/source changed: '+name)
     for name,checksum in native['runtime_files_sha256'].items():
-        require(digest(ROOT/name)==checksum,'Native station runtime library/module changed: '+name)
+        path=Path(name)
+        require(not path.is_absolute() and '..' not in path.parts,'Invalid recorded runtime path')
+        require(digest(a.runtime_root/path)==checksum,'Native station runtime library/module changed: '+name)
     result=dict(status='failed',phase6_complete=False,profile=profile,cases={},
         original_report_sha256=digest(a.original/'stock-vessels.json'),native_report_sha256=digest(a.native/'stock-vessels.json'),
         reference_audit_sha256=digest(a.reference_audit),source_sha256_lf=source_digest(Path(__file__)))

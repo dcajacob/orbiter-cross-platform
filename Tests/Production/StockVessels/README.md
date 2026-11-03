@@ -73,3 +73,10 @@ texture lifecycle makes the DG-and-DG-S ground frame byte-identical to Windows.
 See [the scoped qualification](../../../Docs/Production/StockStations.md).
 Other native profiles, broader stock dependencies and sanitizer acceptance
 remain separate requirements.
+
+The full native workflow now captures these fourteen sessions in each of its
+four build/CPU jobs and archives the matching native binaries. Capture success
+alone is not original-Windows comparison. Downloaded captures must also pass
+`compare.py` against the matching audited original profile. `--runtime-root`
+supports an extracted CI runtime while retaining every recorded binary hash
+check; sources must still match the comparison checkout.

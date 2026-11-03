@@ -3,33 +3,33 @@
   "status": "audited-incomplete",
   "phase6_complete": false,
   "date": "2026-11-03",
-  "runtime_source_commit": "2c00d29b9d982d4096947636dcd61a89006577a0",
+  "runtime_source_commit": "9418ae293fc7c4cbee49538163e14d97ec3e5a1c",
   "scope": "All 157 unchanged stock-scenario startup attempts; failure-preserving readiness baseline, not complete acceptance",
   "summary": {
     "attempted": 157,
-    "passed": 37,
-    "failed": 120,
+    "passed": 44,
+    "failed": 113,
     "inventory_ready": 45,
     "source_metadata_mismatches": 7
   },
   "capture": {
-    "path": "out/phase6-stock-full-smoke/stock-scenarios.json",
-    "sha256": "23f6bad2f9a36f3908db523b5a9b200cf15d9938dfcef0a3e0884d3af3464e8f"
+    "path": "out/phase6-base-stock-full-smoke/stock-scenarios.json",
+    "sha256": "27f12e3ac73009eee365c09b71c9d903dc9a999b04965b77c4915a8fffd7b1be"
   },
   "audit": {
-    "path": "out/phase6-stock-full-audit.json",
-    "sha256": "2ec603fcb4de567213a4580e10c0aaf54337005bd477dfda478f1f6bead1c996"
+    "path": "out/phase6-base-stock-full-audit.json",
+    "sha256": "cc98d93b078260519896c1d82b63b4fcb094833737fb4ba5f69a229f8c1d078a"
   },
   "runtime_sha256": {
-    "executable": "8e074c036edd6abe8f4fd75e870fbffc403f9a73b51f900a8282860abc7d1f2c",
-    "renderer": "a97b839a0e23cb2b5f47cc6ffd633f42c149014939f225457186be3154b34229",
-    "vessels": "8770501b39a8fa20e2a1d28c803276aac69238bc286f0b73986efae75a2227c4"
+    "executable": "edff787c35b5bd1a316ae5aba68709697097441f048279a66625fcafccb03d8a",
+    "renderer": "f75adfeffa5d3c0375e9047c0010804b4f22c7f0fbd6cf0cf7d8f4366fa19f24",
+    "vessels": "5ac0a19b049af75b9911a037ff4d62b9c6a3bbdae1612162cc6db39a8979a817"
   },
   "input_lock_sha256": "5f89334ecb213b56b1bda651acbed8c245f874f6d61ae9f7e9fdccfb3da2f11e",
   "source_sha256": {
     "Tests/Production/StockScenarios/Inventory.Test.py": "376e8e1f1b149ea66b94c178fd888f30ae0d0f6daf0df56c6a2fb2396af2017b",
     "Tests/Production/StockScenarios/Manifest.Test.py": "5840efa345b8b47e8fe69827d6a02aa543495cb3d19175ea7a16fa61be2d60df",
-    "Tests/Production/StockScenarios/README.md": "b3753b3b0c2bbb52635b526e150e9f9b00904b2294ecbfbe8f2fb5ab27addc6b",
+    "Tests/Production/StockScenarios/README.md": "e495eed5c9593ff5201ad877bc98b75f9b5781026fb5156fd47335be9d74f016",
     "Tests/Production/StockScenarios/inventory.py": "6b588cef69a070de53f2545adab19cab5956d73395ed6ae23d5268281f4e3b07",
     "Tests/Production/StockScenarios/run.py": "fe778c15e282bca5206b2286e8d553e2dd4501f1902c35f2b76e3c8008c1294e",
     "Tests/Production/StockScenarios/verify.py": "eb9148ba952aa080321bd3dcb1ee4a039b8bc088f0f68d3dc0be704d5641dc1e"
@@ -46,7 +46,7 @@
   },
   "failure_groups": {
     "missing_dependencies": 112,
-    "unqualified_config_only_classes": 7,
+    "unqualified_config_only_classes": 0,
     "preserved_general_api_assertion": 1
   },
   "missing_classes_by_scenario": {
@@ -72,50 +72,7 @@
     "The Solar System/Jupiter flybys/Galileo's second Io flyby.scn",
     "The Solar System/Jupiter flybys/Tour of Jupiter.scn"
   ],
-  "config_only_runtime_failures": {
-    "Challenges/Challenge 2 - Lunar transfer.scn": [
-      "Orbiter native production: Unsupported stock vessel class or capabilities: Wheel; generic replacement is forbidden",
-      "process exit 1",
-      "Incomplete sixty-frame presentation or context deletion",
-      "Incomplete finalized all-vessel ticks"
-    ],
-    "Challenges/Challenge 3 - Advanced lunar transfer.scn": [
-      "Orbiter native production: Unsupported stock vessel class or capabilities: Wheel; generic replacement is forbidden",
-      "process exit 1",
-      "Incomplete sixty-frame presentation or context deletion",
-      "Incomplete finalized all-vessel ticks"
-    ],
-    "Delta-glider/DG and DG-S.scn": [
-      "Orbiter native production: Unsupported stock vessel class or capabilities: Mir; generic replacement is forbidden",
-      "process exit 1",
-      "Incomplete sixty-frame presentation or context deletion",
-      "Incomplete finalized all-vessel ticks"
-    ],
-    "Delta-glider/Venus takeoff.scn": [
-      "Orbiter native production: Unsupported stock vessel class or capabilities: Mir; generic replacement is forbidden",
-      "process exit 1",
-      "Incomplete sixty-frame presentation or context deletion",
-      "Incomplete finalized all-vessel ticks"
-    ],
-    "Navigation/TransX/Earth to Moon.scn": [
-      "Orbiter native production: Unsupported stock vessel class or capabilities: Wheel; generic replacement is forbidden",
-      "process exit 1",
-      "Incomplete sixty-frame presentation or context deletion",
-      "Incomplete finalized all-vessel ticks"
-    ],
-    "The Solar System/Venus.scn": [
-      "Orbiter native production: Unsupported stock vessel class or capabilities: Mir; generic replacement is forbidden",
-      "process exit 1",
-      "Incomplete sixty-frame presentation or context deletion",
-      "Incomplete finalized all-vessel ticks"
-    ],
-    "Views/Cloud microtexture.scn": [
-      "Orbiter native production: Unsupported stock vessel class or capabilities: Mir; generic replacement is forbidden",
-      "process exit 1",
-      "Incomplete sixty-frame presentation or context deletion",
-      "Incomplete finalized all-vessel ticks"
-    ]
-  },
+  "config_only_runtime_failures": {},
   "named_scenarios": {
     "Delta-glider/Atmospheric autopilot.scn": {
       "status": "failed",
@@ -134,7 +91,8 @@
           "missing class configuration: ShuttleA"
         ]
       },
-      "output": "027"
+      "output": "027",
+      "local_station_capability_qualification": "Passed local Release automatic; other native profiles remain open"
     },
     "Delta-glider/DG Mk4 in orbit.scn": {
       "status": "failed",
@@ -153,7 +111,8 @@
           "missing class configuration: ShuttleA"
         ]
       },
-      "output": "030"
+      "output": "030",
+      "local_station_capability_qualification": "Passed local Release automatic; other native profiles remain open"
     },
     "Delta-glider/DG-S ready for takeoff.scn": {
       "status": "failed",
@@ -172,7 +131,8 @@
           "missing class configuration: ShuttleA"
         ]
       },
-      "output": "032"
+      "output": "032",
+      "local_station_capability_qualification": "Passed local Release automatic; other native profiles remain open"
     },
     "Delta-glider/Docked at ISS.scn": {
       "status": "failed",
@@ -189,7 +149,8 @@
           "missing class configuration: ShuttleA"
         ]
       },
-      "output": "033"
+      "output": "033",
+      "local_station_capability_qualification": "Passed local Release automatic; other native profiles remain open"
     },
     "Delta-glider/Virtual cockpit.scn": {
       "status": "failed",
@@ -208,7 +169,8 @@
           "missing class configuration: ShuttleA"
         ]
       },
-      "output": "041"
+      "output": "041",
+      "local_station_capability_qualification": "Passed local Release automatic; other native profiles remain open"
     },
     "Space Shuttle Atlantis/Atlantis ISS Resupply.scn": {
       "status": "failed",
@@ -225,7 +187,8 @@
           "missing class configuration: Leonardo_mplm"
         ]
       },
-      "output": "096"
+      "output": "096",
+      "local_station_capability_qualification": "Passed local Release automatic; other native profiles remain open"
     },
     "Tutorials/DG to the moon.scn": {
       "status": "failed",
@@ -240,7 +203,8 @@
           "missing class configuration: ShuttleA"
         ]
       },
-      "output": "147"
+      "output": "147",
+      "local_station_capability_qualification": "Passed local Release automatic; other native profiles remain open"
     }
   },
   "preserved": {
@@ -250,8 +214,60 @@
     "required_module_failure": true
   },
   "next_required": [
-    "Original Windows config-only station observations before host qualification",
-    "Source-built ShuttleA dependencies for unchanged DG acceptance scenarios",
-    "Remaining named scenario/module dependencies and physical interaction"
-  ]
+    "Native four-profile hosted station/base qualification",
+    "Source-built ShuttleA and other named scenario dependencies",
+    "Investigate and fix existing failure-path crashes",
+    "Complete full unchanged scenario and interactive acceptance"
+  ],
+  "station_qualification": {
+    "path": "Docs/Production/StockStationsVerification.json",
+    "sha256": "33570e25c51f420bbd7412e827af683d9367468132918a78d6016977041b4e9f"
+  },
+  "previous_baseline": {
+    "runtime_source_commit": "2c00d29b9d982d4096947636dcd61a89006577a0",
+    "summary": {
+      "attempted": 157,
+      "passed": 37,
+      "failed": 120,
+      "inventory_ready": 45,
+      "source_metadata_mismatches": 7
+    },
+    "capture": {
+      "path": "out/phase6-stock-full-smoke/stock-scenarios.json",
+      "sha256": "23f6bad2f9a36f3908db523b5a9b200cf15d9938dfcef0a3e0884d3af3464e8f"
+    },
+    "audit": {
+      "path": "out/phase6-stock-full-audit.json",
+      "sha256": "2ec603fcb4de567213a4580e10c0aaf54337005bd477dfda478f1f6bead1c996"
+    }
+  },
+  "signal_failures": [
+    "Checklists/Mission 2 - ISS to Mir.scn",
+    "Checklists/Mission 3 - Deorbit.scn",
+    "Delta-glider/Docked at ISS.scn",
+    "Delta-glider/Vessel-vessel.scn",
+    "Demo/Docked at ISS.scn",
+    "Demo/Galilean system view.scn",
+    "Demo/Mir.scn",
+    "Demo/Project Alpha.scn",
+    "Demo/Saturn.scn",
+    "Navigation/Space Physics/DG dumbbell.scn",
+    "Shuttle-A/Shuttle-A Docked at ISS.scn",
+    "Space Shuttle Atlantis/Atlantis ISS Resupply.scn",
+    "Space Shuttle Atlantis/Atlantis docked at ISS.scn",
+    "Space Stations/ISS.scn",
+    "Space Stations/Light and darkness.scn",
+    "Space Stations/Mir.scn",
+    "The Solar System/Enceladus.scn",
+    "The Solar System/Galilean system view.scn",
+    "The Solar System/Iapetus.scn",
+    "The Solar System/Mimas.scn",
+    "The Solar System/Rhea.scn",
+    "The Solar System/Saturn.scn",
+    "The Solar System/Tethys.scn",
+    "The Solar System/Titan.scn",
+    "Views/Atmospheric haze.scn"
+  ],
+  "signal_failure_count": 25,
+  "signal_failures_identical_to_previous_runtime": true
 }

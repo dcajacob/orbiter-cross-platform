@@ -235,7 +235,7 @@ the test module's destroy-listener cleanup.
 The real Intel laptop now also passes the fixed 1920x1080 medium performance
 gate on Wayland and XWayland: twelve fresh processes, 25,920 scene presentations
 and 21,600 measured intervals across unchanged stock exterior, 2D-panel and VC
-scenes. The worst median is 22.56 ms and worst p95 is 25.44 ms; every repetition
+scenes. The worst median is 22.64 ms and worst p95 is 25.31 ms; every repetition
 passes the unchanged 33/50 ms limits. Physics traces are byte-identical across
 both repetitions and both backends. Configured window dimensions now request
 framebuffer pixels and settle actual fractional Wayland scale before the
@@ -245,6 +245,21 @@ supersedes the earlier result whose renderer dimension check missed a fixed
 1280x720 cockpit. Default window policy is preserved.
 This remains a local hardware checkpoint within the ongoing Phase 6 acceptance.
 [Hardware results, full method and retained outliers](HardwarePerformance.md)
+
+Original configuration-defined Mir and Wheel now pass seven complete unchanged
+scenarios in the local Release automatic host. All fourteen runs match the
+audited Windows state/capability/port/camera budgets and full-image threshold.
+Restoring the original base-texture lifecycle makes the DG-and-DG-S ground
+frame byte-identical to Windows. The full stock sweep improves to 44 passes and
+113 retained failures; wider module dependencies and 25 existing failure-path
+crashes remain open. The next full native workflow captures these cases in all
+four build/CPU profiles. [Station and base evidence](StockStations.md)
+
+A fresh build that instruments C as well as C++ exposes a Lua empty-upvalue-list
+undefined access before Wayland interaction starts. A two-guard isolated
+prototype passes unsuppressed closure/GC stress and matches the unchanged normal
+interpreter, but is not yet adopted. Broader sanitizer qualification remains
+open. [Failure and prototype evidence](LuaUpvalueLifetime.md)
 
 The native graphics leak now has an isolated source fix and a passing local
 sanitizer menu flow. Mesa's executable-code allocator retained two bookkeeping

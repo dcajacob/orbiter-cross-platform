@@ -55,16 +55,16 @@ benchmark or build competing for the GPU/CPU.
 ```sh
 python3 -B Tests/Production/Performance/run.py \
   --backend wayland \
-  --executable out/phase6-viewport-engine/orbiter-production \
+  --executable out/phase6-base-stations-engine/orbiter-production \
   --assets out/phase6-dg-resources --data out/native-celestial-data \
-  --modules out/phase6-viewport-engine/NativeModules --planets out/archive-data \
+  --modules out/phase6-base-stations-engine/NativeModules --planets out/archive-data \
   --output out/performance-wayland
 
 python3 -B Tests/Production/Performance/run.py \
   --backend x11 \
-  --executable out/phase6-viewport-engine/orbiter-production \
+  --executable out/phase6-base-stations-engine/orbiter-production \
   --assets out/phase6-dg-resources --data out/native-celestial-data \
-  --modules out/phase6-viewport-engine/NativeModules --planets out/archive-data \
+  --modules out/phase6-base-stations-engine/NativeModules --planets out/archive-data \
   --output out/performance-x11
 
 python3 -B Tests/Production/Performance/verify.py \

@@ -280,6 +280,14 @@ jobs:
           python3 -B Tests/Production/CockpitCameraGate.Test.py
           --capture out/native-cockpit-camera/camera_dg_down_center_scenario-1
           --output out/camera-gate-check.json
+      - name: Capture every vessel and docking port in seven unchanged stock station scenarios
+        run: >-
+          xvfb-run -a -s '-screen 0 1920x1080x24' env LIBGL_ALWAYS_SOFTWARE=1 GALLIUM_DRIVER=llvmpipe
+          python3 -B Tests/Production/StockVessels/native.py
+          --executable out/native-cockpit-engine/orbiter-production --assets out/scene-resources
+          --data out/data --modules out/native-cockpit-engine/NativeModules --planets out/planets
+          --configuration ${{ matrix.configuration }} --math-profile ${{ matrix.math_profile }}
+          --output out/native-stock-stations
       - name: Click the visible stock cockpit menu and change ship, warp, pause and save
         run: >-
           xvfb-run -a -s '-screen 0 1920x1080x24' env LIBGL_ALWAYS_SOFTWARE=1 GALLIUM_DRIVER=llvmpipe
@@ -353,6 +361,9 @@ jobs:
             out/native-cockpit-vc-mouse/**
             out/native-cockpit-camera-mouse/**
             out/native-cockpit-camera/**
+            out/native-stock-stations/**
+            out/native-cockpit-engine/orbiter-production
+            out/native-cockpit-engine/**/*.so
             out/camera-gate-check.json
             out/native-cockpit-ui/**
             out/native-cockpit-ui-window/**

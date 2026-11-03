@@ -61,9 +61,10 @@ The new complete stock sweep has 44 clean passes and 113 failures. The remaining
 112 dependency-incomplete cases and GeneralApiTest assertion remain failures;
 25 of those dependency cases terminate by signal in both the old and new
 baselines. They require investigation and cannot count as explicit graceful
-failure or successful initialization. Wider module/scenario acceptance, current
-four-profile hosted native comparison, renewed hardware performance, sanitizer
-coverage and durable evidence storage remain open.
+failure or successful initialization. The restored-texture runtime also passes
+the renewed complete hardware performance matrix. Wider module/scenario
+acceptance, current four-profile hosted native comparison, sanitizer coverage
+and durable evidence storage remain open.
 
 [Machine-readable evidence and hashes](StockStationsVerification.json)
 [Capture, comparison and negative controls](../../Tests/Production/StockVessels/README.md)
