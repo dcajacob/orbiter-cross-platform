@@ -4,6 +4,9 @@ inputs:
   configuration:
     description: Original Windows Debug or Release configuration
     required: true
+  artifact-prefix:
+    description: Distinguish captures made on different Windows runtime hosts
+    default: original-lua-aap
 runs:
   using: composite
   steps:
@@ -34,7 +37,7 @@ runs:
     - uses: actions/upload-artifact@v7
       if: always()
       with:
-        name: original-lua-aap-${{ inputs.configuration }}
+        name: ${{ inputs.artifact-prefix }}-${{ inputs.configuration }}
         retention-days: 90
         path: |
           out/pair-${{ inputs.configuration }}/out/diagnostic-sse2/**/*.json

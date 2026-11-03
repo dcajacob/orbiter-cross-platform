@@ -4,6 +4,7 @@ import argparse
 import json
 import os
 from pathlib import Path
+import platform
 import sys
 import subprocess
 
@@ -97,6 +98,8 @@ def main():
     args.output.mkdir(parents=True)
     os.environ.update(LIBGL_ALWAYS_SOFTWARE='true',GALLIUM_DRIVER='llvmpipe')
     report=dict(status='pending',source=git('rev-parse','HEAD').decode().strip(),runtime=runtime,configuration=args.configuration,math_profile='diagnostic-sse2' if args.diagnostic_sse2 else 'original-default',cases={},failures={})
+    report['host']=dict(platform=platform.platform(),image_os=os.environ.get('ImageOS'),
+                       image_version=os.environ.get('ImageVersion'))
     for case in config['cases']:
         try:
             directories=[]; observations=[]

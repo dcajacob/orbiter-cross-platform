@@ -21,3 +21,15 @@ Each case runs twice per Windows Debug/Release build. Exact Lua event and
 control traces, the existing numerical/image budgets and successful original
 shutdown are required. References remain candidates until the runs and their
 cross-build comparison pass and provenance is preserved.
+
+The paired capture runs on both Windows Server 2022 and 2025, with Debug and
+Release on the same worker for each OS. The 2022 comparison and its artifact
+names remain unchanged. The 2025 artifacts use the `original-lua-aap-windows2025`
+prefix. Both apply the same default-profile gate and separate forced-SSE2
+diagnostic. No reference or numerical budget is changed by this host comparison.
+
+The [CRT diagnostic](../CrtDiagnostic/README.md) established that Windows 2022
+loads different CRT version families for Debug and Release. On Windows 2025,
+both providers belong to the 26100 family and their 8,517 arcsine outputs agree
+in every tested profile. Full simulator captures are required to determine
+whether that runtime provisioning also resolves the Lua/AAP mismatch.

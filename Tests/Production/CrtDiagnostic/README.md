@@ -51,3 +51,9 @@ SDK `10.0.26100.7705` exports return the newer result for the flight's critical
 input, while the older installed SDK versions return the system Release result.
 This demonstrates a runtime-version difference, rather than an intrinsic
 Debug-versus-Release compiler difference. It does not prove full-flight parity.
+
+[Run 41587772339](https://github.com/dcajacob/orbiter-cross-platform/actions/runs/41587772339)
+then observed Windows Server 2025 Debug product version `10.0.26100.9457` and
+Release product version `10.0.26100.33648`. All 8,517 outputs agree across builds
+in default, SSE2 and explicitly enabled FMA3 profiles. The full original Lua/AAP
+workflow now compares both OS hosts with its existing exact gate.
