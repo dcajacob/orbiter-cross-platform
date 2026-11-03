@@ -1,0 +1,186 @@
+{
+  "schema": 1,
+  "status": "native-audit-passed-original-pending",
+  "phase6_complete": false,
+  "native_producer_commit": "76208ed76bc1810c6acbbea90e40a03658e084b8",
+  "verifier_commit": "62b8959266dbf35d1ee004934ee1729edb38e834",
+  "runtime_source_commit": "b1e3f1d60485149f5df63b5e89b531cb8ed0d8cf",
+  "independent_native_audit": {
+    "path": "out/phase6-stock-lua-exit-native-audit-v2.json",
+    "sha256": "7ba04a0d51d9703226894f980e36013bc59f630fafd786144e20e937bf3ac840"
+  },
+  "native_processes": 4,
+  "presentations": 52,
+  "all_vessel_samples": 448,
+  "docking_samples": 840,
+  "assertion_log_events": 240,
+  "assertion_pass_records": 112,
+  "per_process": {
+    "completed_frames": 13,
+    "finalized_ticks": 14,
+    "vessels": 8,
+    "all_vessel_rows": 112,
+    "docking_rows": 210,
+    "assertion_log_events": 60,
+    "assertion_pass_records": 28
+  },
+  "profiles": {
+    "Release-auto-v1": {
+      "capture_sha256": "fb782fd373e9d32e4057a4354aeb109f3135916a2bc2b53fcf698a2f858cca6b",
+      "producer_commit": "76208ed76bc1810c6acbbea90e40a03658e084b8",
+      "build_identity": {
+        "configuration": "Release",
+        "math": "automatic",
+        "instrumentation": [
+          "",
+          ""
+        ],
+        "actual_sanitizer_linked": false,
+        "cmake_cache_sha256": "60b15e7e8900e7fba05c799de31f2b4ed50bbe11c07b316257e8cadefd22795e"
+      },
+      "runs": [
+        {
+          "completed_frames": 13,
+          "finalized_ticks": 14,
+          "all_vessel_rows": 112,
+          "docking_rows": 210,
+          "assertion_events": 60,
+          "assertion_passes": 28,
+          "renderer": {
+            "vendor": "Mesa",
+            "renderer": "llvmpipe (LLVM 21.1.8, 256 bits)",
+            "version": "4.5 (Core Profile) Mesa 26.0.8-1ubuntu0.3",
+            "client_width": 1280,
+            "client_height": 720
+          },
+          "lifecycle": {
+            "rendered_frames": 13,
+            "successful_presents": 13,
+            "context_deleted": true
+          }
+        },
+        {
+          "completed_frames": 13,
+          "finalized_ticks": 14,
+          "all_vessel_rows": 112,
+          "docking_rows": 210,
+          "assertion_events": 60,
+          "assertion_passes": 28,
+          "renderer": {
+            "vendor": "Mesa",
+            "renderer": "llvmpipe (LLVM 21.1.8, 256 bits)",
+            "version": "4.5 (Core Profile) Mesa 26.0.8-1ubuntu0.3",
+            "client_width": 1280,
+            "client_height": 720
+          },
+          "lifecycle": {
+            "rendered_frames": 13,
+            "successful_presents": 13,
+            "context_deleted": true
+          }
+        }
+      ],
+      "negative_controls": 11,
+      "gate_sha256": "6c89ef8f474d6b99f261085970beb89fae35c166c30498039555f3700fd47aca"
+    },
+    "Debug-asan-v1": {
+      "capture_sha256": "195f6218de415d8b4c1d656c69609915b6d20caf8a508d221ff8acfc9bcc57ce",
+      "producer_commit": "76208ed76bc1810c6acbbea90e40a03658e084b8",
+      "build_identity": {
+        "configuration": "Debug",
+        "math": "automatic",
+        "instrumentation": [
+          "-fsanitize=address,undefined -fno-omit-frame-pointer",
+          "-fsanitize=address,undefined -fno-omit-frame-pointer"
+        ],
+        "actual_sanitizer_linked": true,
+        "cmake_cache_sha256": "9551924926b8c2c68a95d1b16025fd7ed30e2f856fe818111dbeaf6cc4ff36b0"
+      },
+      "runs": [
+        {
+          "completed_frames": 13,
+          "finalized_ticks": 14,
+          "all_vessel_rows": 112,
+          "docking_rows": 210,
+          "assertion_events": 60,
+          "assertion_passes": 28,
+          "renderer": {
+            "vendor": "Mesa",
+            "renderer": "llvmpipe (LLVM 21.1.8, 256 bits)",
+            "version": "4.5 (Core Profile) Mesa 26.0.8",
+            "client_width": 1280,
+            "client_height": 720
+          },
+          "lifecycle": {
+            "rendered_frames": 13,
+            "successful_presents": 13,
+            "context_deleted": true
+          }
+        },
+        {
+          "completed_frames": 13,
+          "finalized_ticks": 14,
+          "all_vessel_rows": 112,
+          "docking_rows": 210,
+          "assertion_events": 60,
+          "assertion_passes": 28,
+          "renderer": {
+            "vendor": "Mesa",
+            "renderer": "llvmpipe (LLVM 21.1.8, 256 bits)",
+            "version": "4.5 (Core Profile) Mesa 26.0.8",
+            "client_width": 1280,
+            "client_height": 720
+          },
+          "lifecycle": {
+            "rendered_frames": 13,
+            "successful_presents": 13,
+            "context_deleted": true
+          }
+        }
+      ],
+      "negative_controls": 11,
+      "gate_sha256": "6c89ef8f474d6b99f261085970beb89fae35c166c30498039555f3700fd47aca"
+    }
+  },
+  "cross_native_build_byte_identity": {
+    "stock-vessel-state.csv": true,
+    "stock-vessel-docks.csv": true,
+    "stock-exit-phases.csv": true
+  },
+  "original_reference_attempt": {
+    "run_id": 41724232307,
+    "producer_commit": "76208ed76bc1810c6acbbea90e40a03658e084b8",
+    "qualified": false,
+    "artifact_id": 13271664962,
+    "bytes": 219134,
+    "sha256": "fbb9219c1cd0a0fd5f86a16dc70e48aefb4c2915bd8cacc4e4ae275bb2b1aefa",
+    "failure": "Preserved fixed-time graphics image probe throws at t=12.75 because the unchanged script selects warp=10 and skips t=12.5. Original binaries and script remain untouched; this failed attempt is unqualified."
+  },
+  "corrected_original_observer_commit": "62b8959266dbf35d1ee004934ee1729edb38e834",
+  "original_reference_qualified": false,
+  "original_image_probe_setup_correction": "The original separate renderer evidence flag required exactly t=12.5, which the unchanged warp=10 script skips. The corrected exit-trace observer leaves the original renderer/app/script unchanged, queries actual OpenGL identity after its first presentation, and does not enable that separate image probe.",
+  "corpus_termination_policy_changed": false,
+  "historical_corpus": {
+    "attempted": 157,
+    "passed": 112,
+    "failed": 45
+  },
+  "artifact": {
+    "status": "passed",
+    "path": "out/phase6-stock-lua-exit-native-evidence-v1.tar.gz",
+    "bytes": 1036705,
+    "sha256": "d689c1e7d974f465034e38ba9cc2438ddd99890da407821244d9708ecaff922c",
+    "members": 229,
+    "index_sha256": "f199cac1143f1bf880b4a6320bdef7d1a3cedebef38510d108e5e2a1c424fc5f",
+    "all_payload_hashes_verified": true,
+    "remote_preservation": "pending",
+    "font_and_asset_collections_included": false
+  },
+  "physical_controller": "Unavailable per user; unverified",
+  "qualification": "Native observations and damaged-evidence controls only. Intentional stock-exit acceptance remains unqualified until preserved Windows observations are audited and pinned; ordinary scenarios retain all sixty-frame requirements.",
+  "corrected_original_reference_run": {
+    "id": 41725217641,
+    "source_commit": "62b8959266dbf35d1ee004934ee1729edb38e834",
+    "status": "in-progress-at-native-checkpoint"
+  }
+}

@@ -69,6 +69,17 @@ build logs, standalone test records and the pinned Lua archive. The baseline
 runtime is referenced through the preceding verified Transfer MFD bundle.
 Asset and font collections are excluded; remote preservation remains open.
 
+The separate [stock exit observation](LuaStockExitVerification.json) now records
+four complete native runs: 52 presentations, 448 all-vessel samples and 840
+docking-port samples. Each run contains all 60 ordered script log events and
+28 assertion-pass records. Repeated and cross-build state, port and boundary
+traces are byte-identical. Eleven damaged-capture controls reject missing
+observations, forged completion, a wrong exit code or renderer, and incomplete
+teardown. The four-profile Windows reference is still unqualified. Its first
+attempt exposed an incompatible fixed-time image probe in the fixture; the
+corrected observer measures renderer identity independently. The failed
+artifact is retained, and the stock-corpus termination rules are unchanged.
+
 This is targeted native verification. The historical 157-scenario sweep remains
 112 passed and 45 failed; the original failed result is not rewritten as a
 pass. Hosted checks for the repair, other missing stock modules/dependencies,
