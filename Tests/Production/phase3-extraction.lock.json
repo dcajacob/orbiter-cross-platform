@@ -741,7 +741,7 @@
     },
     "Src/Orbiter/Production/NativeApplication.cpp": {
       "original_sha256_lf": null,
-      "sha256_lf": "63e50a8473bb2db8aa6895322c89d346252ddeb34e5c6d6e17143794d4352232"
+      "sha256_lf": "80fdd1f0a02d6c80fbedf13a59d3c14502a2d0862932bfd4280f3625d8377d80"
     },
     "Src/Orbiter/Production/NativeBuild.h.in": {
       "sha256_lf": "f5fb21f83bb6be0c54839fce670e8410f6911eda86da2eef26e4221c1ae25d97",
@@ -1308,7 +1308,7 @@
     },
     "Src/Orbiter/Production/NativeCockpitGui.cpp": {
       "original_sha256_lf": null,
-      "sha256_lf": "5271ed0530dcbc0ad9c210940367a434f37737784a93ac0a49c23343199200f8"
+      "sha256_lf": "d3fdabebf99e1062e28762a86ebc4329bc20e00083c671b5682ba7c5e04d8940"
     },
     "Src/Orbiter/Production/NativeCockpitProjection.cpp": {
       "original_sha256_lf": null,
@@ -1336,7 +1336,7 @@
     },
     "Src/Orbiter/Production/NativeCockpitUi.h": {
       "original_sha256_lf": null,
-      "sha256_lf": "a0db093cc2f1bfeeba9dd3480c3172494fb808f3e1090b4643d0cc32504c87e1"
+      "sha256_lf": "67abae4545deaa7df787ac588bcc7facd7201fc36ce50b475c37eb2304d2cbf5"
     },
     "Src/Module/LuaScript/Native/CMakeLists.txt": {
       "original_sha256_lf": null,

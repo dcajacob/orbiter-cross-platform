@@ -737,13 +737,13 @@ int main(int argc,char** argv) {
         std::map<std::string,std::string> arguments;
         for(int i=1;i<argc;++i) {
             std::string name=argv[i];
-            if(name=="--help") {std::cout<<"orbiter-production --assets PATH --data PATH --modules PATH --planets PATH --config PATH --scenario PATH [--keymap PATH --save PATH --replay PATH --evidence PATH --fixed-step S --ticks N --render-every N --frames N --sessions N --frame-delay-ms N --run]\n";return 0;}
+            if(name=="--help") {std::cout<<"orbiter-production --assets PATH --data PATH --modules PATH --planets PATH --config PATH --scenario PATH [--keymap PATH --save PATH --replay PATH --evidence PATH --fixed-step S --ticks N --render-every N --frames N --sessions N --frame-delay-ms N --fixed-ui-clock --run]\n";return 0;}
             if(name.rfind("--",0)!=0 || arguments.count(name))throw std::runtime_error("Invalid or duplicate argument: "+name);
-            if(name=="--run"){arguments[name]="1";continue;}
+            if(name=="--run" || name=="--fixed-ui-clock"){arguments[name]="1";continue;}
             if(i+1==argc || std::string(argv[i+1]).rfind("--",0)==0)throw std::runtime_error("Argument value missing: "+name);
             arguments[name]=argv[++i];
         }
-        const std::vector<std::string> allowed={"--assets","--data","--modules","--planets","--config","--scenario","--evidence","--frames","--fixed-step","--run","--capture-time","--keymap","--save","--replay","--ticks","--render-every","--sessions","--joystick-throttle-axis","--joystick-twist-axis","--frame-delay-ms"};
+        const std::vector<std::string> allowed={"--assets","--data","--modules","--planets","--config","--scenario","--evidence","--frames","--fixed-step","--run","--capture-time","--keymap","--save","--replay","--ticks","--render-every","--sessions","--joystick-throttle-axis","--joystick-twist-axis","--frame-delay-ms","--fixed-ui-clock"};
         for(const auto& entry:arguments)if(std::find(allowed.begin(),allowed.end(),entry.first)==allowed.end())throw std::runtime_error("Unknown argument: "+entry.first);
         for(const char* name:{"--assets","--data","--modules","--planets","--config","--scenario"})if(!arguments.count(name))throw std::runtime_error(std::string("Required argument missing: ")+name);
         const auto absolute=[&](const char* name){return std::filesystem::absolute(arguments.at(name));};
@@ -752,6 +752,12 @@ int main(int argc,char** argv) {
         const int frameDelay=integer("--frame-delay-ms",0);
         if(frameDelay && (!frames || !arguments.count("--replay") || frameDelay>1000))
             throw std::runtime_error("Frame delay requires a bounded frame replay and at most 1000 ms");
+        const bool fixedUiClock=arguments.count("--fixed-ui-clock")!=0;
+        if(fixedUiClock && (!frames || !arguments.count("--replay")))
+            throw std::runtime_error("Fixed GUI clock requires a bounded frame replay");
+#ifndef ORBITER_NATIVE_COCKPIT
+        if(fixedUiClock)throw std::runtime_error("This build has no cockpit GUI clock");
+#endif
         const double fixed=arguments.count("--fixed-step")?FlightNumber(arguments.at("--fixed-step")):1.0/60.0;
         const double capture=arguments.count("--capture-time")?FlightNumber(arguments.at("--capture-time")):-1;
         if(fixed<=0 || (arguments.count("--capture-time") && capture<0) || !renderEvery || !sessions || (ticks && frames))throw std::runtime_error("Invalid frame/step/capture/session limits");
@@ -772,6 +778,9 @@ int main(int argc,char** argv) {
             if(arguments.count("--replay"))application.replay.Load(absolute("--replay"));
             application.savePath=save;application.Initialize(absolute("--config"),scenario,output,capture);
             if(arguments.count("--keymap") && (!std::filesystem::is_regular_file(absolute("--keymap")) || !application.controls.keymap.Read(absolute("--keymap").string().c_str())))throw std::runtime_error("Cannot load explicit flight keymap");
+#ifdef ORBITER_NATIVE_COCKPIT
+            if(fixedUiClock)SetCockpitReplayClock(static_cast<float>(fixed));
+#endif
             application.time.SetFixedStep(fixed);application.running=startRunning;application.render.paused=!application.running;
             std::cout<<"Production ShuttlePB flight. Space/Ctrl-P: pause. T/R: warp. Ctrl-S: save. F5: reload. F6: step. Escape: close.\n";
             FlightClock clock(fixed);auto previous=std::chrono::steady_clock::now();

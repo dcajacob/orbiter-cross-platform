@@ -179,6 +179,9 @@ std::unique_ptr<Select> selection;
 std::unique_ptr<InputBox> inputBox;
 std::ofstream uiEvidence;
 std::ofstream uiFrames;
+ImGuiID replayClockHook=0;
+float replayClockStep=0;
+std::ofstream replayClockTrace;
 }
 
 namespace orbiter::production {
@@ -224,9 +227,33 @@ void CreateCockpitGui() {
         throw;
     }
 }
+void SetCockpitReplayClock(float seconds) {
+    if(!ImGui::GetCurrentContext() || seconds<=0 || replayClockHook)
+        throw std::logic_error("Invalid cockpit replay clock setup");
+    replayClockStep=seconds;
+    ImGuiContextHook hook;
+    hook.Type=ImGuiContextHookType_NewFramePre;
+    hook.Callback=[](ImGuiContext* context,ImGuiContextHook*) {
+        context->IO.DeltaTime=replayClockStep;
+        if(replayClockTrace.is_open())replayClockTrace<<context->FrameCount<<','<<context->IO.DeltaTime<<'\n';
+    };
+    replayClockHook=ImGui::AddContextHook(ImGui::GetCurrentContext(),&hook);
+    const auto& evidence=GetNativeRenderContext().evidence;
+    if(!evidence.empty()) {
+        replayClockTrace.exceptions(std::ios::badbit|std::ios::failbit);
+        replayClockTrace.open(evidence/"ui-clock-trace.csv");replayClockTrace<<"frame,delta\n";
+        std::ofstream record(evidence/"ui-clock.json");record.exceptions(std::ios::badbit|std::ios::failbit);
+        record<<"{\"seconds_per_frame\":"<<seconds<<",\"scope\":\"test-only ImGui frame clock\"}\n";
+    }
+}
 void DestroyCockpitGui() {
+    if(replayClockHook) {
+        ImGui::RemoveContextHook(ImGui::GetCurrentContext(),replayClockHook);
+        replayClockHook=0;
+    }
     if(uiEvidence.is_open())uiEvidence.close();
     if(uiFrames.is_open())uiFrames.close();
+    if(replayClockTrace.is_open())replayClockTrace.close();
     inputBox.reset();
     selection.reset();
     ImGui::g_popupStates.clear();

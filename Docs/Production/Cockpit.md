@@ -489,3 +489,18 @@ to exclude that publication-restricted font. Packaged font distribution remains
 a release dependency. [Local UI evidence](CockpitUIVerification.json) records
 this candidate. Full Phase 6 acceptance still requires broader menu/focus and
 Delta-glider/DG-S cockpit and systems coverage.
+
+The additional fixed-clock Windows UI captures are preserved in
+[production-windows-cockpit-ui-timing-v1](https://github.com/dcajacob/orbiter-cross-platform/releases/tag/production-windows-cockpit-ui-timing-v1).
+Run 41551358542 recorded sixty consecutive 0.25 s ImGui frames for each of two
+repeats of all three cases in each configuration. The preservation job verified
+the public release archives independently. The ordinary live UI still uses its
+platform clock.
+
+The bounded native replay now records the same effective frame deltas. The
+local Debug replay compared both original sets and passed all six runs.
+Selection, Sync list entry and cancellation had identical input schedules and
+popup states. Popup crop SSIM was 0.99555, 0.99556 and 0.99551 respectively.
+Full-frame SSIM against the timed originals was at least 0.99994, with zero
+projected geometry error. The comparison includes the caret. Hosted native
+Debug/Release and both math configurations are separate acceptance checks.
