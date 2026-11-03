@@ -35,7 +35,14 @@ It also checks both SDK creation signatures. The fix handles unresolved dock
 tokens and releases class names and temporary parsed docking records. All 25
 remain failed stock scenarios because their dependencies are unavailable.
 [Startup lifetime evidence](VesselStartupLifetime.md) is separate from full
-corpus acceptance; a fresh complete instrumented sweep is in progress.
+corpus acceptance. The subsequent complete sweep is described below.
+
+That subsequent sweep now completes all 157 scenes after two renderer cleanup
+repairs. It preserves the same 44-scenario pass set and 113 failures, with zero
+signal terminations or sanitizer findings. Five invalid renderer-context boolean
+reads and fourteen empty base-mesh allocation reports are removed. The missing
+modules and original GeneralApiTest assertion remain failures.
+[Complete instrumented result and windowing lifetime](RendererContextLifetime.md)
 
 ShuttleA configuration/module dependencies affect 85 scenarios. Atlantis affects
 30. Other missing classes include Carina, Atlantis tank/SRB, Leonardo MPLM,

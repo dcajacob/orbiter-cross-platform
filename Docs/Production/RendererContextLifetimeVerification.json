@@ -1,0 +1,380 @@
+{
+  "schema": 1,
+  "status": "renderer-and-private-windowing-lifetime-gates-passed",
+  "phase6_complete": false,
+  "code_commit": "27f73fa545b7a4a1df42aa4205219fab3d74e83d",
+  "source_sha256": {
+    "OVP/OGLClient/OGLClient.cpp": "51b8ec9f1e2e21001ed2d3d5c937cdbd6ccde5707b8e880ac6439b6deabd0bb4",
+    "OVP/OGLClient/OGLMesh.cpp": "adfcb7224b2769d7f53b43fcf80f7c61d22861aadaee31c4eb14813d047e9929",
+    "OVP/OGLClient/OGLClient.h": "45588b32167b3be82dd88585f4400430eb6618a10a8dd3b7366b4cd7153b1ec6",
+    "OVP/OGLClient/OGLMesh.h": "cb39ba63d161d84c584d0c83d752c169c01cd2680cb168277a8f478cc338106e",
+    "Src/Orbiter/Production/NativeApplication.cpp": "fbe90b83d7901d73f1e9cc1abc9af5fc4903ea3cd5fe14b7db92ffc1c4ca7ba5",
+    "Tests/Production/GdkLifetime/Backend.Test.c": "9acf85c4b16da7c4794210a8b438405f28d246ac83264a0ab7277aabf66173a4",
+    "Tests/Production/GdkLifetime/README.md": "68f7650781046858841738fd046dc3ae7ba95dd21310d3b7e757d499be29c2fe",
+    "Tests/Production/GdkLifetime/build.py": "37831af0a37cb2633be6357cccab482ecf8cc48b88071be47bc7f2799ee5bf7a",
+    "Tests/Production/GdkLifetime/gtk-3.24.52-backend-owner.patch": "742d8b27375b39f3815e2f8facfc3f928ef7c155b793402c8db441e77cabe4a0",
+    "Tests/Production/GdkLifetime/qualify.py": "8c0ee1fb3df105c43f44174c9662fac3647b2b4cde9ef7d2f31b6f95be0c00a2",
+    "Tests/Production/GdkLifetime/source.lock.json": "5b322ec3af6e0b2067343e0a25f97bd3b34f1770f7f849df88b23c4b0e1617e4"
+  },
+  "renderer_repairs": {
+    "context_value_initialized": true,
+    "empty_owned_vertex_arrays_released": true,
+    "only_two_renderer_sites_changed": true,
+    "headers_layouts_geometry_calculations_and_order_conserved": true,
+    "process_maps_symbolize_original_allocation": true
+  },
+  "complete_instrumented_corpus": {
+    "status": "audited-incomplete",
+    "scenarios": 157,
+    "before": {
+      "attempted": 157,
+      "passed": 25,
+      "failed": 132,
+      "inventory_ready": 45,
+      "source_metadata_mismatches": 7
+    },
+    "after": {
+      "attempted": 157,
+      "passed": 44,
+      "failed": 113,
+      "inventory_ready": 45,
+      "source_metadata_mismatches": 7
+    },
+    "sanitizer_findings": 0,
+    "signal_terminations": 0,
+    "previous_release_pass_set_preserved": true,
+    "closed_renderer_findings": 19,
+    "closed_boolean_cases": 5,
+    "closed_empty_array_cases": 14,
+    "remaining_missing_dependency_cases": 112,
+    "preserved_stock_assertion_cases": 1,
+    "locked_scenario_bytes_and_complete_vessel_manifests_checked": true
+  },
+  "successful_regressions": {
+    "windows_station_processes": 14,
+    "station_presents": 840,
+    "windows_budgets_unchanged": true,
+    "targeted_instrumented_stock_cases": 16,
+    "final_gdk_windows_flights": 8
+  },
+  "gdk": {
+    "package": "3.24.52-0ubuntu1",
+    "pinned_source_and_distribution_queue": true,
+    "public_headers_and_backend_policy_unchanged": true,
+    "owned_copies_separate_from_borrowed_default": true,
+    "new_input_copied_before_prior_allocation_release": true,
+    "public_api_controls": {
+      "system": {
+        "once": {
+          "returncode": 0,
+          "bytes": 0,
+          "allocations": 0,
+          "loaded_library": "/usr/lib/x86_64-linux-gnu/libgdk-3.so.0.2420.32",
+          "library_sha256": "47bb58ca25405353b0546b932ddc5a92e74ee006a1904e4d0eca3df162ddd562"
+        },
+        "repeat": {
+          "returncode": 1,
+          "bytes": 152,
+          "allocations": 19,
+          "loaded_library": "/usr/lib/x86_64-linux-gnu/libgdk-3.so.0.2420.32",
+          "library_sha256": "47bb58ca25405353b0546b932ddc5a92e74ee006a1904e4d0eca3df162ddd562"
+        },
+        "borrowed-default": {
+          "returncode": 1,
+          "bytes": 152,
+          "allocations": 19,
+          "loaded_library": "/usr/lib/x86_64-linux-gnu/libgdk-3.so.0.2420.32",
+          "library_sha256": "47bb58ca25405353b0546b932ddc5a92e74ee006a1904e4d0eca3df162ddd562"
+        },
+        "lost": {
+          "returncode": 1,
+          "bytes": 225,
+          "allocations": 20,
+          "loaded_library": "/usr/lib/x86_64-linux-gnu/libgdk-3.so.0.2420.32",
+          "library_sha256": "47bb58ca25405353b0546b932ddc5a92e74ee006a1904e4d0eca3df162ddd562"
+        }
+      },
+      "baseline": {
+        "once": {
+          "returncode": 0,
+          "bytes": 0,
+          "allocations": 0,
+          "loaded_library": "/home/dan/GIT/orbiter-cross-platform/out/phase6-gdk-replay-baseline/install/lib/x86_64-linux-gnu/libgdk-3.so.0.2420.32",
+          "library_sha256": "1feea849a6c676a68b736159c929ac8582af0ac719d39109d8460138bdbdb797"
+        },
+        "repeat": {
+          "returncode": 1,
+          "bytes": 152,
+          "allocations": 19,
+          "loaded_library": "/home/dan/GIT/orbiter-cross-platform/out/phase6-gdk-replay-baseline/install/lib/x86_64-linux-gnu/libgdk-3.so.0.2420.32",
+          "library_sha256": "1feea849a6c676a68b736159c929ac8582af0ac719d39109d8460138bdbdb797"
+        },
+        "borrowed-default": {
+          "returncode": 1,
+          "bytes": 152,
+          "allocations": 19,
+          "loaded_library": "/home/dan/GIT/orbiter-cross-platform/out/phase6-gdk-replay-baseline/install/lib/x86_64-linux-gnu/libgdk-3.so.0.2420.32",
+          "library_sha256": "1feea849a6c676a68b736159c929ac8582af0ac719d39109d8460138bdbdb797"
+        },
+        "lost": {
+          "returncode": 1,
+          "bytes": 225,
+          "allocations": 20,
+          "loaded_library": "/home/dan/GIT/orbiter-cross-platform/out/phase6-gdk-replay-baseline/install/lib/x86_64-linux-gnu/libgdk-3.so.0.2420.32",
+          "library_sha256": "1feea849a6c676a68b736159c929ac8582af0ac719d39109d8460138bdbdb797"
+        }
+      },
+      "candidate": {
+        "once": {
+          "returncode": 0,
+          "bytes": 0,
+          "allocations": 0,
+          "loaded_library": "/home/dan/GIT/orbiter-cross-platform/out/phase6-gdk-replay-candidate/install/lib/x86_64-linux-gnu/libgdk-3.so.0.2420.32",
+          "library_sha256": "537712f85122a57420f2717c13116a515d3cdc3d838bf4062f7a8abdf5eb51de"
+        },
+        "repeat": {
+          "returncode": 0,
+          "bytes": 0,
+          "allocations": 0,
+          "loaded_library": "/home/dan/GIT/orbiter-cross-platform/out/phase6-gdk-replay-candidate/install/lib/x86_64-linux-gnu/libgdk-3.so.0.2420.32",
+          "library_sha256": "537712f85122a57420f2717c13116a515d3cdc3d838bf4062f7a8abdf5eb51de"
+        },
+        "borrowed-default": {
+          "returncode": 0,
+          "bytes": 0,
+          "allocations": 0,
+          "loaded_library": "/home/dan/GIT/orbiter-cross-platform/out/phase6-gdk-replay-candidate/install/lib/x86_64-linux-gnu/libgdk-3.so.0.2420.32",
+          "library_sha256": "537712f85122a57420f2717c13116a515d3cdc3d838bf4062f7a8abdf5eb51de"
+        },
+        "lost": {
+          "returncode": 1,
+          "bytes": 73,
+          "allocations": 1,
+          "loaded_library": "/home/dan/GIT/orbiter-cross-platform/out/phase6-gdk-replay-candidate/install/lib/x86_64-linux-gnu/libgdk-3.so.0.2420.32",
+          "library_sha256": "537712f85122a57420f2717c13116a515d3cdc3d838bf4062f7a8abdf5eb51de"
+        }
+      }
+    },
+    "gdk_symbol_names_and_types_identical": true,
+    "gdk_symbol_count": 761,
+    "compiled_runtime_paths": {
+      "prefix": "/usr",
+      "datadir": "share",
+      "libdir": "lib/x86_64-linux-gnu",
+      "localedir": "share/locale",
+      "localstatedir": "/var",
+      "sysconfdir": "/etc"
+    },
+    "final_libraries_sha256": {
+      "/home/dan/GIT/orbiter-cross-platform/out/phase6-gdk-replay-baseline/install/lib/x86_64-linux-gnu/libgdk-3.so.0.2420.32": "1feea849a6c676a68b736159c929ac8582af0ac719d39109d8460138bdbdb797",
+      "/home/dan/GIT/orbiter-cross-platform/out/phase6-gdk-replay-candidate/install/lib/x86_64-linux-gnu/libgdk-3.so.0.2420.32": "537712f85122a57420f2717c13116a515d3cdc3d838bf4062f7a8abdf5eb51de"
+    },
+    "original_private_prefix_prototype_is_separate": true,
+    "system_installation_modified": false
+  },
+  "repeated_application_sessions": {
+    "status": "passed",
+    "sessions": 20,
+    "successful_presents": 1200,
+    "identical_states": true,
+    "visuals_unregistered": true,
+    "contexts_deleted": true,
+    "sanitizer_exit_clean": true,
+    "actual_process_mappings": 9,
+    "final_candidate_loaded_in_every_process": true
+  },
+  "wayland_input": {
+    "status": "passed",
+    "cases": 16,
+    "successful_presents": 13190,
+    "matrices": {
+      "default": {
+        "status": "passed",
+        "cases": 8,
+        "presents": 10334,
+        "evidence": {
+          "path": "out/phase6-gdk-input-matrix-default/verification.json",
+          "sha256": "724227303b990bfcf37085c41dac6f01e7bab946e0db0b290e52581f30188811"
+        }
+      },
+      "llvmpipe": {
+        "status": "passed",
+        "cases": 8,
+        "presents": 2856,
+        "evidence": {
+          "path": "out/phase6-gdk-input-matrix-llvmpipe/verification.json",
+          "sha256": "602e6c05c39d9df475851ab646222555ab54ea9246eea3bd6c0a14971bd33f11"
+        }
+      }
+    },
+    "original_rcs_picks_keyboard_focus_camera_and_held_button_shutdown": true,
+    "actual_requested_libraries_mapped": true
+  },
+  "runtime_copies": {
+    "phase6-render-context-engine": {
+      "source_runtime": "/home/dan/GIT/orbiter-cross-platform/out/phase6-vessel-dock-records-engine",
+      "baseline_files_sha256": {
+        "orbiter-production": "be677d2ef6a8e914330f3a36c4a16c6668e5737e920e1a527018fee60761fb4a",
+        "CMakeCache.txt": "a87ca70f59fc925da559aa5bc6fa70fd6b512024b5cea2f42548887d30d42028",
+        "native-sdk/OrbiterNativeBuild.h": "5958ef6f82b13540c28ee3dd735d7f3ba0d887057820cf33c3a152b21439af58",
+        "NativeModules/Celbody/Earth/Atmosphere/EarthAtm2006.so": "1f8767372c8f21849d08b322a4a91388ae6fe47b96e5b55b26fa73995798fd4f",
+        "NativeModules/Celbody/Earth/Atmosphere/EarthAtmJ71G.so": "6a28329be42d36dd9b776ba18ad7bba4854de8e74fa17fc397775edfb04a2252",
+        "NativeModules/Celbody/Mars/Atmosphere/MarsAtm2006.so": "f17c6ec15bb8a11d20b65a9293d9747a46a3e8a3ab46dfde6d42b37d4914e05a",
+        "NativeModules/Celbody/spice.so": "65d5f3fb37e546369b07fe499e5eb4ab37f10470cf9fb20c663291e90f8f256e",
+        "NativeModules/Graphics/OGLClient.so": "8f13701f324a868ad194b2e841bc2df7793deb56f7cf1d3cdef917947d0cf08a",
+        "NativeModules/Plugin/LuaInline.so": "662dab9ee3f7ed88da13ba64edb2faa9db520ab39d43fe3542bfecf68bc2960c",
+        "NativeModules/Plugin/LuaInterpreter.so": "4f5b72379adac2b285215b50c0b2415155a955b87a9c3aeea18446446c0febb0",
+        "NativeModules/Vessel/DeltaGlider.so": "bbd12d608ff0540e024c7bc5c5c380ff460743f61edb9b8064006ba0bb337df5",
+        "NativeModules/Vessel/ShuttlePB.so": "161cec0a251695663a0ddcb3146585ba4f37aa3be1cdf30c25b2a12da002afa0",
+        "liborbiter_production_boundary.so": "8bfdc7c942ef6fcd3ebe22e56acb3d39c71b019b69e3f9baeb6d50f951bdc2c0",
+        "liborbiter_production_vessels.so": "f376d577a6d444f7c91b1f04e368409e8750ee2bf2b417ecf1dcba807e1e0c39",
+        "native-lua/doc-tools/lfs.so": "5f4fea01706c968db48ae8cfbb1909747cb3fcecd1ffb0e2953e5897a15b3b47",
+        "native-lua/liblua.so": "f8e60296e13a9a1fb93420971d19285d232d6008e3e7cec47027c74e67572102"
+      },
+      "copied_engine_and_non_renderer_modules_unchanged": true,
+      "rebuilt_renderer_sha256": "677929829db4d0f578fa30730f323988938e85a1c07f3d09887edbdda876826a",
+      "renderer_source_sha256": {
+        "OVP/OGLClient/OGLClient.cpp": "51b8ec9f1e2e21001ed2d3d5c937cdbd6ccde5707b8e880ac6439b6deabd0bb4",
+        "OVP/OGLClient/OGLClient.h": "45588b32167b3be82dd88585f4400430eb6618a10a8dd3b7366b4cd7153b1ec6",
+        "OVP/OGLClient/OGLMesh.cpp": "adfcb7224b2769d7f53b43fcf80f7c61d22861aadaee31c4eb14813d047e9929"
+      }
+    },
+    "phase6-render-context-asan-engine": {
+      "source_runtime": "/home/dan/GIT/orbiter-cross-platform/out/phase6-vessel-dock-records-asan-engine",
+      "baseline_files_sha256": {
+        "orbiter-production": "5dd4fd30b2a3161c2c831a21930d6a8a802505e03d899a6e6b9d0dec434afbda",
+        "CMakeCache.txt": "5f5527f7dd51cc15371d803bbf850546fc556c7e813895ebd497e737f9d3dc40",
+        "native-sdk/OrbiterNativeBuild.h": "5e5c4457581b9bb014d80ec91a0c4b355945321e5b8a8b00e35e47d78584fbf6",
+        "NativeModules/Celbody/Earth/Atmosphere/EarthAtm2006.so": "761df4fd1aa9f91cc3eddb0e67466124eeff64146732714db06f72e5b8775655",
+        "NativeModules/Celbody/Earth/Atmosphere/EarthAtmJ71G.so": "ecec7dc2052a9d3d7e10aa9a9cc000f59b54a57f9b7f8761183d8c565f334d9d",
+        "NativeModules/Celbody/Mars/Atmosphere/MarsAtm2006.so": "182d8f8d1ef146b8d7b33e79b54c115c9224916d72507a8ee9e68f89cb46fc60",
+        "NativeModules/Celbody/spice.so": "57d59924637ada737496f1b444a68b3d6ef614711afd45f7dcffcd2722e58eb0",
+        "NativeModules/Graphics/OGLClient.so": "34c40e14f42d4751dffd2af8dd0976c4cceab32f597372318274d6c0b15c0146",
+        "NativeModules/Plugin/LuaInline.so": "81b32b6232fff1d934c1dd9e81a0d9dc9571385d004086a05c8f9034ff406f53",
+        "NativeModules/Plugin/LuaInterpreter.so": "6dfb35b52c04e65ee16b0d914e84e6b49f8a85891c5a097d9786409375d5f71e",
+        "NativeModules/Vessel/DeltaGlider.so": "34bb06c50183154c3777e3cffb38684c0bb519a92d8526be22b36841b6f604ee",
+        "NativeModules/Vessel/ShuttlePB.so": "3a1ab44c27be94d9aa8ef2cd7a25af745cfb21a52a0cd8cd9cc2666229cfad6f",
+        "liborbiter_production_boundary.so": "db27a9f582138893b8930472dad3a258c644bdae812462322e4079e0581771eb",
+        "liborbiter_production_vessels.so": "f80a956a40dd3574fcedfa81ac83dac0a73062f936e809fade0c286b25cb0b18",
+        "native-lua/doc-tools/lfs.so": "2926a45ccab8283b9eed8eb0b2957fab74d3c33e2a1d0a59f36ce2c44bbb5a3b",
+        "native-lua/liblua.so": "190291d2ff349fa70e8aae92679d76ceeced116857743b2f75a4e9639e93d5a8"
+      },
+      "copied_engine_and_non_renderer_modules_unchanged": true,
+      "rebuilt_renderer_sha256": "c259705d7fb45e26c8a455e7b1d9e963605befc7402c50ce48e106a7a3c7f282",
+      "renderer_source_sha256": {
+        "OVP/OGLClient/OGLClient.cpp": "51b8ec9f1e2e21001ed2d3d5c937cdbd6ccde5707b8e880ac6439b6deabd0bb4",
+        "OVP/OGLClient/OGLClient.h": "45588b32167b3be82dd88585f4400430eb6618a10a8dd3b7366b4cd7153b1ec6",
+        "OVP/OGLClient/OGLMesh.cpp": "adfcb7224b2769d7f53b43fcf80f7c61d22861aadaee31c4eb14813d047e9929"
+      }
+    }
+  },
+  "instrumentation": {
+    "engine_and_renderer_compiled_c_and_cxx": true,
+    "fontconfig_and_gdk_candidates_instrumented": true,
+    "prebuilt_cspice_and_other_system_libraries_retain_builds": true,
+    "suppressions_used": false,
+    "root_annotations_used": false,
+    "cache_resets_used": false,
+    "decoration_policy_changed": false,
+    "asan_options": "detect_leaks=1:fast_unwind_on_malloc=0",
+    "lsan_options": "",
+    "ubsan_options": "halt_on_error=1:print_stacktrace=1"
+  },
+  "source_conservation": {
+    "files": 444,
+    "negative_controls": {
+      "status": "passed",
+      "only_two_renderer_sites_changed": true,
+      "headers_and_layouts_unchanged": true,
+      "negative_controls": {
+        "OVP/OGLClient/OGLClient.cpp:cleanup-removed": "rejected",
+        "OVP/OGLClient/OGLMesh.cpp:cleanup-removed": "rejected",
+        "OVP/OGLClient/OGLMesh.cpp:vertex-count-changed": "rejected"
+      }
+    }
+  },
+  "physical_controller": {
+    "status": "unavailable",
+    "user_confirmed": true,
+    "acceptance": "unverified"
+  },
+  "evidence": [
+    {
+      "path": "out/phase6-vessel-dock-records-full-stock/verification.json",
+      "sha256": "5b6a3e43ef656653b1304b3e1d396741bc9ca93c3685eeeee19c4c68c45e0850"
+    },
+    {
+      "path": "out/phase6-vessel-dock-records-full-stock-audit.json",
+      "sha256": "afee7653ba6995212993a4acac14a8467fb976ffaeaea0128b77fb35aef3916a"
+    },
+    {
+      "path": "out/phase6-render-context-full-stock/verification.json",
+      "sha256": "b22064c60c10b4195acf9153558d52ba790a43a2da3d1f03154845c67e246e03"
+    },
+    {
+      "path": "out/phase6-render-context-full-stock-audit.json",
+      "sha256": "7d7c99fb949ecbd5e4ae2b876ea3857834525b8abbd6dbd2df31637bc42624b6"
+    },
+    {
+      "path": "out/phase6-render-context-corpus-delta.json",
+      "sha256": "3face1f996e769a7d4ddeaa174382086f6f45ec357ddb54d64310a830144b779"
+    },
+    {
+      "path": "out/phase6-render-context-regressions/verification.json",
+      "sha256": "6a80ad4ba20185a2b7a9cd7df8838f234e7e2fa7471632dd4e9eefee5f037701"
+    },
+    {
+      "path": "out/phase6-render-context-regressions/station-comparison.json",
+      "sha256": "61913225642db3ce617716dc2ef44aeec44bd7d23ac3a4e6829ad196f9fe40a6"
+    },
+    {
+      "path": "out/phase6-renderer-exit-map-baseline-v2/verification.json",
+      "sha256": "98e4994086bee0ffdee4090e8101cb7525da3567593ce21cf73abb81d47e5f62"
+    },
+    {
+      "path": "out/phase6-gdk-replay-qualification/verification.json",
+      "sha256": "5ae8cdfe552778f8e8ec2721a339cf9aa3ae820a91bc5257bf713439b6aca2cd"
+    },
+    {
+      "path": "out/phase6-gdk-application-replay/verification.json",
+      "sha256": "26cebe9de53fd58e671f2c100dfae9110d7fde1a7b2ef6fb0a05317001875629"
+    },
+    {
+      "path": "out/phase6-gdk-application-candidate/verification.json",
+      "sha256": "e7eacedd7764894c5f4fec82b3b3c082a8560b7a1405b6a4c2c15638a4365db9"
+    },
+    {
+      "path": "out/phase6-gdk-ownership-controls/verification.json",
+      "sha256": "592516329d1a9050f4f029e790bed16cd5b4b2762fa809dff77bef15f85c866d"
+    },
+    {
+      "path": "out/phase6-gdk-build-tools/packages.json",
+      "sha256": "c0d012cc673e2715b5455104312cca6923ab5beb7210808369a2f49407074024"
+    },
+    {
+      "path": "out/phase6-gdk-build-tools/pkgconfig-tools-complete.json",
+      "sha256": "742d530bc0217f6f0a15da90164b84588cf739b4c7fea72fd550ebdd2f35329b"
+    }
+  ],
+  "remaining_phase6_work": [
+    "Required named vessel modules and full stock acceptance",
+    "Preserved GeneralApiTest assertion",
+    "Current hosted four-profile qualification",
+    "Final current-source hardware performance",
+    "Physical-controller hardware acceptance",
+    "Durable remote raw-evidence preservation"
+  ],
+  "local_evidence_archive": {
+    "schema": 1,
+    "status": "preserved-locally",
+    "phase6_complete": false,
+    "path": "out/phase6-renderer-gdk-evidence-v1.tar.gz",
+    "size_bytes": 217108289,
+    "sha256": "450d5a5c14194312cb9f1889dcb0944c3b964c7e434a5016bd11d9d7adabfb4a",
+    "members": 13455,
+    "code_commit": "27f73fa545b7a4a1df42aa4205219fab3d74e83d",
+    "index_sha256": "d847c7f45d61cc01eecb281a2e4ad580cbe5d4a59f45fb04bb1446baa4c0171d",
+    "all_archive_payload_hashes_verified": true,
+    "remote_publication_complete": false
+  }
+}

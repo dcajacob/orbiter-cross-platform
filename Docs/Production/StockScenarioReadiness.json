@@ -269,5 +269,18 @@
     "Views/Atmospheric haze.scn"
   ],
   "signal_failure_count": 25,
-  "signal_failures_identical_to_previous_runtime": true
+  "signal_failures_identical_to_previous_runtime": true,
+  "subsequent_complete_instrumented_sweep": {
+    "status": "audited-incomplete",
+    "code_commit": "27f73fa545b7a4a1df42aa4205219fab3d74e83d",
+    "attempted": 157,
+    "passed": 44,
+    "failed": 113,
+    "signal_terminations": 0,
+    "sanitizer_findings": 0,
+    "previous_release_pass_set_preserved": true,
+    "audit_path": "out/phase6-render-context-full-stock-audit.json",
+    "audit_sha256": "7d7c99fb949ecbd5e4ae2b876ea3857834525b8abbd6dbd2df31637bc42624b6",
+    "verification": "Docs/Production/RendererContextLifetimeVerification.json"
+  }
 }

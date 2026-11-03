@@ -280,6 +280,14 @@ missing-class rejection checks. The unchanged scenarios remain failures until
 their required modules are supplied; a complete instrumented sweep is running.
 [Startup lifetime evidence](VesselStartupLifetime.md)
 
+The complete instrumented 157-scene sweep now preserves the same 44-pass set
+and 113 failures with zero signal terminations or sanitizer findings. Defined
+renderer-context initialization and empty mesh-array cleanup remove all nineteen
+new findings. A pinned GDK ownership candidate also passes eight Windows flight
+comparisons, twenty clean sessions and sixteen Intel/llvmpipe Wayland input flows
+at 1x/2x, totaling 13,190 presentations. Missing modules and the preserved stock
+assertion still prevent corpus acceptance. [Current lifetime evidence](RendererContextLifetime.md)
+
 The subsequent ownership controls identify the Fontconfig report as an
 offset-encoding false positive. An isolated pointer-compatible Fontconfig build
 and Wayland-capable Mesa cleanup candidate now pass all sixteen fully

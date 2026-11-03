@@ -45,7 +45,7 @@ attachments at two render frequencies. Their states and lifetime callbacks
 match the immutable Windows references, remain independent of render frequency
 and exit without sanitizer findings.
 
-The broader repeated-session check remains failed. All twenty sessions complete
+The captured repeated-session check with system GDK remains failed. All twenty sessions complete
 sixty presentations, unregister their visuals, delete their contexts and produce
 identical flight states. Process exit then reports 152 bytes in 19 allocations
 from `g_strdup` / `gdk_set_allowed_backends` through the installed GTK decoration
@@ -53,10 +53,16 @@ plugin. That retained report requires owning-source analysis. It is not counted
 as a clean repeated-session sanitizer pass, and no suppression or decoration
 policy change is introduced.
 
+Subsequent owning-source analysis and an isolated GDK ownership repair now pass
+twenty instrumented sessions and the full sixteen-flow Wayland input matrix.
+The complete instrumented stock sweep also returns to 44/113 with no sanitizer
+findings after renderer initialization and empty-array cleanup.
+[Current renderer and GDK evidence](RendererContextLifetime.md)
+
 [VesselStartupLifetimeVerification.json](VesselStartupLifetimeVerification.json)
 records source and runtime identities, rejected scenarios, successful-path
 checks and evidence. [The rejection driver](../../Tests/Production/StockScenarios/README.md#startup-rejection-regressions)
 keeps stock acceptance separate from clean dependency rejection. The complete
-157-scene instrumented sweep is also being repeated. Missing vessel modules,
+157-scene instrumented sweep now completes as described in the current evidence above. Missing vessel modules,
 current hosted qualification, physical controllers and remote evidence
 preservation still prevent Phase 6 acceptance.
