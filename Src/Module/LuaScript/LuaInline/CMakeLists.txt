@@ -6,6 +6,7 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${ORBITER_BINARY_ROOT_DIR})
 
 add_library(LuaInline SHARED
 	LuaInline.cpp
+	InlineEnvironment.cpp
 )
 
 target_include_directories(LuaInline

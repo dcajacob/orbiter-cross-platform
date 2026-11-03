@@ -5,7 +5,7 @@
 
 #include "Interpreter.h"
 #include "VesselAPI.h"
-#include "MfdApi.h"
+#include "MFDAPI.h"
 
 
 /*
@@ -9547,7 +9547,7 @@ int Interpreter::v_trigger_redrawarea (lua_State *L)
 
 // We create a VesselMFD, the lua side is in charge of overloading the metatable,
 // then we save the lua object reference to be used when then core will call VesselMFD callbacks
-OAPI_MSGTYPE Interpreter::MsgProcMFD(UINT msg, UINT mfd, WPARAM wparam, LPARAM lparam)
+oapi::CockpitMessageResult Interpreter::MsgProcMFD(oapi::UInt msg, oapi::UInt mfd, oapi::CockpitUnsignedParam wparam, oapi::CockpitSignedParam lparam)
 {
 	switch (msg) {
 		case OAPI_MSG_MFD_OPENEDEX:

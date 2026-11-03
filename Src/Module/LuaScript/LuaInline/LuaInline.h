@@ -23,24 +23,14 @@
 #ifndef __LUAINLINE_H
 #define __LUAINLINE_H
 
-#include "Interpreter.h"
+#include "InlineEnvironment.h"
 
 // ==============================================================
 // class InterpreterList: interface
 
 class InterpreterList: public oapi::Module {
 public:
-	struct Environment {    // interpreter environment
-		Environment();
-		~Environment();
-		Interpreter *CreateInterpreter ();
-		Interpreter *interp;  // interpreter instance
-		HANDLE hThread;       // interpreter thread
-		bool termInterp;      // interpreter kill flag
-		bool singleCmd;       // terminate after single command
-		char *cmd;            // interpreter command
-		static unsigned int WINAPI InterpreterThreadProc (LPVOID context);
-	};
+	using Environment = InlineEnvironment;
 
 	InterpreterList (HINSTANCE hDLL);
 	~InterpreterList ();

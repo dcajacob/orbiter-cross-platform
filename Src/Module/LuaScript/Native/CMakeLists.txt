@@ -36,3 +36,23 @@ endforeach()
 file(GLOB headers "${original_lua_source_SOURCE_DIR}/*.h")
 file(COPY ${headers} DESTINATION "${PROJECT_BINARY_DIR}/sdk/include/lua")
 target_include_directories(lua INTERFACE "${PROJECT_BINARY_DIR}/sdk/include")
+
+find_package(Threads REQUIRED)
+add_library(native_lua_inline_worker OBJECT
+    ../LuaInterpreter/InterpreterExecution.cpp ../LuaInline/InlineEnvironment.cpp)
+target_compile_features(native_lua_inline_worker PRIVATE cxx_std_17)
+target_include_directories(native_lua_inline_worker PRIVATE
+    "${CMAKE_CURRENT_SOURCE_DIR}/../LuaInterpreter" "${ORBITER_SOURCE_ROOT}/Orbitersdk/include")
+target_link_libraries(native_lua_inline_worker PRIVATE lua Threads::Threads)
+set_target_properties(native_lua_inline_worker PROPERTIES POSITION_INDEPENDENT_CODE ON)
+
+include(CTest)
+if(BUILD_TESTING)
+    add_executable(interpreter_handoff_check "${ORBITER_SOURCE_ROOT}/Tests/Production/NativeLua/ExecutionHandoff.Test.cpp")
+    target_compile_features(interpreter_handoff_check PRIVATE cxx_std_17)
+    target_include_directories(interpreter_handoff_check PRIVATE
+        "${CMAKE_CURRENT_SOURCE_DIR}/../LuaInterpreter" "${ORBITER_SOURCE_ROOT}/Orbitersdk/include")
+    target_link_libraries(interpreter_handoff_check PRIVATE lua Threads::Threads)
+    add_test(NAME native_lua_thread_handoff COMMAND interpreter_handoff_check)
+    set_tests_properties(native_lua_thread_handoff PROPERTIES TIMEOUT 30)
+endif()

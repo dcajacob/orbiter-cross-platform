@@ -24,84 +24,20 @@
 #define ORBITER_MODULE
 #include "orbitersdk.h"
 #include "LuaInline.h"
-#include <direct.h>
-#include <process.h>
-
-// ==============================================================
-// class InterpreterList::Environment: implementation
-
-InterpreterList::Environment::Environment()
-{
-	cmd = NULL;
-	singleCmd = false;
-	hThread = NULL;
-	interp = CreateInterpreter ();
-}
-
-InterpreterList::Environment::~Environment()
-{
-	if (interp) {
-		if (hThread) {
-			termInterp = true;
-			interp->Terminate();
-			interp->EndExec(); // give the thread opportunity to close
-
-			if (WaitForSingleObject (hThread, 1000) != 0) {
-				oapiWriteLog((char*)"LuaInline: timeout while waiting for interpreter thread");
-				TerminateThread (hThread, 0);
-			}
-			CloseHandle (hThread);
-		}
-		delete interp;
-	}
-}
-
-Interpreter *InterpreterList::Environment::CreateInterpreter ()
-{
-	unsigned id;
-	termInterp = false;
-	interp = new Interpreter ();
-	interp->Initialise();
-	hThread = (HANDLE)_beginthreadex (NULL, 4096, &InterpreterThreadProc, this, 0, &id);
-	return interp;
-}
-
-unsigned int WINAPI InterpreterList::Environment::InterpreterThreadProc (LPVOID context)
-{
-	InterpreterList::Environment *env = (InterpreterList::Environment*)context;
-	Interpreter *interp = env->interp;
-	// interpreter loop
-	for (;;) {
-		interp->WaitExec(); // wait for execution permission
-		if (env->termInterp) break; // close thread requested
-		if (env->cmd) {
-			interp->RunChunk (env->cmd, strlen (env->cmd)); // run command from buffer
-			delete []env->cmd;
-			env->cmd = 0;
-			if (env->singleCmd) break;
-		} else {
-			interp->RunChunk ("", 0); // idle loop
-		}
-		if (interp->Status() == 1) break;
-		interp->EndExec();  // return control
-	}
-	interp->EndExec();  // return mutex (is this necessary?)
-	_endthreadex(0);
-	return 0;
-}
-
 
 // ==============================================================
 // class InterpreterList: implementation
 
 InterpreterList::InterpreterList (HINSTANCE hDLL): Module (hDLL)
 {
+	list = nullptr;
 	nlist = nbuf = 0;
 }
 
 InterpreterList::~InterpreterList ()
 {
 	while (nlist) DelInterpreter(list[0]);
+	delete []list;
 }
 
 void InterpreterList::clbkSimulationStart (RenderMode mode)
@@ -121,8 +57,7 @@ void InterpreterList::clbkPostStep (double simt, double simdt, double mjd)
 
 	for (i = 0; i < nlist; i++) { // let the interpreter do some work
 		if (list[i]->interp->IsBusy() || list[i]->cmd || list[i]->interp->nJobs()) {
-			list[i]->interp->EndExec();
-			list[i]->interp->WaitExec();
+			list[i]->Advance();
 		}
 	}
 }
@@ -135,12 +70,13 @@ void InterpreterList::clbkDeleteVessel (OBJHANDLE hVessel)
 InterpreterList::Environment *InterpreterList::AddInterpreter ()
 {
 	if (nlist == nbuf) { // increase buffer size
-		Environment **tmp = new Environment*[nbuf += 16];
+		Environment **tmp = new Environment*[nbuf + 16];
 		if (nlist) {
 			memcpy (tmp, list, nlist*sizeof(Environment*));
 			delete []list;
 		}
 		list = tmp;
+		nbuf += 16;
 	}
 
 	Environment *env = new Environment;
@@ -245,8 +181,7 @@ DLLCLBK bool opcExecScriptCmd (INTERPRETERHANDLE hInterp, const char *cmd)
 	env->cmd = str;
 	while (env->cmd) {
 		// wait until command has been executed
-		env->interp->EndExec();
-		env->interp->WaitExec();
+		env->Advance();
 	}
 	if (cmd_async) // restore the asynchronous request
 		env->cmd = cmd_async;

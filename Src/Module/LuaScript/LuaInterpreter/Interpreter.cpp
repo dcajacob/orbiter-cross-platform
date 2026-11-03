@@ -67,8 +67,10 @@ Interpreter::Interpreter ()
 	lua_pushlightuserdata (L, this);
 	lua_setfield (L, LUA_REGISTRYINDEX, "interp");
 
+#ifdef _WIN32
 	hExecMutex = CreateMutex (NULL, TRUE, NULL);
 	hWaitMutex = CreateMutex (NULL, FALSE, NULL);
+#endif
 
 }
 
@@ -112,8 +114,10 @@ Interpreter::~Interpreter ()
 {
 	lua_close (L);
 
+#ifdef _WIN32
 	if (hExecMutex) CloseHandle (hExecMutex);
 	if (hWaitMutex) CloseHandle (hWaitMutex);
+#endif
 }
 
 void Interpreter::Initialise ()
@@ -679,40 +683,6 @@ void Interpreter::lua_pushsketchpad (lua_State *L, oapi::Sketchpad *skp)
 	luaL_getmetatable (L, "SKP.vtable");
 	lua_setmetatable (L, -2);
 #endif
-}
-
-void Interpreter::WaitExec (DWORD timeout)
-{
-	// Called by orbiter thread or interpreter thread to wait its turn
-	// Orbiter waits for the script for 1 second to return
-	WaitForSingleObject (hWaitMutex, timeout); // wait for synchronisation mutex
-	WaitForSingleObject (hExecMutex, timeout); // wait for execution mutex
-	ReleaseMutex (hWaitMutex);              // release synchronisation mutex
-}
-
-void Interpreter::EndExec ()
-{
-	// called by orbiter thread or interpreter thread to hand over control
-	ReleaseMutex (hExecMutex);
-}
-
-void Interpreter::frameskip (lua_State *L)
-{
-	if (status == 1) { // termination request
-		lua_pushboolean(L, 1);
-		lua_setfield (L, LUA_GLOBALSINDEX, "wait_exit");
-	} else {
-		EndExec();
-		WaitExec();
-	}
-}
-
-int Interpreter::ProcessChunk (const char *chunk, int n)
-{
-	WaitExec();
-	int res = RunChunk (chunk, n);
-	EndExec();
-	return res;
 }
 
 int Interpreter::RunChunk (const char *chunk, int n)
@@ -8876,7 +8846,7 @@ int Interpreter::noteSetColour (lua_State *L)
 }
 
 
-RECT Interpreter::lua_torect(lua_State* L, int idx)
+oapi::SdkRectangle Interpreter::lua_torect(lua_State* L, int idx)
 {
 	RECT r;
 	lua_getfield(L, idx, "left");
@@ -10720,7 +10690,7 @@ int Interpreter::ntv_set(lua_State *L) {
 	return 0;
 }
 
-void Interpreter::push_indexarray(lua_State *L, WORD *idx, int nIdx)
+void Interpreter::push_indexarray(lua_State *L, oapi::UInt16 *idx, int nIdx)
 {
 	index_data *array = (index_data *)lua_newuserdata(L, sizeof(index_data));
     

@@ -1340,7 +1340,7 @@
     },
     "Src/Module/LuaScript/Native/CMakeLists.txt": {
       "original_sha256_lf": null,
-      "sha256_lf": "7d0191c7caa0debea69654e4b6524f9eebe224fe1f767d85be16d34249e41708"
+      "sha256_lf": "41f550b103858fc36f38d607f08159d90ead104c649cb2727873677f87e8c0ac"
     },
     "Src/Vessel/Common/Instrument.cpp": {
       "original_sha256_lf": "a358cf68cc90de24b398d431ef38f559c91c12ca6d577cc9dd1e2954b37bd869",
@@ -1409,6 +1409,50 @@
     "Src/Vessel/DeltaGlider/ScramSubsys.h": {
       "original_sha256_lf": "df5e4e4b970574f5c19224e9466688967bbbbfb2f295024a5fd5853082e807b8",
       "sha256_lf": "6db7fc2d03e37b2a5ceaa3b33633053899793a013b7043ffee66c94943c39918"
+    },
+    "Src/Module/LuaScript/LuaInline/CMakeLists.txt": {
+      "original_sha256_lf": "91e3a771eafff2ac872adb4f12403b30f501bdc269d21f94d829a6e03ab1db4e",
+      "sha256_lf": "6514f219ba995fd2a4ee1528adf011a058893a5af6f6619b39f75fa18bc7cee0"
+    },
+    "Src/Module/LuaScript/LuaInline/LuaInline.cpp": {
+      "original_sha256_lf": "14af77c844214a0969797568ab23a8e91c4a15d36725e6b28197cbdd99aecdc2",
+      "sha256_lf": "f09ea4fb96aead60bcdd0ea42eb6f3a2997dba9bef9313cf78973a145d4ed21b"
+    },
+    "Src/Module/LuaScript/LuaInline/LuaInline.h": {
+      "original_sha256_lf": "521af5e29a83a07db482e2d1bfa31111eb341ef44975c84015efbba8c2841eb5",
+      "sha256_lf": "e090299cef3c0a7b6486adafd4550e5388b122a9fc547cd5cafd589653b68eef"
+    },
+    "Src/Module/LuaScript/LuaInterpreter/CMakeLists.txt": {
+      "original_sha256_lf": "b4d55fafeec01574dff7cc97cd35d6cbf908e782b873753b8244a4f3d035d132",
+      "sha256_lf": "aac987307ece4cda856b6d81c8c0272ccde7193c30db7532821e6da2cf52c98b"
+    },
+    "Src/Module/LuaScript/LuaInterpreter/Interpreter.cpp": {
+      "original_sha256_lf": "5feef015089ca4cb3abc2d7197877352e64ade7ca3c98e5c066cd5a252fd74ee",
+      "sha256_lf": "6ecf01178ea800c96b5fc7f4cb8aca9661ab9570f6312dba67a0a22c71132ce2"
+    },
+    "Src/Module/LuaScript/LuaInterpreter/Interpreter.h": {
+      "original_sha256_lf": "0fb3247edcc0c088756b20e4e77fca5086b122720e70251c32efbf83f8ab07b0",
+      "sha256_lf": "c1ef7eb877b5bce68a3843d113b2dacd151e173e3fd1b12b23aa92b6dfbf30d2"
+    },
+    "Src/Module/LuaScript/LuaInterpreter/lua_vessel_mtd.cpp": {
+      "original_sha256_lf": "8649b937f2d189207143af45ff0d7d9f585095c2acfcbbdd8c92c308a8808e29",
+      "sha256_lf": "60e445ced10e464930432ff6cf98e2dd91ade54ea63a0bd2afda44bd44659d37"
+    },
+    "Src/Module/LuaScript/LuaInline/InlineEnvironment.cpp": {
+      "original_sha256_lf": null,
+      "sha256_lf": "bff3c6a7bb8a2051bb5e0abbc24385221121c4d4c993f5aeaaff79294a4416ac"
+    },
+    "Src/Module/LuaScript/LuaInline/InlineEnvironment.h": {
+      "original_sha256_lf": null,
+      "sha256_lf": "0fe7ad1302cde01d9159648f8bec6e24f44fdb196ba02f1b6502b171b86f2ecf"
+    },
+    "Src/Module/LuaScript/LuaInterpreter/InterpreterExecution.cpp": {
+      "original_sha256_lf": null,
+      "sha256_lf": "5849df572ca202d68ec304f763fe62c3e12634ec90a80648ed2fbe31819127f7"
+    },
+    "Src/Module/LuaScript/Native/ExecutionHandoff.h": {
+      "original_sha256_lf": null,
+      "sha256_lf": "294bc00deb2d2deee5f3019c4469b0593361a5bc691eec9e9510c8c20686d90e"
     }
   }
 }

@@ -2,7 +2,7 @@ name: Native Production OpenGL External View
 on:
   push:
     branches: ['codex/production-**']
-    paths: ['Src/Orbiter/**', 'Src/Celbody/**', 'Src/Vessel/ShuttlePB/**', 'Extern/ReferenceMath/**', 'OVP/OGLClient/**', 'Orbitersdk/**', 'Tests/Production/**', '.github/workflows/native-production-client.yml']
+    paths: ['Src/Orbiter/**', 'Src/Celbody/**', 'Src/Vessel/ShuttlePB/**', 'Src/Vessel/DeltaGlider/**', 'Src/Vessel/Common/**', 'Src/Module/LuaScript/**', 'Extern/Lua/**', 'Extern/ReferenceMath/**', 'OVP/OGLClient/**', 'Orbitersdk/**', 'Tests/Production/**', '.github/workflows/native-production-client.yml']
   workflow_dispatch:
 permissions:
   contents: read
@@ -35,6 +35,13 @@ jobs:
           cmake -S Src/Orbiter/Production/Math -B out/native-math -G Ninja -DCMAKE_BUILD_TYPE=${{ matrix.configuration }} 2>&1 | tee native-math-configure.log
           cmake --build out/native-math --parallel 2 2>&1 | tee native-math-build.log
           ctest --test-dir out/native-math --output-on-failure 2>&1 | tee native-math-verification.log
+      - name: Build the pinned native Lua library, interpreter worker and handoff test
+        shell: bash
+        run: |
+          set -euo pipefail
+          cmake -S Src/Module/LuaScript/Native -B out/native-lua -G Ninja -DCMAKE_BUILD_TYPE=${{ matrix.configuration }} 2>&1 | tee native-lua-configure.log
+          cmake --build out/native-lua --parallel 2 2>&1 | tee native-lua-build.log
+          ctest --test-dir out/native-lua --output-on-failure 2>&1 | tee native-lua-verification.log
       - name: Build actual production engine and source-built stock/celestial modules
         shell: bash
         run: |

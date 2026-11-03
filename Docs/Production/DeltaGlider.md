@@ -53,3 +53,19 @@ elements use the production CPU mesh append operation and device-specific
 mesh edits. The regression also advances the original `AnimState2` actuator,
 writes its stock scenario line, reloads it and closes it at the original rate.
 These component checks precede execution by the complete Delta-glider module.
+
+The native Lua build compiles the original interpreter's execution methods
+and the LuaInline worker. Its handoff gives the simulator initial ownership,
+supports nested waits and transfers execution to one worker per interpreter.
+The local concurrency test completed 10,000 round trips per run and passed
+20 consecutive runs. The native worker joins at shutdown. The full interpreter
+bindings, module loading, original script execution and SDK timing comparisons
+are still pending.
+
+The five-case Windows Lua capture at ece22d20 passed both repeats in each
+configuration. The cross-build check remained open. In atmospheric DG flight
+the largest Debug/Release elevator difference was 7.12e-16 and the largest
+aileron difference was 2.43e-16. The other four cases had identical control
+traces. The next capture uses one Windows host and records the stock script's
+intermediates without advancing the interpreter or changing its arithmetic.
+The exact cross-build check remains in force.

@@ -10,8 +10,13 @@ extern "C" {
 #include <lua/lauxlib.h>
 }
 
+#ifdef _WIN32
 #include "OrbiterAPI.h"
 #include "VesselAPI.h" // for TOUCHDOWNVTX
+#else
+#include "NativeVesselAPI.h"
+#include "../Native/ExecutionHandoff.h"
+#endif
 #include <unordered_set>
 
 class gcCore;
@@ -50,7 +55,9 @@ class gcCore;
 
 #define ASSERT_MINPRMCOUNT(L,n) ASSERT_SYNTAX(lua_gettop(L) >= n, "Too few arguments")
 
-#ifdef INTERPRETER_IMPLEMENTATION
+#if !defined(_WIN32)
+#define INTERPRETERLIB __attribute__((visibility("default")))
+#elif defined(INTERPRETER_IMPLEMENTATION)
 #define INTERPRETERLIB DLLEXPORT
 #else
 #define INTERPRETERLIB DLLIMPORT
@@ -143,7 +150,7 @@ public:
 	 * \note This is called by either the orbiter thread or the interpreter
 	 *   thread when they are waiting to regain execution control.
 	 */
-	virtual void WaitExec (DWORD timeout = INFINITE);
+	virtual void WaitExec (oapi::UInt32 timeout = ~oapi::UInt32(0));
 
 	/**
 	 * \brief Release thread execution.
@@ -299,7 +306,7 @@ protected:
 	// pops an OBJHANDLE from the stack
 	static OBJHANDLE lua_toObject (lua_State *L, int idx=-1);
 
-	static RECT lua_torect(lua_State* L, int idx);
+	static oapi::SdkRectangle lua_torect(lua_State* L, int idx);
 
 	// pushes a vessel object on the stack
 	static void lua_pushvessel (lua_State *L, VESSEL *v);
@@ -1115,7 +1122,7 @@ protected:
 	static int idx_get(lua_State *L);
 	static int idx_set(lua_State *L);
 	static int idx_collect(lua_State *L);
-	static void push_indexarray(lua_State *L, WORD *, int);
+	static void push_indexarray(lua_State *L, oapi::UInt16 *, int);
 
 
 	friend int OpenHelp (void *context);
@@ -1152,8 +1159,12 @@ protected:
 #endif
 
 private:
+#ifdef _WIN32
 	HANDLE hExecMutex; // flow control synchronisation
 	HANDLE hWaitMutex;
+#else
+	ExecutionHandoff execution;
+#endif
 	static inline gcCore *pCore;
 	static inline bool gcCoreInitialized = false;
 
@@ -1205,7 +1216,7 @@ private:
 	// checks whether stack entry idx is a VESSELSTATUS or a VESSELSTATUS2
 	static int lua_get_vesselstatus_version (lua_State *L, int idx);
 
-	static OAPI_MSGTYPE MsgProcMFD(UINT msg, UINT mfd, WPARAM wparam, LPARAM lparam);
+	static oapi::CockpitMessageResult MsgProcMFD(oapi::UInt msg, oapi::UInt mfd, oapi::CockpitUnsignedParam wparam, oapi::CockpitSignedParam lparam);
 };
 
 #endif // !__INTERPRETER_H

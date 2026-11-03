@@ -7,6 +7,7 @@ set(BUILD_OUT_DIR ${CMAKE_CURRENT_BINARY_DIR}/out)
 
 add_library(LuaInterpreter SHARED
         Interpreter.cpp
+        InterpreterExecution.cpp
         lua_vessel_mtd.cpp
 )
 
