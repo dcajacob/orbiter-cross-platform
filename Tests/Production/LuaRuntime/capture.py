@@ -37,7 +37,12 @@ def validate(directory,case):
     require(len(control)==61,'Incomplete original AAP controls')
     if case['target']=='DG':
         require(any(abs(float(row['elevator']))>0 or abs(float(row['aileron']))>0 for row in control if 31<=int(row['tick'])<=45),'Original AAP did not actuate stock control surfaces')
-        require(all(float(row['elevator'])==0 and float(row['aileron'])==0 for row in control if int(row['tick'])>=46),'Original AAP stop did not release controls')
+        # The post-step stop clears the demands. Actual stock surfaces slew
+        # back from saturation by 0.25 per subsequent quarter-second frame.
+        for row in control[46:]:
+            remaining=max(0.,1.-.25*(int(row['tick'])-46))
+            require(float(row['elevator'])==-remaining and float(row['aileron'])==remaining,
+                    'Original AAP surface rundown differs: '+row['tick'])
     return dict(events=len(events),environment_isolation=True,frame_yielding=True,aap_controls=case['target']=='DG')
 
 

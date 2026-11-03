@@ -37,6 +37,7 @@ class Driver final : public oapi::Module {
     std::ofstream state, events, inputs, ui, callbacks;
     HWND window = nullptr;
     ImGuiID clockHook = 0;
+    ImGuiContext* clockOwner = nullptr;
     unsigned frames = 0;
     int left = 1;
     bool initialized = false;
@@ -171,7 +172,8 @@ public:
                 ImGuiContextHook hook;
                 hook.Type = ImGuiContextHookType_NewFramePre;
                 hook.Callback = [](ImGuiContext*, ImGuiContextHook*) { ImGui::GetIO().DeltaTime = 0.25f; };
-                clockHook = ImGui::AddContextHook(ImGui::GetCurrentContext(), &hook);
+                clockOwner = ImGui::GetCurrentContext();
+                clockHook = ImGui::AddContextHook(clockOwner, &hook);
                 std::ofstream("ui-clock.json") << "{\"seconds_per_frame\":0.25,\"scope\":\"test-only ImGui frame clock\"}\n";
                 window = FindWindowA("Orbiter Render Window", nullptr);
                 DWORD process = 0;
@@ -195,7 +197,11 @@ public:
         });
     }
     void clbkSimulationEnd() override {
-        guarded([&] { require(frames == 60, "Incomplete UI reference"); ImGui::RemoveContextHook(ImGui::GetCurrentContext(),clockHook); clockHook=0; started = false; events.flush(); std::ofstream("cockpit-complete.txt") << frames << '\n'; });
+        guarded([&] { require(frames == 60, "Incomplete UI reference");
+            // The original close path normally destroys the context before this callback.
+            if (clockOwner && ImGui::GetCurrentContext() == clockOwner)
+                ImGui::RemoveContextHook(clockOwner,clockHook);
+            clockOwner=nullptr; clockHook=0; started = false; events.flush(); std::ofstream("cockpit-complete.txt") << frames << '\n'; });
     }
 };
 void observe(const char* phase, const char* object, double seconds, double mjd, int running) {
