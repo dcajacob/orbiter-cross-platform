@@ -55,7 +55,7 @@ public:
     void core(const char* phase,int running) {guarded([&] {
         if(started && std::string(phase)=="app.frame.end") {
             require(initialized && running,"Unexpected original camera frame state");
-            ++frames;Camera(camera,frames);State(state,frames);
+            ++frames;camera_fixture::Camera(camera,frames);State(state,frames);
         }
     });}
     void clbkSimulationEnd()override {guarded([&] {

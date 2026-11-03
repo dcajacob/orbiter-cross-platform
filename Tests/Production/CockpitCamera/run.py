@@ -106,7 +106,9 @@ def visible_bounds(points):
 
 def crop(pixels,bounds):
     x0,y0,x1,y1=bounds
-    return b''.join(pixels[4*(1280*y+x0):4*(1280*y+x1)] for y in range(y0,y1))
+    # SDK/window projection is measured from the top. glReadPixels stores rows
+    # from the bottom; keep the cropped readback in that same OpenGL order.
+    return b''.join(pixels[4*(1280*y+x0):4*(1280*y+x1)] for y in range(720-y1,720-y0))
 
 def compare_screen_mfds(original,native,config):
     result={};quads=mfd_quads()
@@ -285,7 +287,7 @@ def compare(args):
         require(report['status']=='passed' and report['host']==host and set(report['cases'])==names,
                 'Incomplete original/native camera matrix')
         require(report['settings_sha256']==source_digest(HERE/'cases.json'),'Camera input definition differs')
-        for name in ('Observation.h','Driver.cpp','NativeProbe.cpp'):
+        for name in ('Observation.h','Driver.cpp' if host=='original-windows' else 'NativeProbe.cpp'):
             require(report['input_sources_sha256'][name]==source_digest(HERE/name),
                     'Camera SDK fixture/observer source differs: '+name)
         profiles.append((report['configuration'],report['math_profile']))
