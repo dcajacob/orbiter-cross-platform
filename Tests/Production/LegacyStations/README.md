@@ -61,8 +61,8 @@ objects, to reject twelve damaged copies. Missing background objects, ports or
 ticks, duplicate ports, altered capabilities, nonfinite state, shifted time,
 changed scenario bytes or line endings, incomplete teardown and a wrong renderer
 must fail while the original remains unchanged.
-`AuditIdentity.Test.py` additionally rejects seven forged archive, producer,
-build, reported/raw math and loaded-application identities.
+`AuditIdentity.Test.py` additionally checks eight forged archive, producer,
+build, reported/raw math, actual launch argument and loaded-application identities.
 
 ```sh
 python3 -B Tests/Production/LegacyStations/original.py --verify-inputs

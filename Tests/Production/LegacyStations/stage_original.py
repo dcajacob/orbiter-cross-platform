@@ -1,6 +1,6 @@
 """Stage the preserved Windows package with original scenario and recording names."""
 import json
-from pathlib import Path
+from pathlib import PureWindowsPath
 import shutil
 import subprocess
 
@@ -31,7 +31,8 @@ def run(executable,data,planets,directory,config,case,configure):
     (directory/'Orbiter.cfg').write_text(cfg+'\nVesselCollision = FALSE\nBaseCollision = TRUE\nUnlimitedFuel = FALSE\n',encoding='ascii')
     stage_recordings(ROOT,directory,case,config)
     configure(directory)
-    scenario=Path(case['scenario']).with_suffix('').as_posix()
+    # The preserved recorder strips only Windows separators when choosing Flights/<name>.
+    scenario=str(PureWindowsPath(case['scenario']).with_suffix(''))
     argv=[str(directory/executable.name),'--scenariox='+scenario,f"--fixedstep={config['fixed_step']:.17g}",f"--maxframes={config['frames']}"]
     inputs={p.relative_to(directory).as_posix():digest(p) for name in ('Config','Meshes','Scenarios','Flights')
             for p in (directory/name).rglob('*') if p.is_file()}

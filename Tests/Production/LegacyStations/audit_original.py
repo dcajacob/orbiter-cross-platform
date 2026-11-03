@@ -150,6 +150,9 @@ def audit_profile(base,profile,config,producer,preserved_root=None,metadata=None
             require(all(recorded[key]==value for key,value in actual.items()),'Recomputed original legacy process outcome differs')
             invocation=json.loads((out/'invocation.json').read_text())
             require(invocation['driver_sha256']==report['observer_sha256'],'Original staged legacy observer differs')
+            require([arg for arg in invocation['argv'] if arg.startswith('--scenariox=')]==
+                    ['--scenariox='+str(PureWindowsPath(case['scenario']).with_suffix(''))],
+                    'Actual original scenario argument differs from its Windows-native entry point')
             for name,expected in config['resources_sha256_lf'].items():
                 # Before execution, stage() hashes all raw config/mesh bytes.
                 frozen=subprocess.check_output(['git','-C',str(ROOT),'show',config['application_source']+':'+name])

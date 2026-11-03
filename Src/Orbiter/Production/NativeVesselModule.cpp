@@ -45,13 +45,24 @@ bool Vessel::LoadModule(std::ifstream& config)
     hMod=nullptr;ClearModule();
     flightmodel=GetSurfaceServices().Configuration().CfgLogicPrm.FlightModelLevel;
     char name[256];
-    if(GetItemString(config,"Module",name)) {
-        RegisterModule(name);
-        return true;
+    try {
+        if(GetItemString(config,"Module",name)) {
+            RegisterModule(name);
+            return true;
+        }
+        // Config-driven stock vessels such as ISS intentionally have no DLL.
+        modIntf.v=new VESSEL(this,flightmodel);modIntf.coreCreated=true;
+        return false;
+    } catch(...) {
+        // All three constructors call this after the default allocations and
+        // before class capabilities. Their Vessel destructor will not run if
+        // module loading throws; LoadedVessel already owns any loader state.
+        ClearTouchdownPoints();
+        delete[]forcevec;forcevec=nullptr;
+        delete[]forcepos;forcepos=nullptr;
+        delete[]classname;classname=nullptr;
+        throw;
     }
-    // Config-driven stock vessels such as ISS intentionally have no DLL.
-    modIntf.v=new VESSEL(this,flightmodel);modIntf.coreCreated=true;
-    return false;
 }
 bool Vessel::RegisterModule(const char* name)
 {

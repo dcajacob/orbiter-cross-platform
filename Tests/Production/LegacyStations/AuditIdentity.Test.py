@@ -31,7 +31,8 @@ def main():
     rejected('missing_observer_source',lambda:producer_sources(missing,a.producer_commit))
     with tempfile.TemporaryDirectory(prefix='orbiter-original-legacy-identity-') as temporary:
         root=Path(temporary)
-        for control in ('forged_decoded_capture','wrong_build_CRT','forged_reported_CRT','forged_raw_CRT','forged_loaded_application'):
+        for control in ('forged_decoded_capture','wrong_build_CRT','forged_reported_CRT','forged_raw_CRT',
+                        'forged_actual_scenario_argument','forged_loaded_application'):
             out=root/control;out.mkdir()
             for file in a.profile.rglob('*'):
                 if file.is_file():
@@ -57,6 +58,13 @@ def main():
                 name='legacy-stations-original/'+first+'-1/math-profile.txt'
                 value='sse2' if recorded['actual_math']=='fma3' else 'fma3'
                 replace(name,(value+'\n').encode());recorded['files_sha256']['math-profile.txt']=digest(out/name)
+            elif control=='forged_actual_scenario_argument':
+                name='legacy-stations-original/'+first+'-1/invocation.json'
+                invocation=json.loads((out/name).read_text())
+                invocation['argv']=[('--scenariox=Other' if value.startswith('--scenariox=') else value)
+                                    for value in invocation['argv']]
+                replace(name,(json.dumps(invocation,indent=2)+'\n').encode())
+                recorded['files_sha256']['invocation.json']=digest(out/name)
             else:
                 application=next(item for item in recorded['loaded_modules'] if Path(item['path'].replace('\\','/')).name.lower()=='orbiter.exe')
                 application['sha256']='0'*64
@@ -66,7 +74,7 @@ def main():
             'Original legacy identity controls changed the owning reference')
     result.update(status='passed',rejected_controls=len(result['controls']),original_capture_unchanged=True)
     a.output.write_text(json.dumps(result,indent=2)+'\n')
-    print('Seven original legacy reference identity controls rejected; owning reference unchanged')
+    print('Eight original legacy reference identity controls rejected; owning reference unchanged')
 
 
 if __name__=='__main__':main()
