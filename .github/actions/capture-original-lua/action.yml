@@ -23,7 +23,7 @@ runs:
         Get-CimInstance Win32_Processor | Select-Object Manufacturer, Name, Architecture | ConvertTo-Json | Set-Content cpu.json
         python -B "$root/Tests/Production/CockpitControls/prepare.py" --configuration $env:BUILD --cache "$root/out/cockpit-cache" --output out/original-app
         if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-        cmake -S "$root/Tests/Production/LuaRuntime" -B out/control-driver -G Ninja -DCMAKE_BUILD_TYPE=$env:BUILD -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DORBITER_TEST_RUNTIME="$pwd/out/original-app" 2>&1 | Tee-Object control-configure.log
+        cmake -S "$root/Tests/Production/LuaRuntime" -B out/control-driver -G Ninja "-DCMAKE_BUILD_TYPE=$env:BUILD" -DCMAKE_EXPORT_COMPILE_COMMANDS=ON "-DORBITER_TEST_RUNTIME=$pwd/out/original-app" 2>&1 | Tee-Object control-configure.log
         if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
         cmake --build out/control-driver --parallel 2 2>&1 | Tee-Object control-build.log
         if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
