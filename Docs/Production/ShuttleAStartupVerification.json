@@ -1,0 +1,137 @@
+{
+  "schema": 1,
+  "status": "scoped-candidate-checks-passed",
+  "phase6_complete": false,
+  "shuttle_a_support_qualified": false,
+  "port_code_commit": "778b6c5848e86ca4cc2d277c20b623b1e056b075",
+  "cleanup_code_commit": "2d9367c5abc72da406cefd10164c8fbd980b5a0c",
+  "source_conservation": {
+    "original_application": "f725194209634f7fd5d1d44d426cfa9b5e303e37",
+    "original_shuttle_a_files": 40,
+    "extraction_ledger_files": 477,
+    "method": "Explicit platform adaptations only; attachment cleanup changes exactly two destructor lines from the port revision.",
+    "controls": {
+      "path": "out/phase6-shuttle-a-attachment-source-controls.json",
+      "sha256": "fc0759c53dab22dee295831f1048b0f048075f7be4b4b78f7c55ce3dcc509b3c",
+      "status": "passed"
+    }
+  },
+  "build_reports": {
+    "phase6-shuttle-a-build-normal": {
+      "path": "out/phase6-shuttle-a-build-normal/build.json",
+      "sha256": "dade8aad94bdcc65803029cc34ad1b03b1c5f540b255a3f8c47894b7a5e27709",
+      "status": "built"
+    },
+    "phase6-shuttle-a-build-asan": {
+      "path": "out/phase6-shuttle-a-build-asan/build.json",
+      "sha256": "e9c6a4c652c95bf3f75056cbc7e59dbfdae1fb51285fcc4a5e97a7f76f01d50b",
+      "status": "built"
+    },
+    "phase6-shuttle-a-attach-build-normal": {
+      "path": "out/phase6-shuttle-a-attach-build-normal/build.json",
+      "sha256": "3965adf6e25bbd8783263e6674a6dcf8c06650f999b8172b4e664f60ee2f3a13",
+      "status": "built"
+    },
+    "phase6-shuttle-a-attach-build-asan": {
+      "path": "out/phase6-shuttle-a-attach-build-asan/build.json",
+      "sha256": "6fbc299f2568e82b5fd158a126a858e69aa7bb78c7bdab3939bcbe6964f62026",
+      "status": "built"
+    }
+  },
+  "retained_baseline_leaks": {
+    "code_commit": "778b6c5848e86ca4cc2d277c20b623b1e056b075",
+    "cases": {
+      "Shuttle-A/Shuttle-A Docked at ISS.scn": {
+        "bytes": 36,
+        "allocations": 6,
+        "console_sha256": "31e0b106ee36de0c02d2cbe86b93a5d222f2d565746f1329a299176cfb9fe82d"
+      },
+      "Shuttle-A/Shuttle-A Drop.scn": {
+        "bytes": 36,
+        "allocations": 6,
+        "console_sha256": "7b3517d6071e45367c24442f50d510e27860ebcfb9ea13ada941021c2ac646ca"
+      },
+      "Shuttle-A/Shuttle-A Launch.scn": {
+        "bytes": 36,
+        "allocations": 6,
+        "console_sha256": "145b0add0d64f351266725efe1af68b1fd97de57da370492d3e2d9808046313f"
+      },
+      "Shuttle-A/Shuttle-A Moon.scn": {
+        "bytes": 36,
+        "allocations": 6,
+        "console_sha256": "dfe242d470e81ad32a8d5dbf056ac1ce8aaf39ea08a22efe3bc654690610c84e"
+      }
+    },
+    "cause": "Six owned pending parent-name strings per payload scene survive rejection before InitSupervessel consumes them."
+  },
+  "startup": {
+    "verification": {
+      "path": "out/phase6-shuttle-a-attach-startup/verification.json",
+      "sha256": "6441a951b92b566839b6376e64566e2bd36957083b716aa0ce762f50f111d365",
+      "status": "passed"
+    },
+    "unchanged_scenarios": 10,
+    "rendered_frames": 0,
+    "expected_exit_code": 1,
+    "sanitizer_findings": 0,
+    "meaning": "Original module initialization and clean rejection at the unchanged capability gate; these scenarios remain failures in stock acceptance."
+  },
+  "healthy_lifetime": {
+    "verification": {
+      "path": "out/phase6-shuttle-a-attach-lifetime/verification.json",
+      "sha256": "17cb6e367fc3af07562d231e6b44e229d71bee7caee895429ea477ffa3d36019",
+      "status": "passed"
+    },
+    "original_windows_flight_comparisons": 8,
+    "native_processes": 9,
+    "sessions": 20,
+    "session_presents": 1200,
+    "sanitizer_findings": 0,
+    "actual_private_fontconfig_gdk_mappings_verified": true,
+    "mesa_note": "Requested pinned Mesa in LD_LIBRARY_PATH; these early mapping snapshots do not prove its later-loaded driver mappings."
+  },
+  "station_regression": {
+    "code_commit": "778b6c5848e86ca4cc2d277c20b623b1e056b075",
+    "comparison": {
+      "path": "out/phase6-shuttle-a-release-regressions/station-comparison.json",
+      "sha256": "158e3d89785284e1c3af972bd816a99a0fdf4dd8d3a508f565bc4f8a531bf0e0",
+      "status": "passed"
+    },
+    "processes": 14,
+    "presents": 840,
+    "minimum_ssim": 0.9846069047379694,
+    "original_capture_compatibility_audit": {
+      "path": "out/phase6-shuttle-a-station-original-regression.json",
+      "sha256": "2e1abd8dabbdcee7e1bcce52f2557790c63ab7e92f7d6d6b7f39c060eff4f6a0",
+      "status": "passed"
+    }
+  },
+  "canonical_local_archive": {
+    "status": "verified",
+    "path": "out/phase6-shuttle-a-initial-evidence-v1.tar.gz",
+    "bytes": 121654119,
+    "sha256": "98ea203c928212754b908d59d39aa282a1ae6b54505dc8c24cd21b68c67002a0",
+    "members": 3206,
+    "index_sha256": "d16b02a6afff5392d93785588b5e9986d28d34396984719e4db5d0e5a20cfd9f",
+    "code_commit": "2d9367c5abc72da406cefd10164c8fbd980b5a0c",
+    "phase6_complete": false,
+    "remote_published": false
+  },
+  "open_gates": {
+    "original_windows_shuttle_a": {
+      "run": 41699732070,
+      "url": "https://github.com/dcajacob/orbiter-cross-platform/actions/runs/41699732070",
+      "status": "all-four-captures-passed; downloaded-artifact-audit-running",
+      "producer_commit": "778b6c5848e86ca4cc2d277c20b623b1e056b075",
+      "audit_path": "out/phase6-shuttle-a-original-audit.json"
+    },
+    "current_full_instrumented_corpus": "running separately; not included in this completed targeted evidence bundle",
+    "native_shuttle_a_state_image_input_payload_qualification": "pending",
+    "native_shuttle_a_scenario_editor": "pending",
+    "current_hosted_four_profiles": "pending",
+    "wall_clock_today_semantics": "unverified",
+    "physical_controller": "unavailable per user; unverified",
+    "final_hardware_performance": "pending",
+    "remote_archive_preservation": "pending"
+  }
+}

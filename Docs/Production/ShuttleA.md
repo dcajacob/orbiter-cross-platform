@@ -31,5 +31,40 @@ before admitting native capabilities.
 
 See [the fixture and commands](../../Tests/Production/ShuttleA/README.md).
 Native state/image comparison, interactive Shuttle-A controls, payload
-deployment and sanitizer lifetime checks remain pending. The Windows-specific
+deployment and Shuttle-A flight/cockpit lifetime checks remain pending. The Windows-specific
 Shuttle-A scenario-editor page also needs a native UI implementation.
+
+Local integration checks now pass for the compiled candidate `778b6c58`:
+14 existing station sessions match the original Windows state/image captures,
+with 840 presentations and unchanged budgets. The updated observer also
+re-audits all 56 original station sessions successfully. This protects the
+existing integration scope while Shuttle-A qualification is pending.
+
+Sanitizers then exposed a startup leak in four payload scenes: each retains
+six parent-name strings, totalling 36 bytes, when rejection occurs before
+post-creation. Cleanup revision `2d9367c5` adds two destructor lines to release
+those pending names. The normal attachment initialization still consumes and
+clears them as before. No calculation, callback order or header layout changes.
+Source controls reject removal of the cleanup and an incorrect scalar delete.
+
+Fresh Release and sanitizer builds pass. All ten unchanged candidate scenes
+now reach the closed capability gate, exit with code 1 and delete their graphics
+contexts with zero sanitizer findings. They remain failed stock scenarios.
+The cleanup revision also passes eight original Windows flight comparisons
+in the established ShuttlePB docking, approach, attachment and lifetime fixtures,
+plus twenty sessions and
+1,200 presentations with clean sanitizer exits and identical states. Actual
+Fontconfig and GDK candidate mappings are retained for all nine processes.
+The pinned Mesa candidate was requested in the invocation; the early mapping
+snapshots do not prove the later driver mappings.
+
+The [machine-readable checkpoint](ShuttleAStartupVerification.json) records
+these scopes and their hashes. The verified local evidence archive is
+`out/phase6-shuttle-a-initial-evidence-v1.tar.gz`: 121,654,119 bytes,
+3,206 members, SHA-256
+`98ea203c928212754b908d59d39aa282a1ae6b54505dc8c24cd21b68c67002a0`.
+It retains both runtimes, the four leak cases, clean targeted captures, original
+comparisons, source controls and replay recipes. Remote preservation remains
+open. All four original Windows Shuttle-A capture jobs passed; their downloaded
+artifacts still need auditing before native qualification. The current full-corpus
+sweep is running separately and is not claimed as passed here.
