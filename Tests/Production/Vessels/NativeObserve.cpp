@@ -57,6 +57,7 @@ struct CameraHost final:CameraServices {
     Config& Configuration() const override {return environment.settings;}
     void SetFocus(Vessel*) override {throw std::runtime_error("Focus change outside camera component fixture");}
     void SetFOV(double value) override {camera->SetAperture(value);}
+    void IncFOV(double value) override {camera->IncrAperture(value);}
     bool SetPanelMode(int) override {throw std::runtime_error("No cockpit in camera component fixture");}
     void SelectPanel(int) override {throw std::runtime_error("No panel in camera component fixture");}
     void SelectVC(int) override {throw std::runtime_error("No VC in camera component fixture");}

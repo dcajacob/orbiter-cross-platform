@@ -282,7 +282,7 @@ void CreateCockpitGui() {
         if(std::filesystem::is_regular_file(context.evidence/"vc-picking.enabled")) {
             cameraLayout.open(context.evidence/"cockpit-camera.csv");
             cameraLayout.precision(17);
-            cameraLayout<<"tick,mode,internal,distance,phi,theta,aperture,x,y,z,m11,m12,m13,m21,m22,m23,m31,m32,m33\n";
+            cameraLayout<<"tick,mode,internal,distance,phi,theta,aperture,x,y,z,m11,m12,m13,m21,m22,m23,m31,m32,m33,mouse_rotation\n";
         }
         const auto& fonts = context.configuration->CfgFontPrm;
         auto load = [&](const char* file, const ImFontConfig* options = nullptr) {
@@ -414,6 +414,7 @@ void ObserveCockpitGui(unsigned tick) {
         cameraLayout<<tick<<','<<context.cockpitPane->GetPanelMode()<<','<<camera.IsInternal()<<','<<camera.Distance()<<','<<camera.Phi()<<','<<camera.Theta()<<','<<camera.Aperture();
         for(double value:{position.x,position.y,position.z})cameraLayout<<','<<value;
         for(double value:rotation.data)cameraLayout<<','<<value;
+        cameraLayout<<','<<context.cameraRotating;
         cameraLayout<<'\n';cameraLayout.flush();
     }
     if(panelLayout.is_open()) {

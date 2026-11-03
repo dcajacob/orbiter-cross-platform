@@ -38,6 +38,19 @@ def verify():
         raise ValueError('Original complete system camera/panel/FOV input changed')
     if read('Src/Orbiter/Production/CockpitFovInput.inc')!=body(original,'VOID Orbiter::IncFOV'):
         raise ValueError('Original FOV update and forced refresh changed')
+    from vessel_runtime_source import equal,span
+    steps=[]
+    for name in ('StepIncFOV','StepDecFOV'):
+        match=re.search(r'else if \((keymap\.IsLogicalKey\(key, kstate, OAPI_LKEY_'+name+r'\))\)\s+(SetFOV\([^\n]+);',original)
+        if not match:raise ValueError('Original stepped FOV key is missing: '+name)
+        steps.append('if ('+match[1]+') { '+match[2]+'; return true; }')
+    expected='''bool HandleCockpitStepFov(const Keymap& keymap,UInt32& key,char* kstate) {
+        auto* g_camera=GetNativeRenderContext().camera;
+        auto SetFOV=[](double value){GetCameraServices().SetFOV(value);};
+        '''+'\n'.join(steps)+'''\nreturn false;
+    }'''
+    source=read('Src/Orbiter/Production/NativeCameraMouse.cpp');a,b=span(source,'HandleCockpitStepFov')
+    equal(expected,source[a:b],'Original stepped FOV bindings, rounding, constants and update calls')
     begin=original.index('\t// main/retro/hover thruster settings',original.index('void Orbiter::KbdInputImmediate_OnRunning'))
     end=original.index('\n\t// left/right MFD control',begin)
     cbegin=current.index('\t// main/retro/hover thruster settings');cend=current.index('\n    }\n\tif (bEnableAtt)',cbegin)

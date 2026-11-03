@@ -11,7 +11,7 @@ endif()
 FetchContent_Declare(native_imgui URL "${_ui_url}" URL_HASH "SHA256=${_ui_hash}" DOWNLOAD_EXTRACT_TIMESTAMP TRUE SOURCE_SUBDIR no-build)
 FetchContent_MakeAvailable(native_imgui)
 target_sources(orbiter_production_vessels PRIVATE
-    NativeAnnotations.cpp NativeScript.cpp NativeInterpreterSdk.cpp NativeHelp.cpp NativeCockpitProjection.cpp NativeCockpitMfd.cpp NativeCockpitGui.cpp ../MenuInfoBar.cpp ../DlgFocus.cpp ../DlgMenuCfg.cpp ../DlgTacc.cpp ../DlgCamera.cpp ../DlgInfo.cpp ../DlgMap.cpp ../DlgOptions.cpp ../DlgFunction.cpp ../DlgRecorder.cpp ../PlaybackEd.cpp NativeCockpitCommands.cpp NativeCockpitVessel.cpp ../CockpitSdk.cpp ../Astro.cpp
+    NativeAnnotations.cpp NativeScript.cpp NativeInterpreterSdk.cpp NativeHelp.cpp NativeCockpitProjection.cpp NativeCockpitMfd.cpp NativeCockpitGui.cpp NativeCameraMouse.cpp ../MenuInfoBar.cpp ../DlgFocus.cpp ../DlgMenuCfg.cpp ../DlgTacc.cpp ../DlgCamera.cpp ../DlgInfo.cpp ../DlgMap.cpp ../DlgOptions.cpp ../DlgFunction.cpp ../DlgRecorder.cpp ../PlaybackEd.cpp NativeCockpitCommands.cpp NativeCockpitVessel.cpp ../CockpitSdk.cpp ../Astro.cpp
     ../Pane.cpp ../hud.cpp ../Defpanel.cpp ../Panel2D.cpp ../VCockpit.cpp ../Select.cpp
     ../Mfd.cpp ../MfdUser.cpp ../VectorMap.cpp ../MfdOrbit.cpp ../MfdSurface.cpp ../MfdMap.cpp ../MfdHsi.cpp
     ../MfdLanding.cpp ../MfdDocking.cpp ../MfdAlign.cpp ../MfdSync.cpp ../MfdTransfer.cpp ../MfdComms.cpp

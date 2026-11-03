@@ -154,10 +154,13 @@ struct Runtime final:BodyServices,RigidBodyServices,SurfaceServices,NavigationSe
         case RenderMouseAction::Move:break;
         }
         if(!down && button)paneMouseCapture&=~button;
+        // Original Orbiter::MouseEvent gives an active camera drag priority.
+        if(render.cameraRotating && render.camera->ProcessMouse(event,state,mouse.x,mouse.y,input.keys.data()))return true;
         if(CockpitGuiCapturesMouse())return true;
         bool consumed=running && cockpit->ProcessMouse_OnRunning(event,state,mouse.x,mouse.y,input.keys.data());
         if(!consumed)consumed=cockpit->ProcessMouse_System(event,state,mouse.x,mouse.y,input.keys.data());
         if(down && consumed)paneMouseCapture|=button;
+        if(!consumed)consumed=render.camera->ProcessMouse(event,state,mouse.x,mouse.y,input.keys.data());
         return consumed;
     }
     void CockpitSnapshot() {
@@ -481,6 +484,9 @@ struct Runtime final:BodyServices,RigidBodyServices,SurfaceServices,NavigationSe
             if(event.down) {
                 if(code==OAPI_KEY_SPACE || keymap.IsLogicalKey(code,snapshot.keys.data(),OAPI_LKEY_Pause)) {running=!running;render.paused=!running;continue;}
                 if(keymap.IsLogicalKey(code,snapshot.keys.data(),OAPI_LKEY_Quicksave)) {savePending=true;continue;}
+#ifdef ORBITER_NATIVE_COCKPIT
+                if(HandleCockpitStepFov(keymap,code,snapshot.keys.data()))continue;
+#endif
                 if(code==OAPI_KEY_F5 && !KEYMOD_CONTROL(snapshot.keys.data())) {reloadPending=true;continue;}
 #ifndef ORBITER_NATIVE_COCKPIT
                 if(code==OAPI_KEY_F6 && !KEYMOD_CONTROL(snapshot.keys.data())) {stepOnce=true;continue;}
@@ -923,6 +929,11 @@ struct Runtime final:BodyServices,RigidBodyServices,SurfaceServices,NavigationSe
     void DialogDeleteVessel(Vessel*) override {} // No dialogs are instantiated.
     void ConsoleDeleteVessel(Vessel*) override {} // No console view is instantiated.
     void SetFOV(double value) override {if(render.camera->Aperture()!=value){render.camera->SetAperture(value);force=true;}}
+    void IncFOV(double dfov) override {
+        auto* g_camera=render.camera;
+        auto& g_bForceUpdate=force;
+#include "CockpitFovInput.inc"
+    }
 #ifdef ORBITER_NATIVE_COCKPIT
     bool SetPanelMode(int mode) override {if(!cockpit)throw std::logic_error("Native cockpit is not initialized");return cockpit->SetPanelMode(mode);}
     void SelectPanel(int id) override {if(!cockpit)throw std::logic_error("Native cockpit is not initialized");cockpit->SelectPanel(id);}
@@ -933,7 +944,14 @@ struct Runtime final:BodyServices,RigidBodyServices,SurfaceServices,NavigationSe
     void SelectVC(int) override {unsupported("virtual cockpits yet");}
 #endif
     std::filesystem::path ScenarioPath(const char* name) const override {return name;}
-    Camera* CreateCamera() override {return render.camera=new Camera;}
+    Camera* CreateCamera() override {
+        auto camera=std::make_unique<Camera>();
+#ifdef ORBITER_NATIVE_COCKPIT
+        const auto point=render.graphics->CursorPosition();
+        camera->InitMousePosition(point.x,point.y);
+#endif
+        return render.camera=camera.release();
+    }
     PlanetarySystem* CreateSystem(const char* name) override {
         auto status=[](const char* text,int,void*) {std::clog<<text<<'\n';};
         return render.world=system=new PlanetarySystem(const_cast<char*>(name),&settings,status,nullptr);
@@ -1083,6 +1101,9 @@ struct Runtime final:BodyServices,RigidBodyServices,SurfaceServices,NavigationSe
 #else
         if(running)controls.Immediate(*render.focus,time,input);
 #endif
+#ifdef ORBITER_NATIVE_COCKPIT
+        render.camera->UpdateMouse();
+#endif
         Session::UpdateWorld(*this,time,running,playback,updating,force);
         Session::EndTimeStep(*this,time,running,active,force);
         if(!wasRunning)running=false;
@@ -1165,10 +1186,7 @@ int main(int argc,char** argv) {
                     application.input.x=input.flight.x;application.input.y=input.flight.y;application.input.rz=input.flight.rz;application.input.alternate=input.flight.alternate;
                     if(input.flight.throttle>=0)application.input.throttle=input.flight.throttle;
 #ifdef ORBITER_NATIVE_COCKPIT
-                    bool wheelConsumed=false;
-                    for(const auto& mouse:input.mouse) {const bool consumed=application.Mouse(mouse);if(mouse.action==RenderMouseAction::Wheel && consumed)wheelConsumed=true;}
-                    if(!application.paneMouseCapture && !CockpitGuiCapturesMouse()){application.render.camera->ShiftPhi(input.yaw);application.render.camera->ShiftTheta(input.pitch);}
-                    if(input.zoom && !wheelConsumed && !CockpitGuiCapturesMouse())application.render.camera->ChangeDist(std::pow(1.1,-input.zoom));
+                    for(const auto& mouse:input.mouse)application.Mouse(mouse);
 #else
                     application.render.camera->ShiftPhi(input.yaw);application.render.camera->ShiftTheta(input.pitch);
                     if(input.zoom)application.render.camera->ChangeDist(std::pow(1.1,-input.zoom));

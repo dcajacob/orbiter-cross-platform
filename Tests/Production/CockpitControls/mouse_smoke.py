@@ -27,6 +27,8 @@ def main():
     p.add_argument('--mechanisms',action='store_true',help='Also operate and quicksave all seven DG mechanisms with real keys')
     p.add_argument('--panel-mechanisms',action='store_true',help='Pan the original DG 2D panels and operate all seven mechanisms with real mouse input')
     p.add_argument('--vc-mechanisms',action='store_true',help='Aim the original VC camera and operate all seven mechanisms with real mouse input')
+    p.add_argument('--camera-mouse',action='store_true',help='Verify original camera mouse input and stepped FOV through the real window')
+    p.add_argument('--camera-check',choices=('all','drag','wheel','step'),default='all',help='Select a camera regression or negative-control probe')
     for name in ('executable','assets','data','modules','planets','output'):p.add_argument('--'+name,type=Path,required=True)
     a=p.parse_args();out=a.output.resolve();require(not out.exists(),'Mouse output exists; replacement is forbidden');out.mkdir(parents=True)
     (out/'mouse-driver.py').write_bytes(Path(__file__).read_bytes())
@@ -34,8 +36,8 @@ def main():
     require(not a.mechanisms or case['cockpit']!=1,'Mechanism input requires a DG panel or VC')
     require(not a.panel_mechanisms or case['cockpit']==2,'Panel mechanism input requires a DG 2D panel')
     require(not a.vc_mechanisms or case['cockpit']==3,'VC mechanism input requires a DG virtual cockpit')
-    require(sum((a.mechanisms,a.panel_mechanisms,a.vc_mechanisms))<=1,'Select one mechanism transport per session')
-    dg_input=a.mechanisms or a.panel_mechanisms or a.vc_mechanisms
+    require(sum((a.mechanisms,a.panel_mechanisms,a.vc_mechanisms,a.camera_mouse))<=1,'Select one extended input flow per session')
+    dg_input=a.mechanisms or a.panel_mechanisms or a.vc_mechanisms or a.camera_mouse
     points=[(85,136),(54,136)]
     reference=None
     if case['cockpit']!=1:
@@ -105,7 +107,7 @@ def main():
             if value==pid and title(window).startswith('Orbiter | '):return window
     def send(window,kind,code,state=0,px=1,py=1):
         event=Event();event.key=KeyEvent(kind,0,True,display,window,root,0,0,px,py,0,0,state,code,True)
-        require(x.XSendEvent(display,window,False,{2:1,3:2,4:4,5:8}[kind],C.byref(event))!=0,'Cannot send input to owned window');x.XFlush(display)
+        require(x.XSendEvent(display,window,False,{2:1,3:2,4:4,5:8,6:64}[kind],C.byref(event))!=0,'Cannot send input to owned window');x.XFlush(display)
     def key(window,name,down):
         code=x.XKeysymToKeycode(display,x.XStringToKeysym(name.encode()));require(code,'Unknown keyboard test key')
         send(window,2 if down else 3,code)
@@ -123,8 +125,12 @@ def main():
     (out/'cockpit.scn').write_text(text)
     (out/'Orbiter.cfg').write_text((ROOT/'Tests/Production/NativeScene/Orbiter.cfg').read_text()+'\nFPS = 0\nMenubarMode = 1\nInfobarMode = 1\nInstrumentUpdateInterval = 0.25\n')
     (out/'control-evidence.enabled').write_text('Actual owned X11 window mouse transport\n')
-    if a.panel_mechanisms:(out/'panel-picking.enabled').write_text('Read-only original panel geometry\n')
-    if a.vc_mechanisms:(out/'vc-picking.enabled').write_text('Read-only original VC camera geometry\n')
+    if a.panel_mechanisms or (a.camera_mouse and case['cockpit']==2):(out/'panel-picking.enabled').write_text('Read-only original panel geometry\n')
+    if a.vc_mechanisms or a.camera_mouse:(out/'vc-picking.enabled').write_text('Read-only original camera geometry\n')
+    if a.camera_mouse:
+        (out/'camera-pointer.enabled').write_text('Read-only actual pointer capture transitions\n')
+        (out/'ui-evidence.enabled').write_text('Camera input capture checks\n')
+        (out/'menu-evidence.enabled').write_text('Original Options input capture checks\n')
     argv=[str(a.executable.resolve())]
     for name in ('assets','data','modules','planets'):argv+=['--'+name,str(getattr(a,name).resolve())]
     keymap=ROOT/'Tests/Production/Flight'/('keymap-dg-laptop.cfg' if dg_input else 'keymap-laptop.cfg')
@@ -171,6 +177,7 @@ def main():
             bindings=None
             panel_mechanisms=None
             vc_mechanisms=None
+            camera_mouse=None
             panel_points=[]
             vc_points=[]
             if a.panel_mechanisms:
@@ -251,6 +258,10 @@ def main():
                 from window_vc import verify_focus
                 def transfer(target):x.XSetInputFocus(display,target,1,0);x.XSync(display,False)
                 vc_mechanisms['camera_focus']=verify_focus(out,window,focus_sink,key,transfer,focused)
+            if a.camera_mouse:
+                from window_camera import verify
+                def transfer(target):x.XSetInputFocus(display,target,1,0);x.XSync(display,False)
+                camera_mouse=verify(out,window,focus_sink,key,button,send,x,display,focused,transfer,points[0],case['cockpit'],a.camera_check)
             x.XDestroyWindow(display,focus_sink);focus_sink=0;x.XFlush(display)
             if vc_mechanisms:
                 from window_vc import verify_camera_keys
@@ -271,7 +282,14 @@ def main():
             from window_capture import capture
             capture(x,display,window,out/'owned-cockpit.png')
             (out/'loaded-maps.txt').write_text(Path(f'/proc/{process.pid}/maps').read_text())
+            camera_shutdown=None
+            if a.camera_mouse:
+                from window_camera import arm_shutdown
+                camera_shutdown=arm_shutdown(out,window,button)
             key(window,'Escape',True);require(process.wait(timeout=15)==0,'Actual native mouse session failed')
+            if camera_shutdown:
+                from window_camera import verify_shutdown
+                camera_mouse['shutdown']=verify_shutdown(out,camera_shutdown)
             if mechanisms:
                 from window_keys import verify_completed
                 verify_completed(out,mechanisms)
@@ -283,7 +301,12 @@ def main():
                 verify_completed(out,vc_mechanisms)
             points=panel_points+vc_points+points
             inputs=list(csv.DictReader((out/'control-inputs.csv').open()))
-            require([(r['event'],int(r['x']),int(r['y'])) for r in inputs]==[(kind,px,py) for px,py in points for kind in ('left_down','left_up')],'Actual GLFW events or framebuffer coordinates differ')
+            expected=[(kind,px,py) for px,py in points for kind in ('left_down','left_up')]
+            if camera_mouse:
+                extra=[tuple(event) for event in camera_mouse['events']]
+                # Camera checks run after the two RCS picks, before generic MFD picks.
+                expected=expected[:4]+extra+expected[4:]+[tuple(camera_shutdown['event'])]
+            require([(r['event'],int(r['x']),int(r['y'])) for r in inputs]==expected,'Actual GLFW events or framebuffer coordinates differ')
             state=list(csv.DictReader((out/'cockpit-state.csv').open()));require({int(r['rcs_mode']) for r in state}==({0,1,2} if a.mechanisms else {1,2}),'Finalized actual vessel modes were not observed')
             require(all(int(r['cockpit'])==case['cockpit'] and r['object']==case['target'] and r['class']==case.get('class','ShuttlePB') for r in state),'Requested vessel class or panel/VC changed during real input')
             levels=list(csv.DictReader((out/'thrust-state.csv').open()))
@@ -311,7 +334,7 @@ def main():
                 driver_sha256=DRIVER_SHA256,
                 actual_rcs_mode_buttons=True,mfd_power_off_on=case['cockpit']==1,mfd_mode_surface_orbit=case['cockpit']==1,
                 momentary_keyboard_rcs=True,focus_loss_release=True,verified_focus_transfer=focus_transfer,finalized_release_samples=released,mouse_events=inputs,
-                lifecycle=life,screenshot_sha256=digest(out/'owned-cockpit.png'),mechanisms=mechanisms,keyboard_modes=bindings,panel_mechanisms=panel_mechanisms,vc_mechanisms=vc_mechanisms,
+                lifecycle=life,screenshot_sha256=digest(out/'owned-cockpit.png'),mechanisms=mechanisms,keyboard_modes=bindings,panel_mechanisms=panel_mechanisms,vc_mechanisms=vc_mechanisms,camera_mouse=camera_mouse,
                 keymap=keymap.relative_to(ROOT).as_posix(),keymap_sha256=digest(keymap))
             if dg_input:report.update(bare_key_neutrality_samples=bare,precision_rcs=True,full_rcs_samples=full,precision_rcs_samples=precision)
             (out/'mouse-verification.json').write_text(json.dumps(report,indent=2)+'\n');print(json.dumps(report,indent=2))

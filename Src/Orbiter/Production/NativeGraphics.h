@@ -52,6 +52,8 @@ public:
     virtual int DesktopHeight() const=0;
     virtual std::vector<NativeJoystickDevice> Joysticks() const=0;
     virtual oapi::SdkPoint CursorPosition() const=0;
+    virtual void SetCursorPosition(oapi::SdkPoint)=0;
+    virtual void SetCameraRotation(bool)=0;
     virtual void Open()=0;
     virtual RenderInput Poll()=0;
     virtual void Resize(int,int)=0;
@@ -108,7 +110,7 @@ struct NativeRenderContext {
     std::string scenarioHelp;
     class NativeScriptHost* scripts=nullptr;
     NativeGraphics* graphics=nullptr;Pane* cockpitPane=nullptr;Select* cockpitSelect=nullptr;InputBox* cockpitInput=nullptr;HELPCONTEXT* cockpitHelp=nullptr;
-    bool paused=true,showGrapple=false;
+    bool paused=true,showGrapple=false,cameraRotating=false;
     bool optionsUsed=false;
     int joystickThrottleAxis=-1,joystickTwistAxis=2;
     std::filesystem::path evidence;double captureTime=0;

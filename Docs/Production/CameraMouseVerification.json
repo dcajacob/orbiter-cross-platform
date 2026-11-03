@@ -1,0 +1,1590 @@
+{
+  "schema": 1,
+  "status": "passed",
+  "scope": "Original native camera mouse and stepped FOV input; Phase 6 remains in progress",
+  "source_worktree_base": "d065f93b0692d2e0a09f6411474d12e8fff672d0",
+  "sources_sha256": {
+    ".github/workflows/native-production-client.yml": "8f6f9367408f0be46718f96e4a2eff8ced8e437d7f4002575d9e1561471b13af",
+    "OVP/OGLClient/Native/LinuxAdapter.cpp": "fb6fc7f9fc3e20e01b1e3beb254f7f690d86275018145f488e58c13e13fa3036",
+    "OVP/OGLClient/Native/NativeCallbacks.inc": "b31f7ba54c9494938fff62d5a8f2e80f0323c2a98954d99b9faf3cba661ec2f8",
+    "Src/Orbiter/Camera.h": "bf13240a5666aca047e18a32a418b71447a0a306e03eb056c1e3ec5dc5c593a7",
+    "Src/Orbiter/Production/CMakeLists.txt": "7ade6b42fd5ab95eed23533627c6364ce6a217052629d1a6420c28420831b89c",
+    "Src/Orbiter/Production/CameraServices.h": "9ff2f63394931bd01a82e872fae8d46f5cd2d3ba018c5fc1b5cf7a31856e2136",
+    "Src/Orbiter/Production/NativeApplication.cpp": "2e590eb5b8318a91304b123d45794400a997a0e35a36e678b7730ff222ebe6df",
+    "Src/Orbiter/Production/NativeCockpit.cmake": "e521e44bb7f3b989a571eea341dbc12f11c28bd77a54e30fca546cbdfc780da8",
+    "Src/Orbiter/Production/NativeCockpitGui.cpp": "4e4032fcff4d4ae2d6c4331ac4804d5b6c132a0f4b4b7253d8242d645725e786",
+    "Src/Orbiter/Production/NativeCockpitUi.h": "0f808f8d72b4aaaf6ada301fb4bcf8c8d835dc8e22de4ce9c6d0cd7a9bd4979c",
+    "Src/Orbiter/Production/NativeGraphics.h": "580be8bb0ac0ca79b7e35b2f47cb4359e180b7b4496e4bcdcd4df3fa04bf87be",
+    "Src/Orbiter/Production/WindowsCameraServices.cpp": "20cb0f244ca8d8ebb0764fedfd3e79a68f5cb2e7cd902ced16d09c74f003f8c3",
+    "Tests/Production/CockpitControls/mouse_smoke.py": "1b31c05d9e8401c1e7080b53a03be8f446113698f6e59ca872a4f8b80015a4d7",
+    "Tests/Production/Vessels/NativeObserve.cpp": "52db9298fbce0dd4054e50208ade6c8d271b318ba860551b1dfb0eaa85d118fa",
+    "Tests/Production/camera_source.py": "d49fadd94e45ae60c8ba6c35548f7db4fac8ff45e449f3a99d0b3ce47c523a1f",
+    "Tests/Production/flight_source.py": "f8e254d1360b7bd91d613d19fb25d03bcc43658e5eaa53478c26b59c181bcea1",
+    "Tests/Production/phase3-extraction.lock.json": "ce6bdab687bb572173011ee4e5dd6aa3d2d855ce3ee0bd49ca0bce5b3e7b9492",
+    "Src/Orbiter/Production/NativeCameraMouse.cpp": "8c6d2adefdb679e928aec32a9a83cbcc9a4720981c8f218bc5862da40a5f97ee",
+    "Tests/Production/DeltaGlider/window_camera.py": "fb24b6945946659860d3e2ab70c7829d5ac96bdf8d1a2ad944f18965f4114fbf"
+  },
+  "source_conservation": {
+    "files": 443,
+    "mouse_algorithms": "Complete ProcessMouse and UpdateMouse match preserved Windows CameraApplication after explicit services/types/coordinates adapters",
+    "fov": "Original IncFOV body and five-degree buffered rounding expressions",
+    "actual_preserved_windows_source": "f7251942",
+    "windows_sdk_types_and_layouts_unchanged": true,
+    "log": {
+      "path": "/tmp/phase6-camera-final-source-audit.log",
+      "sha256": "5034eb099d877a3749f72fe4d85d6bac71830dc862f900c4e3a624cd69e49b15"
+    }
+  },
+  "transport": "Targeted X11 key/button/MotionNotify events to owned GLFW windows; server pointer is used for normal cursor coordinates. Captured movement is a targeted MotionNotify relative to GLFW recentering. This does not qualify a physical mouse or native Wayland.",
+  "pointer_capture_fix": "Drain GLFW synthetic grab enter/center events outside callbacks, then restore its virtual client anchor before original Camera::UpdateMouse",
+  "normal_profiles": {
+    "automatic-debug": {
+      "controls_generic_orbit_surface": {
+        "output": "out/phase6-camera-final-profiles/automatic-debug/controls_generic_orbit_surface",
+        "case": "controls_generic_orbit_surface",
+        "report_sha256": "f1caaab844b1650eb538fb5c45f39e2dfe044639551460d01e191c883122c513",
+        "camera_report_sha256": "38cb687669281e08ff71ff9f596d393ab23e5b36d900a6af26f58b23216d5ef0",
+        "shutdown_report_sha256": "7618ea5fc7b0593237de379c2d1aafd0958ef918809c195e8ebd5d150d8eb2ad",
+        "camera_driver_sha256": "fb24b6945946659860d3e2ab70c7829d5ac96bdf8d1a2ad944f18965f4114fbf",
+        "window_driver_sha256": "1b31c05d9e8401c1e7080b53a03be8f446113698f6e59ca872a4f8b80015a4d7",
+        "engine_sha256": "c55b341063536b6dd20fb4189ddae266c5d7593e25ddd293d0e7f6c377513fa7",
+        "engine_library_sha256": "2af9b65f008db8153b02659adf8055486bb2fe691881563b634872b75ca048c1",
+        "renderer_module_sha256": "cf82969b6dbd3a6408e8a7c3f4713d1f157cbf69cee2fbcd41dcdb627334d5d5",
+        "renderer": {
+          "vendor": "Mesa",
+          "renderer": "llvmpipe (LLVM 21.1.8, 256 bits)",
+          "version": "4.5 (Core Profile) Mesa 26.0.8-1ubuntu0.3",
+          "client_width": 1280,
+          "client_height": 720
+        },
+        "lifecycle": {
+          "rendered_frames": 329,
+          "successful_presents": 329,
+          "context_deleted": true
+        },
+        "checks": [
+          "drag",
+          "external_drag",
+          "wheel",
+          "step",
+          "gui_capture"
+        ],
+        "camera_priority": true,
+        "focus_loss_release": true,
+        "held_button_shutdown_release": true,
+        "mouse_events": 35,
+        "sanitizers_unsuppressed": false,
+        "isolated_xlib_loaded": false,
+        "isolated_mesa_loaded": false,
+        "evidence_sha256": {
+          "console.log": "cbb80b540852d1029d66c54a92bd8a90c34bd1aab4de9fa031e5a604a5fc7ed2",
+          "control-inputs.csv": "669711e66c279b02674ba3f6584f79d981b44300ead35e1ff48437e111645bab",
+          "cockpit-camera.csv": "e159390ef670daf53f42a9d0b0685003b820f98ead1ae1bc15fe74e45e053901",
+          "camera-capture.csv": "7c927bba04942a2b6f65c2e6b5f3c86bce9a25d9eaf507016d7577d6e97e243d",
+          "ui-state.csv": "53632be9cc6ae8f453cb376584cfcef3fff3e5a1519789ced387671db88c2929",
+          "menu-windows.csv": "96e0ace60ca83ee1ceba96555d37214115ffdc6f7d144a38457e3bccd2e1ad5b",
+          "input-state.csv": "6bc01b2182c0e263f9ba43d0a54cd07b57da1fe203e5c14f8b31c7ee4c106880",
+          "loaded-maps.txt": "f157b6aed3c5635deb37b1ce887d01d197692ae7cbffcd60df3ff73c7c0750db",
+          "owned-cockpit.png": "4e7365904cc78dd80729567b9227982d307975a44b9a39d4f7da0b8e6ff84a5c"
+        }
+      },
+      "controls_dg_panel": {
+        "output": "out/phase6-camera-final-profiles/automatic-debug/controls_dg_panel",
+        "case": "controls_dg_panel",
+        "report_sha256": "18f3818595857ae36bc5ddda0b27498d88f2b4a9c74ddeb73000c579d4a58f46",
+        "camera_report_sha256": "ca5ee79db9e6213b3c0c3f5e659db40752b36d03b8753a6dfe83e25f68822f6e",
+        "shutdown_report_sha256": "7618ea5fc7b0593237de379c2d1aafd0958ef918809c195e8ebd5d150d8eb2ad",
+        "camera_driver_sha256": "fb24b6945946659860d3e2ab70c7829d5ac96bdf8d1a2ad944f18965f4114fbf",
+        "window_driver_sha256": "1b31c05d9e8401c1e7080b53a03be8f446113698f6e59ca872a4f8b80015a4d7",
+        "engine_sha256": "c55b341063536b6dd20fb4189ddae266c5d7593e25ddd293d0e7f6c377513fa7",
+        "engine_library_sha256": "2af9b65f008db8153b02659adf8055486bb2fe691881563b634872b75ca048c1",
+        "renderer_module_sha256": "cf82969b6dbd3a6408e8a7c3f4713d1f157cbf69cee2fbcd41dcdb627334d5d5",
+        "renderer": {
+          "vendor": "Mesa",
+          "renderer": "llvmpipe (LLVM 21.1.8, 256 bits)",
+          "version": "4.5 (Core Profile) Mesa 26.0.8-1ubuntu0.3",
+          "client_width": 1280,
+          "client_height": 720
+        },
+        "lifecycle": {
+          "rendered_frames": 306,
+          "successful_presents": 306,
+          "context_deleted": true
+        },
+        "checks": [
+          "drag",
+          "external_drag",
+          "wheel",
+          "step",
+          "gui_capture"
+        ],
+        "camera_priority": true,
+        "focus_loss_release": true,
+        "held_button_shutdown_release": true,
+        "mouse_events": 24,
+        "sanitizers_unsuppressed": false,
+        "isolated_xlib_loaded": false,
+        "isolated_mesa_loaded": false,
+        "evidence_sha256": {
+          "console.log": "8189db821175943b4e1c547d3e3401a79cf5b6fa4c01e6135fe589e3708d01b0",
+          "control-inputs.csv": "e1ce48790429dfc6effce6265873c5e17fa1058e8de1c7fa0b3b6c8fb5c5ccfc",
+          "cockpit-camera.csv": "f7bfce8348fa206fa95212cfb1c8daa61bd229cdeff7c5d547385c038aa83acf",
+          "camera-capture.csv": "7c927bba04942a2b6f65c2e6b5f3c86bce9a25d9eaf507016d7577d6e97e243d",
+          "ui-state.csv": "afcb879d281f889e9904f251c7a7b7e6d7f48671d14ab0bd6c6f3e62f34e947b",
+          "menu-windows.csv": "a539cb04798cb42f59b07d666b909be9967b585b4f1e88c5947d473e8e3a94be",
+          "input-state.csv": "201d01bd9db88329c846d5a7ba462f6c8faf80f336a91c4d036bb316f1aee864",
+          "loaded-maps.txt": "7561435f4e4b80775cf0b80b0f672c839807b4b1a650edf007f47694c89cdc8d",
+          "owned-cockpit.png": "44d7fc626946171b13b6a4bd1650beed5e1c2564cbd97c04082a5460ebda34c8"
+        }
+      },
+      "controls_dg_vc": {
+        "output": "out/phase6-camera-final-profiles/automatic-debug/controls_dg_vc",
+        "case": "controls_dg_vc",
+        "report_sha256": "22865fef196fe5212703bf1a01cbd87f5a39403e3476ba09dd5b40cb0b1ebecb",
+        "camera_report_sha256": "8350b61924781de978bb3df84d6a65684119181c8b97eed498b62d88b8d70aab",
+        "shutdown_report_sha256": "7618ea5fc7b0593237de379c2d1aafd0958ef918809c195e8ebd5d150d8eb2ad",
+        "camera_driver_sha256": "fb24b6945946659860d3e2ab70c7829d5ac96bdf8d1a2ad944f18965f4114fbf",
+        "window_driver_sha256": "1b31c05d9e8401c1e7080b53a03be8f446113698f6e59ca872a4f8b80015a4d7",
+        "engine_sha256": "c55b341063536b6dd20fb4189ddae266c5d7593e25ddd293d0e7f6c377513fa7",
+        "engine_library_sha256": "2af9b65f008db8153b02659adf8055486bb2fe691881563b634872b75ca048c1",
+        "renderer_module_sha256": "cf82969b6dbd3a6408e8a7c3f4713d1f157cbf69cee2fbcd41dcdb627334d5d5",
+        "renderer": {
+          "vendor": "Mesa",
+          "renderer": "llvmpipe (LLVM 21.1.8, 256 bits)",
+          "version": "4.5 (Core Profile) Mesa 26.0.8-1ubuntu0.3",
+          "client_width": 1280,
+          "client_height": 720
+        },
+        "lifecycle": {
+          "rendered_frames": 156,
+          "successful_presents": 156,
+          "context_deleted": true
+        },
+        "checks": [
+          "drag",
+          "external_drag",
+          "wheel",
+          "step",
+          "gui_capture"
+        ],
+        "camera_priority": true,
+        "focus_loss_release": true,
+        "held_button_shutdown_release": true,
+        "mouse_events": 23,
+        "sanitizers_unsuppressed": false,
+        "isolated_xlib_loaded": false,
+        "isolated_mesa_loaded": false,
+        "evidence_sha256": {
+          "console.log": "8189db821175943b4e1c547d3e3401a79cf5b6fa4c01e6135fe589e3708d01b0",
+          "control-inputs.csv": "32545cceef2bfc9608f5de4325c348472cee92cb0529270882ba0e04f3a80a3e",
+          "cockpit-camera.csv": "0d5460f49aeda3ffad16549bb33be719c35e7d36626c62070acb2a4b784847eb",
+          "camera-capture.csv": "7c927bba04942a2b6f65c2e6b5f3c86bce9a25d9eaf507016d7577d6e97e243d",
+          "ui-state.csv": "2ab59f113f0e35e892b091c85044624e0de8c913df387aed8924af3301fc80cd",
+          "menu-windows.csv": "ec37332c36b453d49a924471c788f0b9e398398842c2419cd2b8cd83067cf6cf",
+          "input-state.csv": "aac78fa94d54fabef5eeee9e5088ee71f086bdacb220de52d6115a47b4a17b95",
+          "loaded-maps.txt": "82b25eaf5e262554e4d5edff6ef0745246dc795c5798caa481db2e2d13206d19",
+          "owned-cockpit.png": "5e3de7ac7b83dac459416e5b84d8b3b44fbbadb4735f36468c326b58e5493fbc"
+        }
+      },
+      "controls_dgs_panel": {
+        "output": "out/phase6-camera-final-profiles/automatic-debug/controls_dgs_panel",
+        "case": "controls_dgs_panel",
+        "report_sha256": "c073c373d95eaf8ae6e45bbdd69803e2ffaac1dc3a715cbc4822f42467ef6eed",
+        "camera_report_sha256": "eb016e1a088ff0dae38977c5641a227c633d5932a6a438a23c2cf8c3c33929fa",
+        "shutdown_report_sha256": "7618ea5fc7b0593237de379c2d1aafd0958ef918809c195e8ebd5d150d8eb2ad",
+        "camera_driver_sha256": "fb24b6945946659860d3e2ab70c7829d5ac96bdf8d1a2ad944f18965f4114fbf",
+        "window_driver_sha256": "1b31c05d9e8401c1e7080b53a03be8f446113698f6e59ca872a4f8b80015a4d7",
+        "engine_sha256": "c55b341063536b6dd20fb4189ddae266c5d7593e25ddd293d0e7f6c377513fa7",
+        "engine_library_sha256": "2af9b65f008db8153b02659adf8055486bb2fe691881563b634872b75ca048c1",
+        "renderer_module_sha256": "cf82969b6dbd3a6408e8a7c3f4713d1f157cbf69cee2fbcd41dcdb627334d5d5",
+        "renderer": {
+          "vendor": "Mesa",
+          "renderer": "llvmpipe (LLVM 21.1.8, 256 bits)",
+          "version": "4.5 (Core Profile) Mesa 26.0.8-1ubuntu0.3",
+          "client_width": 1280,
+          "client_height": 720
+        },
+        "lifecycle": {
+          "rendered_frames": 310,
+          "successful_presents": 310,
+          "context_deleted": true
+        },
+        "checks": [
+          "drag",
+          "external_drag",
+          "wheel",
+          "step",
+          "gui_capture"
+        ],
+        "camera_priority": true,
+        "focus_loss_release": true,
+        "held_button_shutdown_release": true,
+        "mouse_events": 24,
+        "sanitizers_unsuppressed": false,
+        "isolated_xlib_loaded": false,
+        "isolated_mesa_loaded": false,
+        "evidence_sha256": {
+          "console.log": "abb8a71aa1e4dfea30103070918fcad38691c1a27bc593646876f468eb2364bf",
+          "control-inputs.csv": "7e4cbb52a9f81e9fcd7ed92e7db861dcd2b0fe247405ed90877f42e5ebc265ba",
+          "cockpit-camera.csv": "49ab626053de4338f42d5d996a35dba76fd21d5209fef438bc9f32951dde1cc2",
+          "camera-capture.csv": "7c927bba04942a2b6f65c2e6b5f3c86bce9a25d9eaf507016d7577d6e97e243d",
+          "ui-state.csv": "9b8062fcda13e0b9063ecd8d10d5e4a095471fb86f9d849f5816f4dbcaad89c4",
+          "menu-windows.csv": "f9555b460b5611fa614d546e68f984a495c9eb2f874d7bc94080e099cba2aff9",
+          "input-state.csv": "f2dc8ee69ac4c4d58c504b81f5ea46f2f266a7a6a5352ff246bf7b93562f8257",
+          "loaded-maps.txt": "14164d9abf948d070ff1f9af96e8b958c95111c3c65f1042972406fbb19ac898",
+          "owned-cockpit.png": "cb88f297efd8638cc9d95544fe6239a0f2b0fd6eee0792e09a6456dd847cfe99"
+        }
+      },
+      "controls_dgs_vc": {
+        "output": "out/phase6-camera-final-profiles/automatic-debug/controls_dgs_vc",
+        "case": "controls_dgs_vc",
+        "report_sha256": "a1288e89ca6f5a56421dc94464a235354cfbbc4e65e629a131c9129c46327829",
+        "camera_report_sha256": "ca05d6bf2bdc4406c478c38eabd3abbc221b88925188462315f6c761d0b53ac4",
+        "shutdown_report_sha256": "7618ea5fc7b0593237de379c2d1aafd0958ef918809c195e8ebd5d150d8eb2ad",
+        "camera_driver_sha256": "fb24b6945946659860d3e2ab70c7829d5ac96bdf8d1a2ad944f18965f4114fbf",
+        "window_driver_sha256": "1b31c05d9e8401c1e7080b53a03be8f446113698f6e59ca872a4f8b80015a4d7",
+        "engine_sha256": "c55b341063536b6dd20fb4189ddae266c5d7593e25ddd293d0e7f6c377513fa7",
+        "engine_library_sha256": "2af9b65f008db8153b02659adf8055486bb2fe691881563b634872b75ca048c1",
+        "renderer_module_sha256": "cf82969b6dbd3a6408e8a7c3f4713d1f157cbf69cee2fbcd41dcdb627334d5d5",
+        "renderer": {
+          "vendor": "Mesa",
+          "renderer": "llvmpipe (LLVM 21.1.8, 256 bits)",
+          "version": "4.5 (Core Profile) Mesa 26.0.8-1ubuntu0.3",
+          "client_width": 1280,
+          "client_height": 720
+        },
+        "lifecycle": {
+          "rendered_frames": 155,
+          "successful_presents": 155,
+          "context_deleted": true
+        },
+        "checks": [
+          "drag",
+          "external_drag",
+          "wheel",
+          "step",
+          "gui_capture"
+        ],
+        "camera_priority": true,
+        "focus_loss_release": true,
+        "held_button_shutdown_release": true,
+        "mouse_events": 23,
+        "sanitizers_unsuppressed": false,
+        "isolated_xlib_loaded": false,
+        "isolated_mesa_loaded": false,
+        "evidence_sha256": {
+          "console.log": "abb8a71aa1e4dfea30103070918fcad38691c1a27bc593646876f468eb2364bf",
+          "control-inputs.csv": "d00f7c13090cdea718dfc05b88aed3467f5ea3e97bb6caebc903ad1f29dc26e2",
+          "cockpit-camera.csv": "e174e2de3f65c5bdbee7258e66b63767c3f20d943ceeb17b2f5be023c6020fc9",
+          "camera-capture.csv": "7c927bba04942a2b6f65c2e6b5f3c86bce9a25d9eaf507016d7577d6e97e243d",
+          "ui-state.csv": "5a9a27a523a11b11944f8fea121d6865f32582c864ebe22e7049a4f429173e08",
+          "menu-windows.csv": "344f0d3bb18086eb380259919983302b7cd9b36d5f7488f0795d80aa1b01f525",
+          "input-state.csv": "89f39cbe1bdf042ea68e638b3edb6798f10a3d902d1e4e13491a51d4b05b2642",
+          "loaded-maps.txt": "6add7f21e9ea11012bd240c5fc7d5ca5d7d9de7d9182201f45f0d4ec62785813",
+          "owned-cockpit.png": "b2af69dd4400b854385bca278203a4bc28c1e303d948b1bcab2d4c148e16d34e"
+        }
+      }
+    },
+    "automatic-release": {
+      "controls_generic_orbit_surface": {
+        "output": "out/phase6-camera-final-profiles/automatic-release/controls_generic_orbit_surface",
+        "case": "controls_generic_orbit_surface",
+        "report_sha256": "7316e19f3a94b0f317ebaa2cba6737018b69714e63d7f71d11385898fbb51577",
+        "camera_report_sha256": "55bd537f0d048c65c9390254032aa6b26170a75feef625e814e5b56fb432c568",
+        "shutdown_report_sha256": "7618ea5fc7b0593237de379c2d1aafd0958ef918809c195e8ebd5d150d8eb2ad",
+        "camera_driver_sha256": "fb24b6945946659860d3e2ab70c7829d5ac96bdf8d1a2ad944f18965f4114fbf",
+        "window_driver_sha256": "1b31c05d9e8401c1e7080b53a03be8f446113698f6e59ca872a4f8b80015a4d7",
+        "engine_sha256": "8e074c036edd6abe8f4fd75e870fbffc403f9a73b51f900a8282860abc7d1f2c",
+        "engine_library_sha256": "8770501b39a8fa20e2a1d28c803276aac69238bc286f0b73986efae75a2227c4",
+        "renderer_module_sha256": "f248538c637ef70f2e7cad4ebe602d71b3f61917350b227b3861dace323060e5",
+        "renderer": {
+          "vendor": "Mesa",
+          "renderer": "llvmpipe (LLVM 21.1.8, 256 bits)",
+          "version": "4.5 (Core Profile) Mesa 26.0.8-1ubuntu0.3",
+          "client_width": 1280,
+          "client_height": 720
+        },
+        "lifecycle": {
+          "rendered_frames": 321,
+          "successful_presents": 321,
+          "context_deleted": true
+        },
+        "checks": [
+          "drag",
+          "external_drag",
+          "wheel",
+          "step",
+          "gui_capture"
+        ],
+        "camera_priority": true,
+        "focus_loss_release": true,
+        "held_button_shutdown_release": true,
+        "mouse_events": 35,
+        "sanitizers_unsuppressed": false,
+        "isolated_xlib_loaded": false,
+        "isolated_mesa_loaded": false,
+        "evidence_sha256": {
+          "console.log": "cbb80b540852d1029d66c54a92bd8a90c34bd1aab4de9fa031e5a604a5fc7ed2",
+          "control-inputs.csv": "9f953f7cd5e57f4b8e24cf4af02f50f3a3dda8855b886e6b4cae0c54f1d028cd",
+          "cockpit-camera.csv": "55a86292fa2a5eaa3f5c3b8e8d2a5748521a0671a466881362caaf59025599dd",
+          "camera-capture.csv": "7c927bba04942a2b6f65c2e6b5f3c86bce9a25d9eaf507016d7577d6e97e243d",
+          "ui-state.csv": "3d04cbd193abd55bf74e9897d27ca1e5317920103b37cf0f1a7d9a18abe535c6",
+          "menu-windows.csv": "b5ab9e78ccfba55d009999b7a30b17f81904dc307220dfbef46e8e2bbee815d7",
+          "input-state.csv": "5fc3eeb97c399668c8826bbf2666c44f0c4ee7a6964f9455ead798640d7a361d",
+          "loaded-maps.txt": "5e668a22e6049a3346ace27e3f0690472dd8b33308201578719b332a069a4ab2",
+          "owned-cockpit.png": "285f321f0db6febbf1bd33649531300fc9612ad19dcd927c7a86c08a22f4a749"
+        }
+      },
+      "controls_dg_panel": {
+        "output": "out/phase6-camera-final-profiles/automatic-release/controls_dg_panel",
+        "case": "controls_dg_panel",
+        "report_sha256": "1735cafcc17dc25bb227cb92313325c56d3b0065e87d548d242a9066f567d3eb",
+        "camera_report_sha256": "d0c1fa158734ca2b2a084bdd2c2ae1848177512e09f401921e0df60ef97e9650",
+        "shutdown_report_sha256": "7618ea5fc7b0593237de379c2d1aafd0958ef918809c195e8ebd5d150d8eb2ad",
+        "camera_driver_sha256": "fb24b6945946659860d3e2ab70c7829d5ac96bdf8d1a2ad944f18965f4114fbf",
+        "window_driver_sha256": "1b31c05d9e8401c1e7080b53a03be8f446113698f6e59ca872a4f8b80015a4d7",
+        "engine_sha256": "8e074c036edd6abe8f4fd75e870fbffc403f9a73b51f900a8282860abc7d1f2c",
+        "engine_library_sha256": "8770501b39a8fa20e2a1d28c803276aac69238bc286f0b73986efae75a2227c4",
+        "renderer_module_sha256": "f248538c637ef70f2e7cad4ebe602d71b3f61917350b227b3861dace323060e5",
+        "renderer": {
+          "vendor": "Mesa",
+          "renderer": "llvmpipe (LLVM 21.1.8, 256 bits)",
+          "version": "4.5 (Core Profile) Mesa 26.0.8-1ubuntu0.3",
+          "client_width": 1280,
+          "client_height": 720
+        },
+        "lifecycle": {
+          "rendered_frames": 328,
+          "successful_presents": 328,
+          "context_deleted": true
+        },
+        "checks": [
+          "drag",
+          "external_drag",
+          "wheel",
+          "step",
+          "gui_capture"
+        ],
+        "camera_priority": true,
+        "focus_loss_release": true,
+        "held_button_shutdown_release": true,
+        "mouse_events": 24,
+        "sanitizers_unsuppressed": false,
+        "isolated_xlib_loaded": false,
+        "isolated_mesa_loaded": false,
+        "evidence_sha256": {
+          "console.log": "8189db821175943b4e1c547d3e3401a79cf5b6fa4c01e6135fe589e3708d01b0",
+          "control-inputs.csv": "f92420416906746825205043d3e87481d5e5019e69f57edc2023cc7299891afc",
+          "cockpit-camera.csv": "9ad78ff5e133bef97746274865a02dddeb80e13d88f15550cb2ed7184dafa6ea",
+          "camera-capture.csv": "7c927bba04942a2b6f65c2e6b5f3c86bce9a25d9eaf507016d7577d6e97e243d",
+          "ui-state.csv": "ab9b32c4a6a996a5a334f2b48386605fc1e4228af07d40788b793f3b1a896333",
+          "menu-windows.csv": "f510756c80f354cd12c0e989324eb80ac0a848ffe6a5ef7a98aaf0fc924622a2",
+          "input-state.csv": "df67689f42c40fa8cca8e29f80e1c435398e191afc305a294da2a6ba5a37405e",
+          "loaded-maps.txt": "71b32dfe5f9713432e97257775cc336f8943f47771fd43c1e42767b63cbe2f88",
+          "owned-cockpit.png": "a8d7f6eea3f8f316de065d81778bc6f5041780d7cd2e6199af57c5da8c1fe288"
+        }
+      },
+      "controls_dg_vc": {
+        "output": "out/phase6-camera-final-profiles/automatic-release/controls_dg_vc",
+        "case": "controls_dg_vc",
+        "report_sha256": "b6718e6aa4322a3d9e1c2b1b011b23616d702e8a553109b6f1132f9f79a5e75e",
+        "camera_report_sha256": "e9bae2df3cd5bd956c0dd1c85d752644d034ce87373c5bf5820e468fb878e6c6",
+        "shutdown_report_sha256": "7618ea5fc7b0593237de379c2d1aafd0958ef918809c195e8ebd5d150d8eb2ad",
+        "camera_driver_sha256": "fb24b6945946659860d3e2ab70c7829d5ac96bdf8d1a2ad944f18965f4114fbf",
+        "window_driver_sha256": "1b31c05d9e8401c1e7080b53a03be8f446113698f6e59ca872a4f8b80015a4d7",
+        "engine_sha256": "8e074c036edd6abe8f4fd75e870fbffc403f9a73b51f900a8282860abc7d1f2c",
+        "engine_library_sha256": "8770501b39a8fa20e2a1d28c803276aac69238bc286f0b73986efae75a2227c4",
+        "renderer_module_sha256": "f248538c637ef70f2e7cad4ebe602d71b3f61917350b227b3861dace323060e5",
+        "renderer": {
+          "vendor": "Mesa",
+          "renderer": "llvmpipe (LLVM 21.1.8, 256 bits)",
+          "version": "4.5 (Core Profile) Mesa 26.0.8-1ubuntu0.3",
+          "client_width": 1280,
+          "client_height": 720
+        },
+        "lifecycle": {
+          "rendered_frames": 158,
+          "successful_presents": 158,
+          "context_deleted": true
+        },
+        "checks": [
+          "drag",
+          "external_drag",
+          "wheel",
+          "step",
+          "gui_capture"
+        ],
+        "camera_priority": true,
+        "focus_loss_release": true,
+        "held_button_shutdown_release": true,
+        "mouse_events": 23,
+        "sanitizers_unsuppressed": false,
+        "isolated_xlib_loaded": false,
+        "isolated_mesa_loaded": false,
+        "evidence_sha256": {
+          "console.log": "8189db821175943b4e1c547d3e3401a79cf5b6fa4c01e6135fe589e3708d01b0",
+          "control-inputs.csv": "2063b7478eaf1ce56080b71a1d36dd440eda6759af880f18f9b6051bd1e10eb2",
+          "cockpit-camera.csv": "202fb5b121f60f544a6d8eef5a3b234a470e3636075bb5f560433c2d42853c8b",
+          "camera-capture.csv": "7c927bba04942a2b6f65c2e6b5f3c86bce9a25d9eaf507016d7577d6e97e243d",
+          "ui-state.csv": "522ced831a67025f87b7403c5f90da7e8668ee059bc9a12215e8ec769551b819",
+          "menu-windows.csv": "dbeead17a02f37bd1c435b1fe9a82cff3591bb35f2e100c3bd2885258b336de1",
+          "input-state.csv": "1d1b4fb2ce2b6e9243722f03bd7be781b68fe810994a74b15b0dd7b4d49e6c57",
+          "loaded-maps.txt": "6244934f0720d45696cefb7c5917206906f7c6e6365852f20b306168dcd10ac9",
+          "owned-cockpit.png": "b9dc4924c9d66bbd857d9a8d13fc52140fe7a99080216e25f48a18750eb52244"
+        }
+      },
+      "controls_dgs_panel": {
+        "output": "out/phase6-camera-final-profiles/automatic-release/controls_dgs_panel",
+        "case": "controls_dgs_panel",
+        "report_sha256": "7dbd8f879645e63e72bb6a569e5139fbd35b5c358de571f42a3814506b39f479",
+        "camera_report_sha256": "f892334aa3d361aba3f9464ac84bb197db0b68a8869d5d671dbc2c998861507d",
+        "shutdown_report_sha256": "7618ea5fc7b0593237de379c2d1aafd0958ef918809c195e8ebd5d150d8eb2ad",
+        "camera_driver_sha256": "fb24b6945946659860d3e2ab70c7829d5ac96bdf8d1a2ad944f18965f4114fbf",
+        "window_driver_sha256": "1b31c05d9e8401c1e7080b53a03be8f446113698f6e59ca872a4f8b80015a4d7",
+        "engine_sha256": "8e074c036edd6abe8f4fd75e870fbffc403f9a73b51f900a8282860abc7d1f2c",
+        "engine_library_sha256": "8770501b39a8fa20e2a1d28c803276aac69238bc286f0b73986efae75a2227c4",
+        "renderer_module_sha256": "f248538c637ef70f2e7cad4ebe602d71b3f61917350b227b3861dace323060e5",
+        "renderer": {
+          "vendor": "Mesa",
+          "renderer": "llvmpipe (LLVM 21.1.8, 256 bits)",
+          "version": "4.5 (Core Profile) Mesa 26.0.8-1ubuntu0.3",
+          "client_width": 1280,
+          "client_height": 720
+        },
+        "lifecycle": {
+          "rendered_frames": 323,
+          "successful_presents": 323,
+          "context_deleted": true
+        },
+        "checks": [
+          "drag",
+          "external_drag",
+          "wheel",
+          "step",
+          "gui_capture"
+        ],
+        "camera_priority": true,
+        "focus_loss_release": true,
+        "held_button_shutdown_release": true,
+        "mouse_events": 24,
+        "sanitizers_unsuppressed": false,
+        "isolated_xlib_loaded": false,
+        "isolated_mesa_loaded": false,
+        "evidence_sha256": {
+          "console.log": "abb8a71aa1e4dfea30103070918fcad38691c1a27bc593646876f468eb2364bf",
+          "control-inputs.csv": "0a8ece93560caf771df8bf97fe7c2160bf6a04cdebead2ff1edb802a271a8468",
+          "cockpit-camera.csv": "6628538fb6031021c20c347ff301f18106c5b37da6714c11bb7939881c49bbfa",
+          "camera-capture.csv": "7c927bba04942a2b6f65c2e6b5f3c86bce9a25d9eaf507016d7577d6e97e243d",
+          "ui-state.csv": "553dcfc75c611cfae3094c5b6532466acc0a2d719612206dbe7c60c1c3ed67ed",
+          "menu-windows.csv": "0c934c7c3b5f013caf252266864595676be77036a552e4d4a3c8089782520a39",
+          "input-state.csv": "d85674905d40b8a66bddcbf7942aa8e6aed2ac5ed62df652e8f3e4d5d114ef81",
+          "loaded-maps.txt": "d12c9e50dc65a9dca000cb18a233b2571756e5f3fd1b9214f4829429ed5c7457",
+          "owned-cockpit.png": "98bbdd66dd696ad1cab3ba892b3b72456730409089e90c4902e9de3572317832"
+        }
+      },
+      "controls_dgs_vc": {
+        "output": "out/phase6-camera-final-profiles/automatic-release/controls_dgs_vc",
+        "case": "controls_dgs_vc",
+        "report_sha256": "70eabe85a9801bddbba3a24743963906701de558978a3e6e5b4d2f37ac18a7bc",
+        "camera_report_sha256": "23392d68e8ea79dbae293a339850c0789138952530a1c7d130daacef7dbb3067",
+        "shutdown_report_sha256": "7618ea5fc7b0593237de379c2d1aafd0958ef918809c195e8ebd5d150d8eb2ad",
+        "camera_driver_sha256": "fb24b6945946659860d3e2ab70c7829d5ac96bdf8d1a2ad944f18965f4114fbf",
+        "window_driver_sha256": "1b31c05d9e8401c1e7080b53a03be8f446113698f6e59ca872a4f8b80015a4d7",
+        "engine_sha256": "8e074c036edd6abe8f4fd75e870fbffc403f9a73b51f900a8282860abc7d1f2c",
+        "engine_library_sha256": "8770501b39a8fa20e2a1d28c803276aac69238bc286f0b73986efae75a2227c4",
+        "renderer_module_sha256": "f248538c637ef70f2e7cad4ebe602d71b3f61917350b227b3861dace323060e5",
+        "renderer": {
+          "vendor": "Mesa",
+          "renderer": "llvmpipe (LLVM 21.1.8, 256 bits)",
+          "version": "4.5 (Core Profile) Mesa 26.0.8-1ubuntu0.3",
+          "client_width": 1280,
+          "client_height": 720
+        },
+        "lifecycle": {
+          "rendered_frames": 154,
+          "successful_presents": 154,
+          "context_deleted": true
+        },
+        "checks": [
+          "drag",
+          "external_drag",
+          "wheel",
+          "step",
+          "gui_capture"
+        ],
+        "camera_priority": true,
+        "focus_loss_release": true,
+        "held_button_shutdown_release": true,
+        "mouse_events": 23,
+        "sanitizers_unsuppressed": false,
+        "isolated_xlib_loaded": false,
+        "isolated_mesa_loaded": false,
+        "evidence_sha256": {
+          "console.log": "abb8a71aa1e4dfea30103070918fcad38691c1a27bc593646876f468eb2364bf",
+          "control-inputs.csv": "667657f7a96d966cf3293caf967c5aad01d7df29bc7197968c03b74aae478c92",
+          "cockpit-camera.csv": "24a69fb9b95890d477273f126cbeb6f3df96a92b61030826849bcfde780eeccf",
+          "camera-capture.csv": "7c927bba04942a2b6f65c2e6b5f3c86bce9a25d9eaf507016d7577d6e97e243d",
+          "ui-state.csv": "8250a075f8c3e9e6d9f15efe87fa048f8a735aa8b7c81eff52114ac31873847a",
+          "menu-windows.csv": "93c1fba49c7c84fbaa6e2aa5572a28bd4290862e9281858caa505519b52a09a4",
+          "input-state.csv": "31aa6cc223bc94342b0e2cd10f4f563058e47d103b0f3987b895a6380773af30",
+          "loaded-maps.txt": "31008baa4b8fb5fbbfd084484addec91ea0d0ac7bc38016b97c6a7c170f46471",
+          "owned-cockpit.png": "eb02d29cdd22802d0ce3d1bf1bacddd8d97f650bffedc22eb55614758daef893"
+        }
+      }
+    },
+    "sse2-debug": {
+      "controls_generic_orbit_surface": {
+        "output": "out/phase6-camera-final-profiles/sse2-debug/controls_generic_orbit_surface",
+        "case": "controls_generic_orbit_surface",
+        "report_sha256": "510637d13d63cc122aa16da33aad772fcfb02cdaec5a2d3f7250c9b705ebb647",
+        "camera_report_sha256": "921c991b80372359d5f4ed557c93118ef471757f86f055ab55443cb22d938a3b",
+        "shutdown_report_sha256": "7618ea5fc7b0593237de379c2d1aafd0958ef918809c195e8ebd5d150d8eb2ad",
+        "camera_driver_sha256": "fb24b6945946659860d3e2ab70c7829d5ac96bdf8d1a2ad944f18965f4114fbf",
+        "window_driver_sha256": "1b31c05d9e8401c1e7080b53a03be8f446113698f6e59ca872a4f8b80015a4d7",
+        "engine_sha256": "82e5dce00ef01d002d912e067b13da4d4b3e55aa4d81420b45ad749c30840fb3",
+        "engine_library_sha256": "8810b3949b04f31dc2c239f7f2db6d4972b6bc95eb1e8dc8d77b52dd3d105ed0",
+        "renderer_module_sha256": "74aaf0c89bc1a0137b62d467af9f83153487978edb3705ca1acf3d54fa5241fa",
+        "renderer": {
+          "vendor": "Mesa",
+          "renderer": "llvmpipe (LLVM 21.1.8, 256 bits)",
+          "version": "4.5 (Core Profile) Mesa 26.0.8-1ubuntu0.3",
+          "client_width": 1280,
+          "client_height": 720
+        },
+        "lifecycle": {
+          "rendered_frames": 315,
+          "successful_presents": 315,
+          "context_deleted": true
+        },
+        "checks": [
+          "drag",
+          "external_drag",
+          "wheel",
+          "step",
+          "gui_capture"
+        ],
+        "camera_priority": true,
+        "focus_loss_release": true,
+        "held_button_shutdown_release": true,
+        "mouse_events": 35,
+        "sanitizers_unsuppressed": false,
+        "isolated_xlib_loaded": false,
+        "isolated_mesa_loaded": false,
+        "evidence_sha256": {
+          "console.log": "cbb80b540852d1029d66c54a92bd8a90c34bd1aab4de9fa031e5a604a5fc7ed2",
+          "control-inputs.csv": "f7a23aeb965b6329c667fb7320b95744bc90fcfd43b880d8008ee72c7739c5c0",
+          "cockpit-camera.csv": "9aad0b5dd7405887119259ec096d82ec321aab051a520d710af322d876939df5",
+          "camera-capture.csv": "7c927bba04942a2b6f65c2e6b5f3c86bce9a25d9eaf507016d7577d6e97e243d",
+          "ui-state.csv": "8b48de254084dab892ed6340b0ecc6fa60356bb8476b061ea0ebe92b143a0569",
+          "menu-windows.csv": "466fc27cb4f04d744b2249656439ab2de9f0a4fafa2f96857a29b84b5aa19428",
+          "input-state.csv": "7653dddc8a03e67fd42ade6457097289eef0da3ad6f91749b0b0be28b6782200",
+          "loaded-maps.txt": "11bbb2b929088efdee8d146cab81f773102eb40487de1562a0f82aa6303226a1",
+          "owned-cockpit.png": "5d1bef808f84933af784f93e2ebbc7cc74d77daf08a2785800ed1911a3a1bfcb"
+        }
+      },
+      "controls_dg_panel": {
+        "output": "out/phase6-camera-final-profiles/sse2-debug/controls_dg_panel",
+        "case": "controls_dg_panel",
+        "report_sha256": "716ff08db5da75a40a63430bfeab79f6ed4f0130626f89baf122c9b78654fb71",
+        "camera_report_sha256": "53883308f7b45a492dda9d946094c4f3c0b32d5f22e35c855ec4e5b04b9048cc",
+        "shutdown_report_sha256": "7618ea5fc7b0593237de379c2d1aafd0958ef918809c195e8ebd5d150d8eb2ad",
+        "camera_driver_sha256": "fb24b6945946659860d3e2ab70c7829d5ac96bdf8d1a2ad944f18965f4114fbf",
+        "window_driver_sha256": "1b31c05d9e8401c1e7080b53a03be8f446113698f6e59ca872a4f8b80015a4d7",
+        "engine_sha256": "82e5dce00ef01d002d912e067b13da4d4b3e55aa4d81420b45ad749c30840fb3",
+        "engine_library_sha256": "8810b3949b04f31dc2c239f7f2db6d4972b6bc95eb1e8dc8d77b52dd3d105ed0",
+        "renderer_module_sha256": "74aaf0c89bc1a0137b62d467af9f83153487978edb3705ca1acf3d54fa5241fa",
+        "renderer": {
+          "vendor": "Mesa",
+          "renderer": "llvmpipe (LLVM 21.1.8, 256 bits)",
+          "version": "4.5 (Core Profile) Mesa 26.0.8-1ubuntu0.3",
+          "client_width": 1280,
+          "client_height": 720
+        },
+        "lifecycle": {
+          "rendered_frames": 309,
+          "successful_presents": 309,
+          "context_deleted": true
+        },
+        "checks": [
+          "drag",
+          "external_drag",
+          "wheel",
+          "step",
+          "gui_capture"
+        ],
+        "camera_priority": true,
+        "focus_loss_release": true,
+        "held_button_shutdown_release": true,
+        "mouse_events": 24,
+        "sanitizers_unsuppressed": false,
+        "isolated_xlib_loaded": false,
+        "isolated_mesa_loaded": false,
+        "evidence_sha256": {
+          "console.log": "8189db821175943b4e1c547d3e3401a79cf5b6fa4c01e6135fe589e3708d01b0",
+          "control-inputs.csv": "e9f2edfe4d5bacf652f252a4a183c5f615744b018bbd8dfdf1f1f276161a892b",
+          "cockpit-camera.csv": "6f55230d6f6b51ce4b1019fd7c02f3346d36cef0a63d6a87e47d88acaf7b1fc4",
+          "camera-capture.csv": "7c927bba04942a2b6f65c2e6b5f3c86bce9a25d9eaf507016d7577d6e97e243d",
+          "ui-state.csv": "fac0941a886b851ca4afbd1eb5ef2a1c3dc762719a13c0522b460c3690eea714",
+          "menu-windows.csv": "e4591ffb3042524a67ac08ef8a1c362eeb7fe996e093ecef50fa83e6840f91bc",
+          "input-state.csv": "cd4ece1e08039b0d44e1c174d9ae1ac17c5f0d49ad99797f9f6d571b6fb30b78",
+          "loaded-maps.txt": "44e84c439d8ef32e56b1eb9520246f0d86c6d75e7e91aa37ff4a2080b1cb121e",
+          "owned-cockpit.png": "f93e2726bc235da21a90444ed03b298eef432be54c96f6e1e6aa4d10fcbc3d46"
+        }
+      },
+      "controls_dg_vc": {
+        "output": "out/phase6-camera-final-profiles/sse2-debug/controls_dg_vc",
+        "case": "controls_dg_vc",
+        "report_sha256": "bcb00b95b9b8b4b40818e41f652c9678a580f0a916fb72669c6884b11d5d6bbd",
+        "camera_report_sha256": "11196a705bfa8f5a791c5e8e4651f94b61629312caaaa023d89baab3bdac3a6b",
+        "shutdown_report_sha256": "7618ea5fc7b0593237de379c2d1aafd0958ef918809c195e8ebd5d150d8eb2ad",
+        "camera_driver_sha256": "fb24b6945946659860d3e2ab70c7829d5ac96bdf8d1a2ad944f18965f4114fbf",
+        "window_driver_sha256": "1b31c05d9e8401c1e7080b53a03be8f446113698f6e59ca872a4f8b80015a4d7",
+        "engine_sha256": "82e5dce00ef01d002d912e067b13da4d4b3e55aa4d81420b45ad749c30840fb3",
+        "engine_library_sha256": "8810b3949b04f31dc2c239f7f2db6d4972b6bc95eb1e8dc8d77b52dd3d105ed0",
+        "renderer_module_sha256": "74aaf0c89bc1a0137b62d467af9f83153487978edb3705ca1acf3d54fa5241fa",
+        "renderer": {
+          "vendor": "Mesa",
+          "renderer": "llvmpipe (LLVM 21.1.8, 256 bits)",
+          "version": "4.5 (Core Profile) Mesa 26.0.8-1ubuntu0.3",
+          "client_width": 1280,
+          "client_height": 720
+        },
+        "lifecycle": {
+          "rendered_frames": 144,
+          "successful_presents": 144,
+          "context_deleted": true
+        },
+        "checks": [
+          "drag",
+          "external_drag",
+          "wheel",
+          "step",
+          "gui_capture"
+        ],
+        "camera_priority": true,
+        "focus_loss_release": true,
+        "held_button_shutdown_release": true,
+        "mouse_events": 23,
+        "sanitizers_unsuppressed": false,
+        "isolated_xlib_loaded": false,
+        "isolated_mesa_loaded": false,
+        "evidence_sha256": {
+          "console.log": "8189db821175943b4e1c547d3e3401a79cf5b6fa4c01e6135fe589e3708d01b0",
+          "control-inputs.csv": "420eb44b513af8f6750a80662ccb2c392fa473bd92b8ab54f4a5352ba6d0b5a2",
+          "cockpit-camera.csv": "1224b5750ff80b79e6f25873e01a7a762c122e87956e8926fd9dbc3a89564dfa",
+          "camera-capture.csv": "7c927bba04942a2b6f65c2e6b5f3c86bce9a25d9eaf507016d7577d6e97e243d",
+          "ui-state.csv": "7e64a91374097f68c7a1b8bfcc393fd9f3bdd87d611e226005c5877914558821",
+          "menu-windows.csv": "6f8fc14cc3cbc6bd23b7f770d927a139492e82fb91cc5e06c081e2a58bfef1c0",
+          "input-state.csv": "97ebea2f8da18b628ef3e748deec7612dc194c86cb9e33f710857ad0c18cbaa3",
+          "loaded-maps.txt": "404f4880c6782537f094376266fa743bf83a221181daeba12f2ac9b7c0f89e18",
+          "owned-cockpit.png": "40d05dd20fd537526d1954a66adb17f2c2e56b521b446f34fd8f16fb939af84d"
+        }
+      },
+      "controls_dgs_panel": {
+        "output": "out/phase6-camera-final-profiles/sse2-debug/controls_dgs_panel",
+        "case": "controls_dgs_panel",
+        "report_sha256": "bd56bf635ca3e6ac13a11a64677b78c40a220690c5e1da92a2b3a665833b42ae",
+        "camera_report_sha256": "0bca77d474261c92056c26a9539ae7fe59397a14a36fb163d5bcc0eb66e58e60",
+        "shutdown_report_sha256": "7618ea5fc7b0593237de379c2d1aafd0958ef918809c195e8ebd5d150d8eb2ad",
+        "camera_driver_sha256": "fb24b6945946659860d3e2ab70c7829d5ac96bdf8d1a2ad944f18965f4114fbf",
+        "window_driver_sha256": "1b31c05d9e8401c1e7080b53a03be8f446113698f6e59ca872a4f8b80015a4d7",
+        "engine_sha256": "82e5dce00ef01d002d912e067b13da4d4b3e55aa4d81420b45ad749c30840fb3",
+        "engine_library_sha256": "8810b3949b04f31dc2c239f7f2db6d4972b6bc95eb1e8dc8d77b52dd3d105ed0",
+        "renderer_module_sha256": "74aaf0c89bc1a0137b62d467af9f83153487978edb3705ca1acf3d54fa5241fa",
+        "renderer": {
+          "vendor": "Mesa",
+          "renderer": "llvmpipe (LLVM 21.1.8, 256 bits)",
+          "version": "4.5 (Core Profile) Mesa 26.0.8-1ubuntu0.3",
+          "client_width": 1280,
+          "client_height": 720
+        },
+        "lifecycle": {
+          "rendered_frames": 314,
+          "successful_presents": 314,
+          "context_deleted": true
+        },
+        "checks": [
+          "drag",
+          "external_drag",
+          "wheel",
+          "step",
+          "gui_capture"
+        ],
+        "camera_priority": true,
+        "focus_loss_release": true,
+        "held_button_shutdown_release": true,
+        "mouse_events": 24,
+        "sanitizers_unsuppressed": false,
+        "isolated_xlib_loaded": false,
+        "isolated_mesa_loaded": false,
+        "evidence_sha256": {
+          "console.log": "abb8a71aa1e4dfea30103070918fcad38691c1a27bc593646876f468eb2364bf",
+          "control-inputs.csv": "3daad22888e9d9097ccdf90ae9662ec974d1b90e0b71524af54e8578a2672aae",
+          "cockpit-camera.csv": "8a6130dc0111058e34862e6a876c8f019bfbcdc59f45b3160e6c3f37b1c52b76",
+          "camera-capture.csv": "7c927bba04942a2b6f65c2e6b5f3c86bce9a25d9eaf507016d7577d6e97e243d",
+          "ui-state.csv": "b43f785c9db41505f561ac0a6422e399c838e64db7b401df814aceb4fdb98ff9",
+          "menu-windows.csv": "bfd1e628ba066d4218c3876831669d9cce7553c4aa6f499868b965ffb32642ec",
+          "input-state.csv": "a24f88f32432fd2f8e01eb66c89e9fb60da074bee78675ba8d09cc04f8d7b18d",
+          "loaded-maps.txt": "4c7e4fd17b0f0803f22af32d42b5ec8f46f2b2e043fd6f66cd37bd96fb9ef23a",
+          "owned-cockpit.png": "f3e6967548346ce62d5ac671808f50413a23bdde3a20d8b28f0d213a130c7834"
+        }
+      },
+      "controls_dgs_vc": {
+        "output": "out/phase6-camera-final-profiles/sse2-debug/controls_dgs_vc",
+        "case": "controls_dgs_vc",
+        "report_sha256": "1b3f1c8059620c2d2735578a32df3624e8d5ec7151845edb6d0516c1e5e8504c",
+        "camera_report_sha256": "be8fac2ba2456bc8b8a6bdf942870284e25a28c46ad2f735e4fcfe6a2c509d6d",
+        "shutdown_report_sha256": "7618ea5fc7b0593237de379c2d1aafd0958ef918809c195e8ebd5d150d8eb2ad",
+        "camera_driver_sha256": "fb24b6945946659860d3e2ab70c7829d5ac96bdf8d1a2ad944f18965f4114fbf",
+        "window_driver_sha256": "1b31c05d9e8401c1e7080b53a03be8f446113698f6e59ca872a4f8b80015a4d7",
+        "engine_sha256": "82e5dce00ef01d002d912e067b13da4d4b3e55aa4d81420b45ad749c30840fb3",
+        "engine_library_sha256": "8810b3949b04f31dc2c239f7f2db6d4972b6bc95eb1e8dc8d77b52dd3d105ed0",
+        "renderer_module_sha256": "74aaf0c89bc1a0137b62d467af9f83153487978edb3705ca1acf3d54fa5241fa",
+        "renderer": {
+          "vendor": "Mesa",
+          "renderer": "llvmpipe (LLVM 21.1.8, 256 bits)",
+          "version": "4.5 (Core Profile) Mesa 26.0.8-1ubuntu0.3",
+          "client_width": 1280,
+          "client_height": 720
+        },
+        "lifecycle": {
+          "rendered_frames": 157,
+          "successful_presents": 157,
+          "context_deleted": true
+        },
+        "checks": [
+          "drag",
+          "external_drag",
+          "wheel",
+          "step",
+          "gui_capture"
+        ],
+        "camera_priority": true,
+        "focus_loss_release": true,
+        "held_button_shutdown_release": true,
+        "mouse_events": 23,
+        "sanitizers_unsuppressed": false,
+        "isolated_xlib_loaded": false,
+        "isolated_mesa_loaded": false,
+        "evidence_sha256": {
+          "console.log": "abb8a71aa1e4dfea30103070918fcad38691c1a27bc593646876f468eb2364bf",
+          "control-inputs.csv": "eb88e1673c17522a3587cc425a081a6e17a2a208c031e4ba7f847e3d9015ccd9",
+          "cockpit-camera.csv": "f20a49b9b63fb64f6f58dc8cde898ec018fc3b3958fa0577ccc1066f71417056",
+          "camera-capture.csv": "7c927bba04942a2b6f65c2e6b5f3c86bce9a25d9eaf507016d7577d6e97e243d",
+          "ui-state.csv": "b9d9dd611902c193570b88c227be9ca4a16f3d30dd356fd3f8c985a57b633c5a",
+          "menu-windows.csv": "9585765f364c6e896739075aae154de8cf5dc7e0e6d59b6826dbb883591e933f",
+          "input-state.csv": "be84b0ca30559d10a00dc25f3307b9d22a1bd6bebbba6da8b89846a994c05053",
+          "loaded-maps.txt": "8da0add2a5b266a1f8b664beaab830873a1e61ef767a80a4bdb55357a85ad037",
+          "owned-cockpit.png": "11113051c0b6d74e594caf8275e20a35a61f9add75c2aec358f84916a4bbb9fb"
+        }
+      }
+    },
+    "sse2-release": {
+      "controls_generic_orbit_surface": {
+        "output": "out/phase6-camera-final-profiles/sse2-release/controls_generic_orbit_surface",
+        "case": "controls_generic_orbit_surface",
+        "report_sha256": "26af58dd47c3a53b5373e4c43cf8aaf039a45e2db50e6fc2733dd05ece89f9b6",
+        "camera_report_sha256": "0739e8ce2317c3f211254e5b14ac04422e4c1276c4405d49dd260a8f344453f1",
+        "shutdown_report_sha256": "7618ea5fc7b0593237de379c2d1aafd0958ef918809c195e8ebd5d150d8eb2ad",
+        "camera_driver_sha256": "fb24b6945946659860d3e2ab70c7829d5ac96bdf8d1a2ad944f18965f4114fbf",
+        "window_driver_sha256": "1b31c05d9e8401c1e7080b53a03be8f446113698f6e59ca872a4f8b80015a4d7",
+        "engine_sha256": "f1f57b4fb6c9d6ebabada83472749770c92ec109580b80c8dbec3c4271f51695",
+        "engine_library_sha256": "6b845c2a6a49ef05d5968b51a550711bf38387281e2833702e84055bc68bdd88",
+        "renderer_module_sha256": "61ed753a657879cfbbee9850d69aedea11466b0b1a0513cf419dcd80479fe8bf",
+        "renderer": {
+          "vendor": "Mesa",
+          "renderer": "llvmpipe (LLVM 21.1.8, 256 bits)",
+          "version": "4.5 (Core Profile) Mesa 26.0.8-1ubuntu0.3",
+          "client_width": 1280,
+          "client_height": 720
+        },
+        "lifecycle": {
+          "rendered_frames": 320,
+          "successful_presents": 320,
+          "context_deleted": true
+        },
+        "checks": [
+          "drag",
+          "external_drag",
+          "wheel",
+          "step",
+          "gui_capture"
+        ],
+        "camera_priority": true,
+        "focus_loss_release": true,
+        "held_button_shutdown_release": true,
+        "mouse_events": 35,
+        "sanitizers_unsuppressed": false,
+        "isolated_xlib_loaded": false,
+        "isolated_mesa_loaded": false,
+        "evidence_sha256": {
+          "console.log": "cbb80b540852d1029d66c54a92bd8a90c34bd1aab4de9fa031e5a604a5fc7ed2",
+          "control-inputs.csv": "73c36ee3803fa4dc1a7a6875b7f5697288102e7a24da51923bab21a4684bd3ca",
+          "cockpit-camera.csv": "6f4e42419d50fc3473ee7382f8c11e24140cfbdafcb016a1bab668741ac68656",
+          "camera-capture.csv": "7c927bba04942a2b6f65c2e6b5f3c86bce9a25d9eaf507016d7577d6e97e243d",
+          "ui-state.csv": "f3e0d87436f220b05a4baa5807fb529c276eeb2afc3943be4b61424b735b745c",
+          "menu-windows.csv": "67df1fb99011195d1ee49e2b18dd8d0272c02747a6e2622c338a0e12e30b171e",
+          "input-state.csv": "901ef38bd84d03cb2b18365e8358237ed3c23e95f9fabea3dacf42e49049dc95",
+          "loaded-maps.txt": "ffaa87d3e1e9dfa31fa069eec1f4a34fd08bd5f5375965fc07d8d53189e8781f",
+          "owned-cockpit.png": "4945894713247941dae0a2e6d4d39dc114296886f7cefcbd9276482e3c38d41d"
+        }
+      },
+      "controls_dg_panel": {
+        "output": "out/phase6-camera-final-profiles/sse2-release/controls_dg_panel",
+        "case": "controls_dg_panel",
+        "report_sha256": "6128ab732dcefbf22e8b2f9180a353e983f50b0c21ef3868a494ae015102bf3d",
+        "camera_report_sha256": "1eb7e0ed79977bd12e9c4444972dd0301dce5744de68f4ce363bb6cdc44fcdd7",
+        "shutdown_report_sha256": "7618ea5fc7b0593237de379c2d1aafd0958ef918809c195e8ebd5d150d8eb2ad",
+        "camera_driver_sha256": "fb24b6945946659860d3e2ab70c7829d5ac96bdf8d1a2ad944f18965f4114fbf",
+        "window_driver_sha256": "1b31c05d9e8401c1e7080b53a03be8f446113698f6e59ca872a4f8b80015a4d7",
+        "engine_sha256": "f1f57b4fb6c9d6ebabada83472749770c92ec109580b80c8dbec3c4271f51695",
+        "engine_library_sha256": "6b845c2a6a49ef05d5968b51a550711bf38387281e2833702e84055bc68bdd88",
+        "renderer_module_sha256": "61ed753a657879cfbbee9850d69aedea11466b0b1a0513cf419dcd80479fe8bf",
+        "renderer": {
+          "vendor": "Mesa",
+          "renderer": "llvmpipe (LLVM 21.1.8, 256 bits)",
+          "version": "4.5 (Core Profile) Mesa 26.0.8-1ubuntu0.3",
+          "client_width": 1280,
+          "client_height": 720
+        },
+        "lifecycle": {
+          "rendered_frames": 333,
+          "successful_presents": 333,
+          "context_deleted": true
+        },
+        "checks": [
+          "drag",
+          "external_drag",
+          "wheel",
+          "step",
+          "gui_capture"
+        ],
+        "camera_priority": true,
+        "focus_loss_release": true,
+        "held_button_shutdown_release": true,
+        "mouse_events": 24,
+        "sanitizers_unsuppressed": false,
+        "isolated_xlib_loaded": false,
+        "isolated_mesa_loaded": false,
+        "evidence_sha256": {
+          "console.log": "8189db821175943b4e1c547d3e3401a79cf5b6fa4c01e6135fe589e3708d01b0",
+          "control-inputs.csv": "33a4bbb5fb77bb589800be5beb911058ec3f0e67e2871ec38d6653dd34128646",
+          "cockpit-camera.csv": "2d3da9cd06c2b83a82a56293a69967a70b3ce11d21529c6b5a1ca76cded5a34f",
+          "camera-capture.csv": "7c927bba04942a2b6f65c2e6b5f3c86bce9a25d9eaf507016d7577d6e97e243d",
+          "ui-state.csv": "2139f58a40b2cfb9fe02332e537b91d52d60f97959e8719b4795f223b05924b8",
+          "menu-windows.csv": "e5a76c7941b0b0478f6fdf14fdf70c8823892356e854f3962a69fc7702754530",
+          "input-state.csv": "2e5f5023c1fe54650beb58e8eb247d12698040c59f6d1705dbfadb162af89cf8",
+          "loaded-maps.txt": "72cfdd35519b757d658a2c749846df8b1efb8cbae5b4cba909bf3a47a66c3a4b",
+          "owned-cockpit.png": "9f8f1098aceae6f7d148637ca03a52450e7463da21ebf158ea6d57eaca09ea5d"
+        }
+      },
+      "controls_dg_vc": {
+        "output": "out/phase6-camera-final-profiles/sse2-release/controls_dg_vc",
+        "case": "controls_dg_vc",
+        "report_sha256": "5b9d7b71827d6c19c78c668ba70b00597b04f1f6dcdd0792c21dbfd79eea41c5",
+        "camera_report_sha256": "83139f2a332795f02a35d672b56b5ee67207229e065abf7d70447a1efdb47fdd",
+        "shutdown_report_sha256": "7618ea5fc7b0593237de379c2d1aafd0958ef918809c195e8ebd5d150d8eb2ad",
+        "camera_driver_sha256": "fb24b6945946659860d3e2ab70c7829d5ac96bdf8d1a2ad944f18965f4114fbf",
+        "window_driver_sha256": "1b31c05d9e8401c1e7080b53a03be8f446113698f6e59ca872a4f8b80015a4d7",
+        "engine_sha256": "f1f57b4fb6c9d6ebabada83472749770c92ec109580b80c8dbec3c4271f51695",
+        "engine_library_sha256": "6b845c2a6a49ef05d5968b51a550711bf38387281e2833702e84055bc68bdd88",
+        "renderer_module_sha256": "61ed753a657879cfbbee9850d69aedea11466b0b1a0513cf419dcd80479fe8bf",
+        "renderer": {
+          "vendor": "Mesa",
+          "renderer": "llvmpipe (LLVM 21.1.8, 256 bits)",
+          "version": "4.5 (Core Profile) Mesa 26.0.8-1ubuntu0.3",
+          "client_width": 1280,
+          "client_height": 720
+        },
+        "lifecycle": {
+          "rendered_frames": 154,
+          "successful_presents": 154,
+          "context_deleted": true
+        },
+        "checks": [
+          "drag",
+          "external_drag",
+          "wheel",
+          "step",
+          "gui_capture"
+        ],
+        "camera_priority": true,
+        "focus_loss_release": true,
+        "held_button_shutdown_release": true,
+        "mouse_events": 23,
+        "sanitizers_unsuppressed": false,
+        "isolated_xlib_loaded": false,
+        "isolated_mesa_loaded": false,
+        "evidence_sha256": {
+          "console.log": "8189db821175943b4e1c547d3e3401a79cf5b6fa4c01e6135fe589e3708d01b0",
+          "control-inputs.csv": "700c25d868cf97f56eb9160013118b4960c355139c8357ed7249dcdb72a8d8be",
+          "cockpit-camera.csv": "d8d308f4e77f5b983055d17ac6bf0a456f373c244a18207004a8f1ec9548044c",
+          "camera-capture.csv": "7c927bba04942a2b6f65c2e6b5f3c86bce9a25d9eaf507016d7577d6e97e243d",
+          "ui-state.csv": "a288bcfd057a75927650745d4d7328437c787c5d4f3539b79ed3038c5b4f87e2",
+          "menu-windows.csv": "92d0822c6e09ec590f266d9d1bee1c8c23e082280e2e7b094bc9569838e92c14",
+          "input-state.csv": "d9aeacc36fef60c58af75b1613fe708f1c1c274bb3d18db93868f276ea2dd736",
+          "loaded-maps.txt": "81bf1a1b3e1b83d184aecae00df669b7fbc73dfb509da78a5f4b95543a2f01aa",
+          "owned-cockpit.png": "035f81a03e327455d3fb9e3c8ff387fde3ae4662e77170db5a4ba3a2e6cab1a5"
+        }
+      },
+      "controls_dgs_panel": {
+        "output": "out/phase6-camera-final-profiles/sse2-release/controls_dgs_panel",
+        "case": "controls_dgs_panel",
+        "report_sha256": "4afce189a942d7af917b6464fb7999aece3c4977106bba2ecfa5b77f6154d964",
+        "camera_report_sha256": "b7bce6ca5cd33c824c0b460b0f9c1e7536e7868d1777361b36d714466df05346",
+        "shutdown_report_sha256": "7618ea5fc7b0593237de379c2d1aafd0958ef918809c195e8ebd5d150d8eb2ad",
+        "camera_driver_sha256": "fb24b6945946659860d3e2ab70c7829d5ac96bdf8d1a2ad944f18965f4114fbf",
+        "window_driver_sha256": "1b31c05d9e8401c1e7080b53a03be8f446113698f6e59ca872a4f8b80015a4d7",
+        "engine_sha256": "f1f57b4fb6c9d6ebabada83472749770c92ec109580b80c8dbec3c4271f51695",
+        "engine_library_sha256": "6b845c2a6a49ef05d5968b51a550711bf38387281e2833702e84055bc68bdd88",
+        "renderer_module_sha256": "61ed753a657879cfbbee9850d69aedea11466b0b1a0513cf419dcd80479fe8bf",
+        "renderer": {
+          "vendor": "Mesa",
+          "renderer": "llvmpipe (LLVM 21.1.8, 256 bits)",
+          "version": "4.5 (Core Profile) Mesa 26.0.8-1ubuntu0.3",
+          "client_width": 1280,
+          "client_height": 720
+        },
+        "lifecycle": {
+          "rendered_frames": 312,
+          "successful_presents": 312,
+          "context_deleted": true
+        },
+        "checks": [
+          "drag",
+          "external_drag",
+          "wheel",
+          "step",
+          "gui_capture"
+        ],
+        "camera_priority": true,
+        "focus_loss_release": true,
+        "held_button_shutdown_release": true,
+        "mouse_events": 24,
+        "sanitizers_unsuppressed": false,
+        "isolated_xlib_loaded": false,
+        "isolated_mesa_loaded": false,
+        "evidence_sha256": {
+          "console.log": "abb8a71aa1e4dfea30103070918fcad38691c1a27bc593646876f468eb2364bf",
+          "control-inputs.csv": "caee275bec2fec57164c57e4b65e1edec89595a28a38c39d139a7767bc5715a1",
+          "cockpit-camera.csv": "021af19077a4bbfb586b7aaa6c8e3dade2b17768c2b79ed50ef48050d90bccfa",
+          "camera-capture.csv": "7c927bba04942a2b6f65c2e6b5f3c86bce9a25d9eaf507016d7577d6e97e243d",
+          "ui-state.csv": "a4ce846c21c4e014deab659fe5990b427b62fd82705be61efd87613d9f6b918c",
+          "menu-windows.csv": "7ee64012c7df3589aff983cbd652d2fa2633b7ec291cb313feee0cc22101cfd8",
+          "input-state.csv": "4c9ef087eb3a6d4b299993bc17a340adaa08d82737a2203d75ddfb224baaea93",
+          "loaded-maps.txt": "9e0d95c35756a5667c168f2609df1f643846a84fe9f45986bf7786885479b26d",
+          "owned-cockpit.png": "e8ed88827e4b92e67eaf917ddb46eb4a6c5cd95223d4fd61538c38cfc3a0d026"
+        }
+      },
+      "controls_dgs_vc": {
+        "output": "out/phase6-camera-final-profiles/sse2-release/controls_dgs_vc",
+        "case": "controls_dgs_vc",
+        "report_sha256": "d51163453bc7f9fe17d809073c252004ee5f450acb2a166b75c03f97e6ac5d73",
+        "camera_report_sha256": "3c04b96ee00cb0cf71120d653b569f871bb551664c01e8a349cc6438e35d2b94",
+        "shutdown_report_sha256": "7618ea5fc7b0593237de379c2d1aafd0958ef918809c195e8ebd5d150d8eb2ad",
+        "camera_driver_sha256": "fb24b6945946659860d3e2ab70c7829d5ac96bdf8d1a2ad944f18965f4114fbf",
+        "window_driver_sha256": "1b31c05d9e8401c1e7080b53a03be8f446113698f6e59ca872a4f8b80015a4d7",
+        "engine_sha256": "f1f57b4fb6c9d6ebabada83472749770c92ec109580b80c8dbec3c4271f51695",
+        "engine_library_sha256": "6b845c2a6a49ef05d5968b51a550711bf38387281e2833702e84055bc68bdd88",
+        "renderer_module_sha256": "61ed753a657879cfbbee9850d69aedea11466b0b1a0513cf419dcd80479fe8bf",
+        "renderer": {
+          "vendor": "Mesa",
+          "renderer": "llvmpipe (LLVM 21.1.8, 256 bits)",
+          "version": "4.5 (Core Profile) Mesa 26.0.8-1ubuntu0.3",
+          "client_width": 1280,
+          "client_height": 720
+        },
+        "lifecycle": {
+          "rendered_frames": 160,
+          "successful_presents": 160,
+          "context_deleted": true
+        },
+        "checks": [
+          "drag",
+          "external_drag",
+          "wheel",
+          "step",
+          "gui_capture"
+        ],
+        "camera_priority": true,
+        "focus_loss_release": true,
+        "held_button_shutdown_release": true,
+        "mouse_events": 23,
+        "sanitizers_unsuppressed": false,
+        "isolated_xlib_loaded": false,
+        "isolated_mesa_loaded": false,
+        "evidence_sha256": {
+          "console.log": "abb8a71aa1e4dfea30103070918fcad38691c1a27bc593646876f468eb2364bf",
+          "control-inputs.csv": "0d619de0a4654fefc43932b4a32caebb75d45dcbdc3aba67a88097bad4351a15",
+          "cockpit-camera.csv": "cfcc44c61cc7fa85eb010e0c8cfec6f07f8da48e0be9b4e7d5fc9444f72c95a2",
+          "camera-capture.csv": "7c927bba04942a2b6f65c2e6b5f3c86bce9a25d9eaf507016d7577d6e97e243d",
+          "ui-state.csv": "75c86dd3fd991c40baf95acded9748dc30c33c9946d9b0cf3f9db0a2f02e0ac4",
+          "menu-windows.csv": "aac8d38bc18a62877c9c7fb8673446a5e0d85b42f908f837668868eebde20441",
+          "input-state.csv": "c0bf0b75c909a01a699179eac9919620a5b22d2ff0ff165f7eb5f1204c298946",
+          "loaded-maps.txt": "9fcad0c4896615ac2e040d87b42e11a624c290f38d393af46d727da05d3bbe9c",
+          "owned-cockpit.png": "ba6cc71f67de363e51109a73a6fbcf9d19777666a802c2a876d9b33b432a272d"
+        }
+      }
+    }
+  },
+  "intel_normal": {
+    "output": "out/phase6-camera-intel-targeted",
+    "case": "controls_dgs_vc",
+    "report_sha256": "08c939e36d178e4eca3f1d8cf758c8171dcdce2de0f3a8ddc848db5686924398",
+    "camera_report_sha256": "aa4e462dd5c9a9dec048fd545627f80760f14e911fe0d09614c06a6da92134b7",
+    "shutdown_report_sha256": "7618ea5fc7b0593237de379c2d1aafd0958ef918809c195e8ebd5d150d8eb2ad",
+    "camera_driver_sha256": "fb24b6945946659860d3e2ab70c7829d5ac96bdf8d1a2ad944f18965f4114fbf",
+    "window_driver_sha256": "1b31c05d9e8401c1e7080b53a03be8f446113698f6e59ca872a4f8b80015a4d7",
+    "engine_sha256": "8e074c036edd6abe8f4fd75e870fbffc403f9a73b51f900a8282860abc7d1f2c",
+    "engine_library_sha256": "8770501b39a8fa20e2a1d28c803276aac69238bc286f0b73986efae75a2227c4",
+    "renderer_module_sha256": "f248538c637ef70f2e7cad4ebe602d71b3f61917350b227b3861dace323060e5",
+    "renderer": {
+      "vendor": "Intel",
+      "renderer": "Mesa Intel(R) Graphics (PTL)",
+      "version": "4.6 (Core Profile) Mesa 26.0.8-1ubuntu0.3",
+      "client_width": 1280,
+      "client_height": 720
+    },
+    "lifecycle": {
+      "rendered_frames": 1925,
+      "successful_presents": 1925,
+      "context_deleted": true
+    },
+    "checks": [
+      "drag",
+      "external_drag",
+      "wheel",
+      "step",
+      "gui_capture"
+    ],
+    "camera_priority": true,
+    "focus_loss_release": true,
+    "held_button_shutdown_release": true,
+    "mouse_events": 23,
+    "sanitizers_unsuppressed": false,
+    "isolated_xlib_loaded": false,
+    "isolated_mesa_loaded": false,
+    "evidence_sha256": {
+      "console.log": "d4c72a070f66bce5aeb82070d922901cd5f89ca8e9b8a575a1d186dd6040d1de",
+      "control-inputs.csv": "a5fe0b5d8fefe100ec43929d7cf68dc1317bcacfd606886e127b1f6744805b3e",
+      "cockpit-camera.csv": "46efe359a93cde3e6f5a75f94e0765b91a9a6fc0d22b686bbba7c9885ed6661d",
+      "camera-capture.csv": "7c927bba04942a2b6f65c2e6b5f3c86bce9a25d9eaf507016d7577d6e97e243d",
+      "ui-state.csv": "bd5662588a05f79f5f551da7fddf22e2b186b1ad9609b92e5dcfe3ba0ac4d86a",
+      "menu-windows.csv": "9c079fadae21060cd118436af6edf01aca7992049006867c54b25e6718879a3d",
+      "input-state.csv": "6f40243b99c7aa02b43cd87f5c0bf2e5aedd2e49324b70cb79d0a6f08b6d54df",
+      "loaded-maps.txt": "2fafc8fbe1101d0eb3959d14a75d79d8da66b6b08b5f38089c31c89053992ad9",
+      "owned-cockpit.png": "5326b582c717f9a258207d6fa034d03f9fcd723c752061b1392a193edd20a8d3"
+    }
+  },
+  "sanitizers": {
+    "intel": {
+      "controls_dg_vc": {
+        "output": "out/phase6-camera-intel-sanitizers/controls_dg_vc",
+        "case": "controls_dg_vc",
+        "report_sha256": "e77d3d680d482fb5854a905479a6efdf31f675798375bf9f6fac596e2a782eea",
+        "camera_report_sha256": "027f79fe9d72ed1759a2c18f7e7dcf7b54f5a9a1a08c3d44cd4f314dd04a2ea5",
+        "shutdown_report_sha256": "7618ea5fc7b0593237de379c2d1aafd0958ef918809c195e8ebd5d150d8eb2ad",
+        "camera_driver_sha256": "fb24b6945946659860d3e2ab70c7829d5ac96bdf8d1a2ad944f18965f4114fbf",
+        "window_driver_sha256": "1b31c05d9e8401c1e7080b53a03be8f446113698f6e59ca872a4f8b80015a4d7",
+        "engine_sha256": "4349068454522e36d5cdf08164e883e38dbde9575a5a9bd77919fc95752a8508",
+        "engine_library_sha256": "3aa324538368e4526dc9c7e405192bdf85b135474f4b0da0035e9dafc202ed31",
+        "renderer_module_sha256": "e9d11c6db3a0e02f3cf2930a450c87e4d560b694031c0ef8880484668746354e",
+        "renderer": {
+          "vendor": "Intel",
+          "renderer": "Mesa Intel(R) Graphics (PTL)",
+          "version": "4.6 (Core Profile) Mesa 26.0.8-1ubuntu0.3",
+          "client_width": 1280,
+          "client_height": 720
+        },
+        "lifecycle": {
+          "rendered_frames": 1243,
+          "successful_presents": 1243,
+          "context_deleted": true
+        },
+        "checks": [
+          "drag",
+          "external_drag",
+          "wheel",
+          "step",
+          "gui_capture"
+        ],
+        "camera_priority": true,
+        "focus_loss_release": true,
+        "held_button_shutdown_release": true,
+        "mouse_events": 23,
+        "sanitizers_unsuppressed": true,
+        "isolated_xlib_loaded": true,
+        "isolated_mesa_loaded": false,
+        "evidence_sha256": {
+          "console.log": "770be30b73ca405ce82ea3cd4879034609be7e89d5eba63528b7fcdcc5b0132e",
+          "control-inputs.csv": "a5060c72a08ecba2cf66ed40bd47565791bbe149bba140de523e2e448f02df0f",
+          "cockpit-camera.csv": "08934cb651e7d5d86d88b30a090fc2be2ff3c6d48a27bfa2e75560b63035894e",
+          "camera-capture.csv": "7c927bba04942a2b6f65c2e6b5f3c86bce9a25d9eaf507016d7577d6e97e243d",
+          "ui-state.csv": "0c6cc6d9a5c21460506bd236df328da4b5d4e0980a4ed482883f63dc3ed35c2f",
+          "menu-windows.csv": "56914af280fdd0730adc08eb09328d13c81654908e34ac1c6fe6ea1fe2b903c7",
+          "input-state.csv": "f940a076bda21a5aaff3c15b74d991842d60998720fe9dec644835061309ea63",
+          "loaded-maps.txt": "89279349b3ba17cbe4ebff257f14c0b289916832900734215bec7d0e3286b39f",
+          "owned-cockpit.png": "a500e895865e0dba622c0650eaed6c149b04e8a80ef2eff81444678743587ce0"
+        }
+      },
+      "controls_dgs_panel": {
+        "output": "out/phase6-camera-intel-sanitizers/controls_dgs_panel",
+        "case": "controls_dgs_panel",
+        "report_sha256": "ad361659edafb47736826982f1673f31a3b9b93e214ef5a6a7d218e126ea44e6",
+        "camera_report_sha256": "27367c208e5aacfcd395ca87a8eae641ef36aab8d659f90113d29bcd0a15d208",
+        "shutdown_report_sha256": "7618ea5fc7b0593237de379c2d1aafd0958ef918809c195e8ebd5d150d8eb2ad",
+        "camera_driver_sha256": "fb24b6945946659860d3e2ab70c7829d5ac96bdf8d1a2ad944f18965f4114fbf",
+        "window_driver_sha256": "1b31c05d9e8401c1e7080b53a03be8f446113698f6e59ca872a4f8b80015a4d7",
+        "engine_sha256": "4349068454522e36d5cdf08164e883e38dbde9575a5a9bd77919fc95752a8508",
+        "engine_library_sha256": "3aa324538368e4526dc9c7e405192bdf85b135474f4b0da0035e9dafc202ed31",
+        "renderer_module_sha256": "e9d11c6db3a0e02f3cf2930a450c87e4d560b694031c0ef8880484668746354e",
+        "renderer": {
+          "vendor": "Intel",
+          "renderer": "Mesa Intel(R) Graphics (PTL)",
+          "version": "4.6 (Core Profile) Mesa 26.0.8-1ubuntu0.3",
+          "client_width": 1280,
+          "client_height": 720
+        },
+        "lifecycle": {
+          "rendered_frames": 1355,
+          "successful_presents": 1355,
+          "context_deleted": true
+        },
+        "checks": [
+          "drag",
+          "external_drag",
+          "wheel",
+          "step",
+          "gui_capture"
+        ],
+        "camera_priority": true,
+        "focus_loss_release": true,
+        "held_button_shutdown_release": true,
+        "mouse_events": 24,
+        "sanitizers_unsuppressed": true,
+        "isolated_xlib_loaded": true,
+        "isolated_mesa_loaded": false,
+        "evidence_sha256": {
+          "console.log": "d4c72a070f66bce5aeb82070d922901cd5f89ca8e9b8a575a1d186dd6040d1de",
+          "control-inputs.csv": "01cbc262b0c60e6e67a1f68338fd6bc6845522c9aca5255faad54eae0bfb0720",
+          "cockpit-camera.csv": "a03cb907acd1a3e94a6e619db0c387868b4f8ee1096ca3969ad5ba36139fa1cc",
+          "camera-capture.csv": "7c927bba04942a2b6f65c2e6b5f3c86bce9a25d9eaf507016d7577d6e97e243d",
+          "ui-state.csv": "74781625259889e000b032c86ab0e77d3c79307ae8cc54d38c3829dd5848e24b",
+          "menu-windows.csv": "87bb11ed6283b0ccf79d78c5d5ccd8b0fade2448ae0eedd500145e0a18382499",
+          "input-state.csv": "5ce08933e3c17bf07897cf3d50fe5e954942325685306e567775e724c0383fae",
+          "loaded-maps.txt": "624e64a5653f762fd6f496c542737b83e26c55697987f6a7d92d7e7fef84a9cf",
+          "owned-cockpit.png": "281c115844ed4ef6bc151625a66870d3c09a0cfb009993edb8bb6b7e1e2308b3"
+        }
+      }
+    },
+    "software": {
+      "controls_dg_panel": {
+        "output": "out/phase6-camera-software-sanitizers/controls_dg_panel",
+        "case": "controls_dg_panel",
+        "report_sha256": "8ff6f32d6cbc0ec626f1d9dbb6bf78baa8eae42fb35bcdc21ba1f7804e22d095",
+        "camera_report_sha256": "2d1c5844dcbf1cdbda3da356f19845dadc8bad62947260b4361f3c16425d8625",
+        "shutdown_report_sha256": "7618ea5fc7b0593237de379c2d1aafd0958ef918809c195e8ebd5d150d8eb2ad",
+        "camera_driver_sha256": "fb24b6945946659860d3e2ab70c7829d5ac96bdf8d1a2ad944f18965f4114fbf",
+        "window_driver_sha256": "1b31c05d9e8401c1e7080b53a03be8f446113698f6e59ca872a4f8b80015a4d7",
+        "engine_sha256": "4349068454522e36d5cdf08164e883e38dbde9575a5a9bd77919fc95752a8508",
+        "engine_library_sha256": "3aa324538368e4526dc9c7e405192bdf85b135474f4b0da0035e9dafc202ed31",
+        "renderer_module_sha256": "e9d11c6db3a0e02f3cf2930a450c87e4d560b694031c0ef8880484668746354e",
+        "renderer": {
+          "vendor": "Mesa",
+          "renderer": "llvmpipe (LLVM 21.1.8, 256 bits)",
+          "version": "4.5 (Core Profile) Mesa 26.0.8",
+          "client_width": 1280,
+          "client_height": 720
+        },
+        "lifecycle": {
+          "rendered_frames": 196,
+          "successful_presents": 196,
+          "context_deleted": true
+        },
+        "checks": [
+          "drag",
+          "external_drag",
+          "wheel",
+          "step",
+          "gui_capture"
+        ],
+        "camera_priority": true,
+        "focus_loss_release": true,
+        "held_button_shutdown_release": true,
+        "mouse_events": 24,
+        "sanitizers_unsuppressed": true,
+        "isolated_xlib_loaded": true,
+        "isolated_mesa_loaded": true,
+        "evidence_sha256": {
+          "console.log": "8189db821175943b4e1c547d3e3401a79cf5b6fa4c01e6135fe589e3708d01b0",
+          "control-inputs.csv": "817898e03572bcc92ad58d52e67e545b931a8e8c603c02f9225e9164747b7fd8",
+          "cockpit-camera.csv": "b1d392200d9cf8bca5980414c03374eaaf4ebe23a7f57c6d03e0de0d82bac3b2",
+          "camera-capture.csv": "7c927bba04942a2b6f65c2e6b5f3c86bce9a25d9eaf507016d7577d6e97e243d",
+          "ui-state.csv": "64cb4cbcc29a21fbd5bd7cc1bc029cbec8deb2ad9e6fd9ba97cae569b378761e",
+          "menu-windows.csv": "4658021f1c51235be8a6f1d6661de0b73cb4d4ce374609397bb4d8cf8549ca9d",
+          "input-state.csv": "29c6eaaa3187f085ed229ad628cfd4e8f1e14fa66ff7f5be9918cc8c50952450",
+          "loaded-maps.txt": "0c1bccb40268ab2320cb44b0f1186b2a3a96baab4418855566f6eb5332849036",
+          "owned-cockpit.png": "5592f8b5e29e19968d0c0e4ea11108a22f09b18e73a7aa2eabd4838c3597bc58"
+        }
+      },
+      "controls_dgs_vc": {
+        "output": "out/phase6-camera-software-sanitizers/controls_dgs_vc",
+        "case": "controls_dgs_vc",
+        "report_sha256": "ba09aa2a2c4245e1a682f397423c54956fef55429bce3518977e524910cef30a",
+        "camera_report_sha256": "4ade03485ee3eec6b4f070909e836e953c19fb68f59a1e05a17f9bb6815da287",
+        "shutdown_report_sha256": "7618ea5fc7b0593237de379c2d1aafd0958ef918809c195e8ebd5d150d8eb2ad",
+        "camera_driver_sha256": "fb24b6945946659860d3e2ab70c7829d5ac96bdf8d1a2ad944f18965f4114fbf",
+        "window_driver_sha256": "1b31c05d9e8401c1e7080b53a03be8f446113698f6e59ca872a4f8b80015a4d7",
+        "engine_sha256": "4349068454522e36d5cdf08164e883e38dbde9575a5a9bd77919fc95752a8508",
+        "engine_library_sha256": "3aa324538368e4526dc9c7e405192bdf85b135474f4b0da0035e9dafc202ed31",
+        "renderer_module_sha256": "e9d11c6db3a0e02f3cf2930a450c87e4d560b694031c0ef8880484668746354e",
+        "renderer": {
+          "vendor": "Mesa",
+          "renderer": "llvmpipe (LLVM 21.1.8, 256 bits)",
+          "version": "4.5 (Core Profile) Mesa 26.0.8",
+          "client_width": 1280,
+          "client_height": 720
+        },
+        "lifecycle": {
+          "rendered_frames": 92,
+          "successful_presents": 92,
+          "context_deleted": true
+        },
+        "checks": [
+          "drag",
+          "external_drag",
+          "wheel",
+          "step",
+          "gui_capture"
+        ],
+        "camera_priority": true,
+        "focus_loss_release": true,
+        "held_button_shutdown_release": true,
+        "mouse_events": 23,
+        "sanitizers_unsuppressed": true,
+        "isolated_xlib_loaded": true,
+        "isolated_mesa_loaded": true,
+        "evidence_sha256": {
+          "console.log": "abb8a71aa1e4dfea30103070918fcad38691c1a27bc593646876f468eb2364bf",
+          "control-inputs.csv": "fa89fd291ae1a85e4355f18f5513ab427084f45b8622f9cd1cef1df093a079e5",
+          "cockpit-camera.csv": "64924549b13fca31b408ade900b658f38fe942b456aa3ac0553d0899f4b93ee1",
+          "camera-capture.csv": "7c927bba04942a2b6f65c2e6b5f3c86bce9a25d9eaf507016d7577d6e97e243d",
+          "ui-state.csv": "6183c9d9690f9641fc04569710174b754f0f9b1608bbd260eda8a2e8ce86c416",
+          "menu-windows.csv": "cb649e89d28660a7621f2ee794ed6baacb94b7d9d11c91494bc4e1cd912cc883",
+          "input-state.csv": "497f3965dfae73e017e4c10d336d548860cbeaaa77ade2e77ebf854f229ef565",
+          "loaded-maps.txt": "c1603453cada41c6d5f8cfd957e188ed01b99e2c4f8d904b4d1b6bce75a61998",
+          "owned-cockpit.png": "9f05c249222d3ded75c31694957685fcb279f5f13525077e59010ec0204ef749"
+        }
+      }
+    }
+  },
+  "frozen_control_regression": {
+    "automatic-debug": {
+      "report": {
+        "path": "out/phase6-camera-frozen/automatic-debug/native-control-report.json",
+        "sha256": "b5bb225d934bed21a35896bc12d3047dcbb6b66a07f2e8ecee3b4f247bf4ce6e"
+      },
+      "cases": 5,
+      "processes": 10,
+      "all_full_frame_and_mfd_ssim": 1.0,
+      "state_maxima": {
+        "position_m": 0.0,
+        "velocity_m_s": 0.0,
+        "rotation_rad": 0.0,
+        "angular_velocity_rad_s": 0.0,
+        "mjd_days": 0.0,
+        "propellant_fraction": 0.0
+      }
+    },
+    "automatic-release": {
+      "report": {
+        "path": "out/phase6-camera-frozen/automatic-release/native-control-report.json",
+        "sha256": "5835096116489ac12a54ed63c5648f69695ed714d02fa355d36428dc4a78e67c"
+      },
+      "cases": 5,
+      "processes": 10,
+      "all_full_frame_and_mfd_ssim": 1.0,
+      "state_maxima": {
+        "position_m": 0.0,
+        "velocity_m_s": 0.0,
+        "rotation_rad": 0.0,
+        "angular_velocity_rad_s": 0.0,
+        "mjd_days": 0.0,
+        "propellant_fraction": 0.0
+      }
+    },
+    "sse2-debug": {
+      "report": {
+        "path": "out/phase6-camera-frozen/sse2-debug/native-control-report.json",
+        "sha256": "15fd6b966f5af61c8b32e3943d8836740afa9019f4ce4e82871d5e0366660232"
+      },
+      "cases": 5,
+      "processes": 10,
+      "all_full_frame_and_mfd_ssim": 1.0,
+      "state_maxima": {
+        "position_m": 0.0,
+        "velocity_m_s": 0.0,
+        "rotation_rad": 5.68653432537865e-22,
+        "angular_velocity_rad_s": 1.0040303998149245e-22,
+        "mjd_days": 0.0,
+        "propellant_fraction": 0.0
+      }
+    },
+    "sse2-release": {
+      "report": {
+        "path": "out/phase6-camera-frozen/sse2-release/native-control-report.json",
+        "sha256": "d2b8f04c26f00ddce363202e146efe3db227276b770c68852e240571bb2234d0"
+      },
+      "cases": 5,
+      "processes": 10,
+      "all_full_frame_and_mfd_ssim": 1.0,
+      "state_maxima": {
+        "position_m": 0.0,
+        "velocity_m_s": 0.0,
+        "rotation_rad": 5.68653432537865e-22,
+        "angular_velocity_rad_s": 1.0040303998149245e-22,
+        "mjd_days": 0.0,
+        "propellant_fraction": 0.0
+      }
+    }
+  },
+  "lua_schedule_regression": {
+    "automatic-debug": {
+      "report": {
+        "path": "out/phase6-camera-lua/automatic-debug/lua-schedule-report.json",
+        "sha256": "89ac7ca97fe630e309a171026bfb83469230984fe6a55052793f2d2bac612df9"
+      },
+      "cases": 5,
+      "all_original_events_controls_air_and_states_identical": true
+    },
+    "automatic-release": {
+      "report": {
+        "path": "out/phase6-camera-lua/automatic-release/lua-schedule-report.json",
+        "sha256": "89ac7ca97fe630e309a171026bfb83469230984fe6a55052793f2d2bac612df9"
+      },
+      "cases": 5,
+      "all_original_events_controls_air_and_states_identical": true
+    },
+    "sse2-debug": {
+      "report": {
+        "path": "out/phase6-camera-lua/sse2-debug/lua-schedule-report.json",
+        "sha256": "dbc2d944390a9593e76cc632970050879f30a2323186984f5a7be304e61993a0"
+      },
+      "cases": 5,
+      "all_original_events_controls_air_and_states_identical": true
+    },
+    "sse2-release": {
+      "report": {
+        "path": "out/phase6-camera-lua/sse2-release/lua-schedule-report.json",
+        "sha256": "dbc2d944390a9593e76cc632970050879f30a2323186984f5a7be304e61993a0"
+      },
+      "cases": 5,
+      "all_original_events_controls_air_and_states_identical": true
+    }
+  },
+  "exterior_regression": {
+    "report": {
+      "path": "out/phase6-camera-final-exterior-regression/native-scene-report.json",
+      "sha256": "17c84d38a8244a0dbff3a8e3b6abb71b67d4924ae677a8e5f7c85be4efd3e8e4"
+    },
+    "processes": 2,
+    "result": "passed actual native production external view"
+  },
+  "negative_control": {
+    "source": "d065f93b0692d2e0a09f6411474d12e8fff672d0",
+    "manifest": {
+      "path": "out/phase6-camera-negative/negative-verification.json",
+      "sha256": "4904ab8ad83c0af14e925fe1f2bfe211145ac8f6f966e1ee79c7979d75ec7538"
+    },
+    "details": {
+      "status": "expected_failures",
+      "files_sha256": {
+        "out/phase6-panel-engine/orbiter-production": "0862eeabd1826ae4414a85809a9d419d19f419e74477a26f821df3b24b3dbcda",
+        "out/phase6-panel-engine/liborbiter_production_vessels.so": "d18cf0d4e3de51c31e29fcf3dc1ed04d2c568fa73123261467d1ede269f8f538",
+        "out/phase6-panel-engine/NativeModules/Graphics/OGLClient.so": "d8af5f7d995b0e93ab846cf7f0f6dc59ab36d3f78228c3ab8ba4ff3ea67f65af",
+        "Tests/Production/CockpitControls/mouse_smoke.py": "b537cd7ce8103dc6a3ccd0a93c2034786c1e4411e9a7af1d9ef32170430d3013",
+        "Tests/Production/DeltaGlider/window_camera.py": "05ed6e1ea0fee39e58045c85ae570c29b70cb4b2331b9455d557decfbb5181ff",
+        "Tests/Production/Flight/keymap-dg-laptop.cfg": "2893d9be8c42beeb121d795b21889b53922d982c38b19595961229872dc20139"
+      },
+      "cases": {
+        "drag": {
+          "output": "out/phase6-camera-negative/drag",
+          "camera_samples": 494,
+          "phi_values": [
+            "0"
+          ],
+          "theta_values": [
+            "0"
+          ],
+          "aperture_values": [
+            "0.43633231299858238"
+          ],
+          "mouse_events": [
+            {
+              "tick": "52",
+              "event": "left_down",
+              "x": "755",
+              "y": "661"
+            },
+            {
+              "tick": "58",
+              "event": "left_up",
+              "x": "755",
+              "y": "661"
+            },
+            {
+              "tick": "80",
+              "event": "left_down",
+              "x": "731",
+              "y": "661"
+            },
+            {
+              "tick": "85",
+              "event": "left_up",
+              "x": "731",
+              "y": "661"
+            },
+            {
+              "tick": "190",
+              "event": "right_down",
+              "x": "755",
+              "y": "661"
+            }
+          ],
+          "camera_trace_sha256": "d8f85510097a718587573e98c604697d69b1e3c4365edfbaa66b9087a72a84af",
+          "input_trace_sha256": "986060d6159f96b1f1a5c585afae5fc3fcca308baa9e8f92d1943e321cca053f"
+        },
+        "wheel": {
+          "output": "out/phase6-camera-negative/wheel",
+          "camera_samples": 485,
+          "phi_values": [
+            "0"
+          ],
+          "theta_values": [
+            "0"
+          ],
+          "aperture_values": [
+            "0.43633231299858238"
+          ],
+          "mouse_events": [
+            {
+              "tick": "51",
+              "event": "left_down",
+              "x": "755",
+              "y": "661"
+            },
+            {
+              "tick": "55",
+              "event": "left_up",
+              "x": "755",
+              "y": "661"
+            },
+            {
+              "tick": "76",
+              "event": "left_down",
+              "x": "731",
+              "y": "661"
+            },
+            {
+              "tick": "81",
+              "event": "left_up",
+              "x": "731",
+              "y": "661"
+            },
+            {
+              "tick": "177",
+              "event": "wheel",
+              "x": "640",
+              "y": "360"
+            }
+          ],
+          "camera_trace_sha256": "54132c733d66fa8176c3919116abd6a866334d447511059628d0331a9bd8024b",
+          "input_trace_sha256": "c2507f182f0aa227c41cf21c6bc33d848a7328f1bce5c400ff37b7abeb76169a"
+        },
+        "step": {
+          "output": "out/phase6-camera-negative/step",
+          "camera_samples": 519,
+          "phi_values": [
+            "0"
+          ],
+          "theta_values": [
+            "0"
+          ],
+          "aperture_values": [
+            "0.43633231299858238"
+          ],
+          "mouse_events": [
+            {
+              "tick": "50",
+              "event": "left_down",
+              "x": "755",
+              "y": "661"
+            },
+            {
+              "tick": "56",
+              "event": "left_up",
+              "x": "755",
+              "y": "661"
+            },
+            {
+              "tick": "77",
+              "event": "left_down",
+              "x": "731",
+              "y": "661"
+            },
+            {
+              "tick": "82",
+              "event": "left_up",
+              "x": "731",
+              "y": "661"
+            }
+          ],
+          "camera_trace_sha256": "f124dc416e92ce5e8bdceed976c67ee36b8a3536c22624384d8bf6825953d480",
+          "input_trace_sha256": "45b71b50c30d1b00635c570704d39aca917af27007b5a919ed2c16bcd018b62a"
+        }
+      }
+    }
+  },
+  "diagnostics": {
+    "xwayland_transition": {
+      "output": "out/phase6-camera-intel-transition",
+      "console": {
+        "path": "/tmp/phase6-camera-intel-transition.log",
+        "sha256": "977c93b8aa4a10469fc7fa3eba46f4edd6e17bb50bfc662b04f4ace7f42c098a"
+      },
+      "trace": {
+        "path": "out/phase6-camera-intel-transition/camera-position.csv",
+        "sha256": "0971efcd9b1c52f14fe2b4c756128d38ea497d8ae1c006a4bf10521c40caf556"
+      },
+      "trace_prefix": [
+        "mode,755,661,755,661",
+        "read,640,360,1280,720,1280,720",
+        "read,755,661,1280,720,1280,720"
+      ],
+      "qualification": false,
+      "temporary_renderer_pointer_trace": true
+    },
+    "early_driver_failures": [
+      "Options lookup omitted its title icon",
+      "Consumed F6 was incorrectly expected to remain held in the input snapshot",
+      "Stock DG panel has no zoom range at 1280px",
+      "XWayland discards synthetic server motion under a pointer grab; use targeted MotionNotify"
+    ]
+  },
+  "accepted_phase5_profile_unchanged": true,
+  "qualification_counts": {
+    "camera_processes": 25,
+    "frozen_control_processes": 40,
+    "lua_processes": 20,
+    "exterior_processes": 2,
+    "total_processes": 87,
+    "camera_successful_presents": 9869,
+    "total_successful_presents": 13589
+  },
+  "remaining": [
+    "Current-source hosted native/Windows/paired comparison qualification",
+    "Original Windows off-axis image comparisons",
+    "Broader DG systems and stock scenario acceptance",
+    "Native Wayland, high-DPI and physical controller/mouse coverage"
+  ]
+}

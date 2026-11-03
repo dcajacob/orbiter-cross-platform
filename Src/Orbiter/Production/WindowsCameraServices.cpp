@@ -11,6 +11,7 @@ public:
     Config& Configuration() const override {return *g_pOrbiter->Cfg();}
     void SetFocus(Vessel* vessel) override {g_pOrbiter->SetFocusObject(vessel);}
     void SetFOV(double value) override {g_pOrbiter->SetFOV(value);}
+    void IncFOV(double value) override {g_pOrbiter->IncFOV(value);}
     bool SetPanelMode(int mode) override {return g_pane->SetPanelMode(mode);}
     void SelectPanel(int index) override {g_pane->SelectPanel(index);}
     void SelectVC(int index) override {g_pane->SelectVC(index);}

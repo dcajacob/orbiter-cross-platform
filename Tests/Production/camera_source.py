@@ -50,6 +50,22 @@ def verify():
     for name in gui:
         a,b=span(core,name);moved.append(core[a:b]);core=core[:a]+core[b:]
     adapter=raw('Src/Orbiter/CameraApplication.cpp');a,b=span(adapter,gui[0]);equal('\n'.join(moved),adapter[a:],'Original Windows camera mouse and Direct3D adapter')
+    native_mouse=raw('Src/Orbiter/Production/NativeCameraMouse.cpp')
+    for name in gui[:2]:
+        a,b=span(native_mouse,name);current=native_mouse[a:b]
+        current=current.replace('oapi::UInt event','UINT event').replace('oapi::UInt32','DWORD')
+        for event,portable in [('WM_LBUTTONDOWN','LeftDown'),('WM_RBUTTONDOWN','RightDown'),('WM_LBUTTONUP','LeftUp'),('WM_RBUTTONUP','RightUp'),('WM_MOUSEWHEEL','Wheel')]:
+            current=current.replace('CockpitMouse::'+portable,event)
+        current=current.replace('CockpitHighWord(state)','HIWORD(state)')
+        current=current.replace('GetNativeRenderContext().graphics->SetCameraRotation(true)','g_pOrbiter->InitRotationMode()')
+        current=current.replace('GetNativeRenderContext().graphics->SetCameraRotation(false)','g_pOrbiter->ExitRotationMode()')
+        current=current.replace('GetCameraServices().IncFOV','g_pOrbiter->IncFOV')
+        current=current.replace('const auto cursor = GetNativeRenderContext().graphics->CursorPosition();\n\toapi::SdkPoint pt = cursor;','POINT pt;\n\tGetCursorPos (&pt);')
+        current=current.replace('// GLFW supplies framebuffer client coordinates; no desktop conversion is needed.',
+            'if (!g_pOrbiter->IsFullscreen())\n\t\t\tScreenToClient (g_pOrbiter->GetRenderWnd(), &pt);')
+        current=current.replace('GetNativeRenderContext().graphics->SetCursorPosition ({x0-dx, y0-dy});','SetCursorPos (x0-dx, y0-dy);')
+        current=current.replace('GetRigidBodyServices().Time().','td.')
+        a,b=span(adapter,name);equal(adapter[a:b],current,'Complete original native camera mouse algorithm: '+name)
     for a,b in [('g_pOrbiter->Cfg()->','GetCameraServices().Configuration().'),('g_psys','GetRigidBodyServices().World()'),('g_focusobj','GetCameraServices().Focus()'),('td.','GetRigidBodyServices().Time().'),('g_pOrbiter->SetFocusObject','GetCameraServices().SetFocus'),('g_pOrbiter->SetFOV','GetCameraServices().SetFOV'),('g_pOrbiter->ScnPath','GetCameraServices().ScenarioPath'),('g_pane->','GetCameraServices().'),('TRACENEW','GetRigidBodyServices().TraceAllocation(__FILE__,__LINE__);'),('_strnicmp','ComparePrefix'),('_stricmp','CompareText'),('strnicmp','ComparePrefix'),('normangle (','NormalizeCameraAngle ('),('DWORD','oapi::UInt32')]:core=core.replace(a,b)
     core=core.replace('\tVObject **vobj, *vo;\n\tconst Body *bd;\n\tint i, nobj;','\tint i;\n\tVObject **vobj, *vo;\n\tconst Body *bd;\n\tint nobj;')
     actual=windows(raw('Src/Orbiter/Camera.cpp'));actual=actual[actual.index('static Vector nullvec;'):]

@@ -251,8 +251,12 @@ public:
 	}
 #ifdef _WIN32
 	bool ProcessMouse (UINT event, oapi::UInt32 state, oapi::UInt32 x, oapi::UInt32 y, const char *kstate);
-	void UpdateMouse ();
+#else
+	bool ProcessMouse (oapi::UInt event, oapi::UInt32 state, oapi::UInt32 x, oapi::UInt32 y, const char *kstate);
+	// Native owner supplies the existing window's client cursor at construction.
+	void InitMousePosition (int x, int y) { pm.x = x; pm.y = y; }
 #endif
+	void UpdateMouse ();
 
 	void ClearPresets ();
 	// clear list of preset modes

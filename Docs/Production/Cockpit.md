@@ -128,9 +128,36 @@ latched release, independent controls and zero stops. The accepted Phase 5
 external-view profile remains unchanged. An earlier failed picking probe and
 the camera-key/no-movement baseline remain recorded as failures.
 
-Mouse camera rotation/zoom and step-FOV shortcuts, preserved-Windows comparisons at the turned
-view angles, Wayland/high-DPI input and physical-controller qualification
-remain open. The off-axis diagnostic confirms populated MFD surfaces on both
+The original camera mouse handler and mouse update now run through native
+window services. Right drag rotates cockpit and external views with the
+original pixel scale; wheel input changes cockpit aperture by two degrees or
+external distance, and Ctrl+X/Z retain the original five-degree rounding.
+Source checks compare both complete mouse method bodies and the stepped-FOV
+expressions with the preserved Windows implementation. The private renderer
+adapter uses GLFW disabled cursor mode and restores the virtual client anchor
+after the grab's synthetic enter events. Without that transition, XWayland
+introduced a view jump before deliberate movement.
+
+The real-window regression covers generic instruments and both gliders' panels
+and VCs in Debug/Release automatic/SSE2. It also checks paused input, camera
+priority over an RCS pick, release after a verified focus transfer, GUI-owned
+wheel/right-button input, and normal shutdown with a held capture. At 1280px,
+the original DG panel's minimum and maximum scales are both 1; Ctrl+wheel
+preserves that bound and leaves camera aperture unchanged. Motion uses targeted
+X11 MotionNotify events within the owned grab; this is not physical-mouse or
+native-Wayland qualification. Intel and isolated software graphics additionally
+run the flow with unsuppressed ASan/UBSan/LSan. Forty frozen control processes
+and twenty original Lua schedules retain their existing state/image gates.
+The final local qualification totals 87 application processes and 13,589
+successful presentations, including the non-cockpit external-view regression.
+All frozen cockpit full-frame and MFD comparisons have SSIM 1.0. Automatic
+profiles have exact physical states; the largest SSE2 rotation difference from
+the frozen reference is `5.69e-22` radians, within the existing gate.
+[Camera mouse and FOV evidence](CameraMouseVerification.json)
+
+Preserved-Windows comparisons at the turned view angles, Wayland/high-DPI input
+and physical-controller qualification remain open. The off-axis diagnostic
+confirms populated MFD surfaces on both
 scenario load and explicit mode reopening; it does not establish original
 Windows image parity at those angles.
 [VC mouse, camera and profile evidence](DGVCMouseVerification.json)

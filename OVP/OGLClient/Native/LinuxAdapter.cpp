@@ -259,6 +259,7 @@ bool OGLClient::clbkDisplayFrame()
 void OGLClient::clbkDestroyRenderWindow(bool)
 {
     if(!nativeWindow) return;
+    SetCameraRotation(false);
     glfwMakeContextCurrent(nativeWindow);mScene.reset();mMeshManager.reset();
     if(mResources) {
         OGLPad::GlobalExit();vVessel::GlobalExit();OGLParticleStream::GlobalExit();vStar::GlobalExit();HazeManager::GlobalExit();
@@ -326,6 +327,36 @@ oapi::SdkPoint OGLClient::CursorPosition() const {
     int width,height,fbWidth,fbHeight;glfwGetWindowSize(nativeWindow,&width,&height);glfwGetFramebufferSize(nativeWindow,&fbWidth,&fbHeight);
     require(width>0 && height>0,"Native cockpit cursor requires positive window dimensions");
     return {std::int32_t(x*fbWidth/width),std::int32_t(y*fbHeight/height)};
+}
+void OGLClient::SetCursorPosition(oapi::SdkPoint point) {
+    require(nativeWindow!=nullptr,"Native camera cursor requires an open render window");
+    int width,height,fbWidth,fbHeight;glfwGetWindowSize(nativeWindow,&width,&height);glfwGetFramebufferSize(nativeWindow,&fbWidth,&fbHeight);
+    require(width>0 && height>0 && fbWidth>0 && fbHeight>0,"Native camera cursor requires a positive viewport");
+    glfwSetCursorPos(nativeWindow,double(point.x)*width/fbWidth,double(point.y)*height/fbHeight);
+}
+void OGLClient::SetCameraRotation(bool enabled) {
+    require(!enabled || nativeWindow,"Camera rotation requires an open render window");
+    if(nativeWindow) {
+        double x=0,y=0;
+        if(enabled)glfwGetCursorPos(nativeWindow,&x,&y);
+        glfwSetInputMode(nativeWindow,GLFW_CURSOR,enabled ? GLFW_CURSOR_DISABLED : GLFW_CURSOR_NORMAL);
+        if(enabled) {
+            // Called by the host after Poll, outside GLFW callbacks. Drain the
+            // grab's synthetic enter/center events before restoring its virtual
+            // client anchor; XWayland otherwise reports a spurious first delta.
+            glfwPollEvents();
+            glfwSetCursorPos(nativeWindow,x,y);
+        }
+    }
+    auto& context=GetNativeRenderContext();context.cameraRotating=enabled;
+    if(std::filesystem::is_regular_file(context.evidence/"camera-pointer.enabled")) {
+        const auto path=context.evidence/"camera-capture.csv";
+        const bool header=!std::filesystem::exists(path);
+        std::ofstream trace(path,std::ios::app);
+        if(header)trace<<"capture,cursor_mode,focused\n";
+        trace<<enabled<<','<<(nativeWindow ? glfwGetInputMode(nativeWindow,GLFW_CURSOR) : GLFW_CURSOR_NORMAL)
+            <<','<<(nativeWindow ? glfwGetWindowAttrib(nativeWindow,GLFW_FOCUSED) : 0)<<'\n';
+    }
 }
 
 void OGLClient::InitGui() {

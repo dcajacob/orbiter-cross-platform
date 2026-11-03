@@ -286,7 +286,7 @@
     },
     "Src/Orbiter/Camera.h": {
       "original_sha256_lf": "63c35b0e1f7ca41168dd2a5f5c2f33eeb1f727bb6f233959ac3494bb524aae9c",
-      "sha256_lf": "5724d8b9fd251a4503e10398f22fa8427241d219c0005c2ab22128161016d3ba"
+      "sha256_lf": "bf13240a5666aca047e18a32a418b71447a0a306e03eb056c1e3ec5dc5c593a7"
     },
     "Src/Orbiter/CameraApplication.cpp": {
       "original_sha256_lf": null,
@@ -581,7 +581,7 @@
     },
     "Src/Orbiter/Production/CMakeLists.txt": {
       "original_sha256_lf": null,
-      "sha256_lf": "24bc3a307d9b668ac035cde9c353cdba02b05aa11017093896e0c481cf70fc22",
+      "sha256_lf": "7ade6b42fd5ab95eed23533627c6364ce6a217052629d1a6420c28420831b89c",
       "scope": "Original ten stock MFD declarations use exact platform SDK aliases; shared original conic geometry is moved without calculation or screen-mapping changes. Full native instrument runtime remains incomplete."
     },
     "Src/Orbiter/Production/CameraServices.cpp": {
@@ -590,7 +590,7 @@
     },
     "Src/Orbiter/Production/CameraServices.h": {
       "original_sha256_lf": null,
-      "sha256_lf": "dd8e2b491d33e2f51535aa8ac07806f6476ec61216e946782debc10a24a2df14"
+      "sha256_lf": "9ff2f63394931bd01a82e872fae8d46f5cd2d3ba018c5fc1b5cf7a31856e2136"
     },
     "Src/Orbiter/Production/CelestialServices.cpp": {
       "sha256_lf": "47e6ff45cd058930e66fdf1d1dd176a969118afc9905908507e27f4d837fbd62",
@@ -741,7 +741,7 @@
     },
     "Src/Orbiter/Production/NativeApplication.cpp": {
       "original_sha256_lf": null,
-      "sha256_lf": "15a69a7c2021e9a999c52e2b564c8830acbc772859ad927832865865bfe75e7f"
+      "sha256_lf": "2e590eb5b8318a91304b123d45794400a997a0e35a36e678b7730ff222ebe6df"
     },
     "Src/Orbiter/Production/NativeBuild.h.in": {
       "sha256_lf": "f5fb21f83bb6be0c54839fce670e8410f6911eda86da2eef26e4221c1ae25d97",
@@ -785,7 +785,7 @@
     },
     "Src/Orbiter/Production/NativeGraphics.h": {
       "original_sha256_lf": null,
-      "sha256_lf": "1d501c5cfdf6b547b4efed5d77260c30c8f5d48294f560d1d89f8b75ee5386ce",
+      "sha256_lf": "580be8bb0ac0ca79b7e35b2f47cb4359e180b7b4496e4bcdcd4df3fa04bf87be",
       "scope": "Original scheduler, stock MFDs and modern map compile natively with explicit original epoch/time, authoritative world/UI bindings and indexed map resources. Exact Windows calculations and callback order conserved. Native GDI/legacy map/custom-mode entry points fail explicitly until supported; native cockpit owner and DG runtime remain unfinished."
     },
     "Src/Orbiter/Production/NativeModule.cpp": {
@@ -976,7 +976,7 @@
     },
     "Src/Orbiter/Production/WindowsCameraServices.cpp": {
       "original_sha256_lf": null,
-      "sha256_lf": "05c0662f17412a958c10ca21ce0d207e291fd22cfd4ae03bd718e22bef20681d"
+      "sha256_lf": "20cb0f244ca8d8ebb0764fedfd3e79a68f5cb2e7cd902ced16d09c74f003f8c3"
     },
     "Src/Orbiter/Production/WindowsCameraServices.h": {
       "original_sha256_lf": null,
@@ -1304,11 +1304,11 @@
     },
     "Src/Orbiter/Production/NativeCockpit.cmake": {
       "original_sha256_lf": null,
-      "sha256_lf": "6258318622da39142243e1eda949d8fbee1ab3a95ee01e2ee561431b07e23fe6"
+      "sha256_lf": "e521e44bb7f3b989a571eea341dbc12f11c28bd77a54e30fca546cbdfc780da8"
     },
     "Src/Orbiter/Production/NativeCockpitGui.cpp": {
       "original_sha256_lf": null,
-      "sha256_lf": "ec6f0615629172fee6cd653ad1eadc4b27c9f5234c2d379b84c024c716c6f6ea"
+      "sha256_lf": "4e4032fcff4d4ae2d6c4331ac4804d5b6c132a0f4b4b7253d8242d645725e786"
     },
     "Src/Orbiter/Production/NativeCockpitProjection.cpp": {
       "original_sha256_lf": null,
@@ -1336,7 +1336,7 @@
     },
     "Src/Orbiter/Production/NativeCockpitUi.h": {
       "original_sha256_lf": null,
-      "sha256_lf": "e9b23611b507d05ad02ba66b0fb73406ee21349eea6db1c16f61a6f619e77524"
+      "sha256_lf": "0f808f8d72b4aaaf6ada301fb4bcf8c8d835dc8e22de4ce9c6d0cd7a9bd4979c"
     },
     "Src/Module/LuaScript/Native/CMakeLists.txt": {
       "original_sha256_lf": null,
@@ -1831,6 +1831,11 @@
       "original_sha256_lf": null,
       "sha256_lf": "f43afd96c1513a8f6e5794d28413fe60abdcca9d3a9a320ef95185aaea8ba2d3",
       "scope": "Verbatim Orbiter::IncFOV body and forced-refresh flag assignment, checked by flight_source.py. The native host supplies its actual camera/time/force bindings."
+    },
+    "Src/Orbiter/Production/NativeCameraMouse.cpp": {
+      "original_sha256_lf": null,
+      "sha256_lf": "8c6d2adefdb679e928aec32a9a83cbcc9a4720981c8f218bc5862da40a5f97ee",
+      "scope": "Original CameraApplication mouse method bodies with explicit native pointer/time/FOV services, and original buffered five-degree FOV expressions. camera_source.py and flight_source.py conserve their complete algorithms; Windows declarations/layouts and runtime references remain unchanged."
     }
   }
 }

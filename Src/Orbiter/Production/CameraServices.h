@@ -14,6 +14,7 @@ public:
     virtual Config& Configuration() const=0;
     virtual void SetFocus(Vessel*)=0;
     virtual void SetFOV(double)=0;
+    virtual void IncFOV(double)=0;
     virtual bool SetPanelMode(int)=0;
     virtual void SelectPanel(int)=0;
     virtual void SelectVC(int)=0;

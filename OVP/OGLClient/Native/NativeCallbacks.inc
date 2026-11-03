@@ -8,7 +8,7 @@ void NewVessel(OBJHANDLE vessel) override {clbkNewVessel(vessel);}
 void DeleteVessel(OBJHANDLE vessel) override {clbkDeleteVessel(vessel);}
 void Render() override {clbkClearFrame();clbkRenderScene();}
 bool Present() override {return clbkDisplayFrame();}
-void CloseSession() override {clbkCloseSession(false);}
+void CloseSession() override {SetCameraRotation(false);clbkCloseSession(false);}
 void Close() override {clbkDestroyRenderWindow(false);}
 SURFHANDLE LoadTextureResource(const char* name,oapi::UInt32 flags) override {return LoadTexture(name,int(flags));}
 std::uint64_t GuiTextureId(SURFHANDLE surface) override {return surface ? static_cast<OGLTexture*>(surface)->m_TexId : 0;}
@@ -40,6 +40,8 @@ bool clbkBlt(SURFHANDLE t,oapi::UInt32 x,oapi::UInt32 y,SURFHANDLE s,oapi::UInt3
 int DesktopHeight() const override;
 std::vector<orbiter::production::NativeJoystickDevice> Joysticks() const override;
 oapi::SdkPoint CursorPosition() const override;
+void SetCursorPosition(oapi::SdkPoint) override;
+void SetCameraRotation(bool) override;
 
 bool clbkGetRenderParam(oapi::UInt32 parameter,oapi::UInt32* value) const override {int result=0;const bool ok=GetRenderParam(int(parameter),&result);if(ok)*value=oapi::UInt32(result);return ok;}
 SURFHANDLE clbkLoadSurface(const char* name,oapi::UInt32 flags,bool) override {return LoadSurface(name,int(flags));}
