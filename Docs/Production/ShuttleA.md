@@ -1,9 +1,11 @@
 # Shuttle-A native integration candidate
 
 Phase 6 now compiles the original Shuttle-A production module and its payload
-in the native cockpit build. The application capability gate remains closed
-pending original Windows observations and native comparisons. This does not
-increase the accepted stock-corpus pass count or complete Phase 6.
+in the native cockpit build. Its comparison candidate now admits only the
+initial capabilities observed in all four audited Windows profiles. Required
+modules still use the checked loader. Native state/image comparisons remain
+pending; this does not increase the accepted stock-corpus pass count or complete
+Phase 6.
 
 The port retains the original flight and parachute calculations, resources,
 animations, panel/VC instruments, attachment logic and Lua methods. The source
@@ -69,4 +71,17 @@ open. All four original Windows Shuttle-A profiles are now downloaded, hash-veri
 and audited: 80 sessions, 4,800 presentations and 38,552 finalized all-vessel samples.
 Their complete traces, deterministic repeats and Debug/Release pairs pass the
 unchanged budgets. Native Shuttle-A state/image qualification is still pending.
-The current full-corpus sweep is running separately and is not claimed as passed here.
+The subsequent complete instrumented sweep on cleanup revision `2d9367c5`
+is audited: all 157 scenarios were attempted, with 44 passed, 113 failed, no
+signal-terminated processes and no sanitizer findings. Its inventory finds
+119 complete dependency sets; the capability gate was still closed for that
+capture. Every failure and the seven frozen inventory metadata discrepancies
+remain recorded. This is an audited incomplete corpus, not full stock acceptance.
+
+The new admission candidate checks SDK version, mesh/thruster/propellant counts,
+docking and attachment counts, focus eligibility, transponder, size, inertia
+and cross sections against the observed original classes. Shuttle-A payload
+mass remains the original scenario-controlled quantity. Only the observed
+initial one-mesh cargo configuration is admitted; restored deployed-parachute
+configurations still need their own original observations. None of the flight,
+parachute or attachment calculations are changed by this policy.

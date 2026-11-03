@@ -96,6 +96,27 @@ bool SupportedStockStation(const VESSEL& vessel,const char* type) {
            (wheel && vessel.GetEmptyMass()==1e6 && vessel.GetSize()==250 && vessel.DockCount()==2 &&
             pmi.x==26000 && pmi.y==26000 && pmi.z==52800 && cs.x==20 && cs.y==20 && cs.z==20);
 }
+#ifdef ORBITER_NATIVE_COCKPIT
+bool SupportedStockShuttleA(const VESSEL& vessel,const char* type) {
+    // Initial capabilities observed in all four preserved Windows profiles.
+    // Declared modules still have to load through the checked native factory.
+    if(!vessel.GetEnableFocus() || !vessel.GetTransponder() || vessel.DockCount()!=1)return false;
+    VECTOR3 pmi{},cs{};vessel.GetPMI(pmi);vessel.GetCrossSections(cs);
+    if(CompareText(type,"ShuttleA")==0)
+        return vessel.Version()==3 && vessel.GetSize()==17 && vessel.GetMeshCount()==2 &&
+            vessel.GetThrusterCount()==20 && vessel.GetPropellantCount()==2 &&
+            vessel.AttachmentCount(true)==0 && vessel.AttachmentCount(false)==6 &&
+            pmi.x==86.6 && pmi.y==89.8 && pmi.z==5.5 && cs.x==132.2 && cs.y==237.9 && cs.z==42.4;
+    if(CompareText(type,"ShuttleA_pl")==0)
+        return vessel.Version()==1 && vessel.GetSize()==5 && vessel.GetMeshCount()==1 &&
+            vessel.GetThrusterCount()==0 && vessel.GetPropellantCount()==0 &&
+            vessel.AttachmentCount(true)==3 && vessel.AttachmentCount(false)==0 &&
+            vessel.GetEmptyMass()==20000 && vessel.GetFuelMass()==0 &&
+            pmi.x==2.56 && pmi.y==2.39 && pmi.z==2.02 &&
+            cs.x==17.61f && cs.y==17.44f && cs.z==13.09f;
+    return false;
+}
+#endif
 struct Runtime final:BodyServices,RigidBodyServices,SurfaceServices,NavigationServices,VesselServices,
     CameraServices,WorldFactory,SessionServices,VesselLifetimeServices
 #ifdef ORBITER_NATIVE_COCKPIT
@@ -736,6 +757,7 @@ struct Runtime final:BodyServices,RigidBodyServices,SurfaceServices,NavigationSe
             if ((CompareText(type,"DeltaGlider")==0 || scram) && vessel->Version()==3 && vessel->GetMeshCount()==2 &&
                 vessel->GetThrusterCount()==(scram ? 23 : 21) && vessel->GetPropellantCount()==(scram ? 3 : 2))
                 continue;
+            if(SupportedStockShuttleA(*vessel,type))continue;
 #endif
             if(!pb && !iss && !SupportedStockStation(*vessel,type))
                 throw std::runtime_error(std::string("Unsupported stock vessel class or capabilities: ")+type+"; generic replacement is forbidden");
