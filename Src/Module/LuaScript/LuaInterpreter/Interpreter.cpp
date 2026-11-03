@@ -21,6 +21,7 @@
 #include <iterator>
 #include <cstdint>
 #include <list>
+#include "../../../Orbiter/Production/CameraModeOwner.h"
 
 using std::min;
 using std::max;
@@ -6141,7 +6142,7 @@ int Interpreter::oapi_set_cameramode (lua_State *L)
 	if (cm) {
 		cm->Init(initstr);
 		oapiSetCameraMode (*cm);
-		delete cm;
+		orbiter::production::DeleteCameraMode{}(cm);
 	}
 	return 0;
 }

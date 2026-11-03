@@ -37,6 +37,18 @@ including installed SDK providers, with 8,517 arcsine inputs and repeated fresh
 processes. Its results diagnose runtime provisioning; they do not replace the
 original simulator cross-build gate or change the native math profile.
 
+The subsequent Windows 2025 capture has identical Debug/Release traces for
+four completed cases, including both atmospheric flights. Its Release orbital
+DG case fails because several `proc.skip()` iterations resume within one
+simulation frame. The current native Debug client matches Windows 2025 Debug
+exactly in all five shared schedules. A controlled Win32 reproduction confirms
+that the preserved two-mutex handoff permits repeated worker turns while the
+simulator is descheduled between release and wait. The native explicit-turn
+handoff preserves one turn per frame in that reproduction on both Windows
+hosts. Full original captures with wall-clock/thread observations are running
+to investigate the simulator failure; the reference set remains unaccepted.
+[Protocol evidence](LuaHandoffVerification.json)
+
 The native client flies all five original DG recorded scenarios from the stock
 position, attitude, control and system-event files. DG stunts draws the recorded
 tutorial notes and switches cameras. Both Mojave scenarios also switch cameras.
@@ -73,15 +85,24 @@ The other 84 scenarios require additional vessel classes.
 [Stock scenario census](../../Tests/Production/DeltaGlider/stock_scenarios.py)
 Sanitizer flights now finish without the previous aircraft initialization,
 light destruction, panel texture and virtual-cockpit vertex-buffer errors.
-LeakSanitizer still reports two 56-byte allocations per flight. Loader maps
-place both allocation sites in Mesa libgallium 26.0.8.
+Earlier system-driver runs reported two 56-byte allocations per flight. Loader
+maps placed both allocation sites in Mesa libgallium 26.0.8.
 Matching driver debug symbols now identify `u_mmInit`, reached from
 `rtasm_exec_malloc` during mipmap generation. A
 [standalone EGL reproduction](../../Tests/Production/GraphicsDriverLifetime/README.md)
 reproduces the same 112 bytes without Orbiter, X11 or GLFW; its no-mipmap control
 is clean. The driver retains its global executable-memory heap across context
-destruction and never releases it on library unload. This identifies the cause;
-the unsuppressed lifetime gate still requires a cleanup fix.
+destruction and never releases it on library unload. A checksum-pinned isolated
+Mesa candidate now releases the heap and executable mapping after the last
+generated function is freed. With that driver selected, all four DG/DG-S AAP
+flights and the six stock smoke scenarios pass unsuppressed address,
+undefined-behavior and leak checking across 552 presentations. Earth views
+additionally exposed nonvirtual-base deletion in the Lua camera command; it
+now uses the engine's existing concrete-type camera deleter. The five-process
+recording/editor sequence and twenty GUI teardown cycles also pass. These
+results qualify the tested candidate; system-driver deployment and broader
+platform/stock acceptance remain open.
+[Local lifetime evidence](GraphicsLifetimeVerification.json)
 
 ## Earlier integration milestones
 

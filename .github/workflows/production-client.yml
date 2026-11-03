@@ -6,6 +6,7 @@ on:
     paths:
       - 'OVP/OGLClient/**'
       - 'Src/Orbiter/**'
+      - 'Src/Module/LuaScript/**'
       - 'Orbitersdk/**'
       - 'Tests/Production/*source.py'
       - 'Tests/Production/phase3-extraction.lock.json'
@@ -13,6 +14,7 @@ on:
       - 'Tests/Production/Cockpit/**'
       - 'Tests/Production/CockpitControls/**'
       - 'Tests/Production/CockpitUI/**'
+      - 'Tests/Production/NativeLua/**'
       - 'Tests/Production/RecordedFlight/**'
       - 'Tests/Production/stage_mesa.py'
       - '.github/workflows/production-client.yml'

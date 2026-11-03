@@ -1,0 +1,63 @@
+{
+  "schema": 1,
+  "scope": "Controlled Win32 protocol diagnostic; original simulator acceptance remains separate",
+  "source": "739fdf943cf63dc4e05647cf64b0cde0ace22195",
+  "run": 41590681453,
+  "url": "https://github.com/dcajacob/orbiter-cross-platform/actions/runs/41590681453",
+  "results": {
+    "windows-2022": {
+      "artifact": 13209374842,
+      "job": 125766448387,
+      "archive_sha256": "7eed4047669f9fb75b5fac9a3e1edf5a6b7343d47681a5f25aeaa3f91dc554a6",
+      "result": {
+        "purpose": "controlled handoff diagnostic, not simulator acceptance",
+        "original_frames": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "explicit_turn_frames": [
+          0,
+          1,
+          2,
+          3
+        ]
+      },
+      "files": {
+        "probe.exe": "561fcfe69c6f7e30fdaa460a46be5e9a8a1d038c3b771e85d339b4b6f44e26b2",
+        "result.json": "018ba92cb5949af2dd263ed9c1efb81fcab2c043238437602abfdc93d6218402",
+        "probe.obj": "b7ac591000e6cc74dad76905262366d621ff7657946ff2294363ad65e14be73b"
+      }
+    },
+    "windows-2025": {
+      "artifact": 13209244696,
+      "job": 125766447307,
+      "archive_sha256": "84508c19a8337e984a1f2697834fcd130bbfb21de421d9402a9edb2b9679d589",
+      "result": {
+        "purpose": "controlled handoff diagnostic, not simulator acceptance",
+        "original_frames": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "explicit_turn_frames": [
+          0,
+          1,
+          2,
+          3
+        ]
+      },
+      "files": {
+        "probe.exe": "8745804a12424d18884006fe00934a4c9b658b0b9538d1a6d45f29dd1b849b4b",
+        "probe.obj": "3a8431e3ee616d5c31f47520ccc3f63dc7b9ab4a4e9e8dc7d91ee8d3701a2650",
+        "result.json": "018ba92cb5949af2dd263ed9c1efb81fcab2c043238437602abfdc93d6218402"
+      }
+    }
+  },
+  "source_files_sha256": {
+    "Tests/Production/LuaRuntime/HandoffDiagnostic.cpp": "801240b584aa7f340ab6e7ae79e72ae5610b46323513a88e547c6fc2b3e2c6b5",
+    "Src/Module/LuaScript/Native/ExecutionHandoff.h": "294bc00deb2d2deee5f3019c4469b0593361a5bc691eec9e9510c8c20686d90e"
+  }
+}

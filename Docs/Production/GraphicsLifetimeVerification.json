@@ -1,0 +1,463 @@
+{
+  "schema": 1,
+  "scope": "Local Linux x86-64 ASan/UBSan/LSan using the isolated Mesa cleanup candidate; broader Phase 6 acceptance remains open",
+  "source_base": "739fdf943cf63dc4e05647cf64b0cde0ace22195",
+  "camera_fix": {
+    "source": "Src/Module/LuaScript/LuaInterpreter/Interpreter.cpp",
+    "source_sha256": "0047a391332f904800552f39be49026f89def7275d08afd67fbcc018f2d6e0f3",
+    "previous_failure": "Earth views: new-delete-type-mismatch deleting 64-byte CameraMode_Track through 24-byte CameraMode",
+    "previous_log_sha256": "1e90624540c876610e594aec54e4b3369eee774c0f244cfbfb71a3b714f19507"
+  },
+  "driver_libraries": {
+    "libEGL_mesa.so.0.0.0": "d54115cf78fbffd3e37e98a4324c58008bf43d73e33977855d322475a6783014",
+    "libGLX_mesa.so.0.0.0": "f50c9b653418226f372baaeb26e4510571901da6a8d1fe5a19521357e56ff08b",
+    "libgallium-26.0.8.so": "abbd98e786d1f6ed7dae07821ec420eab5849b794c85663d7a0e2a22884d46cc"
+  },
+  "environment": {
+    "LD_LIBRARY_PATH": "out/phase6-mesa-verified/install/lib/x86_64-linux-gnu",
+    "LIBGL_ALWAYS_SOFTWARE": "1",
+    "GALLIUM_DRIVER": "llvmpipe",
+    "ASAN_OPTIONS": "detect_leaks=1:fast_unwind_on_malloc=0",
+    "LSAN_OPTIONS": "",
+    "UBSAN_OPTIONS": "halt_on_error=1:print_stacktrace=1"
+  },
+  "flights": {
+    "exit_code": 0,
+    "after_camera_fix": true,
+    "cases": [
+      {
+        "vessel": "DeltaGlider",
+        "cockpit": 2,
+        "frames": 48,
+        "lua_yields": 40
+      },
+      {
+        "vessel": "DeltaGlider",
+        "cockpit": 3,
+        "frames": 48,
+        "lua_yields": 40
+      },
+      {
+        "vessel": "DG-S",
+        "cockpit": 2,
+        "frames": 48,
+        "lua_yields": 40
+      },
+      {
+        "vessel": "DG-S",
+        "cockpit": 3,
+        "frames": 48,
+        "lua_yields": 40
+      },
+      {
+        "scenario": "Delta-glider/Venus descent.scn",
+        "focus": "GL-01",
+        "frames": 60
+      },
+      {
+        "scenario": "2024 Edition/Earth views.scn",
+        "focus": "GL-01S",
+        "frames": 60
+      },
+      {
+        "scenario": "2024 Edition/The Alps in 3D.scn",
+        "focus": "GL-01S",
+        "frames": 60
+      },
+      {
+        "scenario": "Demo/DG ISS Approach.scn",
+        "focus": "DG-01",
+        "frames": 60
+      },
+      {
+        "scenario": "Challenges/Challenge 4 - Entry and landing.scn",
+        "focus": "GL-1",
+        "frames": 60
+      },
+      {
+        "scenario": "The Solar System/Jupiter flybys/Galileo's first Ganymede flyby.scn",
+        "focus": "Galileo",
+        "frames": 60
+      }
+    ],
+    "lifecycles": {
+      "Challenge 4 - Entry and landing": {
+        "rendered_frames": 60,
+        "successful_presents": 60,
+        "context_deleted": true
+      },
+      "Earth views": {
+        "rendered_frames": 60,
+        "successful_presents": 60,
+        "context_deleted": true
+      },
+      "lua_dg_atmosphere-panel": {
+        "rendered_frames": 48,
+        "successful_presents": 48,
+        "context_deleted": true
+      },
+      "The Alps in 3D": {
+        "rendered_frames": 60,
+        "successful_presents": 60,
+        "context_deleted": true
+      },
+      "DG ISS Approach": {
+        "rendered_frames": 60,
+        "successful_presents": 60,
+        "context_deleted": true
+      },
+      "lua_dgs_atmosphere-vc": {
+        "rendered_frames": 48,
+        "successful_presents": 48,
+        "context_deleted": true
+      },
+      "Galileo's first Ganymede flyby": {
+        "rendered_frames": 60,
+        "successful_presents": 60,
+        "context_deleted": true
+      },
+      "Venus descent": {
+        "rendered_frames": 60,
+        "successful_presents": 60,
+        "context_deleted": true
+      },
+      "lua_dg_atmosphere-vc": {
+        "rendered_frames": 48,
+        "successful_presents": 48,
+        "context_deleted": true
+      },
+      "lua_dgs_atmosphere-panel": {
+        "rendered_frames": 48,
+        "successful_presents": 48,
+        "context_deleted": true
+      }
+    },
+    "loaded_interpreter_sha256": "4d1edae0d102a28e4591855a63f8c852d391d189a9c31f852d837d874ca4a5f7"
+  },
+  "recording": {
+    "exit_code": 0,
+    "after_camera_fix": false,
+    "verification": {
+      "samples": {
+        "dg.pos": 4,
+        "dg.att": 38,
+        "dg.atc": 3,
+        "dg2.pos": 4,
+        "dg2.att": 38,
+        "dg2.atc": 2,
+        "iss.pos": 4,
+        "iss.att": 7,
+        "iss.atc": 2
+      },
+      "system_events": [
+        "2.5 TACC 2.000000",
+        "5.5 FOCUS DG2",
+        "7.5 TACC 1.000000"
+      ],
+      "replayed_focus": true,
+      "replayed_warp": true,
+      "playback_ended": true,
+      "editor_committed": true,
+      "editor_deleted": true,
+      "editor_discarded": true,
+      "recording_scenario": "out/phase6-recorder-asan-mesa-verified/record/Playback/test_record.scn",
+      "exit_flushed": true,
+      "lifecycle": true
+    },
+    "lifecycles": {
+      "record-until-exit": {
+        "rendered_frames": 20,
+        "successful_presents": 20,
+        "context_deleted": true
+      },
+      "record": {
+        "rendered_frames": 80,
+        "successful_presents": 80,
+        "context_deleted": true
+      },
+      "editor": {
+        "rendered_frames": 55,
+        "successful_presents": 55,
+        "context_deleted": true
+      },
+      "playback": {
+        "rendered_frames": 70,
+        "successful_presents": 70,
+        "context_deleted": true
+      },
+      "edited-playback": {
+        "rendered_frames": 35,
+        "successful_presents": 35,
+        "context_deleted": true
+      }
+    }
+  },
+  "gui_cycles": {
+    "after_camera_fix": false,
+    "exit_code": 0,
+    "sessions": {
+      "session-1": {
+        "rendered_frames": 4,
+        "successful_presents": 4,
+        "context_deleted": true
+      },
+      "session-10": {
+        "rendered_frames": 4,
+        "successful_presents": 4,
+        "context_deleted": true
+      },
+      "session-11": {
+        "rendered_frames": 4,
+        "successful_presents": 4,
+        "context_deleted": true
+      },
+      "session-12": {
+        "rendered_frames": 4,
+        "successful_presents": 4,
+        "context_deleted": true
+      },
+      "session-13": {
+        "rendered_frames": 4,
+        "successful_presents": 4,
+        "context_deleted": true
+      },
+      "session-14": {
+        "rendered_frames": 4,
+        "successful_presents": 4,
+        "context_deleted": true
+      },
+      "session-15": {
+        "rendered_frames": 4,
+        "successful_presents": 4,
+        "context_deleted": true
+      },
+      "session-16": {
+        "rendered_frames": 4,
+        "successful_presents": 4,
+        "context_deleted": true
+      },
+      "session-17": {
+        "rendered_frames": 4,
+        "successful_presents": 4,
+        "context_deleted": true
+      },
+      "session-18": {
+        "rendered_frames": 4,
+        "successful_presents": 4,
+        "context_deleted": true
+      },
+      "session-19": {
+        "rendered_frames": 4,
+        "successful_presents": 4,
+        "context_deleted": true
+      },
+      "session-2": {
+        "rendered_frames": 4,
+        "successful_presents": 4,
+        "context_deleted": true
+      },
+      "session-20": {
+        "rendered_frames": 4,
+        "successful_presents": 4,
+        "context_deleted": true
+      },
+      "session-3": {
+        "rendered_frames": 4,
+        "successful_presents": 4,
+        "context_deleted": true
+      },
+      "session-4": {
+        "rendered_frames": 4,
+        "successful_presents": 4,
+        "context_deleted": true
+      },
+      "session-5": {
+        "rendered_frames": 4,
+        "successful_presents": 4,
+        "context_deleted": true
+      },
+      "session-6": {
+        "rendered_frames": 4,
+        "successful_presents": 4,
+        "context_deleted": true
+      },
+      "session-7": {
+        "rendered_frames": 4,
+        "successful_presents": 4,
+        "context_deleted": true
+      },
+      "session-8": {
+        "rendered_frames": 4,
+        "successful_presents": 4,
+        "context_deleted": true
+      },
+      "session-9": {
+        "rendered_frames": 4,
+        "successful_presents": 4,
+        "context_deleted": true
+      }
+    }
+  },
+  "evidence_files": {
+    "out/phase6-dg-asan-mesa-camera-fixed/Challenge 4 - Entry and landing/graphics-lifecycle.json": {
+      "sha256": "df7514880a865666d7ff653c5f63158753beffc1be13e4fda55ad112cca2d37b",
+      "bytes": 71
+    },
+    "out/phase6-dg-asan-mesa-camera-fixed/Challenge 4 - Entry and landing/console.txt": {
+      "sha256": "54c81c2a86ac083c930c04038758f04ba54d7f58a75693e3f4ae2c636d50eca4",
+      "bytes": 14969
+    },
+    "out/phase6-dg-asan-mesa-camera-fixed/Earth views/graphics-lifecycle.json": {
+      "sha256": "df7514880a865666d7ff653c5f63158753beffc1be13e4fda55ad112cca2d37b",
+      "bytes": 71
+    },
+    "out/phase6-dg-asan-mesa-camera-fixed/Earth views/console.txt": {
+      "sha256": "47c765631cffc32fe8dd72076723bf501b6e29545763f9b2ed4549e66fe999c7",
+      "bytes": 14957
+    },
+    "out/phase6-dg-asan-mesa-camera-fixed/lua_dg_atmosphere-panel/graphics-lifecycle.json": {
+      "sha256": "3c3c473da9e01d70dc21e1f1e62fdfeaaa4ce4a4804eca01f9efc19ab25e9c1e",
+      "bytes": 71
+    },
+    "out/phase6-dg-asan-mesa-camera-fixed/lua_dg_atmosphere-panel/console.txt": {
+      "sha256": "960d9a3983be5695d5a7c06660e98fb42011949b9af693bd1c1ea632618b8391",
+      "bytes": 16774
+    },
+    "out/phase6-dg-asan-mesa-camera-fixed/The Alps in 3D/graphics-lifecycle.json": {
+      "sha256": "df7514880a865666d7ff653c5f63158753beffc1be13e4fda55ad112cca2d37b",
+      "bytes": 71
+    },
+    "out/phase6-dg-asan-mesa-camera-fixed/The Alps in 3D/console.txt": {
+      "sha256": "91bc2b1b2655ae9bdf65902298c0decefe4168f22f19c637fbf03e919bb48c39",
+      "bytes": 15017
+    },
+    "out/phase6-dg-asan-mesa-camera-fixed/DG ISS Approach/graphics-lifecycle.json": {
+      "sha256": "df7514880a865666d7ff653c5f63158753beffc1be13e4fda55ad112cca2d37b",
+      "bytes": 71
+    },
+    "out/phase6-dg-asan-mesa-camera-fixed/DG ISS Approach/console.txt": {
+      "sha256": "6ae2e78be3b6e0c30a9dc3f604de193f417b82283747b11719425e4a8917a5f5",
+      "bytes": 15030
+    },
+    "out/phase6-dg-asan-mesa-camera-fixed/lua_dgs_atmosphere-vc/graphics-lifecycle.json": {
+      "sha256": "3c3c473da9e01d70dc21e1f1e62fdfeaaa4ce4a4804eca01f9efc19ab25e9c1e",
+      "bytes": 71
+    },
+    "out/phase6-dg-asan-mesa-camera-fixed/lua_dgs_atmosphere-vc/console.txt": {
+      "sha256": "75f6f8273994343e951486cab8c4c63444db8d010f87cc35a802a394d50efa1f",
+      "bytes": 16758
+    },
+    "out/phase6-dg-asan-mesa-camera-fixed/Galileo's first Ganymede flyby/graphics-lifecycle.json": {
+      "sha256": "df7514880a865666d7ff653c5f63158753beffc1be13e4fda55ad112cca2d37b",
+      "bytes": 71
+    },
+    "out/phase6-dg-asan-mesa-camera-fixed/Galileo's first Ganymede flyby/console.txt": {
+      "sha256": "13c3404f587ef81eaee8b119bb35b731b01d956d512584af211f814217e69a69",
+      "bytes": 14972
+    },
+    "out/phase6-dg-asan-mesa-camera-fixed/Venus descent/graphics-lifecycle.json": {
+      "sha256": "df7514880a865666d7ff653c5f63158753beffc1be13e4fda55ad112cca2d37b",
+      "bytes": 71
+    },
+    "out/phase6-dg-asan-mesa-camera-fixed/Venus descent/console.txt": {
+      "sha256": "50fc5835202a0fce393394556cf769bafd7831ba0f4cf03962f5f362039873bd",
+      "bytes": 14970
+    },
+    "out/phase6-dg-asan-mesa-camera-fixed/lua_dg_atmosphere-vc/graphics-lifecycle.json": {
+      "sha256": "3c3c473da9e01d70dc21e1f1e62fdfeaaa4ce4a4804eca01f9efc19ab25e9c1e",
+      "bytes": 71
+    },
+    "out/phase6-dg-asan-mesa-camera-fixed/lua_dg_atmosphere-vc/console.txt": {
+      "sha256": "abdf2fb24190d72a2293755054a62f844c636a13096588fec08603deae067036",
+      "bytes": 16771
+    },
+    "out/phase6-dg-asan-mesa-camera-fixed/lua_dgs_atmosphere-panel/graphics-lifecycle.json": {
+      "sha256": "3c3c473da9e01d70dc21e1f1e62fdfeaaa4ce4a4804eca01f9efc19ab25e9c1e",
+      "bytes": 71
+    },
+    "out/phase6-dg-asan-mesa-camera-fixed/lua_dgs_atmosphere-panel/console.txt": {
+      "sha256": "d4637f4494a5a6730c4ce9b28a897fff43c8910f549066d521b125b81b89ba9f",
+      "bytes": 16761
+    },
+    "out/phase6-recorder-asan-mesa-verified/record-until-exit/graphics-lifecycle.json": {
+      "sha256": "8524b90da0015bd1a4d5d5159fb8ff0a45d467b851c94a8a6f28b30f96f6b800",
+      "bytes": 71
+    },
+    "out/phase6-recorder-asan-mesa-verified/record-until-exit/console.log": {
+      "sha256": "5f59024b694d7f5b4ff519308f3df4d0a3ff3ff68530154414cdcc76bbeb0c2f",
+      "bytes": 15263
+    },
+    "out/phase6-recorder-asan-mesa-verified/record-until-exit/invocation.json": {
+      "sha256": "1b6d757ef73b1d214dfd0fbfe0ff20c6851bda442ab028fdfece82876e7c8751",
+      "bytes": 1124
+    },
+    "out/phase6-recorder-asan-mesa-verified/record/graphics-lifecycle.json": {
+      "sha256": "3f1642dd3c1501421b4c76940d9a1859c63498c7f52e2e71a0d50c35f2627e66",
+      "bytes": 71
+    },
+    "out/phase6-recorder-asan-mesa-verified/record/console.log": {
+      "sha256": "186ebd7c5f2afff01fe7302e049440cafdd8ecffe1477199655c192ae9a74003",
+      "bytes": 15260
+    },
+    "out/phase6-recorder-asan-mesa-verified/record/invocation.json": {
+      "sha256": "6e836366a49c1e988eae77b6260f740cd0a5ffb83662d0c6c6f3905d4180e9af",
+      "bytes": 1080
+    },
+    "out/phase6-recorder-asan-mesa-verified/editor/graphics-lifecycle.json": {
+      "sha256": "5b77e17e5f345a34f89bc94cfe971cd32d15668297d80a46623d6288eb3de73b",
+      "bytes": 71
+    },
+    "out/phase6-recorder-asan-mesa-verified/editor/console.log": {
+      "sha256": "4bfa4fc8bab0cc9b6f77dca695423b5f8a8a02843721200d1145ab7f151ce1c3",
+      "bytes": 15075
+    },
+    "out/phase6-recorder-asan-mesa-verified/editor/invocation.json": {
+      "sha256": "1a62d4a695a16a7e98e9ad54f9fb00a8c94cc7978ba3507c7f6c4a446ff67774",
+      "bytes": 1100
+    },
+    "out/phase6-recorder-asan-mesa-verified/playback/graphics-lifecycle.json": {
+      "sha256": "b7119b5111e73cb418bd90fd10d67b73af84ac3a209461664f0b8450e0c8f5d9",
+      "bytes": 71
+    },
+    "out/phase6-recorder-asan-mesa-verified/playback/console.log": {
+      "sha256": "4bfa4fc8bab0cc9b6f77dca695423b5f8a8a02843721200d1145ab7f151ce1c3",
+      "bytes": 15075
+    },
+    "out/phase6-recorder-asan-mesa-verified/playback/invocation.json": {
+      "sha256": "fc4fca6826051a6668d06cc1f53f9410c0548e63cd9fdd2292896ccb3c454563",
+      "bytes": 1108
+    },
+    "out/phase6-recorder-asan-mesa-verified/edited-playback/graphics-lifecycle.json": {
+      "sha256": "d73ccb8f219a03e593d8f64b00d2d6d058b63bbe05a15c39cdedfb3deef42069",
+      "bytes": 71
+    },
+    "out/phase6-recorder-asan-mesa-verified/edited-playback/console.log": {
+      "sha256": "4bfa4fc8bab0cc9b6f77dca695423b5f8a8a02843721200d1145ab7f151ce1c3",
+      "bytes": 15075
+    },
+    "out/phase6-recorder-asan-mesa-verified/edited-playback/invocation.json": {
+      "sha256": "94952fcbb1b173605874f6f894f76889bc3b53c9794e2d3ac78d5686746359cc",
+      "bytes": 1136
+    },
+    "out/phase6-ui-asan-cycles-mesa-verified/console.log": {
+      "sha256": "4395665df5f224538eb2e4afd0e1e821488c5038180cd5d573ba4efa17515b58",
+      "bytes": 300460
+    },
+    "out/phase6-ui-asan-cycles-mesa-verified/invocation.json": {
+      "sha256": "01f6fa074a414e8df1924bc9af819847283f2f210f033b98c03592118393fee4",
+      "bytes": 1058
+    },
+    "out/phase6-ui-asan-cycles-mesa-verified/verification.json": {
+      "sha256": "b3da6aaf5b36068e795e1b3c76283d83b020f6a53a197daede7051012ac37853",
+      "bytes": 2372
+    },
+    "out/phase6-dg-asan-mesa-camera-fixed/flight-report.json": {
+      "sha256": "92dfa9db2eccbb392e7fbed99c8085272fdb6465cb94a8b3885133e915e382e3",
+      "bytes": 1005
+    },
+    "out/phase6-recorder-asan-mesa-verified/verification.json": {
+      "sha256": "f1c39caa01b0c8e9c553c95210b696ea1f3022aba3082e401990e46ac8f9a971",
+      "bytes": 618
+    }
+  }
+}

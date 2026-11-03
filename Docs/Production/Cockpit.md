@@ -23,6 +23,17 @@ the system driver is unchanged and broader platform qualification remains open.
 [Reproduction, patch and build instructions](../../Tests/Production/GraphicsDriverLifetime/README.md)
 Earlier system-driver failures below are retained as historical evidence.
 
+With that candidate selected, unsuppressed ASan/UBSan/LSan now also pass the
+five-process recorder/player/editor sequence (260 presentations) and twenty
+in-process GUI sessions with an input dialog open (80 presentations). Four
+DG/DG-S Lua AAP flights in the 2D panel and virtual cockpit plus six unchanged
+stock scenarios pass all 552 presentations and teardown. The broader stock
+run exposed an additional Lua camera ownership error in Earth views: a
+64-byte track-mode object was deleted through its 24-byte nonvirtual base.
+The command now uses the same concrete-type deleter as the engine's camera
+preset and recorder paths. Its calculations and the SDK class layout are
+conserved. [Local lifetime evidence](GraphicsLifetimeVerification.json)
+
 The cockpit now draws the original target, time and frame-rate displays and
 opens the original spacecraft selection dialog on F3. A two-vessel run used
 the dialog to select DG-S and then return to DG. Both the control focus and the

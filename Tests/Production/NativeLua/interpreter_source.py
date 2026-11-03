@@ -17,6 +17,13 @@ def verify():
     path='Src/Module/LuaScript/LuaInterpreter/Interpreter.cpp'
     source=windows(raw(path)).replace('static std::list<NOTEHANDLE *> g_notehandles;', 'std::list<NOTEHANDLE *> g_notehandles;')
     source=source.replace('#include <iterator>','').replace('#include <cstdint>','')
+    source=source.replace('#include "../../../Orbiter/Production/CameraModeOwner.h"','')
+    # CameraMode has no virtual destructor. Conserve the command's calculations
+    # while checking the one explicit concrete-type lifetime adaptation.
+    camera_delete='orbiter::production::DeleteCameraMode{}(cm);'
+    if source.count(camera_delete)!=1:
+        raise ValueError('Missing or ambiguous Lua camera concrete-type destruction')
+    source=source.replace(camera_delete,'delete cm;')
     source=source.replace('static int CompareScriptText(const char *a, const char *b) { return _stricmp(a,b); }','')
     source=aliases(source).replace('CompareScriptText(', '_stricmp(').replace('std::uint8_t','BYTE')
     source=source.replace('std::size_t i = 0; i < std::size(glob)', 'int i = 0; i < ARRAYSIZE(glob)')
