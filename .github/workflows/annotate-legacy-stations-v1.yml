@@ -1,0 +1,26 @@
+name: Record Original Legacy v1 Playback Limitation
+on:
+  push:
+    branches: ['codex/production-**']
+    paths: ['Tests/Production/annotate_legacy_reference.py', '.github/workflows/annotate-legacy-stations-v1.yml']
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: annotate-original-legacy-stations-v1
+  cancel-in-progress: false
+jobs:
+  annotate:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v7
+      - name: Publish the limitation while verifying the unchanged tag and all four assets
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: python3 -B Tests/Production/annotate_legacy_reference.py --publish --output out/legacy-v1-annotation.json
+      - uses: actions/upload-artifact@v7
+        with:
+          name: legacy-stations-v1-limitation
+          retention-days: 90
+          path: out/legacy-v1-annotation.json
