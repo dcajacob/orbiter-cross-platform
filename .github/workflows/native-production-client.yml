@@ -153,7 +153,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          python3 -B Tests/Production/Help/prepare.py --destination out/scene-resources/Help --lua out/native-cockpit-engine/native-lua/lua 2>&1 | tee native-help-build.log
+          python3 -B Tests/Production/Help/prepare.py --destination out/scene-resources/Help --lua out/native-cockpit-engine/native-lua/lua 2>&1 | tee out/native-help-build.log
           python3 -B Tests/Production/Help/verify.py --help-root out/scene-resources/Help --output out/native-help-sources.json
           c++ -std=c++17 -Wall -Wextra -Werror -I Src/Orbiter Tests/Production/Help/Resolve.Test.cpp Src/Orbiter/Production/NativeHelp.cpp Src/Orbiter/Production/ResourceResolver.cpp -o out/native-help-resolver
           out/native-help-resolver out/scene-resources
@@ -332,7 +332,7 @@ jobs:
             out/native-help-browser/**
             out/native-help-sources.json
             out/scene-resources/Help/manifest.json
-            native-help-build.log
+            out/native-help-build.log
             out/native-stock-menu/custom-function-events.txt
             out/native-stock-menu/menu-windows.csv
             out/native-stock-menu/options-state.csv
