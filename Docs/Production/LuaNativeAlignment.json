@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "status": "passed",
-  "scope": "Native Debug/Release automatic-profile Lua event/control/air/cockpit-state parity with the qualified Windows 2025 candidate. Native image acceptance, full SSE2 simulator comparisons and reference preservation remain separate.",
+  "scope": "Native Debug/Release automatic and forced-SSE2 Lua event/control/air/cockpit-state parity with the qualified Windows 2025 reference. Native image and broader platform acceptance remain separate.",
   "source_base": "3f59b27d",
   "source_sha256": {
     "Src/Orbiter/Production/Math/Runtime.cpp": "b2b04979018ceb6a10b8774369bca651f5a86dce8aaf98b0e8d75ef45241e7f1",
@@ -360,6 +360,166 @@
     }
   },
   "failed_original_rejected": true,
-  "identical_lf_normalized_native_trace_files": 40,
-  "identical_lf_normalized_native_index_sha256": "241fc95deee0cf6044095bcab02deb07505855bceb6421144a329f82ce50a067"
+  "identical_lf_normalized_native_trace_files": 80,
+  "identical_lf_normalized_native_index_sha256": "28fde59e40577779ab1b115f5318921bae2fb8cd20b9929052bc95e24c191b0d",
+  "native_sse2": {
+    "debug": {
+      "exit_code": 0,
+      "cases": {
+        "lua_pb": {
+          "events": 10,
+          "environment_isolation": true,
+          "frame_yielding": true,
+          "aap_controls": false,
+          "original_events_identical": true,
+          "original_controls_identical": true,
+          "original_air_identical": true,
+          "original_state_identical": true,
+          "first_control_difference": null,
+          "control_differences": 0
+        },
+        "lua_dg": {
+          "events": 13,
+          "environment_isolation": true,
+          "frame_yielding": true,
+          "aap_controls": true,
+          "original_events_identical": true,
+          "original_controls_identical": true,
+          "original_air_identical": true,
+          "original_state_identical": true,
+          "first_control_difference": null,
+          "control_differences": 0
+        },
+        "lua_dgs": {
+          "events": 13,
+          "environment_isolation": true,
+          "frame_yielding": true,
+          "aap_controls": true,
+          "original_events_identical": true,
+          "original_controls_identical": true,
+          "original_air_identical": true,
+          "original_state_identical": true,
+          "first_control_difference": null,
+          "control_differences": 0
+        },
+        "lua_dg_atmosphere": {
+          "events": 15,
+          "environment_isolation": true,
+          "frame_yielding": true,
+          "aap_controls": true,
+          "original_events_identical": true,
+          "original_controls_identical": true,
+          "original_air_identical": true,
+          "original_state_identical": true,
+          "first_control_difference": null,
+          "control_differences": 0
+        },
+        "lua_dgs_atmosphere": {
+          "events": 15,
+          "environment_isolation": true,
+          "frame_yielding": true,
+          "aap_controls": true,
+          "original_events_identical": true,
+          "original_controls_identical": true,
+          "original_air_identical": true,
+          "original_state_identical": true,
+          "first_control_difference": null,
+          "control_differences": 0
+        }
+      },
+      "profile": "amd-6121d02-sse2",
+      "original_capture": {
+        "status": "passed",
+        "source": "739fdf943cf63dc4e05647cf64b0cde0ace22195",
+        "configuration": "Debug",
+        "math_profile": "diagnostic-sse2",
+        "host": {
+          "platform": "Windows-2025Server-10.0.26100-SP0",
+          "image_os": "win25-vs2026",
+          "image_version": "20261030.294.1"
+        }
+      },
+      "report_sha256": "cc8ac3e945ed75977c5c3e27196ab790680c69cf0752bc483e2679a2f3b59386",
+      "build_source": "57b536139b4952385ca81e95542b5460db47f3fd"
+    },
+    "release": {
+      "exit_code": 0,
+      "cases": {
+        "lua_pb": {
+          "events": 10,
+          "environment_isolation": true,
+          "frame_yielding": true,
+          "aap_controls": false,
+          "original_events_identical": true,
+          "original_controls_identical": true,
+          "original_air_identical": true,
+          "original_state_identical": true,
+          "first_control_difference": null,
+          "control_differences": 0
+        },
+        "lua_dg": {
+          "events": 13,
+          "environment_isolation": true,
+          "frame_yielding": true,
+          "aap_controls": true,
+          "original_events_identical": true,
+          "original_controls_identical": true,
+          "original_air_identical": true,
+          "original_state_identical": true,
+          "first_control_difference": null,
+          "control_differences": 0
+        },
+        "lua_dgs": {
+          "events": 13,
+          "environment_isolation": true,
+          "frame_yielding": true,
+          "aap_controls": true,
+          "original_events_identical": true,
+          "original_controls_identical": true,
+          "original_air_identical": true,
+          "original_state_identical": true,
+          "first_control_difference": null,
+          "control_differences": 0
+        },
+        "lua_dg_atmosphere": {
+          "events": 15,
+          "environment_isolation": true,
+          "frame_yielding": true,
+          "aap_controls": true,
+          "original_events_identical": true,
+          "original_controls_identical": true,
+          "original_air_identical": true,
+          "original_state_identical": true,
+          "first_control_difference": null,
+          "control_differences": 0
+        },
+        "lua_dgs_atmosphere": {
+          "events": 15,
+          "environment_isolation": true,
+          "frame_yielding": true,
+          "aap_controls": true,
+          "original_events_identical": true,
+          "original_controls_identical": true,
+          "original_air_identical": true,
+          "original_state_identical": true,
+          "first_control_difference": null,
+          "control_differences": 0
+        }
+      },
+      "profile": "amd-6121d02-sse2",
+      "original_capture": {
+        "status": "passed",
+        "source": "739fdf943cf63dc4e05647cf64b0cde0ace22195",
+        "configuration": "Release",
+        "math_profile": "diagnostic-sse2",
+        "host": {
+          "platform": "Windows-2025Server-10.0.26100-SP0",
+          "image_os": "win25-vs2026",
+          "image_version": "20261030.294.1"
+        }
+      },
+      "report_sha256": "cc8ac3e945ed75977c5c3e27196ab790680c69cf0752bc483e2679a2f3b59386",
+      "build_source": "57b536139b4952385ca81e95542b5460db47f3fd"
+    }
+  }
 }

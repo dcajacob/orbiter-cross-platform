@@ -50,11 +50,11 @@ interactive stock acceptance still required.
 The preserved Windows 2025 Lua/AAP candidate now passes both default-profile
 and SSE2 Debug/Release comparisons for all five cases: zero physical-state
 error, exact Lua/control traces and frame/MFD SSIM 1.0. Native Debug and Release
-automatic-profile runs also match all five candidates' event, control,
+automatic and forced-SSE2 runs also match all five candidates' event, control,
 atmosphere and cockpit-state traces exactly after aligning latitude dispatch
 with that CRT family. Windows 2022's legacy default comparison still fails.
-Durable Lua reference preservation, complete SSE2 native simulator parity and
-the broader Phase 6 platform gates remain open.
+Durable Lua reference publication and the broader Phase 6 platform gates
+remain open.
 [Native numerical evidence](LuaNativeAlignment.json)
 
 The cockpit now draws the original target, time and frame-rate displays and

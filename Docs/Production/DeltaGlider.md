@@ -56,16 +56,19 @@ still needs durable preservation.
 [Protocol evidence](LuaHandoffVerification.json)
 
 Native latitude now uses the selected CPU path in both build configurations,
-matching the qualified 26100-family Windows CRTs. Debug and Release both match
-all five original Windows 2025 schedules exactly for events, controls,
-atmosphere and cockpit state. The 40 compared native trace files match their
-original counterparts after CRLF-to-LF normalization. All four Debug/Release automatic/SSE2
+matching the qualified 26100-family Windows CRTs. Separate Debug and Release
+builds in both automatic and forced-SSE2 profiles match all five original
+Windows 2025 schedules exactly for events, controls, atmosphere and cockpit
+state. All 80 native trace files match their original counterparts after
+CRLF-to-LF normalization. All four Debug/Release automatic/SSE2
 math configurations pass the unchanged 28,800-sample Windows primitive corpus
 per exercised CPU path and 7,698 independent MPFR checks per path. Vendor
 mathematical sources and frozen numerical budgets are unchanged. The native
 comparison selects the requested original profile explicitly and rejects failed
-captures before running. Native image comparisons, full SSE2 simulator parity
-and the broader platform gates remain separate.
+captures before running. Native image comparisons and the broader platform
+gates remain separate. The accepted original reference has immutable source,
+artifact and per-file manifests; its publication workflow rechecks all job
+outcomes and both comparisons before preserving it in release storage.
 [Native numerical alignment](LuaNativeAlignment.json)
 
 The native client flies all five original DG recorded scenarios from the stock

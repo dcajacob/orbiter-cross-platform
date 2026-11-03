@@ -384,7 +384,7 @@
     },
     "identical_trace_and_image_files": 260,
     "identical_index_sha256": "4528821625ea7234f63fb67405fec3b150fd675e94e3c35f544de0974857050d",
-    "scope": "Passing original Windows 2025 Debug/Release default and SSE2 candidate. The native automatic-profile alignment is recorded separately; legacy Windows 2022 default failure remains visible.",
+    "scope": "Accepted original Windows 2025 Debug/Release default and SSE2 reference. All four native build/profile comparisons pass separately; legacy Windows 2022 default failure remains visible.",
     "native_alignment_report": "LuaNativeAlignment.json"
   }
 }

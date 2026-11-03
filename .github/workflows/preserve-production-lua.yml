@@ -1,0 +1,44 @@
+name: Preserve Qualified Original Lua and AAP
+on:
+  push:
+    branches: ['codex/production-**']
+    paths:
+      - Tests/Production/LuaRuntime/Reference/**
+      - .github/workflows/preserve-production-lua.yml
+  workflow_dispatch:
+permissions:
+  contents: write
+  actions: read
+concurrency:
+  group: preserve-original-lua-aap
+  cancel-in-progress: false
+jobs:
+  preserve:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    env:
+      GH_TOKEN: ${{ github.token }}
+      GH_REPO: dcajacob/orbiter-cross-platform
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - name: Verify qualified host jobs, exact archives, producer inputs and both comparisons
+        run: python3 -B Tests/Production/additional_references.py lua --preserve out/accepted-original-lua
+      - name: Publish immutable reference assets without replacement
+        shell: bash
+        run: |
+          set -euo pipefail
+          tag=production-windows-lua-aap-v1
+          if gh release view "$tag" >/dev/null 2>&1; then
+            echo 'Verifying existing immutable reference storage; no assets will be replaced.'
+          else
+            gh release create "$tag" out/accepted-original-lua/* --target "$GITHUB_SHA" --prerelease --title 'Original Windows Lua and AAP reference v1' --notes-file Tests/Production/LuaRuntime/Reference/README.md
+          fi
+      - name: Independently download and recompare public reference storage
+        run: python3 -B Tests/Production/additional_references.py lua --cache out/public-lua-cache --output out/public-lua-verification
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: original-lua-public-verification
+          path: out/public-lua-verification/verified-*.json
