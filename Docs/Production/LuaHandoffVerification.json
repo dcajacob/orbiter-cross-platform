@@ -118,7 +118,7 @@
   },
   "windows2025_pair": {
     "status": "passed",
-    "reference_preservation": "pending",
+    "reference_preservation": "published-and-independently-verified",
     "source": "739fdf943cf63dc4e05647cf64b0cde0ace22195",
     "capture_job": 125766447307,
     "comparison_job": 125772368137,
@@ -385,6 +385,8 @@
     "identical_trace_and_image_files": 260,
     "identical_index_sha256": "4528821625ea7234f63fb67405fec3b150fd675e94e3c35f544de0974857050d",
     "scope": "Accepted original Windows 2025 Debug/Release default and SSE2 reference. All four native build/profile comparisons pass separately; legacy Windows 2022 default failure remains visible.",
-    "native_alignment_report": "LuaNativeAlignment.json"
+    "native_alignment_report": "LuaNativeAlignment.json",
+    "reference_release": "https://github.com/dcajacob/orbiter-cross-platform/releases/tag/production-windows-lua-aap-v1",
+    "preservation_evidence": "LuaPreservationVerification.json"
   }
 }

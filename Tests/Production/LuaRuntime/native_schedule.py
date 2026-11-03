@@ -19,19 +19,25 @@ def main():
     for key in ('assets','build','data','planets','output'):
         parser.add_argument('--'+key,type=Path,required=True)
     parser.add_argument('--original',type=Path,help='Original Windows capture ZIP for diagnostic comparison')
-    parser.add_argument('--original-profile',choices=('original-default','diagnostic-sse2'),default='original-default')
+    parser.add_argument('--original-profile',choices=('original-default','diagnostic-sse2','automatic'),default='original-default')
     args=parser.parse_args()
     output=args.output.resolve()
     output.mkdir(parents=True,exist_ok=False)
-    original_directory='diagnostic-sse2' if args.original_profile=='diagnostic-sse2' else 'control-reference'
+    directories={'original-default':'control-reference','diagnostic-sse2':'diagnostic-sse2'}
+    original_capture={}
     if args.original:
         with zipfile.ZipFile(args.original) as archive:
-            original_report=json.loads(archive.read('out/'+original_directory+'/lua-report.json'))
-        if (original_report['status']!='passed' or original_report['math_profile']!=args.original_profile or
-                original_report['runtime']['application_source']!=settings()['application_source']):
-            raise ValueError('Original Lua capture failed, has the wrong profile, or uses a different application')
-        (output/'original-capture.json').write_text(json.dumps({key:original_report[key] for key in
-            ('status','source','configuration','math_profile','host')},indent=2)+'\n')
+            profiles=tuple(directories) if args.original_profile=='automatic' else (args.original_profile,)
+            for profile in profiles:
+                original_report=json.loads(archive.read('out/'+directories[profile]+'/lua-report.json'))
+                if (original_report['status']!='passed' or original_report['math_profile']!=profile or
+                        original_report['runtime']['application_source']!=settings()['application_source']):
+                    raise ValueError('Original Lua capture failed, has the wrong profile, or uses a different application')
+                original_capture[profile]={key:original_report[key] for key in
+                    ('status','source','configuration','math_profile','host')}
+        summary=(dict(selection='automatic',profiles=original_capture,selected_profiles={})
+                 if args.original_profile=='automatic' else original_capture[args.original_profile])
+        (output/'original-capture.json').write_text(json.dumps(summary,indent=2)+'\n')
     build=args.build.resolve()
     compiler=next(line.split('=',1)[1] for line in (build/'CMakeCache.txt').read_text().splitlines()
                   if line.startswith('CMAKE_CXX_COMPILER:FILEPATH='))
@@ -57,6 +63,15 @@ def main():
                            stderr=subprocess.STDOUT,check=True,timeout=120)
         result=validate(out,case,original_intermediates=False)
         if args.original:
+            selected=args.original_profile
+            if selected=='automatic':
+                actual=json.loads((out/'numerics.json').read_text())['math']
+                choices={'amd-6121d02-fma3':'original-default','amd-6121d02-sse2':'diagnostic-sse2'}
+                if actual not in choices:raise ValueError('Unqualified native math profile: '+actual)
+                selected=choices[actual]
+                summary['selected_profiles'][case['id']]=selected
+                (output/'original-capture.json').write_text(json.dumps(summary,indent=2)+'\n')
+            original_directory=directories[selected]
             with zipfile.ZipFile(args.original) as z:
                 suffix='/'+case['id']+'-1/'
                 def original(name):
@@ -71,7 +86,7 @@ def main():
                        for k in ('elevator','aileron','main') if x[k]!=y[k]]
                 matching={name:original(name)==(out/name).read_text().splitlines()
                           for name in ('lua-air.csv','cockpit-state.csv')}
-                result.update(original_events_identical=True,original_controls_identical=not diffs,
+                result.update(original_math_profile=selected,original_events_identical=True,original_controls_identical=not diffs,
                               original_air_identical=matching['lua-air.csv'],
                               original_state_identical=matching['cockpit-state.csv'],
                               first_control_difference=diffs[0] if diffs else None,control_differences=len(diffs))

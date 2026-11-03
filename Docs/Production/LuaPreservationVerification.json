@@ -1,0 +1,267 @@
+{
+  "schema": 1,
+  "status": "passed",
+  "reference_release": "https://github.com/dcajacob/orbiter-cross-platform/releases/tag/production-windows-lua-aap-v1",
+  "tag": "production-windows-lua-aap-v1",
+  "publisher_source": "9ed190d2a2a2f779e5693f6c686bdedc0942156e",
+  "publisher_run": 41596558014,
+  "jobs": [
+    {
+      "id": 125785183609,
+      "name": "preserve",
+      "conclusion": "success",
+      "steps": [
+        {
+          "name": "Set up job",
+          "conclusion": "success"
+        },
+        {
+          "name": "Run actions/checkout@v7",
+          "conclusion": "success"
+        },
+        {
+          "name": "Verify qualified host jobs, exact archives, producer inputs and both comparisons",
+          "conclusion": "success"
+        },
+        {
+          "name": "Publish immutable reference assets without replacement",
+          "conclusion": "success"
+        },
+        {
+          "name": "Independently download and recompare public reference storage",
+          "conclusion": "success"
+        },
+        {
+          "name": "Run actions/upload-artifact@v7",
+          "conclusion": "success"
+        },
+        {
+          "name": "Post Run actions/checkout@v7",
+          "conclusion": "success"
+        },
+        {
+          "name": "Complete job",
+          "conclusion": "success"
+        }
+      ]
+    }
+  ],
+  "assets": {
+    "comparison.json": {
+      "size": 2801,
+      "digest": "sha256:e6c63d75ee4e1daa1c6ac2108bdb93a65ab8a4dd2196ec725195a2096a307b4e"
+    },
+    "diagnostic-sse2-comparison.json": {
+      "size": 2800,
+      "digest": "sha256:50f34bb4d7ab15c9de132a228182f33efe766d972d9bcb28980176d2e807c3f9"
+    },
+    "files.json": {
+      "size": 1181,
+      "digest": "sha256:d071a6738c40cba743e522411341518c58cc4408620c9008234ccaa68f3140d8"
+    },
+    "original-lua-aap-comparison.zip": {
+      "size": 9840,
+      "digest": "sha256:ec08f7ef9b36c4058c1b01043e33b1968115c9baa286fe69d73f76c355743e9e"
+    },
+    "original-lua-aap-Debug.zip": {
+      "size": 51660238,
+      "digest": "sha256:a616737cda69799a135401c867e90d2e5dc3f0ba5d247996f6284911534ac629"
+    },
+    "original-lua-aap-Release.zip": {
+      "size": 51629491,
+      "digest": "sha256:1bc73b260d63f7ba109721f0762542c798e8157044b1c48942d239b4f16f0ef6"
+    },
+    "original-lua-aap-windows2025-comparison.zip": {
+      "size": 988,
+      "digest": "sha256:d4cf0d75521232fe9f26dd26545b6ab704c99172ded0b7fdf63a1f00dcef032c"
+    },
+    "original-lua-aap-windows2025-Debug.zip": {
+      "size": 51772767,
+      "digest": "sha256:7cc4f857d62be1114220deda0c186c2e6bf1a914f82caaa3450140da3b81744e"
+    },
+    "original-lua-aap-windows2025-Release.zip": {
+      "size": 51629472,
+      "digest": "sha256:3c85b03e26193ab6c5621b49fc7e8b61cc9e0cfb6d3571046be06244c170f746"
+    },
+    "provenance.json": {
+      "size": 371785,
+      "digest": "sha256:67367eac7a1446a940849d8c742368876e4d132cd79bd9ed7d74e8a1b194f133"
+    },
+    "README.md": {
+      "size": 2321,
+      "digest": "sha256:c25fc197cc56248884b4fb61ef1e8faa7450b6916f35a6755bdd224cb52c6c01"
+    },
+    "workflow-logs.zip": {
+      "size": 244667,
+      "digest": "sha256:76095b0f24dfacd66265aa701f4ccb2f66c64923dfc35e9e189fcacdf14f82e2"
+    }
+  },
+  "independent_local_download": {
+    "status": "passed",
+    "output": "out/phase6-public-lua-verified",
+    "manifest_sha256": "67367eac7a1446a940849d8c742368876e4d132cd79bd9ed7d74e8a1b194f133",
+    "comparisons": [
+      "verified-default-comparison.json",
+      "verified-sse2-comparison.json"
+    ]
+  },
+  "native_automatic_reference_selection": {
+    "debug-automatic": {
+      "status": "passed",
+      "capture": {
+        "selection": "automatic",
+        "profiles": {
+          "original-default": {
+            "status": "passed",
+            "source": "739fdf943cf63dc4e05647cf64b0cde0ace22195",
+            "configuration": "Debug",
+            "math_profile": "original-default",
+            "host": {
+              "platform": "Windows-2025Server-10.0.26100-SP0",
+              "image_os": "win25-vs2026",
+              "image_version": "20261030.294.1"
+            }
+          },
+          "diagnostic-sse2": {
+            "status": "passed",
+            "source": "739fdf943cf63dc4e05647cf64b0cde0ace22195",
+            "configuration": "Debug",
+            "math_profile": "diagnostic-sse2",
+            "host": {
+              "platform": "Windows-2025Server-10.0.26100-SP0",
+              "image_os": "win25-vs2026",
+              "image_version": "20261030.294.1"
+            }
+          }
+        },
+        "selected_profiles": {
+          "lua_pb": "original-default",
+          "lua_dg": "original-default",
+          "lua_dgs": "original-default",
+          "lua_dg_atmosphere": "original-default",
+          "lua_dgs_atmosphere": "original-default"
+        }
+      },
+      "report_sha256": "89ac7ca97fe630e309a171026bfb83469230984fe6a55052793f2d2bac612df9",
+      "cases": 5
+    },
+    "debug-sse2": {
+      "status": "passed",
+      "capture": {
+        "selection": "automatic",
+        "profiles": {
+          "original-default": {
+            "status": "passed",
+            "source": "739fdf943cf63dc4e05647cf64b0cde0ace22195",
+            "configuration": "Debug",
+            "math_profile": "original-default",
+            "host": {
+              "platform": "Windows-2025Server-10.0.26100-SP0",
+              "image_os": "win25-vs2026",
+              "image_version": "20261030.294.1"
+            }
+          },
+          "diagnostic-sse2": {
+            "status": "passed",
+            "source": "739fdf943cf63dc4e05647cf64b0cde0ace22195",
+            "configuration": "Debug",
+            "math_profile": "diagnostic-sse2",
+            "host": {
+              "platform": "Windows-2025Server-10.0.26100-SP0",
+              "image_os": "win25-vs2026",
+              "image_version": "20261030.294.1"
+            }
+          }
+        },
+        "selected_profiles": {
+          "lua_pb": "diagnostic-sse2",
+          "lua_dg": "diagnostic-sse2",
+          "lua_dgs": "diagnostic-sse2",
+          "lua_dg_atmosphere": "diagnostic-sse2",
+          "lua_dgs_atmosphere": "diagnostic-sse2"
+        }
+      },
+      "report_sha256": "dbc2d944390a9593e76cc632970050879f30a2323186984f5a7be304e61993a0",
+      "cases": 5
+    },
+    "release-automatic": {
+      "status": "passed",
+      "capture": {
+        "selection": "automatic",
+        "profiles": {
+          "original-default": {
+            "status": "passed",
+            "source": "739fdf943cf63dc4e05647cf64b0cde0ace22195",
+            "configuration": "Release",
+            "math_profile": "original-default",
+            "host": {
+              "platform": "Windows-2025Server-10.0.26100-SP0",
+              "image_os": "win25-vs2026",
+              "image_version": "20261030.294.1"
+            }
+          },
+          "diagnostic-sse2": {
+            "status": "passed",
+            "source": "739fdf943cf63dc4e05647cf64b0cde0ace22195",
+            "configuration": "Release",
+            "math_profile": "diagnostic-sse2",
+            "host": {
+              "platform": "Windows-2025Server-10.0.26100-SP0",
+              "image_os": "win25-vs2026",
+              "image_version": "20261030.294.1"
+            }
+          }
+        },
+        "selected_profiles": {
+          "lua_pb": "original-default",
+          "lua_dg": "original-default",
+          "lua_dgs": "original-default",
+          "lua_dg_atmosphere": "original-default",
+          "lua_dgs_atmosphere": "original-default"
+        }
+      },
+      "report_sha256": "89ac7ca97fe630e309a171026bfb83469230984fe6a55052793f2d2bac612df9",
+      "cases": 5
+    },
+    "release-sse2": {
+      "status": "passed",
+      "capture": {
+        "selection": "automatic",
+        "profiles": {
+          "original-default": {
+            "status": "passed",
+            "source": "739fdf943cf63dc4e05647cf64b0cde0ace22195",
+            "configuration": "Release",
+            "math_profile": "original-default",
+            "host": {
+              "platform": "Windows-2025Server-10.0.26100-SP0",
+              "image_os": "win25-vs2026",
+              "image_version": "20261030.294.1"
+            }
+          },
+          "diagnostic-sse2": {
+            "status": "passed",
+            "source": "739fdf943cf63dc4e05647cf64b0cde0ace22195",
+            "configuration": "Release",
+            "math_profile": "diagnostic-sse2",
+            "host": {
+              "platform": "Windows-2025Server-10.0.26100-SP0",
+              "image_os": "win25-vs2026",
+              "image_version": "20261030.294.1"
+            }
+          }
+        },
+        "selected_profiles": {
+          "lua_pb": "diagnostic-sse2",
+          "lua_dg": "diagnostic-sse2",
+          "lua_dgs": "diagnostic-sse2",
+          "lua_dg_atmosphere": "diagnostic-sse2",
+          "lua_dgs_atmosphere": "diagnostic-sse2"
+        }
+      },
+      "report_sha256": "dbc2d944390a9593e76cc632970050879f30a2323186984f5a7be304e61993a0",
+      "cases": 5
+    }
+  },
+  "selection_source_sha256": "0d76c598fc6500959d57ad0f10bfc4353632c9d51fec2f618fad9857250866de"
+}

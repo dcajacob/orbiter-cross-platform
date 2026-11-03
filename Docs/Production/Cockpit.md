@@ -53,9 +53,11 @@ error, exact Lua/control traces and frame/MFD SSIM 1.0. Native Debug and Release
 automatic and forced-SSE2 runs also match all five candidates' event, control,
 atmosphere and cockpit-state traces exactly after aligning latitude dispatch
 with that CRT family. Windows 2022's legacy default comparison still fails.
-Durable Lua reference publication and the broader Phase 6 platform gates
-remain open.
+The Lua reference is now published in immutable release storage and verified
+by fresh downloads and both comparisons. Native CI uses it for every build
+and CPU profile. The broader Phase 6 platform and image gates remain open.
 [Native numerical evidence](LuaNativeAlignment.json)
+[Published reference evidence](LuaPreservationVerification.json)
 
 The cockpit now draws the original target, time and frame-rate displays and
 opens the original spacecraft selection dialog on F3. A two-vessel run used

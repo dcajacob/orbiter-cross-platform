@@ -177,11 +177,21 @@ jobs:
           xvfb-run -a -s '-screen 0 1920x1080x24' env LIBGL_ALWAYS_SOFTWARE=1 GALLIUM_DRIVER=llvmpipe
           python3 -B Tests/Production/LuaRuntime/native_flight.py --build out/native-cockpit-engine
           --assets out/scene-resources --data out/data --planets out/planets --output out/native-lua-flight
-      - name: Check synchronous commands, asynchronous worker timing, isolation and AAP controls
+      - uses: actions/cache@v6
+        with:
+          path: out/original-lua-cache
+          key: original-lua-aap-v1-${{ hashFiles('Tests/Production/LuaRuntime/Reference/provenance.json') }}
+      - name: Verify and stage the immutable original Lua reference
+        run: >-
+          python3 -B Tests/Production/additional_references.py lua
+          --cache out/original-lua-cache --output out/frozen-original-lua
+      - name: Compare original Lua scheduling, isolation, AAP controls and finalized states
         run: >-
           xvfb-run -a -s '-screen 0 1920x1080x24' env LIBGL_ALWAYS_SOFTWARE=1 GALLIUM_DRIVER=llvmpipe
           python3 -B Tests/Production/LuaRuntime/native_schedule.py --build out/native-cockpit-engine
           --assets out/scene-resources --data out/data --planets out/planets --output out/native-lua-schedule
+          --original out/original-lua-cache/original-lua-aap-windows2025-${{ matrix.configuration }}.zip
+          --original-profile automatic
       - name: Fly stock DG recordings, finish one naturally and release another with Ctrl+C
         run: >-
           xvfb-run -a -s '-screen 0 1920x1080x24' env LIBGL_ALWAYS_SOFTWARE=1 GALLIUM_DRIVER=llvmpipe

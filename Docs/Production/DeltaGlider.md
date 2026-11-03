@@ -51,8 +51,12 @@ to the earlier Debug capture. The hosted default and SSE2 comparisons both
 pass: all physical-state errors are zero, Lua/control traces are exact and all
 frame/MFD SSIM values are 1.0. Cross-build byte checks also match all 260 trace
 and image files. Windows 2022's separate default comparison still fails on the
-known CRT-family difference. The passing Windows 2025 reference candidate
-still needs durable preservation.
+known CRT-family difference. The qualified Windows 2025 pair, its complete
+default/SSE2 inventories, original observer binary and legacy diagnostic
+archives are now preserved in
+[`production-windows-lua-aap-v1`](https://github.com/dcajacob/orbiter-cross-platform/releases/tag/production-windows-lua-aap-v1).
+The publication job and an independent local download both reran the unchanged
+comparisons successfully. [Preservation evidence](LuaPreservationVerification.json)
 [Protocol evidence](LuaHandoffVerification.json)
 
 Native latitude now uses the selected CPU path in both build configurations,
@@ -67,8 +71,10 @@ mathematical sources and frozen numerical budgets are unchanged. The native
 comparison selects the requested original profile explicitly and rejects failed
 captures before running. Native image comparisons and the broader platform
 gates remain separate. The accepted original reference has immutable source,
-artifact and per-file manifests; its publication workflow rechecks all job
-outcomes and both comparisons before preserving it in release storage.
+artifact and per-file manifests. Native CI stages that immutable reference and
+chooses the matching original profile from each executable's reported backend,
+covering all four build/profile configurations. Unknown backends and failed
+original captures are rejected.
 [Native numerical alignment](LuaNativeAlignment.json)
 
 The native client flies all five original DG recorded scenarios from the stock

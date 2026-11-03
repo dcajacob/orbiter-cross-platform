@@ -1,4 +1,19 @@
-# Original Lua and AAP reference candidate
+# Original Lua and AAP reference
+
+The qualified Windows 2025 reference is preserved in
+[`production-windows-lua-aap-v1`](https://github.com/dcajacob/orbiter-cross-platform/releases/tag/production-windows-lua-aap-v1).
+Both complete Debug/Release comparisons pass for all five cases in default
+FMA3 and forced-SSE2 profiles. The legacy Windows 2022 default failure remains
+visible in the qualification record and release assets. See the immutable
+[reference contract](Reference/README.md).
+
+Separate native Debug/Release automatic/SSE2 builds match all five original
+schedules. Native CI verifies the public archives and compares finalized
+events, controls, atmosphere and cockpit state. `native_schedule.py
+--original-profile automatic` selects the original default or SSE2 capture
+from the executable's actual `numerics.json` math profile. Both original
+profiles must pass before execution; an unknown native backend is rejected.
+Explicit `original-default` and `diagnostic-sse2` selection remains available.
 
 This gate uses the preserved original Windows application, SDK, Lua libraries
 and OpenGL client. Its additional observation plugin exercises synchronous
@@ -31,8 +46,8 @@ diagnostic. No reference or numerical budget is changed by this host comparison.
 The [CRT diagnostic](../CrtDiagnostic/README.md) established that Windows 2022
 loads different CRT version families for Debug and Release. On Windows 2025,
 both providers belong to the 26100 family and their 8,517 arcsine outputs agree
-in every tested profile. Full simulator captures are required to determine
-whether that runtime provisioning also resolves the Lua/AAP mismatch.
+in every tested profile. Subsequent full simulator captures established the
+passing Windows 2025 pair preserved in v1.
 
 In [run 41588025808](https://github.com/dcajacob/orbiter-cross-platform/actions/runs/41588025808),
 both Windows 2022 captures passed individually, but their default-profile
@@ -46,11 +61,9 @@ DG case prevents acceptance of the complete set. The checks and budgets remain
 unchanged. [`host-diagnostic.json`](host-diagnostic.json) retains the input
 identities, failure details and exact-trace hashes.
 
-The current native Debug client also passes the shared schedule for all five
-cases against the Windows 2025 Debug artifact. Its event timing, controls,
-atmospheric values and complete cockpit-state CSVs match exactly. This checks
-the native handoff and SDK path; it does not accept the failing original
-Windows Release set or qualify native Release.
+At that diagnostic stage, native Debug already matched all five Windows 2025
+Debug schedules. The later native Release alignment and all four build/profile
+comparisons are recorded in [the numerical evidence](../../../Docs/Production/LuaNativeAlignment.json).
 
 The preserved interpreter releases its execution mutex, then waits through a
 second mutex to reacquire execution. If the simulator is descheduled between
