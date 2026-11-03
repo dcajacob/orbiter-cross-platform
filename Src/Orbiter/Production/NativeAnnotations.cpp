@@ -1,6 +1,7 @@
 // Copyright (c) Martin Schweiger
 // Licensed under the MIT License
 #include "NativeAnnotations.h"
+#include "Config.h"
 #include "NativeInterpreterSdk.h"
 #include "RigidBodyServices.h"
 #include <algorithm>
@@ -107,8 +108,18 @@ bool NativeAnnotations::Remove(NOTEHANDLE handle)
     notes.erase(it);
     return true;
 }
-void NativeAnnotations::Render() {for (auto &note:notes) note->Render();}
-void NativeAnnotations::Clear() {notes.clear();}
+void NativeAnnotations::PlaybackNote(char* s)
+{
+    if (!playback) playback=std::make_unique<oapi::ScreenAnnotation>(GetNativeRenderContext().graphics);
+    auto *sa=playback.get();
+#include "PlaybackAnnotation.inc"
+}
+void NativeAnnotations::EndPlayback() {playback.reset();}
+void NativeAnnotations::Render() {
+    for (auto &note:notes) note->Render();
+    if (playback && GetNativeRenderContext().configuration->CfgRecPlayPrm.bShowNotes) playback->Render();
+}
+void NativeAnnotations::Clear() {EndPlayback();notes.clear();}
 NOTEHANDLE oapiCreateAnnotation(bool,double size,const VECTOR3 &col)
 {
     auto *notes=GetNativeRenderContext().annotations;

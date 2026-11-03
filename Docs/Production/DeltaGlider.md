@@ -17,29 +17,39 @@ a missing focus target and relies on Orbiter's fallback to the first vessel.
 Earth views engages its scripted time acceleration. The runner checks focus, frame presentation,
 shutdown and Lua errors.
 
-All five native command schedules reproduce the original Windows Debug Lua
-events, control levels, air data and cockpit state at all 61 samples. DG-S
-initially differed in air density on tick 5. The Jacchia-71 atmosphere now
-uses the exponential from the same pinned AMD math sources as the engine's
-trigonometry. Both exponential CPU paths also passed the independent MPFR test.
-The original Windows Debug and Release atmospheric DG captures still disagree
-in latitude and horizon airspeed at tick 34. The exact cross-build reference
-gate remains open. Native Debug and native Release both reproduce the original
-Windows Debug traces in all five schedules. Against original Windows Release,
-native atmospheric DG first differs in elevator at tick 35 and DG-S first
-differs in angular velocity at tick 48. Air data remains identical. The public
-SDK coordinates reconstructed after the vessel step reproduce neither build's
-stored latitude. The original capture driver now uses the matching historical
-internal headers to read the stored planet-local position and checks its
-latitude, longitude, radius and reference against the public SDK.
+Across five Lua schedules, native Debug and Release each reproduce their
+corresponding original Windows build at all 61 samples, including events,
+controls, air data and cockpit state. The original Windows builds disagree with
+each other. At tick 34 of the atmospheric DG flight, both passed the same
+planet-local coordinate ratio (`0x1.e92199644661ep-2`) to arcsine. Debug
+returned `0x1.fdf30f8d54923p-2` and Release returned `0x1.fdf30f8d54924p-2`.
+The one-bit latitude difference carried into horizon airspeed, then into the
+elevator at tick 35. The native Release engine now uses the pinned SSE2
+arcsine for this equatorial conversion. The Jacchia-71 atmosphere uses the
+pinned exponential for air density. The exact original cross-build gate
+remains open. [Original Windows comparison](https://github.com/dcajacob/orbiter-cross-platform/actions/runs/41560881876)
+
+The native client flies all five original DG recorded scenarios from the stock
+position, attitude, control and system-event files. DG stunts draws the recorded
+tutorial notes and switches cameras. Both Mojave scenarios also switch cameras.
+Glider in orbit 1 returns to free flight at tick 341, following the last recorded
+position at 85.00463713 seconds. In Glider in orbit 2 the pilot takes control
+with Ctrl+C at tick 91. The regression verifies the source files against the
+preserved Windows revision and records vessel, camera and control state. Hosted
+Windows comparisons also check the rendered frames.
+[Recorded flight checks](../../Tests/Production/CockpitUI/recorded_flights.py)
 
 The local frozen instrument and RCS-switch comparisons passed for both gliders
 in both cockpit modes. An F3 dialog run switched from DG to DG-S and back
 through the original Select and Previous controls. The stock time and target
 bars render in visible and auto-hide modes. The native main menu, hosted
 platform qualification and full Phase 6 acceptance remain open.
-A separate stock GeneralApiTest run reached its Earth obliquity assertion, where
-the script expects a different value from the staged SPICE Earth configuration.
+Of the 122 stock scenarios containing a DG or DG-S, 38 use only vessel classes
+this client can load. All 38 presented 60 frames and shut down. Thirty-seven
+completed without script errors. GeneralApiTest reached its Earth obliquity
+assertion, where the script expects a different value from the staged SPICE
+Earth configuration. The other 84 scenarios require additional vessel classes.
+[Stock scenario census](../../Tests/Production/DeltaGlider/stock_scenarios.py)
 Sanitizer flights now finish without the previous aircraft initialization,
 light destruction, panel texture and virtual-cockpit vertex-buffer errors.
 LeakSanitizer still reports two 56-byte allocations per flight. Loader maps

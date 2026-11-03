@@ -52,6 +52,7 @@ def main():
     if args.delta_glider:
         overlay(ROOT/'Script',Path('Script'))
         overlay(ROOT/'Scenarios',Path('Scenarios'))
+        overlay(ROOT/'Flights',Path('Flights'))
         source=ROOT/'Src/Vessel/DeltaGlider'
         for name,target in (('Config','Config/Vessels'),('Meshes','Meshes/DG'),
                             ('Textures','Textures/DG'),('Textures2','Textures2/DG'),

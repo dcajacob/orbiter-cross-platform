@@ -5,7 +5,10 @@ ShuttlePB/ISS external view. In the separate Phase 6 candidate, both stock
 Delta-gliders fly with the original Lua autopilot in the 2D panel and virtual
 cockpit. Local instrument rendering and real RCS-switch clicks pass the frozen
 Windows comparisons for both gliders. All nine frozen instrument cases and five
-RCS-click cases passed locally in Debug.
+RCS-click cases passed locally in Debug. The stock flight recorder now drives
+the native vessel and cockpit camera through five unchanged DG scenarios.
+The tutorial text is drawn and both automatic and pilot-commanded returns
+to free flight pass locally.
 
 The cockpit now draws the original target, time and frame-rate displays and
 opens the original spacecraft selection dialog on F3. A two-vessel run used

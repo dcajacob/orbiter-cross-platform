@@ -11,9 +11,12 @@ public:
     ~NativeAnnotations();
     NOTEHANDLE Create(double size,const VECTOR3 &col);
     bool Remove(NOTEHANDLE handle);
+    void PlaybackNote(char* event);
+    void EndPlayback();
     void Render();
     void Clear();
 private:
+    std::unique_ptr<oapi::ScreenAnnotation> playback;
     std::vector<std::unique_ptr<oapi::ScreenAnnotation>> notes;
 };
 }

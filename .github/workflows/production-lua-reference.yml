@@ -74,11 +74,19 @@ jobs:
         with:
           name: original-lua-aap-Release
           path: out/release
-      - run: >-
+      - name: Compare the separate forced-SSE2 diagnostic
+        run: >-
+          python3 -B Tests/Production/LuaRuntime/compare_lua.py --debug out/debug/out/diagnostic-sse2
+          --release out/release/out/diagnostic-sse2 --output diagnostic-sse2-comparison.json
+      - name: Apply the unchanged default-profile reference gate
+        if: ${{ !cancelled() }}
+        run: >-
           python3 -B Tests/Production/LuaRuntime/compare_lua.py --debug out/debug/out/control-reference
           --release out/release/out/control-reference --output cockpit-control-comparison.json
       - uses: actions/upload-artifact@v7
         if: always()
         with:
           name: original-lua-aap-comparison
-          path: cockpit-control-comparison.json
+          path: |
+            cockpit-control-comparison.json
+            diagnostic-sse2-comparison.json

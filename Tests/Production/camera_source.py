@@ -61,6 +61,10 @@ def verify():
     actual=actual.replace('\trot_smooth = false;\n','',1)
     actual=actual.replace('\t// Setters below read this mode before the first scenario/camera attachment.\n\texternal_view = true;\n\trrot0.Set (1,0,0, 0,1,0, 0,0,1);\n','',1)
     actual=actual.replace('\tnpreset = 0;\n','\tnpreset = 0;\n\texternal_view = true;//false;\n',1)
+    # Factory-created modes have a nonvirtual SDK destructor; destroy them
+    # through their concrete type, including a removed preset's owned mode.
+    actual=actual.replace('DeleteCameraMode{}(preset[i]);','delete preset[i];').replace('DeleteCameraMode{}(cm);','delete cm;')
+    actual=actual.replace('DeleteCameraMode{}(preset[idx]);','')
     equal(core,actual,'All production camera/ground observer/preset calculations and ordering')
     api=old('Orbitersdk/include/OrbiterAPI.h');a,b=span(api,'normangle');helper=raw('Src/Orbiter/Camera.cpp');c,d=span(helper,'NormalizeCameraAngle')
     equal(api[a:b].replace('inline double normangle','static double NormalizeCameraAngle'),helper[c:d],'Original signed angle normalization')

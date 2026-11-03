@@ -5,6 +5,9 @@
 
 #include "Body.h"
 #include "ConfigFile.h"
+#ifdef ORBITER_REFERENCE_MATH
+#include "Production/Math/Runtime.h"
+#endif
 #include <fstream>
 #include <string.h>
 
@@ -130,7 +133,11 @@ void Body::LocalToEquatorial (const Vector &loc, double &lng, double &lat, doubl
 	rad = loc.length();
 	//loc *= 1.0/rad;
 	lng = atan2 (loc.z, loc.x);
+#ifdef ORBITER_REFERENCE_MATH
+	lat = orbiter::production::ReferenceLatitudeAsin(loc.y / rad);
+#else
 	lat = asin  (loc.y / rad);
+#endif
 	//lat = atan  (loc.y / hypot (loc.x, loc.z));
 }
 

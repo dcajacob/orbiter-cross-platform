@@ -38,26 +38,7 @@ public:
     void PlaybackNote(char* s) override
     {
 				oapi::ScreenAnnotation *sa = g_pOrbiter->SNotePB();
-				if (sa) {
-					if (!strcmp (s+4, "COL")) {
-						double r, g, b;
-						sscanf (s+8, "%lf%lf%lf", &r, &g, &b);
-						VECTOR3 col = {r,g,b};
-						sa->SetColour (col);
-					} else if (!strcmp (s+4, "SIZE")) {
-						double scale;
-						sscanf (s+9, "%lf", &scale);
-						sa->SetSize (scale);
-					} else if (!strcmp (s+4, "POS")) {
-						double x1, y1, x2, y2;
-						sscanf (s+8, "%lf%lf%lf%lf", &x1, &y1, &x2, &y2);
-						sa->SetPosition (x1, y1, x2, y2);
-					} else if (!strcmp (s+4, "OFF")) {
-						sa->ClearText();
-					} else {
-						sa->SetText (s+5);
-					}
-				}
+#include "PlaybackAnnotation.inc"
     }
 };
 }

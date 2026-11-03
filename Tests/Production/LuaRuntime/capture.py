@@ -88,6 +88,7 @@ def main():
     for name in ('orbiter','data','planets','mesa','output'):
         parser.add_argument('--'+name,type=Path,required=True)
     parser.add_argument('--configuration',choices=('Debug','Release'),required=True)
+    parser.add_argument('--diagnostic-sse2',action='store_true',help='Additional controls on the original app with FMA3 disabled in the CRT')
     args=parser.parse_args(); config=settings()
     require(sys.platform=='win32','Original Lua capture requires native Windows')
     runtime=json.loads((args.orbiter.parent/'control-reference-runtime.json').read_text())
@@ -95,7 +96,7 @@ def main():
     require(not args.output.exists(),'Original Lua capture output exists')
     args.output.mkdir(parents=True)
     os.environ.update(LIBGL_ALWAYS_SOFTWARE='true',GALLIUM_DRIVER='llvmpipe')
-    report=dict(status='pending',source=git('rev-parse','HEAD').decode().strip(),runtime=runtime,configuration=args.configuration,cases={},failures={})
+    report=dict(status='pending',source=git('rev-parse','HEAD').decode().strip(),runtime=runtime,configuration=args.configuration,math_profile='diagnostic-sse2' if args.diagnostic_sse2 else 'original-default',cases={},failures={})
     for case in config['cases']:
         try:
             directories=[]; observations=[]
@@ -107,11 +108,16 @@ def main():
                     (directory/'Scenarios/Behavior.scn').write_text(lua_fixture(case))
                     profile='atmosphere' if 'stock_atmosphere' in case else 'orbit'
                     (directory/'cockpit-case.txt').write_text(f"{case['target']} 60 {case['cockpit']} 1 2 1 {profile}\n")
+                    if args.diagnostic_sse2:(directory/'diagnostic-sse2.enabled').touch()
                     for name in ('ogl-evidence.enabled','instrument-evidence.enabled'):
                         (directory/name).write_text('Original Lua and AAP observation\n')
                     mesa_files(args.mesa.resolve(),directory)
                 stage(args.orbiter.resolve(),args.data.resolve(),args.planets.resolve(),directory,{**case,'frames':60,'fixed_step':.25,'epoch':config['epoch']},configure)
                 observed=inspect(directory,case,config);observed['lua']=validate(directory,case)
+                provider=Path((directory/'math-provider.txt').read_text(encoding='utf-8').strip())
+                math_host=dict(line.split('=',1) for line in (directory/'math-host.txt').read_text().splitlines())
+                require(not args.diagnostic_sse2 or math_host['fma3_enabled']=='0','Diagnostic CRT profile was not selected')
+                observed['asin_runtime']=dict(path=str(provider),sha256=digest(provider),**math_host)
                 modules=(directory/'lua-loaded.txt').read_text().splitlines()
                 require(modules==['LuaInline.dll','LuaInterpreter.dll','lua.dll'],'Original loaded Lua module identities differ')
                 observed['lua_modules']={name:digest(directory/name) for name in modules}

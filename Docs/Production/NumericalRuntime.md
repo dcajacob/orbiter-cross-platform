@@ -32,8 +32,8 @@ interception was used only in ignored diagnostic builds. It is not shipped.
 The selective [AMD source import](../../Extern/ReferenceMath/README.md) is
 MIT-licensed and pinned by commit and hashes. Raw upstream files retain their
 notices and remain unchanged. The build converts private MASM syntax to ELF/GAS
-and supplies native error/type bindings. Only double sine, cosine, arcsine and
-two-argument arctangent, their coefficient tables and range reduction are built.
+and supplies native error/type bindings. The import covers double sine, cosine, arcsine, two-argument arctangent and
+exponential, with their coefficient tables and range reduction.
 Domain errors, signed zero and NaN/exception propagation have native handlers.
 
 The compiler/linker binds these functions only in numerical SDK consumers.
@@ -41,6 +41,10 @@ No ordinary libc math symbol is exported or globally intercepted; the separate
 renderer and foreign libraries retain their own mathematical runtime. The
 backend automatically selects FMA3 when AVX/FMA are available, otherwise SSE2.
 `-DORBITER_MATH_FORCE_SSE2=ON` forces the baseline CPU path for qualification.
+The Release equatorial latitude conversion in `Body::LocalToEquatorial`
+selects the SSE2 arcsine on both CPU profiles to match original Windows Release.
+The Debug conversion uses ordinary profile dispatch. The primitive test also
+checks the original captured latitude input and both configuration results.
 The supported initial toolchain is GCC on Linux x86-64.
 
 Native simulation randomness uses the original runtime's unsigned 32-bit

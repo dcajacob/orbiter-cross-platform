@@ -108,6 +108,7 @@ def original_general_api(args,pin):
                 script_sha256=hashlib.sha256(test_script).hexdigest())
     require(result['all_passed'] or result['failed_assertion'],'Missing terminal result from stock Windows API test')
     (out/'general-api-result.json').write_text(json.dumps(result,indent=2)+'\n')
+    print('Stock Windows general API result',json.dumps(result),flush=True)
 
 
 def pixels(root,name,frame):
@@ -116,8 +117,22 @@ def pixels(root,name,frame):
     return raw
 
 
+def compare_case(original,native,name):
+    with (original/name/'cockpit-state.csv').open() as source,(native/name/'cockpit-state.csv').open() as actual:
+        require(list(csv.DictReader(source))==list(csv.DictReader(actual)),name+' differs from original cockpit state')
+    scores={f:image_ssim(pixels(original,name,f),pixels(native,name,f),1280,720) for f in (20,50)}
+    require(min(scores.values())>=.98,name+' differs from original rendered instruments')
+    return scores
+
+
 def main():
     p=argparse.ArgumentParser(description=__doc__)
+    if sys.argv[1:2]==['compare']:
+        for key in ('original','native','output'):p.add_argument('--'+key,type=Path,required=True)
+        a=p.parse_args(sys.argv[2:])
+        results={name:compare_case(a.original,a.native,name) for name in ('hidden','visible','auto','focus')}
+        a.output.write_text(json.dumps(results,indent=2)+'\n')
+        return
     for name in ('executable','data','planets','output'):p.add_argument('--'+name,type=Path,required=True)
     for name in ('assets','modules','mesa','reference'):p.add_argument('--'+name,type=Path)
     p.add_argument('--original',action='store_true')
@@ -135,12 +150,7 @@ def main():
     for name,mode,fps in [('hidden',1,0),('visible',0,0),('auto',2,0),('focus',0,0)]:
         report[name]=dict(focus=execute(a,name,mode,fps))
         if a.reference:
-            original=a.reference/name/'cockpit-state.csv'
-            with original.open() as source,(a.output/name/'cockpit-state.csv').open() as native:
-                require(list(csv.DictReader(source))==list(csv.DictReader(native)),name+' differs from original cockpit state')
-            scores={frame:image_ssim(pixels(a.reference,name,frame),pixels(a.output,name,frame),1280,720) for frame in (20,50)}
-            require(min(scores.values())>=.98,name+' differs from original rendered instruments')
-            report[name]['original_frame_ssim']=scores
+            report[name]['original_frame_ssim']=compare_case(a.reference,a.output,name)
     # RGBA is bottom-up. Only the top strip may change when the bars are enabled.
     for frame in (20,50):
         hidden=pixels(a.output,'hidden',frame);visible=pixels(a.output,'visible',frame)

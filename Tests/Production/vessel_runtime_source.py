@@ -82,6 +82,7 @@ def previous_files():
         equal(expected,current,path);result[path]=old(path)
     path='Src/Orbiter/Vessel.h'
     s=raw(path).replace('#ifndef _WIN32\n\tstatic void ReleaseNativeInterface(VESSEL* interface);\n#endif\n','')
+    s=s.replace('public:\n\tvoid FRecorder_EndPlayback ();\n\t// terminates a running playback\nprivate:', '\tvoid FRecorder_EndPlayback ();\n\t// terminates a running playback')
     equal(old(path),s,path);result[path]=old(path)
     # Retain every SDK wrapper. Platform-specific cockpit methods move intact;
     # the numerical and vessel-delegation methods remain one shared source.
@@ -186,7 +187,39 @@ def verify_recorder(result):
     a=s.index('const double max_step');b=s.index('// ================================================================\n// System event recording/playback',a)
     helper=s.index('// convert Euler angles from given reference frame to quaternion')
     expected=s[:a]+'#include "Production/VesselRecorderState.h"\n\n'+s[b:helper]
-    equal(expected,raw(path),'Original Windows system recorder');result[path]=old(path)
+    current=raw(path).replace('#include "Production/SystemPlayback.h"','')
+    start,end=span(current,'Orbiter::FRecorder_Play')
+    # Reconstitute the single shared system event loop with its Windows services.
+    system=raw('Src/Orbiter/Production/SystemPlayback.h')
+    loop=system[system.index('while (stream.good()'):system.index('\n}\n}')]
+    for before,after in [
+        ('stream.good()', 'FRsys_stream'),('clock.', 'td.'),('nextEvent','frec_sys_simt'),
+        ('char cbuf[1024+12]{}','char cbuf[1024]'),('stream.getline','FRsys_stream->getline'),
+        ('if (!stream && !stream.eof()) break;', ''),("if (auto *cr = strchr(cbuf, '\\r')) *cr = 0;",''),
+        ('ComparePrefix','_strnicmp'),('options.','Cfg()->CfgRecPlayPrm.'),
+        ('GetVesselServices().PlaybackWarp(RecordingSpeed,WarpDelay);','SetWarpFactor (RecordingSpeed, true, WarpDelay);'),
+        ('s && !_strnicmp','!_strnicmp'),
+        ('if (sscanf (s+7, "%d", &i) == 1) camera.RecallPreset','sscanf (s+7, "%d", &i); g_camera->RecallPreset'),
+        ('OwnedCameraMode cm(CameraMode::Create(s+4));','CameraMode *cm = CameraMode::Create(s+4);'),
+        ('if (cm) camera.SetCMode(cm.get());','if(cm) g_camera->SetCMode(cm); delete cm;'),
+        ('s ? GetRigidBodyServices().World()->GetVessel (s, true) : nullptr','g_psys->GetVessel (s, true)'),
+        ('setFocus(vfocus)','g_pOrbiter->SetFocusObject(vfocus)'),
+        ('sscanf (s+11, "%lf", &jumptime) == 1','sscanf (s+11, "%lf", &jumptime)'),
+        ('jumpTo(tgtmjd)','g_pOrbiter->Timejump(tgtmjd,PROP_ORBITAL_FIXEDSURF)'),
+        ('endSession();','if(hRenderWnd) PostMessage(hRenderWnd,WM_CLOSE,0,0);'),
+        ('stream >> frec_sys_simt;', '*FRsys_stream >> frec_sys_simt; if (!FRsys_stream->good()) { delete FRsys_stream; FRsys_stream=0; }')
+    ]:loop=loop.replace(before,after)
+    note_body=raw('Src/Orbiter/Production/PlaybackAnnotation.inc')
+    for checked,legacy in [
+        ('if (sscanf (s+8, "%lf%lf%lf", &r, &g, &b)==3) {','sscanf (s+8, "%lf%lf%lf", &r, &g, &b);'),
+        ('sa->SetColour (col);\n\t\t}', 'sa->SetColour (col);'),
+        ('if (sscanf (s+9, "%lf", &scale)==1)', 'sscanf (s+9, "%lf", &scale);'),
+        ('if (sscanf (s+8, "%lf%lf%lf%lf", &x1, &y1, &x2, &y2)==4)', 'sscanf (s+8, "%lf%lf%lf%lf", &x1, &y1, &x2, &y2);')
+    ]:note_body=note_body.replace(checked,legacy)
+    loop=loop.replace('GetVesselServices().PlaybackNote(s);','oapi::ScreenAnnotation *sa = SNotePB();\n'+note_body)
+    assert 'PlaySystemEvents(*FRsys_stream,frec_sys_simt,td,*g_camera' in current[start:end]
+    restored=current[:start]+'void Orbiter::FRecorder_Play ()\n{\n'+loop+'\n}'+current[end:]
+    equal(expected,restored,'Original Windows system recorder');result[path]=old(path)
     original=s[a:b];actual=raw('Src/Orbiter/VesselRecorder.cpp');actual=actual[actual.index('const double max_step'):]
     helper_body=s[s.index('void Euler2Quaternion (double *a, Quaternion &q, int frm)\n{'):]
     original+='\n'+helper_body
@@ -204,9 +237,47 @@ def verify_recorder(result):
     begin=original.index('\t\t\t\toapi::ScreenAnnotation *sa = ');end=original.index('\n\t\t\t} else if (modIntf.v->Version()',begin)
     note=original[begin:end]
     actual=actual.replace('\t\t\t\tGetVesselServices().PlaybackNote(s);',note)
+    # Replace fixed-size playback paths in the expected source with the checked
+    # string paths used by both builds. Missing/short samples cannot be indexed.
+    a=original.index('int i;',original.index('bool Vessel::FRecorder_Read'))
+    b=original.index('if (!ifs)',a)
+    original=original[:a]+"""const std::string directory(scname);
+    const auto start=directory.find_last_of("/\\\\");
+    const std::string stem="Flights/"+directory.substr(start==std::string::npos ? 0 : start+1)+"/"+name;
+    ifstream ifs (GetVesselServices().RecorderFile((stem+".pos").c_str(),false)); char cbuf[256];
+    """+original[b:]
+    original=original.replace('strcpy (fname+strlen(fname)-3, "att");\n\tifs.open (fname);',
+        'ifs.open (GetVesselServices().RecorderFile((stem+".att").c_str(),false));')
+    original=original.replace('strcpy (cbuf, fname); strcpy (cbuf+strlen(cbuf)-3, "atc");\n\tFRatc_stream = new ifstream (cbuf);',
+        'FRatc_stream = new ifstream (GetVesselServices().RecorderFile((stem+".atc").c_str(),false));')
+    original=original.replace('cfrec = 0;\n\tcfrec_att = 0;', 'if (nfrec < 2) {FRecorder_Clear(); return false;} cfrec = 0; cfrec_att = 0;')
+    original=original.replace('sscanf (cbuf, "%lf%lf%lf%lf", &simt, a+0, a+1, a+2);','if (sscanf (cbuf, "%lf%lf%lf%lf", &simt, a+0, a+1, a+2)!=4) continue;')
+    original=original.replace('if (td.SimT1 < frec_att[nfrec_att-1].simt)', 'if (nfrec_att >= 2 && td.SimT1 < frec_att[nfrec_att-1].simt)')
+    original=original.replace('char cbuf[1024], *s, *e, c;', 'char cbuf[1024+12]{}, *s, *e, c;')
+    original=original.replace('FRatc_stream->getline (cbuf, 1024);', "FRatc_stream->getline (cbuf, 1024); if(auto *cr=strchr(cbuf,'\\r')) *cr=0;")
+    # Check scan counts, buffer sizes and missing tokens before dispatch.
+    for old_input,checked_input in [
+        ('sscanf (s, "%d%c%lf", &id','sscanf (s, "%u%c%lf", &id'),
+        ('sscanf (s+strlen(THGROUPSTR[i])+1, "%lf", &lvl))','sscanf (s+strlen(THGROUPSTR[i])+1, "%lf", &lvl)==1)'),
+        ('sscanf (s+11, "%d", &i);\n\t\t\t\t\tClrNavMode (i, false, true);','if (sscanf (s+11, "%d", &i)==1) ClrNavMode (i, false, true);'),
+        ('sscanf (s+8, "%d", &i);\n\t\t\t\t\tSetNavMode (i, true);','if (sscanf (s+8, "%d", &i)==1) SetNavMode (i, true);'),
+        ('sscanf (s+8, "%d", &i);\n\t\t\t\tSetAttMode (i, true);','if (sscanf (s+8, "%d", &i)==1) SetAttMode (i, true);'),
+        ('sscanf (s+8, "%d", &i);\n\t\t\t\tSetADCtrlMode (i, true);','if (sscanf (s+8, "%d", &i)==1) SetADCtrlMode (i, true);'),
+        ('sscanf (s, "%d", &dock);\n\t\t\t\t\tUndock (dock);','if (sscanf (s, "%d", &dock)==1) Undock (dock);'),
+        ('sscanf (s+7, "%d%lf", &id','sscanf (s+7, "%u%lf", &id'),
+        ('AttachmentSpec *as = GetAttachmentFromIndex (false, id);','AttachmentSpec *as = res>=1 ? GetAttachmentFromIndex (false, id) : nullptr;'),
+        ('"%s%d%d%s", cname, &pidx, &cidx, modestr','"%127s%u%u%31s", cname, &pidx, &cidx, modestr'),
+        ('Vessel *child = g_psys->GetVessel (cname, true);','Vessel *child = res>=3 ? g_psys->GetVessel (cname, true) : nullptr;'),
+        ('if (sscanf (s, "%d", &idx) == 1','if (s && sscanf (s, "%u", &idx) == 1'),
+        ('if (!_stricmp (s, "ACTIVATE"))','if (s && !_stricmp (s, "ACTIVATE"))'),
+        ('sscanf (s+9, "%d", &flag)','sscanf (s+9, "%u", &flag)'),
+        ('if (!_strnicmp (s, "PRESET", 6)) {\n\t\t\t\t\tsscanf (s+7, "%d", &i);','if (s && !_strnicmp (s, "PRESET", 6) && sscanf (s+7, "%d", &i)==1) {'),
+    ]:original=original.replace(old_input,checked_input)
     equal(original,actual,'Complete original vessel recording/playback/interpolation')
     # The only removed drawing operations are preserved in the Windows adapter.
     adapter=raw('Src/Orbiter/Production/WindowsVesselServices.cpp')
-    if note.strip() not in adapter:raise ValueError('Original playback note operations are missing from Windows adapter')
+    start=adapter.index('oapi::ScreenAnnotation *sa =')
+    end=adapter.index('\n    }',start)
+    equal(note,adapter[start:end].replace('#include "PlaybackAnnotation.inc"',note_body),'Original playback annotations')
 
 if __name__=='__main__':previous_files()

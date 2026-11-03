@@ -9,6 +9,7 @@
 #include "Vessel.h"
 #include "PsysCore.h"
 #include "Production/CameraServices.h"
+#include "Production/CameraModeOwner.h"
 #include "Production/RigidBodyServices.h"
 #include "Production/GeometryConversions.h"
 #include "Production/Text.h"
@@ -1225,7 +1226,7 @@ void Camera::ClearPresets ()
 {
 	if (npreset) {
 		for (oapi::UInt32 i = 0; i < npreset; i++)
-			delete preset[i];
+			DeleteCameraMode{}(preset[i]);
 		delete []preset;
 		preset = NULL;
 		npreset = 0;
@@ -1255,6 +1256,7 @@ bool Camera::DelPreset (oapi::UInt32 idx)
 		for (i = j = 0; i < npreset; i++)
 			if (i != idx) tmp[j++] = preset[i];
 	}
+	DeleteCameraMode{}(preset[idx]);
 	delete []preset;
 	preset = tmp;
 	if (npreset > 0) npreset--;
@@ -1664,7 +1666,7 @@ CameraMode *CameraMode::Create (char *str)
 	}
 
 	if (!(pc = strtok (NULL, ":")) || !(cm->target = (OBJHANDLE)GetRigidBodyServices().World()->GetObj (trim_string (pc), true))) {
-		delete cm;
+		DeleteCameraMode{}(cm);
 		return 0;
 	}
 

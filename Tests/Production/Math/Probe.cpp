@@ -18,6 +18,8 @@ double __wrap_sin(double);double __wrap_cos(double);double __wrap_asin(double);d
 }
 namespace {int mode=-1;}
 extern "C" {
+int probe_release_latitude() {return ORBITER_MATH_RELEASE_LATITUDE;}
+double probe_latitude(double x) {return orbiter::production::ReferenceLatitudeAsin(x);}
 const char* probe_profile() {return orbiter::production::ReferenceMathProfile();}
 int probe_fma_available() {__builtin_cpu_init();return __builtin_cpu_supports("avx") && __builtin_cpu_supports("fma");}
 void probe_mode(int value) {

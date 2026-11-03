@@ -14,6 +14,8 @@ def main():
     args=parser.parse_args();config=settings()
     for root in (args.debug,args.release):
         require(json.loads((root/'lua-report.json').read_text())['status']=='passed','Failed Lua captures cannot be accepted')
+    profiles=[json.loads((d/'lua-report.json').read_text()).get('math_profile','original-default') for d in (args.debug,args.release)]
+    require(profiles[0]==profiles[1],'Original CRT profile changed between builds')
     results=compare(args.debug,args.release,config)
     divergence={}
     for case in config['cases']:
@@ -30,7 +32,7 @@ def main():
                         differences.append(dict(tick=int(x['tick']),control=key,debug=x[key],release=y[key]))
             divergence[case['id']]=dict(controls=differences,controller_inputs={build:rows(d/'lua-controller.csv') for build,d in zip(('Debug','Release'),directories)},
                 pre_lua_horizon={build:rows(d/'lua-horizon.csv') for build,d in zip(('Debug','Release'),directories)})
-    report=dict(status='failed' if divergence else 'passed',cases=results,mfd_images=mfd_images(args.debug,args.release,config),exact_lua_execution=not divergence)
+    report=dict(status='failed' if divergence else 'passed',math_profile=profiles[0],cases=results,mfd_images=mfd_images(args.debug,args.release,config),exact_lua_execution=not divergence)
     if divergence:report['cross_build_differences']=divergence
     args.output.write_text(json.dumps(report,indent=2)+'\n')
     print(json.dumps(report,indent=2))

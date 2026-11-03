@@ -17,6 +17,7 @@ def scalars(source):
     for a,b in [('oapi::UInt32','DWORD'),('oapi::UInt16','WORD'),('oapi::UInt','UINT'),('std::uintptr_t','DWORD_PTR'),('std::uint8_t','BYTE')]:source=source.replace(a,b)
     return source
 def restore_header(source):
+    source=source.replace('public:\n\tvoid FRecorder_EndPlayback ();\n\t// terminates a running playback\nprivate:', '\tvoid FRecorder_EndPlayback ();\n\t// terminates a running playback')
     source=source.replace('#ifndef _WIN32\n\tstatic void ReleaseNativeInterface(VESSEL* interface);\n#endif\n','')
     source=source.replace('#include "Production/VesselServices.h"\n','')
     source=source.replace('#ifdef _WIN32\n#include "GraphicsAPI.h"\n#include "Log.h"\n#else\n#include "NativeVesselAPI.h"\n#include <stdexcept>\nnamespace oapi {class ParticleStream;}\n#endif','#include "GraphicsAPI.h"\n#include "Log.h"')

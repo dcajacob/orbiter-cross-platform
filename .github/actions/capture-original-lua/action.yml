@@ -28,6 +28,8 @@ runs:
         cmake --build out/control-driver --parallel 2 2>&1 | Tee-Object control-build.log
         if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
         python -B "$root/Tests/Production/LuaRuntime/capture.py" --orbiter out/original-app/Orbiter.exe --data "$root/out/data" --planets "$root/out/planets" --mesa "$root/out/mesa" --configuration $env:BUILD --output out/control-reference
+        if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+        python -B "$root/Tests/Production/LuaRuntime/capture.py" --diagnostic-sse2 --orbiter out/original-app/Orbiter.exe --data "$root/out/data" --planets "$root/out/planets" --mesa "$root/out/mesa" --configuration $env:BUILD --output out/diagnostic-sse2
         exit $LASTEXITCODE
     - uses: actions/upload-artifact@v7
       if: always()
@@ -35,6 +37,10 @@ runs:
         name: original-lua-aap-${{ inputs.configuration }}
         retention-days: 90
         path: |
+          out/pair-${{ inputs.configuration }}/out/diagnostic-sse2/**/*.json
+          out/pair-${{ inputs.configuration }}/out/diagnostic-sse2/**/*.csv
+          out/pair-${{ inputs.configuration }}/out/diagnostic-sse2/**/*.txt
+          out/pair-${{ inputs.configuration }}/out/diagnostic-sse2/**/*.rgba
           out/pair-${{ inputs.configuration }}/cpu.json
           out/pair-${{ inputs.configuration }}/control-*.log
           out/pair-${{ inputs.configuration }}/out/control-reference/**/*.json

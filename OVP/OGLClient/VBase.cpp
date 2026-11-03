@@ -79,6 +79,7 @@ vBase::~vBase ()
 	}
 	if (nshmesh) {
 		for (i = 0; i < nshmesh; i++) {
+			delete shmesh[i].va;
 			delete shmesh[i].vbuf;
 			delete shmesh[i].idx;
 		}

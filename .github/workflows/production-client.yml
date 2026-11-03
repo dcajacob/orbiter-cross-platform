@@ -13,6 +13,7 @@ on:
       - 'Tests/Production/Cockpit/**'
       - 'Tests/Production/CockpitControls/**'
       - 'Tests/Production/CockpitUI/**'
+      - 'Tests/Production/RecordedFlight/**'
       - 'Tests/Production/stage_mesa.py'
       - '.github/workflows/production-client.yml'
   workflow_dispatch:
@@ -175,31 +176,11 @@ jobs:
           python -B Tests/Production/CockpitControls/current.py --orbiter out/production-app/Orbiter.exe
           --data out/production-data --planets out/standard-planets --mesa out/mesa-runtime
           --frozen out/cockpit-controls-frozen --configuration ${{ matrix.configuration }} --output out/cockpit-controls-regression
-      - name: Observe spacecraft selection and info bars in the preserved original Windows app
-        shell: pwsh
-        run: |
-          python -B Tests/Production/CockpitControls/prepare.py --configuration ${{ matrix.configuration }} --cache out/cockpit-cache --output out/focus-original
-          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-          cmake -S Tests/Production/CockpitUI -B out/focus-driver -G Ninja -DCMAKE_BUILD_TYPE=${{ matrix.configuration }} -DORBITER_TEST_RUNTIME="$pwd/out/focus-original"
-          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-          cmake --build out/focus-driver --parallel 2
-          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-          python -B Tests/Production/CockpitUI/focus_bars.py --original --executable out/focus-original/Orbiter.exe --data out/production-data --planets out/standard-planets --mesa out/mesa-runtime --output out/focus-bars-original
-          exit $LASTEXITCODE
       - uses: actions/upload-artifact@v7
         if: always()
         with:
           name: real-client-${{ matrix.configuration }}
           path: |
-            out/focus-bars-original/general-api/general-api-result.json
-            out/focus-bars-original/general-api/Orbiter.log
-            out/focus-bars-original/*/earth-obliquity.txt
-            out/focus-bars-original/focus-bars-report.json
-            out/focus-bars-original/*/cockpit-state.csv
-            out/focus-bars-original/*/instrument-*.rgba
-            out/focus-bars-original/*/cockpit-failure.txt
-            out/focus-bars-original/*/ui-inputs.csv
-            out/focus-original/control-reference-runtime.json
             out/client-execution/**/*.csv
             out/client-execution/**/*.json
             out/client-execution/**/*.png

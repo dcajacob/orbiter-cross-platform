@@ -44,13 +44,7 @@ bool State::Read (const std::filesystem::path& path, double defaultMjd)
 bool State::Read (std::istream& ifs, const std::filesystem::path& path, double defaultMjd)
 {
 	if (!ifs) return false;
-	const std::string filename = path.string();
-	const char* fname = filename.c_str();
-	int i;
-	scenario = fname;
-	for (i = strlen(fname); i >= 0; i--)
-		if (fname[i] == '.') break;
-	if (i >= 0 && i < 256) scenario[i] = '\0';
+	scenario = std::filesystem::path(path).replace_extension().string();
 
 	char cbuf[256], *pc;
 	double t;

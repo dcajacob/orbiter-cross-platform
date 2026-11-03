@@ -23,6 +23,7 @@ class Driver final:public oapi::Module {
     SetObserver setter=nullptr;
     std::ofstream state,events,controls;
     INTERPRETERHANDLE script=nullptr,secondary=nullptr;
+    int restoreFma=-1;
     std::string target,profile;
     unsigned frames=0,total=0;int cockpit=0,left=0,right=0,hud=0;
     bool started=false,initialized=false;
@@ -112,7 +113,28 @@ public:
         for(auto* stream:{&state,&events,&controls,&air,&controller,&horizon}){stream->imbue(std::locale::classic());stream->exceptions(std::ios::badbit|std::ios::failbit);}
         horizon.open("lua-horizon.csv");horizon<<std::setprecision(17)<<"tick,global_x,global_y,global_z,ref_x,ref_y,ref_z,horizon_x,horizon_y,horizon_z,lng,lat,rad,m11,m12,m13,m21,m22,m23,m31,m32,m33,position_local_x,position_local_y,position_local_z,reconstructed_asin_input,reconstructed_latitude,actual_local_x,actual_local_y,actual_local_z,actual_asin_input,probe_asin_of_actual_input,actual_slat,actual_clat\n";
         controller.open("lua-controller.csv");controller<<std::setprecision(17)<<"tick,alt,sl,dslope,delev,elev,dbnk,rate,dail,ail,thrott,dthrott,xz,as_x,as_y,as_z\n";
-        std::ofstream("math-host.txt")<<"fma3_enabled="<<_get_FMA3_enable()<<'\n';
+        if (std::ifstream("diagnostic-sse2.enabled")) {
+            restoreFma=_get_FMA3_enable();
+            _set_FMA3_enable(0);
+            require(_get_FMA3_enable()==0,"Unable to select the diagnostic SSE2 runtime profile");
+        }
+#ifdef _DEBUG
+        const auto crt=GetModuleHandleW(L"ucrtbased.dll");
+#else
+        const auto crt=GetModuleHandleW(L"ucrtbase.dll");
+#endif
+        const auto asinFn=reinterpret_cast<double(*)(double)>(crt ? GetProcAddress(crt,"asin") : nullptr);
+        require(asinFn!=nullptr,"Original CRT asin export is unavailable");
+        HMODULE owner=nullptr;
+        require(GetModuleHandleExW(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS|GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT,
+                reinterpret_cast<LPCWSTR>(asinFn),&owner)!=0,"Cannot identify original asin implementation");
+        wchar_t crtPath[32768];
+        const auto length=GetModuleFileNameW(owner,crtPath,32768);
+        require(length && length<32768,"Cannot resolve original asin module");
+        std::ofstream("math-provider.txt")<<std::filesystem::path(crtPath).u8string()<<'\n';
+        volatile double x=0x1.e92199644661ep-2;
+        std::ofstream("math-host.txt")<<"fma3_enabled="<<_get_FMA3_enable()<<'\n'<<std::hexfloat
+            <<"input="<<x<<"\nlinked_asin="<<std::asin(x)<<"\nexported_asin="<<asinFn(x)<<'\n';
         air.open("lua-air.csv");air<<std::setprecision(17)<<"tick,density,dynamic_pressure,airspeed\n";
         controls.open("lua-controls.csv");controls<<std::setprecision(17)<<"tick,elevator,aileron,main\n";
         state.open("cockpit-state.csv");events.open("cockpit-events.csv");state<<std::setprecision(17);events<<std::setprecision(17);
@@ -120,7 +142,7 @@ public:
         events<<"tick,seconds,mjd,phase,object,running\n";
         setter=reinterpret_cast<SetObserver>(GetProcAddress(GetModuleHandleW(nullptr),"OrbiterTestSetObserver"));require(setter && setter(1,observe,51982.5),"Original observation ABI missing");std::srand(0);
     });}
-    ~Driver()override{if(setter)setter(1,nullptr,std::numeric_limits<double>::quiet_NaN());}
+    ~Driver()override{if(setter)setter(1,nullptr,std::numeric_limits<double>::quiet_NaN());if(restoreFma>=0)_set_FMA3_enable(restoreFma);}
     void clbkSimulationStart(RenderMode mode)override{guarded([&]{
         require(mode!=RENDER_NONE,"Real graphics client required");auto* v=oapiGetFocusInterface();require(v && v->GetThrusterCount()>0 && v->GetMeshCount()>0,"Actual stock vessel required");
         started=true;

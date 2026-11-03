@@ -345,14 +345,12 @@ void Vessel::FRecorder_Clear ()
 
 bool Vessel::FRecorder_Read (const char *scname)
 {
-	int i;
-	char fname[256], cbuf[256];
+	const std::string directory(scname);
+	const auto start=directory.find_last_of("/\\");
+	const std::string stem="Flights/"+directory.substr(start==std::string::npos ? 0 : start+1)+"/"+name;
 
-	for (i = strlen(scname)-1; i > 0; i--)
-		if (scname[i-1] == '\\') break;
-	sprintf (fname, "Flights/%s/%s.pos", scname+i, name.c_str());
-
-	ifstream ifs (GetVesselServices().RecorderFile(fname,false));
+	ifstream ifs (GetVesselServices().RecorderFile((stem+".pos").c_str(),false));
+	char cbuf[256];
 	if (!ifs) {
 		bFRplayback = false;
 		return false;
@@ -410,13 +408,13 @@ bool Vessel::FRecorder_Read (const char *scname)
 	}
 	ifs.close();
 	ifs.clear();
+	if (nfrec < 2) {FRecorder_Clear(); return false;}
 	cfrec = 0;
 	cfrec_att = 0;
 
 	// open attitude stream
 	ref = GetRigidBodyServices().World()->GetGravObj(0);
-	strcpy (fname+strlen(fname)-3, "att");
-	ifs.open (GetVesselServices().RecorderFile(fname,false));
+	ifs.open (GetVesselServices().RecorderFile((stem+".att").c_str(),false));
 	while (ifs.getline (cbuf, 256)) {
 		if (!ComparePrefix (cbuf, "REF", 3)) {
 			ref = GetRigidBodyServices().World()->GetGravObj (trim_string (cbuf+4), true);
@@ -429,7 +427,7 @@ bool Vessel::FRecorder_Read (const char *scname)
 			// assumes that MJDofs from all streams are the same!
 		} else {
 			double a[3];
-			sscanf (cbuf, "%lf%lf%lf%lf", &simt, a+0, a+1, a+2);
+			if (sscanf (cbuf, "%lf%lf%lf%lf", &simt, a+0, a+1, a+2)!=4) continue;
 			if (nfrec_att == nbuf_att) { // re-allocate
 				FRecord_att *tmp = new FRecord_att[nbuf_att += 1024]; GetRigidBodyServices().TraceAllocation(__FILE__,__LINE__);
 				if (nfrec_att) {
@@ -453,8 +451,7 @@ bool Vessel::FRecorder_Read (const char *scname)
 
 	// open articulation event stream
 	if (FRatc_stream) delete FRatc_stream;
-	strcpy (cbuf, fname); strcpy (cbuf+strlen(cbuf)-3, "atc");
-	FRatc_stream = new ifstream (GetVesselServices().RecorderFile(cbuf,false)); GetRigidBodyServices().TraceAllocation(__FILE__,__LINE__);
+	FRatc_stream = new ifstream (GetVesselServices().RecorderFile((stem+".atc").c_str(),false)); GetRigidBodyServices().TraceAllocation(__FILE__,__LINE__);
 	*FRatc_stream >> frec_eng_simt;
 	if (!FRatc_stream->good()) {
 		delete FRatc_stream;
@@ -526,7 +523,7 @@ void Vessel::FRecorder_Play ()
 		sv->vel += frec[cfrec].ref->s1->vel;
 
 		// attitude
-		if (GetRigidBodyServices().Time().SimT1 < frec_att[nfrec_att-1].simt) {
+		if (nfrec_att >= 2 && GetRigidBodyServices().Time().SimT1 < frec_att[nfrec_att-1].simt) {
 
 			// store old orientation for calculating angular velocities
 			Vector r1 (sv->R.m11, sv->R.m21, sv->R.m31);
@@ -583,21 +580,22 @@ void Vessel::FRecorder_PlayEvent ()
 {
 	// articulation (also scanned when landed)
 	while (FRatc_stream && GetRigidBodyServices().Time().SimT1 > frec_eng_simt) {
-		char cbuf[1024], *s, *e, c;
+		char cbuf[1024+12]{}, *s, *e, c;
 		double lvl;
 		int i;
 		oapi::UInt32 id;
 		FRatc_stream->getline (cbuf, 1024);
+		if (auto *cr=strchr(cbuf,'\r')) *cr=0;
 		s = strtok (cbuf, " \t");
 		if (s) {
 			if (!CompareText (s, "ENG")) {
 				while (s = strtok (NULL, " \t\n")) {
-					if (sscanf (s, "%d%c%lf", &id, &c, &lvl) == 3 && c == ':') {
+					if (sscanf (s, "%u%c%lf", &id, &c, &lvl) == 3 && c == ':') {
 						if (id < m_thruster.size()) SetThrusterLevel_playback (m_thruster[id], lvl);
 					} else {
 						for (i = 0; i < NTHGROUP; i++)
 							if (!ComparePrefix (s, THGROUPSTR[i], strlen (THGROUPSTR[i]))) break;
-						if (i < NTHGROUP && sscanf (s+strlen(THGROUPSTR[i])+1, "%lf", &lvl)) {
+						if (i < NTHGROUP && sscanf (s+strlen(THGROUPSTR[i])+1, "%lf", &lvl)==1) {
 							ThrustGroupSpec* tgs = GetThrusterGroup((THGROUP_TYPE)i);
 							if (tgs) {
 								for (auto it = tgs->ts.begin(); it != tgs->ts.end(); it++)
@@ -624,35 +622,30 @@ void Vessel::FRecorder_PlayEvent ()
 					bForceActive = true;
 			} else if (!ComparePrefix (s, "NAVMODE", 7)) {
 				if (!strcmp (s+7, "CLR")) {
-					sscanf (s+11, "%d", &i);
-					ClrNavMode (i, false, true);
+					if (sscanf (s+11, "%d", &i)==1) ClrNavMode (i, false, true);
 				} else {
-					sscanf (s+8, "%d", &i);
-					SetNavMode (i, true);
+					if (sscanf (s+8, "%d", &i)==1) SetNavMode (i, true);
 				}
 			} else if (!CompareText (s, "RCSMODE")) {
-				sscanf (s+8, "%d", &i);
-				SetAttMode (i, true);
+				if (sscanf (s+8, "%d", &i)==1) SetAttMode (i, true);
 			} else if (!CompareText (s, "ADCMODE")) {
-				sscanf (s+8, "%d", &i);
-				SetADCtrlMode (i, true);
+				if (sscanf (s+8, "%d", &i)==1) SetADCtrlMode (i, true);
 			} else if (!CompareText (s, "UNDOCK")) {
 				while (s = strtok (NULL, " \t\n")) {
 					int dock;
-					sscanf (s, "%d", &dock);
-					Undock (dock);
+					if (sscanf (s, "%d", &dock)==1) Undock (dock);
 				}
 			} else if (!CompareText (s, "DETACH")) {
 				double v;
-				int res = sscanf (s+7, "%d%lf", &id, &v);
+				int res = sscanf (s+7, "%u%lf", &id, &v);
 				if (res < 2) v = 0.0;
-				AttachmentSpec *as = GetAttachmentFromIndex (false, id);
+				AttachmentSpec *as = res>=1 ? GetAttachmentFromIndex (false, id) : nullptr;
 				if (as) DetachChild (as, v);
 			} else if (!CompareText (s, "ATTACH")) {
 				oapi::UInt32 pidx, cidx;
 				char cname[128], modestr[32];
-				int res = sscanf (s+7, "%s%d%d%s", cname, &pidx, &cidx, modestr);
-				Vessel *child = GetRigidBodyServices().World()->GetVessel (cname, true);
+				int res = sscanf (s+7, "%127s%u%u%31s", cname, &pidx, &cidx, modestr);
+				Vessel *child = res>=3 ? GetRigidBodyServices().World()->GetVessel (cname, true) : nullptr;
 				bool loose = (res > 3 && !CompareText (modestr,"LOOSE") ? true : false);
 				if (child) {
 					AttachmentSpec *asp = GetAttachmentFromIndex (false, pidx);
@@ -663,11 +656,11 @@ void Vessel::FRecorder_PlayEvent ()
 			} else if (!ComparePrefix (s, "LIGHTSOURCE", 11)) { // light emitter event
 				s = strtok (NULL, " \t\n");
 				oapi::UInt32 idx;
-				if (sscanf (s, "%d", &idx) == 1 && idx < nemitter) {
+				if (s && sscanf (s, "%u", &idx) == 1 && idx < nemitter) {
 					s = strtok (NULL, " \t\n");
-					if (!CompareText (s, "ACTIVATE")) {
+					if (s && !CompareText (s, "ACTIVATE")) {
 						oapi::UInt32 flag;
-						if (sscanf (s+9, "%d", &flag) == 1)
+						if (sscanf (s+9, "%u", &flag) == 1)
 							emitter[idx]->Activate (flag != 0);
 					}
 				}
@@ -678,8 +671,7 @@ void Vessel::FRecorder_PlayEvent ()
 						GetVesselServices().PlaybackWarp (RecordingSpeed, WarpDelay);
 			} else if (!ComparePrefix (s, "CAMERA", 6)) { // DEPRECATED - now stored in system stream
 				s = strtok (NULL, " \t\n");
-				if (!ComparePrefix (s, "PRESET", 6)) {
-					sscanf (s+7, "%d", &i);
+				if (s && !ComparePrefix (s, "PRESET", 6) && sscanf (s+7, "%d", &i)==1) {
 					GetVesselServices().RecallCameraPreset (i);
 				}
 			} else if (!ComparePrefix (s, "NOTE", 4)) { // DEPRECATED - now stored in system stream

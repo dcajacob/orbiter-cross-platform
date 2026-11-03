@@ -159,6 +159,12 @@ jobs:
           xvfb-run -a -s '-screen 0 1920x1080x24' env LIBGL_ALWAYS_SOFTWARE=1 GALLIUM_DRIVER=llvmpipe
           python3 -B Tests/Production/LuaRuntime/native_schedule.py --build out/native-cockpit-engine
           --assets out/scene-resources --data out/data --planets out/planets --output out/native-lua-schedule
+      - name: Fly stock DG recordings, finish one naturally and release another with Ctrl+C
+        run: >-
+          xvfb-run -a -s '-screen 0 1920x1080x24' env LIBGL_ALWAYS_SOFTWARE=1 GALLIUM_DRIVER=llvmpipe
+          python3 -B Tests/Production/CockpitUI/recorded_flights.py --executable out/native-cockpit-engine/orbiter-production
+          --modules out/native-cockpit-engine/NativeModules --assets out/scene-resources --data out/data
+          --planets out/planets --output out/native-recorded-flights
       - name: Operate spacecraft selection and visible and auto-hidden cockpit info bars
         run: >-
           xvfb-run -a -s '-screen 0 1920x1080x24' env LIBGL_ALWAYS_SOFTWARE=1 GALLIUM_DRIVER=llvmpipe
@@ -224,9 +230,6 @@ jobs:
             out/native-lua-schedule/*/lua-events.csv
             out/native-lua-schedule/*/lua-controls.csv
             out/native-lua-schedule/*/lua-air.csv
-            out/native-focus-bars/focus-bars-report.json
-            out/native-focus-bars/*/cockpit-state.csv
-            out/native-focus-bars/*/instrument-*.rgba
             out/native-lua-flight/flight-report.json
             out/native-lua-flight/*/lua-flight.csv
             out/native-lua-flight/*/saved.scn
@@ -245,3 +248,138 @@ jobs:
             out/scene-resources/resources.json
             out/scene-resources/cockpit-test-font.json
             out/native-engine/NativeModules/Graphics/Licenses/**
+
+      - name: Archive spacecraft observation samples for the paired comparison
+        uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: spacecraft-native-${{ matrix.configuration }}-${{ matrix.math_profile }}
+          path: |
+            out/native-recorded-flights/recorded-flights.json
+            out/native-recorded-flights/*/playback-state.csv
+            out/native-recorded-flights/*/instrument-*.rgba
+            out/native-recorded-flights/*/console.txt
+            out/native-focus-bars/focus-bars-report.json
+            out/native-focus-bars/*/cockpit-state.csv
+            out/native-focus-bars/*/instrument-*.rgba
+
+  original_spacecraft:
+    name: Preserved Windows spacecraft observations ${{ matrix.configuration }}
+    runs-on: windows-2022
+    timeout-minutes: 40
+    strategy:
+      fail-fast: false
+      matrix:
+        configuration: [Debug, Release]
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - uses: ilammy/msvc-dev-cmd@v1
+        with:
+          vsversion: '17.0'
+          arch: x64
+      - uses: actions/cache@v6
+        with:
+          path: out/cockpit-cache
+          key: original-cockpit-control-runtime-${{ matrix.configuration }}-${{ hashFiles('Tests/Production/Cockpit/Reference/provenance.json') }}
+      - uses: actions/cache@v6
+        with:
+          path: out/data-cache/Orbiter-x64.zip
+          key: production-data-${{ hashFiles('Tests/Production/stock-data.lock.json') }}
+      - uses: actions/cache@v6
+        with:
+          path: out/planet-cache/Orbiter2016.zip
+          key: production-standard-planets-${{ hashFiles('Tests/Production/standard-planets.lock.json') }}
+      - uses: actions/cache@v6
+        with:
+          path: out/mesa-cache/*.pkg.tar.zst
+          key: mesa-ucrt64-${{ hashFiles('Tests/Production/mesa-ucrt64.lock.json') }}
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.14'
+      - name: Verify and stage stock data and software renderer
+        shell: pwsh
+        run: |
+          python -B Tests/Production/prepare_data.py --archive out/data-cache/Orbiter-x64.zip --destination out/production-data
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          python -B Tests/Production/prepare_data.py --lock Tests/Production/standard-planets.lock.json --archive out/planet-cache/Orbiter2016.zip --destination out/standard-planets
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          python -B Tests/Production/stage_mesa.py stage --cache out/mesa-cache --destination out/mesa-runtime
+          exit $LASTEXITCODE
+      - name: Stage the preserved Windows cockpit app and build its SDK observer
+        id: preserved_cockpit
+        shell: pwsh
+        run: |
+          python -B Tests/Production/CockpitControls/prepare.py --configuration ${{ matrix.configuration }} --cache out/cockpit-cache --output out/focus-original
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          cmake -S Tests/Production/RecordedFlight -B out/focus-driver -G Ninja -DCMAKE_BUILD_TYPE=${{ matrix.configuration }} -DORBITER_TEST_RUNTIME="$pwd/out/focus-original"
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          cmake --build out/focus-driver --parallel 2
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - name: Observe spacecraft selection and info bars in the preserved original Windows app
+        run: >-
+          python -B Tests/Production/CockpitUI/focus_bars.py --original --executable out/focus-original/Orbiter.exe
+          --data out/production-data --planets out/standard-planets --mesa out/mesa-runtime --output out/focus-bars-original
+      - name: Fly unchanged Delta-glider recordings on the preserved original Windows application
+        if: ${{ !cancelled() && steps.preserved_cockpit.outcome == 'success' }}
+        run: >-
+          python -B Tests/Production/CockpitUI/recorded_flights.py --original --executable out/focus-original/Orbiter.exe
+          --data out/production-data --planets out/standard-planets --mesa out/mesa-runtime --output out/original-recorded-flights
+      - name: Archive original spacecraft observations
+        uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: spacecraft-original-${{ matrix.configuration }}
+          path: |
+            out/focus-bars-original/general-api/general-api-result.json
+            out/focus-bars-original/general-api/Orbiter.log
+            out/focus-bars-original/*/earth-obliquity.txt
+            out/original-recorded-flights/recorded-flights.json
+            out/original-recorded-flights/*/playback-state.csv
+            out/original-recorded-flights/*/instrument-*.rgba
+            out/original-recorded-flights/*/cockpit-failure.txt
+            out/original-recorded-flights/*/console.txt
+            out/focus-bars-original/focus-bars-report.json
+            out/focus-bars-original/*/cockpit-state.csv
+            out/focus-bars-original/*/instrument-*.rgba
+            out/focus-bars-original/*/cockpit-failure.txt
+            out/focus-bars-original/*/ui-inputs.csv
+            out/focus-original/control-reference-runtime.json
+
+  compare_spacecraft:
+    name: Compare native and original spacecraft ${{ matrix.configuration }} ${{ matrix.math_profile }}
+    needs: [native, original_spacecraft]
+    if: ${{ !cancelled() }}
+    runs-on: ubuntu-24.04
+    strategy:
+      fail-fast: false
+      matrix:
+        configuration: [Debug, Release]
+        math_profile: [automatic, sse2]
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - uses: actions/download-artifact@v8
+        with:
+          name: spacecraft-original-${{ matrix.configuration }}
+          path: original
+      - uses: actions/download-artifact@v8
+        with:
+          name: spacecraft-native-${{ matrix.configuration }}-${{ matrix.math_profile }}
+          path: native
+      - name: Compare recorded flight trajectories, controls, camera cuts and complete frames
+        run: >-
+          python3 -B Tests/Production/CockpitUI/recorded_flights.py compare --original original/original-recorded-flights
+          --native native/native-recorded-flights --output recorded-comparison.json
+      - name: Compare focus selection, time and target bars
+        if: ${{ !cancelled() }}
+        run: >-
+          python3 -B Tests/Production/CockpitUI/focus_bars.py compare --original original/focus-bars-original
+          --native native/native-focus-bars --output focus-comparison.json
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: spacecraft-comparison-${{ matrix.configuration }}-${{ matrix.math_profile }}
+          path: '*-comparison.json'

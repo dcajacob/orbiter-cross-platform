@@ -40,6 +40,8 @@
 #include "NativeAnnotations.h"
 #include "NativeScript.h"
 #include "NativeInterpreterSdk.h"
+#include "SystemPlayback.h"
+#include "PlaybackObservation.h"
 #include "CockpitSystemClock.h"
 #include "CockpitServices.h"
 #endif
@@ -94,13 +96,16 @@ struct Runtime final:BodyServices,RigidBodyServices,SurfaceServices,NavigationSe
     FlightControls controls;FlightReplay replay;FlightInput input;
 #ifdef ORBITER_NATIVE_COCKPIT
     NativeAnnotations annotations;
+    std::string playbackDirectory;
+    std::ifstream systemPlayback;
+    double nextPlaybackEvent=0;
     NativeScriptHost scripts{resources.modules};
     std::array<char,256> simulatedKeys{};
     TimeJumpData scriptJump{};
     INTERPRETERHANDLE scenarioInterpreter=nullptr;
     std::unique_ptr<Pane> cockpit;
     bool instrumentResources=false,cockpitObserved=false,guiCreated=false;
-    std::ofstream cockpitState;
+    std::ofstream cockpitState,playbackTrace;
     CockpitSystemClock cockpitClock;
     unsigned paneMouseCapture=0;
     bool observeControls=false;
@@ -386,6 +391,7 @@ struct Runtime final:BodyServices,RigidBodyServices,SurfaceServices,NavigationSe
 #endif
                     continue;
                 }
+                if(playback && keymap.IsLogicalKey(code,snapshot.keys.data(),OAPI_LKEY_ToggleRecPlay)) {EndPlayback();continue;}
                 if(keymap.IsLogicalKey(code,snapshot.keys.data(),OAPI_LKEY_SelectPrevVessel)) {if(previousFocus)orbiter::production::SetFocusObject(*this,previousFocus);continue;}
                 if(keymap.IsLogicalKey(code,snapshot.keys.data(),OAPI_LKEY_Quit)) {active=false;continue;}
                 if(keymap.IsLogicalKey(code,snapshot.keys.data(),OAPI_LKEY_IncSimSpeed)) {SetWarpFactor(std::pow(10.,std::floor(std::log10(time.Warp())+1e-6)+1));continue;}
@@ -404,6 +410,7 @@ struct Runtime final:BodyServices,RigidBodyServices,SurfaceServices,NavigationSe
     Runtime(Resources& data):resources(data),config(data.config),celestial(config,data.data,data.modules),world(*this) {}
     void Finish() {
         if(finished)return;
+        if(playback && system)EndPlayback();
 #ifdef ORBITER_NATIVE_COCKPIT
         if(scenarioInterpreter) {oapiDelInterpreter(scenarioInterpreter);scenarioInterpreter=nullptr;}
 #endif
@@ -451,6 +458,9 @@ struct Runtime final:BodyServices,RigidBodyServices,SurfaceServices,NavigationSe
 #ifndef ORBITER_NATIVE_COCKPIT
         if(metadata.Script())unsupported("bundled Lua in the external-view build");
 #else
+        std::string directory=metadata.PlaybackDir();
+        std::replace(directory.begin(),directory.end(),'\\','/');
+        playbackDirectory=std::filesystem::path(directory).filename().string();
         render.annotations=&annotations;render.scripts=&scripts;render.scriptApplication=this;render.scriptSaveDirectory=savePath.parent_path();
 #endif
         if(!std::isfinite(metadata.Mjd()))throw std::runtime_error("Scenario epoch must be finite");
@@ -494,6 +504,12 @@ struct Runtime final:BodyServices,RigidBodyServices,SurfaceServices,NavigationSe
         }
 #ifdef ORBITER_NATIVE_COCKPIT
         if(!evidence.empty()) {
+            if(std::filesystem::is_regular_file(evidence/"playback.enabled")) {
+                playbackTrace.exceptions(std::ios::badbit|std::ios::failbit);
+                playbackTrace.imbue(std::locale::classic());
+                playbackTrace.open(evidence/"playback-state.csv");playbackTrace<<std::setprecision(17);
+                playback_observation::Header(playbackTrace);
+            }
             observeControls=std::filesystem::is_regular_file(evidence/"control-evidence.enabled");
             cockpitState.imbue(std::locale::classic());cockpitState.exceptions(std::ios::badbit|std::ios::failbit);
             cockpitState.open(evidence/"cockpit-state.csv");cockpitState<<std::setprecision(17)<<"tick,seconds,mjd,object,class,cockpit,hud,left_mfd,right_mfd,x,y,z,vx,vy,vz,m11,m12,m13,m21,m22,m23,m31,m32,m33,wx,wy,wz,mass,fuel,meshes,thrusters";
@@ -543,6 +559,11 @@ struct Runtime final:BodyServices,RigidBodyServices,SurfaceServices,NavigationSe
         if(!render.camera->IsExternal())unsupported("cockpits yet; select an external camera");
 #endif
 #ifdef ORBITER_NATIVE_COCKPIT
+        playback=focus->bPlayback();
+        if(playback) {
+            systemPlayback.open(RecorderFile(("Flights/"+playbackDirectory+"/system.dat").c_str(),false));
+            systemPlayback>>nextPlaybackEvent;
+        }
         if(metadata.Script()) scenarioInterpreter=scripts.Load().run(metadata.Script());
 #endif
         render.graphics->PostCreation();system->PostCreation();
@@ -618,10 +639,16 @@ struct Runtime final:BodyServices,RigidBodyServices,SurfaceServices,NavigationSe
     void Fatal(const char* text) override {throw std::runtime_error(text);}
     void Check(bool valid,const char* text) override {if(!valid)throw std::logic_error(text);}
     MeshManager& Meshes() override {return meshes;}
-    const char* PlaybackDirectory() const override {unsupported("flight playback yet");}
+    const char* PlaybackDirectory() const override {
+#ifdef ORBITER_NATIVE_COCKPIT
+        return playbackDirectory.c_str();
+#else
+        unsupported("recorded flights in the external-view build");
+#endif
+    }
     void SetWarpFactor(double warp) override {
         if(!std::isfinite(warp) || warp<=0)throw std::runtime_error("Invalid time acceleration");
-        time.SetWarp(std::clamp(warp,.1,100000.));
+        if(!playback || !settings.CfgRecPlayPrm.bReplayWarp)time.SetWarp(std::clamp(warp,.1,100000.));
     }
     double TimejumpDelta() const override {
 #ifdef ORBITER_NATIVE_COCKPIT
@@ -647,11 +674,34 @@ struct Runtime final:BodyServices,RigidBodyServices,SurfaceServices,NavigationSe
         unsupported("virtual cockpit movement yet");
 #endif
     }
-    std::filesystem::path RecorderFile(const char*,bool) override {unsupported("flight recording yet");}
-    void PlaybackWarp(double,double) override {unsupported("playback time acceleration yet");}
+    std::filesystem::path RecorderFile(const char* relative,bool writing) override {
+        if(writing)unsupported("flight recording yet");
+        auto name=ResourceResolver::Normalize(relative);
+        if(name.rfind("flights/",0)!=0)throw std::invalid_argument("Expected a flight recording path");
+        if(resources.program.Contains(name))return resources.program.Resolve(name);
+        if(std::filesystem::path(name).extension()==".pos")throw std::runtime_error("Missing required flight recording: "+name);
+        return resources.program.Root()/name;
+    }
+    void PlaybackWarp(double warp,double delay) override {
+        if(!std::isfinite(warp) || warp<=0 || !std::isfinite(delay))throw std::runtime_error("Invalid recorded time acceleration");
+        if(std::abs(warp-time.Warp())>1e-6)time.SetWarp(std::clamp(warp,.1,100000.),delay);
+    }
     void RecallCameraPreset(int index) override {render.camera->RecallPreset(index);}
-    void PlaybackNote(char*) override {unsupported("playback annotations yet");}
-    void EndPlayback() override {unsupported("flight playback yet");}
+    void PlaybackNote(char* text) override {
+#ifdef ORBITER_NATIVE_COCKPIT
+        annotations.PlaybackNote(text);
+#else
+        unsupported("playback annotations in the external-view build");
+#endif
+    }
+    void EndPlayback() override {
+        for(auto* vessel:system->GetVessels())vessel->FRecorder_EndPlayback();
+#ifdef ORBITER_NATIVE_COCKPIT
+        systemPlayback.close();
+        annotations.EndPlayback();
+#endif
+        playback=false;
+    }
     Vessel* Focus() const override {return render.focus;}
     void SetFocus(Vessel* vessel) override {orbiter::production::SetFocusObject(*this,vessel,false);}
     PlanetarySystem*& LifetimeWorld() override {RequireWorld();return system;}
@@ -704,15 +754,29 @@ struct Runtime final:BodyServices,RigidBodyServices,SurfaceServices,NavigationSe
     void DestroySystem(PlanetarySystem* body) noexcept override {delete body;render.world=system=nullptr;}
     void Observe(const char* event,bool state) override {
 #ifdef ORBITER_NATIVE_COCKPIT
-        if(cockpitObserved && std::string(event)=="app.frame.end")CockpitSnapshot();
+        if(std::string(event)=="app.frame.end") {
+            if(cockpitObserved)CockpitSnapshot();
+            if(playbackTrace.is_open()) playback_observation::Row(playbackTrace,completedTicks);
+        }
 #endif
         LifetimeEvent(event,"",state?"1":"0");if(lifecycle.is_open())lifecycle<<event<<','<<time.SimT0<<','<<time.MJD0<<','<<state<<'\n';}
     void ModulePreStep() override {LifetimeEvent("module.pre");Commands("pre");
 #ifdef ORBITER_NATIVE_COCKPIT
+        if(playbackTrace.is_open() && !completedTicks)playback_observation::Row(playbackTrace,0);
         if(!cockpitObserved && render.camera->IsInternal()){CockpitSnapshot();cockpitObserved=true;}
 #endif
         for(UInt32 i=0;i<system->nVessel();++i)system->GetVessel(i)->ModulePreStep(time.SimT0,time.SimDT,time.MJD0);}
-    void PlaybackStep() override {unsupported("playback yet");}
+    void PlaybackStep() override {
+#ifdef ORBITER_NATIVE_COCKPIT
+        if(!systemPlayback.good())return;
+        PlaySystemEvents(systemPlayback,nextPlaybackEvent,time,*render.camera,
+            [this](Vessel* v){orbiter::production::SetFocusObject(*this,v);},
+            [this](double mjd){Jump(mjd,PROP_ORBITAL_FIXEDSURF);},[this]{active=false;});
+        if(!systemPlayback.good())systemPlayback.close();
+#else
+        unsupported("recorded flights in the external-view build");
+#endif
+    }
     void UpdateBodies(bool update) override {system->Update(update);}
     void UpdateDialogs() override {} // No dialogs are instantiated in external-view scope.
     void ModulePostStep() override {

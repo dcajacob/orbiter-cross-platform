@@ -19,6 +19,12 @@ def main():
     lib.probe_bits.argtypes=[C.c_int,C.c_uint64,C.c_uint64];lib.probe_bits.restype=C.c_double
     for name in ('probe_profile','oracle_version','oracle_module'):getattr(lib,name).restype=C.c_char_p
     profile=lib.probe_profile().decode();oracle=Path(lib.oracle_module().decode()).resolve()
+    # The original stored SurfParam and CRT asin use this exact input at tick
+    # 34 in the atmospheric DG. Source run 41560881876, same Windows host.
+    lib.probe_latitude.argtypes=[C.c_double];lib.probe_latitude.restype=C.c_double
+    latitude=lib.probe_latitude(float.fromhex('0x1.e92199644661ep-2'))
+    expected_latitude='0x1.fdf30f8d54924p-2' if lib.probe_release_latitude() or profile.endswith('sse2') else '0x1.fdf30f8d54923p-2'
+    require(latitude.hex()==expected_latitude,'Equatorial latitude differs from its original CRT profile')
     rng=random.Random(0x4f524249544552);samples=[]
     values=[0.,-0.,math.ulp(0.),-math.ulp(0.),1.,-1.,float.fromhex('0x1.fffffffffffffp+1023')]
     for x in (.0001,.6,math.pi/4,math.pi/2,math.pi,2*math.pi,500000.,20000000.,1e100,1e308):
@@ -75,6 +81,6 @@ def main():
                 lib.probe_clear();got=lib.probe_bits(f,nan,0)
                 require(bits(got)==0x7ff8000000000042 and bool(lib.probe_invalid())==invalid,'NaN payload/exception propagation failed')
         reports.append(dict(profile=label,windows_samples_exact=count,mpfr_samples=len(samples),maximum_ulps=maxima,edge_cases='passed'))
-    report=dict(status='passed',automatic_profile=profile,probe_sha256=sha(a.probe),oracle=dict(version=lib.oracle_version().decode(),path=str(oracle),sha256=sha(oracle),precision_bits=[256,512]),maximum_allowed_ulps=1,profiles=reports)
+    report=dict(status='passed',automatic_profile=profile,equatorial_latitude_hex=latitude.hex(),probe_sha256=sha(a.probe),oracle=dict(version=lib.oracle_version().decode(),path=str(oracle),sha256=sha(oracle),precision_bits=[256,512]),maximum_allowed_ulps=1,profiles=reports)
     a.output.parent.mkdir(parents=True,exist_ok=True);a.output.write_text(json.dumps(report,indent=2)+'\n');print(json.dumps(report,indent=2))
 if __name__=='__main__':main()

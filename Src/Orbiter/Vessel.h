@@ -1872,8 +1872,10 @@ private:
 	// checks if end of playback is reached, and performs
 	// cleanup operations if it is
 
+public:
 	void FRecorder_EndPlayback ();
 	// terminates a running playback
+private:
 
 	// =======================================================
 	// Routines for automatic animation support

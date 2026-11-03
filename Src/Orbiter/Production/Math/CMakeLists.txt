@@ -28,7 +28,8 @@ add_library(orbiter_reference_math STATIC Runtime.cpp NativeError.cpp
 set_target_properties(orbiter_reference_math PROPERTIES POSITION_INDEPENDENT_CODE ON
     C_VISIBILITY_PRESET hidden CXX_VISIBILITY_PRESET hidden)
 target_compile_features(orbiter_reference_math PRIVATE cxx_std_17)
-target_compile_definitions(orbiter_reference_math PRIVATE ORBITER_MATH_FORCE_SSE2=$<BOOL:${ORBITER_MATH_FORCE_SSE2}>)
+target_compile_definitions(orbiter_reference_math PRIVATE ORBITER_MATH_FORCE_SSE2=$<BOOL:${ORBITER_MATH_FORCE_SSE2}>
+    ORBITER_MATH_RELEASE_LATITUDE=$<CONFIG:Release>)
 target_include_directories(orbiter_reference_math PRIVATE "${CMAKE_CURRENT_LIST_DIR}" "${_math_generated}")
 set_source_files_properties("${_math_generated}/asin_fma.c" PROPERTIES COMPILE_OPTIONS "-O2;-fno-builtin;-mfma;-ffp-contract=fast")
 set_source_files_properties("${_math_generated}/asin_sse2.c" "${_math_generated}/atan2.c" PROPERTIES COMPILE_OPTIONS "-O2;-fno-builtin;-mno-avx;-mno-fma;-ffp-contract=off")
@@ -48,6 +49,7 @@ if(BUILD_TESTING)
     find_path(MPFR_INCLUDE_DIR mpfr.h REQUIRED)
     find_library(MPFR_LIBRARY NAMES mpfr REQUIRED)
     add_library(reference_math_probe MODULE "${CMAKE_CURRENT_LIST_DIR}/../../../../Tests/Production/Math/Probe.cpp")
+    target_compile_definitions(reference_math_probe PRIVATE ORBITER_MATH_RELEASE_LATITUDE=$<CONFIG:Release>)
     target_include_directories(reference_math_probe PRIVATE "${CMAKE_CURRENT_LIST_DIR}" "${MPFR_INCLUDE_DIR}")
     target_link_libraries(reference_math_probe PRIVATE orbiter_reference_math "${MPFR_LIBRARY}" ${CMAKE_DL_LIBS})
     add_test(NAME Production.ReferenceMath COMMAND "${Python3_EXECUTABLE}" -B
