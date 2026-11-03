@@ -1,11 +1,12 @@
-# Shuttle-A native integration candidate
+# Shuttle-A local integration qualification
 
 Phase 6 now compiles the original Shuttle-A production module and its payload
 in the native cockpit build. Its comparison candidate now admits only the
 initial capabilities observed in all four audited Windows profiles. Required
-modules still use the checked loader. Native state/image comparisons remain
-pending; this does not increase the accepted stock-corpus pass count or complete
-Phase 6.
+modules still use the checked loader. Local Release automatic state/image
+qualification now passes for all six complete Shuttle-A scenes and four complete
+DG scenes containing Shuttle-A. Other profiles, interactive acceptance and the
+complete admitted stock corpus remain open; Phase 6 is not complete.
 
 The port retains the original flight and parachute calculations, resources,
 animations, panel/VC instruments, attachment logic and Lua methods. The source
@@ -32,8 +33,8 @@ original Debug/Release automatic/SSE2 profiles must be captured and audited
 before admitting native capabilities.
 
 See [the fixture and commands](../../Tests/Production/ShuttleA/README.md).
-Native state/image comparison, interactive Shuttle-A controls, payload
-deployment and Shuttle-A flight/cockpit lifetime checks remain pending. The Windows-specific
+Other native profiles, interactive Shuttle-A controls, payload deployment and
+Shuttle-A flight/cockpit lifetime checks remain pending. The Windows-specific
 Shuttle-A scenario-editor page also needs a native UI implementation.
 
 Local integration checks now pass for the compiled candidate `778b6c58`:
@@ -85,3 +86,42 @@ mass remains the original scenario-controlled quantity. Only the observed
 initial one-mesh cargo configuration is admitted; restored deployed-parachute
 configurations still need their own original observations. None of the flight,
 parachute or attachment calculations are changed by this policy.
+
+The [native qualification record](ShuttleANativeVerification.json) identifies
+runtime code `09eeed20`. All twenty sessions pass against the matching audited
+Windows profile: every vessel, capability and docking-port row, the camera and
+unmasked full framebuffer. All twenty images are byte-identical to Windows
+(SSIM 1.0), with numerical differences below the unchanged budgets. The same ten
+unchanged scenes also complete 600 presentations with the engine and renderer
+instrumented, normal context deletion and zero sanitizer findings.
+
+Those full graphs exposed two integration defects. A docked DG teardown called
+redraw after the cockpit was released. Two native guards had replaced the
+original nullable pointer test with a throwing lookup; restoring nullable tests
+preserves the original shutdown and callback order. Separately, appending to an
+empty CPU mesh group lost its owned zero-length arrays. Releasing the old arrays
+outside the nonempty-copy condition leaves all geometry and index calculations
+unchanged. The real mesh regression reports 32 leaked allocations before the
+fix and zero afterward, with exact geometry/index checks. Both failed baselines
+and the first-exception backtrace are retained.
+
+Eight real startup controls reject missing required modules, foreign factories,
+generic fallbacks and class clones before presentation, with protected source
+configs unchanged. The workflow now captures and compares all four native
+build/CPU profiles against pinned original observations without refreshing them.
+Hosted results remain pending. A fresh full admitted-corpus run is separate;
+the earlier 44/113 result is retained as the closed-gate baseline.
+
+Three further verified local bundles preserve the evidence:
+
+- Native qualification and retained defect baselines: 215,020,944 bytes,
+  3,231 members; SHA-256
+  `ffd8ac8c764c81a132a2599b0938210a02b1e876b6f2c2e5293d75dc9e16f5d3`.
+- Original observations and preserved application/client/SDK code: 169,802,632
+  bytes, 357 members; SHA-256
+  `54c4a038d8f54aced333c7a7b6fb39606d0f4b0db016e2bcea037a836fea8b41`.
+- Complete closed-gate corpus: 5,153,898 bytes, 4,258 members; SHA-256
+  `ac2e00b1fd05fc1ae5e59cb4b1013ada89a3ca59122a6f35976375f8cfe527c1`.
+
+Their paths and full indexes are recorded by the machine-readable qualification.
+They exclude asset/font collections. Remote preservation remains open.

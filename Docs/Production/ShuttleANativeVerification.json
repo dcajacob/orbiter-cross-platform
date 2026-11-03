@@ -1,0 +1,247 @@
+{
+  "schema": 1,
+  "status": "local-release-automatic-initial-scenes-qualified",
+  "phase6_complete": false,
+  "code_commit": "09eeed2091b36b18681cd10616b608248008ddaa",
+  "original_windows": {
+    "verification": {
+      "path": "out/phase6-shuttle-a-original-audit.json",
+      "sha256": "368c69e44e16c6488a33226ad08371457120c1bc825bd6957d083bf293d46cd9",
+      "status": "passed"
+    },
+    "profiles": 4,
+    "processes": 80,
+    "presents": 4800,
+    "finalized_all_vessel_samples": 38552
+  },
+  "native_comparison": {
+    "verification": {
+      "path": "out/phase6-shuttle-a-mesh-release-comparison/comparison.json",
+      "sha256": "8a1bd761e3cbdd44b8d36dcd4af3a9515bfbacb84df855069219b40e3fbcf067",
+      "status": "passed"
+    },
+    "scenarios": 10,
+    "processes": 20,
+    "presents": 1200,
+    "minimum_ssim": 1.0,
+    "maximum_state_errors": {
+      "position_m": 1.862645149230957e-09,
+      "velocity_m_s": 0.0,
+      "rotation_rad": 1.3472894910096233e-16,
+      "angular_velocity_rad_s": 2.947040667647456e-23,
+      "mjd_days": 0.0,
+      "mass_fraction_of_budget": 0.0,
+      "fuel_fraction_of_budget": 0.0
+    },
+    "all_vessels_and_ports": true,
+    "camera_and_full_frame_without_masks": true,
+    "unchanged_budgets": true,
+    "byte_identical_full_rgba_frames": [
+      {
+        "case": "shuttle_a_1-1",
+        "rgba_sha256": "faf653c1797d0fb4aab7646103c95e8a0bf59222cd10723cea2072314291d716"
+      },
+      {
+        "case": "shuttle_a_1-2",
+        "rgba_sha256": "faf653c1797d0fb4aab7646103c95e8a0bf59222cd10723cea2072314291d716"
+      },
+      {
+        "case": "shuttle_a_2-1",
+        "rgba_sha256": "88fad95d62ce083af18e6323373ac2cc4574fd9bb11c8420290f4f99da787d92"
+      },
+      {
+        "case": "shuttle_a_2-2",
+        "rgba_sha256": "88fad95d62ce083af18e6323373ac2cc4574fd9bb11c8420290f4f99da787d92"
+      },
+      {
+        "case": "shuttle_a_3-1",
+        "rgba_sha256": "15b399faf1140ff2a9a1339a5dc8043c66318500f07a93ceec2e1bbf68a1d628"
+      },
+      {
+        "case": "shuttle_a_3-2",
+        "rgba_sha256": "15b399faf1140ff2a9a1339a5dc8043c66318500f07a93ceec2e1bbf68a1d628"
+      },
+      {
+        "case": "shuttle_a_4-1",
+        "rgba_sha256": "7d85a1b95abbd2f06c382eb8a42f8c96c6251657d0798b27b2f0e2541aae71e0"
+      },
+      {
+        "case": "shuttle_a_4-2",
+        "rgba_sha256": "7d85a1b95abbd2f06c382eb8a42f8c96c6251657d0798b27b2f0e2541aae71e0"
+      },
+      {
+        "case": "shuttle_a_5-1",
+        "rgba_sha256": "308ac499cfe2f4f909580513a91a976551d1b256d21f01c1a6a042137bf74cd4"
+      },
+      {
+        "case": "shuttle_a_5-2",
+        "rgba_sha256": "308ac499cfe2f4f909580513a91a976551d1b256d21f01c1a6a042137bf74cd4"
+      },
+      {
+        "case": "shuttle_a_6-1",
+        "rgba_sha256": "d0750f733c13299416684f015accbdc4f9616ac9d532d7efc2176d9d1a78e25d"
+      },
+      {
+        "case": "shuttle_a_6-2",
+        "rgba_sha256": "d0750f733c13299416684f015accbdc4f9616ac9d532d7efc2176d9d1a78e25d"
+      },
+      {
+        "case": "shuttle_a_7-1",
+        "rgba_sha256": "0e17f5af4cd73b7fac51a63e2d25970c1f9781f4616d9817cb84154ccc66f61d"
+      },
+      {
+        "case": "shuttle_a_7-2",
+        "rgba_sha256": "0e17f5af4cd73b7fac51a63e2d25970c1f9781f4616d9817cb84154ccc66f61d"
+      },
+      {
+        "case": "shuttle_a_8-1",
+        "rgba_sha256": "e9dc82c06010f7388888ce5598b749454fb8f356c7cfb508d9f37d406cce089e"
+      },
+      {
+        "case": "shuttle_a_8-2",
+        "rgba_sha256": "e9dc82c06010f7388888ce5598b749454fb8f356c7cfb508d9f37d406cce089e"
+      },
+      {
+        "case": "shuttle_a_9-1",
+        "rgba_sha256": "31478711f2d10e018d9d50db923807540b9aca54634979198778ea351f5ccb9c"
+      },
+      {
+        "case": "shuttle_a_9-2",
+        "rgba_sha256": "31478711f2d10e018d9d50db923807540b9aca54634979198778ea351f5ccb9c"
+      },
+      {
+        "case": "shuttle_a_10-1",
+        "rgba_sha256": "b4e9d304eb21cada317386b4526a407b9c813ae71280d4222c2d6a0d393e3ddb"
+      },
+      {
+        "case": "shuttle_a_10-2",
+        "rgba_sha256": "b4e9d304eb21cada317386b4526a407b9c813ae71280d4222c2d6a0d393e3ddb"
+      }
+    ]
+  },
+  "instrumented_smoke": {
+    "verification": {
+      "path": "out/phase6-shuttle-a-mesh-sanitized/verification.json",
+      "sha256": "122b99fbc94c40a12f348eca2b8caabbcfaa538f96b9a662196b39f908b414f9",
+      "status": "passed"
+    },
+    "unchanged_scenarios": 10,
+    "presents": 600,
+    "sanitizer_findings": 0,
+    "signals": 0
+  },
+  "admission_controls": {
+    "verification": {
+      "path": "out/phase6-shuttle-a-pane-policy/controls/verification.json",
+      "sha256": "754912d15c859735bfb70dea43e251850229da9920cc43ae3469a01905a74a9c",
+      "status": "passed"
+    },
+    "rejected_variants": 8,
+    "original_configs_unchanged": true
+  },
+  "lifecycle_repairs": {
+    "nullable_redraw_guard": {
+      "source_control": {
+        "path": "out/phase6-shuttle-a-pane-source-controls.json",
+        "sha256": "c6952e0835899bfee0ea939d45d7065dbe9b690de0ebfae95de9d9fa6ec969fc",
+        "status": "passed"
+      },
+      "diagnostic": "out/phase6-shuttle-a-pane-backtrace/gdb.log",
+      "cause": "A throwing native lookup replaced the original nullable pane test during docked DG destruction.",
+      "shutdown_order_unchanged": true
+    },
+    "empty_group_append": {
+      "source_control": {
+        "path": "out/phase6-shuttle-a-mesh-source-controls.json",
+        "sha256": "a3502bd96a72c8548919b9971f6d40a0e3ffce42b951ef7766c15bca271c2b75",
+        "status": "passed"
+      },
+      "regression": {
+        "path": "out/phase6-shuttle-a-mesh-probe-verification.json",
+        "sha256": "750012116f1bbd515f4bd88bc76991a3cdc8a84f80e102ce48da3e2a2f016019",
+        "status": "passed"
+      },
+      "cause": "Zero-length owned arrays were not freed when an empty mesh group received its next block.",
+      "baseline_regression_bytes": 32,
+      "baseline_regression_allocations": 32,
+      "fixed_findings": 0,
+      "geometry_and_indices_unchanged": true
+    }
+  },
+  "immutable_closed_gate_corpus": {
+    "verification": {
+      "path": "out/phase6-shuttle-a-attach-full-stock-audit.json",
+      "sha256": "155ed7647713e17738393bae92488f2e7b2a76021cc7d24c181928e7f8baa0de",
+      "status": "audited-incomplete"
+    },
+    "code_commit": "2d9367c5abc72da406cefd10164c8fbd980b5a0c",
+    "attempted": 157,
+    "passed": 44,
+    "failed": 113,
+    "sanitizer_findings": 0,
+    "signals": 0
+  },
+  "reference_loader": {
+    "offline_audit": {
+      "path": "out/phase6-shuttle-a-frozen-replay-audit.json",
+      "sha256": "d402dd8ede30c44db107d1f6465d2eeda77d57058eb2d07ff85924951f0a8b10",
+      "status": "passed"
+    },
+    "corrupt_cache_control": {
+      "path": "out/phase6-shuttle-a-frozen-controls/verification.json",
+      "sha256": "4fe561e8a4b4bb6e7874de6f4a70c5666c135a4f454a0dac202e534c110de916",
+      "status": "passed"
+    },
+    "automatic_refresh": false
+  },
+  "canonical_local_archives": {
+    "native": {
+      "status": "verified",
+      "path": "out/phase6-shuttle-a-native-evidence-v1.tar.gz",
+      "bytes": 215020944,
+      "sha256": "ffd8ac8c764c81a132a2599b0938210a02b1e876b6f2c2e5293d75dc9e16f5d3",
+      "members": 3231,
+      "index_sha256": "dcbe98e7f15ef5142dac7fcb6f21d9a6c3bc7ca037ef6f7c9e2592f1746e77ac",
+      "phase6_complete": false,
+      "remote_published": false
+    },
+    "original": {
+      "status": "verified",
+      "path": "out/phase6-shuttle-a-original-evidence-v1.tar.gz",
+      "bytes": 169802632,
+      "sha256": "54c4a038d8f54aced333c7a7b6fb39606d0f4b0db016e2bcea037a836fea8b41",
+      "members": 357,
+      "index_sha256": "f33ec29267430595864429fa78fad3cd5ebf99ba4bcbbfbe2c2636febb633e1f",
+      "preserved_code_sdk_files": 228,
+      "phase6_complete": false,
+      "remote_published": false
+    },
+    "closed_corpus": {
+      "status": "verified",
+      "path": "out/phase6-shuttle-a-closed-corpus-evidence-v1.tar.gz",
+      "bytes": 5153898,
+      "sha256": "ac2e00b1fd05fc1ae5e59cb4b1013ada89a3ca59122a6f35976375f8cfe527c1",
+      "members": 4258,
+      "index_sha256": "2c270d1e0e5a7fd5a6683669eea5d4e067b1ef1133408b1906341b9b1aaa93a0",
+      "phase6_complete": false,
+      "remote_published": false
+    }
+  },
+  "open_gates": {
+    "current_full_admitted_corpus": "running on the same code revision, separately from this completed scoped bundle",
+    "hosted_profiles": {
+      "run": 41707877963,
+      "status": "pending-at-checkpoint",
+      "profiles": 4
+    },
+    "interactive_shuttle_a_controls": "pending",
+    "restored_deployed_payload_states": "pending-original-observations-and-comparison",
+    "native_shuttle_a_editor": "pending",
+    "other_stock_modules_and_original_assertion": "incomplete",
+    "current_hardware_performance": "pending",
+    "physical_controller": "unavailable per user; unverified",
+    "wall_clock_today": "unverified",
+    "remote_archive_preservation": "pending",
+    "mesa_note": "Pinned candidate requested for instrumented runs; full late driver mappings were not captured in these reports."
+  }
+}
