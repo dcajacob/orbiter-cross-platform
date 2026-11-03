@@ -1,0 +1,50 @@
+{
+  "schema": 1,
+  "platform": "Ubuntu 26.04 amd64",
+  "scope": "Private headless compositor and SDK; never installed into the system or loaded into the desktop compositor.",
+  "weston_version": "14.0.2",
+  "packages": [
+    {
+      "name": "weston",
+      "version": "14.0.2-5",
+      "filename": "weston_14.0.2-5_amd64.deb",
+      "url": "https://archive.ubuntu.com/ubuntu/pool/universe/w/weston/weston_14.0.2-5_amd64.deb",
+      "size": 987956,
+      "sha256": "edf3509ee3b2fb0b94d45e3e090be2a5cdf0a18e4ebdfef2160d2e2b1c05090f"
+    },
+    {
+      "name": "libweston-14-0",
+      "version": "14.0.2-5",
+      "filename": "libweston-14-0_14.0.2-5_amd64.deb",
+      "url": "https://archive.ubuntu.com/ubuntu/pool/universe/w/weston/libweston-14-0_14.0.2-5_amd64.deb",
+      "size": 447062,
+      "sha256": "55e70afb449341d4de64c8a64535762b28694140e01c4100303609b29947c284"
+    },
+    {
+      "name": "libweston-14-dev",
+      "version": "14.0.2-5",
+      "filename": "libweston-14-dev_14.0.2-5_amd64.deb",
+      "url": "https://archive.ubuntu.com/ubuntu/pool/universe/w/weston/libweston-14-dev_14.0.2-5_amd64.deb",
+      "size": 44014,
+      "sha256": "919cbbf3a047b8007a9cba9f1775d4f3b593cacacb33c998a26a4d153a9f3c19"
+    },
+    {
+      "name": "libpixman-1-dev",
+      "version": "0.46.4-1",
+      "filename": "libpixman-1-dev_0.46.4-1_amd64.deb",
+      "url": "https://archive.ubuntu.com/ubuntu/pool/main/p/pixman/libpixman-1-dev_0.46.4-1_amd64.deb",
+      "size": 11152,
+      "sha256": "c98809a1473c93b5390f057279091ff2685c8b1012f5cce56146df5950b8f3ad"
+    }
+  ],
+  "source": {
+    "filename": "weston_14.0.2.orig.tar.xz",
+    "url": "https://archive.ubuntu.com/ubuntu/pool/universe/w/weston/weston_14.0.2.orig.tar.xz",
+    "size": 2043392,
+    "sha256": "b47216b3530da76d02a3a1acbf1846a9cd41d24caa86448f9c46f78f20b6e0ac"
+  },
+  "source_metadata": {
+    "url": "https://archive.ubuntu.com/ubuntu/pool/universe/w/weston/weston_14.0.2-5.dsc",
+    "sha256": "19f755847b0d87c20dc789d31e5782824c239477847296bb7d32cd2421a57db7"
+  }
+}

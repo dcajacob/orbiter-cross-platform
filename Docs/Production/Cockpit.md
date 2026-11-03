@@ -166,8 +166,8 @@ downward VC angles, with scenario-loaded and explicitly reopened MFDs. Full
 frames, both MFD surfaces and their visible framebuffer regions have SSIM 1.0
 in all four Debug/Release automatic/SSE2 profiles; camera transforms are exact.
 The observed turned-view appearance matches the preserved graphics client, so
-this result requires no rendering change. Wayland/high-DPI input and physical
-controller qualification remain open.
+this result requires no rendering change. That checkpoint did not qualify
+Wayland/high-DPI input or physical controllers.
 [VC mouse, camera and profile evidence](DGVCMouseVerification.json)
 
 The additional [VC camera fixture](../../Tests/Production/CockpitCamera/README.md)
@@ -194,9 +194,39 @@ surfaces and on-screen MFD regions match the corresponding X11 captures exactly.
 The initial test probe's inherited preload prevented GTK's image helper from
 finding its engine dependency; an isolated test-library path resolves that
 failure. Production code and system packages are unchanged. This is camera
-rendering and lifecycle coverage; Wayland pointer/keyboard, high-DPI and
-controller qualification remain open.
+rendering and lifecycle coverage; pointer/keyboard, high-DPI and controller
+acceptance were separate from that checkpoint.
 [Wayland evidence](WaylandVerification.json)
+
+The subsequent private-compositor input fixture passes all sixteen Release
+automatic flows: both gliders' panels and VCs at scales 1 and 2 on llvmpipe and
+the laptop's Intel PTL Mesa driver. All 22,290 engine scene presentations and
+application/compositor shutdowns complete. A separately authenticated test seat
+sends events through actual Wayland protocols and GLFW. Frozen Windows RCS
+picks, original cockpit/external camera pixel scales, wheel/stepped FOV, paused
+input, Options ownership, focus release and held-button shutdown pass. The audit
+joins every finalized thrust record to its input tick: 18,510 released samples
+have zero RCS/exhaust, including 3,066 bare-W samples; 8,762 full-power and 1,459
+precision samples have exactly their requested power.
+
+The opt-in engineering scale fixture independently records a 640x360 logical
+window, 1280x720 framebuffer and content scale 2. It settles Wayland's asynchronous
+output-scale notification before constructing the original fixed-size cockpit;
+blank priming presents are recorded separately. Normal window policy is
+unchanged. A real 1x compositor rejects the requested 2x fixture explicitly.
+The same renderer also passes the existing X11 mouse/camera regression, and all
+twelve default-window camera cases twice: full-frame, direct-MFD and on-screen
+MFD SSIM remain 1.0 against the preserved Windows Release automatic captures,
+with zero camera/state errors. All 443 extraction source checks pass.
+
+This qualifies local Wayland protocol input and framebuffer conversion on the
+pinned private Weston 14 compositor. Physical devices, other desktop compositors,
+Wayland sanitizer coverage, named unchanged scenario acceptance and the
+1920x1080 medium performance gate remain separate requirements. Phase 6 remains
+in progress. The final matrices repeat all sixteen flows after review corrected
+the test module's destroy-listener cleanup.
+[Wayland input and scale evidence](WaylandInputVerification.json)
+[Reproduction and scope](../../Tests/Production/WaylandInput/README.md)
 
 The native graphics leak now has an isolated source fix and a passing local
 sanitizer menu flow. Mesa's executable-code allocator retained two bookkeeping
@@ -886,7 +916,8 @@ coordinate conversion, original ROT/LIN hit testing, momentary keyboard thrust,
 focus-loss release, MFD power off/on and Surface/Orbit mode selection through the
 original buttons, finalized zero jet/exhaust samples, presentation and shutdown.
 The local run passes with 145 finalized release samples. This is distinct from
-the deterministic replay test. Wayland/high-DPI mouse validation remains pending.
+the deterministic replay test. Later local Wayland/high-DPI protocol coverage is
+recorded in [Wayland input evidence](WaylandInputVerification.json).
 
 Both checks are added after the original instrument gate in every native CI
 profile. `current.py` also adds all five original Windows glass/DG/DG-S 2D/VC

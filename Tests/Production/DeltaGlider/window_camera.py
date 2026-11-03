@@ -14,11 +14,12 @@ NORMAL_CURSOR = 0x34001
 
 
 def verify(out, window, destination, key, button, send, x, display, focused, transfer,
-           rcs_point, cockpit, selection='all'):
+           rcs_point, cockpit, selection='all', transport=None):
     out = Path(out)
     (out/'camera-driver.py').write_bytes(Path(__file__).read_bytes())
-    x.XQueryPointer.argtypes = [C.c_void_p, C.c_ulong, C.POINTER(C.c_ulong), C.POINTER(C.c_ulong),
-                               *([C.POINTER(C.c_int)]*4), C.POINTER(C.c_uint)]
+    if transport is None:
+        x.XQueryPointer.argtypes = [C.c_void_p, C.c_ulong, C.POINTER(C.c_ulong), C.POINTER(C.c_ulong),
+                                   *([C.POINTER(C.c_int)]*4), C.POINTER(C.c_uint)]
     events, stages = [], []
     anchor = None
     codes = dict(space=57, Home=0xc7, F1=59, F6=64, Control_L=29, x=45, z=44)
@@ -41,6 +42,8 @@ def verify(out, window, destination, key, button, send, x, display, focused, tra
         deliver(name, False)
 
     def cursor():
+        if transport is not None:
+            return transport.cursor()
         root, child = C.c_ulong(), C.c_ulong()
         rx, ry, wx, wy, mask = C.c_int(), C.c_int(), C.c_int(), C.c_int(), C.c_uint()
         require(x.XQueryPointer(display, window, C.byref(root), C.byref(child), C.byref(rx), C.byref(ry),
@@ -49,7 +52,9 @@ def verify(out, window, destination, key, button, send, x, display, focused, tra
 
     def emit(number, down, point=None):
         before = len(rows(out/'control-inputs.csv'))
-        if point is not None:
+        if transport is not None:
+            transport.emit(number, down, point)
+        elif point is not None:
             button(window, *point, down, number)
         else:
             physical = cursor()
@@ -71,9 +76,12 @@ def verify(out, window, destination, key, button, send, x, display, focused, tra
         # GLFW recenters the server pointer and derives relative movement from
         # MotionNotify. XWayland ignores synthetic server warps while grabbed;
         # deliver that X11 event directly to this harness's owned window.
-        px, py = cursor()
-        send(window, 6, 0, 0, px+dx, py+dy)
-        x.XSync(display, False)
+        if transport is not None:
+            transport.motion(dx, dy)
+        else:
+            px, py = cursor()
+            send(window, 6, 0, 0, px+dx, py+dy)
+            x.XSync(display, False)
 
     def acquire(point):
         before = camera()
@@ -96,8 +104,11 @@ def verify(out, window, destination, key, button, send, x, display, focused, tra
         emit(number, False, point)
 
     def move(point):
-        x.XWarpPointer(display, 0, window, 0, 0, 0, 0, *point)
-        x.XSync(display, False)
+        if transport is not None:
+            transport.move(point)
+        else:
+            x.XWarpPointer(display, 0, window, 0, 0, 0, 0, *point)
+            x.XSync(display, False)
         advance()
 
     def options():
@@ -136,10 +147,11 @@ def verify(out, window, destination, key, button, send, x, display, focused, tra
         acquire(anchor)
         motion(100, 0)
         wait(lambda: abs(float(camera()['phi'])) > .1, 'Camera focus-loss setup did not rotate')
-        transfer(destination)
+        physical_releases = transfer(destination) or []
         wait(lambda: focused() == destination and camera().get('mouse_rotation') == '0',
              'Focus loss did not release camera pointer capture')
         events.append(('right_up', *anchor))  # GLFW's verified synthetic release.
+        events.extend(physical_releases)
         advance()
         stopped = camera()
         advance()
@@ -228,8 +240,19 @@ def verify(out, window, destination, key, button, send, x, display, focused, tra
         key(window, 'F6', False)
         advance()
         dialog = wait(options, 'F6 did not open the original Options dialog')
+        if transport is not None:
+            adjustment = transport.dialog_adjustment(dialog)
+            if adjustment:
+                origin, destination = adjustment
+                emit(1, True, origin)
+                move(destination)
+                advance()
+                emit(1, False, destination)
+                dialog = wait(options, 'Options disappeared during its real titlebar drag')
+        def gui_point(point):
+            return transport.gui_point(point) if transport is not None else point
         ox, oy = int(float(dialog['x'])), int(float(dialog['y']))
-        point = (ox+100, oy+11)
+        point = gui_point((ox+100, oy+11))
         move(point)
         wait(lambda: rows(out/'ui-state.csv')[-1]['capture_mouse'] == '1',
              'Options did not capture the real window pointer')
@@ -245,7 +268,7 @@ def verify(out, window, destination, key, button, send, x, display, focused, tra
                 after['mouse_rotation'] == '0' and len(rows(out/'camera-capture.csv')) == transitions,
                 'Camera consumed pointer input captured by the Options dialog')
         # Right-button movement does not move an ImGui titlebar.
-        close = (ox+int(float(dialog['width']))-12, oy+11)
+        close = gui_point((ox+int(float(dialog['width']))-12, oy+11))
         emit(1, True, close)
         emit(1, False, close)
         wait(lambda: not options(), 'Options close button did not dismiss the dialog')

@@ -34,6 +34,7 @@
 #include "Config.h"
 #include <algorithm>
 #include <cmath>
+#include <chrono>
 #include <map>
 #include <GLFW/glfw3.h>
 #include <filesystem>
@@ -145,6 +146,25 @@ std::vector<FlightKeyEvent> keyEvents;
 bool guiInitialized=false;
 orbiter::production::NativeJoystickState cockpitJoystick;
 int joystickDevice=-1;float initialThrottle=0,lastThrottle=0;bool armed=false,throttleSeen=false;
+int engineeringWindowScale=1;
+
+void recordWindowGeometry(GLFWwindow* window) {
+    const auto& evidence=GetNativeRenderContext().evidence;
+    if(evidence.empty())return;
+    int width=0,height=0,logicalWidth=0,logicalHeight=0;float scaleX=0,scaleY=0;
+    glfwGetFramebufferSize(window,&width,&height);glfwGetWindowSize(window,&logicalWidth,&logicalHeight);
+    glfwGetWindowContentScale(window,&scaleX,&scaleY);
+    const auto temporary=evidence/"native-window.json.tmp";
+    {
+        std::ofstream record(temporary);record.exceptions(std::ios::badbit|std::ios::failbit);
+        record<<"{\"backend\":\""<<(glfwGetPlatform()==GLFW_PLATFORM_X11?"x11":"wayland")
+            <<"\",\"logical_width\":"<<logicalWidth<<",\"logical_height\":"<<logicalHeight
+            <<",\"framebuffer_width\":"<<width<<",\"framebuffer_height\":"<<height
+            <<",\"content_scale_x\":"<<scaleX<<",\"content_scale_y\":"<<scaleY
+            <<",\"engineering_scale\":"<<engineeringWindowScale<<"}\n";
+    }
+    std::filesystem::rename(temporary,evidence/"native-window.json");
+}
 
 void error(int,const char* text) {std::cerr<<"GLFW: "<<text<<'\n';}
 }
@@ -153,11 +173,34 @@ void OGLClient::Open()
     glfwSetErrorCallback(error);require(glfwInit()==GLFW_TRUE,"GLFW initialization failed");
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR,3);glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR,3);
     glfwWindowHint(GLFW_OPENGL_PROFILE,GLFW_OPENGL_CORE_PROFILE);
-    glfwWindowHint(GLFW_SCALE_FRAMEBUFFER,GLFW_FALSE);
-    nativeWindow=glfwCreateWindow(1280,720,"Orbiter: native production engine / Sol / ShuttlePB",nullptr,nullptr);
+    // The opt-in engineering fixture retains the accepted 1280x720 physical
+    // viewport while exercising real 2x Wayland logical/framebuffer conversion.
+    // Normal sessions retain the established window policy.
+    const auto scaleMarker=GetNativeRenderContext().evidence/"window-scale.enabled";
+    engineeringWindowScale=1;
+    if(!GetNativeRenderContext().evidence.empty() && std::filesystem::is_regular_file(scaleMarker)) {
+        std::ifstream marker(scaleMarker);marker>>engineeringWindowScale;
+        require(marker && engineeringWindowScale==2,"Engineering window scale must be 2");
+    }
+    glfwWindowHint(GLFW_SCALE_FRAMEBUFFER,engineeringWindowScale==2?GLFW_TRUE:GLFW_FALSE);
+    nativeWindow=glfwCreateWindow(1280/engineeringWindowScale,720/engineeringWindowScale,"Orbiter: native production engine / Sol / ShuttlePB",nullptr,nullptr);
     require(nativeWindow!=nullptr,"Native OpenGL window creation failed");
     glfwMakeContextCurrent(nativeWindow);glfwSwapInterval(1);
     require(gladLoadGLLoader(reinterpret_cast<GLADloadproc>(glfwGetProcAddress))!=0,"Native OpenGL function loading failed");
+    if(engineeringWindowScale==2) {
+        // Wayland announces the entered output's scale after the first buffer
+        // commit. Settle it before constructing the original fixed-size Pane.
+        const auto deadline=std::chrono::steady_clock::now()+std::chrono::seconds(5);
+        int width=0,height=0;unsigned primingPresents=0;
+        for(;;) {
+            glfwGetFramebufferSize(nativeWindow,&width,&height);
+            if(width==1280 && height==720)break;
+            require(std::chrono::steady_clock::now()<deadline,"Engineering window did not enter a 2x output");
+            glClear(GL_COLOR_BUFFER_BIT);glfwSwapBuffers(nativeWindow);++primingPresents;glfwPollEvents();
+        }
+        std::ofstream priming(GetNativeRenderContext().evidence/"engineering-window-priming.json");
+        priming<<"{\"blank_presents_before_engine_scene\":"<<primingPresents<<"}\n";
+    }
     cockpitJoystick.Reset();
     scroll=0;dragging=false;keyEvents.clear();mouseEvents.clear();joystickDevice=-1;armed=false;throttleSeen=false;
     glfwSetKeyCallback(nativeWindow,[](GLFWwindow*,int key,int,int action,int) {
@@ -177,10 +220,9 @@ void OGLClient::Open()
     });
     int width,height;glfwGetFramebufferSize(nativeWindow,&width,&height);m_width=width;m_height=height;
     Evidence::Begin();
-    if(!GetNativeRenderContext().evidence.empty()) {
-        std::ofstream record(GetNativeRenderContext().evidence/"native-window.json");record.exceptions(std::ios::badbit|std::ios::failbit);
-        record<<"{\"backend\":\""<<(glfwGetPlatform()==GLFW_PLATFORM_X11?"x11":"wayland")<<"\"}\n";
-    }
+    recordWindowGeometry(nativeWindow);
+    glfwSetFramebufferSizeCallback(nativeWindow,[](GLFWwindow* window,int,int){recordWindowGeometry(window);});
+    glfwSetWindowContentScaleCallback(nativeWindow,[](GLFWwindow* window,float,float){recordWindowGeometry(window);});
     Renderer::GlobalInit(m_width,m_height);
     mTextureManager=std::make_unique<TextureManager>();mMeshManager=std::make_unique<OGLMeshManager>();
     mScene=std::make_unique<Scene>(m_width,m_height);

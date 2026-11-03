@@ -1,0 +1,661 @@
+{
+  "schema": 1,
+  "date": "2026-11-03",
+  "status": "passed",
+  "phase6_complete": false,
+  "scope": "Local Release automatic DG/DG-S panels and VCs through actual Wayland protocols at scales 1 and 2, on llvmpipe and the Intel PTL GPU; engineering input/lifecycle qualification, not physical device or desktop-compositor acceptance.",
+  "based_on_commit": "b3ae1cff65b21c0a2e87482dd47c04c59ee9611c",
+  "source_sha256": {
+    "OVP/OGLClient/Native/LinuxAdapter.cpp": "953297620d8d31ad46f2f2dfb7a15294105fd65d851528ef67ddea1791ea71dd",
+    "Tests/Production/DeltaGlider/window_camera.py": "f53268ff726793b5c93c8b30dfaed6972cbc47b166024abeb7447a40f73edeba",
+    "Tests/Production/WaylandInput/CompositorInput.c": "6dabd5ee128bfba9f328765fe04c2eb4f18d5dc84f75830839431f216da3de0d",
+    "Tests/Production/WaylandInput/FocusSink.c": "bb53c70baaf678838c4886d3d13f04aebce014e0fdca17f5453ba5e244118eaa",
+    "Tests/Production/WaylandInput/README.md": "35fd5b6bea37d712f6ea7b041bde504dfad66a4e0235eb5952ff168daf6c09cf",
+    "Tests/Production/WaylandInput/compositor.py": "03665b86fcc30d83766a59d41d13c650211de4770df7602a909ea2ac04bdc1c7",
+    "Tests/Production/WaylandInput/dependencies.lock.json": "84ac205ea23958a37fb547ee27061cb6bc661939cdd4726ca15a90b4cec0866d",
+    "Tests/Production/WaylandInput/prepare.py": "ccc37429432ee198b34babdce03c0dbd3215c502aafaa973d9d06849649b42ee",
+    "Tests/Production/WaylandInput/run.py": "fddb2d997dcb0a6c4e379920c9e31a25bae967855892d7e8d5f9c674336ea91d",
+    "Tests/Production/WaylandInput/verify.py": "6d0851e87b7c61fd45532efc1845d24e0e0facd39dd7731a23eca29498d80597"
+  },
+  "host": {
+    "os": "Linux-7.0.0-42-generic-x86_64-with-glibc2.43",
+    "gpu": "Intel PTL",
+    "software_renderer": "llvmpipe",
+    "mesa": "26.0.8-1ubuntu0.3",
+    "weston": "14.0.2-5"
+  },
+  "frozen_profile": {
+    "path": "Tests/Production/Flight/keymap-dg-laptop.cfg",
+    "sha256": "2893d9be8c42beeb121d795b21889b53922d982c38b19595961229872dc20139",
+    "accepted_phase5_unchanged": true
+  },
+  "tools": {
+    "path": "out/phase6-wayland-input-tools-final/test-tools.json",
+    "sha256": "c643ddf4cc1fc45830b7218be7a452776eac10772f93c2a83bf3a95df56e1893"
+  },
+  "dependency_lock": {
+    "path": "Tests/Production/WaylandInput/dependencies.lock.json",
+    "sha256": "84ac205ea23958a37fb547ee27061cb6bc661939cdd4726ca15a90b4cec0866d"
+  },
+  "matrix_audit": {
+    "path": "out/phase6-wayland-input-final-audit.json",
+    "sha256": "013b13ee776ee4d52ed6b5afc347dd7a5e1307bec49a3b0e29c372d8012ce4cf"
+  },
+  "processes": 16,
+  "successful_presents": 22290,
+  "renderer_module_sha256": "7534cfa6f65866fc3a547ff120c387a7a4cb07e235ab3d395eb724ef630c80fc",
+  "test_module_sha256": "bef4d45570360ad302b161fb6ceef6597a26b4fd613efe06661680374cf0a1ac",
+  "runs": [
+    {
+      "path": "out/phase6-wayland-input-final-qualified/controls_dg_panel-scale1-llvmpipe",
+      "status": "passed",
+      "case": "controls_dg_panel",
+      "scale": 1,
+      "renderer": "llvmpipe (LLVM 21.1.8, 256 bits)",
+      "geometry": {
+        "backend": "wayland",
+        "logical_width": 1280,
+        "logical_height": 720,
+        "framebuffer_width": 1280,
+        "framebuffer_height": 720,
+        "content_scale_x": 1,
+        "content_scale_y": 1,
+        "engineering_scale": 1
+      },
+      "counts": {
+        "released": 1134,
+        "bare": 192,
+        "full": 553,
+        "precision": 90
+      },
+      "lifecycle": {
+        "rendered_frames": 829,
+        "successful_presents": 829,
+        "context_deleted": true
+      },
+      "report_sha256": "0f6c0e2845b8e56e96961f585237440be28c1e08183f98eee824a9507ee44af5",
+      "compositor_returncode": 0
+    },
+    {
+      "path": "out/phase6-wayland-input-final-qualified/controls_dg_panel-scale2-llvmpipe",
+      "status": "passed",
+      "case": "controls_dg_panel",
+      "scale": 2,
+      "renderer": "llvmpipe (LLVM 21.1.8, 256 bits)",
+      "geometry": {
+        "backend": "wayland",
+        "logical_width": 640,
+        "logical_height": 360,
+        "framebuffer_width": 1280,
+        "framebuffer_height": 720,
+        "content_scale_x": 2,
+        "content_scale_y": 2,
+        "engineering_scale": 2
+      },
+      "counts": {
+        "released": 1323,
+        "bare": 187,
+        "full": 555,
+        "precision": 91
+      },
+      "lifecycle": {
+        "rendered_frames": 752,
+        "successful_presents": 752,
+        "context_deleted": true
+      },
+      "report_sha256": "86040482432d11467995e100f5aeaee773cd922ccf9a66c43806dcbd1e954a06",
+      "compositor_returncode": 0
+    },
+    {
+      "path": "out/phase6-wayland-input-final-qualified/controls_dg_vc-scale1-llvmpipe",
+      "status": "passed",
+      "case": "controls_dg_vc",
+      "scale": 1,
+      "renderer": "llvmpipe (LLVM 21.1.8, 256 bits)",
+      "geometry": {
+        "backend": "wayland",
+        "logical_width": 1280,
+        "logical_height": 720,
+        "framebuffer_width": 1280,
+        "framebuffer_height": 720,
+        "content_scale_x": 1,
+        "content_scale_y": 1,
+        "engineering_scale": 1
+      },
+      "counts": {
+        "released": 1150,
+        "bare": 194,
+        "full": 540,
+        "precision": 89
+      },
+      "lifecycle": {
+        "rendered_frames": 446,
+        "successful_presents": 446,
+        "context_deleted": true
+      },
+      "report_sha256": "acb51cb796e591af8e61f55024a0387bd697b30b0af470fdb4eccea309e82e7f",
+      "compositor_returncode": 0
+    },
+    {
+      "path": "out/phase6-wayland-input-final-qualified/controls_dg_vc-scale2-llvmpipe",
+      "status": "passed",
+      "case": "controls_dg_vc",
+      "scale": 2,
+      "renderer": "llvmpipe (LLVM 21.1.8, 256 bits)",
+      "geometry": {
+        "backend": "wayland",
+        "logical_width": 640,
+        "logical_height": 360,
+        "framebuffer_width": 1280,
+        "framebuffer_height": 720,
+        "content_scale_x": 2,
+        "content_scale_y": 2,
+        "engineering_scale": 2
+      },
+      "counts": {
+        "released": 1160,
+        "bare": 197,
+        "full": 517,
+        "precision": 94
+      },
+      "lifecycle": {
+        "rendered_frames": 369,
+        "successful_presents": 369,
+        "context_deleted": true
+      },
+      "report_sha256": "d15e36053499d34fc3cf724e6123a4e566023c132a92435bcf095f851b1af737",
+      "compositor_returncode": 0
+    },
+    {
+      "path": "out/phase6-wayland-input-final-qualified/controls_dgs_panel-scale1-llvmpipe",
+      "status": "passed",
+      "case": "controls_dgs_panel",
+      "scale": 1,
+      "renderer": "llvmpipe (LLVM 21.1.8, 256 bits)",
+      "geometry": {
+        "backend": "wayland",
+        "logical_width": 1280,
+        "logical_height": 720,
+        "framebuffer_width": 1280,
+        "framebuffer_height": 720,
+        "content_scale_x": 1,
+        "content_scale_y": 1,
+        "engineering_scale": 1
+      },
+      "counts": {
+        "released": 1123,
+        "bare": 194,
+        "full": 554,
+        "precision": 93
+      },
+      "lifecycle": {
+        "rendered_frames": 855,
+        "successful_presents": 855,
+        "context_deleted": true
+      },
+      "report_sha256": "c15802a0a16e0eba8981827467d60acac0a74520185084d8d5f8667b3ec201bf",
+      "compositor_returncode": 0
+    },
+    {
+      "path": "out/phase6-wayland-input-final-qualified/controls_dgs_panel-scale2-llvmpipe",
+      "status": "passed",
+      "case": "controls_dgs_panel",
+      "scale": 2,
+      "renderer": "llvmpipe (LLVM 21.1.8, 256 bits)",
+      "geometry": {
+        "backend": "wayland",
+        "logical_width": 640,
+        "logical_height": 360,
+        "framebuffer_width": 1280,
+        "framebuffer_height": 720,
+        "content_scale_x": 2,
+        "content_scale_y": 2,
+        "engineering_scale": 2
+      },
+      "counts": {
+        "released": 1138,
+        "bare": 190,
+        "full": 538,
+        "precision": 91
+      },
+      "lifecycle": {
+        "rendered_frames": 921,
+        "successful_presents": 921,
+        "context_deleted": true
+      },
+      "report_sha256": "b2c3ffe489193386124acf673d8bda44e78cde8278a442cefcaa3146bafbc0b6",
+      "compositor_returncode": 0
+    },
+    {
+      "path": "out/phase6-wayland-input-final-qualified/controls_dgs_vc-scale1-llvmpipe",
+      "status": "passed",
+      "case": "controls_dgs_vc",
+      "scale": 1,
+      "renderer": "llvmpipe (LLVM 21.1.8, 256 bits)",
+      "geometry": {
+        "backend": "wayland",
+        "logical_width": 1280,
+        "logical_height": 720,
+        "framebuffer_width": 1280,
+        "framebuffer_height": 720,
+        "content_scale_x": 1,
+        "content_scale_y": 1,
+        "engineering_scale": 1
+      },
+      "counts": {
+        "released": 1156,
+        "bare": 199,
+        "full": 520,
+        "precision": 95
+      },
+      "lifecycle": {
+        "rendered_frames": 354,
+        "successful_presents": 354,
+        "context_deleted": true
+      },
+      "report_sha256": "18a4f2791521d2acbce7b7ddea6d4025629f5d09a9a6fa19b7d01beddd112de8",
+      "compositor_returncode": 0
+    },
+    {
+      "path": "out/phase6-wayland-input-final-qualified/controls_dgs_vc-scale2-llvmpipe",
+      "status": "passed",
+      "case": "controls_dgs_vc",
+      "scale": 2,
+      "renderer": "llvmpipe (LLVM 21.1.8, 256 bits)",
+      "geometry": {
+        "backend": "wayland",
+        "logical_width": 640,
+        "logical_height": 360,
+        "framebuffer_width": 1280,
+        "framebuffer_height": 720,
+        "content_scale_x": 2,
+        "content_scale_y": 2,
+        "engineering_scale": 2
+      },
+      "counts": {
+        "released": 1319,
+        "bare": 190,
+        "full": 552,
+        "precision": 93
+      },
+      "lifecycle": {
+        "rendered_frames": 507,
+        "successful_presents": 507,
+        "context_deleted": true
+      },
+      "report_sha256": "76b0f8f0d212161a8559ba492458f9fb5c134b2b0961795e3cc3a6ec4224d217",
+      "compositor_returncode": 0
+    },
+    {
+      "path": "out/phase6-wayland-input-intel-final-qualified/controls_dg_panel-scale1-default",
+      "status": "passed",
+      "case": "controls_dg_panel",
+      "scale": 1,
+      "renderer": "Mesa Intel(R) Graphics (PTL)",
+      "geometry": {
+        "backend": "wayland",
+        "logical_width": 1280,
+        "logical_height": 720,
+        "framebuffer_width": 1280,
+        "framebuffer_height": 720,
+        "content_scale_x": 1,
+        "content_scale_y": 1,
+        "engineering_scale": 1
+      },
+      "counts": {
+        "released": 1129,
+        "bare": 193,
+        "full": 551,
+        "precision": 91
+      },
+      "lifecycle": {
+        "rendered_frames": 2350,
+        "successful_presents": 2350,
+        "context_deleted": true
+      },
+      "report_sha256": "55a0c01c8a0e6539403edd1112a68e511d19e4d9c3014f5a18a057862c2933e7",
+      "compositor_returncode": 0
+    },
+    {
+      "path": "out/phase6-wayland-input-intel-final-qualified/controls_dg_panel-scale2-default",
+      "status": "passed",
+      "case": "controls_dg_panel",
+      "scale": 2,
+      "renderer": "Mesa Intel(R) Graphics (PTL)",
+      "geometry": {
+        "backend": "wayland",
+        "logical_width": 640,
+        "logical_height": 360,
+        "framebuffer_width": 1280,
+        "framebuffer_height": 720,
+        "content_scale_x": 2,
+        "content_scale_y": 2,
+        "engineering_scale": 2
+      },
+      "counts": {
+        "released": 1126,
+        "bare": 193,
+        "full": 554,
+        "precision": 91
+      },
+      "lifecycle": {
+        "rendered_frames": 2178,
+        "successful_presents": 2178,
+        "context_deleted": true
+      },
+      "report_sha256": "fd014688f73b556309c8eac793aba1746d127ef36a4990773382638c245d3fe7",
+      "compositor_returncode": 0
+    },
+    {
+      "path": "out/phase6-wayland-input-intel-final-qualified/controls_dg_vc-scale1-default",
+      "status": "passed",
+      "case": "controls_dg_vc",
+      "scale": 1,
+      "renderer": "Mesa Intel(R) Graphics (PTL)",
+      "geometry": {
+        "backend": "wayland",
+        "logical_width": 1280,
+        "logical_height": 720,
+        "framebuffer_width": 1280,
+        "framebuffer_height": 720,
+        "content_scale_x": 1,
+        "content_scale_y": 1,
+        "engineering_scale": 1
+      },
+      "counts": {
+        "released": 1123,
+        "bare": 191,
+        "full": 558,
+        "precision": 90
+      },
+      "lifecycle": {
+        "rendered_frames": 2049,
+        "successful_presents": 2049,
+        "context_deleted": true
+      },
+      "report_sha256": "e010afc51f9cf558fbea74b8130cff0b2187f7f5d0c157977424b5ad3e089cf7",
+      "compositor_returncode": 0
+    },
+    {
+      "path": "out/phase6-wayland-input-intel-final-qualified/controls_dg_vc-scale2-default",
+      "status": "passed",
+      "case": "controls_dg_vc",
+      "scale": 2,
+      "renderer": "Mesa Intel(R) Graphics (PTL)",
+      "geometry": {
+        "backend": "wayland",
+        "logical_width": 640,
+        "logical_height": 360,
+        "framebuffer_width": 1280,
+        "framebuffer_height": 720,
+        "content_scale_x": 2,
+        "content_scale_y": 2,
+        "engineering_scale": 2
+      },
+      "counts": {
+        "released": 1129,
+        "bare": 188,
+        "full": 553,
+        "precision": 90
+      },
+      "lifecycle": {
+        "rendered_frames": 2189,
+        "successful_presents": 2189,
+        "context_deleted": true
+      },
+      "report_sha256": "84b25cd18bc57e55721f1880948f78bd7543d99eaf031b03a283dec065110587",
+      "compositor_returncode": 0
+    },
+    {
+      "path": "out/phase6-wayland-input-intel-final-qualified/controls_dgs_panel-scale1-default",
+      "status": "passed",
+      "case": "controls_dgs_panel",
+      "scale": 1,
+      "renderer": "Mesa Intel(R) Graphics (PTL)",
+      "geometry": {
+        "backend": "wayland",
+        "logical_width": 1280,
+        "logical_height": 720,
+        "framebuffer_width": 1280,
+        "framebuffer_height": 720,
+        "content_scale_x": 1,
+        "content_scale_y": 1,
+        "engineering_scale": 1
+      },
+      "counts": {
+        "released": 1129,
+        "bare": 190,
+        "full": 552,
+        "precision": 90
+      },
+      "lifecycle": {
+        "rendered_frames": 2130,
+        "successful_presents": 2130,
+        "context_deleted": true
+      },
+      "report_sha256": "56cbc6c036d3f86086c048d2094510d74de9ed4c14eab4def421efa51e6de83c",
+      "compositor_returncode": 0
+    },
+    {
+      "path": "out/phase6-wayland-input-intel-final-qualified/controls_dgs_panel-scale2-default",
+      "status": "passed",
+      "case": "controls_dgs_panel",
+      "scale": 2,
+      "renderer": "Mesa Intel(R) Graphics (PTL)",
+      "geometry": {
+        "backend": "wayland",
+        "logical_width": 640,
+        "logical_height": 360,
+        "framebuffer_width": 1280,
+        "framebuffer_height": 720,
+        "content_scale_x": 2,
+        "content_scale_y": 2,
+        "engineering_scale": 2
+      },
+      "counts": {
+        "released": 1125,
+        "bare": 189,
+        "full": 554,
+        "precision": 91
+      },
+      "lifecycle": {
+        "rendered_frames": 2177,
+        "successful_presents": 2177,
+        "context_deleted": true
+      },
+      "report_sha256": "be25aff5d256c462cdf345ce53ff4c93601e35c1b7a86b2aa7931cf55b4c9413",
+      "compositor_returncode": 0
+    },
+    {
+      "path": "out/phase6-wayland-input-intel-final-qualified/controls_dgs_vc-scale1-default",
+      "status": "passed",
+      "case": "controls_dgs_vc",
+      "scale": 1,
+      "renderer": "Mesa Intel(R) Graphics (PTL)",
+      "geometry": {
+        "backend": "wayland",
+        "logical_width": 1280,
+        "logical_height": 720,
+        "framebuffer_width": 1280,
+        "framebuffer_height": 720,
+        "content_scale_x": 1,
+        "content_scale_y": 1,
+        "engineering_scale": 1
+      },
+      "counts": {
+        "released": 1124,
+        "bare": 189,
+        "full": 556,
+        "precision": 90
+      },
+      "lifecycle": {
+        "rendered_frames": 2084,
+        "successful_presents": 2084,
+        "context_deleted": true
+      },
+      "report_sha256": "f13d69aa52b3e8e0edd39d5e439ada93c113ea681ce9be4dcd158a545f918319",
+      "compositor_returncode": 0
+    },
+    {
+      "path": "out/phase6-wayland-input-intel-final-qualified/controls_dgs_vc-scale2-default",
+      "status": "passed",
+      "case": "controls_dgs_vc",
+      "scale": 2,
+      "renderer": "Mesa Intel(R) Graphics (PTL)",
+      "geometry": {
+        "backend": "wayland",
+        "logical_width": 640,
+        "logical_height": 360,
+        "framebuffer_width": 1280,
+        "framebuffer_height": 720,
+        "content_scale_x": 2,
+        "content_scale_y": 2,
+        "engineering_scale": 2
+      },
+      "counts": {
+        "released": 1122,
+        "bare": 190,
+        "full": 555,
+        "precision": 90
+      },
+      "lifecycle": {
+        "rendered_frames": 2100,
+        "successful_presents": 2100,
+        "context_deleted": true
+      },
+      "report_sha256": "65b557854b7734c3d4e80f9baacd0f090e1c35e3f36d17472d7d45e36f0751b7",
+      "compositor_returncode": 0
+    }
+  ],
+  "loaded_runtime_libraries_sha256": {
+    "/usr/lib/x86_64-linux-gnu/libgallium-26.0.8-1ubuntu0.3.so": "64c5508bb7167947f932c950d5e2d2c314f631fc3919de82f757c3769758b79f",
+    "/usr/lib/x86_64-linux-gnu/libdrm_intel.so.1.131.0": "b4efda864f3ff03ec175787fc83c330981cf3a50704127debb782c325055054e",
+    "/usr/lib/x86_64-linux-gnu/libdrm_amdgpu.so.1.131.0": "edc5af5a40623befde7f1214950cb0046e04e9a39f925e6959e71f01d2d34d9c",
+    "/usr/lib/x86_64-linux-gnu/libdrm.so.2.131.0": "c8be7d3863453898666977c12b0b392014a1c728d84215d885d574882d6e7b89",
+    "/usr/lib/x86_64-linux-gnu/libEGL_mesa.so.0.0.0": "33928ce22aa227d807ee63b8dbe8d92c66cbbb2389c3825839f51945ad339b45",
+    "/usr/lib/x86_64-linux-gnu/libgbm.so.1.0.0": "fe7f42f2aada962b9838e6ed83711ed24c45d145d05231aa0b3c5dd9cf30771f",
+    "/usr/lib/x86_64-linux-gnu/libEGL.so.1.1.0": "6fa3af4903be9ce007f56f0a0cd2fff01d6500b5eecb59df13c93f17c2059341",
+    "/usr/lib/x86_64-linux-gnu/libGLdispatch.so.0.0.0": "8c3dbc80a9e435d15bb6394f609f90b823175a92e9ca41133294b5b8fcac50b2",
+    "/usr/lib/x86_64-linux-gnu/libdecor-0.so.0.200.5": "78665b57f55f602c782c01f4d7e92066a79b1418ba2ea338c3aafe7bcc348365",
+    "/usr/lib/x86_64-linux-gnu/libxkbcommon.so.0.13.1": "8b7d244ea1df8b1c073069344f8c705bab90d6b6bcafb96f1c2eccc2312f4946",
+    "/usr/lib/x86_64-linux-gnu/libwayland-client.so.0.24.0": "f27b9eecd96d76ae49ec9f7d4da17dcc43df3411ef3d432ce56d710c8b62930c",
+    "/usr/lib/x86_64-linux-gnu/libGLX.so.0.0.0": "0754505cc97c5c2251aebc10b5ab6ccbb9ad02d765bee07115bc9c09daf13002",
+    "/usr/lib/x86_64-linux-gnu/libdecor/plugins-1/libdecor-gtk.so": "1714f558d95368c972c8440301fceb4d40d82b750a09a1fcdc6d8ee230c8a562"
+  },
+  "assertions": [
+    "Frozen Windows RCS dial coordinates and exact application mouse event order",
+    "Actual keyboard state, neutral bare W, exact full/precision RCS and zero released RCS/exhaust in every finalized matched sample",
+    "Held-key and captured-pointer focus loss, physical release before focus regain, no resumed input",
+    "Original cockpit/external camera pixel scales, no capture-entry jump, camera priority over RCS picks",
+    "Original wheel and stepped FOV, held-key nonrepeat and paused camera behavior",
+    "Actual Options ownership and logical ImGui coordinate conversion",
+    "Independent 1x/2x compositor and GLFW logical/framebuffer/content-scale evidence",
+    "Held-button application shutdown and normal private-compositor shutdown"
+  ],
+  "scale_fixture": {
+    "logical": [
+      640,
+      360
+    ],
+    "framebuffer": [
+      1280,
+      720
+    ],
+    "content_scale": [
+      2,
+      2
+    ],
+    "marker": "window-scale.enabled",
+    "normal_window_policy_unchanged": true,
+    "blank_priming_presents": "Recorded separately before engine scene creation; required for asynchronous Wayland scale announcement"
+  },
+  "negative_scale_control": {
+    "path": "out/phase6-wayland-scale-negative/negative-control.json",
+    "sha256": "a3ce198546e4654087cda7af9d65c993c6b4bc19a033bab8125cb2a0471e49d1"
+  },
+  "default_window_regression": {
+    "camera_capture": {
+      "path": "out/phase6-wayland-input-image-regression/camera/camera-report.json",
+      "sha256": "8239e27b67a2a18ce8956e476738c7f613345940ce69d6c987bfcde168f8123b"
+    },
+    "comparison": {
+      "path": "out/phase6-wayland-input-image-regression/comparison.json",
+      "sha256": "c0b39805a7949abe35ed69b93331ede8e54fe9d7113074d7520f736a3cd67260"
+    },
+    "processes": 24,
+    "successful_presents": 1440,
+    "original_source": "f725194209634f7fd5d1d44d426cfa9b5e303e37",
+    "original_camera_capture": {
+      "path": "out/phase6-headlook-original/Release-automatic/camera-original/camera-report.json",
+      "sha256": "f99f503fda978c998a54a8d58d07758f265f3c9751c2c4534699cf5dc02a1ca4"
+    },
+    "cases": 12,
+    "full_frame_ssim_min": 1.0,
+    "direct_mfd_ssim_min": 1.0,
+    "screen_mfd_ssim_min": 1.0,
+    "camera_maxima": {
+      "position_m": 0.0,
+      "rotation_rad": 0.0,
+      "aperture_rad": 0.0
+    },
+    "x11_mouse": {
+      "path": "out/phase6-wayland-input-x11-regression/mouse-verification.json",
+      "sha256": "5d55024a3374034e794dd0e77e8455686a24b1d9fbfdd64f2567297d84c498a2"
+    }
+  },
+  "source_audit": {
+    "status": "passed",
+    "explicit_extraction_files": 443,
+    "log_sha256": "5034eb099d877a3749f72fe4d85d6bac71830dc862f900c4e3a624cd69e49b15"
+  },
+  "development_trials": [
+    {
+      "path": "out/phase6-wayland-compositor-probe",
+      "result": "rejected absolute backend name; corrected to named backend and explicit private module map"
+    },
+    {
+      "path": "out/phase6-wayland-compositor-probe-2",
+      "result": "sandbox socket bind rejected; isolated compositor requires sandbox escalation"
+    },
+    {
+      "path": "out/phase6-wayland-input-panel-probe-2",
+      "result": "identified libdecor shadow surface; selected actual xdg_toplevel instead"
+    },
+    {
+      "path": "out/phase6-wayland-input-panel-probe-3",
+      "result": "CSV output not finalized yet; synchronized finalized thrust to actual input ticks"
+    },
+    {
+      "path": "out/phase6-wayland-input-panel-probe-4",
+      "result": "declared the separate physical and GLFW synthetic focus-loss button releases"
+    },
+    {
+      "path": "out/phase6-wayland-input-panel-scale2-probe",
+      "result": "Unix socket path exceeded platform limit; moved private runtime to short 0700 temporary directory"
+    },
+    {
+      "path": "out/phase6-wayland-input-panel-scale2-probe-2",
+      "result": "initial framebuffer preceded asynchronous output scale; observe actual geometry transitions"
+    },
+    {
+      "path": "out/phase6-wayland-input-panel-scale2-probe-3",
+      "result": "original fixed-size Pane initialized before output scale; settle engineering scale before scene initialization"
+    },
+    {
+      "path": "out/phase6-wayland-input-panel-scale2-probe-4",
+      "result": "ImGui logical coordinates differed from cockpit pixels; test converts GUI coordinates and uses real dialog drag"
+    },
+    {
+      "path": "out/phase6-wayland-input-final-audit-precleanup.json",
+      "result": "all sixteen input flows passed; superseded after review corrected test-helper destroy-listener unlinking; sixteen fresh final runs required"
+    }
+  ],
+  "remaining": [
+    "Physical keyboard/mouse/controller acceptance and other desktop compositors",
+    "Wayland sanitizer qualification for this input fixture",
+    "1920x1080 medium exterior/cockpit median and p95 performance gate",
+    "Named unchanged stock-scenario acceptance and missing Phase 7 vessel classes",
+    "Current full hosted qualification and durable preservation of final evidence",
+    "Full Phase 6 acceptance audit"
+  ]
+}
