@@ -17,6 +17,7 @@ def scalars(source):
     for a,b in [('oapi::UInt32','DWORD'),('oapi::UInt16','WORD'),('oapi::UInt','UINT'),('std::uintptr_t','DWORD_PTR'),('std::uint8_t','BYTE')]:source=source.replace(a,b)
     return source
 def restore_header(source):
+    source=source.replace('public:\n\t// Session hosts activate the same recorder; sample buffers remain private.\n\tvoid FRecorder_Activate (bool active, const char *fname, bool append = false);\n\t// switch recorder on/off\nprivate:', '\tvoid FRecorder_Activate (bool active, const char *fname, bool append = false);\n\t// switch recorder on/off\n')
     source=source.replace('public:\n\tvoid FRecorder_EndPlayback ();\n\t// terminates a running playback\nprivate:', '\tvoid FRecorder_EndPlayback ();\n\t// terminates a running playback')
     source=source.replace('#ifndef _WIN32\n\tstatic void ReleaseNativeInterface(VESSEL* interface);\n#endif\n','')
     source=source.replace('#include "Production/VesselServices.h"\n','')

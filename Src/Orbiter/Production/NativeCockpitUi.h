@@ -10,6 +10,8 @@ ORBITER_PRODUCTION_API bool HandleCockpitMenuKey(const Keymap&,UInt32,char*);
 MenuInfoBar& CockpitMenuBar();
 DlgInfo* OpenCockpitInfoDialog();
 void CreateCockpitInfoBars();
+void OpenCockpitPlaybackEditor();
+ORBITER_PRODUCTION_API bool ToggleCockpitRecorder();
 void DestroyCockpitInfoBars();
 ORBITER_PRODUCTION_API void OpenCockpitFocusDialog();
 ORBITER_PRODUCTION_API void CreateCockpitGui();

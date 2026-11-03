@@ -4,6 +4,7 @@
 #include "NativeRenderApi.h"
 #include "NativeVesselAPI.h"
 #include <vector>
+#include <filesystem>
 typedef enum { FILE_IN, FILE_OUT, FILE_APP, FILE_IN_ZEROONFAIL } FileAccessMode;
 typedef enum { ROOT, CONFIG, SCENARIOS, TEXTURES, TEXTURES2, MESHES, MODULES } PathRoot;
 #define USRINPUT_NEEDANSWER 1
@@ -61,6 +62,12 @@ public:
     virtual bool Jump(double mjd, int mode) = 0;
     virtual void Quicksave() = 0;
     virtual void EndSession() = 0;
+    virtual int RecorderStatus() const = 0;
+    virtual bool ToggleRecorder(const char *name, bool overwrite = false) = 0;
+    virtual void EndPlayback() = 0;
+    virtual std::filesystem::path PlaybackFile(bool writing) = 0;
+    virtual void SuspendPlayback() = 0;
+    virtual void RescanPlayback() = 0;
     virtual void Pause(bool paused) = 0;
     virtual void SetScriptFOV(double aperture) = 0;
     virtual bool BufferedKey(oapi::UInt32 key, const oapi::UInt32 *modifiers, oapi::UInt32 count, bool runningOnly) = 0;

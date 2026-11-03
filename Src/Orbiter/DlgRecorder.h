@@ -8,7 +8,11 @@
 #ifndef __DLGRECORDER_H
 #define __DLGRECORDER_H
 
+#ifdef _WIN32
 #include "OrbiterAPI.h"
+#else
+#include "NativeVesselAPI.h"
+#endif
 
 class DlgRecorder : public ImGuiDialog {
 public:

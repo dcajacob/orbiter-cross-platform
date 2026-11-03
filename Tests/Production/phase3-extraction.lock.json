@@ -529,7 +529,7 @@
     },
     "Src/Orbiter/Pane.cpp": {
       "original_sha256_lf": "398997e418820aff0d72edd0d977e75182511d3f13a369e0f074182db3f1bdde",
-      "sha256_lf": "5a1ec5cea4aed077082dfd3d035d3767bf21421869ab4c54e2bb612046f6ad64",
+      "sha256_lf": "5134904387ab4dcc0db9889d6724ad10d71e4142234b79dbb0186b9a0cd82447",
       "scope": "Private cockpit graphics/configuration binding. Original algorithms and Windows pointer types conserved by cockpit_source.py; native instrumentation is not operational yet."
     },
     "Src/Orbiter/Pane.h": {
@@ -581,7 +581,7 @@
     },
     "Src/Orbiter/Production/CMakeLists.txt": {
       "original_sha256_lf": null,
-      "sha256_lf": "5a22829d03c43906050f036c06a9a0aead3cc6d78355586b8177077b2bf6c7e8",
+      "sha256_lf": "f8094bb157b14f0bdf6144591e6bc9d260ee94b496e42bcbe894e98d69dc3e1c",
       "scope": "Original ten stock MFD declarations use exact platform SDK aliases; shared original conic geometry is moved without calculation or screen-mapping changes. Full native instrument runtime remains incomplete."
     },
     "Src/Orbiter/Production/CameraServices.cpp": {
@@ -741,7 +741,7 @@
     },
     "Src/Orbiter/Production/NativeApplication.cpp": {
       "original_sha256_lf": null,
-      "sha256_lf": "6dced4e07fa8904cf724ea87365703bb13bece303541e970e7fff4004524665f"
+      "sha256_lf": "4133aa6b8412d84881ee4b353fcf3823deee67f0bf54f255ecfe9f71920f9d6f"
     },
     "Src/Orbiter/Production/NativeBuild.h.in": {
       "sha256_lf": "f5fb21f83bb6be0c54839fce670e8410f6911eda86da2eef26e4221c1ae25d97",
@@ -1040,7 +1040,7 @@
     },
     "Src/Orbiter/Production/WindowsVesselLifetime.cpp": {
       "original_sha256_lf": null,
-      "sha256_lf": "a154b1314163ce1aff3116d24beba674a699d0eba2b20b33b34b5c8999c5796c"
+      "sha256_lf": "97b3026b7fa98452dab9e7df01afa88ba8baa3d7abc93c4fd1d31c02fe0a3b76"
     },
     "Src/Orbiter/Production/WindowsVesselLifetime.h": {
       "original_sha256_lf": null,
@@ -1140,7 +1140,7 @@
       "original_sha256_lf": "6cbb47493fcfe78e0202479c5fa472f959442ccb316ee6d22b58efd6d5a84101"
     },
     "Src/Orbiter/State.h": {
-      "sha256_lf": "f29ee7a0a49dac2679acf208f68deb7816829b8e713500d2ce0d2224ab50c9d9",
+      "sha256_lf": "9146aa3db019f94afd0e05519706bebdb53ecb172ecc25b77eb13a0fd2a39ee4",
       "original_sha256_lf": "d0d07d314e7ff0ee68cdd7d96e9600c1ad0e77a13324ac4beab8785eb4989444"
     },
     "Src/Orbiter/StateApplication.cpp": {
@@ -1192,11 +1192,11 @@
       "scope": "Original scheduler, stock MFDs and modern map compile natively with explicit original epoch/time, authoritative world/UI bindings and indexed map resources. Exact Windows calculations and callback order conserved. Native GDI/legacy map/custom-mode entry points fail explicitly until supported; native cockpit owner and DG runtime remain unfinished."
     },
     "Src/Orbiter/Vessel.cpp": {
-      "sha256_lf": "84df79dacab8e26ed0c28d8c7dd1690492176d2e62476fc7c3d0a9b1de2f42c7",
+      "sha256_lf": "056a080cb6c370632e5bb89b6413c2c697d6d4015e7153a4c4ccc076ee99bbc8",
       "original_sha256_lf": "9e34db9a70552f94f3966dbb14d57b3833e5f8f69246d5454c71161e93664e13"
     },
     "Src/Orbiter/Vessel.h": {
-      "sha256_lf": "106741f362d614d7e101859c49828c2db9d28fa9afd3105ce866d82a4ba4ee96",
+      "sha256_lf": "b2efffd2bfcd2ee1d42c76c4ac15ebd4ba8477883dac0e063305cf2cf442b272",
       "original_sha256_lf": "1d9a42f97d282bbe03fc9b176cefb81d45d36dd990bae8944925502e483e10dd"
     },
     "Src/Orbiter/VesselApplication.cpp": {
@@ -1217,7 +1217,7 @@
     },
     "Src/Orbiter/VesselRecorder.cpp": {
       "original_sha256_lf": null,
-      "sha256_lf": "f17fbefbca954d7ac0eaee3a5483ae977d6f850d0a45bae74dc895aac0667109"
+      "sha256_lf": "1e6f9c87ac5be21ca6520075e2aac183f2f653151360126c4ce61f64482bb874"
     },
     "Src/Orbiter/VesselSdk.cpp": {
       "sha256_lf": "d3eee60623a7d7fe0c090042dcf18ec3e8175f8ede99e41d5edd16c104669afb",
@@ -1304,7 +1304,7 @@
     },
     "Src/Orbiter/Production/NativeCockpit.cmake": {
       "original_sha256_lf": null,
-      "sha256_lf": "80bf0ab4df43ad54d37e18432eb27aa56ab621c3f9d5856705452e4f4ca25fa1"
+      "sha256_lf": "056f58cc0b90b9f92bc57b2037e8de2848ce585ffed2ce80abf03e297c35c761"
     },
     "Src/Orbiter/Production/NativeCockpitGui.cpp": {
       "original_sha256_lf": null,
@@ -1336,7 +1336,7 @@
     },
     "Src/Orbiter/Production/NativeCockpitUi.h": {
       "original_sha256_lf": null,
-      "sha256_lf": "39eca197a5658ab5e2da496a256f6e9839d9fec34c6617742fbfb017e31e2498"
+      "sha256_lf": "9d6e1d32db89e0027b2461685bb2646251c617fc7189d0588d1e34afe0890e26"
     },
     "Src/Module/LuaScript/Native/CMakeLists.txt": {
       "original_sha256_lf": null,
@@ -1656,7 +1656,7 @@
     },
     "Src/Orbiter/Production/NativeInterpreterSdk.h": {
       "original_sha256_lf": null,
-      "sha256_lf": "49e74f00607a9bc603698de9c3c0fe83e0ca0eac43c7ac24126374a4ddd90b43"
+      "sha256_lf": "06e867a6c0d2079fb82b75ac73807977874aab70b648766123433008809b6034"
     },
     "Src/Orbiter/Production/ScreenAnnotationMethods.inc": {
       "original_sha256_lf": null,
@@ -1688,7 +1688,7 @@
     },
     "Src/Orbiter/MenuInfoBar.cpp": {
       "original_sha256_lf": "d0bb8b38f21893ecce434232ae8f05881c33831537c950c69400b92ddbd6ffe7",
-      "sha256_lf": "f225f3290ab74c355a9c3c1afd4af53bfbfa6c4a2b7138fccbc6a62e3a0e824b"
+      "sha256_lf": "0721a09e2c1a9f59f5d594682a8d764115e632d7f0a911ab2989751aeee91990"
     },
     "Src/Orbiter/Production/GuiMenuButton.inc": {
       "original_sha256_lf": null,
@@ -1700,7 +1700,7 @@
     },
     "Src/Orbiter/Production/SystemPlayback.h": {
       "original_sha256_lf": null,
-      "sha256_lf": "0593f19e1ec36fedfe95eac462d5289d469b3df1b6f7ec74e6edb8db51178a08"
+      "sha256_lf": "8b6bf6681f3ce42411710428b03c008d0147ebcb0152ad081721e25702a800c0"
     },
     "Src/Orbiter/Production/CameraModeOwner.h": {
       "original_sha256_lf": null,
@@ -1776,11 +1776,11 @@
     },
     "Src/Orbiter/DlgFunction.cpp": {
       "original_sha256_lf": "d12c2115addaff8b1a7174b063e3f152141f5860e1444570453357364e261d41",
-      "sha256_lf": "6be5ba334acbeb19b53fc0cc6ab3668b487f2fb522b902e13a020c9885aae704"
+      "sha256_lf": "fa298122a0b19370432f1ac510e543b31835c230ad59b0fa32b01616d0295bca"
     },
     "Src/Orbiter/DlgFunction.h": {
       "original_sha256_lf": "1cd42866c1ce197e6c46e945ae15e4b7d2c79c5227d8519e0b455e272e969dc4",
-      "sha256_lf": "55248a7f655d10e9986742c1c55fa489f70a54d8d6d972969b343d99ffcb259e"
+      "sha256_lf": "d4dce8effc2554a7db3eceb4e92bc2f00e2ebb54192469ac9cbbf294d30bd7e5"
     },
     "Src/Orbiter/Production/CustomCommands.h": {
       "original_sha256_lf": null,
@@ -1789,6 +1789,22 @@
     "Src/Orbiter/Production/NativeCockpitCommands.cpp": {
       "original_sha256_lf": null,
       "sha256_lf": "7f7fdc5bab4b059b39e19bd5f0861d1cfa83a388abd0a13dffe181e5800ad4fb"
+    },
+    "Src/Orbiter/DlgRecorder.cpp": {
+      "original_sha256_lf": "c451e3a1fc22a20f09a98476dff70a49b04beecb48cb3a27d4e1b8b884dbf1f3",
+      "sha256_lf": "55ce05f4967762509fbd69d8f8b99e3e0eb84c5b23f2d9e7eec9b9a58b16716a"
+    },
+    "Src/Orbiter/DlgRecorder.h": {
+      "original_sha256_lf": "bb23a1b562d087a5338c0341525197da35f09b72565561717e33d446177c99cd",
+      "sha256_lf": "155f4918e2bcbeaf5feff7f70b6d297dd316b31f09a5b0edc028051c639aefe1"
+    },
+    "Src/Orbiter/PlaybackEd.cpp": {
+      "original_sha256_lf": "b207a27d74d065da83691e4401352e6f954ea6da9b1480c7fe041c72b3a71c18",
+      "sha256_lf": "ac0829341dbfe1699d51a45d2a9efd9b30823518a462651e22e68e6c71f9dce3"
+    },
+    "Src/Orbiter/PlaybackEd.h": {
+      "original_sha256_lf": "0609c17a759d24a28f55abe66521813bb0e8e090bb4af71aa6d35e760cedbbcb",
+      "sha256_lf": "3ea3d1a88b7e87398909c3be78cd30aff2cb9b07866b3d5494a6fa024009cd72"
     }
   }
 }

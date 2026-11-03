@@ -5370,7 +5370,14 @@ void Vessel::ApplyAnimationToHullCache() {
     }
 
     for (auto& pair : tempTransMap) {
-        delete pair.second;
+        // The SDK transform base has no virtual destructor. These copies
+        // were allocated above as their concrete transform types.
+        switch (pair.second->Type()) {
+        case MGROUP_TRANSFORM::ROTATE: delete static_cast<MGROUP_ROTATE*>(pair.second); break;
+        case MGROUP_TRANSFORM::TRANSLATE: delete static_cast<MGROUP_TRANSLATE*>(pair.second); break;
+        case MGROUP_TRANSFORM::SCALE: delete static_cast<MGROUP_SCALE*>(pair.second); break;
+        case MGROUP_TRANSFORM::NULLTRANSFORM: delete pair.second; break;
+        }
     }
 }
 

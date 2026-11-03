@@ -65,6 +65,18 @@ def with_sparse_mesh_slots(source):
     copy=copy.replace('if (meshrec) {','if (meshrec) {\n\t\tmesh = new Mesh; GetRigidBodyServices().TraceAllocation(__FILE__,__LINE__);').replace('} else mesh = 0;','}')
     return source[:start]+copy+source[end:]
 
+def restore_hull_transform_cleanup(source):
+    cleanup="""// The SDK transform base has no virtual destructor. These copies
+        // were allocated above as their concrete transform types.
+        switch (pair.second->Type()) {
+        case MGROUP_TRANSFORM::ROTATE: delete static_cast<MGROUP_ROTATE*>(pair.second); break;
+        case MGROUP_TRANSFORM::TRANSLATE: delete static_cast<MGROUP_TRANSLATE*>(pair.second); break;
+        case MGROUP_TRANSFORM::SCALE: delete static_cast<MGROUP_SCALE*>(pair.second); break;
+        case MGROUP_TRANSFORM::NULLTRANSFORM: delete pair.second; break;
+        }"""
+    if source.count(cleanup)!=1:raise ValueError('Hull animation transform cleanup changed')
+    return source.replace(cleanup,'delete pair.second;',1)
+
 @functools.lru_cache(maxsize=1)
 def previous_files():
     from random_source import canonical as random_bindings
@@ -78,11 +90,13 @@ def previous_files():
             current=current.replace('\t\tdelete []A->comp;','\t\tdelete A->comp;',1)
             # Bulk exhaust cleanup must free owned constant fields like DelExhaust.
             current=current.replace('\t\tfor (i = 0; i < nexhaust; i++) {\n\t\t\tif (exhaust[i]->level && (exhaust[i]->flags & EXHAUST_CONSTANTLEVEL))\n\t\t\t\tdelete exhaust[i]->level;\n\t\t\tif (exhaust[i]->lpos && (exhaust[i]->flags & EXHAUST_CONSTANTPOS))\n\t\t\t\tdelete exhaust[i]->lpos;\n\t\t\tif (exhaust[i]->ldir && (exhaust[i]->flags & EXHAUST_CONSTANTDIR))\n\t\t\t\tdelete exhaust[i]->ldir;\n\t\t\tdelete exhaust[i];\n\t\t}', '\t\tfor (i = 0; i < nexhaust; i++)\n\t\t\tdelete exhaust[i];')
+        if name=='Vessel.cpp':current=restore_hull_transform_cleanup(current)
         expected=with_sparse_mesh_slots(old(path)) if name=='Vessel.cpp' else old(path)
         equal(expected,current,path);result[path]=old(path)
     path='Src/Orbiter/Vessel.h'
     s=raw(path).replace('#ifndef _WIN32\n\tstatic void ReleaseNativeInterface(VESSEL* interface);\n#endif\n','')
     s=s.replace('public:\n\tvoid FRecorder_EndPlayback ();\n\t// terminates a running playback\nprivate:', '\tvoid FRecorder_EndPlayback ();\n\t// terminates a running playback')
+    s=s.replace('public:\n\t// Session hosts activate the same recorder; sample buffers remain private.\n\tvoid FRecorder_Activate (bool active, const char *fname, bool append = false);\n\t// switch recorder on/off\nprivate:', '\tvoid FRecorder_Activate (bool active, const char *fname, bool append = false);\n\t// switch recorder on/off\n')
     equal(old(path),s,path);result[path]=old(path)
     # Retain every SDK wrapper. Platform-specific cockpit methods move intact;
     # the numerical and vessel-delegation methods remain one shared source.
@@ -198,7 +212,7 @@ def verify_recorder(result):
         ('if (!stream && !stream.eof()) break;', ''),("if (auto *cr = strchr(cbuf, '\\r')) *cr = 0;",''),
         ('ComparePrefix','_strnicmp'),('options.','Cfg()->CfgRecPlayPrm.'),
         ('GetVesselServices().PlaybackWarp(RecordingSpeed,WarpDelay);','SetWarpFactor (RecordingSpeed, true, WarpDelay);'),
-        ('s && !_strnicmp','!_strnicmp'),
+        ('Cfg()->CfgRecPlayPrm.bReplayCam && s && !_strnicmp','!_strnicmp'),
         ('if (sscanf (s+7, "%d", &i) == 1) camera.RecallPreset','sscanf (s+7, "%d", &i); g_camera->RecallPreset'),
         ('OwnedCameraMode cm(CameraMode::Create(s+4));','CameraMode *cm = CameraMode::Create(s+4);'),
         ('if (cm) camera.SetCMode(cm.get());','if(cm) g_camera->SetCMode(cm); delete cm;'),
@@ -223,6 +237,7 @@ def verify_recorder(result):
     original=s[a:b];actual=raw('Src/Orbiter/VesselRecorder.cpp');actual=actual[actual.index('const double max_step'):]
     helper_body=s[s.index('void Euler2Quaternion (double *a, Quaternion &q, int frm)\n{'):]
     original+='\n'+helper_body
+    actual=actual.replace('if (!append) {FRecorder_Clear(); FRecorder_Reset();}', 'if (!append) FRecorder_Reset();')
     actual=aliases(actual).replace('double Tofs =','static double Tofs =',1).replace('double MJDofs =','static double MJDofs =',1)
     for before,after in [('GetSurfaceServices().Configuration().','g_pOrbiter->Cfg()->'),('GetRigidBodyServices().Time().','td.'),
         ('GetRigidBodyServices().World()','g_psys'),('ComparePrefix','_strnicmp'),('CompareText','_stricmp'),

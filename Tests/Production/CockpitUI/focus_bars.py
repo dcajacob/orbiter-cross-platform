@@ -29,7 +29,7 @@ def scenario():
 MENU_ITEMS=('Ship','Camera','Speed','Pause','Function','Info','Options','Map','Record','Help','Save','Exit')
 TESTED_MENU={'Ship','Camera','Speed','Pause','Info','Map','Save','Exit'}
 CASES=[('hidden',1,0),('visible',0,0),('auto',2,0),('focus',0,0),
-       ('menu-hidden',1,0),('menu',1,0),('menu-auto',1,0),('options',1,0),('function',1,0)]
+       ('menu-hidden',1,0),('menu',1,0),('menu-auto',1,0),('options',1,0),('function',1,0),('recorder',1,0)]
 
 def menu_preferences(path):
     path.parent.mkdir(parents=True,exist_ok=True)
@@ -40,6 +40,11 @@ def menu_preferences(path):
 
 
 def inputs(name):
+    if name=='recorder':
+        actions=[(3,'recorder_dialog',0,0)]
+        for tick,x,y in [(8,90,117),(32,90,117),(40,377,71)]:
+            actions.extend([(tick,'move',x,y),(tick+1,'left_down',x,y),(tick+2,'left_up',x,y)])
+        return actions
     if name=='function':
         actions=[(3,'function_dialog',0,0)]
         for tick,x,y in [(8,140,98),(40,388,71)]:
@@ -98,8 +103,9 @@ def execute(args,name,mode,fps):
         (out/'instrument-evidence.enabled').touch()
         commands=['tick,phase,action,value','0,pre,mfd,0 1','0,pre,mfd,1 2','0,pre,hud,1']
         for t,event,x,y in actions:
-            if event=='function_dialog':
-                commands.extend([f'{t},pre,key,29',f'{t},pre,key,62',f'{t+1},pre,key,-62',f'{t+1},pre,key,-29'])
+            if event in ('function_dialog','recorder_dialog'):
+                code=62 if event=='function_dialog' else 63
+                commands.extend([f'{t},pre,key,29',f'{t},pre,key,{code}',f'{t+1},pre,key,{-code}',f'{t+1},pre,key,-29'])
             elif event in ('focus_dialog','options_dialog'):
                 code=61 if event=='focus_dialog' else 64
                 commands.extend([f'{t},pre,key,{code}',f'{t+1},pre,key,{-code}'])
@@ -130,6 +136,14 @@ def execute(args,name,mode,fps):
     if name=='function':
         require((out/'custom-function-events.txt').read_text().splitlines()==['registered','invoked','unregistered'],
                 'Public SDK custom function dispatch or teardown differs')
+    if name=='recorder':
+        directory=out/'Flights/test_record'
+        files={p.name.lower():p for p in directory.iterdir()}
+        for vessel in ('dg','dg2','iss'):
+            for extension in ('pos','att','atc'):
+                require(vessel+'.'+extension in files,'Missing original vessel recording stream')
+                lines=files[vessel+'.'+extension].read_text().splitlines()
+                require(sum(bool(line) and line[0].isdigit() for line in lines)>=2,'Recorder did not flush actual samples')
     return changes
 
 

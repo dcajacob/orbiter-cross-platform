@@ -1846,9 +1846,11 @@ private:
 	void FRecorder_Reset ();
 	// Initialise flight recorder
 
+public:
+	// Session hosts activate the same recorder; sample buffers remain private.
 	void FRecorder_Activate (bool active, const char *fname, bool append = false);
 	// switch recorder on/off
-
+private:
 	void FRecorder_Save (bool force = false);
 	// save current status to flight record streams
 

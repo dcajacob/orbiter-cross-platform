@@ -17,6 +17,8 @@ Vessel*& WindowsVesselLifetime::PreviousFocus() {return g_pfocusobj;}
 void WindowsVesselLifetime::SetView(Body* body,int mode) {app.SetView(body,mode);}
 void WindowsVesselLifetime::PaneFocusChanged(Vessel* vessel) {if(g_pane)g_pane->FocusChanged(vessel);}
 void WindowsVesselLifetime::ModuleFocusChanged(Vessel* now,Vessel* previous) {
+    if(app.RecorderStatus()==1 && app.Cfg()->CfgRecPlayPrm.bRecordFocus)
+        app.FRecorder_SaveEvent("FOCUS",now->Name());
     for(auto it=app.m_Plugin.begin();it!=app.m_Plugin.end();++it)it->pModule->clbkFocusChanged(now,previous);
 }
 void WindowsVesselLifetime::DialogFocusChanged(Vessel* vessel) {if(app.pDlgMgr)app.pDlgMgr->BroadcastMessage(MSG_FOCUSVESSEL,vessel);}

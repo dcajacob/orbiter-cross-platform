@@ -37,9 +37,9 @@ void PlaySystemEvents(std::istream& stream, double& nextEvent, const TimeData& c
 						GetVesselServices().PlaybackWarp(RecordingSpeed,WarpDelay);
 			} else if (!ComparePrefix (s, "CAMERA", 6)) {
 				s = strtok (NULL, " \t\n");
-				if (s && !ComparePrefix (s, "PRESET", 6)) {
+				if (options.bReplayCam && s && !ComparePrefix (s, "PRESET", 6)) {
 					if (sscanf (s+7, "%d", &i) == 1) camera.RecallPreset (i);
-				} else if (s && !ComparePrefix (s, "SET", 3)) {
+				} else if (options.bReplayCam && s && !ComparePrefix (s, "SET", 3)) {
 					OwnedCameraMode cm(CameraMode::Create(s+4));
 					if (cm) camera.SetCMode(cm.get());
 				}

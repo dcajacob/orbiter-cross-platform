@@ -16,9 +16,8 @@ extern Orbiter* g_pOrbiter;
 #include "imgui.h"
 #include "IconsFontAwesome6.h"
 
-namespace {
 #ifdef _WIN32
-std::vector<orbiter::production::CustomCommand> CommandsForDisplay() {
+std::vector<orbiter::production::CustomCommand> DlgFunction::CommandsForDisplay() {
     std::vector<orbiter::production::CustomCommand> commands;
     for(DWORD i=0;i<g_pOrbiter->ncustomcmd;++i) {
         const auto& entry=g_pOrbiter->customcmd[i];
@@ -26,11 +25,11 @@ std::vector<orbiter::production::CustomCommand> CommandsForDisplay() {
     }
     return commands;
 }
-bool CommandPresent(int id) {
+bool DlgFunction::CommandPresent(int id) {
     for(DWORD i=0;i<g_pOrbiter->ncustomcmd;++i)if(g_pOrbiter->customcmd[i].id==id)return true;
     return false;
 }
-void InvokeCommand(int id) {
+void DlgFunction::InvokeCommand(int id) {
     for(DWORD i=0;i<g_pOrbiter->ncustomcmd;++i)if(g_pOrbiter->customcmd[i].id==id) {
         const auto callback=g_pOrbiter->customcmd[i].func;
         void* context=g_pOrbiter->customcmd[i].context;
@@ -38,12 +37,11 @@ void InvokeCommand(int id) {
     }
 }
 #else
-auto& Commands() {return orbiter::production::GetNativeRenderContext().customCommands;}
-auto CommandsForDisplay() {return Commands().Snapshot();}
-bool CommandPresent(int id) {return Commands().Contains(id);}
-void InvokeCommand(int id) {Commands().Invoke(id);}
+static auto& Commands() {return orbiter::production::GetNativeRenderContext().customCommands;}
+std::vector<orbiter::production::CustomCommand> DlgFunction::CommandsForDisplay() {return Commands().Snapshot();}
+bool DlgFunction::CommandPresent(int id) {return Commands().Contains(id);}
+void DlgFunction::InvokeCommand(int id) {Commands().Invoke(id);}
 #endif
-}
 
 DlgFunction::DlgFunction() : ImGuiDialog(ICON_FA_PUZZLE_PIECE " Orbiter: Custom functions", {340, 290}) {
 	SetHelp("html/orbiter.chm", "/customcmd.htm");

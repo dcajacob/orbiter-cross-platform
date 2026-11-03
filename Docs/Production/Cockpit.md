@@ -25,7 +25,7 @@ orientation matrix at tick 38. The paired workflow now also captures Windows
 with SSE2 selected. [Hosted spacecraft comparisons](https://github.com/dcajacob/orbiter-cross-platform/actions/runs/41563089040)
 
 The native cockpit now draws the original dynamic menu and stock PNG icons.
-Ship, Camera, Speed, Pause, Function, Info, Options, Map, Save and Exit are connected. In a local
+Ship, Camera, Speed, Pause, Function, Info, Options, Map, Record, Save and Exit are connected. In a local
 X11 flight, mouse clicks paused and resumed the DG, changed the clock to 10×,
 switched focus to DG-S, and opened the original camera, object information,
 map and menu configuration dialogs. The saved scenario contains the selected
@@ -34,7 +34,7 @@ Dragging Ship past Camera persisted their new order. Exit closed the graphics
 context after all 162 frame presentations. The sanitizer run completed 125
 frame presentations, with two 56-byte allocations originating in Mesa
 libgallium 26.0.8 at offsets `0xef1ba0` and `0xef1b89`.
-Record and Help remain open.
+Help remains open.
 [Delta-glider flight evidence](DeltaGlider.md)
 
 The Windows Debug and Release client regressions and their final comparison
@@ -91,14 +91,65 @@ test covers deadzone endpoints, saturation, acquisition, noise, disconnect,
 reconnection and reassignment. Physical controller acceptance remains pending.
 [DirectInput calibration semantics](https://learn.microsoft.com/en-us/previous-versions/windows/desktop/ee417908(v=vs.85))
 
+The Record menu and Ctrl-F5 now open the original recorder/player. REC starts
+all live vessels' original position, attitude and articulation writers; Stop,
+Ctrl-C and normal exit flush their final samples. Files are placed under
+`Flights/<name>` beside the explicit `--save` destination, with a starting
+scenario under `Playback/<name>.scn`. Names are normalized consistently with
+native resource lookup. Existing recordings require the original overwrite
+confirmation. Recorder options use the live configuration and persist when
+the session closes. Time acceleration and focus events feed the original
+system-event playback loop. The shared Windows focus adapter now also records
+focus events when that existing option is enabled. The shared playback loop
+honors the recorded-camera checkbox.
+
+The original playback editor uses the real stream and camera. Commit writes a
+temporary event file, replaces the destination and rescans playback. Editing a
+flight from another directory creates a complete copy next to the user save,
+including its original starting scenario; the source recording is retained.
+Deleted events, the editor filename and factory-created camera modes now have
+matching destruction. Restarting the shared vessel recorder clears its prior
+sample storage before resetting it. The recorder sanitizer fixture also exposed
+an uninitialized MFD flag when both displays were off. Pane now initializes
+its MFD specifications, and legacy registration explicitly selects opaque off
+screens; allocator contents no longer decide whether a blank texture exists.
+The three-vessel recording also exercises an actual collision. Its hull-cache
+animation copies were destroyed through the nonvirtual SDK base; they now
+use their allocating transform type, preserving the SDK ABI and calculations.
+
+`CockpitUI/recording.py` starts recording with original GUI controls, changes
+thrust, focus and speed, stops with Ctrl-C, and loads the generated flight in a
+fresh process. It verifies all three vessels (DG, DG-S and ISS), recorded focus
+and speed, automatic playback completion, editor insertion/deletion/commit/
+discard, and final samples when exiting while recording. The actual X11 menu
+test also exercises both cancellation and confirmation of an overwrite.
+The complete eleven-command flow presented 704 frames in Debug and 633 in
+Release, then destroyed the graphics context. Both also restored Options and
+the real MFD texture dimensions in a subsequent launch.
+Local Debug and Release runs pass these recording and editor checks. A
+60-frame recorder schedule is also included in the preserved-Windows/native
+focus-bar suite: Ctrl-F5, REC, STOP and close, with frames at ticks 20 and 50.
+The sanitizer sequence completed all 260 requested frames across five fresh
+processes: recording, playback, editor, edited-flight reload and exit while
+recording. No address or undefined-behavior errors remained. Every process
+still returned LeakSanitizer's failure for the existing two 56-byte graphics
+allocations; the logs and nonzero exits are retained without suppressions.
+The physical sanitizer menu test also completed 562 presentations, two
+recording starts and callback teardown. Its only leak frames resolve through
+the captured live module map to `libgallium-26.0.8-1ubuntu0.3.so` offsets
+`0xef1ba0` and `0xef1b89`; its nonzero exit remains a failed leak gate.
+These are functional recording checks; paired Windows recording comparisons
+and the full Phase 6 numerical gates remain separate requirements.
+
 The Function menu and Ctrl-F4 now open the original custom-function dialog.
 Native modules register and unregister real callbacks through
 `oapiRegisterCustomCmd` and `oapiUnregisterCustomCmd`. The session owns each
 command's label and description. Drawing uses a stable snapshot and rechecks
 registration before dispatch, so callbacks can remove themselves or other
 entries. Unique widget IDs distinguish identical labels. Windows uses the same
-safe drawing path with its existing registry; unregistering a Windows command
-now also releases its allocated label. Original button and tooltip rendering
+safe drawing path with its existing registry; the registry adapters are static
+`DlgFunction` members so Windows retains its existing friend access. Unregistering
+a Windows command now also releases its allocated label. Original button and tooltip rendering
 is checked after these explicit lifetime adapters.
 
 An SDK-only test module registers two identically named functions. Actual X11

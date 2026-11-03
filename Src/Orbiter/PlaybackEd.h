@@ -4,7 +4,13 @@
 #ifndef __PLAYBACKED_H
 #define __PLAYBACKED_H
 
+#ifdef _WIN32
 #include "Orbiter.h"
+#else
+#include "NativeVesselAPI.h"
+#endif
+#include <list>
+#include <fstream>
 #include "imgui.h"
 
 class PlaybackEditor;

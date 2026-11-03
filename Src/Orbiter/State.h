@@ -29,6 +29,7 @@ public:
 	const char *Focus() const { return focus.c_str(); }
 	const char *ScnHelp() const { return (scnhelp.length() ? scnhelp.c_str() : 0); }
 	const char *PlaybackDir() const { return (playback.length() ? playback.c_str() : scenario.c_str()); }
+	void SetPlaybackDirectory(const std::string& directory) {playback=directory;}
 	void Update ();
 	void Update(double currentMjd, const char* focusName);
 

@@ -3,14 +3,39 @@
 
 #include "PlaybackEd.h"
 #include "Camera.h"
+#ifdef _WIN32
 #include "Log.h"
+#else
+#include "Production/NativeGraphics.h"
+#include "Production/CockpitGuiExports.h"
+#include "Production/NativeInterpreterSdk.h"
+#include "Production/Text.h"
+#include "TimeData.h"
+#define TRACENEW
+#endif
+#include "Production/CameraModeOwner.h"
+#include "Production/Text.h"
+#include <cstring>
+#include <filesystem>
 #include "imgui_extras.h"
 
 using namespace std;
 
+#ifdef _WIN32
 extern Orbiter *g_pOrbiter;
 extern Camera *g_camera;
 extern TimeData td;
+static double EditorTime() {return td.SimT0;}
+static Camera* EditorCamera() {return g_camera;}
+static void SuspendPlayback() {g_pOrbiter->FRecorder_SuspendPlayback();}
+static void RescanPlayback() {g_pOrbiter->FRecorder_RescanPlayback();}
+#else
+using namespace orbiter::production;
+static double EditorTime() {return GetNativeRenderContext().time->SimT0;}
+static Camera* EditorCamera() {return GetNativeRenderContext().camera;}
+static void SuspendPlayback() {GetNativeRenderContext().scriptApplication->SuspendPlayback();}
+static void RescanPlayback() {GetNativeRenderContext().scriptApplication->RescanPlayback();}
+#endif
 
 static bool CompareEvents (const PlaybackEvent *first, const PlaybackEvent *second)
 {
@@ -25,13 +50,14 @@ DlgPlaybackEditor::DlgPlaybackEditor() : ImGuiDialog("Playback Editor", {900,600
 }
 
 DlgPlaybackEditor::~DlgPlaybackEditor() {
+	free(m_sysfname);
 	ClearEvents();
 }
 
 void DlgPlaybackEditor::OnDraw() {
 	ImGuiWindowFlags window_flags = ImGuiWindowFlags_HorizontalScrollbar;
 
-	ImGui::Text("Playback Editor - Simulation time : %f", td.SimT0);
+	ImGui::Text("Playback Editor - Simulation time : %f", EditorTime());
 	ImGui::BeginChild("ChildL", ImVec2(ImGui::GetContentRegionAvail().x/2.0, 0), ImGuiChildFlags_ResizeX,  window_flags);
 
     const ImGuiTableFlags flags = ImGuiTableFlags_SizingStretchProp|ImGuiTableFlags_ScrollY | ImGuiTableFlags_RowBg | ImGuiTableFlags_BordersOuter | ImGuiTableFlags_BordersV | ImGuiTableFlags_Resizable | ImGuiTableFlags_Reorderable | ImGuiTableFlags_Hideable;
@@ -54,7 +80,7 @@ void DlgPlaybackEditor::OnDraw() {
 			ImGui::TableSetBgColor(ImGuiTableBgTarget_RowBg1, ImColor(1.0,0,0));
 			ImGui::TableSetBgColor(ImGuiTableBgTarget_CellBg, ImColor(1.0,0,0));
 			ImGui::TableSetColumnIndex(0);
-			ImGui::Text("%0.2f", td.SimT0);
+			ImGui::Text("%0.2f", EditorTime());
 			ImGui::TableSetColumnIndex(1);
 			ImGui::TextUnformatted("NOW");
 			ImGui::PopStyleColor();
@@ -63,7 +89,7 @@ void DlgPlaybackEditor::OnDraw() {
 			i++;
 			const bool item_is_selected = e == m_SelectedEvent;
 
-			if(e->T0() > td.SimT0 && !ts_drawn) {
+			if(e->T0() > EditorTime() && !ts_drawn) {
 				ts_drawn = true;
 				ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0,1.0,1.0,1.0));
 				ImGui::TableNextRow();
@@ -71,7 +97,7 @@ void DlgPlaybackEditor::OnDraw() {
 				ImGui::TableSetBgColor(ImGuiTableBgTarget_RowBg1, ImColor(1.0,0,0));
 				ImGui::TableSetBgColor(ImGuiTableBgTarget_CellBg, ImColor(1.0,0,0));
 				ImGui::TableSetColumnIndex(0);
-				ImGui::Text("%0.2f", td.SimT0);
+				ImGui::Text("%0.2f", EditorTime());
 				ImGui::TableSetColumnIndex(1);
 				ImGui::TextUnformatted("NOW");
 				ImGui::PopStyleColor();
@@ -100,34 +126,34 @@ void DlgPlaybackEditor::OnDraw() {
 
 	ImGui::SeparatorText("Insert event");
 	if(ImGui::Button("NOTE")) {
-		InsertEvent(new NoteEvent (td.SimT0, "New note"));
+		InsertEvent(new NoteEvent (EditorTime(), "New note"));
 	}
 	ImGui::SameLine();
 	if(ImGui::Button("NOTEOFF")) {
-		InsertEvent(new NoteoffEvent (td.SimT0));
+		InsertEvent(new NoteoffEvent (EditorTime()));
 	}
 	ImGui::SameLine();
 	if(ImGui::Button("NOTEPOS")) {
-		InsertEvent(new NoteposEvent (td.SimT0, 0.1,0.1,0.9,0.9));
+		InsertEvent(new NoteposEvent (EditorTime(), 0.1,0.1,0.9,0.9));
 	}
 	ImGui::SameLine();
 	if(ImGui::Button("NOTECOL")) {
-		InsertEvent(new NotecolEvent (td.SimT0, 1.0, 1.0, 1.0));
+		InsertEvent(new NotecolEvent (EditorTime(), 1.0, 1.0, 1.0));
 	}
 	ImGui::SameLine();
 	if(ImGui::Button("NOTESIZE")) {
-		InsertEvent(new NotesizeEvent (td.SimT0, 1.0));
+		InsertEvent(new NotesizeEvent (EditorTime(), 1.0));
 	}
 	if(ImGui::Button("TACC")) {
-		InsertEvent(new TaccEvent (td.SimT0, 1.0, 0.0));
+		InsertEvent(new TaccEvent (EditorTime(), 1.0, 0.0));
 	}
 	ImGui::SameLine();
 	if(ImGui::Button("CAMERA")) {
-		InsertEvent(new CameraEvent (td.SimT0));
+		InsertEvent(new CameraEvent (EditorTime()));
 	}
 	ImGui::SameLine();
 	if(ImGui::Button("<Other>")) {
-		InsertEvent(new GenericEvent (td.SimT0, "<TAG>", ""));
+		InsertEvent(new GenericEvent (EditorTime(), "<TAG>", ""));
 	}
 	if(ImGui::Button("Delete")) {
 		DeleteSelectedEvent();
@@ -171,6 +197,7 @@ void DlgPlaybackEditor::DeleteSelectedEvent() {
 	PlaybackEvent *prev = nullptr;
 	for(auto it = m_Events.begin(); it!=m_Events.end();++it) {
 		if(*it==m_SelectedEvent) {
+			delete *it;
 			m_Events.erase(it);
 			if(prev) {
 				m_SelectedEvent = prev;
@@ -187,10 +214,15 @@ void DlgPlaybackEditor::DeleteSelectedEvent() {
 
 void DlgPlaybackEditor::Load(const char *ScnName) {
 	char fname[1024];
+#ifdef _WIN32
 	int i;
 	for (i = strlen(ScnName)-1; i > 0; i--)
 		if (ScnName[i-1] == '/' || ScnName[i-1] == '\\') break;
 	sprintf (fname, "Flights/%s/system.dat", ScnName+i);
+#else
+    const auto path=GetNativeRenderContext().scriptApplication->PlaybackFile(false).string();
+    std::snprintf(fname,sizeof(fname),"%s",path.c_str());
+#endif
 
 	if(m_sysfname) free(m_sysfname);
 	m_sysfname = strdup(fname);
@@ -212,13 +244,35 @@ void DlgPlaybackEditor::ScanEventFile ()
 
 void DlgPlaybackEditor::SaveEventFile ()
 {
-	g_pOrbiter->FRecorder_SuspendPlayback();
-	ofstream ofs (m_sysfname);
-	for (auto &e: m_Events) {
-		e->Write (ofs);
-	}
-	ofs.close();
-	g_pOrbiter->FRecorder_RescanPlayback();
+    try {
+#ifdef _WIN32
+        const std::filesystem::path destination=m_sysfname;
+#else
+        const auto destination=GetNativeRenderContext().scriptApplication->PlaybackFile(true);
+#endif
+        auto temporary=destination;temporary+=".tmp";
+        try {
+            ofstream ofs(temporary);
+            ofs.exceptions(ios::badbit|ios::failbit);
+            for(auto &e:m_Events)e->Write(ofs);
+            ofs.close();
+            SuspendPlayback();
+#ifdef _WIN32
+            // Windows rename cannot replace an existing destination.
+            if(!MoveFileExW(temporary.c_str(),destination.c_str(),MOVEFILE_REPLACE_EXISTING))
+                throw std::runtime_error("Cannot replace playback event file");
+#else
+            std::filesystem::rename(temporary,destination);
+#endif
+            free(m_sysfname);m_sysfname=strdup(destination.string().c_str());
+            RescanPlayback();
+        } catch(...) {
+            std::error_code ignored;std::filesystem::remove(temporary,ignored);
+            RescanPlayback();throw;
+        }
+    } catch(const std::exception& error) {
+        oapiAddNotification(OAPINOTIF_ERROR,"Playback events were not saved",error.what());
+    }
 }
 
 void DlgPlaybackEditor::ClearEvents() {
@@ -239,7 +293,7 @@ PlaybackEvent *PlaybackEvent::Create (char *event)
 	if (!s || sscanf (s, "%lf", &t) != 1) return NULL;
 	s = strtok (NULL, " \t\n");
 	if (!s) return NULL;
-	if (!_stricmp (s, "TACC")) {
+	if (!orbiter::production::CompareText (s, "TACC")) {
 		double acc, delay;
 		s = strtok (NULL, " \t\n");
 		if (!s || sscanf (s, "%lf", &acc) != 1) return NULL;
@@ -247,32 +301,32 @@ PlaybackEvent *PlaybackEvent::Create (char *event)
 		if (!s || sscanf (s, "%lf", &delay) != 1)
 			delay = 0.0;
 		TRACENEW; return new TaccEvent (t, acc, delay);
-	} else if (!_stricmp (s, "CAMERA")) {
+	} else if (!orbiter::production::CompareText (s, "CAMERA")) {
 		int32_t pr;
 		s = strtok (NULL, " \t\n");
 		if (!s) return NULL;
-		if (!_stricmp (s, "PRESET")) {
+		if (!orbiter::production::CompareText (s, "PRESET")) {
 			s = strtok (NULL, " \t\n");
 			if (!s || sscanf (s, "%d", &pr) != 1) return NULL;
 			TRACENEW; return new CameraEvent (t, pr);
 		} else if (!strcmp (s, "SET")) {
 			TRACENEW; return new CameraEvent (t, s+4);
 		}
-	} else if (!_stricmp (s, "NOTE")) {
+	} else if (!orbiter::production::CompareText (s, "NOTE")) {
 		TRACENEW; return new NoteEvent (t, strtok (NULL, "\n"));
-	} else if (!_stricmp (s, "NOTEOFF")) {
+	} else if (!orbiter::production::CompareText (s, "NOTEOFF")) {
 		TRACENEW; return new NoteoffEvent (t);
-	} else if (!_stricmp (s, "NOTEPOS")) {
+	} else if (!orbiter::production::CompareText (s, "NOTEPOS")) {
 		double x0, y0, x1, y1;
 		int res = sscanf (s+8, "%lf %lf %lf %lf", &x0, &y0, &x1, &y1);
 		if (res != 4) return NULL;
 		else { TRACENEW; return new NoteposEvent (t, x0, y0, x1, y1); }
-	} else if (!_stricmp (s, "NOTECOL")) {
+	} else if (!orbiter::production::CompareText (s, "NOTECOL")) {
 		double r, g, b;
 		int res = sscanf (s+8, "%lf %lf %lf", &r, &g, &b);
 		if (res != 3) return NULL;
 		else { TRACENEW; return new NotecolEvent (t, r, g, b); }
-	} else if (!_stricmp (s, "NOTESIZE")) {
+	} else if (!orbiter::production::CompareText (s, "NOTESIZE")) {
 		double scale;
 		int res = sscanf (s+9, "%lf", &scale);
 		if (!res) return NULL;
@@ -439,7 +493,7 @@ CameraEvent::CameraEvent (double _t0, int _preset): PlaybackEvent (_t0)
 		SetPreset (_preset);
 	} else {
 		char cbuf[256];
-		CameraMode *cm = g_camera->GetCMode();
+		orbiter::production::OwnedCameraMode cm(EditorCamera()->GetCMode());
 		cm->Store (cbuf);
 		SetInlineMode (cbuf);
 	}
@@ -494,12 +548,12 @@ void CameraEvent::DrawEdit() {
 	ImGui::TextUnformatted(m_tmp_modestr);
 
 	char descr[256];
-	int np = g_camera->nPreset();
+	int np = EditorCamera()->nPreset();
 	if(np) {
 		ImGui::Separator();
 		ImGui::TextUnformatted("Presets:");
 		for(int i=0;i<np;i++) {
-			CameraMode *cm = g_camera->GetPreset (i);
+			CameraMode *cm = EditorCamera()->GetPreset (i);
 			cm->GetDescr (descr, 256);
 			char cbuf[280];
 			sprintf(cbuf, "%d (%s)", i, descr);
@@ -510,7 +564,7 @@ void CameraEvent::DrawEdit() {
 	}
 	ImGui::Separator();
 	ImGui::Text("Current view: ");
-	CameraMode *cm = g_camera->GetCMode();
+	orbiter::production::OwnedCameraMode cm(EditorCamera()->GetCMode());
 	char cbuf[256];
 	cm->Store (cbuf);
 	ImGui::SameLine();
@@ -528,7 +582,7 @@ void CameraEvent::ApplyChanges() {
 
 NoteEvent::NoteEvent (double _t0, const char *_note): PlaybackEvent (_t0)
 {
-	note = strdup(_note);
+	note = strdup(_note ? _note : "");
 	strncpy(m_tmp_note, note, sizeof(m_tmp_note));
 }
 

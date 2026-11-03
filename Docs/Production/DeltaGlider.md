@@ -51,7 +51,7 @@ from 0.99725 to 0.999999.
 The local frozen instrument and RCS-switch comparisons passed for both gliders
 in both cockpit modes. An F3 dialog run switched from DG to DG-S and back
 through the original Select and Previous controls. The stock time and target
-bars render in visible and auto-hide modes. The native menu supports ten stock commands. Full menu and platform
+bars render in visible and auto-hide modes. The native menu supports eleven stock commands, including Record and its original playback editor. Full menu and platform
 qualification remain open.
 Of the 122 stock scenarios containing a DG or DG-S, 38 use only vessel classes
 this client can load. All 38 presented 60 frames and shut down. Thirty-seven

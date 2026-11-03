@@ -201,6 +201,11 @@ jobs:
           xvfb-run -a -s '-screen 0 1920x1080x24' env LIBGL_ALWAYS_SOFTWARE=1 GALLIUM_DRIVER=llvmpipe
           python3 -B Tests/Production/CockpitUI/mouse_smoke.py --stock-menu --function-probe --executable out/native-cockpit-engine/orbiter-production
           --assets out/scene-resources --data out/data --modules out/native-cockpit-engine/NativeModules --planets out/planets --output out/native-stock-menu
+      - name: Record and replay stock vessels and commit playback editor changes
+        run: >-
+          xvfb-run -a -s '-screen 0 1920x1080x24' env LIBGL_ALWAYS_SOFTWARE=1 GALLIUM_DRIVER=llvmpipe
+          python3 -B Tests/Production/CockpitUI/recording.py --executable out/native-cockpit-engine/orbiter-production
+          --assets out/scene-resources --data out/data --modules out/native-cockpit-engine/NativeModules --planets out/planets --output out/native-recording
       - name: Verify original selection and input dialogs against frozen Windows
         shell: bash
         run: |
@@ -273,6 +278,16 @@ jobs:
             out/native-recorded-flights/*/playback-state.csv
             out/native-recorded-flights/*/instrument-*.rgba
             out/native-recorded-flights/*/console.txt
+            out/native-recording/verification.json
+            out/native-recording/initial.scn
+            out/native-recording/*/invocation.json
+            out/native-recording/*/Orbiter.cfg
+            out/native-recording/*/replay.csv
+            out/native-recording/*/console.log
+            out/native-recording/*/playback-state.csv
+            out/native-recording/*/graphics-lifecycle.json
+            out/native-recording/*/Playback/*.scn
+            out/native-recording/*/Flights/*/*
             out/native-stock-menu/menu-verification.json
             out/native-stock-menu/custom-function-events.txt
             out/native-stock-menu/menu-windows.csv
@@ -289,6 +304,8 @@ jobs:
             out/native-focus-bars/focus-bars-report.json
             out/native-focus-bars/options/Orbiter.cfg
             out/native-focus-bars/function/custom-function-events.txt
+            out/native-focus-bars/recorder/Flights/**/*
+            out/native-focus-bars/recorder/Playback/*.scn
             out/native-focus-bars/*/numerics.json
             out/native-focus-bars/*/cockpit-state.csv
             out/native-focus-bars/*/instrument-*.rgba
@@ -384,6 +401,8 @@ jobs:
             out/focus-bars-original/*/ui-inputs.csv
             out/focus-bars-original/options/Orbiter.cfg
             out/focus-bars-original/function/custom-function-events.txt
+            out/focus-bars-original/recorder/Flights/test_record/*
+            out/focus-bars-original/recorder/Scenarios/Playback/*.scn
             out/focus-original/control-reference-runtime.json
 
   compare_spacecraft:

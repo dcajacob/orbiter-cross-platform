@@ -57,6 +57,37 @@ def verify_menu(out,click,advance,button,key,move,window,title,process):
     key(window,'Control_L',True);tap('F4');key(window,'Control_L',False);advance()
     functions=dialog('Custom functions')
     click(int(float(functions['x']))+int(float(functions['width']))-12,int(float(functions['y']))+11)
+    command('Record')
+    recorder=dialog('Flight recorder/player')
+    rx,ry=int(float(recorder['x'])),int(float(recorder['y']))
+    click(rx+30,ry+57)
+    recorded=out/'Playback/test_record.scn'
+    wait(recorded.is_file,'Record menu did not save a playback scenario')
+    for _ in range(12):advance()
+    click(rx+30,ry+57)
+    streams=out/'Flights/test_record'
+    require(all((streams/(name+'.pos')).is_file() for name in ('dg','dg2','iss')),'Record menu did not write each vessel stream')
+    before_record={p.name:p.read_bytes() for p in streams.iterdir() if p.is_file()}
+    click(rx+30,ry+57)
+    warning=dialog('Warning')
+    wx,wy=int(float(warning['x'])),int(float(warning['y']))
+    click(wx+110,wy+57)
+    advance()
+    require({p.name:p.read_bytes() for p in streams.iterdir() if p.is_file()}==before_record,
+            'Cancel overwrote an existing recording')
+    initial_scenario=recorded.read_bytes()
+    click(rx+30,ry+57)
+    warning=dialog('Warning')
+    click(int(float(warning['x']))+42,int(float(warning['y']))+57)
+    wait(lambda:recorded.read_bytes()!=initial_scenario,'Confirmed overwrite did not start a new flight recording')
+    for _ in range(12):advance()
+    click(rx+30,ry+57)
+    require((streams/'dg.pos').read_bytes()!=before_record['dg.pos'],'Restart retained the old position stream')
+    click(rx+int(float(recorder['width']))-12,ry+11)
+    move(1270,300)
+    key(window,'Control_L',True);tap('F5');key(window,'Control_L',False);advance()
+    recorder=dialog('Flight recorder/player')
+    click(int(float(recorder['x']))+int(float(recorder['width']))-12,int(float(recorder['y']))+11)
     command('Camera')
     dialog('Orbiter: Camera')
     command('Options')
@@ -142,7 +173,7 @@ def verify_menu(out,click,advance,button,key,move,window,title,process):
     if events.exists():
         require(events.read_text().splitlines()==['registered:duplicate-labels','first:context:self-unregister:reallocate:replace',
                 'second:context:remove-other:self-unregister','unregistered:teardown'],'Custom function callback/lifetime trace differs')
-    report=dict(custom_functions=events.exists(),options=dict(refresh=.35,panel_scale=1.1,limited_fuel=False,mfd_width_before=before_width,mfd_width_after=resized_width,
+    report=dict(recording=True,recording_overwrite_cancelled=True,recording_overwrite_confirmed=True,custom_functions=events.exists(),options=dict(refresh=.35,panel_scale=1.1,limited_fuel=False,mfd_width_before=before_width,mfd_width_after=resized_width,
                              pages_visited=10,keyboard_shortcuts=True,persisted=True,reloaded=True),commands=before_names,persisted_order=names,focus='DG2',warp=10,quicksave=save.name,configuration_dialog=True,lifecycle=life)
     (out/'menu-verification.json').write_text(json.dumps(report,indent=2)+'\n')
     print(json.dumps(report,indent=2))

@@ -82,7 +82,7 @@ void Vessel::FRecorder_Activate (bool active, const char *fname, bool append)
 {
 	if (bFRrecord == active) return; // nothing to do
 	if (active) {
-		if (!append) FRecorder_Reset();
+		if (!append) {FRecorder_Clear(); FRecorder_Reset();}
 		bFRrecord = true;
 		char cbuf[256];
 		sprintf (cbuf, "Flights/%s/%s.pos", fname, name.c_str());

@@ -73,6 +73,9 @@ class Driver final : public oapi::Module {
             require(observeFocus && oapiSimulateBufferedKey(OAPI_KEY_F3), "Original F3 dispatch failed");
         } else if (action.event == "options_dialog") {
             require(observeFocus && oapiSimulateBufferedKey(OAPI_KEY_F6), "Original F6 dispatch failed");
+        } else if (action.event == "recorder_dialog") {
+            DWORD control=OAPI_KEY_LCONTROL;
+            require(observeFocus && oapiSimulateBufferedKey(OAPI_KEY_F5,&control,1), "Original Ctrl-F5 dispatch failed");
         } else if (action.event == "function_dialog") {
             DWORD control=OAPI_KEY_LCONTROL;
             require(observeFocus && oapiSimulateBufferedKey(OAPI_KEY_F4,&control,1), "Original Ctrl-F4 dispatch failed");

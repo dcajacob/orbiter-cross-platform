@@ -71,6 +71,36 @@ def verify_focus_bars():
     dialog_manager=original('DlgMgr.cpp')
     equal(dialog_manager[dialog_manager.index('DLLEXPORT bool BeginAnimatedCombo'):dialog_manager.rindex('\n}')],
           widgets,'Original combo and collapsing-header drawing, animation and input')
+    before=original('DlgRecorder.cpp');after=windows(current('DlgRecorder.cpp'))
+    for adapter,expr in [
+            ('RecorderStatus()','g_pOrbiter->RecorderStatus()'),
+            ('ToggleRecorder (m_ScenarioFile,true)','g_pOrbiter->ToggleRecorder (true)'),
+            ('ToggleRecorder (m_ScenarioFile)','g_pOrbiter->ToggleRecorder ()'),
+            ('RecorderConfig()','g_pOrbiter->Cfg()'),('StopPlayback()','g_pOrbiter->EndPlayback ()'),
+            ('RecordedWarp(RecordingSpeed)','g_pOrbiter->SetWarpFactor (RecordingSpeed, true)'),
+            ('RecorderFocus()','g_focusobj'),('RecordedFocus(vfocus)','g_pOrbiter->SetFocusObject (vfocus)'),
+            ('OpenRecorderEditor()','g_pOrbiter->FRecorder_ToggleEditor()')]:
+        after=after.replace(adapter,expr)
+    equal(before[before.index('DlgRecorder::DlgRecorder()'):],after[after.index('DlgRecorder::DlgRecorder()'):],
+          'Original recorder controls and playback options through real application services')
+    before=original('PlaybackEd.cpp');after=windows(current('PlaybackEd.cpp'))
+    for adapter,expr in [('EditorTime()','td.SimT0'),('EditorCamera()','g_camera'),
+            ('orbiter::production::CompareText','_stricmp'),
+            ('orbiter::production::OwnedCameraMode cm(g_camera->GetCMode());','CameraMode *cm = g_camera->GetCMode();'),
+            ('free(m_sysfname);',''),('delete *it;',''),
+            ('strdup(_note ? _note : "")','strdup(_note)')]:
+        after=after.replace(adapter,expr)
+    # Keep the existing Load() filename replacement; only the destructor gains it.
+    after=after.replace('if(m_sysfname) \n','if(m_sysfname) free(m_sysfname);\n')
+    # Committing now writes a temporary file before suspending/reopening the
+    # actual stream. The recorder round-trip test exercises that replacement.
+    a=after.index('void DlgPlaybackEditor::SaveEventFile ()')
+    b=after.index('void DlgPlaybackEditor::ClearEvents()',a)
+    c=before.index('void DlgPlaybackEditor::SaveEventFile ()')
+    d=before.index('void DlgPlaybackEditor::ClearEvents()',c)
+    after=after[:a]+before[c:d]+after[b:]
+    equal(before[before.index('static bool CompareEvents'):],after[after.index('static bool CompareEvents'):],
+          'Original playback editor widgets and event serialization with owned events/camera modes')
     before=original('DlgFunction.cpp');after=windows(current('DlgFunction.cpp'))
     for adapter,expr in [
             ('for (const auto& command : CommandsForDisplay())','for (int i = 0; i < g_pOrbiter->ncustomcmd; i++)'),
@@ -251,6 +281,10 @@ namespace oapi {using CockpitClient=GraphicsClient;}
             end=original.index('\n}',start)
             if current.count(owned)!=1:raise ValueError('Scenario MFD ownership changed')
             current=current.replace(owned,original[start:end])
+        if name=='Pane.cpp':
+            for initialization in ('mfd[i].prm      = {};','mfd[id].prm.flag     = 0;'):
+                if current.count(initialization)!=1:raise ValueError('MFD off-state initialization changed')
+                current=current.replace(initialization,'',1)
         current=restore_geometry(name,current,original)
         equal(original.replace('COLORREF','DWORD'),current.replace('COLORREF','DWORD'),'Original cockpit calculations, declarations and call order: '+name)
     print('Original Pane, HUD, MFD and panel algorithms conserved; Windows graphics pointer types unchanged')

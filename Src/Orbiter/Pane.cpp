@@ -75,6 +75,7 @@ Pane::Pane (oapi::CockpitClient *gclient, int width, int height, int bpp)
 	hudmode   = HUD_NONE;
 
 	for (i = 0; i < MAXMFD; i++) {
+		mfd[i].prm      = {};
 		mfd[i].instr     = 0;
 		mfd[i].lastmode  = MFD_NONE;
 		mfd[i].exist     = false;
@@ -1135,6 +1136,7 @@ void Pane::RegisterMFD (int id, const MFDSPEC &spec)
 {
 	// obsolete
 	mfd[id].exist = true;
+	mfd[id].prm.flag     = 0;
 	mfd[id].prm.nbt1     = spec.nbt_left;
 	mfd[id].prm.nbt2     = spec.nbt_right;
 	mfd[id].prm.bt_yofs  = spec.bt_yofs;

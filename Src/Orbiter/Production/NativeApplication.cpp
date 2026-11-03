@@ -98,6 +98,10 @@ struct Runtime final:BodyServices,RigidBodyServices,SurfaceServices,NavigationSe
     NativeAnnotations annotations;
     std::string playbackDirectory;
     std::ifstream systemPlayback;
+    bool recording=false;
+    std::string recordingName;
+    std::filesystem::path localPlaybackRoot;
+    std::filesystem::path initialScenario;
     double nextPlaybackEvent=0;
     NativeScriptHost scripts{resources.modules};
     std::array<char,256> simulatedKeys{};
@@ -316,12 +320,15 @@ struct Runtime final:BodyServices,RigidBodyServices,SurfaceServices,NavigationSe
             } else throw std::runtime_error("Unknown flight replay command: "+command.action);
         }
     }
-    void SaveTo(const std::filesystem::path& destination,const char *description,int format) {
+    void SaveTo(const std::filesystem::path& destination,const char *description,int format,const char *recordName=nullptr) {
         if(destination.empty())throw std::runtime_error("No explicit user save path");
         std::filesystem::create_directories(destination.parent_path());auto temporary=destination;temporary+=".tmp";
         try {
             std::ofstream file(temporary);file.exceptions(std::ios::badbit|std::ios::failbit);file.imbue(std::locale::classic());
-            scenarioState->Update(time.MJD0,render.focus->Name());scenarioState->Write(file,description,format);
+            scenarioState->Update(time.MJD0,render.focus->Name());
+            auto metadata=*scenarioState;
+            if(recordName)metadata.SetPlaybackDirectory(recordName);
+            metadata.Write(file,description,format);
             render.camera->Write(file);
 #ifdef ORBITER_NATIVE_COCKPIT
             if(cockpit)cockpit->Write(file);
@@ -349,6 +356,83 @@ struct Runtime final:BodyServices,RigidBodyServices,SurfaceServices,NavigationSe
         } catch(const std::exception& error) {
             oapiAddNotification(OAPINOTIF_ERROR,"Failed to save scenario",error.what());
         }
+    }
+    int RecorderStatus() const override {return recording ? 1 : playback ? 2 : 0;}
+    void RecordSystemEvent(const char* type,const char* payload) {
+        if(!recording)return;
+        std::ofstream file(RecorderFile(("Flights/"+recordingName+"/system.dat").c_str(),true),std::ios::app);
+        file.exceptions(std::ios::badbit|std::ios::failbit);
+        file.imbue(std::locale::classic());
+        file<<std::setprecision(10)<<(time.SimT1-Tofs)<<' '<<type<<' '<<payload<<std::endl;
+    }
+    void StopRecording() {
+        if(!recording)return;
+        for(auto* vessel:system->GetVessels())vessel->FRecorder_Activate(false,nullptr,false);
+        recording=false;
+    }
+    bool ToggleRecorder(const char* requested,bool overwrite=false) override {
+        if(playback)return true;
+        if(recording) {StopRecording();return true;}
+        try {
+            const std::string name=ResourceResolver::Normalize(requested ? requested : playbackDirectory);
+            // The stock recorder uses fixed 256-byte paths. Accept a single
+            // recording name and validate every vessel filename before activation.
+            if(name.size()>120 || name.find('/')!=std::string::npos)
+                throw std::invalid_argument("Recording name must be a filename of at most 120 characters");
+            for(auto* vessel:system->GetVessels()) {
+                const auto vesselName=ResourceResolver::Normalize(vessel->Name());
+                if(vesselName.find('/')!=std::string::npos || name.size()+std::strlen(vessel->Name())+16>=256)
+                    throw std::invalid_argument("Vessel name is too long or contains a path separator");
+            }
+            const auto directory=render.scriptSaveDirectory/"Flights"/name;
+            if(std::filesystem::exists(directory) && !overwrite)return false;
+            if(std::filesystem::is_symlink(directory))throw std::runtime_error("Recording directory is a symbolic link");
+            if(overwrite)std::filesystem::remove_all(directory);
+            std::filesystem::create_directories(directory);
+            recordingName=name;
+            // Probe the destination before activating any vessel writer.
+            std::ofstream probe(directory/"system.dat");
+            probe.exceptions(std::ios::badbit|std::ios::failbit);probe.close();
+            recording=true;
+            for(auto* vessel:system->GetVessels())vessel->FRecorder_Activate(true,name.c_str(),false);
+            char description[128];
+            std::snprintf(description,sizeof(description),"Orbiter playback scenario at T = %0.0f",time.SimT0);
+            SaveTo(render.scriptSaveDirectory/"Playback"/(name+".scn"),description,0,name.c_str());
+            oapiAddNotification(OAPINOTIF_SUCCESS,"Flight recording started",name.c_str());
+            return true;
+        } catch(const std::exception& error) {
+            StopRecording();
+            oapiAddNotification(OAPINOTIF_ERROR,"Flight recording failed",error.what());
+            return true; // An I/O error is not an overwrite confirmation.
+        }
+    }
+    std::filesystem::path PlaybackFile(bool writing) override {
+        const auto relative="Flights/"+playbackDirectory+"/system.dat";
+        if(!writing)return RecorderFile(relative.c_str(),false);
+        // Editing a bundled flight creates a user copy of the complete flight.
+        // Subsequent playback resolves this user directory as one unit.
+        const auto destination=render.scriptSaveDirectory/"Flights"/ResourceResolver::Normalize(playbackDirectory);
+        const auto source=RecorderFile(relative.c_str(),false).parent_path();
+        if(source!=destination) {
+            std::filesystem::create_directories(destination);
+            for(const auto& file:std::filesystem::directory_iterator(source))
+                if(file.is_regular_file())std::filesystem::copy_file(file.path(),destination/ResourceResolver::Normalize(file.path().filename().string()),std::filesystem::copy_options::overwrite_existing);
+            const auto scenarioCopy=render.scriptSaveDirectory/"Playback"/(ResourceResolver::Normalize(playbackDirectory)+".scn");
+            std::filesystem::create_directories(scenarioCopy.parent_path());
+            if(initialScenario!=scenarioCopy)
+                std::filesystem::copy_file(initialScenario,scenarioCopy,std::filesystem::copy_options::overwrite_existing);
+            localPlaybackRoot=render.scriptSaveDirectory;
+        }
+        return destination/"system.dat";
+    }
+    void SuspendPlayback() override {systemPlayback.close();systemPlayback.clear();}
+    void RescanPlayback() override {
+        SuspendPlayback();
+        if(!playback)return;
+        annotations.EndPlayback();
+        systemPlayback.open(PlaybackFile(false));
+        systemPlayback>>nextPlaybackEvent;
+        PlaybackStep();
     }
     void EndSession() override {active=false;}
     bool SaveScriptScenario(const char *name,const char *desc) override {
@@ -430,7 +514,15 @@ struct Runtime final:BodyServices,RigidBodyServices,SurfaceServices,NavigationSe
                     continue;
                 }
 #endif
+#ifdef ORBITER_NATIVE_COCKPIT
+                if(keymap.IsLogicalKey(code,snapshot.keys.data(),OAPI_LKEY_ToggleRecPlay)) {
+                    if(playback)EndPlayback();
+                    else ToggleCockpitRecorder();
+                    continue;
+                }
+#else
                 if(playback && keymap.IsLogicalKey(code,snapshot.keys.data(),OAPI_LKEY_ToggleRecPlay)) {EndPlayback();continue;}
+#endif
                 if(keymap.IsLogicalKey(code,snapshot.keys.data(),OAPI_LKEY_SelectPrevVessel)) {if(previousFocus)orbiter::production::SetFocusObject(*this,previousFocus);continue;}
                 if(keymap.IsLogicalKey(code,snapshot.keys.data(),OAPI_LKEY_Quit)) {active=false;continue;}
                 if(keymap.IsLogicalKey(code,snapshot.keys.data(),OAPI_LKEY_IncSimSpeed)) {SetWarpFactor(std::pow(10.,std::floor(std::log10(time.Warp())+1e-6)+1));continue;}
@@ -450,6 +542,7 @@ struct Runtime final:BodyServices,RigidBodyServices,SurfaceServices,NavigationSe
     void Finish() {
         if(finished)return;
 #ifdef ORBITER_NATIVE_COCKPIT
+        if(recording && system)StopRecording();
         if(render.optionsUsed) {
             auto temporary=optionsPath;temporary+=".tmp";
             try {
@@ -518,6 +611,9 @@ struct Runtime final:BodyServices,RigidBodyServices,SurfaceServices,NavigationSe
         if(metadata.Script())unsupported("bundled Lua in the external-view build");
 #else
         quicksaveStem=scenario.stem().string();
+        initialScenario=scenario;
+        localPlaybackRoot=CompareText(scenario.parent_path().filename().string().c_str(),"Playback")==0
+            ? scenario.parent_path().parent_path() : savePath.parent_path();
         std::string directory=metadata.PlaybackDir();
         std::replace(directory.begin(),directory.end(),'\\','/');
         playbackDirectory=std::filesystem::path(directory).filename().string();
@@ -711,7 +807,18 @@ struct Runtime final:BodyServices,RigidBodyServices,SurfaceServices,NavigationSe
     }
     void SetWarpFactor(double warp) override {
         if(!std::isfinite(warp) || warp<=0)throw std::runtime_error("Invalid time acceleration");
+#ifndef ORBITER_NATIVE_COCKPIT
         if(!playback || !settings.CfgRecPlayPrm.bReplayWarp)time.SetWarp(std::clamp(warp,.1,100000.));
+#else
+        if(playback && settings.CfgRecPlayPrm.bReplayWarp)return;
+        warp=std::clamp(warp,.1,100000.);
+        if(std::abs(warp-time.Warp())<=1e-6)return;
+        time.SetWarp(warp);
+        if(settings.CfgRecPlayPrm.bRecordWarp) {
+            char payload[128];std::snprintf(payload,sizeof(payload),"%f",warp);
+            RecordSystemEvent("TACC",payload);
+        }
+#endif
     }
     double TimejumpDelta() const override {
 #ifdef ORBITER_NATIVE_COCKPIT
@@ -738,11 +845,24 @@ struct Runtime final:BodyServices,RigidBodyServices,SurfaceServices,NavigationSe
 #endif
     }
     std::filesystem::path RecorderFile(const char* relative,bool writing) override {
-        if(writing)unsupported("flight recording yet");
         auto name=ResourceResolver::Normalize(relative);
         if(name.rfind("flights/",0)!=0)throw std::invalid_argument("Expected a flight recording path");
+#ifdef ORBITER_NATIVE_COCKPIT
+        const auto suffix=name.substr(8);
+        const auto destination=render.scriptSaveDirectory/"Flights"/suffix;
+        if(writing)return destination;
+        // Once a local recording directory exists, missing optional streams
+        // belong to that recording; never mix in similarly named stock data.
+        const auto local=localPlaybackRoot/"Flights"/suffix;
+        if(std::filesystem::is_directory(local.parent_path()))return local;
+#else
+        if(writing)unsupported("flight recording yet");
+#endif
         if(resources.program.Contains(name))return resources.program.Resolve(name);
         if(std::filesystem::path(name).extension()==".pos")throw std::runtime_error("Missing required flight recording: "+name);
+        const auto parent=std::filesystem::path(name).parent_path();
+        if(resources.program.ContainsDirectory(parent.generic_string()))
+            return resources.program.ResolveDirectory(parent.generic_string())/std::filesystem::path(name).filename();
         return resources.program.Root()/name;
     }
     void PlaybackWarp(double warp,double delay) override {
@@ -777,7 +897,12 @@ struct Runtime final:BodyServices,RigidBodyServices,SurfaceServices,NavigationSe
         if(cockpit)cockpit->FocusChanged(vessel);
 #endif
     }
-    void ModuleFocusChanged(Vessel* now,Vessel* previous) override {LifetimeEvent("module.focus",now->Name(),previous?previous->Name():"");}
+    void ModuleFocusChanged(Vessel* now,Vessel* previous) override {
+        LifetimeEvent("module.focus",now->Name(),previous?previous->Name():"");
+#ifdef ORBITER_NATIVE_COCKPIT
+        if(settings.CfgRecPlayPrm.bRecordFocus)RecordSystemEvent("FOCUS",now->Name());
+#endif
+    }
     void DialogFocusChanged(Vessel*) override {} // No dialogs are instantiated.
     void ModuleNewVessel(Vessel* vessel) override {LifetimeEvent("module.create",vessel->Name());}
     void GraphicsNewVessel(Vessel* vessel) override {render.graphics->NewVessel(vessel);LifetimeEvent("graphics.create",vessel->Name());}

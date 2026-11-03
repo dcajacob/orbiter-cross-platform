@@ -21,6 +21,8 @@
 #include "DlgMap.h"
 #include "DlgOptions.h"
 #include "DlgFunction.h"
+#include "DlgRecorder.h"
+#include "PlaybackEd.h"
 #endif
 #include "imgui.h"
 #include "imgui_internal.h"
@@ -94,6 +96,8 @@ std::unique_ptr<DlgInfo> infoDialog;
 std::unique_ptr<DlgMap> mapDialog;
 std::unique_ptr<DlgOptions> optionsDialog;
 std::unique_ptr<DlgFunction> functionDialog;
+std::unique_ptr<DlgRecorder> recorderDialog;
+std::unique_ptr<DlgPlaybackEditor> playbackEditor;
 template<class T> void OpenMenuDialog(std::unique_ptr<T>& dialog) {
     if(!dialog)dialog=std::make_unique<T>();
     oapiOpenDialog(dialog.get());
@@ -114,6 +118,7 @@ const MenuCommand commands[]={
     {"Info","MenuInfoBar/info.png",6,OAPI_LKEY_DlgInfo,[](void*) {orbiter::production::OpenCockpitInfoDialog();}},
     {"Options","MenuInfoBar/options.png",7,OAPI_LKEY_DlgOptions,[](void*) {OpenMenuDialog(optionsDialog);}},
     {"Map","MenuInfoBar/map.png",8,OAPI_LKEY_DlgMap,[](void*) {OpenMenuDialog(mapDialog);}},
+    {"Record","MenuInfoBar/record.png",9,OAPI_LKEY_DlgRecorder,[](void*) {OpenMenuDialog(recorderDialog);}},
     {"Save","MenuInfoBar/save.png",11,0,[](void*) {GetNativeRenderContext().scriptApplication->Quicksave();}},
     {"Exit","MenuInfoBar/exit.png",12,0,[](void*) {GetNativeRenderContext().scriptApplication->EndSession();}},
 };
@@ -952,7 +957,16 @@ bool HandleCockpitMenuKey(const Keymap& keymap,oapi::UInt32 key,char* state) {
 DlgInfo* OpenCockpitInfoDialog() {OpenMenuDialog(infoDialog);return infoDialog.get();}
 MenuInfoBar& CockpitMenuBar() {return *cockpitBars;}
 void CreateCockpitInfoBars() {cockpitBars=std::make_unique<MenuInfoBar>();}
+void OpenCockpitPlaybackEditor() {
+    OpenMenuDialog(playbackEditor);
+    playbackEditor->Load("");
+}
+bool ToggleCockpitRecorder() {
+    return GetNativeRenderContext().scriptApplication->ToggleRecorder(recorderDialog ? recorderDialog->m_ScenarioFile : nullptr);
+}
 void DestroyCockpitInfoBars() {
+    playbackEditor.reset();
+    recorderDialog.reset();
     functionDialog.reset();
     optionsDialog.reset();
     mapDialog.reset();
