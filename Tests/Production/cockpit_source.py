@@ -192,6 +192,14 @@ def restore_transfer_initialization(current):
         raise ValueError('Transfer MFD pending delta-v initialization changed')
     return current.replace(initialized,'\tprocess_num = false;\n',1)
 
+def restore_transfer_rotation_lifetime(current):
+    declaration='\tMatrix rot2, rot3, *workr;\n'
+    expression='RotMatrix (shpel2->coso, shpel2->sino, shpel2->cost, shpel2->sint, shpel2->cosi, shpel2->sini)'
+    assignment='\t\trot3.Set ('+expression+');'
+    if current.count(declaration)!=1 or current.count(assignment)!=1:
+        raise ValueError('Transfer MFD hypothetical rotation lifetime changed')
+    return current.replace(declaration,'\tMatrix rot2, *workr;\n',1).replace(assignment,'\t\tMatrix rot3 ('+expression+');',1)
+
 def verify():
     verify_focus_bars()
     original_dialogs = subprocess.check_output(['git','-C',str(ROOT),'show',BASE+':Src/Orbiter/DlgMgr.cpp']).decode().replace('\r\n','\n')
@@ -312,7 +320,7 @@ namespace oapi {using CockpitClient=GraphicsClient;}
             current=current.replace('orbiter::production::CockpitScreenHeight()','GetSystemMetrics(SM_CYSCREEN)')
         if name=='MfdHsi.cpp':current=current.replace('static const int arrowseg','static const INT arrowseg').replace('static const int narrowseg','static const INT narrowseg')
         if name=='MfdAlign.cpp':current=current.replace('saveprm = {0,0,0,false,0.0,0.0}','saveprm = {0,0,0,0.0,0.0,false}')
-        if name=='MfdTransfer.cpp':current=restore_transfer_initialization(current)
+        if name=='MfdTransfer.cpp':current=restore_transfer_rotation_lifetime(restore_transfer_initialization(current))
         if name=='Mfd.cpp':
             current=current.replace('(long long)id + 1','(int64_t)id + 1').replace('#include <memory>','')
             # The scenario loader owns the instrument through ReadParams, including exceptions.

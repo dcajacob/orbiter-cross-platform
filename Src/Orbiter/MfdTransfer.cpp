@@ -136,7 +136,7 @@ void Instrument_Transfer::UpdateDraw (oapi::Sketchpad *skp)
 	double scale; // scaling factor for orbit display
 	const Elements *tgtel, *workel;
 	Vector sp, sv;
-	Matrix rot2, *workr;
+	Matrix rot2, rot3, *workr;
 	oapi::IVECTOR2 pt[ELN+5], p0;
 	double p1, p2, A, B, C, d, p, q, arg, sinr, cosr, rlng;
 	double myta, ea, rma, cma, escal, T0, dt0, dte, tanm, tlng;
@@ -208,7 +208,7 @@ void Instrument_Transfer::UpdateDraw (oapi::Sketchpad *skp)
 
 	// transfer orbit
 	if (enable_hyp) {
-		Matrix rot3 (RotMatrix (shpel2->coso, shpel2->sino, shpel2->cost, shpel2->sint, shpel2->cosi, shpel2->sini));
+		rot3.Set (RotMatrix (shpel2->coso, shpel2->sino, shpel2->cost, shpel2->sint, shpel2->cosi, shpel2->sini));
 		rot3.premul (irot);
 		UpdateOrbitGraph (ICNTX, ICNTY, IW, IH, scale, shpel2, rot3, irot, pt);
 		skp->SetPen (draw[0][1].dashpen);
