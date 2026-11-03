@@ -32,7 +32,7 @@ def main():
 
     mutations = ['missing_background_ship', 'missing_docking_port', 'missing_last_tick', 'nonfinite_state',
                  'duplicate_docking_port', 'missing_assertion', 'forged_completion', 'wrong_scenario', 'wrong_exit_code',
-                 'incomplete_teardown']
+                 'incomplete_teardown', 'wrong_renderer']
     for label in mutations:
         with tempfile.TemporaryDirectory(prefix='orbiter-stock-exit-gate-') as temporary:
             view = Path(temporary)
@@ -69,6 +69,10 @@ def main():
                 name = 'Scenarios/Behavior.scn' if args.host == 'original-windows' else 'flight.scn'
                 change(view, name, (args.capture/name).read_bytes()+b'\n; changed test scenario\n')
             elif label == 'wrong_exit_code': code = 7
+            elif label == 'wrong_renderer':
+                name = 'stock-exit-renderer.json' if args.host == 'original-windows' else 'renderer-info.json'
+                renderer = json.loads((args.capture/name).read_text()); renderer['renderer'] = 'unverified'
+                change(view, name, json.dumps(renderer).encode())
             elif args.host == 'native-linux':
                 life = json.loads((args.capture/'graphics-lifecycle.json').read_text()); life['context_deleted'] = False
                 change(view, 'graphics-lifecycle.json', json.dumps(life).encode())
@@ -79,7 +83,7 @@ def main():
     require(before == {p.name: digest(p) for p in args.capture.iterdir() if p.is_file()}, 'Original exit capture changed')
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(json.dumps(dict(status='passed', controls=rejected, original_capture_unchanged=True), indent=2)+'\n')
-    print('Ten damaged exit captures rejected; original complete capture unchanged')
+    print('Eleven damaged exit captures rejected; original complete capture unchanged')
 
 
 if __name__ == '__main__': main()

@@ -5,6 +5,7 @@
 #include "ApplicationObservation.h"
 #include "../../StockVessels/Observation.h"
 #include <tlhelp32.h>
+#include <GL/gl.h>
 #include <cstdlib>
 #include <filesystem>
 #include <limits>
@@ -28,6 +29,18 @@ void modules()
     do { output << std::filesystem::path(module.szExePath).generic_u8string() << '\n'; }
     while (Module32NextW(snapshot, &module));
     CloseHandle(snapshot);
+}
+
+void renderer()
+{
+    const auto *vendor = glGetString(GL_VENDOR), *name = glGetString(GL_RENDERER), *version = glGetString(GL_VERSION);
+    stock_vessels::require(vendor && name && version, "Original OpenGL renderer is not current after presentation");
+    DWORD width = 0, height = 0, depth = 0; oapiGetViewportSize(&width, &height, &depth);
+    std::ofstream output("stock-exit-renderer.json");
+    output << "{\"vendor\":" << std::quoted(reinterpret_cast<const char *>(vendor))
+           << ",\"renderer\":" << std::quoted(reinterpret_cast<const char *>(name))
+           << ",\"version\":" << std::quoted(reinterpret_cast<const char *>(version))
+           << ",\"client_width\":" << width << ",\"client_height\":" << height << "}\n";
 }
 
 class Driver final : public oapi::Module {
@@ -73,6 +86,7 @@ public:
         if (started && std::string(phase) == "app.frame.end") {
             stock_vessels::require(initialized && running && frames < 60, "Unexpected original exit frame state");
             stock_vessels::snapshot(state, docks, ++frames);
+            if (frames == 1) renderer();
             phases << frames << ',' << phase << '\n'; phases.flush();
         }
     }); }

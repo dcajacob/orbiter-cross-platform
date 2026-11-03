@@ -12,6 +12,6 @@ target_include_directories(ProductionCockpitDriver PRIVATE
     "${ORBITER_TEST_RUNTIME}/Orbitersdk/include" ../..)
 target_link_libraries(ProductionCockpitDriver PRIVATE
     "${ORBITER_TEST_RUNTIME}/Orbitersdk/lib/Orbiter.lib"
-    "${ORBITER_TEST_RUNTIME}/Orbitersdk/lib/Orbitersdk.lib")
+    "${ORBITER_TEST_RUNTIME}/Orbitersdk/lib/Orbitersdk.lib" opengl32)
 set_target_properties(ProductionCockpitDriver PROPERTIES
     RUNTIME_OUTPUT_DIRECTORY "${ORBITER_TEST_RUNTIME}/Modules/Plugin")

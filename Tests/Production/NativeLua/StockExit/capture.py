@@ -72,7 +72,11 @@ def capture_original(args, config):
                     '\nFPS = 0\nMenubarMode = 1\nInfobarMode = 0\nInstrumentUpdateInterval = 0.25\n')
                 (directory/'Scenarios/Behavior.scn').write_bytes((ROOT/'Scenarios'/config['scenario']).read_bytes())
                 require(sha_lf(directory/config['script']) == config['script_sha256_lf'], 'Staged original script changed')
-                (directory/'ogl-evidence.enabled').touch(); mesa_files(args.mesa, directory)
+                # The preserved image probe requires t=12.5 exactly. This
+                # unchanged script sets warp=10 and steps past it to 12.75.
+                # This fixture observes SDK state/exit; its DLL records actual
+                # renderer identity independently without that image probe.
+                mesa_files(args.mesa, directory)
             # stage runs check=True; a successful return proves the actual exit code was zero.
             stage(args.executable, args.data, args.planets, out, config, configure)
             (out/'process-result.json').write_text(json.dumps(dict(returncode=0, source='checked original subprocess result'))+'\n')

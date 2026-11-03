@@ -12,7 +12,8 @@ from the pinned script bytes. It checks the real exit code, a contiguous
 all-vessel trace and every docking port at every completed tick. Captures run
 twice, with byte-identical repeated traces. Native captures additionally require
 matching presentations, context deletion and an unchanged existing save file.
-Actual build configuration, math selection and sanitizer linkage are checked.
+Actual build configuration, math selection, software-renderer identity and
+sanitizer linkage are checked.
 
 The four original Debug/Release and automatic/SSE2 profiles establish the
 termination point independently of the native repair. Their observations must
@@ -21,9 +22,17 @@ policy. This fixture currently changes no stock-corpus acceptance rule. All
 ordinary scenarios retain their sixty-frame requirement; a missing dependency,
 failed assertion, partial trace or early shutdown cannot become a pass.
 
-`Gate.Test.py` damages copied real captures in ten ways, including a missing
+`Gate.Test.py` damages copied real captures in eleven ways, including a missing
 background ship, docking port or final tick, a forged completion log, a changed
 scenario and an incorrect exit code. The owning capture remains unchanged.
+
+The preserved client's separate image probe requires a render at exactly
+12.5 simulation seconds. The unchanged API script selects time acceleration 10,
+which steps past that time to 12.75 seconds. This exit-trace fixture does not
+enable the image probe; the observation DLL records the actual OpenGL renderer
+and viewport after the first presentation instead. This does not change any
+image-comparison gate or the original binaries. The failed initial probe-enabled
+capture is retained separately.
 
 Original captures require native Windows and the preserved runtime staged by
 `CockpitControls/prepare.py`. Native captures use a matching existing engine

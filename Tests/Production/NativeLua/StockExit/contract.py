@@ -88,6 +88,9 @@ def inspect(out, config, host, returncode):
     require(not any(marker in text for marker in ERRORS), 'Stock assertion, Lua, runtime or sanitizer error')
     events = expected_events(config)
     require(log_events(text) == events, 'Stock assertions are incomplete, reordered or duplicated')
+    renderer = json.loads((out/('stock-exit-renderer.json' if host == 'original-windows' else 'renderer-info.json')).read_text())
+    require('llvmpipe' in renderer['renderer'].lower() and renderer['client_width'] == 1280 and
+            renderer['client_height'] == 720, 'Actual stock exit renderer or geometry differs')
     phases = rows(out/'stock-exit-phases.csv')
     count = len(phases)
     require(0 < count < config['frames'], 'Stock script did not intentionally terminate before the frame limit')
@@ -125,5 +128,5 @@ def inspect(out, config, host, returncode):
     return dict(status='captured', host=host, returncode=returncode, completed_frames=count,
                 finalized_ticks=count+1, all_vessel_rows=len(state), docking_rows=len(docks),
                 declared_vessels=len(expected), assertion_events=len(events), assertion_passes=events.count(' - passed'),
-                lifecycle=life, files_sha256={str(p.relative_to(out)): digest(p) for p in out.iterdir()
+                lifecycle=life, renderer=renderer, files_sha256={str(p.relative_to(out)): digest(p) for p in out.iterdir()
                                             if p.is_file() and p.suffix in ('.csv', '.txt', '.log', '.json', '.scn')})
