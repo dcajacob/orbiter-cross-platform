@@ -257,8 +257,8 @@ scenarios in the local Release automatic host. All fourteen runs match the
 audited Windows state/capability/port/camera budgets and full-image threshold.
 Restoring the original base-texture lifecycle makes the DG-and-DG-S ground
 frame byte-identical to Windows. The full stock sweep improves to 44 passes and
-113 retained failures; wider module dependencies and 25 existing failure-path
-crashes remain open. The next full native workflow captures these cases in all
+113 retained failures; that historical sweep includes 25 failure-path crashes.
+Wider module dependencies remain open. The next full native workflow captures these cases in all
 four build/CPU profiles. [Station and base evidence](StockStations.md)
 
 A fresh build that instruments C as well as C++ exposed a Lua empty-upvalue-list
@@ -271,6 +271,14 @@ teardown, then fails LeakSanitizer in system decoration/font and Gallium
 allocations. A minimal GLFW window isolates the decoration leak. Broader
 sanitizer qualification remains open. [Lua fix](LuaUpvalueLifetime.md),
 [renderer repairs and retained failures](RendererDefinedBehavior.md)
+
+The 25 recorded stock startup crashes now reject their missing dependencies
+with normal context deletion and clean sanitizer exits. Five vessel cleanup
+sites handle unresolved dock-name tokens and release class names on configuration
+failure and temporary docking-record arrays after state application. Both SDK creation signatures also pass
+missing-class rejection checks. The unchanged scenarios remain failures until
+their required modules are supplied; a complete instrumented sweep is running.
+[Startup lifetime evidence](VesselStartupLifetime.md)
 
 The subsequent ownership controls identify the Fontconfig report as an
 offset-encoding false positive. An isolated pointer-compatible Fontconfig build

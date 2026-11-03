@@ -28,7 +28,9 @@ Earth-obliquity assertion. The 112 remaining scenarios lack staged class
 configurations and their source modules. All failures remain failures: the
 result is **44 passed, 113 failed**, improving the preceding `2c00d29b` baseline
 of 37/120. This is not full stock acceptance. The same 25 dependency-incomplete
-cases terminate by signal in both runtimes; their crash handling remains open.
+cases terminate by signal in both historical runtimes. The subsequent startup
+lifetime fix passes clean-rejection regressions for all 25, without qualifying
+their missing dependencies; see [startup lifetime](../../../Docs/Production/VesselStartupLifetime.md).
 
 Each attempted scene must complete 60 original 0.25-second frames with normal
 context deletion and complete finalized ticks 0 through 60. At every tick the
@@ -68,3 +70,34 @@ rejection against temporary fixtures and all locked scenario bytes.
 `Manifest.Test.py` removes a non-focus ship at tick 30 from a copied real
 capture. The all-object gate must reject it despite sixty normal presentations
 and shutdown, while preserving the original trace unchanged.
+
+## Startup rejection regressions
+
+`failure_paths.py` selects every signal-terminated scene from a preserved full
+sweep, verifies its original locked scenario bytes and requires that the
+negative fixture still has unavailable dependencies. It runs each unchanged
+scene with both engine C and C++ sources instrumented, requires the original
+dependency error and exit code 1, rejects sanitizer findings and checks normal
+context deletion with zero presentations. It also exercises missing-class
+creation through both the legacy and extended SDK signatures.
+
+```sh
+python3 -B Tests/Production/StockScenarios/failure_paths.py \
+  --dependencies out/phase6-wayland-input-tools-final \
+  --build out/phase6-vessel-dock-records-asan-engine \
+  --assets out/phase6-dg-resources --data out/native-celestial-data \
+  --planets out/archive-data \
+  --baseline-report out/phase6-base-stock-full-smoke/stock-scenarios.json \
+  --library-directory out/phase6-fontconfig-heap-pointers/build \
+  --library-directory out/phase6-mesa-wayland-verified/install/lib/x86_64-linux-gnu \
+  --output out/stock-startup-rejections
+```
+
+Use the independently qualified private Fontconfig and Wayland-capable Mesa
+libraries described in [WindowingLifetime.md](../../../Docs/Production/WindowingLifetime.md).
+The runner owns a private compositor and records source, executable and library
+hashes. Run outside a LeakSanitizer ptrace sandbox, with fresh output. It does
+not modify system libraries or any accepted reference. `--scenario` selects a
+previously crashing case for diagnosis; omitted, all recorded crashes run.
+The report explicitly keeps every stock scenario failed. Clean error handling
+does not supply its missing module or qualify the complete scene.

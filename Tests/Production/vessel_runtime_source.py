@@ -65,6 +65,24 @@ def with_sparse_mesh_slots(source):
     copy=copy.replace('if (meshrec) {','if (meshrec) {\n\t\tmesh = new Mesh; GetRigidBodyServices().TraceAllocation(__FILE__,__LINE__);').replace('} else mesh = 0;','}')
     return source[:start]+copy+source[end:]
 
+def restore_startup_cleanup(source):
+    """Accept only class-name, unresolved dock-token and temporary-array cleanup."""
+    original='\tif (!OpenConfigFile (classf))\n\t\tGetVesselServices().Fatal("Vessel initialization failed"); // PANIC!'
+    repaired='\tif (!OpenConfigFile (classf)) {\n\t\tdelete []classname;\n\t\tclassname = nullptr;\n\t\tGetVesselServices().Fatal("Vessel initialization failed"); // PANIC!\n\t}'
+    if source.count(repaired)!=3:
+        raise ValueError('Declared failed class-configuration cleanup differs')
+    source=source.replace(repaired,original)
+    original='\t\t\tif (dock[i]->mate) Undock (i, 0, 0.0);'
+    repaired='\t\t\tif (dock[i]->mate && GetRigidBodyServices().World()->isVessel(dock[i]->mate)) Undock (i, 0, 0.0);'
+    if source.count(repaired)!=1:
+        raise ValueError('Declared unresolved docking-token cleanup differs')
+    source=source.replace(repaired,original)
+    original='\t\tvs.thruster = NULL;\n\t}\n\treturn res;'
+    repaired='\t\tvs.thruster = NULL;\n\t}\n\tdelete []vs.dockinfo;\n\tvs.dockinfo = NULL;\n\treturn res;'
+    if source.count(repaired)!=1:
+        raise ValueError('Declared temporary scenario dock-record cleanup differs')
+    return source.replace(repaired,original)
+
 def restore_hull_transform_cleanup(source):
     cleanup="""// The SDK transform base has no virtual destructor. These copies
         // were allocated above as their concrete transform types.
@@ -90,7 +108,7 @@ def previous_files():
             current=current.replace('\t\tdelete []A->comp;','\t\tdelete A->comp;',1)
             # Bulk exhaust cleanup must free owned constant fields like DelExhaust.
             current=current.replace('\t\tfor (i = 0; i < nexhaust; i++) {\n\t\t\tif (exhaust[i]->level && (exhaust[i]->flags & EXHAUST_CONSTANTLEVEL))\n\t\t\t\tdelete exhaust[i]->level;\n\t\t\tif (exhaust[i]->lpos && (exhaust[i]->flags & EXHAUST_CONSTANTPOS))\n\t\t\t\tdelete exhaust[i]->lpos;\n\t\t\tif (exhaust[i]->ldir && (exhaust[i]->flags & EXHAUST_CONSTANTDIR))\n\t\t\t\tdelete exhaust[i]->ldir;\n\t\t\tdelete exhaust[i];\n\t\t}', '\t\tfor (i = 0; i < nexhaust; i++)\n\t\t\tdelete exhaust[i];')
-        if name=='Vessel.cpp':current=restore_hull_transform_cleanup(current)
+        if name=='Vessel.cpp':current=restore_startup_cleanup(restore_hull_transform_cleanup(current))
         expected=with_sparse_mesh_slots(old(path)) if name=='Vessel.cpp' else old(path)
         equal(expected,current,path);result[path]=old(path)
     path='Src/Orbiter/Vessel.h'

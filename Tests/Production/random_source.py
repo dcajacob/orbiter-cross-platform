@@ -29,8 +29,8 @@ def verify():
             original=with_sparse_mesh_slots(original)
         actual=(ROOT/path).read_bytes().replace(b'\r\n',b'\n').decode('cp1252')
         if name=='Vessel.cpp':
-            from vessel_runtime_source import restore_hull_transform_cleanup
-            actual=restore_hull_transform_cleanup(actual)
+            from vessel_runtime_source import restore_hull_transform_cleanup,restore_startup_cleanup
+            actual=restore_startup_cleanup(restore_hull_transform_cleanup(actual))
         if name=='Planet.cpp':
             actual=restore_cloud_microtexture_default(actual)
         if actual.count(include)!=1:raise ValueError('Unexpected random-service include: '+path)

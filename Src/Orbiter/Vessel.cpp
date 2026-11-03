@@ -88,8 +88,11 @@ Vessel::Vessel (const PlanetarySystem *psys, const char *_name, const char *_cla
 	strcpy (classname, _classname);
 
 	ifstream classf;
-	if (!OpenConfigFile (classf))
+	if (!OpenConfigFile (classf)) {
+		delete []classname;
+		classname = nullptr;
 		GetVesselServices().Fatal("Vessel initialization failed"); // PANIC!
+	}
 
 	// Set defaults
 	DefaultGenericCaps ();
@@ -122,8 +125,11 @@ Vessel::Vessel (const PlanetarySystem *psys, const char *_name, const char *_cla
 	strcpy (classname, _classname);
 
 	ifstream classf;
-	if (!OpenConfigFile (classf))
+	if (!OpenConfigFile (classf)) {
+		delete []classname;
+		classname = nullptr;
 		GetVesselServices().Fatal("Vessel initialization failed"); // PANIC!
+	}
 
 	// Set defaults
 	DefaultGenericCaps ();
@@ -164,8 +170,11 @@ Vessel::Vessel (const PlanetarySystem *psys, const char *_name, const char *_cla
 	strcpy (classname, _classname);
 
 	ifstream classf;
-	if (!OpenConfigFile (classf))
+	if (!OpenConfigFile (classf)) {
+		delete []classname;
+		classname = nullptr;
 		GetVesselServices().Fatal("Vessel initialization failed"); // PANIC!
+	}
 
 	// Set defaults
 	DefaultGenericCaps ();
@@ -2517,7 +2526,7 @@ void Vessel::ClearDockDefinitions ()
 {
 	if (ndock) {
 		for (oapi::UInt32 i = 0; i < ndock; i++) {
-			if (dock[i]->mate) Undock (i, 0, 0.0);
+			if (dock[i]->mate && GetRigidBodyServices().World()->isVessel(dock[i]->mate)) Undock (i, 0, 0.0);
 			if (dock[i]->ids) {
 				GetRigidBodyServices().World()->BroadcastVessel (MSG_KILLNAVSENDER, dock[i]->ids);
 				delete dock[i]->ids;
@@ -7561,6 +7570,8 @@ bool Vessel::Read (ifstream &scn)
 		delete []vs.thruster;
 		vs.thruster = NULL;
 	}
+	delete []vs.dockinfo;
+	vs.dockinfo = NULL;
 	return res;
 }
 

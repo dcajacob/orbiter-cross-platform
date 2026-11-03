@@ -1193,7 +1193,7 @@
       "scope": "Original scheduler, stock MFDs and modern map compile natively with explicit original epoch/time, authoritative world/UI bindings and indexed map resources. Exact Windows calculations and callback order conserved. Native GDI/legacy map/custom-mode entry points fail explicitly until supported; native cockpit owner and DG runtime remain unfinished."
     },
     "Src/Orbiter/Vessel.cpp": {
-      "sha256_lf": "056a080cb6c370632e5bb89b6413c2c697d6d4015e7153a4c4ccc076ee99bbc8",
+      "sha256_lf": "af600ca051a38d9f8db82aee0494e66c48496fc1f0ad99246571243263e141aa",
       "original_sha256_lf": "9e34db9a70552f94f3966dbb14d57b3833e5f8f69246d5454c71161e93664e13"
     },
     "Src/Orbiter/Vessel.h": {

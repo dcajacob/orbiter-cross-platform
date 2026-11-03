@@ -1,0 +1,686 @@
+{
+  "schema": 1,
+  "status": "startup-rejections-and-single-session-regressions-passed",
+  "phase6_complete": false,
+  "source_base": "2d5404a46937241c01a4e89186ef38bf28e91142",
+  "source_changes_uncommitted_at_capture": true,
+  "source_sha256": {
+    "Src/Orbiter/Vessel.cpp": "af600ca051a38d9f8db82aee0494e66c48496fc1f0ad99246571243263e141aa",
+    "Src/Orbiter/Production/NativeApplication.cpp": "fbe90b83d7901d73f1e9cc1abc9af5fc4903ea3cd5fe14b7db92ffc1c4ca7ba5",
+    "OVP/OGLClient/Native/LinuxAdapter.cpp": "f88b0ae33d7c7d65e54cdd39526d0386baef40e8b4da4bb1c103d0ce90db20f5",
+    "Tests/Production/random_source.py": "f4f7a126597deacd2efbbe40f5f7e120c0db17a01c05bc00e1b4b21461c43fd0",
+    "Tests/Production/vessel_runtime_source.py": "21eafaf70086e71252e4b18faad40bfc4fec58e29eff666cb745b2a7f37b466e",
+    "Tests/Production/phase3-extraction.lock.json": "c74d548ae67d2639abcdb7c92ca92a7b8349f0107b3f6f274f52205c257a9e29",
+    "Tests/Production/StockScenarios/failure_paths.py": "208898b3f41c5b6722b59c12290ac062a2b868d1f01c3410e46b1e9243b45295"
+  },
+  "repairs": {
+    "declared_vessel_cleanup_sites": 5,
+    "missing_configuration_class_names_released_in_three_constructors": true,
+    "encoded_dock_names_not_dereferenced_during_partial_session_destruction": true,
+    "temporary_dockinfo_array_released_after_state_application": true,
+    "every_other_vessel_source_byte_conserved": true,
+    "numerical_formulas_and_successful_processing_order_unchanged": true,
+    "class_fields_and_sdk_layouts_unchanged": true,
+    "full_source_conservation_files": 444,
+    "source_negative_controls": {
+      "class-name-free-removed": "rejected",
+      "unresolved-mate-check-removed": "rejected",
+      "temporary-dock-free-removed": "rejected",
+      "unrelated-control-calculation-change": "rejected"
+    }
+  },
+  "stock_rejections": {
+    "status": "passed",
+    "scenarios": {
+      "Checklists/Mission 2 - ISS to Mir.scn": {
+        "rejection_status": "passed",
+        "original_returncode": -11,
+        "returncode": 1,
+        "scenario_sha256": "9ff636bd4286bd21187cb3a4377091a9eae7608580111df2bb27e253990fd199",
+        "context_deleted": true,
+        "console_sha256": "2e495c68798859e0b6d28c4c68928b399c044ed364405535e2c8b26cfeeb2ca0",
+        "output": "000",
+        "stock_scenario_status": "failed"
+      },
+      "Checklists/Mission 3 - Deorbit.scn": {
+        "rejection_status": "passed",
+        "original_returncode": -11,
+        "returncode": 1,
+        "scenario_sha256": "deea96b5a618581755e4f6864f570a13dee1ab8a5f221fc912dc2b38b2180826",
+        "context_deleted": true,
+        "console_sha256": "2e495c68798859e0b6d28c4c68928b399c044ed364405535e2c8b26cfeeb2ca0",
+        "output": "001",
+        "stock_scenario_status": "failed"
+      },
+      "Delta-glider/Docked at ISS.scn": {
+        "rejection_status": "passed",
+        "original_returncode": -11,
+        "returncode": 1,
+        "scenario_sha256": "f62ea64c6dc1f84f1d45671e730ba8623b58727274442ebdb7fff42dd318d3ac",
+        "context_deleted": true,
+        "console_sha256": "2d11de4ec97b6910ed3c917fc4214e203ccc53199d702065863b8f1b3e60ae24",
+        "output": "002",
+        "stock_scenario_status": "failed"
+      },
+      "Delta-glider/Vessel-vessel.scn": {
+        "rejection_status": "passed",
+        "original_returncode": -11,
+        "returncode": 1,
+        "scenario_sha256": "07016cab57da88b05021b9c5983bedcdb1ea7c9c8df44d476c3dab7cffed54b7",
+        "context_deleted": true,
+        "console_sha256": "c4a0a80254fc287bad45047e0a1b65c98e2199d2ee20854eed9bbafad703b876",
+        "output": "003",
+        "stock_scenario_status": "failed"
+      },
+      "Demo/Docked at ISS.scn": {
+        "rejection_status": "passed",
+        "original_returncode": -11,
+        "returncode": 1,
+        "scenario_sha256": "78ae1272db4353abb13d0d5e7fe962d98e66e2696d1ab5b6cd736a02452ded4f",
+        "context_deleted": true,
+        "console_sha256": "2d11de4ec97b6910ed3c917fc4214e203ccc53199d702065863b8f1b3e60ae24",
+        "output": "004",
+        "stock_scenario_status": "failed"
+      },
+      "Demo/Galilean system view.scn": {
+        "rejection_status": "passed",
+        "original_returncode": -11,
+        "returncode": 1,
+        "scenario_sha256": "364f84751d31c67da775c537382c77cc1ba29c0041335864d78f6609e8ed4ad8",
+        "context_deleted": true,
+        "console_sha256": "bb55403db3eb0ce904ae6634f981a07cfc1ec0ffc24d80b6cb76796ae44be12e",
+        "output": "005",
+        "stock_scenario_status": "failed"
+      },
+      "Demo/Mir.scn": {
+        "rejection_status": "passed",
+        "original_returncode": -11,
+        "returncode": 1,
+        "scenario_sha256": "d61d0adedabb4c577ba890e8a101a2ba45407dee9f8f5e9a69d4475092881e01",
+        "context_deleted": true,
+        "console_sha256": "4501bf549ca9f08f7cf895a18a626d5995c40516be6bd65c9c75b7274d0fac1e",
+        "output": "006",
+        "stock_scenario_status": "failed"
+      },
+      "Demo/Project Alpha.scn": {
+        "rejection_status": "passed",
+        "original_returncode": -11,
+        "returncode": 1,
+        "scenario_sha256": "6cc2e55b19def99703520f79ad86ecfe51895f337c885ffdd6cbacc127385b78",
+        "context_deleted": true,
+        "console_sha256": "e5413baf6b6348a946fe9ab649d6bdccf57db0a43052f4747e93fd0c9741bc9e",
+        "output": "007",
+        "stock_scenario_status": "failed"
+      },
+      "Demo/Saturn.scn": {
+        "rejection_status": "passed",
+        "original_returncode": -11,
+        "returncode": 1,
+        "scenario_sha256": "c6e80fef0a633daa45982ffc574e01c4f83d3427e4ba3bd3f136ec82d2e7c2fc",
+        "context_deleted": true,
+        "console_sha256": "bb55403db3eb0ce904ae6634f981a07cfc1ec0ffc24d80b6cb76796ae44be12e",
+        "output": "008",
+        "stock_scenario_status": "failed"
+      },
+      "Navigation/Space Physics/DG dumbbell.scn": {
+        "rejection_status": "passed",
+        "original_returncode": -11,
+        "returncode": 1,
+        "scenario_sha256": "e76aa2812750dcb114f85f0cd9a4ed24727d0204827a339ca680c6cd2dc3afe6",
+        "context_deleted": true,
+        "console_sha256": "fa49438601e53c80151b4be18d86031afda1284bd291f6f5f8f90b00e45c70e1",
+        "output": "009",
+        "stock_scenario_status": "failed"
+      },
+      "Shuttle-A/Shuttle-A Docked at ISS.scn": {
+        "rejection_status": "passed",
+        "original_returncode": -11,
+        "returncode": 1,
+        "scenario_sha256": "2ac9355654172c7267b4afcc54555958dff4d5404d9a355485c52939234202a1",
+        "context_deleted": true,
+        "console_sha256": "16ed35199d99a6db6b65f9bdb72c8dcea58749dc153407f4a73bbfa992ebace3",
+        "output": "010",
+        "stock_scenario_status": "failed"
+      },
+      "Space Shuttle Atlantis/Atlantis ISS Resupply.scn": {
+        "rejection_status": "passed",
+        "original_returncode": -11,
+        "returncode": 1,
+        "scenario_sha256": "9359d1e16a972fc417b934449375d9ed4048c19d08763f8683503b842d0aa813",
+        "context_deleted": true,
+        "console_sha256": "e5413baf6b6348a946fe9ab649d6bdccf57db0a43052f4747e93fd0c9741bc9e",
+        "output": "011",
+        "stock_scenario_status": "failed"
+      },
+      "Space Shuttle Atlantis/Atlantis docked at ISS.scn": {
+        "rejection_status": "passed",
+        "original_returncode": -11,
+        "returncode": 1,
+        "scenario_sha256": "5fb61106a52c8d6099f851aec8e3ef166a8d8bd77506757ea3d3a549a87a703a",
+        "context_deleted": true,
+        "console_sha256": "aeced68632a5b59918765a4f700d5dc5ec38226dcdd4ff23bfa3c0340d76e796",
+        "output": "012",
+        "stock_scenario_status": "failed"
+      },
+      "Space Stations/ISS.scn": {
+        "rejection_status": "passed",
+        "original_returncode": -11,
+        "returncode": 1,
+        "scenario_sha256": "0826cd2a27401e17cbbecb480a66157ad4bc85287153ad0ffbac02070c7abbbb",
+        "context_deleted": true,
+        "console_sha256": "e5413baf6b6348a946fe9ab649d6bdccf57db0a43052f4747e93fd0c9741bc9e",
+        "output": "013",
+        "stock_scenario_status": "failed"
+      },
+      "Space Stations/Light and darkness.scn": {
+        "rejection_status": "passed",
+        "original_returncode": -11,
+        "returncode": 1,
+        "scenario_sha256": "86846515e8a0cebfb1b774476160b7a817808834538c9d40716ab8c4dd3c3711",
+        "context_deleted": true,
+        "console_sha256": "2d11de4ec97b6910ed3c917fc4214e203ccc53199d702065863b8f1b3e60ae24",
+        "output": "014",
+        "stock_scenario_status": "failed"
+      },
+      "Space Stations/Mir.scn": {
+        "rejection_status": "passed",
+        "original_returncode": -11,
+        "returncode": 1,
+        "scenario_sha256": "1e8fb5a409e535044418790fde96f29f61268171ff3e72424a32553df7ea9413",
+        "context_deleted": true,
+        "console_sha256": "4501bf549ca9f08f7cf895a18a626d5995c40516be6bd65c9c75b7274d0fac1e",
+        "output": "015",
+        "stock_scenario_status": "failed"
+      },
+      "The Solar System/Enceladus.scn": {
+        "rejection_status": "passed",
+        "original_returncode": -11,
+        "returncode": 1,
+        "scenario_sha256": "88c79abafa902b8d34ce0b9118c1ad650105754ddaa0b0514907988d7600f804",
+        "context_deleted": true,
+        "console_sha256": "bb55403db3eb0ce904ae6634f981a07cfc1ec0ffc24d80b6cb76796ae44be12e",
+        "output": "016",
+        "stock_scenario_status": "failed"
+      },
+      "The Solar System/Galilean system view.scn": {
+        "rejection_status": "passed",
+        "original_returncode": -11,
+        "returncode": 1,
+        "scenario_sha256": "9b714c6492849e79b2624f8583c716bc0f33894ea24f64029d7dda5e972ef4c8",
+        "context_deleted": true,
+        "console_sha256": "bb55403db3eb0ce904ae6634f981a07cfc1ec0ffc24d80b6cb76796ae44be12e",
+        "output": "017",
+        "stock_scenario_status": "failed"
+      },
+      "The Solar System/Iapetus.scn": {
+        "rejection_status": "passed",
+        "original_returncode": -11,
+        "returncode": 1,
+        "scenario_sha256": "671c1b49b36cd3b4c85f49ff2f54a9da56f25bb9eb616ca440a03e2ffbfeb608",
+        "context_deleted": true,
+        "console_sha256": "bb55403db3eb0ce904ae6634f981a07cfc1ec0ffc24d80b6cb76796ae44be12e",
+        "output": "018",
+        "stock_scenario_status": "failed"
+      },
+      "The Solar System/Mimas.scn": {
+        "rejection_status": "passed",
+        "original_returncode": -11,
+        "returncode": 1,
+        "scenario_sha256": "9fe13c13b2c372f9d9d6e24558d8cf98c4ebb33c1920bfe20cfb7c6cbc009b2a",
+        "context_deleted": true,
+        "console_sha256": "bb55403db3eb0ce904ae6634f981a07cfc1ec0ffc24d80b6cb76796ae44be12e",
+        "output": "019",
+        "stock_scenario_status": "failed"
+      },
+      "The Solar System/Rhea.scn": {
+        "rejection_status": "passed",
+        "original_returncode": -11,
+        "returncode": 1,
+        "scenario_sha256": "c84516d967dca7700219d96285abbf0740dcc7e71aa77540785c294d692784b7",
+        "context_deleted": true,
+        "console_sha256": "bb55403db3eb0ce904ae6634f981a07cfc1ec0ffc24d80b6cb76796ae44be12e",
+        "output": "020",
+        "stock_scenario_status": "failed"
+      },
+      "The Solar System/Saturn.scn": {
+        "rejection_status": "passed",
+        "original_returncode": -11,
+        "returncode": 1,
+        "scenario_sha256": "cf3ab7ef382dc48cca70867abe0e47c64455b800ac7a492e66f4c151cc5884d9",
+        "context_deleted": true,
+        "console_sha256": "bb55403db3eb0ce904ae6634f981a07cfc1ec0ffc24d80b6cb76796ae44be12e",
+        "output": "021",
+        "stock_scenario_status": "failed"
+      },
+      "The Solar System/Tethys.scn": {
+        "rejection_status": "passed",
+        "original_returncode": -11,
+        "returncode": 1,
+        "scenario_sha256": "b2b235a48131f17fc73e5d6b3622f4eb37cd2f36aed724d1421a133414a0cc9f",
+        "context_deleted": true,
+        "console_sha256": "bb55403db3eb0ce904ae6634f981a07cfc1ec0ffc24d80b6cb76796ae44be12e",
+        "output": "022",
+        "stock_scenario_status": "failed"
+      },
+      "The Solar System/Titan.scn": {
+        "rejection_status": "passed",
+        "original_returncode": -11,
+        "returncode": 1,
+        "scenario_sha256": "8b6159230338af1bc3c16fdd6757f3799e105e0525552bd0c70a7eb1da794b80",
+        "context_deleted": true,
+        "console_sha256": "bb55403db3eb0ce904ae6634f981a07cfc1ec0ffc24d80b6cb76796ae44be12e",
+        "output": "023",
+        "stock_scenario_status": "failed"
+      },
+      "Views/Atmospheric haze.scn": {
+        "rejection_status": "passed",
+        "original_returncode": -11,
+        "returncode": 1,
+        "scenario_sha256": "24023ff6b8c7b0a022b27d2507ba46af30ca4136e22817c85d1bb307164fb8ee",
+        "context_deleted": true,
+        "console_sha256": "2d11de4ec97b6910ed3c917fc4214e203ccc53199d702065863b8f1b3e60ae24",
+        "output": "024",
+        "stock_scenario_status": "failed"
+      }
+    },
+    "constructors": {
+      "create": {
+        "rejection_status": "passed",
+        "original_returncode": null,
+        "returncode": 1,
+        "scenario_sha256": "a503c01357fd895380f59d0cc0524c453edcc9b59402848f9d7e652bb741d187",
+        "context_deleted": true,
+        "console_sha256": "47fddf791844a07a1f914acdc7e5c8a0a5c1785d2b025ba8ecdce36980af8b54",
+        "output": "025"
+      },
+      "create_legacy": {
+        "rejection_status": "passed",
+        "original_returncode": null,
+        "returncode": 1,
+        "scenario_sha256": "a503c01357fd895380f59d0cc0524c453edcc9b59402848f9d7e652bb741d187",
+        "context_deleted": true,
+        "console_sha256": "47fddf791844a07a1f914acdc7e5c8a0a5c1785d2b025ba8ecdce36980af8b54",
+        "output": "026"
+      }
+    },
+    "stock_scenarios_qualified": false,
+    "scenario_lock_sha256": "5f89334ecb213b56b1bda651acbed8c245f874f6d61ae9f7e9fdccfb3da2f11e"
+  },
+  "successful_station_regressions": {
+    "status": "passed",
+    "profile": "Release-automatic",
+    "processes": 14,
+    "scene_presents": 840,
+    "original_windows_state_camera_capability_port_and_image_budgets_passed": true
+  },
+  "successful_instrumented_flights": {
+    "status": "passed",
+    "cases": {
+      "docked": {
+        "status": "passed",
+        "render_frequency_independent": true,
+        "runs": [
+          {
+            "windows_differences": {
+              "position_m": 0.0,
+              "velocity_m_s": 0.0,
+              "rotation_rad": 0.0,
+              "angular_velocity_rad_s": 0.0,
+              "mjd_days": 0.0,
+              "mass_fraction": 0.0
+            },
+            "lifecycle": {
+              "rendered_frames": 25,
+              "successful_presents": 25,
+              "context_deleted": true
+            },
+            "console_sha256": "cbb80b540852d1029d66c54a92bd8a90c34bd1aab4de9fa031e5a604a5fc7ed2",
+            "state_sha256": "ec735e896db313a50730062e60b6d440212a9a8a5626d055898bd39400adf2b3"
+          },
+          {
+            "windows_differences": {
+              "position_m": 0.0,
+              "velocity_m_s": 0.0,
+              "rotation_rad": 0.0,
+              "angular_velocity_rad_s": 0.0,
+              "mjd_days": 0.0,
+              "mass_fraction": 0.0
+            },
+            "lifecycle": {
+              "rendered_frames": 6,
+              "successful_presents": 6,
+              "context_deleted": true
+            },
+            "console_sha256": "cbb80b540852d1029d66c54a92bd8a90c34bd1aab4de9fa031e5a604a5fc7ed2",
+            "state_sha256": "ec735e896db313a50730062e60b6d440212a9a8a5626d055898bd39400adf2b3"
+          }
+        ]
+      },
+      "dock_approach": {
+        "status": "passed",
+        "render_frequency_independent": true,
+        "runs": [
+          {
+            "windows_differences": {
+              "position_m": 0.0,
+              "velocity_m_s": 0.0,
+              "rotation_rad": 0.0,
+              "angular_velocity_rad_s": 1.0339757656912846e-25,
+              "mjd_days": 0.0,
+              "mass_fraction": 0.0
+            },
+            "lifecycle": {
+              "rendered_frames": 100,
+              "successful_presents": 100,
+              "context_deleted": true
+            },
+            "console_sha256": "cbb80b540852d1029d66c54a92bd8a90c34bd1aab4de9fa031e5a604a5fc7ed2",
+            "state_sha256": "6d26d5817e6ecccae6550a193a7ab74ffa3bbbc6a5477b08120ac3c5530c9cd5"
+          },
+          {
+            "windows_differences": {
+              "position_m": 0.0,
+              "velocity_m_s": 0.0,
+              "rotation_rad": 0.0,
+              "angular_velocity_rad_s": 1.0339757656912846e-25,
+              "mjd_days": 0.0,
+              "mass_fraction": 0.0
+            },
+            "lifecycle": {
+              "rendered_frames": 24,
+              "successful_presents": 24,
+              "context_deleted": true
+            },
+            "console_sha256": "cbb80b540852d1029d66c54a92bd8a90c34bd1aab4de9fa031e5a604a5fc7ed2",
+            "state_sha256": "6d26d5817e6ecccae6550a193a7ab74ffa3bbbc6a5477b08120ac3c5530c9cd5"
+          }
+        ]
+      },
+      "lifetime": {
+        "status": "passed",
+        "render_frequency_independent": true,
+        "runs": [
+          {
+            "windows_differences": {
+              "position_m": 0.0,
+              "velocity_m_s": 0.0,
+              "rotation_rad": 0.0,
+              "angular_velocity_rad_s": 0.0,
+              "mjd_days": 0.0,
+              "mass_fraction": 0.0,
+              "lifetime": {
+                "original_order": true,
+                "compared_events": 1136,
+                "child_samples": 20,
+                "actual_child_mesh_drawn": true,
+                "visual_lifetime": true,
+                "module_lifetime": true
+              }
+            },
+            "lifecycle": {
+              "rendered_frames": 20,
+              "successful_presents": 20,
+              "context_deleted": true
+            },
+            "console_sha256": "cbb80b540852d1029d66c54a92bd8a90c34bd1aab4de9fa031e5a604a5fc7ed2",
+            "state_sha256": "af6fb36f2a0ed619ae80aa9831cdcb6e149b2d527cad64ab266d72965fe5df59"
+          },
+          {
+            "windows_differences": {
+              "position_m": 0.0,
+              "velocity_m_s": 0.0,
+              "rotation_rad": 0.0,
+              "angular_velocity_rad_s": 0.0,
+              "mjd_days": 0.0,
+              "mass_fraction": 0.0,
+              "lifetime": {
+                "original_order": true,
+                "compared_events": 1136,
+                "child_samples": 20,
+                "actual_child_mesh_drawn": true,
+                "visual_lifetime": true,
+                "module_lifetime": true
+              }
+            },
+            "lifecycle": {
+              "rendered_frames": 5,
+              "successful_presents": 5,
+              "context_deleted": true
+            },
+            "console_sha256": "cbb80b540852d1029d66c54a92bd8a90c34bd1aab4de9fa031e5a604a5fc7ed2",
+            "state_sha256": "af6fb36f2a0ed619ae80aa9831cdcb6e149b2d527cad64ab266d72965fe5df59"
+          }
+        ]
+      },
+      "attachments": {
+        "status": "passed",
+        "render_frequency_independent": true,
+        "runs": [
+          {
+            "windows_differences": {
+              "position_m": 0.0,
+              "velocity_m_s": 0.0,
+              "rotation_rad": 0.0,
+              "angular_velocity_rad_s": 0.0,
+              "mjd_days": 0.0,
+              "mass_fraction": 0.0,
+              "lifetime": {
+                "original_order": true,
+                "compared_events": 1364,
+                "child_samples": 79,
+                "actual_child_mesh_drawn": true,
+                "visual_lifetime": true,
+                "module_lifetime": true
+              }
+            },
+            "lifecycle": {
+              "rendered_frames": 20,
+              "successful_presents": 20,
+              "context_deleted": true
+            },
+            "console_sha256": "cbb80b540852d1029d66c54a92bd8a90c34bd1aab4de9fa031e5a604a5fc7ed2",
+            "state_sha256": "222a7fbc12d9dded2e89f265ce4a401241bbe4495079db937ffc9a9cb2ad8725"
+          },
+          {
+            "windows_differences": {
+              "position_m": 0.0,
+              "velocity_m_s": 0.0,
+              "rotation_rad": 0.0,
+              "angular_velocity_rad_s": 0.0,
+              "mjd_days": 0.0,
+              "mass_fraction": 0.0,
+              "lifetime": {
+                "original_order": true,
+                "compared_events": 1364,
+                "child_samples": 79,
+                "actual_child_mesh_drawn": true,
+                "visual_lifetime": true,
+                "module_lifetime": true
+              }
+            },
+            "lifecycle": {
+              "rendered_frames": 5,
+              "successful_presents": 5,
+              "context_deleted": true
+            },
+            "console_sha256": "cbb80b540852d1029d66c54a92bd8a90c34bd1aab4de9fa031e5a604a5fc7ed2",
+            "state_sha256": "222a7fbc12d9dded2e89f265ce4a401241bbe4495079db937ffc9a9cb2ad8725"
+          }
+        ]
+      }
+    },
+    "processes": 8,
+    "windows_references_unchanged": true,
+    "render_frequency_independent": true,
+    "sanitizer_exits_clean": true
+  },
+  "repeated_instrumented_sessions": {
+    "status": "failed-at-process-exit",
+    "sessions": 20,
+    "successful_presents": 1200,
+    "all_contexts_deleted": true,
+    "all_visuals_unregistered": true,
+    "identical_flight_states": true,
+    "leaked_bytes": 152,
+    "leaked_allocations": 19,
+    "allocation_stack": "g_strdup / gdk_set_allowed_backends / system libdecor-gtk",
+    "code_owner_classification_pending": true,
+    "console_sha256": "50b810b739d768339f2cb24ffef1d917a068e67181462e7c8b8a424c9dff9ec6"
+  },
+  "instrumentation": {
+    "compiled_engine_and_renderer_c_and_cxx": true,
+    "prebuilt_cspice_and_system_libraries_retain_builds": true,
+    "asan_options": "detect_leaks=1:fast_unwind_on_malloc=0",
+    "lsan_options": "",
+    "ubsan_options": "halt_on_error=1:print_stacktrace=1",
+    "suppressions_used": false,
+    "private_fontconfig_and_wayland_mesa_candidates_explicit": true,
+    "system_installations_modified": false
+  },
+  "runtime_files_sha256": {
+    "normal": {
+      "out/phase6-vessel-dock-records-engine/orbiter-production": "be677d2ef6a8e914330f3a36c4a16c6668e5737e920e1a527018fee60761fb4a",
+      "out/phase6-vessel-dock-records-engine/NativeModules/Celbody/Earth/Atmosphere/EarthAtm2006.so": "1f8767372c8f21849d08b322a4a91388ae6fe47b96e5b55b26fa73995798fd4f",
+      "out/phase6-vessel-dock-records-engine/NativeModules/Celbody/Earth/Atmosphere/EarthAtmJ71G.so": "6a28329be42d36dd9b776ba18ad7bba4854de8e74fa17fc397775edfb04a2252",
+      "out/phase6-vessel-dock-records-engine/NativeModules/Celbody/Mars/Atmosphere/MarsAtm2006.so": "f17c6ec15bb8a11d20b65a9293d9747a46a3e8a3ab46dfde6d42b37d4914e05a",
+      "out/phase6-vessel-dock-records-engine/NativeModules/Celbody/spice.so": "65d5f3fb37e546369b07fe499e5eb4ab37f10470cf9fb20c663291e90f8f256e",
+      "out/phase6-vessel-dock-records-engine/NativeModules/Graphics/OGLClient.so": "8f13701f324a868ad194b2e841bc2df7793deb56f7cf1d3cdef917947d0cf08a",
+      "out/phase6-vessel-dock-records-engine/NativeModules/Plugin/LuaInline.so": "662dab9ee3f7ed88da13ba64edb2faa9db520ab39d43fe3542bfecf68bc2960c",
+      "out/phase6-vessel-dock-records-engine/NativeModules/Plugin/LuaInterpreter.so": "4f5b72379adac2b285215b50c0b2415155a955b87a9c3aeea18446446c0febb0",
+      "out/phase6-vessel-dock-records-engine/NativeModules/Vessel/DeltaGlider.so": "bbd12d608ff0540e024c7bc5c5c380ff460743f61edb9b8064006ba0bb337df5",
+      "out/phase6-vessel-dock-records-engine/NativeModules/Vessel/ShuttlePB.so": "161cec0a251695663a0ddcb3146585ba4f37aa3be1cdf30c25b2a12da002afa0",
+      "out/phase6-vessel-dock-records-engine/liborbiter_production_boundary.so": "8bfdc7c942ef6fcd3ebe22e56acb3d39c71b019b69e3f9baeb6d50f951bdc2c0",
+      "out/phase6-vessel-dock-records-engine/liborbiter_production_vessels.so": "f376d577a6d444f7c91b1f04e368409e8750ee2bf2b417ecf1dcba807e1e0c39",
+      "out/phase6-vessel-dock-records-engine/native-lua/doc-tools/lfs.so": "5f4fea01706c968db48ae8cfbb1909747cb3fcecd1ffb0e2953e5897a15b3b47",
+      "out/phase6-vessel-dock-records-engine/native-lua/liblua.so": "f8e60296e13a9a1fb93420971d19285d232d6008e3e7cec47027c74e67572102"
+    },
+    "asan": {
+      "out/phase6-vessel-dock-records-asan-engine/orbiter-production": "5dd4fd30b2a3161c2c831a21930d6a8a802505e03d899a6e6b9d0dec434afbda",
+      "out/phase6-vessel-dock-records-asan-engine/NativeModules/Celbody/Earth/Atmosphere/EarthAtm2006.so": "761df4fd1aa9f91cc3eddb0e67466124eeff64146732714db06f72e5b8775655",
+      "out/phase6-vessel-dock-records-asan-engine/NativeModules/Celbody/Earth/Atmosphere/EarthAtmJ71G.so": "ecec7dc2052a9d3d7e10aa9a9cc000f59b54a57f9b7f8761183d8c565f334d9d",
+      "out/phase6-vessel-dock-records-asan-engine/NativeModules/Celbody/Mars/Atmosphere/MarsAtm2006.so": "182d8f8d1ef146b8d7b33e79b54c115c9224916d72507a8ee9e68f89cb46fc60",
+      "out/phase6-vessel-dock-records-asan-engine/NativeModules/Celbody/spice.so": "57d59924637ada737496f1b444a68b3d6ef614711afd45f7dcffcd2722e58eb0",
+      "out/phase6-vessel-dock-records-asan-engine/NativeModules/Graphics/OGLClient.so": "34c40e14f42d4751dffd2af8dd0976c4cceab32f597372318274d6c0b15c0146",
+      "out/phase6-vessel-dock-records-asan-engine/NativeModules/Plugin/LuaInline.so": "81b32b6232fff1d934c1dd9e81a0d9dc9571385d004086a05c8f9034ff406f53",
+      "out/phase6-vessel-dock-records-asan-engine/NativeModules/Plugin/LuaInterpreter.so": "6dfb35b52c04e65ee16b0d914e84e6b49f8a85891c5a097d9786409375d5f71e",
+      "out/phase6-vessel-dock-records-asan-engine/NativeModules/Vessel/DeltaGlider.so": "34bb06c50183154c3777e3cffb38684c0bb519a92d8526be22b36841b6f604ee",
+      "out/phase6-vessel-dock-records-asan-engine/NativeModules/Vessel/ShuttlePB.so": "3a1ab44c27be94d9aa8ef2cd7a25af745cfb21a52a0cd8cd9cc2666229cfad6f",
+      "out/phase6-vessel-dock-records-asan-engine/liborbiter_production_boundary.so": "db27a9f582138893b8930472dad3a258c644bdae812462322e4079e0581771eb",
+      "out/phase6-vessel-dock-records-asan-engine/liborbiter_production_vessels.so": "f80a956a40dd3574fcedfa81ac83dac0a73062f936e809fade0c286b25cb0b18",
+      "out/phase6-vessel-dock-records-asan-engine/native-lua/doc-tools/lfs.so": "2926a45ccab8283b9eed8eb0b2957fab74d3c33e2a1d0a59f36ce2c44bbb5a3b",
+      "out/phase6-vessel-dock-records-asan-engine/native-lua/liblua.so": "190291d2ff349fa70e8aae92679d76ceeced116857743b2f75a4e9639e93d5a8"
+    }
+  },
+  "retained_failures": {
+    "original_three_stock_cases": "Null SuperVessel reference during unresolved dock-token cleanup",
+    "first_candidate": "32 bytes / 2 temporary DOCKINFO allocations after clean context deletion",
+    "repeated_sessions": "152 bytes / 19 allocations through system gdk_set_allowed_backends; owning-source analysis pending"
+  },
+  "accepted_references_and_budgets_unchanged": true,
+  "evidence": [
+    {
+      "path": "out/phase6-stock-failure-asan-baseline/verification.json",
+      "sha256": "51ba86825179b2ff2912da190e0a2ab08f45da48a10e256c6e92f6c6a2986bc3"
+    },
+    {
+      "path": "out/phase6-vessel-startup-rejections/verification.json",
+      "sha256": "f36d03265b8943a938fb494f45f686d55420eed732b0ddf0e142b53296ef2386"
+    },
+    {
+      "path": "out/phase6-vessel-dock-records-rejections/verification.json",
+      "sha256": "effc2ac69e200b52d72de3af32cbe4f4926e303037bef82ece4e97d9a3364d0f"
+    },
+    {
+      "path": "out/phase6-vessel-dock-records-station-comparison.json",
+      "sha256": "5eb41eb3e2591d832524791d32f77ac35d702c522254190b1b1a94fc5ac8f498"
+    },
+    {
+      "path": "out/phase6-vessel-dock-records-success-regressions/stations/stock-vessels.json",
+      "sha256": "c877190eea6493ae08521bae01877a576b7cbfe6c24f6101dc6fc0c8adadc32a"
+    },
+    {
+      "path": "out/phase6-vessel-dock-records-valid-docking/audit.json",
+      "sha256": "91d2067d4ad46b36500c8602b11f2b75fd1fe1d3fb18ed8408cd2f481ab2e613"
+    },
+    {
+      "path": "out/phase6-vessel-dock-records-source-controls.json",
+      "sha256": "3eec94842fcff78984a3395ae43cd270973906b999928c3b6918efc49c26f3f6"
+    },
+    {
+      "path": "out/phase6-vessel-dock-records-build-normal/build.json",
+      "sha256": "558e0767d99073e73462e3406974a2a7ee453dcac1cb4c1d15d72ce43f426ab5"
+    },
+    {
+      "path": "out/phase6-vessel-dock-records-build-asan/build.json",
+      "sha256": "084f9050626317288ce6c6dd0c9c8a8b0327e44938cf5ab2eca4374d925da5d5"
+    }
+  ],
+  "prior_local_evidence_archive": {
+    "schema": 1,
+    "status": "preserved-locally",
+    "phase6_complete": false,
+    "path": "out/phase6-windowing-lifetime-evidence-v1.tar.gz",
+    "size_bytes": 166185816,
+    "sha256": "8594524153e3deaf3b528031e734a1ff0acb0bf80ea4f2e6109fed38eaf9b243",
+    "members": 4465,
+    "source_base": "4863a7696a6ba656272150f350d795c97e0b6982",
+    "index_sha256": "edfbd04e8672678edbf02d093aca5d1f595082c8da54658a0e1adbcc92ad978d",
+    "all_archive_payload_hashes_verified": true,
+    "remote_publication_complete": false
+  },
+  "full_stock_sweep": {
+    "status": "completion-evidence-pending",
+    "path": "out/phase6-vessel-dock-records-full-stock",
+    "entire_unchanged_corpus": 157,
+    "fully_instrumented": true,
+    "observed_findings_in_completed_cases": [
+      {
+        "scenario": "2024 Edition/Solar system.scn",
+        "case_status": "failed",
+        "returncode": 1,
+        "problems": [
+          "/home/dan/GIT/orbiter-cross-platform/OVP/OGLClient/VPlanet.cpp:315:11: runtime error: load of value 190, which is not a valid value for type 'bool'",
+          "process exit 1",
+          "Incomplete sixty-frame presentation or context deletion",
+          "Incomplete finalized all-vessel ticks"
+        ],
+        "console_path": "out/phase6-vessel-dock-records-full-stock/capture/006/console.log",
+        "console_sha256": "cf2f2285e41891bdd1aa158971d36c2cc1d7de9dbd93ea5138440ce4e413f332"
+      },
+      {
+        "scenario": "Antelope Valley scenery/DG at Edwards AFB.scn",
+        "case_status": "failed",
+        "returncode": 1,
+        "problems": [
+          "==3467284==ERROR: LeakSanitizer: detected memory leaks",
+          "process exit 1"
+        ],
+        "console_path": "out/phase6-vessel-dock-records-full-stock/capture/013/console.log",
+        "console_sha256": "b6c2fa210d500f5406e2854d759bb5ef969563790da80df71012eaa121186421"
+      }
+    ]
+  },
+  "remaining_phase6_work": [
+    "Missing named vessel modules and complete stock acceptance",
+    "GDK repeated-session exit report",
+    "Complete current-source instrumented corpus evidence",
+    "Current hosted four-profile qualification",
+    "Physical controllers",
+    "Durable remote evidence preservation",
+    "Additional renderer undefined behavior and DG exit allocation reports from the instrumented corpus sweep"
+  ],
+  "local_evidence_archive": {
+    "schema": 1,
+    "status": "preserved-locally",
+    "phase6_complete": false,
+    "path": "out/phase6-vessel-startup-evidence-v1.tar.gz",
+    "size_bytes": 159737413,
+    "sha256": "c55ea77cbf35440317741b63537ac29c4b1746b4e303ac08b73da13d139a8b57",
+    "members": 2717,
+    "source_base": "2d5404a46937241c01a4e89186ef38bf28e91142",
+    "index_sha256": "c3cde7188ab125ae10285a98a53e64c1243242713998ac206e7c06823878ee59",
+    "all_archive_payload_hashes_verified": true,
+    "remote_publication_complete": false,
+    "live_full_stock_results_included": false
+  }
+}

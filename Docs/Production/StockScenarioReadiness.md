@@ -28,10 +28,14 @@ pass, improving the previous `2c00d29b` baseline from 37/120 to 44/113. The
 preflight's 45 file-ready scenarios are not 45 runtime passes: GeneralApiTest
 still fails its assertion. [Station qualification](StockStations.md)
 
-Twenty-five dependency-incomplete scenarios terminate by signal. They are the
-same 25 cases as in the preceding runtime, and all remain failures. Dependency
-inventory does not establish their crash causes or excuse the missing graceful
-failure behavior. Further module and failure-handling work is required.
+Twenty-five dependency-incomplete scenarios terminate by signal in this
+historical sweep. A subsequent fully instrumented runtime now rejects all 25
+unchanged scenes cleanly, with normal context deletion and no sanitizer findings.
+It also checks both SDK creation signatures. The fix handles unresolved dock
+tokens and releases class names and temporary parsed docking records. All 25
+remain failed stock scenarios because their dependencies are unavailable.
+[Startup lifetime evidence](VesselStartupLifetime.md) is separate from full
+corpus acceptance; a fresh complete instrumented sweep is in progress.
 
 ShuttleA configuration/module dependencies affect 85 scenarios. Atlantis affects
 30. Other missing classes include Carina, Atlantis tank/SRB, Leonardo MPLM,
