@@ -68,6 +68,10 @@ def main():
                         replace('Config/Vessels/'+clone+'.cfg',data)
                         pattern=rb'(?m)^([^:\r\n]+:)'+re.escape(kind.encode())+rb'([ \t]*\r?$)'
                         scenario,count=re.subn(pattern,rb'\g<1>'+clone.encode()+rb'\g<2>',source,count=1)
+                        if not count:
+                            # Stock ISS/Mir headers can omit the explicit class.
+                            pattern=rb'(?m)^([ \t]*'+re.escape(kind.encode())+rb')([ \t]*\r?$)'
+                            scenario,count=re.subn(pattern,rb'\g<1>:'+clone.encode()+rb'\g<2>',source,count=1)
                         require(count==1,'Original complete legacy scenario declaration missing')
                         expected=b'Unsupported stock vessel class or capabilities: '+clone.encode()
                     elif variant=='changed_mass':data=item(data,'Mass',b'450001' if kind=='ISS' else b'8001')

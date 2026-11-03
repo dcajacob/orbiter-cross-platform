@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "status": "audited-original-observations",
+  "status": "limited-original-observations-playback-unqualified",
   "automatic_refresh": false,
   "repository": "dcajacob/orbiter-cross-platform",
   "application_source": "f725194209634f7fd5d1d44d426cfa9b5e303e37",
@@ -237,5 +237,13 @@
     ]
   },
   "native_admission_qualified": false,
-  "scope": "Four complete original Windows legacy station scenes, all declared vessels and ports, exact deterministic repeats and paired Debug/Release state, camera and full-frame comparisons. Native support and complete Phase 6 acceptance remain unqualified."
+  "scope": "Version 1 preserves 32 measured original processes. The three non-playback cases retain their audited state/camera/frame observations. The rescue playback case is not qualified for the intended complete stock scene; versioned replacement observations are required. No native or Phase 6 completion claim.",
+  "qualified_cases": [
+    "legacy_stations_1",
+    "legacy_stations_2",
+    "legacy_stations_3"
+  ],
+  "unqualified_cases": {
+    "legacy_stations_4": "The fixture renamed the scenario Behavior and did not stage Flights/Smack! Rescue. The unchanged original silently fell back from requested playback. Re-capture with the original scenario entry point and all named recording files before full-playback/native qualification."
+  }
 }

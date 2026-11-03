@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "status": "original-reference-audited-native-pending",
+  "status": "limited-original-reference-playback-unqualified",
   "phase6_complete": false,
   "original_application_source": "f725194209634f7fd5d1d44d426cfa9b5e303e37",
   "original_observer_commit": "e81279b9ca108b27b56925bfe034141416f20f1d",
@@ -160,5 +160,13 @@
     }
   },
   "native_support_qualified": false,
-  "scope": "Four unchanged complete original Windows scenes in Debug/Release automatic/SSE2. Native state/camera/frame comparisons and admission remain unqualified."
+  "scope": "Version 1 original observations remain byte-pinned and publicly preserved. Three non-playback cases retain audited observations; the rescue case lacks required playback input and is unqualified. Native support, teardown safety and complete Phase 6 remain unqualified.",
+  "qualified_original_cases": [
+    "legacy_stations_1",
+    "legacy_stations_2",
+    "legacy_stations_3"
+  ],
+  "unqualified_original_cases": {
+    "legacy_stations_4": "Scenario rename and missing flight recordings caused original fallback; correct full-playback reference remains pending."
+  }
 }

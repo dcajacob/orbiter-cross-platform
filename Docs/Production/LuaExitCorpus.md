@@ -35,8 +35,9 @@ GeneralApiTest completes sixty presentations and returns zero while logging its
 failed Lua assertion; the assertion keeps that scenario failed. The other 42
 failures return one with clean context deletion. Dependency rejection does not
 qualify a missing module. The [legacy station reference](../../Tests/Production/LegacyStations/README.md)
-now has audited original observations, while native admission and comparisons
-remain separate work.
+retains audited observations for its three non-playback cases. Its rescue
+playback reference needs corrected recording inputs; native comparison and
+docked-structure teardown qualification remain separate work.
 
 Sixteen damaged-evidence exit-policy controls, the non-focus-vessel removal
 control and the inventory controls pass against this fresh complete capture.

@@ -1,0 +1,35 @@
+{
+  "schema": 1,
+  "status": "unqualified-candidate",
+  "phase6_complete": false,
+  "runtime_source_commit": "c72128b38ded9dd1c08f3ba5c0a4cbbe2fd4c60a",
+  "observer_commit": "fa1d39be06c395f38db21e14ac3c8355b86600ae",
+  "release_capture": "out/phase6-legacy-stations-native-Release-auto-v1/capture.json",
+  "instrumented_capture": "out/phase6-legacy-stations-native-Debug-asan-v1/capture.json",
+  "failures": {
+    "dumbbell_instrumented_teardown": "AddressSanitizer heap-use-after-free in SuperVessel::Detach at SuperVessel.cpp:218, called from ClearDockDefinitions during PlanetarySystem teardown. A previously freed docking-port allocation is read while detaching a later member of the docked chain.",
+    "rescue_staging": "The copied scenario is called Behavior.scn, so native playback requests flights/behavior/iss.pos. The stock recording exists under Flights/Smack! Rescue. Original version 1 also omitted Flights and silently fell back, so its rescue reference is unqualified.",
+    "policy_test_fixture": "The clone control assumed an explicit class header, but stock ISS uses the shorthand ISS header. The fixture now handles both forms; the sixteen-control suite has not yet passed."
+  },
+  "normal_captured_cases": [
+    "legacy_stations_1",
+    "legacy_stations_2",
+    "legacy_stations_3"
+  ],
+  "instrumented_captured_cases": [
+    "legacy_stations_1",
+    "legacy_stations_2"
+  ],
+  "original_v1_qualified_cases": [
+    "legacy_stations_1",
+    "legacy_stations_2",
+    "legacy_stations_3"
+  ],
+  "original_v1_playback_qualified": false,
+  "native_parity_qualified": false,
+  "required_next": [
+    "Correct original and native scenario entry points and stage every pinned playback dependency; capture a versioned replacement reference.",
+    "Repair docked-chain teardown without changing physical propagation or Windows SDK layouts.",
+    "Build fresh packages and complete the full four-profile native/state/camera/image and sanitizer/rejection gates."
+  ]
+}

@@ -1,5 +1,13 @@
 # Original legacy station observations
 
+**Version 1 limitation:** subsequent native testing exposed that the rescue
+fixture used `Behavior.scn` and did not stage its named flight recordings.
+The original application silently fell back from requested playback. The three
+non-playback cases retain their audited observations; the rescue case is
+unqualified for the intended complete stock playback. All version 1 bytes remain
+pinned and preserved. Full reference replay/comparison is blocked until corrected,
+versioned observations include the original entry point and every recording.
+
 This additional reference fixture measures four complete unchanged stock scenes
 that use the configuration-defined `ISS` class. `DG dumbbell` also contains three
 original `Module1` vessels. Every declared vessel remains present. No native
@@ -20,7 +28,7 @@ rechecked alongside its frozen LF identity. The entire preserved package and
 observer sources must remain unchanged. Capture jobs alone do not qualify a
 native capability policy or complete Phase 6.
 
-The four original profiles at observer producer
+The version 1 four-profile measurement audit at observer producer
 `e81279b9ca108b27b56925bfe034141416f20f1d` now pass the independent audit: 32
 processes, 1,920 presentations, 14,640 vessel rows and 25,864 docking-port rows.
 All Debug/Release state errors are zero; repeat and paired camera records are
@@ -35,7 +43,8 @@ reference automatically. `frozen_original.py` stages those bytes and replays
 the complete audit; a same-size corrupted cache must fail before producing an
 audit. `preserve_original.py` publishes only the four already audited original
 ZIPs, re-downloads their remote bytes before publication, and never moves a tag
-or overwrites an asset. Native admission still requires matching native runs.
+or overwrites an asset. Native qualification requires corrected playback inputs,
+matching native runs and clean docked-structure teardown.
 
 `Gate.Test.py` uses the complete dumbbell capture, including all three Module1
 objects, to reject twelve damaged copies. Missing background objects, ports or

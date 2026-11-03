@@ -51,6 +51,7 @@ def main():
     a=p.parse_args();require(not a.output.exists(),'Native legacy comparison replacement forbidden')
     require(re.fullmatch('[0-9a-f]{40}',a.runtime_source_commit),'Native legacy runtime source must be immutable')
     config=legacy.settings();pins=json.loads((HERE/'observations.lock.json').read_text())
+    require(pins['status']=='audited-original-observations','Full original legacy playback reference is not qualified')
     audit=json.loads(a.original_audit.read_text());report=json.loads((a.native/'capture.json').read_text())
     require(audit['status']=='passed' and audit['processes']==32 and len(audit['profiles'])==4 and
             audit['producer_commit']==pins['producer_commit'] and audit['application_source']==config['application_source'] and
