@@ -33,9 +33,9 @@ def restore_geometry(name,current,original):
 
 def verify_focus_bars():
     def original(file):
-        return subprocess.check_output(['git','-C',str(ROOT),'show',BASE+':Src/Orbiter/'+file]).decode('utf-8')
+        return subprocess.check_output(['git','-C',str(ROOT),'show',BASE+':Src/Orbiter/'+file]).replace(b'\r\n',b'\n').decode('utf-8')
     def current(file):
-        return (ROOT/'Src/Orbiter'/file).read_bytes().decode('utf-8')
+        return (ROOT/'Src/Orbiter'/file).read_bytes().replace(b'\r\n',b'\n').decode('utf-8')
     # Compare the actual original dialog/widget code after resolving the owning
     # application's read-only state and its real focus setter.
     old=original('MenuInfoBar.cpp')
@@ -87,11 +87,14 @@ def verify_focus_bars():
     for adapter,expr in [('EditorTime()','td.SimT0'),('EditorCamera()','g_camera'),
             ('orbiter::production::CompareText','_stricmp'),
             ('orbiter::production::OwnedCameraMode cm(g_camera->GetCMode());','CameraMode *cm = g_camera->GetCMode();'),
-            ('free(m_sysfname);',''),('delete *it;',''),
+            ('delete *it;',''),
             ('strdup(_note ? _note : "")','strdup(_note)')]:
         after=after.replace(adapter,expr)
-    # Keep the existing Load() filename replacement; only the destructor gains it.
-    after=after.replace('if(m_sysfname) \n','if(m_sysfname) free(m_sysfname);\n')
+    # Only the destructor gains filename cleanup. Leave Load() untouched so its
+    # original cleanup remains checked, including on CRLF Windows checkouts.
+    destructor='DlgPlaybackEditor::~DlgPlaybackEditor() {\n\tfree(m_sysfname);'
+    if after.count(destructor)!=1:raise ValueError('Playback editor destructor cleanup changed')
+    after=after.replace(destructor,'DlgPlaybackEditor::~DlgPlaybackEditor() {',1)
     # Committing now writes a temporary file before suspending/reopening the
     # actual stream. The recorder round-trip test exercises that replacement.
     a=after.index('void DlgPlaybackEditor::SaveEventFile ()')
