@@ -19,3 +19,21 @@ target_sources(orbiter_production_vessels PRIVATE
     "${native_imgui_SOURCE_DIR}/imgui_tables.cpp" "${native_imgui_SOURCE_DIR}/imgui_widgets.cpp")
 target_include_directories(orbiter_production_vessels PRIVATE "${native_imgui_SOURCE_DIR}")
 target_compile_definitions(orbiter_production_vessels PUBLIC ORBITER_NATIVE_COCKPIT)
+
+# Stock DG sources refer to meshc-generated group IDs in all four meshes.
+add_subdirectory("${CMAKE_CURRENT_LIST_DIR}/../../../Utils/meshc" "${PROJECT_BINARY_DIR}/meshc-native")
+set(_dg_mesh_root "${CMAKE_CURRENT_LIST_DIR}/../../Vessel/DeltaGlider/Meshes")
+set(_dg_header_dir "${PROJECT_BINARY_DIR}/native-dg-include")
+file(MAKE_DIRECTORY "${_dg_header_dir}")
+function(native_dg_mesh_header mesh suffix header)
+    add_custom_command(OUTPUT "${_dg_header_dir}/${header}"
+        COMMAND meshc /I "${_dg_mesh_root}/${mesh}" /P "${suffix}" /O "${_dg_header_dir}/${header}"
+        DEPENDS meshc "${_dg_mesh_root}/${mesh}" VERBATIM)
+endfunction()
+native_dg_mesh_header(deltaglider.msh - meshres.h)
+native_dg_mesh_header(deltaglider_vc.msh _VC meshres_vc.h)
+native_dg_mesh_header(dg_2dpanel0.msh _P0 meshres_p0.h)
+native_dg_mesh_header(dg_2dpanel1.msh _P1 meshres_p1.h)
+add_custom_target(native_dg_mesh_resources DEPENDS
+    "${_dg_header_dir}/meshres.h" "${_dg_header_dir}/meshres_vc.h"
+    "${_dg_header_dir}/meshres_p0.h" "${_dg_header_dir}/meshres_p1.h")

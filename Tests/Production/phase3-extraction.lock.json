@@ -1304,7 +1304,7 @@
     },
     "Src/Orbiter/Production/NativeCockpit.cmake": {
       "original_sha256_lf": null,
-      "sha256_lf": "5770fa43e0c1a08844536c2790a0c687c12959b0c8920936c2f531311c27f3f3"
+      "sha256_lf": "6e79d8a8ce4560293a3c5d1dabbb0a8639b36569ba1d996c66ad1546dd5caa32"
     },
     "Src/Orbiter/Production/NativeCockpitGui.cpp": {
       "original_sha256_lf": null,
@@ -1337,6 +1337,10 @@
     "Src/Orbiter/Production/NativeCockpitUi.h": {
       "original_sha256_lf": null,
       "sha256_lf": "a0db093cc2f1bfeeba9dd3480c3172494fb808f3e1090b4643d0cc32504c87e1"
+    },
+    "Src/Module/LuaScript/Native/CMakeLists.txt": {
+      "original_sha256_lf": null,
+      "sha256_lf": "7d0191c7caa0debea69654e4b6524f9eebe224fe1f767d85be16d34249e41708"
     }
   }
 }
