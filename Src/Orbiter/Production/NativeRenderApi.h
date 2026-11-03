@@ -4,8 +4,13 @@
 #define ORBITER_NATIVE_RENDER_API_H
 #include "Export.h"
 #include "NativeGraphicsData.h"
+#include "NavigationData.h"
 #include "DrawAPI.h"
 #include <cstdint>
+using NAVDATA = orbiter::production::NavigationData;
+ORBITER_PRODUCTION_API void oapiGetNavPos(NAVHANDLE,VECTOR3*);
+ORBITER_PRODUCTION_API oapi::UInt32 oapiGetNavType(NAVHANDLE);
+ORBITER_PRODUCTION_API int oapiGetNavData(NAVHANDLE,NAVDATA*);
 ORBITER_PRODUCTION_API oapi::Brush* oapiCreateBrush(oapi::UInt32);
 ORBITER_PRODUCTION_API void oapiReleaseBrush(oapi::Brush*);
 ORBITER_PRODUCTION_API void oapiDestroySurface(SURFHANDLE);
@@ -24,6 +29,7 @@ ORBITER_PRODUCTION_API SURFHANDLE oapiCreateSurface (int width, int height);
 ORBITER_PRODUCTION_API char *oapiDebugString ();
 ORBITER_PRODUCTION_API void oapiDeleteMesh (MESHHANDLE hMesh);
 ORBITER_PRODUCTION_API MESHHANDLE oapiCreateMesh(oapi::UInt32,MESHGROUP*);
+ORBITER_PRODUCTION_API bool oapiAddMeshGroupBlock(MESHHANDLE,oapi::UInt32,const NTVERTEX*,oapi::UInt32,const oapi::UInt16*,oapi::UInt32);
 ORBITER_PRODUCTION_API ELEVHANDLE oapiElevationManager (OBJHANDLE hPlanet);
 ORBITER_PRODUCTION_API void oapiEquToLocal (OBJHANDLE hObj, double lng, double lat, double rad, VECTOR3 *loc);
 ORBITER_PRODUCTION_API OBJHANDLE oapiGetBaseByIndex (OBJHANDLE hPlanet, int index);

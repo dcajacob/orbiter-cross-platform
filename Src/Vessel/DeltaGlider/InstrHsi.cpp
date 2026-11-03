@@ -79,7 +79,7 @@ double InstrHSI::GetCrs () const
 void InstrHSI::Redraw (NTVERTEX *Vtx)
 {
 	int i, j, vofs;
-	DWORD tp;
+	oapi::UInt32 tp;
 	double yaw = vessel->GetYaw();   if (yaw < 0.0) yaw += PI2;
 	double siny = sin(yaw), cosy = cos(yaw);
 	double dev = 0.0, brg = 0.0, slope, c, sinc, cosc;

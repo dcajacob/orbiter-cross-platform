@@ -21,8 +21,8 @@
 
 #define STRICT 1
 
-#include "orbitersdk.h"
-#include "..\Common\Instrument.h"
+#include <memory>
+#include "../Common/Instrument.h"
 
 // ==============================================================
 // Some vessel class caps
@@ -141,11 +141,11 @@ const double DYNP_MAX = 300e3;
 // =============================================
 // 2D instrument panel parameters
 
-const DWORD PANEL2D_WIDTH = 1280;  // panel width [pixel]
-const DWORD PANEL2D_TEXW  = 2048;  // texture width
-const DWORD PANEL2D_TEXH  = 1024;  // texture height
-const DWORD INSTR3D_TEXW  =  512;
-const DWORD INSTR3D_TEXH  = 1024;
+const oapi::UInt32 PANEL2D_WIDTH = 1280;  // panel width [pixel]
+const oapi::UInt32 PANEL2D_TEXW  = 2048;  // texture width
+const oapi::UInt32 PANEL2D_TEXH  = 1024;  // texture height
+const oapi::UInt32 INSTR3D_TEXW  =  512;
+const oapi::UInt32 INSTR3D_TEXH  = 1024;
 
 // ==========================================================
 // Forward declarations
@@ -190,7 +190,7 @@ public:
 	void UpdateStatusIndicators();
 	void SetPassengerVisuals ();
 	void SetDamageVisuals ();
-	void SetPanelScale (PANELHANDLE hPanel, DWORD viewW, DWORD viewH);
+	void SetPanelScale (PANELHANDLE hPanel, oapi::UInt32 viewW, oapi::UInt32 viewH);
 	void DefinePanelMain (PANELHANDLE hPanel);
 	void DefinePanelOverhead (PANELHANDLE hPanel);
 	bool RedrawPanel_ScramTempDisp (SURFHANDLE surf);
@@ -225,15 +225,15 @@ public:
 	bool clbkDrawHUD (int mode, const HUDPAINTSPEC *hps, oapi::Sketchpad *skp);
 	void clbkRenderHUD (int mode, const HUDPAINTSPEC *hps, SURFHANDLE hTex);
 	void clbkRCSMode (int mode);
-	void clbkADCtrlMode (DWORD mode);
+	void clbkADCtrlMode (oapi::UInt32 mode);
 	void clbkHUDMode (int mode);
 	void clbkMFDMode (int mfd, int mode);
 	void clbkNavMode (int mode, bool active);
 	void clbkDockEvent (int dock, OBJHANDLE mate);
 	int  clbkNavProcess (int mode);
-	int  clbkConsumeBufferedKey (DWORD key, bool down, char *kstate);
+	int  clbkConsumeBufferedKey (oapi::UInt32 key, bool down, char *kstate);
 	bool clbkLoadGenericCockpit ();
-	bool clbkLoadPanel2D (int id, PANELHANDLE hPanel, DWORD viewW, DWORD viewH);
+	bool clbkLoadPanel2D (int id, PANELHANDLE hPanel, oapi::UInt32 viewW, oapi::UInt32 viewH);
 	bool clbkPanelMouseEvent (int id, int event, int mx, int my, void *context);
 	bool clbkPanelRedrawEvent (int id, int event, SURFHANDLE surf, void *context);
 	bool clbkLoadVC (int id);
@@ -251,11 +251,11 @@ public:
 	void SetGearParameters (double state);
 
 	// Animation handles
-	UINT anim_rudder;           // handle for rudder animation
-	UINT anim_elevator;         // handle for elevator animation
-	UINT anim_elevatortrim;     // handle for elevator trim animation
-	UINT anim_laileron;         // handle for left aileron animation
-	UINT anim_raileron;         // handle for right aileron animation
+	oapi::UInt anim_rudder;           // handle for rudder animation
+	oapi::UInt anim_elevator;         // handle for elevator animation
+	oapi::UInt anim_elevatortrim;     // handle for elevator trim animation
+	oapi::UInt anim_laileron;         // handle for left aileron animation
+	oapi::UInt anim_raileron;         // handle for right aileron animation
 
 	SURFHANDLE insignia_tex;    // vessel-specific fuselage markings
 	SURFHANDLE contrail_tex;    // contrail particle texture
@@ -336,8 +336,10 @@ private:
 // ==============================================================
 
 typedef struct {
+#ifdef _WIN32
 	HINSTANCE hDLL;
-	DWORD col[4];
+#endif
+	oapi::UInt32 col[4];
 	oapi::Pen *pen[2];
 	SURFHANDLE surf;
 } GDIParams;

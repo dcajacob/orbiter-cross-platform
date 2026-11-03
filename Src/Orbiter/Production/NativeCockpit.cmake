@@ -37,3 +37,15 @@ native_dg_mesh_header(dg_2dpanel1.msh _P1 meshres_p1.h)
 add_custom_target(native_dg_mesh_resources DEPENDS
     "${_dg_header_dir}/meshres.h" "${_dg_header_dir}/meshres_vc.h"
     "${_dg_header_dir}/meshres_p0.h" "${_dg_header_dir}/meshres_p1.h")
+
+# These are the panel elements and subsystem base used by the stock vessel.
+set(_dg_source "${CMAKE_CURRENT_LIST_DIR}/../../Vessel/DeltaGlider")
+add_library(native_dg_instruments STATIC
+    "${_dg_source}/../Common/Instrument.cpp"
+    "${_dg_source}/DGSwitches.cpp" "${_dg_source}/FuelMfd.cpp" "${_dg_source}/Horizon.cpp"
+    "${_dg_source}/InstrAoa.cpp" "${_dg_source}/InstrHsi.cpp"
+    "${_dg_source}/InstrVs.cpp" "${_dg_source}/MomentInd.cpp")
+target_include_directories(native_dg_instruments PRIVATE "${_dg_header_dir}")
+target_link_libraries(native_dg_instruments PRIVATE orbiter_production_vessels)
+set_target_properties(native_dg_instruments PROPERTIES POSITION_INDEPENDENT_CODE ON)
+add_dependencies(native_dg_instruments native_dg_mesh_resources)

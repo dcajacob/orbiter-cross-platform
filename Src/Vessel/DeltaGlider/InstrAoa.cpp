@@ -26,13 +26,13 @@ InstrAOA::InstrAOA (VESSEL3 *v): PanelElement (v)
 
 	memset (&vc_grp, 0, sizeof(GROUPREQUESTSPEC));
 	for (int i = 0; i < 8; i++)
-		vperm[i] = (WORD)(i+VC_AOA_vofs);
+		vperm[i] = (oapi::UInt16)(i+VC_AOA_vofs);
 	vc_grp.VtxPerm = vperm;
 	vc_grp.nVtx = 8;
 
 	memset (&vc_grp_readout, 0, sizeof(GROUPREQUESTSPEC));
 	for (int i = 0; i < 16; i++)
-		vperm_readout[i] = (WORD)(i+VC_AOA_READOUT_vofs);
+		vperm_readout[i] = (oapi::UInt16)(i+VC_AOA_READOUT_vofs);
 	vc_grp_readout.VtxPerm = vperm_readout;
 	vc_grp_readout.nVtx = 16;
 }
@@ -75,7 +75,7 @@ void InstrAOA::ResetVC (DEVMESHHANDLE hMesh)
 
 // --------------------------------------------------------------
 
-void InstrAOA::LoadPanel2D (int panelid, PANELHANDLE hPanel, DWORD viewW, DWORD viewH)
+void InstrAOA::LoadPanel2D (int panelid, PANELHANDLE hPanel, oapi::UInt32 viewW, oapi::UInt32 viewH)
 {
 	ycnt = 311.0f;
 	disph = 118.0f;
@@ -91,15 +91,15 @@ void InstrAOA::LoadVC (int vcid)
 
 // --------------------------------------------------------------
 
-void InstrAOA::AddMeshData2D (MESHHANDLE hMesh, DWORD grpidx)
+void InstrAOA::AddMeshData2D (MESHHANDLE hMesh, oapi::UInt32 grpidx)
 {
-	const DWORD texw = INSTR3D_TEXW, texh = INSTR3D_TEXH;
-	const DWORD scaleh = 512;
+	const oapi::UInt32 texw = INSTR3D_TEXW, texh = INSTR3D_TEXH;
+	const oapi::UInt32 scaleh = 512;
 	const float horzx = (float)texw-239.5f, horzw = 41.0f;
 	const float horzy = (float)(texh-765);
 	const float xcnt = 593.0f, ycnt = 311.0f;
-	const DWORD NVTX = 40;
-	const DWORD NIDX = 66;
+	const oapi::UInt32 NVTX = 40;
+	const oapi::UInt32 NIDX = 66;
 	static NTVERTEX VTX[NVTX] = {
 		// AOA tape
 		{xcnt-22.0f, ycnt-59,0,  0,0,0,  horzx/(float)texw,        horzy/(float)texh},
@@ -146,7 +146,7 @@ void InstrAOA::AddMeshData2D (MESHHANDLE hMesh, DWORD grpidx)
 		{xcnt+27.0f,ycnt+7.0f,0,  0,0,0,  0, 0},
 		{xcnt+34.0f,ycnt+7.0f,0,  0,0,0,  0, 0}
 	};
-	static WORD IDX[NIDX] = {
+	static oapi::UInt16 IDX[NIDX] = {
 		0,1,2, 3,2,1, 2,3,4, 5,4,3, 4,5,6, 7,6,5,
 		8,9,10, 11,10,9,
 		12,13,14, 15,14,13,

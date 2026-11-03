@@ -23,8 +23,10 @@ def main():
                     if line.startswith('CMAKE_CXX_COMPILER:FILEPATH='))
     subprocess.run([compiler, '-std=c++17', '-fPIC', '-shared', '-Wl,--no-undefined',
                     '-I' + str(ROOT / 'Orbitersdk/include'), '-I' + str(ROOT / 'Src/Orbiter'),
-                    '-I' + str(build / 'native-dg-include'), str(HERE / 'VisualMeshProbe.cpp'),
-                    '-L' + str(build), '-lorbiter_production_vessels', '-ldl', '-o', str(probe)], check=True)
+                    '-I' + str(build / 'native-dg-include'), '-I' + str(ROOT / 'Src/Vessel/Common'),
+                    str(HERE / 'VisualMeshProbe.cpp'), '-Wl,--whole-archive', str(build / 'libnative_dg_instruments.a'),
+                    '-Wl,--no-whole-archive', '-L' + str(build), '-lorbiter_production_vessels',
+                    '-lorbiter_production_boundary', '-ldl', '-o', str(probe)], check=True)
     scene = HERE.parent / 'NativeScene'
     config = output / 'Orbiter.cfg'
     config.write_text((scene / 'Orbiter.cfg').read_text() + '\nMenubarMode = 1\nInfobarMode = 1\n')

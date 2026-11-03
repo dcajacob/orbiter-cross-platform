@@ -15,6 +15,7 @@
 #include "Config.h"
 #include "PsysCore.h"
 #include "Mesh.h"
+#include "Nav.h"
 #include "elevmgr.h"
 #ifdef ORBITER_NATIVE_COCKPIT
 #include "Pane.h"
@@ -25,6 +26,25 @@
 #include <stdexcept>
 using namespace orbiter::production;
 using std::ifstream;
+void oapiGetNavPos(NAVHANDLE handle, VECTOR3 *position)
+{
+    Vector p;
+    static_cast<Nav*>(handle)->GPos(p);
+    position->x = p.x;
+    position->y = p.y;
+    position->z = p.z;
+}
+
+oapi::UInt32 oapiGetNavType(NAVHANDLE handle)
+{
+    return static_cast<Nav*>(handle)->Type();
+}
+
+int oapiGetNavData(NAVHANDLE handle, NAVDATA *data)
+{
+    static_cast<Nav*>(handle)->GetData(data);
+    return 0;
+}
 SURFHANDLE orbiter::production::RenderCockpitMfd(int id) {
 #ifdef ORBITER_NATIVE_COCKPIT
     auto* pane=GetNativeRenderContext().cockpitPane;return pane?pane->GetMFDSurface(id):nullptr;
@@ -63,6 +83,11 @@ MESHHANDLE oapiCreateMesh(oapi::UInt32 ngrp,MESHGROUP* grp)
     for(oapi::UInt32 i=0;i<ngrp;i++)
         mesh->AddGroup(grp[i].Vtx,grp[i].nVtx,grp[i].Idx,grp[i].nIdx,grp[i].MtrlIdx,grp[i].TexIdx,grp[i].zBias,0,true);
     return mesh;
+}
+bool oapiAddMeshGroupBlock(MESHHANDLE mesh, oapi::UInt32 group, const NTVERTEX *vertices, oapi::UInt32 nv,
+                           const oapi::UInt16 *indices, oapi::UInt32 ni)
+{
+    return static_cast<Mesh*>(mesh)->AddGroupBlock(group, vertices, nv, indices, ni);
 }
 namespace {
 Vessel* liveVessel(OBJHANDLE handle) {

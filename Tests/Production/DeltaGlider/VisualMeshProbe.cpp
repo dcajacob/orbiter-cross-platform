@@ -3,6 +3,7 @@
 // exercising the SDK on a live visual in the stock ShuttlePB scene.
 #include "Production/NativeGraphics.h"
 #include "NativeVesselAPI.h"
+#include "Instrument.h"
 #include "meshres_vc.h"
 #include <cstring>
 #include <dlfcn.h>
@@ -19,6 +20,24 @@ void require(bool condition, const char *message)
 
 void exercise(VESSEL &vessel, VISHANDLE visual)
 {
+    AnimState2 gear(0.5);
+    gear.Open();
+    require(gear.Process(0.25) && gear.State() == 0.125, "Stock animation state did not advance");
+    const auto scenario = GetNativeRenderContext().evidence / "animation.scn";
+    {
+        std::ofstream stream(scenario);
+        stream.exceptions(std::ios::badbit | std::ios::failbit);
+        gear.SaveState(&stream, "GEAR");
+    }
+    std::string line;
+    std::ifstream saved(scenario);
+    std::getline(saved, line);
+    AnimState2 restored(0.5);
+    require(line == "  GEAR 0.1250 0.5000" && restored.ParseScenarioLine(line.c_str()+2, "gear") &&
+            restored.State() == gear.State() && restored.Speed() == gear.Speed(), "Stock animation scenario round trip failed");
+    restored.Close();
+    require(restored.Process(0.25) && restored.IsClosed() && !restored.IsActive(), "Restored actuator did not close");
+
     auto mesh = oapiLoadMeshGlobal("DG\\deltaglider_vc");
     require(mesh && oapiMeshGroupCount(mesh) == NGRP_VC, "Stock DG virtual cockpit template missing");
     auto index = vessel.AddMesh(mesh);

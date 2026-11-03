@@ -101,7 +101,7 @@
     },
     "Orbitersdk/include/NativeVesselAPI.h": {
       "original_sha256_lf": null,
-      "sha256_lf": "e7070b0a983b51f2b3e1f957653ed1aef2600002ed387ae0bc9ad13518c69f0a",
+      "sha256_lf": "708eb4dd78e1943f33414d11acc51c4d5e251a603967c75b2e633374fc3df460",
       "scope": "Portable cockpit/ImGui SDK data and original instrument declarations. Exact Windows scalar, callback, class, field order and packing conservation plus native header/layout compilation; runtime instrumentation remains incomplete."
     },
     "Orbitersdk/include/OrbiterAPI.h": {
@@ -810,17 +810,17 @@
     },
     "Src/Orbiter/Production/NativeRenderApi.cpp": {
       "original_sha256_lf": null,
-      "sha256_lf": "07cd82d9cb44b9fa175dd17d0663295b169ec6c62d3d345ea15059cab7508442",
+      "sha256_lf": "afb6bfd9c9192943b7383acd35b8de24fda17082f1883d7b54d964267882c960",
       "scope": "Original scheduler, stock MFDs and modern map compile natively with explicit original epoch/time, authoritative world/UI bindings and indexed map resources. Exact Windows calculations and callback order conserved. Native GDI/legacy map/custom-mode entry points fail explicitly until supported; native cockpit owner and DG runtime remain unfinished."
     },
     "Src/Orbiter/Production/NativeRenderApi.h": {
       "original_sha256_lf": null,
-      "sha256_lf": "144ed1254309e5645d924a1025b2d302fd45b378ab37221226cbeb7b73e9e78b",
+      "sha256_lf": "c98a853d424a46d2492f5086cca9d53660d6b19018d73f1b7ab9ccfca65190e9",
       "scope": "Original scheduler, stock MFDs and modern map compile natively with explicit original epoch/time, authoritative world/UI bindings and indexed map resources. Exact Windows calculations and callback order conserved. Native GDI/legacy map/custom-mode entry points fail explicitly until supported; native cockpit owner and DG runtime remain unfinished."
     },
     "Src/Orbiter/Production/NativeVesselApplication.cpp": {
       "original_sha256_lf": null,
-      "sha256_lf": "bef14953f3eebef97832cfb13546b966abe0daa47ab087f0b0c5e531d7877ea1"
+      "sha256_lf": "130e848d8723df61d6d8d581d992ac2b508205264363c0a96dc6b57a2be17cf9"
     },
     "Src/Orbiter/Production/NativeVesselFactory.h": {
       "original_sha256_lf": null,
@@ -1275,7 +1275,7 @@
     },
     "Src/Vessel/DeltaGlider/FuelMfd.cpp": {
       "original_sha256_lf": "251be4f317f9568087035a289f652eff96b90e4cd499a92aacaf6e4f0c39b648",
-      "sha256_lf": "c8533e9b35bdcabe4493e48b9d84fd5d4942480e3b882a0f201475b8431a999d",
+      "sha256_lf": "58e72caa0f1340e34272eee73ab43f056eb6060e4487f0879df2060da19470b1",
       "scope": "Pre-reference correctness repair only: initialize previously indeterminate fuel-display sample time; no extraction or formula changes."
     },
     "Src/Vessel/ShuttlePB/NativeShuttlePBFactory.inc": {
@@ -1304,7 +1304,7 @@
     },
     "Src/Orbiter/Production/NativeCockpit.cmake": {
       "original_sha256_lf": null,
-      "sha256_lf": "6e79d8a8ce4560293a3c5d1dabbb0a8639b36569ba1d996c66ad1546dd5caa32"
+      "sha256_lf": "136801fbac46c03967459f7bb665fc46ca45ae4f0c0ece6c1bcb6057a5235c9f"
     },
     "Src/Orbiter/Production/NativeCockpitGui.cpp": {
       "original_sha256_lf": null,
@@ -1341,6 +1341,74 @@
     "Src/Module/LuaScript/Native/CMakeLists.txt": {
       "original_sha256_lf": null,
       "sha256_lf": "7d0191c7caa0debea69654e4b6524f9eebe224fe1f767d85be16d34249e41708"
+    },
+    "Src/Vessel/Common/Instrument.cpp": {
+      "original_sha256_lf": "a358cf68cc90de24b398d431ef38f559c91c12ca6d577cc9dd1e2954b37bd869",
+      "sha256_lf": "e3a6a7a018f246badf1d6114d3f4fad36b627d342865e3edd85ce4720e332f93"
+    },
+    "Src/Vessel/Common/Instrument.h": {
+      "original_sha256_lf": "a16658f3bdda1509a2281284b65e350467ec534a26e1097fcb0ce6adba8bf907",
+      "sha256_lf": "7f44a70937aee0f051d2d15a65460ce8e0e6d60de605f6e49d2d6853eee90ff5"
+    },
+    "Src/Vessel/DeltaGlider/DGSubsys.h": {
+      "original_sha256_lf": "f2e18e91c273cd387d4ff1dbdd625fa3f01f14d0a9620eceaaa64219f77479b2",
+      "sha256_lf": "f15ca321d250117d6b5ed11728cf717aa48bd4e85c3efc6b909db03c93e94754"
+    },
+    "Src/Vessel/DeltaGlider/DGSwitches.cpp": {
+      "original_sha256_lf": "7bf9c6bc49811ebb0abc3f5abe6f7d1ed1b1cdb9ad781bfb5a9abce200fcc993",
+      "sha256_lf": "ea3fd85431054652a111742df8b3d65404ea003a234700068a0ad4e71d6aa852"
+    },
+    "Src/Vessel/DeltaGlider/DGSwitches.h": {
+      "original_sha256_lf": "a96b6afd169b3381be44de82d8086c71bb059c8562c092969ce37ccba36e002e",
+      "sha256_lf": "028b4b80a5e6f8da8328154d35098df086e9180127511d21437809b3a55586b1"
+    },
+    "Src/Vessel/DeltaGlider/DeltaGlider.h": {
+      "original_sha256_lf": "c3840d11d268a30d77faa8554c397346b0ffde534085e37d466d9bc807521496",
+      "sha256_lf": "46cc124b2f107935aca6018e2bc7f13e8ecda82b914b12527062bbfff001f309"
+    },
+    "Src/Vessel/DeltaGlider/FuelMfd.h": {
+      "original_sha256_lf": "598f4a87ce755671ee7f691fff3e9ccadeb3a1a8f48de186cd1b563f264b5f45",
+      "sha256_lf": "3eabae64acdabe11251c4a65c9a5894c49589bd8c8d8412a5d79d21cad8bacf6"
+    },
+    "Src/Vessel/DeltaGlider/Horizon.h": {
+      "original_sha256_lf": "6d7fdbf207e697fa31f9919326ecdcf13ebb491161f208c63125c032d532ae29",
+      "sha256_lf": "cb0d4d113738469a35490aeb3198b4b7bbc69d2c0c9f2840ad8dd0a9ee69f983"
+    },
+    "Src/Vessel/DeltaGlider/InstrAoa.cpp": {
+      "original_sha256_lf": "a1afc827205d32d1506cd97901c87d4a54302c83fb5f0a5519020412431bb2bd",
+      "sha256_lf": "e30efa2f07158aafe54a1d8682537d5cce4c77b205824ff5ad98de49e189073a"
+    },
+    "Src/Vessel/DeltaGlider/InstrAoa.h": {
+      "original_sha256_lf": "fba768fdee6ebfb3e18c111c9ff61445a2e11ae409485e3d123e3fbf14f0f9ee",
+      "sha256_lf": "6ab01adbea124e3308a321afc6be52c3672edbb990f228ff137ea8e12ef47f6e"
+    },
+    "Src/Vessel/DeltaGlider/InstrHsi.cpp": {
+      "original_sha256_lf": "91ad420b041b5a1f301f15f28e15560f4c9ebef37509cb8a6153b2ff94b185fc",
+      "sha256_lf": "f3bf82941bde1ecf5aee5685b84c513e785868e0227ff48ea63afcedf58f3d02"
+    },
+    "Src/Vessel/DeltaGlider/InstrHsi.h": {
+      "original_sha256_lf": "bd630092531fa6589892df55814579c5bb1a48367e59880f911b952784750738",
+      "sha256_lf": "69579c26978376fc226f43e0983601887f57df7a543e1ebd0d06a3e1f5e8e543"
+    },
+    "Src/Vessel/DeltaGlider/InstrVs.cpp": {
+      "original_sha256_lf": "b6289e62d90a2f3121f2612f1028f7d7f106467af628d5bc6829cbfb26f87579",
+      "sha256_lf": "0c64166fe9f48491601026c0c283f507f5321bfa7e3fd0818fb80ab26bb8aeda"
+    },
+    "Src/Vessel/DeltaGlider/InstrVs.h": {
+      "original_sha256_lf": "1fb8f6189b6eee8879bf13179263066a059585c3d6ff504e16007aa4936d405a",
+      "sha256_lf": "062f58ef13602a17c27ad5449e00e6f783f2ebc02cecd468318c5acc815fd7d5"
+    },
+    "Src/Vessel/DeltaGlider/MomentInd.cpp": {
+      "original_sha256_lf": "99422492b6d4e451716645bd96d4ca7b7034c7d17355e89c2cb53e31598b7aa9",
+      "sha256_lf": "b711c9244354a477bc7a36d1ef9611f55fb300916f4896b77515b41f3b06cd57"
+    },
+    "Src/Vessel/DeltaGlider/MomentInd.h": {
+      "original_sha256_lf": "f647dab85e1efc262c1b83f09d912dfe43cb949dc1e056bb7543adb052e608ad",
+      "sha256_lf": "112fb6df25615f0cf6ef62fe1474ba2b3ac37a59983edb7b9d815130469d77c2"
+    },
+    "Src/Vessel/DeltaGlider/ScramSubsys.h": {
+      "original_sha256_lf": "df5e4e4b970574f5c19224e9466688967bbbbfb2f295024a5fd5853082e807b8",
+      "sha256_lf": "6db7fc2d03e37b2a5ceaa3b33633053899793a013b7043ffee66c94943c39918"
     }
   }
 }

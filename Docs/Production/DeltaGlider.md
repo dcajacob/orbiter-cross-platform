@@ -43,3 +43,13 @@ queries. Copying an empty slot no longer allocates a mesh. The observations
 skip deleted slots and still require identified assets for populated entries.
 This verifies stock VC mesh services on a live visual. Verification of the
 complete stock DG and DG-S vessel modules and their panel callbacks is pending.
+
+The native cockpit build now compiles the stock common subsystem and panel
+classes, fuel display, artificial horizon, angle of attack, HSI, vertical
+speed, angular rate display and DG switches into `native_dg_instruments`.
+The visual regression links the entire library with undefined symbols rejected.
+The HSI queries Orbiter's original navigation transmitter objects. Panel
+elements use the production CPU mesh append operation and device-specific
+mesh edits. The regression also advances the original `AnimState2` actuator,
+writes its stock scenario line, reloads it and closes it at the original rate.
+These component checks precede execution by the complete Delta-glider module.

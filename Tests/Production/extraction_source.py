@@ -52,8 +52,13 @@ def verify():
         name='Src/Vessel/DeltaGlider/FuelMfd.cpp'
         repaired=(ROOT/name).read_bytes().replace(b'\r\n',b'\n')
         added=b'\tTsample = oapiGetSimTime();\n'
+        # The stock FuelMFD uses one 32-bit group flag. Windows keeps the original DWORD type.
+        repaired=repaired.replace(b'(oapi::UInt32)(isScram ? 3 : 0)', b'(DWORD)(isScram ? 3 : 0)')
         if repaired.count(added)!=1 or repaired.replace(added,b'',1)!=git('show',CAPTURE+':'+name).replace(b'\r\n',b'\n'):
             raise ValueError('DG pre-reference repair exceeds sample-time initialization')
+    if 'Src/Vessel/DeltaGlider/DGSwitches.cpp' in declared:
+        from DeltaGlider.instrument_source import verify as verify_instruments
+        verify_instruments()
     if 'Src/Orbiter/Production/VesselLifetime.h' in declared:
         from lifetime_source import verify as verify_lifetime
         verify_lifetime()

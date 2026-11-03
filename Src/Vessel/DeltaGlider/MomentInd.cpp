@@ -75,7 +75,7 @@ void AngRateIndicator::ResetVC (DEVMESHHANDLE hMesh)
 
 	if (!vtxbuf_VC) {
 		vtxbuf_VC = new NTVERTEX[nvtx];
-		GROUPREQUESTSPEC grs = {vtxbuf_VC, (DWORD)nvtx, 0, 0, 0, 0, 0, 0};
+		GROUPREQUESTSPEC grs = {vtxbuf_VC, (oapi::UInt32)nvtx, 0, 0, 0, 0, 0, 0};
 		oapiGetMeshGroup(hMesh,	GRP_ANGVEL_DISP_OVR_VC, &grs);
 		w0_VC = (double)vtxbuf_VC[0].x - (double)vtxbuf_VC[1].x;
 		for (i = 0; i < 3; i++) {
@@ -88,7 +88,7 @@ void AngRateIndicator::ResetVC (DEVMESHHANDLE hMesh)
 	}
 }
 
-void AngRateIndicator::LoadPanel2D (int panelid, PANELHANDLE hPanel, DWORD viewW, DWORD viewH)
+void AngRateIndicator::LoadPanel2D (int panelid, PANELHANDLE hPanel, oapi::UInt32 viewW, oapi::UInt32 viewH)
 {
 	vtx0 = &vtxbuf_2D;
 	w0 = &w0_2D;
@@ -209,7 +209,7 @@ bool AngRateIndicator::RedrawVC (DEVMESHHANDLE hMesh, SURFHANDLE surf)
 		}
 	}
 
-	GROUPEDITSPEC ges = {GRPEDIT_VTXCRD, 0, vtx, (DWORD)nvtx, 0};
+	GROUPEDITSPEC ges = {GRPEDIT_VTXCRD, 0, vtx, (oapi::UInt32)nvtx, 0};
 	oapiEditMeshGroup(hMesh, GRP_ANGVEL_DISP_OVR_VC, &ges);
 	return false;
 }

@@ -55,13 +55,13 @@ public:
 	// On input, F must point to an array of at least the same
 	// length as the number of thruster definitions (nthdef)
 
-	inline double DMF (UINT idx) const { return thdef[idx]->dmf; }
+	inline double DMF (oapi::UInt idx) const { return thdef[idx]->dmf; }
 	// returns current fuel mass flow of thruster idx
 
-	inline double Temp (UINT idx, UINT which) const { return thdef[idx]->T[which]; }
+	inline double Temp (oapi::UInt idx, oapi::UInt which) const { return thdef[idx]->T[which]; }
 	// returns diffuser, combustion or exhaust temperature [K] of thruster idx
 
-	double TSFC (UINT idx) const;
+	double TSFC (oapi::UInt idx) const;
 	// returns thrust-specific fuel consumption of thruster idx
 	// based on last thrust calculation
 
@@ -78,7 +78,7 @@ private:
 		double F;              //   current thrust [N]              | parameters
 		double T[3];           //   temperatures                   -+
 	} **thdef;
-	UINT nthdef;               // number of ramjet thrusters
+	oapi::UInt nthdef;               // number of ramjet thrusters
 };
 
 // ==============================================================
@@ -86,6 +86,7 @@ private:
 // ==============================================================
 
 class ScramThrottle;
+class ScramThrottleLever;
 
 class ScramSubsystem: public DGSubsystem {
 public:
@@ -98,9 +99,9 @@ public:
 	double GetThrusterLevel (int which) const { return DG()->GetThrusterLevel (hScram[which]); }
 	void IncThrusterLevel (int which, double dlvl);
 	void SetThrusterLevel (int which, double lvl);
-	double TSFC (UINT which) const { return scram->TSFC (which); }
-	double DMF (UINT which) const { return scram->DMF (which); }
-	double Temp (UINT idx, UINT which) const { return scram->Temp (idx, which); }
+	double TSFC (oapi::UInt which) const { return scram->TSFC (which); }
+	double DMF (oapi::UInt which) const { return scram->DMF (which); }
+	double Temp (oapi::UInt idx, oapi::UInt which) const { return scram->Temp (idx, which); }
 	void clbkPostStep (double simt, double simdt, double mjd);
 	int clbkConsumeDirectKey (char *kstate);
 
@@ -125,13 +126,13 @@ class ScramThrottle: public DGSubsystem {
 
 public:
 	ScramThrottle (DGSubsystem *_subsys);
-	bool clbkLoadPanel2D (int panelid, PANELHANDLE hPanel, DWORD viewW, DWORD viewH);
+	bool clbkLoadPanel2D (int panelid, PANELHANDLE hPanel, oapi::UInt32 viewW, oapi::UInt32 viewH);
 	bool clbkLoadVC (int vcid);
 
 private:
 	ScramThrottleLever *lever;
 	int ELID_LEVER;
-	UINT anim_lever[2];    // scram throttle lever animation ID
+	oapi::UInt anim_lever[2];    // scram throttle lever animation ID
 };
 
 // ==============================================================
@@ -149,7 +150,7 @@ public:
 private:
 	ScramThrottle *component;
 	float ppos[2];
-	UINT sliderpos[2];
+	oapi::UInt sliderpos[2];
 };
 
 #endif // !__SCRAMSUBSYS_H

@@ -9,8 +9,14 @@
 #include "RigidBodyServices.h"
 #include "GeometryConversions.h"
 #include "SurfaceServices.h"
+#include <fstream>
 #include <stdexcept>
 using namespace orbiter::production;
+void oapiWriteScenario_string(FILEHANDLE file, char *item, char *value)
+{
+    auto &stream = *static_cast<std::ofstream*>(file);
+    stream << "  " << item << ' ' << value << std::endl;
+}
 namespace {
 [[noreturn]] void unavailable(const char* feature)
 {throw std::runtime_error(std::string("Native vessel service unavailable: ")+feature);}

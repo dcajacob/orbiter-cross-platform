@@ -44,6 +44,7 @@ OAPIFUNC VESSEL* oapiGetFocusInterface();
 OAPIFUNC OBJHANDLE oapiGetVesselByName(char*);
 OAPIFUNC OBJHANDLE oapiGetVesselByIndex(int);
 OAPIFUNC oapi::UInt32 oapiGetVesselCount();
+OAPIFUNC void oapiWriteScenario_string(FILEHANDLE,char*,char*);
 #ifdef ORBITER_NATIVE_OWNS_OAPIFUNC
 #undef OAPIFUNC
 #undef ORBITER_NATIVE_OWNS_OAPIFUNC

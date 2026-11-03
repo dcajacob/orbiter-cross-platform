@@ -16,7 +16,12 @@
 #ifndef __INSTRUMENT_H
 #define __INSTRUMENT_H
 
+#ifdef _WIN32
 #include "Orbitersdk.h"
+#else
+#include "NativeVesselAPI.h"
+#include "Production/NativeRenderApi.h"
+#endif
 #include <vector>
 
 class VESSEL3;
@@ -28,13 +33,13 @@ public:
 	PanelElement (VESSEL3 *v);
 	virtual ~PanelElement ();
 
-	virtual void AddMeshData2D (MESHHANDLE hMesh, DWORD grpidx) {}
-	virtual void AddMeshDataVC (MESHHANDLE hMesh, DWORD grpidx) {}
+	virtual void AddMeshData2D (MESHHANDLE hMesh, oapi::UInt32 grpidx) {}
+	virtual void AddMeshDataVC (MESHHANDLE hMesh, oapi::UInt32 grpidx) {}
 	virtual void Reset2D (int panelid);
 	virtual void Reset2D (int panelid, MESHHANDLE hMesh);
 	virtual void ResetVC (DEVMESHHANDLE hMesh);
 	virtual void LoadVC (int vcid);
-	virtual void LoadPanel2D (int panelid, PANELHANDLE hPanel, DWORD viewW, DWORD viewH);
+	virtual void LoadPanel2D (int panelid, PANELHANDLE hPanel, oapi::UInt32 viewW, oapi::UInt32 viewH);
 	virtual bool Redraw2D (SURFHANDLE surf);
 	virtual bool RedrawVC (DEVMESHHANDLE hMesh, SURFHANDLE surf);
 	virtual bool ProcessMouse2D (int event, int mx, int my);
@@ -50,7 +55,7 @@ protected:
 	 * \param idx pointer to index block
 	 * \param nidx number of indices in block
 	 */
-	void AddGeometry (MESHHANDLE hMesh, DWORD grpidx, const NTVERTEX *vtx, DWORD nvtx, const WORD *idx, DWORD nidx);
+	void AddGeometry (MESHHANDLE hMesh, oapi::UInt32 grpidx, const NTVERTEX *vtx, oapi::UInt32 nvtx, const oapi::UInt16 *idx, oapi::UInt32 nidx);
 
 	/**
 	 * \brief Select an existing set of vertices in a mesh group to define the element
@@ -58,15 +63,15 @@ protected:
 	 * \param grpidx mesh group index
 	 * \param vofs block offset from beginning of vertex list
 	 */
-	void SelectGeometry (MESHHANDLE hMesh, DWORD grpidx, int vofs);
+	void SelectGeometry (MESHHANDLE hMesh, oapi::UInt32 grpidx, int vofs);
 
 	char *DispStr (double dist, int precision=4);
 
 	VESSEL3 *vessel;
 	MESHHANDLE mesh;
-	DWORD gidx;
+	oapi::UInt32 gidx;
 	MESHGROUP *grp; // panel mesh group representing the instrument
-	DWORD vtxofs;   // vertex offset in mesh group
+	oapi::UInt32 vtxofs;   // vertex offset in mesh group
 };
 
 // ==============================================================
@@ -215,7 +220,7 @@ public:
 	 * \param viewH viewport height, as passed to VESSEL3::clbkLoadPanel2D
 	 * \return true if the subsystem supports 2D panel cockpit mode
      */
-	virtual bool clbkLoadPanel2D (int panelid, PANELHANDLE hPanel, DWORD viewW, DWORD viewH);
+	virtual bool clbkLoadPanel2D (int panelid, PANELHANDLE hPanel, oapi::UInt32 viewW, oapi::UInt32 viewH);
 
 	/**
 	 * \brief Set up the virtual panel elements for the subsystem
@@ -268,7 +273,7 @@ public:
 	 *   therefore depends on the subsystem order in ComponentVessel::ssys.
 	 * \sa ComponentVessel::clbkConsumeBufferedKey, VESSEL::clbkConsumeBufferedKey
 	 */
-	virtual int clbkConsumeBufferedKey (DWORD key, bool down, char *kstate);
+	virtual int clbkConsumeBufferedKey (oapi::UInt32 key, bool down, char *kstate);
 
 	/**
 	 * \brief Allow a subsystem to respond to a pressed key
@@ -332,11 +337,11 @@ public:
 	void clbkPostStep (double simt, double simdt, double mjd);
 	void clbkReset2D (int panelid, MESHHANDLE hMesh);
 	void clbkResetVC (int vcid, DEVMESHHANDLE hMesh);
-	bool clbkLoadPanel2D (int panelid, PANELHANDLE hPanel, DWORD viewW, DWORD viewH);
+	bool clbkLoadPanel2D (int panelid, PANELHANDLE hPanel, oapi::UInt32 viewW, oapi::UInt32 viewH);
 	bool clbkLoadVC (int vcid);
 	bool clbkVCMouseEvent (int elid, int event, VECTOR3 &p);
 	bool clbkVCRedrawEvent (int elid, int event, DEVMESHHANDLE hMesh, SURFHANDLE hSurf);
-	int clbkConsumeBufferedKey (DWORD key, bool down, char *kstate);
+	int clbkConsumeBufferedKey (oapi::UInt32 key, bool down, char *kstate);
 	int clbkConsumeDirectKey (char *kstate);
 
 private:
