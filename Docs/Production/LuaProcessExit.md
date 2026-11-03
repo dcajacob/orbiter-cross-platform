@@ -114,9 +114,10 @@ now admits this one pinned intentional exit only after replaying its original
 audit and comparing the complete native state and docking-port traces. Three
 targeted instrumented corpus runs passed, including two ordinary sixty-frame
 scenes and this unchanged stock exit. Sixteen copied-evidence policy controls
-reject forged or incomplete early exits. A fresh full sweep is still required;
-the historical 157-scenario sweep remains
-112 passed and 45 failed; the original failed result is not rewritten as a
-pass. Hosted checks for the repair, other missing stock modules/dependencies,
+reject forged or incomplete early exits. The fresh independently audited
+[complete sweep](LuaExitCorpus.md) now records 114 passed and 43 failed, with
+zero sanitizer diagnostics and all 157 contexts deleted. Exactly the lunar
+transfer and stock vessel API outcomes improved. The historical 112/45 raw
+result remains preserved. Hosted checks for the repair, other missing stock modules/dependencies,
 final hardware testing and remote evidence preservation remain open. A
 physical controller remains unavailable and unverified.

@@ -205,6 +205,37 @@
   "docking_rows": 25864,
   "identity_controls": 7,
   "damaged_capture_controls": 48,
+  "durable_release": {
+    "id": 433308879,
+    "tag": "phase6-legacy-stations-original-v1",
+    "url": "https://github.com/dcajacob/orbiter-cross-platform/releases/tag/phase6-legacy-stations-original-v1",
+    "assets": [
+      {
+        "id": 707399003,
+        "name": "original-legacy-stations-Debug-automatic.zip",
+        "bytes": 32361882,
+        "sha256": "68d813cb67c29bbe2ae0c6f4be1eb254739c9e05afeba27fb564fb6ed7339a91"
+      },
+      {
+        "id": 707399211,
+        "name": "original-legacy-stations-Debug-sse2.zip",
+        "bytes": 32361915,
+        "sha256": "613fc0abf433cc2951253ed07cbfcef2f882a238d92223e13f554f9b2899bfa8"
+      },
+      {
+        "id": 707399613,
+        "name": "original-legacy-stations-Release-automatic.zip",
+        "bytes": 32336898,
+        "sha256": "8aa3653bc060f9dd76a411a183cd5111b4fdf2c4d4ec8f30576687471acac9ef"
+      },
+      {
+        "id": 707399419,
+        "name": "original-legacy-stations-Release-sse2.zip",
+        "bytes": 32336898,
+        "sha256": "e13b66d2a37644823cc1c679b2b66ded48c9eced2450680332327fa6144a0f62"
+      }
+    ]
+  },
   "native_admission_qualified": false,
   "scope": "Four complete original Windows legacy station scenes, all declared vessels and ports, exact deterministic repeats and paired Debug/Release state, camera and full-frame comparisons. Native support and complete Phase 6 acceptance remain unqualified."
 }
