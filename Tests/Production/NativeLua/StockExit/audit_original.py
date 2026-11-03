@@ -57,7 +57,7 @@ def module_audit(out, recorded, expected):
             'Required original application, renderer, Lua or vessel module was not loaded')
 
 
-def audit_profile(base, profile, config, producer, preserved_root):
+def audit_profile(base, profile, config, producer, preserved_root=None, metadata_pins=None):
     configuration, math_profile = profile.split('-', 1)
     capture = base/'stock-exit-original'
     report = json.loads((capture/'capture.json').read_text())
@@ -68,7 +68,12 @@ def audit_profile(base, profile, config, producer, preserved_root):
             report['preserved_runtime_unchanged'] and not report['corpus_termination_policy_changed'],
             'Original profile is failed, incomplete or mismatched: '+profile)
     source = {safe_name(name): value for name, value in report['source_sha256_lf'].items()}
-    require(set(source) == PROTOCOL, 'Original observer source manifest is incomplete')
+    relative_folder = HERE.relative_to(ROOT).as_posix()
+    tracked = subprocess.check_output(['git', '-C', str(ROOT), 'ls-tree', '-r', '--name-only', producer, '--',
+                                       relative_folder], text=True).splitlines()
+    expected_sources = {name for name in tracked if str(PurePosixPath(name).parent) == relative_folder}
+    expected_sources.add('Tests/Production/StockVessels/Observation.h')
+    require(PROTOCOL <= set(source) == expected_sources, 'Original observer source manifest is incomplete')
     for name, expected in source.items():
         body = subprocess.check_output(['git', '-C', str(ROOT), 'show', producer+':'+name])
         require(hashlib.sha256(body.replace(b'\r\n', b'\n')).hexdigest() == expected,
@@ -76,9 +81,14 @@ def audit_profile(base, profile, config, producer, preserved_root):
     runtime_root = base/'stock-exit-runtime'
     preserved = json.loads((runtime_root/'test-runtime.json').read_text())
     runtime = json.loads((runtime_root/'control-reference-runtime.json').read_text())
-    require(digest(runtime_root/'test-runtime.json') == digest(preserved_root/'test-runtime.json') and
-            digest(runtime_root/'control-reference-runtime.json') == digest(preserved_root/'control-reference-runtime.json'),
-            'Original runtime metadata differs from the independently retained application/SDK/client')
+    if preserved_root:
+        require(sha_lf(runtime_root/'test-runtime.json') == sha_lf(preserved_root/'test-runtime.json') and
+                sha_lf(runtime_root/'control-reference-runtime.json') == sha_lf(preserved_root/'control-reference-runtime.json'),
+                'Original runtime metadata differs from the independently retained application/SDK/client')
+    if metadata_pins:
+        require(sha_lf(runtime_root/'test-runtime.json') == metadata_pins['runtime_metadata_sha256_lf'] and
+                sha_lf(runtime_root/'control-reference-runtime.json') == metadata_pins['client_metadata_sha256_lf'],
+                'Original runtime metadata differs from its independently audited pins')
     pins = json.loads((ROOT/'Tests/Production/Cockpit/Reference/provenance.json').read_text())
     require(preserved['source_commit'] == runtime['application_source'] == pins['application_source'] == config['application_source'] and
             runtime['runtime_archive_sha256'] == pins['runtime_artifacts'][configuration]['sha256'] and
@@ -86,8 +96,9 @@ def audit_profile(base, profile, config, producer, preserved_root):
             'Preserved original application/client provenance differs')
     protected = {name: value for name, value in {**preserved['files'], **runtime['client_files_sha256']}.items() if name != OBSERVER}
     require(protected == report['preserved_files_sha256'], 'Original application/SDK/client file set changed')
-    for name, expected in protected.items():
-        require(digest(preserved_root/safe_name(name)) == expected, 'Independently retained original runtime drift: '+name)
+    if preserved_root:
+        for name, expected in protected.items():
+            require(digest(preserved_root/safe_name(name)) == expected, 'Independently retained original runtime drift: '+name)
     observer = runtime_root/OBSERVER
     require(digest(observer) == report['observer_sha256'], 'Executed original observer binary differs')
     build = base/'stock-exit-driver'
@@ -122,23 +133,39 @@ def audit_profile(base, profile, config, producer, preserved_root):
         require((capture/'run-1'/name).read_bytes() == (capture/'run-2'/name).read_bytes(),
                 'Original repeat is not deterministic: '+name)
     gate = json.loads((capture/'gate-control.json').read_text())
-    require(gate['status'] == 'passed' and gate['original_capture_unchanged'] and len(gate['controls']) == 11 and
-            len({item['control'] for item in gate['controls']}) == 11, 'Original damaged-evidence controls failed or incomplete')
+    required_controls = {'missing_background_ship', 'missing_docking_port', 'missing_last_tick', 'nonfinite_state',
+                         'duplicate_docking_port', 'missing_assertion', 'forged_completion', 'wrong_scenario',
+                         'wrong_exit_code', 'incomplete_teardown', 'wrong_renderer'}
+    require(gate['status'] == 'passed' and gate['original_capture_unchanged'] and
+            required_controls <= {item['control'] for item in gate['controls']} and
+            len({item['control'] for item in gate['controls']}) == len(gate['controls']),
+            'Original damaged-evidence controls failed or incomplete')
     return dict(capture_sha256=digest(capture/'capture.json'), observer_sha256=digest(observer), runs=results,
                 actual_math=report['runs'][0]['actual_math'], preserved_files=len(protected),
                 runtime_metadata_sha256=digest(runtime_root/'test-runtime.json'),
                 client_metadata_sha256=digest(runtime_root/'control-reference-runtime.json'),
+                runtime_metadata_sha256_lf=sha_lf(runtime_root/'test-runtime.json'),
+                client_metadata_sha256_lf=sha_lf(runtime_root/'control-reference-runtime.json'),
                 gate_sha256=digest(capture/'gate-control.json'))
 
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    for name in ('artifacts', 'download-manifest', 'preserved-debug', 'preserved-release', 'output'):
+    for name in ('artifacts', 'download-manifest', 'output'):
         parser.add_argument('--'+name, required=True, type=lambda p: Path(p).resolve())
+    for name in ('preserved-debug', 'preserved-release', 'metadata-lock'):
+        parser.add_argument('--'+name, type=lambda p: Path(p).resolve())
     parser.add_argument('--producer-commit', required=True)
     args = parser.parse_args(); config = settings()
     require(not args.output.exists(), 'Original exit audit output exists')
     require(re.fullmatch('[0-9a-f]{40}', args.producer_commit), 'Original observer producer must be immutable')
+    require((args.preserved_debug and args.preserved_release) or args.metadata_lock,
+            'Independent original runtime roots or audited metadata pins are required')
+    pins = json.loads(args.metadata_lock.read_text()) if args.metadata_lock else None
+    if pins:
+        require(pins['status'] == 'audited-original-observations' and pins['automatic_refresh'] is False and
+                pins['producer_commit'] == args.producer_commit and pins['application_source'] == config['application_source'],
+                'Original metadata pins are not an audited immutable reference')
     downloads = json.loads(args.download_manifest.read_text())
     require(downloads['status'] == 'passed' and downloads['source_commit'] == args.producer_commit and
             len(downloads['artifacts']) == 4, 'Original archive matrix incomplete')
@@ -155,7 +182,12 @@ def main():
                 require(entry['name'] == 'original-stock-lua-exit-'+profile and
                         digest(ROOT/safe_name(entry['path'])) == entry['sha256'] and
                         (ROOT/entry['path']).stat().st_size == entry['bytes'], 'Original archive identity differs')
-                result['profiles'][profile] = audit_profile(args.artifacts/profile, profile, config, args.producer_commit, preserved_root)
+                if pins:
+                    pinned = next(item for item in pins['artifacts'] if item['profile'] == profile)
+                    require(all(entry[key] == pinned[key] for key in ('id', 'name', 'bytes', 'sha256')),
+                            'Original transport differs from its pinned artifact')
+                result['profiles'][profile] = audit_profile(args.artifacts/profile, profile, config, args.producer_commit,
+                    preserved_root, pins['runtime_metadata'][configuration] if pins else None)
         stops = {(run['completed_frames'], run['finalized_ticks'], run['all_vessel_rows'], run['docking_rows'])
                  for profile in result['profiles'].values() for run in profile['runs']}
         require(len(stops) == 1, 'Original profiles terminate at different boundaries')

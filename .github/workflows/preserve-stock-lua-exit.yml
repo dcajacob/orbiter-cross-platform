@@ -1,0 +1,43 @@
+name: Preserve Audited Stock Lua Exit Originals
+on:
+  push:
+    branches: ['codex/production-**']
+    paths: ['Tests/Production/NativeLua/StockExit/observations.lock.json', 'Tests/Production/NativeLua/StockExit/preserve_original.py', '.github/workflows/preserve-stock-lua-exit.yml']
+  workflow_dispatch:
+permissions:
+  contents: write
+  actions: read
+concurrency:
+  group: preserve-stock-lua-exit-original-v1
+  cancel-in-progress: false
+jobs:
+  preserve:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - name: Verify exact archive bytes and independently re-audit all four original profiles
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: >-
+          python3 -B Tests/Production/NativeLua/StockExit/frozen_original.py
+          --cache out/original-stock-exit-cache --output out/original-stock-exit
+          --audit out/original-stock-exit-audit.json
+      - name: Preserve only the audited ZIPs and verify the remote bytes before publication
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: >-
+          python3 -B Tests/Production/NativeLua/StockExit/preserve_original.py --publish
+          --cache out/original-stock-exit-cache --audit out/original-stock-exit-audit.json
+          --output out/preservation.json
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: stock-lua-exit-preservation
+          retention-days: 90
+          path: |
+            out/preservation.json
+            out/original-stock-exit-audit.json
+            out/original-stock-exit/downloads.json

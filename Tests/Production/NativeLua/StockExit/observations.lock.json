@@ -1,0 +1,100 @@
+{
+  "schema": 1,
+  "status": "audited-original-observations",
+  "automatic_refresh": false,
+  "repository": "dcajacob/orbiter-cross-platform",
+  "application_source": "f725194209634f7fd5d1d44d426cfa9b5e303e37",
+  "producer_commit": "62b8959266dbf35d1ee004934ee1729edb38e834",
+  "run_id": 41725217641,
+  "workflow": ".github/workflows/original-stock-lua-exit.yml",
+  "case_sha256_lf": "f2217ec3b20e4fe13c2420cc88154e4020c7f8feb697d1977ec69be0483a59d3",
+  "termination": {
+    "scenario": "Tests/VesselApiTest.scn",
+    "scenario_sha256_lf": "767afa8100a43608c4771fe2dbe5cc3a11045a693a65f77955dd76f4132d3aaf",
+    "script": "Script/Tests/VesselApiTest.lua",
+    "script_sha256_lf": "e0697e564d224aaaf5e0e74a59c8c38375a95ec9e6a8cb19f2c69c139c3b6170",
+    "exit_code": 0,
+    "completed_frames": 13,
+    "finalized_ticks": 14,
+    "vessels": 8,
+    "all_vessel_rows": 112,
+    "docking_rows": 210,
+    "assertion_events": 60,
+    "assertion_passes": 28,
+    "fixed_step": 0.25,
+    "frame_limit": 60
+  },
+  "runtime_metadata": {
+    "Debug": {
+      "runtime_metadata_sha256_lf": "c700ab3e0f4076a90db71a6616fd5ca4f9f730a6cf3c47caa71e6d104ac75708",
+      "client_metadata_sha256_lf": "440407a494291b7b31b2c5c1c06c7be0352af6991c494a26fca57ab8a6b582e8"
+    },
+    "Release": {
+      "runtime_metadata_sha256_lf": "73671783841497931ec671149b7f68fd79890b12ca8acc5f088489fac0b48955",
+      "client_metadata_sha256_lf": "21da5b35655f019651ecea5e465c28b9579f133a5fef40be1eb4230f5d53c24e"
+    }
+  },
+  "profiles": {
+    "Debug-automatic": {
+      "capture_sha256": "b08a98677a97b4bf93f12b7cf7e1e31f06af960b7612bc0e78a8211b033d999a",
+      "observer_sha256": "997c4896ec1bee6673b552de9b51778ba6f64940bdb4b58467c24bca3370b7a1",
+      "actual_math": "fma3",
+      "runtime_metadata_sha256_lf": "c700ab3e0f4076a90db71a6616fd5ca4f9f730a6cf3c47caa71e6d104ac75708",
+      "client_metadata_sha256_lf": "440407a494291b7b31b2c5c1c06c7be0352af6991c494a26fca57ab8a6b582e8"
+    },
+    "Debug-sse2": {
+      "capture_sha256": "c2b2c78d05f634ecca9e3ad341db35ff4fed143d5cd56b379c06cf0ec9ffd3f9",
+      "observer_sha256": "a76b53c564db1313983c6219c5bbe212363b401fb1cf4c37dc3b2d3ffad1fae2",
+      "actual_math": "sse2",
+      "runtime_metadata_sha256_lf": "c700ab3e0f4076a90db71a6616fd5ca4f9f730a6cf3c47caa71e6d104ac75708",
+      "client_metadata_sha256_lf": "440407a494291b7b31b2c5c1c06c7be0352af6991c494a26fca57ab8a6b582e8"
+    },
+    "Release-automatic": {
+      "capture_sha256": "27b40196e1a51b70a0dc18f8e38cca3d7a4e84bb81e8fbdcf6177487e4f092cc",
+      "observer_sha256": "1b9a4c923fcd9ba4f8ade4c2884c5af4c7a03e473747dc6354478dcc2dfd2f77",
+      "actual_math": "fma3",
+      "runtime_metadata_sha256_lf": "73671783841497931ec671149b7f68fd79890b12ca8acc5f088489fac0b48955",
+      "client_metadata_sha256_lf": "21da5b35655f019651ecea5e465c28b9579f133a5fef40be1eb4230f5d53c24e"
+    },
+    "Release-sse2": {
+      "capture_sha256": "434df9693f41582101a491bff56a2bbef4454fe9637e13b6c7f5779238469836",
+      "observer_sha256": "b1418b5413e9bdd9556f6d54b5d0eccafa27d30daf3357f6dfa69427f4aa4737",
+      "actual_math": "sse2",
+      "runtime_metadata_sha256_lf": "73671783841497931ec671149b7f68fd79890b12ca8acc5f088489fac0b48955",
+      "client_metadata_sha256_lf": "21da5b35655f019651ecea5e465c28b9579f133a5fef40be1eb4230f5d53c24e"
+    }
+  },
+  "artifacts": [
+    {
+      "id": 13274585725,
+      "name": "original-stock-lua-exit-Debug-automatic",
+      "profile": "Debug-automatic",
+      "bytes": 240009,
+      "sha256": "d8c0159f81236c979c7e9177e9d1c2ce8da85ff8b4fcf9634c2bc7bc84462fd7"
+    },
+    {
+      "id": 13275316307,
+      "name": "original-stock-lua-exit-Debug-sse2",
+      "profile": "Debug-sse2",
+      "bytes": 240004,
+      "sha256": "de2739e82599cdd82f026decbf42dfd2915dbd72eb32a51a718f685c4045d7c2"
+    },
+    {
+      "id": 13274076357,
+      "name": "original-stock-lua-exit-Release-automatic",
+      "profile": "Release-automatic",
+      "bytes": 203326,
+      "sha256": "aa8788030f4a6d994dda5792f72423ad476822e32aadd5565fc6149d8cf53bf6"
+    },
+    {
+      "id": 13273883494,
+      "name": "original-stock-lua-exit-Release-sse2",
+      "profile": "Release-sse2",
+      "bytes": 203217,
+      "sha256": "3f6b3b636cbe9c10a26cc2bd0433acf11c8b8b00be496c176090377aea545f72"
+    }
+  ],
+  "audit_sha256": "0ed9582018c450ead9bdb7851c923d1ac99d160aaf02fe943528c8945c22a954",
+  "audit_verifier_sha256": "697a0d46682c8919da031bcd32dd1acc814869e55b024550e6b0889070a506d5",
+  "scope": "Eight unchanged complete-scene original Windows script exits and full state/port traces, Debug/Release automatic/SSE2. No new image comparison or complete Phase 6 acceptance claim."
+}
