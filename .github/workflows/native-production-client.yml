@@ -230,11 +230,13 @@ jobs:
           set -euo pipefail
           python3 -B Tests/Production/CockpitControls/frozen_controls.py --cache out/cockpit-controls-cache --output out/frozen-cockpit-controls
           xvfb-run -a -s '-screen 0 1920x1080x24' env LIBGL_ALWAYS_SOFTWARE=1 GALLIUM_DRIVER=llvmpipe python3 -B Tests/Production/CockpitControls/native.py --executable out/native-cockpit-engine/orbiter-production --assets out/scene-resources --data out/data --modules out/native-cockpit-engine/NativeModules --planets out/planets --frozen out/frozen-cockpit-controls --configuration ${{ matrix.configuration }} --output out/native-cockpit-controls 2>&1 | tee native-cockpit-controls.log
-      - name: Verify real GLFW mouse clicks and momentary keyboard thrust in an owned X11 cockpit
+      - name: Verify real GLFW mouse clicks and thrust release in glass, DG and DG-S panels and VCs
         shell: bash
         run: |
           set -euo pipefail
-          xvfb-run -a -s '-screen 0 1920x1080x24' env LIBGL_ALWAYS_SOFTWARE=1 GALLIUM_DRIVER=llvmpipe python3 -B Tests/Production/CockpitControls/mouse_smoke.py --executable out/native-cockpit-engine/orbiter-production --assets out/scene-resources --data out/data --modules out/native-cockpit-engine/NativeModules --planets out/planets --output out/native-cockpit-mouse 2>&1 | tee native-cockpit-mouse.log
+          for case in controls_generic_orbit_surface controls_dg_panel controls_dg_vc controls_dgs_panel controls_dgs_vc; do
+            xvfb-run -a -s '-screen 0 1920x1080x24' env LIBGL_ALWAYS_SOFTWARE=1 GALLIUM_DRIVER=llvmpipe python3 -B Tests/Production/CockpitControls/mouse_smoke.py --case "$case" --frozen out/frozen-cockpit-controls --configuration ${{ matrix.configuration }} --executable out/native-cockpit-engine/orbiter-production --assets out/scene-resources --data out/data --modules out/native-cockpit-engine/NativeModules --planets out/planets --output "out/native-cockpit-mouse/$case"
+          done 2>&1 | tee native-cockpit-mouse.log
       - name: Click the visible stock cockpit menu and change ship, warp, pause and save
         run: >-
           xvfb-run -a -s '-screen 0 1920x1080x24' env LIBGL_ALWAYS_SOFTWARE=1 GALLIUM_DRIVER=llvmpipe

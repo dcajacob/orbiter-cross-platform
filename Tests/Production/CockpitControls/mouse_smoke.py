@@ -6,11 +6,31 @@ HERE=Path(__file__).resolve().parent;ROOT=HERE.parents[2]
 sys.path[:0]=[str(HERE.parent/'Cockpit'),str(HERE.parent),str(HERE.parent/'Flight')]
 from reference import fixture
 from keyboard_smoke import KeyEvent,Event,require,wait
+from frozen_controls import metadata
+from mesa_runtime import digest
 
 def main():
     p=argparse.ArgumentParser(description=__doc__)
+    cases=json.loads((HERE/'cases.json').read_text())['cases']
+    p.add_argument('--case',choices=[case['id'] for case in cases],default=cases[0]['id'])
+    p.add_argument('--frozen',type=Path)
+    p.add_argument('--configuration',choices=('Debug','Release'),default='Debug')
     for name in ('executable','assets','data','modules','planets','output'):p.add_argument('--'+name,type=Path,required=True)
     a=p.parse_args();out=a.output.resolve();require(not out.exists(),'Mouse output exists; replacement is forbidden');out.mkdir(parents=True)
+    case=next(case for case in cases if case['id']==a.case)
+    points=[(85,136),(54,136)]
+    reference=None
+    if case['cockpit']!=1:
+        require(a.frozen,'DG panel/VC input checks require the accepted Windows click coordinates')
+        pins=metadata()
+        require(json.loads((a.frozen/'provenance.json').read_text())==pins,'Staged original controls differ')
+        source=Path(a.configuration)/(case['id']+'-1')/'control-inputs.csv'
+        checksum=pins['reference_files_sha256'][a.configuration][source.relative_to(a.configuration).as_posix()]
+        require(digest(a.frozen/source)==checksum,'Frozen original click file differs')
+        clicks=[r for r in csv.DictReader((a.frozen/source).open()) if r['event']=='left_down']
+        require(len(clicks)==2 and [int(r['tick']) for r in clicks]==[10,30],'Frozen original mode click schedule differs')
+        points=[(int(r['x']),int(r['y'])) for r in clicks]
+        reference=dict(run=pins['run_id'],configuration=a.configuration,file=source.as_posix(),sha256=checksum)
     x=C.CDLL(ctypes.util.find_library('X11'))
     x.XOpenDisplay.argtypes=[C.c_char_p];x.XOpenDisplay.restype=C.c_void_p
     display=x.XOpenDisplay(None);require(display,'An owned X11 test display is required')
@@ -53,9 +73,11 @@ def main():
         # not test its framebuffer-coordinate conversion.
         x.XWarpPointer(display,0,window,0,0,0,0,px,py);x.XFlush(display);time.sleep(.05)
         send(window,4 if down else 5,number,0 if down else 1<<(7+number),px,py)
-    case=json.loads((HERE/'cases.json').read_text())['cases'][0]
-    text=fixture(case);start=text.index('PB:ShuttlePB\n');end=text.index('\nEND\n',start)
-    text=(text[:end]+'\n  RCSMODE 1'+text[end:]).replace('BEGIN_SHIPS',
+    text=fixture(case)
+    if case['cockpit']==1:
+        start=text.index('PB:ShuttlePB\n');end=text.index('\nEND\n',start)
+        text=text[:end]+'\n  RCSMODE 1'+text[end:]
+    text=text.replace('BEGIN_SHIPS',
         'BEGIN_MFD Left\n  TYPE Orbit\n  REF Earth\nEND_MFD\nBEGIN_MFD Right\n  TYPE Surface\nEND_MFD\nBEGIN_SHIPS')
     (out/'cockpit.scn').write_text(text)
     (out/'Orbiter.cfg').write_text((ROOT/'Tests/Production/NativeScene/Orbiter.cfg').read_text()+'\nFPS = 0\nMenubarMode = 1\nInfobarMode = 1\nInstrumentUpdateInterval = 0.25\n')
@@ -64,15 +86,27 @@ def main():
     for name in ('assets','data','modules','planets'):argv+=['--'+name,str(getattr(a,name).resolve())]
     argv+=['--config',str(out/'Orbiter.cfg'),'--scenario',str(out/'cockpit.scn'),'--evidence',str(out),'--keymap',str(ROOT/'Tests/Production/Flight/keymap-laptop.cfg'),'--run']
     (out/'invocation.json').write_text(json.dumps(argv,indent=2)+'\n')
+    def latest_state():
+        path=out/'cockpit-state.csv'
+        if not path.exists():return None
+        with path.open() as stream:
+            complete=[row for row in csv.DictReader(stream) if row.get('rcs_mode') and all(value is not None for value in row.values())]
+        return complete[-1] if complete else None
     with (out/'console.log').open('w') as log:
         process=subprocess.Popen(argv,stdout=log,stderr=subprocess.STDOUT,env={**os.environ,'XDG_SESSION_TYPE':'x11'})
         try:
             window=wait(lambda:owned(process.pid),'Owned native cockpit did not initialize')
             x.XSetInputFocus(display,window,1,0);x.XFlush(display)
+            # The window title exists before the first panel/VC frame. Wait for
+            # finalized cockpit state before delivering the first real click.
+            def ready():
+                row=latest_state()
+                return row and int(row['tick'])>=2 and row['object']==case['target'] and int(row['cockpit'])==case['cockpit']
+            wait(ready,'Requested real cockpit did not finish initialization')
             wait(lambda:'RCS ROT 0%' in title(window),'Original initial vessel RCS mode differs')
-            for px,mode in ((85,'LIN'),(54,'ROT')):
-                button(window,px,136,True);wait(lambda:'RCS '+mode+' 0%' in title(window),'Actual GLFW/Pane click did not select '+mode)
-                button(window,px,136,False);time.sleep(.1)
+            for (px,py),mode in zip(points,('LIN','ROT')):
+                button(window,px,py,True);wait(lambda:'RCS '+mode+' 0%' in title(window),'Actual GLFW/Pane click did not select '+mode)
+                button(window,px,py,False);time.sleep(.1)
                 require('RCS '+mode+' 0%' in title(window),'Releasing mode switch activated thrust')
                 key(window,'w',True);wait(lambda:'RCS '+mode+' 100%' in title(window),'Clicked RCS mode did not accept held keyboard thrust')
                 time.sleep(.15);key(window,'w',False);wait(lambda:'RCS '+mode+' 0%' in title(window),'Thrust persisted after release in clicked mode')
@@ -82,21 +116,26 @@ def main():
             key(window,'w',False);x.XSetInputFocus(display,window,1,0);x.XFlush(display);time.sleep(.2)
             require('RCS ROT 0%' in title(window),'Thrust reactivated on focus regain')
             def left_mode():
-                samples=list(csv.DictReader((out/'cockpit-state.csv').open()))
-                complete=[r for r in samples if r.get('left_mfd') and all(v is not None for v in r.values())]
-                return int(complete[-1]['left_mfd']) if complete else -1
+                row=latest_state()
+                return int(row['left_mfd']) if row else -1
             def click(px,py):
                 button(window,px,py,True);time.sleep(.1);button(window,px,py,False);time.sleep(.1)
-            require(left_mode()==1,'Original initial Orbit MFD is missing')
-            click(155,703);wait(lambda:left_mode()==0,'Actual MFD power button did not turn the instrument off')
-            click(155,703);wait(lambda:left_mode()==1,'Actual MFD power button did not restore Orbit')
-            click(216,703);click(20,445);wait(lambda:left_mode()==2,'Actual MFD mode page did not select Surface')
-            click(216,703);click(20,395);wait(lambda:left_mode()==1,'Actual MFD mode page did not restore Orbit')
+            if case['cockpit']==1:
+                require(left_mode()==1,'Original initial Orbit MFD is missing')
+                click(155,703);wait(lambda:left_mode()==0,'Actual MFD power button did not turn the instrument off')
+                click(155,703);wait(lambda:left_mode()==1,'Actual MFD power button did not restore Orbit')
+                click(216,703);click(20,445);wait(lambda:left_mode()==2,'Actual MFD mode page did not select Surface')
+                click(216,703);click(20,395);wait(lambda:left_mode()==1,'Actual MFD mode page did not restore Orbit')
+                points.extend([(155,703),(155,703),(216,703),(20,445),(216,703),(20,395)])
+            sys.path.insert(0,str(HERE.parent/'CockpitUI'))
+            from window_capture import capture
+            capture(x,display,window,out/'owned-cockpit.png')
+            (out/'loaded-maps.txt').write_text(Path(f'/proc/{process.pid}/maps').read_text())
             key(window,'Escape',True);require(process.wait(timeout=15)==0,'Actual native mouse session failed')
             inputs=list(csv.DictReader((out/'control-inputs.csv').open()))
-            points=[(85,136),(54,136),(155,703),(155,703),(216,703),(20,445),(216,703),(20,395)]
             require([(r['event'],int(r['x']),int(r['y'])) for r in inputs]==[(kind,px,py) for px,py in points for kind in ('left_down','left_up')],'Actual GLFW events or framebuffer coordinates differ')
             state=list(csv.DictReader((out/'cockpit-state.csv').open()));require({int(r['rcs_mode']) for r in state}=={1,2},'Finalized actual vessel modes were not observed')
+            require(all(int(r['cockpit'])==case['cockpit'] and r['object']==case['target'] for r in state),'Requested vessel or panel/VC changed during real input')
             levels=list(csv.DictReader((out/'thrust-state.csv').open()))
             keys={int(r['tick']):bytes.fromhex(r['keys']) for r in csv.DictReader((out/'input-state.csv').open())};released=0
             for row in levels:
@@ -108,8 +147,10 @@ def main():
             life=json.loads((out/'graphics-lifecycle.json').read_text());require(life['context_deleted'] and life['successful_presents']>0,'Mouse session did not present/shut down normally')
             errors=out/'graphics-errors.txt';require(not errors.exists() or not errors.read_text().strip(),'Mouse session OpenGL errors')
             report=dict(status='passed',transport='X11 targeted events and real server cursor, GLFW callback, original Pane',
-                actual_rcs_mode_buttons=True,mfd_power_off_on=True,mfd_mode_surface_orbit=True,
-                momentary_keyboard_rcs=True,focus_loss_release=True,finalized_release_samples=released,mouse_events=inputs)
+                case=case['id'],cockpit=case['cockpit'],reference=reference,
+                actual_rcs_mode_buttons=True,mfd_power_off_on=case['cockpit']==1,mfd_mode_surface_orbit=case['cockpit']==1,
+                momentary_keyboard_rcs=True,focus_loss_release=True,finalized_release_samples=released,mouse_events=inputs,
+                lifecycle=life,screenshot_sha256=digest(out/'owned-cockpit.png'))
             (out/'mouse-verification.json').write_text(json.dumps(report,indent=2)+'\n');print(json.dumps(report,indent=2))
         finally:
             if process.poll() is None:

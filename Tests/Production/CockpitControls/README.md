@@ -53,13 +53,18 @@ Current regression entry points are separate from the frozen producer:
 - `current.py` rebuilds the original observation driver against the current
   Windows SDK and compares all five cases with the staged originals. The normal
   Windows client workflow runs it after the nine instrument cases.
-- `native.py` compares the supported generic glass case using the same real
-  Pane hit testing and frozen tick/coordinate schedule. Native DG/DG-S panels
-  and virtual cockpits remain unsupported.
+- `native.py` compares all five cases using the original Pane hit testing and
+  frozen tick/coordinate schedule, including both DG/DG-S panels and VCs.
 - `mouse_smoke.py` separately verifies actual GLFW/X11 input delivery, RCS mode
   switches, momentary keyboard thrust and focus-loss release, plus the original
-  MFD power and Surface/Orbit selection buttons. It operates only on the window
-  owned by its child test process. This test is not a frozen numerical replay.
+  MFD power and Surface/Orbit selection buttons in the glass case. `--case`
+  selects any of the five cases. DG/DG-S cases require `--frozen` and use the
+  accepted original screen coordinates after checking their provenance and
+  hashes. Every case selects linear and rotational modes, applies and releases
+  held thrust, then drops window focus while thrust is held. Finalized actual
+  vessel samples must show no jets or exhaust after release/focus loss. Each
+  run retains an owned-window screenshot, library maps, inputs, state, lifecycle
+  and verification report. This test is not a frozen numerical replay.
 
 Stage accepted references with `frozen_controls.py --cache <cache> --output
 <frozen>` (add `--offline` to require verified cached archives). Native scripts
@@ -69,3 +74,15 @@ the deterministic comparison additionally takes `--frozen` and
 `LIBGL_ALWAYS_SOFTWARE=1 GALLIUM_DRIVER=llvmpipe`. The native workflow runs both
 checks on all four Debug/Release automatic/SSE2 profiles and archives evidence.
 These engineering checks do not establish complete native cockpit compatibility.
+
+For example, after staging the immutable originals and building a matching
+native engine/renderer:
+
+```sh
+xvfb-run -a env LIBGL_ALWAYS_SOFTWARE=1 GALLIUM_DRIVER=llvmpipe \
+  python3 -B Tests/Production/CockpitControls/mouse_smoke.py \
+  --case controls_dg_vc --frozen out/frozen-cockpit-controls \
+  --configuration Debug --executable out/native-cockpit-engine/orbiter-production \
+  --modules out/native-cockpit-engine/NativeModules --assets out/scene-resources \
+  --data out/data --planets out/planets --output out/dg-vc-window-input
+```

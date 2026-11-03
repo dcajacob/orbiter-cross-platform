@@ -33,6 +33,17 @@ system-Xlib run exactly. System libraries are unchanged; wider platform
 qualification remains open. [Xlib lifetime evidence](XlibLifetimeVerification.json)
 [Systems evidence](DGSystemsVerification.json)
 
+Real X11/GLFW input now passes the glass cockpit and both DG/DG-S panels and
+virtual cockpits in all four native Debug/Release automatic/SSE2 configurations.
+Ten further sanitizer processes pass on Intel and isolated software graphics.
+The original RCS dial hit testing selects linear/rotational modes, held keyboard
+thrust releases normally, and focus loss clears thrust. The glider click
+coordinates come from checksum-verified frozen Windows captures. A software VC
+probe exposed a first-click startup race in the test: the window title existed
+at tick zero before cockpit setup finished. The final driver waits for finalized
+cockpit state. Other panel/VC controls and physical joystick hardware remain
+separate gates. [Real-window input evidence](CockpitWindowInputVerification.json)
+
 The native graphics leak now has an isolated source fix and a passing local
 sanitizer menu flow. Mesa's executable-code allocator retained two bookkeeping
 objects (112 bytes) and a 10 MiB mapping after its last generated function was

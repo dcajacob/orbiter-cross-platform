@@ -38,6 +38,12 @@ remain failures; broader platform acceptance remains open.
 [Windows comparisons](DGSystemsWindowsVerification.json)
 [Xlib lifetime evidence](XlibLifetimeVerification.json)
 
+Both gliders' RCS dials also pass actual GLFW/X11 clicks in panels and virtual
+cockpits, including held thrust, key release and thrust cancellation on window
+focus loss. All four native build/profile pairs and Intel/software sanitizer
+flows pass. Broader subsystem mouse controls remain open.
+[Real-window input evidence](CockpitWindowInputVerification.json)
+
 Both native vessels now load the stock Lua interpreter and LuaInline worker and
 fly with the original AAP in the 2D panel and virtual cockpit. In each 48-frame
 atmospheric flight the autopilot drives elevator, aileron and main thrust,

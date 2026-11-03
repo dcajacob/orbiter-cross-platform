@@ -71,8 +71,9 @@ capture identities. It verifies evidence hashes, exact saved mechanism positions
 and speeds, exact animation trajectories at every sample, corresponding CPU math
 profiles, discrete vessel/cockpit state and the unchanged physical-state budgets
 from `Cockpit/cases.json`. Original outputs archive selected evidence files,
-excluding the staged data installation. These new hosted checks remain pending
-until their first complete run succeeds.
+excluding the staged data installation. All four build/profile capture pairs
+from run 41602701454 pass these unchanged comparisons locally; the workflow's
+later Help failure remains separate. [Comparison evidence](../../../Docs/Production/DGSystemsWindowsVerification.json)
 
 On Windows, after staging the preserved runtime with `CockpitControls/prepare.py`:
 
