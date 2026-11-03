@@ -1,0 +1,1150 @@
+{
+  "schema": 1,
+  "status": "native repeatability passed; original Windows image parity pending",
+  "phase6_complete": false,
+  "source_worktree_base": "149b46135dc02f4ce1fe24a3f6c2406690f57faa",
+  "scope": "Both gliders, three VC poses, scenario-loaded and SDK-reopened MFDs, two repeats in four native profiles",
+  "original_application_source": "f725194209634f7fd5d1d44d426cfa9b5e303e37",
+  "sources_sha256_lf": {
+    "Tests/Production/CockpitCamera/run.py": "1490fe54831b9eed74852ca2dab48ff001cbc37d8411c64a0dc787fdb719d9c5",
+    "Tests/Production/CockpitCamera/Driver.cpp": "a999bafcdbb30233ca54839a5da5b4cc2c786909be10a94f23f708f855756b59",
+    "Tests/Production/CockpitCamera/Observation.h": "ad66da760a2a96be28b255e6222aff0c4572ea1180f5f86fde3d8424b9d21c45",
+    "Tests/Production/CockpitCamera/cases.json": "e4913b9f0431335f1da7f53d3e4e4ab7ed85e3d80ac6f4320df6dc7723e0c17d",
+    "Tests/Production/CockpitCamera/CMakeLists.txt": "332bbe8ec79002f783a676a4af0d313e078ac8b8ac6bdcfe2107947fcf154c75",
+    "Tests/Production/CockpitCamera/NativeProbe.cpp": "10ae32def1366f3fb517b9dea839f4d793ecc6a107c39ce26d404622db2d4bd1",
+    "Tests/Production/CockpitCamera/README.md": "bc1d95418cabc212edb852bf2dae935f4c49c1df3f75eef5ed4e252c82cb9337",
+    "Tests/Production/CockpitCameraGate.Test.py": "2449d9dccd242694ac37d7a12bd66ea9a5c2164e4816b91974afa6bd80afcb89",
+    ".github/workflows/native-production-client.yml": "5a06b1d6459312b4b3a3c100548124987e01c2866995b3f0e9bdb5710ff802bc",
+    ".github/workflows/original-cockpit-camera.yml": "e62a3d27c8d1334507942b4e5a633d7e966d9aeb31cfe53b11caf80ddbcf4292"
+  },
+  "native_profiles": {
+    "automatic-debug": {
+      "output": "out/phase6-headlook-qualified/automatic-debug",
+      "report_sha256": "cf5c9588649e532e741be2be03893daa56d44e9ac4edbc240d67f9620bd3d952",
+      "runtime": {
+        "executable_sha256": "c55b341063536b6dd20fb4189ddae266c5d7593e25ddd293d0e7f6c377513fa7",
+        "engine_library_sha256": "2af9b65f008db8153b02659adf8055486bb2fe691881563b634872b75ca048c1",
+        "renderer_module_sha256": "cf82969b6dbd3a6408e8a7c3f4713d1f157cbf69cee2fbcd41dcdb627334d5d5"
+      },
+      "producer_sha256": "affb9c5f1fbd4c96b7950f6f250d3009577dcda363b9fa4ec07889dc9e3e03e0",
+      "cases": {
+        "camera_dg_forward_scenario": {
+          "runs": 2,
+          "full_frame_repeat_ssim": {
+            "20": 1.0,
+            "50": 1.0
+          },
+          "mfd_repeat_ssim": {
+            "mfd-0-20": 1.0,
+            "mfd-1-20": 1.0,
+            "mfd-0-50": 1.0,
+            "mfd-1-50": 1.0
+          },
+          "camera_trace_sha256": [
+            "b0c0a227023c84b732aa8805e00f6e8cc7f28725511cb567d0522264a1987343",
+            "b0c0a227023c84b732aa8805e00f6e8cc7f28725511cb567d0522264a1987343"
+          ],
+          "actual_math": "amd-6121d02-fma3",
+          "exact_camera_state_text_values_and_geometry_repeats": true
+        },
+        "camera_dg_forward_reopened": {
+          "runs": 2,
+          "full_frame_repeat_ssim": {
+            "20": 1.0,
+            "50": 1.0
+          },
+          "mfd_repeat_ssim": {
+            "mfd-0-20": 1.0,
+            "mfd-1-20": 1.0,
+            "mfd-0-50": 1.0,
+            "mfd-1-50": 1.0
+          },
+          "camera_trace_sha256": [
+            "b0c0a227023c84b732aa8805e00f6e8cc7f28725511cb567d0522264a1987343",
+            "b0c0a227023c84b732aa8805e00f6e8cc7f28725511cb567d0522264a1987343"
+          ],
+          "actual_math": "amd-6121d02-fma3",
+          "exact_camera_state_text_values_and_geometry_repeats": true
+        },
+        "camera_dg_down_scenario": {
+          "runs": 2,
+          "full_frame_repeat_ssim": {
+            "20": 1.0,
+            "50": 1.0
+          },
+          "mfd_repeat_ssim": {
+            "mfd-0-20": 1.0,
+            "mfd-1-20": 1.0,
+            "mfd-0-50": 1.0,
+            "mfd-1-50": 1.0
+          },
+          "camera_trace_sha256": [
+            "fc8a30459327bb72d08cfc0b0f99d573e9a8db504159db87b7e7beb606d9d5a9",
+            "fc8a30459327bb72d08cfc0b0f99d573e9a8db504159db87b7e7beb606d9d5a9"
+          ],
+          "actual_math": "amd-6121d02-fma3",
+          "exact_camera_state_text_values_and_geometry_repeats": true
+        },
+        "camera_dg_down_reopened": {
+          "runs": 2,
+          "full_frame_repeat_ssim": {
+            "20": 1.0,
+            "50": 1.0
+          },
+          "mfd_repeat_ssim": {
+            "mfd-0-20": 1.0,
+            "mfd-1-20": 1.0,
+            "mfd-0-50": 1.0,
+            "mfd-1-50": 1.0
+          },
+          "camera_trace_sha256": [
+            "fc8a30459327bb72d08cfc0b0f99d573e9a8db504159db87b7e7beb606d9d5a9",
+            "fc8a30459327bb72d08cfc0b0f99d573e9a8db504159db87b7e7beb606d9d5a9"
+          ],
+          "actual_math": "amd-6121d02-fma3",
+          "exact_camera_state_text_values_and_geometry_repeats": true
+        },
+        "camera_dgs_forward_scenario": {
+          "runs": 2,
+          "full_frame_repeat_ssim": {
+            "20": 1.0,
+            "50": 1.0
+          },
+          "mfd_repeat_ssim": {
+            "mfd-0-20": 1.0,
+            "mfd-1-20": 1.0,
+            "mfd-0-50": 1.0,
+            "mfd-1-50": 1.0
+          },
+          "camera_trace_sha256": [
+            "0e7c6d8b83cd6f8fd64af509db65c494f575c0ebb4a7141a7d8a1aa060e147a7",
+            "0e7c6d8b83cd6f8fd64af509db65c494f575c0ebb4a7141a7d8a1aa060e147a7"
+          ],
+          "actual_math": "amd-6121d02-fma3",
+          "exact_camera_state_text_values_and_geometry_repeats": true
+        },
+        "camera_dgs_forward_reopened": {
+          "runs": 2,
+          "full_frame_repeat_ssim": {
+            "20": 1.0,
+            "50": 1.0
+          },
+          "mfd_repeat_ssim": {
+            "mfd-0-20": 1.0,
+            "mfd-1-20": 1.0,
+            "mfd-0-50": 1.0,
+            "mfd-1-50": 1.0
+          },
+          "camera_trace_sha256": [
+            "0e7c6d8b83cd6f8fd64af509db65c494f575c0ebb4a7141a7d8a1aa060e147a7",
+            "0e7c6d8b83cd6f8fd64af509db65c494f575c0ebb4a7141a7d8a1aa060e147a7"
+          ],
+          "actual_math": "amd-6121d02-fma3",
+          "exact_camera_state_text_values_and_geometry_repeats": true
+        },
+        "camera_dgs_down_scenario": {
+          "runs": 2,
+          "full_frame_repeat_ssim": {
+            "20": 1.0,
+            "50": 1.0
+          },
+          "mfd_repeat_ssim": {
+            "mfd-0-20": 1.0,
+            "mfd-1-20": 1.0,
+            "mfd-0-50": 1.0,
+            "mfd-1-50": 1.0
+          },
+          "camera_trace_sha256": [
+            "51eb4ca3f77c152a0cd7415e21e50454baff21a677870dbdec804adc280301b0",
+            "51eb4ca3f77c152a0cd7415e21e50454baff21a677870dbdec804adc280301b0"
+          ],
+          "actual_math": "amd-6121d02-fma3",
+          "exact_camera_state_text_values_and_geometry_repeats": true
+        },
+        "camera_dgs_down_reopened": {
+          "runs": 2,
+          "full_frame_repeat_ssim": {
+            "20": 1.0,
+            "50": 1.0
+          },
+          "mfd_repeat_ssim": {
+            "mfd-0-20": 1.0,
+            "mfd-1-20": 1.0,
+            "mfd-0-50": 1.0,
+            "mfd-1-50": 1.0
+          },
+          "camera_trace_sha256": [
+            "51eb4ca3f77c152a0cd7415e21e50454baff21a677870dbdec804adc280301b0",
+            "51eb4ca3f77c152a0cd7415e21e50454baff21a677870dbdec804adc280301b0"
+          ],
+          "actual_math": "amd-6121d02-fma3",
+          "exact_camera_state_text_values_and_geometry_repeats": true
+        },
+        "camera_dg_down_center_scenario": {
+          "runs": 2,
+          "full_frame_repeat_ssim": {
+            "20": 1.0,
+            "50": 1.0
+          },
+          "mfd_repeat_ssim": {
+            "mfd-0-20": 1.0,
+            "mfd-1-20": 1.0,
+            "mfd-0-50": 1.0,
+            "mfd-1-50": 1.0
+          },
+          "camera_trace_sha256": [
+            "dfd7d67bde16f6942e2b88caab6fdb38a9339cf8e5002d94f525253cc2e1c1c2",
+            "dfd7d67bde16f6942e2b88caab6fdb38a9339cf8e5002d94f525253cc2e1c1c2"
+          ],
+          "actual_math": "amd-6121d02-fma3",
+          "exact_camera_state_text_values_and_geometry_repeats": true
+        },
+        "camera_dg_down_center_reopened": {
+          "runs": 2,
+          "full_frame_repeat_ssim": {
+            "20": 1.0,
+            "50": 1.0
+          },
+          "mfd_repeat_ssim": {
+            "mfd-0-20": 1.0,
+            "mfd-1-20": 1.0,
+            "mfd-0-50": 1.0,
+            "mfd-1-50": 1.0
+          },
+          "camera_trace_sha256": [
+            "dfd7d67bde16f6942e2b88caab6fdb38a9339cf8e5002d94f525253cc2e1c1c2",
+            "dfd7d67bde16f6942e2b88caab6fdb38a9339cf8e5002d94f525253cc2e1c1c2"
+          ],
+          "actual_math": "amd-6121d02-fma3",
+          "exact_camera_state_text_values_and_geometry_repeats": true
+        },
+        "camera_dgs_down_center_scenario": {
+          "runs": 2,
+          "full_frame_repeat_ssim": {
+            "20": 1.0,
+            "50": 1.0
+          },
+          "mfd_repeat_ssim": {
+            "mfd-0-20": 1.0,
+            "mfd-1-20": 1.0,
+            "mfd-0-50": 1.0,
+            "mfd-1-50": 1.0
+          },
+          "camera_trace_sha256": [
+            "4a127b7a0b3d4b4d3f1f5fbcf89c5370d679cdcfe0a84c2facda55be50a6271f",
+            "4a127b7a0b3d4b4d3f1f5fbcf89c5370d679cdcfe0a84c2facda55be50a6271f"
+          ],
+          "actual_math": "amd-6121d02-fma3",
+          "exact_camera_state_text_values_and_geometry_repeats": true
+        },
+        "camera_dgs_down_center_reopened": {
+          "runs": 2,
+          "full_frame_repeat_ssim": {
+            "20": 1.0,
+            "50": 1.0
+          },
+          "mfd_repeat_ssim": {
+            "mfd-0-20": 1.0,
+            "mfd-1-20": 1.0,
+            "mfd-0-50": 1.0,
+            "mfd-1-50": 1.0
+          },
+          "camera_trace_sha256": [
+            "4a127b7a0b3d4b4d3f1f5fbcf89c5370d679cdcfe0a84c2facda55be50a6271f",
+            "4a127b7a0b3d4b4d3f1f5fbcf89c5370d679cdcfe0a84c2facda55be50a6271f"
+          ],
+          "actual_math": "amd-6121d02-fma3",
+          "exact_camera_state_text_values_and_geometry_repeats": true
+        }
+      }
+    },
+    "automatic-release": {
+      "output": "out/phase6-headlook-qualified/automatic-release",
+      "report_sha256": "d43cdc480902a7c87f856b0fd1252d2db4d9aa7346d0efc3f18d4c3a0f890e86",
+      "runtime": {
+        "executable_sha256": "8e074c036edd6abe8f4fd75e870fbffc403f9a73b51f900a8282860abc7d1f2c",
+        "engine_library_sha256": "8770501b39a8fa20e2a1d28c803276aac69238bc286f0b73986efae75a2227c4",
+        "renderer_module_sha256": "f248538c637ef70f2e7cad4ebe602d71b3f61917350b227b3861dace323060e5"
+      },
+      "producer_sha256": "affb9c5f1fbd4c96b7950f6f250d3009577dcda363b9fa4ec07889dc9e3e03e0",
+      "cases": {
+        "camera_dg_forward_scenario": {
+          "runs": 2,
+          "full_frame_repeat_ssim": {
+            "20": 1.0,
+            "50": 1.0
+          },
+          "mfd_repeat_ssim": {
+            "mfd-0-20": 1.0,
+            "mfd-1-20": 1.0,
+            "mfd-0-50": 1.0,
+            "mfd-1-50": 1.0
+          },
+          "camera_trace_sha256": [
+            "b0c0a227023c84b732aa8805e00f6e8cc7f28725511cb567d0522264a1987343",
+            "b0c0a227023c84b732aa8805e00f6e8cc7f28725511cb567d0522264a1987343"
+          ],
+          "actual_math": "amd-6121d02-fma3",
+          "exact_camera_state_text_values_and_geometry_repeats": true
+        },
+        "camera_dg_forward_reopened": {
+          "runs": 2,
+          "full_frame_repeat_ssim": {
+            "20": 1.0,
+            "50": 1.0
+          },
+          "mfd_repeat_ssim": {
+            "mfd-0-20": 1.0,
+            "mfd-1-20": 1.0,
+            "mfd-0-50": 1.0,
+            "mfd-1-50": 1.0
+          },
+          "camera_trace_sha256": [
+            "b0c0a227023c84b732aa8805e00f6e8cc7f28725511cb567d0522264a1987343",
+            "b0c0a227023c84b732aa8805e00f6e8cc7f28725511cb567d0522264a1987343"
+          ],
+          "actual_math": "amd-6121d02-fma3",
+          "exact_camera_state_text_values_and_geometry_repeats": true
+        },
+        "camera_dg_down_scenario": {
+          "runs": 2,
+          "full_frame_repeat_ssim": {
+            "20": 1.0,
+            "50": 1.0
+          },
+          "mfd_repeat_ssim": {
+            "mfd-0-20": 1.0,
+            "mfd-1-20": 1.0,
+            "mfd-0-50": 1.0,
+            "mfd-1-50": 1.0
+          },
+          "camera_trace_sha256": [
+            "fc8a30459327bb72d08cfc0b0f99d573e9a8db504159db87b7e7beb606d9d5a9",
+            "fc8a30459327bb72d08cfc0b0f99d573e9a8db504159db87b7e7beb606d9d5a9"
+          ],
+          "actual_math": "amd-6121d02-fma3",
+          "exact_camera_state_text_values_and_geometry_repeats": true
+        },
+        "camera_dg_down_reopened": {
+          "runs": 2,
+          "full_frame_repeat_ssim": {
+            "20": 1.0,
+            "50": 1.0
+          },
+          "mfd_repeat_ssim": {
+            "mfd-0-20": 1.0,
+            "mfd-1-20": 1.0,
+            "mfd-0-50": 1.0,
+            "mfd-1-50": 1.0
+          },
+          "camera_trace_sha256": [
+            "fc8a30459327bb72d08cfc0b0f99d573e9a8db504159db87b7e7beb606d9d5a9",
+            "fc8a30459327bb72d08cfc0b0f99d573e9a8db504159db87b7e7beb606d9d5a9"
+          ],
+          "actual_math": "amd-6121d02-fma3",
+          "exact_camera_state_text_values_and_geometry_repeats": true
+        },
+        "camera_dgs_forward_scenario": {
+          "runs": 2,
+          "full_frame_repeat_ssim": {
+            "20": 1.0,
+            "50": 1.0
+          },
+          "mfd_repeat_ssim": {
+            "mfd-0-20": 1.0,
+            "mfd-1-20": 1.0,
+            "mfd-0-50": 1.0,
+            "mfd-1-50": 1.0
+          },
+          "camera_trace_sha256": [
+            "0e7c6d8b83cd6f8fd64af509db65c494f575c0ebb4a7141a7d8a1aa060e147a7",
+            "0e7c6d8b83cd6f8fd64af509db65c494f575c0ebb4a7141a7d8a1aa060e147a7"
+          ],
+          "actual_math": "amd-6121d02-fma3",
+          "exact_camera_state_text_values_and_geometry_repeats": true
+        },
+        "camera_dgs_forward_reopened": {
+          "runs": 2,
+          "full_frame_repeat_ssim": {
+            "20": 1.0,
+            "50": 1.0
+          },
+          "mfd_repeat_ssim": {
+            "mfd-0-20": 1.0,
+            "mfd-1-20": 1.0,
+            "mfd-0-50": 1.0,
+            "mfd-1-50": 1.0
+          },
+          "camera_trace_sha256": [
+            "0e7c6d8b83cd6f8fd64af509db65c494f575c0ebb4a7141a7d8a1aa060e147a7",
+            "0e7c6d8b83cd6f8fd64af509db65c494f575c0ebb4a7141a7d8a1aa060e147a7"
+          ],
+          "actual_math": "amd-6121d02-fma3",
+          "exact_camera_state_text_values_and_geometry_repeats": true
+        },
+        "camera_dgs_down_scenario": {
+          "runs": 2,
+          "full_frame_repeat_ssim": {
+            "20": 1.0,
+            "50": 1.0
+          },
+          "mfd_repeat_ssim": {
+            "mfd-0-20": 1.0,
+            "mfd-1-20": 1.0,
+            "mfd-0-50": 1.0,
+            "mfd-1-50": 1.0
+          },
+          "camera_trace_sha256": [
+            "51eb4ca3f77c152a0cd7415e21e50454baff21a677870dbdec804adc280301b0",
+            "51eb4ca3f77c152a0cd7415e21e50454baff21a677870dbdec804adc280301b0"
+          ],
+          "actual_math": "amd-6121d02-fma3",
+          "exact_camera_state_text_values_and_geometry_repeats": true
+        },
+        "camera_dgs_down_reopened": {
+          "runs": 2,
+          "full_frame_repeat_ssim": {
+            "20": 1.0,
+            "50": 1.0
+          },
+          "mfd_repeat_ssim": {
+            "mfd-0-20": 1.0,
+            "mfd-1-20": 1.0,
+            "mfd-0-50": 1.0,
+            "mfd-1-50": 1.0
+          },
+          "camera_trace_sha256": [
+            "51eb4ca3f77c152a0cd7415e21e50454baff21a677870dbdec804adc280301b0",
+            "51eb4ca3f77c152a0cd7415e21e50454baff21a677870dbdec804adc280301b0"
+          ],
+          "actual_math": "amd-6121d02-fma3",
+          "exact_camera_state_text_values_and_geometry_repeats": true
+        },
+        "camera_dg_down_center_scenario": {
+          "runs": 2,
+          "full_frame_repeat_ssim": {
+            "20": 1.0,
+            "50": 1.0
+          },
+          "mfd_repeat_ssim": {
+            "mfd-0-20": 1.0,
+            "mfd-1-20": 1.0,
+            "mfd-0-50": 1.0,
+            "mfd-1-50": 1.0
+          },
+          "camera_trace_sha256": [
+            "dfd7d67bde16f6942e2b88caab6fdb38a9339cf8e5002d94f525253cc2e1c1c2",
+            "dfd7d67bde16f6942e2b88caab6fdb38a9339cf8e5002d94f525253cc2e1c1c2"
+          ],
+          "actual_math": "amd-6121d02-fma3",
+          "exact_camera_state_text_values_and_geometry_repeats": true
+        },
+        "camera_dg_down_center_reopened": {
+          "runs": 2,
+          "full_frame_repeat_ssim": {
+            "20": 1.0,
+            "50": 1.0
+          },
+          "mfd_repeat_ssim": {
+            "mfd-0-20": 1.0,
+            "mfd-1-20": 1.0,
+            "mfd-0-50": 1.0,
+            "mfd-1-50": 1.0
+          },
+          "camera_trace_sha256": [
+            "dfd7d67bde16f6942e2b88caab6fdb38a9339cf8e5002d94f525253cc2e1c1c2",
+            "dfd7d67bde16f6942e2b88caab6fdb38a9339cf8e5002d94f525253cc2e1c1c2"
+          ],
+          "actual_math": "amd-6121d02-fma3",
+          "exact_camera_state_text_values_and_geometry_repeats": true
+        },
+        "camera_dgs_down_center_scenario": {
+          "runs": 2,
+          "full_frame_repeat_ssim": {
+            "20": 1.0,
+            "50": 1.0
+          },
+          "mfd_repeat_ssim": {
+            "mfd-0-20": 1.0,
+            "mfd-1-20": 1.0,
+            "mfd-0-50": 1.0,
+            "mfd-1-50": 1.0
+          },
+          "camera_trace_sha256": [
+            "4a127b7a0b3d4b4d3f1f5fbcf89c5370d679cdcfe0a84c2facda55be50a6271f",
+            "4a127b7a0b3d4b4d3f1f5fbcf89c5370d679cdcfe0a84c2facda55be50a6271f"
+          ],
+          "actual_math": "amd-6121d02-fma3",
+          "exact_camera_state_text_values_and_geometry_repeats": true
+        },
+        "camera_dgs_down_center_reopened": {
+          "runs": 2,
+          "full_frame_repeat_ssim": {
+            "20": 1.0,
+            "50": 1.0
+          },
+          "mfd_repeat_ssim": {
+            "mfd-0-20": 1.0,
+            "mfd-1-20": 1.0,
+            "mfd-0-50": 1.0,
+            "mfd-1-50": 1.0
+          },
+          "camera_trace_sha256": [
+            "4a127b7a0b3d4b4d3f1f5fbcf89c5370d679cdcfe0a84c2facda55be50a6271f",
+            "4a127b7a0b3d4b4d3f1f5fbcf89c5370d679cdcfe0a84c2facda55be50a6271f"
+          ],
+          "actual_math": "amd-6121d02-fma3",
+          "exact_camera_state_text_values_and_geometry_repeats": true
+        }
+      }
+    },
+    "sse2-debug": {
+      "output": "out/phase6-headlook-qualified/sse2-debug",
+      "report_sha256": "bc432e1e96cbcc13601d9e3e73cbd7001fcd7849c1ccbeaa4d6be7a0c0b9b935",
+      "runtime": {
+        "executable_sha256": "82e5dce00ef01d002d912e067b13da4d4b3e55aa4d81420b45ad749c30840fb3",
+        "engine_library_sha256": "8810b3949b04f31dc2c239f7f2db6d4972b6bc95eb1e8dc8d77b52dd3d105ed0",
+        "renderer_module_sha256": "74aaf0c89bc1a0137b62d467af9f83153487978edb3705ca1acf3d54fa5241fa"
+      },
+      "producer_sha256": "affb9c5f1fbd4c96b7950f6f250d3009577dcda363b9fa4ec07889dc9e3e03e0",
+      "cases": {
+        "camera_dg_forward_scenario": {
+          "runs": 2,
+          "full_frame_repeat_ssim": {
+            "20": 1.0,
+            "50": 1.0
+          },
+          "mfd_repeat_ssim": {
+            "mfd-0-20": 1.0,
+            "mfd-1-20": 1.0,
+            "mfd-0-50": 1.0,
+            "mfd-1-50": 1.0
+          },
+          "camera_trace_sha256": [
+            "07f4b1db1b58bedaacf811f7629525835796443c6ef12491e369eec42a59ac4e",
+            "07f4b1db1b58bedaacf811f7629525835796443c6ef12491e369eec42a59ac4e"
+          ],
+          "actual_math": "amd-6121d02-sse2",
+          "exact_camera_state_text_values_and_geometry_repeats": true
+        },
+        "camera_dg_forward_reopened": {
+          "runs": 2,
+          "full_frame_repeat_ssim": {
+            "20": 1.0,
+            "50": 1.0
+          },
+          "mfd_repeat_ssim": {
+            "mfd-0-20": 1.0,
+            "mfd-1-20": 1.0,
+            "mfd-0-50": 1.0,
+            "mfd-1-50": 1.0
+          },
+          "camera_trace_sha256": [
+            "07f4b1db1b58bedaacf811f7629525835796443c6ef12491e369eec42a59ac4e",
+            "07f4b1db1b58bedaacf811f7629525835796443c6ef12491e369eec42a59ac4e"
+          ],
+          "actual_math": "amd-6121d02-sse2",
+          "exact_camera_state_text_values_and_geometry_repeats": true
+        },
+        "camera_dg_down_scenario": {
+          "runs": 2,
+          "full_frame_repeat_ssim": {
+            "20": 1.0,
+            "50": 1.0
+          },
+          "mfd_repeat_ssim": {
+            "mfd-0-20": 1.0,
+            "mfd-1-20": 1.0,
+            "mfd-0-50": 1.0,
+            "mfd-1-50": 1.0
+          },
+          "camera_trace_sha256": [
+            "4773304726e63e31bc89f344d740766214e6049573cae734206672c6d0bd0f63",
+            "4773304726e63e31bc89f344d740766214e6049573cae734206672c6d0bd0f63"
+          ],
+          "actual_math": "amd-6121d02-sse2",
+          "exact_camera_state_text_values_and_geometry_repeats": true
+        },
+        "camera_dg_down_reopened": {
+          "runs": 2,
+          "full_frame_repeat_ssim": {
+            "20": 1.0,
+            "50": 1.0
+          },
+          "mfd_repeat_ssim": {
+            "mfd-0-20": 1.0,
+            "mfd-1-20": 1.0,
+            "mfd-0-50": 1.0,
+            "mfd-1-50": 1.0
+          },
+          "camera_trace_sha256": [
+            "4773304726e63e31bc89f344d740766214e6049573cae734206672c6d0bd0f63",
+            "4773304726e63e31bc89f344d740766214e6049573cae734206672c6d0bd0f63"
+          ],
+          "actual_math": "amd-6121d02-sse2",
+          "exact_camera_state_text_values_and_geometry_repeats": true
+        },
+        "camera_dgs_forward_scenario": {
+          "runs": 2,
+          "full_frame_repeat_ssim": {
+            "20": 1.0,
+            "50": 1.0
+          },
+          "mfd_repeat_ssim": {
+            "mfd-0-20": 1.0,
+            "mfd-1-20": 1.0,
+            "mfd-0-50": 1.0,
+            "mfd-1-50": 1.0
+          },
+          "camera_trace_sha256": [
+            "288cfa5501e769c1d90592c04867b40fe1188bee904cd73ebf521ee269ac6569",
+            "288cfa5501e769c1d90592c04867b40fe1188bee904cd73ebf521ee269ac6569"
+          ],
+          "actual_math": "amd-6121d02-sse2",
+          "exact_camera_state_text_values_and_geometry_repeats": true
+        },
+        "camera_dgs_forward_reopened": {
+          "runs": 2,
+          "full_frame_repeat_ssim": {
+            "20": 1.0,
+            "50": 1.0
+          },
+          "mfd_repeat_ssim": {
+            "mfd-0-20": 1.0,
+            "mfd-1-20": 1.0,
+            "mfd-0-50": 1.0,
+            "mfd-1-50": 1.0
+          },
+          "camera_trace_sha256": [
+            "288cfa5501e769c1d90592c04867b40fe1188bee904cd73ebf521ee269ac6569",
+            "288cfa5501e769c1d90592c04867b40fe1188bee904cd73ebf521ee269ac6569"
+          ],
+          "actual_math": "amd-6121d02-sse2",
+          "exact_camera_state_text_values_and_geometry_repeats": true
+        },
+        "camera_dgs_down_scenario": {
+          "runs": 2,
+          "full_frame_repeat_ssim": {
+            "20": 1.0,
+            "50": 1.0
+          },
+          "mfd_repeat_ssim": {
+            "mfd-0-20": 1.0,
+            "mfd-1-20": 1.0,
+            "mfd-0-50": 1.0,
+            "mfd-1-50": 1.0
+          },
+          "camera_trace_sha256": [
+            "16d5d56145bc10c766438c837b36643b8bf83497248470c080ffade1168628c9",
+            "16d5d56145bc10c766438c837b36643b8bf83497248470c080ffade1168628c9"
+          ],
+          "actual_math": "amd-6121d02-sse2",
+          "exact_camera_state_text_values_and_geometry_repeats": true
+        },
+        "camera_dgs_down_reopened": {
+          "runs": 2,
+          "full_frame_repeat_ssim": {
+            "20": 1.0,
+            "50": 1.0
+          },
+          "mfd_repeat_ssim": {
+            "mfd-0-20": 1.0,
+            "mfd-1-20": 1.0,
+            "mfd-0-50": 1.0,
+            "mfd-1-50": 1.0
+          },
+          "camera_trace_sha256": [
+            "16d5d56145bc10c766438c837b36643b8bf83497248470c080ffade1168628c9",
+            "16d5d56145bc10c766438c837b36643b8bf83497248470c080ffade1168628c9"
+          ],
+          "actual_math": "amd-6121d02-sse2",
+          "exact_camera_state_text_values_and_geometry_repeats": true
+        },
+        "camera_dg_down_center_scenario": {
+          "runs": 2,
+          "full_frame_repeat_ssim": {
+            "20": 1.0,
+            "50": 1.0
+          },
+          "mfd_repeat_ssim": {
+            "mfd-0-20": 1.0,
+            "mfd-1-20": 1.0,
+            "mfd-0-50": 1.0,
+            "mfd-1-50": 1.0
+          },
+          "camera_trace_sha256": [
+            "32a40d118348adac70ab0a1ee6158fcc3f683693e2e4bc6d64fa67ff16bd19fb",
+            "32a40d118348adac70ab0a1ee6158fcc3f683693e2e4bc6d64fa67ff16bd19fb"
+          ],
+          "actual_math": "amd-6121d02-sse2",
+          "exact_camera_state_text_values_and_geometry_repeats": true
+        },
+        "camera_dg_down_center_reopened": {
+          "runs": 2,
+          "full_frame_repeat_ssim": {
+            "20": 1.0,
+            "50": 1.0
+          },
+          "mfd_repeat_ssim": {
+            "mfd-0-20": 1.0,
+            "mfd-1-20": 1.0,
+            "mfd-0-50": 1.0,
+            "mfd-1-50": 1.0
+          },
+          "camera_trace_sha256": [
+            "32a40d118348adac70ab0a1ee6158fcc3f683693e2e4bc6d64fa67ff16bd19fb",
+            "32a40d118348adac70ab0a1ee6158fcc3f683693e2e4bc6d64fa67ff16bd19fb"
+          ],
+          "actual_math": "amd-6121d02-sse2",
+          "exact_camera_state_text_values_and_geometry_repeats": true
+        },
+        "camera_dgs_down_center_scenario": {
+          "runs": 2,
+          "full_frame_repeat_ssim": {
+            "20": 1.0,
+            "50": 1.0
+          },
+          "mfd_repeat_ssim": {
+            "mfd-0-20": 1.0,
+            "mfd-1-20": 1.0,
+            "mfd-0-50": 1.0,
+            "mfd-1-50": 1.0
+          },
+          "camera_trace_sha256": [
+            "a3d60973587e801773bf7bb9a29da2e999b59d69e2929773fc84d5af144a4ddf",
+            "a3d60973587e801773bf7bb9a29da2e999b59d69e2929773fc84d5af144a4ddf"
+          ],
+          "actual_math": "amd-6121d02-sse2",
+          "exact_camera_state_text_values_and_geometry_repeats": true
+        },
+        "camera_dgs_down_center_reopened": {
+          "runs": 2,
+          "full_frame_repeat_ssim": {
+            "20": 1.0,
+            "50": 1.0
+          },
+          "mfd_repeat_ssim": {
+            "mfd-0-20": 1.0,
+            "mfd-1-20": 1.0,
+            "mfd-0-50": 1.0,
+            "mfd-1-50": 1.0
+          },
+          "camera_trace_sha256": [
+            "a3d60973587e801773bf7bb9a29da2e999b59d69e2929773fc84d5af144a4ddf",
+            "a3d60973587e801773bf7bb9a29da2e999b59d69e2929773fc84d5af144a4ddf"
+          ],
+          "actual_math": "amd-6121d02-sse2",
+          "exact_camera_state_text_values_and_geometry_repeats": true
+        }
+      }
+    },
+    "sse2-release": {
+      "output": "out/phase6-headlook-qualified/sse2-release",
+      "report_sha256": "4117b9b00d24047de02760e7c3cd9496909cf8a437f8edebfd149354fac8f462",
+      "runtime": {
+        "executable_sha256": "f1f57b4fb6c9d6ebabada83472749770c92ec109580b80c8dbec3c4271f51695",
+        "engine_library_sha256": "6b845c2a6a49ef05d5968b51a550711bf38387281e2833702e84055bc68bdd88",
+        "renderer_module_sha256": "61ed753a657879cfbbee9850d69aedea11466b0b1a0513cf419dcd80479fe8bf"
+      },
+      "producer_sha256": "affb9c5f1fbd4c96b7950f6f250d3009577dcda363b9fa4ec07889dc9e3e03e0",
+      "cases": {
+        "camera_dg_forward_scenario": {
+          "runs": 2,
+          "full_frame_repeat_ssim": {
+            "20": 1.0,
+            "50": 1.0
+          },
+          "mfd_repeat_ssim": {
+            "mfd-0-20": 1.0,
+            "mfd-1-20": 1.0,
+            "mfd-0-50": 1.0,
+            "mfd-1-50": 1.0
+          },
+          "camera_trace_sha256": [
+            "07f4b1db1b58bedaacf811f7629525835796443c6ef12491e369eec42a59ac4e",
+            "07f4b1db1b58bedaacf811f7629525835796443c6ef12491e369eec42a59ac4e"
+          ],
+          "actual_math": "amd-6121d02-sse2",
+          "exact_camera_state_text_values_and_geometry_repeats": true
+        },
+        "camera_dg_forward_reopened": {
+          "runs": 2,
+          "full_frame_repeat_ssim": {
+            "20": 1.0,
+            "50": 1.0
+          },
+          "mfd_repeat_ssim": {
+            "mfd-0-20": 1.0,
+            "mfd-1-20": 1.0,
+            "mfd-0-50": 1.0,
+            "mfd-1-50": 1.0
+          },
+          "camera_trace_sha256": [
+            "07f4b1db1b58bedaacf811f7629525835796443c6ef12491e369eec42a59ac4e",
+            "07f4b1db1b58bedaacf811f7629525835796443c6ef12491e369eec42a59ac4e"
+          ],
+          "actual_math": "amd-6121d02-sse2",
+          "exact_camera_state_text_values_and_geometry_repeats": true
+        },
+        "camera_dg_down_scenario": {
+          "runs": 2,
+          "full_frame_repeat_ssim": {
+            "20": 1.0,
+            "50": 1.0
+          },
+          "mfd_repeat_ssim": {
+            "mfd-0-20": 1.0,
+            "mfd-1-20": 1.0,
+            "mfd-0-50": 1.0,
+            "mfd-1-50": 1.0
+          },
+          "camera_trace_sha256": [
+            "4773304726e63e31bc89f344d740766214e6049573cae734206672c6d0bd0f63",
+            "4773304726e63e31bc89f344d740766214e6049573cae734206672c6d0bd0f63"
+          ],
+          "actual_math": "amd-6121d02-sse2",
+          "exact_camera_state_text_values_and_geometry_repeats": true
+        },
+        "camera_dg_down_reopened": {
+          "runs": 2,
+          "full_frame_repeat_ssim": {
+            "20": 1.0,
+            "50": 1.0
+          },
+          "mfd_repeat_ssim": {
+            "mfd-0-20": 1.0,
+            "mfd-1-20": 1.0,
+            "mfd-0-50": 1.0,
+            "mfd-1-50": 1.0
+          },
+          "camera_trace_sha256": [
+            "4773304726e63e31bc89f344d740766214e6049573cae734206672c6d0bd0f63",
+            "4773304726e63e31bc89f344d740766214e6049573cae734206672c6d0bd0f63"
+          ],
+          "actual_math": "amd-6121d02-sse2",
+          "exact_camera_state_text_values_and_geometry_repeats": true
+        },
+        "camera_dgs_forward_scenario": {
+          "runs": 2,
+          "full_frame_repeat_ssim": {
+            "20": 1.0,
+            "50": 1.0
+          },
+          "mfd_repeat_ssim": {
+            "mfd-0-20": 1.0,
+            "mfd-1-20": 1.0,
+            "mfd-0-50": 1.0,
+            "mfd-1-50": 1.0
+          },
+          "camera_trace_sha256": [
+            "288cfa5501e769c1d90592c04867b40fe1188bee904cd73ebf521ee269ac6569",
+            "288cfa5501e769c1d90592c04867b40fe1188bee904cd73ebf521ee269ac6569"
+          ],
+          "actual_math": "amd-6121d02-sse2",
+          "exact_camera_state_text_values_and_geometry_repeats": true
+        },
+        "camera_dgs_forward_reopened": {
+          "runs": 2,
+          "full_frame_repeat_ssim": {
+            "20": 1.0,
+            "50": 1.0
+          },
+          "mfd_repeat_ssim": {
+            "mfd-0-20": 1.0,
+            "mfd-1-20": 1.0,
+            "mfd-0-50": 1.0,
+            "mfd-1-50": 1.0
+          },
+          "camera_trace_sha256": [
+            "288cfa5501e769c1d90592c04867b40fe1188bee904cd73ebf521ee269ac6569",
+            "288cfa5501e769c1d90592c04867b40fe1188bee904cd73ebf521ee269ac6569"
+          ],
+          "actual_math": "amd-6121d02-sse2",
+          "exact_camera_state_text_values_and_geometry_repeats": true
+        },
+        "camera_dgs_down_scenario": {
+          "runs": 2,
+          "full_frame_repeat_ssim": {
+            "20": 1.0,
+            "50": 1.0
+          },
+          "mfd_repeat_ssim": {
+            "mfd-0-20": 1.0,
+            "mfd-1-20": 1.0,
+            "mfd-0-50": 1.0,
+            "mfd-1-50": 1.0
+          },
+          "camera_trace_sha256": [
+            "16d5d56145bc10c766438c837b36643b8bf83497248470c080ffade1168628c9",
+            "16d5d56145bc10c766438c837b36643b8bf83497248470c080ffade1168628c9"
+          ],
+          "actual_math": "amd-6121d02-sse2",
+          "exact_camera_state_text_values_and_geometry_repeats": true
+        },
+        "camera_dgs_down_reopened": {
+          "runs": 2,
+          "full_frame_repeat_ssim": {
+            "20": 1.0,
+            "50": 1.0
+          },
+          "mfd_repeat_ssim": {
+            "mfd-0-20": 1.0,
+            "mfd-1-20": 1.0,
+            "mfd-0-50": 1.0,
+            "mfd-1-50": 1.0
+          },
+          "camera_trace_sha256": [
+            "16d5d56145bc10c766438c837b36643b8bf83497248470c080ffade1168628c9",
+            "16d5d56145bc10c766438c837b36643b8bf83497248470c080ffade1168628c9"
+          ],
+          "actual_math": "amd-6121d02-sse2",
+          "exact_camera_state_text_values_and_geometry_repeats": true
+        },
+        "camera_dg_down_center_scenario": {
+          "runs": 2,
+          "full_frame_repeat_ssim": {
+            "20": 1.0,
+            "50": 1.0
+          },
+          "mfd_repeat_ssim": {
+            "mfd-0-20": 1.0,
+            "mfd-1-20": 1.0,
+            "mfd-0-50": 1.0,
+            "mfd-1-50": 1.0
+          },
+          "camera_trace_sha256": [
+            "32a40d118348adac70ab0a1ee6158fcc3f683693e2e4bc6d64fa67ff16bd19fb",
+            "32a40d118348adac70ab0a1ee6158fcc3f683693e2e4bc6d64fa67ff16bd19fb"
+          ],
+          "actual_math": "amd-6121d02-sse2",
+          "exact_camera_state_text_values_and_geometry_repeats": true
+        },
+        "camera_dg_down_center_reopened": {
+          "runs": 2,
+          "full_frame_repeat_ssim": {
+            "20": 1.0,
+            "50": 1.0
+          },
+          "mfd_repeat_ssim": {
+            "mfd-0-20": 1.0,
+            "mfd-1-20": 1.0,
+            "mfd-0-50": 1.0,
+            "mfd-1-50": 1.0
+          },
+          "camera_trace_sha256": [
+            "32a40d118348adac70ab0a1ee6158fcc3f683693e2e4bc6d64fa67ff16bd19fb",
+            "32a40d118348adac70ab0a1ee6158fcc3f683693e2e4bc6d64fa67ff16bd19fb"
+          ],
+          "actual_math": "amd-6121d02-sse2",
+          "exact_camera_state_text_values_and_geometry_repeats": true
+        },
+        "camera_dgs_down_center_scenario": {
+          "runs": 2,
+          "full_frame_repeat_ssim": {
+            "20": 1.0,
+            "50": 1.0
+          },
+          "mfd_repeat_ssim": {
+            "mfd-0-20": 1.0,
+            "mfd-1-20": 1.0,
+            "mfd-0-50": 1.0,
+            "mfd-1-50": 1.0
+          },
+          "camera_trace_sha256": [
+            "a3d60973587e801773bf7bb9a29da2e999b59d69e2929773fc84d5af144a4ddf",
+            "a3d60973587e801773bf7bb9a29da2e999b59d69e2929773fc84d5af144a4ddf"
+          ],
+          "actual_math": "amd-6121d02-sse2",
+          "exact_camera_state_text_values_and_geometry_repeats": true
+        },
+        "camera_dgs_down_center_reopened": {
+          "runs": 2,
+          "full_frame_repeat_ssim": {
+            "20": 1.0,
+            "50": 1.0
+          },
+          "mfd_repeat_ssim": {
+            "mfd-0-20": 1.0,
+            "mfd-1-20": 1.0,
+            "mfd-0-50": 1.0,
+            "mfd-1-50": 1.0
+          },
+          "camera_trace_sha256": [
+            "a3d60973587e801773bf7bb9a29da2e999b59d69e2929773fc84d5af144a4ddf",
+            "a3d60973587e801773bf7bb9a29da2e999b59d69e2929773fc84d5af144a4ddf"
+          ],
+          "actual_math": "amd-6121d02-sse2",
+          "exact_camera_state_text_values_and_geometry_repeats": true
+        }
+      }
+    }
+  },
+  "qualified_native_processes": 96,
+  "qualified_native_presentations": 5760,
+  "opaque_label_diagnostic": {
+    "path": "out/phase6-headlook-label-probe/verification.json",
+    "sha256": "41465ad9ac119adb78b6633842ed8ceabcba719476bed70d42591d870b945219",
+    "reopened_pairs": 16,
+    "result": "Only opaque pointer-derived surface labels changed; all meaningful drawing values/order are exact. Raw traces are retained."
+  },
+  "image_gate_negative_controls": {
+    "path": "out/phase6-headlook-screen-crops/gate-verification.json",
+    "sha256": "b1b56ca1e31ab6bd07aa52322221b2412ef8f7ad62af4601dd257b95c714abd8",
+    "details": {
+      "status": "passed gate negative controls; not original Windows parity",
+      "source_image_sha256": "f1268e01b00de4afe584362525a9f3a295df6fec6a0142ffe049fa016b1b4a09",
+      "exact_crop_corners_verified": true,
+      "meaningful_text_mutations_detected": 9,
+      "whole_frame_ssim": 0.9975602278852467,
+      "screen_mfd_ssim": 0.963869029761602,
+      "existing_minimum": 0.98,
+      "bounds": {
+        "LMFD_DISPLAY": [
+          249,
+          170,
+          517,
+          416
+        ],
+        "RMFD_DISPLAY": [
+          762,
+          170,
+          1030,
+          416
+        ]
+      }
+    }
+  },
+  "windows_reference": {
+    "status": "in_progress",
+    "run_id": 41637754349,
+    "source": "149b46135dc02f4ce1fe24a3f6c2406690f57faa",
+    "verified_live_jobs": [
+      125923145321,
+      125923145328,
+      125923145464,
+      125923145529
+    ],
+    "earlier_compile_failure": {
+      "run_id": 41637215875,
+      "source": "912b6332d025d2fce85caf6c03db7eb5e0405ac9",
+      "job_id": 125921327778,
+      "error": "C2872: Camera helper collided with SDK Camera class declaration",
+      "fixed_by": "Fully qualified camera_fixture::Camera call; SDK unchanged"
+    }
+  },
+  "stock_scenario_smoke": {
+    "path": "out/phase6-camera-stock-scenarios/stock-scenarios.json",
+    "sha256": "a78909ece5cd5f616783e104788fac3faf43c5f175f252ea00cd4d6c2f35fc20",
+    "declared_scenarios": 122,
+    "currently_loadable": 38,
+    "completed_presentations": 2280,
+    "clean_of_reported_runtime_problems": 37,
+    "failures_retained": {
+      "Tests/GeneralApiTest.scn": [
+        "LuaCall (/home/dan/GIT/orbiter-cross-platform/Src/Module/LuaScript/LuaInterpreter/Interpreter.cpp:126): .../phase6-dg-resources/Script/Tests/GeneralApiTest.lua:13: Assertion failed"
+      ]
+    },
+    "missing_phase7_vessel_classes": 84,
+    "original_windows_general_api_failures": {
+      "spacecraft-original-Debug-automatic": {
+        "path": "out/phase6-spacecraft-qualified/spacecraft-original-Debug-automatic/focus-bars-original/general-api/general-api-result.json",
+        "sha256": "85e7a3f0039ed2704556692c0356704bbda75c73536ed1f9c8f6a9508f853414",
+        "details": {
+          "tests_seen": [
+            "Test: oapi.get_orbiter_version()",
+            "Test: oapi.rand()",
+            "Test: oapi.deflate()",
+            "Test: oapi.inflate()",
+            "Test: oapi.formatvalue(value,prec)",
+            "Test: oapi.openfile(fname,FILE_OUT,root)",
+            "Test: oapi.writeline(f,line)",
+            "Test: oapi.writeitem_xxx(f,item,value)",
+            "Test: oapi.readitem_xxx(f,item)",
+            "Test: oapi.openfile(fname,FILE_IN,...)",
+            "Test: planet status"
+          ],
+          "all_passed": false,
+          "failed_assertion": true,
+          "earth_obliquity_degrees": 23.439801090036248,
+          "script_sha256": "0eb305d7171beabec4a30b07e40eaf0e5063ef3575da59ef40ef5ff889051b69"
+        }
+      },
+      "spacecraft-original-Debug-sse2": {
+        "path": "out/phase6-spacecraft-qualified/spacecraft-original-Debug-sse2/focus-bars-original/general-api/general-api-result.json",
+        "sha256": "85e7a3f0039ed2704556692c0356704bbda75c73536ed1f9c8f6a9508f853414",
+        "details": {
+          "tests_seen": [
+            "Test: oapi.get_orbiter_version()",
+            "Test: oapi.rand()",
+            "Test: oapi.deflate()",
+            "Test: oapi.inflate()",
+            "Test: oapi.formatvalue(value,prec)",
+            "Test: oapi.openfile(fname,FILE_OUT,root)",
+            "Test: oapi.writeline(f,line)",
+            "Test: oapi.writeitem_xxx(f,item,value)",
+            "Test: oapi.readitem_xxx(f,item)",
+            "Test: oapi.openfile(fname,FILE_IN,...)",
+            "Test: planet status"
+          ],
+          "all_passed": false,
+          "failed_assertion": true,
+          "earth_obliquity_degrees": 23.439801090036248,
+          "script_sha256": "0eb305d7171beabec4a30b07e40eaf0e5063ef3575da59ef40ef5ff889051b69"
+        }
+      },
+      "spacecraft-original-Release-automatic": {
+        "path": "out/phase6-spacecraft-qualified/spacecraft-original-Release-automatic/focus-bars-original/general-api/general-api-result.json",
+        "sha256": "85e7a3f0039ed2704556692c0356704bbda75c73536ed1f9c8f6a9508f853414",
+        "details": {
+          "tests_seen": [
+            "Test: oapi.get_orbiter_version()",
+            "Test: oapi.rand()",
+            "Test: oapi.deflate()",
+            "Test: oapi.inflate()",
+            "Test: oapi.formatvalue(value,prec)",
+            "Test: oapi.openfile(fname,FILE_OUT,root)",
+            "Test: oapi.writeline(f,line)",
+            "Test: oapi.writeitem_xxx(f,item,value)",
+            "Test: oapi.readitem_xxx(f,item)",
+            "Test: oapi.openfile(fname,FILE_IN,...)",
+            "Test: planet status"
+          ],
+          "all_passed": false,
+          "failed_assertion": true,
+          "earth_obliquity_degrees": 23.439801090036248,
+          "script_sha256": "0eb305d7171beabec4a30b07e40eaf0e5063ef3575da59ef40ef5ff889051b69"
+        }
+      },
+      "spacecraft-original-Release-sse2": {
+        "path": "out/phase6-spacecraft-qualified/spacecraft-original-Release-sse2/focus-bars-original/general-api/general-api-result.json",
+        "sha256": "85e7a3f0039ed2704556692c0356704bbda75c73536ed1f9c8f6a9508f853414",
+        "details": {
+          "tests_seen": [
+            "Test: oapi.get_orbiter_version()",
+            "Test: oapi.rand()",
+            "Test: oapi.deflate()",
+            "Test: oapi.inflate()",
+            "Test: oapi.formatvalue(value,prec)",
+            "Test: oapi.openfile(fname,FILE_OUT,root)",
+            "Test: oapi.writeline(f,line)",
+            "Test: oapi.writeitem_xxx(f,item,value)",
+            "Test: oapi.readitem_xxx(f,item)",
+            "Test: oapi.openfile(fname,FILE_IN,...)",
+            "Test: planet status"
+          ],
+          "all_passed": false,
+          "failed_assertion": true,
+          "earth_obliquity_degrees": 23.439801090036248,
+          "script_sha256": "0eb305d7171beabec4a30b07e40eaf0e5063ef3575da59ef40ef5ff889051b69"
+        }
+      }
+    },
+    "scope": "Bounded smoke coverage; broader interactive acceptance remains open. GeneralApiTest is not waived."
+  },
+  "remaining": [
+    "Original Windows camera captures and paired image/transform comparisons",
+    "Current-source full hosted native/Windows qualification",
+    "Broader interactive DG systems/scenarios",
+    "Native Wayland, high-DPI and physical input qualification"
+  ]
+}

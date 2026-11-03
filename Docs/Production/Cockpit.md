@@ -169,6 +169,15 @@ preserved application/client and a new public SDK observation module. The
 native workflow captures matching transforms and images, and the paired job
 applies the existing physical, text, overlay, MFD and full-frame gates. This
 is a comparison in progress; native repeats alone do not close off-axis parity.
+The finalized twelve-case native matrix passes twice in all four profiles:
+96 application processes, 5,760 presentations, exact camera/state/drawing-value
+repeats and SSIM 1.0 for all repeated full frames and MFD surfaces. A negative
+control passes whole-frame SSIM at 0.99756 but fails the on-screen MFD gate at
+0.96387, demonstrating why both checks are required. The crop test verifies
+the conversion between SDK top-origin coordinates and bottom-origin OpenGL
+readbacks. The current stock smoke sweep completes all 38 loadable scenarios;
+GeneralApiTest's known assertion remains a reported failure.
+[Native camera repeatability, gate controls and pending Windows comparison](CockpitCameraVerification.json)
 
 The native graphics leak now has an isolated source fix and a passing local
 sanitizer menu flow. Mesa's executable-code allocator retained two bookkeeping
