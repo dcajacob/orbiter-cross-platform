@@ -1,0 +1,47 @@
+{
+  "application_source": "f725194209634f7fd5d1d44d426cfa9b5e303e37",
+  "frames": 60,
+  "fixed_step": 0.25,
+  "epoch": 51982.5,
+  "image_ssim_minimum": 0.98,
+  "budgets": {
+    "position_m": 0.01,
+    "velocity_m_s": 1e-05,
+    "rotation_rad": 1e-08,
+    "angular_velocity_rad_s": 1e-10,
+    "mjd_days": 1e-10,
+    "propellant_relative": 1e-08,
+    "propellant_absolute_kg": 1e-08
+  },
+  "schema": 1,
+  "suite": "legacy-stations",
+  "scope": "Original Windows observations before native admission: four unchanged complete ISS scenarios, including the three original Module1 objects in DG dumbbell; not complete Phase 6 acceptance",
+  "resources_sha256_lf": {
+    "Config/Vessels/ISS.cfg": "cccb840e6cca110f73b6f64735e2aa2e169e11709010c9c433d2a760f812ec3b",
+    "Config/Vessels/Module1.cfg": "8b82f6d6d3e198e3c449717de772306c81f6024604e6ad5da981efd83d1a7870",
+    "Meshes/ISS.msh": "0bff923705f88391f44f61dec58b694d25eb44c432134f3ca28ee63375c9405b",
+    "Meshes/Module1.msh": "f6ab9e3d1d886ccf8e7a9f7d5971761ea4f70aa0e4799dda5e9a9c6bbadc230f"
+  },
+  "cases": [
+    {
+      "id": "legacy_stations_1",
+      "scenario": "Delta-glider/Smack!.scn",
+      "sha256_lf": "446f38636eceaf727e63272abf65009c9fc513bc1e48e963d430de01d33b68a4"
+    },
+    {
+      "id": "legacy_stations_2",
+      "scenario": "Delta-glider/Vessel-vessel.scn",
+      "sha256_lf": "07016cab57da88b05021b9c5983bedcdb1ea7c9c8df44d476c3dab7cffed54b7"
+    },
+    {
+      "id": "legacy_stations_3",
+      "scenario": "Navigation/Space Physics/DG dumbbell.scn",
+      "sha256_lf": "e76aa2812750dcb114f85f0cd9a4ed24727d0204827a339ca680c6cd2dc3afe6"
+    },
+    {
+      "id": "legacy_stations_4",
+      "scenario": "Tutorials/Smack! Rescue.scn",
+      "sha256_lf": "2314c4c57bf931f7f29a9bd044c2c1feec17cc69ecf2fc1b73e46535f8f0a4cf"
+    }
+  ]
+}
