@@ -80,6 +80,7 @@ Instrument_Transfer::Instrument_Transfer (Pane *_pane, std::intptr_t _id, const 
 	path = new Vector[nstep]; TRACENEW
 	pathp = new oapi::IVECTOR2[100]; TRACENEW
 	process_num = false;
+	dv_manip = false;
 
 	SetSize (spec);
 }
