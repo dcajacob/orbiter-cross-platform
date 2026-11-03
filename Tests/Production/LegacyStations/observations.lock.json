@@ -1,0 +1,210 @@
+{
+  "schema": 1,
+  "status": "audited-original-observations",
+  "automatic_refresh": false,
+  "repository": "dcajacob/orbiter-cross-platform",
+  "application_source": "f725194209634f7fd5d1d44d426cfa9b5e303e37",
+  "producer_commit": "e81279b9ca108b27b56925bfe034141416f20f1d",
+  "run_id": 41732880756,
+  "workflow": ".github/workflows/original-legacy-stations.yml",
+  "cases_sha256_lf": "7b4ffed7a0dfa5d2e3146ff196d791a8df81239d4718cdb9740c769c659e007c",
+  "audit_sha256": "cd315b5a70933100576d6c1ef39951ec7e24d8b63cf315bdfc7460cec971fa21",
+  "audit_verifier_sha256": "65ccad68ea18991f25ecceb70ebed6d34d4f6c76712c87c604e7cc32a964a1b4",
+  "runtime_metadata": {
+    "Debug": {
+      "runtime_metadata_sha256_lf": "c700ab3e0f4076a90db71a6616fd5ca4f9f730a6cf3c47caa71e6d104ac75708",
+      "client_metadata_sha256_lf": "440407a494291b7b31b2c5c1c06c7be0352af6991c494a26fca57ab8a6b582e8"
+    },
+    "Release": {
+      "runtime_metadata_sha256_lf": "73671783841497931ec671149b7f68fd79890b12ca8acc5f088489fac0b48955",
+      "client_metadata_sha256_lf": "21da5b35655f019651ecea5e465c28b9579f133a5fef40be1eb4230f5d53c24e"
+    }
+  },
+  "profiles": {
+    "Debug-automatic": {
+      "capture_sha256": "3942e5efb36b6cf205b15abc49e427611d777071a2e04c0cc310fd7225c858b1",
+      "observer_sha256": "283ae6c7a90bd40503a3867e414d61640971f58f99beef17e8f169f63de200ba",
+      "source_manifest_sha256": "5d995946eb22d9aedbf248a5c76ce0135417bf05f5b2362d6a43854c95b828bc",
+      "runtime_metadata_sha256_lf": "c700ab3e0f4076a90db71a6616fd5ca4f9f730a6cf3c47caa71e6d104ac75708",
+      "client_metadata_sha256_lf": "440407a494291b7b31b2c5c1c06c7be0352af6991c494a26fca57ab8a6b582e8",
+      "gate_sha256": "289aaf2c18abff45f5771d1f83b1cf028243b6a2b5e7d722277c16d4ec2d8a65",
+      "archive_sha256": "68d813cb67c29bbe2ae0c6f4be1eb254739c9e05afeba27fb564fb6ed7339a91",
+      "archive_members_verified": 191,
+      "actual_math": "fma3"
+    },
+    "Debug-sse2": {
+      "capture_sha256": "836e9ad3a17b7150200d3ec5c65a8cb3cd3f5ac3b6baf416442e01c87ea611ce",
+      "observer_sha256": "d95b0bad734410f860f0da77abdfc76aca3e4cd1f41f1fc70e8896b2b8642112",
+      "source_manifest_sha256": "5d995946eb22d9aedbf248a5c76ce0135417bf05f5b2362d6a43854c95b828bc",
+      "runtime_metadata_sha256_lf": "c700ab3e0f4076a90db71a6616fd5ca4f9f730a6cf3c47caa71e6d104ac75708",
+      "client_metadata_sha256_lf": "440407a494291b7b31b2c5c1c06c7be0352af6991c494a26fca57ab8a6b582e8",
+      "gate_sha256": "0d992869ab41b9cfade95247b7a3d34e0104af4b7d0e7314b8fd398fa8bdecab",
+      "archive_sha256": "613fc0abf433cc2951253ed07cbfcef2f882a238d92223e13f554f9b2899bfa8",
+      "archive_members_verified": 191,
+      "actual_math": "sse2"
+    },
+    "Release-automatic": {
+      "capture_sha256": "516e41ac36592bcc5d0b48eb4586a421ae0269dcfb1b6953adaca0992f08ca42",
+      "observer_sha256": "fc285815b9b0ea37e399baa1cec6a18035249fe592c344dbfdd381c5661cd1b1",
+      "source_manifest_sha256": "5d995946eb22d9aedbf248a5c76ce0135417bf05f5b2362d6a43854c95b828bc",
+      "runtime_metadata_sha256_lf": "73671783841497931ec671149b7f68fd79890b12ca8acc5f088489fac0b48955",
+      "client_metadata_sha256_lf": "21da5b35655f019651ecea5e465c28b9579f133a5fef40be1eb4230f5d53c24e",
+      "gate_sha256": "a8687107ef82cd6f22949ac6d0d4ab1baa1654c2edd556c64012028037d34814",
+      "archive_sha256": "8aa3653bc060f9dd76a411a183cd5111b4fdf2c4d4ec8f30576687471acac9ef",
+      "archive_members_verified": 191,
+      "actual_math": "fma3"
+    },
+    "Release-sse2": {
+      "capture_sha256": "39c120ce022332c1e5e8b4deea548ff436480f67eaf72aaecca2025025ad18f5",
+      "observer_sha256": "b05b51eb5a12d62b1a074f60b3bf08b4afe4ba80efd3fa70da0dac49430570d6",
+      "source_manifest_sha256": "5d995946eb22d9aedbf248a5c76ce0135417bf05f5b2362d6a43854c95b828bc",
+      "runtime_metadata_sha256_lf": "73671783841497931ec671149b7f68fd79890b12ca8acc5f088489fac0b48955",
+      "client_metadata_sha256_lf": "21da5b35655f019651ecea5e465c28b9579f133a5fef40be1eb4230f5d53c24e",
+      "gate_sha256": "3ed00a1c7847d201cfb5bf0615e8a1303009dfd3a2f7fb3c666f110cc4a7ba91",
+      "archive_sha256": "e13b66d2a37644823cc1c679b2b66ded48c9eced2450680332327fa6144a0f62",
+      "archive_members_verified": 191,
+      "actual_math": "sse2"
+    }
+  },
+  "artifacts": [
+    {
+      "id": 13278193569,
+      "name": "original-legacy-stations-Debug-automatic",
+      "profile": "Debug-automatic",
+      "bytes": 32361882,
+      "sha256": "68d813cb67c29bbe2ae0c6f4be1eb254739c9e05afeba27fb564fb6ed7339a91"
+    },
+    {
+      "id": 13277757524,
+      "name": "original-legacy-stations-Debug-sse2",
+      "profile": "Debug-sse2",
+      "bytes": 32361915,
+      "sha256": "613fc0abf433cc2951253ed07cbfcef2f882a238d92223e13f554f9b2899bfa8"
+    },
+    {
+      "id": 13277757435,
+      "name": "original-legacy-stations-Release-sse2",
+      "profile": "Release-sse2",
+      "bytes": 32336898,
+      "sha256": "e13b66d2a37644823cc1c679b2b66ded48c9eced2450680332327fa6144a0f62"
+    },
+    {
+      "id": 13276837925,
+      "name": "original-legacy-stations-Release-automatic",
+      "profile": "Release-automatic",
+      "bytes": 32336898,
+      "sha256": "8aa3653bc060f9dd76a411a183cd5111b4fdf2c4d4ec8f30576687471acac9ef"
+    }
+  ],
+  "observed_capabilities": {
+    "iss": {
+      "version": 0,
+      "enable_focus": 0,
+      "meshes": 1,
+      "thrusters": 0,
+      "propellants": 0,
+      "docks": 3,
+      "parents": 0,
+      "children": 0,
+      "xpdr": 1,
+      "mass": 450000.0,
+      "empty_mass": 450000.0,
+      "fuel": 0.0,
+      "size": 55.0,
+      "pmix": 395.0,
+      "pmiy": 559.0,
+      "pmiz": 290.0,
+      "csx": 897.2,
+      "csy": 3641.3,
+      "csz": 610.8,
+      "local_docking_ports": [
+        {
+          "x": 13.67,
+          "y": 5.56,
+          "z": 0.0,
+          "dx": 1.0,
+          "dy": 0.0,
+          "dz": 0.0,
+          "rx": 0.0,
+          "ry": 1.0,
+          "rz": 0.0
+        },
+        {
+          "x": -4.32,
+          "y": 17.6,
+          "z": 0.0,
+          "dx": 0.0,
+          "dy": 1.0,
+          "dz": 0.0,
+          "rx": 1.0,
+          "ry": 0.0,
+          "rz": 0.0
+        },
+        {
+          "x": -36.0,
+          "y": 4.21,
+          "z": 0.0,
+          "dx": -1.0,
+          "dy": 0.0,
+          "dz": 0.0,
+          "rx": 0.0,
+          "ry": -1.0,
+          "rz": 0.0
+        }
+      ]
+    },
+    "module1": {
+      "version": 0,
+      "enable_focus": 1,
+      "meshes": 1,
+      "thrusters": 0,
+      "propellants": 0,
+      "docks": 2,
+      "parents": 0,
+      "children": 0,
+      "xpdr": 0,
+      "mass": 8000.0,
+      "empty_mass": 8000.0,
+      "fuel": 0.0,
+      "size": 6.0,
+      "pmix": 7.7,
+      "pmiy": 7.7,
+      "pmiz": 2.3,
+      "csx": 20.0,
+      "csy": 20.0,
+      "csz": 20.0,
+      "local_docking_ports": [
+        {
+          "x": 0.0,
+          "y": 0.0,
+          "z": 5.0,
+          "dx": 0.0,
+          "dy": 0.0,
+          "dz": 1.0,
+          "rx": 0.0,
+          "ry": 1.0,
+          "rz": 0.0
+        },
+        {
+          "x": 0.0,
+          "y": 0.0,
+          "z": -5.0,
+          "dx": 0.0,
+          "dy": 0.0,
+          "dz": -1.0,
+          "rx": 0.0,
+          "ry": 1.0,
+          "rz": 0.0
+        }
+      ]
+    }
+  },
+  "processes": 32,
+  "presentations": 1920,
+  "all_vessel_rows": 14640,
+  "docking_rows": 25864,
+  "identity_controls": 7,
+  "damaged_capture_controls": 48,
+  "native_admission_qualified": false,
+  "scope": "Four complete original Windows legacy station scenes, all declared vessels and ports, exact deterministic repeats and paired Debug/Release state, camera and full-frame comparisons. Native support and complete Phase 6 acceptance remain unqualified."
+}
