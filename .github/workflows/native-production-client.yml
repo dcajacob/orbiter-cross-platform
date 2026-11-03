@@ -28,7 +28,9 @@ jobs:
       - name: Install native build and software OpenGL window dependencies
         run: >-
           sudo apt-get update && sudo apt-get install -y zlib1g-dev libgl1-mesa-dev
-          libxrandr-dev libxinerama-dev libxcursor-dev libxi-dev xvfb mesa-utils libmpfr-dev
+          libxrandr-dev libxinerama-dev libxcursor-dev libxi-dev xvfb mesa-utils libmpfr-dev python3-pil
+      - name: Verify the X11 notification capture dependency
+        run: python3 -c "from PIL import ImageGrab"
       - name: Verify native math against unchanged Windows primitives and independent MPFR
         shell: bash
         run: |
