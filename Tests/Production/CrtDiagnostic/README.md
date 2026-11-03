@@ -1,0 +1,39 @@
+# Windows CRT dispatch diagnostic
+
+The original atmospheric DG AAP capture first diverges at tick 34 when the
+Debug and Release CRTs evaluate the same arcsine input. The direct CRT exports
+also differ, even on one host with FMA3 enabled in both runtimes. This probe
+isolates the installed runtime from simulator code and compiler optimization.
+
+Run in an x64 Visual Studio developer shell:
+
+```powershell
+python -B Tests/Production/CrtDiagnostic/capture.py --output out/crt-diagnostic
+```
+
+The workflow runs both builds on each Windows Server 2022 and 2025 host. It
+records the actual export owner, file/product versions, SHA256, compiler,
+CPU, rounding state and FMA3 state. A fixed corpus includes the exact recorded
+input, its neighbours, endpoints, signed zero, subnormals and a uniform grid.
+Every profile repeats in a fresh process. Default dispatch is observed before
+separate SSE2 and FMA3 requests. Each linked call is checked against its direct
+CRT export.
+
+Installed SDK Debug and redistributable Release CRTs are also requested by
+absolute path in fresh Release processes. Their own FMA3 controls and arcsine
+exports are used. The report distinguishes the requested DLL from the actual
+loaded provider; it does not assume that requesting a DLL overrides Windows
+loader policy. Linked results in these SDK probes still belong to the process's
+Release CRT and are labelled separately. No SDK DLL is copied or uploaded.
+
+An `observed` report means the capture is valid, not that the builds agree.
+Differences are reported without a tolerance or an acceptance override. This
+workflow does not change the preserved application, frozen references, native
+math dispatch or the original Windows Lua/AAP cross-build gate. Full simulator
+qualification remains necessary after any runtime provisioning change.
+
+Microsoft documents that the Release UCRT is an operating-system component
+and that modern Windows uses its system copy even when a newer application-local
+copy is present: [Universal CRT deployment](https://learn.microsoft.com/en-us/cpp/windows/universal-crt-deployment).
+The diagnostic measures the actual providers instead of inferring them from
+the installed compiler or SDK version.

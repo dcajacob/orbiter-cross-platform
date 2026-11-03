@@ -31,6 +31,12 @@ remains open. The separate SSE2 diagnostic passed all five schedules across
 original Debug and Release. [Paired CRT diagnostic](https://github.com/dcajacob/orbiter-cross-platform/actions/runs/41563089062)
 [Original Windows comparison](https://github.com/dcajacob/orbiter-cross-platform/actions/runs/41560881876)
 
+The separate [CRT dispatch diagnostic](../../Tests/Production/CrtDiagnostic/README.md)
+records actual loaded DLL versions and hashes on Windows Server 2022 and 2025,
+including installed SDK providers, with 8,517 arcsine inputs and repeated fresh
+processes. Its results diagnose runtime provisioning; they do not replace the
+original simulator cross-build gate or change the native math profile.
+
 The native client flies all five original DG recorded scenarios from the stock
 position, attitude, control and system-event files. DG stunts draws the recorded
 tutorial notes and switches cameras. Both Mojave scenarios also switch cameras.

@@ -1,0 +1,35 @@
+name: Windows CRT Dispatch Diagnostic
+on:
+  push:
+    branches: ['codex/production-**']
+    paths:
+      - 'Tests/Production/CrtDiagnostic/**'
+      - '.github/workflows/production-crt-diagnostic.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: crt-diagnostic-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  observe:
+    name: CRT versions and dispatch on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-2022, windows-2025]
+    steps:
+      - uses: actions/checkout@v7
+      - uses: ilammy/msvc-dev-cmd@v1
+        with:
+          vsversion: '17.0'
+          arch: x64
+      - name: Observe Debug, Release and installed SDK CRTs on one host
+        run: python -B Tests/Production/CrtDiagnostic/capture.py --output out/crt-diagnostic
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: crt-diagnostic-${{ matrix.os }}
+          path: out/crt-diagnostic
