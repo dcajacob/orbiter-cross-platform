@@ -65,6 +65,8 @@ these scopes and their hashes. The verified local evidence archive is
 `98ea203c928212754b908d59d39aa282a1ae6b54505dc8c24cd21b68c67002a0`.
 It retains both runtimes, the four leak cases, clean targeted captures, original
 comparisons, source controls and replay recipes. Remote preservation remains
-open. All four original Windows Shuttle-A capture jobs passed; their downloaded
-artifacts still need auditing before native qualification. The current full-corpus
-sweep is running separately and is not claimed as passed here.
+open. All four original Windows Shuttle-A profiles are now downloaded, hash-verified
+and audited: 80 sessions, 4,800 presentations and 38,552 finalized all-vessel samples.
+Their complete traces, deterministic repeats and Debug/Release pairs pass the
+unchanged budgets. Native Shuttle-A state/image qualification is still pending.
+The current full-corpus sweep is running separately and is not claimed as passed here.

@@ -121,9 +121,13 @@
     "original_windows_shuttle_a": {
       "run": 41699732070,
       "url": "https://github.com/dcajacob/orbiter-cross-platform/actions/runs/41699732070",
-      "status": "all-four-captures-passed; downloaded-artifact-audit-running",
+      "status": "all-four-original-profiles-audited",
       "producer_commit": "778b6c5848e86ca4cc2d277c20b623b1e056b075",
-      "audit_path": "out/phase6-shuttle-a-original-audit.json"
+      "audit_path": "out/phase6-shuttle-a-original-audit.json",
+      "audit_sha256": "368c69e44e16c6488a33226ad08371457120c1bc825bd6957d083bf293d46cd9",
+      "processes": 80,
+      "scene_presents": 4800,
+      "finalized_all_vessel_samples": 38552
     },
     "current_full_instrumented_corpus": "running separately; not included in this completed targeted evidence bundle",
     "native_shuttle_a_state_image_input_payload_qualification": "pending",
