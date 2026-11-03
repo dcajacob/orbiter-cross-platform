@@ -94,6 +94,37 @@
       "sha256": "3f6b3b636cbe9c10a26cc2bd0433acf11c8b8b00be496c176090377aea545f72"
     }
   ],
+  "durable_release": {
+    "id": 433280202,
+    "tag": "phase6-stock-lua-exit-original-v1",
+    "url": "https://github.com/dcajacob/orbiter-cross-platform/releases/tag/phase6-stock-lua-exit-original-v1",
+    "assets": [
+      {
+        "id": 707299486,
+        "name": "original-stock-lua-exit-Debug-automatic.zip",
+        "bytes": 240009,
+        "sha256": "d8c0159f81236c979c7e9177e9d1c2ce8da85ff8b4fcf9634c2bc7bc84462fd7"
+      },
+      {
+        "id": 707299517,
+        "name": "original-stock-lua-exit-Debug-sse2.zip",
+        "bytes": 240004,
+        "sha256": "de2739e82599cdd82f026decbf42dfd2915dbd72eb32a51a718f685c4045d7c2"
+      },
+      {
+        "id": 707299550,
+        "name": "original-stock-lua-exit-Release-automatic.zip",
+        "bytes": 203326,
+        "sha256": "aa8788030f4a6d994dda5792f72423ad476822e32aadd5565fc6149d8cf53bf6"
+      },
+      {
+        "id": 707299576,
+        "name": "original-stock-lua-exit-Release-sse2.zip",
+        "bytes": 203217,
+        "sha256": "3f6b3b636cbe9c10a26cc2bd0433acf11c8b8b00be496c176090377aea545f72"
+      }
+    ]
+  },
   "audit_sha256": "0ed9582018c450ead9bdb7851c923d1ac99d160aaf02fe943528c8945c22a954",
   "audit_verifier_sha256": "697a0d46682c8919da031bcd32dd1acc814869e55b024550e6b0889070a506d5",
   "scope": "Eight unchanged complete-scene original Windows script exits and full state/port traces, Debug/Release automatic/SSE2. No new image comparison or complete Phase 6 acceptance claim."

@@ -1,92 +1,98 @@
 {
-  "schema": 1,
-  "status": "native-audit-passed-original-pending",
+  "schema": 2,
+  "status": "four-profile-original-native-exit-parity-passed",
   "phase6_complete": false,
-  "native_producer_commit": "76208ed76bc1810c6acbbea90e40a03658e084b8",
-  "verifier_commit": "62b8959266dbf35d1ee004934ee1729edb38e834",
+  "verifier_base_commit": "71fc3614eb4d6846e116b1ed217b38fa841e58b4",
   "runtime_source_commit": "b1e3f1d60485149f5df63b5e89b531cb8ed0d8cf",
-  "independent_native_audit": {
-    "path": "out/phase6-stock-lua-exit-native-audit-v2.json",
-    "sha256": "7ba04a0d51d9703226894f980e36013bc59f630fafd786144e20e937bf3ac840"
+  "original_application_source": "f725194209634f7fd5d1d44d426cfa9b5e303e37",
+  "original_producer_commit": "62b8959266dbf35d1ee004934ee1729edb38e834",
+  "original_run_id": 41725217641,
+  "original_reference_qualified": true,
+  "original_audit": {
+    "path": "out/phase6-stock-lua-exit-original-audit-v5.json",
+    "sha256": "0ed9582018c450ead9bdb7851c923d1ac99d160aaf02fe943528c8945c22a954"
   },
-  "native_processes": 4,
-  "presentations": 52,
-  "all_vessel_samples": 448,
-  "docking_samples": 840,
-  "assertion_log_events": 240,
-  "assertion_pass_records": 112,
+  "public_replay_audit": {
+    "path": "out/phase6-stock-lua-exit-public-audit-v1.json",
+    "sha256": "688147dcdc832d38cf3cc26b1972203ac36e8ba6c3792aa17dba8a6fab4c4cdc"
+  },
+  "durable_original_release": {
+    "id": 433280202,
+    "tag": "phase6-stock-lua-exit-original-v1",
+    "url": "https://github.com/dcajacob/orbiter-cross-platform/releases/tag/phase6-stock-lua-exit-original-v1",
+    "assets": [
+      {
+        "id": 707299486,
+        "name": "original-stock-lua-exit-Debug-automatic.zip",
+        "bytes": 240009,
+        "sha256": "d8c0159f81236c979c7e9177e9d1c2ce8da85ff8b4fcf9634c2bc7bc84462fd7"
+      },
+      {
+        "id": 707299517,
+        "name": "original-stock-lua-exit-Debug-sse2.zip",
+        "bytes": 240004,
+        "sha256": "de2739e82599cdd82f026decbf42dfd2915dbd72eb32a51a718f685c4045d7c2"
+      },
+      {
+        "id": 707299550,
+        "name": "original-stock-lua-exit-Release-automatic.zip",
+        "bytes": 203326,
+        "sha256": "aa8788030f4a6d994dda5792f72423ad476822e32aadd5565fc6149d8cf53bf6"
+      },
+      {
+        "id": 707299576,
+        "name": "original-stock-lua-exit-Release-sse2.zip",
+        "bytes": 203217,
+        "sha256": "3f6b3b636cbe9c10a26cc2bd0433acf11c8b8b00be496c176090377aea545f72"
+      }
+    ]
+  },
+  "preservation_workflow_run": 41729840818,
+  "native_processes": 8,
+  "original_processes": 8,
+  "per_side": {
+    "presentations": 104,
+    "all_vessel_samples": 896,
+    "docking_samples": 1680,
+    "assertion_log_events": 480,
+    "assertion_pass_records": 224
+  },
   "per_process": {
+    "scenario": "Tests/VesselApiTest.scn",
+    "scenario_sha256_lf": "767afa8100a43608c4771fe2dbe5cc3a11045a693a65f77955dd76f4132d3aaf",
+    "script": "Script/Tests/VesselApiTest.lua",
+    "script_sha256_lf": "e0697e564d224aaaf5e0e74a59c8c38375a95ec9e6a8cb19f2c69c139c3b6170",
+    "exit_code": 0,
     "completed_frames": 13,
     "finalized_ticks": 14,
     "vessels": 8,
     "all_vessel_rows": 112,
     "docking_rows": 210,
-    "assertion_log_events": 60,
-    "assertion_pass_records": 28
+    "assertion_events": 60,
+    "assertion_passes": 28,
+    "fixed_step": 0.25,
+    "frame_limit": 60
   },
   "profiles": {
-    "Release-auto-v1": {
-      "capture_sha256": "fb782fd373e9d32e4057a4354aeb109f3135916a2bc2b53fcf698a2f858cca6b",
-      "producer_commit": "76208ed76bc1810c6acbbea90e40a03658e084b8",
-      "build_identity": {
-        "configuration": "Release",
-        "math": "automatic",
-        "instrumentation": [
-          "",
-          ""
-        ],
-        "actual_sanitizer_linked": false,
-        "cmake_cache_sha256": "60b15e7e8900e7fba05c799de31f2b4ed50bbe11c07b316257e8cadefd22795e"
+    "Debug-automatic": {
+      "native_capture": {
+        "path": "out/phase6-stock-lua-exit-native-Debug-asan-v1/capture.json",
+        "sha256": "195f6218de415d8b4c1d656c69609915b6d20caf8a508d221ff8acfc9bcc57ce"
       },
-      "runs": [
-        {
-          "completed_frames": 13,
-          "finalized_ticks": 14,
-          "all_vessel_rows": 112,
-          "docking_rows": 210,
-          "assertion_events": 60,
-          "assertion_passes": 28,
-          "renderer": {
-            "vendor": "Mesa",
-            "renderer": "llvmpipe (LLVM 21.1.8, 256 bits)",
-            "version": "4.5 (Core Profile) Mesa 26.0.8-1ubuntu0.3",
-            "client_width": 1280,
-            "client_height": 720
-          },
-          "lifecycle": {
-            "rendered_frames": 13,
-            "successful_presents": 13,
-            "context_deleted": true
-          }
-        },
-        {
-          "completed_frames": 13,
-          "finalized_ticks": 14,
-          "all_vessel_rows": 112,
-          "docking_rows": 210,
-          "assertion_events": 60,
-          "assertion_passes": 28,
-          "renderer": {
-            "vendor": "Mesa",
-            "renderer": "llvmpipe (LLVM 21.1.8, 256 bits)",
-            "version": "4.5 (Core Profile) Mesa 26.0.8-1ubuntu0.3",
-            "client_width": 1280,
-            "client_height": 720
-          },
-          "lifecycle": {
-            "rendered_frames": 13,
-            "successful_presents": 13,
-            "context_deleted": true
-          }
-        }
-      ],
-      "negative_controls": 11,
-      "gate_sha256": "6c89ef8f474d6b99f261085970beb89fae35c166c30498039555f3700fd47aca"
-    },
-    "Debug-asan-v1": {
-      "capture_sha256": "195f6218de415d8b4c1d656c69609915b6d20caf8a508d221ff8acfc9bcc57ce",
-      "producer_commit": "76208ed76bc1810c6acbbea90e40a03658e084b8",
-      "build_identity": {
+      "original_capture": {
+        "path": "out/phase6-stock-lua-exit-original-62/Debug-automatic/stock-exit-original/capture.json",
+        "sha256": "b08a98677a97b4bf93f12b7cf7e1e31f06af960b7612bc0e78a8211b033d999a"
+      },
+      "comparison": {
+        "path": "out/phase6-stock-lua-exit-native-Debug-asan-v1/comparison-v2.json",
+        "sha256": "49dabe7532a225d70d8382e97a96b9b52f6cfe34dcfd1ee6691c1f13990b060d"
+      },
+      "build_record": {
+        "path": "out/phase6-lua-exit-build-asan/build.json",
+        "sha256": "58a83da65750f01a45dbb2f20b0791e6aefe5b1e65cb6ca95e45f84a13ff54f5"
+      },
+      "native_producer": "76208ed76bc1810c6acbbea90e40a03658e084b8",
+      "native_build_identity": {
         "configuration": "Debug",
         "math": "automatic",
         "instrumentation": [
@@ -98,89 +104,359 @@
       },
       "runs": [
         {
+          "status": "passed",
+          "maxima": {
+            "position_m": 0.0,
+            "velocity_m_s": 0.0,
+            "rotation_rad": 0.0,
+            "angular_velocity_rad_s": 0.0,
+            "mjd_days": 0.0,
+            "mass_fraction_of_budget": 0.0,
+            "fuel_fraction_of_budget": 0.0
+          },
           "completed_frames": 13,
-          "finalized_ticks": 14,
           "all_vessel_rows": 112,
           "docking_rows": 210,
-          "assertion_events": 60,
-          "assertion_passes": 28,
-          "renderer": {
-            "vendor": "Mesa",
-            "renderer": "llvmpipe (LLVM 21.1.8, 256 bits)",
-            "version": "4.5 (Core Profile) Mesa 26.0.8",
-            "client_width": 1280,
-            "client_height": 720
-          },
-          "lifecycle": {
+          "actual_math": "amd-6121d02-fma3",
+          "native_lifecycle": {
             "rendered_frames": 13,
             "successful_presents": 13,
             "context_deleted": true
           }
         },
         {
+          "status": "passed",
+          "maxima": {
+            "position_m": 0.0,
+            "velocity_m_s": 0.0,
+            "rotation_rad": 0.0,
+            "angular_velocity_rad_s": 0.0,
+            "mjd_days": 0.0,
+            "mass_fraction_of_budget": 0.0,
+            "fuel_fraction_of_budget": 0.0
+          },
           "completed_frames": 13,
-          "finalized_ticks": 14,
           "all_vessel_rows": 112,
           "docking_rows": 210,
-          "assertion_events": 60,
-          "assertion_passes": 28,
-          "renderer": {
-            "vendor": "Mesa",
-            "renderer": "llvmpipe (LLVM 21.1.8, 256 bits)",
-            "version": "4.5 (Core Profile) Mesa 26.0.8",
-            "client_width": 1280,
-            "client_height": 720
-          },
-          "lifecycle": {
+          "actual_math": "amd-6121d02-fma3",
+          "native_lifecycle": {
             "rendered_frames": 13,
             "successful_presents": 13,
             "context_deleted": true
           }
         }
       ],
-      "negative_controls": 11,
-      "gate_sha256": "6c89ef8f474d6b99f261085970beb89fae35c166c30498039555f3700fd47aca"
+      "controls": {
+        "native": {
+          "path": "out/phase6-stock-lua-exit-native-Debug-asan-v1/gate-control-v3.json",
+          "sha256": "2a6dced9e772a6d066f2a524406bdfc3c1d08205884d40d04d9cf36001d71167",
+          "rejected_controls": 12
+        },
+        "original": {
+          "path": "out/phase6-stock-lua-exit-original-62/Debug-automatic/independent-gate-v1.json",
+          "sha256": "726733ef7b21837d19f57d1e8ff45c71c3344769ce1a2b13586d39cc24ebb1b8",
+          "rejected_controls": 12
+        }
+      }
+    },
+    "Release-automatic": {
+      "native_capture": {
+        "path": "out/phase6-stock-lua-exit-native-Release-auto-v1/capture.json",
+        "sha256": "fb782fd373e9d32e4057a4354aeb109f3135916a2bc2b53fcf698a2f858cca6b"
+      },
+      "original_capture": {
+        "path": "out/phase6-stock-lua-exit-original-62/Release-automatic/stock-exit-original/capture.json",
+        "sha256": "27b40196e1a51b70a0dc18f8e38cca3d7a4e84bb81e8fbdcf6177487e4f092cc"
+      },
+      "comparison": {
+        "path": "out/phase6-stock-lua-exit-native-Release-auto-v1/comparison-v2.json",
+        "sha256": "a44167b73ea4db3bb5b863c9eaba0179f9411efc37fe45d44ecd9a15b513e267"
+      },
+      "build_record": {
+        "path": "out/phase6-lua-exit-build-normal/build.json",
+        "sha256": "3fd9b5975b0aaf9d7ef45b2b1e59065026de8aec9b35e9299fad7e1f5a75d4a5"
+      },
+      "native_producer": "76208ed76bc1810c6acbbea90e40a03658e084b8",
+      "native_build_identity": {
+        "configuration": "Release",
+        "math": "automatic",
+        "instrumentation": [
+          "",
+          ""
+        ],
+        "actual_sanitizer_linked": false,
+        "cmake_cache_sha256": "60b15e7e8900e7fba05c799de31f2b4ed50bbe11c07b316257e8cadefd22795e"
+      },
+      "runs": [
+        {
+          "status": "passed",
+          "maxima": {
+            "position_m": 0.0,
+            "velocity_m_s": 0.0,
+            "rotation_rad": 0.0,
+            "angular_velocity_rad_s": 0.0,
+            "mjd_days": 0.0,
+            "mass_fraction_of_budget": 0.0,
+            "fuel_fraction_of_budget": 0.0
+          },
+          "completed_frames": 13,
+          "all_vessel_rows": 112,
+          "docking_rows": 210,
+          "actual_math": "amd-6121d02-fma3",
+          "native_lifecycle": {
+            "rendered_frames": 13,
+            "successful_presents": 13,
+            "context_deleted": true
+          }
+        },
+        {
+          "status": "passed",
+          "maxima": {
+            "position_m": 0.0,
+            "velocity_m_s": 0.0,
+            "rotation_rad": 0.0,
+            "angular_velocity_rad_s": 0.0,
+            "mjd_days": 0.0,
+            "mass_fraction_of_budget": 0.0,
+            "fuel_fraction_of_budget": 0.0
+          },
+          "completed_frames": 13,
+          "all_vessel_rows": 112,
+          "docking_rows": 210,
+          "actual_math": "amd-6121d02-fma3",
+          "native_lifecycle": {
+            "rendered_frames": 13,
+            "successful_presents": 13,
+            "context_deleted": true
+          }
+        }
+      ],
+      "controls": {
+        "native": {
+          "path": "out/phase6-stock-lua-exit-native-Release-auto-v1/gate-control-v3.json",
+          "sha256": "2a6dced9e772a6d066f2a524406bdfc3c1d08205884d40d04d9cf36001d71167",
+          "rejected_controls": 12
+        },
+        "original": {
+          "path": "out/phase6-stock-lua-exit-original-62/Release-automatic/independent-gate-v1.json",
+          "sha256": "726733ef7b21837d19f57d1e8ff45c71c3344769ce1a2b13586d39cc24ebb1b8",
+          "rejected_controls": 12
+        }
+      }
+    },
+    "Debug-sse2": {
+      "native_capture": {
+        "path": "out/phase6-stock-lua-exit-native-Debug-sse2-v1/capture.json",
+        "sha256": "0d012b51209d2934b71c1860ddaa739f23b3352024067e7cb8cf2e097a5d1f69"
+      },
+      "original_capture": {
+        "path": "out/phase6-stock-lua-exit-original-62/Debug-sse2/stock-exit-original/capture.json",
+        "sha256": "c2b2c78d05f634ecca9e3ad341db35ff4fed143d5cd56b379c06cf0ec9ffd3f9"
+      },
+      "comparison": {
+        "path": "out/phase6-stock-lua-exit-native-Debug-sse2-v1/comparison-v2.json",
+        "sha256": "f31ea11b4e8e7e9718a880074fde2a494844d9ff9cbc3e97509ad995bfd8bf42"
+      },
+      "build_record": {
+        "path": "out/phase6-stock-exit-Debug-sse2-build/build.json",
+        "sha256": "b905252ae8273e684dba9c5c6dd211557a791d123c51d190ae4b89ec0bd8ecf1"
+      },
+      "native_producer": "5573648cf8aef023d4fdcb4681cc7bdb2f9ae9a0",
+      "native_build_identity": {
+        "configuration": "Debug",
+        "math": "sse2",
+        "instrumentation": [
+          "",
+          ""
+        ],
+        "actual_sanitizer_linked": false,
+        "cmake_cache_sha256": "9ca81aeec24588157c8cfe034fd119809244d5be3a856c06f054270ab2ff7d17"
+      },
+      "runs": [
+        {
+          "status": "passed",
+          "maxima": {
+            "position_m": 0.0,
+            "velocity_m_s": 0.0,
+            "rotation_rad": 0.0,
+            "angular_velocity_rad_s": 0.0,
+            "mjd_days": 0.0,
+            "mass_fraction_of_budget": 0.0,
+            "fuel_fraction_of_budget": 0.0
+          },
+          "completed_frames": 13,
+          "all_vessel_rows": 112,
+          "docking_rows": 210,
+          "actual_math": "amd-6121d02-sse2",
+          "native_lifecycle": {
+            "rendered_frames": 13,
+            "successful_presents": 13,
+            "context_deleted": true
+          }
+        },
+        {
+          "status": "passed",
+          "maxima": {
+            "position_m": 0.0,
+            "velocity_m_s": 0.0,
+            "rotation_rad": 0.0,
+            "angular_velocity_rad_s": 0.0,
+            "mjd_days": 0.0,
+            "mass_fraction_of_budget": 0.0,
+            "fuel_fraction_of_budget": 0.0
+          },
+          "completed_frames": 13,
+          "all_vessel_rows": 112,
+          "docking_rows": 210,
+          "actual_math": "amd-6121d02-sse2",
+          "native_lifecycle": {
+            "rendered_frames": 13,
+            "successful_presents": 13,
+            "context_deleted": true
+          }
+        }
+      ],
+      "controls": {
+        "native": {
+          "path": "out/phase6-stock-lua-exit-native-Debug-sse2-v1/gate-control-v3.json",
+          "sha256": "2a6dced9e772a6d066f2a524406bdfc3c1d08205884d40d04d9cf36001d71167",
+          "rejected_controls": 12
+        },
+        "original": {
+          "path": "out/phase6-stock-lua-exit-original-62/Debug-sse2/independent-gate-v1.json",
+          "sha256": "726733ef7b21837d19f57d1e8ff45c71c3344769ce1a2b13586d39cc24ebb1b8",
+          "rejected_controls": 12
+        }
+      }
+    },
+    "Release-sse2": {
+      "native_capture": {
+        "path": "out/phase6-stock-lua-exit-native-Release-sse2-v1/capture.json",
+        "sha256": "dab8b41a0319860624e951fda4bca1aa21b6da48bd116ba46ea244bff6d9da1f"
+      },
+      "original_capture": {
+        "path": "out/phase6-stock-lua-exit-original-62/Release-sse2/stock-exit-original/capture.json",
+        "sha256": "434df9693f41582101a491bff56a2bbef4454fe9637e13b6c7f5779238469836"
+      },
+      "comparison": {
+        "path": "out/phase6-stock-lua-exit-native-Release-sse2-v1/comparison-v2.json",
+        "sha256": "d29ad7cad58041871a8adeeea5c022293a5227e3ee6cbe866ce2687a534fba3c"
+      },
+      "build_record": {
+        "path": "out/phase6-stock-exit-Release-sse2-build/build.json",
+        "sha256": "507b6e2a2eae49be45b45089bdf3d6d6b6e0814d0835615c5ebaf5ee3aae9ae2"
+      },
+      "native_producer": "5573648cf8aef023d4fdcb4681cc7bdb2f9ae9a0",
+      "native_build_identity": {
+        "configuration": "Release",
+        "math": "sse2",
+        "instrumentation": [
+          "",
+          ""
+        ],
+        "actual_sanitizer_linked": false,
+        "cmake_cache_sha256": "6c9b101b0f910d4acf22c57de0c029ad2e36306d78b34afc5925636d0832b476"
+      },
+      "runs": [
+        {
+          "status": "passed",
+          "maxima": {
+            "position_m": 0.0,
+            "velocity_m_s": 0.0,
+            "rotation_rad": 0.0,
+            "angular_velocity_rad_s": 0.0,
+            "mjd_days": 0.0,
+            "mass_fraction_of_budget": 0.0,
+            "fuel_fraction_of_budget": 0.0
+          },
+          "completed_frames": 13,
+          "all_vessel_rows": 112,
+          "docking_rows": 210,
+          "actual_math": "amd-6121d02-sse2",
+          "native_lifecycle": {
+            "rendered_frames": 13,
+            "successful_presents": 13,
+            "context_deleted": true
+          }
+        },
+        {
+          "status": "passed",
+          "maxima": {
+            "position_m": 0.0,
+            "velocity_m_s": 0.0,
+            "rotation_rad": 0.0,
+            "angular_velocity_rad_s": 0.0,
+            "mjd_days": 0.0,
+            "mass_fraction_of_budget": 0.0,
+            "fuel_fraction_of_budget": 0.0
+          },
+          "completed_frames": 13,
+          "all_vessel_rows": 112,
+          "docking_rows": 210,
+          "actual_math": "amd-6121d02-sse2",
+          "native_lifecycle": {
+            "rendered_frames": 13,
+            "successful_presents": 13,
+            "context_deleted": true
+          }
+        }
+      ],
+      "controls": {
+        "native": {
+          "path": "out/phase6-stock-lua-exit-native-Release-sse2-v1/gate-control-v3.json",
+          "sha256": "2a6dced9e772a6d066f2a524406bdfc3c1d08205884d40d04d9cf36001d71167",
+          "rejected_controls": 12
+        },
+        "original": {
+          "path": "out/phase6-stock-lua-exit-original-62/Release-sse2/independent-gate-v1.json",
+          "sha256": "726733ef7b21837d19f57d1e8ff45c71c3344769ce1a2b13586d39cc24ebb1b8",
+          "rejected_controls": 12
+        }
+      }
     }
   },
-  "cross_native_build_byte_identity": {
-    "stock-vessel-state.csv": true,
-    "stock-vessel-docks.csv": true,
-    "stock-exit-phases.csv": true
+  "all_numerical_maxima": 0.0,
+  "damaged_capture_controls": 96,
+  "comparison_identity_controls": {
+    "path": "out/phase6-stock-lua-exit-comparison-identity-v2.json",
+    "sha256": "bf09173237c1a0219b9c21943b6012bc6f7012726ab41814dc0184b2a8e8a461",
+    "rejected_controls": 3
   },
-  "original_reference_attempt": {
+  "automatic_runtime_archive": {
+    "status": "passed",
+    "path": "out/phase6-lua-process-exit-evidence-v1.tar.gz",
+    "bytes": 56118791,
+    "sha256": "2939629a1d6b177cc5eef565e436c8ae783032f7a4151082c4262ba9551fdaf5",
+    "members": 1404,
+    "index_sha256": "de89cd44e53a4e1500a01d6f83c5f9753f2886559ddb8c8ac1f59d36eccf1893",
+    "all_payload_hashes_verified": true,
+    "remote_preservation": "pending",
+    "font_and_asset_collections_included": false
+  },
+  "original_attempt": {
     "run_id": 41724232307,
-    "producer_commit": "76208ed76bc1810c6acbbea90e40a03658e084b8",
     "qualified": false,
-    "artifact_id": 13271664962,
-    "bytes": 219134,
-    "sha256": "fbb9219c1cd0a0fd5f86a16dc70e48aefb4c2915bd8cacc4e4ae275bb2b1aefa",
-    "failure": "Preserved fixed-time graphics image probe throws at t=12.75 because the unchanged script selects warp=10 and skips t=12.5. Original binaries and script remain untouched; this failed attempt is unqualified."
+    "reason": "The first fixture enabled a separate fixed-time image probe and aborted after skipping t=12.5. The failed capture is retained."
   },
-  "corrected_original_observer_commit": "62b8959266dbf35d1ee004934ee1729edb38e834",
-  "original_reference_qualified": false,
-  "original_image_probe_setup_correction": "The original separate renderer evidence flag required exactly t=12.5, which the unchanged warp=10 script skips. The corrected exit-trace observer leaves the original renderer/app/script unchanged, queries actual OpenGL identity after its first presentation, and does not enable that separate image probe.",
   "corpus_termination_policy_changed": false,
   "historical_corpus": {
     "attempted": 157,
     "passed": 112,
     "failed": 45
   },
+  "physical_controller": "Unavailable per user; unverified",
+  "qualification": "Four-profile complete stock exit state, port and boundary parity; no new image parity, full corpus acceptance or Phase 6 completion claim.",
+  "remote_complete_bundle_preservation": "pending",
+  "font_and_asset_collections_included": false,
   "artifact": {
     "status": "passed",
-    "path": "out/phase6-stock-lua-exit-native-evidence-v1.tar.gz",
-    "bytes": 1036705,
-    "sha256": "d689c1e7d974f465034e38ba9cc2438ddd99890da407821244d9708ecaff922c",
-    "members": 229,
-    "index_sha256": "f199cac1143f1bf880b4a6320bdef7d1a3cedebef38510d108e5e2a1c424fc5f",
+    "path": "out/phase6-stock-lua-exit-parity-evidence-v1.tar.gz",
+    "bytes": 31514023,
+    "sha256": "e5a1c6094b39d30f74feeb8b4cf5eaa752aee64a365d0f138fd5040b73da6d69",
+    "members": 1120,
+    "index_sha256": "827cbd15e19a1d1bb50bf93373900b3df9537fe6c9143ba687b48edf8cf82162",
     "all_payload_hashes_verified": true,
     "remote_preservation": "pending",
     "font_and_asset_collections_included": false
-  },
-  "physical_controller": "Unavailable per user; unverified",
-  "qualification": "Native observations and damaged-evidence controls only. Intentional stock-exit acceptance remains unqualified until preserved Windows observations are audited and pinned; ordinary scenarios retain all sixty-frame requirements.",
-  "corrected_original_reference_run": {
-    "id": 41725217641,
-    "source_commit": "62b8959266dbf35d1ee004934ee1729edb38e834",
-    "status": "in-progress-at-native-checkpoint"
   }
 }

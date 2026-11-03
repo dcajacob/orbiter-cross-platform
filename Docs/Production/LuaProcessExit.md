@@ -69,18 +69,47 @@ build logs, standalone test records and the pinned Lua archive. The baseline
 runtime is referenced through the preceding verified Transfer MFD bundle.
 Asset and font collections are excluded; remote preservation remains open.
 
-The separate [stock exit observation](LuaStockExitVerification.json) now records
-four complete native runs: 52 presentations, 448 all-vessel samples and 840
-docking-port samples. Each run contains all 60 ordered script log events and
-28 assertion-pass records. Repeated and cross-build state, port and boundary
-traces are byte-identical. Eleven damaged-capture controls reject missing
-observations, forged completion, a wrong exit code or renderer, and incomplete
-teardown. The four-profile Windows reference is still unqualified. Its first
-attempt exposed an incompatible fixed-time image probe in the fixture; the
-corrected observer measures renderer identity independently. The failed
-artifact is retained, and the stock-corpus termination rules are unchanged.
+The separate [stock exit observation](LuaStockExitVerification.json) now passes
+an independent original/native comparison in all four Debug/Release and
+automatic/SSE2 profiles. Two complete processes per profile on each platform
+produce 104 presentations, 896 all-vessel samples and 1,680 docking-port samples
+per side. Every process contains all eight stock vessels, 60 ordered script
+log events and 28 assertion-pass records. The original Windows application,
+SDK, graphics client and stock script remain unchanged. Native Debug automatic
+uses the explicitly recorded AddressSanitizer/UndefinedBehaviorSanitizer build;
+the other three native profiles use normal Debug or Release builds.
 
-This is targeted native verification. The historical 157-scenario sweep remains
+All seven numerical error maxima are zero in all eight comparisons, with the
+existing numerical budgets unchanged. Vessel capabilities, local docking-port
+geometry, normalized completed-frame boundaries and actual math implementations
+also match. Both platforms intentionally exit after 13 completed presentations
+and 14 finalized state snapshots. Native processes additionally delete their
+graphics contexts and preserve the existing save. Twelve damaged-capture checks
+on each original and native profile reject 96 altered captures; three comparison
+identity checks reject forged observer sources and reported or raw math records.
+
+The four exact original ZIPs are preserved in the public
+[stock exit reference release](https://github.com/dcajacob/orbiter-cross-platform/releases/tag/phase6-stock-lua-exit-original-v1).
+The preservation workflow succeeded, and a fresh download without authentication
+rechecked all four archive hashes and independently audited all eight original
+processes. The source, archive and metadata pins in
+`Tests/Production/NativeLua/StockExit/observations.lock.json` prevent automatic
+reference refresh. The initial image-probe setup failure is retained separately
+and remains unqualified; this checkpoint makes no new image-comparison claim.
+
+The complete stock-exit parity evidence bundle is
+`out/phase6-stock-lua-exit-parity-evidence-v1.tar.gz`: 31,514,023 bytes and 1,120
+members, SHA-256
+`e5a1c6094b39d30f74feeb8b4cf5eaa752aee64a365d0f138fd5040b73da6d69`.
+Every payload hash was checked after packaging. The bundle contains all four
+profile captures, the original archives, failed initial attempt, final auditors
+and controls, the full owning-source snapshot and both fresh SSE2 packages.
+The two automatic packages are retained in the preceding Lua process-exit
+bundle. Asset and font collections are excluded. Remote preservation of the
+complete native/parity bundle remains open.
+
+The stock-corpus termination rules are unchanged at this checkpoint. The
+historical 157-scenario sweep remains
 112 passed and 45 failed; the original failed result is not rewritten as a
 pass. Hosted checks for the repair, other missing stock modules/dependencies,
 final hardware testing and remote evidence preservation remain open. A
