@@ -255,11 +255,12 @@ frame byte-identical to Windows. The full stock sweep improves to 44 passes and
 crashes remain open. The next full native workflow captures these cases in all
 four build/CPU profiles. [Station and base evidence](StockStations.md)
 
-A fresh build that instruments C as well as C++ exposes a Lua empty-upvalue-list
-undefined access before Wayland interaction starts. A two-guard isolated
-prototype passes unsuppressed closure/GC stress and matches the unchanged normal
-interpreter, but is not yet adopted. Broader sanitizer qualification remains
-open. [Failure and prototype evidence](LuaUpvalueLifetime.md)
+A fresh build that instruments C as well as C++ exposed a Lua empty-upvalue-list
+undefined access. The native build now uses a hash-checked generated copy with
+two null guards, passes unsuppressed closure/GC stress and all five preserved
+Windows Lua/AAP schedules. The full sanitizer run gets past Lua and stops at an
+invalid renderer star-to-planet cast before Wayland interaction. Broader
+sanitizer qualification remains open. [Failure and fix evidence](LuaUpvalueLifetime.md)
 
 The native graphics leak now has an isolated source fix and a passing local
 sanitizer menu flow. Mesa's executable-code allocator retained two bookkeeping

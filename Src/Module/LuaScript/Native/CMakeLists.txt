@@ -29,7 +29,22 @@ set(ORBITER_BINARY_ROOT_DIR "${PROJECT_BINARY_DIR}")
 set(ORBITER_INSTALL_ROOT_DIR .)
 set(ORBITER_INSTALL_SDK_DIR Orbitersdk)
 add_subdirectory("${ORBITER_SOURCE_ROOT}/Extern/Lua" lua-build)
+include(UpvalueGuards.cmake)
+orbiter_native_lua_upvalues("${original_lua_source_SOURCE_DIR}" "${PROJECT_BINARY_DIR}" defined_lfunc)
+file(GLOB lua_original_inputs CONFIGURE_DEPENDS "${original_lua_source_SOURCE_DIR}/*.c" "${original_lua_source_SOURCE_DIR}/*.h")
+set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS ${lua_original_inputs}
+    "${CMAKE_CURRENT_SOURCE_DIR}/UpvalueGuards.cmake"
+    "${ORBITER_SOURCE_ROOT}/Tests/Production/NativeLua/upvalue-source.lock.json")
 foreach(target lua lua-exe)
+    get_target_property(sources ${target} SOURCES)
+    list(FIND sources "${original_lua_source_SOURCE_DIR}/lfunc.c" original_lfunc_index)
+    if(original_lfunc_index EQUAL -1)
+        message(FATAL_ERROR "Original Lua target has no declared lfunc.c input")
+    endif()
+    list(REMOVE_ITEM sources "${original_lua_source_SOURCE_DIR}/lfunc.c")
+    list(APPEND sources "${defined_lfunc}")
+    set_property(TARGET ${target} PROPERTY SOURCES "${sources}")
+    target_include_directories(${target} PRIVATE "${original_lua_source_SOURCE_DIR}")
     target_compile_definitions(${target} PRIVATE LUA_USE_POSIX LUA_USE_DLOPEN)
     target_link_libraries(${target} PRIVATE ${CMAKE_DL_LIBS})
 endforeach()
@@ -75,6 +90,12 @@ set_target_properties(native_dg_lua_bindings PROPERTIES POSITION_INDEPENDENT_COD
 
 include(CTest)
 if(BUILD_TESTING)
+    add_test(NAME native_lua_upvalue_lifetime COMMAND lua-exe
+        "${ORBITER_SOURCE_ROOT}/Tests/Production/NativeLua/Upvalues.Test.lua")
+    find_package(Python3 REQUIRED COMPONENTS Interpreter)
+    add_test(NAME native_lua_upvalue_source_integrity COMMAND "${Python3_EXECUTABLE}" -B
+        "${ORBITER_SOURCE_ROOT}/Tests/Production/NativeLua/Upvalues.Source.Test.py"
+        --source "${original_lua_source_SOURCE_DIR}")
     add_executable(interpreter_handoff_check "${ORBITER_SOURCE_ROOT}/Tests/Production/NativeLua/ExecutionHandoff.Test.cpp")
     target_compile_features(interpreter_handoff_check PRIVATE cxx_std_17)
     target_include_directories(interpreter_handoff_check PRIVATE

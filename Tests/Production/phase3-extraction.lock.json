@@ -581,7 +581,7 @@
     },
     "Src/Orbiter/Production/CMakeLists.txt": {
       "original_sha256_lf": null,
-      "sha256_lf": "7ade6b42fd5ab95eed23533627c6364ce6a217052629d1a6420c28420831b89c",
+      "sha256_lf": "6c591a77344ee8e9ffdcd37202cc8b3a7748b02355f2771d019ef7b3b4142730",
       "scope": "Original ten stock MFD declarations use exact platform SDK aliases; shared original conic geometry is moved without calculation or screen-mapping changes. Full native instrument runtime remains incomplete."
     },
     "Src/Orbiter/Production/CameraServices.cpp": {
@@ -1340,7 +1340,7 @@
     },
     "Src/Module/LuaScript/Native/CMakeLists.txt": {
       "original_sha256_lf": null,
-      "sha256_lf": "02189e39d02e801e984565ee8ef899d61fc0209c161c37389c16162c2bf4be1b"
+      "sha256_lf": "5c2a89da05720ce3eadc0a2f657e485427c7bbf7518df175eb8d4c29fb7e5d9d"
     },
     "Src/Vessel/Common/Instrument.cpp": {
       "original_sha256_lf": "a358cf68cc90de24b398d431ef38f559c91c12ca6d577cc9dd1e2954b37bd869",
@@ -1836,6 +1836,10 @@
       "original_sha256_lf": null,
       "sha256_lf": "8c6d2adefdb679e928aec32a9a83cbcc9a4720981c8f218bc5862da40a5f97ee",
       "scope": "Original CameraApplication mouse method bodies with explicit native pointer/time/FOV services, and original buffered five-degree FOV expressions. camera_source.py and flight_source.py conserve their complete algorithms; Windows declarations/layouts and runtime references remain unchanged."
+    },
+    "Src/Module/LuaScript/Native/UpvalueGuards.cmake": {
+      "original_sha256_lf": null,
+      "sha256_lf": "492fb913f7a9d8a72895f355e2ca863d6d8dc96f45bdc61858cfdfd5f3acb2fe"
     }
   }
 }

@@ -1,0 +1,117 @@
+{
+  "schema": 1,
+  "status": "native-lua-fix-and-original-behavior-passed",
+  "phase6_complete": false,
+  "source_base": "e5007ef15fc6c5edef9ace5931f96b0f90843fa4",
+  "source_sha256": {
+    "Src/Module/LuaScript/Native/CMakeLists.txt": "5c2a89da05720ce3eadc0a2f657e485427c7bbf7518df175eb8d4c29fb7e5d9d",
+    "Src/Module/LuaScript/Native/UpvalueGuards.cmake": "492fb913f7a9d8a72895f355e2ca863d6d8dc96f45bdc61858cfdfd5f3acb2fe",
+    "Src/Orbiter/Production/CMakeLists.txt": "6c591a77344ee8e9ffdcd37202cc8b3a7748b02355f2771d019ef7b3b4142730",
+    "Tests/Production/NativeLua/upvalue-source.lock.json": "41a6ee813a5479ccdedda2a4bbafeceaab675bb44821055c01e92205f341fdbd",
+    "Tests/Production/NativeLua/Upvalues.Test.lua": "962e7d7bd43a01250901d730dd1d008f171d56f62fad7edd9cd448968e40ea98",
+    "Tests/Production/NativeLua/Upvalues.Source.Test.py": "ea79d4c577575f47c56d35eacf0dfb00ec23aa369afcdc05cc84ec0fa124c476"
+  },
+  "lua_source": {
+    "schema": 1,
+    "source_commit": "69ea087dff1daba25a2000dfb8f1883c17545b7a",
+    "archive_sha256": "18fdf2dd3756c0941d227c0eae0cf1f972b350d0ca7fce0052db9920eb06280b",
+    "source_lock_sha256": "41a6ee813a5479ccdedda2a4bbafeceaab675bb44821055c01e92205f341fdbd",
+    "original_inputs": 55,
+    "original_lfunc_sha256": "97daf7da89fa0566516d92cc53606f175aa5f6a5f24fcae69844001c25062aed",
+    "effective_lfunc_sha256": "57fac032136ee3f712f30ae6ab4b7a45a7749dd55beb488658cdcdc7f93e6f3c",
+    "changed_call_sites": 2,
+    "original_source_tree_unchanged": true,
+    "windows_dependency_changed": false
+  },
+  "standalone_sanitizers": {
+    "c_and_cxx": true,
+    "asan_options": "detect_leaks=1:fast_unwind_on_malloc=0",
+    "lsan_options": "",
+    "ubsan_options": "halt_on_error=1:print_stacktrace=1",
+    "tests_passed": [
+      "native_lua_upvalue_lifetime",
+      "native_lua_upvalue_source_integrity",
+      "native_lua_thread_handoff",
+      "native_lua_stock_script_paths"
+    ]
+  },
+  "original_reference": {
+    "run_id": 41590681453,
+    "offline_archive_verification": "passed",
+    "configuration": "Release",
+    "selected_math_profile": "original-default",
+    "cases": {
+      "lua_pb": {
+        "original_events_identical": true,
+        "original_controls_identical": true,
+        "original_air_identical": true,
+        "original_state_identical": true
+      },
+      "lua_dg": {
+        "original_events_identical": true,
+        "original_controls_identical": true,
+        "original_air_identical": true,
+        "original_state_identical": true
+      },
+      "lua_dgs": {
+        "original_events_identical": true,
+        "original_controls_identical": true,
+        "original_air_identical": true,
+        "original_state_identical": true
+      },
+      "lua_dg_atmosphere": {
+        "original_events_identical": true,
+        "original_controls_identical": true,
+        "original_air_identical": true,
+        "original_state_identical": true
+      },
+      "lua_dgs_atmosphere": {
+        "original_events_identical": true,
+        "original_controls_identical": true,
+        "original_air_identical": true,
+        "original_state_identical": true
+      }
+    }
+  },
+  "native_flights": {
+    "autopilot_cockpit_runs": 4,
+    "unchanged_stock_scenarios": 6,
+    "all_normal_teardowns_passed": true
+  },
+  "full_wayland_sanitizers": {
+    "status": "failed-before-interaction",
+    "lua_initialization_passed": true,
+    "failure": "Scene.cpp:544: downcast of vStar to vPlanet",
+    "no_qualification_claim": true
+  },
+  "evidence": [
+    {
+      "path": "out/phase6-lua-guards-regressions/schedule/lua-schedule-report.json",
+      "sha256": "89ac7ca97fe630e309a171026bfb83469230984fe6a55052793f2d2bac612df9"
+    },
+    {
+      "path": "out/phase6-lua-guards-regressions/flight/flight-report.json",
+      "sha256": "92dfa9db2eccbb392e7fbed99c8085272fdb6465cb94a8b3885133e915e382e3"
+    },
+    {
+      "path": "out/phase6-lua-guards-asan-system-panel-1/runtime-snapshot.json",
+      "sha256": "5c47369b04c81b63ae87f2855ad904e2e3feca896ccd82e3b02bee8749025a7d"
+    },
+    {
+      "path": "out/phase6-lua-guards-asan-system-panel-1/console.log",
+      "sha256": "7190e7cd4f740de3528a25c31130df4d42983d56c4fae4035475d68153323047"
+    },
+    {
+      "path": "out/phase6-lua-upvalue-source-controls.json",
+      "sha256": "2997202cf8e6ed274dffbe18bdca1275da8e3ea74b6a2235b7fba230159cd226"
+    },
+    {
+      "path": "out/phase6-lua-defined-asan/Testing/Temporary/LastTest.log",
+      "sha256": "420c03e05e1a8c5592f6f06699c490ad9ddba901a9ea9934d12ee0d37b09e88f"
+    },
+    {
+      "path": "out/phase6-lua-guards-original-verified/provenance.json",
+      "sha256": "67367eac7a1446a940849d8c742368876e4d132cd79bd9ed7d74e8a1b194f133"
+    }
+  ]
+}

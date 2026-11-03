@@ -79,6 +79,8 @@ if(ORBITER_BUILD_NATIVE_VESSELS)
 endif()
 if(ORBITER_BUILD_NATIVE_COCKPIT)
     list(APPEND _native_sources
+        ../../Module/LuaScript/Native/CMakeLists.txt ../../Module/LuaScript/Native/UpvalueGuards.cmake
+        ../../../Tests/Production/NativeLua/upvalue-source.lock.json
         NativeCockpit.cmake SystemPlayback.h PlaybackAnnotation.inc GuiMenuButton.inc GuiAnimatedControls.inc GuiOptionControls.inc GuiNotifications.inc NativeJoystick.h CustomCommands.h NativeAnnotations.cpp ScreenAnnotationMethods.inc NativeScript.cpp NativeInterpreterSdk.cpp NativeHelp.cpp ../CockpitSdk.cpp NativeCockpitMfd.cpp NativeCockpitProjection.cpp NativeCockpitGui.cpp ../MenuInfoBar.cpp ../DlgFocus.cpp ../DlgMenuCfg.cpp ../DlgTacc.cpp ../DlgCamera.cpp ../DlgInfo.cpp ../DlgMap.cpp ../DlgOptions.cpp ../DlgFunction.cpp ../DlgRecorder.cpp ../PlaybackEd.cpp NativeCockpitCommands.cpp NativeCockpitVessel.cpp
         CockpitVesselMethods.inc CockpitCameraMethods.inc CockpitPanelMethods.inc CockpitPanelInput.inc CockpitSystemInput.inc NativeCameraMouse.cpp
         ../Pane.cpp ../hud.cpp ../Defpanel.cpp ../Panel2D.cpp ../VCockpit.cpp ../Select.cpp ../Astro.cpp

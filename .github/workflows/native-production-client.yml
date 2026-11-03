@@ -352,6 +352,11 @@ jobs:
             out/native-lua-flight/*/saved.scn
             out/native-lua-flight/*/console.txt
             out/native-lua-flight/*/graphics-lifecycle.json
+            out/native-lua/lua-source.json
+            out/native-lua/defined-upvalues/lfunc.c
+            out/native-lua/Testing/Temporary/LastTest.log
+            out/native-cockpit-engine/native-lua/lua-source.json
+            out/native-cockpit-engine/native-lua/defined-upvalues/lfunc.c
             out/native-dg-systems/**
             out/native-dg-keymap/**
             out/native-cockpit-evidence/**
