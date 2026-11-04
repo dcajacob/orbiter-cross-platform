@@ -1,0 +1,262 @@
+{
+  "schema": 2,
+  "protocol": 2,
+  "status": "audited-original-observations",
+  "automatic_refresh": false,
+  "repository": "dcajacob/orbiter-cross-platform",
+  "application_source": "f725194209634f7fd5d1d44d426cfa9b5e303e37",
+  "producer_commit": "aeee5826eb86c5c64e6c0fc97f40a20f8104459e",
+  "run_id": 41742824336,
+  "workflow": ".github/workflows/original-legacy-stations.yml",
+  "cases_sha256_lf": "586690bdd14c22f968ea16c93af4f658b674c55476e7ccb00533b0444159e7dd",
+  "audit_sha256": "41b682628747cf652b00ca502cd50d8ce588b4f152ed00cde6ba1a5565c0d9f5",
+  "audit_verifier_sha256": "436750d0c9a57a62b3d5642126bf0271b63b692d37e34f3e6a7f016bd05b3ef4",
+  "runtime_metadata": {
+    "Debug": {
+      "runtime_metadata_sha256_lf": "c700ab3e0f4076a90db71a6616fd5ca4f9f730a6cf3c47caa71e6d104ac75708",
+      "client_metadata_sha256_lf": "440407a494291b7b31b2c5c1c06c7be0352af6991c494a26fca57ab8a6b582e8"
+    },
+    "Release": {
+      "runtime_metadata_sha256_lf": "73671783841497931ec671149b7f68fd79890b12ca8acc5f088489fac0b48955",
+      "client_metadata_sha256_lf": "21da5b35655f019651ecea5e465c28b9579f133a5fef40be1eb4230f5d53c24e"
+    }
+  },
+  "profiles": {
+    "Debug-automatic": {
+      "capture_sha256": "3d8593cbf91dd9555ace66c40e7655856157abdd68a0dc554d080ad6cf3cb9c1",
+      "observer_sha256": "a96e21c3419e4a7ea86a7c28262acbebb6abb4dfc735d65644166ebb8b3dd840",
+      "source_manifest_sha256": "d9a218228af679645b18393ec1596fbf1afbdb8fa5482de9a4719f9ac676585d",
+      "runtime_metadata_sha256_lf": "c700ab3e0f4076a90db71a6616fd5ca4f9f730a6cf3c47caa71e6d104ac75708",
+      "client_metadata_sha256_lf": "440407a494291b7b31b2c5c1c06c7be0352af6991c494a26fca57ab8a6b582e8",
+      "gate_sha256": "f05b66e7ce24573c814dc4046dc0eca7b6e82a5b77c5b60f43552f72acc5c9b9",
+      "playback_gate_sha256": "4af307f41e63db1d07c4236e5e97987e7312564eeb71445456c77dc0bcb78a04",
+      "preserved_files": 1035,
+      "archive_sha256": "5f6d89e1735f9250dc7285c73d27934ba8b078162dc0138e5cbb4bc794118686",
+      "archive_members_verified": 260,
+      "actual_math": "fma3"
+    },
+    "Debug-sse2": {
+      "capture_sha256": "5f4287a35280bfa05dd67df621ea24fcb7dc149cabf72158a9d38b42c29980ab",
+      "observer_sha256": "8d1ec7b29ee504c22c00376f66163c46238a48f3f5788c3e1cfc75762b606d4e",
+      "source_manifest_sha256": "d9a218228af679645b18393ec1596fbf1afbdb8fa5482de9a4719f9ac676585d",
+      "runtime_metadata_sha256_lf": "c700ab3e0f4076a90db71a6616fd5ca4f9f730a6cf3c47caa71e6d104ac75708",
+      "client_metadata_sha256_lf": "440407a494291b7b31b2c5c1c06c7be0352af6991c494a26fca57ab8a6b582e8",
+      "gate_sha256": "f27095e2b249ae73b711556a657c96897f373e818ad6a07ede2ef48720cade98",
+      "playback_gate_sha256": "4af307f41e63db1d07c4236e5e97987e7312564eeb71445456c77dc0bcb78a04",
+      "preserved_files": 1035,
+      "archive_sha256": "433d4562fe5e670c0f9071dc4ee8f4c5eca80b7e1706aa45c6fcea81b73b93dd",
+      "archive_members_verified": 260,
+      "actual_math": "sse2"
+    },
+    "Release-automatic": {
+      "capture_sha256": "09786d7adc1ce2357d3beff3869ceb6ee570c0f608da7809b376ab0be87f428f",
+      "observer_sha256": "58d352bc0c45bbe507e70604085733608d1b3344a42e151c397d60e637905f52",
+      "source_manifest_sha256": "d9a218228af679645b18393ec1596fbf1afbdb8fa5482de9a4719f9ac676585d",
+      "runtime_metadata_sha256_lf": "73671783841497931ec671149b7f68fd79890b12ca8acc5f088489fac0b48955",
+      "client_metadata_sha256_lf": "21da5b35655f019651ecea5e465c28b9579f133a5fef40be1eb4230f5d53c24e",
+      "gate_sha256": "24e48415375e75226f6f9995373de2c96a74c462cd55a34a413d780711d91e99",
+      "playback_gate_sha256": "4af307f41e63db1d07c4236e5e97987e7312564eeb71445456c77dc0bcb78a04",
+      "preserved_files": 923,
+      "archive_sha256": "7efc352070d915d63b1c38b477cdddde4fbe990553710609efca2f1ac10f612b",
+      "archive_members_verified": 260,
+      "actual_math": "fma3"
+    },
+    "Release-sse2": {
+      "capture_sha256": "6f96c02d787101d11564f77e2ce8b11674891f2018a5d114c2be13116e04189c",
+      "observer_sha256": "5ab2a2b7f31e3f062c3a449fe1dbd9b1f6fe6d8d0880cf6747921dd09270b9a7",
+      "source_manifest_sha256": "d9a218228af679645b18393ec1596fbf1afbdb8fa5482de9a4719f9ac676585d",
+      "runtime_metadata_sha256_lf": "73671783841497931ec671149b7f68fd79890b12ca8acc5f088489fac0b48955",
+      "client_metadata_sha256_lf": "21da5b35655f019651ecea5e465c28b9579f133a5fef40be1eb4230f5d53c24e",
+      "gate_sha256": "e37822e8f67b3dfcd5dcb7d84fa71511e09799380d87b97c83b36b5083e10271",
+      "playback_gate_sha256": "4af307f41e63db1d07c4236e5e97987e7312564eeb71445456c77dc0bcb78a04",
+      "preserved_files": 923,
+      "archive_sha256": "a6cb82c22a4b36f0b22e170c196aff300a03fcabd60470175f587d6d533bb331",
+      "archive_members_verified": 260,
+      "actual_math": "sse2"
+    }
+  },
+  "artifacts": [
+    {
+      "id": 13282657605,
+      "name": "original-legacy-stations-v2-Release-sse2",
+      "profile": "Release-sse2",
+      "bytes": 32803337,
+      "sha256": "a6cb82c22a4b36f0b22e170c196aff300a03fcabd60470175f587d6d533bb331"
+    },
+    {
+      "id": 13282606939,
+      "name": "original-legacy-stations-v2-Release-automatic",
+      "profile": "Release-automatic",
+      "bytes": 32803378,
+      "sha256": "7efc352070d915d63b1c38b477cdddde4fbe990553710609efca2f1ac10f612b"
+    },
+    {
+      "id": 13282517860,
+      "name": "original-legacy-stations-v2-Debug-automatic",
+      "profile": "Debug-automatic",
+      "bytes": 32840782,
+      "sha256": "5f6d89e1735f9250dc7285c73d27934ba8b078162dc0138e5cbb4bc794118686"
+    },
+    {
+      "id": 13281488827,
+      "name": "original-legacy-stations-v2-Debug-sse2",
+      "profile": "Debug-sse2",
+      "bytes": 32841027,
+      "sha256": "433d4562fe5e670c0f9071dc4ee8f4c5eca80b7e1706aa45c6fcea81b73b93dd"
+    }
+  ],
+  "observed_capabilities": {
+    "iss": {
+      "version": 0,
+      "enable_focus": 0,
+      "meshes": 1,
+      "thrusters": 0,
+      "propellants": 0,
+      "docks": 3,
+      "parents": 0,
+      "children": 0,
+      "xpdr": 1,
+      "mass": 450000.0,
+      "empty_mass": 450000.0,
+      "fuel": 0.0,
+      "size": 55.0,
+      "pmix": 395.0,
+      "pmiy": 559.0,
+      "pmiz": 290.0,
+      "csx": 897.2,
+      "csy": 3641.3,
+      "csz": 610.8,
+      "local_docking_ports": [
+        {
+          "x": 13.67,
+          "y": 5.56,
+          "z": 0.0,
+          "dx": 1.0,
+          "dy": 0.0,
+          "dz": 0.0,
+          "rx": 0.0,
+          "ry": 1.0,
+          "rz": 0.0
+        },
+        {
+          "x": -4.32,
+          "y": 17.6,
+          "z": 0.0,
+          "dx": 0.0,
+          "dy": 1.0,
+          "dz": 0.0,
+          "rx": 1.0,
+          "ry": 0.0,
+          "rz": 0.0
+        },
+        {
+          "x": -36.0,
+          "y": 4.21,
+          "z": 0.0,
+          "dx": -1.0,
+          "dy": 0.0,
+          "dz": 0.0,
+          "rx": 0.0,
+          "ry": -1.0,
+          "rz": 0.0
+        }
+      ]
+    },
+    "module1": {
+      "version": 0,
+      "enable_focus": 1,
+      "meshes": 1,
+      "thrusters": 0,
+      "propellants": 0,
+      "docks": 2,
+      "parents": 0,
+      "children": 0,
+      "xpdr": 0,
+      "mass": 8000.0,
+      "empty_mass": 8000.0,
+      "fuel": 0.0,
+      "size": 6.0,
+      "pmix": 7.7,
+      "pmiy": 7.7,
+      "pmiz": 2.3,
+      "csx": 20.0,
+      "csy": 20.0,
+      "csz": 20.0,
+      "local_docking_ports": [
+        {
+          "x": 0.0,
+          "y": 0.0,
+          "z": 5.0,
+          "dx": 0.0,
+          "dy": 0.0,
+          "dz": 1.0,
+          "rx": 0.0,
+          "ry": 1.0,
+          "rz": 0.0
+        },
+        {
+          "x": 0.0,
+          "y": 0.0,
+          "z": -5.0,
+          "dx": 0.0,
+          "dy": 0.0,
+          "dz": -1.0,
+          "rx": 0.0,
+          "ry": 1.0,
+          "rz": 0.0
+        }
+      ]
+    }
+  },
+  "recording_files_sha256_lf": {
+    "Flights/Smack! Rescue/GL-01.atc": "8d74cfecf3dfbf5566cf0ee62f0b2939fafa42e147bbce63a200745fa61b1f5e",
+    "Flights/Smack! Rescue/GL-01.att": "77a47b096dd0b1c3424b166a29c96cb3b11a6763702e96fbbbeb5d3c187038a4",
+    "Flights/Smack! Rescue/GL-01.pos": "fa5ab6b298eb939cefd5b7d1d6da9384b2c35d3d532a2ee0d46cd824ba2b9615",
+    "Flights/Smack! Rescue/GL-02.atc": "4caf5867dc15084cbf744901916ea6ef5752a393aaf77008cff1108c2c13039b",
+    "Flights/Smack! Rescue/GL-02.att": "1b47014134626e90c4a854f9bbac832d5b3145230f10562e232ba1f706628523",
+    "Flights/Smack! Rescue/GL-02.pos": "98252f5cc0c80ea66d4d2a9cf6135db8f4f7209855142e9fdbf5372868ca8f96",
+    "Flights/Smack! Rescue/ISS.atc": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "Flights/Smack! Rescue/ISS.att": "0b034b046e8a485d120ed9fa3abc13caa5afa0f9482660df7c1a9c72b0069e63",
+    "Flights/Smack! Rescue/ISS.pos": "b24987ec21360aae38f5b8244d3f0a0a036c8f6e974f35b28ab447c62cee09b9",
+    "Flights/Smack! Rescue/Luna-OB1.atc": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "Flights/Smack! Rescue/Luna-OB1.att": "fa2554731c27ff5139e1df8ce2523e8f75a6c3c56ab9d8e9a57c28adee83ebcc",
+    "Flights/Smack! Rescue/Luna-OB1.pos": "2db17e18ca111ead8957777bb05686f1775f6fbae799a26414c4eb0a63250c4d",
+    "Flights/Smack! Rescue/Mir.atc": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "Flights/Smack! Rescue/Mir.att": "cf342a2ff2bbde2aa10057ff8d89932acf4e32a5e7debc2713420947fe3f63ae",
+    "Flights/Smack! Rescue/Mir.pos": "926b9413697282043577e12c13e3264dcdf3425c8d7955be18c86eee3c4eb802",
+    "Flights/Smack! Rescue/PB-01.atc": "fd07ff7b0cbf1948fcd1d7d6ff402c3031b5e642b0734ecb6f50c82e9a08d258",
+    "Flights/Smack! Rescue/PB-01.att": "52b37461249b46efc74d106366d16b4ff5926e110b379ea60332fe1baafbb752",
+    "Flights/Smack! Rescue/PB-01.pos": "854df51fd1dc76583bda74456ebefd57d8efa83e147c40e74eed371908cf295e",
+    "Flights/Smack! Rescue/SH-01.atc": "87fb982bf58d87270537b6d37a1d4337c87632e26cab19b8a42cbac5b983a697",
+    "Flights/Smack! Rescue/SH-01.att": "a7f82aece2de691a3ac7824595290aa79673c3d272c956d36a6d53be001dee47",
+    "Flights/Smack! Rescue/SH-01.pos": "83e211eb8e056232110ab0e0cf9d7f88409528160270ea8b5ae3dc711486f55c",
+    "Flights/Smack! Rescue/system.dat": "e9b93dfa239a46fa3f41d9a05997243c68f0da0acb05b8293ad545ab0ebe1803"
+  },
+  "scenario_entry_points": {
+    "legacy_stations_1": "Scenarios/Delta-glider/Smack!.scn",
+    "legacy_stations_2": "Scenarios/Delta-glider/Vessel-vessel.scn",
+    "legacy_stations_3": "Scenarios/Navigation/Space Physics/DG dumbbell.scn",
+    "legacy_stations_4": "Scenarios/Tutorials/Smack! Rescue.scn"
+  },
+  "playback_vessels": {
+    "legacy_stations_1": [],
+    "legacy_stations_2": [],
+    "legacy_stations_3": [],
+    "legacy_stations_4": [
+      "ISS",
+      "Mir",
+      "Luna-OB1",
+      "GL-01",
+      "GL-02",
+      "PB-01",
+      "SH-01"
+    ]
+  },
+  "identity_controls": {
+    "path": "out/phase6-legacy-stations-original-v2-identity-v1.json",
+    "sha256": "96fd2e4351f208a858a05a6e2633c41fa339487c957a1be31e8924709188e884",
+    "rejected": 8
+  },
+  "native_admission_qualified": false,
+  "phase6_complete": false
+}

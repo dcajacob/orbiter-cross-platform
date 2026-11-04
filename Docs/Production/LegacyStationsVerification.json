@@ -1,172 +1,120 @@
 {
-  "schema": 1,
-  "status": "limited-original-reference-playback-unqualified",
+  "schema": 2,
+  "status": "native-parity-verified-preservation-pending",
   "phase6_complete": false,
+  "runtime_source_commit": "aeee5826eb86c5c64e6c0fc97f40a20f8104459e",
   "original_application_source": "f725194209634f7fd5d1d44d426cfa9b5e303e37",
-  "original_observer_commit": "e81279b9ca108b27b56925bfe034141416f20f1d",
-  "original_workflow_run": 41732880756,
-  "preservation_workflow_run": 41735121013,
+  "original_observer_commit": "aeee5826eb86c5c64e6c0fc97f40a20f8104459e",
+  "original_workflow_run": 41742824336,
   "original_processes": 32,
-  "presentations": 1920,
-  "all_vessel_rows": 14640,
-  "docking_rows": 25864,
-  "all_paired_numerical_maxima": 0.0,
-  "minimum_original_repeat_and_build_image_ssim": 1.0,
-  "original_repeat_and_build_cameras_byte_identical": true,
-  "extracted_archive_members_verified": 764,
-  "audit": {
-    "path": "out/phase6-legacy-stations-original-audit-v3.json",
-    "sha256": "cd315b5a70933100576d6c1ef39951ec7e24d8b63cf315bdfc7460cec971fa21"
+  "original_presentations": 1920,
+  "original_all_vessel_rows": 14640,
+  "original_docking_rows": 25864,
+  "original_audit": {
+    "path": "out/phase6-legacy-stations-original-v2-audit-v1.json",
+    "sha256": "41b682628747cf652b00ca502cd50d8ce588b4f152ed00cde6ba1a5565c0d9f5"
   },
-  "public_anonymous_replay": {
-    "path": "out/phase6-legacy-stations-public-audit-v1.json",
-    "sha256": "d3223e9290e6e540bda3a8d82994ad1244275c48c583a6eaf198706a8640f3e7",
-    "processes": 32
-  },
-  "durable_original_release": {
-    "id": 433308879,
-    "tag": "phase6-legacy-stations-original-v1",
-    "url": "https://github.com/dcajacob/orbiter-cross-platform/releases/tag/phase6-legacy-stations-original-v1",
-    "assets": [
-      {
-        "id": 707399003,
-        "name": "original-legacy-stations-Debug-automatic.zip",
-        "bytes": 32361882,
-        "sha256": "68d813cb67c29bbe2ae0c6f4be1eb254739c9e05afeba27fb564fb6ed7339a91"
-      },
-      {
-        "id": 707399211,
-        "name": "original-legacy-stations-Debug-sse2.zip",
-        "bytes": 32361915,
-        "sha256": "613fc0abf433cc2951253ed07cbfcef2f882a238d92223e13f554f9b2899bfa8"
-      },
-      {
-        "id": 707399613,
-        "name": "original-legacy-stations-Release-automatic.zip",
-        "bytes": 32336898,
-        "sha256": "8aa3653bc060f9dd76a411a183cd5111b4fdf2c4d4ec8f30576687471acac9ef"
-      },
-      {
-        "id": 707399419,
-        "name": "original-legacy-stations-Release-sse2.zip",
-        "bytes": 32336898,
-        "sha256": "e13b66d2a37644823cc1c679b2b66ded48c9eced2450680332327fa6144a0f62"
-      }
-    ]
-  },
-  "damaged_capture_controls": 48,
-  "identity_controls": 7,
-  "original_capabilities": {
-    "iss": {
-      "version": 0,
-      "enable_focus": 0,
-      "meshes": 1,
-      "thrusters": 0,
-      "propellants": 0,
-      "docks": 3,
-      "parents": 0,
-      "children": 0,
-      "xpdr": 1,
-      "mass": 450000.0,
-      "empty_mass": 450000.0,
-      "fuel": 0.0,
-      "size": 55.0,
-      "pmix": 395.0,
-      "pmiy": 559.0,
-      "pmiz": 290.0,
-      "csx": 897.2,
-      "csy": 3641.3,
-      "csz": 610.8,
-      "local_docking_ports": [
-        {
-          "x": 13.67,
-          "y": 5.56,
-          "z": 0.0,
-          "dx": 1.0,
-          "dy": 0.0,
-          "dz": 0.0,
-          "rx": 0.0,
-          "ry": 1.0,
-          "rz": 0.0
-        },
-        {
-          "x": -4.32,
-          "y": 17.6,
-          "z": 0.0,
-          "dx": 0.0,
-          "dy": 1.0,
-          "dz": 0.0,
-          "rx": 1.0,
-          "ry": 0.0,
-          "rz": 0.0
-        },
-        {
-          "x": -36.0,
-          "y": 4.21,
-          "z": 0.0,
-          "dx": -1.0,
-          "dy": 0.0,
-          "dz": 0.0,
-          "rx": 0.0,
-          "ry": -1.0,
-          "rz": 0.0
-        }
-      ]
+  "original_lock_sha256": "ef63d57d55eb73d7f3d4bd70e388704f7bbad8b132f7993bfc16108132879223",
+  "profiles": {
+    "Release-auto": {
+      "path": "out/phase6-legacy-stations-comparison-Release-auto-v4.json",
+      "sha256": "e808849716fd16169f30428cbcff612c87236d5bfecc4695b556c21f158cbbe1",
+      "profile": "Release-automatic",
+      "processes": 8,
+      "presentations": 480,
+      "sanitizer_linked": false,
+      "capture_sha256": "87b4e2c355668da63afe9b7eac4acfe5dcb81398886ba6ff93d7390dec28ff8a"
     },
-    "module1": {
-      "version": 0,
-      "enable_focus": 1,
-      "meshes": 1,
-      "thrusters": 0,
-      "propellants": 0,
-      "docks": 2,
-      "parents": 0,
-      "children": 0,
-      "xpdr": 0,
-      "mass": 8000.0,
-      "empty_mass": 8000.0,
-      "fuel": 0.0,
-      "size": 6.0,
-      "pmix": 7.7,
-      "pmiy": 7.7,
-      "pmiz": 2.3,
-      "csx": 20.0,
-      "csy": 20.0,
-      "csz": 20.0,
-      "local_docking_ports": [
-        {
-          "x": 0.0,
-          "y": 0.0,
-          "z": 5.0,
-          "dx": 0.0,
-          "dy": 0.0,
-          "dz": 1.0,
-          "rx": 0.0,
-          "ry": 1.0,
-          "rz": 0.0
-        },
-        {
-          "x": 0.0,
-          "y": 0.0,
-          "z": -5.0,
-          "dx": 0.0,
-          "dy": 0.0,
-          "dz": -1.0,
-          "rx": 0.0,
-          "ry": 1.0,
-          "rz": 0.0
-        }
-      ]
+    "Debug-auto": {
+      "path": "out/phase6-legacy-stations-comparison-Debug-auto-v4.json",
+      "sha256": "c3c4961ef12a71f08ca3aca91f74a83c7c485e632025609eb086b11ccbd96893",
+      "profile": "Debug-automatic",
+      "processes": 8,
+      "presentations": 480,
+      "sanitizer_linked": false,
+      "capture_sha256": "62cbc08c0b10a584763789002305b288fa97a434a4680a6c5ff8e6c427d04a6b"
+    },
+    "Debug-sse2": {
+      "path": "out/phase6-legacy-stations-comparison-Debug-sse2-v4.json",
+      "sha256": "c109b15dfdc7369710323fdf40344052663084bb78fa479b6e4dc8ed5877f8e2",
+      "profile": "Debug-sse2",
+      "processes": 8,
+      "presentations": 480,
+      "sanitizer_linked": false,
+      "capture_sha256": "c41f170165a2499bd9df81ffd6ab506ce82c76d8dd8c79dcb0b994105ef2a044"
+    },
+    "Release-sse2": {
+      "path": "out/phase6-legacy-stations-comparison-Release-sse2-v4.json",
+      "sha256": "04182aaad57fe9400e1b772a118891a0b70c2a209834320da16e8fca5a8578f0",
+      "profile": "Release-sse2",
+      "processes": 8,
+      "presentations": 480,
+      "sanitizer_linked": false,
+      "capture_sha256": "5790ed94b01110828c64e77c4587efe43022e4f87784355de9e4a262f540e439"
+    },
+    "Debug-asan": {
+      "path": "out/phase6-legacy-stations-comparison-Debug-asan-v4.json",
+      "sha256": "d8f791feb325d95e48ff679abe581ebc72c33e48ac5e0457e2731b996bf7903a",
+      "profile": "Debug-automatic",
+      "processes": 8,
+      "presentations": 480,
+      "sanitizer_linked": true,
+      "capture_sha256": "894f8bc4e368f92cf48fdf2624aa2c1d066b155c6101da91919e9ab602c6a6d0"
     }
   },
-  "native_support_qualified": false,
-  "scope": "Version 1 original observations remain byte-pinned and publicly preserved. Three non-playback cases retain audited observations; the rescue case lacks required playback input and is unqualified. Native support, teardown safety and complete Phase 6 remain unqualified.",
-  "qualified_original_cases": [
-    "legacy_stations_1",
-    "legacy_stations_2",
-    "legacy_stations_3"
-  ],
-  "unqualified_original_cases": {
-    "legacy_stations_4": "Scenario rename and missing flight recordings caused original fallback; correct full-playback reference remains pending."
-  }
+  "native_compared_processes": 40,
+  "native_presentations": 2400,
+  "maximum_errors": {
+    "position_m": 0,
+    "velocity_m_s": 0,
+    "rotation_rad": 3.1401849173675503e-16,
+    "angular_velocity_rad_s": 8.102228975069212e-16,
+    "mjd_days": 0,
+    "mass_fraction_of_budget": 0,
+    "fuel_fraction_of_budget": 0,
+    "camera_position_m": 0,
+    "camera_rotation_rad": 0,
+    "landmark_maximum_px": 0
+  },
+  "minimum_full_frame_ssim": 1.0,
+  "every_declared_vessel_and_docking_port": true,
+  "full_frames_without_masks": true,
+  "original_budgets_unchanged": true,
+  "observed_recording_files": 22,
+  "per_vessel_playback_flags_every_tick": true,
+  "identity_controls": {
+    "path": "out/phase6-legacy-stations-original-v2-identity-v1.json",
+    "rejected": 8
+  },
+  "original_damage_controls_per_profile": 12,
+  "playback_damage_controls_per_profile": 5,
+  "rejection_controls": {
+    "path": "out/phase6-legacy-stations-constructor-failure-repair-v4.json",
+    "normal": 16,
+    "address_undefined_leak_instrumented": 16
+  },
+  "offline_replay": {
+    "path": "out/phase6-legacy-stations-original-v2-frozen-audit-v1.json",
+    "status": "passed"
+  },
+  "corrupted_archive_control": {
+    "path": "out/phase6-legacy-stations-original-v2-frozen-negative-v1/verification.json",
+    "status": "passed"
+  },
+  "retained_source_runtime_root": "out/phase6-legacy-stations-retained-root-v4",
+  "native_legacy_subset_parity_qualified": true,
+  "durable_v2_release_verified": false,
+  "scope": "Four unchanged complete legacy station scenes for 60 fixed quarter-second frames (15 simulated seconds), repeated in each profile. Does not qualify the entire nine-minute rescue tutorial, every stock scene, other modules, hardware input/performance or Phase 6.",
+  "previous_v1_reference": {
+    "tag": "phase6-legacy-stations-original-v1",
+    "producer": "e81279b9ca108b27b56925bfe034141416f20f1d",
+    "status": "limited-original-observations-playback-unqualified",
+    "public_limitation_annotation_verified": true,
+    "original_assets_unchanged": true
+  },
+  "remaining": [
+    "Publish and anonymously replay the four audited v2 archives and preserve the complete native evidence.",
+    "Rerun all 157 unchanged stock scenarios on the verified runtime; the last complete pre-admission baseline remains 114 passes / 43 failures.",
+    "Complete current hosted comparisons, remaining modules/assertion, interactive/hardware/performance gates and full Phase 6 acceptance."
+  ]
 }

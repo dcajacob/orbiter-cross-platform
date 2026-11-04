@@ -10,17 +10,20 @@ import urllib.parse
 import urllib.request
 
 from frozen_original import ArtifactRedirect, digest, require
+from recording_inputs import LOCK_FILE
 
 HERE = Path(__file__).resolve().parent
-TAG = 'phase6-legacy-stations-original-v1'
-TITLE = 'Phase 6 original legacy station observations v1'
+TAG = 'phase6-legacy-stations-original-v2'
+TITLE = 'Phase 6 original legacy station observations v2'
 BODY = ('preserved-original-windows: four audited Debug/Release automatic/SSE2 profiles. '
         'Thirty-two complete-scene legacy ISS/Module1 runs and 1920 completed presentations. '
+        'Each scenario retains its original entry point; all 22 rescue recording files and '
+        'actual Playback() flags for all seven rescue vessels are verified at every tick. '
         'Application/SDK/client source f725194209634f7fd5d1d44d426cfa9b5e303e37; '
-        'observer producer e81279b9ca108b27b56925bfe034141416f20f1d. '
-        'ZIP sizes and SHA-256 identities are pinned in '
-        'Tests/Production/LegacyStations/observations.lock.json. '
-        'These original state/port/camera/frame observations do not declare native parity or complete Phase 6 acceptance.')
+        'observer producer {producer}. ZIP sizes and SHA-256 identities are pinned in '
+        'Tests/Production/LegacyStations/observations-v2.lock.json. '
+        'Version 1 remains preserved with its documented playback limitation. '
+        'These observations do not declare native parity or complete Phase 6 acceptance.')
 
 
 def main():
@@ -30,12 +33,17 @@ def main():
     parser.add_argument('--publish', action='store_true')
     args = parser.parse_args()
     require(not args.output.exists(), 'Preservation output already exists')
-    pins = json.loads((HERE/'observations.lock.json').read_text())
+    pins = json.loads(LOCK_FILE.read_text())
     audit = json.loads(args.audit.read_text())
-    require(pins['automatic_refresh'] is False and pins['repository'] == 'dcajacob/orbiter-cross-platform' and
+    require(pins['status']=='audited-original-observations' and pins['protocol']==2 and
+        pins['automatic_refresh'] is False and digest(HERE/'audit_original.py')==pins['audit_verifier_sha256'] and
+        audit['verifier_sha256']==pins['audit_verifier_sha256'] and pins['repository'] == 'dcajacob/orbiter-cross-platform' and
         audit['status'] == 'passed' and audit['producer_commit'] == pins['producer_commit'] and
         audit['processes'] == 32 and audit['presentations'] == 1920 and len(audit['profiles']) == 4,
         'Preservation requires all four audited original profiles')
+    require(all(audit['profiles'][profile]['capture_sha256']==item['capture_sha256'] and
+        audit['profiles'][profile]['archive_sha256']==item['archive_sha256'] for profile,item in pins['profiles'].items()),
+        'Preservation audit differs from the pinned v2 profile identities')
     files = {item['name']+'.zip': args.cache/(item['name']+'.zip') for item in pins['artifacts']}
     expected = {item['name']+'.zip': item for item in pins['artifacts']}
     require(len(files) == 4, 'Original asset matrix incomplete')
@@ -72,7 +80,7 @@ def main():
         matches = [r for r in releases if r['tag_name'] == TAG]
         require(len(matches) <= 1, 'Ambiguous preservation release')
         release = matches[0] if matches else request('/releases', 'POST',
-            dict(tag_name=TAG, name=TITLE, body=BODY, draft=True, prerelease=True))
+            dict(tag_name=TAG, name=TITLE, body=BODY.format(producer=pins['producer_commit']), draft=True, prerelease=True))
         require(release['name'] == TITLE and release['prerelease'] and
                 'preserved-original-windows:' in release['body'], 'Conflicting preservation release')
         release_id = int(release['id'])

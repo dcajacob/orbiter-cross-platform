@@ -1,146 +1,23 @@
 {
-  "schema": 2,
-  "status": "unqualified-candidate",
+  "schema": 3,
+  "status": "native-parity-verified-preservation-pending",
   "phase6_complete": false,
-  "latest_tested_runtime_source_commit": "95e6e319efe0fdd8a9d1bae496725cfc65ca3e7c",
-  "native_capture_profiles": {
-    "Release-auto": {
-      "capture": "out/phase6-legacy-stations-capture-Release-auto-v2/capture.json",
-      "sha256": "701163cc2f92e192a2274fa3a5a366306c733e13ff46554e62b0851f7e03b6bc",
-      "processes": 8,
-      "presentations": 480,
-      "all_vessel_rows": 3660,
-      "docking_rows": 6466,
-      "actual_math": "amd-6121d02-fma3",
-      "sanitizer_linked": false,
-      "runtime_source_commit": "95e6e319efe0fdd8a9d1bae496725cfc65ca3e7c",
-      "observer_commit": "81467b7896b7ee5475e9fab3a8a091b44261f8a9"
+  "runtime_source_commit": "aeee5826eb86c5c64e6c0fc97f40a20f8104459e",
+  "qualification": "Docs/Production/LegacyStationsVerification.json",
+  "nominal_native_processes": 40,
+  "native_presentations": 2400,
+  "native_legacy_subset_parity_qualified": true,
+  "original_budgets_unchanged": true,
+  "durable_v2_release_verified": false,
+  "preserved_failed_attempts": [
+    {
+      "source": "aeee5826eb86c5c64e6c0fc97f40a20f8104459e:Docs/Production/LegacyStationsCandidateVerification.json",
+      "local_snapshot": "out/phase6-legacy-stations-candidate-before-v4.json",
+      "sha256": "324b5515ec759468447c2dc475f27e77784fcedf3bdd106387fa6656189691db"
     },
-    "Debug-asan": {
-      "capture": "out/phase6-legacy-stations-capture-Debug-asan-v2/capture.json",
-      "sha256": "2a08c759e6068fa44fb0496d5854fef63052e8917c9315c44271e3426159e2ff",
-      "processes": 8,
-      "presentations": 480,
-      "all_vessel_rows": 3660,
-      "docking_rows": 6466,
-      "actual_math": "amd-6121d02-fma3",
-      "sanitizer_linked": true,
-      "runtime_source_commit": "95e6e319efe0fdd8a9d1bae496725cfc65ca3e7c",
-      "observer_commit": "81467b7896b7ee5475e9fab3a8a091b44261f8a9"
-    },
-    "Debug-auto": {
-      "capture": "out/phase6-legacy-stations-capture-Debug-auto-v2/capture.json",
-      "sha256": "7d88b9d0a88e67b482227865ede243143171c72ed904dd5c3f06bf810c9e8395",
-      "processes": 8,
-      "presentations": 480,
-      "all_vessel_rows": 3660,
-      "docking_rows": 6466,
-      "actual_math": "amd-6121d02-fma3",
-      "sanitizer_linked": false,
-      "runtime_source_commit": "95e6e319efe0fdd8a9d1bae496725cfc65ca3e7c",
-      "observer_commit": "81467b7896b7ee5475e9fab3a8a091b44261f8a9"
-    },
-    "Debug-sse2": {
-      "capture": "out/phase6-legacy-stations-capture-Debug-sse2-v2/capture.json",
-      "sha256": "4ac014ade74b4f2cabb771ca57885b9a2c3febc66f8784b9e87367480029dc9f",
-      "processes": 8,
-      "presentations": 480,
-      "all_vessel_rows": 3660,
-      "docking_rows": 6466,
-      "actual_math": "amd-6121d02-sse2",
-      "sanitizer_linked": false,
-      "runtime_source_commit": "95e6e319efe0fdd8a9d1bae496725cfc65ca3e7c",
-      "observer_commit": "81467b7896b7ee5475e9fab3a8a091b44261f8a9"
-    },
-    "Release-sse2": {
-      "capture": "out/phase6-legacy-stations-capture-Release-sse2-v2/capture.json",
-      "sha256": "e551e785ed43c50f4821930ccd40ccfd1266b181f79572172138949df2dbc6e5",
-      "processes": 8,
-      "presentations": 480,
-      "all_vessel_rows": 3660,
-      "docking_rows": 6466,
-      "actual_math": "amd-6121d02-sse2",
-      "sanitizer_linked": false,
-      "runtime_source_commit": "95e6e319efe0fdd8a9d1bae496725cfc65ca3e7c",
-      "observer_commit": "81467b7896b7ee5475e9fab3a8a091b44261f8a9"
+    {
+      "driver": "out/phase6-legacy-dock-lifetime-capture-v3.py",
+      "reason": "The driver incorrectly renamed the unchanged v2 resource root to a nonexistent v3 path; all attempts failed before launching the app. Corrected v4 captures use the same retained fresh v3 runtime packages."
     }
-  },
-  "nominal_processes": 40,
-  "nominal_presentations": 2400,
-  "all_vessel_rows": 18300,
-  "docking_rows": 32330,
-  "scope": "Four unchanged complete scenes, original entry points, all 22 rescue recordings and per-vessel actual playback flags. Nominal captures passed; native parity and the instrumented rejection matrix remain unqualified.",
-  "dock_lifetime_regression": {
-    "status": "passed",
-    "report": "out/phase6-dock-lifetime-same-platform-regression-v3.json",
-    "completed_sessions": 6,
-    "state_ports_camera_and_full_frame_byte_identical": true,
-    "instrumented_dumbbell_repeats": 2
-  },
-  "preliminary_nonplayback_original_comparison": {
-    "status": "passed",
-    "scope": "Release automatic, first three v1 non-playback observations only",
-    "report": "out/phase6-legacy-stations-three-scene-original-comparison-Release-auto-v2.json",
-    "processes": 6,
-    "full_frame_ssim": 1.0
-  },
-  "rejection_controls": {
-    "normal_status": "passed",
-    "normal_rejected": 16,
-    "normal_report": "out/phase6-legacy-stations-policy-Release-auto-v2/verification.json",
-    "instrumented_status": "failed",
-    "instrumented_report": "out/phase6-legacy-stations-policy-Debug-asan-v2/verification.json",
-    "finding": "Missing-module rejection during Vessel construction leaks the class name, two default force arrays and default touchdown points (676 bytes). A native-only cleanup is prepared; its fresh-build controls remain required."
-  },
-  "original_v2_first_attempt": {
-    "status": "failed",
-    "producer_commit": "95e6e319efe0fdd8a9d1bae496725cfc65ca3e7c",
-    "run_id": 41741502257,
-    "preserved_representative": "out/phase6-legacy-stations-original-v2-first-attempt/downloads.json",
-    "finding": "All 22 recordings were staged, but the preserved recorder recognizes only Windows backslash separators when extracting the recording name. The launched Tutorials/Smack! Rescue path left all seven observed playback flags false. No full v2 lock is created.",
-    "corrective_action": "Use the original relative scenario name with Windows-native separators and capture all four profiles again."
-  },
-  "retained_source_runtime_root": "out/phase6-legacy-stations-retained-root-v2",
-  "original_v1_playback_qualified": false,
-  "native_parity_qualified": false,
-  "required_next": [
-    "Recapture corrected original playback on all four Windows profiles and independently audit the exact archive bytes before pinning v2.",
-    "Verify missing-module constructor cleanup in fresh packages, including all sixteen real sanitizer rejection controls.",
-    "Complete all four matched native state/port/camera/image profiles, sanitizer gates, durable references and the unchanged full 157-scenario acceptance scope."
-  ],
-  "previous_candidate": {
-    "schema": 1,
-    "status": "unqualified-candidate",
-    "phase6_complete": false,
-    "runtime_source_commit": "c72128b38ded9dd1c08f3ba5c0a4cbbe2fd4c60a",
-    "observer_commit": "fa1d39be06c395f38db21e14ac3c8355b86600ae",
-    "release_capture": "out/phase6-legacy-stations-native-Release-auto-v1/capture.json",
-    "instrumented_capture": "out/phase6-legacy-stations-native-Debug-asan-v1/capture.json",
-    "failures": {
-      "dumbbell_instrumented_teardown": "AddressSanitizer heap-use-after-free in SuperVessel::Detach at SuperVessel.cpp:218, called from ClearDockDefinitions during PlanetarySystem teardown. A previously freed docking-port allocation is read while detaching a later member of the docked chain.",
-      "rescue_staging": "The copied scenario is called Behavior.scn, so native playback requests flights/behavior/iss.pos. The stock recording exists under Flights/Smack! Rescue. Original version 1 also omitted Flights and silently fell back, so its rescue reference is unqualified.",
-      "policy_test_fixture": "The clone control assumed an explicit class header, but stock ISS uses the shorthand ISS header. The fixture now handles both forms; the sixteen-control suite has not yet passed."
-    },
-    "normal_captured_cases": [
-      "legacy_stations_1",
-      "legacy_stations_2",
-      "legacy_stations_3"
-    ],
-    "instrumented_captured_cases": [
-      "legacy_stations_1",
-      "legacy_stations_2"
-    ],
-    "original_v1_qualified_cases": [
-      "legacy_stations_1",
-      "legacy_stations_2",
-      "legacy_stations_3"
-    ],
-    "original_v1_playback_qualified": false,
-    "native_parity_qualified": false,
-    "required_next": [
-      "Correct original and native scenario entry points and stage every pinned playback dependency; capture a versioned replacement reference.",
-      "Repair docked-chain teardown without changing physical propagation or Windows SDK layouts.",
-      "Build fresh packages and complete the full four-profile native/state/camera/image and sanitizer/rejection gates."
-    ]
-  }
+  ]
 }

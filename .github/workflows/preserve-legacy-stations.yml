@@ -1,14 +1,14 @@
-name: Preserve Audited Legacy Station Originals
+name: Preserve Audited Legacy Station Originals v2
 on:
   push:
     branches: ['codex/production-**']
-    paths: ['Tests/Production/LegacyStations/observations.lock.json', 'Tests/Production/LegacyStations/preserve_original.py', '.github/workflows/preserve-legacy-stations.yml']
+    paths: ['Tests/Production/LegacyStations/observations-v2.lock.json', 'Tests/Production/LegacyStations/preserve_original.py', '.github/workflows/preserve-legacy-stations.yml']
   workflow_dispatch:
 permissions:
   contents: write
   actions: read
 concurrency:
-  group: preserve-legacy-stations-original-v1
+  group: preserve-legacy-stations-original-v2
   cancel-in-progress: false
 jobs:
   preserve:
@@ -35,7 +35,7 @@ jobs:
       - uses: actions/upload-artifact@v7
         if: always()
         with:
-          name: legacy-stations-preservation
+          name: legacy-stations-preservation-v2
           retention-days: 90
           path: |
             out/preservation.json
