@@ -118,6 +118,11 @@ jobs:
           python -B Tests/Production/RemainingStock/Clock.Test.py
           --capture out/remaining-stock-repaired/remaining_stock_003-1
           --output out/remaining-stock-repaired/clock-control.json
+      - name: Verify actual startup configuration and reject coherent hash/physics changes
+        run: >-
+          python -B Tests/Production/RemainingStockRepaired/ConfigurationInput.Test.py
+          --capture out/remaining-stock-repaired/remaining_stock_003-1
+          --output out/remaining-stock-repaired-build/configuration-input-controls.json
       - uses: actions/upload-artifact@v7
         if: always()
         with:
@@ -136,11 +141,13 @@ jobs:
             out/remaining-stock-repaired/*/Scenarios/**/*.scn
             out/remaining-stock-repaired/*/Flights/**/*
             out/remaining-stock-repaired/*/Orbiter.cfg
+            out/remaining-stock-repaired/*/staged-Orbiter.cfg
             out/remaining-stock-repaired/*/Meshes/Dragonfly/Dragonfly.msh
             out/remaining-stock-repaired-build/build.json
             out/remaining-stock-repaired-build/runtime-file-controls.json
             out/remaining-stock-repaired-build/original-metadata-controls.json
             out/remaining-stock-repaired-build/source-variant-controls.json
+            out/remaining-stock-repaired-build/configuration-input-controls.json
             out/remaining-stock-repaired-build/*.log
             out/remaining-stock-repaired-build/module-sources/**
             out/remaining-stock-repaired-build/observer/**

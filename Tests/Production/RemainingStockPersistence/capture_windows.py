@@ -81,6 +81,7 @@ def main():
                     require(all(sha(parent_dir/n)==v for n,v in previous['files_sha256'].items()),'Actual parent observation bytes changed')
                     guarded.update({str(parent_dir/n):v for n,v in previous['files_sha256'].items()})
                     parent_result=original.inspect_artifacts(parent_dir,case,config)
+                    require('configuration_input' in parent_result,'Fresh Windows reload requires the actual parent startup configuration witness')
                     saved=parent_dir/CURRENT
                     checksum=sha(saved);derived,provenance=derived_case(case,config,saved,checksum);guarded[str(saved)]=checksum
                     provenance.update(parent_capture_sha256=sha(parent_file),parent_run=case['id']+'-'+str(repeat),
@@ -139,6 +140,8 @@ def main():
             owning_sources_runtime_parent_saved_inputs_and_data_unchanged=True,guarded_parent_files_sha256=guarded,
             scope='Every actual vessel and module field retained in exact hashed Windows save inputs. Original Windows writer/reload candidate only; native writer/reload comparison, measured serialization round trips, controls, lifetime and complete Phase 6 acceptance remain required.')
         save();require(complete,'Original persistence reload failures retained; no admission')
+    except BaseException as error:
+        report.update(status='failed',error=str(error));raise
     finally:save()
 
 

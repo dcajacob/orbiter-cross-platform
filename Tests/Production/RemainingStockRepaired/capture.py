@@ -19,6 +19,7 @@ from run_client import mesa_files,png
 from compare_client import image_ssim
 import data_inputs
 import protocols
+import configuration_input
 require=shared.require;sha=shared.digest;sha_lf=shared.sha_lf
 OBSERVER='Modules/Plugin/ProductionCockpitDriver.dll'
 
@@ -57,6 +58,9 @@ def inspect_artifacts(out,case,config):
     require(not re.search(r'^\s*(?:PropStages|PropStage\d+|PropSubsampling)\s*=',cfg,re.M|re.I),
             'Repaired reference overrides original production propagators')
     variant=json.loads((out/'reference-variant.json').read_text())
+    initial_configuration=None
+    if 'configuration_input' in json.loads((out/'invocation.json').read_text()):
+        initial_configuration=configuration_input.inspect(out,configuration_input.expected(ROOT,variant['producer_commit'],'repaired-windows'))
     require(variant['protocol']==config['protocol'] and variant['protocol_sha256_lf']==sha_lf(protocols.path(config['protocol'])) and
             variant['original_application_and_sdk_source']==config['application_source'] and
             variant['frames']==config['frames'] and variant['fixed_step']==config['fixed_step'] and
@@ -87,8 +91,11 @@ def inspect_artifacts(out,case,config):
         case['scenario_entry_point'],*shared.recordings(case,config)]
     names.extend(item['target'] for item in config['delivery_repairs'])
     if config['protocol']==protocols.V2:names.extend(('stock-step-clock.csv',protocols.MARKER))
-    return dict(result,status='captured',process_returncode=0,actual_math=actual_math,renderer=renderer,actual_simulation_data_files=data_files,clock_observation=clock,
-                files_sha256={name:sha(out/name) for name in names})
+    if initial_configuration is not None:names.append(configuration_input.SNAPSHOT)
+    observed=dict(result,status='captured',process_returncode=0,actual_math=actual_math,renderer=renderer,actual_simulation_data_files=data_files,clock_observation=clock,
+                  files_sha256={name:sha(out/name) for name in names})
+    if initial_configuration is not None:observed['configuration_input']=initial_configuration
+    return observed
 
 
 def source_files():

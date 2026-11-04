@@ -6,6 +6,7 @@ import subprocess
 from behavior_suite import link_or_copy
 from mesa_runtime import require,digest
 from inputs import ROOT,recordings,stage_recordings,stage_delivery_repairs,argument
+from configuration_input import stage as stage_configuration
 
 
 def run(executable,data,planets,directory,config,case,configure):
@@ -38,8 +39,10 @@ def run(executable,data,planets,directory,config,case,configure):
     for name in recordings(case,config):require(name in inputs,'Staged recording missing before original execution')
     expected_inputs={name:value for name,value in preserved.items() if name.startswith(('Config/','Meshes/'))}
     require(all(inputs[name]==value for name,value in expected_inputs.items()),'Preserved input files differ before execution')
+    configuration=stage_configuration(directory)
     (directory/'invocation.json').write_text(json.dumps(dict(argv=argv,case=case,scenario_entry_point=case['scenario_entry_point'],
         input_sha256=inputs,preserved_inputs_sha256=expected_inputs,delivery_repairs=repairs,
+        configuration_input=configuration,
         data_profiles={name:digest(ROOT/'Tests/Production'/name) for name in ('stock-data.lock.json','standard-planets.lock.json')},
         driver_sha256=digest(directory/'Modules/Plugin/ProductionCockpitDriver.dll')),indent=2)+'\n')
     with (directory/'console.txt').open('w') as console:

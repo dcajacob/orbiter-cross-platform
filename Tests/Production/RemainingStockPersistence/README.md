@@ -89,6 +89,44 @@ python -B Tests/Production/RemainingStockPersistence/capture_windows.py \
 
 Fresh corrected Windows writers, complete native/Windows reload comparisons,
 all four native profiles, control and lifetime checks are still required.
+
+All four fresh native packages at `e3f3735d` now complete their immutable build:
+Debug/Release, automatic/SSE2, each with ASan/UBSan and independently checked
+generated sources. `capture_native.py` collects either `--phase stock-writer`
+or `--phase windows-save-reload`, with all 38 scenes and both repetitions by
+default. Both execute the real Save command after finalized tick 960, retain
+complete state/resource/mesh/playback/camera/frame outputs and compare repeats
+under the unchanged budgets. The reload phase independently checks the Windows
+source/runtime and full preserved original package before copying each exact
+saved input. A selected case list is explicitly diagnostic-only; missing startup
+configuration evidence is forbidden for the complete reload campaign. Both
+native phases remain required for qualification.
+
+Two repaired Windows diagnostic profiles at `c4c7a231` are independently checked
+in `out/phase6-windows-adi-request-initial-audit-v2.json`: eight actual processes,
+7,680 presentations and 112 recorded damaged-clock/frame controls. The original
+1,037-file Debug and 925-file Release packages, repaired v3 sources and actual
+replacement/build bytes pass their independent checks. PoweredUp's complete
+parsed saved content now matches the repaired native writer exactly in both
+profiles, excluding only the protocol's operator-description blocks; state,
+camera, actual clocks and full-frame image comparisons also pass. These are
+two-scene diagnostics and one native Debug automatic comparison, not the full
+four-profile/all-scene qualification.
+
+That audit exposed a separate validation defect: the full reader compared
+`Orbiter.cfg` after execution to the initial fixture, but the conserved original
+`Orbiter::Launch` and `SaveConfig` call `Config::Write`. The actual file is the
+normal rewritten master configuration. The retained failed v1 audit records
+that incorrect comparison. New runs copy the actual startup bytes to
+`staged-Orbiter.cfg` before execution and hash the separate snapshot in the
+invocation. The full gate checks that exact startup input against the complete
+frozen fixture and still checks/retains the actual rewritten output. Ten
+coherent-hash/descriptor/physics/format controls pass on a separately labeled
+reader fixture made from retained native startup and Windows rewritten files;
+this fixture executes no simulator and is not Windows runtime qualification.
+The native collector and repaired Windows workflows run those controls again
+on their real newly captured startup inputs. Historical captures without a
+startup witness remain historical and cannot satisfy the new complete gate.
 The new persistence protocol specifies reloading the same exact Windows save in
 both runtimes, alongside separately checking the native writer at measured
 original serialization precision. It does not convert a scoped reader or save

@@ -117,6 +117,11 @@ jobs:
             python -B Tests/Production/RemainingStockRepaired/MatchedClock.Test.py --capture "out/remaining-stock-repaired/$case" --output "out/remaining-stock-repaired-build/actual-clock-controls-$case.json"
             if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           }
+      - name: Verify actual startup configuration and reject coherent hash/physics changes
+        run: >-
+          python -B Tests/Production/RemainingStockRepaired/ConfigurationInput.Test.py
+          --capture out/remaining-stock-repaired/remaining_stock_010-1
+          --output out/remaining-stock-repaired-build/configuration-input-controls.json
       - name: Verify exact saved-input provenance against actual Windows end saves
         run: >-
           python -B Tests/Production/RemainingStockPersistence/SavedInputs.Test.py
@@ -147,6 +152,7 @@ jobs:
             out/remaining-stock-repaired/*/Scenarios/**/*.scn
             out/remaining-stock-repaired/*/Flights/**/*
             out/remaining-stock-repaired/*/Orbiter.cfg
+            out/remaining-stock-repaired/*/staged-Orbiter.cfg
             out/remaining-stock-repaired/*/Meshes/Dragonfly/Dragonfly.msh
             out/remaining-stock-repaired-build/build.json
             out/remaining-stock-repaired-build/actual-clock-controls-*.json
@@ -156,6 +162,7 @@ jobs:
             out/remaining-stock-repaired-build/runtime-file-controls.json
             out/remaining-stock-repaired-build/original-metadata-controls.json
             out/remaining-stock-repaired-build/source-variant-controls.json
+            out/remaining-stock-repaired-build/configuration-input-controls.json
             out/remaining-stock-repaired-build/saved-input-controls.json
             out/remaining-stock-persistence/capture.json
             out/remaining-stock-persistence/*/*.csv
@@ -167,6 +174,7 @@ jobs:
             out/remaining-stock-persistence/*/Scenarios/**/*.scn
             out/remaining-stock-persistence/*/Flights/**/*
             out/remaining-stock-persistence/*/Orbiter.cfg
+            out/remaining-stock-persistence/*/staged-Orbiter.cfg
             out/remaining-stock-persistence/*/Meshes/Dragonfly/Dragonfly.msh
             out/remaining-stock-repaired-build/*.log
             out/remaining-stock-repaired-build/module-sources/**

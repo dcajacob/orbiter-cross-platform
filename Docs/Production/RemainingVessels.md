@@ -63,6 +63,36 @@ Actual Windows reload results, native reload comparisons, measured stock writer
 round trips, input and lifetime checks remain pending. No saved-state reader or
 collector establishes persistence acceptance by itself.
 
+The initial corrected Windows v3 artifacts now pass a scoped independent audit
+for Debug automatic and Release SSE2: eight processes, 7,680 presentations, full
+original package/source/runtime checks and 112 recorded damaged clock/frame
+controls. PoweredUp's complete saved content is identical to the corrected
+native writer, apart from the declared description blocks. Its state, camera,
+actual clocks and full-frame image also pass both comparisons. The evidence is
+`out/phase6-windows-adi-request-initial-audit-v2.json` in the persistence checkout.
+The other profiles and full 38/157 qualification remain open.
+
+The first audit incorrectly expected the post-run `Orbiter.cfg` to be the
+startup fixture. Original `Orbiter::Launch` and `SaveConfig` normally rewrite it
+through the conserved `Config::Write`. New captures preserve and hash a separate
+`staged-Orbiter.cfg` before launch. The complete gate requires those actual
+startup bytes to match the frozen fixture, retaining the rewritten output as a
+separate observation. Coherent-hash mutations of physics settings, descriptors
+and newline forms are rejected; old artifacts lacking this witness are not
+promoted to complete references. Four fresh native `e3f3735d` packages now build
+with ASan/UBSan in Debug/Release automatic/SSE2. The separate native stock-writer
+and exact-Windows-save reload collectors cover all scenes and repetitions;
+actual current campaigns and full independent qualification remain required.
+
+The older repaired-v1 Debug automatic campaign at `01d03e49` has also reached its
+terminal zero exit. Its independent audit re-reads all 38 scenes twice: 76
+processes, 72,960 presentations and 4,028 process evidence files, with 898 owning
+source/runtime/probe inputs, 1,130 assets and all 57 actual data files unchanged.
+It is retained in `out/phase6-full38-old-v1-terminal-audit-v2.json`; the first
+reader's incorrect wrapper-key lookup remains a retained audit failure. This
+historical campaign predates matched clocks, panel defaults and ADI request
+initialization and does not qualify those later repairs.
+
 
 ## Corrected panel and four-profile Windows checkpoint
 

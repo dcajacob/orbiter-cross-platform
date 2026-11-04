@@ -100,6 +100,7 @@ jobs:
             out/remaining-stock-original/*/Scenarios/**/*.scn
             out/remaining-stock-original/*/Flights/**/*
             out/remaining-stock-original/*/Orbiter.cfg
+            out/remaining-stock-original/*/staged-Orbiter.cfg
             out/remaining-stock-original/*/Meshes/Dragonfly/Dragonfly.msh
             out/remaining-stock-original-runtime/control-reference-runtime.json
             out/remaining-stock-original-runtime/test-runtime.json

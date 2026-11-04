@@ -14,6 +14,7 @@ import zipfile
 
 import capture
 import protocols
+import configuration_input
 from matched_clock import inspect_matched_clock
 from pe_symbols import PE
 from behavior_suite import quaternion,quaternion_angle
@@ -451,6 +452,19 @@ def audit_profile(root,profile,config,producer,original_root,mesa,mesa_imports):
         diagnostic_only=False,cases_requested=[case['id'] for case in config['cases']])
     expected_inputs={name:value for name,value in build['preserved_package_sha256'].items()
                      if name.startswith(('Config/','Meshes/'))}
+    startup_controls=json.loads((build_root/'configuration-input-controls.json').read_text())
+    require(startup_controls['status']=='passed' and startup_controls['kind']=='repaired-windows' and
+            startup_controls['protocol']==configuration_input.PROTOCOL and startup_controls['producer_commit']==producer and
+            startup_controls['line_ending_reader_positives']==2 and startup_controls['runtime_configuration_was_rewritten'] and
+            startup_controls['owning_capture_unchanged'] and len(startup_controls['controls'])==10 and
+            {c['control'] for c in startup_controls['controls']}=={'missing_snapshot','missing_descriptor','changed_hash',
+                'wrong_protocol','wrong_runtime_path','wrong_snapshot_path','forced_propagators_with_consistent_hash',
+                'changed_physics_with_consistent_hash','mixed_newlines_with_consistent_hash','rewritten_output_as_input'} and
+            startup_controls['test_sha256'] in raw_source_hashes(producer,'Tests/Production/RemainingStockRepaired/ConfigurationInput.Test.py') and
+            startup_controls['reader_sha256'] in raw_source_hashes(producer,'Tests/Production/RemainingStock/configuration_input.py'),
+            'Actual startup configuration controls incomplete or from different sources')
+    require(startup_controls['positive']==configuration_input.inspect(capture_root/'remaining_stock_003-1',expected_configuration(producer)),
+            'Actual startup configuration positive control differs')
     results={};maths=set();system={}
     for case in config['cases']:
         recorded_case=report['cases'][case['id']]
@@ -463,8 +477,8 @@ def audit_profile(root,profile,config,producer,original_root,mesa,mesa_imports):
             actual=capture.inspect_artifacts(out,case,config)
             require(set(recorded)==set(actual)|{'loaded_modules'} and
                     all(recorded[key]==value for key,value in actual.items()),'Recomputed complete repaired observation differs')
-            require((out/'Orbiter.cfg').read_bytes().replace(b'\r\n',b'\n')==expected_configuration(producer).encode('ascii'),
-                    'Actual staged configuration differs beyond the explicit repaired fixture')
+            require(configuration_input.inspect(out,expected_configuration(producer))==actual['configuration_input'],
+                    'Actual startup configuration differs beyond the explicit repaired fixture')
             require(json.loads((out/'reference-variant.json').read_text())==expected_variant,'Actual executed reference variant differs')
             require(json.loads((out/'actual-data-inputs.json').read_text())==report['actual_original_simulation_data'],
                     'Actual staged kernel/gravity/planet bytes differ from the verified original data source')
