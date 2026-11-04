@@ -103,3 +103,31 @@ brush plus the font's stored name. The three SSME rotations now use their
 allocated type during vessel destruction, and module drawing-resource release
 frees its font/brush and clears their handles. A fresh fully enabled sanitizer
 rerun must verify the combined cleanup before any runtime admission.
+
+The combined cleanup passes the fresh `056f20c1a2d717d84c18a14d72ae622657b99901`
+Debug ASan/UBSan package: the real unchanged Edwards approach scene constructs
+Atlantis, reaches the production capability gate, and tears down its graphics
+context with zero sanitizer diagnostics.
+`out/phase6-atlantis-construction-diagnostic-v3/verification.json` records the
+result. This is a clean rejected construction, with zero presentations; simulation
+and class admission remain unqualified.
+
+All four remaining-stock reference profiles at `da11decc` are now terminal
+failures. Their exact ZIPs, decoded members and observer source snapshots are
+retained in `out/phase6-remaining-stock-original-failed-v2`; the independent audit
+is `out/phase6-remaining-stock-original-failure-audit-v2.json`. Profile-local
+capture checks completed for 28/28/28/30 scenes, but no full reference profile
+qualifies. Debug fuel observations become invalid after an external tank leaves
+the population; Release repeats diverge (mostly fuel, with broader later state
+divergence in one scene). The ascent demo times out. Four Dragonfly cockpit scenes
+report invalid surface dimensions and, in Release, further OpenGL diagnostics.
+No numerical or image budget has been changed to admit these failures.
+
+An optional, uninstalled `production_atlantis_diagnostic` executable now permits
+the real Atlantis/tank/SRB structural capabilities for isolated defect
+reproduction. It compiles the same native host/session/rendering code, retains
+checked source-built modules, emits `unqualified-atlantis-diagnostic.json`, and
+keeps production admission unchanged. Build with
+`ORBITER_BUILD_ATLANTIS_DIAGNOSTIC=ON` only for this test host. Its executable is
+not a qualifying production runtime or a substitute for complete reference,
+scenario, interaction and hardware gates.

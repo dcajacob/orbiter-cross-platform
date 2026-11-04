@@ -137,6 +137,27 @@ bool SupportedStockShuttleA(const VESSEL& vessel,const char* type) {
             cs.x==17.61f && cs.y==17.44f && cs.z==13.09f;
     return false;
 }
+#ifdef ORBITER_ATLANTIS_DIAGNOSTIC
+// An isolated test executable exercises the actual, not-yet-qualified modules.
+// The production executable retains its admission checks below.
+bool SupportedAtlantisDiagnostic(const VESSEL& vessel,const char* type) {
+    if(CompareText(type,"Atlantis")==0)
+        return vessel.Version()==3 && vessel.GetSize()==19.6 &&
+            vessel.GetMeshCount()>=3 && vessel.GetMeshCount()<=5 &&
+            vessel.GetThrusterCount()==19 && vessel.GetPropellantCount()==1 &&
+            vessel.DockCount()>=1 && vessel.DockCount()<=2 &&
+            vessel.AttachmentCount(true)==0 && vessel.AttachmentCount(false)==2;
+    if(CompareText(type,"Atlantis_Tank")==0)
+        return vessel.Version()==1 && !vessel.GetEnableFocus() && vessel.GetSize()==24 &&
+            vessel.GetMeshCount()==1 && vessel.GetThrusterCount()==21 &&
+            vessel.GetPropellantCount()==1 && vessel.DockCount()==3;
+    if(CompareText(type,"Atlantis_SRB")==0)
+        return vessel.Version()==1 && !vessel.GetEnableFocus() && vessel.GetSize()>=23 &&
+            vessel.GetMeshCount()==1 && vessel.GetThrusterCount()==2 &&
+            vessel.GetPropellantCount()==1 && vessel.DockCount()==1;
+    return false;
+}
+#endif
 #endif
 struct Runtime final:BodyServices,RigidBodyServices,SurfaceServices,NavigationServices,VesselServices,
     CameraServices,WorldFactory,SessionServices,VesselLifetimeServices
@@ -769,6 +790,13 @@ struct Runtime final:BodyServices,RigidBodyServices,SurfaceServices,NavigationSe
         if(!world.Initialize(metadata.Solsys()))throw std::runtime_error("Production solar system contains no objects");
         system->InitState(scenario.string().c_str());
         if(!system->nVessel())throw std::runtime_error("Native production session requires a live stock vessel");
+#ifdef ORBITER_ATLANTIS_DIAGNOSTIC
+        if(!evidence.empty()) {
+            std::ofstream marker(evidence/"unqualified-atlantis-diagnostic.json");
+            marker.exceptions(std::ios::badbit|std::ios::failbit);
+            marker<<"{\"scope\":\"Unqualified Atlantis test host using real production modules and session algorithms\",\"native_admission_qualified\":false,\"phase6_complete\":false}\n";
+        }
+#endif
         for(auto* body:system->GetVessels()) {
             auto* vessel=body->GetModuleInterface();const char* type=vessel->GetClassName();
             const bool pb=CompareText(type,"ShuttlePB")==0 && vessel->Version()==2 && vessel->GetMeshCount()==1 && vessel->GetThrusterCount()==16 && vessel->GetPropellantCount()==1;
@@ -779,6 +807,9 @@ struct Runtime final:BodyServices,RigidBodyServices,SurfaceServices,NavigationSe
                 vessel->GetThrusterCount()==(scram ? 23 : 21) && vessel->GetPropellantCount()==(scram ? 3 : 2))
                 continue;
             if(SupportedStockShuttleA(*vessel,type))continue;
+#ifdef ORBITER_ATLANTIS_DIAGNOSTIC
+            if(SupportedAtlantisDiagnostic(*vessel,type))continue;
+#endif
 #endif
             if(!pb && !iss && !SupportedStockStation(*vessel,type))
                 throw std::runtime_error(std::string("Unsupported stock vessel class or capabilities: ")+type+"; generic replacement is forbidden");

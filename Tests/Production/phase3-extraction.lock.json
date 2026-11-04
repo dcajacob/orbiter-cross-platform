@@ -742,7 +742,8 @@
     },
     "Src/Orbiter/Production/NativeApplication.cpp": {
       "original_sha256_lf": null,
-      "sha256_lf": "1ce2f290d1830d83a764cd8835df7a698c85cbaa0e0d35279e2e69a62e8b9e34"
+      "sha256_lf": "1acbe6e1414ec93dce4adde0bd94a476e8a4cdb7a238204e68c0d5c457af5986",
+      "scope": "Production admission remains unchanged. A separately compiled, opt-in, uninstalled diagnostic host checks the real Atlantis/tank/SRB structural capabilities and emits an unqualified marker to reproduce original scene defects with the actual session/physics/rendering algorithms; no generic fallback or acceptance claim."
     },
     "Src/Orbiter/Production/NativeBuild.h.in": {
       "sha256_lf": "f5fb21f83bb6be0c54839fce670e8410f6911eda86da2eef26e4221c1ae25d97",
@@ -841,7 +842,7 @@
     },
     "Src/Orbiter/Production/NativeVessels.cmake": {
       "original_sha256_lf": null,
-      "sha256_lf": "4dbf033a09589d28468350b07064bdcf10556d6693dec62c11cd1c74b22d1904"
+      "sha256_lf": "bf1628c079535514becaf776fa39b9000a47de91a7dedbd5d64843a3add77df7"
     },
     "Src/Orbiter/Production/NativeWorldVesselServices.cpp": {
       "original_sha256_lf": null,
