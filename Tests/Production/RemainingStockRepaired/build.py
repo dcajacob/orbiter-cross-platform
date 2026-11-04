@@ -24,6 +24,19 @@ def require(value,message):
     if not value:raise ValueError(message)
 
 
+def runtime_changes(before,after):
+    changes={name:dict(original_sha256=before.get(name),variant_sha256=value)
+             for name,value in after.items() if before.get(name)!=value}
+    replaced={'Modules/Atlantis_Tank.dll','Modules/Dragonfly.dll','Modules/Plugin/OGLClient.dll',
+              'Modules/Plugin/ProductionCockpitDriver.dll'}
+    sidecars={str(Path(name).with_suffix(suffix)).replace('\\','/')
+              for name in replaced for suffix in ('.pdb','.ilk')}
+    require(replaced<=set(changes) and set(before)<=set(after),'Missing replacement or original file removed')
+    unexpected=sorted(name for name in changes if name not in replaced|sidecars and not name.startswith('Modules/OGLClient/'))
+    require(not unexpected,'Undeclared original runtime change: '+', '.join(unexpected))
+    return changes
+
+
 def main():
     p=argparse.ArgumentParser(description=__doc__)
     for name in ('preserved','output'):p.add_argument('--'+name,type=lambda v:Path(v).resolve(),required=True)
@@ -103,15 +116,8 @@ def main():
             require(PE(runtime/name).exports()==PE(a.preserved/name).exports(),
                     'Repaired module public export spellings differ: '+name)
         after=files(runtime)
-        changed={name:dict(original_sha256=before.get(name),variant_sha256=value)
-                 for name,value in after.items() if before.get(name)!=value}
-        replaced={'Modules/Atlantis_Tank.dll','Modules/Dragonfly.dll','Modules/Plugin/OGLClient.dll',
-                  'Modules/Plugin/ProductionCockpitDriver.dll'}
-        require(replaced<=set(changed) and set(before)<=set(after),'Missing replacement or original file removed')
-        require(all(name in replaced or name.startswith('Modules/OGLClient/') or
-                    name in ('Modules/Atlantis_Tank.pdb','Modules/Dragonfly.pdb',
-                             'Modules/Plugin/OGLClient.pdb','Modules/Plugin/ProductionCockpitDriver.pdb')
-                    for name in changed),'Undeclared original runtime change')
+        report['observed_runtime_files_sha256']=after;save()
+        changed=runtime_changes(before,after)
         require(before==files(a.preserved),'Original package changed during variant build')
         require(sources=={name:sha_lf(ROOT/name) for name in sources},'Producer sources changed during build')
         require(staged['staged_files_sha256']==files(source_variant/'source'),'Staged module sources changed during build')

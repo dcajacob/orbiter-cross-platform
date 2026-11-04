@@ -80,6 +80,8 @@ jobs:
       - name: Verify complete unchanged input selection and resource-history reader controls
         shell: pwsh
         run: |
+          python -B Tests/Production/RemainingStockRepaired/RuntimeFiles.Test.py --build out/remaining-stock-repaired-build
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           python -B Tests/Production/RemainingStockRepaired/capture.py --verify-inputs
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           python -B Tests/Production/RemainingStock/Resources.Test.py
@@ -119,6 +121,7 @@ jobs:
             out/remaining-stock-repaired/*/Orbiter.cfg
             out/remaining-stock-repaired/*/Meshes/Dragonfly/Dragonfly.msh
             out/remaining-stock-repaired-build/build.json
+            out/remaining-stock-repaired-build/runtime-file-controls.json
             out/remaining-stock-repaired-build/*.log
             out/remaining-stock-repaired-build/module-sources/**
             out/remaining-stock-repaired-build/observer/**

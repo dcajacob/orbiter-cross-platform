@@ -75,6 +75,19 @@ import-only SRB link failed because the wrapper omitted the original target's
 original source files are now listed, matching the original SRB target. No
 simulation or reference acceptance occurred in that attempt.
 
+At `2ddb6ef6ff52f09f25cfc5872dea63197a2afad4`, workflow
+[41775935303](https://github.com/dcajacob/orbiter-cross-platform/actions/runs/41775935303),
+both Release profiles built successfully and began the full scene campaign.
+Both Debug profiles compiled and linked every target, passed original/repaired
+module export checks, then stopped at the runtime file guard because MSVC also
+emitted four `.ilk` files. The exact hash-verified Debug SSE2 artifact, all decoded
+members and compiler inputs remain in
+`out/phase6-repaired-reference-runtime-guard-failure-2ddb-v1`. The guard now names
+only those four incremental-link files alongside the four existing PDB paths;
+all executable/SDK/other-module protections remain strict. Each fresh completed
+build must also reject six damaged manifest controls protecting the original
+application, SDK, SRB, configuration and unrelated module/root DLL paths.
+
 ```sh
 python3 -B Tests/Production/RemainingStockRepaired/capture.py --verify-inputs
 ```
