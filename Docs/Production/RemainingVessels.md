@@ -58,6 +58,16 @@ This remains two scenes twice in four profiles. Full38 state/camera/frame/persis
 ordinary class admission, the fresh unchanged157 sweep and all broader Phase 6
 requirements retain their scope.
 
+The native stock-writer comparison now also passes the same two scenes twice
+in all four matching profiles: sixteen native and sixteen original Windows
+stock runs, complete saved-token equality, actual clocks, all-vessel state,
+cameras and full frames. The unchanged minimum SSIM budget is 0.98; observed
+scores range from 0.98288095 to 1.0. The record is
+`out/phase6-source-v4-windows-native-stock-comparison-v1.json` in the audit
+checkout. Together with the exact-save reload comparison, this closes the
+selected two-scene/four-profile diagnostic cohort. It does not admit the full
+remaining classes or replace the unchanged full157 result.
+
 ## Independent persistence reader checkpoint
 
 The repaired source-v4 native Debug automatic stock-writer, Release SSE2

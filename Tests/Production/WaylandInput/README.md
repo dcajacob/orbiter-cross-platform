@@ -88,3 +88,35 @@ physical keyboard/mouse/controller use, the named unchanged scenario acceptance
 runs, cross-compositor testing, sanitizer qualification or the 1920x1080 medium
 performance gate. Full Phase 6 acceptance remains separate. Frozen reference
 bytes and image/numerical budgets are unchanged.
+
+## Private decoration ownership candidate
+
+Use `--decoration-plugin PATH --decoration-build-record FILE` together to select
+the verified, instrumented GTK ownership candidate for Orbiter. The runner
+checks the actual plugin bytes against its matching build record before opening
+the compositor. Missing paired arguments or a changed plugin digest are rejected
+before runtime initialization.
+
+The selector applies only to the simulator process. The independent focus client
+uses its normal library path and removes `LIBDECOR_PLUGIN_DIR`; its actual maps
+are retained in `focus-sink-loaded-maps.txt`. The runner requires the requested
+plugin in Orbiter's actual mappings and its absence, along with ASan's runtime,
+from the focus client. Plugin and build-record bytes must remain unchanged.
+The real `application_decoration` descriptor and companion-mapping hash are
+recorded in `wayland-input.json`.
+
+The initial current-source replay exported the instrumented plugin globally.
+The uninstrumented focus client then stopped with an ASan runtime-order error
+before either surface or Orbiter input initialized. That failed attempt remains
+retained. With the explicit per-application selection, current source-v4 Release
+SSE2 canaries pass DG panel input on llvmpipe at 1x and Intel PTL at 2x. The latter
+independently records a 640x360 logical surface and 1280x720 framebuffer. These
+are canaries; complete current four-profile software/hardware matrices remain
+required.
+
+`Decoration.Test.py --capture PATH --output FILE` rechecks a real successful
+application/companion mapping pair, then rejects a changed plugin hash and a
+missing build-record argument before any runtime can launch. Both software and
+hardware canaries pass these controls. Source, plugin, build and actual mapping
+bytes remain protected. These controls do not replace the complete input,
+physical-device, lifetime or Phase 6 gates.

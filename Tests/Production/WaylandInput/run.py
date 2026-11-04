@@ -104,8 +104,25 @@ def main():
     p.add_argument('--renderer', choices=('llvmpipe', 'default'), default='llvmpipe')
     p.add_argument('--library-directory', type=Path, action='append', default=[],
                    help='Explicit isolated application library directory; record hashes and verify actual loading')
+    p.add_argument('--decoration-plugin', type=Path,
+                   help='Verified private GTK decoration plugin for Orbiter only')
+    p.add_argument('--decoration-build-record', type=Path,
+                   help='Matching instrumented decoration ownership build record')
     p.add_argument('--camera-check', choices=('all', 'drag', 'wheel', 'step'), default='all')
     a = p.parse_args()
+    require(bool(a.decoration_plugin)==bool(a.decoration_build_record),
+            'Decoration plugin and matching build record must be supplied together')
+    decoration = None
+    if a.decoration_plugin:
+        plugin = a.decoration_plugin.resolve(strict=True)
+        build_record = a.decoration_build_record.resolve(strict=True)
+        built = json.loads(build_record.read_text())
+        require(plugin.name=='libdecor-gtk.so' and built['status']=='built' and
+                built['baseline'] is False and built['sanitizers'] is True and
+                built['plugin_sha256']==digest(plugin),
+                'Actual instrumented decoration ownership build differs')
+        decoration = dict(plugin=str(plugin), plugin_sha256=digest(plugin),
+                          build_record=str(build_record), build_record_sha256=digest(build_record))
     tools_manifest = json.loads((a.dependencies/'test-tools.json').read_text())
     require(tools_manifest['status']=='passed' and
             tools_manifest['lock_sha256']==digest(HERE/'dependencies.lock.json'), 'Private dependency lock differs')
@@ -155,7 +172,8 @@ def main():
              '--evidence', str(out), '--keymap', str(ROOT/'Tests/Production/Flight/keymap-dg-laptop.cfg'), '--run']
     (out/'invocation.json').write_text(json.dumps(argv, indent=2)+'\n')
     report = dict(status='failed', case=case['id'], scale=a.scale, phase6_complete=False,
-                  runtime_libraries=dict(directories=list(library_files), files_sha256=library_hashes))
+                  runtime_libraries=dict(directories=list(library_files), files_sha256=library_hashes),
+                  application_decoration=decoration)
     inputs_sha256 = dict(executable=digest(a.executable), renderer=digest(a.modules/'Graphics/OGLClient.so'))
     try:
         with Compositor(a.dependencies, out/'compositor', a.scale,
@@ -171,11 +189,19 @@ def main():
                 # Isolated application libraries can be instrumented. Keep the
                 # independent, preverified focus client on its normal runtime.
                 sink_environment = dict(environment, LD_LIBRARY_PATH=str(a.executable.resolve().parent))
+                sink_environment.pop('LIBDECOR_PLUGIN_DIR', None)
+                if decoration:
+                    environment['LIBDECOR_PLUGIN_DIR'] = str(plugin.parent)
                 sink = subprocess.Popen([str(a.dependencies.resolve()/'focus-sink')], env=sink_environment,
                                         stdout=sink_log, stderr=subprocess.STDOUT)
                 process = None
                 try:
                     wait(lambda: compositor.surface(sink.pid), 'Owned focus sink did not map')
+                    sink_maps = Path(f'/proc/{sink.pid}/maps').read_text()
+                    (out/'focus-sink-loaded-maps.txt').write_text(sink_maps)
+                    if decoration:
+                        require(str(plugin) not in sink_maps and 'libasan.so' not in sink_maps,
+                                'Independent focus client loaded instrumented application libraries')
                     process = subprocess.Popen(argv, env=environment, stdout=log, stderr=subprocess.STDOUT)
                     surface = wait(lambda: compositor.surface(process.pid), 'Owned Wayland Orbiter did not map')
                     wait(lambda: (out/'cockpit-camera.csv').exists() and rows(out/'cockpit-camera.csv') and
@@ -250,6 +276,9 @@ def main():
                     shutdown = arm_shutdown(out, process.pid, t.button)
                     loaded_maps = Path(f'/proc/{process.pid}/maps').read_text()
                     (out/'loaded-maps.txt').write_text(loaded_maps)
+                    if decoration:
+                        require(str(plugin) in loaded_maps,
+                                'Requested private decoration plugin was not loaded by Orbiter')
                     mapped_files = {line.split(maxsplit=5)[5] for line in loaded_maps.splitlines()
                                     if len(line.split(maxsplit=5))==6 and line.split(maxsplit=5)[5].startswith('/')}
                     for directory, files in library_files.items():
@@ -273,6 +302,10 @@ def main():
                             'Application binaries changed during input session')
                     require(all(digest(Path(path))==checksum for path,checksum in library_hashes.items()),
                             'Isolated runtime libraries changed during input session')
+                    if decoration:
+                        require(digest(plugin)==decoration['plugin_sha256'] and
+                                digest(build_record)==decoration['build_record_sha256'],
+                                'Application decoration plugin/build record changed during input session')
                     renderer = json.loads((out/'renderer-info.json').read_text())
                     require(('llvmpipe' in renderer['renderer'].lower()) == (a.renderer=='llvmpipe'),
                             'Actual OpenGL renderer differs from requested driver')
@@ -286,6 +319,7 @@ def main():
                             [Path(__file__), HERE/'compositor.py', HERE/'CompositorInput.c', HERE/'FocusSink.c',
                              HERE.parent/'DeltaGlider/window_camera.py']},
                         executable_sha256=digest(a.executable),
+                        focus_sink_mappings_sha256=digest(out/'focus-sink-loaded-maps.txt'),
                         renderer_sha256=digest(a.modules/'Graphics/OGLClient.so'),
                         test_module_sha256=digest(a.dependencies/'compositor-input.so'))
                 finally:
