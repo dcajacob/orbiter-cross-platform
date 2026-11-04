@@ -67,6 +67,14 @@ all decoded members remain in
 all three incoming paths before constructing target sources and exposes failed
 build-log tails directly in the job log. A fresh run is required.
 
+The next run
+[41774907247](https://github.com/dcajacob/orbiter-cross-platform/actions/runs/41774907247)
+at `1d1f80b64d70d1ed737d56b788c1381c18b9039a` configured successfully, then the
+import-only SRB link failed because the wrapper omitted the original target's
+`Common.cpp`, which defines `srb_contrail` and `srb_exhaust`. Both unchanged
+original source files are now listed, matching the original SRB target. No
+simulation or reference acceptance occurred in that attempt.
+
 ```sh
 python3 -B Tests/Production/RemainingStockRepaired/capture.py --verify-inputs
 ```

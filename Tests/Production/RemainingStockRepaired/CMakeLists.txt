@@ -27,7 +27,8 @@ function(module_defaults target)
 endfunction()
 # Build the unchanged SRB solely to obtain its genuine MSVC import library.
 # Its DLL is retained as build evidence and must never replace the original SRB.
-add_library(RepairedSrbImport SHARED "${atlantis}/Atlantis_SRB/Atlantis_SRB.cpp")
+add_library(RepairedSrbImport SHARED
+  "${atlantis}/Atlantis_SRB/Atlantis_SRB.cpp" "${atlantis}/Common.cpp")
 module_defaults(RepairedSrbImport)
 target_include_directories(RepairedSrbImport PRIVATE "${atlantis}/Atlantis")
 set_target_properties(RepairedSrbImport PROPERTIES OUTPUT_NAME Atlantis_SRB
