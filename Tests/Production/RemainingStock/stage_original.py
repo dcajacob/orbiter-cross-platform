@@ -1,7 +1,7 @@
 """Stage complete original scenes, all preserved inputs and every named recording."""
 import json
 import shutil
-import subprocess
+from execution import run_process
 
 from behavior_suite import link_or_copy
 from mesa_runtime import require,digest
@@ -9,7 +9,7 @@ from inputs import ROOT,recordings,stage_recordings,stage_delivery_repairs,argum
 from configuration_input import stage as stage_configuration
 
 
-def run(executable,data,planets,directory,config,case,configure):
+def run(executable,data,planets,directory,config,case,configure,*,process_timeout=240):
     directory.mkdir()
     for p in executable.parent.iterdir():
         if p.is_file() and p.suffix.lower() in ('.dll','.exe'):shutil.copy2(p,directory/p.name)
@@ -45,9 +45,7 @@ def run(executable,data,planets,directory,config,case,configure):
         configuration_input=configuration,
         data_profiles={name:digest(ROOT/'Tests/Production'/name) for name in ('stock-data.lock.json','standard-planets.lock.json')},
         driver_sha256=digest(directory/'Modules/Plugin/ProductionCockpitDriver.dll')),indent=2)+'\n')
-    with (directory/'console.txt').open('w') as console:
-        process=subprocess.run(argv,cwd=directory,stdout=console,stderr=subprocess.STDOUT,timeout=240)
-    (directory/'process-result.json').write_text(json.dumps(dict(returncode=process.returncode))+'\n')
+    process=run_process(argv,directory,process_timeout)
     require(process.returncode==0,'Preserved original process returned '+str(process.returncode))
     require('Could not find a module' not in (directory/'Orbiter.log').read_text(errors='replace'),
             'Required original vessel module failed; generic fallback prohibited')

@@ -21,6 +21,7 @@ import data_inputs
 import protocols
 import configuration_input
 require=shared.require;sha=shared.digest;sha_lf=shared.sha_lf
+from execution import collect,worker_count
 OBSERVER='Modules/Plugin/ProductionCockpitDriver.dll'
 
 
@@ -92,6 +93,7 @@ def inspect_artifacts(out,case,config):
     names.extend(item['target'] for item in config['delivery_repairs'])
     if config['protocol']==protocols.V2:names.extend(('stock-step-clock.csv',protocols.MARKER))
     if initial_configuration is not None:names.append(configuration_input.SNAPSHOT)
+    if (out/'process-timing.json').is_file():names.append('process-timing.json')
     observed=dict(result,status='captured',process_returncode=0,actual_math=actual_math,renderer=renderer,actual_simulation_data_files=data_files,clock_observation=clock,
                   files_sha256={name:sha(out/name) for name in names})
     if initial_configuration is not None:observed['configuration_input']=initial_configuration
@@ -149,6 +151,7 @@ def capture(a):
         protocol_sha256_lf=sha_lf(protocols.path(config['protocol'])),settings_sha256_lf=sha_lf(shared.CASE_FILE),
         source_sha256_lf=sources,source_raw_sha256=raw_sources,runtime_variant_manifest_sha256=sha(root/'runtime-variant.json'),
         actual_original_simulation_data=original_data,
+        execution=dict(workers=a.workers,process_timeout_seconds=900,scene_repetitions='serial',aggregate_writes='main-thread'),
         diagnostic_only=diagnostic,cases_requested=[case['id'] for case in cases],
         runtime_files_sha256=protected,observer_sha256=protected[OBSERVER],cases={},failures={},
         native_admission_qualified=False,phase6_complete=False)
@@ -156,50 +159,53 @@ def capture(a):
     def save():manifest.write_text(json.dumps(report,indent=2)+'\n')
     save()
     try:
-        for case in cases:
+        def observe(case):
             paths=[];runs=[]
-            try:
-                for repeat in (1,2):
-                    out=a.output/(case['id']+'-'+str(repeat));paths.append(out)
-                    def configure(directory):
-                        path=directory/'Orbiter.cfg';text=path.read_text()
-                        for line in ('PropStages = 1\n','PropStage0 = 1 1 1\n','PropSubsampling = 1\n'):
-                            require(text.count(line)==1,'Original fixture propagator override differs');text=text.replace(line,'')
-                        path.write_text(text.replace('  ProductionBehaviorDriver','  ProductionCockpitDriver\n  OGLClient')+
-                            '\nFPS = 0\nMenubarMode = 1\nInfobarMode = 1\nInstrumentUpdateInterval = 0.25\n')
-                        scenario=shared.entry_point(directory,case);scenario.parent.mkdir(parents=True,exist_ok=True)
-                        scenario.write_bytes((ROOT/case['scenario_entry_point']).read_bytes())
-                        for kind in set(case['declared_vessels'].values()):
-                            item=config['classes'][kind]
-                            require(sha_lf(directory/item['target'])==item['sha256_lf'],'Original staged class configuration differs')
-                        (directory/'reference-variant.json').write_text(json.dumps(variant,indent=2)+'\n')
-                        if config['protocol']==protocols.V2:
-                            (directory/protocols.MARKER).write_bytes(protocols.marker_bytes(config))
-                        (directory/'ogl-evidence.enabled').touch();mesa_files(a.mesa,directory)
-                    stage(a.executable,a.data,a.planets,out,config,case,configure)
-                    staged_data=data_inputs.inspect(out,out)
-                    require(staged_data==original_data,'Actual staged scene data differs from original source inputs')
-                    (out/'actual-data-inputs.json').write_text(json.dumps(staged_data,indent=2)+'\n')
-                    require(all(sha(out/name)==value for name,value in protected.items()
-                                if name.lower().endswith(('.dll','.exe'))),'Executed runtime module bytes differ')
-                    result=inspect_artifacts(out,case,config)
-                    result['loaded_modules']=shared.shared.loaded_modules(out,expected)
-                    loaded={Path(item['path'].replace('\\','/')).name.casefold() for item in result['loaded_modules']}
-                    required={'orbiter.exe','oglclient.dll','productioncockpitdriver.dll'}
-                    required|={Path(config['classes'][kind]['original_module']).name.casefold()
-                               for kind in set(case['declared_vessels'].values()) if config['classes'][kind]['module']}
-                    require(required<=loaded,'Actual declared vessel factory/application/client/observer was not loaded')
-                    require(a.math_profile!='sse2' or result['actual_math']=='sse2','Actual CRT profile differs')
-                    runs.append(result);png(out/'scene.png',(out/'scene.rgba').read_bytes(),1280,720)
-                for name in (*shared.TRACES,'camera.csv'):
-                    require((paths[0]/name).read_bytes()==(paths[1]/name).read_bytes(),'Repaired repeat trace differs: '+name)
-                score=image_ssim((paths[0]/'scene.rgba').read_bytes(),(paths[1]/'scene.rgba').read_bytes(),1280,720)
-                require(score>=config['image_ssim_minimum'],'Repaired repeat full-frame budget failed')
-                report['cases'][case['id']]=dict(scenario=case['scenario'],runs=runs,repeat_ssim=score)
+            for repeat in (1,2):
+                out=a.output/(case['id']+'-'+str(repeat));paths.append(out)
+                def configure(directory):
+                    path=directory/'Orbiter.cfg';text=path.read_text()
+                    for line in ('PropStages = 1\n','PropStage0 = 1 1 1\n','PropSubsampling = 1\n'):
+                        require(text.count(line)==1,'Original fixture propagator override differs');text=text.replace(line,'')
+                    path.write_text(text.replace('  ProductionBehaviorDriver','  ProductionCockpitDriver\n  OGLClient')+
+                        '\nFPS = 0\nMenubarMode = 1\nInfobarMode = 1\nInstrumentUpdateInterval = 0.25\n')
+                    scenario=shared.entry_point(directory,case);scenario.parent.mkdir(parents=True,exist_ok=True)
+                    scenario.write_bytes((ROOT/case['scenario_entry_point']).read_bytes())
+                    for kind in set(case['declared_vessels'].values()):
+                        item=config['classes'][kind]
+                        require(sha_lf(directory/item['target'])==item['sha256_lf'],'Original staged class configuration differs')
+                    (directory/'reference-variant.json').write_text(json.dumps(variant,indent=2)+'\n')
+                    if config['protocol']==protocols.V2:
+                        (directory/protocols.MARKER).write_bytes(protocols.marker_bytes(config))
+                    (directory/'ogl-evidence.enabled').touch();mesa_files(a.mesa,directory)
+                stage(a.executable,a.data,a.planets,out,config,case,configure,process_timeout=900)
+                staged_data=data_inputs.inspect(out,out)
+                require(staged_data==original_data,'Actual staged scene data differs from original source inputs')
+                (out/'actual-data-inputs.json').write_text(json.dumps(staged_data,indent=2)+'\n')
+                require(all(sha(out/name)==value for name,value in protected.items()
+                            if name.lower().endswith(('.dll','.exe'))),'Executed runtime module bytes differ')
+                result=inspect_artifacts(out,case,config)
+                result['loaded_modules']=shared.shared.loaded_modules(out,expected)
+                loaded={Path(item['path'].replace('\\','/')).name.casefold() for item in result['loaded_modules']}
+                required={'orbiter.exe','oglclient.dll','productioncockpitdriver.dll'}
+                required|={Path(config['classes'][kind]['original_module']).name.casefold()
+                           for kind in set(case['declared_vessels'].values()) if config['classes'][kind]['module']}
+                require(required<=loaded,'Actual declared vessel factory/application/client/observer was not loaded')
+                require(a.math_profile!='sse2' or result['actual_math']=='sse2','Actual CRT profile differs')
+                runs.append(result);png(out/'scene.png',(out/'scene.rgba').read_bytes(),1280,720)
+            for name in (*shared.TRACES,'camera.csv'):
+                require((paths[0]/name).read_bytes()==(paths[1]/name).read_bytes(),'Repaired repeat trace differs: '+name)
+            score=image_ssim((paths[0]/'scene.rgba').read_bytes(),(paths[1]/'scene.rgba').read_bytes(),1280,720)
+            require(score>=config['image_ssim_minimum'],'Repaired repeat full-frame budget failed')
+            return dict(scenario=case['scenario'],runs=runs,repeat_ssim=score)
+        def record(case,result,error):
+            if error is None:
+                report['cases'][case['id']]=result
                 print(case['id'],case['scenario'],'captured twice',flush=True)
-            except Exception as error:
+            else:
                 report['failures'][case['id']]=str(error);print(case['id'],'failed:',error,flush=True)
             save()
+        collect(cases,a.workers,observe,record)
         require(all(sha(root/name)==value for name,value in protected.items()),'Runtime variant changed during capture')
         require(raw_sources=={p.relative_to(ROOT).as_posix():sha(p) for p in source_files()},'Raw observer source changed during capture')
         require(data_inputs.inspect(a.data,a.planets)==original_data,'Original simulation data changed during capture')
@@ -215,6 +221,7 @@ def main():
     for name in ('executable','data','planets','mesa','output'):p.add_argument('--'+name,type=lambda v:Path(v).resolve())
     p.add_argument('--configuration',choices=('Debug','Release'));p.add_argument('--math-profile',choices=('automatic','sse2'))
     p.add_argument('--protocol',choices=protocols.NAMES,default=protocols.V1)
+    p.add_argument('--workers',type=worker_count,default=1,help='Independent scene processes (1-4); each scene retains both serial repetitions')
     p.add_argument('--diagnostic-case',action='append',help='Run selected complete scenes with an explicit diagnostic-only marker; never eligible for full-reference acceptance')
     a=p.parse_args()
     if a.verify_inputs:

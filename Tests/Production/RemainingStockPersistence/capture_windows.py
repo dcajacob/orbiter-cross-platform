@@ -20,6 +20,7 @@ from saved_state import parse_saved,content_differences,require
 spec=importlib.util.spec_from_file_location('persistence_original_auditor',HERE.parent/'RemainingStockRepaired/audit.py')
 independent=importlib.util.module_from_spec(spec);spec.loader.exec_module(independent)
 sha=original.sha;sha_lf=original.sha_lf
+from execution import collect,worker_count
 CURRENT='Scenarios/(Current state).scn'
 
 
@@ -29,6 +30,7 @@ def main():
         p.add_argument('--'+name,type=lambda v:Path(v).resolve(),required=True)
     p.add_argument('--configuration',choices=('Debug','Release'),required=True)
     p.add_argument('--math-profile',choices=('automatic','sse2'),required=True)
+    p.add_argument('--workers',type=worker_count,default=1,help='Independent scene processes (1-4); each scene retains both serial repetitions')
     p.add_argument('--diagnostic-case',action='append')
     a=p.parse_args();contract=protocol();config=original.settings(protocols.V2)
     require(sys.platform=='win32','Original persistence observations require native Windows')
@@ -64,74 +66,80 @@ def main():
     a.output.mkdir(parents=True)
     report=dict(status='running',protocol=contract['protocol'],host='repaired-original-windows',producer_commit=producer,
         original_application_and_sdk_source=config['application_source'],configuration=a.configuration,math_profile=a.math_profile,
+        execution=dict(workers=a.workers,process_timeout_seconds=900,scene_repetitions='serial',aggregate_writes='main-thread'),
         diagnostic_only=diagnostic,cases_requested=[c['id'] for c in cases],source_raw_sha256=sources,
         parent_capture_sha256=sha(parent_file),independently_checked_runtime=runtime,actual_original_data=original_data,
         cases={},failures={},native_admission_qualified=False,phase6_complete=False)
     manifest=a.output/'capture.json'
     def save():manifest.write_text(json.dumps(report,indent=2)+'\n')
     save()
+    case_guards={case['id']:{} for case in cases}
     try:
-        for case in cases:
-            results=[];directories=[]
-            try:
-                require(len(parent['cases'][case['id']]['runs'])==2,'Both original parent repetitions required')
-                for repeat in (1,2):
-                    parent_dir=a.parent_capture/(case['id']+'-'+str(repeat))
-                    previous=parent['cases'][case['id']]['runs'][repeat-1]
-                    require(all(sha(parent_dir/n)==v for n,v in previous['files_sha256'].items()),'Actual parent observation bytes changed')
-                    guarded.update({str(parent_dir/n):v for n,v in previous['files_sha256'].items()})
-                    parent_result=original.inspect_artifacts(parent_dir,case,config)
-                    require('configuration_input' in parent_result,'Fresh Windows reload requires the actual parent startup configuration witness')
-                    saved=parent_dir/CURRENT
-                    checksum=sha(saved);derived,provenance=derived_case(case,config,saved,checksum);guarded[str(saved)]=checksum
-                    provenance.update(parent_capture_sha256=sha(parent_file),parent_run=case['id']+'-'+str(repeat),
-                        parent_finalized_clock=parent_result['matched_clock_observation'],parent_run_files_sha256=previous['files_sha256'])
-                    out=a.output/(case['id']+'-'+str(repeat));directories.append(out)
-                    def configure(directory):
-                        cfg=directory/'Orbiter.cfg';text=cfg.read_text()
-                        for line in ('PropStages = 1\n','PropStage0 = 1 1 1\n','PropSubsampling = 1\n'):
-                            require(text.count(line)==1,'Original propagator fixture differs');text=text.replace(line,'')
-                        cfg.write_text(text.replace('  ProductionBehaviorDriver','  ProductionCockpitDriver\n  OGLClient')+
-                            '\nFPS = 0\nMenubarMode = 1\nInfobarMode = 1\nInstrumentUpdateInterval = 0.25\n')
-                        target=directory/derived['scenario_entry_point'];target.parent.mkdir(parents=True,exist_ok=True);target.write_bytes(saved.read_bytes())
-                        require(sha(target)==provenance['saved_input_sha256'],'Derived save copy differs')
-                        (directory/'persistence-input.json').write_text(json.dumps(provenance,indent=2)+'\n')
-                        variant=dict(protocol=config['protocol'],protocol_sha256_lf=sha_lf(protocols.path(protocols.V2)),
-                            original_application_and_sdk_source=config['application_source'],producer_commit=producer,
-                            runtime_variant_manifest_sha256=sha(a.build/'runtime/runtime-variant.json'),frames=config['frames'],
-                            fixed_step=config['fixed_step'],capture_tick=config['capture_tick'],diagnostic_only=diagnostic,
-                            cases_requested=[c['id'] for c in cases])
-                        (directory/'reference-variant.json').write_text(json.dumps(variant,indent=2)+'\n')
-                        (directory/protocols.MARKER).write_bytes(protocols.marker_bytes(config))
-                        (directory/'ogl-evidence.enabled').touch();original.mesa_files(a.mesa,directory)
-                    original.stage(a.build/'runtime/Orbiter.exe',a.data,a.planets,out,config,derived,configure)
-                    staged_data=original.data_inputs.inspect(out,out)
-                    require(staged_data==original_data,'Reload staged original simulation data differs')
-                    (out/'actual-data-inputs.json').write_text(json.dumps(staged_data,indent=2)+'\n')
-                    require(all(sha(out/n)==v for n,v in build['runtime_files_sha256'].items() if n.lower().endswith(('.dll','.exe'))),'Executed reload module bytes differ')
-                    result=original.inspect_artifacts(out,derived,config)
-                    result['loaded_modules']=original.shared.shared.loaded_modules(out,expected)
-                    loaded={Path(item['path'].replace('\\','/')).name.casefold() for item in result['loaded_modules']}
-                    required={'orbiter.exe','oglclient.dll','productioncockpitdriver.dll'}
-                    required|={Path(config['classes'][kind]['original_module']).name.casefold()
-                               for kind in set(derived['declared_vessels'].values()) if config['classes'][kind]['module']}
-                    require(required<=loaded,'Required saved-vessel factory/application/client/observer not mapped')
-                    require(a.math_profile!='sse2' or result['actual_math']=='sse2','Executed reload CRT differs')
-                    end=parse_saved(out/CURRENT)
-                    result.update(derived_case=derived,persistence_input=provenance,saved_state=end,
-                        saved_content_changes=content_differences(parse_saved(saved),end,contract['operator_description_blocks']))
-                    result['files_sha256'].update({n:sha(out/n) for n in (CURRENT,'persistence-input.json')})
-                    results.append(result);original.png(out/'scene.png',(out/'scene.rgba').read_bytes(),1280,720)
-                for name in (*original.shared.TRACES,'stock-clock.csv','stock-step-clock.csv','camera.csv'):
-                    require((directories[0]/name).read_bytes()==(directories[1]/name).read_bytes(),'Original repeated reload trace differs: '+name)
-                require(not content_differences(results[0]['saved_state'],results[1]['saved_state']),'Original repeated reload saved content differs')
-                similarity=original.image_ssim((directories[0]/'scene.rgba').read_bytes(),(directories[1]/'scene.rgba').read_bytes(),1280,720)
-                require(similarity>=config['image_ssim_minimum'],'Original repeated reload exceeds unchanged full-frame budget')
-                report['cases'][case['id']]=dict(runs=results,repeat_ssim=similarity)
+        def observe(case):
+            results=[];directories=[];case_guarded=case_guards[case['id']]
+            require(len(parent['cases'][case['id']]['runs'])==2,'Both original parent repetitions required')
+            for repeat in (1,2):
+                parent_dir=a.parent_capture/(case['id']+'-'+str(repeat))
+                previous=parent['cases'][case['id']]['runs'][repeat-1]
+                require(all(sha(parent_dir/n)==v for n,v in previous['files_sha256'].items()),'Actual parent observation bytes changed')
+                case_guarded.update({str(parent_dir/n):v for n,v in previous['files_sha256'].items()})
+                parent_result=original.inspect_artifacts(parent_dir,case,config)
+                require('configuration_input' in parent_result,'Fresh Windows reload requires the actual parent startup configuration witness')
+                saved=parent_dir/CURRENT
+                checksum=sha(saved);derived,provenance=derived_case(case,config,saved,checksum);case_guarded[str(saved)]=checksum
+                provenance.update(parent_capture_sha256=sha(parent_file),parent_run=case['id']+'-'+str(repeat),
+                    parent_finalized_clock=parent_result['matched_clock_observation'],parent_run_files_sha256=previous['files_sha256'])
+                out=a.output/(case['id']+'-'+str(repeat));directories.append(out)
+                def configure(directory):
+                    cfg=directory/'Orbiter.cfg';text=cfg.read_text()
+                    for line in ('PropStages = 1\n','PropStage0 = 1 1 1\n','PropSubsampling = 1\n'):
+                        require(text.count(line)==1,'Original propagator fixture differs');text=text.replace(line,'')
+                    cfg.write_text(text.replace('  ProductionBehaviorDriver','  ProductionCockpitDriver\n  OGLClient')+
+                        '\nFPS = 0\nMenubarMode = 1\nInfobarMode = 1\nInstrumentUpdateInterval = 0.25\n')
+                    target=directory/derived['scenario_entry_point'];target.parent.mkdir(parents=True,exist_ok=True);target.write_bytes(saved.read_bytes())
+                    require(sha(target)==provenance['saved_input_sha256'],'Derived save copy differs')
+                    (directory/'persistence-input.json').write_text(json.dumps(provenance,indent=2)+'\n')
+                    variant=dict(protocol=config['protocol'],protocol_sha256_lf=sha_lf(protocols.path(protocols.V2)),
+                        original_application_and_sdk_source=config['application_source'],producer_commit=producer,
+                        runtime_variant_manifest_sha256=sha(a.build/'runtime/runtime-variant.json'),frames=config['frames'],
+                        fixed_step=config['fixed_step'],capture_tick=config['capture_tick'],diagnostic_only=diagnostic,
+                        cases_requested=[c['id'] for c in cases])
+                    (directory/'reference-variant.json').write_text(json.dumps(variant,indent=2)+'\n')
+                    (directory/protocols.MARKER).write_bytes(protocols.marker_bytes(config))
+                    (directory/'ogl-evidence.enabled').touch();original.mesa_files(a.mesa,directory)
+                original.stage(a.build/'runtime/Orbiter.exe',a.data,a.planets,out,config,derived,configure,process_timeout=900)
+                staged_data=original.data_inputs.inspect(out,out)
+                require(staged_data==original_data,'Reload staged original simulation data differs')
+                (out/'actual-data-inputs.json').write_text(json.dumps(staged_data,indent=2)+'\n')
+                require(all(sha(out/n)==v for n,v in build['runtime_files_sha256'].items() if n.lower().endswith(('.dll','.exe'))),'Executed reload module bytes differ')
+                result=original.inspect_artifacts(out,derived,config)
+                result['loaded_modules']=original.shared.shared.loaded_modules(out,expected)
+                loaded={Path(item['path'].replace('\\','/')).name.casefold() for item in result['loaded_modules']}
+                required={'orbiter.exe','oglclient.dll','productioncockpitdriver.dll'}
+                required|={Path(config['classes'][kind]['original_module']).name.casefold()
+                           for kind in set(derived['declared_vessels'].values()) if config['classes'][kind]['module']}
+                require(required<=loaded,'Required saved-vessel factory/application/client/observer not mapped')
+                require(a.math_profile!='sse2' or result['actual_math']=='sse2','Executed reload CRT differs')
+                end=parse_saved(out/CURRENT)
+                result.update(derived_case=derived,persistence_input=provenance,saved_state=end,
+                    saved_content_changes=content_differences(parse_saved(saved),end,contract['operator_description_blocks']))
+                result['files_sha256'].update({n:sha(out/n) for n in (CURRENT,'persistence-input.json')})
+                results.append(result);original.png(out/'scene.png',(out/'scene.rgba').read_bytes(),1280,720)
+            for name in (*original.shared.TRACES,'stock-clock.csv','stock-step-clock.csv','camera.csv'):
+                require((directories[0]/name).read_bytes()==(directories[1]/name).read_bytes(),'Original repeated reload trace differs: '+name)
+            require(not content_differences(results[0]['saved_state'],results[1]['saved_state']),'Original repeated reload saved content differs')
+            similarity=original.image_ssim((directories[0]/'scene.rgba').read_bytes(),(directories[1]/'scene.rgba').read_bytes(),1280,720)
+            require(similarity>=config['image_ssim_minimum'],'Original repeated reload exceeds unchanged full-frame budget')
+            return dict(runs=results,repeat_ssim=similarity)
+        def record(case,result,error):
+            guarded.update(case_guards[case['id']])
+            if error is None:
+                report['cases'][case['id']]=result
                 print(case['id'],'exact Windows saves reloaded twice',flush=True)
-            except Exception as error:
+            else:
                 report['failures'][case['id']]=str(error);print(case['id'],'reload failed:',error,flush=True)
             save()
+        collect(cases,a.workers,observe,record)
         require(all(sha(a.build/'runtime'/n)==v for n,v in build['runtime_files_sha256'].items()),'Owning runtime bytes changed')
         require(sources=={n:sha(ROOT/n) for n in sources} and all(sha(Path(n))==v for n,v in guarded.items()),'Owning readers/parent observations/saved inputs changed')
         require(original.data_inputs.inspect(a.data,a.planets)==original_data,'Owning actual original data changed')

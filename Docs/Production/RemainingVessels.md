@@ -492,3 +492,25 @@ metadata and rejected by the full-reference auditor. Complete four-profile
 38-scene comparisons, controls, broader persistence/lifetime, the admitted
 157-scene corpus, platform/hardware/performance and full Phase 6 acceptance
 remain required.
+
+
+The retained full38 Windows run `41853756521` failed both Release profiles at
+its 240-second process limit in the KSC tour, Atlantis undocking and Atlantis
+cockpit. Each profile retained 35 complete scene pairs; these are incomplete
+full campaigns and provide no admission. The undocking failure reaches tick
+960 before its timeout, so a finalized clock alone does not establish normal
+save/teardown completion. The raw failed artifacts and independent observations
+remain local, alongside the current platform, Lua, cockpit and typing archives.
+
+The full Windows harness now runs two independent scenes concurrently within
+each existing matrix job. Each scene retains two sequential fresh processes,
+all 960 original ticks, the original 120 ms observer delay, unchanged physics,
+scripts, full-frame budgets, parent-save checks and all failure controls.
+Workers return observations to the main thread for aggregate report writes;
+a failed worker retains its error while the other cases continue. A bounded
+900-second per-process limit replaces 240 seconds for repaired writer/reload
+captures. Other original captures retain their 240-second default. Actual
+process PID, wall duration, timeout and reaped exit status are recorded.
+This harness change still requires a fresh complete Windows run and independent
+full38 auditing; it establishes no passing simulation or persistence result.
+The evidence release remains unpublished under the user's local-storage policy.

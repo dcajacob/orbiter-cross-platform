@@ -88,6 +88,8 @@ jobs:
       - name: Verify complete unchanged input selection and resource-history reader controls
         shell: pwsh
         run: |
+          python -B Tests/Production/RemainingStock/Execution.Test.py
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           python -B Tests/Production/RemainingStockRepaired/RuntimeFiles.Test.py --build out/remaining-stock-repaired-build
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           python -B Tests/Production/RemainingStockRepaired/OriginalMetadata.Test.py --preserved out/remaining-stock-preserved --runtime out/remaining-stock-repaired-build/runtime --output out/remaining-stock-repaired-build/original-metadata-controls.json
@@ -108,7 +110,7 @@ jobs:
           --executable out/remaining-stock-repaired-build/runtime/Orbiter.exe --data out/production-data
           --planets out/standard-planets --mesa out/mesa-runtime
           --configuration ${{ matrix.configuration }} --math-profile ${{ matrix.math_profile }}
-          --output out/remaining-stock-repaired --protocol remaining-stock-matched-clock-v2
+          --output out/remaining-stock-repaired --protocol remaining-stock-matched-clock-v2 --workers 2
       - name: Reject damaged complete-scene, playback, clock, full-frame and variant evidence
         run: >-
           python -B Tests/Production/RemainingStockRepaired/Gate.Test.py
@@ -141,7 +143,7 @@ jobs:
           --preserved out/remaining-stock-preserved --data out/production-data
           --planets out/standard-planets --mesa out/mesa-runtime
           --configuration ${{ matrix.configuration }} --math-profile ${{ matrix.math_profile }}
-          --output out/remaining-stock-persistence
+          --output out/remaining-stock-persistence --workers 2
       - uses: actions/upload-artifact@v7
         if: always()
         with:
