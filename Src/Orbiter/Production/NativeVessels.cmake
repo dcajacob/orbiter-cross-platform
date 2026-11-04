@@ -3,6 +3,7 @@
 if(WIN32)
     message(FATAL_ERROR "Native vessel host currently requires Linux; Windows retains the original application adapters")
 endif()
+
 add_library(orbiter_production_vessels SHARED
     NativeVesselObservation.cpp
     FlightControls.cpp ../Keymap.cpp NativeRenderApi.cpp NativeParticle.cpp ../CelSphereAPI.cpp ../DrawAPI.cpp ../Camera.cpp ../CameraControl.cpp NativeCameraProjection.cpp ../Vessel.cpp ../VesselSdk.cpp ../Vesselstatus.cpp ../SuperVessel.cpp
@@ -38,4 +39,16 @@ if(ORBITER_BUILD_ATLANTIS_DIAGNOSTIC)
     target_compile_definitions(production_atlantis_diagnostic PRIVATE ORBITER_ATLANTIS_DIAGNOSTIC)
     target_link_libraries(production_atlantis_diagnostic PRIVATE orbiter_production_vessels)
     add_dependencies(production_atlantis_diagnostic native_deltaglider native_atlantis native_atlantis_tank native_atlantis_srb)
+endif()
+
+option(ORBITER_BUILD_REMAINING_STOCK_DIAGNOSTIC "Build isolated unqualified remaining-stock simulation test host" OFF)
+if(ORBITER_BUILD_REMAINING_STOCK_DIAGNOSTIC)
+    if(NOT ORBITER_BUILD_NATIVE_COCKPIT)
+        message(FATAL_ERROR "The remaining-stock diagnostic needs the original cockpit and modules")
+    endif()
+    add_executable(production_remaining_stock_diagnostic NativeApplication.cpp)
+    target_compile_definitions(production_remaining_stock_diagnostic PRIVATE ORBITER_REMAINING_STOCK_DIAGNOSTIC)
+    target_link_libraries(production_remaining_stock_diagnostic PRIVATE orbiter_production_vessels)
+    add_dependencies(production_remaining_stock_diagnostic native_deltaglider native_atlantis native_atlantis_tank
+        native_atlantis_srb native_hst native_solar_sail native_quadcopter)
 endif()

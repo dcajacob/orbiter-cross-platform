@@ -48,6 +48,9 @@ def verify():
     if 'Src/Vessel/Dragonfly/instruments.cpp' in declared:
         from Dragonfly.source_audit import verify as verify_dragonfly
         verify_dragonfly()
+    if 'Src/Vessel/HST/HST.cpp' in declared:
+        from RemainingVessels.source_audit import verify as verify_remaining_vessels
+        verify_remaining_vessels()
     if 'Src/Orbiter/Production/CockpitVesselMethods.inc' in declared:
         from cockpit_runtime_source import verify as verify_cockpit_runtime
         verify_cockpit_runtime()

@@ -85,6 +85,17 @@ if(ORBITER_BUILD_NATIVE_COCKPIT)
         "${CMAKE_CURRENT_SOURCE_DIR}/../../Vessel/Atlantis/*.msh"
         "${CMAKE_CURRENT_SOURCE_DIR}/../../Vessel/Atlantis/*.cfg")
     list(APPEND _native_sources ${_atlantis_sources})
+    foreach(_remaining_family HST Solarsail Quadcopter)
+        file(GLOB_RECURSE _remaining_sources CONFIGURE_DEPENDS
+            "${CMAKE_CURRENT_SOURCE_DIR}/../../Vessel/${_remaining_family}/*.cpp"
+            "${CMAKE_CURRENT_SOURCE_DIR}/../../Vessel/${_remaining_family}/*.h"
+            "${CMAKE_CURRENT_SOURCE_DIR}/../../Vessel/${_remaining_family}/*.inc"
+            "${CMAKE_CURRENT_SOURCE_DIR}/../../Vessel/${_remaining_family}/*.msh"
+            "${CMAKE_CURRENT_SOURCE_DIR}/../../Vessel/${_remaining_family}/*.cfg")
+        list(APPEND _native_sources ${_remaining_sources})
+    endforeach()
+    list(APPEND _native_sources "${CMAKE_CURRENT_SOURCE_DIR}/../../Vessel/StockVesselPlatform.h"
+        "${CMAKE_CURRENT_SOURCE_DIR}/../../Vessel/NativeStockFactory.inc")
     file(GLOB _shuttle_a_sources CONFIGURE_DEPENDS
         "${CMAKE_CURRENT_SOURCE_DIR}/../../Vessel/ShuttleA/*.cpp"
         "${CMAKE_CURRENT_SOURCE_DIR}/../../Vessel/ShuttleA/*.h"

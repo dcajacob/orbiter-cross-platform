@@ -582,7 +582,7 @@
     },
     "Src/Orbiter/Production/CMakeLists.txt": {
       "original_sha256_lf": null,
-      "sha256_lf": "7b3a725c9f3ab59cf7e0de9926fa5489701d2907805e51fc31f2153849f2d658",
+      "sha256_lf": "cb36edfc10e4adbbb92a3e0c52d669697589a970bd5cd69ae1f79a7d23ddb896",
       "scope": "Original ten stock MFD declarations use exact platform SDK aliases; shared original conic geometry is moved without calculation or screen-mapping changes. Full native instrument runtime remains incomplete."
     },
     "Src/Orbiter/Production/CameraServices.cpp": {
@@ -742,8 +742,8 @@
     },
     "Src/Orbiter/Production/NativeApplication.cpp": {
       "original_sha256_lf": null,
-      "sha256_lf": "1acbe6e1414ec93dce4adde0bd94a476e8a4cdb7a238204e68c0d5c457af5986",
-      "scope": "Production admission remains unchanged. A separately compiled, opt-in, uninstalled diagnostic host checks the real Atlantis/tank/SRB structural capabilities and emits an unqualified marker to reproduce original scene defects with the actual session/physics/rendering algorithms; no generic fallback or acceptance claim."
+      "sha256_lf": "44eef93f0b18244c9520d4d4528e44deb79229c251e1d08b875eada64460deca",
+      "scope": "Production admission remains unchanged. Separately compiled opt-in, uninstalled diagnostic hosts check real Atlantis/HST/solar-sail/quadcopter and named configuration-payload capabilities and emit explicit unqualified markers. Generic replacement remains forbidden and complete original/native qualification remains required."
     },
     "Src/Orbiter/Production/NativeBuild.h.in": {
       "sha256_lf": "f5fb21f83bb6be0c54839fce670e8410f6911eda86da2eef26e4221c1ae25d97",
@@ -842,7 +842,7 @@
     },
     "Src/Orbiter/Production/NativeVessels.cmake": {
       "original_sha256_lf": null,
-      "sha256_lf": "bf1628c079535514becaf776fa39b9000a47de91a7dedbd5d64843a3add77df7"
+      "sha256_lf": "0b6035379b7a372957e8484943e35638e1323b52cf7d23c2bfa179f77d02e34a"
     },
     "Src/Orbiter/Production/NativeWorldVesselServices.cpp": {
       "original_sha256_lf": null,
@@ -1306,7 +1306,7 @@
     },
     "Src/Orbiter/Production/NativeCockpit.cmake": {
       "original_sha256_lf": null,
-      "sha256_lf": "a3d29c17cab945aabbde563580bfb7ce2f879525557ff3a42da0d13d4f3df3cf"
+      "sha256_lf": "a6bdd28ac7b8161ad38a2841a6e3b2b3e682a16b15c3da548fbce432cbc32994"
     },
     "Src/Orbiter/Production/NativeCockpitGui.cpp": {
       "original_sha256_lf": null,
@@ -2122,6 +2122,161 @@
       "original_sha256_lf": null,
       "sha256_lf": "069374ded753c01c78364c5a0b63dab1c65987a9334a7023f3e06196cbbe6bfa",
       "scope": "Real owned compatibility context, color-only framebuffer and bottom-up GDI DIB replacing unsupported bitmap pixel formats; no GL geometry or physical model substitution."
+    },
+    "Src/Vessel/HST/CMakeLists.txt": {
+      "original_sha256_lf": "a8e1905433fc5249ca9326ac71e12b553d3282a6c434989e6a83f66496e5bf58",
+      "scope": "Complete original HST/solar-sail/quadcopter sources, resources and real native factory/platform bindings; physical/animation/Lua calculations conserved; separate diagnostic execution remains unqualified.",
+      "sha256_lf": "a8e1905433fc5249ca9326ac71e12b553d3282a6c434989e6a83f66496e5bf58"
+    },
+    "Src/Vessel/HST/Config/HST.cfg": {
+      "original_sha256_lf": "b2baaa2006c67b9afdd7f0519199374ff1e8f773d0621748f65519e7361a17ea",
+      "scope": "Complete original HST/solar-sail/quadcopter sources, resources and real native factory/platform bindings; physical/animation/Lua calculations conserved; separate diagnostic execution remains unqualified.",
+      "sha256_lf": "b2baaa2006c67b9afdd7f0519199374ff1e8f773d0621748f65519e7361a17ea"
+    },
+    "Src/Vessel/HST/HST.cpp": {
+      "original_sha256_lf": "17715a6b368665ad13f2106ebcfb482d27be3cc1b830316b3c8edc2ec6a7790d",
+      "scope": "Complete original HST/solar-sail/quadcopter sources, resources and real native factory/platform bindings; physical/animation/Lua calculations conserved; separate diagnostic execution remains unqualified.",
+      "sha256_lf": "5baaf976143935aaefb5c3ce1e26e5eb5675da89ce97efaf0a4e175b13d8ea93"
+    },
+    "Src/Vessel/HST/HST.h": {
+      "original_sha256_lf": "fd5315842180d835b1f06e0bdc608bcb4b1f53f8110b967240feeb0dc96aaecc",
+      "scope": "Complete original HST/solar-sail/quadcopter sources, resources and real native factory/platform bindings; physical/animation/Lua calculations conserved; separate diagnostic execution remains unqualified.",
+      "sha256_lf": "70c6538ebe8abaddf7f4cdd39a41632b1702d1ca78cc73b93db071cca8e5925e"
+    },
+    "Src/Vessel/HST/HST_Lua.cpp": {
+      "original_sha256_lf": "70cf65292a8ef3de8e6269b1d8623006b9e82fd7fb79dcd95e25a569d0f15eec",
+      "scope": "Complete original HST/solar-sail/quadcopter sources, resources and real native factory/platform bindings; physical/animation/Lua calculations conserved; separate diagnostic execution remains unqualified.",
+      "sha256_lf": "8b4025ea0388dc890277ea8c5d966c10b01f3e204b7463d9b65a90706dbdd43b"
+    },
+    "Src/Vessel/HST/Meshes/HST_STS-109.msh": {
+      "original_sha256_lf": "b1ea1fb62542613b3e54f262be3976fef568d8d3bb762c1aa71bb9b3f7c01220",
+      "scope": "Complete original HST/solar-sail/quadcopter sources, resources and real native factory/platform bindings; physical/animation/Lua calculations conserved; separate diagnostic execution remains unqualified.",
+      "sha256_lf": "b1ea1fb62542613b3e54f262be3976fef568d8d3bb762c1aa71bb9b3f7c01220"
+    },
+    "Src/Vessel/HST/Textures/HST_NASA.dds": {
+      "original_sha256_lf": "1ad809e2c9fa353fc4d50566d87a8fa6b1b76304fd9a9c4988f9e8bb623e7012",
+      "scope": "Complete original HST/solar-sail/quadcopter sources, resources and real native factory/platform bindings; physical/animation/Lua calculations conserved; separate diagnostic execution remains unqualified.",
+      "sha256_lf": "1ad809e2c9fa353fc4d50566d87a8fa6b1b76304fd9a9c4988f9e8bb623e7012"
+    },
+    "Src/Vessel/HST/Textures/HST_New_Solar_array.dds": {
+      "original_sha256_lf": "be874826f6045198092fc1c0fbef29dbfe135d2c42685bb9abde4cadc2b9327a",
+      "scope": "Complete original HST/solar-sail/quadcopter sources, resources and real native factory/platform bindings; physical/animation/Lua calculations conserved; separate diagnostic execution remains unqualified.",
+      "sha256_lf": "be874826f6045198092fc1c0fbef29dbfe135d2c42685bb9abde4cadc2b9327a"
+    },
+    "Src/Vessel/HST/Thumbnail/HST.bmp": {
+      "original_sha256_lf": "924340fb44d2e0ea71544c434903436b642ec2147f04bbc40ebc50dd13624474",
+      "scope": "Complete original HST/solar-sail/quadcopter sources, resources and real native factory/platform bindings; physical/animation/Lua calculations conserved; separate diagnostic execution remains unqualified.",
+      "sha256_lf": "924340fb44d2e0ea71544c434903436b642ec2147f04bbc40ebc50dd13624474"
+    },
+    "Src/Vessel/Quadcopter/CMakeLists.txt": {
+      "original_sha256_lf": "66b1fae6c93effffa63fb3804f59da1585f10bfe86be5c1ac1e487730fe195fa",
+      "scope": "Complete original HST/solar-sail/quadcopter sources, resources and real native factory/platform bindings; physical/animation/Lua calculations conserved; separate diagnostic execution remains unqualified.",
+      "sha256_lf": "66b1fae6c93effffa63fb3804f59da1585f10bfe86be5c1ac1e487730fe195fa"
+    },
+    "Src/Vessel/Quadcopter/Config/Quadcopter.cfg": {
+      "original_sha256_lf": "82da4f99276990bca1064c30f2872b6e0776bd126a605da2f636388f274cc778",
+      "scope": "Complete original HST/solar-sail/quadcopter sources, resources and real native factory/platform bindings; physical/animation/Lua calculations conserved; separate diagnostic execution remains unqualified.",
+      "sha256_lf": "82da4f99276990bca1064c30f2872b6e0776bd126a605da2f636388f274cc778"
+    },
+    "Src/Vessel/Quadcopter/Meshes/quadcopter.msh": {
+      "original_sha256_lf": "8c8d33a26d6ef88200d7fbcd678f77bf77eca71f324a9c5ccceb01db36dfe32f",
+      "scope": "Complete original HST/solar-sail/quadcopter sources, resources and real native factory/platform bindings; physical/animation/Lua calculations conserved; separate diagnostic execution remains unqualified.",
+      "sha256_lf": "8c8d33a26d6ef88200d7fbcd678f77bf77eca71f324a9c5ccceb01db36dfe32f"
+    },
+    "Src/Vessel/Quadcopter/PropulsionSubsys.cpp": {
+      "original_sha256_lf": "29db17a18a7f80b6a806b7fe7722e1179df34d7c14e8d54f10c0450cd2350c6a",
+      "scope": "Complete original HST/solar-sail/quadcopter sources, resources and real native factory/platform bindings; physical/animation/Lua calculations conserved; separate diagnostic execution remains unqualified.",
+      "sha256_lf": "29db17a18a7f80b6a806b7fe7722e1179df34d7c14e8d54f10c0450cd2350c6a"
+    },
+    "Src/Vessel/Quadcopter/PropulsionSubsys.h": {
+      "original_sha256_lf": "371a2c41d0e466550a12597453587e97dc4891b4e107ad8b5a0abb0cd2c5e3b6",
+      "scope": "Complete original HST/solar-sail/quadcopter sources, resources and real native factory/platform bindings; physical/animation/Lua calculations conserved; separate diagnostic execution remains unqualified.",
+      "sha256_lf": "371a2c41d0e466550a12597453587e97dc4891b4e107ad8b5a0abb0cd2c5e3b6"
+    },
+    "Src/Vessel/Quadcopter/Quadcopter.cpp": {
+      "original_sha256_lf": "03dbb9257e9efdd55889a71829ce81248c7aa31e8adc3f8355c5686fbf7e9ea3",
+      "scope": "Complete original HST/solar-sail/quadcopter sources, resources and real native factory/platform bindings; physical/animation/Lua calculations conserved; separate diagnostic execution remains unqualified.",
+      "sha256_lf": "499425f42e55467a6bd88b4ecdf5f1e2e1055171907a97031ba09acde16ceadd"
+    },
+    "Src/Vessel/Quadcopter/Quadcopter.h": {
+      "original_sha256_lf": "3d56ac9a194258dd91937039e08a2650614815da498432986ef03e76c55a3b7d",
+      "scope": "Complete original HST/solar-sail/quadcopter sources, resources and real native factory/platform bindings; physical/animation/Lua calculations conserved; separate diagnostic execution remains unqualified.",
+      "sha256_lf": "ee2bbfba6afe71b5f92384ef9a870a107b4dacca573d48579de17a1dc7fdbf34"
+    },
+    "Src/Vessel/Quadcopter/QuadcopterLua.cpp": {
+      "original_sha256_lf": "bd103bdced8a01208ea9a23d535b1e4fbfe316868754e1fac46e02b76e67b705",
+      "scope": "Complete original HST/solar-sail/quadcopter sources, resources and real native factory/platform bindings; physical/animation/Lua calculations conserved; separate diagnostic execution remains unqualified.",
+      "sha256_lf": "bd103bdced8a01208ea9a23d535b1e4fbfe316868754e1fac46e02b76e67b705"
+    },
+    "Src/Vessel/Quadcopter/QuadcopterLua.h": {
+      "original_sha256_lf": "ee7f848298c7ce14be83d83f0e4514576d64a2da1bf6ca2030f5a07b64661cc8",
+      "scope": "Complete original HST/solar-sail/quadcopter sources, resources and real native factory/platform bindings; physical/animation/Lua calculations conserved; separate diagnostic execution remains unqualified.",
+      "sha256_lf": "ee7f848298c7ce14be83d83f0e4514576d64a2da1bf6ca2030f5a07b64661cc8"
+    },
+    "Src/Vessel/Quadcopter/QuadcopterSubsys.cpp": {
+      "original_sha256_lf": "bfeb69d8d5a856b4bdf4032787db335b5daaf57303d683db84b24ef2f80a2d5d",
+      "scope": "Complete original HST/solar-sail/quadcopter sources, resources and real native factory/platform bindings; physical/animation/Lua calculations conserved; separate diagnostic execution remains unqualified.",
+      "sha256_lf": "bfeb69d8d5a856b4bdf4032787db335b5daaf57303d683db84b24ef2f80a2d5d"
+    },
+    "Src/Vessel/Quadcopter/QuadcopterSubsys.h": {
+      "original_sha256_lf": "fd46af16d26e76677163fddfae895c37c71482dc799f0647a97ba277a48658bb",
+      "scope": "Complete original HST/solar-sail/quadcopter sources, resources and real native factory/platform bindings; physical/animation/Lua calculations conserved; separate diagnostic execution remains unqualified.",
+      "sha256_lf": "fc87a929812c34f5c401b9fabbc5a545cfbf099a63198f98ebcc63b85e3b66b2"
+    },
+    "Src/Vessel/Solarsail/CMakeLists.txt": {
+      "original_sha256_lf": "e2fcd6f47fc5fb3dc732d7c91c51d18cce960473d474bf067e68b06c51c65939",
+      "scope": "Complete original HST/solar-sail/quadcopter sources, resources and real native factory/platform bindings; physical/animation/Lua calculations conserved; separate diagnostic execution remains unqualified.",
+      "sha256_lf": "e2fcd6f47fc5fb3dc732d7c91c51d18cce960473d474bf067e68b06c51c65939"
+    },
+    "Src/Vessel/Solarsail/Config/SolarSail.cfg": {
+      "original_sha256_lf": "6159760592d46b7b5a7e2bb54e95cc722f60ad933f158a41489e7dd1c2cafdf2",
+      "scope": "Complete original HST/solar-sail/quadcopter sources, resources and real native factory/platform bindings; physical/animation/Lua calculations conserved; separate diagnostic execution remains unqualified.",
+      "sha256_lf": "6159760592d46b7b5a7e2bb54e95cc722f60ad933f158a41489e7dd1c2cafdf2"
+    },
+    "Src/Vessel/Solarsail/Meshes/SolarSail.msh": {
+      "original_sha256_lf": "df4df8b95bc5c7a5cf034fbeb27fc5c968fe7c041a924918591817926b529707",
+      "scope": "Complete original HST/solar-sail/quadcopter sources, resources and real native factory/platform bindings; physical/animation/Lua calculations conserved; separate diagnostic execution remains unqualified.",
+      "sha256_lf": "df4df8b95bc5c7a5cf034fbeb27fc5c968fe7c041a924918591817926b529707"
+    },
+    "Src/Vessel/Solarsail/SailLua.cpp": {
+      "original_sha256_lf": "7a205f76f5b7994bd752f4936e821a4f015c2e5445fa594550687c65b0f48f59",
+      "scope": "Complete original HST/solar-sail/quadcopter sources, resources and real native factory/platform bindings; physical/animation/Lua calculations conserved; separate diagnostic execution remains unqualified.",
+      "sha256_lf": "6a25db4e6ab906ed541901e1ee9406a4977b8f804df0f750b7a0dedd6dc4ba85"
+    },
+    "Src/Vessel/Solarsail/SolarSail.h": {
+      "original_sha256_lf": "648d6e44d9c4a9ffb27ca2335ff560739d16f84042236a086a1fdfc0561eccb3",
+      "scope": "Complete original HST/solar-sail/quadcopter sources, resources and real native factory/platform bindings; physical/animation/Lua calculations conserved; separate diagnostic execution remains unqualified.",
+      "sha256_lf": "659b8bd08b15f2e67722c33df7d8639e301c710e39c0a45158330234cdcd0db6"
+    },
+    "Src/Vessel/Solarsail/Solarsail.cpp": {
+      "original_sha256_lf": "9f8ef907945d424cd3062f50eb357cfa5ba99d7cd904fff8544637aa89feb5f7",
+      "scope": "Complete original HST/solar-sail/quadcopter sources, resources and real native factory/platform bindings; physical/animation/Lua calculations conserved; separate diagnostic execution remains unqualified.",
+      "sha256_lf": "3ba288834406fafd83c9b6bee49510201ed5e70bce39636ea5c6fb1e48c945bd"
+    },
+    "Src/Vessel/StockVesselPlatform.h": {
+      "original_sha256_lf": null,
+      "scope": "Complete original HST/solar-sail/quadcopter sources, resources and real native factory/platform bindings; physical/animation/Lua calculations conserved; separate diagnostic execution remains unqualified.",
+      "sha256_lf": "41650103b38b20d61e91a34e60853c7e62b8237595b1a7699f48665e0262806f"
+    },
+    "Src/Vessel/NativeStockFactory.inc": {
+      "original_sha256_lf": null,
+      "scope": "Complete original HST/solar-sail/quadcopter sources, resources and real native factory/platform bindings; physical/animation/Lua calculations conserved; separate diagnostic execution remains unqualified.",
+      "sha256_lf": "fb8a6161b67563bd293ca2c6e0d0defba78a6ee4b5da0411d014c302928d2a5a"
+    },
+    "Src/Vessel/HST/NativeHstFactory.inc": {
+      "original_sha256_lf": null,
+      "scope": "Complete original HST/solar-sail/quadcopter sources, resources and real native factory/platform bindings; physical/animation/Lua calculations conserved; separate diagnostic execution remains unqualified.",
+      "sha256_lf": "bc4a58da6218ea99b3d8949cfcbfb379e8fe5c422cc9a8c725b11d95217ba0e5"
+    },
+    "Src/Vessel/Solarsail/NativeSolarSailFactory.inc": {
+      "original_sha256_lf": null,
+      "scope": "Complete original HST/solar-sail/quadcopter sources, resources and real native factory/platform bindings; physical/animation/Lua calculations conserved; separate diagnostic execution remains unqualified.",
+      "sha256_lf": "e0e27e6a3f937f9fcc2d6376cbddf4ee0c58c1e55d0351f98ef151ab6d213a49"
+    },
+    "Src/Vessel/Quadcopter/NativeQuadcopterFactory.inc": {
+      "original_sha256_lf": null,
+      "scope": "Complete original HST/solar-sail/quadcopter sources, resources and real native factory/platform bindings; physical/animation/Lua calculations conserved; separate diagnostic execution remains unqualified.",
+      "sha256_lf": "0b9ba00e4a71b752e9cb0b54a3f3de491b89187126b79522731c086ee498147f"
     }
   }
 }

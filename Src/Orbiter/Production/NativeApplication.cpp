@@ -137,7 +137,7 @@ bool SupportedStockShuttleA(const VESSEL& vessel,const char* type) {
             cs.x==17.61f && cs.y==17.44f && cs.z==13.09f;
     return false;
 }
-#ifdef ORBITER_ATLANTIS_DIAGNOSTIC
+#if defined(ORBITER_ATLANTIS_DIAGNOSTIC) || defined(ORBITER_REMAINING_STOCK_DIAGNOSTIC)
 // An isolated test executable exercises the actual, not-yet-qualified modules.
 // The production executable retains its admission checks below.
 bool SupportedAtlantisDiagnostic(const VESSEL& vessel,const char* type) {
@@ -155,6 +155,29 @@ bool SupportedAtlantisDiagnostic(const VESSEL& vessel,const char* type) {
         return vessel.Version()==1 && !vessel.GetEnableFocus() && vessel.GetSize()>=23 &&
             vessel.GetMeshCount()==1 && vessel.GetThrusterCount()==2 &&
             vessel.GetPropellantCount()==1 && vessel.DockCount()==1;
+    return false;
+}
+#endif
+#ifdef ORBITER_REMAINING_STOCK_DIAGNOSTIC
+bool SupportedRemainingStockDiagnostic(const VESSEL& vessel,const char* type) {
+    if(vessel.GetMeshCount()!=1)return false;
+    if(CompareText(type,"HST")==0)
+        return vessel.Version()==2 && vessel.GetEmptyMass()==10886 && vessel.GetSize()==7.52;
+    if(CompareText(type,"SolarSail")==0)
+        return vessel.Version()==2 && vessel.GetEmptyMass()==100 && vessel.GetSize()==1000;
+    if(CompareText(type,"Quadcopter")==0)
+        return vessel.Version()==3 && vessel.GetEmptyMass()==2 && vessel.GetSize()==0.3 &&
+            vessel.GetThrusterCount()==1 && vessel.GetPropellantCount()==1;
+    if(vessel.Version()!=0)return false;
+    if(CompareText(type,"Carina")==0)
+        return vessel.GetEmptyMass()==5000 && vessel.GetSize()==5 && vessel.AttachmentCount(true)==2;
+    if(CompareText(type,"LDEF")==0)
+        return vessel.GetEmptyMass()==2500 && vessel.GetSize()==12 && vessel.AttachmentCount(true)==2 &&
+            vessel.AttachmentCount(false)==1;
+    if(CompareText(type,"Leonardo_mplm")==0)
+        return vessel.GetEmptyMass()==1800 && vessel.GetSize()==6 && vessel.AttachmentCount(true)==2;
+    if(CompareText(type,"Module2")==0)
+        return vessel.GetEmptyMass()==4000 && vessel.GetSize()==2.5 && vessel.DockCount()==6;
     return false;
 }
 #endif
@@ -797,6 +820,13 @@ struct Runtime final:BodyServices,RigidBodyServices,SurfaceServices,NavigationSe
             marker<<"{\"scope\":\"Unqualified Atlantis test host using real production modules and session algorithms\",\"native_admission_qualified\":false,\"phase6_complete\":false}\n";
         }
 #endif
+#ifdef ORBITER_REMAINING_STOCK_DIAGNOSTIC
+        if(!evidence.empty()) {
+            std::ofstream marker(evidence/"unqualified-remaining-stock-diagnostic.json");
+            marker.exceptions(std::ios::badbit|std::ios::failbit);
+            marker<<"{\"scope\":\"Unqualified remaining-stock host using actual original modules and session algorithms\",\"native_admission_qualified\":false,\"phase6_complete\":false}\n";
+        }
+#endif
         for(auto* body:system->GetVessels()) {
             auto* vessel=body->GetModuleInterface();const char* type=vessel->GetClassName();
             const bool pb=CompareText(type,"ShuttlePB")==0 && vessel->Version()==2 && vessel->GetMeshCount()==1 && vessel->GetThrusterCount()==16 && vessel->GetPropellantCount()==1;
@@ -807,8 +837,11 @@ struct Runtime final:BodyServices,RigidBodyServices,SurfaceServices,NavigationSe
                 vessel->GetThrusterCount()==(scram ? 23 : 21) && vessel->GetPropellantCount()==(scram ? 3 : 2))
                 continue;
             if(SupportedStockShuttleA(*vessel,type))continue;
-#ifdef ORBITER_ATLANTIS_DIAGNOSTIC
+#if defined(ORBITER_ATLANTIS_DIAGNOSTIC) || defined(ORBITER_REMAINING_STOCK_DIAGNOSTIC)
             if(SupportedAtlantisDiagnostic(*vessel,type))continue;
+#endif
+#ifdef ORBITER_REMAINING_STOCK_DIAGNOSTIC
+            if(SupportedRemainingStockDiagnostic(*vessel,type))continue;
 #endif
 #endif
             if(!pb && !iss && !SupportedStockStation(*vessel,type))

@@ -72,3 +72,6 @@ DLLCLBK void ovcExit(VESSEL *vessel)
 {
 	if (vessel) delete (Quadcopter*)vessel;
 }
+#ifndef _WIN32
+#include "NativeQuadcopterFactory.inc"
+#endif

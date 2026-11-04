@@ -75,12 +75,12 @@ void SolarSail::SetupElasticity (MESHHANDLE hMeshTemplate)
 {
 	MESHGROUP *sail = oapiMeshGroup (hMeshTemplate, GRP_sail1);
 	// all sail segments have the same mesh structure, so segment 1 represents all 4
-	DWORD nvtx = sail->nVtx/2; // scan front side only
-	DWORD nidx = sail->nIdx/2; // scan front side only
-	DWORD ntri = nidx/3;
-	WORD *idx = sail->Idx;
+	oapi::UInt32 nvtx = sail->nVtx/2; // scan front side only
+	oapi::UInt32 nidx = sail->nIdx/2; // scan front side only
+	oapi::UInt32 ntri = nidx/3;
+	oapi::UInt16 *idx = sail->Idx;
 	NTVERTEX *vtx = sail->Vtx;
-	DWORD i, j, k, m, nj, nk;
+	oapi::UInt32 i, j, k, m, nj, nk;
 
 	// generate node neighbour graph
 	sail_vbuf = new VECTOR3[nvtx];
@@ -91,7 +91,7 @@ void SolarSail::SetupElasticity (MESHHANDLE hMeshTemplate)
 	}
 
 	for (i = 0; i < ntri; i++) {
-		WORD *tri = idx+(i*3);
+		oapi::UInt16 *tri = idx+(i*3);
 		for (j = 0; j < 3; j++) {
 			nj = tri[j];
 			for (k = 0; k < 3; k++) {
@@ -116,8 +116,8 @@ void SolarSail::SetupElasticity (MESHHANDLE hMeshTemplate)
 
 	for (i = 0; i < 4; i++) {
 		MESHGROUP *mg = oapiMeshGroup (hMeshTemplate, i);
-		sail_idx[i] = new WORD[mg->nIdx];
-		memcpy(sail_idx[i], mg->Idx, mg->nIdx*sizeof(WORD));
+		sail_idx[i] = new oapi::UInt16[mg->nIdx];
+		memcpy(sail_idx[i], mg->Idx, mg->nIdx*sizeof(oapi::UInt16));
 	}
 }
 
@@ -156,7 +156,7 @@ void SolarSail::DefineAnimations ()
 	int i;
 
 	// Steering paddle animations
-	static UINT PaddleGrp[4] = {GRP_paddle1, GRP_paddle2, GRP_paddle3, GRP_paddle4};
+	static oapi::UInt PaddleGrp[4] = {GRP_paddle1, GRP_paddle2, GRP_paddle3, GRP_paddle4};
 
 	static MGROUP_ROTATE Paddle0 (0, PaddleGrp+0, 1, _V(0,0,0), _V(0,1,0), (float)(180.0*RAD));
 	static MGROUP_ROTATE Paddle1 (0, PaddleGrp+1, 1, _V(0,0,0), _V(1,0,0), (float)(180.0*RAD));
@@ -181,17 +181,17 @@ void SolarSail::UpdateSail (const VECTOR3 *rpressure)
 
 	const double elast = 1e-1;
 	const double pscale = 1e3;
-	DWORD i, j;
+	oapi::UInt32 i, j;
 	NBHR *nb;
 	NTVERTEX *vi, *vj;
 	VECTOR3 dv, F, nm;
 	static VECTOR3 *nml = 0;
-	static DWORD *nsd = 0;
+	static oapi::UInt32 *nsd = 0;
 	double dst;
 
 	sailidx = ++sailidx % 4;
 	NTVERTEX *Vtx = sail_vtx[sailidx];
-	WORD *Idx = sail_idx[sailidx];
+	oapi::UInt16 *Idx = sail_idx[sailidx];
 
 	for (i = 0; i < sail_nvtx; i++) {
 		F = _V(0,0,rpressure->z*pscale); // note - should be calculated for LOCAL normal
@@ -230,12 +230,12 @@ void SolarSail::UpdateSail (const VECTOR3 *rpressure)
 	// calculate smooth normals - surely this could be done more efficiently!
 	if (!nml) {
 		nml = new VECTOR3[sail_nvtx];
-		nsd = new DWORD[sail_nvtx];
+		nsd = new oapi::UInt32[sail_nvtx];
 	}
 	memset (nml, 0, sail_nvtx*sizeof(VECTOR3));
-	memset (nsd, 0, sail_nvtx*sizeof(DWORD));
+	memset (nsd, 0, sail_nvtx*sizeof(oapi::UInt32));
 	for (i = 0; i < sail_ntri; i++) {
-		WORD *idx = Idx + (WORD)i*3;
+		oapi::UInt16 *idx = Idx + (oapi::UInt16)i*3;
 		nm = Nml(Vtx + *idx, Vtx + *(idx+1), Vtx + *(idx+2));
 		for (j = 0; j < 3; j++) {
 			nml[*(idx+j)] += unit(nm);
@@ -395,8 +395,8 @@ int SolarSail::clbkGeneric (int msgid, int prm, void *context)
 MESHHANDLE SolarSail::hMeshTpl = NULL;
 NBHR *SolarSail::nbhr = NULL;
 VECTOR3 *SolarSail::sail_vbuf = NULL;
-DWORD SolarSail::sail_nvtx = 0;
-DWORD SolarSail::sail_ntri = 0;
+oapi::UInt32 SolarSail::sail_nvtx = 0;
+oapi::UInt32 SolarSail::sail_ntri = 0;
 
 
 // ==============================================================
@@ -407,12 +407,12 @@ DWORD SolarSail::sail_ntri = 0;
 // Global initialisation
 // --------------------------------------------------------------
 
-DLLCLBK void InitModule (HINSTANCE hModule)
+static void InitSailResources ()
 {
 	SolarSail::GlobalSetup();
 }
 
-DLLCLBK void ExitModule (HINSTANCE hModule)
+static void ReleaseSailResources ()
 {
 	for (int i = 0; i < 4; i++) {
 		delete []SolarSail::sail_idx[i];
@@ -420,6 +420,18 @@ DLLCLBK void ExitModule (HINSTANCE hModule)
 }
 
 // --------------------------------------------------------------
+#ifdef _WIN32
+DLLCLBK void InitModule (HINSTANCE hModule)
+{
+	InitSailResources();
+}
+
+DLLCLBK void ExitModule (HINSTANCE hModule)
+{
+	ReleaseSailResources();
+}
+#endif
+
 // Vessel initialisation
 // --------------------------------------------------------------
 DLLCLBK VESSEL *ovcInit (OBJHANDLE hvessel, int flightmodel)
@@ -434,3 +446,7 @@ DLLCLBK void ovcExit (VESSEL *vessel)
 {
 	if (vessel) delete (SolarSail*)vessel;
 }
+
+#ifndef _WIN32
+#include "NativeSolarSailFactory.inc"
+#endif

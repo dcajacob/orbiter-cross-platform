@@ -1,0 +1,112 @@
+#!/usr/bin/env python3
+"""Build a fresh source-bound remaining-stock native package with actual original modules."""
+import argparse
+import hashlib
+import json
+from pathlib import Path
+import subprocess
+import sys
+
+HERE=Path(__file__).resolve().parent
+ROOT=HERE.parents[2]
+sys.path.insert(0,str(HERE.parent))
+import extraction_source
+
+
+def sha(path):return hashlib.sha256(path.read_bytes()).hexdigest()
+def sha_lf(path):return hashlib.sha256(path.read_bytes().replace(b'\r\n',b'\n')).hexdigest()
+def require(value,message):
+    if not value:raise ValueError(message)
+
+
+def main():
+    p=argparse.ArgumentParser(description=__doc__)
+    for name in ('output','renderer-dependencies','lua-archive','plot-archive'):
+        p.add_argument('--'+name,type=lambda v:Path(v).resolve(),required=True)
+    p.add_argument('--development-prefix',type=lambda v:Path(v).resolve())
+    p.add_argument('--configuration',choices=('Debug','Release'),required=True)
+    p.add_argument('--math-profile',choices=('automatic','sse2'),required=True)
+    p.add_argument('--sanitizers',action='store_true')
+    p.add_argument('--jobs',type=int,default=4)
+    a=p.parse_args();require(sys.platform=='linux','Native package requires Linux')
+    require(not a.output.exists() and a.jobs>0,'Fresh package output and positive build concurrency required')
+    extraction_source.verify()
+    ledger=json.loads((HERE.parent/'phase3-extraction.lock.json').read_text())['files']
+    inputs=set(ledger)|{'OVP/OGLClient/dependencies.lock.json','Tests/Production/dependencies.lock.json',
+        'Tests/Production/Licenses/implot-LICENSE','Tests/Production/extraction_source.py',
+        'Tests/Production/phase3-extraction.lock.json'}
+    inputs.update(path.relative_to(ROOT).as_posix() for path in HERE.iterdir() if path.is_file())
+    for module in list(sys.modules.values()):
+        name=getattr(module,'__file__',None)
+        if name:
+            path=Path(name).resolve()
+            if ROOT in path.parents and path.suffix=='.py':inputs.add(path.relative_to(ROOT).as_posix())
+    before={name:sha_lf(ROOT/name) for name in sorted(inputs)}
+    source=subprocess.check_output(['git','-C',str(ROOT),'rev-parse','HEAD'],text=True).strip()
+    for name,value in before.items():
+        body=subprocess.check_output(['git','-C',str(ROOT),'show',source+':'+name]).replace(b'\r\n',b'\n')
+        require(hashlib.sha256(body).hexdigest()==value,'Builder input differs from immutable producer: '+name)
+    archives=[a.lua_archive,a.plot_archive,*sorted(a.renderer_dependencies.glob('*.zip')),
+              a.renderer_dependencies/'glfw.tar.gz']
+    require(all(path.is_file() for path in archives),'Pinned dependency archive absent')
+    archive_hashes={str(path):sha(path) for path in archives}
+    engine=a.output/'engine';renderer=a.output/'renderer'
+    common=['-DCMAKE_BUILD_TYPE='+a.configuration,'-DCMAKE_EXPORT_COMPILE_COMMANDS=ON']
+    if a.sanitizers:
+        common+=['-DCMAKE_C_FLAGS=-fsanitize=address,undefined -fno-omit-frame-pointer',
+                 '-DCMAKE_CXX_FLAGS=-fsanitize=address,undefined -fno-omit-frame-pointer']
+    commands=[dict(label='engine-configure',argv=['cmake','-S',str(ROOT/'Src/Orbiter/Production'),'-B',str(engine),'-G','Ninja',*common,
+        '-DBUILD_TESTING=OFF','-DORBITER_BUILD_NATIVE_CELESTIAL_MODULES=ON','-DORBITER_BUILD_NATIVE_VESSELS=ON',
+        '-DORBITER_BUILD_NATIVE_COCKPIT=ON','-DORBITER_BUILD_ATLANTIS_DIAGNOSTIC=ON','-DORBITER_BUILD_REMAINING_STOCK_DIAGNOSTIC=ON',
+        '-DORBITER_MATH_FORCE_SSE2='+('ON' if a.math_profile=='sse2' else 'OFF'),
+        '-DORBITER_NATIVE_LUA_ARCHIVE='+str(a.lua_archive),'-DORBITER_NATIVE_UI_ARCHIVE='+str(a.renderer_dependencies/'imgui.zip'),
+        '-DORBITER_NATIVE_PLOT_ARCHIVE='+str(a.plot_archive)]),
+        dict(label='engine-build',argv=['cmake','--build',str(engine),'--parallel',str(a.jobs)]),
+        dict(label='renderer-configure',argv=['cmake','-S',str(ROOT/'OVP/OGLClient/Native'),'-B',str(renderer),'-G','Ninja',*common,
+        '-DORBITER_ENGINE_BUILD='+str(engine),'-DORBITER_RENDERER_DEPENDENCIES='+str(a.renderer_dependencies)]),
+        dict(label='renderer-build',argv=['cmake','--build',str(renderer),'--parallel',str(a.jobs)])]
+    if a.development_prefix:commands[2]['argv'].append('-DCMAKE_PREFIX_PATH='+str(a.development_prefix))
+    a.output.mkdir(parents=True)
+    report=dict(status='building',source_base=source,source_sha256_lf={name:before[name] for name in ledger},
+        dependency_sha256_lf={name:value for name,value in before.items() if name not in ledger},source_guard_inputs=len(before),
+        configuration=a.configuration,math_profile=a.math_profile,instrumentation='address,undefined' if a.sanitizers else 'none',
+        commands=commands,builder_sha256=sha(Path(__file__)),archive_sha256=archive_hashes,
+        native_admission_qualified=False,phase6_complete=False)
+    manifest=a.output/'build.json'
+    def save():manifest.write_text(json.dumps(report,indent=2)+'\n')
+    save()
+    try:
+        for command in commands:
+            log=a.output/(command['label']+'.log')
+            with log.open('w') as stream:process=subprocess.run(command['argv'],cwd=ROOT,stdout=stream,stderr=subprocess.STDOUT)
+            if process.returncode:
+                print('\n'.join(log.read_text(errors='replace').splitlines()[-70:]),flush=True);process.check_returncode()
+            print(command['label'],'passed',flush=True)
+        require(before=={name:sha_lf(ROOT/name) for name in before},'Owning source changed during fresh build')
+        require(archive_hashes=={name:sha(Path(name)) for name in archive_hashes},'Dependency archive changed during build')
+        cache=dict(line.split('=',1) for line in (engine/'CMakeCache.txt').read_text().splitlines() if '=' in line and not line.startswith(('#','//')))
+        require(cache['CMAKE_BUILD_TYPE:STRING']==a.configuration and cache['ORBITER_MATH_FORCE_SSE2:BOOL']==('ON' if a.math_profile=='sse2' else 'OFF'),
+                'Actual configuration/math profile differs')
+        for language in ('C','CXX'):
+            require(('-fsanitize=address,undefined' in cache['CMAKE_'+language+'_FLAGS:STRING'])==a.sanitizers,'Actual sanitizer flags differ')
+        for name in ('HST','SolarSail','Quadcopter'):
+            module=engine/'NativeModules/Vessel'/(name+'.so');require(module.is_file(),'Original native module absent: '+name)
+            symbols=subprocess.check_output(['nm','-D','--defined-only',str(module)],text=True)
+            require(any(line.split()[-1]=='OrbiterNativeQuery' for line in symbols.splitlines()),'Actual checked SDK entry absent: '+name)
+            linked=subprocess.check_output(['readelf','-d',str(module)],text=True)
+            require(('libasan.so' in linked)==a.sanitizers and ('libubsan.so' in linked)==a.sanitizers,'Actual module sanitizer linkage differs')
+        candidates=[engine/'production_atlantis_diagnostic',engine/'production_remaining_stock_diagnostic']
+        require(all(path.is_file() for path in candidates),'Real diagnostic host absent')
+        runtime=[engine/'orbiter-production',engine/'CMakeCache.txt',engine/'compile_commands.json',*sorted(engine.rglob('*.so'))]
+        notice=engine/'NativeModules/Licenses/implot-LICENSE.txt'
+        require(sha_lf(notice)==sha_lf(ROOT/'Tests/Production/Licenses/implot-LICENSE'),'ImPlot notice differs')
+        report.update(status='built',owning_sources_unchanged=True,implot_notice_sha256_lf=sha_lf(notice),
+            candidate_runtime_files_sha256={path.relative_to(ROOT).as_posix():sha(path) for path in candidates},
+            runtime_files_sha256={path.relative_to(ROOT).as_posix():sha(path) for path in runtime},
+            scope='Fresh original-source native modules and real diagnostic host; complete Windows/native state/camera/frame, '
+                  'interaction, lifecycle, stock admission and full Phase 6 qualification remain required.')
+    except BaseException as error:report.update(status='failed',error=str(error));raise
+    finally:save()
+
+
+if __name__=='__main__':main()

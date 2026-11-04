@@ -44,24 +44,24 @@ HST::HST (OBJHANDLE hObj, int fmodel)
 void HST::DefineAnimations (void)
 {
 	// 1. Hi-gain antenna
-	static UINT HiGainAnt1Grp[2] = {1,3};
+	static oapi::UInt HiGainAnt1Grp[2] = {1,3};
 	static MGROUP_ROTATE HiGainAnt1 (0, HiGainAnt1Grp, 2, _V(0.002579,1.993670,0.238158), _V(-1,0,0), (float)(PI*0.51));
-	static UINT HiGainAnt2Grp[2] = {0,2};
+	static oapi::UInt HiGainAnt2Grp[2] = {0,2};
 	static MGROUP_ROTATE HiGainAnt2 (0, HiGainAnt2Grp, 2, _V(0.002740,-2.013091,0.238118), _V(1,0,0), (float)(PI*0.51));
 	anim_ant = CreateAnimation (0.0196);
 	AddAnimationComponent (anim_ant, 0, 0.5, &HiGainAnt1);
 	AddAnimationComponent (anim_ant, 0, 1,   &HiGainAnt2);
 
 	// 2. Main telescope hatch
-	static UINT HatchGrp[1] = {86};
+	static oapi::UInt HatchGrp[1] = {86};
 	static MGROUP_ROTATE Hatch (0, HatchGrp, 1, _V(0.089688,1.456229,7.526453), _V(-1,0,0), (float)(RAD*113));
 	anim_hatch = CreateAnimation (0);
 	AddAnimationComponent (anim_hatch, 0, 1, &Hatch);
 
 	// 3. Solar arrays - folding
 	anim_array = CreateAnimation (1);
-	static UINT ArrayLFoldGrp[5] = {87,88,89,90,103};
-	static UINT ArrayRFoldGrp[5] = {92,93,94,95,102};
+	static oapi::UInt ArrayLFoldGrp[5] = {87,88,89,90,103};
+	static oapi::UInt ArrayRFoldGrp[5] = {92,93,94,95,102};
 	static MGROUP_ROTATE ArrayLFold1 (0, ArrayLFoldGrp, 5, _V(-1.9, 0.053583,1.429349), _V(0,-1,0), (float)(PI*0.5));
 	AddAnimationComponent (anim_array, 0,   0.4, &ArrayLFold1);
 	static MGROUP_ROTATE ArrayLFold2 (0, ArrayLFoldGrp, 5, _V(0,0.053583,1.429349), _V(-1,0,0), (float)(PI*0.5));
@@ -130,11 +130,11 @@ void HST::clbkLoadStateEx (FILEHANDLE scn, void *vs)
 	char *line;
 
 	while (oapiReadScenario_nextline (scn, line)) {
-		if (!_strnicmp (line, "ANT", 3)) {
+		if (!stock_vessel::ComparePrefix (line, "ANT", 3)) {
 			sscanf (line+3, "%d%lf", &ant_status, &ant_proc);
-		} else if (!_strnicmp (line, "HATCH", 5)) {
+		} else if (!stock_vessel::ComparePrefix (line, "HATCH", 5)) {
 			sscanf (line+5, "%d%lf", &hatch_status, &hatch_proc);
-		} else if (!_strnicmp (line, "FOLD", 4)) {
+		} else if (!stock_vessel::ComparePrefix (line, "FOLD", 4)) {
 			sscanf (line+5, "%d%lf", &array_status, &array_proc);
 		} else {
 			ParseScenarioLineEx (line, vs);
@@ -209,7 +209,7 @@ void HST::clbkPostStep (double simt, double simdt, double mjd)
 // --------------------------------------------------------------
 // Keyboard interface handler (buffered key events)
 // --------------------------------------------------------------
-int HST::clbkConsumeBufferedKey (DWORD key, bool down, char *kstate)
+int HST::clbkConsumeBufferedKey (oapi::UInt32 key, bool down, char *kstate)
 {
 	if (!down) return 0; // only process keydown events
 
@@ -263,3 +263,7 @@ DLLCLBK void ovcExit (VESSEL *vessel)
 {
 	if (vessel) delete (HST*)vessel;
 }
+
+#ifndef _WIN32
+#include "NativeHstFactory.inc"
+#endif

@@ -15,7 +15,7 @@
 #define __HST_H
 
 #define STRICT
-#include "orbitersdk.h"
+#include "../StockVesselPlatform.h"
 
 // ==============================================================
 // Some parameters and capabilities
@@ -48,11 +48,11 @@ public:
 	void clbkLoadStateEx (FILEHANDLE scn, void *vs);
 	void clbkSaveState (FILEHANDLE scn);
 	void clbkPostStep (double simt, double simdt, double mjd);
-	int  clbkConsumeBufferedKey (DWORD key, bool down, char *kstate);
+	int  clbkConsumeBufferedKey (oapi::UInt32 key, bool down, char *kstate);
 	int  clbkGeneric (int msgid, int prm, void *context);
 
 private:
-	UINT anim_ant, anim_hatch, anim_array;
+	oapi::UInt anim_ant, anim_hatch, anim_array;
 	double ant_proc, hatch_proc, array_proc;
 
 	// script interface-related methods, implemented in HST_Lua.cpp

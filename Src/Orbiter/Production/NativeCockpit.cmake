@@ -173,6 +173,32 @@ native_atlantis_entry(native_atlantis Atlantis OrbiterNativeAtlantisQuery)
 native_atlantis_entry(native_atlantis_tank Atlantis_Tank OrbiterNativeAtlantisTankQuery)
 native_atlantis_entry(native_atlantis_srb Atlantis_SRB OrbiterNativeAtlantisSrbQuery)
 
+# Original HST, solar-sail and quadcopter modules retain their complete Lua
+# bindings and physical/animation callbacks. Admission is qualified separately.
+set(_remaining_source "${CMAKE_CURRENT_LIST_DIR}/../../Vessel")
+add_library(native_hst MODULE "${_remaining_source}/HST/HST.cpp" "${_remaining_source}/HST/HST_Lua.cpp")
+target_compile_definitions(native_hst PRIVATE SCRIPTSUPPORT)
+set(_sail_headers "${PROJECT_BINARY_DIR}/native-solar-sail-include")
+file(MAKE_DIRECTORY "${_sail_headers}")
+add_custom_command(OUTPUT "${_sail_headers}/meshres.h"
+    COMMAND meshc /I "${_remaining_source}/Solarsail/Meshes/SolarSail.msh" /P - /O "${_sail_headers}/meshres.h"
+    DEPENDS meshc "${_remaining_source}/Solarsail/Meshes/SolarSail.msh" VERBATIM)
+add_library(native_solar_sail MODULE "${_sail_headers}/meshres.h"
+    "${_remaining_source}/Solarsail/Solarsail.cpp" "${_remaining_source}/Solarsail/SailLua.cpp")
+target_include_directories(native_solar_sail PRIVATE "${_sail_headers}")
+add_library(native_quadcopter MODULE
+    "${_remaining_source}/Quadcopter/Quadcopter.cpp" "${_remaining_source}/Quadcopter/QuadcopterLua.cpp"
+    "${_remaining_source}/Quadcopter/QuadcopterSubsys.cpp" "${_remaining_source}/Quadcopter/PropulsionSubsys.cpp"
+    "${_remaining_source}/Common/Instrument.cpp")
+foreach(target native_hst native_solar_sail native_quadcopter)
+    target_link_libraries(${target} PRIVATE lua orbiter_production_vessels)
+    target_link_options(${target} PRIVATE -Wl,--no-undefined)
+    set_target_properties(${target} PROPERTIES PREFIX "" LIBRARY_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/NativeModules/Vessel")
+endforeach()
+set_target_properties(native_hst PROPERTIES OUTPUT_NAME HST)
+set_target_properties(native_solar_sail PROPERTIES OUTPUT_NAME SolarSail)
+set_target_properties(native_quadcopter PROPERTIES OUTPUT_NAME Quadcopter)
+
 add_library(native_lua_inline_list OBJECT ../../Module/LuaScript/LuaInline/LuaInline.cpp)
 target_include_directories(native_lua_inline_list PRIVATE "${CMAKE_CURRENT_LIST_DIR}/../../Module/LuaScript/LuaInterpreter")
 target_link_libraries(native_lua_inline_list PRIVATE lua orbiter_production_vessels)
