@@ -198,3 +198,32 @@ configuration problem; it does not establish complete mission stability or
 Windows/native parity. Existing captures, protocol settings and budgets remain
 untouched. A separately versioned comparison using original production default
 propagation remains required.
+
+At owning source `4b03aa4dd60a778b9f2bc43d3f9ccb8745e3d7f1`, the fresh
+Debug ASan/UBSan package repeats all three actual tank lifetime cases cleanly in
+`out/phase6-atlantis-tank-lifetime-v9`: 180 presents, three clean context
+deletions, 510 unchanged owning/dependency inputs and 1,102 unchanged assets.
+This execution selects the source-pinned GTK icon-owner candidate described in
+`WindowingLifetime.md`. Production admission remains closed.
+
+Two complete unchanged KSC diagnostics now use the original production
+propagator defaults over 15 simulated seconds: 900 actual 60-Hz frames and 960
+actual 64-Hz frames. Both have clean ASan/UBSan/LSan and GL teardown. The tank's
+mean altitude stays between 65.9769 and 65.9782 metres in both runs; the complete
+five-vessel population remains present. The 64-Hz finalized simulation clock is
+binary-exact. Raw observations and actual screenshots are retained in
+`out/phase6-atlantis-propagation-{60,64}hz-v1`; the independent whole-population,
+source/asset/runtime/loaded-plugin/clock audit is
+`out/phase6-atlantis-default-propagation-audit-v3.json`. It checks 9,310 actual
+vessel-state rows and all 510 owning/dependency inputs and 1,102 assets.
+
+Cross-rate diagnostics record a maximum 0.002119-metre position difference,
+0.002163-metre/second velocity difference and full-frame SSIM 0.984812. These are
+calibration measurements. Qualifying Windows/native comparisons still require
+the same step and unchanged state/camera/image budgets.
+`Tests/Production/RemainingStockRepaired/protocol.json` explicitly versions a
+960-tick, 1/64-second, original-default-propagator candidate, retaining the same
+15-second interval and 12.5-second full-frame capture time. Its four-profile
+Windows campaign keeps all 38 complete scenes and both repetitions, with explicit
+tank/Dragonfly/client replacements in a fresh copy of the original application
+and SDK. No observations lock or full stock admission follows automatically.

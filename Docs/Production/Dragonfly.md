@@ -51,9 +51,31 @@ The surface control now exercises a real separate window compatibility context
 and the actual ADI target implementation. Two additional readbacks check
 compatibility display lists, color, vertical orientation and creation/drawing/
 destruction context restoration. The same GDI object-count and byte-identical
-ordinary-scene gates remain required. These replacements await fresh execution.
+ordinary-scene gates remain required.
 
-These are implementation candidates awaiting their hosted controls. Actual
-Dragonfly complete-scene capture, four-profile state/image comparisons, controls,
+The actual hosted controls now pass in both Debug and Release at
+`4b03aa4dd60a778b9f2bc43d3f9ccb8745e3d7f1`, workflow
+[41772469095](https://github.com/dcajacob/orbiter-cross-platform/actions/runs/41772469095).
+Both runtime jobs and the final numerical/scene/image comparison succeed. The
+independent exact-artifact audit is
+`out/phase6-windows-surface-dc-audit-4b-v1.json`: four real scene processes,
+400 round trips, 72,800 checked pixels, 200 foreign-context round trips, eight
+actual compatibility-target readbacks and 240 scene presentations. GDI object
+counts remain 97 before and after each process's exercise. Full ordinary-scene
+state/event/propellant/animation traces and framebuffers remain byte-identical;
+all recorded original numerical errors are zero. The audit also verifies the
+immutable producer closure, actual MSVC Debug/Release CRT flags and loaded driver.
+
+The exact retained Debug ZIP is 125,861,420 bytes, SHA-256
+`b30c1f76715eeed5bb82ba8860d78148580591e90746e0d65ede65aeee95d9cf`;
+Release is 125,024,709 bytes, SHA-256
+`fd6cfa1229f022b74fa91b27e8d51a7802cea2e309e30b49ca110c54725c96e8`.
+Each artifact contains 3,096 independently rehashed file members. Exact ZIPs,
+decoded control evidence and transport manifests are retained under
+`out/phase6-windows-surface-dc-qualified-4b-{Debug,Release}-v1`.
+
+Actual Dragonfly complete-scene capture, four-profile state/image comparisons, controls,
 save/reload, native rendering and lifetime qualification remain open. The
-preserved v2 reference is not refreshed or reclassified by these changes.
+separately versioned `Tests/Production/RemainingStockRepaired` candidate builds
+the repaired module and current client against the retained original application
+and SDK in a fresh copy. The preserved failed v2 campaign remains unchanged.
