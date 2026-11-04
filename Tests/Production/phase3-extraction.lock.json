@@ -742,7 +742,7 @@
     },
     "Src/Orbiter/Production/NativeApplication.cpp": {
       "original_sha256_lf": null,
-      "sha256_lf": "2449cffa48ace24457965bb88db656acea2c5bbf03d729edd129f270c65458ed",
+      "sha256_lf": "db23ff7d592d5c82496b5b02c6802835878a07a803dbf07b2ad436348c4fb690",
       "scope": "Complete original Dragonfly source and resources with independently audited native SDK/drawing/resource ownership bindings. Actual compatibility target uses distinct color-renderbuffer storage. Native diagnostic build/runtime and Windows/native qualification required; original formulas and public Windows SDK layouts unchanged."
     },
     "Src/Orbiter/Production/NativeBuild.h.in": {

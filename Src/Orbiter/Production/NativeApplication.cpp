@@ -164,7 +164,7 @@ bool SupportedRemainingStockDiagnostic(const VESSEL& vessel,const char* type) {
     if(CompareText(type,"HST")==0)
         return vessel.Version()==2 && vessel.GetEmptyMass()==10886 && vessel.GetSize()==7.52;
     if(CompareText(type,"Dragonfly")==0)
-        return vessel.Version()==2 && vessel.GetEmptyMass()==7000 && vessel.GetSize()==4 &&
+        return vessel.Version()==1 && vessel.GetEmptyMass()==7000 && vessel.GetSize()==4 &&
             // Original ShipInternal::Init adds eleven vent jets/tanks before
             // SetClassCaps adds the fourteen RCS thrusters and main propellant.
             vessel.GetThrusterCount()==25 && vessel.GetPropellantCount()==12 && vessel.DockCount()==1;

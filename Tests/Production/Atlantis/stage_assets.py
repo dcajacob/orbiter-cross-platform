@@ -93,6 +93,8 @@ def main():
     sys.path.insert(0,str(sys_path))
     from Dragonfly.prepare_native import resources as dragonfly_resources
     rc=frozen(ROOT/'Src/Vessel/Dragonfly/panel.rc');rules[rc]=digest(ROOT/rc)
+    resource_header=frozen(ROOT/'Src/Vessel/Dragonfly/resource.h')
+    rules[resource_header]=digest(ROOT/resource_header)
     for resource_id,filename in dragonfly_resources():
         source=ROOT/'Src/Vessel/Dragonfly'/filename;original=frozen(source)
         relative='Textures/Dragonfly/Panels/'+filename

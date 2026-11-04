@@ -82,7 +82,25 @@ of the preserved source, not additions to the simulation.
 
 The second failed capture, all 57 actual data inputs and all 794 owning sources
 remain in `out/phase6-dragonfly-native-smoke-v2` and
-`out/phase6-dragonfly-source-dd41-v1`. Fresh repaired execution and unchanged
+`out/phase6-dragonfly-source-dd41-v1`.
+
+The third fresh package at `2e5e2c3782eb7464a0c9f11c5577324d4fdbd52f`
+builds and clears the polymorphic deletion error. Its unchanged external scene
+then rejects the diagnostic capability check: the Dragonfly module derives
+from VESSEL2, whose actual SDK interface version is 1. The check incorrectly
+required 2 and is corrected. Cleanup also reports 888 bytes in 37 allocations;
+those leaks remain failures. The terminal capture and exact sources are
+`out/phase6-dragonfly-native-smoke-v3` and
+`out/phase6-dragonfly-source-2e5e-v1`.
+
+The observation probe now forwards the original complete SetClassCaps call once,
+then reads the actual capabilities and current process mappings. This preserves
+allocation-address evidence even if an early scene failure unloads the module
+before LSan runs. It sets no vessel state and changes no simulation callback.
+The bitmap resource stager separately verifies the original resource.h ID
+definitions as well as panel.rc and each raw BMP.
+
+Fresh repaired execution and unchanged
 Dragonfly scene checks, sanitizer teardown, panel/input and persistence
 checks, repeated sessions and matched four-profile Windows/native state/camera/
 full-frame comparisons still have to pass. Normal class admission and Phase 6
