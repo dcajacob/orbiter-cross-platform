@@ -7,6 +7,8 @@
 #include "SceneLabels.h"
 #include "FlightInput.h"
 #include "CustomCommands.h"
+#include "NativeInstrumentTarget.h"
+#include <memory>
 #include <vector>
 class Config;class Camera;class PlanetarySystem;class MeshManager;class TimeData;class Vessel;class Pane;class Select;class InputBox;
 namespace oapi {class ParticleStream;}
@@ -37,6 +39,10 @@ public:
     SURFHANDLE clbkCreateSurface(oapi::UInt32 width,oapi::UInt32 height) {return CreateSurfaceResource(width,height);}
     virtual SURFHANDLE clbkCreateSurfaceEx(oapi::UInt32,oapi::UInt32,oapi::UInt32)=0;
     virtual bool clbkSetSurfaceColourKey(SURFHANDLE,oapi::UInt32)=0;
+    virtual std::unique_ptr<NativeGraphicsContext> SaveGraphicsContext()=0;
+    virtual std::unique_ptr<NativeInstrumentTarget> CreateInstrumentTarget(int,int)=0;
+    // Rows use the existing surface/Sketchpad coordinate order, beginning at y=0.
+    virtual bool UploadSurfacePixels(SURFHANDLE,int,int,const std::vector<std::uint8_t>&)=0;
     virtual oapi::UInt32 clbkGetDeviceColour(std::uint8_t,std::uint8_t,std::uint8_t)=0;
     virtual bool clbkFillSurface(SURFHANDLE,oapi::UInt32) const=0;
     virtual bool clbkFillSurface(SURFHANDLE,oapi::UInt32,oapi::UInt32,oapi::UInt32,oapi::UInt32,oapi::UInt32) const=0;

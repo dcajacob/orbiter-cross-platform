@@ -9,6 +9,9 @@
 #include <cstdlib>
 #include <dlfcn.h>
 #include <thread>
+#ifdef ORBITER_NATIVE_INSTRUMENT_CONTROL
+#include "../NativeInstrumentTarget/Control.h"
+#endif
 
 namespace {
 struct Preload {Preload(){unsetenv("LD_PRELOAD");}} preload;
@@ -27,6 +30,9 @@ void orbiter::production::Session::UpdateWorld(SessionServices& services,const T
     stock_vessels::require(original!=nullptr,"Original remaining-stock UpdateWorld missing");
     std::this_thread::sleep_for(std::chrono::milliseconds(120));
     if(!initialized) {
+#ifdef ORBITER_NATIVE_INSTRUMENT_CONTROL
+        native_instrument_target::run();
+#endif
         stock_vessels::headers(state,docks);details.open();
         stock_vessels::snapshot(state,docks,0);details.snapshot(0);
         std::ifstream maps("/proc/self/maps");std::ofstream loaded("observer-loaded-maps.txt");loaded<<maps.rdbuf();

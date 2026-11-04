@@ -787,8 +787,8 @@
     },
     "Src/Orbiter/Production/NativeGraphics.h": {
       "original_sha256_lf": null,
-      "sha256_lf": "87a3f98813d08193aa30a658ace9dfe6d3b5c6bcbb450f1b2e157f057b3c0227",
-      "scope": "Original legacy bitmap panel layout, scaling, MFD, mouse and redraw algorithms conserved by cockpit_source.py. Native surface ownership and actual renderer bindings; full Dragonfly drawing/runtime qualification remains pending. Public Windows SDK layout unchanged."
+      "sha256_lf": "49e8b523cd5b564686c9a952713f1cae96fc0056bf07ee829b3f6fa58ab399bb",
+      "scope": "Private actual compatibility-context/color-renderbuffer ownership and state-preserving RGBA transfer for original legacy instrument commands; no original physical calculations, public Windows SDK layout or acceptance budget changes. Real target/collision/transfer and complete-scene runtime controls required."
     },
     "Src/Orbiter/Production/NativeModule.cpp": {
       "sha256_lf": "d90fc24038e5acf5c20329c08ac433c94fb4603811e7a1fc9aaf38eedb59e82a",
@@ -2286,13 +2286,28 @@
     },
     "OVP/OGLClient/Native/NativeCallbacks.inc": {
       "original_sha256_lf": null,
-      "sha256_lf": "2ea9fff026dec85f04333b715fddc9876518320261ea8bdbd733d59fdd6790d9",
-      "scope": "Original legacy bitmap panel layout, scaling, MFD, mouse and redraw algorithms conserved by cockpit_source.py. Native surface ownership and actual renderer bindings; full Dragonfly drawing/runtime qualification remains pending. Public Windows SDK layout unchanged."
+      "sha256_lf": "f86584e6c77fafbcabae9c3013f57bf6fb174934da8e57db4ade781ff7b29a01",
+      "scope": "Private actual compatibility-context/color-renderbuffer ownership and state-preserving RGBA transfer for original legacy instrument commands; no original physical calculations, public Windows SDK layout or acceptance budget changes. Real target/collision/transfer and complete-scene runtime controls required."
     },
     "Src/Orbiter/Production/NativeLegacyPanelSdk.cpp": {
       "original_sha256_lf": null,
       "sha256_lf": "17efef071b360a499e2083fca83e4bc5a193753f6ed7ee857b61feafa4f98e61",
       "scope": "Original legacy bitmap panel layout, scaling, MFD, mouse and redraw algorithms conserved by cockpit_source.py. Native surface ownership and actual renderer bindings; full Dragonfly drawing/runtime qualification remains pending. Public Windows SDK layout unchanged."
+    },
+    "Src/Orbiter/Production/NativeInstrumentTarget.h": {
+      "original_sha256_lf": null,
+      "sha256_lf": "362e54dd02e3705c2e06cdde0137b974a784e6e67f0d91a5c339b995dff7352a",
+      "scope": "Private actual compatibility-context/color-renderbuffer ownership and state-preserving RGBA transfer for original legacy instrument commands; no original physical calculations, public Windows SDK layout or acceptance budget changes. Real target/collision/transfer and complete-scene runtime controls required."
+    },
+    "OVP/OGLClient/Native/NativeInstrumentTarget.cpp": {
+      "original_sha256_lf": null,
+      "sha256_lf": "580b3432bcdbfa4598f1e655a191d8bb2a0fa78a772bfd5a6ac940f57675110b",
+      "scope": "Private actual compatibility-context/color-renderbuffer ownership and state-preserving RGBA transfer for original legacy instrument commands; no original physical calculations, public Windows SDK layout or acceptance budget changes. Real target/collision/transfer and complete-scene runtime controls required."
+    },
+    "OVP/OGLClient/Native/CMakeLists.txt": {
+      "original_sha256_lf": null,
+      "sha256_lf": "8941ee1292ab367ce1e902217e1e0b95578a5772b44fbd6faf08380627ff2289",
+      "scope": "Private actual compatibility-context/color-renderbuffer ownership and state-preserving RGBA transfer for original legacy instrument commands; no original physical calculations, public Windows SDK layout or acceptance budget changes. Real target/collision/transfer and complete-scene runtime controls required."
     }
   }
 }

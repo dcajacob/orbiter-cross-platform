@@ -47,7 +47,7 @@ FetchContent_Declare(glfw URL "${ORBITER_RENDERER_DEPENDENCIES}/glfw.tar.gz"
 set(CMAKE_POLICY_VERSION_MINIMUM 3.5)
 FetchContent_MakeAvailable(glm freetype soil2 nanovg libnsbmp imgui zlib glfw)
 add_library(orbiter_ogl_native MODULE
-    LinuxAdapter.cpp NativeEvidence.cpp
+    LinuxAdapter.cpp NativeEvidence.cpp NativeInstrumentTarget.cpp
     ../OGLClient.cpp ../Shader.cpp ../CelSphere.cpp ../Renderer.cpp ../VertexBuffer.cpp ../Scene.cpp ../Light.cpp
     ../OGLCamera.cpp ../OGLMesh.cpp ../MeshManager.cpp ../VObject.cpp ../VVessel.cpp ../Texture.cpp ../VPlanet.cpp ../VStar.cpp ../ztreemgr.cpp
     ../TileMgr.cpp ../SurfMgr.cpp ../RingMgr.cpp ../HazeMgr.cpp ../CloudMgr.cpp ../tilemgr2.cpp ../surfmgr2.cpp ../tilelabel.cpp

@@ -56,7 +56,7 @@ def inspect_inputs(out,case,config):
 shared.inspect_inputs=inspect_inputs
 
 
-def inspect(out,case,config,identity,build,probe,libraries,gtk_plugin):
+def inspect(out,case,config,identity,build,probe,libraries,gtk_plugin,instrument_control=False):
     require(json.loads((out/'process-result.json').read_text())['returncode']==0,'Native process did not return zero')
     require((out/'stock-vessel-complete.txt').read_text().strip()==str(config['frames']),'Native observation ended early')
     result=shared.inspect_trace(out,case,config)
@@ -94,9 +94,17 @@ def inspect(out,case,config,identity,build,probe,libraries,gtk_plugin):
     require(not any('/usr/lib/' in line and '/libdecor-gtk.so' in line for line in mapped.splitlines()),'Unpinned GTK decoration plugin mapped')
     actual_math=json.loads((out/'numerics.json').read_text())['math']
     require(actual_math=='amd-6121d02-'+('sse2' if identity['math_profile']=='sse2' else 'fma3'),'Actual native CPU math differs')
+    control=None
+    if instrument_control:
+        control=json.loads((out/'native-instrument-control.json').read_text())
+        require(control==dict(status='passed',contexts=3,context_restorations=7,display_lists=2,pixel_uploads=1,
+                checked_pixels=25736,texture_name_1_collision_reproduced=True,
+                native_admission_qualified=False,phase6_complete=False),'Actual native compatibility-target control incomplete')
     files={p.relative_to(out).as_posix():sha(p) for p in out.iterdir() if p.is_file()}
-    return dict(result,status='captured',lifecycle=life,renderer=renderer,actual_math=actual_math,files_sha256=files,
+    result=dict(result,status='captured',lifecycle=life,renderer=renderer,actual_math=actual_math,files_sha256=files,
                 input_sha256=sha(out/'invocation.json'))
+    if instrument_control:result['instrument_control']=control
+    return result
 
 
 def main():
@@ -105,6 +113,7 @@ def main():
         p.add_argument('--'+name,type=lambda v:Path(v).resolve(),required=True)
     p.add_argument('--library',type=lambda v:Path(v).resolve(),action='append',default=[])
     p.add_argument('--case',action='append');p.add_argument('--repeats',type=int,choices=(1,2),default=2)
+    p.add_argument('--instrument-control',action='store_true',help='Exercise real native compatibility contexts and surface uploads in the complete unchanged scene')
     p.add_argument('--jobs',type=int,default=1)
     a=p.parse_args();config=settings();require(not a.output.exists() and a.jobs>0,'Fresh diagnostic output and positive concurrency required')
     cases=[case for case in config['cases'] if not a.case or case['id'] in a.case]
@@ -130,6 +139,7 @@ def main():
     paths={p for p in HERE.iterdir() if p.is_file()}
     paths.update(shared.source_files());paths.add(HERE.parent/'RemainingStockRepaired/protocol.json')
     paths.update(HERE.parent/name for name in ('StockScenarios/intentional_exit.py','WaylandInput/compositor.py'))
+    if a.instrument_control:paths.add(HERE.parent/'NativeInstrumentTarget/Control.h')
     producer=subprocess.check_output(['git','-C',str(ROOT),'rev-parse','HEAD'],text=True).strip()
     sources={p.relative_to(ROOT).as_posix():sha_lf(p) for p in paths}
     for name,value in sources.items():
@@ -140,9 +150,11 @@ def main():
     probe=a.output/'remaining-vessels-probe.so'
     command=[identity['compiler'],'-std=c++17','-fPIC','-shared','-Wl,--no-undefined']
     if identity['sanitizer_linked']:command+=['-fsanitize=address,undefined','-fno-omit-frame-pointer']
+    if a.instrument_control:command+=['-DORBITER_NATIVE_INSTRUMENT_CONTROL']
     command+=['-I'+str(ROOT/'Orbitersdk/include'),'-I'+str(ROOT/'Src/Orbiter'),'-I'+str(a.build/'native-sdk'),
         str(HERE/'NativeProbe.cpp'),'-L'+str(a.build),'-Wl,-rpath,'+str(a.build),
         '-lorbiter_production_vessels','-lorbiter_production_boundary','-ldl','-o',str(probe)]
+    if a.instrument_control:command.insert(-2,'-lGL')
     (a.output/'probe-command.json').write_text(json.dumps(command,indent=2)+'\n')
     with (a.output/'probe-build.log').open('w') as log:subprocess.run(command,stdout=log,stderr=subprocess.STDOUT,check=True)
     guarded[str(probe)]=sha(probe)
@@ -150,6 +162,7 @@ def main():
         runtime_source_commit=record['source_base'],runtime_identity=identity,build_record_sha256=sha(a.build_record),
         source_sha256_lf=sources,guarded_files_sha256=guarded,asset_files_sha256=assets,
         cases_requested=[c['id'] for c in cases],repeats=a.repeats,frames=config['frames'],fixed_step=config['fixed_step'],
+        instrument_control=a.instrument_control,
         native_admission_qualified=False,phase6_complete=False,cases={},failures={})
     manifest=a.output/'capture.json'
     def save():manifest.write_text(json.dumps(report,indent=2)+'\n')
@@ -191,7 +204,7 @@ def main():
                 if (out/'scene.rgba').is_file() and (out/'scene.rgba').stat().st_size==1280*720*4:
                     png(out/'scene.png',(out/'scene.rgba').read_bytes(),1280,720)
                 libraries=[directory/name for directory in a.library for name in ('libfontconfig.so.1','libEGL_mesa.so.0','libgdk-3.so.0') if (directory/name).exists()]
-                runs.append(inspect(out,case,config,identity,a.build,probe,libraries,a.gtk_plugin))
+                runs.append(inspect(out,case,config,identity,a.build,probe,libraries,a.gtk_plugin,a.instrument_control))
             if len(folders)==2:
                 for name in (*shared.TRACES,'camera.csv'):
                     require((folders[0]/name).read_bytes()==(folders[1]/name).read_bytes(),'Native deterministic repeat differs: '+name)

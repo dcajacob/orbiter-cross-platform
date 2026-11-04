@@ -34,6 +34,9 @@ void clbkGetViewportSize(oapi::UInt32* width,oapi::UInt32* height) const overrid
 SURFHANDLE clbkCreateSurfaceEx(oapi::UInt32 w,oapi::UInt32 h,oapi::UInt32 flags) override {return CreateSurfaceEx(int(w),int(h),int(flags));}
 oapi::UInt32 clbkGetDeviceColour(std::uint8_t r,std::uint8_t g,std::uint8_t b) override {return GetDeviceColour(r,g,b);}
 bool clbkSetSurfaceColourKey(SURFHANDLE surface,oapi::UInt32 color) override {return SetSurfaceColourKey(surface,color);}
+std::unique_ptr<NativeGraphicsContext> SaveGraphicsContext() override;
+std::unique_ptr<NativeInstrumentTarget> CreateInstrumentTarget(int,int) override;
+bool UploadSurfacePixels(SURFHANDLE,int,int,const std::vector<std::uint8_t>&) override;
 bool clbkFillSurface(SURFHANDLE surface,oapi::UInt32 color) const override {return FillSurface(surface,color);}
 bool clbkFillSurface(SURFHANDLE surface,oapi::UInt32 x,oapi::UInt32 y,oapi::UInt32 w,oapi::UInt32 h,oapi::UInt32 color) const override {return FillSurface(surface,int(x),int(y),int(w),int(h),color);}
 bool clbkBlt(SURFHANDLE t,oapi::UInt32 x,oapi::UInt32 y,SURFHANDLE s,oapi::UInt32 flags) const override {return Blt(t,int(x),int(y),s,int(flags));}
