@@ -22,3 +22,9 @@ parity, hardware performance or final Phase 6 acceptance.
 The ordinary native application uses its fixed-step default for system time.
 A bounded replay with only its header supplies the required pacing contract;
 it contains no HUD, MFD, camera, keyboard or physics commands.
+
+Every rendered TrA/TrL value is also parsed numerically. The result records
+unique numeric tokens and any nonfinite or nonnumeric CRT spelling from both
+repetitions, so platform-specific NaN/IND formatting cannot hide a difference.
+This inspects captured text after each process exits and changes no application,
+observer, input, clock, physics or renderer behavior.

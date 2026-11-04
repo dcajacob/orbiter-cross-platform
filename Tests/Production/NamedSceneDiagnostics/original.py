@@ -1,17 +1,34 @@
 """Observe two complete-scene cases without changing frozen acceptance pins."""
-import argparse,json,os,sys
+import argparse,json,math,os,sys
 from pathlib import Path
 from common import HERE,ROOT,require,sha,rows,settings,scenario,configuration,summarize
 sys.path[:0]=[str(HERE.parent),str(HERE.parent/'Client'),str(HERE.parent/'Cockpit')]
 from stage import run as stage
 from run_client import mesa_files
 
+def inspect_anomaly_draws(text_rows):
+    # Parse every actual anomaly draw numerically too: CRT-specific NaN/IND
+    # spellings must not escape the ordinary nan/inf text-token diagnostic.
+    anomaly={label:dict(draws=0,unique_tokens=set(),nonfinite_or_non_numeric_tokens=set()) for label in ('TrA','TrL')}
+    for row in text_rows:
+        value=bytes.fromhex(row['text_hex']).decode('ascii',errors='replace')
+        if not value.startswith(('TrA ','TrL ')):continue
+        label=value[:3];token=value[3:].split('\ufffd',1)[0].strip();entry=anomaly[label];entry['draws']+=1;entry['unique_tokens'].add(token)
+        try:finite=math.isfinite(float(token))
+        except ValueError:finite=False
+        if not finite:entry['nonfinite_or_non_numeric_tokens'].add(token)
+    for entry in anomaly.values():
+        for key in ('unique_tokens','nonfinite_or_non_numeric_tokens'):entry[key]=sorted(entry[key])
+    require(all(v['draws']>0 for v in anomaly.values()),'Actual TrA/TrL instrument draws missing')
+    return anomaly
+
 def inspect(folder,case):
     require(not (folder/'named-failure.txt').exists(),'Original SDK diagnostic failed')
     require((folder/'named-complete.txt').read_text().strip()=='60','Original process did not complete')
     info=json.loads((folder/'renderer-info.json').read_text());require('llvmpipe' in info['renderer'].lower(),'Pinned real original software renderer missing: '+json.dumps(info,sort_keys=True))
     require(not (folder/'graphics-errors.txt').exists() or not (folder/'graphics-errors.txt').read_text().strip(),'Original renderer errors')
-    result=summarize(folder,case);result['actual_math']=(folder/'named-math.txt').read_text().strip();result['renderer']=info;return result
+    result=summarize(folder,case);result['actual_math']=(folder/'named-math.txt').read_text().strip();result['renderer']=info
+    result['orbital_anomaly_draws']=inspect_anomaly_draws(rows(folder/'instrument-text.csv'));return result
 
 def run(a):
     # Match the accepted original cockpit reference's actual Mesa selection.
@@ -47,7 +64,7 @@ def run(a):
     finally:save()
     # Normal concise CI test output only. Full runtime/SDK/provider/trace archives
     # are intentionally absent from this workflow; accepted pins stay unchanged.
-    compact=dict(status=report['status'],application_source=report['application_source'],configuration=a.configuration,math_profile=a.math_profile,actual_processes=4,cases={name:value['runs'][0] for name,value in report['cases'].items()},native_admission_qualified=False,phase6_complete=False)
+    compact=dict(status=report['status'],application_source=report['application_source'],configuration=a.configuration,math_profile=a.math_profile,actual_processes=4,cases={name:value['runs'][0] for name,value in report['cases'].items()},orbital_anomaly_repeat_inspections={name:[r['orbital_anomaly_draws'] for r in value['runs']] for name,value in report['cases'].items()},native_admission_qualified=False,phase6_complete=False)
     print('ORIGINAL_NAMED_SCENE_DIAGNOSTIC='+json.dumps(compact,sort_keys=True),flush=True)
 if __name__=='__main__':
     p=argparse.ArgumentParser(description=__doc__)
