@@ -11,8 +11,9 @@ source/header files at `f725194209634f7fd5d1d44d426cfa9b5e303e37`: nine runtime
 files and two unchanged Windows configuration-tool files. It also checks all
 nine original meshes/class configurations. The port uses explicit SDK scalar,
 message, rectangle and text adapters, existing native UI services, and checked
-native factory entry points. The original orbiter-to-tank-to-booster C++ library
-dependency chain is retained. Each module exports its own checked bootstrap.
+native factory entry points. Each class retains its own checked SDK bootstrap module. Their original C++
+implementations share a private library, so the tank's checked Atlantis casts
+resolve the orbiter's real RTTI under UBSan without a circular library dependency.
 
 The payload-bay UI and ascent autopilot retain their original ImGui and ImPlot
 implementations. The native cockpit now owns the same ImPlot creation/destruction
@@ -29,11 +30,16 @@ with only explicit context, export and fixed-width bindings.
 
 The prototype Release build at
 `out/phase6-atlantis-candidate-Release-v1-engine` passes compilation and linkage
-with no undefined symbols. Its three exported factories and actual shared-library
+with no undefined symbols. Its three exported factories and initial shared-library
 dependencies were inspected; the report is
 `out/phase6-atlantis-candidate-Release-v1-build/verification.json`.
 Initial compile/link failures remain in that build's separate attempt logs.
-This prototype has not supplied runtime acceptance evidence.
+This prototype has not supplied runtime acceptance evidence. A fresh normal
+package compiled successfully; the first sanitizer link exposed the cross-library
+RTTI dependency described above. Failed build reports and separate attempt logs
+remain retained, including a source-guard key-set bookkeeping failure and a
+ptrace-incompatible sanitizer mesh-compiler launch. Fresh qualified builds must
+check the full owning-source and dependency input sets outside ptrace.
 
 The [complete remaining-stock Windows reference](../../Tests/Production/RemainingStock/README.md)
 is measuring all 38 unchanged complete scenes in four profiles. Its corrected
@@ -55,3 +61,19 @@ orbiter/booster/tank cleanup under sanitizers; physical cockpit and payload-bay,
 RMS, ascent-MFD/autopilot controls; save/reload; rejection controls; and the current
 four-profile hosted matrix. The wider Phase 6 module, hardware, input and
 performance gates remain open, including the unavailable physical controller.
+
+`Tests/Production/Atlantis/stage_assets.py` extends a retained native resource
+tree with all remaining vessel families at their original installed paths. The
+staged tree verifies 38 complete scenes, 19 class configurations and all 36
+recording files, preserves the original final stock-data texture overlay, and
+checks that its base remains unchanged. Local output
+`out/phase6-remaining-vessels-resources-v2` contains 1,102 files with 79 vessel
+resource entries. Asset availability remains separate from implementation and
+runtime qualification.
+
+The shared-implementation sanitizer prototype now links successfully.
+`Tests/Production/Atlantis/Bootstrap.Test.cpp` completed 60 real module
+load/version/identity/missing-host/unload cycles with ASan/UBSan, leak detection
+and no suppressions. The exact local invocation and result are retained in
+`out/phase6-atlantis-shared-runtime-bootstrap-v1/verification.json`. This probes
+SDK library lifetime and does not instantiate a vessel or qualify simulation.

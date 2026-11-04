@@ -9,6 +9,6 @@ const OrbiterNativeModuleDescriptor srbModule={
 };
 }
 extern "C" ORBITER_NATIVE_EXPORT const OrbiterNativeModuleDescriptor* ORBITER_NATIVE_CALL
-OrbiterNativeQuery(std::uint32_t version) noexcept {
+OrbiterNativeAtlantisSrbQuery(std::uint32_t version) noexcept {
     return version==ORBITER_NATIVE_BOOTSTRAP_VERSION?&srbModule:nullptr;
 }

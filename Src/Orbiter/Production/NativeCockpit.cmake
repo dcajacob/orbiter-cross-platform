@@ -131,8 +131,8 @@ target_link_options(native_shuttle_a_payload PRIVATE -Wl,--no-undefined)
 set_target_properties(native_shuttle_a_payload PROPERTIES PREFIX "" OUTPUT_NAME ShuttleA_PL
     LIBRARY_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/NativeModules/Vessel")
 
-# Preserve the original Atlantis -> external tank -> booster C++ dependency
-# chain; each vessel still enters through the checked native SDK factory.
+# The original orbiter, external tank and booster keep separate checked SDK
+# factories over their shared cross-referencing C++ implementation.
 set(_atlantis_source "${CMAKE_CURRENT_LIST_DIR}/../../Vessel/Atlantis")
 set(_atlantis_header_dir "${PROJECT_BINARY_DIR}/native-atlantis-include")
 file(MAKE_DIRECTORY "${_atlantis_header_dir}" "${_atlantis_header_dir}/srb")
@@ -145,27 +145,32 @@ add_custom_command(OUTPUT "${_atlantis_header_dir}/meshres_vc.h"
 add_custom_command(OUTPUT "${_atlantis_header_dir}/srb/meshres.h"
     COMMAND meshc /I "${_atlantis_source}/Atlantis_SRB/Meshes/Atlantis_SRB.msh" /P - /O "${_atlantis_header_dir}/srb/meshres.h"
     DEPENDS meshc "${_atlantis_source}/Atlantis_SRB/Meshes/Atlantis_SRB.msh" VERBATIM)
-add_library(native_atlantis_srb SHARED "${_atlantis_header_dir}/srb/meshres.h"
-    "${_atlantis_source}/Atlantis_SRB/Atlantis_SRB.cpp" "${_atlantis_source}/Common.cpp")
-target_include_directories(native_atlantis_srb PRIVATE "${_atlantis_header_dir}/srb" "${_atlantis_source}/Atlantis")
-target_link_libraries(native_atlantis_srb PRIVATE orbiter_production_vessels)
-add_library(native_atlantis_tank SHARED "${_atlantis_source}/Atlantis_Tank/Atlantis_Tank.cpp")
-target_include_directories(native_atlantis_tank PRIVATE "${_atlantis_source}/Atlantis")
-target_link_libraries(native_atlantis_tank PRIVATE native_atlantis_srb orbiter_production_vessels)
-add_library(native_atlantis MODULE "${_atlantis_header_dir}/meshres.h" "${_atlantis_header_dir}/meshres_vc.h"
+# A single implementation owns the mutually referring polymorphic classes.
+# In particular, UBSan's checked Atlantis casts in the tank need the orbiter's
+# real RTTI. Keep that check and give each SDK class its own bootstrap module.
+add_library(native_atlantis_runtime SHARED
+    "${_atlantis_header_dir}/meshres.h" "${_atlantis_header_dir}/meshres_vc.h"
+    "${_atlantis_header_dir}/srb/meshres.h"
     "${_atlantis_source}/Atlantis/Atlantis.cpp" "${_atlantis_source}/Atlantis/AscentAP.cpp"
-    "${_atlantis_source}/Atlantis/PlBayOp.cpp" "${_atlantis_source}/Common.cpp")
-target_include_directories(native_atlantis PRIVATE "${_atlantis_header_dir}" "${_atlantis_source}/Atlantis"
+    "${_atlantis_source}/Atlantis/PlBayOp.cpp" "${_atlantis_source}/Common.cpp"
+    "${_atlantis_source}/Atlantis_Tank/Atlantis_Tank.cpp"
+    "${_atlantis_source}/Atlantis_SRB/Atlantis_SRB.cpp")
+target_include_directories(native_atlantis_runtime PRIVATE "${_atlantis_header_dir}" "${_atlantis_source}/Atlantis"
     "${native_imgui_SOURCE_DIR}" "${native_implot_SOURCE_DIR}")
-target_link_libraries(native_atlantis PRIVATE native_atlantis_tank orbiter_production_vessels)
-foreach(_atlantis_part IN ITEMS native_atlantis native_atlantis_tank native_atlantis_srb)
-    target_link_options(${_atlantis_part} PRIVATE -Wl,--no-undefined)
-    set_target_properties(${_atlantis_part} PROPERTIES PREFIX ""
+target_link_libraries(native_atlantis_runtime PRIVATE orbiter_production_vessels)
+target_link_options(native_atlantis_runtime PRIVATE -Wl,--no-undefined)
+set_target_properties(native_atlantis_runtime PROPERTIES OUTPUT_NAME orbiter_native_atlantis BUILD_RPATH_USE_ORIGIN TRUE)
+function(native_atlantis_entry target output query)
+    add_library(${target} MODULE "${_atlantis_source}/NativeAtlantisEntry.cpp")
+    target_compile_definitions(${target} PRIVATE ATLANTIS_NATIVE_QUERY=${query})
+    target_link_libraries(${target} PRIVATE native_atlantis_runtime orbiter_production_vessels)
+    target_link_options(${target} PRIVATE -Wl,--no-undefined)
+    set_target_properties(${target} PROPERTIES PREFIX "" OUTPUT_NAME ${output}
         LIBRARY_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/NativeModules/Vessel" BUILD_RPATH_USE_ORIGIN TRUE)
-endforeach()
-set_target_properties(native_atlantis PROPERTIES OUTPUT_NAME Atlantis)
-set_target_properties(native_atlantis_tank PROPERTIES OUTPUT_NAME Atlantis_Tank)
-set_target_properties(native_atlantis_srb PROPERTIES OUTPUT_NAME Atlantis_SRB)
+endfunction()
+native_atlantis_entry(native_atlantis Atlantis OrbiterNativeAtlantisQuery)
+native_atlantis_entry(native_atlantis_tank Atlantis_Tank OrbiterNativeAtlantisTankQuery)
+native_atlantis_entry(native_atlantis_srb Atlantis_SRB OrbiterNativeAtlantisSrbQuery)
 
 add_library(native_lua_inline_list OBJECT ../../Module/LuaScript/LuaInline/LuaInline.cpp)
 target_include_directories(native_lua_inline_list PRIVATE "${CMAKE_CURRENT_LIST_DIR}/../../Module/LuaScript/LuaInterpreter")

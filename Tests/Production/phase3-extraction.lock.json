@@ -1305,7 +1305,7 @@
     },
     "Src/Orbiter/Production/NativeCockpit.cmake": {
       "original_sha256_lf": null,
-      "sha256_lf": "877d39394b13b5f69cf76c25e037ddbc138cdfe518927f827e1df7e9e211b846"
+      "sha256_lf": "768ba17a4f14acc9a1cbfd3a58c71ad3a84cde59ac243717d4b8853304acaeb0"
     },
     "Src/Orbiter/Production/NativeCockpitGui.cpp": {
       "original_sha256_lf": null,
@@ -2009,7 +2009,7 @@
     },
     "Src/Vessel/Atlantis/Atlantis/NativeAtlantisFactory.inc": {
       "original_sha256_lf": null,
-      "sha256_lf": "22f1a8c43d2c60f0ae3a9993595c6b3b94257733c9c92dcce0d133be5f6a5d89",
+      "sha256_lf": "d3fc010ec2949a23a0c32ff27306058d181a828f6783a71be71ce9eb0b9e7018",
       "scope": "Original Atlantis source portability through explicit SDK spellings, UI service imports and checked native factories; exact source conservation required. Native class admission, matched runtime and interaction qualification remain pending."
     },
     "Src/Vessel/Atlantis/Atlantis/PlBayOp.cpp": {
@@ -2029,7 +2029,7 @@
     },
     "Src/Vessel/Atlantis/Atlantis_SRB/NativeAtlantisSrbFactory.inc": {
       "original_sha256_lf": null,
-      "sha256_lf": "64d4d04e8fcc767343c530a5177abd6ec5308d27d0fb9417b9ca148167ff0020",
+      "sha256_lf": "a334159d885262da6264a7c2add4e2eb6586b5d917587dc4aac5ab8d44cc1e0e",
       "scope": "Original Atlantis source portability through explicit SDK spellings, UI service imports and checked native factories; exact source conservation required. Native class admission, matched runtime and interaction qualification remain pending."
     },
     "Src/Vessel/Atlantis/Atlantis_Tank/Atlantis_Tank.cpp": {
@@ -2039,7 +2039,7 @@
     },
     "Src/Vessel/Atlantis/Atlantis_Tank/NativeAtlantisTankFactory.inc": {
       "original_sha256_lf": null,
-      "sha256_lf": "f9a22e12f5d32e8a4e881a841d0e106580de495f947e4f75a3f954e418f8a824",
+      "sha256_lf": "1e6b32335b38a644b34185b1634c5cc8148789eca277654d7decb4ef12bfe56b",
       "scope": "Original Atlantis source portability through explicit SDK spellings, UI service imports and checked native factories; exact source conservation required. Native class admission, matched runtime and interaction qualification remain pending."
     },
     "Src/Vessel/Atlantis/Common.cpp": {
@@ -2091,6 +2091,11 @@
       "original_sha256_lf": "b036791776181e1f6e7f40df5ae984f86ca7fa8e6135453339a76ea1628e11b9",
       "sha256_lf": "b036791776181e1f6e7f40df5ae984f86ca7fa8e6135453339a76ea1628e11b9",
       "scope": "Unchanged original Atlantis mesh/configuration input; source audit and native SDK build fingerprint include it."
+    },
+    "Src/Vessel/Atlantis/NativeAtlantisEntry.cpp": {
+      "original_sha256_lf": null,
+      "scope": "Thin native SDK bootstrap entry for an original Atlantis class; real factories and cross-referencing polymorphic implementations share one private runtime to retain sanitizer RTTI checks.",
+      "sha256_lf": "8b7fd98348f5409d4f012ef45acd12671dbf6113c21daa0f1e61bb23f915248a"
     }
   }
 }
