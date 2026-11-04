@@ -10,15 +10,27 @@ if(ORBITER_NATIVE_UI_ARCHIVE)
 endif()
 FetchContent_Declare(native_imgui URL "${_ui_url}" URL_HASH "SHA256=${_ui_hash}" DOWNLOAD_EXTRACT_TIMESTAMP TRUE SOURCE_SUBDIR no-build)
 FetchContent_MakeAvailable(native_imgui)
+set(ORBITER_NATIVE_PLOT_ARCHIVE "" CACHE FILEPATH "Verified original ImPlot archive (offline builds)")
+string(JSON _plot_hash GET "${_ui_lock}" implot sha256)
+string(JSON _plot_url GET "${_ui_lock}" implot url)
+if(ORBITER_NATIVE_PLOT_ARCHIVE)
+    set(_plot_url "${ORBITER_NATIVE_PLOT_ARCHIVE}")
+endif()
+FetchContent_Declare(native_implot URL "${_plot_url}" URL_HASH "SHA256=${_plot_hash}"
+    DOWNLOAD_EXTRACT_TIMESTAMP TRUE SOURCE_SUBDIR no-build)
+FetchContent_MakeAvailable(native_implot)
 target_sources(orbiter_production_vessels PRIVATE
     NativeAnnotations.cpp NativeScript.cpp NativeInterpreterSdk.cpp NativeHelp.cpp NativeCockpitProjection.cpp NativeCockpitMfd.cpp NativeCockpitGui.cpp NativeCameraMouse.cpp ../MenuInfoBar.cpp ../DlgFocus.cpp ../DlgMenuCfg.cpp ../DlgTacc.cpp ../DlgCamera.cpp ../DlgInfo.cpp ../DlgMap.cpp ../DlgOptions.cpp ../DlgFunction.cpp ../DlgRecorder.cpp ../PlaybackEd.cpp NativeCockpitCommands.cpp NativeCockpitVessel.cpp ../CockpitSdk.cpp ../Astro.cpp
     ../Pane.cpp ../hud.cpp ../Defpanel.cpp ../Panel2D.cpp ../VCockpit.cpp ../Select.cpp
     ../Mfd.cpp ../MfdUser.cpp ../VectorMap.cpp ../MfdOrbit.cpp ../MfdSurface.cpp ../MfdMap.cpp ../MfdHsi.cpp
     ../MfdLanding.cpp ../MfdDocking.cpp ../MfdAlign.cpp ../MfdSync.cpp ../MfdTransfer.cpp ../MfdComms.cpp
     "${native_imgui_SOURCE_DIR}/imgui.cpp" "${native_imgui_SOURCE_DIR}/imgui_draw.cpp"
-    "${native_imgui_SOURCE_DIR}/imgui_tables.cpp" "${native_imgui_SOURCE_DIR}/imgui_widgets.cpp")
-target_include_directories(orbiter_production_vessels PRIVATE "${native_imgui_SOURCE_DIR}")
+    "${native_imgui_SOURCE_DIR}/imgui_tables.cpp" "${native_imgui_SOURCE_DIR}/imgui_widgets.cpp"
+    "${native_implot_SOURCE_DIR}/implot.cpp" "${native_implot_SOURCE_DIR}/implot_items.cpp")
+target_include_directories(orbiter_production_vessels PRIVATE "${native_imgui_SOURCE_DIR}" "${native_implot_SOURCE_DIR}")
 target_compile_definitions(orbiter_production_vessels PUBLIC ORBITER_NATIVE_COCKPIT)
+file(MAKE_DIRECTORY "${PROJECT_BINARY_DIR}/NativeModules/Licenses")
+configure_file("${native_implot_SOURCE_DIR}/LICENSE" "${PROJECT_BINARY_DIR}/NativeModules/Licenses/implot-LICENSE.txt" COPYONLY)
 
 # Stock DG sources refer to meshc-generated group IDs in all four meshes.
 add_subdirectory("${CMAKE_CURRENT_LIST_DIR}/../../../Utils/meshc" "${PROJECT_BINARY_DIR}/meshc-native")
@@ -118,6 +130,42 @@ target_link_libraries(native_shuttle_a_payload PRIVATE orbiter_production_vessel
 target_link_options(native_shuttle_a_payload PRIVATE -Wl,--no-undefined)
 set_target_properties(native_shuttle_a_payload PROPERTIES PREFIX "" OUTPUT_NAME ShuttleA_PL
     LIBRARY_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/NativeModules/Vessel")
+
+# Preserve the original Atlantis -> external tank -> booster C++ dependency
+# chain; each vessel still enters through the checked native SDK factory.
+set(_atlantis_source "${CMAKE_CURRENT_LIST_DIR}/../../Vessel/Atlantis")
+set(_atlantis_header_dir "${PROJECT_BINARY_DIR}/native-atlantis-include")
+file(MAKE_DIRECTORY "${_atlantis_header_dir}" "${_atlantis_header_dir}/srb")
+add_custom_command(OUTPUT "${_atlantis_header_dir}/meshres.h"
+    COMMAND meshc /I "${_atlantis_source}/Atlantis/Meshes/Atlantis.msh" /P - /O "${_atlantis_header_dir}/meshres.h"
+    DEPENDS meshc "${_atlantis_source}/Atlantis/Meshes/Atlantis.msh" VERBATIM)
+add_custom_command(OUTPUT "${_atlantis_header_dir}/meshres_vc.h"
+    COMMAND meshc /I "${_atlantis_source}/Atlantis/Meshes/AtlantisVC.msh" /P _VC /O "${_atlantis_header_dir}/meshres_vc.h"
+    DEPENDS meshc "${_atlantis_source}/Atlantis/Meshes/AtlantisVC.msh" VERBATIM)
+add_custom_command(OUTPUT "${_atlantis_header_dir}/srb/meshres.h"
+    COMMAND meshc /I "${_atlantis_source}/Atlantis_SRB/Meshes/Atlantis_SRB.msh" /P - /O "${_atlantis_header_dir}/srb/meshres.h"
+    DEPENDS meshc "${_atlantis_source}/Atlantis_SRB/Meshes/Atlantis_SRB.msh" VERBATIM)
+add_library(native_atlantis_srb SHARED "${_atlantis_header_dir}/srb/meshres.h"
+    "${_atlantis_source}/Atlantis_SRB/Atlantis_SRB.cpp" "${_atlantis_source}/Common.cpp")
+target_include_directories(native_atlantis_srb PRIVATE "${_atlantis_header_dir}/srb" "${_atlantis_source}/Atlantis")
+target_link_libraries(native_atlantis_srb PRIVATE orbiter_production_vessels)
+add_library(native_atlantis_tank SHARED "${_atlantis_source}/Atlantis_Tank/Atlantis_Tank.cpp")
+target_include_directories(native_atlantis_tank PRIVATE "${_atlantis_source}/Atlantis")
+target_link_libraries(native_atlantis_tank PRIVATE native_atlantis_srb orbiter_production_vessels)
+add_library(native_atlantis MODULE "${_atlantis_header_dir}/meshres.h" "${_atlantis_header_dir}/meshres_vc.h"
+    "${_atlantis_source}/Atlantis/Atlantis.cpp" "${_atlantis_source}/Atlantis/AscentAP.cpp"
+    "${_atlantis_source}/Atlantis/PlBayOp.cpp" "${_atlantis_source}/Common.cpp")
+target_include_directories(native_atlantis PRIVATE "${_atlantis_header_dir}" "${_atlantis_source}/Atlantis"
+    "${native_imgui_SOURCE_DIR}" "${native_implot_SOURCE_DIR}")
+target_link_libraries(native_atlantis PRIVATE native_atlantis_tank orbiter_production_vessels)
+foreach(_atlantis_part IN ITEMS native_atlantis native_atlantis_tank native_atlantis_srb)
+    target_link_options(${_atlantis_part} PRIVATE -Wl,--no-undefined)
+    set_target_properties(${_atlantis_part} PROPERTIES PREFIX ""
+        LIBRARY_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/NativeModules/Vessel" BUILD_RPATH_USE_ORIGIN TRUE)
+endforeach()
+set_target_properties(native_atlantis PROPERTIES OUTPUT_NAME Atlantis)
+set_target_properties(native_atlantis_tank PROPERTIES OUTPUT_NAME Atlantis_Tank)
+set_target_properties(native_atlantis_srb PROPERTIES OUTPUT_NAME Atlantis_SRB)
 
 add_library(native_lua_inline_list OBJECT ../../Module/LuaScript/LuaInline/LuaInline.cpp)
 target_include_directories(native_lua_inline_list PRIVATE "${CMAKE_CURRENT_LIST_DIR}/../../Module/LuaScript/LuaInterpreter")

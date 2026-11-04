@@ -14,7 +14,11 @@
 #include "Atlantis.h"
 #include "AscentAP.h"
 #include "IconsFontAwesome6.h"
+#ifdef _WIN32
 #include "imgui_extras.h"
+#else
+#include "Production/CockpitGuiExports.h"
+#endif
 #include "implot.h"
 
 #define NDATA 256
@@ -535,11 +539,11 @@ void AscentAP::SaveState (FILEHANDLE scn)
 
 bool AscentAP::ParseScenarioLine (const char *line)
 {
-	if (!_strnicmp(line, "MET ", 4)) {
+	if (!atlantis::ComparePrefix(line, "MET ", 4)) {
 		sscanf(line+4, "%lf%lf%lf%lf", &met, &met_meco, &met_oms_start, &met_oms_end);
 		t_launch = oapiGetSimTime()-met;
 		return true;
-	} else if (!_strnicmp(line, "ASCENTAP", 8)) {
+	} else if (!atlantis::ComparePrefix(line, "ASCENTAP", 8)) {
 		int i1, i2, i3;
 		sscanf(line+9, "%d%d%d%lf%lf%lf%lf", &i1, &i2, &i3, &tgt_alt, &launch_azimuth, &launch_lng, &launch_lat);
 		active = (bool)i1;
@@ -619,13 +623,13 @@ void AscentAP::OnDraw()
 // class AscentApMfd: MFD interface for ascent autopilot
 // ==============================================================
 
-AscentApMfd::AscentApMfd (DWORD w, DWORD h, VESSEL *v)
+AscentApMfd::AscentApMfd (oapi::UInt32 w, oapi::UInt32 h, VESSEL *v)
 : MFD2 (w, h, v)
 {
 	ap = ((Atlantis*)v)->AscentAutopilot();
 	ap->SetLaunchAzimuth (ap->GetLaunchAzimuth());
 	cpg = 0;
-	pen[0] = oapiCreatePen(1, 1, RGB(96,96,96));
+	pen[0] = oapiCreatePen(1, 1, 0x00606060);
 }
 
 // --------------------------------------------------------------
@@ -853,7 +857,7 @@ int AscentApMfd::ButtonMenu (const MFDBUTTONMENU **menu) const
 
 // --------------------------------------------------------------
 
-bool AscentApMfd::ConsumeKeyBuffered (DWORD key)
+bool AscentApMfd::ConsumeKeyBuffered (oapi::UInt32 key)
 {
 	switch (key) {
 	case OAPI_KEY_L:
@@ -893,20 +897,20 @@ bool AscentApMfd::ConsumeButton (int bt, int event)
 {
 	if (!bt) {
 		if (event & PANEL_MOUSE_LBDOWN) {
-			DWORD btkey = (ap->Active() ? OAPI_KEY_D : ap->GetVessel()->status == 0 ? OAPI_KEY_L : OAPI_KEY_E);
+			oapi::UInt32 btkey = (ap->Active() ? OAPI_KEY_D : ap->GetVessel()->status == 0 ? OAPI_KEY_L : OAPI_KEY_E);
 			return ConsumeKeyBuffered (btkey);
 		}
 	}
 
 	if (bt < 3) {
 		if (event & PANEL_MOUSE_LBDOWN) {
-			static const DWORD btkey[2] = {OAPI_KEY_COMMA, OAPI_KEY_PERIOD};
+			static const oapi::UInt32 btkey[2] = {OAPI_KEY_COMMA, OAPI_KEY_PERIOD};
 			return ConsumeKeyBuffered (btkey[bt-1]);
 		}
 	}
 
 	if (bt < 8 && cpg == 0 && !ap->Active() && ap->GetVessel()->status == 0) {
-		static const DWORD btkey[5] = {OAPI_KEY_SEMICOLON, OAPI_KEY_APOSTROPHE, OAPI_KEY_MINUS, OAPI_KEY_EQUALS, OAPI_KEY_O};
+		static const oapi::UInt32 btkey[5] = {OAPI_KEY_SEMICOLON, OAPI_KEY_APOSTROPHE, OAPI_KEY_MINUS, OAPI_KEY_EQUALS, OAPI_KEY_O};
 		if (event & PANEL_MOUSE_LBDOWN) {
 			return ConsumeKeyBuffered(btkey[bt-3]);
 		} else if (event & PANEL_MOUSE_LBUP) {
@@ -931,7 +935,7 @@ bool AscentApMfd::ConsumeButton (int bt, int event)
 
 void AscentApMfd::DecPage ()
 {
-	const DWORD npage = 4;
+	const oapi::UInt32 npage = 4;
 	cpg = (cpg == 0 ? npage-3 : cpg-1);
 	InvalidateButtons();
 	InvalidateDisplay();
@@ -941,7 +945,7 @@ void AscentApMfd::DecPage ()
 
 void AscentApMfd::IncPage ()
 {
-	const DWORD npage = 4;
+	const oapi::UInt32 npage = 4;
 	cpg = (cpg == npage-1 ? 0 : cpg+1);
 	InvalidateButtons();
 	InvalidateDisplay();
@@ -1100,11 +1104,11 @@ void AscentApMfd::ToggleOMS2Schedule ()
 
 // --------------------------------------------------------------
 
-OAPI_MSGTYPE AscentApMfd::MsgProc (UINT msg, UINT mfd, WPARAM wparam, LPARAM lparam)
+oapi::CockpitMessageResult AscentApMfd::MsgProc (oapi::UInt msg, oapi::UInt mfd, oapi::CockpitUnsignedParam wparam, oapi::CockpitSignedParam lparam)
 {
 	switch (msg) {
 	case OAPI_MSG_MFD_OPENED:
-		return (OAPI_MSGTYPE)(new AscentApMfd (LOWORD(wparam), HIWORD(wparam), (VESSEL*)lparam));
+		return (oapi::CockpitMessageResult)(new AscentApMfd (atlantis::LowWord(wparam), atlantis::HighWord(wparam), (VESSEL*)lparam));
 	}
 	return 0;
 }

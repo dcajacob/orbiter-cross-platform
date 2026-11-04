@@ -78,6 +78,13 @@ if(ORBITER_BUILD_NATIVE_VESSELS)
         FlightControls.cpp ../Keymap.cpp NativeApplication.cpp CockpitFovInput.inc NativeRenderApi.cpp NativeParticle.cpp NativeVesselObservation.cpp NativeObservation/ApplicationObservation.h ../CelSphereAPI.cpp ../DrawAPI.cpp ../Camera.cpp ../CameraControl.cpp NativeCameraProjection.cpp NativeVessels.cmake ../../Vessel/ShuttlePB/ShuttlePB.cpp ../../Vessel/ShuttlePB/NativeShuttlePBFactory.inc)
 endif()
 if(ORBITER_BUILD_NATIVE_COCKPIT)
+    file(GLOB_RECURSE _atlantis_sources CONFIGURE_DEPENDS
+        "${CMAKE_CURRENT_SOURCE_DIR}/../../Vessel/Atlantis/*.cpp"
+        "${CMAKE_CURRENT_SOURCE_DIR}/../../Vessel/Atlantis/*.h"
+        "${CMAKE_CURRENT_SOURCE_DIR}/../../Vessel/Atlantis/*.inc"
+        "${CMAKE_CURRENT_SOURCE_DIR}/../../Vessel/Atlantis/*.msh"
+        "${CMAKE_CURRENT_SOURCE_DIR}/../../Vessel/Atlantis/*.cfg")
+    list(APPEND _native_sources ${_atlantis_sources})
     file(GLOB _shuttle_a_sources CONFIGURE_DEPENDS
         "${CMAKE_CURRENT_SOURCE_DIR}/../../Vessel/ShuttleA/*.cpp"
         "${CMAKE_CURRENT_SOURCE_DIR}/../../Vessel/ShuttleA/*.h"

@@ -242,3 +242,7 @@ DLLCLBK void ovcExit (VESSEL *vessel)
 {
 	if (vessel) delete (Atlantis_Tank*)vessel;
 }
+
+#ifndef _WIN32
+#include "NativeAtlantisTankFactory.inc"
+#endif

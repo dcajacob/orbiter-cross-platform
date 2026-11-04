@@ -468,6 +468,33 @@ int oapiSetMaterial (DEVMESHHANDLE hMesh, oapi::UInt32 matidx, const MATERIAL *m
 	return GetNativeRenderContext().showGrapple;
 }
 
+void oapiSetShowGrapplePoints (bool show)
+{
+	GetNativeRenderContext().showGrapple = show;
+}
+
+bool oapiGetSurfaceSize(SURFHANDLE hSrf, int *width, int *height)
+{
+	auto* gc = GetNativeRenderContext().graphics;
+	return (gc ? gc->clbkGetSurfaceSize(hSrf, (oapi::UInt32*)width, (oapi::UInt32*)height) : false);
+}
+
+void WriteScenario_state (FILEHANDLE f, char *tag, const AnimState &s)
+{
+	char cbuf[256];
+	sprintf (cbuf, "%d %0.4f", s.action-1, s.pos);
+	oapiWriteScenario_string (f, tag, cbuf);
+}
+
+void sscan_state (char *str, AnimState &s)
+{
+	int a;
+	double p;
+	sscanf (str, "%d%lf", &a, &p);
+	s.action = (AnimState::Action)(a+1);
+	s.pos = p;
+}
+
  double oapiGetSimStep ()
 {
 	return GetNativeRenderContext().time->SimDT;

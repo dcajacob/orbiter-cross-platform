@@ -384,16 +384,16 @@ void PayloadBayOp::RevertKuAntennaAction ()
 
 bool PayloadBayOp::ParseScenarioLine (char *line)
 {
-	if (!_strnicmp (line, "CARGODOOR", 9)) {
+	if (!atlantis::ComparePrefix (line, "CARGODOOR", 9)) {
 		sscan_state (line+9, BayDoorStatus);
 		return true;
-	} else if (!_strnicmp (line, "RADIATOR", 8)) {
+	} else if (!atlantis::ComparePrefix (line, "RADIATOR", 8)) {
 		sscan_state (line+8, RadiatorStatus);
 		return true;
-	} else if (!_strnicmp (line, "RADLATCH", 8)) {
+	} else if (!atlantis::ComparePrefix (line, "RADLATCH", 8)) {
 		sscan_state (line+8, RadLatchStatus);
 		return true;
-	} else if (!_strnicmp (line, "KUBAND", 6)) {
+	} else if (!atlantis::ComparePrefix (line, "KUBAND", 6)) {
 		sscan_state (line+6, KuAntennaStatus);
 		return true;
 	}
@@ -416,7 +416,7 @@ void PayloadBayOp::SaveState (FILEHANDLE scn)
 
 // ==============================================================
 
-void PayloadBayOp::DefineAnimations (UINT vcidx)
+void PayloadBayOp::DefineAnimations (oapi::UInt vcidx)
 {
 	static VECTOR3 switch_rot = {0,0,1};
 	static VECTOR3 switch_row1 = {1.3068,2.1991,12.7983};
@@ -424,67 +424,67 @@ void PayloadBayOp::DefineAnimations (UINT vcidx)
 	static VECTOR3 switch_row3 = {1.1244,2.0794,12.7983};
 
 	// Animations for switches on panel R13L in the VC
-	static UINT VC_R13L_S1_Grp = GRP_SwitchR13L_1_VC;
+	static oapi::UInt VC_R13L_S1_Grp = GRP_SwitchR13L_1_VC;
 	static MGROUP_ROTATE VC_R13L_S1 (vcidx, &VC_R13L_S1_Grp, 1,
 		switch_row1, switch_rot, (float)(90.0*RAD));
 	anim_VC_R13L[0] = sts->CreateAnimation (0.5);
 	sts->AddAnimationComponent (anim_VC_R13L[0], 0, 1, &VC_R13L_S1);
 
-	static UINT VC_R13L_S2_Grp = GRP_SwitchR13L_2_VC;
+	static oapi::UInt VC_R13L_S2_Grp = GRP_SwitchR13L_2_VC;
 	static MGROUP_ROTATE VC_R13L_S2 (vcidx, &VC_R13L_S2_Grp, 1,
 		switch_row1, switch_rot, (float)(90.0*RAD));
 	anim_VC_R13L[1] = sts->CreateAnimation (0.5);
 	sts->AddAnimationComponent (anim_VC_R13L[1], 0, 1, &VC_R13L_S2);
 
-	static UINT VC_R13L_S3_Grp = GRP_SwitchR13L_3_VC;
+	static oapi::UInt VC_R13L_S3_Grp = GRP_SwitchR13L_3_VC;
 	static MGROUP_ROTATE VC_R13L_S3 (vcidx, &VC_R13L_S3_Grp, 1,
 		switch_row1, switch_rot, (float)(90.0*RAD));
 	anim_VC_R13L[2] = sts->CreateAnimation (0.5);
 	sts->AddAnimationComponent (anim_VC_R13L[2], 0, 1, &VC_R13L_S3);
 
-	static UINT VC_R13L_S4_Grp = GRP_SwitchR13L_4_VC;
+	static oapi::UInt VC_R13L_S4_Grp = GRP_SwitchR13L_4_VC;
 	static MGROUP_ROTATE VC_R13L_S4 (vcidx, &VC_R13L_S4_Grp, 1,
 		switch_row1, switch_rot, (float)(90.0*RAD));
 	anim_VC_R13L[3] = sts->CreateAnimation (0.5);
 	sts->AddAnimationComponent (anim_VC_R13L[3], 0, 1, &VC_R13L_S4);
 
-	static UINT VC_R13L_S5_Grp = GRP_SwitchR13L_5_VC;
+	static oapi::UInt VC_R13L_S5_Grp = GRP_SwitchR13L_5_VC;
 	static MGROUP_ROTATE VC_R13L_S5 (vcidx, &VC_R13L_S5_Grp, 1,
 		switch_row2, switch_rot, (float)(90.0*RAD));
 	anim_VC_R13L[4] = sts->CreateAnimation (0.5);
 	sts->AddAnimationComponent (anim_VC_R13L[4], 0, 1, &VC_R13L_S5);
 
-	static UINT VC_R13L_S6_Grp = GRP_SwitchR13L_6_VC;
+	static oapi::UInt VC_R13L_S6_Grp = GRP_SwitchR13L_6_VC;
 	static MGROUP_ROTATE VC_R13L_S6 (vcidx, &VC_R13L_S6_Grp, 1,
 		switch_row2, switch_rot, (float)(90.0*RAD));
 	anim_VC_R13L[5] = sts->CreateAnimation (0.5);
 	sts->AddAnimationComponent (anim_VC_R13L[5], 0, 1, &VC_R13L_S6);
 
-	static UINT VC_R13L_S7_Grp = GRP_SwitchR13L_7_VC;
+	static oapi::UInt VC_R13L_S7_Grp = GRP_SwitchR13L_7_VC;
 	static MGROUP_ROTATE VC_R13L_S7 (vcidx, &VC_R13L_S7_Grp, 1,
 		switch_row2, switch_rot, (float)(90.0*RAD));
 	anim_VC_R13L[6] = sts->CreateAnimation (0.5);
 	sts->AddAnimationComponent (anim_VC_R13L[6], 0, 1, &VC_R13L_S7);
 
-	static UINT VC_R13L_S8_Grp = GRP_SwitchR13L_8_VC;
+	static oapi::UInt VC_R13L_S8_Grp = GRP_SwitchR13L_8_VC;
 	static MGROUP_ROTATE VC_R13L_S8 (vcidx, &VC_R13L_S8_Grp, 1,
 		switch_row2, switch_rot, (float)(90.0*RAD));
 	anim_VC_R13L[7] = sts->CreateAnimation (0.5);
 	sts->AddAnimationComponent (anim_VC_R13L[7], 0, 1, &VC_R13L_S8);
 
-	static UINT VC_R13L_S9_Grp = GRP_SwitchR13L_9_VC;
+	static oapi::UInt VC_R13L_S9_Grp = GRP_SwitchR13L_9_VC;
 	static MGROUP_ROTATE VC_R13L_S9 (vcidx, &VC_R13L_S9_Grp, 1,
 		switch_row2, switch_rot, (float)(90.0*RAD));
 	anim_VC_R13L[8] = sts->CreateAnimation (0.5);
 	sts->AddAnimationComponent (anim_VC_R13L[8], 0, 1, &VC_R13L_S9);
 
-	static UINT VC_R13L_S10_Grp = GRP_SwitchR13L_10_VC;
+	static oapi::UInt VC_R13L_S10_Grp = GRP_SwitchR13L_10_VC;
 	static MGROUP_ROTATE VC_R13L_S10 (vcidx, &VC_R13L_S10_Grp, 1,
 		switch_row3, switch_rot, (float)(90.0*RAD));
 	anim_VC_R13L[9] = sts->CreateAnimation (0.5);
 	sts->AddAnimationComponent (anim_VC_R13L[9], 0, 1, &VC_R13L_S10);
 
-	static UINT VC_R13L_S11_Grp = GRP_SwitchR13L_11_VC;
+	static oapi::UInt VC_R13L_S11_Grp = GRP_SwitchR13L_11_VC;
 	static MGROUP_ROTATE VC_R13L_S11 (vcidx, &VC_R13L_S11_Grp, 1,
 		switch_row3, switch_rot, (float)(90.0*RAD));
 	anim_VC_R13L[10] = sts->CreateAnimation (0.5);

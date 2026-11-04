@@ -42,6 +42,9 @@ def verify():
     if 'Src/Vessel/ShuttleA/ShuttleA.cpp' in declared:
         from ShuttleA.source_audit import verify as verify_shuttle_a
         verify_shuttle_a()
+    if 'Src/Vessel/Atlantis/Atlantis/Atlantis.cpp' in declared:
+        from Atlantis.source_audit import verify as verify_atlantis
+        verify_atlantis()
     if 'Src/Orbiter/Production/CockpitVesselMethods.inc' in declared:
         from cockpit_runtime_source import verify as verify_cockpit_runtime
         verify_cockpit_runtime()

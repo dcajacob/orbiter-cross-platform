@@ -203,7 +203,7 @@ void Atlantis_SRB::clbkPostCreation ()
 	// find out which side of the ET we are attached to
 	OBJHANDLE hTank = GetDockStatus (GetDockHandle (0));
 	if (hTank) {
-		for (UINT i = 1; i <= 2; i++) {
+		for (oapi::UInt i = 1; i <= 2; i++) {
 			OBJHANDLE hSRB = oapiGetDockStatus (oapiGetDockHandle (hTank, i));
 			if (hSRB == GetHandle()) {
 				srbpos = (i == 1 ? SRB_LEFT : SRB_RIGHT);
@@ -221,7 +221,7 @@ void Atlantis_SRB::clbkLoadStateEx (FILEHANDLE scn, void *vs)
 	char *line;
 
 	while (oapiReadScenario_nextline (scn, line)) {
-		if (!_strnicmp (line, "MET ", 4)) {
+		if (!atlantis::ComparePrefix (line, "MET ", 4)) {
 			double met;
 			sscanf (line+4, "%lf", &met);
 			t0 = oapiGetSimTime()-met;
@@ -312,3 +312,7 @@ DLLCLBK void ovcExit (VESSEL *vessel)
 {
 	if (vessel) delete (Atlantis_SRB*)vessel;
 }
+
+#ifndef _WIN32
+#include "NativeAtlantisSrbFactory.inc"
+#endif

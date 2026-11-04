@@ -23,6 +23,8 @@ ORBITER_PRODUCTION_API void oapiCameraGlobalPos (VECTOR3 *gpos);
 ORBITER_PRODUCTION_API bool oapiCameraInternal ();
 ORBITER_PRODUCTION_API void oapiCameraSetCockpitDir(double polar, double azimuth, bool transition=false);
 ORBITER_PRODUCTION_API SURFHANDLE oapiLoadTexture(const char *fname, bool dynamic=false);
+ORBITER_PRODUCTION_API bool oapiGetSurfaceSize(SURFHANDLE surface,int* width,int* height);
+ORBITER_PRODUCTION_API int oapiSetMaterialEx(DEVMESHHANDLE mesh,oapi::UInt32 index,MatProp prop,const oapi::FVECTOR4* value);
 ORBITER_PRODUCTION_API SURFHANDLE oapiLoadSurfaceEx(const char*,oapi::UInt32,bool=false);
 ORBITER_PRODUCTION_API SURFHANDLE oapiCreateTextureSurface(int,int);
 ORBITER_PRODUCTION_API oapi::UInt32 oapiAddMeshGroup(MESHHANDLE,MESHGROUP*);
@@ -67,6 +69,7 @@ ORBITER_PRODUCTION_API const ATMCONST *oapiGetPlanetAtmConstants (OBJHANDLE hPla
 ORBITER_PRODUCTION_API void oapiGetPlanetAtmParams (OBJHANDLE hPlanet, double rad, ATMPARAM *prm);
 ORBITER_PRODUCTION_API void oapiGetRotationMatrix (OBJHANDLE hObj, MATRIX3 *mat);
 ORBITER_PRODUCTION_API bool oapiGetShowGrapplePoints ();
+ORBITER_PRODUCTION_API void oapiSetShowGrapplePoints (bool show);
 ORBITER_PRODUCTION_API double oapiGetSimStep ();
 ORBITER_PRODUCTION_API double oapiGetSimTime ();
 ORBITER_PRODUCTION_API double oapiGetSize (OBJHANDLE hObj);

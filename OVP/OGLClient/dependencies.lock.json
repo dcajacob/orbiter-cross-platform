@@ -33,5 +33,10 @@
     "url": "https://codeload.github.com/TheGondos/libnsbmp/zip/97842c873fe0907536cdb30e59bc27ba27eacb6e",
     "sha256": "0c414c85093250a744c8d2b48154015abe52f70cd2dc1278892c1af70a3cccb3",
     "bytes": 15885
+  },
+  "implot": {
+    "url": "https://codeload.github.com/epezent/implot/zip/3da8bd34299965d3b0ab124df743fe3e076fa222",
+    "sha256": "e9b439a94aa6f09fcf12ed9c2cd784efe5e99e96242122aa683e690b29f7a59f",
+    "bytes": 146571
   }
 }

@@ -39,6 +39,8 @@ struct VESSELPARAM;
 #define VMSG_LUAINSTANCE    0x0002
 OAPIFUNC void oapiOpenDialog(ImGuiDialog *dialog);
 OAPIFUNC void oapiCloseDialog(ImGuiDialog *dialog);
+OAPIFUNC SURFHANDLE oapiRegisterExhaustTexture(char *name);
+OAPIFUNC bool oapiOpenHelp(HELPCONTEXT *context);
 using CustomFunc = void (*)(void*);
 OAPIFUNC oapi::UInt32 oapiRegisterCustomCmd(char* label,char* description,CustomFunc callback,void* context);
 OAPIFUNC bool oapiUnregisterCustomCmd(int id);

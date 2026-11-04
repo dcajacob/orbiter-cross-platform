@@ -7,7 +7,11 @@
 #include "Atlantis.h"
 #define IMGUI_DEFINE_MATH_OPERATORS
 #include "imgui.h"
+#ifdef _WIN32
 #include "imgui_extras.h"
+#else
+#include "Production/CockpitGuiExports.h"
+#endif
 #include <functional>
 #include <vector>
 #include <array>
@@ -128,7 +132,7 @@ class PayloadBayOp: public ImGuiDialog {
 public:
 	PayloadBayOp (Atlantis *_sts);
 	~PayloadBayOp();
-	void DefineAnimations (UINT vcidx);
+	void DefineAnimations (oapi::UInt vcidx);
 	void RegisterVC ();
 	void UpdateVC ();
 	bool VCMouseEvent (int id, int event, VECTOR3 &p);
@@ -183,7 +187,7 @@ private:
 	int KuDirectCtrl;
 
 	// VC switch animations
-	UINT anim_VC_R13L[11];
+	oapi::UInt anim_VC_R13L[11];
 	int tkbk_state[6];
 
 	// physical status

@@ -22,6 +22,7 @@
 #include "CockpitGuiExports.h"
 #include "NativeGraphics.h"
 #include "imgui_internal.h"
+#include "implot.h"
 #include <unordered_map>
 #include <algorithm>
 #include <vector>
@@ -76,6 +77,11 @@ namespace ImGui {
 #define ORBITER_MENU_EXPORT ORBITER_PRODUCTION_API
 #include "GuiMenuButton.inc"
 #undef ORBITER_MENU_EXPORT
+    ORBITER_PRODUCTION_API void Image(SURFHANDLE surf, const ImVec2& image_size, const ImVec2& uv0, const ImVec2& uv1, const ImVec4& tint_col, const ImVec4& border_col)
+    {
+        ImTextureID tex_id = GetImTextureID(surf);
+        Image(tex_id, image_size, uv0, uv1, tint_col, border_col);
+    }
     ORBITER_PRODUCTION_API bool ImageButton(const char* id,SURFHANDLE surf,const ImVec2& size,const ImVec2& uv0,const ImVec2& uv1,const ImVec4& bg,const ImVec4& tint) {
         return ImageButton(id,GetImTextureID(surf),size,uv0,uv1,bg,tint);
     }
@@ -265,9 +271,11 @@ void OpenCockpitFocusDialog() {
 }
 void CreateCockpitGui() {
     if (ImGui::GetCurrentContext()) throw std::logic_error("A cockpit GUI context already exists");
+    if (ImPlot::GetCurrentContext()) throw std::logic_error("A cockpit plot context already exists");
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
     try {
+        ImPlot::CreateContext();
         auto& context = GetNativeRenderContext();
         auto& io = ImGui::GetIO();
         io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
@@ -364,6 +372,7 @@ void DestroyCockpitGui() {
     ImGui::g_stackHeaders.clear();
     ImGui::g_headerStates.clear();
     ImGui::g_popupStates.clear();
+    if (ImPlot::GetCurrentContext()) ImPlot::DestroyContext();
     if (ImGui::GetCurrentContext()) ImGui::DestroyContext();
 }
 void BeginCockpitGuiFrame() {

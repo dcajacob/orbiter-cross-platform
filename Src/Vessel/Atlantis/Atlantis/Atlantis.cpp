@@ -552,7 +552,7 @@ bool Atlantis::EnableSSME (bool enable)
 		else return false; // can't activate without attached ET
 	}
 
-	for (DWORD i = 0; i < 3; i++)
+	for (oapi::UInt32 i = 0; i < 3; i++)
 		SetThrusterResource (th_main[i], hProp);
 
 	if (enable) {
@@ -573,7 +573,7 @@ void Atlantis::EnableOMS (bool enable)
 {
 	PROPELLANT_HANDLE hProp = (enable ? ph_oms : NULL);
 
-	for (DWORD i = 0; i < 2; i++)
+	for (oapi::UInt32 i = 0; i < 2; i++)
 		SetThrusterResource (th_oms[i], hProp);
 
 	if (enable) {
@@ -594,7 +594,7 @@ void Atlantis::EnableRCS (int mode)
 	bool enable = (mode != RCS_NONE);
 
 	PROPELLANT_HANDLE hProp = (enable ? ph_oms : NULL);
-	DWORD i;
+	oapi::UInt32 i;
 
 	for (i = 0; i < GetGroupThrusterCount (THGROUP_ATT_PITCHUP); i++)
 		SetThrusterResource (GetGroupThruster (THGROUP_ATT_PITCHUP, i), hProp);
@@ -634,15 +634,15 @@ void Atlantis::EnableRCS (int mode)
 // --------------------------------------------------------------
 void Atlantis::DefineAnimations (void)
 {
-	UINT midx = 1; // mesh index for all external animations
-	UINT vidx = 2; // mesh index for all VC animations
+	oapi::UInt midx = 1; // mesh index for all external animations
+	oapi::UInt vidx = 2; // mesh index for all VC animations
 
 	// ***** 1. Cargo door and radiator animations *****
 
-	static UINT RCargoDoorGrp[4] = {GRP_cargodooroutR,GRP_cargodoorinR,GRP_radiatorFR,GRP_radiatorBR};
+	static oapi::UInt RCargoDoorGrp[4] = {GRP_cargodooroutR,GRP_cargodoorinR,GRP_radiatorFR,GRP_radiatorBR};
 	static MGROUP_ROTATE RCargoDoor (midx, RCargoDoorGrp, 4,
 		_V(2.88, 1.3, 0), _V(0,0,1), (float)(-175.5*RAD));
-	static UINT LCargoDoorGrp[4] = {GRP_cargodooroutL,GRP_cargodoorinL,GRP_radiatorFL,GRP_radiatorBL};
+	static oapi::UInt LCargoDoorGrp[4] = {GRP_cargodooroutL,GRP_cargodoorinL,GRP_radiatorFL,GRP_radiatorBL};
 	static MGROUP_ROTATE LCargoDoor (midx, LCargoDoorGrp, 4,
 		_V(-2.88, 1.3, 0), _V(0,0,1), (float)(175.5*RAD));
 
@@ -650,10 +650,10 @@ void Atlantis::DefineAnimations (void)
 	AddAnimationComponent (anim_door, 0.0, 0.4632, &RCargoDoor);
 	AddAnimationComponent (anim_door, 0.5368, 1.0, &LCargoDoor);
 
-	static UINT RRadiatorGrp[1] = {GRP_radiatorFR};
+	static oapi::UInt RRadiatorGrp[1] = {GRP_radiatorFR};
 	static MGROUP_ROTATE RRadiator (midx, RRadiatorGrp, 1,
 		_V(2.88, 1.3, 0), _V(0,0,1), (float)(35.5*RAD));
-	static UINT LRadiatorGrp[1] = {GRP_radiatorFL};
+	static oapi::UInt LRadiatorGrp[1] = {GRP_radiatorFL};
 	static MGROUP_ROTATE LRadiator (midx, LRadiatorGrp, 1,
 		_V(-2.88, 1.3, 0), _V(0,0,1), (float)(-35.5*RAD));
 
@@ -663,22 +663,22 @@ void Atlantis::DefineAnimations (void)
 
 	// ***** 2. Landing gear animation *****
 
-	static UINT LNosewheelDoorGrp[1] = {GRP_nosedoorL};
+	static oapi::UInt LNosewheelDoorGrp[1] = {GRP_nosedoorL};
 	static MGROUP_ROTATE LNosewheelDoor (midx, LNosewheelDoorGrp, 1,
 		_V(-0.78, -2.15, 17), _V(0, 0.195, 0.981), (float)(-60.0*RAD));
-	static UINT RNosewheelDoorGrp[1] = {GRP_nosedoorR};
+	static oapi::UInt RNosewheelDoorGrp[1] = {GRP_nosedoorR};
 	static MGROUP_ROTATE RNosewheelDoor (midx, RNosewheelDoorGrp, 1,
 		_V(0.78, -2.15, 17), _V(0, 0.195, 0.981), (float)(60.0*RAD));
-	static UINT NosewheelGrp[2] = {GRP_nosewheel,GRP_nosegear};
+	static oapi::UInt NosewheelGrp[2] = {GRP_nosewheel,GRP_nosegear};
 	static MGROUP_ROTATE Nosewheel (midx, NosewheelGrp, 2,
 		_V(0.0, -1.95, 17.45), _V(1, 0, 0), (float)(109.0*RAD));
-	static UINT RGearDoorGrp[1] = {GRP_geardoorR};
+	static oapi::UInt RGearDoorGrp[1] = {GRP_geardoorR};
 	static MGROUP_ROTATE RGearDoor (midx, RGearDoorGrp, 1,
 		_V(4.35, -2.64, -1.69), _V(0, 0.02, 0.9), (float)(96.2*RAD));
-	static UINT LGearDoorGrp[1] = {GRP_geardoorL};
+	static oapi::UInt LGearDoorGrp[1] = {GRP_geardoorL};
 	static MGROUP_ROTATE LGearDoor (midx, LGearDoorGrp, 1,
 		_V(-4.35, -2.64, -1.69), _V(0, 0.02, 0.9), (float)(-96.2*RAD));
-	static UINT MainGearGrp[4] = {GRP_wheelR,GRP_gearR,GRP_wheelL,GRP_gearL};
+	static oapi::UInt MainGearGrp[4] = {GRP_wheelR,GRP_gearR,GRP_wheelL,GRP_gearL};
 	static MGROUP_ROTATE MainGear (midx, MainGearGrp, 4,
 		_V(0, -2.66, -3.68), _V(1, 0, 0), (float)(94.5*RAD));
 
@@ -692,13 +692,13 @@ void Atlantis::DefineAnimations (void)
 
 	// ***** 3. Ku-band antenna animation *****
 
-	static UINT KuBand1Grp[3] = {GRP_startrackers,GRP_KUband1,GRP_KUband2};
+	static oapi::UInt KuBand1Grp[3] = {GRP_startrackers,GRP_KUband1,GRP_KUband2};
 	static MGROUP_ROTATE KuBand1 (midx, KuBand1Grp, 3,
 		_V(2.85, 0.85, 0), _V(0,0,1), (float)(-18*RAD));
-	static UINT KuBand2Grp[1] = {GRP_KUband2};
+	static oapi::UInt KuBand2Grp[1] = {GRP_KUband2};
 	static MGROUP_ROTATE KuBand2 (midx, KuBand2Grp, 1,
 		_V(2.78, 1.7, 0), _V(0,0,1), (float)(-90*RAD));
-	static UINT KuBand3Grp[2] = {GRP_KUband1,GRP_KUband2};
+	static oapi::UInt KuBand3Grp[2] = {GRP_KUband1,GRP_KUband2};
 	static MGROUP_ROTATE KuBand3 (midx, KuBand3Grp, 2,
 		_V(2.75, 2.05, 11.47), _V(0,1,0), (float)(-113*RAD));
 
@@ -709,7 +709,7 @@ void Atlantis::DefineAnimations (void)
 
 	// ***** 4. Elevator animation of elevons *****
 
-	static UINT ElevGrp[4] = {GRP_flapR,GRP_flapL,GRP_aileronL,GRP_aileronR};
+	static oapi::UInt ElevGrp[4] = {GRP_flapR,GRP_flapL,GRP_aileronL,GRP_aileronR};
 	static MGROUP_ROTATE Elevator (midx, ElevGrp, 4,
 		_V(0,-2.173,-8.84), _V(1,0,0), (float)(30.0*RAD));
 	anim_elev = CreateAnimation (0.5);
@@ -717,10 +717,10 @@ void Atlantis::DefineAnimations (void)
 
 	// ***** 5. Aileron animation of elevons *****
 
-	static UINT LAileronGrp[2] = {GRP_flapL,GRP_aileronL};
+	static oapi::UInt LAileronGrp[2] = {GRP_flapL,GRP_aileronL};
 	static MGROUP_ROTATE LAileron (midx, LAileronGrp, 2,
 		_V(0,-2.173,-8.84), _V(-1,0,0), (float)(10.0*RAD));
-	static UINT RAileronGrp[2] = {GRP_flapR,GRP_aileronR};
+	static oapi::UInt RAileronGrp[2] = {GRP_flapR,GRP_aileronR};
 	static MGROUP_ROTATE RAileron (midx, RAileronGrp, 2,
 		_V(0,-2.173,-8.84), _V(1,0,0), (float)(10.0*RAD));
 	anim_laileron = CreateAnimation (0.5);
@@ -730,7 +730,7 @@ void Atlantis::DefineAnimations (void)
 
 	// ***** 6. Rudder animation *****
 
-	static UINT RudderGrp[2] = {GRP_rudderR,GRP_rudderL};
+	static oapi::UInt RudderGrp[2] = {GRP_rudderR,GRP_rudderL};
 	static MGROUP_ROTATE Rudder (midx, RudderGrp, 2,
 		_V(0,5.77,-12.17), _V(-0.037,0.833,-0.552), (float)(-54.2*RAD));
 	anim_rudder = CreateAnimation (0.5);
@@ -738,10 +738,10 @@ void Atlantis::DefineAnimations (void)
 
 	// ***** 7. Speedbrake animation *****
 
-	static UINT SB1Grp[1] = {GRP_rudderR};
+	static oapi::UInt SB1Grp[1] = {GRP_rudderR};
 	static MGROUP_ROTATE SB1 (midx, SB1Grp, 1,
 		_V(0.32,5.77,-12.17), _V(-0.037,0.833,-0.552), (float)(-49.3*RAD));
-	static UINT SB2Grp[1] = {GRP_rudderL};
+	static oapi::UInt SB2Grp[1] = {GRP_rudderL};
 	static MGROUP_ROTATE SB2 (midx, SB2Grp, 1,
 		_V(-0.32,5.77,-12.17), _V(0.037,0.833,-0.552), (float)(49.3*RAD));
 
@@ -755,31 +755,31 @@ void Atlantis::DefineAnimations (void)
 
 	ANIMATIONCOMPONENT_HANDLE parent;
 
-	static UINT RMSShoulderYawGrp[1] = {GRP_Shoulder};
+	static oapi::UInt RMSShoulderYawGrp[1] = {GRP_Shoulder};
 	rms_anim[0] = new MGROUP_ROTATE (midx, RMSShoulderYawGrp, 1,
 		_V(-2.26, 1.70, 9.65), _V(0, 1, 0), (float)(-360*RAD)); // -180 .. +180
 	anim_arm_sy = CreateAnimation (0.5);
 	parent = AddAnimationComponent (anim_arm_sy, 0, 1, rms_anim[0]);
 
-	static UINT RMSShoulderPitchGrp[1] = {GRP_Humerus};
+	static oapi::UInt RMSShoulderPitchGrp[1] = {GRP_Humerus};
 	rms_anim[1] = new MGROUP_ROTATE (midx, RMSShoulderPitchGrp, 1,
 		_V(-2.26, 1.70, 9.65), _V(1, 0, 0), (float)(147*RAD)); // -2 .. +145
 	anim_arm_sp = CreateAnimation (0.0136);
 	parent = AddAnimationComponent (anim_arm_sp, 0, 1, rms_anim[1], parent);
 
-	static UINT RMSElbowPitchGrp[3] = {GRP_radii,GRP_RMScamera,GRP_RMScamera_pivot};
+	static oapi::UInt RMSElbowPitchGrp[3] = {GRP_radii,GRP_RMScamera,GRP_RMScamera_pivot};
 	rms_anim[2] = new MGROUP_ROTATE (midx, RMSElbowPitchGrp, 3,
 		_V(-2.26,1.55,3.10), _V(1,0,0), (float)(-162*RAD)); // -160 .. +2
 	anim_arm_ep = CreateAnimation (0.0123);
 	parent = AddAnimationComponent (anim_arm_ep, 0, 1, rms_anim[2], parent);
 
-	static UINT RMSWristPitchGrp[1] = {GRP_wrist};
+	static oapi::UInt RMSWristPitchGrp[1] = {GRP_wrist};
 	rms_anim[3] = new MGROUP_ROTATE (midx, RMSWristPitchGrp, 1,
 		_V(-2.26,1.7,-3.55), _V(1,0,0), (float)(240*RAD)); // -120 .. +120
 	anim_arm_wp = CreateAnimation (0.5);
 	parent = AddAnimationComponent (anim_arm_wp, 0, 1, rms_anim[3], parent);
 
-	static UINT RMSWristYawGrp[1] = {GRP_endeffecter};
+	static oapi::UInt RMSWristYawGrp[1] = {GRP_endeffecter};
 	rms_anim[4] = new MGROUP_ROTATE (midx, RMSWristYawGrp, 1,
 		_V(-2.26,1.7,-4.9), _V(0,1,0), (float)(-240*RAD)); // -120 .. +120
 	anim_arm_wy = CreateAnimation (0.5);
@@ -795,15 +795,15 @@ void Atlantis::DefineAnimations (void)
 	float max_gimbal = (float)(-0.2*PI);
 	anim_ssme = CreateAnimation (init_gimbal/max_gimbal);
 
-	static UINT SSMEL_Grp = GRP_SSMEL;
+	static oapi::UInt SSMEL_Grp = GRP_SSMEL;
 	ssme_anim[0] = new MGROUP_ROTATE (midx, &SSMEL_Grp, 1, _V(-1.55,-0.37,-12.5), _V(-1,0,0), max_gimbal);
 	AddAnimationComponent (anim_ssme, 0, 1, ssme_anim[0]);
 
-	static UINT SSMER_Grp = GRP_SSMER;
+	static oapi::UInt SSMER_Grp = GRP_SSMER;
 	ssme_anim[1] = new MGROUP_ROTATE (midx, &SSMER_Grp, 1, _V( 1.55,-0.37,-12.5), _V(-1,0,0), max_gimbal);
 	AddAnimationComponent (anim_ssme, 0, 1, ssme_anim[1]);
 
-	static UINT SSMET_Grp = GRP_SSMET;
+	static oapi::UInt SSMET_Grp = GRP_SSMET;
 	ssme_anim[2] = new MGROUP_ROTATE (midx, &SSMET_Grp, 1, _V(0.0,  2.7, -12.5), _V(-1,0,0), max_gimbal);
 	AddAnimationComponent (anim_ssme, 0, 1, ssme_anim[2]);
 
@@ -902,8 +902,8 @@ void Atlantis::ToggleGrapple (void)
 		GetAttachmentParams (sat_attach, pos, dir, rot);
 		Local2Global (pos, gbay);
 		VESSEL *v = oapiGetVesselInterface (hV);
-		DWORD nAttach = v->AttachmentCount (true);
-		for (DWORD j = 0; j < nAttach; j++) { // now scan all attachment points
+		oapi::UInt32 nAttach = v->AttachmentCount (true);
+		for (oapi::UInt32 j = 0; j < nAttach; j++) { // now scan all attachment points
 			ATTACHMENTHANDLE hAtt = v->GetAttachmentHandle (true, j);
 			v->GetAttachmentParams (hAtt, pos, dir, rot);
 			v->Local2Global (pos, gpos);
@@ -921,14 +921,14 @@ void Atlantis::ToggleGrapple (void)
 		
 		// Search the complete vessel list for a grappling candidate.
 		// Not very scalable ...
-		for (DWORD i = 0; i < oapiGetVesselCount(); i++) {
+		for (oapi::UInt32 i = 0; i < oapiGetVesselCount(); i++) {
 			OBJHANDLE hV = oapiGetVesselByIndex (i);
 			if (hV == GetHandle()) continue; // we don't want to grapple ourselves ...
 			oapiGetGlobalPos (hV, &gpos);
 			if (dist (gpos, grms) < oapiGetSize (hV)) { // in range
 				VESSEL *v = oapiGetVesselInterface (hV);
-				DWORD nAttach = v->AttachmentCount (true);
-				for (DWORD j = 0; j < nAttach; j++) { // now scan all attachment points of the candidate
+				oapi::UInt32 nAttach = v->AttachmentCount (true);
+				for (oapi::UInt32 j = 0; j < nAttach; j++) { // now scan all attachment points of the candidate
 					ATTACHMENTHANDLE hAtt = v->GetAttachmentHandle (true, j);
 					const char *id = v->GetAttachmentId (hAtt);
 					if (strncmp (id, "GS", 2)) continue; // attachment point not compatible
@@ -988,11 +988,11 @@ ATTACHMENTHANDLE Atlantis::CanArrest (void) const
 	OBJHANDLE hV = GetAttachmentStatus (rms_attach);
 	if (!hV) return 0;
 	VESSEL *v = oapiGetVesselInterface (hV);
-	DWORD nAttach = v->AttachmentCount (true);
+	oapi::UInt32 nAttach = v->AttachmentCount (true);
 	VECTOR3 pos, dir, rot, gpos, gbay;
 	GetAttachmentParams (sat_attach, pos, dir, rot);
 	Local2Global (pos, gbay);
-	for (DWORD j = 0; j < nAttach; j++) {
+	for (oapi::UInt32 j = 0; j < nAttach; j++) {
 		ATTACHMENTHANDLE hAtt = v->GetAttachmentHandle (true, j);
 		if (strncmp (v->GetAttachmentId (hAtt), "XS", 2)) continue; // attachment point not compatible
 		v->GetAttachmentParams (hAtt, pos, dir, rot);
@@ -1358,7 +1358,7 @@ void Atlantis::RevertSpeedbrake (void)
 		AnimState::OPENING : AnimState::CLOSING);
 }
 
-void Atlantis::SetAnimationArm (UINT anim, double state)
+void Atlantis::SetAnimationArm (oapi::UInt anim, double state)
 {
 	SetAnimation (anim, state);
 	arm_scheduled = true;
@@ -1372,13 +1372,13 @@ void Atlantis::RedrawPanel_MFDButton (SURFHANDLE surf, int mfd)
 
 	// D. Beachy: BUGFIX: if MFD powered off, cover separator lines and do not paint buttons
     if (oapiGetMFDMode(mfd) == MFD_NONE) {
-        RECT r = { 0,0,255,13 };
+        oapi::SdkRectangle r = { 0,0,255,13 };
 		pSkp->SetPen(NULL);
 		pSkp->SetBrush(g_Param.brush[0]);
         pSkp->Rectangle(r.left, r.top, r.right, r.bottom);
     } else {   // MFD powered on
 		auto pOld = pSkp->SetFont(g_Param.font[0]);
-		pSkp->SetTextColor (RGB(0,255,216));
+		pSkp->SetTextColor (0x00d8ff00);
 		pSkp->SetTextAlign (Sketchpad::CENTER, Sketchpad::TOP);
 		pSkp->SetBackgroundMode(Sketchpad::BK_TRANSPARENT);
 
@@ -1445,30 +1445,30 @@ void Atlantis::clbkLoadStateEx (FILEHANDLE scn, void *vs)
 	spdb_status = AnimState::CLOSED; spdb_proc = 0.0;
 
 	while (oapiReadScenario_nextline (scn, line)) {
-        if (!_strnicmp (line, "CONFIGURATION", 13)) {
+        if (!atlantis::ComparePrefix (line, "CONFIGURATION", 13)) {
             sscanf (line+13, "%d", &status);
-		//} else if (!_strnicmp (line, "MET", 3)) {
+		//} else if (!atlantis::ComparePrefix (line, "MET", 3)) {
 		//	sscanf (line+3, "%lf", &met);
-		} else if (!_strnicmp (line, "GEAR", 4)) {
+		} else if (!atlantis::ComparePrefix (line, "GEAR", 4)) {
 			sscanf (line+4, "%d%lf", &action, &gear_proc);
 			gear_status = (AnimState::Action)(action+1);
-		} else if (!_strnicmp (line, "SPEEDBRAKE", 10)) {
+		} else if (!atlantis::ComparePrefix (line, "SPEEDBRAKE", 10)) {
 			sscanf (line+10, "%d%lf", &action, &spdb_proc);
 			spdb_status = (AnimState::Action)(action+1);
-		} else if (!_strnicmp (line, "SRB_IGNITION_TIME", 17)) {
+		} else if (!atlantis::ComparePrefix (line, "SRB_IGNITION_TIME", 17)) {
 			sscanf (line+17, "%lf", &srbtime);
-		} else if (!_strnicmp (line, "SAT_OFS_X", 9)) {
+		} else if (!atlantis::ComparePrefix (line, "SAT_OFS_X", 9)) {
 			sscanf (line+9, "%lf", &sts_sat_x);
-		} else if (!_strnicmp (line, "SAT_OFS_Y", 9)) {
+		} else if (!atlantis::ComparePrefix (line, "SAT_OFS_Y", 9)) {
 			sscanf (line+9, "%lf", &sts_sat_y);
-		} else if (!_strnicmp (line, "SAT_OFS_Z", 9)) {
+		} else if (!atlantis::ComparePrefix (line, "SAT_OFS_Z", 9)) {
 			sscanf (line+9, "%lf", &sts_sat_z);
-		} else if (!_strnicmp (line, "CARGO_STATIC_MESH", 17)) {
+		} else if (!atlantis::ComparePrefix (line, "CARGO_STATIC_MESH", 17)) {
 			sscanf (line+17, "%s", cargo_static_mesh_name);
 			do_cargostatic = true;
-		} else if (!_strnicmp (line, "CARGO_STATIC_OFS", 16)) {
+		} else if (!atlantis::ComparePrefix (line, "CARGO_STATIC_OFS", 16)) {
 			sscanf (line+16, "%lf%lf%lf", &cargo_static_ofs.x, &cargo_static_ofs.y, &cargo_static_ofs.z);
-		} else if (!_strnicmp (line, "ARM_STATUS", 10)) {
+		} else if (!atlantis::ComparePrefix (line, "ARM_STATUS", 10)) {
 			sscanf (line+10, "%lf%lf%lf%lf%lf%lf", &arm_sy, &arm_sp, &arm_ep, &arm_wp, &arm_wy, &arm_wr);
         } else {
 			if      (plop->ParseScenarioLine (line)) continue;  // offer the line to bay door operations
@@ -1596,7 +1596,7 @@ void Atlantis::clbkPostCreation ()
 		pET = (Atlantis_Tank*)oapiGetVesselInterface(hET);
 		if (status < 2) {
 			pV = oapiGetVesselInterface (hET);
-			for (UINT i = 0; i < 2; i++) {
+			for (oapi::UInt i = 0; i < 2; i++) {
 				OBJHANDLE hSRB = pV->GetDockStatus (pV->GetDockHandle (i+1));
 				if (!hSRB) {
 					sprintf (name, "%s-SRB%d", GetName(), i+1);
@@ -1832,38 +1832,38 @@ void Atlantis::clbkPreStep (double simt, double simdt, double mjd)
 // --------------------------------------------------------------
 bool Atlantis::clbkPlaybackEvent (double simt, double event_t, const char *event_type, const char *event)
 {
-	if (!_stricmp (event_type, "JET")) {
-		if (!_stricmp (event, "SRB")) {
+	if (!atlantis::CompareText (event_type, "JET")) {
+		if (!atlantis::CompareText (event, "SRB")) {
 			bManualSeparate = true;
 			return true;
 		}
-		else if (!_stricmp (event, "ET")) {
+		else if (!atlantis::CompareText (event, "ET")) {
 			bManualSeparate = true;
 			return true;
 		}
-	} else if (!_stricmp (event_type, "STATUS")) {
-		if (!_stricmp (event, "SRB_IGNITION")) {
+	} else if (!atlantis::CompareText (event_type, "STATUS")) {
+		if (!atlantis::CompareText (event, "SRB_IGNITION")) {
 			status = 1;
 			t0 = event_t + SRB_STABILISATION_TIME;
 			return true;
 		}
-	} else if (!_stricmp (event_type, "ADJUST_LAUNCHTIME")) {
+	} else if (!atlantis::CompareText (event_type, "ADJUST_LAUNCHTIME")) {
 		sscanf (event, "%lf", &t0);
 		return true;
-	} else if (!_stricmp (event_type, "CARGODOOR")) {
-		if (!_stricmp(event, "OPEN"))       plop->SetDoorAction (AnimState::OPENING, true);
-		else if (!_stricmp(event, "CLOSE")) plop->SetDoorAction (AnimState::CLOSING, true);
-		else if (!_stricmp(event, "ISOPEN")) plop->SetDoorAction (AnimState::OPEN, true);
-		else if (!_stricmp(event, "ISCLOSED")) plop->SetDoorAction (AnimState::CLOSED, true);
+	} else if (!atlantis::CompareText (event_type, "CARGODOOR")) {
+		if (!atlantis::CompareText(event, "OPEN"))       plop->SetDoorAction (AnimState::OPENING, true);
+		else if (!atlantis::CompareText(event, "CLOSE")) plop->SetDoorAction (AnimState::CLOSING, true);
+		else if (!atlantis::CompareText(event, "ISOPEN")) plop->SetDoorAction (AnimState::OPEN, true);
+		else if (!atlantis::CompareText(event, "ISCLOSED")) plop->SetDoorAction (AnimState::CLOSED, true);
 		return true;
-	} else if (!_stricmp (event_type, "GEAR")) {
-		OperateLandingGear (!_stricmp (event, "UP") ? AnimState::CLOSING : AnimState::OPENING);
+	} else if (!atlantis::CompareText (event_type, "GEAR")) {
+		OperateLandingGear (!atlantis::CompareText (event, "UP") ? AnimState::CLOSING : AnimState::OPENING);
 		return true;
-	} else if (!_stricmp (event_type,"SPEEDBRAKE")) {
-		OperateSpeedbrake (!_stricmp (event, "CLOSE") ? AnimState::CLOSING : AnimState::OPENING);
+	} else if (!atlantis::CompareText (event_type,"SPEEDBRAKE")) {
+		OperateSpeedbrake (!atlantis::CompareText (event, "CLOSE") ? AnimState::CLOSING : AnimState::OPENING);
 		return true;
-	} else if (!_stricmp (event_type, "KUBAND")) {
-		plop->SetKuAntennaAction (!_stricmp (event, "CLOSE") ? AnimState::CLOSING : AnimState::OPENING);
+	} else if (!atlantis::CompareText (event_type, "KUBAND")) {
+		plop->SetKuAntennaAction (!atlantis::CompareText (event, "CLOSE") ? AnimState::CLOSING : AnimState::OPENING);
 		return true;
 	}
 
@@ -2277,7 +2277,7 @@ bool Atlantis::clbkDrawHUD (int mode, const HUDPAINTSPEC *hps, oapi::Sketchpad *
 // --------------------------------------------------------------
 // Keyboard interface handler (buffered key events)
 // --------------------------------------------------------------
-int Atlantis::clbkConsumeBufferedKey (DWORD key, bool down, char *kstate)
+int Atlantis::clbkConsumeBufferedKey (oapi::UInt32 key, bool down, char *kstate)
 {
 	if (!down) return 0; // only process keydown events
 
@@ -2332,22 +2332,33 @@ int Atlantis::clbkConsumeBufferedKey (DWORD key, bool down, char *kstate)
 // --------------------------------------------------------------
 // Module initialisation
 // --------------------------------------------------------------
-DLLCLBK void InitModule (HINSTANCE hModule)
-{
-	g_Param.hDLL = hModule;
-	g_Param.tkbk_label = oapiLoadTexture("Atlantis/tkbk_label.bmp");
+static void InitDrawingResources ()
+{	g_Param.tkbk_label = oapiLoadTexture("Atlantis/tkbk_label.bmp");
 
 	// allocate GDI resources
 	g_Param.font[0] = oapiCreateFont(-11, false, (char*)"Arial");
 	g_Param.brush[0] = oapiCreateBrush(0x000000);
 }
 
-DLLCLBK void ExitModule (HINSTANCE hModule)
+static void ReleaseDrawingResources ()
 {
 	oapiDestroySurface (g_Param.tkbk_label);
 }
 
 // --------------------------------------------------------------
+#ifdef _WIN32
+DLLCLBK void InitModule (HINSTANCE hModule)
+{
+	g_Param.hDLL = hModule;
+	InitDrawingResources();
+}
+
+DLLCLBK void ExitModule (HINSTANCE hModule)
+{
+	ReleaseDrawingResources();
+}
+#endif
+
 // Vessel initialisation
 // --------------------------------------------------------------
 DLLCLBK VESSEL *ovcInit (OBJHANDLE hvessel, int flightmodel)
@@ -2362,3 +2373,7 @@ DLLCLBK void ovcExit (VESSEL *vessel)
 {
 	if (vessel) delete (Atlantis*)vessel;
 }
+
+#ifndef _WIN32
+#include "NativeAtlantisFactory.inc"
+#endif

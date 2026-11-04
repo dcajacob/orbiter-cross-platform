@@ -23,7 +23,7 @@ int GrowStack()
 
     // NOTE: this requires that orbiter.exe has its 'Size of Stack Reserve' PE header parameter set to 4 MB
     int pageCount = 256;    // 256 4K pages = reserve 1 MB of stack
-    DWORD dwStackDelta = 0; // total # of stack bytes used
+    oapi::UInt32 dwStackDelta = 0; // total # of stack bytes used
     for (int i=0; i < pageCount; i++)
     {
         dwStackDelta += 4096;

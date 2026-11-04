@@ -13,9 +13,10 @@
 #ifndef __ATLANTIS_H
 #define __ATLANTIS_H
 
-#include "Orbitersdk.h"
+#include "AtlantisPlatform.h"
 #include <math.h>
 
+#ifdef _WIN32
 #ifdef ATLANTIS_TANK_MODULE
 #define TANKFUNC DLLEXPORT
 #else
@@ -26,6 +27,10 @@
 #define SRBFUNC DLLEXPORT
 #else
 #define SRBFUNC DLLIMPORT
+#endif
+#else
+#define TANKFUNC __attribute__((visibility("default")))
+#define SRBFUNC __attribute__((visibility("default")))
 #endif
 
 // ==========================================================
@@ -218,7 +223,9 @@ const VECTOR3 ORBITER_DOCKPOS      = { 0.0, 2.40, 10.15};
 #define AID_R13L_MAX     120
 
 typedef struct {
+#ifdef _WIN32
 	HINSTANCE hDLL;
+#endif
 	SURFHANDLE tkbk_label;
 	oapi::Font *font[1];
 	oapi::Brush* brush[1];
@@ -289,7 +296,7 @@ public:
 	void RevertLandingGear ();
 	void OperateSpeedbrake (AnimState::Action action);
 	void RevertSpeedbrake ();
-	void SetAnimationArm (UINT anim, double state);
+	void SetAnimationArm (oapi::UInt anim, double state);
 
 	double GetSRBThrustLevel (int which);
 	// returns the thrust level from left (which=0) or right (which=1)
@@ -309,7 +316,7 @@ public:
 	            // 3=Tank separated (orbiter only)
 
 	double t0;          // reference time: designated liftoff time
-	WORD srb_id1, srb_id2;
+	oapi::UInt16 srb_id1, srb_id2;
 
 	double gear_proc; // landing gear deployment state (0=retracted, 1=deployed)
 	//double kubd_proc; // Ku-band antenna deployment state (0=retracted, 1=deployed)
@@ -338,7 +345,7 @@ public:
 	void clbkFocusChanged (bool getfocus, OBJHANDLE hNewVessel, OBJHANDLE hOldVessel);
 	void clbkPreStep (double simt, double simdt, double mjd);
 	bool clbkPlaybackEvent (double simt, double event_t, const char *event_type, const char *event);
-	int  clbkConsumeBufferedKey (DWORD key, bool down, char *kstate);
+	int  clbkConsumeBufferedKey (oapi::UInt32 key, bool down, char *kstate);
 	void clbkVisualCreated (VISHANDLE vis, int refcount);
 	void clbkVisualDestroyed (VISHANDLE vis, int refcount);
 	void clbkAnimate (double simt);
@@ -405,21 +412,21 @@ private:
 
 	VECTOR3 gimbal_pos;                        // gimbal settings for pitch,yaw,roll
 
-	UINT anim_door;                            // handle for cargo door animation
-	UINT anim_rad;                             // handle for radiator animation
-	UINT anim_gear;                            // handle for landing gear animation
-	UINT anim_kubd;                            // handle for Ku-band antenna animation
-	UINT anim_elev;                            // handle for elevator animation
-	UINT anim_laileron;						   // handle for left aileron animation
-	UINT anim_raileron;						   // handle for right aileron animation
-	UINT anim_rudder;						   // handle for rudder animation
-	UINT anim_spdb;                            // handle for speed brake animation
-	UINT anim_ssme;                            // handle for SSME pitch gimbal animation
-	UINT mesh_orbiter;                         // index for orbiter mesh
-	UINT mesh_cockpit;                         // index for cockpit mesh for external view
-	UINT mesh_vc;                              // index for virtual cockpit mesh
-	UINT mesh_cargo;                           // index for static cargo mesh
-	UINT mesh_platform;                        // index for payload platform mesh
+	oapi::UInt anim_door;                            // handle for cargo door animation
+	oapi::UInt anim_rad;                             // handle for radiator animation
+	oapi::UInt anim_gear;                            // handle for landing gear animation
+	oapi::UInt anim_kubd;                            // handle for Ku-band antenna animation
+	oapi::UInt anim_elev;                            // handle for elevator animation
+	oapi::UInt anim_laileron;						   // handle for left aileron animation
+	oapi::UInt anim_raileron;						   // handle for right aileron animation
+	oapi::UInt anim_rudder;						   // handle for rudder animation
+	oapi::UInt anim_spdb;                            // handle for speed brake animation
+	oapi::UInt anim_ssme;                            // handle for SSME pitch gimbal animation
+	oapi::UInt mesh_orbiter;                         // index for orbiter mesh
+	oapi::UInt mesh_cockpit;                         // index for cockpit mesh for external view
+	oapi::UInt mesh_vc;                              // index for virtual cockpit mesh
+	oapi::UInt mesh_cargo;                           // index for static cargo mesh
+	oapi::UInt mesh_platform;                        // index for payload platform mesh
 	PROPELLANT_HANDLE ph_oms;                  // handles for propellant resources
 	THRUSTER_HANDLE th_main[3];                // handles for orbiter main engines
 	THRUSTER_HANDLE th_oms[2];                 // handles for orbiter oms engines
@@ -429,7 +436,7 @@ private:
 	ANIMATIONCOMPONENT_HANDLE hAC_arm, hAC_sat, hAC_satref;
 	MGROUP_TRANSFORM *rms_anim[6];
 	MGROUP_TRANSFORM *ssme_anim[3];
-	UINT anim_arm_sy, anim_arm_sp, anim_arm_ep, anim_arm_wp, anim_arm_wy, anim_arm_wr;
+	oapi::UInt anim_arm_sy, anim_arm_sp, anim_arm_ep, anim_arm_wp, anim_arm_wy, anim_arm_wr;
 	double arm_sy, arm_sp, arm_ep, arm_wp, arm_wy, arm_wr;
 	double launchelev;                         // elevation of launch stack on the ground [m]
 

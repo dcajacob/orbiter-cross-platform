@@ -115,14 +115,14 @@ private:
 
 class AscentApMfd: public MFD2 {
 public:
-	AscentApMfd (DWORD w, DWORD h, VESSEL *v);
+	AscentApMfd (oapi::UInt32 w, oapi::UInt32 h, VESSEL *v);
 	~AscentApMfd();
 	bool Update (oapi::Sketchpad *skp);
 	char *ButtonLabel (int bt);
 	int ButtonMenu (const MFDBUTTONMENU **menu) const;
-	bool ConsumeKeyBuffered (DWORD key);
+	bool ConsumeKeyBuffered (oapi::UInt32 key);
 	bool ConsumeButton (int bt, int event);
-	static OAPI_MSGTYPE MsgProc (UINT msg, UINT mfd, WPARAM wparam, LPARAM lparam);
+	static oapi::CockpitMessageResult MsgProc (oapi::UInt msg, oapi::UInt mfd, oapi::CockpitUnsignedParam wparam, oapi::CockpitSignedParam lparam);
 
 private:
 	void UpdatePg_Prm (oapi::Sketchpad *skp);
@@ -146,7 +146,7 @@ private:
 	double ref_t;
 	double ref_val;
 	AscentAP *ap;
-	DWORD cpg;  // current page
+	oapi::UInt32 cpg;  // current page
 	oapi::Pen *pen[2];
 };
 
