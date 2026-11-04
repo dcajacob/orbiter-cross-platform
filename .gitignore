@@ -3,6 +3,7 @@
 **/.vs/
 meshres*.h
 CMakeSettings.json
+__pycache__/
 out/**
 !/Sound/XRSound/XRSound/**/*.vcxproj.user
 **/*.bak
