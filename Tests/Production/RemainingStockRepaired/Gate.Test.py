@@ -23,7 +23,7 @@ def main():
         'missing_mesh_slot','false_initial_playback','missing_position_recording','wrong_windows_entry_point',
         'changed_class_input','shifted_clock','missing_population_tick','missing_mesh_delivery_repair',
         'changed_mesh_delivery_provenance','forced_single_step_propagators','wrong_full_frame_tick',
-        'incomplete_presentations','wrong_reference_variant')
+        'incomplete_presentations','wrong_reference_variant','changed_actual_data_hash','missing_actual_planet_archive')
     with tempfile.TemporaryDirectory(prefix='orbiter-repaired-stock-control-') as temporary:
         for name in names:
             out=Path(temporary)/name;out.mkdir()
@@ -40,6 +40,11 @@ def main():
             elif name=='missing_mesh_delivery_repair':(out/config['delivery_repairs'][0]['target']).unlink()
             elif name=='forced_single_step_propagators':
                 path=out/'Orbiter.cfg';path.write_text(path.read_text()+'\nPropStages = 1\nPropStage0 = 1 1 1\n')
+            elif name in ('changed_actual_data_hash','missing_actual_planet_archive'):
+                value=json.loads((out/'actual-data-inputs.json').read_text())
+                if name=='changed_actual_data_hash':next(iter(value['files'].values()))['sha256']='0'*64
+                else:del value['files'][next(v for v in value['files'] if v.startswith('Textures/'))]
+                replace('actual-data-inputs.json',(json.dumps(value,indent=2)+'\n').encode())
             elif name in ('wrong_full_frame_tick','incomplete_presentations','wrong_reference_variant'):
                 file={'wrong_full_frame_tick':'scene-summary.json','incomplete_presentations':'graphics-lifecycle.json',
                       'wrong_reference_variant':'reference-variant.json'}[name]
@@ -77,7 +82,7 @@ def main():
     capture.require(before==hashes(a.capture),'Owning capture changed during controls')
     a.output.write_text(json.dumps(dict(status='passed',protocol=config['protocol'],controls=controls,positive=positive,
         owning_capture_unchanged=True,source_sha256=capture.sha(Path(__file__))),indent=2)+'\n')
-    print('Eighteen damaged complete-scene/input/clock/graphics/variant captures rejected; owning evidence unchanged')
+    print('Twenty damaged complete-scene/input/data/clock/graphics/variant captures rejected; owning evidence unchanged')
 
 
 if __name__=='__main__':main()

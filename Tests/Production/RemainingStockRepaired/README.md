@@ -50,12 +50,63 @@ playback flag and mesh is observed at every actual tick. Both repetitions in all
 four Debug/Release automatic/SSE2 profiles are required: 304 processes and 291,840
 real presentations. The initial workflow can take several hours per profile.
 Loaded modules must match the explicit variant, with no generic vessel fallback.
-Eighteen damaged real-capture controls check the reader; the existing independent
+Twenty damaged real-capture controls check the reader; the existing independent
 resource-history controls retain live/retired ownership validation.
+
+`data_inputs.py` hashes the actual 21 kernel files, eight gravity models and 28
+standard planet archives before and after the complete campaign. It also hashes
+all 57 files in each executed scene after that process exits. Each scene's
+`actual-data-inputs.json` retains the sizes, SHA-256 values and original lock
+identities; the complete source and scene byte maps must agree. These checks
+stream the large archives and do not change the simulation or its inputs. Two
+additional scene controls reject a changed data hash or omitted planet archive.
 
 Fresh captures, independent transport/build/profile/state/camera/full-frame audit,
 new negative-control results and matched native runs are pending. No failed
 original result is reclassified, and no reference is accepted automatically.
+
+`audit.py` requires the exact four artifact ZIPs and their complete decoded trees,
+independently retained Debug/Release original packages, the independently retained
+pinned Mesa DLLs and an immutable full producer commit. It reconstructs the runtime
+file map from actual original and replacement bytes, checks the complete original
+SDK, module exports, generated observer, actual MSVC compile commands/CRT and
+source closure, then re-reads all 304 actual processes. Windows system DLL paths
+and hashes remain explicitly identified as captured process evidence; they are
+not confused with replacement DLLs or represented as independently archived bytes.
+
+Every repeated state/resource/playback/mesh/camera trace must be byte-identical.
+Both Debug/Release pairs must satisfy the unchanged state and camera budgets and
+the original full-frame SSIM minimum. Additional resource numeric differences are
+reported as calibration, without inventing acceptance tolerances. A missing or
+failed profile produces a retained failed audit. The auditor creates no accepted
+reference or class admission.
+
+The transport manifest has `status: "passed"`, the exact `source_commit`, and four
+`artifacts` entries with `profile`, `name`, repository-relative ZIP `path`, `bytes`
+and `sha256`. Each artifact's decoded directory is `<artifacts>/<profile>/`.
+
+```sh
+python3 -B Tests/Production/RemainingStockRepaired/audit.py \
+  --artifacts out/repaired-reference-artifacts \
+  --download-manifest out/repaired-reference-downloads.json \
+  --preserved-debug out/phase6-shuttle-a-preserved-Debug \
+  --preserved-release out/phase6-shuttle-a-preserved-Release \
+  --mesa-runtime out/mesa-python-stage \
+  --producer-commit <full-40-character-capture-producer> \
+  --output out/repaired-reference-independent-audit.json
+```
+
+`Audit.Test.py` has 18 independent source, compiler, actual loaded-DLL/provider,
+data and incomplete-matrix controls. The initial control run is retained at
+`out/phase6-repaired-reference-independent-controls-v2.json`. It independently
+verified the real failed Debug artifact from `2ddb6ef6ff52f09f25cfc5872dea63197a2afad4`
+(140 original / 142 staged source/resource files, exactly five declared changes,
+131 compile inputs and 33 client C++ inputs), the separate actual original scene
+observer, 91 captured system providers and all 57 actual locked data files.
+Damaged copies were rejected and owning evidence remained unchanged. This tests
+the sub-readers and proves that the actual failed build and single artifact cannot
+qualify; it is not a successful complete repaired-matrix audit. The 20 Windows
+scene controls still require fresh complete repaired observations.
 
 The initial candidate workflow
 [41774454528](https://github.com/dcajacob/orbiter-cross-platform/actions/runs/41774454528)

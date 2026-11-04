@@ -17,6 +17,7 @@ shared=importlib.util.module_from_spec(spec);spec.loader.exec_module(shared)
 from stage_original import run as stage
 from run_client import mesa_files,png
 from compare_client import image_ssim
+import data_inputs
 require=shared.require;sha=shared.digest;sha_lf=shared.sha_lf
 OBSERVER='Modules/Plugin/ProductionCockpitDriver.dll'
 
@@ -63,6 +64,7 @@ def inspect_artifacts(out,case,config):
             variant['frames']==config['frames'] and variant['fixed_step']==config['fixed_step'] and
             variant['capture_tick']==config['capture_tick'],'Executed reference variant differs')
     require(len((out/'scene.rgba').read_bytes())==1280*720*4,'Repaired framebuffer incomplete')
+    data_files=data_inputs.validate(json.loads((out/'actual-data-inputs.json').read_text()))
     summary=json.loads((out/'scene-summary.json').read_text())
     require(summary['simulation_seconds']==12.5 and summary['frames']==config['capture_tick'] and
             summary['width']==1280 and summary['height']==720,'Repaired full-frame capture tick differs')
@@ -78,10 +80,10 @@ def inspect_artifacts(out,case,config):
     require(actual_math in ('fma3','sse2'),'Unknown repaired reference CRT implementation')
     names=[*shared.TRACES,'stock-vessel-complete.txt','scene.csv','scene.rgba','scene-summary.json','camera.csv',
         'renderer-info.json','graphics-lifecycle.json','renderer-modules.txt','invocation.json','mesa-bindings.json',
-        'math-profile.txt','console.txt','Orbiter.log','Orbiter.cfg','process-result.json','reference-variant.json',
+        'math-profile.txt','console.txt','Orbiter.log','Orbiter.cfg','process-result.json','reference-variant.json','actual-data-inputs.json',
         case['scenario_entry_point'],*shared.recordings(case,config)]
     names.extend(item['target'] for item in config['delivery_repairs'])
-    return dict(result,status='captured',process_returncode=0,actual_math=actual_math,renderer=renderer,
+    return dict(result,status='captured',process_returncode=0,actual_math=actual_math,renderer=renderer,actual_simulation_data_files=data_files,
                 files_sha256={name:sha(out/name) for name in names})
 
 
@@ -117,6 +119,10 @@ def capture(a):
     for name,value in {**build['source_sha256_lf'],**sources}.items():
         body=subprocess.check_output(['git','-C',str(ROOT),'show',producer+':'+name]).replace(b'\r\n',b'\n')
         require(hashlib.sha256(body).hexdigest()==value==sha_lf(ROOT/name),'Capture source differs from producer: '+name)
+    original_data=data_inputs.inspect(a.data,a.planets)
+    for name,value in original_data['lock_sha256_lf'].items():
+        body=subprocess.check_output(['git','-C',str(ROOT),'show',producer+':Tests/Production/'+name]).replace(b'\r\n',b'\n')
+        require(hashlib.sha256(body).hexdigest()==value,'Data lock differs from capture producer: '+name)
     a.output.mkdir(parents=True)
     variant=dict(protocol=config['protocol'],protocol_sha256_lf=sha_lf(HERE/'protocol.json'),
         original_application_and_sdk_source=config['application_source'],producer_commit=producer,
@@ -126,6 +132,7 @@ def capture(a):
         original_application_and_sdk_source=config['application_source'],configuration=a.configuration,math_profile=a.math_profile,
         protocol_sha256_lf=sha_lf(HERE/'protocol.json'),settings_sha256_lf=sha_lf(shared.CASE_FILE),
         source_sha256_lf=sources,source_raw_sha256=raw_sources,runtime_variant_manifest_sha256=sha(root/'runtime-variant.json'),
+        actual_original_simulation_data=original_data,
         runtime_files_sha256=protected,observer_sha256=protected[OBSERVER],cases={},failures={},
         native_admission_qualified=False,phase6_complete=False)
     manifest=a.output/'capture.json'
@@ -151,6 +158,9 @@ def capture(a):
                         (directory/'reference-variant.json').write_text(json.dumps(variant,indent=2)+'\n')
                         (directory/'ogl-evidence.enabled').touch();mesa_files(a.mesa,directory)
                     stage(a.executable,a.data,a.planets,out,config,case,configure)
+                    staged_data=data_inputs.inspect(out,out)
+                    require(staged_data==original_data,'Actual staged scene data differs from original source inputs')
+                    (out/'actual-data-inputs.json').write_text(json.dumps(staged_data,indent=2)+'\n')
                     require(all(sha(out/name)==value for name,value in protected.items()
                                 if name.lower().endswith(('.dll','.exe'))),'Executed runtime module bytes differ')
                     result=inspect_artifacts(out,case,config)
@@ -173,7 +183,8 @@ def capture(a):
             save()
         require(all(sha(root/name)==value for name,value in protected.items()),'Runtime variant changed during capture')
         require(raw_sources=={p.relative_to(ROOT).as_posix():sha(p) for p in source_files()},'Raw observer source changed during capture')
-        report.update(runtime_variant_unchanged=True,observer_sources_unchanged=True,
+        require(data_inputs.inspect(a.data,a.planets)==original_data,'Original simulation data changed during capture')
+        report.update(runtime_variant_unchanged=True,observer_sources_unchanged=True,actual_original_simulation_data_unchanged=True,
             status='captured-awaiting-independent-audit' if len(report['cases'])==38 and not report['failures'] else 'incomplete')
         require(report['status']=='captured-awaiting-independent-audit','Repaired full capture incomplete; no native admission')
     finally:save()
