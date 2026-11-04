@@ -1,5 +1,63 @@
 # Original remaining native vessel integration
 
+## Current four-profile repeated-session checkpoint
+
+Each current source-v4 native profile now passes twenty real 60-frame PoweredUp
+sessions in one process. The independent post-exit audit checks **80 sessions,
+4,800 presentations**, twenty Dragonfly load/init/fini/unload events per
+profile, clean context destruction, identical repeated physical/control/camera/
+full-frame bytes, and unchanged source/runtime/generated/provider/assets/data
+guards. ASan/UBSan/LSan remain enabled without suppressions. The original assets,
+scenarios, physics and SDK layouts are unchanged. The evidence is
+`out/phase6-current-dragonfly-twenty-sessions-independent-audit-v3.json` in the
+audit checkout.
+
+The initial launcher rejected a fixed GUI clock without a replay file. A second
+launcher exported a redundant sanitizer preload into GTK image-loader children
+and aborted before its first frame. The corrected control supplies an empty
+input replay and uses the executable's actual first `libasan` dependency plus
+`libubsan`, with no inherited preload. Those failed attempts remain retained.
+An earlier Debug automatic orchestration handle returned 143 after producing
+passed child evidence; its separately retained direct-exec repeat returns zero.
+The selected scoped four-profile set uses that repeat and clean launcher exits.
+This is a focused callback/module/context lifetime control, with the wider
+menu/input/help and complete Phase 6 gates still open.
+
+## Current source-v4 Windows reload checkpoint
+
+The four exact artifacts from Windows diagnostic run `41853756525` are now
+locally retained and API-digest/member-verified: 2,190 members across all four
+profiles. The independent audit passes PoweredUp/Spin stock writers and exact
+saved-state reloads twice in every profile: **32 actual Windows processes and
+30,720 presentations**. It checks the complete preserved original packages,
+v4 sources/build/runtime/compiled policy, real startup snapshots, all-vessel
+state/resource/mesh/playback/camera/frame observations and complete saved state.
+Mapped Mesa import/provider hashes are bound to the independently checked 69
+actual DLL/license files. The record is
+`out/phase6-source-v4-windows-diagnostic-independent-audit-v3.json` in the audit
+checkout. The overall GitHub status was still `in_progress` during transfer;
+all data remain explicitly diagnostic-only.
+
+The real reload records retain exactly two more raw files than the base
+observation reader: the end save and its input-provenance JSON. The complete
+auditor now checks that exact additional closure, every raw hash and every other
+observation field. Sixteen actual Windows reload positives and eight damaged
+boundary controls pass in `out/phase6-windows-reload-observation-controls-v1.json`.
+The default complete artifact gate requires a completed successful workflow and
+all four full-scene artifacts. The downloader's explicit active/failed-run modes
+retain diagnostic bytes and cannot promote them to that gate.
+
+Native same-profile reloads from these exact current Windows saves now pass in
+all four frozen source-v4 packages: sixteen actual native processes, 15,360
+presentations, clean unsuppressed sanitizer/context teardown and sixteen paired
+Windows/native comparisons. Raw executed save hashes, fresh v4/startup
+provenance, every saved token, actual clocks, all-vessel state/resource/mesh/
+playback, cameras and full frames pass the original budgets. The independent
+record is `out/phase6-source-v4-exact-windows-native-reload-comparison-v1.json`.
+This remains two scenes twice in four profiles. Full38 state/camera/frame/persistence,
+ordinary class admission, the fresh unchanged157 sweep and all broader Phase 6
+requirements retain their scope.
+
 ## Independent persistence reader checkpoint
 
 The repaired source-v4 native Debug automatic stock-writer, Release SSE2

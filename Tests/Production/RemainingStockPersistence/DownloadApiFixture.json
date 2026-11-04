@@ -1,0 +1,84 @@
+{
+  "workflow_run": {
+    "id": 41840942051,
+    "head_sha": "c4c7a231bd9d3335ddf91662bb5f4ceefee38428",
+    "head_branch": "codex/production-bootstrap",
+    "path": ".github/workflows/matched-clock-remaining-stock.yml",
+    "status": "completed",
+    "conclusion": "success",
+    "repository": {
+      "full_name": "dcajacob/orbiter-cross-platform"
+    }
+  },
+  "artifacts": [
+    {
+      "api_artifact": {
+        "id": 13331361976,
+        "name": "matched-clock-complete-scene-diagnostic-v2-Release-automatic",
+        "size_in_bytes": 24609860,
+        "digest": "sha256:3bcb909c3117056b9f8ffcdc0487b1e2cc3051a62b74e701b0c269824333490a",
+        "expired": false,
+        "workflow_run": {
+          "id": 41840942051,
+          "repository_id": 1440551273,
+          "head_repository_id": 1440551273,
+          "head_branch": "codex/production-bootstrap",
+          "head_sha": "c4c7a231bd9d3335ddf91662bb5f4ceefee38428"
+        }
+      },
+      "download_url": "https://example.invalid/retained-artifact-control"
+    },
+    {
+      "api_artifact": {
+        "id": 13331007823,
+        "name": "matched-clock-complete-scene-diagnostic-v2-Debug-sse2",
+        "size_in_bytes": 29229295,
+        "digest": "sha256:f468ee92bc5200d70636a1ba96a58761b1bac9c221a7f5a3fd8ce89a30dcd177",
+        "expired": false,
+        "workflow_run": {
+          "id": 41840942051,
+          "repository_id": 1440551273,
+          "head_repository_id": 1440551273,
+          "head_branch": "codex/production-bootstrap",
+          "head_sha": "c4c7a231bd9d3335ddf91662bb5f4ceefee38428"
+        }
+      },
+      "download_url": "https://example.invalid/retained-artifact-control"
+    },
+    {
+      "api_artifact": {
+        "id": 13330207279,
+        "name": "matched-clock-complete-scene-diagnostic-v2-Release-sse2",
+        "size_in_bytes": 24580697,
+        "digest": "sha256:37849d64c145d0665084681c604bdbe0158772b34e6ba782e12957b71a9b1a4d",
+        "expired": false,
+        "workflow_run": {
+          "id": 41840942051,
+          "repository_id": 1440551273,
+          "head_repository_id": 1440551273,
+          "head_branch": "codex/production-bootstrap",
+          "head_sha": "c4c7a231bd9d3335ddf91662bb5f4ceefee38428"
+        }
+      },
+      "download_url": "https://example.invalid/retained-artifact-control"
+    },
+    {
+      "api_artifact": {
+        "id": 13328934546,
+        "name": "matched-clock-complete-scene-diagnostic-v2-Debug-automatic",
+        "size_in_bytes": 29262806,
+        "digest": "sha256:666f8255937d85ebd7856d17f3be23184551fab9394fa4ddce2ac7fe38675b65",
+        "expired": false,
+        "workflow_run": {
+          "id": 41840942051,
+          "repository_id": 1440551273,
+          "head_repository_id": 1440551273,
+          "head_branch": "codex/production-bootstrap",
+          "head_sha": "c4c7a231bd9d3335ddf91662bb5f4ceefee38428"
+        }
+      },
+      "download_url": "https://example.invalid/retained-artifact-control"
+    }
+  ],
+  "scope": "Public GitHub API metadata from run 41840942051 retained on 2026-11-04. Transfer URLs are control-only example.invalid placeholders, never real download references."
+}

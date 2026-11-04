@@ -35,6 +35,18 @@ def observe_files(report,owner):
         require(value in allowed,'Actual persistence observer source differs from its immutable producer: '+name)
 
 
+def check_windows_reload_observation(folder,recorded,actual):
+    """Reloads retain exactly two additional raw provenance/output files."""
+    expected=set(actual['files_sha256'])|{CURRENT,'persistence-input.json'}
+    require(set(recorded['files_sha256'])==expected and
+            all(recorded['files_sha256'][name]==value for name,value in actual['files_sha256'].items()),
+            'Complete Windows reload file closure differs')
+    check_files(folder,recorded['files_sha256'])
+    require('configuration_input' in actual and
+            all(recorded[k]==value for k,value in actual.items() if k!='files_sha256'),
+            'Actual complete Windows reload observation differs')
+
+
 def inspect_windows(decoded,profile,reader,original,mesa,mesa_imports):
     capture=reader.windows;audit=reader.original_audit;config=capture.settings(reader.protocols.V2)
     parent_root=decoded/'remaining-stock-repaired';reload_root=decoded/'remaining-stock-persistence';build_root=decoded/'remaining-stock-repaired-build'
@@ -68,10 +80,9 @@ def inspect_windows(decoded,profile,reader,original,mesa,mesa_imports):
                     prior['persistence_input']['parent_run']==case['id']+'-'+str(repeat) and
                     prior['persistence_input']['parent_capture_sha256']==sha(parent_root/'capture.json'),
                     'Windows reload discarded or substituted an exact saved input')
-            check_files(folder,prior['files_sha256'])
             observed_files.update({str(folder/n):v for n,v in prior['files_sha256'].items()})
             actual=capture.inspect_artifacts(folder,derived,config)
-            require(all(prior[k]==v for k,v in actual.items()) and 'configuration_input' in actual,'Actual complete Windows reload observation differs')
+            check_windows_reload_observation(folder,prior,actual)
             require(actual['actual_math']==stock['actual_math'],'Actual Windows reload CRT differs from the audited stock profile')
             require(json.loads((folder/'reference-variant.json').read_text())==
                     json.loads((parent_root/(case['id']+'-'+str(repeat))/'reference-variant.json').read_text()),

@@ -159,9 +159,12 @@ decoded artifact root containing `remaining-stock-repaired`,
 | `--download-manifest`, `--archive-root` | Passed complete four-profile download report and repository root for its relative ZIP paths |
 | `--output` | Fresh JSON result path; existing results cannot be replaced |
 
-The download report uses the existing complete Windows auditor's transport
-shape: `status`, `source_commit`, and four `artifacts` entries with `profile`,
-`name`, `path`, `bytes` and `sha256`. Only the full
+The download report uses protocol `remaining-stock-windows-artifact-transport-v1`,
+with `status`, `source_commit`, `workflow_run`, `diagnostic_only` and four
+`artifacts` entries. Each entry retains `profile`, `name`, `path`, `bytes`,
+`sha256`, and its public `api_artifact` record. The exact completed workflow,
+repository, branch, source, artifact ID, profile, API digest, size and expiry
+witness must agree. Only the full
 `matched-clock-remaining-stock-v2-PROFILE` artifacts qualify. The auditor checks
 each retained ZIP and every decoded member, rejecting duplicate/case-colliding,
 unsafe, symlink and unmanifested members. A selected diagnostic archive cannot
@@ -198,10 +201,94 @@ they earn no Windows reload/process credit. Four historical Windows v3/native
 Debug automatic stock-writer comparisons also pass: PoweredUp SSIM 0.9864176,
 Spin 1.0, with actual clocks, state, camera and complete saved tokens checked.
 Those old Windows files cannot satisfy fresh v4/startup-witness qualification.
-The outputs are `out/phase6-persistence-audit-reader-controls-v3.json` and `.log`
+The outputs are `out/phase6-persistence-audit-reader-controls-v6.json` and `.log`
 in the isolated persistence-audit checkout. This rerun follows the additional
 full-gate checks that every Windows reload retains its audited parent's actual
 CRT, exact full-scope/runtime/producer descriptor and configuration/mesh/data
 witnesses. Those full Windows reload checks still await real matrix inputs.
-The prior v2, earlier 21-control v1 result and initial failed library-SONAME
+The prior v5/v4/v3/v2, earlier 21-control v1 result and initial failed library-SONAME
 reader attempt remain retained.
+
+## Exact Windows artifact transfer
+
+`download.py` consumes a generated request with the public GitHub workflow-run
+metadata and exactly four artifact records. Each request artifact contains its
+unchanged public `api_artifact` metadata and the GitHub connector's temporary
+`download_url`. Default requests with missing/duplicate profiles or artifact IDs, an
+uncompleted/different workflow, mismatched source/branch/repository, expired
+artifacts, invalid API digests or insecure transfer references are rejected.
+The private request is separate from the public result and must not be archived.
+
+```sh
+python3 -B Tests/Production/RemainingStockPersistence/download.py \
+  --request /tmp/phase6-generated-artifact-request.json \
+  --output out/phase6-windows-full-download --consume-request
+```
+
+The default mode selects the full matched-clock workflow and every profile.
+`--diagnostic` explicitly selects the two-scene workflow while retaining all
+four profiles. `--allow-failed-run` preserves artifacts from a completed failed
+run as diagnostic transport only. The complete persistence auditor rejects
+diagnostic or failed-run transport. `--allow-active-run` permits retaining all
+four already-published artifacts while their workflow still reports
+`in_progress`; it always marks the result diagnostic-only. The default full
+qualification path still requires a completed successful workflow. None of
+these modes accepts partial profile sets. Existing output directories cannot
+be replaced.
+
+Every downloaded ZIP is checked against the API-advertised SHA256 and byte
+count, and all decoded members are checked independently against that exact
+archive. Failed transfers and partially decoded bytes remain retained with a
+failed report. Temporary transfer URLs are omitted from output reports and
+failure messages. `--consume-request` removes the generated private request on
+success and failure, including output/preflight rejection.
+
+`Download.Test.py` passes **26** damaged request, digest, transfer, member and
+CLI-cleanup controls. Its positive stream uses a retained actual Windows ZIP
+and verifies all 388 members; the metadata fixture contains the four real
+artifacts from Windows run `41840942051`. The fixture's `example.invalid` URLs
+are placeholders and are never contacted by these controls. This test executes
+no simulator and performs no live network download. The exact result is
+`out/phase6-artifact-transfer-controls-v4.json` in the persistence-audit checkout.
+
+```sh
+python3 -B Tests/Production/RemainingStockPersistence/Download.Test.py \
+  --retained-archive /path/to/retained/windows-diagnostic.zip \
+  --output out/artifact-transfer-controls.json
+```
+
+The current source-v4 diagnostic artifacts from run `41853756525` now transfer
+successfully in all four profiles: 2,190 members from four exact API-digest ZIPs.
+Both stock and reload phases complete PoweredUp/Spin twice. The independent
+audit rechecks **32 original Windows processes / 30,720 presentations**, the
+complete preserved application/SDK packages, v4 source/runtime/compiled policy,
+actual startup inputs, exact saved inputs, all-vessel physical/resource/mesh/
+playback observations and original camera/full-frame budgets. Actual mapped
+Mesa imports bind to the independently retained 69 DLL/license bytes. The
+result is `out/phase6-source-v4-windows-diagnostic-independent-audit-v3.json`.
+The first transfer's two failed older references, its two verified Release
+archives and both earlier failed reader attempts remain retained. The aggregate
+workflow status still reported `in_progress` during acquisition, so this result
+remains a diagnostic and creates no complete reference.
+
+That real reload data exposed an audit bug: `capture_windows.py` adds the end
+save and `persistence-input.json` to its raw-file table, beyond the original
+observation reader's table. The corrected complete auditor requires exactly
+those two additional entries, independently checks every recorded byte/hash,
+and retains exact equality for the other observed fields. It accepts no missing
+or unexpected files. `ReloadObservation.Test.py` rechecks all **16 actual
+Windows reload observations** and rejects **eight** changed/omitted-file,
+saved/provenance-hash, math and startup-witness controls. Its result is
+`out/phase6-windows-reload-observation-controls-v1.json`. Actual complete
+four-profile/all38 persistence comparison remains pending.
+
+The exact current Windows saves now also reload natively in all four matching
+profiles. Sixteen new native processes complete 15,360 presentations with clean
+unsuppressed sanitizer/context teardown. The independent comparison checks their
+fresh Windows v4/startup provenance, raw executed input hashes, complete saved
+tokens, actual clocks, all-vessel state/resource/mesh/playback, cameras and full
+frames against the sixteen corresponding Windows reloads. All sixteen pairs
+pass the original budgets and complete saved-token equality. The record is
+`out/phase6-source-v4-exact-windows-native-reload-comparison-v1.json`. This is
+PoweredUp/Spin twice in four profiles; it does not substitute for all38 or the
+remaining native stock-writer comparisons.

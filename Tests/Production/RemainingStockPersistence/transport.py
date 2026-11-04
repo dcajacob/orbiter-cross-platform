@@ -8,6 +8,33 @@ import zipfile
 from observations import require,sha
 
 PROFILES={c+'-'+m for c in ('Debug','Release') for m in ('automatic','sse2')}
+PROTOCOL='remaining-stock-windows-artifact-transport-v1'
+REPOSITORY='dcajacob/orbiter-cross-platform'
+WORKFLOWS={False:'.github/workflows/matched-clock-remaining-stock-full.yml',
+           True:'.github/workflows/matched-clock-remaining-stock.yml'}
+PREFIXES={False:'matched-clock-remaining-stock-v2-',True:'matched-clock-complete-scene-diagnostic-v2-'}
+
+
+def run_identity(run,diagnostic,allow_failed=False,allow_active=False):
+    require(type(diagnostic) is bool and type(run['id']) is int and run['id']>0 and
+            run['repository']['full_name']==REPOSITORY and run['head_branch']=='codex/production-bootstrap' and
+            re.fullmatch('[0-9a-f]{40}',run['head_sha']) and run['path']==WORKFLOWS[diagnostic] and
+            ((run['status']=='completed' and (run['conclusion']=='success' or allow_failed)) or
+             (allow_active and run['status']=='in_progress' and run['conclusion'] is None)),
+            'Completed matching Windows workflow/repository/source identity required')
+    return {k:run[k] for k in ('id','head_sha','head_branch','path','status','conclusion')}|{'repository':{'full_name':REPOSITORY}}
+
+
+def artifact_identity(artifact,run,diagnostic):
+    prefix=PREFIXES[diagnostic];name=artifact['name']
+    require(name.startswith(prefix) and name[len(prefix):] in PROFILES and type(artifact['id']) is int and artifact['id']>0 and
+            type(artifact['size_in_bytes']) is int and artifact['size_in_bytes']>0 and artifact['expired'] is False and
+            re.fullmatch('sha256:[0-9a-f]{64}',artifact['digest']) and artifact['workflow_run']['id']==run['id'] and
+            artifact['workflow_run']['head_sha']==run['head_sha'] and artifact['workflow_run']['head_branch']==run['head_branch'],
+            'Artifact profile/digest/size/expiry or owning Windows workflow identity differs')
+    return dict(id=artifact['id'],name=name,profile=name[len(prefix):],bytes=artifact['size_in_bytes'],
+                sha256=artifact['digest'][7:],api_digest=artifact['digest'],workflow_run_id=run['id'],
+                workflow_run_source=run['head_sha'])
 
 
 def safe(name):
@@ -41,15 +68,20 @@ def inspect_archive(archive,decoded,checksum,size):
 
 
 def inspect_matrix(manifest,archive_root,decoded,producer):
-    require(manifest['status']=='passed' and manifest['source_commit']==producer and
+    require(manifest['status']=='passed' and manifest['protocol']==PROTOCOL and manifest['diagnostic_only'] is False and
+            manifest['source_commit']==producer and
             re.fullmatch('[0-9a-f]{40}',producer) and len(manifest['artifacts'])==4 and
             {v['profile'] for v in manifest['artifacts']}==PROFILES and set(decoded)==PROFILES,
             'Complete matching four-profile Windows artifact transport required')
+    run=run_identity(manifest['workflow_run'],False)
+    require(run['head_sha']==producer,'Artifact API workflow source differs from captured producer')
     result={}
     for item in manifest['artifacts']:
         profile=item['profile']
         require(item['name']=='matched-clock-remaining-stock-v2-'+profile,
                 'Full persistence requires the complete-scene artifact, not a selected diagnostic')
+        recorded=artifact_identity(item['api_artifact'],run,False)
+        require(all(item[k]==v for k,v in recorded.items()),'Actual artifact API identity differs from retained ZIP descriptor')
         archive=archive_root/str(safe(item['path']))
         members=inspect_archive(archive,decoded[profile],item['sha256'],item['bytes'])
         result[profile]=dict(archive=str(archive),archive_sha256=item['sha256'],archive_bytes=item['bytes'],
