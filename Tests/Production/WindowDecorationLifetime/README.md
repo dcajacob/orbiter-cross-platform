@@ -78,3 +78,23 @@ behavior in that paired sample. Leak elimination, independent lost-allocation
 controls, repeated real-window ownership and broad dependency qualification
 remain open because the fresh baselines also exited cleanly. The normal
 application's dependency selection and historical failed gate remain unchanged.
+
+The optional `ORBITER_ICON_OWNER_PROBE=ON` CMake target now provides a read-only
+GTK return observer and a real GLFW title-update window. The observer forwards
+every original argument and return, reads the live public GObject reference
+count, and keeps addresses only as text. It retains no strong object references
+that could taint leak scanning. The window performs 120 actual title updates
+and swaps with normal GTK decorations. Its separate `lost` mode loses a 73-byte
+allocation on a joined worker thread.
+
+`out/phase6-libdecor-icon-controls-v1` records 363 actual button-icon lookups in
+each of four processes. Each baseline icon's reference sequence is exactly
+1 through 121; each candidate sequence contains 121 samples of 1. Both libraries
+still detect precisely 73 bytes/one allocation in the lost-object mode. The
+independent byte/hash/sequence audit is
+`out/phase6-libdecor-icon-controls-audit-v1.json`. This demonstrates the missing
+release even when the default theme's reachable cache prevents an exit-time
+leak report. The reproducible baseline and candidate builders also complete in
+fresh outputs, with the exact descriptor export and requested sanitizer linkage.
+Application regression with the pinned candidate and wider lifetime coverage
+remain required before changing normal runtime dependency selection.

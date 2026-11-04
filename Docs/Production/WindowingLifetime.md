@@ -58,3 +58,19 @@ system Mesa control, which still reports 112 bytes in two lost allocations.
 Remote publication remains open. Current-source hosted qualification, remaining stock
 modules and failure-path crashes, physical controllers and remote evidence
 preservation remain open. Phase 6 is in progress.
+
+A later `c10db131` native control completed 60 presentations and graphics
+teardown, then reported 14,085 bytes/123 allocations in GTK's title-bar icon
+path. That failed run remains retained in
+`out/phase6-atlantis-tank-lifetime-v7/detached-below`. The original libdecor
+0.2.5 GTK plugin releases the icon pixbuf but omits the caller-owned icon-info
+release. Its private one-release candidate is pinned to the exact 52 upstream
+and distribution source files. A real 120-update Wayland control observes each
+baseline icon's reference count grow from 1 to 121 and every candidate return
+at 1. The independent 73-byte lost-object control still fails precisely under
+both libraries, with all sanitizers enabled. Source, controls and raw evidence
+are described in the
+[decoration ownership fixture](../../Tests/Production/WindowDecorationLifetime/README.md).
+Broader current-source application/input qualification with this dependency
+candidate is pending; the preceding sixteen-flow result retains its recorded
+source/runtime scope.
