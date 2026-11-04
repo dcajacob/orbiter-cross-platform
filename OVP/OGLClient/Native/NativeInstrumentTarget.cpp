@@ -118,6 +118,12 @@ public:
 }
 
 std::unique_ptr<NativeGraphicsContext> OGLClient::SaveGraphicsContext() {return std::make_unique<ContextRestore>();}
+std::unique_ptr<NativeGraphicsContext> OGLClient::ActivateMainGraphicsContext() {
+    auto restore=std::make_unique<ContextRestore>();
+    require(nativeWindow!=nullptr,"Native drawing resource requires an open renderer");
+    glfwMakeContextCurrent(nativeWindow);require(glfwGetCurrentContext()==nativeWindow,"Native main context activation failed");
+    return restore;
+}
 std::unique_ptr<NativeInstrumentTarget> OGLClient::CreateInstrumentTarget(int width,int height) {
     return std::make_unique<InstrumentTarget>(width,height);
 }

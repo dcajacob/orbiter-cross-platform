@@ -14,7 +14,11 @@ class WglBitmapTarget {
     static constexpr GLenum framebufferComplete=0x8CD5;
     using GenFramebuffers=void (APIENTRY*)(GLsizei,GLuint*);
     using BindFramebuffer=void (APIENTRY*)(GLenum,GLuint);
-    using FramebufferTexture=void (APIENTRY*)(GLenum,GLenum,GLenum,GLuint,GLint);
+    using GenRenderbuffers=void (APIENTRY*)(GLsizei,GLuint*);
+    using BindRenderbuffer=void (APIENTRY*)(GLenum,GLuint);
+    using RenderbufferStorage=void (APIENTRY*)(GLenum,GLenum,GLsizei,GLsizei);
+    using FramebufferRenderbuffer=void (APIENTRY*)(GLenum,GLenum,GLenum,GLuint);
+    using DeleteRenderbuffers=void (APIENTRY*)(GLsizei,const GLuint*);
     using CheckFramebuffer=GLenum (APIENTRY*)(GLenum);
     using DeleteFramebuffers=void (APIENTRY*)(GLsizei,const GLuint*);
     HWND window=nullptr;
@@ -27,6 +31,7 @@ class WglBitmapTarget {
     int width,height;
     BindFramebuffer bindFramebuffer=nullptr;
     DeleteFramebuffers deleteFramebuffers=nullptr;
+    DeleteRenderbuffers deleteRenderbuffers=nullptr;
 
     static void require(bool value,const char* message) {if(!value)throw std::runtime_error(message);}
     class WindowClass {
@@ -64,7 +69,7 @@ class WglBitmapTarget {
         WglContextRestore restore;restore.Discard(context);
         if(context && wglMakeCurrent(renderDC,context)) {
             if(framebuffer && deleteFramebuffers)deleteFramebuffers(1,&framebuffer);
-            if(color)glDeleteTextures(1,&color);
+            if(color && deleteRenderbuffers)deleteRenderbuffers(1,&color);
         }
         if(context){wglMakeCurrent(nullptr,nullptr);wglDeleteContext(context);context=nullptr;}
         if(renderDC && window){ReleaseDC(window,renderDC);renderDC=nullptr;}
@@ -91,15 +96,19 @@ public:
             require(context && wglMakeCurrent(renderDC,context),"Dragonfly compatibility context failed");
             auto generate=procedure<GenFramebuffers>("glGenFramebuffers","glGenFramebuffersEXT");
             bindFramebuffer=procedure<BindFramebuffer>("glBindFramebuffer","glBindFramebufferEXT");
-            auto attach=procedure<FramebufferTexture>("glFramebufferTexture2D","glFramebufferTexture2DEXT");
+            auto generateColor=procedure<GenRenderbuffers>("glGenRenderbuffers","glGenRenderbuffersEXT");
+            auto bindColor=procedure<BindRenderbuffer>("glBindRenderbuffer","glBindRenderbufferEXT");
+            auto allocateColor=procedure<RenderbufferStorage>("glRenderbufferStorage","glRenderbufferStorageEXT");
+            auto attach=procedure<FramebufferRenderbuffer>("glFramebufferRenderbuffer","glFramebufferRenderbufferEXT");
             auto check=procedure<CheckFramebuffer>("glCheckFramebufferStatus","glCheckFramebufferStatusEXT");
             deleteFramebuffers=procedure<DeleteFramebuffers>("glDeleteFramebuffers","glDeleteFramebuffersEXT");
-            glGenTextures(1,&color);glBindTexture(GL_TEXTURE_2D,color);
-            glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR);
-            glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_LINEAR);
-            glTexImage2D(GL_TEXTURE_2D,0,GL_RGBA,width,height,0,GL_RGBA,GL_UNSIGNED_BYTE,nullptr);
+            deleteRenderbuffers=procedure<DeleteRenderbuffers>("glDeleteRenderbuffers","glDeleteRenderbuffersEXT");
+            // The original texture loader binds name 1 for the actual 512x256
+            // ADI bitmap. Keep the target outside that texture namespace.
+            generateColor(1,&color);bindColor(0x8D41 /* GL_RENDERBUFFER */,color);
+            allocateColor(0x8D41,0x8058 /* GL_RGBA8 */,width,height);
             generate(1,&framebuffer);bindFramebuffer(framebufferTarget,framebuffer);
-            attach(framebufferTarget,colorAttachment,GL_TEXTURE_2D,color,0);
+            attach(framebufferTarget,colorAttachment,0x8D41,color);
             // The original bitmap format requests zero depth/stencil bits.
             glDrawBuffer(colorAttachment);glReadBuffer(colorAttachment);
             require(check(framebufferTarget)==framebufferComplete && glGetError()==GL_NO_ERROR,

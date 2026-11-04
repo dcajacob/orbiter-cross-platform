@@ -582,8 +582,8 @@
     },
     "Src/Orbiter/Production/CMakeLists.txt": {
       "original_sha256_lf": null,
-      "sha256_lf": "8cbe12f0a989fa739c671e31117417b2316f16765e63307f4d9c03b3e9614dd5",
-      "scope": "Original legacy bitmap panel layout, scaling, MFD, mouse and redraw algorithms conserved by cockpit_source.py. Native surface ownership and actual renderer bindings; full Dragonfly drawing/runtime qualification remains pending. Public Windows SDK layout unchanged."
+      "sha256_lf": "3d4bde522efbd8193abcfc8af0fc7c6d04113ac81ff9b81ca6b471c96b731d6a",
+      "scope": "Complete original Dragonfly source and resources with independently audited native SDK/drawing/resource ownership bindings. Actual compatibility target uses distinct color-renderbuffer storage. Native diagnostic build/runtime and Windows/native qualification required; original formulas and public Windows SDK layouts unchanged."
     },
     "Src/Orbiter/Production/CameraServices.cpp": {
       "original_sha256_lf": null,
@@ -742,8 +742,8 @@
     },
     "Src/Orbiter/Production/NativeApplication.cpp": {
       "original_sha256_lf": null,
-      "sha256_lf": "44eef93f0b18244c9520d4d4528e44deb79229c251e1d08b875eada64460deca",
-      "scope": "Production admission remains unchanged. Separately compiled opt-in, uninstalled diagnostic hosts check real Atlantis/HST/solar-sail/quadcopter and named configuration-payload capabilities and emit explicit unqualified markers. Generic replacement remains forbidden and complete original/native qualification remains required."
+      "sha256_lf": "07a3f790d86aef939983a84eb2fbf2371607620ca98f709bb0fe7e230d7cb010",
+      "scope": "Complete original Dragonfly source and resources with independently audited native SDK/drawing/resource ownership bindings. Actual compatibility target uses distinct color-renderbuffer storage. Native diagnostic build/runtime and Windows/native qualification required; original formulas and public Windows SDK layouts unchanged."
     },
     "Src/Orbiter/Production/NativeBuild.h.in": {
       "sha256_lf": "f5fb21f83bb6be0c54839fce670e8410f6911eda86da2eef26e4221c1ae25d97",
@@ -787,8 +787,8 @@
     },
     "Src/Orbiter/Production/NativeGraphics.h": {
       "original_sha256_lf": null,
-      "sha256_lf": "49e8b523cd5b564686c9a952713f1cae96fc0056bf07ee829b3f6fa58ab399bb",
-      "scope": "Private actual compatibility-context/color-renderbuffer ownership and state-preserving RGBA transfer for original legacy instrument commands; no original physical calculations, public Windows SDK layout or acceptance budget changes. Real target/collision/transfer and complete-scene runtime controls required."
+      "sha256_lf": "7e8bfc6914669c62432854f65c0ca2f4345cc9412179fc5ec7314aa568483a7b",
+      "scope": "Complete original Dragonfly source and resources with independently audited native SDK/drawing/resource ownership bindings. Actual compatibility target uses distinct color-renderbuffer storage. Native diagnostic build/runtime and Windows/native qualification required; original formulas and public Windows SDK layouts unchanged."
     },
     "Src/Orbiter/Production/NativeModule.cpp": {
       "sha256_lf": "d90fc24038e5acf5c20329c08ac433c94fb4603811e7a1fc9aaf38eedb59e82a",
@@ -1306,8 +1306,8 @@
     },
     "Src/Orbiter/Production/NativeCockpit.cmake": {
       "original_sha256_lf": null,
-      "sha256_lf": "0ddd6e82b72c9ceb98f34195c8aee6731d2e97bb45468dc8c2079ab6b579a9c5",
-      "scope": "Original legacy bitmap panel layout, scaling, MFD, mouse and redraw algorithms conserved by cockpit_source.py. Native surface ownership and actual renderer bindings; full Dragonfly drawing/runtime qualification remains pending. Public Windows SDK layout unchanged."
+      "sha256_lf": "d847b34bfa700f69600a397be28701f9343ddbeff2b4c6576893c2f803870565",
+      "scope": "Complete original Dragonfly source and resources with independently audited native SDK/drawing/resource ownership bindings. Actual compatibility target uses distinct color-renderbuffer storage. Native diagnostic build/runtime and Windows/native qualification required; original formulas and public Windows SDK layouts unchanged."
     },
     "Src/Orbiter/Production/NativeCockpitGui.cpp": {
       "original_sha256_lf": null,
@@ -2107,7 +2107,7 @@
     "Src/Vessel/Dragonfly/instruments.cpp": {
       "original_sha256_lf": "d2ffe3a7edb2a6c71d5f2f7c03e8a4e58d63d75c7413fa3ff8b15d8b45a3e932",
       "sha256_lf": "9cdeaed05227c54216737b478c718d6e8fe8415cfd0f6e7463b26a726832babf",
-      "scope": "Original Dragonfly ADI calculations and rendering commands retained exactly; acquire its own WGL context for bitmap rendering, restore its caller at initialization/paint/teardown, and skip deletion when no context was initialized. Native Dragonfly implementation and matched stock qualification remain pending. The unsupported bitmap WGL allocation block now owns a private compatibility-window context with a 160x160 color-only framebuffer and real 32-bit bottom-up GDI readback; original GL commands, geometry, projection, lighting, attitude math and SDK blits remain exact."
+      "scope": "Complete original Dragonfly source and resources with independently audited native SDK/drawing/resource ownership bindings. Actual compatibility target uses distinct color-renderbuffer storage. Native diagnostic build/runtime and Windows/native qualification required; original formulas and public Windows SDK layouts unchanged."
     },
     "Src/Vessel/Dragonfly/WglContext.h": {
       "original_sha256_lf": null,
@@ -2117,12 +2117,12 @@
     "Src/Vessel/Dragonfly/instruments.h": {
       "original_sha256_lf": "5e98d45be9c3ff945f5c80392f91689b22e5384a7b6f1df18069dcdee89cda36",
       "sha256_lf": "936277a34765f9af19d634fe42a87ae200654392aaac6fd7d3d5c2421b6f2ee0",
-      "scope": "Private ADI target pointer for real offscreen compatibility rendering; no public SDK or physical state layout changes."
+      "scope": "Complete original Dragonfly source and resources with independently audited native SDK/drawing/resource ownership bindings. Actual compatibility target uses distinct color-renderbuffer storage. Native diagnostic build/runtime and Windows/native qualification required; original formulas and public Windows SDK layouts unchanged."
     },
     "Src/Vessel/Dragonfly/WglBitmapTarget.h": {
       "original_sha256_lf": null,
-      "sha256_lf": "069374ded753c01c78364c5a0b63dab1c65987a9334a7023f3e06196cbbe6bfa",
-      "scope": "Real owned compatibility context, color-only framebuffer and bottom-up GDI DIB replacing unsupported bitmap pixel formats; no GL geometry or physical model substitution."
+      "sha256_lf": "663566724c5cdc499ac30bc335137946294c9c2a034f2ba5344dfcb8948d90a9",
+      "scope": "Complete original Dragonfly source and resources with independently audited native SDK/drawing/resource ownership bindings. Actual compatibility target uses distinct color-renderbuffer storage. Native diagnostic build/runtime and Windows/native qualification required; original formulas and public Windows SDK layouts unchanged."
     },
     "Src/Vessel/HST/CMakeLists.txt": {
       "original_sha256_lf": "a8e1905433fc5249ca9326ac71e12b553d3282a6c434989e6a83f66496e5bf58",
@@ -2286,8 +2286,8 @@
     },
     "OVP/OGLClient/Native/NativeCallbacks.inc": {
       "original_sha256_lf": null,
-      "sha256_lf": "f86584e6c77fafbcabae9c3013f57bf6fb174934da8e57db4ade781ff7b29a01",
-      "scope": "Private actual compatibility-context/color-renderbuffer ownership and state-preserving RGBA transfer for original legacy instrument commands; no original physical calculations, public Windows SDK layout or acceptance budget changes. Real target/collision/transfer and complete-scene runtime controls required."
+      "sha256_lf": "3be4c5cd6d7ff2537ae59bcda1e273124b77ace382ef8ae1a53898fa9d032a25",
+      "scope": "Complete original Dragonfly source and resources with independently audited native SDK/drawing/resource ownership bindings. Actual compatibility target uses distinct color-renderbuffer storage. Native diagnostic build/runtime and Windows/native qualification required; original formulas and public Windows SDK layouts unchanged."
     },
     "Src/Orbiter/Production/NativeLegacyPanelSdk.cpp": {
       "original_sha256_lf": null,
@@ -2301,13 +2301,353 @@
     },
     "OVP/OGLClient/Native/NativeInstrumentTarget.cpp": {
       "original_sha256_lf": null,
-      "sha256_lf": "580b3432bcdbfa4598f1e655a191d8bb2a0fa78a772bfd5a6ac940f57675110b",
-      "scope": "Private actual compatibility-context/color-renderbuffer ownership and state-preserving RGBA transfer for original legacy instrument commands; no original physical calculations, public Windows SDK layout or acceptance budget changes. Real target/collision/transfer and complete-scene runtime controls required."
+      "sha256_lf": "cc223906f3a2d1b55804c2c39e7a99a4356d0824b1e794241ae34af01f798e3c",
+      "scope": "Complete original Dragonfly source and resources with independently audited native SDK/drawing/resource ownership bindings. Actual compatibility target uses distinct color-renderbuffer storage. Native diagnostic build/runtime and Windows/native qualification required; original formulas and public Windows SDK layouts unchanged."
     },
     "OVP/OGLClient/Native/CMakeLists.txt": {
       "original_sha256_lf": null,
       "sha256_lf": "8941ee1292ab367ce1e902217e1e0b95578a5772b44fbd6faf08380627ff2289",
       "scope": "Private actual compatibility-context/color-renderbuffer ownership and state-preserving RGBA transfer for original legacy instrument commands; no original physical calculations, public Windows SDK layout or acceptance budget changes. Real target/collision/transfer and complete-scene runtime controls required."
+    },
+    "Src/Vessel/Dragonfly/ADIborder.bmp": {
+      "original_sha256_lf": "b9ff0f9a1c70cc0f29abe4ab198dd7ac2e936380e516c2dd960f662f6d69d220",
+      "sha256_lf": "b9ff0f9a1c70cc0f29abe4ab198dd7ac2e936380e516c2dd960f662f6d69d220",
+      "scope": "Complete original Dragonfly source and resources with independently audited native SDK/drawing/resource ownership bindings. Actual compatibility target uses distinct color-renderbuffer storage. Native diagnostic build/runtime and Windows/native qualification required; original formulas and public Windows SDK layouts unchanged."
+    },
+    "Src/Vessel/Dragonfly/CMakeLists.txt": {
+      "original_sha256_lf": "fe5d46c1158fb15281ec60cbd41aff00f3cfcd21a9bc4374f86c2215d44fc64c",
+      "sha256_lf": "fe5d46c1158fb15281ec60cbd41aff00f3cfcd21a9bc4374f86c2215d44fc64c",
+      "scope": "Complete original Dragonfly source and resources with independently audited native SDK/drawing/resource ownership bindings. Actual compatibility target uses distinct color-renderbuffer storage. Native diagnostic build/runtime and Windows/native qualification required; original formulas and public Windows SDK layouts unchanged."
+    },
+    "Src/Vessel/Dragonfly/Config/Dragonfly.cfg": {
+      "original_sha256_lf": "d8d4f335ae3a56373c48a2275c3505c29397412f0ab76cda639629e88f1f7238",
+      "sha256_lf": "d8d4f335ae3a56373c48a2275c3505c29397412f0ab76cda639629e88f1f7238",
+      "scope": "Complete original Dragonfly source and resources with independently audited native SDK/drawing/resource ownership bindings. Actual compatibility target uses distinct color-renderbuffer storage. Native diagnostic build/runtime and Windows/native qualification required; original formulas and public Windows SDK layouts unchanged."
+    },
+    "Src/Vessel/Dragonfly/Dial1.bmp": {
+      "original_sha256_lf": "e07d78307edb7f32d6d8bd642ba8756ba5e48eb295d6192f1151011956d93f41",
+      "sha256_lf": "e07d78307edb7f32d6d8bd642ba8756ba5e48eb295d6192f1151011956d93f41",
+      "scope": "Complete original Dragonfly source and resources with independently audited native SDK/drawing/resource ownership bindings. Actual compatibility target uses distinct color-renderbuffer storage. Native diagnostic build/runtime and Windows/native qualification required; original formulas and public Windows SDK layouts unchanged."
+    },
+    "Src/Vessel/Dragonfly/Dragonfly.cpp": {
+      "original_sha256_lf": "b7eafa84abb0e4bf7e99c424434dc07af02bbe8517c6be854cb02f739c3c8cd5",
+      "sha256_lf": "b7eafa84abb0e4bf7e99c424434dc07af02bbe8517c6be854cb02f739c3c8cd5",
+      "scope": "Complete original Dragonfly source and resources with independently audited native SDK/drawing/resource ownership bindings. Actual compatibility target uses distinct color-renderbuffer storage. Native diagnostic build/runtime and Windows/native qualification required; original formulas and public Windows SDK layouts unchanged."
+    },
+    "Src/Vessel/Dragonfly/Dragonfly.h": {
+      "original_sha256_lf": "97bd57050f80cbf586b430db4fde79c71d97fe849d6fa5f8d2028db18b0f4f5d",
+      "sha256_lf": "97bd57050f80cbf586b430db4fde79c71d97fe849d6fa5f8d2028db18b0f4f5d",
+      "scope": "Complete original Dragonfly source and resources with independently audited native SDK/drawing/resource ownership bindings. Actual compatibility target uses distinct color-renderbuffer storage. Native diagnostic build/runtime and Windows/native qualification required; original formulas and public Windows SDK layouts unchanged."
+    },
+    "Src/Vessel/Dragonfly/Esystems.cpp": {
+      "original_sha256_lf": "05c06b5ba36a3777dd6481bf18ff77c287edef8cdeadd3fc80d7eda71de798de",
+      "sha256_lf": "05c06b5ba36a3777dd6481bf18ff77c287edef8cdeadd3fc80d7eda71de798de",
+      "scope": "Complete original Dragonfly source and resources with independently audited native SDK/drawing/resource ownership bindings. Actual compatibility target uses distinct color-renderbuffer storage. Native diagnostic build/runtime and Windows/native qualification required; original formulas and public Windows SDK layouts unchanged."
+    },
+    "Src/Vessel/Dragonfly/Esystems.h": {
+      "original_sha256_lf": "7e9258c34c0596b79618c156535313e5e1fd5c17bab0f34aeda22867197cb47d",
+      "sha256_lf": "7e9258c34c0596b79618c156535313e5e1fd5c17bab0f34aeda22867197cb47d",
+      "scope": "Complete original Dragonfly source and resources with independently audited native SDK/drawing/resource ownership bindings. Actual compatibility target uses distinct color-renderbuffer storage. Native diagnostic build/runtime and Windows/native qualification required; original formulas and public Windows SDK layouts unchanged."
+    },
+    "Src/Vessel/Dragonfly/Fonts.bmp": {
+      "original_sha256_lf": "e2aa92ba982ee67ed1a708d44e906cbdb89813448b7a38593b9cf4d571c485ae",
+      "sha256_lf": "e2aa92ba982ee67ed1a708d44e906cbdb89813448b7a38593b9cf4d571c485ae",
+      "scope": "Complete original Dragonfly source and resources with independently audited native SDK/drawing/resource ownership bindings. Actual compatibility target uses distinct color-renderbuffer storage. Native diagnostic build/runtime and Windows/native qualification required; original formulas and public Windows SDK layouts unchanged."
+    },
+    "Src/Vessel/Dragonfly/Hsystems.cpp": {
+      "original_sha256_lf": "95d601531347999e5674b3035dac474f9c2afbdcfc9825ea521fba0e5d08aaeb",
+      "sha256_lf": "95d601531347999e5674b3035dac474f9c2afbdcfc9825ea521fba0e5d08aaeb",
+      "scope": "Complete original Dragonfly source and resources with independently audited native SDK/drawing/resource ownership bindings. Actual compatibility target uses distinct color-renderbuffer storage. Native diagnostic build/runtime and Windows/native qualification required; original formulas and public Windows SDK layouts unchanged."
+    },
+    "Src/Vessel/Dragonfly/Hsystems.h": {
+      "original_sha256_lf": "e30b69b5b0181eb5a3abed626dc5ce0df05bb5058acb6575cfd756c807999b40",
+      "sha256_lf": "e30b69b5b0181eb5a3abed626dc5ce0df05bb5058acb6575cfd756c807999b40",
+      "scope": "Complete original Dragonfly source and resources with independently audited native SDK/drawing/resource ownership bindings. Actual compatibility target uses distinct color-renderbuffer storage. Native diagnostic build/runtime and Windows/native qualification required; original formulas and public Windows SDK layouts unchanged."
+    },
+    "Src/Vessel/Dragonfly/Internal.cpp": {
+      "original_sha256_lf": "8ece592ea4de4171d817769072b1022fe95349f99a2b99142b21bc79912647e4",
+      "sha256_lf": "8ece592ea4de4171d817769072b1022fe95349f99a2b99142b21bc79912647e4",
+      "scope": "Complete original Dragonfly source and resources with independently audited native SDK/drawing/resource ownership bindings. Actual compatibility target uses distinct color-renderbuffer storage. Native diagnostic build/runtime and Windows/native qualification required; original formulas and public Windows SDK layouts unchanged."
+    },
+    "Src/Vessel/Dragonfly/Internal.h": {
+      "original_sha256_lf": "58a8152c784c706277c180fa4aca8efa525ad2a80306e7efa920d7ba608d0bc6",
+      "sha256_lf": "58a8152c784c706277c180fa4aca8efa525ad2a80306e7efa920d7ba608d0bc6",
+      "scope": "Complete original Dragonfly source and resources with independently audited native SDK/drawing/resource ownership bindings. Actual compatibility target uses distinct color-renderbuffer storage. Native diagnostic build/runtime and Windows/native qualification required; original formulas and public Windows SDK layouts unchanged."
+    },
+    "Src/Vessel/Dragonfly/MFD.bmp": {
+      "original_sha256_lf": "69349a2cee0aeeda0a5f62a756d73a211b90d268eac054e710c49f9f614045cf",
+      "sha256_lf": "69349a2cee0aeeda0a5f62a756d73a211b90d268eac054e710c49f9f614045cf",
+      "scope": "Complete original Dragonfly source and resources with independently audited native SDK/drawing/resource ownership bindings. Actual compatibility target uses distinct color-renderbuffer storage. Native diagnostic build/runtime and Windows/native qualification required; original formulas and public Windows SDK layouts unchanged."
+    },
+    "Src/Vessel/Dragonfly/Matrix.cpp": {
+      "original_sha256_lf": "a0fb0457ce7f5dd8be3aa4dc3dcda124c1866052d538b0994230a630878071b3",
+      "sha256_lf": "a0fb0457ce7f5dd8be3aa4dc3dcda124c1866052d538b0994230a630878071b3",
+      "scope": "Complete original Dragonfly source and resources with independently audited native SDK/drawing/resource ownership bindings. Actual compatibility target uses distinct color-renderbuffer storage. Native diagnostic build/runtime and Windows/native qualification required; original formulas and public Windows SDK layouts unchanged."
+    },
+    "Src/Vessel/Dragonfly/Meshes/Dragonfly.msh": {
+      "original_sha256_lf": "c0de2b4bba539e9f0cdcced2c816422aa7571eac809d340299ecd81867d6a77a",
+      "sha256_lf": "c0de2b4bba539e9f0cdcced2c816422aa7571eac809d340299ecd81867d6a77a",
+      "scope": "Complete original Dragonfly source and resources with independently audited native SDK/drawing/resource ownership bindings. Actual compatibility target uses distinct color-renderbuffer storage. Native diagnostic build/runtime and Windows/native qualification required; original formulas and public Windows SDK layouts unchanged."
+    },
+    "Src/Vessel/Dragonfly/Panel.h": {
+      "original_sha256_lf": "303bba749eaafc8f32881182bef09f05befda8d1721705d5a0d9cb664591fbfd",
+      "sha256_lf": "303bba749eaafc8f32881182bef09f05befda8d1721705d5a0d9cb664591fbfd",
+      "scope": "Complete original Dragonfly source and resources with independently audited native SDK/drawing/resource ownership bindings. Actual compatibility target uses distinct color-renderbuffer storage. Native diagnostic build/runtime and Windows/native qualification required; original formulas and public Windows SDK layouts unchanged."
+    },
+    "Src/Vessel/Dragonfly/PanelDef.h": {
+      "original_sha256_lf": "8c3e450f00141063f550f747fe43738719c24139771fd85328182f9f63af3181",
+      "sha256_lf": "8c3e450f00141063f550f747fe43738719c24139771fd85328182f9f63af3181",
+      "scope": "Complete original Dragonfly source and resources with independently audited native SDK/drawing/resource ownership bindings. Actual compatibility target uses distinct color-renderbuffer storage. Native diagnostic build/runtime and Windows/native qualification required; original formulas and public Windows SDK layouts unchanged."
+    },
+    "Src/Vessel/Dragonfly/SL.bmp": {
+      "original_sha256_lf": "dea4ea2677cc3b337b290d508482c1ad402b1c30d2e2893d0524412b6af5d181",
+      "sha256_lf": "dea4ea2677cc3b337b290d508482c1ad402b1c30d2e2893d0524412b6af5d181",
+      "scope": "Complete original Dragonfly source and resources with independently audited native SDK/drawing/resource ownership bindings. Actual compatibility target uses distinct color-renderbuffer storage. Native diagnostic build/runtime and Windows/native qualification required; original formulas and public Windows SDK layouts unchanged."
+    },
+    "Src/Vessel/Dragonfly/Switch1.bmp": {
+      "original_sha256_lf": "c24ebb7339aa82ab18923f9519858c3071bc9ab58399381e25319b6bca7bdaf9",
+      "sha256_lf": "c24ebb7339aa82ab18923f9519858c3071bc9ab58399381e25319b6bca7bdaf9",
+      "scope": "Complete original Dragonfly source and resources with independently audited native SDK/drawing/resource ownership bindings. Actual compatibility target uses distinct color-renderbuffer storage. Native diagnostic build/runtime and Windows/native qualification required; original formulas and public Windows SDK layouts unchanged."
+    },
+    "Src/Vessel/Dragonfly/Switch2.bmp": {
+      "original_sha256_lf": "813590a88111e7ee812da90f578d7641b12128ba7190fcdc499b6039ac383369",
+      "sha256_lf": "813590a88111e7ee812da90f578d7641b12128ba7190fcdc499b6039ac383369",
+      "scope": "Complete original Dragonfly source and resources with independently audited native SDK/drawing/resource ownership bindings. Actual compatibility target uses distinct color-renderbuffer storage. Native diagnostic build/runtime and Windows/native qualification required; original formulas and public Windows SDK layouts unchanged."
+    },
+    "Src/Vessel/Dragonfly/Textures/dfly1x.dds": {
+      "original_sha256_lf": "68ba48a93faf4311d8fc109ebb109fc0f187b9cf3ada13fb497183963ed170a6",
+      "sha256_lf": "68ba48a93faf4311d8fc109ebb109fc0f187b9cf3ada13fb497183963ed170a6",
+      "scope": "Complete original Dragonfly source and resources with independently audited native SDK/drawing/resource ownership bindings. Actual compatibility target uses distinct color-renderbuffer storage. Native diagnostic build/runtime and Windows/native qualification required; original formulas and public Windows SDK layouts unchanged."
+    },
+    "Src/Vessel/Dragonfly/Textures/dfly3x.dds": {
+      "original_sha256_lf": "3682369989d3315636d3e6a3e43c5bd1edb0a8f090e6d99f4cf40a45775ea99b",
+      "sha256_lf": "3682369989d3315636d3e6a3e43c5bd1edb0a8f090e6d99f4cf40a45775ea99b",
+      "scope": "Complete original Dragonfly source and resources with independently audited native SDK/drawing/resource ownership bindings. Actual compatibility target uses distinct color-renderbuffer storage. Native diagnostic build/runtime and Windows/native qualification required; original formulas and public Windows SDK layouts unchanged."
+    },
+    "Src/Vessel/Dragonfly/Textures/dfly4x.dds": {
+      "original_sha256_lf": "1a8511e29b2983c2066d15fc54cb00a311973e3b7c1567326cf6e86f38975143",
+      "sha256_lf": "1a8511e29b2983c2066d15fc54cb00a311973e3b7c1567326cf6e86f38975143",
+      "scope": "Complete original Dragonfly source and resources with independently audited native SDK/drawing/resource ownership bindings. Actual compatibility target uses distinct color-renderbuffer storage. Native diagnostic build/runtime and Windows/native qualification required; original formulas and public Windows SDK layouts unchanged."
+    },
+    "Src/Vessel/Dragonfly/Textures/dfly5x.dds": {
+      "original_sha256_lf": "07af481a9bdc223b880bd4491408d9db07e0513cd290305cc6c0d2a42a360091",
+      "sha256_lf": "07af481a9bdc223b880bd4491408d9db07e0513cd290305cc6c0d2a42a360091",
+      "scope": "Complete original Dragonfly source and resources with independently audited native SDK/drawing/resource ownership bindings. Actual compatibility target uses distinct color-renderbuffer storage. Native diagnostic build/runtime and Windows/native qualification required; original formulas and public Windows SDK layouts unchanged."
+    },
+    "Src/Vessel/Dragonfly/Textures/dfly6x.dds": {
+      "original_sha256_lf": "8b433e9174998f7225a557776296e5d30e36b9df9e752fcbb624d393226d80d2",
+      "sha256_lf": "8b433e9174998f7225a557776296e5d30e36b9df9e752fcbb624d393226d80d2",
+      "scope": "Complete original Dragonfly source and resources with independently audited native SDK/drawing/resource ownership bindings. Actual compatibility target uses distinct color-renderbuffer storage. Native diagnostic build/runtime and Windows/native qualification required; original formulas and public Windows SDK layouts unchanged."
+    },
+    "Src/Vessel/Dragonfly/Textures/dfly7x.dds": {
+      "original_sha256_lf": "47a0c624ef37326052fddce1590b9921f3b07a461756f676e187c50419f4a784",
+      "sha256_lf": "47a0c624ef37326052fddce1590b9921f3b07a461756f676e187c50419f4a784",
+      "scope": "Complete original Dragonfly source and resources with independently audited native SDK/drawing/resource ownership bindings. Actual compatibility target uses distinct color-renderbuffer storage. Native diagnostic build/runtime and Windows/native qualification required; original formulas and public Windows SDK layouts unchanged."
+    },
+    "Src/Vessel/Dragonfly/Textures2/dfly1x.dds": {
+      "original_sha256_lf": "a16f7c5e429e27799584ecbea31ccbe98f692500a11ee19347013598a78b0697",
+      "sha256_lf": "a16f7c5e429e27799584ecbea31ccbe98f692500a11ee19347013598a78b0697",
+      "scope": "Complete original Dragonfly source and resources with independently audited native SDK/drawing/resource ownership bindings. Actual compatibility target uses distinct color-renderbuffer storage. Native diagnostic build/runtime and Windows/native qualification required; original formulas and public Windows SDK layouts unchanged."
+    },
+    "Src/Vessel/Dragonfly/Textures2/dfly4x.dds": {
+      "original_sha256_lf": "2a18bddab2af9f24a71405cf4afa281b278a8c1f9eb67b1b76f64b31d626c13e",
+      "sha256_lf": "2a18bddab2af9f24a71405cf4afa281b278a8c1f9eb67b1b76f64b31d626c13e",
+      "scope": "Complete original Dragonfly source and resources with independently audited native SDK/drawing/resource ownership bindings. Actual compatibility target uses distinct color-renderbuffer storage. Native diagnostic build/runtime and Windows/native qualification required; original formulas and public Windows SDK layouts unchanged."
+    },
+    "Src/Vessel/Dragonfly/Textures2/dfly7x.dds": {
+      "original_sha256_lf": "a4c3e9321609c0fbda849cebc98e889872c1a4d327629d64dfef236241fc60ba",
+      "sha256_lf": "a4c3e9321609c0fbda849cebc98e889872c1a4d327629d64dfef236241fc60ba",
+      "scope": "Complete original Dragonfly source and resources with independently audited native SDK/drawing/resource ownership bindings. Actual compatibility target uses distinct color-renderbuffer storage. Native diagnostic build/runtime and Windows/native qualification required; original formulas and public Windows SDK layouts unchanged."
+    },
+    "Src/Vessel/Dragonfly/Thermal.cpp": {
+      "original_sha256_lf": "671bd638087a0f42b01b21df73e0f7ac0d0dcced9b43505d0136d30583c9b617",
+      "sha256_lf": "671bd638087a0f42b01b21df73e0f7ac0d0dcced9b43505d0136d30583c9b617",
+      "scope": "Complete original Dragonfly source and resources with independently audited native SDK/drawing/resource ownership bindings. Actual compatibility target uses distinct color-renderbuffer storage. Native diagnostic build/runtime and Windows/native qualification required; original formulas and public Windows SDK layouts unchanged."
+    },
+    "Src/Vessel/Dragonfly/Thermal.h": {
+      "original_sha256_lf": "5a094b2a9d19fe8c74a7e1abda27fb138b0c4b1379effc0194c820b43e39c078",
+      "sha256_lf": "5a094b2a9d19fe8c74a7e1abda27fb138b0c4b1379effc0194c820b43e39c078",
+      "scope": "Complete original Dragonfly source and resources with independently audited native SDK/drawing/resource ownership bindings. Actual compatibility target uses distinct color-renderbuffer storage. Native diagnostic build/runtime and Windows/native qualification required; original formulas and public Windows SDK layouts unchanged."
+    },
+    "Src/Vessel/Dragonfly/Thumbnail/Dragonfly.bmp": {
+      "original_sha256_lf": "6c541ff4a43568c944a8ccabb75b38d6467ce3ff698dc766904bc47c600096b0",
+      "sha256_lf": "6c541ff4a43568c944a8ccabb75b38d6467ce3ff698dc766904bc47c600096b0",
+      "scope": "Complete original Dragonfly source and resources with independently audited native SDK/drawing/resource ownership bindings. Actual compatibility target uses distinct color-renderbuffer storage. Native diagnostic build/runtime and Windows/native qualification required; original formulas and public Windows SDK layouts unchanged."
+    },
+    "Src/Vessel/Dragonfly/Up.bmp": {
+      "original_sha256_lf": "fa85ef14a09faef20038240bcfd3549adf841e00a4a1a3bbab01c1f4a0b3265d",
+      "sha256_lf": "fa85ef14a09faef20038240bcfd3549adf841e00a4a1a3bbab01c1f4a0b3265d",
+      "scope": "Complete original Dragonfly source and resources with independently audited native SDK/drawing/resource ownership bindings. Actual compatibility target uses distinct color-renderbuffer storage. Native diagnostic build/runtime and Windows/native qualification required; original formulas and public Windows SDK layouts unchanged."
+    },
+    "Src/Vessel/Dragonfly/cb.bmp": {
+      "original_sha256_lf": "548ca0597ede90c49c504fe8ac366ac797999fd534ee89cbf2e5a92561a6336c",
+      "sha256_lf": "548ca0597ede90c49c504fe8ac366ac797999fd534ee89cbf2e5a92561a6336c",
+      "scope": "Complete original Dragonfly source and resources with independently audited native SDK/drawing/resource ownership bindings. Actual compatibility target uses distinct color-renderbuffer storage. Native diagnostic build/runtime and Windows/native qualification required; original formulas and public Windows SDK layouts unchanged."
+    },
+    "Src/Vessel/Dragonfly/cw.bmp": {
+      "original_sha256_lf": "ebc2efe261149f34c69239136c62b1b3e655f9c5ae82f1caaedac3dbc109bac2",
+      "sha256_lf": "ebc2efe261149f34c69239136c62b1b3e655f9c5ae82f1caaedac3dbc109bac2",
+      "scope": "Complete original Dragonfly source and resources with independently audited native SDK/drawing/resource ownership bindings. Actual compatibility target uses distinct color-renderbuffer storage. Native diagnostic build/runtime and Windows/native qualification required; original formulas and public Windows SDK layouts unchanged."
+    },
+    "Src/Vessel/Dragonfly/dock.bmp": {
+      "original_sha256_lf": "fab2e703bc2404ca02ba259c337bea7980beb4a9bd4f0fab8713897cfaaf7173",
+      "sha256_lf": "fab2e703bc2404ca02ba259c337bea7980beb4a9bd4f0fab8713897cfaaf7173",
+      "scope": "Complete original Dragonfly source and resources with independently audited native SDK/drawing/resource ownership bindings. Actual compatibility target uses distinct color-renderbuffer storage. Native diagnostic build/runtime and Windows/native qualification required; original formulas and public Windows SDK layouts unchanged."
+    },
+    "Src/Vessel/Dragonfly/dragon.bmp": {
+      "original_sha256_lf": "4cd938a06485b3730a50c81874fc905709b506aa86d333ab898e281e9ee6a5d6",
+      "sha256_lf": "4cd938a06485b3730a50c81874fc905709b506aa86d333ab898e281e9ee6a5d6",
+      "scope": "Complete original Dragonfly source and resources with independently audited native SDK/drawing/resource ownership bindings. Actual compatibility target uses distinct color-renderbuffer storage. Native diagnostic build/runtime and Windows/native qualification required; original formulas and public Windows SDK layouts unchanged."
+    },
+    "Src/Vessel/Dragonfly/dragon2.bmp": {
+      "original_sha256_lf": "93c07b25bb793c986845311555172bcb3c335c14d566d99fe814cf613b51848e",
+      "sha256_lf": "93c07b25bb793c986845311555172bcb3c335c14d566d99fe814cf613b51848e",
+      "scope": "Complete original Dragonfly source and resources with independently audited native SDK/drawing/resource ownership bindings. Actual compatibility target uses distinct color-renderbuffer storage. Native diagnostic build/runtime and Windows/native qualification required; original formulas and public Windows SDK layouts unchanged."
+    },
+    "Src/Vessel/Dragonfly/egauge.bmp": {
+      "original_sha256_lf": "45af1855923b83f2c9730ba4b45fa1b900044097392380c8fb140a056c9409a9",
+      "sha256_lf": "45af1855923b83f2c9730ba4b45fa1b900044097392380c8fb140a056c9409a9",
+      "scope": "Complete original Dragonfly source and resources with independently audited native SDK/drawing/resource ownership bindings. Actual compatibility target uses distinct color-renderbuffer storage. Native diagnostic build/runtime and Windows/native qualification required; original formulas and public Windows SDK layouts unchanged."
+    },
+    "Src/Vessel/Dragonfly/front.bmp": {
+      "original_sha256_lf": "6a373df8992db5026db640585d736d82bea8b8e045bf32480c4e9bd01e723e1d",
+      "sha256_lf": "6a373df8992db5026db640585d736d82bea8b8e045bf32480c4e9bd01e723e1d",
+      "scope": "Complete original Dragonfly source and resources with independently audited native SDK/drawing/resource ownership bindings. Actual compatibility target uses distinct color-renderbuffer storage. Native diagnostic build/runtime and Windows/native qualification required; original formulas and public Windows SDK layouts unchanged."
+    },
+    "Src/Vessel/Dragonfly/fuel.bmp": {
+      "original_sha256_lf": "3899bb082621f383f6db6f5e4348ad53d924d5852877027b6f29e76354d6e075",
+      "sha256_lf": "3899bb082621f383f6db6f5e4348ad53d924d5852877027b6f29e76354d6e075",
+      "scope": "Complete original Dragonfly source and resources with independently audited native SDK/drawing/resource ownership bindings. Actual compatibility target uses distinct color-renderbuffer storage. Native diagnostic build/runtime and Windows/native qualification required; original formulas and public Windows SDK layouts unchanged."
+    },
+    "Src/Vessel/Dragonfly/gauge.bmp": {
+      "original_sha256_lf": "71f802bb211d785e159530350fd26d602581bcfad456cad8079f8eb2978f0513",
+      "sha256_lf": "71f802bb211d785e159530350fd26d602581bcfad456cad8079f8eb2978f0513",
+      "scope": "Complete original Dragonfly source and resources with independently audited native SDK/drawing/resource ownership bindings. Actual compatibility target uses distinct color-renderbuffer storage. Native diagnostic build/runtime and Windows/native qualification required; original formulas and public Windows SDK layouts unchanged."
+    },
+    "Src/Vessel/Dragonfly/grill.bmp": {
+      "original_sha256_lf": "1d32a6a7be5fcf813591c483d8f37f91ef4725817c29667243579c2dee0b2fd3",
+      "sha256_lf": "1d32a6a7be5fcf813591c483d8f37f91ef4725817c29667243579c2dee0b2fd3",
+      "scope": "Complete original Dragonfly source and resources with independently audited native SDK/drawing/resource ownership bindings. Actual compatibility target uses distinct color-renderbuffer storage. Native diagnostic build/runtime and Windows/native qualification required; original formulas and public Windows SDK layouts unchanged."
+    },
+    "Src/Vessel/Dragonfly/left.bmp": {
+      "original_sha256_lf": "57db0b522ec8f872565e4cb95f023afd66bc569892cce30074f69b517289e517",
+      "sha256_lf": "57db0b522ec8f872565e4cb95f023afd66bc569892cce30074f69b517289e517",
+      "scope": "Complete original Dragonfly source and resources with independently audited native SDK/drawing/resource ownership bindings. Actual compatibility target uses distinct color-renderbuffer storage. Native diagnostic build/runtime and Windows/native qualification required; original formulas and public Windows SDK layouts unchanged."
+    },
+    "Src/Vessel/Dragonfly/matrix.h": {
+      "original_sha256_lf": "326414644f44d9fd1cbd13bac41d4ea28c68c8dfdb9c2a6cfdc1abd8c2ce0270",
+      "sha256_lf": "326414644f44d9fd1cbd13bac41d4ea28c68c8dfdb9c2a6cfdc1abd8c2ce0270",
+      "scope": "Complete original Dragonfly source and resources with independently audited native SDK/drawing/resource ownership bindings. Actual compatibility target uses distinct color-renderbuffer storage. Native diagnostic build/runtime and Windows/native qualification required; original formulas and public Windows SDK layouts unchanged."
+    },
+    "Src/Vessel/Dragonfly/nav.bmp": {
+      "original_sha256_lf": "d9bb66bf895341fef87298dd0b0aec115bbb47ee4fd070822d309dc0cc38696f",
+      "sha256_lf": "d9bb66bf895341fef87298dd0b0aec115bbb47ee4fd070822d309dc0cc38696f",
+      "scope": "Complete original Dragonfly source and resources with independently audited native SDK/drawing/resource ownership bindings. Actual compatibility target uses distinct color-renderbuffer storage. Native diagnostic build/runtime and Windows/native qualification required; original formulas and public Windows SDK layouts unchanged."
+    },
+    "Src/Vessel/Dragonfly/panel.cpp": {
+      "original_sha256_lf": "a62e9effc6436c9037ad33452ea2ecbae655234720d5e61c77d6af2fedefe22c",
+      "sha256_lf": "a62e9effc6436c9037ad33452ea2ecbae655234720d5e61c77d6af2fedefe22c",
+      "scope": "Complete original Dragonfly source and resources with independently audited native SDK/drawing/resource ownership bindings. Actual compatibility target uses distinct color-renderbuffer storage. Native diagnostic build/runtime and Windows/native qualification required; original formulas and public Windows SDK layouts unchanged."
+    },
+    "Src/Vessel/Dragonfly/panel.rc": {
+      "original_sha256_lf": "165265e3d3e27feaee6dc71e55b12b8edebc916989deaee3062baa62fbcf842a",
+      "sha256_lf": "165265e3d3e27feaee6dc71e55b12b8edebc916989deaee3062baa62fbcf842a",
+      "scope": "Complete original Dragonfly source and resources with independently audited native SDK/drawing/resource ownership bindings. Actual compatibility target uses distinct color-renderbuffer storage. Native diagnostic build/runtime and Windows/native qualification required; original formulas and public Windows SDK layouts unchanged."
+    },
+    "Src/Vessel/Dragonfly/quaternion.cpp": {
+      "original_sha256_lf": "1f85e88da2fd80a077090ec007c60b65ffaca43bfe0a54e0c3c87f46ac5e9e43",
+      "sha256_lf": "1f85e88da2fd80a077090ec007c60b65ffaca43bfe0a54e0c3c87f46ac5e9e43",
+      "scope": "Complete original Dragonfly source and resources with independently audited native SDK/drawing/resource ownership bindings. Actual compatibility target uses distinct color-renderbuffer storage. Native diagnostic build/runtime and Windows/native qualification required; original formulas and public Windows SDK layouts unchanged."
+    },
+    "Src/Vessel/Dragonfly/quaternion.h": {
+      "original_sha256_lf": "c2163efc71caf379958aaed2ce106dc92e5e874abd97974fcbe2a2fe70ae43e7",
+      "sha256_lf": "c2163efc71caf379958aaed2ce106dc92e5e874abd97974fcbe2a2fe70ae43e7",
+      "scope": "Complete original Dragonfly source and resources with independently audited native SDK/drawing/resource ownership bindings. Actual compatibility target uses distinct color-renderbuffer storage. Native diagnostic build/runtime and Windows/native qualification required; original formulas and public Windows SDK layouts unchanged."
+    },
+    "Src/Vessel/Dragonfly/rad2.bmp": {
+      "original_sha256_lf": "51866a383a7738bf0c6c795ffbbbd8379e4f6a5f8a214d823b41114b45ad414f",
+      "sha256_lf": "51866a383a7738bf0c6c795ffbbbd8379e4f6a5f8a214d823b41114b45ad414f",
+      "scope": "Complete original Dragonfly source and resources with independently audited native SDK/drawing/resource ownership bindings. Actual compatibility target uses distinct color-renderbuffer storage. Native diagnostic build/runtime and Windows/native qualification required; original formulas and public Windows SDK layouts unchanged."
+    },
+    "Src/Vessel/Dragonfly/radar.bmp": {
+      "original_sha256_lf": "de074342e40a15ef197bc2989d2e6fe97a428803e9b3bc4ddec8cab2b24f5ebb",
+      "sha256_lf": "de074342e40a15ef197bc2989d2e6fe97a428803e9b3bc4ddec8cab2b24f5ebb",
+      "scope": "Complete original Dragonfly source and resources with independently audited native SDK/drawing/resource ownership bindings. Actual compatibility target uses distinct color-renderbuffer storage. Native diagnostic build/runtime and Windows/native qualification required; original formulas and public Windows SDK layouts unchanged."
+    },
+    "Src/Vessel/Dragonfly/radar2.bmp": {
+      "original_sha256_lf": "33b85409ba543cf9be0e8362ff041df932f2304a8e23bb957a26bad088d90a80",
+      "sha256_lf": "33b85409ba543cf9be0e8362ff041df932f2304a8e23bb957a26bad088d90a80",
+      "scope": "Complete original Dragonfly source and resources with independently audited native SDK/drawing/resource ownership bindings. Actual compatibility target uses distinct color-renderbuffer storage. Native diagnostic build/runtime and Windows/native qualification required; original formulas and public Windows SDK layouts unchanged."
+    },
+    "Src/Vessel/Dragonfly/resource.h": {
+      "original_sha256_lf": "2ce99cc246676eeda8d0100c76292d859f9855b49e2106fc188e8ae8dbfbc094",
+      "sha256_lf": "2ce99cc246676eeda8d0100c76292d859f9855b49e2106fc188e8ae8dbfbc094",
+      "scope": "Complete original Dragonfly source and resources with independently audited native SDK/drawing/resource ownership bindings. Actual compatibility target uses distinct color-renderbuffer storage. Native diagnostic build/runtime and Windows/native qualification required; original formulas and public Windows SDK layouts unchanged."
+    },
+    "Src/Vessel/Dragonfly/right.bmp": {
+      "original_sha256_lf": "fea38f68b49a1df68bcf92897853d42b8980215c3bd34adf3ad210d2b2695fd8",
+      "sha256_lf": "fea38f68b49a1df68bcf92897853d42b8980215c3bd34adf3ad210d2b2695fd8",
+      "scope": "Complete original Dragonfly source and resources with independently audited native SDK/drawing/resource ownership bindings. Actual compatibility target uses distinct color-renderbuffer storage. Native diagnostic build/runtime and Windows/native qualification required; original formulas and public Windows SDK layouts unchanged."
+    },
+    "Src/Vessel/Dragonfly/rotary.bmp": {
+      "original_sha256_lf": "97e0217795af2969b6f410f7be33da2e2a045f86f65bd7f9f72a6b9cd1af59ef",
+      "sha256_lf": "97e0217795af2969b6f410f7be33da2e2a045f86f65bd7f9f72a6b9cd1af59ef",
+      "scope": "Complete original Dragonfly source and resources with independently audited native SDK/drawing/resource ownership bindings. Actual compatibility target uses distinct color-renderbuffer storage. Native diagnostic build/runtime and Windows/native qualification required; original formulas and public Windows SDK layouts unchanged."
+    },
+    "Src/Vessel/Dragonfly/switch.bmp": {
+      "original_sha256_lf": "28aa0da7c2605563aef9c915a791a6b76a291c8c791b6ea18527131e0daaba62",
+      "sha256_lf": "28aa0da7c2605563aef9c915a791a6b76a291c8c791b6ea18527131e0daaba62",
+      "scope": "Complete original Dragonfly source and resources with independently audited native SDK/drawing/resource ownership bindings. Actual compatibility target uses distinct color-renderbuffer storage. Native diagnostic build/runtime and Windows/native qualification required; original formulas and public Windows SDK layouts unchanged."
+    },
+    "Src/Vessel/Dragonfly/tb.bmp": {
+      "original_sha256_lf": "3515573e07c3efe6d2a93edd84c1a545c403dbbf254fec64866140fa24db1090",
+      "sha256_lf": "3515573e07c3efe6d2a93edd84c1a545c403dbbf254fec64866140fa24db1090",
+      "scope": "Complete original Dragonfly source and resources with independently audited native SDK/drawing/resource ownership bindings. Actual compatibility target uses distinct color-renderbuffer storage. Native diagnostic build/runtime and Windows/native qualification required; original formulas and public Windows SDK layouts unchanged."
+    },
+    "Src/Vessel/Dragonfly/vectors.cpp": {
+      "original_sha256_lf": "96911bd399ebfb8f7259602428e57a77a789b3b02d56880ff79e5c2af9b81b04",
+      "sha256_lf": "96911bd399ebfb8f7259602428e57a77a789b3b02d56880ff79e5c2af9b81b04",
+      "scope": "Complete original Dragonfly source and resources with independently audited native SDK/drawing/resource ownership bindings. Actual compatibility target uses distinct color-renderbuffer storage. Native diagnostic build/runtime and Windows/native qualification required; original formulas and public Windows SDK layouts unchanged."
+    },
+    "Src/Vessel/Dragonfly/vectors.h": {
+      "original_sha256_lf": "51b47a648bd370674dd6957209c51eea912c0fafdea641d5252206531ee87e19",
+      "sha256_lf": "51b47a648bd370674dd6957209c51eea912c0fafdea641d5252206531ee87e19",
+      "scope": "Complete original Dragonfly source and resources with independently audited native SDK/drawing/resource ownership bindings. Actual compatibility target uses distinct color-renderbuffer storage. Native diagnostic build/runtime and Windows/native qualification required; original formulas and public Windows SDK layouts unchanged."
+    },
+    "Src/Vessel/Dragonfly/vrot.bmp": {
+      "original_sha256_lf": "7f2d12cb4a7e29f5ccea7b90cd43acea250a2062e01ae8e4316c6583756f56c7",
+      "sha256_lf": "7f2d12cb4a7e29f5ccea7b90cd43acea250a2062e01ae8e4316c6583756f56c7",
+      "scope": "Complete original Dragonfly source and resources with independently audited native SDK/drawing/resource ownership bindings. Actual compatibility target uses distinct color-renderbuffer storage. Native diagnostic build/runtime and Windows/native qualification required; original formulas and public Windows SDK layouts unchanged."
+    },
+    "Src/Vessel/Dragonfly/vrotbk.bmp": {
+      "original_sha256_lf": "b568ac4f623bfa2a9a14b227a3a6507eca612ff6c30df42ba4fa5a5e077d215c",
+      "sha256_lf": "b568ac4f623bfa2a9a14b227a3a6507eca612ff6c30df42ba4fa5a5e077d215c",
+      "scope": "Complete original Dragonfly source and resources with independently audited native SDK/drawing/resource ownership bindings. Actual compatibility target uses distinct color-renderbuffer storage. Native diagnostic build/runtime and Windows/native qualification required; original formulas and public Windows SDK layouts unchanged."
+    },
+    "Src/Vessel/Dragonfly/warn.bmp": {
+      "original_sha256_lf": "a0ead56bb4bccbcaa1dd40ee8c1da2d59e7b65f2bab5704fb3f6898858350d94",
+      "sha256_lf": "a0ead56bb4bccbcaa1dd40ee8c1da2d59e7b65f2bab5704fb3f6898858350d94",
+      "scope": "Complete original Dragonfly source and resources with independently audited native SDK/drawing/resource ownership bindings. Actual compatibility target uses distinct color-renderbuffer storage. Native diagnostic build/runtime and Windows/native qualification required; original formulas and public Windows SDK layouts unchanged."
+    },
+    "Src/Vessel/Dragonfly/Native/NativeDragonflyFactory.inc": {
+      "original_sha256_lf": null,
+      "sha256_lf": "535ddc160ff9bd055b7db86742b384c278bd105c0e4c7a7b4cee3041c1c0e00e",
+      "scope": "Complete original Dragonfly source and resources with independently audited native SDK/drawing/resource ownership bindings. Actual compatibility target uses distinct color-renderbuffer storage. Native diagnostic build/runtime and Windows/native qualification required; original formulas and public Windows SDK layouts unchanged."
+    },
+    "Src/Vessel/Dragonfly/Native/NativeDrawing.cpp": {
+      "original_sha256_lf": null,
+      "sha256_lf": "a7bc3f16590af474d228daf40e2fb8245146951e047ff16a44a3b74c578dea7c",
+      "scope": "Complete original Dragonfly source and resources with independently audited native SDK/drawing/resource ownership bindings. Actual compatibility target uses distinct color-renderbuffer storage. Native diagnostic build/runtime and Windows/native qualification required; original formulas and public Windows SDK layouts unchanged."
+    },
+    "Src/Vessel/Dragonfly/Native/NativeDrawing.h": {
+      "original_sha256_lf": null,
+      "sha256_lf": "e6308a404948b2b04fb25f6d9f2096709eba0379627b715ad69f7852432d7ea0",
+      "scope": "Complete original Dragonfly source and resources with independently audited native SDK/drawing/resource ownership bindings. Actual compatibility target uses distinct color-renderbuffer storage. Native diagnostic build/runtime and Windows/native qualification required; original formulas and public Windows SDK layouts unchanged."
+    },
+    "Src/Vessel/Dragonfly/Native/NativeInstrument.h": {
+      "original_sha256_lf": null,
+      "sha256_lf": "18872987d4a0ac04829e8784752e39889e94ead7bef3bfd81bb9fb70b6c1670c",
+      "scope": "Complete original Dragonfly source and resources with independently audited native SDK/drawing/resource ownership bindings. Actual compatibility target uses distinct color-renderbuffer storage. Native diagnostic build/runtime and Windows/native qualification required; original formulas and public Windows SDK layouts unchanged."
     }
   }
 }

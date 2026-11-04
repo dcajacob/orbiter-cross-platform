@@ -78,6 +78,21 @@ def main():
                 shutil.copy2(path,output)
                 additions[relative]=dict(source=original,source_sha256=digest(path),sha256=digest(output),
                     install_rule=name,final_overlay='original vessel installation')
+    # Windows embeds these exact original bitmaps through panel.rc. The native
+    # module loads the same bytes at explicit resource-ID installation paths.
+    sys_path=ROOT/'Tests/Production'
+    import sys
+    sys.path.insert(0,str(sys_path))
+    from Dragonfly.prepare_native import resources as dragonfly_resources
+    rc=frozen(ROOT/'Src/Vessel/Dragonfly/panel.rc');rules[rc]=digest(ROOT/rc)
+    for resource_id,filename in dragonfly_resources():
+        source=ROOT/'Src/Vessel/Dragonfly'/filename;original=frozen(source)
+        relative='Textures/Dragonfly/Panels/'+filename
+        require(relative.casefold() not in chosen,'Native Dragonfly bitmap delivery path already exists')
+        chosen[relative.casefold()]=relative;target=a.output/relative;target.parent.mkdir(parents=True,exist_ok=True)
+        shutil.copy2(source,target)
+        additions[relative]=dict(source=original,source_sha256=digest(source),sha256=digest(target),
+            install_rule=rc,resource_id=resource_id,final_overlay='original embedded bitmap delivered for native module')
     config=json.loads((ROOT/'Tests/Production/RemainingStock/cases.json').read_text())
     for kind,item in config['classes'].items():
         path=a.output/chosen.get(item['target'].casefold(),item['target'])

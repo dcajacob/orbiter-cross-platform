@@ -205,6 +205,34 @@ set_target_properties(native_hst PROPERTIES OUTPUT_NAME HST)
 set_target_properties(native_solar_sail PROPERTIES OUTPUT_NAME SolarSail)
 set_target_properties(native_quadcopter PROPERTIES OUTPUT_NAME Quadcopter)
 
+# Complete original Dragonfly translation units, mechanically bound to actual
+# native drawing resources. Keep its preserved Windows source/SDK untouched.
+find_package(Python3 REQUIRED COMPONENTS Interpreter)
+find_package(OpenGL REQUIRED)
+if(NOT TARGET OpenGL::GLU)
+    message(FATAL_ERROR "The original Dragonfly instrument commands require actual OpenGL/GLU")
+endif()
+set(_dragonfly_generated "${PROJECT_BINARY_DIR}/native-dragonfly-${ORBITER_NATIVE_BUILD_BASE}")
+set(_dragonfly_verify)
+if(EXISTS "${_dragonfly_generated}")
+    set(_dragonfly_verify --verify-output)
+endif()
+execute_process(COMMAND "${Python3_EXECUTABLE}" -B
+    "${CMAKE_CURRENT_LIST_DIR}/../../../Tests/Production/Dragonfly/prepare_native.py"
+    --output "${_dragonfly_generated}" ${_dragonfly_verify}
+    RESULT_VARIABLE _dragonfly_prepared COMMAND_ERROR_IS_FATAL ANY)
+add_library(native_dragonfly MODULE
+    "${_dragonfly_generated}/Dragonfly.cpp" "${_dragonfly_generated}/Internal.cpp"
+    "${_dragonfly_generated}/instruments.cpp" "${_dragonfly_generated}/Matrix.cpp"
+    "${_dragonfly_generated}/quaternion.cpp" "${_dragonfly_generated}/vectors.cpp"
+    "${_dragonfly_generated}/Hsystems.cpp" "${_dragonfly_generated}/Thermal.cpp"
+    "${_dragonfly_generated}/Esystems.cpp" "${_remaining_source}/Dragonfly/Native/NativeDrawing.cpp")
+target_include_directories(native_dragonfly PRIVATE "${_dragonfly_generated}" "${_remaining_source}/Dragonfly/Native")
+target_link_libraries(native_dragonfly PRIVATE orbiter_production_vessels OpenGL::GL OpenGL::GLU)
+target_link_options(native_dragonfly PRIVATE -Wl,--no-undefined)
+set_target_properties(native_dragonfly PROPERTIES PREFIX "" OUTPUT_NAME Dragonfly
+    LIBRARY_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/NativeModules/Vessel")
+
 add_library(native_lua_inline_list OBJECT ../../Module/LuaScript/LuaInline/LuaInline.cpp)
 target_include_directories(native_lua_inline_list PRIVATE "${CMAKE_CURRENT_LIST_DIR}/../../Module/LuaScript/LuaInterpreter")
 target_link_libraries(native_lua_inline_list PRIVATE lua orbiter_production_vessels)

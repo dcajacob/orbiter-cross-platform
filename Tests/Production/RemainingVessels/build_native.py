@@ -37,6 +37,7 @@ def main():
         'Tests/Production/phase3-extraction.lock.json'}
     inputs.update(subprocess.check_output(['git','-C',str(ROOT),'ls-tree','-r','--name-only','HEAD','--','OVP/OGLClient'],text=True).splitlines())
     inputs.update(path.relative_to(ROOT).as_posix() for path in HERE.iterdir() if path.is_file())
+    inputs.update(path.relative_to(ROOT).as_posix() for path in (HERE.parent/'Dragonfly').glob('*.py'))
     for module in list(sys.modules.values()):
         name=getattr(module,'__file__',None)
         if name:
@@ -90,7 +91,7 @@ def main():
                 'Actual configuration/math profile differs')
         for language in ('C','CXX'):
             require(('-fsanitize=address,undefined' in cache['CMAKE_'+language+'_FLAGS:STRING'])==a.sanitizers,'Actual sanitizer flags differ')
-        for name in ('HST','SolarSail','Quadcopter'):
+        for name in ('HST','SolarSail','Quadcopter','Dragonfly'):
             module=engine/'NativeModules/Vessel'/(name+'.so');require(module.is_file(),'Original native module absent: '+name)
             symbols=subprocess.check_output(['nm','-D','--defined-only',str(module)],text=True)
             require(any(line.split()[-1]=='OrbiterNativeQuery' for line in symbols.splitlines()),'Actual checked SDK entry absent: '+name)

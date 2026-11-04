@@ -116,6 +116,14 @@ void offscreenReadback() {
                 "Actual ADI target creation changed its caller context");
         {
             dragonfly::WglContextRestore active(target.RenderDC(),target.Context());
+            using Attachment=void(APIENTRY*)(GLenum,GLenum,GLenum,GLint*);
+            auto attachment=reinterpret_cast<Attachment>(wglGetProcAddress("glGetFramebufferAttachmentParameteriv"));
+            require(attachment!=nullptr,"Actual ADI attachment query unavailable");GLint colorType=0;
+            attachment(0x8D40,0x8CE0,0x8CD0 /* GL_FRAMEBUFFER_ATTACHMENT_OBJECT_TYPE */,&colorType);
+            require(colorType==0x8D41 /* GL_RENDERBUFFER */,"Actual ADI target aliases the original hardcoded texture namespace");
+            // Exercise the exact texture name/dimensions used by the original
+            // ADI loader before checking the unchanged framebuffer/DIB output.
+            glBindTexture(GL_TEXTURE_2D,1);glTexImage2D(GL_TEXTURE_2D,0,GL_RGBA,512,256,0,GL_RGBA,GL_UNSIGNED_BYTE,nullptr);
             glViewport(0,0,13,7);
             // Exercise the actual compatibility command path used by the ADI.
             glMatrixMode(GL_PROJECTION);glLoadIdentity();
@@ -129,6 +137,7 @@ void offscreenReadback() {
             for(int y=0;y<7;++y)for(int x=0;x<13;++x)
                 require(GetPixel(target.BitmapDC(),x,y)==(y<4?RGB(0,0,255):RGB(255,0,0)),
                         "Actual ADI framebuffer/DIB color or vertical orientation differs");
+            const GLuint originalTexture=1;glDeleteTextures(1,&originalTexture);
         }
         require(wglGetCurrentDC()==parentDC && wglGetCurrentContext()==parentContext,
                 "Actual ADI drawing changed its caller context");

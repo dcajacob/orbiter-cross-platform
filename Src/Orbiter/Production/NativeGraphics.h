@@ -40,6 +40,7 @@ public:
     virtual SURFHANDLE clbkCreateSurfaceEx(oapi::UInt32,oapi::UInt32,oapi::UInt32)=0;
     virtual bool clbkSetSurfaceColourKey(SURFHANDLE,oapi::UInt32)=0;
     virtual std::unique_ptr<NativeGraphicsContext> SaveGraphicsContext()=0;
+    virtual std::unique_ptr<NativeGraphicsContext> ActivateMainGraphicsContext()=0;
     virtual std::unique_ptr<NativeInstrumentTarget> CreateInstrumentTarget(int,int)=0;
     // Rows use the existing surface/Sketchpad coordinate order, beginning at y=0.
     virtual bool UploadSurfacePixels(SURFHANDLE,int,int,const std::vector<std::uint8_t>&)=0;
@@ -91,6 +92,7 @@ public:
     virtual oapi::Brush* CreateBrushResource(oapi::UInt32)=0;
     virtual void ReleaseBrushResource(oapi::Brush*)=0;
     virtual oapi::Sketchpad* AcquireSketchpad(SURFHANDLE)=0;
+    virtual oapi::Sketchpad* AcquireRasterSketchpad(SURFHANDLE)=0;
     virtual void ReleaseSketchpadResource(oapi::Sketchpad*)=0;
     virtual SURFHANDLE CreateSurfaceResource(int,int)=0;
     virtual int MeshGroup(DEVMESHHANDLE,oapi::UInt32,GROUPREQUESTSPEC*)=0;

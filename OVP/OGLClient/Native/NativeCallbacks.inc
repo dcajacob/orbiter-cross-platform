@@ -22,6 +22,7 @@ void ReleasePenResource(oapi::Pen* pen) override {clbkReleasePen(pen);}
 oapi::Brush* CreateBrushResource(oapi::UInt32 color) override {return CreateBrush(color);}
 void ReleaseBrushResource(oapi::Brush* brush) override {clbkReleaseBrush(brush);}
 oapi::Sketchpad* AcquireSketchpad(SURFHANDLE surface) override {return GetSketchpad(surface,true);}
+oapi::Sketchpad* AcquireRasterSketchpad(SURFHANDLE surface) override {return GetSketchpad(surface,false);}
 void ReleaseSketchpadResource(oapi::Sketchpad* pad) override {clbkReleaseSketchpad(pad);}
 SURFHANDLE CreateSurfaceResource(int w,int h) override {return CreateSurface(w,h);}
 int MeshGroup(DEVMESHHANDLE mesh,oapi::UInt32 index,GROUPREQUESTSPEC* request) override {return GetMeshGroup(mesh,int(index),request);}
@@ -35,6 +36,7 @@ SURFHANDLE clbkCreateSurfaceEx(oapi::UInt32 w,oapi::UInt32 h,oapi::UInt32 flags)
 oapi::UInt32 clbkGetDeviceColour(std::uint8_t r,std::uint8_t g,std::uint8_t b) override {return GetDeviceColour(r,g,b);}
 bool clbkSetSurfaceColourKey(SURFHANDLE surface,oapi::UInt32 color) override {return SetSurfaceColourKey(surface,color);}
 std::unique_ptr<NativeGraphicsContext> SaveGraphicsContext() override;
+std::unique_ptr<NativeGraphicsContext> ActivateMainGraphicsContext() override;
 std::unique_ptr<NativeInstrumentTarget> CreateInstrumentTarget(int,int) override;
 bool UploadSurfacePixels(SURFHANDLE,int,int,const std::vector<std::uint8_t>&) override;
 bool clbkFillSurface(SURFHANDLE surface,oapi::UInt32 color) const override {return FillSurface(surface,color);}
