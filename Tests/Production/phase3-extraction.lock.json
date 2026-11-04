@@ -2035,8 +2035,8 @@
     },
     "Src/Vessel/Atlantis/Atlantis_Tank/Atlantis_Tank.cpp": {
       "original_sha256_lf": "704ce73e67c4d76e49dbdb9ab46257b22d65942fc781af153931b189352abe97",
-      "sha256_lf": "9bffc740d8967a038ce671492ed8ab97db956a14124ac667676ce188c663a401",
-      "scope": "Original Atlantis source portability through explicit SDK spellings, UI service imports and checked native factories; exact source conservation required. Native class admission, matched runtime and interaction qualification remain pending."
+      "sha256_lf": "bdb7c4fe08d534f2bcfaaa4bb5a601206b7d14b423a07b236d004109d4015056",
+      "scope": "Original Atlantis source portability through explicit SDK spellings, UI service imports and checked native factories; exact source conservation required. Native class admission, matched runtime and interaction qualification remain pending. ASan-confirmed premature deletion is prevented while port 0 remains connected to the orbiter; the original below-ground deletion condition remains for detached tanks."
     },
     "Src/Vessel/Atlantis/Atlantis_Tank/NativeAtlantisTankFactory.inc": {
       "original_sha256_lf": null,

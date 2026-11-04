@@ -134,7 +134,9 @@ void Atlantis_Tank::clbkPreStep (double simt, double simdt, double mjd)
 
 void Atlantis_Tank::clbkPostStep (double simt, double simdt, double mjd)
 {
-	if (GetAltitude() < 0.0) oapiDeleteVessel (GetHandle());
+	// The orbiter owns this propellant while connected, including on the pad.
+	if (!GetDockStatus (GetDockHandle (0)) && GetAltitude() < 0.0)
+		oapiDeleteVessel (GetHandle());
 }
 
 Atlantis_SRB *Atlantis_Tank::GetSRB (int which) const

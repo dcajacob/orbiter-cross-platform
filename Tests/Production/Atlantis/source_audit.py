@@ -47,6 +47,13 @@ def adapted(name,source):
         source=source.replace(marker,
             '#ifdef _WIN32\nDLLCLBK void InitModule (HINSTANCE hModule)\n{\n\tg_Param.hDLL = hModule;\n\tInitDrawingResources();\n}\n\nDLLCLBK void ExitModule (HINSTANCE hModule)\n{\n\tReleaseDrawingResources();\n}\n#endif\n\n'+marker,1)
         source+='\n#ifndef _WIN32\n#include "NativeAtlantisFactory.inc"\n#endif\n'
+    if filename=='Atlantis_Tank.cpp':
+        # The unchanged KSC tour reproduces an ASan stale default-tank read:
+        # the original callback deletes a still-connected external tank.
+        source=source.replace('\tif (GetAltitude() < 0.0) oapiDeleteVessel (GetHandle());',
+            '\t// The orbiter owns this propellant while connected, including on the pad.\n'
+            '\tif (!GetDockStatus (GetDockHandle (0)) && GetAltitude() < 0.0)\n'
+            '\t\toapiDeleteVessel (GetHandle());')
     if filename in ('Atlantis_Tank.cpp','Atlantis_SRB.cpp'):
         factory='NativeAtlantisTankFactory.inc' if filename=='Atlantis_Tank.cpp' else 'NativeAtlantisSrbFactory.inc'
         source+='\n#ifndef _WIN32\n#include "'+factory+'"\n#endif\n'

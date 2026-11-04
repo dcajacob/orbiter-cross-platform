@@ -131,3 +131,17 @@ keeps production admission unchanged. Build with
 `ORBITER_BUILD_ATLANTIS_DIAGNOSTIC=ON` only for this test host. Its executable is
 not a qualifying production runtime or a substitute for complete reference,
 scenario, interaction and hardware gates.
+
+The isolated `003c10e41ae1effe4d14387d9d8ad0dd918ced35` diagnostic has now
+reproduced a heap-use-after-free in the unchanged complete KSC tour. ASan traces
+the invalid `VESSEL::GetFuelMass()` read to the external tank's freed propellant
+resource. The failed invocation, source/dependency identities, complete console
+and unchanged assets are retained in `out/phase6-atlantis-pad-lifetime-v1`.
+The original tank post-step callback deletes itself below ground even while
+port 0 remains connected to the orbiter, which still uses its propellant.
+The callback now permits that deletion only after the orbiter port is undocked;
+the original altitude condition and deletion service remain unchanged. This is
+an explicit lifetime correction in the source audit, applied on both platforms.
+Fresh instrumented execution and detached-tank deletion controls remain required.
+Any repaired Windows comparison must use an explicitly versioned source variant;
+the failed unmodified original captures remain preserved.
