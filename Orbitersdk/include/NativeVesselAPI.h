@@ -121,7 +121,7 @@ OAPIFUNC void oapiDecHUDIntensity ();
 OAPIFUNC void oapiRenderHUD (MESHHANDLE hMesh, SURFHANDLE *hTex);
 OAPIFUNC void oapiRegisterMFD (int mfd, const EXTMFDSPEC *spec);
 OAPIFUNC void oapiRegisterPanelBackground(SURFHANDLE,oapi::UInt32=PANEL_ATTACH_BOTTOM|PANEL_MOVEOUT_BOTTOM,oapi::UInt32=oapi::UInt32(-1));
-OAPIFUNC void oapiRegisterPanelArea(int,const oapi::SdkRectangle&,int,int,int=PANEL_MAP_BACKGROUND);
+OAPIFUNC void oapiRegisterPanelArea(int,const oapi::SdkRectangle&,int=PANEL_REDRAW_NEVER,int=PANEL_MOUSE_IGNORE,int=PANEL_MAP_NONE);
 OAPIFUNC void oapiSetPanelNeighbours (int left, int right, int top, int bottom);
 OAPIFUNC void oapiVCSetNeighbours (int left, int right, int top, int bottom);
 OAPIFUNC bool oapiBltPanelAreaBackground (int area_id, SURFHANDLE surf);

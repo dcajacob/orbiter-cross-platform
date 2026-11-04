@@ -95,7 +95,8 @@ def source_files():
     paths={*shared.source_files(),*(p for p in HERE.iterdir() if p.is_file()),
            ROOT/'.github/workflows/repaired-remaining-stock.yml',
            ROOT/'.github/workflows/repaired-remaining-stock-diagnostics.yml',
-           ROOT/'.github/workflows/matched-clock-remaining-stock.yml'}
+           ROOT/'.github/workflows/matched-clock-remaining-stock.yml',
+           ROOT/'.github/workflows/matched-clock-remaining-stock-full.yml'}
     for module in list(sys.modules.values()):
         name=getattr(module,'__file__',None)
         if name:

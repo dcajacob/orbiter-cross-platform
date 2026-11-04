@@ -13,6 +13,8 @@ import sys
 import zipfile
 
 import capture
+import protocols
+from matched_clock import inspect_matched_clock
 from pe_symbols import PE
 from behavior_suite import quaternion,quaternion_angle
 from verify_original import compare_state
@@ -137,11 +139,11 @@ def source_closure(values,producer,minimum):
         require(checksum(git(producer,name).replace(b'\r\n',b'\n'))==value,'Immutable producer source differs: '+name)
 
 
-def runtime_variant(root,producer,configuration,original_root):
+def runtime_variant(root,producer,configuration,original_root,protocol=protocols.V1):
     path=root/'build.json';build=json.loads(path.read_text());runtime=root/'runtime'
     require(build['schema']==1 and build['status']=='built-awaiting-runtime-and-independent-audit' and
             build['producer_commit']==producer and build['configuration']==configuration and
-            build['protocol']=='remaining-stock-repaired-v1' and build['original_application_and_sdk_source']==BASE and
+            build['protocol']==protocol and build['original_application_and_sdk_source']==BASE and
             build['preserved_package_unchanged'] and not build['native_admission_qualified'] and not build['phase6_complete'],
             'Repaired build incomplete or misidentified')
     require((runtime/'runtime-variant.json').read_bytes()==path.read_bytes(),'Runtime manifest differs from actual build report')
@@ -172,6 +174,9 @@ def runtime_variant(root,producer,configuration,original_root):
         'Tests/Production/RemainingStockRepaired/PreservedSdkTypes.h','Tests/Production/StockVessels/Observation.h',
         'Tests/Production/RemainingStock/Details.h','Tests/Production/RemainingStock/Driver.cpp',
         '.github/workflows/repaired-remaining-stock-diagnostics.yml'})
+    if protocol==protocols.V2:
+        source_closure(sources,producer,{'.github/workflows/matched-clock-remaining-stock.yml',
+                                       '.github/workflows/matched-clock-remaining-stock-full.yml'})
     staged=source_variant(root/'module-sources',producer)
     require(build['module_source_manifest_sha256']==staged['manifest_sha256'],'Built module source manifest differs')
     observer=git(producer,'Tests/Production/RemainingStock/Driver.cpp').replace(b'\r\n',b'\n')
@@ -183,6 +188,16 @@ def runtime_variant(root,producer,configuration,original_root):
             build['observer_source_variant']['compiled_sha256']==checksum(compiled),
             'Passive observer changes exceed the explicit 960-frame validation')
     compiled_inputs=compile_evidence(root,build,configuration)
+    if protocol==protocols.V2:
+        policy=build['finalized_frame_policy_control']
+        require(policy['executable_sha256']==sha(root/'cmake/controls/finalized_frame_policy_test.exe') and
+                policy['result_sha256']==sha(root/'finalized-frame-policy.log') and
+                policy['result']==json.loads((root/'finalized-frame-policy.log').read_text())==dict(
+                    status='passed',legacy_unchanged=True,selected_finalized_tick=800,rejected_controls=9),
+                'Actual finalized-frame policy controls incomplete or changed')
+        entries=json.loads((root/'cmake/compile_commands.json').read_text())
+        require(sum(PureWindowsPath(item['file']).name=='FinalizedFrame.Test.cpp' for item in entries)==1,
+                'Actual finalized-frame policy test was not compiled exactly once')
     srb=root/'cmake/import-only/Atlantis_SRB.dll'
     require(sha(srb)==build['import_only_srb_sha256'] and PE(srb).exports()==PE(original_root/'Modules/Atlantis_SRB.dll').exports(),
             'Actual import-only SRB public symbols differ from the running original SRB')
@@ -320,11 +335,11 @@ def audit_profile(root,profile,config,producer,original_root,mesa,mesa_imports):
             report['protocol']==config['protocol'] and report['producer_commit']==producer and
             report['original_application_and_sdk_source']==BASE and report['configuration']==configuration and
             report['math_profile']==math_profile and report['settings_sha256_lf']==sha_lf(capture.shared.CASE_FILE) and
-            report['protocol_sha256_lf']==sha_lf(HERE/'protocol.json') and report['runtime_variant_unchanged'] and
+            report['protocol_sha256_lf']==sha_lf(protocols.path(config['protocol'])) and report['runtime_variant_unchanged'] and
             report['observer_sources_unchanged'] and report['actual_original_simulation_data_unchanged'] and not report['failures'] and
             not report['native_admission_qualified'] and not report['phase6_complete'] and
             set(report['cases'])=={c['id'] for c in config['cases']},'Repaired full profile incomplete or misidentified')
-    build,built=runtime_variant(build_root,producer,configuration,original_root)
+    build,built=runtime_variant(build_root,producer,configuration,original_root,config['protocol'])
     capture.data_inputs.validate(report['actual_original_simulation_data'])
     for name,value in report['actual_original_simulation_data']['lock_sha256_lf'].items():
         require(value==checksum(git(producer,'Tests/Production/'+name).replace(b'\r\n',b'\n')),
@@ -336,6 +351,9 @@ def audit_profile(root,profile,config,producer,original_root,mesa,mesa_imports):
         'Tests/Production/Client/run_client.py','Tests/Production/Client/compare_client.py',
         'Tests/Production/StockVessels/Observation.h','Tests/Production/StockVessels/original.py',
         '.github/workflows/repaired-remaining-stock.yml','.github/workflows/repaired-remaining-stock-diagnostics.yml'})
+    if config['protocol']==protocols.V2:
+        source_closure(sources,producer,{'.github/workflows/matched-clock-remaining-stock.yml',
+                                       '.github/workflows/matched-clock-remaining-stock-full.yml'})
     require(set(sources)==set(report['source_raw_sha256']) and
             all(value in raw_source_hashes(producer,name) for name,value in report['source_raw_sha256'].items()),
             'Actual raw capture source differs from its immutable producer')
@@ -345,6 +363,11 @@ def audit_profile(root,profile,config,producer,original_root,mesa,mesa_imports):
                  'Tests/Production/RemainingStock/cases.json','Tests/Production/Client/run_client.py',
                  'Tests/Production/Client/compare_client.py','Tests/Production/StockVessels/original.py'):
         require(sha_lf(ROOT/name)==sources[name],'Current independent trace reader differs from capture producer: '+name)
+    if config['protocol']==protocols.V2:
+        for name in ('Tests/Production/RemainingStockRepaired/protocols.py',
+                     'Tests/Production/RemainingStockRepaired/matched-clock-v2.json',
+                     'Tests/Production/RemainingStock/matched_clock.py','Tests/Production/RemainingStock/clock_observation.py'):
+            require(sha_lf(ROOT/name)==sources[name],'Current matched-clock reader differs from capture producer: '+name)
     require(report['runtime_files_sha256']==runtime and report['observer_sha256']==runtime[OBSERVER] and
             report['runtime_variant_manifest_sha256']==built['runtime_manifest_sha256'],
             'Executed full runtime/observer differs from audited build')
@@ -417,6 +440,24 @@ def audit_profile(root,profile,config,producer,original_root,mesa,mesa_imports):
             clock_control['positive']==capture.shared.inspect_clock(clock_positive,config['frames']) and
             clock_control['owning_capture_files_sha256']=={name:sha(clock_positive/name) for name in ('stock-clock.csv','stock-vessel-state.csv')},
             'Actual SDK clock reader controls or owning observations differ')
+    if config['protocol']==protocols.V2:
+        matched=json.loads((capture_root/'matched-clock-control.json').read_text())
+        matched_names={'missing_begin_tick','reordered_begin_ticks','nonfinite_begin_clock','different_system_elapsed',
+            'different_begin_boundary','different_physical_step','different_begin_warp','different_final_step',
+            'different_final_system_time','different_capture_protocol','different_capture_tick',
+            'different_finalized_tick','different_capture_time','different_descriptor'}
+        require(matched['status']=='passed' and matched['protocol']==protocols.V2 and matched['owning_capture_unchanged'] and
+                len(matched['controls'])==14 and {item['control'] for item in matched['controls']}==matched_names and
+                all(item['reason'] for item in matched['controls']) and
+                matched['positive']==inspect_matched_clock(clock_positive,config)[0] and
+                matched['owning_capture_files_sha256']=={name:sha(clock_positive/name) for name in (
+                    'stock-clock.csv','stock-step-clock.csv','stock-vessel-state.csv','scene-summary.json',protocols.MARKER)},
+                'Actual matched-clock/frame damaged-copy controls incomplete or changed')
+        require(set(matched['source_sha256'])=={'Tests/Production/RemainingStockRepaired/MatchedClock.Test.py',
+                'Tests/Production/RemainingStockRepaired/protocols.py','Tests/Production/RemainingStock/matched_clock.py',
+                'Tests/Production/RemainingStock/clock_observation.py'} and
+                all(value in raw_source_hashes(producer,name) for name,value in matched['source_sha256'].items()),
+                'Actual matched-clock controls use different owning sources')
     return dict(capture_sha256=sha(capture_root/'capture.json'),actual_math=next(iter(maths)),build=built,cases=results,
         source_manifest_sha256=checksum(json.dumps(sources,sort_keys=True).encode()),
         gate_control_sha256=sha(capture_root/'gate-control.json'),
@@ -456,28 +497,30 @@ def main():
     p=argparse.ArgumentParser(description=__doc__)
     for name in ('artifacts','download-manifest','preserved-debug','preserved-release','mesa-runtime','output'):
         p.add_argument('--'+name,type=lambda value:Path(value).resolve(),required=True)
-    p.add_argument('--producer-commit',required=True);a=p.parse_args()
+    p.add_argument('--producer-commit',required=True)
+    p.add_argument('--protocol',choices=protocols.NAMES,default=protocols.V1);a=p.parse_args()
     require(not a.output.exists(),'Fresh independent audit output required; replacement forbidden')
-    result=dict(status='failed',protocol='remaining-stock-repaired-v1',phase6_complete=False,native_admission_qualified=False,
+    result=dict(status='failed',protocol=a.protocol,phase6_complete=False,native_admission_qualified=False,
         producer_commit=a.producer_commit,original_application_and_sdk_source=BASE,verifier_sha256=sha(Path(__file__)),
         verifier_input_sha256=verifier_inputs(),
         profiles={},build_pairs={},scope='Independent explicitly repaired Windows candidate evidence only. '
             'No observations lock, native class admission, native parity or Phase 6 acceptance is created.')
     try:
         require(re.fullmatch('[0-9a-f]{40}',a.producer_commit),'Full immutable producer commit required')
-        config=capture.settings();downloads=json.loads(a.download_manifest.read_text())
+        config=capture.settings(a.protocol);downloads=json.loads(a.download_manifest.read_text())
         profiles={c+'-'+m for c in ('Debug','Release') for m in ('automatic','sse2')}
         require(downloads['status']=='passed' and downloads['source_commit']==a.producer_commit and
                 len(downloads['artifacts'])==4 and {item['profile'] for item in downloads['artifacts']}==profiles,
                 'Exact complete four-profile repaired artifact transport required')
         result.update(download_manifest_sha256=sha(a.download_manifest),
-            protocol_sha256_lf=sha_lf(HERE/'protocol.json'),settings_sha256_lf=sha_lf(capture.shared.CASE_FILE),
+            protocol_sha256_lf=sha_lf(protocols.path(config['protocol'])),settings_sha256_lf=sha_lf(capture.shared.CASE_FILE),
             unchanged_state_budgets=config['budgets'],unchanged_image_ssim_minimum=config['image_ssim_minimum'])
         mesa,mesa_imports=independent_mesa(a.mesa_runtime,a.producer_commit)
         result['independent_mesa_manifest_sha256']=sha(a.mesa_runtime/'mesa-runtime.json')
         for profile in sorted(profiles):
             item=next(v for v in downloads['artifacts'] if v['profile']==profile);archive=ROOT/safe(item['path'])
-            require(item['name']=='repaired-remaining-stock-v1-'+profile and
+            artifact_prefix='matched-clock-remaining-stock-v2-' if config['protocol']==protocols.V2 else 'repaired-remaining-stock-v1-'
+            require(item['name']==artifact_prefix+profile and
                     archive.stat().st_size==item['bytes'] and sha(archive)==item['sha256'],
                     'Exact repaired artifact ZIP transport differs: '+profile)
             members=archive_members(archive,a.artifacts/profile)

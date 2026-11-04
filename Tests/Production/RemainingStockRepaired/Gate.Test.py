@@ -14,8 +14,9 @@ import capture
 def main():
     p=argparse.ArgumentParser(description=__doc__)
     for name in ('capture','output'):p.add_argument('--'+name,type=lambda v:Path(v).resolve(),required=True)
+    p.add_argument('--protocol',choices=capture.protocols.NAMES,default=capture.protocols.V1)
     a=p.parse_args();capture.require(not a.output.exists(),'Fresh repaired gate output required')
-    config=capture.settings();case=next(c for c in config['cases'] if c['id']=='remaining_stock_003')
+    config=capture.settings(a.protocol);case=next(c for c in config['cases'] if c['id']=='remaining_stock_003')
     positive=capture.inspect_artifacts(a.capture,case,config)
     def hashes(root):return {p.relative_to(root).as_posix():capture.sha(p) for p in root.rglob('*') if p.is_file()}
     before=hashes(a.capture);controls=[]

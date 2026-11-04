@@ -1,5 +1,58 @@
 # Original remaining native vessel integration
 
+## Matched-clock v2 and native panel default checkpoint
+
+The separate `59cbbc74dfe015500f75e9867adba0e18c7e9b31` native Debug
+automatic ASan/UBSan/LSan diagnostic now completes unchanged PoweredUp and Spin
+stabilisation twice: four clean processes and 3,840 presentations. The explicit
+v2 protocol retains the original 1/64-second physical input and script-controlled
+warp, supplies matched system elapsed input through the original startup/clamp
+helper, and observes actual begin/end clocks. Spin changes warp at tick 355;
+the first 1.5625-second physical step is tick 356. Its real finalized tick-800
+frame is at simulation time 700.859375 seconds, and all 960 ticks complete.
+
+The independent scoped audit rechecks 902 guarded files, 1,130 assets, all 57
+actual kernel/gravity/planet inputs and both complete repetitions. State,
+resource, playback, mesh, begin/end clock and camera traces repeat exactly;
+both full-frame repeat SSIM values are 1.0. Fourteen damaged real clock/frame
+copies per process are rejected (56 total). Separate unsuppressed native
+sanitizer controls reject nine invalid frame-selection policies. The actual
+native clock prefix through tick 360 equals all four retained Windows failed-v1
+Spin traces, including the original warp change and old skipped capture target.
+
+Evidence is retained in `out/phase6-matched-clock-native-diagnostic-v1`,
+`out/phase6-matched-clock-native-diagnostic-audit-v1.json` and
+`out/phase6-matched-clock-original-prefix-audit-v1.json`. The terminal source
+snapshot retains 801 actual source/dependency/observer files and 68 generated
+inputs in `out/phase6-matched-clock-source-59cbbc74-v1`. The four-profile Windows
+v2 diagnostic [41824542797](https://github.com/dcajacob/orbiter-cross-platform/actions/runs/41824542797)
+is still running; native success does not establish Windows execution or full
+four-profile parity.
+
+A separate real PoweredUp Windows/native comparison passes state budgets
+(maximum position error about 0.00003058 m) with byte-identical camera and
+finalized clock CSVs after line-ending normalization. Its first Debug automatic
+image comparison fails the unchanged 0.995 budget at SSIM 0.7334550048519237.
+That failure remains in `out/phase6-matched-clock-poweredup-cross-platform-v1.json`;
+it is not accepted as visual parity.
+
+The initial artwork is erased by a native SDK declaration mismatch:
+`oapiRegisterPanelArea` defaulted to `PANEL_MAP_BACKGROUND`, whereas the frozen
+Windows SDK specifies `PANEL_MAP_NONE`. Original refresh callbacks can therefore
+replace initialization-only artwork with the background. A fresh GDB diagnostic
+confirms that actual bitmap/MFD/radio initialization callbacks do run; it makes
+no sanitizer/lifecycle claim because LSan cannot finish under ptrace. The native
+declaration now mirrors all three original default arguments, and
+`cockpit_source.py` derives them from the frozen Windows declaration. The old
+declaration fails that source check; the correction passes the full 612-file
+conservation audit. Fresh rendering and full qualification remain required.
+
+The separate full-38 v2 Windows workflow and explicit v2 independent auditor
+retain every existing original-package, complete-scene, data, state, camera,
+repeat and image gate. Diagnostic subsets remain ineligible. The last qualified
+full 157-scene result and all broader Phase 6 acceptance requirements remain
+unchanged.
+
 The latest source-built package includes the real Dragonfly module and its
 declared initial-current repair. The complete 38-scene native campaign is
 running against one fresh Debug automatic ASan/UBSan package at `01d03e49`.

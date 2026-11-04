@@ -70,7 +70,8 @@ def main():
                   'Tests/Production/ApplicationObservation.h','Tests/Production/production-source.lock.json',
                   '.github/workflows/repaired-remaining-stock.yml',
                   '.github/workflows/repaired-remaining-stock-diagnostics.yml',
-                  '.github/workflows/matched-clock-remaining-stock.yml'))
+                  '.github/workflows/matched-clock-remaining-stock.yml',
+                  '.github/workflows/matched-clock-remaining-stock-full.yml'))
     require({str(path.relative_to(ROOT).as_posix()) for path in HERE.iterdir() if path.is_file()}<=paths,
             'Builder has uncommitted inputs')
     sources={name:sha_lf(ROOT/name) for name in sorted(paths)}
@@ -114,6 +115,10 @@ def main():
         run(['cmake','--build',str(build),'--parallel','2'],'compile')
         run([str(build/'controls/finalized_frame_policy_test.exe'),str(a.output/'finalized-frame-controls')],
             'finalized-frame-policy')
+        report['finalized_frame_policy_control']=dict(
+            executable_sha256=sha(build/'controls/finalized_frame_policy_test.exe'),
+            result_sha256=sha(a.output/'finalized-frame-policy.log'),
+            result=json.loads((a.output/'finalized-frame-policy.log').read_text()))
         srb=build/'import-only/Atlantis_SRB.dll'
         require(PE(srb).exports()==PE(a.preserved/'Modules/Atlantis_SRB.dll').exports(),
                 'Rebuilt import-only SRB exports differ from actual preserved SRB')

@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Conserve original cockpit algorithms while introducing real platform services."""
 import subprocess
+import re
 from pathlib import Path
 from camera_source import windows
 from vessel_runtime_source import equal,raw
@@ -13,6 +14,21 @@ FILES=('Pane.h','Pane.cpp','Mfd.h','Mfd.cpp','hud.h','hud.cpp','Panel.h','Panel.
        'MfdMap_old.h','MfdOrbit.h','MfdSurface.h','MfdSync.h','MfdTransfer.h','Astro.h',
        'MfdOrbit.cpp','MfdAlign.cpp','MfdComms.cpp','MfdDocking.cpp','MfdHsi.cpp','MfdLanding.cpp',
        'MfdMap.cpp','MfdSync.cpp','MfdTransfer.cpp','Select.cpp')
+
+def verify_legacy_panel_defaults():
+    """Check native call-site defaults against the frozen Windows SDK itself."""
+    path='Orbitersdk/include/OrbiterAPI.h'
+    original=subprocess.check_output(['git','-C',str(ROOT),'show',BASE+':'+path]).decode('cp1252')
+    def defaults(source):
+        matches=re.findall(r'OAPIFUNC\s+void\s+oapiRegisterPanelArea\s*\(([^;]+)\);',source)
+        if len(matches)!=1:raise ValueError('Legacy panel registration declaration missing or ambiguous')
+        arguments=matches[0].split(',')
+        if len(arguments)!=5:raise ValueError('Legacy panel registration argument count differs')
+        return ','.join(argument.partition('=')[2].strip() for argument in arguments)
+    expected=defaults(original)
+    equal(expected,defaults(raw(path)),'Original Windows legacy panel registration defaults')
+    equal(expected,defaults(raw('Orbitersdk/include/NativeVesselAPI.h')),'Native legacy panel registration defaults')
+    print('Original legacy panel area default arguments conserved, including PANEL_MAP_NONE')
 
 def restore_geometry(name,current,original):
     """Prove the shared production conic implementation is an exact code move."""
@@ -208,6 +224,7 @@ def restore_transfer_finite_indicators(current):
     return current.replace(guarded,line).replace('#include <cmath>\n','',1)
 
 def verify():
+    verify_legacy_panel_defaults()
     verify_focus_bars()
     original_dialogs = subprocess.check_output(['git','-C',str(ROOT),'show',BASE+':Src/Orbiter/DlgMgr.cpp']).decode().replace('\r\n','\n')
     style = original_dialogs[original_dialogs.index('static void ApplyGlowTheme'):original_dialogs.index('void DialogManager::InitImGui()')]

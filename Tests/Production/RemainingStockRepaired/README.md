@@ -9,9 +9,10 @@ original campaigns remain failed and unchanged.
 `--protocol remaining-stock-matched-clock-v2` selects the separate
 `matched-clock-v2.json` contract in both the Windows builder/capture and native
 capture. The default remains `remaining-stock-repaired-v1`; its JSON contract and
-the failed historical captures are retained. The full-reference v1 auditor
-continues to reject diagnostic subsets and other protocols. V2 diagnostics do
-not establish native admission or an accepted replacement reference.
+the failed historical captures are retained. The full-reference auditor requires
+an explicit matching protocol selector, all 38 scenes twice and all four profiles;
+it rejects diagnostic subsets. V2 diagnostics do not establish native admission
+or an accepted replacement reference.
 
 V2 retains the unchanged complete scenes/scripts, 960 physical steps, original
 1/64-second fixed input, original production propagators and all existing state,
@@ -44,6 +45,14 @@ frame-policy damage controls. `MatchedClock.Test.py` requires real captured
 begin/end/vessel clocks and frame metadata, rejects fourteen damaged copies and
 checks that owning capture bytes remain unchanged. Real execution and a full
 independent four-profile/reference audit remain required before qualification.
+The separate `Windows Matched-Clock Full Remaining Stock Candidate v2` workflow
+runs all 38 complete scenes twice, retains original-runtime/source damage
+controls and adds the actual matched-clock controls. `audit.py --protocol
+remaining-stock-matched-clock-v2` checks the explicit v2 artifact names, compiled
+frame-policy control binary/results, real clock/frame controls and immutable
+source/input closure in addition to every existing complete-scene, original
+package, module, data, repeat and build-pair gate. It creates no automatic
+reference promotion or Phase 6 completion.
 
 The shared passive SDK observer additionally writes `stock-clock.csv` at the
 same initial and finalized boundaries as the vessel snapshots. Its separately

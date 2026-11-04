@@ -101,8 +101,8 @@
     },
     "Orbitersdk/include/NativeVesselAPI.h": {
       "original_sha256_lf": null,
-      "sha256_lf": "d6dc64b0baf4df3aa29dac072dcb52d184a1aba631c0efa3959359f7afa25015",
-      "scope": "Original legacy bitmap panel layout, scaling, MFD, mouse and redraw algorithms conserved by cockpit_source.py. Native surface ownership and actual renderer bindings; full Dragonfly drawing/runtime qualification remains pending. Public Windows SDK layout unchanged."
+      "sha256_lf": "9059ba223ea1196d4621e65f522bb215498a2a57b2b6170fbeb5e1ce94483990",
+      "scope": "Original legacy panel layout, scaling, MFD, mouse and redraw algorithms conserved by cockpit_source.py. Native legacy area call-site defaults are derived from the frozen Windows SDK, including PANEL_MAP_NONE, so initial artwork persists across refreshes. Native surface ownership and actual renderer bindings; complete Dragonfly image/runtime qualification remains pending. Public Windows SDK layout unchanged."
     },
     "Orbitersdk/include/OrbiterAPI.h": {
       "original_sha256_lf": "3425025c178218dce10bf7b8edf296dfe7eda8f171d925aca622a7534735fd31",
