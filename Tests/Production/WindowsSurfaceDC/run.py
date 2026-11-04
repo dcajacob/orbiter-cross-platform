@@ -14,6 +14,7 @@ import run_client
 
 
 def sha(path):return hashlib.sha256(path.read_bytes()).hexdigest()
+def sha_lf(path):return hashlib.sha256(path.read_bytes().replace(b'\r\n',b'\n')).hexdigest()
 
 
 def main():
@@ -32,11 +33,13 @@ def main():
         if name:
             path=Path(name).resolve()
             if ROOT in path.parents and path.suffix=='.py':source_paths.add(path)
-    source={path.relative_to(ROOT).as_posix():sha(path) for path in source_paths}
+    raw_source={path.relative_to(ROOT).as_posix():sha(path) for path in source_paths}
+    source={path.relative_to(ROOT).as_posix():sha_lf(path) for path in source_paths}
     producer=subprocess.check_output(['git','-C',str(ROOT),'rev-parse','HEAD'],text=True).strip()
     for name,expected in source.items():
         body=subprocess.check_output(['git','-C',str(ROOT),'show',producer+':'+name])
-        if hashlib.sha256(body).hexdigest()!=expected:raise ValueError('GDI observer differs from producer: '+name)
+        if hashlib.sha256(body.replace(b'\r\n',b'\n')).hexdigest()!=expected:
+            raise ValueError('GDI observer differs from producer after LF normalization: '+name)
     original_stage=run_client.stage
     def stage(*stage_args,**options):
         before=options.pop('before_launch')
@@ -68,8 +71,8 @@ def main():
         results[name]=dict(result,driver_sha256=expected,client_report_sha256=sha(folder/'client-report.json'),
                           result_sha256=sha(folder/'surface-dc-result.json'),
                           ordinary_frame_sha256=sha(baseline/name/'scene.rgba'))
-    if source!={name:sha(ROOT/name) for name in source}:raise ValueError('GDI observer changed during execution')
-    report=dict(status='passed',producer_commit=producer,source_sha256=source,runs=results,
+    if raw_source!={name:sha(ROOT/name) for name in raw_source}:raise ValueError('GDI observer changed during execution')
+    report=dict(status='passed',producer_commit=producer,source_sha256_lf=source,source_raw_sha256=raw_source,runs=results,
                 scope='Real Windows public surface API/GDI/OpenGL pixel, context and ownership controls; '
                       'accepted complete Sol/ISS/ShuttlePB scene and original numerical comparison run twice. '
                       'This does not qualify Dragonfly stock cockpits or complete Phase 6.')
