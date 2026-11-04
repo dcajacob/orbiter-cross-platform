@@ -1,5 +1,14 @@
 # Original remaining native vessel integration
 
+The latest source-built package includes the real Dragonfly module and its
+declared initial-current repair. The complete 38-scene native campaign is
+running against one fresh Debug automatic ASan/UBSan package at `01d03e49`.
+The four-profile original Windows diagnostic confirms that PoweredUp now
+completes twice with finite internal tanks. Spin stabilisation still fails the
+unchanged frame gate; its actual clocks identify the next required protocol
+repair. None of these diagnostics changes normal class admission or the last
+qualified 157-scene result.
+
 The complete original HST, solar-sail and quadcopter modules now compile against
 the real native SDK and pinned Lua 5.1. Their actual forces, flight controllers,
 HST keys/animations/Lua bindings and solar-sail deformation/paddle/radiation code
@@ -70,11 +79,12 @@ controls, Dragonfly native instruments and the original full Phase 6 scope
 remain open. The historical complete 157-scene result remains 118 passed and
 39 failed at its recorded owning source; these diagnostics do not revise it.
 
-The complete original Dragonfly module now also builds against actual native
+The first complete original Dragonfly module also built against actual native
 bitmap, Sketchpad and compatibility-context resources. Its original 28 embedded
 panel BMPs are delivered unchanged. Complete-scene sanitizer execution has
 identified and retained an ELF class-symbol collision and an original nonvirtual
-system-list deletion; native qualification remains pending.
+system-list deletion; those failed starts remain preserved. Subsequent repairs
+and current scoped checks are recorded below; full qualification remains open.
 [Dragonfly source conservation, actual controls and retained failures](../../Tests/Production/Dragonfly/README.md)
 
 The separate complete 38-scene Debug automatic native diagnostic has now
@@ -92,3 +102,77 @@ The independent post-campaign audit rehashes all 3,300 successful process files,
 `out/phase6-remaining-vessels-native-complete-audit-v1.json` in the isolated
 Dragonfly worktree. It retains all five failed starts and does not revise the
 historical 157-scene qualification.
+
+## Dragonfly and actual clock checkpoint
+
+The native Dragonfly renderer/lifetime repairs at `83c025ec` complete all five
+unchanged scenes twice: ten clean processes, 9,600 presentations, repeated
+state/resource/playback/mesh/camera traces identical and full-frame SSIM 1.0.
+The independent audit is `out/phase6-dragonfly-repeat-audit-v1.json`. It retains
+896 source/runtime/probe guards, 68 generated compiler inputs, 1,130 assets and
+all 57 actual original simulation-data inputs. This remains one native profile.
+
+The inherited fuel-cell constructor left `Amperes` uninitialized before its first
+thermal read. Actual native allocation-fill controls reproduce both the good
+and bad Windows PoweredUp outcomes exactly for thirteen mass/fuel snapshots and
+twenty-six waste-vent rows. Read-only debugger observations show the allocation
+bits at the first actual read; the failed Windows save contains a nonfinite
+waste tank. The source now defines previous current as zero, preserving every
+original update formula and callback order. Both source auditors independently
+derive that single assignment from the frozen original. Windows repaired-source
+v2 declares its sixth changed source path; the original application and public
+SDK remain unchanged. The causal audit is
+`out/phase6-dragonfly-fcell-initialization-audit-v1.json`.
+
+Fresh native v7 execution at `c2a2c37a` gives identical results with zero and
+NaN allocation-fill patterns: two clean twelve-frame processes and thirteen
+state/resource/playback/mesh/control/clock/lifecycle outputs identical to the
+old zero-fill control. These short controls produced no camera/full-frame
+snapshot and make no visual claim. The record is
+`out/phase6-dragonfly-initial-current-regression-audit-v2.json`. A broad anchor
+in the new native mutation test initially matched five existing assignments;
+that failed test is retained. The corrected constructor-specific test passes
+all eleven damaged-source controls. Fresh v8 compilation binds that test to
+public source `01d03e49` with all 768 source/dependency and 68 actual generated
+compiler inputs guarded. Its full 38-scene campaign remains in progress in
+`out/phase6-remaining-vessels-native-complete-v2`.
+
+[Windows diagnostic run 41815816832](https://github.com/dcajacob/orbiter-cross-platform/actions/runs/41815816832)
+at `4afc7e26` completes PoweredUp twice in each Debug/Release automatic/SSE2
+profile: eight successful processes and 7,680 actual presentations. State,
+resource and camera repeats are identical; repeated full-frame SSIM ranges
+from 0.9950829224 to 1.0, within the unchanged budget. All sixteen saved
+internal tanks are finite and nonnegative in every run. The four exact ZIPs,
+1,258 decoded evidence files, explicit source-v2 electrical delta, actual
+replacement DLL bytes, complete-scene gates and thirty-two damaged clock copies
+are independently checked in `out/phase6-windows-clock-current-audit-v2.json`.
+The archives remain in `out/phase6-windows-clock-current-diagnostic-4afc-v1`.
+
+All four diagnostic workflows still fail at the original Spin stabilisation
+frame gate. Actual SDK samples show Windows taking three 0.01-second startup
+steps and then 0.1 system seconds per step; the native fixed-frame loop takes
+three 0.01-second steps and then 1/64. At 960 ordinary steps, system time is
+95.72999999999884 on Windows and 14.983125000000001 natively, while simulation
+time is 15 in both. The unchanged script sets warp to 100 at Windows tick 355;
+physical steps accelerate at tick 356. Simulation time moves from 11.796875 at
+tick 359 to 13.359375 at tick 360, skipping the old exact 12.5-second frame
+target. The four Windows clock traces agree exactly. The native complete run
+never reaches that system-time script point. A separately versioned matched
+system-clock and finalized-frame capture protocol is still required; the old
+failed captures, script bytes, physics, data locks and budgets remain intact.
+
+Real native Save/Load also restores all 100 non-socket serialized internal lines
+exactly. The first before-update check fails on six socket markers: the original
+loader intentionally sets each connection pending until its first refresh.
+An additional real process verifies that all six restore after that original
+update, with sixteen finite saved tanks and clean sanitizer/context teardown.
+The failed early check remains in `out/phase6-dragonfly-save-load-v1`; the
+follow-up is `out/phase6-dragonfly-save-load-post-first-step-v1`. This observes
+the original deferred load sequence; it does not change the serialization or
+establish broader physical/visual Windows persistence parity.
+
+Diagnostic selections are explicitly marked in campaign and executed-variant
+metadata and rejected by the full-reference auditor. Complete four-profile
+38-scene comparisons, controls, broader persistence/lifetime, the admitted
+157-scene corpus, platform/hardware/performance and full Phase 6 acceptance
+remain required.
