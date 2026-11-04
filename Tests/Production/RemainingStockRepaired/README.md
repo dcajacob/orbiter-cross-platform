@@ -1,5 +1,19 @@
 # Explicit repaired original Windows reference candidate
 
+Source variant v3 additionally initializes the transient `ADI::ref_handle`
+request to zero. Actual original-scene allocation controls reproduce the saved
+reference difference with no physical-state change or user reference request.
+The original constructor leaves that flag undefined; its paint path captures a
+reference for any nonzero value. The single assignment preserves loaded manual
+references and all original orientation/drawing operations. The independent
+reader derives the complete ADI source/header from the frozen original for both
+v2 and v3, with exact allowed platform ownership and constructor changes. Missing
+or nonzero requests, attitude formula changes, false initialization metadata and
+mislabeling v3 as v2 are rejected even with self-consistent damaged manifests.
+Fresh v3 Windows execution and full persistence/input qualification remain
+required; prior v2 captures and their recorded failures remain unchanged.
+
+
 This is a separately versioned candidate, not an untouched-original reference,
 an observations lock, native class admission or Phase 6 acceptance. The failed
 original campaigns remain failed and unchanged.

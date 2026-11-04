@@ -1,5 +1,47 @@
 # Original remaining native vessel integration
 
+## Finalized save and ADI request checkpoint
+
+A separate unchanged PoweredUp run using the `45c3155d` native Debug automatic
+package executes the existing real Save command at input tick 959, phase
+`after`: all physics/camera work for finalized tick 960 is complete. It returns
+zero with 960 presentations, clean context/sanitizer teardown and unchanged
+source/runtime/generated/assets/data guards. The destination argument alone does
+not request a save. The candidate persistence contract and complete saved-state
+reader are in `Tests/Production/RemainingStockPersistence`.
+
+The actual original Windows and native saves have the same date, focus, three
+vessels and complete parsed state except the ADI's manual-reference vector.
+Two fresh real one-frame controls vary only heap fill 0/255 with a 65,536-byte
+fill limit. Both processes return zero with clean contexts and unsuppressed
+sanitizers; ten actual state/resource/mesh/playback/clock traces are identical.
+Only the saved ADI reference vector changes, and nonzero fill reproduces the
+original Windows value. Debug information places the request flag at offset
+10,656 in the 10,784-byte native ADI object. The original constructor does not
+initialize `ref_handle`; paint consumes any nonzero value as a request to capture
+the current attitude, although no reference-button input was supplied.
+
+The common Windows/native constructor now initializes that transient request to
+zero, preserving loaded references and every original attitude/drawing operation.
+Source variant v3 declares the repair separately. The Windows independent auditor
+now derives the complete ADI source/header from the frozen original for both
+historical v2 and corrected v3, rather than trusting a producer's drawing or
+attitude changes. Native controls additionally reject missing/nonzero requests;
+Windows controls also reject altered attitude operations, false policy and false
+historical labeling. Fresh corrected native/Windows execution remains required.
+
+The causal comparison and raw controls are retained under
+`out/phase6-adi-request-initialization-audit-v1.json`,
+`out/phase6-finalized-save-windows-native-comparison-v1.json` and
+`out/phase6-adi-request-heap-*-v1` in the isolated persistence worktree.
+Reader controls retain all 128 actual vessel/module records, reject seven
+malformed copies and detect four changed/omitted fields. The first missing-END
+control failure remains retained. No numerical tolerance is inferred from save
+text, and no scoped save experiment establishes full persistence qualification.
+All four immutable native full-38 campaigns at `45c3155d` continue in their
+separate checkout; those old runs are not relabeled as containing this repair.
+
+
 ## Corrected panel and four-profile Windows checkpoint
 
 The `eb239c72d60baa2df56c77e36ca77d9f0c0ea6c3` native panel-default

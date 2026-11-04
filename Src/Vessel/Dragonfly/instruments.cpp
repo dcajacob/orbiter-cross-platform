@@ -1006,6 +1006,7 @@ float trad;
 float Pi=acos(-1.0);
 int indx;
 function_mode=0;//GDC;
+ref_handle=0; // No pending reference capture before user input.
 orbital_ecliptic=-1; //orbital GDC;
 reference.x=0.0;reference.y=0.0;reference.z=0.0;//ecliptic is also first reference
 now.x=0.37;now.y=-1.2;now.z=0.5;

@@ -2106,8 +2106,8 @@
     },
     "Src/Vessel/Dragonfly/instruments.cpp": {
       "original_sha256_lf": "d2ffe3a7edb2a6c71d5f2f7c03e8a4e58d63d75c7413fa3ff8b15d8b45a3e932",
-      "sha256_lf": "9cdeaed05227c54216737b478c718d6e8fe8415cfd0f6e7463b26a726832babf",
-      "scope": "Complete original Dragonfly source and resources with independently audited native SDK/drawing/resource ownership bindings. Actual compatibility target uses distinct color-renderbuffer storage. Native diagnostic build/runtime and Windows/native qualification required; original formulas and public Windows SDK layouts unchanged."
+      "sha256_lf": "ac31a8defa6f7151be290eb90b9c3a67c7812d699b9ad3927d1a60d8355e595d",
+      "scope": "Complete original Dragonfly ADI drawing/attitude operations with independently audited context/bitmap ownership. Initialize the transient reference-capture request to zero before first paint; actual allocation controls reproduce its inherited uninitialized saved-reference difference. All attitude calculations, GL drawing order, physical formulas and public Windows SDK layouts unchanged. Fresh runtime and Windows/native qualification required."
     },
     "Src/Vessel/Dragonfly/WglContext.h": {
       "original_sha256_lf": null,

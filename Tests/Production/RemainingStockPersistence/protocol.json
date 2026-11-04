@@ -1,0 +1,23 @@
+{
+  "schema": 1,
+  "protocol": "remaining-stock-persistence-v1",
+  "original_application_and_sdk_source": "f725194209634f7fd5d1d44d426cfa9b5e303e37",
+  "parent_observation_protocol": "remaining-stock-matched-clock-v2",
+  "complete_scenes": 38,
+  "profiles": ["Debug-automatic", "Debug-sse2", "Release-automatic", "Release-sse2"],
+  "repeats": 2,
+  "frames": 960,
+  "fixed_step": 0.015625,
+  "system_elapsed_input": 0.1,
+  "system_startup_steps": [0.01, 0.01, 0.01],
+  "capture_tick": 800,
+  "native_save_command": {"input_tick": 959, "phase": "after", "action": "save", "value": 0, "finalized_tick": 960},
+  "reload_input": "The exact hashed original Windows end save is loaded by both runtimes; the native writer is also compared separately at original serialization precision.",
+  "original_parent_scenes_and_scripts_unchanged": true,
+  "state_camera_and_image_budgets": "Inherited unchanged from RemainingStock/cases.json. Save/read comparisons require measured original Windows round trips at stock serialization precision.",
+  "operator_description_blocks": ["BEGIN_DESC", "BEGIN_URLDESC"],
+  "automatic_refresh": false,
+  "native_admission_qualified": false,
+  "phase6_complete": false,
+  "scope": "Candidate persistence protocol for every complete remaining-stock scene and every actual saved vessel. Generated saves are separately named, hashed derived inputs and never replace the frozen original scenarios. Qualification requires original Windows/native writer, reload, physical, camera, framebuffer, input, repeated-session and source/data/runtime provenance evidence; this declaration establishes no accepted reference."
+}

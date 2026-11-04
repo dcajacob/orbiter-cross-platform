@@ -103,10 +103,44 @@ def preserved_metadata(root,delivery):
     return result
 
 
+def original_adi_sources(original,initialize_request):
+    """Independently derive every ADI source byte from the frozen Windows code."""
+    path='Src/Vessel/Dragonfly/instruments.cpp'
+    source=original[path].decode('cp1252').replace('\r\n','\n')
+    start=source.index('GLuint      PixelFormat;',source.index('void ADI::InitGL()'))
+    end=source.index('//We load the texture',start)
+    require(checksum(source[start:end].encode('cp1252'))=='23bf423fc4c6006f95f5a629c4dc799f3d9c0afc6be5086a9602ffafe15c7a76',
+            'Original ADI platform block differs')
+    source=source[:start]+('bitmap_target=new dragonfly::WglBitmapTarget(160,160);\n'
+        'hDC2=bitmap_target->BitmapDC();\nhRC=bitmap_target->Context();\n'
+        'hBMP=bitmap_target->Bitmap();\nhBMP_old=(HBITMAP)bitmap_target->PreviousBitmap();\n'
+        'bitmap_target->Activate();\n\n')+source[end:]
+    start=source.index('wglMakeCurrent(NULL,NULL);',source.index('ADI::~ADI()'))
+    end=source.index('\n};\nvoid ADI::RegisterMe',start)
+    source=source[:start]+'delete bitmap_target;\nbitmap_target=nullptr;\nhRC=NULL;\nhDC2=NULL;\n'+source[end:]
+    replacements=[('#include "dragonfly.h"','#include "dragonfly.h"\n#include "WglBitmapTarget.h"'),
+        ('init=0;\nradius=10;','init=0;\nbitmap_target=nullptr;\nradius=10;'),
+        ('void ADI::InitGL()\n{','void ADI::InitGL()\n{\ndragonfly::WglContextRestore restore;'),
+        ('\tif (!init) InitGL();','\tif (!init) InitGL();\n\t{\n\tdragonfly::WglContextRestore active(bitmap_target->RenderDC(),hRC);'),
+        ('\tglFinish();','\tglFinish();\n\tbitmap_target->Readback();\n\t}')]
+    if initialize_request:
+        replacements.append(('function_mode=0;//GDC;\norbital_ecliptic=-1;',
+            'function_mode=0;//GDC;\nref_handle=0; // No pending reference capture before user input.\norbital_ecliptic=-1;'))
+    for before,after in replacements:
+        require(source.count(before)==1,'Original ADI binding boundary differs')
+        source=source.replace(before,after,1)
+    header='Src/Vessel/Dragonfly/instruments.h'
+    body=original[header].decode('cp1252').replace('\r\n','\n')
+    require(body.count('class Panel;')==body.count('   HBITMAP hBMP_old;')==1,'Original ADI header boundary differs')
+    body=body.replace('class Panel;','class Panel;\nnamespace dragonfly {class WglBitmapTarget;}',1)
+    body=body.replace('   HBITMAP hBMP_old;','   HBITMAP hBMP_old;\n   dragonfly::WglBitmapTarget* bitmap_target;',1)
+    return {path:source.encode('cp1252'),header:body.encode('cp1252')}
+
+
 def source_variant(root,producer):
     report=json.loads((root/'source-variant.json').read_text())
     require(report['schema']==1 and report['status']=='prepared-awaiting-build-and-independent-audit' and
-            report['protocol']=='remaining-stock-repaired-sources-v2' and
+            report['protocol'] in ('remaining-stock-repaired-sources-v2','remaining-stock-repaired-sources-v3') and
             report['producer_commit']==producer and report['original_application_and_sdk_source']==BASE and
             report['complete_scenes']==38 and report['declared_classes']==19 and report['recording_files']==36 and
             report['staged_original_module_files_unchanged_except_declared_changes'] and
@@ -136,6 +170,14 @@ def source_variant(root,producer):
             report['initialization_repair']==dict(field='FCell::Amperes',initial_value=0,
                 policy='Define previous current before the first thermal update; retain every original update formula and callback order.'),
             'Electrical source exceeds the one declared initial-current assignment')
+    request_init=report['protocol']=='remaining-stock-repaired-sources-v3'
+    for name,body in original_adi_sources(original,request_init).items():
+        require(expected[name].replace(b'\r\n',b'\n')==body,'ADI source exceeds original drawing/attitude and declared initial-request bindings: '+name)
+    if request_init:
+        require(report['adi_reference_request_repair']==dict(field='ADI::ref_handle',initial_value=0,
+            policy='No reference capture request before user input; preserve loaded reference and all original attitude/drawing operations.'),
+            'ADI initial reference-request policy differs')
+    else:require('adi_reference_request_repair' not in report,'Historical v2 source misdeclares an ADI request repair')
     original_hashes={name:checksum(body) for name,body in original.items()}
     staged={name:checksum(body) for name,body in expected.items()}
     actual={p.relative_to(root/'source').as_posix():sha(p) for p in (root/'source').rglob('*') if p.is_file()}
@@ -143,7 +185,7 @@ def source_variant(root,producer):
             'Exact original/repaired module source or resource closure differs')
     changes={name:dict(original_sha256=original_hashes.get(name),repaired_sha256=value)
              for name,value in staged.items() if original_hashes.get(name)!=value}
-    require(set(changes)=={tank,*dragonfly} and report['declared_changes']==changes,'Module changes exceed six declared platform/lifetime/initial-current paths')
+    require(set(changes)=={tank,*dragonfly} and report['declared_changes']==changes,'Module changes exceed six declared platform/lifetime/initial-state paths')
     require(report['preparer_sha256'] in raw_source_hashes(producer,'Tests/Production/RemainingStockRepaired/prepare_sources.py'),
             'Actual source preparer producer differs')
     require(report['current_dragonfly_producer_sha256']=={name:staged[name] for name in dragonfly},'Dragonfly source producer differs')

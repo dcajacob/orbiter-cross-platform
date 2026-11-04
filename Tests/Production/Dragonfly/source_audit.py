@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Conserve original calculations around declared WGL and initial-current repairs."""
+"""Conserve original calculations around declared WGL, initial-current and initial-reference-request repairs."""
 from pathlib import Path
 import hashlib
 import subprocess
@@ -37,6 +37,8 @@ def adapted(name,source):
         ('void ADI::InitGL()\n{','void ADI::InitGL()\n{\ndragonfly::WglContextRestore restore;'),
         ('\tif (!init) InitGL();','\tif (!init) InitGL();\n\t{\n\tdragonfly::WglContextRestore active(bitmap_target->RenderDC(),hRC);'),
         ('\tglFinish();','\tglFinish();\n\tbitmap_target->Readback();\n\t}')]
+    changes.append(('function_mode=0;//GDC;\norbital_ecliptic=-1;',
+                    'function_mode=0;//GDC;\nref_handle=0; // No pending reference capture before user input.\norbital_ecliptic=-1;'))
     for old,new in changes:
         if source.count(old)!=1:raise ValueError('Original ADI WGL binding anchor changed: '+old)
         source=source.replace(old,new)
@@ -51,10 +53,10 @@ def verify():
         original=subprocess.check_output(['git','-C',str(ROOT),'show',BASE+':'+name]).decode('cp1252').replace('\r\n','\n')
         current=(ROOT/name).read_bytes().decode('cp1252').replace('\r\n','\n')
         if adapted(name,original)!=current:
-            raise ValueError('Dragonfly source differs beyond declared WGL ownership and initial-current repairs: '+name)
+            raise ValueError('Dragonfly source differs beyond declared WGL ownership and initial-state repairs: '+name)
         checked.append(name)
     if len(checked)!=23:raise ValueError('Incomplete original Dragonfly source closure')
-    print('Conserved all '+str(len(checked))+' original Dragonfly source/header/resource files; only ADI context/bitmap ownership and initial fuel-cell current are repaired; all update formulas, ordering, attitude calculations and GL drawing commands retained')
+    print('Conserved all '+str(len(checked))+' original Dragonfly source/header/resource files; only ADI context/bitmap ownership, initial fuel-cell current and initial ADI request are repaired; all update formulas, ordering, attitude calculations and GL drawing commands retained')
 
 
 if __name__=='__main__':verify()
