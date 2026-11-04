@@ -258,5 +258,42 @@
     "rejected": 8
   },
   "native_admission_qualified": false,
-  "phase6_complete": false
+  "phase6_complete": false,
+  "durable_release": {
+    "id": 433356563,
+    "tag": "phase6-legacy-stations-original-v2",
+    "url": "https://github.com/dcajacob/orbiter-cross-platform/releases/tag/phase6-legacy-stations-original-v2",
+    "producer": "aeee5826eb86c5c64e6c0fc97f40a20f8104459e",
+    "preservation_workflow_run": 41744483549,
+    "assets": [
+      {
+        "id": 707583578,
+        "name": "original-legacy-stations-v2-Debug-automatic.zip",
+        "bytes": 32840782,
+        "sha256": "5f6d89e1735f9250dc7285c73d27934ba8b078162dc0138e5cbb4bc794118686",
+        "state": "uploaded"
+      },
+      {
+        "id": 707583717,
+        "name": "original-legacy-stations-v2-Debug-sse2.zip",
+        "bytes": 32841027,
+        "sha256": "433d4562fe5e670c0f9071dc4ee8f4c5eca80b7e1706aa45c6fcea81b73b93dd",
+        "state": "uploaded"
+      },
+      {
+        "id": 707583463,
+        "name": "original-legacy-stations-v2-Release-automatic.zip",
+        "bytes": 32803378,
+        "sha256": "7efc352070d915d63b1c38b477cdddde4fbe990553710609efca2f1ac10f612b",
+        "state": "uploaded"
+      },
+      {
+        "id": 707583295,
+        "name": "original-legacy-stations-v2-Release-sse2.zip",
+        "bytes": 32803337,
+        "sha256": "a6cb82c22a4b36f0b22e170c196aff300a03fcabd60470175f587d6d533bb331",
+        "state": "uploaded"
+      }
+    ]
+  }
 }

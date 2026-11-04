@@ -1,6 +1,6 @@
 {
   "schema": 2,
-  "status": "native-parity-verified-preservation-pending",
+  "status": "native-parity-verified-and-archived",
   "phase6_complete": false,
   "runtime_source_commit": "aeee5826eb86c5c64e6c0fc97f40a20f8104459e",
   "original_application_source": "f725194209634f7fd5d1d44d426cfa9b5e303e37",
@@ -14,7 +14,7 @@
     "path": "out/phase6-legacy-stations-original-v2-audit-v1.json",
     "sha256": "41b682628747cf652b00ca502cd50d8ce588b4f152ed00cde6ba1a5565c0d9f5"
   },
-  "original_lock_sha256": "ef63d57d55eb73d7f3d4bd70e388704f7bbad8b132f7993bfc16108132879223",
+  "original_lock_sha256": "d480349b8bfe973c8c740a90817bd5a4e91c070ced333d4570ec3a056e9fc0bb",
   "profiles": {
     "Release-auto": {
       "path": "out/phase6-legacy-stations-comparison-Release-auto-v4.json",
@@ -103,7 +103,7 @@
   },
   "retained_source_runtime_root": "out/phase6-legacy-stations-retained-root-v4",
   "native_legacy_subset_parity_qualified": true,
-  "durable_v2_release_verified": false,
+  "durable_v2_release_verified": true,
   "scope": "Four unchanged complete legacy station scenes for 60 fixed quarter-second frames (15 simulated seconds), repeated in each profile. Does not qualify the entire nine-minute rescue tutorial, every stock scene, other modules, hardware input/performance or Phase 6.",
   "previous_v1_reference": {
     "tag": "phase6-legacy-stations-original-v1",
@@ -113,8 +113,61 @@
     "original_assets_unchanged": true
   },
   "remaining": [
-    "Publish and anonymously replay the four audited v2 archives and preserve the complete native evidence.",
     "Rerun all 157 unchanged stock scenarios on the verified runtime; the last complete pre-admission baseline remains 114 passes / 43 failures.",
     "Complete current hosted comparisons, remaining modules/assertion, interactive/hardware/performance gates and full Phase 6 acceptance."
-  ]
+  ],
+  "preservation_workflow_run": 41744483549,
+  "durable_original_release": {
+    "id": 433356563,
+    "tag": "phase6-legacy-stations-original-v2",
+    "url": "https://github.com/dcajacob/orbiter-cross-platform/releases/tag/phase6-legacy-stations-original-v2",
+    "producer": "aeee5826eb86c5c64e6c0fc97f40a20f8104459e",
+    "preservation_workflow_run": 41744483549,
+    "assets": [
+      {
+        "id": 707583578,
+        "name": "original-legacy-stations-v2-Debug-automatic.zip",
+        "bytes": 32840782,
+        "sha256": "5f6d89e1735f9250dc7285c73d27934ba8b078162dc0138e5cbb4bc794118686",
+        "state": "uploaded"
+      },
+      {
+        "id": 707583717,
+        "name": "original-legacy-stations-v2-Debug-sse2.zip",
+        "bytes": 32841027,
+        "sha256": "433d4562fe5e670c0f9071dc4ee8f4c5eca80b7e1706aa45c6fcea81b73b93dd",
+        "state": "uploaded"
+      },
+      {
+        "id": 707583463,
+        "name": "original-legacy-stations-v2-Release-automatic.zip",
+        "bytes": 32803378,
+        "sha256": "7efc352070d915d63b1c38b477cdddde4fbe990553710609efca2f1ac10f612b",
+        "state": "uploaded"
+      },
+      {
+        "id": 707583295,
+        "name": "original-legacy-stations-v2-Release-sse2.zip",
+        "bytes": 32803337,
+        "sha256": "a6cb82c22a4b36f0b22e170c196aff300a03fcabd60470175f587d6d533bb331",
+        "state": "uploaded"
+      }
+    ]
+  },
+  "public_anonymous_replay": {
+    "path": "out/phase6-legacy-stations-v2-public-audit-v1.json",
+    "sha256": "a4d08d6105e3cac96150e1b7ebcf72b8d19f1e791247b57b36f0dd28b3aaefd4",
+    "processes": 32
+  },
+  "native_evidence_archive": {
+    "status": "verified-archive",
+    "path": "out/phase6-legacy-stations-evidence-v2.tar.gz",
+    "bytes": 463788960,
+    "sha256": "324fe385e45d14b8e6c8b10ed180697a0f5de743cf73c9c0622a6be50261a780",
+    "members": 3822,
+    "every_member_rehashed": true,
+    "source_manifest_sha256": "53bfc321d1c826f6530fc191b04eee179b3926d36a5d42a39e5bf577eea2d28c",
+    "phase6_complete": false,
+    "publication": "verified-local-archive"
+  }
 }

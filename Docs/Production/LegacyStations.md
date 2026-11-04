@@ -39,9 +39,15 @@ archive fails before producing an audit. See the exact hashes and paths in
 
 Version 1 remains preserved with its documented rescue-playback limitation;
 none of its archive identities or its observer tag moved. Version 2 uses the
-separate `phase6-legacy-stations-original-v2` tag at the audited producer. Public
-v2 publication and anonymous replay are pending, as is the complete native
-evidence archive.
+separate `phase6-legacy-stations-original-v2` tag at the audited producer. [Public v2
+publication](https://github.com/dcajacob/orbiter-cross-platform/releases/tag/phase6-legacy-stations-original-v2)
+and a fresh anonymous four-archive replay both pass. The complete legacy evidence
+archive retains five native packages/captures, all four original ZIPs, sources,
+controls and failed-attempt context: 3,822 individually rehashed members,
+463,788,960 bytes, SHA-256
+`324fe385e45d14b8e6c8b10ed180697a0f5de743cf73c9c0622a6be50261a780`.
+It is a verified local evidence archive; the four original ZIPs are also publicly
+preserved. No font or stock-data collections are bundled.
 
 The last complete pre-admission 157-scenario sweep remains 114 passes and 43
 failures. A new complete sweep is required before changing that count. Current

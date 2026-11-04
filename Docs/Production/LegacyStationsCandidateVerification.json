@@ -1,6 +1,6 @@
 {
   "schema": 3,
-  "status": "native-parity-verified-preservation-pending",
+  "status": "native-parity-verified-and-archived",
   "phase6_complete": false,
   "runtime_source_commit": "aeee5826eb86c5c64e6c0fc97f40a20f8104459e",
   "qualification": "Docs/Production/LegacyStationsVerification.json",
@@ -8,7 +8,7 @@
   "native_presentations": 2400,
   "native_legacy_subset_parity_qualified": true,
   "original_budgets_unchanged": true,
-  "durable_v2_release_verified": false,
+  "durable_v2_release_verified": true,
   "preserved_failed_attempts": [
     {
       "source": "aeee5826eb86c5c64e6c0fc97f40a20f8104459e:Docs/Production/LegacyStationsCandidateVerification.json",
@@ -19,5 +19,6 @@
       "driver": "out/phase6-legacy-dock-lifetime-capture-v3.py",
       "reason": "The driver incorrectly renamed the unchanged v2 resource root to a nonexistent v3 path; all attempts failed before launching the app. Corrected v4 captures use the same retained fresh v3 runtime packages."
     }
-  ]
+  ],
+  "native_evidence_archive_sha256": "324fe385e45d14b8e6c8b10ed180697a0f5de743cf73c9c0622a6be50261a780"
 }

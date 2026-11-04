@@ -32,8 +32,12 @@ extracted archive byte are independently audited.
 any reference. An offline positive replay passes; a same-size corrupted ZIP
 fails before creating an audit. `preserve_original.py` publishes only those four
 audited archives under the separate v2 tag, verifies the remote bytes, and never
-moves a tag or replaces an asset. Public v2 preservation is pending until its
-workflow and anonymous replay complete.
+moves a tag or replaces an asset. [Public v2 preservation](https://github.com/dcajacob/orbiter-cross-platform/releases/tag/phase6-legacy-stations-original-v2)
+and a fresh anonymous four-archive replay both pass. The tag remains at the exact
+audited observer producer. The verified local legacy evidence archive contains
+3,822 independently rehashed members, including all five native packages, raw
+captures, source snapshots, controls and the four original ZIPs; its size and
+SHA-256 are recorded in the verification record.
 
 `Gate.Test.py` rejects twelve damaged real captures per Windows profile.
 `PlaybackGate.Test.py` rejects five missing/changed recording, playback and entry-
