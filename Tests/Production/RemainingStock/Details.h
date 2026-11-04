@@ -7,7 +7,7 @@
 
 namespace remaining_stock {
 struct Details {
-    std::ofstream population,propellants,thrusters,attachments,playback,meshes;
+    std::ofstream population,propellants,thrusters,attachments,playback,meshes,clock;
     struct Resource {std::string object;unsigned index,id,lastTick;};
     std::map<PROPELLANT_HANDLE,Resource> history;
     unsigned nextResource=0;
@@ -19,10 +19,16 @@ struct Details {
         open(attachments,"stock-vessel-attachments.csv","tick,object,to_parent,index,id,x,y,z,dx,dy,dz,rx,ry,rz,attached");
         open(playback,"stock-playback.csv","tick,object,playback");
         open(meshes,"stock-vessel-meshes.csv","tick,object,index,present,template,name,visibility,x,y,z");
+        open(clock,"stock-clock.csv","tick,system_seconds,system_step,simulation_seconds,simulation_step,time_acceleration");
     }
     void snapshot(unsigned tick) {
         using stock_vessels::csv;
         using stock_vessels::require;
+        // The same initial/finalized boundary as the vessel observations. These
+        // public getters do not supply a clock, set warp or alter script order.
+        clock<<tick<<','<<oapiGetSysTime()<<','<<oapiGetSysStep()<<','<<oapiGetSimTime()
+             <<','<<oapiGetSimStep()<<','<<oapiGetTimeAcceleration()<<'\n';
+        clock.flush(); // Retain the last observed clock even if a later gate fails.
         const auto count=oapiGetVesselCount();
         population<<tick<<','<<count<<'\n';
         std::map<PROPELLANT_HANDLE,Resource*> resources;

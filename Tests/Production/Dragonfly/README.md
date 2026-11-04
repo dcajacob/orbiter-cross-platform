@@ -168,9 +168,18 @@ controls. Both historical runtimes and caller-header identities are retained in
 verification remains pending. CI explicitly installs the GLU development
 dependency required by the original instrument commands.
 
-Fresh repaired execution and unchanged
-Dragonfly scene checks, sanitizer teardown, panel/input and persistence
-checks, repeated sessions and matched four-profile Windows/native state/camera/
+All five complete unchanged scenes now also pass twice in native Debug automatic:
+ten clean processes, 9,600 actual presentations, 34,596 vessel-state rows and
+identical repeated state/resource/playback/mesh/camera traces and full frames
+(SSIM 1.0). The post-exit audit rehashes all 520 process evidence files, 896
+source/runtime/probe guards, 68 generated compiler inputs, 1,130 staged assets
+and all 57 actual kernel/gravity/planet inputs. The records are
+`out/phase6-dragonfly-native-complete-v1` and
+`out/phase6-dragonfly-repeat-audit-v1.json`; the matching source snapshot is
+`out/phase6-dragonfly-source-83c025ec-v1`.
+
+Fresh repaired Windows execution, panel/input and persistence checks, broader
+repeated sessions and matched four-profile Windows/native state/camera/
 full-frame comparisons still have to pass. Normal class admission and Phase 6
 completion remain unchanged. The Windows reference workflow now also watches
 the actual Dragonfly and renderer source inputs, so a target-ownership repair

@@ -4,6 +4,27 @@ This is a separately versioned candidate, not an untouched-original reference,
 an observations lock, native class admission or Phase 6 acceptance. The failed
 original campaigns remain failed and unchanged.
 
+The shared passive SDK observer additionally writes `stock-clock.csv` at the
+same initial and finalized boundaries as the vessel snapshots. Its separately
+identified `remaining-stock-sdk-clock-v1` samples record system time/step,
+simulation time/step and time acceleration using public getters only. They
+supply no clock input, change no warp or script ordering, and do not replace or
+relax the existing fixed-step, repeat, finalized-frame or complete-scene gates.
+The reader checks complete ordered samples, finite values, forward system time
+and association with every vessel snapshot; it makes no matched-clock claim.
+`RemainingStock/Clock.Test.py` uses real observations and requires eight damaged
+copies to fail while leaving the owning evidence unchanged. Both successful and
+failed Windows runs retain the raw CSV through the existing artifact rule.
+
+This observation is needed because the original application measures elapsed
+system time (capped at 0.1 seconds after three 0.01-second launch steps), while
+the current fixed-frame native diagnostic supplies 1/64 second to its system
+clock helper. The 120-ms observer delay is not itself a system-clock input in
+that native loop. Original scripts that wait on system time can therefore reach
+warp changes at different physical ticks. Existing failed clock/repeat captures
+remain failures; a matched capture protocol still needs its own evidence and
+explicit versioning before it can replace any reference.
+
 The original v2 campaign at `da11decc84db1211bd2efc016594880f8d5cc269`, workflow
 [41752276001](https://github.com/dcajacob/orbiter-cross-platform/actions/runs/41752276001),
 failed in all four profiles. Its exact ZIPs and decoded members remain under

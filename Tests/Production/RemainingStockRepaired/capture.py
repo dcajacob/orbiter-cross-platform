@@ -44,6 +44,7 @@ def inspect_artifacts(out,case,config):
             'Repaired stock session ended early')
     require(json.loads((out/'process-result.json').read_text())['returncode']==0,'Repaired process did not return zero')
     result=shared.inspect_trace(out,case,config)
+    clock=shared.inspect_clock(out,config['frames'])
     life=json.loads((out/'graphics-lifecycle.json').read_text())
     require(life==dict(rendered_frames=config['frames'],successful_presents=config['frames'],context_deleted=True),
             'Repaired graphics teardown incomplete')
@@ -78,12 +79,12 @@ def inspect_artifacts(out,case,config):
             'Repaired rendered class differs from physical object')
     actual_math=(out/'math-profile.txt').read_text().strip()
     require(actual_math in ('fma3','sse2'),'Unknown repaired reference CRT implementation')
-    names=[*shared.TRACES,'stock-vessel-complete.txt','scene.csv','scene.rgba','scene-summary.json','camera.csv',
+    names=[*shared.TRACES,'stock-clock.csv','stock-vessel-complete.txt','scene.csv','scene.rgba','scene-summary.json','camera.csv',
         'renderer-info.json','graphics-lifecycle.json','renderer-modules.txt','invocation.json','mesa-bindings.json',
         'math-profile.txt','console.txt','Orbiter.log','Orbiter.cfg','process-result.json','reference-variant.json','actual-data-inputs.json',
         case['scenario_entry_point'],*shared.recordings(case,config)]
     names.extend(item['target'] for item in config['delivery_repairs'])
-    return dict(result,status='captured',process_returncode=0,actual_math=actual_math,renderer=renderer,actual_simulation_data_files=data_files,
+    return dict(result,status='captured',process_returncode=0,actual_math=actual_math,renderer=renderer,actual_simulation_data_files=data_files,clock_observation=clock,
                 files_sha256={name:sha(out/name) for name in names})
 
 

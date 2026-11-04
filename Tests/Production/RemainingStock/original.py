@@ -17,6 +17,7 @@ from inputs import ROOT,CASE_FILE,settings,require,digest,sha_lf,entry_point,rec
 from stage_original import run as stage
 from run_client import mesa_files,png
 from compare_client import image_ssim
+from clock_observation import inspect_clock
 
 spec=importlib.util.spec_from_file_location('remaining_shared_stock',HERE.parent/'StockVessels/original.py')
 shared=importlib.util.module_from_spec(spec);spec.loader.exec_module(shared)

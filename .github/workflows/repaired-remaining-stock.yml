@@ -4,6 +4,8 @@ on:
     branches: ['codex/production-**']
     paths:
       - 'Tests/Production/RemainingStockRepaired/**'
+      - 'Tests/Production/RemainingStock/**'
+      - 'Tests/Production/StockVessels/Observation.h'
       - 'Src/Vessel/Dragonfly/**'
       - 'Tests/Production/Dragonfly/**'
       - 'OVP/OGLClient/**'
@@ -107,6 +109,11 @@ jobs:
           python -B Tests/Production/RemainingStockRepaired/Gate.Test.py
           --capture out/remaining-stock-repaired/remaining_stock_003-1
           --output out/remaining-stock-repaired/gate-control.json
+      - name: Reject damaged public SDK clock samples and snapshot associations
+        run: >-
+          python -B Tests/Production/RemainingStock/Clock.Test.py
+          --capture out/remaining-stock-repaired/remaining_stock_003-1
+          --output out/remaining-stock-repaired/clock-control.json
       - uses: actions/upload-artifact@v7
         if: always()
         with:
@@ -115,6 +122,7 @@ jobs:
           path: |
             out/remaining-stock-repaired/capture.json
             out/remaining-stock-repaired/gate-control.json
+            out/remaining-stock-repaired/clock-control.json
             out/remaining-stock-repaired/*/*.csv
             out/remaining-stock-repaired/*/*.rgba
             out/remaining-stock-repaired/*/*.png
