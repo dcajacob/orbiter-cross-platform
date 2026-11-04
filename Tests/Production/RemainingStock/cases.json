@@ -1,0 +1,718 @@
+{
+  "application_source": "f725194209634f7fd5d1d44d426cfa9b5e303e37",
+  "frames": 60,
+  "fixed_step": 0.25,
+  "epoch": 51982.5,
+  "image_ssim_minimum": 0.98,
+  "budgets": {
+    "position_m": 0.01,
+    "velocity_m_s": 1e-05,
+    "rotation_rad": 1e-08,
+    "angular_velocity_rad_s": 1e-10,
+    "mjd_days": 1e-10,
+    "propellant_relative": 1e-08,
+    "propellant_absolute_kg": 1e-08
+  },
+  "schema": 1,
+  "protocol": "remaining-stock-v1",
+  "suite": "remaining-stock-modules",
+  "automatic_refresh": false,
+  "scope": "All 38 unchanged complete locked stock scenes that declare any remaining native module or payload class, every initial vessel and every actual later vessel, SDK state/ports/attachments/thrusters/propellants/playback, full frames and original package identity. Original measurement only; no native admission.",
+  "required_classes": [
+    "Atlantis",
+    "Atlantis_SRB",
+    "Atlantis_Tank",
+    "Carina",
+    "Leonardo_mplm",
+    "Module2",
+    "Dragonfly",
+    "HST",
+    "LDEF",
+    "SolarSail",
+    "Quadcopter"
+  ],
+  "classes": {
+    "Atlantis": {
+      "source": "Src/Vessel/Atlantis/Atlantis/Config/Atlantis.cfg",
+      "target": "Config/Vessels/Atlantis.cfg",
+      "sha256_lf": "e09bb814e1324a2b507b0f3eac5f26a14281448767b2bb49fd065820d5d0bc00",
+      "module": "Atlantis",
+      "original_module": "Modules/Atlantis.dll"
+    },
+    "Atlantis_SRB": {
+      "source": "Src/Vessel/Atlantis/Atlantis_SRB/Config/Atlantis_SRB.cfg",
+      "target": "Config/Vessels/Atlantis_SRB.cfg",
+      "sha256_lf": "80c94998b74d990b4e1012032fce606ee9a64030e0736d052ccb3549c3575462",
+      "module": "Atlantis_SRB",
+      "original_module": "Modules/Atlantis_SRB.dll"
+    },
+    "Atlantis_Tank": {
+      "source": "Src/Vessel/Atlantis/Atlantis_Tank/Config/Atlantis_Tank.cfg",
+      "target": "Config/Vessels/Atlantis_Tank.cfg",
+      "sha256_lf": "df8e180fa894cdad82d82fa602f322732d217fb30708e69262e791a3185f8970",
+      "module": "Atlantis_Tank",
+      "original_module": "Modules/Atlantis_Tank.dll"
+    },
+    "Carina": {
+      "source": "Src/Vessel/Carina/Config/Carina.cfg",
+      "target": "Config/Vessels/Carina.cfg",
+      "sha256_lf": "68ec5acc24983f5bd19997f90a3ef8602ea82ef7d6a876ed417250bbfaed3572",
+      "module": null
+    },
+    "DG-S": {
+      "source": "Src/Vessel/DeltaGlider/Config/DG-S.cfg",
+      "target": "Config/Vessels/DG-S.cfg",
+      "sha256_lf": "22c36530484555355ef76b158fca1b89a71987e35eb502fbbbf530ec11f362d2",
+      "module": "DeltaGlider",
+      "original_module": "Modules/DeltaGlider.dll"
+    },
+    "DeltaGlider": {
+      "source": "Src/Vessel/DeltaGlider/Config/Deltaglider.cfg",
+      "target": "Config/Vessels/Deltaglider.cfg",
+      "sha256_lf": "213305c43bb4c12d742eb911179a0ede573760391696c5a47d340e4e25fded70",
+      "module": "DeltaGlider",
+      "original_module": "Modules/DeltaGlider.dll"
+    },
+    "Dragonfly": {
+      "source": "Src/Vessel/Dragonfly/Config/Dragonfly.cfg",
+      "target": "Config/Vessels/Dragonfly.cfg",
+      "sha256_lf": "d8d4f335ae3a56373c48a2275c3505c29397412f0ab76cda639629e88f1f7238",
+      "module": "Dragonfly",
+      "original_module": "Modules/Dragonfly.dll"
+    },
+    "HST": {
+      "source": "Src/Vessel/HST/Config/HST.cfg",
+      "target": "Config/Vessels/HST.cfg",
+      "sha256_lf": "b2baaa2006c67b9afdd7f0519199374ff1e8f773d0621748f65519e7361a17ea",
+      "module": "HST",
+      "original_module": "Modules/HST.dll"
+    },
+    "ISS": {
+      "source": "Config/Vessels/ISS.cfg",
+      "target": "Config/Vessels/ISS.cfg",
+      "sha256_lf": "cccb840e6cca110f73b6f64735e2aa2e169e11709010c9c433d2a760f812ec3b",
+      "module": null
+    },
+    "LDEF": {
+      "source": "Src/Vessel/LDEF/Config/LDEF.cfg",
+      "target": "Config/Vessels/LDEF.cfg",
+      "sha256_lf": "b9508b0d4df4b88f5ba1a8c30d75e66111f97b0e496ff24e6ad1be4752dd2341",
+      "module": null
+    },
+    "Leonardo_mplm": {
+      "source": "Src/Vessel/Leonardo/Config/Leonardo_mplm.cfg",
+      "target": "Config/Vessels/Leonardo_mplm.cfg",
+      "sha256_lf": "89e7569e4cd48cef8bcedbc9eebd1b7c93f84582f30e9778632cf8b75e0dd7bc",
+      "module": null
+    },
+    "Mir": {
+      "source": "Config/Vessels/Mir.cfg",
+      "target": "Config/Vessels/Mir.cfg",
+      "sha256_lf": "91efb778a451c45f8b3830b45720711cd1d9504877bacadd3dc1b6796db77f0e",
+      "module": null
+    },
+    "Module1": {
+      "source": "Config/Vessels/Module1.cfg",
+      "target": "Config/Vessels/Module1.cfg",
+      "sha256_lf": "8b82f6d6d3e198e3c449717de772306c81f6024604e6ad5da981efd83d1a7870",
+      "module": null
+    },
+    "Module2": {
+      "source": "Config/Vessels/Module2.cfg",
+      "target": "Config/Vessels/Module2.cfg",
+      "sha256_lf": "ff836fc53a93af7678209eb4ddf2f37322cfcc2de37fa8650d78fff67623e030",
+      "module": null
+    },
+    "ProjectAlpha_ISS": {
+      "source": "Src/Vessel/ISS/Config/ProjectAlpha_ISS.cfg",
+      "target": "Config/Vessels/ProjectAlpha_ISS.cfg",
+      "sha256_lf": "f2d605e58be17358bc4b9aaf60a8187e363c0c1546ddd471ca64e1b4e380811f",
+      "module": null
+    },
+    "Quadcopter": {
+      "source": "Src/Vessel/Quadcopter/Config/Quadcopter.cfg",
+      "target": "Config/Vessels/Quadcopter.cfg",
+      "sha256_lf": "82da4f99276990bca1064c30f2872b6e0776bd126a605da2f636388f274cc778",
+      "module": "Quadcopter",
+      "original_module": "Modules/Quadcopter.dll"
+    },
+    "ShuttleA": {
+      "source": "Src/Vessel/ShuttleA/Config/ShuttleA.cfg",
+      "target": "Config/Vessels/ShuttleA.cfg",
+      "sha256_lf": "ae5718da9614575c07163580ad7b197f27752ecf85bd466b57b7e6c4f4aa29eb",
+      "module": "ShuttleA",
+      "original_module": "Modules/ShuttleA.dll"
+    },
+    "SolarSail": {
+      "source": "Src/Vessel/Solarsail/Config/SolarSail.cfg",
+      "target": "Config/Vessels/SolarSail.cfg",
+      "sha256_lf": "6159760592d46b7b5a7e2bb54e95cc722f60ad933f158a41489e7dd1c2cafdf2",
+      "module": "SolarSail",
+      "original_module": "Modules/Solarsail.dll"
+    },
+    "Wheel": {
+      "source": "Config/Vessels/Wheel.cfg",
+      "target": "Config/Vessels/Wheel.cfg",
+      "sha256_lf": "0b0d93aeaa28724444cd1f7110a864fecf4d3276cc5b627bfabd0b835be84e3a",
+      "module": null
+    }
+  },
+  "cases": [
+    {
+      "id": "remaining_stock_001",
+      "scenario": "2024 Edition/3 Minute Tour of Kennedy Space Center.scn",
+      "scenario_entry_point": "Scenarios/2024 Edition/3 Minute Tour of Kennedy Space Center.scn",
+      "sha256_lf": "1fbd3e46c109c21780e738081aecc73a57500d4f52516db8b8a322911661d8e8",
+      "declared_vessels": {
+        "GL-01S": "DG-S",
+        "STS-101": "Atlantis"
+      },
+      "playback_vessels": [
+        "GL-01S"
+      ],
+      "recording_directory": "3 Minute Tour of Kennedy Space Center"
+    },
+    {
+      "id": "remaining_stock_002",
+      "scenario": "2024 Edition/Space Shuttle ascent autopilot.scn",
+      "scenario_entry_point": "Scenarios/2024 Edition/Space Shuttle ascent autopilot.scn",
+      "sha256_lf": "ce203d191a18522232e5657052d316ccaa86f8f10aca4c8c949c6e1ec5973030",
+      "declared_vessels": {
+        "ISS": "ProjectAlpha_ISS",
+        "STS-101": "Atlantis",
+        "Carina": "Carina",
+        "STS-101_ET": "Atlantis_Tank",
+        "STS-101-SRB1": "Atlantis_SRB",
+        "STS-101-SRB2": "Atlantis_SRB"
+      },
+      "playback_vessels": []
+    },
+    {
+      "id": "remaining_stock_003",
+      "scenario": "2024 Edition/Space Shuttle to ISS.scn",
+      "scenario_entry_point": "Scenarios/2024 Edition/Space Shuttle to ISS.scn",
+      "sha256_lf": "8f761cbef791a47a022559db07b0357a56281989acda1e4c8a9914ec6a17b4ab",
+      "declared_vessels": {
+        "ISS": "ProjectAlpha_ISS",
+        "Atlantis": "Atlantis",
+        "Leonardo": "Leonardo_mplm",
+        "Atlantis_ET": "Atlantis_Tank",
+        "Atlantis-SRB1": "Atlantis_SRB",
+        "Atlantis-SRB2": "Atlantis_SRB"
+      },
+      "playback_vessels": [
+        "ISS",
+        "Atlantis",
+        "Leonardo",
+        "Atlantis_ET",
+        "Atlantis-SRB1",
+        "Atlantis-SRB2"
+      ],
+      "recording_directory": "Space Shuttle to ISS"
+    },
+    {
+      "id": "remaining_stock_004",
+      "scenario": "Antelope Valley scenery/STS-125 finals at Edwards.scn",
+      "scenario_entry_point": "Scenarios/Antelope Valley scenery/STS-125 finals at Edwards.scn",
+      "sha256_lf": "70a10a5ad3b514609bd751a0490943e688f4a6e0b17f0c32594fd97a0149bd62",
+      "declared_vessels": {
+        "STS-125": "Atlantis"
+      },
+      "playback_vessels": []
+    },
+    {
+      "id": "remaining_stock_005",
+      "scenario": "Demo/Atlantis Ascent AP.scn",
+      "scenario_entry_point": "Scenarios/Demo/Atlantis Ascent AP.scn",
+      "sha256_lf": "c292b8d85f04944fc03624c0a68873de29a94da2473fa23843ca7fb3750f5a04",
+      "declared_vessels": {
+        "ISS": "ProjectAlpha_ISS",
+        "Mir": "Mir",
+        "Luna-OB1": "Wheel",
+        "STS-101": "Atlantis",
+        "Carina": "Carina",
+        "SH-02": "ShuttleA",
+        "STS-101_ET": "Atlantis_Tank",
+        "STS-101-SRB1": "Atlantis_SRB",
+        "STS-101-SRB2": "Atlantis_SRB"
+      },
+      "playback_vessels": []
+    },
+    {
+      "id": "remaining_stock_006",
+      "scenario": "Demo/Project Alpha.scn",
+      "scenario_entry_point": "Scenarios/Demo/Project Alpha.scn",
+      "sha256_lf": "6cc2e55b19def99703520f79ad86ecfe51895f337c885ffdd6cbacc127385b78",
+      "declared_vessels": {
+        "ISS": "ProjectAlpha_ISS",
+        "STS-101": "Atlantis",
+        "Leonardo": "Leonardo_mplm"
+      },
+      "playback_vessels": []
+    },
+    {
+      "id": "remaining_stock_007",
+      "scenario": "Dragonfly/Dragonfly.scn",
+      "scenario_entry_point": "Scenarios/Dragonfly/Dragonfly.scn",
+      "sha256_lf": "c5edf5c1c369650acbd7d237ae2884a33211b81e396e5dfc0393c717d9d0342b",
+      "declared_vessels": {
+        "Module1A": "Module1",
+        "Module1B": "Module1",
+        "TUG-01": "Dragonfly"
+      },
+      "playback_vessels": []
+    },
+    {
+      "id": "remaining_stock_008",
+      "scenario": "Dragonfly/Dragonfly021118.scn",
+      "scenario_entry_point": "Scenarios/Dragonfly/Dragonfly021118.scn",
+      "sha256_lf": "2197b154698f08ad688bc8ef7d49e62242c1c97fc013374f6210d49f8a1571e3",
+      "declared_vessels": {
+        "Module1A": "Module1",
+        "Module1B": "Module1",
+        "Module1C": "Module2",
+        "TUG-01": "Dragonfly"
+      },
+      "playback_vessels": []
+    },
+    {
+      "id": "remaining_stock_009",
+      "scenario": "Dragonfly/Station building.scn",
+      "scenario_entry_point": "Scenarios/Dragonfly/Station building.scn",
+      "sha256_lf": "78e4c7e5f8d382eb2931febb6dc633f0ab331822265de72982dbc31a7bf222c1",
+      "declared_vessels": {
+        "Module2A": "Module2",
+        "Module1A": "Module1",
+        "Module1B": "Module1",
+        "Module1C": "Module1",
+        "TUG-01": "Dragonfly"
+      },
+      "playback_vessels": []
+    },
+    {
+      "id": "remaining_stock_010",
+      "scenario": "Dragonfly/v1.0.0b PoweredUp.scn",
+      "scenario_entry_point": "Scenarios/Dragonfly/v1.0.0b PoweredUp.scn",
+      "sha256_lf": "17414c50b4e28489ad5472146190650ee3990e5408bd2c77a73ac9f91b0da8f7",
+      "declared_vessels": {
+        "Module1A": "Module1",
+        "Module1B": "Module1",
+        "TUG-01": "Dragonfly"
+      },
+      "playback_vessels": []
+    },
+    {
+      "id": "remaining_stock_011",
+      "scenario": "Launch sites and spaceports/STS-125 finals at Edwards.scn",
+      "scenario_entry_point": "Scenarios/Launch sites and spaceports/STS-125 finals at Edwards.scn",
+      "sha256_lf": "70a10a5ad3b514609bd751a0490943e688f4a6e0b17f0c32594fd97a0149bd62",
+      "declared_vessels": {
+        "STS-125": "Atlantis"
+      },
+      "playback_vessels": []
+    },
+    {
+      "id": "remaining_stock_012",
+      "scenario": "Navigation/Space Physics/Atlantis in orbit.scn",
+      "scenario_entry_point": "Scenarios/Navigation/Space Physics/Atlantis in orbit.scn",
+      "sha256_lf": "9df895f7062dba0f467732a99bd006078f7377187ba17e48ab80cdb84c204d7d",
+      "declared_vessels": {
+        "ISS": "ProjectAlpha_ISS",
+        "Mir": "Mir",
+        "Luna-OB1": "Wheel",
+        "STS-101": "Atlantis"
+      },
+      "playback_vessels": []
+    },
+    {
+      "id": "remaining_stock_013",
+      "scenario": "Navigation/Space Physics/Solar sail.scn",
+      "scenario_entry_point": "Scenarios/Navigation/Space Physics/Solar sail.scn",
+      "sha256_lf": "fc6aeccd00cb6511c6ca13a387fd8ceaecaf9cd5de6eb7bbd1ee97e6df6d0c05",
+      "declared_vessels": {
+        "GL-01": "DeltaGlider",
+        "FlyingDutchman": "SolarSail"
+      },
+      "playback_vessels": []
+    },
+    {
+      "id": "remaining_stock_014",
+      "scenario": "Navigation/Space Physics/Spin stabilisation.scn",
+      "scenario_entry_point": "Scenarios/Navigation/Space Physics/Spin stabilisation.scn",
+      "sha256_lf": "2f669bff614c7bddf8542a9e7f54b7b561c2898cd292189887f503daca12ccf5",
+      "declared_vessels": {
+        "GL-01": "DeltaGlider",
+        "srb1": "Atlantis_SRB",
+        "srb2": "Atlantis_SRB"
+      },
+      "playback_vessels": []
+    },
+    {
+      "id": "remaining_stock_015",
+      "scenario": "Navigation/Special orbits/Molniya orbit.scn",
+      "scenario_entry_point": "Scenarios/Navigation/Special orbits/Molniya orbit.scn",
+      "sha256_lf": "d131c9f874672a730cd80cec50e509b9487e7146fbf2c42e864cce230745f2f0",
+      "declared_vessels": {
+        "Module1A": "Module1",
+        "Module1B": "Module1",
+        "TUG-01": "Dragonfly"
+      },
+      "playback_vessels": []
+    },
+    {
+      "id": "remaining_stock_016",
+      "scenario": "Playback/Atlantis undocking.scn",
+      "scenario_entry_point": "Scenarios/Playback/Atlantis undocking.scn",
+      "sha256_lf": "d7937a47e467c35fbd14220e108be969b755600068b8743096f974b216c8e181",
+      "declared_vessels": {
+        "ISS": "ProjectAlpha_ISS",
+        "STS-101": "Atlantis"
+      },
+      "playback_vessels": [
+        "ISS",
+        "STS-101"
+      ],
+      "recording_directory": "Atlantis undocking"
+    },
+    {
+      "id": "remaining_stock_017",
+      "scenario": "Quadcopter/Quadcopter at KSC.scn",
+      "scenario_entry_point": "Scenarios/Quadcopter/Quadcopter at KSC.scn",
+      "sha256_lf": "7456b766e3c274068ce992d25f840002656d93c5679fabdacf22f8f2b0add920",
+      "declared_vessels": {
+        "QC-01": "Quadcopter"
+      },
+      "playback_vessels": []
+    },
+    {
+      "id": "remaining_stock_018",
+      "scenario": "Satellites and Probes/Hubble Space Telescope/HST Animation.scn",
+      "scenario_entry_point": "Scenarios/Satellites and Probes/Hubble Space Telescope/HST Animation.scn",
+      "sha256_lf": "1531c3e6f06fbd1b37d7766e9a01b163a0d132fea963991da64c32978a2ff880",
+      "declared_vessels": {
+        "STS-101": "Atlantis",
+        "HST": "HST"
+      },
+      "playback_vessels": []
+    },
+    {
+      "id": "remaining_stock_019",
+      "scenario": "Satellites and Probes/Hubble Space Telescope/HST Launch.scn",
+      "scenario_entry_point": "Scenarios/Satellites and Probes/Hubble Space Telescope/HST Launch.scn",
+      "sha256_lf": "aeda7e306a628d8cff114e05e259cc08b95c832252a24e44cdfefc3369dd269c",
+      "declared_vessels": {
+        "STS-31R": "Atlantis",
+        "HST": "HST"
+      },
+      "playback_vessels": []
+    },
+    {
+      "id": "remaining_stock_020",
+      "scenario": "Satellites and Probes/Hubble Space Telescope/HST Orbit Deployment.scn",
+      "scenario_entry_point": "Scenarios/Satellites and Probes/Hubble Space Telescope/HST Orbit Deployment.scn",
+      "sha256_lf": "94e10cb9c8a80dde80a047d27b97228f83d08a1520ff55ee8d71d2cf76c4bcd1",
+      "declared_vessels": {
+        "STS-31R": "Atlantis",
+        "HST": "HST"
+      },
+      "playback_vessels": []
+    },
+    {
+      "id": "remaining_stock_021",
+      "scenario": "Satellites and Probes/Hubble Space Telescope/HST Recapture.scn",
+      "scenario_entry_point": "Scenarios/Satellites and Probes/Hubble Space Telescope/HST Recapture.scn",
+      "sha256_lf": "7e7d89f393fe5d613c926f5f99b682c9b337800d0977c8f99b53cb1287b84369",
+      "declared_vessels": {
+        "STS-61": "Atlantis",
+        "HST": "HST"
+      },
+      "playback_vessels": []
+    },
+    {
+      "id": "remaining_stock_022",
+      "scenario": "Satellites and Probes/LDEF/LDEF deployment.scn",
+      "scenario_entry_point": "Scenarios/Satellites and Probes/LDEF/LDEF deployment.scn",
+      "sha256_lf": "7ef39f9ece46a08b763f71f9a64ae4792623726fc690fa39fe4e0bbfa4495dd6",
+      "declared_vessels": {
+        "STS-41-C": "Atlantis",
+        "LDEF": "LDEF"
+      },
+      "playback_vessels": []
+    },
+    {
+      "id": "remaining_stock_023",
+      "scenario": "Satellites and Probes/LDEF/LDEF retrieval.scn",
+      "scenario_entry_point": "Scenarios/Satellites and Probes/LDEF/LDEF retrieval.scn",
+      "sha256_lf": "5b531304a3767e1a15682f1eef5d2db69569836e7ae5b1f4349a7f9c4015f231",
+      "declared_vessels": {
+        "STS-32R": "Atlantis",
+        "LDEF": "LDEF"
+      },
+      "playback_vessels": []
+    },
+    {
+      "id": "remaining_stock_024",
+      "scenario": "Space Shuttle Atlantis/Atlantis ISS Resupply.scn",
+      "scenario_entry_point": "Scenarios/Space Shuttle Atlantis/Atlantis ISS Resupply.scn",
+      "sha256_lf": "9359d1e16a972fc417b934449375d9ed4048c19d08763f8683503b842d0aa813",
+      "declared_vessels": {
+        "ISS": "ProjectAlpha_ISS",
+        "STS-101": "Atlantis",
+        "Leonardo": "Leonardo_mplm"
+      },
+      "playback_vessels": []
+    },
+    {
+      "id": "remaining_stock_025",
+      "scenario": "Space Shuttle Atlantis/Atlantis MMU Satellite Repair.scn",
+      "scenario_entry_point": "Scenarios/Space Shuttle Atlantis/Atlantis MMU Satellite Repair.scn",
+      "sha256_lf": "9b1b71f4554da8ac9c9a3f87bd73bdbd497c1dc27893ee22606c2d36e506540f",
+      "declared_vessels": {
+        "ISS": "ProjectAlpha_ISS",
+        "Mir": "Mir",
+        "Luna-OB1": "Wheel",
+        "STS-101": "Atlantis",
+        "SH-02": "ShuttleA",
+        "STS-101-Tank": "Atlantis_Tank",
+        "Carina": "Carina"
+      },
+      "playback_vessels": []
+    },
+    {
+      "id": "remaining_stock_026",
+      "scenario": "Space Shuttle Atlantis/Atlantis cockpit.scn",
+      "scenario_entry_point": "Scenarios/Space Shuttle Atlantis/Atlantis cockpit.scn",
+      "sha256_lf": "0b7b4c4e46b2c1502199b607deff613210edc3b9af4d6349bd75580883cf77ae",
+      "declared_vessels": {
+        "ISS": "ProjectAlpha_ISS",
+        "STS-101": "Atlantis",
+        "Carina": "Carina"
+      },
+      "playback_vessels": []
+    },
+    {
+      "id": "remaining_stock_027",
+      "scenario": "Space Shuttle Atlantis/Atlantis docked at ISS.scn",
+      "scenario_entry_point": "Scenarios/Space Shuttle Atlantis/Atlantis docked at ISS.scn",
+      "sha256_lf": "5fb61106a52c8d6099f851aec8e3ef166a8d8bd77506757ea3d3a549a87a703a",
+      "declared_vessels": {
+        "ISS": "ProjectAlpha_ISS",
+        "GL-01": "DeltaGlider",
+        "STS-101": "Atlantis",
+        "GL-02": "DeltaGlider",
+        "SH-01": "ShuttleA"
+      },
+      "playback_vessels": []
+    },
+    {
+      "id": "remaining_stock_028",
+      "scenario": "Space Shuttle Atlantis/Atlantis final approach.scn",
+      "scenario_entry_point": "Scenarios/Space Shuttle Atlantis/Atlantis final approach.scn",
+      "sha256_lf": "0868ce4b450e2cdab152cec9b338780d7d7f6f3aae5f01c9263d69e08285b6c2",
+      "declared_vessels": {
+        "ISS": "ProjectAlpha_ISS",
+        "Mir": "Mir",
+        "Luna-OB1": "Wheel",
+        "GL-01": "DeltaGlider",
+        "STS-101": "Atlantis",
+        "GL-02": "DeltaGlider",
+        "SH-01": "ShuttleA"
+      },
+      "playback_vessels": []
+    },
+    {
+      "id": "remaining_stock_029",
+      "scenario": "Space Shuttle Atlantis/Atlantis landing preparation.scn",
+      "scenario_entry_point": "Scenarios/Space Shuttle Atlantis/Atlantis landing preparation.scn",
+      "sha256_lf": "c8ef5ee25d9fd749b549a3b89bad6c28ba87762a71123ea0e1655b9f8feacdd4",
+      "declared_vessels": {
+        "ISS": "ISS",
+        "GL-01": "DeltaGlider",
+        "STS-101": "Atlantis",
+        "GL-02": "DeltaGlider",
+        "SH-01": "ShuttleA"
+      },
+      "playback_vessels": []
+    },
+    {
+      "id": "remaining_stock_030",
+      "scenario": "Space Shuttle Atlantis/Atlantis reentry 1.scn",
+      "scenario_entry_point": "Scenarios/Space Shuttle Atlantis/Atlantis reentry 1.scn",
+      "sha256_lf": "c16e2897104cba4aa4d1742aef8589fe39937c1fd00378b064cf1846980fb5f7",
+      "declared_vessels": {
+        "ISS": "ISS",
+        "GL-01": "DeltaGlider",
+        "STS-101": "Atlantis",
+        "GL-02": "DeltaGlider",
+        "SH-01": "ShuttleA"
+      },
+      "playback_vessels": []
+    },
+    {
+      "id": "remaining_stock_031",
+      "scenario": "Space Shuttle Atlantis/Atlantis reentry 2.scn",
+      "scenario_entry_point": "Scenarios/Space Shuttle Atlantis/Atlantis reentry 2.scn",
+      "sha256_lf": "650357057c8974e5bb02945600682869884a6ae995621b94f02b039bea4045ab",
+      "declared_vessels": {
+        "ISS": "ISS",
+        "GL-01": "DeltaGlider",
+        "STS-101": "Atlantis",
+        "GL-02": "DeltaGlider",
+        "SH-01": "ShuttleA"
+      },
+      "playback_vessels": []
+    },
+    {
+      "id": "remaining_stock_032",
+      "scenario": "Space Shuttle Atlantis/Atlantis satellite Launch.scn",
+      "scenario_entry_point": "Scenarios/Space Shuttle Atlantis/Atlantis satellite Launch.scn",
+      "sha256_lf": "f1a55759ce082f9c73a3d124513556f9ab139d7bef8a47a3907cdf94bc9b8b7c",
+      "declared_vessels": {
+        "ISS": "ProjectAlpha_ISS",
+        "Mir": "Mir",
+        "Luna-OB1": "Wheel",
+        "STS-101": "Atlantis",
+        "Carina": "Carina",
+        "SH-02": "ShuttleA"
+      },
+      "playback_vessels": []
+    },
+    {
+      "id": "remaining_stock_033",
+      "scenario": "Space Shuttle Atlantis/Atlantis satellite.scn",
+      "scenario_entry_point": "Scenarios/Space Shuttle Atlantis/Atlantis satellite.scn",
+      "sha256_lf": "29161e7d2f2bc0ee7ee9950df68a8cf5c3bef9b36e154a6a2bee38427ea7756d",
+      "declared_vessels": {
+        "ISS": "ProjectAlpha_ISS",
+        "Mir": "Mir",
+        "Luna-OB1": "Wheel",
+        "STS-101": "Atlantis",
+        "Carina": "Carina",
+        "SH-02": "ShuttleA",
+        "STS-101-SRB1": "Atlantis_SRB",
+        "STS-101-SRB2": "Atlantis_SRB",
+        "STS-101-Tank": "Atlantis_Tank"
+      },
+      "playback_vessels": []
+    },
+    {
+      "id": "remaining_stock_034",
+      "scenario": "Space Shuttle Atlantis/Launch into Sunrise.scn",
+      "scenario_entry_point": "Scenarios/Space Shuttle Atlantis/Launch into Sunrise.scn",
+      "sha256_lf": "26180e57423d4735694f4f0e82785a525e5808f6b57055f227053d9750533c78",
+      "declared_vessels": {
+        "ISS": "ProjectAlpha_ISS",
+        "Mir": "Mir",
+        "Luna-OB1": "Wheel",
+        "STS-101": "Atlantis",
+        "Carina": "Carina",
+        "SH-02": "ShuttleA"
+      },
+      "playback_vessels": []
+    },
+    {
+      "id": "remaining_stock_035",
+      "scenario": "Space Stations/ISS.scn",
+      "scenario_entry_point": "Scenarios/Space Stations/ISS.scn",
+      "sha256_lf": "0826cd2a27401e17cbbecb480a66157ad4bc85287153ad0ffbac02070c7abbbb",
+      "declared_vessels": {
+        "ISS": "ProjectAlpha_ISS",
+        "STS-101": "Atlantis",
+        "Leonardo": "Leonardo_mplm"
+      },
+      "playback_vessels": []
+    },
+    {
+      "id": "remaining_stock_036",
+      "scenario": "Tutorials/Space Shuttle final approach.scn",
+      "scenario_entry_point": "Scenarios/Tutorials/Space Shuttle final approach.scn",
+      "sha256_lf": "bd288e6d6d84f8de152d9970104256a613c1b01ce42ed9832b8388f6f8996098",
+      "declared_vessels": {
+        "ISS": "ProjectAlpha_ISS",
+        "Atlantis": "Atlantis"
+      },
+      "playback_vessels": [
+        "ISS",
+        "Atlantis"
+      ],
+      "recording_directory": "Space Shuttle final approach"
+    },
+    {
+      "id": "remaining_stock_037",
+      "scenario": "Tutorials/Space Shuttle to ISS.scn",
+      "scenario_entry_point": "Scenarios/Tutorials/Space Shuttle to ISS.scn",
+      "sha256_lf": "8f761cbef791a47a022559db07b0357a56281989acda1e4c8a9914ec6a17b4ab",
+      "declared_vessels": {
+        "ISS": "ProjectAlpha_ISS",
+        "Atlantis": "Atlantis",
+        "Leonardo": "Leonardo_mplm",
+        "Atlantis_ET": "Atlantis_Tank",
+        "Atlantis-SRB1": "Atlantis_SRB",
+        "Atlantis-SRB2": "Atlantis_SRB"
+      },
+      "playback_vessels": [
+        "ISS",
+        "Atlantis",
+        "Leonardo",
+        "Atlantis_ET",
+        "Atlantis-SRB1",
+        "Atlantis-SRB2"
+      ],
+      "recording_directory": "Space Shuttle to ISS"
+    },
+    {
+      "id": "remaining_stock_038",
+      "scenario": "Views/Moon through atmosphere.scn",
+      "scenario_entry_point": "Scenarios/Views/Moon through atmosphere.scn",
+      "sha256_lf": "232c9cb7d90da38f804aa55aa2ad666e834075cb52cac61f3c524949fdf265b8",
+      "declared_vessels": {
+        "ISS": "ProjectAlpha_ISS",
+        "Mir": "Mir",
+        "Luna-OB1": "Wheel",
+        "STS-101": "Atlantis",
+        "Carina": "Carina",
+        "SH-02": "ShuttleA"
+      },
+      "playback_vessels": []
+    }
+  ],
+  "recording_files_sha256_lf": {
+    "Flights/3 Minute Tour of Kennedy Space Center/GL-01S.atc": "49881d2cc06091c6f92f2ccdf6321c4aa3b7449f457a18aeb5afc1d5af9624a6",
+    "Flights/3 Minute Tour of Kennedy Space Center/GL-01S.att": "813f9c432c2fa3bde73a1c726815e8d6912c2d71978e9af88b170c36f4ce0e82",
+    "Flights/3 Minute Tour of Kennedy Space Center/GL-01S.pos": "ddace0797b50e8c05940ab36f9e4aeb0015d2618d9a46fdb17aa72e87a170466",
+    "Flights/3 Minute Tour of Kennedy Space Center/system.dat": "5d2e45a3f335ae5983daf0462f77491f9de1fcebc0f0aa37a42cc8b3d2a5d228",
+    "Flights/Space Shuttle to ISS/Atlantis-SRB1.atc": "6a6bf40f6410a76ccf5745938d52afa5b9b1abb63768a820785ce9ed5dff0595",
+    "Flights/Space Shuttle to ISS/Atlantis-SRB1.att": "63a9c3a34ee3cd87cc74e2b5ef0d8b373257383756ab0368b0917660e14028aa",
+    "Flights/Space Shuttle to ISS/Atlantis-SRB1.pos": "023201ea274c442d356cf8a6341818c8d9f8568d1d30becc260cb057857f7618",
+    "Flights/Space Shuttle to ISS/Atlantis-SRB2.atc": "b8bd47a910cd7dc713a3ff34c3101f50415a529d91d2542f4fcd1799f4d653d8",
+    "Flights/Space Shuttle to ISS/Atlantis-SRB2.att": "a5e3502aa9969be71b913964d15eb44d262c111fc5142372ff7dd3c4dd08c02d",
+    "Flights/Space Shuttle to ISS/Atlantis-SRB2.pos": "d4a5dc4c41ae4eb2d6beabf5dc3cf1f77571668d6abcc729a6258c1464817680",
+    "Flights/Space Shuttle to ISS/Atlantis.atc": "fcfc53b338e8eb1395abddb9d1b5a585c8d0a6f4109325c795a53962bb7fef8e",
+    "Flights/Space Shuttle to ISS/Atlantis.att": "3e4d422f0f067853307a5dc03f99d4e45d9a325f6e6756ed1202509ad454673e",
+    "Flights/Space Shuttle to ISS/Atlantis.pos": "f3e187ba6bd6f6f33ea63d6e55a7b3b1be7846e7fdb5b1270f44c46104b576ae",
+    "Flights/Space Shuttle to ISS/Atlantis_ET.atc": "69329a76e919f88590dd6f78fc0a9d91455597a01f806c981ee28bff18743913",
+    "Flights/Space Shuttle to ISS/Atlantis_ET.att": "0f7bf080ca40249d172b53da382181914ddf63bb14e200035ad088a9ffe8a502",
+    "Flights/Space Shuttle to ISS/Atlantis_ET.pos": "33ad22bf114708a3cba09f630292804761fe71b1b77377765996beb7bc585ea7",
+    "Flights/Space Shuttle to ISS/ISS.atc": "c59480cbfa6664815ceea76e2240d7c07b2bfcebfad18f6ad825a40586a17fab",
+    "Flights/Space Shuttle to ISS/ISS.att": "773ff62ddb2190965a34a2cb0c1437e6824174873d8091eb6d0bb826af165807",
+    "Flights/Space Shuttle to ISS/ISS.pos": "a5dea7e747bc81459106d37aa5a5e89019f641bee79419f392f43d9b3e070a2b",
+    "Flights/Space Shuttle to ISS/Leonardo.atc": "8e56ddf044249f15e2ce2e16258475d5276d8d67dc7dc59330d43c81df97970d",
+    "Flights/Space Shuttle to ISS/Leonardo.att": "27186e697c1d7ca7cecabdbbc008987f25c1b1f063b4f705de9cac70ce89c727",
+    "Flights/Space Shuttle to ISS/Leonardo.pos": "61aec8e9a8e6214666dc63296e993f580e077bcd666f3c67e17738c9b456c125",
+    "Flights/Space Shuttle to ISS/system.dat": "0be88b2c4623bc44662a57c16e6fd2e13938d7cdbf25a0ea29258669207fe410",
+    "Flights/Atlantis undocking/ISS.atc": "305a8a38c31ae8d3c9aeeb004d0bf7163cb6c515ef9949a25480983d2c53cc94",
+    "Flights/Atlantis undocking/ISS.att": "9af720271963da849547760fbcc1cb25909276c46fff9e8b0a0c86193459bb41",
+    "Flights/Atlantis undocking/ISS.pos": "dd3277df2b8aa5ebb6ac25e6901c3267a6379488691f76e07b3d3d4c591efae9",
+    "Flights/Atlantis undocking/STS-101.atc": "d87ba8c58c6a9ee0c04979e6877aa52bbb8167f8455f5f2cafb38d0acd328f8c",
+    "Flights/Atlantis undocking/STS-101.att": "1f1fd492dc02c9ddf183ea15c4fb92645ed33d0f71e55ae9d03d7e61ad061e3d",
+    "Flights/Atlantis undocking/STS-101.pos": "b417177ea1fcc79e4d22ca842f18259ca0db02539be197787147a93355c21aac",
+    "Flights/Space Shuttle final approach/Atlantis.atc": "0c40468f35a54ca31163acf38a4fc2914887118e5a4607c1ebeb988c36841272",
+    "Flights/Space Shuttle final approach/Atlantis.att": "d99f766a2fa7a3044b633c916898365615df8bed082f1bf9f813fa7cb09d1731",
+    "Flights/Space Shuttle final approach/Atlantis.pos": "ded04d1ef4d7343780c23bc86cb018893ca4a4b935f64db6f7d3a413bbceadc6",
+    "Flights/Space Shuttle final approach/ISS.atc": "161289c027b794fa5580ee93b048a2ac1eaa812b9feed7e98dec280528a38b88",
+    "Flights/Space Shuttle final approach/ISS.att": "33d3f3384d0f380668e6bac546141914a8be070de373192213313061126991cc",
+    "Flights/Space Shuttle final approach/ISS.pos": "d398953c808ebe139aa986bb2e4977602d599438c12e22dab85439bc9f70067e",
+    "Flights/Space Shuttle final approach/system.dat": "c2b223ea001c9e9029f8d5032065c57d1f174a33f7878f955578be5e90eec262"
+  },
+  "corpus_lock_sha256": "5f89334ecb213b56b1bda651acbed8c245f874f6d61ae9f7e9fdccfb3da2f11e"
+}
