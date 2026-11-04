@@ -113,7 +113,7 @@
     "original_assets_unchanged": true
   },
   "remaining": [
-    "Rerun all 157 unchanged stock scenarios on the verified runtime; the last complete pre-admission baseline remains 114 passes / 43 failures.",
+    "The new full 157-scenario sweep is audited at 118 passes / 39 failures; 38 missing dependency cases and one inherited original assertion remain open.",
     "Complete current hosted comparisons, remaining modules/assertion, interactive/hardware/performance gates and full Phase 6 acceptance."
   ],
   "preservation_workflow_run": 41744483549,
@@ -169,5 +169,11 @@
     "source_manifest_sha256": "53bfc321d1c826f6530fc191b04eee179b3926d36a5d42a39e5bf577eea2d28c",
     "phase6_complete": false,
     "publication": "verified-local-archive"
+  },
+  "complete_stock_sweep": {
+    "path": "Docs/Production/LegacyStationsCorpusVerification.json",
+    "attempted": 157,
+    "passed": 118,
+    "failed": 39
   }
 }

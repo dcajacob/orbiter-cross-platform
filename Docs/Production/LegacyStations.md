@@ -49,8 +49,9 @@ controls and failed-attempt context: 3,822 individually rehashed members,
 It is a verified local evidence archive; the four original ZIPs are also publicly
 preserved. No font or stock-data collections are bundled.
 
-The last complete pre-admission 157-scenario sweep remains 114 passes and 43
-failures. A new complete sweep is required before changing that count. Current
+The new [complete 157-scenario sweep](LegacyStationsCorpus.md) is independently
+audited at 118 passes and 39 failures, improving exactly the four legacy scenes
+from the preserved 114/43 baseline. All failures remain explicit. Current
 hosted comparisons, remaining stock modules/assertion, interactive acceptance,
 final hardware performance/input, the unavailable physical controller and full
 Phase 6 evidence preservation remain open.

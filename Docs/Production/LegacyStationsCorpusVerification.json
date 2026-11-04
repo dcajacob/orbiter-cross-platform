@@ -1,0 +1,179 @@
+{
+  "schema": 1,
+  "status": "audited-incomplete",
+  "phase6_complete": false,
+  "runtime_source_commit": "aeee5826eb86c5c64e6c0fc97f40a20f8104459e",
+  "observer_commit": "2dcfcfc1638bdd5430cff79b809346deb3ec3154",
+  "driver_source_commit_at_start": "2dcfcfc1638bdd5430cff79b809346deb3ec3154",
+  "summary": {
+    "attempted": 157,
+    "passed": 118,
+    "failed": 39,
+    "inventory_ready": 119,
+    "source_metadata_mismatches": 7
+  },
+  "audit": {
+    "path": "out/phase6-legacy-stations-complete-corpus-audit-v1.json",
+    "sha256": "3854fd5a59700c9fd7cc2b7386f0e74405049f0a6d74e6a45862bd0d3f3cc05a"
+  },
+  "prior_audit": {
+    "path": "out/phase6-stock-exit-complete-corpus-audit-v1.json",
+    "sha256": "27c3ecbcf7b4d056f65294bbed676888062aa6aba09e7004390f31ad9a040b9c"
+  },
+  "changed_outcomes": {
+    "Delta-glider/Smack!.scn": {
+      "before": "failed",
+      "after": "passed"
+    },
+    "Delta-glider/Vessel-vessel.scn": {
+      "before": "failed",
+      "after": "passed"
+    },
+    "Navigation/Space Physics/DG dumbbell.scn": {
+      "before": "failed",
+      "after": "passed"
+    },
+    "Tutorials/Smack! Rescue.scn": {
+      "before": "failed",
+      "after": "passed"
+    }
+  },
+  "failure_partition": {
+    "missing_dependencies": [
+      "2024 Edition/3 Minute Tour of Kennedy Space Center.scn",
+      "2024 Edition/Space Shuttle ascent autopilot.scn",
+      "2024 Edition/Space Shuttle to ISS.scn",
+      "Antelope Valley scenery/STS-125 finals at Edwards.scn",
+      "Demo/Atlantis Ascent AP.scn",
+      "Demo/Project Alpha.scn",
+      "Dragonfly/Dragonfly.scn",
+      "Dragonfly/Dragonfly021118.scn",
+      "Dragonfly/Station building.scn",
+      "Dragonfly/v1.0.0b PoweredUp.scn",
+      "Launch sites and spaceports/STS-125 finals at Edwards.scn",
+      "Navigation/Space Physics/Atlantis in orbit.scn",
+      "Navigation/Space Physics/Solar sail.scn",
+      "Navigation/Space Physics/Spin stabilisation.scn",
+      "Navigation/Special orbits/Molniya orbit.scn",
+      "Playback/Atlantis undocking.scn",
+      "Quadcopter/Quadcopter at KSC.scn",
+      "Satellites and Probes/Hubble Space Telescope/HST Animation.scn",
+      "Satellites and Probes/Hubble Space Telescope/HST Launch.scn",
+      "Satellites and Probes/Hubble Space Telescope/HST Orbit Deployment.scn",
+      "Satellites and Probes/Hubble Space Telescope/HST Recapture.scn",
+      "Satellites and Probes/LDEF/LDEF deployment.scn",
+      "Satellites and Probes/LDEF/LDEF retrieval.scn",
+      "Space Shuttle Atlantis/Atlantis ISS Resupply.scn",
+      "Space Shuttle Atlantis/Atlantis MMU Satellite Repair.scn",
+      "Space Shuttle Atlantis/Atlantis cockpit.scn",
+      "Space Shuttle Atlantis/Atlantis docked at ISS.scn",
+      "Space Shuttle Atlantis/Atlantis final approach.scn",
+      "Space Shuttle Atlantis/Atlantis landing preparation.scn",
+      "Space Shuttle Atlantis/Atlantis reentry 1.scn",
+      "Space Shuttle Atlantis/Atlantis reentry 2.scn",
+      "Space Shuttle Atlantis/Atlantis satellite Launch.scn",
+      "Space Shuttle Atlantis/Atlantis satellite.scn",
+      "Space Shuttle Atlantis/Launch into Sunrise.scn",
+      "Space Stations/ISS.scn",
+      "Tutorials/Space Shuttle final approach.scn",
+      "Tutorials/Space Shuttle to ISS.scn",
+      "Views/Moon through atmosphere.scn"
+    ],
+    "legacy_stations_unqualified": [],
+    "preserved_original_assertion": [
+      "Tests/GeneralApiTest.scn"
+    ]
+  },
+  "returncodes": {
+    "0": 119,
+    "1": 38
+  },
+  "signals": 0,
+  "sanitizer_diagnostics": 0,
+  "context_deletions": 157,
+  "total_presentations": 7093,
+  "finite_all_vessel_rows": 34333,
+  "native_build_identity": {
+    "configuration": "Debug",
+    "math_profile": "automatic",
+    "profile": "Debug-automatic",
+    "sanitizer_linked": true,
+    "compiler": "/usr/bin/c++",
+    "cache_sha256": "6fa02a650b3e07ece17770101386e09f8f2cf996b06ab717404919174d58c832",
+    "build_record_sha256": "ced27c1f385d96be5d50560485a3a6ff85f27954bfd2cc9c62a42153f5db1631",
+    "runtime_source_commit": "aeee5826eb86c5c64e6c0fc97f40a20f8104459e"
+  },
+  "runtime_environment": {
+    "LD_LIBRARY_PATH": "/home/dan/GIT/orbiter-cross-platform/out/phase6-legacy-dock-lifetime-Debug-asan-v3-engine:/home/dan/GIT/orbiter-cross-platform/out/phase6-fontconfig-heap-pointers/build:/home/dan/GIT/orbiter-cross-platform/out/phase6-mesa-wayland-verified/install/lib/x86_64-linux-gnu:/home/dan/GIT/orbiter-cross-platform/out/phase6-gdk-replay-candidate/install/lib/x86_64-linux-gnu",
+    "LIBGL_ALWAYS_SOFTWARE": "1",
+    "GALLIUM_DRIVER": "llvmpipe",
+    "LP_NUM_THREADS": "2",
+    "ASAN_OPTIONS": "detect_leaks=1:fast_unwind_on_malloc=0",
+    "LSAN_OPTIONS": "",
+    "UBSAN_OPTIONS": "halt_on_error=1:print_stacktrace=1"
+  },
+  "protected_files": 519,
+  "all_protected_files_unchanged": true,
+  "controls": {
+    "exit_policy": {
+      "path": "out/phase6-legacy-stations-complete-corpus-policy-controls-v1.json",
+      "sha256": "8ae895468f2f301c5d462ad5ce0652e93c0f88eb654b36e675276ec309721952"
+    },
+    "all_object_manifest": {
+      "path": "out/phase6-legacy-stations-complete-corpus-manifest-controls-v1.json",
+      "sha256": "dfacf28f8dd5473f0a72217ab9fb48292d728f0dfccb212b1ee686bffdd73920"
+    },
+    "inventory": {
+      "path": "out/phase6-legacy-stations-complete-corpus-inventory-controls-v1.json",
+      "sha256": "5e1306fcf9064fa850186280cf9bbbfe275aa0013df886aa7b33360039ad4c09"
+    }
+  },
+  "intentional_exit": {
+    "policy": "pinned-original-stock-script-exit",
+    "original_profile": "Debug-automatic",
+    "original_capture_sha256": "b08a98677a97b4bf93f12b7cf7e1e31f06af960b7612bc0e78a8211b033d999a",
+    "maxima": {
+      "position_m": 0.0,
+      "velocity_m_s": 0.0,
+      "rotation_rad": 0.0,
+      "angular_velocity_rad_s": 0.0,
+      "mjd_days": 0.0,
+      "mass_fraction_of_budget": 0.0,
+      "fuel_fraction_of_budget": 0.0
+    },
+    "completed_frames": 13,
+    "assertion_events": 60,
+    "assertion_passes": 28,
+    "docking_rows": 210,
+    "actual_math": "amd-6121d02-fma3"
+  },
+  "ordinary_sixty_frame_policy_preserved": true,
+  "existing_stock_exit_save_preserved": true,
+  "frozen_lock_and_all_157_scenario_bytes_unchanged": true,
+  "runtime_bundle": {
+    "status": "verified-archive",
+    "path": "out/phase6-legacy-stations-evidence-v2.tar.gz",
+    "bytes": 463788960,
+    "sha256": "324fe385e45d14b8e6c8b10ed180697a0f5de743cf73c9c0622a6be50261a780",
+    "members": 3822,
+    "every_member_rehashed": true,
+    "source_manifest_sha256": "53bfc321d1c826f6530fc191b04eee179b3926d36a5d42a39e5bf577eea2d28c",
+    "phase6_complete": false
+  },
+  "original_stock_exit_reference": "https://github.com/dcajacob/orbiter-cross-platform/releases/tag/phase6-stock-lua-exit-original-v1",
+  "font_and_asset_collections_included": false,
+  "remote_complete_bundle_preservation": "pending",
+  "physical_controller": "Unavailable per user; unverified",
+  "scope": "Full unchanged initialization/smoke sweep; every failure retained. The four legacy scenes have separate five-package original/native state/camera/full-frame qualification. This does not qualify missing modules, the preserved original assertion, additional interactive/hardware gates or complete Phase 6 acceptance.",
+  "artifact": {
+    "status": "passed",
+    "path": "out/phase6-legacy-stations-complete-corpus-evidence-v1.tar.gz",
+    "bytes": 25486155,
+    "sha256": "e03607fcf8ab8cc60a0dec13979d44a3b9a9806371d4d6be9e14c97b0cfa089c",
+    "members": 5579,
+    "index_sha256": "29bd56f654f9925cce8e37c98546a8b46f8171e25a261be394cd64f2ee2d2e1f",
+    "all_payload_hashes_verified": true,
+    "font_and_asset_collections_included": false,
+    "remote_preservation": "pending"
+  }
+}
