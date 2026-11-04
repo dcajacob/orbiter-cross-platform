@@ -69,8 +69,12 @@ def main():
     def save():manifest.write_text(json.dumps(report,indent=2)+'\n')
     def run(argv,label):
         report['commands'].append(argv);save()
-        with (a.output/(label+'.log')).open('w') as log:
-            subprocess.run(argv,check=True,stdout=log,stderr=subprocess.STDOUT)
+        path=a.output/(label+'.log')
+        with path.open('w') as log:
+            process=subprocess.run(argv,stdout=log,stderr=subprocess.STDOUT)
+        if process.returncode:
+            print('\n'.join(path.read_text(errors='replace').splitlines()[-80:]),flush=True)
+            process.check_returncode()
     save()
     try:
         source_variant=a.output/'module-sources'

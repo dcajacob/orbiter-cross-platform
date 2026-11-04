@@ -57,6 +57,16 @@ Fresh captures, independent transport/build/profile/state/camera/full-frame audi
 new negative-control results and matched native runs are pending. No failed
 original result is reclassified, and no reference is accepted automatically.
 
+The initial candidate workflow
+[41774454528](https://github.com/dcajacob/orbiter-cross-platform/actions/runs/41774454528)
+at `df8f1e0d4e0c7eb8e9da1c2a8ffebde30eb7dfcb` stopped during CMake configuration
+in all four profiles: native backslashes in the newly supplied source path were
+parsed as CMake escapes. No simulation ran. The hash-verified Debug artifact and
+all decoded members remain in
+`out/phase6-repaired-reference-configure-failure-df8-v1`. The wrapper now normalizes
+all three incoming paths before constructing target sources and exposes failed
+build-log tails directly in the job log. A fresh run is required.
+
 ```sh
 python3 -B Tests/Production/RemainingStockRepaired/capture.py --verify-inputs
 ```
