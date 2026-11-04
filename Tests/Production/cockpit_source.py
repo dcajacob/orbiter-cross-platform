@@ -278,16 +278,21 @@ namespace oapi {using CockpitClient=GraphicsClient;}
 #endif''',header,'Windows cockpit graphics type identity')
     legacy_source=subprocess.check_output(['git','-C',str(ROOT),'show',BASE+':Src/Orbiter/OrbiterAPI.cpp']).decode('cp1252').replace('\r\n','\n')
     delegates=[]
-    for signature in ('void oapiRegisterMFD (int mfd, const MFDSPEC &spec)',
-                      'void oapiRegisterPanelBackground (HBITMAP hBmp, DWORD flag, DWORD ck)',
+    for signature in ('void oapiRegisterPanelBackground (HBITMAP hBmp, DWORD flag, DWORD ck)',
                       'void oapiRegisterPanelArea (int id, const RECT &pos, int draw_event, int mouse_event, int bkmode)'):
         start=legacy_source.index(signature);end=legacy_source.index('\n}',start)+2
         body=legacy_source[start:end]
         for before,after in [('g_pane','orbiter::production::CockpitPane()'),('HBITMAP','SURFHANDLE'),('DWORD','oapi::UInt32'),('RECT','oapi::SdkRectangle')]:body=body.replace(before,after)
         delegates.append(body)
     actual=raw('Src/Orbiter/Production/NativeLegacyPanelSdk.cpp')
-    actual=actual[actual.index('void oapiRegisterMFD'):]
-    equal('\n\n'.join(delegates)+'\n',actual,'Original legacy MFD/background/area SDK delegates with actual native surface ownership')
+    actual=actual[actual.index('void oapiRegisterPanelBackground'):]
+    equal('\n\n'.join(delegates)+'\n',actual,'Original legacy background/area SDK delegates with actual native surface ownership')
+    signature='void oapiRegisterMFD (int mfd, const MFDSPEC &spec)'
+    start=legacy_source.index(signature);end=legacy_source.index('\n}',start)+2
+    expected=legacy_source[start:end].replace('g_pane','CockpitPane()')
+    actual=raw('Src/Orbiter/Production/NativeCockpitMfd.cpp')
+    start=actual.index(signature);end=actual.index('\n}',start)+2
+    equal(expected,actual[start:end],'Existing original legacy MFD delegate retained exactly once')
     for name in FILES:
         path='Src/Orbiter/'+name
         import re

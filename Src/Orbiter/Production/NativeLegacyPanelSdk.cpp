@@ -4,11 +4,6 @@
 #include "Pane.h"
 #include "CockpitServices.h"
 
-void oapiRegisterMFD (int mfd, const MFDSPEC &spec)
-{
-	orbiter::production::CockpitPane()->RegisterMFD (mfd, spec);
-}
-
 void oapiRegisterPanelBackground (SURFHANDLE hBmp, oapi::UInt32 flag, oapi::UInt32 ck)
 {
 	orbiter::production::CockpitPane()->RegisterPanelBackground (hBmp, flag, ck);
