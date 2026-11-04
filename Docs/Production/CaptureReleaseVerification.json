@@ -1,0 +1,203 @@
+{
+  "schema": 1,
+  "status": "passed-actual-capture-release-regression-and-four-profile-input",
+  "scope": "Actual original-popup capture/save boundary regression and four-profile current ordinary-application X11 typing/parameter/cancel/flight/save checks. Broader GUI, Windows/native stock qualification, physical controllers and full Phase6 acceptance remain open.",
+  "runtime_source": "d255d79176c9fffccf7f50b0af96bdab11f34fe3",
+  "baseline_helper_source": "c20135a10d8462ecab49b3d9d4a33e45ae18a53c",
+  "baseline_helper_sha256": "4aedacb0fa546567a2fc279f121f944a610651d7485a3f2d567e46f2b2fe0600",
+  "corrected_helper_sha256": "a1cc65dadfee1943a2b75ecd982a0b54771daa2888e9242048fc30f6f21704ca",
+  "actual_failed_boundary": {
+    "save_release_tick": 337,
+    "popup_first_observed_closed_tick": 338,
+    "save_file_absent": true,
+    "filtered_save_press": true
+  },
+  "actual_processes": 4,
+  "successful_presents": 178,
+  "profiles": {
+    "Debug-automatic": {
+      "successful_presents": 46,
+      "context_deleted": true,
+      "actual_save_boundaries": [
+        {
+          "gui_frame": 18,
+          "observed_ui_state": {
+            "tick": "293",
+            "popup_hex": "",
+            "x": "0",
+            "y": "0",
+            "width": "0",
+            "height": "0",
+            "capture_mouse": "0",
+            "capture_keyboard": "0"
+          }
+        },
+        {
+          "gui_frame": 29,
+          "observed_ui_state": {
+            "tick": "415",
+            "popup_hex": "",
+            "x": "0",
+            "y": "0",
+            "width": "0",
+            "height": "0",
+            "capture_mouse": "0",
+            "capture_keyboard": "0"
+          }
+        },
+        {
+          "gui_frame": 42,
+          "observed_ui_state": {
+            "tick": "540",
+            "popup_hex": "",
+            "x": "0",
+            "y": "0",
+            "width": "0",
+            "height": "0",
+            "capture_mouse": "0",
+            "capture_keyboard": "0"
+          }
+        }
+      ]
+    },
+    "Debug-sse2": {
+      "successful_presents": 44,
+      "context_deleted": true,
+      "actual_save_boundaries": [
+        {
+          "gui_frame": 17,
+          "observed_ui_state": {
+            "tick": "329",
+            "popup_hex": "",
+            "x": "0",
+            "y": "0",
+            "width": "0",
+            "height": "0",
+            "capture_mouse": "0",
+            "capture_keyboard": "0"
+          }
+        },
+        {
+          "gui_frame": 28,
+          "observed_ui_state": {
+            "tick": "462",
+            "popup_hex": "",
+            "x": "0",
+            "y": "0",
+            "width": "0",
+            "height": "0",
+            "capture_mouse": "0",
+            "capture_keyboard": "0"
+          }
+        },
+        {
+          "gui_frame": 40,
+          "observed_ui_state": {
+            "tick": "653",
+            "popup_hex": "",
+            "x": "0",
+            "y": "0",
+            "width": "0",
+            "height": "0",
+            "capture_mouse": "0",
+            "capture_keyboard": "0"
+          }
+        }
+      ]
+    },
+    "Release-automatic": {
+      "successful_presents": 44,
+      "context_deleted": true,
+      "actual_save_boundaries": [
+        {
+          "gui_frame": 17,
+          "observed_ui_state": {
+            "tick": "288",
+            "popup_hex": "",
+            "x": "0",
+            "y": "0",
+            "width": "0",
+            "height": "0",
+            "capture_mouse": "0",
+            "capture_keyboard": "0"
+          }
+        },
+        {
+          "gui_frame": 28,
+          "observed_ui_state": {
+            "tick": "421",
+            "popup_hex": "",
+            "x": "0",
+            "y": "0",
+            "width": "0",
+            "height": "0",
+            "capture_mouse": "0",
+            "capture_keyboard": "0"
+          }
+        },
+        {
+          "gui_frame": 40,
+          "observed_ui_state": {
+            "tick": "554",
+            "popup_hex": "",
+            "x": "0",
+            "y": "0",
+            "width": "0",
+            "height": "0",
+            "capture_mouse": "0",
+            "capture_keyboard": "0"
+          }
+        }
+      ]
+    },
+    "Release-sse2": {
+      "successful_presents": 44,
+      "context_deleted": true,
+      "actual_save_boundaries": [
+        {
+          "gui_frame": 17,
+          "observed_ui_state": {
+            "tick": "331",
+            "popup_hex": "",
+            "x": "0",
+            "y": "0",
+            "width": "0",
+            "height": "0",
+            "capture_mouse": "0",
+            "capture_keyboard": "0"
+          }
+        },
+        {
+          "gui_frame": 28,
+          "observed_ui_state": {
+            "tick": "463",
+            "popup_hex": "",
+            "x": "0",
+            "y": "0",
+            "width": "0",
+            "height": "0",
+            "capture_mouse": "0",
+            "capture_keyboard": "0"
+          }
+        },
+        {
+          "gui_frame": 40,
+          "observed_ui_state": {
+            "tick": "631",
+            "popup_hex": "",
+            "x": "0",
+            "y": "0",
+            "width": "0",
+            "height": "0",
+            "capture_mouse": "0",
+            "capture_keyboard": "0"
+          }
+        }
+      ]
+    }
+  },
+  "original_assertions_and_routes_unchanged": true,
+  "raw_audit_sha256": "831c5b6199da902597a303cb8ec428d3cbdca068ec8eef951c100b8d3cd9b1ab",
+  "native_admission_qualified": false,
+  "phase6_complete": false
+}

@@ -370,6 +370,13 @@ def main():
             def save():
                 previous=(out/'saved.scn').stat().st_mtime_ns if (out/'saved.scn').exists() else 0
                 x.XWarpPointer(display,0,window,0,0,0,0,640,360);x.XFlush(display);advance()
+                def released_capture():
+                    with (out/'ui-state.csv').open() as stream:states=list(csv.DictReader(stream))
+                    if not states:return None
+                    latest=states[-1]
+                    return latest if not latest['popup_hex'] and latest['capture_keyboard']=='0' and latest['capture_mouse']=='0' else None
+                boundary=wait(released_capture,'Original input dialog did not release capture before the save shortcut')
+                with (out/'gui-save-boundaries.jsonl').open('a') as stream:stream.write(json.dumps(dict(gui_frame=gui_frame(),observed_ui_state=boundary))+'\n')
                 key(window,'Control_L',True);key(window,'s',True);advance()
                 key(window,'s',False);key(window,'Control_L',False)
                 wait(lambda:(out/'saved.scn').exists() and (out/'saved.scn').stat().st_mtime_ns!=previous,'Native UI result was not saved')

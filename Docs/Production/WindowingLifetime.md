@@ -94,3 +94,17 @@ DG/DG-S panel/VC, scale1/2, software/Intel matrix across all four build profiles
 is running in the input-frame-sync checkout. Full current-source input and
 Phase 6 acceptance remain open until that complete matrix and its independent
 audit pass.
+
+The current X11 typing replay exposed a second harness boundary race. Its
+Debug automatic process accepted the target entry, but Ctrl-S was delivered
+while the original popup still captured the keyboard: the save-key release
+was observed at input tick 337, and the first uncaptured UI row followed at
+tick 338. The failed process rendered 94 frames and deleted its context; it
+produced no save. The driver now waits for flushed original UI observations
+to show no popup and released mouse/keyboard capture before each save shortcut.
+The same unchanged typing, parameter, cancellation, flight-key and save checks
+pass in all four current profiles: four clean processes and 178 presentations.
+The retained-source regression proves the helper preserves every original
+input route and assertion, and checks all twelve actual corrected save
+boundaries. [Scoped evidence](CaptureReleaseVerification.json) does not replace
+the complete GUI, stock, platform or Phase 6 gates.
