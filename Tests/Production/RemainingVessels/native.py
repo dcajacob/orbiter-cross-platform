@@ -17,19 +17,16 @@ ROOT=HERE.parents[2]
 spec=importlib.util.spec_from_file_location('remaining_native_reader',HERE.parent/'RemainingStock/original.py')
 shared=importlib.util.module_from_spec(spec);spec.loader.exec_module(shared)
 sys.path[:0]=[str(HERE.parent/'StockScenarios'),str(HERE.parent/'WaylandInput')]
+sys.path.insert(0,str(HERE.parent/'RemainingStockRepaired'))
+import protocols
 from intentional_exit import build_identity
 from compositor import Compositor
 from run_client import png
 require=shared.require;sha=shared.digest;sha_lf=shared.sha_lf
 
 
-def settings():
-    value=shared.settings()
-    protocol=json.loads((HERE.parent/'RemainingStockRepaired/protocol.json').read_text())
-    require(protocol['protocol']=='remaining-stock-repaired-v1' and protocol['frames']==960 and
-            protocol['fixed_step']==1/64 and protocol['capture_tick']==800 and protocol['complete_scenes']==38,
-            'Explicit repaired observation clock differs')
-    return dict(value,protocol=protocol['protocol'],frames=960,fixed_step=1/64,capture_tick=800)
+def settings(protocol=protocols.V1):
+    return protocols.load(shared.settings(),protocol)
 
 
 def inspect_inputs(out,case,config):
@@ -38,6 +35,15 @@ def inspect_inputs(out,case,config):
     require(invocation['scenario_entry_point']==entry and args[args.index('--scenario')+1]==str(out/entry) and
             args[args.index('--assets')+1]==str(out),'Actual complete native scenario/asset root differs')
     require(sha_lf(out/entry)==case['sha256_lf']==invocation['scenario_sha256_lf'],'Original native scenario bytes differ')
+    if config['protocol']==protocols.V2:
+        require(args.count('--fixed-system-step')==1 and args[args.index('--fixed-system-step')+1]==str(config['system_elapsed_input']) and
+                '--capture-time' not in args and args.count('--fixed-step')==1 and
+                args[args.index('--fixed-step')+1]==str(config['fixed_step']) and
+                args.count('--frames')==1 and args[args.index('--frames')+1]==str(config['frames']) and
+                invocation['protocol']==protocols.V2 and
+                (out/protocols.MARKER).read_bytes()==protocols.marker_bytes(config) and
+                invocation['finalized_frame_descriptor_sha256']==sha(out/protocols.MARKER),
+                'Executed matched-clock arguments or finalized-frame descriptor differ')
     for name,value in invocation['class_inputs'].items():
         require(name in case['declared_vessels'].values() and sha_lf(out/value['path'])==value['sha256_lf']==config['classes'][name]['sha256_lf'],
                 'Actual native class input differs: '+name)
@@ -73,7 +79,7 @@ def inspect(out,case,config,identity,build,probe,libraries,gtk_plugin,instrument
     cfg=(out/'Orbiter.cfg').read_text()
     require(not re.search(r'^\s*(?:PropStages|PropStage\d+|PropSubsampling)\s*=',cfg,re.I|re.M),'Native original propagator defaults overridden')
     summary=json.loads((out/'scene-summary.json').read_text())
-    require(summary['frames']==800 and summary['simulation_seconds']==12.5,'Native actual full-frame capture clock differs')
+    protocols.inspect_frame(summary,config,result.get('matched_clock_observation'))
     scene=shared.rows(out/'scene.csv');tick=str(config['capture_tick'])
     expected={(r['object'],r['index']) for r in shared.rows(out/'stock-vessel-meshes.csv') if r['tick']==tick and r['present']=='1'}
     actual=[(r['object'],r['index']) for r in scene if r['type']=='vessel']
@@ -116,7 +122,8 @@ def main():
     p.add_argument('--case',action='append');p.add_argument('--repeats',type=int,choices=(1,2),default=2)
     p.add_argument('--instrument-control',action='store_true',help='Exercise real native compatibility contexts and surface uploads in the complete unchanged scene')
     p.add_argument('--jobs',type=int,default=1)
-    a=p.parse_args();config=settings();require(not a.output.exists() and a.jobs>0,'Fresh diagnostic output and positive concurrency required')
+    p.add_argument('--protocol',choices=protocols.NAMES,default=protocols.V1)
+    a=p.parse_args();config=settings(a.protocol);require(not a.output.exists() and a.jobs>0,'Fresh diagnostic output and positive concurrency required')
     cases=[case for case in config['cases'] if not a.case or case['id'] in a.case]
     require(cases and (not a.case or {c['id'] for c in cases}==set(a.case)),'Unknown native complete-scene case')
     record=json.loads(a.build_record.read_text());require(record['status']=='built','Complete immutable build required')
@@ -140,7 +147,7 @@ def main():
     require(assets=={name:sha(a.assets/name) for name in assets},'Full immutable native resource tree changed')
     chosen={name.casefold():name for name in assets};require(len(chosen)==len(assets),'Ambiguous native asset paths')
     paths={p for p in HERE.iterdir() if p.is_file()}
-    paths.update(shared.source_files());paths.add(HERE.parent/'RemainingStockRepaired/protocol.json')
+    paths.update(shared.source_files());paths.update((Path(protocols.__file__),protocols.path(protocols.V1),protocols.path(protocols.V2)))
     paths.update(HERE.parent/name for name in ('StockScenarios/intentional_exit.py','WaylandInput/compositor.py'))
     if a.instrument_control:paths.add(HERE.parent/'NativeInstrumentTarget/Control.h')
     producer=subprocess.check_output(['git','-C',str(ROOT),'rev-parse','HEAD'],text=True).strip()
@@ -186,11 +193,17 @@ def main():
                 argv=[str(candidate),'--assets',str(out),'--data',str(a.data),'--planets',str(a.planets),
                     '--modules',str(a.build/'NativeModules'),'--scenario',str(out/case['scenario_entry_point']),
                     '--config',str(path),'--evidence',str(out),'--save',str(out/'saved.scn'),
-                    '--frames',str(config['frames']),'--fixed-step',str(config['fixed_step']),'--capture-time','12.5','--run']
+                    '--frames',str(config['frames']),'--fixed-step',str(config['fixed_step']),'--run']
+                if config['protocol']==protocols.V2:
+                    argv+=['--fixed-system-step',str(config['system_elapsed_input'])]
+                    (out/protocols.MARKER).write_bytes(protocols.marker_bytes(config))
+                else:argv+=['--capture-time','12.5']
                 invocation=dict(argv=argv,scenario_entry_point=case['scenario_entry_point'],scenario_sha256_lf=sha_lf(out/case['scenario_entry_point']),
                     class_inputs={kind:dict(path=chosen[config['classes'][kind]['target'].casefold()],sha256_lf=config['classes'][kind]['sha256_lf'])
                                   for kind in set(case['declared_vessels'].values())},
                     recording_files_sha256={name:sha(out/name) for name in shared.recordings(case,config)})
+                if config['protocol']==protocols.V2:
+                    invocation.update(protocol=config['protocol'],finalized_frame_descriptor_sha256=sha(out/protocols.MARKER))
                 (out/'invocation.json').write_text(json.dumps(invocation,indent=2)+'\n')
                 env=dict(display.environment,LIBGL_ALWAYS_SOFTWARE='1',GALLIUM_DRIVER='llvmpipe',LP_NUM_THREADS='2',
                     LIBDECOR_PLUGIN_DIR=str(a.gtk_plugin.parent),LD_LIBRARY_PATH=':'.join(map(str,[a.build,*a.library])))

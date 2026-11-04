@@ -99,13 +99,18 @@ def inspect_trace(out,case,config):
     require(all(initial.get(name,'').lower()==kind.lower() for name,kind in case['declared_vessels'].items()),
             'An original declared vessel or class is absent at initialization')
     initial_mjd=float(next(row['mjd'] for (tick,_),row in state.items() if tick=='0'))
+    matched_clock=None;simulation_times=None
+    if config.get('protocol')=='remaining-stock-matched-clock-v2':
+        from matched_clock import inspect_matched_clock
+        matched_clock,simulation_times=inspect_matched_clock(out,config)
     for tick in ticks:
         group=[row for (number,_),row in state.items() if number==tick]
         require(len(group)==int(population[(tick,)]['count']) and len(group)>0,
                 'Complete actual vessel population differs')
         require(sum(row['focus']=='1' for row in group)==1,'Actual population focus differs')
-        require(all(float(row['seconds'])==int(tick)*config['fixed_step'] and
-                    abs(float(row['mjd'])-(initial_mjd+int(tick)*config['fixed_step']/86400))<=config['budgets']['mjd_days']
+        expected_time=simulation_times[tick] if simulation_times is not None else int(tick)*config['fixed_step']
+        require(all(float(row['seconds'])==expected_time and
+                    abs(float(row['mjd'])-(initial_mjd+expected_time/86400))<=config['budgets']['mjd_days']
                     for row in group),'Original remaining-stock clock changed')
         require(all(float(row['mass'])>0 and float(row['empty_mass'])>0 and float(row['fuel'])>=0 for row in group),
                 'Original vessel mass or fuel is invalid')
@@ -133,12 +138,14 @@ def inspect_trace(out,case,config):
     for row in [*docks.values(),*attachments.values()]:
         peer=row.get('docked',row.get('attached'))
         require(not peer or (row['tick'],peer) in state,'Attached/docked peer absent from actual population')
-    return dict(initial_declared_vessels=len(case['declared_vessels']),initial_actual_vessels=len(initial),
+    result=dict(initial_declared_vessels=len(case['declared_vessels']),initial_actual_vessels=len(initial),
         initial_generated_vessels={name:kind for name,kind in initial.items() if name not in case['declared_vessels']},
         observed_classes=sorted({row['class'] for row in state.values()}),finalized_ticks=len(ticks),
         all_vessel_rows=len(state),docking_rows=len(docks),propellant_rows=len(propellants),thruster_rows=len(thrusters),
         attachment_rows=len(attachments),playback_rows=len(playback),mesh_rows=len(meshes),
         **resources,recording_files=recording_count)
+    if matched_clock is not None:result['matched_clock_observation']=matched_clock
+    return result
 
 
 def inspect_artifacts(out,case,config):

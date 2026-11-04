@@ -10,6 +10,7 @@
 #include <cstdlib>
 #include <dlfcn.h>
 #include <thread>
+#include <limits>
 #ifdef ORBITER_NATIVE_INSTRUMENT_CONTROL
 #include "../NativeInstrumentTarget/Control.h"
 #endif
@@ -24,6 +25,9 @@ bool capabilitiesOpened=false;
 struct Complete {
     ~Complete(){if(initialized)std::ofstream("stock-vessel-complete.txt")<<frames<<'\n';}
 } complete;
+}
+extern "C" unsigned OrbiterRemainingStockFinalizedTickV2(unsigned abi) {
+    return abi==2?frames:std::numeric_limits<unsigned>::max();
 }
 // Preserve real module capabilities and contemporaneous mappings before the
 // session's qualification check. An early failure can otherwise unload the DSO
@@ -58,6 +62,7 @@ void orbiter::production::Session::UpdateWorld(SessionServices& services,const T
         std::ifstream maps("/proc/self/maps");std::ofstream loaded("observer-loaded-maps.txt");loaded<<maps.rdbuf();
         initialized=true;
     }
+    details.beginStep(frames+1);
     original(services,time,running,playback,updating,force);
 }
 void orbiter::production::Session::EndTimeStep(SessionServices& services,TimeData& time,

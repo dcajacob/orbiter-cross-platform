@@ -1,5 +1,6 @@
 #include "glad.h"
 #include "Evidence.h"
+#include "FinalizedFrameCapture.h"
 #include "InstrumentEvidence.h"
 #include "OGLClient.h"
 #include "MeshManager.h"
@@ -19,6 +20,7 @@
 namespace Evidence {
 namespace {
 bool enabled=false,captured=false;
+FinalizedFrameCapture finalizedCapture;
 PVOID faultHandler=nullptr;
 unsigned frames=0,draws=0,presents=0;
 uint64_t indices=0;
@@ -61,6 +63,7 @@ void Begin() {
     InstrumentEvidence::Begin();
     enabled=std::filesystem::is_regular_file("ogl-evidence.enabled");frames=draws=presents=0;indices=0;seen.clear();objectDraws.clear();currentObject.clear();planetTiles.clear();archiveReads.clear();
     if(!enabled)return;
+    finalizedCapture.Begin(std::filesystem::current_path());
     captured=false;
     setvbuf(stdout,nullptr,_IONBF,0);
     faultHandler=AddVectoredExceptionHandler(1,fault);
@@ -103,8 +106,16 @@ void Frame() {
         if(!surface)throw std::runtime_error("Required original MFD texture missing");
         InstrumentEvidence::Mfd(i,surface->m_TexId,surface->m_Width,surface->m_Height);
     }
-    if(!enabled || captured || !frames || oapiGetSimTime()<12.5)return;
-    if(std::abs(oapiGetSimTime()-12.5)>1e-12)throw std::runtime_error("missing finalized tick-50 render for graphics evidence");
+    if(!enabled || captured || !frames)return;
+    if(finalizedCapture.Enabled()) {
+        const auto observer=GetModuleHandleW(L"ProductionCockpitDriver.dll");
+        const auto reader=observer?reinterpret_cast<FinalizedFrameCapture::Reader>(
+            GetProcAddress(observer,FinalizedFrameCapture::Observer())):nullptr;
+        if(!finalizedCapture.Select(reader))return;
+    } else {
+        if(oapiGetSimTime()<12.5)return;
+        if(std::abs(oapiGetSimTime()-12.5)>1e-12)throw std::runtime_error("missing finalized tick-50 render for graphics evidence");
+    }
     captured=true;
     GLint viewport[4]{};glGetIntegerv(GL_VIEWPORT,viewport);
     if(viewport[2]!=1280 || viewport[3]!=720)throw std::runtime_error("unexpected real-client evidence viewport: "+std::to_string(viewport[2])+"x"+std::to_string(viewport[3]));
@@ -152,7 +163,8 @@ void Frame() {
     camera<<"px,py,pz,dx,dy,dz,aperture,m11,m12,m13,m21,m22,m23,m31,m32,m33\n"
           <<p.x<<','<<p.y<<','<<p.z<<','<<d.x<<','<<d.y<<','<<d.z<<','<<oapiCameraAperture();
     for(double value:r.data)camera<<','<<value;camera<<'\n';
-    auto summary=output("scene-summary.json");summary<<"{\"frames\":"<<frames<<",\"simulation_seconds\":"<<oapiGetSimTime()<<",\"mesh_draw_calls\":"<<draws<<",\"indices\":"<<indices<<",\"width\":1280,\"height\":720}\n";
+    auto summary=output("scene-summary.json");summary<<"{\"frames\":"<<frames<<",\"simulation_seconds\":"<<oapiGetSimTime()<<",\"mesh_draw_calls\":"<<draws<<",\"indices\":"<<indices<<",\"width\":1280,\"height\":720";
+    finalizedCapture.Summary(summary);summary<<"}\n";
     auto objects=output("object-draws.csv");objects<<"object,mesh_draw_calls\n";
     for(auto &entry:objectDraws)objects<<entry.first<<','<<entry.second<<'\n';
     auto planets=output("planet-tiles.csv");planets<<"object,textured_draw_calls,indices\n";

@@ -4,6 +4,47 @@ This is a separately versioned candidate, not an untouched-original reference,
 an observations lock, native class admission or Phase 6 acceptance. The failed
 original campaigns remain failed and unchanged.
 
+## Explicit matched-clock protocol v2
+
+`--protocol remaining-stock-matched-clock-v2` selects the separate
+`matched-clock-v2.json` contract in both the Windows builder/capture and native
+capture. The default remains `remaining-stock-repaired-v1`; its JSON contract and
+the failed historical captures are retained. The full-reference v1 auditor
+continues to reject diagnostic subsets and other protocols. V2 diagnostics do
+not establish native admission or an accepted replacement reference.
+
+V2 retains the unchanged complete scenes/scripts, 960 physical steps, original
+1/64-second fixed input, original production propagators and all existing state,
+camera and image budgets. The native diagnostic alone accepts a bounded
+`--fixed-system-step 0.1` input through the original startup/clamp helper, matching
+the actual Windows system steps: 0.01 for the first three, then 0.1. The ordinary
+native application does not expose that diagnostic argument. Original scripts
+retain control of time acceleration; physical steps use their actual warp.
+
+The passive observer now writes `stock-step-clock.csv` immediately after
+BeginStep and before module callbacks, in addition to `stock-clock.csv` at the
+initial/finalized boundaries. The reader checks actual startup/system inputs,
+pre-callback warp, the physical step, the conserved clock accumulator and every
+vessel's observed simulation time. A post-step warp change is distinguished
+from the warp used by the physical step.
+
+The explicit `remaining-stock-finalized-frame-v2.txt` descriptor selects actual
+finalized tick 800 through a private versioned observer getter. Both renderers
+read the real framebuffer after world/camera finalization at that tick, and
+record the actual simulation time plus protocol/tick in the frame summary.
+They reject missing/incompatible observers and skipped ticks. This preserves
+the same tick selection when a script crosses the old 12.5-second target in a
+larger warped physical step; no interpolation, script override or API value is
+substituted. Absent the descriptor, the legacy capture policy remains active.
+
+The separate `Windows Matched-Clock Complete-Scene Diagnostics v2` workflow
+runs PoweredUp and Spin stabilisation twice in all four Windows profiles with
+an explicit diagnostic-only marker. The builder executes nine standalone
+frame-policy damage controls. `MatchedClock.Test.py` requires real captured
+begin/end/vessel clocks and frame metadata, rejects fourteen damaged copies and
+checks that owning capture bytes remain unchanged. Real execution and a full
+independent four-profile/reference audit remain required before qualification.
+
 The shared passive SDK observer additionally writes `stock-clock.csv` at the
 same initial and finalized boundaries as the vessel snapshots. Its separately
 identified `remaining-stock-sdk-clock-v1` samples record system time/step,

@@ -28,6 +28,7 @@ class Driver final:public oapi::Module {
         }
     }
 public:
+    unsigned FinalizedTicks()const {return frames;}
     explicit Driver(HINSTANCE instance):Module(instance) {guarded([&] {
         if(std::getenv("ORBITER_TEST_OBSERVER_SSE2")) {
             previousFma=_get_FMA3_enable();_set_FMA3_enable(0);
@@ -51,6 +52,7 @@ public:
         if(!initialized) {snapshot(state,docks,0);details.snapshot(0);initialized=true;}
     });}
     void core(const char* phase,int running) {guarded([&] {
+        if(started && std::string(phase)=="world.update.before")details.beginStep(frames+1);
         if(started && std::string(phase)=="app.frame.end") {
             require(initialized && running,"Unexpected original stock frame state");
             snapshot(state,docks,++frames);details.snapshot(frames);
@@ -67,3 +69,7 @@ void observe(const char* phase,const char*,double,double,int running) {
 }
 DLLCLBK void InitModule(HINSTANCE instance) {driver=new Driver(instance);oapiRegisterModule(driver);}
 DLLCLBK void ExitModule(HINSTANCE) {delete driver;driver=nullptr;}
+DLLCLBK unsigned OrbiterRemainingStockFinalizedTickV2(unsigned abi) {
+    if(abi!=2)return std::numeric_limits<unsigned>::max();
+    return driver?driver->FinalizedTicks():0;
+}

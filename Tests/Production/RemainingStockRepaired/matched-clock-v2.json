@@ -1,0 +1,19 @@
+{
+  "schema": 2,
+  "protocol": "remaining-stock-matched-clock-v2",
+  "original_application_and_sdk_source": "f725194209634f7fd5d1d44d426cfa9b5e303e37",
+  "complete_scenes": 38,
+  "frames": 960,
+  "fixed_step": 0.015625,
+  "system_elapsed_input": 0.1,
+  "system_startup_steps": [0.01, 0.01, 0.01],
+  "capture_tick": 800,
+  "capture_time": null,
+  "repeats": 2,
+  "original_propagator_defaults": true,
+  "script_controlled_warp": true,
+  "automatic_refresh": false,
+  "native_admission_qualified": false,
+  "phase6_complete": false,
+  "scope": "Separately versioned actual complete-scene observations. Preserve original scenes, scripts, physics, callback order, data and budgets. Match observed Windows system-step inputs through the original native startup/clamp policy. Observe finalized ticks and actual begin/end clocks; capture the real framebuffer at tick 800 even when an unchanged script changes warp. No reference acceptance or native class admission."
+}

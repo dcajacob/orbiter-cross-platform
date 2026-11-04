@@ -13,6 +13,7 @@ ROOT=HERE.parents[2]
 sys.path[:0]=[str(HERE),str(HERE.parent),str(HERE.parent/'Client')]
 from prepare_sources import BASE,git
 from pe_symbols import PE
+import protocols
 
 
 def sha(path):return hashlib.sha256(path.read_bytes()).hexdigest()
@@ -41,7 +42,9 @@ def main():
     p=argparse.ArgumentParser(description=__doc__)
     for name in ('preserved','output'):p.add_argument('--'+name,type=lambda v:Path(v).resolve(),required=True)
     p.add_argument('--configuration',choices=('Debug','Release'),required=True)
+    p.add_argument('--protocol',choices=protocols.NAMES,default=protocols.V1)
     a=p.parse_args()
+    protocol=protocols.read(a.protocol)
     require(sys.platform=='win32','The repaired preserved-runtime build requires native Windows')
     require(not a.output.exists(),'Fresh variant output required; replacement forbidden')
     metadata=json.loads((a.preserved/'test-runtime.json').read_text())
@@ -66,7 +69,8 @@ def main():
                   'Tests/Production/Client/pe_symbols.py','Tests/Production/StockVessels/Observation.h',
                   'Tests/Production/ApplicationObservation.h','Tests/Production/production-source.lock.json',
                   '.github/workflows/repaired-remaining-stock.yml',
-                  '.github/workflows/repaired-remaining-stock-diagnostics.yml'))
+                  '.github/workflows/repaired-remaining-stock-diagnostics.yml',
+                  '.github/workflows/matched-clock-remaining-stock.yml'))
     require({str(path.relative_to(ROOT).as_posix()) for path in HERE.iterdir() if path.is_file()}<=paths,
             'Builder has uncommitted inputs')
     sources={name:sha_lf(ROOT/name) for name in sorted(paths)}
@@ -75,7 +79,7 @@ def main():
                 'Builder input differs from producer: '+name)
     a.output.mkdir(parents=True)
     runtime=a.output/'runtime';shutil.copytree(a.preserved,runtime)
-    report=dict(schema=1,status='building',protocol='remaining-stock-repaired-v1',
+    report=dict(schema=1,status='building',protocol=protocol['protocol'],
         producer_commit=producer,original_application_and_sdk_source=BASE,configuration=a.configuration,
         preserved_package_sha256=before,source_sha256_lf=sources,commands=[],
         native_admission_qualified=False,phase6_complete=False)
@@ -108,6 +112,8 @@ def main():
              '-DORBITER_TEST_RUNTIME='+str(runtime),'-DORBITER_REPAIRED_SOURCES='+str(source_variant/'source'),
              '-DORBITER_REPAIRED_OBSERVER='+str(observer)],'configure')
         run(['cmake','--build',str(build),'--parallel','2'],'compile')
+        run([str(build/'controls/finalized_frame_policy_test.exe'),str(a.output/'finalized-frame-controls')],
+            'finalized-frame-policy')
         srb=build/'import-only/Atlantis_SRB.dll'
         require(PE(srb).exports()==PE(a.preserved/'Modules/Atlantis_SRB.dll').exports(),
                 'Rebuilt import-only SRB exports differ from actual preserved SRB')

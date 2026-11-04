@@ -742,8 +742,8 @@
     },
     "Src/Orbiter/Production/NativeApplication.cpp": {
       "original_sha256_lf": null,
-      "sha256_lf": "db23ff7d592d5c82496b5b02c6802835878a07a803dbf07b2ad436348c4fb690",
-      "scope": "Complete original Dragonfly source and resources with independently audited native SDK/drawing/resource ownership bindings. Actual compatibility target uses distinct color-renderbuffer storage. Native diagnostic build/runtime and Windows/native qualification required; original formulas and public Windows SDK layouts unchanged."
+      "sha256_lf": "527c3a2eb7a406a164bde5ec866235d4df86231c9680c7c7a1390404628d6845",
+      "scope": "Complete original Dragonfly source and resources with independently audited native SDK/drawing/resource ownership bindings. Actual compatibility target uses distinct color-renderbuffer storage. Native diagnostic build/runtime and Windows/native qualification required; original formulas and public Windows SDK layouts unchanged. Opt-in bounded remaining-stock diagnostic supplies an independently declared system elapsed input through the unchanged startup/clamp policy; physical fixed step, every update formula and callback order remain unchanged. Ordinary native application argument/admission policy and timing inputs are retained."
     },
     "Src/Orbiter/Production/NativeBuild.h.in": {
       "sha256_lf": "f5fb21f83bb6be0c54839fce670e8410f6911eda86da2eef26e4221c1ae25d97",

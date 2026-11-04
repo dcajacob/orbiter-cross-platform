@@ -2,10 +2,12 @@
 // Actual native renderer evidence, same scene manifest/readback as Windows.
 #include "glad.h"
 #include "Evidence.h"
+#include "FinalizedFrameCapture.h"
 #include "InstrumentEvidence.h"
 #include "OGLClient.h"
 #include "MeshManager.h"
 #include <cmath>
+#include <dlfcn.h>
 #include <fstream>
 #include <iomanip>
 #include <locale>
@@ -16,6 +18,7 @@
 namespace Evidence {
 namespace {
 bool enabled=false,captured=false;unsigned frames=0,draws=0,presents=0;uint64_t indices=0;
+FinalizedFrameCapture finalizedCapture;
 std::ofstream events,assets,visualMeshes;std::set<std::string> seen;std::map<std::string,unsigned> objectDraws;
 std::string currentObject;std::map<std::string,std::pair<unsigned,uint64_t>> planetTiles;
 std::map<std::pair<std::string,int>,uint64_t> archiveReads;
@@ -33,6 +36,7 @@ std::ofstream output(const char* name) {
 void Begin() {
     InstrumentEvidence::Begin(GetNativeRenderContext().evidence);
     enabled=!GetNativeRenderContext().evidence.empty();if(!enabled)return;
+    finalizedCapture.Begin(GetNativeRenderContext().evidence);
     std::filesystem::create_directories(GetNativeRenderContext().evidence);
     if(glDebugMessageCallback){glEnable(GL_DEBUG_OUTPUT);glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);glDebugMessageCallback(debugMessage,nullptr);}
     frames=draws=presents=0;indices=0;captured=false;seen.clear();objectDraws.clear();currentObject.clear();planetTiles.clear();archiveReads.clear();
@@ -87,8 +91,16 @@ void Frame() {
         if(!surface)throw std::runtime_error("Required native MFD texture missing");
         InstrumentEvidence::Mfd(i,surface->m_TexId,surface->m_Width,surface->m_Height);
     }
-    if(!enabled || GetNativeRenderContext().captureTime<0 || captured || frames<50 || oapiGetSimTime()<GetNativeRenderContext().captureTime-1e-12)return;
-    if(std::abs(oapiGetSimTime()-GetNativeRenderContext().captureTime)>1e-12)throw std::runtime_error("missing finalized tick-50 render for graphics evidence");
+    if(!enabled || captured)return;
+    if(finalizedCapture.Enabled()) {
+        if(!frames)return;
+        const auto reader=reinterpret_cast<FinalizedFrameCapture::Reader>(
+            dlsym(RTLD_DEFAULT,FinalizedFrameCapture::Observer()));
+        if(!finalizedCapture.Select(reader))return;
+    } else {
+        if(GetNativeRenderContext().captureTime<0 || frames<50 || oapiGetSimTime()<GetNativeRenderContext().captureTime-1e-12)return;
+        if(std::abs(oapiGetSimTime()-GetNativeRenderContext().captureTime)>1e-12)throw std::runtime_error("missing finalized tick-50 render for graphics evidence");
+    }
     captured=true;
     GLint viewport[4]{};glGetIntegerv(GL_VIEWPORT,viewport);
     if(viewport[2]!=1280 || viewport[3]!=720)throw std::runtime_error("unexpected real-client evidence viewport: "+std::to_string(viewport[2])+"x"+std::to_string(viewport[3]));
@@ -132,7 +144,8 @@ void Frame() {
     camera<<"px,py,pz,dx,dy,dz,aperture,m11,m12,m13,m21,m22,m23,m31,m32,m33\n"
           <<p.x<<','<<p.y<<','<<p.z<<','<<d.x<<','<<d.y<<','<<d.z<<','<<oapiCameraAperture();
     for(double value:r.data)camera<<','<<value;camera<<'\n';
-    auto summary=output("scene-summary.json");summary<<"{\"frames\":"<<frames<<",\"simulation_seconds\":"<<oapiGetSimTime()<<",\"mesh_draw_calls\":"<<draws<<",\"indices\":"<<indices<<",\"width\":1280,\"height\":720}\n";
+    auto summary=output("scene-summary.json");summary<<"{\"frames\":"<<frames<<",\"simulation_seconds\":"<<oapiGetSimTime()<<",\"mesh_draw_calls\":"<<draws<<",\"indices\":"<<indices<<",\"width\":1280,\"height\":720";
+    finalizedCapture.Summary(summary);summary<<"}\n";
     auto objects=output("object-draws.csv");objects<<"object,mesh_draw_calls\n";
     for(auto &entry:objectDraws)objects<<entry.first<<','<<entry.second<<'\n';
     auto planets=output("planet-tiles.csv");planets<<"object,textured_draw_calls,indices\n";

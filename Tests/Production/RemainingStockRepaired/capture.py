@@ -18,24 +18,13 @@ from stage_original import run as stage
 from run_client import mesa_files,png
 from compare_client import image_ssim
 import data_inputs
+import protocols
 require=shared.require;sha=shared.digest;sha_lf=shared.sha_lf
 OBSERVER='Modules/Plugin/ProductionCockpitDriver.dll'
 
 
-def settings():
-    original=shared.settings()
-    protocol=json.loads((HERE/'protocol.json').read_text())
-    require(protocol['schema']==1 and protocol['protocol']=='remaining-stock-repaired-v1' and
-            protocol['original_application_and_sdk_source']==original['application_source'] and
-            protocol['complete_scenes']==len(original['cases'])==38 and protocol['frames']==960 and
-            protocol['fixed_step']==1/64 and protocol['capture_time']==12.5 and protocol['capture_tick']==800 and
-            protocol['duration_seconds']==15 and protocol['epoch']==original['epoch'] and protocol['repeats']==2 and
-            protocol['frames']*protocol['fixed_step']==protocol['duration_seconds'] and
-            protocol['capture_tick']*protocol['fixed_step']==protocol['capture_time'] and
-            protocol['automatic_refresh'] is False and not protocol['native_admission_qualified'] and not protocol['phase6_complete'],
-            'Repaired reference protocol changed')
-    return dict(original,protocol=protocol['protocol'],frames=protocol['frames'],fixed_step=protocol['fixed_step'],
-                capture_tick=protocol['capture_tick'])
+def settings(protocol=protocols.V1):
+    return protocols.load(shared.settings(),protocol)
 
 
 def selected_cases(config,requested):
@@ -68,7 +57,7 @@ def inspect_artifacts(out,case,config):
     require(not re.search(r'^\s*(?:PropStages|PropStage\d+|PropSubsampling)\s*=',cfg,re.M|re.I),
             'Repaired reference overrides original production propagators')
     variant=json.loads((out/'reference-variant.json').read_text())
-    require(variant['protocol']==config['protocol'] and variant['protocol_sha256_lf']==sha_lf(HERE/'protocol.json') and
+    require(variant['protocol']==config['protocol'] and variant['protocol_sha256_lf']==sha_lf(protocols.path(config['protocol'])) and
             variant['original_application_and_sdk_source']==config['application_source'] and
             variant['frames']==config['frames'] and variant['fixed_step']==config['fixed_step'] and
             variant['capture_tick']==config['capture_tick'],'Executed reference variant differs')
@@ -79,8 +68,9 @@ def inspect_artifacts(out,case,config):
     require(len((out/'scene.rgba').read_bytes())==1280*720*4,'Repaired framebuffer incomplete')
     data_files=data_inputs.validate(json.loads((out/'actual-data-inputs.json').read_text()))
     summary=json.loads((out/'scene-summary.json').read_text())
-    require(summary['simulation_seconds']==12.5 and summary['frames']==config['capture_tick'] and
-            summary['width']==1280 and summary['height']==720,'Repaired full-frame capture tick differs')
+    protocols.inspect_frame(summary,config,result.get('matched_clock_observation'))
+    if config['protocol']==protocols.V2:
+        require((out/protocols.MARKER).read_bytes()==protocols.marker_bytes(config),'Executed finalized-frame descriptor differs')
     scene=shared.rows(out/'scene.csv');tick=str(config['capture_tick'])
     expected={(row['object'],row['index']) for row in shared.rows(out/'stock-vessel-meshes.csv')
               if row['tick']==tick and row['present']=='1'}
@@ -96,6 +86,7 @@ def inspect_artifacts(out,case,config):
         'math-profile.txt','console.txt','Orbiter.log','Orbiter.cfg','process-result.json','reference-variant.json','actual-data-inputs.json',
         case['scenario_entry_point'],*shared.recordings(case,config)]
     names.extend(item['target'] for item in config['delivery_repairs'])
+    if config['protocol']==protocols.V2:names.extend(('stock-step-clock.csv',protocols.MARKER))
     return dict(result,status='captured',process_returncode=0,actual_math=actual_math,renderer=renderer,actual_simulation_data_files=data_files,clock_observation=clock,
                 files_sha256={name:sha(out/name) for name in names})
 
@@ -103,7 +94,8 @@ def inspect_artifacts(out,case,config):
 def source_files():
     paths={*shared.source_files(),*(p for p in HERE.iterdir() if p.is_file()),
            ROOT/'.github/workflows/repaired-remaining-stock.yml',
-           ROOT/'.github/workflows/repaired-remaining-stock-diagnostics.yml'}
+           ROOT/'.github/workflows/repaired-remaining-stock-diagnostics.yml',
+           ROOT/'.github/workflows/matched-clock-remaining-stock.yml'}
     for module in list(sys.modules.values()):
         name=getattr(module,'__file__',None)
         if name:
@@ -114,7 +106,7 @@ def source_files():
 
 def capture(a):
     require(sys.platform=='win32','Repaired original observations require native Windows')
-    config=settings();require(not a.output.exists(),'Fresh repaired capture required; replacement forbidden')
+    config=settings(a.protocol);require(not a.output.exists(),'Fresh repaired capture required; replacement forbidden')
     cases=selected_cases(config,a.diagnostic_case);diagnostic=a.diagnostic_case is not None
     require((os.environ.get('ORBITER_TEST_OBSERVER_SSE2')=='1')==(a.math_profile=='sse2'),'Requested CRT profile differs')
     os.environ.update(LIBGL_ALWAYS_SOFTWARE='true',GALLIUM_DRIVER='llvmpipe')
@@ -139,14 +131,14 @@ def capture(a):
         body=subprocess.check_output(['git','-C',str(ROOT),'show',producer+':Tests/Production/'+name]).replace(b'\r\n',b'\n')
         require(hashlib.sha256(body).hexdigest()==value,'Data lock differs from capture producer: '+name)
     a.output.mkdir(parents=True)
-    variant=dict(protocol=config['protocol'],protocol_sha256_lf=sha_lf(HERE/'protocol.json'),
+    variant=dict(protocol=config['protocol'],protocol_sha256_lf=sha_lf(protocols.path(config['protocol'])),
         original_application_and_sdk_source=config['application_source'],producer_commit=producer,
         runtime_variant_manifest_sha256=sha(root/'runtime-variant.json'),frames=config['frames'],
         fixed_step=config['fixed_step'],capture_tick=config['capture_tick'])
     variant.update(diagnostic_only=diagnostic,cases_requested=[case['id'] for case in cases])
     report=dict(status='running',host='repaired-original-windows',protocol=config['protocol'],producer_commit=producer,
         original_application_and_sdk_source=config['application_source'],configuration=a.configuration,math_profile=a.math_profile,
-        protocol_sha256_lf=sha_lf(HERE/'protocol.json'),settings_sha256_lf=sha_lf(shared.CASE_FILE),
+        protocol_sha256_lf=sha_lf(protocols.path(config['protocol'])),settings_sha256_lf=sha_lf(shared.CASE_FILE),
         source_sha256_lf=sources,source_raw_sha256=raw_sources,runtime_variant_manifest_sha256=sha(root/'runtime-variant.json'),
         actual_original_simulation_data=original_data,
         diagnostic_only=diagnostic,cases_requested=[case['id'] for case in cases],
@@ -173,6 +165,8 @@ def capture(a):
                             item=config['classes'][kind]
                             require(sha_lf(directory/item['target'])==item['sha256_lf'],'Original staged class configuration differs')
                         (directory/'reference-variant.json').write_text(json.dumps(variant,indent=2)+'\n')
+                        if config['protocol']==protocols.V2:
+                            (directory/protocols.MARKER).write_bytes(protocols.marker_bytes(config))
                         (directory/'ogl-evidence.enabled').touch();mesa_files(a.mesa,directory)
                     stage(a.executable,a.data,a.planets,out,config,case,configure)
                     staged_data=data_inputs.inspect(out,out)
@@ -212,11 +206,12 @@ def main():
     p=argparse.ArgumentParser(description=__doc__);p.add_argument('--verify-inputs',action='store_true')
     for name in ('executable','data','planets','mesa','output'):p.add_argument('--'+name,type=lambda v:Path(v).resolve())
     p.add_argument('--configuration',choices=('Debug','Release'));p.add_argument('--math-profile',choices=('automatic','sse2'))
+    p.add_argument('--protocol',choices=protocols.NAMES,default=protocols.V1)
     p.add_argument('--diagnostic-case',action='append',help='Run selected complete scenes with an explicit diagnostic-only marker; never eligible for full-reference acceptance')
     a=p.parse_args()
     if a.verify_inputs:
-        config=settings();chosen=selected_cases(config,a.diagnostic_case)
-        print('Verified all 38 unchanged scene inputs with separately versioned 960-tick/64-Hz protocol and unchanged budgets')
+        config=settings(a.protocol);chosen=selected_cases(config,a.diagnostic_case)
+        print('Verified all 38 unchanged scene inputs and unchanged budgets for',config['protocol'])
         if a.diagnostic_case is not None:print('Diagnostic-only complete-scene selection:',','.join(case['id'] for case in chosen))
         return
     require(all(getattr(a,name) is not None for name in ('executable','data','planets','mesa','output','configuration','math_profile')),

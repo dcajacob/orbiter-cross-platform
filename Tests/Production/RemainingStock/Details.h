@@ -7,7 +7,7 @@
 
 namespace remaining_stock {
 struct Details {
-    std::ofstream population,propellants,thrusters,attachments,playback,meshes,clock;
+    std::ofstream population,propellants,thrusters,attachments,playback,meshes,clock,stepClock;
     struct Resource {std::string object;unsigned index,id,lastTick;};
     std::map<PROPELLANT_HANDLE,Resource> history;
     unsigned nextResource=0;
@@ -20,6 +20,13 @@ struct Details {
         open(playback,"stock-playback.csv","tick,object,playback");
         open(meshes,"stock-vessel-meshes.csv","tick,object,index,present,template,name,visibility,x,y,z");
         open(clock,"stock-clock.csv","tick,system_seconds,system_step,simulation_seconds,simulation_step,time_acceleration");
+        open(stepClock,"stock-step-clock.csv","tick,system_seconds,system_step,simulation_seconds,simulation_step,time_acceleration");
+    }
+    void beginStep(unsigned tick) {
+        // Sample after BeginStep and before any module callbacks can change warp.
+        stepClock<<tick<<','<<oapiGetSysTime()<<','<<oapiGetSysStep()<<','<<oapiGetSimTime()
+                 <<','<<oapiGetSimStep()<<','<<oapiGetTimeAcceleration()<<'\n';
+        stepClock.flush();
     }
     void snapshot(unsigned tick) {
         using stock_vessels::csv;
