@@ -1,0 +1,18 @@
+{
+  "schema": 1,
+  "protocol": "remaining-stock-repaired-v1",
+  "original_application_and_sdk_source": "f725194209634f7fd5d1d44d426cfa9b5e303e37",
+  "complete_scenes": 38,
+  "frames": 960,
+  "fixed_step": 0.015625,
+  "capture_time": 12.5,
+  "capture_tick": 800,
+  "duration_seconds": 15,
+  "epoch": 51982.5,
+  "repeats": 2,
+  "propagators": "original production defaults; no PropStages, PropStage0 or PropSubsampling overrides",
+  "state_camera_and_image_budgets": "exactly inherited from RemainingStock/cases.json",
+  "automatic_refresh": false,
+  "native_admission_qualified": false,
+  "phase6_complete": false
+}
