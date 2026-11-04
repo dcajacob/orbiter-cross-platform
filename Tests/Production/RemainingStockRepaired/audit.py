@@ -170,7 +170,8 @@ def runtime_variant(root,producer,configuration,original_root):
         'OVP/OGLClient','Tests/Production/RemainingStock','Tests/Production/RemainingStockRepaired'],text=True).splitlines()
     source_closure(sources,producer,set(ledger)|set(tracked)|{'Tests/Production/RemainingStockRepaired/CMakeLists.txt',
         'Tests/Production/RemainingStockRepaired/PreservedSdkTypes.h','Tests/Production/StockVessels/Observation.h',
-        'Tests/Production/RemainingStock/Details.h','Tests/Production/RemainingStock/Driver.cpp'})
+        'Tests/Production/RemainingStock/Details.h','Tests/Production/RemainingStock/Driver.cpp',
+        '.github/workflows/repaired-remaining-stock-diagnostics.yml'})
     staged=source_variant(root/'module-sources',producer)
     require(build['module_source_manifest_sha256']==staged['manifest_sha256'],'Built module source manifest differs')
     observer=git(producer,'Tests/Production/RemainingStock/Driver.cpp').replace(b'\r\n',b'\n')
@@ -315,6 +316,7 @@ def audit_profile(root,profile,config,producer,original_root,mesa,mesa_imports):
     capture_root=root/'remaining-stock-repaired';build_root=root/'remaining-stock-repaired-build'
     report=json.loads((capture_root/'capture.json').read_text());configuration,math_profile=profile.split('-',1)
     require(report['status']=='captured-awaiting-independent-audit' and report['host']=='repaired-original-windows' and
+            report['diagnostic_only'] is False and report['cases_requested']==[case['id'] for case in config['cases']] and
             report['protocol']==config['protocol'] and report['producer_commit']==producer and
             report['original_application_and_sdk_source']==BASE and report['configuration']==configuration and
             report['math_profile']==math_profile and report['settings_sha256_lf']==sha_lf(capture.shared.CASE_FILE) and
@@ -333,7 +335,7 @@ def audit_profile(root,profile,config,producer,original_root,mesa,mesa_imports):
     source_closure(sources,producer,set(tracked)|{
         'Tests/Production/Client/run_client.py','Tests/Production/Client/compare_client.py',
         'Tests/Production/StockVessels/Observation.h','Tests/Production/StockVessels/original.py',
-        '.github/workflows/repaired-remaining-stock.yml'})
+        '.github/workflows/repaired-remaining-stock.yml','.github/workflows/repaired-remaining-stock-diagnostics.yml'})
     require(set(sources)==set(report['source_raw_sha256']) and
             all(value in raw_source_hashes(producer,name) for name,value in report['source_raw_sha256'].items()),
             'Actual raw capture source differs from its immutable producer')
@@ -348,7 +350,8 @@ def audit_profile(root,profile,config,producer,original_root,mesa,mesa_imports):
             'Executed full runtime/observer differs from audited build')
     expected_variant=dict(protocol=config['protocol'],protocol_sha256_lf=report['protocol_sha256_lf'],
         original_application_and_sdk_source=BASE,producer_commit=producer,
-        runtime_variant_manifest_sha256=built['runtime_manifest_sha256'],frames=960,fixed_step=1/64,capture_tick=800)
+        runtime_variant_manifest_sha256=built['runtime_manifest_sha256'],frames=960,fixed_step=1/64,capture_tick=800,
+        diagnostic_only=False,cases_requested=[case['id'] for case in config['cases']])
     expected_inputs={name:value for name,value in build['preserved_package_sha256'].items()
                      if name.startswith(('Config/','Meshes/'))}
     results={};maths=set();system={}

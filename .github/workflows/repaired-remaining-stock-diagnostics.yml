@@ -1,0 +1,143 @@
+name: Windows Complete-Scene Clock and Initial-Current Diagnostics
+on:
+  push:
+    branches: ['codex/production-**']
+    paths:
+      - 'Tests/Production/RemainingStockRepaired/**'
+      - 'Tests/Production/RemainingStock/**'
+      - 'Tests/Production/StockVessels/Observation.h'
+      - 'Src/Vessel/Dragonfly/**'
+      - 'Tests/Production/Dragonfly/**'
+      - 'OVP/OGLClient/**'
+      - '.github/workflows/repaired-remaining-stock-diagnostics.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: repaired-remaining-stock-diagnostics-v1-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  repaired_stock_diagnostics:
+    name: Original clock/current diagnostic ${{ matrix.configuration }} ${{ matrix.math_profile }}
+    runs-on: windows-2022
+    timeout-minutes: 90
+    strategy:
+      fail-fast: false
+      matrix:
+        configuration: [Debug, Release]
+        math_profile: [automatic, sse2]
+    env:
+      DXSDK_DIR: '${{ github.workspace }}\DXSDK'
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - uses: ilammy/msvc-dev-cmd@v1
+        with:
+          vsversion: '17.0'
+          arch: x64
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.14'
+      - uses: actions/cache@v6
+        id: dxsdk
+        with:
+          path: '${{ github.workspace }}\DXSDK'
+          key: dxsdk_jun10
+      - name: Prepare existing SDK header dependency
+        if: steps.dxsdk.outputs.cache-hit != 'true'
+        shell: cmd
+        run: |
+          curl --fail -L https://download.microsoft.com/download/a/e/7/ae743f1f-632b-4809-87a9-aa1bb3458e31/DXSDK_Jun10.exe -o DXSDK_Jun10.exe
+          if errorlevel 1 exit /b 1
+          7z x DXSDK_Jun10.exe DXSDK/Include DXSDK/Lib
+          if errorlevel 1 exit /b 1
+      - uses: actions/cache@v6
+        with:
+          path: out/cockpit-cache
+          key: original-cockpit-control-runtime-${{ matrix.configuration }}-${{ hashFiles('Tests/Production/Cockpit/Reference/provenance.json') }}
+      - uses: actions/cache@v6
+        with:
+          path: out/data-cache/Orbiter-x64.zip
+          key: production-data-${{ hashFiles('Tests/Production/stock-data.lock.json') }}
+      - uses: actions/cache@v6
+        with:
+          path: out/planet-cache/Orbiter2016.zip
+          key: production-standard-planets-${{ hashFiles('Tests/Production/standard-planets.lock.json') }}
+      - uses: actions/cache@v6
+        with:
+          path: out/mesa-cache/*.pkg.tar.zst
+          key: mesa-ucrt64-${{ hashFiles('Tests/Production/mesa-ucrt64.lock.json') }}
+      - name: Stage and verify untouched application, SDK, client and data inputs
+        shell: pwsh
+        run: |
+          python -B Tests/Production/prepare_data.py --archive out/data-cache/Orbiter-x64.zip --destination out/production-data
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          python -B Tests/Production/prepare_data.py --lock Tests/Production/standard-planets.lock.json --archive out/planet-cache/Orbiter2016.zip --destination out/standard-planets
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          python -B Tests/Production/stage_mesa.py stage --cache out/mesa-cache --destination out/mesa-runtime
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          python -B Tests/Production/CockpitControls/prepare.py --configuration ${{ matrix.configuration }} --cache out/cockpit-cache --output out/remaining-stock-preserved
+          exit $LASTEXITCODE
+      - name: Build explicit repaired modules and client in a fresh copy while preserving the original
+        run: >-
+          python -B Tests/Production/RemainingStockRepaired/build.py
+          --preserved out/remaining-stock-preserved --output out/remaining-stock-repaired-build
+          --configuration ${{ matrix.configuration }}
+      - name: Verify complete unchanged input selection and resource-history reader controls
+        shell: pwsh
+        run: |
+          python -B Tests/Production/RemainingStockRepaired/RuntimeFiles.Test.py --build out/remaining-stock-repaired-build
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          python -B Tests/Production/RemainingStockRepaired/SourceVariant.Test.py --sources out/remaining-stock-repaired-build/module-sources --output out/remaining-stock-repaired-build/source-variant-controls.json
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          python -B Tests/Production/RemainingStockRepaired/capture.py --verify-inputs
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          python -B Tests/Production/RemainingStock/Resources.Test.py
+          exit $LASTEXITCODE
+      - name: Select original SSE2 CRT when required
+        if: matrix.math_profile == 'sse2'
+        shell: pwsh
+        run: '"ORBITER_TEST_OBSERVER_SSE2=1" >> $env:GITHUB_ENV'
+      - name: Observe complete unchanged PoweredUp and Spin stabilisation scenes twice without altering any original gate
+        run: >-
+          python -B Tests/Production/RemainingStockRepaired/capture.py
+          --executable out/remaining-stock-repaired-build/runtime/Orbiter.exe --data out/production-data
+          --planets out/standard-planets --mesa out/mesa-runtime
+          --configuration ${{ matrix.configuration }} --math-profile ${{ matrix.math_profile }}
+          --output out/remaining-stock-repaired
+          --diagnostic-case remaining_stock_010 --diagnostic-case remaining_stock_014
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: repaired-clock-current-diagnostic-v1-${{ matrix.configuration }}-${{ matrix.math_profile }}
+          retention-days: 90
+          path: |
+            out/remaining-stock-repaired/capture.json
+            out/remaining-stock-repaired/*/*.csv
+            out/remaining-stock-repaired/*/*.rgba
+            out/remaining-stock-repaired/*/*.png
+            out/remaining-stock-repaired/*/*.json
+            out/remaining-stock-repaired/*/*.txt
+            out/remaining-stock-repaired/*/*.log
+            out/remaining-stock-repaired/*/Scenarios/**/*.scn
+            out/remaining-stock-repaired/*/Flights/**/*
+            out/remaining-stock-repaired/*/Orbiter.cfg
+            out/remaining-stock-repaired/*/Meshes/Dragonfly/Dragonfly.msh
+            out/remaining-stock-repaired-build/build.json
+            out/remaining-stock-repaired-build/runtime-file-controls.json
+            out/remaining-stock-repaired-build/source-variant-controls.json
+            out/remaining-stock-repaired-build/*.log
+            out/remaining-stock-repaired-build/module-sources/**
+            out/remaining-stock-repaired-build/observer/**
+            out/remaining-stock-repaired-build/cmake/CMakeCache.txt
+            out/remaining-stock-repaired-build/cmake/compile_commands.json
+            out/remaining-stock-repaired-build/cmake/import-only/**
+            out/remaining-stock-repaired-build/runtime/test-runtime.json
+            out/remaining-stock-repaired-build/runtime/control-reference-runtime.json
+            out/remaining-stock-repaired-build/runtime/runtime-variant.json
+            out/remaining-stock-repaired-build/runtime/Modules/Atlantis_Tank.*
+            out/remaining-stock-repaired-build/runtime/Modules/Dragonfly.*
+            out/remaining-stock-repaired-build/runtime/Modules/Plugin/OGLClient.*
+            out/remaining-stock-repaired-build/runtime/Modules/Plugin/ProductionCockpitDriver.*
+            out/remaining-stock-repaired-build/runtime/Modules/OGLClient/**

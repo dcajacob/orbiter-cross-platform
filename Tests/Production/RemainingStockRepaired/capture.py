@@ -38,6 +38,14 @@ def settings():
                 capture_tick=protocol['capture_tick'])
 
 
+def selected_cases(config,requested):
+    if requested is None:return config['cases']
+    require(requested and len(requested)==len(set(requested)),'Unique nonempty diagnostic case selection required')
+    selected=[case for case in config['cases'] if case['id'] in set(requested)]
+    require({case['id'] for case in selected}==set(requested),'Unknown repaired diagnostic case')
+    return selected
+
+
 def inspect_artifacts(out,case,config):
     require(not (out/'stock-vessel-failure.txt').exists(),'Repaired SDK detail observer reported a failure')
     require((out/'stock-vessel-complete.txt').read_text().strip()==str(config['frames']),
@@ -64,6 +72,10 @@ def inspect_artifacts(out,case,config):
             variant['original_application_and_sdk_source']==config['application_source'] and
             variant['frames']==config['frames'] and variant['fixed_step']==config['fixed_step'] and
             variant['capture_tick']==config['capture_tick'],'Executed reference variant differs')
+    require(isinstance(variant['diagnostic_only'],bool) and case['id'] in variant['cases_requested'] and
+            variant['cases_requested']==[item['id'] for item in selected_cases(config,variant['cases_requested'])] and
+            (variant['diagnostic_only'] or variant['cases_requested']==[item['id'] for item in config['cases']]),
+            'Executed complete-scene diagnostic/full-reference scope differs')
     require(len((out/'scene.rgba').read_bytes())==1280*720*4,'Repaired framebuffer incomplete')
     data_files=data_inputs.validate(json.loads((out/'actual-data-inputs.json').read_text()))
     summary=json.loads((out/'scene-summary.json').read_text())
@@ -90,7 +102,8 @@ def inspect_artifacts(out,case,config):
 
 def source_files():
     paths={*shared.source_files(),*(p for p in HERE.iterdir() if p.is_file()),
-           ROOT/'.github/workflows/repaired-remaining-stock.yml'}
+           ROOT/'.github/workflows/repaired-remaining-stock.yml',
+           ROOT/'.github/workflows/repaired-remaining-stock-diagnostics.yml'}
     for module in list(sys.modules.values()):
         name=getattr(module,'__file__',None)
         if name:
@@ -102,6 +115,7 @@ def source_files():
 def capture(a):
     require(sys.platform=='win32','Repaired original observations require native Windows')
     config=settings();require(not a.output.exists(),'Fresh repaired capture required; replacement forbidden')
+    cases=selected_cases(config,a.diagnostic_case);diagnostic=a.diagnostic_case is not None
     require((os.environ.get('ORBITER_TEST_OBSERVER_SSE2')=='1')==(a.math_profile=='sse2'),'Requested CRT profile differs')
     os.environ.update(LIBGL_ALWAYS_SOFTWARE='true',GALLIUM_DRIVER='llvmpipe')
     root=a.executable.parent
@@ -129,18 +143,20 @@ def capture(a):
         original_application_and_sdk_source=config['application_source'],producer_commit=producer,
         runtime_variant_manifest_sha256=sha(root/'runtime-variant.json'),frames=config['frames'],
         fixed_step=config['fixed_step'],capture_tick=config['capture_tick'])
+    variant.update(diagnostic_only=diagnostic,cases_requested=[case['id'] for case in cases])
     report=dict(status='running',host='repaired-original-windows',protocol=config['protocol'],producer_commit=producer,
         original_application_and_sdk_source=config['application_source'],configuration=a.configuration,math_profile=a.math_profile,
         protocol_sha256_lf=sha_lf(HERE/'protocol.json'),settings_sha256_lf=sha_lf(shared.CASE_FILE),
         source_sha256_lf=sources,source_raw_sha256=raw_sources,runtime_variant_manifest_sha256=sha(root/'runtime-variant.json'),
         actual_original_simulation_data=original_data,
+        diagnostic_only=diagnostic,cases_requested=[case['id'] for case in cases],
         runtime_files_sha256=protected,observer_sha256=protected[OBSERVER],cases={},failures={},
         native_admission_qualified=False,phase6_complete=False)
     manifest=a.output/'capture.json'
     def save():manifest.write_text(json.dumps(report,indent=2)+'\n')
     save()
     try:
-        for case in config['cases']:
+        for case in cases:
             paths=[];runs=[]
             try:
                 for repeat in (1,2):
@@ -185,9 +201,10 @@ def capture(a):
         require(all(sha(root/name)==value for name,value in protected.items()),'Runtime variant changed during capture')
         require(raw_sources=={p.relative_to(ROOT).as_posix():sha(p) for p in source_files()},'Raw observer source changed during capture')
         require(data_inputs.inspect(a.data,a.planets)==original_data,'Original simulation data changed during capture')
+        complete=len(report['cases'])==len(cases) and not report['failures']
         report.update(runtime_variant_unchanged=True,observer_sources_unchanged=True,actual_original_simulation_data_unchanged=True,
-            status='captured-awaiting-independent-audit' if len(report['cases'])==38 and not report['failures'] else 'incomplete')
-        require(report['status']=='captured-awaiting-independent-audit','Repaired full capture incomplete; no native admission')
+            status=('captured-diagnostic-only' if diagnostic else 'captured-awaiting-independent-audit') if complete else 'incomplete')
+        require(complete,'Repaired complete-scene capture incomplete; no native admission')
     finally:save()
 
 
@@ -195,9 +212,13 @@ def main():
     p=argparse.ArgumentParser(description=__doc__);p.add_argument('--verify-inputs',action='store_true')
     for name in ('executable','data','planets','mesa','output'):p.add_argument('--'+name,type=lambda v:Path(v).resolve())
     p.add_argument('--configuration',choices=('Debug','Release'));p.add_argument('--math-profile',choices=('automatic','sse2'))
+    p.add_argument('--diagnostic-case',action='append',help='Run selected complete scenes with an explicit diagnostic-only marker; never eligible for full-reference acceptance')
     a=p.parse_args()
     if a.verify_inputs:
-        config=settings();print('Verified all 38 unchanged scenes with separately versioned 960-tick/64-Hz protocol and unchanged budgets');return
+        config=settings();chosen=selected_cases(config,a.diagnostic_case)
+        print('Verified all 38 unchanged scene inputs with separately versioned 960-tick/64-Hz protocol and unchanged budgets')
+        if a.diagnostic_case is not None:print('Diagnostic-only complete-scene selection:',','.join(case['id'] for case in chosen))
+        return
     require(all(getattr(a,name) is not None for name in ('executable','data','planets','mesa','output','configuration','math_profile')),
             'All repaired capture arguments required')
     capture(a)

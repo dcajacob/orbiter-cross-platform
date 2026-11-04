@@ -65,7 +65,8 @@ def main():
     paths.update(('LICENSE','Extern/imgui/imconfig.h','Tests/Production/phase3-extraction.lock.json',
                   'Tests/Production/Client/pe_symbols.py','Tests/Production/StockVessels/Observation.h',
                   'Tests/Production/ApplicationObservation.h','Tests/Production/production-source.lock.json',
-                  '.github/workflows/repaired-remaining-stock.yml'))
+                  '.github/workflows/repaired-remaining-stock.yml',
+                  '.github/workflows/repaired-remaining-stock-diagnostics.yml'))
     require({str(path.relative_to(ROOT).as_posix()) for path in HERE.iterdir() if path.is_file()}<=paths,
             'Builder has uncommitted inputs')
     sources={name:sha_lf(ROOT/name) for name in sorted(paths)}

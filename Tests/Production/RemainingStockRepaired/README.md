@@ -25,6 +25,23 @@ warp changes at different physical ticks. Existing failed clock/repeat captures
 remain failures; a matched capture protocol still needs its own evidence and
 explicit versioning before it can replace any reference.
 
+The separate `Windows Complete-Scene Clock and Initial-Current Diagnostics`
+workflow runs complete unchanged PoweredUp and Spin stabilisation scenes twice
+in all four Windows profiles, independently of the longer 38-scene campaign.
+`capture.py --diagnostic-case` verifies the full frozen 38-scene input inventory
+before selecting complete scenes. It records `diagnostic_only: true` and the
+requested case IDs in both the campaign and each executed reference variant.
+Even a successful selection has status `captured-diagnostic-only`; the independent
+full-reference auditor explicitly rejects it. Unknown or duplicate selectors
+fail. With no diagnostic selector, all 38 scenes remain required.
+
+Every original fixed-step, finalized-frame, repeat and input gate still runs in
+the diagnostic workflow. A system-time script reaching warp and failing the old
+frame gate remains a failing diagnostic, with its raw clock/state/log evidence
+uploaded. The separate workflow provides earlier owning evidence for the clock
+and initialization investigation; it creates no accepted reference or native
+class admission. Both workflow files are immutable build/capture source inputs.
+
 The original v2 campaign at `da11decc84db1211bd2efc016594880f8d5cc269`, workflow
 [41752276001](https://github.com/dcajacob/orbiter-cross-platform/actions/runs/41752276001),
 failed in all four profiles. Its exact ZIPs and decoded members remain under
