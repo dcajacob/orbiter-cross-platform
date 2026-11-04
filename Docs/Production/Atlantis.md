@@ -171,3 +171,15 @@ and the same ImPlot pin lives in the dedicated native Atlantis lock, which the
 native SDK source fingerprint includes. Frozen reference provenance, binaries,
 captures and comparison budgets remain unchanged. Fresh hosted checks are required
 after this lock-layout correction.
+
+The fresh corrected-lock package at
+`5e1ff0625e011eddcc642789164c494af081cc18` repeats all three real lifetime
+cases successfully. `out/phase6-atlantis-tank-lifetime-v6/verification.json`
+records 180 presentations, three clean graphics-context deletions, 506 guarded
+source/dependency inputs, 1,102 unchanged assets and the immutable 20-file observer
+source closure. Callback clocks are checked at every quarter-second boundary.
+The frozen Windows cockpit metadata/source audit also passes again without
+changing its provenance or comparison budgets. The independent earlier lifetime
+audit is `out/phase6-atlantis-lifetime-audit-v1.json`; it explicitly records the
+unqualified KSC trajectory's extreme position/speed magnitudes alongside the
+successful memory-lifetime observations.
