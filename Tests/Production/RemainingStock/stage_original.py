@@ -5,7 +5,7 @@ import subprocess
 
 from behavior_suite import link_or_copy
 from mesa_runtime import require,digest
-from inputs import ROOT,recordings,stage_recordings,argument
+from inputs import ROOT,recordings,stage_recordings,stage_delivery_repairs,argument
 
 
 def run(executable,data,planets,directory,config,case,configure):
@@ -30,15 +30,17 @@ def run(executable,data,planets,directory,config,case,configure):
     (directory/'Orbiter.cfg').write_text(cfg+'\nVesselCollision = FALSE\nBaseCollision = TRUE\nUnlimitedFuel = FALSE\n',encoding='ascii')
     stage_recordings(directory,case,config)
     configure(directory)
+    preserved=json.loads((executable.parent/'test-runtime.json').read_text())['files']
+    repairs=stage_delivery_repairs(directory,config,preserved)
     argv=[str(directory/executable.name),argument(case),f"--fixedstep={config['fixed_step']:.17g}",f"--maxframes={config['frames']}"]
     inputs={p.relative_to(directory).as_posix():digest(p) for name in ('Config','Meshes','Scenarios','Flights')
             for p in (directory/name).rglob('*') if p.is_file()}
     for name in recordings(case,config):require(name in inputs,'Staged recording missing before original execution')
-    preserved=json.loads((executable.parent/'test-runtime.json').read_text())['files']
     expected_inputs={name:value for name,value in preserved.items() if name.startswith(('Config/','Meshes/'))}
     require(all(inputs[name]==value for name,value in expected_inputs.items()),'Preserved input files differ before execution')
     (directory/'invocation.json').write_text(json.dumps(dict(argv=argv,case=case,scenario_entry_point=case['scenario_entry_point'],
-        input_sha256=inputs,preserved_inputs_sha256=expected_inputs,data_profiles={name:digest(ROOT/'Tests/Production'/name) for name in ('stock-data.lock.json','standard-planets.lock.json')},
+        input_sha256=inputs,preserved_inputs_sha256=expected_inputs,delivery_repairs=repairs,
+        data_profiles={name:digest(ROOT/'Tests/Production'/name) for name in ('stock-data.lock.json','standard-planets.lock.json')},
         driver_sha256=digest(directory/'Modules/Plugin/ProductionCockpitDriver.dll')),indent=2)+'\n')
     with (directory/'console.txt').open('w') as console:
         process=subprocess.run(argv,cwd=directory,stdout=console,stderr=subprocess.STDOUT,timeout=240)

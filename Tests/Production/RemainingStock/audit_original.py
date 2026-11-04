@@ -117,13 +117,17 @@ def audit_profile(root,profile,config,producer,preserved):
     controls=json.loads((capture/'gate-control.json').read_text())
     names={'missing_background_vessel','missing_thruster','missing_tank','unknown_tank_owner','missing_attachment',
         'missing_mesh_slot','false_initial_playback','missing_position_recording','wrong_windows_entry_point',
-        'changed_class_input','shifted_clock','missing_population_tick'}
+        'changed_class_input','shifted_clock','missing_population_tick','missing_mesh_delivery_repair',
+        'changed_mesh_delivery_provenance','live_resource_marked_retired','retired_resource_marked_live',
+        'forged_retired_resource_seen_tick','missing_retired_resource_witness'}
     require(controls['status']=='passed' and controls['original_capture_unchanged'] and
-        len(controls['controls'])==12 and {row['control'] for row in controls['controls']}==names,'Original detail controls incomplete')
+        len(controls['controls'])==18 and {row['control'] for row in controls['controls']}==names,'Original detail controls incomplete')
     gate=subprocess.check_output(['git','-C',str(ROOT),'show',producer+':'+HERE.relative_to(ROOT).as_posix()+'/Gate.Test.py']).replace(b'\r\n',b'\n')
     require(controls['source_sha256'] in {hashlib.sha256(gate).hexdigest(),hashlib.sha256(gate.replace(b'\n',b'\r\n')).hexdigest()},'Original control producer differs')
     require(controls['positive']==original.inspect_artifacts(capture/'remaining_stock_003-1',config['cases'][2],config),
             'Original control positive capture differs')
+    require(controls['retired_positive']==original.inspect_artifacts(capture/'remaining_stock_001-1',config['cases'][0],config) and
+            controls['retired_positive']['retired_resource_bindings']>0,'Original retired-resource control positive differs')
     return dict(capture_sha256=digest(capture/'capture.json'),observer_sha256=digest(observer),actual_math=next(iter(maths)),
         runtime_metadata_sha256_lf=sha_lf(runtime/'test-runtime.json'),client_metadata_sha256_lf=sha_lf(runtime/'control-reference-runtime.json'),
         source_manifest_sha256=hashlib.sha256(json.dumps(source,sort_keys=True).encode()).hexdigest(),
@@ -131,7 +135,8 @@ def audit_profile(root,profile,config,producer,preserved):
 
 
 def detail_calibration(left,right):
-    identities={'tick','object','index','to_parent','id','attached','resource_object','resource_index','present','template','name','visibility','playback','count'}
+    identities={'tick','object','index','to_parent','id','attached','resource_object','resource_index','resource_state',
+                'resource_id','resource_seen_tick','present','template','name','visibility','playback','count'}
     maxima={}
     for name in original.TRACES[2:]:
         a=original.rows(left/name);b=original.rows(right/name)
@@ -193,6 +198,9 @@ def main():
             all_vessel_rows=sum(r['all_vessel_rows'] for r in runs),docking_rows=sum(r['docking_rows'] for r in runs),
             attachment_rows=sum(r['attachment_rows'] for r in runs),thruster_rows=sum(r['thruster_rows'] for r in runs),
             propellant_rows=sum(r['propellant_rows'] for r in runs),mesh_rows=sum(r['mesh_rows'] for r in runs))
+        result.update(retired_resource_bindings=sum(r['retired_resource_bindings'] for r in runs),
+            retired_resource_nonzero_levels=sum(r['retired_resource_nonzero_levels'] for r in runs),
+            retired_resource_scope='Inherited original sampled handle-lifetime evidence; no native lifetime waiver or admission')
     except BaseException as error:result['error']=str(error);raise
     finally:a.output.parent.mkdir(parents=True,exist_ok=True);a.output.write_text(json.dumps(result,indent=2)+'\n')
     print(json.dumps({key:result[key] for key in ('status','processes','presentations','all_vessel_rows','attachment_rows','thruster_rows')}))

@@ -25,14 +25,30 @@ The observer records all actual vessels at every finalized tick, including
 vessels generated during initialization or subsequent staging. Declared objects
 must be present initially. Every actual public docking port, parent and child
 attachment, individual thruster, propellant resource, mesh slot and playback flag
-is recorded. Shared external tank handles resolve to the owning actual vessel and
-resource index. Deleted mesh slots remain explicit; the renderer must identify
+is recorded. Live shared external tank handles resolve to the owning actual vessel
+and resource index. Protocol v2 also assigns deterministic sampled resource IDs
+and records `none`, `live`, or `retired` for every thruster resource. A retired
+handle must have a prior public ownership witness and its exact last observed
+tick; it is never dereferenced. Unknown handles, forged ownership/history and
+reused sample IDs fail validation. This records inherited original behavior and
+does not waive a native resource-lifetime gate. Deleted mesh slots remain explicit; the renderer must identify
 every present physics mesh at the captured frame, with matching object classes.
 No focus-only or simplified scene can satisfy this protocol.
 
 The capture protects all preserved application/SDK/client bytes, raw staged
 configuration/mesh inputs, actual observer/DLL identities and producer sources.
-`Gate.Test.py` rejects twelve damaged copies of a real complete launch stack.
+The preserved package stages Dragonfly's mesh at `Meshes/Dragonfly.msh`, while
+the original module and original CMake install rule use
+`Meshes/Dragonfly/Dragonfly.msh`. The v2 delivery manifest pins that rule and source
+bytes, adds an exact copy at the installed path, retains every preserved file,
+and carries the copy and provenance in each artifact. No application, SDK,
+module, mesh content, scenario, clock or numerical budget is changed.
+
+`Gate.Test.py` rejects eighteen damaged copies of two real complete scenes,
+including actual retired-resource history and repaired mesh delivery.
+`Resources.Test.py` separately checks the reader with two small synthetic
+positive histories and eleven damaged histories; these controls create no
+runtime/reference evidence.
 `audit_original.py` binds every decoded member to all four exact downloaded ZIPs,
 rechecks independently retained SDK/client packages, actual MSVC source/config/CRT,
 loaded modules, repeats and paired state/camera/full-frame budgets. Extra per-
@@ -40,7 +56,17 @@ thruster/tank/attachment/mesh numeric differences are reported as calibration;
 these new fields do not create or relax an existing numerical tolerance or
 establish native parity.
 
-Measurements and independent audit are pending. No observations lock is created
+The first attempt at producer `ec7c0e6e5ccd09bcccbaf1ab1a4700ce6af1c498`,
+workflow [41748228383](https://github.com/dcajacob/orbiter-cross-platform/actions/runs/41748228383),
+failed identically in all four profiles: 27 scenes captured twice, six observer
+rejections after an Atlantis external tank left the physical population, and five
+Dragonfly missing-mesh crashes before the first simulation tick. All four exact
+ZIPs, every decoded member and producer sources are retained and rehashed in
+`out/phase6-remaining-stock-original-failed-v1`; the local audit is
+`out/phase6-remaining-stock-original-failure-audit-v1.json`. These failures remain
+failed evidence. Protocol v2 measures their causes explicitly.
+
+Fresh v2 measurements and independent audit are pending. No observations lock is created
 or refreshed automatically. Use fresh outputs and never rebuild accepted
 applications, SDK packages or native packages to obtain a different reference.
 

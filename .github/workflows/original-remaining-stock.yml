@@ -7,7 +7,7 @@ on:
 permissions:
   contents: read
 concurrency:
-  group: original-remaining-stock-v1-${{ github.ref }}
+  group: original-remaining-stock-v2-${{ github.ref }}
   cancel-in-progress: false
 jobs:
   original_remaining_stock:
@@ -64,6 +64,8 @@ jobs:
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           cmake --build out/remaining-stock-driver --parallel 2
           exit $LASTEXITCODE
+      - name: Check sampled resource-history reader controls
+        run: python -B Tests/Production/RemainingStock/Resources.Test.py
       - name: Select original SSE2 CRT when required
         if: matrix.math_profile == 'sse2'
         shell: pwsh
@@ -79,6 +81,7 @@ jobs:
         run: >-
           python -B Tests/Production/RemainingStock/Gate.Test.py
           --capture out/remaining-stock-original/remaining_stock_003-1
+          --retired-capture out/remaining-stock-original/remaining_stock_001-1
           --output out/remaining-stock-original/gate-control.json
       - uses: actions/upload-artifact@v7
         if: always()
@@ -97,6 +100,7 @@ jobs:
             out/remaining-stock-original/*/Scenarios/**/*.scn
             out/remaining-stock-original/*/Flights/**/*
             out/remaining-stock-original/*/Orbiter.cfg
+            out/remaining-stock-original/*/Meshes/Dragonfly/Dragonfly.msh
             out/remaining-stock-original-runtime/control-reference-runtime.json
             out/remaining-stock-original-runtime/test-runtime.json
             out/remaining-stock-original-runtime/Modules/Plugin/ProductionCockpitDriver.dll

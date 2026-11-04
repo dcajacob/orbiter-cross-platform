@@ -8,11 +8,14 @@
 namespace remaining_stock {
 struct Details {
     std::ofstream population,propellants,thrusters,attachments,playback,meshes;
+    struct Resource {std::string object;unsigned index,id,lastTick;};
+    std::map<PROPELLANT_HANDLE,Resource> history;
+    unsigned nextResource=0;
     void open() {
         using stock_vessels::open;
         open(population,"stock-population.csv","tick,count");
-        open(propellants,"stock-vessel-propellants.csv","tick,object,index,mass,max_mass,efficiency");
-        open(thrusters,"stock-vessel-thrusters.csv","tick,object,index,x,y,z,dx,dy,dz,max_thrust,isp0,level,resource_object,resource_index");
+        open(propellants,"stock-vessel-propellants.csv","tick,object,index,resource_id,mass,max_mass,efficiency");
+        open(thrusters,"stock-vessel-thrusters.csv","tick,object,index,x,y,z,dx,dy,dz,max_thrust,isp0,level,resource_state,resource_id,resource_object,resource_index,resource_seen_tick");
         open(attachments,"stock-vessel-attachments.csv","tick,object,to_parent,index,id,x,y,z,dx,dy,dz,rx,ry,rz,attached");
         open(playback,"stock-playback.csv","tick,object,playback");
         open(meshes,"stock-vessel-meshes.csv","tick,object,index,present,template,name,visibility,x,y,z");
@@ -22,15 +25,25 @@ struct Details {
         using stock_vessels::require;
         const auto count=oapiGetVesselCount();
         population<<tick<<','<<count<<'\n';
-        std::map<PROPELLANT_HANDLE,std::pair<std::string,unsigned>> resources;
+        std::map<PROPELLANT_HANDLE,Resource*> resources;
         for(unsigned i=0;i<count;++i) {
             auto* vessel=oapiGetVesselInterface(oapiGetVesselByIndex(i));
             require(vessel!=nullptr,"Remaining stock vessel missing");
             for(unsigned j=0;j<vessel->GetPropellantCount();++j) {
                 auto handle=vessel->GetPropellantHandleByIndex(j);
-                require(handle!=nullptr && resources.emplace(handle,std::make_pair(std::string(vessel->GetName()),j)).second,
-                        "Duplicate or missing public propellant resource");
-                propellants<<tick<<','<<csv(vessel->GetName())<<','<<j<<','<<vessel->GetPropellantMass(handle)
+                require(handle!=nullptr,"Missing public propellant resource");
+                auto found=history.find(handle);
+                // Public handles are opaque. Keep sampled ownership history without
+                // dereferencing a handle after its resource leaves the population.
+                // A changed owner/slot or an observed gap starts a fresh sample ID.
+                if(found==history.end() || found->second.object!=vessel->GetName() ||
+                   found->second.index!=j || found->second.lastTick+1<tick) {
+                    history[handle]=Resource{vessel->GetName(),j,++nextResource,tick};
+                    found=history.find(handle);
+                }
+                found->second.lastTick=tick;
+                require(resources.emplace(handle,&found->second).second,"Duplicate public propellant resource");
+                propellants<<tick<<','<<csv(vessel->GetName())<<','<<j<<','<<found->second.id<<','<<vessel->GetPropellantMass(handle)
                     <<','<<vessel->GetPropellantMaxMass(handle)<<','<<vessel->GetPropellantEfficiency(handle)<<'\n';
             }
         }
@@ -54,9 +67,12 @@ struct Details {
                                   vessel->GetThrusterIsp0(handle),vessel->GetThrusterLevel(handle)})thrusters<<','<<value;
                 auto fuel=vessel->GetThrusterResource(handle);
                 if(fuel) {
-                    auto found=resources.find(fuel);require(found!=resources.end(),"Thruster tank absent from complete public vessel population");
-                    thrusters<<','<<csv(found->second.first.c_str())<<','<<found->second.second;
-                } else thrusters<<",\"\",-1";
+                    auto found=history.find(fuel);
+                    require(found!=history.end(),"Thruster tank has no public ownership witness");
+                    const auto& owner=found->second;
+                    thrusters<<','<<(resources.count(fuel)?"live":"retired")<<','<<owner.id
+                        <<','<<csv(owner.object.c_str())<<','<<owner.index<<','<<owner.lastTick;
+                } else thrusters<<",none,0,\"\",-1,-1";
                 thrusters<<'\n';
             }
             for(bool parent:{false,true}) {

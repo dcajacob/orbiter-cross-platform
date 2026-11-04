@@ -48,6 +48,45 @@ def indexed(out,name,keys,strings):
     return result
 
 
+def inspect_resources(propellants,thrusters):
+    for row in propellants.values():
+        require(float(row['mass'])>=0 and float(row['max_mass'])>=0 and float(row['efficiency'])>=0,
+                'Invalid public propellant resource')
+    histories={}
+    for (tick,name,index),row in propellants.items():
+        identity=row['resource_id']
+        require(str(int(identity))==identity and int(identity)>0,'Invalid sampled public resource ID')
+        history=histories.setdefault(identity,dict(owner=(name,index),ticks=set()))
+        require(history['owner']==(name,index) and int(tick) not in history['ticks'],
+                'Sampled public resource ownership changed or duplicated')
+        history['ticks'].add(int(tick))
+    for history in histories.values():
+        seen=history['ticks']
+        require(seen==set(range(min(seen),max(seen)+1)),'A retired resource sample ID was resurrected')
+    external=0;retired=0;retired_nonzero=0
+    for row in thrusters.values():
+        owner=row['resource_object'];index=row['resource_index'];identity=row['resource_id']
+        kind=row['resource_state'];tick=int(row['tick']);seen=int(row['resource_seen_tick'])
+        if kind=='none':
+            require(not owner and index=='-1' and identity=='0' and seen==-1,'Absent thruster resource has an identity')
+        else:
+            require(kind in ('live','retired') and identity in histories,'Thruster tank has no public ownership witness')
+            history=histories[identity]
+            require(history['owner']==(owner,index),'Thruster resource ownership witness differs')
+            if kind=='live':
+                current=propellants.get((row['tick'],owner,index))
+                require(current is not None and current['resource_id']==identity and seen==tick,
+                        'Live thruster resource absent from the complete actual population')
+                external+=owner!=row['object']
+            else:
+                require(tick not in history['ticks'] and seen<tick and
+                        seen==max((t for t in history['ticks'] if t<tick),default=-1) and seen>=0,
+                        'Retired thruster resource lacks its last prior ownership witness')
+                retired+=1;retired_nonzero+=float(row['level'])!=0
+    return dict(external_tank_bindings=external,retired_resource_bindings=retired,
+                retired_resource_nonzero_levels=retired_nonzero)
+
+
 def inspect_trace(out,case,config):
     recording_count=inspect_inputs(out,case,config)
     state=indexed(out,'stock-vessel-state.csv',('tick','object'),('object','class'))
@@ -71,7 +110,7 @@ def inspect_trace(out,case,config):
                 'Original vessel mass or fuel is invalid')
     docks=indexed(out,'stock-vessel-docks.csv',('tick','object','index'),('object','docked'))
     propellants=indexed(out,'stock-vessel-propellants.csv',('tick','object','index'),('object',))
-    thrusters=indexed(out,'stock-vessel-thrusters.csv',('tick','object','index'),('object','resource_object'))
+    thrusters=indexed(out,'stock-vessel-thrusters.csv',('tick','object','index'),('object','resource_object','resource_state'))
     attachments=indexed(out,'stock-vessel-attachments.csv',('tick','object','to_parent','index'),('object','id','attached'))
     playback=indexed(out,'stock-playback.csv',('tick','object'),('object',))
     meshes=indexed(out,'stock-vessel-meshes.csv',('tick','object','index'),('object','name'))
@@ -89,15 +128,7 @@ def inspect_trace(out,case,config):
         require(row['playback'] in ('0','1'),'Invalid actual playback flag')
         if key[0]=='0':require(row['playback']==('1' if key[1] in case['playback_vessels'] else '0'),
                                'Original requested playback silently fell back or substituted a vessel')
-    for row in propellants.values():
-        require(float(row['mass'])>=0 and float(row['max_mass'])>=0 and float(row['efficiency'])>=0,
-                'Invalid public propellant resource')
-    external=0
-    for row in thrusters.values():
-        owner=row['resource_object'];index=row['resource_index']
-        require((not owner and index=='-1') or (row['tick'],owner,index) in propellants,
-                'Thruster tank absent from the complete actual population')
-        external+=bool(owner and owner!=row['object'])
+    resources=inspect_resources(propellants,thrusters)
     for row in [*docks.values(),*attachments.values()]:
         peer=row.get('docked',row.get('attached'))
         require(not peer or (row['tick'],peer) in state,'Attached/docked peer absent from actual population')
@@ -106,7 +137,7 @@ def inspect_trace(out,case,config):
         observed_classes=sorted({row['class'] for row in state.values()}),finalized_ticks=len(ticks),
         all_vessel_rows=len(state),docking_rows=len(docks),propellant_rows=len(propellants),thruster_rows=len(thrusters),
         attachment_rows=len(attachments),playback_rows=len(playback),mesh_rows=len(meshes),
-        external_tank_bindings=external,recording_files=recording_count)
+        **resources,recording_files=recording_count)
 
 
 def inspect_artifacts(out,case,config):
@@ -139,12 +170,14 @@ def inspect_artifacts(out,case,config):
     names=[*TRACES,'stock-vessel-complete.txt','scene.csv','scene.rgba','camera.csv','renderer-info.json',
         'graphics-lifecycle.json','renderer-modules.txt','invocation.json','mesa-bindings.json','math-profile.txt',
         'console.txt','Orbiter.log','Orbiter.cfg','process-result.json',case['scenario_entry_point'],*recordings(case,config)]
+    names.extend(item['target'] for item in config['delivery_repairs'])
     return dict(result,status='captured',process_returncode=0,actual_math=actual_math,renderer=renderer,
                 files_sha256={name:digest(out/name) for name in names})
 
 
 def source_files():
-    shared_files=('Tests/Production/StockVessels/Observation.h','Tests/Production/StockVessels/original.py',
+    shared_files=('.github/workflows/original-remaining-stock.yml',
+        'Tests/Production/StockVessels/Observation.h','Tests/Production/StockVessels/original.py',
         'Tests/Production/StockScenarios/inventory.py','Tests/Production/behavior_suite.py','Tests/Production/mesa_runtime.py',
         'Tests/Production/Client/run_client.py','Tests/Production/Client/compare_client.py',
         'Tests/Production/Fixtures/Orbiter.cfg','Tests/Production/Cockpit/cases.json','Tests/Production/Cockpit/stage.py',

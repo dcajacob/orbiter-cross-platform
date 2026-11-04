@@ -13,8 +13,8 @@
     "propellant_relative": 1e-08,
     "propellant_absolute_kg": 1e-08
   },
-  "schema": 1,
-  "protocol": "remaining-stock-v1",
+  "schema": 2,
+  "protocol": "remaining-stock-v2",
   "suite": "remaining-stock-modules",
   "automatic_refresh": false,
   "scope": "All 38 unchanged complete locked stock scenes that declare any remaining native module or payload class, every initial vessel and every actual later vessel, SDK state/ports/attachments/thrusters/propellants/playback, full frames and original package identity. Original measurement only; no native admission.",
@@ -714,5 +714,16 @@
     "Flights/Space Shuttle final approach/ISS.pos": "d398953c808ebe139aa986bb2e4977602d599438c12e22dab85439bc9f70067e",
     "Flights/Space Shuttle final approach/system.dat": "c2b223ea001c9e9029f8d5032065c57d1f174a33f7878f955578be5e90eec262"
   },
-  "corpus_lock_sha256": "5f89334ecb213b56b1bda651acbed8c245f874f6d61ae9f7e9fdccfb3da2f11e"
+  "corpus_lock_sha256": "5f89334ecb213b56b1bda651acbed8c245f874f6d61ae9f7e9fdccfb3da2f11e",
+  "delivery_repairs": [
+    {
+      "preserved_source": "Meshes/Dragonfly.msh",
+      "target": "Meshes/Dragonfly/Dragonfly.msh",
+      "source": "Src/Vessel/Dragonfly/Meshes/Dragonfly.msh",
+      "sha256_lf": "c0de2b4bba539e9f0cdcced2c816422aa7571eac809d340299ecd81867d6a77a",
+      "install_rule": "Src/Vessel/Dragonfly/CMakeLists.txt",
+      "install_rule_sha256_lf": "fe5d46c1158fb15281ec60cbd41aff00f3cfcd21a9bc4374f86c2215d44fc64c",
+      "reason": "The preserved build-tree package copies this mesh to Meshes; the original module and install rule require Meshes/Dragonfly. Add an exact byte copy at the original installed path, retaining every preserved file unchanged."
+    }
+  ]
 }

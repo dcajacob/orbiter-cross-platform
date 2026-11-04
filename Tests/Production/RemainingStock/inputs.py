@@ -44,7 +44,7 @@ def settings():
     lock_path=HERE.parent/'production-source.lock.json';lock=json.loads(lock_path.read_text())
     require(digest(lock_path)==value['corpus_lock_sha256'] and lock['scenario_count']==157,
             'Full original stock corpus identity changed')
-    require(value['protocol']=='remaining-stock-v1' and value['automatic_refresh'] is False and len(value['cases'])==38,
+    require(value['schema']==2 and value['protocol']=='remaining-stock-v2' and value['automatic_refresh'] is False and len(value['cases'])==38,
             'Remaining stock scene protocol changed')
     selected=set()
     for entry in lock['scenarios']:
@@ -62,6 +62,14 @@ def settings():
         sources[case['scenario_entry_point']]=case['sha256_lf']
         recordings(case,value)
     for item in value['classes'].values():sources[item['source']]=item['sha256_lf']
+    repairs=value['delivery_repairs']
+    require(len(repairs)==1 and repairs[0]['preserved_source']=='Meshes/Dragonfly.msh' and
+            repairs[0]['target']=='Meshes/Dragonfly/Dragonfly.msh' and
+            repairs[0]['source']=='Src/Vessel/Dragonfly/Meshes/Dragonfly.msh' and
+            repairs[0]['install_rule']=='Src/Vessel/Dragonfly/CMakeLists.txt',
+            'Original mesh delivery repair changed')
+    for item in repairs:
+        sources[item['source']]=item['sha256_lf'];sources[item['install_rule']]=item['install_rule_sha256_lf']
     require(set(value['classes'])=={kind for c in value['cases'] for kind in c['declared_vessels'].values()},
             'Declared class configuration closure incomplete')
     for name,checksum in sources.items():
@@ -96,11 +104,33 @@ def stage_recordings(out,case,config):
         target=out/name;target.parent.mkdir(parents=True,exist_ok=True);shutil.copy2(ROOT/name,target)
 
 
+def stage_delivery_repairs(out,config,preserved):
+    result={}
+    for item in config['delivery_repairs']:
+        source=out/item['preserved_source'];target=out/item['target']
+        require(not target.exists() and digest(source)==preserved[item['preserved_source']] and
+                sha_lf(source)==item['sha256_lf'],'Original mesh delivery repair source differs')
+        target.parent.mkdir(parents=True,exist_ok=True);shutil.copy2(source,target)
+        require(digest(target)==digest(source),'Original mesh delivery copy differs')
+        result[item['target']]=dict(preserved_source=item['preserved_source'],sha256=digest(target),
+            source=item['source'],install_rule=item['install_rule'],install_rule_sha256_lf=item['install_rule_sha256_lf'])
+    return result
+
+
 def inspect_inputs(out,case,config):
     invocation=json.loads((out/'invocation.json').read_text())
     require(invocation['scenario_entry_point']==case['scenario_entry_point'] and
             [v for v in invocation['argv'] if v.startswith('--scenariox=')]==[argument(case)],
             'Actual original Windows entry point changed')
+    repairs=invocation['delivery_repairs']
+    require(set(repairs)=={item['target'] for item in config['delivery_repairs']},'Original mesh delivery repair omitted')
+    for item in config['delivery_repairs']:
+        actual=repairs[item['target']]
+        require(actual==dict(preserved_source=item['preserved_source'],sha256=invocation['preserved_inputs_sha256'][item['preserved_source']],
+            source=item['source'],install_rule=item['install_rule'],install_rule_sha256_lf=item['install_rule_sha256_lf']) and
+            invocation['input_sha256'][item['target']]==actual['sha256']==digest(out/item['target']) and
+            sha_lf(out/item['target'])==item['sha256_lf'],
+            'Original mesh delivery repair bytes or provenance differ')
     for name,checksum in {case['scenario_entry_point']:case['sha256_lf'],**recordings(case,config)}.items():
         require(sha_lf(out/name)==checksum and digest(out/name)==invocation['input_sha256'][name],
                 'Executed scenario or recording changed: '+name)
