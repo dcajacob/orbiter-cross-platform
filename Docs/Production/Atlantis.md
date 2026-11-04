@@ -183,3 +183,18 @@ changing its provenance or comparison budgets. The independent earlier lifetime
 audit is `out/phase6-atlantis-lifetime-audit-v1.json`; it explicitly records the
 unqualified KSC trajectory's extreme position/speed magnitudes alongside the
 successful memory-lifetime observations.
+
+A configuration-only diagnostic at the same `5e1ff062` runtime has isolated a
+cause of the extreme KSC trajectory. With the existing reference's forced
+single-step propagator settings, the tank reaches approximately `6.20e70` metres
+geocentric distance in 15 seconds. Removing only the three propagator overrides
+lets the original production defaults select their integration method and
+substeps: maximum tank distance is about `6.372e6` metres and speed about
+`421.1 m/s` over the same interval. Both runs retain all 60 actual frames, the
+unchanged complete stock scene, identical original algorithms, all 506 owning
+inputs and all assets, and clean sanitizer teardown. Raw inputs and observations
+are in `out/phase6-atlantis-propagation-diagnostic-v1`. This identifies a fixture
+configuration problem; it does not establish complete mission stability or
+Windows/native parity. Existing captures, protocol settings and budgets remain
+untouched. A separately versioned comparison using original production default
+propagation remains required.

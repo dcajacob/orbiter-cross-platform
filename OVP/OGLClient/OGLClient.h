@@ -12,6 +12,9 @@ using visevent_data = std::uintptr_t;
 #include "Shader.h"
 //#include "OGLMesh.h"
 #include <memory>
+#ifdef _WIN32
+#include "WindowsSurfaceDC.h"
+#endif
 
 struct OGLMaterial {
     glm::vec4 diffuse;
@@ -1087,6 +1090,7 @@ private:
 	uint32_t m_width=1280, m_height=720;
 	HDC mDC=nullptr;
 	HGLRC mContext=nullptr;
+	WindowsSurfaceDCs mSurfaceDCs;
 #else
 	uint32_t m_width=1280,m_height=720;
 	GLFWwindow* nativeWindow=nullptr;

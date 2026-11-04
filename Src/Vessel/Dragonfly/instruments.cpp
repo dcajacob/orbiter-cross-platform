@@ -10,6 +10,7 @@
 #include "resource.h"
 #include "orbitersdk.h"
 #include "dragonfly.h"
+#include "WglContext.h"
 
 using std::min;
 
@@ -1041,6 +1042,7 @@ for (i=0;i<16;i++)
 };
 void ADI::InitGL()
 {
+dragonfly::WglContextRestore restore;
 
 GLuint      PixelFormat;  
 BITMAPINFOHEADER BIH;
@@ -1143,6 +1145,9 @@ init=1;		//that's it. If we made it so far, we can use OpenGL
 
 ADI::~ADI()
 {
+if (!init) return;
+dragonfly::WglContextRestore restore;
+restore.Discard(hRC);
 wglMakeCurrent(NULL,NULL);	//standard OpenGL release
 wglDeleteContext(hRC);
 hRC=NULL;
@@ -1292,6 +1297,8 @@ void ADI::MoveBall()
 void ADI::PaintMe()
 {
 	if (!init) InitGL();
+	{
+	dragonfly::WglContextRestore active(hDC2,hRC);
 /*	float temp;
 	float sign;
 	float Pi=acos(-1);
@@ -1334,6 +1341,7 @@ void ADI::PaintMe()
 	glCallList(list_name);	//render
 	glFlush();
 	glFinish();
+	}
 
 HDC hDC=oapiGetDC(parent->surf);
 

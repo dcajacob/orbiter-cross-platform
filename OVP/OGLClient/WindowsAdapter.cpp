@@ -27,9 +27,76 @@
 #include <cstdlib>
 #include <vector>
 
+struct WindowsSurfaceDC {
+    HDC dc=nullptr;
+    HBITMAP bitmap=nullptr;
+    HGDIOBJ previous=nullptr;
+    void* pixels=nullptr;
+    OGLTexture* texture=nullptr;
+    ~WindowsSurfaceDC() {
+        if(dc && previous)SelectObject(dc,previous);
+        if(bitmap)DeleteObject(bitmap);
+        if(dc)DeleteDC(dc);
+        if(texture)texture->Release();
+    }
+};
+void WindowsSurfaceDCDelete::operator()(WindowsSurfaceDC* lease) const {delete lease;}
+
 namespace {
 void require(bool ok,const char *message) { if(!ok) throw std::runtime_error(message); }
+void requireGl(const char* message) {require(glGetError()==GL_NO_ERROR,message);}
 using CreateContext = HGLRC(WINAPI *)(HDC,HGLRC,const int *);
+
+class WglContextScope {
+    HDC previousDC=wglGetCurrentDC();
+    HGLRC previousContext=wglGetCurrentContext();
+public:
+    WglContextScope(HDC dc,HGLRC context) {
+        require(dc && context,"GDI surface requires the live client context");
+        if(previousDC!=dc || previousContext!=context) {
+            if(!wglMakeCurrent(dc,context)) {
+                wglMakeCurrent(previousDC,previousContext);
+                throw std::runtime_error("GDI surface context acquisition failed");
+            }
+        }
+    }
+    ~WglContextScope() {
+        if(wglGetCurrentDC()!=previousDC || wglGetCurrentContext()!=previousContext)
+            wglMakeCurrent(previousDC,previousContext);
+    }
+};
+
+class PixelTransferScope {
+    GLenum bufferTarget,bufferBinding;
+    GLenum parameters[4];
+    GLint values[4]{},texture=0,buffer=0;
+public:
+    explicit PixelTransferScope(bool reading)
+        :bufferTarget(reading?GL_PIXEL_PACK_BUFFER:GL_PIXEL_UNPACK_BUFFER),
+         bufferBinding(reading?GL_PIXEL_PACK_BUFFER_BINDING:GL_PIXEL_UNPACK_BUFFER_BINDING) {
+        const GLenum pack[]={GL_PACK_ALIGNMENT,GL_PACK_ROW_LENGTH,GL_PACK_SKIP_PIXELS,GL_PACK_SKIP_ROWS};
+        const GLenum unpack[]={GL_UNPACK_ALIGNMENT,GL_UNPACK_ROW_LENGTH,GL_UNPACK_SKIP_PIXELS,GL_UNPACK_SKIP_ROWS};
+        glGetIntegerv(GL_TEXTURE_BINDING_2D,&texture);
+        glGetIntegerv(bufferBinding,&buffer);
+        glBindBuffer(bufferTarget,0);
+        for(unsigned i=0;i<4;++i) {
+            parameters[i]=reading?pack[i]:unpack[i];
+            glGetIntegerv(parameters[i],&values[i]);
+            glPixelStorei(parameters[i],i?0:4);
+        }
+    }
+    ~PixelTransferScope() {
+        for(unsigned i=0;i<4;++i)glPixelStorei(parameters[i],values[i]);
+        glBindBuffer(bufferTarget,buffer);
+        glBindTexture(GL_TEXTURE_2D,texture);
+    }
+};
+
+void gdiFailure(const char* message) {
+    oapiWriteLog(const_cast<char*>(message));
+    if(std::ifstream("ogl-evidence.enabled").good())
+        std::ofstream("graphics-errors.txt",std::ios::app)<<message<<'\n';
+}
 }
 
 HWND OGLClient::clbkCreateRenderWindow() {
@@ -74,6 +141,8 @@ HWND OGLClient::clbkCreateRenderWindow() {
 void OGLClient::clbkMakeContextCurrent(bool current) { wglMakeCurrent(current?mDC:nullptr,current?mContext:nullptr); }
 void OGLClient::clbkDestroyRenderWindow(bool fastclose) {
     if(mContext) wglMakeCurrent(mDC,mContext);
+    // Outstanding GDI leases own real surface references and must end first.
+    mSurfaceDCs.clear();
     mScene.reset();mMeshManager.reset();
     if(mResources) {
         OGLPad::GlobalExit();vVessel::GlobalExit();OGLParticleStream::GlobalExit();vStar::GlobalExit();HazeManager::GlobalExit();
@@ -146,4 +215,67 @@ SURFHANDLE OGLClient::clbkCreateSurface(HBITMAP bitmap) {
     auto surface=CreateSurfaceEx(info.bmWidth,info.bmHeight,OAPISURFACE_TEXTURE);
     if(surface && !clbkUpdateSurface(surface,0,0,info.bmWidth,info.bmHeight,pixels.data())){clbkReleaseSurface(surface);return nullptr;}
     return surface;
+}
+
+HDC OGLClient::clbkGetSurfaceDC(SURFHANDLE surface) {
+    if(!surface)return nullptr;
+    try {
+        WglContextScope context(mDC,mContext);
+        require(mSurfaceDCs.find(surface)==mSurfaceDCs.end(),"GDI surface DC is already acquired");
+        auto* texture=static_cast<OGLTexture*>(surface);
+        require(texture->m_Width>0 && texture->m_Height>0,"Invalid GDI surface dimensions");
+        std::unique_ptr<WindowsSurfaceDC,WindowsSurfaceDCDelete> lease(new WindowsSurfaceDC);
+        lease->dc=CreateCompatibleDC(mDC);
+        require(lease->dc!=nullptr,"GDI surface memory DC creation failed");
+        BITMAPINFO info{};
+        info.bmiHeader.biSize=sizeof(BITMAPINFOHEADER);
+        info.bmiHeader.biWidth=texture->m_Width;
+        // Match the existing HBITMAP adapter's top-down BGRA row order.
+        info.bmiHeader.biHeight=-texture->m_Height;
+        info.bmiHeader.biPlanes=1;
+        info.bmiHeader.biBitCount=32;
+        info.bmiHeader.biCompression=BI_RGB;
+        lease->bitmap=CreateDIBSection(lease->dc,&info,DIB_RGB_COLORS,&lease->pixels,nullptr,0);
+        require(lease->bitmap && lease->pixels,"GDI surface DIB creation failed");
+        HGDIOBJ previous=SelectObject(lease->dc,lease->bitmap);
+        require(previous && previous!=HGDI_ERROR,"GDI surface bitmap selection failed");
+        lease->previous=previous;
+        {
+            PixelTransferScope transfer(true);
+            glBindTexture(GL_TEXTURE_2D,texture->m_TexId);
+            glGetTexImage(GL_TEXTURE_2D,0,GL_BGRA,GL_UNSIGNED_BYTE,lease->pixels);
+            requireGl("GDI surface readback failed");
+        }
+        texture->AddRef();lease->texture=texture;
+        HDC dc=lease->dc;
+        mSurfaceDCs.emplace(surface,std::move(lease));
+        return dc;
+    } catch(const std::exception& error) {
+        gdiFailure(error.what());return nullptr;
+    }
+}
+
+void OGLClient::clbkReleaseSurfaceDC(SURFHANDLE surface,HDC dc) {
+    auto found=mSurfaceDCs.find(surface);
+    if(found==mSurfaceDCs.end() || found->second->dc!=dc) {
+        gdiFailure("GDI surface release does not match its acquired DC");return;
+    }
+    try {
+        WglContextScope context(mDC,mContext);
+        auto lease=std::move(found->second);mSurfaceDCs.erase(found);
+        // GDI can batch writes to a DIB. Complete them before CPU/GL access.
+        require(GdiFlush()!=FALSE,"GDI surface flush failed");
+        auto* bytes=static_cast<unsigned char*>(lease->pixels);
+        const size_t pixels=size_t(lease->texture->m_Width)*size_t(lease->texture->m_Height);
+        // GDI RGB drawing does not supply an alpha channel, as with HBITMAP upload.
+        for(size_t i=0;i<pixels;++i)bytes[4*i+3]=255;
+        {
+            PixelTransferScope transfer(false);
+            glBindTexture(GL_TEXTURE_2D,lease->texture->m_TexId);
+            glTexSubImage2D(GL_TEXTURE_2D,0,0,0,lease->texture->m_Width,lease->texture->m_Height,
+                            GL_BGRA,GL_UNSIGNED_BYTE,bytes);
+            requireGl("GDI surface upload failed");
+        }
+        lease.reset();
+    } catch(const std::exception& error) {gdiFailure(error.what());}
 }

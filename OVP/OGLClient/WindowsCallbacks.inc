@@ -12,6 +12,8 @@ bool clbkGetRenderParam(DWORD param,DWORD *value) const override { int v;bool ok
 SURFHANDLE clbkCreateSurfaceEx(DWORD w,DWORD h,DWORD flags) override { return CreateSurfaceEx(int(w),int(h),int(flags)); }
 SURFHANDLE clbkCreateSurface(DWORD w,DWORD h,SURFHANDLE pattern) override { return CreateSurface(int(w),int(h),pattern); }
 SURFHANDLE clbkCreateSurface(HBITMAP bitmap) override;
+HDC clbkGetSurfaceDC(SURFHANDLE surface) override;
+void clbkReleaseSurfaceDC(SURFHANDLE surface,HDC dc) override;
 SURFHANDLE clbkCreateTexture(DWORD w,DWORD h) override { return CreateTexture(int(w),int(h)); }
 bool clbkGetSurfaceSize(SURFHANDLE s,DWORD *w,DWORD *h) override { int a,b;bool ok=GetSurfaceSize(s,&a,&b);if(ok){*w=a;*h=b;}return ok; }
 bool clbkSetSurfaceColourKey(SURFHANDLE s,DWORD key) override { return SetSurfaceColourKey(s,key); }

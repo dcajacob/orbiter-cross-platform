@@ -7,10 +7,12 @@ on:
       - 'OVP/OGLClient/**'
       - 'Src/Orbiter/**'
       - 'Src/Module/LuaScript/**'
+      - 'Src/Vessel/Dragonfly/**'
       - 'Orbitersdk/**'
       - 'Tests/Production/*source.py'
       - 'Tests/Production/phase3-extraction.lock.json'
       - 'Tests/Production/Client/**'
+      - 'Tests/Production/WindowsSurfaceDC/**'
       - 'Tests/Production/Cockpit/**'
       - 'Tests/Production/CockpitControls/**'
       - 'Tests/Production/CockpitUI/**'
@@ -147,6 +149,19 @@ jobs:
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           cmake --build out/cockpit-driver --parallel 2
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - name: Build real Windows surface DC controls against the same SDK
+        shell: pwsh
+        run: |
+          cmake -S Tests/Production/WindowsSurfaceDC -B out/surface-dc-driver -G Ninja -DCMAKE_BUILD_TYPE=${{ matrix.configuration }} -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DORBITER_TEST_RUNTIME="$pwd/out/production-app"
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          cmake --build out/surface-dc-driver --parallel 2
+          exit $LASTEXITCODE
+      - name: Verify actual GDI pixels, GPU blits, context restoration and DC ownership
+        run: >-
+          python -B Tests/Production/WindowsSurfaceDC/run.py --orbiter out/production-app/Orbiter.exe
+          --data out/production-data --planets out/standard-planets --mesa out/mesa-runtime
+          --configuration ${{ matrix.configuration }} --baseline out/client-execution
+          --output out/surface-dc-execution
       - uses: actions/cache@v6
         with:
           path: out/cockpit-cache
@@ -191,6 +206,17 @@ jobs:
             out/client-execution/**/*.log
             out/client-execution/**/*.scn
             out/client-execution/**/Orbiter.cfg
+            out/surface-dc-execution/**/*.csv
+            out/surface-dc-execution/**/*.json
+            out/surface-dc-execution/**/*.png
+            out/surface-dc-execution/**/*.rgba
+            out/surface-dc-execution/**/*.txt
+            out/surface-dc-execution/**/*.log
+            out/surface-dc-execution/**/*.scn
+            out/surface-dc-execution/**/Orbiter.cfg
+            out/surface-dc-driver/CMakeCache.txt
+            out/surface-dc-driver/compile_commands.json
+            out/production-app/Modules/Plugin/ProductionSurfaceDCDriver.dll
             out/cockpit-regression/**/*.csv
             out/cockpit-regression/**/*.json
             out/cockpit-regression/**/*.png

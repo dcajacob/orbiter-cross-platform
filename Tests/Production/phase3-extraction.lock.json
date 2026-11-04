@@ -2102,6 +2102,16 @@
       "original_sha256_lf": null,
       "sha256_lf": "424ec4a6f1d7d74f26c6243bcf98f2b93c6159430d0ce3b87667d5a247d1f7dc",
       "scope": "Exact original ImPlot source archive pin for native Atlantis; separate from the frozen Windows renderer lock, included in the native SDK source fingerprint."
+    },
+    "Src/Vessel/Dragonfly/instruments.cpp": {
+      "original_sha256_lf": "d2ffe3a7edb2a6c71d5f2f7c03e8a4e58d63d75c7413fa3ff8b15d8b45a3e932",
+      "sha256_lf": "d9f03fbbe34672bac6b490debb2842815242ff5f8edc657ed9ad40d993accbd7",
+      "scope": "Original Dragonfly ADI calculations and rendering commands retained exactly; acquire its own WGL context for bitmap rendering, restore its caller at initialization/paint/teardown, and skip deletion when no context was initialized. Native Dragonfly implementation and matched stock qualification remain pending."
+    },
+    "Src/Vessel/Dragonfly/WglContext.h": {
+      "original_sha256_lf": null,
+      "sha256_lf": "913391543b0c6b128c8c9eb7e8f5d6c66e70430509c08d7bca10247bed252945",
+      "scope": "Private Windows WGL context ownership guard for the original Dragonfly ADI; no SDK layout, attitude calculation, GL geometry or physical model change."
     }
   }
 }
