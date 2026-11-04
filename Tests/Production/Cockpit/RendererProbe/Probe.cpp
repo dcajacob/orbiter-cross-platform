@@ -28,6 +28,7 @@ int main(int argc,char** argv){try{
     NativeModule module(std::filesystem::absolute(argv[1]),ORBITER_NATIVE_GRAPHICS,&context);
     auto* client=static_cast<NativeGraphics*>(module.Instance());context.graphics=client;
     constexpr unsigned cycles=20;
+    unsigned obsoleteCopyPixels=0;
     for(unsigned cycle=0;cycle<cycles;++cycle){
     context.evidence=std::filesystem::absolute(argv[4]).parent_path()/("context-"+std::to_string(cycle));
     client->Open();
@@ -87,8 +88,15 @@ int main(int argc,char** argv){try{
     const auto apiCopied=read(target,24,24);
     for(int y=0;y<16;++y) require(std::equal(sourcePixels.begin()+size_t(y)*16*4,sourcePixels.begin()+size_t(y+1)*16*4,
         apiCopied.begin()+size_t(y)*24*4),"Native SDK rectangular surface copy differs from its source");
-    bool obsoleteRejected=false;try{oapiBlt(target,source,0,0,0,0,16,16,0);}catch(const std::runtime_error&){obsoleteRejected=true;}
-    require(obsoleteRejected,"Unsupported obsolete SDK color key silently succeeded");
+    // The original OrbiterAPI.cpp warns once and ignores this obsolete
+    // argument. Use the actual source background as the requested key and a
+    // different destination color so incorrectly applying it is observable.
+    require(client->clbkFillSurface(target,client->clbkGetDeviceColour(250,240,10)),"Obsolete-argument target fill failed");
+    oapiBlt(target,source,0,0,0,0,16,16,client->clbkGetDeviceColour(20,70,130));
+    const auto obsoleteCopied=read(target,24,24);
+    for(int y=0;y<16;++y)require(std::equal(sourcePixels.begin()+size_t(y)*16*4,sourcePixels.begin()+size_t(y+1)*16*4,
+        obsoleteCopied.begin()+size_t(y)*24*4),"Obsolete SDK argument changed original default-copy pixels");
+    obsoleteCopyPixels+=16*16;
     require(client->clbkBlt(target,1,1,target,0,0,16,16),"Overlapping instrument copy failed");
     const auto overlap=read(target,24,24);
     for(int y=0;y<16;++y) require(std::equal(apiCopied.begin()+size_t(y)*24*4,apiCopied.begin()+size_t(y)*24*4+16*4,
@@ -149,7 +157,8 @@ int main(int argc,char** argv){try{
     if(cycle+1!=cycles)continue;
     std::ofstream report(argv[4]);report.exceptions(std::ios::badbit|std::ios::failbit);
     report<<"{\"status\":\"passed\",\"requested_height\":-14,\"character_width\":"<<width<<",\"character_height\":"<<height
-          <<",\"surface_callback_pixels_verified\":true,\"panel_opacity_and_additive_pixels_verified\":true,\"surface_references_verified\":true,\"context_cycles\":"<<cycles<<",\"glyph_pixels\":"<<green<<",\"invalid_surface_rejected\":true,\"gl_error\":0,\"compressed_target_changed_pixels\":"<<changed<<"}\n";
+          <<",\"surface_callback_pixels_verified\":true,\"obsolete_sdk_copy_pixels_verified\":"<<obsoleteCopyPixels
+          <<",\"panel_opacity_and_additive_pixels_verified\":true,\"surface_references_verified\":true,\"context_cycles\":"<<cycles<<",\"glyph_pixels\":"<<green<<",\"invalid_surface_rejected\":true,\"gl_error\":0,\"compressed_target_changed_pixels\":"<<changed<<"}\n";
     std::cout<<"Actual font metrics "<<width<<'x'<<height<<"; green glyph pixels "<<green<<'\n';
     }
     context.graphics=nullptr;BindNativeRenderContext(nullptr);

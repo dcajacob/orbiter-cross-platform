@@ -131,6 +131,43 @@ exercises a real fresh preparation and read-only round trip, then requires
 physical-source and resource-ID provenance damage to fail without rewriting
 either valid or damaged inputs. The fresh build still has to pass that check.
 
+The fresh v6 package at `83c025ecdaf383cc963aa36ec798fdd667023536`
+passes all four build stages with 768 immutable source/dependency inputs and
+68 actual generated compiler inputs verified before and after compilation.
+The real preparation/JSON round trip and both damaged-copy controls pass in
+`out/phase6-dragonfly-prepared-source-controls-v1`.
+
+All five complete unchanged Dragonfly scenes now complete once: 4,800 real
+presentations, five clean graphics teardowns and no ASan/UBSan/LSan findings.
+The external-scene record is `out/phase6-dragonfly-native-smoke-v6`; the four
+cockpit scenes are in `out/phase6-dragonfly-native-cockpits-v1`. Their independent
+post-exit audits are `out/phase6-dragonfly-first-clean-runtime-audit-v1.json` and
+`out/phase6-dragonfly-four-cockpits-audit-v1.json`. The actual instrument control
+also passes all 25,781 pixels and the original obsolete-argument copy during a
+complete unchanged SolarSail scene. All 15 compared state/resource/playback/mesh/
+camera/full-frame/lifecycle files remain byte-identical to the earlier native
+SolarSail capture. No scene or input resource is changed.
+
+The same-process PoweredUp control passes two real 60-frame sessions. The
+loader trace records two actual Dragonfly link-map creations, initializations,
+finalizations and destructions. Both contexts close cleanly, all six compared
+session state/control/camera/full-frame outputs are byte-identical and the
+sanitizers report no findings. The record is
+`out/phase6-dragonfly-inprocess-cycles-v1/verification.json`. This is a separate
+short lifetime control; it does not replace the full-scene repeat requirement.
+
+The hosted renderer probe still expected rejection of the obsolete oapiBlt
+argument. That assertion contradicted the original SDK contract and stopped
+the later Shuttle-A captures. It now requires exact copied pixels with the
+requested key matching the source background and a different destination fill.
+The same updated probe fails the actual old bridge and passes all twenty real
+context cycles on the corrected bridge: 5,120 legacy-copy pixels plus the
+existing glyph, dimension, overlap, reference, opacity and compressed-target
+controls. Both historical runtimes and caller-header identities are retained in
+`out/phase6-legacy-copy-renderer-regression-v1/verification.json`. Hosted
+verification remains pending. CI explicitly installs the GLU development
+dependency required by the original instrument commands.
+
 Fresh repaired execution and unchanged
 Dragonfly scene checks, sanitizer teardown, panel/input and persistence
 checks, repeated sessions and matched four-profile Windows/native state/camera/

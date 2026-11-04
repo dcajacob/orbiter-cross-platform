@@ -29,7 +29,7 @@ jobs:
           fetch-depth: 0
       - name: Install native build and software OpenGL window dependencies
         run: >-
-          sudo apt-get update && sudo apt-get install -y zlib1g-dev libgl1-mesa-dev
+          sudo apt-get update && sudo apt-get install -y zlib1g-dev libgl1-mesa-dev libglu1-mesa-dev
           libxrandr-dev libxinerama-dev libxcursor-dev libxi-dev xvfb mesa-utils libmpfr-dev
       - uses: actions/cache@v6
         with:
