@@ -6,7 +6,7 @@ from camera_source import windows
 from vessel_runtime_source import equal,raw
 ROOT=Path(__file__).resolve().parents[2]
 BASE='f725194209634f7fd5d1d44d426cfa9b5e303e37'
-FILES=('Pane.h','Pane.cpp','Mfd.h','Mfd.cpp','hud.h','hud.cpp','Panel.h',
+FILES=('Pane.h','Pane.cpp','Mfd.h','Mfd.cpp','hud.h','hud.cpp','Panel.h','Panel.cpp',
        'Defpanel.h','Defpanel.cpp','Panel2D.h','Panel2D.cpp','VCockpit.h','VCockpit.cpp',
        'VectorMap.h','VectorMap.cpp','MfdSurface.cpp','Select.h',
        'MfdAlign.h','MfdComms.h','MfdDocking.h','MfdHsi.h','MfdLanding.h','MfdMap.h',
@@ -276,6 +276,18 @@ inline double posangle(double angle) {return orbiter::math::PositiveAngle(angle,
 #include "GraphicsAPI.h"
 namespace oapi {using CockpitClient=GraphicsClient;}
 #endif''',header,'Windows cockpit graphics type identity')
+    legacy_source=subprocess.check_output(['git','-C',str(ROOT),'show',BASE+':Src/Orbiter/OrbiterAPI.cpp']).decode('cp1252').replace('\r\n','\n')
+    delegates=[]
+    for signature in ('void oapiRegisterMFD (int mfd, const MFDSPEC &spec)',
+                      'void oapiRegisterPanelBackground (HBITMAP hBmp, DWORD flag, DWORD ck)',
+                      'void oapiRegisterPanelArea (int id, const RECT &pos, int draw_event, int mouse_event, int bkmode)'):
+        start=legacy_source.index(signature);end=legacy_source.index('\n}',start)+2
+        body=legacy_source[start:end]
+        for before,after in [('g_pane','orbiter::production::CockpitPane()'),('HBITMAP','SURFHANDLE'),('DWORD','oapi::UInt32'),('RECT','oapi::SdkRectangle')]:body=body.replace(before,after)
+        delegates.append(body)
+    actual=raw('Src/Orbiter/Production/NativeLegacyPanelSdk.cpp')
+    actual=actual[actual.index('void oapiRegisterMFD'):]
+    equal('\n\n'.join(delegates)+'\n',actual,'Original legacy MFD/background/area SDK delegates with actual native surface ownership')
     for name in FILES:
         path='Src/Orbiter/'+name
         import re
@@ -285,6 +297,13 @@ namespace oapi {using CockpitClient=GraphicsClient;}
                 raise ValueError('Windows cockpit implementation lacks its explicit service include: '+name)
         original=subprocess.check_output(['git','-C',str(ROOT),'show',BASE+':'+path]).decode('cp1252').replace('\r\n','\n')
         current=view.replace('oapi::CockpitClient','oapi::GraphicsClient')
+        if name in ('Panel.h','Panel.cpp'):
+            # The SDK coordinate is original Windows LONG and explicit native int32.
+            current=current.replace('oapi::SdkCoordinate','LONG')
+            current=current.replace('LONG srcX, LONG srcY, LONG &tgtX, LONG &tgtY',
+                                    'long srcX, long srcY, long &tgtX, long &tgtY')
+            current=current.replace('srcX = (LONG)(srcX*scale)','srcX = (long)(srcX*scale)')
+            current=current.replace('srcY = (LONG)(srcY*scale)','srcY = (long)(srcY*scale)')
         if name=='Panel2D.h':
             observation='\t// Read-only engine observation; no panel state or SDK layout changes.\n\tvoid GetOrigin(double &x, double &y) const { x = x0; y = y0; }\n'
             if current.count(observation)!=1:raise ValueError('Panel origin observation changed')

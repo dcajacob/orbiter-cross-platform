@@ -10,7 +10,11 @@
 #define __PANEL_H
 
 #define STRICT 1
+#ifdef _WIN32
 #include <windows.h>
+#else
+#include "OrbiterSdkDrawingTypes.h"
+#endif
 #include <fstream>
 #include "Production/CockpitGraphics.h"
 
@@ -44,18 +48,22 @@ public:
 	void Display (SURFHANDLE pdds);
 	// map panel to screen
 
-	void Move (LONG dx, LONG dy);
+	void Move (oapi::SdkCoordinate dx, oapi::SdkCoordinate dy);
 	// scrolls panel by the specified amount in x and y
 
-	void Point2Screen (long srcX, long srcY, long &tgtX, long &tgtY) const;
+	void Point2Screen (oapi::SdkCoordinate srcX, oapi::SdkCoordinate srcY, oapi::SdkCoordinate &tgtX, oapi::SdkCoordinate &tgtY) const;
 	// converts point from unscaled panel space to viewport space
 
-	void Area2Screen (const RECT &srcR, RECT &tgtR) const;
+	void Area2Screen (const oapi::SdkRectangle &srcR, oapi::SdkRectangle &tgtR) const;
 	// converts rectangle from unscaled panel space to viewport space
 
-	void DefineBackground (HBITMAP hBmp, DWORD flag, DWORD ck = (DWORD)-1);
+#ifdef _WIN32
+	void DefineBackground (HBITMAP hBmp, oapi::UInt32 flag, oapi::UInt32 ck = (oapi::UInt32)-1);
+#else
+	void DefineBackground (SURFHANDLE bitmap, oapi::UInt32 flag, oapi::UInt32 ck = (oapi::UInt32)-1);
+#endif
 
-	void DefineArea (int aid, const RECT &pos, int draw_mode, int mouse_mode, int bkmode);
+	void DefineArea (int aid, const oapi::SdkRectangle &pos, int draw_mode, int mouse_mode, int bkmode);
 	void ReleaseAreas ();
 
 	SURFHANDLE GetArea (int idx);
@@ -80,7 +88,7 @@ public:
 	inline void MFDSize (int id, int &w, int &h) const
 	{ w = mfd[id].w, h = mfd[id].h; }
 
-	bool ProcessMouse (UINT event, DWORD state, int x, int y);
+	bool ProcessMouse (oapi::UInt event, oapi::UInt32 state, int x, int y);
 
 	void GetMouseState (int &idx, int &state, int &mx, int &my) const;
 	//{ idx = idx_mfocus; state = mstate; mx = mousex, my = mousey; }
@@ -105,24 +113,26 @@ private:
 	oapi::CockpitClient *gc;
 	int id;                     // panel id
 	SURFHANDLE surf;            // drawing surface
-	LONG tgtW, tgtH;            // panel target width, height
-	LONG srcW, srcH;            // panel source width, height
-	LONG X0, Y0;                // coordinates of upper left corner of scaled source rectangle in target space
+	oapi::SdkCoordinate tgtW, tgtH;            // panel target width, height
+	oapi::SdkCoordinate srcW, srcH;            // panel source width, height
+	oapi::SdkCoordinate X0, Y0;                // coordinates of upper left corner of scaled source rectangle in target space
+#ifdef _WIN32
 	HWND cwnd;                  // window handle for mouse position offset calculations
+#endif
 	double scale, iscale;       // panel scaling factor src->tgt and tgt->src
-	RECT tgtRect;               // corners of visible part of target rectangle
-	RECT srcRect;				// visible panel area in source rectangle
+	oapi::SdkRectangle tgtRect;               // corners of visible part of target rectangle
+	oapi::SdkRectangle srcRect;				// visible panel area in source rectangle
 	bool visible;				// panel is visible?
 	bool scaled;                // true if scale != 1
 	bool has_ck;                // flag if color key is used for blitting
-	DWORD ck;                   // color key for blitting
-	DWORD bltflag;              // blitting flag
-	DWORD shiftflag;            // bitflags for shifting modes
+	oapi::UInt32 ck;                   // color key for blitting
+	oapi::UInt32 bltflag;              // blitting flag
+	oapi::UInt32 shiftflag;            // bitflags for shifting modes
 	int connect[4];             // connected panels (left,right,up,down) -1=none
 
 	struct Area {
 		int id;       // area identifier
-		RECT pos;     // area rectangle in source panel
+		oapi::SdkRectangle pos;     // area rectangle in source panel
 		int w, h;     // width, height of area
 		int bltmode;  // blt mode: 0=return black surface, 1=return background, 2=return current panel state
 		int redraw;   // redraw trigger code: 0=no redraw, 1=each frame, 2=on mouseclick in area
@@ -139,9 +149,9 @@ private:
 	struct MFD {
 		bool exist;      // MFD defined for this panel?
 		bool visible;    // MFD currently visible on screen
-		RECT panel_pos;  // full area of MFD in scaled panel
+		oapi::SdkRectangle panel_pos;  // full area of MFD in scaled panel
 		int w, h;        // MFD size in scaled panel
-		RECT src_vis;    // visible part of MFD source rectangle
+		oapi::SdkRectangle src_vis;    // visible part of MFD source rectangle
 		int tgtx, tgty;  // upper left corner of visible part of MFD in screen coords
 	} mfd[MAXMFD];
 };

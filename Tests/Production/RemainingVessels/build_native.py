@@ -35,6 +35,7 @@ def main():
     inputs=set(ledger)|{'OVP/OGLClient/dependencies.lock.json','Tests/Production/dependencies.lock.json',
         'Tests/Production/Licenses/implot-LICENSE','Tests/Production/extraction_source.py',
         'Tests/Production/phase3-extraction.lock.json'}
+    inputs.update(subprocess.check_output(['git','-C',str(ROOT),'ls-tree','-r','--name-only','HEAD','--','OVP/OGLClient'],text=True).splitlines())
     inputs.update(path.relative_to(ROOT).as_posix() for path in HERE.iterdir() if path.is_file())
     for module in list(sys.modules.values()):
         name=getattr(module,'__file__',None)

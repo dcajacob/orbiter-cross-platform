@@ -101,8 +101,8 @@
     },
     "Orbitersdk/include/NativeVesselAPI.h": {
       "original_sha256_lf": null,
-      "sha256_lf": "b95a29983df5f1365e0865366fb7791da639bb275c7e0981e38e4190596f92d3",
-      "scope": "Portable cockpit/ImGui SDK data and original instrument declarations. Exact Windows scalar, callback, class, field order and packing conservation plus native header/layout compilation; runtime instrumentation remains incomplete."
+      "sha256_lf": "c54b7cda1fc41f2fa1a101cc78119c37ae4e90d45a408985539654ea618fd798",
+      "scope": "Original legacy bitmap panel layout, scaling, MFD, mouse and redraw algorithms conserved by cockpit_source.py. Native surface ownership and actual renderer bindings; full Dragonfly drawing/runtime qualification remains pending. Public Windows SDK layout unchanged."
     },
     "Orbitersdk/include/OrbiterAPI.h": {
       "original_sha256_lf": "3425025c178218dce10bf7b8edf296dfe7eda8f171d925aca622a7534735fd31",
@@ -529,18 +529,18 @@
     },
     "Src/Orbiter/Pane.cpp": {
       "original_sha256_lf": "398997e418820aff0d72edd0d977e75182511d3f13a369e0f074182db3f1bdde",
-      "sha256_lf": "5134904387ab4dcc0db9889d6724ad10d71e4142234b79dbb0186b9a0cd82447",
-      "scope": "Private cockpit graphics/configuration binding. Original algorithms and Windows pointer types conserved by cockpit_source.py; native instrumentation is not operational yet."
+      "sha256_lf": "26fbfb3d889ec9856a988fc5e88aecdf27a2a43cb08524525c9b6a53da05cfe0",
+      "scope": "Original legacy bitmap panel layout, scaling, MFD, mouse and redraw algorithms conserved by cockpit_source.py. Native surface ownership and actual renderer bindings; full Dragonfly drawing/runtime qualification remains pending. Public Windows SDK layout unchanged."
     },
     "Src/Orbiter/Pane.h": {
       "original_sha256_lf": "9ea0b381f6a97848c12ac3d08cce898c3b4cdf500338bb21d489236c310fb706",
-      "sha256_lf": "db98e4fd85ed4b2bbd21e81ad51f8854ab88a6960256df64b01544b23d298747",
-      "scope": "Compile all ten original stock instrument implementations with native SDK types. Preserve exact Windows calculations/call order and share panel mouse constants. Native brush/fill/blit callbacks delegate to the shared renderer and are checked by actual pixels across twenty contexts; instrument lifecycle and native DG runtime remain unfinished."
+      "sha256_lf": "5bb7918a0b92eb8b931dc14ea0821a7488266f49e01438df5bd2d139946a5fa6",
+      "scope": "Original legacy bitmap panel layout, scaling, MFD, mouse and redraw algorithms conserved by cockpit_source.py. Native surface ownership and actual renderer bindings; full Dragonfly drawing/runtime qualification remains pending. Public Windows SDK layout unchanged."
     },
     "Src/Orbiter/Panel.h": {
       "original_sha256_lf": "d517f73ee3cf326e944b8ac000fd19a75e1b30ac2a4bac59b0c1d481cadce1c3",
-      "sha256_lf": "bbea866528d96135b24437d701416d7d4c8012e4ade3bffc036edfe3fd78a295",
-      "scope": "Private cockpit graphics binding only. Original algorithms and Windows underlying pointer types conserved by cockpit_source.py; native instrumentation is not operational yet."
+      "sha256_lf": "46718c9fdd8f1a0e81c12d54dd96fec72108b5942e6ddd5add70aade3f2e0e48",
+      "scope": "Original legacy bitmap panel layout, scaling, MFD, mouse and redraw algorithms conserved by cockpit_source.py. Native surface ownership and actual renderer bindings; full Dragonfly drawing/runtime qualification remains pending. Public Windows SDK layout unchanged."
     },
     "Src/Orbiter/Panel2D.h": {
       "original_sha256_lf": "c8a36214609a549f7715a332f2c1a6b66eaf542ff5b0b5646f89cd119a4dff82",
@@ -582,8 +582,8 @@
     },
     "Src/Orbiter/Production/CMakeLists.txt": {
       "original_sha256_lf": null,
-      "sha256_lf": "cb36edfc10e4adbbb92a3e0c52d669697589a970bd5cd69ae1f79a7d23ddb896",
-      "scope": "Original ten stock MFD declarations use exact platform SDK aliases; shared original conic geometry is moved without calculation or screen-mapping changes. Full native instrument runtime remains incomplete."
+      "sha256_lf": "8cbe12f0a989fa739c671e31117417b2316f16765e63307f4d9c03b3e9614dd5",
+      "scope": "Original legacy bitmap panel layout, scaling, MFD, mouse and redraw algorithms conserved by cockpit_source.py. Native surface ownership and actual renderer bindings; full Dragonfly drawing/runtime qualification remains pending. Public Windows SDK layout unchanged."
     },
     "Src/Orbiter/Production/CameraServices.cpp": {
       "original_sha256_lf": null,
@@ -787,8 +787,8 @@
     },
     "Src/Orbiter/Production/NativeGraphics.h": {
       "original_sha256_lf": null,
-      "sha256_lf": "478c44702e939930a63113756fe071d7c2c510bbbc99dc106031db8d6c986336",
-      "scope": "Original scheduler, stock MFDs and modern map compile natively with explicit original epoch/time, authoritative world/UI bindings and indexed map resources. Exact Windows calculations and callback order conserved. Native GDI/legacy map/custom-mode entry points fail explicitly until supported; native cockpit owner and DG runtime remain unfinished."
+      "sha256_lf": "87a3f98813d08193aa30a658ace9dfe6d3b5c6bcbb450f1b2e157f057b3c0227",
+      "scope": "Original legacy bitmap panel layout, scaling, MFD, mouse and redraw algorithms conserved by cockpit_source.py. Native surface ownership and actual renderer bindings; full Dragonfly drawing/runtime qualification remains pending. Public Windows SDK layout unchanged."
     },
     "Src/Orbiter/Production/NativeModule.cpp": {
       "sha256_lf": "d90fc24038e5acf5c20329c08ac433c94fb4603811e7a1fc9aaf38eedb59e82a",
@@ -1306,8 +1306,8 @@
     },
     "Src/Orbiter/Production/NativeCockpit.cmake": {
       "original_sha256_lf": null,
-      "sha256_lf": "bf2d061dc1299e11ceb93b06efce49e8ebbedf2a21dbee283fbcd1eec316a888",
-      "scope": "Original physical/animation/deformation/Lua bodies retained. Actual ASan/LSan defects permit explicit rotor destruction and original shared scratch-cache ownership/cleanup; GNU builds allow real solar-sail module unload with original traversal code unchanged. No public Windows SDK or instance layout change."
+      "sha256_lf": "0ddd6e82b72c9ceb98f34195c8aee6731d2e97bb45468dc8c2079ab6b579a9c5",
+      "scope": "Original legacy bitmap panel layout, scaling, MFD, mouse and redraw algorithms conserved by cockpit_source.py. Native surface ownership and actual renderer bindings; full Dragonfly drawing/runtime qualification remains pending. Public Windows SDK layout unchanged."
     },
     "Src/Orbiter/Production/NativeCockpitGui.cpp": {
       "original_sha256_lf": null,
@@ -2278,6 +2278,21 @@
       "original_sha256_lf": null,
       "scope": "Complete original HST/solar-sail/quadcopter sources, resources and real native factory/platform bindings; physical/animation/Lua calculations conserved; separate diagnostic execution remains unqualified.",
       "sha256_lf": "0b9ba00e4a71b752e9cb0b54a3f3de491b89187126b79522731c086ee498147f"
+    },
+    "Src/Orbiter/Panel.cpp": {
+      "original_sha256_lf": "efcbb61effed7b2059aeae02294937370ac660521c42d8f7f50fe189ce35e427",
+      "sha256_lf": "d219a202ef9c2b72a406f162a658f9f10fd6921719b331cb12137b0568a09bd9",
+      "scope": "Original legacy bitmap panel layout, scaling, MFD, mouse and redraw algorithms conserved by cockpit_source.py. Native surface ownership and actual renderer bindings; full Dragonfly drawing/runtime qualification remains pending. Public Windows SDK layout unchanged."
+    },
+    "OVP/OGLClient/Native/NativeCallbacks.inc": {
+      "original_sha256_lf": null,
+      "sha256_lf": "2ea9fff026dec85f04333b715fddc9876518320261ea8bdbd733d59fdd6790d9",
+      "scope": "Original legacy bitmap panel layout, scaling, MFD, mouse and redraw algorithms conserved by cockpit_source.py. Native surface ownership and actual renderer bindings; full Dragonfly drawing/runtime qualification remains pending. Public Windows SDK layout unchanged."
+    },
+    "Src/Orbiter/Production/NativeLegacyPanelSdk.cpp": {
+      "original_sha256_lf": null,
+      "sha256_lf": "57015f0fb110dca4e12b77600162d657463a84a06733b60f3388a08c3d90666b",
+      "scope": "Original legacy bitmap panel layout, scaling, MFD, mouse and redraw algorithms conserved by cockpit_source.py. Native surface ownership and actual renderer bindings; full Dragonfly drawing/runtime qualification remains pending. Public Windows SDK layout unchanged."
     }
   }
 }

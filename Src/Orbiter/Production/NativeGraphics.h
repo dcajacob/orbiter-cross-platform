@@ -34,7 +34,9 @@ public:
     oapi::Sketchpad* clbkGetSketchpad(SURFHANDLE surface) {return AcquireSketchpad(surface);}
 
     void clbkReleaseSketchpad(oapi::Sketchpad* pad) {ReleaseSketchpadResource(pad);}
+    SURFHANDLE clbkCreateSurface(oapi::UInt32 width,oapi::UInt32 height) {return CreateSurfaceResource(width,height);}
     virtual SURFHANDLE clbkCreateSurfaceEx(oapi::UInt32,oapi::UInt32,oapi::UInt32)=0;
+    virtual bool clbkSetSurfaceColourKey(SURFHANDLE,oapi::UInt32)=0;
     virtual oapi::UInt32 clbkGetDeviceColour(std::uint8_t,std::uint8_t,std::uint8_t)=0;
     virtual bool clbkFillSurface(SURFHANDLE,oapi::UInt32) const=0;
     virtual bool clbkFillSurface(SURFHANDLE,oapi::UInt32,oapi::UInt32,oapi::UInt32,oapi::UInt32,oapi::UInt32) const=0;

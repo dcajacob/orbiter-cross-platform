@@ -1,18 +1,29 @@
 // Copyright (c) Martin Schweiger
 // Licensed under the MIT License
 
+#include "Production/CockpitServices.h"
+#ifdef _WIN32
 #include "Orbiter.h"
+#else
+#include "Production/CockpitNativeSupport.h"
+#endif
 #include "Panel.h"
 #include "Pane.h"
 #include "Vessel.h"
+#ifdef _WIN32
 #include "Texture.h"
+#endif
+#ifdef _WIN32
 #include "Log.h"
+#endif
 
 using namespace std;
 
+#ifdef _WIN32
 extern Orbiter *g_pOrbiter;
 extern Vessel *g_focusobj;
 extern char DBG_MSG[256];
+#endif
 
 // =======================================================================
 // class Panel
@@ -21,7 +32,7 @@ Panel::Panel (int _id, const Pane *_pane, double _scale)
 {
 	int i;
 
-	gc      = g_pOrbiter->GetGraphicsClient();
+	gc      = orbiter::production::CockpitGraphicsClient();
 	id      = _id;
 	pane    = _pane;
 	scale   = _scale;
@@ -30,10 +41,12 @@ Panel::Panel (int _id, const Pane *_pane, double _scale)
 	surf    = NULL;
 	visible = false;
 	has_ck  = false;
+#ifdef _WIN32
 	if (g_pOrbiter->IsFullscreen())
 		cwnd = 0;
 	else
 		cwnd = g_pOrbiter->GetRenderWnd();
+#endif
 	narea   = nareabuf = 0;
 	idx_mfocus = aid_mfocus = mstate = 0;
 
@@ -80,7 +93,7 @@ void Panel::Display (SURFHANDLE pdds)
 	}
 }
 
-void Panel::Move (LONG dx, LONG dy)
+void Panel::Move (oapi::SdkCoordinate dx, oapi::SdkCoordinate dy)
 {
 	// we only allow horizontal shifts if panel is wider than screen
 	if (dx && tgtW > pane->W) {
@@ -88,12 +101,12 @@ void Panel::Move (LONG dx, LONG dy)
 		if (X0 > 0) X0 = 0;
 		if (tgtW+X0 < pane->W) X0 = pane->W-tgtW;
 		tgtRect.left   = 0;
-		tgtRect.right  = min (tgtRect.left+tgtW, (LONG)pane->W);
+		tgtRect.right  = min (tgtRect.left+tgtW, (oapi::SdkCoordinate)pane->W);
 		srcRect.left   = -X0;
 		srcRect.right  = srcRect.left + (tgtRect.right-tgtRect.left);
 		if (scaled) {
-			srcRect.left   = max((LONG)(srcRect.left  *iscale), (LONG)0);
-			srcRect.right  = min((LONG)(srcRect.right * iscale), srcW);
+			srcRect.left   = max((oapi::SdkCoordinate)(srcRect.left  *iscale), (oapi::SdkCoordinate)0);
+			srcRect.right  = min((oapi::SdkCoordinate)(srcRect.right * iscale), srcW);
 		}
 	}
 	if (dy) {
@@ -109,12 +122,12 @@ void Panel::Move (LONG dx, LONG dy)
 		else                                 visible = true;
 
 		tgtRect.top    = (Y0 >= 0 ? Y0 : 0);
-		tgtRect.bottom = min (Y0+tgtH, (LONG)pane->H);
+		tgtRect.bottom = min (Y0+tgtH, (oapi::SdkCoordinate)pane->H);
 		srcRect.top    = tgtRect.top-Y0;
 		srcRect.bottom = min (tgtH, srcRect.top  + (tgtRect.bottom-tgtRect.top));
 		if (scaled) {
-			srcRect.top    = max((LONG)(srcRect.top   *iscale), (LONG)0);
-			srcRect.bottom = min((LONG)(srcRect.bottom* iscale), srcH);
+			srcRect.top    = max((oapi::SdkCoordinate)(srcRect.top   *iscale), (oapi::SdkCoordinate)0);
+			srcRect.bottom = min((oapi::SdkCoordinate)(srcRect.bottom* iscale), srcH);
 		}
 	}
 	MFDMoved();
@@ -137,19 +150,34 @@ void Panel::MFDMoved ()
 	}
 }
 
-void Panel::DefineBackground (HBITMAP hBmp, DWORD flag, DWORD _ck)
+#ifdef _WIN32
+void Panel::DefineBackground (HBITMAP hBmp, oapi::UInt32 flag, oapi::UInt32 _ck)
+#else
+void Panel::DefineBackground (SURFHANDLE hBmp, oapi::UInt32 flag, oapi::UInt32 _ck)
+#endif
 {
 	if (!gc) return;
 
 	//HRESULT res;
+#ifdef _WIN32
 	BITMAP bm;
+#endif
 
 	if (surf) gc->clbkReleaseSurface (surf);
+#ifndef _WIN32
+	surf = NULL;
+#endif
 
 	// bitmap size
+#ifdef _WIN32
     GetObject (hBmp, sizeof(bm), &bm);
     srcW = bm.bmWidth;
 	srcH = bm.bmHeight;
+#else
+	oapi::UInt32 width=0,height=0;
+	if (!gc->clbkGetSurfaceSize(hBmp,&width,&height)) return;
+	srcW=width; srcH=height;
+#endif
 	tgtW = (int)(scale*srcW);
 	tgtH = (int)(scale*srcH);
 
@@ -172,25 +200,29 @@ void Panel::DefineBackground (HBITMAP hBmp, DWORD flag, DWORD _ck)
 	}
 
 	if (!(surf = gc->clbkCreateSurface (srcW, srcH))) return;
+#ifdef _WIN32
 	if (!gc->clbkCopyBitmap (surf, hBmp, 0, 0, 0, 0)) {
+#else
+	if (!gc->clbkBlt (surf, 0, 0, hBmp)) {
+#endif
 		gc->clbkReleaseSurface (surf);
 		surf = NULL;
 		return;
 	}
 
-	X0 = ((LONG)pane->W - tgtW)/2;
+	X0 = ((oapi::SdkCoordinate)pane->W - tgtW)/2;
 
 	if ((shiftflag & 0x0003) == PANEL_ATTACH_BOTTOM) // panel attached to screen bottom
-		Y0 = (LONG)pane->H - tgtH;
+		Y0 = (oapi::SdkCoordinate)pane->H - tgtH;
 	else if ((shiftflag & 0x0003) == PANEL_ATTACH_TOP) // panel attached to screen top
 		Y0 = 0;
 	else // pane either attached to top and bottom or not attached
-		Y0 = ((LONG)pane->H - tgtH)/2;
+		Y0 = ((oapi::SdkCoordinate)pane->H - tgtH)/2;
 
 	tgtRect.left   = (X0 >= 0 ? X0 : 0);
 	tgtRect.top    = (Y0 >= 0 ? Y0 : 0);
-	tgtRect.right  = min (tgtRect.left+tgtW, (LONG)pane->W);
-	tgtRect.bottom = min (tgtRect.top+tgtH, (LONG)pane->H);
+	tgtRect.right  = min (tgtRect.left+tgtW, (oapi::SdkCoordinate)pane->W);
+	tgtRect.bottom = min (tgtRect.top+tgtH, (oapi::SdkCoordinate)pane->H);
 
 	srcRect.left   = tgtRect.left-X0;
     srcRect.top    = tgtRect.top-Y0;
@@ -198,15 +230,15 @@ void Panel::DefineBackground (HBITMAP hBmp, DWORD flag, DWORD _ck)
 	srcRect.bottom = srcRect.top  + (tgtRect.bottom-tgtRect.top);
 
 	if (scaled) {
-		srcRect.left   = max((LONG)(srcRect.left  *iscale), (LONG)0);
-		srcRect.top    = max((LONG)(srcRect.top   *iscale), (LONG)0);
-		srcRect.right  = min((LONG)(srcRect.right * iscale), srcW);
-		srcRect.bottom = min((LONG)(srcRect.bottom* iscale), srcH);
+		srcRect.left   = max((oapi::SdkCoordinate)(srcRect.left  *iscale), (oapi::SdkCoordinate)0);
+		srcRect.top    = max((oapi::SdkCoordinate)(srcRect.top   *iscale), (oapi::SdkCoordinate)0);
+		srcRect.right  = min((oapi::SdkCoordinate)(srcRect.right * iscale), srcW);
+		srcRect.bottom = min((oapi::SdkCoordinate)(srcRect.bottom* iscale), srcH);
 	}
 
 	// define color key for blitting
 	bltflag = 0;
-	if (has_ck = (_ck != (DWORD)-1)) {
+	if (has_ck = (_ck != (oapi::UInt32)-1)) {
 		ck = _ck;
 		//ck.dwColorSpaceLowValue = ck.dwColorSpaceHighValue = _ck;
 		bltflag |= BLT_SRCCOLORKEY;
@@ -215,7 +247,7 @@ void Panel::DefineBackground (HBITMAP hBmp, DWORD flag, DWORD _ck)
 	visible = true;
 }
 
-void Panel::DefineArea (int aid, const RECT &pos, int draw_mode, int mouse_mode, int bkmode)
+void Panel::DefineArea (int aid, const oapi::SdkRectangle &pos, int draw_mode, int mouse_mode, int bkmode)
 {
 	// sanity-checks
 	if (draw_mode == PANEL_REDRAW_NEVER) bkmode = PANEL_MAP_NONE;
@@ -252,7 +284,7 @@ void Panel::DefineArea (int aid, const RECT &pos, int draw_mode, int mouse_mode,
 			area[narea]->bksurf = NULL;
 			area[narea]->bltmode = PANEL_MAP_NONE;
 			if (area[narea]->surf) {
-				RECT &r = area[narea]->pos;
+				oapi::SdkRectangle &r = area[narea]->pos;
 				gc->clbkBlt (area[narea]->surf, 0, 0, surf, r.left, r.top, r.right-r.left, r.bottom-r.top);
 			}
 			break;
@@ -261,7 +293,7 @@ void Panel::DefineArea (int aid, const RECT &pos, int draw_mode, int mouse_mode,
 			if (!(area[narea]->bksurf = gc->clbkCreateSurface (area[narea]->w, area[narea]->h))) {
 				area[narea]->bltmode = PANEL_MAP_NONE;
 			} else {
-				RECT &r = area[narea]->pos;
+				oapi::SdkRectangle &r = area[narea]->pos;
 				gc->clbkBlt (area[narea]->bksurf, 0, 0, surf, r.left, r.top, r.right-r.left, r.bottom-r.top);
 			}
 			break;
@@ -330,7 +362,7 @@ void Panel::SetArea (int idx, SURFHANDLE s)
 void Panel::RedrawArea (int idx, int event)
 {
 	SURFHANDLE s = GetArea(idx);
-	if (g_focusobj->PanelRedrawEvent (area[idx]->id, event, s, 0))
+	if (orbiter::production::CockpitFocus()->PanelRedrawEvent (area[idx]->id, event, s, 0))
 		SetArea (idx, s);
 }
 
@@ -344,7 +376,7 @@ void Panel::RedrawAllAreas (int event)
 
 void Panel::RegisterMFD (int id, const MFDSPEC &spec)
 {
-	RECT &r = mfd[id].panel_pos;
+	oapi::SdkRectangle &r = mfd[id].panel_pos;
 	r = spec.pos;
 	if (scaled) {
 		r.left        = (int)(scale*r.left);
@@ -357,36 +389,36 @@ void Panel::RegisterMFD (int id, const MFDSPEC &spec)
 	mfd[id].exist = true;
 }
 
-void Panel::Point2Screen (long srcX, long srcY, long &tgtX, long &tgtY) const
+void Panel::Point2Screen (oapi::SdkCoordinate srcX, oapi::SdkCoordinate srcY, oapi::SdkCoordinate &tgtX, oapi::SdkCoordinate &tgtY) const
 {
 	if (scaled) {
-		srcX = (long)(srcX*scale);
-		srcY = (long)(srcY*scale);
+		srcX = (oapi::SdkCoordinate)(srcX*scale);
+		srcY = (oapi::SdkCoordinate)(srcY*scale);
 	}
 	tgtX = srcX+X0;
 	tgtY = srcY+Y0;
 }
 
-void Panel::Area2Screen (const RECT &srcR, RECT &tgtR) const
+void Panel::Area2Screen (const oapi::SdkRectangle &srcR, oapi::SdkRectangle &tgtR) const
 {
 	Point2Screen (srcR.left, srcR.top, tgtR.left, tgtR.top);
 	Point2Screen (srcR.right, srcR.bottom, tgtR.right, tgtR.bottom);
 }
 
-bool Panel::ProcessMouse (UINT event, DWORD state, int x, int y)
+bool Panel::ProcessMouse (oapi::UInt event, oapi::UInt32 state, int x, int y)
 {
 	mstate = 0;
 	switch (event) {
-	case WM_LBUTTONDOWN:
+	case orbiter::production::CockpitMouse::LeftDown:
 		state = PANEL_MOUSE_LBDOWN | PANEL_MOUSE_LBPRESSED;
 		break;
-	case WM_RBUTTONDOWN:
+	case orbiter::production::CockpitMouse::RightDown:
 		state = PANEL_MOUSE_RBDOWN | PANEL_MOUSE_RBPRESSED;
 		break;
-	case WM_LBUTTONUP:
+	case orbiter::production::CockpitMouse::LeftUp:
 		state = PANEL_MOUSE_LBUP;
 		break;
-	case WM_RBUTTONUP:
+	case orbiter::production::CockpitMouse::RightUp:
 		state = PANEL_MOUSE_RBUP;
 		break;
 	}
@@ -406,7 +438,7 @@ bool Panel::ProcessMouse (UINT event, DWORD state, int x, int y)
 		mousex = x - area[i]->pos.left;
 		mousey = y - area[i]->pos.top;
 		if (!(mstate = state & area[i]->mouse)) return false;
-		if (g_focusobj->bPlayback() && !(area[i]->mouse & PANEL_MOUSE_ONREPLAY)) {
+		if (orbiter::production::CockpitFocus()->bPlayback() && !(area[i]->mouse & PANEL_MOUSE_ONREPLAY)) {
 			mstate = 0;
 			return false;
 		}
@@ -420,10 +452,14 @@ bool Panel::ProcessMouse (UINT event, DWORD state, int x, int y)
 void Panel::GetMouseState (int &idx, int &state, int &mx, int &my) const
 {
 	if (mstate & PANEL_MOUSE_PRESSED) {
+#ifdef _WIN32
 		POINT pt;
 		GetCursorPos (&pt);
 		if (cwnd) // need to subtract client window offset
 			ScreenToClient (cwnd, &pt);
+#else
+		oapi::SdkPoint pt=orbiter::production::CockpitCursor();
+#endif
 		pt.x -= X0, pt.y -= Y0;
 		if (scaled) pt.x = (int)(pt.x*iscale), pt.y = (int)(pt.y*iscale);
 		mousex = pt.x - area[idx_mfocus]->pos.left;

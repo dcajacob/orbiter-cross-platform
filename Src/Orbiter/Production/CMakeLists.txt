@@ -111,9 +111,9 @@ if(ORBITER_BUILD_NATIVE_COCKPIT)
         ../../Module/LuaScript/Native/CMakeLists.txt ../../Module/LuaScript/Native/UpvalueGuards.cmake
         ../../Module/LuaScript/Native/ScriptExit.c ../../Module/LuaScript/Native/ScriptExit.h
         ../../../Tests/Production/NativeLua/upvalue-source.lock.json
-        NativeCockpit.cmake SystemPlayback.h PlaybackAnnotation.inc GuiMenuButton.inc GuiAnimatedControls.inc GuiOptionControls.inc GuiNotifications.inc NativeJoystick.h CustomCommands.h NativeAnnotations.cpp ScreenAnnotationMethods.inc NativeScript.cpp NativeInterpreterSdk.cpp NativeHelp.cpp ../CockpitSdk.cpp NativeCockpitMfd.cpp NativeCockpitProjection.cpp NativeCockpitGui.cpp ../MenuInfoBar.cpp ../DlgFocus.cpp ../DlgMenuCfg.cpp ../DlgTacc.cpp ../DlgCamera.cpp ../DlgInfo.cpp ../DlgMap.cpp ../DlgOptions.cpp ../DlgFunction.cpp ../DlgRecorder.cpp ../PlaybackEd.cpp NativeCockpitCommands.cpp NativeCockpitVessel.cpp
+        NativeCockpit.cmake SystemPlayback.h PlaybackAnnotation.inc GuiMenuButton.inc GuiAnimatedControls.inc GuiOptionControls.inc GuiNotifications.inc NativeJoystick.h CustomCommands.h NativeAnnotations.cpp ScreenAnnotationMethods.inc NativeScript.cpp NativeInterpreterSdk.cpp NativeHelp.cpp ../CockpitSdk.cpp NativeLegacyPanelSdk.cpp NativeCockpitMfd.cpp NativeCockpitProjection.cpp NativeCockpitGui.cpp ../MenuInfoBar.cpp ../DlgFocus.cpp ../DlgMenuCfg.cpp ../DlgTacc.cpp ../DlgCamera.cpp ../DlgInfo.cpp ../DlgMap.cpp ../DlgOptions.cpp ../DlgFunction.cpp ../DlgRecorder.cpp ../PlaybackEd.cpp NativeCockpitCommands.cpp NativeCockpitVessel.cpp
         CockpitVesselMethods.inc CockpitCameraMethods.inc CockpitPanelMethods.inc CockpitPanelInput.inc CockpitSystemInput.inc NativeCameraMouse.cpp
-        ../Pane.cpp ../hud.cpp ../Defpanel.cpp ../Panel2D.cpp ../VCockpit.cpp ../Select.cpp ../Astro.cpp
+        ../Pane.cpp ../hud.cpp ../Defpanel.cpp ../Panel.cpp ../Panel2D.cpp ../VCockpit.cpp ../Select.cpp ../Astro.cpp
         ../Mfd.cpp ../MfdUser.cpp ../VectorMap.cpp ../MfdOrbit.cpp ../MfdSurface.cpp ../MfdMap.cpp ../MfdHsi.cpp
         ../MfdLanding.cpp ../MfdDocking.cpp ../MfdAlign.cpp ../MfdSync.cpp ../MfdTransfer.cpp ../MfdComms.cpp
         ../../../OVP/OGLClient/dependencies.lock.json

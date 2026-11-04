@@ -228,7 +228,11 @@ public:
 #ifdef _WIN32
 	void RegisterPanelBackground (HBITMAP hBmp, oapi::UInt32 flag, oapi::UInt32 ck);
 #endif
+#ifdef _WIN32
 	void RegisterPanelBackground (SURFHANDLE hSurf, oapi::UInt32 flag);
+#else
+	void RegisterPanelBackground (SURFHANDLE bitmap, oapi::UInt32 flag, oapi::UInt32 colorKey);
+#endif
 	void RegisterPanelArea (int id, const oapi::SdkRectangle &pos, int draw_mode, int mouse_mode, int bkmode);
 	void SetPanelNeighbours (int left, int right, int top, int bottom);
 	void SetVCNeighbours (int left, int right, int top, int bottom);

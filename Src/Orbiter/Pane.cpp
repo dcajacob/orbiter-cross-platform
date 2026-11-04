@@ -10,9 +10,7 @@
 #endif
 #include "Defpanel.h"
 #include "Panel2D.h"
-#ifdef _WIN32
 #include "Panel.h"
-#endif
 #ifdef _WIN32
 #include "MenuInfoBar.h"
 #endif
@@ -144,9 +142,7 @@ Pane::~Pane ()
 #endif
 	if (defpanel) delete defpanel;
 	if (panel2d)  delete panel2d;
-#ifdef _WIN32
 	if (panel)    delete panel;
-#endif
 	if (vcockpit) delete vcockpit;
 	if (hud)      delete hud;
 	if (blinkmesh.mesh2d) oapiDeleteMesh (blinkmesh.mesh2d);
@@ -218,9 +214,7 @@ bool Pane::ProcessMouse_OnRunning (oapi::UInt event, oapi::UInt32 state, oapi::U
 	bool consumed = false;
 	if (defpanel)      consumed = defpanel->ProcessMouse (event, state, x, y);
 	else if (panel2d)  consumed = panel2d->ProcessMouse_OnRunning (event, state, x, y, kstate);
-#ifdef _WIN32
 	else if (panel)    consumed = panel->ProcessMouse (event, state, x, y);
-#endif
 	else if (vcockpit) consumed = vcockpit->ProcessMouse (event, state, x, y);
 	return consumed;
 }
@@ -234,9 +228,7 @@ void Pane::RedrawCockpitAreas (int mode)
 {
 	if (panel2d)       panel2d->RedrawAllAreas (mode);
 	else if (vcockpit) vcockpit->RedrawAllAreas (mode);
-#ifdef _WIN32
 	else if (panel)    panel->RedrawAllAreas (mode);
-#endif
 }
 
 bool Pane::SetPanelMode (int pmode, bool force)
@@ -258,9 +250,7 @@ bool Pane::SetPanelMode (int pmode, bool force)
 	for (i = 0; i < 3; i++) {
 
 		if (defpanel) { delete defpanel; defpanel = 0; }
-#ifdef _WIN32
 		if (panel)    { delete panel;    panel    = 0; }
-#endif
 		if (panel2d)  { delete panel2d;  panel2d  = 0; }
 		if (vcockpit) { delete vcockpit; vcockpit = 0; }
 
@@ -280,7 +270,6 @@ bool Pane::SetPanelMode (int pmode, bool force)
 				delete panel2d;
 				panel2d = 0;
 			}
-#ifdef _WIN32
 			panel = new Panel (0, this, orbiter::production::CockpitConfiguration()->CfgLogicPrm.PanelScale); TRACENEW
 			if (ok = orbiter::production::CockpitFocus()->LoadPanel (0)) {
 				//panel->RedrawAllAreas (PANEL_REDRAW_INIT);
@@ -290,9 +279,6 @@ bool Pane::SetPanelMode (int pmode, bool force)
 				delete panel;
 				panel = 0;
 			}
-#else
-			if (orbiter::production::CockpitFocus()->LoadPanel(0)) throw std::runtime_error("Native legacy bitmap panels are unavailable");
-#endif
 			break;
 		case 3:
 			vcockpit = new VirtualCockpit (0, this); TRACENEW
@@ -338,9 +324,7 @@ int Pane::SelectPanel (int id)
 	}
 
 	if (panel2d) delete panel2d;
-#ifdef _WIN32
 	if (panel) delete panel;
-#endif
 
 	panel2d = new Panel2D (id, this, orbiter::production::CockpitConfiguration()->CfgLogicPrm.PanelScale); TRACENEW
 	if (orbiter::production::CockpitFocus()->LoadPanel2D (id, panel2d)) {
@@ -357,7 +341,6 @@ int Pane::SelectPanel (int id)
 		panel2d = 0;
 	}
 
-#ifdef _WIN32
 	panel = new Panel (id, this, orbiter::production::CockpitConfiguration()->CfgLogicPrm.PanelScale); TRACENEW
 	if (orbiter::production::CockpitFocus()->LoadPanel (id)) {
 		panel->RedrawAllAreas (PANEL_REDRAW_INIT);
@@ -374,10 +357,6 @@ int Pane::SelectPanel (int id)
 		panel = 0;
 		return -1;
 	}
-#else
-	if (orbiter::production::CockpitFocus()->LoadPanel(id)) throw std::runtime_error("Native legacy bitmap panels are unavailable");
-	return -1;
-#endif
 }
 
 int Pane::SelectVC (int id)
@@ -420,12 +399,8 @@ int Pane::SwitchPanel (int dir)
 			id = panel2d->Connect (dir);
 			if (id >= 0) id = SelectPanel (id);
 		} else if (panel) {
-#ifdef _WIN32
 			id = panel->Connect (dir);
 			if (id >= 0) id = SelectPanel (id);
-#else
-		throw std::runtime_error("Native legacy bitmap panels are unavailable");
-#endif
 		}
 		break;
 	case 3:
@@ -451,9 +426,7 @@ void Pane::ShiftPanel (double dx, double dy)
 		if (ix) panel_dx -= ix;
 		if (iy) panel_dy -= iy;
 		if (panel2d) panel2d->Move (ix, iy);
-#ifdef _WIN32
 		else         panel->Move (ix, iy);
-#endif
 	}
 }
 
@@ -658,7 +631,6 @@ void Pane::Update (double simt, double syst)
 			}
 			panel2d->RedrawAllAreas (PANEL_REDRAW_ALWAYS);
 		} else if (panel) { // update other panel instruments
-#ifdef _WIN32
 			int idx, aid, mstate, mx, my;
 			panel->GetMouseState (idx, mstate, mx, my);
 			if (mstate) {
@@ -671,9 +643,6 @@ void Pane::Update (double simt, double syst)
 				panel->SetMouseState (nmstate);
 			}
 			panel->RedrawAllAreas (PANEL_REDRAW_ALWAYS);
-#else
-		throw std::runtime_error("Native legacy bitmap panels are unavailable");
-#endif
 		} else if (vcockpit) {
 			int idx, aid, mstate;
 			Vector vx;
@@ -738,11 +707,7 @@ void Pane::Render ()
 			panel2d->Render ();
 			if (hud) hud->Render ();
 		} else if (panel) {      // legacy panel mode
-#ifdef _WIN32
 			panel->Display (0);
-#else
-		throw std::runtime_error("Native legacy bitmap panels are unavailable");
-#endif
 			if (hud) hud->Render ();
 		} else if (defpanel) {   // generic glass cockpit mode
 			if (hud) hud->Render ();
@@ -772,15 +737,11 @@ void Pane::TriggerRedrawArea (int pid, int vcid, int area_id)
 void Pane::TriggerPanelRedrawArea (int pid, int aid)
 {
 	if (panel) {
-#ifdef _WIN32
 		if (panel->GetId() == pid) {
 			int idx = panel->AreaIndex (aid);
 			if (idx >= 0)
 				panel->RedrawArea (idx, PANEL_REDRAW_USER);
 		}
-#else
-		throw std::runtime_error("Native legacy bitmap panels are unavailable");
-#endif
 	} else if (panel2d) {
 		if (panel2d->GetId() == pid) {
 			int idx = panel2d->AreaIndex (aid);
@@ -813,13 +774,9 @@ void Pane::SetPanel2DBlink (VECTOR3 v[4])
 bool Pane::BltPanelAreaBackground (int aid, SURFHANDLE surf)
 {
 	if (panel) {
-#ifdef _WIN32
 		int idx = panel->AreaIndex (aid);
 		if (idx >= 0)
 			return panel->BltAreaBackground (idx, surf);
-#else
-		throw std::runtime_error("Native legacy bitmap panels are unavailable");
-#endif
 	} else if (vcockpit) {
 		int idx = vcockpit->AreaIndex (aid);
 		if (idx >= 0)
@@ -983,16 +940,12 @@ bool Pane::OpenMFD (std::intptr_t id, int type, ifstream *ifs)
 		break;
 	case 2:
 		if (panel) {
-#ifdef _WIN32
 			panel->MFDSize (id, spec.w, spec.h);
 			spec.nbtl  = mfd[id].prm.nbt1;
 			spec.nbtr  = mfd[id].prm.nbt2;
 			spec.bt_y0 = (int)(panel->GetScale()*mfd[id].prm.bt_yofs+0.5);
 			spec.bt_dy = (int)(panel->GetScale()*mfd[id].prm.bt_ydist+0.5);
 			spec.flag = mfd[id].prm.flag;
-#else
-		throw std::runtime_error("Native legacy bitmap panels are unavailable");
-#endif
 		} else if (panel2d) {
 			spec = panel2d->GetMFDSpec(id);
 		}
@@ -1141,9 +1094,7 @@ void Pane::RegisterMFD (int id, const MFDSPEC &spec)
 	mfd[id].prm.nbt2     = spec.nbt_right;
 	mfd[id].prm.bt_yofs  = spec.bt_yofs;
 	mfd[id].prm.bt_ydist = spec.bt_ydist;
-#ifdef _WIN32
 	if (panel) panel->RegisterMFD (id, spec);
-#endif
 }
 
 void Pane::RegisterMFD (int id, const EXTMFDSPEC *spec)
@@ -1349,25 +1300,23 @@ void Pane::RegisterPanelBackground (SURFHANDLE hSurf, oapi::UInt32 flag)
 	// todo
 }
 #else
-void Pane::RegisterPanelBackground (SURFHANDLE, oapi::UInt32) {throw std::runtime_error("Native legacy bitmap panels are unavailable");}
+void Pane::RegisterPanelBackground (SURFHANDLE bitmap, oapi::UInt32 flag, oapi::UInt32 colorKey)
+{
+	if (panel) panel->DefineBackground(bitmap,flag,colorKey);
+	gc->clbkReleaseSurface(bitmap);
+}
 #endif
 
-#ifdef _WIN32
 void Pane::RegisterPanelArea (int aid, const oapi::SdkRectangle &pos, int draw_mode, int mouse_mode, int bkmode)
 {
 	/*if      (panel2d) panel2d->DefineArea (aid, pos, draw_mode, mouse_mode, bkmode);
 	else*/ if (panel)   panel->DefineArea (aid, pos, draw_mode, mouse_mode, bkmode);
 }
-#else
-void Pane::RegisterPanelArea (int,const oapi::SdkRectangle&,int,int,int) {throw std::runtime_error("Native legacy bitmap panels are unavailable");}
-#endif
 
 void Pane::SetPanelNeighbours (int left, int right, int top, int bottom)
 {
 	if      (panel2d) panel2d->SetConnections (left, right, top, bottom);
-#ifdef _WIN32
 	else if (panel)   panel->SetConnections (left, right, top, bottom);
-#endif
 }
 
 void Pane::SetVCNeighbours (int left, int right, int top, int bottom)
@@ -1418,12 +1367,8 @@ void Pane::Write (ostream &ofs) const
 		ofs << endl;
 	}
 	if (panel) {
-#ifdef _WIN32
 		panel->Write (ofs);
 		ofs << endl;
-#else
-		throw std::runtime_error("Native legacy bitmap panels are unavailable");
-#endif
 	}
 	if (vcockpit) {
 		vcockpit->Write (ofs);
