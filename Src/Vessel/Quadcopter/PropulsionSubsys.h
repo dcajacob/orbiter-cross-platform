@@ -11,6 +11,7 @@ class Rotor;
 class PropulsionSubsystem : public QuadcopterSubsystem {
 public:
 	PropulsionSubsystem(Quadcopter *qc);
+	~PropulsionSubsystem() override;
 	double getAtmDensity() const;
 	double getMaxThrust() const;
 

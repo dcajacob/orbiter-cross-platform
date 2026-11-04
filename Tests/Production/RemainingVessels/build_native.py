@@ -93,6 +93,9 @@ def main():
             module=engine/'NativeModules/Vessel'/(name+'.so');require(module.is_file(),'Original native module absent: '+name)
             symbols=subprocess.check_output(['nm','-D','--defined-only',str(module)],text=True)
             require(any(line.split()[-1]=='OrbiterNativeQuery' for line in symbols.splitlines()),'Actual checked SDK entry absent: '+name)
+            if name=='SolarSail':
+                require(not any(len(line.split())>=3 and line.split()[-2]=='u' for line in symbols.splitlines()),
+                        'GNU-unique symbols would prevent real solar-sail module unload')
             linked=subprocess.check_output(['readelf','-d',str(module)],text=True)
             require(('libasan.so' in linked)==a.sanitizers and ('libubsan.so' in linked)==a.sanitizers,'Actual module sanitizer linkage differs')
         candidates=[engine/'production_atlantis_diagnostic',engine/'production_remaining_stock_diagnostic']
@@ -101,6 +104,7 @@ def main():
         notice=engine/'NativeModules/Licenses/implot-LICENSE.txt'
         require(sha_lf(notice)==sha_lf(ROOT/'Tests/Production/Licenses/implot-LICENSE'),'ImPlot notice differs')
         report.update(status='built',owning_sources_unchanged=True,implot_notice_sha256_lf=sha_lf(notice),
+            solar_sail_gnu_unique_symbols=False,
             candidate_runtime_files_sha256={path.relative_to(ROOT).as_posix():sha(path) for path in candidates},
             runtime_files_sha256={path.relative_to(ROOT).as_posix():sha(path) for path in runtime},
             scope='Fresh original-source native modules and real diagnostic host; complete Windows/native state/camera/frame, '

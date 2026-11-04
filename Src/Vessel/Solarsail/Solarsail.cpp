@@ -71,6 +71,20 @@ void SolarSail::GlobalSetup()
 // --------------------------------------------------------------
 // Set up the dynamic elastic sail deformation code
 // --------------------------------------------------------------
+void SolarSail::GlobalCleanup()
+{
+	for (int i = 0; i < 4; i++) {
+		delete []sail_idx[i];
+		sail_idx[i] = NULL;
+	}
+	delete []nbhr; nbhr = NULL;
+	delete []sail_vbuf; sail_vbuf = NULL;
+	delete []sail_nml; sail_nml = NULL;
+	delete []sail_nsd; sail_nsd = NULL;
+	sail_nvtx = sail_ntri = 0;
+	hMeshTpl = NULL;
+}
+
 void SolarSail::SetupElasticity (MESHHANDLE hMeshTemplate)
 {
 	MESHGROUP *sail = oapiMeshGroup (hMeshTemplate, GRP_sail1);
@@ -185,8 +199,8 @@ void SolarSail::UpdateSail (const VECTOR3 *rpressure)
 	NBHR *nb;
 	NTVERTEX *vi, *vj;
 	VECTOR3 dv, F, nm;
-	static VECTOR3 *nml = 0;
-	static oapi::UInt32 *nsd = 0;
+	VECTOR3 *&nml = sail_nml;
+	oapi::UInt32 *&nsd = sail_nsd;
 	double dst;
 
 	sailidx = ++sailidx % 4;
@@ -397,6 +411,8 @@ NBHR *SolarSail::nbhr = NULL;
 VECTOR3 *SolarSail::sail_vbuf = NULL;
 oapi::UInt32 SolarSail::sail_nvtx = 0;
 oapi::UInt32 SolarSail::sail_ntri = 0;
+VECTOR3 *SolarSail::sail_nml = NULL;
+oapi::UInt32 *SolarSail::sail_nsd = NULL;
 
 
 // ==============================================================
@@ -414,9 +430,7 @@ static void InitSailResources ()
 
 static void ReleaseSailResources ()
 {
-	for (int i = 0; i < 4; i++) {
-		delete []SolarSail::sail_idx[i];
-	}
+	SolarSail::GlobalCleanup();
 }
 
 // --------------------------------------------------------------

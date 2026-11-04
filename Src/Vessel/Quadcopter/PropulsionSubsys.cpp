@@ -93,6 +93,11 @@ PropulsionSubsystem::PropulsionSubsystem(Quadcopter *qc)
 	HoldActivate(true);
 }
 
+PropulsionSubsystem::~PropulsionSubsystem()
+{
+	for (int i = 0; i < 4; i++) delete m_rotor[i];
+}
+
 double PropulsionSubsystem::getAtmDensity() const
 {
 	return QC()->GetAtmDensity();

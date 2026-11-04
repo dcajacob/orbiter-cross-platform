@@ -1306,7 +1306,8 @@
     },
     "Src/Orbiter/Production/NativeCockpit.cmake": {
       "original_sha256_lf": null,
-      "sha256_lf": "a6bdd28ac7b8161ad38a2841a6e3b2b3e682a16b15c3da548fbce432cbc32994"
+      "sha256_lf": "bf2d061dc1299e11ceb93b06efce49e8ebbedf2a21dbee283fbcd1eec316a888",
+      "scope": "Original physical/animation/deformation/Lua bodies retained. Actual ASan/LSan defects permit explicit rotor destruction and original shared scratch-cache ownership/cleanup; GNU builds allow real solar-sail module unload with original traversal code unchanged. No public Windows SDK or instance layout change."
     },
     "Src/Orbiter/Production/NativeCockpitGui.cpp": {
       "original_sha256_lf": null,
@@ -2185,13 +2186,13 @@
     },
     "Src/Vessel/Quadcopter/PropulsionSubsys.cpp": {
       "original_sha256_lf": "29db17a18a7f80b6a806b7fe7722e1179df34d7c14e8d54f10c0450cd2350c6a",
-      "scope": "Complete original HST/solar-sail/quadcopter sources, resources and real native factory/platform bindings; physical/animation/Lua calculations conserved; separate diagnostic execution remains unqualified.",
-      "sha256_lf": "29db17a18a7f80b6a806b7fe7722e1179df34d7c14e8d54f10c0450cd2350c6a"
+      "scope": "Original physical/animation/deformation/Lua bodies retained. Actual ASan/LSan defects permit explicit rotor destruction and original shared scratch-cache ownership/cleanup; GNU builds allow real solar-sail module unload with original traversal code unchanged. No public Windows SDK or instance layout change.",
+      "sha256_lf": "70778542839add9ffdc42a3efa4f0f815ce4e6b978d5c65cfab5214a2b50db78"
     },
     "Src/Vessel/Quadcopter/PropulsionSubsys.h": {
       "original_sha256_lf": "371a2c41d0e466550a12597453587e97dc4891b4e107ad8b5a0abb0cd2c5e3b6",
-      "scope": "Complete original HST/solar-sail/quadcopter sources, resources and real native factory/platform bindings; physical/animation/Lua calculations conserved; separate diagnostic execution remains unqualified.",
-      "sha256_lf": "371a2c41d0e466550a12597453587e97dc4891b4e107ad8b5a0abb0cd2c5e3b6"
+      "scope": "Original physical/animation/deformation/Lua bodies retained. Actual ASan/LSan defects permit explicit rotor destruction and original shared scratch-cache ownership/cleanup; GNU builds allow real solar-sail module unload with original traversal code unchanged. No public Windows SDK or instance layout change.",
+      "sha256_lf": "6951a566e00b34ab97bbbcd41afda40c0eefd5102411c9015784ac437b76eb24"
     },
     "Src/Vessel/Quadcopter/Quadcopter.cpp": {
       "original_sha256_lf": "03dbb9257e9efdd55889a71829ce81248c7aa31e8adc3f8355c5686fbf7e9ea3",
@@ -2245,13 +2246,13 @@
     },
     "Src/Vessel/Solarsail/SolarSail.h": {
       "original_sha256_lf": "648d6e44d9c4a9ffb27ca2335ff560739d16f84042236a086a1fdfc0561eccb3",
-      "scope": "Complete original HST/solar-sail/quadcopter sources, resources and real native factory/platform bindings; physical/animation/Lua calculations conserved; separate diagnostic execution remains unqualified.",
-      "sha256_lf": "659b8bd08b15f2e67722c33df7d8639e301c710e39c0a45158330234cdcd0db6"
+      "scope": "Original physical/animation/deformation/Lua bodies retained. Actual ASan/LSan defects permit explicit rotor destruction and original shared scratch-cache ownership/cleanup; GNU builds allow real solar-sail module unload with original traversal code unchanged. No public Windows SDK or instance layout change.",
+      "sha256_lf": "0bc3b6e8c932e1cb3f1adb0aa1dfd876f22e9e9309551b9e1412fd3463f52c1e"
     },
     "Src/Vessel/Solarsail/Solarsail.cpp": {
       "original_sha256_lf": "9f8ef907945d424cd3062f50eb357cfa5ba99d7cd904fff8544637aa89feb5f7",
-      "scope": "Complete original HST/solar-sail/quadcopter sources, resources and real native factory/platform bindings; physical/animation/Lua calculations conserved; separate diagnostic execution remains unqualified.",
-      "sha256_lf": "3ba288834406fafd83c9b6bee49510201ed5e70bce39636ea5c6fb1e48c945bd"
+      "scope": "Original physical/animation/deformation/Lua bodies retained. Actual ASan/LSan defects permit explicit rotor destruction and original shared scratch-cache ownership/cleanup; GNU builds allow real solar-sail module unload with original traversal code unchanged. No public Windows SDK or instance layout change.",
+      "sha256_lf": "4e5e5ddc2d3aeb0d6290a396efc86bad93171b69b46b1ac1513f792e3744cc1b"
     },
     "Src/Vessel/StockVesselPlatform.h": {
       "original_sha256_lf": null,

@@ -24,7 +24,37 @@ def adapted(name,source):
             source=source.replace(old,'static '+old)
     if filename=='SailLua.cpp':
         source=source.replace('int sailSetPaddle (lua_State *L);','static int sailSetPaddle (lua_State *L);')
+    if filename=='PropulsionSubsys.h':
+        source=source.replace('\tPropulsionSubsystem(Quadcopter *qc);',
+            '\tPropulsionSubsystem(Quadcopter *qc);\n\t~PropulsionSubsystem() override;')
+    if filename=='PropulsionSubsys.cpp':
+        source=source.replace('double PropulsionSubsystem::getAtmDensity() const',
+            'PropulsionSubsystem::~PropulsionSubsystem()\n{\n\tfor (int i = 0; i < 4; i++) delete m_rotor[i];\n}\n\n'
+            'double PropulsionSubsystem::getAtmDensity() const')
+    if filename=='SolarSail.h':
+        source=source.replace('\tstatic void GlobalSetup();','\tstatic void GlobalSetup();\n\tstatic void GlobalCleanup();')
+        source=source.replace('\tstatic VECTOR3 *sail_vbuf;   // vertex temporary buffer',
+            '\tstatic VECTOR3 *sail_vbuf;   // vertex temporary buffer\n'
+            '\tstatic VECTOR3 *sail_nml;\n\tstatic oapi::UInt32 *sail_nsd;')
     if filename=='Solarsail.cpp':
+        # Actual two-session LSan evidence loses the first 153-node graph
+        # and vertex buffer. Give the original shared scratch caches the
+        # same explicit module lifetime as the indices. Keep traversal exact.
+        source=source.replace('\tstatic VECTOR3 *nml = 0;','\tVECTOR3 *&nml = sail_nml;')
+        source=source.replace('\tstatic oapi::UInt32 *nsd = 0;','\toapi::UInt32 *&nsd = sail_nsd;')
+        marker='void SolarSail::SetupElasticity (MESHHANDLE hMeshTemplate)'
+        source=source.replace(marker,
+            'void SolarSail::GlobalCleanup()\n{\n'
+            '\tfor (int i = 0; i < 4; i++) {\n\t\tdelete []sail_idx[i];\n\t\tsail_idx[i] = NULL;\n\t}\n'
+            '\tdelete []nbhr; nbhr = NULL;\n\tdelete []sail_vbuf; sail_vbuf = NULL;\n'
+            '\tdelete []sail_nml; sail_nml = NULL;\n\tdelete []sail_nsd; sail_nsd = NULL;\n'
+            '\tsail_nvtx = sail_ntri = 0;\n\thMeshTpl = NULL;\n}\n\n'+marker)
+        source=source.replace('oapi::UInt32 SolarSail::sail_ntri = 0;',
+            'oapi::UInt32 SolarSail::sail_ntri = 0;\n'
+            'VECTOR3 *SolarSail::sail_nml = NULL;\noapi::UInt32 *SolarSail::sail_nsd = NULL;')
+        original_cleanup='\tfor (int i = 0; i < 4; i++) {\n\t\tdelete []SolarSail::sail_idx[i];\n\t}'
+        if source.count(original_cleanup)!=1:raise ValueError('Original solar-sail index cleanup changed')
+        source=source.replace(original_cleanup,'\tSolarSail::GlobalCleanup();')
         source=source.replace('DLLCLBK void InitModule (HINSTANCE hModule)','static void InitSailResources ()')
         source=source.replace('DLLCLBK void ExitModule (HINSTANCE hModule)','static void ReleaseSailResources ()')
         marker='// Vessel initialisation\n// --------------------------------------------------------------'
@@ -59,7 +89,7 @@ def verify():
             resources.append(name)
     if len(checked)!=14:raise ValueError('Original HST/solar-sail/quadcopter source closure incomplete')
     print('Conserved all 14 original HST/solar-sail/quadcopter source/header/Lua files and '+str(len(resources))+
-          ' unchanged resources/install rules; all original physical, animation, deformation and Lua operations retained')
+          ' unchanged resources/install rules; original physical/animation/deformation/Lua operations retained with declared rotor and shared scratch-cache cleanup')
 
 
 if __name__=='__main__':verify()

@@ -186,6 +186,12 @@ add_custom_command(OUTPUT "${_sail_headers}/meshres.h"
 add_library(native_solar_sail MODULE "${_sail_headers}/meshres.h"
     "${_remaining_source}/Solarsail/Solarsail.cpp" "${_remaining_source}/Solarsail/SailLua.cpp")
 target_include_directories(native_solar_sail PRIVATE "${_sail_headers}")
+# GNU-unique inline variables pin a DSO after dlclose. This private module's
+# index cache needs ordinary module unload/reset semantics, including its
+# original function-local traversal state. No other DSO defines this class.
+if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+    target_compile_options(native_solar_sail PRIVATE -fno-gnu-unique)
+endif()
 add_library(native_quadcopter MODULE
     "${_remaining_source}/Quadcopter/Quadcopter.cpp" "${_remaining_source}/Quadcopter/QuadcopterLua.cpp"
     "${_remaining_source}/Quadcopter/QuadcopterSubsys.cpp" "${_remaining_source}/Quadcopter/PropulsionSubsys.cpp"

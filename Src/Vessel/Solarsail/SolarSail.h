@@ -34,6 +34,7 @@ public:
 
 	// one-time global setup across all instances
 	static void GlobalSetup();
+	static void GlobalCleanup();
 
 	void clbkSetClassCaps (FILEHANDLE cfg);
 	void clbkPreStep (double simt, double simdt, double mjd);
@@ -66,6 +67,8 @@ private:
 	static oapi::UInt32 sail_nvtx, sail_ntri;
 	static NBHR *nbhr;
 	static VECTOR3 *sail_vbuf;   // vertex temporary buffer
+	static VECTOR3 *sail_nml;
+	static oapi::UInt32 *sail_nsd;
 	NTVERTEX *sail_vtx[4];       // vertex cache for each sail group
 
 };
