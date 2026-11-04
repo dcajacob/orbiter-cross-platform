@@ -582,7 +582,7 @@
     },
     "Src/Orbiter/Production/CMakeLists.txt": {
       "original_sha256_lf": null,
-      "sha256_lf": "2776c624188f1a85174bac5621e0e4ee27516d81a428e5f181adb4694c0b9a36",
+      "sha256_lf": "7b3a725c9f3ab59cf7e0de9926fa5489701d2907805e51fc31f2153849f2d658",
       "scope": "Original ten stock MFD declarations use exact platform SDK aliases; shared original conic geometry is moved without calculation or screen-mapping changes. Full native instrument runtime remains incomplete."
     },
     "Src/Orbiter/Production/CameraServices.cpp": {
@@ -1306,7 +1306,7 @@
     },
     "Src/Orbiter/Production/NativeCockpit.cmake": {
       "original_sha256_lf": null,
-      "sha256_lf": "768ba17a4f14acc9a1cbfd3a58c71ad3a84cde59ac243717d4b8853304acaeb0"
+      "sha256_lf": "a3d29c17cab945aabbde563580bfb7ce2f879525557ff3a42da0d13d4f3df3cf"
     },
     "Src/Orbiter/Production/NativeCockpitGui.cpp": {
       "original_sha256_lf": null,
@@ -2097,6 +2097,11 @@
       "original_sha256_lf": null,
       "scope": "Thin native SDK bootstrap entry for an original Atlantis class; real factories and cross-referencing polymorphic implementations share one private runtime to retain sanitizer RTTI checks.",
       "sha256_lf": "8b7fd98348f5409d4f012ef45acd12671dbf6113c21daa0f1e61bb23f915248a"
+    },
+    "Tests/Production/Atlantis/dependencies.lock.json": {
+      "original_sha256_lf": null,
+      "sha256_lf": "424ec4a6f1d7d74f26c6243bcf98f2b93c6159430d0ce3b87667d5a247d1f7dc",
+      "scope": "Exact original ImPlot source archive pin for native Atlantis; separate from the frozen Windows renderer lock, included in the native SDK source fingerprint."
     }
   }
 }

@@ -18,8 +18,8 @@ resolve the orbiter's real RTTI under UBSan without a circular library dependenc
 The payload-bay UI and ascent autopilot retain their original ImGui and ImPlot
 implementations. The native cockpit now owns the same ImPlot creation/destruction
 order as the original application. ImPlot is pinned to the original commit
-`3da8bd34299965d3b0ab124df743fe3e076fa222`; its exact archive hash is in the
-OpenGL dependency lock and its MIT notice accompanies native modules. The
+`3da8bd34299965d3b0ab124df743fe3e076fa222`; its exact archive hash is in
+`Tests/Production/Atlantis/dependencies.lock.json` and its MIT notice accompanies native modules. The
 existing audited notice in `Tests/Production/Licenses/implot-LICENSE` matches the
 downloaded source. Offline builds can set `ORBITER_NATIVE_PLOT_ARCHIVE`.
 
@@ -145,3 +145,29 @@ an explicit lifetime correction in the source audit, applied on both platforms.
 Fresh instrumented execution and detached-tank deletion controls remain required.
 Any repaired Windows comparison must use an explicitly versioned source variant;
 the failed unmodified original captures remain preserved.
+
+The fresh `3aa99da724f711b6775a9fa56b0d508d7818f017` Debug ASan/UBSan
+package completes the unchanged KSC tour with the complete five-vessel launch
+stack retained through 61 finalized ticks and 60 presentations. The actual
+post-step witness observes the tank below ground while still connected. Two
+supplemental controls verify that an undocked below-ground tank is deleted after
+its first callback, while an undocked above-ground tank survives all 60 callbacks.
+All three processes have clean sanitizer teardown, with all 505 source/dependency
+inputs, 1,102 assets, binaries and verifier bytes unchanged. The local result is
+`out/phase6-atlantis-tank-lifetime-v5/verification.json`; the reusable runner is
+`Tests/Production/Atlantis/tank_lifetime.py`. Its read-only callback probe retains
+the implementation's local loader scope and forwards every original argument.
+Earlier failed control/observer attempts and their verifier snapshots remain
+retained. The unchanged Edwards approach also completes 60 clean native frames;
+its actual approach-view screenshot is in `out/phase6-progress-atlantis-edwards-v1`.
+These are isolated lifetime and smoke results. The KSC ground-contact trajectory
+still grows to extreme numerical magnitudes; finite state and clean memory do
+not establish valid dynamics or qualify the stock scene.
+
+Hosted checks at `003c10e4` and `3aa99da7` exposed a separate frozen-reference
+input mismatch: adding ImPlot to the shared renderer dependency lock invalidated
+its recorded input hash. The renderer lock now returns to its exact frozen bytes,
+and the same ImPlot pin lives in the dedicated native Atlantis lock, which the
+native SDK source fingerprint includes. Frozen reference provenance, binaries,
+captures and comparison budgets remain unchanged. Fresh hosted checks are required
+after this lock-layout correction.
