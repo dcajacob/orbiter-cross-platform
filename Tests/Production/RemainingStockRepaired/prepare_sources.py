@@ -11,7 +11,7 @@ HERE=Path(__file__).resolve().parent
 ROOT=HERE.parents[2]
 BASE='f725194209634f7fd5d1d44d426cfa9b5e303e37'
 sys.path[:0]=[str(HERE.parent),str(HERE.parent/'RemainingStock')]
-from Dragonfly.source_audit import verify as verify_dragonfly
+from Dragonfly.source_audit import verify as verify_dragonfly,gauge_unit_capacity
 from Atlantis.source_audit import verify as verify_atlantis
 from inputs import settings
 
@@ -67,7 +67,7 @@ def main():
         if name not in changes and (source/name).read_bytes()!=original[name]:
             raise ValueError('An original source, resource, config or mesh was altered')
     report=dict(schema=1,status='prepared-awaiting-build-and-independent-audit',
-        protocol='remaining-stock-repaired-sources-v3',original_application_and_sdk_source=BASE,
+        protocol='remaining-stock-repaired-sources-v4',original_application_and_sdk_source=BASE,
         producer_commit=producer,preparer_sha256=digest(Path(__file__).read_bytes()),
         original_files_sha256={name:digest(body) for name,body in original.items()},
         staged_files_sha256={name:digest(body) for name,body in modified.items()},
@@ -76,6 +76,8 @@ def main():
             policy='Define previous current before the first thermal update; retain every original update formula and callback order.'),
         adi_reference_request_repair=dict(field='ADI::ref_handle',initial_value=0,
             policy='No reference capture request before user input; preserve loaded reference and all original attitude/drawing operations.'),
+        gauge_unit_buffer_repair=dict(field='EGauge::unit',original_capacity=5,capacity=gauge_unit_capacity(),
+            original_longest_label='PITCH',policy='Retain every original gauge label and drawing/calculation operation; include the longest original label and its terminator.'),
         complete_scenes=38,declared_classes=len(config['classes']),recording_files=len(config['recording_files_sha256_lf']),
         staged_original_module_files_unchanged_except_declared_changes=True,
         repository_scene_class_and_recording_inputs_verified=True,
@@ -90,7 +92,7 @@ def main():
               'all 38 complete scenes twice in four profiles, independent audit, native comparisons and '
               'interactions remain required before any reference acceptance.')
     (a.output/'source-variant.json').write_text(json.dumps(report,indent=2)+'\n')
-    print('Prepared exact original Windows module source closure with six declared repaired/added files, including initial fuel-cell current and ADI request; no reference qualification')
+    print('Prepared exact original Windows module source closure with six declared repaired/added files, including initial fuel-cell current, ADI request and complete gauge-label storage; no reference qualification')
 
 
 if __name__=='__main__':main()

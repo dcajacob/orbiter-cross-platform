@@ -42,7 +42,7 @@ def main():
     checked_build,runtime=independent.runtime_variant(a.build,producer,a.configuration,a.preserved,protocols.V2)
     require(checked_build==build,'Independently read build manifest differs')
     staged=json.loads((a.build/'module-sources/source-variant.json').read_text())
-    require(staged['protocol']=='remaining-stock-repaired-sources-v3','Fresh persistence requires the declared ADI request initialization repair')
+    require(staged['protocol']=='remaining-stock-repaired-sources-v4','Fresh persistence requires the declared ADI request and complete gauge-storage repairs')
     parent_file=a.parent_capture/'capture.json';parent=json.loads(parent_file.read_text())
     require(parent['producer_commit']==producer and parent['protocol']==protocols.V2 and
             parent['status'] in ('captured-diagnostic-only','captured-awaiting-independent-audit') and not parent['failures'] and

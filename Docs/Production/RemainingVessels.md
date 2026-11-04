@@ -1,5 +1,29 @@
 # Original remaining native vessel integration
 
+## Release gauge-label storage checkpoint
+
+The new Release SSE2 exact-save reload aborts during Dragonfly initialization.
+The older `45c3155d` Release automatic/SSE2 campaigns also retain failures in
+multiple Dragonfly scenes. The actual GDB trace reaches `__strcpy_chk` with
+`src="PITCH", destlen=5`, called by `EGauge::EGauge` from
+`ShipInternal::MakePanels`. The six-byte string includes its terminator; the
+original private unit buffer has only five bytes. Debug's clean heap sanitizer
+runs do not establish safety for this intra-object overflow. The raw failure
+and GDB diagnostic remain in the persistence checkout under
+`out/phase6-native-persistence-reload-diagnostic-Release-sse2-v1` and
+`out/phase6-release-dragonfly-fortify-gdb-v1`; ptrace is not sanitizer acceptance.
+
+The shared header now reserves six bytes, preserving the complete original
+label, copy and drawing/calculation bodies. Independent source readers derive
+that exact capacity from all frozen original gauge-unit literals. Source
+variant v4 declares this separately from the prior ADI and initial-current
+repairs. The original 23-file Dragonfly and complete 612-file source audits
+pass. Fifteen native and thirteen Windows damaged-source/initialization/
+ownership/gauge-capacity/policy controls also pass against the actual generated
+source trees. Repaired runtime executions and all four profiles remain required. Live captures retain their original worktrees and binaries.
+The isolated repair checkpoint is
+`out/phase6-gauge-unit-overflow-source-checkpoint-v1.json` in the gauge checkout.
+
 ## Finalized save and ADI request checkpoint
 
 A separate unchanged PoweredUp run using the `45c3155d` native Debug automatic

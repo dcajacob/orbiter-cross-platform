@@ -141,8 +141,9 @@ def main():
         source_sha256_lf={name:sha(canonical(body)) for name,body in inputs.items()},original_files_sha256=original,
         generated_files_sha256=generated,bitmap_resources=[list(entry) for entry in resources()],native_admission_qualified=False,phase6_complete=False,
         initialization_repairs=[dict(field='FCell::Amperes',initial_value=0),dict(field='ADI::ref_handle',initial_value=0)],
+        bounds_repairs=[dict(field='EGauge::unit',original_capacity=5,capacity=6,original_longest_label='PITCH')],
         scope='Complete original module; mechanical SDK/drawing/resource/path/case bindings, concrete polymorphic teardown, empty platform-handle ownership '
-              'and checked native factory, plus the independently declared initial fuel-cell current and ADI reference-request repairs shared with Windows. '
+              'and checked native factory, plus the independently declared initial fuel-cell current, ADI reference-request and complete gauge-label storage repairs shared with Windows. '
               'Every physical/internal-system update formula, callback order, attitude and GL drawing body retained. No class admission.')
     if a.verify_output:
         if json.loads((a.output/'native-source.json').read_text())!=report:raise ValueError('Native module source provenance changed')

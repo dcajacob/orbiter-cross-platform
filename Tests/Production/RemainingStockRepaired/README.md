@@ -1,5 +1,18 @@
 # Explicit repaired original Windows reference candidate
 
+Source variant v4 additionally reserves six bytes for `EGauge::unit`: the
+original longest label, `PITCH`, needs five characters and a terminator. The
+actual unchanged Release SSE2 native module aborts in `__strcpy_chk` with
+`src="PITCH", destlen=5`, through `EGauge::EGauge` and `ShipInternal::MakePanels`.
+The original string/copy/drawing/calculation bodies remain intact; only the
+private destination capacity changes. Both source readers derive the exact
+capacity from every frozen original gauge-label call site. Historical v2/v3
+sources remain independently readable without being relabeled as v4. Fifteen
+native and thirteen Windows source controls pass, including coherent changed
+capacity, missing terminator space, false policy and false historical version
+controls. Fresh Windows/native compilation, runtime, parity and complete
+qualification remain required for this repair.
+
 Source variant v3 additionally initializes the transient `ADI::ref_handle`
 request to zero. Actual original-scene allocation controls reproduce the saved
 reference difference with no physical-state change or user reference request.

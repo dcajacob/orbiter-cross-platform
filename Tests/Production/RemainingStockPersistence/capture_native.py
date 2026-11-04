@@ -102,8 +102,9 @@ def main():
                 'Completed same-profile, same-data original Windows parent observations required')
         if not diagnostic:require(not parent['diagnostic_only'] and len(parent['cases'])==38,'Complete reload requires all 38 original Windows parent scenes')
         win_build,parent_runtime=original_audit.runtime_variant(a.windows_build,parent['producer_commit'],identity['configuration'],a.preserved,protocols.V2)
-        require(json.loads((a.windows_build/'module-sources/source-variant.json').read_text())['protocol']=='remaining-stock-repaired-sources-v3',
-                'Exact reload requires actual Windows ADI request repair v3')
+        source_protocol=json.loads((a.windows_build/'module-sources/source-variant.json').read_text())['protocol']
+        require(source_protocol=='remaining-stock-repaired-sources-v4' or (diagnostic and source_protocol=='remaining-stock-repaired-sources-v3'),
+                'Complete reload requires Windows gauge-storage repair v4; historical v3 is diagnostic-only')
         guarded[str(a.windows_build/'build.json')]=sha(a.windows_build/'build.json')
         for directory in (a.windows_build,a.preserved):
             guarded.update({str(path):sha(path) for path in directory.rglob('*') if path.is_file()})
@@ -121,7 +122,7 @@ def main():
                 saved_case,provenance=derived_case(case,config,source,checksum);guarded[str(source)]=checksum
                 provenance.update(parent_capture_sha256=sha(parent_file),parent_run=case['id']+'-'+str(repeat),
                     parent_finalized_clock=checked['matched_clock_observation'],parent_producer_commit=parent['producer_commit'],
-                    parent_startup_configuration=checked.get('configuration_input'))
+                    parent_startup_configuration=checked.get('configuration_input'),parent_source_variant_protocol=source_protocol)
                 derived[(case['id'],repeat)]=(saved_case,source,provenance)
     else:
         require(not any((a.windows_parent_capture,a.windows_build,a.preserved)),'Stock-writer phase retains unchanged stock inputs; select windows-save-reload to supply Windows saves')
@@ -148,7 +149,7 @@ def main():
         subprocess.run([sys.executable,'-B',str(HERE.parent/'Dragonfly/NativeSource.Test.py'),'--generated',str(generated[0]),
             '--output',str(controls_path)],stdout=log,stderr=subprocess.STDOUT,check=True)
     controls=json.loads(controls_path.read_text())
-    require(controls['status']=='passed' and len(controls['controls'])==13 and controls['original_and_generated_files_unchanged'],
+    require(controls['status']=='passed' and len(controls['controls'])==15 and controls['original_and_generated_files_unchanged'],
             'Actual native generated-source mutation controls incomplete')
     guarded[str(controls_path)]=sha(controls_path)
     report=dict(status='running',protocol=contract['protocol'],phase=a.phase,host='native-linux',producer_commit=producer,

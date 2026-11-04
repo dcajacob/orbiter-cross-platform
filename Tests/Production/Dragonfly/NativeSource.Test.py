@@ -39,6 +39,8 @@ def main():
          'ref_handle=1; // No pending reference capture before user input.'),
         ('missing-initial-adi-request','instruments.cpp',
          'ref_handle=0; // No pending reference capture before user input.',''),
+        ('missing-gauge-unit-terminator','instruments.h','char unit[6];','char unit[5];'),
+        ('changed-gauge-unit-capacity','instruments.h','char unit[6];','char unit[7];'),
         ('undeclared-include','Thermal.cpp','#include "Thermal.h"','#include "NativeDrawing.h"'),
         ('nonvirtual-hydraulic-destruction','Hsystems.h','virtual ~h_object()=default;','~h_object()=default;'),
         ('missing-electrical-destruction','Esystems.h','virtual ~e_object()=default;',''),

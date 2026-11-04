@@ -131,3 +131,12 @@ The new persistence protocol specifies reloading the same exact Windows save in
 both runtimes, alongside separately checking the native writer at measured
 original serialization precision. It does not convert a scoped reader or save
 experiment into full persistence acceptance.
+
+The fresh Release reload diagnostic also exposes an inherited gauge-label
+storage overflow before the first frame. GDB identifies the actual `PITCH`
+copy into `EGauge::unit[5]`. Source variant v4 enlarges only that private buffer
+to the exact original longest label plus its terminator (six bytes), with
+unchanged strings, arithmetic and drawing. Complete persistence collectors now
+require v4; explicit native diagnostics can read historical v3 inputs and
+record that source identity. Repaired Release execution and full qualification
+remain pending; the failed v3 processes remain retained.

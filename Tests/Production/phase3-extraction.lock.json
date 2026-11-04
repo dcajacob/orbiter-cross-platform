@@ -2116,8 +2116,8 @@
     },
     "Src/Vessel/Dragonfly/instruments.h": {
       "original_sha256_lf": "5e98d45be9c3ff945f5c80392f91689b22e5384a7b6f1df18069dcdee89cda36",
-      "sha256_lf": "936277a34765f9af19d634fe42a87ae200654392aaac6fd7d3d5c2421b6f2ee0",
-      "scope": "Complete original Dragonfly source and resources with independently audited native SDK/drawing/resource ownership bindings. Actual compatibility target uses distinct color-renderbuffer storage. Native diagnostic build/runtime and Windows/native qualification required; original formulas and public Windows SDK layouts unchanged."
+      "sha256_lf": "0b189b2cebfcc4aba89d18ce361233a141aa4c4ee3fd254ec3d6abbba6ac1b8e",
+      "scope": "Complete original Dragonfly source and resources with independently audited native SDK/drawing/resource ownership bindings. Actual compatibility target uses distinct color-renderbuffer storage. Native diagnostic build/runtime and Windows/native qualification required; original formulas and public Windows SDK layouts unchanged. EGauge unit storage includes the original PITCH label and its terminator; original drawing/calculation operations retained."
     },
     "Src/Vessel/Dragonfly/WglBitmapTarget.h": {
       "original_sha256_lf": null,

@@ -104,7 +104,21 @@ def preserved_metadata(root,delivery):
     return result
 
 
-def original_adi_sources(original,initialize_request):
+def original_gauge_unit_capacity(original):
+    labels=[];calls=0
+    for name,body in original.items():
+        if not name.startswith('Src/Vessel/Dragonfly/') or Path(name).suffix.lower() not in ('.cpp','.h'):continue
+        text=body.decode('cp1252')
+        calls+=len(re.findall(r'\bnew\s+EGauge\s*\(',text))
+        labels+=re.findall(r'\bnew\s+EGauge\s*\(\s*[^,]+,\s*[^,]+,\s*[^,]+,\s*"([^"\\]*)"',text)
+    require(calls==len(labels)>0 and set(labels)=={'%','Amps','V','YAW','PITCH','SGN'},
+            'Original complete gauge label literals differ')
+    capacity=max(len(value.encode('cp1252')) for value in labels)+1
+    require(capacity==6,'Original longest gauge label and terminator capacity differs')
+    return capacity
+
+
+def original_adi_sources(original,initialize_request,repair_gauge_storage=False):
     """Independently derive every ADI source byte from the frozen Windows code."""
     path='Src/Vessel/Dragonfly/instruments.cpp'
     source=original[path].decode('cp1252').replace('\r\n','\n')
@@ -135,13 +149,17 @@ def original_adi_sources(original,initialize_request):
     require(body.count('class Panel;')==body.count('   HBITMAP hBMP_old;')==1,'Original ADI header boundary differs')
     body=body.replace('class Panel;','class Panel;\nnamespace dragonfly {class WglBitmapTarget;}',1)
     body=body.replace('   HBITMAP hBMP_old;','   HBITMAP hBMP_old;\n   dragonfly::WglBitmapTarget* bitmap_target;',1)
+    if repair_gauge_storage:
+        anchor='char unit[5];'
+        require(body.count(anchor)==1,'Original gauge unit storage differs')
+        body=body.replace(anchor,'char unit['+str(original_gauge_unit_capacity(original))+'];',1)
     return {path:source.encode('cp1252'),header:body.encode('cp1252')}
 
 
 def source_variant(root,producer):
     report=json.loads((root/'source-variant.json').read_text())
     require(report['schema']==1 and report['status']=='prepared-awaiting-build-and-independent-audit' and
-            report['protocol'] in ('remaining-stock-repaired-sources-v2','remaining-stock-repaired-sources-v3') and
+            report['protocol'] in ('remaining-stock-repaired-sources-v2','remaining-stock-repaired-sources-v3','remaining-stock-repaired-sources-v4') and
             report['producer_commit']==producer and report['original_application_and_sdk_source']==BASE and
             report['complete_scenes']==38 and report['declared_classes']==19 and report['recording_files']==36 and
             report['staged_original_module_files_unchanged_except_declared_changes'] and
@@ -171,14 +189,20 @@ def source_variant(root,producer):
             report['initialization_repair']==dict(field='FCell::Amperes',initial_value=0,
                 policy='Define previous current before the first thermal update; retain every original update formula and callback order.'),
             'Electrical source exceeds the one declared initial-current assignment')
-    request_init=report['protocol']=='remaining-stock-repaired-sources-v3'
-    for name,body in original_adi_sources(original,request_init).items():
+    request_init=report['protocol'] in ('remaining-stock-repaired-sources-v3','remaining-stock-repaired-sources-v4')
+    gauge_storage=report['protocol']=='remaining-stock-repaired-sources-v4'
+    for name,body in original_adi_sources(original,request_init,gauge_storage).items():
         require(expected[name].replace(b'\r\n',b'\n')==body,'ADI source exceeds original drawing/attitude and declared initial-request bindings: '+name)
     if request_init:
         require(report['adi_reference_request_repair']==dict(field='ADI::ref_handle',initial_value=0,
             policy='No reference capture request before user input; preserve loaded reference and all original attitude/drawing operations.'),
             'ADI initial reference-request policy differs')
     else:require('adi_reference_request_repair' not in report,'Historical v2 source misdeclares an ADI request repair')
+    if gauge_storage:
+        require(report['gauge_unit_buffer_repair']==dict(field='EGauge::unit',original_capacity=5,capacity=original_gauge_unit_capacity(original),
+            original_longest_label='PITCH',policy='Retain every original gauge label and drawing/calculation operation; include the longest original label and its terminator.'),
+            'Gauge label storage exceeds the exact original longest label and terminator')
+    else:require('gauge_unit_buffer_repair' not in report,'Historical source misdeclares a gauge storage repair')
     original_hashes={name:checksum(body) for name,body in original.items()}
     staged={name:checksum(body) for name,body in expected.items()}
     actual={p.relative_to(root/'source').as_posix():sha(p) for p in (root/'source').rglob('*') if p.is_file()}

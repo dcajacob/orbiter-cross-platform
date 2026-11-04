@@ -80,7 +80,7 @@ private:
 
 class EGauge:public instrument
 { public:
-    char unit[5];							// units as displayed on the screen
+    char unit[6];							// units as displayed on the screen
     int MaxV,MinV;						// min & max values on the scale
     float scale;							// scale between displayed values and actual pointer value (usually 10,100,1000);
 	float *SRC;

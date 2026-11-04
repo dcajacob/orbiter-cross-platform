@@ -19,22 +19,30 @@ def main():
     before=hashes(a.sources);controls=[]
     electrical='Src/Vessel/Dragonfly/Esystems.cpp'
     adi='Src/Vessel/Dragonfly/instruments.cpp'
+    header='Src/Vessel/Dragonfly/instruments.h'
     cases=['missing_initial_current','changed_initial_current','changed_thermal_formula','false_initialization_policy']
-    if manifest['protocol']=='remaining-stock-repaired-sources-v3':
+    if manifest['protocol'] in ('remaining-stock-repaired-sources-v3','remaining-stock-repaired-sources-v4'):
         cases+=['missing_initial_adi_request','changed_initial_adi_request','changed_adi_attitude_formula','false_adi_initialization_policy','falsely_label_as_v2']
+    if manifest['protocol']=='remaining-stock-repaired-sources-v4':
+        cases+=['missing_gauge_terminator','changed_gauge_capacity','false_gauge_storage_policy','falsely_label_as_v3']
     with tempfile.TemporaryDirectory(prefix='orbiter-electrical-source-control-') as temporary:
         for name in cases:
             out=Path(temporary)/name;shutil.copytree(a.sources,out)
             report=json.loads((out/'source-variant.json').read_text())
             if name=='false_initialization_policy':report['initialization_repair']['initial_value']=1
             elif name=='false_adi_initialization_policy':report['adi_reference_request_repair']['initial_value']=1
+            elif name=='false_gauge_storage_policy':report['gauge_unit_buffer_repair']['capacity']=5
+            elif name=='falsely_label_as_v3':
+                report['protocol']='remaining-stock-repaired-sources-v3';del report['gauge_unit_buffer_repair']
             elif name=='falsely_label_as_v2':
                 report['protocol']='remaining-stock-repaired-sources-v2';del report['adi_reference_request_repair']
             else:
-                relative=adi if name in ('missing_initial_adi_request','changed_initial_adi_request','changed_adi_attitude_formula') else electrical
+                relative=header if name in ('missing_gauge_terminator','changed_gauge_capacity') else adi if name in ('missing_initial_adi_request','changed_initial_adi_request','changed_adi_attitude_formula') else electrical
                 path=out/'source'/relative;body=path.read_bytes()
                 anchor=b'  Amperes=0; // No previous current before the first refresh.\n'
-                if name in ('missing_initial_adi_request','changed_initial_adi_request'):
+                if name in ('missing_gauge_terminator','changed_gauge_capacity'):
+                    anchor=b'char unit[6];';replacement=b'char unit[5];' if name=='missing_gauge_terminator' else b'char unit[7];'
+                elif name in ('missing_initial_adi_request','changed_initial_adi_request'):
                     anchor=b'ref_handle=0; // No pending reference capture before user input.\n'
                     replacement=b'' if name=='missing_initial_adi_request' else anchor.replace(b'ref_handle=0;',b'ref_handle=1;')
                 elif name=='changed_adi_attitude_formula':
