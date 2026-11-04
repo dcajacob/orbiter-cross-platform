@@ -120,3 +120,29 @@ missing build-record argument before any runtime can launch. Both software and
 hardware canaries pass these controls. Source, plugin, build and actual mapping
 bytes remain protected. These controls do not replace the complete input,
 physical-device, lifetime or Phase 6 gates.
+
+## Completed GUI-frame drag boundaries
+
+A current Release SSE2 software VC flow at scale 2 delivered its real GLFW
+button and motion events, but left Options at logical x=60. Its close target
+then lay outside the 640-pixel content surface. The matching hardware flow
+moved the same original dialog to x=-60. The old camera helper advanced only
+input-sample ticks between its titlebar press, movement and release; those
+samples can complete before ImGui consumes the queued press/position events.
+
+The camera helper now holds the original press at the real titlebar until two
+completed GUI frames have acknowledged it, then waits for completed GUI frames
+and the actual moved dialog geometry before release. It retains the real
+compositor drag, original close control, full event-order checks, camera
+capture/priority/FOV assertions and original coordinate budgets. It does not
+move the dialog through an engine or ImGui call.
+
+The failed flow is retained in the persistence-audit checkout. The synchronized
+same-package software VC canary at 2x passes, including the real movement from
+x=60 to x=-60 and subsequent camera and shutdown checks. `GuiDrag.Test.py`
+rechecks both actual captures, their unchanged simulator/generated-source
+package guards, the old/fixed executed helper source, original dialog geometry
+and successful complete camera assertions. Its local result is
+`out/phase6-actual-gui-frame-drag-regression-v1.json` in the input-frame-sync
+checkout. A fresh complete four-profile software/hardware matrix is running;
+this canary does not qualify that complete matrix by itself.

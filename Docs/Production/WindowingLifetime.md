@@ -74,3 +74,23 @@ are described in the
 Broader current-source application/input qualification with this dependency
 candidate is pending; the preceding sixteen-flow result retains its recorded
 source/runtime scope.
+
+
+The current-source replay now selects the private decoration plugin only for
+Orbiter and records its actual mappings separately from the normal focus
+client. The first globally exported selector caused that uninstrumented client
+to fail ASan runtime-order initialization; the corrected explicit selector
+passes actual software 1x and Intel PTL 2x canaries and rejects mismatched
+plugin/build inputs before either application can launch. The simulator and
+physics sources remain unchanged.
+
+The broader replay then exposed an input-harness race in one software VC 2x
+Options drag: input samples advanced before ImGui consumed the queued titlebar
+press. A separately frozen helper now waits for completed GUI frames and actual
+moved-window geometry while preserving every original pointer/camera check.
+The same-package failed/fixed regression passes. Superseded coordinator outputs
+and active flow results are preserved separately; a complete fresh 64-flow
+DG/DG-S panel/VC, scale1/2, software/Intel matrix across all four build profiles
+is running in the input-frame-sync checkout. Full current-source input and
+Phase 6 acceptance remain open until that complete matrix and its independent
+audit pass.

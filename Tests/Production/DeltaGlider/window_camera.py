@@ -31,6 +31,15 @@ def verify(out, window, destination, key, button, send, x, display, focused, tra
         before = input_state(out)[0]
         wait(lambda: input_state(out)[0] >= before+ticks, 'No camera input/release samples')
 
+    def advance_gui(frames=2):
+        def completed():
+            path = out/'ui-frames.csv'
+            lines = path.read_text().splitlines() if path.exists() else []
+            return int(lines[-1]) if lines else 0
+        before = completed()
+        wait(lambda: completed() >= before+frames,
+             'Original GUI did not render the input drag boundary')
+
     def deliver(name, down):
         before = input_state(out)[0]
         key(window, name, down)
@@ -245,9 +254,19 @@ def verify(out, window, destination, key, button, send, x, display, focused, tra
             if adjustment:
                 origin, destination = adjustment
                 emit(1, True, origin)
+                # An input sample acknowledges GLFW delivery, before ImGui
+                # consumes its queued button/position events. Keep the press
+                # at the real titlebar until completed GUI frames see it.
+                advance_gui()
                 move(destination)
-                advance()
+                advance_gui()
+                def dragged_options():
+                    current = options()
+                    return current if current and transport.dialog_adjustment(current) is None else None
+                dialog = wait(dragged_options,
+                              'Original Options titlebar drag did not bring its close control into view')
                 emit(1, False, destination)
+                advance_gui()
                 dialog = wait(options, 'Options disappeared during its real titlebar drag')
         def gui_point(point):
             return transport.gui_point(point) if transport is not None else point
