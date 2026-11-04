@@ -77,3 +77,19 @@ load/version/identity/missing-host/unload cycles with ASan/UBSan, leak detection
 and no suppressions. The exact local invocation and result are retained in
 `out/phase6-atlantis-shared-runtime-bootstrap-v1/verification.json`. This probes
 SDK library lifetime and does not instantiate a vessel or qualify simulation.
+
+The fresh `1052e1a7cf9ffdaafd262f1355e3e409b9f6934c` Release and Debug
+ASan/UBSan packages completed all 505 owning-source/dependency checks. The
+unchanged “DG Mk4 in orbit” scene then completed 60 real native frames with
+clean sanitizer teardown; evidence and a 2D-cockpit screenshot are in
+`out/phase6-progress-2d-source-port-v1`. This is a DG regression, not Atlantis
+simulation qualification.
+
+Actual construction of the unchanged Atlantis-only Edwards approach scene
+exposed an inherited `new-delete-type-mismatch`: `Atlantis::~Atlantis` deleted
+an 88-byte RMS `MGROUP_ROTATE` through its 32-byte non-virtual base. The failed
+run, stack, exact invocation and unchanged assets remain in
+`out/phase6-atlantis-construction-diagnostic-v1`. The six RMS allocations now
+use their allocated type during deletion; source conservation allows only that
+confirmed cleanup correction. A fresh instrumented rerun remains required to
+inspect the rest of teardown.

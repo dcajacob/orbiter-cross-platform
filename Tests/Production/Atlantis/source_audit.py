@@ -28,6 +28,10 @@ def adapted(name,source):
             '#define SRBFUNC DLLIMPORT\n#endif\n#else\n#define TANKFUNC __attribute__((visibility("default")))\n#define SRBFUNC __attribute__((visibility("default")))\n#endif',1)
         source=source.replace('\tHINSTANCE hDLL;','#ifdef _WIN32\n\tHINSTANCE hDLL;\n#endif')
     if filename=='Atlantis.cpp':
+        # ASan proves the six original 88-byte rotations were deleted through
+        # their 32-byte, non-virtual base. Preserve allocation/callback order.
+        source=source.replace('for (i = 0; i < 6; i++) delete rms_anim[i];',
+                              'for (i = 0; i < 6; i++) delete static_cast<MGROUP_ROTATE*>(rms_anim[i]);')
         source=source.replace('DLLCLBK void InitModule (HINSTANCE hModule)\n{\n\tg_Param.hDLL = hModule;\n',
                               'static void InitDrawingResources ()\n{')
         source=source.replace('DLLCLBK void ExitModule (HINSTANCE hModule)','static void ReleaseDrawingResources ()')

@@ -300,7 +300,7 @@ Atlantis::~Atlantis ()
 	delete ascap;
 	delete plop;
 	int i;
-	for (i = 0; i < 6; i++) delete rms_anim[i];
+	for (i = 0; i < 6; i++) delete static_cast<MGROUP_ROTATE*>(rms_anim[i]);
 }
 
 // --------------------------------------------------------------
