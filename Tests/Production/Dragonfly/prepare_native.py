@@ -139,7 +139,7 @@ def main():
     verify_generated(a.output)
     report=dict(status='prepared-awaiting-build-and-runtime',original_source=BASE,producer_commit=producer,
         source_sha256_lf={name:sha(canonical(body)) for name,body in inputs.items()},original_files_sha256=original,
-        generated_files_sha256=generated,bitmap_resources=resources(),native_admission_qualified=False,phase6_complete=False,
+        generated_files_sha256=generated,bitmap_resources=[list(entry) for entry in resources()],native_admission_qualified=False,phase6_complete=False,
         scope='Complete original module; mechanical SDK/drawing/resource/path/case bindings, concrete polymorphic teardown, empty platform-handle ownership '
               'and checked native factory. Every physical/internal-system/attitude/GL drawing body retained. No class admission.')
     if a.verify_output:

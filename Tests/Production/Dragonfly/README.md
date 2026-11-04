@@ -124,6 +124,12 @@ configuration and after each actual build stage, retaining every generated raw
 input hash. The capture runner guards those exact generated files alongside the
 original sources, runtime and probe through process exit. This closes the gap
 between verifying the generator's inputs and retaining its actual compiler inputs.
+The first invocation of that stricter check is retained as a failed v5 build:
+JSON reads resource-ID pairs back as lists, while the in-memory provenance used
+tuples. The schema now explicitly creates JSON arrays. `PreparedSource.Test.py`
+exercises a real fresh preparation and read-only round trip, then requires
+physical-source and resource-ID provenance damage to fail without rewriting
+either valid or damaged inputs. The fresh build still has to pass that check.
 
 Fresh repaired execution and unchanged
 Dragonfly scene checks, sanitizer teardown, panel/input and persistence
