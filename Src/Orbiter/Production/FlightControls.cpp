@@ -3,6 +3,12 @@
 #include "FlightControls.h"
 #include "Vessel.h"
 #include "TimeData.h"
+#ifdef ORBITER_NATIVE_COCKPIT
+#include "CockpitServices.h"
+#include "Camera.h"
+#include "Pane.h"
+#include "hud.h"
+#endif
 #include <algorithm>
 #include <stdexcept>
 namespace orbiter::production {
@@ -101,6 +107,12 @@ int FlightControls::DefaultBuffered(Vessel& vessel,UInt32 key,bool down,char* ks
 	if (keymap.IsLogicalKey (key, kstate, OAPI_LKEY_RCSEnable))      vessel.SetAttMode (vessel.AttMode() >= 1 ? 0 : 1);
 	if (keymap.IsLogicalKey (key, kstate, OAPI_LKEY_RCSMode))        vessel.ToggleAttMode ();
 	if (keymap.IsLogicalKey (key, kstate, OAPI_LKEY_Undock))         vessel.UndockInteractive ();
+
+#ifdef ORBITER_NATIVE_COCKPIT
+    auto* g_camera=CockpitCamera();
+    auto* g_pane=CockpitPane();
+#include "CockpitHudInput.inc"
+#endif
 
     // Aerodynamic control surfaces: original ALT-Divide, plus the laptop ALT-F alias.
     if(!KEYMOD_CONTROL(kstate) && !KEYMOD_SHIFT(kstate) && KEYMOD_ALT(kstate)) {

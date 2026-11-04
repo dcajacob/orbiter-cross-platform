@@ -366,6 +366,19 @@ namespace oapi {using CockpitClient=GraphicsClient;}
             current=current.replace(':drawdata(td.MJD_ref)','')
             current=current.replace('drawdata.focusel.Set (*g_focusobj->Els(), td.MJD_ref)','drawdata.focusel.Set (*g_focusobj->Els())')
             current=current.replace('orbiter::production::CockpitScreenHeight()','GetSystemMetrics(SM_CYSCREEN)')
+        if name=='MfdSurface.cpp':
+            # Only define rates when the sample interval is positive. The full
+            # original positive-time formulas and all subsequent drawing stay exact.
+            comment='\t// A paused initial draw has no elapsed sample interval. Seed the current\n\t// values below and leave their rates zero until simulation time advances.\n'
+            if current.count(comment)!=1:raise ValueError('Surface MFD paused-sample explanation changed')
+            current=current.replace(comment,'',1)
+            for repaired,legacy in [
+                ('vacc = (dt > 0.0 ? (sp->vspd-vspd)/dt : 0.0);','vacc = (sp->vspd-vspd)/dt;'),
+                ('vlng = (dt > 0.0 ? (sp->lng-lng)/dt : 0.0);','vlng = (sp->lng-lng)/dt;'),
+                ('vlat = (dt > 0.0 ? (sp->lat-lat)/dt : 0.0);','vlat = (sp->lat-lat)/dt;'),
+                ('acc = (spd_valid && dt > 0.0 ? (spd-pspd)/dt : 0.0);','acc = (spd_valid ? (spd-pspd)/dt : 0.0);')]:
+                if current.count(repaired)!=1:raise ValueError('Surface MFD elapsed-sample repair changed')
+                current=current.replace(repaired,legacy,1)
         if name=='MfdHsi.cpp':current=current.replace('static const int arrowseg','static const INT arrowseg').replace('static const int narrowseg','static const INT narrowseg')
         if name=='MfdAlign.cpp':current=current.replace('saveprm = {0,0,0,false,0.0,0.0}','saveprm = {0,0,0,0.0,0.0,false}')
         if name=='MfdTransfer.cpp':current=restore_transfer_finite_indicators(restore_transfer_rotation_lifetime(restore_transfer_initialization(current)))

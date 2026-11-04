@@ -1103,3 +1103,19 @@ The saved scenario contained the mode's custom status line. Shutdown called
 store, close and destruction in order. The original Windows SDK declarations
 and virtual method order are checked against f7251942. The native Lua vessel
 bindings and full stock vessel runs are still separate gates.
+
+
+The native default vessel key path now includes the complete original internal
+HUD handler after module and navigation processing. H cycles the generic HUD,
+Ctrl-H toggles it, and the original reference and docking-target shortcuts open
+their original selectors. A vessel module can still consume these keys first,
+including the DeltaGlider HUD controls. The source audit checks the extracted
+handler against the unchanged Windows implementation.
+
+Loading a paused session can draw the Surface MFD before any simulation time
+has elapsed. The original rate divisions then produced nonfinite acceleration
+and angular rates, followed by an integer overflow in a tape redraw after
+resume. Those four rates are now zero until a positive sample interval exists;
+the current samples are still retained and every positive-interval formula and
+subsequent drawing operation is conserved. Complete named-mission, repeated
+Windows comparison and full Phase 6 acceptance remain required.

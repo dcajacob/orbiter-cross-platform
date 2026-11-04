@@ -697,6 +697,8 @@ void Instrument_Surface::UpdateDraw (oapi::Sketchpad *skp)
 	static char spdstr[4][4] = {"GS","TAS","IAS","OS"};
 
 	//double dt = SimT - updT + instrDT; // last step interval
+	// A paused initial draw has no elapsed sample interval. Seed the current
+	// values below and leave their rates zero until simulation time advances.
 	double v, dt = orbiter::production::CockpitTime().SimT1 - psimt;
 	double pspd = spd;
 	bool spd_valid = false;
@@ -708,7 +710,7 @@ void Instrument_Surface::UpdateDraw (oapi::Sketchpad *skp)
 
 		strcpy (title+9, sp->ref->Name());
 
-		vacc = (sp->vspd-vspd)/dt;
+		vacc = (dt > 0.0 ? (sp->vspd-vspd)/dt : 0.0);
 		vspd = sp->vspd;
 		alt = sp->alt0;
 		dir   = sp->dir;
@@ -719,8 +721,8 @@ void Instrument_Surface::UpdateDraw (oapi::Sketchpad *skp)
 		if (!vessel->AtmTemperature(atm_T)) atm_T = -1.0;
 		if (!vessel->MachNumber(atm_M))     atm_M = -1.0;
 		// equatorial position
-		vlng = (sp->lng-lng)/dt; lng = sp->lng;
-		vlat = (sp->lat-lat)/dt; lat = sp->lat;
+		vlng = (dt > 0.0 ? (sp->lng-lng)/dt : 0.0); lng = sp->lng;
+		vlat = (dt > 0.0 ? (sp->lat-lat)/dt : 0.0); lat = sp->lat;
 
 	} else {
 		strcpy (title+9, "N/A");
@@ -753,7 +755,7 @@ void Instrument_Surface::UpdateDraw (oapi::Sketchpad *skp)
 		spd_valid = true;
 		break;
 	}
-	acc = (spd_valid ? (spd-pspd)/dt : 0.0);
+	acc = (spd_valid && dt > 0.0 ? (spd-pspd)/dt : 0.0);
 
 	int x = cw/2, y = (3*ch)/2, dy = ch;
 	int x0, y0, x1, y1, x2;

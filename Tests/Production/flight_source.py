@@ -62,9 +62,19 @@ def verify():
     joystick=current[begin2:end2].replace('joystick[','ctrlJoystick[').replace('input.alternate','js->rgbButtons[2]').replace('input.x','js->lX').replace('input.y','js->lY').replace('input.rz','js->lRz')
     if joystick.rstrip()!=original[begin:end].rstrip():raise ValueError('Joystick direction/control formulas changed')
     original=old('Src/Orbiter/VesselApplication.cpp');begin=original.index('\t// Navigation computer modes');end=original.index('\n\t// HUD control',begin)
-    begin2=current.index('\t// Navigation computer modes');end2=current.index('\n    // Aerodynamic control surfaces:',begin2)
+    begin2=current.index('\t// Navigation computer modes');end2=current.index('\n#ifdef ORBITER_NATIVE_COCKPIT',begin2)
     canonical=current[begin2:end2].replace('vessel.AttMode()','attmode').replace('vessel.','')
     if canonical.rstrip()!=original[begin:end].rstrip():raise ValueError('Buffered flight controls changed')
+    begin=original.index('\t// HUD control (internal view only)');end=original.index('\n\tif (KEYMOD_CONTROL (kstate))',begin)
+    if read('Src/Orbiter/Production/CockpitHudInput.inc').rstrip()!=original[begin:end].rstrip():
+        raise ValueError('Original default internal-view HUD key handler changed')
+    call='''#ifdef ORBITER_NATIVE_COCKPIT
+    auto* g_camera=CockpitCamera();
+    auto* g_pane=CockpitPane();
+#include "CockpitHudInput.inc"
+#endif'''
+    if current.count(call)!=1 or current.index(call)<end2:
+        raise ValueError('Original HUD defaults must follow module and navigation handlers')
     begin=original.index('\t\tcase OAPI_KEY_DIVIDE:');end=original.index('\n\t\t}',begin)
     begin2=current.index('\t\tcase OAPI_KEY_DIVIDE:');end2=current.index('\n\t\t}',begin2)
     if current[begin2:end2].replace('vessel.','')!=original[begin:end]:raise ValueError('Original aerodynamic mode command changed')

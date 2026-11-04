@@ -479,8 +479,8 @@
     },
     "Src/Orbiter/MfdSurface.cpp": {
       "original_sha256_lf": "c1a1522edc9fbda54db00341ff078473a1d142f3763bee93b1496434c0644aaf",
-      "sha256_lf": "d40cceac93887bd8e587eb502b58bdc4514e817e7a0e3545b2ced404442654dc",
-      "scope": "Original scheduler, stock MFDs and modern map compile natively with explicit original epoch/time, authoritative world/UI bindings and indexed map resources. Exact Windows calculations and callback order conserved. Native GDI/legacy map/custom-mode entry points fail explicitly until supported; native cockpit owner and DG runtime remain unfinished."
+      "sha256_lf": "036672b6ae5e4707eb9820d01ba0ec2a39682b4400af785cc1a1f05d0053ed58",
+      "scope": "Original scheduler, stock MFDs and modern map compile natively with explicit original epoch/time, authoritative world/UI bindings and indexed map resources. Exact Windows calculations and callback order conserved. Native GDI/legacy map/custom-mode entry points fail explicitly until supported; native cockpit owner and DG runtime remain unfinished. Rates are zero when no positive sample interval exists; every original positive-interval calculation and drawing operation remains unchanged."
     },
     "Src/Orbiter/MfdSurface.h": {
       "original_sha256_lf": "5febb34bf6f0734e4ed4f28a64d4f20758dd40d89a18c9831b13fa4189ad1b5d",
@@ -646,7 +646,7 @@
     },
     "Src/Orbiter/Production/FlightControls.cpp": {
       "original_sha256_lf": null,
-      "sha256_lf": "2dc8a57aa1c896620c33262ce256a408b770552fd1ff0bdc868692aa4800e799"
+      "sha256_lf": "9d953862fb8cad220ca842ba7dc2949bb98aaea9ddb7ab269b6d4b9f3be4a388"
     },
     "Src/Orbiter/Production/FlightControls.h": {
       "original_sha256_lf": null,
@@ -2648,6 +2648,11 @@
       "original_sha256_lf": null,
       "sha256_lf": "18872987d4a0ac04829e8784752e39889e94ead7bef3bfd81bb9fb70b6c1670c",
       "scope": "Complete original Dragonfly source and resources with independently audited native SDK/drawing/resource ownership bindings. Actual compatibility target uses distinct color-renderbuffer storage. Native diagnostic build/runtime and Windows/native qualification required; original formulas and public Windows SDK layouts unchanged."
+    },
+    "Src/Orbiter/Production/CockpitHudInput.inc": {
+      "original_sha256_lf": null,
+      "sha256_lf": "cc1850d651960ed9e1756edc131bf5f776b2555f9711f6efc46318174f2f9522",
+      "scope": "Exact original internal-view default HUD keyboard handler, reached after the vessel module and navigation handlers."
     }
   }
 }
