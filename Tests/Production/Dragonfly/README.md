@@ -225,5 +225,23 @@ public SDK layout stays unchanged. Windows repaired-source v2 declares this
 sixth source path, independently rederives its permitted delta, and rejects
 self-consistent changed/missing initialization or thermal-formula copies. The
 native token reader additionally rejects changed and removed initial current.
-Fresh source preparation, compilation, allocation-pattern controls, complete
-scenes and four-profile Windows/native qualification of this repair are pending.
+Fresh v7 compilation passes at `c2a2c37a`, retaining 768 source/dependency inputs
+and 68 generated compiler inputs. Both real twelve-frame allocation-pattern
+executions now return zero, close their contexts and report no sanitizer
+diagnostics. All thirteen compared state/resource/playback/mesh/control/clock/
+lifecycle outputs are byte-identical across zero and 255 fill, and to the old
+zero-fill control. The record is
+`out/phase6-dragonfly-initial-current-regression-audit-v2.json`, with the actual
+source snapshot in `out/phase6-dragonfly-source-c2a2c37a-v1`. These short runs
+produced no camera/full-frame snapshot and make no visual-parity claim. The first
+audit attempt incorrectly required those absent short-run files; its script is
+retained, and the v2 audit explicitly limits its claim to the actual evidence.
+
+The fresh prepared-source round trip and four independent self-consistent
+Windows source-variant damage controls also pass. One new native damage test
+fails before mutation because its short `Amperes=0;` anchor matches five existing
+assignments. Its failure is preserved. The test now selects the full unique
+constructor assignment; no runtime source or update formula changes with this
+test correction. A fresh package must bind the corrected test source before
+full-scene repeats. Complete scenes and four-profile Windows/native
+qualification of this repair remain pending.
