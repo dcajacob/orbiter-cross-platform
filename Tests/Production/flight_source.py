@@ -75,6 +75,8 @@ def verify():
 #endif'''
     if current.count(call)!=1 or current.index(call)<end2:
         raise ValueError('Original HUD defaults must follow module and navigation handlers')
+    if read('Src/Orbiter/Production/CMakeLists.txt').count('CockpitHudInput.inc')!=1:
+        raise ValueError('Original HUD source must be bound into the native SDK fingerprint')
     begin=original.index('\t\tcase OAPI_KEY_DIVIDE:');end=original.index('\n\t\t}',begin)
     begin2=current.index('\t\tcase OAPI_KEY_DIVIDE:');end2=current.index('\n\t\t}',begin2)
     if current[begin2:end2].replace('vessel.','')!=original[begin:end]:raise ValueError('Original aerodynamic mode command changed')

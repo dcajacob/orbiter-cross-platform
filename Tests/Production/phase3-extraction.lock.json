@@ -582,7 +582,7 @@
     },
     "Src/Orbiter/Production/CMakeLists.txt": {
       "original_sha256_lf": null,
-      "sha256_lf": "3d4bde522efbd8193abcfc8af0fc7c6d04113ac81ff9b81ca6b471c96b731d6a",
+      "sha256_lf": "7d902dc7a9b280fb3d4c5fb239c2f4a32df484ffea03a7f45a8c4db7ef7dffe1",
       "scope": "Complete original Dragonfly source and resources with independently audited native SDK/drawing/resource ownership bindings. Actual compatibility target uses distinct color-renderbuffer storage. Native diagnostic build/runtime and Windows/native qualification required; original formulas and public Windows SDK layouts unchanged."
     },
     "Src/Orbiter/Production/CameraServices.cpp": {
