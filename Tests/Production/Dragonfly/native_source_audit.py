@@ -82,6 +82,11 @@ def inverse(source):
 
 
 def verify_text(name,original,generated,names):
+    for header,kind in (('Hsystems.h','h_object'),('Esystems.h','e_object')):
+        if name==header:
+            destructor=re.compile(r'\bvirtual\s+~'+kind+r'\s*\(\s*\)\s*=\s*default\s*;')
+            if len(destructor.findall(generated))!=1:raise ValueError('Concrete native system destruction differs: '+kind)
+            generated=destructor.sub('',generated,count=1)
     if name=='Dragonfly.cpp':
         original=remove_dispatch(original,'DllMain','1378b675a41700dc508446010d5d3a1d524652c41c38f1bc35c4d6e724cd2e01')
         suffix='\n#include "NativeDragonflyFactory.inc"\n'
@@ -119,7 +124,7 @@ def verify(generated):
         original=(ROOT/path).read_bytes().decode('cp1252').replace('\r\n','\n')
         actual=(generated/name).read_bytes().decode('cp1252').replace('\r\n','\n')
         verify_text(name,original,actual,names)
-    print('Independently conserved all 22 original Dragonfly C++/header token streams; physical, internal-system, attitude and GL drawing commands retained')
+    print('Independently conserved all 22 original Dragonfly C++/header token streams after declared bindings and concrete native teardown; physical, internal-system, attitude and GL drawing commands retained')
     return sources
 
 

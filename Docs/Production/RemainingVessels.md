@@ -69,3 +69,10 @@ state/camera/full-frame comparisons, additional Lua/input/persistence/lifetime
 controls, Dragonfly native instruments and the original full Phase 6 scope
 remain open. The historical complete 157-scene result remains 118 passed and
 39 failed at its recorded owning source; these diagnostics do not revise it.
+
+The complete original Dragonfly module now also builds against actual native
+bitmap, Sketchpad and compatibility-context resources. Its original 28 embedded
+panel BMPs are delivered unchanged. Complete-scene sanitizer execution has
+identified and retained an ELF class-symbol collision and an original nonvirtual
+system-list deletion; native qualification remains pending.
+[Dragonfly source conservation, actual controls and retained failures](../../Tests/Production/Dragonfly/README.md)

@@ -39,6 +39,14 @@ def adapt(name,body,names):
     source=body.decode('cp1252').replace('\r\n','\n')
     if name=='Dragonfly.cpp':source=remove_platform_dispatch(source,'DllMain')
     if name=='panel.cpp':source=remove_platform_dispatch(source,'MsgProc')
+    # The original owning lists delete polymorphic hydraulic/electrical objects
+    # through these base pointers. Give the native copies concrete destruction;
+    # all fields, construction and simulation method bodies remain unchanged.
+    for header,kind in (('Hsystems.h','h_object'),('Esystems.h','e_object')):
+        if name==header:
+            anchor='\t'+kind+'();'
+            if source.count(anchor)!=1:raise ValueError('Original system constructor boundary differs: '+kind)
+            source=source.replace(anchor,anchor+'\n\tvirtual ~'+kind+'()=default;',1)
     source=re.sub(r'#include\s*<\s*windows\.h\s*>','',source,flags=re.I)
     source=re.sub(r'#include\s*<\s*GL[\\/](gl|glu)\.h\s*>',lambda m:'#include <GL/'+m[1]+'.h>',source)
     def include(match):
@@ -128,7 +136,7 @@ def main():
     report=dict(status='prepared-awaiting-build-and-runtime',original_source=BASE,producer_commit=producer,
         source_sha256_lf={name:sha(canonical(body)) for name,body in inputs.items()},original_files_sha256=original,
         generated_files_sha256=generated,bitmap_resources=resources(),native_admission_qualified=False,phase6_complete=False,
-        scope='Complete original module; mechanical SDK/drawing/resource/path/case bindings, empty platform-handle ownership '
+        scope='Complete original module; mechanical SDK/drawing/resource/path/case bindings, concrete polymorphic teardown, empty platform-handle ownership '
               'and checked native factory. Every physical/internal-system/attitude/GL drawing body retained. No class admission.')
     if a.verify_output:
         if json.loads((a.output/'native-source.json').read_text())!=report:raise ValueError('Native module source provenance changed')

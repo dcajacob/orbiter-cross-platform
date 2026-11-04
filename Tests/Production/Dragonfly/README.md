@@ -15,9 +15,10 @@ The preserved Windows C++ sources and public SDK layouts remain unchanged.
 `native_source_audit.py` independently reverses the declared bindings and
 compares every original C++/header token stream, including literals and command
 ordering. It does not import the generator. `NativeSource.Test.py` first checks
-the real native copies, then rejects six in-memory changes to thermal state,
+the real native copies, then rejects eight in-memory changes to thermal state,
 physical size, attitude, original GL commands, state initialization and include
-bindings. The original and generated trees must remain unchanged throughout.
+bindings, plus missing/nonvirtual native system destruction. The original and
+generated trees must remain unchanged throughout.
 
 The real native drawing bindings use renderer surfaces, raster Sketchpads and
 owned fonts, pens, brushes and bitmaps. The original 28 embedded BMP resources
@@ -58,8 +59,31 @@ unchanged. No sanitizer checks are suppressed.
 
 The failed captures, all 57 actual data-file hashes and the exact 794 owning
 source inputs are retained in `out/phase6-dragonfly-native-smoke-v1` and
-`out/phase6-dragonfly-source-dc632-v1`. The repaired fresh build and unchanged
-Dragonfly scene execution, sanitizer teardown, panel/input and persistence
+`out/phase6-dragonfly-source-dc632-v1`.
+
+The second fresh package at `dd41f811a9cb8dd88cdcf5a76a2b8717ab9ede8a`
+also passes all four build stages, with all 767 inputs unchanged. Actual DSO
+inspection proves that Dragonfly no longer exports the conflicting tank class
+table, typeinfo or methods, and its checked factory remains exported. The engine
+retains its actual scenery Tank symbols. The independent record is
+`out/phase6-dragonfly-symbol-isolation-v1.json`.
+
+All five original scenes get past that collision, then ASan stops the actual
+electrical-system list's destruction: it deletes a 184-byte FCell through a
+104-byte nonvirtual e_object base. The hydraulic owning list has the same
+nonvirtual-base deletion. Both base classes are already polymorphic. The native
+copies now gain default virtual destructors so the existing deletion calls use
+each allocated concrete type. The independent source reader requires exactly
+those declarations and conserves every original simulation body and field.
+The original Windows source copies stay unchanged. The diagnostic capability
+check also accounts for all eleven original vent jets/tanks created before the
+fourteen RCS thrusters and main propellant resource. Those resources are part
+of the preserved source, not additions to the simulation.
+
+The second failed capture, all 57 actual data inputs and all 794 owning sources
+remain in `out/phase6-dragonfly-native-smoke-v2` and
+`out/phase6-dragonfly-source-dd41-v1`. Fresh repaired execution and unchanged
+Dragonfly scene checks, sanitizer teardown, panel/input and persistence
 checks, repeated sessions and matched four-profile Windows/native state/camera/
 full-frame comparisons still have to pass. Normal class admission and Phase 6
 completion remain unchanged. The Windows reference workflow now also watches

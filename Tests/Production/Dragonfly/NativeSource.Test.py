@@ -29,7 +29,9 @@ def main():
         ('attitude-formula','instruments.cpp','glRotatef(-now.z/Pi*180.0','glRotatef(-now.z/Pi*180.1'),
         ('original-gl-command','instruments.cpp','glLightfv(GL_LIGHT0,GL_DIFFUSE,light_diffuse);','glLightfv(GL_LIGHT1,GL_DIFFUSE,light_diffuse);'),
         ('physical-state-initialization','Thermal.cpp','Temp=_en;','Temp=0;'),
-        ('undeclared-include','Thermal.cpp','#include "Thermal.h"','#include "NativeDrawing.h"')]
+        ('undeclared-include','Thermal.cpp','#include "Thermal.h"','#include "NativeDrawing.h"'),
+        ('nonvirtual-hydraulic-destruction','Hsystems.h','virtual ~h_object()=default;','~h_object()=default;'),
+        ('missing-electrical-destruction','Esystems.h','virtual ~e_object()=default;','')]
     results=[]
     for label,name,anchor,replacement in controls:
         original=(ROOT/PREFIX/name).read_bytes().decode('cp1252').replace('\r\n','\n')
