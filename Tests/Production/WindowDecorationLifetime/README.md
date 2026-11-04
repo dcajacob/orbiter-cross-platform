@@ -39,3 +39,42 @@ compatible representation. The original and candidate still report identical
 genuinely lost allocations. The unchanged GTK window is clean with that
 explicitly selected candidate, without changing its decoration preference or
 resetting the shared Pango map. Historical system-library reports remain here.
+
+## GTK icon-info ownership candidate
+
+A later current-source tank deletion control completed graphics teardown, then
+reported 14,085 leaked bytes in 123 allocations. Its three direct GObject
+allocations originate in `gtk_icon_theme_lookup_icon_for_scale` through
+libdecor's three title-bar buttons. The raw failed run is retained in
+`out/phase6-atlantis-tank-lifetime-v7/detached-below`. libdecor 0.2.5 releases the
+loaded icon pixbuf but omits the returned `GtkIconInfo`. GTK assigns ownership of
+that return to the caller in its
+[public API contract](https://docs.gtk.org/gtk3/method.IconTheme.lookup_icon_for_scale.html).
+The private patch adds that one release after drawing.
+
+`libdecor-icon-source.lock.json` pins the official upstream and Debian source
+archives from the distribution descriptor. Both Ubuntu and Debian supplied the
+same descriptor bytes; all 52 extracted source/package files match the retained
+baseline exactly. `build_icon_owner.py` verifies that complete tree, applies only
+the declared release, checks the plugin's actual exports and sanitizer linkage,
+and builds into a new private directory. It performs no system installation.
+
+```sh
+python3 -B Tests/Production/WindowDecorationLifetime/build_icon_owner.py \
+  --cache out/phase6-libdecor-source-cache-v1 \
+  --output out/libdecor-icon-candidate \
+  --meson out/phase6-mesa-build/deps/usr/bin/meson \
+  --meson-pythonpath out/phase6-mesa-build/deps/usr/lib/python3/dist-packages \
+  --development-prefix out/phase6-decoration-build-deps/root/usr --sanitizers
+```
+
+Use `--baseline` in a separate fresh output for the unmodified source.
+The source-bound prototypes in `out/phase6-libdecor-icon-owner-build-v1` have
+completed two baseline and two candidate real native sessions. All four exit
+cleanly, retain 60 presentations and context deletion, and have byte-identical
+complete state/control/animation traces and full frames. Raw evidence is in
+`out/phase6-libdecor-icon-application-v1`. This validates unchanged application
+behavior in that paired sample. Leak elimination, independent lost-allocation
+controls, repeated real-window ownership and broad dependency qualification
+remain open because the fresh baselines also exited cleanly. The normal
+application's dependency selection and historical failed gate remain unchanged.

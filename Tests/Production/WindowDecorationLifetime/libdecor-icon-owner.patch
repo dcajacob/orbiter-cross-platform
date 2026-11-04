@@ -1,0 +1,10 @@
+--- a/src/plugins/gtk/libdecor-gtk.c
++++ b/src/plugins/gtk/libdecor-gtk.c
+@@ -1168,6 +1168,7 @@
+ 	cairo_paint(cr);
+ 	cairo_surface_destroy(icon_surface);
+ 	g_object_unref(icon_pixbuf);
++	g_object_unref(icon_info);
+ }
+ 
+ static void

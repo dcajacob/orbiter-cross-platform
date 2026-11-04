@@ -1,0 +1,82 @@
+{
+  "schema": 1,
+  "package_version": "0.2.5-1",
+  "automatic_refresh": false,
+  "descriptor": {
+    "urls": [
+      "https://archive.ubuntu.com/ubuntu/pool/main/libd/libdecor-0/libdecor-0_0.2.5-1.dsc",
+      "https://deb.debian.org/debian/pool/main/libd/libdecor-0/libdecor-0_0.2.5-1.dsc"
+    ],
+    "sha256": "160fe3250942685a3667e667a2f2d191187587be30ecf7ac5eba694f0f663e2c"
+  },
+  "archives": {
+    "libdecor-0_0.2.5.orig.tar.xz": {
+      "url": "https://archive.ubuntu.com/ubuntu/pool/main/libd/libdecor-0/libdecor-0_0.2.5.orig.tar.xz",
+      "sha256": "5aa8cb05ed8e2bfea0791342072108aa41965700d7b848d4cc2f866c6a2b8734",
+      "bytes": 45092
+    },
+    "libdecor-0_0.2.5-1.debian.tar.xz": {
+      "url": "https://archive.ubuntu.com/ubuntu/pool/main/libd/libdecor-0/libdecor-0_0.2.5-1.debian.tar.xz",
+      "sha256": "66967e7a962f213f6227806b9e09ab426aea47e828e2efd6c29b7f779bf85614",
+      "bytes": 6864
+    }
+  },
+  "upstream_directory": "libdecor-0-0.2.5",
+  "patched_file": "src/plugins/gtk/libdecor-gtk.c",
+  "patched_file_sha256": "842da2c4f0e0940358d5353c185fd640924fdda1eebb70d214fb737040e05de6",
+  "source_files_sha256": {
+    ".gitignore": "181314065df2f2fdaf920b1a8b5311daa216a2d6489a06ada5b49cc514d89417",
+    ".gitlab-ci.yml": "ba0b65edeaf9b687dc7b1c719e4c8f554194081e38e82cbfb60317d55245a43a",
+    "LICENSE": "508a77d2e7b51d98adeed32648ad124b7b30241a8e70b2e72c99f92d8e5874d1",
+    "README.md": "7f60e24ba10b1bf79c9fca5c2ba1a0eb5742bf1e9d585742fc64c62059c43a32",
+    "config.h.meson": "ced180a39f8cc5884176a685d7e84bd12c0f2a13a3574a5a847a9139c86968ac",
+    "debian/.gitignore": "9abe8e5b5bd26f4f0b960e1ab2bb3e9074929ebde803fc839140242e1d0c7d2b",
+    "debian/changelog": "2b11bdb9eb0de35353407543c58a29d5a6f22f91439d45ceeea42da70a8ceb55",
+    "debian/clean": "9360af85e385cfd5c807d84405a21a5360c41a294e2dada0fd7b0856c59a2f19",
+    "debian/control": "888131bba36cbead0917f5333256802bc62bc689053769f904bfd2e0b5757014",
+    "debian/copyright": "29a9bc5f6316111076b7769d6f82562f1036b171c8d1af5ce2c7d20638a6a441",
+    "debian/gbp.conf": "6e7ef1dd460b0a9534808eb8c5b65d795517459418ee70ae4aacafd35df61bb7",
+    "debian/libdecor-0-0.install": "b2cf3804ec6d2a34c51ce6c9a4ebbfad780a4e81a9b18f176df42da58982bb64",
+    "debian/libdecor-0-0.symbols.in": "9b8538df8dd9bb92eb51154e58580f6a760ae726626e01b1bbcd660111538ab3",
+    "debian/libdecor-0-dev.install": "2e2334209a177e022306f3111c19fe49848da6ac4299cdcaa99dc16de2f3b98b",
+    "debian/libdecor-0-plugin-1-cairo.install": "9ebec646b324bf4dee877a4aef962fe2c5f0d6078ef280dab21b79d026622842",
+    "debian/libdecor-0-plugin-1-gtk.install": "2f61a4fc683c121c549d3e82f63c57e2f95587a0ea3d0a4ecbccc9141931e94b",
+    "debian/libdecor-tests.install": "1ae14e4852a85e5f91776f6bd375b668d01b24b733ba6f4fef3faa2bd58bd35f",
+    "debian/rules": "3234710c637315e405914ca95402a69d8c82c18a2e80e3e43da1e19e59842944",
+    "debian/shlibs.local": "5c9943fb69b176a40ec2a5dfc70967f4a71a8d5c4e601de37703e42fe8a80485",
+    "debian/source/format": "1be7080d72e6b566df3e236ce2c55efdfbbb8fa1c972d825e5b672ff8773be1a",
+    "debian/tests/control": "077ba9a47d069a3f37df842e93e9a49dba33667bca9e664944900e9a9fd3aadc",
+    "debian/tests/libdecor-0-dev": "a26a7299d459971080010f4af9b2ec14d8b3bdc6a47eae03db5afe4eb2c08e8f",
+    "debian/tests/run-with-display": "4b8e00ded5378b2f2657948e639231a268b030a026c79ec50d3968f871196531",
+    "debian/upstream/metadata": "88a3e82906b31cbd91a28bf501cc6c2b6253258aeee181d22d7c073674d76006",
+    "debian/watch": "f2bcaeacb63d16ad34156e0eb911ba3ac583b428ce836ba1144437f9a385893e",
+    "demo/c++-demo.cc": "92689dd4164a6b88000c8629e715902e383bc2ce7cf91226326047c1887a942c",
+    "demo/demo.c": "df23fed5fc5d5a36e6c0c9aaf88e1c668e989071ca3442eaebae82c9c5ccca4a",
+    "demo/egl.c": "67feb109b65fed88f909917ed6619b5262ffa477d21838a2533ce744313d3f7f",
+    "demo/meson.build": "ccf4d5c5792e64c3ff3df5e640c120b9adc564e25b17e2cc296274dfdc468d6c",
+    "meson.build": "4cf7c390129c9979c3f97748318db7ab10e3e728b4ec0a25ceafa66289f94530",
+    "meson_options.txt": "a87531595550a710121db67e8ef09156d2e1a08780b97a137edc842a544df023",
+    "src/desktop-settings.c": "16519c1b6a9e7b80c7ad681273c8389a2c9a7c3fe3c3196b2e34170ae8723fe5",
+    "src/desktop-settings.h": "1d8ea41b9d40b976daf2ce738be10020d33c29b766659937cf69ac0a3b4c1cdb",
+    "src/libdecor-fallback.c": "e681f25119b01eeea17c2d980e9a7380ab2b4892081525ce5063ac9f14ab867e",
+    "src/libdecor-fallback.h": "78fd4fd3a2ab068f4cd457f0f7cff9873ea4a8e7af88780fbfb613f01e66aaf4",
+    "src/libdecor-plugin.h": "dad82b0ae8f8c77da26666644b8073a13f05d60b70a30849edc06efd7100426d",
+    "src/libdecor.c": "2cdbcc069ec76593480c2e639774ede157eea6823aa66bcb7b885478d84b475f",
+    "src/libdecor.h": "bb85696fea29eea7f7c78cdddacbc02e6234a0ac94f5d331e7f36eedb5f52cfa",
+    "src/meson.build": "3c0058f5c923ff2df1c7a52562c2affb0e2626bda2eab288a77a4dda45fbcd01",
+    "src/os-compatibility.c": "27418c91716c1941369f611df545d7358d95d0680f119969c87ae8f02646bfb5",
+    "src/os-compatibility.h": "81ded20f5a566bcaf9fb2de0e83e62b748443ff91cb17508609273cfb6e58057",
+    "src/plugins/cairo/libdecor-cairo.c": "faacf5584024f894855b8393f953f55d7d411ea48e56ba63f728b8eabd181ab8",
+    "src/plugins/cairo/meson.build": "37e393d7b114d6dcfa8f0d99b292fba0a65c25128dbe1a43adbbf70ff1d02241",
+    "src/plugins/common/libdecor-cairo-blur.c": "fa9e82cbd4ca17786cdfc89d31ba28a81659c6e75476aa51aa1e16d7c0a18bf1",
+    "src/plugins/common/libdecor-cairo-blur.h": "938cb301573578b20197564280516bad48c175696e6ea3a6a575848751e26259",
+    "src/plugins/common/meson.build": "22b0ee33bd4939651153d7c6cc31818dd1403ee7c739f21fd33d8b7ee60afbcf",
+    "src/plugins/dummy/libdecor-dummy.c": "e342a904de40bac7bbc5e7754d2ba349e758a8d80dc08e02d436624d5c18158b",
+    "src/plugins/dummy/meson.build": "1b6ba7e91549558eadbb7b776f29ab596f9609b2fa572dda9a64373d464e27cd",
+    "src/plugins/gtk/libdecor-gtk.c": "a2551af70240e024bab69b8c0887bacc150f04aa0089306ee5d10783fe762f2c",
+    "src/plugins/gtk/meson.build": "e603f29316891f14c2333fed7f15158925ec8f7f47c80134a565235de99deb2a",
+    "src/plugins/meson.build": "aae54119ab631c4257d056a35beb0d14de80511ae223293e9de1fceddd3ea94f",
+    "src/utils.h": "9487b7136e326ec442179dfeccc89ca819ae2818610e94a3d068b7192abd5536"
+  },
+  "scope": "Exact upstream and distribution source files. One owned GtkIconInfo release; source integration only, no runtime or Phase 6 qualification."
+}
