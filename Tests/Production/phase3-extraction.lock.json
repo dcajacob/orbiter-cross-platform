@@ -1306,7 +1306,7 @@
     },
     "Src/Orbiter/Production/NativeCockpit.cmake": {
       "original_sha256_lf": null,
-      "sha256_lf": "d847b34bfa700f69600a397be28701f9343ddbeff2b4c6576893c2f803870565",
+      "sha256_lf": "f1b9596326162108ccf4ace57d3197b74252c30607fc82ea1b2ca5b60de9a4d4",
       "scope": "Complete original Dragonfly source and resources with independently audited native SDK/drawing/resource ownership bindings. Actual compatibility target uses distinct color-renderbuffer storage. Native diagnostic build/runtime and Windows/native qualification required; original formulas and public Windows SDK layouts unchanged."
     },
     "Src/Orbiter/Production/NativeCockpitGui.cpp": {

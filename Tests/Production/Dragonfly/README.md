@@ -39,9 +39,29 @@ identical to the earlier native capture. The record is
 target ownership and regression evidence; it does not qualify Dragonfly raster
 parity, interaction or lifetime behavior.
 
-All nine original translation units and the actual native drawing implementation
-passed syntax compilation in the retained development v3 record. The complete
-fresh module build, unchanged Dragonfly scenes, sanitizer teardown, panel/input
-and persistence checks, repeated sessions and matched four-profile Windows/native
-state/camera/full-frame comparisons still have to pass. Normal class admission
-and Phase 6 completion remain unchanged.
+The complete fresh Debug ASan/UBSan module and renderer package at
+`dc63207202722bb2efc1b8422c352251ab2b38a5` passed all four actual build stages,
+with 767 source/dependency inputs guarded. Its record is
+`out/phase6-dragonfly-native-Debug-asan-v1/build.json`. All 28 original panel
+bitmaps are delivered in the 1,130-file resource tree. The stager also supports
+isolated worktrees on another filesystem by copying when hard-linking returns
+EXDEV. The first failed staging tree is retained separately.
+
+All five complete unchanged Dragonfly scenes then failed during real module
+initialization. UBSan identifies a Valve member access whose actual object
+table belongs to the engine's unrelated scenery Tank. Both the original vessel
+module and actual engine export the same ELF Tank class-table/typeinfo names.
+The private native module now hides its C++ implementation symbols while its
+checked OrbiterNativeQuery entry remains exported. The builder checks the actual
+DSO's dynamic symbols for this collision. Every original calculation remains
+unchanged. No sanitizer checks are suppressed.
+
+The failed captures, all 57 actual data-file hashes and the exact 794 owning
+source inputs are retained in `out/phase6-dragonfly-native-smoke-v1` and
+`out/phase6-dragonfly-source-dc632-v1`. The repaired fresh build and unchanged
+Dragonfly scene execution, sanitizer teardown, panel/input and persistence
+checks, repeated sessions and matched four-profile Windows/native state/camera/
+full-frame comparisons still have to pass. Normal class admission and Phase 6
+completion remain unchanged. The Windows reference workflow now also watches
+the actual Dragonfly and renderer source inputs, so a target-ownership repair
+cannot leave its reference candidate stale.

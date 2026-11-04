@@ -231,6 +231,7 @@ target_include_directories(native_dragonfly PRIVATE "${_dragonfly_generated}" "$
 target_link_libraries(native_dragonfly PRIVATE orbiter_production_vessels OpenGL::GL OpenGL::GLU)
 target_link_options(native_dragonfly PRIVATE -Wl,--no-undefined)
 set_target_properties(native_dragonfly PROPERTIES PREFIX "" OUTPUT_NAME Dragonfly
+    CXX_VISIBILITY_PRESET hidden VISIBILITY_INLINES_HIDDEN YES
     LIBRARY_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/NativeModules/Vessel")
 
 add_library(native_lua_inline_list OBJECT ../../Module/LuaScript/LuaInline/LuaInline.cpp)

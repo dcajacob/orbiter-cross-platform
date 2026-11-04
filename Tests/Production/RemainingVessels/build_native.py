@@ -95,6 +95,10 @@ def main():
             module=engine/'NativeModules/Vessel'/(name+'.so');require(module.is_file(),'Original native module absent: '+name)
             symbols=subprocess.check_output(['nm','-D','--defined-only',str(module)],text=True)
             require(any(line.split()[-1]=='OrbiterNativeQuery' for line in symbols.splitlines()),'Actual checked SDK entry absent: '+name)
+            if name=='Dragonfly':
+                demangled=subprocess.check_output(['nm','-DC','--defined-only',str(module)],text=True)
+                require(not any(value in demangled for value in ('typeinfo for Tank','vtable for Tank','Tank::')),
+                        'Private Dragonfly tank symbols would collide with the actual engine scenery Tank')
             if name=='SolarSail':
                 require(not any(len(line.split())>=3 and line.split()[-2]=='u' for line in symbols.splitlines()),
                         'GNU-unique symbols would prevent real solar-sail module unload')
@@ -107,6 +111,7 @@ def main():
         require(sha_lf(notice)==sha_lf(ROOT/'Tests/Production/Licenses/implot-LICENSE'),'ImPlot notice differs')
         report.update(status='built',owning_sources_unchanged=True,implot_notice_sha256_lf=sha_lf(notice),
             solar_sail_gnu_unique_symbols=False,
+            dragonfly_private_tank_symbols_exported=False,
             candidate_runtime_files_sha256={path.relative_to(ROOT).as_posix():sha(path) for path in candidates},
             runtime_files_sha256={path.relative_to(ROOT).as_posix():sha(path) for path in runtime},
             scope='Fresh original-source native modules and real diagnostic host; complete Windows/native state/camera/frame, '

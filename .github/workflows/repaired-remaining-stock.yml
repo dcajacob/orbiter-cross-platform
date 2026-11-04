@@ -2,7 +2,12 @@ name: Explicitly Repaired Windows Remaining Stock Reference Candidate
 on:
   push:
     branches: ['codex/production-**']
-    paths: ['Tests/Production/RemainingStockRepaired/**', '.github/workflows/repaired-remaining-stock.yml']
+    paths:
+      - 'Tests/Production/RemainingStockRepaired/**'
+      - 'Src/Vessel/Dragonfly/**'
+      - 'Tests/Production/Dragonfly/**'
+      - 'OVP/OGLClient/**'
+      - '.github/workflows/repaired-remaining-stock.yml'
   workflow_dispatch:
 permissions:
   contents: read
