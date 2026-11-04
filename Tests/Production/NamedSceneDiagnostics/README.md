@@ -18,3 +18,7 @@ This workflow has no release, binary or evidence-archive upload step. Its
 concise normal CI output can be retained locally. It does not refresh accepted
 references or qualify unchanged named missions, full stock, image/numerical
 parity, hardware performance or final Phase 6 acceptance.
+
+The ordinary native application uses its fixed-step default for system time.
+A bounded replay with only its header supplies the required pacing contract;
+it contains no HUD, MFD, camera, keyboard or physics commands.

@@ -36,8 +36,9 @@ try:
             for repeat in (1,2):
                 folder=a.output/(case['id']+'-'+str(repeat));folder.mkdir();body,expected=scenario(case)
                 (folder/'scene.scn').write_bytes(body);(folder/'Orbiter.cfg').write_text(configuration((ROOT/'Tests/Production/NativeScene/Orbiter.cfg').read_text())+'\nVesselCollision = FALSE\nBaseCollision = TRUE\nUnlimitedFuel = FALSE\n')
+                (folder/'replay.csv').write_text('tick,phase,action,value\n')
                 (folder/'instrument-evidence.enabled').write_text('Complete-scene diagnostic observation only\n')
-                argv=[str(a.build/'orbiter-production'),'--assets',str(a.assets),'--data',str(a.data),'--planets',str(a.planets),'--modules',str(a.build/'NativeModules'),'--scenario',str(folder/'scene.scn'),'--config',str(folder/'Orbiter.cfg'),'--evidence',str(folder),'--frames','60','--fixed-step','0.25','--fixed-system-step','0.25','--frame-delay-ms','120','--run']
+                argv=[str(a.build/'orbiter-production'),'--assets',str(a.assets),'--data',str(a.data),'--planets',str(a.planets),'--modules',str(a.build/'NativeModules'),'--scenario',str(folder/'scene.scn'),'--config',str(folder/'Orbiter.cfg'),'--evidence',str(folder),'--replay',str(folder/'replay.csv'),'--frames','60','--fixed-step','0.25','--frame-delay-ms','120','--run']
                 env=dict(display.environment,ASAN_OPTIONS='detect_leaks=1:fast_unwind_on_malloc=0',LSAN_OPTIONS='',UBSAN_OPTIONS='halt_on_error=1:print_stacktrace=1',LIBGL_ALWAYS_SOFTWARE='1',GALLIUM_DRIVER='llvmpipe',LP_NUM_THREADS='2',LIBDECOR_PLUGIN_DIR=str(a.gtk_plugin.parent),LD_LIBRARY_PATH=':'.join(map(str,[a.build,*a.library])))
                 env.pop('LD_PRELOAD',None)
                 with (folder/'console.log').open('w') as log:child=subprocess.run(argv,cwd=folder,env=env,stdout=log,stderr=subprocess.STDOUT,timeout=240)
