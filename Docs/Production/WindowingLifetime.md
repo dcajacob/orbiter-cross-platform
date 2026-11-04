@@ -108,3 +108,18 @@ The retained-source regression proves the helper preserves every original
 input route and assertion, and checks all twelve actual corrected save
 boundaries. [Scoped evidence](CaptureReleaseVerification.json) does not replace
 the complete GUI, stock, platform or Phase 6 gates.
+
+The complete current-package X11 GUI/lifetime groups now pass independent
+all-profile auditing: 36 actual application processes, 112 deleted graphics
+contexts and 7,306 presentations. Each profile includes the twelve-command
+menu, actual browser Help, SDK callback teardown, Options reload, the
+five-process recorder/player/editor/exit-flush sequence, corrected dialog
+typing and twenty in-process sessions with an input dialog open at teardown.
+All 44 renderer-startup and Shuttle-A module-policy rejections also pass
+independent raw-log, actual-provider, exit and original-assertion AST checks;
+the 32 module failures render zero frames and delete their contexts.
+[Current scoped results](CurrentGuiVerification.json) retain each raw audit's
+identity and the failed/interrupted cohorts. Full stock Windows/native parity,
+the complete Wayland matrix, final platform/hardware/performance and durable
+evidence gates remain open. The unavailable physical controller remains
+unverified and unwaived; Phase 6 is not complete.

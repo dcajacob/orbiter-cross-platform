@@ -1,0 +1,96 @@
+{
+  "schema": 1,
+  "status": "passed-current-four-profile-x11-gui-lifetime-and-startup-rejection-gates",
+  "runtime_source": "d255d79176c9fffccf7f50b0af96bdab11f34fe3",
+  "owning_test_source": "c20135a10d8462ecab49b3d9d4a33e45ae18a53c",
+  "published_capture_release_repair": "45401ca7ff06b1421fbcef02ee657a9b4cc03b0b",
+  "scope": "Complete four-profile local X11 menu/Help/SDK/Options reload, recorder/player/editor/exit flush, synchronized physical typing/cancel/save, twenty-session open-input lifetime, and existing renderer/module rejection groups. These do not qualify full stock Windows/native parity or complete Phase6.",
+  "gui": {
+    "actual_processes": 36,
+    "actual_contexts": 112,
+    "successful_presents": 7306,
+    "profiles": {
+      "Debug-automatic": {
+        "processes": 9,
+        "contexts": 28,
+        "gui_sessions": 20,
+        "successful_presents": 1823
+      },
+      "Debug-sse2": {
+        "processes": 9,
+        "contexts": 28,
+        "gui_sessions": 20,
+        "successful_presents": 1822
+      },
+      "Release-automatic": {
+        "processes": 9,
+        "contexts": 28,
+        "gui_sessions": 20,
+        "successful_presents": 1819
+      },
+      "Release-sse2": {
+        "processes": 9,
+        "contexts": 28,
+        "gui_sessions": 20,
+        "successful_presents": 1842
+      }
+    }
+  },
+  "rejections": {
+    "actual_processes": 44,
+    "zero_frame_module_contexts": 32,
+    "renderer_startup_rejections": 12,
+    "original_assertion_asts_conserved": true,
+    "profiles": {
+      "Release-sse2": 11,
+      "Debug-automatic": 11,
+      "Debug-sse2": 11,
+      "Release-automatic": 11
+    }
+  },
+  "input_regression": {
+    "actual_processes": 4,
+    "successful_presents": 178,
+    "actual_failed_boundary": {
+      "save_release_tick": 337,
+      "popup_first_observed_closed_tick": 338,
+      "save_file_absent": true,
+      "filtered_save_press": true
+    }
+  },
+  "raw_audits": {
+    "gui": {
+      "file": "phase6-current-x11-four-profile-gui-independent-audit-v2.json",
+      "sha256": "2f46a0faa4e1abf9b2eb02550ed89160f86ac7ac8314165c8c32b23a8f5920f5",
+      "protected_files": 9927
+    },
+    "rejections": {
+      "file": "phase6-current-startup-policy-independent-v2.json",
+      "sha256": "fa1afa316bbbeaeaf2d058979ccf0157203cef6fca218dcdf325e420cca45e55",
+      "protected_files": 4134
+    },
+    "input_regression": {
+      "file": "phase6-current-x11-input-capture-sync-independent-v1.json",
+      "sha256": "831c5b6199da902597a303cb8ec428d3cbdca068ec8eef951c100b8d3cd9b1ab",
+      "protected_files": 2153
+    }
+  },
+  "raw_capture_owner": "phase6-input-frame-sync",
+  "source_runtime_generated_libraries_assets_and_raw_evidence_rehashed": true,
+  "failed_and_interrupted_captures_preserved": true,
+  "selected_lifetime_outer_and_simulator_exits_zero": true,
+  "remote_raw_evidence_preservation": "pending",
+  "full157_last_qualified": {
+    "passed": 118,
+    "failed": 39
+  },
+  "remaining": [
+    "Complete 64-flow current software/Intel Wayland independent qualification",
+    "Complete all38 original Windows/native stock and exact Windows-save reload comparisons in all four profiles",
+    "Fresh unchanged full157 and named interactive acceptance",
+    "Remaining current-source reference, failure-path, platform/DPI/hardware/performance and durable-evidence gates",
+    "Unavailable physical controller remains unverified and unwaived"
+  ],
+  "native_admission_qualified": false,
+  "phase6_complete": false
+}
