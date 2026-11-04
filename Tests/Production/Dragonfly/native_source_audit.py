@@ -82,6 +82,11 @@ def inverse(source):
 
 
 def verify_text(name,original,generated,names):
+    if name=='instruments.cpp':
+        anchor='CW::~CW()\n{'
+        cleanup=anchor+'\nwhile (b_list.next) {bounds* gone=b_list.next;b_list.next=gone->next;delete gone;}\n'
+        if generated.count(cleanup)!=1:raise ValueError('Native warning-list ownership cleanup differs')
+        generated=generated.replace(cleanup,anchor,1)
     for header,kind in (('Hsystems.h','h_object'),('Esystems.h','e_object')):
         if name==header:
             destructor=re.compile(r'\bvirtual\s+~'+kind+r'\s*\(\s*\)\s*=\s*default\s*;')

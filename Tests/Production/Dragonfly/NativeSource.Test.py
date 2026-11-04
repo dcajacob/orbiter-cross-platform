@@ -31,7 +31,9 @@ def main():
         ('physical-state-initialization','Thermal.cpp','Temp=_en;','Temp=0;'),
         ('undeclared-include','Thermal.cpp','#include "Thermal.h"','#include "NativeDrawing.h"'),
         ('nonvirtual-hydraulic-destruction','Hsystems.h','virtual ~h_object()=default;','~h_object()=default;'),
-        ('missing-electrical-destruction','Esystems.h','virtual ~e_object()=default;','')]
+        ('missing-electrical-destruction','Esystems.h','virtual ~e_object()=default;',''),
+        ('missing-warning-list-cleanup','instruments.cpp',
+         'while (b_list.next) {bounds* gone=b_list.next;b_list.next=gone->next;delete gone;}','')]
     results=[]
     for label,name,anchor,replacement in controls:
         original=(ROOT/PREFIX/name).read_bytes().decode('cp1252').replace('\r\n','\n')

@@ -19,6 +19,20 @@ def require(value,message):
     if not value:raise ValueError(message)
 
 
+def generated_inputs(engine,producer,log):
+    directories=list(engine.glob('native-dragonfly-*'))
+    require(len(directories)==1,'Actual generated Dragonfly source tree missing or ambiguous')
+    directory=directories[0]
+    with log.open('w') as stream:
+        subprocess.run([sys.executable,'-B',str(HERE.parent/'Dragonfly/prepare_native.py'),
+                        '--output',str(directory),'--verify-output'],stdout=stream,stderr=subprocess.STDOUT,check=True)
+    report=json.loads((directory/'native-source.json').read_text())
+    require(report['producer_commit']==producer,'Actual generated source producer differs')
+    paths=list(directory.rglob('*'))
+    require(not any(p.is_symlink() for p in paths),'Symlink in actual generated source inputs')
+    return {p.relative_to(ROOT).as_posix():sha(p) for p in paths if p.is_file()}
+
+
 def main():
     p=argparse.ArgumentParser(description=__doc__)
     for name in ('output','renderer-dependencies','lua-archive','plot-archive'):
@@ -78,12 +92,19 @@ def main():
     def save():manifest.write_text(json.dumps(report,indent=2)+'\n')
     save()
     try:
+        generated=None
         for command in commands:
             log=a.output/(command['label']+'.log')
             with log.open('w') as stream:process=subprocess.run(command['argv'],cwd=ROOT,stdout=stream,stderr=subprocess.STDOUT)
             if process.returncode:
                 print('\n'.join(log.read_text(errors='replace').splitlines()[-70:]),flush=True);process.check_returncode()
             print(command['label'],'passed',flush=True)
+            if command['label']=='engine-configure':
+                generated=generated_inputs(engine,source,a.output/'generated-source-before.log')
+                report['generated_source_files_sha256']=generated;save()
+            elif command['label'] in ('engine-build','renderer-build'):
+                require(generated==generated_inputs(engine,source,a.output/(command['label']+'-generated-source-after.log')),
+                        'Actual generated source inputs changed during compilation')
         require(before=={name:sha_lf(ROOT/name) for name in before},'Owning source changed during fresh build')
         require(archive_hashes=={name:sha(Path(name)) for name in archive_hashes},'Dependency archive changed during build')
         cache=dict(line.split('=',1) for line in (engine/'CMakeCache.txt').read_text().splitlines() if '=' in line and not line.startswith(('#','//')))

@@ -15,9 +15,9 @@ The preserved Windows C++ sources and public SDK layouts remain unchanged.
 `native_source_audit.py` independently reverses the declared bindings and
 compares every original C++/header token stream, including literals and command
 ordering. It does not import the generator. `NativeSource.Test.py` first checks
-the real native copies, then rejects eight in-memory changes to thermal state,
+the real native copies, then rejects nine in-memory changes to thermal state,
 physical size, attitude, original GL commands, state initialization and include
-bindings, plus missing/nonvirtual native system destruction. The original and
+bindings, plus missing/nonvirtual native system and warning-list destruction. The original and
 generated trees must remain unchanged throughout.
 
 The real native drawing bindings use renderer surfaces, raster Sketchpads and
@@ -99,6 +99,31 @@ allocation-address evidence even if an early scene failure unloads the module
 before LSan runs. It sets no vessel state and changes no simulation callback.
 The bitmap resource stager separately verifies the original resource.h ID
 definitions as well as panel.rc and each raw BMP.
+
+The fourth package at `3e47a10c06e6b1787f8a7570706080201cda56ba` builds
+and directly observes Dragonfly's original capabilities: SDK version 1, empty
+mass 7,000, size 4, one mesh, 25 thrusters, 12 propellants and one dock. The next
+initialization failure is the native oapiBlt bridge rejecting its obsolete
+color-key argument. The original Windows API warns once, ignores that argument
+and always performs the default rectangle copy. The native bridge now follows
+that original contract. An added GPU control requires all 45 copied pixels,
+including a black pixel with ck=0, in addition to the previous target controls;
+its fresh execution remains pending.
+
+The captured pre-unload module mappings resolve all 37 leaks to the exact
+original `CW::Watch(new bounds(...))` allocation statements: 888 bytes total.
+The record is `out/phase6-dragonfly-watch-list-leak-audit-v1.json`. The native
+warning destructor now deletes its owned list before the original surface
+release. Every monitoring threshold, comparison, allocation and update remains
+unchanged. The fourth failed capture and exact source tree remain in
+`out/phase6-dragonfly-native-smoke-v4` and
+`out/phase6-dragonfly-source-3e47-v1`.
+
+The builder now independently verifies the complete generated source tree after
+configuration and after each actual build stage, retaining every generated raw
+input hash. The capture runner guards those exact generated files alongside the
+original sources, runtime and probe through process exit. This closes the gap
+between verifying the generator's inputs and retaining its actual compiler inputs.
 
 Fresh repaired execution and unchanged
 Dragonfly scene checks, sanitizer teardown, panel/input and persistence

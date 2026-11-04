@@ -98,7 +98,8 @@ def inspect(out,case,config,identity,build,probe,libraries,gtk_plugin,instrument
     if instrument_control:
         control=json.loads((out/'native-instrument-control.json').read_text())
         require(control==dict(status='passed',contexts=3,context_restorations=7,display_lists=2,pixel_uploads=1,
-                checked_pixels=25736,texture_name_1_collision_reproduced=True,
+                checked_pixels=25781,texture_name_1_collision_reproduced=True,
+                legacy_blt_copies=1,obsolete_blt_color_key_ignored=True,
                 native_admission_qualified=False,phase6_complete=False),'Actual native compatibility-target control incomplete')
     files={p.relative_to(out).as_posix():sha(p) for p in out.iterdir() if p.is_file()}
     result=dict(result,status='captured',lifecycle=life,renderer=renderer,actual_math=actual_math,files_sha256=files,
@@ -119,6 +120,7 @@ def main():
     cases=[case for case in config['cases'] if not a.case or case['id'] in a.case]
     require(cases and (not a.case or {c['id'] for c in cases}==set(a.case)),'Unknown native complete-scene case')
     record=json.loads(a.build_record.read_text());require(record['status']=='built','Complete immutable build required')
+    require(record.get('generated_source_files_sha256'),'Actual generated module source closure missing')
     candidate=a.build/'production_remaining_stock_diagnostic'
     require(record['candidate_runtime_files_sha256'][candidate.relative_to(ROOT).as_posix()]==sha(candidate),'Actual diagnostic host differs')
     identity=build_identity(a.build/'orbiter-production',a.build/'NativeModules',a.build_record,record['source_base'])
@@ -128,6 +130,7 @@ def main():
     require(gtk['status']=='built' and gtk['baseline'] is False and gtk['plugin_sha256']==sha(a.gtk_plugin) and
             gtk['sanitizers']==identity['sanitizer_linked'],'Actual source-pinned GTK owner candidate differs')
     guarded={str(ROOT/name):sha(ROOT/name) for name in {**record['source_sha256_lf'],**record['dependency_sha256_lf']}}
+    guarded.update({str(ROOT/name):value for name,value in record['generated_source_files_sha256'].items()})
     guarded.update({str(ROOT/name):value for name,value in {**record['runtime_files_sha256'],**record['candidate_runtime_files_sha256']}.items()})
     guarded[str(a.build_record)]=sha(a.build_record);guarded[str(a.gtk_plugin)]=sha(a.gtk_plugin)
     guarded[str(a.gtk_build_record)]=sha(a.gtk_build_record)

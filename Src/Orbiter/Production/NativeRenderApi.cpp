@@ -726,7 +726,12 @@ void oapiBlt(SURFHANDLE target,SURFHANDLE source,int x,int y,int sx,int sy,int w
     if(!source || !target)return;
     auto* graphics=GetNativeRenderContext().graphics;
     if(!graphics)return;
-    if(color_key!=SURF_NO_CK)throw std::runtime_error("Native oapiBlt: obsolete color-key argument is unsupported");
+    // The original OrbiterAPI.cpp warns once and ignores this obsolete SDK
+    // argument. It always delegates the same rectangle with default flags.
+    if(color_key!=SURF_NO_CK) {
+        static bool warn=true;
+        if(warn){std::clog<<"Obsolete oapiBlt: colour key argument not supported by graphics client\n";warn=false;}
+    }
     if(!graphics->clbkBlt(target,x,y,source,sx,sy,width,height))throw std::runtime_error("Native oapiBlt: graphics surface copy failed");
 }
 

@@ -76,3 +76,19 @@ panel BMPs are delivered unchanged. Complete-scene sanitizer execution has
 identified and retained an ELF class-symbol collision and an original nonvirtual
 system-list deletion; native qualification remains pending.
 [Dragonfly source conservation, actual controls and retained failures](../../Tests/Production/Dragonfly/README.md)
+
+The separate complete 38-scene Debug automatic native diagnostic has now
+finished at runtime source `108c5d524b80294151f3e09e0fcfb9e08943b370`.
+Thirty-three unchanged scenes complete twice: 66 successful processes, 63,360
+actual presentations and 66 clean context deletions. Every repeated full frame
+has SSIM 1.0. The five remaining scenes stop at the missing real Dragonfly
+module; no replacement is substituted. The terminal capture is
+`out/phase6-remaining-vessels-native-complete-v1` in the preserved original
+checkout. All source/runtime/probe/assets and the 57 actual original simulation
+data files remain unchanged through the campaign. This is one native diagnostic
+profile; Windows comparisons and the full Phase 6 requirements remain open.
+The independent post-campaign audit rehashes all 3,300 successful process files,
+631 source/runtime/probe guards, 1,102 asset inputs and 57 actual data files in
+`out/phase6-remaining-vessels-native-complete-audit-v1.json` in the isolated
+Dragonfly worktree. It retains all five failed starts and does not revise the
+historical 157-scene qualification.

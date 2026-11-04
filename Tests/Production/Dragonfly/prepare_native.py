@@ -39,6 +39,10 @@ def adapt(name,body,names):
     source=body.decode('cp1252').replace('\r\n','\n')
     if name=='Dragonfly.cpp':source=remove_platform_dispatch(source,'DllMain')
     if name=='panel.cpp':source=remove_platform_dispatch(source,'MsgProc')
+    if name=='instruments.cpp':
+        anchor='CW::~CW()\n{'
+        if source.count(anchor)!=1:raise ValueError('Original warning-list destructor boundary differs')
+        source=source.replace(anchor,anchor+'\nwhile (b_list.next) {bounds* gone=b_list.next;b_list.next=gone->next;delete gone;}\n',1)
     # The original owning lists delete polymorphic hydraulic/electrical objects
     # through these base pointers. Give the native copies concrete destruction;
     # all fields, construction and simulation method bodies remain unchanged.

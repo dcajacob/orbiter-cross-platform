@@ -5,6 +5,7 @@
 #include <GL/gl.h>
 #include <GL/glext.h>
 #include "Production/NativeGraphics.h"
+#include "Production/NativeRenderApi.h"
 #include <array>
 #include <fstream>
 #include <stdexcept>
@@ -129,6 +130,17 @@ inline void run() {
         glActiveTexture(GL_TEXTURE0);glBindTexture(GL_TEXTURE_2D,GLuint(graphics->GuiTextureId(surface)));
         glGetTexImage(GL_TEXTURE_2D,0,GL_RGBA,GL_UNSIGNED_BYTE,actual.data());clean("Actual uploaded-surface readback failed");
         require(actual==expected,"Actual uploaded-surface bytes differ or reverse rows");pixelsChecked+=width*height;
+        saved.RestorePixelState();
+        SURFHANDLE copied=graphics->CreateSurfaceResource(width,height);
+        require(copied!=nullptr,"Original obsolete-argument copy target allocation failed");
+        // The original SDK ignores ck=0 even for the source's black pixel.
+        // Exercise the actual entry point and verify every copied RGBA byte.
+        oapiBlt(copied,surface,0,0,0,0,width,height,0);
+        glBindBuffer(GL_PIXEL_PACK_BUFFER,0);for(unsigned i=0;i<8;++i)glPixelStorei(pixelParameters[i],i?0:1);
+        glActiveTexture(GL_TEXTURE0);glBindTexture(GL_TEXTURE_2D,GLuint(graphics->GuiTextureId(copied)));
+        glGetTexImage(GL_TEXTURE_2D,0,GL_RGBA,GL_UNSIGNED_BYTE,actual.data());clean("Original obsolete-argument copy readback failed");
+        require(actual==expected,"Native obsolete oapiBlt argument changed original default-copy semantics");pixelsChecked+=width*height;
+        graphics->ReleaseTextureResource(copied);
         saved.RestorePixelState();glDeleteBuffers(1,&unpack);glDeleteTextures(1,&foreign);graphics->ReleaseTextureResource(surface);
         require(State()==saved,"Pixel upload control failed to release its real resources/state");
     }
@@ -136,6 +148,7 @@ inline void run() {
     std::ofstream result("native-instrument-control.json");
     result<<"{\"status\":\"passed\",\"contexts\":"<<contexts<<",\"context_restorations\":"<<restorations
           <<",\"display_lists\":2,\"pixel_uploads\":"<<uploads<<",\"checked_pixels\":"<<pixelsChecked
-          <<",\"texture_name_1_collision_reproduced\":true,\"native_admission_qualified\":false,\"phase6_complete\":false}\n";
+          <<",\"texture_name_1_collision_reproduced\":true,\"legacy_blt_copies\":1,\"obsolete_blt_color_key_ignored\":true"
+          <<",\"native_admission_qualified\":false,\"phase6_complete\":false}\n";
 }
 }
