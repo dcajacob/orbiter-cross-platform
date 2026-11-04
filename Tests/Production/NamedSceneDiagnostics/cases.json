@@ -1,0 +1,24 @@
+{
+  "schema": 1,
+  "application_source": "f725194209634f7fd5d1d44d426cfa9b5e303e37",
+  "parent_scenario": "Scenarios/Delta-glider/DG Mk4 in orbit.scn",
+  "parent_sha256_lf": "fc76ff6089ef242c2f92c680192748e95175483f8eb33832e50b83cf0dda6155",
+  "frames": 60,
+  "fixed_step": 0.25,
+  "repetitions": 2,
+  "scope": "Diagnostic derived inputs preserve all eight original objects. They do not qualify unchanged named missions or replace any frozen reference.",
+  "cases": [
+    {
+      "id": "full_dg_saved_hud_contrast",
+      "target": "GL-01",
+      "cockpit": 2,
+      "hud": 1
+    },
+    {
+      "id": "full_scene_landed_pb_focus",
+      "target": "PB-01",
+      "cockpit": 1,
+      "hud": 2
+    }
+  ]
+}
