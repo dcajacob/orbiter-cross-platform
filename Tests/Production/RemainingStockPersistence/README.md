@@ -198,6 +198,10 @@ they earn no Windows reload/process credit. Four historical Windows v3/native
 Debug automatic stock-writer comparisons also pass: PoweredUp SSIM 0.9864176,
 Spin 1.0, with actual clocks, state, camera and complete saved tokens checked.
 Those old Windows files cannot satisfy fresh v4/startup-witness qualification.
-The outputs are `out/phase6-persistence-audit-reader-controls-v2.json` and `.log`
-in the isolated persistence-audit checkout; the earlier 21-control v1 result
-and the initial failed library-SONAME reader attempt remain retained.
+The outputs are `out/phase6-persistence-audit-reader-controls-v3.json` and `.log`
+in the isolated persistence-audit checkout. This rerun follows the additional
+full-gate checks that every Windows reload retains its audited parent's actual
+CRT, exact full-scope/runtime/producer descriptor and configuration/mesh/data
+witnesses. Those full Windows reload checks still await real matrix inputs.
+The prior v2, earlier 21-control v1 result and initial failed library-SONAME
+reader attempt remain retained.

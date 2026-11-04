@@ -72,8 +72,17 @@ def inspect_windows(decoded,profile,reader,original,mesa,mesa_imports):
             observed_files.update({str(folder/n):v for n,v in prior['files_sha256'].items()})
             actual=capture.inspect_artifacts(folder,derived,config)
             require(all(prior[k]==v for k,v in actual.items()) and 'configuration_input' in actual,'Actual complete Windows reload observation differs')
+            require(actual['actual_math']==stock['actual_math'],'Actual Windows reload CRT differs from the audited stock profile')
+            require(json.loads((folder/'reference-variant.json').read_text())==
+                    json.loads((parent_root/(case['id']+'-'+str(repeat))/'reference-variant.json').read_text()),
+                    'Windows reload producer/runtime/full-scope descriptor differs from the audited parent')
+            require(json.loads((folder/'actual-data-inputs.json').read_text())==parent['actual_original_simulation_data'],
+                    'Executed Windows reload original data witness differs from the audited parent')
             require(sha(folder/derived['scenario_entry_point'])==sha(saved),'Executed Windows reload input changed')
             invocation=json.loads((folder/'invocation.json').read_text())
+            parent_invocation=json.loads((parent_root/(case['id']+'-'+str(repeat))/'invocation.json').read_text())
+            require(all(invocation[k]==parent_invocation[k] for k in ('preserved_inputs_sha256','data_profiles')),
+                    'Executed Windows reload original configuration/mesh/data-profile closure differs')
             require(invocation['case']==derived and json.loads((folder/'persistence-input.json').read_text())==prior['persistence_input'],
                     'Executed Windows reload descriptor/provenance differs')
             require(prior['persistence_input']['parent_finalized_clock']==parent['cases'][case['id']]['runs'][repeat-1]['matched_clock_observation'] and

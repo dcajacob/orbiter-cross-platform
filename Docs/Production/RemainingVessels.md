@@ -15,14 +15,19 @@ Four historical Windows v3/native Debug automatic stock-writer comparisons
 also pass the existing state/camera/full-frame budgets and complete saved-token
 checks. These historical Windows inputs provide no fresh v4 reload qualification.
 
-The result is `out/phase6-persistence-audit-reader-controls-v2.json` in the
+The result is `out/phase6-persistence-audit-reader-controls-v3.json` in the
 persistence-audit checkout. The complete audit candidate requires all 38 scenes,
 two repetitions, four profiles and both stock-writer/reload phases, with no
 selected-case escape. Its full positive path awaits the actual complete Windows
 and native matrices. The source-v4 native full stock-writer campaigns remain
-live in their frozen gauge checkout; the latest Windows full and diagnostic
-jobs remain pending behind earlier workflows. No native admission, 157-scene
-result or Phase 6 acceptance changes at this checkpoint.
+live in their frozen gauge checkout. The latest source-v4 Windows diagnostic
+[run 41853756525](https://github.com/dcajacob/orbiter-cross-platform/actions/runs/41853756525)
+has started actual PoweredUp/Spin observation in all four profiles; the full
+workflow remains pending behind the older complete-scene campaign. Each
+Windows reload must match its audited stock run's actual CRT, exact full-scope/
+producer/runtime descriptor and original configuration/mesh/data witnesses.
+These full-gate checks await actual complete Windows reload inputs. No native
+admission, 157-scene result or Phase 6 acceptance changes at this checkpoint.
 
 ## Release gauge-label storage checkpoint
 
