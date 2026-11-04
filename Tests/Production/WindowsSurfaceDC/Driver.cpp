@@ -4,47 +4,54 @@
 #include "Orbitersdk.h"
 #include <GL/gl.h>
 #include <cstdlib>
+#include <cstdio>
 #include <fstream>
 #include <stdexcept>
+#include "WglBitmapTarget.h"
 
 namespace {
 void require(bool value,const char* message) {if(!value)throw std::runtime_error(message);}
 
-class BitmapContext {
+class CompatibilityContext {
     HDC previousDC=wglGetCurrentDC();
     HGLRC previousContext=wglGetCurrentContext();
+    HINSTANCE instance=GetModuleHandleW(nullptr);
+    HWND window=nullptr;
     HDC dc=nullptr;
-    HBITMAP bitmap=nullptr;
-    HGDIOBJ previousBitmap=nullptr;
     HGLRC context=nullptr;
+    bool registered=false;
+    static const wchar_t* Name() {return L"Orbiter.SurfaceDC.ForeignContext";}
+    void cleanup() noexcept {
+        wglMakeCurrent(previousDC,previousContext);
+        if(context)wglDeleteContext(context);
+        if(dc && window)ReleaseDC(window,dc);
+        if(window)DestroyWindow(window);
+        if(registered)UnregisterClassW(Name(),instance);
+    }
 public:
-    BitmapContext() {
-        require(previousDC && previousContext,"Actual client context is missing");
-        dc=CreateCompatibleDC(previousDC);require(dc!=nullptr,"Compatibility DC failed");
-        BITMAPINFO info{};info.bmiHeader.biSize=sizeof(BITMAPINFOHEADER);
-        info.bmiHeader.biWidth=16;info.bmiHeader.biHeight=16;
-        info.bmiHeader.biPlanes=1;info.bmiHeader.biBitCount=32;info.bmiHeader.biCompression=BI_RGB;
-        void* bits=nullptr;bitmap=CreateDIBSection(dc,&info,DIB_RGB_COLORS,&bits,nullptr,0);
-        require(bitmap && bits,"Compatibility DIB failed");
-        previousBitmap=SelectObject(dc,bitmap);require(previousBitmap && previousBitmap!=HGDI_ERROR,"Compatibility bitmap selection failed");
-        PIXELFORMATDESCRIPTOR format{};format.nSize=sizeof(format);format.nVersion=1;
-        format.dwFlags=PFD_DRAW_TO_BITMAP|PFD_SUPPORT_OPENGL|PFD_SUPPORT_GDI;
-        format.iPixelType=PFD_TYPE_RGBA;format.cColorBits=32;
-        const int index=ChoosePixelFormat(dc,&format);
-        require(index && SetPixelFormat(dc,index,&format),"Compatibility pixel format failed");
-        context=wglCreateContext(dc);require(context!=nullptr,"Compatibility OpenGL context failed");
+    CompatibilityContext() {
+        try {
+            require(previousDC && previousContext,"Actual client context is missing");
+            WNDCLASSEXW type{};type.cbSize=sizeof(type);type.style=CS_OWNDC;
+            type.lpfnWndProc=DefWindowProcW;type.hInstance=instance;type.lpszClassName=Name();
+            registered=RegisterClassExW(&type)!=0;require(registered,"Compatibility window class failed");
+            window=CreateWindowExW(WS_EX_TOOLWINDOW|WS_EX_NOACTIVATE,Name(),L"",WS_POPUP,
+                                  0,0,16,16,nullptr,nullptr,instance,nullptr);
+            require(window!=nullptr,"Compatibility window failed");
+            dc=GetDC(window);require(dc!=nullptr,"Compatibility window DC failed");
+            PIXELFORMATDESCRIPTOR format{};format.nSize=sizeof(format);format.nVersion=1;
+            format.dwFlags=PFD_DRAW_TO_WINDOW|PFD_SUPPORT_OPENGL;
+            format.iPixelType=PFD_TYPE_RGBA;format.cColorBits=32;
+            const int index=ChoosePixelFormat(dc,&format);
+            require(index && SetPixelFormat(dc,index,&format),"Compatibility pixel format failed");
+            context=wglCreateContext(dc);require(context!=nullptr,"Compatibility OpenGL context failed");
+        } catch(...) {cleanup();throw;}
     }
     void Activate() {require(wglMakeCurrent(dc,context)!=FALSE,"Compatibility context acquisition failed");}
     void Restore() {require(wglMakeCurrent(previousDC,previousContext)!=FALSE,"Actual client context restoration failed");}
     HGLRC Context() const {return context;}
     HDC DC() const {return dc;}
-    ~BitmapContext() {
-        wglMakeCurrent(previousDC,previousContext);
-        if(context)wglDeleteContext(context);
-        if(dc && previousBitmap)SelectObject(dc,previousBitmap);
-        if(bitmap)DeleteObject(bitmap);
-        if(dc)DeleteDC(dc);
-    }
+    ~CompatibilityContext() {cleanup();}
 };
 
 class PixelState {
@@ -64,7 +71,7 @@ COLORREF color(int x,int y,unsigned repeat) {
     return RGB((x*17+repeat)%256,(y*31+repeat*3)%256,(x+y*13)%256);
 }
 
-void roundtrip(unsigned repeat,BitmapContext* foreign) {
+void roundtrip(unsigned repeat,CompatibilityContext* foreign) {
     const HDC clientDC=wglGetCurrentDC();const HGLRC clientContext=wglGetCurrentContext();
     PixelState state;
     SURFHANDLE surface=oapiCreateSurface(13,7);require(surface!=nullptr,"Actual test surface creation failed");
@@ -101,24 +108,55 @@ void roundtrip(unsigned repeat,BitmapContext* foreign) {
     require(glGetError()==GL_NO_ERROR,"Actual GDI integration produced an OpenGL error");
 }
 
+void offscreenReadback() {
+    const HDC parentDC=wglGetCurrentDC();const HGLRC parentContext=wglGetCurrentContext();
+    {
+        dragonfly::WglBitmapTarget target(13,7);
+        require(wglGetCurrentDC()==parentDC && wglGetCurrentContext()==parentContext,
+                "Actual ADI target creation changed its caller context");
+        {
+            dragonfly::WglContextRestore active(target.RenderDC(),target.Context());
+            glViewport(0,0,13,7);
+            // Exercise the actual compatibility command path used by the ADI.
+            glMatrixMode(GL_PROJECTION);glLoadIdentity();
+            glMatrixMode(GL_MODELVIEW);glLoadIdentity();
+            const GLuint list=glGenLists(1);require(list!=0,"Actual ADI compatibility display list failed");
+            glNewList(list,GL_COMPILE);glClearColor(0,0,1,1);glClear(GL_COLOR_BUFFER_BIT);glEndList();
+            glCallList(list);glDeleteLists(list,1);
+            glEnable(GL_SCISSOR_TEST);glScissor(0,0,13,3);
+            glClearColor(1,0,0,1);glClear(GL_COLOR_BUFFER_BIT);glDisable(GL_SCISSOR_TEST);
+            glFinish();target.Readback();
+            for(int y=0;y<7;++y)for(int x=0;x<13;++x)
+                require(GetPixel(target.BitmapDC(),x,y)==(y<4?RGB(0,0,255):RGB(255,0,0)),
+                        "Actual ADI framebuffer/DIB color or vertical orientation differs");
+        }
+        require(wglGetCurrentDC()==parentDC && wglGetCurrentContext()==parentContext,
+                "Actual ADI drawing changed its caller context");
+    }
+    require(wglGetCurrentDC()==parentDC && wglGetCurrentContext()==parentContext,
+            "Actual ADI target destruction changed its caller context");
+}
+
 class Driver final:public oapi::Module {
 public:
     explicit Driver(HINSTANCE instance):Module(instance) {}
     void clbkSimulationStart(RenderMode mode) override {
         try {
             require(mode!=RENDER_NONE,"Actual window renderer required");
-            BitmapContext foreign;
-            roundtrip(0,nullptr);roundtrip(1,&foreign); // Complete one-time driver allocation first.
+            CompatibilityContext foreign;
+            roundtrip(0,nullptr);roundtrip(1,&foreign);offscreenReadback(); // Complete one-time driver allocation first.
             const DWORD before=GetGuiResources(GetCurrentProcess(),GR_GDIOBJECTS);
             require(before>0,"Actual GDI object count unavailable");
             for(unsigned repeat=0;repeat<100;++repeat)roundtrip(repeat,repeat%2?&foreign:nullptr);
+            offscreenReadback();
             const DWORD after=GetGuiResources(GetCurrentProcess(),GR_GDIOBJECTS);
             require(after<=before,"Actual GDI surface DC/bitmap objects leaked");
             std::ofstream result("surface-dc-result.json");
             result<<"{\"status\":\"passed\",\"roundtrips\":100,\"pixel_checks\":18200,"
-                  <<"\"foreign_context_roundtrips\":50,\"gdi_objects_before\":"<<before
+                  <<"\"foreign_context_roundtrips\":50,\"offscreen_target_readbacks\":2,\"gdi_objects_before\":"<<before
                   <<",\"gdi_objects_after\":"<<after<<"}\n";
         } catch(const std::exception& error) {
+            std::fprintf(stderr,"Windows surface controls: %s\n",error.what());std::fflush(stderr);
             std::ofstream("surface-dc-failure.txt")<<error.what()<<'\n';std::exit(42);
         }
     }

@@ -28,6 +28,7 @@ def main():
         raise ValueError('A passed ordinary real-client run is required')
     sys.argv=[sys.argv[0],*remaining,'--output',str(output)]
     source_paths={*HERE.glob('*.py'),*HERE.glob('*.cpp'),*HERE.glob('CMakeLists.txt')}
+    source_paths.update(ROOT/'Src/Vessel/Dragonfly'/name for name in ('WglBitmapTarget.h','WglContext.h'))
     for module in list(sys.modules.values()):
         name=getattr(module,'__file__',None)
         if name:
@@ -58,7 +59,8 @@ def main():
         if (folder/'surface-dc-failure.txt').exists():raise ValueError((folder/'surface-dc-failure.txt').read_text())
         result=json.loads((folder/'surface-dc-result.json').read_text())
         if result['status']!='passed' or result['roundtrips']!=100 or result['pixel_checks']!=18200 or \
-                result['foreign_context_roundtrips']!=50 or result['gdi_objects_after']>result['gdi_objects_before']:
+                result['foreign_context_roundtrips']!=50 or result['offscreen_target_readbacks']!=2 or \
+                result['gdi_objects_after']>result['gdi_objects_before']:
             raise ValueError('Real GDI round-trip/context/lifetime controls incomplete')
         client=json.loads((folder/'client-report.json').read_text())
         expected=sha(folder/'Modules/Plugin/ProductionSurfaceDCDriver.dll')

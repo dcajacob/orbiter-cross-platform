@@ -11,6 +11,7 @@
 
 
 class Panel;
+namespace dragonfly {class WglBitmapTarget;}
 
 class instrument		// basic instrument template
 {  public:
@@ -287,6 +288,7 @@ class ADI:public instrument
    HGLRC       hRC;
    HBITMAP	   hBMP;
    HBITMAP hBMP_old;
+   dragonfly::WglBitmapTarget* bitmap_target;
    ADI(int x,int y,Panel *i_parent);
    virtual ~ADI();
    void InitGL();

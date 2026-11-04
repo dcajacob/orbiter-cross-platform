@@ -98,3 +98,13 @@ leak report. The reproducible baseline and candidate builders also complete in
 fresh outputs, with the exact descriptor export and requested sanitizer linkage.
 Application regression with the pinned candidate and wider lifetime coverage
 remain required before changing normal runtime dependency selection.
+
+The pinned candidate now passes the three actual native tank controls at
+`c10db131`: 180 presentations, three clean context deletions and sanitizer exits,
+508 guarded source/dependency inputs and 1,102 unchanged assets. Each process
+verifies the candidate's actual loaded path and hash. Complete state, controls,
+animations, thrust and frames remain byte-identical to their retained baselines,
+including the process that previously ended with the GTK leak. Evidence is in
+`out/phase6-atlantis-tank-lifetime-v8`; its independent plugin/state/frame audit is
+`out/phase6-libdecor-icon-native-regression-v1.json`. The full input/backend/
+scale/hardware matrix and delivery integration retain their separate gates.

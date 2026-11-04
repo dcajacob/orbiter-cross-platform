@@ -2105,13 +2105,23 @@
     },
     "Src/Vessel/Dragonfly/instruments.cpp": {
       "original_sha256_lf": "d2ffe3a7edb2a6c71d5f2f7c03e8a4e58d63d75c7413fa3ff8b15d8b45a3e932",
-      "sha256_lf": "d9f03fbbe34672bac6b490debb2842815242ff5f8edc657ed9ad40d993accbd7",
-      "scope": "Original Dragonfly ADI calculations and rendering commands retained exactly; acquire its own WGL context for bitmap rendering, restore its caller at initialization/paint/teardown, and skip deletion when no context was initialized. Native Dragonfly implementation and matched stock qualification remain pending."
+      "sha256_lf": "9cdeaed05227c54216737b478c718d6e8fe8415cfd0f6e7463b26a726832babf",
+      "scope": "Original Dragonfly ADI calculations and rendering commands retained exactly; acquire its own WGL context for bitmap rendering, restore its caller at initialization/paint/teardown, and skip deletion when no context was initialized. Native Dragonfly implementation and matched stock qualification remain pending. The unsupported bitmap WGL allocation block now owns a private compatibility-window context with a 160x160 color-only framebuffer and real 32-bit bottom-up GDI readback; original GL commands, geometry, projection, lighting, attitude math and SDK blits remain exact."
     },
     "Src/Vessel/Dragonfly/WglContext.h": {
       "original_sha256_lf": null,
       "sha256_lf": "913391543b0c6b128c8c9eb7e8f5d6c66e70430509c08d7bca10247bed252945",
       "scope": "Private Windows WGL context ownership guard for the original Dragonfly ADI; no SDK layout, attitude calculation, GL geometry or physical model change."
+    },
+    "Src/Vessel/Dragonfly/instruments.h": {
+      "original_sha256_lf": "5e98d45be9c3ff945f5c80392f91689b22e5384a7b6f1df18069dcdee89cda36",
+      "sha256_lf": "936277a34765f9af19d634fe42a87ae200654392aaac6fd7d3d5c2421b6f2ee0",
+      "scope": "Private ADI target pointer for real offscreen compatibility rendering; no public SDK or physical state layout changes."
+    },
+    "Src/Vessel/Dragonfly/WglBitmapTarget.h": {
+      "original_sha256_lf": null,
+      "sha256_lf": "069374ded753c01c78364c5a0b63dab1c65987a9334a7023f3e06196cbbe6bfa",
+      "scope": "Real owned compatibility context, color-only framebuffer and bottom-up GDI DIB replacing unsupported bitmap pixel formats; no GL geometry or physical model substitution."
     }
   }
 }

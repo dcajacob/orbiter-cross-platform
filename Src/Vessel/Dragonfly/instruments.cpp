@@ -10,7 +10,7 @@
 #include "resource.h"
 #include "orbitersdk.h"
 #include "dragonfly.h"
-#include "WglContext.h"
+#include "WglBitmapTarget.h"
 
 using std::min;
 
@@ -999,6 +999,7 @@ ADI::ADI(int x,int y, Panel *i_parent):instrument(x,y,i_parent)
 {
 type= 44; //ADI ball
 init=0;
+bitmap_target=nullptr;
 radius=10;
 int i;
 float trad;
@@ -1044,55 +1045,12 @@ void ADI::InitGL()
 {
 dragonfly::WglContextRestore restore;
 
-GLuint      PixelFormat;  
-BITMAPINFOHEADER BIH;
-int iSize=sizeof(BITMAPINFOHEADER);
-BIH.biSize=iSize;
-BIH.biWidth=160;				//size of the sphere is 160x160
-BIH.biHeight=160;
-BIH.biPlanes=1;
-BIH.biBitCount=16;//default is 16.
-BIH.biCompression=BI_RGB;
-BIH.biSizeImage=0;
-void* m_pBits;
-hDC2=CreateCompatibleDC(NULL);//we make a new DC and DIbitmap for OpenGL to draw onto
-static  PIXELFORMATDESCRIPTOR pfd2;
-DescribePixelFormat(hDC2,1,sizeof(PIXELFORMATDESCRIPTOR),&pfd2);//just get a random pixel format.. 
-BIH.biBitCount=pfd2.cColorBits;//to get the current bit depth.. !?
-hBMP=CreateDIBSection(hDC2,(BITMAPINFO*)&BIH,DIB_RGB_COLORS,&m_pBits,NULL,0);
-hBMP_old=(HBITMAP)SelectObject(hDC2,hBMP);
-
-static  PIXELFORMATDESCRIPTOR pfd={                             // pfd Tells Windows How We Want Things To Be
-															   
-        sizeof(PIXELFORMATDESCRIPTOR),                              // Size Of This Pixel Format Descriptor
-        1,                                                          // Version Number
-		PFD_DRAW_TO_BITMAP |                                        // Format Must Support Bitmap Rendering
-        PFD_SUPPORT_OPENGL |									
-		PFD_SUPPORT_GDI,											// Format Must Support OpenGL,                                           
-		0,//        PFD_TYPE_RGBA,                                              // Request An RGBA Format
-        16,															// Select Our Color Depth
-        0, 0, 0, 0, 0, 0,                                           // Color Bits Ignored
-        0,//1,                                                          // No Alpha Buffer
-        0,                                                          // Shift Bit Ignored
-        0,                                                          // No Accumulation Buffer
-        0, 0, 0, 0,                                                 // Accumulation Bits Ignored
-        0,//16,                                                         // 16Bit Z-Buffer (Depth Buffer)  
-        0,                                                          // No Stencil Buffer
-        0,                                                          // No Auxiliary Buffer
-        0,//PFD_MAIN_PLANE,                                             // Main Drawing Layer
-        0,                                                          // Reserved
-        0, 0, 0                                                     // Layer Masks Ignored
-    };
-pfd.cColorBits=pfd2.cColorBits;//same color depth needed.
-DWORD code;
-code=GetLastError();
-
-PixelFormat=ChoosePixelFormat(hDC2,&pfd);// now pretend we want a new format
-int ret;
-ret=SetPixelFormat(hDC2,PixelFormat,&pfd);
-code=GetLastError();
-hRC=wglCreateContext(hDC2);
-ret=wglMakeCurrent(hDC2,hRC);					//all standard OpenGL init so far
+bitmap_target=new dragonfly::WglBitmapTarget(160,160);
+hDC2=bitmap_target->BitmapDC();
+hRC=bitmap_target->Context();
+hBMP=bitmap_target->Bitmap();
+hBMP_old=(HBITMAP)bitmap_target->PreviousBitmap();
+bitmap_target->Activate();
 
 //We load the texture
 int texture_index=LoadOGLBitmap("Textures\\adi.dds");
@@ -1145,15 +1103,10 @@ init=1;		//that's it. If we made it so far, we can use OpenGL
 
 ADI::~ADI()
 {
-if (!init) return;
-dragonfly::WglContextRestore restore;
-restore.Discard(hRC);
-wglMakeCurrent(NULL,NULL);	//standard OpenGL release
-wglDeleteContext(hRC);
+delete bitmap_target;
+bitmap_target=nullptr;
 hRC=NULL;
-SelectObject(hDC2,hBMP_old);//remember to delete DC and bitmap memory we created
-DeleteObject(hBMP);
-DeleteDC(hDC2);
+hDC2=NULL;
 
 };
 void ADI::RegisterMe(int index)
@@ -1298,7 +1251,7 @@ void ADI::PaintMe()
 {
 	if (!init) InitGL();
 	{
-	dragonfly::WglContextRestore active(hDC2,hRC);
+	dragonfly::WglContextRestore active(bitmap_target->RenderDC(),hRC);
 /*	float temp;
 	float sign;
 	float Pi=acos(-1);
@@ -1341,6 +1294,7 @@ void ADI::PaintMe()
 	glCallList(list_name);	//render
 	glFlush();
 	glFinish();
+	bitmap_target->Readback();
 	}
 
 HDC hDC=oapiGetDC(parent->surf);
