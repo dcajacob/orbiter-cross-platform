@@ -89,6 +89,8 @@ jobs:
         run: |
           python -B Tests/Production/RemainingStockRepaired/RuntimeFiles.Test.py --build out/remaining-stock-repaired-build
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          python -B Tests/Production/RemainingStockRepaired/OriginalMetadata.Test.py --preserved out/remaining-stock-preserved --runtime out/remaining-stock-repaired-build/runtime --output out/remaining-stock-repaired-build/original-metadata-controls.json
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           python -B Tests/Production/RemainingStockRepaired/SourceVariant.Test.py --sources out/remaining-stock-repaired-build/module-sources --output out/remaining-stock-repaired-build/source-variant-controls.json
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           python -B Tests/Production/RemainingStockRepaired/capture.py --verify-inputs --protocol remaining-stock-matched-clock-v2
@@ -146,6 +148,7 @@ jobs:
             out/remaining-stock-repaired-build/finalized-frame-controls/**
             out/remaining-stock-repaired-build/cmake/controls/**
             out/remaining-stock-repaired-build/runtime-file-controls.json
+            out/remaining-stock-repaired-build/original-metadata-controls.json
             out/remaining-stock-repaired-build/source-variant-controls.json
             out/remaining-stock-repaired-build/*.log
             out/remaining-stock-repaired-build/module-sources/**

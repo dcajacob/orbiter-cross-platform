@@ -4,6 +4,20 @@ This is a separately versioned candidate, not an untouched-original reference,
 an observations lock, native class admission or Phase 6 acceptance. The failed
 original campaigns remain failed and unchanged.
 
+The original-package auditor verifies every retained original file as raw bytes.
+The generated `control-reference-runtime.json` delivery report alone has an
+explicit host representation rule: its exact LF and CRLF forms are independently
+derived from the retained report. Values, archive identities, ordering and all
+other whitespace remain exact. The embedded `test-runtime.json` archive member
+and all application/SDK/module/resource bytes retain raw-byte equality.
+`OriginalMetadata.Test.py` uses actual retained/delivered metadata, checks both
+report forms and rejects eight damaged copies without changing either owning
+package. All four capture workflows retain those controls. The independent
+auditor requires them when the immutable producer includes that test; it does
+not invent missing tests for historical source versions. An actual Windows
+artifact exposed the former cross-host report mismatch; its failed audit is
+retained beside the corrected independent audit.
+
 ## Explicit matched-clock protocol v2
 
 `--protocol remaining-stock-matched-clock-v2` selects the separate

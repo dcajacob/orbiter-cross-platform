@@ -86,6 +86,23 @@ def preserved(root):
     return expected
 
 
+def preserved_metadata(root,delivery):
+    result={}
+    for name in ('test-runtime.json','control-reference-runtime.json'):
+        original=(root/name).read_bytes();actual=(delivery/name).read_bytes()
+        if name=='test-runtime.json':
+            require(actual==original,'Original embedded application/SDK manifest was replaced')
+        else:
+            # prepare.py writes this report on the staging host. Reconstruct
+            # only its exact LF/CRLF forms; every archive identity, value,
+            # ordering and whitespace byte otherwise remains pinned.
+            lf=original.replace(b'\r\n',b'\n');crlf=lf.replace(b'\n',b'\r\n')
+            require(original in (lf,crlf) and actual in (lf,crlf),
+                    'Generated original-package report differs beyond host line endings')
+        result[name]=checksum(actual)
+    return result
+
+
 def source_variant(root,producer):
     report=json.loads((root/'source-variant.json').read_text())
     require(report['schema']==1 and report['status']=='prepared-awaiting-build-and-independent-audit' and
@@ -148,9 +165,8 @@ def runtime_variant(root,producer,configuration,original_root,protocol=protocols
             'Repaired build incomplete or misidentified')
     require((runtime/'runtime-variant.json').read_bytes()==path.read_bytes(),'Runtime manifest differs from actual build report')
     before=preserved(original_root)
+    before.update(preserved_metadata(original_root,runtime))
     require(build['preserved_package_sha256']==before,'Original package closure differs from independent retained bytes')
-    for name in ('test-runtime.json','control-reference-runtime.json'):
-        require((runtime/name).read_bytes()==(original_root/name).read_bytes(),'Original package metadata was replaced')
     subset={p.relative_to(runtime).as_posix():sha(p) for p in runtime.rglob('*') if p.is_file() and p.name!='runtime-variant.json'}
     after=dict(before);after.update(subset)
     require(after==build['runtime_files_sha256'],'Actual uploaded replacement files do not reconstruct the explicit complete runtime manifest')
@@ -214,9 +230,25 @@ def runtime_variant(root,producer,configuration,original_root,protocol=protocols
                 'missing_original_configuration','unrecorded_vessel_module','unrecorded_root_library'} and
             len(controls['controls'])==6 and all(r['reason'] for r in controls['controls']),
             'Protected original-runtime controls incomplete')
+    metadata_controls=None
+    metadata_test='Tests/Production/RemainingStockRepaired/OriginalMetadata.Test.py'
+    if metadata_test in sources:
+        metadata_path=root/'original-metadata-controls.json';metadata_controls=json.loads(metadata_path.read_text())
+        require(metadata_controls['status']=='passed' and metadata_controls['actual_original_files_verified']==len(before) and
+                metadata_controls['positive']==preserved_metadata(original_root,runtime) and
+                metadata_controls['owning_package_and_metadata_unchanged'] and
+                len(metadata_controls['controls'])==8 and {item['control'] for item in metadata_controls['controls']}=={
+                    'changed_client_archive_hash','changed_runtime_archive_hash','extra_report_whitespace',
+                    'reordered_report','mixed_report_newlines','changed_original_manifest',
+                    'changed_original_manifest_newlines','missing_metadata'} and
+                all(item['reason'] for item in metadata_controls['controls']) and
+                metadata_controls['source_sha256'] in raw_source_hashes(producer,metadata_test) and
+                metadata_controls['reader_sha256'] in raw_source_hashes(producer,'Tests/Production/RemainingStockRepaired/audit.py'),
+                'Actual original-package metadata controls incomplete or from different sources')
     return build,dict(build_manifest_sha256=sha(path),runtime_manifest_sha256=sha(runtime/'runtime-variant.json'),
         actual_original_files_verified=len(before),actual_runtime_files=len(after),declared_changes=changes,
-        source_variant=staged,**compiled_inputs,runtime_file_controls_sha256=sha(root/'runtime-file-controls.json'))
+        source_variant=staged,**compiled_inputs,runtime_file_controls_sha256=sha(root/'runtime-file-controls.json'),
+        original_metadata_controls_sha256=sha(root/'original-metadata-controls.json') if metadata_controls else None)
 
 
 def compile_evidence(root,build,configuration):

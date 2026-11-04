@@ -1,5 +1,53 @@
 # Original remaining native vessel integration
 
+## Corrected panel and four-profile Windows checkpoint
+
+The `eb239c72d60baa2df56c77e36ca77d9f0c0ea6c3` native panel-default
+correction completes unchanged PoweredUp and Spin twice: all four simulator
+processes return zero, with 3,840 successful presentations, deleted contexts and
+clean sanitizer logs. The independent scoped audit rechecks 902 guarded files,
+1,130 assets and all 57 actual data inputs; 56 damaged actual clock/frame copies
+are rejected. Both repetitions have identical traces/cameras and full-frame
+SSIM 1.0. The source snapshot retains 801 source/dependency/observer inputs and
+68 generated files in `out/phase6-native-panel-defaults-source-eb239c72-v1`.
+The tool launcher reported 143 after the terminal reports; that anomaly is
+retained alongside the four separate zero simulator results and is not called
+a successful launcher exit.
+
+All four Windows v2 diagnostic profiles at `59cbbc74` now pass: 16 actual
+processes and 15,360 presentations, including 224 damaged clock/frame controls.
+Their exact ZIPs and 1,534 decoded members are retained in
+`out/phase6-windows-matched-clock-59cb-Release-sse2-v1` and
+`out/phase6-windows-matched-clock-59cb-other-profiles-v1`. Independent audits
+recheck original/replacement bytes, source variants, actual compile settings,
+clock/frame controls, repeats and complete scene observations. The preserved
+Debug/Release packages were independently restaged offline from the accepted
+digest-pinned frozen archives: 1,037 and 925 actual files respectively.
+
+The corrected native Debug automatic capture passes the unchanged numerical,
+camera and 0.98 full-scene image budgets against every Windows profile for both
+scenes. PoweredUp SSIM ranges from 0.9857823170 to 0.9864175540; Spin SSIM is
+1.0 in every comparison. Actual begin/end clocks match after line-ending
+normalization, and cameras are byte-identical. The previous missing-artwork
+comparison remains a failed diagnostic. This is two-scene/profile-pair evidence,
+not the complete four-profile native corpus.
+
+The artifact audit also exposed host line endings in the generated
+`control-reference-runtime.json` report. The auditor now derives only its exact
+LF/CRLF forms from the independently retained report. The embedded original
+application/SDK manifest and every original binary/resource remain raw-byte
+checks. `OriginalMetadata.Test.py` checks real package/delivery bytes, accepts
+both generated-report forms and rejects eight damaged copies, including changed
+archive identities, extra/reordered metadata, mixed line endings and changes to
+the embedded original manifest. Future producers must retain those controls;
+historical artifacts retain their original source-defined control requirements.
+
+The full-38 Windows v2 matrix has started in
+[41827348809](https://github.com/dcajacob/orbiter-cross-platform/actions/runs/41827348809).
+All 38 scenes in every native profile, the full unchanged 157-scene sweep,
+interactions, persistence, lifetime, hardware/performance and Phase 6 acceptance
+remain required.
+
 ## Matched-clock v2 and native panel default checkpoint
 
 The separate `59cbbc74dfe015500f75e9867adba0e18c7e9b31` native Debug
@@ -32,7 +80,7 @@ four-profile parity.
 A separate real PoweredUp Windows/native comparison passes state budgets
 (maximum position error about 0.00003058 m) with byte-identical camera and
 finalized clock CSVs after line-ending normalization. Its first Debug automatic
-image comparison fails the unchanged 0.995 budget at SSIM 0.7334550048519237.
+image comparison fails the unchanged 0.98 full-scene budget at SSIM 0.7334550048519237.
 That failure remains in `out/phase6-matched-clock-poweredup-cross-platform-v1.json`;
 it is not accepted as visual parity.
 
