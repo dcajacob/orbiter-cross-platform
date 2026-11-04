@@ -301,6 +301,7 @@ Atlantis::~Atlantis ()
 	delete plop;
 	int i;
 	for (i = 0; i < 6; i++) delete static_cast<MGROUP_ROTATE*>(rms_anim[i]);
+	for (i = 0; i < 3; i++) delete static_cast<MGROUP_ROTATE*>(ssme_anim[i]);
 }
 
 // --------------------------------------------------------------
@@ -2343,6 +2344,11 @@ static void InitDrawingResources ()
 static void ReleaseDrawingResources ()
 {
 	oapiDestroySurface (g_Param.tkbk_label);
+	if (g_Param.font[0]) oapiReleaseFont (g_Param.font[0]);
+	if (g_Param.brush[0]) oapiReleaseBrush (g_Param.brush[0]);
+	g_Param.tkbk_label = nullptr;
+	g_Param.font[0] = nullptr;
+	g_Param.brush[0] = nullptr;
 }
 
 // --------------------------------------------------------------

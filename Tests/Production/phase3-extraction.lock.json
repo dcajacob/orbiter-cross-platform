@@ -1994,8 +1994,8 @@
     },
     "Src/Vessel/Atlantis/Atlantis/Atlantis.cpp": {
       "original_sha256_lf": "b1451784bf78866b99dba584f0694c9ae55a854f2b560b697f7320dfb272be0f",
-      "sha256_lf": "889bb4523b6dbd7508febb4fe7e3a6a606a62aaa4b63176d1c25d61f37ecea4f",
-      "scope": "Original Atlantis source portability through explicit SDK spellings, UI service imports and checked native factories; exact source conservation required. Native class admission, matched runtime and interaction qualification remain pending. ASan-confirmed six RMS rotations are reclaimed through their allocated MGROUP_ROTATE type; no numerical or callback-order change."
+      "sha256_lf": "a0c4a506065da0f95c67f78c535e60637ae8fb2fc01e2eb6fbb06073a5e0c682",
+      "scope": "Original Atlantis source portability through explicit SDK spellings, UI service imports and checked native factories; exact source conservation required. Native class admission, matched runtime and interaction qualification remain pending. ASan-confirmed six RMS rotations are reclaimed through their allocated MGROUP_ROTATE type; no numerical or callback-order change. LSan-confirmed three SSME rotations, module font and brush are released at their existing ownership boundaries; handles clear after module resource release."
     },
     "Src/Vessel/Atlantis/Atlantis/Atlantis.h": {
       "original_sha256_lf": "5f4bd6bd80ea8c44b847f7802ad2966d73b4d72054c62bbc758f4c12b0f5f74b",

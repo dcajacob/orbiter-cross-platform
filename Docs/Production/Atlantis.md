@@ -93,3 +93,13 @@ run, stack, exact invocation and unchanged assets remain in
 use their allocated type during deletion; source conservation allows only that
 confirmed cleanup correction. A fresh instrumented rerun remains required to
 inspect the rest of teardown.
+
+The first fresh typed-deletion rerun reached the still-closed Atlantis capability
+gate and deleted the graphics context, then LSan reported 473 bytes in six
+allocations. `out/phase6-atlantis-construction-diagnostic-v2/leak-audit.json`
+binds the actual library and console bytes and resolves the three SSME rotation
+allocations to `DefineAnimations`; the remaining owners are the module font and
+brush plus the font's stored name. The three SSME rotations now use their
+allocated type during vessel destruction, and module drawing-resource release
+frees its font/brush and clears their handles. A fresh fully enabled sanitizer
+rerun must verify the combined cleanup before any runtime admission.

@@ -31,10 +31,18 @@ def adapted(name,source):
         # ASan proves the six original 88-byte rotations were deleted through
         # their 32-byte, non-virtual base. Preserve allocation/callback order.
         source=source.replace('for (i = 0; i < 6; i++) delete rms_anim[i];',
-                              'for (i = 0; i < 6; i++) delete static_cast<MGROUP_ROTATE*>(rms_anim[i]);')
+            'for (i = 0; i < 6; i++) delete static_cast<MGROUP_ROTATE*>(rms_anim[i]);\n'
+            '\tfor (i = 0; i < 3; i++) delete static_cast<MGROUP_ROTATE*>(ssme_anim[i]);')
         source=source.replace('DLLCLBK void InitModule (HINSTANCE hModule)\n{\n\tg_Param.hDLL = hModule;\n',
                               'static void InitDrawingResources ()\n{')
         source=source.replace('DLLCLBK void ExitModule (HINSTANCE hModule)','static void ReleaseDrawingResources ()')
+        # The next fully enabled LSan run identifies these three rotations,
+        # module font and brush (473 bytes with the font's owned name).
+        source=source.replace('\toapiDestroySurface (g_Param.tkbk_label);\n}',
+            '\toapiDestroySurface (g_Param.tkbk_label);\n'
+            '\tif (g_Param.font[0]) oapiReleaseFont (g_Param.font[0]);\n'
+            '\tif (g_Param.brush[0]) oapiReleaseBrush (g_Param.brush[0]);\n'
+            '\tg_Param.tkbk_label = nullptr;\n\tg_Param.font[0] = nullptr;\n\tg_Param.brush[0] = nullptr;\n}')
         marker='// Vessel initialisation\n// --------------------------------------------------------------'
         source=source.replace(marker,
             '#ifdef _WIN32\nDLLCLBK void InitModule (HINSTANCE hModule)\n{\n\tg_Param.hDLL = hModule;\n\tInitDrawingResources();\n}\n\nDLLCLBK void ExitModule (HINSTANCE hModule)\n{\n\tReleaseDrawingResources();\n}\n#endif\n\n'+marker,1)
