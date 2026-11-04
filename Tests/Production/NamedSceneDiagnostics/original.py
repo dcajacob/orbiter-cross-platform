@@ -1,5 +1,5 @@
 """Observe two complete-scene cases without changing frozen acceptance pins."""
-import argparse,json,sys
+import argparse,json,os,sys
 from pathlib import Path
 from common import HERE,ROOT,require,sha,rows,settings,scenario,configuration,summarize
 sys.path[:0]=[str(HERE.parent),str(HERE.parent/'Client'),str(HERE.parent/'Cockpit')]
@@ -9,11 +9,13 @@ from run_client import mesa_files
 def inspect(folder,case):
     require(not (folder/'named-failure.txt').exists(),'Original SDK diagnostic failed')
     require((folder/'named-complete.txt').read_text().strip()=='60','Original process did not complete')
-    info=json.loads((folder/'renderer-info.json').read_text());require('llvmpipe' in info['renderer'].lower(),'Pinned real original software renderer missing')
+    info=json.loads((folder/'renderer-info.json').read_text());require('llvmpipe' in info['renderer'].lower(),'Pinned real original software renderer missing: '+json.dumps(info,sort_keys=True))
     require(not (folder/'graphics-errors.txt').exists() or not (folder/'graphics-errors.txt').read_text().strip(),'Original renderer errors')
-    result=summarize(folder,case);result['actual_math']=(folder/'named-math.txt').read_text().strip();return result
+    result=summarize(folder,case);result['actual_math']=(folder/'named-math.txt').read_text().strip();result['renderer']=info;return result
 
 def run(a):
+    # Match the accepted original cockpit reference's actual Mesa selection.
+    os.environ.update(LIBGL_ALWAYS_SOFTWARE='true',GALLIUM_DRIVER='llvmpipe')
     config=settings();require(not a.output.exists(),'Fresh original diagnostic output required');a.output.mkdir(parents=True)
     runtime=json.loads((a.orbiter.parent/'test-runtime.json').read_text());inputs=json.loads((a.orbiter.parent/'named-original-inputs.json').read_text())
     require(runtime['source_commit']==inputs['application_source']==config['application_source'] and inputs['configuration']==a.configuration,'Exact frozen original package required')
