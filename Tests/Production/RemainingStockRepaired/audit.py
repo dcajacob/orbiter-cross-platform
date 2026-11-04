@@ -87,7 +87,7 @@ def preserved(root):
 def source_variant(root,producer):
     report=json.loads((root/'source-variant.json').read_text())
     require(report['schema']==1 and report['status']=='prepared-awaiting-build-and-independent-audit' and
-            report['protocol']=='remaining-stock-repaired-sources-v1' and
+            report['protocol']=='remaining-stock-repaired-sources-v2' and
             report['producer_commit']==producer and report['original_application_and_sdk_source']==BASE and
             report['complete_scenes']==38 and report['declared_classes']==19 and report['recording_files']==36 and
             report['staged_original_module_files_unchanged_except_declared_changes'] and
@@ -104,8 +104,19 @@ def source_variant(root,producer):
         '\t// The orbiter owns this propellant while connected, including on the pad.\n'
         '\tif (!GetDockStatus (GetDockHandle (0)) && GetAltitude() < 0.0)\n'
         '\t\toapiDeleteVessel (GetHandle());').encode('cp1252')
-    dragonfly={'Src/Vessel/Dragonfly/'+name for name in ('instruments.cpp','instruments.h','WglContext.h','WglBitmapTarget.h')}
+    dragonfly={'Src/Vessel/Dragonfly/'+name for name in ('instruments.cpp','instruments.h','WglContext.h','WglBitmapTarget.h','Esystems.cpp')}
     for name in dragonfly:expected[name]=git(producer,name)
+    # Independently derive the sole electrical delta from the frozen original,
+    # rather than accepting an arbitrary producer's electrical source.
+    electrical='Src/Vessel/Dragonfly/Esystems.cpp'
+    prior=original[electrical].replace(b'\r\n',b'\n')
+    anchor=b'  Volts=28.8;\n  power_load=r_amp;'
+    require(prior.count(anchor)==1,'Original fuel-cell initialization boundary differs')
+    repaired=prior.replace(anchor,b'  Volts=28.8;\n  Amperes=0; // No previous current before the first refresh.\n  power_load=r_amp;',1)
+    require(expected[electrical].replace(b'\r\n',b'\n')==repaired and
+            report['initialization_repair']==dict(field='FCell::Amperes',initial_value=0,
+                policy='Define previous current before the first thermal update; retain every original update formula and callback order.'),
+            'Electrical source exceeds the one declared initial-current assignment')
     original_hashes={name:checksum(body) for name,body in original.items()}
     staged={name:checksum(body) for name,body in expected.items()}
     actual={p.relative_to(root/'source').as_posix():sha(p) for p in (root/'source').rglob('*') if p.is_file()}
@@ -113,7 +124,7 @@ def source_variant(root,producer):
             'Exact original/repaired module source or resource closure differs')
     changes={name:dict(original_sha256=original_hashes.get(name),repaired_sha256=value)
              for name,value in staged.items() if original_hashes.get(name)!=value}
-    require(set(changes)=={tank,*dragonfly} and report['declared_changes']==changes,'Module changes exceed five declared platform/lifetime paths')
+    require(set(changes)=={tank,*dragonfly} and report['declared_changes']==changes,'Module changes exceed six declared platform/lifetime/initial-current paths')
     require(report['preparer_sha256'] in raw_source_hashes(producer,'Tests/Production/RemainingStockRepaired/prepare_sources.py'),
             'Actual source preparer producer differs')
     require(report['current_dragonfly_producer_sha256']=={name:staged[name] for name in dragonfly},'Dragonfly source producer differs')
@@ -391,6 +402,18 @@ def audit_profile(root,profile,config,producer,original_root,mesa,mesa_imports):
             'Real complete repaired reader controls incomplete or from a different producer')
     require(controls['positive']==capture.inspect_artifacts(capture_root/'remaining_stock_003-1',config['cases'][2],config),
             'Actual owning positive control capture differs')
+    clock_control=json.loads((capture_root/'clock-control.json').read_text())
+    clock_names={'missing_tick','reordered_ticks','nonfinite_clock','system_clock_regression',
+                 'different_vessel_snapshot','missing_clock_column','zero_system_step','zero_acceleration'}
+    clock_positive=capture_root/'remaining_stock_003-1'
+    require(clock_control['status']=='passed' and clock_control['owning_capture_unchanged'] and
+            len(clock_control['controls'])==8 and {row['control'] for row in clock_control['controls']}==clock_names and
+            all(row['reason'] for row in clock_control['controls']) and
+            clock_control['source_sha256'] in raw_source_hashes(producer,'Tests/Production/RemainingStock/Clock.Test.py') and
+            clock_control['reader_sha256'] in raw_source_hashes(producer,'Tests/Production/RemainingStock/clock_observation.py') and
+            clock_control['positive']==capture.shared.inspect_clock(clock_positive,config['frames']) and
+            clock_control['owning_capture_files_sha256']=={name:sha(clock_positive/name) for name in ('stock-clock.csv','stock-vessel-state.csv')},
+            'Actual SDK clock reader controls or owning observations differ')
     return dict(capture_sha256=sha(capture_root/'capture.json'),actual_math=next(iter(maths)),build=built,cases=results,
         source_manifest_sha256=checksum(json.dumps(sources,sort_keys=True).encode()),
         gate_control_sha256=sha(capture_root/'gate-control.json'),

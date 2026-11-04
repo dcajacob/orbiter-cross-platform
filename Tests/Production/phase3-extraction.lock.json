@@ -2341,8 +2341,8 @@
     },
     "Src/Vessel/Dragonfly/Esystems.cpp": {
       "original_sha256_lf": "05c06b5ba36a3777dd6481bf18ff77c287edef8cdeadd3fc80d7eda71de798de",
-      "sha256_lf": "05c06b5ba36a3777dd6481bf18ff77c287edef8cdeadd3fc80d7eda71de798de",
-      "scope": "Complete original Dragonfly source and resources with independently audited native SDK/drawing/resource ownership bindings. Actual compatibility target uses distinct color-renderbuffer storage. Native diagnostic build/runtime and Windows/native qualification required; original formulas and public Windows SDK layouts unchanged."
+      "sha256_lf": "840d6ffa227a34608995b0a6bb30326b464022464f6cba096053b74163305bde",
+      "scope": "Complete original electrical update formulas and ordering retained. Explicitly initialize FCell::Amperes to zero before its first thermal read, shared by native and separately versioned Windows repaired-source v2. Actual allocator-pattern controls reproduce the inherited tick-2 vent/mass failure before repair. Original source hash retained; fresh build, runtime controls and four-profile Windows/native qualification required."
     },
     "Src/Vessel/Dragonfly/Esystems.h": {
       "original_sha256_lf": "7e9258c34c0596b79618c156535313e5e1fd5c17bab0f34aeda22867197cb47d",

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Conserve original Dragonfly calculations around explicit WGL ownership repair."""
+"""Conserve original calculations around declared WGL and initial-current repairs."""
 from pathlib import Path
 import hashlib
 import subprocess
@@ -9,6 +9,10 @@ BASE='f725194209634f7fd5d1d44d426cfa9b5e303e37'
 
 
 def adapted(name,source):
+    if name=='Src/Vessel/Dragonfly/Esystems.cpp':
+        anchor='  Volts=28.8;\n  power_load=r_amp;'
+        if source.count(anchor)!=1:raise ValueError('Original fuel-cell constructor boundary differs')
+        return source.replace(anchor,'  Volts=28.8;\n  Amperes=0; // No previous current before the first refresh.\n  power_load=r_amp;',1)
     if name=='Src/Vessel/Dragonfly/instruments.h':
         source=source.replace('class Panel;','class Panel;\nnamespace dragonfly {class WglBitmapTarget;}')
         return source.replace('   HBITMAP hBMP_old;','   HBITMAP hBMP_old;\n   dragonfly::WglBitmapTarget* bitmap_target;')
@@ -47,10 +51,10 @@ def verify():
         original=subprocess.check_output(['git','-C',str(ROOT),'show',BASE+':'+name]).decode('cp1252').replace('\r\n','\n')
         current=(ROOT/name).read_bytes().decode('cp1252').replace('\r\n','\n')
         if adapted(name,original)!=current:
-            raise ValueError('Dragonfly source differs beyond declared WGL ownership repair: '+name)
+            raise ValueError('Dragonfly source differs beyond declared WGL ownership and initial-current repairs: '+name)
         checked.append(name)
     if len(checked)!=23:raise ValueError('Incomplete original Dragonfly source closure')
-    print('Conserved all '+str(len(checked))+' original Dragonfly source/header/resource files; only ADI context/bitmap target ownership is adapted, with every attitude calculation and GL drawing command retained')
+    print('Conserved all '+str(len(checked))+' original Dragonfly source/header/resource files; only ADI context/bitmap ownership and initial fuel-cell current are repaired; all update formulas, ordering, attitude calculations and GL drawing commands retained')
 
 
 if __name__=='__main__':verify()

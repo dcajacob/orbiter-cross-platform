@@ -45,8 +45,18 @@ module export checks are retained. The unchanged SRB is rebuilt solely to obtain
 an MSVC import library; that build's DLL never enters the running application.
 
 `prepare_sources.py` stages the complete original Atlantis and Dragonfly source
-and resource trees. Exactly five paths differ: the tank callback, the two ADI
-source/header files and two new WGL ownership helpers. The original Windows
+and resource trees. Source variant v1 changed exactly five paths: the tank
+callback, the two ADI source/header files and two new WGL ownership helpers.
+Source variant v2 additionally initializes `FCell::Amperes` to zero before its
+first thermal read. Independent actual native allocation-pattern controls
+reproduce both sides of the inherited Windows tick-2 vent/mass mismatch, and
+the failed Windows save contains a nonfinite waste tank. The source auditor
+independently derives the sole added electrical assignment from the frozen
+original, and `SourceVariant.Test.py` rejects missing/changed initialization,
+thermal-formula changes and false policy metadata even with internally
+consistent damaged manifests. Every original update formula and callback order
+is retained; no old failed capture is accepted. Fresh v2 Windows execution and
+full four-profile/native qualification remain required. The original Windows
 Atlantis header is retained, including its public and exported class spellings.
 Existing source audits preserve every original physics and ADI drawing operation.
 

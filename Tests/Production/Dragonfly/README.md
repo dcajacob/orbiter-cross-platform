@@ -75,7 +75,7 @@ nonvirtual-base deletion. Both base classes are already polymorphic. The native
 copies now gain default virtual destructors so the existing deletion calls use
 each allocated concrete type. The independent source reader requires exactly
 those declarations and conserves every original simulation body and field.
-The original Windows source copies stay unchanged. The diagnostic capability
+The frozen Windows baseline stays unchanged. The diagnostic capability
 check also accounts for all eleven original vent jets/tanks created before the
 fourteen RCS thrusters and main propellant resource. Those resources are part
 of the preserved source, not additions to the simulation.
@@ -184,3 +184,46 @@ full-frame comparisons still have to pass. Normal class admission and Phase 6
 completion remain unchanged. The Windows reference workflow now also watches
 the actual Dragonfly and renderer source inputs, so a target-ownership repair
 cannot leave its reference candidate stale.
+
+The read-only SDK clock observer at `3d582560` also completes unchanged
+PoweredUp and Spin stabilisation scenes twice: 3,840 presentations, four clean
+teardowns, 212 rehashed process evidence files and all original gates retained.
+Both native traces end at system time 14.983125000000001 and simulation time 15;
+neither reaches the original system-time script's later warp change. All twelve
+compared PoweredUp state/resource/playback/mesh/camera/frame/lifecycle outputs
+remain byte-identical with the extra clock getters. Eight damaged clock copies
+are rejected for each of the four actual executions. The audit and frozen
+observer/runtime source inputs are in
+`out/phase6-remaining-stock-sdk-clock-audit-v1.json` and
+`out/phase6-remaining-stock-source-3d582560-clock-v1`.
+
+The old repaired Windows Release/SSE2 PoweredUp mismatch is now reproduced with
+the real v6 native module. Varying only ASan's allocation fill between zero and
+255 reproduces the good and bad Windows runs exactly for all thirteen observed
+TUG mass/fuel snapshots and twenty-six waste-vent rows over twelve real frames.
+The bad Windows save has a waste tank with negative mass and NaN temperature;
+the good save is finite. Read-only debugger observations at the first actual
+`FCell::Cloging` call show `Amperes` still carrying the allocation-fill bits
+(`0xbebebebe`, or NaN with `0xffffffff`). The constructor never assigned it,
+and the thermal expression reads it before the normal update assigns current.
+Both short allocation-pattern executions return zero, close their graphics
+contexts and produce no ASan/UBSan/LSan diagnostics; those sanitizers do not
+prove initialization of this field. The separate debugger observations are
+intentionally terminated at the observation point and count as diagnostic
+evidence only. The first debugger command-format failure is retained as v1.
+
+`out/phase6-dragonfly-fcell-initialization-audit-v1.json` records the actual
+source/read evidence, original Windows saves, native controls and exact
+cross-platform correlations. The historical Windows process was not debugged
+at its initial read. The evidence supports the initial-current cause; it does
+not turn the old failed or merely repeatable captures into accepted references.
+
+The shared source now explicitly initializes the stopped fuel cell's previous
+current to zero. The independent source audit derives exactly that one
+assignment from the frozen original; every update formula, operation order and
+public SDK layout stays unchanged. Windows repaired-source v2 declares this
+sixth source path, independently rederives its permitted delta, and rejects
+self-consistent changed/missing initialization or thermal-formula copies. The
+native token reader additionally rejects changed and removed initial current.
+Fresh source preparation, compilation, allocation-pattern controls, complete
+scenes and four-profile Windows/native qualification of this repair are pending.

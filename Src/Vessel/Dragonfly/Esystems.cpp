@@ -103,6 +103,7 @@ FCell::FCell(vector3 i_pos,Valve *o2,Valve *h2,VentValve *vent,Tank* waste,float
   Temp=290;//(O2_SRC->Temp+H2_SRC->Temp)/2;
   H20_waste->Temp=Temp;
   Volts=28.8;
+  Amperes=0; // No previous current before the first refresh.
   power_load=r_amp;
   max_power=7200; //watts 
   clogg=0.0; //no clog

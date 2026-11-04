@@ -46,7 +46,7 @@ def main():
     # Keep the original Windows Atlantis header and ABI spellings. The native
     # port's aliases/factories are not copied into the preserved-SDK variant.
     dragonfly=['Src/Vessel/Dragonfly/'+name for name in
-               ('instruments.cpp','instruments.h','WglContext.h','WglBitmapTarget.h')]
+               ('instruments.cpp','instruments.h','WglContext.h','WglBitmapTarget.h','Esystems.cpp')]
     producer_sources={}
     for name in dragonfly:
         body=git('show',producer+':'+name)
@@ -60,18 +60,20 @@ def main():
     changes={name:dict(original_sha256=digest(original[name]) if name in original else None,
                        repaired_sha256=digest(body)) for name,body in modified.items() if original.get(name)!=body}
     if set(changes)!={tank,*dragonfly}:
-        raise ValueError('Module source variant differs beyond the exact lifetime/platform bindings')
+        raise ValueError('Module source variant differs beyond the exact lifetime/platform/initial-current repairs')
     for name,body in modified.items():
         if (source/name).read_bytes()!=body:raise ValueError('Staged source copy differs: '+name)
     for name in paths:
         if name not in changes and (source/name).read_bytes()!=original[name]:
             raise ValueError('An original source, resource, config or mesh was altered')
     report=dict(schema=1,status='prepared-awaiting-build-and-independent-audit',
-        protocol='remaining-stock-repaired-sources-v1',original_application_and_sdk_source=BASE,
+        protocol='remaining-stock-repaired-sources-v2',original_application_and_sdk_source=BASE,
         producer_commit=producer,preparer_sha256=digest(Path(__file__).read_bytes()),
         original_files_sha256={name:digest(body) for name,body in original.items()},
         staged_files_sha256={name:digest(body) for name,body in modified.items()},
         declared_changes=changes,current_dragonfly_producer_sha256=producer_sources,
+        initialization_repair=dict(field='FCell::Amperes',initial_value=0,
+            policy='Define previous current before the first thermal update; retain every original update formula and callback order.'),
         complete_scenes=38,declared_classes=len(config['classes']),recording_files=len(config['recording_files_sha256_lf']),
         staged_original_module_files_unchanged_except_declared_changes=True,
         repository_scene_class_and_recording_inputs_verified=True,
@@ -86,7 +88,7 @@ def main():
               'all 38 complete scenes twice in four profiles, independent audit, native comparisons and '
               'interactions remain required before any reference acceptance.')
     (a.output/'source-variant.json').write_text(json.dumps(report,indent=2)+'\n')
-    print('Prepared exact original Windows module source closure with five declared repaired/added files; no reference qualification')
+    print('Prepared exact original Windows module source closure with six declared repaired/added files, including initial fuel-cell current; no reference qualification')
 
 
 if __name__=='__main__':main()
