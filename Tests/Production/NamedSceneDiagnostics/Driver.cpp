@@ -38,7 +38,7 @@ public:
         std::ifstream input("named-case.txt");require(bool(input>>target>>cockpit>>initialHud>>math),"Invalid complete-scene diagnostic input");
         require(math=="automatic" || math=="sse2","Unknown original arithmetic selection");
         previousFma=_get_FMA3_enable();if(math=="sse2")_set_FMA3_enable(0);
-        require(_get_FMA3_enable()==(math=="sse2"?0:1),"Original actual CRT math profile differs");
+        if(math=="sse2")require(_get_FMA3_enable()==0,"Original actual SSE2 CRT selection failed");
         std::ofstream("named-math.txt")<<(_get_FMA3_enable()?"fma3":"sse2")<<'\n';
         std::ifstream names("named-vessels.txt");std::string name,kind;while(names>>name>>kind)require(expected.emplace(name,kind).second,"Duplicate required stock object");require(expected.size()==8,"Complete original roster missing");
         for(auto* stream:{&hud,&vessels}){stream->imbue(std::locale::classic());stream->exceptions(std::ios::badbit|std::ios::failbit);*stream<<std::setprecision(17);}

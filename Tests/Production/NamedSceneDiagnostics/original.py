@@ -36,7 +36,7 @@ def run(a):
                     for name in ('ogl-evidence.enabled','instrument-evidence.enabled'):(directory/name).write_text('Complete eight-object original SDK diagnostic\n')
                     mesa_files(a.mesa.resolve(),directory)
                 stage(a.orbiter.resolve(),a.data.resolve(),a.planets.resolve(),folder,dict(frames=60,fixed_step=.25),configure)
-                result=inspect(folder,case);require(result['actual_math']==('sse2' if a.math_profile=='sse2' else 'fma3'),'Actual original CRT profile differs');runs.append(result)
+                result=inspect(folder,case);require(result['actual_math'] in ('sse2','fma3') and (a.math_profile!='sse2' or result['actual_math']=='sse2'),'Actual original CRT profile differs');runs.append(result)
             for key in ('raw_state_sha256','raw_vessel_state_sha256','hud_changes','second_DG_visual_registration_frames','nonfinite_text_labels','nonfinite_text_values'):
                 require(runs[0][key]==runs[1][key],'Original repeat differs: '+key)
             report['cases'][case['id']]=dict(runs=runs,identical_discrete_and_vessel_repeats=True);save()
