@@ -1,5 +1,29 @@
 # Original remaining native vessel integration
 
+## Independent persistence reader checkpoint
+
+The repaired source-v4 native Debug automatic stock-writer, Release SSE2
+stock-writer and Release SSE2 exact-Windows-save reload diagnostics all complete
+PoweredUp/Spin twice. The new independent reader rechecks those 12 actual
+processes and 11,520 presentations, complete saved fields, actual startup
+witnesses, source/runtime/generated/library identities and clean unsuppressed
+sanitizer/context teardown. Twenty-six damaged evidence controls pass, including
+omitted saved vessels/module fields, changed frame/source hashes, disabled leak
+checks, missing profiles, altered ZIP/member bytes and Windows parent guard
+paths. A retained Windows diagnostic archive passes all 388 member checks.
+Four historical Windows v3/native Debug automatic stock-writer comparisons
+also pass the existing state/camera/full-frame budgets and complete saved-token
+checks. These historical Windows inputs provide no fresh v4 reload qualification.
+
+The result is `out/phase6-persistence-audit-reader-controls-v2.json` in the
+persistence-audit checkout. The complete audit candidate requires all 38 scenes,
+two repetitions, four profiles and both stock-writer/reload phases, with no
+selected-case escape. Its full positive path awaits the actual complete Windows
+and native matrices. The source-v4 native full stock-writer campaigns remain
+live in their frozen gauge checkout; the latest Windows full and diagnostic
+jobs remain pending behind earlier workflows. No native admission, 157-scene
+result or Phase 6 acceptance changes at this checkpoint.
+
 ## Release gauge-label storage checkpoint
 
 The new Release SSE2 exact-save reload aborts during Dragonfly initialization.

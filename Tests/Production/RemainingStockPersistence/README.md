@@ -140,3 +140,64 @@ unchanged strings, arithmetic and drawing. Complete persistence collectors now
 require v4; explicit native diagnostics can read historical v3 inputs and
 record that source identity. Repaired Release execution and full qualification
 remain pending; the failed v3 processes remain retained.
+
+## Independent persistence audit candidate
+
+`audit.py` requires every scene and both repetitions in all four profiles for
+both native phases and the original Windows writer/reload phases. It has no
+selected-case switch. Each of `--native-stock`, `--native-reload` and `--windows`
+must occur four times as `PROFILE=PATH`, with exactly `Debug-automatic`,
+`Debug-sse2`, `Release-automatic` and `Release-sse2`. The Windows path is the
+decoded artifact root containing `remaining-stock-repaired`,
+`remaining-stock-persistence` and `remaining-stock-repaired-build`.
+
+| Required argument | Owning input |
+| --- | --- |
+| `--native-owner` | Retained checkout that owns the immutable native packages and capture readers |
+| `--preserved-debug`, `--preserved-release` | Independently retained complete original Windows application/SDK/client packages |
+| `--mesa-runtime` | Independently checked original Windows Mesa DLL/license bytes |
+| `--download-manifest`, `--archive-root` | Passed complete four-profile download report and repository root for its relative ZIP paths |
+| `--output` | Fresh JSON result path; existing results cannot be replaced |
+
+The download report uses the existing complete Windows auditor's transport
+shape: `status`, `source_commit`, and four `artifacts` entries with `profile`,
+`name`, `path`, `bytes` and `sha256`. Only the full
+`matched-clock-remaining-stock-v2-PROFILE` artifacts qualify. The auditor checks
+each retained ZIP and every decoded member, rejecting duplicate/case-colliding,
+unsafe, symlink and unmanifested members. A selected diagnostic archive cannot
+stand in for a complete profile.
+
+`observations.py` binds the original observation readers to their hash-checked
+owning checkout and independently re-reads actual native source/package,
+generated source, mapped library, sanitizer, state/resource/mesh/playback,
+startup configuration, Save command, full saved content, camera and frame
+evidence. Complete reloads require the fresh Windows source-v4 and startup
+witnesses. `transport.py` resolves recorded absolute Windows parent guard paths
+only to exact retained relative suffixes from one output root; it does not try
+to open a Windows drive path on Linux or silently drop those guards.
+
+The complete comparison checks the same exact hashed Windows input in both
+reloads, stock and reload state/camera/full-frame comparisons, complete saved
+tokens excluding only the declared operator descriptions, and direct original
+Windows Debug/Release comparisons. It reports actual Windows writer-to-reload
+field changes as calibration, without creating a numerical tolerance or
+serialization waiver. Its successful status is a comparison **candidate**;
+class admission, controls, repeated sessions, full157 and Phase 6 acceptance
+remain separate gates. A complete positive matrix has not yet been available
+to exercise this final path.
+
+`Audit.Test.py` currently passes against three retained source-v4 native
+diagnostic captures: Debug automatic stock writers, Release SSE2 stock writers
+and Release SSE2 exact-Windows-save reloads, each with PoweredUp/Spin twice.
+It re-reads **12 actual processes / 11,520 presentations** and rejects **26**
+damaged report, source identity, frame hash, saved-vessel/module-field,
+sanitizer, profile, ZIP/member and parent-path copies. It verifies all 388
+members of a retained 29,262,806-byte Windows diagnostic ZIP. Five path controls
+use reconstructed Windows descriptors over 126 actual retained parent files;
+they earn no Windows reload/process credit. Four historical Windows v3/native
+Debug automatic stock-writer comparisons also pass: PoweredUp SSIM 0.9864176,
+Spin 1.0, with actual clocks, state, camera and complete saved tokens checked.
+Those old Windows files cannot satisfy fresh v4/startup-witness qualification.
+The outputs are `out/phase6-persistence-audit-reader-controls-v2.json` and `.log`
+in the isolated persistence-audit checkout; the earlier 21-control v1 result
+and the initial failed library-SONAME reader attempt remain retained.
