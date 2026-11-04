@@ -28,7 +28,18 @@ now derives the complete ADI source/header from the frozen original for both
 historical v2 and corrected v3, rather than trusting a producer's drawing or
 attitude changes. Native controls additionally reject missing/nonzero requests;
 Windows controls also reject altered attitude operations, false policy and false
-historical labeling. Fresh corrected native/Windows execution remains required.
+historical labeling. Corrected native Debug automatic now passes four actual
+allocation/load controls: stock reference values remain zero under both heap
+fills, while an exact original Windows save retains its nonzero reference under
+both fills. Ten actual physical/resource/mesh/playback/clock traces and complete
+parsed saved content are identical within each pair. All four processes return
+zero with clean sanitizer/context teardown. A separate repaired 960-frame Save
+run preserves the earlier native physical traces, camera, framebuffer and saved
+content. The independent audit is
+`out/phase6-adi-request-fixed-audit-v1.json`; it rechecks 769 source/dependency,
+96 runtime/generated, 1,130 asset and 57 actual data inputs. Its source snapshot
+retains all 837 source/dependency/generated streams. Fresh corrected Windows
+execution and full four-profile/all-scene qualification remain required.
 
 The causal comparison and raw controls are retained under
 `out/phase6-adi-request-initialization-audit-v1.json`,
@@ -40,6 +51,17 @@ control failure remains retained. No numerical tolerance is inferred from save
 text, and no scoped save experiment establishes full persistence qualification.
 All four immutable native full-38 campaigns at `45c3155d` continue in their
 separate checkout; those old runs are not relabeled as containing this repair.
+
+The persistence candidate now retains exact hashed Windows saves beneath a
+separate `_Phase6Persistence` path, preserving original recording basenames and
+all actual saved vessels/classes. Four real Windows saves pass twenty
+changed-parent/class/field/newline rejection controls. The new Windows reload
+collector independently verifies the original application/SDK and repaired v3
+source/runtime before executing all 38 saved scenes twice in every Windows
+profile; the diagnostic workflow explicitly selects only PoweredUp/Spin.
+Actual Windows reload results, native reload comparisons, measured stock writer
+round trips, input and lifetime checks remain pending. No saved-state reader or
+collector establishes persistence acceptance by itself.
 
 
 ## Corrected panel and four-profile Windows checkpoint

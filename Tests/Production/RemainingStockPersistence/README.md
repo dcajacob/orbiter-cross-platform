@@ -41,8 +41,54 @@ The shared constructor now explicitly initializes that request to zero, retainin
 loaded references and all original reference/attitude/drawing operations.
 Windows source variant v3 declares this separately from the prior v2 fuel-cell
 repair. Both source variants are independently derived from the frozen original
-ADI source; old captures remain old captures. Fresh native/Windows allocation,
-writer, reload, physical/visual, control and lifetime checks are still required.
+ADI source; old captures remain old captures.
+
+The repaired `c4c7a231` native Debug automatic package now completes four real
+one-frame controls: both allocation fills with the unchanged stock input and
+both fills with the exact hashed original Windows end save. Stock references
+remain zero and loaded nonzero references remain unchanged. All ten physical,
+resource, playback, mesh and begin/end-clock trace files, and all parsed saved
+content, are identical between each pair. Every process returns zero with one
+successful presentation, clean context destruction and unsuppressed sanitizers.
+A separate repaired 960-frame native Save run also returns zero; its ten traces,
+camera, framebuffer and complete saved content are byte/content-identical to
+the earlier default-allocation native run. The independent audit rechecks 769
+source/dependency files, 96 runtime/generated files, 1,130 assets and 57 actual
+data files. Evidence is `out/phase6-adi-request-fixed-audit-v1.json`; the exact
+837 source/dependency/generated streams are retained in
+`out/phase6-adi-request-source-c4c7a231-v1`. Fourteen damaged actual clock/frame
+copies are rejected in `out/phase6-finalized-save-fixed-clock-controls-v1.json`.
+
+`saved_inputs.py` names each exact Windows save beneath `_Phase6Persistence`,
+keeps the original recording basename and retains every saved vessel/class.
+The source save's raw hash is mandatory: even transport-newline changes are
+rejected as a different reload input. `SavedInputs.Test.py` uses actual Windows
+outputs to reject changed parents, classes, fields and line endings. Four real
+saved inputs and twenty damaged-copy controls pass locally in
+`out/phase6-exact-saved-input-controls-v2.json`; these historical v2 saves test
+the reader only and are not relabeled as repaired v3 observations.
+
+`capture_windows.py` first independently verifies the complete original
+application/SDK package, repaired v3 module/runtime/source closure and actual
+parent observations. It then reloads every exact saved input in fresh processes,
+using the unchanged 960-frame matched-clock policy, real framebuffer, all-vessel
+state/resource/mesh/playback observations and original numerical/camera/image
+budgets. Every original recording and simulation-data byte remains guarded.
+The diagnostic workflow selects PoweredUp/Spin explicitly; the full workflow
+selects all 38 scenes, both original repetitions and all four Windows profiles.
+Both workflows retain the separately named input saves and reload outputs.
+They await actual Windows execution; adding collection is not a runtime pass.
+
+```sh
+python -B Tests/Production/RemainingStockPersistence/capture_windows.py \
+  --parent-capture out/remaining-stock-repaired \
+  --build out/remaining-stock-repaired-build --preserved out/remaining-stock-preserved \
+  --data out/production-data --planets out/standard-planets --mesa out/mesa-runtime \
+  --configuration Debug --math-profile automatic --output out/remaining-stock-persistence
+```
+
+Fresh corrected Windows writers, complete native/Windows reload comparisons,
+all four native profiles, control and lifetime checks are still required.
 The new persistence protocol specifies reloading the same exact Windows save in
 both runtimes, alongside separately checking the native writer at measured
 original serialization precision. It does not convert a scoped reader or save

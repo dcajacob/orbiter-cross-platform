@@ -5,6 +5,7 @@ on:
     paths:
       - 'Tests/Production/RemainingStockRepaired/**'
       - 'Tests/Production/RemainingStock/**'
+      - 'Tests/Production/RemainingStockPersistence/**'
       - 'Tests/Production/StockVessels/Observation.h'
       - 'Src/Vessel/Dragonfly/**'
       - 'Tests/Production/Dragonfly/**'
@@ -123,6 +124,19 @@ jobs:
           python -B Tests/Production/RemainingStockRepaired/MatchedClock.Test.py
           --capture out/remaining-stock-repaired/remaining_stock_003-1
           --output out/remaining-stock-repaired/matched-clock-control.json
+      - name: Verify exact saved-input provenance for all complete scenes and repetitions
+        run: >-
+          python -B Tests/Production/RemainingStockPersistence/SavedInputs.Test.py
+          --parent-capture out/remaining-stock-repaired
+          --output out/remaining-stock-repaired-build/saved-input-controls.json
+      - name: Reload all 38 exact Windows end saves twice with original physics and matched clocks
+        run: >-
+          python -B Tests/Production/RemainingStockPersistence/capture_windows.py
+          --parent-capture out/remaining-stock-repaired --build out/remaining-stock-repaired-build
+          --preserved out/remaining-stock-preserved --data out/production-data
+          --planets out/standard-planets --mesa out/mesa-runtime
+          --configuration ${{ matrix.configuration }} --math-profile ${{ matrix.math_profile }}
+          --output out/remaining-stock-persistence
       - uses: actions/upload-artifact@v7
         if: always()
         with:
@@ -150,6 +164,18 @@ jobs:
             out/remaining-stock-repaired-build/runtime-file-controls.json
             out/remaining-stock-repaired-build/original-metadata-controls.json
             out/remaining-stock-repaired-build/source-variant-controls.json
+            out/remaining-stock-repaired-build/saved-input-controls.json
+            out/remaining-stock-persistence/capture.json
+            out/remaining-stock-persistence/*/*.csv
+            out/remaining-stock-persistence/*/*.rgba
+            out/remaining-stock-persistence/*/*.png
+            out/remaining-stock-persistence/*/*.json
+            out/remaining-stock-persistence/*/*.txt
+            out/remaining-stock-persistence/*/*.log
+            out/remaining-stock-persistence/*/Scenarios/**/*.scn
+            out/remaining-stock-persistence/*/Flights/**/*
+            out/remaining-stock-persistence/*/Orbiter.cfg
+            out/remaining-stock-persistence/*/Meshes/Dragonfly/Dragonfly.msh
             out/remaining-stock-repaired-build/*.log
             out/remaining-stock-repaired-build/module-sources/**
             out/remaining-stock-repaired-build/observer/**
