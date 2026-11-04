@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Extend a verified native asset tree with unchanged remaining-vessel installation resources."""
 import argparse
+import errno
 import hashlib
 import json
 import os
@@ -15,6 +16,13 @@ SOURCE='f725194209634f7fd5d1d44d426cfa9b5e303e37'
 def digest(path):return hashlib.sha256(path.read_bytes()).hexdigest()
 def require(value,message):
     if not value:raise ValueError(message)
+
+
+def link_or_copy(source,target):
+    try:return os.link(source,target)
+    except OSError as error:
+        if error.errno!=errno.EXDEV:raise
+        return shutil.copy2(source,target)
 
 
 def tree(root):
@@ -36,7 +44,7 @@ def main():
     manifest=json.loads((a.base_assets/'resources.json').read_text())
     for name,item in manifest['source_resources'].items():
         require(before[name]==item['sha256'],'Base native asset no longer matches its source manifest: '+name)
-    shutil.copytree(a.base_assets,a.output,copy_function=os.link)
+    shutil.copytree(a.base_assets,a.output,copy_function=link_or_copy)
     chosen={name.casefold():name for name in before};additions={};rules={}
     locked_data={name.casefold():value for name,value in manifest['locked_data'].items()}
 
