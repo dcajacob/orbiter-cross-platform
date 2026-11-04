@@ -123,3 +123,30 @@ identity and the failed/interrupted cohorts. Full stock Windows/native parity,
 the complete Wayland matrix, final platform/hardware/performance and durable
 evidence gates remain open. The unavailable physical controller remains
 unverified and unwaived; Phase 6 is not complete.
+
+The complete current-source Wayland input matrix now also passes its
+independent all-profile audit: 64 real application processes and 36,981
+presentations across Debug/Release automatic/SSE2, DG/DG-S, panel/VC, 1x/2x
+and llvmpipe/Intel. Every finalized thrust sample, original camera and FOV
+check, Options capture, actual surface/framebuffer scale, focus release and
+held-button shutdown check passes. Actual simulator/focus-client mappings
+keep the instrumented decoration candidate confined to the application.
+The audit rehashes 1,152 owning source/runtime/generated/provider files and
+402 raw report/lifecycle/mapping files; the four underlying matrix verifiers
+retain each input/thrust/camera evidence hash. The failed and interrupted
+cohorts remain unchanged. [Current complete input scope](CurrentWaylandVerification.json)
+leaves full stock parity, final hardware/performance, physical-controller and
+durable remote-evidence requirements open.
+
+The unchanged loader/resource/archive assertion sources now also pass against
+the exact current shared libraries and matching private SDK in all four
+profiles. Independent auditing checks 540 C++ test processes, eighty actual
+valid ELF load/init/fini/unload cycles, incompatible ABI/build/toolchain/kind
+and missing-entry/module rejections, and original session/resource/mesh/body
+checks including ambiguous paths and corrupt meshes. All 28 locked stock
+archives plus the explicit and sparse64 fixtures match both accepted Windows
+references exactly: 1,200 unique queries repeated twice per profile, or 9,600
+actual repeated queries. Each profile also completes all seventy original
+archive validity/failure controls. [Boundary scope and raw identities](CurrentBoundaryVerification.json)
+keep this separate from full scenario, cockpit/physics, hardware/performance
+and complete Phase 6 qualification.

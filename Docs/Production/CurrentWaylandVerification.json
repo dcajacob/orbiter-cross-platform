@@ -1,0 +1,83 @@
+{
+  "schema": 1,
+  "status": "passed-current-four-profile-wayland-input-and-decoration-matrices",
+  "runtime_source": "d255d79176c9fffccf7f50b0af96bdab11f34fe3",
+  "owning_harness_source": "c20135a10d8462ecab49b3d9d4a33e45ae18a53c",
+  "scope": "Complete four-profile local DG/DG-S panel/virtual-cockpit real Wayland input, 1x/2x, llvmpipe/Intel matrix; input and resource lifetime only. Full stock Windows/native parity, physical controllers and Phase6 acceptance remain separate.",
+  "profiles": {
+    "Debug-automatic": {
+      "status": "passed",
+      "verification_sha256": "837284f323d037e38c3befb645a6ac36bf8aa79f4d4ad408f1f43b731bf567a0",
+      "processes": 16,
+      "successful_presents": 9216
+    },
+    "Debug-sse2": {
+      "status": "passed",
+      "verification_sha256": "45a0310c3f0984285cc43051d22b8183c321337111982b7a2258fa2cc5a52d57",
+      "processes": 16,
+      "successful_presents": 8153
+    },
+    "Release-automatic": {
+      "status": "passed",
+      "verification_sha256": "2bb0cabb44f3613bbb600a480ab12f66d1f261422f12f6a880e56be9fcbf79e0",
+      "processes": 16,
+      "successful_presents": 9142
+    },
+    "Release-sse2": {
+      "status": "passed",
+      "verification_sha256": "826227ee9a383434cdc5bf827fb1f161675e78bd8aba650ab407fbd46549c7e3",
+      "processes": 16,
+      "successful_presents": 10470
+    }
+  },
+  "actual_processes": 64,
+  "successful_presents": 36981,
+  "matrix_dimensions": {
+    "build_profiles": 4,
+    "vessels": 2,
+    "cockpit_modes": 2,
+    "content_scales": 2,
+    "graphics_drivers": 2
+  },
+  "actual_geometry": {
+    "framebuffer": [
+      1280,
+      720
+    ],
+    "scale1_logical": [
+      1280,
+      720
+    ],
+    "scale2_logical": [
+      640,
+      360
+    ],
+    "backend": "wayland"
+  },
+  "checked": [
+    "Original real keyboard/button/focus routes",
+    "Every finalized release, bare-key neutrality, full and precision RCS thrust sample",
+    "Cockpit/external camera drag, wheel, step FOV and Options capture",
+    "Real 2x surface/framebuffer negotiation before scene initialization",
+    "Held-button shutdown release and graphics-context deletion",
+    "Private instrumented GTK decoration only in the simulator; normal focus client mappings",
+    "Actual source, runtime, generated input and provider hashes; unsuppressed sanitizer environment and clean logs"
+  ],
+  "raw_independent_audit": {
+    "file": "phase6-current-wayland-matrix-independent-audit-v4.json",
+    "sha256": "65915eea4c6981781bb782b57639c6cbb8d577e47b258436b033eb74737b167f",
+    "protected_files": 402,
+    "owning_source_runtime_generated_provider_files": 1152
+  },
+  "source_runtime_generated_provider_bytes_unchanged": true,
+  "all_selected_application_and_compositor_exits_zero": true,
+  "interrupted_and_failed_cohorts_preserved": true,
+  "remote_raw_evidence_preservation": "pending",
+  "physical_controller": "unavailable-unverified-unwaived",
+  "full157_last_qualified": {
+    "passed": 118,
+    "failed": 39
+  },
+  "native_admission_qualified": false,
+  "phase6_complete": false
+}

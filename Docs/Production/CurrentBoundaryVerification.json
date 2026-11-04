@@ -1,0 +1,74 @@
+{
+  "schema": 1,
+  "status": "passed-current-four-profile-native-boundary-independent-audit",
+  "runtime_source": "d255d79176c9fffccf7f50b0af96bdab11f34fe3",
+  "assertion_source": "d255d79176c9fffccf7f50b0af96bdab11f34fe3",
+  "scope": "All four current shared-library build profiles: unchanged NativeModule/Body bootstrap and lifetime assertions, production session/resource/mesh/body checks, all28 locked stock archives plus explicit and sparse64 Windows-reference fixtures, and all70 archive validity/failure controls per profile. Full scenario/cockpit/physics admission and Phase6 completion remain separate.",
+  "profiles": {
+    "Debug-automatic": {
+      "actual_cpp_test_processes": 135,
+      "actual_module_load_init_fini_unload_cycles": 20,
+      "actual_stock_archives": 28,
+      "archive_inputs": 30,
+      "unique_queries": 1200,
+      "repetitions": 2,
+      "archive_validity_and_failure_processes": 70
+    },
+    "Debug-sse2": {
+      "actual_cpp_test_processes": 135,
+      "actual_module_load_init_fini_unload_cycles": 20,
+      "actual_stock_archives": 28,
+      "archive_inputs": 30,
+      "unique_queries": 1200,
+      "repetitions": 2,
+      "archive_validity_and_failure_processes": 70
+    },
+    "Release-automatic": {
+      "actual_cpp_test_processes": 135,
+      "actual_module_load_init_fini_unload_cycles": 20,
+      "actual_stock_archives": 28,
+      "archive_inputs": 30,
+      "unique_queries": 1200,
+      "repetitions": 2,
+      "archive_validity_and_failure_processes": 70
+    },
+    "Release-sse2": {
+      "actual_cpp_test_processes": 135,
+      "actual_module_load_init_fini_unload_cycles": 20,
+      "actual_stock_archives": 28,
+      "archive_inputs": 30,
+      "unique_queries": 1200,
+      "repetitions": 2,
+      "archive_validity_and_failure_processes": 70
+    }
+  },
+  "actual_cpp_test_processes": 540,
+  "actual_module_load_init_fini_unload_cycles": 80,
+  "unique_archive_queries": 4800,
+  "actual_repeated_archive_queries": 9600,
+  "archive_validity_and_failure_processes": 280,
+  "archive_control_detail": "Each profile runs one valid archive control and 69 missing/corrupt/truncated/header/index/payload/resource failure controls.",
+  "actual_shared_library_and_matching_private_sdk": true,
+  "engine_and_renderer_binaries_rebuilt": false,
+  "original_cpp_and_python_assertions_unchanged": true,
+  "full_stock_archive_windows_comparison": {
+    "status": "passed-current-four-profile-exact-accepted-windows-archive-closure",
+    "actual_stock_archives": 28,
+    "explicit_and_sparse64_fixtures": 2,
+    "all_profiles": true,
+    "raw_closure_sha256": "bd7c14cdeb332a919dc9a417a8b7dafb60cc169986010725c85f51349694d36b"
+  },
+  "raw_independent_audit": {
+    "file": "phase6-current-native-boundary-independent-v1.json",
+    "sha256": "35e56680fe28ab7a4b5abc5e28db68fc5bac0bbdd431deaa369ab6bb2dd94fb1",
+    "protected_files": 2857
+  },
+  "sanitizers": {
+    "ASAN_OPTIONS": "detect_leaks=1:fast_unwind_on_malloc=0",
+    "LSAN_OPTIONS": "",
+    "UBSAN_OPTIONS": "halt_on_error=1:print_stacktrace=1"
+  },
+  "remote_raw_evidence_preservation": "pending",
+  "native_admission_qualified": false,
+  "phase6_complete": false
+}
