@@ -127,6 +127,11 @@ in both Windows and native Linux; the original wheel-brake keys stop it and prod
 a native `Landed Moon` save at Brighton Beach. Complete Windows/native recording
 and four-profile mission qualification remain open.
 
+The unchanged eight-vessel [DG-S takeoff development flow](DgsTakeoff.md)
+now reaches 10 km and 700 m/s, runs both scramjets, saves the complete scene,
+reloads it with F5 and exits cleanly. A separate actual-save reload also passes.
+Matching Windows and complete four-profile qualification remain open.
+
 ## Phase 1 reproducibility
 
 ```sh
