@@ -25,3 +25,9 @@ captured OpenGL client, with their frozen package and file hashes. It has no
 release, artifact, runtime, SDK or provider upload step. Concise normal CI test
 results may be retained locally alongside native evidence; evidence archives
 remain local.
+
+The diagnostic records a read-only Win32 snapshot of its own actual DLL paths
+at the paused save and verifies the required application, observer, original
+vessel, renderer and Mesa module hashes. This does not depend on the frozen
+renderer reaching its later image-capture time. No physics, save, input, clock,
+module byte or reference criterion changes with this observation.

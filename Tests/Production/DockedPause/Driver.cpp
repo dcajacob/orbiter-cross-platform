@@ -4,6 +4,8 @@
 #include "ApplicationObservation.h"
 #include <cmath>
 #include <cstdlib>
+#include <filesystem>
+#include <tlhelp32.h>
 #include <fstream>
 #include <iomanip>
 #include <limits>
@@ -35,9 +37,21 @@ class Driver final:public oapi::Module {
         }
         require(actual==expected,"Original docked scene lost or replaced an object");vessels.flush();
     }
+    void loaded_modules(){
+        HANDLE snapshot=CreateToolhelp32Snapshot(TH32CS_SNAPMODULE|TH32CS_SNAPMODULE32,GetCurrentProcessId());
+        require(snapshot!=INVALID_HANDLE_VALUE,"Cannot inspect actual paused-process DLL paths");
+        try {
+            std::ofstream modules("pause-loaded-modules.txt");modules.exceptions(std::ios::badbit|std::ios::failbit);
+            MODULEENTRY32W module{};module.dwSize=sizeof(module);
+            require(Module32FirstW(snapshot,&module)!=FALSE,"Actual paused-process module snapshot is empty");
+            do { modules<<std::filesystem::path(module.szExePath).generic_u8string()<<'\n'; }
+            while(Module32NextW(snapshot,&module));
+        }catch(...){CloseHandle(snapshot);throw;}
+        CloseHandle(snapshot);
+    }
     void save(){
         require(oapiGetPause(),"Serialization occurred while running");savedSeconds=oapiGetSimTime();savedMjd=oapiGetSimMJD();
-        require(oapiSaveScenario("PausedResult","Original paused docked state"),"Original public SDK save failed");saved=true;
+        require(oapiSaveScenario("PausedResult","Original paused docked state"),"Original public SDK save failed");loaded_modules();saved=true;
         std::ofstream marker("pause-saved-clock.csv");marker.imbue(std::locale::classic());marker<<std::setprecision(17)<<"seconds,mjd\n"<<savedSeconds<<','<<savedMjd<<'\n';
     }
 public:

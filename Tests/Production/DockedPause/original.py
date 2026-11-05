@@ -10,7 +10,7 @@ from saved_state import parse_saved,content_differences
 def rows(path):
     with Path(path).open() as f:return list(csv.DictReader(f))
 
-def inspect(folder,case,phase,config,expected,parent=None):
+def inspect(folder,case,phase,config,expected,parent=None,expected_binaries=None):
     frames=case['pause_tick']+config['paused_frames'] if phase=='writer' else config['paused_frames']
     require(not (folder/'pause-failure.txt').exists(),'Original paused SDK diagnostic failed: '+((folder/'pause-failure.txt').read_text() if (folder/'pause-failure.txt').exists() else ''))
     require((folder/'pause-complete.txt').read_text().strip()==str(frames),'Original paused process did not complete')
@@ -35,11 +35,25 @@ def inspect(folder,case,phase,config,expected,parent=None):
     renderer=json.loads((folder/'renderer-info.json').read_text());require('llvmpipe' in renderer['renderer'].lower(),'Original pinned software renderer missing: '+json.dumps(renderer))
     life=json.loads((folder/'graphics-lifecycle.json').read_text());require(life['context_deleted'] and life['successful_presents']==frames,'Original render lifecycle incomplete')
     errors=folder/'graphics-errors.txt';require(not errors.exists() or not errors.read_text().strip(),'Original real renderer reported errors')
-    modules={Path(s.replace('\\','/')).name.casefold() for s in (folder/'renderer-modules.txt').read_text().splitlines()}
-    require({'opengl32.dll','libgallium_wgl.dll','oglclient.dll','deltaglider.dll','shuttlea.dll'}<=modules,'Actual original client/provider/vessel DLL missing')
+    # The frozen renderer emits its own DLL list only at its delayed graphics
+    # capture. These paused runs stop before that time, so the diagnostic takes
+    # a read-only Win32 module snapshot exactly when the real SDK save occurs.
+    mapped=[Path(s).resolve() for s in (folder/'pause-loaded-modules.txt').read_text().splitlines()]
+    modules={p.name.casefold() for p in mapped}
+    required={'orbiter.exe','productioncockpitdriver.dll','opengl32.dll','libgallium_wgl.dll','oglclient.dll','deltaglider.dll','shuttlea.dll'}
+    require(required<=modules,'Actual original application/observer/client/provider/vessel DLL missing')
+    bindings=json.loads((folder/'mesa-bindings.json').read_text());effective={n.casefold():v for n,v in bindings['bindings'].items()};mesa={n.casefold():v for n,v in bindings['runtime']['files'].items()}
+    expected_paths={n.casefold():v for n,v in expected_binaries.items()};loaded=[]
+    for name in sorted(required):
+        paths=[p for p in mapped if p.name.casefold()==name];require(len(paths)==1,'Required actual module path is missing or ambiguous: '+name)
+        path=paths[0];require(folder.resolve() in path.parents,'Required original module came from outside the staged runtime: '+str(path))
+        relative=path.relative_to(folder.resolve()).as_posix().casefold();value=sha(path)
+        if name in mesa:expected_hash=effective.get(name,{}).get('effective_sha256',mesa[name]['sha256'])
+        else:require(relative in expected_paths,'Executed original module is unrecorded: '+relative);expected_hash=expected_paths[relative]
+        require(value==expected_hash,'Executed original module bytes differ: '+name);loaded.append(dict(path=str(path),sha256=value))
     saved=folder/'Scenarios/PausedResult.scn';state=parse_saved(saved);require({n:v['class_name'] for n,v in state['ships'].items()}==expected and state['focus']=='GL-02','Actual original saved graph/focus differs')
     math_profile=(folder/'pause-math.txt').read_text().strip();require(math_profile in ('sse2','fma3'),'Original CRT profile missing')
-    return dict(frames=frames,paused_frames=8,paused_seconds=paused[0]['seconds'],paused_mjd=paused[0]['mjd'],successful_presents=life['successful_presents'],actual_vessels=expected,actual_math=math_profile,clock_sha256=sha(folder/'pause-clock.csv'),vessel_state_sha256=sha(folder/'pause-vessels.csv'),saved_sha256=sha(saved),saved_state=state,saved_path=str(saved),renderer=renderer,physics_steps=case['pause_tick'] if phase=='writer' else 0)
+    return dict(frames=frames,paused_frames=8,paused_seconds=paused[0]['seconds'],paused_mjd=paused[0]['mjd'],successful_presents=life['successful_presents'],actual_vessels=expected,actual_math=math_profile,clock_sha256=sha(folder/'pause-clock.csv'),vessel_state_sha256=sha(folder/'pause-vessels.csv'),saved_sha256=sha(saved),saved_state=state,saved_path=str(saved),renderer=renderer,actual_loaded_required_modules=loaded,physics_steps=case['pause_tick'] if phase=='writer' else 0)
 
 def run(a):
     import os
@@ -48,6 +62,7 @@ def run(a):
     manifest=json.loads((a.orbiter.parent/'test-runtime.json').read_text());inputs=json.loads((a.orbiter.parent/'named-original-inputs.json').read_text())
     require(manifest['source_commit']==inputs['application_source']==config['application_source'] and inputs['configuration']==a.configuration,'Exact already accepted original runtime/SDK required')
     require(all(sha(a.orbiter.parent/n)==v for n,v in manifest['files'].items()) and all(sha(a.orbiter.parent/n)==v for n,v in inputs['original_client_files_sha256'].items()),'An original application/SDK/client file changed')
+    expected_binaries={**manifest['files'],**inputs['original_client_files_sha256'],'Modules/Plugin/ProductionCockpitDriver.dll':sha(a.orbiter.parent/'Modules/Plugin/ProductionCockpitDriver.dll')}
     report=dict(status='running',diagnostic_source=__import__('subprocess').check_output(['git','-C',str(ROOT),'rev-parse','HEAD'],text=True).strip(),application_source=config['application_source'],configuration=a.configuration,math_profile=a.math_profile,cases={},native_admission_qualified=False,phase6_complete=False,scope='Original paused save/read/write diagnostic at the observed native pause ticks in both unchanged complete docked-ISS entry points. Every saved semantic token difference is retained. No numerical tolerance, frozen reference, original physics, source module or acceptance budget is changed; no evidence archive, SDK, runtime or provider is uploaded.')
     report_file=a.output/'diagnostic.json'
     def save():report_file.write_text(json.dumps(report,indent=2)+'\n')
@@ -70,7 +85,7 @@ def run(a):
                     try:stage(a.orbiter.resolve(),a.data.resolve(),a.planets.resolve(),folder,dict(frames=frames,fixed_step=config['fixed_step']),configure)
                     except BaseException:
                         failure=folder/'pause-failure.txt';print('ORIGINAL_DOCKED_PAUSE_FAILURE='+json.dumps(dict(case=case['id'],phase=phase,error=failure.read_text() if failure.exists() else 'See actual original process exit',console_tail=(folder/'console.txt').read_text(errors='replace')[-2000:] if (folder/'console.txt').exists() else '')),flush=True);raise
-                    actual=inspect(folder,case,phase,config,expected,parent);require(a.math_profile!='sse2' or actual['actual_math']=='sse2','Actual original SSE2 CRT selection differs');pair[phase]=actual;parent=Path(actual['saved_path'])
+                    actual=inspect(folder,case,phase,config,expected,parent,expected_binaries);require(a.math_profile!='sse2' or actual['actual_math']=='sse2','Actual original SSE2 CRT selection differs');pair[phase]=actual;parent=Path(actual['saved_path'])
                 pair['exact_semantic_differences']=content_differences(pair['writer']['saved_state'],pair['reload']['saved_state'])
                 results.append(pair)
             for phase in ('writer','reload'):
