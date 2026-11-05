@@ -31,7 +31,20 @@ flight, invokes F5, and exits normally after both worlds have rendered. Its two
 contexts close after 53 and 51 successful presents. This helped distinguish the
 flight driver's premature close command from application reload behavior.
 
-These results establish development flight and saved-state interaction in one
-configuration and math profile. Matching original Windows observations,
-complete four-profile qualification, the other named scenarios and full Phase 6
-acceptance remain open. Raw evidence stays local; Windows work uses the local VM.
+Those earlier `84706794` results cover one configuration and math profile.
+
+The fresh `6a67588b` packages now complete the same unchanged eight-vessel
+takeoff flow in Debug/Release and automatic/SSE2 profiles. All four aircraft
+climb above 10 km, reach 700 m/s, run both scramjets, save all eight original
+vessels, reload with F5 and exit normally. Each full Ctrl+S chord is delivered
+in one real Wayland input batch. The eight graphics contexts close normally;
+all 452,400 recorded vessel-state rows are finite and retain the complete
+roster. Guarded inputs remain unchanged and unsuppressed ASan, UBSan and leak
+checks report no findings.
+
+The pilot and numerical thresholds retain the earlier physical-control flow.
+Flight deadlines use simulation time with a separate wall watchdog, and F5
+waits for the replacement world before closing. These are native functional
+flight results. Matching original Windows clocks, inputs, trajectories and
+images, the other named scenarios and full Phase 6 acceptance remain open.
+Raw evidence stays local; Windows work uses the local VM.

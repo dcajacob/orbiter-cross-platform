@@ -150,3 +150,17 @@ actual repeated queries. Each profile also completes all seventy original
 archive validity/failure controls. [Boundary scope and raw identities](CurrentBoundaryVerification.json)
 keep this separate from full scenario, cockpit/physics, hardware/performance
 and complete Phase 6 qualification.
+
+The fresh `6a67588b` native packages also complete twenty unchanged eight-vessel
+Atmospheric autopilot startup/teardown worlds in one process per build profile.
+Debug/Release and automatic/SSE2 each complete all twenty worlds, for eighty
+deleted graphics contexts and 160 actual presents. Every world retains all
+eight original vessels with finite recorded states, initializes the original
+vessel-bound AAP Terminal, and records five vessel-library open/close pairs.
+All four processes exit normally with clean unsuppressed ASan, UBSan and leak
+logs; guarded source, runtime, assets and original data remain unchanged.
+
+Each lifetime world runs two physics/render steps. These are repeated complete
+world startup and teardown checks; full guided tutorials, original Windows
+comparisons, other platform/lifetime gates and complete Phase 6 acceptance remain
+separate requirements. Raw evidence remains local.

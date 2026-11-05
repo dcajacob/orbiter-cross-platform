@@ -38,7 +38,8 @@ acceptance remain separate requirements. The last full-stock result and normal
 module admission policy are unchanged. Raw evidence stays local; Windows work
 uses the local VM.
 
-The fresh Debug/SSE2 package at `6a67588b` also completes all four entry points
+The fresh packages at `6a67588b` also complete all four entry points in
+Debug/Release and automatic/SSE2 profiles
 after repairing a [buffered modifier defect](BufferedInput.md). Each save now
 delivers the complete Ctrl+S chord in one real Wayland input batch. Initial,
 separated and re-docked saves retain the expected reciprocal docking graphs.
@@ -50,5 +51,7 @@ elapsed. That incomplete attempt exits cleanly and remains preserved. The
 driver now retains a 300-second flight-time approach budget with a separate
 900-second wall watchdog; the complete original Demo flow passes. The original
 scene, physical controls, RCS approach, physics and numerical/frame budgets are
-unchanged. Remaining native profiles and matching Windows qualification stay
-open.
+unchanged. All sixteen current scene flows and four full DG orbit shortcut
+runs exit normally, close 44 graphics contexts and retain all original vessels.
+Matching Windows, other named scenarios, lifetime, hardware/performance and full
+Phase 6 qualification stay open.
