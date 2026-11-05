@@ -70,7 +70,7 @@ def popup():
 assert all(c in "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789.,' (): _" for text in ('print(V:get_name())','aap.spd(300)','proc.wait_simdt(1000)') for c in text)
 process=None;save()
 try:
- with Compositor(a.compositor_tools,OUT/'compositor',1,'gl') as display:
+ with Compositor(a.compositor_tools,OUT/'compositor',1,'gl',repeat_rate=0) as display:
   env=dict(display.environment,ASAN_OPTIONS='detect_leaks=1:fast_unwind_on_malloc=0',LSAN_OPTIONS='',UBSAN_OPTIONS='halt_on_error=1:print_stacktrace=1',LD_LIBRARY_PATH=':'.join(map(str,[ENGINE,*a.library])),LIBDECOR_PLUGIN_DIR=str(a.gtk_plugin.parent),WAYLAND_DEBUG='client')
   argv=list(map(str,[ENGINE/'orbiter-production','--assets',ASSETS,'--data',a.data,'--planets',a.planets,'--modules',ENGINE/'NativeModules','--scenario',SCENARIO,'--config',OUT/'Orbiter.cfg','--evidence',OUT,'--save',OUT/'saved.scn','--run']))
   with (OUT/'console.log').open('w') as log:
@@ -82,6 +82,8 @@ try:
     display.command('focus '+str(process.pid));assert display.command('state')['keyboard_pid']==process.pid
     wait(lambda:title()=='Term 1/1','Original Terminal MFD did not render',60)
     state=rows(OUT/'cockpit-state.csv')[-1];assert state['object']=='GL-01S' and int(state['left_mfd'])>10
+    assert re.search(r'wl_keyboard[@#]\d+\.repeat_info\(0,\s*400\)',(OUT/'console.log').read_text()),'Private typing seat did not disable repeat'
+    report['test_keyboard_repeat_rate']=0
     report['initial_terminal_state']=state;save()
     codes={'Shift':42,'Enter':28,'Escape':1,'Space':57,'Control':29,'F5':63,'i':23,'n':49,'d':32,'s':31}
     letters=dict(zip('qwertyuiop',[16,17,18,19,20,21,22,23,24,25]));letters.update(dict(zip('asdfghjkl',[30,31,32,33,34,35,36,37,38])));letters.update(dict(zip('zxcvbnm',[44,45,46,47,48,49,50])))
@@ -114,7 +116,8 @@ try:
       tap_code(code)
       if shift:key(42,False);time.sleep(.025)
     def command(text):
-     shifted('i');wait(popup,'Original INP shortcut did not open its real input box');report['last_actual_popup_observation']=rows(OUT/'ui-state.csv')[-1];type_text(text);tap_code(28);wait(lambda:not popup(),'Original terminal input box did not close');report['commands'].append(dict(text=text,monotonic_ns=time.monotonic_ns()));save()
+     command_frame=max(int(r['frame']) for r,t in texts())
+     shifted('i');wait(popup,'Original INP shortcut did not open its real input box');report['last_actual_popup_observation']=rows(OUT/'ui-state.csv')[-1];type_text(text);tap_code(28);wait(lambda:not popup(),'Original terminal input box did not close');wait(lambda:any(t==text and int(r['frame'])>command_frame for r,t in texts()),'Actual typed Terminal command differs from the requested command');report['commands'].append(dict(text=text,monotonic_ns=time.monotonic_ns()));save()
     command('print(V:get_name())');wait(lambda:any(t=='GL-01S' for _,t in texts()),'Terminal did not execute the real vessel-bound Lua print command')
     before=rows(OUT/'flight-state.csv')[-1];command('aap.spd(300)')
     wait(lambda:any(r.get('object')=='GL-01S' and float(r['main'])>0 for r in rows(OUT/'thrust-state.csv')),'Original terminal AAP did not drive the real DG-S engines',30)
@@ -133,7 +136,10 @@ try:
     tap_code(57);wait(lambda:(OUT/'instrument-50.rgba').exists() and (OUT/'instrument-50.rgba').stat().st_size==1280*720*4,'No actual presented terminal frame50 capture',20)
     key(1,True);process.wait(timeout=60);report['actual_exitcode']=process.returncode
    finally:
-    if process.poll() is None:process.terminate();process.wait(timeout=15)
+    if process.poll() is None:
+     try:display.command(f'key {process.pid} 1 1');process.wait(timeout=15);report['failure_cleanup_requested_normal_escape']=True
+     except BaseException:
+      if process.poll() is None:process.terminate();process.wait(timeout=15)
     report['actual_exitcode']=process.returncode;save()
   assert process.returncode==0
   sys.path.insert(0,str(ROOT/'Tests/Production/Client'));from run_client import png

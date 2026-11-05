@@ -10,7 +10,7 @@ import time
 
 
 class Compositor:
-    def __init__(self, dependencies, output, scale=1, renderer='pixman'):
+    def __init__(self, dependencies, output, scale=1, renderer='pixman', repeat_rate=None):
         self.dependencies = Path(dependencies).resolve()
         self.output = Path(output).resolve()
         self.output.mkdir(parents=True, exist_ok=False)
@@ -30,6 +30,11 @@ class Compositor:
                           str(prefix/'usr/libexec/weston-desktop-shell')+
                           '\npanel-position=none\nlocking=false\nanimation=none\n'
                           'startup-animation=none\nclose-animation=none\n')
+        if repeat_rate is not None:
+            if not isinstance(repeat_rate, int) or repeat_rate < 0:
+                raise ValueError('Private keyboard repeat rate must be a nonnegative integer')
+            with config.open('a') as fixture:
+                fixture.write('[keyboard]\nrepeat-rate='+str(repeat_rate)+'\nrepeat-delay=400\n')
         self.socket, child = socket.socketpair(socket.AF_UNIX, socket.SOCK_SEQPACKET)
         self.socket.settimeout(15)
         environment = dict(os.environ, XDG_RUNTIME_DIR=str(runtime),
