@@ -1,0 +1,81 @@
+{
+  "schema": 1,
+  "protocol": "original-stock-docked-physical-clock-inputs-v1",
+  "native_runtime_source": "693ce8cfb44617889d3a7218281d769a3f29cfd6",
+  "original_application_source": "f725194209634f7fd5d1d44d426cfa9b5e303e37",
+  "independent_native_matrix_sha256": "1a4362feaa4d09ce5a5d1de550c82b1c5cd352738f3f254593fa8e30109dbd10",
+  "profiles": {
+    "Release-sse2": {
+      "docked_ISS": {
+        "scenario": "Scenarios/Delta-glider/Docked at ISS.scn",
+        "sha256_lf": "f62ea64c6dc1f84f1d45671e730ba8623b58727274442ebdb7fff42dd318d3ac",
+        "pause_tick": 323,
+        "paused_seconds": "5.3833333333333195",
+        "paused_mjd": "51982.029062307098",
+        "native_verification_sha256": "12bb5e056c20c22e872159c89ede16e0b2983981c2dc514e31f4e9a62feb8be5"
+      },
+      "docked_ISS_demo": {
+        "scenario": "Scenarios/Demo/Docked at ISS.scn",
+        "sha256_lf": "78ae1272db4353abb13d0d5e7fe962d98e66e2696d1ab5b6cd736a02452ded4f",
+        "pause_tick": 355,
+        "paused_seconds": "5.916666666666651",
+        "paused_mjd": "51982.02906847994",
+        "native_verification_sha256": "43eed330d9c85eebe5925a0d363677e4cf4445a1f02766aee889e1100b82e72c"
+      }
+    },
+    "Debug-sse2": {
+      "docked_ISS": {
+        "scenario": "Scenarios/Delta-glider/Docked at ISS.scn",
+        "sha256_lf": "f62ea64c6dc1f84f1d45671e730ba8623b58727274442ebdb7fff42dd318d3ac",
+        "pause_tick": 526,
+        "paused_seconds": "8.7666666666666817",
+        "paused_mjd": "51982.029101466054",
+        "native_verification_sha256": "ff1ca6f312134adc7c1abf375b97adfed88de69c418d6e13662e3af959a3eebc"
+      },
+      "docked_ISS_demo": {
+        "scenario": "Scenarios/Demo/Docked at ISS.scn",
+        "sha256_lf": "78ae1272db4353abb13d0d5e7fe962d98e66e2696d1ab5b6cd736a02452ded4f",
+        "pause_tick": 470,
+        "paused_seconds": "7.8333333333333108",
+        "paused_mjd": "51982.029090663586",
+        "native_verification_sha256": "55924496906d23ebb63a70bf3b3565545ce6369feead2ad7ad1f832a0ad057d6"
+      }
+    },
+    "Debug-automatic": {
+      "docked_ISS": {
+        "scenario": "Scenarios/Delta-glider/Docked at ISS.scn",
+        "sha256_lf": "f62ea64c6dc1f84f1d45671e730ba8623b58727274442ebdb7fff42dd318d3ac",
+        "pause_tick": 539,
+        "paused_seconds": "8.9833333333333591",
+        "paused_mjd": "51982.029103973771",
+        "native_verification_sha256": "7750f6a7296e586d5c683bbebdc29271b058bd35cc5f3aa1189828c167dee233"
+      },
+      "docked_ISS_demo": {
+        "scenario": "Scenarios/Demo/Docked at ISS.scn",
+        "sha256_lf": "78ae1272db4353abb13d0d5e7fe962d98e66e2696d1ab5b6cd736a02452ded4f",
+        "pause_tick": 360,
+        "paused_seconds": "5.999999999999984",
+        "paused_mjd": "51982.029069444448",
+        "native_verification_sha256": "c472c07b7f8cecb8f6f38666c1718bc9bd1c9c5a031cb47a8a3aa85615f23b48"
+      }
+    },
+    "Release-automatic": {
+      "docked_ISS": {
+        "scenario": "Scenarios/Delta-glider/Docked at ISS.scn",
+        "sha256_lf": "f62ea64c6dc1f84f1d45671e730ba8623b58727274442ebdb7fff42dd318d3ac",
+        "pause_tick": 311,
+        "paused_seconds": "5.1833333333333202",
+        "paused_mjd": "51982.029059992288",
+        "native_verification_sha256": "d28c1efd511082c34018adba58e6bcc83e2ca6473203b6f8b170c71f9140e678"
+      },
+      "docked_ISS_demo": {
+        "scenario": "Scenarios/Demo/Docked at ISS.scn",
+        "sha256_lf": "78ae1272db4353abb13d0d5e7fe962d98e66e2696d1ab5b6cd736a02452ded4f",
+        "pause_tick": 281,
+        "paused_seconds": "4.683333333333322",
+        "paused_mjd": "51982.029054205246",
+        "native_verification_sha256": "6d152c78607d4b4fffcd9cb459b9cc8b54ebe15af7878cac80b9a9baf0c929c1"
+      }
+    }
+  }
+}

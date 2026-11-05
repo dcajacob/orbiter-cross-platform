@@ -1,5 +1,5 @@
 """Read the exact original docked scenes and the declared paused-clock diagnostic."""
-import hashlib,json,subprocess,sys
+import hashlib,json,math,re,subprocess,sys
 from pathlib import Path
 HERE=Path(__file__).resolve().parent;ROOT=HERE.parents[2]
 sys.path.insert(0,str(HERE.parent/'StockScenarios'))
@@ -35,3 +35,30 @@ def configuration(body):
     # The reload observer requests pause through the public SDK before the first
     # BeginTimeStep instead; every reload physics callback is rejected.
     return body+'\nFPS = 0\nMenubarMode = 1\nInfobarMode = 1\nInstrumentUpdateInterval = 0.25\n'
+
+
+def physical_clocks(path,configuration_name,math_profile):
+    """Bind every profile/case to an independently captured native pause clock."""
+    path=Path(path);value=settings();request=json.loads(path.read_text())
+    require(request['schema']==1 and request['protocol']=='original-stock-docked-physical-clock-inputs-v1','Unknown physical clock input protocol')
+    require(request['native_runtime_source']=='693ce8cfb44617889d3a7218281d769a3f29cfd6' and request['original_application_source']==value['application_source'],'Physical clock source producer differs')
+    profiles={'Debug-automatic','Debug-sse2','Release-automatic','Release-sse2'}
+    require(set(request['profiles'])==profiles,'All four physical clock profiles required')
+    require(re.fullmatch('[0-9a-f]{64}',request['independent_native_matrix_sha256']) is not None,'Independent native clock matrix binding missing')
+    expected={c['id']:c for c in value['cases']}
+    for name,entries in request['profiles'].items():
+        require(set(entries)==set(expected),'Both complete docked entry points required in every profile')
+        for key,entry in entries.items():
+            case=expected[key];body,objects=scenario(case)
+            require(entry['scenario']==case['scenario'] and entry['sha256_lf']==case['sha256_lf'],'Physical clock original parent differs')
+            tick=entry['pause_tick'];require(type(tick) is int and 6<tick<3600,'Physical pause tick outside measured diagnostic bounds')
+            require(re.fullmatch('[0-9a-f]{64}',entry['native_verification_sha256']) is not None,'Native physical-flow binding missing')
+            elapsed=0.0
+            for _ in range(tick):elapsed+=value['fixed_step']
+            require(isinstance(entry['paused_seconds'],str) and math.isfinite(float(entry['paused_seconds'])) and float(entry['paused_seconds'])==elapsed,'Exact native physical tick/seconds association differs')
+            dates=[row.split()[2] for row in body.decode('cp1252').splitlines() if row.strip().startswith('Date MJD ')]
+            require(len(dates)==1 and isinstance(entry['paused_mjd'],str) and math.isfinite(float(entry['paused_mjd'])) and float(entry['paused_mjd'])==float(dates[0])+elapsed/86400,'Exact native physical tick/epoch association differs')
+    profile=configuration_name+'-'+math_profile;require(profile in profiles,'Unknown requested physical profile')
+    value['cases']=[dict(case,pause_tick=request['profiles'][profile][case['id']]['pause_tick'],native_clock_request=request['profiles'][profile][case['id']]) for case in value['cases']]
+    value.update(clock_input_scope='actual-complete-native-physical-keyboard-flows',physical_clock_input_sha256=sha(path),independent_native_matrix_sha256=request['independent_native_matrix_sha256'])
+    return value

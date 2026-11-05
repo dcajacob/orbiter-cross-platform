@@ -1,7 +1,7 @@
 """Measure original paused docked save/read/write tokens without a tolerance waiver."""
 import argparse,csv,json,math,sys
 from pathlib import Path
-from inputs import HERE,ROOT,require,sha,settings,scenario,configuration
+from inputs import HERE,ROOT,require,sha,settings,scenario,configuration,physical_clocks
 sys.path[:0]=[str(HERE.parent),str(HERE.parent/'Client'),str(HERE.parent/'Cockpit'),str(HERE.parent/'RemainingStockPersistence')]
 from stage import run as stage
 from run_client import mesa_files
@@ -58,12 +58,12 @@ def inspect(folder,case,phase,config,expected,parent=None,expected_binaries=None
 def run(a):
     import os
     os.environ.update(LIBGL_ALWAYS_SOFTWARE='true',GALLIUM_DRIVER='llvmpipe')
-    config=settings();require(not a.output.exists(),'Fresh original paused diagnostic output required');a.output.mkdir(parents=True)
+    config=physical_clocks(a.physical_clock_inputs,a.configuration,a.math_profile) if a.physical_clock_inputs else settings();require(not a.output.exists(),'Fresh original paused diagnostic output required');a.output.mkdir(parents=True)
     manifest=json.loads((a.orbiter.parent/'test-runtime.json').read_text());inputs=json.loads((a.orbiter.parent/'named-original-inputs.json').read_text())
     require(manifest['source_commit']==inputs['application_source']==config['application_source'] and inputs['configuration']==a.configuration,'Exact already accepted original runtime/SDK required')
     require(all(sha(a.orbiter.parent/n)==v for n,v in manifest['files'].items()) and all(sha(a.orbiter.parent/n)==v for n,v in inputs['original_client_files_sha256'].items()),'An original application/SDK/client file changed')
     expected_binaries={**manifest['files'],**inputs['original_client_files_sha256'],'Modules/Plugin/ProductionCockpitDriver.dll':sha(a.orbiter.parent/'Modules/Plugin/ProductionCockpitDriver.dll')}
-    report=dict(status='running',diagnostic_source=__import__('subprocess').check_output(['git','-C',str(ROOT),'rev-parse','HEAD'],text=True).strip(),application_source=config['application_source'],configuration=a.configuration,math_profile=a.math_profile,cases={},native_admission_qualified=False,phase6_complete=False,scope='Original paused save/read/write diagnostic at the observed native pause ticks in both unchanged complete docked-ISS entry points. Every saved semantic token difference is retained. No numerical tolerance, frozen reference, original physics, source module or acceptance budget is changed; no evidence archive, SDK, runtime or provider is uploaded.')
+    report=dict(status='running',diagnostic_source=__import__('subprocess').check_output(['git','-C',str(ROOT),'rev-parse','HEAD'],text=True).strip(),application_source=config['application_source'],configuration=a.configuration,math_profile=a.math_profile,clock_input_scope=config.get('clock_input_scope','fixed-observed-ticks293-and272'),physical_clock_input_sha256=config.get('physical_clock_input_sha256'),cases={},native_admission_qualified=False,phase6_complete=False,scope='Original paused save/read/write diagnostic at the observed native pause ticks in both unchanged complete docked-ISS entry points. Every saved semantic token difference is retained. No numerical tolerance, frozen reference, original physics, source module or acceptance budget is changed; no evidence archive, SDK, runtime or provider is uploaded.')
     report_file=a.output/'diagnostic.json'
     def save():report_file.write_text(json.dumps(report,indent=2)+'\n')
     save()
@@ -91,15 +91,18 @@ def run(a):
             for phase in ('writer','reload'):
                 for key in ('clock_sha256','vessel_state_sha256','saved_sha256'):require(results[0][phase][key]==results[1][phase][key],'Original paused diagnostic repeat differs: '+phase+'/'+key)
             require(results[0]['exact_semantic_differences']==results[1]['exact_semantic_differences'],'Original paused semantic deltas differ between repetitions')
+            if 'native_clock_request' in case:
+                requested=case['native_clock_request']
+                require(results[0]['writer']['paused_seconds']==requested['paused_seconds'] and results[0]['writer']['paused_mjd']==requested['paused_mjd'],'Exact original/native physical pause clock differs')
             report['cases'][case['id']]=dict(scenario=case['scenario'],scenario_sha256_lf=case['sha256_lf'],pause_tick=case['pause_tick'],runs=results,repeated_original_semantic_changes_identical=True);save()
         require(all(sha(a.orbiter.parent/n)==v for n,v in manifest['files'].items()) and all(sha(a.orbiter.parent/n)==v for n,v in inputs['original_client_files_sha256'].items()),'Owning original runtime/SDK/client changed during execution')
         report['owning_original_runtime_sdk_client_unchanged']=True
         report['status']='completed-original-paused-docked-roundtrip-diagnostic'
     except BaseException as error:report.update(status='failed',error=str(error));raise
     finally:save()
-    compact=dict(status=report['status'],application_source=report['application_source'],configuration=a.configuration,math_profile=a.math_profile,actual_processes=8,cases={n:dict(scenario=v['scenario'],pause_tick=v['pause_tick'],original_vessels=v['runs'][0]['writer']['actual_vessels'],writer_paused_seconds=v['runs'][0]['writer']['paused_seconds'],writer_paused_mjd=v['runs'][0]['writer']['paused_mjd'],reload_paused_seconds=v['runs'][0]['reload']['paused_seconds'],reload_paused_mjd=v['runs'][0]['reload']['paused_mjd'],reload_physics_steps=v['runs'][0]['reload']['physics_steps'],exact_original_semantic_differences=v['runs'][0]['exact_semantic_differences'],repetitions_identical=True) for n,v in report['cases'].items()},native_admission_qualified=False,phase6_complete=False)
+    compact=dict(status=report['status'],diagnostic_source=report['diagnostic_source'],clock_input_scope=report['clock_input_scope'],physical_clock_input_sha256=report['physical_clock_input_sha256'],application_source=report['application_source'],configuration=a.configuration,math_profile=a.math_profile,actual_processes=8,cases={n:dict(scenario=v['scenario'],pause_tick=v['pause_tick'],original_vessels=v['runs'][0]['writer']['actual_vessels'],writer_paused_seconds=v['runs'][0]['writer']['paused_seconds'],writer_paused_mjd=v['runs'][0]['writer']['paused_mjd'],reload_paused_seconds=v['runs'][0]['reload']['paused_seconds'],reload_paused_mjd=v['runs'][0]['reload']['paused_mjd'],reload_physics_steps=v['runs'][0]['reload']['physics_steps'],exact_original_semantic_differences=v['runs'][0]['exact_semantic_differences'],repetitions_identical=True) for n,v in report['cases'].items()},native_admission_qualified=False,phase6_complete=False)
     print('ORIGINAL_DOCKED_PAUSE_DIAGNOSTIC='+json.dumps(compact,sort_keys=True),flush=True)
 if __name__=='__main__':
     p=argparse.ArgumentParser(description=__doc__)
     for name in ('orbiter','data','planets','mesa','output'):p.add_argument('--'+name,type=lambda v:Path(v).resolve(),required=True)
-    p.add_argument('--configuration',choices=('Debug','Release'),required=True);p.add_argument('--math-profile',choices=('automatic','sse2'),required=True);run(p.parse_args())
+    p.add_argument('--physical-clock-inputs',type=lambda v:Path(v).resolve());p.add_argument('--configuration',choices=('Debug','Release'),required=True);p.add_argument('--math-profile',choices=('automatic','sse2'),required=True);run(p.parse_args())

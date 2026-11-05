@@ -31,3 +31,20 @@ at the paused save and verifies the required application, observer, original
 vessel, renderer and Mesa module hashes. This does not depend on the frozen
 renderer reaching its later image-capture time. No physics, save, input, clock,
 module byte or reference criterion changes with this observation.
+
+The optional `--physical-clock-inputs` argument measures the same original
+application at the actual pause clocks captured by the current native physical
+keyboard flows. The workflow uses this mode after all eight complete native
+flows and their four independent profile audits finish. The committed small
+input file binds both unchanged parents and every profile to its actual tick,
+full-precision seconds/epoch, native verification hash and whole independent
+matrix hash. Raw native evidence remains local. Inconsistent ticks, epochs,
+parents, missing profiles/cases and changed producers are rejected before any
+original process runs. The original SDK observer, scenarios, source modules,
+configuration, repeats, zero-step paused reload and token reader stay unchanged.
+
+The original results must then be compared locally with every retained native
+save/read/write token delta at the exact matching clock. Capturing native input
+through F5 and resume does not by itself qualify that comparison. No generic
+one-millimetre allowance or skipped field is introduced. Omitting the argument
+retains the earlier fixed293/272 diagnostic and its original input checks.
