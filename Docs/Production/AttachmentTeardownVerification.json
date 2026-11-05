@@ -1,0 +1,75 @@
+{
+  "schema": 1,
+  "status": "passed-local-paused-attachment-lifetime-Release-sse2",
+  "created_utc": "2026-11-05T23:12:35.588852+00:00",
+  "runtime_source_commit": "e411b1c4b72c868edef3c7b4c56fc1ea7b0481bc",
+  "regression": {
+    "path": "Tests/Production/RemainingVessels/paused_attachments.py",
+    "sha256": "5bb412921d2c247bfe0b3a8070e4ac1d0985329c3f2fd24ce9b11cf1faceb767"
+  },
+  "baseline": {
+    "status": "reproduced-paused-attachment-teardown-use-after-free-without-observer",
+    "runtime_identity": {
+      "configuration": "Release",
+      "math_profile": "sse2",
+      "profile": "Release-sse2",
+      "sanitizer_linked": true,
+      "compiler": "/usr/bin/c++",
+      "cache_sha256": "389d428b8bbb2f72934f3f4db2aa47834508d52e6e05f61fa938b6bb80a1f1e4",
+      "build_record_sha256": "37003535e0a50789ad24555ab8f9e2f3f21a0f6547f8ae89601a8ab6cd89b4dd",
+      "runtime_source_commit": "6a67588babde902a8f96f3a0261be07c96e5d9eb"
+    },
+    "original_baseline_package_available": false,
+    "raw_failure_retained": true
+  },
+  "runtime_identity": {
+    "configuration": "Release",
+    "math_profile": "sse2",
+    "profile": "Release-sse2",
+    "sanitizer_linked": true,
+    "compiler": "/usr/bin/c++",
+    "cache_sha256": "4caa90019171475dacdee2ab317379f5d6f24bc7b8fc606aab3301758d99f4f5",
+    "build_record_sha256": "82d9b0733880da805abbe4da0401849cc2e2f1060156b45d6285f8b93fda1aa2",
+    "runtime_source_commit": "e411b1c4b72c868edef3c7b4c56fc1ea7b0481bc"
+  },
+  "result": {
+    "original_objects": {
+      "ISS": "ProjectAlpha_ISS",
+      "STS-101": "Atlantis",
+      "Leonardo": "Leonardo_mplm"
+    },
+    "requested_worlds": 20,
+    "worlds_observed_ready": 20,
+    "actual_exitcode": 0,
+    "clean_contexts": 20,
+    "successful_presents": 1234,
+    "finite_original_vessel_rows": 60,
+    "no_preload_observer": true,
+    "all_guarded_inputs_unchanged": true,
+    "sanitizer_suppressions": false
+  },
+  "real_F5_reloads": 19,
+  "scope": "Complete unchanged Atlantis ISS Resupply remains paused at tick/time zero through world replacement and normal exit. Original scene bytes seed F5; this covers lifetime, not actual-save persistence or flight parity.",
+  "local_evidence_sha256": {
+    "out/phase6-attachment-fresh-Release-sse2-v1/build.json": "82d9b0733880da805abbe4da0401849cc2e2f1060156b45d6285f8b93fda1aa2",
+    "out/phase6-attachment-fresh-Release-sse2-v1/initial-build-failure.json": "9367387619ba8bed0598a8e08873a3c78cd5cc66d496808c3b8344f6707e8a7a",
+    "out/phase6-attachment-fresh-Release-sse2-v1/engine-build.log": "816a59d34ffa1b0c987fc758945bb50828b4f94e53196a9d5d33daf6d9d64b56",
+    "out/phase6-attachment-fresh-Release-sse2-v1/resumed-engine-build.log": "5b358ee3db0f97c6a06001fb79765661df7850994b15b14336e13558a4c2495f",
+    "out/phase6-attachment-fresh-Release-sse2-v1/resumed-renderer-build.log": "4241565d1ed93f10a459e10904cee8f5003ada13626ad103c433a25d5c46b1de",
+    "out/resume_attachment_build_v1.py": "0e32a0fabd594cf0e88ba8976a9f290d1bd4ddd3e107c95b4954361668db832b",
+    "out/phase6-attachment-paused-worlds-Release-sse2-v1/verification.json": "7fefd2fc5cca7b733675175f1da3780ea28f42cb90f6b94e02f90f79e507ebf1",
+    "out/phase6-attachment-paused-worlds-Release-sse2-v1/console.log": "8972f8f8fee2f9ae5004d7f8af9c65ce40fc9fd6126941cf96f214c5be088da2",
+    "out/phase6-Atlantis-paused-no-observer-baseline-v1/verification.json": "504f9680eff9f2c57a22d6874aae43e65c1856b6b9b76806b953b592c5cc1b1e",
+    "out/phase6-Atlantis-paused-no-observer-baseline-v1/console.log": "bf899d5d1adb343d36cb5a317cb7519b94276ebac788bb0a0fbb6b7f9f930003"
+  },
+  "outstanding": [
+    "Other native configuration/math profiles",
+    "Windows runtime regression",
+    "Full numerical/image and mission qualification",
+    "Production class admission and remaining Phase 6 gates"
+  ],
+  "cloud_builds_used": false,
+  "raw_evidence_uploaded": false,
+  "native_admission_qualified": false,
+  "phase6_complete": false
+}

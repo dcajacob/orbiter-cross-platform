@@ -21,6 +21,19 @@ host checks named original module/configuration capabilities, emits an explicit
 unqualified marker and retains the real session/physics/rendering code. Production
 admission remains unchanged.
 
+`paused_attachments.py` exercises the complete unchanged three-vessel Atlantis
+ISS-resupply scene without a preload observer. It keeps simulation time at zero,
+uses real F5 keys to replace the world up to nineteen times, then closes normally.
+Every world must retain ISS docking and both Leonardo attachment links, render
+at least sixty frames, preserve all three finite vessel states and delete its
+graphics context. ASan, UBSan and unsuppressed LSan must remain clean. Original
+scene bytes seed F5; this is lifetime coverage, not actual-save persistence or
+flight parity. `--expect-use-after-free --worlds 1` instead requires the original
+paused-shutdown failure from an identified old package. Supply the package,
+staged assets, celestial data, planet archives, private compositor tools,
+decoration plugin and library paths explicitly; `--help` lists the arguments.
+See [the attachment cleanup record](../../../Docs/Production/AttachmentTeardown.md).
+
 The first fresh Debug ASan/UBSan package at
 `72c35b75c117c16a94b38925e90e7d1ca2812a08` builds all three actual modules and
 both diagnostic hosts. Its record is
