@@ -579,77 +579,79 @@ struct Runtime final:BodyServices,RigidBodyServices,SurfaceServices,NavigationSe
     const char *KeyState() const override {return input.keys.data();}
 #endif
     void Buffered(FlightInput& snapshot) {
+        BufferedKeyState buffered(snapshot);
         for(auto event:snapshot.events) {
+            auto& eventKeys=buffered.Advance(event);
             if(inputEvents.is_open()) {
                 inputEvents<<inputTick<<','<<event.code<<','<<event.down;
-                for(unsigned key:{OAPI_KEY_LSHIFT,OAPI_KEY_RSHIFT,OAPI_KEY_LCONTROL,OAPI_KEY_RCONTROL,OAPI_KEY_LALT,OAPI_KEY_RALT})inputEvents<<','<<bool(KEYDOWN(snapshot.keys.data(),key));
+                for(unsigned key:{OAPI_KEY_LSHIFT,OAPI_KEY_RSHIFT,OAPI_KEY_LCONTROL,OAPI_KEY_RCONTROL,OAPI_KEY_LALT,OAPI_KEY_RALT})inputEvents<<','<<bool(KEYDOWN(eventKeys.data(),key));
                 inputEvents<<'\n';
             }
             auto code=UInt32(event.code);
             auto& keymap=controls.keymap;
             if(event.down) {
-                const bool spacePause=code==OAPI_KEY_SPACE && !KEYMOD_SHIFT(snapshot.keys.data()) &&
-                    !KEYMOD_CONTROL(snapshot.keys.data()) && !KEYMOD_ALT(snapshot.keys.data());
-                if(spacePause || keymap.IsLogicalKey(code,snapshot.keys.data(),OAPI_LKEY_Pause)) {running=!running;render.paused=!running;continue;}
-                if(keymap.IsLogicalKey(code,snapshot.keys.data(),OAPI_LKEY_Quicksave)) {savePending=true;continue;}
+                const bool spacePause=code==OAPI_KEY_SPACE && !KEYMOD_SHIFT(eventKeys.data()) &&
+                    !KEYMOD_CONTROL(eventKeys.data()) && !KEYMOD_ALT(eventKeys.data());
+                if(spacePause || keymap.IsLogicalKey(code,eventKeys.data(),OAPI_LKEY_Pause)) {running=!running;render.paused=!running;continue;}
+                if(keymap.IsLogicalKey(code,eventKeys.data(),OAPI_LKEY_Quicksave)) {savePending=true;continue;}
 #ifdef ORBITER_NATIVE_COCKPIT
-                if(HandleCockpitStepFov(keymap,code,snapshot.keys.data()))continue;
+                if(HandleCockpitStepFov(keymap,code,eventKeys.data()))continue;
 #endif
-                if(code==OAPI_KEY_F5 && !KEYMOD_CONTROL(snapshot.keys.data())) {reloadPending=true;continue;}
+                if(code==OAPI_KEY_F5 && !KEYMOD_CONTROL(eventKeys.data())) {reloadPending=true;continue;}
 #ifndef ORBITER_NATIVE_COCKPIT
-                if(code==OAPI_KEY_F6 && !KEYMOD_CONTROL(snapshot.keys.data())) {stepOnce=true;continue;}
+                if(code==OAPI_KEY_F6 && !KEYMOD_CONTROL(eventKeys.data())) {stepOnce=true;continue;}
 #endif
 #ifdef ORBITER_NATIVE_COCKPIT
-                if(HandleCockpitMenuKey(keymap,code,snapshot.keys.data()))continue;
-                if(keymap.IsLogicalKey(code,snapshot.keys.data(),OAPI_LKEY_TogglePlanetarium)) {settings.CfgVisHelpPrm.flagPlanetarium^=PLN_ENABLE;continue;}
-                if(keymap.IsLogicalKey(code,snapshot.keys.data(),OAPI_LKEY_ToggleLabels)) {settings.CfgVisHelpPrm.flagMarkers^=MKR_ENABLE;continue;}
-                if(keymap.IsLogicalKey(code,snapshot.keys.data(),OAPI_LKEY_ToggleCamInternal)) {
+                if(HandleCockpitMenuKey(keymap,code,eventKeys.data()))continue;
+                if(keymap.IsLogicalKey(code,eventKeys.data(),OAPI_LKEY_TogglePlanetarium)) {settings.CfgVisHelpPrm.flagPlanetarium^=PLN_ENABLE;continue;}
+                if(keymap.IsLogicalKey(code,eventKeys.data(),OAPI_LKEY_ToggleLabels)) {settings.CfgVisHelpPrm.flagMarkers^=MKR_ENABLE;continue;}
+                if(keymap.IsLogicalKey(code,eventKeys.data(),OAPI_LKEY_ToggleCamInternal)) {
                     SetView(render.focus,!render.camera->IsExternal());continue;
                 }
                 if(render.camera->IsInternal()) {
-                    if(keymap.IsLogicalKey(code,snapshot.keys.data(),OAPI_LKEY_TogglePanelMode)) {cockpit->TogglePanelMode();continue;}
-                    if(keymap.IsLogicalKey(code,snapshot.keys.data(),OAPI_LKEY_CockpitResetCam)) {render.camera->ResetCockpitDir();continue;}
-                    if(keymap.IsLogicalKey(code,snapshot.keys.data(),OAPI_LKEY_PanelSwitchLeft)) {cockpit->SwitchPanel(0);continue;}
-                    if(keymap.IsLogicalKey(code,snapshot.keys.data(),OAPI_LKEY_PanelSwitchRight)) {cockpit->SwitchPanel(1);continue;}
-                    if(keymap.IsLogicalKey(code,snapshot.keys.data(),OAPI_LKEY_PanelSwitchUp)) {cockpit->SwitchPanel(2);continue;}
-                    if(keymap.IsLogicalKey(code,snapshot.keys.data(),OAPI_LKEY_PanelSwitchDown)) {cockpit->SwitchPanel(3);continue;}
-                    if(keymap.IsLogicalKey(code,snapshot.keys.data(),OAPI_LKEY_CockpitDontLean)) {render.focus->LeanCamera(0);continue;}
-                    if(keymap.IsLogicalKey(code,snapshot.keys.data(),OAPI_LKEY_CockpitLeanForward)) {render.focus->LeanCamera(1);continue;}
-                    if(keymap.IsLogicalKey(code,snapshot.keys.data(),OAPI_LKEY_CockpitLeanLeft)) {render.focus->LeanCamera(2);continue;}
-                    if(keymap.IsLogicalKey(code,snapshot.keys.data(),OAPI_LKEY_CockpitLeanRight)) {render.focus->LeanCamera(3);continue;}
-                    if(keymap.IsLogicalKey(code,snapshot.keys.data(),OAPI_LKEY_HUDColour)) {cockpit->ToggleHUDColour();continue;}
-                } else if(keymap.IsLogicalKey(code,snapshot.keys.data(),OAPI_LKEY_ToggleTrackMode)) {
+                    if(keymap.IsLogicalKey(code,eventKeys.data(),OAPI_LKEY_TogglePanelMode)) {cockpit->TogglePanelMode();continue;}
+                    if(keymap.IsLogicalKey(code,eventKeys.data(),OAPI_LKEY_CockpitResetCam)) {render.camera->ResetCockpitDir();continue;}
+                    if(keymap.IsLogicalKey(code,eventKeys.data(),OAPI_LKEY_PanelSwitchLeft)) {cockpit->SwitchPanel(0);continue;}
+                    if(keymap.IsLogicalKey(code,eventKeys.data(),OAPI_LKEY_PanelSwitchRight)) {cockpit->SwitchPanel(1);continue;}
+                    if(keymap.IsLogicalKey(code,eventKeys.data(),OAPI_LKEY_PanelSwitchUp)) {cockpit->SwitchPanel(2);continue;}
+                    if(keymap.IsLogicalKey(code,eventKeys.data(),OAPI_LKEY_PanelSwitchDown)) {cockpit->SwitchPanel(3);continue;}
+                    if(keymap.IsLogicalKey(code,eventKeys.data(),OAPI_LKEY_CockpitDontLean)) {render.focus->LeanCamera(0);continue;}
+                    if(keymap.IsLogicalKey(code,eventKeys.data(),OAPI_LKEY_CockpitLeanForward)) {render.focus->LeanCamera(1);continue;}
+                    if(keymap.IsLogicalKey(code,eventKeys.data(),OAPI_LKEY_CockpitLeanLeft)) {render.focus->LeanCamera(2);continue;}
+                    if(keymap.IsLogicalKey(code,eventKeys.data(),OAPI_LKEY_CockpitLeanRight)) {render.focus->LeanCamera(3);continue;}
+                    if(keymap.IsLogicalKey(code,eventKeys.data(),OAPI_LKEY_HUDColour)) {cockpit->ToggleHUDColour();continue;}
+                } else if(keymap.IsLogicalKey(code,eventKeys.data(),OAPI_LKEY_ToggleTrackMode)) {
                     render.camera->SetTrackMode(ExtCamMode((int(render.camera->GetExtMode())+1)%3));continue;
                 }
 #else
-                if(keymap.IsLogicalKey(code,snapshot.keys.data(),OAPI_LKEY_DlgSelectVessel)) {
+                if(keymap.IsLogicalKey(code,eventKeys.data(),OAPI_LKEY_DlgSelectVessel)) {
                     const auto& list=system->GetVessels();auto it=std::find(list.begin(),list.end(),render.focus);auto start=std::size_t(it-list.begin());
                     for(std::size_t i=1;i<=list.size();++i) {auto* next=list[(start+i)%list.size()];if(next->GetEnableFocus() && !next->KillPending()) {orbiter::production::SetFocusObject(*this,next);break;}}
                     continue;
                 }
 #endif
 #ifdef ORBITER_NATIVE_COCKPIT
-                if(keymap.IsLogicalKey(code,snapshot.keys.data(),OAPI_LKEY_ToggleRecPlay)) {
+                if(keymap.IsLogicalKey(code,eventKeys.data(),OAPI_LKEY_ToggleRecPlay)) {
                     if(playback)EndPlayback();
                     else ToggleCockpitRecorder();
                     continue;
                 }
 #else
-                if(playback && keymap.IsLogicalKey(code,snapshot.keys.data(),OAPI_LKEY_ToggleRecPlay)) {EndPlayback();continue;}
+                if(playback && keymap.IsLogicalKey(code,eventKeys.data(),OAPI_LKEY_ToggleRecPlay)) {EndPlayback();continue;}
 #endif
-                if(keymap.IsLogicalKey(code,snapshot.keys.data(),OAPI_LKEY_SelectPrevVessel)) {if(previousFocus)orbiter::production::SetFocusObject(*this,previousFocus);continue;}
-                if(keymap.IsLogicalKey(code,snapshot.keys.data(),OAPI_LKEY_Quit)) {active=false;continue;}
-                if(keymap.IsLogicalKey(code,snapshot.keys.data(),OAPI_LKEY_IncSimSpeed)) {SetWarpFactor(std::pow(10.,std::floor(std::log10(time.Warp())+1e-6)+1));continue;}
-                if(keymap.IsLogicalKey(code,snapshot.keys.data(),OAPI_LKEY_DecSimSpeed)) {SetWarpFactor(std::pow(10.,std::ceil(std::log10(time.Warp())-1e-6)-1));continue;}
+                if(keymap.IsLogicalKey(code,eventKeys.data(),OAPI_LKEY_SelectPrevVessel)) {if(previousFocus)orbiter::production::SetFocusObject(*this,previousFocus);continue;}
+                if(keymap.IsLogicalKey(code,eventKeys.data(),OAPI_LKEY_Quit)) {active=false;continue;}
+                if(keymap.IsLogicalKey(code,eventKeys.data(),OAPI_LKEY_IncSimSpeed)) {SetWarpFactor(std::pow(10.,std::floor(std::log10(time.Warp())+1e-6)+1));continue;}
+                if(keymap.IsLogicalKey(code,eventKeys.data(),OAPI_LKEY_DecSimSpeed)) {SetWarpFactor(std::pow(10.,std::ceil(std::log10(time.Warp())-1e-6)-1));continue;}
             }
             if(running) {
-                if(render.focus->ConsumeBufferedKey(code,event.down,snapshot.keys.data()))continue;
+                if(render.focus->ConsumeBufferedKey(code,event.down,eventKeys.data()))continue;
 #ifdef ORBITER_NATIVE_COCKPIT
                 // Preserve the original vessel-first priority and Shift-side
                 // selection; Control combinations never reach this MFD path.
                 if(event.down && code!=OAPI_KEY_LSHIFT && code!=OAPI_KEY_RSHIFT &&
-                   !KEYMOD_CONTROL(snapshot.keys.data()) && KEYMOD_SHIFT(snapshot.keys.data())) {
-                    auto* g_pane=cockpit.get();auto* kstate=snapshot.keys.data();auto key=code;
+                   !KEYMOD_CONTROL(eventKeys.data()) && KEYMOD_SHIFT(eventKeys.data())) {
+                    auto* g_pane=cockpit.get();auto* kstate=eventKeys.data();auto key=code;
 #include "CockpitMfdInput.inc"
                 }
 #endif

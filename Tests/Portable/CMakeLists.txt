@@ -97,3 +97,8 @@ add_executable(production_flight_clock ../Production/Flight/ClockTest.cpp)
 target_include_directories(production_flight_clock PRIVATE ../../Src/Orbiter)
 target_compile_features(production_flight_clock PRIVATE cxx_std_17)
 add_test(NAME Production.FlightClock COMMAND production_flight_clock)
+
+add_executable(production_buffered_keys ../Production/Flight/BufferedKeys.Test.cpp)
+target_include_directories(production_buffered_keys PRIVATE ../../Src/Orbiter)
+target_compile_features(production_buffered_keys PRIVATE cxx_std_17)
+add_test(NAME Production.BufferedKeys COMMAND production_buffered_keys)

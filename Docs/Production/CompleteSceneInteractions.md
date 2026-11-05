@@ -37,3 +37,8 @@ the other required named flows, hardware/performance gates and full Phase 6
 acceptance remain separate requirements. The last full-stock result and normal
 module admission policy are unchanged. Raw evidence stays local; Windows work
 uses the local VM.
+
+A subsequent current Debug/SSE2 run also completes both Virtual cockpit
+variants. Its Docked at ISS run exposes a [buffered modifier defect](BufferedInput.md)
+when Ctrl+S edges arrive together after braking; that failed run remains
+preserved. A repair and fresh application verification are in progress.

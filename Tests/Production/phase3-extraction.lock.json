@@ -654,7 +654,8 @@
     },
     "Src/Orbiter/Production/FlightInput.h": {
       "original_sha256_lf": null,
-      "sha256_lf": "c510ff9f9d9a8c6ace158467ce5cd35f84c760d5d2f01cc8f2ea43700889a570"
+      "sha256_lf": "aca54845dc0e1cb0007d7ee914622daf396508045c89796b51005fc2a8bbac71",
+      "scope": " Native buffered key edges recover their chronological key state from the final held snapshot; modifier chords retain event-time meaning across batched polls. Immediate held input, FlightInput layout, original vessel/MFD priority and physics are unchanged."
     },
     "Src/Orbiter/Production/FlightKeys.h": {
       "original_sha256_lf": null,
@@ -742,8 +743,8 @@
     },
     "Src/Orbiter/Production/NativeApplication.cpp": {
       "original_sha256_lf": null,
-      "sha256_lf": "2a2620a1ce2ccf5e19679e3c3120c760bb299784385c4be3001cc29d2691f234",
-      "scope": "Original Lua Terminal MFD native SDK/bootstrap and cooperative worker ownership; explicitly admit LuaMFD only, conserve original vessel-first left/right Shift MFD dispatch, and destroy terminal Lua states before their vessels. Original drawing/commands/repository/Windows callbacks independently conserved; terminal buffers reclaimed and command termination bounded. Full runtime and original Windows qualification remain required. Native bare-Space pause convenience applies only without Shift/Control/Alt, retaining exact logical Pause bindings and original modified-space delivery to vessel callbacks. Original DG and Atlantis Ctrl+Space control dialogs retain their source and behavior; no physics or dispatch order change."
+      "sha256_lf": "cfc75580342f834f2efe659e8bc6c7d10cb8e68d43e0bd544ea8a58c4732b9c9",
+      "scope": "Original Lua Terminal MFD native SDK/bootstrap and cooperative worker ownership; explicitly admit LuaMFD only, conserve original vessel-first left/right Shift MFD dispatch, and destroy terminal Lua states before their vessels. Original drawing/commands/repository/Windows callbacks independently conserved; terminal buffers reclaimed and command termination bounded. Full runtime and original Windows qualification remain required. Native bare-Space pause convenience applies only without Shift/Control/Alt, retaining exact logical Pause bindings and original modified-space delivery to vessel callbacks. Original DG and Atlantis Ctrl+Space control dialogs retain their source and behavior; no physics or dispatch order change. Native buffered key edges recover their chronological key state from the final held snapshot; modifier chords retain event-time meaning across batched polls. Immediate held input, FlightInput layout, original vessel/MFD priority and physics are unchanged."
     },
     "Src/Orbiter/Production/NativeBuild.h.in": {
       "sha256_lf": "f5fb21f83bb6be0c54839fce670e8410f6911eda86da2eef26e4221c1ae25d97",
