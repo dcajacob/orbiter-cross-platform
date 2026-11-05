@@ -1,5 +1,24 @@
 # Phase 6 cockpit and instrument integration
 
+## Vessel control shortcuts
+
+A real Wayland run of the unchanged eight-object DG orbit scene at `eca65a9a`
+reproduces a native shortcut defect: Ctrl+Space pauses flight and does not open
+the original DG Controls dialog. The physical input trace records Control held
+at the Space keydown. The original DG and Atlantis callbacks use Ctrl+Space
+for their control dialogs; the original mapped pause shortcut is Ctrl+P.
+
+The native bare-Space convenience now applies only without Shift, Control or
+Alt. Explicit logical Pause bindings retain priority, and modified Space reaches
+the original vessel callbacks. No callback order, vessel dialog implementation,
+physics or scenario data changes.
+
+`Tests/Production/Flight/vessel_shortcuts.py --help` lists the explicit local
+build, data and provider inputs. It checks both physical Control keys opening
+DG Controls while flight continues, closing the actual dialogs, bare-Space and
+original Ctrl+P pause/resume, a full eight-object save, and normal sanitizer and
+context teardown. Runtime qualification of the repair remains pending.
+
 A native Orbit MFD candidate now recovers displayed TrA/TrL values only when
 the original true-anomaly calculation is nonfinite because its normalized
 `acos` argument rounded outside the domain by at most two machine epsilons.

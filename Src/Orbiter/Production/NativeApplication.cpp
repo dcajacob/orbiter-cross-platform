@@ -588,7 +588,9 @@ struct Runtime final:BodyServices,RigidBodyServices,SurfaceServices,NavigationSe
             auto code=UInt32(event.code);
             auto& keymap=controls.keymap;
             if(event.down) {
-                if(code==OAPI_KEY_SPACE || keymap.IsLogicalKey(code,snapshot.keys.data(),OAPI_LKEY_Pause)) {running=!running;render.paused=!running;continue;}
+                const bool spacePause=code==OAPI_KEY_SPACE && !KEYMOD_SHIFT(snapshot.keys.data()) &&
+                    !KEYMOD_CONTROL(snapshot.keys.data()) && !KEYMOD_ALT(snapshot.keys.data());
+                if(spacePause || keymap.IsLogicalKey(code,snapshot.keys.data(),OAPI_LKEY_Pause)) {running=!running;render.paused=!running;continue;}
                 if(keymap.IsLogicalKey(code,snapshot.keys.data(),OAPI_LKEY_Quicksave)) {savePending=true;continue;}
 #ifdef ORBITER_NATIVE_COCKPIT
                 if(HandleCockpitStepFov(keymap,code,snapshot.keys.data()))continue;
