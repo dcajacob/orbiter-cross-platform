@@ -19,6 +19,16 @@ def restore_cloud_microtexture_default(source):
         raise ValueError('Declared planet cloud-microtexture default differs')
     return source.replace(repaired,original)
 
+def restore_contact_speed_check_default(source):
+    # A stock DG-S ground launch reaches the initial contact-check branch before
+    # the first collision assigns this flag. Accept exactly the false default;
+    # compare every remaining numerical expression and update in original order.
+    original='\tbSurfaceContact = false;\n\tLandingTest.testing = false;'
+    repaired='\tbSurfaceContact = false;\n\tcollision_speed_checked = false;\n\tLandingTest.testing = false;'
+    if source.count(repaired)!=1:
+        raise ValueError('Declared initial contact-speed-check flag differs')
+    return source.replace(repaired,original,1)
+
 def verify():
     include='#include "Production/Random.h"\n'
     for name in FILES:
@@ -33,6 +43,8 @@ def verify():
             actual=restore_startup_cleanup(restore_hull_transform_cleanup(actual))
         if name=='Planet.cpp':
             actual=restore_cloud_microtexture_default(actual)
+        if name=='Vesselbase.cpp':
+            actual=restore_contact_speed_check_default(actual)
         if actual.count(include)!=1:raise ValueError('Unexpected random-service include: '+path)
         if canonical(actual.replace(include,''))!=original:raise ValueError('Numerical code changed beyond explicit RNG bindings: '+path)
     print('Original RNG expressions, numerical formulas and stage ordering conserved through explicit bindings')

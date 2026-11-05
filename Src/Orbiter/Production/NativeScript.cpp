@@ -19,18 +19,39 @@ NativeScriptApi& NativeScriptHost::Load()
     return *api;
 }
 
+void NativeScriptHost::LoadTerminalMfd()
+{
+    if (terminalLibrary) return;
+    auto next = std::make_unique<NativeModule>(modules.Resolve("Plugin/LuaMFD.so"), ORBITER_NATIVE_PLUGIN, this);
+    auto *entry = static_cast<NativeLuaMfdApi*>(next->Instance());
+    if (entry->size != sizeof(*entry) || !entry->postStep || !entry->deleteVessel || !entry->end)
+        throw std::runtime_error("Incomplete native LuaMFD interface");
+    terminalApi = entry;
+    terminalLibrary = std::move(next);
+}
+
+void NativeScriptHost::EndTerminalMfd()
+{
+    if (terminalApi) terminalApi->end();
+    terminalApi = nullptr;
+    terminalLibrary.reset();
+}
+
 void NativeScriptHost::PostStep(double simt, double simdt, double mjd)
 {
     if (api) api->postStep(simt, simdt, mjd);
+    if (terminalApi) terminalApi->postStep(simt, simdt, mjd);
 }
 
 void NativeScriptHost::DeleteVessel(OBJHANDLE vessel)
 {
     if (api) api->deleteVessel(vessel);
+    if (terminalApi) terminalApi->deleteVessel(vessel);
 }
 
 void NativeScriptHost::End()
 {
+    EndTerminalMfd();
     if (api) api->end();
     api = nullptr;
     library.reset();

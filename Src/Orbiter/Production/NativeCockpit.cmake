@@ -261,3 +261,15 @@ target_link_libraries(native_lua_inline PRIVATE native_lua_interpreter lua orbit
 target_link_options(native_lua_inline PRIVATE -Wl,--no-undefined)
 set_target_properties(native_lua_inline PROPERTIES PREFIX "" OUTPUT_NAME LuaInline
     LIBRARY_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/NativeModules/Plugin")
+
+# The stock Terminal MFD is an optional user mode selected through ACTIVE_MODULES.
+add_library(native_lua_mfd MODULE
+    ../../Plugin/LuaMFD/LuaMFD.cpp ../../Plugin/LuaMFD/MfdInterpreter.cpp)
+target_compile_definitions(native_lua_mfd PRIVATE ORBITER_NATIVE_MODULE)
+target_include_directories(native_lua_mfd PRIVATE
+    "${CMAKE_CURRENT_LIST_DIR}/../../Module/LuaScript/LuaInterpreter")
+target_link_libraries(native_lua_mfd PRIVATE native_lua_interpreter lua orbiter_production_vessels)
+target_link_options(native_lua_mfd PRIVATE -Wl,--no-undefined)
+set_target_properties(native_lua_mfd PROPERTIES PREFIX "" OUTPUT_NAME LuaMFD
+    CXX_VISIBILITY_PRESET hidden VISIBILITY_INLINES_HIDDEN YES
+    LIBRARY_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/NativeModules/Plugin")

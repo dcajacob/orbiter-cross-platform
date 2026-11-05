@@ -2,7 +2,12 @@
 // Licensed under the MIT License
 
 #include "MfdInterpreter.h"
+#ifdef _WIN32
 #include <process.h>
+#else
+#include <memory>
+#include "Production/NativeRenderApi.h"
+#endif
 
 // ==============================================================
 // MFD interpreter class implementation
@@ -14,15 +19,19 @@ MFDInterpreter::MFDInterpreter (): Interpreter ()
 	nline = 0;
 }
 
+MFDInterpreter::~MFDInterpreter ()
+{
+    term_clear();
+}
+
 void MFDInterpreter::SetSelf (OBJHANDLE hV)
 {
-	VESSEL **pv = (VESSEL**)lua_newuserdata (L, sizeof(VESSEL*));
-	*pv = oapiGetVesselInterface (hV);
-	luaL_getmetatable (L, "VESSEL.vtable");  // push metatable
-	lua_setmetatable (L, -2);               // set metatable for user data
-	LoadVesselExtensions (L, *pv);
-	lua_setfield (L, LUA_GLOBALSINDEX, "V");
-	InitialiseVessel (L, *pv);
+    VESSEL *vessel = oapiGetVesselInterface(hV);
+    // Use the SDK's canonical userdata factory, which also registers this
+    // interface for the interpreter's existing vessel-validity checks.
+    lua_pushvessel(L, vessel);
+    lua_setfield(L, LUA_GLOBALSINDEX, "V");
+    InitialiseVessel(L, vessel);
 }
 
 void MFDInterpreter::LoadAPI ()
@@ -97,7 +106,7 @@ int MFDInterpreter::termSetVerbosity (lua_State *L)
 	return 0;
 }
 
-void MFDInterpreter::AddLine (const char *line, COLORREF col)
+void MFDInterpreter::AddLine (const char *line, oapi::UInt32 col)
 {
 	LineSpec *ls = new LineSpec;
 	strncpy (ls->buf, line, NCHAR);
@@ -129,24 +138,42 @@ InterpreterList::Environment::Environment (OBJHANDLE hV)
 InterpreterList::Environment::~Environment()
 {
 	if (interp) {
+#ifdef _WIN32
 		if (hThread) {
 			TerminateThread (hThread, 0);
 			CloseHandle (hThread);
 		}
+#else
+        // The simulator owns execution while deleting a terminal page. Wake
+        // its worker cooperatively before destroying the Lua state or vessel.
+        interp->Terminate();
+        interp->EndExec();
+        if (thread.joinable()) thread.join();
+#endif
 		delete interp;
 	}
 }
 
 MFDInterpreter *InterpreterList::Environment::CreateInterpreter (OBJHANDLE hV)
 {
+#ifdef _WIN32
 	unsigned int id;
 	interp = new MFDInterpreter ();
 	interp->Initialise();
 	interp->SetSelf (hV);
 	hThread = (HANDLE)_beginthreadex (NULL, 4096, &InterpreterThreadProc, this, 0, &id);
 	return interp;
+#else
+    auto candidate = std::make_unique<MFDInterpreter>();
+    candidate->Initialise();
+    candidate->SetSelf(hV);
+    interp = candidate.get();
+    thread = std::thread(&Environment::Run, this);
+    return candidate.release();
+#endif
 }
 
+#ifdef _WIN32
 // Interpreter thread function
 unsigned int WINAPI InterpreterList::Environment::InterpreterThreadProc (LPVOID context)
 {
@@ -167,6 +194,34 @@ unsigned int WINAPI InterpreterList::Environment::InterpreterThreadProc (LPVOID 
 	return 0;
 }
 
+#else
+void InterpreterList::Environment::Advance()
+{
+    if (failure) std::rethrow_exception(failure);
+    interp->EndExec();
+    interp->WaitExec();
+    if (failure) std::rethrow_exception(failure);
+}
+
+void InterpreterList::Environment::Run()
+{
+    for (;;) {
+        interp->WaitExec();
+        if (interp->Status() == 1) break;
+        try {
+            interp->RunChunk(cmd, static_cast<int>(std::strlen(cmd)));
+            cmd[0] = '\0';
+        } catch (...) {
+            failure = std::current_exception();
+            break;
+        }
+        if (interp->Status() == 1) break;
+        interp->EndExec();
+    }
+    interp->EndExec();
+}
+#endif
+
 // ==============================================================
 // Interpreter repository implementation
 
@@ -182,13 +237,17 @@ InterpreterList::~InterpreterList ()
 
 void InterpreterList::Update (double simt, double simdt, double mjd)
 {
-	DWORD i, j;
+	oapi::UInt32 i, j;
 	for (i = 0; i < nlist; i++) {
 		for (j = 0; j < list[i].nenv; j++) {
 			Environment *env = list[i].env[j];
 			if (env->interp->IsBusy() || env->cmd[0] || env->interp->nJobs()) { // let the interpreter do some work
+#ifdef _WIN32
 				env->interp->EndExec();
 				env->interp->WaitExec();
+#else
+                env->Advance();
+#endif
 			}
 			env->interp->PostStep (simt, simdt, mjd);
 		}
@@ -197,6 +256,10 @@ void InterpreterList::Update (double simt, double simdt, double mjd)
 
 InterpreterList::Environment *InterpreterList::AddInterpreter (OBJHANDLE hV)
 {
+#ifndef _WIN32
+    // Finish fallible Lua setup before publishing a vessel/page or its array.
+    auto pending = std::make_unique<Environment>(hV);
+#endif
 	VesselInterp *vi = FindVesselInterp (hV);
 
 	if (!vi) { // no interpreters defined for this vessel yet
@@ -222,13 +285,17 @@ InterpreterList::Environment *InterpreterList::AddInterpreter (OBJHANDLE hV)
 	}
 	vi->env = tmp;
 
+#ifdef _WIN32
 	Environment *env = new Environment (hV);
+#else
+    Environment *env = pending.release();
+#endif
 	vi->env[vi->nenv++] = env;
 	
 	return env;
 }
 
-bool InterpreterList::DeleteInterpreter (OBJHANDLE hV, DWORD idx)
+bool InterpreterList::DeleteInterpreter (OBJHANDLE hV, oapi::UInt32 idx)
 {
 	VesselInterp *vi = FindVesselInterp (hV);
 	if (!vi || idx >= vi->nenv) return false;
@@ -239,7 +306,7 @@ bool InterpreterList::DeleteInterpreter (OBJHANDLE hV, DWORD idx)
 
 	Environment **tmp = NULL;
 	if (vi->nenv > 1) {
-		DWORD i, j;
+		oapi::UInt32 i, j;
 		tmp = new Environment*[vi->nenv-1];
 		for (i = j = 0; i < vi->nenv; i++)
 			if (i != idx) tmp[j++] = vi->env[i];
@@ -255,7 +322,7 @@ bool InterpreterList::DeleteInterpreters (OBJHANDLE hV)
 	VesselInterp *vi = FindVesselInterp (hV);
 	if (!vi) return false;
 
-	DWORD i;
+	oapi::UInt32 i;
 	for (i = 0; i < vi->nenv; i++) {
 		Environment *env = vi->env[i];
 		delete env;
@@ -265,12 +332,15 @@ bool InterpreterList::DeleteInterpreters (OBJHANDLE hV)
 		vi->env = 0;
 		vi->nenv = 0;
 	}
+#ifndef _WIN32
+    vi->hVessel = nullptr;
+#endif
 	return true;
 }
 
 void InterpreterList::DeleteList ()
 {
-	DWORD i, j;
+	oapi::UInt32 i, j;
 	for (j = 0; j < nlist; j++) {
 		VesselInterp *vi = list+j;
 		for (i = 0; i < vi->nenv; i++) {
@@ -285,20 +355,20 @@ void InterpreterList::DeleteList ()
 
 InterpreterList::VesselInterp *InterpreterList::FindVesselInterp (OBJHANDLE hV)
 {
-	DWORD i;
+	oapi::UInt32 i;
 	for (i = 0; i < nlist; i++)
 		if (list[i].hVessel == hV) return list+i;
 	return NULL;
 }
 
-InterpreterList::Environment *InterpreterList::FindInterpreter (OBJHANDLE hV, DWORD idx)
+InterpreterList::Environment *InterpreterList::FindInterpreter (OBJHANDLE hV, oapi::UInt32 idx)
 {
 	VesselInterp *vi = FindVesselInterp (hV);
 	if (!vi) return NULL;
 	return (vi->nenv > idx ? vi->env[idx] : NULL);
 }
 
-DWORD InterpreterList::InterpreterCount (OBJHANDLE hV)
+oapi::UInt32 InterpreterList::InterpreterCount (OBJHANDLE hV)
 {
 	VesselInterp *vi = FindVesselInterp (hV);
 	return (vi ? vi->nenv : 0);

@@ -202,6 +202,7 @@ void VesselBase::SetDefaultState ()
 	proxybase = 0;
 	bDynamicGroundContact = true;
 	bSurfaceContact = false;
+	collision_speed_checked = false;
 	LandingTest.testing = false;
 	proxyT    = -(double)orbiter::production::RandomInteger()*100.0/(double)orbiter::production::RandomMaximum - 1.0;
 	// distribute update times

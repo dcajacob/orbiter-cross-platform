@@ -640,7 +640,18 @@ struct Runtime final:BodyServices,RigidBodyServices,SurfaceServices,NavigationSe
                 if(keymap.IsLogicalKey(code,snapshot.keys.data(),OAPI_LKEY_IncSimSpeed)) {SetWarpFactor(std::pow(10.,std::floor(std::log10(time.Warp())+1e-6)+1));continue;}
                 if(keymap.IsLogicalKey(code,snapshot.keys.data(),OAPI_LKEY_DecSimSpeed)) {SetWarpFactor(std::pow(10.,std::ceil(std::log10(time.Warp())-1e-6)-1));continue;}
             }
-            if(running)render.focus->ConsumeBufferedKey(code,event.down,snapshot.keys.data());
+            if(running) {
+                if(render.focus->ConsumeBufferedKey(code,event.down,snapshot.keys.data()))continue;
+#ifdef ORBITER_NATIVE_COCKPIT
+                // Preserve the original vessel-first priority and Shift-side
+                // selection; Control combinations never reach this MFD path.
+                if(event.down && code!=OAPI_KEY_LSHIFT && code!=OAPI_KEY_RSHIFT &&
+                   !KEYMOD_CONTROL(snapshot.keys.data()) && KEYMOD_SHIFT(snapshot.keys.data())) {
+                    auto* g_pane=cockpit.get();auto* kstate=snapshot.keys.data();auto key=code;
+#include "CockpitMfdInput.inc"
+                }
+#endif
+            }
         }
         snapshot.events.clear();
     }
@@ -684,6 +695,7 @@ struct Runtime final:BodyServices,RigidBodyServices,SurfaceServices,NavigationSe
             guiCreated=false;
         }
         cockpit.reset();render.cockpitPane=nullptr;
+        scripts.EndTerminalMfd();
         if(instrumentResources){Instrument::GlobalExit(render.graphics);instrumentResources=false;}
         // Match the production Windows cockpit shutdown order while the
         // graphics context and logical world still exist.
@@ -718,7 +730,15 @@ struct Runtime final:BodyServices,RigidBodyServices,SurfaceServices,NavigationSe
         if(render.joystickTwistAxis==-2)
             render.joystickTwistAxis=settings.GetInt("NativeJoystickRudderAxis",axis) && axis>=-1 && axis<=15 ? axis : 2;
 #endif
+#ifdef ORBITER_NATIVE_COCKPIT
+        bool terminalMfdRequested=false;
+        for(const auto& plugin:settings.GetActiveModules()) {
+            if(CompareText(plugin.c_str(),"LuaMFD"))unsupported("application plugins in this external-view host");
+            terminalMfdRequested=true;
+        }
+#else
         if(!settings.GetActiveModules().empty())unsupported("application plugins in this external-view host");
+#endif
         scenarioState=std::make_unique<State>(51982.5);State& metadata=*scenarioState;if(!metadata.Read(scenario,51982.5))throw std::runtime_error("Cannot parse production scenario");
 #ifndef ORBITER_NATIVE_COCKPIT
         if(metadata.Script())unsupported("bundled Lua in the external-view build");
@@ -811,6 +831,7 @@ struct Runtime final:BodyServices,RigidBodyServices,SurfaceServices,NavigationSe
         CreateCockpitGui();guiCreated=true;
         render.graphics->InitGui();
         static bool modesRegistered=false;if(!modesRegistered){Instrument::RegisterBuiltinModes();modesRegistered=true;}
+        if(terminalMfdRequested)scripts.LoadTerminalMfd();
         Instrument::GlobalInit(render.graphics);instrumentResources=true;
 #endif
         Base::CreateStaticDeviceObjects();baseResources=true;

@@ -582,8 +582,8 @@
     },
     "Src/Orbiter/Production/CMakeLists.txt": {
       "original_sha256_lf": null,
-      "sha256_lf": "b4c23f12906c759019c4bdf15cac07f58e487164eeebc83d8c43086e0cae4571",
-      "scope": "Complete original Dragonfly source and resources with independently audited native SDK/drawing/resource ownership bindings. Actual compatibility target uses distinct color-renderbuffer storage. Native diagnostic build/runtime and Windows/native qualification required; original formulas and public Windows SDK layouts unchanged."
+      "sha256_lf": "7672ce1f798ae33cf0eebd8d89c756fedde2903740b80ad6a508f3977752d7dc",
+      "scope": "Original Lua Terminal MFD native SDK/bootstrap and cooperative worker ownership; explicitly admit LuaMFD only, conserve original vessel-first left/right Shift MFD dispatch, and destroy terminal Lua states before their vessels. Original drawing/commands/repository/Windows callbacks independently conserved; terminal buffers reclaimed and command termination bounded. Full runtime and original Windows qualification remain required."
     },
     "Src/Orbiter/Production/CameraServices.cpp": {
       "original_sha256_lf": null,
@@ -742,8 +742,8 @@
     },
     "Src/Orbiter/Production/NativeApplication.cpp": {
       "original_sha256_lf": null,
-      "sha256_lf": "527c3a2eb7a406a164bde5ec866235d4df86231c9680c7c7a1390404628d6845",
-      "scope": "Complete original Dragonfly source and resources with independently audited native SDK/drawing/resource ownership bindings. Actual compatibility target uses distinct color-renderbuffer storage. Native diagnostic build/runtime and Windows/native qualification required; original formulas and public Windows SDK layouts unchanged. Opt-in bounded remaining-stock diagnostic supplies an independently declared system elapsed input through the unchanged startup/clamp policy; physical fixed step, every update formula and callback order remain unchanged. Ordinary native application argument/admission policy and timing inputs are retained."
+      "sha256_lf": "5e31df3e04a47d62fe086cf396a3c19ec79ad66d6e7fe461c41b45480daef96b",
+      "scope": "Original Lua Terminal MFD native SDK/bootstrap and cooperative worker ownership; explicitly admit LuaMFD only, conserve original vessel-first left/right Shift MFD dispatch, and destroy terminal Lua states before their vessels. Original drawing/commands/repository/Windows callbacks independently conserved; terminal buffers reclaimed and command termination bounded. Full runtime and original Windows qualification remain required."
     },
     "Src/Orbiter/Production/NativeBuild.h.in": {
       "sha256_lf": "f5fb21f83bb6be0c54839fce670e8410f6911eda86da2eef26e4221c1ae25d97",
@@ -1230,8 +1230,9 @@
       "sha256_lf": "780722d09c070d2e1684fb22ccbd6c3987fe15f0f21176e3a1853da7591d466f"
     },
     "Src/Orbiter/Vesselbase.cpp": {
-      "sha256_lf": "f68718e0d648aae4b97c49b35c9e8956897835a54e60d248a1e06ce8776e1c7f",
-      "original_sha256_lf": "35f86ad61b02240e645c60c6c71808691a984eb127042581d0d18a8ad899b0b8"
+      "sha256_lf": "0733bbb749eb084b61bf5eb234a3a7e8fb0ebb4da7b93c0dcdcf7f90322b899f",
+      "original_sha256_lf": "35f86ad61b02240e645c60c6c71808691a984eb127042581d0d18a8ad899b0b8",
+      "scope": "Original vessel surface/contact implementation and numerical update order conserved; explicitly initialize the collision-speed-check bool to false before the first ground-launch validation, after the complete stock DG-S atmospheric-autopilot scene exposed an indeterminate bool190. No force, contact formula, propagator, layout or tolerance changes."
     },
     "Src/Orbiter/Vesselbase.h": {
       "sha256_lf": "6b10c77702d992db4c1d62ad37d7e9cda737762447d8175d56b2bd4bf43af4b3",
@@ -1306,8 +1307,8 @@
     },
     "Src/Orbiter/Production/NativeCockpit.cmake": {
       "original_sha256_lf": null,
-      "sha256_lf": "f1b9596326162108ccf4ace57d3197b74252c30607fc82ea1b2ca5b60de9a4d4",
-      "scope": "Complete original Dragonfly source and resources with independently audited native SDK/drawing/resource ownership bindings. Actual compatibility target uses distinct color-renderbuffer storage. Native diagnostic build/runtime and Windows/native qualification required; original formulas and public Windows SDK layouts unchanged."
+      "sha256_lf": "054b4eb6540384f014a68cb0a7996ab5342f0f45017eac1a97ae5a0c33258954",
+      "scope": "Original Lua Terminal MFD integrated through native SDK types and checked optional module bootstrap. Original drawing, commands, vessel/page repository, Lua registrations, Windows callbacks and update order conserved independently; native workers use cooperative join before Lua/vessel teardown. Terminal line buffers are reclaimed and command copies explicitly terminated. Full native/original runtime, lifecycle and mission qualification required."
     },
     "Src/Orbiter/Production/NativeCockpitGui.cpp": {
       "original_sha256_lf": null,
@@ -1631,11 +1632,13 @@
     },
     "Src/Orbiter/Production/NativeScript.cpp": {
       "original_sha256_lf": null,
-      "sha256_lf": "ed38e44fdef4430ba93e87d930548510c6eb43efa55f912bae71b13e203ce48f"
+      "sha256_lf": "61a87979ea043e83940108693da2fe95db2d42abf6d02d1fb9dcdf23ab964e64",
+      "scope": "Original Lua Terminal MFD integrated through native SDK types and checked optional module bootstrap. Original drawing, commands, vessel/page repository, Lua registrations, Windows callbacks and update order conserved independently; native workers use cooperative join before Lua/vessel teardown. Terminal line buffers are reclaimed and command copies explicitly terminated. Full native/original runtime, lifecycle and mission qualification required."
     },
     "Src/Orbiter/Production/NativeScript.h": {
       "original_sha256_lf": null,
-      "sha256_lf": "1dde1502e0f2ee3788193479344936113e05845c4f4df7425ae17ddb5d1dcdd6"
+      "sha256_lf": "6fb170dc8969548f7bc028662e3d2276975d6b313716dc4bac1a182dc08c85c9",
+      "scope": "Original Lua Terminal MFD integrated through native SDK types and checked optional module bootstrap. Original drawing, commands, vessel/page repository, Lua registrations, Windows callbacks and update order conserved independently; native workers use cooperative join before Lua/vessel teardown. Terminal line buffers are reclaimed and command copies explicitly terminated. Full native/original runtime, lifecycle and mission qualification required."
     },
     "Src/Vessel/DeltaGlider/NativeDeltaGliderFactory.inc": {
       "original_sha256_lf": null,
@@ -2658,6 +2661,41 @@
       "original_sha256_lf": null,
       "sha256_lf": "488b1e8b9aa382e415843b853ccb5a69d223137b649e86c3675551944b027a20",
       "scope": "Native Orbit MFD display-only recovery of nonfinite true anomaly/longitude caused by normalized acos argument roundoff of at most two machine epsilons. Uses existing cached eccentric anomaly without changing original Elements calculations, object state, propagation, finite display values or Windows calls. Runtime qualification remains separate."
+    },
+    "Src/Plugin/LuaMFD/LuaMFD.cpp": {
+      "original_sha256_lf": "b1a6a1c24cf27a62eae18b1f625a23e2f57d60ddd56f268ff73facb57c4c1134",
+      "sha256_lf": "422b5d715c729ede8ab98a3c7f066f90c9cbf8ccbc16cd638c96ecc938195c19",
+      "scope": "Original Lua Terminal MFD integrated through native SDK types and checked optional module bootstrap. Original drawing, commands, vessel/page repository, Lua registrations, Windows callbacks and update order conserved independently; native workers use cooperative join before Lua/vessel teardown. Terminal line buffers are reclaimed and command copies explicitly terminated. Full native/original runtime, lifecycle and mission qualification required. Canonical SDK vessel-userdata registration preserves validity checks; native font/page allocations now unwind cleanly when interpreter startup fails, after an actual231-byte/3-allocation failure."
+    },
+    "Src/Plugin/LuaMFD/LuaMFD.h": {
+      "original_sha256_lf": "aff36d972877da12017a44b7b78b4ac7875c0901afa311ba33c5d3f3fc5bc559",
+      "sha256_lf": "2eee127b3694e50e907d9af4a310a4216e43a4607352b33e072d34dcc5415210",
+      "scope": "Original Lua Terminal MFD integrated through native SDK types and checked optional module bootstrap. Original drawing, commands, vessel/page repository, Lua registrations, Windows callbacks and update order conserved independently; native workers use cooperative join before Lua/vessel teardown. Terminal line buffers are reclaimed and command copies explicitly terminated. Full native/original runtime, lifecycle and mission qualification required."
+    },
+    "Src/Plugin/LuaMFD/MfdInterpreter.cpp": {
+      "original_sha256_lf": "eb0656a0f65b55631fcd4ce99e38ff63f1a527dbf23ba758bef22c77c13e97d2",
+      "sha256_lf": "5ab7591e5bfc84fe8dc4a5d0dad34d66d2da8a229dfdf52326346cdb4a594363",
+      "scope": "Original Lua Terminal MFD integrated through native SDK types and checked optional module bootstrap. Original drawing, commands, vessel/page repository, Lua registrations, Windows callbacks and update order conserved independently; native workers use cooperative join before Lua/vessel teardown. Terminal line buffers are reclaimed and command copies explicitly terminated. Full native/original runtime, lifecycle and mission qualification required. Canonical SDK vessel-userdata registration preserves validity checks; native font/page allocations now unwind cleanly when interpreter startup fails, after an actual231-byte/3-allocation failure."
+    },
+    "Src/Plugin/LuaMFD/MfdInterpreter.h": {
+      "original_sha256_lf": "1a2d6b9c6b420a84967e8084f09c5f866825010062e9331a87383ca9e585c964",
+      "sha256_lf": "4db2a747c8198ba16c09ff2a64238408cd36bbcc8696a4a95a4ec534b56a6352",
+      "scope": "Original Lua Terminal MFD integrated through native SDK types and checked optional module bootstrap. Original drawing, commands, vessel/page repository, Lua registrations, Windows callbacks and update order conserved independently; native workers use cooperative join before Lua/vessel teardown. Terminal line buffers are reclaimed and command copies explicitly terminated. Full native/original runtime, lifecycle and mission qualification required."
+    },
+    "Src/Plugin/LuaMFD/NativeLuaMfdFactory.inc": {
+      "original_sha256_lf": null,
+      "sha256_lf": "21e71de77e840d36ad9786676b3ee31e40f19b753423bf742190ead48725fd51",
+      "scope": "Original Lua Terminal MFD integrated through native SDK types and checked optional module bootstrap. Original drawing, commands, vessel/page repository, Lua registrations, Windows callbacks and update order conserved independently; native workers use cooperative join before Lua/vessel teardown. Terminal line buffers are reclaimed and command copies explicitly terminated. Full native/original runtime, lifecycle and mission qualification required."
+    },
+    "Src/Orbiter/Production/NativeLuaMfd.h": {
+      "original_sha256_lf": null,
+      "sha256_lf": "fb075a327155dfbc4095e7bc7190f8ec456f255ef2def1cdc18e4f30923ba83b",
+      "scope": "Original Lua Terminal MFD integrated through native SDK types and checked optional module bootstrap. Original drawing, commands, vessel/page repository, Lua registrations, Windows callbacks and update order conserved independently; native workers use cooperative join before Lua/vessel teardown. Terminal line buffers are reclaimed and command copies explicitly terminated. Full native/original runtime, lifecycle and mission qualification required."
+    },
+    "Src/Orbiter/Production/CockpitMfdInput.inc": {
+      "original_sha256_lf": null,
+      "sha256_lf": "54c708b44050d4266951efc4dd77f586ecfdcd3e954353a977ff4c5788c06a7f",
+      "scope": "Original Lua Terminal MFD native SDK/bootstrap and cooperative worker ownership; explicitly admit LuaMFD only, conserve original vessel-first left/right Shift MFD dispatch, and destroy terminal Lua states before their vessels. Original drawing/commands/repository/Windows callbacks independently conserved; terminal buffers reclaimed and command termination bounded. Full runtime and original Windows qualification remain required."
     }
   }
 }

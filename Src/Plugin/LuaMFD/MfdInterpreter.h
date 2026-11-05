@@ -5,6 +5,10 @@
 #define __MFDINTERPRETER_H
 
 #include "Interpreter.h"
+#ifndef _WIN32
+#include <exception>
+#include <thread>
+#endif
 
 #define NCHAR 80 // characters per line in console buffer
 #define NLINE 50 // number of buffered lines
@@ -18,16 +22,17 @@ class MFDInterpreter: public Interpreter {
 public:
 	struct LineSpec {
 		char buf[NCHAR];
-		COLORREF col;
+		oapi::UInt32 col;
 		LineSpec *prev, *next;
 	};
 
 	MFDInterpreter ();
+	~MFDInterpreter () override;
 	void SetSelf (OBJHANDLE hV);
 	void LoadAPI();
-	void AddLine (const char *line, COLORREF col);
+	void AddLine (const char *line, oapi::UInt32 col);
 	inline LineSpec *FirstLine() const { return lineFirst; }
-	inline DWORD LineCount() const { return nline; }
+	inline oapi::UInt32 LineCount() const { return nline; }
 	void term_strout (const char *str, bool iserr=false);
 	void term_clear ();
 
@@ -39,7 +44,7 @@ protected:
 
 private:
 	LineSpec *lineFirst, *lineLast;
-	DWORD nline;
+	oapi::UInt32 nline;
 };
 
 // ==============================================================
@@ -52,17 +57,26 @@ public:
 		~Environment();
 		MFDInterpreter *CreateInterpreter (OBJHANDLE hV);
 		MFDInterpreter *interp;
+#ifdef _WIN32
 		HANDLE hThread;
+#else
+        std::thread thread;
+        std::exception_ptr failure;
+        void Advance();
+        void Run();
+#endif
 		char cmd[1024];
+#ifdef _WIN32
 		static unsigned int WINAPI InterpreterThreadProc (LPVOID context);
+#endif
 	};
 	struct VesselInterp {
 		OBJHANDLE hVessel;
 		Environment **env;
-		DWORD nenv;
+		oapi::UInt32 nenv;
 	} *list;
-	DWORD nlist;
-	DWORD nbuf;
+	oapi::UInt32 nlist;
+	oapi::UInt32 nbuf;
 
 	InterpreterList();
 	~InterpreterList();
@@ -70,12 +84,12 @@ public:
 	void Update (double simt, double simdt, double mjd);
 
 	Environment *AddInterpreter (OBJHANDLE hV);
-	bool DeleteInterpreter (OBJHANDLE hV, DWORD idx);
+	bool DeleteInterpreter (OBJHANDLE hV, oapi::UInt32 idx);
 	bool DeleteInterpreters (OBJHANDLE hV);
 	void DeleteList ();
 	VesselInterp *FindVesselInterp (OBJHANDLE hV);
-	Environment *FindInterpreter (OBJHANDLE hV, DWORD idx);
-	DWORD InterpreterCount (OBJHANDLE hV);
+	Environment *FindInterpreter (OBJHANDLE hV, oapi::UInt32 idx);
+	oapi::UInt32 InterpreterCount (OBJHANDLE hV);
 };
 
 #endif // !__MFDINTERPRETER_H

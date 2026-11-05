@@ -71,6 +71,9 @@ def verify():
     if 'Src/Orbiter/Production/NativeInterpreterSdk.cpp' in declared:
         from NativeLua.interpreter_source import verify as verify_interpreter
         verify_interpreter()
+    if 'Src/Plugin/LuaMFD/LuaMFD.cpp' in declared:
+        from NativeLuaMfd.source_audit import verify as verify_lua_mfd
+        verify_lua_mfd()
     if 'Src/Module/LuaScript/LuaInterpreter/lua_vessel_mtd.cpp' in declared:
         name='Src/Module/LuaScript/LuaInterpreter/lua_vessel_mtd.cpp'
         from vessel_runtime_source import equal

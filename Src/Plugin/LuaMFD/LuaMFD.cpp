@@ -3,8 +3,17 @@
 
 #define STRICT 1
 #define ORBITER_MODULE
+#ifdef ORBITER_NATIVE_MODULE
+#include "NativeVesselAPI.h"
+#include "Production/NativeRenderApi.h"
+#include "Production/FlightKeys.h"
+#define DLLCLBK static
+#else
 #include "orbitersdk.h"
+#endif
 #include "LuaMFD.h"
+#include <algorithm>
+#include <cstring>
 
 using std::min;
 
@@ -18,18 +27,28 @@ InterpreterList *g_IList = NULL;
 // MFD class implementation
 
 // Constructor
-ScriptMFD::ScriptMFD (DWORD w, DWORD h, VESSEL *vessel)
+ScriptMFD::ScriptMFD (oapi::UInt32 w, oapi::UInt32 h, VESSEL *vessel)
 : MFD2 (w, h, vessel)
 {
 	hVessel = pV->GetHandle();
 	hFont = NULL;
 	SetFontSize (0.8);
+#ifndef _WIN32
+    try {
+#endif
 	vi = g_IList->FindVesselInterp (hVessel);
 	if (!vi) {
 		g_IList->AddInterpreter (hVessel);
 		vi = g_IList->FindVesselInterp (hVessel);
 	}
 	pg = 0;
+#ifndef _WIN32
+    } catch (...) {
+        if (hFont) oapiReleaseFont(hFont);
+        hFont = nullptr;
+        throw;
+    }
+#endif
 }
 
 // Destructor
@@ -63,7 +82,7 @@ int ScriptMFD::ButtonMenu (const MFDBUTTONMENU **menu) const
 	return 5; // return the number of buttons used
 }
 
-bool ScriptMFD::ConsumeKeyBuffered (DWORD key)
+bool ScriptMFD::ConsumeKeyBuffered (oapi::UInt32 key)
 {
 	switch (key) {
 	case OAPI_KEY_I:
@@ -88,7 +107,7 @@ bool ScriptMFD::ConsumeKeyBuffered (DWORD key)
 bool ScriptMFD::ConsumeButton (int bt, int event)
 {
 	if (!(event & PANEL_MOUSE_LBDOWN)) return false;
-	static const DWORD btkey[5] = { OAPI_KEY_I, OAPI_KEY_N, OAPI_KEY_D, OAPI_KEY_PERIOD, OAPI_KEY_COMMA };
+	static const oapi::UInt32 btkey[5] = { OAPI_KEY_I, OAPI_KEY_N, OAPI_KEY_D, OAPI_KEY_PERIOD, OAPI_KEY_COMMA };
 	if (bt < 5) return ConsumeKeyBuffered (btkey[bt]);
 	else return false;
 }
@@ -97,7 +116,7 @@ void ScriptMFD::SetFontSize (double size)
 {
 	if (hFont) oapiReleaseFont (hFont);
 	int h = (int)(H*size*9.0/200.0);
-	hFont = oapiCreateFont (-h, true, "Courier New");
+	hFont = oapiCreateFont (-h, true, "Courier New", FONT_NORMAL);
 	fw = fh = 0;
 }
 
@@ -111,7 +130,8 @@ bool ScriptMFD::Input (const char *line)
 	InterpreterList::Environment *env = vi->env[pg];
 	env->interp->AddLine (line, 0xFFFFFF);
 	if (env->cmd[0]) return false;
-	strncpy (env->cmd, line, 1024);
+	strncpy (env->cmd, line, sizeof(env->cmd)-1);
+	env->cmd[sizeof(env->cmd)-1] = '\0';
 	return true;
 }
 
@@ -136,10 +156,10 @@ void ScriptMFD::DeleteInterpreter ()
 	InvalidateDisplay();
 }
 
-void ScriptMFD::SetPage (DWORD newpg)
+void ScriptMFD::SetPage (oapi::UInt32 newpg)
 {
-	DWORD npg = vi->nenv;
-	if (newpg == (DWORD)-1) newpg = npg-1;
+	oapi::UInt32 npg = vi->nenv;
+	if (newpg == (oapi::UInt32)-1) newpg = npg-1;
 	else if  (newpg >= npg) newpg = 0;
 	if (newpg != pg) {
 		pg = newpg;
@@ -150,7 +170,7 @@ void ScriptMFD::SetPage (DWORD newpg)
 // Repaint the MFD
 bool ScriptMFD::Update (oapi::Sketchpad *skp)
 {
-	DWORD npg = vi->nenv;
+	oapi::UInt32 npg = vi->nenv;
 	pg = min (pg, npg-1);
 	InterpreterList::Environment *env = vi->env[pg];
 	int yofs = (5*ch)/4;
@@ -166,16 +186,16 @@ bool ScriptMFD::Update (oapi::Sketchpad *skp)
 
 	oapi::Font *oldFont = skp->SetFont(hFont);
 	if (!fh) {
-		DWORD cs = skp->GetCharSize();
+		oapi::UInt32 cs = skp->GetCharSize();
 		fw = (cs >> 16) & 0xffff;
 		fh = cs & 0xffff;
 		nchar = (W-fw/2)/fw;
 		nline = (H-yofs-fh/2)/fh;
 	}
-	DWORD nbuf = env->interp->LineCount();
+	oapi::UInt32 nbuf = env->interp->LineCount();
 	MFDInterpreter::LineSpec *ls = env->interp->FirstLine();
 	int xofs = fw/2;
-	COLORREF col = 0;
+	oapi::UInt32 col = 0;
 	for (; ls && nbuf > nline; ls = ls->next) { // skip lines scrolled out of sight
 		nbuf--;
 	}
@@ -192,13 +212,14 @@ bool ScriptMFD::Update (oapi::Sketchpad *skp)
 }
 
 // MFD message parser
-OAPI_MSGTYPE ScriptMFD::MsgProc (UINT msg, UINT mfd, WPARAM wparam, LPARAM lparam)
+oapi::CockpitMessageResult ScriptMFD::MsgProc (oapi::UInt msg, oapi::UInt mfd, oapi::CockpitUnsignedParam wparam, oapi::CockpitSignedParam lparam)
 {
 	switch (msg) {
 	case OAPI_MSG_MFD_OPENED:
 		// Our new MFD mode has been selected, so we create the MFD and
 		// return a pointer to it.
-		return (OAPI_MSGTYPE) new ScriptMFD(LOWORD(wparam), HIWORD(wparam), (VESSEL*)lparam);
+		return reinterpret_cast<oapi::CockpitMessageResult>(new ScriptMFD(
+            oapi::UInt32(wparam & 0xffff), oapi::UInt32((wparam >> 16) & 0xffff), reinterpret_cast<VESSEL*>(lparam)));
 	}
 	return 0;
 }
@@ -206,7 +227,11 @@ OAPI_MSGTYPE ScriptMFD::MsgProc (UINT msg, UINT mfd, WPARAM wparam, LPARAM lpara
 // ==============================================================
 // API interface
 
+#ifdef ORBITER_NATIVE_MODULE
+static void InitModule ()
+#else
 DLLCLBK void InitModule (HINSTANCE hDLL)
+#endif
 {
 	MFDMODESPECEX spec;
 	spec.name = (char*)"Terminal MFD";
@@ -217,7 +242,11 @@ DLLCLBK void InitModule (HINSTANCE hDLL)
 	g_IList = new InterpreterList;
 }
 
+#ifdef ORBITER_NATIVE_MODULE
+static void ExitModule ()
+#else
 DLLCLBK void ExitModule (HINSTANCE hDLL)
+#endif
 {
 	oapiUnregisterMFDMode (g_MFDmode);
 	delete g_IList;
@@ -230,7 +259,8 @@ DLLCLBK void opcPostStep (double simt, double simdt, double mjd)
 	}
 }
 
-DLLCLBK void opcOpenRenderViewport (HWND hWnd, DWORD w, DWORD h, BOOL bFullscreen)
+#ifndef ORBITER_NATIVE_MODULE
+DLLCLBK void opcOpenRenderViewport (HWND hWnd, oapi::UInt32 w, oapi::UInt32 h, BOOL bFullscreen)
 {
 }
 
@@ -238,3 +268,9 @@ DLLCLBK void opcCloseRenderViewport ()
 {
 	g_IList->DeleteList();
 }
+
+#endif
+
+#ifdef ORBITER_NATIVE_MODULE
+#include "NativeLuaMfdFactory.inc"
+#endif

@@ -1,6 +1,7 @@
 // Licensed under the MIT License
 #pragma once
 #include "NativeModule.h"
+#include "NativeLuaMfd.h"
 #include "NativeVesselAPI.h"
 #include "ResourceResolver.h"
 #include <memory>
@@ -26,12 +27,16 @@ class NativeScriptHost {
 public:
     explicit NativeScriptHost(const ResourceResolver &modules): modules(modules) {}
     NativeScriptApi& Load();
+    void LoadTerminalMfd();
+    void EndTerminalMfd();
     void PostStep(double simt, double simdt, double mjd);
     void DeleteVessel(OBJHANDLE vessel);
     void End();
 private:
     const ResourceResolver &modules;
     std::unique_ptr<NativeModule> library;
+    std::unique_ptr<NativeModule> terminalLibrary;
+    NativeLuaMfdApi *terminalApi = nullptr;
     NativeScriptApi *api = nullptr;
 };
 }

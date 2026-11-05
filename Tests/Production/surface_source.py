@@ -51,7 +51,13 @@ def verify():
     for line in ('\tD3DCOLOR shcol = D3DRGBA(0,0,0,0.3);\n','\t\tD3DCOLOR shcol = D3DRGBA(shadowCol.x, shadowCol.y, shadowCol.z, shadowCol.w);\n'):
         a=a.replace(line,'') # unused colors; their only consumers were commented out
     equal(a,b,'Complete production base-object geometry/dynamics')
-    equal(old('Src/Orbiter/Vesselbase.cpp').split('// =======================================================================',1)[1],now('Src/Orbiter/Vesselbase.cpp').split('// =======================================================================',1)[1].replace('GetRigidBodyServices().World()->','g_psys->'),'Original vessel surface/contact implementation')
+    vessel=now('Src/Orbiter/Vesselbase.cpp')
+    # A complete stock DG-S AAP launch exposed an indeterminate bool190 here.
+    # Define only its initial unchecked state; retain every contact calculation,
+    # propagator choice and state-update order from the original implementation.
+    from random_source import restore_contact_speed_check_default
+    vessel=restore_contact_speed_check_default(vessel)
+    equal(old('Src/Orbiter/Vesselbase.cpp').split('// =======================================================================',1)[1],vessel.split('// =======================================================================',1)[1].replace('GetRigidBodyServices().World()->','g_psys->'),'Original vessel surface/contact implementation with defined initial collision-speed flag')
     for name in ('Base::Setup','Base::Attach','Base::Update','Base::Rel_EquPos','Base::Pad_EquPos','Base::CosSunAlt','Base::ExportBaseStructures','Base::ExportShadowGeometry','Base::ExportCollisionMeshes'):
         equal(method(old('Src/Orbiter/Base.cpp'),name),method(now('Src/Orbiter/Base.cpp'),name),name)
     a=old('Src/Orbiter/Astro.cpp');start=a.index('void Orthodome (');end=a.index('static char strbuf',start)

@@ -75,7 +75,7 @@ if(ORBITER_BUILD_NATIVE_VESSELS)
         ../Vessel.cpp ../VesselSdk.cpp ../Vesselstatus.cpp ../SuperVessel.cpp
         ../VesselLights.cpp ../LightEmitter.cpp ../VesselFlightMath.cpp ../FlightSdk.cpp ../ScenarioSdk.cpp ../VesselRecorder.cpp ../CollisionCore.cpp
         NativeCockpitUnavailable.cpp NativeVesselApplication.cpp NativeVesselModule.cpp NativeWorldVesselServices.cpp
-        FlightControls.cpp ../Keymap.cpp NativeApplication.cpp CockpitFovInput.inc NativeRenderApi.cpp NativeParticle.cpp NativeVesselObservation.cpp NativeObservation/ApplicationObservation.h ../CelSphereAPI.cpp ../DrawAPI.cpp ../Camera.cpp ../CameraControl.cpp NativeCameraProjection.cpp NativeVessels.cmake ../../Vessel/ShuttlePB/ShuttlePB.cpp ../../Vessel/ShuttlePB/NativeShuttlePBFactory.inc)
+        FlightControls.cpp ../Keymap.cpp NativeApplication.cpp CockpitFovInput.inc CockpitMfdInput.inc NativeRenderApi.cpp NativeParticle.cpp NativeVesselObservation.cpp NativeObservation/ApplicationObservation.h ../CelSphereAPI.cpp ../DrawAPI.cpp ../Camera.cpp ../CameraControl.cpp NativeCameraProjection.cpp NativeVessels.cmake ../../Vessel/ShuttlePB/ShuttlePB.cpp ../../Vessel/ShuttlePB/NativeShuttlePBFactory.inc)
 endif()
 if(ORBITER_BUILD_NATIVE_COCKPIT)
     file(GLOB_RECURSE _atlantis_sources CONFIGURE_DEPENDS
@@ -116,6 +116,9 @@ if(ORBITER_BUILD_NATIVE_COCKPIT)
         ../../Module/LuaScript/Native/CMakeLists.txt ../../Module/LuaScript/Native/UpvalueGuards.cmake
         ../../Module/LuaScript/Native/ScriptExit.c ../../Module/LuaScript/Native/ScriptExit.h
         ../../../Tests/Production/NativeLua/upvalue-source.lock.json
+        ../../Plugin/LuaMFD/LuaMFD.cpp ../../Plugin/LuaMFD/LuaMFD.h
+        ../../Plugin/LuaMFD/MfdInterpreter.cpp ../../Plugin/LuaMFD/MfdInterpreter.h
+        ../../Plugin/LuaMFD/NativeLuaMfdFactory.inc NativeLuaMfd.h NativeScript.h
         NativeCockpit.cmake SystemPlayback.h PlaybackAnnotation.inc GuiMenuButton.inc GuiAnimatedControls.inc GuiOptionControls.inc GuiNotifications.inc NativeJoystick.h CustomCommands.h NativeAnnotations.cpp ScreenAnnotationMethods.inc NativeScript.cpp NativeInterpreterSdk.cpp NativeHelp.cpp ../CockpitSdk.cpp NativeLegacyPanelSdk.cpp NativeCockpitMfd.cpp NativeCockpitProjection.cpp NativeCockpitGui.cpp ../MenuInfoBar.cpp ../DlgFocus.cpp ../DlgMenuCfg.cpp ../DlgTacc.cpp ../DlgCamera.cpp ../DlgInfo.cpp ../DlgMap.cpp ../DlgOptions.cpp ../DlgFunction.cpp ../DlgRecorder.cpp ../PlaybackEd.cpp NativeCockpitCommands.cpp NativeCockpitVessel.cpp
         CockpitVesselMethods.inc CockpitCameraMethods.inc CockpitPanelMethods.inc CockpitPanelInput.inc CockpitSystemInput.inc CockpitHudInput.inc OrbitAnomalyDisplay.h NativeCameraMouse.cpp
         ../Pane.cpp ../hud.cpp ../Defpanel.cpp ../Panel.cpp ../Panel2D.cpp ../VCockpit.cpp ../Select.cpp ../Astro.cpp
