@@ -138,6 +138,9 @@ also complete native development interaction flows. They retain all eight or six
 original vessels respectively, exercise real camera/mouse controls or RCS
 undocking and automatic re-docking, and preserve saved graphs through F5 reload.
 The current four-profile interaction results do not complete Phase 6 qualification.
+The unchanged eight-vessel [atmospheric-autopilot tutorial](AtmosphericAutopilot.md)
+also completes its full native functional flow in all four current profiles,
+including manual override, autopilot recovery, the conclusion and full saves.
 
 ## Phase 1 reproducibility
 

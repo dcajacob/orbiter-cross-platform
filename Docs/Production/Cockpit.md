@@ -56,6 +56,13 @@ the native vessel and cockpit camera through five unchanged DG scenarios.
 The tutorial text is drawn and both automatic and pilot-commanded returns
 to free flight pass locally.
 
+The current `6a67588b` packages also complete the full unchanged eight-vessel
+[atmospheric-autopilot tutorial](AtmosphericAutopilot.md) in all four native
+profiles. Real Terminal commands, manual override and recovery reach the
+tutorial conclusion, save the full scene and exit with clean sanitizer and
+graphics teardown. Matching current original Windows mission qualification
+remains open; this evidence stays local.
+
 The complete hosted native-client workflow now passes at `334d0105`: all four
 Linux Debug/Release automatic/SSE2 jobs, all four preserved Windows captures,
 and all four paired comparison jobs. Every required native step ran; the only
