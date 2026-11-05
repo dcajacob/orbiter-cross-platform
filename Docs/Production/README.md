@@ -132,6 +132,12 @@ now reaches 10 km and 700 m/s, runs both scramjets, saves the complete scene,
 reloads it with F5 and exits cleanly. A separate actual-save reload also passes.
 Matching Windows and complete four-profile qualification remain open.
 
+The unchanged [Virtual cockpit and Docked at ISS scenarios](CompleteSceneInteractions.md)
+also complete native development interaction flows. They retain all eight or six
+original vessels respectively, exercise real camera/mouse controls or RCS
+undocking and automatic re-docking, and preserve saved graphs through F5 reload.
+Their single-profile results do not complete Phase 6 qualification.
+
 ## Phase 1 reproducibility
 
 ```sh
