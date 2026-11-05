@@ -121,7 +121,11 @@ the local VM, and this candidate's raw evidence remains local.
 The complete Moon tutorial exposed a recorded-attitude NaN during lunar
 approach. A focused [recording interpolation repair](RecordedPlayback.md)
 passes Linux and local Windows scalar controls while preserving finite legacy
-results bit for bit. The repaired full mission remains pending.
+results bit for bit. The repaired native playback now reaches the final tutorial
+note, saves all four vessels and shuts down cleanly. The actual save keeps rolling
+in both Windows and native Linux; the original wheel-brake keys stop it and produce
+a native `Landed Moon` save at Brighton Beach. Complete Windows/native recording
+and four-profile mission qualification remain open.
 
 ## Phase 1 reproducibility
 
