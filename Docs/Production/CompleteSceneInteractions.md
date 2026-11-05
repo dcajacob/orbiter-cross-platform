@@ -38,7 +38,17 @@ acceptance remain separate requirements. The last full-stock result and normal
 module admission policy are unchanged. Raw evidence stays local; Windows work
 uses the local VM.
 
-A subsequent current Debug/SSE2 run also completes both Virtual cockpit
-variants. Its Docked at ISS run exposes a [buffered modifier defect](BufferedInput.md)
-when Ctrl+S edges arrive together after braking; that failed run remains
-preserved. A repair and fresh application verification are in progress.
+The fresh Debug/SSE2 package at `6a67588b` also completes all four entry points
+after repairing a [buffered modifier defect](BufferedInput.md). Each save now
+delivers the complete Ctrl+S chord in one real Wayland input batch. Initial,
+separated and re-docked saves retain the expected reciprocal docking graphs.
+The original missed-save failure remains preserved.
+
+The Demo docking driver's first repaired attempt reached about two metres from
+the port before its 300-second wall limit. Only 205 seconds of flight time had
+elapsed. That incomplete attempt exits cleanly and remains preserved. The
+driver now retains a 300-second flight-time approach budget with a separate
+900-second wall watchdog; the complete original Demo flow passes. The original
+scene, physical controls, RCS approach, physics and numerical/frame budgets are
+unchanged. Remaining native profiles and matching Windows qualification stay
+open.

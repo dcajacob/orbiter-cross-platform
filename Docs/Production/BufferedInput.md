@@ -17,5 +17,19 @@ priority and original physics are unchanged.
 a modifier held across polls, a modifier pressed after the command key, and
 all 32 poll partitions of a mixed Ctrl/Shift chord. The complete portable
 sanitizer suite passes 38 tests, and the original source conservation audit
-passes. Fresh full-application interaction and remaining profile qualification
-are still required; these checks do not complete Phase 6.
+passes. The exact committed helper also compiles and passes its console
+regression with local Windows MSVC in Debug and Release.
+
+The fresh `6a67588b` Debug/SSE2 application now completes all four unchanged
+Virtual cockpit and Docked at ISS entry points with their original eight or six
+vessels. Every Ctrl+S chord is deliberately delivered in one real Wayland input
+batch. Both docking variants save the initial connection, the separated state
+and the automatic re-docking, then preserve the connection through F5 reload.
+All four applications and their graphics contexts close normally with clean
+unsuppressed sanitizer logs and unchanged guarded inputs.
+
+A separate full eight-vessel DG orbit run also passes both Ctrl+Space control
+dialogs, original Ctrl+P pause/resume and Ctrl+S save with all five modified
+chords delivered as complete batches. The remaining native build profiles and
+matching full Windows flight observations remain required for qualification.
+These checks do not complete Phase 6.

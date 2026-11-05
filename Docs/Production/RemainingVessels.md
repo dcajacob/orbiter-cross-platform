@@ -514,3 +514,18 @@ process PID, wall duration, timeout and reaped exit status are recorded.
 This harness change still requires a fresh complete Windows run and independent
 full38 auditing; it establishes no passing simulation or persistence result.
 The evidence release remains unpublished under the user's local-storage policy.
+
+The four retained complete native stock-writer captures at `d255d791` now pass
+an independent audit of all 38 unchanged scenes twice in Debug/Release and
+automatic/SSE2 profiles: 304 process records and 291,840 successful presentations.
+The audit re-reads actual source/package/generated inputs, mapped providers,
+sanitizer evidence, every state/resource/mesh/playback observation, complete
+saved content, cameras and repeated full frames with the original checks.
+It reuses the closed captures and launches no simulator processes. The earlier
+incomplete captures remain preserved separately.
+
+This completes the independent native stock-writer phase of that retained
+reference cohort. Matching complete Windows and exact-save reload comparisons,
+current-source qualification, controls, lifetime, full157, hardware/performance
+and Phase 6 acceptance remain required. Normal class admission is unchanged;
+all raw evidence remains local.
