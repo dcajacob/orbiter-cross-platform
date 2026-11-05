@@ -31,7 +31,26 @@ The captured-pair rotation error is approximately `4.2e-12` radians, within the
 existing `1e-8` budget. Linux sanitizer checks and the 622-file extraction audit
 pass.
 
-The repaired complete tutorial, normal four-object save and shutdown, and
-matching full Windows/native mission qualification remain pending. This repair
-does not change the last full-stock result or complete Phase 6. Raw evidence
-remains local; Windows execution uses the local VM.
+The repaired native Release/SSE2 application at `84706794` subsequently ran the
+unchanged four-object playback through the final tutorial note interval at
+simulation time `308760`, saved all four vessels, and exited normally after
+95,112 successful presents. All observed flight states remained finite. The
+665 guarded source, runtime and recording inputs were unchanged, and
+unsuppressed ASan, UBSan and leak checks reported no findings.
+
+The mission check remains failed: GL-01's save reports `Orbiting Moon`, with
+ground contact and about `0.65 m/s` of motion. An unedited reload followed by
+120 seconds of natural physics also retained that status, ending at about
+`0.57 m/s`. The shared original landing code distinguishes surface contact from
+the settled landed state and requires five seconds of sufficiently little
+movement. These observations establish playback and teardown progress; they do
+not establish that the final landing behavior matches Windows. The failure and
+both diagnostic attempts remain local, including an initial screenshot-capture
+timing failure that stopped before the continuation finished.
+
+The matching full Windows/native mission comparison and final landing/save
+qualification remain pending. The current Windows application builds and all
+28 standalone checks passed in both Release and Debug in the local VM, including
+`Production.RecordedAttitude`; those checks do not replace a full mission.
+This repair does not change the last full-stock result or complete Phase 6.
+Raw evidence remains local; Windows execution uses the local VM.

@@ -17,7 +17,20 @@ physics or scenario data changes.
 build, data and provider inputs. It checks both physical Control keys opening
 DG Controls while flight continues, closing the actual dialogs, bare-Space and
 original Ctrl+P pause/resume, a full eight-object save, and normal sanitizer and
-context teardown. Runtime qualification of the repair remains pending.
+context teardown. This scope passed in a fresh native Release/SSE2 package at
+`84706794`: both Control keys opened the actual DG Controls dialog while
+simulation time continued, and all eight original vessels were saved. The
+application exited normally after 376 successful presents with unsuppressed
+ASan, UBSan and leak checks. This single-profile result does not qualify the
+remaining named missions, other profiles or Phase 6 as a whole.
+
+The matching Windows source at `84706794` also passed the existing nine
+instrument fixtures and five window-routed mouse-control fixtures, each twice
+in Release and Debug: 56 actual application processes in the local Windows VM.
+All measured state differences from the frozen Windows references were zero;
+display text and HUD updates matched, and captured full-frame and MFD images
+had SSIM `1.0`. These reduced Windows fixtures establish the current baseline;
+they do not replace full native/Windows mission comparisons.
 
 A native Orbit MFD candidate now recovers displayed TrA/TrL values only when
 the original true-anomaly calculation is nonfinite because its normalized
