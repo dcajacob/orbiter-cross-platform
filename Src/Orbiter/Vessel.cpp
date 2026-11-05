@@ -2857,7 +2857,21 @@ bool Vessel::DelAttachment (AttachmentSpec *as)
 
 void Vessel::ClearAttachments ()
 {
-	if (attach) DetachFromParent();
+	// Before the first passive update an attached child has no proxy body, so
+	// normal release cannot compute its free-flight state. Definitions are
+	// still being destroyed: remove both links before either owner is freed.
+	const auto unlinkChild = [](Vessel *child) {
+		AttachmentSpec *point = child->attach;
+		if (!point) return;
+		if (point->mate_attach) {
+			point->mate_attach->mate = 0;
+			point->mate_attach->mate_attach = 0;
+		}
+		point->mate = 0;
+		point->mate_attach = 0;
+		child->attach = 0;
+	};
+	if (attach && !DetachFromParent()) unlinkChild(this);
 	if (npattach) {
 		for (oapi::UInt32 i = 0; i < npattach; i++)
 			delete pattach[i];
@@ -2867,7 +2881,7 @@ void Vessel::ClearAttachments ()
 	}
 	if (ncattach) {
 		for (oapi::UInt32 i = 0; i < ncattach; i++) {
-			if (cattach[i]->mate) DetachChild (cattach[i]);
+			if (cattach[i]->mate && !DetachChild (cattach[i])) unlinkChild(cattach[i]->mate);
 			delete cattach[i];
 		}
 		delete []cattach;

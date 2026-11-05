@@ -65,8 +65,17 @@ def with_sparse_mesh_slots(source):
     copy=copy.replace('if (meshrec) {','if (meshrec) {\n\t\tmesh = new Mesh; GetRigidBodyServices().TraceAllocation(__FILE__,__LINE__);').replace('} else mesh = 0;','}')
     return source[:start]+copy+source[end:]
 
+def restore_attachment_cleanup(source):
+    """Accept only reciprocal unlinking when normal release lacks initial proxy state."""
+    original='void Vessel::ClearAttachments ()\n{\n\tif (attach) DetachFromParent();\n\tif (npattach) {\n\t\tfor (oapi::UInt32 i = 0; i < npattach; i++)\n\t\t\tdelete pattach[i];\n\t\tdelete []pattach;\n\t\tpattach = NULL;\n\t\tnpattach = 0;\n\t}\n\tif (ncattach) {\n\t\tfor (oapi::UInt32 i = 0; i < ncattach; i++) {\n\t\t\tif (cattach[i]->mate) DetachChild (cattach[i]);\n\t\t\tdelete cattach[i];\n\t\t}\n\t\tdelete []cattach;\n\t\tcattach = NULL;\n\t\tncattach = 0;\n\t}\n}'
+    repaired='void Vessel::ClearAttachments ()\n{\n\t// Before the first passive update an attached child has no proxy body, so\n\t// normal release cannot compute its free-flight state. Definitions are\n\t// still being destroyed: remove both links before either owner is freed.\n\tconst auto unlinkChild = [](Vessel *child) {\n\t\tAttachmentSpec *point = child->attach;\n\t\tif (!point) return;\n\t\tif (point->mate_attach) {\n\t\t\tpoint->mate_attach->mate = 0;\n\t\t\tpoint->mate_attach->mate_attach = 0;\n\t\t}\n\t\tpoint->mate = 0;\n\t\tpoint->mate_attach = 0;\n\t\tchild->attach = 0;\n\t};\n\tif (attach && !DetachFromParent()) unlinkChild(this);\n\tif (npattach) {\n\t\tfor (oapi::UInt32 i = 0; i < npattach; i++)\n\t\t\tdelete pattach[i];\n\t\tdelete []pattach;\n\t\tpattach = NULL;\n\t\tnpattach = 0;\n\t}\n\tif (ncattach) {\n\t\tfor (oapi::UInt32 i = 0; i < ncattach; i++) {\n\t\t\tif (cattach[i]->mate && !DetachChild (cattach[i])) unlinkChild(cattach[i]->mate);\n\t\t\tdelete cattach[i];\n\t\t}\n\t\tdelete []cattach;\n\t\tcattach = NULL;\n\t\tncattach = 0;\n\t}\n}'
+    if source.count(repaired)!=1:
+        raise ValueError('Declared uninitialized attachment cleanup differs')
+    return source.replace(repaired,original,1)
+
 def restore_startup_cleanup(source):
     """Accept only the declared dock lifetime, class-name, token and temporary-array cleanup."""
+    source=restore_attachment_cleanup(source)
     source=restore_docking_cleanup(source)
     original='\tClearAttachments();'
     repaired=original+'\n\tdelete []attach_status.pname;\n\tattach_status.pname = nullptr;'
