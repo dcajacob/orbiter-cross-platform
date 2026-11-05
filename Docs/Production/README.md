@@ -111,8 +111,11 @@ The [native Lua Terminal candidate](../../Tests/Production/NativeLuaMfd/README.m
 now loads the original MFD through the configuration’s `ACTIVE_MODULES` block. Complete-scene development checks exercise real typed Lua, AAP
 acceleration, twenty busy-page deletions, an eight-vessel save and clean sanitizer
 teardown. Local Windows MSVC/startup comparisons retain the observed Terminal
-text difference. Fresh immutable all-profile runs and the guided tutorial remain
-open; the last full stock sweep above is unchanged. Windows validation runs in
+text difference. The complete original atmospheric-autopilot tutorial now reaches its conclusion
+in the development build, including real takeoff, altitude/speed changes, scramjet
+input, manual override/recovery, descent and saving. Fresh immutable all-profile
+runs and original-reference qualification remain open; the last full stock sweep
+above is unchanged. Windows validation runs in
 the local VM, and this candidate's raw evidence remains local.
 
 ## Phase 1 reproducibility

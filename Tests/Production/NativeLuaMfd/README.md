@@ -13,6 +13,10 @@ The unchanged Atmospheric autopilot scenario selects `Terminal MFD` on the
 left. While running, left Shift+I opens its input box; right Shift+I addresses
 the right MFD. The stock NEW, DEL and page commands are retained. Terminal
 commands run in the original interpreter and use the original DG/DG-S AAP.
+For keyboard takeoff in this scenario, Alt+numeric-keypad Divide connects the
+aerodynamic controls; the scenario starts with both aerodynamic and RCS input
+disconnected. Numeric-keypad 2 raises the nose, and G retracts the landing gear.
+The Terminal then accepts the stock `aap.alt(10e3)` altitude command.
 Other application plugins still fail explicitly unless implemented by the
 native host. Modules must match the engine's SDK and compiler ABI.
 
@@ -57,7 +61,26 @@ page that the first failed startup leaked. Windows startup observations also ret
 Terminal is blank below its title, whereas the canonical vessel-bound current
 plugin prints the AAP startup/help lines. Observed flight-state rows and the
 right Surface MFD are byte-identical. This is not an assertion of identical
-Terminal output. Raw evidence stays local. Fresh
-immutable all-profile runs, full native/original interaction and physics/image
-comparisons, complete session lifetimes and the guided tutorial remain required;
-this module does not by itself qualify Phase 6.
+Terminal output. Raw evidence stays local.
+
+The complete unchanged eight-vessel Atmospheric autopilot tutorial has also
+reached its conclusion in the manual Release/SSE2 sanitizer development build:
+real keyboard takeoff and gear retraction, 10/20 km altitude and 300/600/250 m/s
+speed commands, scramjet input, manual altitude override and recovery, low-speed
+descent, help command and a full eight-vessel save. The application completed
+11,694 presentations and closed without sanitizer findings. Its saved flight
+also reopened with all eight objects for an airborne preview. These observations
+do not establish original Windows numerical/image parity or all-profile
+acceptance. Fresh immutable all-profile runs, full native/original comparisons
+and complete session lifetimes remain required; this module does not by itself
+qualify Phase 6.
+
+Native Lua validity data now has one owner in the interpreter backend. Native
+GNU builds avoid unique inline-data bindings so their module images can actually
+unload; the original Windows declaration and object layout are retained.
+
+The repaired local development runtime passes real `dlopen`/`dlclose` checks for
+both Terminal and interpreter images, plus twenty complete eight-object
+startup/teardown sessions in one process, with forty real presentations and no
+sanitizer findings. These are lifecycle sessions, distinct from twenty complete
+tutorials. Full all-profile and original-reference qualification remains open.

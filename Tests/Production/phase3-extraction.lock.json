@@ -1307,8 +1307,8 @@
     },
     "Src/Orbiter/Production/NativeCockpit.cmake": {
       "original_sha256_lf": null,
-      "sha256_lf": "054b4eb6540384f014a68cb0a7996ab5342f0f45017eac1a97ae5a0c33258954",
-      "scope": "Original Lua Terminal MFD integrated through native SDK types and checked optional module bootstrap. Original drawing, commands, vessel/page repository, Lua registrations, Windows callbacks and update order conserved independently; native workers use cooperative join before Lua/vessel teardown. Terminal line buffers are reclaimed and command copies explicitly terminated. Full native/original runtime, lifecycle and mission qualification required."
+      "sha256_lf": "3ca947b15a6322d19e2f7930d5ce19044220e4c8a834d8248b12bd9b1925746e",
+      "scope": "Original Lua Terminal MFD integrated through native SDK types and checked optional module bootstrap. Original drawing, commands, vessel/page repository, Lua registrations, Windows callbacks and update order conserved independently; native workers use cooperative join before Lua/vessel teardown. Terminal line buffers are reclaimed and command copies explicitly terminated. Native Lua validity data has one backend owner; GNU native targets avoid unique inline-data bindings. Hidden implementation symbols and the explicit backend export boundary prevent reverse engine-to-backend relocation dependencies, including consumer-emitted CameraMode RTTI, while retaining the declared Interpreter/lua_tovector APIs and native bridges. Public SDK layouts, Windows declarations, numerical methods and callback order remain unchanged. Full native/original runtime, lifecycle and mission qualification required."
     },
     "Src/Orbiter/Production/NativeCockpitGui.cpp": {
       "original_sha256_lf": null,
@@ -1432,11 +1432,13 @@
     },
     "Src/Module/LuaScript/LuaInterpreter/Interpreter.cpp": {
       "original_sha256_lf": "5feef015089ca4cb3abc2d7197877352e64ade7ca3c98e5c066cd5a252fd74ee",
-      "sha256_lf": "bfd04ba44b719fc370600a79c6b132493f78d246633d6a9a49ae96fe4c2ac899"
+      "sha256_lf": "427c37b869404e946aee3d02336888a625aa38eca6591d62a5f64e8fd617a721",
+      "scope": "Native Lua validity registry has one backend-owned exported definition; Windows inline declaration and instance layout retained. Registration, validity checks, method bodies, math and callback order unchanged."
     },
     "Src/Module/LuaScript/LuaInterpreter/Interpreter.h": {
       "original_sha256_lf": "0fb3247edcc0c088756b20e4e77fca5086b122720e70251c32efbf83f8ab07b0",
-      "sha256_lf": "c1ef7eb877b5bce68a3843d113b2dacd151e173e3fd1b12b23aa92b6dfbf30d2"
+      "sha256_lf": "921779ecf48c4d3688503f00d66a2f73ec2142695e8c6bbb4282eb553aa0595b",
+      "scope": "Native Lua validity registry has one backend-owned exported definition; Windows inline declaration and instance layout retained. Registration, validity checks, method bodies, math and callback order unchanged."
     },
     "Src/Module/LuaScript/LuaInterpreter/lua_vessel_mtd.cpp": {
       "original_sha256_lf": "8649b937f2d189207143af45ff0d7d9f585095c2acfcbbdd8c92c308a8808e29",

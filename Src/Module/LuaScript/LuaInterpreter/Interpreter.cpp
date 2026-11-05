@@ -15,6 +15,10 @@
 #endif
 
 #ifndef _WIN32
+// The interpreter backend owns the validity registry. Consumers borrow this
+// single instance without creating inline GNU-unique data that pins a module.
+std::unordered_set<VESSEL *> Interpreter::knownVessels;
+
 // A native exit crosses to C++ only after the outer protected Lua call has
 // returned. Nested callbacks propagate cancellation through their caller's VM.
 struct NativeLuaCall {

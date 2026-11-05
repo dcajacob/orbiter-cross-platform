@@ -1179,7 +1179,11 @@ private:
 	int (*postfunc)(void*);
 	void *postcontext;
 
+#ifdef _WIN32
 	static inline std::unordered_set<VESSEL *>knownVessels; // for lua_isvessel
+#else
+	static std::unordered_set<VESSEL *> knownVessels;
+#endif
 
 
 	static int lua_tointeger_safe (lua_State *L, int idx, int prmno, const char *funcname);

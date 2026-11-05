@@ -273,3 +273,44 @@ target_link_options(native_lua_mfd PRIVATE -Wl,--no-undefined)
 set_target_properties(native_lua_mfd PROPERTIES PREFIX "" OUTPUT_NAME LuaMFD
     CXX_VISIBILITY_PRESET hidden VISIBILITY_INLINES_HIDDEN YES
     LIBRARY_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/NativeModules/Plugin")
+
+# Hide private math/STL helpers so they cannot preempt engine definitions and
+# create reverse relocation dependencies. Declared interpreter API methods
+# retain their explicit public visibility.
+set_target_properties(native_lua_interpreter_core native_lua_vessel_bindings
+    native_lua_inline_list native_lua_inline_worker native_lua_interpreter
+    native_lua_inline PROPERTIES CXX_VISIBILITY_PRESET hidden
+    VISIBILITY_INLINES_HIDDEN YES)
+
+# Keep native Lua DSOs unloadable after their workers and states are released.
+# The shared vessel registry has one exported owner in LuaInterpreter; private
+# inline constants must not acquire GNU-unique bindings that pin a consumer.
+if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+    foreach(_lua_target native_lua_interpreter_core native_lua_vessel_bindings
+            native_lua_inline_list native_lua_inline_worker native_lua_interpreter
+            native_lua_inline native_lua_mfd)
+        target_compile_options(${_lua_target} PRIVATE -fno-gnu-unique)
+    endforeach()
+endif()
+
+# The SDK's abstract CameraMode has no key function, so a consumer can emit
+# default-visible RTTI even with hidden private code. Export only this DLL's
+# declared interpreter API and C bridges; CameraMode and other SDK types belong
+# to the engine. This also prevents reverse relocation dependencies from it.
+set(_lua_export_map "${PROJECT_BINARY_DIR}/native-lua-interpreter.exports")
+file(GENERATE OUTPUT "${_lua_export_map}" CONTENT [=[
+{
+  global:
+    _ZN11Interpreter*;
+    _ZNK11Interpreter*;
+    _ZTV11Interpreter;
+    _ZTI11Interpreter;
+    _ZTS11Interpreter;
+    _Z12lua_tovector*;
+    orbiter_native_*;
+    _ZN7orbiter6script*;
+  local: *;
+};
+]=])
+target_link_options(native_lua_interpreter PRIVATE "-Wl,--version-script=${_lua_export_map}")
+set_property(TARGET native_lua_interpreter APPEND PROPERTY LINK_DEPENDS "${_lua_export_map}")
