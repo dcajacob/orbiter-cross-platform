@@ -89,7 +89,7 @@ def inspect_matrix(manifest,archive_root,decoded,producer):
     return result
 
 
-def parent_guards(decoded,report,parent):
+def parent_guards(decoded,report,parent,windows_roots=None):
     """Resolve only exact retained parent/build suffixes of Windows execution paths."""
     prefix='remaining-stock-repaired/'
     expected={prefix+'capture.json':sha(decoded/prefix/'capture.json'),
@@ -103,6 +103,26 @@ def parent_guards(decoded,report,parent):
             saved=directory+'Scenarios/(Current state).scn'
             expected[saved]=sha(decoded/saved)
     actual={};roots=set()
+    if windows_roots is not None:
+        require(set(windows_roots)=={'remaining-stock-repaired','remaining-stock-repaired-build'},
+                'Complete explicit local Windows parent/build root bindings required')
+        bindings={name:PureWindowsPath(path) for name,path in windows_roots.items()}
+        require(all(path.is_absolute() and re.fullmatch('[A-Za-z]:',path.drive) and '..' not in path.parts
+                    for path in bindings.values()) and
+                all(not a.is_relative_to(b) for a in bindings.values() for b in bindings.values() if a!=b) and
+                len(set(bindings.values()))==2,'Distinct local Windows capture/build roots required')
+        for name,value in report['guarded_parent_files_sha256'].items():
+            path=PureWindowsPath(name)
+            require(path.is_absolute() and '..' not in path.parts,'Unsafe original Windows guarded path')
+            matched=[(anchor,path.relative_to(root)) for anchor,root in bindings.items() if path.is_relative_to(root)]
+            require(len(matched)==1,'Local Windows parent guard has missing or ambiguous exact root')
+            anchor,suffix=matched[0];relative=anchor+'/'+str(safe(suffix.as_posix()));roots.add(anchor)
+            require(relative in expected and relative not in actual and value==expected[relative],
+                    'Windows parent guard omitted, substituted or changed actual evidence')
+            actual[relative]=value
+        require(actual==expected and roots==set(bindings),'Complete explicit local Windows parent/build guard closure required')
+        require(all(sha(decoded/name)==value for name,value in expected.items()),'Actual retained Windows parent bytes changed')
+        return expected
     for name,value in report['guarded_parent_files_sha256'].items():
         path=PureWindowsPath(name)
         require(path.is_absolute() and '..' not in path.parts,'Unsafe original Windows guarded path')

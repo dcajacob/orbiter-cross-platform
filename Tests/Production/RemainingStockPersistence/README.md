@@ -292,3 +292,49 @@ pass the original budgets and complete saved-token equality. The record is
 `out/phase6-source-v4-exact-windows-native-reload-comparison-v1.json`. This is
 PoweredUp/Spin twice in four profiles; it does not substitute for all38 or the
 remaining native stock-writer comparisons.
+
+## Local Windows VM captures
+
+Windows builds and captures can run in the local VM. `LocalVM/` retains the exact
+Python harness sources used for the native Windows SDK builds' full38 runtime
+campaign. The recorded request binds the worker and private-desktop bootstrap to
+their source hashes. The guest-agent result, normal-user launch, session, private
+desktop and completed process receipts are retained with the raw captures. Static
+DLL/EXE staging uses identical NTFS hardlinks; its real copy/link byte-equivalence
+control and unchanged input hashes are retained. The original capture helpers,
+all 38 scenes, both repetitions, 960-step clock policy, and existing runtime,
+numerical, camera, image and lifetime checks still run.
+
+After all four complete stock/reload profiles finish, retain their guest-agent
+terminal results and collect their already-closed exports locally:
+
+```sh
+python -B Tests/Production/RemainingStockPersistence/collect_local.py \
+  --vm-output out/phase6-local-windows-vm \
+  --runner-commit "$(git rev-parse HEAD)" \
+  --output out/local-windows-full38
+```
+
+The runner commit must contain the exact executed `LocalVM/*.py` blobs. Default
+job names are `full38-local-PROFILE-v1`; `--profile-entry PROFILE=JOB_NAME` accepts
+all four explicit names when needed. Collection requires all four completed
+152-process profiles before creating its output. It copies each closed raw
+export and preserved build closure, retains the original launch receipts and
+runner files, and checks every ZIP member. All files remain local.
+
+Use `--local-vm-manifest out/local-windows-full38/manifest.json` in `audit.py`,
+with `--archive-root out/local-windows-full38` and each `--windows` path beneath
+`out/local-windows-full38/decoded/PROFILE`. This is an explicit alternative to
+`--download-manifest`. The existing GitHub API identity checks remain the
+artifact route's requirement. The local route checks the actual VM receipt chain,
+immutable runner source, whole process roster, build and exact retained bytes.
+Explicit Windows build/capture roots resolve the original absolute parent guards
+without rewriting captured reports. The complete original Windows/native
+persistence comparisons and original budgets apply to both routes.
+
+`LocalTransport.Test.py --vm-output out/phase6-local-windows-vm --output PATH`
+checks a real retained eight-process docked diagnostic receipt chain, its actual
+ZIP bytes, and damaged/partial provenance controls. Its parent-path fixtures
+execute no simulator. The complete four-profile full38 positive path still needs
+all actual finished captures and the full independent audit; these reader
+controls create no native admission or Phase 6 completion.

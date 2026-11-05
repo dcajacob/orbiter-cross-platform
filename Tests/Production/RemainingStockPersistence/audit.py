@@ -7,6 +7,7 @@ from pathlib import Path
 import subprocess
 from observations import bind_owner,inspect_native,require,sha,git,check_files
 import transport
+import local_transport
 
 HERE=Path(__file__).resolve().parent
 ROOT=HERE.parents[2]
@@ -47,7 +48,7 @@ def check_windows_reload_observation(folder,recorded,actual):
             'Actual complete Windows reload observation differs')
 
 
-def inspect_windows(decoded,profile,reader,original,mesa,mesa_imports):
+def inspect_windows(decoded,profile,reader,original,mesa,mesa_imports,windows_roots=None):
     capture=reader.windows;audit=reader.original_audit;config=capture.settings(reader.protocols.V2)
     parent_root=decoded/'remaining-stock-repaired';reload_root=decoded/'remaining-stock-persistence';build_root=decoded/'remaining-stock-repaired-build'
     parent=json.loads((parent_root/'capture.json').read_text());producer=parent['producer_commit']
@@ -68,7 +69,7 @@ def inspect_windows(decoded,profile,reader,original,mesa,mesa_imports):
             report['actual_original_data']==parent['actual_original_simulation_data'] and report['owning_sources_runtime_parent_saved_inputs_and_data_unchanged'] and
             report['native_admission_qualified'] is False and report['phase6_complete'] is False,'Complete matching Windows reload matrix required')
     observe_files(report,reader.ROOT)
-    parent_files=transport.parent_guards(decoded,report,parent)
+    parent_files=transport.parent_guards(decoded,report,parent,windows_roots)
     result={};system={};observed_files={}
     for case in config['cases']:
         recorded=report['cases'][case['id']];require(len(recorded['runs'])==2,'Two actual Windows reload repetitions required')
@@ -149,8 +150,11 @@ def compare_pair(win,native,reader,config):
 
 def main():
     p=argparse.ArgumentParser(description=__doc__)
-    for name in ('native-owner','preserved-debug','preserved-release','mesa-runtime','download-manifest','archive-root','output'):
+    for name in ('native-owner','preserved-debug','preserved-release','mesa-runtime','archive-root','output'):
         p.add_argument('--'+name,type=lambda v:Path(v).resolve(),required=True)
+    origin=p.add_mutually_exclusive_group(required=True)
+    origin.add_argument('--download-manifest',type=lambda v:Path(v).resolve(),help='Retained successful GitHub artifact transport')
+    origin.add_argument('--local-vm-manifest',type=lambda v:Path(v).resolve(),help='Retained complete local Windows VM execution/ZIP transport')
     for name in ('native-stock','native-reload','windows'):
         p.add_argument('--'+name,action='append',required=True,help='All four unique PROFILE=PATH entries required')
     a=p.parse_args();require(not a.output.exists(),'Fresh persistence audit output required')
@@ -158,7 +162,7 @@ def main():
     first=json.loads((stock['Debug-automatic']/'capture.json').read_text())
     reader=bind_owner(a.native_owner,first['producer_commit']);config=reader.native.settings(reader.protocols.V2)
     def verifier_inputs():
-        paths={Path(__file__).resolve(),HERE/'observations.py',HERE/'transport.py'}
+        paths={Path(__file__).resolve(),HERE/'observations.py',HERE/'transport.py',HERE/'local_transport.py'}
         return dict(owning_readers=reader.original_audit.verifier_inputs(),
                     persistence_readers={str(p):sha(p) for p in sorted(paths)})
     readers=verifier_inputs()
@@ -166,9 +170,11 @@ def main():
         native_admission_qualified=False,phase6_complete=False,
         scope='Complete all38/two-repeat/four-profile stock-writer and exact-Windows-save reload comparisons. This does not by itself admit classes or complete controls, in-process lifetime, hardware/performance, full157 or Phase6 acceptance.')
     try:
-        download_sha=sha(a.download_manifest);downloads=json.loads(a.download_manifest.read_text())
-        report['windows_transport']=transport.inspect_matrix(downloads,a.archive_root,windows,downloads['source_commit'])
-        report['download_manifest_sha256']=download_sha
+        manifest_path=a.local_vm_manifest or a.download_manifest
+        download_sha=sha(manifest_path);downloads=json.loads(manifest_path.read_text())
+        origin=local_transport if a.local_vm_manifest else transport
+        report['windows_transport']=origin.inspect_matrix(downloads,a.archive_root,windows,downloads['source_commit'])
+        report['local_vm_manifest_sha256' if a.local_vm_manifest else 'download_manifest_sha256']=download_sha
         for profile in sorted(PROFILES):
             native_stock=inspect_native(stock[profile],a.native_owner,reader,profile,'stock-writer')
             native_reload=inspect_native(reload[profile],a.native_owner,reader,profile,'windows-save-reload')
@@ -176,7 +182,8 @@ def main():
             require(producer==downloads['source_commit'],'Actual Windows producer differs from retained artifact transport')
             mesa,mesa_imports=reader.original_audit.independent_mesa(a.mesa_runtime,producer)
             original=a.preserved_debug if profile.startswith('Debug-') else a.preserved_release
-            observed=inspect_windows(windows[profile],profile,reader,original,mesa,mesa_imports)
+            observed=inspect_windows(windows[profile],profile,reader,original,mesa,mesa_imports,
+                report['windows_transport'][profile].get('windows_roots'))
             comparisons={}
             for case in config['cases']:
                 cases=[]
@@ -218,7 +225,7 @@ def main():
             report['build_pairs'][math_profile]=pairs
         report.update(status='passed-complete-persistence-comparison-candidate',actual_native_processes=608,actual_windows_processes=608,
             actual_native_presentations=608*960,actual_windows_presentations=608*960)
-        require(readers==verifier_inputs() and sha(a.download_manifest)==download_sha,'Independent readers or transport manifest changed during full audit')
+        require(readers==verifier_inputs() and sha(manifest_path)==download_sha,'Independent readers or transport manifest changed during full audit')
         for profile,binding in report['windows_transport'].items():
             require(sha(Path(binding['archive']))==binding['archive_sha256'],'Retained Windows ZIP changed during full comparison')
             check_files(windows[profile],binding['decoded_members_sha256'])

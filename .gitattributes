@@ -18,3 +18,6 @@ Tests/Production/Archives/** text eol=lf
 Tests/Production/SpiceModules/** text eol=lf
 GravityModels/egm96_to360.tab -text
 GravityModels/jgl165p1.sha -text
+
+# Local VM receipts bind these executed Python scripts to exact Git blob bytes.
+Tests/Production/RemainingStockPersistence/LocalVM/*.py text eol=lf
