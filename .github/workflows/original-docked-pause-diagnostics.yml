@@ -1,0 +1,75 @@
+name: Original Windows Paused Docked Save Diagnostics
+on:
+  push:
+    branches: ['codex/production-bootstrap']
+    paths:
+      - 'Tests/Production/DockedPause/**'
+      - '.github/workflows/original-docked-pause-diagnostics.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: original-docked-pause-diagnostics-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  original:
+    name: Original paused docked scene ${{ matrix.configuration }} ${{ matrix.math_profile }}
+    runs-on: windows-2022
+    timeout-minutes: 45
+    strategy:
+      fail-fast: false
+      matrix:
+        configuration: [Debug, Release]
+        math_profile: [automatic, sse2]
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - uses: ilammy/msvc-dev-cmd@v1
+        with:
+          vsversion: '17.0'
+          arch: x64
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.14'
+      - name: Verify exact already accepted original application, SDK and captured renderer
+        run: >-
+          python -B Tests/Production/NamedSceneDiagnostics/prepare_runtime.py
+          --cache out/original-cache --output out/original-app
+          --configuration ${{ matrix.configuration }}
+      - name: Build separate original public-SDK pause/save diagnostic
+        shell: pwsh
+        run: |
+          cmake -S Tests/Production/DockedPause -B out/named-driver -G Ninja -DCMAKE_BUILD_TYPE=${{ matrix.configuration }} "-DORBITER_TEST_RUNTIME=$pwd/out/original-app"
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          cmake --build out/named-driver --parallel 2
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - uses: actions/cache@v6
+        with:
+          path: out/data-cache/Orbiter-x64.zip
+          key: production-data-${{ hashFiles('Tests/Production/stock-data.lock.json') }}
+      - uses: actions/cache@v6
+        with:
+          path: out/planet-cache/Orbiter2016.zip
+          key: production-standard-planets-${{ hashFiles('Tests/Production/standard-planets.lock.json') }}
+      - uses: actions/cache@v6
+        with:
+          path: out/mesa-cache/*.pkg.tar.zst
+          key: mesa-ucrt64-${{ hashFiles('Tests/Production/mesa-ucrt64.lock.json') }}
+      - name: Stage exact original data and original software provider
+        shell: pwsh
+        run: |
+          python -B Tests/Production/prepare_data.py --archive out/data-cache/Orbiter-x64.zip --destination out/production-data
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          python -B Tests/Production/prepare_data.py --lock Tests/Production/standard-planets.lock.json --archive out/planet-cache/Orbiter2016.zip --destination out/standard-planets
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          python -B Tests/Production/stage_mesa.py stage --cache out/mesa-cache --destination out/mesa-runtime
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - name: Measure both original paused docked round trips twice without changing frozen references
+        run: >-
+          python -B Tests/Production/DockedPause/original.py
+          --orbiter out/original-app/Orbiter.exe --data out/production-data
+          --planets out/standard-planets --mesa out/mesa-runtime
+          --configuration ${{ matrix.configuration }} --math-profile ${{ matrix.math_profile }}
+          --output out/docked-pause-original
+      # Deliberately no release, artifact, runtime, SDK or provider upload step.

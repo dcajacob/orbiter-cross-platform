@@ -1,0 +1,12 @@
+{
+  "schema": 1,
+  "protocol": "original-stock-docked-paused-roundtrip-diagnostic-v1",
+  "application_source": "f725194209634f7fd5d1d44d426cfa9b5e303e37",
+  "fixed_step": 0.016666666666666666,
+  "paused_frames": 8,
+  "repetitions": 2,
+  "cases": [
+    {"id": "docked_ISS", "scenario": "Scenarios/Delta-glider/Docked at ISS.scn", "sha256_lf": "f62ea64c6dc1f84f1d45671e730ba8623b58727274442ebdb7fff42dd318d3ac", "cockpit": 3, "pause_tick": 293},
+    {"id": "docked_ISS_demo", "scenario": "Scenarios/Demo/Docked at ISS.scn", "sha256_lf": "78ae1272db4353abb13d0d5e7fe962d98e66e2696d1ab5b6cd736a02452ded4f", "cockpit": 2, "pause_tick": 272}
+  ]
+}
