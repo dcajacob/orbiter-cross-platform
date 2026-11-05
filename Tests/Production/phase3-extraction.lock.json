@@ -459,8 +459,8 @@
     },
     "Src/Orbiter/MfdOrbit.cpp": {
       "original_sha256_lf": "26bdab789772b7da3fdd0f6f379a51a21bd2e9cfe14d1fa0f92f9b931ebd2a5b",
-      "sha256_lf": "d9f17a9a38e0f18b073bc51224249fcdbfdc45ebd35c1b84ae9fcb16a144054f",
-      "scope": "Original scheduler, stock MFDs and modern map compile natively with explicit original epoch/time, authoritative world/UI bindings and indexed map resources. Exact Windows calculations and callback order conserved. Native GDI/legacy map/custom-mode entry points fail explicitly until supported; native cockpit owner and DG runtime remain unfinished."
+      "sha256_lf": "f4d2a24b65f77904a27d50895d8038460a6dd7386ad721d0a99a6885db42a0fa",
+      "scope": "Original scheduler, stock MFDs and modern map compile natively with explicit original epoch/time, authoritative world/UI bindings and indexed map resources. Exact Windows calculations and callback order conserved. Native GDI/legacy map/custom-mode entry points fail explicitly until supported; native cockpit owner and DG runtime remain unfinished. Native displayed true anomaly/longitude alone can recover a nonfinite value caused by at most two-epsilon acos argument roundoff from the existing cached eccentric anomaly. Original finite output and every Windows drawing call remain unchanged; no physics/Elements calculation changes."
     },
     "Src/Orbiter/MfdOrbit.h": {
       "original_sha256_lf": "c2ee5449c7d6684cd9dd40d2518e02dbbb41f44c656390e9814cb39c79d1efa5",
@@ -582,7 +582,7 @@
     },
     "Src/Orbiter/Production/CMakeLists.txt": {
       "original_sha256_lf": null,
-      "sha256_lf": "7d902dc7a9b280fb3d4c5fb239c2f4a32df484ffea03a7f45a8c4db7ef7dffe1",
+      "sha256_lf": "b4c23f12906c759019c4bdf15cac07f58e487164eeebc83d8c43086e0cae4571",
       "scope": "Complete original Dragonfly source and resources with independently audited native SDK/drawing/resource ownership bindings. Actual compatibility target uses distinct color-renderbuffer storage. Native diagnostic build/runtime and Windows/native qualification required; original formulas and public Windows SDK layouts unchanged."
     },
     "Src/Orbiter/Production/CameraServices.cpp": {
@@ -2653,6 +2653,11 @@
       "original_sha256_lf": null,
       "sha256_lf": "cc1850d651960ed9e1756edc131bf5f776b2555f9711f6efc46318174f2f9522",
       "scope": "Exact original internal-view default HUD keyboard handler, reached after the vessel module and navigation handlers."
+    },
+    "Src/Orbiter/Production/OrbitAnomalyDisplay.h": {
+      "original_sha256_lf": null,
+      "sha256_lf": "488b1e8b9aa382e415843b853ccb5a69d223137b649e86c3675551944b027a20",
+      "scope": "Native Orbit MFD display-only recovery of nonfinite true anomaly/longitude caused by normalized acos argument roundoff of at most two machine epsilons. Uses existing cached eccentric anomaly without changing original Elements calculations, object state, propagation, finite display values or Windows calls. Runtime qualification remains separate."
     }
   }
 }

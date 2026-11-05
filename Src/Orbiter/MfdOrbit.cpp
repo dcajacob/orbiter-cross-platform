@@ -4,6 +4,7 @@
 #include "Production/CockpitServices.h"
 #ifndef _WIN32
 #include "Production/CockpitNativeSupport.h"
+#include "Production/OrbitAnomalyDisplay.h"
 #include "Planet.h"
 #endif
 
@@ -435,9 +436,17 @@ void Instrument_Orbit::DisplayElements (oapi::Sketchpad *skp, const Elements *el
 			skp->Text (x, y, cbuf, strlen(cbuf)); y += dy;
 			sprintf (cbuf, "AgP% 7.2fº", Deg(el->ArgPer()));
 			skp->Text (x, y, cbuf, strlen(cbuf)); y += dy;
+#ifndef _WIN32
+			sprintf (cbuf, "TrA% 7.2fº", Deg(orbiter::production::OrbitDisplayTrueAnomaly(*el)));
+#else
 			sprintf (cbuf, "TrA% 7.2fº", Deg(el->TrueAnm()));
+#endif
 			skp->Text (x, y, cbuf, strlen(cbuf)); y += dy;
+#ifndef _WIN32
+			sprintf (cbuf, "TrL% 7.2fº", Deg(orbiter::production::OrbitDisplayTrueLongitude(*el)));
+#else
 			sprintf (cbuf, "TrL% 7.2fº", Deg(el->TrueLng()));
+#endif
 			skp->Text (x, y, cbuf, strlen(cbuf)); y += dy;
 			sprintf (cbuf, "MnA% 7.2fº", Deg(posangle(el->MeanAnm())));
 			skp->Text (x, y, cbuf, strlen(cbuf)); y += dy;
@@ -487,9 +496,17 @@ void Instrument_Orbit::DisplayElements (oapi::Sketchpad *skp, const Elements *el
 			skp->Text (x, y, cbuf, strlen(cbuf)); y += dy;
 			sprintf (cbuf, "AgP% 7.2fº", Deg(el->ArgPer()));
 			skp->Text (x, y, cbuf, strlen(cbuf)); y += dy;
+#ifndef _WIN32
+			sprintf (cbuf, "TrA% 7.2fº", Deg(orbiter::production::OrbitDisplayTrueAnomaly(*el)));
+#else
 			sprintf (cbuf, "TrA% 7.2fº", Deg(el->TrueAnm()));
+#endif
 			skp->Text (x, y, cbuf, strlen(cbuf)); y += dy;
+#ifndef _WIN32
+			sprintf (cbuf, "TrL% 7.2fº", Deg(orbiter::production::OrbitDisplayTrueLongitude(*el)));
+#else
 			sprintf (cbuf, "TrL% 7.2fº", Deg(el->TrueLng()));
+#endif
 			skp->Text (x, y, cbuf, strlen(cbuf)); y += dy;
 			sprintf (cbuf, "MnA%sº", FloatStr (DEG*el->MeanAnm(),4));
 			skp->Text (x, y, cbuf, strlen(cbuf)); y += dy;

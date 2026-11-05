@@ -1,5 +1,19 @@
 # Phase 6 cockpit and instrument integration
 
+A native Orbit MFD candidate now recovers displayed TrA/TrL values only when
+the original true-anomaly calculation is nonfinite because its normalized
+`acos` argument rounded outside the domain by at most two machine epsilons.
+The display reads the existing cached eccentric anomaly; the original Elements
+object, physics, finite values and Windows drawing calls remain unchanged.
+The complete original Windows DG-orbit diagnostic emits finite landed-PB
+anomaly values in both repetitions across all four profiles
+([original run](https://github.com/dcajacob/orbiter-cross-platform/actions/runs/41936239415)).
+The prior native candidate emits 208 nonfinite TrA/TrL draws in that scope.
+This recovery is a new candidate and requires fresh runtime qualification.
+`Tests/Production/Cockpit/OrbitDisplay.Test.cpp` links the real production
+boundary and checks the recorded failing vector, unchanged finite result bits,
+unchanged physical object bytes, and three initialized invalid-input controls.
+
 Phase 6 is in progress. The accepted Phase 5 laptop preview runs the production
 ShuttlePB/ISS external view. In the separate Phase 6 candidate, both stock
 Delta-gliders fly with the original Lua autopilot in the 2D panel and virtual

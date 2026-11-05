@@ -313,6 +313,19 @@ namespace oapi {using CockpitClient=GraphicsClient;}
     for name in FILES:
         path='Src/Orbiter/'+name
         import re
+        if name=='MfdOrbit.cpp':
+            native=raw(path)
+            if native.count('#include "Production/OrbitAnomalyDisplay.h"')!=1:
+                raise ValueError('Native Orbit display recovery include changed')
+            for legacy,function in [('el->TrueAnm()','OrbitDisplayTrueAnomaly'),('el->TrueLng()','OrbitDisplayTrueLongitude')]:
+                pattern=re.compile(r'^#ifndef _WIN32\n([^\n]*sprintf[^\n]*'+function+r'\(\*el\)[^\n]*)\n#else\n([^\n]*sprintf[^\n]*)\n#endif$',re.M)
+                matches=list(pattern.finditer(native))
+                if len(matches)!=2:raise ValueError('Native Orbit display recovery call count differs')
+                for match in matches:
+                    if match[1].replace('orbiter::production::'+function+'(*el)',legacy)!=match[2]:
+                        raise ValueError('Native Orbit display recovery changed another formatting operation')
+            if raw('Src/Orbiter/Production/CMakeLists.txt').count('OrbitAnomalyDisplay.h')!=1:
+                raise ValueError('Native SDK fingerprint omits Orbit display recovery')
         view=windows(raw(path))
         if name.endswith('.cpp') and re.search(r'orbiter::production::Cockpit\w+\s*\(',view):
             if '#include "Production/CockpitServices.h"' not in view:
