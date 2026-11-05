@@ -146,3 +146,23 @@ add_test(NAME Production.MeshBoundary COMMAND production_boundary_test meshes "$
 add_test(NAME Production.BodyBoundary COMMAND production_boundary_test bodies "${CMAKE_CURRENT_BINARY_DIR}")
 set_tests_properties(Production.SessionBoundary Production.ResourceBoundary Production.MeshBoundary Production.BodyBoundary
     PROPERTIES TIMEOUT 30)
+
+# Compile the actual recorder Euler conversion with the unchanged production
+# quaternion methods; the codec regression needs no initialized world/window.
+set(_recorder_source "${CMAKE_CURRENT_SOURCE_DIR}/../../../Src/Orbiter/VesselRecorder.cpp")
+set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS "${_recorder_source}")
+file(READ "${_recorder_source}" _recorder_body)
+string(FIND "${_recorder_body}" "void Euler2Quaternion (double *a, Quaternion &q, int frm)\n{" _euler_start REVERSE)
+if(_euler_start LESS 0)
+    message(FATAL_ERROR "Production recorder Euler conversion is missing")
+endif()
+string(SUBSTRING "${_recorder_body}" ${_euler_start} -1 _euler_body)
+file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/RecordedEulerFixture.cpp" "#include \"Vecmat.h\"\n${_euler_body}")
+add_executable(production_recorded_attitude_test ../PlaybackAttitude.Test.cpp
+    "${CMAKE_CURRENT_BINARY_DIR}/RecordedEulerFixture.cpp"
+    ../../../Src/Orbiter/Vecmat.cpp ../../../Src/Orbiter/Production/Random.cpp)
+target_compile_features(production_recorded_attitude_test PRIVATE cxx_std_17)
+target_include_directories(production_recorded_attitude_test PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/../../../Src/Orbiter")
+add_test(NAME Production.RecordedAttitude COMMAND production_recorded_attitude_test
+    "${CMAKE_CURRENT_SOURCE_DIR}/../../../Flights/DG to the moon/GL-01.att")
+set_tests_properties(Production.RecordedAttitude PROPERTIES TIMEOUT 30)

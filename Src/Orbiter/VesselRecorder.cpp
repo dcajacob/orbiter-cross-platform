@@ -14,6 +14,7 @@
 #include "Production/SurfaceServices.h"
 #include "Production/Text.h"
 #include "Production/VesselRecorderState.h"
+#include "Production/RecordedAttitude.h"
 #include <fstream>
 #include <iomanip>
 #include <cstring>
@@ -538,11 +539,11 @@ void Vessel::FRecorder_Play ()
 			// Orientation at intermediate time point by interpolating endpoint quaternions
 			if (frec_att[cfrec_att].frm == 0) {
 				Quaternion Q;
-				Q.interp (frec_att[cfrec_att].q, frec_att[cfrec_att+1].q, w1);
+				InterpolateRecordedAttitude (Q, frec_att[cfrec_att].q, frec_att[cfrec_att+1].q, w1);
 				sv->SetRot (Q);
 			} else {
 				Quaternion Q;
-				Q.interp (frec_att[cfrec_att].q, frec_att[cfrec_att+1].q, w1);
+				InterpolateRecordedAttitude (Q, frec_att[cfrec_att].q, frec_att[cfrec_att+1].q, w1);
 				sv->R.Set (Q);
 				double lng, lat, rad, slng, clng, slat, clat;
 				Vector loc = tmul (frec_att[cfrec_att].ref->s1->R, sv->pos - frec_att[cfrec_att].ref->s1->pos);

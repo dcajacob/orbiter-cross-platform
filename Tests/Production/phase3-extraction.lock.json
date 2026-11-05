@@ -1219,7 +1219,8 @@
     },
     "Src/Orbiter/VesselRecorder.cpp": {
       "original_sha256_lf": null,
-      "sha256_lf": "1e6f9c87ac5be21ca6520075e2aac183f2f653151360126c4ce61f64482bb874"
+      "sha256_lf": "54c5e4ba7f0024f219379a5b4c8e3b3fe9205353d466a7f4111f05501ed19c78",
+      "scope": "Original recording data, Euler conversion, quaternion primitives, physical propagators and callback order retained. Both original recording-frame interpolation sites use a private codec guard: only an out-of-domain finite endpoint dot from finite Euler-derived rotations is retried with unit endpoints. All in-domain interpolation calls remain the original method. Nonfinite or zero-length inputs retain failure behavior. Frozen original Windows x64 and native code both reproduce the actual Moon-tutorial NaN before this repair; references and tolerances are not refreshed."
     },
     "Src/Orbiter/VesselSdk.cpp": {
       "sha256_lf": "d3eee60623a7d7fe0c090042dcf18ec3e8175f8ede99e41d5edd16c104669afb",
@@ -2698,6 +2699,11 @@
       "original_sha256_lf": null,
       "sha256_lf": "54c708b44050d4266951efc4dd77f586ecfdcd3e954353a977ff4c5788c06a7f",
       "scope": "Original Lua Terminal MFD native SDK/bootstrap and cooperative worker ownership; explicitly admit LuaMFD only, conserve original vessel-first left/right Shift MFD dispatch, and destroy terminal Lua states before their vessels. Original drawing/commands/repository/Windows callbacks independently conserved; terminal buffers reclaimed and command termination bounded. Full runtime and original Windows qualification remain required."
+    },
+    "Src/Orbiter/Production/RecordedAttitude.h": {
+      "original_sha256_lf": null,
+      "sha256_lf": "45e5a5ee81924eadaeb0bbfbcc530b9cbd1389252d3172a58050d05a72ad6085",
+      "scope": "Original recording data, Euler conversion, quaternion primitives, physical propagators and callback order retained. Both original recording-frame interpolation sites use a private codec guard: only an out-of-domain finite endpoint dot from finite Euler-derived rotations is retried with unit endpoints. All in-domain interpolation calls remain the original method. Nonfinite or zero-length inputs retain failure behavior. Frozen original Windows x64 and native code both reproduce the actual Moon-tutorial NaN before this repair; references and tolerances are not refreshed."
     }
   }
 }

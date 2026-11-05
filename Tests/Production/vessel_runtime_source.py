@@ -288,6 +288,10 @@ def verify_recorder(result):
     original=s[a:b];actual=raw('Src/Orbiter/VesselRecorder.cpp');actual=actual[actual.index('const double max_step'):]
     helper_body=s[s.index('void Euler2Quaternion (double *a, Quaternion &q, int frm)\n{'):]
     original+='\n'+helper_body
+    replay_binding='InterpolateRecordedAttitude (Q, frec_att[cfrec_att].q, frec_att[cfrec_att+1].q, w1);'
+    legacy_interpolation='Q.interp (frec_att[cfrec_att].q, frec_att[cfrec_att+1].q, w1);'
+    assert actual.count(replay_binding)==2 and legacy_interpolation not in actual
+    actual=actual.replace(replay_binding,legacy_interpolation)
     actual=actual.replace('if (!append) {FRecorder_Clear(); FRecorder_Reset();}', 'if (!append) FRecorder_Reset();')
     actual=aliases(actual).replace('double Tofs =','static double Tofs =',1).replace('double MJDofs =','static double MJDofs =',1)
     for before,after in [('GetSurfaceServices().Configuration().','g_pOrbiter->Cfg()->'),('GetRigidBodyServices().Time().','td.'),

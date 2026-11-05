@@ -118,6 +118,11 @@ runs and original-reference qualification remain open; the last full stock sweep
 above is unchanged. Windows validation runs in
 the local VM, and this candidate's raw evidence remains local.
 
+The complete Moon tutorial exposed a recorded-attitude NaN during lunar
+approach. A focused [recording interpolation repair](RecordedPlayback.md)
+passes Linux and local Windows scalar controls while preserving finite legacy
+results bit for bit. The repaired full mission remains pending.
+
 ## Phase 1 reproducibility
 
 ```sh
