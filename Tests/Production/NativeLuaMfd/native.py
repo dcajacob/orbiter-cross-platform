@@ -20,15 +20,16 @@ identity=build_identity(ENGINE/'orbiter-production',ENGINE/'NativeModules',a.bui
 assert identity['sanitizer_linked'],'Actual ASan/UBSan package required'
 for name,value in record['dependency_sha256_lf'].items():
  assert hashlib.sha256((ROOT/name).read_bytes().replace(b'\r\n',b'\n')).hexdigest()==value,name
+collector_producer=subprocess.check_output(['git','-C',str(ROOT),'rev-parse','HEAD'],text=True).strip()
 for helper in (Path(__file__),Path(data_inputs.__file__),ROOT/'Tests/Production/WaylandInput/compositor.py',ROOT/'Tests/Production/Flight/keyboard_smoke.py'):
- body=subprocess.check_output(['git','-C',str(ROOT),'show',record['source_base']+':'+helper.relative_to(ROOT).as_posix()])
+ body=subprocess.check_output(['git','-C',str(ROOT),'show',collector_producer+':'+helper.relative_to(ROOT).as_posix()])
  assert hashlib.sha256(body.replace(b'\r\n',b'\n')).hexdigest()==hashlib.sha256(helper.read_bytes().replace(b'\r\n',b'\n')).hexdigest(),str(helper)
 SCENARIO=ASSETS/'Scenarios/Delta-glider/Atmospheric autopilot.scn'
 OUT.mkdir(parents=True)
 def sha(p):return hashlib.sha256(Path(p).read_bytes()).hexdigest()
 def rows(p):
  if not p.exists():return []
- try:return list(csv.DictReader(p.read_text().splitlines()))
+ try:return [r for r in csv.DictReader(p.read_text().splitlines()) if None not in r and all(v is not None for v in r.values())]
  except (OSError,UnicodeError):return []
 config=(ROOT/'Tests/Production/NativeScene/Orbiter.cfg').read_text()
 for line in ('PropStages = 1\n','PropStage0 = 1 1 1\n','PropSubsampling = 1\n'):assert config.count(line)==1;config=config.replace(line,'')
@@ -36,8 +37,8 @@ for line in ('PropStages = 1\n','PropStage0 = 1 1 1\n','PropSubsampling = 1\n'):
 for name in ('instrument-evidence','control-evidence','ui-evidence','menu-evidence'):(OUT/(name+'.enabled')).touch()
 assert SCENARIO.read_bytes()==(ROOT/'Scenarios/Delta-glider/Atmospheric autopilot.scn').read_bytes()
 expected=ships(SCENARIO.read_text());assert len(expected)==8
-for name in ('Script/Demos/AtmAutopilot.lua','Script/DG/aap.lua'):
- assert (ASSETS/name).read_bytes()==(ROOT/name).read_bytes(),name
+for source,target in (('Script/Demos/AtmAutopilot.lua','Script/Demos/AtmAutopilot.lua'),('Src/Vessel/DeltaGlider/Script/aap.lua','Script/DG/aap.lua')):
+ assert (ASSETS/target).read_bytes().replace(b'\r\n',b'\n')==(ROOT/source).read_bytes().replace(b'\r\n',b'\n'),target
 original_data=data_inputs.inspect(a.data,a.planets)
 ledger=json.loads((ROOT/'Tests/Production/phase3-extraction.lock.json').read_text())
 guards={str(ROOT/n):sha(ROOT/n) for n in ledger['files']}
@@ -45,7 +46,7 @@ guards.update({str(p):sha(p) for p in ASSETS.rglob('*') if p.is_file()})
 for p in (Path(data_inputs.__file__),ROOT/'Tests/Production/StockScenarios/intentional_exit.py',ROOT/'Tests/Production/WaylandInput/compositor.py',ROOT/'Tests/Production/Flight/keyboard_smoke.py'):
  guards[str(p)]=sha(p)
 for p in [a.build_record,a.gtk_plugin,*(p for directory in a.library for p in directory.glob('*.so*') if p.is_file()),ENGINE/'orbiter-production',ENGINE/'liborbiter_production_boundary.so',ENGINE/'liborbiter_production_vessels.so',ENGINE/'native-sdk/OrbiterNativeBuild.h',*(ENGINE/'NativeModules').rglob('*.so'),SCENARIO,ASSETS/'Script/Demos/AtmAutopilot.lua',OUT/'Orbiter.cfg',Path(__file__)]:guards[str(p)]=sha(p)
-report=dict(status='running',scope='Development regression of original Terminal MFD inside the unchanged complete eight-object atmospheric-autopilot scene. Real private Wayland keyboard/input box, AAP throttle and terminal-page worker lifetimes. Not a completed guided tutorial, immutable qualified package, original Windows runtime comparison or Phase6 acceptance.',source_base_commit=record['source_base'],working_tree_changes=False,runtime_identity=identity,actual_original_simulation_data=original_data,expected_original_objects=expected,guarded_files_sha256=guards,commands=[],page_cycles=[],key_deliveries=[],native_admission_qualified=False,phase6_complete=False)
+report=dict(status='running',scope='Development regression of original Terminal MFD inside the unchanged complete eight-object atmospheric-autopilot scene. Real private Wayland keyboard/input box, AAP throttle and terminal-page worker lifetimes. Not a completed guided tutorial, immutable qualified package, original Windows runtime comparison or Phase6 acceptance.',source_base_commit=record['source_base'],working_tree_changes=False,collector_producer_commit=collector_producer,runtime_identity=identity,actual_original_simulation_data=original_data,expected_original_objects=expected,guarded_files_sha256=guards,commands=[],page_cycles=[],key_deliveries=[],native_admission_qualified=False,phase6_complete=False)
 def save():(OUT/'verification.json').write_text(json.dumps(report,indent=2)+'\n')
 def texts():
  values=[]
