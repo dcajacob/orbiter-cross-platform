@@ -28,6 +28,16 @@ the complete roster at each tick. It also checks the original Terminal commands,
 instruction checkpoints, saved rosters, graphics teardown and 1,036 distinct
 guarded files. Unsuppressed ASan, UBSan and leak checks report no findings.
 
+Each actual completed tutorial save also opens unedited in a fresh process
+with its matching profile and reloads through real Wayland F5 input. All eight
+paused worlds render and preserve the full original roster. Their 64 initial
+vessel-state rows are finite, and the fresh-load and F5 states match exactly
+within each profile. The four processes exit normally after 492 successful
+presents; all eight graphics contexts close, saved bytes remain unchanged and
+unsuppressed ASan, UBSan and leak checks report no findings. The representative
+reloaded Release/SSE2 view shows 14.28 km altitude and 250 m/s. Continued flight
+and restoration of Lua coroutine or autopilot jobs remain unqualified.
+
 These are complete native functional tutorial flows. They use the existing
 successful pilot and original scenario, script, controls and thresholds; the
 observer reads SDK state and forwards the original session calls. No vessel
