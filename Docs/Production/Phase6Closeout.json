@@ -181,6 +181,11 @@
           "path": "/home/dan/.codex/worktrees/phase6-closeout/orbiter-cross-platform/out/phase6-general-api-native-diagnostic-v1/independent-audit.json",
           "sha256": "64a1e4c3a580473e09dd343f4d268f30d85f88c3861e486546ecce7c17ea0408",
           "scope": "Debug-automatic-original-failure-and-corrected-script-success-startup-exit-policy-pending"
+        },
+        {
+          "path": "/home/dan/.codex/worktrees/phase6-closeout/orbiter-cross-platform/out/phase6-general-api-correction-v1/helper-controls-v4.json",
+          "sha256": "5015b473fdd37d006ca7e335fe93f42f25c500dfe1623380b0f34c6199fb18ea",
+          "scope": "same-corrected-script-bytes-with-whitespace-safe-original-matcher"
         }
       ]
     },

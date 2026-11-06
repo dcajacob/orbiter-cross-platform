@@ -44,7 +44,7 @@ def corrected(original, earth):
 \tif b==0 then
 \t\treturn math.abs(a) < 0.000000001
 \tend
-\treturn math.abs(a/b) < 1.0000000001 
+\treturn math.abs(a/b) < 1.0000000001\x20
 end'''
     new_comparator = '''function almost_equal(a,b)
 \tif type(a) ~= "number" or type(b) ~= "number" then return false end
