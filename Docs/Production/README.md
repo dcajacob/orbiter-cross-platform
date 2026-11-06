@@ -12,6 +12,18 @@ budgets. The [native orbital flight host](NativeFlight.md) adds keyboard/joystic
 control paths, independent timing and original docking/persistence. These remain
 narrower deliveries than the stock release.
 
+## Phase 6 closeout
+
+[Phase6Closeout.json](Phase6Closeout.json) is the finite closeout ledger. It
+preserves checkpoint `0842893b`, exact acceptance scopes and evidence hashes.
+The initial runner and archive controls are implemented; final software gates
+remain open. Debug/automatic scene003 exact-save reload still exceeds the
+unchanged numerical budgets. Physical-controller hardware remains unavailable.
+The intended interim signoff is **software complete; awaiting physical-controller
+acceptance**, after all software gates and the operator walkthrough pass.
+[Closeout tools and current limits](../../Tests/Production/Closeout/README.md)
+record the implementation and its retained evidence scope.
+
 ## Frozen scope and starting point
 
 The release uses the existing `PlanetarySystem`, `Body`, `RigidBody`, `Vessel`,

@@ -1,0 +1,726 @@
+{
+  "schema": 1,
+  "protocol": "phase6-closeout-v1",
+  "checkpoint_commit": "0842893ba8b3807f67245c78d729a4758dab3fdd",
+  "software_complete": false,
+  "phase6_complete": false,
+  "candidate": {
+    "frozen": false,
+    "id": null,
+    "source_commit": null,
+    "identities": {}
+  },
+  "policy": {
+    "physical_controller_required_for_phase6_complete": true,
+    "virtual_controllers_qualify": false,
+    "raw_evidence_local_only": true,
+    "windows_local_vm_only": true,
+    "maximum_windows_scenes": 2,
+    "maximum_native_simulators": 4,
+    "automatic_golden_refresh": false,
+    "budgets_unchanged": true,
+    "excluded": [
+      "audio",
+      "general-scenario-editor",
+      "installers",
+      "phase7",
+      "phase8"
+    ]
+  },
+  "protected_documents": [
+    {
+      "path": "Tests/Production/production-source.lock.json",
+      "sha256": "5f89334ecb213b56b1bda651acbed8c245f874f6d61ae9f7e9fdccfb3da2f11e"
+    },
+    {
+      "path": "Tests/Production/RemainingStock/cases.json",
+      "sha256": "d1dad2672f6ae77541df774cafd4ca5a8730f77733e80b733a1f970c7697a162"
+    },
+    {
+      "path": "Tests/Production/RemainingStockPersistence/protocol.json",
+      "sha256": "01c98e54e3ef9568fbba5c368093ecdc89880b797e042e5f254e4f64d735f249"
+    },
+    {
+      "path": "Script/Tests/GeneralApiTest.lua",
+      "sha256": "0eb305d7171beabec4a30b07e40eaf0e5063ef3575da59ef40ef5ff889051b69"
+    }
+  ],
+  "gates": {
+    "runner-controls": {
+      "expected": {
+        "depends_on": [],
+        "required": [
+          "full-versus-selected",
+          "terminal-statuses",
+          "cancellation",
+          "process-receipts",
+          "completed-capture-reuse",
+          "declared-share-roots",
+          "disk-preflight",
+          "archive-restoration"
+        ],
+        "final_candidate_required": false
+      },
+      "result": "in-progress",
+      "coverage": null,
+      "diagnostic_only": null,
+      "candidate_id": null,
+      "evidence": [
+        {
+          "path": "/home/dan/.codex/worktrees/phase6-closeout/orbiter-cross-platform/out/phase6-closeout-storage-v1/restoration-audit.json",
+          "sha256": "8f4adf13f212144c86bd7e6c65cbdd4d5d4b41d3fa579696789ba32feeb1b510",
+          "scope": "complete-restoration-of-four-historical-Windows-archives"
+        },
+        {
+          "path": "/home/dan/.codex/worktrees/phase6-closeout/orbiter-cross-platform/out/phase6-closeout-storage-v1/controls-v4.json",
+          "sha256": "e24837499d4f2fc633e98a920c58888277c239bd8cad023c1642fa9569d69c7e",
+          "scope": "18-discovered-control-tests-only"
+        },
+        {
+          "path": "/home/dan/.codex/worktrees/phase6-closeout/orbiter-cross-platform/out/phase6-closeout-reuse-writers-v3/status.json",
+          "sha256": "52e564d5377b86172d0f7cc212b1b525d2d4c496e871389befaad2b1039c248f",
+          "scope": "8-real-writers-independently-reread-and-compared-no-reloads"
+        }
+      ]
+    },
+    "numerical-reload": {
+      "expected": {
+        "depends_on": [
+          "runner-controls"
+        ],
+        "profiles": [
+          "Debug-automatic",
+          "Debug-sse2",
+          "Release-automatic",
+          "Release-sse2"
+        ],
+        "cohorts": [
+          "original-windows",
+          "current-windows",
+          "native"
+        ],
+        "cases": [
+          "remaining_stock_003"
+        ],
+        "phases": [
+          "stock-writer",
+          "windows-save-reload"
+        ],
+        "repeats": 2,
+        "required": [
+          "first-differing-operation",
+          "observer-on-off-equivalence",
+          "actual-crt-providers",
+          "failing-and-neighbour-input-regression",
+          "all-existing-budgets"
+        ],
+        "final_candidate_required": false
+      },
+      "result": "failed",
+      "coverage": null,
+      "diagnostic_only": null,
+      "candidate_id": null,
+      "evidence": [
+        {
+          "path": "/home/dan/.codex/worktrees/phase6-mfd-world-cache/orbiter-cross-platform/out/phase6-boundary-scene003-coordinator-v3/status.json",
+          "sha256": "a429ba432e3a3d354cd5e729274589d33c50cb89ad6ee76212a7cbe792c2db44",
+          "scope": "preserved-diagnostic-failure"
+        },
+        {
+          "path": "/home/dan/GIT/orbiter-cross-platform/out/phase6-native-boundary-reload-state-diagnostic-v1.json",
+          "sha256": "e3dc74a8518a2477e263d40d130eb181f7745ded67caf78f06e5fdfa1bffedee",
+          "scope": "preserved-diagnostic-failure"
+        },
+        {
+          "path": "/home/dan/.codex/worktrees/phase6-closeout/orbiter-cross-platform/out/phase6-reload-math-corpus-v1/corpus.json",
+          "sha256": "c31105d06867554a6c5bc97306266f0236e2bef81920e88dad7d72d1b635b465",
+          "scope": "2145-observed-and-neighbouring-arcsine-inputs-not-root-cause-proof"
+        }
+      ],
+      "note": "Retained failure is diagnostic-only; eight writer passes do not qualify writers plus reloads."
+    },
+    "general-api": {
+      "expected": {
+        "depends_on": [
+          "runner-controls"
+        ],
+        "profiles": [
+          "Debug-automatic",
+          "Debug-sse2",
+          "Release-automatic",
+          "Release-sse2"
+        ],
+        "cohorts": [
+          "current-windows",
+          "native"
+        ],
+        "required": [
+          "original-bytes-and-failure-preserved",
+          "locked-spice-oracle",
+          "symmetric-comparator",
+          "nil-false-and-wrong-value-controls"
+        ],
+        "final_candidate_required": false
+      },
+      "result": "in-progress",
+      "coverage": null,
+      "diagnostic_only": null,
+      "candidate_id": null,
+      "evidence": [
+        {
+          "path": "/home/dan/.codex/worktrees/phase6-closeout/orbiter-cross-platform/out/phase6-general-api-correction-v1/helper-controls.json",
+          "sha256": "ad7e39b070de9c1c1d844de46b1df35b15bfc234d320af4226e8d804e955f4cb",
+          "scope": "helper-controls-only-no-simulator-qualification"
+        },
+        {
+          "path": "/home/dan/.codex/worktrees/phase6-closeout/orbiter-cross-platform/out/phase6-general-api-correction-v1/helper-controls-v3.json",
+          "sha256": "7d5e92132d26c6cfbf8197d9460f329d0cec3c4e0a4ce71325a7102049b45c67",
+          "scope": "latest-four-region-variant-22-lua-helper-and-3-damaged-input-controls"
+        },
+        {
+          "path": "/home/dan/.codex/worktrees/phase6-closeout/orbiter-cross-platform/out/phase6-general-api-native-diagnostic-v1/independent-audit.json",
+          "sha256": "64a1e4c3a580473e09dd343f4d268f30d85f88c3861e486546ecce7c17ea0408",
+          "scope": "Debug-automatic-original-failure-and-corrected-script-success-startup-exit-policy-pending"
+        }
+      ]
+    },
+    "class-eligibility": {
+      "expected": {
+        "depends_on": [
+          "numerical-reload",
+          "general-api"
+        ],
+        "profiles": [
+          "Debug-automatic",
+          "Debug-sse2",
+          "Release-automatic",
+          "Release-sse2"
+        ],
+        "families": [
+          "Atlantis",
+          "Atlantis_SRB",
+          "Atlantis_Tank",
+          "Carina",
+          "Leonardo_mplm",
+          "Module2",
+          "Dragonfly",
+          "HST",
+          "LDEF",
+          "SolarSail",
+          "Quadcopter"
+        ],
+        "required": [
+          "source-abi",
+          "capabilities",
+          "interactions",
+          "persistence",
+          "resource-ownership",
+          "twenty-cycle-teardown",
+          "rejection-controls"
+        ],
+        "final_candidate_required": false
+      },
+      "result": "not-run",
+      "coverage": null,
+      "diagnostic_only": null,
+      "candidate_id": null,
+      "evidence": []
+    },
+    "candidate-freeze": {
+      "expected": {
+        "depends_on": [
+          "class-eligibility"
+        ],
+        "required": [
+          "windows-debug-release",
+          "four-native-profiles",
+          "application-observer-runner-reference-identities",
+          "dependency-and-provider-inventories",
+          "discovered-unit-test-inventory"
+        ]
+      },
+      "result": "not-run",
+      "coverage": null,
+      "diagnostic_only": null,
+      "candidate_id": null,
+      "evidence": []
+    },
+    "remaining-stock": {
+      "expected": {
+        "depends_on": [
+          "candidate-freeze"
+        ],
+        "profiles": [
+          "Debug-automatic",
+          "Debug-sse2",
+          "Release-automatic",
+          "Release-sse2"
+        ],
+        "cohorts": [
+          "original-windows",
+          "current-windows",
+          "native"
+        ],
+        "cases": [
+          "remaining_stock_001",
+          "remaining_stock_002",
+          "remaining_stock_003",
+          "remaining_stock_004",
+          "remaining_stock_005",
+          "remaining_stock_006",
+          "remaining_stock_007",
+          "remaining_stock_008",
+          "remaining_stock_009",
+          "remaining_stock_010",
+          "remaining_stock_011",
+          "remaining_stock_012",
+          "remaining_stock_013",
+          "remaining_stock_014",
+          "remaining_stock_015",
+          "remaining_stock_016",
+          "remaining_stock_017",
+          "remaining_stock_018",
+          "remaining_stock_019",
+          "remaining_stock_020",
+          "remaining_stock_021",
+          "remaining_stock_022",
+          "remaining_stock_023",
+          "remaining_stock_024",
+          "remaining_stock_025",
+          "remaining_stock_026",
+          "remaining_stock_027",
+          "remaining_stock_028",
+          "remaining_stock_029",
+          "remaining_stock_030",
+          "remaining_stock_031",
+          "remaining_stock_032",
+          "remaining_stock_033",
+          "remaining_stock_034",
+          "remaining_stock_035",
+          "remaining_stock_036",
+          "remaining_stock_037",
+          "remaining_stock_038"
+        ],
+        "phases": [
+          "stock-writer",
+          "windows-save-reload"
+        ],
+        "repeats": 2,
+        "runs_per_cohort": 608,
+        "required": [
+          "complete-state",
+          "clocks",
+          "cameras",
+          "complete-saved-content",
+          "full-frames",
+          "exact-same-windows-save",
+          "fresh-launch-worker-desktop-process-receipts"
+        ]
+      },
+      "result": "not-run",
+      "coverage": null,
+      "diagnostic_only": null,
+      "candidate_id": null,
+      "evidence": []
+    },
+    "normal-admission": {
+      "expected": {
+        "depends_on": [
+          "candidate-freeze"
+        ],
+        "profiles": [
+          "Debug-automatic",
+          "Debug-sse2",
+          "Release-automatic",
+          "Release-sse2"
+        ],
+        "cohorts": [
+          "native"
+        ],
+        "entry_points": [
+          "Scenarios/2024 Edition/# Welcome to Orbiter 2024.scn",
+          "Scenarios/2024 Edition/3 Minute Tour of Kennedy Space Center.scn",
+          "Scenarios/2024 Edition/City lights at night.scn",
+          "Scenarios/2024 Edition/Cruising above Florida.scn",
+          "Scenarios/2024 Edition/Earth views.scn",
+          "Scenarios/2024 Edition/KSC Update.scn",
+          "Scenarios/2024 Edition/Solar system.scn",
+          "Scenarios/2024 Edition/Space Shuttle ascent autopilot.scn",
+          "Scenarios/2024 Edition/Space Shuttle to ISS.scn",
+          "Scenarios/2024 Edition/Spotlights.scn",
+          "Scenarios/2024 Edition/Surface impact model.scn",
+          "Scenarios/2024 Edition/Tesseral Gravity.scn",
+          "Scenarios/2024 Edition/The Alps in 3D.scn",
+          "Scenarios/Antelope Valley scenery/DG at Edwards AFB.scn",
+          "Scenarios/Antelope Valley scenery/Mojave spaceport.scn",
+          "Scenarios/Antelope Valley scenery/Mojave to Edwards.scn",
+          "Scenarios/Antelope Valley scenery/Palmdale launchpad.scn",
+          "Scenarios/Antelope Valley scenery/STS-125 finals at Edwards.scn",
+          "Scenarios/Challenges/Challenge 1 - Launch and docking.scn",
+          "Scenarios/Challenges/Challenge 2 - Lunar transfer.scn",
+          "Scenarios/Challenges/Challenge 3 - Advanced lunar transfer.scn",
+          "Scenarios/Challenges/Challenge 4 - Entry and landing.scn",
+          "Scenarios/Checklists/Mission 1 - DG to ISS.scn",
+          "Scenarios/Checklists/Mission 2 - ISS to Mir.scn",
+          "Scenarios/Checklists/Mission 3 - Deorbit.scn",
+          "Scenarios/Checklists/Quickstart.scn",
+          "Scenarios/Delta-glider/Animated control surfaces.scn",
+          "Scenarios/Delta-glider/Atmospheric autopilot.scn",
+          "Scenarios/Delta-glider/Brighton Beach.scn",
+          "Scenarios/Delta-glider/Cape Canaveral.scn",
+          "Scenarios/Delta-glider/DG Mk4 in orbit.scn",
+          "Scenarios/Delta-glider/DG and DG-S.scn",
+          "Scenarios/Delta-glider/DG-S ready for takeoff.scn",
+          "Scenarios/Delta-glider/Docked at ISS.scn",
+          "Scenarios/Delta-glider/Glass cockpit.scn",
+          "Scenarios/Delta-glider/Habana Spaceport.scn",
+          "Scenarios/Delta-glider/Smack!.scn",
+          "Scenarios/Delta-glider/The rotation model.scn",
+          "Scenarios/Delta-glider/Venus descent.scn",
+          "Scenarios/Delta-glider/Venus takeoff.scn",
+          "Scenarios/Delta-glider/Vessel-vessel.scn",
+          "Scenarios/Delta-glider/Virtual cockpit.scn",
+          "Scenarios/Demo/Atlantis Ascent AP.scn",
+          "Scenarios/Demo/DG ISS Approach.scn",
+          "Scenarios/Demo/Dione.scn",
+          "Scenarios/Demo/Docked at ISS.scn",
+          "Scenarios/Demo/Earth.scn",
+          "Scenarios/Demo/Galilean system view.scn",
+          "Scenarios/Demo/ISS Approach.scn",
+          "Scenarios/Demo/Level 9 textures.scn",
+          "Scenarios/Demo/Mir.scn",
+          "Scenarios/Demo/Project Alpha.scn",
+          "Scenarios/Demo/Saturn.scn",
+          "Scenarios/Demo/The 1999 solar eclipse.scn",
+          "Scenarios/Demo/Today.scn",
+          "Scenarios/Demo/Virtual cockpit.scn",
+          "Scenarios/Dragonfly/Dragonfly.scn",
+          "Scenarios/Dragonfly/Dragonfly021118.scn",
+          "Scenarios/Dragonfly/Station building.scn",
+          "Scenarios/Dragonfly/v1.0.0b PoweredUp.scn",
+          "Scenarios/Launch sites and spaceports/DG at Edwards AFB.scn",
+          "Scenarios/Launch sites and spaceports/Mojave spaceport.scn",
+          "Scenarios/Launch sites and spaceports/Palmdale launchpad.scn",
+          "Scenarios/Launch sites and spaceports/STS-125 finals at Edwards.scn",
+          "Scenarios/Navigation/Lunar transfer/Lunar transfer 1.scn",
+          "Scenarios/Navigation/Lunar transfer/Lunar transfer 2.scn",
+          "Scenarios/Navigation/Space Physics/Atlantis in orbit.scn",
+          "Scenarios/Navigation/Space Physics/DG dumbbell.scn",
+          "Scenarios/Navigation/Space Physics/Solar sail.scn",
+          "Scenarios/Navigation/Space Physics/Spin stabilisation.scn",
+          "Scenarios/Navigation/Special orbits/Geostationary orbit.scn",
+          "Scenarios/Navigation/Special orbits/Lagrange point.scn",
+          "Scenarios/Navigation/Special orbits/Molniya orbit.scn",
+          "Scenarios/Navigation/Special orbits/Orbiting Phobos.scn",
+          "Scenarios/Navigation/Special orbits/Sun-synchronous orbit.scn",
+          "Scenarios/Navigation/Special orbits/Tundra orbit.scn",
+          "Scenarios/Navigation/TransX/Earth to Mars.scn",
+          "Scenarios/Navigation/TransX/Earth to Moon.scn",
+          "Scenarios/Navigation/TransX/Voyager Grand Tour.scn",
+          "Scenarios/Playback/Atlantis undocking.scn",
+          "Scenarios/Playback/Glider in orbit 1.scn",
+          "Scenarios/Playback/Glider in orbit 2.scn",
+          "Scenarios/Playback/Mojave to Edwards.scn",
+          "Scenarios/Quadcopter/Quadcopter at KSC.scn",
+          "Scenarios/Satellites and Probes/Hubble Space Telescope/HST Animation.scn",
+          "Scenarios/Satellites and Probes/Hubble Space Telescope/HST Launch.scn",
+          "Scenarios/Satellites and Probes/Hubble Space Telescope/HST Orbit Deployment.scn",
+          "Scenarios/Satellites and Probes/Hubble Space Telescope/HST Recapture.scn",
+          "Scenarios/Satellites and Probes/LDEF/LDEF deployment.scn",
+          "Scenarios/Satellites and Probes/LDEF/LDEF retrieval.scn",
+          "Scenarios/Shuttle-A/ISS Approach.scn",
+          "Scenarios/Shuttle-A/Olympus spaceport on Mars.scn",
+          "Scenarios/Shuttle-A/Shuttle-A Docked at ISS.scn",
+          "Scenarios/Shuttle-A/Shuttle-A Drop.scn",
+          "Scenarios/Shuttle-A/Shuttle-A Launch.scn",
+          "Scenarios/Shuttle-A/Shuttle-A Moon.scn",
+          "Scenarios/Space Shuttle Atlantis/Atlantis ISS Resupply.scn",
+          "Scenarios/Space Shuttle Atlantis/Atlantis MMU Satellite Repair.scn",
+          "Scenarios/Space Shuttle Atlantis/Atlantis cockpit.scn",
+          "Scenarios/Space Shuttle Atlantis/Atlantis docked at ISS.scn",
+          "Scenarios/Space Shuttle Atlantis/Atlantis final approach.scn",
+          "Scenarios/Space Shuttle Atlantis/Atlantis landing preparation.scn",
+          "Scenarios/Space Shuttle Atlantis/Atlantis reentry 1.scn",
+          "Scenarios/Space Shuttle Atlantis/Atlantis reentry 2.scn",
+          "Scenarios/Space Shuttle Atlantis/Atlantis satellite Launch.scn",
+          "Scenarios/Space Shuttle Atlantis/Atlantis satellite.scn",
+          "Scenarios/Space Shuttle Atlantis/Launch into Sunrise.scn",
+          "Scenarios/Space Stations/Blue Danube.scn",
+          "Scenarios/Space Stations/ISS.scn",
+          "Scenarios/Space Stations/Light and darkness.scn",
+          "Scenarios/Space Stations/Mir.scn",
+          "Scenarios/Tests/GeneralApiTest.scn",
+          "Scenarios/Tests/Manual/ScriptMfdApiTest.scn",
+          "Scenarios/Tests/VesselApiTest.scn",
+          "Scenarios/The Solar System/Dione.scn",
+          "Scenarios/The Solar System/Earth/Earth views 1.scn",
+          "Scenarios/The Solar System/Earth/Earth views 2.scn",
+          "Scenarios/The Solar System/Earth/In low orbit over Africa.scn",
+          "Scenarios/The Solar System/Earth/The Alps in 3D.scn",
+          "Scenarios/The Solar System/Earth/The Great Lakes.scn",
+          "Scenarios/The Solar System/Earth/The Himalayas.scn",
+          "Scenarios/The Solar System/Eclipses/April 8 2005 Panama.scn",
+          "Scenarios/The Solar System/Eclipses/April 8 2005.scn",
+          "Scenarios/The Solar System/Eclipses/Lunar eclipse 2004.scn",
+          "Scenarios/The Solar System/Eclipses/The 1999 solar eclipse.scn",
+          "Scenarios/The Solar System/Enceladus.scn",
+          "Scenarios/The Solar System/Ephemerides/Earth-Moon system.scn",
+          "Scenarios/The Solar System/Ephemerides/Jovian satellites.scn",
+          "Scenarios/The Solar System/Galilean system view.scn",
+          "Scenarios/The Solar System/Grand tour.scn",
+          "Scenarios/The Solar System/Iapetus.scn",
+          "Scenarios/The Solar System/Jupiter flybys/Galileo's first Ganymede flyby.scn",
+          "Scenarios/The Solar System/Jupiter flybys/Galileo's first Io flyby.scn",
+          "Scenarios/The Solar System/Jupiter flybys/Galileo's second Ganymede flyby.scn",
+          "Scenarios/The Solar System/Jupiter flybys/Galileo's second Io flyby.scn",
+          "Scenarios/The Solar System/Jupiter flybys/Tour of Jupiter.scn",
+          "Scenarios/The Solar System/Mimas.scn",
+          "Scenarios/The Solar System/Moon.scn",
+          "Scenarios/The Solar System/Rhea.scn",
+          "Scenarios/The Solar System/Saturn.scn",
+          "Scenarios/The Solar System/Tethys.scn",
+          "Scenarios/The Solar System/Titan.scn",
+          "Scenarios/The Solar System/Today.scn",
+          "Scenarios/The Solar System/Triton.scn",
+          "Scenarios/The Solar System/Venus.scn",
+          "Scenarios/Tutorials/ADI training.scn",
+          "Scenarios/Tutorials/DG stunts.scn",
+          "Scenarios/Tutorials/DG to the moon.scn",
+          "Scenarios/Tutorials/DG-ISS Sync Dock.scn",
+          "Scenarios/Tutorials/Smack! Rescue.scn",
+          "Scenarios/Tutorials/Space Shuttle final approach.scn",
+          "Scenarios/Tutorials/Space Shuttle to ISS.scn",
+          "Scenarios/Views/Atmospheric haze.scn",
+          "Scenarios/Views/Cloud microtexture.scn",
+          "Scenarios/Views/KSC coverage.scn",
+          "Scenarios/Views/Martian atmosphere colours.scn",
+          "Scenarios/Views/Moon through atmosphere.scn"
+        ],
+        "runs": 628,
+        "required": [
+          "normal-host",
+          "no-class-rejections",
+          "versioned-general-api-correction",
+          "unchanged-intentional-exit-policy"
+        ]
+      },
+      "result": "not-run",
+      "coverage": null,
+      "diagnostic_only": null,
+      "candidate_id": null,
+      "evidence": []
+    },
+    "named-workflows": {
+      "expected": {
+        "depends_on": [
+          "candidate-freeze"
+        ],
+        "profiles": [
+          "Debug-automatic",
+          "Debug-sse2",
+          "Release-automatic",
+          "Release-sse2"
+        ],
+        "cohorts": [
+          "current-windows",
+          "native"
+        ],
+        "workflows": [
+          "dg-orbit",
+          "virtual-cockpit-dg",
+          "virtual-cockpit-demo",
+          "dgs-takeoff",
+          "iss-docking-dg",
+          "iss-docking-demo",
+          "atmospheric-autopilot",
+          "moon-stock-playback",
+          "moon-brake-continuation",
+          "atlantis-resupply",
+          "atlantis-rms-payload",
+          "atlantis-ascent"
+        ],
+        "repeats": 2,
+        "required": [
+          "complete-original-vessel-roster",
+          "tick-indexed-original-input-dispatch",
+          "no-state-placement-setters",
+          "actual-save-and-F5",
+          "moon-stock-parity-and-distinct-landed-braking"
+        ]
+      },
+      "result": "not-run",
+      "coverage": null,
+      "diagnostic_only": null,
+      "candidate_id": null,
+      "evidence": []
+    },
+    "core-interfaces": {
+      "expected": {
+        "depends_on": [
+          "candidate-freeze"
+        ],
+        "profiles": [
+          "Debug-automatic",
+          "Debug-sse2",
+          "Release-automatic",
+          "Release-sse2"
+        ],
+        "required": [
+          "all-discovered-unit-tests-with-actual-totals",
+          "three-hud-modes",
+          "ten-stock-mfds",
+          "gdi-sketchpad",
+          "dialogs",
+          "lua-aap",
+          "recording-playback",
+          "invalid-input-and-module-controls",
+          "terminal-hud-mfd-text-and-images-without-new-masks"
+        ]
+      },
+      "result": "not-run",
+      "coverage": null,
+      "diagnostic_only": null,
+      "candidate_id": null,
+      "evidence": []
+    },
+    "lifecycle-input": {
+      "expected": {
+        "depends_on": [
+          "candidate-freeze"
+        ],
+        "profiles": [
+          "Debug-automatic",
+          "Debug-sse2",
+          "Release-automatic",
+          "Release-sse2"
+        ],
+        "cycles": 20,
+        "backends": [
+          "x11",
+          "wayland"
+        ],
+        "scales": [
+          1,
+          2
+        ],
+        "views": [
+          "panel",
+          "virtual-cockpit"
+        ],
+        "required": [
+          "load-reload-unload",
+          "paused-attachments",
+          "lua-ownership",
+          "actual-provider-matrices",
+          "clean-exits",
+          "unsuppressed-native-sanitizers"
+        ]
+      },
+      "result": "not-run",
+      "coverage": null,
+      "diagnostic_only": null,
+      "candidate_id": null,
+      "evidence": []
+    },
+    "performance": {
+      "expected": {
+        "depends_on": [
+          "remaining-stock",
+          "normal-admission",
+          "named-workflows",
+          "core-interfaces",
+          "lifecycle-input"
+        ],
+        "profile": "Release-automatic",
+        "resolution": [
+          1920,
+          1080
+        ],
+        "quality": "medium",
+        "device": "Intel",
+        "backends": [
+          "wayland",
+          "xwayland"
+        ],
+        "scenes": 3,
+        "repeats": 2,
+        "runs": 12,
+        "median_ms_max": 33,
+        "p95_ms_max": 50,
+        "required": [
+          "serial",
+          "ac-power",
+          "no-competing-qualification-jobs"
+        ]
+      },
+      "result": "not-run",
+      "coverage": null,
+      "diagnostic_only": null,
+      "candidate_id": null,
+      "evidence": []
+    },
+    "hands-on": {
+      "expected": {
+        "depends_on": [
+          "performance"
+        ],
+        "required": [
+          "physical-keyboard-mouse",
+          "cockpit-view-changes",
+          "controls",
+          "typing-cancellation",
+          "focus-recovery",
+          "save-F5-reload",
+          "normal-exit"
+        ]
+      },
+      "result": "not-run",
+      "coverage": null,
+      "diagnostic_only": null,
+      "candidate_id": null,
+      "evidence": []
+    },
+    "archive-audit": {
+      "expected": {
+        "depends_on": [
+          "hands-on"
+        ],
+        "required": [
+          "independent-final-evidence-reread",
+          "every-required-case-profile-repetition",
+          "versioned-sealed-local-archives",
+          "archive-restoration",
+          "central-status-and-supported-class-documents"
+        ]
+      },
+      "result": "not-run",
+      "coverage": null,
+      "diagnostic_only": null,
+      "candidate_id": null,
+      "evidence": []
+    },
+    "controller": {
+      "expected": {
+        "depends_on": [
+          "hands-on"
+        ],
+        "required": [
+          "real-axes-buttons",
+          "deadzones",
+          "throttle-arming",
+          "keyboard-handoff",
+          "disconnect-reconnect",
+          "physical-hardware"
+        ]
+      },
+      "result": "blocked",
+      "coverage": null,
+      "diagnostic_only": null,
+      "candidate_id": null,
+      "evidence": [],
+      "note": "Physical controller hardware unavailable; virtual devices do not satisfy acceptance."
+    }
+  },
+  "current_blocker": "Debug/automatic exact Windows-save reload numerical divergence; Windows VM paused by user, resume choice pending. VM storage reclamation is staged but not launched.",
+  "next_exit_condition": "Resume the user-paused local Windows VM, reclaim only independently restored duplicate outputs, ensure adequate capacity, then compare passive observer on/off traces and actual CRT outputs before changing math."
+}
