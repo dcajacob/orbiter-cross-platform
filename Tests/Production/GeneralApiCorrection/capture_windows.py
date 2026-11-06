@@ -45,6 +45,9 @@ def main():
         built=load(cfg['application_build_manifest']);item=built['configurations'][cfg['configuration']]
         require(built['source_commit']==cfg['source_commit'] and built['owning_sources_unchanged'] and item['status']=='built' and
                 Path(item['runtime'])==Path(cfg['preserved']),'Actual current application/SDK package differs')
+        require(all(cfg['roles'][role]['manifest_sha256']==item['sdk_manifest_sha256'] and
+                    Path(cfg['roles'][role]['manifest_path'])==Path(cfg['preserved'])/'test-runtime.json'
+                    for role in ('application','sdk')),'Application/SDK role does not name the actual current package')
         require(subprocess.check_output([cfg['git'],'-C',source,'rev-parse','HEAD'],text=True).strip()==cfg['source_commit'],
                 'Actual owning application source differs')
         source_guards=built['source_guard_sha256_lf']
@@ -56,6 +59,8 @@ def main():
                 observer['source_commit']==cfg['roles']['observer']['commit'] and observer['sdk_source_commit']==cfg['source_commit'] and
                 observer['configuration']==cfg['configuration'] and sha(observer['binary'])==observer['sha256'],
                 'Actual matching-SDK API observer differs')
+        require(observer_build['sdk']['manifest_sha256']==item['sdk_manifest_sha256'],
+                'Observer was compiled against a different SDK package')
         guards[observer['binary']]=observer['sha256']
         variant=load(cfg['variant']['manifest']);require(sha(cfg['variant']['manifest'])==cfg['variant']['manifest_sha256'] and
             variant['protocol']=='general-api-spice-test-correction-v2' and variant['oracle']['replaced_regions']==4 and
