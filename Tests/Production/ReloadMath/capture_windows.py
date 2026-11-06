@@ -58,8 +58,24 @@ def main():
             original_application_and_sdk_source=config['application_source'],producer_commit=cfg['source_commit'],
             runtime_variant_manifest_sha256=sha(build/'runtime/runtime-variant.json'),frames=config['frames'],
             fixed_step=config['fixed_step'],capture_tick=config['capture_tick'],diagnostic_only=True,cases_requested=[case['id']])
+        folders={}
         for mode in ('off','on'):
-            folder=output/('observer-'+mode)
+            reuse=cfg.get('reuse_off') if mode=='off' else None
+            if reuse:
+                prior=Path(reuse['report']);require(sha(prior)==reuse['report_sha256'],'Closed off-capture report changed')
+                previous=load(prior);folder=Path(reuse['folder'])
+                require(previous['status']=='captured-identical-observer-off-on-diagnostic-only' and
+                        previous['saved_input_sha256']==sha(saved) and
+                        previous['primary_runtime_identity']==runtime_identity and
+                        previous['captures']['off']['folder']==str(folder),'Reusable off-capture identity/scope differs')
+                require(all(sha(folder/n)==v for n,v in previous['observer_on_off_sha256'].items()),'Closed off-capture bytes changed')
+                actual=original.inspect_artifacts(folder,derived,config)
+                require(actual==previous['captures']['off']['canonical_primary_audit'] and
+                        load(folder/'process-timing.json')==previous['captures']['off']['process'], 'Recomputed closed off-capture differs')
+                folders[mode]=folder
+                report['captures'][mode]=dict(previous['captures']['off'],reused_report_sha256=sha(prior))
+                save();continue
+            folder=output/('observer-'+mode);folders[mode]=folder
             def configure(directory):
                 path=directory/'Orbiter.cfg';text=path.read_text()
                 for line in ('PropStages = 1\n','PropStage0 = 1 1 1\n','PropSubsampling = 1\n'):
@@ -94,16 +110,32 @@ def main():
         # Trust the extra observer only after exact on/off equality over all
         # original physical/resource/event, clocks, camera, saved and frame bytes.
         names=[*original.shared.TRACES,'stock-clock.csv','stock-step-clock.csv','camera.csv','scene.rgba','Scenarios/(Current state).scn']
-        unchanged={name:sha(output/'observer-off'/name) for name in names}
-        require(all(sha(output/'observer-on'/n)==v for n,v in unchanged.items()),'Passive observer changed original simulation/camera/save/frame results')
+        unchanged={name:sha(folders['off']/name) for name in names}
+        require(all(sha(folders['on']/n)==v for n,v in unchanged.items()),'Passive observer changed original simulation/camera/save/frame results')
         require(all(sha(Path(n))==v for n,v in guarded.items()),'Original runtime/provider changed')
         report.update(status='captured-identical-observer-off-on-diagnostic-only',observer_on_off_sha256=unchanged,
             passive_observer_equivalence=True,guarded_runtime_files=len(guarded),saved_input_sha256=sha(saved))
         # Export raw observations, complete invocations and actual receipts only;
         # immutable original runtime/data caches remain in C:.
         export=Path(cfg['export']);export.mkdir()
+        folders={}
         for mode in ('off','on'):
-            folder=output/('observer-'+mode);target=export/folder.name;target.mkdir()
+            reuse=cfg.get('reuse_off') if mode=='off' else None
+            if reuse:
+                prior=Path(reuse['report']);require(sha(prior)==reuse['report_sha256'],'Closed off-capture report changed')
+                previous=load(prior);folder=Path(reuse['folder'])
+                require(previous['status']=='captured-identical-observer-off-on-diagnostic-only' and
+                        previous['saved_input_sha256']==sha(saved) and
+                        previous['primary_runtime_identity']==runtime_identity and
+                        previous['captures']['off']['folder']==str(folder),'Reusable off-capture identity/scope differs')
+                require(all(sha(folder/n)==v for n,v in previous['observer_on_off_sha256'].items()),'Closed off-capture bytes changed')
+                actual=original.inspect_artifacts(folder,derived,config)
+                require(actual==previous['captures']['off']['canonical_primary_audit'] and
+                        load(folder/'process-timing.json')==previous['captures']['off']['process'], 'Recomputed closed off-capture differs')
+                folders[mode]=folder
+                report['captures'][mode]=dict(previous['captures']['off'],reused_report_sha256=sha(prior))
+                save();continue
+            folder=output/('observer-'+mode);folders[mode]=folder;target=export/folder.name;target.mkdir()
             paths={p.relative_to(folder).as_posix() for p in folder.iterdir() if p.is_file() and p.suffix.lower() not in ('.exe','.dll')}
             paths|={p.relative_to(folder).as_posix() for p in (folder/'Scenarios').rglob('*') if p.is_file()}
             for name in paths:
