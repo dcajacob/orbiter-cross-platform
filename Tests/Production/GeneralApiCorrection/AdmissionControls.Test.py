@@ -51,7 +51,8 @@ def main():
             elif control=='nonzero_exit':code=1
             elif control=='overwritten_save':replace('saved.scn',b'overwritten\n')
             elif control=='changed_private_script':
-                original=Path(argv[argv.index('--assets')+1]);assets=out/'changed-assets';shutil.copytree(original,assets,copy_function=os.link)
+                original=Path(argv[argv.index('--assets')+1]);assets=out/'changed-assets'
+                shutil.copytree(original,assets,copy_function=lambda source,target:Path(target).symlink_to(Path(source).resolve()))
                 target=assets/'Script/Tests/GeneralApiTest.lua';target.unlink();target.write_text('oapi.exit(0)\n')
                 argv[argv.index('--assets')+1]=str(assets);argv[argv.index('--scenario')+1]=str(assets/'Scenarios/Tests/GeneralApiTest.scn');write('invocation.json',argv)
                 manifest=json.loads((source/'api-asset-variant.json').read_text());manifest['variant_assets']=str(assets);write('api-asset-variant.json',manifest)

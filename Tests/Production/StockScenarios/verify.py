@@ -63,9 +63,14 @@ def main():
         data=subprocess.check_output(['git','-C',str(ROOT),'show',commit+':'+source])
         actual=hashlib.sha256(data).hexdigest()
         require(actual==checksum,'Stock observer or pinned runtime source differs: '+source)
-    summary=dict(attempted=0,passed=0,failed=0,inventory_ready=0,source_metadata_mismatches=0)
+    summary=dict(attempted=0,passed=0,failed=0,
+        inventory_ready=sum(case['inventory_ready'] for case in current['cases'].values()),
+        source_metadata_mismatches=sum(case['locked_inventory_metadata_differs'] for case in current['cases'].values()))
     failures={};runs=[]
     for name,case in report['cases'].items():
+        require(all(case[key]==current['cases'][name][key] for key in
+            ('sha256_lf','sha256_raw','ships','locked_inventory_metadata_differs','inventory_ready','dependency_problems')),
+            'Stock identity or dependency data differs: '+name)
         if name not in requested:
             require(case['status']=='not-run' and 'output' not in case,'Unexpected attempt outside declared stock audit scope')
             continue
@@ -85,8 +90,6 @@ def main():
         actual=json.loads(json.dumps(inspect(out,case,case['returncode'],name,a.stock_exit_reference,identity['profile'],api_reference)))
         require(all(case[k]==v for k,v in actual.items()),'Recomputed stock outcome differs: '+name)
         summary['attempted']+=1;summary[case['status']]+=1
-        summary['inventory_ready']+=case['inventory_ready']
-        summary['source_metadata_mismatches']+=case['locked_inventory_metadata_differs']
         if case['status']=='failed':failures[name]=case['problems']
         runs.append(dict(scenario=name,status=case['status'],output=case['output'],
                          finalized_ticks=case['finalized_ticks'],vessels=case['declared_vessels'],
