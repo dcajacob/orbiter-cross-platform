@@ -87,7 +87,7 @@ def main():
     sys.path.insert(0, str(request.parent))
     from win_local_process_v1 import context
     source = Path(cfg['source'])
-    sys.path[:0] = [str(source / 'Tests/Production'), str(source / 'Tests/Production/Client'), str(source / 'Tests/Production/RemainingStock')]
+    sys.path[:0] = [str(source / 'Tests/Production'), str(source / 'Tests/Production/Client'), str(source / 'Tests/Production/RemainingStock'), str(source / 'Tests/Production/RemainingStockRepaired')]
     from behavior_suite import link_or_copy
     from run_client import mesa_files
     import data_inputs
