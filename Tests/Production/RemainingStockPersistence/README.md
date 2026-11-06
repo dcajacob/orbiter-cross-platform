@@ -6,6 +6,12 @@ accepted reference, native admission or Phase 6 completion. Frozen original
 scenes/scripts and all existing numerical, camera and image budgets remain
 unchanged. Generated saved scenarios are separate hashed inputs.
 
+The native collector preserves the copied stock scenario's bytes and read-only
+mode rather than rewriting it. Exact Windows saves are written only to fresh
+derived paths; collisions with staged assets fail. `ScenarioInput.Test.py`
+checks read-only copies, exact CRLF/non-ASCII saved bytes and five invalid-input
+controls. This staging fix changes no simulation, reference or admission policy.
+
 The native `--save` argument supplies the destination for a Save command; it does
 not save automatically on exit. The existing real replay command at input tick
 959 in phase `after` runs after finalized physics/camera tick 960. A fresh native

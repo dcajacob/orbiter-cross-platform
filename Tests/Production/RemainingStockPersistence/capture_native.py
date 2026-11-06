@@ -28,6 +28,20 @@ sha=native.sha;sha_lf=native.sha_lf
 PHASES=('stock-writer','windows-save-reload')
 
 
+def stage_scenario_input(source,target,phase):
+    """Keep the copied stock input intact; write only a fresh derived save input."""
+    require(phase in PHASES,'Unknown native persistence phase')
+    if phase=='stock-writer':
+        require(target.is_file() and target.read_bytes()==source.read_bytes(),
+                'Copied original stock scenario differs or is missing')
+    else:
+        require(not target.exists() and not target.is_symlink(),
+                'Derived Windows save input collides with staged assets')
+        target.parent.mkdir(parents=True,exist_ok=True)
+        target.write_bytes(source.read_bytes())
+    require(sha(target)==sha(source),'Executed exact stock/Windows saved input differs')
+
+
 def replay_bytes(contract):
     value=contract['native_save_command']
     require(value==dict(input_tick=959,phase='after',action='save',value=0,finalized_tick=960),
@@ -171,8 +185,8 @@ def main():
                     provenance=dict(protocol=contract['protocol'],phase=a.phase,original_parent_case=case,stock_input_sha256=sha(source),
                         original_scenarios_and_scripts_unchanged=True,native_admission_qualified=False,phase6_complete=False)
                 out=a.output/(case['id']+'-'+str(repeat));folders.append(out);shutil.copytree(a.assets,out,copy_function=shutil.copy2)
-                target=out/case['scenario_entry_point'];target.parent.mkdir(parents=True,exist_ok=True);target.write_bytes(source.read_bytes())
-                require(sha(target)==sha(source),'Executed exact stock/Windows saved input differs')
+                target=out/case['scenario_entry_point']
+                stage_scenario_input(source,target,a.phase)
                 cfg=(HERE.parent/'NativeScene/Orbiter.cfg').read_text()
                 for line in ('PropStages = 1\n','PropStage0 = 1 1 1\n','PropSubsampling = 1\n'):
                     require(cfg.count(line)==1,'Native propagator fixture differs');cfg=cfg.replace(line,'')
