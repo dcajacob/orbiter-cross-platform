@@ -9,6 +9,7 @@ import subprocess
 
 from inventory import ROOT,corpus,digest,require
 from run import inspect
+from run import api_admission
 import intentional_exit
 
 
@@ -16,19 +17,29 @@ def main():
     p=argparse.ArgumentParser(description=__doc__)
     for name in ('capture','assets','modules','output'):p.add_argument('--'+name,type=Path,required=True)
     p.add_argument('--runtime-source-commit',required=True)
+    p.add_argument('--runtime-owner',type=Path,default=ROOT)
     p.add_argument('--stock-exit-reference',type=Path)
+    p.add_argument('--general-api-qualification',type=Path)
     a=p.parse_args();require(not a.output.exists(),'Stock audit output exists')
     require(re.fullmatch('[0-9a-f]{40}',a.runtime_source_commit),'Runtime source must be an immutable full commit')
     report=json.loads((a.capture/'stock-scenarios.json').read_text())
+    owner=a.runtime_owner.resolve()
+    require(report.get('runtime_owner',str(ROOT))==str(owner),'Actual retained runtime owner differs')
+    api_reference=api_admission.reference(a.general_api_qualification)
+    if 'general_api_qualification' in report:
+        require(api_reference is not None and report['general_api_qualification']==dict(path=api_reference['path'],
+            sha256=api_reference['sha256'],protocol=api_reference['body']['protocol'],variant='general-api-spice-test-correction-v2'),
+            'Actual versioned API qualification differs')
+    else:require(api_reference is None,'Cannot apply the corrected API policy retrospectively')
     current=corpus(a.assets,a.modules)
     require(report['scenario_count']==157 and set(report['cases'])==set(current['cases']), 'Stock corpus is incomplete')
     require(report['lock_sha256']==current['lock_sha256'],'Frozen source lock differs')
     build_path=Path(report['build_record_path'])
     build=json.loads(build_path.read_text())
     binaries=build['runtime_files_sha256']
-    executable=next(ROOT/name for name in binaries if Path(name).name=='orbiter-production')
-    renderer=next(ROOT/name for name in binaries if name.endswith('/NativeModules/Graphics/OGLClient.so'))
-    identity=intentional_exit.build_identity(executable,renderer.parent.parent,build_path,a.runtime_source_commit)
+    executable=next(owner/name for name in binaries if Path(name).name=='orbiter-production')
+    renderer=next(owner/name for name in binaries if name.endswith('/NativeModules/Graphics/OGLClient.so'))
+    identity=intentional_exit.build_identity(executable,renderer.parent.parent,build_path,a.runtime_source_commit,owner)
     require(identity==report['runtime_identity'],'Recomputed stock build identity differs')
     if identity['sanitizer_linked']:
         require(all(report['runtime_environment'][key]==value for key,value in dict(
@@ -54,10 +65,15 @@ def main():
             ('sha256_lf','sha256_raw','ships','locked_inventory_metadata_differs','inventory_ready','dependency_problems')),
             'Stock identity or dependency data differs: '+name)
         out=a.capture/case['output']
+        if report.get('execution_protocol')=='normal-stock-capture-v2':
+            receipt=json.loads((out/'process-receipt.json').read_text())
+            require(receipt['terminal'] is True and receipt['cancelled'] is False and
+                    type(receipt['actual_collector_pid']) is int and receipt['actual_collector_pid']>0 and
+                    receipt['actual_returncode']==case['returncode'],'Actual normal-stock process receipt incomplete')
         for file,checksum in case.get('files_sha256',{}).items():
             require(digest(out/file)==checksum,'Stock attempt artifact changed: '+str(out/file))
         require('returncode' in case,'Attempt did not terminate normally or report its exit: '+name)
-        actual=json.loads(json.dumps(inspect(out,case,case['returncode'],name,a.stock_exit_reference,identity['profile'])))
+        actual=json.loads(json.dumps(inspect(out,case,case['returncode'],name,a.stock_exit_reference,identity['profile'],api_reference)))
         require(all(case[k]==v for k,v in actual.items()),'Recomputed stock outcome differs: '+name)
         summary['attempted']+=1;summary[case['status']]+=1
         summary['inventory_ready']+=case['inventory_ready']
