@@ -4,6 +4,9 @@
 #include "Orbitersdk.h"
 #include "../../../Src/Orbiter/Production/MathObservation.h"
 #include "TouchdownObservation.h"
+#ifdef ORBITER_RELOAD_INTERNAL_OBSERVATION
+#include "InternalObservation.h"
+#endif
 #include <cstdlib>
 #include <fstream>
 #include <iomanip>
@@ -13,6 +16,9 @@ namespace {
 class Observer final : public oapi::Module {
     std::ofstream trace;
     std::ofstream touchdown;
+#ifdef ORBITER_RELOAD_INTERNAL_OBSERVATION
+    std::ofstream internal;
+#endif
     unsigned tick = 0;
     std::string target;
 public:
@@ -26,6 +32,10 @@ public:
         touchdown.open("touchdown-math.csv",std::ios::binary);
         touchdown.imbue(std::locale::classic());touchdown<<std::setprecision(17);
         reload_touchdown::Header(touchdown);
+#ifdef ORBITER_RELOAD_INTERNAL_OBSERVATION
+        internal.open("internal-state.csv",std::ios::binary);internal.imbue(std::locale::classic());
+        internal<<std::setprecision(17);reload_internal::Header(internal);
+#endif
     }
     void clbkPreStep(double seconds, double, double) override {
         auto* vessel = oapiGetVesselInterface(oapiGetVesselByName(const_cast<char*>(target.c_str())));
@@ -37,7 +47,11 @@ public:
         oapiGetPlanetObliquityMatrix(earth, &obliquity);
         orbiter::production::math_observation::Row(trace, tick, seconds, *vessel,
             position, rotation, obliquity, oapiGetPlanetCurrentRotation(earth));
-        reload_touchdown::Rows(touchdown,tick++,seconds);
+        reload_touchdown::Rows(touchdown,tick,seconds);
+#ifdef ORBITER_RELOAD_INTERNAL_OBSERVATION
+        reload_internal::Rows(internal,tick,seconds);
+#endif
+        ++tick;
         if (!trace || !touchdown) std::exit(1);
     }
 };

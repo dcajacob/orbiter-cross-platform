@@ -5,6 +5,7 @@
 #include "Production/NativeRenderApi.h"
 #include "TimeData.h"
 #include "TouchdownObservation.h"
+#include "InternalObservation.h"
 #include <dlfcn.h>
 #include <fstream>
 #include <iomanip>
@@ -27,4 +28,10 @@ void orbiter::production::Session::EndTimeStep(SessionServices& services,TimeDat
     if(!original)throw std::runtime_error("Actual original session end missing");
     original(services,time,running,active,force);
     reload_touchdown::Rows(trace(),++tick,time.SimT0);
+    static std::ofstream internal=[] {
+        std::ofstream result("internal-state.csv",std::ios::binary);
+        result.imbue(std::locale::classic());result<<std::setprecision(17);
+        reload_internal::Header(result);return result;
+    }();
+    reload_internal::Rows(internal,tick,time.SimT0);
 }
