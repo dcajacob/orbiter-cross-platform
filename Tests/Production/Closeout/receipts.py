@@ -16,7 +16,16 @@ def pid(value):
 def inspect_launch(root, trusted_scripts):
     root = Path(root)
     config = load(root/'request.json')
-    roots = validate(config)
+    if config['transport_protocol']=='phase6-local-windows-vm-v3':
+        # Import explicitly from this versioned sibling; v2 remains unchanged.
+        import importlib.util
+        file=Path(__file__).parent/'LocalVM/runtime_descriptor_v3.py'
+        import sys
+        sys.path.insert(0,str(file.parent))
+        spec=importlib.util.spec_from_file_location('local_windows_transport_v3',file)
+        descriptor=importlib.util.module_from_spec(spec);spec.loader.exec_module(descriptor)
+        roots=descriptor.validate(config)
+    else:roots = validate(config)
     records = {name:load(root/(name+'.json')) for name in
                ('system-launch','bootstrap-started','bootstrap-result','worker-result','guest-job','guest-result','vm')}
     system = records['system-launch']; started = records['bootstrap-started']

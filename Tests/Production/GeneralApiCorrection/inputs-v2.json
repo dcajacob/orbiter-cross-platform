@@ -1,0 +1,7 @@
+{
+  "protocol": "general-api-spice-test-correction-v2",
+  "inputs_sha256_lf": {
+    "Script/Tests/GeneralApiTest.lua": "0eb305d7171beabec4a30b07e40eaf0e5063ef3575da59ef40ef5ff889051b69",
+    "Src/Celbody/SPICE/Config/Earth.cfg": "aadffb231f82e61ae9e1428858e70fa5b9352e6dd9f91b2c42cea0df5cf56537"
+  }
+}

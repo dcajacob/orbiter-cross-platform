@@ -13,12 +13,13 @@ def main():
     parser.add_argument('--capture',type=Path,required=True)
     parser.add_argument('--owner',type=Path,required=True)
     parser.add_argument('--output',type=Path,required=True)
+    parser.add_argument('--variant-version',choices=('v1','v2'),default='v2')
     args=parser.parse_args();require(not args.output.exists(),'Fresh focused audit output required')
     report_path=args.capture/'diagnostic.json';body=report_path.read_bytes();report=json.loads(body)
     require(report['status']=='captured-original-and-corrected-native-diagnostic-only' and
             set(report['cases'])=={'original','corrected'} and report['normal_admission_qualified'] is False,
             'Complete focused original/corrected diagnostic required')
-    expected,oracle=corrected((ROOT/ORIGINAL).read_bytes(),(ROOT/EARTH).read_bytes())
+    expected,oracle=corrected((ROOT/ORIGINAL).read_bytes(),(ROOT/EARTH).read_bytes(),args.variant_version)
     sys.path.insert(0,str(args.owner/'Tests/Production/StockScenarios'))
     import intentional_exit
     observed={};protected={str(report_path):digest(body)}
@@ -41,6 +42,9 @@ def main():
                 'Actual completed simulator receipt required')
         life=json.loads((folder/'graphics-lifecycle.json').read_text())
         require(life==record['graphics'] and life['context_deleted'] is True, 'Actual graphics closure differs')
+        math=json.loads((folder/'numerics.json').read_text())['math']
+        require(math=='amd-6121d02-'+('sse2' if identity['math_profile']=='sse2' else 'fma3'),
+                'Actual original/corrected math profile differs')
         require(not any(s in text for s in ('ERROR: AddressSanitizer','ERROR: LeakSanitizer','runtime error:')),
                 'Native sanitizer finding in focused diagnostic')
         if variant=='original':

@@ -21,7 +21,8 @@ def digest(body):
     return hashlib.sha256(body).hexdigest()
 
 
-def corrected(original, earth):
+def corrected(original, earth, version='v2'):
+    require(version in ('v1','v2'), 'Unknown API correction version')
     fields = {}
     for line in earth.decode('ascii').splitlines():
         line = line.split(';', 1)[0].strip()
@@ -57,7 +58,20 @@ assert(almost_equal(oapi.get_planetobliquity(earth)/math.pi*180,23.43929100097))
     new_planet = ('-- Oracle: locked SPICE Earth.cfg; zero PrecessionObliquity fixes the axis tilt.\n'
                   'assert(almost_equal(oapi.get_planetperiod(earth), ' + repr(period) + '))\n'
                   'assert(almost_equal(oapi.get_planetobliquity(earth), ' + repr(tilt) + '))')
-    replacements = [('if cond == false then', 'if not cond then'),
+    old_assert = '''function assert(cond)
+\tif cond == false then
+\t\tadd_line(" - FAILED!")
+\t\terror("Assertion failed\\n"..debug.traceback())
+        oapi.exit(1)
+\tend
+end'''
+    new_assert = '''local lua_assert = assert
+function assert(cond, ...)
+\tif not cond then add_line(" - FAILED!") end
+\treturn lua_assert(cond, ...)
+end'''
+    assertion = ('if cond == false then', 'if not cond then') if version=='v1' else (old_assert,new_assert)
+    replacements = [assertion,
                     (old_comparator, new_comparator), (old_planet, new_planet),
                     ('assert(almost_equal(gv.z, 464.58137217991))',
                      'assert(almost_equal(gv.z, ' + repr(equatorial_speed) + '))')]
@@ -68,14 +82,15 @@ assert(almost_equal(oapi.get_planetobliquity(earth)/math.pi*180,23.43929100097))
                                 precession_obliquity_radians=0, equatorial_speed_m_s=equatorial_speed, replaced_regions=4)
 
 
-def prepare(output):
+def prepare(output, version='v2'):
     output = Path(output)
     require(not output.exists(), 'Fresh test-variant output required')
-    lock = json.loads((HERE/'inputs-v1.json').read_text())
+    require(version in ('v1','v2'), 'Unknown API correction version')
+    lock = json.loads((HERE/('inputs-'+version+'.json')).read_text())
     inputs = {name:(ROOT/name).read_bytes() for name in (ORIGINAL, EARTH)}
     for name, body in inputs.items():
         require(digest(body.replace(b'\r\n',b'\n')) == lock['inputs_sha256_lf'][name], 'Locked correction input differs: ' + name)
-    body, oracle = corrected(inputs[ORIGINAL].replace(b'\r\n',b'\n'), inputs[EARTH])
+    body, oracle = corrected(inputs[ORIGINAL].replace(b'\r\n',b'\n'), inputs[EARTH], version)
     output.mkdir(parents=True)
     original = output/'original/GeneralApiTest.lua'; original.parent.mkdir(); original.write_bytes(inputs[ORIGINAL])
     target = output/ORIGINAL;target.parent.mkdir(parents=True);target.write_bytes(body)
@@ -91,4 +106,5 @@ def prepare(output):
 if __name__ == '__main__':
     parser=argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--output',type=Path,required=True)
-    prepare(parser.parse_args().output)
+    parser.add_argument('--version',choices=('v1','v2'),default='v2')
+    args=parser.parse_args();prepare(args.output,args.version)

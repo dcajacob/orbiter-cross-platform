@@ -5,6 +5,7 @@ import hashlib
 import json
 import os
 from pathlib import Path
+import re
 import shutil
 import subprocess
 import sys
@@ -27,6 +28,7 @@ def main():
                 commands=[],raw_evidence_uploaded=False,phase6_complete=False)
     def save():
         temporary=status.with_suffix('.tmp');temporary.write_text(json.dumps(report,indent=2)+'\n');temporary.replace(status)
+        (work/'observer-build.json').write_text(json.dumps(report,indent=2)+'\n')
     def run(label,argv,cwd,env=None):
         record=dict(label=label,argv=list(map(str,argv)),cwd=str(cwd));report['commands'].append(record);save()
         with (work/(label+'.log')).open('w') as log:
@@ -72,23 +74,30 @@ def main():
         environment['PYTHONDONTWRITEBYTECODE']='1'
         report['compiler_environment_script_sha256']=sha(cfg['compiler_environment'])
         sdk=Path(cfg['preserved']);manifest=sdk/'test-runtime.json';package=json.loads(manifest.read_text())
-        require(package['source_commit']=='f725194209634f7fd5d1d44d426cfa9b5e303e37','Preserved original SDK required')
+        sdk_source=cfg.get('sdk_source_commit','f725194209634f7fd5d1d44d426cfa9b5e303e37')
+        require(re.fullmatch('[0-9a-f]{40}',sdk_source) and package['source_commit']==sdk_source,
+                'Declared actual SDK source differs')
         guarded={n:v for n,v in package['files'].items() if n.startswith('Orbitersdk/') or n=='Orbiter.exe'}
         require(all(sha(sdk/n)==v for n,v in guarded.items()),'Actual original application/SDK bytes differ')
         report['sdk']=dict(source=package['source_commit'],manifest_sha256=sha(manifest),files_sha256=guarded)
-        binary=work/'ProductionReloadMathObserver.dll';obj=work/'Observer.obj'
+        kind=cfg.get('observer_kind','reload-math')
+        require(kind in ('reload-math','general-api'),'Known passive observer required')
+        configuration=cfg.get('configuration','Debug');require(configuration in ('Debug','Release'),'Known configuration required')
+        relative='Tests/Production/'+('ReloadMath/Observer.cpp' if kind=='reload-math' else 'GeneralApiCorrection/Observer.cpp')
+        binary=work/('ProductionReloadMathObserver.dll' if kind=='reload-math' else 'ProductionGeneralApiObserver.dll');obj=work/'Observer.obj'
         compiler=shutil.which('cl.exe',path=environment['PATH']);require(compiler,'Actual MSVC compiler missing from validated environment')
         report['compiler']=dict(path=compiler,sha256=sha(compiler))
-        command=[compiler,'/nologo','/EHsc','/std:c++17','/W3','/fp:precise','/Oi-','/MDd','/Od','/LD',
-            '/DNOMINMAX','/I'+str(sdk/'Orbitersdk/include'),str(source/'Tests/Production/ReloadMath/Observer.cpp'),
+        command=[compiler,'/nologo','/EHsc','/std:c++17','/W3','/fp:precise','/Oi-',
+            '/MDd' if configuration=='Debug' else '/MD','/Od' if configuration=='Debug' else '/O2','/LD',
+            '/DNOMINMAX','/I'+str(sdk/'Orbitersdk/include'),str(source/relative),
             '/Fo'+str(obj),'/Fe'+str(binary),'/link',str(sdk/'Orbitersdk/lib/Orbiter.lib'),str(sdk/'Orbitersdk/lib/Orbitersdk.lib')]
         if cfg.get('internal_headers'):
             command[1:1]=['/DORBITER_RELOAD_INTERNAL_OBSERVATION','/I'+str(source/'internal/Src/Orbiter'),
                            '/I'+str(Path(cfg['directx_sdk'])/'Include')]
         run('observer-build',command,work,environment)
-        report['observer']=dict(binary=str(binary),sha256=sha(binary),configuration='Debug',
-            source_commit=cfg['source_commit'],source_sha256=sha(source/'Tests/Production/ReloadMath/Observer.cpp'),
-            header_sha256=sha(source/'Src/Orbiter/Production/MathObservation.h'))
+        report['observer']=dict(binary=str(binary),sha256=sha(binary),configuration=configuration,kind=kind,
+            sdk_source_commit=sdk_source,source_commit=cfg['source_commit'],source_sha256=sha(source/relative),
+            header_sha256=sha(source/'Src/Orbiter/Production/MathObservation.h') if kind=='reload-math' else None)
         if cfg.get('run_crt',True):
             run('crt',[sys.executable,'-B',source/'Tests/Production/CrtDiagnostic/capture.py',
                        '--inputs',cfg['inputs'],'--output',work/'crt'],source,environment)
@@ -106,7 +115,8 @@ def main():
             target=request.parent/'crt';target.mkdir(exist_ok=True)
             for path in crt.iterdir():
                 if path.is_file() and path.suffix not in ('.exe','.obj'):shutil.copy2(path,target/path.name)
-        if (work/'ProductionReloadMathObserver.dll').is_file():shutil.copy2(work/'ProductionReloadMathObserver.dll',request.parent/'ProductionReloadMathObserver.dll')
+        for name in ('ProductionReloadMathObserver.dll','ProductionGeneralApiObserver.dll'):
+            if (work/name).is_file():shutil.copy2(work/name,request.parent/name)
 
 
 if __name__=='__main__':main()
