@@ -34,6 +34,21 @@ staged assets, celestial data, planet archives, private compositor tools,
 decoration plugin and library paths explicitly; `--help` lists the arguments.
 See [the attachment cleanup record](../../../Docs/Production/AttachmentTeardown.md).
 
+The same `native.py` entry point accepts `--lifetime-sessions 20 --owner PATH`
+for selected twenty-world ownership diagnostics on an immutable package in a
+separate checkout. Supply its usual build, build-record, assets, data, planet,
+compositor, pinned decoration/provider and output arguments, plus explicit
+`--case` IDs and at most four `--jobs`. This mode uses the complete original
+scenarios, sixty fixed-step frames per world, an empty original-dispatch replay,
+and actual module initialization, finalization and link-map destruction records.
+It preserves every world's state, camera and full frame, checks all original
+vessels, actual math mode, clean graphics and unsuppressed sanitizers, and records
+the simulator's owned PID/start/exit receipt. It does not qualify interactions,
+persistence, normal admission or stock parity. Independently re-read closed
+captures with `lifetimes.py --capture PATH/lifetimes.json --output FRESH.json`.
+`Lifetimes.Test.py` rejects incomplete ticks, substituted or lost vessels,
+nonfinite state, truncated frames, incomplete graphics and retained modules.
+
 The first fresh Debug ASan/UBSan package at
 `72c35b75c117c16a94b38925e90e7d1ca2812a08` builds all three actual modules and
 both diagnostic hosts. Its record is

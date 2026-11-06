@@ -123,7 +123,17 @@ def main():
     p.add_argument('--instrument-control',action='store_true',help='Exercise real native compatibility contexts and surface uploads in the complete unchanged scene')
     p.add_argument('--jobs',type=int,default=1)
     p.add_argument('--protocol',choices=protocols.NAMES,default=protocols.V1)
-    a=p.parse_args();config=settings(a.protocol);require(not a.output.exists() and a.jobs>0,'Fresh diagnostic output and positive concurrency required')
+    p.add_argument('--owner',type=lambda v:Path(v).resolve(),default=ROOT,
+                   help='Immutable package owner for the separate repeated-lifetime diagnostic')
+    p.add_argument('--lifetime-sessions',type=int,choices=(20,),
+                   help='Run twenty bounded whole-world lifetimes; cannot satisfy stock parity')
+    a=p.parse_args()
+    if a.lifetime_sessions:
+        from lifetimes import capture
+        capture(a)
+        return
+    require(a.owner==ROOT,'Separate package owner is supported only for lifetime diagnostics')
+    config=settings(a.protocol);require(not a.output.exists() and a.jobs>0,'Fresh diagnostic output and positive concurrency required')
     cases=[case for case in config['cases'] if not a.case or case['id'] in a.case]
     require(cases and (not a.case or {c['id'] for c in cases}==set(a.case)),'Unknown native complete-scene case')
     record=json.loads(a.build_record.read_text());require(record['status']=='built','Complete immutable build required')
