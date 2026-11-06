@@ -40,6 +40,15 @@ def inspect(out,case,returncode,scenario=None,exit_reference=None,profile=None,a
     except (ValueError,OSError,KeyError,TypeError) as error:
         problems.append('Pinned stock exit rejected: '+str(error))
     frames=selected['pins']['termination']['completed_frames'] if selected else 0 if api_selected else 60
+    receipt_path=out/'process-receipt.json'
+    if api_selected or receipt_path.exists():
+        try:
+            receipt=json.loads(receipt_path.read_text())
+            require(receipt['terminal'] is True and receipt['cancelled'] is False and
+                    type(receipt['actual_collector_pid']) is int and receipt['actual_collector_pid']>0 and
+                    receipt['actual_returncode']==returncode, 'Completed actual simulator PID/exit receipt required')
+        except (ValueError,OSError,KeyError,TypeError) as error:
+            problems.append('Process receipt rejected: '+str(error))
     life_path=out/'graphics-lifecycle.json'
     life=json.loads(life_path.read_text()) if life_path.exists() else {}
     if life!=dict(rendered_frames=frames,successful_presents=frames,context_deleted=True):
@@ -114,6 +123,7 @@ def main():
         scope='Unchanged complete 157-scenario corpus; initialization/smoke, not physical interaction or new Windows state/image parity',
         backend=a.backend,engine_default_mjd_without_numeric_date=51982.5,execution_protocol='normal-stock-capture-v2',
         runtime_owner=str(a.runtime_owner),diagnostic_only=a.case is not None,
+        cases_requested=[name for name in report['cases'] if a.case is None or name in a.case],
         source_sha256={str(path.relative_to(ROOT)):digest(path) for path in sources},
         runtime_identity=identity,runtime_environment=runtime_environment,build_record_path=str(a.build_record),
         runtime_sha256=dict(executable=digest(a.executable),renderer=digest(a.modules/'Graphics/OGLClient.so'),

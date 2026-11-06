@@ -20,6 +20,7 @@ def main():
     p.add_argument('--runtime-owner',type=Path,default=ROOT)
     p.add_argument('--stock-exit-reference',type=Path)
     p.add_argument('--general-api-qualification',type=Path)
+    p.add_argument('--diagnostic-case',action='append',help='Explicit selected audit; cannot produce full stock acceptance')
     a=p.parse_args();require(not a.output.exists(),'Stock audit output exists')
     require(re.fullmatch('[0-9a-f]{40}',a.runtime_source_commit),'Runtime source must be an immutable full commit')
     report=json.loads((a.capture/'stock-scenarios.json').read_text())
@@ -34,6 +35,11 @@ def main():
     current=corpus(a.assets,a.modules)
     require(report['scenario_count']==157 and set(report['cases'])==set(current['cases']), 'Stock corpus is incomplete')
     require(report['lock_sha256']==current['lock_sha256'],'Frozen source lock differs')
+    requested=list(report['cases']) if a.diagnostic_case is None else a.diagnostic_case
+    require(requested and len(requested)==len(set(requested)) and set(requested)<=set(report['cases']), 'Invalid stock audit selection')
+    diagnostic=a.diagnostic_case is not None
+    require(report.get('diagnostic_only',False) is diagnostic, 'Full/selected stock audit scope differs')
+    require(report.get('cases_requested',requested)==[name for name in report['cases'] if name in requested], 'Recorded stock selection differs')
     build_path=Path(report['build_record_path'])
     build=json.loads(build_path.read_text())
     binaries=build['runtime_files_sha256']
@@ -60,6 +66,9 @@ def main():
     summary=dict(attempted=0,passed=0,failed=0,inventory_ready=0,source_metadata_mismatches=0)
     failures={};runs=[]
     for name,case in report['cases'].items():
+        if name not in requested:
+            require(case['status']=='not-run' and 'output' not in case,'Unexpected attempt outside declared stock audit scope')
+            continue
         require(case['status'] in ('passed','failed') and 'output' in case,'Scenario was skipped: '+name)
         require(all(case[key]==current['cases'][name][key] for key in
             ('sha256_lf','sha256_raw','ships','locked_inventory_metadata_differs','inventory_ready','dependency_problems')),
@@ -83,7 +92,8 @@ def main():
                          finalized_ticks=case['finalized_ticks'],vessels=case['declared_vessels'],
                          files_sha256=case['files_sha256']))
     require(summary==report['summary'],'Stock summary differs')
-    result=dict(status='passed' if not failures else 'audited-incomplete',phase6_complete=False,
+    status=('audited-selected-stock-scenarios-diagnostic-only' if not failures else 'audited-selected-incomplete') if diagnostic else ('passed' if not failures else 'audited-incomplete')
+    result=dict(status=status,phase6_complete=False,diagnostic_only=diagnostic,cases_requested=requested,
                 capture_sha256=digest(a.capture/'stock-scenarios.json'),source_sha256=digest(Path(__file__)),
                 runtime_source_commit=a.runtime_source_commit,summary=summary,failures=failures,runs=runs)
     a.output.write_text(json.dumps(result,indent=2)+'\n')
