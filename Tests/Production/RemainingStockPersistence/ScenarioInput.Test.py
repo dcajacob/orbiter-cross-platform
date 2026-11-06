@@ -7,7 +7,7 @@ import shutil
 import stat
 import tempfile
 
-from capture_native import stage_scenario_input,sha
+from capture_native import stage_asset_tree,stage_scenario_input,sha
 
 
 def rejected(action):
@@ -43,8 +43,28 @@ def main():
         assert rejected(lambda:stage_scenario_input(source,link,'windows-save-reload'))
         assert rejected(lambda:stage_scenario_input(source,target,'unknown'))
         assert sha(source)==original and sha(target)==copied
+        assets=root/'assets';scenario=assets/'Scenarios/Space Shuttle Atlantis/original.scn'
+        scenario.parent.mkdir(parents=True);scenario.write_bytes(source.read_bytes())
+        cfg=assets/'Orbiter.cfg';cfg.write_bytes(b'Original configuration\n')
+        for path in (scenario,cfg):path.chmod(0o444)
+        source_hashes={path.relative_to(assets).as_posix():sha(path) for path in (scenario,cfg)}
+        source_directories=[assets,assets/'Scenarios',scenario.parent]
+        for path in source_directories:path.chmod(0o555)
+        staged=root/'private-world';stage_asset_tree(assets,staged)
+        stage_scenario_input(scenario,staged/scenario.relative_to(assets),'stock-writer')
+        private_cfg=staged/'Orbiter.cfg';private_cfg.unlink();private_cfg.write_bytes(b'Private test configuration\n')
+        for name in ('finalized-frame.json','persistence-replay.csv','persistence-input.json'):
+            (staged/name).write_bytes(b'Private test evidence\n')
+        stage_scenario_input(saved,staged/'Scenarios/_Phase6Persistence/exact.scn','windows-save-reload')
+        assert stat.S_IMODE((staged/scenario.relative_to(assets)).stat().st_mode)==0o444
+        assert all(stat.S_IMODE((staged/path.relative_to(assets)).stat().st_mode)==0o755 for path in source_directories)
+        assert all(stat.S_IMODE(path.stat().st_mode)==0o555 for path in source_directories)
+        assert all(sha(assets/name)==value for name,value in source_hashes.items())
+        # TemporaryDirectory must be able to remove this deliberately read-only source tree.
+        for path in source_directories:path.chmod(0o755)
     result=dict(status='passed',source_sha256=sha(Path(__file__)),read_only_stock_mode_and_bytes_preserved=True,
                 repeated_stock_staging_preserved=True,exact_derived_input_written=True,
+                read_only_asset_sources_and_scenario_preserved=True,private_directory_and_evidence_staging_passed=True,
                 rejected_controls=['changed_stock_copy','missing_stock_copy','existing_derived_input',
                                    'dangling_derived_symlink','unknown_phase'])
     args.output.write_text(json.dumps(result,indent=2)+'\n')

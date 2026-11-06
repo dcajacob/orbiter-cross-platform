@@ -10,7 +10,11 @@ The native collector preserves the copied stock scenario's bytes and read-only
 mode rather than rewriting it. Exact Windows saves are written only to fresh
 derived paths; collisions with staged assets fail. `ScenarioInput.Test.py`
 checks read-only copies, exact CRLF/non-ASCII saved bytes and five invalid-input
-controls. This staging fix changes no simulation, reference or admission policy.
+controls. Private copied directories gain owner write/execute permission so the
+collector can replace its configuration and create evidence; original asset
+file modes and the complete source tree remain unchanged. The regression also
+exercises that complete staging sequence. This changes no simulation, reference
+or admission policy.
 
 The native `--save` argument supplies the destination for a Save command; it does
 not save automatically on exit. The existing real replay command at input tick

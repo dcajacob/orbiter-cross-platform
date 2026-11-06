@@ -8,6 +8,7 @@ import json
 import os
 from pathlib import Path
 import shutil
+import stat
 import subprocess
 import sys
 
@@ -26,6 +27,14 @@ spec=importlib.util.spec_from_file_location('persistence_native_scene_reader',HE
 native=importlib.util.module_from_spec(spec);spec.loader.exec_module(native)
 sha=native.sha;sha_lf=native.sha_lf
 PHASES=('stock-writer','windows-save-reload')
+
+
+def stage_asset_tree(source,target):
+    """Retain asset file modes while permitting private configuration/evidence files."""
+    shutil.copytree(source,target,copy_function=shutil.copy2)
+    directories=[target,*(path for path in target.rglob('*') if path.is_dir())]
+    for path in directories:
+        path.chmod(stat.S_IMODE(path.stat().st_mode)|stat.S_IWUSR|stat.S_IXUSR)
 
 
 def stage_scenario_input(source,target,phase):
@@ -184,7 +193,8 @@ def main():
                     case=parent_case;source=ROOT/case['scenario_entry_point']
                     provenance=dict(protocol=contract['protocol'],phase=a.phase,original_parent_case=case,stock_input_sha256=sha(source),
                         original_scenarios_and_scripts_unchanged=True,native_admission_qualified=False,phase6_complete=False)
-                out=a.output/(case['id']+'-'+str(repeat));folders.append(out);shutil.copytree(a.assets,out,copy_function=shutil.copy2)
+                out=a.output/(case['id']+'-'+str(repeat));folders.append(out)
+                stage_asset_tree(a.assets,out)
                 target=out/case['scenario_entry_point']
                 stage_scenario_input(source,target,a.phase)
                 cfg=(HERE.parent/'NativeScene/Orbiter.cfg').read_text()
