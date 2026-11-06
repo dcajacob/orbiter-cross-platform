@@ -1,0 +1,453 @@
+{
+  "schema": 1,
+  "status": "audited-incomplete-current-normal-admission-corpus",
+  "created_utc": "2026-11-06T04:18:04.475764+00:00",
+  "runtime_source_commit": "f82b7392d4a5a1e86c23d88f9ad16f5c5398f541",
+  "observer_commit": "0240d51639f1765c1a27ac511432885483de538f",
+  "runtime_identity": {
+    "configuration": "Debug",
+    "math_profile": "automatic",
+    "profile": "Debug-automatic",
+    "sanitizer_linked": true,
+    "compiler": "/usr/bin/c++",
+    "cache_sha256": "40867dcf91afd08adea6701ca7dde772383d6bcc474e911775a5a8a5b6551b33",
+    "build_record_sha256": "62478a31737cf9e97d3ab878742fa486a5fdd6a3937bd90f6682ef3887b6c8f9",
+    "runtime_source_commit": "f82b7392d4a5a1e86c23d88f9ad16f5c5398f541"
+  },
+  "scope": "Unchanged complete 157-scenario corpus; initialization/smoke, not physical interaction or new Windows state/image parity",
+  "summary": {
+    "attempted": 157,
+    "passed": 118,
+    "failed": 39,
+    "inventory_ready": 157,
+    "source_metadata_mismatches": 7
+  },
+  "failure_causes": {
+    "unqualified_normal_class_capabilities": 38,
+    "inherited_original_GeneralApiTest_Earth_obliquity_assertion": 1
+  },
+  "admission_rejections": {
+    "2024 Edition/3 Minute Tour of Kennedy Space Center.scn": [
+      "Orbiter native production: Unsupported stock vessel class or capabilities: Atlantis; generic replacement is forbidden",
+      "process exit 1",
+      "Incomplete 60-frame presentation or context deletion",
+      "Incomplete finalized all-vessel ticks"
+    ],
+    "2024 Edition/Space Shuttle ascent autopilot.scn": [
+      "Orbiter native production: Unsupported stock vessel class or capabilities: Atlantis; generic replacement is forbidden",
+      "process exit 1",
+      "Incomplete 60-frame presentation or context deletion",
+      "Incomplete finalized all-vessel ticks"
+    ],
+    "2024 Edition/Space Shuttle to ISS.scn": [
+      "Orbiter native production: Unsupported stock vessel class or capabilities: Atlantis; generic replacement is forbidden",
+      "process exit 1",
+      "Incomplete 60-frame presentation or context deletion",
+      "Incomplete finalized all-vessel ticks"
+    ],
+    "Antelope Valley scenery/STS-125 finals at Edwards.scn": [
+      "Orbiter native production: Unsupported stock vessel class or capabilities: Atlantis; generic replacement is forbidden",
+      "process exit 1",
+      "Incomplete 60-frame presentation or context deletion",
+      "Incomplete finalized all-vessel ticks"
+    ],
+    "Demo/Atlantis Ascent AP.scn": [
+      "Orbiter native production: Unsupported stock vessel class or capabilities: Atlantis; generic replacement is forbidden",
+      "process exit 1",
+      "Incomplete 60-frame presentation or context deletion",
+      "Incomplete finalized all-vessel ticks"
+    ],
+    "Demo/Project Alpha.scn": [
+      "Orbiter native production: Unsupported stock vessel class or capabilities: Atlantis; generic replacement is forbidden",
+      "process exit 1",
+      "Incomplete 60-frame presentation or context deletion",
+      "Incomplete finalized all-vessel ticks"
+    ],
+    "Dragonfly/Dragonfly.scn": [
+      "Orbiter native production: Unsupported stock vessel class or capabilities: Dragonfly; generic replacement is forbidden",
+      "process exit 1",
+      "Incomplete 60-frame presentation or context deletion",
+      "Incomplete finalized all-vessel ticks"
+    ],
+    "Dragonfly/Dragonfly021118.scn": [
+      "Orbiter native production: Unsupported stock vessel class or capabilities: Module2; generic replacement is forbidden",
+      "process exit 1",
+      "Incomplete 60-frame presentation or context deletion",
+      "Incomplete finalized all-vessel ticks"
+    ],
+    "Dragonfly/Station building.scn": [
+      "Orbiter native production: Unsupported stock vessel class or capabilities: Module2; generic replacement is forbidden",
+      "process exit 1",
+      "Incomplete 60-frame presentation or context deletion",
+      "Incomplete finalized all-vessel ticks"
+    ],
+    "Dragonfly/v1.0.0b PoweredUp.scn": [
+      "Orbiter native production: Unsupported stock vessel class or capabilities: Dragonfly; generic replacement is forbidden",
+      "process exit 1",
+      "Incomplete 60-frame presentation or context deletion",
+      "Incomplete finalized all-vessel ticks"
+    ],
+    "Launch sites and spaceports/STS-125 finals at Edwards.scn": [
+      "Orbiter native production: Unsupported stock vessel class or capabilities: Atlantis; generic replacement is forbidden",
+      "process exit 1",
+      "Incomplete 60-frame presentation or context deletion",
+      "Incomplete finalized all-vessel ticks"
+    ],
+    "Navigation/Space Physics/Atlantis in orbit.scn": [
+      "Orbiter native production: Unsupported stock vessel class or capabilities: Atlantis; generic replacement is forbidden",
+      "process exit 1",
+      "Incomplete 60-frame presentation or context deletion",
+      "Incomplete finalized all-vessel ticks"
+    ],
+    "Navigation/Space Physics/Solar sail.scn": [
+      "Orbiter native production: Unsupported stock vessel class or capabilities: SolarSail; generic replacement is forbidden",
+      "process exit 1",
+      "Incomplete 60-frame presentation or context deletion",
+      "Incomplete finalized all-vessel ticks"
+    ],
+    "Navigation/Space Physics/Spin stabilisation.scn": [
+      "Orbiter native production: Unsupported stock vessel class or capabilities: Atlantis_SRB; generic replacement is forbidden",
+      "process exit 1",
+      "Incomplete 60-frame presentation or context deletion",
+      "Incomplete finalized all-vessel ticks"
+    ],
+    "Navigation/Special orbits/Molniya orbit.scn": [
+      "Orbiter native production: Unsupported stock vessel class or capabilities: Dragonfly; generic replacement is forbidden",
+      "process exit 1",
+      "Incomplete 60-frame presentation or context deletion",
+      "Incomplete finalized all-vessel ticks"
+    ],
+    "Playback/Atlantis undocking.scn": [
+      "Orbiter native production: Unsupported stock vessel class or capabilities: Atlantis; generic replacement is forbidden",
+      "process exit 1",
+      "Incomplete 60-frame presentation or context deletion",
+      "Incomplete finalized all-vessel ticks"
+    ],
+    "Quadcopter/Quadcopter at KSC.scn": [
+      "Orbiter native production: Unsupported stock vessel class or capabilities: Quadcopter; generic replacement is forbidden",
+      "process exit 1",
+      "Incomplete 60-frame presentation or context deletion",
+      "Incomplete finalized all-vessel ticks"
+    ],
+    "Satellites and Probes/Hubble Space Telescope/HST Animation.scn": [
+      "Orbiter native production: Unsupported stock vessel class or capabilities: Atlantis; generic replacement is forbidden",
+      "process exit 1",
+      "Incomplete 60-frame presentation or context deletion",
+      "Incomplete finalized all-vessel ticks"
+    ],
+    "Satellites and Probes/Hubble Space Telescope/HST Launch.scn": [
+      "Orbiter native production: Unsupported stock vessel class or capabilities: Atlantis; generic replacement is forbidden",
+      "process exit 1",
+      "Incomplete 60-frame presentation or context deletion",
+      "Incomplete finalized all-vessel ticks"
+    ],
+    "Satellites and Probes/Hubble Space Telescope/HST Orbit Deployment.scn": [
+      "Orbiter native production: Unsupported stock vessel class or capabilities: Atlantis; generic replacement is forbidden",
+      "process exit 1",
+      "Incomplete 60-frame presentation or context deletion",
+      "Incomplete finalized all-vessel ticks"
+    ],
+    "Satellites and Probes/Hubble Space Telescope/HST Recapture.scn": [
+      "Orbiter native production: Unsupported stock vessel class or capabilities: Atlantis; generic replacement is forbidden",
+      "process exit 1",
+      "Incomplete 60-frame presentation or context deletion",
+      "Incomplete finalized all-vessel ticks"
+    ],
+    "Satellites and Probes/LDEF/LDEF deployment.scn": [
+      "Orbiter native production: Unsupported stock vessel class or capabilities: Atlantis; generic replacement is forbidden",
+      "process exit 1",
+      "Incomplete 60-frame presentation or context deletion",
+      "Incomplete finalized all-vessel ticks"
+    ],
+    "Satellites and Probes/LDEF/LDEF retrieval.scn": [
+      "Orbiter native production: Unsupported stock vessel class or capabilities: Atlantis; generic replacement is forbidden",
+      "process exit 1",
+      "Incomplete 60-frame presentation or context deletion",
+      "Incomplete finalized all-vessel ticks"
+    ],
+    "Space Shuttle Atlantis/Atlantis ISS Resupply.scn": [
+      "Orbiter native production: Unsupported stock vessel class or capabilities: Atlantis; generic replacement is forbidden",
+      "process exit 1",
+      "Incomplete 60-frame presentation or context deletion",
+      "Incomplete finalized all-vessel ticks"
+    ],
+    "Space Shuttle Atlantis/Atlantis MMU Satellite Repair.scn": [
+      "Orbiter native production: Unsupported stock vessel class or capabilities: Atlantis; generic replacement is forbidden",
+      "process exit 1",
+      "Incomplete 60-frame presentation or context deletion",
+      "Incomplete finalized all-vessel ticks"
+    ],
+    "Space Shuttle Atlantis/Atlantis cockpit.scn": [
+      "Orbiter native production: Unsupported stock vessel class or capabilities: Atlantis; generic replacement is forbidden",
+      "process exit 1",
+      "Incomplete 60-frame presentation or context deletion",
+      "Incomplete finalized all-vessel ticks"
+    ],
+    "Space Shuttle Atlantis/Atlantis docked at ISS.scn": [
+      "Orbiter native production: Unsupported stock vessel class or capabilities: Atlantis; generic replacement is forbidden",
+      "process exit 1",
+      "Incomplete 60-frame presentation or context deletion",
+      "Incomplete finalized all-vessel ticks"
+    ],
+    "Space Shuttle Atlantis/Atlantis final approach.scn": [
+      "Orbiter native production: Unsupported stock vessel class or capabilities: Atlantis; generic replacement is forbidden",
+      "process exit 1",
+      "Incomplete 60-frame presentation or context deletion",
+      "Incomplete finalized all-vessel ticks"
+    ],
+    "Space Shuttle Atlantis/Atlantis landing preparation.scn": [
+      "Orbiter native production: Unsupported stock vessel class or capabilities: Atlantis; generic replacement is forbidden",
+      "process exit 1",
+      "Incomplete 60-frame presentation or context deletion",
+      "Incomplete finalized all-vessel ticks"
+    ],
+    "Space Shuttle Atlantis/Atlantis reentry 1.scn": [
+      "Orbiter native production: Unsupported stock vessel class or capabilities: Atlantis; generic replacement is forbidden",
+      "process exit 1",
+      "Incomplete 60-frame presentation or context deletion",
+      "Incomplete finalized all-vessel ticks"
+    ],
+    "Space Shuttle Atlantis/Atlantis reentry 2.scn": [
+      "Orbiter native production: Unsupported stock vessel class or capabilities: Atlantis; generic replacement is forbidden",
+      "process exit 1",
+      "Incomplete 60-frame presentation or context deletion",
+      "Incomplete finalized all-vessel ticks"
+    ],
+    "Space Shuttle Atlantis/Atlantis satellite Launch.scn": [
+      "Orbiter native production: Unsupported stock vessel class or capabilities: Atlantis; generic replacement is forbidden",
+      "process exit 1",
+      "Incomplete 60-frame presentation or context deletion",
+      "Incomplete finalized all-vessel ticks"
+    ],
+    "Space Shuttle Atlantis/Atlantis satellite.scn": [
+      "Orbiter native production: Unsupported stock vessel class or capabilities: Atlantis; generic replacement is forbidden",
+      "process exit 1",
+      "Incomplete 60-frame presentation or context deletion",
+      "Incomplete finalized all-vessel ticks"
+    ],
+    "Space Shuttle Atlantis/Launch into Sunrise.scn": [
+      "Orbiter native production: Unsupported stock vessel class or capabilities: Atlantis; generic replacement is forbidden",
+      "process exit 1",
+      "Incomplete 60-frame presentation or context deletion",
+      "Incomplete finalized all-vessel ticks"
+    ],
+    "Space Stations/ISS.scn": [
+      "Orbiter native production: Unsupported stock vessel class or capabilities: Atlantis; generic replacement is forbidden",
+      "process exit 1",
+      "Incomplete 60-frame presentation or context deletion",
+      "Incomplete finalized all-vessel ticks"
+    ],
+    "Tutorials/Space Shuttle final approach.scn": [
+      "Orbiter native production: Unsupported stock vessel class or capabilities: Atlantis; generic replacement is forbidden",
+      "process exit 1",
+      "Incomplete 60-frame presentation or context deletion",
+      "Incomplete finalized all-vessel ticks"
+    ],
+    "Tutorials/Space Shuttle to ISS.scn": [
+      "Orbiter native production: Unsupported stock vessel class or capabilities: Atlantis; generic replacement is forbidden",
+      "process exit 1",
+      "Incomplete 60-frame presentation or context deletion",
+      "Incomplete finalized all-vessel ticks"
+    ],
+    "Views/Moon through atmosphere.scn": [
+      "Orbiter native production: Unsupported stock vessel class or capabilities: Atlantis; generic replacement is forbidden",
+      "process exit 1",
+      "Incomplete 60-frame presentation or context deletion",
+      "Incomplete finalized all-vessel ticks"
+    ]
+  },
+  "other_failures": {
+    "Tests/GeneralApiTest.scn": [
+      "LuaCall (/home/dan/GIT/orbiter-cross-platform/Src/Module/LuaScript/LuaInterpreter/Interpreter.cpp:159): ...ed-mission-assets-v1/Script/Tests/GeneralApiTest.lua:13: Assertion failed"
+    ]
+  },
+  "safety": {
+    "finalized_finite_vessel_rows": 34333,
+    "successful_presents": 7093,
+    "clean_contexts": 157,
+    "actual_mapped_provider_processes": 157,
+    "original_reference_and_budgets_unchanged": true,
+    "suppressions_used": false
+  },
+  "controls": {
+    "inventory": {
+      "status": "passed",
+      "source_sha256": "376e8e1f1b149ea66b94c178fd888f30ae0d0f6daf0df56c6a2fb2396af2017b",
+      "lock_sha256": "5f89334ecb213b56b1bda651acbed8c245f874f6d61ae9f7e9fdccfb3da2f11e",
+      "locked_scenarios_verified": 157,
+      "config_only_vessel_preserved": true,
+      "required_module_fallback_rejected": true,
+      "directory_aliases_rejected": true,
+      "corrected_parse_metadata": [
+        "Scenarios/The Solar System/Eclipses/April 8 2005 Panama.scn",
+        "Scenarios/The Solar System/Eclipses/April 8 2005.scn",
+        "Scenarios/The Solar System/Jupiter flybys/Galileo's first Ganymede flyby.scn",
+        "Scenarios/The Solar System/Jupiter flybys/Galileo's first Io flyby.scn",
+        "Scenarios/The Solar System/Jupiter flybys/Galileo's second Ganymede flyby.scn",
+        "Scenarios/The Solar System/Jupiter flybys/Galileo's second Io flyby.scn",
+        "Scenarios/The Solar System/Jupiter flybys/Tour of Jupiter.scn"
+      ],
+      "frozen_scenario_bytes_and_lock_unchanged": true
+    },
+    "missing_non_focus_ship": {
+      "status": "passed",
+      "source_sha256": "5840efa345b8b47e8fe69827d6a02aa543495cb3d19175ea7a16fa61be2d60df",
+      "capture_sha256": "75127bd467cfd508a38fde0ebbadb1aaceb71a1276813fd463d45dde12fa2df7",
+      "omitted": {
+        "tick": 30,
+        "object": "ISS",
+        "focus": "GL-02"
+      },
+      "incomplete_manifest_rejected": true,
+      "original_capture_unchanged": true
+    },
+    "strict_original_exit": {
+      "status": "passed",
+      "source_sha256": "6e657e338896bbc093b7c03a9cd8cfcbaca0018ffdd3bc8d0fa8a20b1bd02b54",
+      "capture_sha256": "d1bd30d473006a7c73209f7d6c9102ba577888b176a655adfb5827a1c3dcdc78",
+      "controls": [
+        {
+          "control": "ordinary_partial_exit",
+          "problems": [
+            "Incomplete 60-frame presentation or context deletion",
+            "Incomplete finalized all-vessel ticks"
+          ]
+        },
+        {
+          "control": "missing_policy_identity",
+          "problems": [
+            "Incomplete 60-frame presentation or context deletion",
+            "Incomplete finalized all-vessel ticks"
+          ]
+        },
+        {
+          "control": "wrong_scenario_hash",
+          "problems": [
+            "Pinned stock exit rejected: Stock exit scenario identity differs",
+            "Incomplete 60-frame presentation or context deletion",
+            "Incomplete finalized all-vessel ticks"
+          ]
+        },
+        {
+          "control": "missing_reference",
+          "problems": [
+            "Pinned stock exit rejected: Audited original profile required for stock exit acceptance"
+          ]
+        },
+        {
+          "control": "wrong_profile",
+          "problems": [
+            "Pinned stock exit rejected: Stock exit original/native CRT differs"
+          ]
+        },
+        {
+          "control": "wrong_raw_math",
+          "problems": [
+            "Pinned stock exit rejected: Stock exit original/native CRT differs"
+          ]
+        },
+        {
+          "control": "missing_assertion",
+          "problems": [
+            "Pinned stock exit rejected: Stock assertions are incomplete, reordered or duplicated"
+          ]
+        },
+        {
+          "control": "forged_completion",
+          "problems": [
+            "Pinned stock exit rejected: Stock assertions are incomplete, reordered or duplicated"
+          ]
+        },
+        {
+          "control": "missing_core_background_ship",
+          "problems": [
+            "Incomplete or substituted vessel manifest at tick 3"
+          ]
+        },
+        {
+          "control": "missing_sdk_background_ship",
+          "problems": [
+            "Pinned stock exit rejected: Incomplete stock exit vessel manifest at tick 3"
+          ]
+        },
+        {
+          "control": "missing_docking_port",
+          "problems": [
+            "Pinned stock exit rejected: Incomplete stock exit docking-port observations"
+          ]
+        },
+        {
+          "control": "missing_final_tick",
+          "problems": [
+            "Pinned stock exit rejected: Incomplete stock exit vessel manifest at tick 13"
+          ]
+        },
+        {
+          "control": "wrong_exit_code",
+          "problems": [
+            "process exit 7",
+            "Pinned stock exit rejected: Stock script did not return the original exit code"
+          ]
+        },
+        {
+          "control": "incomplete_teardown",
+          "problems": [
+            "Pinned stock exit rejected: Native stock exit presentations or graphics teardown incomplete",
+            "Incomplete 13-frame presentation or context deletion"
+          ]
+        },
+        {
+          "control": "overwritten_save",
+          "problems": [
+            "Pinned stock exit rejected: Stock explicit exit saved over the current state"
+          ]
+        },
+        {
+          "control": "changed_staged_script",
+          "problems": [
+            "Staged stock exit script changed"
+          ]
+        }
+      ],
+      "rejected_controls": 16,
+      "original_capture_unchanged": true
+    }
+  },
+  "retained_first_attempt": {
+    "status": "interrupted-incomplete-provider-selection-control",
+    "reason": "The first coordinator omitted the already qualified private Wayland Mesa provider; it retained 112-byte/two-allocation sanitizer findings and was stopped without altering the simulator, source scenarios, sanitizer settings or admission policy. The corrected run records the actual private provider in every process."
+  },
+  "archive": {
+    "archive": "/home/dan/GIT/orbiter-cross-platform/out/phase6-current-stock157-Debug-automatic-evidence-v1.tar.zst",
+    "archive_sha256": "27aa099e8b482a5a602cdf649480823da4dd6b1d3e36bf35832d48a057c882ea",
+    "archive_bytes": 108275374,
+    "verified_members": 5687
+  },
+  "local_evidence_sha256": {
+    "out/phase6-current-stock157-Debug-automatic-v2/stock-scenarios.json": "d1bd30d473006a7c73209f7d6c9102ba577888b176a655adfb5827a1c3dcdc78",
+    "out/phase6-current-stock157-audit-Debug-automatic-v1/corpus-audit.json": "3c0dd97b7859f1a2c89c2161d6527ef99055687d8df12a448963bbf55362ad12",
+    "out/phase6-current-stock157-audit-Debug-automatic-v1/safety-provider-audit.json": "cf3487d4a047445634cade6efd29b1dabb0d7059c4eff7cc258d1d5e65cff1bf",
+    "out/phase6-current-stock157-audit-Debug-automatic-v1/inventory-controls.json": "5e1306fcf9064fa850186280cf9bbbfe275aa0013df886aa7b33360039ad4c09",
+    "out/phase6-current-stock157-audit-Debug-automatic-v1/manifest-control.json": "dfacf28f8dd5473f0a72217ab9fb48292d728f0dfccb212b1ee686bffdd73920",
+    "out/phase6-current-stock157-audit-Debug-automatic-v1/exit-policy-controls.json": "5bc410f3ef784364895d9f77ffd59faaf2188c778289a98359db80b576c287ee",
+    "out/phase6-current-stock157-Debug-automatic-evidence-v1.tar.json": "3a95fe66f47f9b90b47948c4ab8b1bec351b7e3fd64c044dcc3eaccfff525f83",
+    "out/phase6-current-stock157-display-Debug-automatic-v2/runtime-libraries.json": "618333a5298b7d075d46323c148c9d854688f5952c14ca495d6f85628e916e65",
+    "out/phase6-current-stock157-display-Debug-automatic-v2/mapped-process-count.json": "2d46d9d4fae98beb1499e1bd8dc0f6ccad8df83e04dbf0f279a449794d7081e5",
+    "out/phase6-current-stock157-display-Debug-automatic-v2/process-result.json": "8869ca5e7f3ae989b151917c32f706ea8b83fd8d2ab5fd425117c4860c4e595f",
+    "out/run_current_stock157_v2.py": "1c05305ca65f6235fe833da1640f90a1265f7fa4ad05f2cb55dac0f96aeb758b",
+    "out/verify_current_stock157_v1.py": "fa4516346b729e2c83f4b340646cddd1f3a72932d76151b9e7a58368bc77f572",
+    "out/phase6-current-stock157-display-Debug-automatic-v1/provider-control-stop.json": "5f0597e82b59271a0d0efa1968c0fa47deb0768f912ac9bba325cb173ee3b6ca",
+    "out/phase6-current-stock157-display-Debug-automatic-v1/process-result.json": "152b52171f40642421c0152425ebf9c099a569487d6b2505bd1931f060a2ca0b"
+  },
+  "normal_class_admission_broadened": false,
+  "accepted_references_changed": false,
+  "cloud_builds_used": false,
+  "raw_evidence_uploaded": false,
+  "phase6_complete": false,
+  "outstanding": [
+    "Complete current Windows/native numerical/image/mission qualification",
+    "All remaining-module admission gates",
+    "Current-source Windows attachment lifetime regression",
+    "Controller, hardware/performance and remaining Phase 6 acceptance"
+  ]
+}

@@ -1,0 +1,120 @@
+{
+  "schema": 1,
+  "status": "passed-recovered-original-Windows-observation-and-comparison-candidate",
+  "created_utc": "2026-11-06T04:22:34.470755+00:00",
+  "original_application_and_sdk_source": "f725194209634f7fd5d1d44d426cfa9b5e303e37",
+  "capture_producer_commit": "f3d826c265b032961445272a97be9c778c01153f",
+  "independent_auditor_commit": "0240d51639f1765c1a27ac511432885483de538f",
+  "source_variant": "remaining-stock-repaired-sources-v4",
+  "profiles": {
+    "Debug-automatic": {
+      "actual_math": "fma3",
+      "original_writer_processes": 76,
+      "original_exact_save_reload_processes": 76,
+      "original_presentations": 145920,
+      "writer_minimum_repeat_ssim": 1.0,
+      "reload_minimum_repeat_ssim": 1.0,
+      "archive": "out/phase6-recovered-Windows-observations-f3d-v1/Debug-automatic.zip",
+      "archive_sha256": "4eff59f42121af45f02c7acccbc48a621e4216e617d4046565db7ac18e571ed2",
+      "archive_bytes": 435871971,
+      "verified_archive_members": 5370
+    },
+    "Debug-sse2": {
+      "actual_math": "sse2",
+      "original_writer_processes": 76,
+      "original_exact_save_reload_processes": 76,
+      "original_presentations": 145920,
+      "writer_minimum_repeat_ssim": 1.0,
+      "reload_minimum_repeat_ssim": 1.0,
+      "archive": "out/phase6-recovered-Windows-observations-f3d-v1/Debug-sse2.zip",
+      "archive_sha256": "4da6ce78cf724f30c062aad47b3db1917213f906105dc9afa7e213c6f12ae274",
+      "archive_bytes": 435830058,
+      "verified_archive_members": 5370
+    },
+    "Release-automatic": {
+      "actual_math": "fma3",
+      "original_writer_processes": 76,
+      "original_exact_save_reload_processes": 76,
+      "original_presentations": 145920,
+      "writer_minimum_repeat_ssim": 0.9963538010101808,
+      "reload_minimum_repeat_ssim": 1.0,
+      "archive": "out/phase6-recovered-Windows-observations-f3d-v1/Release-automatic.zip",
+      "archive_sha256": "3311532bc10ca48ca73bf7e76131ff0754be3ccdcfa49c3a8fbc748013b86d89",
+      "archive_bytes": 435751560,
+      "verified_archive_members": 5370
+    },
+    "Release-sse2": {
+      "actual_math": "sse2",
+      "original_writer_processes": 76,
+      "original_exact_save_reload_processes": 76,
+      "original_presentations": 145920,
+      "writer_minimum_repeat_ssim": 0.9998015794576954,
+      "reload_minimum_repeat_ssim": 1.0,
+      "archive": "out/phase6-recovered-Windows-observations-f3d-v1/Release-sse2.zip",
+      "archive_sha256": "be31d0dedd790ea2ae0a0b888e8d0e2992161eb7a61783f86bb7bb947af67467",
+      "archive_bytes": 435716695,
+      "verified_archive_members": 5370
+    }
+  },
+  "aggregate": {
+    "complete_scenes": 38,
+    "repetitions": 2,
+    "profiles": 4,
+    "phases": 2,
+    "recorded_original_processes": 608,
+    "recorded_original_presentations": 583680,
+    "newly_launched_simulator_processes": 0,
+    "verified_archive_members": 21480,
+    "verified_preserved_build_files": 467,
+    "direct_Debug_Release_case_repeat_phase_comparisons": 304,
+    "minimum_direct_full_frame_ssim": 0.9963538010101808,
+    "maximum_direct_state_errors": {
+      "position_m": 0.0,
+      "velocity_m_s": 0.0,
+      "rotation_rad": 0.0,
+      "angular_velocity_rad_s": 2.1827539436924517e-22,
+      "mjd_days": 0.0,
+      "mass_fraction_of_budget": 0.0,
+      "fuel_fraction_of_budget": 0.0
+    }
+  },
+  "budgets_unchanged": {
+    "position_m": 0.01,
+    "velocity_m_s": 1e-05,
+    "rotation_rad": 1e-08,
+    "angular_velocity_rad_s": 1e-10,
+    "mjd_days": 1e-10,
+    "propellant_relative": 1e-08,
+    "propellant_absolute_kg": 1e-08
+  },
+  "image_minimum_unchanged": 0.98,
+  "local_evidence_sha256": {
+    "out/phase6-recovered-Windows-observations-f3d-v1/recovery-audits/closed-Windows-full38-audit-v3.json": "5f04b393c4ac06ccda39de2e79b9aa240675ffabcbab9fcaaa94a5f309611733",
+    "out/phase6-recovered-Windows-observations-f3d-v1/recovery-audits/closed-Windows-build-pair-audit-v1.json": "b7a70f66c7b8fa3df76703b5bc14dd4c865a5e6dd1fb4439f8dafc4ed62ef5e5",
+    "out/phase6-recovered-Windows-observations-f3d-v1/recovery-audits/closed-Windows-full38-audit-v2.json": "d595b3e81a664f943a6c97f0172c0664dee6f56c526a819aba4c687eb9f3f856",
+    "out/phase6-recovered-Windows-observations-f3d-v1/recovery-audits/manifest.json": "47507d0a0815bc290bea0f285b5f23df60c947f3ad823145bb81b7ec547219d8",
+    "out/phase6-recovered-Windows-observations-f3d-v1/manifest.json": "075dfc7223b357dfcf2896cc1ed71f60f92a250b49f6cc6a9840b63b5f123a71",
+    "out/phase6-recovered-Windows-observations-f3d-v1/host-preservation.json": "cdf234929bb7000d87cf2c20702428bd439a002b57c29e1ea0f98bf66444cd5d",
+    "out/phase6-recovered-Windows-archive-verification-v1.json": "9f7f2bea829b624d88d590413cf5ca0febc255dec39d7570a7fe75ca78d9dc75",
+    "out/phase6-recovered-Windows-builds-f3d-v1/recovery-manifest.json": "1cf0a051fe9050647009b78dabdb2ffbefadb73ba01bcb2d8422a3a65cef7bc2",
+    "out/phase6-recovered-Windows-builds-f3d-v1/independent-build-recovery-check.json": "aab6958238d16e2a6368e5456fac28430872d8eacc0b2084737ec964c40f24cc"
+  },
+  "retained_failed_setups": [
+    "Initial auditor imported the two distinct audit.py modules under one name",
+    "The capture-era persistence reader did not support local build-root mapping; the committed current reader was loaded separately"
+  ],
+  "historical_worker_launch_and_private_desktop_receipts_available": false,
+  "historical_receipts_reconstructed": false,
+  "full_transport_admission_qualified": false,
+  "accepted_references_changed": false,
+  "native_class_admission_broadened": false,
+  "raw_evidence_uploaded": false,
+  "cloud_builds_used": false,
+  "phase6_complete": false,
+  "scope": "Independently re-read and preserve the already closed four-profile repaired-original Windows stock writers and exact-saved-input reloads. New audit/export jobs earn no new simulator credit. Missing historical worker/private-desktop receipts remain a failed transport gate; current-source native/Windows mission and lifetime qualification remain separate.",
+  "outstanding": [
+    "Original complete worker-launch/private-desktop transport receipts or fresh fully witnessed runtime campaign",
+    "Complete matching current Windows/native writer and exact-save reload comparisons",
+    "Current-source Windows attachment lifetime and remaining Phase 6 gates"
+  ]
+}
