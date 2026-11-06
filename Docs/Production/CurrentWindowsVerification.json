@@ -1,0 +1,38 @@
+{
+  "status": "passed-current-Windows-scene-GDI-cockpit-control-qualification",
+  "application_and_sdk_source": "f3e86add7464fcb7745d7a3e1cf66d281402a705",
+  "exact_runner_source_commit": "b6f9a1a060792a91f22fdd1a2915abc2c5672736",
+  "exact_runner_files_sha256": {
+    "runtime_worker_v1.py": "2c037edfefb28b169585b24d5acdc2e879532211f5423c16e5688f8e72d9ab64",
+    "private_desktop_bootstrap_v1.py": "ebdb45b3a6ad1b5203874735f679f3f9b3fdca97e9e5b805dd2c1ad42f738a0e",
+    "system_user_launcher_v1.py": "1a4c78bf3868c52ea602e320a668df019781290e5e2e7131cc6922f615a1c255"
+  },
+  "canonical_gate_process_receipts": 11,
+  "fresh_scene_repetitions": 64,
+  "configurations": [
+    "Debug",
+    "Release"
+  ],
+  "unit_tests_per_configuration": 22,
+  "verified_build_archive_members": 9454,
+  "verified_observation_files": 15213,
+  "complete_new_launch_and_private_desktop_chain": true,
+  "private_desktop_closed": true,
+  "independent_host_comparisons": {
+    "client": "d7acb034c818bb8fc572cf5eba9564d20afeac950cb9c210ce667fac14c04b06",
+    "cockpit": "f962ad79340155ec38844b064607480bf51e7a4331b7fbd21015355faf253d04",
+    "controls": "f6d10947a0df431ecedd2ad1e340a931b47ca2c70ed21550e657f7d1f62aabed"
+  },
+  "ordinary_scene_ssim": 1.0,
+  "ordinary_scene_frozen_ssim": {
+    "debug": 1.0,
+    "release": 1.0
+  },
+  "phase6_complete": false,
+  "raw_evidence_uploaded": false,
+  "scope": "Existing current application/SDK/client, GDI, nine cockpit fixtures and five control fixtures, both configurations and repeats. Remaining stock missions, attached-vessel lifetime, hardware/controller/performance and Phase 6 acceptance remain separate.",
+  "local_audit": {
+    "path": "/home/dan/GIT/orbiter-cross-platform/out/phase6-current-Windows-independent-audit-f3e8-v1.json",
+    "sha256": "9ccd8b167d064773d8224a2e6c276387309bcbfea84a5fc3918459eb71bfc1e2"
+  }
+}

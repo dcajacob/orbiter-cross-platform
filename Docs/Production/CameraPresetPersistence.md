@@ -15,8 +15,9 @@ changes.
 
 The permanent [serializer regression](../../Tests/Production/CameraPreset/Store.Test.py)
 passes 18 exact-format cases and four damaged-source controls locally. The full
-622-file extraction/source-conservation audit also passes. This is a writer
-repair with focused validation; complete rebuilt runtime parity remains open.
+622-file extraction/source-conservation audit also passes. The actual method also passes the MSVC control run, where the old Windows writer
+and repaired writer produce identical output. Complete all38 runtime parity
+remains open.
 
 Local evidence stays in the original checkout under:
 
@@ -30,3 +31,19 @@ The incomplete collections retain their raw files and earn no complete-matrix
 qualification. The earlier successful PoweredUp staging canary and its
 independent audit remain separately scoped. Phase 6 and class admission remain
 incomplete.
+
+Fresh ASan/UBSan packages from `2d6fa396` now complete the unchanged ascent-
+autopilot mission twice in all four profiles, both as stock writers and after
+loading the exact hashed Windows save. All sixteen actual native processes
+complete 15,360 presentations, clean context destruction and unsuppressed
+sanitizers. Independent comparisons pass original physical, camera and full-
+frame budgets, SSIM 1.0, identical actual clocks and complete parsed saved
+content, excluding only protocol-declared operator descriptions. The
+[runtime verification record](CameraPresetRuntimeVerification.json) pins the
+three independent audits and their exact scope.
+
+The subsequent full38 attempt stopped on a separate playback/save-boundary
+mismatch in `2024 Edition/Space Shuttle to ISS.scn`. Its recorded physical state
+and camera match exactly and SSIM is 1.0; Leonardo's saved landed-coordinate
+cache differs. That failure remains retained and the complete matrix remains
+unqualified. These sixteen successful runs do not replace the full matrix.
