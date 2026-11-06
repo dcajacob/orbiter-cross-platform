@@ -21,7 +21,8 @@ class ManifestTests(unittest.TestCase):
             lambda v:v.update(software_complete=True),
             lambda v:v['gates']['remaining-stock']['expected'].update(runs_per_cohort=607),
             lambda v:v['gates']['normal-admission']['expected']['entry_points'].pop(),
-            lambda v:v['gates']['numerical-reload'].update(result='passed'),
+            lambda v:v['gates']['numerical-reload'].update(result='passed',coverage=None),
+            lambda v:v['gates']['numerical-reload'].update(result='passed',diagnostic_only=True),
             lambda v:v['gates']['remaining-stock'].update(result='audited-incomplete')]
         with tempfile.TemporaryDirectory() as temporary:
             path=Path(temporary)/'manifest.json'

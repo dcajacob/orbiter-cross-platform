@@ -16,15 +16,18 @@ narrower deliveries than the stock release.
 
 [Phase6Closeout.json](Phase6Closeout.json) is the finite closeout ledger. It
 preserves checkpoint `0842893b`, exact acceptance scopes and evidence hashes.
-The runner and archive controls are implemented; final software gates remain
+Three preparatory gates are closed: runner controls, the focused numerical
+repair and the corrected API test. Final software acceptance gates remain
 open. The scene003 reload failure was traced to native automatic mode using an
 SSE2-only `atan2` binding. Repair `81dcc014` passes all sixteen focused native
 writer/reload runs across four profiles and two repetitions, with unchanged
 budgets. The versioned corrected API test passes Windows/native in all four
 profiles, including normal-host startup-exit checks and rejection controls.
-The current-Windows scene003 matrix is running; its first automatic writer and
-reload pairs pass unchanged budgets. Remaining class eligibility, full campaigns
-and full-campaign VM capacity are still open. Physical-controller hardware remains unavailable.
+The matching current-Windows scene003 matrix also passes all sixteen runs and
+independent complete comparisons. Restored archives and verified duplicate
+reclamation provide the declared 8 GiB campaign reserve. Remaining class
+eligibility, candidate freeze, full campaigns and operator acceptance are open.
+Physical-controller acceptance remains blocked.
 The intended interim signoff is **software complete; awaiting physical-controller
 acceptance**, after all software gates and the operator walkthrough pass.
 [Closeout tools and current limits](../../Tests/Production/Closeout/README.md)

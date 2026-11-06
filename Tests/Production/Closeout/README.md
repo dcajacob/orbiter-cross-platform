@@ -3,8 +3,10 @@
 `Docs/Production/Phase6Closeout.json` is the single finite ledger. Its fourteen
 gates retain the approved acceptance requirements and explicit failures. The
 manifest validator checks checklist and hash bindings; it is not a substitute
-for independently reading simulation evidence. No gate is currently closed by
-this implementation. Physical-controller acceptance remains blocked.
+for independently reading simulation evidence. Runner controls, the focused
+numerical repair and the versioned API correction are closed for their exact
+declared scopes. Class eligibility, the final candidate and full acceptance
+campaigns remain open. Physical-controller acceptance remains blocked.
 
 `run_native.py` replaces the local ad hoc persistence coordinators. Its JSON
 request names the owning checkout, immutable collector and runtime commits,
@@ -72,4 +74,37 @@ fresh independent Windows comparisons. Those writer passes do not qualify reload
 The repaired `81dcc014` native matrix now also has sixteen complete, independently
 audited scene003 writer/reload runs in four profiles and two repetitions. Those
 selected captures qualify only that focused native comparison; full campaigns,
-current-Windows coverage and normal admission remain open.
+and normal admission remain open. The matching current-Windows matrix now
+also passes all sixteen runs and independent original/current/native state,
+clock, camera, frame and complete-serialization comparisons. All paired reloads
+consume the same exact hashed Windows save. Minimum frame SSIM is 1.0;
+maximum position error is 0.000030532475664194236 m and angular velocity matches.
+The original first-divergence failure and failed reader attempts remain retained.
+Missing historical launch receipts remain missing. This closes only the
+scene003 numerical-repair gate, not any full38 cohort.
+
+The current-SDK v3 adapter and separate verifier live under `CurrentWindows/`
+and `LocalVM/stock_runtime_worker_v3.py`. They retain distinct application/SDK,
+observer and runner identities without relaxing the preserved original-SDK
+reader. The initially omitted delivery mesh was collected from every actual
+closed staging folder and checked against its prelaunch input hash; this is
+separately identified supplemental input evidence, not a reconstructed launch
+receipt or another simulation capture. Future exports include that input.
+
+`local_vm.py --receipt-v2` binds a fresh nonce to the actual child PID,
+Windows process creation time, exact script bytes and OS child exit. A returned
+agent receipt belonging to another job stays rejected and preserved. The
+logical result can close only through the matching owned-child receipt. The
+historical direct-job reader remains available. Fresh expensive jobs must use
+the nonce-bound path. Actual Windows positive captures and disposable negative
+controls cover this binding.
+
+The new generated-output archiver/reclaimer handles only finite task output
+roots. It preserves input directories, scenarios, recordings, replay schedules,
+SDKs and source trees; all selected traces/frames must match independently
+restored archives before any removal, and each duplicate is rehashed immediately
+before unlink. A further 3,136 verified duplicates reclaimed 1,982,244,688 bytes.
+Independent post-removal checks rehashed 5,797 owning sources and all 3,847
+retained current/original package files. The actual remaining capacity is
+8,624,025,600 bytes, above the required 8 GiB reserve; every campaign must
+preflight capacity again. All raw archives and restore audits remain local.

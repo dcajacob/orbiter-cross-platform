@@ -61,9 +61,22 @@
         ],
         "final_candidate_required": false
       },
-      "result": "in-progress",
-      "coverage": null,
-      "diagnostic_only": null,
+      "result": "passed",
+      "coverage": {
+        "depends_on": [],
+        "required": [
+          "full-versus-selected",
+          "terminal-statuses",
+          "cancellation",
+          "process-receipts",
+          "completed-capture-reuse",
+          "declared-share-roots",
+          "disk-preflight",
+          "archive-restoration"
+        ],
+        "final_candidate_required": false
+      },
+      "diagnostic_only": false,
       "candidate_id": null,
       "evidence": [
         {
@@ -115,8 +128,34 @@
           "path": "/home/dan/.codex/worktrees/phase6-acceptance/orbiter-cross-platform/out/phase6-general-api-normal-host-v1/runner-controls-final-v1.json",
           "sha256": "5eb3906f57858fe8c0c4ba1cc91ba550a0cddf3413d6d974deb88f091790d5a7",
           "scope": "54-discovered-helper-process-transport-and-API-exit-controls-only"
+        },
+        {
+          "path": "/home/dan/.codex/worktrees/phase6-acceptance/orbiter-cross-platform/out/phase6-closeout-storage-v2/final-reclamation-controls-v1.json",
+          "sha256": "8e06462d128a1d876166b6a8c21cbce6b052daa4a4b5da37657c7bd0bafdc26d",
+          "scope": "63-discovered-control-tests-including-stale-agent-source-PID-and-input-resource-rejections"
+        },
+        {
+          "path": "/home/dan/.codex/worktrees/phase6-acceptance/orbiter-cross-platform/out/phase6-closeout-storage-v2/combined-restoration-v1.json",
+          "sha256": "cd13414b1f40f5ced58e53b7b4dd6634dd7a36440513abfec080a0e965769646",
+          "scope": "all-members-fully-restored-before-generated-duplicate-reclamation"
+        },
+        {
+          "path": "/home/dan/.codex/worktrees/phase6-acceptance/orbiter-cross-platform/out/phase6-closeout-storage-v2/independent-reclamation-audit-v2.json",
+          "sha256": "50fc5a2cfe86fd4f7d0e67968bc06767fcb84c3f8500c53894d9ff2f1241afcd",
+          "scope": "3136-exact-duplicates-removed-owning5797-sources-and3847-current-original-package-files-rehashed-8GiB-reserve-passed"
+        },
+        {
+          "path": "/home/dan/.codex/worktrees/phase6-acceptance/orbiter-cross-platform/out/phase6-current-stock-Windows-v2/Debug-closed-inputs-terminal-v2.json",
+          "sha256": "198c143e4eca89f8d3b938abad305c51c82299ca0271abc3ca0139d761bcbb79",
+          "scope": "actual-Windows-nonce-bound-read-only-child-PID-start-identity-and-exit-only"
+        },
+        {
+          "path": "/home/dan/.codex/worktrees/phase6-acceptance/orbiter-cross-platform/out/phase6-current-stock-Windows-v2/Release-closed-inputs-terminal-v2.json",
+          "sha256": "ad4aca8797e685afdd637a9e5c586d21a820b3d0f514db07df21a04b899d18f7",
+          "scope": "actual-Windows-nonce-bound-read-only-child-PID-start-identity-and-exit-only"
         }
-      ]
+      ],
+      "note": "Complete declared runner/control/restoration/receipt scope passed, including actual nonce-bound Windows child receipts. Actual free capacity exceeds eight GiB; each long campaign must preflight capacity again."
     },
     "numerical-reload": {
       "expected": {
@@ -151,9 +190,40 @@
         ],
         "final_candidate_required": false
       },
-      "result": "in-progress",
-      "coverage": null,
-      "diagnostic_only": null,
+      "result": "passed",
+      "coverage": {
+        "depends_on": [
+          "runner-controls"
+        ],
+        "profiles": [
+          "Debug-automatic",
+          "Debug-sse2",
+          "Release-automatic",
+          "Release-sse2"
+        ],
+        "cohorts": [
+          "original-windows",
+          "current-windows",
+          "native"
+        ],
+        "cases": [
+          "remaining_stock_003"
+        ],
+        "phases": [
+          "stock-writer",
+          "windows-save-reload"
+        ],
+        "repeats": 2,
+        "required": [
+          "first-differing-operation",
+          "observer-on-off-equivalence",
+          "actual-crt-providers",
+          "failing-and-neighbour-input-regression",
+          "all-existing-budgets"
+        ],
+        "final_candidate_required": false
+      },
+      "diagnostic_only": false,
       "candidate_id": null,
       "evidence": [
         {
@@ -280,9 +350,19 @@
           "path": "/home/dan/.codex/worktrees/phase6-acceptance/orbiter-cross-platform/out/phase6-current-stock-Windows-v2/first-reload-pairs-v1.json",
           "sha256": "7c7198315f2a6aff4220b888f88f7ab309b7ab534c784b3f9ef5eb524db3a7d4",
           "scope": "first-current-Windows-reload-Debug-Release-automatic-pairs-only-not-complete-matrix"
+        },
+        {
+          "path": "/home/dan/.codex/worktrees/phase6-acceptance/orbiter-cross-platform/out/phase6-current-stock-Windows-v2/independent-audit-v4/audit.json",
+          "sha256": "6de51fbc31118a792bc2f32952f9e8893e71251070c42ff136f6c8ac28b7af54",
+          "scope": "entire-declared-scene003-original-current-Windows-native-four-profile-two-repeat-writer-reload-matrix-only"
+        },
+        {
+          "path": "/home/dan/.codex/worktrees/phase6-acceptance/orbiter-cross-platform/out/phase6-current-stock-Windows-v2/independent-audit-v4/source-seal.json",
+          "sha256": "c4e3eb1d190b5c7207ac0a0e033eebf0b723c3ca0f405a1992a048ec4bc0701a",
+          "scope": "immutable-verifier-source-seal-no-full38-inference"
         }
       ],
-      "note": "Original failures remain preserved. The repaired source passes the complete 16-run focused native matrix; current-Windows cohort qualification and full campaigns are not inferred."
+      "note": "The entire focused scene003 exit condition passes: all four profiles, both repetitions and writer/exact-Windows-save reload phases, with original/current Windows and native comparisons. Selected full38 captures cover this whole focused gate, not the remaining-stock gate. Historical missing launch receipts remain missing."
     },
     "general-api": {
       "expected": {
@@ -307,9 +387,30 @@
         ],
         "final_candidate_required": false
       },
-      "result": "in-progress",
-      "coverage": null,
-      "diagnostic_only": null,
+      "result": "passed",
+      "coverage": {
+        "depends_on": [
+          "runner-controls"
+        ],
+        "profiles": [
+          "Debug-automatic",
+          "Debug-sse2",
+          "Release-automatic",
+          "Release-sse2"
+        ],
+        "cohorts": [
+          "current-windows",
+          "native"
+        ],
+        "required": [
+          "original-bytes-and-failure-preserved",
+          "locked-spice-oracle",
+          "symmetric-comparator",
+          "nil-false-and-wrong-value-controls"
+        ],
+        "final_candidate_required": false
+      },
+      "diagnostic_only": false,
       "candidate_id": null,
       "evidence": [
         {
@@ -388,7 +489,7 @@
           "scope": "all-sixteen-existing-VesselApiTest-exit-controls-preserved"
         }
       ],
-      "note": "The complete versioned API test matrix is qualified across both runtimes and four profiles. Its specific normal-host startup exit and all negative controls pass. Runner dependency/full-campaign capacity remains open; this is not 157-scene admission."
+      "note": "The complete explicitly versioned API test and specific normal-host startup exit pass in both runtimes and all four profiles. Original failure, normal assertion semantics and actual negative controls remain preserved. No 157-scene admission is inferred."
     },
     "class-eligibility": {
       "expected": {
@@ -927,6 +1028,6 @@
       "note": "Physical controller hardware unavailable; virtual devices do not satisfy acceptance."
     }
   },
-  "current_blocker": "Complete the current-Windows scene003 writer/exact-save reload matrix and its independent audit. Remaining per-family class eligibility and the eight-GiB full-campaign VM reserve are open; the corrected API test matrix is qualified.",
-  "next_exit_condition": "Finish all sixteen current-Windows focused runs with unchanged comparisons and restore adequate full-campaign VM capacity, then complete class eligibility and freeze one candidate before full acceptance campaigns."
+  "current_blocker": "Per-family remaining-stock class/capability eligibility, including interactions, ownership, repeated teardown and rejection controls. No final candidate is frozen; full acceptance campaigns and operator/controller acceptance remain open.",
+  "next_exit_condition": "Complete the missing per-family evidence and admit only qualified stock class/capability combinations, preserving the closed source-bound evidence, then freeze and build one matching final candidate."
 }
