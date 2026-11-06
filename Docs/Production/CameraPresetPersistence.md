@@ -1,7 +1,7 @@
 # Tracking-camera preset save compatibility
 
 An actual Release/SSE2 native stock writer at `f82b7392`, collected by
-`f3e86add`, completed 960 steps and saved the unchanged Atlantis launch scene.
+`f3e86add`, completed 960 steps and saved the unchanged `2024 Edition/Space Shuttle ascent autopilot.scn` scene.
 The independent early comparison with its preserved same-profile Windows
 writer found three differing tracking-preset target tokens: `STS-101%`, `ISS%`
 and `Earth%` instead of the Windows names without the trailing percent.

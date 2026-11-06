@@ -2,7 +2,7 @@
 
 The inherited `CameraMode_Track::Store` format contains `%s%:`. The Windows CRT
 writes the intended colon, while glibc retains an extra percent. A real native
-960-frame `Atlantis/Atlantis launch` save therefore writes `STS-101%`, `ISS%` and
+960-frame `2024 Edition/Space Shuttle ascent autopilot.scn` save therefore writes `STS-101%`, `ISS%` and
 `Earth%` in tracking presets, differing from the preserved Windows save.
 
 The shared writer now uses the valid `%s:` format. Field order, precision,
