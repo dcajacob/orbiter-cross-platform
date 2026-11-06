@@ -3,14 +3,15 @@ import json
 from pathlib import Path
 import sys
 import zipfile
-from generated_outputs_v2 import sha,require,relative,output_root,closures,file_map,generated
+from generated_outputs_v2 import sha,require,relative,output_root,closures,file_map,generated,load
 
 
 def main():
-    request=Path(sys.argv[1]);cfg=json.loads(request.read_text());manifest=request.parent/cfg['manifest']
+    request=Path(sys.argv[1]);cfg=load(request);manifest=request.parent/cfg['manifest']
     require(sys.platform=='win32' and not manifest.exists(),'Windows and fresh preservation manifest required')
     result=dict(status='running',profiles={},request_sha256=sha(request),phase6_complete=False,raw_evidence_uploaded=False)
-    def save():manifest.write_text(json.dumps(result,indent=2)+'\n')
+    def save():
+        temporary=manifest.with_suffix('.tmp');temporary.write_text(json.dumps(result,indent=2)+'\n');temporary.replace(manifest)
     try:
         for profile,item in cfg['profiles'].items():
             root=Path(output_root(item['vm_root']));require(root.is_dir() and root.resolve()==root,'Actual output root missing/redirected')

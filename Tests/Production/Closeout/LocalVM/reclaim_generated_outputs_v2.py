@@ -3,24 +3,27 @@ import json
 from pathlib import Path
 import shutil
 import sys
-from generated_outputs_v2 import sha,require,relative,output_root,closures,generated
+from generated_outputs_v2 import sha,require,relative,output_root,closures,generated,load,windows_path
 
 
 def main():
-    request=Path(sys.argv[1]);cfg=json.loads(request.read_text());path=request.parent/cfg['result']
+    request=Path(sys.argv[1]);cfg=load(request);path=request.parent/cfg['result']
     require(sys.platform=='win32' and not path.exists(),'Windows and a fresh reclamation receipt required')
     report=dict(status='preflight',request_sha256=sha(request),removed=[],removed_bytes=0,
         free_bytes_before=shutil.disk_usage('C:/').free,source_dependencies_reference_packages_untouched=True,phase6_complete=False)
-    def save():path.write_text(json.dumps(report,indent=2)+'\n')
+    def save():
+        temporary=path.with_suffix('.tmp');temporary.write_text(json.dumps(report,indent=2)+'\n');temporary.replace(path)
     try:
         require(sha(cfg['restoration_audit'])==cfg['restoration_audit_sha256'],'Independent restoration audit changed')
-        audit=json.loads(Path(cfg['restoration_audit']).read_text())
+        audit=load(cfg['restoration_audit']);share=windows_path(cfg['share_root'])
         require(audit['status']=='passed-independent-all-archive-restorations','Complete independent restoration required')
         targets=[];seen=set()
         for profile,item in cfg['profiles'].items():
             root=Path(output_root(item['vm_root']));require(root.is_dir() and root.resolve()==root,'Actual closed output root differs')
             closures(item['closures']);restored=audit['profiles'][profile]
             require(restored['archive_sha256']==item['archive_sha256'],'Restored archive identity differs')
+            require(windows_path(item['archive']).is_relative_to(share) and sha(item['archive'])==restored['archive_sha256'],
+                    'Actual sealed local archive missing or changed before reclamation')
             for name in item['generated_files']:
                 require(generated(name),'Input/source/SDK files cannot be reclaimed');name=str(relative(name));target=root/name
                 require(target not in seen and target.is_file() and not target.is_symlink() and name in restored['restored_files'],

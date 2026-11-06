@@ -112,6 +112,11 @@ def retain_supplement(path,target,cfg,worker,config):
             'Actual closed supplemental input scope/source differs')
     require(hashlib.sha256(immutable(report['collector_source_commit'],'Closeout/LocalVM/stock_runtime_worker_v3.py')).hexdigest()==report['collector_sha256'],
             'Supplemental input collector differs from its immutable source')
+    require(set(report['helpers_sha256'])==set(RUNNER_SOURCES),'Complete supplemental helper identity closure required')
+    for name,source_name in RUNNER_SOURCES.items():
+        commit=report['collector_source_commit'] if name=='stock_runtime_worker_v3.py' else cfg['roles']['runner']['commit']
+        require(hashlib.sha256(immutable(commit,source_name)).hexdigest()==report['helpers_sha256'][name],
+                'Supplemental helper differs from its immutable owning source: '+name)
     by_folder={r['math_profile']+'-'+r['phase']+'/'+r['case']+'-'+str(r['repeat']):r for r in worker['actual_process_receipts']}
     for name,record in report['files'].items():
         folder=name.removesuffix('/'+record['target']);process=by_folder[folder];invocation=target/'export'/folder/'invocation.json'
@@ -124,6 +129,8 @@ def retain_supplement(path,target,cfg,worker,config):
     shutil.copy2(path,target/'closed-input-witnesses.json')
     for name in ('collection-job.json','collection-terminal.json','request.json'):
         shutil.copy2(path.parent/name,target/('supplement-'+name))
+    require(sha(job['transport']['result_local'])==terminal['transport_receipt_sha256'], 'Actual supplemental transport receipt bytes differ')
+    shutil.copy2(job['transport']['result_local'],target/'supplement-actual-transport.json')
 
 
 def main():
