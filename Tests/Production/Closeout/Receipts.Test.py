@@ -7,7 +7,7 @@ from pathlib import Path
 import tempfile
 import unittest
 from contracts import atomic_json,sha
-from receipts import inspect_launch
+from receipts import inspect_launch,inspect_selected_processes,inspect_full38_processes
 
 
 def fixture(root):
@@ -55,6 +55,29 @@ def fixture(root):
 
 
 class ReceiptTests(unittest.TestCase):
+    def test_selected_receipts_require_every_phase_repeat_and_never_qualify_full38(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root=Path(temporary);fixture(root)
+            config=json.loads((root/'request.json').read_text())
+            config['capture_scope']=dict(kind='diagnostic',cases=['remaining_stock_003'])
+            worker=dict(status='completed-local-Windows-selected-stock-and-exact-save-reload-diagnostic-only',
+                diagnostic_only=True,cases_requested=['remaining_stock_003'],actual_processes=4,successful_presents=3840,
+                actual_process_receipts=[])
+            for phase,folder in [('stock','remaining-stock-repaired'),('reload','remaining-stock-persistence')]:
+                for repeat in [1,2]:
+                    path=root/folder/('remaining_stock_003-'+str(repeat));path.mkdir(parents=True)
+                    timing=dict(actual_pid=200+len(worker['actual_process_receipts']),actual_returncode=0,
+                        timed_out=False,timeout_seconds=900,elapsed_wall_ns=1000)
+                    atomic_json(path/'process-timing.json',timing)
+                    atomic_json(path/'graphics-lifecycle.json',dict(rendered_frames=960,successful_presents=960,context_deleted=True))
+                    worker['actual_process_receipts'].append(dict(phase=phase,case='remaining_stock_003',repeat=repeat,
+                        folder=config['output']+'/'+folder+'/'+path.name,timing=timing))
+            self.assertEqual(inspect_selected_processes(root,config,worker)['actual_processes'],4)
+            with self.assertRaises(ValueError):inspect_full38_processes(root,config,worker)
+            for items in (worker['actual_process_receipts'][:-1],worker['actual_process_receipts']+[worker['actual_process_receipts'][0]]):
+                changed=dict(worker,actual_process_receipts=items)
+                with self.assertRaises(ValueError):inspect_selected_processes(root,config,changed)
+
     def test_launch_chain_and_each_missing_terminal_identity(self):
         with tempfile.TemporaryDirectory() as temporary:
             root=Path(temporary);pins,records=fixture(root)

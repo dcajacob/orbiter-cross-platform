@@ -100,6 +100,16 @@
           "path": "/home/dan/.codex/worktrees/phase6-closeout/orbiter-cross-platform/out/phase6-reload-launch-audit-v2/audit.json",
           "sha256": "eedbf0496a79138bc23057d7914997a457244acd361b018c36dd8c950ff711f7",
           "scope": "three-actual-closed-diagnostic-launch-chains-not-full38"
+        },
+        {
+          "path": "/home/dan/.codex/worktrees/phase6-closeout/orbiter-cross-platform/out/phase6-reload-launch-audit-v3/audit.json",
+          "sha256": "a09863658e48529a3e8e33f8aa031d4626080e0d732d1457d8784e9db8fde4dd",
+          "scope": "closed-live-surface-launch-with-actual-VM-worker-private-desktop-receipts"
+        },
+        {
+          "path": "/home/dan/.codex/worktrees/phase6-closeout/orbiter-cross-platform/out/phase6-closeout-storage-v1/controls-v10.json",
+          "sha256": "865a6906f80efae3d86c8d77baef4fd6741c234ba8e1ce00e61fe124ae253652",
+          "scope": "26-discovered-controls-full-versus-selected-Windows-process-scope-only"
         }
       ]
     },
@@ -136,7 +146,7 @@
         ],
         "final_candidate_required": false
       },
-      "result": "failed",
+      "result": "in-progress",
       "coverage": null,
       "diagnostic_only": null,
       "candidate_id": null,
@@ -195,9 +205,69 @@
           "path": "/home/dan/.codex/worktrees/phase6-closeout/orbiter-cross-platform/out/phase6-atan2-fma-experiment-v1/comparison.json",
           "sha256": "6b4c649bde17ba9e7bc938960603f0c6a84baefe15a7d65d762299adfe57d02c",
           "scope": "unchanged-atan2-source-FMA-compilation-matches-all8748-centre-samples-experiment-only"
+        },
+        {
+          "path": "/home/dan/.codex/worktrees/phase6-closeout/orbiter-cross-platform/out/phase6-reload-math-Windows-native-v1/live-surface-comparison.json",
+          "sha256": "b42b4e14a0d39f3c249d55db68d1fee3d2a4a1ad076eeca093a49d78832857c8",
+          "scope": "actual-SRB1-cached-longitude-first-diff211-identical-atan2-inputs-complete-passive-equivalence"
+        },
+        {
+          "path": "/home/dan/.codex/worktrees/phase6-closeout/orbiter-cross-platform/out/phase6-atan2-neighbours-v1/old-binding-negative-control.json",
+          "sha256": "17a2d1b5ca4437b1ac59e7602d9a024e92d869b1bc1a86f35be7b4a21e476c89",
+          "scope": "preserved-unfixed-native-automatic-binary-fails-exact-captured-regression"
+        },
+        {
+          "path": "/home/dan/.codex/worktrees/phase6-closeout/orbiter-cross-platform/out/phase6-atan2-binding-automatic-v1/math-verification.json",
+          "sha256": "ea5830624b8f1e86215da37d2c3204d5d434a7f7859c9ba998aceb41b8bfcdde",
+          "scope": "automatic-build-original28800-per-mode-MPFR-4225-new-pairs-pass"
+        },
+        {
+          "path": "/home/dan/.codex/worktrees/phase6-closeout/orbiter-cross-platform/out/phase6-atan2-binding-sse2-v1/math-verification.json",
+          "sha256": "3e96d57831a9fca68b83d9d19f2521ccd3e94d6ce294d545b50776c8df8d09d6",
+          "scope": "forced-SSE2-build-original28800-per-mode-MPFR-4225-new-pairs-pass"
+        },
+        {
+          "path": "/home/dan/.codex/worktrees/phase6-closeout/orbiter-cross-platform/out/phase6-atan2-focused-v1/Debug-automatic-first-reload-pair.json",
+          "sha256": "fa7b0e1fee4731110ef0e270f18209e1a4a49e568e595dd8d276bf735b502d75",
+          "scope": "first-repaired-native-Debug-automatic-reload-only-all-pair-budgets-pass"
+        },
+        {
+          "path": "/home/dan/.codex/worktrees/phase6-closeout/orbiter-cross-platform/out/phase6-atan2-binding-Release-automatic-v1/math-verification.json",
+          "sha256": "d06c82590f84d2c32cbd4fb0fd390ff3e9c582257c56c5ced7e120550503b796",
+          "scope": "Release-automatic-binding-original28800-per-mode-MPFR-4225-new-pairs-pass"
+        },
+        {
+          "path": "/home/dan/.codex/worktrees/phase6-closeout/orbiter-cross-platform/out/phase6-atan2-binding-Release-sse2-v1/math-verification.json",
+          "sha256": "0b9005ce2c40d3a357259b9bc3332e55085c79b0bcdf42cc30c4cc2f270836b0",
+          "scope": "Release-forced-SSE2-binding-original28800-per-mode-MPFR-4225-new-pairs-pass"
+        },
+        {
+          "path": "/home/dan/.codex/worktrees/phase6-closeout/orbiter-cross-platform/out/phase6-atan2-focused-coordinator-v1/status.json",
+          "sha256": "64e8fad29222471c204e1a321c556b1d1ecdc658cfb84b9a39b10469e8cda961",
+          "scope": "complete-native-scene003-four-profile-two-repeat-writer-and-exact-save-reload-16-runs-not-full38"
+        },
+        {
+          "path": "/home/dan/.codex/worktrees/phase6-closeout/orbiter-cross-platform/out/phase6-atan2-Debug-automatic-v1/build.json",
+          "sha256": "90e1fb9a0f085592f3d5c0fbbb9936a37dcbceb4ffabdf0944d0c48af8390012",
+          "scope": "source-bound-81dcc014-sanitizer-package-Debug-automatic-build-only"
+        },
+        {
+          "path": "/home/dan/.codex/worktrees/phase6-closeout/orbiter-cross-platform/out/phase6-atan2-Debug-sse2-v2/build.json",
+          "sha256": "06dc785d4bb6153d6517c1c09d1d2a5a6d98ff2a66618e32cda33f92080732ee",
+          "scope": "source-bound-81dcc014-sanitizer-package-Debug-sse2-build-only"
+        },
+        {
+          "path": "/home/dan/.codex/worktrees/phase6-closeout/orbiter-cross-platform/out/phase6-atan2-Release-automatic-v1/build.json",
+          "sha256": "1a70cfe93617315b9859e8c4f3936f7ca13cdde8fc4416e7e159e32e0465bad9",
+          "scope": "source-bound-81dcc014-sanitizer-package-Release-automatic-build-only"
+        },
+        {
+          "path": "/home/dan/.codex/worktrees/phase6-closeout/orbiter-cross-platform/out/phase6-atan2-Release-sse2-v1/build.json",
+          "sha256": "9394730a0ede3b1b1b7ceab654b2055316f5a51bca696e36ad92ad1c7b283eec",
+          "scope": "source-bound-81dcc014-sanitizer-package-Release-sse2-build-only"
         }
       ],
-      "note": "Retained failure is diagnostic-only; eight writer passes do not qualify writers plus reloads."
+      "note": "Original failures remain preserved. The repaired source passes the complete 16-run focused native matrix; current-Windows cohort qualification and full campaigns are not inferred."
     },
     "general-api": {
       "expected": {
@@ -786,6 +856,6 @@
       "note": "Physical controller hardware unavailable; virtual devices do not satisfy acceptance."
     }
   },
-  "current_blocker": "Debug/automatic reload: native atan2 uses an SSE2-compiled implementation in automatic mode. The reconstructed SRB1 centre input first differs from Windows FMA3 at tick211, matching the first acceleration difference. Live cache confirmation and a qualified repair remain open; full38 capacity reserve also remains open.",
-  "next_exit_condition": "Confirm the actual cached SRB1 longitude at211, qualify separate atan2 FMA/SSE2 bindings on captured inputs and neighbours, then pass scene003 writers and exact-save reloads twice in all four profiles before broad campaigns."
+  "current_blocker": "Repair81dcc014 passes all sixteen focused native runs and independent rereads. Current-Windows numerical qualification, corrected API test qualification and remaining per-family class eligibility are incomplete. Full38 VM capacity reserve also remains open.",
+  "next_exit_condition": "Complete the scoped current-Windows/API evidence and class eligibility review, preserving the now source-bound81dcc014 packages, then freeze one final candidate before the full acceptance campaigns."
 }

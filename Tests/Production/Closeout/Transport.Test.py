@@ -2,7 +2,7 @@
 """Root/role controls are fixtures; no Windows execution is claimed by these tests."""
 import copy
 import unittest
-from LocalVM.runtime_descriptor_v2 import ORIGINAL, PROTOCOL, validate
+from LocalVM.runtime_descriptor_v2 import ORIGINAL, PROTOCOL, validate, capture_selection
 
 
 def descriptor():
@@ -58,6 +58,25 @@ class TransportTests(unittest.TestCase):
             validate(value)
         value['roles']['sdk']['commit']='c'*40
         validate(value)
+
+    def test_selected_worker_arguments_counts_and_full_selection_scope(self):
+        value=descriptor();full=capture_selection(value)
+        self.assertEqual(full['expected_processes'],152);self.assertEqual(full['arguments'],[])
+        value['capture_scope']=dict(kind='diagnostic',cases=['remaining_stock_003']);value['scene_workers']=1
+        selected=capture_selection(value)
+        self.assertEqual(selected['arguments'],['--diagnostic-case','remaining_stock_003'])
+        self.assertEqual(selected['expected_processes'],4);self.assertEqual(selected['expected_presents'],3840)
+        value['capture_scope']['cases']=full['cases']
+        self.assertTrue(capture_selection(value)['diagnostic_only'])
+        value['minimum_free_bytes']=1024**3
+        with self.assertRaises(ValueError):validate(value)
+        for cases in ([],['remaining_stock_003','remaining_stock_002'],['remaining_stock_003']*2):
+            value['capture_scope']['cases']=cases
+            with self.assertRaises(ValueError):capture_selection(value)
+        value['capture_scope']['cases']=['remaining_stock_003']
+        for workers in (0,3,True):
+            value['scene_workers']=workers
+            with self.assertRaises(ValueError):capture_selection(value)
 
 
 if __name__ == '__main__':

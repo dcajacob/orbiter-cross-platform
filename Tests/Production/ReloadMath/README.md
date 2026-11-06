@@ -54,5 +54,10 @@ The derived `Math/Reference/ReloadAtan2` regression fixture covers the exact pai
 and 32 neighbours on each axis (4,225 pairs). Both actual Windows CRT providers
 agree in each mode. The revised automatic and forced-SSE2 builds pass those
 values, the 28,800 existing frozen samples per mode, MPFR and existing edge
-checks. Raw CRT observations remain local. Live cache confirmation and the
-complete focused mission matrix remain required before qualifying the repair.
+checks. Raw CRT observations remain local. Live cache reads confirm the exact
+first differing SRB1 longitude and its cosine at tick 211. Fresh source-bound
+sanitizer packages at `81dcc014` pass all sixteen focused native writer/reload
+runs: four profiles, two repetitions, unchanged complete state, clocks, camera,
+frame and saved-content checks. The consolidated coordinator independently
+re-read all eight completed stages. Current-Windows qualification and the final
+full campaigns remain separate gates.

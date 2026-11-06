@@ -11,6 +11,24 @@ ROLES = ('application', 'sdk', 'observer', 'runner')
 ROOTS = ('share', 'source', 'output', 'build', 'preserved', 'data', 'planets', 'mesa')
 
 
+def capture_selection(config):
+    """Keep explicit diagnostic selections distinct even when all cases are named."""
+    scope=config.get('capture_scope', {'kind':'full38'})
+    require(scope['kind'] in ('full38','diagnostic'), 'Explicit full38 or diagnostic capture scope required')
+    all_cases=['remaining_stock_'+str(i).zfill(3) for i in range(1,39)]
+    diagnostic=scope['kind']=='diagnostic'
+    require(set(scope)==({'kind','cases'} if diagnostic else {'kind'}),'Capture scope has undeclared selection fields')
+    cases=scope['cases'] if diagnostic else all_cases
+    require(type(cases) is list and cases and all(type(case) is str for case in cases) and
+            cases==sorted(set(cases)) and set(cases)<=set(all_cases),
+            'Explicit valid ordered diagnostic scene selection required')
+    workers=config.get('scene_workers',2)
+    require(type(workers) is int and workers in (1,2),'At most two actual Windows scene workers required')
+    return dict(diagnostic_only=diagnostic,cases=cases,scene_workers=workers,expected_processes=4*len(cases),
+                expected_presents=4*len(cases)*960,
+                arguments=[part for case in cases for part in ('--diagnostic-case',case)] if diagnostic else [])
+
+
 def require(value, message):
     if not value:
         raise ValueError(message)
@@ -63,14 +81,10 @@ def validate(config):
         require(windows_path(config[role + '_script']).is_relative_to(roots['share']) and
                 re.fullmatch('[0-9a-f]{64}', config[role + '_sha256']), 'Runner script is outside declared share')
     require(windows_path(config['export']).is_relative_to(roots['share']), 'Export outside declared host share')
-    scope=config.get('capture_scope', {'kind':'full38'})
-    require(scope['kind'] in ('full38','diagnostic'), 'Explicit full38 or diagnostic capture scope required')
-    if scope['kind']=='diagnostic':
-        cases=scope['cases']
-        require(type(cases) is list and cases and len(cases)==len(set(cases)) and
-                all(re.fullmatch(r'remaining_stock_(00[1-9]|0[12][0-9]|03[0-8])',case) for case in cases),
-                'Explicit valid diagnostic scene selection required')
-    minimum=(8 if scope['kind']=='full38' else 1)*1024**3
+    selection=capture_selection(config)
+    # A diagnostic selection containing all 38 scenes still needs the same
+    # storage as a full capture, while retaining diagnostic-only evidence scope.
+    minimum=max(1024**3,(8*1024**3*len(selection['cases'])+37)//38)
     require(type(config['minimum_free_bytes']) is int and config['minimum_free_bytes'] >= minimum,
             'Insufficient declared full38/diagnostic capacity reserve')
     return roots

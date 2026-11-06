@@ -30,6 +30,12 @@ The worker currently supports original-Windows reference captures; current
 Windows needs its matching runtime adapter and is explicitly rejected by this
 worker. `receipts.py` reads the generic local launcher/private-desktop chain
 and complete process coverage separately from numerical/runtime auditors.
+The same worker also accepts explicit diagnostic selections containing scene003
+for its existing mutation controls. Selected status, arguments, case/repetition
+counts and process receipts are checked separately; even an explicit selection
+of all 38 scenes remains diagnostic. Its storage reserve scales with work size.
+The selected worker path currently has fixture coverage; actual audited Windows
+diagnostics used the separate passive-observer collector.
 The historical v1 transport and its `O:` receipt reader remain unchanged.
 The v2 path also has independently audited actual diagnostic launches: normal
 user workers, private desktop creation/closure, actual simulator PIDs and clean
@@ -62,4 +68,8 @@ The discovered controls include disposable real
 process trees; `run_controls.py --output NEW_JSON` records actual totals and
 source hashes. Fixture captures do not count as simulator acceptance. Eight
 real retained scene003 writers have also passed the reuse-only coordinator and
-fresh independent Windows comparisons. Reload qualification remains failed.
+fresh independent Windows comparisons. Those writer passes do not qualify reloads.
+The repaired `81dcc014` native matrix now also has sixteen complete, independently
+audited scene003 writer/reload runs in four profiles and two repetitions. Those
+selected captures qualify only that focused native comparison; full campaigns,
+current-Windows coverage and normal admission remain open.

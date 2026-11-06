@@ -6,7 +6,7 @@ import re
 import uuid
 
 from contracts import case_ids, load, require, sha
-from LocalVM.runtime_descriptor_v2 import validate, windows_path
+from LocalVM.runtime_descriptor_v2 import validate, windows_path, capture_selection
 
 
 def pid(value):
@@ -87,6 +87,28 @@ def inspect_full38_processes(decoded, config, worker):
             worker['actual_processes'] == 152 and worker['successful_presents'] == 145920,
             'Completed full38 worker required')
     expected = {(phase,case,repeat) for phase in ('stock','reload') for case in case_ids() for repeat in (1,2)}
+    require(not capture_selection(config)['diagnostic_only'] and worker.get('diagnostic_only',False) is False,
+            'Selected captures cannot satisfy a full38 process gate')
+    count=inspect_processes(decoded,config,worker,expected)
+    return dict(status='audited-full38-process-receipts-only',actual_processes=count,
+                complete_simulation_audit_pending=True,phase6_complete=False)
+
+
+def inspect_selected_processes(decoded, config, worker):
+    selection=capture_selection(config)
+    require(selection['diagnostic_only'] and worker['diagnostic_only'] is True and
+            worker['status']=='completed-local-Windows-selected-stock-and-exact-save-reload-diagnostic-only' and
+            worker['cases_requested']==selection['cases'] and
+            worker['actual_processes']==selection['expected_processes'] and
+            worker['successful_presents']==selection['expected_presents'],
+            'Completed explicitly selected diagnostic worker required')
+    expected={(phase,case,repeat) for phase in ('stock','reload') for case in selection['cases'] for repeat in (1,2)}
+    count=inspect_processes(decoded,config,worker,expected)
+    return dict(status='audited-selected-process-receipts-diagnostic-only',actual_processes=count,
+                diagnostic_only=True,complete_simulation_audit_pending=True,phase6_complete=False)
+
+
+def inspect_processes(decoded,config,worker,expected):
     seen = set()
     folders = {'stock':'remaining-stock-repaired','reload':'remaining-stock-persistence'}
     for item in worker['actual_process_receipts']:
@@ -105,6 +127,5 @@ def inspect_full38_processes(decoded, config, worker):
                 dict(rendered_frames=960,successful_presents=960,context_deleted=True),
                 'Simulator graphics lifetime incomplete')
         seen.add(key)
-    require(seen == expected, 'All 152 simulator process receipts required')
-    return dict(status='audited-full38-process-receipts-only',actual_processes=len(seen),
-                complete_simulation_audit_pending=True,phase6_complete=False)
+    require(seen == expected, 'Every declared simulator process receipt required')
+    return len(seen)
