@@ -3,7 +3,7 @@
 Fresh Debug and Release application/SDK/client builds at `f3e86add` pass the
 existing ordinary-scene, SurfaceDC GDI, nine cockpit-fixture and five control-
 fixture gates, with both scene repetitions. The eleven canonical gate processes
-complete 64 fresh scene repetitions. Both builds pass all 22 unit tests.
+complete 64 fresh scene repetitions. Both builds pass all 28 unit tests.
 Independent Linux re-reading passes all three Debug/Release comparisons;
 ordinary-scene and frozen image SSIM are 1.0.
 
@@ -23,6 +23,7 @@ All raw evidence remains local; no hosted build or evidence upload was used.
 
 These results belong to the stated source. They do not qualify the subsequent
 MFD-cache repair. The separate [normal-cleanup lifetime regression](../../Tests/Production/AttachmentTeardownWindows/README.md)
-subsequently failed during its Debug/SSE2 restart campaign. Complete remaining-
-mission persistence, class admission, controllers, hardware/performance and
+subsequently failed during its Debug/SSE2 restart campaign. Fresh `bdfd067f`
+builds repair that cache defect and pass the [complete eighty-world checkpoint](WindowsAttachmentLifetime.md).
+Complete remaining mission persistence, class admission, controllers, hardware/performance and
 Phase 6 acceptance remain open.

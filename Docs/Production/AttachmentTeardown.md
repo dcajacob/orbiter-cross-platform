@@ -69,7 +69,9 @@ and every other guarded input still match. That failed audit remains retained;
 the fresh Release/SSE2 build and capture replace it in the new matrix without
 waiving a guard.
 
-Windows regression and full numerical/image and mission qualification remain
-outstanding. Original scene bytes still seed F5, so these results establish
+The [current Windows normal-cleanup regression](WindowsAttachmentLifetime.md)
+now also passes eighty worlds in all four profiles at `bdfd067f`, with its full
+new launch chain independently audited. Full numerical/image and mission
+qualification remains outstanding. Original scene bytes still seed F5, so these results establish
 paused lifetime coverage. The production class gate remains closed and Phase 6
 remains incomplete. Raw runtime evidence stays local; no hosted build was used.

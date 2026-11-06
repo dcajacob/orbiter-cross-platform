@@ -13,7 +13,7 @@
     "Debug",
     "Release"
   ],
-  "unit_tests_per_configuration": 22,
+  "unit_tests_per_configuration": 28,
   "verified_build_archive_members": 9454,
   "verified_observation_files": 15213,
   "complete_new_launch_and_private_desktop_chain": true,
@@ -32,7 +32,8 @@
   "raw_evidence_uploaded": false,
   "scope": "Existing current application/SDK/client, GDI, nine cockpit fixtures and five control fixtures, both configurations and repeats. Remaining stock missions, attached-vessel lifetime, hardware/controller/performance and Phase 6 acceptance remain separate.",
   "local_audit": {
-    "path": "/home/dan/GIT/orbiter-cross-platform/out/phase6-current-Windows-independent-audit-f3e8-v1.json",
-    "sha256": "9ccd8b167d064773d8224a2e6c276387309bcbfea84a5fc3918459eb71bfc1e2"
+    "path": "/home/dan/GIT/orbiter-cross-platform/out/phase6-current-Windows-independent-audit-f3e8-v2.json",
+    "sha256": "76b3db0f0fa6f5ef00d2ee3f29a38487e113652c3e269c8a20e3e1ff8b31c873",
+    "count_correction": "The v1 audit reported 22 from a test-number occurrence. Both preserved ctest summaries actually report 28 passed and zero failed; v2 checks those exact summaries."
   }
 }
