@@ -9,6 +9,7 @@ import shutil
 import subprocess
 import sys
 import traceback
+import zipfile
 
 
 def require(value,message):
@@ -34,19 +35,33 @@ def main():
         record['log_sha256']=sha(work/(label+'.log'));save()
         require(record['actual_returncode']==0,'Preparation command failed: '+label)
     try:
-        require(sha(cfg['bundle'])==cfg['bundle_sha256'],'Exact source bundle required')
         git=cfg['git']
-        if cfg.get('prepared_source'):
+        snapshot=cfg.get('source_snapshot')
+        if snapshot:
+            archive=Path(snapshot['archive']);manifest=Path(snapshot['manifest'])
+            require(sha(archive)==snapshot['archive_sha256'] and sha(manifest)==snapshot['manifest_sha256'],'Sealed source snapshot differs')
+            sealed=json.loads(manifest.read_text());require(sealed['commit']==cfg['source_commit'],'Snapshot source identity differs')
+            source=work/'source';source.mkdir()
+            with zipfile.ZipFile(archive) as z:
+                require(len(z.namelist())==len(set(z.namelist())) and set(z.namelist())==set(sealed['files_sha256']),'Snapshot file closure differs')
+                for name,digest in sealed['files_sha256'].items():
+                    parts=Path(name).parts;require(not Path(name).is_absolute() and '..' not in parts and ':' not in name and '\\' not in name,'Unsafe snapshot path')
+                    target=source/name;target.parent.mkdir(parents=True,exist_ok=True);target.write_bytes(z.read(name))
+                    require(sha(target)==digest,'Snapshot source file differs')
+            report['source_snapshot']=sealed
+        elif cfg.get('prepared_source'):
             source=Path(cfg['prepared_source']);require(source.is_dir(),'Declared prepared source missing')
             report['reused_prepared_source']=str(source)
         else:
+            require(sha(cfg['bundle'])==cfg['bundle_sha256'],'Exact source bundle required')
             source=work/'source'
             run('clone',[git,'clone','--shared','--no-checkout',cfg['seed'],source],work)
             run('line-endings',[git,'-C',source,'config','core.autocrlf','false'],work)
             run('fetch',[git,'-C',source,'fetch',cfg['bundle'],'refs/heads/codex/phase6-closeout:refs/heads/source-snapshot'],work)
             run('checkout',[git,'-C',source,'checkout','--detach',cfg['source_commit']],work)
-        require(subprocess.check_output([git,'-C',source,'rev-parse','HEAD'],text=True).strip()==cfg['source_commit'],
-                'Actual isolated source snapshot differs')
+        if not snapshot:
+            require(subprocess.check_output([git,'-C',source,'rev-parse','HEAD'],text=True).strip()==cfg['source_commit'],
+                    'Actual isolated source snapshot differs')
         environment={k.upper():v for k,v in os.environ.items()}
         raw=subprocess.check_output([str(Path(environment['SYSTEMROOT'])/'System32/cmd.exe'),
             '/d','/c',cfg['compiler_environment']],env=environment,text=True)
@@ -71,11 +86,12 @@ def main():
         report['observer']=dict(binary=str(binary),sha256=sha(binary),configuration='Debug',
             source_commit=cfg['source_commit'],source_sha256=sha(source/'Tests/Production/ReloadMath/Observer.cpp'),
             header_sha256=sha(source/'Src/Orbiter/Production/MathObservation.h'))
-        run('crt',[sys.executable,'-B',source/'Tests/Production/CrtDiagnostic/capture.py',
-                   '--inputs',cfg['inputs'],'--output',work/'crt'],source,environment)
+        if cfg.get('run_crt',True):
+            run('crt',[sys.executable,'-B',source/'Tests/Production/CrtDiagnostic/capture.py',
+                       '--inputs',cfg['inputs'],'--output',work/'crt'],source,environment)
         require(all(sha(sdk/n)==v for n,v in guarded.items()),'Preserved SDK changed during diagnostic preparation')
-        report.update(status='prepared-passive-observer-and-observed-actual-CRT',source=str(source),
-                      source_commit=cfg['source_commit'],crt_report_sha256=sha(work/'crt/report.json'),
+        report.update(status='prepared-passive-observer-and-observed-actual-CRT' if cfg.get('run_crt',True) else 'prepared-passive-observer-only',source=str(source),
+                      source_commit=cfg['source_commit'],crt_report_sha256=sha(work/'crt/report.json') if cfg.get('run_crt',True) else None,
                       free_bytes=shutil.disk_usage(work).free)
     except BaseException as error:
         report.update(status='failed',error=str(error),traceback=traceback.format_exc());raise
