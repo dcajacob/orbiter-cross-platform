@@ -12,6 +12,7 @@
 
 class Instrument_Orbit: public Instrument {
 public:
+	static void InvalidateWorldCache() { saveprm.usr = nullptr; saveprm.elref = nullptr; saveprm.tgt = nullptr; }
 	enum ProjectionMode { PRJ_FRM, PRJ_SHIP, PRJ_TGT };
 	enum FrameMode { FRM_ECL, FRM_EQU };
 	enum DistMode { DIST_RAD, DIST_ALT };

@@ -384,7 +384,7 @@
     },
     "Src/Orbiter/Mfd.cpp": {
       "original_sha256_lf": "0a5d504ea777abd83b0f3ce45e147a946fad03bb3c70a17eb61600e4ff5108f4",
-      "sha256_lf": "be159a0b07ebe540cc10008ef8265a613297fff8b844ae7588db9ab20225c090",
+      "sha256_lf": "6389479bb02c8ade8bbe5da616e74df3f70f6374c8f5be8271ff5e6515129380",
       "scope": "Original scheduler, stock MFDs and modern map compile natively with explicit original epoch/time, authoritative world/UI bindings and indexed map resources. Exact Windows calculations and callback order conserved. Native GDI/legacy map/custom-mode entry points fail explicitly until supported; native cockpit owner and DG runtime remain unfinished."
     },
     "Src/Orbiter/Mfd.h": {
@@ -399,7 +399,7 @@
     },
     "Src/Orbiter/MfdAlign.h": {
       "original_sha256_lf": "a5072818cf93c21b5f9f94619003c9d628209f9bc4f2d77089f09b660f97eae1",
-      "sha256_lf": "49d2b6e6ecbbdb46219a442876b391212de7615fbdf356e7d4e79b950417ea7e",
+      "sha256_lf": "eeb66d7a6d745e59dd4ae9b3245bbd9acd1e9207cea1056b61c6bfc7a9f151e7",
       "scope": "Original ten stock MFD declarations use exact platform SDK aliases; shared original conic geometry is moved without calculation or screen-mapping changes. Full native instrument runtime remains incomplete."
     },
     "Src/Orbiter/MfdComms.cpp": {
@@ -419,7 +419,7 @@
     },
     "Src/Orbiter/MfdDocking.h": {
       "original_sha256_lf": "9f88ada7e20b847f79308cfc5eaac57fbb80223bcfd0c32eab9085f12e83e168",
-      "sha256_lf": "640c062b0eaa563b300479d597a335b88362da74ebceb70f60d444c05af0491b",
+      "sha256_lf": "bd41484eab6f17d08aa399914fb78ff0945ea088c40a360cd9e6bda26121e8b2",
       "scope": "Original ten stock MFD declarations use exact platform SDK aliases; shared original conic geometry is moved without calculation or screen-mapping changes. Full native instrument runtime remains incomplete."
     },
     "Src/Orbiter/MfdHsi.cpp": {
@@ -429,7 +429,7 @@
     },
     "Src/Orbiter/MfdHsi.h": {
       "original_sha256_lf": "eb6c233a4cc0d2e94019c9f6d92b0f5134214a363016f8478e390c4385ff0aa8",
-      "sha256_lf": "c18581a42592fcf18680caba1a58a2013981cb58053be323abc9077701a211e7",
+      "sha256_lf": "9015b47857698c0813e49843a8463e3eb4283c65b79e11ee8cb6072286727469",
       "scope": "Original ten stock MFD declarations use exact platform SDK aliases; shared original conic geometry is moved without calculation or screen-mapping changes. Full native instrument runtime remains incomplete."
     },
     "Src/Orbiter/MfdLanding.cpp": {
@@ -439,7 +439,7 @@
     },
     "Src/Orbiter/MfdLanding.h": {
       "original_sha256_lf": "157bfbad13a21b119dfeb2f5170d88c45bf56bd0ded232803ce0b27c0f1a5012",
-      "sha256_lf": "50fef84eaaf8b2fbe5d62e050c157f67b48d81dedc0470355cac319b274c6e9f",
+      "sha256_lf": "070bd12e041566f1db8497bc368d8776a49e6599713a7d096fce31f857e0e993",
       "scope": "Original ten stock MFD declarations use exact platform SDK aliases; shared original conic geometry is moved without calculation or screen-mapping changes. Full native instrument runtime remains incomplete."
     },
     "Src/Orbiter/MfdMap.cpp": {
@@ -449,12 +449,12 @@
     },
     "Src/Orbiter/MfdMap.h": {
       "original_sha256_lf": "5e3528e71c285b7fa48ca3ed5acc175892d67ea2c8795f3e5784cafcf28d97d8",
-      "sha256_lf": "697c48f32260e949134c5211d717db852a5e39e9e70260f33cefca772ac342fa",
+      "sha256_lf": "7f3a6c703d9e0c3a80901bd01d358c1140567f51daf344503fa38288d1310d59",
       "scope": "Original ten stock MFD declarations use exact platform SDK aliases; shared original conic geometry is moved without calculation or screen-mapping changes. Full native instrument runtime remains incomplete."
     },
     "Src/Orbiter/MfdMap_old.h": {
       "original_sha256_lf": "1be1311324b9d2883c92902503d6bf54f79d232f4685bd283fc6498e0624b501",
-      "sha256_lf": "0c8c061b48a4b541f5d81a059a475d21fc7903a96c9088e3cce9cc5063d9fe98",
+      "sha256_lf": "b8622b9546c73de323188f3c0f12d07ada077ff8408ae7e00c41a568b1b8885e",
       "scope": "Original ten stock MFD declarations use exact platform SDK aliases; shared original conic geometry is moved without calculation or screen-mapping changes. Full native instrument runtime remains incomplete."
     },
     "Src/Orbiter/MfdOrbit.cpp": {
@@ -464,7 +464,7 @@
     },
     "Src/Orbiter/MfdOrbit.h": {
       "original_sha256_lf": "c2ee5449c7d6684cd9dd40d2518e02dbbb41f44c656390e9814cb39c79d1efa5",
-      "sha256_lf": "4e813af750e5e5b50bada2f229a3cf2afdec40cf18d11f35a5570e26170f6932",
+      "sha256_lf": "a2e8dcb1c1f8e3c1f6d9a8736772dbb339102ea3dcc350f73702c1233ee4b159",
       "scope": "Original ten stock MFD declarations use exact platform SDK aliases; shared original conic geometry is moved without calculation or screen-mapping changes. Full native instrument runtime remains incomplete."
     },
     "Src/Orbiter/MfdOrbitGeometry.cpp": {
@@ -494,7 +494,7 @@
     },
     "Src/Orbiter/MfdSync.h": {
       "original_sha256_lf": "7dc3909008838ef49d15e82c4ade4667d034bb17b47db06bd3ebfdeabe9cbe16",
-      "sha256_lf": "3f12b81dad7886f343cb83cd1000fca64d65ebfb57830a44e4ce619421891b64",
+      "sha256_lf": "761e87ba11182be5c02e4923f676dc31f3a1b477d14737caabf7fac204bcfb66",
       "scope": "Original ten stock MFD declarations use exact platform SDK aliases; shared original conic geometry is moved without calculation or screen-mapping changes. Full native instrument runtime remains incomplete."
     },
     "Src/Orbiter/MfdTransfer.cpp": {
@@ -504,7 +504,7 @@
     },
     "Src/Orbiter/MfdTransfer.h": {
       "original_sha256_lf": "93a9de4ba8104468a2c8135e223b951124c71bf3e76aacdd5fcec7126ca56846",
-      "sha256_lf": "f32a7088233a8008096411cc3204c0eb777577d95a5dec359b017cb5b90069ab",
+      "sha256_lf": "f2ce11cff843df564b3371042370941ca6cc1ad029a0ef52dd8df8b30e9a603e",
       "scope": "Original ten stock MFD declarations use exact platform SDK aliases; shared original conic geometry is moved without calculation or screen-mapping changes. Full native instrument runtime remains incomplete."
     },
     "Src/Orbiter/Nav.cpp": {

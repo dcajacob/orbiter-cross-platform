@@ -15,6 +15,7 @@
 
 class Instrument_Map: public Instrument {
 public:
+	static void InvalidateWorldCache() { saveprm.usr = nullptr; saveprm.ref = nullptr; saveprm.sel = {}; }
 	Instrument_Map (Pane *_pane, std::intptr_t _id, const Spec &spec, Vessel *_vessel);
 	~Instrument_Map();
 	int Type () const { return MFD_MAP; }

@@ -22,7 +22,12 @@ additional controls; this is not Windows ASan or leak qualification. Paused
 lifetime uses actual renderer presentation counters, while image parity remains
 a separate gate. Short or partial-profile runs are diagnostic only.
 
-This new harness awaits actual Windows compilation and execution. Adding it is
-not a lifetime pass, class admission or Phase 6 completion. Raw evidence and the
-exact launch/private-desktop chain must remain local and be independently
-re-read before recording a completed result.
+Both drivers compile against the current `f3e86add` Windows SDK. A two-world
+Debug/automatic pilot passes, and the independent reader rejects ten damaged
+copies of its evidence. The full matrix passes twenty Debug/automatic worlds,
+then Debug/SSE2 crashes opening Map MFD in world seventeen, after sixteen normal
+cleanups. Release profiles were not run. This is a failed matrix and provides no
+complete Windows lifetime qualification. The [MFD cache regression](../MfdWorldCache/README.md)
+records the resulting repair and its remaining runtime checks. Raw evidence and
+the exact launch/private-desktop chain remain local. Class admission and Phase 6
+completion remain separate.

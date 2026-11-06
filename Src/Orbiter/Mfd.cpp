@@ -219,6 +219,20 @@ void Instrument::GlobalInit (oapi::CockpitClient *gc)
 
 void Instrument::GlobalExit (oapi::CockpitClient *gc)
 {
+	// All MFDs are destroyed before this world boundary. Cached object
+	// addresses must not restore handles from a retired world after reuse.
+	Instrument_Orbit::InvalidateWorldCache();
+	Instrument_Map::InvalidateWorldCache();
+#ifdef _WIN32
+	Instrument_MapOld::InvalidateWorldCache();
+#endif
+	Instrument_Docking::InvalidateWorldCache();
+	Instrument_Landing::InvalidateWorldCache();
+	Instrument_HSI::InvalidateWorldCache();
+	Instrument_OPlaneAlign::InvalidateWorldCache();
+	Instrument_OSync::InvalidateWorldCache();
+	Instrument_Transfer::InvalidateWorldCache();
+
 	int i, j;
 
 #ifdef _WIN32
