@@ -1,0 +1,184 @@
+{
+  "schema": 1,
+  "status": "passed-local-paused-attachment-lifetime-four-fresh-native-profiles",
+  "created_utc": "2026-11-06T03:11:47.034088+00:00",
+  "runtime_source_commit": "f82b7392d4a5a1e86c23d88f9ad16f5c5398f541",
+  "regression": {
+    "path": "Tests/Production/RemainingVessels/paused_attachments.py",
+    "sha256": "5bb412921d2c247bfe0b3a8070e4ac1d0985329c3f2fd24ce9b11cf1faceb767"
+  },
+  "historical_verification": {
+    "path": "Docs/Production/AttachmentTeardownVerification.json",
+    "sha256": "50b05c60b2a1d44d6c35a9532280ae7a53dc18421c25f15466bec31586d8f68a",
+    "retained_unchanged": true
+  },
+  "profiles": {
+    "Debug-automatic": {
+      "runtime_identity": {
+        "configuration": "Debug",
+        "math_profile": "automatic",
+        "profile": "Debug-automatic",
+        "sanitizer_linked": true,
+        "compiler": "/usr/bin/c++",
+        "cache_sha256": "40867dcf91afd08adea6701ca7dde772383d6bcc474e911775a5a8a5b6551b33",
+        "build_record_sha256": "62478a31737cf9e97d3ab878742fa486a5fdd6a3937bd90f6682ef3887b6c8f9",
+        "runtime_source_commit": "f82b7392d4a5a1e86c23d88f9ad16f5c5398f541"
+      },
+      "build_record": "out/phase6-attachment-current-Debug-automatic-v1/build.json",
+      "verification": "out/phase6-attachment-paused-worlds-Debug-automatic-v2/verification.json",
+      "guarded_inputs": 901,
+      "resource_inputs": 1130,
+      "worlds": 20,
+      "real_F5_reloads": 19,
+      "finite_vessel_rows": 60,
+      "successful_presents": 1245,
+      "clean_contexts": 20,
+      "actual_exitcode": 0,
+      "all_guarded_inputs_unchanged": true,
+      "sanitizer_suppressions": false
+    },
+    "Debug-sse2": {
+      "runtime_identity": {
+        "configuration": "Debug",
+        "math_profile": "sse2",
+        "profile": "Debug-sse2",
+        "sanitizer_linked": true,
+        "compiler": "/usr/bin/c++",
+        "cache_sha256": "cd43607e0e2f79b7fbfe564a04c8531c091b04bde5adc683174528cf1b30cc20",
+        "build_record_sha256": "80864cf792b30c417626372ed5b94255f8a890810ca8e34be0804fa9dc90c816",
+        "runtime_source_commit": "f82b7392d4a5a1e86c23d88f9ad16f5c5398f541"
+      },
+      "build_record": "out/phase6-attachment-current-Debug-sse2-v1/build.json",
+      "verification": "out/phase6-attachment-paused-worlds-Debug-sse2-v2/verification.json",
+      "guarded_inputs": 901,
+      "resource_inputs": 1130,
+      "worlds": 20,
+      "real_F5_reloads": 19,
+      "finite_vessel_rows": 60,
+      "successful_presents": 1237,
+      "clean_contexts": 20,
+      "actual_exitcode": 0,
+      "all_guarded_inputs_unchanged": true,
+      "sanitizer_suppressions": false
+    },
+    "Release-automatic": {
+      "runtime_identity": {
+        "configuration": "Release",
+        "math_profile": "automatic",
+        "profile": "Release-automatic",
+        "sanitizer_linked": true,
+        "compiler": "/usr/bin/c++",
+        "cache_sha256": "503783d2b091105d8b65d00b484956d857fff420e7fe6818b1b12970b73a1e13",
+        "build_record_sha256": "696b1a9d4b82ccef38af7e9ed734442a7142e3d1da739041582b4cce9882cd5d",
+        "runtime_source_commit": "f82b7392d4a5a1e86c23d88f9ad16f5c5398f541"
+      },
+      "build_record": "out/phase6-attachment-current-Release-automatic-v1/build.json",
+      "verification": "out/phase6-attachment-paused-worlds-Release-automatic-v2/verification.json",
+      "guarded_inputs": 901,
+      "resource_inputs": 1130,
+      "worlds": 20,
+      "real_F5_reloads": 19,
+      "finite_vessel_rows": 60,
+      "successful_presents": 1231,
+      "clean_contexts": 20,
+      "actual_exitcode": 0,
+      "all_guarded_inputs_unchanged": true,
+      "sanitizer_suppressions": false
+    },
+    "Release-sse2": {
+      "runtime_identity": {
+        "configuration": "Release",
+        "math_profile": "sse2",
+        "profile": "Release-sse2",
+        "sanitizer_linked": true,
+        "compiler": "/usr/bin/c++",
+        "cache_sha256": "cee382a9eff4750de4ff7c24235d10b3921847b71723229bbf4c9d99f8829918",
+        "build_record_sha256": "c43483edc2c6155853584c365453cfda6e23ebfe498e03908ca757c57af08213",
+        "runtime_source_commit": "f82b7392d4a5a1e86c23d88f9ad16f5c5398f541"
+      },
+      "build_record": "out/phase6-attachment-current-Release-sse2-v1/build.json",
+      "verification": "out/phase6-attachment-paused-worlds-Release-sse2-v2/verification.json",
+      "guarded_inputs": 901,
+      "resource_inputs": 1130,
+      "worlds": 20,
+      "real_F5_reloads": 19,
+      "finite_vessel_rows": 60,
+      "successful_presents": 1229,
+      "clean_contexts": 20,
+      "actual_exitcode": 0,
+      "all_guarded_inputs_unchanged": true,
+      "sanitizer_suppressions": false
+    }
+  },
+  "aggregate": {
+    "production_input_count": 622,
+    "worlds": 80,
+    "real_F5_reloads": 76,
+    "finite_vessel_rows": 240,
+    "clean_contexts": 80,
+    "successful_presents": 4942
+  },
+  "independent_audit": {
+    "path": "out/phase6-attachment-four-profile-audit-v2.json",
+    "sha256": "b0ed4ba76a4d73caedb0e592a201f47d67194291a963ab8ded84651e01dd9b0e",
+    "status": "passed",
+    "checks": [
+      "Actual compositor key acknowledgements and normal compositor exit",
+      "Every guarded source/runtime/generated input and staged resource hash",
+      "Complete three-vessel scenes, finite paused states and reciprocal docking/attachment links",
+      "Every full-sized framebuffer and normal graphics-context deletion",
+      "Unsuppressed sanitizer logs and actual zero process exit",
+      "All 622 production input hashes identical in all four fresh packages"
+    ]
+  },
+  "source_snapshot": {
+    "path": "out/phase6-attachment-capture-source-f82-v1/manifest.json",
+    "sha256": "36f2cea34f729b480c5c473f5e2c188bdde27dff4d74bc461b6bf1ed9c012713",
+    "file_count": 798,
+    "verified_against_all_four_captures": true,
+    "scope": "Owning source and imported fixture inputs only. Actual runtime and generated compiler inputs remain in each guarded package. This creates no additional simulator execution or acceptance."
+  },
+  "retained_failed_audit": {
+    "path": "out/phase6-attachment-four-profile-audit-v1.json",
+    "reason": "The historical Release/SSE2 capture has exactly one post-capture guard difference: its test README. All ten pinned raw-evidence files and all other guarded inputs still match. The fresh four-profile cohort uses no guard waiver."
+  },
+  "local_evidence_sha256": {
+    "out/phase6-attachment-current-Debug-automatic-v1/build.json": "62478a31737cf9e97d3ab878742fa486a5fdd6a3937bd90f6682ef3887b6c8f9",
+    "out/phase6-attachment-paused-worlds-Debug-automatic-v2/verification.json": "794d8d2b66419fe383a24a95c05cd14c7a51dd4ea41c2b76695629b62b2096ad",
+    "out/phase6-attachment-paused-worlds-Debug-automatic-v2/console.log": "a744c5fe3277c30b16a7bd78951160ad1842d32247776f89f1fb30f460db480a",
+    "out/phase6-attachment-paused-worlds-Debug-automatic-v2/compositor/control.jsonl": "47cb5e627dea921bcd95fb8203b2fbd75be35b8351c4a88b4044001b518f0ee8",
+    "out/phase6-attachment-current-Debug-sse2-v1/build.json": "80864cf792b30c417626372ed5b94255f8a890810ca8e34be0804fa9dc90c816",
+    "out/phase6-attachment-paused-worlds-Debug-sse2-v2/verification.json": "68fbed6062262d2730e71ac60de8f65cd90c2b560cc392333bb0419581b8f977",
+    "out/phase6-attachment-paused-worlds-Debug-sse2-v2/console.log": "afc2304b0110603a6e45cb1fb8e2a4c657ee3046c1d9e7e6e9ca9aa0a218b11f",
+    "out/phase6-attachment-paused-worlds-Debug-sse2-v2/compositor/control.jsonl": "5d12ab1d00cba0a3ad386a1d1868ec7259b1318c98d2e0a29502ff79de35ba95",
+    "out/phase6-attachment-current-Release-automatic-v1/build.json": "696b1a9d4b82ccef38af7e9ed734442a7142e3d1da739041582b4cce9882cd5d",
+    "out/phase6-attachment-paused-worlds-Release-automatic-v2/verification.json": "98b718b3b21176a29275b33a81a80199aaf04f2002b508d61affbc7e2ed361d6",
+    "out/phase6-attachment-paused-worlds-Release-automatic-v2/console.log": "6fe8c8406ad0e4ea164ba7306056c8e30ec4180babb6d8ac988f412bc05cf177",
+    "out/phase6-attachment-paused-worlds-Release-automatic-v2/compositor/control.jsonl": "a01b0fd5cda7f32de643ff5bf52574aed82bb60f1a5252eeaecf303983d648b3",
+    "out/phase6-attachment-current-Release-sse2-v1/build.json": "c43483edc2c6155853584c365453cfda6e23ebfe498e03908ca757c57af08213",
+    "out/phase6-attachment-paused-worlds-Release-sse2-v2/verification.json": "a85a5c10d4925d3fb3c0b7c3f510c9a29311e01cfe198574be18428d61a9db34",
+    "out/phase6-attachment-paused-worlds-Release-sse2-v2/console.log": "b4a0989a3744881deea724f86b779631c55d603666cb982d5439ee684d35af4d",
+    "out/phase6-attachment-paused-worlds-Release-sse2-v2/compositor/control.jsonl": "7fd75a095934c17ddb0bb2b1b813ab4028be0728bba3e618383af5f1200f1632",
+    "out/phase6-attachment-four-profile-audit-v1.json": "522712e5b2a319671293ff9b4a016c02ddd95199d2f66d85aa24e58d5498908c",
+    "out/phase6-attachment-four-profile-audit-v2.json": "b0ed4ba76a4d73caedb0e592a201f47d67194291a963ab8ded84651e01dd9b0e",
+    "out/audit_attachment_profiles_v1.py": "ae44bc7b727ad790f49b611482d659f703b7707c56eabeca3b35db76bc591635",
+    "out/audit_attachment_profiles_v2.py": "4ab23ded092a96aa265bd8225d25c62cc5d41c22ba191b2bed9ade97f5250567",
+    "out/phase6-attachment-retained-evidence-audit-v1.json": "f7b71d74d2aabbc239fa841ca8ffe797d7ec6c91ae15989519a5945631785708",
+    "out/phase6-attachment-retained-guard-drift-v1.json": "be24d559f4150d97a01f6add854a24920cde9180a376c3a5067393330138e518",
+    "out/phase6-attachment-capture-source-f82-v1/manifest.json": "36f2cea34f729b480c5c473f5e2c188bdde27dff4d74bc461b6bf1ed9c012713",
+    "out/run_attachment_profiles_v1.py": "187fb04b7ceaccde97df9f1ad52da803968b50261cbc3afbff5eab582b48f52f",
+    "out/run_attachment_profiles_v2.py": "937d117fd004a45a5d0b6cc002df407cd5b0b6dae6649aaf7cbf7d83bdc9ad3f",
+    "out/phase6-attachment-profile-execution-v1/execution.json": "21245bea7426ec685a3b213b9985663587880a6e4b255eb0c3c90c4208aecb2f",
+    "out/phase6-attachment-profile-execution-v2/execution.json": "ab295923831ca3c35bb25dedce41da6af2625020d6860a50e1bc30882764ab83"
+  },
+  "scope": "Four fresh Linux Debug/Release automatic/SSE2 sanitizer packages from the same immutable producer. Complete unchanged Atlantis ISS Resupply stays paused at tick/time zero through nineteen real F5 world replacements and normal exit per profile. Original scene bytes seed F5; this is lifetime coverage, not actual-save persistence or flight/numerical/image parity.",
+  "outstanding": [
+    "Windows runtime regression",
+    "Full numerical/image and mission qualification",
+    "Production class admission and remaining Phase 6 gates"
+  ],
+  "cloud_builds_used": false,
+  "raw_evidence_uploaded": false,
+  "native_admission_qualified": false,
+  "phase6_complete": false
+}

@@ -142,6 +142,13 @@ The unchanged eight-vessel [atmospheric-autopilot tutorial](AtmosphericAutopilot
 also completes its full native functional flow in all four current profiles,
 including manual override, autopilot recovery, the conclusion and full saves.
 
+The complete paused [Atlantis resupply lifetime regression](AttachmentTeardown.md)
+now passes in four fresh Debug/Release automatic/SSE2 sanitizer packages from
+`f82b7392`: 80 worlds, 76 real F5 replacements, 4,942 presentations and 80 clean
+context deletions. Exact source inputs are preserved locally, and an independent
+audit verifies all three original vessels and attachment/docking links. Windows
+regression and full numerical/image and mission qualification remain open.
+
 ## Phase 1 reproducibility
 
 ```sh

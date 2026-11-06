@@ -37,8 +37,39 @@ unchanged recorded build commands were resumed outside tracing, with source,
 archive and generated-input guards checked before and after compilation. This
 was an environment failure in the mesh compiler, not a simulator test pass.
 
-[The verification record](AttachmentTeardownVerification.json) pins the local
-baseline failure, fresh package and completed capture. Other native profiles,
-Windows regression and full numerical/image qualification remain outstanding.
-The production class gate remains closed and Phase 6 remains incomplete. Raw
-runtime evidence stays local; no hosted build was used for this result.
+[The original verification record](AttachmentTeardownVerification.json) pins the
+local baseline failure, package and completed capture and remains unchanged.
+
+Four fresh ASan/UBSan packages from `f82b7392` now complete the same regression:
+
+| Native profile | Paused worlds | Real F5 reloads | Successful presents |
+| --- | ---: | ---: | ---: |
+| Debug automatic | 20 | 19 | 1,245 |
+| Debug SSE2 | 20 | 19 | 1,237 |
+| Release automatic | 20 | 19 | 1,231 |
+| Release SSE2 | 20 | 19 | 1,229 |
+
+All four processes exit normally: 80 graphics contexts delete cleanly, 240
+finalized vessel rows remain finite at tick/time zero, and the original docking
+and reciprocal payload links survive every replacement. All four packages share
+the same 622 production input hashes. Each capture protects 901 source, runtime,
+generated and fixture inputs plus all 1,130 staged resources. No preload
+observer or sanitizer suppression is used.
+
+The independent audit re-reads the actual compositor key acknowledgements,
+state rows, full-sized framebuffers, lifecycle records, sanitizer logs and every
+guarded input. The [four-profile verification record](AttachmentTeardownProfilesVerification.json)
+pins the completed audit and captures. Exact copies of all 798 consumed source
+and fixture files are preserved locally and checked against all four captures;
+runtime and generated compiler inputs remain in their guarded packages.
+
+The first combined audit stopped because the historical Release/SSE2 capture's
+guarded test README had changed after capture. Its ten pinned raw-evidence files
+and every other guarded input still match. That failed audit remains retained;
+the fresh Release/SSE2 build and capture replace it in the new matrix without
+waiving a guard.
+
+Windows regression and full numerical/image and mission qualification remain
+outstanding. Original scene bytes still seed F5, so these results establish
+paused lifetime coverage. The production class gate remains closed and Phase 6
+remains incomplete. Raw runtime evidence stays local; no hosted build was used.
