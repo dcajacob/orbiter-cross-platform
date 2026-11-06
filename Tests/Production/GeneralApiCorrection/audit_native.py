@@ -6,6 +6,7 @@ import json
 from pathlib import Path
 import sys
 from prepare import ROOT, ORIGINAL, EARTH, corrected, digest, require
+from startup_contract import inspect_native
 
 
 def main():
@@ -55,15 +56,20 @@ def main():
             require(text.count('=== All tests passed ===')==1 and text.count(' - passed')==11 and
                     'LuaCall (' not in text and ' - FAILED!' not in text,
                     'Corrected actual API script did not pass')
+            if record.get('startup_exit') is not None:
+                actual=inspect_native(folder,identity['profile'],record['process']['actual_returncode'],folder/ORIGINAL,
+                                      folder/'Scenarios/Tests/GeneralApiTest.scn',folder/'saved.scn')
+                require(actual==record['startup_exit'], 'Independent API startup-exit audit differs')
+                protected[str(folder/'saved.scn')]=digest((folder/'saved.scn').read_bytes())
         for path in (folder/ORIGINAL,folder/'console.log',folder/'diagnostic-invocation.json',folder/'graphics-lifecycle.json',
                      folder/'numerics.json',folder/'flight-state.csv',folder/'Scenarios/Tests/GeneralApiTest.scn'):
             protected[str(path)]=digest(path.read_bytes())
         observed[variant]=dict(actual_pid=record['process']['actual_collector_pid'],returncode=0,
-            completed_pass_markers=text.count(' - passed'),graphics=life,script_sha256=digest(script))
+            completed_pass_markers=text.count(' - passed'),graphics=life,script_sha256=digest(script),startup_exit=record.get('startup_exit'))
     require(all(digest(Path(p).read_bytes())==h for p,h in protected.items()), 'Diagnostic changed during independent read')
     result=dict(status='passed-native-api-script-diagnostic-only',runtime_identity=report['runtime_identity'],oracle=oracle,
         observed=observed,evidence_sha256=protected,normal_admission_qualified=False,phase6_complete=False,
-        windows_match_and_explicit_startup_exit_policy_pending=True)
+        windows_match_pending=True,startup_exit_policy_audited=report['cases']['corrected'].get('startup_exit') is not None)
     args.output.write_text(json.dumps(result,indent=2)+'\n')
     print(json.dumps(dict(status=result['status'],observed=observed)))
 

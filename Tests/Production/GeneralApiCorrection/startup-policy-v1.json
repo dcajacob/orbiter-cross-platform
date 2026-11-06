@@ -1,0 +1,18 @@
+{
+  "protocol": "general-api-startup-exit-v1",
+  "test_variant": "general-api-spice-test-correction-v2",
+  "scenario": "Tests/GeneralApiTest.scn",
+  "scenario_sha256_lf": "b7a37a80218cd71e0b9265443a091a2a4d58423225f066b626bdc422c1c0ec5e",
+  "script": "Script/Tests/GeneralApiTest.lua",
+  "script_sha256": "106c214b0b7ff8fec4dba024a67784d1d9c0adfd16adc130d993f519254937ca",
+  "frame_limit": 60,
+  "fixed_step": 0.015625,
+  "expected_exit_code": 0,
+  "assertion_passes": 11,
+  "vessels": {"GL-01": "DeltaGlider"},
+  "native_completed_frames": 0,
+  "native_finalized_ticks": 1,
+  "native_context_deleted": true,
+  "windows_exit": "existing-immediate-CRT-exit-without-normal-graphics-teardown",
+  "automatic_reference_refresh": false
+}

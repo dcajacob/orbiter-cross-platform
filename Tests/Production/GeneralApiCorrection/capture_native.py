@@ -8,6 +8,7 @@ import subprocess
 import sys
 import time
 from prepare import ROOT,ORIGINAL,prepare,require,digest
+from startup_contract import SAVE_SENTINEL, inspect_native
 
 
 def main():
@@ -35,8 +36,15 @@ def main():
                if (directory/name).exists()]
     require({p.name for p in libraries}=={'libfontconfig.so.1','libEGL_mesa.so.0','libgdk-3.so.0'},'Pinned native providers required')
     guards={str(path):sha(path) for path in [a.gtk_plugin,*libraries,a.package/'build.json',a.assets/'remaining-vessels-resources.json']}
+    producer=subprocess.check_output(['git','-C',str(ROOT),'rev-parse','HEAD'],text=True).strip()
+    sources=[Path(__file__),Path(__file__).with_name('prepare.py'),Path(__file__).with_name('startup_contract.py'),
+             Path(__file__).with_name('startup-policy-v1.json')]
+    for source in sources:
+        require(digest(subprocess.check_output(['git','-C',str(ROOT),'show',producer+':'+source.relative_to(ROOT).as_posix()]))==sha(source),
+                'API capture source must match its immutable producer')
+    guards.update({str(source):sha(source) for source in sources})
     report=dict(status='running',runtime_identity=identity,build_sha256=sha(a.package/'build.json'),variant=proof,
-                cases={},guarded_files_sha256=guards,normal_admission_qualified=False,phase6_complete=False)
+                producer_commit=producer,cases={},guarded_files_sha256=guards,normal_admission_qualified=False,phase6_complete=False)
     atomic_json(a.output/'diagnostic.json',report)
     try:
         with native.Compositor(a.compositor_tools,a.output/'compositor') as display:
@@ -45,9 +53,10 @@ def main():
                 target=out/ORIGINAL;require(sha(target)==proof['original_script_sha256'],'Copied original script differs')
                 if mode=='corrected':target.unlink();target.write_bytes((variant/ORIGINAL).read_bytes())
                 cfg=out/'Orbiter.cfg';cfg.unlink(missing_ok=True);cfg.write_bytes((a.owner/'Tests/Production/NativeScene/Orbiter.cfg').read_bytes())
+                saved=out/'saved.scn';saved.write_bytes(SAVE_SENTINEL)
                 argv=[str(engine/'orbiter-production'),'--assets',str(out),'--data',str(a.data),'--planets',str(a.planets),
                     '--modules',str(engine/'NativeModules'),'--scenario',str(out/'Scenarios/Tests/GeneralApiTest.scn'),
-                    '--config',str(cfg),'--evidence',str(out),'--frames','60','--fixed-step','0.015625','--run']
+                    '--config',str(cfg),'--evidence',str(out),'--save',str(saved),'--frames','60','--fixed-step','0.015625','--run']
                 env=dict(display.environment,LIBGL_ALWAYS_SOFTWARE='1',GALLIUM_DRIVER='llvmpipe',LP_NUM_THREADS='2',
                     LD_LIBRARY_PATH=':'.join(map(str,[engine,*a.library])),LIBDECOR_PLUGIN_DIR=str(a.gtk_plugin.parent),
                     ASAN_OPTIONS='detect_leaks=1:fast_unwind_on_malloc=0',LSAN_OPTIONS='',UBSAN_OPTIONS='halt_on_error=1:print_stacktrace=1')
@@ -75,8 +84,10 @@ def main():
                 math=json.loads((out/'numerics.json').read_text())['math']
                 require(math=='amd-6121d02-'+('sse2' if identity['math_profile']=='sse2' else 'fma3'),
                         'Actual API CPU math path differs')
+                startup=inspect_native(out,identity['profile'],receipt['actual_returncode'],target,
+                                       out/'Scenarios/Tests/GeneralApiTest.scn',saved) if mode=='corrected' else None
                 report['cases'][mode]=dict(process=receipt,graphics=life,script_sha256=sha(target),console_sha256=sha(out/'console.log'),
-                    actual_math=math,script_result='failed-inherited-assertion' if mode=='original' else 'passed-corrected-test')
+                    actual_math=math,startup_exit=startup,script_result='failed-inherited-assertion' if mode=='original' else 'passed-corrected-test')
                 atomic_json(a.output/'diagnostic.json',report)
         require(all(sha(Path(path))==value for path,value in guards.items()),'Pinned API runtime/provider inputs changed')
         require(intentional_exit.build_identity(engine/'orbiter-production',engine/'NativeModules',a.package/'build.json',build['source_base'])==identity,
