@@ -18,6 +18,8 @@ def protocol():
             value['system_startup_steps']==[.01,.01,.01] and value['capture_tick']==800 and
             value['profiles']==['Debug-automatic','Debug-sse2','Release-automatic','Release-sse2'] and
             value['native_save_command']==dict(input_tick=959,phase='after',action='save',value=0,finalized_tick=960) and
+            value['native_save_boundary']=='windows-close-session-v2' and
+            value['native_before_save_command']==dict(input_tick=959,phase='after',action='endplayback',value=0,finalized_tick=960) and
             value['automatic_refresh'] is False and value['native_admission_qualified'] is False and
             value['phase6_complete'] is False,'Complete persistence protocol differs')
     return value

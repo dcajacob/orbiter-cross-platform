@@ -418,7 +418,12 @@ struct Runtime final:BodyServices,RigidBodyServices,SurfaceServices,NavigationSe
             else if(command.action=="warp") SetWarpFactor(value);
             else if(command.action=="pause") {if(value!=0 && value!=1)throw std::runtime_error("Invalid pause command");running=value==0;render.paused=!running;}
             else if(command.action=="undock") {if(value<0 || value>=v->DockCount() || std::floor(value)!=value)throw std::runtime_error("Invalid docking port");if(!v->Undock(int(value)))throw std::runtime_error("Replay undocking failed");}
-            else if(command.action=="save") Save();
+            else if(command.action=="endplayback") {
+                if(value!=0)throw std::runtime_error("Invalid end-playback command");
+                LifetimeEvent("input.endplayback","",playback?"active":"idle");
+                if(playback)EndPlayback();
+            }
+            else if(command.action=="save") {LifetimeEvent("input.save");Save();}
             else if(command.action.rfind("rcs",0)==0) {
                 auto token=command.action.substr(3);std::size_t end=0;auto group=std::stoul(token,&end);if(end!=token.size())throw std::runtime_error("Invalid replay RCS group");
                 if(group<THGROUP_ATT_PITCHUP || group>THGROUP_ATT_BACK || value<0 || value>1)throw std::runtime_error("Invalid replay RCS group");
@@ -1060,6 +1065,7 @@ struct Runtime final:BodyServices,RigidBodyServices,SurfaceServices,NavigationSe
         annotations.EndPlayback();
 #endif
         playback=false;
+        LifetimeEvent("playback.ended");
     }
     Vessel* Focus() const override {return render.focus;}
     void SetFocus(Vessel* vessel) override {orbiter::production::SetFocusObject(*this,vessel,false);}

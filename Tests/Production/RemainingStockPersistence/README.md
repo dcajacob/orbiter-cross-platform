@@ -17,8 +17,17 @@ exercises that complete staging sequence. This changes no simulation, reference
 or admission policy.
 
 The native `--save` argument supplies the destination for a Save command; it does
-not save automatically on exit. The existing real replay command at input tick
-959 in phase `after` runs after finalized physics/camera tick 960. A fresh native
+not save automatically on exit. The original single Save replay at input tick 959 in phase `after` runs after
+finalized physics/camera tick 960. The current native boundary version
+`windows-close-session-v2` first executes the real EndPlayback operation there,
+then Save at the same tick, matching the original Windows exit-save order.
+Actual lifetime witnesses must show the requested playback state, completed
+EndPlayback when active, and Save in that order with identical clocks.
+`SaveBoundary.Test.py` checks active, idle and naturally completed playback and
+rejects fifteen changed-command, missing/reordered-event and clock controls.
+These reader controls earn no simulator credit. The older single-command
+captures retain their original source and evidence; they are not relabeled as
+this aligned boundary. A fresh native
 PoweredUp run at `45c3155d` completes 960 actual steps/presentations, executes that
 Save command, returns zero and deletes the context with unsuppressed sanitizers.
 Every source/runtime/generated input, all 1,130 assets and all 57 actual data

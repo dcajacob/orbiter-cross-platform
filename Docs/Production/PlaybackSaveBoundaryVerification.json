@@ -1,0 +1,55 @@
+{
+  "status": "diagnosed-save-ordering-pending-aligned-runtime-validation",
+  "case": "remaining_stock_003",
+  "scenario": "Scenarios/2024 Edition/Space Shuttle to ISS.scn",
+  "runtime_source": "2d6fa3963e9c66ddc24106ad2133cb11b20eba48",
+  "collector_source": "b6f9a1a060792a91f22fdd1a2915abc2c5672736",
+  "actual_physical_camera_image_comparison": {
+    "path": "/home/dan/GIT/orbiter-cross-platform/out/phase6-current-full38-first-payload-difference-remaining_stock_003-v1.json",
+    "sha256": "7a829aa42226a9233affa1a674fc7048d04d436cb23346502b765ace9f21fef7",
+    "result": {
+      "state": {
+        "position_m": 0.0,
+        "velocity_m_s": 0.0,
+        "rotation_rad": 0.0,
+        "angular_velocity_rad_s": 0.0,
+        "mjd_days": 0.0,
+        "mass_fraction_of_budget": 0.0,
+        "fuel_fraction_of_budget": 0.0
+      },
+      "camera": {
+        "position_m": 0.0,
+        "rotation_rad": 0.0,
+        "byte_identical": true
+      },
+      "ssim": 1.0
+    }
+  },
+  "windows_close_order": [
+    "EndPlayback",
+    "SaveScenario"
+  ],
+  "native_collection_order": [
+    "Save at finalized tick 960",
+    "EndPlayback during Finish"
+  ],
+  "affected_cached_records": [
+    "Leonardo POS",
+    "Leonardo HEADING",
+    "Leonardo ALT"
+  ],
+  "reference_or_budget_changes": false,
+  "complete_matrix_passed": false,
+  "native_admission_qualified": false,
+  "phase6_complete": false,
+  "scope": "Source ordering explains the observed attached-payload cache difference; an actual aligned runtime rerun is required before claiming resolution. Original captures and failed full38 coordinator remain retained.",
+  "candidate_boundary": "windows-close-session-v2",
+  "reader_controls": {
+    "path": "/home/dan/GIT/orbiter-cross-platform/out/phase6-playback-save-boundary-controls-v1.json",
+    "sha256": "1ce940d7ad0505081724296ba48353083486974db8a70de3ee743d22f22ffc81",
+    "status": "passed",
+    "positive_witnesses": 3,
+    "damaged_controls": 15,
+    "runtime_credit": false
+  }
+}

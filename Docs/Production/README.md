@@ -149,6 +149,17 @@ context deletions. Exact source inputs are preserved locally, and an independent
 audit verifies all three original vessels and attachment/docking links. Windows
 regression and full numerical/image and mission qualification remain open.
 
+The [fresh local Windows baseline](CurrentWindowsQualification.md) at
+`f3e86add` passes 64 scene repetitions and both 22-test build configurations.
+The [tracking-camera save repair](CameraPresetPersistence.md) also passes sixteen
+native writer/reload runs for one unchanged mission across all four profiles.
+The longer Windows restart matrix then exposes a [world-owned MFD cache defect](../../Tests/Production/MfdWorldCache/README.md),
+and the native full38 writer matrix stops on a separate [playback/save boundary](PlaybackSaveBoundary.md).
+The former repair has focused source-method validation; complete rebuilt
+Windows lifetime qualification and the latter aligned-runtime check remain
+pending. These scoped results leave the full157 result and Phase 6 status above
+unchanged.
+
 ## Phase 1 reproducibility
 
 ```sh

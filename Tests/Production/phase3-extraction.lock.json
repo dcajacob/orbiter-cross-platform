@@ -743,7 +743,7 @@
     },
     "Src/Orbiter/Production/NativeApplication.cpp": {
       "original_sha256_lf": null,
-      "sha256_lf": "cfc75580342f834f2efe659e8bc6c7d10cb8e68d43e0bd544ea8a58c4732b9c9",
+      "sha256_lf": "5856a097b57dcca1dcab6281fec6d23d05869171631fbe49dc19bee7dff0bc68",
       "scope": "Original Lua Terminal MFD native SDK/bootstrap and cooperative worker ownership; explicitly admit LuaMFD only, conserve original vessel-first left/right Shift MFD dispatch, and destroy terminal Lua states before their vessels. Original drawing/commands/repository/Windows callbacks independently conserved; terminal buffers reclaimed and command termination bounded. Full runtime and original Windows qualification remain required. Native bare-Space pause convenience applies only without Shift/Control/Alt, retaining exact logical Pause bindings and original modified-space delivery to vessel callbacks. Original DG and Atlantis Ctrl+Space control dialogs retain their source and behavior; no physics or dispatch order change. Native buffered key edges recover their chronological key state from the final held snapshot; modifier chords retain event-time meaning across batched polls. Immediate held input, FlightInput layout, original vessel/MFD priority and physics are unchanged."
     },
     "Src/Orbiter/Production/NativeBuild.h.in": {

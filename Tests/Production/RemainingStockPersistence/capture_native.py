@@ -2,9 +2,11 @@
 """Collect full native stock writers or exact-Windows-save reloads; qualify separately."""
 import argparse
 import concurrent.futures
+import csv
 import hashlib
 import importlib.util
 import json
+import math
 import os
 from pathlib import Path
 import shutil
@@ -55,7 +57,34 @@ def replay_bytes(contract):
     value=contract['native_save_command']
     require(value==dict(input_tick=959,phase='after',action='save',value=0,finalized_tick=960),
             'Native finalized Save boundary differs')
-    return ('tick,phase,action,value\n'+','.join(str(value[k]) for k in ('input_tick','phase','action','value'))+'\n').encode('ascii')
+    preparation=contract['native_before_save_command']
+    require(contract['native_save_boundary']=='windows-close-session-v2' and
+            preparation==dict(input_tick=959,phase='after',action='endplayback',value=0,finalized_tick=960),
+            'Native EndPlayback/Save ordering differs from Windows CloseSession')
+    return ('tick,phase,action,value\n'+''.join(','.join(str(command[k]) for k in
+            ('input_tick','phase','action','value'))+'\n' for command in (preparation,value))).encode('ascii')
+
+
+def inspect_save_boundary(out,contract):
+    """Require the real playback completion before Save at the original final tick."""
+    replay_bytes(contract)
+    with (out/'lifetime-events.csv').open() as stream:
+        rows=list(csv.DictReader(stream))
+    names=('input.endplayback','input.save')
+    inputs=[row for row in rows if row['phase'] in names]
+    require([row['phase'] for row in inputs]==list(names),'Actual EndPlayback/Save input sequence differs')
+    require(inputs[0]['detail'] in ('active','idle'),'Actual playback state witness differs')
+    boundary=[row for row in rows if row['phase'] in (*names,'playback.ended') and
+              row['frame']=='959' and row['tick']=='960']
+    expected=['input.endplayback']+(['playback.ended'] if inputs[0]['detail']=='active' else [])+['input.save']
+    require([row['phase'] for row in boundary]==expected and all(row in boundary for row in inputs),
+            'Actual playback completion/Save boundary differs')
+    require(all(math.isfinite(float(row[k])) for row in boundary for k in ('seconds','mjd')) and
+            len({(row['seconds'],row['mjd']) for row in boundary})==1,
+            'Actual EndPlayback/Save clocks differ')
+    return dict(boundary=contract['native_save_boundary'],input_tick=959,finalized_tick=960,
+                playback_was_active=inputs[0]['detail']=='active',events=expected)
+
 
 
 def inspect_save(out,contract):
@@ -73,6 +102,7 @@ def inspect_save(out,contract):
     require((out/'stock-vessel-complete.txt').read_text().strip()==str(contract['frames']),
             'Native saved-state observation did not reach the finalized boundary')
     configuration_input.inspect(out,configuration_input.expected(ROOT,invocation['collector_producer_commit'],'native'))
+    inspect_save_boundary(out,contract)
     return parse_saved(out/'saved.scn')
 
 
