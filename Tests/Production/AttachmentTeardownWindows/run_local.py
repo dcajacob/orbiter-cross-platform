@@ -18,7 +18,28 @@ def sha(path):
 
 
 def inspect(folder, worlds, math_profile, expected_modules):
-    require = lambda value, message: None if value else (_ for _ in ()).throw(ValueError(message))
+    def require(value, message):
+        if not value:
+            raise ValueError(message)
+    invocation = json.loads((folder / 'invocation.json').read_text())
+    require(invocation['argv'] == [str(folder / 'Orbiter.exe'), '--scenario=Space Shuttle Atlantis/Atlantis ISS Resupply',
+                                  '--fixedstep=0.015625', '--maxframes=60'] and invocation['worlds'] == worlds and
+            invocation['math_profile'] == math_profile and invocation['normal_cleanup_required'] is True and
+            invocation['no_physics_steps_required'] is True, 'Normal original-scene invocation differs')
+    startup = folder / 'staged-Orbiter.cfg'
+    require(sha(startup) == invocation['startup_configuration_sha256'], 'Actual startup snapshot changed')
+    text = startup.read_text()
+    require(text.count('StartPaused = FALSE') == 1 and text.count('ShutdownMode = 0') == 1 and
+            'StartPaused = TRUE' not in text and 'ShutdownMode = 1' not in text and 'ShutdownMode = 2' not in text,
+            'Normal zero-update cleanup configuration differs')
+    scene = folder / 'Scenarios/Space Shuttle Atlantis/Atlantis ISS Resupply.scn'
+    require(sha(scene) == invocation['original_scenario_sha256'] and
+            hashlib.sha256(scene.read_bytes().replace(b'\r\n', b'\n')).hexdigest() ==
+            '9359d1e16a972fc417b934449375d9ed4048c19d08763f8683503b842d0aa813', 'Original complete scenario changed')
+    require(bool(invocation['original_inputs_sha256']), 'Original scene/input witnesses missing')
+    for name, expected in invocation['original_inputs_sha256'].items():
+        require(not Path(name).is_absolute() and '..' not in Path(name).parts and sha(folder / name) == expected,
+                'Actual original input changed: ' + name)
     require((folder / 'attachment-completed-worlds.txt').read_text().strip() == str(worlds), 'Normal world completions missing')
     require((folder / 'attachment-driver-unloaded.txt').read_text().strip() == str(worlds), 'Actual driver did not finish unloading')
     require(not (folder / 'attachment-failure.txt').exists(), 'Actual paused attachment driver failed')
