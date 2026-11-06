@@ -21,16 +21,16 @@ nonfinite comparator inputs fail. Only four declared script regions change.
 `Controls.Test.py --lua LUA --output NEW_JSON` executes the generated helpers
 with harmless logging sinks: 26 Lua checks cover correct/incorrect values,
 both signs and sides, nil, false and truthy Lua values. Three damaged source/model
-controls are rejected. These are helper controls only. Corrected-script Windows
-and native simulator runs, their original failures, normal-host intentional-exit
-policy and final admission evidence remain required before qualification.
+controls are rejected. These helper controls are distinct from simulator evidence.
 
-The initial focused Debug/automatic native diagnostic preserves the original
-planet-status failure and reaches `All tests passed` with the corrected variant.
-Both contexts close with no sanitizer finding. The corrected test calls
-`oapi.exit(0)` during startup and presents zero frames; normal corpus acceptance
-therefore still requires the matching Windows run and an explicitly qualified
-startup-exit policy. This result does not close the four-profile API gate.
+The complete four-profile Windows/native test matrix is independently audited
+in the local closeout ledger. Every original run retains its planet-status
+failure; every corrected run completes all eleven assertions. Native contexts
+close without a sanitizer finding and preserve the existing save. Windows
+Debug/Release automatic/SSE2 captures include real VM, private-desktop, worker
+and simulator receipts, actual CRT providers, complete postcreation vessel
+rosters and observer-off/on equivalence. `qualification.py` seals only that API
+test scope; it cannot qualify the 157-scene corpus or complete Phase 6.
 
 `Observer.cpp` reads the existing private test callbacks and public SDK during
 Windows startup. It logs the real CRT mode/provider and loaded vessel identities.
@@ -39,3 +39,17 @@ the same diagnostic DLL and math mode in both equivalence captures. It never
 changes vessel state, time, input or exit behavior. Windows' existing `oapi.exit`
 uses immediate CRT termination; its missing normal teardown remains an observed
 property, rather than a general waiver for ordinary scene exits.
+
+`startup-policy-v1.json` identifies only the v2 corrected script and unchanged
+GeneralApiTest scenario. The native exit presents zero frames and retains the
+complete initial Delta-glider row and a cleanly deleted graphics context.
+`startup_contract.py` requires all eleven assertion events, the actual CPU math
+lane, unchanged script/scenario bytes and preserved existing save. Eighteen
+control tests reject incomplete or substituted startup evidence.
+
+Normal stock runs opt into this variant with `--general-api-qualification FILE`.
+`admission.py` makes a private asset copy and changes only the pinned script;
+the canonical original remains intact. Four selected normal-host captures pass
+their independent stock audits and fourteen damaged-real-evidence controls
+each. The existing sixteen VesselApiTest exit controls still pass. These are
+selected API captures, not full stock admission evidence.

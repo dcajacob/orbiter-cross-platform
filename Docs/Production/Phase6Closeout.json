@@ -110,6 +110,11 @@
           "path": "/home/dan/.codex/worktrees/phase6-closeout/orbiter-cross-platform/out/phase6-closeout-storage-v1/controls-v10.json",
           "sha256": "865a6906f80efae3d86c8d77baef4fd6741c234ba8e1ce00e61fe124ae253652",
           "scope": "26-discovered-controls-full-versus-selected-Windows-process-scope-only"
+        },
+        {
+          "path": "/home/dan/.codex/worktrees/phase6-acceptance/orbiter-cross-platform/out/phase6-general-api-normal-host-v1/runner-controls-final-v1.json",
+          "sha256": "5eb3906f57858fe8c0c4ba1cc91ba550a0cddf3413d6d974deb88f091790d5a7",
+          "scope": "54-discovered-helper-process-transport-and-API-exit-controls-only"
         }
       ]
     },
@@ -265,6 +270,16 @@
           "path": "/home/dan/.codex/worktrees/phase6-closeout/orbiter-cross-platform/out/phase6-atan2-Release-sse2-v1/build.json",
           "sha256": "9394730a0ede3b1b1b7ceab654b2055316f5a51bca696e36ad92ad1c7b283eec",
           "scope": "source-bound-81dcc014-sanitizer-package-Release-sse2-build-only"
+        },
+        {
+          "path": "/home/dan/.codex/worktrees/phase6-acceptance/orbiter-cross-platform/out/phase6-current-stock-Windows-v2/first-writer-pairs-v2.json",
+          "sha256": "e61f2bf40ad96da90131170c63f8abfc719ec8f824e4161b62e7a684b9f94a9a",
+          "scope": "first-current-Windows-writer-Debug-Release-automatic-pairs-only-not-complete-matrix"
+        },
+        {
+          "path": "/home/dan/.codex/worktrees/phase6-acceptance/orbiter-cross-platform/out/phase6-current-stock-Windows-v2/first-reload-pairs-v1.json",
+          "sha256": "7c7198315f2a6aff4220b888f88f7ab309b7ab534c784b3f9ef5eb524db3a7d4",
+          "scope": "first-current-Windows-reload-Debug-Release-automatic-pairs-only-not-complete-matrix"
         }
       ],
       "note": "Original failures remain preserved. The repaired source passes the complete 16-run focused native matrix; current-Windows cohort qualification and full campaigns are not inferred."
@@ -316,8 +331,64 @@
           "path": "/home/dan/.codex/worktrees/phase6-closeout/orbiter-cross-platform/out/phase6-general-api-correction-v1/helper-controls-v4.json",
           "sha256": "5015b473fdd37d006ca7e335fe93f42f25c500dfe1623380b0f34c6199fb18ea",
           "scope": "same-corrected-script-bytes-with-whitespace-safe-original-matcher"
+        },
+        {
+          "path": "/home/dan/.codex/worktrees/phase6-acceptance/orbiter-cross-platform/out/phase6-general-api-Windows-v3/qualification-v1.json",
+          "sha256": "2589700797f7065e3ede5c8f84eedfd7cd7c56ff029fab7cdf91463d0d9461d2",
+          "scope": "complete-corrected-API-test-Windows-native-four-profile-qualification-only"
+        },
+        {
+          "path": "/home/dan/.codex/worktrees/phase6-acceptance/orbiter-cross-platform/out/phase6-general-api-normal-host-v2/matrix.json",
+          "sha256": "b397b3ff23ffa01fd6a957f33faae9f25f6d9ef316449bbc7b96cfa25938b164",
+          "scope": "four-profile-selected-normal-host-API-captures-and-independent-audits-not-157-scenes"
+        },
+        {
+          "path": "/home/dan/.codex/worktrees/phase6-acceptance/orbiter-cross-platform/out/phase6-general-api-normal-host-v2/Debug-automatic/independent-audit.json",
+          "sha256": "c025d5abbd74827109949fe9b24662da3a753adbf884e7a8d66e9a82c7c5eb58",
+          "scope": "Debug-automatic-selected-normal-host-API-capture-only"
+        },
+        {
+          "path": "/home/dan/.codex/worktrees/phase6-acceptance/orbiter-cross-platform/out/phase6-general-api-normal-host-v2/Debug-automatic/admission-controls.json",
+          "sha256": "bce7e05b2a331025f0ed0bb941b1ff44c7f05c0046ebc6147e674c575f78130c",
+          "scope": "Debug-automatic-fourteen-damaged-real-API-evidence-controls"
+        },
+        {
+          "path": "/home/dan/.codex/worktrees/phase6-acceptance/orbiter-cross-platform/out/phase6-general-api-normal-host-v2/Debug-sse2/independent-audit.json",
+          "sha256": "3098d553deb55765c6fca1300d079f9a92f5409c7eb44d4638d1c2a3d16807c2",
+          "scope": "Debug-sse2-selected-normal-host-API-capture-only"
+        },
+        {
+          "path": "/home/dan/.codex/worktrees/phase6-acceptance/orbiter-cross-platform/out/phase6-general-api-normal-host-v2/Debug-sse2/admission-controls.json",
+          "sha256": "8f98e59bcf0aecf2404d0f13858bdff3ac11797bb591372b456ee6381d03732d",
+          "scope": "Debug-sse2-fourteen-damaged-real-API-evidence-controls"
+        },
+        {
+          "path": "/home/dan/.codex/worktrees/phase6-acceptance/orbiter-cross-platform/out/phase6-general-api-normal-host-v2/Release-automatic/independent-audit.json",
+          "sha256": "d4b214f8923abf1c2ec16d340175616fbc9cdfe9997a04e1b1042cdfe6c123ae",
+          "scope": "Release-automatic-selected-normal-host-API-capture-only"
+        },
+        {
+          "path": "/home/dan/.codex/worktrees/phase6-acceptance/orbiter-cross-platform/out/phase6-general-api-normal-host-v2/Release-automatic/admission-controls.json",
+          "sha256": "53631b02e9ce65447c5512deadbd8d7dc72140bbc3282991b3807f7d15e8b1b8",
+          "scope": "Release-automatic-fourteen-damaged-real-API-evidence-controls"
+        },
+        {
+          "path": "/home/dan/.codex/worktrees/phase6-acceptance/orbiter-cross-platform/out/phase6-general-api-normal-host-v2/Release-sse2/independent-audit.json",
+          "sha256": "bc34d46354d6b316b11b171b4679690d66f0ff40c2e151261e05a3b98b41de03",
+          "scope": "Release-sse2-selected-normal-host-API-capture-only"
+        },
+        {
+          "path": "/home/dan/.codex/worktrees/phase6-acceptance/orbiter-cross-platform/out/phase6-general-api-normal-host-v2/Release-sse2/admission-controls.json",
+          "sha256": "b72e380c1bc7f64267a5f6089b79c613fce5876611397d7170a0a972c43afbd9",
+          "scope": "Release-sse2-fourteen-damaged-real-API-evidence-controls"
+        },
+        {
+          "path": "/home/dan/.codex/worktrees/phase6-acceptance/orbiter-cross-platform/out/phase6-general-api-normal-host-v1/retained-vessel-api-exit-controls-v2.json",
+          "sha256": "5bc410f3ef784364895d9f77ffd59faaf2188c778289a98359db80b576c287ee",
+          "scope": "all-sixteen-existing-VesselApiTest-exit-controls-preserved"
         }
-      ]
+      ],
+      "note": "The complete versioned API test matrix is qualified across both runtimes and four profiles. Its specific normal-host startup exit and all negative controls pass. Runner dependency/full-campaign capacity remains open; this is not 157-scene admission."
     },
     "class-eligibility": {
       "expected": {
@@ -856,6 +927,6 @@
       "note": "Physical controller hardware unavailable; virtual devices do not satisfy acceptance."
     }
   },
-  "current_blocker": "Repair81dcc014 passes all sixteen focused native runs and independent rereads. Current-Windows numerical qualification, corrected API test qualification and remaining per-family class eligibility are incomplete. Full38 VM capacity reserve also remains open.",
-  "next_exit_condition": "Complete the scoped current-Windows/API evidence and class eligibility review, preserving the now source-bound81dcc014 packages, then freeze one final candidate before the full acceptance campaigns."
+  "current_blocker": "Complete the current-Windows scene003 writer/exact-save reload matrix and its independent audit. Remaining per-family class eligibility and the eight-GiB full-campaign VM reserve are open; the corrected API test matrix is qualified.",
+  "next_exit_condition": "Finish all sixteen current-Windows focused runs with unchanged comparisons and restore adequate full-campaign VM capacity, then complete class eligibility and freeze one candidate before full acceptance campaigns."
 }

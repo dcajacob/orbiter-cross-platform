@@ -20,8 +20,11 @@ The runner and archive controls are implemented; final software gates remain
 open. The scene003 reload failure was traced to native automatic mode using an
 SSE2-only `atan2` binding. Repair `81dcc014` passes all sixteen focused native
 writer/reload runs across four profiles and two repetitions, with unchanged
-budgets. Current-Windows qualification, the corrected API test and remaining
-class eligibility evidence are still open. Physical-controller hardware remains unavailable.
+budgets. The versioned corrected API test passes Windows/native in all four
+profiles, including normal-host startup-exit checks and rejection controls.
+The current-Windows scene003 matrix is running; its first automatic writer and
+reload pairs pass unchanged budgets. Remaining class eligibility, full campaigns
+and full-campaign VM capacity are still open. Physical-controller hardware remains unavailable.
 The intended interim signoff is **software complete; awaiting physical-controller
 acceptance**, after all software gates and the operator walkthrough pass.
 [Closeout tools and current limits](../../Tests/Production/Closeout/README.md)
