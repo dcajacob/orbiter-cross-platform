@@ -80,6 +80,26 @@
           "path": "/home/dan/.codex/worktrees/phase6-closeout/orbiter-cross-platform/out/phase6-closeout-reuse-writers-v3/status.json",
           "sha256": "52e564d5377b86172d0f7cc212b1b525d2d4c496e871389befaad2b1039c248f",
           "scope": "8-real-writers-independently-reread-and-compared-no-reloads"
+        },
+        {
+          "path": "/home/dan/.codex/worktrees/phase6-closeout/orbiter-cross-platform/out/phase6-closeout-storage-v1/controls-v8.json",
+          "sha256": "0417328f5b3e2c9f174c8871b0727dcef083f2eca33ac7b3071e2548c88b5f3a",
+          "scope": "24-discovered-controls-only-no-simulator-acceptance"
+        },
+        {
+          "path": "/home/dan/.codex/worktrees/phase6-closeout/orbiter-cross-platform/out/phase6-closeout-storage-v1/reclamation-independent-audit-v2.json",
+          "sha256": "36c8d764ebd40e2259028aa0f618ec2ca44100bf65c84d3f0b4c41ca605cc4a0",
+          "scope": "7904-closed-generated-duplicates-matched-to-fully-restored-archives-before-removal"
+        },
+        {
+          "path": "/home/dan/.codex/worktrees/phase6-closeout/orbiter-cross-platform/out/phase6-reload-launch-audit-v1/audit.json",
+          "sha256": "0b4bc6d84ea6520cc40614ee45a6ccbefcf2ce3c3de3b816c5b979a259ad49cb",
+          "scope": "two-actual-diagnostic-launch-chains-only-not-full38"
+        },
+        {
+          "path": "/home/dan/.codex/worktrees/phase6-closeout/orbiter-cross-platform/out/phase6-reload-launch-audit-v2/audit.json",
+          "sha256": "eedbf0496a79138bc23057d7914997a457244acd361b018c36dd8c950ff711f7",
+          "scope": "three-actual-closed-diagnostic-launch-chains-not-full38"
         }
       ]
     },
@@ -135,6 +155,46 @@
           "path": "/home/dan/.codex/worktrees/phase6-closeout/orbiter-cross-platform/out/phase6-reload-math-corpus-v1/corpus.json",
           "sha256": "c31105d06867554a6c5bc97306266f0236e2bef81920e88dad7d72d1b635b465",
           "scope": "2145-observed-and-neighbouring-arcsine-inputs-not-root-cause-proof"
+        },
+        {
+          "path": "/home/dan/.codex/worktrees/phase6-closeout/orbiter-cross-platform/out/phase6-reload-native-observer-equivalence-v2/independent-audit.json",
+          "sha256": "1aa16ceacd859c0aff42dfcaca8f37fc598afe8a717f305f521c37118eacc09a",
+          "scope": "independent-native-off-on-equivalence-collector-count-failure-preserved"
+        },
+        {
+          "path": "/home/dan/.codex/worktrees/phase6-closeout/orbiter-cross-platform/out/phase6-reload-native-internal-cache-v1/capture.json",
+          "sha256": "0aa6361d298863c678dd38d777509ec78bdad449ce19c8053b42008fb85dee9d",
+          "scope": "complete-native-cache-observer-960-frame-baseline-equivalence-diagnostic-only"
+        },
+        {
+          "path": "/home/dan/.codex/worktrees/phase6-closeout/orbiter-cross-platform/out/phase6-reload-native-crt-v1/Windows-comparison.json",
+          "sha256": "2e6210f9817696b3d877850a23c34559a783a8e5f42b9d1898ec376e574179c5",
+          "scope": "2145-arcsine-inputs-and-neighbours-agree-automatic-and-separate-sse2"
+        },
+        {
+          "path": "/home/dan/.codex/worktrees/phase6-closeout/orbiter-cross-platform/out/phase6-reload-math-Windows-native-v1/comparison.json",
+          "sha256": "2e45a8fdb6a780350d0da3848fc2e36b73cd6f081e999387079ce8c404902fab",
+          "scope": "first-observed-angular-acceleration-difference-211-not-proven-operation"
+        },
+        {
+          "path": "/home/dan/.codex/worktrees/phase6-closeout/orbiter-cross-platform/out/phase6-reload-math-Windows-native-v1/touchdown-comparison.json",
+          "sha256": "97cb1f5a60cf6715ae42207c83eabbee3383f319ac940bbfb7393900c2472e3a",
+          "scope": "all-six-vessel-public-touchdown-inputs-identical-through-211"
+        },
+        {
+          "path": "/home/dan/.codex/worktrees/phase6-closeout/orbiter-cross-platform/out/phase6-surface-centre-crt-v3/Windows-comparison.json",
+          "sha256": "10e70df810dd1dfaf24b36578691ef39319c05429ce4f3bd244f3f755276e179",
+          "scope": "only-centre-math-difference-is-SRB1-atan2-at211-native-uses-SSE2"
+        },
+        {
+          "path": "/home/dan/.codex/worktrees/phase6-closeout/orbiter-cross-platform/out/phase6-reload-math-Windows-native-v1/internal-cache-comparison.json",
+          "sha256": "ded8d70689d19cb42040c18f8e15c59fd1c699c879806570ef902faadd37dd1e",
+          "scope": "physical-quaternions-buffers-identical-through211-final-acceleration-first211"
+        },
+        {
+          "path": "/home/dan/.codex/worktrees/phase6-closeout/orbiter-cross-platform/out/phase6-atan2-fma-experiment-v1/comparison.json",
+          "sha256": "6b4c649bde17ba9e7bc938960603f0c6a84baefe15a7d65d762299adfe57d02c",
+          "scope": "unchanged-atan2-source-FMA-compilation-matches-all8748-centre-samples-experiment-only"
         }
       ],
       "note": "Retained failure is diagnostic-only; eight writer passes do not qualify writers plus reloads."
@@ -726,6 +786,6 @@
       "note": "Physical controller hardware unavailable; virtual devices do not satisfy acceptance."
     }
   },
-  "current_blocker": "Debug/automatic exact Windows-save reload numerical divergence; Windows VM paused by user, resume choice pending. VM storage reclamation is staged but not launched.",
-  "next_exit_condition": "Resume the user-paused local Windows VM, reclaim only independently restored duplicate outputs, ensure adequate capacity, then compare passive observer on/off traces and actual CRT outputs before changing math."
+  "current_blocker": "Debug/automatic reload: native atan2 uses an SSE2-compiled implementation in automatic mode. The reconstructed SRB1 centre input first differs from Windows FMA3 at tick211, matching the first acceleration difference. Live cache confirmation and a qualified repair remain open; full38 capacity reserve also remains open.",
+  "next_exit_condition": "Confirm the actual cached SRB1 longitude at211, qualify separate atan2 FMA/SSE2 bindings on captured inputs and neighbours, then pass scene003 writers and exact-save reloads twice in all four profiles before broad campaigns."
 }

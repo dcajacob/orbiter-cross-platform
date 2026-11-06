@@ -36,6 +36,8 @@ def main():
     modes=a.mode or ['off','on'];require(len(set(modes))==len(modes),'Unique requested modes required')
     report=dict(status='running',diagnostic_only=True,requested_modes=modes,cases={},baseline_sha256=expected,
                 diagnostic_build_sha256=sha(a.build/'build.json'),phase6_complete=False)
+    extra=dict(path=str(a.extra_observer),sha256=sha(a.extra_observer)) if a.extra_observer else None
+    report['extra_observer']=extra
     atomic_json(a.output/'capture.json',report)
     try:
         with native.Compositor(a.compositor_tools,a.output/'compositor') as display:
@@ -56,7 +58,7 @@ def main():
                 if mode=='off':env['ORBITER_TEST_DISABLE_MATH_OBSERVER']='1'
                 atomic_json(out/'diagnostic-invocation.json',dict(argv=argv,mode=mode,saved_input_sha256=sha(target),
                     sanitizer_environment={k:env[k] for k in ('ASAN_OPTIONS','LSAN_OPTIONS','UBSAN_OPTIONS')},
-                    sdk_observer_sha256=sha(probe),gtk_plugin_sha256=sha(a.gtk_plugin)))
+                    sdk_observer_sha256=sha(probe),gtk_plugin_sha256=sha(a.gtk_plugin),extra_observer=extra))
                 with (out/'console.log').open('w') as log:
                     process=OwnedProcess(argv,cwd=out,env=env,stdout=log,stderr=subprocess.STDOUT);deadline=time.monotonic()+1200
                     try:
@@ -80,6 +82,7 @@ def main():
                 for future in concurrent.futures.as_completed([pool.submit(run,mode) for mode in modes]):
                     mode,result=future.result();report['cases'][mode]=result;atomic_json(a.output/'capture.json',report)
         require(all(sha(Path(p))==value for p,value in build['guarded_sha256'].items()),'Retained native package changed')
+        require(extra is None or sha(a.extra_observer)==extra['sha256'],'Extra observer changed during capture')
         report.update(status='passed-native-observer-equivalence-diagnostic-only',passive_observer_baseline_equivalence=True,on_off_equivalence=set(modes)=={'off','on'})
         atomic_json(a.output/'capture.json',report);print(report['status'])
     except BaseException as error:

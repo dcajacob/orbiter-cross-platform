@@ -45,6 +45,7 @@ def fixture(root):
     records={'system-launch':system,'bootstrap-started':started,'bootstrap-result':finished,'worker-result':worker,
         'guest-job':dict(pid=100,guest_script='Z:/Phase6/scripts/system_user_launcher_v1.py',
             script_sha256=pins['system_user_launcher_v1.py'],domain='win11',
+            domain_uuid='3b599191-901c-4578-9706-ba2763d030b7',
             argv=['-B','Z:\\Phase6\\scripts\\system_user_launcher_v1.py','Z:\\Phase6\\request.json']),
         'guest-result':dict(exited=True,exitcode=0,**{'out-data':base64.b64encode(json.dumps(system).encode()).decode()}),
         'vm':dict(hypervisor='libvirt/kvm',domain_name='win11',guest_os_id='mswindows',guest_arch='x86_64',
@@ -67,6 +68,8 @@ class ReceiptTests(unittest.TestCase):
                 ('worker-result',lambda r:r['root_preflight'].update(free_bytes=1)),
                 ('worker-result',lambda r:r['context'].update(session=0)),
                 ('guest-job',lambda r:r.update(guest_script='O:/old/launcher.py')),
+                ('guest-job',lambda r:r.update(argv=['-B','Z:/Phase6/scripts/system_user_launcher_v1.py','Z:/Other/request.json'])),
+                ('guest-job',lambda r:r.update(domain_uuid='4b599191-901c-4578-9706-ba2763d030b7')),
                 ('guest-result',lambda r:r.update(exited=False)),
                 ('guest-result',lambda r:r.update(exitcode=1)),
                 ('vm',lambda r:r.update(guest_os_id='linux'))]
@@ -74,6 +77,10 @@ class ReceiptTests(unittest.TestCase):
                 changed=copy.deepcopy(records[name]);mutate(changed);atomic_json(root/(name+'.json'),changed)
                 with self.subTest(name=name,changed=changed),self.assertRaises(ValueError):inspect_launch(root,pins)
                 atomic_json(root/(name+'.json'),records[name])
+            slash_job=copy.deepcopy(records['guest-job'])
+            slash_job['argv']=[value.replace('\\','/') for value in slash_job['argv']]
+            atomic_json(root/'guest-job.json',slash_job)
+            inspect_launch(root,pins)
             (root/'scripts/worker.py').write_text('# changed\n')
             with self.assertRaisesRegex(ValueError,'runner bytes'):inspect_launch(root,pins)
 

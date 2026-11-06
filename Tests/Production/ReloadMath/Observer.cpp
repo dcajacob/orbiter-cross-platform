@@ -4,6 +4,7 @@
 #include "Orbitersdk.h"
 #include "../../../Src/Orbiter/Production/MathObservation.h"
 #include "TouchdownObservation.h"
+#include "SurfaceObservation.h"
 #ifdef ORBITER_RELOAD_INTERNAL_OBSERVATION
 #include "InternalObservation.h"
 #endif
@@ -16,6 +17,7 @@ namespace {
 class Observer final : public oapi::Module {
     std::ofstream trace;
     std::ofstream touchdown;
+    std::ofstream surface;
 #ifdef ORBITER_RELOAD_INTERNAL_OBSERVATION
     std::ofstream internal;
 #endif
@@ -32,6 +34,8 @@ public:
         touchdown.open("touchdown-math.csv",std::ios::binary);
         touchdown.imbue(std::locale::classic());touchdown<<std::setprecision(17);
         reload_touchdown::Header(touchdown);
+        surface.open("surface-math.csv",std::ios::binary);surface.imbue(std::locale::classic());
+        surface<<std::setprecision(17);reload_surface::Header(surface);
 #ifdef ORBITER_RELOAD_INTERNAL_OBSERVATION
         internal.open("internal-state.csv",std::ios::binary);internal.imbue(std::locale::classic());
         internal<<std::setprecision(17);reload_internal::Header(internal);
@@ -48,6 +52,7 @@ public:
         orbiter::production::math_observation::Row(trace, tick, seconds, *vessel,
             position, rotation, obliquity, oapiGetPlanetCurrentRotation(earth));
         reload_touchdown::Rows(touchdown,tick,seconds);
+        reload_surface::Rows(surface,tick,seconds);
 #ifdef ORBITER_RELOAD_INTERNAL_OBSERVATION
         reload_internal::Rows(internal,tick,seconds);
 #endif

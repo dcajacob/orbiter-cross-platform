@@ -6,6 +6,7 @@
 #include "TimeData.h"
 #include "TouchdownObservation.h"
 #include "InternalObservation.h"
+#include "SurfaceObservation.h"
 #include <dlfcn.h>
 #include <fstream>
 #include <iomanip>
@@ -34,4 +35,10 @@ void orbiter::production::Session::EndTimeStep(SessionServices& services,TimeDat
         reload_internal::Header(result);return result;
     }();
     reload_internal::Rows(internal,tick,time.SimT0);
+    static std::ofstream surface=[] {
+        std::ofstream result("surface-math.csv",std::ios::binary);
+        result.imbue(std::locale::classic());result<<std::setprecision(17);
+        reload_surface::Header(result);return result;
+    }();
+    reload_surface::Rows(surface,tick,time.SimT0);
 }

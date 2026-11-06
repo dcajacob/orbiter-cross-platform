@@ -31,14 +31,22 @@ Windows needs its matching runtime adapter and is explicitly rejected by this
 worker. `receipts.py` reads the generic local launcher/private-desktop chain
 and complete process coverage separately from numerical/runtime auditors.
 The historical v1 transport and its `O:` receipt reader remain unchanged.
-The v2 Windows path has fixture coverage; a fresh actual VM run remains open.
+The v2 path also has independently audited actual diagnostic launches: normal
+user workers, private desktop creation/closure, actual simulator PIDs and clean
+exits, runtime roles, declared share/capacity preflights and retained raw hashes.
+Those scene003 diagnostics do not qualify a fresh full38 campaign or fill
+missing historical launch receipts.
 
 `storage.py` restores every archive member to a temporary directory and hashes
 it through a separate file read. `reclaim_duplicates_v1.py` refuses removal
 until *all* requested VM duplicates match those restored hashes. It removes
 only named generated trace/frame files from closed Full38 output directories;
 source, scenarios, modules, dependencies, data and reference packages remain.
-The staged cleanup has not run: the VM became paused with reason `user`.
+The local VM resumed. All four original archives restored and independently
+verified (21,480 members, 8,038,366,358 decoded bytes). The closed cleanup removed
+7,904 matching generated duplicates, reclaiming 7,611,832,829 bytes. The removal
+set was independently checked against the request. Full campaigns still require
+the separate 8 GiB free-space preflight; the explicit diagnostic reserve is 1 GiB.
 
 Run the local controls before qualification:
 
@@ -47,6 +55,7 @@ python3 -B Tests/Production/Closeout/Runner.Test.py
 python3 -B Tests/Production/Closeout/Transport.Test.py
 python3 -B Tests/Production/Closeout/Storage.Test.py
 python3 -B Tests/Production/Closeout/Manifest.Test.py
+python3 -B Tests/Production/Closeout/run_controls.py --output NEW_JSON
 ```
 
 The discovered controls include disposable real

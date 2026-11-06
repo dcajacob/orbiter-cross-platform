@@ -60,14 +60,17 @@ def inspect_launch(root, trusted_scripts):
             'Bootstrap role was substituted')
     require(pid(job['pid']) and windows_path(job['guest_script']) == scripts/'system_user_launcher_v1.py' and
             job['script_sha256'] == system['launcher_sha256'] and
-            job['argv'] == ['-B',str(scripts/'system_user_launcher_v1.py'),str(windows_path(config['request_path']))],
+            len(job['argv']) == 3 and job['argv'][0] == '-B' and
+            windows_path(job['argv'][1]) == scripts/'system_user_launcher_v1.py' and
+            windows_path(job['argv'][2]) == windows_path(config['request_path']),
             'Actual guest-agent launcher invocation differs')
     require(terminal['exited'] is True and terminal['exitcode'] == 0 and
             json.loads(base64.b64decode(terminal['out-data'],validate=True)) == system,
             'Actual terminal guest-agent result differs')
     require(vm['hypervisor'] == 'libvirt/kvm' and vm['domain_name'] == job['domain'] and
             vm['guest_os_id'] == 'mswindows' and vm['guest_arch'] in ('x86_64','AMD64') and
-            str(uuid.UUID(vm['domain_uuid'])) == vm['domain_uuid'], 'Local Windows VM identity differs')
+            str(uuid.UUID(vm['domain_uuid'])) == vm['domain_uuid'] == job['domain_uuid'],
+            'Local Windows VM identity differs')
     preflight = worker['root_preflight']
     require(preflight['status'] == 'passed-actual-Windows-root-and-capacity-preflight' and
             preflight['protocol'] == config['transport_protocol'] and
