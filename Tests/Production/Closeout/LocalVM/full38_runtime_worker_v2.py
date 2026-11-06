@@ -40,6 +40,7 @@ def original_main(relative,args):
 
 try:
  assert report['context']==dict(session=cfg['active_session'],window_station='WinSta0',desktop=cfg['desktop'])
+ assert cfg.get('capture_scope',{'kind':'full38'})['kind']=='full38','Full38 worker cannot claim a selected scope'
  assert cfg['cohort']=='original-windows','Current-Windows needs its matching runtime adapter; original-SDK reader cannot certify it'
  report['root_preflight']=preflight(cfg);report['roles']=cfg['roles'];report['transport_protocol']=cfg['transport_protocol']
  assert sha(Path(cfg['worker_script']).parent/'static_binary_link_staging_v1.py')==cfg['staging_script_sha256']

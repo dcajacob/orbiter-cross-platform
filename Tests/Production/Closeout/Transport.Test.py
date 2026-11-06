@@ -43,6 +43,14 @@ class TransportTests(unittest.TestCase):
             with self.subTest(value=value), self.assertRaises(ValueError):
                 validate(value)
 
+    def test_diagnostic_capacity_is_scoped_and_cannot_shorten_full_scope(self):
+        value=descriptor();value['capture_scope']=dict(kind='diagnostic',cases=['remaining_stock_003'])
+        value['minimum_free_bytes']=1024**3;validate(value)
+        value['capture_scope']['kind']='full38'
+        with self.assertRaises(ValueError):validate(value)
+        value['capture_scope']=dict(kind='diagnostic',cases=['unknown'])
+        with self.assertRaises(ValueError):validate(value)
+
     def test_current_roles_require_matching_sdk(self):
         value = descriptor();value['cohort']='current-windows'
         value['roles']['application']['commit']='c'*40

@@ -63,8 +63,16 @@ def validate(config):
         require(windows_path(config[role + '_script']).is_relative_to(roots['share']) and
                 re.fullmatch('[0-9a-f]{64}', config[role + '_sha256']), 'Runner script is outside declared share')
     require(windows_path(config['export']).is_relative_to(roots['share']), 'Export outside declared host share')
-    require(type(config['minimum_free_bytes']) is int and config['minimum_free_bytes'] >= 8 * 1024**3,
-            'Full38 worker requires at least 8 GiB free')
+    scope=config.get('capture_scope', {'kind':'full38'})
+    require(scope['kind'] in ('full38','diagnostic'), 'Explicit full38 or diagnostic capture scope required')
+    if scope['kind']=='diagnostic':
+        cases=scope['cases']
+        require(type(cases) is list and cases and len(cases)==len(set(cases)) and
+                all(re.fullmatch(r'remaining_stock_(00[1-9]|0[12][0-9]|03[0-8])',case) for case in cases),
+                'Explicit valid diagnostic scene selection required')
+    minimum=(8 if scope['kind']=='full38' else 1)*1024**3
+    require(type(config['minimum_free_bytes']) is int and config['minimum_free_bytes'] >= minimum,
+            'Insufficient declared full38/diagnostic capacity reserve')
     return roots
 
 
