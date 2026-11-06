@@ -89,10 +89,39 @@ def inspect_observer(root,cfg,qualified,output):
     return observer
 
 
+def retain_supplement(path,target,cfg,worker,config):
+    """Supplement actual closed input bytes; never manufacture a missing runtime receipt."""
+    targets={item['target'] for item in config['delivery_repairs']}
+    expected={mode+'-'+phase+'/'+case+'-'+str(repeat)+'/'+name
+              for mode,phase,case,repeat in ((r['math_profile'],r['phase'],r['case'],r['repeat']) for r in worker['actual_process_receipts'])
+              for name in targets}
+    missing={name for name in expected if not (target/'export'/name).is_file()}
+    if not missing:return
+    require(path is not None,'Actual executed delivery-mesh witnesses are missing from the raw export')
+    report=load(path)
+    require(report['status']=='retained-actual-closed-input-witnesses-only' and report['captured_inputs_unchanged'] is True and
+            report['simulation_reexecuted'] is False and report['capture_request_sha256']==sha(target/'request.json') and
+            report['closed_worker_sha256']==sha(target/'worker-result.json') and set(report['files'])==expected,
+            'Actual closed supplemental input scope/source differs')
+    require(hashlib.sha256(immutable(report['collector_source_commit'],'Closeout/LocalVM/stock_runtime_worker_v3.py')).hexdigest()==report['collector_sha256'],
+            'Supplemental input collector differs from its immutable source')
+    by_folder={r['math_profile']+'-'+r['phase']+'/'+r['case']+'-'+str(r['repeat']):r for r in worker['actual_process_receipts']}
+    for name,record in report['files'].items():
+        folder=name.removesuffix('/'+record['target']);process=by_folder[folder];invocation=target/'export'/folder/'invocation.json'
+        source=path.parent/'closed-input-witnesses'/name;destination=target/'export'/name
+        require(record['target'] in targets and sha(source)==record['sha256']==load(invocation)['input_sha256'][record['target']] and
+                record['invocation_sha256']==sha(invocation) and record['actual_process_pid']==process['timing']['actual_pid'] and
+                windows_path(record['actual_source'])==windows_path(process['folder'])/record['target'],
+                'Actual supplemental bytes/prelaunch input hash/process differs')
+        if name in missing:destination.parent.mkdir(parents=True,exist_ok=True);shutil.copy2(source,destination)
+    shutil.copy2(path,target/'closed-input-witnesses.json')
+
+
 def main():
     p=argparse.ArgumentParser(description=__doc__)
     for name in ('debug-capture','release-capture','debug-observer','release-observer','jobs','vm','sdk-qualification',
                  'native-owner','original-reference','output'):p.add_argument('--'+name,type=lambda value:Path(value).resolve(),required=True)
+    p.add_argument('--debug-supplement',type=Path);p.add_argument('--release-supplement',type=Path)
     a=p.parse_args();require(not a.output.exists(),'Fresh current stock independent audit directory required');a.output.mkdir()
     result=dict(status='running',profiles={},phase6_complete=False,normal_stock_admission_qualified=False)
     protected={str(a.sdk_qualification):sha(a.sdk_qualification)}
@@ -107,6 +136,7 @@ def main():
         config=reader.native.settings(reader.protocols.V2);all_ids=None;all_processes=0
         for configuration,capture,observer_root in [('Debug',a.debug_capture,a.debug_observer),('Release',a.release_capture,a.release_observer)]:
             target,cfg,worker=retain_launch(capture,a.jobs,a.vm,configuration,a.output)
+            retain_supplement(a.debug_supplement if configuration=='Debug' else a.release_supplement,target,cfg,worker,config)
             cases,diagnostic=selection(cfg,config);ids=[case['id'] for case in cases]
             require(worker['cases_requested']==ids and worker['diagnostic_only'] is diagnostic and
                     worker['repeats']==2 and worker['frames']==960, 'Current stock requested scope/repetition/frame count differs')
@@ -139,6 +169,7 @@ def main():
                     require(native_audit['actual_processes']==len(cases)*2,'Complete paired native phase required')
                     atomic_json(a.output/(profile+'-'+native_suffix+'-native-independent-audit.json'),native_audit)
                     native_report=load(native/'capture.json');protected[str(native/'capture.json')]=sha(native/'capture.json')
+                    protected.update(native_report['guarded_files_sha256'])
                     original_root=a.original_reference/profile/original_phase;original_report=load(original_root/'capture.json')
                     protected[str(original_root/'capture.json')]=sha(original_root/'capture.json')
                     for case in cases:
@@ -150,7 +181,7 @@ def main():
                                 require(sha(original/name)==checksum,'Retained original Windows reference bytes changed');protected[str(original/name)]=checksum
                             native_record=native_report['cases'][case['id']]['runs'][repeat-1]
                             for name,checksum in native_record['files_sha256'].items():protected[str(native_folder/name)]=checksum
-                            executed=record['executed_case'];actual=inspect_run(folder,executed,config,reader,cfg['source_commit'],ROOT)
+                            executed=record['executed_case'];actual=inspect_run(folder,executed,config,reader.windows,cfg['source_commit'],ROOT)
                             require(all(actual[key]==value for key,value in record.items() if key in actual), 'Independent current stock trace/clock observation differs')
                             require(actual['actual_math']==('sse2' if mode=='sse2' else 'fma3'), 'Actual paired current math mode differs')
                             metadata=load(folder/'current-runtime-variant.json')

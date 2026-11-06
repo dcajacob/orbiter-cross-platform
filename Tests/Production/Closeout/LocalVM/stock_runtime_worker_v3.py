@@ -18,8 +18,46 @@ def load(path):return json.loads(Path(path).read_text())
 def lfsha(path):return hashlib.sha256(Path(path).read_bytes().replace(b'\r\n',b'\n')).hexdigest()
 
 
+def collect_closed_inputs(request,cfg):
+    """Retain actual staged input bytes omitted by an earlier export, without recapture."""
+    capture_request=Path(cfg['capture_request']);capture=load(capture_request);worker_path=capture_request.parent/'worker-result.json'
+    require(sha(capture_request)==cfg['capture_request_sha256'] and sha(worker_path)==cfg['closed_worker_sha256'],
+            'Actual closed capture request/result differs')
+    worker=load(worker_path);bootstrap=load(capture_request.parent/(capture['name']+'-bootstrap-result.json'))
+    require(worker['status']=='captured-current-Windows-stock-and-paired-exact-save-reloads' and
+            bootstrap['status']=='actual-private-worker-finished' and bootstrap['actual_worker_exitcode']==0 and
+            bootstrap['private_desktop_closed'] is True, 'Actual closed worker/private desktop required')
+    output=request.parent/'closed-input-witnesses';require(not output.exists(),'Fresh supplemental witness output required');output.mkdir()
+    targets=cfg['targets'];require(targets and all(name.startswith('Meshes/') and '..' not in Path(name).parts for name in targets),
+                               'Only explicit original delivery-mesh targets may be retained')
+    record=dict(status='collecting',capture_request_sha256=sha(capture_request),closed_worker_sha256=sha(worker_path),
+        collector_source_commit=cfg['collector_source_commit'],collector_sha256=sha(__file__),files={},
+        captured_inputs_unchanged=False,simulation_reexecuted=False,phase6_complete=False)
+    guards={str(capture_request):sha(capture_request),str(worker_path):sha(worker_path)}
+    for process in worker['actual_process_receipts']:
+        folder=Path(process['folder']);require(folder.is_relative_to(Path(capture['output'])),'Closed run outside its declared output')
+        invocation=folder/'invocation.json';body=load(invocation);timing=load(folder/'process-timing.json')
+        require(timing==process['timing'] and timing['actual_returncode']==0 and timing['timed_out'] is False,
+                'Actual closed simulator receipt differs')
+        guards[str(invocation)]=sha(invocation)
+        for name in targets:
+            source=folder/name;checksum=sha(source)
+            require(checksum==body['input_sha256'][name], 'Actual retained staged input differs from its prelaunch witness')
+            relative=source.relative_to(Path(capture['output']));destination=output/relative
+            destination.parent.mkdir(parents=True,exist_ok=True);shutil.copy2(source,destination)
+            require(sha(destination)==checksum,'Supplemental actual input copy differs')
+            record['files'][relative.as_posix()]=dict(sha256=checksum,actual_source=str(source),
+                invocation_sha256=sha(invocation),actual_process_pid=timing['actual_pid'],target=name)
+            guards[str(source)]=checksum
+    require(all(sha(path)==checksum for path,checksum in guards.items()), 'Closed capture/input changed during supplemental retention')
+    record.update(status='retained-actual-closed-input-witnesses-only',captured_inputs_unchanged=True)
+    (request.parent/'closed-input-witnesses.json').write_text(json.dumps(record,indent=2)+'\n')
+
+
 def main():
-    request=Path(sys.argv[1]);cfg=load(request);share=request.parent;source=Path(cfg['source']);output=Path(cfg['output'])
+    request=Path(sys.argv[1]);cfg=load(request);share=request.parent
+    if cfg.get('action')=='collect-closed-input-witnesses':collect_closed_inputs(request,cfg);return
+    source=Path(cfg['source']);output=Path(cfg['output'])
     report=dict(status='running',source=cfg['source_commit'],configuration=cfg['configuration'],math_profile=cfg['math_profile'],
         roles=cfg['roles'],transport_protocol=cfg['transport_protocol'],context=context(),request_sha256=sha(request),
         script_sha256=sha(__file__),cloud_builds_used=False,native_admission_qualified=False,phase6_complete=False,
@@ -31,6 +69,7 @@ def main():
         target.mkdir()
         paths=[p for p in folder.iterdir() if p.is_file() and p.suffix.lower() not in ('.exe','.dll')]
         paths.extend(p for sub in ('Scenarios','Flights') for p in (folder/sub).rglob('*') if p.is_file())
+        paths.extend(folder/item['target'] for item in config['delivery_repairs'] if (folder/item['target']).is_file())
         for path in paths:
             destination=target/path.relative_to(folder);destination.parent.mkdir(parents=True,exist_ok=True);shutil.copy2(path,destination)
     try:
