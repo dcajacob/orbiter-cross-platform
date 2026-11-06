@@ -36,6 +36,8 @@ def main():
     try:
         require(report['context']==dict(session=cfg['active_session'],window_station='WinSta0',desktop=cfg['desktop']), 'Actual private desktop differs')
         report['root_preflight']=preflight(cfg)
+        os.environ.update(PATH=str(Path(cfg['git']).parent)+';'+os.environ['PATH'],PYTHONDONTWRITEBYTECODE='1',
+                          LIBGL_ALWAYS_SOFTWARE='true',GALLIUM_DRIVER='llvmpipe')
         require(cfg['cohort']=='current-windows' and cfg['source_role']=='application', 'Actual current application source role required')
         require(sha(cfg['application_build_manifest'])==cfg['application_build_manifest_sha256'], 'Current application build record differs')
         built=load(cfg['application_build_manifest']);item=built['configurations'][cfg['configuration']];runtime=Path(cfg['preserved'])
@@ -73,8 +75,6 @@ def main():
         for value in cfg['windows_save_inputs']:
             path=Path(value['path']);require(sha(path)==value['sha256'], 'Exact Windows save input changed')
             inputs[(value['math_profile'],value['case'],value['repeat'])]=value;guards[str(path)]=value['sha256']
-        os.environ.update(PATH=str(Path(cfg['git']).parent)+';'+os.environ['PATH'],PYTHONDONTWRITEBYTECODE='1',
-                          LIBGL_ALWAYS_SOFTWARE='true',GALLIUM_DRIVER='llvmpipe')
         output.mkdir();export=Path(cfg['export']);export.mkdir();links=BinaryLinks(guards,output);links.install();save()
         expected_modules={}
         for path,value in guards.items():expected_modules.setdefault(Path(path).name.casefold(),set()).add(value)
