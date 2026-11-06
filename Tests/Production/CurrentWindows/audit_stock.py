@@ -99,6 +99,13 @@ def retain_supplement(path,target,cfg,worker,config):
     if not missing:return
     require(path is not None,'Actual executed delivery-mesh witnesses are missing from the raw export')
     report=load(path)
+    from local_vm import validate_nonce_receipt
+    job=load(path.parent/'collection-job.json');terminal=load(path.parent/'collection-terminal.json')
+    require(validate_nonce_receipt(job,terminal['transport_receipt']) and terminal['exitcode']==0 and
+            terminal['transport_receipt']['actual_target_pid']==report['actual_collector_pid'] and
+            job['script_sha256']==report['collector_sha256'] and job['domain_uuid']==load(target/'vm.json')['domain_uuid'] and
+            sha(path.parent/'request.json')==report['collection_request_sha256'],
+            'Actual nonce-bound supplemental collector/VM/source/exit identity differs')
     require(report['status']=='retained-actual-closed-input-witnesses-only' and report['captured_inputs_unchanged'] is True and
             report['simulation_reexecuted'] is False and report['capture_request_sha256']==sha(target/'request.json') and
             report['closed_worker_sha256']==sha(target/'worker-result.json') and set(report['files'])==expected,
@@ -115,6 +122,8 @@ def retain_supplement(path,target,cfg,worker,config):
                 'Actual supplemental bytes/prelaunch input hash/process differs')
         if name in missing:destination.parent.mkdir(parents=True,exist_ok=True);shutil.copy2(source,destination)
     shutil.copy2(path,target/'closed-input-witnesses.json')
+    for name in ('collection-job.json','collection-terminal.json','request.json'):
+        shutil.copy2(path.parent/name,target/('supplement-'+name))
 
 
 def main():

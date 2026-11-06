@@ -31,6 +31,15 @@ def inspect_launch(root, trusted_scripts):
     system = records['system-launch']; started = records['bootstrap-started']
     finished = records['bootstrap-result']; worker = records['worker-result']
     job = records['guest-job']; terminal = records['guest-result']; vm = records['vm']
+    if job.get('transport',{}).get('protocol')=='phase6-local-guest-job-v2':
+        from local_vm import validate_nonce_receipt
+        require(validate_nonce_receipt(job,terminal['transport_receipt']) and
+                terminal['transport_receipt']['actual_target_returncode']==terminal['exitcode'] and
+                terminal['terminal_basis']=='actual-owned-child-exit-and-fresh-nonce-bound-file',
+                'Actual nonce-bound launcher exit receipt incomplete')
+        transport=job['transport'];actual=job['request']
+        require(actual['arguments']['arg']==['-B',str(windows_path(job['guest_script']).parent/'guest_job_v2.py'),transport['request_guest']],
+                'Actual nonce-bound launcher wrapper invocation differs')
     request_sha = sha(root/'request.json')
     require(type(config['active_session']) is int and config['active_session'] > 0 and
             re.fullmatch('[A-Za-z0-9-]+',config['name']) and re.fullmatch('[A-Za-z0-9]+',config['desktop']),

@@ -20,6 +20,8 @@ def lfsha(path):return hashlib.sha256(Path(path).read_bytes().replace(b'\r\n',b'
 
 def collect_closed_inputs(request,cfg):
     """Retain actual staged input bytes omitted by an earlier export, without recapture."""
+    require(cfg['helpers_sha256'] and all(sha(Path(__file__).parent/name)==value for name,value in cfg['helpers_sha256'].items()),
+            'Actual supplemental collector/helper bytes differ')
     capture_request=Path(cfg['capture_request']);capture=load(capture_request);worker_path=capture_request.parent/'worker-result.json'
     require(sha(capture_request)==cfg['capture_request_sha256'] and sha(worker_path)==cfg['closed_worker_sha256'],
             'Actual closed capture request/result differs')
@@ -31,7 +33,8 @@ def collect_closed_inputs(request,cfg):
     targets=cfg['targets'];require(targets and all(name.startswith('Meshes/') and '..' not in Path(name).parts for name in targets),
                                'Only explicit original delivery-mesh targets may be retained')
     record=dict(status='collecting',capture_request_sha256=sha(capture_request),closed_worker_sha256=sha(worker_path),
-        collector_source_commit=cfg['collector_source_commit'],collector_sha256=sha(__file__),files={},
+        collector_source_commit=cfg['collector_source_commit'],collector_sha256=sha(__file__),actual_collector_pid=os.getpid(),
+        collection_request_sha256=sha(request),helpers_sha256=cfg['helpers_sha256'],files={},
         captured_inputs_unchanged=False,simulation_reexecuted=False,phase6_complete=False)
     guards={str(capture_request):sha(capture_request),str(worker_path):sha(worker_path)}
     for process in worker['actual_process_receipts']:
