@@ -81,6 +81,13 @@ def verify():
     # through their concrete type, including a removed preset's owned mode.
     actual=actual.replace('DeleteCameraMode{}(preset[i]);','delete preset[i];').replace('DeleteCameraMode{}(cm);','delete cm;')
     actual=actual.replace('DeleteCameraMode{}(preset[idx]);','')
+    # The original invalid %: conversion is ignored by the Windows CRT but
+    # emits an extra percent with glibc. Preserve the actual Windows save bytes.
+    fixed='"Track:%s:%0.2f:%s %0.3f %0.3f %0.3f"'
+    legacy='"Track:%s%:%0.2f:%s %0.3f %0.3f %0.3f"'
+    if actual.count(fixed)!=1 or core.count(legacy)!=1:
+        raise ValueError('Tracking preset format repair differs')
+    actual=actual.replace(fixed,legacy,1)
     equal(core,actual,'All production camera/ground observer/preset calculations and ordering')
     api=old('Orbitersdk/include/OrbiterAPI.h');a,b=span(api,'normangle');helper=raw('Src/Orbiter/Camera.cpp');c,d=span(helper,'NormalizeCameraAngle')
     equal(api[a:b].replace('inline double normangle','static double NormalizeCameraAngle'),helper[c:d],'Original signed angle normalization')
