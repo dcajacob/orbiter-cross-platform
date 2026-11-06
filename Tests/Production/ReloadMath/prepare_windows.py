@@ -81,19 +81,31 @@ def main():
         require(all(sha(sdk/n)==v for n,v in guarded.items()),'Actual original application/SDK bytes differ')
         report['sdk']=dict(source=package['source_commit'],manifest_sha256=sha(manifest),files_sha256=guarded)
         kind=cfg.get('observer_kind','reload-math')
-        require(kind in ('reload-math','general-api'),'Known passive observer required')
+        require(kind in ('reload-math','general-api','remaining-stock'),'Known test observer required')
         configuration=cfg.get('configuration','Debug');require(configuration in ('Debug','Release'),'Known configuration required')
-        relative='Tests/Production/'+('ReloadMath/Observer.cpp' if kind=='reload-math' else 'GeneralApiCorrection/Observer.cpp')
-        binary=work/('ProductionReloadMathObserver.dll' if kind=='reload-math' else 'ProductionGeneralApiObserver.dll');obj=work/'Observer.obj'
+        relative='Tests/Production/'+{'reload-math':'ReloadMath/Observer.cpp','general-api':'GeneralApiCorrection/Observer.cpp',
+                                     'remaining-stock':'RemainingStock/Driver.cpp'}[kind]
+        binary=work/{'reload-math':'ProductionReloadMathObserver.dll','general-api':'ProductionGeneralApiObserver.dll',
+                     'remaining-stock':'ProductionCockpitDriver.dll'}[kind];obj=work/'Observer.obj'
+        compiled=source/relative
+        if kind=='remaining-stock':
+            body=compiled.read_bytes().replace(b'\r\n',b'\n')
+            old=b'require(frames==60,"Incomplete original stock observation")'
+            require(body.count(old)==1,'Original stock observer frame assertion differs')
+            compiled=compiled.with_name('Driver-960.cpp')
+            compiled.write_bytes(body.replace(old,b'require(frames==960,"Incomplete repaired stock observation")'))
+            report['observer_source_variant']=dict(original_sha256=sha(source/relative),compiled_sha256=sha(compiled),
+                only_change='Validate 960 finalized ticks instead of 60; all observation calls and delays unchanged')
         compiler=shutil.which('cl.exe',path=environment['PATH']);require(compiler,'Actual MSVC compiler missing from validated environment')
         report['compiler']=dict(path=compiler,sha256=sha(compiler))
         command=[compiler,'/nologo','/EHsc','/std:c++17','/W3','/fp:precise','/Oi-',
             '/MDd' if configuration=='Debug' else '/MD','/Od' if configuration=='Debug' else '/O2','/LD',
-            '/DNOMINMAX','/I'+str(sdk/'Orbitersdk/include'),str(source/relative),
+            '/DNOMINMAX','/I'+str(sdk/'Orbitersdk/include'),str(compiled),
             '/Fo'+str(obj),'/Fe'+str(binary),'/link',str(sdk/'Orbitersdk/lib/Orbiter.lib'),str(sdk/'Orbitersdk/lib/Orbitersdk.lib')]
         if cfg.get('internal_headers'):
             command[1:1]=['/DORBITER_RELOAD_INTERNAL_OBSERVATION','/I'+str(source/'internal/Src/Orbiter'),
                            '/I'+str(Path(cfg['directx_sdk'])/'Include')]
+        if kind=='remaining-stock':command[1:1]=['/I'+str(source/'Tests/Production')]
         run('observer-build',command,work,environment)
         report['observer']=dict(binary=str(binary),sha256=sha(binary),configuration=configuration,kind=kind,
             sdk_source_commit=sdk_source,source_commit=cfg['source_commit'],source_sha256=sha(source/relative),
@@ -115,7 +127,7 @@ def main():
             target=request.parent/'crt';target.mkdir(exist_ok=True)
             for path in crt.iterdir():
                 if path.is_file() and path.suffix not in ('.exe','.obj'):shutil.copy2(path,target/path.name)
-        for name in ('ProductionReloadMathObserver.dll','ProductionGeneralApiObserver.dll'):
+        for name in ('ProductionReloadMathObserver.dll','ProductionGeneralApiObserver.dll','ProductionCockpitDriver.dll'):
             if (work/name).is_file():shutil.copy2(work/name,request.parent/name)
 
 
