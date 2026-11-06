@@ -22,7 +22,8 @@ def main():
     expected,oracle=corrected((ROOT/ORIGINAL).read_bytes(),(ROOT/EARTH).read_bytes(),args.variant_version)
     sys.path.insert(0,str(args.owner/'Tests/Production/StockScenarios'))
     import intentional_exit
-    observed={};protected={str(report_path):digest(body)}
+    observed={};protected={str(report_path):digest(body),**report['guarded_files_sha256']}
+    require(all(digest(Path(p).read_bytes())==h for p,h in protected.items()), 'Retained diagnostic inputs differ')
     for variant in ('original','corrected'):
         folder=args.capture/variant;record=report['cases'][variant]
         invocation=json.loads((folder/'diagnostic-invocation.json').read_text())
@@ -51,9 +52,11 @@ def main():
             require('Assertion failed' in text and 'Test: planet status' in text and
                     '=== All tests passed ===' not in text, 'Original inherited failure was lost')
         else:
-            require(text.count('=== All tests passed ===')==1 and 'LuaCall (' not in text and ' - FAILED!' not in text,
+            require(text.count('=== All tests passed ===')==1 and text.count(' - passed')==11 and
+                    'LuaCall (' not in text and ' - FAILED!' not in text,
                     'Corrected actual API script did not pass')
-        for path in (folder/ORIGINAL,folder/'console.log',folder/'diagnostic-invocation.json',folder/'graphics-lifecycle.json'):
+        for path in (folder/ORIGINAL,folder/'console.log',folder/'diagnostic-invocation.json',folder/'graphics-lifecycle.json',
+                     folder/'numerics.json',folder/'flight-state.csv',folder/'Scenarios/Tests/GeneralApiTest.scn'):
             protected[str(path)]=digest(path.read_bytes())
         observed[variant]=dict(actual_pid=record['process']['actual_collector_pid'],returncode=0,
             completed_pass_markers=text.count(' - passed'),graphics=life,script_sha256=digest(script))

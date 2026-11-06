@@ -51,7 +51,9 @@ public:
     void Event(const char* phase,const char* object,double seconds,double mjd,int running) {
         const unsigned count=oapiGetVesselCount();
         events<<phase<<','<<(object?object:"")<<','<<seconds<<','<<mjd<<','<<running<<','<<count<<'\n';events.flush();
-        if(std::string(phase)!="vessel.load.after")return;
+        // load.after precedes insertion into the world vessel list. Read the
+        // completed roster after postcreation, before the startup script exits.
+        if(std::string(phase)!="vessel.postcreation.after")return;
         for(unsigned index=0;index<count;++index) {
             const auto* vessel=oapiGetVesselInterface(oapiGetVesselByIndex(index));
             if(!vessel)std::exit(42);
