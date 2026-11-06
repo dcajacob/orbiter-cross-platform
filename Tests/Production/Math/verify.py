@@ -52,6 +52,23 @@ def main():
     # Exercise production automatic dispatch first, then the other CPU path.
     auto=1 if profile.endswith('fma3') else 0
     modes=[('automatic',auto,-1)]+([('sse2',0,0)] if auto else ([('fma3',1,1)] if lib.probe_fma_available() else []))
+    reload_root=HERE/'Reference/ReloadAtan2'
+    reload_provenance=json.loads((reload_root/'provenance.json').read_text())
+    require(reload_provenance['protocol']=='phase6-reload-atan2-v1' and
+            reload_provenance['automatic_refresh'] is False and reload_provenance['samples']==4225 and
+            reload_provenance['exact_input']==dict(function='atan2',y='c1550c2a4f069879',x='412bcfdda20e1e30'),
+            'Wrong captured reload atan2 regression')
+    reload_fixture=reload_root/'windows.csv.gz'
+    require(sha(reload_fixture)==reload_provenance['fixture_sha256'],'Captured reload regression fixture changed')
+    raw=gzip.decompress(reload_fixture.read_bytes())
+    require(hashlib.sha256(raw).hexdigest()==reload_provenance['decoded_sha256'],'Decoded reload fixture changed')
+    reload_rows=list(csv.DictReader(raw.decode().splitlines()))
+    require(len(reload_rows)==4225 and {r['tag'] for r in reload_rows}==
+            {f'{dy}|{dx}' for dy in range(-32,33) for dx in range(-32,33)},'Complete captured neighbour matrix required')
+    seed=next(r for r in reload_rows if r['tag']=='0|0')
+    require(seed['y']==reload_provenance['exact_input']['y'] and seed['x']==reload_provenance['exact_input']['x'] and
+            seed['fma3']=='bff6837bee573509' and seed['sse2']=='bff6837bee57350a',
+            'The first differing automatic/SSE2 operation was lost')
     for label,mode,select in modes:
         if select>=0:lib.probe_mode(select)
         maxima={name:0 for name in FUNCTIONS}
@@ -69,6 +86,13 @@ def main():
                 require(bits(lib.probe_value(f,x,y))==bits(target),'Native primitive differs from original Windows '+r['function'])
                 count+=1
         require(count==record['samples'],'Frozen primitive sample count changed')
+        for row in reload_rows:
+            dy,dx=map(int,row['tag'].split('|'))
+            require(int(row['y'],16)==int(seed['y'],16)+dy and int(row['x'],16)==int(seed['x'],16)+dx,
+                    'Captured neighbouring input changed')
+            y=struct.unpack('>d',bytes.fromhex(row['y']))[0];x=struct.unpack('>d',bytes.fromhex(row['x']))[0]
+            require(bits(lib.probe_value(3,y,x))==int(row['fma3' if mode else 'sse2'],16),
+                    'Reload atan2 differs from actual Windows '+label+' at '+row['tag'])
         for f in (0,2):require(bits(lib.probe_value(f,-0.,0.))==bits(-0.),'Negative zero was lost')
         for f,x in ((0,math.inf),(1,-math.inf),(2,1.01)):
             lib.probe_clear();got=lib.probe_value(f,x,0.)
@@ -81,7 +105,8 @@ def main():
             for nan,invalid in ((0x7ff8000000000042,False),(0x7ff0000000000042,True)):
                 lib.probe_clear();got=lib.probe_bits(f,nan,0)
                 require(bits(got)==0x7ff8000000000042 and bool(lib.probe_invalid())==invalid,'NaN payload/exception propagation failed')
-        reports.append(dict(profile=label,windows_samples_exact=count,mpfr_samples=len(samples),maximum_ulps=maxima,edge_cases='passed'))
+        reports.append(dict(profile=label,windows_samples_exact=count,reload_atan2_samples_exact=len(reload_rows),
+            mpfr_samples=len(samples),maximum_ulps=maxima,edge_cases='passed'))
     report=dict(status='passed',automatic_profile=profile,equatorial_latitude_hex=latitude.hex(),probe_sha256=sha(a.probe),oracle=dict(version=lib.oracle_version().decode(),path=str(oracle),sha256=sha(oracle),precision_bits=[256,512]),maximum_allowed_ulps=1,profiles=reports)
     a.output.parent.mkdir(parents=True,exist_ok=True);a.output.write_text(json.dumps(report,indent=2)+'\n');print(json.dumps(report,indent=2))
 if __name__=='__main__':main()

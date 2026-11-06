@@ -11,9 +11,10 @@
 extern "C" {
 extern int __use_fma3_lib;
 double aw_exp(double);double __wrap_exp(double);
-double aw_sin(double);double aw_cos(double);double aw_atan2(double,double);
+double aw_sin(double);double aw_cos(double);
 double orbiter_math_sin_value(double);
 double orbiter_asin_fma(double);double orbiter_asin_sse2(double);
+double orbiter_atan2_fma(double,double);double orbiter_atan2_sse2(double,double);
 double __wrap_sin(double);double __wrap_cos(double);double __wrap_asin(double);double __wrap_atan2(double,double);
 }
 namespace {int mode=-1;}
@@ -34,7 +35,8 @@ double probe_value(int function,double x,double y) {
     } else {
         switch(function) {
         case 0:return orbiter_math_sin_value(x);case 1:return aw_cos(x);
-        case 2:return mode?orbiter_asin_fma(x):orbiter_asin_sse2(x);case 3:return aw_atan2(x,y);case 4:return aw_exp(x);
+        case 2:return mode?orbiter_asin_fma(x):orbiter_asin_sse2(x);
+        case 3:return mode?orbiter_atan2_fma(x,y):orbiter_atan2_sse2(x,y);case 4:return aw_exp(x);
         }
     }
     std::abort();

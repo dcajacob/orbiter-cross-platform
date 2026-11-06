@@ -41,3 +41,18 @@ object/kind roster, clocks and field closure. It records first differing binary6
 values and never grants acceptance. Native observation/relink captures must
 remain byte-identical to the complete retained 960-frame baseline with clean,
 unsuppressed sanitizers before those observations are used.
+
+Reconstructing the six vessel centres found one primitive mismatch among 8,748
+samples: SRB1 longitude at tick 211, `atan2` with binary64 arguments
+`c1550c2a4f069879` and `412bcfdda20e1e30`. Windows automatic returns
+`bff6837bee573509`; Windows SSE2 and the old native automatic binding return
+`bff6837bee57350a`. Native had compiled `atan2.c` only for SSE2. The revised
+internal binding compiles the unchanged vendor source for both paths and
+dispatches by the existing CPU profile. It changes no physics source or ordering.
+
+The derived `Math/Reference/ReloadAtan2` regression fixture covers the exact pair
+and 32 neighbours on each axis (4,225 pairs). Both actual Windows CRT providers
+agree in each mode. The revised automatic and forced-SSE2 builds pass those
+values, the 28,800 existing frozen samples per mode, MPFR and existing edge
+checks. Raw CRT observations remain local. Live cache confirmation and the
+complete focused mission matrix remain required before qualifying the repair.

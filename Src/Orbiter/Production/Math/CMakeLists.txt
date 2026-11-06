@@ -24,14 +24,17 @@ add_library(orbiter_reference_math STATIC Runtime.cpp NativeError.cpp
     "${_math_generated}/remainder_piby2_forAsm.s" "${_math_generated}/remainder_piby2_forFMA3.s"
     "${_math_generated}/Lsincos_array.s" "${_math_generated}/L2_by_pi_bits.s"
     "${_math_generated}/exp.s" "${_math_generated}/two_to_jby64_table.s" "${_math_generated}/two_to_jby64_head_tail_table.s"
-    "${_math_generated}/atan2.c" "${_math_generated}/asin_fma.c" "${_math_generated}/asin_sse2.c")
+    "${_math_generated}/atan2_fma.c" "${_math_generated}/atan2_sse2.c"
+    "${_math_generated}/asin_fma.c" "${_math_generated}/asin_sse2.c")
 set_target_properties(orbiter_reference_math PROPERTIES POSITION_INDEPENDENT_CODE ON
     C_VISIBILITY_PRESET hidden CXX_VISIBILITY_PRESET hidden)
 target_compile_features(orbiter_reference_math PRIVATE cxx_std_17)
 target_compile_definitions(orbiter_reference_math PRIVATE ORBITER_MATH_FORCE_SSE2=$<BOOL:${ORBITER_MATH_FORCE_SSE2}>)
 target_include_directories(orbiter_reference_math PRIVATE "${CMAKE_CURRENT_LIST_DIR}" "${_math_generated}")
-set_source_files_properties("${_math_generated}/asin_fma.c" PROPERTIES COMPILE_OPTIONS "-O2;-fno-builtin;-mfma;-ffp-contract=fast")
-set_source_files_properties("${_math_generated}/asin_sse2.c" "${_math_generated}/atan2.c" PROPERTIES COMPILE_OPTIONS "-O2;-fno-builtin;-mno-avx;-mno-fma;-ffp-contract=off")
+set_source_files_properties("${_math_generated}/asin_fma.c" "${_math_generated}/atan2_fma.c"
+    PROPERTIES COMPILE_OPTIONS "-O2;-fno-builtin;-mfma;-ffp-contract=fast")
+set_source_files_properties("${_math_generated}/asin_sse2.c" "${_math_generated}/atan2_sse2.c"
+    PROPERTIES COMPILE_OPTIONS "-O2;-fno-builtin;-mno-avx;-mno-fma;-ffp-contract=off")
 target_link_options(orbiter_reference_math INTERFACE
     -Wl,--wrap=sin -Wl,--wrap=cos -Wl,--wrap=asin -Wl,--wrap=atan2 -Wl,--wrap=sincos)
 target_link_libraries(orbiter_reference_math INTERFACE m)

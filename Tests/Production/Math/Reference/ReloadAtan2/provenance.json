@@ -1,0 +1,66 @@
+{
+  "exact_input": {
+    "function": "atan2",
+    "y": "c1550c2a4f069879",
+    "x": "412bcfdda20e1e30"
+  },
+  "tick": 211,
+  "object": "Atlantis-SRB1",
+  "neighbours_each_side": 32,
+  "samples": 4225,
+  "saved_input_sha256": "afc91115951ec44a81cffb6ffa34c00191f9b005aac3f14cf94b21de171b0538",
+  "inputs_sha256": "afcca39123f15c3d70d1b95f6be47457aae18227a6d422b200948b2778df38c2",
+  "source_comparison_sha256": "10e70df810dd1dfaf24b36578691ef39319c05429ce4f3bd244f3f755276e179",
+  "automatic_refresh": false,
+  "phase6_complete": false,
+  "protocol": "phase6-reload-atan2-v1",
+  "fixture_sha256": "49255b205e5223f9644fc7f4674242e9d7e08c481ab5276269ab1b11b84e241d",
+  "decoded_sha256": "73686e13a36b044eb167934c943c47fe359334670c13ad9741c4c70a54d70ee4",
+  "providers": {
+    "Debug": {
+      "report_sha256": "0b76b7e6497fff3690d5e0d9298cac67648f2bd4f0d46538e983957e32a6fda8",
+      "providers": {
+        "atan2": {
+          "actual_owner_path": "C:\\Windows\\System32\\ucrtbased.dll",
+          "sha256": "3bd8c11641a5e98d1edff2cb36c9b5f021b94bd05929b8295380786c5458ba46"
+        }
+      },
+      "profiles": {
+        "default": {
+          "samples": 4225,
+          "active_fma3": 1,
+          "output_sha256": "5c60b690b073c19b41fdb1a4d5a458b2bf81751408bbd3291f25690f688e65b5"
+        },
+        "sse2": {
+          "samples": 4225,
+          "active_fma3": 0,
+          "output_sha256": "4274c34b96903b56b4c0e779ee1754b4bd4ccab2c7182ffe0061ca0697c19c4f"
+        }
+      }
+    },
+    "Release": {
+      "report_sha256": "e7f8a0a93b86e6c2b8da35232af7d72f5e4679d1db28d8b1ce24ce1b69fb956d",
+      "providers": {
+        "atan2": {
+          "actual_owner_path": "C:\\WINDOWS\\System32\\ucrtbase.dll",
+          "sha256": "dedb7611e1abc1ff3852dcac3d4c93a048d729e25b061973b9969f22698f14ca"
+        }
+      },
+      "profiles": {
+        "default": {
+          "samples": 4225,
+          "active_fma3": 1,
+          "output_sha256": "5c60b690b073c19b41fdb1a4d5a458b2bf81751408bbd3291f25690f688e65b5"
+        },
+        "sse2": {
+          "samples": 4225,
+          "active_fma3": 0,
+          "output_sha256": "4274c34b96903b56b4c0e779ee1754b4bd4ccab2c7182ffe0061ca0697c19c4f"
+        }
+      }
+    }
+  },
+  "raw_evidence_local_only": true,
+  "raw_root": "/home/dan/Shared/OrbiterPhase6-Codex-20261105-0240d516/reload-atan2-neighbours-v1",
+  "sdk_or_physics_changes": false
+}

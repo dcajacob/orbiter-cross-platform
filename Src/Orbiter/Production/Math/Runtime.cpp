@@ -2,8 +2,9 @@
 #include "Runtime.h"
 extern "C" {
 int __use_fma3_lib=0;
-double aw_exp(double);double aw_sin(double);double aw_cos(double);double aw_atan2(double,double);
+double aw_exp(double);double aw_sin(double);double aw_cos(double);
 double orbiter_asin_fma(double);double orbiter_asin_sse2(double);
+double orbiter_atan2_fma(double,double);double orbiter_atan2_sse2(double,double);
 }
 namespace {
 bool Fma() noexcept {
@@ -30,7 +31,9 @@ double __wrap_sin(double x) noexcept {Fma();return orbiter_math_sin_value(x);}
 double __wrap_exp(double x) noexcept {Fma();return aw_exp(x);}
 double __wrap_cos(double x) noexcept {Fma();return aw_cos(x);}
 double __wrap_asin(double x) noexcept {return Fma()?orbiter_asin_fma(x):orbiter_asin_sse2(x);}
-double __wrap_atan2(double y,double x) noexcept {Fma();return aw_atan2(y,x);}
+// The Windows CRT also selects fused atan2 operations in automatic mode.
+// Keep the unchanged vendor source compiled separately for both CPU paths.
+double __wrap_atan2(double y,double x) noexcept {return Fma()?orbiter_atan2_fma(y,x):orbiter_atan2_sse2(y,x);}
 void __wrap_sincos(double x,double* s,double* c) noexcept {Fma();*s=orbiter_math_sin_value(x);*c=aw_cos(x);}
 }
 namespace orbiter::production {

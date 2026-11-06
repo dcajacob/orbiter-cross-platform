@@ -81,9 +81,10 @@ def main():
             text=text.replace('#undef long\n#define long __int64','/* GNU LP64 already supplies the required 64-bit long. */')
         (a.output/name).write_text(text)
     # Generated C names agree with the C++ dispatcher, without changing vendor C.
-    for profile in ('fma','sse2'):
-        path=a.output/('asin_'+profile+'.c')
-        path.write_text('#define FN_PROTOTYPE(name) orbiter_asin_'+profile+'\n#include "asin.c"\n')
+    for function in ('asin','atan2'):
+        for profile in ('fma','sse2'):
+            path=a.output/(function+'_'+profile+'.c')
+            path.write_text('#define FN_PROTOTYPE(name) orbiter_'+function+'_'+profile+'\n#include "'+function+'.c"\n')
     (a.output/'preparation.json').write_text(json.dumps(dict(source_commit=lock['commit'],source_archive_sha256=lock['archive_sha256'],
         syntax_and_private_bindings_only=True,files=lock['files']),indent=2)+'\n')
     print('Verified pinned AMD numerical sources and prepared native ELF bindings')
