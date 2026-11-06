@@ -97,6 +97,11 @@ def main():
                         target=directory/script
                         if test=='corrected':target.unlink();target.write_bytes(corrected.read_bytes())
                         target=directory/scenario;target.parent.mkdir(parents=True,exist_ok=True);target.write_bytes((source/scenario).read_bytes())
+                        fixture='Scenarios/Tests/Description.txt';target=directory/fixture
+                        target.parent.mkdir(parents=True,exist_ok=True);shutil.copy2(source/fixture,target)
+                        require(all((directory/name).is_file() for name in (
+                            'Config/Sun.cfg',fixture,'Textures/transp.dds','Textures2/DG/dgmk4_1.dds',
+                            'Meshes/dummy.msh','Modules/ScriptVessel.dll')),'Original API file-access fixtures incomplete')
                         shutil.copy2(observer['binary'],directory/'Modules/Plugin/ProductionGeneralApiObserver.dll')
                         (directory/'ogl-evidence.enabled').touch();mesa_files(Path(cfg['mesa']),directory)
                     run(runtime/'Orbiter.exe',Path(cfg['data']),Path(cfg['planets']),folder,
