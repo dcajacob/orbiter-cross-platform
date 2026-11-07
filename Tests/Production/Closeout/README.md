@@ -16,8 +16,12 @@ profiles pass: 80 worlds and 76 real reloads. `ClassEvidence.Test.py` rejects
 partial worlds, missing input, lost links, nonfinite state and missing binary
 bindings. The existing `RemainingVessels/native.py` also provides a selected
 twenty-world lifetime mode and separate closed-evidence reader; its HST/Atlantis
-Debug automatic canary passes, and the seven-scene/four-profile family selection
-is running. The central ledger records each remaining family/facet explicitly.
+Debug automatic canary passes. The completed seven-scene/four-profile matrix
+also passes independent audit: 28 actual simulator processes, 560 unpaused
+worlds and 33,600 presentations. Every remaining family passes positive checked
+ABI loading, resource ownership and twenty-cycle teardown facets. The central
+ledger records capability, interaction, persistence and rejection controls as
+still open for each family.
 These controls do not qualify interactions, persistence, normal admission or a
 full acceptance campaign. The first failed canary's capture-clock mismatch is
 preserved; the corrected runner captures its actual fiftieth fixed-step frame.

@@ -153,9 +153,37 @@
           "path": "/home/dan/.codex/worktrees/phase6-acceptance/orbiter-cross-platform/out/phase6-current-stock-Windows-v2/Release-closed-inputs-terminal-v2.json",
           "sha256": "ad4aca8797e685afdd637a9e5c586d21a820b3d0f514db07df21a04b899d18f7",
           "scope": "actual-Windows-nonce-bound-read-only-child-PID-start-identity-and-exit-only"
+        },
+        {
+          "path": "/home/dan/.codex/worktrees/phase6-class-eligibility/orbiter-cross-platform/out/phase6-vm-qualification-storage-v1/verification-v1.json",
+          "sha256": "a8707ee1b1ebbe68a0f830679204fa6a249ef04a41ab5e3b846beecf7e601df8",
+          "scope": "Actual declared local-volume staging, capacity and unchanged reference/source closure"
+        },
+        {
+          "path": "/home/dan/.codex/worktrees/phase6-class-eligibility/orbiter-cross-platform/out/phase6-eligibility-closeout-controls-v5.json",
+          "sha256": "39e37104bd15f53d8dfc6112465dacb2bd391b704f5083879f87ba7dca640f76",
+          "scope": "74 actually discovered closeout controls, including staging and family-matrix negative controls"
+        },
+        {
+          "path": "/home/dan/.codex/worktrees/phase6-class-eligibility/orbiter-cross-platform/out/phase6-historical-current-stock-reader-v3/audit.json",
+          "sha256": "3e41239a75819db2fb3c9088864bc591d65b405c5579bcb90a021e688e1ebbb0",
+          "scope": "Updated reader re-audits all retained focused original/current/native runs with historical v1 staging; no new simulations"
         }
       ],
-      "note": "Complete declared runner/control/restoration/receipt scope passed, including actual nonce-bound Windows child receipts. Actual free capacity exceeds eight GiB; each long campaign must preflight capacity again."
+      "note": "Complete declared runner/control/restoration/receipt scope passed, including actual nonce-bound Windows child receipts. Actual free capacity exceeds eight GiB; each long campaign must preflight capacity again.",
+      "qualification_storage": {
+        "root": "P:/OrbiterPhase6",
+        "serial": "phase6qual20261106",
+        "virtual_bytes": 68719476736,
+        "verified_free_bytes": 68597768192,
+        "minimum_free_bytes": 8589934592,
+        "staging_protocol": "phase6-guarded-local-staging-v2",
+        "verification": {
+          "path": "/home/dan/.codex/worktrees/phase6-class-eligibility/orbiter-cross-platform/out/phase6-vm-qualification-storage-v1/verification-v1.json",
+          "sha256": "a8707ee1b1ebbe68a0f830679204fa6a249ef04a41ab5e3b846beecf7e601df8",
+          "scope": "Actual declared local-volume staging, capacity and unchanged reference/source closure"
+        }
+      }
     },
     "numerical-reload": {
       "expected": {
@@ -586,6 +614,11 @@
           "path": "/home/dan/.codex/worktrees/phase6-class-eligibility/orbiter-cross-platform/out/phase6-class-source-conservation-v1.json",
           "sha256": "2034d84d0909a0ce64b5490b817b8c72ca95c2314fa276b9b43276a20cd4faf8",
           "scope": "Exact declared source-conservation deltas only; runtime eligibility remains open"
+        },
+        {
+          "path": "/home/dan/.codex/worktrees/phase6-class-eligibility/orbiter-cross-platform/out/phase6-class-family-lifetime-matrix-audit-v1.json",
+          "sha256": "6b6695982f7229071bb98742d339d8063cb42522d9b967beb727ffef3f99d359",
+          "scope": "Independent complete seven-scene/four-profile positive ABI loading, resource ownership and twenty-world facets only"
         }
       ],
       "qualification_progress": {
@@ -713,8 +746,18 @@
             "lifetime_case": "remaining_stock_003",
             "facets": {
               "source-abi": {
-                "result": "not-run",
-                "passed_profiles": []
+                "result": "passed-scoped-family-facet",
+                "passed_profiles": [
+                  "Debug-automatic",
+                  "Debug-sse2",
+                  "Release-automatic",
+                  "Release-sse2"
+                ],
+                "evidence": {
+                  "path": "/home/dan/.codex/worktrees/phase6-class-eligibility/orbiter-cross-platform/out/phase6-class-family-lifetime-matrix-audit-v1.json",
+                  "sha256": "6b6695982f7229071bb98742d339d8063cb42522d9b967beb727ffef3f99d359",
+                  "scope": "Independent complete seven-scene/four-profile positive ABI loading, resource ownership and twenty-world facets only"
+                }
               },
               "capabilities": {
                 "result": "not-run",
@@ -729,14 +772,32 @@
                 "passed_profiles": []
               },
               "resource-ownership": {
-                "result": "not-run",
-                "passed_profiles": []
+                "result": "passed-scoped-family-facet",
+                "passed_profiles": [
+                  "Debug-automatic",
+                  "Debug-sse2",
+                  "Release-automatic",
+                  "Release-sse2"
+                ],
+                "evidence": {
+                  "path": "/home/dan/.codex/worktrees/phase6-class-eligibility/orbiter-cross-platform/out/phase6-class-family-lifetime-matrix-audit-v1.json",
+                  "sha256": "6b6695982f7229071bb98742d339d8063cb42522d9b967beb727ffef3f99d359",
+                  "scope": "Independent complete seven-scene/four-profile positive ABI loading, resource ownership and twenty-world facets only"
+                }
               },
               "twenty-cycle-teardown": {
-                "result": "in-progress",
+                "result": "passed-scoped-family-facet",
                 "passed_profiles": [
-                  "Debug-automatic"
-                ]
+                  "Debug-automatic",
+                  "Debug-sse2",
+                  "Release-automatic",
+                  "Release-sse2"
+                ],
+                "evidence": {
+                  "path": "/home/dan/.codex/worktrees/phase6-class-eligibility/orbiter-cross-platform/out/phase6-class-family-lifetime-matrix-audit-v1.json",
+                  "sha256": "6b6695982f7229071bb98742d339d8063cb42522d9b967beb727ffef3f99d359",
+                  "scope": "Independent complete seven-scene/four-profile positive ABI loading, resource ownership and twenty-world facets only"
+                }
               },
               "rejection-controls": {
                 "result": "not-run",
@@ -748,8 +809,18 @@
             "lifetime_case": "remaining_stock_003",
             "facets": {
               "source-abi": {
-                "result": "not-run",
-                "passed_profiles": []
+                "result": "passed-scoped-family-facet",
+                "passed_profiles": [
+                  "Debug-automatic",
+                  "Debug-sse2",
+                  "Release-automatic",
+                  "Release-sse2"
+                ],
+                "evidence": {
+                  "path": "/home/dan/.codex/worktrees/phase6-class-eligibility/orbiter-cross-platform/out/phase6-class-family-lifetime-matrix-audit-v1.json",
+                  "sha256": "6b6695982f7229071bb98742d339d8063cb42522d9b967beb727ffef3f99d359",
+                  "scope": "Independent complete seven-scene/four-profile positive ABI loading, resource ownership and twenty-world facets only"
+                }
               },
               "capabilities": {
                 "result": "not-run",
@@ -764,12 +835,32 @@
                 "passed_profiles": []
               },
               "resource-ownership": {
-                "result": "not-run",
-                "passed_profiles": []
+                "result": "passed-scoped-family-facet",
+                "passed_profiles": [
+                  "Debug-automatic",
+                  "Debug-sse2",
+                  "Release-automatic",
+                  "Release-sse2"
+                ],
+                "evidence": {
+                  "path": "/home/dan/.codex/worktrees/phase6-class-eligibility/orbiter-cross-platform/out/phase6-class-family-lifetime-matrix-audit-v1.json",
+                  "sha256": "6b6695982f7229071bb98742d339d8063cb42522d9b967beb727ffef3f99d359",
+                  "scope": "Independent complete seven-scene/four-profile positive ABI loading, resource ownership and twenty-world facets only"
+                }
               },
               "twenty-cycle-teardown": {
-                "result": "in-progress",
-                "passed_profiles": []
+                "result": "passed-scoped-family-facet",
+                "passed_profiles": [
+                  "Debug-automatic",
+                  "Debug-sse2",
+                  "Release-automatic",
+                  "Release-sse2"
+                ],
+                "evidence": {
+                  "path": "/home/dan/.codex/worktrees/phase6-class-eligibility/orbiter-cross-platform/out/phase6-class-family-lifetime-matrix-audit-v1.json",
+                  "sha256": "6b6695982f7229071bb98742d339d8063cb42522d9b967beb727ffef3f99d359",
+                  "scope": "Independent complete seven-scene/four-profile positive ABI loading, resource ownership and twenty-world facets only"
+                }
               },
               "rejection-controls": {
                 "result": "not-run",
@@ -781,8 +872,18 @@
             "lifetime_case": "remaining_stock_003",
             "facets": {
               "source-abi": {
-                "result": "not-run",
-                "passed_profiles": []
+                "result": "passed-scoped-family-facet",
+                "passed_profiles": [
+                  "Debug-automatic",
+                  "Debug-sse2",
+                  "Release-automatic",
+                  "Release-sse2"
+                ],
+                "evidence": {
+                  "path": "/home/dan/.codex/worktrees/phase6-class-eligibility/orbiter-cross-platform/out/phase6-class-family-lifetime-matrix-audit-v1.json",
+                  "sha256": "6b6695982f7229071bb98742d339d8063cb42522d9b967beb727ffef3f99d359",
+                  "scope": "Independent complete seven-scene/four-profile positive ABI loading, resource ownership and twenty-world facets only"
+                }
               },
               "capabilities": {
                 "result": "not-run",
@@ -797,12 +898,32 @@
                 "passed_profiles": []
               },
               "resource-ownership": {
-                "result": "not-run",
-                "passed_profiles": []
+                "result": "passed-scoped-family-facet",
+                "passed_profiles": [
+                  "Debug-automatic",
+                  "Debug-sse2",
+                  "Release-automatic",
+                  "Release-sse2"
+                ],
+                "evidence": {
+                  "path": "/home/dan/.codex/worktrees/phase6-class-eligibility/orbiter-cross-platform/out/phase6-class-family-lifetime-matrix-audit-v1.json",
+                  "sha256": "6b6695982f7229071bb98742d339d8063cb42522d9b967beb727ffef3f99d359",
+                  "scope": "Independent complete seven-scene/four-profile positive ABI loading, resource ownership and twenty-world facets only"
+                }
               },
               "twenty-cycle-teardown": {
-                "result": "in-progress",
-                "passed_profiles": []
+                "result": "passed-scoped-family-facet",
+                "passed_profiles": [
+                  "Debug-automatic",
+                  "Debug-sse2",
+                  "Release-automatic",
+                  "Release-sse2"
+                ],
+                "evidence": {
+                  "path": "/home/dan/.codex/worktrees/phase6-class-eligibility/orbiter-cross-platform/out/phase6-class-family-lifetime-matrix-audit-v1.json",
+                  "sha256": "6b6695982f7229071bb98742d339d8063cb42522d9b967beb727ffef3f99d359",
+                  "scope": "Independent complete seven-scene/four-profile positive ABI loading, resource ownership and twenty-world facets only"
+                }
               },
               "rejection-controls": {
                 "result": "not-run",
@@ -814,8 +935,18 @@
             "lifetime_case": "remaining_stock_026",
             "facets": {
               "source-abi": {
-                "result": "not-run",
-                "passed_profiles": []
+                "result": "passed-scoped-family-facet",
+                "passed_profiles": [
+                  "Debug-automatic",
+                  "Debug-sse2",
+                  "Release-automatic",
+                  "Release-sse2"
+                ],
+                "evidence": {
+                  "path": "/home/dan/.codex/worktrees/phase6-class-eligibility/orbiter-cross-platform/out/phase6-class-family-lifetime-matrix-audit-v1.json",
+                  "sha256": "6b6695982f7229071bb98742d339d8063cb42522d9b967beb727ffef3f99d359",
+                  "scope": "Independent complete seven-scene/four-profile positive ABI loading, resource ownership and twenty-world facets only"
+                }
               },
               "capabilities": {
                 "result": "not-run",
@@ -830,12 +961,32 @@
                 "passed_profiles": []
               },
               "resource-ownership": {
-                "result": "not-run",
-                "passed_profiles": []
+                "result": "passed-scoped-family-facet",
+                "passed_profiles": [
+                  "Debug-automatic",
+                  "Debug-sse2",
+                  "Release-automatic",
+                  "Release-sse2"
+                ],
+                "evidence": {
+                  "path": "/home/dan/.codex/worktrees/phase6-class-eligibility/orbiter-cross-platform/out/phase6-class-family-lifetime-matrix-audit-v1.json",
+                  "sha256": "6b6695982f7229071bb98742d339d8063cb42522d9b967beb727ffef3f99d359",
+                  "scope": "Independent complete seven-scene/four-profile positive ABI loading, resource ownership and twenty-world facets only"
+                }
               },
               "twenty-cycle-teardown": {
-                "result": "in-progress",
-                "passed_profiles": []
+                "result": "passed-scoped-family-facet",
+                "passed_profiles": [
+                  "Debug-automatic",
+                  "Debug-sse2",
+                  "Release-automatic",
+                  "Release-sse2"
+                ],
+                "evidence": {
+                  "path": "/home/dan/.codex/worktrees/phase6-class-eligibility/orbiter-cross-platform/out/phase6-class-family-lifetime-matrix-audit-v1.json",
+                  "sha256": "6b6695982f7229071bb98742d339d8063cb42522d9b967beb727ffef3f99d359",
+                  "scope": "Independent complete seven-scene/four-profile positive ABI loading, resource ownership and twenty-world facets only"
+                }
               },
               "rejection-controls": {
                 "result": "not-run",
@@ -847,8 +998,18 @@
             "lifetime_case": "remaining_stock_003",
             "facets": {
               "source-abi": {
-                "result": "not-run",
-                "passed_profiles": []
+                "result": "passed-scoped-family-facet",
+                "passed_profiles": [
+                  "Debug-automatic",
+                  "Debug-sse2",
+                  "Release-automatic",
+                  "Release-sse2"
+                ],
+                "evidence": {
+                  "path": "/home/dan/.codex/worktrees/phase6-class-eligibility/orbiter-cross-platform/out/phase6-class-family-lifetime-matrix-audit-v1.json",
+                  "sha256": "6b6695982f7229071bb98742d339d8063cb42522d9b967beb727ffef3f99d359",
+                  "scope": "Independent complete seven-scene/four-profile positive ABI loading, resource ownership and twenty-world facets only"
+                }
               },
               "capabilities": {
                 "result": "not-run",
@@ -863,12 +1024,32 @@
                 "passed_profiles": []
               },
               "resource-ownership": {
-                "result": "not-run",
-                "passed_profiles": []
+                "result": "passed-scoped-family-facet",
+                "passed_profiles": [
+                  "Debug-automatic",
+                  "Debug-sse2",
+                  "Release-automatic",
+                  "Release-sse2"
+                ],
+                "evidence": {
+                  "path": "/home/dan/.codex/worktrees/phase6-class-eligibility/orbiter-cross-platform/out/phase6-class-family-lifetime-matrix-audit-v1.json",
+                  "sha256": "6b6695982f7229071bb98742d339d8063cb42522d9b967beb727ffef3f99d359",
+                  "scope": "Independent complete seven-scene/four-profile positive ABI loading, resource ownership and twenty-world facets only"
+                }
               },
               "twenty-cycle-teardown": {
-                "result": "in-progress",
-                "passed_profiles": []
+                "result": "passed-scoped-family-facet",
+                "passed_profiles": [
+                  "Debug-automatic",
+                  "Debug-sse2",
+                  "Release-automatic",
+                  "Release-sse2"
+                ],
+                "evidence": {
+                  "path": "/home/dan/.codex/worktrees/phase6-class-eligibility/orbiter-cross-platform/out/phase6-class-family-lifetime-matrix-audit-v1.json",
+                  "sha256": "6b6695982f7229071bb98742d339d8063cb42522d9b967beb727ffef3f99d359",
+                  "scope": "Independent complete seven-scene/four-profile positive ABI loading, resource ownership and twenty-world facets only"
+                }
               },
               "rejection-controls": {
                 "result": "not-run",
@@ -880,8 +1061,18 @@
             "lifetime_case": "remaining_stock_009",
             "facets": {
               "source-abi": {
-                "result": "not-run",
-                "passed_profiles": []
+                "result": "passed-scoped-family-facet",
+                "passed_profiles": [
+                  "Debug-automatic",
+                  "Debug-sse2",
+                  "Release-automatic",
+                  "Release-sse2"
+                ],
+                "evidence": {
+                  "path": "/home/dan/.codex/worktrees/phase6-class-eligibility/orbiter-cross-platform/out/phase6-class-family-lifetime-matrix-audit-v1.json",
+                  "sha256": "6b6695982f7229071bb98742d339d8063cb42522d9b967beb727ffef3f99d359",
+                  "scope": "Independent complete seven-scene/four-profile positive ABI loading, resource ownership and twenty-world facets only"
+                }
               },
               "capabilities": {
                 "result": "not-run",
@@ -896,12 +1087,32 @@
                 "passed_profiles": []
               },
               "resource-ownership": {
-                "result": "not-run",
-                "passed_profiles": []
+                "result": "passed-scoped-family-facet",
+                "passed_profiles": [
+                  "Debug-automatic",
+                  "Debug-sse2",
+                  "Release-automatic",
+                  "Release-sse2"
+                ],
+                "evidence": {
+                  "path": "/home/dan/.codex/worktrees/phase6-class-eligibility/orbiter-cross-platform/out/phase6-class-family-lifetime-matrix-audit-v1.json",
+                  "sha256": "6b6695982f7229071bb98742d339d8063cb42522d9b967beb727ffef3f99d359",
+                  "scope": "Independent complete seven-scene/four-profile positive ABI loading, resource ownership and twenty-world facets only"
+                }
               },
               "twenty-cycle-teardown": {
-                "result": "in-progress",
-                "passed_profiles": []
+                "result": "passed-scoped-family-facet",
+                "passed_profiles": [
+                  "Debug-automatic",
+                  "Debug-sse2",
+                  "Release-automatic",
+                  "Release-sse2"
+                ],
+                "evidence": {
+                  "path": "/home/dan/.codex/worktrees/phase6-class-eligibility/orbiter-cross-platform/out/phase6-class-family-lifetime-matrix-audit-v1.json",
+                  "sha256": "6b6695982f7229071bb98742d339d8063cb42522d9b967beb727ffef3f99d359",
+                  "scope": "Independent complete seven-scene/four-profile positive ABI loading, resource ownership and twenty-world facets only"
+                }
               },
               "rejection-controls": {
                 "result": "not-run",
@@ -913,8 +1124,18 @@
             "lifetime_case": "remaining_stock_009",
             "facets": {
               "source-abi": {
-                "result": "not-run",
-                "passed_profiles": []
+                "result": "passed-scoped-family-facet",
+                "passed_profiles": [
+                  "Debug-automatic",
+                  "Debug-sse2",
+                  "Release-automatic",
+                  "Release-sse2"
+                ],
+                "evidence": {
+                  "path": "/home/dan/.codex/worktrees/phase6-class-eligibility/orbiter-cross-platform/out/phase6-class-family-lifetime-matrix-audit-v1.json",
+                  "sha256": "6b6695982f7229071bb98742d339d8063cb42522d9b967beb727ffef3f99d359",
+                  "scope": "Independent complete seven-scene/four-profile positive ABI loading, resource ownership and twenty-world facets only"
+                }
               },
               "capabilities": {
                 "result": "not-run",
@@ -929,12 +1150,32 @@
                 "passed_profiles": []
               },
               "resource-ownership": {
-                "result": "not-run",
-                "passed_profiles": []
+                "result": "passed-scoped-family-facet",
+                "passed_profiles": [
+                  "Debug-automatic",
+                  "Debug-sse2",
+                  "Release-automatic",
+                  "Release-sse2"
+                ],
+                "evidence": {
+                  "path": "/home/dan/.codex/worktrees/phase6-class-eligibility/orbiter-cross-platform/out/phase6-class-family-lifetime-matrix-audit-v1.json",
+                  "sha256": "6b6695982f7229071bb98742d339d8063cb42522d9b967beb727ffef3f99d359",
+                  "scope": "Independent complete seven-scene/four-profile positive ABI loading, resource ownership and twenty-world facets only"
+                }
               },
               "twenty-cycle-teardown": {
-                "result": "in-progress",
-                "passed_profiles": []
+                "result": "passed-scoped-family-facet",
+                "passed_profiles": [
+                  "Debug-automatic",
+                  "Debug-sse2",
+                  "Release-automatic",
+                  "Release-sse2"
+                ],
+                "evidence": {
+                  "path": "/home/dan/.codex/worktrees/phase6-class-eligibility/orbiter-cross-platform/out/phase6-class-family-lifetime-matrix-audit-v1.json",
+                  "sha256": "6b6695982f7229071bb98742d339d8063cb42522d9b967beb727ffef3f99d359",
+                  "scope": "Independent complete seven-scene/four-profile positive ABI loading, resource ownership and twenty-world facets only"
+                }
               },
               "rejection-controls": {
                 "result": "not-run",
@@ -946,8 +1187,18 @@
             "lifetime_case": "remaining_stock_018",
             "facets": {
               "source-abi": {
-                "result": "not-run",
-                "passed_profiles": []
+                "result": "passed-scoped-family-facet",
+                "passed_profiles": [
+                  "Debug-automatic",
+                  "Debug-sse2",
+                  "Release-automatic",
+                  "Release-sse2"
+                ],
+                "evidence": {
+                  "path": "/home/dan/.codex/worktrees/phase6-class-eligibility/orbiter-cross-platform/out/phase6-class-family-lifetime-matrix-audit-v1.json",
+                  "sha256": "6b6695982f7229071bb98742d339d8063cb42522d9b967beb727ffef3f99d359",
+                  "scope": "Independent complete seven-scene/four-profile positive ABI loading, resource ownership and twenty-world facets only"
+                }
               },
               "capabilities": {
                 "result": "not-run",
@@ -962,14 +1213,32 @@
                 "passed_profiles": []
               },
               "resource-ownership": {
-                "result": "not-run",
-                "passed_profiles": []
+                "result": "passed-scoped-family-facet",
+                "passed_profiles": [
+                  "Debug-automatic",
+                  "Debug-sse2",
+                  "Release-automatic",
+                  "Release-sse2"
+                ],
+                "evidence": {
+                  "path": "/home/dan/.codex/worktrees/phase6-class-eligibility/orbiter-cross-platform/out/phase6-class-family-lifetime-matrix-audit-v1.json",
+                  "sha256": "6b6695982f7229071bb98742d339d8063cb42522d9b967beb727ffef3f99d359",
+                  "scope": "Independent complete seven-scene/four-profile positive ABI loading, resource ownership and twenty-world facets only"
+                }
               },
               "twenty-cycle-teardown": {
-                "result": "in-progress",
+                "result": "passed-scoped-family-facet",
                 "passed_profiles": [
-                  "Debug-automatic"
-                ]
+                  "Debug-automatic",
+                  "Debug-sse2",
+                  "Release-automatic",
+                  "Release-sse2"
+                ],
+                "evidence": {
+                  "path": "/home/dan/.codex/worktrees/phase6-class-eligibility/orbiter-cross-platform/out/phase6-class-family-lifetime-matrix-audit-v1.json",
+                  "sha256": "6b6695982f7229071bb98742d339d8063cb42522d9b967beb727ffef3f99d359",
+                  "scope": "Independent complete seven-scene/four-profile positive ABI loading, resource ownership and twenty-world facets only"
+                }
               },
               "rejection-controls": {
                 "result": "not-run",
@@ -981,8 +1250,18 @@
             "lifetime_case": "remaining_stock_022",
             "facets": {
               "source-abi": {
-                "result": "not-run",
-                "passed_profiles": []
+                "result": "passed-scoped-family-facet",
+                "passed_profiles": [
+                  "Debug-automatic",
+                  "Debug-sse2",
+                  "Release-automatic",
+                  "Release-sse2"
+                ],
+                "evidence": {
+                  "path": "/home/dan/.codex/worktrees/phase6-class-eligibility/orbiter-cross-platform/out/phase6-class-family-lifetime-matrix-audit-v1.json",
+                  "sha256": "6b6695982f7229071bb98742d339d8063cb42522d9b967beb727ffef3f99d359",
+                  "scope": "Independent complete seven-scene/four-profile positive ABI loading, resource ownership and twenty-world facets only"
+                }
               },
               "capabilities": {
                 "result": "not-run",
@@ -997,12 +1276,32 @@
                 "passed_profiles": []
               },
               "resource-ownership": {
-                "result": "not-run",
-                "passed_profiles": []
+                "result": "passed-scoped-family-facet",
+                "passed_profiles": [
+                  "Debug-automatic",
+                  "Debug-sse2",
+                  "Release-automatic",
+                  "Release-sse2"
+                ],
+                "evidence": {
+                  "path": "/home/dan/.codex/worktrees/phase6-class-eligibility/orbiter-cross-platform/out/phase6-class-family-lifetime-matrix-audit-v1.json",
+                  "sha256": "6b6695982f7229071bb98742d339d8063cb42522d9b967beb727ffef3f99d359",
+                  "scope": "Independent complete seven-scene/four-profile positive ABI loading, resource ownership and twenty-world facets only"
+                }
               },
               "twenty-cycle-teardown": {
-                "result": "in-progress",
-                "passed_profiles": []
+                "result": "passed-scoped-family-facet",
+                "passed_profiles": [
+                  "Debug-automatic",
+                  "Debug-sse2",
+                  "Release-automatic",
+                  "Release-sse2"
+                ],
+                "evidence": {
+                  "path": "/home/dan/.codex/worktrees/phase6-class-eligibility/orbiter-cross-platform/out/phase6-class-family-lifetime-matrix-audit-v1.json",
+                  "sha256": "6b6695982f7229071bb98742d339d8063cb42522d9b967beb727ffef3f99d359",
+                  "scope": "Independent complete seven-scene/four-profile positive ABI loading, resource ownership and twenty-world facets only"
+                }
               },
               "rejection-controls": {
                 "result": "not-run",
@@ -1014,8 +1313,18 @@
             "lifetime_case": "remaining_stock_013",
             "facets": {
               "source-abi": {
-                "result": "not-run",
-                "passed_profiles": []
+                "result": "passed-scoped-family-facet",
+                "passed_profiles": [
+                  "Debug-automatic",
+                  "Debug-sse2",
+                  "Release-automatic",
+                  "Release-sse2"
+                ],
+                "evidence": {
+                  "path": "/home/dan/.codex/worktrees/phase6-class-eligibility/orbiter-cross-platform/out/phase6-class-family-lifetime-matrix-audit-v1.json",
+                  "sha256": "6b6695982f7229071bb98742d339d8063cb42522d9b967beb727ffef3f99d359",
+                  "scope": "Independent complete seven-scene/four-profile positive ABI loading, resource ownership and twenty-world facets only"
+                }
               },
               "capabilities": {
                 "result": "not-run",
@@ -1030,12 +1339,32 @@
                 "passed_profiles": []
               },
               "resource-ownership": {
-                "result": "not-run",
-                "passed_profiles": []
+                "result": "passed-scoped-family-facet",
+                "passed_profiles": [
+                  "Debug-automatic",
+                  "Debug-sse2",
+                  "Release-automatic",
+                  "Release-sse2"
+                ],
+                "evidence": {
+                  "path": "/home/dan/.codex/worktrees/phase6-class-eligibility/orbiter-cross-platform/out/phase6-class-family-lifetime-matrix-audit-v1.json",
+                  "sha256": "6b6695982f7229071bb98742d339d8063cb42522d9b967beb727ffef3f99d359",
+                  "scope": "Independent complete seven-scene/four-profile positive ABI loading, resource ownership and twenty-world facets only"
+                }
               },
               "twenty-cycle-teardown": {
-                "result": "in-progress",
-                "passed_profiles": []
+                "result": "passed-scoped-family-facet",
+                "passed_profiles": [
+                  "Debug-automatic",
+                  "Debug-sse2",
+                  "Release-automatic",
+                  "Release-sse2"
+                ],
+                "evidence": {
+                  "path": "/home/dan/.codex/worktrees/phase6-class-eligibility/orbiter-cross-platform/out/phase6-class-family-lifetime-matrix-audit-v1.json",
+                  "sha256": "6b6695982f7229071bb98742d339d8063cb42522d9b967beb727ffef3f99d359",
+                  "scope": "Independent complete seven-scene/four-profile positive ABI loading, resource ownership and twenty-world facets only"
+                }
               },
               "rejection-controls": {
                 "result": "not-run",
@@ -1047,8 +1376,18 @@
             "lifetime_case": "remaining_stock_017",
             "facets": {
               "source-abi": {
-                "result": "not-run",
-                "passed_profiles": []
+                "result": "passed-scoped-family-facet",
+                "passed_profiles": [
+                  "Debug-automatic",
+                  "Debug-sse2",
+                  "Release-automatic",
+                  "Release-sse2"
+                ],
+                "evidence": {
+                  "path": "/home/dan/.codex/worktrees/phase6-class-eligibility/orbiter-cross-platform/out/phase6-class-family-lifetime-matrix-audit-v1.json",
+                  "sha256": "6b6695982f7229071bb98742d339d8063cb42522d9b967beb727ffef3f99d359",
+                  "scope": "Independent complete seven-scene/four-profile positive ABI loading, resource ownership and twenty-world facets only"
+                }
               },
               "capabilities": {
                 "result": "not-run",
@@ -1063,12 +1402,32 @@
                 "passed_profiles": []
               },
               "resource-ownership": {
-                "result": "not-run",
-                "passed_profiles": []
+                "result": "passed-scoped-family-facet",
+                "passed_profiles": [
+                  "Debug-automatic",
+                  "Debug-sse2",
+                  "Release-automatic",
+                  "Release-sse2"
+                ],
+                "evidence": {
+                  "path": "/home/dan/.codex/worktrees/phase6-class-eligibility/orbiter-cross-platform/out/phase6-class-family-lifetime-matrix-audit-v1.json",
+                  "sha256": "6b6695982f7229071bb98742d339d8063cb42522d9b967beb727ffef3f99d359",
+                  "scope": "Independent complete seven-scene/four-profile positive ABI loading, resource ownership and twenty-world facets only"
+                }
               },
               "twenty-cycle-teardown": {
-                "result": "in-progress",
-                "passed_profiles": []
+                "result": "passed-scoped-family-facet",
+                "passed_profiles": [
+                  "Debug-automatic",
+                  "Debug-sse2",
+                  "Release-automatic",
+                  "Release-sse2"
+                ],
+                "evidence": {
+                  "path": "/home/dan/.codex/worktrees/phase6-class-eligibility/orbiter-cross-platform/out/phase6-class-family-lifetime-matrix-audit-v1.json",
+                  "sha256": "6b6695982f7229071bb98742d339d8063cb42522d9b967beb727ffef3f99d359",
+                  "scope": "Independent complete seven-scene/four-profile positive ABI loading, resource ownership and twenty-world facets only"
+                }
               },
               "rejection-controls": {
                 "result": "not-run",
@@ -1089,7 +1448,25 @@
             "sha256": "85830368aa8dd6e685f57329c99904ed762e1164ae2b36d199fb945e379e23fb",
             "cause": "Runner requested time-zero readback after advancing simulation; actual fiftieth fixed step is 0.78125 seconds. Original failed simulator exit retained."
           }
-        ]
+        ],
+        "family_lifetime_matrix": {
+          "result": "audited-family-positive-ABI-ownership-and-twenty-cycle-facets-only",
+          "audit": {
+            "path": "/home/dan/.codex/worktrees/phase6-class-eligibility/orbiter-cross-platform/out/phase6-class-family-lifetime-matrix-audit-v1.json",
+            "sha256": "6b6695982f7229071bb98742d339d8063cb42522d9b967beb727ffef3f99d359",
+            "scope": "Independent complete seven-scene/four-profile positive ABI loading, resource ownership and twenty-world facets only"
+          },
+          "worlds": 560,
+          "actual_simulator_processes": 28,
+          "successful_presents": 33600
+        },
+        "remaining_facets": [
+          "capabilities",
+          "interactions",
+          "persistence",
+          "rejection-controls"
+        ],
+        "lifetime_captures_terminal": true
       }
     },
     "candidate-freeze": {
@@ -1587,6 +1964,6 @@
       "note": "Physical controller hardware unavailable; virtual devices do not satisfy acceptance."
     }
   },
-  "current_blocker": "Per-family remaining-stock class/capability eligibility. Fresh source81 paused attachments pass all four profiles (80 worlds/76 real F5s), and the unpaused HST/Atlantis canary passes twenty actual module lifetimes in Debug automatic. Remaining family/profile lifecycle, interactions, persistence and rejection controls remain open.",
-  "next_exit_condition": "Independently audit the finite seven-scene/four-profile twenty-world family lifetime selection, complete each missing eligibility facet, then admit only proven class/capability combinations and freeze one final candidate."
+  "current_blocker": "Four remaining per-family eligibility facets: actual capabilities, original-dispatch interactions, persistence and rejection controls. Positive ABI loading, resource ownership and twenty-world lifetimes now pass all eleven families and all four profiles. No normal admission change or final candidate yet.",
+  "next_exit_condition": "Complete and independently audit the four missing family facets, admit only proven class/capability combinations, then freeze the matching final candidate and run the full acceptance matrix. New Windows work uses the validated P:/OrbiterPhase6 local volume with versioned exact-input staging."
 }

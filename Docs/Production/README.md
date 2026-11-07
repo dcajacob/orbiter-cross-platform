@@ -25,16 +25,19 @@ budgets. The versioned corrected API test passes Windows/native in all four
 profiles, including normal-host startup-exit checks and rejection controls.
 The matching current-Windows scene003 matrix also passes all sixteen runs and
 independent complete comparisons. Restored archives and verified duplicate
-reclamation provide the declared 8 GiB campaign reserve. Remaining class
+reclamation preserve the retained evidence. A separately verified 64 GiB local
+qualification volume provides the declared 8 GiB campaign reserve. Remaining class
 eligibility, candidate freeze, full campaigns and operator acceptance are open.
 Physical-controller acceptance remains blocked.
 Class eligibility is in progress on retained source-`81dcc014` packages. Fresh
 paused attachment controls pass all four profiles: 80 complete worlds and 76
 actual F5 reloads with the original docking and reciprocal payload links intact.
-An independently audited Debug automatic HST/Atlantis canary also passes twenty
-unpaused worlds and actual module unloads. The finite seven-scene, four-profile
-family lifetime selection is running. These are scoped eligibility facets;
-normal class admission and the final candidate remain unchanged.
+The complete seven-scene, four-profile family lifetime audit also passes:
+560 unpaused worlds, 33,600 presentations and actual module unloads. This closes
+positive ABI loading, resource ownership and twenty-cycle lifetime facets for
+all eleven remaining families. Actual capability checks, interactions,
+persistence and rejection controls remain open. Normal class admission and the
+final candidate remain unchanged.
 The intended interim signoff is **software complete; awaiting physical-controller
 acceptance**, after all software gates and the operator walkthrough pass.
 [Closeout tools and current limits](../../Tests/Production/Closeout/README.md)

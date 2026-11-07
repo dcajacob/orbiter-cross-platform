@@ -1,5 +1,23 @@
 # Original remaining native vessel integration
 
+## Source81 class lifetime checkpoint
+
+The finite seven-scene selection now passes all four native profiles on retained
+source-`81dcc014` packages: 28 actual simulator processes, 560 unpaused worlds
+and 33,600 presentations. Independent audit re-reads every original complete
+vessel roster, actual module initialization/finalization/link-map destruction,
+clean graphics lifetime, simulator receipt and source/runtime/provider/data
+guard. Sanitizers remain enabled without suppressions. The separate original
+paused ISS/Atlantis/Leonardo control also passes all four profiles: 80 worlds
+and 76 actual F5 reloads with reciprocal attachments and docking intact.
+
+These checks close positive ABI loading, resource ownership and twenty-cycle
+teardown facets for all eleven remaining families. Capability qualification,
+original-dispatch interactions, persistence and incompatible/unknown rejection
+controls remain open before normal class admission. No final candidate or full
+acceptance gate is inferred. The single
+[closeout ledger](Phase6Closeout.json) binds the scoped reports and remaining cells.
+
 ## Current four-profile repeated-session checkpoint
 
 Each current source-v4 native profile now passes twenty real 60-frame PoweredUp
