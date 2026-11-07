@@ -699,6 +699,11 @@
           "path": "/home/dan/.codex/worktrees/phase6-stock-admission/orbiter-cross-platform/out/phase6-all-family-persistence-matrix-audit-v2.json",
           "sha256": "f88902c6e7ae13e72284849a23d2327d6b7f1b301aa71ffd41e7afbad31d1002",
           "scope": "Selected complete original scenes, full serialized content and matching exact Windows-save reloads. No full38, actual operator save/F5 workflow, interaction, normal admission or final-candidate credit. Historical missing launch receipts remain missing."
+        },
+        {
+          "path": "/home/dan/.codex/worktrees/phase6-production-qualification/orbiter-cross-platform/out/phase6-one-profile-all-family-interactions-v1.json",
+          "sha256": "962ebd16cab094996c3915b16597a059a3c47fd818d76b308fc3b34da73b6e5f",
+          "scope": "All nine original-control flows twice on Debug/SSE2. Other three profiles remain required. No complete class, normal admission, named workflow or software gate credit."
         }
       ],
       "qualification_progress": {
@@ -854,8 +859,15 @@
                 }
               },
               "interactions": {
-                "result": "not-run",
-                "passed_profiles": []
+                "result": "in-progress",
+                "passed_profiles": [
+                  "Debug-sse2"
+                ],
+                "evidence": {
+                  "path": "/home/dan/.codex/worktrees/phase6-production-qualification/orbiter-cross-platform/out/phase6-one-profile-all-family-interactions-v1.json",
+                  "sha256": "962ebd16cab094996c3915b16597a059a3c47fd818d76b308fc3b34da73b6e5f",
+                  "scope": "All nine original-control flows twice on Debug/SSE2. Other three profiles remain required. No complete class, normal admission, named workflow or software gate credit."
+                }
               },
               "persistence": {
                 "result": "passed-scoped-family-facet",
@@ -947,8 +959,15 @@
                 }
               },
               "interactions": {
-                "result": "not-run",
-                "passed_profiles": []
+                "result": "in-progress",
+                "passed_profiles": [
+                  "Debug-sse2"
+                ],
+                "evidence": {
+                  "path": "/home/dan/.codex/worktrees/phase6-production-qualification/orbiter-cross-platform/out/phase6-one-profile-all-family-interactions-v1.json",
+                  "sha256": "962ebd16cab094996c3915b16597a059a3c47fd818d76b308fc3b34da73b6e5f",
+                  "scope": "All nine original-control flows twice on Debug/SSE2. Other three profiles remain required. No complete class, normal admission, named workflow or software gate credit."
+                }
               },
               "persistence": {
                 "result": "passed-scoped-family-facet",
@@ -1040,8 +1059,15 @@
                 }
               },
               "interactions": {
-                "result": "not-run",
-                "passed_profiles": []
+                "result": "in-progress",
+                "passed_profiles": [
+                  "Debug-sse2"
+                ],
+                "evidence": {
+                  "path": "/home/dan/.codex/worktrees/phase6-production-qualification/orbiter-cross-platform/out/phase6-one-profile-all-family-interactions-v1.json",
+                  "sha256": "962ebd16cab094996c3915b16597a059a3c47fd818d76b308fc3b34da73b6e5f",
+                  "scope": "All nine original-control flows twice on Debug/SSE2. Other three profiles remain required. No complete class, normal admission, named workflow or software gate credit."
+                }
               },
               "persistence": {
                 "result": "passed-scoped-family-facet",
@@ -1133,8 +1159,15 @@
                 }
               },
               "interactions": {
-                "result": "not-run",
-                "passed_profiles": []
+                "result": "in-progress",
+                "passed_profiles": [
+                  "Debug-sse2"
+                ],
+                "evidence": {
+                  "path": "/home/dan/.codex/worktrees/phase6-production-qualification/orbiter-cross-platform/out/phase6-one-profile-all-family-interactions-v1.json",
+                  "sha256": "962ebd16cab094996c3915b16597a059a3c47fd818d76b308fc3b34da73b6e5f",
+                  "scope": "All nine original-control flows twice on Debug/SSE2. Other three profiles remain required. No complete class, normal admission, named workflow or software gate credit."
+                }
               },
               "persistence": {
                 "result": "passed-scoped-family-facet",
@@ -1226,8 +1259,15 @@
                 }
               },
               "interactions": {
-                "result": "not-run",
-                "passed_profiles": []
+                "result": "in-progress",
+                "passed_profiles": [
+                  "Debug-sse2"
+                ],
+                "evidence": {
+                  "path": "/home/dan/.codex/worktrees/phase6-production-qualification/orbiter-cross-platform/out/phase6-one-profile-all-family-interactions-v1.json",
+                  "sha256": "962ebd16cab094996c3915b16597a059a3c47fd818d76b308fc3b34da73b6e5f",
+                  "scope": "All nine original-control flows twice on Debug/SSE2. Other three profiles remain required. No complete class, normal admission, named workflow or software gate credit."
+                }
               },
               "persistence": {
                 "result": "passed-scoped-family-facet",
@@ -1319,8 +1359,15 @@
                 }
               },
               "interactions": {
-                "result": "not-run",
-                "passed_profiles": []
+                "result": "in-progress",
+                "passed_profiles": [
+                  "Debug-sse2"
+                ],
+                "evidence": {
+                  "path": "/home/dan/.codex/worktrees/phase6-production-qualification/orbiter-cross-platform/out/phase6-one-profile-all-family-interactions-v1.json",
+                  "sha256": "962ebd16cab094996c3915b16597a059a3c47fd818d76b308fc3b34da73b6e5f",
+                  "scope": "All nine original-control flows twice on Debug/SSE2. Other three profiles remain required. No complete class, normal admission, named workflow or software gate credit."
+                }
               },
               "persistence": {
                 "result": "passed-scoped-family-facet",
@@ -1412,8 +1459,15 @@
                 }
               },
               "interactions": {
-                "result": "not-run",
-                "passed_profiles": []
+                "result": "in-progress",
+                "passed_profiles": [
+                  "Debug-sse2"
+                ],
+                "evidence": {
+                  "path": "/home/dan/.codex/worktrees/phase6-production-qualification/orbiter-cross-platform/out/phase6-one-profile-all-family-interactions-v1.json",
+                  "sha256": "962ebd16cab094996c3915b16597a059a3c47fd818d76b308fc3b34da73b6e5f",
+                  "scope": "All nine original-control flows twice on Debug/SSE2. Other three profiles remain required. No complete class, normal admission, named workflow or software gate credit."
+                }
               },
               "persistence": {
                 "result": "passed-scoped-family-facet",
@@ -1505,8 +1559,15 @@
                 }
               },
               "interactions": {
-                "result": "not-run",
-                "passed_profiles": []
+                "result": "in-progress",
+                "passed_profiles": [
+                  "Debug-sse2"
+                ],
+                "evidence": {
+                  "path": "/home/dan/.codex/worktrees/phase6-production-qualification/orbiter-cross-platform/out/phase6-one-profile-all-family-interactions-v1.json",
+                  "sha256": "962ebd16cab094996c3915b16597a059a3c47fd818d76b308fc3b34da73b6e5f",
+                  "scope": "All nine original-control flows twice on Debug/SSE2. Other three profiles remain required. No complete class, normal admission, named workflow or software gate credit."
+                }
               },
               "persistence": {
                 "result": "passed-scoped-family-facet",
@@ -1598,8 +1659,15 @@
                 }
               },
               "interactions": {
-                "result": "not-run",
-                "passed_profiles": []
+                "result": "in-progress",
+                "passed_profiles": [
+                  "Debug-sse2"
+                ],
+                "evidence": {
+                  "path": "/home/dan/.codex/worktrees/phase6-production-qualification/orbiter-cross-platform/out/phase6-one-profile-all-family-interactions-v1.json",
+                  "sha256": "962ebd16cab094996c3915b16597a059a3c47fd818d76b308fc3b34da73b6e5f",
+                  "scope": "All nine original-control flows twice on Debug/SSE2. Other three profiles remain required. No complete class, normal admission, named workflow or software gate credit."
+                }
               },
               "persistence": {
                 "result": "passed-scoped-family-facet",
@@ -1691,8 +1759,15 @@
                 }
               },
               "interactions": {
-                "result": "not-run",
-                "passed_profiles": []
+                "result": "in-progress",
+                "passed_profiles": [
+                  "Debug-sse2"
+                ],
+                "evidence": {
+                  "path": "/home/dan/.codex/worktrees/phase6-production-qualification/orbiter-cross-platform/out/phase6-one-profile-all-family-interactions-v1.json",
+                  "sha256": "962ebd16cab094996c3915b16597a059a3c47fd818d76b308fc3b34da73b6e5f",
+                  "scope": "All nine original-control flows twice on Debug/SSE2. Other three profiles remain required. No complete class, normal admission, named workflow or software gate credit."
+                }
               },
               "persistence": {
                 "result": "passed-scoped-family-facet",
@@ -1784,8 +1859,15 @@
                 }
               },
               "interactions": {
-                "result": "not-run",
-                "passed_profiles": []
+                "result": "in-progress",
+                "passed_profiles": [
+                  "Debug-sse2"
+                ],
+                "evidence": {
+                  "path": "/home/dan/.codex/worktrees/phase6-production-qualification/orbiter-cross-platform/out/phase6-one-profile-all-family-interactions-v1.json",
+                  "sha256": "962ebd16cab094996c3915b16597a059a3c47fd818d76b308fc3b34da73b6e5f",
+                  "scope": "All nine original-control flows twice on Debug/SSE2. Other three profiles remain required. No complete class, normal admission, named workflow or software gate credit."
+                }
               },
               "persistence": {
                 "result": "passed-scoped-family-facet",
@@ -2139,8 +2221,8 @@
           }
         },
         "interaction_controls": {
-          "result": "focused-runner-correction-in-progress",
-          "source_owner": "/home/dan/.codex/worktrees/phase6-final-stock-controls/orbiter-cross-platform",
+          "result": "in-progress-fixed-72-run-matrix",
+          "source_owner": "/home/dan/.codex/worktrees/phase6-candidate-freeze/orbiter-cross-platform",
           "canary_profile": "Debug-sse2",
           "plans": [
             {
@@ -2169,7 +2251,28 @@
             "/home/dan/.codex/worktrees/phase6-stock-admission/orbiter-cross-platform/out/phase6-rms-dialog-Debug-sse2-calibration-v1/interactions.json"
           ],
           "failure_cause": "Runner declared --save destination without dispatching Ctrl-S; original HST and RMS simulations exit cleanly but fail required saved-file inspection. The original RCS docking also reaches its target, but the capture remains failed for the missing save.",
-          "corrected_capture": "/home/dan/.codex/worktrees/phase6-final-stock-controls/orbiter-cross-platform/out/phase6-hst-save-dispatch-Debug-sse2-v1/interactions.json"
+          "corrected_capture": "/home/dan/.codex/worktrees/phase6-final-stock-controls/orbiter-cross-platform/out/phase6-hst-save-dispatch-Debug-sse2-v1/interactions.json",
+          "expected_flows": 9,
+          "expected_runs": 72,
+          "completed_focused_runs": 18,
+          "remaining_new_runs": 54,
+          "request": {
+            "path": "/home/dan/.codex/worktrees/phase6-candidate-freeze/orbiter-cross-platform/out/phase6-all-family-interactions-request-v2.json",
+            "sha256": "c455165d4dd9b5d9e3bc6fa90378b793ae51985766f6e99ab5f9f1b8ff6e7a5d"
+          },
+          "live_status": "/home/dan/.codex/worktrees/phase6-candidate-freeze/orbiter-cross-platform/out/phase6-all-family-interactions-v2/status.json",
+          "independent_focused_audit": {
+            "path": "/home/dan/.codex/worktrees/phase6-production-qualification/orbiter-cross-platform/out/phase6-one-profile-all-family-interactions-v1.json",
+            "sha256": "962ebd16cab094996c3915b16597a059a3c47fd818d76b308fc3b34da73b6e5f",
+            "scope": "All nine original-control flows twice on Debug/SSE2. Other three profiles remain required. No complete class, normal admission, named workflow or software gate credit."
+          },
+          "coordinator_controls": {
+            "path": "/home/dan/.codex/worktrees/phase6-candidate-freeze/orbiter-cross-platform/out/phase6-interactions-coordinator-controls-v2.json",
+            "sha256": "b3047f5e855facaa4b285aec325222611019ca8ff7d436017bcecc9c7221170a",
+            "scope": "Completed capture reuse, missing profile/flow rejection and actual cancellation. Zero new simulator launches."
+          },
+          "canonical_launch_plan": "/home/dan/.codex/worktrees/phase6-candidate-freeze/orbiter-cross-platform/Tests/Production/RemainingVessels/Interactions/atlantis-launch-staging-v2.json",
+          "preserved_coarse_launch_failure": "/home/dan/.codex/worktrees/phase6-candidate-freeze/orbiter-cross-platform/out/phase6-launch-staging-Debug-sse2-v1/interactions.json"
         }
       }
     },
@@ -2730,6 +2833,6 @@
       "note": "Physical controller hardware unavailable; virtual devices do not satisfy acceptance."
     }
   },
-  "current_blocker": "Class interactions are the only remaining class-eligibility facet. All eleven families pass the other six facets, including the independently audited 144 current-runtime writer/exact-Windows-save reload runs. Corrected original Ctrl-S interaction capture is in focused verification. Normal admission and final candidate freeze remain open.",
-  "next_exit_condition": "Complete and independently audit the remaining original-control interactions for all eleven families in all four profiles, then promote only their qualified class/capability combinations and freeze the final candidate."
+  "current_blocker": "The remaining 54 class interaction runs in Debug/automatic and both Release math profiles. All 18 Debug/SSE2 control runs independently pass, including real docking, six-joint RMS, three payload releases and canonical-clock launch/staging. Six other class facets and the complete 144-run persistence matrix are closed.",
+  "next_exit_condition": "All 72 original-control interaction runs independently pass, then admit only the qualified class/capability combinations and freeze the final candidate."
 }
