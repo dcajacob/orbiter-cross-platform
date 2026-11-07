@@ -12,7 +12,7 @@ from compare import bits, sha
 KEYS = ('tick', 'seconds', 'object', 'kind')
 
 
-def read(path, first, last):
+def read(path, first, last, aggregate_lifetimes=False):
     with path.open() as stream:
         reader = csv.DictReader(stream)
         fields = reader.fieldnames
@@ -36,15 +36,21 @@ def read(path, first, last):
         raise ValueError('Ordered internal-state ticks required')
     identities = {(obj, kind) for tick, obj, kind in result}
     expected = {(tick, obj, kind) for tick in range(first, last + 1) for obj, kind in identities}
-    if not identities or set(result) != expected:
+    if aggregate_lifetimes:
+        vessels={obj for obj,kind in identities if kind=='vessel'}
+        required={(tick,obj,'vessel') for tick in range(first,last+1) for obj in vessels}
+        complete=bool(vessels) and required<=set(result) and all(first<=tick<=last and
+            (tick,obj,'vessel') in result for tick,obj,kind in result)
+    else:complete=bool(identities) and set(result)==expected
+    if not complete:
         raise ValueError('Complete investigated ticks and stable object/kind roster required')
     return fields, result
 
 
-def compare(windows, native, first=1, last=243):
+def compare(windows, native, first=1, last=243, aggregate_lifetimes=False):
     guarded = {str(path): sha(path) for path in (windows, native)}
-    fields, left = read(windows, first, last)
-    other_fields, right = read(native, first, last)
+    fields, left = read(windows, first, last, aggregate_lifetimes)
+    other_fields, right = read(native, first, last, aggregate_lifetimes)
     if fields != other_fields or set(left) != set(right):
         raise ValueError('Internal-state field or object/kind closure differs')
     first_differences = {}
@@ -67,6 +73,7 @@ def compare(windows, native, first=1, last=243):
         raise ValueError('Internal-state inputs changed during comparison')
     return dict(status='compared-complete-internal-state-diagnostic-only', ticks=[first, last],
         rows_per_runtime=len(left), object_kinds=sorted({obj+'/'+kind for tick,obj,kind in left}),
+        aggregate_lifetimes=aggregate_lifetimes,
         first_differing_fields=first_differences, differing_row_counts=counts, evidence_sha256=guarded,
         abi_fences='Observer requires exact public/internal position, velocity and matrix agreement before each row',
         simulator_acceptance=False, phase6_complete=False)
@@ -79,11 +86,12 @@ if __name__ == '__main__':
     parser.add_argument('--output', type=Path, required=True)
     parser.add_argument('--first',type=int,default=1)
     parser.add_argument('--last',type=int,default=243)
+    parser.add_argument('--aggregate-lifetimes',action='store_true',help='Keep every vessel at every tick; require identical observed aggregate creation/deletion ticks in both runtimes')
     args = parser.parse_args()
     if args.output.exists():
         raise ValueError('Fresh internal-state comparison output required')
     if not 1<=args.first<=args.last<=960:raise ValueError('Bounded complete internal tick interval required')
-    result = compare(args.windows, args.native,args.first,args.last)
+    result = compare(args.windows, args.native,args.first,args.last,args.aggregate_lifetimes)
     args.output.write_text(json.dumps(result, indent=2)+'\n')
     print(json.dumps({key: min(v['tick'] for v in fields.values())
                       for key, fields in result['first_differing_fields'].items()}, indent=2))

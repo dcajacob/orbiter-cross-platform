@@ -49,7 +49,9 @@ The supported initial toolchain is GCC on Linux x86-64.
 
 Native simulation randomness uses the original runtime's unsigned 32-bit
 recurrence, 15-bit result range and per-thread state. Host-library random draws
-cannot consume it. Windows calls its existing `std::rand`/`std::srand`. An
+cannot consume it. The source-ported OpenGL client explicitly shares this stream
+through its private renderer binding, preserving the original Windows CRT
+relationship. Windows calls its existing `std::rand`/`std::srand`. An
 exhaustive inverse source check recovers the pre-change eight calculation files
 by undoing only the explicit RNG names and include.
 
@@ -84,3 +86,15 @@ Windows application/SDK/client/reference checks.
 the source revisions, actual profiles, measured errors and verified artifact
 digests. Current flight results and remaining gates are tracked in
 [GroundFlight.md](GroundFlight.md).
+
+The exact Station building save reload exposed a missing renderer binding.
+Original OpenGL particle initialization makes 3,000 random draws; native had
+sent those calls to glibc instead of the numerical stream. The resulting body
+counters differed before flight. Windows folded Module2A increments at tick 903;
+the first public position difference followed at 904 and changed a saved decimal
+digit. Passive off/on diagnostics reproduce all original simulation/frame/save
+bytes before their internal observations are used. The private renderer adapter
+now uses the existing engine generator and its original range for particle and
+exhaust randomness. Formulas, draw order, integrator and serialization budgets
+remain unchanged. A focused regression uses the five captured startup counters;
+fresh complete-scene qualification remains required.
