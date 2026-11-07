@@ -62,8 +62,15 @@ def main():
             build = Path(built['configurations'][configuration]['build'])
             libraries = list(build.rglob('orbiter_production_boundary.lib'))
             require(len(libraries) == 1, 'Unique actual retained boundary import library required')
-            library = libraries[0]; dll = library.with_suffix('.dll')
-            require(dll.is_file(), 'Actual retained production boundary DLL missing')
+            library = libraries[0]
+            inputs = json.loads((build/'build-inputs.json').read_text())
+            candidates = [build/name for name in inputs['binaries']
+                          if Path(name).name.lower() == 'orbiter_production_boundary.dll']
+            require(candidates and len({inputs['binaries'][p.relative_to(build).as_posix()]
+                                       for p in candidates}) == 1 and
+                    all(p.is_file() and sha(p) == inputs['binaries'][p.relative_to(build).as_posix()]
+                        for p in candidates), 'Actual metadata-bound production boundary DLL missing/different')
+            dll = min(candidates, key=lambda p: len(p.relative_to(build).parts))
             guards = {str(p): sha(p) for p in (library, dll, source)}
             fixture = output/configuration; fixture.mkdir()
             root = Path(built['source'])
