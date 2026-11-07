@@ -1,0 +1,425 @@
+{
+  "schema": 1,
+  "protocol": "remaining-stock-original-input-interactions-v1",
+  "flows": [
+    {
+      "frames": 640,
+      "fixed_step": 0.015625,
+      "replay": [
+        {
+          "tick": 128,
+          "phase": "before",
+          "action": "key",
+          "value": "2"
+        },
+        {
+          "tick": 129,
+          "phase": "before",
+          "action": "key",
+          "value": "-2"
+        },
+        {
+          "tick": 128,
+          "phase": "before",
+          "action": "key",
+          "value": "3"
+        },
+        {
+          "tick": 129,
+          "phase": "before",
+          "action": "key",
+          "value": "-3"
+        },
+        {
+          "tick": 128,
+          "phase": "before",
+          "action": "key",
+          "value": "4"
+        },
+        {
+          "tick": 129,
+          "phase": "before",
+          "action": "key",
+          "value": "-4"
+        },
+        {
+          "tick": 256,
+          "phase": "before",
+          "action": "key",
+          "value": "2"
+        },
+        {
+          "tick": 257,
+          "phase": "before",
+          "action": "key",
+          "value": "-2"
+        },
+        {
+          "tick": 256,
+          "phase": "before",
+          "action": "key",
+          "value": "3"
+        },
+        {
+          "tick": 257,
+          "phase": "before",
+          "action": "key",
+          "value": "-3"
+        },
+        {
+          "tick": 256,
+          "phase": "before",
+          "action": "key",
+          "value": "4"
+        },
+        {
+          "tick": 257,
+          "phase": "before",
+          "action": "key",
+          "value": "-4"
+        }
+      ],
+      "id": "hst-keys",
+      "case": "remaining_stock_018",
+      "families": [
+        "HST"
+      ],
+      "checks": [
+        {
+          "left": {
+            "trace": "flight-animations.csv",
+            "where": {
+              "tick": 192,
+              "object": "HST",
+              "index": 0
+            },
+            "field": "state"
+          },
+          "op": "lt",
+          "right": {
+            "trace": "flight-animations.csv",
+            "where": {
+              "tick": 128,
+              "object": "HST",
+              "index": 0
+            },
+            "field": "state"
+          }
+        },
+        {
+          "left": {
+            "trace": "flight-animations.csv",
+            "where": {
+              "tick": 600,
+              "object": "HST",
+              "index": 0
+            },
+            "field": "state"
+          },
+          "op": "gt",
+          "right": {
+            "trace": "flight-animations.csv",
+            "where": {
+              "tick": 256,
+              "object": "HST",
+              "index": 0
+            },
+            "field": "state"
+          }
+        },
+        {
+          "left": {
+            "trace": "flight-animations.csv",
+            "where": {
+              "tick": 192,
+              "object": "HST",
+              "index": 1
+            },
+            "field": "state"
+          },
+          "op": "lt",
+          "right": {
+            "trace": "flight-animations.csv",
+            "where": {
+              "tick": 128,
+              "object": "HST",
+              "index": 1
+            },
+            "field": "state"
+          }
+        },
+        {
+          "left": {
+            "trace": "flight-animations.csv",
+            "where": {
+              "tick": 600,
+              "object": "HST",
+              "index": 1
+            },
+            "field": "state"
+          },
+          "op": "gt",
+          "right": {
+            "trace": "flight-animations.csv",
+            "where": {
+              "tick": 256,
+              "object": "HST",
+              "index": 1
+            },
+            "field": "state"
+          }
+        },
+        {
+          "left": {
+            "trace": "flight-animations.csv",
+            "where": {
+              "tick": 192,
+              "object": "HST",
+              "index": 2
+            },
+            "field": "state"
+          },
+          "op": "lt",
+          "right": {
+            "trace": "flight-animations.csv",
+            "where": {
+              "tick": 128,
+              "object": "HST",
+              "index": 2
+            },
+            "field": "state"
+          }
+        },
+        {
+          "left": {
+            "trace": "flight-animations.csv",
+            "where": {
+              "tick": 600,
+              "object": "HST",
+              "index": 2
+            },
+            "field": "state"
+          },
+          "op": "gt",
+          "right": {
+            "trace": "flight-animations.csv",
+            "where": {
+              "tick": 256,
+              "object": "HST",
+              "index": 2
+            },
+            "field": "state"
+          }
+        }
+      ]
+    },
+    {
+      "frames": 640,
+      "fixed_step": 0.015625,
+      "replay": [],
+      "id": "solar-paddles",
+      "case": "remaining_stock_013",
+      "families": [
+        "SolarSail"
+      ],
+      "configuration": "RadiationPressure = TRUE\n",
+      "script": "Tests/Production/RemainingVessels/Interactions/phase6_solar_controls.lua",
+      "checks": [
+        {
+          "left": {
+            "trace": "flight-animations.csv",
+            "where": {
+              "tick": 224,
+              "object": "FlyingDutchman",
+              "index": 0
+            },
+            "field": "state"
+          },
+          "op": "eq",
+          "right": 1
+        },
+        {
+          "left": {
+            "trace": "flight-animations.csv",
+            "where": {
+              "tick": 224,
+              "object": "FlyingDutchman",
+              "index": 1
+            },
+            "field": "state"
+          },
+          "op": "eq",
+          "right": 0
+        },
+        {
+          "left": {
+            "trace": "flight-animations.csv",
+            "where": {
+              "tick": 224,
+              "object": "FlyingDutchman",
+              "index": 2
+            },
+            "field": "state"
+          },
+          "op": "eq",
+          "right": 0.75
+        },
+        {
+          "left": {
+            "trace": "flight-animations.csv",
+            "where": {
+              "tick": 224,
+              "object": "FlyingDutchman",
+              "index": 3
+            },
+            "field": "state"
+          },
+          "op": "eq",
+          "right": 0.25
+        },
+        {
+          "left": {
+            "trace": "flight-animations.csv",
+            "where": {
+              "tick": 352,
+              "object": "FlyingDutchman",
+              "index": 0
+            },
+            "field": "state"
+          },
+          "op": "eq",
+          "right": 0.5
+        },
+        {
+          "left": {
+            "trace": "flight-animations.csv",
+            "where": {
+              "tick": 352,
+              "object": "FlyingDutchman",
+              "index": 1
+            },
+            "field": "state"
+          },
+          "op": "eq",
+          "right": 0.5
+        },
+        {
+          "left": {
+            "trace": "flight-animations.csv",
+            "where": {
+              "tick": 352,
+              "object": "FlyingDutchman",
+              "index": 2
+            },
+            "field": "state"
+          },
+          "op": "eq",
+          "right": 0.5
+        },
+        {
+          "left": {
+            "trace": "flight-animations.csv",
+            "where": {
+              "tick": 352,
+              "object": "FlyingDutchman",
+              "index": 3
+            },
+            "field": "state"
+          },
+          "op": "eq",
+          "right": 0.5
+        },
+        {
+          "left": {
+            "trace": "flight-animations.csv",
+            "where": {
+              "tick": 608,
+              "object": "FlyingDutchman",
+              "index": 0
+            },
+            "field": "state"
+          },
+          "op": "eq",
+          "right": 0
+        },
+        {
+          "left": {
+            "trace": "flight-animations.csv",
+            "where": {
+              "tick": 608,
+              "object": "FlyingDutchman",
+              "index": 1
+            },
+            "field": "state"
+          },
+          "op": "eq",
+          "right": 1
+        },
+        {
+          "left": {
+            "trace": "flight-animations.csv",
+            "where": {
+              "tick": 608,
+              "object": "FlyingDutchman",
+              "index": 2
+            },
+            "field": "state"
+          },
+          "op": "eq",
+          "right": 0.25
+        },
+        {
+          "left": {
+            "trace": "flight-animations.csv",
+            "where": {
+              "tick": 608,
+              "object": "FlyingDutchman",
+              "index": 3
+            },
+            "field": "state"
+          },
+          "op": "eq",
+          "right": 0.75
+        }
+      ],
+      "required_log": [
+        "PHASE6_CONTROL solar deflect",
+        "PHASE6_CONTROL solar neutral",
+        "PHASE6_CONTROL solar reverse"
+      ]
+    },
+    {
+      "frames": 640,
+      "fixed_step": 0.015625,
+      "replay": [],
+      "id": "quad-controllers",
+      "case": "remaining_stock_017",
+      "families": [
+        "Quadcopter"
+      ],
+      "script": "Tests/Production/RemainingVessels/Interactions/phase6_quad_controls.lua",
+      "checks": [
+        {
+          "left": {
+            "trace": "flight-state.csv",
+            "where": {
+              "tick": 640,
+              "object": "QC-01"
+            },
+            "field": "altitude_agl"
+          },
+          "op": "gt",
+          "right": 1
+        }
+      ],
+      "required_log": [
+        "PHASE6_CONTROL quad altitude-heading",
+        "PHASE6_CONTROL quad horizontal-speed",
+        "PHASE6_CONTROL quad course",
+        "PHASE6_CONTROL quad vertical-speed"
+      ]
+    }
+  ],
+  "scope": "Three selected class interaction controls through original keys and Lua actuator/controller APIs, full original rosters, two repetitions per requested profile. No full-family, normal-admission, named-workflow or final-candidate credit.",
+  "phase6_complete": false
+}

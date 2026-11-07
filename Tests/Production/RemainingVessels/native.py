@@ -131,6 +131,8 @@ def main():
                    help='Compare short actual SDK capability snapshots and observer-off/on controls; diagnostic only')
     p.add_argument('--rejection-control',action='store_true',
                    help='Exercise actual loader and class-policy failures before presentation; diagnostic only')
+    p.add_argument('--interaction-plan',type=lambda v:Path(v).resolve(),
+                   help='Run an explicit original-input interaction plan; diagnostic only')
     p.add_argument('--rejection-windows-dll',type=lambda v:Path(v).resolve(),
                    help='Preserved original Windows HST DLL for the foreign-format rejection')
     p.add_argument('--windows-reference',type=lambda v:Path(v).resolve(),
@@ -138,6 +140,12 @@ def main():
     p.add_argument('--windows-build',type=lambda v:Path(v).resolve())
     p.add_argument('--preserved',type=lambda v:Path(v).resolve())
     a=p.parse_args()
+    if a.interaction_plan:
+        require(not a.capability_control and not a.lifetime_sessions and not a.rejection_control,
+                'Separate interaction scope required')
+        from interactions import capture
+        capture(a)
+        return
     if a.rejection_control:
         require(not a.capability_control and not a.lifetime_sessions and a.rejection_windows_dll,
                 'Separate rejection controls and preserved Windows DLL required')
