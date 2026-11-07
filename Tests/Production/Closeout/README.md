@@ -37,6 +37,25 @@ These controls do not qualify interactions, persistence, normal admission or a
 full acceptance campaign. The first failed canary's capture-clock mismatch is
 preserved; the corrected runner captures its actual fiftieth fixed-step frame.
 
+The same `RemainingVessels/native.py` runner accepts `--interaction-plan` for
+bounded original key, GUI and Lua actuator schedules. Plans live in
+`RemainingVessels/Interactions`; captures retain actual process/provider maps,
+complete original vessel populations, every finalized tick, saved content,
+frames and unsuppressed sanitizers. A separate `interactions.py --capture ...
+--output FRESH.json` invocation re-reads outcomes and both repetitions. Generated
+vessels require an explicitly hashed original Windows population observation.
+The schedules cover HST animations, solar paddles, quadcopter controllers,
+original RCS docking and original Atlantis payload release commands. The RMS
+dialog calibration earns no family acceptance. These schedules remain pending
+until their actual captures and independent readers pass; they neither admit
+classes nor replace the named Windows/native workflows.
+
+Final `RemainingVessels/build_native.py --include-unit-tests` packages also build
+the existing CTest registrations and retain the actual command listing and
+binary hashes. This is discovery, not execution or a core-gate pass. Portable,
+upstream Catch and standalone fixture totals still require their own actual
+registrations and execution; source-file counts are not test totals.
+
 `run_native.py` replaces the local ad hoc persistence coordinators. Its JSON
 request names the owning checkout, immutable collector and runtime commits,
 four package paths, declared data/providers/Windows references, and either
