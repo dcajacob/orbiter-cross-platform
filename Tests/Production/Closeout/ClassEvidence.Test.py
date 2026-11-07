@@ -6,7 +6,7 @@ from pathlib import Path
 import tempfile
 import unittest
 
-from class_eligibility import inspect_paused, family_coverage, OBJECTS
+from class_eligibility import inspect_paused, family_coverage, capability_profile_cases, OBJECTS
 from contracts import atomic_json, sha, load, ROOT
 from checklist import requirements
 
@@ -19,6 +19,19 @@ def write_csv(path, records):
 
 
 class PausedEvidenceControls(unittest.TestCase):
+    def test_completed_subset_and_repaired_case_must_cover_exact_matrix(self):
+        def part(names):
+            return dict(runtime_identity=dict(profile='Debug-automatic',runtime_source_commit='a'*40),
+                        repeats=2,cases={name:[] for name in names},actual_processes=len(names)*4)
+        first,last=part(['a','b']),part(['c'])
+        result=capability_profile_cases([first,last],'Debug-automatic',['a','b','c'])
+        self.assertEqual(set(result[0]),{'a','b','c'});self.assertEqual(result[2],12)
+        wrong=part(['c']);wrong['runtime_identity']['runtime_source_commit']='b'*40
+        for parts in ([first],[first,last,last],[first,wrong]):
+            with self.subTest(parts=parts),self.assertRaises(ValueError):
+                capability_profile_cases(parts,'Debug-automatic',['a','b','c'])
+        with self.assertRaises(ValueError):capability_profile_cases([first,last],'Release-automatic',['a','b','c'])
+
     def test_family_matrix_rejects_partial_duplicate_and_mixed_source_cells(self):
         specification=requirements()['class-eligibility']
         ledger=load(ROOT/'Docs/Production/Phase6Closeout.json')

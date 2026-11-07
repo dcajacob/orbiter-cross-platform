@@ -137,6 +137,20 @@ def inspect_family_lifetimes(path):
         diagnostic_only=True,native_admission_qualified=False,phase6_complete=False)
 
 
+def capability_profile_cases(audits,profile,expected_cases):
+    cases={};sources=set();processes=0
+    for checked in audits:
+        require(checked['runtime_identity']['profile']==profile and checked['repeats']==2,
+                'Capability profile/repetition incomplete')
+        sources.add(checked['runtime_identity']['runtime_source_commit'])
+        for name,runs in checked['cases'].items():
+            require(name not in cases,'Duplicate completed capability cell')
+            cases[name]=runs
+        processes+=checked['actual_processes']
+    require(len(sources)==1 and set(cases)==set(expected_cases),'Missing capability case or mixed runtime source')
+    return cases,sources,processes
+
+
 def inspect_capability_matrix(path):
     path=Path(path).resolve();ledger=load(path);gate=ledger['gates']['class-eligibility']
     expected=requirements()['class-eligibility'];require(gate['expected']==expected,'Fixed capability requirements differ')
@@ -166,18 +180,23 @@ def inspect_capability_matrix(path):
     from capabilities import audit
     results={};sources=set();processes=0
     for profile in expected['profiles']:
-        capture=Path(work['captures'][profile]);checked=audit(capture)
-        require(checked['runtime_identity']['profile']==profile and checked['repeats']==2 and
-                list(checked['cases'])==work['expected_cases'],'Capability profile/case/repetition incomplete')
+        stages=work.get('stages',{}).get(profile,[dict(capture=work['captures'][profile])])
+        checked_stages=[]
+        for stage in stages:
+            capture=Path(stage['capture'])
+            checked=audit(capture,stage.get('selected_completed_cases'),stage.get('source_owner'))
+            checked_stages.append(dict(capture=str(capture),audit=checked))
+        cases,actual_sources,actual_processes=capability_profile_cases(
+            [s['audit'] for s in checked_stages],profile,work['expected_cases'])
         observed=set()
-        for runs in checked['cases'].values():
+        for runs in cases.values():
             for run in runs:
                 for row in run['actual_capabilities'].values():
                     if row['class'] in expected['families']:
                         observed.add((row['class'],*(float(row[k]) for k in fields)))
         require(observed==signatures,'Native capability selection misses an original structural combination')
-        sources.add(checked['runtime_identity']['runtime_source_commit']);processes+=checked['actual_processes']
-        results[profile]=dict(capture=str(capture),audit=checked)
+        sources.update(actual_sources);processes+=actual_processes
+        results[profile]=dict(stages=checked_stages)
     require(len(sources)==1 and processes==work['expected_processes'],'Mixed or incomplete capability runtime cohort')
     return dict(status='audited-all-family-capability-variants-and-passive-observer-controls-only',
         profiles=results,families=expected['families'],structural_signatures=len(signatures),
