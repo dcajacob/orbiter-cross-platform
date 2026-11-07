@@ -53,6 +53,23 @@ of all 38 scenes remains diagnostic. Its storage reserve scales with work size.
 The selected worker path currently has fixture coverage; actual audited Windows
 diagnostics used the separate passive-observer collector.
 The historical v1 transport and its `O:` receipt reader remain unchanged.
+The local VM now has a separate 64 GiB NTFS qualification volume, explicitly
+declared as `P:/OrbiterPhase6` for new work. Its serial, fresh empty-disk checks,
+attachment and persistent image location are retained locally. Actual Windows
+root/capacity and separate-process file/cache readback controls pass with more
+than the required 8 GiB reserve. The original C: owning sources and all four
+original/current reference packages were independently rehashed unchanged.
+
+New original/current workers require `phase6-guarded-local-staging-v2` and the
+versioned `static_binary_link_staging_v2.py` adapter. It verifies each explicitly
+guarded input and maintains a checked cache on the declared output volume,
+then links local staged copies. This avoids copying the same multi-gigabyte
+data for every scene across C:/P:. Private replacements detach their staged
+links, preserving canonical inputs and cache bytes. Receipts record complete
+link totals and input counts, with an explicitly bounded sample of link IDs.
+Actual C:/P: NTFS controls cover the pinned Mesa provider as well as data files.
+The historical v1 adapter and evidence remain readable; runner closures require
+exactly one declared adapter. No simulation budgets or source formulas change.
 The v2 path also has independently audited actual diagnostic launches: normal
 user workers, private desktop creation/closure, actual simulator PIDs and clean
 exits, runtime roles, declared share/capacity preflights and retained raw hashes.

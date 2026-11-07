@@ -4,7 +4,8 @@ import argparse
 import hashlib
 import importlib.util
 import json
-from pathlib import Path
+from pathlib import Path,PureWindowsPath
+import re
 import shutil
 import subprocess
 import sys
@@ -22,6 +23,44 @@ RUNNER_SOURCES={
     **{name:'Closeout/LocalVM/'+name for name in ('runtime_descriptor_v2.py','runtime_descriptor_v3.py')},
     'static_binary_link_staging_v1.py':'RemainingStockPersistence/LocalVM/static_binary_link_staging_v1.py',
     **{name:'CurrentWindows/LocalVM/'+name for name in ('win_local_process_v1.py','private_desktop_bootstrap_v1.py','system_user_launcher_v1.py')}}
+
+
+def runner_sources(files):
+    """Keep historical v1 readable; require exactly one declared staging adapter."""
+    adapters={'static_binary_link_staging_v1.py':'RemainingStockPersistence/LocalVM/static_binary_link_staging_v1.py',
+              'static_binary_link_staging_v2.py':'Closeout/LocalVM/static_binary_link_staging_v2.py'}
+    selected=set(files)&set(adapters)
+    require(len(selected)==1,'Exactly one versioned local staging adapter required')
+    name=next(iter(selected))
+    result={k:v for k,v in RUNNER_SOURCES.items() if k not in adapters}
+    result[name]=adapters[name]
+    require(set(files)==set(result),'Current stock runner role/file closure differs')
+    return result
+
+
+def inspect_staging(cfg,worker):
+    protocol='phase6-guarded-local-staging-v2'
+    receipt=worker['staging_receipt'];controls=worker['staging_controls']
+    require(cfg['staging_protocol']==receipt['protocol']==controls['protocol']==protocol and
+            controls['status']=='passed-real-local-volume-copy-cache-and-hardlink-byte-equivalence',
+            'Actual versioned local-volume staging controls missing')
+    counts=receipt['linked_input_counts'];total=receipt['actual_link_count'];samples=receipt['link_samples']
+    require(counts and all(type(v) is int and v>0 for v in counts.values()) and
+            type(total) is int and total==sum(counts.values()) and
+            receipt['link_sample_limit']==128 and len(samples)==min(total,128),
+            'Actual staging totals or explicitly bounded sample scope differs')
+    output=PureWindowsPath(cfg['output']);cache=output/'immutable-input-cache-v2'
+    for path,checksum in receipt['cache_files_sha256'].items():
+        value=PureWindowsPath(path)
+        require(re.fullmatch('[0-9a-f]{64}',checksum) and value.parent==cache and value.name==checksum,
+                'Guarded staging cache identity/path differs')
+    for sample in samples:
+        require(sample['source'] in counts and PureWindowsPath(sample['target']).is_relative_to(output) and
+                (sample['linked_source']==sample['source'] or
+                 PureWindowsPath(sample['linked_source']).is_relative_to(cache)),
+                'Actual staging sample escaped its source/output/cache binding')
+    return dict(protocol=protocol,actual_link_count=total,link_samples=len(samples),
+                cache_files=len(receipt['cache_files_sha256']))
 
 
 def immutable(commit,name):
@@ -45,9 +84,9 @@ def retain_launch(capture,jobs,vm,configuration,output):
     require(binding==dict(job_sha256=sha(target/'guest-job.json'),terminal_sha256=sha(target/'guest-result.json'),
                          actual_guest_pid=job['pid'],domain_uuid=job['domain_uuid']), 'Actual current-stock guest terminal binding differs')
     runners=load(target/'runners.json');trusted=runners['files_sha256']
-    require(runners['commit']==cfg['roles']['runner']['commit'] and sha(target/'runners.json')==cfg['roles']['runner']['manifest_sha256'] and
-            set(trusted)==set(RUNNER_SOURCES), 'Current stock runner role/file closure differs')
-    for name,source in RUNNER_SOURCES.items():
+    require(runners['commit']==cfg['roles']['runner']['commit'] and sha(target/'runners.json')==cfg['roles']['runner']['manifest_sha256'],
+            'Current stock runner role/file closure differs')
+    for name,source in runner_sources(trusted).items():
         body=immutable(runners['commit'],source)
         require(hashlib.sha256(body).hexdigest()==trusted[name], 'Current stock runner differs from its immutable source: '+name)
     cfg,worker,actual_vm=inspect_launch(target,trusted)
@@ -55,6 +94,7 @@ def retain_launch(capture,jobs,vm,configuration,output):
             worker['owning_sources_runtime_sdk_provider_and_saved_inputs_unchanged'] is True and
             worker['simulation_comparison_and_independent_audit_pending'] is True and cfg['configuration']==configuration,
             'Actual complete current-stock terminal result required')
+    if 'static_binary_link_staging_v2.py' in trusted:inspect_staging(cfg,worker)
     export=target/'export'
     require(worker['export_files_sha256']=={p.relative_to(export).as_posix():sha(p) for p in export.rglob('*') if p.is_file()},
             'Actual current stock raw export closure/hash differs')
@@ -112,8 +152,7 @@ def retain_supplement(path,target,cfg,worker,config):
             'Actual closed supplemental input scope/source differs')
     require(hashlib.sha256(immutable(report['collector_source_commit'],'Closeout/LocalVM/stock_runtime_worker_v3.py')).hexdigest()==report['collector_sha256'],
             'Supplemental input collector differs from its immutable source')
-    require(set(report['helpers_sha256'])==set(RUNNER_SOURCES),'Complete supplemental helper identity closure required')
-    for name,source_name in RUNNER_SOURCES.items():
+    for name,source_name in runner_sources(report['helpers_sha256']).items():
         commit=report['collector_source_commit'] if name=='stock_runtime_worker_v3.py' else cfg['roles']['runner']['commit']
         require(hashlib.sha256(immutable(commit,source_name)).hexdigest()==report['helpers_sha256'][name],
                 'Supplemental helper differs from its immutable owning source: '+name)

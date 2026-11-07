@@ -10,7 +10,7 @@ import traceback
 
 from win_local_process_v1 import context
 from runtime_descriptor_v3 import preflight,require,sha
-from static_binary_link_staging_v1 import BinaryLinks
+from static_binary_link_staging_v2 import BinaryLinks,PROTOCOL as STAGING_PROTOCOL
 from current_stock import selection,inspect_run
 
 
@@ -78,6 +78,7 @@ def main():
     try:
         require(report['context']==dict(session=cfg['active_session'],window_station='WinSta0',desktop=cfg['desktop']), 'Actual private desktop differs')
         report['root_preflight']=preflight(cfg)
+        require(cfg['staging_protocol']==STAGING_PROTOCOL, 'Explicit versioned local-volume staging required')
         os.environ.update(PATH=str(Path(cfg['git']).parent)+';'+os.environ['PATH'],PYTHONDONTWRITEBYTECODE='1',
                           LIBGL_ALWAYS_SOFTWARE='true',GALLIUM_DRIVER='llvmpipe')
         require(cfg['cohort']=='current-windows' and cfg['source_role']=='application', 'Actual current application source role required')
@@ -108,6 +109,9 @@ def main():
         from saved_state import parse_saved,content_differences
         config=reader.settings(reader.protocols.V2);cases,diagnostic=selection(cfg,config)
         actual_data=reader.data_inputs.inspect(Path(cfg['data']),Path(cfg['planets']))
+        planet_inputs=load(source/'Tests/Production/standard-planets.lock.json')['data_files']
+        for name,value in actual_data['files'].items():
+            guards[str(Path(cfg['planets'] if name in planet_inputs else cfg['data'])/name)]=value['sha256']
         report.update(diagnostic_only=diagnostic,cases_requested=[case['id'] for case in cases],repeats=2,frames=960,
                       observer_build_sha256=sha(cfg['roles']['observer']['manifest_path']),actual_simulation_data=actual_data)
         expected_inputs={(mode,case['id'],repeat) for mode in ('automatic','sse2') for case in cases for repeat in (1,2)}
@@ -117,7 +121,8 @@ def main():
         for value in cfg['windows_save_inputs']:
             path=Path(value['path']);require(sha(path)==value['sha256'], 'Exact Windows save input changed')
             inputs[(value['math_profile'],value['case'],value['repeat'])]=value;guards[str(path)]=value['sha256']
-        output.mkdir();export=Path(cfg['export']);export.mkdir();links=BinaryLinks(guards,output);links.install();save()
+        output.mkdir();export=Path(cfg['export']);export.mkdir();links=BinaryLinks(guards,output)
+        report['staging_controls']=links.controls(cfg['mesa']);links.install();save()
         expected_modules={}
         for path,value in guards.items():expected_modules.setdefault(Path(path).name.casefold(),set()).add(value)
         for mode in ('automatic','sse2'):
@@ -182,6 +187,7 @@ def main():
                 'Owning current sources/runtime/SDK/provider/paired saves changed')
         require(reader.data_inputs.inspect(Path(cfg['data']),Path(cfg['planets']))==actual_data, 'Owning simulation data changed')
         links.close()
+        report['staging_receipt']=links.receipt()
         report.update(status='captured-current-Windows-stock-and-paired-exact-save-reloads',actual_processes=len(report['actual_process_receipts']),
                       successful_presents=960*len(report['actual_process_receipts']),owning_sources_runtime_sdk_provider_and_saved_inputs_unchanged=True,
                       simulation_comparison_and_independent_audit_pending=True)

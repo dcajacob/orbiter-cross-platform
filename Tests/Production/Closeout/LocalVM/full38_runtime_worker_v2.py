@@ -2,7 +2,7 @@
 import datetime,hashlib,json,os,runpy,shutil,subprocess,sys,threading,time,traceback
 from pathlib import Path
 from win_local_process_v1 import context
-from static_binary_link_staging_v1 import BinaryLinks
+from static_binary_link_staging_v2 import BinaryLinks,PROTOCOL as STAGING_PROTOCOL
 from runtime_descriptor_v2 import preflight, validate, capture_selection
 REQUEST=Path(sys.argv[1]);cfg=json.loads(REQUEST.read_text());SHARE=Path(cfg['roots']['share']);SOURCE=Path(cfg['source']);OUTPUT=Path(cfg['output']);name=cfg['name'];seq=0;lock=threading.RLock();done=threading.Event();links=None
 report=dict(status='running',name=name,source=cfg['source_commit'],configuration=cfg['configuration'],math_profile=cfg['math_profile'],context=context(),cloud_builds_used=False,native_admission_qualified=False,phase6_complete=False)
@@ -46,7 +46,7 @@ try:
  report.update(diagnostic_only=diagnostic,cases_requested=ids,scene_workers=selection['scene_workers'])
  assert cfg['cohort']=='original-windows','Current-Windows needs its matching runtime adapter; original-SDK reader cannot certify it'
  report['root_preflight']=preflight(cfg);report['roles']=cfg['roles'];report['transport_protocol']=cfg['transport_protocol']
- assert sha(Path(cfg['worker_script']).parent/'static_binary_link_staging_v1.py')==cfg['staging_script_sha256']
+ assert cfg['staging_protocol']==STAGING_PROTOCOL and sha(Path(cfg['worker_script']).parent/'static_binary_link_staging_v2.py')==cfg['staging_script_sha256']
  assert not OUTPUT.exists(),'Fresh output required'
  os.environ.update(PATH=str(Path(cfg['git']).parent)+';'+str(Path(sys.executable).parent)+';'+os.environ['PATH'],PYTHONDONTWRITEBYTECODE='1',LIBGL_ALWAYS_SOFTWARE='true',GALLIUM_DRIVER='llvmpipe')
  if cfg['math_profile']=='sse2':os.environ['ORBITER_TEST_OBSERVER_SSE2']='1'
@@ -55,7 +55,13 @@ try:
  build=Path(cfg['build']);built=load(build/'build.json');runtime=build/'runtime';assert built['status']=='built-awaiting-runtime-and-independent-audit' and built['producer_commit']==cfg['source_commit']
  assert all(sha(runtime/n)==v for n,v in built['runtime_files_sha256'].items())
  provider=Path(cfg['mesa']);mesa=load(provider/'mesa-runtime.json');immutable={str(runtime/n):v for n,v in built['runtime_files_sha256'].items()};immutable.update({str(provider/n):v['sha256'] for n,v in mesa['files'].items()})
- OUTPUT.mkdir();links=BinaryLinks(immutable,OUTPUT);report['staging_controls']=links.controls(provider);links.install();report.update(request_sha256=sha(REQUEST),build_manifest_sha256=sha(build/'build.json'),original_source_files_unchanged=True,reference_variant=cfg['reference_variant'],static_staging_policy='Exact pinned DLL/EXE bytes are linked on NTFS; original copy behavior remains for all other inputs and any unavailable link. Original source, runtime assertions, every declared scene, both repeats and all clock/numerical/camera/image budgets unchanged.');save('running-original-input-controls')
+ for lock,root in [('stock-data.lock.json',Path(cfg['data'])),('standard-planets.lock.json',Path(cfg['planets']))]:
+  for relative,value in load(SOURCE/'Tests/Production'/lock)['data_files'].items():
+   path=root/relative
+   if path.is_file():
+    assert path.stat().st_size==value['bytes'] and sha(path)==value['sha256'],'Actual guarded data differs: '+str(path)
+    immutable[str(path)]=value['sha256']
+ OUTPUT.mkdir();links=BinaryLinks(immutable,OUTPUT);report['staging_controls']=links.controls(provider);links.install();report.update(request_sha256=sha(REQUEST),build_manifest_sha256=sha(build/'build.json'),original_source_files_unchanged=True,reference_variant=cfg['reference_variant'],static_staging_policy=STAGING_PROTOCOL);save('running-original-input-controls')
  run_source('Tests/Production/RemainingStock/Execution.Test.py',[],'execution-controls');run_source('Tests/Production/RemainingStock/Resources.Test.py',[],'resource-controls');run_source('Tests/Production/RemainingStockRepaired/capture.py',['--verify-inputs','--protocol','remaining-stock-matched-clock-v2'],'complete-input-selection-controls')
  watcher=threading.Thread(target=monitor,daemon=True);watcher.start();stock=OUTPUT/'remaining-stock-repaired';reload=OUTPUT/'remaining-stock-persistence';data=Path(cfg['data']);planets=Path(cfg['planets'])
  save('running-declared-original-writers-twice')
@@ -79,9 +85,9 @@ try:
    for repeat in (1,2):
     folder=root/(identity+'-'+str(repeat));timing=load(folder/'process-timing.json');assert timing['actual_returncode']==0 and timing['timed_out'] is False and timing['timeout_seconds']==900;actual.append(dict(phase=phase,case=identity,repeat=repeat,folder=str(folder),timing=timing))
  assert len(actual)==selection['expected_processes']
- done.set();watcher.join(timeout=15);links.close();report['static_binary_link_count']=len(links.links);report['static_binary_copy_fallbacks']=links.fallback
- (OUTPUT/'local-static-binary-links.json').write_text(json.dumps(dict(inputs=links.inputs,links=links.links,fallbacks=links.fallback),default=str,indent=2)+'\n')
- # Export closed raw evidence to the host; immutable runtime/data caches stay local in C:.
+ done.set();watcher.join(timeout=15);links.close();report['staging_receipt']=links.receipt();report['static_binary_link_count']=links.link_count;report['static_binary_copy_fallbacks']=links.fallback
+ (OUTPUT/'local-static-binary-links.json').write_text(json.dumps(links.receipt(),default=str,indent=2)+'\n')
+ # Export closed raw evidence; immutable caches stay on the declared local output volume.
  export=Path(cfg['export']);assert not export.exists();export.mkdir()
  for p in OUTPUT.iterdir():
   if p.is_file():shutil.copy2(p,export/p.name)
