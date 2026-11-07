@@ -70,6 +70,8 @@ def inspect_paused(path):
             report['finite_original_vessel_rows'] == 60, 'Paused aggregate differs')
     return dict(status='audited-paused-attachment-lifetime-facet-only',
                 capture_sha256=sha(path), runtime_identity=report['runtime_identity'],
+                auditor_sources_sha256={str(p): sha(p) for p in
+                    (Path(__file__).resolve(), Path(__file__).with_name('contracts.py').resolve())},
                 actual_simulator_pid=report['actual_pid'], actual_exitcode=report['actual_exitcode'],
                 worlds=worlds, real_F5_reloads=19, original_vessels=OBJECTS,
                 owning_bytes_unchanged=True, no_preload_observer=True, sanitizer_suppressions=False,
