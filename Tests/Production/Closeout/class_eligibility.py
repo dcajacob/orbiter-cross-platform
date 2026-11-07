@@ -1,8 +1,10 @@
 """Independently inspect scoped class evidence; partial facets never admit a class."""
 import argparse
 import csv
+import hashlib
 import importlib.util
 import math
+import subprocess
 from pathlib import Path
 import sys
 
@@ -243,9 +245,11 @@ def inspect_persistence_matrix(path):
     require(names == progress['capability_controls']['expected_cases'] == work['expected_cases'] and
             plan['required_runs'] == work['expected_runs'] == len(names) * len(expected['profiles']) * 4,
             'Exact finite family persistence matrix required')
-    declared = {plan[k]['path']: plan[k]['sha256'] for k in ('new_request', 'retained_request')}
+    entries = plan['requests'] if plan.get('schema')==2 else [plan[k] for k in ('new_request','retained_request')]
+    declared = {entry['path']:entry['sha256'] for entry in entries}
     require({item['request'] for item in plan['coordinators']} == set(declared) and
-            len(plan['coordinators']) == len(declared) == 2, 'Exact new and retained coordinator scopes required')
+            len(plan['coordinators']) == len(declared) == len(entries) and len(entries)>=2,
+            'Exact nonduplicated declared coordinator scopes required')
     stages = []; coordinators = []; reader = None; owning_root = None
     for item in plan['coordinators']:
         request_path = Path(item['request']); status_path = Path(item['status'])
@@ -255,12 +259,18 @@ def inspect_persistence_matrix(path):
         require(scope.selected and set(scope.cases) <= set(names) and
                 request['profiles'] == expected['profiles'] and request['jobs_per_collector'] in (1, 2),
                 'Persistence coordinator profile, case or process scope differs')
-        require(status['status'] == ('audited-reusable-captures-only' if request['reuse'] else
-                'diagnostic-collected-and-audited') and status['failures'] == {} and
+        runner=Path(__file__).with_name('run_native.py')
+        if plan.get('schema')==2:
+            source=item['coordinator_source'];runner=Path(source['owner'])/source['path']
+            body=subprocess.check_output(['git','-C',source['owner'],'show',source['commit']+':'+source['path']])
+            require(hashlib.sha256(body).hexdigest()==source['sha256']==sha(runner),
+                    'Actual coordinator differs from its explicit immutable producer')
+        require(status['status'] in ('audited-reusable-captures-only','diagnostic-collected-and-audited') and
+                status['failures'] == {} and
                 status['request_sha256'] == declared[str(request_path)] and
                 status['diagnostic_only'] is True and status['cases'] == list(scope.cases) and
                 status['native_admission_qualified'] is False and status['phase6_complete'] is False and
-                status['coordinator_sha256'] == sha(Path(__file__).with_name('run_native.py')) and
+                status['coordinator_sha256'] == sha(runner) and
                 status['maximum_native_simulators'] <= 4 and
                 set(status['stages']) == {p + '/' + phase for p in expected['profiles'] for phase in PHASES},
                 'Incomplete, failed or changed persistence coordinator')
@@ -273,11 +283,18 @@ def inspect_persistence_matrix(path):
                 owner / 'Tests/Production/RemainingStockPersistence/audit.py')
             comparator = importlib.util.module_from_spec(spec); spec.loader.exec_module(comparator)
             config = reader.native.settings(reader.protocols.V2)
+            if 'audit_frame_comparator' in plan:
+                from ssim_kernel import bind
+                descriptor=plan['audit_frame_comparator']
+                function,kernel=bind(descriptor['verification'],descriptor['verification_sha256'],reader.windows.image_ssim)
+                reader.windows.image_ssim=reader.native.shared.image_ssim=function
         require(owner == owning_root, 'Mixed persistence owning checkouts')
         for profile in expected['profiles']:
             for phase in PHASES:
                 key = profile + '/' + phase; stage = status['stages'][key]; capture = Path(stage['output'])
                 reused = request.get('reuse', {}).get(key)
+                require(status['status']!='audited-reusable-captures-only' or reused,
+                        'Reuse-only coordinator contains a newly collected stage')
                 if reused:
                     require(stage['status'] == 'reused-after-independent-audit' and
                             capture == Path(reused['path']) and sha(capture / 'capture.json') == reused['capture_sha256'],
@@ -323,6 +340,7 @@ def inspect_persistence_matrix(path):
         coordinators=coordinators, stages=stages, actual_processes=processes,
         successful_presents=processes * 960, passed_facet='persistence',
         auditor_source_sha256=sha(Path(__file__)), execution_plan_sha256=sha(plan_path),
+        frame_comparator=locals().get('kernel'),
         scope='Selected complete original scenes, full serialized content and matching exact Windows-save reloads. '
               'No full38, actual operator save/F5 workflow, interaction, normal admission or final-candidate credit. '
               'Historical missing launch receipts remain missing.',
