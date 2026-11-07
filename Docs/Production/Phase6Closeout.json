@@ -2867,6 +2867,11 @@
           "path": "/home/dan/.codex/worktrees/phase6-orbit-node-qualification/orbiter-cross-platform/out/phase6-existing-unit-matrix-audit-v1.json",
           "sha256": "aee2d1dbd4f78cba3040413b1ca8492cb78f87888ddd55521092a3fa687efa68",
           "scope": "Final C4 libraries: 32 registered native unit processes and 16 upstream Catch cases in all four profiles; explicitly corrected Orbit fixture also passes current Windows Debug and Release. Remaining interface and runtime checks stay open."
+        },
+        {
+          "path": "/home/dan/.codex/worktrees/phase6-orbit-node-qualification/orbiter-cross-platform/out/phase6-final-portable-unit-matrix-audit-v1.json",
+          "sha256": "1ff8ed46e62bb7ac8aa5efa61a7930d661163830ea2867095ce1f1d3416f6d1d",
+          "scope": "13 additional portable/headless CTest registrations in all four profiles, including 34 actual nested Python tests and 15 collision Catch cases per profile. Empty CTest attempt explicitly rejected; no interface runtime gate credit."
         }
       ],
       "qualification_progress": {
@@ -2944,6 +2949,13 @@
             "Debug",
             "Release"
           ]
+        },
+        "final_portable_units": {
+          "result": "passed-scoped-existing-portable-and-headless-units",
+          "profiles": 4,
+          "registered_processes_per_profile": 13,
+          "nested_python_tests_per_profile": 34,
+          "portable_collision_catch_cases_per_profile": 15
         }
       }
     },
