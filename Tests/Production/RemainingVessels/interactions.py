@@ -147,6 +147,8 @@ def capture(args):
             for line in ('PropStages = 1\n','PropStage0 = 1 1 1\n','PropSubsampling = 1\n'):
                 require(cfg.count(line)==1,'Original propagator fixture differs');cfg=cfg.replace(line,'')
             (folder/'Orbiter.cfg').write_text(cfg+'\nMenubarMode = 1\nInfobarMode = 1\nVesselCollision = FALSE\nBaseCollision = TRUE\nUnlimitedFuel = FALSE\n'+flow.get('configuration',''))
+            if flow.get('gui_evidence',False):
+                (folder/'menu-evidence.enabled').touch();(folder/'ui-evidence.enabled').touch()
             with (folder/'replay.csv').open('w') as stream:
                 writer=csv.DictWriter(stream,fieldnames=('tick','phase','action','value'));writer.writeheader();writer.writerows(flow['replay'])
             argv=list(map(str,[executable,'--assets',assets,'--data',args.data,'--planets',args.planets,'--modules',args.build/'NativeModules',
