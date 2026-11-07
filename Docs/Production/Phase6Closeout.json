@@ -168,6 +168,11 @@
           "path": "/home/dan/.codex/worktrees/phase6-class-eligibility/orbiter-cross-platform/out/phase6-historical-current-stock-reader-v3/audit.json",
           "sha256": "3e41239a75819db2fb3c9088864bc591d65b405c5579bcb90a021e688e1ebbb0",
           "scope": "Updated reader re-audits all retained focused original/current/native runs with historical v1 staging; no new simulations"
+        },
+        {
+          "path": "/home/dan/.codex/worktrees/phase6-eligibility-controls/orbiter-cross-platform/out/phase6-closeout-controls-v75.json",
+          "sha256": "bcd79c8d8a37fc207e07ff81f95cf109973a6a38194dd0797dab6b39c0953714",
+          "scope": "75 actually discovered closeout controls, including completed/repaired capability scope negative controls"
         }
       ],
       "note": "Complete declared runner/control/restoration/receipt scope passed, including actual nonce-bound Windows child receipts. Actual free capacity exceeds eight GiB; each long campaign must preflight capacity again.",
@@ -634,6 +639,11 @@
           "path": "/home/dan/.codex/worktrees/phase6-capability-eligibility/orbiter-cross-platform/out/phase6-family-persistence-plan-v1.json",
           "sha256": "3638906a17bff091feb0462dd4e2f201f947cf9aeeed59d4deedf7325302043b",
           "scope": "Prepared existing-coordinator request: 128 new runs plus 16 separately retained runs; not launched"
+        },
+        {
+          "path": "/home/dan/.codex/worktrees/phase6-eligibility-controls/orbiter-cross-platform/out/phase6-all-family-capability-matrix-audit-v1.json",
+          "sha256": "13ae9d581d25a7f68859aa9b19b048ee61ca453cefc85f9317719a6c313d94f2",
+          "scope": "All sixteen original structural combinations, four profiles, two passive-observer off/on repetitions; capabilities facet only"
         }
       ],
       "qualification_progress": {
@@ -775,8 +785,18 @@
                 }
               },
               "capabilities": {
-                "result": "in-progress",
-                "passed_profiles": []
+                "result": "passed-scoped-family-facet",
+                "passed_profiles": [
+                  "Debug-automatic",
+                  "Debug-sse2",
+                  "Release-automatic",
+                  "Release-sse2"
+                ],
+                "evidence": {
+                  "path": "/home/dan/.codex/worktrees/phase6-eligibility-controls/orbiter-cross-platform/out/phase6-all-family-capability-matrix-audit-v1.json",
+                  "sha256": "13ae9d581d25a7f68859aa9b19b048ee61ca453cefc85f9317719a6c313d94f2",
+                  "scope": "All sixteen original structural combinations, four profiles, two passive-observer off/on repetitions; capabilities facet only"
+                }
               },
               "interactions": {
                 "result": "not-run",
@@ -838,8 +858,18 @@
                 }
               },
               "capabilities": {
-                "result": "in-progress",
-                "passed_profiles": []
+                "result": "passed-scoped-family-facet",
+                "passed_profiles": [
+                  "Debug-automatic",
+                  "Debug-sse2",
+                  "Release-automatic",
+                  "Release-sse2"
+                ],
+                "evidence": {
+                  "path": "/home/dan/.codex/worktrees/phase6-eligibility-controls/orbiter-cross-platform/out/phase6-all-family-capability-matrix-audit-v1.json",
+                  "sha256": "13ae9d581d25a7f68859aa9b19b048ee61ca453cefc85f9317719a6c313d94f2",
+                  "scope": "All sixteen original structural combinations, four profiles, two passive-observer off/on repetitions; capabilities facet only"
+                }
               },
               "interactions": {
                 "result": "not-run",
@@ -901,8 +931,18 @@
                 }
               },
               "capabilities": {
-                "result": "in-progress",
-                "passed_profiles": []
+                "result": "passed-scoped-family-facet",
+                "passed_profiles": [
+                  "Debug-automatic",
+                  "Debug-sse2",
+                  "Release-automatic",
+                  "Release-sse2"
+                ],
+                "evidence": {
+                  "path": "/home/dan/.codex/worktrees/phase6-eligibility-controls/orbiter-cross-platform/out/phase6-all-family-capability-matrix-audit-v1.json",
+                  "sha256": "13ae9d581d25a7f68859aa9b19b048ee61ca453cefc85f9317719a6c313d94f2",
+                  "scope": "All sixteen original structural combinations, four profiles, two passive-observer off/on repetitions; capabilities facet only"
+                }
               },
               "interactions": {
                 "result": "not-run",
@@ -964,8 +1004,18 @@
                 }
               },
               "capabilities": {
-                "result": "in-progress",
-                "passed_profiles": []
+                "result": "passed-scoped-family-facet",
+                "passed_profiles": [
+                  "Debug-automatic",
+                  "Debug-sse2",
+                  "Release-automatic",
+                  "Release-sse2"
+                ],
+                "evidence": {
+                  "path": "/home/dan/.codex/worktrees/phase6-eligibility-controls/orbiter-cross-platform/out/phase6-all-family-capability-matrix-audit-v1.json",
+                  "sha256": "13ae9d581d25a7f68859aa9b19b048ee61ca453cefc85f9317719a6c313d94f2",
+                  "scope": "All sixteen original structural combinations, four profiles, two passive-observer off/on repetitions; capabilities facet only"
+                }
               },
               "interactions": {
                 "result": "not-run",
@@ -1027,8 +1077,18 @@
                 }
               },
               "capabilities": {
-                "result": "in-progress",
-                "passed_profiles": []
+                "result": "passed-scoped-family-facet",
+                "passed_profiles": [
+                  "Debug-automatic",
+                  "Debug-sse2",
+                  "Release-automatic",
+                  "Release-sse2"
+                ],
+                "evidence": {
+                  "path": "/home/dan/.codex/worktrees/phase6-eligibility-controls/orbiter-cross-platform/out/phase6-all-family-capability-matrix-audit-v1.json",
+                  "sha256": "13ae9d581d25a7f68859aa9b19b048ee61ca453cefc85f9317719a6c313d94f2",
+                  "scope": "All sixteen original structural combinations, four profiles, two passive-observer off/on repetitions; capabilities facet only"
+                }
               },
               "interactions": {
                 "result": "not-run",
@@ -1090,8 +1150,18 @@
                 }
               },
               "capabilities": {
-                "result": "in-progress",
-                "passed_profiles": []
+                "result": "passed-scoped-family-facet",
+                "passed_profiles": [
+                  "Debug-automatic",
+                  "Debug-sse2",
+                  "Release-automatic",
+                  "Release-sse2"
+                ],
+                "evidence": {
+                  "path": "/home/dan/.codex/worktrees/phase6-eligibility-controls/orbiter-cross-platform/out/phase6-all-family-capability-matrix-audit-v1.json",
+                  "sha256": "13ae9d581d25a7f68859aa9b19b048ee61ca453cefc85f9317719a6c313d94f2",
+                  "scope": "All sixteen original structural combinations, four profiles, two passive-observer off/on repetitions; capabilities facet only"
+                }
               },
               "interactions": {
                 "result": "not-run",
@@ -1153,8 +1223,18 @@
                 }
               },
               "capabilities": {
-                "result": "in-progress",
-                "passed_profiles": []
+                "result": "passed-scoped-family-facet",
+                "passed_profiles": [
+                  "Debug-automatic",
+                  "Debug-sse2",
+                  "Release-automatic",
+                  "Release-sse2"
+                ],
+                "evidence": {
+                  "path": "/home/dan/.codex/worktrees/phase6-eligibility-controls/orbiter-cross-platform/out/phase6-all-family-capability-matrix-audit-v1.json",
+                  "sha256": "13ae9d581d25a7f68859aa9b19b048ee61ca453cefc85f9317719a6c313d94f2",
+                  "scope": "All sixteen original structural combinations, four profiles, two passive-observer off/on repetitions; capabilities facet only"
+                }
               },
               "interactions": {
                 "result": "not-run",
@@ -1216,8 +1296,18 @@
                 }
               },
               "capabilities": {
-                "result": "in-progress",
-                "passed_profiles": []
+                "result": "passed-scoped-family-facet",
+                "passed_profiles": [
+                  "Debug-automatic",
+                  "Debug-sse2",
+                  "Release-automatic",
+                  "Release-sse2"
+                ],
+                "evidence": {
+                  "path": "/home/dan/.codex/worktrees/phase6-eligibility-controls/orbiter-cross-platform/out/phase6-all-family-capability-matrix-audit-v1.json",
+                  "sha256": "13ae9d581d25a7f68859aa9b19b048ee61ca453cefc85f9317719a6c313d94f2",
+                  "scope": "All sixteen original structural combinations, four profiles, two passive-observer off/on repetitions; capabilities facet only"
+                }
               },
               "interactions": {
                 "result": "not-run",
@@ -1279,8 +1369,18 @@
                 }
               },
               "capabilities": {
-                "result": "in-progress",
-                "passed_profiles": []
+                "result": "passed-scoped-family-facet",
+                "passed_profiles": [
+                  "Debug-automatic",
+                  "Debug-sse2",
+                  "Release-automatic",
+                  "Release-sse2"
+                ],
+                "evidence": {
+                  "path": "/home/dan/.codex/worktrees/phase6-eligibility-controls/orbiter-cross-platform/out/phase6-all-family-capability-matrix-audit-v1.json",
+                  "sha256": "13ae9d581d25a7f68859aa9b19b048ee61ca453cefc85f9317719a6c313d94f2",
+                  "scope": "All sixteen original structural combinations, four profiles, two passive-observer off/on repetitions; capabilities facet only"
+                }
               },
               "interactions": {
                 "result": "not-run",
@@ -1342,8 +1442,18 @@
                 }
               },
               "capabilities": {
-                "result": "in-progress",
-                "passed_profiles": []
+                "result": "passed-scoped-family-facet",
+                "passed_profiles": [
+                  "Debug-automatic",
+                  "Debug-sse2",
+                  "Release-automatic",
+                  "Release-sse2"
+                ],
+                "evidence": {
+                  "path": "/home/dan/.codex/worktrees/phase6-eligibility-controls/orbiter-cross-platform/out/phase6-all-family-capability-matrix-audit-v1.json",
+                  "sha256": "13ae9d581d25a7f68859aa9b19b048ee61ca453cefc85f9317719a6c313d94f2",
+                  "scope": "All sixteen original structural combinations, four profiles, two passive-observer off/on repetitions; capabilities facet only"
+                }
               },
               "interactions": {
                 "result": "not-run",
@@ -1405,8 +1515,18 @@
                 }
               },
               "capabilities": {
-                "result": "in-progress",
-                "passed_profiles": []
+                "result": "passed-scoped-family-facet",
+                "passed_profiles": [
+                  "Debug-automatic",
+                  "Debug-sse2",
+                  "Release-automatic",
+                  "Release-sse2"
+                ],
+                "evidence": {
+                  "path": "/home/dan/.codex/worktrees/phase6-eligibility-controls/orbiter-cross-platform/out/phase6-all-family-capability-matrix-audit-v1.json",
+                  "sha256": "13ae9d581d25a7f68859aa9b19b048ee61ca453cefc85f9317719a6c313d94f2",
+                  "scope": "All sixteen original structural combinations, four profiles, two passive-observer off/on repetitions; capabilities facet only"
+                }
               },
               "interactions": {
                 "result": "not-run",
@@ -1462,6 +1582,36 @@
             "path": "/home/dan/.codex/worktrees/phase6-class-eligibility/orbiter-cross-platform/out/phase6-eligibility-lifetimes-Debug-automatic-canary-v1/lifetimes.json",
             "sha256": "85830368aa8dd6e685f57329c99904ed762e1164ae2b36d199fb945e379e23fb",
             "cause": "Runner requested time-zero readback after advancing simulation; actual fiftieth fixed step is 0.78125 seconds. Original failed simulator exit retained."
+          },
+          {
+            "path": "/home/dan/.codex/worktrees/phase6-capability-eligibility/orbiter-cross-platform/out/phase6-family-capabilities-Debug-automatic-v1/capabilities.json",
+            "sha256": "1c8c002a15ae7d880eb8ef8088639792967a775ce490aacb0ad5e9feeb6c7ca1",
+            "scope": "Original failed capture retained; only eight explicitly completed cases are reusable",
+            "cause": "Declared-only roster validation omitted the original Windows-generated Atlantis external tank and two SRBs in scene032."
+          },
+          {
+            "path": "/home/dan/.codex/worktrees/phase6-capability-eligibility/orbiter-cross-platform/out/phase6-family-capabilities-Debug-sse2-v1/capabilities.json",
+            "sha256": "d8ee130088979e39d239b64b35982ae6246636eb7b83ed3eb489d66fee5508a6",
+            "scope": "Original failed capture retained; only eight explicitly completed cases are reusable",
+            "cause": "Declared-only roster validation omitted the original Windows-generated Atlantis external tank and two SRBs in scene032."
+          },
+          {
+            "path": "/home/dan/.codex/worktrees/phase6-capability-eligibility/orbiter-cross-platform/out/phase6-family-capabilities-Release-automatic-v1/capabilities.json",
+            "sha256": "34a6d66181eade3379b3109650a4f5af036c0fc3c4069f1e3c055352a521d11c",
+            "scope": "Original failed capture retained; only eight explicitly completed cases are reusable",
+            "cause": "Declared-only roster validation omitted the original Windows-generated Atlantis external tank and two SRBs in scene032."
+          },
+          {
+            "path": "/home/dan/.codex/worktrees/phase6-capability-eligibility/orbiter-cross-platform/out/phase6-family-capabilities-Release-sse2-v1/capabilities.json",
+            "sha256": "d4add68c4fc534b699dda0aba69c6494ac846016533c4f8429f9a3c37271aa9b",
+            "scope": "Original failed capture retained; only eight explicitly completed cases are reusable",
+            "cause": "Declared-only roster validation omitted the original Windows-generated Atlantis external tank and two SRBs in scene032."
+          },
+          {
+            "path": "/home/dan/.codex/worktrees/phase6-eligibility-controls/orbiter-cross-platform/out/phase6-generated-capabilities-Release-automatic-v1/capabilities.json",
+            "sha256": "231964e12ae69df61532a66bba92ab6af5231cd4b07e511c1fb0b926ce4b6030",
+            "scope": "Failed actual process receipt retained; no acceptance credit",
+            "cause": "Repeat2 observer-off process exited cleanly but its initial /proc receipt had empty argv; missing identity is not reconstructed."
           }
         ],
         "family_lifetime_matrix": {
@@ -1476,14 +1626,13 @@
           "successful_presents": 33600
         },
         "remaining_facets": [
-          "capabilities",
           "interactions",
           "persistence",
           "rejection-controls"
         ],
         "lifetime_captures_terminal": true,
         "capability_controls": {
-          "result": "in-progress",
+          "result": "audited-all-family-capability-variants-and-passive-observer-controls-only",
           "original_structural_signature_count": 16,
           "expected_cases": [
             "remaining_stock_003",
@@ -1524,7 +1673,96 @@
             "Debug-sse2": "/home/dan/.codex/worktrees/phase6-capability-eligibility/orbiter-cross-platform/out/phase6-family-capabilities-Debug-sse2-v1/capabilities.json",
             "Release-automatic": "/home/dan/.codex/worktrees/phase6-capability-eligibility/orbiter-cross-platform/out/phase6-family-capabilities-Release-automatic-v1/capabilities.json",
             "Release-sse2": "/home/dan/.codex/worktrees/phase6-capability-eligibility/orbiter-cross-platform/out/phase6-family-capabilities-Release-sse2-v1/capabilities.json"
-          }
+          },
+          "stages": {
+            "Debug-automatic": [
+              {
+                "capture": "/home/dan/.codex/worktrees/phase6-capability-eligibility/orbiter-cross-platform/out/phase6-family-capabilities-Debug-automatic-v1/capabilities.json",
+                "source_owner": "/home/dan/.codex/worktrees/phase6-capability-eligibility/orbiter-cross-platform",
+                "selected_completed_cases": [
+                  "remaining_stock_003",
+                  "remaining_stock_009",
+                  "remaining_stock_013",
+                  "remaining_stock_014",
+                  "remaining_stock_017",
+                  "remaining_stock_018",
+                  "remaining_stock_022",
+                  "remaining_stock_026"
+                ]
+              },
+              {
+                "capture": "/home/dan/.codex/worktrees/phase6-eligibility-controls/orbiter-cross-platform/out/phase6-generated-capabilities-Debug-automatic-v1/capabilities.json",
+                "source_owner": "/home/dan/.codex/worktrees/phase6-eligibility-controls/orbiter-cross-platform"
+              }
+            ],
+            "Debug-sse2": [
+              {
+                "capture": "/home/dan/.codex/worktrees/phase6-capability-eligibility/orbiter-cross-platform/out/phase6-family-capabilities-Debug-sse2-v1/capabilities.json",
+                "source_owner": "/home/dan/.codex/worktrees/phase6-capability-eligibility/orbiter-cross-platform",
+                "selected_completed_cases": [
+                  "remaining_stock_003",
+                  "remaining_stock_009",
+                  "remaining_stock_013",
+                  "remaining_stock_014",
+                  "remaining_stock_017",
+                  "remaining_stock_018",
+                  "remaining_stock_022",
+                  "remaining_stock_026"
+                ]
+              },
+              {
+                "capture": "/home/dan/.codex/worktrees/phase6-eligibility-controls/orbiter-cross-platform/out/phase6-generated-capabilities-Debug-sse2-v1/capabilities.json",
+                "source_owner": "/home/dan/.codex/worktrees/phase6-eligibility-controls/orbiter-cross-platform"
+              }
+            ],
+            "Release-automatic": [
+              {
+                "capture": "/home/dan/.codex/worktrees/phase6-capability-eligibility/orbiter-cross-platform/out/phase6-family-capabilities-Release-automatic-v1/capabilities.json",
+                "source_owner": "/home/dan/.codex/worktrees/phase6-capability-eligibility/orbiter-cross-platform",
+                "selected_completed_cases": [
+                  "remaining_stock_003",
+                  "remaining_stock_009",
+                  "remaining_stock_013",
+                  "remaining_stock_014",
+                  "remaining_stock_017",
+                  "remaining_stock_018",
+                  "remaining_stock_022",
+                  "remaining_stock_026"
+                ]
+              },
+              {
+                "capture": "/home/dan/.codex/worktrees/phase6-eligibility-controls/orbiter-cross-platform/out/phase6-generated-capabilities-Release-automatic-v2/capabilities.json",
+                "source_owner": "/home/dan/.codex/worktrees/phase6-eligibility-controls/orbiter-cross-platform"
+              }
+            ],
+            "Release-sse2": [
+              {
+                "capture": "/home/dan/.codex/worktrees/phase6-capability-eligibility/orbiter-cross-platform/out/phase6-family-capabilities-Release-sse2-v1/capabilities.json",
+                "source_owner": "/home/dan/.codex/worktrees/phase6-capability-eligibility/orbiter-cross-platform",
+                "selected_completed_cases": [
+                  "remaining_stock_003",
+                  "remaining_stock_009",
+                  "remaining_stock_013",
+                  "remaining_stock_014",
+                  "remaining_stock_017",
+                  "remaining_stock_018",
+                  "remaining_stock_022",
+                  "remaining_stock_026"
+                ]
+              },
+              {
+                "capture": "/home/dan/.codex/worktrees/phase6-eligibility-controls/orbiter-cross-platform/out/phase6-generated-capabilities-Release-sse2-v1/capabilities.json",
+                "source_owner": "/home/dan/.codex/worktrees/phase6-eligibility-controls/orbiter-cross-platform"
+              }
+            ]
+          },
+          "audit": {
+            "path": "/home/dan/.codex/worktrees/phase6-eligibility-controls/orbiter-cross-platform/out/phase6-all-family-capability-matrix-audit-v1.json",
+            "sha256": "13ae9d581d25a7f68859aa9b19b048ee61ca453cefc85f9317719a6c313d94f2",
+            "scope": "All sixteen original structural combinations, four profiles, two passive-observer off/on repetitions; capabilities facet only"
+          },
+          "actual_processes": 144,
+          "successful_presents": 8640
         },
         "prepared_persistence": {
           "path": "/home/dan/.codex/worktrees/phase6-capability-eligibility/orbiter-cross-platform/out/phase6-family-persistence-plan-v1.json",

@@ -35,9 +35,11 @@ actual F5 reloads with the original docking and reciprocal payload links intact.
 The complete seven-scene, four-profile family lifetime audit also passes:
 560 unpaused worlds, 33,600 presentations and actual module unloads. This closes
 positive ABI loading, resource ownership and twenty-cycle lifetime facets for
-all eleven remaining families. Actual capability checks, interactions,
-persistence and rejection controls remain open. Normal class admission and the
-final candidate remain unchanged.
+all eleven remaining families. The independently audited capability matrix also
+passes all sixteen original structural variants across four profiles and two
+observer-off/on repetitions: 144 actual processes and 8,640 presentations.
+Interactions, persistence and rejection controls remain open. Normal class
+admission and the final candidate remain unchanged.
 The intended interim signoff is **software complete; awaiting physical-controller
 acceptance**, after all software gates and the operator walkthrough pass.
 [Closeout tools and current limits](../../Tests/Production/Closeout/README.md)

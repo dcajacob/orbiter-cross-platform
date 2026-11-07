@@ -20,8 +20,14 @@ Debug automatic canary passes. The completed seven-scene/four-profile matrix
 also passes independent audit: 28 actual simulator processes, 560 unpaused
 worlds and 33,600 presentations. Every remaining family passes positive checked
 ABI loading, resource ownership and twenty-cycle teardown facets. The central
-ledger records capability, interaction, persistence and rejection controls as
-still open for each family.
+ledger also records the independently audited capability matrix: all sixteen
+original structural variants in all four profiles and two observer-off/on
+repetitions, 144 actual processes and 8,640 presentations. Eight explicitly
+completed cases per profile are retained from the original failed captures;
+the generated-vessel scene is separately repeated with its full original
+Windows population. Original failures and the missing-argv receipt attempt
+remain failed. Interaction, persistence and rejection controls are still open
+for each family.
 These controls do not qualify interactions, persistence, normal admission or a
 full acceptance campaign. The first failed canary's capture-clock mismatch is
 preserved; the corrected runner captures its actual fiftieth fixed-step frame.

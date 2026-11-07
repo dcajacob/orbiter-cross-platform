@@ -60,6 +60,11 @@ an explicit diagnostic switch around its old wall-clock delay. Normal capture
 keeps that delay. Exact local docking comparisons and existing physical/image
 budgets remain in force. Re-read closed captures independently with
 `capabilities.py --capture PATH/capabilities.json --output FRESH.json`.
+Original generated vessels are derived from the hashed initial Windows
+population; every declared ship remains mandatory. A reader may reuse only
+explicitly named, fully completed cases from a failed capture, preserving its
+original status and failure map. The class auditor requires exact, nonduplicated
+combined coverage and all sixteen original structural signatures.
 These sixty-frame diagnostics earn capability/observer scope only. They do not
 qualify full stock parity, persistence, interactions or normal class admission.
 
