@@ -121,13 +121,13 @@ class BinaryLinks:
                     linked_input_counts=dict(self.linked_inputs), link_samples=list(self.links),
                     link_sample_limit=128, fallback=list(self.fallback))
 
-    def controls(self, provider):
-        source = Path(provider) / 'opengl32.dll'
+    def controls(self, provider, input_name='opengl32.dll'):
+        source = Path(provider) / input_name
         require(os.path.normcase(str(source.resolve())) in self.inputs, 'Pinned provider input missing')
         folder = self.output / 'local-staging-controls-v2'
         require(not folder.exists(), 'Fresh real staging controls required')
         folder.mkdir()
-        ordinary, linked = folder / 'ordinary-copy.dll', folder / 'local-link.dll'
+        ordinary, linked = folder / ('ordinary-copy'+source.suffix), folder / ('local-link'+source.suffix)
         self.original(source, ordinary)
         self.copy2(source, linked)
         checksum = self.inputs[os.path.normcase(str(source.resolve()))][1]

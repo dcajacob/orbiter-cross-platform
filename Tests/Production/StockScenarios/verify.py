@@ -34,10 +34,14 @@ def main():
     else:require(api_reference is None,'Cannot apply the corrected API policy retrospectively')
     current=corpus(a.assets,a.modules)
     require(report['scenario_count']==157 and set(report['cases'])==set(current['cases']), 'Stock corpus is incomplete')
-    if report.get('execution_protocol')=='normal-stock-capture-v3':
+    if report.get('execution_protocol') in ('normal-stock-capture-v3','normal-stock-capture-v4'):
         require(report['roster_policy']=='stock-initialization-manifest-v1' and
                 all(c['initial_ships']==current['cases'][n]['initial_ships'] for n,c in report['cases'].items()),
                 'Versioned complete stock-initialization graph differs')
+    if report.get('execution_protocol')=='normal-stock-capture-v4':
+        require(report['propagation_policy']=='original-propagators-with-pinned-stock-exit-v1' and
+                all(c.get('startup_configuration_policy') in ('original-propagators-v1','pinned-stock-exit-v1') for c in report['cases'].values()),
+                'Explicit original stock propagator policy missing')
     require(report['lock_sha256']==current['lock_sha256'],'Frozen source lock differs')
     requested=list(report['cases']) if a.diagnostic_case is None else a.diagnostic_case
     require(requested and len(requested)==len(set(requested)) and set(requested)<=set(report['cases']), 'Invalid stock audit selection')
@@ -83,7 +87,7 @@ def main():
             ('sha256_lf','sha256_raw','ships','locked_inventory_metadata_differs','inventory_ready','dependency_problems')),
             'Stock identity or dependency data differs: '+name)
         out=a.capture/case['output']
-        if report.get('execution_protocol') in ('normal-stock-capture-v2','normal-stock-capture-v3'):
+        if report.get('execution_protocol') in ('normal-stock-capture-v2','normal-stock-capture-v3','normal-stock-capture-v4'):
             receipt=json.loads((out/'process-receipt.json').read_text())
             require(receipt['terminal'] is True and receipt['cancelled'] is False and
                     type(receipt['actual_collector_pid']) is int and receipt['actual_collector_pid']>0 and

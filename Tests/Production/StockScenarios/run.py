@@ -23,6 +23,14 @@ def rows(path):
     with path.open() as stream:return list(csv.DictReader(stream))
 
 
+def configuration(pinned_exit=False):
+    body=(ROOT/'Tests/Production/NativeScene/Orbiter.cfg').read_text()
+    for line in ('PropStages = 1\n','PropStage0 = 1 1 1\n','PropSubsampling = 1\n'):
+        require(body.count(line)==1,'Legacy smoke propagator fixture differs')
+        if not pinned_exit:body=body.replace(line,'')
+    return body+'\nFPS = 0\nMenubarMode = 1\nInfobarMode = 0\n'
+
+
 def inspect(out,case,returncode,scenario=None,exit_reference=None,profile=None,api_reference=None):
     log=(out/'console.log').read_text(errors='replace')
     markers=('Lua error:','LuaCall (','Orbiter native production:','runtime error:',
@@ -39,6 +47,14 @@ def inspect(out,case,returncode,scenario=None,exit_reference=None,profile=None,a
             api_observation=api_admission.inspect(out,case,api_reference,profile,returncode)
     except (ValueError,OSError,KeyError,TypeError) as error:
         problems.append('Pinned stock exit rejected: '+str(error))
+    if 'startup_configuration_policy' in case:
+        try:
+            require(case['startup_configuration_policy']==('pinned-stock-exit-v1' if selected else 'original-propagators-v1'),
+                    'Stock startup policy differs from the specific intentional exit')
+            expected=configuration(bool(selected))+('InstrumentUpdateInterval = 0.25\n' if selected else '')
+            require((out/'staged-Orbiter.cfg').read_text()==expected,
+                    'Actual stock startup configuration overrides original propagators or differs')
+        except (ValueError,OSError) as error:problems.append('Startup configuration rejected: '+str(error))
     frames=selected['pins']['termination']['completed_frames'] if selected else 0 if api_selected else 60
     receipt_path=out/'process-receipt.json'
     if api_selected or receipt_path.exists():
@@ -69,7 +85,7 @@ def inspect(out,case,returncode,scenario=None,exit_reference=None,profile=None,a
         initial_mjd=float(states[0]['mjd']) if states else None,
         visual_mesh_records=len(meshes),
         files_sha256={name:digest(out/name) for name in ('console.log','flight-state.csv','visual-meshes.csv',
-            'graphics-lifecycle.json','native-window.json','invocation.json','process-receipt.json') if (out/name).exists()})
+            'graphics-lifecycle.json','native-window.json','invocation.json','process-receipt.json','staged-Orbiter.cfg') if (out/name).exists()})
     if 'initial_ships' in case:result['initialized_vessels']=len(expected)
     if selected:
         result['intentional_exit']=exit_observation
@@ -98,6 +114,8 @@ def main():
     for name in ('executable','assets','data','modules','planets','output','build_record','stock_exit_reference'):
         if getattr(a,name) is not None:setattr(a,name,getattr(a,name).resolve())
     report=corpus(a.assets,a.modules)
+    for name,case in report['cases'].items():
+        case['startup_configuration_policy']='pinned-stock-exit-v1' if intentional_exit.policy(name,case,a.assets) else 'original-propagators-v1'
     require(not a.case or set(a.case)<=set(report['cases']),'Unknown stock scenario selection')
     a.runtime_owner=a.runtime_owner.resolve()
     identity=intentional_exit.build_identity(a.executable,a.modules,a.build_record,a.runtime_source_commit,a.runtime_owner)
@@ -112,6 +130,7 @@ def main():
     a.output.mkdir(parents=True,exist_ok=False)
     sources=[Path(__file__),Path(__file__).with_name('inventory.py'),Path(intentional_exit.__file__),
              ROOT/'Src/Orbiter/Production/NativeApplication.cpp',
+             ROOT/'Tests/Production/NativeScene/Orbiter.cfg',
              ROOT/'Tests/Production/StockVessels/Observation.h',ROOT/'Tests/Production/StockVessels/verify_original.py',
              ROOT/'Tests/Production/StockVessels/original.py',ROOT/'Tests/Production/behavior_suite.py',
              ROOT/'Tests/Production/Cockpit/cases.json',ROOT/'Tests/Production/phase3-extraction.lock.json',
@@ -122,7 +141,8 @@ def main():
     sources.append(ROOT/'Tests/Production/Closeout/processes.py')
     report.update(status='inventory-only' if a.inventory_only else 'running',phase6_complete=False,
         scope='Unchanged complete 157-scenario corpus; initialization/smoke, not physical interaction or new Windows state/image parity',
-        backend=a.backend,engine_default_mjd_without_numeric_date=51982.5,execution_protocol='normal-stock-capture-v3',
+        backend=a.backend,engine_default_mjd_without_numeric_date=51982.5,execution_protocol='normal-stock-capture-v4',
+        propagation_policy='original-propagators-with-pinned-stock-exit-v1',
         roster_policy='stock-initialization-manifest-v1',
         runtime_owner=str(a.runtime_owner),diagnostic_only=a.case is not None,
         cases_requested=[name for name in report['cases'] if a.case is None or name in a.case],
@@ -177,8 +197,7 @@ def main():
                 variant=api_admission.stage_assets(a.assets,selected_assets)
                 (out/'api-asset-variant.json').write_text(json.dumps(variant,indent=2)+'\n')
                 (out/'saved.scn').write_bytes(api_admission.startup_contract.SAVE_SENTINEL)
-            (out/'Orbiter.cfg').write_text((ROOT/'Tests/Production/NativeScene/Orbiter.cfg').read_text()+
-                '\nFPS = 0\nMenubarMode = 1\nInfobarMode = 0\n')
+            (out/'Orbiter.cfg').write_text(configuration(bool(selected)))
             scenario=selected_assets/'Scenarios'/name
             env=None
             if selected:
@@ -187,6 +206,7 @@ def main():
                 (out/'replay.csv').write_text('tick,phase,action,value\n')
                 with (out/'Orbiter.cfg').open('a') as config:config.write('InstrumentUpdateInterval = 0.25\n')
                 env=intentional_exit.environment(probe,identity)
+            with (out/'staged-Orbiter.cfg').open('xb') as snapshot:snapshot.write((out/'Orbiter.cfg').read_bytes())
             argv=[str(a.executable)]
             for key in ('assets','data','modules','planets'):argv+=['--'+key,str(selected_assets if key=='assets' else getattr(a,key))]
             argv+=['--config',str(out/'Orbiter.cfg'),'--scenario',str(scenario),

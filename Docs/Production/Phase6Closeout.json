@@ -2571,7 +2571,14 @@
       "coverage": null,
       "diagnostic_only": null,
       "candidate_id": null,
-      "evidence": []
+      "evidence": [],
+      "qualification_progress": {
+        "early_fresh_original_writers": {
+          "path": "/home/dan/.codex/worktrees/phase6-orbit-node-qualification/orbiter-cross-platform/out/phase6-fresh-reference-early-closed-writers-audit-v1.json",
+          "sha256": "18a506a8ac9d89fc24d5da53dd233533761c81a2815477ab12a1dc1a38fd74a1",
+          "scope": "Eight already completed fresh original Windows writers: unchanged physical/camera budgets, exact clocks and save bytes, SSIM 1.0. Full campaigns and launch/process receipt audits remain open."
+        }
+      }
     },
     "normal-admission": {
       "expected": {
@@ -2754,7 +2761,7 @@
           "unchanged-intentional-exit-policy"
         ]
       },
-      "result": "in-progress",
+      "result": "failed",
       "coverage": null,
       "diagnostic_only": null,
       "candidate_id": null,
@@ -2763,6 +2770,11 @@
           "path": "/home/dan/.codex/worktrees/phase6-orbit-node-qualification/orbiter-cross-platform/out/phase6-stock-initialization-roster-qualification-v1.json",
           "sha256": "49023b06755d867b63b8ca7b32a5bdf8824af1f4f0a0e04cffae983915be4e63",
           "scope": "Versioned stock-initialization roster test correction; 152 preserved original Windows initialization graphs agree, five damaged real native graph controls rejected. Original failed attempt remains failed; no full admission credit."
+        },
+        {
+          "path": "/home/dan/.codex/worktrees/phase6-orbit-node-qualification/orbiter-cross-platform/out/phase6-final-normal-admission-v4/campaign.json",
+          "sha256": "8bda724a3e7ca35514c9189b46273c6083837572f45fcd318f4c769e053dde38",
+          "scope": "Failed broad attempt retained: legacy smoke propagation overrides drive ascent to extreme states, then Orbit MFD overflows its local label buffer. All collectors stopped; no full admission credit."
         }
       ],
       "qualification_progress": {
@@ -2773,7 +2785,12 @@
           "phase6-final-normal-admission-v2",
           "phase6-final-normal-admission-v3"
         ],
-        "note": "v1/v2 stopped in evidence preflight; v3 stopped after exact-roster equality incorrectly rejected the three normal Atlantis-created children. Application/SDK unchanged."
+        "note": "v1/v2 stopped in evidence preflight; v3 stopped after exact-roster equality incorrectly rejected the three normal Atlantis-created children. Application/SDK unchanged.",
+        "ascent_default_reproduction": {
+          "path": "/home/dan/.codex/worktrees/phase6-orbit-node-qualification/orbiter-cross-platform/out/phase6-ascent-normal-defaults-focused-v1/verification.json",
+          "sha256": "65c31a85f096ba03dd74247d675725954f44ecfbb85873442b2e6d3c303e0d54",
+          "scope": "Same C4 Release/SSE2 application, unchanged quarter-second step and scenario, only forced legacy propagator settings removed: 61 finite ticks, 60 presents, clean sanitizer exit."
+        }
       }
     },
     "named-workflows": {
@@ -3097,6 +3114,6 @@
       "note": "Physical controller hardware unavailable; virtual devices do not satisfy acceptance."
     }
   },
-  "current_blocker": "Complete finite final-candidate acceptance campaigns. Original-Windows full38 Debug/Release automatic captures are live. Normal admission is in focused validation of a proven inherited roster-test error; software gates and the hands-on walkthrough remain open.",
-  "next_exit_condition": "Pass the focused versioned normal-admission roster check, then complete all 157 entries in all four native profiles; independently audit complete final Windows/native campaigns."
+  "current_blocker": "Resolve the actual Orbit MFD label-buffer overflow and the proven legacy propagation override in the normal-stock runner, then qualify the affected final candidate. Fresh original-Windows reference captures continue unchanged.",
+  "next_exit_condition": "Focused default-propagator and display-buffer regressions pass before another full normal-admission campaign. Complete fresh Windows/native software gates afterward."
 }

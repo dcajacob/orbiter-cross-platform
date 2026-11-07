@@ -26,6 +26,7 @@ from saved_inputs import derived_case,protocol
 from saved_state import parse_saved,require
 sys.path.insert(0,str(HERE.parent/'Closeout'))
 from processes import OwnedProcess
+from LocalVM.static_binary_link_staging_v2 import BinaryLinks
 
 spec=importlib.util.spec_from_file_location('persistence_native_scene_reader',HERE.parent/'RemainingVessels/native.py')
 native=importlib.util.module_from_spec(spec);spec.loader.exec_module(native)
@@ -33,9 +34,15 @@ sha=native.sha;sha_lf=native.sha_lf
 PHASES=('stock-writer','windows-save-reload')
 
 
-def stage_asset_tree(source,target):
+class PrivateAssetCache(BinaryLinks):
+    """Link only a private cache; the canonical assets never share file records."""
+    def same_volume(self, source, target):
+        return False
+
+
+def stage_asset_tree(source,target,cache=None):
     """Retain asset file modes while permitting private configuration/evidence files."""
-    shutil.copytree(source,target,copy_function=shutil.copy2)
+    shutil.copytree(source,target,copy_function=cache.copy2 if cache else shutil.copy2)
     directories=[target,*(path for path in target.rglob('*') if path.is_dir())]
     for path in directories:
         path.chmod(stat.S_IMODE(path.stat().st_mode)|stat.S_IWUSR|stat.S_IXUSR)
@@ -122,6 +129,8 @@ def main():
                    help='Explicit observer wall pacing; zero requires equivalence qualification before broad use')
     p.add_argument('--runtime-role',choices=('diagnostic','normal'),default='diagnostic',
                    help='Compiled application role, separate from full or selected capture scope')
+    p.add_argument('--asset-staging',choices=('private-copies','private-cache-links'),default='private-copies',
+                   help='Explicit staging policy; guarded links share only private immutable cached inputs')
     p.add_argument('--case',action='append');p.add_argument('--jobs',type=int,default=1)
     a=p.parse_args();contract=protocol();config=native.settings(protocols.V2)
     require(sys.platform=='linux' and not a.output.exists() and a.jobs>0,'Native Linux, fresh output and positive concurrency required')
@@ -192,6 +201,7 @@ def main():
     paths=set(windows.source_files())|{x for x in HERE.iterdir() if x.is_file()}|{x for x in native.HERE.iterdir() if x.is_file()}
     paths.update((Path(original_audit.__file__),HERE.parent/'StockScenarios/intentional_exit.py',HERE.parent/'WaylandInput/compositor.py',
                   HERE.parent/'NativeScene/Orbiter.cfg',Path(protocols.__file__),protocols.path(protocols.V2)))
+    paths.add(HERE.parent/'Closeout/LocalVM/static_binary_link_staging_v2.py')
     sources={path.relative_to(ROOT).as_posix():sha_lf(path) for path in paths}
     for name,value in sources.items():
         body=subprocess.check_output(['git','-C',str(ROOT),'show',producer+':'+name]).replace(b'\r\n',b'\n')
@@ -199,6 +209,10 @@ def main():
         guarded[str(ROOT/name)]=sha(ROOT/name)
     require(all(sha(Path(n))==v for n,v in guarded.items()),'Owning native/Windows inputs differ before collection')
     a.output.mkdir(parents=True);probe=a.output/'remaining-vessels-probe.so'
+    asset_cache=None;staging_controls=None
+    if a.asset_staging=='private-cache-links':
+        asset_cache=PrivateAssetCache({str(path):sha(path) for path in a.assets.rglob('*') if path.is_file()},a.output)
+        staging_controls=asset_cache.controls(a.assets,'Orbiter.cfg')
     command=[identity['compiler'],'-std=c++17','-fPIC','-shared','-Wl,--no-undefined','-fsanitize=address,undefined','-fno-omit-frame-pointer',
         '-I'+str(ROOT/'Orbitersdk/include'),'-I'+str(ROOT/'Src/Orbiter'),'-I'+str(a.build/'native-sdk'),str(native.HERE/'NativeProbe.cpp'),
         '-L'+str(a.build),'-Wl,-rpath,'+str(a.build),'-lorbiter_production_vessels','-lorbiter_production_boundary','-ldl','-o',str(probe)]
@@ -222,6 +236,7 @@ def main():
         asset_files_sha256=assets,actual_original_data=original_data,independently_checked_windows_runtime=parent_runtime,
         windows_parent_producer=parent['producer_commit'] if parent else None,diagnostic_only=diagnostic,cases_requested=[c['id'] for c in cases],
         repeats=2,frames=960,cases={},failures={},native_admission_qualified=False,phase6_complete=False)
+    report['asset_staging']=dict(policy=a.asset_staging,controls=staging_controls)
     manifest=a.output/'capture.json'
     def save():manifest.write_text(json.dumps(report,indent=2)+'\n')
     save()
@@ -236,7 +251,8 @@ def main():
                     provenance=dict(protocol=contract['protocol'],phase=a.phase,original_parent_case=case,stock_input_sha256=sha(source),
                         original_scenarios_and_scripts_unchanged=True,native_admission_qualified=False,phase6_complete=False)
                 out=a.output/(case['id']+'-'+str(repeat));folders.append(out)
-                stage_asset_tree(a.assets,out)
+                stage_asset_tree(a.assets,out,asset_cache)
+                if asset_cache:require(not asset_cache.fallback,'Private-cache links unavailable; a new storage preflight is required')
                 target=out/case['scenario_entry_point']
                 stage_scenario_input(source,target,a.phase)
                 cfg=(HERE.parent/'NativeScene/Orbiter.cfg').read_text()
@@ -316,7 +332,15 @@ def main():
         save();require(complete,'Native persistence failures retained; no admission')
     except BaseException as error:
         report.update(status='failed',error=str(error));raise
-    finally:save()
+    finally:
+        try:
+            if asset_cache:asset_cache.close()
+        except BaseException as error:
+            report.update(status='failed',error='Private asset cache verification: '+str(error))
+            raise
+        finally:
+            if asset_cache:report['asset_staging']['receipt']=asset_cache.receipt()
+            save()
 
 
 if __name__=='__main__':main()

@@ -210,6 +210,7 @@ def main():
                 '--output', str(output), '--phase', phase, '--jobs', str(request['jobs_per_collector'])]
         if 'runtime_owner' in request:argv+=['--runtime-owner',request['runtime_owner']]
         if 'runtime_role' in request:argv+=['--runtime-role',request['runtime_role']]
+        if 'asset_staging' in request:argv+=['--asset-staging',request['asset_staging']]
         if 'observer_delay_ms' in request:
             require(type(request['observer_delay_ms']) is int and request['observer_delay_ms'] in (0,120),'Explicit observer pacing required')
             argv+=['--observer-delay-ms',str(request['observer_delay_ms'])]
