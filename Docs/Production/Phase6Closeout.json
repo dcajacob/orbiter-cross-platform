@@ -674,6 +674,11 @@
           "path": "/home/dan/.codex/worktrees/phase6-persistence-controls/orbiter-cross-platform/out/phase6-family-persistence-retained003-v1/status.json",
           "sha256": "6050f5d048484194c59def971f588a9e6f645055f1d8f4837ddef5b67df30811",
           "scope": "Fresh independent audit and Windows comparisons of all sixteen retained scene003 writer/reloads under their exact original selected scope; no new simulators"
+        },
+        {
+          "path": "/home/dan/.codex/worktrees/phase6-persistence-controls/orbiter-cross-platform/out/phase6-family-persistence-selected-v2/status.json",
+          "sha256": "43488fe79c9bb57b9621178cf47fbc861b692e40c5e4948d310b8bf93858832d",
+          "scope": "Failure-preserving coordinator: 32 new complete Debug writer runs pass; scene009 SSE2 reload fails exact saved RPOS; other work cancelled and partial captures remain incomplete"
         }
       ],
       "qualification_progress": {
@@ -1642,6 +1647,12 @@
             "sha256": "231964e12ae69df61532a66bba92ab6af5231cd4b07e511c1fb0b926ce4b6030",
             "scope": "Failed actual process receipt retained; no acceptance credit",
             "cause": "Repeat2 observer-off process exited cleanly but its initial /proc receipt had empty argv; missing identity is not reconstructed."
+          },
+          {
+            "path": "/home/dan/.codex/worktrees/phase6-persistence-controls/orbiter-cross-platform/out/phase6-family-persistence-selected-v2/status.json",
+            "sha256": "43488fe79c9bb57b9621178cf47fbc861b692e40c5e4948d310b8bf93858832d",
+            "scope": "Failure-preserving coordinator: 32 new complete Debug writer runs pass; scene009 SSE2 reload fails exact saved RPOS; other work cancelled and partial captures remain incomplete",
+            "cause": "Complete Windows/native saved content differs: [{\"path\": \"ships/Module2A/records/1\", \"left\": [\"RPOS\", \"1060561.786\", \"-954440.965\", \"-6582784.319\"], \"right\": [\"RPOS\", \"1060561.785\", \"-954440.965\", \"-6582784.319\"]}]"
           }
         ],
         "family_lifetime_matrix": {
@@ -1800,7 +1811,7 @@
           "scope": "Prepared existing-coordinator request: 128 new runs plus 16 separately retained runs; not launched"
         },
         "persistence_controls": {
-          "result": "in-progress",
+          "result": "failed-exact-save-serialization-comparison",
           "execution_plan": {
             "path": "/home/dan/.codex/worktrees/phase6-persistence-controls/orbiter-cross-platform/out/phase6-family-persistence-execution-plan-v2.json",
             "sha256": "65f13c97d97bf9daeee886de024caff6d911b0a6fd552b07631ebed8c57273b7",
@@ -1825,7 +1836,10 @@
             "path": "/home/dan/.codex/worktrees/phase6-persistence-controls/orbiter-cross-platform/out/phase6-family-persistence-retained003-v1/status.json",
             "sha256": "6050f5d048484194c59def971f588a9e6f645055f1d8f4837ddef5b67df30811",
             "scope": "Fresh independent audit and Windows comparisons of all sixteen retained scene003 writer/reloads under their exact original selected scope; no new simulators"
-          }
+          },
+          "completed_new_writer_runs": 32,
+          "current_blocker": "Complete Windows/native saved content differs: [{\"path\": \"ships/Module2A/records/1\", \"left\": [\"RPOS\", \"1060561.786\", \"-954440.965\", \"-6582784.319\"], \"right\": [\"RPOS\", \"1060561.785\", \"-954440.965\", \"-6582784.319\"]}]",
+          "next_exit_condition": "Trace and repair the first proven state/formatting difference in scene009 exact Windows-save reload; repeat the focused matrix before resuming remaining captures."
         }
       }
     },

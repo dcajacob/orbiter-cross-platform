@@ -103,8 +103,11 @@ def main():
             '/DNOMINMAX','/I'+str(sdk/'Orbitersdk/include'),str(compiled),
             '/Fo'+str(obj),'/Fe'+str(binary),'/link',str(sdk/'Orbitersdk/lib/Orbiter.lib'),str(sdk/'Orbitersdk/lib/Orbitersdk.lib')]
         if cfg.get('internal_headers'):
+            last=cfg.get('internal_last_tick',243)
+            require(type(last) is int and 1<=last<=960,'Explicit bounded internal observation interval required')
             command[1:1]=['/DORBITER_RELOAD_INTERNAL_OBSERVATION','/I'+str(source/'internal/Src/Orbiter'),
-                           '/I'+str(Path(cfg['directx_sdk'])/'Include')]
+                           '/I'+str(Path(cfg['directx_sdk'])/'Include'),'/DORBITER_RELOAD_INTERNAL_LAST_TICK='+str(last)]
+            report['internal_observation_ticks']=[1,last]
         if kind=='remaining-stock':command[1:1]=['/I'+str(source/'Tests/Production')]
         run('observer-build',command,work,environment)
         report['observer']=dict(binary=str(binary),sha256=sha(binary),configuration=configuration,kind=kind,

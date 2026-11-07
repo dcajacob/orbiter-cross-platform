@@ -7,6 +7,9 @@
 #include <cmath>
 #include <ostream>
 #include <stdexcept>
+#ifndef ORBITER_RELOAD_INTERNAL_LAST_TICK
+#define ORBITER_RELOAD_INTERNAL_LAST_TICK 243
+#endif
 namespace reload_internal {
 // Typed protected-member pointers expose reads only; no derived object is
 // constructed, no cast to a fabricated layout and no runtime header is changed.
@@ -58,7 +61,7 @@ inline void BodyRow(std::ostream& out,unsigned tick,double seconds,const char* n
     out<<'\n';
 }
 inline void Rows(std::ostream& out,unsigned tick,double seconds) {
-    if(tick==0 || tick>243)return;
+    if(tick==0 || tick>ORBITER_RELOAD_INTERNAL_LAST_TICK)return;
     for(unsigned index=0;index<oapiGetVesselCount();++index) {
         const auto handle=oapiGetVesselByIndex(index);auto* sdk=oapiGetVesselInterface(handle);
         auto* core=static_cast<const Vessel*>(handle);
