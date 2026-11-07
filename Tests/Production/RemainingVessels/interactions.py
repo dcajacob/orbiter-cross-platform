@@ -26,6 +26,17 @@ ENV=dict(ASAN_OPTIONS='detect_leaks=1:fast_unwind_on_malloc=0',LSAN_OPTIONS='',
          UBSAN_OPTIONS='halt_on_error=1:print_stacktrace=1',LD_PRELOAD=None)
 
 
+def schedule(flow):
+    # --save declares a destination. The original Ctrl-S dispatch must write it.
+    final=flow['frames']-8
+    require(all(int(row['tick'])<final for row in flow['replay']),
+            'Control schedule must leave the declared final Ctrl-S interval free')
+    result=list(flow['replay'])
+    for offset,key in enumerate((29,31,-31,-29)):
+        result.append(dict(tick=final+offset,phase='before',action='key',value=str(key)))
+    return sorted(result,key=lambda row:(int(row['tick']),{'start':0,'before':1,'pre':2,'after':3}[row['phase']]))
+
+
 def population(flow,declared):
     reference=flow.get('original_population')
     if reference is None:return declared
@@ -67,6 +78,14 @@ def inspect(folder,flow,expected):
             'Actual application/module/provider mapping missing')
     require(load(folder/'numerics.json')['math']==invocation['expected_actual_math'],
             'Actual interaction CPU math profile differs')
+    dispatched=schedule(flow)
+    require(invocation['dispatched_replay']==dispatched,'Exact original-control and Ctrl-S schedule differs')
+    events=rows(folder/'input-events.csv')
+    expected_keys=[(int(row['tick']),abs(int(row['value'])),int(int(row['value'])>0))
+                   for row in dispatched if row['action']=='key']
+    require([(int(row['tick']),int(row['key']),int(row['down'])) for row in events]==expected_keys and
+            any(row['tick']==str(flow['frames']-7) and row['key']=='31' and row['down']==row['lctrl']=='1'
+                for row in events),'Actual key dispatch did not consume the complete schedule and Ctrl-S')
     groups={}
     for row in rows(folder/'flight-state.csv'):
         require(None not in row and None not in row.values() and
@@ -170,7 +189,7 @@ def capture(args):
             if flow.get('gui_evidence',False):
                 (folder/'menu-evidence.enabled').touch();(folder/'ui-evidence.enabled').touch()
             with (folder/'replay.csv').open('w') as stream:
-                writer=csv.DictWriter(stream,fieldnames=('tick','phase','action','value'));writer.writeheader();writer.writerows(flow['replay'])
+                writer=csv.DictWriter(stream,fieldnames=('tick','phase','action','value'));writer.writeheader();writer.writerows(schedule(flow))
             argv=list(map(str,[executable,'--assets',assets,'--data',args.data,'--planets',args.planets,'--modules',args.build/'NativeModules',
                 '--scenario',scenario,'--config',folder/'Orbiter.cfg','--evidence',folder,'--save',folder/'saved.scn',
                 '--replay',folder/'replay.csv','--frames',flow['frames'],'--fixed-step',flow['fixed_step'],
@@ -186,7 +205,8 @@ def capture(args):
                 require(len(found)==1,'Explicit unique interaction provider required: '+name);required+=found
             required=[str(p.resolve()) for p in required]
             atomic_json(folder/'invocation.json',dict(argv=argv,flow=flow,environment=ENV,guarded_files_sha256=inputs,
-                required_mapped_files=required,expected_actual_math='amd-6121d02-'+('sse2' if identity['math_profile']=='sse2' else 'fma3')))
+                required_mapped_files=required,dispatched_replay=schedule(flow),
+                expected_actual_math='amd-6121d02-'+('sse2' if identity['math_profile']=='sse2' else 'fma3')))
             with Compositor(args.compositor_tools,folder/'compositor',1,'gl',repeat_rate=0) as display:
                 env=dict(display.environment,**{k:v for k,v in ENV.items() if v is not None},
                     LIBGL_ALWAYS_SOFTWARE='1',GALLIUM_DRIVER='llvmpipe',LP_NUM_THREADS='2',
