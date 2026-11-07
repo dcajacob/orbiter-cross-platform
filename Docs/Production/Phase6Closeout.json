@@ -590,9 +590,43 @@
         ],
         "final_candidate_required": false
       },
-      "result": "in-progress",
-      "coverage": null,
-      "diagnostic_only": true,
+      "result": "passed",
+      "coverage": {
+        "depends_on": [
+          "numerical-reload",
+          "general-api"
+        ],
+        "profiles": [
+          "Debug-automatic",
+          "Debug-sse2",
+          "Release-automatic",
+          "Release-sse2"
+        ],
+        "families": [
+          "Atlantis",
+          "Atlantis_SRB",
+          "Atlantis_Tank",
+          "Carina",
+          "Leonardo_mplm",
+          "Module2",
+          "Dragonfly",
+          "HST",
+          "LDEF",
+          "SolarSail",
+          "Quadcopter"
+        ],
+        "required": [
+          "source-abi",
+          "capabilities",
+          "interactions",
+          "persistence",
+          "resource-ownership",
+          "twenty-cycle-teardown",
+          "rejection-controls"
+        ],
+        "final_candidate_required": false
+      },
+      "diagnostic_only": false,
       "candidate_id": null,
       "evidence": [
         {
@@ -704,10 +738,15 @@
           "path": "/home/dan/.codex/worktrees/phase6-production-qualification/orbiter-cross-platform/out/phase6-one-profile-all-family-interactions-v1.json",
           "sha256": "962ebd16cab094996c3915b16597a059a3c47fd818d76b308fc3b34da73b6e5f",
           "scope": "All nine original-control flows twice on Debug/SSE2. Other three profiles remain required. No complete class, normal admission, named workflow or software gate credit."
+        },
+        {
+          "path": "/home/dan/.codex/worktrees/phase6-production-qualification/orbiter-cross-platform/out/phase6-all-family-interaction-matrix-audit-v1.json",
+          "sha256": "fa0b2b8b07f4da97a80bb4876d9e54e5cc874f0eb8aadb7533f2d96ad85fa34e",
+          "scope": "All nine original-control flows in four profiles, twice each, complete original/generated rosters, actual keys/GUI/Lua actuators, physical docking, payload mass transfer, six-joint RMS and canonical-clock launch/staging. No normal-host admission, full38, named Windows/native workflow or final-candidate credit."
         }
       ],
       "qualification_progress": {
-        "scope": "Pre-admission facets on retained source81 diagnostic packages. No normal policy changes, final candidate or complete class eligibility.",
+        "scope": "All eleven stock families satisfy every declared eligibility facet across all four profiles. Final normal-host admission and candidate acceptance remain separate gates.",
         "source_conservation": {
           "path": "/home/dan/.codex/worktrees/phase6-class-eligibility/orbiter-cross-platform/out/phase6-class-source-conservation-v1.json",
           "sha256": "2034d84d0909a0ce64b5490b817b8c72ca95c2314fa276b9b43276a20cd4faf8",
@@ -859,14 +898,17 @@
                 }
               },
               "interactions": {
-                "result": "in-progress",
+                "result": "passed-scoped-family-facet",
                 "passed_profiles": [
-                  "Debug-sse2"
+                  "Debug-automatic",
+                  "Debug-sse2",
+                  "Release-automatic",
+                  "Release-sse2"
                 ],
                 "evidence": {
-                  "path": "/home/dan/.codex/worktrees/phase6-production-qualification/orbiter-cross-platform/out/phase6-one-profile-all-family-interactions-v1.json",
-                  "sha256": "962ebd16cab094996c3915b16597a059a3c47fd818d76b308fc3b34da73b6e5f",
-                  "scope": "All nine original-control flows twice on Debug/SSE2. Other three profiles remain required. No complete class, normal admission, named workflow or software gate credit."
+                  "path": "/home/dan/.codex/worktrees/phase6-production-qualification/orbiter-cross-platform/out/phase6-all-family-interaction-matrix-audit-v1.json",
+                  "sha256": "fa0b2b8b07f4da97a80bb4876d9e54e5cc874f0eb8aadb7533f2d96ad85fa34e",
+                  "scope": "All nine original-control flows in four profiles, twice each, complete original/generated rosters, actual keys/GUI/Lua actuators, physical docking, payload mass transfer, six-joint RMS and canonical-clock launch/staging. No normal-host admission, full38, named Windows/native workflow or final-candidate credit."
                 }
               },
               "persistence": {
@@ -959,14 +1001,17 @@
                 }
               },
               "interactions": {
-                "result": "in-progress",
+                "result": "passed-scoped-family-facet",
                 "passed_profiles": [
-                  "Debug-sse2"
+                  "Debug-automatic",
+                  "Debug-sse2",
+                  "Release-automatic",
+                  "Release-sse2"
                 ],
                 "evidence": {
-                  "path": "/home/dan/.codex/worktrees/phase6-production-qualification/orbiter-cross-platform/out/phase6-one-profile-all-family-interactions-v1.json",
-                  "sha256": "962ebd16cab094996c3915b16597a059a3c47fd818d76b308fc3b34da73b6e5f",
-                  "scope": "All nine original-control flows twice on Debug/SSE2. Other three profiles remain required. No complete class, normal admission, named workflow or software gate credit."
+                  "path": "/home/dan/.codex/worktrees/phase6-production-qualification/orbiter-cross-platform/out/phase6-all-family-interaction-matrix-audit-v1.json",
+                  "sha256": "fa0b2b8b07f4da97a80bb4876d9e54e5cc874f0eb8aadb7533f2d96ad85fa34e",
+                  "scope": "All nine original-control flows in four profiles, twice each, complete original/generated rosters, actual keys/GUI/Lua actuators, physical docking, payload mass transfer, six-joint RMS and canonical-clock launch/staging. No normal-host admission, full38, named Windows/native workflow or final-candidate credit."
                 }
               },
               "persistence": {
@@ -1059,14 +1104,17 @@
                 }
               },
               "interactions": {
-                "result": "in-progress",
+                "result": "passed-scoped-family-facet",
                 "passed_profiles": [
-                  "Debug-sse2"
+                  "Debug-automatic",
+                  "Debug-sse2",
+                  "Release-automatic",
+                  "Release-sse2"
                 ],
                 "evidence": {
-                  "path": "/home/dan/.codex/worktrees/phase6-production-qualification/orbiter-cross-platform/out/phase6-one-profile-all-family-interactions-v1.json",
-                  "sha256": "962ebd16cab094996c3915b16597a059a3c47fd818d76b308fc3b34da73b6e5f",
-                  "scope": "All nine original-control flows twice on Debug/SSE2. Other three profiles remain required. No complete class, normal admission, named workflow or software gate credit."
+                  "path": "/home/dan/.codex/worktrees/phase6-production-qualification/orbiter-cross-platform/out/phase6-all-family-interaction-matrix-audit-v1.json",
+                  "sha256": "fa0b2b8b07f4da97a80bb4876d9e54e5cc874f0eb8aadb7533f2d96ad85fa34e",
+                  "scope": "All nine original-control flows in four profiles, twice each, complete original/generated rosters, actual keys/GUI/Lua actuators, physical docking, payload mass transfer, six-joint RMS and canonical-clock launch/staging. No normal-host admission, full38, named Windows/native workflow or final-candidate credit."
                 }
               },
               "persistence": {
@@ -1159,14 +1207,17 @@
                 }
               },
               "interactions": {
-                "result": "in-progress",
+                "result": "passed-scoped-family-facet",
                 "passed_profiles": [
-                  "Debug-sse2"
+                  "Debug-automatic",
+                  "Debug-sse2",
+                  "Release-automatic",
+                  "Release-sse2"
                 ],
                 "evidence": {
-                  "path": "/home/dan/.codex/worktrees/phase6-production-qualification/orbiter-cross-platform/out/phase6-one-profile-all-family-interactions-v1.json",
-                  "sha256": "962ebd16cab094996c3915b16597a059a3c47fd818d76b308fc3b34da73b6e5f",
-                  "scope": "All nine original-control flows twice on Debug/SSE2. Other three profiles remain required. No complete class, normal admission, named workflow or software gate credit."
+                  "path": "/home/dan/.codex/worktrees/phase6-production-qualification/orbiter-cross-platform/out/phase6-all-family-interaction-matrix-audit-v1.json",
+                  "sha256": "fa0b2b8b07f4da97a80bb4876d9e54e5cc874f0eb8aadb7533f2d96ad85fa34e",
+                  "scope": "All nine original-control flows in four profiles, twice each, complete original/generated rosters, actual keys/GUI/Lua actuators, physical docking, payload mass transfer, six-joint RMS and canonical-clock launch/staging. No normal-host admission, full38, named Windows/native workflow or final-candidate credit."
                 }
               },
               "persistence": {
@@ -1259,14 +1310,17 @@
                 }
               },
               "interactions": {
-                "result": "in-progress",
+                "result": "passed-scoped-family-facet",
                 "passed_profiles": [
-                  "Debug-sse2"
+                  "Debug-automatic",
+                  "Debug-sse2",
+                  "Release-automatic",
+                  "Release-sse2"
                 ],
                 "evidence": {
-                  "path": "/home/dan/.codex/worktrees/phase6-production-qualification/orbiter-cross-platform/out/phase6-one-profile-all-family-interactions-v1.json",
-                  "sha256": "962ebd16cab094996c3915b16597a059a3c47fd818d76b308fc3b34da73b6e5f",
-                  "scope": "All nine original-control flows twice on Debug/SSE2. Other three profiles remain required. No complete class, normal admission, named workflow or software gate credit."
+                  "path": "/home/dan/.codex/worktrees/phase6-production-qualification/orbiter-cross-platform/out/phase6-all-family-interaction-matrix-audit-v1.json",
+                  "sha256": "fa0b2b8b07f4da97a80bb4876d9e54e5cc874f0eb8aadb7533f2d96ad85fa34e",
+                  "scope": "All nine original-control flows in four profiles, twice each, complete original/generated rosters, actual keys/GUI/Lua actuators, physical docking, payload mass transfer, six-joint RMS and canonical-clock launch/staging. No normal-host admission, full38, named Windows/native workflow or final-candidate credit."
                 }
               },
               "persistence": {
@@ -1359,14 +1413,17 @@
                 }
               },
               "interactions": {
-                "result": "in-progress",
+                "result": "passed-scoped-family-facet",
                 "passed_profiles": [
-                  "Debug-sse2"
+                  "Debug-automatic",
+                  "Debug-sse2",
+                  "Release-automatic",
+                  "Release-sse2"
                 ],
                 "evidence": {
-                  "path": "/home/dan/.codex/worktrees/phase6-production-qualification/orbiter-cross-platform/out/phase6-one-profile-all-family-interactions-v1.json",
-                  "sha256": "962ebd16cab094996c3915b16597a059a3c47fd818d76b308fc3b34da73b6e5f",
-                  "scope": "All nine original-control flows twice on Debug/SSE2. Other three profiles remain required. No complete class, normal admission, named workflow or software gate credit."
+                  "path": "/home/dan/.codex/worktrees/phase6-production-qualification/orbiter-cross-platform/out/phase6-all-family-interaction-matrix-audit-v1.json",
+                  "sha256": "fa0b2b8b07f4da97a80bb4876d9e54e5cc874f0eb8aadb7533f2d96ad85fa34e",
+                  "scope": "All nine original-control flows in four profiles, twice each, complete original/generated rosters, actual keys/GUI/Lua actuators, physical docking, payload mass transfer, six-joint RMS and canonical-clock launch/staging. No normal-host admission, full38, named Windows/native workflow or final-candidate credit."
                 }
               },
               "persistence": {
@@ -1459,14 +1516,17 @@
                 }
               },
               "interactions": {
-                "result": "in-progress",
+                "result": "passed-scoped-family-facet",
                 "passed_profiles": [
-                  "Debug-sse2"
+                  "Debug-automatic",
+                  "Debug-sse2",
+                  "Release-automatic",
+                  "Release-sse2"
                 ],
                 "evidence": {
-                  "path": "/home/dan/.codex/worktrees/phase6-production-qualification/orbiter-cross-platform/out/phase6-one-profile-all-family-interactions-v1.json",
-                  "sha256": "962ebd16cab094996c3915b16597a059a3c47fd818d76b308fc3b34da73b6e5f",
-                  "scope": "All nine original-control flows twice on Debug/SSE2. Other three profiles remain required. No complete class, normal admission, named workflow or software gate credit."
+                  "path": "/home/dan/.codex/worktrees/phase6-production-qualification/orbiter-cross-platform/out/phase6-all-family-interaction-matrix-audit-v1.json",
+                  "sha256": "fa0b2b8b07f4da97a80bb4876d9e54e5cc874f0eb8aadb7533f2d96ad85fa34e",
+                  "scope": "All nine original-control flows in four profiles, twice each, complete original/generated rosters, actual keys/GUI/Lua actuators, physical docking, payload mass transfer, six-joint RMS and canonical-clock launch/staging. No normal-host admission, full38, named Windows/native workflow or final-candidate credit."
                 }
               },
               "persistence": {
@@ -1559,14 +1619,17 @@
                 }
               },
               "interactions": {
-                "result": "in-progress",
+                "result": "passed-scoped-family-facet",
                 "passed_profiles": [
-                  "Debug-sse2"
+                  "Debug-automatic",
+                  "Debug-sse2",
+                  "Release-automatic",
+                  "Release-sse2"
                 ],
                 "evidence": {
-                  "path": "/home/dan/.codex/worktrees/phase6-production-qualification/orbiter-cross-platform/out/phase6-one-profile-all-family-interactions-v1.json",
-                  "sha256": "962ebd16cab094996c3915b16597a059a3c47fd818d76b308fc3b34da73b6e5f",
-                  "scope": "All nine original-control flows twice on Debug/SSE2. Other three profiles remain required. No complete class, normal admission, named workflow or software gate credit."
+                  "path": "/home/dan/.codex/worktrees/phase6-production-qualification/orbiter-cross-platform/out/phase6-all-family-interaction-matrix-audit-v1.json",
+                  "sha256": "fa0b2b8b07f4da97a80bb4876d9e54e5cc874f0eb8aadb7533f2d96ad85fa34e",
+                  "scope": "All nine original-control flows in four profiles, twice each, complete original/generated rosters, actual keys/GUI/Lua actuators, physical docking, payload mass transfer, six-joint RMS and canonical-clock launch/staging. No normal-host admission, full38, named Windows/native workflow or final-candidate credit."
                 }
               },
               "persistence": {
@@ -1659,14 +1722,17 @@
                 }
               },
               "interactions": {
-                "result": "in-progress",
+                "result": "passed-scoped-family-facet",
                 "passed_profiles": [
-                  "Debug-sse2"
+                  "Debug-automatic",
+                  "Debug-sse2",
+                  "Release-automatic",
+                  "Release-sse2"
                 ],
                 "evidence": {
-                  "path": "/home/dan/.codex/worktrees/phase6-production-qualification/orbiter-cross-platform/out/phase6-one-profile-all-family-interactions-v1.json",
-                  "sha256": "962ebd16cab094996c3915b16597a059a3c47fd818d76b308fc3b34da73b6e5f",
-                  "scope": "All nine original-control flows twice on Debug/SSE2. Other three profiles remain required. No complete class, normal admission, named workflow or software gate credit."
+                  "path": "/home/dan/.codex/worktrees/phase6-production-qualification/orbiter-cross-platform/out/phase6-all-family-interaction-matrix-audit-v1.json",
+                  "sha256": "fa0b2b8b07f4da97a80bb4876d9e54e5cc874f0eb8aadb7533f2d96ad85fa34e",
+                  "scope": "All nine original-control flows in four profiles, twice each, complete original/generated rosters, actual keys/GUI/Lua actuators, physical docking, payload mass transfer, six-joint RMS and canonical-clock launch/staging. No normal-host admission, full38, named Windows/native workflow or final-candidate credit."
                 }
               },
               "persistence": {
@@ -1759,14 +1825,17 @@
                 }
               },
               "interactions": {
-                "result": "in-progress",
+                "result": "passed-scoped-family-facet",
                 "passed_profiles": [
-                  "Debug-sse2"
+                  "Debug-automatic",
+                  "Debug-sse2",
+                  "Release-automatic",
+                  "Release-sse2"
                 ],
                 "evidence": {
-                  "path": "/home/dan/.codex/worktrees/phase6-production-qualification/orbiter-cross-platform/out/phase6-one-profile-all-family-interactions-v1.json",
-                  "sha256": "962ebd16cab094996c3915b16597a059a3c47fd818d76b308fc3b34da73b6e5f",
-                  "scope": "All nine original-control flows twice on Debug/SSE2. Other three profiles remain required. No complete class, normal admission, named workflow or software gate credit."
+                  "path": "/home/dan/.codex/worktrees/phase6-production-qualification/orbiter-cross-platform/out/phase6-all-family-interaction-matrix-audit-v1.json",
+                  "sha256": "fa0b2b8b07f4da97a80bb4876d9e54e5cc874f0eb8aadb7533f2d96ad85fa34e",
+                  "scope": "All nine original-control flows in four profiles, twice each, complete original/generated rosters, actual keys/GUI/Lua actuators, physical docking, payload mass transfer, six-joint RMS and canonical-clock launch/staging. No normal-host admission, full38, named Windows/native workflow or final-candidate credit."
                 }
               },
               "persistence": {
@@ -1859,14 +1928,17 @@
                 }
               },
               "interactions": {
-                "result": "in-progress",
+                "result": "passed-scoped-family-facet",
                 "passed_profiles": [
-                  "Debug-sse2"
+                  "Debug-automatic",
+                  "Debug-sse2",
+                  "Release-automatic",
+                  "Release-sse2"
                 ],
                 "evidence": {
-                  "path": "/home/dan/.codex/worktrees/phase6-production-qualification/orbiter-cross-platform/out/phase6-one-profile-all-family-interactions-v1.json",
-                  "sha256": "962ebd16cab094996c3915b16597a059a3c47fd818d76b308fc3b34da73b6e5f",
-                  "scope": "All nine original-control flows twice on Debug/SSE2. Other three profiles remain required. No complete class, normal admission, named workflow or software gate credit."
+                  "path": "/home/dan/.codex/worktrees/phase6-production-qualification/orbiter-cross-platform/out/phase6-all-family-interaction-matrix-audit-v1.json",
+                  "sha256": "fa0b2b8b07f4da97a80bb4876d9e54e5cc874f0eb8aadb7533f2d96ad85fa34e",
+                  "scope": "All nine original-control flows in four profiles, twice each, complete original/generated rosters, actual keys/GUI/Lua actuators, physical docking, payload mass transfer, six-joint RMS and canonical-clock launch/staging. No normal-host admission, full38, named Windows/native workflow or final-candidate credit."
                 }
               },
               "persistence": {
@@ -1988,9 +2060,7 @@
           "actual_simulator_processes": 28,
           "successful_presents": 33600
         },
-        "remaining_facets": [
-          "interactions"
-        ],
+        "remaining_facets": [],
         "lifetime_captures_terminal": true,
         "capability_controls": {
           "result": "audited-all-family-capability-variants-and-passive-observer-controls-only",
@@ -2221,7 +2291,7 @@
           }
         },
         "interaction_controls": {
-          "result": "in-progress-fixed-72-run-matrix",
+          "result": "passed-all-four-profile-original-control-interactions",
           "source_owner": "/home/dan/.codex/worktrees/phase6-candidate-freeze/orbiter-cross-platform",
           "canary_profile": "Debug-sse2",
           "plans": [
@@ -2254,8 +2324,8 @@
           "corrected_capture": "/home/dan/.codex/worktrees/phase6-final-stock-controls/orbiter-cross-platform/out/phase6-hst-save-dispatch-Debug-sse2-v1/interactions.json",
           "expected_flows": 9,
           "expected_runs": 72,
-          "completed_focused_runs": 18,
-          "remaining_new_runs": 54,
+          "completed_focused_runs": 72,
+          "remaining_new_runs": 0,
           "request": {
             "path": "/home/dan/.codex/worktrees/phase6-candidate-freeze/orbiter-cross-platform/out/phase6-all-family-interactions-request-v2.json",
             "sha256": "c455165d4dd9b5d9e3bc6fa90378b793ae51985766f6e99ab5f9f1b8ff6e7a5d"
@@ -2272,9 +2342,27 @@
             "scope": "Completed capture reuse, missing profile/flow rejection and actual cancellation. Zero new simulator launches."
           },
           "canonical_launch_plan": "/home/dan/.codex/worktrees/phase6-candidate-freeze/orbiter-cross-platform/Tests/Production/RemainingVessels/Interactions/atlantis-launch-staging-v2.json",
-          "preserved_coarse_launch_failure": "/home/dan/.codex/worktrees/phase6-candidate-freeze/orbiter-cross-platform/out/phase6-launch-staging-Debug-sse2-v1/interactions.json"
+          "preserved_coarse_launch_failure": "/home/dan/.codex/worktrees/phase6-candidate-freeze/orbiter-cross-platform/out/phase6-launch-staging-Debug-sse2-v1/interactions.json",
+          "complete_audit": {
+            "path": "/home/dan/.codex/worktrees/phase6-production-qualification/orbiter-cross-platform/out/phase6-all-family-interaction-matrix-audit-v1.json",
+            "sha256": "fa0b2b8b07f4da97a80bb4876d9e54e5cc874f0eb8aadb7533f2d96ad85fa34e",
+            "scope": "All nine original-control flows in four profiles, twice each, complete original/generated rosters, actual keys/GUI/Lua actuators, physical docking, payload mass transfer, six-joint RMS and canonical-clock launch/staging. No normal-host admission, full38, named Windows/native workflow or final-candidate credit."
+          },
+          "raw_audits": "/home/dan/.codex/worktrees/phase6-production-qualification/orbiter-cross-platform/out/phase6-all-family-interaction-matrix-audit-v1-raw-audits"
+        },
+        "normal_host_policy": {
+          "result": "enabled-in-source-awaiting-final-normal-host-qualification",
+          "structural_combinations": 16,
+          "declared_module_identity_required": true,
+          "source": {
+            "path": "/home/dan/.codex/worktrees/phase6-production-qualification/orbiter-cross-platform/Src/Orbiter/Production/NativeApplication.cpp",
+            "sha256": "41f00c7343faf7952099cf9a7c15beecf0b7877d6867ae8ec9a09578592e55c0"
+          },
+          "public_sdk_or_abi_changed": false,
+          "normal_admission_gate_passed": false
         }
-      }
+      },
+      "note": "All eleven families, all seven eligibility facets, four profiles. Per-facet source/binary identities and failures are retained. The final source enables only sixteen qualified structural combinations and their declared modules. Matching final binaries, all 157 normal entry points, fresh full38/workflow qualification and operator acceptance remain separate gates."
     },
     "candidate-freeze": {
       "expected": {
@@ -2833,6 +2921,6 @@
       "note": "Physical controller hardware unavailable; virtual devices do not satisfy acceptance."
     }
   },
-  "current_blocker": "The remaining 54 class interaction runs in Debug/automatic and both Release math profiles. All 18 Debug/SSE2 control runs independently pass, including real docking, six-joint RMS, three payload releases and canonical-clock launch/staging. Six other class facets and the complete 144-run persistence matrix are closed.",
-  "next_exit_condition": "All 72 original-control interaction runs independently pass, then admit only the qualified class/capability combinations and freeze the final candidate."
+  "current_blocker": "Matching final-candidate Windows Debug/Release and four native builds, followed by the remaining software acceptance campaigns. All seven class facets are closed; final normal-host admission remains unqualified.",
+  "next_exit_condition": "Build and seal the matching final candidate, verify the normal-host capture path, then run the complete fixed qualification matrices with fresh Windows reference receipts."
 }

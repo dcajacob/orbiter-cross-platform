@@ -118,6 +118,49 @@ bool SupportedStockStation(const VESSEL& vessel,const char* type) {
             pmi.x==26000 && pmi.y==26000 && pmi.z==52800 && cs.x==20 && cs.y==20 && cs.z==20);
 }
 #ifdef ORBITER_NATIVE_COCKPIT
+bool SupportedRemainingStock(const Vessel& body,const VESSEL& vessel,const char* type) {
+    struct Capabilities {
+        const char* type;
+        const char* module;
+        int version;
+        bool focus;
+        double size;
+        unsigned meshes,thrusters,propellants,docks,parents,children;
+        bool transponder;
+    };
+    // The sixteen initial structural combinations observed in the preserved
+    // original Windows cohort. Diagnostic admission ranges are not reused.
+    static constexpr Capabilities qualified[]={
+        {"Atlantis","Atlantis",3,true,19.6,3,19,1,1,0,2,false},
+        {"Atlantis","Atlantis",3,true,19.6,3,19,1,2,0,2,false},
+        {"Atlantis","Atlantis",3,true,19.6,4,19,1,1,0,2,false},
+        {"Atlantis","Atlantis",3,true,19.6,4,19,1,2,0,2,false},
+        {"Atlantis_SRB","Atlantis_SRB",1,false,23,1,2,1,1,0,0,false},
+        {"Atlantis_SRB","Atlantis_SRB",1,false,51.397999999999996,1,2,1,1,0,0,false},
+        {"Atlantis_SRB","Atlantis_SRB",1,false,51.399,1,2,1,1,0,0,false},
+        {"Atlantis_Tank","Atlantis_Tank",1,false,24,1,21,1,3,0,0,false},
+        {"Carina",nullptr,0,true,5,1,21,1,0,2,0,false},
+        {"Dragonfly","Dragonfly",1,true,4,1,25,12,1,0,0,false},
+        {"HST","HST",2,true,7.52,1,0,0,0,3,0,false},
+        {"LDEF",nullptr,0,true,12,1,18,1,0,2,1,true},
+        {"Leonardo_mplm",nullptr,0,true,6,1,0,0,1,2,0,true},
+        {"Module2",nullptr,0,true,2.5,1,0,0,6,0,0,false},
+        {"Quadcopter","Quadcopter",3,true,.3,1,1,1,0,0,0,false},
+        {"SolarSail","SolarSail",2,true,1000,1,0,0,1,0,0,false}
+    };
+    const char* module=NativeVesselModuleName(body);
+    for(const auto& caps:qualified) {
+        if(CompareText(type,caps.type)!=0 || (caps.module?
+           (!module || CompareText(module,caps.module)!=0):module!=nullptr))continue;
+        if(vessel.Version()==caps.version && vessel.GetEnableFocus()==caps.focus &&
+           vessel.GetSize()==caps.size && vessel.GetMeshCount()==caps.meshes &&
+           vessel.GetThrusterCount()==caps.thrusters && vessel.GetPropellantCount()==caps.propellants &&
+           vessel.DockCount()==caps.docks && vessel.AttachmentCount(true)==caps.parents &&
+           vessel.AttachmentCount(false)==caps.children && bool(vessel.GetTransponder())==caps.transponder)
+            return true;
+    }
+    return false;
+}
 bool SupportedStockShuttleA(const VESSEL& vessel,const char* type) {
     // Initial capabilities observed in all four preserved Windows profiles.
     // Declared modules still have to load through the checked native factory.
@@ -872,6 +915,7 @@ struct Runtime final:BodyServices,RigidBodyServices,SurfaceServices,NavigationSe
                 vessel->GetThrusterCount()==(scram ? 23 : 21) && vessel->GetPropellantCount()==(scram ? 3 : 2))
                 continue;
             if(SupportedStockShuttleA(*vessel,type))continue;
+            if(SupportedRemainingStock(*body,*vessel,type))continue;
 #if defined(ORBITER_ATLANTIS_DIAGNOSTIC) || defined(ORBITER_REMAINING_STOCK_DIAGNOSTIC)
             if(SupportedAtlantisDiagnostic(*vessel,type))continue;
 #endif

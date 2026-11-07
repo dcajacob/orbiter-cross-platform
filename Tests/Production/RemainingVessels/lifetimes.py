@@ -179,9 +179,12 @@ def prepare(args, extra_sources=()):
     identity = build_identity(args.build / 'orbiter-production', args.build / 'NativeModules',
                               args.build_record, build['source_base'], args.owner)
     require(identity['sanitizer_linked'], 'Unsuppressed ASan/UBSan/LSan package required')
-    executable = args.build / 'production_remaining_stock_diagnostic'
-    require(build['candidate_runtime_files_sha256'][executable.relative_to(args.owner).as_posix()]
-            == sha(executable), 'Actual diagnostic executable differs')
+    role = getattr(args, 'runtime_role', 'diagnostic')
+    require(role in ('diagnostic', 'normal'), 'Explicit actual native host role required')
+    executable = args.build / ('orbiter-production' if role == 'normal' else 'production_remaining_stock_diagnostic')
+    files = build['runtime_files_sha256' if role == 'normal' else 'candidate_runtime_files_sha256']
+    require(files[executable.relative_to(args.owner).as_posix()] == sha(executable),
+            'Actual declared native executable differs')
     guards = {}
     for group in ('source_sha256_lf', 'dependency_sha256_lf'):
         for name, value in build[group].items():

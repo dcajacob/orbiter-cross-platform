@@ -80,11 +80,20 @@ def audit(path):
             'Incomplete family/loader rejection coverage')
     actual={v['id']:inspect_case(path.parent/v['id'],v) for v in expected}
     require(actual==report['controls'],'Recomputed negative runtime observation differs')
-    return dict(status='audited-negative-loader-and-class-controls-only',
+    if 'runtime_role' in report:
+        role=report['runtime_role'];executable=report['runtime_executable']
+        require(role in ('diagnostic','normal') and Path(executable).name==
+                ('orbiter-production' if role=='normal' else 'production_remaining_stock_diagnostic') and
+                report['guarded_files_sha256'].get(executable)==sha(executable) and
+                all(load(path.parent/v['id']/'invocation.json')['argv'][0]==executable for v in expected),
+                'Actual rejection host role/executable differs')
+    result=dict(status='audited-negative-loader-and-class-controls-only',
                 capture_sha256=sha(path),runtime_identity=report['runtime_identity'],
                 families=config['required_classes'],actual_processes=len(actual),
                 controls=actual,owning_bytes_unchanged=True,sanitizer_suppressions=False,
                 diagnostic_only=True,native_admission_qualified=False,phase6_complete=False)
+    if 'runtime_role' in report:result['runtime_role']=report['runtime_role']
+    return result
 
 
 def capture(args):
@@ -100,6 +109,7 @@ def capture(args):
                 guarded_files_sha256=guards,cases_requested=[c['id'] for c in cases],
                 controls_requested=expected,controls={},failures={},diagnostic_only=True,
                 native_admission_qualified=False,phase6_complete=False)
+    report.update(runtime_role=getattr(args,'runtime_role','diagnostic'),runtime_executable=str(executable))
     manifest=args.output/'rejections.json';atomic_json(manifest,report)
     for i in range(len(META)):
         argv=[identity['compiler'],'-std=c++17','-shared','-fPIC','-Wl,--no-undefined',

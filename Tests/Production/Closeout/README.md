@@ -50,11 +50,12 @@ dialog calibration earns no family acceptance. These schedules remain pending
 until their actual captures and independent readers pass; they neither admit
 classes nor replace the named Windows/native workflows.
 
-Final `RemainingVessels/build_native.py --include-unit-tests` packages also build
-the existing CTest registrations and retain the actual command listing and
-binary hashes. This is discovery, not execution or a core-gate pass. Portable,
-upstream Catch and standalone fixture totals still require their own actual
-registrations and execution; source-file counts are not test totals.
+Final `RemainingVessels/build_native.py --include-unit-tests --catch-source PATH`
+packages build the existing CTest targets and unchanged upstream C++/Lua unit
+bodies, retaining their actual command listings, fixture inputs and binary
+hashes. This records registration without claiming execution or a core-gate
+pass. Portable tests, runtime Catch case discovery and standalone fixtures still
+require execution; source-file counts are not test totals.
 
 `run_native.py` replaces the local ad hoc persistence coordinators. Its JSON
 request names the owning checkout, immutable collector and runtime commits,

@@ -1,5 +1,12 @@
 # Current Windows local regression runner
 
+`build.py --request PATH` consolidates the historical machine-specific build
+scripts. Its versioned request declares the local toolchain, seed repository,
+bundle, offline dependencies and fresh build/export roots. It builds both
+configurations in a new source checkout, records the actual registered CTest
+inventory and results, and preserves existing source/package owners. Build and
+unit-test success does not establish simulator runtime acceptance.
+
 These are the exact source-bound runner bytes used for the fresh local Windows
 Debug/Release application/SDK/client qualification at `f3e86add`. Configuration
 comes from a separately hashed request. The worker invokes the existing ordinary

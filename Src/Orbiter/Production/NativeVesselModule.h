@@ -5,6 +5,7 @@
 #include "ResourceResolver.h"
 #include "NativeVesselAPI.h"
 #include <cstdint>
+class Vessel;
 namespace orbiter::native {
 struct VesselInit {
     std::uint32_t size;
@@ -21,5 +22,7 @@ struct VesselInstance {
 }
 namespace orbiter::production {
 const ResourceResolver* BindNativeVesselModuleResources(const ResourceResolver*);
+// Internal admission metadata; configuration-only vessels return nullptr.
+const char* NativeVesselModuleName(const Vessel&) noexcept;
 }
 #endif

@@ -16,8 +16,8 @@ narrower deliveries than the stock release.
 
 [Phase6Closeout.json](Phase6Closeout.json) is the finite closeout ledger. It
 preserves checkpoint `0842893b`, exact acceptance scopes and evidence hashes.
-Three preparatory gates are closed: runner controls, the focused numerical
-repair and the corrected API test. Final software acceptance gates remain
+Four preparatory gates are closed: runner controls, the focused numerical
+repair, the corrected API test and remaining-class eligibility. Final software acceptance gates remain
 open. The scene003 reload failure was traced to native automatic mode using an
 SSE2-only `atan2` binding. Repair `81dcc014` passes all sixteen focused native
 writer/reload runs across four profiles and two repetitions, with unchanged
@@ -26,10 +26,10 @@ profiles, including normal-host startup-exit checks and rejection controls.
 The matching current-Windows scene003 matrix also passes all sixteen runs and
 independent complete comparisons. Restored archives and verified duplicate
 reclamation preserve the retained evidence. A separately verified 64 GiB local
-qualification volume provides the declared 8 GiB campaign reserve. Remaining class
-eligibility, candidate freeze, full campaigns and operator acceptance are open.
+qualification volume provides the declared 8 GiB campaign reserve. Candidate
+freeze, full campaigns and operator acceptance are open.
 Physical-controller acceptance remains blocked.
-Class eligibility is in progress on retained source-`81dcc014` packages. Fresh
+Class eligibility retains its declared source/binary identities for each facet. Fresh
 paused attachment controls pass all four profiles: 80 complete worlds and 76
 actual F5 reloads with the original docking and reciprocal payload links intact.
 The complete seven-scene, four-profile family lifetime audit also passes:
@@ -38,8 +38,13 @@ positive ABI loading, resource ownership and twenty-cycle lifetime facets for
 all eleven remaining families. The independently audited capability matrix also
 passes all sixteen original structural variants across four profiles and two
 observer-off/on repetitions: 144 actual processes and 8,640 presentations.
-Interactions, persistence and rejection controls remain open. Normal class
-admission and the final candidate remain unchanged.
+The independent persistence audit passes all 144 writer/exact-Windows-save
+reload runs, and 180 negative processes pass the rejection controls. The final
+interaction audit passes all 72 original-control runs and 56,192 presentations.
+All seven facets are closed for all eleven families. The final-candidate source
+enables the exact sixteen qualified structural combinations and declared
+modules; matching binaries and the complete 157-entry normal-admission matrix
+remain required.
 The intended interim signoff is **software complete; awaiting physical-controller
 acceptance**, after all software gates and the operator walkthrough pass.
 [Closeout tools and current limits](../../Tests/Production/Closeout/README.md)

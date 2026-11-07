@@ -397,6 +397,7 @@ def inspect_interaction_matrix(path,output):
         plans[item['id']]=found[0]
     cells={p+'/'+f for p in expected['profiles'] for f in required}
     owner=Path(request['owner']);runner=owner/'Tests/Production/Closeout/run_native.py'
+    require(owner==Path(work['source_owner']),'Declared interaction runner owner differs')
     require(set(plans)==required and request['profiles']==expected['profiles'] and request['expected_runs']==72 and
             {f for flow in plans.values() for f in flow['families']}==set(expected['families']) and
             status['status']=='all-family-interactions-collected-and-independently-audited' and not status['failures'] and
@@ -452,7 +453,10 @@ def inspect_interaction_matrix(path,output):
         profiles={p:{family:[name for name,flow in plans.items() if family in flow['families']]
                      for family in expected['families']} for p in expected['profiles']},
         actual_processes=72,required_cells=36,cells=records,runtime_source=sources.pop(),
-        coordinator_status=str(status_path),coordinator_sha256=status_sha,request_sha256=sha(request_path),
+        successful_presents=sum(run['lifecycle']['successful_presents'] for cell in records.values()
+                                for run in cell['actual_runs']),
+        coordinator_status=str(status_path),coordinator_status_sha256=status_sha,
+        coordinator_runner_sha256=sha(runner),request_sha256=sha(request_path),
         auditor_source_sha256=sha(__file__),raw_audits=str(directory),
         scope='All nine original-control flows in four profiles, twice each, complete original/generated rosters, '
               'actual keys/GUI/Lua actuators, physical docking, payload mass transfer, six-joint RMS and canonical-clock '

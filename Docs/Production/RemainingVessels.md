@@ -20,10 +20,18 @@ nine complete scenes, four profiles, writer and exact Windows-save reload
 phases, twice each, with 138,240 presentations. Complete saved content, clocks,
 cameras, physical state and full frames retain their original checks and budgets.
 
-Six of the seven class facets are closed. Original-dispatch interactions remain
-open before normal class admission. No final candidate or full acceptance gate
-is inferred. The single
-[closeout ledger](Phase6Closeout.json) binds the scoped reports and remaining cells.
+All seven class facets are now closed. The independent interaction audit covers
+72 real simulator processes and 56,192 presentations: nine original-control
+flows, four profiles and two repetitions. It re-reads actual keys, GUI/Lua
+actuators, physical docking, six-joint RMS motion/stow, payload releases and
+canonical-clock launch/staging, retaining every original/generated vessel.
+
+The final-candidate source now admits exactly the sixteen qualified structural
+combinations and their declared native modules. Diagnostic ranges are kept
+separate; unknown classes, foreign factories and incompatible modules retain
+explicit rejection. Matching final binaries, the complete 157-entry normal-host
+matrix and full acceptance remain pending. The single
+[closeout ledger](Phase6Closeout.json) binds the scoped reports and remaining gates.
 
 ## Current four-profile repeated-session checkpoint
 

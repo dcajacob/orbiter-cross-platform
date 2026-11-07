@@ -136,6 +136,8 @@ def main():
                    help='Compare short actual SDK capability snapshots and observer-off/on controls; diagnostic only')
     p.add_argument('--rejection-control',action='store_true',
                    help='Exercise actual loader and class-policy failures before presentation; diagnostic only')
+    p.add_argument('--runtime-role',choices=('diagnostic','normal'),default='diagnostic',
+                   help='Actual host for rejection controls; other modes retain their existing diagnostic scope')
     p.add_argument('--interaction-plan',type=lambda v:Path(v).resolve(),
                    help='Run an explicit original-input interaction plan; diagnostic only')
     p.add_argument('--rejection-windows-dll',type=lambda v:Path(v).resolve(),
@@ -145,6 +147,8 @@ def main():
     p.add_argument('--windows-build',type=lambda v:Path(v).resolve())
     p.add_argument('--preserved',type=lambda v:Path(v).resolve())
     a=p.parse_args()
+    require(a.runtime_role=='diagnostic' or a.rejection_control,
+            'Normal host role is supported here only for the existing rejection controls')
     if a.interaction_plan:
         require(not a.capability_control and not a.lifetime_sessions and not a.rejection_control,
                 'Separate interaction scope required')
