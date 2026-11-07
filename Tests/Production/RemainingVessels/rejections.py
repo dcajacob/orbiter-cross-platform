@@ -5,6 +5,7 @@ import os
 from pathlib import Path
 import re
 import shutil
+import stat
 import subprocess
 
 from lifetimes import (HERE, ROOT, Compositor, OwnedProcess, atomic_json, load,
@@ -128,6 +129,11 @@ def capture(args):
             for control in expected:
                 folder=args.output/control['id'];folder.mkdir()
                 assets=folder/'assets';shutil.copytree(args.assets,assets,copy_function=os.link)
+                # The accepted asset tree is read-only. Only these newly
+                # allocated directories become writable; linked originals
+                # are detached before any content change.
+                for directory in (assets,*(p for p in assets.rglob('*') if p.is_dir())):
+                    directory.chmod(directory.stat().st_mode | stat.S_IWUSR)
                 family=control['family'];variant=control['variant'];case=by_id[control['case']]
                 target=config['classes'][family]['target'];source=(args.assets/target).read_bytes()
                 scenario=(args.assets/case['scenario_entry_point']).read_text()
