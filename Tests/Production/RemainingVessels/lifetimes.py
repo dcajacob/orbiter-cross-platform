@@ -91,6 +91,7 @@ def inspect_case(folder, case):
     require(argv[argv.index('--sessions') + 1] == str(SESSIONS) and
             argv[argv.index('--frames') + 1] == str(FRAMES) and
             argv[argv.index('--fixed-step') + 1] == '0.015625' and
+            argv[argv.index('--capture-time') + 1] == '0.78125' and
             '--run' in argv and '--fixed-ui-clock' in argv,
             'Bounded lifetime invocation differs')
     require(sha(argv[0]) == invocation['executable_sha256'] and
@@ -260,7 +261,7 @@ def capture(args):
                 '--planets', args.planets, '--modules', args.build / 'NativeModules', '--scenario', scenario,
                 '--config', folder / 'Orbiter.cfg', '--evidence', folder, '--save', folder / 'saved.scn',
                 '--frames', FRAMES, '--sessions', SESSIONS, '--fixed-step', '0.015625',
-                '--replay', folder / 'replay.csv', '--fixed-ui-clock', '--capture-time', '0', '--run']))
+                '--replay', folder / 'replay.csv', '--fixed-ui-clock', '--capture-time', '0.78125', '--run']))
             invocation = dict(argv=argv, executable_sha256=sha(executable),
                               scenario_sha256=sha(scenario), environment={k: env.get(k) for k in
                               ('ASAN_OPTIONS', 'LSAN_OPTIONS', 'UBSAN_OPTIONS', 'LD_PRELOAD', 'LD_DEBUG')})
