@@ -169,7 +169,7 @@ def audit(path):
                 native_admission_qualified=False, phase6_complete=False)
 
 
-def capture(args):
+def prepare(args, extra_sources=()):
     require(not args.output.exists() and 1 <= args.jobs <= 4 and args.case,
             'Fresh selected lifetime output and one to four workers required')
     config = load(HERE.parent / 'RemainingStock/cases.json')
@@ -205,6 +205,7 @@ def capture(args):
                *[HERE.parent / name for name in ('stock-data.lock.json', 'standard-planets.lock.json')],
                *[Path(sys.modules[n].__file__) for n in ('contracts', 'processes', 'intentional_exit',
                                                        'inventory', 'compositor')]]
+    helpers.extend(extra_sources)
     for path in helpers:
         guards[str(path)] = sha(path)
     gtk = load(args.gtk_build_record)
@@ -215,11 +216,16 @@ def capture(args):
         for path in library.glob('*.so*'):
             if path.is_file(): guards[str(path)] = sha(path)
     producer = subprocess.check_output(['git', '-C', str(ROOT), 'rev-parse', 'HEAD'], text=True).strip()
-    for path in (HERE / 'native.py', Path(__file__)):
+    for path in (HERE / 'native.py', Path(__file__), *extra_sources):
         require(subprocess.check_output(['git', '-C', str(ROOT), 'show',
                                         producer + ':' + path.relative_to(ROOT).as_posix()]) == path.read_bytes(),
                 'Lifetime runner must match immutable producer')
     original_data = data_inputs.inspect(args.data, args.planets)
+    return config,cases,build,identity,executable,guards,producer,original_data
+
+
+def capture(args):
+    config,cases,build,identity,executable,guards,producer,original_data=prepare(args)
     args.output.mkdir(parents=True)
     report = dict(protocol='remaining-stock-lifetimes-v1', status='running',
                   runtime_identity=identity, runtime_owner=str(args.owner), producer_commit=producer,

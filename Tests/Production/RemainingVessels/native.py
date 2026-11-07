@@ -127,7 +127,19 @@ def main():
                    help='Immutable package owner for the separate repeated-lifetime diagnostic')
     p.add_argument('--lifetime-sessions',type=int,choices=(20,),
                    help='Run twenty bounded whole-world lifetimes; cannot satisfy stock parity')
+    p.add_argument('--capability-control',action='store_true',
+                   help='Compare short actual SDK capability snapshots and observer-off/on controls; diagnostic only')
+    p.add_argument('--windows-reference',type=lambda v:Path(v).resolve(),
+                   help='Matching retained original-Windows stock capture for capability diagnostics')
+    p.add_argument('--windows-build',type=lambda v:Path(v).resolve())
+    p.add_argument('--preserved',type=lambda v:Path(v).resolve())
     a=p.parse_args()
+    if a.capability_control:
+        require(not a.lifetime_sessions and all((a.windows_reference,a.windows_build,a.preserved)),
+                'Separate capability control and its original-Windows references required')
+        from capabilities import capture
+        capture(a)
+        return
     if a.lifetime_sessions:
         from lifetimes import capture
         capture(a)
