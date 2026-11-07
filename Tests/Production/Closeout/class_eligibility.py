@@ -381,6 +381,85 @@ def inspect_rejection_matrix(path):
                 diagnostic_only=True,native_admission_qualified=False,phase6_complete=False)
 
 
+def inspect_interaction_matrix(path,output):
+    ledger=load(path);gate=ledger['gates']['class-eligibility'];expected=requirements()['class-eligibility']
+    require(gate['expected']==expected,'Fixed class interaction requirements differ')
+    work=gate['qualification_progress']['interaction_controls'];entry=work['request'];request_path=Path(entry['path'])
+    require(sha(request_path)==entry['sha256'],'Interaction request changed')
+    request=load(request_path);status_path=Path(work['live_status']);status=load(status_path);status_sha=sha(status_path)
+    required={'hst-keys','solar-paddles','quad-controllers','module2-physical-docking','rms-six-joint-and-stow',
+              'ldef-payload-release','leonardo_mplm-payload-release','carina-payload-release','atlantis-original-launch-staging'}
+    plans={}
+    for item in request['flows']:
+        require(item['id'] not in plans and sha(item['plan'])==item['plan_sha256'],'Changed/duplicate interaction plan')
+        found=[f for f in load(item['plan'])['flows'] if f['id']==item['id']]
+        require(len(found)==1 and found[0]['case']==item['case'],'Substituted original interaction flow')
+        plans[item['id']]=found[0]
+    cells={p+'/'+f for p in expected['profiles'] for f in required}
+    owner=Path(request['owner']);runner=owner/'Tests/Production/Closeout/run_native.py'
+    require(set(plans)==required and request['profiles']==expected['profiles'] and request['expected_runs']==72 and
+            {f for flow in plans.values() for f in flow['families']}==set(expected['families']) and
+            status['status']=='all-family-interactions-collected-and-independently-audited' and not status['failures'] and
+            status['kind']=='class-interactions' and status['request_sha256']==sha(request_path) and
+            status['coordinator_sha256']==sha(runner) and status['maximum_native_simulators']==4 and
+            status['actual_runs']==72 and set(status['cells'])==cells and
+            status['native_admission_qualified'] is False and status['phase6_complete'] is False,
+            'Incomplete or incorrectly scoped interaction matrix')
+    directory=Path(output).with_suffix('').with_name(Path(output).stem+'-raw-audits')
+    require(not directory.exists(),'Fresh independent interaction audit directory required');directory.mkdir(parents=True)
+    checked_captures={};records={};identities=set();sources=set()
+    for key in sorted(cells):
+        profile,name=key.split('/',1);cell=status['cells'][key];capture=Path(cell['capture']);reader=Path(cell['reader_owner'])
+        reused=request.get('reuse',{}).get(key)
+        if reused:
+            require(cell['status']=='reused-after-independent-audit' and str(capture)==reused['capture'] and
+                    str(reader)==reused['owner'] and sha(capture)==reused['capture_sha256'],
+                    'Retained interaction binding differs')
+        else:
+            receipt=cell['receipts']['collector']
+            actual=[p for p in receipt['owned_process_identities'] if p['pid']==receipt['actual_collector_pid']]
+            require(cell['status']=='collected-and-independently-audited' and receipt['terminal'] and
+                    not receipt['cancelled'] and receipt['actual_returncode']==0 and len(actual)==1 and
+                    actual[0]['start_ticks']>0 and str(owner/'Tests/Production/RemainingVessels/native.py') in actual[0]['argv'],
+                    'Actual interaction collector receipt differs')
+        require(sha(capture)==cell['capture_sha256'] and sha(cell['audit'])==cell['audit_sha256'],
+                'Closed interaction capture/audit changed')
+        token=(str(capture),str(reader))
+        if token not in checked_captures:
+            destination=directory/(sha(capture)+'.json')
+            with destination.with_suffix('.log').open('w') as log:
+                subprocess.run([sys.executable,'-B',str(reader/'Tests/Production/RemainingVessels/interactions.py'),
+                    '--capture',str(capture),'--output',str(destination)],stdout=log,stderr=subprocess.STDOUT,check=True)
+            checked_captures[token]=load(destination)
+        checked=checked_captures[token];identity=checked['runtime_identity']
+        require(checked==load(cell['audit']) and identity['profile']==profile and
+                identity['runtime_source_commit']==request['runtime_commit'] and
+                len(checked['flows'][name])==2 and checked['flows'][name]==cell['actual_runs'] and
+                next(f for f in load(load(capture)['plan'])['flows'] if f['id']==name)==plans[name],
+                'Recomputed original interaction/profile/runtime differs')
+        sources.add(identity['runtime_source_commit'])
+        for repeat in (1,2):
+            receipt=load(capture.parent/(name+'-'+str(repeat))/'process-receipt.json')
+            actual=[p for p in receipt['owned_process_identities'] if p['pid']==receipt['actual_collector_pid']]
+            require(len(actual)==1 and actual[0]['start_ticks']>0,'Actual simulator start identity missing')
+            token=(actual[0]['pid'],actual[0]['start_ticks'])
+            require(token not in identities,'One simulator process credited to multiple interaction cells');identities.add(token)
+        records[key]=dict(capture=str(capture),capture_sha256=sha(capture),reader_owner=str(reader),
+                          audit_sha256=cell['audit_sha256'],actual_runs=checked['flows'][name])
+    require(len(sources)==1 and len(identities)==72 and sha(status_path)==status_sha and
+            sha(request_path)==entry['sha256'],'Interaction matrix scope/source changed during independent audit')
+    return dict(status='audited-all-family-original-control-interactions-only',passed_facet='interactions',
+        profiles={p:{family:[name for name,flow in plans.items() if family in flow['families']]
+                     for family in expected['families']} for p in expected['profiles']},
+        actual_processes=72,required_cells=36,cells=records,runtime_source=sources.pop(),
+        coordinator_status=str(status_path),coordinator_sha256=status_sha,request_sha256=sha(request_path),
+        auditor_source_sha256=sha(__file__),raw_audits=str(directory),
+        scope='All nine original-control flows in four profiles, twice each, complete original/generated rosters, '
+              'actual keys/GUI/Lua actuators, physical docking, payload mass transfer, six-joint RMS and canonical-clock '
+              'launch/staging. No normal-host admission, full38, named Windows/native workflow or final-candidate credit.',
+        native_admission_qualified=False,phase6_complete=False)
+
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=__doc__)
     kind=parser.add_mutually_exclusive_group(required=True)
@@ -389,11 +468,13 @@ if __name__ == '__main__':
     kind.add_argument('--capability-manifest',type=Path)
     kind.add_argument('--persistence-manifest',type=Path)
     kind.add_argument('--rejection-manifest',type=Path)
+    kind.add_argument('--interaction-manifest',type=Path)
     parser.add_argument('--output', type=Path, required=True)
     args = parser.parse_args()
     require(not args.output.exists(), 'Fresh independent class-evidence audit required')
     result=inspect_paused(args.paused_capture) if args.paused_capture else \
         inspect_family_lifetimes(args.family_manifest) if args.family_manifest else \
         inspect_capability_matrix(args.capability_manifest) if args.capability_manifest else \
-        inspect_rejection_matrix(args.rejection_manifest) if args.rejection_manifest else inspect_persistence_matrix(args.persistence_manifest)
+        inspect_rejection_matrix(args.rejection_manifest) if args.rejection_manifest else \
+        inspect_interaction_matrix(args.interaction_manifest,args.output) if args.interaction_manifest else inspect_persistence_matrix(args.persistence_manifest)
     atomic_json(args.output,result)
