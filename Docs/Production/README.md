@@ -28,6 +28,13 @@ independent complete comparisons. Restored archives and verified duplicate
 reclamation provide the declared 8 GiB campaign reserve. Remaining class
 eligibility, candidate freeze, full campaigns and operator acceptance are open.
 Physical-controller acceptance remains blocked.
+Class eligibility is in progress on retained source-`81dcc014` packages. Fresh
+paused attachment controls pass all four profiles: 80 complete worlds and 76
+actual F5 reloads with the original docking and reciprocal payload links intact.
+An independently audited Debug automatic HST/Atlantis canary also passes twenty
+unpaused worlds and actual module unloads. The finite seven-scene, four-profile
+family lifetime selection is running. These are scoped eligibility facets;
+normal class admission and the final candidate remain unchanged.
 The intended interim signoff is **software complete; awaiting physical-controller
 acceptance**, after all software gates and the operator walkthrough pass.
 [Closeout tools and current limits](../../Tests/Production/Closeout/README.md)

@@ -527,11 +527,570 @@
         ],
         "final_candidate_required": false
       },
-      "result": "not-run",
+      "result": "in-progress",
       "coverage": null,
-      "diagnostic_only": null,
+      "diagnostic_only": true,
       "candidate_id": null,
-      "evidence": []
+      "evidence": [
+        {
+          "path": "/home/dan/.codex/worktrees/phase6-class-eligibility/orbiter-cross-platform/out/phase6-eligibility-paused-Debug-automatic-v1/independent-audit-v2.json",
+          "sha256": "c1259037aaaa4671d869c6e976de7cf4a29d8db7a2688d97ef479b997ca4ac30",
+          "scope": "Independent twenty-world paused attachment lifetime facet only"
+        },
+        {
+          "path": "/home/dan/.codex/worktrees/phase6-class-eligibility/orbiter-cross-platform/out/phase6-eligibility-paused-Debug-automatic-v1/verification.json",
+          "sha256": "b84e3ca876c8d18b5402cd851854d9c9dbdbf52fd79dba5ce802cc5fb5704081",
+          "scope": "Original complete paused ISS/Atlantis/Leonardo graph; original bytes seed nineteen real F5 reloads"
+        },
+        {
+          "path": "/home/dan/.codex/worktrees/phase6-class-eligibility/orbiter-cross-platform/out/phase6-eligibility-paused-Debug-sse2-v1/independent-audit-v2.json",
+          "sha256": "00bd41c0d47645a003a537cbe9d121806ec74cb57afc81401514904d6e044d32",
+          "scope": "Independent twenty-world paused attachment lifetime facet only"
+        },
+        {
+          "path": "/home/dan/.codex/worktrees/phase6-class-eligibility/orbiter-cross-platform/out/phase6-eligibility-paused-Debug-sse2-v1/verification.json",
+          "sha256": "f63e15a7cbba330bf570ef18842f16b6df33d3db19a1a859d8eb0c7a7026ecb4",
+          "scope": "Original complete paused ISS/Atlantis/Leonardo graph; original bytes seed nineteen real F5 reloads"
+        },
+        {
+          "path": "/home/dan/.codex/worktrees/phase6-class-eligibility/orbiter-cross-platform/out/phase6-eligibility-paused-Release-automatic-v1/independent-audit-v2.json",
+          "sha256": "b7498730940ece3f2674c4560acd4fb3a1afc6c5de6bc65c3211920f126bf7e0",
+          "scope": "Independent twenty-world paused attachment lifetime facet only"
+        },
+        {
+          "path": "/home/dan/.codex/worktrees/phase6-class-eligibility/orbiter-cross-platform/out/phase6-eligibility-paused-Release-automatic-v1/verification.json",
+          "sha256": "dfc496e655a31b6a71ff4f8f6dedb2a9d3dc77305bedb7835811732d69eaf1da",
+          "scope": "Original complete paused ISS/Atlantis/Leonardo graph; original bytes seed nineteen real F5 reloads"
+        },
+        {
+          "path": "/home/dan/.codex/worktrees/phase6-class-eligibility/orbiter-cross-platform/out/phase6-eligibility-paused-Release-sse2-v1/independent-audit-v2.json",
+          "sha256": "82c3cce9ee6617ee2a3fd4ff38d993ff9a37a59160cbdcbdf0065e43d8cea450",
+          "scope": "Independent twenty-world paused attachment lifetime facet only"
+        },
+        {
+          "path": "/home/dan/.codex/worktrees/phase6-class-eligibility/orbiter-cross-platform/out/phase6-eligibility-paused-Release-sse2-v1/verification.json",
+          "sha256": "ed3e601ccc541d12ffc1b4ebbac48ff937ce5f7f68b728340687508a4eb74465",
+          "scope": "Original complete paused ISS/Atlantis/Leonardo graph; original bytes seed nineteen real F5 reloads"
+        },
+        {
+          "path": "/home/dan/.codex/worktrees/phase6-class-eligibility/orbiter-cross-platform/out/phase6-eligibility-lifetimes-Debug-automatic-canary-v2/independent-audit-v1.json",
+          "sha256": "3b40b0b1549e90b55b6281a45df2010500d790dc3ef2a408ad777b5cbcc0b820",
+          "scope": "Independent twenty unpaused HST/Atlantis whole-world and actual module unload lifetimes only"
+        },
+        {
+          "path": "/home/dan/.codex/worktrees/phase6-class-eligibility/orbiter-cross-platform/out/phase6-eligibility-lifetimes-Debug-automatic-canary-v2/lifetimes.json",
+          "sha256": "789f0195137a5a8ff84421d613a9f504996bd0dfebf168fc377ff55208fc47e9",
+          "scope": "Complete original HST Animation roster; no interaction or full parity credit"
+        },
+        {
+          "path": "/home/dan/.codex/worktrees/phase6-class-eligibility/orbiter-cross-platform/out/phase6-class-source-conservation-v1.json",
+          "sha256": "2034d84d0909a0ce64b5490b817b8c72ca95c2314fa276b9b43276a20cd4faf8",
+          "scope": "Exact declared source-conservation deltas only; runtime eligibility remains open"
+        }
+      ],
+      "qualification_progress": {
+        "scope": "Pre-admission facets on retained source81 diagnostic packages. No normal policy changes, final candidate or complete class eligibility.",
+        "source_conservation": {
+          "path": "/home/dan/.codex/worktrees/phase6-class-eligibility/orbiter-cross-platform/out/phase6-class-source-conservation-v1.json",
+          "sha256": "2034d84d0909a0ce64b5490b817b8c72ca95c2314fa276b9b43276a20cd4faf8",
+          "scope": "Exact declared source-conservation deltas only; runtime eligibility remains open"
+        },
+        "paused_attachment_control": {
+          "result": "passed-scoped-facet-only",
+          "worlds": 80,
+          "real_F5_reloads": 76,
+          "profiles": {
+            "Debug-automatic": {
+              "audit": {
+                "path": "/home/dan/.codex/worktrees/phase6-class-eligibility/orbiter-cross-platform/out/phase6-eligibility-paused-Debug-automatic-v1/independent-audit-v2.json",
+                "sha256": "c1259037aaaa4671d869c6e976de7cf4a29d8db7a2688d97ef479b997ca4ac30",
+                "scope": "Independent twenty-world paused attachment lifetime facet only"
+              },
+              "capture": {
+                "path": "/home/dan/.codex/worktrees/phase6-class-eligibility/orbiter-cross-platform/out/phase6-eligibility-paused-Debug-automatic-v1/verification.json",
+                "sha256": "b84e3ca876c8d18b5402cd851854d9c9dbdbf52fd79dba5ce802cc5fb5704081",
+                "scope": "Original complete paused ISS/Atlantis/Leonardo graph; original bytes seed nineteen real F5 reloads"
+              },
+              "runtime_identity": {
+                "configuration": "Debug",
+                "math_profile": "automatic",
+                "profile": "Debug-automatic",
+                "sanitizer_linked": true,
+                "compiler": "/usr/bin/c++",
+                "cache_sha256": "9a4c0c958867be4638b6a882e5cc6d50b38e3cdcdbc4755f2151d3ceb601f1f6",
+                "build_record_sha256": "90e1fb9a0f085592f3d5c0fbbb9936a37dcbceb4ffabdf0944d0c48af8390012",
+                "runtime_source_commit": "81dcc014ba132fe4ad8c6551839569bf81c581f7"
+              }
+            },
+            "Debug-sse2": {
+              "audit": {
+                "path": "/home/dan/.codex/worktrees/phase6-class-eligibility/orbiter-cross-platform/out/phase6-eligibility-paused-Debug-sse2-v1/independent-audit-v2.json",
+                "sha256": "00bd41c0d47645a003a537cbe9d121806ec74cb57afc81401514904d6e044d32",
+                "scope": "Independent twenty-world paused attachment lifetime facet only"
+              },
+              "capture": {
+                "path": "/home/dan/.codex/worktrees/phase6-class-eligibility/orbiter-cross-platform/out/phase6-eligibility-paused-Debug-sse2-v1/verification.json",
+                "sha256": "f63e15a7cbba330bf570ef18842f16b6df33d3db19a1a859d8eb0c7a7026ecb4",
+                "scope": "Original complete paused ISS/Atlantis/Leonardo graph; original bytes seed nineteen real F5 reloads"
+              },
+              "runtime_identity": {
+                "configuration": "Debug",
+                "math_profile": "sse2",
+                "profile": "Debug-sse2",
+                "sanitizer_linked": true,
+                "compiler": "/usr/bin/c++",
+                "cache_sha256": "616e6477447d7fb7f554286762528f0510eb724b73c8fa1dea7cc1bd29d30c6e",
+                "build_record_sha256": "06dc785d4bb6153d6517c1c09d1d2a5a6d98ff2a66618e32cda33f92080732ee",
+                "runtime_source_commit": "81dcc014ba132fe4ad8c6551839569bf81c581f7"
+              }
+            },
+            "Release-automatic": {
+              "audit": {
+                "path": "/home/dan/.codex/worktrees/phase6-class-eligibility/orbiter-cross-platform/out/phase6-eligibility-paused-Release-automatic-v1/independent-audit-v2.json",
+                "sha256": "b7498730940ece3f2674c4560acd4fb3a1afc6c5de6bc65c3211920f126bf7e0",
+                "scope": "Independent twenty-world paused attachment lifetime facet only"
+              },
+              "capture": {
+                "path": "/home/dan/.codex/worktrees/phase6-class-eligibility/orbiter-cross-platform/out/phase6-eligibility-paused-Release-automatic-v1/verification.json",
+                "sha256": "dfc496e655a31b6a71ff4f8f6dedb2a9d3dc77305bedb7835811732d69eaf1da",
+                "scope": "Original complete paused ISS/Atlantis/Leonardo graph; original bytes seed nineteen real F5 reloads"
+              },
+              "runtime_identity": {
+                "configuration": "Release",
+                "math_profile": "automatic",
+                "profile": "Release-automatic",
+                "sanitizer_linked": true,
+                "compiler": "/usr/bin/c++",
+                "cache_sha256": "e8c97d459984542e8e808f86b07040da1bdc190c018e97da34c355043bd8abad",
+                "build_record_sha256": "1a70cfe93617315b9859e8c4f3936f7ca13cdde8fc4416e7e159e32e0465bad9",
+                "runtime_source_commit": "81dcc014ba132fe4ad8c6551839569bf81c581f7"
+              }
+            },
+            "Release-sse2": {
+              "audit": {
+                "path": "/home/dan/.codex/worktrees/phase6-class-eligibility/orbiter-cross-platform/out/phase6-eligibility-paused-Release-sse2-v1/independent-audit-v2.json",
+                "sha256": "82c3cce9ee6617ee2a3fd4ff38d993ff9a37a59160cbdcbdf0065e43d8cea450",
+                "scope": "Independent twenty-world paused attachment lifetime facet only"
+              },
+              "capture": {
+                "path": "/home/dan/.codex/worktrees/phase6-class-eligibility/orbiter-cross-platform/out/phase6-eligibility-paused-Release-sse2-v1/verification.json",
+                "sha256": "ed3e601ccc541d12ffc1b4ebbac48ff937ce5f7f68b728340687508a4eb74465",
+                "scope": "Original complete paused ISS/Atlantis/Leonardo graph; original bytes seed nineteen real F5 reloads"
+              },
+              "runtime_identity": {
+                "configuration": "Release",
+                "math_profile": "sse2",
+                "profile": "Release-sse2",
+                "sanitizer_linked": true,
+                "compiler": "/usr/bin/c++",
+                "cache_sha256": "3ac5aa04f1f41d9eeb2ecc4a38ad03e3da8d0c8b3381d80b7e25905f786d5894",
+                "build_record_sha256": "9394730a0ede3b1b1b7ceab654b2055316f5a51bca696e36ad92ad1c7b283eec",
+                "runtime_source_commit": "81dcc014ba132fe4ad8c6551839569bf81c581f7"
+              }
+            }
+          }
+        },
+        "unpaused_hst_canary": {
+          "profile": "Debug-automatic",
+          "cases": [
+            "remaining_stock_018"
+          ],
+          "worlds": 20,
+          "successful_presents": 1200,
+          "audit": {
+            "path": "/home/dan/.codex/worktrees/phase6-class-eligibility/orbiter-cross-platform/out/phase6-eligibility-lifetimes-Debug-automatic-canary-v2/independent-audit-v1.json",
+            "sha256": "3b40b0b1549e90b55b6281a45df2010500d790dc3ef2a408ad777b5cbcc0b820",
+            "scope": "Independent twenty unpaused HST/Atlantis whole-world and actual module unload lifetimes only"
+          },
+          "capture": {
+            "path": "/home/dan/.codex/worktrees/phase6-class-eligibility/orbiter-cross-platform/out/phase6-eligibility-lifetimes-Debug-automatic-canary-v2/lifetimes.json",
+            "sha256": "789f0195137a5a8ff84421d613a9f504996bd0dfebf168fc377ff55208fc47e9",
+            "scope": "Complete original HST Animation roster; no interaction or full parity credit"
+          }
+        },
+        "family_results": {
+          "Atlantis": {
+            "lifetime_case": "remaining_stock_003",
+            "facets": {
+              "source-abi": {
+                "result": "not-run",
+                "passed_profiles": []
+              },
+              "capabilities": {
+                "result": "not-run",
+                "passed_profiles": []
+              },
+              "interactions": {
+                "result": "not-run",
+                "passed_profiles": []
+              },
+              "persistence": {
+                "result": "not-run",
+                "passed_profiles": []
+              },
+              "resource-ownership": {
+                "result": "not-run",
+                "passed_profiles": []
+              },
+              "twenty-cycle-teardown": {
+                "result": "in-progress",
+                "passed_profiles": [
+                  "Debug-automatic"
+                ]
+              },
+              "rejection-controls": {
+                "result": "not-run",
+                "passed_profiles": []
+              }
+            }
+          },
+          "Atlantis_SRB": {
+            "lifetime_case": "remaining_stock_003",
+            "facets": {
+              "source-abi": {
+                "result": "not-run",
+                "passed_profiles": []
+              },
+              "capabilities": {
+                "result": "not-run",
+                "passed_profiles": []
+              },
+              "interactions": {
+                "result": "not-run",
+                "passed_profiles": []
+              },
+              "persistence": {
+                "result": "not-run",
+                "passed_profiles": []
+              },
+              "resource-ownership": {
+                "result": "not-run",
+                "passed_profiles": []
+              },
+              "twenty-cycle-teardown": {
+                "result": "in-progress",
+                "passed_profiles": []
+              },
+              "rejection-controls": {
+                "result": "not-run",
+                "passed_profiles": []
+              }
+            }
+          },
+          "Atlantis_Tank": {
+            "lifetime_case": "remaining_stock_003",
+            "facets": {
+              "source-abi": {
+                "result": "not-run",
+                "passed_profiles": []
+              },
+              "capabilities": {
+                "result": "not-run",
+                "passed_profiles": []
+              },
+              "interactions": {
+                "result": "not-run",
+                "passed_profiles": []
+              },
+              "persistence": {
+                "result": "not-run",
+                "passed_profiles": []
+              },
+              "resource-ownership": {
+                "result": "not-run",
+                "passed_profiles": []
+              },
+              "twenty-cycle-teardown": {
+                "result": "in-progress",
+                "passed_profiles": []
+              },
+              "rejection-controls": {
+                "result": "not-run",
+                "passed_profiles": []
+              }
+            }
+          },
+          "Carina": {
+            "lifetime_case": "remaining_stock_026",
+            "facets": {
+              "source-abi": {
+                "result": "not-run",
+                "passed_profiles": []
+              },
+              "capabilities": {
+                "result": "not-run",
+                "passed_profiles": []
+              },
+              "interactions": {
+                "result": "not-run",
+                "passed_profiles": []
+              },
+              "persistence": {
+                "result": "not-run",
+                "passed_profiles": []
+              },
+              "resource-ownership": {
+                "result": "not-run",
+                "passed_profiles": []
+              },
+              "twenty-cycle-teardown": {
+                "result": "in-progress",
+                "passed_profiles": []
+              },
+              "rejection-controls": {
+                "result": "not-run",
+                "passed_profiles": []
+              }
+            }
+          },
+          "Leonardo_mplm": {
+            "lifetime_case": "remaining_stock_003",
+            "facets": {
+              "source-abi": {
+                "result": "not-run",
+                "passed_profiles": []
+              },
+              "capabilities": {
+                "result": "not-run",
+                "passed_profiles": []
+              },
+              "interactions": {
+                "result": "not-run",
+                "passed_profiles": []
+              },
+              "persistence": {
+                "result": "not-run",
+                "passed_profiles": []
+              },
+              "resource-ownership": {
+                "result": "not-run",
+                "passed_profiles": []
+              },
+              "twenty-cycle-teardown": {
+                "result": "in-progress",
+                "passed_profiles": []
+              },
+              "rejection-controls": {
+                "result": "not-run",
+                "passed_profiles": []
+              }
+            }
+          },
+          "Module2": {
+            "lifetime_case": "remaining_stock_009",
+            "facets": {
+              "source-abi": {
+                "result": "not-run",
+                "passed_profiles": []
+              },
+              "capabilities": {
+                "result": "not-run",
+                "passed_profiles": []
+              },
+              "interactions": {
+                "result": "not-run",
+                "passed_profiles": []
+              },
+              "persistence": {
+                "result": "not-run",
+                "passed_profiles": []
+              },
+              "resource-ownership": {
+                "result": "not-run",
+                "passed_profiles": []
+              },
+              "twenty-cycle-teardown": {
+                "result": "in-progress",
+                "passed_profiles": []
+              },
+              "rejection-controls": {
+                "result": "not-run",
+                "passed_profiles": []
+              }
+            }
+          },
+          "Dragonfly": {
+            "lifetime_case": "remaining_stock_009",
+            "facets": {
+              "source-abi": {
+                "result": "not-run",
+                "passed_profiles": []
+              },
+              "capabilities": {
+                "result": "not-run",
+                "passed_profiles": []
+              },
+              "interactions": {
+                "result": "not-run",
+                "passed_profiles": []
+              },
+              "persistence": {
+                "result": "not-run",
+                "passed_profiles": []
+              },
+              "resource-ownership": {
+                "result": "not-run",
+                "passed_profiles": []
+              },
+              "twenty-cycle-teardown": {
+                "result": "in-progress",
+                "passed_profiles": []
+              },
+              "rejection-controls": {
+                "result": "not-run",
+                "passed_profiles": []
+              }
+            }
+          },
+          "HST": {
+            "lifetime_case": "remaining_stock_018",
+            "facets": {
+              "source-abi": {
+                "result": "not-run",
+                "passed_profiles": []
+              },
+              "capabilities": {
+                "result": "not-run",
+                "passed_profiles": []
+              },
+              "interactions": {
+                "result": "not-run",
+                "passed_profiles": []
+              },
+              "persistence": {
+                "result": "not-run",
+                "passed_profiles": []
+              },
+              "resource-ownership": {
+                "result": "not-run",
+                "passed_profiles": []
+              },
+              "twenty-cycle-teardown": {
+                "result": "in-progress",
+                "passed_profiles": [
+                  "Debug-automatic"
+                ]
+              },
+              "rejection-controls": {
+                "result": "not-run",
+                "passed_profiles": []
+              }
+            }
+          },
+          "LDEF": {
+            "lifetime_case": "remaining_stock_022",
+            "facets": {
+              "source-abi": {
+                "result": "not-run",
+                "passed_profiles": []
+              },
+              "capabilities": {
+                "result": "not-run",
+                "passed_profiles": []
+              },
+              "interactions": {
+                "result": "not-run",
+                "passed_profiles": []
+              },
+              "persistence": {
+                "result": "not-run",
+                "passed_profiles": []
+              },
+              "resource-ownership": {
+                "result": "not-run",
+                "passed_profiles": []
+              },
+              "twenty-cycle-teardown": {
+                "result": "in-progress",
+                "passed_profiles": []
+              },
+              "rejection-controls": {
+                "result": "not-run",
+                "passed_profiles": []
+              }
+            }
+          },
+          "SolarSail": {
+            "lifetime_case": "remaining_stock_013",
+            "facets": {
+              "source-abi": {
+                "result": "not-run",
+                "passed_profiles": []
+              },
+              "capabilities": {
+                "result": "not-run",
+                "passed_profiles": []
+              },
+              "interactions": {
+                "result": "not-run",
+                "passed_profiles": []
+              },
+              "persistence": {
+                "result": "not-run",
+                "passed_profiles": []
+              },
+              "resource-ownership": {
+                "result": "not-run",
+                "passed_profiles": []
+              },
+              "twenty-cycle-teardown": {
+                "result": "in-progress",
+                "passed_profiles": []
+              },
+              "rejection-controls": {
+                "result": "not-run",
+                "passed_profiles": []
+              }
+            }
+          },
+          "Quadcopter": {
+            "lifetime_case": "remaining_stock_017",
+            "facets": {
+              "source-abi": {
+                "result": "not-run",
+                "passed_profiles": []
+              },
+              "capabilities": {
+                "result": "not-run",
+                "passed_profiles": []
+              },
+              "interactions": {
+                "result": "not-run",
+                "passed_profiles": []
+              },
+              "persistence": {
+                "result": "not-run",
+                "passed_profiles": []
+              },
+              "resource-ownership": {
+                "result": "not-run",
+                "passed_profiles": []
+              },
+              "twenty-cycle-teardown": {
+                "result": "in-progress",
+                "passed_profiles": []
+              },
+              "rejection-controls": {
+                "result": "not-run",
+                "passed_profiles": []
+              }
+            }
+          }
+        },
+        "active_lifetime_captures": {
+          "Debug-automatic": "/home/dan/.codex/worktrees/phase6-class-eligibility/orbiter-cross-platform/out/phase6-eligibility-lifetimes-Debug-automatic-v1/lifetimes.json",
+          "Debug-sse2": "/home/dan/.codex/worktrees/phase6-class-eligibility/orbiter-cross-platform/out/phase6-eligibility-lifetimes-Debug-sse2-v1/lifetimes.json",
+          "Release-automatic": "/home/dan/.codex/worktrees/phase6-class-eligibility/orbiter-cross-platform/out/phase6-eligibility-lifetimes-Release-automatic-v1/lifetimes.json",
+          "Release-sse2": "/home/dan/.codex/worktrees/phase6-class-eligibility/orbiter-cross-platform/out/phase6-eligibility-lifetimes-Release-sse2-v1/lifetimes.json"
+        },
+        "preserved_failed_attempts": [
+          {
+            "path": "/home/dan/.codex/worktrees/phase6-class-eligibility/orbiter-cross-platform/out/phase6-eligibility-lifetimes-Debug-automatic-canary-v1/lifetimes.json",
+            "sha256": "85830368aa8dd6e685f57329c99904ed762e1164ae2b36d199fb945e379e23fb",
+            "cause": "Runner requested time-zero readback after advancing simulation; actual fiftieth fixed step is 0.78125 seconds. Original failed simulator exit retained."
+          }
+        ]
+      }
     },
     "candidate-freeze": {
       "expected": {
@@ -1028,6 +1587,6 @@
       "note": "Physical controller hardware unavailable; virtual devices do not satisfy acceptance."
     }
   },
-  "current_blocker": "Per-family remaining-stock class/capability eligibility, including interactions, ownership, repeated teardown and rejection controls. No final candidate is frozen; full acceptance campaigns and operator/controller acceptance remain open.",
-  "next_exit_condition": "Complete the missing per-family evidence and admit only qualified stock class/capability combinations, preserving the closed source-bound evidence, then freeze and build one matching final candidate."
+  "current_blocker": "Per-family remaining-stock class/capability eligibility. Fresh source81 paused attachments pass all four profiles (80 worlds/76 real F5s), and the unpaused HST/Atlantis canary passes twenty actual module lifetimes in Debug automatic. Remaining family/profile lifecycle, interactions, persistence and rejection controls remain open.",
+  "next_exit_condition": "Independently audit the finite seven-scene/four-profile twenty-world family lifetime selection, complete each missing eligibility facet, then admit only proven class/capability combinations and freeze one final candidate."
 }

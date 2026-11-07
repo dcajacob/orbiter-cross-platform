@@ -8,6 +8,20 @@ numerical repair and the versioned API correction are closed for their exact
 declared scopes. Class eligibility, the final candidate and full acceptance
 campaigns remain open. Physical-controller acceptance remains blocked.
 
+Class eligibility is now in progress. `class_eligibility.py` independently
+re-reads the fresh source81 paused-attachment captures, including all complete
+frames, finite original vessel graphs, nineteen actual buffered F5 pairs per
+profile, normal graphics exit and retained source/package guards. All four
+profiles pass: 80 worlds and 76 real reloads. `ClassEvidence.Test.py` rejects
+partial worlds, missing input, lost links, nonfinite state and missing binary
+bindings. The existing `RemainingVessels/native.py` also provides a selected
+twenty-world lifetime mode and separate closed-evidence reader; its HST/Atlantis
+Debug automatic canary passes, and the seven-scene/four-profile family selection
+is running. The central ledger records each remaining family/facet explicitly.
+These controls do not qualify interactions, persistence, normal admission or a
+full acceptance campaign. The first failed canary's capture-clock mismatch is
+preserved; the corrected runner captures its actual fiftieth fixed-step frame.
+
 `run_native.py` replaces the local ad hoc persistence coordinators. Its JSON
 request names the owning checkout, immutable collector and runtime commits,
 four package paths, declared data/providers/Windows references, and either
