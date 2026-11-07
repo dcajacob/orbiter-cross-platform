@@ -68,6 +68,19 @@ combined coverage and all sixteen original structural signatures.
 These sixty-frame diagnostics earn capability/observer scope only. They do not
 qualify full stock parity, persistence, interactions or normal class admission.
 
+`native.py --rejection-control --owner PATH --rejection-windows-dll PATH` uses
+the same package, original selected scenes and pinned providers for actual
+negative loader/class controls. Select scenes covering all eleven families.
+Unknown class clones, foreign factories, missing declared modules and generic
+fallbacks must fail before presentation. Seven invalid bootstrap descriptors,
+a library without the query symbol and a preserved Windows DLL exercise the
+actual native loader. Every original vessel remains in each input; each process
+must return one, delete its graphics context and leave unsuppressed sanitizers
+clean. Invalid metadata must never call its initializer. Retain all failed
+attempts. Re-read completed evidence using `rejections.py --capture
+PATH/rejections.json --output FRESH.json`; these controls do not qualify positive
+interactions, persistence or normal class admission.
+
 The first fresh Debug ASan/UBSan package at
 `72c35b75c117c16a94b38925e90e7d1ca2812a08` builds all three actual modules and
 both diagnostic hosts. Its record is

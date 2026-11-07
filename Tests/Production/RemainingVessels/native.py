@@ -129,11 +129,21 @@ def main():
                    help='Run twenty bounded whole-world lifetimes; cannot satisfy stock parity')
     p.add_argument('--capability-control',action='store_true',
                    help='Compare short actual SDK capability snapshots and observer-off/on controls; diagnostic only')
+    p.add_argument('--rejection-control',action='store_true',
+                   help='Exercise actual loader and class-policy failures before presentation; diagnostic only')
+    p.add_argument('--rejection-windows-dll',type=lambda v:Path(v).resolve(),
+                   help='Preserved original Windows HST DLL for the foreign-format rejection')
     p.add_argument('--windows-reference',type=lambda v:Path(v).resolve(),
                    help='Matching retained original-Windows stock capture for capability diagnostics')
     p.add_argument('--windows-build',type=lambda v:Path(v).resolve())
     p.add_argument('--preserved',type=lambda v:Path(v).resolve())
     a=p.parse_args()
+    if a.rejection_control:
+        require(not a.capability_control and not a.lifetime_sessions and a.rejection_windows_dll,
+                'Separate rejection controls and preserved Windows DLL required')
+        from rejections import capture
+        capture(a)
+        return
     if a.capability_control:
         require(not a.lifetime_sessions and all((a.windows_reference,a.windows_build,a.preserved)),
                 'Separate capability control and its original-Windows references required')

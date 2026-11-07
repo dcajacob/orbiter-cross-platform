@@ -171,12 +171,26 @@ def main():
                                 with lock:
                                     stage['process'] = process.receipt()
                                     active.pop(key, None)
-                                require(code == 0 and not process.cancelled and captured is not None,
+                                require(code == 0 and not process.cancelled,
                                         'Collector failed or was cancelled')
+                                # The collector can atomically finalize after our
+                                # last live read and before poll observes exit.
+                                # Only the closed manifest establishes terminal
+                                # scope, including cases completed in that gap.
+                                captured = load(output / 'capture.json')
+                                require(captured.get('runtime_owner',str(owner))==request.get('runtime_owner',str(owner)) and
+                                        captured.get('observer_delay_ms',120)==request.get('observer_delay_ms',120),
+                                        'Closed runtime owner or observer pacing differs from request')
                                 scope.inspect_terminal(captured, profile, phase)
                                 require(captured['producer_commit'] == producer and
                                         captured['runtime_source_commit'] == request['runtime_commit'],
                                         'Collected source/runtime identity differs')
+                                for case in scope.cases:
+                                    if case not in checked:
+                                        pairs = compare_case(profile, phase, output, case)
+                                        with lock:
+                                            stage['comparisons'][case] = pairs
+                                        checked.add(case)
                                 # Completed stages are audited even if another profile
                                 # has just failed. They remain reusable scoped evidence.
                                 actual = inspect(output, profile, phase, scope.selection)
