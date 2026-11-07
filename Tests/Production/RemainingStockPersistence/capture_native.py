@@ -114,22 +114,26 @@ def main():
         p.add_argument('--'+name,type=lambda v:Path(v).resolve())
     p.add_argument('--library',type=lambda v:Path(v).resolve(),action='append',default=[])
     p.add_argument('--phase',choices=PHASES,required=True)
+    p.add_argument('--runtime-owner',type=lambda v:Path(v).resolve(),default=ROOT,
+                   help='Immutable checkout owning the compiled package; collector identity remains separate')
+    p.add_argument('--observer-delay-ms',type=int,choices=(0,120),default=120,
+                   help='Explicit observer wall pacing; zero requires equivalence qualification before broad use')
     p.add_argument('--case',action='append');p.add_argument('--jobs',type=int,default=1)
     a=p.parse_args();contract=protocol();config=native.settings(protocols.V2)
     require(sys.platform=='linux' and not a.output.exists() and a.jobs>0,'Native Linux, fresh output and positive concurrency required')
     cases=windows.selected_cases(config,a.case);diagnostic=a.case is not None
     record=json.loads(a.build_record.read_text());require(record['status']=='built','Complete immutable native package required')
-    identity=native.build_identity(a.build/'orbiter-production',a.build/'NativeModules',a.build_record,record['source_base'])
+    identity=native.build_identity(a.build/'orbiter-production',a.build/'NativeModules',a.build_record,record['source_base'],a.runtime_owner)
     require(identity['sanitizer_linked'],'Persistence candidate requires actual ASan/UBSan linkage')
     candidate=a.build/'production_remaining_stock_diagnostic'
-    require(record['candidate_runtime_files_sha256'][candidate.relative_to(ROOT).as_posix()]==sha(candidate),
+    require(record['candidate_runtime_files_sha256'][candidate.relative_to(a.runtime_owner).as_posix()]==sha(candidate),
             'Actual native diagnostic host differs from immutable package')
-    guarded={str(ROOT/n):sha(ROOT/n) for n in {**record['source_sha256_lf'],**record['dependency_sha256_lf']}}
+    guarded={str(a.runtime_owner/n):sha(a.runtime_owner/n) for n in {**record['source_sha256_lf'],**record['dependency_sha256_lf']}}
     for name,value in {**record['source_sha256_lf'],**record['dependency_sha256_lf']}.items():
-        require(sha_lf(ROOT/name)==value,'Current owning source/dependency differs from native package: '+name)
-        body=subprocess.check_output(['git','-C',str(ROOT),'show',record['source_base']+':'+name]).replace(b'\r\n',b'\n')
+        require(sha_lf(a.runtime_owner/name)==value,'Current owning source/dependency differs from native package: '+name)
+        body=subprocess.check_output(['git','-C',str(a.runtime_owner),'show',record['source_base']+':'+name]).replace(b'\r\n',b'\n')
         require(hashlib.sha256(body).hexdigest()==value,'Native package dependency differs from immutable producer: '+name)
-    guarded.update({str(ROOT/n):v for n,v in {**record['generated_source_files_sha256'],**record['runtime_files_sha256'],
+    guarded.update({str(a.runtime_owner/n):v for n,v in {**record['generated_source_files_sha256'],**record['runtime_files_sha256'],
         **record['candidate_runtime_files_sha256']}.items()})
     guarded[str(a.build_record)]=sha(a.build_record)
     gtk=json.loads(a.gtk_build_record.read_text())
@@ -193,6 +197,7 @@ def main():
     command=[identity['compiler'],'-std=c++17','-fPIC','-shared','-Wl,--no-undefined','-fsanitize=address,undefined','-fno-omit-frame-pointer',
         '-I'+str(ROOT/'Orbitersdk/include'),'-I'+str(ROOT/'Src/Orbiter'),'-I'+str(a.build/'native-sdk'),str(native.HERE/'NativeProbe.cpp'),
         '-L'+str(a.build),'-Wl,-rpath,'+str(a.build),'-lorbiter_production_vessels','-lorbiter_production_boundary','-ldl','-o',str(probe)]
+    if a.observer_delay_ms==0:command.insert(1,'-DORBITER_NATIVE_FAST_CAPABILITY_DIAGNOSTIC')
     (a.output/'probe-command.json').write_text(json.dumps(command,indent=2)+'\n')
     with (a.output/'probe-build.log').open('w') as log:subprocess.run(command,stdout=log,stderr=subprocess.STDOUT,check=True)
     guarded[str(probe)]=sha(probe)
@@ -206,6 +211,7 @@ def main():
             'Actual native generated-source mutation controls incomplete')
     guarded[str(controls_path)]=sha(controls_path)
     report=dict(status='running',protocol=contract['protocol'],phase=a.phase,host='native-linux',producer_commit=producer,
+        runtime_owner=str(a.runtime_owner),observer_delay_ms=a.observer_delay_ms,
         runtime_source_commit=record['source_base'],runtime_identity=identity,source_sha256_lf=sources,guarded_files_sha256=guarded,
         asset_files_sha256=assets,actual_original_data=original_data,independently_checked_windows_runtime=parent_runtime,
         windows_parent_producer=parent['producer_commit'] if parent else None,diagnostic_only=diagnostic,cases_requested=[c['id'] for c in cases],

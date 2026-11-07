@@ -79,6 +79,10 @@ def main():
         argv = [sys.executable, '-B', str(owner / 'Tests/Production/RemainingStockPersistence/capture_native.py'),
                 '--build', str(package / 'engine'), '--build-record', str(package / 'build.json'),
                 '--output', str(output), '--phase', phase, '--jobs', str(request['jobs_per_collector'])]
+        if 'runtime_owner' in request:argv+=['--runtime-owner',request['runtime_owner']]
+        if 'observer_delay_ms' in request:
+            require(type(request['observer_delay_ms']) is int and request['observer_delay_ms'] in (0,120),'Explicit observer pacing required')
+            argv+=['--observer-delay-ms',str(request['observer_delay_ms'])]
         for name in ('assets', 'data', 'planets', 'compositor-tools', 'gtk-plugin', 'gtk-build-record'):
             argv += ['--' + name, request['inputs'][name]]
         for path in request['inputs']['libraries']:
@@ -150,6 +154,9 @@ def main():
                             except (FileNotFoundError, json.JSONDecodeError):
                                 captured = None
                             if captured:
+                                require(captured.get('runtime_owner',str(owner))==request.get('runtime_owner',str(owner)) and
+                                        captured.get('observer_delay_ms',120)==request.get('observer_delay_ms',120),
+                                        'Captured runtime owner or observer pacing differs from request')
                                 require(not captured['failures'], 'Actual capture failure: ' + str(captured['failures']))
                                 require(captured['status'] not in ('failed', 'incomplete'), 'Collector failed or incomplete')
                                 for case in scope.cases:

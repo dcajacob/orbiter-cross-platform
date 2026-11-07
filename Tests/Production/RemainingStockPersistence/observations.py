@@ -53,6 +53,12 @@ def check_files(root,values):
 def inspect_native(root,owner,reader,profile,phase,selected=None):
     root=Path(root).resolve();owner=Path(owner).resolve();manifest=root/'capture.json'
     report=json.loads(manifest.read_text());manifest_sha=sha(manifest)
+    runtime_owner=Path(report.get('runtime_owner',owner)).resolve()
+    delay=report.get('observer_delay_ms',120)
+    command=json.loads((root/'probe-command.json').read_text())
+    require(type(delay) is int and delay in (0,120) and
+            command.count('-DORBITER_NATIVE_FAST_CAPABILITY_DIAGNOSTIC')==int(delay==0),
+            'Declared observer pacing differs from actual compile command')
     contract=reader.protocol();config=reader.native.settings(reader.protocols.V2)
     cases=reader.windows.selected_cases(config,selected);ids=[c['id'] for c in cases]
     require(report['status'] in ('captured-diagnostic-only','captured-awaiting-independent-persistence-audit') and
@@ -75,13 +81,14 @@ def inspect_native(root,owner,reader,profile,phase,selected=None):
     engine=Path(invocation['argv'][0]).parent;build_path=engine.parent/'build.json'
     build=json.loads(build_path.read_text())
     require(build['source_base']==report['runtime_source_commit'],'Native package source identity differs')
-    identity=reader.native.build_identity(engine/'orbiter-production',engine/'NativeModules',build_path,build['source_base'])
+    identity=reader.native.build_identity(engine/'orbiter-production',engine/'NativeModules',build_path,build['source_base'],runtime_owner) \
+        if runtime_owner!=owner else reader.native.build_identity(engine/'orbiter-production',engine/'NativeModules',build_path,build['source_base'])
     require(identity==report['runtime_identity'] and identity['profile']==profile and identity['sanitizer_linked'],
             'Actual native build/profile/sanitizer identity differs')
     for name,value in build['dependency_sha256_lf'].items():
-        require(sha_lf(owner/name)==value==hashlib.sha256(git(owner,build['source_base'],name).replace(b'\r\n',b'\n')).hexdigest(),
+        require(sha_lf(runtime_owner/name)==value==hashlib.sha256(git(runtime_owner,build['source_base'],name).replace(b'\r\n',b'\n')).hexdigest(),
                 'Native dependency source differs from immutable package producer')
-    check_files(owner,{**build['generated_source_files_sha256'],**build['runtime_files_sha256'],**build['candidate_runtime_files_sha256']})
+    check_files(runtime_owner,{**build['generated_source_files_sha256'],**build['runtime_files_sha256'],**build['candidate_runtime_files_sha256']})
     generated=list(engine.glob('native-dragonfly-*'));require(len(generated)==1,'Actual generated module source closure ambiguous')
     generated_manifest=json.loads((generated[0]/'native-source.json').read_text())
     require(generated_manifest['bounds_repairs']==[dict(field='EGauge::unit',original_capacity=5,capacity=6,original_longest_label='PITCH')],
@@ -155,6 +162,6 @@ def inspect_native(root,owner,reader,profile,phase,selected=None):
             all(sha(Path(n))==v for n,v in report['guarded_files_sha256'].items()),'Owning native capture or protected bytes changed during audit')
     return dict(status='audited-native-phase-only',phase=phase,profile=profile,diagnostic_only=selected is not None,
         actual_processes=processes,actual_presentations=processes*960,cases=results,capture_sha256=manifest_sha,
-        source_producer=report['producer_commit'],runtime_source=build['source_base'],actual_original_data=report['actual_original_data'],
+        source_producer=report['producer_commit'],runtime_source=build['source_base'],runtime_owner=str(runtime_owner),observer_delay_ms=delay,actual_original_data=report['actual_original_data'],
         guarded_files=len(report['guarded_files_sha256']),process_files=len(all_files),owning_bytes_unchanged=True,
         native_admission_qualified=False,phase6_complete=False)
