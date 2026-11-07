@@ -6,7 +6,7 @@ import json
 from pathlib import Path
 import tempfile
 
-from inventory import Dependencies,LOCK,ROOT,digest,index,normalize,require,ships
+from inventory import Dependencies,LOCK,ROOT,digest,index,normalize,require,ships,initial_ships
 
 
 def rejected(action):
@@ -22,6 +22,15 @@ def main():
     require(parsed=={'Wheel':'Wheel','Mir':'Mir'},'Indented stock blocks or class-name shorthand differ')
     require(rejected(lambda:ships('BEGIN_SHIPS\nA:Wheel\nEND\nA:Mir\nEND\nEND_SHIPS')),
             'Duplicate stock vessel headers were hidden')
+    def shuttle(configuration=''):
+        return 'BEGIN_SHIPS\nSTS:Atlantis\n'+configuration+'\nEND\nEND_SHIPS\n'
+    require(initial_ships(shuttle())=={'STS':'Atlantis'},'Original Atlantis default configuration differs')
+    require(initial_ships(shuttle('CONFIGURATION 2'))=={'STS':'Atlantis','STS_ET':'Atlantis_Tank'},
+            'Original tank-only initialization differs')
+    require(initial_ships(shuttle('CONFIGURATION 0'))==dict(STS='Atlantis',STS_ET='Atlantis_Tank',
+            **{'STS-SRB1':'Atlantis_SRB','STS-SRB2':'Atlantis_SRB'}),'Original launch-stack initialization differs')
+    require(rejected(lambda:initial_ships('BEGIN_SHIPS\nSTS:Atlantis\nCONFIGURATION 0\nEND\nSTS_ET:Wheel\nEND\nEND_SHIPS\n')),
+            'An incompatible generated-vessel name collision was accepted')
     require(rejected(lambda:normalize('../outside')) and normalize('Vessels\\.\\MiR')=='vessels/mir',
             'Resource path normalization differs')
     with tempfile.TemporaryDirectory(prefix='orbiter-stock-dependencies-') as temporary:
@@ -42,6 +51,8 @@ def main():
         raw=(ROOT/entry['path']).read_bytes().replace(b'\r\n',b'\n')
         require(hashlib.sha256(raw).hexdigest()==entry['sha256'],'Frozen source bytes differ')
         actual=ships(raw.decode('cp1252'))
+        require(initial_ships(raw.decode('cp1252')).items()>=actual.items(),
+                'Initialization manifest omitted an original vessel')
         if actual!={s['name']:s['vessel_class'] for s in entry['objects']}:mismatches.append(entry['path'])
     result=dict(status='passed',source_sha256=digest(Path(__file__)),lock_sha256=digest(LOCK),
         locked_scenarios_verified=157,config_only_vessel_preserved=True,required_module_fallback_rejected=True,

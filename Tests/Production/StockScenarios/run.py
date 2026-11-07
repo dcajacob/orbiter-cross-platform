@@ -55,7 +55,7 @@ def inspect(out,case,returncode,scenario=None,exit_reference=None,profile=None,a
         problems.append('Incomplete '+str(frames)+'-frame presentation or context deletion')
     states=rows(out/'flight-state.csv');groups={}
     for row in states:groups.setdefault(int(row['tick']),[]).append(row)
-    expected={(name,kind.lower()) for name,kind in case['ships'].items()}
+    expected={(name,kind.lower()) for name,kind in case.get('initial_ships',case['ships']).items()}
     if set(groups)!=set(range(frames+1)):problems.append('Incomplete finalized all-vessel ticks')
     for tick,group in groups.items():
         actual={(r['object'],r['class'].lower()) for r in group}
@@ -64,12 +64,13 @@ def inspect(out,case,returncode,scenario=None,exit_reference=None,profile=None,a
     if case['dependency_problems']:problems.append('Declared vessel dependencies are incomplete')
     meshes=rows(out/'visual-meshes.csv')
     result=dict(status='passed' if not problems else 'failed',problems=problems,returncode=returncode,
-        lifecycle=life,finalized_ticks=len(groups),declared_vessels=len(expected),
+        lifecycle=life,finalized_ticks=len(groups),declared_vessels=len(case['ships']),
         observed_vessels=sorted({(r['object'],r['class']) for r in states}),
         initial_mjd=float(states[0]['mjd']) if states else None,
         visual_mesh_records=len(meshes),
         files_sha256={name:digest(out/name) for name in ('console.log','flight-state.csv','visual-meshes.csv',
             'graphics-lifecycle.json','native-window.json','invocation.json','process-receipt.json') if (out/name).exists()})
+    if 'initial_ships' in case:result['initialized_vessels']=len(expected)
     if selected:
         result['intentional_exit']=exit_observation
         for path in sorted(out.iterdir()):
@@ -121,7 +122,8 @@ def main():
     sources.append(ROOT/'Tests/Production/Closeout/processes.py')
     report.update(status='inventory-only' if a.inventory_only else 'running',phase6_complete=False,
         scope='Unchanged complete 157-scenario corpus; initialization/smoke, not physical interaction or new Windows state/image parity',
-        backend=a.backend,engine_default_mjd_without_numeric_date=51982.5,execution_protocol='normal-stock-capture-v2',
+        backend=a.backend,engine_default_mjd_without_numeric_date=51982.5,execution_protocol='normal-stock-capture-v3',
+        roster_policy='stock-initialization-manifest-v1',
         runtime_owner=str(a.runtime_owner),diagnostic_only=a.case is not None,
         cases_requested=[name for name in report['cases'] if a.case is None or name in a.case],
         source_sha256={str(path.relative_to(ROOT)):digest(path) for path in sources},

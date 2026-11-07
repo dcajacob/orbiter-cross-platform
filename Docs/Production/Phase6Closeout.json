@@ -2754,11 +2754,27 @@
           "unchanged-intentional-exit-policy"
         ]
       },
-      "result": "not-run",
+      "result": "in-progress",
       "coverage": null,
       "diagnostic_only": null,
       "candidate_id": null,
-      "evidence": []
+      "evidence": [
+        {
+          "path": "/home/dan/.codex/worktrees/phase6-orbit-node-qualification/orbiter-cross-platform/out/phase6-stock-initialization-roster-qualification-v1.json",
+          "sha256": "49023b06755d867b63b8ca7b32a5bdf8824af1f4f0a0e04cffae983915be4e63",
+          "scope": "Versioned stock-initialization roster test correction; 152 preserved original Windows initialization graphs agree, five damaged real native graph controls rejected. Original failed attempt remains failed; no full admission credit."
+        }
+      ],
+      "qualification_progress": {
+        "application_source_commit": "c4ad4c424cd3bcd04fc56ba3a5ee37d033f8f1b8",
+        "roster_policy": "stock-initialization-manifest-v1",
+        "original_failures_preserved": [
+          "phase6-final-normal-admission-v1",
+          "phase6-final-normal-admission-v2",
+          "phase6-final-normal-admission-v3"
+        ],
+        "note": "v1/v2 stopped in evidence preflight; v3 stopped after exact-roster equality incorrectly rejected the three normal Atlantis-created children. Application/SDK unchanged."
+      }
     },
     "named-workflows": {
       "expected": {
@@ -3069,6 +3085,6 @@
       "note": "Physical controller hardware unavailable; virtual devices do not satisfy acceptance."
     }
   },
-  "current_blocker": "Finish the fourth native candidate build and corrected existing unit coverage, then complete normal-host canaries and the fixed software qualification campaigns. The inherited MFD fixture failure is corrected without changing production source.",
-  "next_exit_condition": "Seal the unchanged C4 Windows/native candidate identities and verify normal-host writers/exact-save reloads before full campaigns."
+  "current_blocker": "Complete finite final-candidate acceptance campaigns. Original-Windows full38 Debug/Release automatic captures are live. Normal admission is in focused validation of a proven inherited roster-test error; software gates and the hands-on walkthrough remain open.",
+  "next_exit_condition": "Pass the focused versioned normal-admission roster check, then complete all 157 entries in all four native profiles; independently audit complete final Windows/native campaigns."
 }

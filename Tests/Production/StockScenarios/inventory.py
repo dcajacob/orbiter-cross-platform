@@ -66,6 +66,47 @@ def ships(text):
     return result
 
 
+def initial_ships(text):
+    """Include the stock Atlantis post-creation graph, retaining every input ship.
+
+    Atlantis.cpp defaults CONFIGURATION to 3. Below 3 it docks/creates its ET;
+    below 2 it docks/creates both SRBs. No other generated class is admitted.
+    """
+    declared=ships(text);result=dict(declared);blocks={};current=None;inside=False
+    for raw in text.splitlines():
+        line=trim(raw)
+        if not inside:
+            if line.upper()=='BEGIN_SHIPS':inside=True
+            continue
+        if line.upper()=='END_SHIPS':break
+        if current is None:
+            if line:
+                current=line.partition(':')[0].strip();blocks[current]=[]
+        elif line.upper()=='END':current=None
+        else:blocks[current].append(line)
+    def values(name,key):
+        return [line.split(None,1)[1] for line in blocks.get(name,[])
+                if len(line.split(None,1))==2 and line.split(None,1)[0].upper()==key]
+    def dock(name,port):
+        entries=values(name,'DOCKINFO')
+        for item in (' '.join(entries)).split():
+            ports,separator,target=item.partition(',')
+            if separator and ports.partition(':')[0]==str(port):return target
+        return None
+    def add(name,kind):
+        require(name not in result or result[name].lower()==kind.lower(),
+                'Stock-created vessel collides with an incompatible declared class: '+name)
+        if name not in result:result[name]=kind
+    for name,kind in declared.items():
+        if kind.lower()!='atlantis':continue
+        entries=values(name,'CONFIGURATION');configuration=int(entries[-1]) if entries else 3
+        if configuration>=3:continue
+        tank=dock(name,1) or name+'_ET';add(tank,'Atlantis_Tank')
+        if configuration<2:
+            for port in (1,2):add(dock(tank,port) or name+'-SRB'+str(port),'Atlantis_SRB')
+    return result
+
+
 def fields(path):
     # Match GetItemString: strip semicolon comments, use the first key and stop
     # before END_PARSE. Module is read from the class file, not its base class.
@@ -138,6 +179,6 @@ def corpus(assets,modules):
         problem_classes={kind:classes[kind]['problems'] for kind in sorted(set(vessels.values())) if classes[kind]['problems']}
         original={v['name']:v['vessel_class'] for v in item['objects']}
         cases[relative.as_posix()]=dict(sha256_lf=item['sha256'],sha256_raw=hashlib.sha256(raw).hexdigest(),
-            ships=vessels,locked_inventory_metadata_differs=original!=vessels,
+            ships=vessels,initial_ships=initial_ships(text),locked_inventory_metadata_differs=original!=vessels,
             inventory_ready=not problem_classes,dependency_problems=problem_classes,status='not-run')
     return dict(lock_sha256=digest(LOCK),scenario_count=len(cases),cases=cases,classes=classes)
