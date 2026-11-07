@@ -54,6 +54,9 @@ def inspect_native(root,owner,reader,profile,phase,selected=None):
     root=Path(root).resolve();owner=Path(owner).resolve();manifest=root/'capture.json'
     report=json.loads(manifest.read_text());manifest_sha=sha(manifest)
     runtime_owner=Path(report.get('runtime_owner',owner)).resolve()
+    role=report.get('runtime_role','diagnostic')
+    require(role in ('diagnostic','normal'),'Unknown native application role')
+    if role=='normal':require(report.get('process_receipts')=='owned-pid-start-argv-exit-v1','Normal captures require actual owned process receipts')
     delay=report.get('observer_delay_ms',120)
     command=json.loads((root/'probe-command.json').read_text())
     require(type(delay) is int and delay in (0,120) and
@@ -79,6 +82,7 @@ def inspect_native(root,owner,reader,profile,phase,selected=None):
                 'Actual native reader/input differs from immutable producer: '+name)
     first=root/(ids[0]+'-1');invocation=json.loads((first/'invocation.json').read_text())
     engine=Path(invocation['argv'][0]).parent;build_path=engine.parent/'build.json'
+    executable=engine/('orbiter-production' if role=='normal' else 'production_remaining_stock_diagnostic')
     build=json.loads(build_path.read_text())
     require(build['source_base']==report['runtime_source_commit'],'Native package source identity differs')
     identity=reader.native.build_identity(engine/'orbiter-production',engine/'NativeModules',build_path,build['source_base'],runtime_owner) \
@@ -123,8 +127,16 @@ def inspect_native(root,owner,reader,profile,phase,selected=None):
             executed=recorded['executed_case']
             invocation=json.loads((out/'invocation.json').read_text())
             require(invocation['collector_producer_commit']==report['producer_commit'] and
-                    invocation['persistence_phase']==phase and invocation['argv'][0]==str(engine/'production_remaining_stock_diagnostic'),
+                    invocation['persistence_phase']==phase and invocation['argv'][0]==str(executable) and
+                    invocation.get('runtime_role','diagnostic')==role,
                     'Executed native collector phase/producer/application differs')
+            if report.get('process_receipts'):
+                require(report['process_receipts']=='owned-pid-start-argv-exit-v1','Unknown native process receipt protocol')
+                receipt=json.loads((out/'process-receipt.json').read_text())
+                actual=[entry for entry in receipt['owned_process_identities'] if entry['pid']==receipt['actual_collector_pid']]
+                require(receipt['terminal'] and not receipt['cancelled'] and receipt['actual_returncode']==0 and
+                        len(actual)==1 and actual[0]['start_ticks']>0 and actual[0]['argv']==invocation['argv'],
+                        'Actual native simulator PID/start/argv/exit differs')
             require(json.loads((out/'persistence-input.json').read_text())==recorded['persistence_input'],
                     'Actual native saved-input descriptor differs')
             if phase=='stock-writer':require(executed==case,'Unchanged stock-writer scene was substituted')
@@ -136,7 +148,8 @@ def inspect_native(root,owner,reader,profile,phase,selected=None):
                 if selected is None:require(provenance['parent_source_variant_protocol']=='remaining-stock-repaired-sources-v4' and
                     provenance['parent_startup_configuration'] is not None,'Full native reload lacks fresh original Windows source/input witnesses')
             check_files(out,recorded['files_sha256']);all_files.update({str(out/n):v for n,v in recorded['files_sha256'].items()})
-            actual=reader.native.inspect(out,executed,config,identity,engine,root/'remaining-vessels-probe.so',libraries,gtk)
+            options={'runtime_role':role} if role=='normal' else {}
+            actual=reader.native.inspect(out,executed,config,identity,engine,root/'remaining-vessels-probe.so',libraries,gtk,**options)
             require(all(recorded[k]==v for k,v in actual.items()),'Recomputed complete native runtime observation differs')
             saved=reader.inspect_save(out,contract);require(saved==recorded['saved_state'],'Complete actual native saved content differs')
             all_files[str(out/'saved.scn')]=saved['sha256']
@@ -160,8 +173,10 @@ def inspect_native(root,owner,reader,profile,phase,selected=None):
     reader.data_inputs.validate(report['actual_original_data'])
     require(sha(manifest)==manifest_sha and all(sha(Path(n))==v for n,v in all_files.items()) and
             all(sha(Path(n))==v for n,v in report['guarded_files_sha256'].items()),'Owning native capture or protected bytes changed during audit')
-    return dict(status='audited-native-phase-only',phase=phase,profile=profile,diagnostic_only=selected is not None,
+    result=dict(status='audited-native-phase-only',phase=phase,profile=profile,diagnostic_only=selected is not None,
         actual_processes=processes,actual_presentations=processes*960,cases=results,capture_sha256=manifest_sha,
         source_producer=report['producer_commit'],runtime_source=build['source_base'],runtime_owner=str(runtime_owner),observer_delay_ms=delay,actual_original_data=report['actual_original_data'],
         guarded_files=len(report['guarded_files_sha256']),process_files=len(all_files),owning_bytes_unchanged=True,
         native_admission_qualified=False,phase6_complete=False)
+    if 'runtime_role' in report:result.update(runtime_role=role,process_receipts=report.get('process_receipts'))
+    return result

@@ -73,6 +73,19 @@ constants, disabled contraction/fast math, two actual full-frame pairs and five
 small exact controls preserve the retained Python scores bit for bit. The
 original reader remains intact. No masks, rescaling or threshold changes.
 
+For final native stock capture, explicitly declare `runtime_role: normal` in
+the coordinator request (`capture_native.py --runtime-role normal`). This
+selects the source-bound `orbiter-production`, rejects diagnostic-host markers
+and retains actual simulator PID/start/argv/exit receipts. The role is separate
+from complete-versus-selected scene scope. Historical captures default to the
+diagnostic application and retain their original missing receipts. A normal
+host accepts the existing controlled system-clock input only for a bounded
+evidence replay; this does not change the interactive clock or physics methods.
+The coordinator executes the scalar comparison wrapper from its independently
+verified owning path, with that identity recorded alongside the current runner.
+Normal admission and actual qualification remain required before this role can
+earn final-candidate acceptance.
+
 A `reuse` entry names a closed capture, its SHA256 and its actual original
 `collector_commit`. Reuse re-runs the owning independent reader and comparisons;
 it never relabels an old capture with the current reader's commit.

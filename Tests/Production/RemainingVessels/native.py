@@ -62,15 +62,20 @@ def inspect_inputs(out,case,config):
 shared.inspect_inputs=inspect_inputs
 
 
-def inspect(out,case,config,identity,build,probe,libraries,gtk_plugin,instrument_control=False):
+def inspect(out,case,config,identity,build,probe,libraries,gtk_plugin,instrument_control=False,runtime_role='diagnostic'):
+    require(runtime_role in ('diagnostic','normal'),'Explicit native runtime role required')
     require(json.loads((out/'process-result.json').read_text())['returncode']==0,'Native process did not return zero')
     require((out/'stock-vessel-complete.txt').read_text().strip()==str(config['frames']),'Native observation ended early')
     result=shared.inspect_trace(out,case,config)
     life=json.loads((out/'graphics-lifecycle.json').read_text())
     require(life==dict(rendered_frames=config['frames'],successful_presents=config['frames'],context_deleted=True),
             'Native actual presentations/context teardown incomplete')
-    marker=json.loads((out/'unqualified-remaining-stock-diagnostic.json').read_text())
-    require(marker['native_admission_qualified'] is False and marker['phase6_complete'] is False,'Diagnostic marker differs')
+    if runtime_role=='diagnostic':
+        marker=json.loads((out/'unqualified-remaining-stock-diagnostic.json').read_text())
+        require(marker['native_admission_qualified'] is False and marker['phase6_complete'] is False,'Diagnostic marker differs')
+    else:
+        require(not (out/'unqualified-remaining-stock-diagnostic.json').exists() and
+                not (out/'unqualified-atlantis-diagnostic.json').exists(),'Normal host emitted an unqualified-host marker')
     text=(out/'console.log').read_text(errors='replace')
     require(not any(value in text for value in ('Lua error:','LuaCall (','Orbiter native production:','Production teardown:',
         'runtime error:','ERROR: AddressSanitizer','ERROR: LeakSanitizer','AddressSanitizer:DEADLYSIGNAL',
@@ -92,7 +97,7 @@ def inspect(out,case,config,identity,build,probe,libraries,gtk_plugin,instrument
     require(len((out/'scene.rgba').read_bytes())==1280*720*4,'Native framebuffer incomplete')
     mapped=(out/'observer-loaded-maps.txt').read_text()
     required=[build/'liborbiter_production_boundary.so',build/'liborbiter_production_vessels.so',
-              build/'production_remaining_stock_diagnostic',probe,*libraries,gtk_plugin]
+              build/('orbiter-production' if runtime_role=='normal' else 'production_remaining_stock_diagnostic'),probe,*libraries,gtk_plugin]
     for kind in set(case['declared_vessels'].values()):
         module=config['classes'][kind]['module']
         if module:required.append(build/'NativeModules/Vessel'/(module+'.so'))

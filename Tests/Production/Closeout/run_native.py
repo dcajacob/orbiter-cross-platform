@@ -16,6 +16,21 @@ from contracts import (PHASES, PROFILES, Scope, atomic_json, load, require,
 from processes import OwnedProcess
 
 
+def bind_frame_comparator(descriptor,reference):
+    # Execute the verified wrapper at its retained owner. Copying its bytes
+    # into another worktree must not invent a new implementation identity.
+    path=Path(descriptor['verification']);require(sha(path)==descriptor['verification_sha256'],'Frame verification changed')
+    record=load(path)
+    wrappers=[Path(p) for p in record['guarded_files_sha256'] if Path(p).name=='ssim_kernel.py']
+    require(len(wrappers)==1 and sha(wrappers[0])==record['guarded_files_sha256'][str(wrappers[0])],
+            'Unique actual verified frame wrapper required')
+    spec=importlib.util.spec_from_file_location('verified_frame_wrapper',wrappers[0])
+    module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module)
+    function,identity=module.bind(path,descriptor['verification_sha256'],reference)
+    identity['wrapper']=dict(path=str(wrappers[0]),sha256=sha(wrappers[0]))
+    return function,identity
+
+
 def interaction_matrix(args,request):
     """Use the existing collector/readers for one finite class-control matrix."""
     required={'hst-keys','solar-paddles','quad-controllers','module2-physical-docking',
@@ -154,9 +169,8 @@ def main():
     config = reader.native.settings(reader.protocols.V2)
     comparator = None
     if 'frame_comparator' in request:
-        from ssim_kernel import bind
         descriptor=request['frame_comparator']
-        function,comparator=bind(descriptor['verification'],descriptor['verification_sha256'],reader.windows.image_ssim)
+        function,comparator=bind_frame_comparator(descriptor,reader.windows.image_ssim)
         reader.windows.image_ssim=reader.native.shared.image_ssim=function
     args.output.mkdir(parents=True)
     lock = threading.RLock()
@@ -195,6 +209,7 @@ def main():
                 '--build', str(package / 'engine'), '--build-record', str(package / 'build.json'),
                 '--output', str(output), '--phase', phase, '--jobs', str(request['jobs_per_collector'])]
         if 'runtime_owner' in request:argv+=['--runtime-owner',request['runtime_owner']]
+        if 'runtime_role' in request:argv+=['--runtime-role',request['runtime_role']]
         if 'observer_delay_ms' in request:
             require(type(request['observer_delay_ms']) is int and request['observer_delay_ms'] in (0,120),'Explicit observer pacing required')
             argv+=['--observer-delay-ms',str(request['observer_delay_ms'])]

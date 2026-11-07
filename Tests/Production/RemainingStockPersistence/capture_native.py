@@ -24,6 +24,8 @@ import data_inputs
 import configuration_input
 from saved_inputs import derived_case,protocol
 from saved_state import parse_saved,require
+sys.path.insert(0,str(HERE.parent/'Closeout'))
+from processes import OwnedProcess
 
 spec=importlib.util.spec_from_file_location('persistence_native_scene_reader',HERE.parent/'RemainingVessels/native.py')
 native=importlib.util.module_from_spec(spec);spec.loader.exec_module(native)
@@ -118,6 +120,8 @@ def main():
                    help='Immutable checkout owning the compiled package; collector identity remains separate')
     p.add_argument('--observer-delay-ms',type=int,choices=(0,120),default=120,
                    help='Explicit observer wall pacing; zero requires equivalence qualification before broad use')
+    p.add_argument('--runtime-role',choices=('diagnostic','normal'),default='diagnostic',
+                   help='Compiled application role, separate from full or selected capture scope')
     p.add_argument('--case',action='append');p.add_argument('--jobs',type=int,default=1)
     a=p.parse_args();contract=protocol();config=native.settings(protocols.V2)
     require(sys.platform=='linux' and not a.output.exists() and a.jobs>0,'Native Linux, fresh output and positive concurrency required')
@@ -125,9 +129,10 @@ def main():
     record=json.loads(a.build_record.read_text());require(record['status']=='built','Complete immutable native package required')
     identity=native.build_identity(a.build/'orbiter-production',a.build/'NativeModules',a.build_record,record['source_base'],a.runtime_owner)
     require(identity['sanitizer_linked'],'Persistence candidate requires actual ASan/UBSan linkage')
-    candidate=a.build/'production_remaining_stock_diagnostic'
-    require(record['candidate_runtime_files_sha256'][candidate.relative_to(a.runtime_owner).as_posix()]==sha(candidate),
-            'Actual native diagnostic host differs from immutable package')
+    candidate=a.build/('orbiter-production' if a.runtime_role=='normal' else 'production_remaining_stock_diagnostic')
+    runtime_files=record['runtime_files_sha256'] if a.runtime_role=='normal' else record['candidate_runtime_files_sha256']
+    require(runtime_files[candidate.relative_to(a.runtime_owner).as_posix()]==sha(candidate),
+            'Actual declared native application differs from immutable package')
     guarded={str(a.runtime_owner/n):sha(a.runtime_owner/n) for n in {**record['source_sha256_lf'],**record['dependency_sha256_lf']}}
     for name,value in {**record['source_sha256_lf'],**record['dependency_sha256_lf']}.items():
         require(sha_lf(a.runtime_owner/name)==value,'Current owning source/dependency differs from native package: '+name)
@@ -211,7 +216,8 @@ def main():
             'Actual native generated-source mutation controls incomplete')
     guarded[str(controls_path)]=sha(controls_path)
     report=dict(status='running',protocol=contract['protocol'],phase=a.phase,host='native-linux',producer_commit=producer,
-        runtime_owner=str(a.runtime_owner),observer_delay_ms=a.observer_delay_ms,
+        runtime_owner=str(a.runtime_owner),observer_delay_ms=a.observer_delay_ms,runtime_role=a.runtime_role,
+        process_receipts='owned-pid-start-argv-exit-v1',
         runtime_source_commit=record['source_base'],runtime_identity=identity,source_sha256_lf=sources,guarded_files_sha256=guarded,
         asset_files_sha256=assets,actual_original_data=original_data,independently_checked_windows_runtime=parent_runtime,
         windows_parent_producer=parent['producer_commit'] if parent else None,diagnostic_only=diagnostic,cases_requested=[c['id'] for c in cases],
@@ -251,16 +257,22 @@ def main():
                 asan=subprocess.check_output([identity['compiler'],'-print-file-name=libasan.so'],text=True).strip()
                 env.update(LD_PRELOAD=asan+':'+str(probe),ASAN_OPTIONS='detect_leaks=1:fast_unwind_on_malloc=0',LSAN_OPTIONS='',UBSAN_OPTIONS='halt_on_error=1:print_stacktrace=1')
                 invocation=dict(argv=argv,protocol=protocols.V2,persistence_phase=a.phase,collector_producer_commit=producer,
+                    runtime_role=a.runtime_role,
                     configuration_input=startup_configuration,scenario_entry_point=case['scenario_entry_point'],
                     scenario_sha256_lf=sha_lf(target),class_inputs={kind:dict(path=chosen[config['classes'][kind]['target'].casefold()],sha256_lf=config['classes'][kind]['sha256_lf']) for kind in set(case['declared_vessels'].values())},
                     recording_files_sha256={n:sha(out/n) for n in native.shared.recordings(case,config)},finalized_frame_descriptor_sha256=sha(out/protocols.MARKER),
                     save_replay_sha256=sha(out/'persistence-replay.csv'),sanitizer_environment={k:env[k] for k in ('ASAN_OPTIONS','LSAN_OPTIONS','UBSAN_OPTIONS')})
                 (out/'invocation.json').write_text(json.dumps(invocation,indent=2)+'\n')
-                with (out/'console.log').open('w') as log:process=subprocess.run(argv,cwd=out,env=env,stdout=log,stderr=subprocess.STDOUT,timeout=1200)
-                (out/'process-result.json').write_text(json.dumps(dict(returncode=process.returncode))+'\n')
+                with (out/'console.log').open('w') as log:
+                    owned=OwnedProcess(argv,cwd=out,env=env,stdout=log,stderr=subprocess.STDOUT)
+                    try:owned.process.wait(timeout=1200)
+                    finally:
+                        receipt=owned.cancel()
+                        (out/'process-receipt.json').write_text(json.dumps(receipt,indent=2)+'\n')
+                        (out/'process-result.json').write_text(json.dumps(dict(returncode=owned.process.returncode))+'\n')
                 require(all(sha(out/n)==v for n,v in assets.items() if n!='Orbiter.cfg'),'An original native scene/script/recording/configuration/mesh/texture changed')
                 if (out/'scene.rgba').is_file() and (out/'scene.rgba').stat().st_size==1280*720*4:native.png(out/'scene.png',(out/'scene.rgba').read_bytes(),1280,720)
-                result=native.inspect(out,case,config,identity,a.build,probe,libraries,a.gtk_plugin)
+                result=native.inspect(out,case,config,identity,a.build,probe,libraries,a.gtk_plugin,runtime_role=a.runtime_role)
                 result.update(saved_state=inspect_save(out,contract),persistence_input=provenance,executed_case=case)
                 if parent_case['id']==cases[0]['id'] and repeat==1:
                     control_file=a.output/'configuration-input-controls.json'
