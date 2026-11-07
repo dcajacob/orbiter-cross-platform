@@ -16,6 +16,109 @@ from contracts import (PHASES, PROFILES, Scope, atomic_json, load, require,
 from processes import OwnedProcess
 
 
+def interaction_matrix(args,request):
+    """Use the existing collector/readers for one finite class-control matrix."""
+    required={'hst-keys','solar-paddles','quad-controllers','module2-physical-docking',
+              'rms-six-joint-and-stow','ldef-payload-release','leonardo_mplm-payload-release',
+              'carina-payload-release','atlantis-original-launch-staging'}
+    require(request['schema']==1 and tuple(request['profiles'])==PROFILES and
+            set(request['packages'])==set(PROFILES) and request['maximum_native_simulators']==4,
+            'Exact four-profile interaction packages and four-process ceiling required')
+    owner=Path(request['owner']).resolve();flows={}
+    require(request.get('collector_sources_sha256') and all(sha(owner/name)==value
+            for name,value in request['collector_sources_sha256'].items()),'Declared interaction collector source changed')
+    for entry in request['flows']:
+        path=Path(entry['plan']);require(sha(path)==entry['plan_sha256'],'Interaction plan changed')
+        found=[flow for flow in load(path)['flows'] if flow['id']==entry['id']]
+        require(len(found)==1 and entry['id'] not in flows and found[0]['case']==entry['case'],
+                'Missing, duplicate or substituted original interaction flow')
+        flows[entry['id']]=(entry,found[0])
+    from checklist import requirements
+    require(set(flows)==required and {family for _,flow in flows.values() for family in flow['families']}==
+            set(requirements()['class-eligibility']['families']), 'Finite complete family interaction scope required')
+    cells={profile+'/'+name for profile in PROFILES for name in flows}
+    require(request['expected_runs']==len(cells)*2==72 and set(request.get('reuse',{}))<=cells and
+            (not args.verify_reuse_only or request.get('reuse')),'Exact interaction cells/reuse scope required')
+    require(not args.output.exists(),'Fresh interaction coordinator output required')
+    args.output.mkdir(parents=True);(args.output/'audits').mkdir();(args.output/'captures').mkdir()
+    request_hash=sha(args.request);source_hash=sha(__file__);lock=threading.RLock();stop=threading.Event();active={}
+    report=dict(status='running',kind='class-interactions',request_sha256=request_hash,
+        coordinator_sha256=source_hash,cells={},failures={},required_runs=72,maximum_native_simulators=4,
+        diagnostic_only=True,native_admission_qualified=False,phase6_complete=False)
+    def save():
+        with lock:atomic_json(args.output/'status.json',report)
+    def cancel(_signal=None,_frame=None):
+        stop.set()
+        with lock:processes=list(active.values())
+        for process in processes:process.cancel()
+        save()
+    signal.signal(signal.SIGINT,cancel);signal.signal(signal.SIGTERM,cancel)
+    def execute(key,role,argv,cwd):
+        with (args.output/(key.replace('/','--')+'-'+role+'.log')).open('w') as log:
+            with lock:
+                require(not stop.is_set(),'Stopped after an earlier interaction failure')
+                process=OwnedProcess(argv,cwd=cwd,stdout=log,stderr=subprocess.STDOUT);active[key]=process
+            try:
+                while process.process.poll() is None:
+                    if stop.wait(.25):process.cancel();raise ValueError('Interaction coordinator cancelled')
+                require(process.process.returncode==0,'Actual '+role+' process failed')
+            finally:
+                receipt=process.cancel()
+                with lock:active.pop(key,None)
+                atomic_json(args.output/(key.replace('/','--')+'-'+role+'-receipt.json'),receipt)
+            return receipt
+    def cell(profile,name):
+        key=profile+'/'+name;entry,flow=flows[name]
+        with lock:report['cells'][key]=dict(status='starting');save()
+        try:
+            reused=request.get('reuse',{}).get(key);receipts={}
+            if reused:
+                capture=Path(reused['capture']).resolve();reader=Path(reused['owner']).resolve()
+                require(sha(capture)==reused['capture_sha256'],'Retained interaction capture changed')
+            else:
+                capture=args.output/'captures'/(profile+'--'+name)/'interactions.json';reader=owner
+                package=Path(request['packages'][profile]);argv=[sys.executable,'-B',str(owner/'Tests/Production/RemainingVessels/native.py'),
+                    '--interaction-plan',entry['plan'],'--owner',request['runtime_owner'],
+                    '--build',str(package/'engine'),'--build-record',str(package/'build.json'),
+                    '--output',str(capture.parent),'--jobs','1','--case',entry['case']]
+                for option in ('assets','data','planets','compositor-tools','gtk-plugin','gtk-build-record'):
+                    argv+=['--'+option,request['inputs'][option]]
+                for path in request['inputs']['libraries']:argv+=['--library',path]
+                receipts['collector']=execute(key,'collector',argv,owner)
+            audit_path=args.output/'audits'/(profile+'--'+name+'.json')
+            receipts['auditor']=execute(key,'auditor',[sys.executable,'-B',str(reader/'Tests/Production/RemainingVessels/interactions.py'),
+                '--capture',str(capture),'--output',str(audit_path)],reader)
+            original=load(capture);audit=load(audit_path)
+            require(audit['status']=='audited-selected-original-input-interactions-only' and
+                    audit['capture_sha256']==sha(capture) and audit['runtime_identity']['profile']==profile and
+                    audit['runtime_identity']['runtime_source_commit']==request['runtime_commit'] and
+                    name in audit['flows'] and len(audit['flows'][name])==2 and
+                    next(f for f in load(original['plan'])['flows'] if f['id']==name)==flow,
+                    'Independent exact interaction/profile/runtime/flow scope differs')
+            with lock:
+                report['cells'][key]=dict(status='reused-after-independent-audit' if reused else 'collected-and-independently-audited',
+                    capture=str(capture),capture_sha256=sha(capture),reader_owner=str(reader),
+                    audit=str(audit_path),audit_sha256=sha(audit_path),actual_runs=audit['flows'][name],receipts=receipts)
+                save()
+        except BaseException as error:
+            with lock:report['failures'][key]=dict(error=str(error),traceback=traceback.format_exc());save()
+            cancel()
+    selected=sorted(request['reuse']) if args.verify_reuse_only else sorted(cells)
+    with concurrent.futures.ThreadPoolExecutor(max_workers=4) as pool:
+        futures=[pool.submit(cell,*key.split('/',1)) for key in selected]
+        for future in concurrent.futures.as_completed(futures):future.result()
+    require(sha(args.request)==request_hash and sha(__file__)==source_hash,'Interaction request/coordinator changed')
+    require(all(sha(owner/name)==value for name,value in request['collector_sources_sha256'].items()),
+            'Interaction collector source changed during qualification')
+    if not report['failures'] and not stop.is_set():
+        require(set(report['cells'])==set(selected),'Incomplete interaction scope')
+        report['actual_runs']=sum(len(c['actual_runs']) for c in report['cells'].values())
+        require(report['actual_runs']==len(selected)*2,'Incomplete interaction repetition coverage')
+        report['status']='audited-reusable-interactions-only' if args.verify_reuse_only else 'all-family-interactions-collected-and-independently-audited'
+    else:report['status']='stopped-after-qualification-failure'
+    save();return int(bool(report['failures']) or stop.is_set())
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--request', required=True, type=lambda p: Path(p).resolve())
@@ -25,6 +128,7 @@ def main():
     request_sha = sha(args.request)
     request = load(args.request)
     require(request['schema'] == 1, 'Unknown coordinator request schema')
+    if request.get('kind')=='class-interactions':return interaction_matrix(args,request)
     owner = Path(request['owner']).resolve()
     producer = request['collector_commit']
     require(subprocess.check_output(['git', '-C', str(owner), 'rev-parse', 'HEAD'], text=True).strip() == producer,
