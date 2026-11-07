@@ -41,6 +41,7 @@ def main():
     p.add_argument('--configuration',choices=('Debug','Release'),required=True)
     p.add_argument('--math-profile',choices=('automatic','sse2'),required=True)
     p.add_argument('--sanitizers',action='store_true')
+    p.add_argument('--include-unit-tests',action='store_true',help='Build and inventory existing registered tests; does not mark them passed')
     p.add_argument('--jobs',type=int,default=4)
     a=p.parse_args();require(sys.platform=='linux','Native package requires Linux')
     require(not a.output.exists() and a.jobs>0,'Fresh package output and positive build concurrency required')
@@ -72,7 +73,7 @@ def main():
         common+=['-DCMAKE_C_FLAGS=-fsanitize=address,undefined -fno-omit-frame-pointer',
                  '-DCMAKE_CXX_FLAGS=-fsanitize=address,undefined -fno-omit-frame-pointer']
     commands=[dict(label='engine-configure',argv=['cmake','-S',str(ROOT/'Src/Orbiter/Production'),'-B',str(engine),'-G','Ninja',*common,
-        '-DBUILD_TESTING=OFF','-DORBITER_BUILD_NATIVE_CELESTIAL_MODULES=ON','-DORBITER_BUILD_NATIVE_VESSELS=ON',
+        '-DBUILD_TESTING='+('ON' if a.include_unit_tests else 'OFF'),'-DORBITER_BUILD_NATIVE_CELESTIAL_MODULES=ON','-DORBITER_BUILD_NATIVE_VESSELS=ON',
         '-DORBITER_BUILD_NATIVE_COCKPIT=ON','-DORBITER_BUILD_ATLANTIS_DIAGNOSTIC=ON','-DORBITER_BUILD_REMAINING_STOCK_DIAGNOSTIC=ON',
         '-DORBITER_MATH_FORCE_SSE2='+('ON' if a.math_profile=='sse2' else 'OFF'),
         '-DORBITER_NATIVE_LUA_ARCHIVE='+str(a.lua_archive),'-DORBITER_NATIVE_UI_ARCHIVE='+str(a.renderer_dependencies/'imgui.zip'),
@@ -128,6 +129,19 @@ def main():
         candidates=[engine/'production_atlantis_diagnostic',engine/'production_remaining_stock_diagnostic']
         require(all(path.is_file() for path in candidates),'Real diagnostic host absent')
         runtime=[engine/'orbiter-production',engine/'CMakeCache.txt',engine/'compile_commands.json',*sorted(engine.rglob('*.so'))]
+        if a.include_unit_tests:
+            listing=a.output/'registered-unit-tests.json'
+            command=['ctest','--test-dir',str(engine),'--show-only=json-v1']
+            data=json.loads(subprocess.check_output(command,text=True))
+            require(data['tests'] and len({test['name'] for test in data['tests']})==len(data['tests']) and
+                    all(test.get('command') and Path(test['command'][0]).is_file() for test in data['tests']),
+                    'Complete existing registered test binaries/commands required')
+            listing.write_text(json.dumps(data,indent=2)+'\n')
+            report['registered_unit_tests']=dict(path=str(listing),sha256=sha(listing),
+                command=command,registered_processes=len(data['tests']),executed=False,
+                scope='Actual CTest registration only; upstream Catch cases, portable tests and standalone fixtures remain separately required')
+            runtime += [listing,*sorted({Path(test['command'][0]) for test in data['tests']
+                                        if engine in Path(test['command'][0]).parents})]
         notice=engine/'NativeModules/Licenses/implot-LICENSE.txt'
         require(sha_lf(notice)==sha_lf(ROOT/'Tests/Production/Licenses/implot-LICENSE'),'ImPlot notice differs')
         report.update(status='built',owning_sources_unchanged=True,implot_notice_sha256_lf=sha_lf(notice),
