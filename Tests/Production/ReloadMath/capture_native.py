@@ -32,7 +32,7 @@ def main():
     if a.retained_package:
         require(a.extra_observer is not None,'Retained executable requires an additional passive observer')
         engine=a.retained_package/'engine';record=load(a.retained_package/'build.json')
-        identity=native.build_identity(engine/'orbiter-production',engine/'NativeModules',a.retained_package/'build.json',record['source_base'],a.owner)
+        identity=native.build_identity(engine/'orbiter-production',engine/'NativeModules',a.retained_package/'build.json',record['source_base'])
         require(identity['sanitizer_linked'],'Actual unsuppressed sanitizer package required')
         executable=engine/'production_remaining_stock_diagnostic'
         guarded={str(a.owner/name):value for group in ('runtime_files_sha256','candidate_runtime_files_sha256','generated_source_files_sha256') for name,value in record[group].items()}
