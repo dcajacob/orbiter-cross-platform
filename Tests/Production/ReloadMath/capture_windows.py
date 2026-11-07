@@ -77,6 +77,11 @@ def main():
                     guarded[str(path)]=value['sha256']
         output.mkdir();links=BinaryLinks(guarded,output);report['staging_controls']=links.controls(mesa);links.install()
         report['primary_runtime_identity']=runtime_identity;report['diagnostic_observer']=cfg['diagnostic_observer'];save()
+        if pacing:
+            report['base_primary_runtime_identity']=runtime_identity
+            report['primary_observer_overrides']=dict(off=dict(delay_ms=120,
+                sha256=built['runtime_files_sha256']['Modules/Plugin/ProductionCockpitDriver.dll']),
+                on=dict(delay_ms=0,sha256=sha(observer),preparation_sha256=cfg['diagnostic_observer']['preparation_sha256']))
         saved=Path(cfg['saved_input']['path']);require(sha(saved)==cfg['saved_input']['sha256'],'Exact Windows input bytes differ')
         derived,provenance=derived_case(case,config,saved,sha(saved))
         base_variant=dict(protocol=config['protocol'],protocol_sha256_lf=original.sha_lf(protocols.path(protocols.V2)),
@@ -141,6 +146,12 @@ def main():
             else:require((folder/'reload-math.csv').is_file(),'Actual passive observation missing')
             report['captures'][mode]=dict(folder=str(folder),process=load(folder/'process-timing.json'),graphics=life,
                 canonical_primary_audit=primary,staged_input_sha256=sha(folder/derived['scenario_entry_point']))
+            if pacing:
+                staged_observer=folder/'Modules/Plugin/ProductionCockpitDriver.dll'
+                require(any(Path(line.strip())==staged_observer for line in
+                    (folder/'renderer-modules.txt').read_text().splitlines()),'Actual primary observer mapping missing')
+                report['captures'][mode]['actual_primary_observer']=dict(path=str(staged_observer),
+                    sha256=sha(staged_observer),delay_ms=0 if mode=='on' else 120)
             save()
         # Trust the extra observer only after exact on/off equality over all
         # original physical/resource/event, clocks, camera, saved and frame bytes.
