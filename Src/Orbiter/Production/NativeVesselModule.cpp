@@ -39,13 +39,13 @@ struct LoadedVessel {
     }
 };
 }
-const char* NativeVesselModuleName(const Vessel& vessel) noexcept
-{
-    const auto* loaded=static_cast<const LoadedVessel*>(vessel.hMod);
-    return loaded?loaded->name.c_str():nullptr;
-}
 }
 using namespace orbiter::production;
+const char* Vessel::NativeModuleName() const noexcept
+{
+    const auto* loaded=static_cast<const LoadedVessel*>(hMod);
+    return loaded?loaded->name.c_str():nullptr;
+}
 bool Vessel::LoadModule(std::ifstream& config)
 {
     hMod=nullptr;ClearModule();

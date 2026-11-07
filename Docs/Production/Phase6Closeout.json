@@ -2355,8 +2355,8 @@
           "structural_combinations": 16,
           "declared_module_identity_required": true,
           "source": {
-            "path": "/home/dan/.codex/worktrees/phase6-production-qualification/orbiter-cross-platform/Src/Orbiter/Production/NativeApplication.cpp",
-            "sha256": "41f00c7343faf7952099cf9a7c15beecf0b7877d6867ae8ec9a09578592e55c0"
+            "path": "/home/dan/.codex/worktrees/phase6-final-build-integration/orbiter-cross-platform/Src/Orbiter/Production/NativeApplication.cpp",
+            "sha256": "a979d3b1969de4dd4a3e3d963327181d2ddccb7d06581222f8701258c22426ed"
           },
           "public_sdk_or_abi_changed": false,
           "normal_admission_gate_passed": false
@@ -2377,11 +2377,51 @@
           "discovered-unit-test-inventory"
         ]
       },
-      "result": "not-run",
+      "result": "in-progress",
       "coverage": null,
       "diagnostic_only": null,
       "candidate_id": null,
-      "evidence": []
+      "evidence": [],
+      "qualification_progress": {
+        "preserved_native_build_attempts": [
+          {
+            "path": "/home/dan/.codex/worktrees/phase6-production-qualification/orbiter-cross-platform/out/phase6-final-candidate-Debug-sse2-v1/build.json",
+            "sha256": "51d983b6653134b3fad463152a3b77a04ce1501ea84c5df39ff50645f93079e8",
+            "result": "failed-before-runtime-qualification"
+          },
+          {
+            "path": "/home/dan/.codex/worktrees/phase6-production-qualification/orbiter-cross-platform/out/phase6-final-candidate-Debug-sse2-v2/build.json",
+            "sha256": "4b8f1df497f1accdb4b65032e9e3098691716f695a0bd9de1b1c5607c48f428a",
+            "result": "failed-before-runtime-qualification"
+          },
+          {
+            "path": "/home/dan/.codex/worktrees/phase6-production-qualification/orbiter-cross-platform/out/phase6-final-candidate-Debug-sse2-v3/build.json",
+            "sha256": "963dac8f0f3a399a62a8431098a4447e81ccf0d9ba205cd62aac50be8a42670f",
+            "result": "failed-before-runtime-qualification"
+          }
+        ],
+        "preserved_windows_build_attempt": {
+          "path": "/home/dan/Shared/OrbiterPhase6-Codex-20261105-0240d516/phase6-final-candidate-22a1-v1/built/build.json",
+          "sha256": "37de9244d59d4178a4a82715f2e54ca7de22c1ada3a3c8c34051cfc4b53e7606",
+          "result": "Debug-compile-and-CTest-passed-metadata-failed-no-runtime-credit"
+        },
+        "accessor_compile_regression": {
+          "path": "/home/dan/.codex/worktrees/phase6-final-build-integration/orbiter-cross-platform/out/phase6-accessor-compile-regression-v1/commands.json",
+          "sha256": "5259af87b14aba0af53703b18cc5bb3ae004bc631a72bf4645c345d1068eb050",
+          "scope": "Actual failed module accessor and normal-host caller compile with captured compiler flags; syntax only, no runtime pass"
+        },
+        "source_conservation": {
+          "path": "/home/dan/.codex/worktrees/phase6-final-build-integration/orbiter-cross-platform/out/phase6-accessor-compile-regression-v1/source-conservation.log",
+          "sha256": "2223ebf27164fc41817a0540c4d847e4f954f4ad52c5d8ecbeb6a2e7809e5beb",
+          "scope": "All 622 extraction files; original Windows declarations, public SDK layouts and numerical operations conserved"
+        },
+        "fixes": [
+          "Explicit retained MPFR unit-test development prefix",
+          "Canonical recorder test dependency path",
+          "Native-only internal module-name accessor",
+          "Windows dependency junctions expected by the unchanged provenance reader"
+        ]
+      }
     },
     "remaining-stock": {
       "expected": {
@@ -2921,6 +2961,6 @@
       "note": "Physical controller hardware unavailable; virtual devices do not satisfy acceptance."
     }
   },
-  "current_blocker": "Matching final-candidate Windows Debug/Release and four native builds, followed by the remaining software acceptance campaigns. All seven class facets are closed; final normal-host admission remains unqualified.",
-  "next_exit_condition": "Build and seal the matching final candidate, verify the normal-host capture path, then run the complete fixed qualification matrices with fresh Windows reference receipts."
+  "current_blocker": "Final-candidate build integration. Class eligibility is closed. The focused native accessor compile and source conservation pass; matching full Windows/native builds and all remaining software qualification are pending.",
+  "next_exit_condition": "Complete matching Windows Debug/Release and four native builds, verify the normal-host capture path, and seal the final candidate before the remaining fixed campaigns."
 }

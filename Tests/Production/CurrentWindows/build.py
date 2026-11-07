@@ -131,12 +131,17 @@ def main():
         for configuration in ('Debug', 'Release'):
             report.update(status='building', active_configuration=configuration); save()
             build = work/('build-'+configuration)
+            (build/'_deps').mkdir(parents=True)
+            for name in deps:
+                target = build/'_deps'/(name.lower()+'-src')
+                run(configuration+'-dependency-'+name, [cmd, '/d', '/c', 'mklink', '/J',
+                    target, dependency_root/target.name], environment, source)
             flags = ['-DCMAKE_BUILD_TYPE='+configuration, '-DCMAKE_C_COMPILER=cl', '-DCMAKE_CXX_COMPILER=cl',
                      '-DCMAKE_EXPORT_COMPILE_COMMANDS=ON', '-DORBITER_BUILD_D3D9CLIENT=ON',
                      '-DORBITER_BUILD_XRSOUND=OFF', '-DORBITER_MAKE_DOC=OFF', '-DORBITER_MAKE_TESTS=ON',
                      '-DORBITER_PORTABLE_REFERENCE_CAPTURE=ON', '-DORBITER_PRODUCTION_REFERENCE_CAPTURE=ON',
                      '-DFETCHCONTENT_FULLY_DISCONNECTED=ON', '-DDXSDK_DIR:PATH='+cfg['dxsdk']]
-            flags += ['-DFETCHCONTENT_SOURCE_DIR_'+name.upper()+'='+str(dependency_root/(name.lower()+'-src')) for name in deps]
+            flags += ['-DFETCHCONTENT_SOURCE_DIR_'+name.upper()+'='+str(build/'_deps'/(name.lower()+'-src')) for name in deps]
             run(configuration+'-configure', [cmake, '-S', source, '-B', build, '-G', 'Ninja', *flags], environment, source)
             run(configuration+'-build', [cmake, '--build', build, '--parallel', cfg['jobs']], environment, source)
             listing = subprocess.check_output([str(cmake.parent/'ctest.exe'), '--test-dir', str(build), '--show-only=json-v1'], env=environment, text=True)

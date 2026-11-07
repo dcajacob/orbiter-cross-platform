@@ -148,7 +148,7 @@ bool SupportedRemainingStock(const Vessel& body,const VESSEL& vessel,const char*
         {"Quadcopter","Quadcopter",3,true,.3,1,1,1,0,0,0,false},
         {"SolarSail","SolarSail",2,true,1000,1,0,0,1,0,0,false}
     };
-    const char* module=NativeVesselModuleName(body);
+    const char* module=body.NativeModuleName();
     for(const auto& caps:qualified) {
         if(CompareText(type,caps.type)!=0 || (caps.module?
            (!module || CompareText(module,caps.module)!=0):module!=nullptr))continue;

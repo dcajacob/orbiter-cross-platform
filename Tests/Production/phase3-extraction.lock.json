@@ -743,7 +743,7 @@
     },
     "Src/Orbiter/Production/NativeApplication.cpp": {
       "original_sha256_lf": null,
-      "sha256_lf": "41f00c7343faf7952099cf9a7c15beecf0b7877d6867ae8ec9a09578592e55c0",
+      "sha256_lf": "a979d3b1969de4dd4a3e3d963327181d2ddccb7d06581222f8701258c22426ed",
       "scope": "Original Lua Terminal MFD native SDK/bootstrap and cooperative worker ownership; explicitly admit LuaMFD only, conserve original vessel-first left/right Shift MFD dispatch, and destroy terminal Lua states before their vessels. Original drawing/commands/repository/Windows callbacks independently conserved; terminal buffers reclaimed and command termination bounded. Full runtime and original Windows qualification remain required. Native bare-Space pause convenience applies only without Shift/Control/Alt, retaining exact logical Pause bindings and original modified-space delivery to vessel callbacks. Original DG and Atlantis Ctrl+Space control dialogs retain their source and behavior; no physics or dispatch order change. Native buffered key edges recover their chronological key state from the final held snapshot; modifier chords retain event-time meaning across batched polls. Immediate held input, FlightInput layout, original vessel/MFD priority and physics are unchanged."
     },
     "Src/Orbiter/Production/NativeBuild.h.in": {
@@ -831,11 +831,11 @@
     },
     "Src/Orbiter/Production/NativeVesselModule.cpp": {
       "original_sha256_lf": null,
-      "sha256_lf": "f362d0274bbc0cc01107df09edddec057509770c9ac4d8f7849f2fb7086ad755"
+      "sha256_lf": "cbbf40e2fcb0ee16174370d9d262eaab9e1c76b9c6c120e19264c2961674faea"
     },
     "Src/Orbiter/Production/NativeVesselModule.h": {
       "original_sha256_lf": null,
-      "sha256_lf": "5e236c2566f4b6c7bc19a5801725d7ab7f87ffd04f26dc5ce6ca9d490de08d3f"
+      "sha256_lf": "e144f5f72c4f1af67d75d938aa07b8ee602ef26b09282d64b10df76b4761d378"
     },
     "Src/Orbiter/Production/NativeVesselObservation.cpp": {
       "original_sha256_lf": null,
@@ -1199,7 +1199,7 @@
       "original_sha256_lf": "9e34db9a70552f94f3966dbb14d57b3833e5f8f69246d5454c71161e93664e13"
     },
     "Src/Orbiter/Vessel.h": {
-      "sha256_lf": "b2efffd2bfcd2ee1d42c76c4ac15ebd4ba8477883dac0e063305cf2cf442b272",
+      "sha256_lf": "732b0be62ed311d4971dba17417fd09b950b15b8c8e47074aaa355c193c8c8db",
       "original_sha256_lf": "1d9a42f97d282bbe03fc9b176cefb81d45d36dd990bae8944925502e483e10dd"
     },
     "Src/Orbiter/VesselApplication.cpp": {
