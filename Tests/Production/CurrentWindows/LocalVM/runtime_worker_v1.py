@@ -67,7 +67,7 @@ try:
     assert report['context']['desktop'] == config['desktop']
     assert report['context']['window_station'].lower() == 'winsta0'
     assert report['worker_sha256'] == config['worker_sha256']
-    assert sha(share / 'win_local_process_v1.py') == config['helper_sha256']
+    assert sha(Path(__file__).parent / 'win_local_process_v1.py') == config['helper_sha256']
     os.environ['PATH'] = config['git_directory'] + ';' + str(Path(sys.executable).parent) + ';' + os.environ['PATH']
     os.environ['PYTHONDONTWRITEBYTECODE'] = '1'
     os.environ['LIBGL_ALWAYS_SOFTWARE'] = 'true'
