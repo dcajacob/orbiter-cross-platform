@@ -238,7 +238,9 @@ def capture(args):
                       args.build/'NativeModules/Graphics/OGLClient.so']
             required.extend(args.build/'NativeModules/Vessel'/(config['classes'][kind]['module']+'.so')
                 for kind in set(expected.values()) if config['classes'][kind]['module'])
-            providers=('libfontconfig.so.1','libGLX_mesa.so.0') if flow.get('window_system')=='x11' else ('libfontconfig.so.1','libEGL_mesa.so.0','libgdk-3.so.0')
+            # X11 uses GLX and no libdecor/GTK font stack. Wayland retains its
+            # actual GTK, fontconfig and EGL provider requirements.
+            providers=('libGLX_mesa.so.0',) if flow.get('window_system')=='x11' else ('libfontconfig.so.1','libEGL_mesa.so.0','libgdk-3.so.0')
             if flow.get('window_system','wayland')=='wayland':required.append(args.gtk_plugin)
             for name in providers:
                 found=[p/name for p in args.library if (p/name).is_file()]
@@ -256,11 +258,14 @@ def capture(args):
                     owned=OwnedProcess(argv,cwd=folder,env=env,stdout=log,stderr=subprocess.STDOUT)
                     try:
                         deadline=time.monotonic()+900
+                        observed_mappings=-1
                         while owned.process.poll() is None:
                             try:mapped=(Path('/proc')/str(owned.process.pid)/'maps').read_text()
                             except OSError:mapped=''
-                            if all(p in mapped for p in required):
-                                (folder/'actual-loaded-maps.txt').write_text(mapped);break
+                            count=sum(p in mapped for p in required)
+                            if mapped and count>observed_mappings:
+                                (folder/'actual-loaded-maps.txt').write_text(mapped);observed_mappings=count
+                            if count==len(required):break
                             require(time.monotonic()<deadline,'Interaction mapping/exit timeout');time.sleep(.01)
                         owned.process.wait(timeout=max(1,deadline-time.monotonic()))
                     finally:atomic_json(folder/'process-receipt.json',owned.cancel())
