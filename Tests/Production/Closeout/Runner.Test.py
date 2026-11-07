@@ -17,6 +17,15 @@ from processes import OwnedProcess, identity, same_process
 
 
 class ScopeTests(unittest.TestCase):
+    def test_selected_helper_directory_without_tests_cannot_pass(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root=Path(temporary);output=root/'must-not-pass.json'
+            result=subprocess.run([sys.executable,'-B',str(Path(__file__).with_name('run_controls.py')),
+                '--test-directory',str(root),'--output',str(output)],stdout=subprocess.PIPE,stderr=subprocess.STDOUT,text=True)
+            self.assertNotEqual(result.returncode,0)
+            self.assertIn('No unittest tests discovered',result.stdout)
+            self.assertFalse(output.exists())
+
     def capture(self, scope):
         return dict(status=scope.terminal, diagnostic_only=scope.selected,
             cases_requested=list(scope.cases), cases={c:dict(runs=[{}, {}]) for c in scope.cases},
