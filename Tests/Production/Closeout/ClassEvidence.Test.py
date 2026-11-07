@@ -6,8 +6,9 @@ from pathlib import Path
 import tempfile
 import unittest
 
-from class_eligibility import inspect_paused, OBJECTS
-from contracts import atomic_json, sha
+from class_eligibility import inspect_paused, family_coverage, OBJECTS
+from contracts import atomic_json, sha, load, ROOT
+from checklist import requirements
 
 
 def write_csv(path, records):
@@ -18,6 +19,26 @@ def write_csv(path, records):
 
 
 class PausedEvidenceControls(unittest.TestCase):
+    def test_family_matrix_rejects_partial_duplicate_and_mixed_source_cells(self):
+        specification=requirements()['class-eligibility']
+        ledger=load(ROOT/'Docs/Production/Phase6Closeout.json')
+        selected={k:v['lifetime_case'] for k,v in ledger['gates']['class-eligibility']['qualification_progress']['family_results'].items()}
+        cases={c['id']:c for c in load(ROOT/'Tests/Production/RemainingStock/cases.json')['cases']}
+        captures=[dict(capture='synthetic-'+profile,audit=dict(capture_sha256='a'*64,
+            runtime_identity=dict(profile=profile,runtime_source_commit='b'*40),
+            cases={name:dict(worlds=[None]*20,module_lifetimes={}) for name in set(selected.values())}))
+            for profile in specification['profiles']]
+        self.assertEqual(set(family_coverage(captures,specification,selected,cases)),set(specification['families']))
+        bad=copy.deepcopy(captures);bad[0]['audit']['cases'].pop(selected['HST'])
+        mixed=copy.deepcopy(captures);mixed[0]['audit']['runtime_identity']['runtime_source_commit']='c'*40
+        short=copy.deepcopy(captures);short[0]['audit']['cases'][selected['HST']]['worlds'].pop()
+        for damaged in (captures[:-1],captures+[captures[0]],bad,mixed,short):
+            with self.subTest(damaged=len(damaged)),self.assertRaises(ValueError):
+                family_coverage(damaged,specification,selected,cases)
+        wrong=dict(selected);wrong['HST']=selected['SolarSail']
+        with self.assertRaisesRegex(ValueError,'does not contain'):
+            family_coverage(captures,specification,wrong,cases)
+
     def test_incomplete_and_damaged_closed_controls_rejected(self):
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)

@@ -3,8 +3,10 @@ import argparse
 import csv
 import math
 from pathlib import Path
+import sys
 
 from contracts import atomic_json, load, require, sha
+from checklist import requirements
 
 OBJECTS = {'ISS': 'ProjectAlpha_ISS', 'STS-101': 'Atlantis', 'Leonardo': 'Leonardo_mplm'}
 STRINGS = {'object', 'class', 'dock', 'focus', 'attached'}
@@ -81,10 +83,67 @@ def inspect_paused(path):
                 native_admission_qualified=False, phase6_complete=False)
 
 
+def family_coverage(captures, specification, family_cases, cases):
+    profiles=specification['profiles'];families=specification['families']
+    require(set(family_cases)==set(families),'Finite family lifetime map differs')
+    expected_cases=set(family_cases.values())
+    require(all(name in cases and family in cases[name]['declared_vessels'].values()
+                for family,name in family_cases.items()),'Lifetime case does not contain its original family')
+    cells={profile:{} for profile in profiles};sources=set()
+    for capture in captures:
+        identity=capture['audit']['runtime_identity'];profile=identity['profile']
+        require(profile in cells,'Unknown family lifetime profile')
+        sources.add(identity['runtime_source_commit'])
+        for name,result in capture['audit']['cases'].items():
+            require(name in expected_cases and name not in cells[profile],
+                    'Unexpected or duplicate family lifetime case')
+            require(len(result['worlds'])==20,'Incomplete family twenty-world cell')
+            cells[profile][name]=dict(capture=capture['capture'],capture_sha256=capture['audit']['capture_sha256'],
+                                     actual_module_lifetimes=result['module_lifetimes'])
+    require(len(sources)==1 and all(set(row)==expected_cases for row in cells.values()),
+            'Missing family/profile/case or mixed source identities')
+    return {family:{profile:cells[profile][family_cases[family]] for profile in profiles} for family in families}
+
+
+def inspect_family_lifetimes(path):
+    path=Path(path).resolve();ledger=load(path);gate=ledger['gates']['class-eligibility']
+    specification=requirements()['class-eligibility']
+    require(gate['expected']==specification and
+            all(ledger['gates'][name]['result']=='passed' for name in specification['depends_on']),
+            'Fixed family requirements or prerequisite gates differ')
+    progress=gate['qualification_progress'];family_cases={name:value['lifetime_case']
+        for name,value in progress['family_results'].items()}
+    entries=[Path(p) for p in progress['active_lifetime_captures'].values()]
+    entries.append(Path(progress['unpaused_hst_canary']['capture']['path']))
+    require(len(entries)==len(set(entries))==5,'Exact four captures plus retained HST canary required')
+    sys.path.insert(0,str(Path(__file__).resolve().parents[1]/'RemainingVessels'))
+    from lifetimes import audit
+    captures=[dict(capture=str(p),audit=audit(p)) for p in entries]
+    cases={c['id']:c for c in load(Path(__file__).resolve().parents[1]/'RemainingStock/cases.json')['cases']}
+    covered=family_coverage(captures,specification,family_cases,cases)
+    facets=['source-abi','resource-ownership','twenty-cycle-teardown']
+    return dict(status='audited-family-positive-ABI-ownership-and-twenty-cycle-facets-only',
+        ledger_sha256=sha(path),families=covered,captures=captures,
+        actual_simulator_processes=sum(len(c['audit']['cases']) for c in captures),
+        complete_worlds=sum(c['audit']['worlds'] for c in captures),
+        successful_presents=sum(c['audit']['successful_presents'] for c in captures),
+        passed_facets=facets,remaining_facets=[v for v in specification['required'] if v not in facets],
+        auditor_sources_sha256={str(p):sha(p) for p in (Path(__file__).resolve(),
+            Path(__file__).with_name('checklist.py').resolve(),Path(__file__).with_name('contracts.py').resolve())},
+        scope='Complete original selected scenes in all four source-matched profiles. Actual checked native '
+              'factories/SDK ABI load, source/runtime/resource guards, twenty active worlds, module unloads, '
+              'clean contexts and unsuppressed sanitizer exits. Positive ABI loading does not satisfy '
+              'incompatible-module rejection controls. Capabilities, interactions and persistence remain open.',
+        diagnostic_only=True,native_admission_qualified=False,phase6_complete=False)
+
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('--paused-capture', type=Path, required=True)
+    kind=parser.add_mutually_exclusive_group(required=True)
+    kind.add_argument('--paused-capture', type=Path)
+    kind.add_argument('--family-manifest',type=Path)
     parser.add_argument('--output', type=Path, required=True)
     args = parser.parse_args()
     require(not args.output.exists(), 'Fresh independent class-evidence audit required')
-    atomic_json(args.output, inspect_paused(args.paused_capture))
+    atomic_json(args.output, inspect_paused(args.paused_capture) if args.paused_capture else
+                inspect_family_lifetimes(args.family_manifest))
