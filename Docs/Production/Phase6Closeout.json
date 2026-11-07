@@ -188,6 +188,11 @@
           "path": "/home/dan/.codex/worktrees/phase6-persistence-controls/orbiter-cross-platform/out/phase6-incomplete-persistence-matrix-control-v1.json",
           "sha256": "3541b854c0e2bc3af3c37f3ec22de602fd25d9f74137237c0ee1a4831505b2a9",
           "scope": "Actual running persistence matrix is rejected; no acceptance output produced"
+        },
+        {
+          "path": "/home/dan/.codex/worktrees/phase6-persistence-controls/orbiter-cross-platform/out/phase6-python-helper-inventory-v1.json",
+          "sha256": "587480d24e74b2a76dffc2742286e02961660d5536f8f68c5b09486991e2a056",
+          "scope": "128 actual Python helper tests in all 22 helper unittest files; separate headless CLI/runtime TestCase adapter remains open"
         }
       ],
       "note": "Complete declared runner/control/restoration/receipt scope passed, including actual nonce-bound Windows child receipts. Actual free capacity exceeds eight GiB; each long campaign must preflight capacity again.",
@@ -2175,11 +2180,30 @@
           "terminal-hud-mfd-text-and-images-without-new-masks"
         ]
       },
-      "result": "not-run",
+      "result": "in-progress",
       "coverage": null,
       "diagnostic_only": null,
       "candidate_id": null,
-      "evidence": []
+      "evidence": [
+        {
+          "path": "/home/dan/.codex/worktrees/phase6-persistence-controls/orbiter-cross-platform/out/phase6-python-helper-inventory-v1.json",
+          "sha256": "587480d24e74b2a76dffc2742286e02961660d5536f8f68c5b09486991e2a056",
+          "scope": "128 actual Python helper tests in all 22 helper unittest files; separate headless CLI/runtime TestCase adapter remains open"
+        }
+      ],
+      "qualification_progress": {
+        "python_helpers": {
+          "result": "passed-scoped-helper-tests-only",
+          "actual_tests": 128,
+          "executed_test_files": 22,
+          "audit": {
+            "path": "/home/dan/.codex/worktrees/phase6-persistence-controls/orbiter-cross-platform/out/phase6-python-helper-inventory-v1.json",
+            "sha256": "587480d24e74b2a76dffc2742286e02961660d5536f8f68c5b09486991e2a056",
+            "scope": "128 actual Python helper tests in all 22 helper unittest files; separate headless CLI/runtime TestCase adapter remains open"
+          },
+          "remaining": "C++/Lua, headless integration, runtime fixtures and final-candidate profile qualification"
+        }
+      }
     },
     "lifecycle-input": {
       "expected": {

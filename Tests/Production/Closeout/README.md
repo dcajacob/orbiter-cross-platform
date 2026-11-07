@@ -123,6 +123,14 @@ python3 -B Tests/Production/Closeout/Manifest.Test.py
 python3 -B Tests/Production/Closeout/run_controls.py --output NEW_JSON
 ```
 
+`run_controls.py --test-directory PATH --output NEW_JSON` selects one isolated
+helper directory, discovers both `*.Test.py` and `test_*.py`, records actual totals
+and immutable source matches, and rejects empty selections. Tests with top-level
+CLI arguments remain explicitly inventoried for their runtime adapters. Across
+seven isolated directories, all 128 helper tests in 22 files pass. These totals
+do not include the separate headless integration adapter, C++/Lua or runtime CLI
+fixtures, and do not close the core/interface gate.
+
 The discovered controls include disposable real
 process trees; `run_controls.py --output NEW_JSON` records actual totals and
 source hashes. Fixture captures do not count as simulator acceptance. Eight
