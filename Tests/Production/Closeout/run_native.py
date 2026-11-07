@@ -44,6 +44,12 @@ def main():
     audit = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(audit)
     config = reader.native.settings(reader.protocols.V2)
+    comparator = None
+    if 'frame_comparator' in request:
+        from ssim_kernel import bind
+        descriptor=request['frame_comparator']
+        function,comparator=bind(descriptor['verification'],descriptor['verification_sha256'],reader.windows.image_ssim)
+        reader.windows.image_ssim=reader.native.shared.image_ssim=function
     args.output.mkdir(parents=True)
     lock = threading.RLock()
     stop = threading.Event()
@@ -53,6 +59,7 @@ def main():
                   diagnostic_only=scope.selected, cases=list(scope.cases), stages={}, failures={},
                   native_admission_qualified=False, phase6_complete=False,
                   maximum_native_simulators=2 * request['jobs_per_collector'])
+    report['frame_comparator']=comparator
 
     def save():
         with lock:
