@@ -137,13 +137,67 @@ def inspect_family_lifetimes(path):
         diagnostic_only=True,native_admission_qualified=False,phase6_complete=False)
 
 
+def inspect_capability_matrix(path):
+    path=Path(path).resolve();ledger=load(path);gate=ledger['gates']['class-eligibility']
+    expected=requirements()['class-eligibility'];require(gate['expected']==expected,'Fixed capability requirements differ')
+    work=gate['qualification_progress']['capability_controls'];inventory_path=Path(work['inventory']['path'])
+    require(sha(inventory_path)==work['inventory']['sha256'],'Original structural capability inventory changed')
+    inventory=load(inventory_path)
+    require(inventory['status']=='hashed-original-Windows-initial-structural-capability-inventory-only' and
+            all(sha(p)==value for p,value in inventory['reference_files_sha256'].items()) and
+            set(work['captures'])==set(expected['profiles']) and work['repeats']==2 and
+            work['observer_lanes']==['off','on'] and work['expected_cases']==inventory['proposed_native_cases'],
+            'Complete actual capability inventory/profile/repeat scope required')
+    fields=inventory['fields'];signatures={tuple(v) for v in inventory['unique_signatures']}
+    require(len(signatures)==inventory['signature_count']==work['original_structural_signature_count'],
+            'Original capability signature inventory differs')
+    # Re-read the hashed Windows initial fields, instead of trusting a proposed
+    # signature list or a scene selection that happens to name every family.
+    actual=set()
+    for filename in inventory['reference_files_sha256']:
+        if Path(filename).name!='stock-vessel-state.csv':continue
+        with Path(filename).open(newline='') as stream:
+            for row in csv.DictReader(stream):
+                if row['tick']!='0':break
+                if row['class'] in expected['families']:
+                    actual.add((row['class'],*(float(row[k]) for k in fields)))
+    require(actual==signatures,'Proposed signatures omit or substitute actual original SDK fields')
+    sys.path.insert(0,str(Path(__file__).resolve().parents[1]/'RemainingVessels'))
+    from capabilities import audit
+    results={};sources=set();processes=0
+    for profile in expected['profiles']:
+        capture=Path(work['captures'][profile]);checked=audit(capture)
+        require(checked['runtime_identity']['profile']==profile and checked['repeats']==2 and
+                list(checked['cases'])==work['expected_cases'],'Capability profile/case/repetition incomplete')
+        observed=set()
+        for runs in checked['cases'].values():
+            for run in runs:
+                for row in run['actual_capabilities'].values():
+                    if row['class'] in expected['families']:
+                        observed.add((row['class'],*(float(row[k]) for k in fields)))
+        require(observed==signatures,'Native capability selection misses an original structural combination')
+        sources.add(checked['runtime_identity']['runtime_source_commit']);processes+=checked['actual_processes']
+        results[profile]=dict(capture=str(capture),audit=checked)
+    require(len(sources)==1 and processes==work['expected_processes'],'Mixed or incomplete capability runtime cohort')
+    return dict(status='audited-all-family-capability-variants-and-passive-observer-controls-only',
+        profiles=results,families=expected['families'],structural_signatures=len(signatures),
+        actual_processes=processes,successful_presents=processes*60,passed_facet='capabilities',
+        inventory_sha256=sha(inventory_path),auditor_source_sha256=sha(Path(__file__)),
+        scope='Every original stock initial structural combination is covered in native SDK snapshots, '
+              'four profiles and two observer-off/on repetitions. Sixty-frame diagnostics do not '
+              'qualify complete stock parity, interactions, persistence, rejection or normal admission.',
+        diagnostic_only=True,native_admission_qualified=False,phase6_complete=False)
+
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=__doc__)
     kind=parser.add_mutually_exclusive_group(required=True)
     kind.add_argument('--paused-capture', type=Path)
     kind.add_argument('--family-manifest',type=Path)
+    kind.add_argument('--capability-manifest',type=Path)
     parser.add_argument('--output', type=Path, required=True)
     args = parser.parse_args()
     require(not args.output.exists(), 'Fresh independent class-evidence audit required')
-    atomic_json(args.output, inspect_paused(args.paused_capture) if args.paused_capture else
-                inspect_family_lifetimes(args.family_manifest))
+    result=inspect_paused(args.paused_capture) if args.paused_capture else \
+        inspect_family_lifetimes(args.family_manifest) if args.family_manifest else inspect_capability_matrix(args.capability_manifest)
+    atomic_json(args.output,result)
