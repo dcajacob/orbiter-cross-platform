@@ -26,6 +26,19 @@ ENV=dict(ASAN_OPTIONS='detect_leaks=1:fast_unwind_on_malloc=0',LSAN_OPTIONS='',
          UBSAN_OPTIONS='halt_on_error=1:print_stacktrace=1',LD_PRELOAD=None)
 
 
+def population(flow,declared):
+    reference=flow.get('original_population')
+    if reference is None:return declared
+    require(set(reference)=={'path','sha256'} and sha(reference['path'])==reference['sha256'],
+            'Unchanged original Windows population observation required')
+    initial=[r for r in rows(reference['path']) if r['tick']=='0']
+    expected={r['object']:r['class'] for r in initial}
+    require(expected and len(expected)==len(initial) and
+            all(expected.get(name)==kind for name,kind in declared.items()),
+            'Generated stock population cannot remove or substitute a declared vessel')
+    return expected
+
+
 def value(folder,spec):
     if not isinstance(spec,dict):return spec
     require(set(spec)=={'trace','where','field'} and spec['trace'] in TRACES,'Explicit interaction trace selector required')
@@ -85,10 +98,13 @@ def audit(path):
     expected=[f for f in plan['flows'] if f['case'] in report['cases_requested']]
     require(set(report['flows'])=={f['id'] for f in expected},'Complete requested interaction scope required')
     result={}
+    cases={c['id']:c for c in load(HERE.parent/'RemainingStock/cases.json')['cases']}
     for flow in expected:
         runs=[]
         for repeat in (1,2):
             recorded=report['flows'][flow['id']][repeat-1]
+            require(recorded['original_vessels']==population(flow,cases[flow['case']]['declared_vessels']),
+                    'Independent complete original/generated population differs')
             actual=inspect(path.parent/(flow['id']+'-'+str(repeat)),flow,recorded['original_vessels'])
             require(actual==recorded,'Recomputed actual interaction differs');runs.append(actual)
         for name in ('flight-state.csv','flight-animations.csv','input-events.csv','saved.scn','scene.rgba'):
@@ -113,7 +129,11 @@ def capture(args):
     for flow in flows:
         require(1<=flow['frames']<=100000 and flow['fixed_step'] in (.015625,.25) and flow['checks'],
                 'Bounded declared interaction duration and outcomes required')
-        require(set(flow['families'])<=set(by_id[flow['case']]['declared_vessels'].values()),'Flow does not contain its original families')
+        expected=population(flow,by_id[flow['case']]['declared_vessels'])
+        require(set(expected.values())<=set(config['classes']) and set(flow['families'])<=set(expected.values()),
+                'Flow does not contain its original families')
+        if flow.get('original_population'):
+            guards[flow['original_population']['path']]=flow['original_population']['sha256']
         if flow.get('script'):require(not re.search(POSE,(ROOT/flow['script']).read_text()),'State-placement setters cannot manufacture an interaction')
         require(all(r['action'] in ('key','ui','mouse','focus','save') for r in flow['replay']),
                 'Original input/GUI/focus/save dispatch only')
@@ -133,7 +153,7 @@ def capture(args):
             for p in (assets,*(p for p in assets.rglob('*') if p.is_dir())):p.chmod(p.stat().st_mode|stat.S_IWUSR)
             scenario=assets/case['scenario_entry_point'];original=scenario.read_text()
             require(original==(ROOT/case['scenario_entry_point']).read_text(),'Original complete interaction scene differs')
-            expected=ships(original)
+            expected=population(flow,ships(original))
             if flow.get('script'):
                 require(not re.search(r'^\s*Script\s',original,re.M),'Original scenario script cannot be replaced')
                 line='  Script '+Path(flow['script']).stem+'\n'
