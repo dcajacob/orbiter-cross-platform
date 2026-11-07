@@ -1,15 +1,19 @@
 """Original key/GUI/Lua actuator interactions through the existing native runner."""
 import argparse
 import concurrent.futures
+from contextlib import contextmanager
 import csv
 import json
 import math
 import os
 from pathlib import Path
 import re
+import select
 import shutil
 import stat
 import subprocess
+import struct
+import tempfile
 import threading
 import time
 import traceback
@@ -24,6 +28,38 @@ OPS={'eq':lambda a,b:a==b,'ne':lambda a,b:a!=b,'gt':lambda a,b:a>b,'lt':lambda a
 POSE=r'(?:\bset_(?:globalpos|globalvel|rotationmatrix|globalorientation|elements|angvel)|:dock|:create_dock|:create_attachment|:attach_child|\bcreate_vessel)\s*\('
 ENV=dict(ASAN_OPTIONS='detect_leaks=1:fast_unwind_on_malloc=0',LSAN_OPTIONS='',
          UBSAN_OPTIONS='halt_on_error=1:print_stacktrace=1',LD_PRELOAD=None)
+
+
+@contextmanager
+def display_backend(args,folder,flow):
+    kind=flow.get('window_system','wayland')
+    require(kind in ('wayland','x11'),'Explicit supported interaction window system required')
+    if kind=='wayland':
+        with Compositor(args.compositor_tools,folder,1,'gl',repeat_rate=0) as display:
+            yield display.environment
+        return
+    executable=shutil.which('Xvfb');require(executable,'Existing private X11 server missing')
+    folder.mkdir()
+    with tempfile.TemporaryDirectory(prefix='orbiter-x11-',dir='/tmp') as private:
+        authority=Path(private)/'authority';cookie=os.urandom(16)
+        def auth(number):
+            fields=(b'',number.encode(),b'MIT-MAGIC-COOKIE-1',cookie)
+            authority.write_bytes(struct.pack('>H',65535)+b''.join(struct.pack('>H',len(v))+v for v in fields))
+        auth('0')
+        argv=[executable,'-displayfd','1','-screen','0','1920x1080x24','-nolisten','tcp','-auth',str(authority)]
+        atomic_json(folder/'invocation.json',dict(argv=argv,executable_sha256=sha(executable)))
+        with (folder/'console.log').open('w') as log:
+            owned=OwnedProcess(argv,stdout=subprocess.PIPE,stderr=log)
+            try:
+                require(select.select([owned.process.stdout],[],[],30)[0],'Private X11 server did not become ready')
+                number=owned.process.stdout.readline().decode().strip();require(number.isdigit(),'Private X11 display receipt missing')
+                auth(number)
+                environment=dict(os.environ,DISPLAY=':'+number,XAUTHORITY=str(authority),XDG_SESSION_TYPE='x11')
+                environment.pop('WAYLAND_DISPLAY',None);environment.pop('LD_PRELOAD',None)
+                yield environment
+            finally:
+                receipt=owned.cancel();atomic_json(folder/'process-receipt.json',receipt)
+        require(receipt['actual_returncode'] in (0,-15),'Private X11 server did not close')
 
 
 def schedule(flow):
@@ -78,6 +114,8 @@ def inspect(folder,flow,expected):
             'Actual application/module/provider mapping missing')
     require(load(folder/'numerics.json')['math']==invocation['expected_actual_math'],
             'Actual interaction CPU math profile differs')
+    require(load(folder/'native-window.json')['backend']==flow.get('window_system','wayland'),
+            'Actual interaction window backend differs')
     dispatched=schedule(flow)
     require(invocation['dispatched_replay']==dispatched,'Exact original-control and Ctrl-S schedule differs')
     events=rows(folder/'input-events.csv')
@@ -197,18 +235,20 @@ def capture(args):
             inputs={str(p):sha(p) for p in (executable,scenario,folder/'Orbiter.cfg',folder/'replay.csv')}
             if flow.get('script'):inputs[str(target)]=sha(target)
             required=[executable,args.build/'liborbiter_production_boundary.so',args.build/'liborbiter_production_vessels.so',
-                      args.build/'NativeModules/Graphics/OGLClient.so',args.gtk_plugin]
+                      args.build/'NativeModules/Graphics/OGLClient.so']
             required.extend(args.build/'NativeModules/Vessel'/(config['classes'][kind]['module']+'.so')
                 for kind in set(expected.values()) if config['classes'][kind]['module'])
-            for name in ('libfontconfig.so.1','libEGL_mesa.so.0','libgdk-3.so.0'):
+            providers=('libfontconfig.so.1','libGLX_mesa.so.0') if flow.get('window_system')=='x11' else ('libfontconfig.so.1','libEGL_mesa.so.0','libgdk-3.so.0')
+            if flow.get('window_system','wayland')=='wayland':required.append(args.gtk_plugin)
+            for name in providers:
                 found=[p/name for p in args.library if (p/name).is_file()]
                 require(len(found)==1,'Explicit unique interaction provider required: '+name);required+=found
             required=[str(p.resolve()) for p in required]
             atomic_json(folder/'invocation.json',dict(argv=argv,flow=flow,environment=ENV,guarded_files_sha256=inputs,
                 required_mapped_files=required,dispatched_replay=schedule(flow),
                 expected_actual_math='amd-6121d02-'+('sse2' if identity['math_profile']=='sse2' else 'fma3')))
-            with Compositor(args.compositor_tools,folder/'compositor',1,'gl',repeat_rate=0) as display:
-                env=dict(display.environment,**{k:v for k,v in ENV.items() if v is not None},
+            with display_backend(args,folder/'compositor',flow) as display_environment:
+                env=dict(display_environment,**{k:v for k,v in ENV.items() if v is not None},
                     LIBGL_ALWAYS_SOFTWARE='1',GALLIUM_DRIVER='llvmpipe',LP_NUM_THREADS='2',
                     LIBDECOR_PLUGIN_DIR=str(args.gtk_plugin.parent),LD_LIBRARY_PATH=':'.join(map(str,[args.build,*args.library])))
                 env.pop('LD_PRELOAD',None)
