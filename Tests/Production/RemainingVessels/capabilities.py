@@ -109,7 +109,7 @@ def reference(args,cases,identity,original_data,guards):
             for name,value in recorded['files_sha256'].items():
                 require(sha(folder/name)==value,'Original Windows reference file changed: '+name)
                 guards[str(folder/name)]=value
-            value=audit.capture.inspect_run(folder,case,config)
+            value=audit.capture.inspect_artifacts(folder,case,config)
             require(all(recorded[k]==v for k,v in value.items()),'Original Windows observation differs')
             wanted={'Orbiter.exe':build['runtime_files_sha256']['Orbiter.exe']}
             wanted.update({PureWindowsPath(config['classes'][kind]['original_module']).name:
