@@ -2,8 +2,37 @@
 #include "NativeWorldVesselServices.h"
 #include "Vessel.h"
 #include "SuperVessel.h"
+#include "VesselServices.h"
+#include "Text.h"
+#include <stdexcept>
 namespace orbiter::production {
 namespace {
+void PreflightPlayback(std::ifstream& input,const char* name) {
+    // A missing required stock position stream is a native resource error.
+    // Resolve it before entering Vessel's original constructor, whose legacy
+    // raw allocations cannot unwind a throwing host resource lookup. Retain
+    // the stream position and every original status/physics operation.
+    const auto position=input.tellg();
+    if(position==std::streampos(-1))throw std::runtime_error("Vessel scenario stream is not seekable");
+    bool requested=false;std::string line;
+    while(std::getline(input,line)) {
+        const auto start=line.find_first_not_of(" \t\r");
+        if(start==std::string::npos)continue;
+        const auto end=line.find_last_not_of(" \t\r");
+        const auto value=line.substr(start,end-start+1);
+        if(!CompareText(value.c_str(),"END"))break;
+        if(!ComparePrefix(value.c_str(),"FLIGHTDATA",10)) {requested=true;break;}
+    }
+    input.clear();input.seekg(position);
+    if(!input)throw std::runtime_error("Cannot restore vessel scenario stream");
+    if(requested) {
+        auto& services=GetVesselServices();
+        const std::string directory(services.PlaybackDirectory());
+        const auto slash=directory.find_last_of("/\\");
+        const auto relative="Flights/"+directory.substr(slash==std::string::npos?0:slash+1)+"/"+name+".pos";
+        services.RecorderFile(relative.c_str(),false);
+    }
+}
 class NativeWorldVesselServices final:public WorldVesselServices {
     bool& force;
 public:
@@ -11,7 +40,7 @@ public:
     Body& State(Vessel& vessel) const override {return vessel;}
     const char* Name(const Vessel& vessel) const override {return vessel.Name();}
     Vessel* Create(PlanetarySystem& system,const char* name,const char* type,std::ifstream& input) override
-    {return new Vessel(&system,name,type,input);}
+    {PreflightPlayback(input,name);return new Vessel(&system,name,type,input);}
     void PostCreation(Vessel& vessel) override {vessel.PostCreation();}
     void InitSupervessel(Vessel& vessel) override {vessel.InitSupervessel();}
     void ModulePostCreation(Vessel& vessel) override {vessel.ModulePostCreation();}
