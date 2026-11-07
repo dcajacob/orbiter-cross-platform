@@ -2769,6 +2769,11 @@
           "path": "/home/dan/.codex/worktrees/phase6-stock-admission/orbiter-cross-platform/out/phase6-existing-core-units-Debug-sse2-v1/verification.json",
           "sha256": "c8d386aa5f973efa83fa3df1de26f1bc77a85b3429337a423deb53ed61313d51",
           "scope": "Two existing upstream units, sixteen actual Catch cases, on the retained C8 Debug/SSE2 SDK. Actual runtime listing and CTest execution, no new test bodies. Other profiles, existing CTest/portable/standalone fixtures and the final candidate core gate remain required."
+        },
+        {
+          "path": "/home/dan/.codex/worktrees/phase6-orbit-node-qualification/orbiter-cross-platform/out/phase6-orbit-fixture-root-cause-v1.json",
+          "sha256": "7f01d3cc64b44444540f0a9f73b2fa8a5259630bc50e4988cd0e289edefa2c9a",
+          "scope": "Explicit inherited fixture initialization correction; original failure and rejected uncommitted production guard retained. Production source stays C4; all-profile/current-Windows verification remains required."
         }
       ],
       "qualification_progress": {
@@ -2820,6 +2825,20 @@
             "scope": "Two existing upstream units, sixteen actual Catch cases, on the retained C8 Debug/SSE2 SDK. Actual runtime listing and CTest execution, no new test bodies. Other profiles, existing CTest/portable/standalone fixtures and the final candidate core gate remain required."
           },
           "final_candidate_gate_passed": false
+        },
+        "orbit_geometry_fixture": {
+          "result": "corrected-fixture-three-native-profiles-passed",
+          "variant": "orbit-geometry-production-state-initialization-v1",
+          "evidence": {
+            "path": "/home/dan/.codex/worktrees/phase6-orbit-node-qualification/orbiter-cross-platform/out/phase6-orbit-fixture-root-cause-v1.json",
+            "sha256": "7f01d3cc64b44444540f0a9f73b2fa8a5259630bc50e4988cd0e289edefa2c9a",
+            "scope": "Explicit inherited fixture initialization correction; original failure and rejected uncommitted production guard retained. Production source stays C4; all-profile/current-Windows verification remains required."
+          },
+          "production_changed": false,
+          "remaining": [
+            "Release-sse2",
+            "current-Windows"
+          ]
         }
       }
     },
@@ -2961,6 +2980,6 @@
       "note": "Physical controller hardware unavailable; virtual devices do not satisfy acceptance."
     }
   },
-  "current_blocker": "Final-candidate build integration. Class eligibility is closed. The focused native accessor compile and source conservation pass; matching full Windows/native builds and all remaining software qualification are pending.",
-  "next_exit_condition": "Complete matching Windows Debug/Release and four native builds, verify the normal-host capture path, and seal the final candidate before the remaining fixed campaigns."
+  "current_blocker": "Finish the fourth native candidate build and corrected existing unit coverage, then complete normal-host canaries and the fixed software qualification campaigns. The inherited MFD fixture failure is corrected without changing production source.",
+  "next_exit_condition": "Seal the unchanged C4 Windows/native candidate identities and verify normal-host writers/exact-save reloads before full campaigns."
 }
