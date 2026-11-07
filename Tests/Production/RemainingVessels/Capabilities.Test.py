@@ -7,7 +7,7 @@ import subprocess
 import sys
 import unittest
 
-from capabilities import compare_capabilities,observer_source_control,FIELDS,PORTS,HERE
+from capabilities import compare_capabilities,observer_source_control,expected_population,selected_scope,FIELDS,PORTS,HERE
 
 
 def write(path,records,fields=None):
@@ -17,6 +17,25 @@ def write(path,records,fields=None):
 
 
 class CapabilityControls(unittest.TestCase):
+    def test_generated_population_preserves_every_original_and_exact_reference(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root=Path(temporary);case=dict(declared_vessels={'Telescope':'HST'})
+            records=[dict(tick='0',object='Telescope',**{'class':'HST'}),
+                     dict(tick='0',object='GeneratedTank',**{'class':'Atlantis_Tank'})]
+            write(root/'stock-vessel-state.csv',records)
+            self.assertEqual(expected_population(case,root),{'Telescope':'HST','GeneratedTank':'Atlantis_Tank'})
+            for damaged in (records[1:],records+[records[0]],[dict(records[0],**{'class':'Generic'})]):
+                with self.subTest(damaged=damaged),self.assertRaises(ValueError):
+                    write(root/'stock-vessel-state.csv',damaged);expected_population(case,root)
+
+    def test_reuse_earns_only_explicit_completed_cases_and_preserves_failure(self):
+        report=dict(status='failed',diagnostic_only=True,native_admission_qualified=False,phase6_complete=False,
+                    repeats=2,cases_requested=['a','b'],cases={'a':{}},failures={'b':'retained failure'})
+        original=copy.deepcopy(report)
+        self.assertEqual(selected_scope(report,['a']),['a']);self.assertEqual(report,original)
+        for selected in (None,[],['b'],['a','a'],['unknown'],['a','b']):
+            with self.subTest(selected=selected),self.assertRaises(ValueError):selected_scope(report,selected)
+
     def test_independent_reader_imports_without_native_launcher_context(self):
         code=('import sys;sys.path.insert(0,'+repr(str(HERE))+');'
               'from capabilities import original_reader;'
