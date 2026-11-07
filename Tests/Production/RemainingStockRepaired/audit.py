@@ -266,15 +266,10 @@ def runtime_variant(root,producer,configuration,original_root,protocol=protocols
     old=b'require(frames==60,"Incomplete original stock observation")'
     require(observer.count(old)==1,'Original passive observer contract differs')
     compiled=observer.replace(old,b'require(frames==960,"Incomplete repaired stock observation")')
-    delay=build.get('observer_delay_ms',120)
-    require(type(delay) is int and delay in (0,120) and compiled.count(b'Sleep(120);')==1,
-            'Explicit original observer pacing operation required')
-    if delay==0:compiled=compiled.replace(b'Sleep(120);',b'Sleep(0);')
     require((root/'observer/Driver.cpp').read_bytes()==compiled and
             build['observer_source_variant']['original_sha256']==checksum(observer) and
-            build['observer_source_variant']['compiled_sha256']==checksum(compiled) and
-            build['observer_source_variant'].get('observer_delay_ms',120)==delay,
-            'Passive observer changes exceed the explicit finalized-frame contract and declared pacing')
+            build['observer_source_variant']['compiled_sha256']==checksum(compiled),
+            'Passive observer changes exceed the explicit 960-frame validation')
     compiled_inputs=compile_evidence(root,build,configuration)
     if protocol==protocols.V2:
         policy=build['finalized_frame_policy_control']

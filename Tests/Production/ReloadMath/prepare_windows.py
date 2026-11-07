@@ -93,15 +93,9 @@ def main():
             old=b'require(frames==60,"Incomplete original stock observation")'
             require(body.count(old)==1,'Original stock observer frame assertion differs')
             compiled=compiled.with_name('Driver-960.cpp')
-            delay=cfg.get('observer_delay_ms',120)
-            require(type(delay) is int and delay in (0,120) and body.count(b'Sleep(120);')==1,
-                    'Explicit original observer pacing required')
-            changed=body.replace(old,b'require(frames==960,"Incomplete repaired stock observation")')
-            if delay==0:changed=changed.replace(b'Sleep(120);',b'Sleep(0);')
-            compiled.write_bytes(changed)
+            compiled.write_bytes(body.replace(old,b'require(frames==960,"Incomplete repaired stock observation")'))
             report['observer_source_variant']=dict(original_sha256=sha(source/relative),compiled_sha256=sha(compiled),
-                observer_delay_ms=delay,
-                only_change='Validate 960 finalized ticks instead of 60; explicitly declared observer pacing; observation calls unchanged')
+                only_change='Validate 960 finalized ticks instead of 60; all observation calls and delays unchanged')
         compiler=shutil.which('cl.exe',path=environment['PATH']);require(compiler,'Actual MSVC compiler missing from validated environment')
         report['compiler']=dict(path=compiler,sha256=sha(compiler))
         command=[compiler,'/nologo','/EHsc','/std:c++17','/W3','/fp:precise','/Oi-',

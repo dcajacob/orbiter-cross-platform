@@ -208,6 +208,16 @@
           "sha256": "a8707ee1b1ebbe68a0f830679204fa6a249ef04a41ab5e3b846beecf7e601df8",
           "scope": "Actual declared local-volume staging, capacity and unchanged reference/source closure"
         }
+      },
+      "qualification_progress": {
+        "Windows_pacing_canary": {
+          "result": "failed-experiment-preserved-original-pacing-retained",
+          "evidence": {
+            "path": "/home/dan/.codex/worktrees/phase6-audit-throughput/orbiter-cross-platform/out/phase6-Windows-observer-pacing-capture-v1/failure-analysis.json",
+            "sha256": "a841c3ef8feafd75df668a574f04de5fc89e9f0fbf5a9e51fd76d56c7edbb086",
+            "scope": "Failed diagnostic only. Original Windows wall-clock startup/clamp inputs require the retained 120ms observer pacing. No altered clock input, mask, tolerance or reference refresh accepted."
+          }
+        }
       }
     },
     "numerical-reload": {
@@ -1945,7 +1955,7 @@
           ],
           "expected_runs": 144,
           "new_runs": 112,
-          "retained_runs": 0,
+          "retained_runs": 32,
           "maximum_native_simulators": 4,
           "retained_audit": {
             "path": "/home/dan/.codex/worktrees/phase6-persistence-controls/orbiter-cross-platform/out/phase6-family-persistence-retained003-v1/status.json",
@@ -1953,7 +1963,7 @@
             "scope": "Fresh independent audit and Windows comparisons of all sixteen retained scene003 writer/reloads under their exact original selected scope; no new simulators"
           },
           "completed_new_writer_runs": 32,
-          "current_blocker": "Scene009 repaired matrix passes all four profiles. Scene003 regression is running; the other seven-case scope waits for the focused matrices and rejection jobs to close.",
+          "current_blocker": "Both source-c8 focused matrices pass. The seven-case/112-run remainder is running with complete direct Windows comparisons and the verified scalar frame comparator.",
           "next_exit_condition": "All 144 current-runtime writer/exact-save runs and their independent complete Windows comparisons pass without a budget change.",
           "previous_execution_plans": [
             {
@@ -1962,7 +1972,8 @@
               "scope": "Two separate exact scopes: 128 new runs plus 16 retained runs to re-audit; requests launched, no persistence pass yet"
             }
           ],
-          "focused_runs": 32
+          "focused_runs": 32,
+          "completed_focused_runs": 32
         },
         "renderer_rng_repair": {
           "runtime_commit": "c8a8181e75d32aa08f59ed46eae8ac8215a8dbb8",
@@ -1980,6 +1991,11 @@
             "path": "/home/dan/.codex/worktrees/phase6-audit-throughput/orbiter-cross-platform/out/phase6-ssim-kernel-v1/verification.json",
             "sha256": "31b9659fe7ab2fedaac7f43426160cdd5624dc9398a946d23b27d8f0928a74e7",
             "scope": "Two real full-frame pairs and five small controls have bit-identical retained Python/scalar compiled SSIM scores; existing images, arithmetic and budgets preserved"
+          },
+          "two_mission_focused_matrix": {
+            "path": "/home/dan/.codex/worktrees/phase6-audit-throughput/orbiter-cross-platform/out/phase6-rng-focused-two-mission-matrix-v1.json",
+            "sha256": "80a565b7ec86f48e7a722861aae73457472c9b0f871e273dff6b2880c67943b2",
+            "scope": "32 actual runs: scenes003/009, four profiles, writers/exact Windows-save reloads, both repetitions; all existing checks pass"
           }
         },
         "rejection_controls": {
@@ -2394,6 +2410,11 @@
             "sha256": "73798d934b0267bb0e4ef8e76868521e287b4bd6a6ca0e972e3f1caa0e289804",
             "scope": "Two complete Debug/SSE2 Shuttle stock writers retain byte-identical primary state, clocks, camera, full frame and complete saved file after the read-only resource preflight; independent native re-read and direct Windows comparison pass. Focused resource regression only."
           }
+        },
+        "existing_cpp_lua_discovery": {
+          "path": "/home/dan/.codex/worktrees/phase6-audit-throughput/orbiter-cross-platform/out/phase6-existing-Cxx-Lua-test-source-inventory-v1.json",
+          "sha256": "c755fdb354109ac8ddf87a83a03e8ef24e3c91cc411505f96051c79d7530f948",
+          "scope": "Existing test-source discovery only; actual configured and executed totals remain open for the final candidate"
         }
       }
     },
@@ -2535,6 +2556,6 @@
       "note": "Physical controller hardware unavailable; virtual devices do not satisfy acceptance."
     }
   },
-  "current_blocker": "Class interactions and the finite 144-run current-runtime persistence matrix. All 180 actual class/loader rejection controls independently pass in four profiles. Scene009 repaired writers/exact-save reloads pass in all four profiles; source-c8 scene003 regression is running. Normal admission and candidate freeze remain open.",
+  "current_blocker": "Class interactions and the remaining 112 of 144 current-runtime family persistence runs. The 32 focused writers/reloads and 180 actual class/loader rejection controls independently pass in all four profiles. Normal admission and final candidate freeze remain open.",
   "next_exit_condition": "Close the source-c8 family persistence and interaction facets, independently verify all four rejection profiles, and admit only proven stock class/capability combinations before freezing the final candidate."
 }

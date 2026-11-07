@@ -43,8 +43,6 @@ def main():
     for name in ('preserved','output'):p.add_argument('--'+name,type=lambda v:Path(v).resolve(),required=True)
     p.add_argument('--configuration',choices=('Debug','Release'),required=True)
     p.add_argument('--protocol',choices=protocols.NAMES,default=protocols.V1)
-    p.add_argument('--observer-delay-ms',type=int,choices=(0,120),default=120,
-                   help='Explicit observer pacing; zero requires separate primary-byte neutrality evidence')
     a=p.parse_args()
     protocol=protocols.read(a.protocol)
     require(sys.platform=='win32','The repaired preserved-runtime build requires native Windows')
@@ -84,7 +82,6 @@ def main():
     runtime=a.output/'runtime';shutil.copytree(a.preserved,runtime)
     report=dict(schema=1,status='building',protocol=protocol['protocol'],
         producer_commit=producer,original_application_and_sdk_source=BASE,configuration=a.configuration,
-        observer_delay_ms=a.observer_delay_ms,
         preserved_package_sha256=before,source_sha256_lf=sources,commands=[],
         native_admission_qualified=False,phase6_complete=False)
     manifest=a.output/'build.json'
@@ -107,13 +104,9 @@ def main():
         old=b'require(frames==60,"Incomplete original stock observation")'
         require(original.count(old)==1,'Original observer frame contract differs')
         observer=a.output/'observer/Driver.cpp';observer.parent.mkdir()
-        compiled=original.replace(old,b'require(frames==960,"Incomplete repaired stock observation")')
-        require(compiled.count(b'Sleep(120);')==1,'Original observer pacing operation differs')
-        if a.observer_delay_ms==0:compiled=compiled.replace(b'Sleep(120);',b'Sleep(0);')
-        observer.write_bytes(compiled)
+        observer.write_bytes(original.replace(old,b'require(frames==960,"Incomplete repaired stock observation")'))
         report['observer_source_variant']=dict(original_sha256=hashlib.sha256(original).hexdigest(),
-            compiled_sha256=sha(observer),observer_delay_ms=a.observer_delay_ms,
-            only_change='Validate 960 finalized ticks instead of 60; explicitly declared '+str(a.observer_delay_ms)+'ms observer pacing; observation calls unchanged')
+            compiled_sha256=sha(observer),only_change='Validate 960 finalized ticks instead of 60; all observation calls and delays unchanged')
         build=a.output/'cmake'
         run(['cmake','-S',str(HERE),'-B',str(build),'-G','Ninja',
              '-DCMAKE_BUILD_TYPE='+a.configuration,'-DCMAKE_EXPORT_COMPILE_COMMANDS=ON','-DCMAKE_POLICY_VERSION_MINIMUM=3.5',
