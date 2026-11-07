@@ -94,22 +94,29 @@ def capture(args):
     guards[str(pe)]=sha(pe)
     args.output.mkdir(parents=True)
     fixtures=args.output/'fixtures';fixtures.mkdir()
-    for i in range(len(META)):
-        argv=[identity['compiler'],'-std=c++17','-shared','-fPIC','-Wl,--no-undefined',
-              '-fsanitize=address,undefined','-fno-omit-frame-pointer',
-              '-DPHASE6_REJECTED_METADATA='+str(i),'-I'+str(ROOT/'Src/Orbiter'),
-              '-I'+str(args.build/'native-sdk'),str(HERE/'RejectedModule.cpp'),
-              '-o',str(fixtures/('metadata-'+str(i)+'.so'))]
-        atomic_json(fixtures/('command-'+str(i)+'.json'),argv)
-        with (fixtures/('build-'+str(i)+'.log')).open('w') as log:
-            subprocess.run(argv,check=True,stdout=log,stderr=subprocess.STDOUT)
-        guards[str(fixtures/('metadata-'+str(i)+'.so'))]=sha(fixtures/('metadata-'+str(i)+'.so'))
     report=dict(protocol='remaining-stock-rejections-v1',status='running',producer_commit=producer,
                 runtime_identity=identity,runtime_owner=str(args.owner),actual_original_data=original_data,
                 guarded_files_sha256=guards,cases_requested=[c['id'] for c in cases],
                 controls_requested=expected,controls={},failures={},diagnostic_only=True,
                 native_admission_qualified=False,phase6_complete=False)
     manifest=args.output/'rejections.json';atomic_json(manifest,report)
+    for i in range(len(META)):
+        argv=[identity['compiler'],'-std=c++17','-shared','-fPIC','-Wl,--no-undefined',
+              '-fsanitize=address,undefined','-fno-omit-frame-pointer',
+              '-DORBITER_NATIVE_BUILD_CONFIGURATION="'+identity['configuration']+'"',
+              '-DPHASE6_REJECTED_METADATA='+str(i),'-I'+str(ROOT/'Src/Orbiter'),
+              '-I'+str(args.build/'native-sdk'),str(HERE/'RejectedModule.cpp'),
+              '-o',str(fixtures/('metadata-'+str(i)+'.so'))]
+        atomic_json(fixtures/('command-'+str(i)+'.json'),argv)
+        try:
+            with (fixtures/('build-'+str(i)+'.log')).open('w') as log:
+                subprocess.run(argv,check=True,stdout=log,stderr=subprocess.STDOUT)
+        except BaseException as error:
+            report['status']='failed';report['failures']['fixture-build-'+str(i)]=str(error)
+            atomic_json(manifest,report)
+            raise
+        guards[str(fixtures/('metadata-'+str(i)+'.so'))]=sha(fixtures/('metadata-'+str(i)+'.so'))
+    atomic_json(manifest,report)
     by_id={c['id']:c for c in cases}
     try:
         with Compositor(args.compositor_tools,args.output/'compositor',1,'gl',repeat_rate=0) as display:
