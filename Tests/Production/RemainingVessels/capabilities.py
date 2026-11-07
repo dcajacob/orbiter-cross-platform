@@ -83,9 +83,16 @@ def compare_capabilities(native,windows,expected,budgets):
     return result
 
 
-def reference(args,cases,identity,original_data,guards):
+def original_reader():
+    sys.path[:0]=[str(HERE.parent/name) for name in
+                  ('RemainingStockRepaired','RemainingStock','StockVessels','Client')]+[str(HERE.parent)]
     spec=importlib.util.spec_from_file_location('capability_original_runtime',HERE.parent/'RemainingStockRepaired/audit.py')
     audit=importlib.util.module_from_spec(spec);spec.loader.exec_module(audit)
+    return audit
+
+
+def reference(args,cases,identity,original_data,guards):
+    audit=original_reader()
     parent=load(args.windows_reference/'capture.json')
     require(parent['protocol']==audit.protocols.V2 and parent['status'] in
             ('captured-diagnostic-only','captured-awaiting-independent-audit') and not parent['failures'] and

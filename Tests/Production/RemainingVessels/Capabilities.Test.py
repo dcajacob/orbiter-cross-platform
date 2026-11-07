@@ -3,6 +3,8 @@ import copy
 import csv
 from pathlib import Path
 import tempfile
+import subprocess
+import sys
 import unittest
 
 from capabilities import compare_capabilities,observer_source_control,FIELDS,PORTS,HERE
@@ -15,6 +17,13 @@ def write(path,records,fields=None):
 
 
 class CapabilityControls(unittest.TestCase):
+    def test_independent_reader_imports_without_native_launcher_context(self):
+        code=('import sys;sys.path.insert(0,'+repr(str(HERE))+');'
+              'from capabilities import original_reader;'
+              'reader=original_reader();assert callable(reader.capture.inspect_artifacts);'
+              'assert callable(reader.runtime_variant)')
+        subprocess.run([sys.executable,'-B','-c',code],check=True,cwd='/tmp')
+
     def test_passive_observer_forwarding_and_getters_cannot_change(self):
         self.assertIn('passed',observer_source_control()['status'])
         body=(HERE/'NativeProbe.cpp').read_bytes()
