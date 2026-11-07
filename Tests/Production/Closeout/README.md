@@ -54,6 +54,17 @@ complete it only from an actual observation with the same PID and start token.
 Requested arguments never fill a missing OS identity. The original failed
 capability receipt remains failed.
 
+The separate family persistence scopes are coordinated by the same runner:
+eight new cases and the retained scene003 writer/reloads, each in four profiles,
+both phases and two repetitions. The retained sixteen runs pass fresh independent
+audit; the new 128 runs are still in progress. After both coordinators close,
+`class_eligibility.py --persistence-manifest Docs/Production/Phase6Closeout.json
+--output FRESH.json` re-reads every capture, source/runtime guard, original
+Windows observation, exact paired save hash and complete comparison. It rejects
+incomplete coordinators, missing phases/cases/profiles, duplicate cells, short
+repetitions and mixed runtime sources. This qualifies only the per-family
+persistence facet; actual save/F5 interaction and full38 acceptance remain open.
+
 The v2 Windows worker and descriptor live under `LocalVM/`. They use explicitly
 declared roots and a hashed host-share witness, validate real capacity before
 running, and record separate application, SDK, observer and runner identities.

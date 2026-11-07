@@ -6,7 +6,7 @@ from pathlib import Path
 import tempfile
 import unittest
 
-from class_eligibility import inspect_paused, family_coverage, capability_profile_cases, OBJECTS
+from class_eligibility import inspect_paused, family_coverage, capability_profile_cases, persistence_coverage, OBJECTS
 from contracts import atomic_json, sha, load, ROOT
 from checklist import requirements
 
@@ -19,6 +19,22 @@ def write_csv(path, records):
 
 
 class PausedEvidenceControls(unittest.TestCase):
+    def test_persistence_requires_both_phases_exact_cases_repetitions_and_one_runtime(self):
+        def part(phase,names):
+            return dict(capture='synthetic-'+phase,audit=dict(profile='Debug-automatic',phase=phase,
+                runtime_source='a'*40,diagnostic_only=True,owning_bytes_unchanged=True,
+                actual_processes=len(names)*2,cases={name:dict(runs=[{},{}]) for name in names}))
+        stages=[part(phase,names) for phase in ('stock-writer','windows-save-reload')
+                for names in (['retained'],['new-a','new-b'])]
+        self.assertEqual(persistence_coverage(stages,['Debug-automatic'],['retained','new-a','new-b'])[1],12)
+        mixed=copy.deepcopy(stages);mixed[-1]['audit']['runtime_source']='b'*40
+        short=copy.deepcopy(stages);short[-1]['audit']['cases']['new-a']['runs'].pop()
+        count=copy.deepcopy(stages);count[-1]['audit']['actual_processes']-=1
+        for damaged in (stages[:-1],stages+[stages[0]],mixed,short,count):
+            with self.subTest(damaged=damaged),self.assertRaises(ValueError):
+                persistence_coverage(damaged,['Debug-automatic'],['retained','new-a','new-b'])
+        with self.assertRaises(ValueError):persistence_coverage(stages,['Debug-automatic','Debug-sse2'],['retained','new-a','new-b'])
+
     def test_completed_subset_and_repaired_case_must_cover_exact_matrix(self):
         def part(names):
             return dict(runtime_identity=dict(profile='Debug-automatic',runtime_source_commit='a'*40),

@@ -178,6 +178,16 @@
           "path": "/home/dan/.codex/worktrees/phase6-persistence-controls/orbiter-cross-platform/out/phase6-closeout-controls-argv-v1.json",
           "sha256": "d66e98be2575a0a57a931e19e16f7aacf98a7970be8fcfa962fe572e8499fe4b",
           "scope": "77 actual controls; transient and persistent empty OS argv, bounded retry, actual child identity and reused-PID rejection"
+        },
+        {
+          "path": "/home/dan/.codex/worktrees/phase6-persistence-controls/orbiter-cross-platform/out/phase6-closeout-controls-persistence-matrix-v1.json",
+          "sha256": "e0918ed688c798d68716cf696bd7673caf39e00b6ecc43a0fea554b469df800f",
+          "scope": "78 actual control tests; missing persistence phases/profiles, duplicate cells, short repetitions and mixed source rejection"
+        },
+        {
+          "path": "/home/dan/.codex/worktrees/phase6-persistence-controls/orbiter-cross-platform/out/phase6-incomplete-persistence-matrix-control-v1.json",
+          "sha256": "3541b854c0e2bc3af3c37f3ec22de602fd25d9f74137237c0ee1a4831505b2a9",
+          "scope": "Actual running persistence matrix is rejected; no acceptance output produced"
         }
       ],
       "note": "Complete declared runner/control/restoration/receipt scope passed, including actual nonce-bound Windows child receipts. Actual free capacity exceeds eight GiB; each long campaign must preflight capacity again.",
@@ -654,6 +664,11 @@
           "path": "/home/dan/.codex/worktrees/phase6-persistence-controls/orbiter-cross-platform/out/phase6-family-persistence-execution-plan-v2.json",
           "sha256": "65f13c97d97bf9daeee886de024caff6d911b0a6fd552b07631ebed8c57273b7",
           "scope": "Two separate exact scopes: 128 new runs plus 16 retained runs to re-audit; requests launched, no persistence pass yet"
+        },
+        {
+          "path": "/home/dan/.codex/worktrees/phase6-persistence-controls/orbiter-cross-platform/out/phase6-family-persistence-retained003-v1/status.json",
+          "sha256": "6050f5d048484194c59def971f588a9e6f645055f1d8f4837ddef5b67df30811",
+          "scope": "Fresh independent audit and Windows comparisons of all sixteen retained scene003 writer/reloads under their exact original selected scope; no new simulators"
         }
       ],
       "qualification_progress": {
@@ -1800,7 +1815,12 @@
           "expected_runs": 144,
           "new_runs": 128,
           "retained_runs": 16,
-          "maximum_native_simulators": 4
+          "maximum_native_simulators": 4,
+          "retained_audit": {
+            "path": "/home/dan/.codex/worktrees/phase6-persistence-controls/orbiter-cross-platform/out/phase6-family-persistence-retained003-v1/status.json",
+            "sha256": "6050f5d048484194c59def971f588a9e6f645055f1d8f4837ddef5b67df30811",
+            "scope": "Fresh independent audit and Windows comparisons of all sixteen retained scene003 writer/reloads under their exact original selected scope; no new simulators"
+          }
         }
       }
     },
