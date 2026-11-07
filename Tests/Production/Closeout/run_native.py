@@ -49,7 +49,9 @@ def interaction_matrix(args,request):
         with lock:atomic_json(args.output/'status.json',report)
     def cancel(_signal=None,_frame=None):
         stop.set()
-        with lock:processes=list(active.values())
+        with lock:
+            if _signal is not None:report['cancelled_by_operator_signal']=_signal
+            processes=list(active.values())
         for process in processes:process.cancel()
         save()
     signal.signal(signal.SIGINT,cancel);signal.signal(signal.SIGTERM,cancel)
@@ -101,7 +103,9 @@ def interaction_matrix(args,request):
                     audit=str(audit_path),audit_sha256=sha(audit_path),actual_runs=audit['flows'][name],receipts=receipts)
                 save()
         except BaseException as error:
-            with lock:report['failures'][key]=dict(error=str(error),traceback=traceback.format_exc());save()
+            with lock:
+                report['cells'][key]['status']='cancelled' if stop.is_set() else 'failed'
+                report['failures'][key]=dict(error=str(error),traceback=traceback.format_exc());save()
             cancel()
     selected=sorted(request['reuse']) if args.verify_reuse_only else sorted(cells)
     with concurrent.futures.ThreadPoolExecutor(max_workers=4) as pool:
@@ -115,7 +119,7 @@ def interaction_matrix(args,request):
         report['actual_runs']=sum(len(c['actual_runs']) for c in report['cells'].values())
         require(report['actual_runs']==len(selected)*2,'Incomplete interaction repetition coverage')
         report['status']='audited-reusable-interactions-only' if args.verify_reuse_only else 'all-family-interactions-collected-and-independently-audited'
-    else:report['status']='stopped-after-qualification-failure'
+    else:report['status']='cancelled' if report.get('cancelled_by_operator_signal') else 'stopped-after-qualification-failure'
     save();return int(bool(report['failures']) or stop.is_set())
 
 
