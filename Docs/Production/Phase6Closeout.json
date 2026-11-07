@@ -2420,7 +2420,12 @@
           "Canonical recorder test dependency path",
           "Native-only internal module-name accessor",
           "Windows dependency junctions expected by the unchanged provenance reader"
-        ]
+        ],
+        "normal_host_canary": {
+          "path": "/home/dan/.codex/worktrees/phase6-orbit-node-qualification/orbiter-cross-platform/out/phase6-final-normal-canary-Debug-sse2-audit-v1.json",
+          "sha256": "7fa69a031129ba86cc697af7bb00234454e36a7c9ae47c0b159bf283ea769071",
+          "scope": "Actual final normal host, two complete missions, two repetitions, writers and exact same hashed Windows-save reloads. Eight processes; selected scope only."
+        }
       }
     },
     "remaining-stock": {
@@ -2774,6 +2779,11 @@
           "path": "/home/dan/.codex/worktrees/phase6-orbit-node-qualification/orbiter-cross-platform/out/phase6-orbit-fixture-root-cause-v1.json",
           "sha256": "7f01d3cc64b44444540f0a9f73b2fa8a5259630bc50e4988cd0e289edefa2c9a",
           "scope": "Explicit inherited fixture initialization correction; original failure and rejected uncommitted production guard retained. Production source stays C4; all-profile/current-Windows verification remains required."
+        },
+        {
+          "path": "/home/dan/.codex/worktrees/phase6-orbit-node-qualification/orbiter-cross-platform/out/phase6-existing-unit-matrix-audit-v1.json",
+          "sha256": "aee2d1dbd4f78cba3040413b1ca8492cb78f87888ddd55521092a3fa687efa68",
+          "scope": "Final C4 libraries: 32 registered native unit processes and 16 upstream Catch cases in all four profiles; explicitly corrected Orbit fixture also passes current Windows Debug and Release. Remaining interface and runtime checks stay open."
         }
       ],
       "qualification_progress": {
@@ -2838,6 +2848,18 @@
           "remaining": [
             "Release-sse2",
             "current-Windows"
+          ]
+        },
+        "final_existing_units": {
+          "result": "passed-scoped-existing-units-only",
+          "application_source_commit": "c4ad4c424cd3bcd04fc56ba3a5ee37d033f8f1b8",
+          "native_profiles": 4,
+          "core_registered_processes_per_profile": 32,
+          "upstream_cases_per_profile": 16,
+          "upstream_assertions_per_profile": 132611,
+          "windows_corrected_fixture_configurations": [
+            "Debug",
+            "Release"
           ]
         }
       }

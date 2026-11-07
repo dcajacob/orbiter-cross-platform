@@ -55,8 +55,8 @@ try:
  build=Path(cfg['build']);built=load(build/'build.json');runtime=build/'runtime';assert built['status']=='built-awaiting-runtime-and-independent-audit' and built['producer_commit']==cfg['source_commit']
  assert all(sha(runtime/n)==v for n,v in built['runtime_files_sha256'].items())
  provider=Path(cfg['mesa']);mesa=load(provider/'mesa-runtime.json');immutable={str(runtime/n):v for n,v in built['runtime_files_sha256'].items()};immutable.update({str(provider/n):v['sha256'] for n,v in mesa['files'].items()})
- for lock,root in [('stock-data.lock.json',Path(cfg['data'])),('standard-planets.lock.json',Path(cfg['planets']))]:
-  for relative,value in load(SOURCE/'Tests/Production'/lock)['data_files'].items():
+ for lock_name,root in [('stock-data.lock.json',Path(cfg['data'])),('standard-planets.lock.json',Path(cfg['planets']))]:
+  for relative,value in load(SOURCE/'Tests/Production'/lock_name)['data_files'].items():
    path=root/relative
    if path.is_file():
     assert path.stat().st_size==value['bytes'] and sha(path)==value['sha256'],'Actual guarded data differs: '+str(path)
