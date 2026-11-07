@@ -20,6 +20,7 @@ def main():
     p.add_argument('--output',type=Path,required=True);a=p.parse_args()
     require(not a.output.exists(),'Fresh independent observation audit required')
     recorded=json.loads((a.capture/'capture.json').read_text())
+    additional=recorded.get('observer_kind')=='additional-passive-module'
     known=recorded['status']=='failed' and recorded.get('error')=='Actual enabled/disabled observation coverage differs'
     require(known or recorded['status']=='passed-native-observer-equivalence-diagnostic-only','Only completed observation captures or the preserved initial-row count failure can be audited')
     protected={str(a.capture/'capture.json'):sha(a.capture/'capture.json')};modes={}
@@ -38,8 +39,15 @@ def main():
         with (folder/'stock-vessel-state.csv').open() as stream:rows=list(csv.DictReader(stream))
         require({int(r['tick']) for r in rows}==set(range(961)),'Complete finalized all-vessel snapshots required')
         math_rows=(folder/'ground-math.csv').read_text().splitlines();baseline_rows=(a.baseline/'ground-math.csv').read_text().splitlines()
-        require(len(math_rows)==(len(baseline_rows) if mode=='on' else 1),'Actual observation coverage differs')
-        if mode=='on':require(sha(folder/'ground-math.csv')==sha(a.baseline/'ground-math.csv'),'Enabled math observation differs')
+        require(len(math_rows)==(len(baseline_rows) if mode=='on' or additional else 1),'Actual observation coverage differs')
+        if mode=='on' or additional:require(sha(folder/'ground-math.csv')==sha(a.baseline/'ground-math.csv'),'Enabled math observation differs')
+        if additional:
+            observer=recorded['extra_observer'];require(sha(Path(observer['path']))==observer['sha256'],'Actual extra observer binary changed')
+            require((folder/'internal-state.csv').is_file()==(mode=='on'),'Actual extra observer toggle differs')
+            mapped=folder/'observer-loaded-maps.txt'
+            require((observer['path'] in mapped.read_text())==(mode=='on'),'Actual extra observer mapping differs')
+            protected[str(mapped)]=sha(mapped);protected[observer['path']]=observer['sha256']
+            if mode=='on':protected[str(folder/'internal-state.csv')]=sha(folder/'internal-state.csv')
         for name in ('process-result.json','diagnostic-invocation.json','graphics-lifecycle.json','console.log','ground-math.csv'):
             protected[str(folder/name)]=sha(folder/name)
         modes[mode]=dict(actual_pid=receipt['actual_collector_pid'],returncode=0,math_rows=len(math_rows)-1,baseline_bytes_identical=True)
