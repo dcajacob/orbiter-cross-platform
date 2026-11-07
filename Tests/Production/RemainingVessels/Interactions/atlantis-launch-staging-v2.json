@@ -1,0 +1,216 @@
+{
+  "schema": 1,
+  "protocol": "remaining-stock-original-input-interactions-v1",
+  "flows": [
+    {
+      "id": "atlantis-original-launch-staging",
+      "case": "remaining_stock_032",
+      "families": [
+        "Atlantis",
+        "Atlantis_Tank",
+        "Atlantis_SRB"
+      ],
+      "frames": 2304,
+      "fixed_step": 0.015625,
+      "replay": [
+        {
+          "tick": 320,
+          "phase": "before",
+          "action": "key",
+          "value": "29"
+        },
+        {
+          "tick": 320,
+          "phase": "before",
+          "action": "key",
+          "value": "78"
+        },
+        {
+          "tick": 672,
+          "phase": "before",
+          "action": "key",
+          "value": "-78"
+        },
+        {
+          "tick": 672,
+          "phase": "before",
+          "action": "key",
+          "value": "-29"
+        },
+        {
+          "tick": 1792,
+          "phase": "before",
+          "action": "key",
+          "value": "36"
+        },
+        {
+          "tick": 1793,
+          "phase": "before",
+          "action": "key",
+          "value": "-36"
+        },
+        {
+          "tick": 2048,
+          "phase": "before",
+          "action": "key",
+          "value": "36"
+        },
+        {
+          "tick": 2049,
+          "phase": "before",
+          "action": "key",
+          "value": "-36"
+        }
+      ],
+      "original_population": {
+        "path": "/home/dan/GIT/orbiter-cross-platform/out/phase6-recovered-Windows-observations-f3d-v1/decoded-for-native-qualification-v1/Debug-sse2/remaining-stock-repaired/remaining_stock_032-1/stock-vessel-state.csv",
+        "sha256": "9f00957132b146b4988703e596bc2d6d0835b96ccf7c57a7ad25d1055e60ced9"
+      },
+      "checks": [
+        {
+          "left": {
+            "trace": "flight-state.csv",
+            "where": {
+              "tick": 1728,
+              "object": "STS-101"
+            },
+            "field": "ground"
+          },
+          "op": "eq",
+          "right": 0
+        },
+        {
+          "left": {
+            "trace": "flight-state.csv",
+            "where": {
+              "tick": 1728,
+              "object": "STS-101"
+            },
+            "field": "altitude_agl"
+          },
+          "op": "gt",
+          "right": 100
+        },
+        {
+          "left": {
+            "trace": "flight-state.csv",
+            "where": {
+              "tick": 1728,
+              "object": "STS-101_ET"
+            },
+            "field": "mass"
+          },
+          "op": "lt",
+          "right": {
+            "trace": "flight-state.csv",
+            "where": {
+              "tick": 0,
+              "object": "STS-101_ET"
+            },
+            "field": "mass"
+          }
+        },
+        {
+          "left": {
+            "trace": "flight-state.csv",
+            "where": {
+              "tick": 2304,
+              "object": "STS-101_ET"
+            },
+            "field": "dock"
+          },
+          "op": "eq",
+          "right": ""
+        },
+        {
+          "left": {
+            "trace": "flight-state.csv",
+            "where": {
+              "tick": 1728,
+              "object": "STS-101-SRB1"
+            },
+            "field": "mass"
+          },
+          "op": "lt",
+          "right": {
+            "trace": "flight-state.csv",
+            "where": {
+              "tick": 0,
+              "object": "STS-101-SRB1"
+            },
+            "field": "mass"
+          }
+        },
+        {
+          "left": {
+            "trace": "flight-state.csv",
+            "where": {
+              "tick": 2304,
+              "object": "STS-101-SRB1"
+            },
+            "field": "dock"
+          },
+          "op": "eq",
+          "right": ""
+        },
+        {
+          "left": {
+            "trace": "flight-state.csv",
+            "where": {
+              "tick": 1728,
+              "object": "STS-101-SRB2"
+            },
+            "field": "mass"
+          },
+          "op": "lt",
+          "right": {
+            "trace": "flight-state.csv",
+            "where": {
+              "tick": 0,
+              "object": "STS-101-SRB2"
+            },
+            "field": "mass"
+          }
+        },
+        {
+          "left": {
+            "trace": "flight-state.csv",
+            "where": {
+              "tick": 2304,
+              "object": "STS-101-SRB2"
+            },
+            "field": "dock"
+          },
+          "op": "eq",
+          "right": ""
+        },
+        {
+          "left": {
+            "trace": "flight-state.csv",
+            "where": {
+              "tick": 2304,
+              "object": "STS-101"
+            },
+            "field": "attached"
+          },
+          "op": "eq",
+          "right": "Carina;"
+        },
+        {
+          "left": {
+            "trace": "flight-state.csv",
+            "where": {
+              "tick": 2304,
+              "object": "Carina"
+            },
+            "field": "attached"
+          },
+          "op": "eq",
+          "right": "STS-101;"
+        }
+      ]
+    }
+  ],
+  "scope": "Original throttle ramp through the same first 15.75 seconds as the preserved coarse-step failure, using the established 1/64-second qualification step. Real liftoff and propellant consumption before original J-key SRB staging at 28 seconds and ET staging at 32 seconds; all nine original/generated vessels retained through 36 seconds. Class interaction only, not the complete named ascent workflow.",
+  "phase6_complete": false
+}
