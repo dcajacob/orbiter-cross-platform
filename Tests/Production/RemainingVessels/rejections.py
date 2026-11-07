@@ -161,7 +161,10 @@ def capture(args):
                         error=(META[control['metadata']] if variant=='metadata' else
                                'Missing native module entry: OrbiterNativeQuery' if variant=='missing-query' else
                                'Cannot load native module')
-                scenario_path=folder/'input.scn';scenario_path.write_text(scenario)
+                # Stock playback resolves its directory from the scenario
+                # name. Preserve that name and all original recording files.
+                scenario_path=assets/case['scenario_entry_point']
+                scenario_path.unlink();scenario_path.write_text(scenario)
                 roster=ships(scenario)
                 require(set(roster)==set(case['declared_vessels']), 'Negative control removed an original vessel')
                 cfg=folder/'Orbiter.cfg';cfg.write_bytes((HERE.parent/'NativeScene/Orbiter.cfg').read_bytes())
