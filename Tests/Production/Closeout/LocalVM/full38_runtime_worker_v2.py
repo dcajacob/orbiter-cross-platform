@@ -53,6 +53,9 @@ try:
  else:os.environ.pop('ORBITER_TEST_OBSERVER_SSE2',None)
  assert subprocess.check_output([cfg['git'],'-C',SOURCE,'rev-parse','HEAD'],text=True).strip()==cfg['source_commit']
  build=Path(cfg['build']);built=load(build/'build.json');runtime=build/'runtime';assert built['status']=='built-awaiting-runtime-and-independent-audit' and built['producer_commit']==cfg['source_commit']
+ delay=cfg.get('observer_delay_ms',120)
+ assert type(delay) is int and delay in (0,120) and built.get('observer_delay_ms',120)==delay,'Observer pacing differs from explicit descriptor'
+ report['observer_delay_ms']=delay
  assert all(sha(runtime/n)==v for n,v in built['runtime_files_sha256'].items())
  provider=Path(cfg['mesa']);mesa=load(provider/'mesa-runtime.json');immutable={str(runtime/n):v for n,v in built['runtime_files_sha256'].items()};immutable.update({str(provider/n):v['sha256'] for n,v in mesa['files'].items()})
  for lock,root in [('stock-data.lock.json',Path(cfg['data'])),('standard-planets.lock.json',Path(cfg['planets']))]:

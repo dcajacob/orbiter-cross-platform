@@ -54,7 +54,19 @@ def main():
         build=Path(cfg['build']);built,runtime_identity=auditor.runtime_variant(build,cfg['source_commit'],cfg['configuration'],Path(cfg['preserved']),protocols.V2)
         require(sha(build/'build.json')==cfg['roles']['observer']['manifest_sha256'],'Original observer build role differs')
         observer=Path(cfg['diagnostic_observer']['path']);require(sha(observer)==cfg['diagnostic_observer']['sha256'],'Passive observer binary differs')
+        pacing=cfg.get('primary_observer_pacing_control',False)
+        require(type(pacing) is bool,'Explicit observer diagnostic mode required')
+        if pacing:
+            preparation=Path(cfg['diagnostic_observer']['preparation_manifest'])
+            prepared=load(preparation)
+            require(sha(preparation)==cfg['diagnostic_observer']['preparation_sha256'] and
+                    prepared['observer']['kind']=='remaining-stock' and
+                    prepared['observer']['sha256']==sha(observer) and
+                    prepared['observer_source_variant']['observer_delay_ms']==0,
+                    'Compiled zero-delay primary observer identity required')
+            report['primary_observer_pacing_control']=True
         guarded={str(build/'runtime'/n):v for n,v in built['runtime_files_sha256'].items()}
+        if pacing:guarded[str(observer)]=sha(observer)
         mesa=Path(cfg['mesa']);provider=load(mesa/'mesa-runtime.json')
         guarded.update({str(mesa/n):v['sha256'] for n,v in provider['files'].items()})
         for lock,root in [('stock-data.lock.json',Path(cfg['data'])),('standard-planets.lock.json',Path(cfg['planets']))]:
@@ -95,18 +107,28 @@ def main():
                     require(text.count(line)==1,'Original propagator fixture differs');text=text.replace(line,'')
                 text=text.replace('  ProductionBehaviorDriver','  ProductionCockpitDriver\n  OGLClient')
                 if mode=='on':
-                    text=text.replace('END_MODULES','  ProductionReloadMathObserver\nEND_MODULES')
-                    shutil.copy2(observer,directory/'Modules/Plugin/ProductionReloadMathObserver.dll')
+                    if pacing:
+                        replacement=directory/'Modules/Plugin/ProductionCockpitDriver.dll'
+                        replacement.unlink();shutil.copy2(observer,replacement)
+                    else:
+                        text=text.replace('END_MODULES','  ProductionReloadMathObserver\nEND_MODULES')
+                        shutil.copy2(observer,directory/'Modules/Plugin/ProductionReloadMathObserver.dll')
                 path.unlink();path.write_text(text+'\nFPS = 0\nMenubarMode = 1\nInfobarMode = 1\nInstrumentUpdateInterval = 0.25\n')
                 target=directory/derived['scenario_entry_point'];target.parent.mkdir(parents=True,exist_ok=True);target.write_bytes(saved.read_bytes())
                 (directory/'persistence-input.json').write_text(json.dumps(provenance,indent=2)+'\n')
-                (directory/'reference-variant.json').write_text(json.dumps(base_variant,indent=2)+'\n')
+                variant=dict(base_variant)
+                if pacing:variant['primary_observer_pacing_variant']=dict(delay_ms=0 if mode=='on' else 120,
+                    replacement_sha256=sha(observer) if mode=='on' else None,
+                    preparation_manifest_sha256=cfg['diagnostic_observer']['preparation_sha256'])
+                (directory/'reference-variant.json').write_text(json.dumps(variant,indent=2)+'\n')
                 (directory/protocols.MARKER).write_bytes(protocols.marker_bytes(config));(directory/'ogl-evidence.enabled').touch()
                 original.mesa_files(mesa,directory)
             original.stage(build/'runtime/Orbiter.exe',Path(cfg['data']),Path(cfg['planets']),folder,config,derived,configure,process_timeout=900)
             actual_data=original.data_inputs.inspect(folder,folder)
             (folder/'actual-data-inputs.json').write_text(json.dumps(actual_data,indent=2)+'\n')
-            require(all(sha(folder/n)==v for n,v in built['runtime_files_sha256'].items() if n.lower().endswith(('.dll','.exe'))),
+            expected=dict(built['runtime_files_sha256'])
+            if pacing and mode=='on':expected['Modules/Plugin/ProductionCockpitDriver.dll']=sha(observer)
+            require(all(sha(folder/n)==v for n,v in expected.items() if n.lower().endswith(('.dll','.exe'))),
                     'Original runtime was altered by diagnostic staging')
             life=load(folder/'graphics-lifecycle.json')
             require(life==dict(rendered_frames=960,successful_presents=960,context_deleted=True),'Complete real graphics lifetime required')
@@ -115,7 +137,7 @@ def main():
             require(not any(s in text for s in ('LuaCall (','Lua error:','Assertion failed','Could not find a module','runtime error:')),'Runtime diagnostic in capture')
             require((folder/'math-profile.txt').read_text().strip()==('sse2' if cfg['math_profile']=='sse2' else 'fma3'),'Actual diagnostic CRT math path differs')
             primary=None
-            if mode=='off':primary=original.inspect_artifacts(folder,derived,config)
+            if mode=='off' or pacing:primary=original.inspect_artifacts(folder,derived,config)
             else:require((folder/'reload-math.csv').is_file(),'Actual passive observation missing')
             report['captures'][mode]=dict(folder=str(folder),process=load(folder/'process-timing.json'),graphics=life,
                 canonical_primary_audit=primary,staged_input_sha256=sha(folder/derived['scenario_entry_point']))
@@ -126,8 +148,10 @@ def main():
         unchanged={name:sha(folders['off']/name) for name in names}
         require(all(sha(folders['on']/n)==v for n,v in unchanged.items()),'Passive observer changed original simulation/camera/save/frame results')
         require(all(sha(Path(n))==v for n,v in guarded.items()),'Original runtime/provider changed')
-        report.update(status='captured-identical-observer-off-on-diagnostic-only',observer_on_off_sha256=unchanged,
-            passive_observer_equivalence=True,guarded_runtime_files=len(guarded),saved_input_sha256=sha(saved))
+        report.update(status='captured-identical-primary-observer-pacing-diagnostic-only' if pacing else
+            'captured-identical-observer-off-on-diagnostic-only',observer_on_off_sha256=unchanged,
+            passive_observer_equivalence=not pacing,primary_observer_pacing_equivalence=pacing,
+            guarded_runtime_files=len(guarded),saved_input_sha256=sha(saved))
         # Export raw observations, complete invocations and actual receipts only;
         # immutable original runtime/data caches remain in C:.
         export=Path(cfg['export']);export.mkdir()
