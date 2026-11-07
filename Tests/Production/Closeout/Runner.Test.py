@@ -10,7 +10,7 @@ import sys
 import tempfile
 import time
 import unittest
-from unittest.mock import Mock
+from unittest.mock import Mock, patch
 
 from contracts import Scope, atomic_json, reusable_capture, sha
 from processes import OwnedProcess, identity, same_process
@@ -74,6 +74,50 @@ class ScopeTests(unittest.TestCase):
 
 
 class ProcessTests(unittest.TestCase):
+    def test_transient_empty_os_argv_is_reobserved_on_the_actual_child(self):
+        reads = []
+        def transient(pid):
+            record = identity(pid)
+            reads.append(record)
+            return dict(record, argv=[]) if record and len(reads) <= 2 else record
+        argv = [sys.executable, '-c', 'import time; time.sleep(30)']
+        with patch('processes.identity', side_effect=transient):
+            owned = OwnedProcess(argv)
+        try:
+            actual = owned.receipt()['owned_process_identities'][0]
+            self.assertGreaterEqual(len(reads), 3)
+            self.assertEqual(actual['pid'], owned.process.pid)
+            self.assertEqual(actual['start_ticks'], reads[0]['start_ticks'])
+            self.assertEqual(actual['argv'], identity(owned.process.pid)['argv'])
+            self.assertEqual(actual['argv'], argv)
+        finally:
+            owned.cancel()
+
+    def test_missing_os_argv_stays_missing_until_same_process_is_observed(self):
+        def empty(pid):
+            record = identity(pid)
+            return dict(record, argv=[]) if record else None
+        argv = [sys.executable, '-c', 'import time; time.sleep(30)']
+        started = time.monotonic()
+        with patch('processes.identity', side_effect=empty):
+            owned = OwnedProcess(argv)
+        try:
+            self.assertLess(time.monotonic() - started, 2)
+            original = owned.receipt()['owned_process_identities'][0]
+            self.assertEqual(original['argv'], [])
+            # A reused PID must never supply the missing launch identity.
+            owned.known[owned.process.pid] = dict(original, start_ticks=original['start_ticks'] + 1)
+            owned.discover()
+            self.assertEqual(owned.known[owned.process.pid]['argv'], [])
+            owned.known[owned.process.pid] = original
+            owned.discover()
+            actual = owned.known[owned.process.pid]
+            self.assertEqual(actual['start_ticks'], original['start_ticks'])
+            self.assertEqual(actual['argv'], argv)
+        finally:
+            owned.known[owned.process.pid] = original
+            owned.cancel()
+
     def test_completed_process_receipt_is_not_cancelled(self):
         owned = OwnedProcess([sys.executable, '-c', 'pass'])
         owned.process.wait(timeout=5)

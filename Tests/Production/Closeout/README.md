@@ -48,6 +48,11 @@ It earns only `audited-reusable-captures-only`, not a completed campaign.
 Cancellation records collector exit receipts and checks PID start tokens before
 signalling observed descendants, including separate-session compositor children.
 Completed stages remain independently auditable when another stage fails.
+An empty live `/proc` command line is retried for a bounded interval after
+launch. A missing command line stays missing in the receipt; discovery may
+complete it only from an actual observation with the same PID and start token.
+Requested arguments never fill a missing OS identity. The original failed
+capability receipt remains failed.
 
 The v2 Windows worker and descriptor live under `LocalVM/`. They use explicitly
 declared roots and a hashed host-share witness, validate real capacity before

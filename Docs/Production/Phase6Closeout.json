@@ -173,6 +173,11 @@
           "path": "/home/dan/.codex/worktrees/phase6-eligibility-controls/orbiter-cross-platform/out/phase6-closeout-controls-v75.json",
           "sha256": "bcd79c8d8a37fc207e07ff81f95cf109973a6a38194dd0797dab6b39c0953714",
           "scope": "75 actually discovered closeout controls, including completed/repaired capability scope negative controls"
+        },
+        {
+          "path": "/home/dan/.codex/worktrees/phase6-persistence-controls/orbiter-cross-platform/out/phase6-closeout-controls-argv-v1.json",
+          "sha256": "d66e98be2575a0a57a931e19e16f7aacf98a7970be8fcfa962fe572e8499fe4b",
+          "scope": "77 actual controls; transient and persistent empty OS argv, bounded retry, actual child identity and reused-PID rejection"
         }
       ],
       "note": "Complete declared runner/control/restoration/receipt scope passed, including actual nonce-bound Windows child receipts. Actual free capacity exceeds eight GiB; each long campaign must preflight capacity again.",

@@ -25,12 +25,26 @@ def same_process(record):
     return actual is not None and actual['start_ticks'] == record['start_ticks']
 
 
+def initial_identity(pid, timeout=.25):
+    record = identity(pid)
+    deadline = time.monotonic() + timeout
+    # exec can briefly expose a live process with an empty /proc cmdline.
+    # Retry the actual OS observation; requested argv is never evidence.
+    while record and not record['argv'] and record['state'] != 'Z' and time.monotonic() < deadline:
+        time.sleep(.005)
+        current = identity(pid)
+        if current is None or current['start_ticks'] != record['start_ticks']:
+            break
+        record = current
+    return record
+
+
 class OwnedProcess:
     def __init__(self, argv, **kwargs):
         self.lock = threading.RLock()
         self.process = subprocess.Popen(argv, start_new_session=True, **kwargs)
         self.started_ns = time.time_ns()
-        root = identity(self.process.pid)
+        root = initial_identity(self.process.pid)
         require(root is not None, 'Collector disappeared before its identity was recorded')
         self.known = {self.process.pid: root}
         self.cancelled = False
@@ -47,6 +61,10 @@ class OwnedProcess:
             while changed:
                 changed = False
                 for record in candidates:
+                    previous = self.known.get(record['pid'])
+                    if previous and not previous['argv'] and record['argv'] and \
+                            previous['start_ticks'] == record['start_ticks']:
+                        self.known[record['pid']] = record
                     parent = self.known.get(record['parent'])
                     if record['pid'] not in self.known and parent and same_process(parent):
                         self.known[record['pid']] = record
