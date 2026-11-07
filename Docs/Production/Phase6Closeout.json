@@ -619,6 +619,21 @@
           "path": "/home/dan/.codex/worktrees/phase6-class-eligibility/orbiter-cross-platform/out/phase6-class-family-lifetime-matrix-audit-v1.json",
           "sha256": "6b6695982f7229071bb98742d339d8063cb42522d9b967beb727ffef3f99d359",
           "scope": "Independent complete seven-scene/four-profile positive ABI loading, resource ownership and twenty-world facets only"
+        },
+        {
+          "path": "/home/dan/.codex/worktrees/phase6-capability-eligibility/orbiter-cross-platform/out/phase6-original-structural-capability-inventory-v1.json",
+          "sha256": "6f894873e9b7b482a286824208d831b430886bb36d23ae2c8362a319338ee0ed",
+          "scope": "Hashed initial structural fields across all original Windows stock scenes; proposed native cover only"
+        },
+        {
+          "path": "/home/dan/.codex/worktrees/phase6-capability-eligibility/orbiter-cross-platform/out/phase6-capability-HST-Debug-automatic-canary-v4/independent-audit-v1.json",
+          "sha256": "882330ff95df3234b22d8ee0f8c27160dfb23e644e7e2a33d1bb237ba9d59e55",
+          "scope": "HST/Atlantis actual SDK fields/ports and observer-off/on native equivalence; one profile/repetition, diagnostic only"
+        },
+        {
+          "path": "/home/dan/.codex/worktrees/phase6-capability-eligibility/orbiter-cross-platform/out/phase6-family-persistence-plan-v1.json",
+          "sha256": "3638906a17bff091feb0462dd4e2f201f947cf9aeeed59d4deedf7325302043b",
+          "scope": "Prepared existing-coordinator request: 128 new runs plus 16 separately retained runs; not launched"
         }
       ],
       "qualification_progress": {
@@ -760,7 +775,7 @@
                 }
               },
               "capabilities": {
-                "result": "not-run",
+                "result": "in-progress",
                 "passed_profiles": []
               },
               "interactions": {
@@ -823,7 +838,7 @@
                 }
               },
               "capabilities": {
-                "result": "not-run",
+                "result": "in-progress",
                 "passed_profiles": []
               },
               "interactions": {
@@ -886,7 +901,7 @@
                 }
               },
               "capabilities": {
-                "result": "not-run",
+                "result": "in-progress",
                 "passed_profiles": []
               },
               "interactions": {
@@ -949,7 +964,7 @@
                 }
               },
               "capabilities": {
-                "result": "not-run",
+                "result": "in-progress",
                 "passed_profiles": []
               },
               "interactions": {
@@ -1012,7 +1027,7 @@
                 }
               },
               "capabilities": {
-                "result": "not-run",
+                "result": "in-progress",
                 "passed_profiles": []
               },
               "interactions": {
@@ -1075,7 +1090,7 @@
                 }
               },
               "capabilities": {
-                "result": "not-run",
+                "result": "in-progress",
                 "passed_profiles": []
               },
               "interactions": {
@@ -1138,7 +1153,7 @@
                 }
               },
               "capabilities": {
-                "result": "not-run",
+                "result": "in-progress",
                 "passed_profiles": []
               },
               "interactions": {
@@ -1201,7 +1216,7 @@
                 }
               },
               "capabilities": {
-                "result": "not-run",
+                "result": "in-progress",
                 "passed_profiles": []
               },
               "interactions": {
@@ -1264,7 +1279,7 @@
                 }
               },
               "capabilities": {
-                "result": "not-run",
+                "result": "in-progress",
                 "passed_profiles": []
               },
               "interactions": {
@@ -1327,7 +1342,7 @@
                 }
               },
               "capabilities": {
-                "result": "not-run",
+                "result": "in-progress",
                 "passed_profiles": []
               },
               "interactions": {
@@ -1390,7 +1405,7 @@
                 }
               },
               "capabilities": {
-                "result": "not-run",
+                "result": "in-progress",
                 "passed_profiles": []
               },
               "interactions": {
@@ -1466,7 +1481,56 @@
           "persistence",
           "rejection-controls"
         ],
-        "lifetime_captures_terminal": true
+        "lifetime_captures_terminal": true,
+        "capability_controls": {
+          "result": "in-progress",
+          "original_structural_signature_count": 16,
+          "expected_cases": [
+            "remaining_stock_003",
+            "remaining_stock_009",
+            "remaining_stock_013",
+            "remaining_stock_014",
+            "remaining_stock_017",
+            "remaining_stock_018",
+            "remaining_stock_022",
+            "remaining_stock_026",
+            "remaining_stock_032"
+          ],
+          "profiles": [
+            "Debug-automatic",
+            "Debug-sse2",
+            "Release-automatic",
+            "Release-sse2"
+          ],
+          "repeats": 2,
+          "observer_lanes": [
+            "off",
+            "on"
+          ],
+          "expected_processes": 144,
+          "expected_presents": 8640,
+          "inventory": {
+            "path": "/home/dan/.codex/worktrees/phase6-capability-eligibility/orbiter-cross-platform/out/phase6-original-structural-capability-inventory-v1.json",
+            "sha256": "6f894873e9b7b482a286824208d831b430886bb36d23ae2c8362a319338ee0ed",
+            "scope": "Hashed initial structural fields across all original Windows stock scenes; proposed native cover only"
+          },
+          "focused_canary": {
+            "path": "/home/dan/.codex/worktrees/phase6-capability-eligibility/orbiter-cross-platform/out/phase6-capability-HST-Debug-automatic-canary-v4/independent-audit-v1.json",
+            "sha256": "882330ff95df3234b22d8ee0f8c27160dfb23e644e7e2a33d1bb237ba9d59e55",
+            "scope": "HST/Atlantis actual SDK fields/ports and observer-off/on native equivalence; one profile/repetition, diagnostic only"
+          },
+          "captures": {
+            "Debug-automatic": "/home/dan/.codex/worktrees/phase6-capability-eligibility/orbiter-cross-platform/out/phase6-family-capabilities-Debug-automatic-v1/capabilities.json",
+            "Debug-sse2": "/home/dan/.codex/worktrees/phase6-capability-eligibility/orbiter-cross-platform/out/phase6-family-capabilities-Debug-sse2-v1/capabilities.json",
+            "Release-automatic": "/home/dan/.codex/worktrees/phase6-capability-eligibility/orbiter-cross-platform/out/phase6-family-capabilities-Release-automatic-v1/capabilities.json",
+            "Release-sse2": "/home/dan/.codex/worktrees/phase6-capability-eligibility/orbiter-cross-platform/out/phase6-family-capabilities-Release-sse2-v1/capabilities.json"
+          }
+        },
+        "prepared_persistence": {
+          "path": "/home/dan/.codex/worktrees/phase6-capability-eligibility/orbiter-cross-platform/out/phase6-family-persistence-plan-v1.json",
+          "sha256": "3638906a17bff091feb0462dd4e2f201f947cf9aeeed59d4deedf7325302043b",
+          "scope": "Prepared existing-coordinator request: 128 new runs plus 16 separately retained runs; not launched"
+        }
       }
     },
     "candidate-freeze": {
@@ -1964,6 +2028,6 @@
       "note": "Physical controller hardware unavailable; virtual devices do not satisfy acceptance."
     }
   },
-  "current_blocker": "Four remaining per-family eligibility facets: actual capabilities, original-dispatch interactions, persistence and rejection controls. Positive ABI loading, resource ownership and twenty-world lifetimes now pass all eleven families and all four profiles. No normal admission change or final candidate yet.",
-  "next_exit_condition": "Complete and independently audit the four missing family facets, admit only proven class/capability combinations, then freeze the matching final candidate and run the full acceptance matrix. New Windows work uses the validated P:/OrbiterPhase6 local volume with versioned exact-input staging."
+  "current_blocker": "Per-family capability, original-dispatch interaction, persistence and rejection controls. The capability run now covers all sixteen original structural signatures in nine selected scenes, four profiles and two off/on repetitions. ABI/ownership/twenty-world facets pass; normal class admission and candidate freeze remain open.",
+  "next_exit_condition": "Independently audit the finite capability matrix, then complete interactions, exact-save persistence and rejection controls before admitting proven class/capability combinations. Preserve all existing numerical and image budgets and the source-bound completed captures."
 }

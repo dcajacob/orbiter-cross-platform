@@ -49,6 +49,20 @@ captures with `lifetimes.py --capture PATH/lifetimes.json --output FRESH.json`.
 `Lifetimes.Test.py` rejects incomplete ticks, substituted or lost vessels,
 nonfinite state, truncated frames, incomplete graphics and retained modules.
 
+`native.py --capability-control` uses the same immutable package/provider setup
+for short actual SDK snapshots. Declare the matching `--windows-reference`
+capture, `--windows-build` and `--preserved` original package. Each selected case
+runs with the passive observer off and on, preserving all original vessels.
+Actual fields and ports are compared with the hashed Windows observations;
+native state, camera, controls and complete frames must remain equivalent.
+The observer's existing getters and forwarding remain byte-conserved, with only
+an explicit diagnostic switch around its old wall-clock delay. Normal capture
+keeps that delay. Exact local docking comparisons and existing physical/image
+budgets remain in force. Re-read closed captures independently with
+`capabilities.py --capture PATH/capabilities.json --output FRESH.json`.
+These sixty-frame diagnostics earn capability/observer scope only. They do not
+qualify full stock parity, persistence, interactions or normal class admission.
+
 The first fresh Debug ASan/UBSan package at
 `72c35b75c117c16a94b38925e90e7d1ca2812a08` builds all three actual modules and
 both diagnostic hosts. Its record is
