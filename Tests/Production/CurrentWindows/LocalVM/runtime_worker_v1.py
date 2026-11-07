@@ -17,13 +17,24 @@ config = json.loads(request.read_text())
 share = request.parent
 work = Path(config['work'])
 source = Path(config['source'])
-output = work / 'qualification-v1'
+declared_roots = config.get('transport_protocol') == 'phase6-local-windows-vm-v3'
+output = Path(config['output']) if declared_roots else work / 'qualification-v1'
+root_preflight = None
+if declared_roots:
+    from runtime_descriptor_v3 import preflight
+    root_preflight = preflight(config)
 assert not output.exists()
 output.mkdir()
 report = dict(status='starting', source_commit=config['source_commit'], context=context(),
               request_sha256=sha(request), worker_sha256=sha(__file__), commands=[],
               cloud_builds_used=False, raw_evidence_uploaded=False, phase6_complete=False,
               started_utc=datetime.datetime.now(datetime.timezone.utc).isoformat())
+if declared_roots:
+    report.update(source=config['source_commit'], roles=config['roles'],
+                  transport_protocol=config['transport_protocol'], root_preflight=root_preflight,
+                  configuration=config['configuration'], math_profile=config['math_profile'],
+                  script_sha256=sha(__file__), native_admission_qualified=False,
+                  canonical_runtime_files_sha256={})
 
 
 def save():
@@ -84,9 +95,17 @@ try:
     save()
     all_passed = True
     for configuration in ('Debug', 'Release'):
-        runtime = work / ('runtime-' + configuration)
-        built = build_record['configuration_results'][configuration]
-        assert all(sha(runtime / name) == expected for name, expected in built['runtime_files_sha256'].items())
+        built = build_record.get('configurations', build_record.get('configuration_results'))[configuration]
+        canonical = Path(built['runtime']) if 'runtime' in built else work / ('runtime-' + configuration)
+        assert all(sha(canonical / name) == expected for name, expected in built['runtime_files_sha256'].items())
+        if declared_roots:
+            # Driver changes belong to a private test copy. The frozen package
+            # remains usable by other captures and survives an interrupted gate.
+            runtime = output / 'private-runtime-inputs' / configuration
+            shutil.copytree(canonical, runtime)
+            report['canonical_runtime_files_sha256'][configuration] = built['runtime_files_sha256']
+        else:
+            runtime = canonical
         common = ['--orbiter', runtime / 'Orbiter.exe', '--data', data, '--planets', planets,
                   '--mesa', config['mesa'], '--configuration', configuration]
         current = output / configuration
@@ -113,6 +132,8 @@ try:
         for name, expected in built['driver_snapshots']['controls'].items():
             assert sha(runtime / 'Modules/Plugin' / name) == expected
         assert all(sha(runtime / name) == expected for name, expected in built['runtime_files_sha256'].items())
+        if declared_roots:
+            assert all(sha(canonical / name) == expected for name, expected in built['runtime_files_sha256'].items())
     if all_passed:
         for label, script, folder, extra, option in (
             ('client-comparison', 'Client/compare_client.py', 'client/scene', ['--frozen', source / 'Tests/Production/ClientReference'], '--report'),
@@ -134,6 +155,8 @@ finally:
     members = {}
     with zipfile.ZipFile(archive, 'w', zipfile.ZIP_DEFLATED, compresslevel=1) as target:
         for path in sorted(output.rglob('*')):
+            if declared_roots and path.relative_to(output).parts[0] == 'private-runtime-inputs':
+                continue
             if path.is_file() and (path.suffix.lower() in ('.json', '.csv', '.rgba', '.png', '.log', '.txt', '.cfg')
                                   or (path.suffix.lower() == '.scn' and 'Scenarios' in path.parts)):
                 name = path.relative_to(output).as_posix()
