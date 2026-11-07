@@ -5,10 +5,60 @@
   "software_complete": false,
   "phase6_complete": false,
   "candidate": {
-    "frozen": false,
-    "id": null,
-    "source_commit": null,
-    "identities": {}
+    "frozen": true,
+    "id": "phase6-c4ad-final-v1",
+    "source_commit": "c4ad4c424cd3bcd04fc56ba3a5ee37d033f8f1b8",
+    "identities": {
+      "application": {
+        "manifest": {
+          "path": "/home/dan/.codex/worktrees/phase6-orbit-node-qualification/orbiter-cross-platform/out/phase6-final-candidate-freeze-v1.json",
+          "sha256": "2aaa553c85bf849b55b4193d4131ea8e59f478bd6bbdb0884730b11907e80910"
+        },
+        "scope": "C4 original Windows application and four matching native applications"
+      },
+      "sdk": {
+        "manifest": {
+          "path": "/home/dan/.codex/worktrees/phase6-orbit-node-qualification/orbiter-cross-platform/out/phase6-final-candidate-freeze-v1.json",
+          "sha256": "2aaa553c85bf849b55b4193d4131ea8e59f478bd6bbdb0884730b11907e80910"
+        },
+        "scope": "Matching C4 Windows/native SDKs and modules"
+      },
+      "observer": {
+        "manifest": {
+          "path": "/home/dan/.codex/worktrees/phase6-orbit-node-qualification/orbiter-cross-platform/out/phase6-final-candidate-freeze-v1.json",
+          "sha256": "2aaa553c85bf849b55b4193d4131ea8e59f478bd6bbdb0884730b11907e80910"
+        },
+        "scope": "C4 passive observers; versioned test-only fixture correction"
+      },
+      "runner": {
+        "manifest": {
+          "path": "/home/dan/.codex/worktrees/phase6-orbit-node-qualification/orbiter-cross-platform/out/phase6-final-candidate-freeze-v1.json",
+          "sha256": "2aaa553c85bf849b55b4193d4131ea8e59f478bd6bbdb0884730b11907e80910"
+        },
+        "scope": "Separated runner ad23fc6664dfcde0bb16296e9b55a470dc85952e"
+      },
+      "reference": {
+        "manifest": {
+          "path": "/home/dan/.codex/worktrees/phase6-orbit-node-qualification/orbiter-cross-platform/out/phase6-final-candidate-freeze-v1.json",
+          "sha256": "2aaa553c85bf849b55b4193d4131ea8e59f478bd6bbdb0884730b11907e80910"
+        },
+        "scope": "Original f725 application and SDK; declared f3d v4 repaired modules; fresh receipts pending"
+      },
+      "dependencies": {
+        "manifest": {
+          "path": "/home/dan/.codex/worktrees/phase6-orbit-node-qualification/orbiter-cross-platform/out/phase6-final-candidate-freeze-v1.json",
+          "sha256": "2aaa553c85bf849b55b4193d4131ea8e59f478bd6bbdb0884730b11907e80910"
+        },
+        "scope": "Pinned renderer archives, build dependency hashes and actual provider inventory"
+      },
+      "runtime": {
+        "manifest": {
+          "path": "/home/dan/.codex/worktrees/phase6-orbit-node-qualification/orbiter-cross-platform/out/phase6-final-candidate-freeze-v1.json",
+          "sha256": "2aaa553c85bf849b55b4193d4131ea8e59f478bd6bbdb0884730b11907e80910"
+        },
+        "scope": "Actual hashed native binaries and metadata-recorded local Windows runtime files"
+      }
+    }
   },
   "policy": {
     "physical_controller_required_for_phase6_complete": true,
@@ -2377,11 +2427,28 @@
           "discovered-unit-test-inventory"
         ]
       },
-      "result": "in-progress",
-      "coverage": null,
-      "diagnostic_only": null,
-      "candidate_id": null,
-      "evidence": [],
+      "result": "passed",
+      "coverage": {
+        "depends_on": [
+          "class-eligibility"
+        ],
+        "required": [
+          "windows-debug-release",
+          "four-native-profiles",
+          "application-observer-runner-reference-identities",
+          "dependency-and-provider-inventories",
+          "discovered-unit-test-inventory"
+        ]
+      },
+      "diagnostic_only": false,
+      "candidate_id": "phase6-c4ad-final-v1",
+      "evidence": [
+        {
+          "path": "/home/dan/.codex/worktrees/phase6-orbit-node-qualification/orbiter-cross-platform/out/phase6-final-candidate-freeze-v1.json",
+          "sha256": "2aaa553c85bf849b55b4193d4131ea8e59f478bd6bbdb0884730b11907e80910",
+          "scope": "Frozen C4 application/SDK builds, four native profiles, both Windows configurations; separated observer/runner/reference/provider identities and actual discovered unit inventories."
+        }
+      ],
       "qualification_progress": {
         "preserved_native_build_attempts": [
           {
