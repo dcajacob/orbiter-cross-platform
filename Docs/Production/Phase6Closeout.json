@@ -694,6 +694,11 @@
           "path": "/home/dan/.codex/worktrees/phase6-audit-throughput/orbiter-cross-platform/out/phase6-all-family-rejection-matrix-audit-v1.json",
           "sha256": "8c7559f506a5906aeea504ab0ce51862c578141d1843936a8661d31372c1fd8b",
           "scope": "Every family: unknown class and foreign factory. Each module-defined family: missing module and generic fallback. Shared checked loader: seven invalid ABI descriptors, missing query and actual Windows PE. All return one before presentation, clean contexts and unsuppressed sanitizers; invalid metadata never initializes. No positive interaction, persistence or normal admission credit."
+        },
+        {
+          "path": "/home/dan/.codex/worktrees/phase6-stock-admission/orbiter-cross-platform/out/phase6-all-family-persistence-matrix-audit-v2.json",
+          "sha256": "f88902c6e7ae13e72284849a23d2327d6b7f1b301aa71ffd41e7afbad31d1002",
+          "scope": "Selected complete original scenes, full serialized content and matching exact Windows-save reloads. No full38, actual operator save/F5 workflow, interaction, normal admission or final-candidate credit. Historical missing launch receipts remain missing."
         }
       ],
       "qualification_progress": {
@@ -853,8 +858,18 @@
                 "passed_profiles": []
               },
               "persistence": {
-                "result": "in-progress",
-                "passed_profiles": []
+                "result": "passed-scoped-family-facet",
+                "passed_profiles": [
+                  "Debug-automatic",
+                  "Debug-sse2",
+                  "Release-automatic",
+                  "Release-sse2"
+                ],
+                "evidence": {
+                  "path": "/home/dan/.codex/worktrees/phase6-stock-admission/orbiter-cross-platform/out/phase6-all-family-persistence-matrix-audit-v2.json",
+                  "sha256": "f88902c6e7ae13e72284849a23d2327d6b7f1b301aa71ffd41e7afbad31d1002",
+                  "scope": "Selected complete original scenes, full serialized content and matching exact Windows-save reloads. No full38, actual operator save/F5 workflow, interaction, normal admission or final-candidate credit. Historical missing launch receipts remain missing."
+                }
               },
               "resource-ownership": {
                 "result": "passed-scoped-family-facet",
@@ -936,8 +951,18 @@
                 "passed_profiles": []
               },
               "persistence": {
-                "result": "in-progress",
-                "passed_profiles": []
+                "result": "passed-scoped-family-facet",
+                "passed_profiles": [
+                  "Debug-automatic",
+                  "Debug-sse2",
+                  "Release-automatic",
+                  "Release-sse2"
+                ],
+                "evidence": {
+                  "path": "/home/dan/.codex/worktrees/phase6-stock-admission/orbiter-cross-platform/out/phase6-all-family-persistence-matrix-audit-v2.json",
+                  "sha256": "f88902c6e7ae13e72284849a23d2327d6b7f1b301aa71ffd41e7afbad31d1002",
+                  "scope": "Selected complete original scenes, full serialized content and matching exact Windows-save reloads. No full38, actual operator save/F5 workflow, interaction, normal admission or final-candidate credit. Historical missing launch receipts remain missing."
+                }
               },
               "resource-ownership": {
                 "result": "passed-scoped-family-facet",
@@ -1019,8 +1044,18 @@
                 "passed_profiles": []
               },
               "persistence": {
-                "result": "in-progress",
-                "passed_profiles": []
+                "result": "passed-scoped-family-facet",
+                "passed_profiles": [
+                  "Debug-automatic",
+                  "Debug-sse2",
+                  "Release-automatic",
+                  "Release-sse2"
+                ],
+                "evidence": {
+                  "path": "/home/dan/.codex/worktrees/phase6-stock-admission/orbiter-cross-platform/out/phase6-all-family-persistence-matrix-audit-v2.json",
+                  "sha256": "f88902c6e7ae13e72284849a23d2327d6b7f1b301aa71ffd41e7afbad31d1002",
+                  "scope": "Selected complete original scenes, full serialized content and matching exact Windows-save reloads. No full38, actual operator save/F5 workflow, interaction, normal admission or final-candidate credit. Historical missing launch receipts remain missing."
+                }
               },
               "resource-ownership": {
                 "result": "passed-scoped-family-facet",
@@ -1102,8 +1137,18 @@
                 "passed_profiles": []
               },
               "persistence": {
-                "result": "in-progress",
-                "passed_profiles": []
+                "result": "passed-scoped-family-facet",
+                "passed_profiles": [
+                  "Debug-automatic",
+                  "Debug-sse2",
+                  "Release-automatic",
+                  "Release-sse2"
+                ],
+                "evidence": {
+                  "path": "/home/dan/.codex/worktrees/phase6-stock-admission/orbiter-cross-platform/out/phase6-all-family-persistence-matrix-audit-v2.json",
+                  "sha256": "f88902c6e7ae13e72284849a23d2327d6b7f1b301aa71ffd41e7afbad31d1002",
+                  "scope": "Selected complete original scenes, full serialized content and matching exact Windows-save reloads. No full38, actual operator save/F5 workflow, interaction, normal admission or final-candidate credit. Historical missing launch receipts remain missing."
+                }
               },
               "resource-ownership": {
                 "result": "passed-scoped-family-facet",
@@ -1185,8 +1230,18 @@
                 "passed_profiles": []
               },
               "persistence": {
-                "result": "in-progress",
-                "passed_profiles": []
+                "result": "passed-scoped-family-facet",
+                "passed_profiles": [
+                  "Debug-automatic",
+                  "Debug-sse2",
+                  "Release-automatic",
+                  "Release-sse2"
+                ],
+                "evidence": {
+                  "path": "/home/dan/.codex/worktrees/phase6-stock-admission/orbiter-cross-platform/out/phase6-all-family-persistence-matrix-audit-v2.json",
+                  "sha256": "f88902c6e7ae13e72284849a23d2327d6b7f1b301aa71ffd41e7afbad31d1002",
+                  "scope": "Selected complete original scenes, full serialized content and matching exact Windows-save reloads. No full38, actual operator save/F5 workflow, interaction, normal admission or final-candidate credit. Historical missing launch receipts remain missing."
+                }
               },
               "resource-ownership": {
                 "result": "passed-scoped-family-facet",
@@ -1268,8 +1323,18 @@
                 "passed_profiles": []
               },
               "persistence": {
-                "result": "in-progress",
-                "passed_profiles": []
+                "result": "passed-scoped-family-facet",
+                "passed_profiles": [
+                  "Debug-automatic",
+                  "Debug-sse2",
+                  "Release-automatic",
+                  "Release-sse2"
+                ],
+                "evidence": {
+                  "path": "/home/dan/.codex/worktrees/phase6-stock-admission/orbiter-cross-platform/out/phase6-all-family-persistence-matrix-audit-v2.json",
+                  "sha256": "f88902c6e7ae13e72284849a23d2327d6b7f1b301aa71ffd41e7afbad31d1002",
+                  "scope": "Selected complete original scenes, full serialized content and matching exact Windows-save reloads. No full38, actual operator save/F5 workflow, interaction, normal admission or final-candidate credit. Historical missing launch receipts remain missing."
+                }
               },
               "resource-ownership": {
                 "result": "passed-scoped-family-facet",
@@ -1351,8 +1416,18 @@
                 "passed_profiles": []
               },
               "persistence": {
-                "result": "in-progress",
-                "passed_profiles": []
+                "result": "passed-scoped-family-facet",
+                "passed_profiles": [
+                  "Debug-automatic",
+                  "Debug-sse2",
+                  "Release-automatic",
+                  "Release-sse2"
+                ],
+                "evidence": {
+                  "path": "/home/dan/.codex/worktrees/phase6-stock-admission/orbiter-cross-platform/out/phase6-all-family-persistence-matrix-audit-v2.json",
+                  "sha256": "f88902c6e7ae13e72284849a23d2327d6b7f1b301aa71ffd41e7afbad31d1002",
+                  "scope": "Selected complete original scenes, full serialized content and matching exact Windows-save reloads. No full38, actual operator save/F5 workflow, interaction, normal admission or final-candidate credit. Historical missing launch receipts remain missing."
+                }
               },
               "resource-ownership": {
                 "result": "passed-scoped-family-facet",
@@ -1434,8 +1509,18 @@
                 "passed_profiles": []
               },
               "persistence": {
-                "result": "in-progress",
-                "passed_profiles": []
+                "result": "passed-scoped-family-facet",
+                "passed_profiles": [
+                  "Debug-automatic",
+                  "Debug-sse2",
+                  "Release-automatic",
+                  "Release-sse2"
+                ],
+                "evidence": {
+                  "path": "/home/dan/.codex/worktrees/phase6-stock-admission/orbiter-cross-platform/out/phase6-all-family-persistence-matrix-audit-v2.json",
+                  "sha256": "f88902c6e7ae13e72284849a23d2327d6b7f1b301aa71ffd41e7afbad31d1002",
+                  "scope": "Selected complete original scenes, full serialized content and matching exact Windows-save reloads. No full38, actual operator save/F5 workflow, interaction, normal admission or final-candidate credit. Historical missing launch receipts remain missing."
+                }
               },
               "resource-ownership": {
                 "result": "passed-scoped-family-facet",
@@ -1517,8 +1602,18 @@
                 "passed_profiles": []
               },
               "persistence": {
-                "result": "in-progress",
-                "passed_profiles": []
+                "result": "passed-scoped-family-facet",
+                "passed_profiles": [
+                  "Debug-automatic",
+                  "Debug-sse2",
+                  "Release-automatic",
+                  "Release-sse2"
+                ],
+                "evidence": {
+                  "path": "/home/dan/.codex/worktrees/phase6-stock-admission/orbiter-cross-platform/out/phase6-all-family-persistence-matrix-audit-v2.json",
+                  "sha256": "f88902c6e7ae13e72284849a23d2327d6b7f1b301aa71ffd41e7afbad31d1002",
+                  "scope": "Selected complete original scenes, full serialized content and matching exact Windows-save reloads. No full38, actual operator save/F5 workflow, interaction, normal admission or final-candidate credit. Historical missing launch receipts remain missing."
+                }
               },
               "resource-ownership": {
                 "result": "passed-scoped-family-facet",
@@ -1600,8 +1695,18 @@
                 "passed_profiles": []
               },
               "persistence": {
-                "result": "in-progress",
-                "passed_profiles": []
+                "result": "passed-scoped-family-facet",
+                "passed_profiles": [
+                  "Debug-automatic",
+                  "Debug-sse2",
+                  "Release-automatic",
+                  "Release-sse2"
+                ],
+                "evidence": {
+                  "path": "/home/dan/.codex/worktrees/phase6-stock-admission/orbiter-cross-platform/out/phase6-all-family-persistence-matrix-audit-v2.json",
+                  "sha256": "f88902c6e7ae13e72284849a23d2327d6b7f1b301aa71ffd41e7afbad31d1002",
+                  "scope": "Selected complete original scenes, full serialized content and matching exact Windows-save reloads. No full38, actual operator save/F5 workflow, interaction, normal admission or final-candidate credit. Historical missing launch receipts remain missing."
+                }
               },
               "resource-ownership": {
                 "result": "passed-scoped-family-facet",
@@ -1683,8 +1788,18 @@
                 "passed_profiles": []
               },
               "persistence": {
-                "result": "in-progress",
-                "passed_profiles": []
+                "result": "passed-scoped-family-facet",
+                "passed_profiles": [
+                  "Debug-automatic",
+                  "Debug-sse2",
+                  "Release-automatic",
+                  "Release-sse2"
+                ],
+                "evidence": {
+                  "path": "/home/dan/.codex/worktrees/phase6-stock-admission/orbiter-cross-platform/out/phase6-all-family-persistence-matrix-audit-v2.json",
+                  "sha256": "f88902c6e7ae13e72284849a23d2327d6b7f1b301aa71ffd41e7afbad31d1002",
+                  "scope": "Selected complete original scenes, full serialized content and matching exact Windows-save reloads. No full38, actual operator save/F5 workflow, interaction, normal admission or final-candidate credit. Historical missing launch receipts remain missing."
+                }
               },
               "resource-ownership": {
                 "result": "passed-scoped-family-facet",
@@ -1792,9 +1907,7 @@
           "successful_presents": 33600
         },
         "remaining_facets": [
-          "interactions",
-          "persistence",
-          "rejection-controls"
+          "interactions"
         ],
         "lifetime_captures_terminal": true,
         "capability_controls": {
@@ -1936,7 +2049,7 @@
           "scope": "Prepared existing-coordinator request: 128 new runs plus 16 separately retained runs; not launched"
         },
         "persistence_controls": {
-          "result": "in-progress-after-proven-renderer-rng-repair",
+          "result": "passed-scoped-family-persistence-facet",
           "execution_plan": {
             "path": "/home/dan/.codex/worktrees/phase6-audit-throughput/orbiter-cross-platform/out/phase6-family-persistence-execution-plan-v3.json",
             "sha256": "ff7d311f51e1a870b21d78fa4071a5c4edd7c181778d6fe1d89143fd44dceea9",
@@ -1957,14 +2070,8 @@
           "new_runs": 112,
           "retained_runs": 32,
           "maximum_native_simulators": 4,
-          "retained_audit": {
-            "path": "/home/dan/.codex/worktrees/phase6-persistence-controls/orbiter-cross-platform/out/phase6-family-persistence-retained003-v1/status.json",
-            "sha256": "6050f5d048484194c59def971f588a9e6f645055f1d8f4837ddef5b67df30811",
-            "scope": "Fresh independent audit and Windows comparisons of all sixteen retained scene003 writer/reloads under their exact original selected scope; no new simulators"
-          },
-          "completed_new_writer_runs": 32,
-          "current_blocker": "Both source-c8 focused matrices pass. The seven-case/112-run remainder is running with complete direct Windows comparisons and the verified scalar frame comparator.",
-          "next_exit_condition": "All 144 current-runtime writer/exact-save runs and their independent complete Windows comparisons pass without a budget change.",
+          "current_blocker": null,
+          "next_exit_condition": "Persistence facet closed; original-dispatch class interactions remain before normal admission.",
           "previous_execution_plans": [
             {
               "path": "/home/dan/.codex/worktrees/phase6-persistence-controls/orbiter-cross-platform/out/phase6-family-persistence-execution-plan-v2.json",
@@ -1973,7 +2080,22 @@
             }
           ],
           "focused_runs": 32,
-          "completed_focused_runs": 32
+          "completed_focused_runs": 32,
+          "independent_audit": {
+            "path": "/home/dan/.codex/worktrees/phase6-stock-admission/orbiter-cross-platform/out/phase6-all-family-persistence-matrix-audit-v2.json",
+            "sha256": "f88902c6e7ae13e72284849a23d2327d6b7f1b301aa71ffd41e7afbad31d1002",
+            "scope": "Selected complete original scenes, full serialized content and matching exact Windows-save reloads. No full38, actual operator save/F5 workflow, interaction, normal admission or final-candidate credit. Historical missing launch receipts remain missing."
+          },
+          "completed_runs": 144,
+          "completed_writer_runs": 72,
+          "completed_exact_save_reload_runs": 72,
+          "completed_new_runs": 112,
+          "remaining_runs": 0,
+          "historical_source81_retained_audit": {
+            "path": "/home/dan/.codex/worktrees/phase6-persistence-controls/orbiter-cross-platform/out/phase6-family-persistence-retained003-v1/status.json",
+            "sha256": "6050f5d048484194c59def971f588a9e6f645055f1d8f4837ddef5b67df30811",
+            "scope": "Fresh independent audit and Windows comparisons of all sixteen retained scene003 writer/reloads under their exact original selected scope; no new simulators"
+          }
         },
         "renderer_rng_repair": {
           "runtime_commit": "c8a8181e75d32aa08f59ed46eae8ac8215a8dbb8",
@@ -2017,8 +2139,8 @@
           }
         },
         "interaction_controls": {
-          "result": "prepared-awaiting-actual-capture-and-independent-audit",
-          "source_owner": "/home/dan/.codex/worktrees/phase6-stock-admission/orbiter-cross-platform",
+          "result": "focused-runner-correction-in-progress",
+          "source_owner": "/home/dan/.codex/worktrees/phase6-final-stock-controls/orbiter-cross-platform",
           "canary_profile": "Debug-sse2",
           "plans": [
             {
@@ -2039,7 +2161,15 @@
             }
           ],
           "scope": "Bounded original controls only. Three actuator flows, one original RCS docking flow and three original payload releases; RMS dialog calibration earns no family facet. All-profile interactions, RMS and ascent remain open.",
-          "native_admission_qualified": false
+          "native_admission_qualified": false,
+          "save_dispatch_fix": "70d80294",
+          "preserved_failed_captures": [
+            "/home/dan/.codex/worktrees/phase6-stock-admission/orbiter-cross-platform/out/phase6-actuator-controls-Debug-sse2-canary-v1/interactions.json",
+            "/home/dan/.codex/worktrees/phase6-stock-admission/orbiter-cross-platform/out/phase6-module2-docking-Debug-sse2-canary-v1/interactions.json",
+            "/home/dan/.codex/worktrees/phase6-stock-admission/orbiter-cross-platform/out/phase6-rms-dialog-Debug-sse2-calibration-v1/interactions.json"
+          ],
+          "failure_cause": "Runner declared --save destination without dispatching Ctrl-S; original HST and RMS simulations exit cleanly but fail required saved-file inspection. The original RCS docking also reaches its target, but the capture remains failed for the missing save.",
+          "corrected_capture": "/home/dan/.codex/worktrees/phase6-final-stock-controls/orbiter-cross-platform/out/phase6-hst-save-dispatch-Debug-sse2-v1/interactions.json"
         }
       }
     },
@@ -2600,6 +2730,6 @@
       "note": "Physical controller hardware unavailable; virtual devices do not satisfy acceptance."
     }
   },
-  "current_blocker": "Class interactions and the remaining 112 of 144 current-runtime family persistence runs. The 32 focused writers/reloads and 180 actual class/loader rejection controls independently pass in all four profiles. Normal admission and final candidate freeze remain open.",
-  "next_exit_condition": "Close the source-c8 family persistence and interaction facets, independently verify all four rejection profiles, and admit only proven stock class/capability combinations before freezing the final candidate."
+  "current_blocker": "Class interactions are the only remaining class-eligibility facet. All eleven families pass the other six facets, including the independently audited 144 current-runtime writer/exact-Windows-save reload runs. Corrected original Ctrl-S interaction capture is in focused verification. Normal admission and final candidate freeze remain open.",
+  "next_exit_condition": "Complete and independently audit the remaining original-control interactions for all eleven families in all four profiles, then promote only their qualified class/capability combinations and freeze the final candidate."
 }
