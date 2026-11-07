@@ -26,8 +26,13 @@ repetitions, 144 actual processes and 8,640 presentations. Eight explicitly
 completed cases per profile are retained from the original failed captures;
 the generated-vessel scene is separately repeated with its full original
 Windows population. Original failures and the missing-argv receipt attempt
-remain failed. Interaction, persistence and rejection controls are still open
-for each family.
+remain failed. All eleven families now pass independently re-read rejection
+controls in four profiles: 180 actual processes. Each family rejects unknown
+class clones and foreign factories; module-defined families also reject missing
+modules and generic fallbacks. Nine shared loader controls per profile reject
+invalid ABI metadata, a missing query and an actual Windows PE library. Every
+process returns one before presentation, closes graphics cleanly and retains
+unsuppressed sanitizers. Interaction and persistence remain open for each family.
 These controls do not qualify interactions, persistence, normal admission or a
 full acceptance campaign. The first failed canary's capture-clock mismatch is
 preserved; the corrected runner captures its actual fiftieth fixed-step frame.
@@ -39,6 +44,15 @@ four package paths, declared data/providers/Windows references, and either
 Two collectors with at most two jobs each enforce the four-simulator limit.
 The existing capture, state/camera/frame/save comparators and independent native
 reader retain their complete checks. No physics formula, ordering or budget changes.
+`runtime_owner` explicitly separates a retained compiled package from its
+collector checkout. Optional `observer_delay_ms: 0` removes the old 120ms
+observer pause; both repeated writer/reload canaries retain byte-identical
+primary state, clocks, camera, saved file and frame. Defaults remain 120ms.
+An optional `frame_comparator` binds a local verification record and executable
+hash for the same scalar SSIM operation order. Supplied binary64 weights and
+constants, disabled contraction/fast math, two actual full-frame pairs and five
+small exact controls preserve the retained Python scores bit for bit. The
+original reader remains intact. No masks, rescaling or threshold changes.
 
 A `reuse` entry names a closed capture, its SHA256 and its actual original
 `collector_commit`. Reuse re-runs the owning independent reader and comparisons;
@@ -53,17 +67,33 @@ launch. A missing command line stays missing in the receipt; discovery may
 complete it only from an actual observation with the same PID and start token.
 Requested arguments never fill a missing OS identity. The original failed
 capability receipt remains failed.
+After observing process exit, the coordinator re-reads the closed capture before
+checking terminal scope and comparing any last completed cases. This avoids a
+live-read/exit race; the original rejected complete capture remains preserved
+and is reused only after a fresh independent audit.
 
-The separate family persistence scopes are coordinated by the same runner:
-eight new cases and the retained scene003 writer/reloads, each in four profiles,
-both phases and two repetitions. The retained sixteen runs pass fresh independent
-audit; the new 128 runs are still in progress. After both coordinators close,
+The current family persistence matrix has exactly 144 runs on the repaired
+renderer-RNG runtime: nine selected scenes, four profiles, writer/reload phases
+and two repetitions. Three disjoint scopes cover scene003, scene009 and the
+other seven scenes. Scene009's sixteen runs pass; its original exact-save
+failure and source81 attempts remain preserved. Initial accumulation counters
+now consume the original renderer's 3,000 CRT draws through the same private
+Windows-compatible stream; physics formulas and flush ordering are unchanged.
+After the three coordinators close,
 `class_eligibility.py --persistence-manifest Docs/Production/Phase6Closeout.json
 --output FRESH.json` re-reads every capture, source/runtime guard, original
 Windows observation, exact paired save hash and complete comparison. It rejects
 incomplete coordinators, missing phases/cases/profiles, duplicate cells, short
 repetitions and mixed runtime sources. This qualifies only the per-family
 persistence facet; actual save/F5 interaction and full38 acceptance remain open.
+
+A malformed-recording diagnostic also exposed 3,705 leaked bytes in forty
+allocations when a host lookup threw inside the original vessel constructor.
+The native world adapter now resolves required playback resources before
+construction and restores the input stream. The exact captured failure retains
+its explicit rejection and clean unsuppressed sanitizers; two valid Shuttle
+writers retain byte-identical primary state, clocks, camera, save and full frame.
+All 622 extraction files and original physics conservation checks pass.
 
 The v2 Windows worker and descriptor live under `LocalVM/`. They use explicitly
 declared roots and a hashed host-share witness, validate real capacity before

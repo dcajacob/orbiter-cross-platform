@@ -347,6 +347,40 @@ def inspect_persistence_matrix(path):
         diagnostic_only=True, native_admission_qualified=False, phase6_complete=False)
 
 
+def inspect_rejection_matrix(path):
+    ledger=load(path);gate=ledger['gates']['class-eligibility'];expected=requirements()['class-eligibility']
+    require(gate['expected']==expected,'Fixed class rejection requirements differ')
+    work=gate['qualification_progress']['rejection_controls'];owner=Path(work['source_owner']).resolve()
+    for name in ('native.py','lifetimes.py','rejections.py','RejectedModule.cpp'):
+        relative='Tests/Production/RemainingVessels/'+name
+        body=subprocess.check_output(['git','-C',str(owner),'show',work['producer_commit']+':'+relative])
+        require(hashlib.sha256(body).hexdigest()==sha(owner/relative),'Immutable rejection runner changed')
+    sys.path.insert(0,str(owner/'Tests/Production/RemainingVessels'))
+    import rejections
+    require(rejections.ROOT==owner and set(work['captures'])==set(expected['profiles']),
+            'Exact owning rejection reader and all four profiles required')
+    results={};sources=set()
+    for profile in expected['profiles']:
+        capture=Path(work['captures'][profile]);checked=rejections.audit(capture)
+        require(checked['runtime_identity']['profile']==profile and checked['families']==expected['families'] and
+                checked['actual_processes']==len(checked['controls'])==45 and
+                load(capture)['producer_commit']==work['producer_commit'],
+                'Incomplete family/profile/bootstrap rejection coverage')
+        sources.add(checked['runtime_identity']['runtime_source_commit'])
+        results[profile]=dict(capture=str(capture),audit=checked)
+    require(len(sources)==1,'Mixed native rejection runtime sources')
+    return dict(status='audited-all-family-negative-loader-and-class-controls-only',
+                profiles=results,families=expected['families'],actual_processes=180,
+                common_loader_controls_per_profile=9,passed_facet='rejection-controls',
+                runtime_source=sources.pop(),auditor_source_sha256=sha(__file__),
+                scope='Every family: unknown class and foreign factory. Each module-defined family: '
+                      'missing module and generic fallback. Shared checked loader: seven invalid ABI '
+                      'descriptors, missing query and actual Windows PE. All return one before '
+                      'presentation, clean contexts and unsuppressed sanitizers; invalid metadata '
+                      'never initializes. No positive interaction, persistence or normal admission credit.',
+                diagnostic_only=True,native_admission_qualified=False,phase6_complete=False)
+
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=__doc__)
     kind=parser.add_mutually_exclusive_group(required=True)
@@ -354,10 +388,12 @@ if __name__ == '__main__':
     kind.add_argument('--family-manifest',type=Path)
     kind.add_argument('--capability-manifest',type=Path)
     kind.add_argument('--persistence-manifest',type=Path)
+    kind.add_argument('--rejection-manifest',type=Path)
     parser.add_argument('--output', type=Path, required=True)
     args = parser.parse_args()
     require(not args.output.exists(), 'Fresh independent class-evidence audit required')
     result=inspect_paused(args.paused_capture) if args.paused_capture else \
         inspect_family_lifetimes(args.family_manifest) if args.family_manifest else \
-        inspect_capability_matrix(args.capability_manifest) if args.capability_manifest else inspect_persistence_matrix(args.persistence_manifest)
+        inspect_capability_matrix(args.capability_manifest) if args.capability_manifest else \
+        inspect_rejection_matrix(args.rejection_manifest) if args.rejection_manifest else inspect_persistence_matrix(args.persistence_manifest)
     atomic_json(args.output,result)

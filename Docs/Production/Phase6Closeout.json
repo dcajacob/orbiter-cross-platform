@@ -679,6 +679,11 @@
           "path": "/home/dan/.codex/worktrees/phase6-persistence-controls/orbiter-cross-platform/out/phase6-family-persistence-selected-v2/status.json",
           "sha256": "43488fe79c9bb57b9621178cf47fbc861b692e40c5e4948d310b8bf93858832d",
           "scope": "Failure-preserving coordinator: 32 new complete Debug writer runs pass; scene009 SSE2 reload fails exact saved RPOS; other work cancelled and partial captures remain incomplete"
+        },
+        {
+          "path": "/home/dan/.codex/worktrees/phase6-audit-throughput/orbiter-cross-platform/out/phase6-all-family-rejection-matrix-audit-v1.json",
+          "sha256": "8c7559f506a5906aeea504ab0ce51862c578141d1843936a8661d31372c1fd8b",
+          "scope": "Every family: unknown class and foreign factory. Each module-defined family: missing module and generic fallback. Shared checked loader: seven invalid ABI descriptors, missing query and actual Windows PE. All return one before presentation, clean contexts and unsuppressed sanitizers; invalid metadata never initializes. No positive interaction, persistence or normal admission credit."
         }
       ],
       "qualification_progress": {
@@ -870,8 +875,18 @@
                 }
               },
               "rejection-controls": {
-                "result": "not-run",
-                "passed_profiles": []
+                "result": "passed-scoped-family-facet",
+                "passed_profiles": [
+                  "Debug-automatic",
+                  "Debug-sse2",
+                  "Release-automatic",
+                  "Release-sse2"
+                ],
+                "evidence": {
+                  "path": "/home/dan/.codex/worktrees/phase6-audit-throughput/orbiter-cross-platform/out/phase6-all-family-rejection-matrix-audit-v1.json",
+                  "sha256": "8c7559f506a5906aeea504ab0ce51862c578141d1843936a8661d31372c1fd8b",
+                  "scope": "Every family: unknown class and foreign factory. Each module-defined family: missing module and generic fallback. Shared checked loader: seven invalid ABI descriptors, missing query and actual Windows PE. All return one before presentation, clean contexts and unsuppressed sanitizers; invalid metadata never initializes. No positive interaction, persistence or normal admission credit."
+                }
               }
             }
           },
@@ -943,8 +958,18 @@
                 }
               },
               "rejection-controls": {
-                "result": "not-run",
-                "passed_profiles": []
+                "result": "passed-scoped-family-facet",
+                "passed_profiles": [
+                  "Debug-automatic",
+                  "Debug-sse2",
+                  "Release-automatic",
+                  "Release-sse2"
+                ],
+                "evidence": {
+                  "path": "/home/dan/.codex/worktrees/phase6-audit-throughput/orbiter-cross-platform/out/phase6-all-family-rejection-matrix-audit-v1.json",
+                  "sha256": "8c7559f506a5906aeea504ab0ce51862c578141d1843936a8661d31372c1fd8b",
+                  "scope": "Every family: unknown class and foreign factory. Each module-defined family: missing module and generic fallback. Shared checked loader: seven invalid ABI descriptors, missing query and actual Windows PE. All return one before presentation, clean contexts and unsuppressed sanitizers; invalid metadata never initializes. No positive interaction, persistence or normal admission credit."
+                }
               }
             }
           },
@@ -1016,8 +1041,18 @@
                 }
               },
               "rejection-controls": {
-                "result": "not-run",
-                "passed_profiles": []
+                "result": "passed-scoped-family-facet",
+                "passed_profiles": [
+                  "Debug-automatic",
+                  "Debug-sse2",
+                  "Release-automatic",
+                  "Release-sse2"
+                ],
+                "evidence": {
+                  "path": "/home/dan/.codex/worktrees/phase6-audit-throughput/orbiter-cross-platform/out/phase6-all-family-rejection-matrix-audit-v1.json",
+                  "sha256": "8c7559f506a5906aeea504ab0ce51862c578141d1843936a8661d31372c1fd8b",
+                  "scope": "Every family: unknown class and foreign factory. Each module-defined family: missing module and generic fallback. Shared checked loader: seven invalid ABI descriptors, missing query and actual Windows PE. All return one before presentation, clean contexts and unsuppressed sanitizers; invalid metadata never initializes. No positive interaction, persistence or normal admission credit."
+                }
               }
             }
           },
@@ -1089,8 +1124,18 @@
                 }
               },
               "rejection-controls": {
-                "result": "not-run",
-                "passed_profiles": []
+                "result": "passed-scoped-family-facet",
+                "passed_profiles": [
+                  "Debug-automatic",
+                  "Debug-sse2",
+                  "Release-automatic",
+                  "Release-sse2"
+                ],
+                "evidence": {
+                  "path": "/home/dan/.codex/worktrees/phase6-audit-throughput/orbiter-cross-platform/out/phase6-all-family-rejection-matrix-audit-v1.json",
+                  "sha256": "8c7559f506a5906aeea504ab0ce51862c578141d1843936a8661d31372c1fd8b",
+                  "scope": "Every family: unknown class and foreign factory. Each module-defined family: missing module and generic fallback. Shared checked loader: seven invalid ABI descriptors, missing query and actual Windows PE. All return one before presentation, clean contexts and unsuppressed sanitizers; invalid metadata never initializes. No positive interaction, persistence or normal admission credit."
+                }
               }
             }
           },
@@ -1162,8 +1207,18 @@
                 }
               },
               "rejection-controls": {
-                "result": "not-run",
-                "passed_profiles": []
+                "result": "passed-scoped-family-facet",
+                "passed_profiles": [
+                  "Debug-automatic",
+                  "Debug-sse2",
+                  "Release-automatic",
+                  "Release-sse2"
+                ],
+                "evidence": {
+                  "path": "/home/dan/.codex/worktrees/phase6-audit-throughput/orbiter-cross-platform/out/phase6-all-family-rejection-matrix-audit-v1.json",
+                  "sha256": "8c7559f506a5906aeea504ab0ce51862c578141d1843936a8661d31372c1fd8b",
+                  "scope": "Every family: unknown class and foreign factory. Each module-defined family: missing module and generic fallback. Shared checked loader: seven invalid ABI descriptors, missing query and actual Windows PE. All return one before presentation, clean contexts and unsuppressed sanitizers; invalid metadata never initializes. No positive interaction, persistence or normal admission credit."
+                }
               }
             }
           },
@@ -1235,8 +1290,18 @@
                 }
               },
               "rejection-controls": {
-                "result": "not-run",
-                "passed_profiles": []
+                "result": "passed-scoped-family-facet",
+                "passed_profiles": [
+                  "Debug-automatic",
+                  "Debug-sse2",
+                  "Release-automatic",
+                  "Release-sse2"
+                ],
+                "evidence": {
+                  "path": "/home/dan/.codex/worktrees/phase6-audit-throughput/orbiter-cross-platform/out/phase6-all-family-rejection-matrix-audit-v1.json",
+                  "sha256": "8c7559f506a5906aeea504ab0ce51862c578141d1843936a8661d31372c1fd8b",
+                  "scope": "Every family: unknown class and foreign factory. Each module-defined family: missing module and generic fallback. Shared checked loader: seven invalid ABI descriptors, missing query and actual Windows PE. All return one before presentation, clean contexts and unsuppressed sanitizers; invalid metadata never initializes. No positive interaction, persistence or normal admission credit."
+                }
               }
             }
           },
@@ -1308,8 +1373,18 @@
                 }
               },
               "rejection-controls": {
-                "result": "not-run",
-                "passed_profiles": []
+                "result": "passed-scoped-family-facet",
+                "passed_profiles": [
+                  "Debug-automatic",
+                  "Debug-sse2",
+                  "Release-automatic",
+                  "Release-sse2"
+                ],
+                "evidence": {
+                  "path": "/home/dan/.codex/worktrees/phase6-audit-throughput/orbiter-cross-platform/out/phase6-all-family-rejection-matrix-audit-v1.json",
+                  "sha256": "8c7559f506a5906aeea504ab0ce51862c578141d1843936a8661d31372c1fd8b",
+                  "scope": "Every family: unknown class and foreign factory. Each module-defined family: missing module and generic fallback. Shared checked loader: seven invalid ABI descriptors, missing query and actual Windows PE. All return one before presentation, clean contexts and unsuppressed sanitizers; invalid metadata never initializes. No positive interaction, persistence or normal admission credit."
+                }
               }
             }
           },
@@ -1381,8 +1456,18 @@
                 }
               },
               "rejection-controls": {
-                "result": "not-run",
-                "passed_profiles": []
+                "result": "passed-scoped-family-facet",
+                "passed_profiles": [
+                  "Debug-automatic",
+                  "Debug-sse2",
+                  "Release-automatic",
+                  "Release-sse2"
+                ],
+                "evidence": {
+                  "path": "/home/dan/.codex/worktrees/phase6-audit-throughput/orbiter-cross-platform/out/phase6-all-family-rejection-matrix-audit-v1.json",
+                  "sha256": "8c7559f506a5906aeea504ab0ce51862c578141d1843936a8661d31372c1fd8b",
+                  "scope": "Every family: unknown class and foreign factory. Each module-defined family: missing module and generic fallback. Shared checked loader: seven invalid ABI descriptors, missing query and actual Windows PE. All return one before presentation, clean contexts and unsuppressed sanitizers; invalid metadata never initializes. No positive interaction, persistence or normal admission credit."
+                }
               }
             }
           },
@@ -1454,8 +1539,18 @@
                 }
               },
               "rejection-controls": {
-                "result": "not-run",
-                "passed_profiles": []
+                "result": "passed-scoped-family-facet",
+                "passed_profiles": [
+                  "Debug-automatic",
+                  "Debug-sse2",
+                  "Release-automatic",
+                  "Release-sse2"
+                ],
+                "evidence": {
+                  "path": "/home/dan/.codex/worktrees/phase6-audit-throughput/orbiter-cross-platform/out/phase6-all-family-rejection-matrix-audit-v1.json",
+                  "sha256": "8c7559f506a5906aeea504ab0ce51862c578141d1843936a8661d31372c1fd8b",
+                  "scope": "Every family: unknown class and foreign factory. Each module-defined family: missing module and generic fallback. Shared checked loader: seven invalid ABI descriptors, missing query and actual Windows PE. All return one before presentation, clean contexts and unsuppressed sanitizers; invalid metadata never initializes. No positive interaction, persistence or normal admission credit."
+                }
               }
             }
           },
@@ -1527,8 +1622,18 @@
                 }
               },
               "rejection-controls": {
-                "result": "not-run",
-                "passed_profiles": []
+                "result": "passed-scoped-family-facet",
+                "passed_profiles": [
+                  "Debug-automatic",
+                  "Debug-sse2",
+                  "Release-automatic",
+                  "Release-sse2"
+                ],
+                "evidence": {
+                  "path": "/home/dan/.codex/worktrees/phase6-audit-throughput/orbiter-cross-platform/out/phase6-all-family-rejection-matrix-audit-v1.json",
+                  "sha256": "8c7559f506a5906aeea504ab0ce51862c578141d1843936a8661d31372c1fd8b",
+                  "scope": "Every family: unknown class and foreign factory. Each module-defined family: missing module and generic fallback. Shared checked loader: seven invalid ABI descriptors, missing query and actual Windows PE. All return one before presentation, clean contexts and unsuppressed sanitizers; invalid metadata never initializes. No positive interaction, persistence or normal admission credit."
+                }
               }
             }
           },
@@ -1600,8 +1705,18 @@
                 }
               },
               "rejection-controls": {
-                "result": "not-run",
-                "passed_profiles": []
+                "result": "passed-scoped-family-facet",
+                "passed_profiles": [
+                  "Debug-automatic",
+                  "Debug-sse2",
+                  "Release-automatic",
+                  "Release-sse2"
+                ],
+                "evidence": {
+                  "path": "/home/dan/.codex/worktrees/phase6-audit-throughput/orbiter-cross-platform/out/phase6-all-family-rejection-matrix-audit-v1.json",
+                  "sha256": "8c7559f506a5906aeea504ab0ce51862c578141d1843936a8661d31372c1fd8b",
+                  "scope": "Every family: unknown class and foreign factory. Each module-defined family: missing module and generic fallback. Shared checked loader: seven invalid ABI descriptors, missing query and actual Windows PE. All return one before presentation, clean contexts and unsuppressed sanitizers; invalid metadata never initializes. No positive interaction, persistence or normal admission credit."
+                }
               }
             }
           }
@@ -1811,11 +1926,11 @@
           "scope": "Prepared existing-coordinator request: 128 new runs plus 16 separately retained runs; not launched"
         },
         "persistence_controls": {
-          "result": "failed-exact-save-serialization-comparison",
+          "result": "in-progress-after-proven-renderer-rng-repair",
           "execution_plan": {
-            "path": "/home/dan/.codex/worktrees/phase6-persistence-controls/orbiter-cross-platform/out/phase6-family-persistence-execution-plan-v2.json",
-            "sha256": "65f13c97d97bf9daeee886de024caff6d911b0a6fd552b07631ebed8c57273b7",
-            "scope": "Two separate exact scopes: 128 new runs plus 16 retained runs to re-audit; requests launched, no persistence pass yet"
+            "path": "/home/dan/.codex/worktrees/phase6-audit-throughput/orbiter-cross-platform/out/phase6-family-persistence-execution-plan-v3.json",
+            "sha256": "ff7d311f51e1a870b21d78fa4071a5c4edd7c181778d6fe1d89143fd44dceea9",
+            "scope": "Finite 144-run source-c8 family matrix from exact 003, 009 and seven-case scopes; original failed source-81 attempt preserved"
           },
           "expected_cases": [
             "remaining_stock_003",
@@ -1829,8 +1944,8 @@
             "remaining_stock_032"
           ],
           "expected_runs": 144,
-          "new_runs": 128,
-          "retained_runs": 16,
+          "new_runs": 112,
+          "retained_runs": 0,
           "maximum_native_simulators": 4,
           "retained_audit": {
             "path": "/home/dan/.codex/worktrees/phase6-persistence-controls/orbiter-cross-platform/out/phase6-family-persistence-retained003-v1/status.json",
@@ -1838,8 +1953,52 @@
             "scope": "Fresh independent audit and Windows comparisons of all sixteen retained scene003 writer/reloads under their exact original selected scope; no new simulators"
           },
           "completed_new_writer_runs": 32,
-          "current_blocker": "Complete Windows/native saved content differs: [{\"path\": \"ships/Module2A/records/1\", \"left\": [\"RPOS\", \"1060561.786\", \"-954440.965\", \"-6582784.319\"], \"right\": [\"RPOS\", \"1060561.785\", \"-954440.965\", \"-6582784.319\"]}]",
-          "next_exit_condition": "Trace and repair the first proven state/formatting difference in scene009 exact Windows-save reload; repeat the focused matrix before resuming remaining captures."
+          "current_blocker": "Scene009 repaired matrix passes all four profiles. Scene003 regression is running; the other seven-case scope waits for the focused matrices and rejection jobs to close.",
+          "next_exit_condition": "All 144 current-runtime writer/exact-save runs and their independent complete Windows comparisons pass without a budget change.",
+          "previous_execution_plans": [
+            {
+              "path": "/home/dan/.codex/worktrees/phase6-persistence-controls/orbiter-cross-platform/out/phase6-family-persistence-execution-plan-v2.json",
+              "sha256": "65f13c97d97bf9daeee886de024caff6d911b0a6fd552b07631ebed8c57273b7",
+              "scope": "Two separate exact scopes: 128 new runs plus 16 retained runs to re-audit; requests launched, no persistence pass yet"
+            }
+          ],
+          "focused_runs": 32
+        },
+        "renderer_rng_repair": {
+          "runtime_commit": "c8a8181e75d32aa08f59ed46eae8ac8215a8dbb8",
+          "fixed_matrix": {
+            "path": "/home/dan/.codex/worktrees/phase6-admission-controls/orbiter-cross-platform/out/phase6-rng-focused-009-v2/status.json",
+            "sha256": "a13d47ca8b10cfd3d6b0cac9efffe2070c28c6d586baf518ffc5ff1385eb2fc0",
+            "scope": "All sixteen scene009 writer/exact-save runs, four profiles, two repetitions, independently compared and audited"
+          },
+          "pacing_neutrality": {
+            "path": "/home/dan/.codex/worktrees/phase6-final-qualification/orbiter-cross-platform/out/phase6-renderer-rng-pacing-neutrality-v1.json",
+            "sha256": "d5ac7a0a5b97b28e87dd201ab6b5ec8e85eeb2ad6c84f9f66008fcfa99189b20",
+            "scope": "Both repetitions/phases retain byte-identical primary simulation traces, clocks, cameras, saved content and frames with observer delay 120ms versus 0ms"
+          },
+          "frame_comparator": {
+            "path": "/home/dan/.codex/worktrees/phase6-audit-throughput/orbiter-cross-platform/out/phase6-ssim-kernel-v1/verification.json",
+            "sha256": "31b9659fe7ab2fedaac7f43426160cdd5624dc9398a946d23b27d8f0928a74e7",
+            "scope": "Two real full-frame pairs and five small controls have bit-identical retained Python/scalar compiled SSIM scores; existing images, arithmetic and budgets preserved"
+          }
+        },
+        "rejection_controls": {
+          "result": "passed-scoped-family-facet",
+          "source_owner": "/home/dan/.codex/worktrees/phase6-admission-controls/orbiter-cross-platform",
+          "producer_commit": "6434f4e286ae65ab02c284d82850bf155a33adf9",
+          "captures": {
+            "Debug-automatic": "/home/dan/.codex/worktrees/phase6-admission-controls/orbiter-cross-platform/out/phase6-rejections-Debug-automatic-v1/rejections.json",
+            "Debug-sse2": "/home/dan/.codex/worktrees/phase6-admission-controls/orbiter-cross-platform/out/phase6-rejections-Debug-sse2-v4/rejections.json",
+            "Release-automatic": "/home/dan/.codex/worktrees/phase6-admission-controls/orbiter-cross-platform/out/phase6-rejections-Release-automatic-v1/rejections.json",
+            "Release-sse2": "/home/dan/.codex/worktrees/phase6-admission-controls/orbiter-cross-platform/out/phase6-rejections-Release-sse2-v1/rejections.json"
+          },
+          "expected_processes": 180,
+          "controls_per_profile": 45,
+          "audit": {
+            "path": "/home/dan/.codex/worktrees/phase6-audit-throughput/orbiter-cross-platform/out/phase6-all-family-rejection-matrix-audit-v1.json",
+            "sha256": "8c7559f506a5906aeea504ab0ce51862c578141d1843936a8661d31372c1fd8b",
+            "scope": "Every family: unknown class and foreign factory. Each module-defined family: missing module and generic fallback. Shared checked loader: seven invalid ABI descriptors, missing query and actual Windows PE. All return one before presentation, clean contexts and unsuppressed sanitizers; invalid metadata never initializes. No positive interaction, persistence or normal admission credit."
+          }
         }
       }
     },
@@ -2216,6 +2375,25 @@
             "scope": "128 actual Python helper tests in all 22 helper unittest files; separate headless CLI/runtime TestCase adapter remains open"
           },
           "remaining": "C++/Lua, headless integration, runtime fixtures and final-candidate profile qualification"
+        },
+        "missing_recording_error": {
+          "result": "passed-focused-negative-regression-and-valid-playback-equivalence",
+          "source_commit": "904c9f4b82dd150258edaba819eac7938057bde3",
+          "evidence": {
+            "path": "/home/dan/.codex/worktrees/phase6-audit-throughput/orbiter-cross-platform/out/phase6-preflight-captured-missing-recording-control-v1/verification.json",
+            "sha256": "dc479a2be74772749f239d66932bcde45c9a3e6050e286c2461c45b396b4e764",
+            "scope": "Exact captured malformed input, same required recording error, exit one before presentation, clean context and unsuppressed sanitizers; focused regression only."
+          },
+          "original_failure_preserved": "/home/dan/.codex/worktrees/phase6-admission-controls/orbiter-cross-platform/out/phase6-rejections-Debug-sse2-v3/Atlantis-unknown-class",
+          "original_leaked_bytes": 3705,
+          "original_leaked_allocations": 40,
+          "positive_control": "/home/dan/.codex/worktrees/phase6-audit-throughput/orbiter-cross-platform/out/phase6-preflight-positive-003-Debug-sse2-v1/capture.json",
+          "normal_admission_qualified": false,
+          "positive_evidence": {
+            "path": "/home/dan/.codex/worktrees/phase6-audit-throughput/orbiter-cross-platform/out/phase6-missing-recording-preflight-v1/positive-equivalence.json",
+            "sha256": "73798d934b0267bb0e4ef8e76868521e287b4bd6a6ca0e972e3f1caa0e289804",
+            "scope": "Two complete Debug/SSE2 Shuttle stock writers retain byte-identical primary state, clocks, camera, full frame and complete saved file after the read-only resource preflight; independent native re-read and direct Windows comparison pass. Focused resource regression only."
+          }
         }
       }
     },
@@ -2357,6 +2535,6 @@
       "note": "Physical controller hardware unavailable; virtual devices do not satisfy acceptance."
     }
   },
-  "current_blocker": "Per-family capability, original-dispatch interaction, persistence and rejection controls. The capability run now covers all sixteen original structural signatures in nine selected scenes, four profiles and two off/on repetitions. ABI/ownership/twenty-world facets pass; normal class admission and candidate freeze remain open.",
-  "next_exit_condition": "Independently audit the finite capability matrix, then complete interactions, exact-save persistence and rejection controls before admitting proven class/capability combinations. Preserve all existing numerical and image budgets and the source-bound completed captures."
+  "current_blocker": "Class interactions and the finite 144-run current-runtime persistence matrix. All 180 actual class/loader rejection controls independently pass in four profiles. Scene009 repaired writers/exact-save reloads pass in all four profiles; source-c8 scene003 regression is running. Normal admission and candidate freeze remain open.",
+  "next_exit_condition": "Close the source-c8 family persistence and interaction facets, independently verify all four rejection profiles, and admit only proven stock class/capability combinations before freezing the final candidate."
 }
