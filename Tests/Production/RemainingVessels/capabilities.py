@@ -76,7 +76,11 @@ def compare_capabilities(native,windows,expected,budgets):
             for field in row:
                 if field in keys or field=='tick':continue
                 if field in ('x','y','z','dx','dy','dz','rx','ry','rz'):
-                    limit=budgets['position_m'] if field in ('x','y','z') else budgets['rotation_rad']
+                    # Preserve the existing exact local docking contract.
+                    # Attachment calibration additionally uses the unchanged
+                    # physical position/rotation budgets; it replaces no gate.
+                    limit=0 if filename=='stock-vessel-docks.csv' else \
+                        budgets['position_m'] if field in ('x','y','z') else budgets['rotation_rad']
                     require(abs(float(row[field])-float(other[field]))<=limit,
                             'Actual capability port geometry differs: '+filename+'/'+field)
                 else:require(row[field]==other[field],'Actual capability port identity differs: '+field)
@@ -158,6 +162,13 @@ def inspect_lane(folder,case,identity,observer):
     require(load(folder/'numerics.json')['math']=='amd-6121d02-'+
             ('sse2' if identity['math_profile']=='sse2' else 'fma3'),'Actual capability math mode differs')
     world=inspect_world(folder,case['declared_vessels'])
+    renderer=load(folder/'renderer-info.json');marker=load(folder/'unqualified-remaining-stock-diagnostic.json')
+    require('llvmpipe' in renderer['renderer'].lower() and
+            renderer['client_width']==1280 and renderer['client_height']==720 and
+            marker['native_admission_qualified'] is False and marker['phase6_complete'] is False,
+            'Actual capability renderer or diagnostic scope differs')
+    errors=folder/'graphics-errors.txt'
+    require(not errors.exists() or not errors.read_text().strip(),'Capability graphics diagnostic')
     if observer:
         require((folder/'stock-vessel-complete.txt').read_text().strip()=='60','Capability observer ended early')
         mapped=(folder/'observer-loaded-maps.txt').read_text()

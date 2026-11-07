@@ -59,8 +59,8 @@ class CapabilityControls(unittest.TestCase):
     def test_missing_port_identity_and_geometry_outside_existing_budget_fail(self):
         with tempfile.TemporaryDirectory() as temporary:
             root=Path(temporary);state,port=self.fixture(root)
-            write(root/'native/stock-vessel-docks.csv',[dict(port,x='0.009')]);self.check(root)
-            for records in ([],[dict(port,x='0.011')],[dict(port,dy='0.00000002')],[dict(port,docked='Manufactured')],[port,port]):
+            self.check(root)
+            for records in ([],[dict(port,x='0.000000000001')],[dict(port,x='0.011')],[dict(port,dy='0.00000002')],[dict(port,docked='Manufactured')],[port,port]):
                 with self.subTest(records=records),self.assertRaises(ValueError):
                     write(root/'native/stock-vessel-docks.csv',records,list(port));self.check(root)
             partial={key:port[key] for key in ('tick','object','index')}
