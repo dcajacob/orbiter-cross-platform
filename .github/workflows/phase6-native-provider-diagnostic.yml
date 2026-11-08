@@ -1,0 +1,73 @@
+name: Phase 6 Retained Native Provider Diagnostic
+
+on:
+  push:
+    branches: ['qualification/native-provider-diagnostic']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  diagnostic:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
+      - name: Verify and read the retained failed provider artifact
+        uses: actions/github-script@v8
+        with:
+          script: |
+            const fs = require('fs');
+            const crypto = require('crypto');
+            const {owner,repo} = context.repo;
+            const run_id = 42527451639;
+            const artifact_id = 13636017475;
+            const producer = '0097da245b12f46420cd19a446e5ffe231788b95';
+            if (owner !== 'dcajacob' || repo !== 'orbiter-cross-platform') throw Error('Exact authorized repository required');
+            const run = (await github.rest.actions.getWorkflowRun({owner,repo,run_id})).data;
+            const jobs = await github.paginate(github.rest.actions.listJobsForWorkflowRun,{owner,repo,run_id,per_page:100});
+            const artifact = (await github.rest.actions.getArtifact({owner,repo,artifact_id})).data;
+            if (run.head_sha !== producer || run.status !== 'completed' || run.conclusion !== 'failure' || jobs.length !== 1 || jobs[0].id !== 128874100670 || jobs[0].conclusion !== 'failure') throw Error('Actual closed failed provider producer required');
+            if (artifact.expired || artifact.workflow_run.id !== run_id || artifact.workflow_run.head_sha !== producer || artifact.digest !== 'sha256:2c615137a710cb1bd839691dfef810606ec2ab603ab45c9b169ec63eb0ced9f3') throw Error('Exact retained provider artifact required');
+            const result = await github.rest.actions.downloadArtifact({owner,repo,artifact_id,archive_format:'zip'});
+            const bytes = Buffer.from(result.data);
+            if ('sha256:'+crypto.createHash('sha256').update(bytes).digest('hex') !== artifact.digest || bytes.length !== artifact.size_in_bytes) throw Error('Actual provider artifact digest/length differs');
+            fs.mkdirSync('out/provider-diagnostic',{recursive:true});
+            fs.writeFileSync('out/provider-diagnostic/producer.zip',bytes);
+            fs.writeFileSync('out/provider-diagnostic/api.json',JSON.stringify({run,jobs,artifact},null,2));
+      - name: Retain only selected raw configuration and completed control reports
+        shell: python
+        run: |
+          import hashlib,io,json,tarfile,zipfile
+          from pathlib import Path
+          root=Path('out/provider-diagnostic')
+          selected={'mesa/configure.log','mesa/build/meson-logs/meson-log.txt','fontconfig-controls/verification.json','gdk-controls/verification.json','libdecor-candidate/build.json','system-packages.txt'}
+          prefix='out/hosted-native-providers/'
+          results={}
+          with zipfile.ZipFile(root/'producer.zip') as outer:
+              names=[n for n in outer.namelist() if n.endswith('hosted-native-providers.tar.gz')]
+              assert len(names)==1
+              with tarfile.open(fileobj=io.BytesIO(outer.read(names[0])),mode='r:gz') as archive:
+                  for entry in archive:
+                      if not entry.name.startswith(prefix) or entry.name[len(prefix):] not in selected:
+                          continue
+                      assert entry.isfile() and entry.size < 1024*1024
+                      body=archive.extractfile(entry).read()
+                      relative=entry.name[len(prefix):]
+                      path=root/relative.replace('/','__');path.write_bytes(body)
+                      results[relative]=dict(sha256=hashlib.sha256(body).hexdigest(),bytes=len(body))
+                      if relative=='mesa/configure.log':
+                          print(body.decode(errors='replace')[-16000:])
+          assert 'mesa/configure.log' in results
+          (root/'diagnostic.json').write_text(json.dumps(dict(status='retained-failed-provider-configuration-only',source_commit='0097da245b12f46420cd19a446e5ffe231788b95',files=results,simulation_executed=False,phase6_complete=False),indent=2)+'\n')
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: native-provider-configuration-diagnostic
+          retention-days: 14
+          path: |
+            out/provider-diagnostic/*.json
+            out/provider-diagnostic/*.log
+            out/provider-diagnostic/*.txt
