@@ -1,0 +1,127 @@
+"""Strict ordinary GitHub-runner identities, roots and complete single-lane scope."""
+import hashlib
+import json
+import os
+from pathlib import Path, PureWindowsPath
+import re
+import shutil
+import sys
+
+PROTOCOL='phase6-github-current-stock-v1'
+REPOSITORY='dcajacob/orbiter-cross-platform'
+ROOT_NAMES={'source','preserved','build','data','planets','mesa','output','export'}
+ROLES={'application','sdk','observer','runner'}
+
+
+def require(value,message):
+    if not value:raise ValueError(message)
+
+
+def sha(path):
+    digest=hashlib.sha256()
+    with Path(path).open('rb') as stream:
+        for block in iter(lambda:stream.read(1024*1024),b''):digest.update(block)
+    return digest.hexdigest()
+
+
+def local_path(value):
+    require(type(value) is str,'Explicit Windows path required')
+    path=PureWindowsPath(value)
+    require(path.is_absolute() and re.fullmatch('[A-Za-z]:',path.drive) and '..' not in path.parts and
+            all(':' not in part for part in path.parts[1:]),'Absolute local Windows drive path required')
+    return path
+
+
+def validate(cfg):
+    require(cfg['transport_protocol']==PROTOCOL and cfg['cohort']=='current-windows' and cfg['source_role']=='application',
+            'Explicit hosted current-application transport required')
+    require(not set(cfg)&{'domain_uuid','nonce','desktop','active_session','share_witness','bootstrap_script'},
+            'VM and private-desktop claims cannot identify a hosted capture')
+    workspace=local_path(cfg['workspace']);roots={name:local_path(value) for name,value in cfg['roots'].items()}
+    require(set(roots)==ROOT_NAMES and all(path.is_relative_to(workspace) and path!=workspace for path in roots.values()),
+            'Complete explicit roots below the actual runner workspace required')
+    for name,path in roots.items():require(local_path(cfg[name])==path,'Declared root differs: '+name)
+    for writable in ('output','export'):
+        for name,path in roots.items():
+            if name!=writable:require(not roots[writable].is_relative_to(path) and not path.is_relative_to(roots[writable]),
+                                      'Capture/export overlaps another declared root: '+name)
+    require(set(cfg['roles'])==ROLES,'Independent application, SDK, observer and collector roles required')
+    for name,role in cfg['roles'].items():
+        require(re.fullmatch('[0-9a-f]{40}',role['commit']) and re.fullmatch('[0-9a-f]{64}',role['manifest_sha256']),
+                'Immutable actual runtime role required: '+name)
+        allowed=roots['preserved'] if name in ('application','sdk') else roots['build'] if name=='observer' else workspace
+        require(local_path(role['manifest_path']).is_relative_to(allowed),'Role manifest outside its owning root: '+name)
+    require(cfg['source_commit']==cfg['roles']['application']['commit']==cfg['roles']['sdk']['commit'],
+            'Actual current application and SDK producer differ')
+    gh=cfg['github']
+    require(gh['repository']==REPOSITORY and type(gh['run_id']) is int and gh['run_id']>0 and
+            type(gh['run_attempt']) is int and gh['run_attempt']>0 and gh['collector_commit']==cfg['roles']['runner']['commit'],
+            'Actual authorized GitHub run/collector identity required')
+    require(cfg['configuration'] in ('Debug','Release') and cfg['math_profile'] in ('automatic','sse2') and
+            type(cfg['scene_workers']) is int and cfg['scene_workers']==1 and type(cfg['minimum_free_bytes']) is int and cfg['minimum_free_bytes']>=8*1024**3,
+            'One complete profile, one serial scene worker and unchanged capacity reserve required')
+    return workspace,roots
+
+
+def selection(cfg,config):
+    validate(cfg);scope=cfg['capture_scope'];ids=[case['id'] for case in config['cases']]
+    require(len(ids)==len(set(ids))==38 and scope==dict(kind='complete',gate='remaining-stock',cases=ids) and
+            config['frames']==960,'All 38 complete original scenes and unchanged finalized ticks required')
+    return list(config['cases']),False
+
+
+def context():
+    """Observe the inherited station/desktop; never create or switch either."""
+    require(sys.platform=='win32','Actual Windows context required')
+    import ctypes
+    from ctypes import wintypes
+    user=ctypes.WinDLL('user32',use_last_error=True);kernel=ctypes.WinDLL('kernel32',use_last_error=True)
+    user.GetProcessWindowStation.argtypes=[];user.GetProcessWindowStation.restype=wintypes.HANDLE
+    kernel.GetCurrentThreadId.argtypes=[];kernel.GetCurrentThreadId.restype=wintypes.DWORD
+    user.GetThreadDesktop.argtypes=[wintypes.DWORD];user.GetThreadDesktop.restype=wintypes.HANDLE
+    user.GetUserObjectInformationW.argtypes=[wintypes.HANDLE,ctypes.c_int,wintypes.LPVOID,wintypes.DWORD,ctypes.POINTER(wintypes.DWORD)]
+    user.GetUserObjectInformationW.restype=wintypes.BOOL
+    kernel.ProcessIdToSessionId.argtypes=[wintypes.DWORD,ctypes.POINTER(wintypes.DWORD)]
+    kernel.ProcessIdToSessionId.restype=wintypes.BOOL
+    def name(handle):
+        require(handle,'Actual inherited object handle missing');size=wintypes.DWORD()
+        user.GetUserObjectInformationW(handle,2,None,0,ctypes.byref(size))
+        require(0<size.value<65536,'Actual inherited object name size invalid')
+        buffer=ctypes.create_unicode_buffer(size.value//ctypes.sizeof(ctypes.c_wchar))
+        require(user.GetUserObjectInformationW(handle,2,buffer,ctypes.sizeof(buffer),ctypes.byref(size)),
+                'Actual inherited object name could not be observed')
+        require(buffer.value,'Empty inherited object name');return buffer.value
+    session=wintypes.DWORD();require(kernel.ProcessIdToSessionId(os.getpid(),ctypes.byref(session)),'Actual Windows session could not be observed')
+    return dict(actual_pid=os.getpid(),session=session.value,window_station=name(user.GetProcessWindowStation()),
+                desktop=name(user.GetThreadDesktop(kernel.GetCurrentThreadId())),inherited_context_only=True)
+
+
+def preflight(cfg):
+    require(sys.platform=='win32' and os.environ.get('GITHUB_ACTIONS')=='true' and
+            os.environ.get('GITHUB_REPOSITORY')==REPOSITORY and os.environ.get('ImageOS') in {'win25','win25-vs2026'},
+            'Actual standard GitHub Windows 2025 runner required')
+    workspace,roots=validate(cfg);gh=cfg['github']
+    require(workspace==local_path(os.environ['GITHUB_WORKSPACE']) and gh['run_id']==int(os.environ['GITHUB_RUN_ID']) and
+            gh['run_attempt']==int(os.environ['GITHUB_RUN_ATTEMPT']) and gh['collector_commit']==os.environ['GITHUB_SHA'],
+            'Actual runner workspace/run/attempt/collector differs')
+    for name,pure in roots.items():
+        path=Path(pure)
+        if name in ('output','export'):require(not path.exists() and not path.is_symlink() and path.parent.is_dir() and path.parent.resolve()==path.parent,'Fresh capture/export root required')
+        else:require(path.is_dir() and path.resolve()==path,'Missing or redirected protected root: '+name)
+    for name,role in cfg['roles'].items():
+        require(sha(role['manifest_path'])==role['manifest_sha256'],'Actual role manifest changed: '+name)
+    for name in ('reference_transport','reference_audit'):
+        require(local_path(cfg[name]['path']).is_relative_to(workspace) and sha(cfg[name]['path'])==cfg[name]['sha256'],
+                'API-bound original Windows reference evidence changed')
+    transport=json.loads(Path(cfg['reference_transport']['path']).read_text());audit=json.loads(Path(cfg['reference_audit']['path']).read_text())
+    require(transport['protocol']=='remaining-stock-hosted-campaign-transport-v1' and transport['status']=='passed' and
+            audit['status']=='passed' and audit['producer_commit']==transport['source_commit'] and
+            audit['download_manifest_sha256']==cfg['reference_transport']['sha256'] and audit['processes']==304 and
+            audit['presentations']==304*960 and set(audit['profiles'])=={c+'-'+m for c in ('Debug','Release') for m in ('automatic','sse2')},
+            'Complete independently audited original Windows writer cohort required')
+    free=shutil.disk_usage(Path(roots['output']).parent).free
+    require(free>=cfg['minimum_free_bytes'],'Complete stock capacity reserve unavailable')
+    return dict(status='passed-actual-GitHub-Windows-root-and-capacity-preflight',protocol=PROTOCOL,
+        github=gh,roots={name:str(path) for name,path in roots.items()},free_bytes=free,
+        minimum_free_bytes=cfg['minimum_free_bytes'],actual_inherited_context=context(),
+        reference_transport_sha256=cfg['reference_transport']['sha256'],reference_audit_sha256=cfg['reference_audit']['sha256'])

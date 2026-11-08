@@ -128,3 +128,17 @@ requires current Windows and native reloads to consume the same hashed original
 Windows save, uses the existing comparison budgets and independently re-audits
 retained native captures. It does not reconstruct missing historical receipts
 or promote a focused matrix into full38 or class admission acceptance.
+
+The versioned ordinary Actions stock provider lives in `Hosted/`. Its worker
+requires the exact retained v3 worker hash and conserves the entire per-lane
+simulation, export, repeat and comparison body. Four hosted profile jobs select
+one unchanged math lane each; historical two-lane selection remains strict.
+The new provider requires all 38 scenes, both repetitions, 960 finalized ticks,
+one scene worker, independent runtime/SDK/observer/collector identities, an
+8 GiB reserve and an independently audited complete original writer cohort.
+It observes the actual inherited session/station/desktop and never creates or
+switches a desktop. VM identity and private-desktop claims are rejected.
+`phase6-hosted-stock-provider.yml` runs helper controls and a separate read-only
+context observation on standard Windows 2025. Neither step executes a simulator
+or qualifies stock. Actual API-bound SDK/reference restoration, full captures
+and independent cross-cohort audits remain required before acceptance.

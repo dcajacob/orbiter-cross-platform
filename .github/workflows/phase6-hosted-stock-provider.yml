@@ -1,0 +1,60 @@
+name: Phase 6 Hosted Stock Provider Controls
+
+on:
+  push:
+    branches: ['qualification/hosted-stock-provider']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: phase6-hosted-stock-provider-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  controls:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - run: mkdir -p out && python3 -B Tests/Production/Closeout/run_controls.py --output out/hosted-stock-provider-controls.json
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: hosted-stock-provider-controls
+          retention-days: 14
+          path: out/hosted-stock-provider-controls.json
+  inherited-context:
+    needs: controls
+    runs-on: windows-2025
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v7
+      - name: Observe the existing runner session without creating or switching desktops
+        shell: python
+        run: |
+          import json, os, subprocess, sys
+          from pathlib import Path
+          sys.path.insert(0,str(Path('Tests/Production/CurrentWindows/Hosted').resolve()))
+          import provider
+          assert os.environ['GITHUB_ACTIONS']=='true' and os.environ['GITHUB_REPOSITORY']==provider.REPOSITORY
+          assert os.environ['ImageOS'] in {'win25','win25-vs2026'}
+          assert subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip()==os.environ['GITHUB_SHA']
+          observed=provider.context()
+          assert observed['actual_pid']==os.getpid() and observed['inherited_context_only'] is True
+          report=dict(status='observed-actual-inherited-context-only',context=observed,
+              image_os=os.environ['ImageOS'],source_commit=os.environ['GITHUB_SHA'],
+              run_id=int(os.environ['GITHUB_RUN_ID']),run_attempt=int(os.environ['GITHUB_RUN_ATTEMPT']),
+              simulator_executed=False,private_desktop_created=False,phase6_complete=False)
+          Path('out').mkdir(exist_ok=True)
+          Path('out/hosted-inherited-context.json').write_text(json.dumps(report,indent=2)+'\n')
+          print(json.dumps(report))
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: hosted-inherited-context
+          retention-days: 14
+          path: out/hosted-inherited-context.json
