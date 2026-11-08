@@ -74,6 +74,14 @@ def main():
         (output/'actual-system-packages.txt').write_text(actual)
         require(package_inventory(actual)==inventory,'Actual complete provider userspace package versions differ')
         report['actual_system_packages_sha256']=sha(output/'actual-system-packages.txt');save()
+        from hosted_compositor_runtime import install
+        report['compositor_host_dependencies']=install(providers,output,inventory,run,package_inventory);save()
+        sys.path.insert(0,str(ROOT/'Tests/Production/WaylandInput'))
+        from compositor import Compositor
+        with Compositor(providers/'compositor',output/'compositor-preflight') as display:
+            report['compositor_preflight']=dict(actual_pid=display.process.pid,ready=True)
+        require(display.process.returncode==0,'Owned compositor preflight must shut down normally')
+        report['compositor_preflight']['actual_returncode']=display.process.returncode;save()
         py=[sys.executable,'-B']
         run('stock-data',py+['Tests/Production/prepare_native_data.py','--archive','out/data-cache/production-stock-data-v1.zip','--destination','out/native-stock-data','--group','all'],1200)
         run('planet-data',py+['Tests/Production/prepare_hosted_data.py','--lock','Tests/Production/standard-planets.lock.json','--archive','out/planet-cache/Orbiter2016.zip','--destination','out/native-stock-planets'],1200)
