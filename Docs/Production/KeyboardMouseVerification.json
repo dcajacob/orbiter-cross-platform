@@ -1,0 +1,54 @@
+{
+  "status": "passed-human-core-keyboard-walkthrough",
+  "phase6_complete": false,
+  "human_keyboard_tested": true,
+  "source_audit": "out/phase6-cockpit-resize-fix-v1/source-audit-final.log",
+  "source_inputs": 623,
+  "resize_report": "/home/dan/GIT/orbiter-cross-platform/out/phase6-keyboard-mouse-walkthrough-v2/sessions/20261107-195506-484785-orbit/desktop-probe.json",
+  "right_drag_report": "out/phase6-keyboard-mouse-walkthrough-v2/checks/right-drag-gpu/mouse-verification.json",
+  "gpu_driver": "Mesa Intel(R) Graphics (PTL)",
+  "resize_median_frame_ms": 8.409112,
+  "resize_p95_frame_ms": 13.876294,
+  "resize_context_presentations": 3750,
+  "right_drag_context_presentations": 1388,
+  "sanitizer_findings": false,
+  "user_feedback_addressed": [
+    "Removed software-only Mesa selector; launcher rejects software fallback.",
+    "Native cockpit layout and HUD now refresh with live framebuffer changes."
+  ],
+  "earlier_diagnostic_trials": [
+    "20261107-194641-946570-orbit: observer unprimed, then unsynchronized key/click edges; retained without a resize-pass claim.",
+    "20261107-195241-929521-orbit: synthetic key delivery failed the pause check; retained."
+  ],
+  "source_scope": "Native-only window/cockpit adaptation; original Windows SDK and original simulation calculations conserved.",
+  "human_keyboard_scope": "Core RCS, mode/enable, focus-loss and save/reload walkthrough; other controls and full Phase 6 qualification remain open.",
+  "human_confirmation_date": "2026-11-07",
+  "human_confirmation_source": "Direct user confirmations in this chat",
+  "human_keyboard_checks": {
+    "full_rcs_and_release": "passed-user-confirmed",
+    "precision_rcs_and_release": "passed-user-confirmed",
+    "kill_rotation_and_pause_resume": "passed-user-confirmed",
+    "rotational_linear_modes": "passed-user-confirmed",
+    "rcs_off_on": "passed-user-confirmed",
+    "focus_loss_and_return": "passed-user-confirmed",
+    "save_reload_view_mfds_and_pause": "passed-user-confirmed"
+  },
+  "human_walkthrough_save": {
+    "path": "/home/dan/GIT/orbiter-cross-platform/out/phase6-keyboard-mouse-walkthrough-v2/saves/orbit-quicksave.scn",
+    "sha256": "9934d0f21c25c1493b7b01baaebdc4d1c4ba154dc4fd58c8e66f6931efbdff93",
+    "original_vessels": {
+      "ISS": "ProjectAlpha_ISS",
+      "Mir": "Mir",
+      "Luna-OB1": "Wheel",
+      "GL-01": "DeltaGlider",
+      "SH-03": "ShuttleA",
+      "PB-01": "ShuttlePB",
+      "GL-02": "DeltaGlider",
+      "SH-01": "ShuttleA"
+    },
+    "original_vessel_count": 8
+  },
+  "schema": 1,
+  "scope": "Local Intel Release/automatic cockpit resize/right-drag regression and user-confirmed core keyboard walkthrough; full Phase 6 qualification remains open.",
+  "candidate_manifest": "out/phase6-keyboard-mouse-walkthrough-v2/manifest.json"
+}

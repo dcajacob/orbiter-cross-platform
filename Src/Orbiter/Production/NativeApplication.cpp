@@ -1372,7 +1372,13 @@ int main(int argc,char** argv) {
                     if(input.zoom)application.render.camera->ChangeDist(std::pow(1.1,-input.zoom));
 #endif
                 }
-                if(input.width>0 && input.height>0){application.render.graphics->Resize(input.width,input.height);application.render.camera->ResizeViewport(input.width,input.height);}
+                if(input.width>0 && input.height>0){
+                    application.render.graphics->Resize(input.width,input.height);
+                    application.render.camera->ResizeViewport(input.width,input.height);
+#ifdef ORBITER_NATIVE_COCKPIT
+                    application.cockpit->ResizeViewport(input.width,input.height);
+#endif
+                }
                 if(frameDelay)std::this_thread::sleep_for(std::chrono::milliseconds(frameDelay));
                 if(frames || ticks) {
                     for(int n=0;n<(ticks?renderEvery:1) && application.active && !application.reloadPending && (!ticks || application.inputTick<unsigned(ticks));++n)application.Step(systemFixed);

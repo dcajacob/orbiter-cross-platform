@@ -21,7 +21,7 @@ FetchContent_Declare(native_implot URL "${_plot_url}" URL_HASH "SHA256=${_plot_h
     DOWNLOAD_EXTRACT_TIMESTAMP TRUE SOURCE_SUBDIR no-build)
 FetchContent_MakeAvailable(native_implot)
 target_sources(orbiter_production_vessels PRIVATE
-    NativeAnnotations.cpp NativeScript.cpp NativeInterpreterSdk.cpp NativeHelp.cpp NativeCockpitProjection.cpp NativeCockpitMfd.cpp NativeCockpitGui.cpp NativeCameraMouse.cpp ../MenuInfoBar.cpp ../DlgFocus.cpp ../DlgMenuCfg.cpp ../DlgTacc.cpp ../DlgCamera.cpp ../DlgInfo.cpp ../DlgMap.cpp ../DlgOptions.cpp ../DlgFunction.cpp ../DlgRecorder.cpp ../PlaybackEd.cpp NativeCockpitCommands.cpp NativeCockpitVessel.cpp ../CockpitSdk.cpp NativeLegacyPanelSdk.cpp ../Astro.cpp
+    NativeAnnotations.cpp NativeScript.cpp NativeInterpreterSdk.cpp NativeHelp.cpp NativeCockpitProjection.cpp NativeCockpitMfd.cpp NativeCockpitGui.cpp NativeCameraMouse.cpp ../MenuInfoBar.cpp ../DlgFocus.cpp ../DlgMenuCfg.cpp ../DlgTacc.cpp ../DlgCamera.cpp ../DlgInfo.cpp ../DlgMap.cpp ../DlgOptions.cpp ../DlgFunction.cpp ../DlgRecorder.cpp ../PlaybackEd.cpp NativeCockpitCommands.cpp NativeCockpitVessel.cpp NativeCockpitResize.cpp ../CockpitSdk.cpp NativeLegacyPanelSdk.cpp ../Astro.cpp
     ../Pane.cpp ../hud.cpp ../Defpanel.cpp ../Panel.cpp ../Panel2D.cpp ../VCockpit.cpp ../Select.cpp
     ../Mfd.cpp ../MfdUser.cpp ../VectorMap.cpp ../MfdOrbit.cpp ../MfdSurface.cpp ../MfdMap.cpp ../MfdHsi.cpp
     ../MfdLanding.cpp ../MfdDocking.cpp ../MfdAlign.cpp ../MfdSync.cpp ../MfdTransfer.cpp ../MfdComms.cpp

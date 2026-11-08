@@ -534,7 +534,7 @@
     },
     "Src/Orbiter/Pane.h": {
       "original_sha256_lf": "9ea0b381f6a97848c12ac3d08cce898c3b4cdf500338bb21d489236c310fb706",
-      "sha256_lf": "5bb7918a0b92eb8b931dc14ea0821a7488266f49e01438df5bd2d139946a5fa6",
+      "sha256_lf": "2f7de49a20bd2cd0e40eddc8dcd065780709888050a9ab8d19515ec45571ed64",
       "scope": "Original legacy bitmap panel layout, scaling, MFD, mouse and redraw algorithms conserved by cockpit_source.py. Native surface ownership and actual renderer bindings; full Dragonfly drawing/runtime qualification remains pending. Public Windows SDK layout unchanged."
     },
     "Src/Orbiter/Panel.h": {
@@ -582,7 +582,7 @@
     },
     "Src/Orbiter/Production/CMakeLists.txt": {
       "original_sha256_lf": null,
-      "sha256_lf": "7672ce1f798ae33cf0eebd8d89c756fedde2903740b80ad6a508f3977752d7dc",
+      "sha256_lf": "98259d51b2d9d9895c4093a5bac4a65e7a995c9e2af7161889a5b7f5bb1b2951",
       "scope": "Original Lua Terminal MFD native SDK/bootstrap and cooperative worker ownership; explicitly admit LuaMFD only, conserve original vessel-first left/right Shift MFD dispatch, and destroy terminal Lua states before their vessels. Original drawing/commands/repository/Windows callbacks independently conserved; terminal buffers reclaimed and command termination bounded. Full runtime and original Windows qualification remain required."
     },
     "Src/Orbiter/Production/CameraServices.cpp": {
@@ -743,7 +743,7 @@
     },
     "Src/Orbiter/Production/NativeApplication.cpp": {
       "original_sha256_lf": null,
-      "sha256_lf": "cfc75580342f834f2efe659e8bc6c7d10cb8e68d43e0bd544ea8a58c4732b9c9",
+      "sha256_lf": "7f2a5f4ae18c069cd08be9299e1daae9fac88ba30becdb2d0a0e53f40536c9de",
       "scope": "Original Lua Terminal MFD native SDK/bootstrap and cooperative worker ownership; explicitly admit LuaMFD only, conserve original vessel-first left/right Shift MFD dispatch, and destroy terminal Lua states before their vessels. Original drawing/commands/repository/Windows callbacks independently conserved; terminal buffers reclaimed and command termination bounded. Full runtime and original Windows qualification remain required. Native bare-Space pause convenience applies only without Shift/Control/Alt, retaining exact logical Pause bindings and original modified-space delivery to vessel callbacks. Original DG and Atlantis Ctrl+Space control dialogs retain their source and behavior; no physics or dispatch order change. Native buffered key edges recover their chronological key state from the final held snapshot; modifier chords retain event-time meaning across batched polls. Immediate held input, FlightInput layout, original vessel/MFD priority and physics are unchanged."
     },
     "Src/Orbiter/Production/NativeBuild.h.in": {
@@ -1309,7 +1309,7 @@
     },
     "Src/Orbiter/Production/NativeCockpit.cmake": {
       "original_sha256_lf": null,
-      "sha256_lf": "3ca947b15a6322d19e2f7930d5ce19044220e4c8a834d8248b12bd9b1925746e",
+      "sha256_lf": "788102b36d6209061ada4fd7b073593c67ecc8e3164435ea66349a9179cad6dd",
       "scope": "Original Lua Terminal MFD integrated through native SDK types and checked optional module bootstrap. Original drawing, commands, vessel/page repository, Lua registrations, Windows callbacks and update order conserved independently; native workers use cooperative join before Lua/vessel teardown. Terminal line buffers are reclaimed and command copies explicitly terminated. Native Lua validity data has one backend owner; GNU native targets avoid unique inline-data bindings. Hidden implementation symbols and the explicit backend export boundary prevent reverse engine-to-backend relocation dependencies, including consumer-emitted CameraMode RTTI, while retaining the declared Interpreter/lua_tovector APIs and native bridges. Public SDK layouts, Windows declarations, numerical methods and callback order remain unchanged. Full native/original runtime, lifecycle and mission qualification required."
     },
     "Src/Orbiter/Production/NativeCockpitGui.cpp": {
@@ -2705,6 +2705,10 @@
       "original_sha256_lf": null,
       "sha256_lf": "45e5a5ee81924eadaeb0bbfbcc530b9cbd1389252d3172a58050d05a72ad6085",
       "scope": "Original recording data, Euler conversion, quaternion primitives, physical propagators and callback order retained. Both original recording-frame interpolation sites use a private codec guard: only an out-of-domain finite endpoint dot from finite Euler-derived rotations is retried with unit endpoints. All in-domain interpolation calls remain the original method. Nonfinite or zero-length inputs retain failure behavior. Frozen original Windows x64 and native code both reproduce the actual Moon-tutorial NaN before this repair; references and tolerances are not refreshed."
+    },
+    "Src/Orbiter/Production/NativeCockpitResize.cpp": {
+      "original_sha256_lf": null,
+      "sha256_lf": "15ba4623c80f005fca4862c1a326e479f7ad17ec3c7313bac90c2fb8da4542ac"
     }
   }
 }

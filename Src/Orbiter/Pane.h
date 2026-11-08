@@ -72,6 +72,10 @@ public:
 	int BitsPerPixel() const { return BPP; }
 	// Return pane dimensions
 
+#ifndef _WIN32
+	void ResizeViewport (int width, int height);
+#endif
+
 #ifdef _WIN32
 	void RestoreDeviceObjects (LPDIRECT3D7 d3d, LPDIRECT3DDEVICE7 dev);
 #endif
