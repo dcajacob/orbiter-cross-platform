@@ -2,7 +2,7 @@ name: Phase 6 Normal Native Complete Stock Writers
 
 on:
   push:
-    branches: ['codex/native-stock-writers']
+    branches: ['qualification/native-stock-writers']
   workflow_dispatch:
 
 permissions:
