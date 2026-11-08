@@ -23,10 +23,16 @@ def main():
     parser.add_argument('--destination', type=Path, required=True)
     parser.add_argument('--verify-only', action='store_true')
     parser.add_argument('--container-lock', type=Path,
-                        default=Path(os.environ['ORBITER_DATA_CONTAINER_LOCK']) if os.environ.get('ORBITER_DATA_CONTAINER_LOCK') else None,
                         help='Explicitly versioned official container; every original locked input remains required')
     args = parser.parse_args()
     lock = json.loads(args.lock.read_text())
+    # A hosted job provisions both stock data and standard planets. Its stock
+    # container override applies only to the exact profile named by that lock.
+    environment_container = os.environ.get('ORBITER_DATA_CONTAINER_LOCK')
+    if args.container_lock is None and environment_container:
+        candidate = Path(environment_container)
+        if json.loads(candidate.read_text())['original_profile_sha256'] == digest(args.lock):
+            args.container_lock = candidate
     containers = [lock]
     if args.container_lock:
         variant = json.loads(args.container_lock.read_text())

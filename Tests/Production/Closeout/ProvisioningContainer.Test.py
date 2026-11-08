@@ -33,9 +33,9 @@ class ProvisioningContainerTests(unittest.TestCase):
         atomic_json(root / 'container.json', variant)
         return profile, variant, files
 
-    def run_prepare(self, root, archive, destination, explicit=True, environment=False):
+    def run_prepare(self, root, archive, destination, explicit=True, environment=False, profile='profile.json'):
         args = [sys.executable, '-B', str(ROOT / 'Tests/Production/prepare_data.py'),
-                '--lock', str(root / 'profile.json'), '--archive', str(root / archive),
+                '--lock', str(root / profile), '--archive', str(root / archive),
                 '--destination', str(root / destination)]
         env = dict(os.environ)
         env.pop('ORBITER_DATA_CONTAINER_LOCK', None)
@@ -63,6 +63,21 @@ class ProvisioningContainerTests(unittest.TestCase):
             self.assertNotEqual(self.run_prepare(root, 'replacement.zip', 'undeclared', explicit=False).returncode, 0)
             result = self.run_prepare(root, 'replacement.zip', 'env-output', environment=True)
             self.assertEqual(result.returncode, 0, result.stderr)
+
+    def test_job_stock_override_does_not_apply_to_the_separate_planet_profile(self):
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            profile, variant, unused = self.fixture(root)
+            # Another independently locked package may share files, but must
+            # retain its own original archive identity under the job-wide env.
+            other = dict(profile, repository='standard/planets')
+            atomic_json(root / 'planets.json', other)
+            result = self.run_prepare(root, 'original.zip', 'planets-output', explicit=False,
+                                      environment=True, profile='planets.json')
+            self.assertEqual(result.returncode, 0, result.stderr)
+            receipt = json.loads(result.stdout.splitlines()[-1])
+            self.assertEqual(receipt['actual_container_sha256'], profile['sha256'])
+            self.assertIsNone(receipt['versioned_container_lock_sha256'])
 
     def test_changed_kernel_missing_font_and_foreign_profile_are_rejected(self):
         with tempfile.TemporaryDirectory() as temp:
