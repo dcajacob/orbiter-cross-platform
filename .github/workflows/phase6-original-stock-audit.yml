@@ -1,0 +1,87 @@
+name: Phase 6 Independent Original Windows Stock Audit
+
+on:
+  push:
+    branches: ['qualification/original-stock-audit-**']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: phase6-original-stock-audit-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  audit:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 180
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.14'
+      - name: Verify every helper and unchanged-source control
+        run: mkdir -p out && python3 -B Tests/Production/Closeout/run_controls.py --output out/original-stock-audit-controls.json
+      - name: Verify the actual completed original cohort and retain exact API ZIP bytes
+        uses: actions/github-script@v8
+        with:
+          script: |
+            const fs = require('fs');
+            const crypto = require('crypto');
+            const {owner, repo} = context.repo;
+            const run_id = 42515116858;
+            const producer = 'f9bf6c7814965cd897f349f97890d9e005cbb66d';
+            if (owner !== 'dcajacob' || repo !== 'orbiter-cross-platform') throw Error('Exact authorized public repository required');
+            const run = (await github.rest.actions.getWorkflowRun({owner, repo, run_id})).data;
+            if (run.head_sha !== producer || run.status !== 'completed' || !['success','failure'].includes(run.conclusion)) throw Error('Completed immutable reference campaign required');
+            const allJobs = await github.paginate(github.rest.actions.listJobsForWorkflowRun,{owner, repo, run_id, per_page:100});
+            const jobs = allJobs.filter(j => j.name.startsWith('Original Windows complete stock and exact-save reloads / Matched-clock v2 original '));
+            if (jobs.length !== 4 || jobs.some(j => j.status !== 'completed' || j.conclusion !== 'success' || !j.labels.includes('windows-2025'))) throw Error('All four successful original Windows 2025 jobs required');
+            const allArtifacts = await github.paginate(github.rest.actions.listWorkflowRunArtifacts,{owner, repo, run_id, per_page:100});
+            const artifacts = allArtifacts.filter(a => /^matched-clock-remaining-stock-v2-(Debug|Release)-(automatic|sse2)$/.test(a.name));
+            if (artifacts.length !== 4 || artifacts.some(a => a.expired || a.workflow_run.head_sha !== producer)) throw Error('Four complete original source artifacts required');
+            fs.mkdirSync('out/original-stock-audit/archives',{recursive:true});
+            fs.writeFileSync('out/original-stock-audit/api-records.json',JSON.stringify({workflow_run:run,jobs,artifacts},null,2));
+            for (const artifact of artifacts) {
+              const download = await github.rest.actions.downloadArtifact({owner,repo,artifact_id:artifact.id,archive_format:'zip'});
+              const bytes = Buffer.from(download.data);
+              const digest = 'sha256:' + crypto.createHash('sha256').update(bytes).digest('hex');
+              if (digest !== artifact.digest || bytes.length !== artifact.size_in_bytes) throw Error('Actual original API artifact digest/length differs');
+              fs.writeFileSync('out/original-stock-audit/archives/'+artifact.name+'.zip',bytes);
+            }
+      - name: Independently bind and restore every original artifact member
+        run: >-
+          python3 -B Tests/Production/RemainingStockPersistence/hosted_transport.py
+          --records out/original-stock-audit/api-records.json
+          --archives out/original-stock-audit/archives --output out/original-stock-audit/transport
+      - name: Stage the immutable original Debug application and SDK
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: python3 -B Tests/Production/CockpitControls/prepare.py --configuration Debug --cache out/original-stock-audit/preserved-cache --output out/original-stock-audit/preserved-Debug
+      - name: Stage the immutable original Release application and SDK
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: python3 -B Tests/Production/CockpitControls/prepare.py --configuration Release --cache out/original-stock-audit/preserved-cache --output out/original-stock-audit/preserved-Release
+      - name: Stage independent exact Mesa DLLs and notices without executing Windows code
+        run: python3 -B Tests/Production/stage_mesa.py stage --cache out/original-stock-audit/mesa-cache --destination out/original-stock-audit/mesa
+      - name: Audit all original writers, exact-save reloads and direct build pairs
+        run: >-
+          python3 -B Tests/Production/Closeout/audit_hosted_original_stock.py
+          --transport out/original-stock-audit/transport/download.json --decoded out/original-stock-audit/transport
+          --preserved-debug out/original-stock-audit/preserved-Debug --preserved-release out/original-stock-audit/preserved-Release
+          --mesa out/original-stock-audit/mesa --output out/original-stock-audit/independent
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: original-stock-independent-audit
+          retention-days: 14
+          path: |
+            out/original-stock-audit/api-records.json
+            out/original-stock-audit/transport/download.json
+            out/original-stock-audit/independent/*.json
+            out/original-stock-audit/independent/*.log
+            out/original-stock-audit-controls.json
