@@ -12,6 +12,7 @@
 
 class Instrument_Transfer: public Instrument {
 public:
+	static void InvalidateWorldCache() { saveprm.usr = nullptr; saveprm.elref = nullptr; saveprm.src = nullptr; saveprm.tgt = nullptr; }
 	Instrument_Transfer (Pane *_pane, std::intptr_t _id, const Spec &spec, Vessel *_vessel);
 	virtual ~Instrument_Transfer ();
 	int Type() const { return MFD_TRANSFER; }

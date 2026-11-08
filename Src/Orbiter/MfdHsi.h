@@ -12,6 +12,7 @@
 
 class Instrument_HSI: public Instrument {
 public:
+	static void InvalidateWorldCache() { saveprm.usr = nullptr; }
 	Instrument_HSI (Pane *_pane, std::intptr_t _id, const Spec &spec, Vessel *_vessel);
 	~Instrument_HSI();
 	int Type () const { return MFD_HSI; }

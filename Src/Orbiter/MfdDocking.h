@@ -12,6 +12,7 @@
 
 class Instrument_Docking: public Instrument {
 public:
+	static void InvalidateWorldCache() { saveprm.usr = nullptr; saveprm.Legacy_ref = nullptr; }
 	Instrument_Docking (Pane *_pane, std::intptr_t _id, const Spec &spec, Vessel *_vessel, bool restore);
 	virtual ~Instrument_Docking ();
 	int Type () const { return MFD_DOCKING; }

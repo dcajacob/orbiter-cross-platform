@@ -326,7 +326,8 @@ namespace oapi {using CockpitClient=GraphicsClient;}
                         raise ValueError('Native Orbit display recovery changed another formatting operation')
             if raw('Src/Orbiter/Production/CMakeLists.txt').count('OrbitAnomalyDisplay.h')!=1:
                 raise ValueError('Native SDK fingerprint omits Orbit display recovery')
-        view=windows(raw(path))
+        from MfdWorldCache.source_audit import restore_world_cache
+        view=windows(restore_world_cache(raw(path),name))
         if name.endswith('.cpp') and re.search(r'orbiter::production::Cockpit\w+\s*\(',view):
             if '#include "Production/CockpitServices.h"' not in view:
                 raise ValueError('Windows cockpit implementation lacks its explicit service include: '+name)

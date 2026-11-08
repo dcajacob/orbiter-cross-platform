@@ -12,6 +12,7 @@
 
 class Instrument_OPlaneAlign: public Instrument {
 public:
+	static void InvalidateWorldCache() { saveprm.usr = nullptr; saveprm.elref = nullptr; saveprm.tgt = nullptr; }
 	Instrument_OPlaneAlign (Pane *_pane, std::intptr_t _id, const Spec &spec, Vessel *_vessel, bool restore);
 	virtual ~Instrument_OPlaneAlign();
 	int Type () const { return MFD_OPLANEALIGN; }
