@@ -24,6 +24,10 @@ allocator participates in the same allocation tracking. A separate launcher
 control loads a native library into Python, requires the clean path to pass,
 and requires an actual 4096-byte native leak to fail. Intentional invalid native
 array indices must also fail. These small controls precede the full builds.
+The system CPython 3.12 still retains allocations during the clean native-library
+load even with the system allocator. The instrumented harness explicitly selects
+the runner's cached CPython 3.14 and binds CMake's test interpreter to that same
+executable. The native leak control must still fail; no suppression is added.
 
 The first GCC 13 full-stock units exposed the array-indexed member-pointer
 miscompilation described in [GCC PR116449](https://gcc.gnu.org/pipermail/gcc-bugs/2024-September/879559.html).

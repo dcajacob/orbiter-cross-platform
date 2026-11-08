@@ -79,6 +79,8 @@ def main():
     archive_hashes={str(path):sha(path) for path in archives}
     engine=a.output/'engine';renderer=a.output/'renderer'
     common=['-DCMAKE_BUILD_TYPE='+a.configuration,'-DCMAKE_EXPORT_COMPILE_COMMANDS=ON']
+    if a.include_unit_tests:
+        common.append('-DPython3_EXECUTABLE='+sys.executable)
     if a.sanitizers:
         common+=['-DCMAKE_C_FLAGS=-fsanitize=address,undefined -fno-omit-frame-pointer',
                  '-DCMAKE_CXX_FLAGS=-fsanitize=address,undefined -fno-omit-frame-pointer']

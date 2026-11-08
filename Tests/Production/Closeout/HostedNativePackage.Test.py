@@ -95,6 +95,7 @@ class HostedNativePackageTests(unittest.TestCase):
         self.assertIn('ctest --test-dir "$PACKAGE/upstream-units"', body)
         self.assertIn('LD_PRELOAD="$(c++ -print-file-name=libasan.so)"', body)
         self.assertIn('export PYTHONMALLOC=malloc', body)
+        self.assertEqual(body.count("python-version: '3.14'"), 2)
         self.assertIn('needs: [controls, sanitizer-launcher-controls]', body)
         self.assertNotIn('detect_leaks=0', body)
         self.assertNotIn('continue-on-error', body)
