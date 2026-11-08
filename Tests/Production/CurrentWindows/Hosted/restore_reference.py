@@ -57,6 +57,18 @@ def audit_receipts(manifest,writer,cohort,manifest_sha,writer_sha):
             'Complete independently audited original writer/reload and build-pair cohort required')
 
 
+def bind_artifacts(recorded,fresh,manifest):
+    def identities(artifacts):
+        values=[transport.legacy.artifact_identity(item,manifest['workflow_run'],False) for item in artifacts]
+        require(len(values)==len({v['profile'] for v in values})==len({v['id'] for v in values})==4,
+                'Four distinct exact original artifact/profile identities required')
+        return {item['profile']:item for item in values}
+    actual=identities(fresh['artifacts'])
+    require(identities(recorded['artifacts'])==actual==identities([item['api_artifact'] for item in manifest['artifacts']]) and
+            set(actual)==PROFILES,'Every actual original API artifact must be the exact artifact independently audited')
+    return actual
+
+
 def extract(archive,target):
     require(not target.exists(),'Fresh decoded original evidence root required');target.mkdir(parents=True)
     seen=set()
@@ -87,9 +99,7 @@ def main():
     require(transport.run_identity(recorded['workflow_run'],recorded['jobs'])==transport.run_identity(fresh['workflow_run'],fresh['jobs'])==
             transport.run_identity(manifest['workflow_run']) and fresh['workflow_run']['id']==42515116858 and
             fresh['workflow_run']['head_sha']==ORIGINAL,'Actual current API producer/job identities differ from the independently audited reference')
-    identities=lambda data:{item['profile']:item for item in [transport.legacy.artifact_identity(a,manifest['workflow_run'],False) for a in data['artifacts']]}
-    require(len(recorded['artifacts'])==len(fresh['artifacts'])==4 and identities(recorded)==identities(fresh) and set(identities(fresh))==PROFILES,
-            'Actual original API artifact identities differ from audited four-profile receipts')
+    bind_artifacts(recorded,fresh,manifest)
     destination=ROOT/'out/original-stock-audit/transport';require(not destination.exists(),'Fresh immutable original transport destination required');destination.mkdir(parents=True)
     shutil.copy2(manifest_file,destination/'download.json');decoded={}
     for item in manifest['artifacts']:

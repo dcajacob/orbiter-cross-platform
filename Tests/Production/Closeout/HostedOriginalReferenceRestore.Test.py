@@ -55,6 +55,20 @@ class HostedOriginalReferenceRestoreTests(unittest.TestCase):
             values=self.receipts();change(*values)
             with self.assertRaises(ValueError):reader.audit_receipts(*values,'a'*64,'b'*64)
 
+    def test_every_manifest_artifact_must_be_the_exact_current_api_artifact(self):
+        run=dict(id=42515116858,head_sha=reader.ORIGINAL,head_branch='codex/github-qualification')
+        artifacts=[dict(id=index+1,name='matched-clock-remaining-stock-v2-'+profile,size_in_bytes=100,
+                        digest='sha256:'+'a'*64,expired=False,workflow_run=run) for index,profile in enumerate(sorted(reader.PROFILES))]
+        original=dict(artifacts=artifacts);fresh=copy.deepcopy(original)
+        manifest=dict(workflow_run=run,artifacts=[dict(api_artifact=item) for item in copy.deepcopy(artifacts)])
+        self.assertEqual(set(reader.bind_artifacts(original,fresh,manifest)),reader.PROFILES)
+        for change in (lambda r:r['artifacts'][0].update(id=999),lambda r:r['artifacts'][0].update(digest='sha256:'+'b'*64),
+                       lambda r:r['artifacts'][0].update(size_in_bytes=101),lambda r:r['artifacts'].append(copy.deepcopy(r['artifacts'][0]))):
+            changed=copy.deepcopy(fresh);change(changed)
+            with self.assertRaises(ValueError):reader.bind_artifacts(original,changed,manifest)
+        changed=copy.deepcopy(manifest);changed['artifacts'][0]['api_artifact']['id']=999
+        with self.assertRaises(ValueError):reader.bind_artifacts(original,fresh,changed)
+
     def test_decoding_is_read_only_and_rejects_aliases_links_and_escapes(self):
         for names in (('folder/evidence.json',),('../escape',),('C:/escape',),('folder/a','folder/A'),('symlink',)):
             with tempfile.TemporaryDirectory() as directory:
