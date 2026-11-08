@@ -224,6 +224,14 @@ def restore_transfer_finite_indicators(current):
     return current.replace(guarded,line).replace('#include <cmath>\n','',1)
 
 def verify():
+    # These two local arrays retain the exact original formatting operations.
+    # Even finite distances can produce hundreds of fixed-point AU digits.
+    astro=raw('Src/Orbiter/Astro.cpp')
+    storage='// Fixed-point AU text can contain nearly 300 digits for a finite double.\nstatic char strbuf[512];'
+    if astro.count(storage)!=1:raise ValueError('Astro distance formatter storage differs')
+    astro=astro.replace(storage,'static char strbuf[256];',1)
+    original_astro=subprocess.check_output(['git','-C',str(ROOT),'show',BASE+':Src/Orbiter/Astro.cpp']).decode('cp1252')
+    equal(original_astro,astro,'Original Astro formatting and calculations with enlarged local storage')
     verify_legacy_panel_defaults()
     verify_focus_bars()
     original_dialogs = subprocess.check_output(['git','-C',str(ROOT),'show',BASE+':Src/Orbiter/DlgMgr.cpp']).decode().replace('\r\n','\n')
@@ -328,6 +336,11 @@ namespace oapi {using CockpitClient=GraphicsClient;}
                 raise ValueError('Native SDK fingerprint omits Orbit display recovery')
         from MfdWorldCache.source_audit import restore_world_cache
         view=windows(restore_world_cache(raw(path),name))
+        if name=='MfdOrbit.cpp':
+            storage='\t// Keep the original text, including large finite distance labels.\n\tchar cbuf[512];'
+            boundary='void Instrument_Orbit::DisplayElements (oapi::Sketchpad *skp, const Elements *el, int x, int y)\n{\n'+storage
+            if view.count(boundary)!=1:raise ValueError('Orbit label storage repair moved or changed')
+            view=view.replace(storage,'\tchar cbuf[16];',1)
         if name.endswith('.cpp') and re.search(r'orbiter::production::Cockpit\w+\s*\(',view):
             if '#include "Production/CockpitServices.h"' not in view:
                 raise ValueError('Windows cockpit implementation lacks its explicit service include: '+name)

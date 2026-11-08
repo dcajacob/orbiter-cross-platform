@@ -1,0 +1,38 @@
+{
+  "status": "passed-focused-formatting-and-Windows-staging-regressions",
+  "original_formatter_overflows_reproduced": 2,
+  "ordinary_label_sets": 40,
+  "extreme_label_sets": 24,
+  "ordinary_text_byte_identical": true,
+  "windows_original_stale_DLL_reproduced": true,
+  "windows_corrected_staging_passed": true,
+  "source_conservation_passed": true,
+  "evidence": [
+    {
+      "path": "/home/dan/GIT/orbiter-cross-platform/out/phase6-orbit-label-buffer-controls-v1/verification.json",
+      "sha256": "93944fdebebb5dc47d8dc5419faf42fd6ebb6f196d9f69bc660d8f5e1dc4bf41"
+    },
+    {
+      "path": "/home/dan/GIT/orbiter-cross-platform/out/phase6-orbit-label-buffer-source-audit-v1.log",
+      "sha256": "2c72c2e2bca197dd0248c1a2c1f94f245bf1ec24c239f33834e65aa9b144e826"
+    },
+    {
+      "path": "/home/dan/GIT/orbiter-cross-platform/out/phase6-Windows-staging-controls-preserved-v1/independent-audit.json",
+      "sha256": "2e9435986536e8bf25d163fbbca299ce25115f390a17024e4eac2cefc6d6d4ab"
+    },
+    {
+      "path": "/home/dan/GIT/orbiter-cross-platform/out/phase6-integrated-closeout-controls-v1.json",
+      "sha256": "e7b7285e630958acee2d2329dc00843543c20155856f499286a8532780653904"
+    },
+    {
+      "path": "/home/dan/GIT/orbiter-cross-platform/out/phase6-integrated-stock-inventory-controls-v1.json",
+      "sha256": "5b2de9d0d0f17a1faebb6e7f96faa7cf61d3ae2447b9aaabe1883f31787c4879"
+    },
+    {
+      "path": "/home/dan/GIT/orbiter-cross-platform/out/phase6-integrated-asset-staging-controls-v1.json",
+      "sha256": "7cb17189d149e08d36941d1d641a7018a6f595a2b26320eb1ebf57780050df27"
+    }
+  ],
+  "scope": "Focused actual source formatter and Windows build-staging controls; no physical, full-corpus, or Phase 6 completion credit.",
+  "phase6_complete": false
+}

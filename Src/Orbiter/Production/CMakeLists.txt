@@ -143,6 +143,10 @@ target_include_directories(orbiter_production_boundary PUBLIC "${CMAKE_CURRENT_B
 # library must stage its runtime beside itself, including nested test targets.
 function(orbiter_stage_core_runtime target)
     if(WIN32)
+        # Import libraries can remain byte-identical when only the SDK token
+        # changes. Relink consumers so their POST_BUILD DLL copy is refreshed.
+        set_property(TARGET ${target} APPEND PROPERTY LINK_DEPENDS
+            "$<TARGET_FILE:orbiter_production_boundary>")
         add_custom_command(TARGET ${target} POST_BUILD
             COMMAND ${CMAKE_COMMAND} -E copy_if_different
                 $<TARGET_FILE:orbiter_production_boundary> $<TARGET_FILE_DIR:${target}>)

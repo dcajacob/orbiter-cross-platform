@@ -88,7 +88,8 @@ double Obliquity (double jc)
 	return 0.4090928042 - (2.269655248e-4 + (2.860400719e-9 - 8.789672039e-9*jc)*jc)*jc;
 }
 
-static char strbuf[256];
+// Fixed-point AU text can contain nearly 300 digits for a finite double.
+static char strbuf[512];
 
 char *DistStr (double dist, int precision)
 {

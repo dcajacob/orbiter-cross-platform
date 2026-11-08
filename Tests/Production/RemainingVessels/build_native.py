@@ -38,6 +38,8 @@ def main():
     for name in ('output','renderer-dependencies','lua-archive','plot-archive'):
         p.add_argument('--'+name,type=lambda v:Path(v).resolve(),required=True)
     p.add_argument('--development-prefix',type=lambda v:Path(v).resolve())
+    p.add_argument('--math-development-prefix',type=lambda v:Path(v).resolve(),
+                   help='Explicit MPFR development prefix for the existing reference-math unit target')
     p.add_argument('--configuration',choices=('Debug','Release'),required=True)
     p.add_argument('--math-profile',choices=('automatic','sse2'),required=True)
     p.add_argument('--sanitizers',action='store_true')
@@ -91,6 +93,13 @@ def main():
         '-DORBITER_ENGINE_BUILD='+str(engine),'-DORBITER_RENDERER_DEPENDENCIES='+str(a.renderer_dependencies)]),
         dict(label='renderer-build',argv=['cmake','--build',str(renderer),'--parallel',str(a.jobs)])]
     if a.development_prefix:commands[2]['argv'].append('-DCMAKE_PREFIX_PATH='+str(a.development_prefix))
+    math_inputs={}
+    if a.math_development_prefix:
+        commands[0]['argv'].append('-DCMAKE_PREFIX_PATH='+str(a.math_development_prefix))
+        for path in (a.math_development_prefix/'include/mpfr.h',
+                     a.math_development_prefix/'lib/x86_64-linux-gnu/libmpfr.so'):
+            require(path.is_file(),'Explicit MPFR development input missing: '+str(path))
+            math_inputs[str(path)]=sha(path)
     upstream=a.output/'upstream-units'
     if a.include_unit_tests:
         commands += [dict(label='upstream-units-configure',argv=['cmake','-S',str(HERE.parent/'CoreUnits'),
@@ -103,6 +112,7 @@ def main():
         dependency_sha256_lf={name:value for name,value in before.items() if name not in ledger},source_guard_inputs=len(before),
         configuration=a.configuration,math_profile=a.math_profile,instrumentation='address,undefined' if a.sanitizers else 'none',
         commands=commands,builder_sha256=sha(Path(__file__)),archive_sha256=archive_hashes,
+        math_development_inputs_sha256=math_inputs,
         native_admission_qualified=False,phase6_complete=False)
     manifest=a.output/'build.json'
     def save():manifest.write_text(json.dumps(report,indent=2)+'\n')
@@ -173,6 +183,8 @@ def main():
                         *sorted((upstream/'assets').rglob('*.lua'))]
         notice=engine/'NativeModules/Licenses/implot-LICENSE.txt'
         require(sha_lf(notice)==sha_lf(ROOT/'Tests/Production/Licenses/implot-LICENSE'),'ImPlot notice differs')
+        require(all(sha(Path(name))==value for name,value in math_inputs.items()),
+                'Explicit MPFR development inputs changed during the build')
         report.update(status='built',owning_sources_unchanged=True,implot_notice_sha256_lf=sha_lf(notice),
             solar_sail_gnu_unique_symbols=False,
             dragonfly_private_tank_symbols_exported=False,

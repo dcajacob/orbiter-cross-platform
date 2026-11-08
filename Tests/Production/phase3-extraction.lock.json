@@ -232,7 +232,7 @@
       "original_sha256_lf": "d3d119bb989d226f32498a710e8b77fa89b0d4cc9c05581a3a7a039777d95152"
     },
     "Src/Orbiter/Astro.cpp": {
-      "sha256_lf": "7da20cc343cf8f31f6fa02327ecc96e7b8c25cc2126b6ce16e404b40cd07ad8e",
+      "sha256_lf": "e594cc565b0310b27d47bd038243a0178262b05b0baa88e3bc5b9a5b5226bdf4",
       "original_sha256_lf": "82ea743582531793fc564092ec83a1fa3651d094bd7480d6ab9ffe0e82d8ec05"
     },
     "Src/Orbiter/Astro.h": {
@@ -459,7 +459,7 @@
     },
     "Src/Orbiter/MfdOrbit.cpp": {
       "original_sha256_lf": "26bdab789772b7da3fdd0f6f379a51a21bd2e9cfe14d1fa0f92f9b931ebd2a5b",
-      "sha256_lf": "f4d2a24b65f77904a27d50895d8038460a6dd7386ad721d0a99a6885db42a0fa",
+      "sha256_lf": "2cde72d270cb6583569bd395384239607a44710c5ee383ad833cb98c06704568",
       "scope": "Original scheduler, stock MFDs and modern map compile natively with explicit original epoch/time, authoritative world/UI bindings and indexed map resources. Exact Windows calculations and callback order conserved. Native GDI/legacy map/custom-mode entry points fail explicitly until supported; native cockpit owner and DG runtime remain unfinished. Native displayed true anomaly/longitude alone can recover a nonfinite value caused by at most two-epsilon acos argument roundoff from the existing cached eccentric anomaly. Original finite output and every Windows drawing call remain unchanged; no physics/Elements calculation changes."
     },
     "Src/Orbiter/MfdOrbit.h": {
@@ -582,7 +582,7 @@
     },
     "Src/Orbiter/Production/CMakeLists.txt": {
       "original_sha256_lf": null,
-      "sha256_lf": "98259d51b2d9d9895c4093a5bac4a65e7a995c9e2af7161889a5b7f5bb1b2951",
+      "sha256_lf": "2f25076d09d2ec1eaac14527a107061d3a4169bdfebbd212f1841d84cbf634b4",
       "scope": "Original Lua Terminal MFD native SDK/bootstrap and cooperative worker ownership; explicitly admit LuaMFD only, conserve original vessel-first left/right Shift MFD dispatch, and destroy terminal Lua states before their vessels. Original drawing/commands/repository/Windows callbacks independently conserved; terminal buffers reclaimed and command termination bounded. Full runtime and original Windows qualification remain required."
     },
     "Src/Orbiter/Production/CameraServices.cpp": {
