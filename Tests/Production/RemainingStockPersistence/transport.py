@@ -68,6 +68,9 @@ def inspect_archive(archive,decoded,checksum,size):
 
 
 def inspect_matrix(manifest,archive_root,decoded,producer):
+    if manifest.get('protocol')=='remaining-stock-hosted-campaign-transport-v1':
+        import hosted_transport
+        return hosted_transport.inspect_matrix(manifest,archive_root,decoded,producer)
     require(manifest['status']=='passed' and manifest['protocol']==PROTOCOL and manifest['diagnostic_only'] is False and
             manifest['source_commit']==producer and
             re.fullmatch('[0-9a-f]{40}',producer) and len(manifest['artifacts'])==4 and

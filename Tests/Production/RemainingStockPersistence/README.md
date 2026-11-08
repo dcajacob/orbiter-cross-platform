@@ -6,6 +6,24 @@ accepted reference, native admission or Phase 6 completion. Frozen original
 scenes/scripts and all existing numerical, camera and image budgets remain
 unchanged. Generated saved scenarios are separate hashed inputs.
 
+Hosted campaign transport has a separate versioned route in
+`hosted_transport.py`. Supply the actual API run record, its four original-stock
+job records and four artifact records, plus the already retained artifact ZIPs.
+The reader requires the authorized repository, branch, caller workflow and
+immutable source; every stock job and its capture, rejection-control, reload and
+upload steps must have succeeded. The automatic/SSE2 selection is checked too.
+All API digests, ZIP members and decoded files are re-read. Existing standalone
+workflow transport remains strict and unchanged in scope.
+
+The mixed campaign may have failed in a separate native job. That overall
+conclusion is retained verbatim; a successful stock transport claims only the
+complete original-Windows cohort. Independent simulation/persistence audits,
+native admission and Phase 6 acceptance remain separate. The new protocol is
+selected explicitly by its manifest identifier and records both acceptance
+flags as false. `Closeout/HostedTransport.Test.py` checks complete positive
+metadata, failed/skipped/missing steps, mixed sources/profiles, damaged ZIPs,
+unsafe paths, the legacy route and the declared incomplete acceptance scope.
+
 The native collector preserves the copied stock scenario's bytes and read-only
 mode rather than rewriting it. Exact Windows saves are written only to fresh
 derived paths; collisions with staged assets fail. `ScenarioInput.Test.py`

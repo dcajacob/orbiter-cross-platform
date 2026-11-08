@@ -171,7 +171,7 @@ def main():
         function,comparator=bind(a.frame_comparator,sha(a.frame_comparator),reader.windows.image_ssim)
         reader.windows.image_ssim=reader.native.shared.image_ssim=function
     def verifier_inputs():
-        paths={Path(__file__).resolve(),HERE/'observations.py',HERE/'transport.py',HERE/'local_transport.py'}
+        paths={Path(__file__).resolve(),HERE/'observations.py',HERE/'transport.py',HERE/'local_transport.py',HERE/'hosted_transport.py'}
         return dict(owning_readers=reader.original_audit.verifier_inputs(),
                     persistence_readers={str(p):sha(p) for p in sorted(paths)})
     readers=verifier_inputs()
