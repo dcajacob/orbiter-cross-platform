@@ -1,0 +1,36 @@
+name: Phase 6 Current Windows SDK for Complete Stock Qualification
+
+on:
+  push:
+    branches: ['qualification/current-windows-sdk']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: phase6-current-windows-sdk-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  controls:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - run: mkdir -p out && python3 -B Tests/Production/Closeout/run_controls.py --output out/current-windows-sdk-controls.json
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: current-windows-sdk-controls
+          retention-days: 14
+          path: out/current-windows-sdk-controls.json
+  current-windows:
+    needs: controls
+    uses: ./.github/workflows/production-client.yml
+    with:
+      data_container_lock: Tests/Production/stock-data-container-v2.lock.json
+      retain_stock_sdk: true

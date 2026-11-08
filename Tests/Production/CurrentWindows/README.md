@@ -18,6 +18,22 @@ evidence. The final current-source stock matrix and independent cross-cohort
 audits remain explicit pending gates; a successful campaign summary does not
 close them. Performance, physical input and controller acceptance stay local.
 
+`phase6-current-windows-sdk.yml` prepares the final current-source SDKs on the
+dedicated `qualification/current-windows-sdk` branch. It reuses every existing
+Windows application/client/cockpit/control check and forces the complete source
+build even if the same-revision cache exists. The same CTest invocation now
+retains XML; retention checks every registered process against that XML.
+`retain_hosted_sdk.py` verifies every tracked source against the actual producer,
+keeps the original packaged application/SDK members intact, and adds the exact
+separately linked OpenGL client exercised by the tests. The client suite rebuilds
+its test-only behavior driver after SDK verification; those tested variants are
+retained separately while the SDK's original driver bytes remain unchanged.
+Every production application, module and SDK byte must still match the package.
+The archive binds its actual runner/run/source, compiler metadata, unit receipts
+and complete member hashes. These artifacts prepare complete stock captures;
+they grant no stock, cross-cohort or hands-on acceptance. No local VM setup is
+used by this workflow, and the historical worker/provider contracts stay strict.
+
 The hosted caller explicitly supplies `stock-data-container-v2.lock.json` after
 the upstream rolling release removed the original archive asset. This records
 the replacement official container separately. `prepare_hosted_data.py` requires

@@ -27,6 +27,34 @@ class HostedCampaignTests(unittest.TestCase):
                 existing_policy = b' -DCMAKE_POLICY_VERSION_MINIMUM=3.5 '
                 self.assertEqual(expected.count(existing_policy), 1)
                 expected = expected.replace(existing_policy, b' "-DCMAKE_POLICY_VERSION_MINIMUM=3.5" ')
+                # The optional retained-SDK route forces the same complete build
+                # and records XML from the same CTest invocation. The original
+                # application/client/cockpit/control bodies remain byte exact.
+                rebuild=b"if: steps.rebuild.outputs.needed == 'true'"
+                self.assertEqual(expected.count(rebuild),1)
+                expected=expected.replace(rebuild,rebuild+b' || inputs.retain_stock_sdk')
+                ctest=b'ctest --test-dir out/runtime-rebuild --output-on-failure '
+                self.assertEqual(expected.count(ctest),1)
+                expected=expected.replace(ctest,ctest+b'--output-junit "$pwd/out/runtime-rebuild/runtime-ctest.xml" ')
+                retention=b'''      - name: Retain the exact current application and SDK for full stock qualification
+        if: inputs.retain_stock_sdk
+        run: python -B Tests/Production/CurrentWindows/retain_hosted_sdk.py --configuration ${{ matrix.configuration }} --output out/current-windows-sdk
+      - name: Upload the current SDK without granting stock qualification
+        uses: actions/upload-artifact@v7
+        if: inputs.retain_stock_sdk && always()
+        with:
+          name: current-windows-sdk-${{ matrix.configuration }}
+          retention-days: 14
+          compression-level: 0
+          path: |
+            out/current-windows-sdk/*.json
+            out/current-windows-sdk/*.xml
+            out/current-windows-sdk/*.log
+            out/current-windows-sdk/runtime.zip
+            out/current-windows-sdk/tested-driver-variants/**
+'''
+                self.assertEqual(after.count(retention),1)
+                after=after.replace(retention,b'',1)
             self.assertEqual(expected, after.split(b'\njobs:\n', 1)[1], name)
             self.assertIn(b'  workflow_call:\n', after)
 
