@@ -142,3 +142,21 @@ switches a desktop. VM identity and private-desktop claims are rejected.
 context observation on standard Windows 2025. Neither step executes a simulator
 or qualifies stock. Actual API-bound SDK/reference restoration, full captures
 and independent cross-cohort audits remain required before acceptance.
+
+The hosted stock v2 route partitions each configuration/math profile by stock
+writer and exact-save reload phase to fit standard Actions job limits. Each
+cell still executes all 38 scenes twice with 960 finalized ticks; the unchanged
+per-phase simulation/export/repeat/comparison body is checked against the
+retained worker. A complete matrix requires all eight distinct cells and 608
+actual processes from one current application source. Partial phase artifacts
+retain a phase-only status and cannot claim a complete matrix.
+
+`phase6-current-stock-preparation.yml` restores the already-tested `c08f9315`
+SDKs through their exact successful API run/jobs/artifact digests. It separately
+checks every runtime member, the immutable owning source tree and all 28 passed
+unit process receipts, then invokes the original passive observer preparer in
+its inherited MSVC environment. The original 60-to-960 observation assertion is
+the only observer-source variant. The preparation retains actual compiler
+receipts and SDK/observer identities; no simulator is executed. Large SDK ZIPs
+stay on GitHub. This preparation does not bypass the complete original Windows
+writer audit or qualify any current/native stock comparison.

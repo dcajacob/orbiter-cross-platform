@@ -7,7 +7,7 @@ import re
 import shutil
 import sys
 
-PROTOCOL='phase6-github-current-stock-v1'
+PROTOCOL='phase6-github-current-stock-v2'
 REPOSITORY='dcajacob/orbiter-cross-platform'
 ROOT_NAMES={'source','preserved','build','data','planets','mesa','output','export'}
 ROLES={'application','sdk','observer','runner'}
@@ -57,7 +57,7 @@ def validate(cfg):
     require(gh['repository']==REPOSITORY and type(gh['run_id']) is int and gh['run_id']>0 and
             type(gh['run_attempt']) is int and gh['run_attempt']>0 and gh['collector_commit']==cfg['roles']['runner']['commit'],
             'Actual authorized GitHub run/collector identity required')
-    require(cfg['configuration'] in ('Debug','Release') and cfg['math_profile'] in ('automatic','sse2') and
+    require(cfg['configuration'] in ('Debug','Release') and cfg['math_profile'] in ('automatic','sse2') and cfg['phase'] in ('stock','reload') and
             type(cfg['scene_workers']) is int and cfg['scene_workers']==1 and type(cfg['minimum_free_bytes']) is int and cfg['minimum_free_bytes']>=8*1024**3,
             'One complete profile, one serial scene worker and unchanged capacity reserve required')
     return workspace,roots
@@ -68,6 +68,29 @@ def selection(cfg,config):
     require(len(ids)==len(set(ids))==38 and scope==dict(kind='complete',gate='remaining-stock',cases=ids) and
             config['frames']==960,'All 38 complete original scenes and unchanged finalized ticks required')
     return list(config['cases']),False
+
+
+def complete_phase_matrix(records,case_ids):
+    expected={(c,m,p) for c in ('Debug','Release') for m in ('automatic','sse2') for p in ('stock','reload')}
+    require(len(case_ids)==len(set(case_ids))==38 and len(records)==8,'Complete eight-cell current-stock phase matrix required')
+    seen=set();sources=set()
+    for report in records:
+        key=(report['configuration'],report['math_profile'],report['captured_phase'])
+        require(key in expected and key not in seen and report['phase']==key[2] and
+                report['transport_protocol']==PROTOCOL and report['status']=='captured-current-Windows-stock-phase-awaiting-independent-audit',
+                'Missing, duplicate or substituted current-stock phase')
+        require(report['actual_processes']==76 and report['successful_presents']==76*960 and
+                report['owning_sources_runtime_sdk_provider_and_saved_inputs_unchanged'] is True and
+                report['simulation_comparison_and_independent_audit_pending'] is True and
+                report['phase6_complete'] is False and report['native_admission_qualified'] is False,
+                'Complete original run counts, guards and pending audit status required')
+        require(set(report['cases'])=={key[1]+'-'+key[2]+'-'+name for name in case_ids} and
+                all(len(case['runs'])==2 for case in report['cases'].values()),'Complete two-repeat original case coverage required')
+        require(re.fullmatch('[0-9a-f]{40}',report['source']),'Immutable current application source required')
+        seen.add(key);sources.add(report['source'])
+    require(seen==expected and len(sources)==1,'Complete matching current application source across both phases required')
+    return dict(cells=8,actual_processes=608,successful_presents=608*960,source_commit=sources.pop(),
+                physical_comparisons_and_independent_audit_pending=True,phase6_complete=False)
 
 
 def context():

@@ -34,6 +34,13 @@ def prepared_body():
         ("expected_inputs={(mode,case['id'],repeat) for mode in ('automatic','sse2')",
          "expected_inputs={(mode,case['id'],repeat) for mode in (cfg['math_profile'],)"),
         ("        for mode in ('automatic','sse2'):\n","        for mode in (cfg['math_profile'],):\n"),
+        ("            for phase in ('stock','reload'):","            for phase in (cfg['phase'],):"),
+        ("roles=cfg['roles'],transport_protocol=cfg['transport_protocol'],context=context(),request_sha256=sha(request),",
+         "roles=cfg['roles'],transport_protocol=cfg['transport_protocol'],phase=cfg['phase'],context=context(),request_sha256=sha(request),"),
+        ("report.update(status='captured-current-Windows-stock-and-paired-exact-save-reloads',actual_processes=",
+         "report.update(status='captured-current-Windows-stock-phase-awaiting-independent-audit',captured_phase=cfg['phase'],actual_processes="),
+        ("        report['staging_receipt']=links.receipt()",
+         "        require(len(report['actual_process_receipts'])==76 and len(report['cases'])==38, 'Complete single-phase process coverage required');report['staging_receipt']=links.receipt()"),
     ):body=replace_once(body,before,after)
     return body
 
