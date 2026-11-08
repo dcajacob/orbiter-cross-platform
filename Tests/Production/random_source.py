@@ -9,6 +9,17 @@ FILES=('Vecmat.cpp','Rigidbody.cpp','Vesselbase.cpp','Vessel.cpp','SuperVessel.c
 def canonical(source):
     return source.replace('orbiter::production::RandomInteger()','rand()').replace('orbiter::production::RandomMaximum','RAND_MAX')
 
+def restore_rigid_dispatch(source):
+    # GCC PR116449 can miscompile an array-indexed member-function-pointer call
+    # under UBSan. Capture the same selected pointer once before dispatch; undo
+    # exactly that spelling here and compare every original formula and call.
+    before='\t\t\t\t\t((*this).*(PropMode[PropLevel].propagator)) (dt, nPropSubsteps, i);'
+    after=('\t\t\t\t\tconst LinAngPropagator propagate = PropMode[PropLevel].propagator;\n'
+           '\t\t\t\t\t((*this).*propagate) (dt, nPropSubsteps, i);')
+    if source.count(after)!=1:
+        raise ValueError('Declared rigid-body compiler dispatch binding differs')
+    return source.replace(after,before,1)
+
 def restore_cloud_microtexture_default(source):
     # The file-based constructor omitted the false default already present in
     # the numerical constructor. Accept exactly that initialization repair;
@@ -38,6 +49,8 @@ def verify():
             from vessel_runtime_source import with_sparse_mesh_slots
             original=with_sparse_mesh_slots(original)
         actual=(ROOT/path).read_bytes().replace(b'\r\n',b'\n').decode('cp1252')
+        if name=='Rigidbody.cpp':
+            actual=restore_rigid_dispatch(actual)
         if name=='Vessel.cpp':
             from vessel_runtime_source import restore_hull_transform_cleanup,restore_startup_cleanup
             actual=restore_startup_cleanup(restore_hull_transform_cleanup(actual))

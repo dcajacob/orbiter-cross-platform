@@ -106,9 +106,14 @@ def package(folder):
         immutable = subprocess.check_output(['git', '-C', str(ROOT), 'show', producer+':'+name]).replace(b'\r\n', b'\n')
         require(hashlib.sha256(actual).hexdigest() == value == hashlib.sha256(immutable).hexdigest(),
                 'Owning package source differs: '+name)
-    tests = {kind: test_result(folder/inventory, folder/result) for kind, inventory, result in (
+    tests = {}; test_errors = {}
+    for kind, inventory, result in (
         ('engine', 'registered-unit-tests.json', 'engine-tests.xml'),
-        ('upstream', 'upstream-registered-unit-tests.json', 'upstream-tests.xml'))}
+        ('upstream', 'upstream-registered-unit-tests.json', 'upstream-tests.xml')):
+        try:
+            tests[kind] = test_result(folder/inventory, folder/result)
+        except (ValueError, OSError, ET.ParseError) as error:
+            test_errors[kind] = str(error)
     members = {}
     for field in ('runtime_files_sha256', 'candidate_runtime_files_sha256', 'generated_source_files_sha256'):
         for name, value in record[field].items():
@@ -120,22 +125,24 @@ def package(folder):
         members[path.relative_to(ROOT).as_posix()] = path
     for kind in ('lua', 'collision'):
         path = folder/('upstream-'+kind+'-case-inventory.txt')
-        require(path.is_file() and path.read_text().strip() and '0 test cases' not in path.read_text(),
-                'Actual nonempty upstream Catch case discovery required')
+        if not (path.is_file() and path.read_text().strip() and '0 test cases' not in path.read_text()):
+            test_errors['upstream-'+kind+'-discovery'] = 'Actual nonempty upstream Catch case discovery missing'
     closure = {name: sha(path) for name, path in sorted(members.items())}
     output = folder.with_suffix('.tar.gz'); require(not output.exists(), 'Fresh sealed package required')
     with tarfile.open(output, 'w:gz', compresslevel=6) as archive:
         for name, path in sorted(members.items()):
             archive.add(path, arcname=name, recursive=False)
     require(all(sha(path) == closure[name] for name, path in members.items()), 'Package changed during retention')
-    report = dict(protocol='phase6-hosted-full-native-package-v1', status='built-and-unit-tested-only',
+    report = dict(protocol='phase6-hosted-full-native-package-v1',
+        status='built-only-tests-failed-or-incomplete' if test_errors else 'built-and-unit-tested-only',
         source_commit=producer, configuration=record['configuration'], math_profile=record['math_profile'],
         builder_sha256=record['builder_sha256'], retention_helper_sha256=sha(__file__),
         build_manifest_sha256=sha(build), archive_sha256=sha(output), archive_bytes=output.stat().st_size,
-        archive_members_sha256=closure, tests=tests, cloud_builds_used=True,
+        archive_members_sha256=closure, tests=tests, test_errors=test_errors, cloud_builds_used=True,
         runtime_qualification_pending=True, full_stock_capture_pending=True,
         native_admission_qualified=False, phase6_complete=False)
     (folder/'hosted-package.json').write_text(json.dumps(report, indent=2)+'\n')
+    require(not test_errors, 'Retained explicitly failed/unqualified runtime; original unit failures remain required: '+str(test_errors))
     print('Retained complete sanitized runtime and actual unit results:', output)
 
 

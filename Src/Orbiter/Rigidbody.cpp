@@ -250,7 +250,8 @@ void RigidBody::Update (bool force)
 				acc = acc0, arot = arot0;
 				rpos_add = rpos_add0, rvel_add = rvel_add0;
 				for (i = 0; i < nPropSubsteps; i++) {
-					((*this).*(PropMode[PropLevel].propagator)) (dt, nPropSubsteps, i);
+					const LinAngPropagator propagate = PropMode[PropLevel].propagator;
+					((*this).*propagate) (dt, nPropSubsteps, i);
 					orbiter::physics::FinalizeStage(*s1, rpos_base, rvel_base, rpos_add, rvel_add);
 					GetIntermediateMoments (acc, tau, *s1, (i+1.0)/nPropSubsteps, dt);
 					arot.Set (EulerInv_full (tau, s1->omega));

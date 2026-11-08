@@ -19,6 +19,24 @@ the complete registered test inventories, discovers actual upstream Catch cases,
 and retains source-bound binaries, generated sources and real test results.
 Loading ASan before the Python math probe permits instrumented shared-library
 loading without disabling address, leak or undefined-behavior diagnostics.
+Python uses `PYTHONMALLOC=malloc` in these instrumented launches so its object
+allocator participates in the same allocation tracking. A separate launcher
+control loads a native library into Python, requires the clean path to pass,
+and requires an actual 4096-byte native leak to fail. Intentional invalid native
+array indices must also fail. These small controls precede the full builds.
+
+The first GCC 13 full-stock units exposed the array-indexed member-pointer
+miscompilation described in [GCC PR116449](https://gcc.gnu.org/pipermail/gcc-bugs/2024-September/879559.html).
+Rigid-body dispatch now captures the exact same selected member pointer before
+calling it. `CompilerDispatch.Test.py` reverses only that two-line spelling and
+requires every remaining runtime byte and every original free-spin test byte to
+match the prior source. No force formula, integrator, arguments, stage order,
+step count or numerical tolerance changes. The native-only retry branch runs
+the full four-profile sanitizer matrix while preserving active Windows jobs.
+Both engine and upstream unit inventories run even if the other fails. Failed
+or incomplete units keep the job failed; completed runtime binaries, generated
+sources and raw failure logs are still sealed with an explicitly unqualified
+status for diagnosis. Package retention cannot convert a failed test into a pass.
 
 The Windows 2025 runner's CMake 4 requires the explicit external setting
 `CMAKE_POLICY_VERSION_MINIMUM=3.5` for the unchanged pinned zlib source. This is

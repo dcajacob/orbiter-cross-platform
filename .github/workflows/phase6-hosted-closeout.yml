@@ -2,7 +2,7 @@ name: Phase 6 Hosted Closeout Builds
 
 on:
   push:
-    branches: ['qualification/hosted-closeout', 'qualification/windows-client-retry']
+    branches: ['qualification/hosted-closeout', 'qualification/windows-client-retry', 'qualification/native-package-retry']
   workflow_dispatch:
 
 permissions:
@@ -32,15 +32,32 @@ jobs:
 
   windows-client:
     name: Retry current Windows application and all client checks
+    if: github.ref != 'refs/heads/qualification/native-package-retry'
     needs: controls
     uses: ./.github/workflows/production-client.yml
     with:
       data_container_lock: Tests/Production/stock-data-container-v2.lock.json
 
+  sanitizer-launcher-controls:
+    name: Verify native sanitizer dispatch and Python launcher controls
+    if: github.ref != 'refs/heads/qualification/windows-client-retry'
+    needs: controls
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
+      - run: python3 -B Tests/Production/Closeout/sanitizer_launcher.py --output out/sanitizer-launcher-controls
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: sanitizer-launcher-controls
+          retention-days: 14
+          path: out/sanitizer-launcher-controls/**
+
   native-package:
     name: Complete sanitized native package ${{ matrix.configuration }} ${{ matrix.math_profile }}
     if: github.ref != 'refs/heads/qualification/windows-client-retry'
-    needs: controls
+    needs: [controls, sanitizer-launcher-controls]
     runs-on: ubuntu-24.04
     timeout-minutes: 180
     strategy:
@@ -83,11 +100,15 @@ jobs:
         run: |
           set -euo pipefail
           export LD_PRELOAD="$(c++ -print-file-name=libasan.so)"
-          ctest --test-dir "$PACKAGE/engine" --output-on-failure --output-junit "$PWD/$PACKAGE/engine-tests.xml" 2>&1 | tee "$PACKAGE/engine-tests.log"
-          ctest --test-dir "$PACKAGE/upstream-units" --output-on-failure --output-junit "$PWD/$PACKAGE/upstream-tests.xml" 2>&1 | tee "$PACKAGE/upstream-tests.log"
-          "$PACKAGE/upstream-units/existing_lua_unit" --list-tests > "$PACKAGE/upstream-lua-case-inventory.txt"
-          "$PACKAGE/upstream-units/existing_collision_unit" --list-tests > "$PACKAGE/upstream-collision-case-inventory.txt"
+          export PYTHONMALLOC=malloc
+          failed=0
+          ctest --test-dir "$PACKAGE/engine" --output-on-failure --output-junit "$PWD/$PACKAGE/engine-tests.xml" 2>&1 | tee "$PACKAGE/engine-tests.log" || failed=1
+          ctest --test-dir "$PACKAGE/upstream-units" --output-on-failure --output-junit "$PWD/$PACKAGE/upstream-tests.xml" 2>&1 | tee "$PACKAGE/upstream-tests.log" || failed=1
+          "$PACKAGE/upstream-units/existing_lua_unit" --list-tests > "$PACKAGE/upstream-lua-case-inventory.txt" || failed=1
+          "$PACKAGE/upstream-units/existing_collision_unit" --list-tests > "$PACKAGE/upstream-collision-case-inventory.txt" || failed=1
+          exit "$failed"
       - name: Seal exact runtime, generated sources and actual test results without acceptance credit
+        if: ${{ always() && !cancelled() }}
         run: python3 -B Tests/Production/Closeout/hosted_native_package.py package --package "$PACKAGE"
       - uses: actions/upload-artifact@v7
         if: always()

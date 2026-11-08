@@ -2,7 +2,9 @@
 """Reject partial, skipped or substituted hosted build/test retention."""
 import importlib.util
 import json
+import hashlib
 from pathlib import Path
+import subprocess
 import tempfile
 import unittest
 
@@ -52,6 +54,38 @@ class HostedNativePackageTests(unittest.TestCase):
             with self.assertRaises(ValueError):
                 hosted.package(Path(directory))
 
+    def test_failed_units_retain_raw_bundle_without_becoming_a_success(self):
+        (hosted.ROOT/'out').mkdir(exist_ok=True)
+        with tempfile.TemporaryDirectory(dir=hosted.ROOT/'out') as directory:
+            package = Path(directory)/'fixture'; package.mkdir()
+            binary = package/'fixture-runtime'; binary.write_bytes(b'disposable retention control, not a simulator')
+            relative = binary.relative_to(hosted.ROOT).as_posix()
+            source_name = 'README.md'
+            source_hash = hashlib.sha256((hosted.ROOT/source_name).read_bytes().replace(b'\r\n', b'\n')).hexdigest()
+            record = dict(status='built', source_base=subprocess.check_output(['git','-C',str(hosted.ROOT),'rev-parse','HEAD'],text=True).strip(),
+                owning_sources_unchanged=True, instrumentation='address,undefined', source_sha256_lf={source_name:source_hash},
+                dependency_sha256_lf={}, runtime_files_sha256={relative:hosted.sha(binary)},
+                candidate_runtime_files_sha256={}, generated_source_files_sha256={},
+                configuration='Debug', math_profile='sse2', builder_sha256=hosted.sha(hosted.__file__))
+            (package/'build.json').write_text(json.dumps(record))
+            inventory={'tests':[{'name':'original'}]}
+            for prefix in ('registered', 'upstream-registered'):
+                (package/(prefix+'-unit-tests.json')).write_text(json.dumps(inventory))
+            (package/'engine-tests.xml').write_text('<testsuite><testcase name="original"><failure/></testcase></testsuite>')
+            (package/'upstream-tests.xml').write_text('<testsuite><testcase name="original"/></testsuite>')
+            for kind in ('lua','collision'):
+                (package/('upstream-'+kind+'-case-inventory.txt')).write_text('1 test case\n')
+            with self.assertRaises(ValueError):
+                hosted.package(package)
+            report=json.loads((package/'hosted-package.json').read_text())
+            self.assertEqual(report['status'],'built-only-tests-failed-or-incomplete')
+            self.assertIn('engine',report['test_errors'])
+            self.assertEqual(report['tests']['upstream']['executed_processes'],1)
+            self.assertTrue(package.with_suffix('.tar.gz').is_file())
+            self.assertEqual(report['archive_members_sha256'][relative],hosted.sha(binary))
+            self.assertFalse(report['native_admission_qualified'])
+            self.assertFalse(report['phase6_complete'])
+
     def test_hosted_matrix_keeps_all_profiles_units_and_unsuppressed_sanitizers(self):
         body = (hosted.ROOT/'.github/workflows/phase6-hosted-closeout.yml').read_text()
         self.assertIn('configuration: [Debug, Release]', body)
@@ -60,6 +94,8 @@ class HostedNativePackageTests(unittest.TestCase):
         self.assertIn('ctest --test-dir "$PACKAGE/engine"', body)
         self.assertIn('ctest --test-dir "$PACKAGE/upstream-units"', body)
         self.assertIn('LD_PRELOAD="$(c++ -print-file-name=libasan.so)"', body)
+        self.assertIn('export PYTHONMALLOC=malloc', body)
+        self.assertIn('needs: [controls, sanitizer-launcher-controls]', body)
         self.assertNotIn('detect_leaks=0', body)
         self.assertNotIn('continue-on-error', body)
         self.assertIn('runs-on: ubuntu-24.04', body)
@@ -72,6 +108,11 @@ class HostedNativePackageTests(unittest.TestCase):
         windows = (hosted.ROOT/'.github/workflows/production-client.yml').read_text()
         self.assertEqual(windows.count('"-DCMAKE_POLICY_VERSION_MINIMUM=3.5"'), 2)
         self.assertNotIn(' -DCMAKE_POLICY_VERSION_MINIMUM=3.5 ', windows)
+
+    def test_native_retry_preserves_active_windows_work(self):
+        body = (hosted.ROOT/'.github/workflows/phase6-hosted-closeout.yml').read_text()
+        windows = body.split('  windows-client:\n', 1)[1].split('  sanitizer-launcher-controls:\n', 1)[0]
+        self.assertIn("if: github.ref != 'refs/heads/qualification/native-package-retry'", windows)
 
 
 if __name__ == '__main__':
