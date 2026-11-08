@@ -27,7 +27,7 @@ env:
 jobs:
   repaired_remaining_stock:
     name: Matched-clock v2 original ${{ matrix.configuration }} ${{ matrix.math_profile }}
-    runs-on: windows-2022
+    runs-on: windows-2025
     timeout-minutes: 360
     strategy:
       fail-fast: false
@@ -79,9 +79,9 @@ jobs:
       - name: Stage and verify untouched application, SDK, client and data inputs
         shell: pwsh
         run: |
-          python -B Tests/Production/prepare_data.py --archive out/data-cache/Orbiter-x64.zip --destination out/production-data
+          python -B Tests/Production/prepare_hosted_data.py --archive out/data-cache/Orbiter-x64.zip --destination out/production-data
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-          python -B Tests/Production/prepare_data.py --lock Tests/Production/standard-planets.lock.json --archive out/planet-cache/Orbiter2016.zip --destination out/standard-planets
+          python -B Tests/Production/prepare_hosted_data.py --lock Tests/Production/standard-planets.lock.json --archive out/planet-cache/Orbiter2016.zip --destination out/standard-planets
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           python -B Tests/Production/stage_mesa.py stage --cache out/mesa-cache --destination out/mesa-runtime
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }

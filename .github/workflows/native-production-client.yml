@@ -96,7 +96,7 @@ jobs:
       - name: Verify original data and planetary archives
         run: |
           python3 -B Tests/Production/prepare_native_data.py --archive out/data-cache/production-stock-data-v1.zip --destination out/data --group all
-          python3 -B Tests/Production/prepare_data.py --lock Tests/Production/standard-planets.lock.json --archive out/planet-cache/Orbiter2016.zip --destination out/planets
+          python3 -B Tests/Production/prepare_hosted_data.py --lock Tests/Production/standard-planets.lock.json --archive out/planet-cache/Orbiter2016.zip --destination out/planets
           python3 -B Tests/Production/NativeScene/prepare.py --delta-glider --shuttle-a --data out/data --planets out/planets --destination out/scene-resources
       - name: Run real software-rendered native application twice against frozen Windows
         shell: bash
@@ -505,7 +505,7 @@ jobs:
 
   original_spacecraft:
     name: Preserved Windows spacecraft observations ${{ matrix.configuration }} ${{ matrix.math_profile }}
-    runs-on: windows-2022
+    runs-on: windows-2025
     timeout-minutes: 40
     strategy:
       fail-fast: false
@@ -542,9 +542,9 @@ jobs:
       - name: Verify and stage stock data and software renderer
         shell: pwsh
         run: |
-          python -B Tests/Production/prepare_data.py --archive out/data-cache/Orbiter-x64.zip --destination out/production-data
+          python -B Tests/Production/prepare_hosted_data.py --archive out/data-cache/Orbiter-x64.zip --destination out/production-data
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-          python -B Tests/Production/prepare_data.py --lock Tests/Production/standard-planets.lock.json --archive out/planet-cache/Orbiter2016.zip --destination out/standard-planets
+          python -B Tests/Production/prepare_hosted_data.py --lock Tests/Production/standard-planets.lock.json --archive out/planet-cache/Orbiter2016.zip --destination out/standard-planets
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           python -B Tests/Production/stage_mesa.py stage --cache out/mesa-cache --destination out/mesa-runtime
           exit $LASTEXITCODE

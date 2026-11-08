@@ -3,7 +3,13 @@
 The authorized hosted campaign is `.github/workflows/phase6-qualification.yml`
 on `codex/github-qualification`. It reuses the complete existing current Windows
 client/cockpit/control, original Windows all38 writer/reload, and four-profile
-native/paired-Windows workflow jobs without changing their test commands. The
+native/paired-Windows checks with their original simulation commands and budgets.
+Hosted provisioning explicitly uses `prepare_hosted_data.py`; the historical
+`prepare_data.py` retains the exact bytes pinned by the Lua and UI reference
+provenance. The Windows jobs use the Windows 2025 CRT family already qualified
+by the accepted Lua/AAP reference;
+Windows 2022 automatic Debug/Release captures remain rejected by the independent
+state audit. A successful transport or capture job does not waive that audit. The
 portable core matrix also runs on pushes to this branch. Hosted build/result
 identities and raw Actions artifacts remain distinct from historical local VM
 evidence. The final current-source stock matrix and independent cross-cohort
@@ -12,7 +18,7 @@ close them. Performance, physical input and controller acceptance stay local.
 
 The hosted caller explicitly supplies `stock-data-container-v2.lock.json` after
 the upstream rolling release removed the original archive asset. This records
-the replacement official container separately. `prepare_data.py` still requires
+the replacement official container separately. `prepare_hosted_data.py` requires
 the original profile hash and all 463 original file hashes and lengths; either
 the retained original archive or the explicitly declared replacement may supply
 those identical inputs. The original stock-data lock, fonts, kernels and

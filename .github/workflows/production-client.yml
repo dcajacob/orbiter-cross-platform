@@ -41,7 +41,7 @@ env:
 jobs:
   client:
     name: Real Windows client ${{ matrix.configuration }} x64
-    runs-on: windows-2022
+    runs-on: windows-2025
     timeout-minutes: 60
     strategy:
       fail-fast: false
@@ -133,8 +133,8 @@ jobs:
           key: production-standard-planets-${{ hashFiles('Tests/Production/standard-planets.lock.json') }}
       - name: Prepare verified real Solar System and planet resources
         run: |
-          python Tests/Production/prepare_data.py --archive out/data-cache/Orbiter-x64.zip --destination out/production-data
-          python Tests/Production/prepare_data.py --lock Tests/Production/standard-planets.lock.json --archive out/planet-cache/Orbiter2016.zip --destination out/standard-planets
+          python Tests/Production/prepare_hosted_data.py --archive out/data-cache/Orbiter-x64.zip --destination out/production-data
+          python Tests/Production/prepare_hosted_data.py --lock Tests/Production/standard-planets.lock.json --archive out/planet-cache/Orbiter2016.zip --destination out/standard-planets
       - uses: actions/cache@v6
         with:
           path: out/mesa-cache/*.pkg.tar.zst

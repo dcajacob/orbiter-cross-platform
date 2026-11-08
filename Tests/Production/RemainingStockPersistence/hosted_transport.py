@@ -61,7 +61,8 @@ def run_identity(run,jobs=None):
                 dispatch[0]['conclusion']==('success' if profile.endswith('-sse2') else 'skipped'),
                 'Actual original stock CRT lane selection differs')
         seen.add(profile);ids.add(job['id'])
-        retained.append({k:job[k] for k in ('id','run_id','head_sha','head_branch','run_url','name','status','conclusion','steps')})
+        retained.append({k:job[k] for k in ('id','run_id','head_sha','head_branch','run_url','name','status','conclusion','steps')}|
+                        {'labels':list(job.get('labels',[]))})
     require(seen==legacy.PROFILES,'Complete four-profile original stock cohort required')
     return {k:run[k] for k in ('id','head_sha','head_branch','path','status','conclusion')}|dict(
         repository={'full_name':legacy.REPOSITORY},stock_jobs=retained)

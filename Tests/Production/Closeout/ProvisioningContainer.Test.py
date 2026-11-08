@@ -34,7 +34,7 @@ class ProvisioningContainerTests(unittest.TestCase):
         return profile, variant, files
 
     def run_prepare(self, root, archive, destination, explicit=True, environment=False, profile='profile.json'):
-        args = [sys.executable, '-B', str(ROOT / 'Tests/Production/prepare_data.py'),
+        args = [sys.executable, '-B', str(ROOT / 'Tests/Production/prepare_hosted_data.py'),
                 '--lock', str(root / profile), '--archive', str(root / archive),
                 '--destination', str(root / destination)]
         env = dict(os.environ)

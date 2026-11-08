@@ -8,13 +8,22 @@ from contracts import ROOT, load
 
 
 class HostedCampaignTests(unittest.TestCase):
-    def test_reused_workflow_jobs_and_test_commands_are_byte_identical(self):
+    def test_reused_checks_conserve_commands_with_explicit_provisioner_and_crt_host(self):
         for name in ('production-client.yml', 'matched-clock-remaining-stock-full.yml', 'native-production-client.yml'):
             path = '.github/workflows/' + name
             before = subprocess.check_output(['git', '-C', str(ROOT), 'show', 'bee7e1c1:' + path])
             after = (ROOT / path).read_bytes()
-            self.assertEqual(before.split(b'\njobs:\n', 1)[1], after.split(b'\njobs:\n', 1)[1], name)
+            expected = before.split(b'\njobs:\n', 1)[1].replace(
+                b'Tests/Production/prepare_data.py', b'Tests/Production/prepare_hosted_data.py')
+            self.assertEqual(expected.count(b'runs-on: windows-2022'), 1)
+            expected = expected.replace(b'runs-on: windows-2022', b'runs-on: windows-2025')
+            self.assertEqual(expected, after.split(b'\njobs:\n', 1)[1], name)
             self.assertIn(b'  workflow_call:\n', after)
+
+    def test_historical_provisioner_retains_exact_immutable_reference_bytes(self):
+        path = 'Tests/Production/prepare_data.py'
+        historical = subprocess.check_output(['git', '-C', str(ROOT), 'show', 'b8a2b610:' + path])
+        self.assertEqual((ROOT / path).read_bytes(), historical)
 
     def test_hosted_execution_retains_local_hardware_and_incomplete_status(self):
         manifest = load(ROOT / 'Docs/Production/Phase6Closeout.json')
