@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""The hosted launcher preserves every existing reusable qualification job."""
+"""Hosted setup is explicit; existing simulation commands and controls are conserved."""
 from pathlib import Path
 import subprocess
 import unittest
@@ -17,6 +17,9 @@ class HostedCampaignTests(unittest.TestCase):
                 b'Tests/Production/prepare_data.py', b'Tests/Production/prepare_hosted_data.py')
             self.assertEqual(expected.count(b'runs-on: windows-2022'), 1)
             expected = expected.replace(b'runs-on: windows-2022', b'runs-on: windows-2025')
+            selector = b"          vsversion: '17.0'\n"
+            self.assertEqual(expected.count(selector), 1)
+            expected = expected.replace(selector, b'')
             self.assertEqual(expected, after.split(b'\njobs:\n', 1)[1], name)
             self.assertIn(b'  workflow_call:\n', after)
 

@@ -8,6 +8,8 @@ Hosted provisioning explicitly uses `prepare_hosted_data.py`; the historical
 `prepare_data.py` retains the exact bytes pinned by the Lua and UI reference
 provenance. The Windows jobs use the Windows 2025 CRT family already qualified
 by the accepted Lua/AAP reference;
+the compiler is selected from the installed image and recorded, rather than
+requiring Visual Studio 2022 on the current Visual Studio 2026 runner image.
 Windows 2022 automatic Debug/Release captures remain rejected by the independent
 state audit. A successful transport or capture job does not waive that audit. The
 portable core matrix also runs on pushes to this branch. Hosted build/result

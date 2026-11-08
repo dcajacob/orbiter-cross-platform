@@ -42,7 +42,6 @@ jobs:
           fetch-depth: 0
       - uses: ilammy/msvc-dev-cmd@v1
         with:
-          vsversion: '17.0'
           arch: x64
       - uses: actions/setup-python@v6
         with:

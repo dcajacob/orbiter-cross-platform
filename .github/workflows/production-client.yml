@@ -55,7 +55,6 @@ jobs:
           fetch-depth: 0
       - uses: ilammy/msvc-dev-cmd@v1
         with:
-          vsversion: '17.0'
           arch: x64
       - name: Verify Phase 1 is accepted and all frozen evidence remains intact
         run: |
