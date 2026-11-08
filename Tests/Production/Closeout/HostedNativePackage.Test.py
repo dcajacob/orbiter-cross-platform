@@ -65,6 +65,14 @@ class HostedNativePackageTests(unittest.TestCase):
         self.assertIn('runs-on: ubuntu-24.04', body)
         self.assertNotIn('self-hosted', body)
 
+    def test_windows_retry_does_not_duplicate_the_active_native_builds(self):
+        body = (hosted.ROOT/'.github/workflows/phase6-hosted-closeout.yml').read_text()
+        native = body.split('  native-package:\n', 1)[1]
+        self.assertIn("if: github.ref != 'refs/heads/qualification/windows-client-retry'", native)
+        windows = (hosted.ROOT/'.github/workflows/production-client.yml').read_text()
+        self.assertEqual(windows.count('"-DCMAKE_POLICY_VERSION_MINIMUM=3.5"'), 2)
+        self.assertNotIn(' -DCMAKE_POLICY_VERSION_MINIMUM=3.5 ', windows)
+
 
 if __name__ == '__main__':
     unittest.main()

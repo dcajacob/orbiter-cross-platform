@@ -92,7 +92,7 @@ jobs:
         if: steps.rebuild.outputs.needed == 'true'
         shell: pwsh
         run: |
-          cmake -S . -B out/runtime-rebuild -G Ninja -DCMAKE_BUILD_TYPE=${{ matrix.configuration }} -DCMAKE_POLICY_VERSION_MINIMUM=3.5 -DCMAKE_C_COMPILER=cl -DCMAKE_CXX_COMPILER=cl -DORBITER_BUILD_D3D9CLIENT=ON -DORBITER_BUILD_XRSOUND=OFF -DORBITER_MAKE_DOC=OFF -DORBITER_MAKE_TESTS=ON -DORBITER_PORTABLE_REFERENCE_CAPTURE=ON -DORBITER_PRODUCTION_REFERENCE_CAPTURE=ON "-DDXSDK_DIR:PATH=$env:DXSDK_DIR" 2>&1 | Tee-Object runtime-configure.log
+          cmake -S . -B out/runtime-rebuild -G Ninja -DCMAKE_BUILD_TYPE=${{ matrix.configuration }} "-DCMAKE_POLICY_VERSION_MINIMUM=3.5" -DCMAKE_C_COMPILER=cl -DCMAKE_CXX_COMPILER=cl -DORBITER_BUILD_D3D9CLIENT=ON -DORBITER_BUILD_XRSOUND=OFF -DORBITER_MAKE_DOC=OFF -DORBITER_MAKE_TESTS=ON -DORBITER_PORTABLE_REFERENCE_CAPTURE=ON -DORBITER_PRODUCTION_REFERENCE_CAPTURE=ON "-DDXSDK_DIR:PATH=$env:DXSDK_DIR" 2>&1 | Tee-Object runtime-configure.log
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           cmake --build out/runtime-rebuild --parallel 2 2>&1 | Tee-Object runtime-build.log
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
@@ -111,7 +111,7 @@ jobs:
       - name: Build the separately linked Windows GraphicsClient module
         shell: pwsh
         run: |
-          cmake -S OVP/OGLClient -B out/opengl-client -G Ninja -DCMAKE_BUILD_TYPE=${{ matrix.configuration }} -DCMAKE_POLICY_VERSION_MINIMUM=3.5 -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DORBITER_TEST_RUNTIME="$pwd/out/production-app" "-DDXSDK_DIR=$env:DXSDK_DIR" 2>&1 | Tee-Object client-configure.log
+          cmake -S OVP/OGLClient -B out/opengl-client -G Ninja -DCMAKE_BUILD_TYPE=${{ matrix.configuration }} "-DCMAKE_POLICY_VERSION_MINIMUM=3.5" -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DORBITER_TEST_RUNTIME="$pwd/out/production-app" "-DDXSDK_DIR=$env:DXSDK_DIR" 2>&1 | Tee-Object client-configure.log
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           cmake --build out/opengl-client --target OGLClient --parallel 2 -- -k0 2>&1 | Tee-Object client-build.log
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }

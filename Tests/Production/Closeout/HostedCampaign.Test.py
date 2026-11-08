@@ -23,7 +23,10 @@ class HostedCampaignTests(unittest.TestCase):
             if name == 'production-client.yml':
                 configure = b'-B out/runtime-rebuild -G Ninja -DCMAKE_BUILD_TYPE=${{ matrix.configuration }} '
                 self.assertEqual(expected.count(configure), 1)
-                expected = expected.replace(configure, configure + b'-DCMAKE_POLICY_VERSION_MINIMUM=3.5 ')
+                expected = expected.replace(configure, configure + b'"-DCMAKE_POLICY_VERSION_MINIMUM=3.5" ')
+                existing_policy = b' -DCMAKE_POLICY_VERSION_MINIMUM=3.5 '
+                self.assertEqual(expected.count(existing_policy), 1)
+                expected = expected.replace(existing_policy, b' "-DCMAKE_POLICY_VERSION_MINIMUM=3.5" ')
             self.assertEqual(expected, after.split(b'\njobs:\n', 1)[1], name)
             self.assertIn(b'  workflow_call:\n', after)
 

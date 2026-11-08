@@ -7,6 +7,9 @@ builds the full native stock packages in Debug/Release and automatic/SSE2.
 The existing qualification campaign can continue its native runtime and original
 Windows captures while this distinct build scope runs. This branch does not
 trigger a duplicate portable or full qualification campaign.
+The `qualification/windows-client-retry` branch runs the same Windows checks and
+helper controls while leaving the already-running full native package builds
+alone. CMake's dotted policy value is quoted as one native argument in PowerShell.
 
 The native package job invokes the existing `RemainingVessels/build_native.py`
 with `--sanitizers --include-unit-tests` and the unchanged dependency pins.

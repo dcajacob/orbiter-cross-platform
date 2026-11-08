@@ -2,7 +2,7 @@ name: Phase 6 Hosted Closeout Builds
 
 on:
   push:
-    branches: ['qualification/hosted-closeout']
+    branches: ['qualification/hosted-closeout', 'qualification/windows-client-retry']
   workflow_dispatch:
 
 permissions:
@@ -39,6 +39,7 @@ jobs:
 
   native-package:
     name: Complete sanitized native package ${{ matrix.configuration }} ${{ matrix.math_profile }}
+    if: github.ref != 'refs/heads/qualification/windows-client-retry'
     needs: controls
     runs-on: ubuntu-24.04
     timeout-minutes: 180
