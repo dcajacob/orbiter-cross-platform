@@ -20,6 +20,10 @@ class HostedCampaignTests(unittest.TestCase):
             selector = b"          vsversion: '17.0'\n"
             self.assertEqual(expected.count(selector), 1)
             expected = expected.replace(selector, b'')
+            if name == 'production-client.yml':
+                configure = b'-B out/runtime-rebuild -G Ninja -DCMAKE_BUILD_TYPE=${{ matrix.configuration }} '
+                self.assertEqual(expected.count(configure), 1)
+                expected = expected.replace(configure, configure + b'-DCMAKE_POLICY_VERSION_MINIMUM=3.5 ')
             self.assertEqual(expected, after.split(b'\njobs:\n', 1)[1], name)
             self.assertIn(b'  workflow_call:\n', after)
 
