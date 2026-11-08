@@ -23,10 +23,11 @@ const ResourceResolver* BindNativeVesselModuleResources(const ResourceResolver* 
 namespace {
 struct LoadedVessel {
     native::VesselInit context;
+    std::string name;
     std::unique_ptr<NativeModule> module;
     native::VesselInstance* instance=nullptr;
     LoadedVessel(Vessel& vessel,int flightmodel,const char* name)
-        :context{sizeof(context),&vessel,flightmodel}
+        :context{sizeof(context),&vessel,flightmodel},name(name)
     {
         if(!resources) throw std::logic_error("Native vessel module resources are not bound");
         const auto file=resources->Resolve(std::string("Vessel/")+name+".so");
@@ -40,6 +41,11 @@ struct LoadedVessel {
 }
 }
 using namespace orbiter::production;
+const char* Vessel::NativeModuleName() const noexcept
+{
+    const auto* loaded=static_cast<const LoadedVessel*>(hMod);
+    return loaded?loaded->name.c_str():nullptr;
+}
 bool Vessel::LoadModule(std::ifstream& config)
 {
     hMod=nullptr;ClearModule();

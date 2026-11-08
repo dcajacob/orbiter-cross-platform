@@ -2,9 +2,11 @@
 """Collect full native stock writers or exact-Windows-save reloads; qualify separately."""
 import argparse
 import concurrent.futures
+import csv
 import hashlib
 import importlib.util
 import json
+import math
 import os
 from pathlib import Path
 import shutil
@@ -22,6 +24,9 @@ import data_inputs
 import configuration_input
 from saved_inputs import derived_case,protocol
 from saved_state import parse_saved,require
+sys.path.insert(0,str(HERE.parent/'Closeout'))
+from processes import OwnedProcess
+from LocalVM.static_binary_link_staging_v2 import BinaryLinks
 
 spec=importlib.util.spec_from_file_location('persistence_native_scene_reader',HERE.parent/'RemainingVessels/native.py')
 native=importlib.util.module_from_spec(spec);spec.loader.exec_module(native)
@@ -29,9 +34,15 @@ sha=native.sha;sha_lf=native.sha_lf
 PHASES=('stock-writer','windows-save-reload')
 
 
-def stage_asset_tree(source,target):
+class PrivateAssetCache(BinaryLinks):
+    """Link only a private cache; the canonical assets never share file records."""
+    def same_volume(self, source, target):
+        return False
+
+
+def stage_asset_tree(source,target,cache=None):
     """Retain asset file modes while permitting private configuration/evidence files."""
-    shutil.copytree(source,target,copy_function=shutil.copy2)
+    shutil.copytree(source,target,copy_function=cache.copy2 if cache else shutil.copy2)
     directories=[target,*(path for path in target.rglob('*') if path.is_dir())]
     for path in directories:
         path.chmod(stat.S_IMODE(path.stat().st_mode)|stat.S_IWUSR|stat.S_IXUSR)
@@ -55,7 +66,34 @@ def replay_bytes(contract):
     value=contract['native_save_command']
     require(value==dict(input_tick=959,phase='after',action='save',value=0,finalized_tick=960),
             'Native finalized Save boundary differs')
-    return ('tick,phase,action,value\n'+','.join(str(value[k]) for k in ('input_tick','phase','action','value'))+'\n').encode('ascii')
+    preparation=contract['native_before_save_command']
+    require(contract['native_save_boundary']=='windows-close-session-v2' and
+            preparation==dict(input_tick=959,phase='after',action='endplayback',value=0,finalized_tick=960),
+            'Native EndPlayback/Save ordering differs from Windows CloseSession')
+    return ('tick,phase,action,value\n'+''.join(','.join(str(command[k]) for k in
+            ('input_tick','phase','action','value'))+'\n' for command in (preparation,value))).encode('ascii')
+
+
+def inspect_save_boundary(out,contract):
+    """Require the real playback completion before Save at the original final tick."""
+    replay_bytes(contract)
+    with (out/'lifetime-events.csv').open() as stream:
+        rows=list(csv.DictReader(stream))
+    names=('input.endplayback','input.save')
+    inputs=[row for row in rows if row['phase'] in names]
+    require([row['phase'] for row in inputs]==list(names),'Actual EndPlayback/Save input sequence differs')
+    require(inputs[0]['detail'] in ('active','idle'),'Actual playback state witness differs')
+    boundary=[row for row in rows if row['phase'] in (*names,'playback.ended') and
+              row['frame']=='959' and row['tick']=='960']
+    expected=['input.endplayback']+(['playback.ended'] if inputs[0]['detail']=='active' else [])+['input.save']
+    require([row['phase'] for row in boundary]==expected and all(row in boundary for row in inputs),
+            'Actual playback completion/Save boundary differs')
+    require(all(math.isfinite(float(row[k])) for row in boundary for k in ('seconds','mjd')) and
+            len({(row['seconds'],row['mjd']) for row in boundary})==1,
+            'Actual EndPlayback/Save clocks differ')
+    return dict(boundary=contract['native_save_boundary'],input_tick=959,finalized_tick=960,
+                playback_was_active=inputs[0]['detail']=='active',events=expected)
+
 
 
 def inspect_save(out,contract):
@@ -73,6 +111,7 @@ def inspect_save(out,contract):
     require((out/'stock-vessel-complete.txt').read_text().strip()==str(contract['frames']),
             'Native saved-state observation did not reach the finalized boundary')
     configuration_input.inspect(out,configuration_input.expected(ROOT,invocation['collector_producer_commit'],'native'))
+    inspect_save_boundary(out,contract)
     return parse_saved(out/'saved.scn')
 
 
@@ -84,22 +123,31 @@ def main():
         p.add_argument('--'+name,type=lambda v:Path(v).resolve())
     p.add_argument('--library',type=lambda v:Path(v).resolve(),action='append',default=[])
     p.add_argument('--phase',choices=PHASES,required=True)
+    p.add_argument('--runtime-owner',type=lambda v:Path(v).resolve(),default=ROOT,
+                   help='Immutable checkout owning the compiled package; collector identity remains separate')
+    p.add_argument('--observer-delay-ms',type=int,choices=(0,120),default=120,
+                   help='Explicit observer wall pacing; zero requires equivalence qualification before broad use')
+    p.add_argument('--runtime-role',choices=('diagnostic','normal'),default='diagnostic',
+                   help='Compiled application role, separate from full or selected capture scope')
+    p.add_argument('--asset-staging',choices=('private-copies','private-cache-links'),default='private-copies',
+                   help='Explicit staging policy; guarded links share only private immutable cached inputs')
     p.add_argument('--case',action='append');p.add_argument('--jobs',type=int,default=1)
     a=p.parse_args();contract=protocol();config=native.settings(protocols.V2)
     require(sys.platform=='linux' and not a.output.exists() and a.jobs>0,'Native Linux, fresh output and positive concurrency required')
     cases=windows.selected_cases(config,a.case);diagnostic=a.case is not None
     record=json.loads(a.build_record.read_text());require(record['status']=='built','Complete immutable native package required')
-    identity=native.build_identity(a.build/'orbiter-production',a.build/'NativeModules',a.build_record,record['source_base'])
+    identity=native.build_identity(a.build/'orbiter-production',a.build/'NativeModules',a.build_record,record['source_base'],a.runtime_owner)
     require(identity['sanitizer_linked'],'Persistence candidate requires actual ASan/UBSan linkage')
-    candidate=a.build/'production_remaining_stock_diagnostic'
-    require(record['candidate_runtime_files_sha256'][candidate.relative_to(ROOT).as_posix()]==sha(candidate),
-            'Actual native diagnostic host differs from immutable package')
-    guarded={str(ROOT/n):sha(ROOT/n) for n in {**record['source_sha256_lf'],**record['dependency_sha256_lf']}}
+    candidate=a.build/('orbiter-production' if a.runtime_role=='normal' else 'production_remaining_stock_diagnostic')
+    runtime_files=record['runtime_files_sha256'] if a.runtime_role=='normal' else record['candidate_runtime_files_sha256']
+    require(runtime_files[candidate.relative_to(a.runtime_owner).as_posix()]==sha(candidate),
+            'Actual declared native application differs from immutable package')
+    guarded={str(a.runtime_owner/n):sha(a.runtime_owner/n) for n in {**record['source_sha256_lf'],**record['dependency_sha256_lf']}}
     for name,value in {**record['source_sha256_lf'],**record['dependency_sha256_lf']}.items():
-        require(sha_lf(ROOT/name)==value,'Current owning source/dependency differs from native package: '+name)
-        body=subprocess.check_output(['git','-C',str(ROOT),'show',record['source_base']+':'+name]).replace(b'\r\n',b'\n')
+        require(sha_lf(a.runtime_owner/name)==value,'Current owning source/dependency differs from native package: '+name)
+        body=subprocess.check_output(['git','-C',str(a.runtime_owner),'show',record['source_base']+':'+name]).replace(b'\r\n',b'\n')
         require(hashlib.sha256(body).hexdigest()==value,'Native package dependency differs from immutable producer: '+name)
-    guarded.update({str(ROOT/n):v for n,v in {**record['generated_source_files_sha256'],**record['runtime_files_sha256'],
+    guarded.update({str(a.runtime_owner/n):v for n,v in {**record['generated_source_files_sha256'],**record['runtime_files_sha256'],
         **record['candidate_runtime_files_sha256']}.items()})
     guarded[str(a.build_record)]=sha(a.build_record)
     gtk=json.loads(a.gtk_build_record.read_text())
@@ -153,6 +201,7 @@ def main():
     paths=set(windows.source_files())|{x for x in HERE.iterdir() if x.is_file()}|{x for x in native.HERE.iterdir() if x.is_file()}
     paths.update((Path(original_audit.__file__),HERE.parent/'StockScenarios/intentional_exit.py',HERE.parent/'WaylandInput/compositor.py',
                   HERE.parent/'NativeScene/Orbiter.cfg',Path(protocols.__file__),protocols.path(protocols.V2)))
+    paths.add(HERE.parent/'Closeout/LocalVM/static_binary_link_staging_v2.py')
     sources={path.relative_to(ROOT).as_posix():sha_lf(path) for path in paths}
     for name,value in sources.items():
         body=subprocess.check_output(['git','-C',str(ROOT),'show',producer+':'+name]).replace(b'\r\n',b'\n')
@@ -160,9 +209,14 @@ def main():
         guarded[str(ROOT/name)]=sha(ROOT/name)
     require(all(sha(Path(n))==v for n,v in guarded.items()),'Owning native/Windows inputs differ before collection')
     a.output.mkdir(parents=True);probe=a.output/'remaining-vessels-probe.so'
+    asset_cache=None;staging_controls=None
+    if a.asset_staging=='private-cache-links':
+        asset_cache=PrivateAssetCache({str(path):sha(path) for path in a.assets.rglob('*') if path.is_file()},a.output)
+        staging_controls=asset_cache.controls(a.assets,'Orbiter.cfg')
     command=[identity['compiler'],'-std=c++17','-fPIC','-shared','-Wl,--no-undefined','-fsanitize=address,undefined','-fno-omit-frame-pointer',
         '-I'+str(ROOT/'Orbitersdk/include'),'-I'+str(ROOT/'Src/Orbiter'),'-I'+str(a.build/'native-sdk'),str(native.HERE/'NativeProbe.cpp'),
         '-L'+str(a.build),'-Wl,-rpath,'+str(a.build),'-lorbiter_production_vessels','-lorbiter_production_boundary','-ldl','-o',str(probe)]
+    if a.observer_delay_ms==0:command.insert(1,'-DORBITER_NATIVE_FAST_CAPABILITY_DIAGNOSTIC')
     (a.output/'probe-command.json').write_text(json.dumps(command,indent=2)+'\n')
     with (a.output/'probe-build.log').open('w') as log:subprocess.run(command,stdout=log,stderr=subprocess.STDOUT,check=True)
     guarded[str(probe)]=sha(probe)
@@ -176,10 +230,13 @@ def main():
             'Actual native generated-source mutation controls incomplete')
     guarded[str(controls_path)]=sha(controls_path)
     report=dict(status='running',protocol=contract['protocol'],phase=a.phase,host='native-linux',producer_commit=producer,
+        runtime_owner=str(a.runtime_owner),observer_delay_ms=a.observer_delay_ms,runtime_role=a.runtime_role,
+        process_receipts='owned-pid-start-argv-exit-v1',
         runtime_source_commit=record['source_base'],runtime_identity=identity,source_sha256_lf=sources,guarded_files_sha256=guarded,
         asset_files_sha256=assets,actual_original_data=original_data,independently_checked_windows_runtime=parent_runtime,
         windows_parent_producer=parent['producer_commit'] if parent else None,diagnostic_only=diagnostic,cases_requested=[c['id'] for c in cases],
         repeats=2,frames=960,cases={},failures={},native_admission_qualified=False,phase6_complete=False)
+    report['asset_staging']=dict(policy=a.asset_staging,controls=staging_controls)
     manifest=a.output/'capture.json'
     def save():manifest.write_text(json.dumps(report,indent=2)+'\n')
     save()
@@ -194,7 +251,8 @@ def main():
                     provenance=dict(protocol=contract['protocol'],phase=a.phase,original_parent_case=case,stock_input_sha256=sha(source),
                         original_scenarios_and_scripts_unchanged=True,native_admission_qualified=False,phase6_complete=False)
                 out=a.output/(case['id']+'-'+str(repeat));folders.append(out)
-                stage_asset_tree(a.assets,out)
+                stage_asset_tree(a.assets,out,asset_cache)
+                if asset_cache:require(not asset_cache.fallback,'Private-cache links unavailable; a new storage preflight is required')
                 target=out/case['scenario_entry_point']
                 stage_scenario_input(source,target,a.phase)
                 cfg=(HERE.parent/'NativeScene/Orbiter.cfg').read_text()
@@ -215,16 +273,22 @@ def main():
                 asan=subprocess.check_output([identity['compiler'],'-print-file-name=libasan.so'],text=True).strip()
                 env.update(LD_PRELOAD=asan+':'+str(probe),ASAN_OPTIONS='detect_leaks=1:fast_unwind_on_malloc=0',LSAN_OPTIONS='',UBSAN_OPTIONS='halt_on_error=1:print_stacktrace=1')
                 invocation=dict(argv=argv,protocol=protocols.V2,persistence_phase=a.phase,collector_producer_commit=producer,
+                    runtime_role=a.runtime_role,
                     configuration_input=startup_configuration,scenario_entry_point=case['scenario_entry_point'],
                     scenario_sha256_lf=sha_lf(target),class_inputs={kind:dict(path=chosen[config['classes'][kind]['target'].casefold()],sha256_lf=config['classes'][kind]['sha256_lf']) for kind in set(case['declared_vessels'].values())},
                     recording_files_sha256={n:sha(out/n) for n in native.shared.recordings(case,config)},finalized_frame_descriptor_sha256=sha(out/protocols.MARKER),
                     save_replay_sha256=sha(out/'persistence-replay.csv'),sanitizer_environment={k:env[k] for k in ('ASAN_OPTIONS','LSAN_OPTIONS','UBSAN_OPTIONS')})
                 (out/'invocation.json').write_text(json.dumps(invocation,indent=2)+'\n')
-                with (out/'console.log').open('w') as log:process=subprocess.run(argv,cwd=out,env=env,stdout=log,stderr=subprocess.STDOUT,timeout=1200)
-                (out/'process-result.json').write_text(json.dumps(dict(returncode=process.returncode))+'\n')
+                with (out/'console.log').open('w') as log:
+                    owned=OwnedProcess(argv,cwd=out,env=env,stdout=log,stderr=subprocess.STDOUT)
+                    try:owned.process.wait(timeout=1200)
+                    finally:
+                        receipt=owned.cancel()
+                        (out/'process-receipt.json').write_text(json.dumps(receipt,indent=2)+'\n')
+                        (out/'process-result.json').write_text(json.dumps(dict(returncode=owned.process.returncode))+'\n')
                 require(all(sha(out/n)==v for n,v in assets.items() if n!='Orbiter.cfg'),'An original native scene/script/recording/configuration/mesh/texture changed')
                 if (out/'scene.rgba').is_file() and (out/'scene.rgba').stat().st_size==1280*720*4:native.png(out/'scene.png',(out/'scene.rgba').read_bytes(),1280,720)
-                result=native.inspect(out,case,config,identity,a.build,probe,libraries,a.gtk_plugin)
+                result=native.inspect(out,case,config,identity,a.build,probe,libraries,a.gtk_plugin,runtime_role=a.runtime_role)
                 result.update(saved_state=inspect_save(out,contract),persistence_input=provenance,executed_case=case)
                 if parent_case['id']==cases[0]['id'] and repeat==1:
                     control_file=a.output/'configuration-input-controls.json'
@@ -268,7 +332,15 @@ def main():
         save();require(complete,'Native persistence failures retained; no admission')
     except BaseException as error:
         report.update(status='failed',error=str(error));raise
-    finally:save()
+    finally:
+        try:
+            if asset_cache:asset_cache.close()
+        except BaseException as error:
+            report.update(status='failed',error='Private asset cache verification: '+str(error))
+            raise
+        finally:
+            if asset_cache:report['asset_staging']['receipt']=asset_cache.receipt()
+            save()
 
 
 if __name__=='__main__':main()

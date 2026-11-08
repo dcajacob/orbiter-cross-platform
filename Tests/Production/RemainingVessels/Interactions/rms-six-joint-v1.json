@@ -1,0 +1,364 @@
+{
+  "schema": 1,
+  "protocol": "remaining-stock-original-input-interactions-v1",
+  "flows": [
+    {
+      "id": "rms-six-joint-and-stow",
+      "case": "remaining_stock_026",
+      "families": [
+        "Atlantis"
+      ],
+      "frames": 240,
+      "fixed_step": 0.25,
+      "replay": [
+        {
+          "tick": 10,
+          "phase": "before",
+          "action": "key",
+          "value": "29"
+        },
+        {
+          "tick": 10,
+          "phase": "before",
+          "action": "key",
+          "value": "57"
+        },
+        {
+          "tick": 11,
+          "phase": "before",
+          "action": "key",
+          "value": "-57"
+        },
+        {
+          "tick": 11,
+          "phase": "before",
+          "action": "key",
+          "value": "-29"
+        },
+        {
+          "tick": 25,
+          "phase": "before",
+          "action": "ui",
+          "value": "move 115 143 -"
+        },
+        {
+          "tick": 27,
+          "phase": "before",
+          "action": "ui",
+          "value": "left_down 115 143 -"
+        },
+        {
+          "tick": 29,
+          "phase": "before",
+          "action": "ui",
+          "value": "left_up 115 143 -"
+        },
+        {
+          "tick": 35,
+          "phase": "before",
+          "action": "ui",
+          "value": "move 404 334 -"
+        },
+        {
+          "tick": 37,
+          "phase": "before",
+          "action": "ui",
+          "value": "left_down 404 334 -"
+        },
+        {
+          "tick": 39,
+          "phase": "before",
+          "action": "ui",
+          "value": "move 404 660 -"
+        },
+        {
+          "tick": 41,
+          "phase": "before",
+          "action": "ui",
+          "value": "left_up 404 660 -"
+        },
+        {
+          "tick": 48,
+          "phase": "before",
+          "action": "ui",
+          "value": "move 80 150 -"
+        },
+        {
+          "tick": 50,
+          "phase": "before",
+          "action": "ui",
+          "value": "left_down 80 150 -"
+        },
+        {
+          "tick": 66,
+          "phase": "before",
+          "action": "ui",
+          "value": "left_up 80 150 -"
+        },
+        {
+          "tick": 68,
+          "phase": "before",
+          "action": "ui",
+          "value": "move 115 150 -"
+        },
+        {
+          "tick": 70,
+          "phase": "before",
+          "action": "ui",
+          "value": "left_down 115 150 -"
+        },
+        {
+          "tick": 86,
+          "phase": "before",
+          "action": "ui",
+          "value": "left_up 115 150 -"
+        },
+        {
+          "tick": 88,
+          "phase": "before",
+          "action": "ui",
+          "value": "move 80 182 -"
+        },
+        {
+          "tick": 90,
+          "phase": "before",
+          "action": "ui",
+          "value": "left_down 80 182 -"
+        },
+        {
+          "tick": 106,
+          "phase": "before",
+          "action": "ui",
+          "value": "left_up 80 182 -"
+        },
+        {
+          "tick": 108,
+          "phase": "before",
+          "action": "ui",
+          "value": "move 115 270 -"
+        },
+        {
+          "tick": 110,
+          "phase": "before",
+          "action": "ui",
+          "value": "left_down 115 270 -"
+        },
+        {
+          "tick": 126,
+          "phase": "before",
+          "action": "ui",
+          "value": "left_up 115 270 -"
+        },
+        {
+          "tick": 128,
+          "phase": "before",
+          "action": "ui",
+          "value": "move 115 326 -"
+        },
+        {
+          "tick": 130,
+          "phase": "before",
+          "action": "ui",
+          "value": "left_down 115 326 -"
+        },
+        {
+          "tick": 146,
+          "phase": "before",
+          "action": "ui",
+          "value": "left_up 115 326 -"
+        },
+        {
+          "tick": 148,
+          "phase": "before",
+          "action": "ui",
+          "value": "move 80 358 -"
+        },
+        {
+          "tick": 150,
+          "phase": "before",
+          "action": "ui",
+          "value": "left_down 80 358 -"
+        },
+        {
+          "tick": 166,
+          "phase": "before",
+          "action": "ui",
+          "value": "left_up 80 358 -"
+        },
+        {
+          "tick": 180,
+          "phase": "before",
+          "action": "key",
+          "value": "10"
+        },
+        {
+          "tick": 181,
+          "phase": "before",
+          "action": "key",
+          "value": "-10"
+        }
+      ],
+      "gui_evidence": true,
+      "checks": [
+        {
+          "left": {
+            "trace": "flight-animations.csv",
+            "where": {
+              "tick": 170,
+              "object": "STS-101",
+              "index": 9
+            },
+            "field": "state"
+          },
+          "op": "gt",
+          "right": 0.5
+        },
+        {
+          "left": {
+            "trace": "flight-animations.csv",
+            "where": {
+              "tick": 210,
+              "object": "STS-101",
+              "index": 9
+            },
+            "field": "state"
+          },
+          "op": "eq",
+          "right": 0.5
+        },
+        {
+          "left": {
+            "trace": "flight-animations.csv",
+            "where": {
+              "tick": 170,
+              "object": "STS-101",
+              "index": 10
+            },
+            "field": "state"
+          },
+          "op": "gt",
+          "right": 0
+        },
+        {
+          "left": {
+            "trace": "flight-animations.csv",
+            "where": {
+              "tick": 210,
+              "object": "STS-101",
+              "index": 10
+            },
+            "field": "state"
+          },
+          "op": "eq",
+          "right": 0
+        },
+        {
+          "left": {
+            "trace": "flight-animations.csv",
+            "where": {
+              "tick": 170,
+              "object": "STS-101",
+              "index": 11
+            },
+            "field": "state"
+          },
+          "op": "gt",
+          "right": 0
+        },
+        {
+          "left": {
+            "trace": "flight-animations.csv",
+            "where": {
+              "tick": 210,
+              "object": "STS-101",
+              "index": 11
+            },
+            "field": "state"
+          },
+          "op": "eq",
+          "right": 0
+        },
+        {
+          "left": {
+            "trace": "flight-animations.csv",
+            "where": {
+              "tick": 170,
+              "object": "STS-101",
+              "index": 12
+            },
+            "field": "state"
+          },
+          "op": "gt",
+          "right": 0.5
+        },
+        {
+          "left": {
+            "trace": "flight-animations.csv",
+            "where": {
+              "tick": 210,
+              "object": "STS-101",
+              "index": 12
+            },
+            "field": "state"
+          },
+          "op": "eq",
+          "right": 0.5
+        },
+        {
+          "left": {
+            "trace": "flight-animations.csv",
+            "where": {
+              "tick": 170,
+              "object": "STS-101",
+              "index": 13
+            },
+            "field": "state"
+          },
+          "op": "gt",
+          "right": 0.5
+        },
+        {
+          "left": {
+            "trace": "flight-animations.csv",
+            "where": {
+              "tick": 210,
+              "object": "STS-101",
+              "index": 13
+            },
+            "field": "state"
+          },
+          "op": "eq",
+          "right": 0.5
+        },
+        {
+          "left": {
+            "trace": "flight-animations.csv",
+            "where": {
+              "tick": 170,
+              "object": "STS-101",
+              "index": 14
+            },
+            "field": "state"
+          },
+          "op": "gt",
+          "right": 0.5
+        },
+        {
+          "left": {
+            "trace": "flight-animations.csv",
+            "where": {
+              "tick": 210,
+              "object": "STS-101",
+              "index": 14
+            },
+            "field": "state"
+          },
+          "op": "eq",
+          "right": 0.5
+        }
+      ]
+    }
+  ],
+  "scope": "Original GUI: open and resize the RMS dialog, move all six joints with its actual buttons, then use original 9-key stow. Full original ISS/Atlantis/Carina roster. Class control facet only; named payload and complete ascent workflows remain required.",
+  "phase6_complete": false
+}

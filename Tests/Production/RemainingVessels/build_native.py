@@ -41,9 +41,14 @@ def main():
     p.add_argument('--configuration',choices=('Debug','Release'),required=True)
     p.add_argument('--math-profile',choices=('automatic','sse2'),required=True)
     p.add_argument('--sanitizers',action='store_true')
+    p.add_argument('--include-unit-tests',action='store_true',help='Build and inventory existing registered tests; does not mark them passed')
+    p.add_argument('--catch-source',type=lambda v:Path(v).resolve(),
+                   help='Offline locked Catch checkout for the existing upstream C++/Lua units')
     p.add_argument('--jobs',type=int,default=4)
     a=p.parse_args();require(sys.platform=='linux','Native package requires Linux')
     require(not a.output.exists() and a.jobs>0,'Fresh package output and positive build concurrency required')
+    require(not a.include_unit_tests or a.catch_source is not None,
+            'Existing upstream units require their explicit offline Catch source')
     extraction_source.verify()
     ledger=json.loads((HERE.parent/'phase3-extraction.lock.json').read_text())['files']
     inputs=set(ledger)|{'OVP/OGLClient/dependencies.lock.json','Tests/Production/dependencies.lock.json',
@@ -52,6 +57,10 @@ def main():
     inputs.update(subprocess.check_output(['git','-C',str(ROOT),'ls-tree','-r','--name-only','HEAD','--','OVP/OGLClient'],text=True).splitlines())
     inputs.update(path.relative_to(ROOT).as_posix() for path in HERE.iterdir() if path.is_file())
     inputs.update(path.relative_to(ROOT).as_posix() for path in (HERE.parent/'Dragonfly').glob('*.py'))
+    if a.include_unit_tests:
+        inputs.update(path.relative_to(ROOT).as_posix() for path in (HERE.parent/'CoreUnits').iterdir() if path.is_file())
+        inputs.update(('Tests/Lua.Interpreter.cpp','Tests/Collision.CollisionCore.cpp',
+                       'Script/oapi_init.lua','Script/strict.lua'))
     for module in list(sys.modules.values()):
         name=getattr(module,'__file__',None)
         if name:
@@ -72,7 +81,7 @@ def main():
         common+=['-DCMAKE_C_FLAGS=-fsanitize=address,undefined -fno-omit-frame-pointer',
                  '-DCMAKE_CXX_FLAGS=-fsanitize=address,undefined -fno-omit-frame-pointer']
     commands=[dict(label='engine-configure',argv=['cmake','-S',str(ROOT/'Src/Orbiter/Production'),'-B',str(engine),'-G','Ninja',*common,
-        '-DBUILD_TESTING=OFF','-DORBITER_BUILD_NATIVE_CELESTIAL_MODULES=ON','-DORBITER_BUILD_NATIVE_VESSELS=ON',
+        '-DBUILD_TESTING='+('ON' if a.include_unit_tests else 'OFF'),'-DORBITER_BUILD_NATIVE_CELESTIAL_MODULES=ON','-DORBITER_BUILD_NATIVE_VESSELS=ON',
         '-DORBITER_BUILD_NATIVE_COCKPIT=ON','-DORBITER_BUILD_ATLANTIS_DIAGNOSTIC=ON','-DORBITER_BUILD_REMAINING_STOCK_DIAGNOSTIC=ON',
         '-DORBITER_MATH_FORCE_SSE2='+('ON' if a.math_profile=='sse2' else 'OFF'),
         '-DORBITER_NATIVE_LUA_ARCHIVE='+str(a.lua_archive),'-DORBITER_NATIVE_UI_ARCHIVE='+str(a.renderer_dependencies/'imgui.zip'),
@@ -82,6 +91,13 @@ def main():
         '-DORBITER_ENGINE_BUILD='+str(engine),'-DORBITER_RENDERER_DEPENDENCIES='+str(a.renderer_dependencies)]),
         dict(label='renderer-build',argv=['cmake','--build',str(renderer),'--parallel',str(a.jobs)])]
     if a.development_prefix:commands[2]['argv'].append('-DCMAKE_PREFIX_PATH='+str(a.development_prefix))
+    upstream=a.output/'upstream-units'
+    if a.include_unit_tests:
+        commands += [dict(label='upstream-units-configure',argv=['cmake','-S',str(HERE.parent/'CoreUnits'),
+            '-B',str(upstream),'-G','Ninja',*common,'-DCMAKE_POLICY_VERSION_MINIMUM=3.5',
+            '-DORBITER_ENGINE_SOURCE='+str(ROOT),'-DORBITER_ENGINE_BUILD='+str(engine),
+            '-DORBITER_CATCH_SOURCE='+str(a.catch_source)]),
+            dict(label='upstream-units-build',argv=['cmake','--build',str(upstream),'--parallel',str(a.jobs)])]
     a.output.mkdir(parents=True)
     report=dict(status='building',source_base=source,source_sha256_lf={name:before[name] for name in ledger},
         dependency_sha256_lf={name:value for name,value in before.items() if name not in ledger},source_guard_inputs=len(before),
@@ -128,6 +144,33 @@ def main():
         candidates=[engine/'production_atlantis_diagnostic',engine/'production_remaining_stock_diagnostic']
         require(all(path.is_file() for path in candidates),'Real diagnostic host absent')
         runtime=[engine/'orbiter-production',engine/'CMakeCache.txt',engine/'compile_commands.json',*sorted(engine.rglob('*.so'))]
+        if a.include_unit_tests:
+            listing=a.output/'registered-unit-tests.json'
+            command=['ctest','--test-dir',str(engine),'--show-only=json-v1']
+            data=json.loads(subprocess.check_output(command,text=True))
+            require(data['tests'] and len({test['name'] for test in data['tests']})==len(data['tests']) and
+                    all(test.get('command') and Path(test['command'][0]).is_file() for test in data['tests']),
+                    'Complete existing registered test binaries/commands required')
+            listing.write_text(json.dumps(data,indent=2)+'\n')
+            report['registered_unit_tests']=dict(path=str(listing),sha256=sha(listing),
+                command=command,registered_processes=len(data['tests']),executed=False,
+                scope='Actual CTest registration only; upstream Catch cases, portable tests and standalone fixtures remain separately required')
+            runtime += [listing,*sorted({Path(test['command'][0]) for test in data['tests']
+                                        if engine in Path(test['command'][0]).parents})]
+            command=['ctest','--test-dir',str(upstream),'--show-only=json-v1']
+            data=json.loads(subprocess.check_output(command,text=True))
+            require({test['name'] for test in data['tests']}=={'Lua.Interpreter','Collision.CollisionCore'} and
+                    all(Path(test['command'][0]).is_file() for test in data['tests']),
+                    'Both unchanged upstream unit processes required')
+            listing=a.output/'upstream-registered-unit-tests.json'
+            listing.write_text(json.dumps(data,indent=2)+'\n')
+            report['upstream_unit_tests']=dict(path=str(listing),sha256=sha(listing),
+                command=command,registered_processes=2,executed=False,build=str(upstream),
+                catch_source=str(a.catch_source),
+                catch_commit=subprocess.check_output(['git','-C',str(a.catch_source),'rev-parse','HEAD'],text=True).strip(),
+                scope='Existing upstream C++/Lua bodies; runtime case discovery, execution and assertions remain required')
+            runtime += [listing,*[Path(test['command'][0]) for test in data['tests']],
+                        *sorted((upstream/'assets').rglob('*.lua'))]
         notice=engine/'NativeModules/Licenses/implot-LICENSE.txt'
         require(sha_lf(notice)==sha_lf(ROOT/'Tests/Production/Licenses/implot-LICENSE'),'ImPlot notice differs')
         report.update(status='built',owning_sources_unchanged=True,implot_notice_sha256_lf=sha_lf(notice),

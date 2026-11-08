@@ -1,0 +1,38 @@
+{
+  "schema": 1,
+  "protocol": "remaining-stock-original-input-interactions-v1",
+  "flows": [
+    {
+      "id": "module2-physical-docking",
+      "case": "remaining_stock_008",
+      "families": [
+        "Dragonfly",
+        "Module2"
+      ],
+      "frames": 1600,
+      "fixed_step": 0.25,
+      "replay": [],
+      "script": "Tests/Production/RemainingVessels/Interactions/phase6_module2_docking.lua",
+      "required_log": [
+        "PHASE6_CONTROL Module2 final approach",
+        "PHASE6_CONTROL Module2 reciprocal physical docking"
+      ],
+      "checks": [
+        {
+          "left": {
+            "trace": "flight-state.csv",
+            "where": {
+              "tick": 1600,
+              "object": "TUG-01"
+            },
+            "field": "dock"
+          },
+          "op": "ne",
+          "right": ""
+        }
+      ]
+    }
+  ],
+  "scope": "Two original-RCS physical docking repetitions with the complete original Dragonfly021118 scene. No pose, docking or attachment setters. Selected interaction facet only.",
+  "phase6_complete": false
+}

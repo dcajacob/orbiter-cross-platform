@@ -675,7 +675,7 @@
     },
     "Src/Orbiter/Production/Math/CMakeLists.txt": {
       "original_sha256_lf": null,
-      "sha256_lf": "1f38670991a7f05dde62778eb4cb1acddafb9c0b3d3c45d0e4267448539a9b04"
+      "sha256_lf": "b4800ed191ee8468e3a621cffe084e5ad67405408c1c582f534395fcffd99693"
     },
     "Src/Orbiter/Production/Math/NativeError.cpp": {
       "original_sha256_lf": null,
@@ -687,7 +687,7 @@
     },
     "Src/Orbiter/Production/Math/Runtime.cpp": {
       "original_sha256_lf": null,
-      "sha256_lf": "b2b04979018ceb6a10b8774369bca651f5a86dce8aaf98b0e8d75ef45241e7f1"
+      "sha256_lf": "a090c2dcfcf9179e634df17c02e807dd210577d250d4bb4cce2b9f22e26a82ee"
     },
     "Src/Orbiter/Production/Math/Runtime.h": {
       "original_sha256_lf": null,
@@ -695,7 +695,7 @@
     },
     "Src/Orbiter/Production/Math/prepare.py": {
       "original_sha256_lf": null,
-      "sha256_lf": "ee6194b9bacaff55a08d89aecd3eb164fcdf70093de0e716b9c2d91ac5aa139c"
+      "sha256_lf": "3ce59a1c84c56580492e388cb632860113da4b82fcd18ad6ce6be434e75112ae"
     },
     "Src/Orbiter/Production/MathObservation.h": {
       "original_sha256_lf": null,
@@ -743,7 +743,7 @@
     },
     "Src/Orbiter/Production/NativeApplication.cpp": {
       "original_sha256_lf": null,
-      "sha256_lf": "7f2a5f4ae18c069cd08be9299e1daae9fac88ba30becdb2d0a0e53f40536c9de",
+      "sha256_lf": "d72d4c6fc6a89d3516535d16df23bee99f205829298edc323d0e49481aa9013f",
       "scope": "Original Lua Terminal MFD native SDK/bootstrap and cooperative worker ownership; explicitly admit LuaMFD only, conserve original vessel-first left/right Shift MFD dispatch, and destroy terminal Lua states before their vessels. Original drawing/commands/repository/Windows callbacks independently conserved; terminal buffers reclaimed and command termination bounded. Full runtime and original Windows qualification remain required. Native bare-Space pause convenience applies only without Shift/Control/Alt, retaining exact logical Pause bindings and original modified-space delivery to vessel callbacks. Original DG and Atlantis Ctrl+Space control dialogs retain their source and behavior; no physics or dispatch order change. Native buffered key edges recover their chronological key state from the final held snapshot; modifier chords retain event-time meaning across batched polls. Immediate held input, FlightInput layout, original vessel/MFD priority and physics are unchanged."
     },
     "Src/Orbiter/Production/NativeBuild.h.in": {
@@ -831,7 +831,7 @@
     },
     "Src/Orbiter/Production/NativeVesselModule.cpp": {
       "original_sha256_lf": null,
-      "sha256_lf": "c817b77f183779768df245c58fcf9367d5e7f2e622892e9cb40e5de3c8a6eb6b"
+      "sha256_lf": "cbbf40e2fcb0ee16174370d9d262eaab9e1c76b9c6c120e19264c2961674faea"
     },
     "Src/Orbiter/Production/NativeVesselModule.h": {
       "original_sha256_lf": null,
@@ -847,7 +847,7 @@
     },
     "Src/Orbiter/Production/NativeWorldVesselServices.cpp": {
       "original_sha256_lf": null,
-      "sha256_lf": "fd058adebe23341185b3fcdbd59ab1ece1a706ce466b4bea2feb077ded6af24b"
+      "sha256_lf": "f744d26167207a3edc12e8682d82a163f1e1a47918ee00803ccb847ba2e333b5"
     },
     "Src/Orbiter/Production/NativeWorldVesselServices.h": {
       "original_sha256_lf": null,
@@ -1199,7 +1199,7 @@
       "original_sha256_lf": "9e34db9a70552f94f3966dbb14d57b3833e5f8f69246d5454c71161e93664e13"
     },
     "Src/Orbiter/Vessel.h": {
-      "sha256_lf": "b2efffd2bfcd2ee1d42c76c4ac15ebd4ba8477883dac0e063305cf2cf442b272",
+      "sha256_lf": "732b0be62ed311d4971dba17417fd09b950b15b8c8e47074aaa355c193c8c8db",
       "original_sha256_lf": "1d9a42f97d282bbe03fc9b176cefb81d45d36dd990bae8944925502e483e10dd"
     },
     "Src/Orbiter/VesselApplication.cpp": {

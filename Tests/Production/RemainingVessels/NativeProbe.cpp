@@ -52,7 +52,9 @@ void orbiter::production::Session::UpdateWorld(SessionServices& services,const T
     static auto original=reinterpret_cast<decltype(&Session::UpdateWorld)>(dlsym(RTLD_NEXT,
         "_ZN7orbiter10production7Session11UpdateWorldERNS0_15SessionServicesERK8TimeDataRKbS8_RbS8_"));
     stock_vessels::require(original!=nullptr,"Original remaining-stock UpdateWorld missing");
+#ifndef ORBITER_NATIVE_FAST_CAPABILITY_DIAGNOSTIC
     std::this_thread::sleep_for(std::chrono::milliseconds(120));
+#endif
     if(!initialized) {
 #ifdef ORBITER_NATIVE_INSTRUMENT_CONTROL
         native_instrument_target::run();

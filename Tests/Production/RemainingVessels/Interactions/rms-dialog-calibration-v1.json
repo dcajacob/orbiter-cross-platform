@@ -1,0 +1,74 @@
+{
+  "schema": 1,
+  "protocol": "remaining-stock-original-input-interactions-v1",
+  "flows": [
+    {
+      "id": "rms-dialog-calibration",
+      "case": "remaining_stock_026",
+      "families": [],
+      "frames": 160,
+      "fixed_step": 0.25,
+      "replay": [
+        {
+          "tick": 10,
+          "phase": "before",
+          "action": "key",
+          "value": "29"
+        },
+        {
+          "tick": 10,
+          "phase": "before",
+          "action": "key",
+          "value": "57"
+        },
+        {
+          "tick": 11,
+          "phase": "before",
+          "action": "key",
+          "value": "-57"
+        },
+        {
+          "tick": 11,
+          "phase": "before",
+          "action": "key",
+          "value": "-29"
+        },
+        {
+          "tick": 25,
+          "phase": "before",
+          "action": "ui",
+          "value": "move 115 143 -"
+        },
+        {
+          "tick": 27,
+          "phase": "before",
+          "action": "ui",
+          "value": "left_down 115 143 -"
+        },
+        {
+          "tick": 29,
+          "phase": "before",
+          "action": "ui",
+          "value": "left_up 115 143 -"
+        }
+      ],
+      "gui_evidence": true,
+      "checks": [
+        {
+          "left": {
+            "trace": "flight-state.csv",
+            "where": {
+              "tick": 160,
+              "object": "STS-101"
+            },
+            "field": "attached"
+          },
+          "op": "ne",
+          "right": ""
+        }
+      ]
+    }
+  ],
+  "scope": "Dialog-coordinate calibration only, no family interaction acceptance credit.",
+  "phase6_complete": false
+}

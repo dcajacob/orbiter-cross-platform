@@ -40,5 +40,6 @@ The compressed archive is 108,275,374 bytes. Raw evidence remains local.
 This establishes current initialization/smoke coverage. Missing or invalid dates
 retain the harness's declared controlled epoch; wall-clock Today behavior is not
 qualified. Complete Windows/native numerical, image and mission comparisons,
-remaining-module admission, current Windows attachment lifetime, physical
-controller and final hardware/performance gates remain open. Phase 6 is incomplete.
+remaining-module admission, physical controller and final hardware/performance
+gates remain open. The separate [current Windows attachment lifetime checkpoint](WindowsAttachmentLifetime.md)
+now passes eighty worlds in all four profiles. Phase 6 is incomplete.

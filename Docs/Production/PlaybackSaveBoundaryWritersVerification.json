@@ -1,0 +1,406 @@
+{
+  "status": "passed-four-profile-stock-writer-boundary-only",
+  "runtime_source": "744b072961921237395d0614df769069d841a464",
+  "scenario": "Scenarios/2024 Edition/Space Shuttle to ISS.scn",
+  "actual_processes": 8,
+  "actual_presentations": 7680,
+  "profiles": {
+    "Debug-automatic": {
+      "output": "/home/dan/.codex/worktrees/phase6-mfd-world-cache/orbiter-cross-platform/out/phase6-boundary-scene003-Debug-automatic-stock-writer-v1",
+      "processes": 2,
+      "presentations": 1920,
+      "comparisons": {
+        "1": {
+          "state": {
+            "position_m": 0.0,
+            "velocity_m_s": 0.0,
+            "rotation_rad": 0.0,
+            "angular_velocity_rad_s": 0.0,
+            "mjd_days": 0.0,
+            "mass_fraction_of_budget": 0.0,
+            "fuel_fraction_of_budget": 0.0
+          },
+          "camera": {
+            "position_m": 0.0,
+            "rotation_rad": 0.0,
+            "byte_identical": true
+          },
+          "ssim": 1.0,
+          "complete_saved_content_identical": true,
+          "actual_clocks_identical_lf": true,
+          "detail_calibration_only": {
+            "stock-vessel-propellants.csv:mass": 0,
+            "stock-vessel-propellants.csv:max_mass": 0,
+            "stock-vessel-propellants.csv:efficiency": 0,
+            "stock-vessel-thrusters.csv:x": 0,
+            "stock-vessel-thrusters.csv:y": 0,
+            "stock-vessel-thrusters.csv:z": 0,
+            "stock-vessel-thrusters.csv:dx": 0,
+            "stock-vessel-thrusters.csv:dy": 0,
+            "stock-vessel-thrusters.csv:dz": 0,
+            "stock-vessel-thrusters.csv:max_thrust": 0,
+            "stock-vessel-thrusters.csv:isp0": 0,
+            "stock-vessel-thrusters.csv:level": 0,
+            "stock-vessel-attachments.csv:x": 0,
+            "stock-vessel-attachments.csv:y": 0,
+            "stock-vessel-attachments.csv:z": 0,
+            "stock-vessel-attachments.csv:dx": 0,
+            "stock-vessel-attachments.csv:dy": 0,
+            "stock-vessel-attachments.csv:dz": 0,
+            "stock-vessel-attachments.csv:rx": 0,
+            "stock-vessel-attachments.csv:ry": 0,
+            "stock-vessel-attachments.csv:rz": 0,
+            "stock-vessel-meshes.csv:x": 0,
+            "stock-vessel-meshes.csv:y": 0,
+            "stock-vessel-meshes.csv:z": 0
+          }
+        },
+        "2": {
+          "state": {
+            "position_m": 0.0,
+            "velocity_m_s": 0.0,
+            "rotation_rad": 0.0,
+            "angular_velocity_rad_s": 0.0,
+            "mjd_days": 0.0,
+            "mass_fraction_of_budget": 0.0,
+            "fuel_fraction_of_budget": 0.0
+          },
+          "camera": {
+            "position_m": 0.0,
+            "rotation_rad": 0.0,
+            "byte_identical": true
+          },
+          "ssim": 1.0,
+          "complete_saved_content_identical": true,
+          "actual_clocks_identical_lf": true,
+          "detail_calibration_only": {
+            "stock-vessel-propellants.csv:mass": 0,
+            "stock-vessel-propellants.csv:max_mass": 0,
+            "stock-vessel-propellants.csv:efficiency": 0,
+            "stock-vessel-thrusters.csv:x": 0,
+            "stock-vessel-thrusters.csv:y": 0,
+            "stock-vessel-thrusters.csv:z": 0,
+            "stock-vessel-thrusters.csv:dx": 0,
+            "stock-vessel-thrusters.csv:dy": 0,
+            "stock-vessel-thrusters.csv:dz": 0,
+            "stock-vessel-thrusters.csv:max_thrust": 0,
+            "stock-vessel-thrusters.csv:isp0": 0,
+            "stock-vessel-thrusters.csv:level": 0,
+            "stock-vessel-attachments.csv:x": 0,
+            "stock-vessel-attachments.csv:y": 0,
+            "stock-vessel-attachments.csv:z": 0,
+            "stock-vessel-attachments.csv:dx": 0,
+            "stock-vessel-attachments.csv:dy": 0,
+            "stock-vessel-attachments.csv:dz": 0,
+            "stock-vessel-attachments.csv:rx": 0,
+            "stock-vessel-attachments.csv:ry": 0,
+            "stock-vessel-attachments.csv:rz": 0,
+            "stock-vessel-meshes.csv:x": 0,
+            "stock-vessel-meshes.csv:y": 0,
+            "stock-vessel-meshes.csv:z": 0
+          }
+        }
+      }
+    },
+    "Debug-sse2": {
+      "output": "/home/dan/.codex/worktrees/phase6-mfd-world-cache/orbiter-cross-platform/out/phase6-boundary-scene003-Debug-sse2-stock-writer-v1",
+      "processes": 2,
+      "presentations": 1920,
+      "comparisons": {
+        "1": {
+          "state": {
+            "position_m": 0.0,
+            "velocity_m_s": 0.0,
+            "rotation_rad": 0.0,
+            "angular_velocity_rad_s": 0.0,
+            "mjd_days": 0.0,
+            "mass_fraction_of_budget": 0.0,
+            "fuel_fraction_of_budget": 0.0
+          },
+          "camera": {
+            "position_m": 0.0,
+            "rotation_rad": 0.0,
+            "byte_identical": true
+          },
+          "ssim": 1.0,
+          "complete_saved_content_identical": true,
+          "actual_clocks_identical_lf": true,
+          "detail_calibration_only": {
+            "stock-vessel-propellants.csv:mass": 0,
+            "stock-vessel-propellants.csv:max_mass": 0,
+            "stock-vessel-propellants.csv:efficiency": 0,
+            "stock-vessel-thrusters.csv:x": 0,
+            "stock-vessel-thrusters.csv:y": 0,
+            "stock-vessel-thrusters.csv:z": 0,
+            "stock-vessel-thrusters.csv:dx": 0,
+            "stock-vessel-thrusters.csv:dy": 0,
+            "stock-vessel-thrusters.csv:dz": 0,
+            "stock-vessel-thrusters.csv:max_thrust": 0,
+            "stock-vessel-thrusters.csv:isp0": 0,
+            "stock-vessel-thrusters.csv:level": 0,
+            "stock-vessel-attachments.csv:x": 0,
+            "stock-vessel-attachments.csv:y": 0,
+            "stock-vessel-attachments.csv:z": 0,
+            "stock-vessel-attachments.csv:dx": 0,
+            "stock-vessel-attachments.csv:dy": 0,
+            "stock-vessel-attachments.csv:dz": 0,
+            "stock-vessel-attachments.csv:rx": 0,
+            "stock-vessel-attachments.csv:ry": 0,
+            "stock-vessel-attachments.csv:rz": 0,
+            "stock-vessel-meshes.csv:x": 0,
+            "stock-vessel-meshes.csv:y": 0,
+            "stock-vessel-meshes.csv:z": 0
+          }
+        },
+        "2": {
+          "state": {
+            "position_m": 0.0,
+            "velocity_m_s": 0.0,
+            "rotation_rad": 0.0,
+            "angular_velocity_rad_s": 0.0,
+            "mjd_days": 0.0,
+            "mass_fraction_of_budget": 0.0,
+            "fuel_fraction_of_budget": 0.0
+          },
+          "camera": {
+            "position_m": 0.0,
+            "rotation_rad": 0.0,
+            "byte_identical": true
+          },
+          "ssim": 1.0,
+          "complete_saved_content_identical": true,
+          "actual_clocks_identical_lf": true,
+          "detail_calibration_only": {
+            "stock-vessel-propellants.csv:mass": 0,
+            "stock-vessel-propellants.csv:max_mass": 0,
+            "stock-vessel-propellants.csv:efficiency": 0,
+            "stock-vessel-thrusters.csv:x": 0,
+            "stock-vessel-thrusters.csv:y": 0,
+            "stock-vessel-thrusters.csv:z": 0,
+            "stock-vessel-thrusters.csv:dx": 0,
+            "stock-vessel-thrusters.csv:dy": 0,
+            "stock-vessel-thrusters.csv:dz": 0,
+            "stock-vessel-thrusters.csv:max_thrust": 0,
+            "stock-vessel-thrusters.csv:isp0": 0,
+            "stock-vessel-thrusters.csv:level": 0,
+            "stock-vessel-attachments.csv:x": 0,
+            "stock-vessel-attachments.csv:y": 0,
+            "stock-vessel-attachments.csv:z": 0,
+            "stock-vessel-attachments.csv:dx": 0,
+            "stock-vessel-attachments.csv:dy": 0,
+            "stock-vessel-attachments.csv:dz": 0,
+            "stock-vessel-attachments.csv:rx": 0,
+            "stock-vessel-attachments.csv:ry": 0,
+            "stock-vessel-attachments.csv:rz": 0,
+            "stock-vessel-meshes.csv:x": 0,
+            "stock-vessel-meshes.csv:y": 0,
+            "stock-vessel-meshes.csv:z": 0
+          }
+        }
+      }
+    },
+    "Release-automatic": {
+      "output": "/home/dan/.codex/worktrees/phase6-mfd-world-cache/orbiter-cross-platform/out/phase6-boundary-scene003-Release-automatic-stock-writer-v2",
+      "processes": 2,
+      "presentations": 1920,
+      "comparisons": {
+        "1": {
+          "state": {
+            "position_m": 0.0,
+            "velocity_m_s": 0.0,
+            "rotation_rad": 0.0,
+            "angular_velocity_rad_s": 0.0,
+            "mjd_days": 0.0,
+            "mass_fraction_of_budget": 0.0,
+            "fuel_fraction_of_budget": 0.0
+          },
+          "camera": {
+            "position_m": 0.0,
+            "rotation_rad": 0.0,
+            "byte_identical": true
+          },
+          "ssim": 1.0,
+          "complete_saved_content_identical": true,
+          "actual_clocks_identical_lf": true,
+          "detail_calibration_only": {
+            "stock-vessel-propellants.csv:mass": 0,
+            "stock-vessel-propellants.csv:max_mass": 0,
+            "stock-vessel-propellants.csv:efficiency": 0,
+            "stock-vessel-thrusters.csv:x": 0,
+            "stock-vessel-thrusters.csv:y": 0,
+            "stock-vessel-thrusters.csv:z": 0,
+            "stock-vessel-thrusters.csv:dx": 0,
+            "stock-vessel-thrusters.csv:dy": 0,
+            "stock-vessel-thrusters.csv:dz": 0,
+            "stock-vessel-thrusters.csv:max_thrust": 0,
+            "stock-vessel-thrusters.csv:isp0": 0,
+            "stock-vessel-thrusters.csv:level": 0,
+            "stock-vessel-attachments.csv:x": 0,
+            "stock-vessel-attachments.csv:y": 0,
+            "stock-vessel-attachments.csv:z": 0,
+            "stock-vessel-attachments.csv:dx": 0,
+            "stock-vessel-attachments.csv:dy": 0,
+            "stock-vessel-attachments.csv:dz": 0,
+            "stock-vessel-attachments.csv:rx": 0,
+            "stock-vessel-attachments.csv:ry": 0,
+            "stock-vessel-attachments.csv:rz": 0,
+            "stock-vessel-meshes.csv:x": 0,
+            "stock-vessel-meshes.csv:y": 0,
+            "stock-vessel-meshes.csv:z": 0
+          }
+        },
+        "2": {
+          "state": {
+            "position_m": 0.0,
+            "velocity_m_s": 0.0,
+            "rotation_rad": 0.0,
+            "angular_velocity_rad_s": 0.0,
+            "mjd_days": 0.0,
+            "mass_fraction_of_budget": 0.0,
+            "fuel_fraction_of_budget": 0.0
+          },
+          "camera": {
+            "position_m": 0.0,
+            "rotation_rad": 0.0,
+            "byte_identical": true
+          },
+          "ssim": 1.0,
+          "complete_saved_content_identical": true,
+          "actual_clocks_identical_lf": true,
+          "detail_calibration_only": {
+            "stock-vessel-propellants.csv:mass": 0,
+            "stock-vessel-propellants.csv:max_mass": 0,
+            "stock-vessel-propellants.csv:efficiency": 0,
+            "stock-vessel-thrusters.csv:x": 0,
+            "stock-vessel-thrusters.csv:y": 0,
+            "stock-vessel-thrusters.csv:z": 0,
+            "stock-vessel-thrusters.csv:dx": 0,
+            "stock-vessel-thrusters.csv:dy": 0,
+            "stock-vessel-thrusters.csv:dz": 0,
+            "stock-vessel-thrusters.csv:max_thrust": 0,
+            "stock-vessel-thrusters.csv:isp0": 0,
+            "stock-vessel-thrusters.csv:level": 0,
+            "stock-vessel-attachments.csv:x": 0,
+            "stock-vessel-attachments.csv:y": 0,
+            "stock-vessel-attachments.csv:z": 0,
+            "stock-vessel-attachments.csv:dx": 0,
+            "stock-vessel-attachments.csv:dy": 0,
+            "stock-vessel-attachments.csv:dz": 0,
+            "stock-vessel-attachments.csv:rx": 0,
+            "stock-vessel-attachments.csv:ry": 0,
+            "stock-vessel-attachments.csv:rz": 0,
+            "stock-vessel-meshes.csv:x": 0,
+            "stock-vessel-meshes.csv:y": 0,
+            "stock-vessel-meshes.csv:z": 0
+          }
+        }
+      }
+    },
+    "Release-sse2": {
+      "output": "/home/dan/.codex/worktrees/phase6-mfd-world-cache/orbiter-cross-platform/out/phase6-boundary-scene003-Release-sse2-stock-writer-v2",
+      "processes": 2,
+      "presentations": 1920,
+      "comparisons": {
+        "1": {
+          "state": {
+            "position_m": 0.0,
+            "velocity_m_s": 0.0,
+            "rotation_rad": 0.0,
+            "angular_velocity_rad_s": 0.0,
+            "mjd_days": 0.0,
+            "mass_fraction_of_budget": 0.0,
+            "fuel_fraction_of_budget": 0.0
+          },
+          "camera": {
+            "position_m": 0.0,
+            "rotation_rad": 0.0,
+            "byte_identical": true
+          },
+          "ssim": 1.0,
+          "complete_saved_content_identical": true,
+          "actual_clocks_identical_lf": true,
+          "detail_calibration_only": {
+            "stock-vessel-propellants.csv:mass": 0,
+            "stock-vessel-propellants.csv:max_mass": 0,
+            "stock-vessel-propellants.csv:efficiency": 0,
+            "stock-vessel-thrusters.csv:x": 0,
+            "stock-vessel-thrusters.csv:y": 0,
+            "stock-vessel-thrusters.csv:z": 0,
+            "stock-vessel-thrusters.csv:dx": 0,
+            "stock-vessel-thrusters.csv:dy": 0,
+            "stock-vessel-thrusters.csv:dz": 0,
+            "stock-vessel-thrusters.csv:max_thrust": 0,
+            "stock-vessel-thrusters.csv:isp0": 0,
+            "stock-vessel-thrusters.csv:level": 0,
+            "stock-vessel-attachments.csv:x": 0,
+            "stock-vessel-attachments.csv:y": 0,
+            "stock-vessel-attachments.csv:z": 0,
+            "stock-vessel-attachments.csv:dx": 0,
+            "stock-vessel-attachments.csv:dy": 0,
+            "stock-vessel-attachments.csv:dz": 0,
+            "stock-vessel-attachments.csv:rx": 0,
+            "stock-vessel-attachments.csv:ry": 0,
+            "stock-vessel-attachments.csv:rz": 0,
+            "stock-vessel-meshes.csv:x": 0,
+            "stock-vessel-meshes.csv:y": 0,
+            "stock-vessel-meshes.csv:z": 0
+          }
+        },
+        "2": {
+          "state": {
+            "position_m": 0.0,
+            "velocity_m_s": 0.0,
+            "rotation_rad": 0.0,
+            "angular_velocity_rad_s": 0.0,
+            "mjd_days": 0.0,
+            "mass_fraction_of_budget": 0.0,
+            "fuel_fraction_of_budget": 0.0
+          },
+          "camera": {
+            "position_m": 0.0,
+            "rotation_rad": 0.0,
+            "byte_identical": true
+          },
+          "ssim": 1.0,
+          "complete_saved_content_identical": true,
+          "actual_clocks_identical_lf": true,
+          "detail_calibration_only": {
+            "stock-vessel-propellants.csv:mass": 0,
+            "stock-vessel-propellants.csv:max_mass": 0,
+            "stock-vessel-propellants.csv:efficiency": 0,
+            "stock-vessel-thrusters.csv:x": 0,
+            "stock-vessel-thrusters.csv:y": 0,
+            "stock-vessel-thrusters.csv:z": 0,
+            "stock-vessel-thrusters.csv:dx": 0,
+            "stock-vessel-thrusters.csv:dy": 0,
+            "stock-vessel-thrusters.csv:dz": 0,
+            "stock-vessel-thrusters.csv:max_thrust": 0,
+            "stock-vessel-thrusters.csv:isp0": 0,
+            "stock-vessel-thrusters.csv:level": 0,
+            "stock-vessel-attachments.csv:x": 0,
+            "stock-vessel-attachments.csv:y": 0,
+            "stock-vessel-attachments.csv:z": 0,
+            "stock-vessel-attachments.csv:dx": 0,
+            "stock-vessel-attachments.csv:dy": 0,
+            "stock-vessel-attachments.csv:dz": 0,
+            "stock-vessel-attachments.csv:rx": 0,
+            "stock-vessel-attachments.csv:ry": 0,
+            "stock-vessel-attachments.csv:rz": 0,
+            "stock-vessel-meshes.csv:x": 0,
+            "stock-vessel-meshes.csv:y": 0,
+            "stock-vessel-meshes.csv:z": 0
+          }
+        }
+      }
+    }
+  },
+  "source_and_runtime_independently_audited": true,
+  "coordinator_raw_status": {
+    "path": "/home/dan/.codex/worktrees/phase6-mfd-world-cache/orbiter-cross-platform/out/phase6-boundary-scene003-coordinator-v3/status.json",
+    "sha256": "a429ba432e3a3d354cd5e729274589d33c50cb89ad6ee76212a7cbe792c2db44",
+    "status": "stopped-after-qualification-failure"
+  },
+  "exact_save_reload_qualification": "failed-Debug-automatic-physical-state-budget; interrupted remaining campaign retained",
+  "native_admission_qualified": false,
+  "phase6_complete": false
+}

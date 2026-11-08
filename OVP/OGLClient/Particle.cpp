@@ -13,6 +13,7 @@
 
 #include "glad.h"
 #include "Particle.h"
+#include "RendererRandom.h"
 #include "Scene.h"
 //#include "Camera.h"
 #include "Texture.h"
@@ -99,7 +100,7 @@ void OGLParticleStream::GlobalInit ()
 		idx[j++] = ofs+2;
 		idx[j++] = ofs;
 		idx[j++] = ofs+3;
-		r = rand() & 7;
+		r = renderer_random::Next() & 7;
 		for (k = 0; k < 4; k++) {
 			evtx[ofs+k].tu = dvtx[ofs+k].tu = tu[r*4+k];
 			evtx[ofs+k].tv = dvtx[ofs+k].tv = tv[r*4+k];
@@ -255,7 +256,7 @@ void OGLParticleStream::SetSpecs (PARTICLESTREAMSPEC *pss)
 
 void OGLParticleStream::SetParticleHalflife (double pht)
 {
-	exp_rate = RAND_MAX/pht;
+	exp_rate = renderer_random::Maximum/pht;
 	stride = std::max (1, std::min (20,(int)pht));
 	ipht2 = 0.5/pht;
 }
@@ -319,7 +320,7 @@ ParticleSpec *OGLParticleStream::CreateParticle (const VECTOR3 &pos, const VECTO
 	p->size = size;
 	p->alpha0 = alpha;
 	p->t0 = oapiGetSimTime();
-	p->texidx = (rand() & 7) * 4;
+	p->texidx = (renderer_random::Next() & 7) * 4;
 	p->flag = 0;
 	p->next = NULL;
 	p->prev = plast;
@@ -350,7 +351,7 @@ void OGLParticleStream::Update ()
 	double dt = oapiGetSimStep();
 
 	for (p = pfirst; p;) {
-		if (dt * exp_rate > rand()) {
+		if (dt * exp_rate > renderer_random::Next()) {
 			tmp = p;
 			p = p->next;
 			DeleteParticle (tmp);
@@ -735,17 +736,17 @@ void ExhaustStream::Update ()
 					p->pos += dp;
 
 					static double dv_scale = length(vv)*0.2;
-					VECTOR3 dv = {((double)rand()/(double)RAND_MAX-0.5)*dv_scale,
-								  ((double)rand()/(double)RAND_MAX-0.5)*dv_scale,
-								  ((double)rand()/(double)RAND_MAX-0.5)*dv_scale};
+					VECTOR3 dv = {((double)renderer_random::Next()/(double)renderer_random::Maximum-0.5)*dv_scale,
+								  ((double)renderer_random::Next()/(double)renderer_random::Maximum-0.5)*dv_scale,
+								  ((double)renderer_random::Next()/(double)renderer_random::Maximum-0.5)*dv_scale};
 					dv += vv;
 
 					normalise(s);
 					VECTOR3 vv2 = dv - s*dotp(s,dv);
 					if (length(vv2)) vv2 *= 0.5*length(vv)/length(vv2);
-					vv2 += s*(((double)rand()/(double)RAND_MAX)*dv_scale);
+					vv2 += s*(((double)renderer_random::Next()/(double)renderer_random::Maximum)*dv_scale);
 					p->vel = vv2*1.0/*2.0*/+av;
-					double r = (double)rand()/(double)RAND_MAX;
+					double r = (double)renderer_random::Next()/(double)renderer_random::Maximum;
 					p->pos += (vv2-vv) * dt * r;
 					//p->size *= (1.0+r);
 				}
@@ -765,9 +766,9 @@ void ExhaustStream::Update ()
 				// create new particle
 				double dt = simt-t0-interval;
 				double dv_scale = speed*vrand; // exhaust velocity randomisation
-				VECTOR3 dv = {((double)rand()/(double)RAND_MAX-0.5)*dv_scale,
-						      ((double)rand()/(double)RAND_MAX-0.5)*dv_scale,
-							  ((double)rand()/(double)RAND_MAX-0.5)*dv_scale};
+				VECTOR3 dv = {((double)renderer_random::Next()/(double)renderer_random::Maximum-0.5)*dv_scale,
+						      ((double)renderer_random::Next()/(double)renderer_random::Maximum-0.5)*dv_scale,
+							  ((double)renderer_random::Next()/(double)renderer_random::Maximum-0.5)*dv_scale};
 				ParticleSpec *p = CreateParticle (mul (vR, *pos) + vp + (vr+dv)*dt,
 					vv + vr+dv, size0, alpha0);
 				p->size += alpha * dt;
@@ -788,7 +789,7 @@ void ExhaustStream::Update ()
 				} else {
 					interval = 1.0/pdensity;
 				}
-				interval *= (double)rand()/(double)RAND_MAX + 0.5;
+				interval *= (double)renderer_random::Next()/(double)renderer_random::Maximum + 0.5;
 				interval*=0.2;
 			}
 		}
@@ -954,15 +955,15 @@ void ReentryStream::Update ()
 				double dt = simt-t0-interval;
 				double ebt = exp(-beta*dt);
 				double dv_scale = vessel->GetAirspeed()*vrand; // exhaust velocity randomisation
-				VECTOR3 dv = {((double)rand()/(double)RAND_MAX-0.5)*dv_scale,
-						      ((double)rand()/(double)RAND_MAX-0.5)*dv_scale,
-							  ((double)rand()/(double)RAND_MAX-0.5)*dv_scale};
+				VECTOR3 dv = {((double)renderer_random::Next()/(double)renderer_random::Maximum-0.5)*dv_scale,
+						      ((double)renderer_random::Next()/(double)renderer_random::Maximum-0.5)*dv_scale,
+							  ((double)renderer_random::Next()/(double)renderer_random::Maximum-0.5)*dv_scale};
 				VECTOR3 dx = (vv-av) * (1.0-ebt)/beta + av*dt;
 				CreateParticle (vp + dx - vv*dt, (vv+dv-av)*ebt + av, size0, alpha0);
 				// determine next interval
 				t0 += interval;
 				interval = std::max (0.015, size0 / (pdensity * (0.1*vessel->GetAirspeed() + size0)));
-				interval *= (double)rand()/(double)RAND_MAX + 0.5;
+				interval *= (double)renderer_random::Next()/(double)renderer_random::Maximum + 0.5;
 			}
 		}
 	} else t0 = simt;

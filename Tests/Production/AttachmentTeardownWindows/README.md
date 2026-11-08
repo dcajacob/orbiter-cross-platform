@@ -31,3 +31,10 @@ complete Windows lifetime qualification. The [MFD cache regression](../MfdWorldC
 records the resulting repair and its remaining runtime checks. Raw evidence and
 the exact launch/private-desktop chain remain local. Class admission and Phase 6
 completion remain separate.
+
+Fresh source-bound `bdfd067f` Windows builds now pass twenty worlds in every
+profile: eighty worlds, 76 real launchpad restarts, 4,800 presents and eighty
+normal renderer/context deletions. The [completed independent audit](../../../Docs/Production/WindowsAttachmentLifetime.md)
+checks all 14,400 finite paused vessel rows and the full new launch chain.
+The prior failed capture remains failed. These results close this Windows
+paused-lifetime checkpoint; full mission and Phase 6 acceptance remain separate.

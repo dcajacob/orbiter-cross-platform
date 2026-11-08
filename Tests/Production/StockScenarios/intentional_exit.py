@@ -51,25 +51,26 @@ def audit_reference(reference,output):
                 producer_commit=pins['producer_commit'])
 
 
-def build_identity(executable,modules,record_path,source_commit):
+def build_identity(executable,modules,record_path,source_commit,owner=None):
+    owner=Path(owner).resolve() if owner is not None else ROOT
     require(re.fullmatch('[0-9a-f]{40}',source_commit),'Runtime source must be an immutable full commit')
     record=json.loads(record_path.read_text())
     require(record['status']=='built','Stock runtime build is incomplete')
     owning=record.get('source_sha256_lf',record.get('source_sha256'))
-    ledger=json.loads((ROOT/'Tests/Production/phase3-extraction.lock.json').read_text())['files']
+    ledger=json.loads((owner/'Tests/Production/phase3-extraction.lock.json').read_text())['files']
     require(owning and set(owning)==set(ledger),'Stock runtime owning-source ledger incomplete')
     for name,expected in owning.items():
-        body=subprocess.check_output(['git','-C',str(ROOT),'show',source_commit+':'+name])
+        body=subprocess.check_output(['git','-C',str(owner),'show',source_commit+':'+name])
         require(hashlib.sha256(body.replace(b'\r\n',b'\n')).hexdigest()==expected,
                 'Built stock input differs from immutable source: '+name)
-        require(sha_lf(ROOT/name)==expected,'Current owning source differs from the selected stock runtime: '+name)
+        require(sha_lf(owner/name)==expected,'Current owning source differs from the selected stock runtime: '+name)
     for name,expected in record['runtime_files_sha256'].items():
-        require(digest(ROOT/name)==expected,'Retained stock runtime file changed: '+name)
-    require(record['runtime_files_sha256'][executable.relative_to(ROOT).as_posix()]==digest(executable) and
-            record['runtime_files_sha256'][(modules/'Graphics/OGLClient.so').relative_to(ROOT).as_posix()]==
+        require(digest(owner/name)==expected,'Retained stock runtime file changed: '+name)
+    require(record['runtime_files_sha256'][executable.relative_to(owner).as_posix()]==digest(executable) and
+            record['runtime_files_sha256'][(modules/'Graphics/OGLClient.so').relative_to(owner).as_posix()]==
             digest(modules/'Graphics/OGLClient.so'),'Selected stock application or renderer differs from its build')
     cache_path=executable.parent/'CMakeCache.txt'
-    require(record['runtime_files_sha256'][cache_path.relative_to(ROOT).as_posix()]==digest(cache_path),
+    require(record['runtime_files_sha256'][cache_path.relative_to(owner).as_posix()]==digest(cache_path),
             'Stock runtime cache identity differs')
     cache=dict(line.split('=',1) for line in cache_path.read_text().splitlines()
                if '=' in line and not line.startswith(('#','//')))

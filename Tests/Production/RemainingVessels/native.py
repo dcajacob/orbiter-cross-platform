@@ -62,15 +62,20 @@ def inspect_inputs(out,case,config):
 shared.inspect_inputs=inspect_inputs
 
 
-def inspect(out,case,config,identity,build,probe,libraries,gtk_plugin,instrument_control=False):
+def inspect(out,case,config,identity,build,probe,libraries,gtk_plugin,instrument_control=False,runtime_role='diagnostic'):
+    require(runtime_role in ('diagnostic','normal'),'Explicit native runtime role required')
     require(json.loads((out/'process-result.json').read_text())['returncode']==0,'Native process did not return zero')
     require((out/'stock-vessel-complete.txt').read_text().strip()==str(config['frames']),'Native observation ended early')
     result=shared.inspect_trace(out,case,config)
     life=json.loads((out/'graphics-lifecycle.json').read_text())
     require(life==dict(rendered_frames=config['frames'],successful_presents=config['frames'],context_deleted=True),
             'Native actual presentations/context teardown incomplete')
-    marker=json.loads((out/'unqualified-remaining-stock-diagnostic.json').read_text())
-    require(marker['native_admission_qualified'] is False and marker['phase6_complete'] is False,'Diagnostic marker differs')
+    if runtime_role=='diagnostic':
+        marker=json.loads((out/'unqualified-remaining-stock-diagnostic.json').read_text())
+        require(marker['native_admission_qualified'] is False and marker['phase6_complete'] is False,'Diagnostic marker differs')
+    else:
+        require(not (out/'unqualified-remaining-stock-diagnostic.json').exists() and
+                not (out/'unqualified-atlantis-diagnostic.json').exists(),'Normal host emitted an unqualified-host marker')
     text=(out/'console.log').read_text(errors='replace')
     require(not any(value in text for value in ('Lua error:','LuaCall (','Orbiter native production:','Production teardown:',
         'runtime error:','ERROR: AddressSanitizer','ERROR: LeakSanitizer','AddressSanitizer:DEADLYSIGNAL',
@@ -92,7 +97,7 @@ def inspect(out,case,config,identity,build,probe,libraries,gtk_plugin,instrument
     require(len((out/'scene.rgba').read_bytes())==1280*720*4,'Native framebuffer incomplete')
     mapped=(out/'observer-loaded-maps.txt').read_text()
     required=[build/'liborbiter_production_boundary.so',build/'liborbiter_production_vessels.so',
-              build/'production_remaining_stock_diagnostic',probe,*libraries,gtk_plugin]
+              build/('orbiter-production' if runtime_role=='normal' else 'production_remaining_stock_diagnostic'),probe,*libraries,gtk_plugin]
     for kind in set(case['declared_vessels'].values()):
         module=config['classes'][kind]['module']
         if module:required.append(build/'NativeModules/Vessel'/(module+'.so'))
@@ -123,7 +128,51 @@ def main():
     p.add_argument('--instrument-control',action='store_true',help='Exercise real native compatibility contexts and surface uploads in the complete unchanged scene')
     p.add_argument('--jobs',type=int,default=1)
     p.add_argument('--protocol',choices=protocols.NAMES,default=protocols.V1)
-    a=p.parse_args();config=settings(a.protocol);require(not a.output.exists() and a.jobs>0,'Fresh diagnostic output and positive concurrency required')
+    p.add_argument('--owner',type=lambda v:Path(v).resolve(),default=ROOT,
+                   help='Immutable package owner for the separate repeated-lifetime diagnostic')
+    p.add_argument('--lifetime-sessions',type=int,choices=(20,),
+                   help='Run twenty bounded whole-world lifetimes; cannot satisfy stock parity')
+    p.add_argument('--capability-control',action='store_true',
+                   help='Compare short actual SDK capability snapshots and observer-off/on controls; diagnostic only')
+    p.add_argument('--rejection-control',action='store_true',
+                   help='Exercise actual loader and class-policy failures before presentation; diagnostic only')
+    p.add_argument('--runtime-role',choices=('diagnostic','normal'),default='diagnostic',
+                   help='Actual host for rejection controls; other modes retain their existing diagnostic scope')
+    p.add_argument('--interaction-plan',type=lambda v:Path(v).resolve(),
+                   help='Run an explicit original-input interaction plan; diagnostic only')
+    p.add_argument('--rejection-windows-dll',type=lambda v:Path(v).resolve(),
+                   help='Preserved original Windows HST DLL for the foreign-format rejection')
+    p.add_argument('--windows-reference',type=lambda v:Path(v).resolve(),
+                   help='Matching retained original-Windows stock capture for capability diagnostics')
+    p.add_argument('--windows-build',type=lambda v:Path(v).resolve())
+    p.add_argument('--preserved',type=lambda v:Path(v).resolve())
+    a=p.parse_args()
+    require(a.runtime_role=='diagnostic' or a.rejection_control,
+            'Normal host role is supported here only for the existing rejection controls')
+    if a.interaction_plan:
+        require(not a.capability_control and not a.lifetime_sessions and not a.rejection_control,
+                'Separate interaction scope required')
+        from interactions import capture
+        capture(a)
+        return
+    if a.rejection_control:
+        require(not a.capability_control and not a.lifetime_sessions and a.rejection_windows_dll,
+                'Separate rejection controls and preserved Windows DLL required')
+        from rejections import capture
+        capture(a)
+        return
+    if a.capability_control:
+        require(not a.lifetime_sessions and all((a.windows_reference,a.windows_build,a.preserved)),
+                'Separate capability control and its original-Windows references required')
+        from capabilities import capture
+        capture(a)
+        return
+    if a.lifetime_sessions:
+        from lifetimes import capture
+        capture(a)
+        return
+    require(a.owner==ROOT,'Separate package owner is supported only for lifetime diagnostics')
+    config=settings(a.protocol);require(not a.output.exists() and a.jobs>0,'Fresh diagnostic output and positive concurrency required')
     cases=[case for case in config['cases'] if not a.case or case['id'] in a.case]
     require(cases and (not a.case or {c['id'] for c in cases}==set(a.case)),'Unknown native complete-scene case')
     record=json.loads(a.build_record.read_text());require(record['status']=='built','Complete immutable build required')

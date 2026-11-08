@@ -149,7 +149,7 @@ set_tests_properties(Production.SessionBoundary Production.ResourceBoundary Prod
 
 # Compile the actual recorder Euler conversion with the unchanged production
 # quaternion methods; the codec regression needs no initialized world/window.
-set(_recorder_source "${CMAKE_CURRENT_SOURCE_DIR}/../../../Src/Orbiter/VesselRecorder.cpp")
+get_filename_component(_recorder_source "${CMAKE_CURRENT_SOURCE_DIR}/../../../Src/Orbiter/VesselRecorder.cpp" REALPATH)
 set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS "${_recorder_source}")
 file(READ "${_recorder_source}" _recorder_body)
 string(FIND "${_recorder_body}" "void Euler2Quaternion (double *a, Quaternion &q, int frm)\n{" _euler_start REVERSE)

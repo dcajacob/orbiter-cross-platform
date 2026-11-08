@@ -7,7 +7,7 @@ import shutil
 import stat
 import tempfile
 
-from capture_native import stage_asset_tree,stage_scenario_input,sha
+from capture_native import stage_asset_tree,stage_scenario_input,sha,PrivateAssetCache
 
 
 def rejected(action):
@@ -60,11 +60,25 @@ def main():
         assert all(stat.S_IMODE((staged/path.relative_to(assets)).stat().st_mode)==0o755 for path in source_directories)
         assert all(stat.S_IMODE(path.stat().st_mode)==0o555 for path in source_directories)
         assert all(sha(assets/name)==value for name,value in source_hashes.items())
+        cache_root=root/'cache-owner';cache_root.mkdir()
+        cache=PrivateAssetCache({str(assets/name):value for name,value in source_hashes.items()},cache_root)
+        controls=cache.controls(assets,'Orbiter.cfg')
+        for name in ('one','two'):
+            world=cache_root/name;stage_asset_tree(assets,world,cache)
+            stage_scenario_input(scenario,world/scenario.relative_to(assets),'stock-writer')
+            cfg=world/'Orbiter.cfg';cfg.unlink();cfg.write_bytes(b'Private test configuration\n')
+            stage_scenario_input(saved,world/'Scenarios/_Phase6Persistence/exact.scn','windows-save-reload')
+            assert (world/scenario.relative_to(assets)).read_bytes()==scenario.read_bytes()
+        one=cache_root/'one'/scenario.relative_to(assets);two=cache_root/'two'/scenario.relative_to(assets)
+        assert one.stat().st_ino==two.stat().st_ino and one.stat().st_ino!=scenario.stat().st_ino
+        assert not cache.fallback and all(sha(assets/name)==value for name,value in source_hashes.items())
+        cache.close()
         # TemporaryDirectory must be able to remove this deliberately read-only source tree.
         for path in source_directories:path.chmod(0o755)
     result=dict(status='passed',source_sha256=sha(Path(__file__)),read_only_stock_mode_and_bytes_preserved=True,
                 repeated_stock_staging_preserved=True,exact_derived_input_written=True,
                 read_only_asset_sources_and_scenario_preserved=True,private_directory_and_evidence_staging_passed=True,
+                private_cached_links_share_no_canonical_file_records=True,private_cached_controls=controls,
                 rejected_controls=['changed_stock_copy','missing_stock_copy','existing_derived_input',
                                    'dangling_derived_symlink','unknown_phase'])
     args.output.write_text(json.dumps(result,indent=2)+'\n')

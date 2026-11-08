@@ -1124,6 +1124,9 @@ public:
 	const BEACONLIGHTSPEC *GetBeacon (oapi::UInt32 idx) const;
 
 	inline VESSEL *GetModuleInterface () { return modIntf.v; }
+#ifndef _WIN32
+	const char* NativeModuleName() const noexcept;
+#endif
 	// Return module interface for vessel. Guaranteed to exist even if the
 	// vessle class isn't managed by a module
 

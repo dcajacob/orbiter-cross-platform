@@ -155,6 +155,7 @@ def previous_files():
         equal(expected,current,path);result[path]=old(path)
     path='Src/Orbiter/Vessel.h'
     s=raw(path).replace('#ifndef _WIN32\n\tstatic void ReleaseNativeInterface(VESSEL* interface);\n#endif\n','')
+    s=s.replace('#ifndef _WIN32\n\tconst char* NativeModuleName() const noexcept;\n#endif\n','')
     s=s.replace('public:\n\tvoid FRecorder_EndPlayback ();\n\t// terminates a running playback\nprivate:', '\tvoid FRecorder_EndPlayback ();\n\t// terminates a running playback')
     s=s.replace('public:\n\t// Session hosts activate the same recorder; sample buffers remain private.\n\tvoid FRecorder_Activate (bool active, const char *fname, bool append = false);\n\t// switch recorder on/off\nprivate:', '\tvoid FRecorder_Activate (bool active, const char *fname, bool append = false);\n\t// switch recorder on/off\n')
     equal(old(path),s,path);result[path]=old(path)

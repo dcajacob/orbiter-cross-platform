@@ -150,6 +150,8 @@ def compare_pair(win,native,reader,config):
 
 def main():
     p=argparse.ArgumentParser(description=__doc__)
+    p.add_argument('--frame-comparator',type=lambda v:Path(v).resolve(),
+                   help='Explicit locally verified bit-identical scalar SSIM kernel record')
     for name in ('native-owner','preserved-debug','preserved-release','mesa-runtime','archive-root','output'):
         p.add_argument('--'+name,type=lambda v:Path(v).resolve(),required=True)
     origin=p.add_mutually_exclusive_group(required=True)
@@ -161,12 +163,20 @@ def main():
     stock=profile_paths(a.native_stock);reload=profile_paths(a.native_reload);windows=profile_paths(a.windows)
     first=json.loads((stock['Debug-automatic']/'capture.json').read_text())
     reader=bind_owner(a.native_owner,first['producer_commit']);config=reader.native.settings(reader.protocols.V2)
+    comparator=None
+    if a.frame_comparator:
+        import sys
+        sys.path.insert(0,str(HERE.parent/'Closeout'))
+        from ssim_kernel import bind
+        function,comparator=bind(a.frame_comparator,sha(a.frame_comparator),reader.windows.image_ssim)
+        reader.windows.image_ssim=reader.native.shared.image_ssim=function
     def verifier_inputs():
         paths={Path(__file__).resolve(),HERE/'observations.py',HERE/'transport.py',HERE/'local_transport.py'}
         return dict(owning_readers=reader.original_audit.verifier_inputs(),
                     persistence_readers={str(p):sha(p) for p in sorted(paths)})
     readers=verifier_inputs()
     report=dict(status='failed',protocol=reader.protocol()['protocol'],profiles={},build_pairs={},reader_sha256=readers,
+        frame_comparator=comparator,
         native_admission_qualified=False,phase6_complete=False,
         scope='Complete all38/two-repeat/four-profile stock-writer and exact-Windows-save reload comparisons. This does not by itself admit classes or complete controls, in-process lifetime, hardware/performance, full157 or Phase6 acceptance.')
     try:

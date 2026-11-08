@@ -27,5 +27,9 @@ existing world boundary, removes them, and compares the complete original MFD
 implementation. The full 622-file extraction audit and focused regression pass.
 The original failed Windows capture remains local, archive SHA-256
 `aacabe229dcbd8b41f40f0e167e684fd12798bcbc74625afb13211339df34ac9`.
-A fresh source-bound Windows build and complete eighty-world run are required
-before this repair earns runtime qualification. Phase 6 remains incomplete.
+Fresh source-bound Windows builds at `bdfd067f` now pass the complete eighty-
+world normal-cleanup matrix, all four profiles and all 28 tests per build.
+The [independent lifetime verification](../../../Docs/Production/WindowsAttachmentLifetime.md)
+re-reads the full new receipt chain, every world/state/graphics record and the
+preserved source/runtime/Mesa closure. The original failed matrix remains
+retained. Native admission, full mission parity and Phase 6 remain incomplete.

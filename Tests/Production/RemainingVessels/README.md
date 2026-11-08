@@ -34,6 +34,53 @@ staged assets, celestial data, planet archives, private compositor tools,
 decoration plugin and library paths explicitly; `--help` lists the arguments.
 See [the attachment cleanup record](../../../Docs/Production/AttachmentTeardown.md).
 
+The same `native.py` entry point accepts `--lifetime-sessions 20 --owner PATH`
+for selected twenty-world ownership diagnostics on an immutable package in a
+separate checkout. Supply its usual build, build-record, assets, data, planet,
+compositor, pinned decoration/provider and output arguments, plus explicit
+`--case` IDs and at most four `--jobs`. This mode uses the complete original
+scenarios, sixty fixed-step frames per world, an empty original-dispatch replay,
+and actual module initialization, finalization and link-map destruction records.
+It preserves every world's state, camera and full frame, checks all original
+vessels, actual math mode, clean graphics and unsuppressed sanitizers, and records
+the simulator's owned PID/start/exit receipt. It does not qualify interactions,
+persistence, normal admission or stock parity. Independently re-read closed
+captures with `lifetimes.py --capture PATH/lifetimes.json --output FRESH.json`.
+`Lifetimes.Test.py` rejects incomplete ticks, substituted or lost vessels,
+nonfinite state, truncated frames, incomplete graphics and retained modules.
+
+`native.py --capability-control` uses the same immutable package/provider setup
+for short actual SDK snapshots. Declare the matching `--windows-reference`
+capture, `--windows-build` and `--preserved` original package. Each selected case
+runs with the passive observer off and on, preserving all original vessels.
+Actual fields and ports are compared with the hashed Windows observations;
+native state, camera, controls and complete frames must remain equivalent.
+The observer's existing getters and forwarding remain byte-conserved, with only
+an explicit diagnostic switch around its old wall-clock delay. Normal capture
+keeps that delay. Exact local docking comparisons and existing physical/image
+budgets remain in force. Re-read closed captures independently with
+`capabilities.py --capture PATH/capabilities.json --output FRESH.json`.
+Original generated vessels are derived from the hashed initial Windows
+population; every declared ship remains mandatory. A reader may reuse only
+explicitly named, fully completed cases from a failed capture, preserving its
+original status and failure map. The class auditor requires exact, nonduplicated
+combined coverage and all sixteen original structural signatures.
+These sixty-frame diagnostics earn capability/observer scope only. They do not
+qualify full stock parity, persistence, interactions or normal class admission.
+
+`native.py --rejection-control --owner PATH --rejection-windows-dll PATH` uses
+the same package, original selected scenes and pinned providers for actual
+negative loader/class controls. Select scenes covering all eleven families.
+Unknown class clones, foreign factories, missing declared modules and generic
+fallbacks must fail before presentation. Seven invalid bootstrap descriptors,
+a library without the query symbol and a preserved Windows DLL exercise the
+actual native loader. Every original vessel remains in each input; each process
+must return one, delete its graphics context and leave unsuppressed sanitizers
+clean. Invalid metadata must never call its initializer. Retain all failed
+attempts. Re-read completed evidence using `rejections.py --capture
+PATH/rejections.json --output FRESH.json`; these controls do not qualify positive
+interactions, persistence or normal class admission.
+
 The first fresh Debug ASan/UBSan package at
 `72c35b75c117c16a94b38925e90e7d1ca2812a08` builds all three actual modules and
 both diagnostic hosts. Its record is

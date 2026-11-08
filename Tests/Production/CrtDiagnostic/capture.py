@@ -44,6 +44,15 @@ def corpus():
     return list(dict.fromkeys(map(bits, values)))
 
 
+def input_values(path=None):
+    inputs = corpus() if path is None else path.read_text(encoding='ascii').splitlines()
+    require(inputs and len(inputs) == len(set(inputs)) and all(
+        len(value) == 16 and all(c in '0123456789abcdef' for c in value) and
+        math.isfinite(number(value)) and abs(number(value)) <= 1 for value in inputs),
+        'Unique finite binary64 arcsine corpus required')
+    return inputs
+
+
 def parse(raw, inputs, profile, configuration, external):
     first, rows = raw.split('\n', 1)
     metadata = json.loads(first)
@@ -88,12 +97,13 @@ def save(path, value):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--output', type=Path, required=True)
+    parser.add_argument('--inputs', type=Path, help='Explicit diagnostic corpus of unique IEEE-754 hex inputs')
     args = parser.parse_args()
     require(sys.platform == 'win32', 'This diagnostic requires native Windows')
     require(not args.output.exists(), 'Diagnostic output already exists')
     output = args.output.resolve()
     output.mkdir(parents=True)
-    inputs = corpus()
+    inputs = input_values(args.inputs)
     input_text = '\n'.join(inputs) + '\n'
     (output / 'inputs.txt').write_text(input_text, encoding='ascii')
     report = dict(status='pending', purpose='CRT diagnostic, not simulator acceptance',
@@ -101,6 +111,10 @@ def main():
                   platform=platform.platform(), windows_version=list(sys.getwindowsversion()),
                   image={key: os.environ.get(key) for key in ('ImageOS', 'ImageVersion')},
                   samples=len(inputs), corpus_sha256=hashlib.sha256(input_text.encode()).hexdigest(),
+                  input_source=None if args.inputs is None else dict(path=str(args.inputs.resolve()),
+                      sha256=hashlib.sha256(args.inputs.read_bytes()).hexdigest()),
+                  source_sha256={name:hashlib.sha256((HERE/name).read_bytes()).hexdigest()
+                                 for name in ('capture.py','Probe.cpp')},
                   captures={}, comparisons={}, build_commands={})
     save(output / 'report.json', report)
     try:
@@ -141,14 +155,16 @@ def main():
                     path = Path(metadata[key]['path'])
                     metadata[key]['sha256'] = hashlib.sha256(path.read_bytes()).hexdigest()
                 metadata.update(profile=profile, requested_dll=str(dll) if dll else None,
-                                repeat_exact=True, critical=rows[0],
+                                repeat_exact=True, first_input=rows[0],
                                 linked_vs_exported_different=sum(r['linked'] != r['exported'] for r in rows))
+                if args.inputs is None:
+                    metadata['critical'] = rows[0]
                 if dll:
                     metadata['requested_sha256'] = hashlib.sha256(dll.read_bytes()).hexdigest()
                     metadata['loaded_requested_file'] = os.path.samefile(dll, metadata['exported_provider']['path'])
                 report['captures'][name] = metadata
                 captures[name] = rows
-                print(name, json.dumps(metadata['exported_provider']), metadata['critical'], flush=True)
+                print(name, json.dumps(metadata['exported_provider']), metadata['first_input'], flush=True)
                 save(output / 'report.json', report)
             report['comparisons'][target + '-default-vs-sse2'] = compare(captures[target + '-default'], captures[target + '-sse2'])
             report['comparisons'][target + '-default-vs-fma3'] = compare(captures[target + '-default'], captures[target + '-fma3'])

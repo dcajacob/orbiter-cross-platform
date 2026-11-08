@@ -11,6 +11,12 @@ Run in an x64 Visual Studio developer shell:
 python -B Tests/Production/CrtDiagnostic/capture.py --output out/crt-diagnostic
 ```
 
+For a captured failing-input corpus, pass `--inputs path/to/inputs.txt`.
+Each line must be one unique finite binary64 arcsine input in 16-digit hex.
+The explicit corpus and diagnostic sources are hashed; this remains diagnostic
+scope and does not replace the default corpus or any simulation acceptance gate.
+Current Phase 6 work runs these diagnostics only in the local Windows VM.
+
 The workflow runs both builds on each Windows Server 2022 and 2025 host. It
 uses each image's installed Visual Studio (the 2025 runner now supplies 2026),
 and records the compiler rather than assuming both images carry VS 2022. It

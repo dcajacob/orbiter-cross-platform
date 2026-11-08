@@ -13,6 +13,7 @@
 
 #include "glad.h"
 #include "VVessel.h"
+#include "RendererRandom.h"
 #include "OGLMesh.h"
 #include "OGLCamera.h"
 #include "Texture.h"
@@ -506,9 +507,9 @@ bool vVessel::RenderExhaust ()
 		//xsize = sqrt (zsize = lvl);
 		xsize = zsize = 1.0;
 
-		//const double irmax = 0.1/(double)RAND_MAX;
+		//const double irmax = 0.1/(double)renderer_random::Maximum;
 		double alpha = *es.level;
-		if (es.modulate) alpha *= ((1.0 - es.modulate)+(double)rand()* es.modulate/(double)RAND_MAX);
+		if (es.modulate) alpha *= ((1.0 - es.modulate)+(double)renderer_random::Next()* es.modulate/(double)renderer_random::Maximum);
 
 		SetExhaustVertices (-(*es.ldir), cdir, *es.lpos, zsize*es.lsize, xsize*es.wsize, ExhaustVtx);
 

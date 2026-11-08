@@ -1,0 +1,66 @@
+{
+  "status": "passed-scoped-camera-persistence-mission",
+  "runtime_source": "2d6fa3963e9c66ddc24106ad2133cb11b20eba48",
+  "scenario": "Scenarios/2024 Edition/Space Shuttle ascent autopilot.scn",
+  "actual_native_processes": 16,
+  "actual_presentations": 15360,
+  "profile_phases": [
+    [
+      "Debug-automatic",
+      "stock-writer"
+    ],
+    [
+      "Debug-automatic",
+      "windows-save-reload"
+    ],
+    [
+      "Debug-sse2",
+      "stock-writer"
+    ],
+    [
+      "Debug-sse2",
+      "windows-save-reload"
+    ],
+    [
+      "Release-automatic",
+      "stock-writer"
+    ],
+    [
+      "Release-automatic",
+      "windows-save-reload"
+    ],
+    [
+      "Release-sse2",
+      "stock-writer"
+    ],
+    [
+      "Release-sse2",
+      "windows-save-reload"
+    ]
+  ],
+  "independent_audits": [
+    {
+      "path": "/home/dan/.codex/worktrees/phase6-camera-persistence/orbiter-cross-platform/out/phase6-camera-Debug-stock-independent-audit-v1.json",
+      "sha256": "e83e5e04f21907b8f11d00657dbfefef54a475b113a7c5227f21e35f77f88766",
+      "status": "passed-two-Debug-profiles-diagnostic-only"
+    },
+    {
+      "path": "/home/dan/.codex/worktrees/phase6-camera-persistence/orbiter-cross-platform/out/phase6-camera-additional-eight-runs-independent-audit-v1.json",
+      "sha256": "87a7962b0da40759704d6e8bd30cb4c2d1960fca52068731d9d6eadbe325a654",
+      "status": "passed-scoped-native-mission-audit"
+    },
+    {
+      "path": "/home/dan/.codex/worktrees/phase6-camera-persistence/orbiter-cross-platform/out/phase6-camera-Release-reload-independent-audit-v1.json",
+      "sha256": "598b34a4b76a54dcfa44b21cb54c15562fc82f02b607993c8bd77de472fd63b6",
+      "status": "passed-remaining-Release-reload-diagnostic-audit"
+    }
+  ],
+  "minimum_ssim": 1.0,
+  "maximum_position_error_m": 3.05771249024554e-05,
+  "maximum_velocity_error_m_s": 9.884310936847387e-12,
+  "complete_saved_content_identical": true,
+  "actual_clocks_identical_lf": true,
+  "native_admission_qualified": false,
+  "phase6_complete": false,
+  "scope": "One unchanged mission, stock writer and exact Windows-save reload, twice in all four native profiles. Historical Windows transport limits and the incomplete full38 campaign remain separate."
+}

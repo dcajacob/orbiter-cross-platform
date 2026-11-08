@@ -94,6 +94,23 @@ and retains every failure. It never equates that status with passing the
 corpus gate. `--inventory-only` and selected `--case` runs are not complete
 smoke qualification.
 
+`--general-api-qualification FILE` explicitly enables the independently audited
+[v2 GeneralApiTest correction](../GeneralApiCorrection/README.md) for that one
+entry point. The runner copies its assets privately, preserves the original
+script, seeds an existing save and requires the qualified zero-frame startup
+exit. Other scenarios retain their existing presentation and vessel-coverage
+checks; the VesselApiTest policy is unchanged. The same option is required by
+the independent auditor. It cannot be applied retrospectively to a capture
+that did not select the variant.
+
+New captures use `normal-stock-capture-v2` process receipts with real PIDs,
+process start identities, cancellation status and actual exits. `--runtime-owner`
+declares a preserved source/package worktree separately from the current runner;
+every source, binary and sanitizer identity remains checked against that owner.
+`verify.py --diagnostic-case NAME` audits exactly the declared selection and
+reports `audited-selected-stock-scenarios-diagnostic-only`. Full audits still
+require all 157 attempts. A selected run cannot satisfy full stock admission.
+
 `Inventory.Test.py` checks indented/shorthand parsing, required-module failure,
 intentional configuration-defined vessels, path escape and directory-alias
 rejection against temporary fixtures and all locked scenario bytes.

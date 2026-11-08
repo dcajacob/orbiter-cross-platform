@@ -1,0 +1,254 @@
+{
+  "schema": 1,
+  "protocol": "remaining-stock-original-input-interactions-v1",
+  "flows": [
+    {
+      "id": "ldef-payload-release",
+      "case": "remaining_stock_022",
+      "families": [
+        "LDEF"
+      ],
+      "frames": 320,
+      "fixed_step": 0.015625,
+      "replay": [
+        {
+          "tick": 64,
+          "phase": "before",
+          "action": "key",
+          "value": "36"
+        },
+        {
+          "tick": 65,
+          "phase": "before",
+          "action": "key",
+          "value": "-36"
+        }
+      ],
+      "checks": [
+        {
+          "left": {
+            "trace": "flight-state.csv",
+            "where": {
+              "tick": 0,
+              "object": "LDEF"
+            },
+            "field": "attached"
+          },
+          "op": "eq",
+          "right": "STS-41-C;"
+        },
+        {
+          "left": {
+            "trace": "flight-state.csv",
+            "where": {
+              "tick": 320,
+              "object": "LDEF"
+            },
+            "field": "attached"
+          },
+          "op": "eq",
+          "right": ""
+        },
+        {
+          "left": {
+            "trace": "flight-state.csv",
+            "where": {
+              "tick": 320,
+              "object": "STS-41-C"
+            },
+            "field": "attached"
+          },
+          "op": "eq",
+          "right": ""
+        },
+        {
+          "left": {
+            "trace": "flight-state.csv",
+            "where": {
+              "tick": 320,
+              "object": "STS-41-C"
+            },
+            "field": "mass"
+          },
+          "op": "lt",
+          "right": {
+            "trace": "flight-state.csv",
+            "where": {
+              "tick": 0,
+              "object": "STS-41-C"
+            },
+            "field": "mass"
+          }
+        }
+      ]
+    },
+    {
+      "id": "leonardo_mplm-payload-release",
+      "case": "remaining_stock_024",
+      "families": [
+        "Leonardo_mplm"
+      ],
+      "frames": 320,
+      "fixed_step": 0.015625,
+      "replay": [
+        {
+          "tick": 0,
+          "phase": "start",
+          "action": "focus",
+          "value": "STS-101"
+        },
+        {
+          "tick": 64,
+          "phase": "before",
+          "action": "key",
+          "value": "36"
+        },
+        {
+          "tick": 65,
+          "phase": "before",
+          "action": "key",
+          "value": "-36"
+        }
+      ],
+      "checks": [
+        {
+          "left": {
+            "trace": "flight-state.csv",
+            "where": {
+              "tick": 0,
+              "object": "Leonardo"
+            },
+            "field": "attached"
+          },
+          "op": "eq",
+          "right": "STS-101;"
+        },
+        {
+          "left": {
+            "trace": "flight-state.csv",
+            "where": {
+              "tick": 320,
+              "object": "Leonardo"
+            },
+            "field": "attached"
+          },
+          "op": "eq",
+          "right": ""
+        },
+        {
+          "left": {
+            "trace": "flight-state.csv",
+            "where": {
+              "tick": 320,
+              "object": "STS-101"
+            },
+            "field": "attached"
+          },
+          "op": "eq",
+          "right": ""
+        },
+        {
+          "left": {
+            "trace": "flight-state.csv",
+            "where": {
+              "tick": 320,
+              "object": "STS-101"
+            },
+            "field": "mass"
+          },
+          "op": "lt",
+          "right": {
+            "trace": "flight-state.csv",
+            "where": {
+              "tick": 0,
+              "object": "STS-101"
+            },
+            "field": "mass"
+          }
+        }
+      ]
+    },
+    {
+      "id": "carina-payload-release",
+      "case": "remaining_stock_026",
+      "families": [
+        "Carina"
+      ],
+      "frames": 320,
+      "fixed_step": 0.015625,
+      "replay": [
+        {
+          "tick": 64,
+          "phase": "before",
+          "action": "key",
+          "value": "36"
+        },
+        {
+          "tick": 65,
+          "phase": "before",
+          "action": "key",
+          "value": "-36"
+        }
+      ],
+      "checks": [
+        {
+          "left": {
+            "trace": "flight-state.csv",
+            "where": {
+              "tick": 0,
+              "object": "Carina"
+            },
+            "field": "attached"
+          },
+          "op": "eq",
+          "right": "STS-101;"
+        },
+        {
+          "left": {
+            "trace": "flight-state.csv",
+            "where": {
+              "tick": 320,
+              "object": "Carina"
+            },
+            "field": "attached"
+          },
+          "op": "eq",
+          "right": ""
+        },
+        {
+          "left": {
+            "trace": "flight-state.csv",
+            "where": {
+              "tick": 320,
+              "object": "STS-101"
+            },
+            "field": "attached"
+          },
+          "op": "eq",
+          "right": ""
+        },
+        {
+          "left": {
+            "trace": "flight-state.csv",
+            "where": {
+              "tick": 320,
+              "object": "STS-101"
+            },
+            "field": "mass"
+          },
+          "op": "lt",
+          "right": {
+            "trace": "flight-state.csv",
+            "where": {
+              "tick": 0,
+              "object": "STS-101"
+            },
+            "field": "mass"
+          }
+        }
+      ]
+    }
+  ],
+  "scope": "Original Atlantis J-key payload releases, complete original scenes and physical child detachment/mass transfer, two repetitions. Payload family interaction facet only; RMS, recapture, ascent and named workflow gates remain separate.",
+  "phase6_complete": false
+}

@@ -12,6 +12,44 @@ budgets. The [native orbital flight host](NativeFlight.md) adds keyboard/joystic
 control paths, independent timing and original docking/persistence. These remain
 narrower deliveries than the stock release.
 
+## Phase 6 closeout
+
+[Phase6Closeout.json](Phase6Closeout.json) is the finite closeout ledger. It
+preserves checkpoint `0842893b`, exact acceptance scopes and evidence hashes.
+Four preparatory gates are closed: runner controls, the focused numerical
+repair, the corrected API test and remaining-class eligibility. Final software acceptance gates remain
+open. The scene003 reload failure was traced to native automatic mode using an
+SSE2-only `atan2` binding. Repair `81dcc014` passes all sixteen focused native
+writer/reload runs across four profiles and two repetitions, with unchanged
+budgets. The versioned corrected API test passes Windows/native in all four
+profiles, including normal-host startup-exit checks and rejection controls.
+The matching current-Windows scene003 matrix also passes all sixteen runs and
+independent complete comparisons. Restored archives and verified duplicate
+reclamation preserve the retained evidence. A separately verified 64 GiB local
+qualification volume provides the declared 8 GiB campaign reserve. Candidate
+freeze, full campaigns and operator acceptance are open.
+Physical-controller acceptance remains blocked.
+Class eligibility retains its declared source/binary identities for each facet. Fresh
+paused attachment controls pass all four profiles: 80 complete worlds and 76
+actual F5 reloads with the original docking and reciprocal payload links intact.
+The complete seven-scene, four-profile family lifetime audit also passes:
+560 unpaused worlds, 33,600 presentations and actual module unloads. This closes
+positive ABI loading, resource ownership and twenty-cycle lifetime facets for
+all eleven remaining families. The independently audited capability matrix also
+passes all sixteen original structural variants across four profiles and two
+observer-off/on repetitions: 144 actual processes and 8,640 presentations.
+The independent persistence audit passes all 144 writer/exact-Windows-save
+reload runs, and 180 negative processes pass the rejection controls. The final
+interaction audit passes all 72 original-control runs and 56,192 presentations.
+All seven facets are closed for all eleven families. The final-candidate source
+enables the exact sixteen qualified structural combinations and declared
+modules; matching binaries and the complete 157-entry normal-admission matrix
+remain required.
+The intended interim signoff is **software complete; awaiting physical-controller
+acceptance**, after all software gates and the operator walkthrough pass.
+[Closeout tools and current limits](../../Tests/Production/Closeout/README.md)
+record the implementation and its retained evidence scope.
+
 ## Frozen scope and starting point
 
 The release uses the existing `PlanetarySystem`, `Body`, `RigidBody`, `Vessel`,
@@ -99,7 +137,7 @@ NRLMSISE C package; its author notice is retained.
 | 3 | Production engine/platform boundary | Native shared production world, original Vessel/Camera/Session and checked source-built modules now build and run. General application, instrumentation and module coverage remain in progress. [Scope and remaining gates](EngineBoundary.md) |
 | 4 | Native real world/external client | Accepted reduced Sol/ISS/ShuttlePB external view on the laptop and hosted Ubuntu 24.04 Debug/Release. Current Windows application/client, frozen state/image/landmark checks and twenty in-process sessions pass. General stock compatibility and remaining release hardware gates follow later. [Evidence](NativeExternalView.md) |
 | 5 | Usable flight and interaction | Accepted for production ShuttlePB/ISS fixtures: flight, docking, attachments, creation/deferred deletion/focus, persistence, keyboard, atmosphere/contact and upright landing pass. All four native Debug/Release automatic/SSE2 configurations and current Windows application/SDK/client/reference gates pass. [Orbital evidence](NativeFlight.md), [ground-flight evidence](GroundFlight.md), [lifetime acceptance](VesselLifetime.md) |
-| 6 | Cockpit and Delta-glider | In progress. HUD/MFD, DG/DG-S panels/VC, systems, Lua AAP, input, Shuttle-A and named mission flows have scoped evidence. Four-profile paused Atlantis lifetime passes. The fresh normal-gate Debug automatic full157 sweep at `f82b7392` has **118 passes and 39 failures**, zero sanitizer findings and 157 clean context deletions: 38 class-admission rejections despite all dependencies being available, plus one inherited original assertion. Recovered four-profile Windows all38 writer/reload observations and 304 direct Debug/Release comparisons pass their original budgets; historical worker/desktop transport receipts remain missing. Complete current Windows/native numerical/image/mission parity, remaining class admission, current Windows attachment lifetime, controller and hardware/performance gates remain open. [Current corpus](CurrentStockCorpus.md), [recovered Windows observations](RecoveredWindowsObservations.md), [paused lifetime](AttachmentTeardown.md), [cockpit](Cockpit.md), [remaining modules](RemainingVessels.md) |
+| 6 | Cockpit and Delta-glider | In progress. HUD/MFD, DG/DG-S panels/VC, systems, Lua AAP, input, Shuttle-A and named mission flows have scoped evidence. Four-profile paused Atlantis lifetime passes. The fresh normal-gate Debug automatic full157 sweep at `f82b7392` has **118 passes and 39 failures**, zero sanitizer findings and 157 clean context deletions: 38 class-admission rejections despite all dependencies being available, plus one inherited original assertion. Recovered four-profile Windows all38 writer/reload observations and 304 direct Debug/Release comparisons pass their original budgets; historical worker/desktop transport receipts remain missing. Current Windows paused normal-cleanup lifetime passes eighty worlds in all four profiles at `bdfd067f`. Complete current Windows/native numerical/image/mission parity, remaining class admission, controller and hardware/performance gates remain open. [Current corpus](CurrentStockCorpus.md), [recovered Windows observations](RecoveredWindowsObservations.md), [paused lifetime](AttachmentTeardown.md), [cockpit](Cockpit.md), [remaining modules](RemainingVessels.md) |
 | 7 | Practical stock experience | Not started as a phase; remaining modules, audio, wider stock scenarios, settings and input configuration |
 | 8 | Packages and release acceptance | Not started; clean install outside checkout, data installer, SDK, all automated and hardware gates |
 
@@ -146,8 +184,21 @@ The complete paused [Atlantis resupply lifetime regression](AttachmentTeardown.m
 now passes in four fresh Debug/Release automatic/SSE2 sanitizer packages from
 `f82b7392`: 80 worlds, 76 real F5 replacements, 4,942 presentations and 80 clean
 context deletions. Exact source inputs are preserved locally, and an independent
-audit verifies all three original vessels and attachment/docking links. Windows
-regression and full numerical/image and mission qualification remain open.
+audit verifies all three original vessels and attachment/docking links. The [current Windows regression](WindowsAttachmentLifetime.md) also passes eighty
+normal-cleanup worlds in all four profiles. Full numerical/image and mission
+qualification remain open.
+
+The [fresh local Windows baseline](CurrentWindowsQualification.md) at
+`f3e86add` passes 64 scene repetitions and both 28-test build configurations.
+The [tracking-camera save repair](CameraPresetPersistence.md) also passes sixteen
+native writer/reload runs for one unchanged mission across all four profiles.
+The longer Windows restart matrix then exposes a [world-owned MFD cache defect](../../Tests/Production/MfdWorldCache/README.md),
+and the native full38 writer matrix stops on a separate [playback/save boundary](PlaybackSaveBoundary.md).
+The MFD repair now passes the independently audited eighty-world Windows
+lifetime matrix. Eight independently audited stock writers now match the aligned playback/save
+boundary. Exact-save reloads expose a separate Debug/automatic physical-state
+budget failure, so the complete matrix remains open. These scoped results leave the full157 result and Phase 6 status above
+unchanged.
 
 ## Phase 1 reproducibility
 

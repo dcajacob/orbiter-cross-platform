@@ -1,0 +1,62 @@
+{
+  "status": "passed-independently-audited-current-Windows-paused-lifetime",
+  "application_and_sdk_source": "bdfd067fda2623c1202d8ef816e1f1caad727e49",
+  "profiles": {
+    "Debug-automatic": {
+      "status": "passed",
+      "worlds": 20,
+      "actual_math": "fma3",
+      "paused_vessel_rows": 3600,
+      "successful_presents": 1200,
+      "normal_cleanup_events": 20,
+      "original_launchpad_restarts": 19
+    },
+    "Debug-sse2": {
+      "status": "passed",
+      "worlds": 20,
+      "actual_math": "sse2",
+      "paused_vessel_rows": 3600,
+      "successful_presents": 1200,
+      "normal_cleanup_events": 20,
+      "original_launchpad_restarts": 19
+    },
+    "Release-automatic": {
+      "status": "passed",
+      "worlds": 20,
+      "actual_math": "fma3",
+      "paused_vessel_rows": 3600,
+      "successful_presents": 1200,
+      "normal_cleanup_events": 20,
+      "original_launchpad_restarts": 19
+    },
+    "Release-sse2": {
+      "status": "passed",
+      "worlds": 20,
+      "actual_math": "sse2",
+      "paused_vessel_rows": 3600,
+      "successful_presents": 1200,
+      "normal_cleanup_events": 20,
+      "original_launchpad_restarts": 19
+    }
+  },
+  "actual_simulator_processes": 4,
+  "paused_worlds": 80,
+  "normal_launchpad_restarts": 76,
+  "successful_presents": 4800,
+  "finite_paused_vessel_rows": 14400,
+  "clean_context_deletions": 80,
+  "independently_verified_Mesa_DLL_and_license_files": 69,
+  "verified_raw_files": 1089,
+  "observation_archive_sha256": "e5577b90adacad8179033c9f21c23837736b5ca7fe06df21ab4edc2a992c37b9",
+  "build_verification_sha256": "57b12c165aba03cad255b4772c0deb06fdd844f7f212fc486a324ce76dff43a8",
+  "complete_new_local_VM_launch_chain": true,
+  "private_desktop_closed": true,
+  "Windows_ASan_qualified": false,
+  "raw_evidence_uploaded": false,
+  "native_admission_qualified": false,
+  "phase6_complete": false,
+  "local_independent_audit": {
+    "path": "/home/dan/GIT/orbiter-cross-platform/out/phase6-Windows-mfd-lifetime-bdfd-audit-v3/audit.json",
+    "sha256": "9d0f1e651052869b2008e8d24802b3b2386b8515993c073acd1be92144d9fa3d"
+  }
+}

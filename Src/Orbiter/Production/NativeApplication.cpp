@@ -118,6 +118,49 @@ bool SupportedStockStation(const VESSEL& vessel,const char* type) {
             pmi.x==26000 && pmi.y==26000 && pmi.z==52800 && cs.x==20 && cs.y==20 && cs.z==20);
 }
 #ifdef ORBITER_NATIVE_COCKPIT
+bool SupportedRemainingStock(const Vessel& body,const VESSEL& vessel,const char* type) {
+    struct Capabilities {
+        const char* type;
+        const char* module;
+        int version;
+        bool focus;
+        double size;
+        unsigned meshes,thrusters,propellants,docks,parents,children;
+        bool transponder;
+    };
+    // The sixteen initial structural combinations observed in the preserved
+    // original Windows cohort. Diagnostic admission ranges are not reused.
+    static constexpr Capabilities qualified[]={
+        {"Atlantis","Atlantis",3,true,19.6,3,19,1,1,0,2,false},
+        {"Atlantis","Atlantis",3,true,19.6,3,19,1,2,0,2,false},
+        {"Atlantis","Atlantis",3,true,19.6,4,19,1,1,0,2,false},
+        {"Atlantis","Atlantis",3,true,19.6,4,19,1,2,0,2,false},
+        {"Atlantis_SRB","Atlantis_SRB",1,false,23,1,2,1,1,0,0,false},
+        {"Atlantis_SRB","Atlantis_SRB",1,false,51.397999999999996,1,2,1,1,0,0,false},
+        {"Atlantis_SRB","Atlantis_SRB",1,false,51.399,1,2,1,1,0,0,false},
+        {"Atlantis_Tank","Atlantis_Tank",1,false,24,1,21,1,3,0,0,false},
+        {"Carina",nullptr,0,true,5,1,21,1,0,2,0,false},
+        {"Dragonfly","Dragonfly",1,true,4,1,25,12,1,0,0,false},
+        {"HST","HST",2,true,7.52,1,0,0,0,3,0,false},
+        {"LDEF",nullptr,0,true,12,1,18,1,0,2,1,true},
+        {"Leonardo_mplm",nullptr,0,true,6,1,0,0,1,2,0,true},
+        {"Module2",nullptr,0,true,2.5,1,0,0,6,0,0,false},
+        {"Quadcopter","Quadcopter",3,true,.3,1,1,1,0,0,0,false},
+        {"SolarSail","SolarSail",2,true,1000,1,0,0,1,0,0,false}
+    };
+    const char* module=body.NativeModuleName();
+    for(const auto& caps:qualified) {
+        if(CompareText(type,caps.type)!=0 || (caps.module?
+           (!module || CompareText(module,caps.module)!=0):module!=nullptr))continue;
+        if(vessel.Version()==caps.version && vessel.GetEnableFocus()==caps.focus &&
+           vessel.GetSize()==caps.size && vessel.GetMeshCount()==caps.meshes &&
+           vessel.GetThrusterCount()==caps.thrusters && vessel.GetPropellantCount()==caps.propellants &&
+           vessel.DockCount()==caps.docks && vessel.AttachmentCount(true)==caps.parents &&
+           vessel.AttachmentCount(false)==caps.children && bool(vessel.GetTransponder())==caps.transponder)
+            return true;
+    }
+    return false;
+}
 bool SupportedStockShuttleA(const VESSEL& vessel,const char* type) {
     // Initial capabilities observed in all four preserved Windows profiles.
     // Declared modules still have to load through the checked native factory.
@@ -418,7 +461,12 @@ struct Runtime final:BodyServices,RigidBodyServices,SurfaceServices,NavigationSe
             else if(command.action=="warp") SetWarpFactor(value);
             else if(command.action=="pause") {if(value!=0 && value!=1)throw std::runtime_error("Invalid pause command");running=value==0;render.paused=!running;}
             else if(command.action=="undock") {if(value<0 || value>=v->DockCount() || std::floor(value)!=value)throw std::runtime_error("Invalid docking port");if(!v->Undock(int(value)))throw std::runtime_error("Replay undocking failed");}
-            else if(command.action=="save") Save();
+            else if(command.action=="endplayback") {
+                if(value!=0)throw std::runtime_error("Invalid end-playback command");
+                LifetimeEvent("input.endplayback","",playback?"active":"idle");
+                if(playback)EndPlayback();
+            }
+            else if(command.action=="save") {LifetimeEvent("input.save");Save();}
             else if(command.action.rfind("rcs",0)==0) {
                 auto token=command.action.substr(3);std::size_t end=0;auto group=std::stoul(token,&end);if(end!=token.size())throw std::runtime_error("Invalid replay RCS group");
                 if(group<THGROUP_ATT_PITCHUP || group>THGROUP_ATT_BACK || value<0 || value>1)throw std::runtime_error("Invalid replay RCS group");
@@ -867,6 +915,7 @@ struct Runtime final:BodyServices,RigidBodyServices,SurfaceServices,NavigationSe
                 vessel->GetThrusterCount()==(scram ? 23 : 21) && vessel->GetPropellantCount()==(scram ? 3 : 2))
                 continue;
             if(SupportedStockShuttleA(*vessel,type))continue;
+            if(SupportedRemainingStock(*body,*vessel,type))continue;
 #if defined(ORBITER_ATLANTIS_DIAGNOSTIC) || defined(ORBITER_REMAINING_STOCK_DIAGNOSTIC)
             if(SupportedAtlantisDiagnostic(*vessel,type))continue;
 #endif
@@ -1060,6 +1109,7 @@ struct Runtime final:BodyServices,RigidBodyServices,SurfaceServices,NavigationSe
         annotations.EndPlayback();
 #endif
         playback=false;
+        LifetimeEvent("playback.ended");
     }
     Vessel* Focus() const override {return render.focus;}
     void SetFocus(Vessel* vessel) override {orbiter::production::SetFocusObject(*this,vessel,false);}
@@ -1292,9 +1342,7 @@ int main(int argc,char** argv) {
             arguments[name]=argv[++i];
         }
         std::vector<std::string> allowed={"--assets","--data","--modules","--planets","--config","--scenario","--evidence","--frames","--fixed-step","--run","--capture-time","--keymap","--save","--replay","--ticks","--render-every","--sessions","--joystick-throttle-axis","--joystick-twist-axis","--frame-delay-ms","--fixed-ui-clock"};
-#ifdef ORBITER_REMAINING_STOCK_DIAGNOSTIC
         allowed.push_back("--fixed-system-step");
-#endif
         for(const auto& entry:arguments)if(std::find(allowed.begin(),allowed.end(),entry.first)==allowed.end())throw std::runtime_error("Unknown argument: "+entry.first);
         for(const char* name:{"--assets","--data","--modules","--planets","--config","--scenario"})if(!arguments.count(name))throw std::runtime_error(std::string("Required argument missing: ")+name);
         const auto absolute=[&](const char* name){return std::filesystem::absolute(arguments.at(name));};
@@ -1311,13 +1359,11 @@ int main(int argc,char** argv) {
 #endif
         const double fixed=arguments.count("--fixed-step")?FlightNumber(arguments.at("--fixed-step")):1.0/60.0;
         double systemFixed=fixed;
-#ifdef ORBITER_REMAINING_STOCK_DIAGNOSTIC
         if(arguments.count("--fixed-system-step")) {
             systemFixed=FlightNumber(arguments.at("--fixed-system-step"));
-            if((!frames && !ticks) || systemFixed<=0 || systemFixed>0.1)
-                throw std::runtime_error("Diagnostic system step requires bounded frames/ticks and an elapsed input in (0,0.1]");
+            if((!frames && !ticks) || !arguments.count("--evidence") || !arguments.count("--replay") || systemFixed<=0 || systemFixed>0.1)
+                throw std::runtime_error("Controlled system step requires bounded evidence/replay and an elapsed input in (0,0.1]");
         }
-#endif
         const double capture=arguments.count("--capture-time")?FlightNumber(arguments.at("--capture-time")):-1;
         if(fixed<=0 || (arguments.count("--capture-time") && capture<0) || !renderEvery || !sessions || (ticks && frames))throw std::runtime_error("Invalid frame/step/capture/session limits");
         std::srand(0);SeedRandom(0);Resources resources(absolute("--assets"),absolute("--data"),absolute("--modules"),absolute("--planets"));

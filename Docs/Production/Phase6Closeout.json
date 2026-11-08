@@ -1,0 +1,3119 @@
+{
+  "schema": 1,
+  "protocol": "phase6-closeout-v1",
+  "checkpoint_commit": "0842893ba8b3807f67245c78d729a4758dab3fdd",
+  "software_complete": false,
+  "phase6_complete": false,
+  "candidate": {
+    "frozen": true,
+    "id": "phase6-c4ad-final-v1",
+    "source_commit": "c4ad4c424cd3bcd04fc56ba3a5ee37d033f8f1b8",
+    "identities": {
+      "application": {
+        "manifest": {
+          "path": "/home/dan/.codex/worktrees/phase6-orbit-node-qualification/orbiter-cross-platform/out/phase6-final-candidate-freeze-v1.json",
+          "sha256": "2aaa553c85bf849b55b4193d4131ea8e59f478bd6bbdb0884730b11907e80910"
+        },
+        "scope": "C4 original Windows application and four matching native applications"
+      },
+      "sdk": {
+        "manifest": {
+          "path": "/home/dan/.codex/worktrees/phase6-orbit-node-qualification/orbiter-cross-platform/out/phase6-final-candidate-freeze-v1.json",
+          "sha256": "2aaa553c85bf849b55b4193d4131ea8e59f478bd6bbdb0884730b11907e80910"
+        },
+        "scope": "Matching C4 Windows/native SDKs and modules"
+      },
+      "observer": {
+        "manifest": {
+          "path": "/home/dan/.codex/worktrees/phase6-orbit-node-qualification/orbiter-cross-platform/out/phase6-final-candidate-freeze-v1.json",
+          "sha256": "2aaa553c85bf849b55b4193d4131ea8e59f478bd6bbdb0884730b11907e80910"
+        },
+        "scope": "C4 passive observers; versioned test-only fixture correction"
+      },
+      "runner": {
+        "manifest": {
+          "path": "/home/dan/.codex/worktrees/phase6-orbit-node-qualification/orbiter-cross-platform/out/phase6-final-candidate-freeze-v1.json",
+          "sha256": "2aaa553c85bf849b55b4193d4131ea8e59f478bd6bbdb0884730b11907e80910"
+        },
+        "scope": "Separated runner ad23fc6664dfcde0bb16296e9b55a470dc85952e"
+      },
+      "reference": {
+        "manifest": {
+          "path": "/home/dan/.codex/worktrees/phase6-orbit-node-qualification/orbiter-cross-platform/out/phase6-final-candidate-freeze-v1.json",
+          "sha256": "2aaa553c85bf849b55b4193d4131ea8e59f478bd6bbdb0884730b11907e80910"
+        },
+        "scope": "Original f725 application and SDK; declared f3d v4 repaired modules; fresh receipts pending"
+      },
+      "dependencies": {
+        "manifest": {
+          "path": "/home/dan/.codex/worktrees/phase6-orbit-node-qualification/orbiter-cross-platform/out/phase6-final-candidate-freeze-v1.json",
+          "sha256": "2aaa553c85bf849b55b4193d4131ea8e59f478bd6bbdb0884730b11907e80910"
+        },
+        "scope": "Pinned renderer archives, build dependency hashes and actual provider inventory"
+      },
+      "runtime": {
+        "manifest": {
+          "path": "/home/dan/.codex/worktrees/phase6-orbit-node-qualification/orbiter-cross-platform/out/phase6-final-candidate-freeze-v1.json",
+          "sha256": "2aaa553c85bf849b55b4193d4131ea8e59f478bd6bbdb0884730b11907e80910"
+        },
+        "scope": "Actual hashed native binaries and metadata-recorded local Windows runtime files"
+      }
+    }
+  },
+  "policy": {
+    "physical_controller_required_for_phase6_complete": true,
+    "virtual_controllers_qualify": false,
+    "raw_evidence_local_only": true,
+    "windows_local_vm_only": true,
+    "maximum_windows_scenes": 2,
+    "maximum_native_simulators": 4,
+    "automatic_golden_refresh": false,
+    "budgets_unchanged": true,
+    "excluded": [
+      "audio",
+      "general-scenario-editor",
+      "installers",
+      "phase7",
+      "phase8"
+    ]
+  },
+  "protected_documents": [
+    {
+      "path": "Tests/Production/production-source.lock.json",
+      "sha256": "5f89334ecb213b56b1bda651acbed8c245f874f6d61ae9f7e9fdccfb3da2f11e"
+    },
+    {
+      "path": "Tests/Production/RemainingStock/cases.json",
+      "sha256": "d1dad2672f6ae77541df774cafd4ca5a8730f77733e80b733a1f970c7697a162"
+    },
+    {
+      "path": "Tests/Production/RemainingStockPersistence/protocol.json",
+      "sha256": "01c98e54e3ef9568fbba5c368093ecdc89880b797e042e5f254e4f64d735f249"
+    },
+    {
+      "path": "Script/Tests/GeneralApiTest.lua",
+      "sha256": "0eb305d7171beabec4a30b07e40eaf0e5063ef3575da59ef40ef5ff889051b69"
+    }
+  ],
+  "gates": {
+    "runner-controls": {
+      "expected": {
+        "depends_on": [],
+        "required": [
+          "full-versus-selected",
+          "terminal-statuses",
+          "cancellation",
+          "process-receipts",
+          "completed-capture-reuse",
+          "declared-share-roots",
+          "disk-preflight",
+          "archive-restoration"
+        ],
+        "final_candidate_required": false
+      },
+      "result": "passed",
+      "coverage": {
+        "depends_on": [],
+        "required": [
+          "full-versus-selected",
+          "terminal-statuses",
+          "cancellation",
+          "process-receipts",
+          "completed-capture-reuse",
+          "declared-share-roots",
+          "disk-preflight",
+          "archive-restoration"
+        ],
+        "final_candidate_required": false
+      },
+      "diagnostic_only": false,
+      "candidate_id": null,
+      "evidence": [
+        {
+          "path": "/home/dan/.codex/worktrees/phase6-closeout/orbiter-cross-platform/out/phase6-closeout-storage-v1/restoration-audit.json",
+          "sha256": "8f4adf13f212144c86bd7e6c65cbdd4d5d4b41d3fa579696789ba32feeb1b510",
+          "scope": "complete-restoration-of-four-historical-Windows-archives"
+        },
+        {
+          "path": "/home/dan/.codex/worktrees/phase6-closeout/orbiter-cross-platform/out/phase6-closeout-storage-v1/controls-v4.json",
+          "sha256": "e24837499d4f2fc633e98a920c58888277c239bd8cad023c1642fa9569d69c7e",
+          "scope": "18-discovered-control-tests-only"
+        },
+        {
+          "path": "/home/dan/.codex/worktrees/phase6-closeout/orbiter-cross-platform/out/phase6-closeout-reuse-writers-v3/status.json",
+          "sha256": "52e564d5377b86172d0f7cc212b1b525d2d4c496e871389befaad2b1039c248f",
+          "scope": "8-real-writers-independently-reread-and-compared-no-reloads"
+        },
+        {
+          "path": "/home/dan/.codex/worktrees/phase6-closeout/orbiter-cross-platform/out/phase6-closeout-storage-v1/controls-v8.json",
+          "sha256": "0417328f5b3e2c9f174c8871b0727dcef083f2eca33ac7b3071e2548c88b5f3a",
+          "scope": "24-discovered-controls-only-no-simulator-acceptance"
+        },
+        {
+          "path": "/home/dan/.codex/worktrees/phase6-closeout/orbiter-cross-platform/out/phase6-closeout-storage-v1/reclamation-independent-audit-v2.json",
+          "sha256": "36c8d764ebd40e2259028aa0f618ec2ca44100bf65c84d3f0b4c41ca605cc4a0",
+          "scope": "7904-closed-generated-duplicates-matched-to-fully-restored-archives-before-removal"
+        },
+        {
+          "path": "/home/dan/.codex/worktrees/phase6-closeout/orbiter-cross-platform/out/phase6-reload-launch-audit-v1/audit.json",
+          "sha256": "0b4bc6d84ea6520cc40614ee45a6ccbefcf2ce3c3de3b816c5b979a259ad49cb",
+          "scope": "two-actual-diagnostic-launch-chains-only-not-full38"
+        },
+        {
+          "path": "/home/dan/.codex/worktrees/phase6-closeout/orbiter-cross-platform/out/phase6-reload-launch-audit-v2/audit.json",
+          "sha256": "eedbf0496a79138bc23057d7914997a457244acd361b018c36dd8c950ff711f7",
+          "scope": "three-actual-closed-diagnostic-launch-chains-not-full38"
+        },
+        {
+          "path": "/home/dan/.codex/worktrees/phase6-closeout/orbiter-cross-platform/out/phase6-reload-launch-audit-v3/audit.json",
+          "sha256": "a09863658e48529a3e8e33f8aa031d4626080e0d732d1457d8784e9db8fde4dd",
+          "scope": "closed-live-surface-launch-with-actual-VM-worker-private-desktop-receipts"
+        },
+        {
+          "path": "/home/dan/.codex/worktrees/phase6-closeout/orbiter-cross-platform/out/phase6-closeout-storage-v1/controls-v10.json",
+          "sha256": "865a6906f80efae3d86c8d77baef4fd6741c234ba8e1ce00e61fe124ae253652",
+          "scope": "26-discovered-controls-full-versus-selected-Windows-process-scope-only"
+        },
+        {
+          "path": "/home/dan/.codex/worktrees/phase6-acceptance/orbiter-cross-platform/out/phase6-general-api-normal-host-v1/runner-controls-final-v1.json",
+          "sha256": "5eb3906f57858fe8c0c4ba1cc91ba550a0cddf3413d6d974deb88f091790d5a7",
+          "scope": "54-discovered-helper-process-transport-and-API-exit-controls-only"
+        },
+        {
+          "path": "/home/dan/.codex/worktrees/phase6-acceptance/orbiter-cross-platform/out/phase6-closeout-storage-v2/final-reclamation-controls-v1.json",
+          "sha256": "8e06462d128a1d876166b6a8c21cbce6b052daa4a4b5da37657c7bd0bafdc26d",
+          "scope": "63-discovered-control-tests-including-stale-agent-source-PID-and-input-resource-rejections"
+        },
+        {
+          "path": "/home/dan/.codex/worktrees/phase6-acceptance/orbiter-cross-platform/out/phase6-closeout-storage-v2/combined-restoration-v1.json",
+          "sha256": "cd13414b1f40f5ced58e53b7b4dd6634dd7a36440513abfec080a0e965769646",
+          "scope": "all-members-fully-restored-before-generated-duplicate-reclamation"
+        },
+        {
+          "path": "/home/dan/.codex/worktrees/phase6-acceptance/orbiter-cross-platform/out/phase6-closeout-storage-v2/independent-reclamation-audit-v2.json",
+          "sha256": "50fc5a2cfe86fd4f7d0e67968bc06767fcb84c3f8500c53894d9ff2f1241afcd",
+          "scope": "3136-exact-duplicates-removed-owning5797-sources-and3847-current-original-package-files-rehashed-8GiB-reserve-passed"
+        },
+        {
+          "path": "/home/dan/.codex/worktrees/phase6-acceptance/orbiter-cross-platform/out/phase6-current-stock-Windows-v2/Debug-closed-inputs-terminal-v2.json",
+          "sha256": "198c143e4eca89f8d3b938abad305c51c82299ca0271abc3ca0139d761bcbb79",
+          "scope": "actual-Windows-nonce-bound-read-only-child-PID-start-identity-and-exit-only"
+        },
+        {
+          "path": "/home/dan/.codex/worktrees/phase6-acceptance/orbiter-cross-platform/out/phase6-current-stock-Windows-v2/Release-closed-inputs-terminal-v2.json",
+          "sha256": "ad4aca8797e685afdd637a9e5c586d21a820b3d0f514db07df21a04b899d18f7",
+          "scope": "actual-Windows-nonce-bound-read-only-child-PID-start-identity-and-exit-only"
+        },
+        {
+          "path": "/home/dan/.codex/worktrees/phase6-class-eligibility/orbiter-cross-platform/out/phase6-vm-qualification-storage-v1/verification-v1.json",
+          "sha256": "a8707ee1b1ebbe68a0f830679204fa6a249ef04a41ab5e3b846beecf7e601df8",
+          "scope": "Actual declared local-volume staging, capacity and unchanged reference/source closure"
+        },
+        {
+          "path": "/home/dan/.codex/worktrees/phase6-class-eligibility/orbiter-cross-platform/out/phase6-eligibility-closeout-controls-v5.json",
+          "sha256": "39e37104bd15f53d8dfc6112465dacb2bd391b704f5083879f87ba7dca640f76",
+          "scope": "74 actually discovered closeout controls, including staging and family-matrix negative controls"
+        },
+        {
+          "path": "/home/dan/.codex/worktrees/phase6-class-eligibility/orbiter-cross-platform/out/phase6-historical-current-stock-reader-v3/audit.json",
+          "sha256": "3e41239a75819db2fb3c9088864bc591d65b405c5579bcb90a021e688e1ebbb0",
+          "scope": "Updated reader re-audits all retained focused original/current/native runs with historical v1 staging; no new simulations"
+        },
+        {
+          "path": "/home/dan/.codex/worktrees/phase6-eligibility-controls/orbiter-cross-platform/out/phase6-closeout-controls-v75.json",
+          "sha256": "bcd79c8d8a37fc207e07ff81f95cf109973a6a38194dd0797dab6b39c0953714",
+          "scope": "75 actually discovered closeout controls, including completed/repaired capability scope negative controls"
+        },
+        {
+          "path": "/home/dan/.codex/worktrees/phase6-persistence-controls/orbiter-cross-platform/out/phase6-closeout-controls-argv-v1.json",
+          "sha256": "d66e98be2575a0a57a931e19e16f7aacf98a7970be8fcfa962fe572e8499fe4b",
+          "scope": "77 actual controls; transient and persistent empty OS argv, bounded retry, actual child identity and reused-PID rejection"
+        },
+        {
+          "path": "/home/dan/.codex/worktrees/phase6-persistence-controls/orbiter-cross-platform/out/phase6-closeout-controls-persistence-matrix-v1.json",
+          "sha256": "e0918ed688c798d68716cf696bd7673caf39e00b6ecc43a0fea554b469df800f",
+          "scope": "78 actual control tests; missing persistence phases/profiles, duplicate cells, short repetitions and mixed source rejection"
+        },
+        {
+          "path": "/home/dan/.codex/worktrees/phase6-persistence-controls/orbiter-cross-platform/out/phase6-incomplete-persistence-matrix-control-v1.json",
+          "sha256": "3541b854c0e2bc3af3c37f3ec22de602fd25d9f74137237c0ee1a4831505b2a9",
+          "scope": "Actual running persistence matrix is rejected; no acceptance output produced"
+        },
+        {
+          "path": "/home/dan/.codex/worktrees/phase6-persistence-controls/orbiter-cross-platform/out/phase6-python-helper-inventory-v1.json",
+          "sha256": "587480d24e74b2a76dffc2742286e02961660d5536f8f68c5b09486991e2a056",
+          "scope": "128 actual Python helper tests in all 22 helper unittest files; separate headless CLI/runtime TestCase adapter remains open"
+        }
+      ],
+      "note": "Complete declared runner/control/restoration/receipt scope passed, including actual nonce-bound Windows child receipts. Actual free capacity exceeds eight GiB; each long campaign must preflight capacity again.",
+      "qualification_storage": {
+        "root": "P:/OrbiterPhase6",
+        "serial": "phase6qual20261106",
+        "virtual_bytes": 68719476736,
+        "verified_free_bytes": 68597768192,
+        "minimum_free_bytes": 8589934592,
+        "staging_protocol": "phase6-guarded-local-staging-v2",
+        "verification": {
+          "path": "/home/dan/.codex/worktrees/phase6-class-eligibility/orbiter-cross-platform/out/phase6-vm-qualification-storage-v1/verification-v1.json",
+          "sha256": "a8707ee1b1ebbe68a0f830679204fa6a249ef04a41ab5e3b846beecf7e601df8",
+          "scope": "Actual declared local-volume staging, capacity and unchanged reference/source closure"
+        }
+      },
+      "qualification_progress": {
+        "Windows_pacing_canary": {
+          "result": "failed-experiment-preserved-original-pacing-retained",
+          "evidence": {
+            "path": "/home/dan/.codex/worktrees/phase6-audit-throughput/orbiter-cross-platform/out/phase6-Windows-observer-pacing-capture-v1/failure-analysis.json",
+            "sha256": "a841c3ef8feafd75df668a574f04de5fc89e9f0fbf5a9e51fd76d56c7edbb086",
+            "scope": "Failed diagnostic only. Original Windows wall-clock startup/clamp inputs require the retained 120ms observer pacing. No altered clock input, mask, tolerance or reference refresh accepted."
+          }
+        }
+      }
+    },
+    "numerical-reload": {
+      "expected": {
+        "depends_on": [
+          "runner-controls"
+        ],
+        "profiles": [
+          "Debug-automatic",
+          "Debug-sse2",
+          "Release-automatic",
+          "Release-sse2"
+        ],
+        "cohorts": [
+          "original-windows",
+          "current-windows",
+          "native"
+        ],
+        "cases": [
+          "remaining_stock_003"
+        ],
+        "phases": [
+          "stock-writer",
+          "windows-save-reload"
+        ],
+        "repeats": 2,
+        "required": [
+          "first-differing-operation",
+          "observer-on-off-equivalence",
+          "actual-crt-providers",
+          "failing-and-neighbour-input-regression",
+          "all-existing-budgets"
+        ],
+        "final_candidate_required": false
+      },
+      "result": "passed",
+      "coverage": {
+        "depends_on": [
+          "runner-controls"
+        ],
+        "profiles": [
+          "Debug-automatic",
+          "Debug-sse2",
+          "Release-automatic",
+          "Release-sse2"
+        ],
+        "cohorts": [
+          "original-windows",
+          "current-windows",
+          "native"
+        ],
+        "cases": [
+          "remaining_stock_003"
+        ],
+        "phases": [
+          "stock-writer",
+          "windows-save-reload"
+        ],
+        "repeats": 2,
+        "required": [
+          "first-differing-operation",
+          "observer-on-off-equivalence",
+          "actual-crt-providers",
+          "failing-and-neighbour-input-regression",
+          "all-existing-budgets"
+        ],
+        "final_candidate_required": false
+      },
+      "diagnostic_only": false,
+      "candidate_id": null,
+      "evidence": [
+        {
+          "path": "/home/dan/.codex/worktrees/phase6-mfd-world-cache/orbiter-cross-platform/out/phase6-boundary-scene003-coordinator-v3/status.json",
+          "sha256": "a429ba432e3a3d354cd5e729274589d33c50cb89ad6ee76212a7cbe792c2db44",
+          "scope": "preserved-diagnostic-failure"
+        },
+        {
+          "path": "/home/dan/GIT/orbiter-cross-platform/out/phase6-native-boundary-reload-state-diagnostic-v1.json",
+          "sha256": "e3dc74a8518a2477e263d40d130eb181f7745ded67caf78f06e5fdfa1bffedee",
+          "scope": "preserved-diagnostic-failure"
+        },
+        {
+          "path": "/home/dan/.codex/worktrees/phase6-closeout/orbiter-cross-platform/out/phase6-reload-math-corpus-v1/corpus.json",
+          "sha256": "c31105d06867554a6c5bc97306266f0236e2bef81920e88dad7d72d1b635b465",
+          "scope": "2145-observed-and-neighbouring-arcsine-inputs-not-root-cause-proof"
+        },
+        {
+          "path": "/home/dan/.codex/worktrees/phase6-closeout/orbiter-cross-platform/out/phase6-reload-native-observer-equivalence-v2/independent-audit.json",
+          "sha256": "1aa16ceacd859c0aff42dfcaca8f37fc598afe8a717f305f521c37118eacc09a",
+          "scope": "independent-native-off-on-equivalence-collector-count-failure-preserved"
+        },
+        {
+          "path": "/home/dan/.codex/worktrees/phase6-closeout/orbiter-cross-platform/out/phase6-reload-native-internal-cache-v1/capture.json",
+          "sha256": "0aa6361d298863c678dd38d777509ec78bdad449ce19c8053b42008fb85dee9d",
+          "scope": "complete-native-cache-observer-960-frame-baseline-equivalence-diagnostic-only"
+        },
+        {
+          "path": "/home/dan/.codex/worktrees/phase6-closeout/orbiter-cross-platform/out/phase6-reload-native-crt-v1/Windows-comparison.json",
+          "sha256": "2e6210f9817696b3d877850a23c34559a783a8e5f42b9d1898ec376e574179c5",
+          "scope": "2145-arcsine-inputs-and-neighbours-agree-automatic-and-separate-sse2"
+        },
+        {
+          "path": "/home/dan/.codex/worktrees/phase6-closeout/orbiter-cross-platform/out/phase6-reload-math-Windows-native-v1/comparison.json",
+          "sha256": "2e45a8fdb6a780350d0da3848fc2e36b73cd6f081e999387079ce8c404902fab",
+          "scope": "first-observed-angular-acceleration-difference-211-not-proven-operation"
+        },
+        {
+          "path": "/home/dan/.codex/worktrees/phase6-closeout/orbiter-cross-platform/out/phase6-reload-math-Windows-native-v1/touchdown-comparison.json",
+          "sha256": "97cb1f5a60cf6715ae42207c83eabbee3383f319ac940bbfb7393900c2472e3a",
+          "scope": "all-six-vessel-public-touchdown-inputs-identical-through-211"
+        },
+        {
+          "path": "/home/dan/.codex/worktrees/phase6-closeout/orbiter-cross-platform/out/phase6-surface-centre-crt-v3/Windows-comparison.json",
+          "sha256": "10e70df810dd1dfaf24b36578691ef39319c05429ce4f3bd244f3f755276e179",
+          "scope": "only-centre-math-difference-is-SRB1-atan2-at211-native-uses-SSE2"
+        },
+        {
+          "path": "/home/dan/.codex/worktrees/phase6-closeout/orbiter-cross-platform/out/phase6-reload-math-Windows-native-v1/internal-cache-comparison.json",
+          "sha256": "ded8d70689d19cb42040c18f8e15c59fd1c699c879806570ef902faadd37dd1e",
+          "scope": "physical-quaternions-buffers-identical-through211-final-acceleration-first211"
+        },
+        {
+          "path": "/home/dan/.codex/worktrees/phase6-closeout/orbiter-cross-platform/out/phase6-atan2-fma-experiment-v1/comparison.json",
+          "sha256": "6b4c649bde17ba9e7bc938960603f0c6a84baefe15a7d65d762299adfe57d02c",
+          "scope": "unchanged-atan2-source-FMA-compilation-matches-all8748-centre-samples-experiment-only"
+        },
+        {
+          "path": "/home/dan/.codex/worktrees/phase6-closeout/orbiter-cross-platform/out/phase6-reload-math-Windows-native-v1/live-surface-comparison.json",
+          "sha256": "b42b4e14a0d39f3c249d55db68d1fee3d2a4a1ad076eeca093a49d78832857c8",
+          "scope": "actual-SRB1-cached-longitude-first-diff211-identical-atan2-inputs-complete-passive-equivalence"
+        },
+        {
+          "path": "/home/dan/.codex/worktrees/phase6-closeout/orbiter-cross-platform/out/phase6-atan2-neighbours-v1/old-binding-negative-control.json",
+          "sha256": "17a2d1b5ca4437b1ac59e7602d9a024e92d869b1bc1a86f35be7b4a21e476c89",
+          "scope": "preserved-unfixed-native-automatic-binary-fails-exact-captured-regression"
+        },
+        {
+          "path": "/home/dan/.codex/worktrees/phase6-closeout/orbiter-cross-platform/out/phase6-atan2-binding-automatic-v1/math-verification.json",
+          "sha256": "ea5830624b8f1e86215da37d2c3204d5d434a7f7859c9ba998aceb41b8bfcdde",
+          "scope": "automatic-build-original28800-per-mode-MPFR-4225-new-pairs-pass"
+        },
+        {
+          "path": "/home/dan/.codex/worktrees/phase6-closeout/orbiter-cross-platform/out/phase6-atan2-binding-sse2-v1/math-verification.json",
+          "sha256": "3e96d57831a9fca68b83d9d19f2521ccd3e94d6ce294d545b50776c8df8d09d6",
+          "scope": "forced-SSE2-build-original28800-per-mode-MPFR-4225-new-pairs-pass"
+        },
+        {
+          "path": "/home/dan/.codex/worktrees/phase6-closeout/orbiter-cross-platform/out/phase6-atan2-focused-v1/Debug-automatic-first-reload-pair.json",
+          "sha256": "fa7b0e1fee4731110ef0e270f18209e1a4a49e568e595dd8d276bf735b502d75",
+          "scope": "first-repaired-native-Debug-automatic-reload-only-all-pair-budgets-pass"
+        },
+        {
+          "path": "/home/dan/.codex/worktrees/phase6-closeout/orbiter-cross-platform/out/phase6-atan2-binding-Release-automatic-v1/math-verification.json",
+          "sha256": "d06c82590f84d2c32cbd4fb0fd390ff3e9c582257c56c5ced7e120550503b796",
+          "scope": "Release-automatic-binding-original28800-per-mode-MPFR-4225-new-pairs-pass"
+        },
+        {
+          "path": "/home/dan/.codex/worktrees/phase6-closeout/orbiter-cross-platform/out/phase6-atan2-binding-Release-sse2-v1/math-verification.json",
+          "sha256": "0b9005ce2c40d3a357259b9bc3332e55085c79b0bcdf42cc30c4cc2f270836b0",
+          "scope": "Release-forced-SSE2-binding-original28800-per-mode-MPFR-4225-new-pairs-pass"
+        },
+        {
+          "path": "/home/dan/.codex/worktrees/phase6-closeout/orbiter-cross-platform/out/phase6-atan2-focused-coordinator-v1/status.json",
+          "sha256": "64e8fad29222471c204e1a321c556b1d1ecdc658cfb84b9a39b10469e8cda961",
+          "scope": "complete-native-scene003-four-profile-two-repeat-writer-and-exact-save-reload-16-runs-not-full38"
+        },
+        {
+          "path": "/home/dan/.codex/worktrees/phase6-closeout/orbiter-cross-platform/out/phase6-atan2-Debug-automatic-v1/build.json",
+          "sha256": "90e1fb9a0f085592f3d5c0fbbb9936a37dcbceb4ffabdf0944d0c48af8390012",
+          "scope": "source-bound-81dcc014-sanitizer-package-Debug-automatic-build-only"
+        },
+        {
+          "path": "/home/dan/.codex/worktrees/phase6-closeout/orbiter-cross-platform/out/phase6-atan2-Debug-sse2-v2/build.json",
+          "sha256": "06dc785d4bb6153d6517c1c09d1d2a5a6d98ff2a66618e32cda33f92080732ee",
+          "scope": "source-bound-81dcc014-sanitizer-package-Debug-sse2-build-only"
+        },
+        {
+          "path": "/home/dan/.codex/worktrees/phase6-closeout/orbiter-cross-platform/out/phase6-atan2-Release-automatic-v1/build.json",
+          "sha256": "1a70cfe93617315b9859e8c4f3936f7ca13cdde8fc4416e7e159e32e0465bad9",
+          "scope": "source-bound-81dcc014-sanitizer-package-Release-automatic-build-only"
+        },
+        {
+          "path": "/home/dan/.codex/worktrees/phase6-closeout/orbiter-cross-platform/out/phase6-atan2-Release-sse2-v1/build.json",
+          "sha256": "9394730a0ede3b1b1b7ceab654b2055316f5a51bca696e36ad92ad1c7b283eec",
+          "scope": "source-bound-81dcc014-sanitizer-package-Release-sse2-build-only"
+        },
+        {
+          "path": "/home/dan/.codex/worktrees/phase6-acceptance/orbiter-cross-platform/out/phase6-current-stock-Windows-v2/first-writer-pairs-v2.json",
+          "sha256": "e61f2bf40ad96da90131170c63f8abfc719ec8f824e4161b62e7a684b9f94a9a",
+          "scope": "first-current-Windows-writer-Debug-Release-automatic-pairs-only-not-complete-matrix"
+        },
+        {
+          "path": "/home/dan/.codex/worktrees/phase6-acceptance/orbiter-cross-platform/out/phase6-current-stock-Windows-v2/first-reload-pairs-v1.json",
+          "sha256": "7c7198315f2a6aff4220b888f88f7ab309b7ab534c784b3f9ef5eb524db3a7d4",
+          "scope": "first-current-Windows-reload-Debug-Release-automatic-pairs-only-not-complete-matrix"
+        },
+        {
+          "path": "/home/dan/.codex/worktrees/phase6-acceptance/orbiter-cross-platform/out/phase6-current-stock-Windows-v2/independent-audit-v4/audit.json",
+          "sha256": "6de51fbc31118a792bc2f32952f9e8893e71251070c42ff136f6c8ac28b7af54",
+          "scope": "entire-declared-scene003-original-current-Windows-native-four-profile-two-repeat-writer-reload-matrix-only"
+        },
+        {
+          "path": "/home/dan/.codex/worktrees/phase6-acceptance/orbiter-cross-platform/out/phase6-current-stock-Windows-v2/independent-audit-v4/source-seal.json",
+          "sha256": "c4e3eb1d190b5c7207ac0a0e033eebf0b723c3ca0f405a1992a048ec4bc0701a",
+          "scope": "immutable-verifier-source-seal-no-full38-inference"
+        }
+      ],
+      "note": "The entire focused scene003 exit condition passes: all four profiles, both repetitions and writer/exact-Windows-save reload phases, with original/current Windows and native comparisons. Selected full38 captures cover this whole focused gate, not the remaining-stock gate. Historical missing launch receipts remain missing."
+    },
+    "general-api": {
+      "expected": {
+        "depends_on": [
+          "runner-controls"
+        ],
+        "profiles": [
+          "Debug-automatic",
+          "Debug-sse2",
+          "Release-automatic",
+          "Release-sse2"
+        ],
+        "cohorts": [
+          "current-windows",
+          "native"
+        ],
+        "required": [
+          "original-bytes-and-failure-preserved",
+          "locked-spice-oracle",
+          "symmetric-comparator",
+          "nil-false-and-wrong-value-controls"
+        ],
+        "final_candidate_required": false
+      },
+      "result": "passed",
+      "coverage": {
+        "depends_on": [
+          "runner-controls"
+        ],
+        "profiles": [
+          "Debug-automatic",
+          "Debug-sse2",
+          "Release-automatic",
+          "Release-sse2"
+        ],
+        "cohorts": [
+          "current-windows",
+          "native"
+        ],
+        "required": [
+          "original-bytes-and-failure-preserved",
+          "locked-spice-oracle",
+          "symmetric-comparator",
+          "nil-false-and-wrong-value-controls"
+        ],
+        "final_candidate_required": false
+      },
+      "diagnostic_only": false,
+      "candidate_id": null,
+      "evidence": [
+        {
+          "path": "/home/dan/.codex/worktrees/phase6-closeout/orbiter-cross-platform/out/phase6-general-api-correction-v1/helper-controls.json",
+          "sha256": "ad7e39b070de9c1c1d844de46b1df35b15bfc234d320af4226e8d804e955f4cb",
+          "scope": "helper-controls-only-no-simulator-qualification"
+        },
+        {
+          "path": "/home/dan/.codex/worktrees/phase6-closeout/orbiter-cross-platform/out/phase6-general-api-correction-v1/helper-controls-v3.json",
+          "sha256": "7d5e92132d26c6cfbf8197d9460f329d0cec3c4e0a4ce71325a7102049b45c67",
+          "scope": "latest-four-region-variant-22-lua-helper-and-3-damaged-input-controls"
+        },
+        {
+          "path": "/home/dan/.codex/worktrees/phase6-closeout/orbiter-cross-platform/out/phase6-general-api-native-diagnostic-v1/independent-audit.json",
+          "sha256": "64a1e4c3a580473e09dd343f4d268f30d85f88c3861e486546ecce7c17ea0408",
+          "scope": "Debug-automatic-original-failure-and-corrected-script-success-startup-exit-policy-pending"
+        },
+        {
+          "path": "/home/dan/.codex/worktrees/phase6-closeout/orbiter-cross-platform/out/phase6-general-api-correction-v1/helper-controls-v4.json",
+          "sha256": "5015b473fdd37d006ca7e335fe93f42f25c500dfe1623380b0f34c6199fb18ea",
+          "scope": "same-corrected-script-bytes-with-whitespace-safe-original-matcher"
+        },
+        {
+          "path": "/home/dan/.codex/worktrees/phase6-acceptance/orbiter-cross-platform/out/phase6-general-api-Windows-v3/qualification-v1.json",
+          "sha256": "2589700797f7065e3ede5c8f84eedfd7cd7c56ff029fab7cdf91463d0d9461d2",
+          "scope": "complete-corrected-API-test-Windows-native-four-profile-qualification-only"
+        },
+        {
+          "path": "/home/dan/.codex/worktrees/phase6-acceptance/orbiter-cross-platform/out/phase6-general-api-normal-host-v2/matrix.json",
+          "sha256": "b397b3ff23ffa01fd6a957f33faae9f25f6d9ef316449bbc7b96cfa25938b164",
+          "scope": "four-profile-selected-normal-host-API-captures-and-independent-audits-not-157-scenes"
+        },
+        {
+          "path": "/home/dan/.codex/worktrees/phase6-acceptance/orbiter-cross-platform/out/phase6-general-api-normal-host-v2/Debug-automatic/independent-audit.json",
+          "sha256": "c025d5abbd74827109949fe9b24662da3a753adbf884e7a8d66e9a82c7c5eb58",
+          "scope": "Debug-automatic-selected-normal-host-API-capture-only"
+        },
+        {
+          "path": "/home/dan/.codex/worktrees/phase6-acceptance/orbiter-cross-platform/out/phase6-general-api-normal-host-v2/Debug-automatic/admission-controls.json",
+          "sha256": "bce7e05b2a331025f0ed0bb941b1ff44c7f05c0046ebc6147e674c575f78130c",
+          "scope": "Debug-automatic-fourteen-damaged-real-API-evidence-controls"
+        },
+        {
+          "path": "/home/dan/.codex/worktrees/phase6-acceptance/orbiter-cross-platform/out/phase6-general-api-normal-host-v2/Debug-sse2/independent-audit.json",
+          "sha256": "3098d553deb55765c6fca1300d079f9a92f5409c7eb44d4638d1c2a3d16807c2",
+          "scope": "Debug-sse2-selected-normal-host-API-capture-only"
+        },
+        {
+          "path": "/home/dan/.codex/worktrees/phase6-acceptance/orbiter-cross-platform/out/phase6-general-api-normal-host-v2/Debug-sse2/admission-controls.json",
+          "sha256": "8f98e59bcf0aecf2404d0f13858bdff3ac11797bb591372b456ee6381d03732d",
+          "scope": "Debug-sse2-fourteen-damaged-real-API-evidence-controls"
+        },
+        {
+          "path": "/home/dan/.codex/worktrees/phase6-acceptance/orbiter-cross-platform/out/phase6-general-api-normal-host-v2/Release-automatic/independent-audit.json",
+          "sha256": "d4b214f8923abf1c2ec16d340175616fbc9cdfe9997a04e1b1042cdfe6c123ae",
+          "scope": "Release-automatic-selected-normal-host-API-capture-only"
+        },
+        {
+          "path": "/home/dan/.codex/worktrees/phase6-acceptance/orbiter-cross-platform/out/phase6-general-api-normal-host-v2/Release-automatic/admission-controls.json",
+          "sha256": "53631b02e9ce65447c5512deadbd8d7dc72140bbc3282991b3807f7d15e8b1b8",
+          "scope": "Release-automatic-fourteen-damaged-real-API-evidence-controls"
+        },
+        {
+          "path": "/home/dan/.codex/worktrees/phase6-acceptance/orbiter-cross-platform/out/phase6-general-api-normal-host-v2/Release-sse2/independent-audit.json",
+          "sha256": "bc34d46354d6b316b11b171b4679690d66f0ff40c2e151261e05a3b98b41de03",
+          "scope": "Release-sse2-selected-normal-host-API-capture-only"
+        },
+        {
+          "path": "/home/dan/.codex/worktrees/phase6-acceptance/orbiter-cross-platform/out/phase6-general-api-normal-host-v2/Release-sse2/admission-controls.json",
+          "sha256": "b72e380c1bc7f64267a5f6089b79c613fce5876611397d7170a0a972c43afbd9",
+          "scope": "Release-sse2-fourteen-damaged-real-API-evidence-controls"
+        },
+        {
+          "path": "/home/dan/.codex/worktrees/phase6-acceptance/orbiter-cross-platform/out/phase6-general-api-normal-host-v1/retained-vessel-api-exit-controls-v2.json",
+          "sha256": "5bc410f3ef784364895d9f77ffd59faaf2188c778289a98359db80b576c287ee",
+          "scope": "all-sixteen-existing-VesselApiTest-exit-controls-preserved"
+        }
+      ],
+      "note": "The complete explicitly versioned API test and specific normal-host startup exit pass in both runtimes and all four profiles. Original failure, normal assertion semantics and actual negative controls remain preserved. No 157-scene admission is inferred."
+    },
+    "class-eligibility": {
+      "expected": {
+        "depends_on": [
+          "numerical-reload",
+          "general-api"
+        ],
+        "profiles": [
+          "Debug-automatic",
+          "Debug-sse2",
+          "Release-automatic",
+          "Release-sse2"
+        ],
+        "families": [
+          "Atlantis",
+          "Atlantis_SRB",
+          "Atlantis_Tank",
+          "Carina",
+          "Leonardo_mplm",
+          "Module2",
+          "Dragonfly",
+          "HST",
+          "LDEF",
+          "SolarSail",
+          "Quadcopter"
+        ],
+        "required": [
+          "source-abi",
+          "capabilities",
+          "interactions",
+          "persistence",
+          "resource-ownership",
+          "twenty-cycle-teardown",
+          "rejection-controls"
+        ],
+        "final_candidate_required": false
+      },
+      "result": "passed",
+      "coverage": {
+        "depends_on": [
+          "numerical-reload",
+          "general-api"
+        ],
+        "profiles": [
+          "Debug-automatic",
+          "Debug-sse2",
+          "Release-automatic",
+          "Release-sse2"
+        ],
+        "families": [
+          "Atlantis",
+          "Atlantis_SRB",
+          "Atlantis_Tank",
+          "Carina",
+          "Leonardo_mplm",
+          "Module2",
+          "Dragonfly",
+          "HST",
+          "LDEF",
+          "SolarSail",
+          "Quadcopter"
+        ],
+        "required": [
+          "source-abi",
+          "capabilities",
+          "interactions",
+          "persistence",
+          "resource-ownership",
+          "twenty-cycle-teardown",
+          "rejection-controls"
+        ],
+        "final_candidate_required": false
+      },
+      "diagnostic_only": false,
+      "candidate_id": null,
+      "evidence": [
+        {
+          "path": "/home/dan/.codex/worktrees/phase6-class-eligibility/orbiter-cross-platform/out/phase6-eligibility-paused-Debug-automatic-v1/independent-audit-v2.json",
+          "sha256": "c1259037aaaa4671d869c6e976de7cf4a29d8db7a2688d97ef479b997ca4ac30",
+          "scope": "Independent twenty-world paused attachment lifetime facet only"
+        },
+        {
+          "path": "/home/dan/.codex/worktrees/phase6-class-eligibility/orbiter-cross-platform/out/phase6-eligibility-paused-Debug-automatic-v1/verification.json",
+          "sha256": "b84e3ca876c8d18b5402cd851854d9c9dbdbf52fd79dba5ce802cc5fb5704081",
+          "scope": "Original complete paused ISS/Atlantis/Leonardo graph; original bytes seed nineteen real F5 reloads"
+        },
+        {
+          "path": "/home/dan/.codex/worktrees/phase6-class-eligibility/orbiter-cross-platform/out/phase6-eligibility-paused-Debug-sse2-v1/independent-audit-v2.json",
+          "sha256": "00bd41c0d47645a003a537cbe9d121806ec74cb57afc81401514904d6e044d32",
+          "scope": "Independent twenty-world paused attachment lifetime facet only"
+        },
+        {
+          "path": "/home/dan/.codex/worktrees/phase6-class-eligibility/orbiter-cross-platform/out/phase6-eligibility-paused-Debug-sse2-v1/verification.json",
+          "sha256": "f63e15a7cbba330bf570ef18842f16b6df33d3db19a1a859d8eb0c7a7026ecb4",
+          "scope": "Original complete paused ISS/Atlantis/Leonardo graph; original bytes seed nineteen real F5 reloads"
+        },
+        {
+          "path": "/home/dan/.codex/worktrees/phase6-class-eligibility/orbiter-cross-platform/out/phase6-eligibility-paused-Release-automatic-v1/independent-audit-v2.json",
+          "sha256": "b7498730940ece3f2674c4560acd4fb3a1afc6c5de6bc65c3211920f126bf7e0",
+          "scope": "Independent twenty-world paused attachment lifetime facet only"
+        },
+        {
+          "path": "/home/dan/.codex/worktrees/phase6-class-eligibility/orbiter-cross-platform/out/phase6-eligibility-paused-Release-automatic-v1/verification.json",
+          "sha256": "dfc496e655a31b6a71ff4f8f6dedb2a9d3dc77305bedb7835811732d69eaf1da",
+          "scope": "Original complete paused ISS/Atlantis/Leonardo graph; original bytes seed nineteen real F5 reloads"
+        },
+        {
+          "path": "/home/dan/.codex/worktrees/phase6-class-eligibility/orbiter-cross-platform/out/phase6-eligibility-paused-Release-sse2-v1/independent-audit-v2.json",
+          "sha256": "82c3cce9ee6617ee2a3fd4ff38d993ff9a37a59160cbdcbdf0065e43d8cea450",
+          "scope": "Independent twenty-world paused attachment lifetime facet only"
+        },
+        {
+          "path": "/home/dan/.codex/worktrees/phase6-class-eligibility/orbiter-cross-platform/out/phase6-eligibility-paused-Release-sse2-v1/verification.json",
+          "sha256": "ed3e601ccc541d12ffc1b4ebbac48ff937ce5f7f68b728340687508a4eb74465",
+          "scope": "Original complete paused ISS/Atlantis/Leonardo graph; original bytes seed nineteen real F5 reloads"
+        },
+        {
+          "path": "/home/dan/.codex/worktrees/phase6-class-eligibility/orbiter-cross-platform/out/phase6-eligibility-lifetimes-Debug-automatic-canary-v2/independent-audit-v1.json",
+          "sha256": "3b40b0b1549e90b55b6281a45df2010500d790dc3ef2a408ad777b5cbcc0b820",
+          "scope": "Independent twenty unpaused HST/Atlantis whole-world and actual module unload lifetimes only"
+        },
+        {
+          "path": "/home/dan/.codex/worktrees/phase6-class-eligibility/orbiter-cross-platform/out/phase6-eligibility-lifetimes-Debug-automatic-canary-v2/lifetimes.json",
+          "sha256": "789f0195137a5a8ff84421d613a9f504996bd0dfebf168fc377ff55208fc47e9",
+          "scope": "Complete original HST Animation roster; no interaction or full parity credit"
+        },
+        {
+          "path": "/home/dan/.codex/worktrees/phase6-class-eligibility/orbiter-cross-platform/out/phase6-class-source-conservation-v1.json",
+          "sha256": "2034d84d0909a0ce64b5490b817b8c72ca95c2314fa276b9b43276a20cd4faf8",
+          "scope": "Exact declared source-conservation deltas only; runtime eligibility remains open"
+        },
+        {
+          "path": "/home/dan/.codex/worktrees/phase6-class-eligibility/orbiter-cross-platform/out/phase6-class-family-lifetime-matrix-audit-v1.json",
+          "sha256": "6b6695982f7229071bb98742d339d8063cb42522d9b967beb727ffef3f99d359",
+          "scope": "Independent complete seven-scene/four-profile positive ABI loading, resource ownership and twenty-world facets only"
+        },
+        {
+          "path": "/home/dan/.codex/worktrees/phase6-capability-eligibility/orbiter-cross-platform/out/phase6-original-structural-capability-inventory-v1.json",
+          "sha256": "6f894873e9b7b482a286824208d831b430886bb36d23ae2c8362a319338ee0ed",
+          "scope": "Hashed initial structural fields across all original Windows stock scenes; proposed native cover only"
+        },
+        {
+          "path": "/home/dan/.codex/worktrees/phase6-capability-eligibility/orbiter-cross-platform/out/phase6-capability-HST-Debug-automatic-canary-v4/independent-audit-v1.json",
+          "sha256": "882330ff95df3234b22d8ee0f8c27160dfb23e644e7e2a33d1bb237ba9d59e55",
+          "scope": "HST/Atlantis actual SDK fields/ports and observer-off/on native equivalence; one profile/repetition, diagnostic only"
+        },
+        {
+          "path": "/home/dan/.codex/worktrees/phase6-capability-eligibility/orbiter-cross-platform/out/phase6-family-persistence-plan-v1.json",
+          "sha256": "3638906a17bff091feb0462dd4e2f201f947cf9aeeed59d4deedf7325302043b",
+          "scope": "Prepared existing-coordinator request: 128 new runs plus 16 separately retained runs; not launched"
+        },
+        {
+          "path": "/home/dan/.codex/worktrees/phase6-eligibility-controls/orbiter-cross-platform/out/phase6-all-family-capability-matrix-audit-v1.json",
+          "sha256": "13ae9d581d25a7f68859aa9b19b048ee61ca453cefc85f9317719a6c313d94f2",
+          "scope": "All sixteen original structural combinations, four profiles, two passive-observer off/on repetitions; capabilities facet only"
+        },
+        {
+          "path": "/home/dan/.codex/worktrees/phase6-persistence-controls/orbiter-cross-platform/out/phase6-family-persistence-execution-plan-v2.json",
+          "sha256": "65f13c97d97bf9daeee886de024caff6d911b0a6fd552b07631ebed8c57273b7",
+          "scope": "Two separate exact scopes: 128 new runs plus 16 retained runs to re-audit; requests launched, no persistence pass yet"
+        },
+        {
+          "path": "/home/dan/.codex/worktrees/phase6-persistence-controls/orbiter-cross-platform/out/phase6-family-persistence-retained003-v1/status.json",
+          "sha256": "6050f5d048484194c59def971f588a9e6f645055f1d8f4837ddef5b67df30811",
+          "scope": "Fresh independent audit and Windows comparisons of all sixteen retained scene003 writer/reloads under their exact original selected scope; no new simulators"
+        },
+        {
+          "path": "/home/dan/.codex/worktrees/phase6-persistence-controls/orbiter-cross-platform/out/phase6-family-persistence-selected-v2/status.json",
+          "sha256": "43488fe79c9bb57b9621178cf47fbc861b692e40c5e4948d310b8bf93858832d",
+          "scope": "Failure-preserving coordinator: 32 new complete Debug writer runs pass; scene009 SSE2 reload fails exact saved RPOS; other work cancelled and partial captures remain incomplete"
+        },
+        {
+          "path": "/home/dan/.codex/worktrees/phase6-audit-throughput/orbiter-cross-platform/out/phase6-all-family-rejection-matrix-audit-v1.json",
+          "sha256": "8c7559f506a5906aeea504ab0ce51862c578141d1843936a8661d31372c1fd8b",
+          "scope": "Every family: unknown class and foreign factory. Each module-defined family: missing module and generic fallback. Shared checked loader: seven invalid ABI descriptors, missing query and actual Windows PE. All return one before presentation, clean contexts and unsuppressed sanitizers; invalid metadata never initializes. No positive interaction, persistence or normal admission credit."
+        },
+        {
+          "path": "/home/dan/.codex/worktrees/phase6-stock-admission/orbiter-cross-platform/out/phase6-all-family-persistence-matrix-audit-v2.json",
+          "sha256": "f88902c6e7ae13e72284849a23d2327d6b7f1b301aa71ffd41e7afbad31d1002",
+          "scope": "Selected complete original scenes, full serialized content and matching exact Windows-save reloads. No full38, actual operator save/F5 workflow, interaction, normal admission or final-candidate credit. Historical missing launch receipts remain missing."
+        },
+        {
+          "path": "/home/dan/.codex/worktrees/phase6-production-qualification/orbiter-cross-platform/out/phase6-one-profile-all-family-interactions-v1.json",
+          "sha256": "962ebd16cab094996c3915b16597a059a3c47fd818d76b308fc3b34da73b6e5f",
+          "scope": "All nine original-control flows twice on Debug/SSE2. Other three profiles remain required. No complete class, normal admission, named workflow or software gate credit."
+        },
+        {
+          "path": "/home/dan/.codex/worktrees/phase6-production-qualification/orbiter-cross-platform/out/phase6-all-family-interaction-matrix-audit-v1.json",
+          "sha256": "fa0b2b8b07f4da97a80bb4876d9e54e5cc874f0eb8aadb7533f2d96ad85fa34e",
+          "scope": "All nine original-control flows in four profiles, twice each, complete original/generated rosters, actual keys/GUI/Lua actuators, physical docking, payload mass transfer, six-joint RMS and canonical-clock launch/staging. No normal-host admission, full38, named Windows/native workflow or final-candidate credit."
+        }
+      ],
+      "qualification_progress": {
+        "scope": "All eleven stock families satisfy every declared eligibility facet across all four profiles. Final normal-host admission and candidate acceptance remain separate gates.",
+        "source_conservation": {
+          "path": "/home/dan/.codex/worktrees/phase6-class-eligibility/orbiter-cross-platform/out/phase6-class-source-conservation-v1.json",
+          "sha256": "2034d84d0909a0ce64b5490b817b8c72ca95c2314fa276b9b43276a20cd4faf8",
+          "scope": "Exact declared source-conservation deltas only; runtime eligibility remains open"
+        },
+        "paused_attachment_control": {
+          "result": "passed-scoped-facet-only",
+          "worlds": 80,
+          "real_F5_reloads": 76,
+          "profiles": {
+            "Debug-automatic": {
+              "audit": {
+                "path": "/home/dan/.codex/worktrees/phase6-class-eligibility/orbiter-cross-platform/out/phase6-eligibility-paused-Debug-automatic-v1/independent-audit-v2.json",
+                "sha256": "c1259037aaaa4671d869c6e976de7cf4a29d8db7a2688d97ef479b997ca4ac30",
+                "scope": "Independent twenty-world paused attachment lifetime facet only"
+              },
+              "capture": {
+                "path": "/home/dan/.codex/worktrees/phase6-class-eligibility/orbiter-cross-platform/out/phase6-eligibility-paused-Debug-automatic-v1/verification.json",
+                "sha256": "b84e3ca876c8d18b5402cd851854d9c9dbdbf52fd79dba5ce802cc5fb5704081",
+                "scope": "Original complete paused ISS/Atlantis/Leonardo graph; original bytes seed nineteen real F5 reloads"
+              },
+              "runtime_identity": {
+                "configuration": "Debug",
+                "math_profile": "automatic",
+                "profile": "Debug-automatic",
+                "sanitizer_linked": true,
+                "compiler": "/usr/bin/c++",
+                "cache_sha256": "9a4c0c958867be4638b6a882e5cc6d50b38e3cdcdbc4755f2151d3ceb601f1f6",
+                "build_record_sha256": "90e1fb9a0f085592f3d5c0fbbb9936a37dcbceb4ffabdf0944d0c48af8390012",
+                "runtime_source_commit": "81dcc014ba132fe4ad8c6551839569bf81c581f7"
+              }
+            },
+            "Debug-sse2": {
+              "audit": {
+                "path": "/home/dan/.codex/worktrees/phase6-class-eligibility/orbiter-cross-platform/out/phase6-eligibility-paused-Debug-sse2-v1/independent-audit-v2.json",
+                "sha256": "00bd41c0d47645a003a537cbe9d121806ec74cb57afc81401514904d6e044d32",
+                "scope": "Independent twenty-world paused attachment lifetime facet only"
+              },
+              "capture": {
+                "path": "/home/dan/.codex/worktrees/phase6-class-eligibility/orbiter-cross-platform/out/phase6-eligibility-paused-Debug-sse2-v1/verification.json",
+                "sha256": "f63e15a7cbba330bf570ef18842f16b6df33d3db19a1a859d8eb0c7a7026ecb4",
+                "scope": "Original complete paused ISS/Atlantis/Leonardo graph; original bytes seed nineteen real F5 reloads"
+              },
+              "runtime_identity": {
+                "configuration": "Debug",
+                "math_profile": "sse2",
+                "profile": "Debug-sse2",
+                "sanitizer_linked": true,
+                "compiler": "/usr/bin/c++",
+                "cache_sha256": "616e6477447d7fb7f554286762528f0510eb724b73c8fa1dea7cc1bd29d30c6e",
+                "build_record_sha256": "06dc785d4bb6153d6517c1c09d1d2a5a6d98ff2a66618e32cda33f92080732ee",
+                "runtime_source_commit": "81dcc014ba132fe4ad8c6551839569bf81c581f7"
+              }
+            },
+            "Release-automatic": {
+              "audit": {
+                "path": "/home/dan/.codex/worktrees/phase6-class-eligibility/orbiter-cross-platform/out/phase6-eligibility-paused-Release-automatic-v1/independent-audit-v2.json",
+                "sha256": "b7498730940ece3f2674c4560acd4fb3a1afc6c5de6bc65c3211920f126bf7e0",
+                "scope": "Independent twenty-world paused attachment lifetime facet only"
+              },
+              "capture": {
+                "path": "/home/dan/.codex/worktrees/phase6-class-eligibility/orbiter-cross-platform/out/phase6-eligibility-paused-Release-automatic-v1/verification.json",
+                "sha256": "dfc496e655a31b6a71ff4f8f6dedb2a9d3dc77305bedb7835811732d69eaf1da",
+                "scope": "Original complete paused ISS/Atlantis/Leonardo graph; original bytes seed nineteen real F5 reloads"
+              },
+              "runtime_identity": {
+                "configuration": "Release",
+                "math_profile": "automatic",
+                "profile": "Release-automatic",
+                "sanitizer_linked": true,
+                "compiler": "/usr/bin/c++",
+                "cache_sha256": "e8c97d459984542e8e808f86b07040da1bdc190c018e97da34c355043bd8abad",
+                "build_record_sha256": "1a70cfe93617315b9859e8c4f3936f7ca13cdde8fc4416e7e159e32e0465bad9",
+                "runtime_source_commit": "81dcc014ba132fe4ad8c6551839569bf81c581f7"
+              }
+            },
+            "Release-sse2": {
+              "audit": {
+                "path": "/home/dan/.codex/worktrees/phase6-class-eligibility/orbiter-cross-platform/out/phase6-eligibility-paused-Release-sse2-v1/independent-audit-v2.json",
+                "sha256": "82c3cce9ee6617ee2a3fd4ff38d993ff9a37a59160cbdcbdf0065e43d8cea450",
+                "scope": "Independent twenty-world paused attachment lifetime facet only"
+              },
+              "capture": {
+                "path": "/home/dan/.codex/worktrees/phase6-class-eligibility/orbiter-cross-platform/out/phase6-eligibility-paused-Release-sse2-v1/verification.json",
+                "sha256": "ed3e601ccc541d12ffc1b4ebbac48ff937ce5f7f68b728340687508a4eb74465",
+                "scope": "Original complete paused ISS/Atlantis/Leonardo graph; original bytes seed nineteen real F5 reloads"
+              },
+              "runtime_identity": {
+                "configuration": "Release",
+                "math_profile": "sse2",
+                "profile": "Release-sse2",
+                "sanitizer_linked": true,
+                "compiler": "/usr/bin/c++",
+                "cache_sha256": "3ac5aa04f1f41d9eeb2ecc4a38ad03e3da8d0c8b3381d80b7e25905f786d5894",
+                "build_record_sha256": "9394730a0ede3b1b1b7ceab654b2055316f5a51bca696e36ad92ad1c7b283eec",
+                "runtime_source_commit": "81dcc014ba132fe4ad8c6551839569bf81c581f7"
+              }
+            }
+          }
+        },
+        "unpaused_hst_canary": {
+          "profile": "Debug-automatic",
+          "cases": [
+            "remaining_stock_018"
+          ],
+          "worlds": 20,
+          "successful_presents": 1200,
+          "audit": {
+            "path": "/home/dan/.codex/worktrees/phase6-class-eligibility/orbiter-cross-platform/out/phase6-eligibility-lifetimes-Debug-automatic-canary-v2/independent-audit-v1.json",
+            "sha256": "3b40b0b1549e90b55b6281a45df2010500d790dc3ef2a408ad777b5cbcc0b820",
+            "scope": "Independent twenty unpaused HST/Atlantis whole-world and actual module unload lifetimes only"
+          },
+          "capture": {
+            "path": "/home/dan/.codex/worktrees/phase6-class-eligibility/orbiter-cross-platform/out/phase6-eligibility-lifetimes-Debug-automatic-canary-v2/lifetimes.json",
+            "sha256": "789f0195137a5a8ff84421d613a9f504996bd0dfebf168fc377ff55208fc47e9",
+            "scope": "Complete original HST Animation roster; no interaction or full parity credit"
+          }
+        },
+        "family_results": {
+          "Atlantis": {
+            "lifetime_case": "remaining_stock_003",
+            "facets": {
+              "source-abi": {
+                "result": "passed-scoped-family-facet",
+                "passed_profiles": [
+                  "Debug-automatic",
+                  "Debug-sse2",
+                  "Release-automatic",
+                  "Release-sse2"
+                ],
+                "evidence": {
+                  "path": "/home/dan/.codex/worktrees/phase6-class-eligibility/orbiter-cross-platform/out/phase6-class-family-lifetime-matrix-audit-v1.json",
+                  "sha256": "6b6695982f7229071bb98742d339d8063cb42522d9b967beb727ffef3f99d359",
+                  "scope": "Independent complete seven-scene/four-profile positive ABI loading, resource ownership and twenty-world facets only"
+                }
+              },
+              "capabilities": {
+                "result": "passed-scoped-family-facet",
+                "passed_profiles": [
+                  "Debug-automatic",
+                  "Debug-sse2",
+                  "Release-automatic",
+                  "Release-sse2"
+                ],
+                "evidence": {
+                  "path": "/home/dan/.codex/worktrees/phase6-eligibility-controls/orbiter-cross-platform/out/phase6-all-family-capability-matrix-audit-v1.json",
+                  "sha256": "13ae9d581d25a7f68859aa9b19b048ee61ca453cefc85f9317719a6c313d94f2",
+                  "scope": "All sixteen original structural combinations, four profiles, two passive-observer off/on repetitions; capabilities facet only"
+                }
+              },
+              "interactions": {
+                "result": "passed-scoped-family-facet",
+                "passed_profiles": [
+                  "Debug-automatic",
+                  "Debug-sse2",
+                  "Release-automatic",
+                  "Release-sse2"
+                ],
+                "evidence": {
+                  "path": "/home/dan/.codex/worktrees/phase6-production-qualification/orbiter-cross-platform/out/phase6-all-family-interaction-matrix-audit-v1.json",
+                  "sha256": "fa0b2b8b07f4da97a80bb4876d9e54e5cc874f0eb8aadb7533f2d96ad85fa34e",
+                  "scope": "All nine original-control flows in four profiles, twice each, complete original/generated rosters, actual keys/GUI/Lua actuators, physical docking, payload mass transfer, six-joint RMS and canonical-clock launch/staging. No normal-host admission, full38, named Windows/native workflow or final-candidate credit."
+                }
+              },
+              "persistence": {
+                "result": "passed-scoped-family-facet",
+                "passed_profiles": [
+                  "Debug-automatic",
+                  "Debug-sse2",
+                  "Release-automatic",
+                  "Release-sse2"
+                ],
+                "evidence": {
+                  "path": "/home/dan/.codex/worktrees/phase6-stock-admission/orbiter-cross-platform/out/phase6-all-family-persistence-matrix-audit-v2.json",
+                  "sha256": "f88902c6e7ae13e72284849a23d2327d6b7f1b301aa71ffd41e7afbad31d1002",
+                  "scope": "Selected complete original scenes, full serialized content and matching exact Windows-save reloads. No full38, actual operator save/F5 workflow, interaction, normal admission or final-candidate credit. Historical missing launch receipts remain missing."
+                }
+              },
+              "resource-ownership": {
+                "result": "passed-scoped-family-facet",
+                "passed_profiles": [
+                  "Debug-automatic",
+                  "Debug-sse2",
+                  "Release-automatic",
+                  "Release-sse2"
+                ],
+                "evidence": {
+                  "path": "/home/dan/.codex/worktrees/phase6-class-eligibility/orbiter-cross-platform/out/phase6-class-family-lifetime-matrix-audit-v1.json",
+                  "sha256": "6b6695982f7229071bb98742d339d8063cb42522d9b967beb727ffef3f99d359",
+                  "scope": "Independent complete seven-scene/four-profile positive ABI loading, resource ownership and twenty-world facets only"
+                }
+              },
+              "twenty-cycle-teardown": {
+                "result": "passed-scoped-family-facet",
+                "passed_profiles": [
+                  "Debug-automatic",
+                  "Debug-sse2",
+                  "Release-automatic",
+                  "Release-sse2"
+                ],
+                "evidence": {
+                  "path": "/home/dan/.codex/worktrees/phase6-class-eligibility/orbiter-cross-platform/out/phase6-class-family-lifetime-matrix-audit-v1.json",
+                  "sha256": "6b6695982f7229071bb98742d339d8063cb42522d9b967beb727ffef3f99d359",
+                  "scope": "Independent complete seven-scene/four-profile positive ABI loading, resource ownership and twenty-world facets only"
+                }
+              },
+              "rejection-controls": {
+                "result": "passed-scoped-family-facet",
+                "passed_profiles": [
+                  "Debug-automatic",
+                  "Debug-sse2",
+                  "Release-automatic",
+                  "Release-sse2"
+                ],
+                "evidence": {
+                  "path": "/home/dan/.codex/worktrees/phase6-audit-throughput/orbiter-cross-platform/out/phase6-all-family-rejection-matrix-audit-v1.json",
+                  "sha256": "8c7559f506a5906aeea504ab0ce51862c578141d1843936a8661d31372c1fd8b",
+                  "scope": "Every family: unknown class and foreign factory. Each module-defined family: missing module and generic fallback. Shared checked loader: seven invalid ABI descriptors, missing query and actual Windows PE. All return one before presentation, clean contexts and unsuppressed sanitizers; invalid metadata never initializes. No positive interaction, persistence or normal admission credit."
+                }
+              }
+            }
+          },
+          "Atlantis_SRB": {
+            "lifetime_case": "remaining_stock_003",
+            "facets": {
+              "source-abi": {
+                "result": "passed-scoped-family-facet",
+                "passed_profiles": [
+                  "Debug-automatic",
+                  "Debug-sse2",
+                  "Release-automatic",
+                  "Release-sse2"
+                ],
+                "evidence": {
+                  "path": "/home/dan/.codex/worktrees/phase6-class-eligibility/orbiter-cross-platform/out/phase6-class-family-lifetime-matrix-audit-v1.json",
+                  "sha256": "6b6695982f7229071bb98742d339d8063cb42522d9b967beb727ffef3f99d359",
+                  "scope": "Independent complete seven-scene/four-profile positive ABI loading, resource ownership and twenty-world facets only"
+                }
+              },
+              "capabilities": {
+                "result": "passed-scoped-family-facet",
+                "passed_profiles": [
+                  "Debug-automatic",
+                  "Debug-sse2",
+                  "Release-automatic",
+                  "Release-sse2"
+                ],
+                "evidence": {
+                  "path": "/home/dan/.codex/worktrees/phase6-eligibility-controls/orbiter-cross-platform/out/phase6-all-family-capability-matrix-audit-v1.json",
+                  "sha256": "13ae9d581d25a7f68859aa9b19b048ee61ca453cefc85f9317719a6c313d94f2",
+                  "scope": "All sixteen original structural combinations, four profiles, two passive-observer off/on repetitions; capabilities facet only"
+                }
+              },
+              "interactions": {
+                "result": "passed-scoped-family-facet",
+                "passed_profiles": [
+                  "Debug-automatic",
+                  "Debug-sse2",
+                  "Release-automatic",
+                  "Release-sse2"
+                ],
+                "evidence": {
+                  "path": "/home/dan/.codex/worktrees/phase6-production-qualification/orbiter-cross-platform/out/phase6-all-family-interaction-matrix-audit-v1.json",
+                  "sha256": "fa0b2b8b07f4da97a80bb4876d9e54e5cc874f0eb8aadb7533f2d96ad85fa34e",
+                  "scope": "All nine original-control flows in four profiles, twice each, complete original/generated rosters, actual keys/GUI/Lua actuators, physical docking, payload mass transfer, six-joint RMS and canonical-clock launch/staging. No normal-host admission, full38, named Windows/native workflow or final-candidate credit."
+                }
+              },
+              "persistence": {
+                "result": "passed-scoped-family-facet",
+                "passed_profiles": [
+                  "Debug-automatic",
+                  "Debug-sse2",
+                  "Release-automatic",
+                  "Release-sse2"
+                ],
+                "evidence": {
+                  "path": "/home/dan/.codex/worktrees/phase6-stock-admission/orbiter-cross-platform/out/phase6-all-family-persistence-matrix-audit-v2.json",
+                  "sha256": "f88902c6e7ae13e72284849a23d2327d6b7f1b301aa71ffd41e7afbad31d1002",
+                  "scope": "Selected complete original scenes, full serialized content and matching exact Windows-save reloads. No full38, actual operator save/F5 workflow, interaction, normal admission or final-candidate credit. Historical missing launch receipts remain missing."
+                }
+              },
+              "resource-ownership": {
+                "result": "passed-scoped-family-facet",
+                "passed_profiles": [
+                  "Debug-automatic",
+                  "Debug-sse2",
+                  "Release-automatic",
+                  "Release-sse2"
+                ],
+                "evidence": {
+                  "path": "/home/dan/.codex/worktrees/phase6-class-eligibility/orbiter-cross-platform/out/phase6-class-family-lifetime-matrix-audit-v1.json",
+                  "sha256": "6b6695982f7229071bb98742d339d8063cb42522d9b967beb727ffef3f99d359",
+                  "scope": "Independent complete seven-scene/four-profile positive ABI loading, resource ownership and twenty-world facets only"
+                }
+              },
+              "twenty-cycle-teardown": {
+                "result": "passed-scoped-family-facet",
+                "passed_profiles": [
+                  "Debug-automatic",
+                  "Debug-sse2",
+                  "Release-automatic",
+                  "Release-sse2"
+                ],
+                "evidence": {
+                  "path": "/home/dan/.codex/worktrees/phase6-class-eligibility/orbiter-cross-platform/out/phase6-class-family-lifetime-matrix-audit-v1.json",
+                  "sha256": "6b6695982f7229071bb98742d339d8063cb42522d9b967beb727ffef3f99d359",
+                  "scope": "Independent complete seven-scene/four-profile positive ABI loading, resource ownership and twenty-world facets only"
+                }
+              },
+              "rejection-controls": {
+                "result": "passed-scoped-family-facet",
+                "passed_profiles": [
+                  "Debug-automatic",
+                  "Debug-sse2",
+                  "Release-automatic",
+                  "Release-sse2"
+                ],
+                "evidence": {
+                  "path": "/home/dan/.codex/worktrees/phase6-audit-throughput/orbiter-cross-platform/out/phase6-all-family-rejection-matrix-audit-v1.json",
+                  "sha256": "8c7559f506a5906aeea504ab0ce51862c578141d1843936a8661d31372c1fd8b",
+                  "scope": "Every family: unknown class and foreign factory. Each module-defined family: missing module and generic fallback. Shared checked loader: seven invalid ABI descriptors, missing query and actual Windows PE. All return one before presentation, clean contexts and unsuppressed sanitizers; invalid metadata never initializes. No positive interaction, persistence or normal admission credit."
+                }
+              }
+            }
+          },
+          "Atlantis_Tank": {
+            "lifetime_case": "remaining_stock_003",
+            "facets": {
+              "source-abi": {
+                "result": "passed-scoped-family-facet",
+                "passed_profiles": [
+                  "Debug-automatic",
+                  "Debug-sse2",
+                  "Release-automatic",
+                  "Release-sse2"
+                ],
+                "evidence": {
+                  "path": "/home/dan/.codex/worktrees/phase6-class-eligibility/orbiter-cross-platform/out/phase6-class-family-lifetime-matrix-audit-v1.json",
+                  "sha256": "6b6695982f7229071bb98742d339d8063cb42522d9b967beb727ffef3f99d359",
+                  "scope": "Independent complete seven-scene/four-profile positive ABI loading, resource ownership and twenty-world facets only"
+                }
+              },
+              "capabilities": {
+                "result": "passed-scoped-family-facet",
+                "passed_profiles": [
+                  "Debug-automatic",
+                  "Debug-sse2",
+                  "Release-automatic",
+                  "Release-sse2"
+                ],
+                "evidence": {
+                  "path": "/home/dan/.codex/worktrees/phase6-eligibility-controls/orbiter-cross-platform/out/phase6-all-family-capability-matrix-audit-v1.json",
+                  "sha256": "13ae9d581d25a7f68859aa9b19b048ee61ca453cefc85f9317719a6c313d94f2",
+                  "scope": "All sixteen original structural combinations, four profiles, two passive-observer off/on repetitions; capabilities facet only"
+                }
+              },
+              "interactions": {
+                "result": "passed-scoped-family-facet",
+                "passed_profiles": [
+                  "Debug-automatic",
+                  "Debug-sse2",
+                  "Release-automatic",
+                  "Release-sse2"
+                ],
+                "evidence": {
+                  "path": "/home/dan/.codex/worktrees/phase6-production-qualification/orbiter-cross-platform/out/phase6-all-family-interaction-matrix-audit-v1.json",
+                  "sha256": "fa0b2b8b07f4da97a80bb4876d9e54e5cc874f0eb8aadb7533f2d96ad85fa34e",
+                  "scope": "All nine original-control flows in four profiles, twice each, complete original/generated rosters, actual keys/GUI/Lua actuators, physical docking, payload mass transfer, six-joint RMS and canonical-clock launch/staging. No normal-host admission, full38, named Windows/native workflow or final-candidate credit."
+                }
+              },
+              "persistence": {
+                "result": "passed-scoped-family-facet",
+                "passed_profiles": [
+                  "Debug-automatic",
+                  "Debug-sse2",
+                  "Release-automatic",
+                  "Release-sse2"
+                ],
+                "evidence": {
+                  "path": "/home/dan/.codex/worktrees/phase6-stock-admission/orbiter-cross-platform/out/phase6-all-family-persistence-matrix-audit-v2.json",
+                  "sha256": "f88902c6e7ae13e72284849a23d2327d6b7f1b301aa71ffd41e7afbad31d1002",
+                  "scope": "Selected complete original scenes, full serialized content and matching exact Windows-save reloads. No full38, actual operator save/F5 workflow, interaction, normal admission or final-candidate credit. Historical missing launch receipts remain missing."
+                }
+              },
+              "resource-ownership": {
+                "result": "passed-scoped-family-facet",
+                "passed_profiles": [
+                  "Debug-automatic",
+                  "Debug-sse2",
+                  "Release-automatic",
+                  "Release-sse2"
+                ],
+                "evidence": {
+                  "path": "/home/dan/.codex/worktrees/phase6-class-eligibility/orbiter-cross-platform/out/phase6-class-family-lifetime-matrix-audit-v1.json",
+                  "sha256": "6b6695982f7229071bb98742d339d8063cb42522d9b967beb727ffef3f99d359",
+                  "scope": "Independent complete seven-scene/four-profile positive ABI loading, resource ownership and twenty-world facets only"
+                }
+              },
+              "twenty-cycle-teardown": {
+                "result": "passed-scoped-family-facet",
+                "passed_profiles": [
+                  "Debug-automatic",
+                  "Debug-sse2",
+                  "Release-automatic",
+                  "Release-sse2"
+                ],
+                "evidence": {
+                  "path": "/home/dan/.codex/worktrees/phase6-class-eligibility/orbiter-cross-platform/out/phase6-class-family-lifetime-matrix-audit-v1.json",
+                  "sha256": "6b6695982f7229071bb98742d339d8063cb42522d9b967beb727ffef3f99d359",
+                  "scope": "Independent complete seven-scene/four-profile positive ABI loading, resource ownership and twenty-world facets only"
+                }
+              },
+              "rejection-controls": {
+                "result": "passed-scoped-family-facet",
+                "passed_profiles": [
+                  "Debug-automatic",
+                  "Debug-sse2",
+                  "Release-automatic",
+                  "Release-sse2"
+                ],
+                "evidence": {
+                  "path": "/home/dan/.codex/worktrees/phase6-audit-throughput/orbiter-cross-platform/out/phase6-all-family-rejection-matrix-audit-v1.json",
+                  "sha256": "8c7559f506a5906aeea504ab0ce51862c578141d1843936a8661d31372c1fd8b",
+                  "scope": "Every family: unknown class and foreign factory. Each module-defined family: missing module and generic fallback. Shared checked loader: seven invalid ABI descriptors, missing query and actual Windows PE. All return one before presentation, clean contexts and unsuppressed sanitizers; invalid metadata never initializes. No positive interaction, persistence or normal admission credit."
+                }
+              }
+            }
+          },
+          "Carina": {
+            "lifetime_case": "remaining_stock_026",
+            "facets": {
+              "source-abi": {
+                "result": "passed-scoped-family-facet",
+                "passed_profiles": [
+                  "Debug-automatic",
+                  "Debug-sse2",
+                  "Release-automatic",
+                  "Release-sse2"
+                ],
+                "evidence": {
+                  "path": "/home/dan/.codex/worktrees/phase6-class-eligibility/orbiter-cross-platform/out/phase6-class-family-lifetime-matrix-audit-v1.json",
+                  "sha256": "6b6695982f7229071bb98742d339d8063cb42522d9b967beb727ffef3f99d359",
+                  "scope": "Independent complete seven-scene/four-profile positive ABI loading, resource ownership and twenty-world facets only"
+                }
+              },
+              "capabilities": {
+                "result": "passed-scoped-family-facet",
+                "passed_profiles": [
+                  "Debug-automatic",
+                  "Debug-sse2",
+                  "Release-automatic",
+                  "Release-sse2"
+                ],
+                "evidence": {
+                  "path": "/home/dan/.codex/worktrees/phase6-eligibility-controls/orbiter-cross-platform/out/phase6-all-family-capability-matrix-audit-v1.json",
+                  "sha256": "13ae9d581d25a7f68859aa9b19b048ee61ca453cefc85f9317719a6c313d94f2",
+                  "scope": "All sixteen original structural combinations, four profiles, two passive-observer off/on repetitions; capabilities facet only"
+                }
+              },
+              "interactions": {
+                "result": "passed-scoped-family-facet",
+                "passed_profiles": [
+                  "Debug-automatic",
+                  "Debug-sse2",
+                  "Release-automatic",
+                  "Release-sse2"
+                ],
+                "evidence": {
+                  "path": "/home/dan/.codex/worktrees/phase6-production-qualification/orbiter-cross-platform/out/phase6-all-family-interaction-matrix-audit-v1.json",
+                  "sha256": "fa0b2b8b07f4da97a80bb4876d9e54e5cc874f0eb8aadb7533f2d96ad85fa34e",
+                  "scope": "All nine original-control flows in four profiles, twice each, complete original/generated rosters, actual keys/GUI/Lua actuators, physical docking, payload mass transfer, six-joint RMS and canonical-clock launch/staging. No normal-host admission, full38, named Windows/native workflow or final-candidate credit."
+                }
+              },
+              "persistence": {
+                "result": "passed-scoped-family-facet",
+                "passed_profiles": [
+                  "Debug-automatic",
+                  "Debug-sse2",
+                  "Release-automatic",
+                  "Release-sse2"
+                ],
+                "evidence": {
+                  "path": "/home/dan/.codex/worktrees/phase6-stock-admission/orbiter-cross-platform/out/phase6-all-family-persistence-matrix-audit-v2.json",
+                  "sha256": "f88902c6e7ae13e72284849a23d2327d6b7f1b301aa71ffd41e7afbad31d1002",
+                  "scope": "Selected complete original scenes, full serialized content and matching exact Windows-save reloads. No full38, actual operator save/F5 workflow, interaction, normal admission or final-candidate credit. Historical missing launch receipts remain missing."
+                }
+              },
+              "resource-ownership": {
+                "result": "passed-scoped-family-facet",
+                "passed_profiles": [
+                  "Debug-automatic",
+                  "Debug-sse2",
+                  "Release-automatic",
+                  "Release-sse2"
+                ],
+                "evidence": {
+                  "path": "/home/dan/.codex/worktrees/phase6-class-eligibility/orbiter-cross-platform/out/phase6-class-family-lifetime-matrix-audit-v1.json",
+                  "sha256": "6b6695982f7229071bb98742d339d8063cb42522d9b967beb727ffef3f99d359",
+                  "scope": "Independent complete seven-scene/four-profile positive ABI loading, resource ownership and twenty-world facets only"
+                }
+              },
+              "twenty-cycle-teardown": {
+                "result": "passed-scoped-family-facet",
+                "passed_profiles": [
+                  "Debug-automatic",
+                  "Debug-sse2",
+                  "Release-automatic",
+                  "Release-sse2"
+                ],
+                "evidence": {
+                  "path": "/home/dan/.codex/worktrees/phase6-class-eligibility/orbiter-cross-platform/out/phase6-class-family-lifetime-matrix-audit-v1.json",
+                  "sha256": "6b6695982f7229071bb98742d339d8063cb42522d9b967beb727ffef3f99d359",
+                  "scope": "Independent complete seven-scene/four-profile positive ABI loading, resource ownership and twenty-world facets only"
+                }
+              },
+              "rejection-controls": {
+                "result": "passed-scoped-family-facet",
+                "passed_profiles": [
+                  "Debug-automatic",
+                  "Debug-sse2",
+                  "Release-automatic",
+                  "Release-sse2"
+                ],
+                "evidence": {
+                  "path": "/home/dan/.codex/worktrees/phase6-audit-throughput/orbiter-cross-platform/out/phase6-all-family-rejection-matrix-audit-v1.json",
+                  "sha256": "8c7559f506a5906aeea504ab0ce51862c578141d1843936a8661d31372c1fd8b",
+                  "scope": "Every family: unknown class and foreign factory. Each module-defined family: missing module and generic fallback. Shared checked loader: seven invalid ABI descriptors, missing query and actual Windows PE. All return one before presentation, clean contexts and unsuppressed sanitizers; invalid metadata never initializes. No positive interaction, persistence or normal admission credit."
+                }
+              }
+            }
+          },
+          "Leonardo_mplm": {
+            "lifetime_case": "remaining_stock_003",
+            "facets": {
+              "source-abi": {
+                "result": "passed-scoped-family-facet",
+                "passed_profiles": [
+                  "Debug-automatic",
+                  "Debug-sse2",
+                  "Release-automatic",
+                  "Release-sse2"
+                ],
+                "evidence": {
+                  "path": "/home/dan/.codex/worktrees/phase6-class-eligibility/orbiter-cross-platform/out/phase6-class-family-lifetime-matrix-audit-v1.json",
+                  "sha256": "6b6695982f7229071bb98742d339d8063cb42522d9b967beb727ffef3f99d359",
+                  "scope": "Independent complete seven-scene/four-profile positive ABI loading, resource ownership and twenty-world facets only"
+                }
+              },
+              "capabilities": {
+                "result": "passed-scoped-family-facet",
+                "passed_profiles": [
+                  "Debug-automatic",
+                  "Debug-sse2",
+                  "Release-automatic",
+                  "Release-sse2"
+                ],
+                "evidence": {
+                  "path": "/home/dan/.codex/worktrees/phase6-eligibility-controls/orbiter-cross-platform/out/phase6-all-family-capability-matrix-audit-v1.json",
+                  "sha256": "13ae9d581d25a7f68859aa9b19b048ee61ca453cefc85f9317719a6c313d94f2",
+                  "scope": "All sixteen original structural combinations, four profiles, two passive-observer off/on repetitions; capabilities facet only"
+                }
+              },
+              "interactions": {
+                "result": "passed-scoped-family-facet",
+                "passed_profiles": [
+                  "Debug-automatic",
+                  "Debug-sse2",
+                  "Release-automatic",
+                  "Release-sse2"
+                ],
+                "evidence": {
+                  "path": "/home/dan/.codex/worktrees/phase6-production-qualification/orbiter-cross-platform/out/phase6-all-family-interaction-matrix-audit-v1.json",
+                  "sha256": "fa0b2b8b07f4da97a80bb4876d9e54e5cc874f0eb8aadb7533f2d96ad85fa34e",
+                  "scope": "All nine original-control flows in four profiles, twice each, complete original/generated rosters, actual keys/GUI/Lua actuators, physical docking, payload mass transfer, six-joint RMS and canonical-clock launch/staging. No normal-host admission, full38, named Windows/native workflow or final-candidate credit."
+                }
+              },
+              "persistence": {
+                "result": "passed-scoped-family-facet",
+                "passed_profiles": [
+                  "Debug-automatic",
+                  "Debug-sse2",
+                  "Release-automatic",
+                  "Release-sse2"
+                ],
+                "evidence": {
+                  "path": "/home/dan/.codex/worktrees/phase6-stock-admission/orbiter-cross-platform/out/phase6-all-family-persistence-matrix-audit-v2.json",
+                  "sha256": "f88902c6e7ae13e72284849a23d2327d6b7f1b301aa71ffd41e7afbad31d1002",
+                  "scope": "Selected complete original scenes, full serialized content and matching exact Windows-save reloads. No full38, actual operator save/F5 workflow, interaction, normal admission or final-candidate credit. Historical missing launch receipts remain missing."
+                }
+              },
+              "resource-ownership": {
+                "result": "passed-scoped-family-facet",
+                "passed_profiles": [
+                  "Debug-automatic",
+                  "Debug-sse2",
+                  "Release-automatic",
+                  "Release-sse2"
+                ],
+                "evidence": {
+                  "path": "/home/dan/.codex/worktrees/phase6-class-eligibility/orbiter-cross-platform/out/phase6-class-family-lifetime-matrix-audit-v1.json",
+                  "sha256": "6b6695982f7229071bb98742d339d8063cb42522d9b967beb727ffef3f99d359",
+                  "scope": "Independent complete seven-scene/four-profile positive ABI loading, resource ownership and twenty-world facets only"
+                }
+              },
+              "twenty-cycle-teardown": {
+                "result": "passed-scoped-family-facet",
+                "passed_profiles": [
+                  "Debug-automatic",
+                  "Debug-sse2",
+                  "Release-automatic",
+                  "Release-sse2"
+                ],
+                "evidence": {
+                  "path": "/home/dan/.codex/worktrees/phase6-class-eligibility/orbiter-cross-platform/out/phase6-class-family-lifetime-matrix-audit-v1.json",
+                  "sha256": "6b6695982f7229071bb98742d339d8063cb42522d9b967beb727ffef3f99d359",
+                  "scope": "Independent complete seven-scene/four-profile positive ABI loading, resource ownership and twenty-world facets only"
+                }
+              },
+              "rejection-controls": {
+                "result": "passed-scoped-family-facet",
+                "passed_profiles": [
+                  "Debug-automatic",
+                  "Debug-sse2",
+                  "Release-automatic",
+                  "Release-sse2"
+                ],
+                "evidence": {
+                  "path": "/home/dan/.codex/worktrees/phase6-audit-throughput/orbiter-cross-platform/out/phase6-all-family-rejection-matrix-audit-v1.json",
+                  "sha256": "8c7559f506a5906aeea504ab0ce51862c578141d1843936a8661d31372c1fd8b",
+                  "scope": "Every family: unknown class and foreign factory. Each module-defined family: missing module and generic fallback. Shared checked loader: seven invalid ABI descriptors, missing query and actual Windows PE. All return one before presentation, clean contexts and unsuppressed sanitizers; invalid metadata never initializes. No positive interaction, persistence or normal admission credit."
+                }
+              }
+            }
+          },
+          "Module2": {
+            "lifetime_case": "remaining_stock_009",
+            "facets": {
+              "source-abi": {
+                "result": "passed-scoped-family-facet",
+                "passed_profiles": [
+                  "Debug-automatic",
+                  "Debug-sse2",
+                  "Release-automatic",
+                  "Release-sse2"
+                ],
+                "evidence": {
+                  "path": "/home/dan/.codex/worktrees/phase6-class-eligibility/orbiter-cross-platform/out/phase6-class-family-lifetime-matrix-audit-v1.json",
+                  "sha256": "6b6695982f7229071bb98742d339d8063cb42522d9b967beb727ffef3f99d359",
+                  "scope": "Independent complete seven-scene/four-profile positive ABI loading, resource ownership and twenty-world facets only"
+                }
+              },
+              "capabilities": {
+                "result": "passed-scoped-family-facet",
+                "passed_profiles": [
+                  "Debug-automatic",
+                  "Debug-sse2",
+                  "Release-automatic",
+                  "Release-sse2"
+                ],
+                "evidence": {
+                  "path": "/home/dan/.codex/worktrees/phase6-eligibility-controls/orbiter-cross-platform/out/phase6-all-family-capability-matrix-audit-v1.json",
+                  "sha256": "13ae9d581d25a7f68859aa9b19b048ee61ca453cefc85f9317719a6c313d94f2",
+                  "scope": "All sixteen original structural combinations, four profiles, two passive-observer off/on repetitions; capabilities facet only"
+                }
+              },
+              "interactions": {
+                "result": "passed-scoped-family-facet",
+                "passed_profiles": [
+                  "Debug-automatic",
+                  "Debug-sse2",
+                  "Release-automatic",
+                  "Release-sse2"
+                ],
+                "evidence": {
+                  "path": "/home/dan/.codex/worktrees/phase6-production-qualification/orbiter-cross-platform/out/phase6-all-family-interaction-matrix-audit-v1.json",
+                  "sha256": "fa0b2b8b07f4da97a80bb4876d9e54e5cc874f0eb8aadb7533f2d96ad85fa34e",
+                  "scope": "All nine original-control flows in four profiles, twice each, complete original/generated rosters, actual keys/GUI/Lua actuators, physical docking, payload mass transfer, six-joint RMS and canonical-clock launch/staging. No normal-host admission, full38, named Windows/native workflow or final-candidate credit."
+                }
+              },
+              "persistence": {
+                "result": "passed-scoped-family-facet",
+                "passed_profiles": [
+                  "Debug-automatic",
+                  "Debug-sse2",
+                  "Release-automatic",
+                  "Release-sse2"
+                ],
+                "evidence": {
+                  "path": "/home/dan/.codex/worktrees/phase6-stock-admission/orbiter-cross-platform/out/phase6-all-family-persistence-matrix-audit-v2.json",
+                  "sha256": "f88902c6e7ae13e72284849a23d2327d6b7f1b301aa71ffd41e7afbad31d1002",
+                  "scope": "Selected complete original scenes, full serialized content and matching exact Windows-save reloads. No full38, actual operator save/F5 workflow, interaction, normal admission or final-candidate credit. Historical missing launch receipts remain missing."
+                }
+              },
+              "resource-ownership": {
+                "result": "passed-scoped-family-facet",
+                "passed_profiles": [
+                  "Debug-automatic",
+                  "Debug-sse2",
+                  "Release-automatic",
+                  "Release-sse2"
+                ],
+                "evidence": {
+                  "path": "/home/dan/.codex/worktrees/phase6-class-eligibility/orbiter-cross-platform/out/phase6-class-family-lifetime-matrix-audit-v1.json",
+                  "sha256": "6b6695982f7229071bb98742d339d8063cb42522d9b967beb727ffef3f99d359",
+                  "scope": "Independent complete seven-scene/four-profile positive ABI loading, resource ownership and twenty-world facets only"
+                }
+              },
+              "twenty-cycle-teardown": {
+                "result": "passed-scoped-family-facet",
+                "passed_profiles": [
+                  "Debug-automatic",
+                  "Debug-sse2",
+                  "Release-automatic",
+                  "Release-sse2"
+                ],
+                "evidence": {
+                  "path": "/home/dan/.codex/worktrees/phase6-class-eligibility/orbiter-cross-platform/out/phase6-class-family-lifetime-matrix-audit-v1.json",
+                  "sha256": "6b6695982f7229071bb98742d339d8063cb42522d9b967beb727ffef3f99d359",
+                  "scope": "Independent complete seven-scene/four-profile positive ABI loading, resource ownership and twenty-world facets only"
+                }
+              },
+              "rejection-controls": {
+                "result": "passed-scoped-family-facet",
+                "passed_profiles": [
+                  "Debug-automatic",
+                  "Debug-sse2",
+                  "Release-automatic",
+                  "Release-sse2"
+                ],
+                "evidence": {
+                  "path": "/home/dan/.codex/worktrees/phase6-audit-throughput/orbiter-cross-platform/out/phase6-all-family-rejection-matrix-audit-v1.json",
+                  "sha256": "8c7559f506a5906aeea504ab0ce51862c578141d1843936a8661d31372c1fd8b",
+                  "scope": "Every family: unknown class and foreign factory. Each module-defined family: missing module and generic fallback. Shared checked loader: seven invalid ABI descriptors, missing query and actual Windows PE. All return one before presentation, clean contexts and unsuppressed sanitizers; invalid metadata never initializes. No positive interaction, persistence or normal admission credit."
+                }
+              }
+            }
+          },
+          "Dragonfly": {
+            "lifetime_case": "remaining_stock_009",
+            "facets": {
+              "source-abi": {
+                "result": "passed-scoped-family-facet",
+                "passed_profiles": [
+                  "Debug-automatic",
+                  "Debug-sse2",
+                  "Release-automatic",
+                  "Release-sse2"
+                ],
+                "evidence": {
+                  "path": "/home/dan/.codex/worktrees/phase6-class-eligibility/orbiter-cross-platform/out/phase6-class-family-lifetime-matrix-audit-v1.json",
+                  "sha256": "6b6695982f7229071bb98742d339d8063cb42522d9b967beb727ffef3f99d359",
+                  "scope": "Independent complete seven-scene/four-profile positive ABI loading, resource ownership and twenty-world facets only"
+                }
+              },
+              "capabilities": {
+                "result": "passed-scoped-family-facet",
+                "passed_profiles": [
+                  "Debug-automatic",
+                  "Debug-sse2",
+                  "Release-automatic",
+                  "Release-sse2"
+                ],
+                "evidence": {
+                  "path": "/home/dan/.codex/worktrees/phase6-eligibility-controls/orbiter-cross-platform/out/phase6-all-family-capability-matrix-audit-v1.json",
+                  "sha256": "13ae9d581d25a7f68859aa9b19b048ee61ca453cefc85f9317719a6c313d94f2",
+                  "scope": "All sixteen original structural combinations, four profiles, two passive-observer off/on repetitions; capabilities facet only"
+                }
+              },
+              "interactions": {
+                "result": "passed-scoped-family-facet",
+                "passed_profiles": [
+                  "Debug-automatic",
+                  "Debug-sse2",
+                  "Release-automatic",
+                  "Release-sse2"
+                ],
+                "evidence": {
+                  "path": "/home/dan/.codex/worktrees/phase6-production-qualification/orbiter-cross-platform/out/phase6-all-family-interaction-matrix-audit-v1.json",
+                  "sha256": "fa0b2b8b07f4da97a80bb4876d9e54e5cc874f0eb8aadb7533f2d96ad85fa34e",
+                  "scope": "All nine original-control flows in four profiles, twice each, complete original/generated rosters, actual keys/GUI/Lua actuators, physical docking, payload mass transfer, six-joint RMS and canonical-clock launch/staging. No normal-host admission, full38, named Windows/native workflow or final-candidate credit."
+                }
+              },
+              "persistence": {
+                "result": "passed-scoped-family-facet",
+                "passed_profiles": [
+                  "Debug-automatic",
+                  "Debug-sse2",
+                  "Release-automatic",
+                  "Release-sse2"
+                ],
+                "evidence": {
+                  "path": "/home/dan/.codex/worktrees/phase6-stock-admission/orbiter-cross-platform/out/phase6-all-family-persistence-matrix-audit-v2.json",
+                  "sha256": "f88902c6e7ae13e72284849a23d2327d6b7f1b301aa71ffd41e7afbad31d1002",
+                  "scope": "Selected complete original scenes, full serialized content and matching exact Windows-save reloads. No full38, actual operator save/F5 workflow, interaction, normal admission or final-candidate credit. Historical missing launch receipts remain missing."
+                }
+              },
+              "resource-ownership": {
+                "result": "passed-scoped-family-facet",
+                "passed_profiles": [
+                  "Debug-automatic",
+                  "Debug-sse2",
+                  "Release-automatic",
+                  "Release-sse2"
+                ],
+                "evidence": {
+                  "path": "/home/dan/.codex/worktrees/phase6-class-eligibility/orbiter-cross-platform/out/phase6-class-family-lifetime-matrix-audit-v1.json",
+                  "sha256": "6b6695982f7229071bb98742d339d8063cb42522d9b967beb727ffef3f99d359",
+                  "scope": "Independent complete seven-scene/four-profile positive ABI loading, resource ownership and twenty-world facets only"
+                }
+              },
+              "twenty-cycle-teardown": {
+                "result": "passed-scoped-family-facet",
+                "passed_profiles": [
+                  "Debug-automatic",
+                  "Debug-sse2",
+                  "Release-automatic",
+                  "Release-sse2"
+                ],
+                "evidence": {
+                  "path": "/home/dan/.codex/worktrees/phase6-class-eligibility/orbiter-cross-platform/out/phase6-class-family-lifetime-matrix-audit-v1.json",
+                  "sha256": "6b6695982f7229071bb98742d339d8063cb42522d9b967beb727ffef3f99d359",
+                  "scope": "Independent complete seven-scene/four-profile positive ABI loading, resource ownership and twenty-world facets only"
+                }
+              },
+              "rejection-controls": {
+                "result": "passed-scoped-family-facet",
+                "passed_profiles": [
+                  "Debug-automatic",
+                  "Debug-sse2",
+                  "Release-automatic",
+                  "Release-sse2"
+                ],
+                "evidence": {
+                  "path": "/home/dan/.codex/worktrees/phase6-audit-throughput/orbiter-cross-platform/out/phase6-all-family-rejection-matrix-audit-v1.json",
+                  "sha256": "8c7559f506a5906aeea504ab0ce51862c578141d1843936a8661d31372c1fd8b",
+                  "scope": "Every family: unknown class and foreign factory. Each module-defined family: missing module and generic fallback. Shared checked loader: seven invalid ABI descriptors, missing query and actual Windows PE. All return one before presentation, clean contexts and unsuppressed sanitizers; invalid metadata never initializes. No positive interaction, persistence or normal admission credit."
+                }
+              }
+            }
+          },
+          "HST": {
+            "lifetime_case": "remaining_stock_018",
+            "facets": {
+              "source-abi": {
+                "result": "passed-scoped-family-facet",
+                "passed_profiles": [
+                  "Debug-automatic",
+                  "Debug-sse2",
+                  "Release-automatic",
+                  "Release-sse2"
+                ],
+                "evidence": {
+                  "path": "/home/dan/.codex/worktrees/phase6-class-eligibility/orbiter-cross-platform/out/phase6-class-family-lifetime-matrix-audit-v1.json",
+                  "sha256": "6b6695982f7229071bb98742d339d8063cb42522d9b967beb727ffef3f99d359",
+                  "scope": "Independent complete seven-scene/four-profile positive ABI loading, resource ownership and twenty-world facets only"
+                }
+              },
+              "capabilities": {
+                "result": "passed-scoped-family-facet",
+                "passed_profiles": [
+                  "Debug-automatic",
+                  "Debug-sse2",
+                  "Release-automatic",
+                  "Release-sse2"
+                ],
+                "evidence": {
+                  "path": "/home/dan/.codex/worktrees/phase6-eligibility-controls/orbiter-cross-platform/out/phase6-all-family-capability-matrix-audit-v1.json",
+                  "sha256": "13ae9d581d25a7f68859aa9b19b048ee61ca453cefc85f9317719a6c313d94f2",
+                  "scope": "All sixteen original structural combinations, four profiles, two passive-observer off/on repetitions; capabilities facet only"
+                }
+              },
+              "interactions": {
+                "result": "passed-scoped-family-facet",
+                "passed_profiles": [
+                  "Debug-automatic",
+                  "Debug-sse2",
+                  "Release-automatic",
+                  "Release-sse2"
+                ],
+                "evidence": {
+                  "path": "/home/dan/.codex/worktrees/phase6-production-qualification/orbiter-cross-platform/out/phase6-all-family-interaction-matrix-audit-v1.json",
+                  "sha256": "fa0b2b8b07f4da97a80bb4876d9e54e5cc874f0eb8aadb7533f2d96ad85fa34e",
+                  "scope": "All nine original-control flows in four profiles, twice each, complete original/generated rosters, actual keys/GUI/Lua actuators, physical docking, payload mass transfer, six-joint RMS and canonical-clock launch/staging. No normal-host admission, full38, named Windows/native workflow or final-candidate credit."
+                }
+              },
+              "persistence": {
+                "result": "passed-scoped-family-facet",
+                "passed_profiles": [
+                  "Debug-automatic",
+                  "Debug-sse2",
+                  "Release-automatic",
+                  "Release-sse2"
+                ],
+                "evidence": {
+                  "path": "/home/dan/.codex/worktrees/phase6-stock-admission/orbiter-cross-platform/out/phase6-all-family-persistence-matrix-audit-v2.json",
+                  "sha256": "f88902c6e7ae13e72284849a23d2327d6b7f1b301aa71ffd41e7afbad31d1002",
+                  "scope": "Selected complete original scenes, full serialized content and matching exact Windows-save reloads. No full38, actual operator save/F5 workflow, interaction, normal admission or final-candidate credit. Historical missing launch receipts remain missing."
+                }
+              },
+              "resource-ownership": {
+                "result": "passed-scoped-family-facet",
+                "passed_profiles": [
+                  "Debug-automatic",
+                  "Debug-sse2",
+                  "Release-automatic",
+                  "Release-sse2"
+                ],
+                "evidence": {
+                  "path": "/home/dan/.codex/worktrees/phase6-class-eligibility/orbiter-cross-platform/out/phase6-class-family-lifetime-matrix-audit-v1.json",
+                  "sha256": "6b6695982f7229071bb98742d339d8063cb42522d9b967beb727ffef3f99d359",
+                  "scope": "Independent complete seven-scene/four-profile positive ABI loading, resource ownership and twenty-world facets only"
+                }
+              },
+              "twenty-cycle-teardown": {
+                "result": "passed-scoped-family-facet",
+                "passed_profiles": [
+                  "Debug-automatic",
+                  "Debug-sse2",
+                  "Release-automatic",
+                  "Release-sse2"
+                ],
+                "evidence": {
+                  "path": "/home/dan/.codex/worktrees/phase6-class-eligibility/orbiter-cross-platform/out/phase6-class-family-lifetime-matrix-audit-v1.json",
+                  "sha256": "6b6695982f7229071bb98742d339d8063cb42522d9b967beb727ffef3f99d359",
+                  "scope": "Independent complete seven-scene/four-profile positive ABI loading, resource ownership and twenty-world facets only"
+                }
+              },
+              "rejection-controls": {
+                "result": "passed-scoped-family-facet",
+                "passed_profiles": [
+                  "Debug-automatic",
+                  "Debug-sse2",
+                  "Release-automatic",
+                  "Release-sse2"
+                ],
+                "evidence": {
+                  "path": "/home/dan/.codex/worktrees/phase6-audit-throughput/orbiter-cross-platform/out/phase6-all-family-rejection-matrix-audit-v1.json",
+                  "sha256": "8c7559f506a5906aeea504ab0ce51862c578141d1843936a8661d31372c1fd8b",
+                  "scope": "Every family: unknown class and foreign factory. Each module-defined family: missing module and generic fallback. Shared checked loader: seven invalid ABI descriptors, missing query and actual Windows PE. All return one before presentation, clean contexts and unsuppressed sanitizers; invalid metadata never initializes. No positive interaction, persistence or normal admission credit."
+                }
+              }
+            }
+          },
+          "LDEF": {
+            "lifetime_case": "remaining_stock_022",
+            "facets": {
+              "source-abi": {
+                "result": "passed-scoped-family-facet",
+                "passed_profiles": [
+                  "Debug-automatic",
+                  "Debug-sse2",
+                  "Release-automatic",
+                  "Release-sse2"
+                ],
+                "evidence": {
+                  "path": "/home/dan/.codex/worktrees/phase6-class-eligibility/orbiter-cross-platform/out/phase6-class-family-lifetime-matrix-audit-v1.json",
+                  "sha256": "6b6695982f7229071bb98742d339d8063cb42522d9b967beb727ffef3f99d359",
+                  "scope": "Independent complete seven-scene/four-profile positive ABI loading, resource ownership and twenty-world facets only"
+                }
+              },
+              "capabilities": {
+                "result": "passed-scoped-family-facet",
+                "passed_profiles": [
+                  "Debug-automatic",
+                  "Debug-sse2",
+                  "Release-automatic",
+                  "Release-sse2"
+                ],
+                "evidence": {
+                  "path": "/home/dan/.codex/worktrees/phase6-eligibility-controls/orbiter-cross-platform/out/phase6-all-family-capability-matrix-audit-v1.json",
+                  "sha256": "13ae9d581d25a7f68859aa9b19b048ee61ca453cefc85f9317719a6c313d94f2",
+                  "scope": "All sixteen original structural combinations, four profiles, two passive-observer off/on repetitions; capabilities facet only"
+                }
+              },
+              "interactions": {
+                "result": "passed-scoped-family-facet",
+                "passed_profiles": [
+                  "Debug-automatic",
+                  "Debug-sse2",
+                  "Release-automatic",
+                  "Release-sse2"
+                ],
+                "evidence": {
+                  "path": "/home/dan/.codex/worktrees/phase6-production-qualification/orbiter-cross-platform/out/phase6-all-family-interaction-matrix-audit-v1.json",
+                  "sha256": "fa0b2b8b07f4da97a80bb4876d9e54e5cc874f0eb8aadb7533f2d96ad85fa34e",
+                  "scope": "All nine original-control flows in four profiles, twice each, complete original/generated rosters, actual keys/GUI/Lua actuators, physical docking, payload mass transfer, six-joint RMS and canonical-clock launch/staging. No normal-host admission, full38, named Windows/native workflow or final-candidate credit."
+                }
+              },
+              "persistence": {
+                "result": "passed-scoped-family-facet",
+                "passed_profiles": [
+                  "Debug-automatic",
+                  "Debug-sse2",
+                  "Release-automatic",
+                  "Release-sse2"
+                ],
+                "evidence": {
+                  "path": "/home/dan/.codex/worktrees/phase6-stock-admission/orbiter-cross-platform/out/phase6-all-family-persistence-matrix-audit-v2.json",
+                  "sha256": "f88902c6e7ae13e72284849a23d2327d6b7f1b301aa71ffd41e7afbad31d1002",
+                  "scope": "Selected complete original scenes, full serialized content and matching exact Windows-save reloads. No full38, actual operator save/F5 workflow, interaction, normal admission or final-candidate credit. Historical missing launch receipts remain missing."
+                }
+              },
+              "resource-ownership": {
+                "result": "passed-scoped-family-facet",
+                "passed_profiles": [
+                  "Debug-automatic",
+                  "Debug-sse2",
+                  "Release-automatic",
+                  "Release-sse2"
+                ],
+                "evidence": {
+                  "path": "/home/dan/.codex/worktrees/phase6-class-eligibility/orbiter-cross-platform/out/phase6-class-family-lifetime-matrix-audit-v1.json",
+                  "sha256": "6b6695982f7229071bb98742d339d8063cb42522d9b967beb727ffef3f99d359",
+                  "scope": "Independent complete seven-scene/four-profile positive ABI loading, resource ownership and twenty-world facets only"
+                }
+              },
+              "twenty-cycle-teardown": {
+                "result": "passed-scoped-family-facet",
+                "passed_profiles": [
+                  "Debug-automatic",
+                  "Debug-sse2",
+                  "Release-automatic",
+                  "Release-sse2"
+                ],
+                "evidence": {
+                  "path": "/home/dan/.codex/worktrees/phase6-class-eligibility/orbiter-cross-platform/out/phase6-class-family-lifetime-matrix-audit-v1.json",
+                  "sha256": "6b6695982f7229071bb98742d339d8063cb42522d9b967beb727ffef3f99d359",
+                  "scope": "Independent complete seven-scene/four-profile positive ABI loading, resource ownership and twenty-world facets only"
+                }
+              },
+              "rejection-controls": {
+                "result": "passed-scoped-family-facet",
+                "passed_profiles": [
+                  "Debug-automatic",
+                  "Debug-sse2",
+                  "Release-automatic",
+                  "Release-sse2"
+                ],
+                "evidence": {
+                  "path": "/home/dan/.codex/worktrees/phase6-audit-throughput/orbiter-cross-platform/out/phase6-all-family-rejection-matrix-audit-v1.json",
+                  "sha256": "8c7559f506a5906aeea504ab0ce51862c578141d1843936a8661d31372c1fd8b",
+                  "scope": "Every family: unknown class and foreign factory. Each module-defined family: missing module and generic fallback. Shared checked loader: seven invalid ABI descriptors, missing query and actual Windows PE. All return one before presentation, clean contexts and unsuppressed sanitizers; invalid metadata never initializes. No positive interaction, persistence or normal admission credit."
+                }
+              }
+            }
+          },
+          "SolarSail": {
+            "lifetime_case": "remaining_stock_013",
+            "facets": {
+              "source-abi": {
+                "result": "passed-scoped-family-facet",
+                "passed_profiles": [
+                  "Debug-automatic",
+                  "Debug-sse2",
+                  "Release-automatic",
+                  "Release-sse2"
+                ],
+                "evidence": {
+                  "path": "/home/dan/.codex/worktrees/phase6-class-eligibility/orbiter-cross-platform/out/phase6-class-family-lifetime-matrix-audit-v1.json",
+                  "sha256": "6b6695982f7229071bb98742d339d8063cb42522d9b967beb727ffef3f99d359",
+                  "scope": "Independent complete seven-scene/four-profile positive ABI loading, resource ownership and twenty-world facets only"
+                }
+              },
+              "capabilities": {
+                "result": "passed-scoped-family-facet",
+                "passed_profiles": [
+                  "Debug-automatic",
+                  "Debug-sse2",
+                  "Release-automatic",
+                  "Release-sse2"
+                ],
+                "evidence": {
+                  "path": "/home/dan/.codex/worktrees/phase6-eligibility-controls/orbiter-cross-platform/out/phase6-all-family-capability-matrix-audit-v1.json",
+                  "sha256": "13ae9d581d25a7f68859aa9b19b048ee61ca453cefc85f9317719a6c313d94f2",
+                  "scope": "All sixteen original structural combinations, four profiles, two passive-observer off/on repetitions; capabilities facet only"
+                }
+              },
+              "interactions": {
+                "result": "passed-scoped-family-facet",
+                "passed_profiles": [
+                  "Debug-automatic",
+                  "Debug-sse2",
+                  "Release-automatic",
+                  "Release-sse2"
+                ],
+                "evidence": {
+                  "path": "/home/dan/.codex/worktrees/phase6-production-qualification/orbiter-cross-platform/out/phase6-all-family-interaction-matrix-audit-v1.json",
+                  "sha256": "fa0b2b8b07f4da97a80bb4876d9e54e5cc874f0eb8aadb7533f2d96ad85fa34e",
+                  "scope": "All nine original-control flows in four profiles, twice each, complete original/generated rosters, actual keys/GUI/Lua actuators, physical docking, payload mass transfer, six-joint RMS and canonical-clock launch/staging. No normal-host admission, full38, named Windows/native workflow or final-candidate credit."
+                }
+              },
+              "persistence": {
+                "result": "passed-scoped-family-facet",
+                "passed_profiles": [
+                  "Debug-automatic",
+                  "Debug-sse2",
+                  "Release-automatic",
+                  "Release-sse2"
+                ],
+                "evidence": {
+                  "path": "/home/dan/.codex/worktrees/phase6-stock-admission/orbiter-cross-platform/out/phase6-all-family-persistence-matrix-audit-v2.json",
+                  "sha256": "f88902c6e7ae13e72284849a23d2327d6b7f1b301aa71ffd41e7afbad31d1002",
+                  "scope": "Selected complete original scenes, full serialized content and matching exact Windows-save reloads. No full38, actual operator save/F5 workflow, interaction, normal admission or final-candidate credit. Historical missing launch receipts remain missing."
+                }
+              },
+              "resource-ownership": {
+                "result": "passed-scoped-family-facet",
+                "passed_profiles": [
+                  "Debug-automatic",
+                  "Debug-sse2",
+                  "Release-automatic",
+                  "Release-sse2"
+                ],
+                "evidence": {
+                  "path": "/home/dan/.codex/worktrees/phase6-class-eligibility/orbiter-cross-platform/out/phase6-class-family-lifetime-matrix-audit-v1.json",
+                  "sha256": "6b6695982f7229071bb98742d339d8063cb42522d9b967beb727ffef3f99d359",
+                  "scope": "Independent complete seven-scene/four-profile positive ABI loading, resource ownership and twenty-world facets only"
+                }
+              },
+              "twenty-cycle-teardown": {
+                "result": "passed-scoped-family-facet",
+                "passed_profiles": [
+                  "Debug-automatic",
+                  "Debug-sse2",
+                  "Release-automatic",
+                  "Release-sse2"
+                ],
+                "evidence": {
+                  "path": "/home/dan/.codex/worktrees/phase6-class-eligibility/orbiter-cross-platform/out/phase6-class-family-lifetime-matrix-audit-v1.json",
+                  "sha256": "6b6695982f7229071bb98742d339d8063cb42522d9b967beb727ffef3f99d359",
+                  "scope": "Independent complete seven-scene/four-profile positive ABI loading, resource ownership and twenty-world facets only"
+                }
+              },
+              "rejection-controls": {
+                "result": "passed-scoped-family-facet",
+                "passed_profiles": [
+                  "Debug-automatic",
+                  "Debug-sse2",
+                  "Release-automatic",
+                  "Release-sse2"
+                ],
+                "evidence": {
+                  "path": "/home/dan/.codex/worktrees/phase6-audit-throughput/orbiter-cross-platform/out/phase6-all-family-rejection-matrix-audit-v1.json",
+                  "sha256": "8c7559f506a5906aeea504ab0ce51862c578141d1843936a8661d31372c1fd8b",
+                  "scope": "Every family: unknown class and foreign factory. Each module-defined family: missing module and generic fallback. Shared checked loader: seven invalid ABI descriptors, missing query and actual Windows PE. All return one before presentation, clean contexts and unsuppressed sanitizers; invalid metadata never initializes. No positive interaction, persistence or normal admission credit."
+                }
+              }
+            }
+          },
+          "Quadcopter": {
+            "lifetime_case": "remaining_stock_017",
+            "facets": {
+              "source-abi": {
+                "result": "passed-scoped-family-facet",
+                "passed_profiles": [
+                  "Debug-automatic",
+                  "Debug-sse2",
+                  "Release-automatic",
+                  "Release-sse2"
+                ],
+                "evidence": {
+                  "path": "/home/dan/.codex/worktrees/phase6-class-eligibility/orbiter-cross-platform/out/phase6-class-family-lifetime-matrix-audit-v1.json",
+                  "sha256": "6b6695982f7229071bb98742d339d8063cb42522d9b967beb727ffef3f99d359",
+                  "scope": "Independent complete seven-scene/four-profile positive ABI loading, resource ownership and twenty-world facets only"
+                }
+              },
+              "capabilities": {
+                "result": "passed-scoped-family-facet",
+                "passed_profiles": [
+                  "Debug-automatic",
+                  "Debug-sse2",
+                  "Release-automatic",
+                  "Release-sse2"
+                ],
+                "evidence": {
+                  "path": "/home/dan/.codex/worktrees/phase6-eligibility-controls/orbiter-cross-platform/out/phase6-all-family-capability-matrix-audit-v1.json",
+                  "sha256": "13ae9d581d25a7f68859aa9b19b048ee61ca453cefc85f9317719a6c313d94f2",
+                  "scope": "All sixteen original structural combinations, four profiles, two passive-observer off/on repetitions; capabilities facet only"
+                }
+              },
+              "interactions": {
+                "result": "passed-scoped-family-facet",
+                "passed_profiles": [
+                  "Debug-automatic",
+                  "Debug-sse2",
+                  "Release-automatic",
+                  "Release-sse2"
+                ],
+                "evidence": {
+                  "path": "/home/dan/.codex/worktrees/phase6-production-qualification/orbiter-cross-platform/out/phase6-all-family-interaction-matrix-audit-v1.json",
+                  "sha256": "fa0b2b8b07f4da97a80bb4876d9e54e5cc874f0eb8aadb7533f2d96ad85fa34e",
+                  "scope": "All nine original-control flows in four profiles, twice each, complete original/generated rosters, actual keys/GUI/Lua actuators, physical docking, payload mass transfer, six-joint RMS and canonical-clock launch/staging. No normal-host admission, full38, named Windows/native workflow or final-candidate credit."
+                }
+              },
+              "persistence": {
+                "result": "passed-scoped-family-facet",
+                "passed_profiles": [
+                  "Debug-automatic",
+                  "Debug-sse2",
+                  "Release-automatic",
+                  "Release-sse2"
+                ],
+                "evidence": {
+                  "path": "/home/dan/.codex/worktrees/phase6-stock-admission/orbiter-cross-platform/out/phase6-all-family-persistence-matrix-audit-v2.json",
+                  "sha256": "f88902c6e7ae13e72284849a23d2327d6b7f1b301aa71ffd41e7afbad31d1002",
+                  "scope": "Selected complete original scenes, full serialized content and matching exact Windows-save reloads. No full38, actual operator save/F5 workflow, interaction, normal admission or final-candidate credit. Historical missing launch receipts remain missing."
+                }
+              },
+              "resource-ownership": {
+                "result": "passed-scoped-family-facet",
+                "passed_profiles": [
+                  "Debug-automatic",
+                  "Debug-sse2",
+                  "Release-automatic",
+                  "Release-sse2"
+                ],
+                "evidence": {
+                  "path": "/home/dan/.codex/worktrees/phase6-class-eligibility/orbiter-cross-platform/out/phase6-class-family-lifetime-matrix-audit-v1.json",
+                  "sha256": "6b6695982f7229071bb98742d339d8063cb42522d9b967beb727ffef3f99d359",
+                  "scope": "Independent complete seven-scene/four-profile positive ABI loading, resource ownership and twenty-world facets only"
+                }
+              },
+              "twenty-cycle-teardown": {
+                "result": "passed-scoped-family-facet",
+                "passed_profiles": [
+                  "Debug-automatic",
+                  "Debug-sse2",
+                  "Release-automatic",
+                  "Release-sse2"
+                ],
+                "evidence": {
+                  "path": "/home/dan/.codex/worktrees/phase6-class-eligibility/orbiter-cross-platform/out/phase6-class-family-lifetime-matrix-audit-v1.json",
+                  "sha256": "6b6695982f7229071bb98742d339d8063cb42522d9b967beb727ffef3f99d359",
+                  "scope": "Independent complete seven-scene/four-profile positive ABI loading, resource ownership and twenty-world facets only"
+                }
+              },
+              "rejection-controls": {
+                "result": "passed-scoped-family-facet",
+                "passed_profiles": [
+                  "Debug-automatic",
+                  "Debug-sse2",
+                  "Release-automatic",
+                  "Release-sse2"
+                ],
+                "evidence": {
+                  "path": "/home/dan/.codex/worktrees/phase6-audit-throughput/orbiter-cross-platform/out/phase6-all-family-rejection-matrix-audit-v1.json",
+                  "sha256": "8c7559f506a5906aeea504ab0ce51862c578141d1843936a8661d31372c1fd8b",
+                  "scope": "Every family: unknown class and foreign factory. Each module-defined family: missing module and generic fallback. Shared checked loader: seven invalid ABI descriptors, missing query and actual Windows PE. All return one before presentation, clean contexts and unsuppressed sanitizers; invalid metadata never initializes. No positive interaction, persistence or normal admission credit."
+                }
+              }
+            }
+          }
+        },
+        "active_lifetime_captures": {
+          "Debug-automatic": "/home/dan/.codex/worktrees/phase6-class-eligibility/orbiter-cross-platform/out/phase6-eligibility-lifetimes-Debug-automatic-v1/lifetimes.json",
+          "Debug-sse2": "/home/dan/.codex/worktrees/phase6-class-eligibility/orbiter-cross-platform/out/phase6-eligibility-lifetimes-Debug-sse2-v1/lifetimes.json",
+          "Release-automatic": "/home/dan/.codex/worktrees/phase6-class-eligibility/orbiter-cross-platform/out/phase6-eligibility-lifetimes-Release-automatic-v1/lifetimes.json",
+          "Release-sse2": "/home/dan/.codex/worktrees/phase6-class-eligibility/orbiter-cross-platform/out/phase6-eligibility-lifetimes-Release-sse2-v1/lifetimes.json"
+        },
+        "preserved_failed_attempts": [
+          {
+            "path": "/home/dan/.codex/worktrees/phase6-class-eligibility/orbiter-cross-platform/out/phase6-eligibility-lifetimes-Debug-automatic-canary-v1/lifetimes.json",
+            "sha256": "85830368aa8dd6e685f57329c99904ed762e1164ae2b36d199fb945e379e23fb",
+            "cause": "Runner requested time-zero readback after advancing simulation; actual fiftieth fixed step is 0.78125 seconds. Original failed simulator exit retained."
+          },
+          {
+            "path": "/home/dan/.codex/worktrees/phase6-capability-eligibility/orbiter-cross-platform/out/phase6-family-capabilities-Debug-automatic-v1/capabilities.json",
+            "sha256": "1c8c002a15ae7d880eb8ef8088639792967a775ce490aacb0ad5e9feeb6c7ca1",
+            "scope": "Original failed capture retained; only eight explicitly completed cases are reusable",
+            "cause": "Declared-only roster validation omitted the original Windows-generated Atlantis external tank and two SRBs in scene032."
+          },
+          {
+            "path": "/home/dan/.codex/worktrees/phase6-capability-eligibility/orbiter-cross-platform/out/phase6-family-capabilities-Debug-sse2-v1/capabilities.json",
+            "sha256": "d8ee130088979e39d239b64b35982ae6246636eb7b83ed3eb489d66fee5508a6",
+            "scope": "Original failed capture retained; only eight explicitly completed cases are reusable",
+            "cause": "Declared-only roster validation omitted the original Windows-generated Atlantis external tank and two SRBs in scene032."
+          },
+          {
+            "path": "/home/dan/.codex/worktrees/phase6-capability-eligibility/orbiter-cross-platform/out/phase6-family-capabilities-Release-automatic-v1/capabilities.json",
+            "sha256": "34a6d66181eade3379b3109650a4f5af036c0fc3c4069f1e3c055352a521d11c",
+            "scope": "Original failed capture retained; only eight explicitly completed cases are reusable",
+            "cause": "Declared-only roster validation omitted the original Windows-generated Atlantis external tank and two SRBs in scene032."
+          },
+          {
+            "path": "/home/dan/.codex/worktrees/phase6-capability-eligibility/orbiter-cross-platform/out/phase6-family-capabilities-Release-sse2-v1/capabilities.json",
+            "sha256": "d4add68c4fc534b699dda0aba69c6494ac846016533c4f8429f9a3c37271aa9b",
+            "scope": "Original failed capture retained; only eight explicitly completed cases are reusable",
+            "cause": "Declared-only roster validation omitted the original Windows-generated Atlantis external tank and two SRBs in scene032."
+          },
+          {
+            "path": "/home/dan/.codex/worktrees/phase6-eligibility-controls/orbiter-cross-platform/out/phase6-generated-capabilities-Release-automatic-v1/capabilities.json",
+            "sha256": "231964e12ae69df61532a66bba92ab6af5231cd4b07e511c1fb0b926ce4b6030",
+            "scope": "Failed actual process receipt retained; no acceptance credit",
+            "cause": "Repeat2 observer-off process exited cleanly but its initial /proc receipt had empty argv; missing identity is not reconstructed."
+          },
+          {
+            "path": "/home/dan/.codex/worktrees/phase6-persistence-controls/orbiter-cross-platform/out/phase6-family-persistence-selected-v2/status.json",
+            "sha256": "43488fe79c9bb57b9621178cf47fbc861b692e40c5e4948d310b8bf93858832d",
+            "scope": "Failure-preserving coordinator: 32 new complete Debug writer runs pass; scene009 SSE2 reload fails exact saved RPOS; other work cancelled and partial captures remain incomplete",
+            "cause": "Complete Windows/native saved content differs: [{\"path\": \"ships/Module2A/records/1\", \"left\": [\"RPOS\", \"1060561.786\", \"-954440.965\", \"-6582784.319\"], \"right\": [\"RPOS\", \"1060561.785\", \"-954440.965\", \"-6582784.319\"]}]"
+          }
+        ],
+        "family_lifetime_matrix": {
+          "result": "audited-family-positive-ABI-ownership-and-twenty-cycle-facets-only",
+          "audit": {
+            "path": "/home/dan/.codex/worktrees/phase6-class-eligibility/orbiter-cross-platform/out/phase6-class-family-lifetime-matrix-audit-v1.json",
+            "sha256": "6b6695982f7229071bb98742d339d8063cb42522d9b967beb727ffef3f99d359",
+            "scope": "Independent complete seven-scene/four-profile positive ABI loading, resource ownership and twenty-world facets only"
+          },
+          "worlds": 560,
+          "actual_simulator_processes": 28,
+          "successful_presents": 33600
+        },
+        "remaining_facets": [],
+        "lifetime_captures_terminal": true,
+        "capability_controls": {
+          "result": "audited-all-family-capability-variants-and-passive-observer-controls-only",
+          "original_structural_signature_count": 16,
+          "expected_cases": [
+            "remaining_stock_003",
+            "remaining_stock_009",
+            "remaining_stock_013",
+            "remaining_stock_014",
+            "remaining_stock_017",
+            "remaining_stock_018",
+            "remaining_stock_022",
+            "remaining_stock_026",
+            "remaining_stock_032"
+          ],
+          "profiles": [
+            "Debug-automatic",
+            "Debug-sse2",
+            "Release-automatic",
+            "Release-sse2"
+          ],
+          "repeats": 2,
+          "observer_lanes": [
+            "off",
+            "on"
+          ],
+          "expected_processes": 144,
+          "expected_presents": 8640,
+          "inventory": {
+            "path": "/home/dan/.codex/worktrees/phase6-capability-eligibility/orbiter-cross-platform/out/phase6-original-structural-capability-inventory-v1.json",
+            "sha256": "6f894873e9b7b482a286824208d831b430886bb36d23ae2c8362a319338ee0ed",
+            "scope": "Hashed initial structural fields across all original Windows stock scenes; proposed native cover only"
+          },
+          "focused_canary": {
+            "path": "/home/dan/.codex/worktrees/phase6-capability-eligibility/orbiter-cross-platform/out/phase6-capability-HST-Debug-automatic-canary-v4/independent-audit-v1.json",
+            "sha256": "882330ff95df3234b22d8ee0f8c27160dfb23e644e7e2a33d1bb237ba9d59e55",
+            "scope": "HST/Atlantis actual SDK fields/ports and observer-off/on native equivalence; one profile/repetition, diagnostic only"
+          },
+          "captures": {
+            "Debug-automatic": "/home/dan/.codex/worktrees/phase6-capability-eligibility/orbiter-cross-platform/out/phase6-family-capabilities-Debug-automatic-v1/capabilities.json",
+            "Debug-sse2": "/home/dan/.codex/worktrees/phase6-capability-eligibility/orbiter-cross-platform/out/phase6-family-capabilities-Debug-sse2-v1/capabilities.json",
+            "Release-automatic": "/home/dan/.codex/worktrees/phase6-capability-eligibility/orbiter-cross-platform/out/phase6-family-capabilities-Release-automatic-v1/capabilities.json",
+            "Release-sse2": "/home/dan/.codex/worktrees/phase6-capability-eligibility/orbiter-cross-platform/out/phase6-family-capabilities-Release-sse2-v1/capabilities.json"
+          },
+          "stages": {
+            "Debug-automatic": [
+              {
+                "capture": "/home/dan/.codex/worktrees/phase6-capability-eligibility/orbiter-cross-platform/out/phase6-family-capabilities-Debug-automatic-v1/capabilities.json",
+                "source_owner": "/home/dan/.codex/worktrees/phase6-capability-eligibility/orbiter-cross-platform",
+                "selected_completed_cases": [
+                  "remaining_stock_003",
+                  "remaining_stock_009",
+                  "remaining_stock_013",
+                  "remaining_stock_014",
+                  "remaining_stock_017",
+                  "remaining_stock_018",
+                  "remaining_stock_022",
+                  "remaining_stock_026"
+                ]
+              },
+              {
+                "capture": "/home/dan/.codex/worktrees/phase6-eligibility-controls/orbiter-cross-platform/out/phase6-generated-capabilities-Debug-automatic-v1/capabilities.json",
+                "source_owner": "/home/dan/.codex/worktrees/phase6-eligibility-controls/orbiter-cross-platform"
+              }
+            ],
+            "Debug-sse2": [
+              {
+                "capture": "/home/dan/.codex/worktrees/phase6-capability-eligibility/orbiter-cross-platform/out/phase6-family-capabilities-Debug-sse2-v1/capabilities.json",
+                "source_owner": "/home/dan/.codex/worktrees/phase6-capability-eligibility/orbiter-cross-platform",
+                "selected_completed_cases": [
+                  "remaining_stock_003",
+                  "remaining_stock_009",
+                  "remaining_stock_013",
+                  "remaining_stock_014",
+                  "remaining_stock_017",
+                  "remaining_stock_018",
+                  "remaining_stock_022",
+                  "remaining_stock_026"
+                ]
+              },
+              {
+                "capture": "/home/dan/.codex/worktrees/phase6-eligibility-controls/orbiter-cross-platform/out/phase6-generated-capabilities-Debug-sse2-v1/capabilities.json",
+                "source_owner": "/home/dan/.codex/worktrees/phase6-eligibility-controls/orbiter-cross-platform"
+              }
+            ],
+            "Release-automatic": [
+              {
+                "capture": "/home/dan/.codex/worktrees/phase6-capability-eligibility/orbiter-cross-platform/out/phase6-family-capabilities-Release-automatic-v1/capabilities.json",
+                "source_owner": "/home/dan/.codex/worktrees/phase6-capability-eligibility/orbiter-cross-platform",
+                "selected_completed_cases": [
+                  "remaining_stock_003",
+                  "remaining_stock_009",
+                  "remaining_stock_013",
+                  "remaining_stock_014",
+                  "remaining_stock_017",
+                  "remaining_stock_018",
+                  "remaining_stock_022",
+                  "remaining_stock_026"
+                ]
+              },
+              {
+                "capture": "/home/dan/.codex/worktrees/phase6-eligibility-controls/orbiter-cross-platform/out/phase6-generated-capabilities-Release-automatic-v2/capabilities.json",
+                "source_owner": "/home/dan/.codex/worktrees/phase6-eligibility-controls/orbiter-cross-platform"
+              }
+            ],
+            "Release-sse2": [
+              {
+                "capture": "/home/dan/.codex/worktrees/phase6-capability-eligibility/orbiter-cross-platform/out/phase6-family-capabilities-Release-sse2-v1/capabilities.json",
+                "source_owner": "/home/dan/.codex/worktrees/phase6-capability-eligibility/orbiter-cross-platform",
+                "selected_completed_cases": [
+                  "remaining_stock_003",
+                  "remaining_stock_009",
+                  "remaining_stock_013",
+                  "remaining_stock_014",
+                  "remaining_stock_017",
+                  "remaining_stock_018",
+                  "remaining_stock_022",
+                  "remaining_stock_026"
+                ]
+              },
+              {
+                "capture": "/home/dan/.codex/worktrees/phase6-eligibility-controls/orbiter-cross-platform/out/phase6-generated-capabilities-Release-sse2-v1/capabilities.json",
+                "source_owner": "/home/dan/.codex/worktrees/phase6-eligibility-controls/orbiter-cross-platform"
+              }
+            ]
+          },
+          "audit": {
+            "path": "/home/dan/.codex/worktrees/phase6-eligibility-controls/orbiter-cross-platform/out/phase6-all-family-capability-matrix-audit-v1.json",
+            "sha256": "13ae9d581d25a7f68859aa9b19b048ee61ca453cefc85f9317719a6c313d94f2",
+            "scope": "All sixteen original structural combinations, four profiles, two passive-observer off/on repetitions; capabilities facet only"
+          },
+          "actual_processes": 144,
+          "successful_presents": 8640
+        },
+        "prepared_persistence": {
+          "path": "/home/dan/.codex/worktrees/phase6-capability-eligibility/orbiter-cross-platform/out/phase6-family-persistence-plan-v1.json",
+          "sha256": "3638906a17bff091feb0462dd4e2f201f947cf9aeeed59d4deedf7325302043b",
+          "scope": "Prepared existing-coordinator request: 128 new runs plus 16 separately retained runs; not launched"
+        },
+        "persistence_controls": {
+          "result": "passed-scoped-family-persistence-facet",
+          "execution_plan": {
+            "path": "/home/dan/.codex/worktrees/phase6-audit-throughput/orbiter-cross-platform/out/phase6-family-persistence-execution-plan-v3.json",
+            "sha256": "ff7d311f51e1a870b21d78fa4071a5c4edd7c181778d6fe1d89143fd44dceea9",
+            "scope": "Finite 144-run source-c8 family matrix from exact 003, 009 and seven-case scopes; original failed source-81 attempt preserved"
+          },
+          "expected_cases": [
+            "remaining_stock_003",
+            "remaining_stock_009",
+            "remaining_stock_013",
+            "remaining_stock_014",
+            "remaining_stock_017",
+            "remaining_stock_018",
+            "remaining_stock_022",
+            "remaining_stock_026",
+            "remaining_stock_032"
+          ],
+          "expected_runs": 144,
+          "new_runs": 112,
+          "retained_runs": 32,
+          "maximum_native_simulators": 4,
+          "current_blocker": null,
+          "next_exit_condition": "Persistence facet closed; original-dispatch class interactions remain before normal admission.",
+          "previous_execution_plans": [
+            {
+              "path": "/home/dan/.codex/worktrees/phase6-persistence-controls/orbiter-cross-platform/out/phase6-family-persistence-execution-plan-v2.json",
+              "sha256": "65f13c97d97bf9daeee886de024caff6d911b0a6fd552b07631ebed8c57273b7",
+              "scope": "Two separate exact scopes: 128 new runs plus 16 retained runs to re-audit; requests launched, no persistence pass yet"
+            }
+          ],
+          "focused_runs": 32,
+          "completed_focused_runs": 32,
+          "independent_audit": {
+            "path": "/home/dan/.codex/worktrees/phase6-stock-admission/orbiter-cross-platform/out/phase6-all-family-persistence-matrix-audit-v2.json",
+            "sha256": "f88902c6e7ae13e72284849a23d2327d6b7f1b301aa71ffd41e7afbad31d1002",
+            "scope": "Selected complete original scenes, full serialized content and matching exact Windows-save reloads. No full38, actual operator save/F5 workflow, interaction, normal admission or final-candidate credit. Historical missing launch receipts remain missing."
+          },
+          "completed_runs": 144,
+          "completed_writer_runs": 72,
+          "completed_exact_save_reload_runs": 72,
+          "completed_new_runs": 112,
+          "remaining_runs": 0,
+          "historical_source81_retained_audit": {
+            "path": "/home/dan/.codex/worktrees/phase6-persistence-controls/orbiter-cross-platform/out/phase6-family-persistence-retained003-v1/status.json",
+            "sha256": "6050f5d048484194c59def971f588a9e6f645055f1d8f4837ddef5b67df30811",
+            "scope": "Fresh independent audit and Windows comparisons of all sixteen retained scene003 writer/reloads under their exact original selected scope; no new simulators"
+          }
+        },
+        "renderer_rng_repair": {
+          "runtime_commit": "c8a8181e75d32aa08f59ed46eae8ac8215a8dbb8",
+          "fixed_matrix": {
+            "path": "/home/dan/.codex/worktrees/phase6-admission-controls/orbiter-cross-platform/out/phase6-rng-focused-009-v2/status.json",
+            "sha256": "a13d47ca8b10cfd3d6b0cac9efffe2070c28c6d586baf518ffc5ff1385eb2fc0",
+            "scope": "All sixteen scene009 writer/exact-save runs, four profiles, two repetitions, independently compared and audited"
+          },
+          "pacing_neutrality": {
+            "path": "/home/dan/.codex/worktrees/phase6-final-qualification/orbiter-cross-platform/out/phase6-renderer-rng-pacing-neutrality-v1.json",
+            "sha256": "d5ac7a0a5b97b28e87dd201ab6b5ec8e85eeb2ad6c84f9f66008fcfa99189b20",
+            "scope": "Both repetitions/phases retain byte-identical primary simulation traces, clocks, cameras, saved content and frames with observer delay 120ms versus 0ms"
+          },
+          "frame_comparator": {
+            "path": "/home/dan/.codex/worktrees/phase6-audit-throughput/orbiter-cross-platform/out/phase6-ssim-kernel-v1/verification.json",
+            "sha256": "31b9659fe7ab2fedaac7f43426160cdd5624dc9398a946d23b27d8f0928a74e7",
+            "scope": "Two real full-frame pairs and five small controls have bit-identical retained Python/scalar compiled SSIM scores; existing images, arithmetic and budgets preserved"
+          },
+          "two_mission_focused_matrix": {
+            "path": "/home/dan/.codex/worktrees/phase6-audit-throughput/orbiter-cross-platform/out/phase6-rng-focused-two-mission-matrix-v1.json",
+            "sha256": "80a565b7ec86f48e7a722861aae73457472c9b0f871e273dff6b2880c67943b2",
+            "scope": "32 actual runs: scenes003/009, four profiles, writers/exact Windows-save reloads, both repetitions; all existing checks pass"
+          }
+        },
+        "rejection_controls": {
+          "result": "passed-scoped-family-facet",
+          "source_owner": "/home/dan/.codex/worktrees/phase6-admission-controls/orbiter-cross-platform",
+          "producer_commit": "6434f4e286ae65ab02c284d82850bf155a33adf9",
+          "captures": {
+            "Debug-automatic": "/home/dan/.codex/worktrees/phase6-admission-controls/orbiter-cross-platform/out/phase6-rejections-Debug-automatic-v1/rejections.json",
+            "Debug-sse2": "/home/dan/.codex/worktrees/phase6-admission-controls/orbiter-cross-platform/out/phase6-rejections-Debug-sse2-v4/rejections.json",
+            "Release-automatic": "/home/dan/.codex/worktrees/phase6-admission-controls/orbiter-cross-platform/out/phase6-rejections-Release-automatic-v1/rejections.json",
+            "Release-sse2": "/home/dan/.codex/worktrees/phase6-admission-controls/orbiter-cross-platform/out/phase6-rejections-Release-sse2-v1/rejections.json"
+          },
+          "expected_processes": 180,
+          "controls_per_profile": 45,
+          "audit": {
+            "path": "/home/dan/.codex/worktrees/phase6-audit-throughput/orbiter-cross-platform/out/phase6-all-family-rejection-matrix-audit-v1.json",
+            "sha256": "8c7559f506a5906aeea504ab0ce51862c578141d1843936a8661d31372c1fd8b",
+            "scope": "Every family: unknown class and foreign factory. Each module-defined family: missing module and generic fallback. Shared checked loader: seven invalid ABI descriptors, missing query and actual Windows PE. All return one before presentation, clean contexts and unsuppressed sanitizers; invalid metadata never initializes. No positive interaction, persistence or normal admission credit."
+          }
+        },
+        "interaction_controls": {
+          "result": "passed-all-four-profile-original-control-interactions",
+          "source_owner": "/home/dan/.codex/worktrees/phase6-candidate-freeze/orbiter-cross-platform",
+          "canary_profile": "Debug-sse2",
+          "plans": [
+            {
+              "path": "/home/dan/.codex/worktrees/phase6-stock-admission/orbiter-cross-platform/Tests/Production/RemainingVessels/Interactions/actuator-controls-v1.json",
+              "sha256": "805fc0d2e122e326d6cc9b0e73bf873d2628dbc716c43595f816403a0916de17"
+            },
+            {
+              "path": "/home/dan/.codex/worktrees/phase6-stock-admission/orbiter-cross-platform/Tests/Production/RemainingVessels/Interactions/module2-docking-v1.json",
+              "sha256": "b97180f186c8cfce64328ad41f4eebf19a2ed4395cd84bc78c4b0c715b5857b5"
+            },
+            {
+              "path": "/home/dan/.codex/worktrees/phase6-stock-admission/orbiter-cross-platform/Tests/Production/RemainingVessels/Interactions/payload-releases-v1.json",
+              "sha256": "0aac3c12b686920532465a389b99182ef43ceadd26147a76328d01df7d8f3988"
+            },
+            {
+              "path": "/home/dan/.codex/worktrees/phase6-stock-admission/orbiter-cross-platform/Tests/Production/RemainingVessels/Interactions/rms-dialog-calibration-v1.json",
+              "sha256": "dc5d9ed9780337b4a56f214b73ee41507bbdb5cb854cbafd8adcbd1a445b47d0"
+            }
+          ],
+          "scope": "Bounded original controls only. Three actuator flows, one original RCS docking flow and three original payload releases; RMS dialog calibration earns no family facet. All-profile interactions, RMS and ascent remain open.",
+          "native_admission_qualified": false,
+          "save_dispatch_fix": "70d80294",
+          "preserved_failed_captures": [
+            "/home/dan/.codex/worktrees/phase6-stock-admission/orbiter-cross-platform/out/phase6-actuator-controls-Debug-sse2-canary-v1/interactions.json",
+            "/home/dan/.codex/worktrees/phase6-stock-admission/orbiter-cross-platform/out/phase6-module2-docking-Debug-sse2-canary-v1/interactions.json",
+            "/home/dan/.codex/worktrees/phase6-stock-admission/orbiter-cross-platform/out/phase6-rms-dialog-Debug-sse2-calibration-v1/interactions.json"
+          ],
+          "failure_cause": "Runner declared --save destination without dispatching Ctrl-S; original HST and RMS simulations exit cleanly but fail required saved-file inspection. The original RCS docking also reaches its target, but the capture remains failed for the missing save.",
+          "corrected_capture": "/home/dan/.codex/worktrees/phase6-final-stock-controls/orbiter-cross-platform/out/phase6-hst-save-dispatch-Debug-sse2-v1/interactions.json",
+          "expected_flows": 9,
+          "expected_runs": 72,
+          "completed_focused_runs": 72,
+          "remaining_new_runs": 0,
+          "request": {
+            "path": "/home/dan/.codex/worktrees/phase6-candidate-freeze/orbiter-cross-platform/out/phase6-all-family-interactions-request-v2.json",
+            "sha256": "c455165d4dd9b5d9e3bc6fa90378b793ae51985766f6e99ab5f9f1b8ff6e7a5d"
+          },
+          "live_status": "/home/dan/.codex/worktrees/phase6-candidate-freeze/orbiter-cross-platform/out/phase6-all-family-interactions-v2/status.json",
+          "independent_focused_audit": {
+            "path": "/home/dan/.codex/worktrees/phase6-production-qualification/orbiter-cross-platform/out/phase6-one-profile-all-family-interactions-v1.json",
+            "sha256": "962ebd16cab094996c3915b16597a059a3c47fd818d76b308fc3b34da73b6e5f",
+            "scope": "All nine original-control flows twice on Debug/SSE2. Other three profiles remain required. No complete class, normal admission, named workflow or software gate credit."
+          },
+          "coordinator_controls": {
+            "path": "/home/dan/.codex/worktrees/phase6-candidate-freeze/orbiter-cross-platform/out/phase6-interactions-coordinator-controls-v2.json",
+            "sha256": "b3047f5e855facaa4b285aec325222611019ca8ff7d436017bcecc9c7221170a",
+            "scope": "Completed capture reuse, missing profile/flow rejection and actual cancellation. Zero new simulator launches."
+          },
+          "canonical_launch_plan": "/home/dan/.codex/worktrees/phase6-candidate-freeze/orbiter-cross-platform/Tests/Production/RemainingVessels/Interactions/atlantis-launch-staging-v2.json",
+          "preserved_coarse_launch_failure": "/home/dan/.codex/worktrees/phase6-candidate-freeze/orbiter-cross-platform/out/phase6-launch-staging-Debug-sse2-v1/interactions.json",
+          "complete_audit": {
+            "path": "/home/dan/.codex/worktrees/phase6-production-qualification/orbiter-cross-platform/out/phase6-all-family-interaction-matrix-audit-v1.json",
+            "sha256": "fa0b2b8b07f4da97a80bb4876d9e54e5cc874f0eb8aadb7533f2d96ad85fa34e",
+            "scope": "All nine original-control flows in four profiles, twice each, complete original/generated rosters, actual keys/GUI/Lua actuators, physical docking, payload mass transfer, six-joint RMS and canonical-clock launch/staging. No normal-host admission, full38, named Windows/native workflow or final-candidate credit."
+          },
+          "raw_audits": "/home/dan/.codex/worktrees/phase6-production-qualification/orbiter-cross-platform/out/phase6-all-family-interaction-matrix-audit-v1-raw-audits"
+        },
+        "normal_host_policy": {
+          "result": "enabled-in-source-awaiting-final-normal-host-qualification",
+          "structural_combinations": 16,
+          "declared_module_identity_required": true,
+          "source": {
+            "path": "/home/dan/.codex/worktrees/phase6-final-build-integration/orbiter-cross-platform/Src/Orbiter/Production/NativeApplication.cpp",
+            "sha256": "a979d3b1969de4dd4a3e3d963327181d2ddccb7d06581222f8701258c22426ed"
+          },
+          "public_sdk_or_abi_changed": false,
+          "normal_admission_gate_passed": false
+        }
+      },
+      "note": "All eleven families, all seven eligibility facets, four profiles. Per-facet source/binary identities and failures are retained. The final source enables only sixteen qualified structural combinations and their declared modules. Matching final binaries, all 157 normal entry points, fresh full38/workflow qualification and operator acceptance remain separate gates."
+    },
+    "candidate-freeze": {
+      "expected": {
+        "depends_on": [
+          "class-eligibility"
+        ],
+        "required": [
+          "windows-debug-release",
+          "four-native-profiles",
+          "application-observer-runner-reference-identities",
+          "dependency-and-provider-inventories",
+          "discovered-unit-test-inventory"
+        ]
+      },
+      "result": "passed",
+      "coverage": {
+        "depends_on": [
+          "class-eligibility"
+        ],
+        "required": [
+          "windows-debug-release",
+          "four-native-profiles",
+          "application-observer-runner-reference-identities",
+          "dependency-and-provider-inventories",
+          "discovered-unit-test-inventory"
+        ]
+      },
+      "diagnostic_only": false,
+      "candidate_id": "phase6-c4ad-final-v1",
+      "evidence": [
+        {
+          "path": "/home/dan/.codex/worktrees/phase6-orbit-node-qualification/orbiter-cross-platform/out/phase6-final-candidate-freeze-v1.json",
+          "sha256": "2aaa553c85bf849b55b4193d4131ea8e59f478bd6bbdb0884730b11907e80910",
+          "scope": "Frozen C4 application/SDK builds, four native profiles, both Windows configurations; separated observer/runner/reference/provider identities and actual discovered unit inventories."
+        }
+      ],
+      "qualification_progress": {
+        "preserved_native_build_attempts": [
+          {
+            "path": "/home/dan/.codex/worktrees/phase6-production-qualification/orbiter-cross-platform/out/phase6-final-candidate-Debug-sse2-v1/build.json",
+            "sha256": "51d983b6653134b3fad463152a3b77a04ce1501ea84c5df39ff50645f93079e8",
+            "result": "failed-before-runtime-qualification"
+          },
+          {
+            "path": "/home/dan/.codex/worktrees/phase6-production-qualification/orbiter-cross-platform/out/phase6-final-candidate-Debug-sse2-v2/build.json",
+            "sha256": "4b8f1df497f1accdb4b65032e9e3098691716f695a0bd9de1b1c5607c48f428a",
+            "result": "failed-before-runtime-qualification"
+          },
+          {
+            "path": "/home/dan/.codex/worktrees/phase6-production-qualification/orbiter-cross-platform/out/phase6-final-candidate-Debug-sse2-v3/build.json",
+            "sha256": "963dac8f0f3a399a62a8431098a4447e81ccf0d9ba205cd62aac50be8a42670f",
+            "result": "failed-before-runtime-qualification"
+          }
+        ],
+        "preserved_windows_build_attempt": {
+          "path": "/home/dan/Shared/OrbiterPhase6-Codex-20261105-0240d516/phase6-final-candidate-22a1-v1/built/build.json",
+          "sha256": "37de9244d59d4178a4a82715f2e54ca7de22c1ada3a3c8c34051cfc4b53e7606",
+          "result": "Debug-compile-and-CTest-passed-metadata-failed-no-runtime-credit"
+        },
+        "accessor_compile_regression": {
+          "path": "/home/dan/.codex/worktrees/phase6-final-build-integration/orbiter-cross-platform/out/phase6-accessor-compile-regression-v1/commands.json",
+          "sha256": "5259af87b14aba0af53703b18cc5bb3ae004bc631a72bf4645c345d1068eb050",
+          "scope": "Actual failed module accessor and normal-host caller compile with captured compiler flags; syntax only, no runtime pass"
+        },
+        "source_conservation": {
+          "path": "/home/dan/.codex/worktrees/phase6-final-build-integration/orbiter-cross-platform/out/phase6-accessor-compile-regression-v1/source-conservation.log",
+          "sha256": "2223ebf27164fc41817a0540c4d847e4f954f4ad52c5d8ecbeb6a2e7809e5beb",
+          "scope": "All 622 extraction files; original Windows declarations, public SDK layouts and numerical operations conserved"
+        },
+        "fixes": [
+          "Explicit retained MPFR unit-test development prefix",
+          "Canonical recorder test dependency path",
+          "Native-only internal module-name accessor",
+          "Windows dependency junctions expected by the unchanged provenance reader"
+        ],
+        "normal_host_canary": {
+          "path": "/home/dan/.codex/worktrees/phase6-orbit-node-qualification/orbiter-cross-platform/out/phase6-final-normal-canary-Debug-sse2-audit-v1.json",
+          "sha256": "7fa69a031129ba86cc697af7bb00234454e36a7c9ae47c0b159bf283ea769071",
+          "scope": "Actual final normal host, two complete missions, two repetitions, writers and exact same hashed Windows-save reloads. Eight processes; selected scope only."
+        }
+      }
+    },
+    "remaining-stock": {
+      "expected": {
+        "depends_on": [
+          "candidate-freeze"
+        ],
+        "profiles": [
+          "Debug-automatic",
+          "Debug-sse2",
+          "Release-automatic",
+          "Release-sse2"
+        ],
+        "cohorts": [
+          "original-windows",
+          "current-windows",
+          "native"
+        ],
+        "cases": [
+          "remaining_stock_001",
+          "remaining_stock_002",
+          "remaining_stock_003",
+          "remaining_stock_004",
+          "remaining_stock_005",
+          "remaining_stock_006",
+          "remaining_stock_007",
+          "remaining_stock_008",
+          "remaining_stock_009",
+          "remaining_stock_010",
+          "remaining_stock_011",
+          "remaining_stock_012",
+          "remaining_stock_013",
+          "remaining_stock_014",
+          "remaining_stock_015",
+          "remaining_stock_016",
+          "remaining_stock_017",
+          "remaining_stock_018",
+          "remaining_stock_019",
+          "remaining_stock_020",
+          "remaining_stock_021",
+          "remaining_stock_022",
+          "remaining_stock_023",
+          "remaining_stock_024",
+          "remaining_stock_025",
+          "remaining_stock_026",
+          "remaining_stock_027",
+          "remaining_stock_028",
+          "remaining_stock_029",
+          "remaining_stock_030",
+          "remaining_stock_031",
+          "remaining_stock_032",
+          "remaining_stock_033",
+          "remaining_stock_034",
+          "remaining_stock_035",
+          "remaining_stock_036",
+          "remaining_stock_037",
+          "remaining_stock_038"
+        ],
+        "phases": [
+          "stock-writer",
+          "windows-save-reload"
+        ],
+        "repeats": 2,
+        "runs_per_cohort": 608,
+        "required": [
+          "complete-state",
+          "clocks",
+          "cameras",
+          "complete-saved-content",
+          "full-frames",
+          "exact-same-windows-save",
+          "fresh-launch-worker-desktop-process-receipts"
+        ]
+      },
+      "result": "not-run",
+      "coverage": null,
+      "diagnostic_only": null,
+      "candidate_id": null,
+      "evidence": [],
+      "qualification_progress": {
+        "early_fresh_original_writers": {
+          "path": "/home/dan/.codex/worktrees/phase6-orbit-node-qualification/orbiter-cross-platform/out/phase6-fresh-reference-early-closed-writers-audit-v1.json",
+          "sha256": "18a506a8ac9d89fc24d5da53dd233533761c81a2815477ab12a1dc1a38fd74a1",
+          "scope": "Eight already completed fresh original Windows writers: unchanged physical/camera budgets, exact clocks and save bytes, SSIM 1.0. Full campaigns and launch/process receipt audits remain open."
+        }
+      }
+    },
+    "normal-admission": {
+      "expected": {
+        "depends_on": [
+          "candidate-freeze"
+        ],
+        "profiles": [
+          "Debug-automatic",
+          "Debug-sse2",
+          "Release-automatic",
+          "Release-sse2"
+        ],
+        "cohorts": [
+          "native"
+        ],
+        "entry_points": [
+          "Scenarios/2024 Edition/# Welcome to Orbiter 2024.scn",
+          "Scenarios/2024 Edition/3 Minute Tour of Kennedy Space Center.scn",
+          "Scenarios/2024 Edition/City lights at night.scn",
+          "Scenarios/2024 Edition/Cruising above Florida.scn",
+          "Scenarios/2024 Edition/Earth views.scn",
+          "Scenarios/2024 Edition/KSC Update.scn",
+          "Scenarios/2024 Edition/Solar system.scn",
+          "Scenarios/2024 Edition/Space Shuttle ascent autopilot.scn",
+          "Scenarios/2024 Edition/Space Shuttle to ISS.scn",
+          "Scenarios/2024 Edition/Spotlights.scn",
+          "Scenarios/2024 Edition/Surface impact model.scn",
+          "Scenarios/2024 Edition/Tesseral Gravity.scn",
+          "Scenarios/2024 Edition/The Alps in 3D.scn",
+          "Scenarios/Antelope Valley scenery/DG at Edwards AFB.scn",
+          "Scenarios/Antelope Valley scenery/Mojave spaceport.scn",
+          "Scenarios/Antelope Valley scenery/Mojave to Edwards.scn",
+          "Scenarios/Antelope Valley scenery/Palmdale launchpad.scn",
+          "Scenarios/Antelope Valley scenery/STS-125 finals at Edwards.scn",
+          "Scenarios/Challenges/Challenge 1 - Launch and docking.scn",
+          "Scenarios/Challenges/Challenge 2 - Lunar transfer.scn",
+          "Scenarios/Challenges/Challenge 3 - Advanced lunar transfer.scn",
+          "Scenarios/Challenges/Challenge 4 - Entry and landing.scn",
+          "Scenarios/Checklists/Mission 1 - DG to ISS.scn",
+          "Scenarios/Checklists/Mission 2 - ISS to Mir.scn",
+          "Scenarios/Checklists/Mission 3 - Deorbit.scn",
+          "Scenarios/Checklists/Quickstart.scn",
+          "Scenarios/Delta-glider/Animated control surfaces.scn",
+          "Scenarios/Delta-glider/Atmospheric autopilot.scn",
+          "Scenarios/Delta-glider/Brighton Beach.scn",
+          "Scenarios/Delta-glider/Cape Canaveral.scn",
+          "Scenarios/Delta-glider/DG Mk4 in orbit.scn",
+          "Scenarios/Delta-glider/DG and DG-S.scn",
+          "Scenarios/Delta-glider/DG-S ready for takeoff.scn",
+          "Scenarios/Delta-glider/Docked at ISS.scn",
+          "Scenarios/Delta-glider/Glass cockpit.scn",
+          "Scenarios/Delta-glider/Habana Spaceport.scn",
+          "Scenarios/Delta-glider/Smack!.scn",
+          "Scenarios/Delta-glider/The rotation model.scn",
+          "Scenarios/Delta-glider/Venus descent.scn",
+          "Scenarios/Delta-glider/Venus takeoff.scn",
+          "Scenarios/Delta-glider/Vessel-vessel.scn",
+          "Scenarios/Delta-glider/Virtual cockpit.scn",
+          "Scenarios/Demo/Atlantis Ascent AP.scn",
+          "Scenarios/Demo/DG ISS Approach.scn",
+          "Scenarios/Demo/Dione.scn",
+          "Scenarios/Demo/Docked at ISS.scn",
+          "Scenarios/Demo/Earth.scn",
+          "Scenarios/Demo/Galilean system view.scn",
+          "Scenarios/Demo/ISS Approach.scn",
+          "Scenarios/Demo/Level 9 textures.scn",
+          "Scenarios/Demo/Mir.scn",
+          "Scenarios/Demo/Project Alpha.scn",
+          "Scenarios/Demo/Saturn.scn",
+          "Scenarios/Demo/The 1999 solar eclipse.scn",
+          "Scenarios/Demo/Today.scn",
+          "Scenarios/Demo/Virtual cockpit.scn",
+          "Scenarios/Dragonfly/Dragonfly.scn",
+          "Scenarios/Dragonfly/Dragonfly021118.scn",
+          "Scenarios/Dragonfly/Station building.scn",
+          "Scenarios/Dragonfly/v1.0.0b PoweredUp.scn",
+          "Scenarios/Launch sites and spaceports/DG at Edwards AFB.scn",
+          "Scenarios/Launch sites and spaceports/Mojave spaceport.scn",
+          "Scenarios/Launch sites and spaceports/Palmdale launchpad.scn",
+          "Scenarios/Launch sites and spaceports/STS-125 finals at Edwards.scn",
+          "Scenarios/Navigation/Lunar transfer/Lunar transfer 1.scn",
+          "Scenarios/Navigation/Lunar transfer/Lunar transfer 2.scn",
+          "Scenarios/Navigation/Space Physics/Atlantis in orbit.scn",
+          "Scenarios/Navigation/Space Physics/DG dumbbell.scn",
+          "Scenarios/Navigation/Space Physics/Solar sail.scn",
+          "Scenarios/Navigation/Space Physics/Spin stabilisation.scn",
+          "Scenarios/Navigation/Special orbits/Geostationary orbit.scn",
+          "Scenarios/Navigation/Special orbits/Lagrange point.scn",
+          "Scenarios/Navigation/Special orbits/Molniya orbit.scn",
+          "Scenarios/Navigation/Special orbits/Orbiting Phobos.scn",
+          "Scenarios/Navigation/Special orbits/Sun-synchronous orbit.scn",
+          "Scenarios/Navigation/Special orbits/Tundra orbit.scn",
+          "Scenarios/Navigation/TransX/Earth to Mars.scn",
+          "Scenarios/Navigation/TransX/Earth to Moon.scn",
+          "Scenarios/Navigation/TransX/Voyager Grand Tour.scn",
+          "Scenarios/Playback/Atlantis undocking.scn",
+          "Scenarios/Playback/Glider in orbit 1.scn",
+          "Scenarios/Playback/Glider in orbit 2.scn",
+          "Scenarios/Playback/Mojave to Edwards.scn",
+          "Scenarios/Quadcopter/Quadcopter at KSC.scn",
+          "Scenarios/Satellites and Probes/Hubble Space Telescope/HST Animation.scn",
+          "Scenarios/Satellites and Probes/Hubble Space Telescope/HST Launch.scn",
+          "Scenarios/Satellites and Probes/Hubble Space Telescope/HST Orbit Deployment.scn",
+          "Scenarios/Satellites and Probes/Hubble Space Telescope/HST Recapture.scn",
+          "Scenarios/Satellites and Probes/LDEF/LDEF deployment.scn",
+          "Scenarios/Satellites and Probes/LDEF/LDEF retrieval.scn",
+          "Scenarios/Shuttle-A/ISS Approach.scn",
+          "Scenarios/Shuttle-A/Olympus spaceport on Mars.scn",
+          "Scenarios/Shuttle-A/Shuttle-A Docked at ISS.scn",
+          "Scenarios/Shuttle-A/Shuttle-A Drop.scn",
+          "Scenarios/Shuttle-A/Shuttle-A Launch.scn",
+          "Scenarios/Shuttle-A/Shuttle-A Moon.scn",
+          "Scenarios/Space Shuttle Atlantis/Atlantis ISS Resupply.scn",
+          "Scenarios/Space Shuttle Atlantis/Atlantis MMU Satellite Repair.scn",
+          "Scenarios/Space Shuttle Atlantis/Atlantis cockpit.scn",
+          "Scenarios/Space Shuttle Atlantis/Atlantis docked at ISS.scn",
+          "Scenarios/Space Shuttle Atlantis/Atlantis final approach.scn",
+          "Scenarios/Space Shuttle Atlantis/Atlantis landing preparation.scn",
+          "Scenarios/Space Shuttle Atlantis/Atlantis reentry 1.scn",
+          "Scenarios/Space Shuttle Atlantis/Atlantis reentry 2.scn",
+          "Scenarios/Space Shuttle Atlantis/Atlantis satellite Launch.scn",
+          "Scenarios/Space Shuttle Atlantis/Atlantis satellite.scn",
+          "Scenarios/Space Shuttle Atlantis/Launch into Sunrise.scn",
+          "Scenarios/Space Stations/Blue Danube.scn",
+          "Scenarios/Space Stations/ISS.scn",
+          "Scenarios/Space Stations/Light and darkness.scn",
+          "Scenarios/Space Stations/Mir.scn",
+          "Scenarios/Tests/GeneralApiTest.scn",
+          "Scenarios/Tests/Manual/ScriptMfdApiTest.scn",
+          "Scenarios/Tests/VesselApiTest.scn",
+          "Scenarios/The Solar System/Dione.scn",
+          "Scenarios/The Solar System/Earth/Earth views 1.scn",
+          "Scenarios/The Solar System/Earth/Earth views 2.scn",
+          "Scenarios/The Solar System/Earth/In low orbit over Africa.scn",
+          "Scenarios/The Solar System/Earth/The Alps in 3D.scn",
+          "Scenarios/The Solar System/Earth/The Great Lakes.scn",
+          "Scenarios/The Solar System/Earth/The Himalayas.scn",
+          "Scenarios/The Solar System/Eclipses/April 8 2005 Panama.scn",
+          "Scenarios/The Solar System/Eclipses/April 8 2005.scn",
+          "Scenarios/The Solar System/Eclipses/Lunar eclipse 2004.scn",
+          "Scenarios/The Solar System/Eclipses/The 1999 solar eclipse.scn",
+          "Scenarios/The Solar System/Enceladus.scn",
+          "Scenarios/The Solar System/Ephemerides/Earth-Moon system.scn",
+          "Scenarios/The Solar System/Ephemerides/Jovian satellites.scn",
+          "Scenarios/The Solar System/Galilean system view.scn",
+          "Scenarios/The Solar System/Grand tour.scn",
+          "Scenarios/The Solar System/Iapetus.scn",
+          "Scenarios/The Solar System/Jupiter flybys/Galileo's first Ganymede flyby.scn",
+          "Scenarios/The Solar System/Jupiter flybys/Galileo's first Io flyby.scn",
+          "Scenarios/The Solar System/Jupiter flybys/Galileo's second Ganymede flyby.scn",
+          "Scenarios/The Solar System/Jupiter flybys/Galileo's second Io flyby.scn",
+          "Scenarios/The Solar System/Jupiter flybys/Tour of Jupiter.scn",
+          "Scenarios/The Solar System/Mimas.scn",
+          "Scenarios/The Solar System/Moon.scn",
+          "Scenarios/The Solar System/Rhea.scn",
+          "Scenarios/The Solar System/Saturn.scn",
+          "Scenarios/The Solar System/Tethys.scn",
+          "Scenarios/The Solar System/Titan.scn",
+          "Scenarios/The Solar System/Today.scn",
+          "Scenarios/The Solar System/Triton.scn",
+          "Scenarios/The Solar System/Venus.scn",
+          "Scenarios/Tutorials/ADI training.scn",
+          "Scenarios/Tutorials/DG stunts.scn",
+          "Scenarios/Tutorials/DG to the moon.scn",
+          "Scenarios/Tutorials/DG-ISS Sync Dock.scn",
+          "Scenarios/Tutorials/Smack! Rescue.scn",
+          "Scenarios/Tutorials/Space Shuttle final approach.scn",
+          "Scenarios/Tutorials/Space Shuttle to ISS.scn",
+          "Scenarios/Views/Atmospheric haze.scn",
+          "Scenarios/Views/Cloud microtexture.scn",
+          "Scenarios/Views/KSC coverage.scn",
+          "Scenarios/Views/Martian atmosphere colours.scn",
+          "Scenarios/Views/Moon through atmosphere.scn"
+        ],
+        "runs": 628,
+        "required": [
+          "normal-host",
+          "no-class-rejections",
+          "versioned-general-api-correction",
+          "unchanged-intentional-exit-policy"
+        ]
+      },
+      "result": "failed",
+      "coverage": null,
+      "diagnostic_only": null,
+      "candidate_id": null,
+      "evidence": [
+        {
+          "path": "/home/dan/.codex/worktrees/phase6-orbit-node-qualification/orbiter-cross-platform/out/phase6-stock-initialization-roster-qualification-v1.json",
+          "sha256": "49023b06755d867b63b8ca7b32a5bdf8824af1f4f0a0e04cffae983915be4e63",
+          "scope": "Versioned stock-initialization roster test correction; 152 preserved original Windows initialization graphs agree, five damaged real native graph controls rejected. Original failed attempt remains failed; no full admission credit."
+        },
+        {
+          "path": "/home/dan/.codex/worktrees/phase6-orbit-node-qualification/orbiter-cross-platform/out/phase6-final-normal-admission-v4/campaign.json",
+          "sha256": "8bda724a3e7ca35514c9189b46273c6083837572f45fcd318f4c769e053dde38",
+          "scope": "Failed broad attempt retained: legacy smoke propagation overrides drive ascent to extreme states, then Orbit MFD overflows its local label buffer. All collectors stopped; no full admission credit."
+        }
+      ],
+      "qualification_progress": {
+        "application_source_commit": "c4ad4c424cd3bcd04fc56ba3a5ee37d033f8f1b8",
+        "roster_policy": "stock-initialization-manifest-v1",
+        "original_failures_preserved": [
+          "phase6-final-normal-admission-v1",
+          "phase6-final-normal-admission-v2",
+          "phase6-final-normal-admission-v3"
+        ],
+        "note": "v1/v2 stopped in evidence preflight; v3 stopped after exact-roster equality incorrectly rejected the three normal Atlantis-created children. Application/SDK unchanged.",
+        "ascent_default_reproduction": {
+          "path": "/home/dan/.codex/worktrees/phase6-orbit-node-qualification/orbiter-cross-platform/out/phase6-ascent-normal-defaults-focused-v1/verification.json",
+          "sha256": "65c31a85f096ba03dd74247d675725954f44ecfbb85873442b2e6d3c303e0d54",
+          "scope": "Same C4 Release/SSE2 application, unchanged quarter-second step and scenario, only forced legacy propagator settings removed: 61 finite ticks, 60 presents, clean sanitizer exit."
+        }
+      }
+    },
+    "named-workflows": {
+      "expected": {
+        "depends_on": [
+          "candidate-freeze"
+        ],
+        "profiles": [
+          "Debug-automatic",
+          "Debug-sse2",
+          "Release-automatic",
+          "Release-sse2"
+        ],
+        "cohorts": [
+          "current-windows",
+          "native"
+        ],
+        "workflows": [
+          "dg-orbit",
+          "virtual-cockpit-dg",
+          "virtual-cockpit-demo",
+          "dgs-takeoff",
+          "iss-docking-dg",
+          "iss-docking-demo",
+          "atmospheric-autopilot",
+          "moon-stock-playback",
+          "moon-brake-continuation",
+          "atlantis-resupply",
+          "atlantis-rms-payload",
+          "atlantis-ascent"
+        ],
+        "repeats": 2,
+        "required": [
+          "complete-original-vessel-roster",
+          "tick-indexed-original-input-dispatch",
+          "no-state-placement-setters",
+          "actual-save-and-F5",
+          "moon-stock-parity-and-distinct-landed-braking"
+        ]
+      },
+      "result": "not-run",
+      "coverage": null,
+      "diagnostic_only": null,
+      "candidate_id": null,
+      "evidence": []
+    },
+    "core-interfaces": {
+      "expected": {
+        "depends_on": [
+          "candidate-freeze"
+        ],
+        "profiles": [
+          "Debug-automatic",
+          "Debug-sse2",
+          "Release-automatic",
+          "Release-sse2"
+        ],
+        "required": [
+          "all-discovered-unit-tests-with-actual-totals",
+          "three-hud-modes",
+          "ten-stock-mfds",
+          "gdi-sketchpad",
+          "dialogs",
+          "lua-aap",
+          "recording-playback",
+          "invalid-input-and-module-controls",
+          "terminal-hud-mfd-text-and-images-without-new-masks"
+        ]
+      },
+      "result": "in-progress",
+      "coverage": null,
+      "diagnostic_only": null,
+      "candidate_id": null,
+      "evidence": [
+        {
+          "path": "/home/dan/.codex/worktrees/phase6-persistence-controls/orbiter-cross-platform/out/phase6-python-helper-inventory-v1.json",
+          "sha256": "587480d24e74b2a76dffc2742286e02961660d5536f8f68c5b09486991e2a056",
+          "scope": "128 actual Python helper tests in all 22 helper unittest files; separate headless CLI/runtime TestCase adapter remains open"
+        },
+        {
+          "path": "/home/dan/.codex/worktrees/phase6-stock-admission/orbiter-cross-platform/out/phase6-existing-core-units-Debug-sse2-v1/verification.json",
+          "sha256": "c8d386aa5f973efa83fa3df1de26f1bc77a85b3429337a423deb53ed61313d51",
+          "scope": "Two existing upstream units, sixteen actual Catch cases, on the retained C8 Debug/SSE2 SDK. Actual runtime listing and CTest execution, no new test bodies. Other profiles, existing CTest/portable/standalone fixtures and the final candidate core gate remain required."
+        },
+        {
+          "path": "/home/dan/.codex/worktrees/phase6-orbit-node-qualification/orbiter-cross-platform/out/phase6-orbit-fixture-root-cause-v1.json",
+          "sha256": "7f01d3cc64b44444540f0a9f73b2fa8a5259630bc50e4988cd0e289edefa2c9a",
+          "scope": "Explicit inherited fixture initialization correction; original failure and rejected uncommitted production guard retained. Production source stays C4; all-profile/current-Windows verification remains required."
+        },
+        {
+          "path": "/home/dan/.codex/worktrees/phase6-orbit-node-qualification/orbiter-cross-platform/out/phase6-existing-unit-matrix-audit-v1.json",
+          "sha256": "aee2d1dbd4f78cba3040413b1ca8492cb78f87888ddd55521092a3fa687efa68",
+          "scope": "Final C4 libraries: 32 registered native unit processes and 16 upstream Catch cases in all four profiles; explicitly corrected Orbit fixture also passes current Windows Debug and Release. Remaining interface and runtime checks stay open."
+        },
+        {
+          "path": "/home/dan/.codex/worktrees/phase6-orbit-node-qualification/orbiter-cross-platform/out/phase6-final-portable-unit-matrix-audit-v1.json",
+          "sha256": "1ff8ed46e62bb7ac8aa5efa61a7930d661163830ea2867095ce1f1d3416f6d1d",
+          "scope": "13 additional portable/headless CTest registrations in all four profiles, including 34 actual nested Python tests and 15 collision Catch cases per profile. Empty CTest attempt explicitly rejected; no interface runtime gate credit."
+        }
+      ],
+      "qualification_progress": {
+        "python_helpers": {
+          "result": "passed-scoped-helper-tests-only",
+          "actual_tests": 128,
+          "executed_test_files": 22,
+          "audit": {
+            "path": "/home/dan/.codex/worktrees/phase6-persistence-controls/orbiter-cross-platform/out/phase6-python-helper-inventory-v1.json",
+            "sha256": "587480d24e74b2a76dffc2742286e02961660d5536f8f68c5b09486991e2a056",
+            "scope": "128 actual Python helper tests in all 22 helper unittest files; separate headless CLI/runtime TestCase adapter remains open"
+          },
+          "remaining": "C++/Lua, headless integration, runtime fixtures and final-candidate profile qualification"
+        },
+        "missing_recording_error": {
+          "result": "passed-focused-negative-regression-and-valid-playback-equivalence",
+          "source_commit": "904c9f4b82dd150258edaba819eac7938057bde3",
+          "evidence": {
+            "path": "/home/dan/.codex/worktrees/phase6-audit-throughput/orbiter-cross-platform/out/phase6-preflight-captured-missing-recording-control-v1/verification.json",
+            "sha256": "dc479a2be74772749f239d66932bcde45c9a3e6050e286c2461c45b396b4e764",
+            "scope": "Exact captured malformed input, same required recording error, exit one before presentation, clean context and unsuppressed sanitizers; focused regression only."
+          },
+          "original_failure_preserved": "/home/dan/.codex/worktrees/phase6-admission-controls/orbiter-cross-platform/out/phase6-rejections-Debug-sse2-v3/Atlantis-unknown-class",
+          "original_leaked_bytes": 3705,
+          "original_leaked_allocations": 40,
+          "positive_control": "/home/dan/.codex/worktrees/phase6-audit-throughput/orbiter-cross-platform/out/phase6-preflight-positive-003-Debug-sse2-v1/capture.json",
+          "normal_admission_qualified": false,
+          "positive_evidence": {
+            "path": "/home/dan/.codex/worktrees/phase6-audit-throughput/orbiter-cross-platform/out/phase6-missing-recording-preflight-v1/positive-equivalence.json",
+            "sha256": "73798d934b0267bb0e4ef8e76868521e287b4bd6a6ca0e972e3f1caa0e289804",
+            "scope": "Two complete Debug/SSE2 Shuttle stock writers retain byte-identical primary state, clocks, camera, full frame and complete saved file after the read-only resource preflight; independent native re-read and direct Windows comparison pass. Focused resource regression only."
+          }
+        },
+        "existing_cpp_lua_discovery": {
+          "path": "/home/dan/.codex/worktrees/phase6-audit-throughput/orbiter-cross-platform/out/phase6-existing-Cxx-Lua-test-source-inventory-v1.json",
+          "sha256": "c755fdb354109ac8ddf87a83a03e8ef24e3c91cc411505f96051c79d7530f948",
+          "scope": "Existing test-source discovery only; actual configured and executed totals remain open for the final candidate"
+        },
+        "upstream_core_preflight": {
+          "result": "passed-existing-upstream-unit-preflight-only",
+          "profile": "Debug-sse2",
+          "runtime_source": "c8a8181e75d32aa08f59ed46eae8ac8215a8dbb8",
+          "actual_ctest_processes": 2,
+          "actual_catch_cases": 16,
+          "actual_assertions": 132611,
+          "evidence": {
+            "path": "/home/dan/.codex/worktrees/phase6-stock-admission/orbiter-cross-platform/out/phase6-existing-core-units-Debug-sse2-v1/verification.json",
+            "sha256": "c8d386aa5f973efa83fa3df1de26f1bc77a85b3429337a423deb53ed61313d51",
+            "scope": "Two existing upstream units, sixteen actual Catch cases, on the retained C8 Debug/SSE2 SDK. Actual runtime listing and CTest execution, no new test bodies. Other profiles, existing CTest/portable/standalone fixtures and the final candidate core gate remain required."
+          },
+          "final_candidate_gate_passed": false
+        },
+        "orbit_geometry_fixture": {
+          "result": "corrected-fixture-three-native-profiles-passed",
+          "variant": "orbit-geometry-production-state-initialization-v1",
+          "evidence": {
+            "path": "/home/dan/.codex/worktrees/phase6-orbit-node-qualification/orbiter-cross-platform/out/phase6-orbit-fixture-root-cause-v1.json",
+            "sha256": "7f01d3cc64b44444540f0a9f73b2fa8a5259630bc50e4988cd0e289edefa2c9a",
+            "scope": "Explicit inherited fixture initialization correction; original failure and rejected uncommitted production guard retained. Production source stays C4; all-profile/current-Windows verification remains required."
+          },
+          "production_changed": false,
+          "remaining": [
+            "Release-sse2",
+            "current-Windows"
+          ]
+        },
+        "final_existing_units": {
+          "result": "passed-scoped-existing-units-only",
+          "application_source_commit": "c4ad4c424cd3bcd04fc56ba3a5ee37d033f8f1b8",
+          "native_profiles": 4,
+          "core_registered_processes_per_profile": 32,
+          "upstream_cases_per_profile": 16,
+          "upstream_assertions_per_profile": 132611,
+          "windows_corrected_fixture_configurations": [
+            "Debug",
+            "Release"
+          ]
+        },
+        "final_portable_units": {
+          "result": "passed-scoped-existing-portable-and-headless-units",
+          "profiles": 4,
+          "registered_processes_per_profile": 13,
+          "nested_python_tests_per_profile": 34,
+          "portable_collision_catch_cases_per_profile": 15
+        }
+      }
+    },
+    "lifecycle-input": {
+      "expected": {
+        "depends_on": [
+          "candidate-freeze"
+        ],
+        "profiles": [
+          "Debug-automatic",
+          "Debug-sse2",
+          "Release-automatic",
+          "Release-sse2"
+        ],
+        "cycles": 20,
+        "backends": [
+          "x11",
+          "wayland"
+        ],
+        "scales": [
+          1,
+          2
+        ],
+        "views": [
+          "panel",
+          "virtual-cockpit"
+        ],
+        "required": [
+          "load-reload-unload",
+          "paused-attachments",
+          "lua-ownership",
+          "actual-provider-matrices",
+          "clean-exits",
+          "unsuppressed-native-sanitizers"
+        ]
+      },
+      "result": "not-run",
+      "coverage": null,
+      "diagnostic_only": null,
+      "candidate_id": null,
+      "evidence": []
+    },
+    "performance": {
+      "expected": {
+        "depends_on": [
+          "remaining-stock",
+          "normal-admission",
+          "named-workflows",
+          "core-interfaces",
+          "lifecycle-input"
+        ],
+        "profile": "Release-automatic",
+        "resolution": [
+          1920,
+          1080
+        ],
+        "quality": "medium",
+        "device": "Intel",
+        "backends": [
+          "wayland",
+          "xwayland"
+        ],
+        "scenes": 3,
+        "repeats": 2,
+        "runs": 12,
+        "median_ms_max": 33,
+        "p95_ms_max": 50,
+        "required": [
+          "serial",
+          "ac-power",
+          "no-competing-qualification-jobs"
+        ]
+      },
+      "result": "not-run",
+      "coverage": null,
+      "diagnostic_only": null,
+      "candidate_id": null,
+      "evidence": []
+    },
+    "hands-on": {
+      "expected": {
+        "depends_on": [
+          "performance"
+        ],
+        "required": [
+          "physical-keyboard-mouse",
+          "cockpit-view-changes",
+          "controls",
+          "typing-cancellation",
+          "focus-recovery",
+          "save-F5-reload",
+          "normal-exit"
+        ]
+      },
+      "result": "not-run",
+      "coverage": null,
+      "diagnostic_only": null,
+      "candidate_id": null,
+      "evidence": []
+    },
+    "archive-audit": {
+      "expected": {
+        "depends_on": [
+          "hands-on"
+        ],
+        "required": [
+          "independent-final-evidence-reread",
+          "every-required-case-profile-repetition",
+          "versioned-sealed-local-archives",
+          "archive-restoration",
+          "central-status-and-supported-class-documents"
+        ]
+      },
+      "result": "not-run",
+      "coverage": null,
+      "diagnostic_only": null,
+      "candidate_id": null,
+      "evidence": []
+    },
+    "controller": {
+      "expected": {
+        "depends_on": [
+          "hands-on"
+        ],
+        "required": [
+          "real-axes-buttons",
+          "deadzones",
+          "throttle-arming",
+          "keyboard-handoff",
+          "disconnect-reconnect",
+          "physical-hardware"
+        ]
+      },
+      "result": "blocked",
+      "coverage": null,
+      "diagnostic_only": null,
+      "candidate_id": null,
+      "evidence": [],
+      "note": "Physical controller hardware unavailable; virtual devices do not satisfy acceptance."
+    }
+  },
+  "current_blocker": "Resolve the actual Orbit MFD label-buffer overflow and the proven legacy propagation override in the normal-stock runner, then qualify the affected final candidate. Fresh original-Windows reference captures continue unchanged.",
+  "next_exit_condition": "Focused default-propagator and display-buffer regressions pass before another full normal-admission campaign. Complete fresh Windows/native software gates afterward."
+}

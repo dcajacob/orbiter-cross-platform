@@ -1,0 +1,125 @@
+"""Synthetic paused controls cannot hide lost links, missing F5 or partial worlds."""
+import copy
+import csv
+import os
+from pathlib import Path
+import tempfile
+import unittest
+
+from class_eligibility import inspect_paused, family_coverage, capability_profile_cases, persistence_coverage, OBJECTS
+from contracts import atomic_json, sha, load, ROOT
+from checklist import requirements
+
+
+def write_csv(path, records):
+    with path.open('w') as stream:
+        writer = csv.DictWriter(stream, fieldnames=list(records[0]))
+        writer.writeheader()
+        writer.writerows(records)
+
+
+class PausedEvidenceControls(unittest.TestCase):
+    def test_persistence_requires_both_phases_exact_cases_repetitions_and_one_runtime(self):
+        def part(phase,names):
+            return dict(capture='synthetic-'+phase,audit=dict(profile='Debug-automatic',phase=phase,
+                runtime_source='a'*40,diagnostic_only=True,owning_bytes_unchanged=True,
+                actual_processes=len(names)*2,cases={name:dict(runs=[{},{}]) for name in names}))
+        stages=[part(phase,names) for phase in ('stock-writer','windows-save-reload')
+                for names in (['retained'],['new-a','new-b'])]
+        self.assertEqual(persistence_coverage(stages,['Debug-automatic'],['retained','new-a','new-b'])[1],12)
+        mixed=copy.deepcopy(stages);mixed[-1]['audit']['runtime_source']='b'*40
+        short=copy.deepcopy(stages);short[-1]['audit']['cases']['new-a']['runs'].pop()
+        count=copy.deepcopy(stages);count[-1]['audit']['actual_processes']-=1
+        for damaged in (stages[:-1],stages+[stages[0]],mixed,short,count):
+            with self.subTest(damaged=damaged),self.assertRaises(ValueError):
+                persistence_coverage(damaged,['Debug-automatic'],['retained','new-a','new-b'])
+        with self.assertRaises(ValueError):persistence_coverage(stages,['Debug-automatic','Debug-sse2'],['retained','new-a','new-b'])
+
+    def test_completed_subset_and_repaired_case_must_cover_exact_matrix(self):
+        def part(names):
+            return dict(runtime_identity=dict(profile='Debug-automatic',runtime_source_commit='a'*40),
+                        repeats=2,cases={name:[] for name in names},actual_processes=len(names)*4)
+        first,last=part(['a','b']),part(['c'])
+        result=capability_profile_cases([first,last],'Debug-automatic',['a','b','c'])
+        self.assertEqual(set(result[0]),{'a','b','c'});self.assertEqual(result[2],12)
+        wrong=part(['c']);wrong['runtime_identity']['runtime_source_commit']='b'*40
+        for parts in ([first],[first,last,last],[first,wrong]):
+            with self.subTest(parts=parts),self.assertRaises(ValueError):
+                capability_profile_cases(parts,'Debug-automatic',['a','b','c'])
+        with self.assertRaises(ValueError):capability_profile_cases([first,last],'Release-automatic',['a','b','c'])
+
+    def test_family_matrix_rejects_partial_duplicate_and_mixed_source_cells(self):
+        specification=requirements()['class-eligibility']
+        ledger=load(ROOT/'Docs/Production/Phase6Closeout.json')
+        selected={k:v['lifetime_case'] for k,v in ledger['gates']['class-eligibility']['qualification_progress']['family_results'].items()}
+        cases={c['id']:c for c in load(ROOT/'Tests/Production/RemainingStock/cases.json')['cases']}
+        captures=[dict(capture='synthetic-'+profile,audit=dict(capture_sha256='a'*64,
+            runtime_identity=dict(profile=profile,runtime_source_commit='b'*40),
+            cases={name:dict(worlds=[None]*20,module_lifetimes={}) for name in set(selected.values())}))
+            for profile in specification['profiles']]
+        self.assertEqual(set(family_coverage(captures,specification,selected,cases)),set(specification['families']))
+        bad=copy.deepcopy(captures);bad[0]['audit']['cases'].pop(selected['HST'])
+        mixed=copy.deepcopy(captures);mixed[0]['audit']['runtime_identity']['runtime_source_commit']='c'*40
+        short=copy.deepcopy(captures);short[0]['audit']['cases'][selected['HST']]['worlds'].pop()
+        for damaged in (captures[:-1],captures+[captures[0]],bad,mixed,short):
+            with self.subTest(damaged=len(damaged)),self.assertRaises(ValueError):
+                family_coverage(damaged,specification,selected,cases)
+        wrong=dict(selected);wrong['HST']=selected['SolarSail']
+        with self.assertRaisesRegex(ValueError,'does not contain'):
+            family_coverage(captures,specification,wrong,cases)
+
+    def test_incomplete_and_damaged_closed_controls_rejected(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            executable = root / 'synthetic-executable'
+            executable.write_bytes(b'Synthetic fixture; no simulator or acceptance credit.')
+            frame = root / 'scene.rgba'
+            with frame.open('wb') as stream: stream.truncate(1280 * 720 * 4)
+            life = dict(rendered_frames=60, successful_presents=60, context_deleted=True)
+            states = [dict(object=name, **{'class': kind}, tick='0', seconds='0', mass='100',
+                           dock='ISS' if name == 'STS-101' else '',
+                           attached='Leonardo;' if name == 'STS-101' else 'STS-101;' if name == 'Leonardo' else '')
+                      for name, kind in OBJECTS.items()]
+            (root / 'console.log').write_text('Synthetic clean fixture\n')
+            events = [dict(key=63, down=1), dict(key=63, down=0)]
+            for index in range(1, 21):
+                folder = root if index == 1 else root / ('session-' + str(index))
+                folder.mkdir(exist_ok=True)
+                if index > 1: os.link(frame, folder / 'scene.rgba')
+                atomic_json(folder / 'graphics-lifecycle.json', life)
+                write_csv(folder / 'flight-state.csv', states)
+                if index < 20: write_csv(folder / 'input-events.csv', events)
+                else: (folder / 'input-events.csv').write_text('key,down\n')
+            keys = [dict(code=code, down=down, monotonic_ns=i + 1)
+                    for i, (code, down) in enumerate([(63, True), (63, False)] * 19 + [(1, True)])]
+            report = dict(status='passed-actual-paused-attached-docked-world-lifetimes',
+                requested_worlds=20, worlds_observed_ready=20, clean_contexts=20, actual_exitcode=0,
+                actual_pid=123, no_preload_observer=True, sanitizer_suppressions=False,
+                all_guarded_inputs_unchanged=True, native_admission_qualified=False, phase6_complete=False,
+                original_objects=OBJECTS, guarded_files_sha256={str(executable): sha(executable)},
+                actual_executable=str(executable), actual_executable_sha256=sha(executable),
+                physical_keys=keys, lifecycles=[life] * 20, successful_presents=1200,
+                finite_original_vessel_rows=60, runtime_identity={'profile': 'synthetic-control-only'})
+            path = root / 'verification.json'
+            atomic_json(path, report)
+            self.assertEqual(inspect_paused(path)['real_F5_reloads'], 19)
+            for change in (dict(status='running'), dict(worlds_observed_ready=19), dict(actual_exitcode=7),
+                           dict(sanitizer_suppressions=True), dict(guarded_files_sha256={}),
+                           dict(physical_keys=keys[:-1]), dict(native_admission_qualified=True)):
+                with self.subTest(change=change), self.assertRaises(ValueError):
+                    atomic_json(path, dict(report, **change))
+                    inspect_paused(path)
+            atomic_json(path, report)
+            for change in (dict(attached=''), dict(mass='nan'), dict(seconds='1')):
+                damaged = copy.deepcopy(states)
+                damaged[1].update(change)
+                with self.subTest(change=change), self.assertRaises(ValueError):
+                    write_csv(root / 'flight-state.csv', damaged)
+                    inspect_paused(path)
+            write_csv(root / 'flight-state.csv', states)
+            write_csv(root / 'input-events.csv', events[:1])
+            with self.assertRaisesRegex(ValueError, 'nineteen'):
+                inspect_paused(path)
+
+
+if __name__ == '__main__': unittest.main()

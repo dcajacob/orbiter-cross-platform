@@ -20,6 +20,8 @@ void conic(double eccentricity,double inclination,bool orbital_plane) {
     Elements elements(major,eccentricity,inclination,.7,1.1,1.2,epoch,epoch);
     elements.Setup(1000,5.972e24,epoch,epoch);
     Vector position,velocity;elements.Update(position,velocity,123.);
+    // The real Orbit MFD derives all element/node fields from its state vectors.
+    elements.Calculate(position,velocity,123.);
     auto rotation=RotMatrix(elements.coso,elements.sino,elements.cost,elements.sint,elements.cosi,elements.sini);
     auto projection=orbital_plane?IRotMatrix(elements.cost,elements.sint,elements.cosi,elements.sini):IMatrix();
     orthogonal(rotation);orthogonal(projection);
@@ -65,10 +67,14 @@ int main() {
         for(const double eccentricity:{0.,.3,.9,1.2,2.})
             for(const double inclination:{.0,.7,1.5,2.4})
                 for(const bool orbital_plane:{false,true}) conic(eccentricity,inclination,orbital_plane);
+        for(const double eccentricity:{std::nextafter(1.2,1.),std::nextafter(1.2,2.)})
+            for(const bool orbital_plane:{false,true}) conic(eccentricity,0,orbital_plane);
+        for(const double inclination:{-1e-12,1e-12})
+            for(const bool orbital_plane:{false,true}) conic(1.2,inclination,orbital_plane);
         oapi::IVECTOR2 point;MapScreen(100,200,2,Vector(-1.75,999,3.25),&point);
         require(point.x==97 && point.y==194,"MFD mapping changed truncation or coordinate conventions");
         require(PointInView(512,512,&point),"MFD visible point rejected");
         point.x=512;require(!PointInView(512,512,&point),"MFD right edge must be excluded");
-        std::cout<<"Original MFD conics: 40 circular/eccentric/hyperbolic/inclined projections, analytical pixel bounds and invalid scales pass\n";
+        std::cout<<"Original MFD conics: 40 projections plus 8 neighboring hyperbolas, production node initialization, analytical pixel bounds and invalid scales pass\n";
     } catch(const std::exception& error) {std::cerr<<error.what()<<'\n';return 1;}
 }
