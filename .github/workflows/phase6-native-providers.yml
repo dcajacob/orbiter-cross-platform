@@ -2,7 +2,7 @@ name: Phase 6 Native Stock Runtime Providers
 
 on:
   push:
-    branches: ['qualification/native-providers']
+    branches: ['qualification/native-providers', 'qualification/native-providers-retry']
   workflow_dispatch:
 
 permissions:
@@ -32,6 +32,15 @@ jobs:
           docker run --rm --init --cpus=2 --shm-size=1g -v "$GITHUB_WORKSPACE:$GITHUB_WORKSPACE" -w "$GITHUB_WORKSPACE" \
             -e ORBITER_PROVIDER_SOURCE="${{ github.sha }}" -e ORBITER_PROVIDER_CONTAINER_DIGEST="$image" \
             "$image" bash Tests/Production/Closeout/build_hosted_native_providers.sh 2>&1 | tee out/native-provider-build.log
+      - name: Retain readable dependency configuration diagnostics
+        if: always()
+        shell: python
+        run: |
+          from pathlib import Path
+          root=Path('out/hosted-native-providers')
+          for path in sorted(root.glob('*/configure.log')):
+              print(str(path)+':')
+              print(path.read_text(errors='replace')[-10000:])
       - name: Preserve completed dependency evidence and every available failure output
         if: always()
         run: python3 -B Tests/Production/Closeout/seal_hosted_native_providers.py
@@ -43,7 +52,7 @@ jobs:
           compression-level: 0
           path: |
             out/hosted-native-providers.tar.gz
-            out/hosted-native-providers/hosted-provider.json
+            out/hosted-native-provider.json
             out/native-provider-container.json
             out/native-provider-build.log
             out/native-provider-controls.json

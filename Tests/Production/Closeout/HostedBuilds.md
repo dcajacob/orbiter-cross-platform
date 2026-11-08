@@ -75,3 +75,20 @@ this workflow does not alter account billing or the repository's cache limit.
 New native build artifacts have a 14-day retention period. Download and verify
 needed raw evidence before expiration. Local GPU performance, user hands-on
 checks and physical-controller acceptance remain local requirements.
+
+The remaining normal-host stock captures require the existing source-pinned
+Fontconfig, GDK, decoration and Wayland-capable Mesa providers. Their original
+ownership, genuine-leak, ABI, cache and allocator controls run in the matching
+Ubuntu 26.04 userspace pinned by `native-provider-container.lock.json`, on the
+standard `ubuntu-24.04` GitHub runner. The workspace keeps the same absolute
+path inside Docker so retained native build paths remain truthful. No image is
+pulled or built on the user's machine. Successful dependency controls do not
+qualify the simulator; full stock/reload captures and independent audits remain.
+The first hosted provider attempt passed Fontconfig and GDK controls and built
+the decoration plugin, then failed Mesa configuration because the separate
+Wayland EGL backend development package was missing. Its exact 109,161,383-byte
+artifact remains retained and API-digest-bound; the GitHub diagnostic reads
+that archive without transferring it locally. The retry installs the missing
+backend/XCB development inputs and writes its archive receipt outside the
+container-owned tree. Readable configuration tails and all available failure
+outputs remain retained. No sanitizer or numerical check is disabled.

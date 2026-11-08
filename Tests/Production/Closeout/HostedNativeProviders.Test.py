@@ -5,7 +5,7 @@ import re
 import tempfile
 import unittest
 from contracts import ROOT
-from seal_hosted_native_providers import control_status
+from seal_hosted_native_providers import control_status,retain_receipt
 
 
 class HostedNativeProvidersTests(unittest.TestCase):
@@ -21,6 +21,16 @@ class HostedNativeProvidersTests(unittest.TestCase):
                 altered=good|{key:value};marker.write_text(json.dumps(altered));self.assertFalse(control_status(base,producer,image)[0])
             marker.write_text(json.dumps(good));(base/'gdk-controls/verification.json').write_text('{"status":"failed"}')
             self.assertFalse(control_status(base,producer,image)[0])
+
+    def test_host_receipt_does_not_write_inside_the_container_owned_tree(self):
+        with tempfile.TemporaryDirectory() as directory:
+            base=Path(directory)/'providers';base.mkdir();base.chmod(0o555)
+            report=dict(status='failed-or-incomplete-unqualified',phase6_complete=False)
+            try:
+                retain_receipt(base,report)
+                self.assertEqual(json.loads((base.parent/'hosted-native-provider.json').read_text()),report)
+                self.assertEqual(list(base.iterdir()),[])
+            finally:base.chmod(0o755)
 
     def test_matching_userspace_is_pinned_on_a_standard_runner(self):
         lock=json.loads((ROOT/'Tests/Production/Closeout/native-provider-container.lock.json').read_text())

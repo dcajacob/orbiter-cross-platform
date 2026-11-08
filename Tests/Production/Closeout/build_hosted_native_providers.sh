@@ -5,7 +5,7 @@ apt-get update
 apt-get install -y --no-install-recommends ca-certificates git build-essential cmake ninja-build meson pkg-config python3 python3-mako python3-yaml \
   bison flex gperf llvm-dev libexpat1-dev libfreetype6-dev libgtk-3-dev libepoxy-dev libx11-xcb-dev \
   libxcb-dri2-0-dev libxcb-dri3-dev libxcb-present-dev libxcb-randr0-dev libxcb-shm0-dev libxshmfence-dev \
-  libxxf86vm-dev libdrm-dev libglvnd-dev libwayland-dev wayland-protocols libxkbcommon-dev libzstd-dev \
+  libxxf86vm-dev libdrm-dev libglvnd-dev libwayland-dev libwayland-egl-backend-dev wayland-protocols libxkbcommon-dev libzstd-dev libxcb-glx0-dev \
   zlib1g-dev libxrandr-dev libxinerama-dev libxcursor-dev libxi-dev fonts-dejavu-core xfonts-base
 
 git config --global --add safe.directory "$PWD"

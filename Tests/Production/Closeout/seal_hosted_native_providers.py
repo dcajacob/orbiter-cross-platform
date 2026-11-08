@@ -16,6 +16,11 @@ def control_status(base,producer,image):
     return complete,controls
 
 
+def retain_receipt(base,report):
+    # Docker-created provider trees may be readable but not writable by the host.
+    atomic_json(base.parent/'hosted-native-provider.json',report)
+
+
 def main():
     base=ROOT/'out/hosted-native-providers';require(base.is_dir(),'Actual provider output required')
     archive=base.with_suffix('.tar.gz');require(not archive.exists(),'Fresh provider archive required')
@@ -44,7 +49,7 @@ def main():
         source_commit=producer,actual_container_receipt_sha256=sha(ROOT/'out/native-provider-container.json'),container_lock_sha256=sha(ROOT/'Tests/Production/Closeout/native-provider-container.lock.json'),
         archive_sha256=sha(archive),archive_bytes=archive.stat().st_size,members=members,controls=controls,
         runtime_qualification_pending=True,full_stock_capture_pending=True,native_admission_qualified=False,phase6_complete=False)
-    atomic_json(base/'hosted-provider.json',report)
+    retain_receipt(base,report)
     require(complete,'Retained failed/incomplete provider evidence; no runtime qualification')
     print(report['status'])
 
