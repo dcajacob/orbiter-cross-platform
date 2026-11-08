@@ -1,0 +1,122 @@
+name: Phase 6 Restore Exact Current Stock SDK and Observer
+
+on:
+  push:
+    branches: ['qualification/current-stock-evidence-prep']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: phase6-current-stock-evidence-prep-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  controls:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - run: mkdir -p out && python3 -B Tests/Production/Closeout/run_controls.py --output out/current-stock-evidence-restore-controls.json
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: current-stock-evidence-restore-controls
+          retention-days: 14
+          path: out/current-stock-evidence-restore-controls.json
+  prepare:
+    name: Restore exact SDK and passive stock observer ${{ matrix.configuration }}
+    needs: controls
+    runs-on: windows-2025
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      max-parallel: 2
+      matrix:
+        configuration: [Debug, Release]
+    env:
+      CONFIGURATION: ${{ matrix.configuration }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - name: Retain the separate immutable application source owner
+        uses: actions/checkout@v7
+        with:
+          ref: c08f93151827949ee3ad498f8021f35c11753fde
+          path: application-source
+          fetch-depth: 0
+      - name: Download only the exact successful current SDK from its actual API producer
+        uses: actions/github-script@v8
+        with:
+          script: |
+            const fs = require('fs');
+            const crypto = require('crypto');
+            const {owner,repo} = context.repo;
+            const run_id = 42525562745;
+            const producer = 'c08f93151827949ee3ad498f8021f35c11753fde';
+            const configuration = process.env.CONFIGURATION;
+            const ids = {Debug:13636121355,Release:13635896646};
+            if (owner !== 'dcajacob' || repo !== 'orbiter-cross-platform' || !ids[configuration]) throw Error('Exact authorized SDK profile required');
+            const run = (await github.rest.actions.getWorkflowRun({owner,repo,run_id})).data;
+            const jobs = await github.paginate(github.rest.actions.listJobsForWorkflowRun,{owner,repo,run_id,per_page:100});
+            const artifact = (await github.rest.actions.getArtifact({owner,repo,artifact_id:ids[configuration]})).data;
+            if (run.head_sha !== producer || run.status !== 'completed' || run.conclusion !== 'success' || artifact.expired || artifact.workflow_run.id !== run_id || artifact.workflow_run.head_sha !== producer) throw Error('Closed successful source-bound SDK required');
+            const downloaded = await github.rest.actions.downloadArtifact({owner,repo,artifact_id:artifact.id,archive_format:'zip'});
+            const bytes = Buffer.from(downloaded.data);
+            if ('sha256:'+crypto.createHash('sha256').update(bytes).digest('hex') !== artifact.digest || bytes.length !== artifact.size_in_bytes) throw Error('Actual SDK API archive digest/length differs');
+            fs.mkdirSync('out/current-sdk-source',{recursive:true});
+            fs.writeFileSync('out/current-sdk-source/producer.zip',bytes);
+            fs.writeFileSync('out/current-sdk-source/api.json',JSON.stringify({repository:context.repo,run,jobs,artifact},null,2));
+      - name: Restore every exact SDK member and independently re-read all original source and unit receipts
+        run: >-
+          python -B Tests/Production/CurrentWindows/Hosted/restore_sdk.py
+          --api out/current-sdk-source/api.json --archive out/current-sdk-source/producer.zip
+          --configuration ${{ matrix.configuration }} --source-owner application-source --output out/current-windows-sdk
+      - name: Verify the same immutable application and SDK from their separate source checkout
+        working-directory: application-source
+        run: python -B Tests/Production/verify_test_runtime.py --runtime ../out/current-windows-sdk/runtime --source c08f93151827949ee3ad498f8021f35c11753fde
+      - name: Download the exact original passive observer preparation on GitHub only
+        uses: actions/github-script@v8
+        with:
+          script: |
+            const fs = require('fs');
+            const crypto = require('crypto');
+            const {owner,repo} = context.repo;
+            const run_id = 42529727362;
+            const producer = '348880c447f8d86beb75a92ec4aaf23d44df6500';
+            const configuration = process.env.CONFIGURATION;
+            const ids = {Debug:13637186106,Release:13635944416};
+            if (owner !== 'dcajacob' || repo !== 'orbiter-cross-platform' || !ids[configuration]) throw Error('Exact authorized observer profile required');
+            const run = (await github.rest.actions.getWorkflowRun({owner,repo,run_id})).data;
+            const jobs = await github.paginate(github.rest.actions.listJobsForWorkflowRun,{owner,repo,run_id,per_page:100});
+            const artifact = (await github.rest.actions.getArtifact({owner,repo,artifact_id:ids[configuration]})).data;
+            if (run.head_sha !== producer || run.status !== 'completed' || run.conclusion !== 'success' || artifact.expired || artifact.workflow_run.id !== run_id || artifact.workflow_run.head_sha !== producer) throw Error('Closed original passive observer preparation required');
+            const downloaded = await github.rest.actions.downloadArtifact({owner,repo,artifact_id:artifact.id,archive_format:'zip'});
+            const bytes = Buffer.from(downloaded.data);
+            if ('sha256:'+crypto.createHash('sha256').update(bytes).digest('hex') !== artifact.digest || bytes.length !== artifact.size_in_bytes) throw Error('Actual observer API ZIP digest/length differs');
+            fs.mkdirSync('out/current-observer-download',{recursive:true});
+            fs.writeFileSync('out/current-observer-download/producer.zip',bytes);
+            fs.writeFileSync('out/current-observer-download/api.json',JSON.stringify({repository:context.repo,run,jobs,artifact},null,2));
+      - name: Restore the original passive observer without recompilation or simulation
+        run: >-
+          python -B Tests/Production/CurrentWindows/Hosted/restore_observer.py
+          --api out/current-observer-download/api.json --archive out/current-observer-download/producer.zip
+          --configuration ${{ matrix.configuration }} --source-owner application-source
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: current-stock-evidence-restoration-${{ matrix.configuration }}
+          retention-days: 14
+          path: |
+            out/current-observer-restoration/restoration.json
+            out/current-observer-download/api.json
+            out/current-stock-preparation/preparation.json
+            out/current-stock-preparation/observer/observer-build.json
+            out/current-stock-preparation/observer-prepare.log
+            out/current-windows-sdk/restoration.json
+            out/current-sdk-source/api.json
