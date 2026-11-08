@@ -98,3 +98,24 @@ now uses the existing engine generator and its original range for particle and
 exhaust randomness. Formulas, draw order, integrator and serialization budgets
 remain unchanged. A focused regression uses the five captured startup counters;
 fresh complete-scene qualification remains required.
+
+The 8 November 2026 Phase 6 campaign exposed the shared renderer binding being
+applied to the external-view host as well as the complete cockpit host. Its
+particle initialization consumed 3,000 simulation draws before body creation,
+changing ISS/PB startup counters from the frozen external-view reference's
+50/0 to 98/11. The changed accumulation timing caused the controlled-flight
+fuel and uncontrolled-impact attitude comparisons to exceed their existing
+budgets. A read-only startup probe and an isolated renderer diagnostic reproduced
+the failure and passed both unchanged flight comparisons after separating the
+visual draws.
+
+Each native host now declares renderer ownership at process startup. The
+external-view host uses an isolated, engine-owned renderer stream with the same
+MSVC recurrence and range. The complete cockpit host retains the original shared
+application/client stream needed by the Station building reload. The simulation
+recurrence, body counter expression, accumulation schedule, physical calculations
+and frozen references are unchanged. `numerics.json` records `renderer_random`
+alongside the existing math and simulation RNG identities. The existing original
+CRT and Station building tests remain intact; added controls preserve the
+external-view counters, independent stream resets and restored shared ownership.
+Fresh hosted qualification and independent final-candidate audits remain required.

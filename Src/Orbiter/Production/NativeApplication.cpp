@@ -827,7 +827,7 @@ struct Runtime final:BodyServices,RigidBodyServices,SurfaceServices,NavigationSe
             vesselCallbacks.open(evidence/"vessel-callbacks.csv");vesselCallbacks<<std::setprecision(17)<<"frame,tick,seconds,mjd,phase,object\n";
             lifetimeEvents.open(evidence/"lifetime-events.csv");lifetimeEvents<<std::setprecision(17)<<"frame,tick,seconds,mjd,phase,object,detail\n";
             std::ofstream numerical(evidence/"numerics.json");numerical.exceptions(std::ios::badbit|std::ios::failbit);
-            numerical<<"{\"math\":\""<<SimulationMathProfile()<<"\",\"random\":\"private-msvc-lcg32\",\"random_maximum\":"<<RandomMaximum<<",\"process_seed\":0}\n";
+            numerical<<"{\"math\":\""<<SimulationMathProfile()<<"\",\"random\":\"private-msvc-lcg32\",\"random_maximum\":"<<RandomMaximum<<",\"process_seed\":0,\"renderer_random\":\""<<RendererRandomProfile()<<"\"}\n";
             flightTrace.open(evidence/"flight-state.csv");flightTrace.imbue(std::locale::classic());flightTrace.exceptions(std::ios::badbit|std::ios::failbit);
             flightTrace<<std::setprecision(17)<<"tick,frame,seconds,mjd,object,class,rx,ry,rz,vx,vy,vz,m11,m12,m13,m21,m22,m23,m31,m32,m33,wx,wy,wz,mass,fuel,altitude_agl,altitude_mean,airspeed,density,dynamic_pressure,lift,drag,ground,dock,focus,navmask,attached\n";
             inputTrace.open(evidence/"input-state.csv");inputTrace.imbue(std::locale::classic());inputTrace.exceptions(std::ios::badbit|std::ios::failbit);
@@ -1366,7 +1366,15 @@ int main(int argc,char** argv) {
         }
         const double capture=arguments.count("--capture-time")?FlightNumber(arguments.at("--capture-time")):-1;
         if(fixed<=0 || (arguments.count("--capture-time") && capture<0) || !renderEvery || !sessions || (ticks && frames))throw std::runtime_error("Invalid frame/step/capture/session limits");
-        std::srand(0);SeedRandom(0);Resources resources(absolute("--assets"),absolute("--data"),absolute("--modules"),absolute("--planets"));
+        std::srand(0);SeedRandom(0);
+#ifdef ORBITER_NATIVE_COCKPIT
+        // Original full-client captures include particle draws before world startup.
+        ConfigureRendererRandom(true,0);
+#else
+        // Frozen external-view flights have no graphics draws in the CRT stream.
+        ConfigureRendererRandom(false,0);
+#endif
+        Resources resources(absolute("--assets"),absolute("--data"),absolute("--modules"),absolute("--planets"));
         std::filesystem::path scenario=absolute("--scenario");
         const auto evidence=arguments.count("--evidence")?absolute("--evidence"):std::filesystem::path{};
         std::filesystem::path save;

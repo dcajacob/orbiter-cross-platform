@@ -743,8 +743,8 @@
     },
     "Src/Orbiter/Production/NativeApplication.cpp": {
       "original_sha256_lf": null,
-      "sha256_lf": "d72d4c6fc6a89d3516535d16df23bee99f205829298edc323d0e49481aa9013f",
-      "scope": "Original Lua Terminal MFD native SDK/bootstrap and cooperative worker ownership; explicitly admit LuaMFD only, conserve original vessel-first left/right Shift MFD dispatch, and destroy terminal Lua states before their vessels. Original drawing/commands/repository/Windows callbacks independently conserved; terminal buffers reclaimed and command termination bounded. Full runtime and original Windows qualification remain required. Native bare-Space pause convenience applies only without Shift/Control/Alt, retaining exact logical Pause bindings and original modified-space delivery to vessel callbacks. Original DG and Atlantis Ctrl+Space control dialogs retain their source and behavior; no physics or dispatch order change. Native buffered key edges recover their chronological key state from the final held snapshot; modifier chords retain event-time meaning across batched polls. Immediate held input, FlightInput layout, original vessel/MFD priority and physics are unchanged."
+      "sha256_lf": "a45553d1a1e280cbaa980673f997b387d41ab5e5f4b4b207caf4f28746fb36c7",
+      "scope": "Original Lua Terminal MFD native SDK/bootstrap and cooperative worker ownership; explicitly admit LuaMFD only, conserve original vessel-first left/right Shift MFD dispatch, and destroy terminal Lua states before their vessels. Original drawing/commands/repository/Windows callbacks independently conserved; terminal buffers reclaimed and command termination bounded. Full runtime and original Windows qualification remain required. Native bare-Space pause convenience applies only without Shift/Control/Alt, retaining exact logical Pause bindings and original modified-space delivery to vessel callbacks. Original DG and Atlantis Ctrl+Space control dialogs retain their source and behavior; no physics or dispatch order change. Native buffered key edges recover their chronological key state from the final held snapshot; modifier chords retain event-time meaning across batched polls. Immediate held input, FlightInput layout, original vessel/MFD priority and physics are unchanged. Explicit host-owned renderer RNG policy: external-view visual draws use an isolated stream; complete cockpit retains original shared CRT coupling. Simulation recurrence, physics formulas, accumulation schedule and frozen comparison budgets are unchanged."
     },
     "Src/Orbiter/Production/NativeBuild.h.in": {
       "sha256_lf": "f5fb21f83bb6be0c54839fce670e8410f6911eda86da2eef26e4221c1ae25d97",
@@ -874,12 +874,14 @@
       "original_sha256_lf": null
     },
     "Src/Orbiter/Production/Random.cpp": {
-      "sha256_lf": "3c0ac01fa82aa45a569da3631568401b7b368f2de4359522ae61c4c730979824",
-      "original_sha256_lf": null
+      "sha256_lf": "3539f400e3fe0dadcfb7e10ba884ea822905d1a7ac8710f84a2eef2bd3105280",
+      "original_sha256_lf": null,
+      "scope": " Explicit host-owned renderer RNG policy: external-view visual draws use an isolated stream; complete cockpit retains original shared CRT coupling. Simulation recurrence, physics formulas, accumulation schedule and frozen comparison budgets are unchanged."
     },
     "Src/Orbiter/Production/Random.h": {
-      "sha256_lf": "3c37e2100bed7157bbb79a60fa0fd3b25e5ea3995a0f3fd2acab640532abd62d",
-      "original_sha256_lf": null
+      "sha256_lf": "68c1c930759a5021a9df7a616f7c58087cbf61eb10f66b32b0b159bc0c706bc7",
+      "original_sha256_lf": null,
+      "scope": " Explicit host-owned renderer RNG policy: external-view visual draws use an isolated stream; complete cockpit retains original shared CRT coupling. Simulation recurrence, physics formulas, accumulation schedule and frozen comparison budgets are unchanged."
     },
     "Src/Orbiter/Production/ResourceResolver.cpp": {
       "sha256_lf": "f0be59e2ad915ea2a0d5eadad3212b1a79c7db63b24f29d27ff9cd5e5586ca73",

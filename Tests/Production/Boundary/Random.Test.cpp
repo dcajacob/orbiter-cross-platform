@@ -38,6 +38,22 @@ int main() {
             require(irand(100)==counter,"Captured original startup accumulator counter differs");
             for(int timer=0;timer<3;++timer)(void)RandomInteger();
         }
+#ifndef _WIN32
+        // Independently captured original external-view startup: ISS=50, PB=0.
+        // Particle initialization must not shift these simulation accumulators.
+        ConfigureRendererRandom(false,0);SeedRandom(0);
+        for(int i=0;i<3000;++i)(void)renderer_random::Next();
+        for(int i=0;i<80;++i)(void)RandomInteger();
+        for(int counter:{50,0}) {
+            require(irand(100)==counter,"External-view graphics changed original simulation startup");
+            for(int timer=0;timer<3;++timer)(void)RandomInteger();
+        }
+        ConfigureRendererRandom(false,1);SeedRandom(1);
+        require(renderer_random::Next()==41 && RandomInteger()==41,"Isolated renderer stream did not reset independently");
+        require(renderer_random::Next()==18467 && RandomInteger()==18467,"Renderer and simulation streams are coupled");
+        ConfigureRendererRandom(true,0);SeedRandom(1);
+        require(renderer_random::Next()==41 && RandomInteger()==18467,"Full-client shared CRT stream was not restored");
+#endif
         std::cout<<"Original runtime sequence, reset, thread ownership, foreign-library isolation and captured renderer/startup coupling passed\n";
         return 0;
     } catch(const std::exception& error){std::cerr<<error.what()<<'\n';return 1;}

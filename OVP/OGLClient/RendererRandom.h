@@ -1,6 +1,6 @@
 // Licensed under the MIT License
-// The original client shares the application's CRT random stream. Keep that
-// explicit relationship in the native port without intercepting foreign libc.
+// The host declares whether visual draws share the simulation's CRT stream.
+// Keep that relationship explicit without intercepting foreign libc.
 #pragma once
 #include <cstdlib>
 #ifndef _WIN32
@@ -11,7 +11,7 @@ namespace renderer_random {
 inline int Next() noexcept { return std::rand(); }
 inline constexpr int Maximum = RAND_MAX;
 #else
-inline int Next() noexcept { return orbiter::production::RandomInteger(); }
+inline int Next() noexcept { return orbiter::production::RendererRandomNext(); }
 inline constexpr int Maximum = orbiter::production::RandomMaximum;
 #endif
 }
