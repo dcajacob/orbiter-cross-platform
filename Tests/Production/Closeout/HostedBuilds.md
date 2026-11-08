@@ -42,6 +42,20 @@ or incomplete units keep the job failed; completed runtime binaries, generated
 sources and raw failure logs are still sealed with an explicitly unqualified
 status for diagnosis. Package retention cannot convert a failed test into a pass.
 
+The CCC package jobs passed all 32 engine CTest processes and both unchanged
+upstream C++/Lua processes, then failed the separate Lua case-discovery command:
+the custom unit main requires its resource directory before Catch options.
+The corrected build workflow supplies that existing asset directory.
+`phase6-native-discovery-recheck.yml` avoids rebuilding those completed binaries.
+It downloads the original API-bound ZIP, verifies its digest and every sealed
+member, preserves the original failed receipt, and independently re-reads the
+passed unit XML against the complete registered inventories. It executes fresh
+discovery and both complete upstream units from the unchanged retained binaries.
+Every discovered/executed case must match the immutable upstream source name,
+tags and source line. Reports distinguish compiled producer CCC from the new
+collector and retain the original raw ZIP. This is an explicit evidence
+correction, not a relabelled original job or final qualification.
+
 The Windows 2025 runner's CMake 4 requires the explicit external setting
 `CMAKE_POLICY_VERSION_MINIMUM=3.5` for the unchanged pinned zlib source. This is
 the same compatibility setting already used by the renderer configuration;

@@ -1,0 +1,77 @@
+name: Phase 6 Retained Native Unit Discovery Recheck
+
+on:
+  push:
+    branches: ['qualification/native-discovery-recheck']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: phase6-native-discovery-recheck-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  recheck:
+    name: Retained native units ${{ matrix.configuration }} ${{ matrix.math_profile }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      max-parallel: 2
+      matrix:
+        configuration: [Debug, Release]
+        math_profile: [automatic, sse2]
+    env:
+      PROFILE: ${{ matrix.configuration }}-${{ matrix.math_profile }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.14'
+      - name: Verify every helper and source-conservation control
+        run: mkdir -p out && python3 -B Tests/Production/Closeout/run_controls.py --output out/discovery-recheck-controls.json
+      - name: Download the immutable producer artifact and bind its actual failed job
+        uses: actions/github-script@v8
+        with:
+          script: |
+            const fs = require('fs');
+            const crypto = require('crypto');
+            const {owner, repo} = context.repo;
+            const run_id = 42519601899;
+            const run = (await github.rest.actions.getWorkflowRun({owner, repo, run_id})).data;
+            const jobs = await github.paginate(github.rest.actions.listJobsForWorkflowRun, {owner, repo, run_id, per_page:100});
+            const artifacts = await github.paginate(github.rest.actions.listWorkflowRunArtifacts, {owner, repo, run_id, per_page:100});
+            const name = 'phase6-full-native-' + process.env.PROFILE;
+            const found = artifacts.filter(a => a.name === name && !a.expired);
+            if (found.length !== 1) throw Error('Exactly one closed source artifact required');
+            const artifact = found[0];
+            const source = await github.rest.actions.downloadArtifact({owner, repo, artifact_id:artifact.id, archive_format:'zip'});
+            const bytes = Buffer.from(source.data);
+            const digest = 'sha256:' + crypto.createHash('sha256').update(bytes).digest('hex');
+            if (digest !== artifact.digest || bytes.length !== artifact.size_in_bytes) throw Error('Actual downloaded API artifact digest/length differs');
+            fs.mkdirSync('out/discovery-source', {recursive:true});
+            fs.writeFileSync('out/discovery-source/producer.zip', bytes);
+            fs.writeFileSync('out/discovery-source/api.json', JSON.stringify({repository:context.repo, run, jobs, artifact}, null, 2));
+      - name: Re-read passed unit evidence and discover every retained original case
+        run: >-
+          python3 -B Tests/Production/Closeout/recheck_native_discovery.py
+          --api out/discovery-source/api.json --archive out/discovery-source/producer.zip
+          --profile "$PROFILE" --output "out/discovery-recheck/$PROFILE"
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: phase6-native-discovery-recheck-${{ matrix.configuration }}-${{ matrix.math_profile }}
+          retention-days: 14
+          compression-level: 0
+          path: |
+            out/discovery-recheck/${{ matrix.configuration }}-${{ matrix.math_profile }}/*.json
+            out/discovery-recheck/${{ matrix.configuration }}-${{ matrix.math_profile }}/*.xml
+            out/discovery-recheck/${{ matrix.configuration }}-${{ matrix.math_profile }}/*.log
+            out/discovery-source/producer.zip
+            out/discovery-source/api.json
+            out/discovery-recheck-controls.json

@@ -110,7 +110,7 @@ jobs:
           failed=0
           ctest --test-dir "$PACKAGE/engine" --output-on-failure --output-junit "$PWD/$PACKAGE/engine-tests.xml" 2>&1 | tee "$PACKAGE/engine-tests.log" || failed=1
           ctest --test-dir "$PACKAGE/upstream-units" --output-on-failure --output-junit "$PWD/$PACKAGE/upstream-tests.xml" 2>&1 | tee "$PACKAGE/upstream-tests.log" || failed=1
-          "$PACKAGE/upstream-units/existing_lua_unit" --list-tests > "$PACKAGE/upstream-lua-case-inventory.txt" || failed=1
+          "$PACKAGE/upstream-units/existing_lua_unit" "$PACKAGE/upstream-units/assets" --list-tests > "$PACKAGE/upstream-lua-case-inventory.txt" || failed=1
           "$PACKAGE/upstream-units/existing_collision_unit" --list-tests > "$PACKAGE/upstream-collision-case-inventory.txt" || failed=1
           exit "$failed"
       - name: Seal exact runtime, generated sources and actual test results without acceptance credit
