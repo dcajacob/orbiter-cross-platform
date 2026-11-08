@@ -1,0 +1,11 @@
+{
+  "schema": 1,
+  "repository": "docker.io/library/ubuntu",
+  "platform": "linux/amd64",
+  "tag_observed": "26.04",
+  "image_digest": "sha256:157dc3d6e4a3e4f2c68d12df9df9ed6e808b59af6d4c3757b432b4f519916725",
+  "manifest_digest": "sha256:6a06111c3b0a8600feadb270aec771dc239bf407b25625f93f44ab00e11f4d3c",
+  "metadata_url": "https://hub.docker.com/v2/repositories/library/ubuntu/tags/26.04",
+  "checked_utc": "2026-11-08",
+  "scope": "Pinned userspace for existing Ubuntu 26.04 dependency controls, hosted by the standard ubuntu-24.04 GitHub runner; no local image pull."
+}

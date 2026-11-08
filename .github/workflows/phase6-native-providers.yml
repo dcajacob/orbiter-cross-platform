@@ -1,0 +1,49 @@
+name: Phase 6 Native Stock Runtime Providers
+
+on:
+  push:
+    branches: ['qualification/native-providers']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: phase6-native-providers-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  providers:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - name: Verify all source-conservation and helper controls
+        run: mkdir -p out && python3 -B Tests/Production/Closeout/run_controls.py --output out/native-provider-controls.json
+      - name: Build the existing source-pinned providers in a matching pinned userspace
+        shell: bash
+        run: |
+          set -euo pipefail
+          image=$(python3 -c "import json; print('ubuntu@'+json.load(open('Tests/Production/Closeout/native-provider-container.lock.json'))['image_digest'])")
+          docker pull "$image"
+          docker image inspect "$image" > out/native-provider-container.json
+          docker run --rm --init --cpus=2 --shm-size=1g -v "$GITHUB_WORKSPACE:$GITHUB_WORKSPACE" -w "$GITHUB_WORKSPACE" \
+            -e ORBITER_PROVIDER_SOURCE="${{ github.sha }}" -e ORBITER_PROVIDER_CONTAINER_DIGEST="$image" \
+            "$image" bash Tests/Production/Closeout/build_hosted_native_providers.sh 2>&1 | tee out/native-provider-build.log
+      - name: Preserve completed dependency evidence and every available failure output
+        if: always()
+        run: python3 -B Tests/Production/Closeout/seal_hosted_native_providers.py
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: native-stock-runtime-providers
+          retention-days: 14
+          compression-level: 0
+          path: |
+            out/hosted-native-providers.tar.gz
+            out/hosted-native-providers/hosted-provider.json
+            out/native-provider-container.json
+            out/native-provider-build.log
+            out/native-provider-controls.json
