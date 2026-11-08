@@ -1,0 +1,12 @@
+{
+  "protocol": "production-stock-container-v1",
+  "repository": "orbitersim/orbiter",
+  "release_id": 430435738,
+  "asset_id": 697694472,
+  "url": "https://github.com/orbitersim/orbiter/releases/download/latest/Orbiter-x64.zip",
+  "bytes": 1749597686,
+  "sha256": "23e2c5446e5bf58872be517244da3a35cd78c67cf238e29b62ac97fc6acaa8cf",
+  "original_profile_sha256": "155fb89d22d58af113da6ff662904d74f82bbbbb7b9deb5e654b7c7141e27620",
+  "scope": "Official replacement container for the exact original locked data only; no release DLLs, scenarios or simulation code are staged",
+  "original_profile_and_per_file_lengths_and_hashes_unchanged": true
+}

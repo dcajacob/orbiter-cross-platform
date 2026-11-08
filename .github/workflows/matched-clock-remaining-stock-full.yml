@@ -13,11 +13,17 @@ on:
       - '.github/workflows/matched-clock-remaining-stock-full.yml'
   workflow_dispatch:
   workflow_call:
+    inputs:
+      data_container_lock:
+        type: string
+        default: ''
 permissions:
   contents: read
 concurrency:
   group: matched-clock-remaining-stock-full-v2-${{ github.ref }}
   cancel-in-progress: false
+env:
+  ORBITER_DATA_CONTAINER_LOCK: ${{ inputs.data_container_lock || '' }}
 jobs:
   repaired_remaining_stock:
     name: Matched-clock v2 original ${{ matrix.configuration }} ${{ matrix.math_profile }}

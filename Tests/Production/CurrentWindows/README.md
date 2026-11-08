@@ -10,6 +10,15 @@ evidence. The final current-source stock matrix and independent cross-cohort
 audits remain explicit pending gates; a successful campaign summary does not
 close them. Performance, physical input and controller acceptance stay local.
 
+The hosted caller explicitly supplies `stock-data-container-v2.lock.json` after
+the upstream rolling release removed the original archive asset. This records
+the replacement official container separately. `prepare_data.py` still requires
+the original profile hash and all 463 original file hashes and lengths; either
+the retained original archive or the explicitly declared replacement may supply
+those identical inputs. The original stock-data lock, fonts, kernels and
+reference inputs are unchanged. Actual container/profile identities are printed
+to each provisioning log. No release executable or DLL is staged from it.
+
 `build.py --request PATH` consolidates the historical machine-specific build
 scripts. Its versioned request declares the local toolchain, seed repository,
 bundle, offline dependencies and fresh build/export roots. It builds both

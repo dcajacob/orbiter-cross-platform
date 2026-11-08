@@ -7,6 +7,7 @@ are verified against the published release digest before extraction.
 """
 import argparse
 import json
+import os
 from pathlib import Path, PurePosixPath
 import shutil
 import urllib.request
@@ -21,21 +22,38 @@ def main():
     parser.add_argument('--archive', type=Path)
     parser.add_argument('--destination', type=Path, required=True)
     parser.add_argument('--verify-only', action='store_true')
+    parser.add_argument('--container-lock', type=Path,
+                        default=Path(os.environ['ORBITER_DATA_CONTAINER_LOCK']) if os.environ.get('ORBITER_DATA_CONTAINER_LOCK') else None,
+                        help='Explicitly versioned official container; every original locked input remains required')
     args = parser.parse_args()
     lock = json.loads(args.lock.read_text())
+    containers = [lock]
+    if args.container_lock:
+        variant = json.loads(args.container_lock.read_text())
+        require(variant['protocol'] == 'production-stock-container-v1' and
+                variant['original_profile_sha256'] == digest(args.lock) and
+                variant['repository'] == lock['repository'] and
+                variant['url'].startswith('https://github.com/' + lock['repository'] + '/releases/download/'),
+                'versioned container does not bind the unchanged official input profile')
+        containers.append(variant)
+    actual_container = None
     if not args.verify_only:
         require(args.archive is not None, '--archive is required for provisioning')
         archive = args.archive
         if not archive.is_file():
             archive.parent.mkdir(parents=True, exist_ok=True)
             temporary = archive.with_suffix('.partial')
-            with urllib.request.urlopen(lock['url'], timeout=180) as stream, temporary.open('wb') as output:
+            download = containers[-1]
+            with urllib.request.urlopen(download['url'], timeout=180) as stream, temporary.open('wb') as output:
                 shutil.copyfileobj(stream, output)
-            require(temporary.stat().st_size == lock['bytes'] and digest(temporary) == lock['sha256'],
+            require(temporary.stat().st_size == download['bytes'] and digest(temporary) == download['sha256'],
                     'official stock package does not match frozen release; obtain the recorded asset, do not update the lock')
             temporary.replace(archive)
-        require(archive.stat().st_size == lock['bytes'] and digest(archive) == lock['sha256'],
+        checksum = digest(archive)
+        matches = [record for record in containers if archive.stat().st_size == record['bytes'] and checksum == record['sha256']]
+        require(len(matches) == 1,
                 'stock package SHA256 mismatch')
+        actual_container = matches[0]
         args.destination.mkdir(parents=True, exist_ok=True)
         with zipfile.ZipFile(archive) as source:
             for name in lock['data_files']:
@@ -52,7 +70,14 @@ def main():
                 'missing or incompatible production data: ' + name)
     for name in lock.get('required_files', ['Kernels/orbiter.bsp']):
         require((args.destination/name).is_file(), 'required data file is missing: '+name)
-    print(f"Verified {len(lock['data_files'])} production data files; package {lock['sha256']}")
+    print(f"Verified {len(lock['data_files'])} production data files; original profile package {lock['sha256']}")
+    if actual_container:
+        print(json.dumps(dict(provisioning_protocol='production-stock-container-v1',
+            original_profile_sha256=digest(args.lock), original_package_sha256=lock['sha256'],
+            actual_container_sha256=actual_container['sha256'], actual_container_bytes=actual_container['bytes'],
+            official_asset_id=actual_container.get('asset_id'),
+            versioned_container_lock_sha256=digest(args.container_lock) if args.container_lock else None,
+            locked_input_files=len(lock['data_files']), every_original_input_hash_and_length_preserved=True)))
 
 
 if __name__ == '__main__':

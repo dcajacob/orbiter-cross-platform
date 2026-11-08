@@ -22,6 +22,10 @@ on:
       - '.github/workflows/production-client.yml'
   workflow_dispatch:
   workflow_call:
+    inputs:
+      data_container_lock:
+        type: string
+        default: ''
 
 permissions:
   contents: read
@@ -30,6 +34,9 @@ permissions:
 concurrency:
   group: production-client-${{ github.ref }}
   cancel-in-progress: true
+
+env:
+  ORBITER_DATA_CONTAINER_LOCK: ${{ inputs.data_container_lock || '' }}
 
 jobs:
   client:

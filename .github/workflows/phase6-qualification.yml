@@ -26,9 +26,9 @@ jobs:
         with:
           python-version: '3.14'
       - name: Run every discovered closeout control with unchanged acceptance requirements
-        run: >-
-          python3 -B Tests/Production/Closeout/run_controls.py
-          --output out/phase6-closeout-controls.json
+        run: |
+          mkdir -p out
+          python3 -B Tests/Production/Closeout/run_controls.py --output out/phase6-closeout-controls.json
       - uses: actions/upload-artifact@v7
         if: always()
         with:
@@ -39,14 +39,20 @@ jobs:
   windows-client:
     name: Current Windows client, cockpit and controls
     uses: ./.github/workflows/production-client.yml
+    with:
+      data_container_lock: Tests/Production/stock-data-container-v2.lock.json
 
   original-stock:
     name: Original Windows complete stock and exact-save reloads
     uses: ./.github/workflows/matched-clock-remaining-stock-full.yml
+    with:
+      data_container_lock: Tests/Production/stock-data-container-v2.lock.json
 
   native-client:
     name: Native four-profile runtime and paired Windows observations
     uses: ./.github/workflows/native-production-client.yml
+    with:
+      data_container_lock: Tests/Production/stock-data-container-v2.lock.json
 
   campaign-result:
     name: Retain automated campaign outcome
