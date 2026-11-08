@@ -2,7 +2,7 @@ name: Phase 6 Current Windows SDK for Complete Stock Qualification
 
 on:
   push:
-    branches: ['qualification/current-windows-sdk']
+    branches: ['qualification/current-windows-sdk', 'qualification/current-windows-sdk-retry']
   workflow_dispatch:
 
 permissions:

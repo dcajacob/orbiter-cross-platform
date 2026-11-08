@@ -52,6 +52,24 @@ class HostedCampaignTests(unittest.TestCase):
             out/current-windows-sdk/*.log
             out/current-windows-sdk/runtime.zip
             out/current-windows-sdk/tested-driver-variants/**
+      - name: Preserve raw SDK and unit evidence after a retention failure
+        uses: actions/upload-artifact@v7
+        if: inputs.retain_stock_sdk && failure()
+        with:
+          name: current-windows-sdk-failure-${{ matrix.configuration }}
+          retention-days: 14
+          compression-level: 0
+          path: |
+            out/current-windows-sdk/**
+            out/runtime-archive/windows-test-runtime.zip
+            out/runtime-rebuild/runtime-ctest.xml
+            out/runtime-rebuild/build-inputs.json
+            out/runtime-rebuild/CTestTestfile.cmake
+            out/runtime-rebuild/Tests/**/CTestTestfile.cmake
+            out/production-app/Modules/Plugin/OGLClient.dll
+            out/opengl-client/compile_commands.json
+            out/opengl-client/CMakeCache.txt
+            runtime-ctest.log
 '''
                 self.assertEqual(after.count(retention),1)
                 after=after.replace(retention,b'',1)

@@ -13,6 +13,13 @@ reader=importlib.util.module_from_spec(spec);spec.loader.exec_module(reader)
 
 
 class HostedWindowsSdkTests(unittest.TestCase):
+    def test_observed_standard_2025_image_alias_is_explicit_and_closed(self):
+        for name in ('win25','win25-vs2026'):
+            self.assertTrue(reader.standard_windows_2025(name,'Windows'))
+        for name in ('win22','win25-large','win25-vs2026-unknown','windows-latest',''):
+            self.assertFalse(reader.standard_windows_2025(name,'Windows'))
+        self.assertFalse(reader.standard_windows_2025('win25-vs2026','Linux'))
+
     def test_every_registered_process_must_pass_once(self):
         with tempfile.TemporaryDirectory() as directory:
             path=Path(directory)/'tests.xml';inventory={'tests':[{'name':'original-one'},{'name':'original-two'}]}

@@ -33,6 +33,14 @@ The archive binds its actual runner/run/source, compiler metadata, unit receipts
 and complete member hashes. These artifacts prepare complete stock captures;
 they grant no stock, cross-cohort or hands-on acceptance. No local VM setup is
 used by this workflow, and the historical worker/provider contracts stay strict.
+The actual standard Windows 2025 image reports `win25-vs2026`; retention accepts
+that explicitly observed image and `win25`, while preserving the exact value.
+A separate failure-only upload retains the original SDK archive, actual CTest
+XML and registration files, build metadata and renderer if sealing fails. The
+first `b4c883b1` retention attempt failed before this fallback existed; its
+application tests and failure receipt remain preserved, but its full SDK was
+not uploaded and must be rebuilt. The dedicated retry branch leaves any active
+original job running.
 
 The hosted caller explicitly supplies `stock-data-container-v2.lock.json` after
 the upstream rolling release removed the original archive asset. This records

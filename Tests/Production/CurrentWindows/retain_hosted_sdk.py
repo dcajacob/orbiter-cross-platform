@@ -12,6 +12,11 @@ import xml.etree.ElementTree as ET
 import zipfile
 
 ROOT=Path(__file__).resolve().parents[3]
+WINDOWS_2025_IMAGES={'win25','win25-vs2026'}
+
+
+def standard_windows_2025(image,runner_os):
+    return runner_os=='Windows' and image in WINDOWS_2025_IMAGES
 
 
 def require(value,message):
@@ -114,7 +119,7 @@ def main():
     def save():(args.output/'current-application.json').write_text(json.dumps(report,indent=2)+'\n')
     save()
     try:
-        require(producer==report['github']['source'] and report['github']['image_os']=='win25',
+        require(producer==report['github']['source'] and standard_windows_2025(report['github']['image_os'],report['github']['runner_os']),
                 'Exact current source and standard Windows 2025 image required')
         tested=ROOT/'out/production-app';build=ROOT/'out/runtime-rebuild'
         runtime=args.output/'runtime';original_archive=ROOT/'out/runtime-archive/windows-test-runtime.zip'
