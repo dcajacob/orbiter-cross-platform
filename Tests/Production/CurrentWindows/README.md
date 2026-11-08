@@ -22,6 +22,35 @@ request, scripts, actual guest-agent job/terminal receipt, VM identity, system
 launch, bootstrap-started/result, worker status, build closure and observations.
 A launcher success alone is not a runtime pass.
 
+For new runs, `Closeout/prepare_interactive.py` also prepares an ordinary-session
+launch. Start its generated `run.cmd` inside the Windows VM as the signed-in,
+non-elevated user. The worker inherits `WinSta0/Default` through normal Python
+`subprocess` execution; the package excludes the token launcher and private
+desktop helpers. `windows_session_v1.py` only observes the inherited context and
+child creation time. A per-session exclusive lock serializes these visible
+jobs. Keep the VM desktop idle and do not overlap another qualification campaign.
+The launcher reads the Windows machine UUID through CIM and matches the declared
+local VM. A console interruption leaves the session lock for explicit inspection
+of any surviving simulator processes; it does not automatically retry a campaign.
+
+Preparation requires a committed runner revision and a fresh package path on
+the declared host share. Pass `--template EXISTING_REQUEST --output LOCAL_PACKAGE
+--guest-root Z:/NEW_PACKAGE --python C:/PATH/python.exe --vm VM_JSON
+--runner-commit COMMIT`. The application, SDK, data, paired save inputs, complete
+or diagnostic scope, and capacity reserve are conserved from the template.
+Original stock scenes run serially, with all original phases and repetitions.
+The four worker bodies retain every simulation assertion and comparator; only
+their context-helper import and its identity check change.
+
+Retain `interactive-started.json`, `interactive-result.json`, the actual worker
+log/result, request, script manifest and VM identity. The independent launch
+reader verifies nonce, source hashes, inherited desktop, actual child PID/start,
+exit, output hashes and preflight. Existing stock/API auditors select that
+versioned receipt path explicitly; historical private-desktop evidence still
+requires its original complete chain. Passing launch controls does not qualify
+a Windows simulator run. Actual Windows execution and all existing independent
+simulation audits remain required.
+
 The worker expects the corresponding complete local build record, source-bound
 current runtimes, both instrument/control driver snapshots, locked data and
 Mesa files, and the immutable original instrument/control references. Outputs

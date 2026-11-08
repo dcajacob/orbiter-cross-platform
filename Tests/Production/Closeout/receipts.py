@@ -26,6 +26,9 @@ def inspect_launch(root, trusted_scripts):
         descriptor=importlib.util.module_from_spec(spec);spec.loader.exec_module(descriptor)
         roots=descriptor.validate(config)
     else:roots = validate(config)
+    if 'interactive_launch' in config:
+        from interactive_launch import inspect
+        return inspect(root, trusted_scripts, roots)
     records = {name:load(root/(name+'.json')) for name in
                ('system-launch','bootstrap-started','bootstrap-result','worker-result','guest-job','guest-result','vm')}
     system = records['system-launch']; started = records['bootstrap-started']

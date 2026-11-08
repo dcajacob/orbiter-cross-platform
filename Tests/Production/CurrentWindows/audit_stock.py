@@ -14,6 +14,7 @@ ROOT=Path(__file__).resolve().parents[3]
 sys.path[:0]=[str(ROOT/'Tests/Production/Closeout'),str(ROOT/'Tests/Production/GeneralApiCorrection')]
 from contracts import require,sha,load,atomic_json
 from receipts import inspect_launch,windows_path
+from interactive_launch import sources as launch_sources
 from qualification import inspect as inspect_sdk_qualification
 from stock import selection,inspect_run
 
@@ -34,8 +35,7 @@ def runner_sources(files):
     name=next(iter(selected))
     result={k:v for k,v in RUNNER_SOURCES.items() if k not in adapters}
     result[name]=adapters[name]
-    require(set(files)==set(result),'Current stock runner role/file closure differs')
-    return result
+    return launch_sources(files,result)
 
 
 def inspect_staging(cfg,worker):
@@ -74,15 +74,18 @@ def module(path,name):
 def retain_launch(capture,jobs,vm,configuration,output):
     target=output/configuration;shutil.copytree(capture,target)
     cfg=load(target/'request.json')
-    for name in ('system-launch','bootstrap-started','bootstrap-result'):
-        shutil.copy2(target/(cfg['name']+'-'+name+'.json'),target/(name+'.json'))
-    for source,name in [(jobs/(configuration+'-capture-job.json'),'guest-job.json'),
-                        (jobs/(configuration+'-capture-terminal.json'),'guest-result.json'),
-                        (jobs/(configuration+'-capture-terminal.json.binding.json'),'guest-result.binding.json'),(vm,'vm.json')]:
-        shutil.copy2(source,target/name)
-    binding=load(target/'guest-result.binding.json');job=load(target/'guest-job.json')
-    require(binding==dict(job_sha256=sha(target/'guest-job.json'),terminal_sha256=sha(target/'guest-result.json'),
-                         actual_guest_pid=job['pid'],domain_uuid=job['domain_uuid']), 'Actual current-stock guest terminal binding differs')
+    if 'interactive_launch' in cfg:
+        shutil.copy2(vm,target/'vm.json')
+    else:
+        for name in ('system-launch','bootstrap-started','bootstrap-result'):
+            shutil.copy2(target/(cfg['name']+'-'+name+'.json'),target/(name+'.json'))
+        for source,name in [(jobs/(configuration+'-capture-job.json'),'guest-job.json'),
+                            (jobs/(configuration+'-capture-terminal.json'),'guest-result.json'),
+                            (jobs/(configuration+'-capture-terminal.json.binding.json'),'guest-result.binding.json'),(vm,'vm.json')]:
+            shutil.copy2(source,target/name)
+        binding=load(target/'guest-result.binding.json');job=load(target/'guest-job.json')
+        require(binding==dict(job_sha256=sha(target/'guest-job.json'),terminal_sha256=sha(target/'guest-result.json'),
+                             actual_guest_pid=job['pid'],domain_uuid=job['domain_uuid']), 'Actual current-stock guest terminal binding differs')
     runners=load(target/'runners.json');trusted=runners['files_sha256']
     require(runners['commit']==cfg['roles']['runner']['commit'] and sha(target/'runners.json')==cfg['roles']['runner']['manifest_sha256'],
             'Current stock runner role/file closure differs')

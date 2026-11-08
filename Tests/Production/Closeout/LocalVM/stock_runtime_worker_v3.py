@@ -8,7 +8,7 @@ import subprocess
 import sys
 import traceback
 
-from win_local_process_v1 import context
+from windows_session_v1 import context
 from runtime_descriptor_v3 import preflight,require,sha
 from static_binary_link_staging_v2 import BinaryLinks,PROTOCOL as STAGING_PROTOCOL
 from current_stock import selection,inspect_run
@@ -76,7 +76,7 @@ def main():
         for path in paths:
             destination=target/path.relative_to(folder);destination.parent.mkdir(parents=True,exist_ok=True);shutil.copy2(path,destination)
     try:
-        require(report['context']==dict(session=cfg['active_session'],window_station='WinSta0',desktop=cfg['desktop']), 'Actual private desktop differs')
+        require(report['context']==dict(session=cfg['active_session'],window_station='WinSta0',desktop=cfg['desktop']), 'Actual declared rendering context differs')
         report['root_preflight']=preflight(cfg)
         require(cfg['staging_protocol']==STAGING_PROTOCOL, 'Explicit versioned local-volume staging required')
         os.environ.update(PATH=str(Path(cfg['git']).parent)+';'+os.environ['PATH'],PYTHONDONTWRITEBYTECODE='1',

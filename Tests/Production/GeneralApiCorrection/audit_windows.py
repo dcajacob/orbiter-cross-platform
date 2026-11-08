@@ -15,6 +15,7 @@ from startup_contract import events, corrected_log, inspect_windows_roster
 sys.path.insert(0,str(ROOT/'Tests/Production/Closeout'))
 from contracts import load, sha, atomic_json
 from receipts import inspect_launch, windows_path
+from interactive_launch import sources as launch_sources
 
 SOURCES = {
     'capture_api.py': ['GeneralApiCorrection/capture_windows.py'],
@@ -34,19 +35,24 @@ def audit(capture, job, terminal, vm, observer, application, output):
     output.mkdir(parents=True)
     retained=output/'capture';shutil.copytree(capture,retained)
     cfg=load(retained/'request.json')
-    for role,name in [('system-launch','system-launch'),('bootstrap-started','bootstrap-started'),('bootstrap-result','bootstrap-result')]:
-        shutil.copy2(retained/(cfg['name']+'-'+role+'.json'),retained/(name+'.json'))
-    for source,name in [(job,'guest-job.json'),(terminal,'guest-result.json'),(vm,'vm.json'),
-                        (terminal.with_name(terminal.name+'.binding.json'),'guest-result.binding.json')]:
-        shutil.copy2(source,retained/name)
-    bound=load(retained/'guest-result.binding.json');guest=load(retained/'guest-job.json')
-    require(bound==dict(job_sha256=sha(retained/'guest-job.json'),terminal_sha256=sha(retained/'guest-result.json'),
-                        actual_guest_pid=guest['pid'],domain_uuid=guest['domain_uuid']), 'Actual terminal receipt binding differs')
+    if 'interactive_launch' in cfg:
+        shutil.copy2(vm,retained/'vm.json')
+    else:
+        for role,name in [('system-launch','system-launch'),('bootstrap-started','bootstrap-started'),('bootstrap-result','bootstrap-result')]:
+            shutil.copy2(retained/(cfg['name']+'-'+role+'.json'),retained/(name+'.json'))
+        for source,name in [(job,'guest-job.json'),(terminal,'guest-result.json'),(vm,'vm.json'),
+                            (terminal.with_name(terminal.name+'.binding.json'),'guest-result.binding.json')]:
+            shutil.copy2(source,retained/name)
+        bound=load(retained/'guest-result.binding.json');guest=load(retained/'guest-job.json')
+        require(bound==dict(job_sha256=sha(retained/'guest-job.json'),terminal_sha256=sha(retained/'guest-result.json'),
+                           actual_guest_pid=guest['pid'],domain_uuid=guest['domain_uuid']), 'Actual terminal receipt binding differs')
     runners=load(retained/'runners.json');trusted=runners['files_sha256']
-    require(set(trusted)==set(SOURCES) and runners['commit']==cfg['roles']['runner']['commit'] and
+    sources=launch_sources(trusted,{name:paths for name,paths in SOURCES.items()})
+    require(runners['commit']==cfg['roles']['runner']['commit'] and
             sha(retained/'runners.json')==cfg['roles']['runner']['manifest_sha256'], 'Runner role/source closure differs')
     origins={}
-    for name,candidates in SOURCES.items():
+    for name,candidates in sources.items():
+        if isinstance(candidates,str):candidates=[candidates]
         matches=[candidate for candidate in candidates if digest(immutable(runners['commit'],candidate))==trusted[name]]
         require(matches, 'Runner does not match its immutable owning source: '+name)
         origins[name]=matches[0]

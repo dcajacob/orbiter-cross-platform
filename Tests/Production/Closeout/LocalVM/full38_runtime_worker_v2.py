@@ -1,7 +1,7 @@
 """Run full or explicitly diagnostic original-Windows persistence profiles locally."""
 import datetime,hashlib,json,os,runpy,shutil,subprocess,sys,threading,time,traceback
 from pathlib import Path
-from win_local_process_v1 import context
+from windows_session_v1 import context
 from static_binary_link_staging_v2 import BinaryLinks,PROTOCOL as STAGING_PROTOCOL
 from runtime_descriptor_v2 import preflight, validate, capture_selection
 REQUEST=Path(sys.argv[1]);cfg=json.loads(REQUEST.read_text());SHARE=Path(cfg['roots']['share']);SOURCE=Path(cfg['source']);OUTPUT=Path(cfg['output']);name=cfg['name'];seq=0;lock=threading.RLock();done=threading.Event();links=None

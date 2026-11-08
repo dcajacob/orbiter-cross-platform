@@ -8,7 +8,7 @@ import shutil
 import subprocess
 import sys
 import traceback
-from win_local_process_v1 import context
+from windows_session_v1 import context
 from runtime_descriptor_v3 import preflight,require,sha
 from static_binary_link_staging_v1 import BinaryLinks
 
@@ -37,7 +37,7 @@ def main():
         temporary=share/'worker-result.tmp';temporary.write_text(json.dumps(report,indent=2)+'\n');temporary.replace(share/'worker-result.json')
     try:
         require(report['context']==dict(session=cfg['active_session'],window_station='WinSta0',desktop=cfg['desktop']),
-                'Actual private desktop context differs')
+                'Actual declared rendering context differs')
         report['root_preflight']=preflight(cfg)
         require(cfg['capture_scope']==dict(kind='diagnostic',gate='general-api',cases=['Scenarios/Tests/GeneralApiTest.scn']) and
                 cfg['source_role']=='application' and cfg['math_profile']=='matrix', 'Explicit API correction scope required')

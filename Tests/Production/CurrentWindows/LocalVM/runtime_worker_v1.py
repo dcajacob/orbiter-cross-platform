@@ -1,4 +1,4 @@
-"""Run the unchanged current Windows gates on a new, unshown private desktop."""
+"""Run the unchanged current Windows gates in the declared rendering session."""
 import datetime
 import hashlib
 import json
@@ -10,7 +10,7 @@ import sys
 import traceback
 import zipfile
 
-from win_local_process_v1 import context, sha
+from windows_session_v1 import context, sha
 
 request = Path(sys.argv[1])
 config = json.loads(request.read_text())
@@ -67,7 +67,7 @@ try:
     assert report['context']['desktop'] == config['desktop']
     assert report['context']['window_station'].lower() == 'winsta0'
     assert report['worker_sha256'] == config['worker_sha256']
-    assert sha(Path(__file__).parent / 'win_local_process_v1.py') == config['helper_sha256']
+    assert sha(Path(__file__).parent / 'windows_session_v1.py') == config['helper_sha256']
     os.environ['PATH'] = config['git_directory'] + ';' + str(Path(sys.executable).parent) + ';' + os.environ['PATH']
     os.environ['PYTHONDONTWRITEBYTECODE'] = '1'
     os.environ['LIBGL_ALWAYS_SOFTWARE'] = 'true'
