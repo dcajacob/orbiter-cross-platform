@@ -1,5 +1,15 @@
 # Current Windows local regression runner
 
+The authorized hosted campaign is `.github/workflows/phase6-qualification.yml`
+on `codex/github-qualification`. It reuses the complete existing current Windows
+client/cockpit/control, original Windows all38 writer/reload, and four-profile
+native/paired-Windows workflow jobs without changing their test commands. The
+portable core matrix also runs on pushes to this branch. Hosted build/result
+identities and raw Actions artifacts remain distinct from historical local VM
+evidence. The final current-source stock matrix and independent cross-cohort
+audits remain explicit pending gates; a successful campaign summary does not
+close them. Performance, physical input and controller acceptance stay local.
+
 `build.py --request PATH` consolidates the historical machine-specific build
 scripts. Its versioned request declares the local toolchain, seed repository,
 bundle, offline dependencies and fresh build/export roots. It builds both

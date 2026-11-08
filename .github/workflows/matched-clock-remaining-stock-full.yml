@@ -12,6 +12,7 @@ on:
       - 'OVP/OGLClient/**'
       - '.github/workflows/matched-clock-remaining-stock-full.yml'
   workflow_dispatch:
+  workflow_call:
 permissions:
   contents: read
 concurrency:

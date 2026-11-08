@@ -1,0 +1,102 @@
+name: Phase 6 Automated Qualification
+
+on:
+  push:
+    branches: ['codex/github-qualification']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: phase6-qualification-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  closeout-controls:
+    name: Source-bound qualification controls
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.14'
+      - name: Run every discovered closeout control with unchanged acceptance requirements
+        run: >-
+          python3 -B Tests/Production/Closeout/run_controls.py
+          --output out/phase6-closeout-controls.json
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: phase6-closeout-controls
+          retention-days: 90
+          path: out/phase6-closeout-controls.json
+
+  windows-client:
+    name: Current Windows client, cockpit and controls
+    uses: ./.github/workflows/production-client.yml
+
+  original-stock:
+    name: Original Windows complete stock and exact-save reloads
+    uses: ./.github/workflows/matched-clock-remaining-stock-full.yml
+
+  native-client:
+    name: Native four-profile runtime and paired Windows observations
+    uses: ./.github/workflows/native-production-client.yml
+
+  campaign-result:
+    name: Retain automated campaign outcome
+    if: always()
+    needs: [closeout-controls, windows-client, original-stock, native-client]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    env:
+      QUALIFICATION_JOB_RESULTS: ${{ toJSON(needs) }}
+    steps:
+      - uses: actions/checkout@v7
+      - name: Record actual hosted results without claiming Phase 6 acceptance
+        run: |
+          python3 - <<'PY'
+          import json, os
+          from pathlib import Path
+          jobs = json.loads(os.environ['QUALIFICATION_JOB_RESULTS'])
+          passed = all(job['result'] == 'success' for job in jobs.values())
+          record = dict(protocol='phase6-github-qualification-v1',
+              status='passed-automated-campaign' if passed else 'failed-automated-campaign',
+              source_commit=os.environ['GITHUB_SHA'], run_id=int(os.environ['GITHUB_RUN_ID']),
+              run_attempt=int(os.environ['GITHUB_RUN_ATTEMPT']), jobs=jobs,
+              cloud_builds_used=True, raw_evidence_storage='github-actions-artifacts',
+              original_stock_profiles=4, original_stock_cases=38,
+              original_stock_phases=['stock-writer', 'windows-save-reload'],
+              original_stock_repeats=2, original_stock_expected_processes=608,
+              existing_reusable_workflow_jobs_unchanged=True,
+              portable_core_workflow='separate push-triggered Portable Core and Windows Reference',
+              local_acceptance_pending=['performance', 'hands-on', 'controller'],
+              final_current_windows_stock_matrix_pending=True,
+              phase6_complete=False)
+          output = Path('out/phase6-github-campaign.json')
+          output.parent.mkdir(exist_ok=True)
+          output.write_text(json.dumps(record, indent=2) + '\n')
+          with Path(os.environ['GITHUB_STEP_SUMMARY']).open('a') as summary:
+              summary.write('Automated qualification: ' + record['status'] + '\n\n')
+              for name, result in jobs.items():
+                  summary.write('- ' + name + ': ' + result['result'] + '\n')
+              summary.write('\nPhysical input/hardware acceptance and final current-source stock qualification remain separate.\n')
+          PY
+      - uses: actions/upload-artifact@v7
+        with:
+          name: phase6-github-campaign
+          retention-days: 90
+          path: out/phase6-github-campaign.json
+      - name: Propagate any failed or skipped required workflow
+        run: |
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          record = json.loads(Path('out/phase6-github-campaign.json').read_text())
+          raise SystemExit(0 if record['status'] == 'passed-automated-campaign' else 1)
+          PY

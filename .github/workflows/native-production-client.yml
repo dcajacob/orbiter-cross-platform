@@ -4,6 +4,7 @@ on:
     branches: ['codex/production-**']
     paths: ['Src/Orbiter/**', 'Src/Celbody/**', 'Src/Vessel/ShuttlePB/**', 'Src/Vessel/DeltaGlider/**', 'Src/Vessel/Common/**', 'Src/Vessel/ShuttleA/**', 'Src/Vessel/Atlantis/Help/**', 'Src/Plugin/ScnEditor/Help/**', 'Src/Module/LuaScript/**', 'Extern/Lua/**', 'Extern/ReferenceMath/**', 'Extern/ldoc/**', 'Extern/Penlight/**', 'Extern/luafilesystem/**', 'OVP/OGLClient/**', 'Orbitersdk/**', 'Html/**', 'Tests/Production/**', '.github/workflows/native-production-client.yml']
   workflow_dispatch:
+  workflow_call:
 permissions:
   contents: read
 concurrency:

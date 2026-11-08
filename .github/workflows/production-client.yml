@@ -21,6 +21,7 @@ on:
       - 'Tests/Production/stage_mesa.py'
       - '.github/workflows/production-client.yml'
   workflow_dispatch:
+  workflow_call:
 
 permissions:
   contents: read
