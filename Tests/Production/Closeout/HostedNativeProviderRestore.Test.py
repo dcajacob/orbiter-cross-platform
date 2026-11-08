@@ -66,6 +66,20 @@ class HostedNativeProviderRestoreTests(unittest.TestCase):
         for body in ('','python3','python3=3.14\npython3=3.15','package=1;command','--option=1','package=$(command)'):
             with self.assertRaises(ValueError):package_inventory(body)
 
+    def test_native_asset_preparation_supplies_a_private_original_configuration(self):
+        from capture_hosted_native_writer import stage_configuration
+        with tempfile.TemporaryDirectory() as directory:
+            root=Path(directory);source=root/'original.cfg';source.write_bytes(b'; Original configuration fixture\n')
+            source.chmod(0o444);assets=root/'assets';assets.mkdir()
+            checksum=reader.sha(source);result=stage_configuration(source,assets)
+            self.assertEqual(result['sha256'],checksum);self.assertEqual(reader.sha(assets/'Orbiter.cfg'),checksum)
+            self.assertNotEqual(source.stat().st_ino,(assets/'Orbiter.cfg').stat().st_ino)
+            (assets/'Orbiter.cfg').chmod(0o644);(assets/'Orbiter.cfg').write_bytes(b'Private runtime input\n')
+            self.assertEqual(reader.sha(source),checksum)
+            with self.assertRaises(ValueError):stage_configuration(source,assets)
+            (assets/'Orbiter.cfg').unlink();(assets/'Orbiter.cfg').symlink_to(root/'absent')
+            with self.assertRaises(ValueError):stage_configuration(source,assets)
+
     def test_member_paths_and_links_cannot_escape_or_alias(self):
         for name,kind,link in (('../outside','file',None),(reader.PREFIX+'/lib','symlink','../../outside'),
                 (reader.PREFIX+'/lib','symlink','/etc/passwd'),(reader.PREFIX+'/hard','hardlink','../outside')):

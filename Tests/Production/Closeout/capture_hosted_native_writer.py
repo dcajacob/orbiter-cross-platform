@@ -6,6 +6,7 @@ import json
 import os
 from pathlib import Path
 import re
+import shutil
 import subprocess
 import sys
 import time
@@ -19,6 +20,16 @@ def package_inventory(body):
     result=dict(line.split('=',1) for line in lines)
     require(len(result)==len(lines),'Duplicate original system package')
     return result
+
+
+def stage_configuration(source,assets):
+    source=Path(source);target=Path(assets)/'Orbiter.cfg'
+    require(source.is_file() and not target.exists() and not target.is_symlink(),
+            'Original configuration fixture and a fresh private asset destination required')
+    checksum=sha(source);shutil.copy2(source,target)
+    require(sha(source)==sha(target)==checksum and source.stat().st_ino!=target.stat().st_ino,
+            'Original native configuration must retain its bytes in a separate asset file')
+    return dict(source=str(source),target=str(target),sha256=checksum,canonical_source_unchanged=True)
 
 
 def main():
@@ -68,6 +79,7 @@ def main():
         run('planet-data',py+['Tests/Production/prepare_hosted_data.py','--lock','Tests/Production/standard-planets.lock.json','--archive','out/planet-cache/Orbiter2016.zip','--destination','out/native-stock-planets'],1200)
         run('base-assets',py+['Tests/Production/NativeScene/prepare.py','--delta-glider','--shuttle-a','--data','out/native-stock-data','--planets','out/native-stock-planets','--destination','out/native-stock-base-assets'])
         run('test-font',py+['Tests/Production/CockpitUI/prepare_fonts.py','--assets','out/native-stock-base-assets'])
+        report['staged_configuration_fixture']=stage_configuration(ROOT/'Tests/Production/NativeScene/Orbiter.cfg',ROOT/'out/native-stock-base-assets');save()
         run('complete-stock-assets',py+['Tests/Production/Atlantis/stage_assets.py','--base-assets','out/native-stock-base-assets','--output','out/native-stock-assets'])
         build=ROOT/'out/phase6-hosted-native'/a.profile;capture=ROOT/'out/native-stock-writer'/a.profile
         environment=dict(os.environ,__EGL_VENDOR_LIBRARY_FILENAMES=str(providers/'mesa/install/share/glvnd/egl_vendor.d/50_mesa.json'))

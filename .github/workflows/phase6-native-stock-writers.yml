@@ -131,6 +131,7 @@ jobs:
             out/native-stock-writer/${{ env.PROFILE }}/*.log
             out/native-stock-writer/${{ env.PROFILE }}/*.so
             out/native-stock-writer/${{ env.PROFILE }}/compositor/**
+            out/native-stock-writer/${{ env.PROFILE }}/local-staging-controls-v2/*
             out/native-stock-writer/${{ env.PROFILE }}/*/*.json
             out/native-stock-writer/${{ env.PROFILE }}/*/*.csv
             out/native-stock-writer/${{ env.PROFILE }}/*/*.txt
