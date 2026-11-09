@@ -1,0 +1,94 @@
+name: Phase 6 Mesa CPU Topology Owner Repair
+
+on:
+  push:
+    branches: ['qualification/mesa-topology-repair']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: phase6-mesa-topology-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  mesa:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 100
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - name: Verify unchanged source and small helper controls
+        run: mkdir -p out && python3 -B Tests/Production/Closeout/run_controls.py --output out/mesa-topology-helper-controls.json
+      - name: Download the exact original passed dependency package for reuse and comparison
+        uses: actions/github-script@v8
+        with:
+          script: |
+            const fs = require('fs');
+            const crypto = require('crypto');
+            const {owner,repo} = context.repo;
+            const run_id = 42528403133;
+            const artifact_id = 13636482999;
+            if (owner !== 'dcajacob' || repo !== 'orbiter-cross-platform') throw Error('Exact authorized repository required');
+            const run = (await github.rest.actions.getWorkflowRun({owner,repo,run_id})).data;
+            const jobs = await github.paginate(github.rest.actions.listJobsForWorkflowRun,{owner,repo,run_id,per_page:100});
+            const artifact = (await github.rest.actions.getArtifact({owner,repo,artifact_id})).data;
+            if (run.head_sha!=='60ba46377f236c2d4705f444c0174e0f5af8252f' || run.status!=='completed' || run.conclusion!=='success' || artifact.expired || artifact.size_in_bytes!==164848563 || artifact.digest!=='sha256:6304d1701c0fc0775b80046d1ed3aa813b07313207027046d9a026be4f1dfe9e') throw Error('Exact original successful provider API identity required');
+            const response = await github.rest.actions.downloadArtifact({owner,repo,artifact_id,archive_format:'zip'});
+            const bytes = Buffer.from(response.data);
+            if ('sha256:'+crypto.createHash('sha256').update(bytes).digest('hex')!==artifact.digest || bytes.length!==artifact.size_in_bytes) throw Error('Actual provider API ZIP bytes differ');
+            fs.mkdirSync('out/mesa-provider-source',{recursive:true});
+            fs.writeFileSync('out/mesa-provider-source/producer.zip',bytes);
+            fs.writeFileSync('out/mesa-provider-source/api.json',JSON.stringify({repository:context.repo,run,jobs,artifact},null,2));
+      - name: Restore all original providers without rebuilding or relabelling them
+        run: >-
+          python3 -B Tests/Production/Closeout/restore_hosted_native_providers.py
+          --api out/mesa-provider-source/api.json --archive out/mesa-provider-source/producer.zip
+          --output out/native-provider-restoration/restoration.json
+      - name: Build only Mesa and run original allocator and graphics plus CPU owner controls in exact userspace
+        shell: bash
+        run: |
+          set -euo pipefail
+          image=$(python3 -c "import json; print('ubuntu@'+json.load(open('Tests/Production/Closeout/native-provider-container.lock.json'))['image_digest'])")
+          docker pull "$image"
+          docker image inspect "$image" > out/mesa-topology-container.json
+          docker run --rm --init --cpus=2 --shm-size=1g -v "$GITHUB_WORKSPACE:$GITHUB_WORKSPACE" -w "$GITHUB_WORKSPACE" \
+            -e GITHUB_ACTIONS -e GITHUB_WORKSPACE -e GITHUB_SHA \
+            "$image" bash -c '
+              set -euo pipefail
+              export DEBIAN_FRONTEND=noninteractive
+              mapfile -t bootstrap < <(awk -F= '\''$1=="python3" || $1=="ca-certificates" || $1=="git" {print}'\'' out/hosted-native-providers/system-packages.txt)
+              test "${#bootstrap[@]}" -eq 3
+              apt-get update
+              apt-get install -y --no-install-recommends "${bootstrap[@]}"
+              git config --global --add safe.directory "$PWD"
+              python3 -B Tests/Production/Closeout/build_hosted_mesa_topology.py
+            ' 2>&1 | tee out/mesa-topology-container.log
+      - name: Preserve all dependency failure diagnostics
+        if: always()
+        shell: python
+        run: |
+          from pathlib import Path
+          for pattern in ('out/hosted-mesa-topology/*.log','out/hosted-mesa-topology/mesa/*.log','out/hosted-mesa-topology/cpu-controls/*.log'):
+              for path in sorted(Path('.').glob(pattern)):
+                  print(str(path)+':\n'+path.read_text(errors='replace')[-12000:])
+      - name: Retain the separate repair bytes and every completed or partial control
+        if: always()
+        run: python3 -B Tests/Production/Closeout/seal_hosted_mesa_topology.py
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: mesa-topology-owner-repair
+          retention-days: 14
+          compression-level: 0
+          path: |
+            out/hosted-mesa-topology.tar.gz
+            out/hosted-mesa-topology.json
+            out/mesa-provider-source/api.json
+            out/native-provider-restoration/restoration.json
+            out/mesa-topology-container.json
+            out/mesa-topology-container.log
+            out/mesa-topology-helper-controls.json
