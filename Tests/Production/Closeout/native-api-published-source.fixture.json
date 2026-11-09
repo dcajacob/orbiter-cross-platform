@@ -1,0 +1,96 @@
+{
+  "protocol": "helper-fixture-derived-from-completed-native-API-v1",
+  "qualification_granted": false,
+  "record": {
+    "repository": {
+      "owner": "dcajacob",
+      "repo": "orbiter-cross-platform"
+    },
+    "run": {
+      "id": 42701960873,
+      "head_sha": "a75157bdec9f49b17da6ca04eb57699e16c87e8a",
+      "head_branch": "qualification/native-general-api-v2",
+      "path": ".github/workflows/phase6-native-general-api.yml",
+      "run_attempt": 1,
+      "status": "completed",
+      "conclusion": "success"
+    },
+    "jobs": [
+      {
+        "id": 129448700566,
+        "name": "readiness",
+        "run_id": 42701960873,
+        "head_sha": "a75157bdec9f49b17da6ca04eb57699e16c87e8a",
+        "status": "completed",
+        "conclusion": "success",
+        "labels": [
+          "ubuntu-24.04"
+        ]
+      },
+      {
+        "id": 129448960799,
+        "name": "Native original and corrected API Release sse2",
+        "run_id": 42701960873,
+        "head_sha": "a75157bdec9f49b17da6ca04eb57699e16c87e8a",
+        "status": "completed",
+        "conclusion": "success",
+        "labels": [
+          "ubuntu-24.04"
+        ]
+      },
+      {
+        "id": 129448960802,
+        "name": "Native original and corrected API Release automatic",
+        "run_id": 42701960873,
+        "head_sha": "a75157bdec9f49b17da6ca04eb57699e16c87e8a",
+        "status": "completed",
+        "conclusion": "success",
+        "labels": [
+          "ubuntu-24.04"
+        ]
+      },
+      {
+        "id": 129448960890,
+        "name": "Native original and corrected API Debug sse2",
+        "run_id": 42701960873,
+        "head_sha": "a75157bdec9f49b17da6ca04eb57699e16c87e8a",
+        "status": "completed",
+        "conclusion": "success",
+        "labels": [
+          "ubuntu-24.04"
+        ]
+      },
+      {
+        "id": 129448961099,
+        "name": "Native original and corrected API Debug automatic",
+        "run_id": 42701960873,
+        "head_sha": "a75157bdec9f49b17da6ca04eb57699e16c87e8a",
+        "status": "completed",
+        "conclusion": "success",
+        "labels": [
+          "ubuntu-24.04"
+        ]
+      }
+    ],
+    "artifact": {
+      "id": 13712350791,
+      "node_id": "MDg6QXJ0aWZhY3QxMzcxMjM1MDc5MQ==",
+      "name": "native-GeneralApi-Debug-automatic",
+      "size_in_bytes": 320264924,
+      "url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/actions/artifacts/13712350791",
+      "archive_download_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/actions/artifacts/13712350791/zip",
+      "expired": false,
+      "digest": "sha256:388805482645bddfa827f57cd33e79dc2d5aae8c540bbb6b1128dff5595ab072",
+      "created_at": "2026-11-09T21:27:35Z",
+      "updated_at": "2026-11-09T21:27:35Z",
+      "expires_at": "2026-11-23T21:27:19Z",
+      "workflow_run": {
+        "id": 42701960873,
+        "repository_id": 1440551273,
+        "head_repository_id": 1440551273,
+        "head_branch": "qualification/native-general-api-v2",
+        "head_sha": "a75157bdec9f49b17da6ca04eb57699e16c87e8a"
+      }
+    }
+  }
+}

@@ -1,0 +1,128 @@
+name: Phase 6 Independently Audit Published Native API Matrix
+
+on:
+  push:
+    branches: ['qualification/native-general-api-independent-v1']
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: phase6-native-GeneralApi-independent-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  readiness:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - run: mkdir -p out && python3 -B Tests/Production/Closeout/run_controls.py --output out/native-api-independent-controls.json
+      - uses: actions/github-script@v8
+        with:
+          script: |
+            core.info(JSON.stringify(await require('./.github/scripts/phase6-download-bound-artifact.Test.cjs')({core})));
+            core.info(JSON.stringify(await require('./.github/scripts/phase6-download-native-api-inputs.Test.cjs')({core})));
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: independent-native-GeneralApi-readiness
+          retention-days: 14
+          path: out/native-api-independent-controls.json
+  audit:
+    name: Independently audit native API ${{ matrix.profile }}
+    needs: readiness
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      max-parallel: 2
+      matrix:
+        profile: [Debug-automatic, Debug-sse2, Release-automatic, Release-sse2]
+    env:
+      PROFILE: ${{ matrix.profile }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.14'
+      - name: Download only the already-passed exact native runtime and provider inputs
+        uses: actions/github-script@v8
+        with:
+          script: |
+            await require('./.github/scripts/phase6-download-native-api-inputs.cjs')({github,context,core});
+      - name: Restore the complete source-bound sanitized runtime and all original unit receipts
+        run: >-
+          python3 -B Tests/Production/Closeout/recheck_native_discovery.py
+          --api out/native-api-source/native/api.json --archive out/native-api-source/native/producer.zip
+          --profile "$PROFILE" --output "out/native-api-retained-units/$PROFILE"
+      - name: Independently restore every base provider byte and original control
+        run: >-
+          python3 -B Tests/Production/Closeout/restore_hosted_native_providers.py
+          --api out/native-api-source/providers/api.json --archive out/native-api-source/providers/producer.zip
+          --output out/native-provider-restoration/restoration.json
+      - name: Independently restore every separately compiled Mesa byte and negative control
+        run: >-
+          python3 -B Tests/Production/Closeout/restore_hosted_mesa_topology.py
+          --api out/native-api-source/mesa/api.json --archive out/native-api-source/mesa/producer.zip
+          --output out/mesa-topology-restoration/restoration.json
+      - name: Download only the exact completed published native API capture on GitHub
+        uses: actions/github-script@v8
+        with:
+          script: |
+            await require('./.github/scripts/phase6-download-native-api-capture.cjs')({github,context,core});
+      - name: Re-read every raw member and reproduce the unchanged original native API audit byte for byte
+        run: >-
+          python3 -B Tests/Production/Closeout/inspect_hosted_native_general_api.py
+          --api "out/native-api-published/$PROFILE/api.json" --archive "out/native-api-published/$PROFILE/producer.zip"
+          --profile "$PROFILE" --output "out/native-api-independent/$PROFILE"
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: independent-native-GeneralApi-${{ matrix.profile }}
+          retention-days: 14
+          compression-level: 3
+          path: |
+            out/native-api-independent/${{ env.PROFILE }}/*.json
+            out/native-api-independent/${{ env.PROFILE }}/*.log
+            out/native-api-published/${{ env.PROFILE }}/*.json
+            out/native-api-published/${{ env.PROFILE }}/*.body
+            out/native-api-source/*/*.json
+            out/native-api-source/*/*.body
+            out/native-api-retained-units/${{ env.PROFILE }}/*.json
+            out/native-api-retained-units/${{ env.PROFILE }}/*.xml
+            out/native-api-retained-units/${{ env.PROFILE }}/*.log
+            out/native-provider-restoration/restoration.json
+            out/mesa-topology-restoration/restoration.json
+  final:
+    name: Verify complete native API subset proof
+    needs: audit
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - name: Retain exact completed independent profile artifacts and their actual APIs
+        uses: actions/github-script@v8
+        with:
+          script: |
+            await require('./.github/scripts/phase6-download-native-api-profile-proofs.cjs')({github,context,core});
+      - name: Close all four native API profiles without granting joint or normal admission
+        run: >-
+          python3 -B Tests/Production/Closeout/final_hosted_native_general_api.py
+          --inputs out/native-api-profile-proofs --output out/native-api-final-proof
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: complete-independent-native-GeneralApi-subset
+          retention-days: 14
+          path: |
+            out/native-api-final-proof/**
+            out/native-api-profile-proofs/*/*.json
+            out/native-api-profile-proofs/*/*.body
