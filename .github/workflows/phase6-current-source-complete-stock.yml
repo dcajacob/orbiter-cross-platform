@@ -1,0 +1,233 @@
+name: Phase 6 Source Complete Current Windows Stock Phases
+
+on:
+  push:
+    branches: ['qualification/current-stock-capture-v2']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: phase6-current-stock-capture-v2-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  readiness:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    outputs:
+      audit_run_id: ${{ steps.reference.outputs.audit_run_id }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - run: mkdir -p out && python3 -B Tests/Production/Closeout/run_controls.py --output out/current-stock-controls.json
+      - name: Require the complete successful immutable independent original audit
+        id: reference
+        uses: actions/github-script@v8
+        with:
+          script: |
+            const {owner,repo} = context.repo;
+            if (owner !== 'dcajacob' || repo !== 'orbiter-cross-platform') throw Error('Exact authorized public repository required');
+            const runs = await github.paginate(github.rest.actions.listWorkflowRunsForRepo,{owner,repo,branch:'qualification/original-source-audit-v2',status:'completed',per_page:100});
+            const found = runs.filter(run => run.path==='.github/workflows/phase6-original-source-audit.yml' && run.head_sha==='a13bae582c7de0c9b6e2fd0c064b1a3ea12e85c7' && run.conclusion==='success' && run.run_attempt===1);
+            if (found.length !== 1) throw Error('Exactly one complete successful original cohort audit required; no stock capture can start');
+            core.setOutput('audit_run_id',String(found[0].id));
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: source-complete-current-stock-controls
+          retention-days: 14
+          path: out/current-stock-controls.json
+  capture:
+    name: Source-complete current stock ${{ matrix.configuration }} ${{ matrix.math_profile }} ${{ matrix.phase }}
+    needs: readiness
+    runs-on: windows-2025
+    timeout-minutes: 330
+    strategy:
+      fail-fast: false
+      max-parallel: 4
+      matrix:
+        configuration: [Debug, Release]
+        math_profile: [automatic, sse2]
+        phase: [stock, reload]
+    env:
+      CONFIGURATION: ${{ matrix.configuration }}
+      CELL: ${{ matrix.configuration }}-${{ matrix.math_profile }}-${{ matrix.phase }}
+      REFERENCE_AUDIT_RUN_ID: ${{ needs.readiness.outputs.audit_run_id }}
+      ORBITER_DATA_CONTAINER_LOCK: application-source/Tests/Production/stock-data-container-v2.lock.json
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.14'
+      - name: Retain the separate immutable current application source owner
+        uses: actions/checkout@v7
+        with:
+          ref: c08f93151827949ee3ad498f8021f35c11753fde
+          path: application-source
+          fetch-depth: 0
+      - name: Download only the exact successful current SDK from its actual API producer
+        uses: actions/github-script@v8
+        with:
+          script: |
+            const fs = require('fs');
+            const crypto = require('crypto');
+            const {owner,repo} = context.repo;
+            const run_id = 42525562745;
+            const producer = 'c08f93151827949ee3ad498f8021f35c11753fde';
+            const configuration = process.env.CONFIGURATION;
+            const ids = {Debug:13636121355,Release:13635896646};
+            if (owner !== 'dcajacob' || repo !== 'orbiter-cross-platform' || !ids[configuration]) throw Error('Exact authorized SDK profile required');
+            const run = (await github.rest.actions.getWorkflowRun({owner,repo,run_id})).data;
+            const jobs = await github.paginate(github.rest.actions.listJobsForWorkflowRun,{owner,repo,run_id,per_page:100});
+            const artifact = (await github.rest.actions.getArtifact({owner,repo,artifact_id:ids[configuration]})).data;
+            if (run.head_sha !== producer || run.status !== 'completed' || run.conclusion !== 'success' || artifact.expired || artifact.workflow_run.id !== run_id || artifact.workflow_run.head_sha !== producer) throw Error('Closed successful source-bound SDK required');
+            const downloaded = await github.rest.actions.downloadArtifact({owner,repo,artifact_id:artifact.id,archive_format:'zip'});
+            const bytes = Buffer.from(downloaded.data);
+            if ('sha256:'+crypto.createHash('sha256').update(bytes).digest('hex') !== artifact.digest || bytes.length !== artifact.size_in_bytes) throw Error('Actual SDK API archive digest/length differs');
+            fs.mkdirSync('out/current-sdk-source',{recursive:true});
+            fs.writeFileSync('out/current-sdk-source/producer.zip',bytes);
+            fs.writeFileSync('out/current-sdk-source/api.json',JSON.stringify({repository:context.repo,run,jobs,artifact},null,2));
+      - name: Restore every exact SDK member and independently re-read all original source and unit receipts
+        run: >-
+          python -B Tests/Production/CurrentWindows/Hosted/restore_sdk.py
+          --api out/current-sdk-source/api.json --archive out/current-sdk-source/producer.zip
+          --configuration ${{ matrix.configuration }} --source-owner application-source --output out/current-windows-sdk
+      - name: Verify the same immutable application and SDK from their separate source checkout
+        working-directory: application-source
+        run: python -B Tests/Production/verify_test_runtime.py --runtime ../out/current-windows-sdk/runtime --source c08f93151827949ee3ad498f8021f35c11753fde
+      - name: Download the exact original passive observer preparation on GitHub only
+        uses: actions/github-script@v8
+        with:
+          script: |
+            const fs = require('fs');
+            const crypto = require('crypto');
+            const {owner,repo} = context.repo;
+            const run_id = 42529727362;
+            const producer = '348880c447f8d86beb75a92ec4aaf23d44df6500';
+            const configuration = process.env.CONFIGURATION;
+            const ids = {Debug:13637186106,Release:13635944416};
+            if (owner !== 'dcajacob' || repo !== 'orbiter-cross-platform' || !ids[configuration]) throw Error('Exact authorized observer profile required');
+            const run = (await github.rest.actions.getWorkflowRun({owner,repo,run_id})).data;
+            const jobs = await github.paginate(github.rest.actions.listJobsForWorkflowRun,{owner,repo,run_id,per_page:100});
+            const artifact = (await github.rest.actions.getArtifact({owner,repo,artifact_id:ids[configuration]})).data;
+            if (run.head_sha !== producer || run.status !== 'completed' || run.conclusion !== 'success' || artifact.expired || artifact.workflow_run.id !== run_id || artifact.workflow_run.head_sha !== producer) throw Error('Closed original passive observer preparation required');
+            const downloaded = await github.rest.actions.downloadArtifact({owner,repo,artifact_id:artifact.id,archive_format:'zip'});
+            const bytes = Buffer.from(downloaded.data);
+            if ('sha256:'+crypto.createHash('sha256').update(bytes).digest('hex') !== artifact.digest || bytes.length !== artifact.size_in_bytes) throw Error('Actual observer API ZIP digest/length differs');
+            fs.mkdirSync('out/current-observer-download',{recursive:true});
+            fs.writeFileSync('out/current-observer-download/producer.zip',bytes);
+            fs.writeFileSync('out/current-observer-download/api.json',JSON.stringify({repository:context.repo,run,jobs,artifact},null,2));
+      - name: Restore the original passive observer without recompilation or simulation
+        run: >-
+          python -B Tests/Production/CurrentWindows/Hosted/restore_observer.py
+          --api out/current-observer-download/api.json --archive out/current-observer-download/producer.zip
+          --configuration ${{ matrix.configuration }} --source-owner application-source
+      - name: Download the audited original cohort using its actual closed API identities
+        uses: actions/github-script@v8
+        with:
+          script: |
+            const fs = require('fs');
+            const crypto = require('crypto');
+            const {owner,repo} = context.repo;
+            if (owner !== 'dcajacob' || repo !== 'orbiter-cross-platform') throw Error('Exact authorized repository required');
+            const run_id = Number(process.env.REFERENCE_AUDIT_RUN_ID);
+            if (!Number.isSafeInteger(run_id) || run_id<=0) throw Error('Actual original audit run id required');
+            const run = (await github.rest.actions.getWorkflowRun({owner,repo,run_id})).data;
+            const jobs = await github.paginate(github.rest.actions.listJobsForWorkflowRun,{owner,repo,run_id,per_page:100});
+            const auditArtifacts = await github.paginate(github.rest.actions.listWorkflowRunArtifacts,{owner,repo,run_id,per_page:100});
+            const audit = auditArtifacts.filter(a=>a.name==='source-complete-original-stock-independent-audit' && !a.expired);
+            if (run.head_sha!=='a13bae582c7de0c9b6e2fd0c064b1a3ea12e85c7' || run.head_branch!=='qualification/original-source-audit-v2' || run.status!=='completed' || run.conclusion!=='success' || audit.length!==1) throw Error('Complete immutable original independent audit required');
+            async function download(artifact,path) {
+              const response = await github.rest.actions.downloadArtifact({owner,repo,artifact_id:artifact.id,archive_format:'zip'});
+              const bytes = Buffer.from(response.data);
+              if ('sha256:'+crypto.createHash('sha256').update(bytes).digest('hex')!==artifact.digest || bytes.length!==artifact.size_in_bytes) throw Error('Actual reference API ZIP bytes differ');
+              fs.writeFileSync(path,bytes);
+            }
+            fs.mkdirSync('out/reference-api',{recursive:true});
+            fs.writeFileSync('out/reference-api/audit.json',JSON.stringify({repository:context.repo,run,jobs,artifact:audit[0]},null,2));
+            await download(audit[0],'out/reference-api/audit.zip');
+            const original_id = 42544579421;
+            const workflow_run = (await github.rest.actions.getWorkflowRun({owner,repo,run_id:original_id})).data;
+            const originalJobs = await github.paginate(github.rest.actions.listJobsForWorkflowRun,{owner,repo,run_id:original_id,per_page:100});
+            const artifacts = (await github.paginate(github.rest.actions.listWorkflowRunArtifacts,{owner,repo,run_id:original_id,per_page:100})).filter(a=>/^matched-clock-remaining-stock-v2-(Debug|Release)-(automatic|sse2)$/.test(a.name));
+            if (workflow_run.head_sha!=='ba38a7efccb5f770e87add95f5e966aa40270756' || workflow_run.status!=='completed' || workflow_run.conclusion!=='success' || originalJobs.length!==5 || originalJobs.filter(j=>j.name.startsWith('Original Windows source-complete writer and exact-save reloads / Matched-clock v2 original ')).length!==4 || originalJobs.some(j=>j.status!=='completed' || j.conclusion!=='success') || artifacts.length!==4 || artifacts.some(a=>a.expired)) throw Error('Actual complete original reference cohort required');
+            fs.writeFileSync('out/reference-api/original.json',JSON.stringify({workflow_run,jobs:originalJobs,artifacts},null,2));
+            fs.mkdirSync('out/original-stock-audit/archives',{recursive:true});
+            for (const artifact of artifacts) await download(artifact,'out/original-stock-audit/archives/'+artifact.name+'.zip');
+      - name: Restore exact audited reference members and preserve every original transport and save byte
+        run: >-
+          python -B Tests/Production/CurrentWindows/Hosted/restore_source_complete_reference.py
+          --audit-api out/reference-api/audit.json --audit-archive out/reference-api/audit.zip
+          --reference-api out/reference-api/original.json
+      - name: Stage every original current-stock data file and planetary input
+        run: |
+          python -B application-source/Tests/Production/prepare_hosted_data.py --archive out/current-data-cache/Orbiter-x64.zip --destination out/current-stock-data
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          python -B application-source/Tests/Production/prepare_hosted_data.py --lock application-source/Tests/Production/standard-planets.lock.json --archive out/current-planet-cache/Orbiter2016.zip --destination out/current-stock-planets
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - name: Stage the exact original software renderer DLLs and notices
+        run: python -B application-source/Tests/Production/stage_mesa.py stage --cache out/current-mesa-cache --destination out/current-stock-mesa
+      - name: Prepare every exact original saved input and immutable runtime role for this complete phase
+        run: >-
+          python -B Tests/Production/CurrentWindows/Hosted/prepare_source_complete_request.py
+          --configuration ${{ matrix.configuration }} --math-profile ${{ matrix.math_profile }} --phase ${{ matrix.phase }}
+      - name: Execute all 38 scenes twice in the inherited ordinary runner session
+        run: >-
+          python -B Tests/Production/CurrentWindows/Hosted/execute_source_complete_phase.py
+          out/current-stock-requests/${{ matrix.configuration }}-${{ matrix.math_profile }}-${{ matrix.phase }}/request.json
+      - name: Retain bounded failure diagnostics
+        if: failure()
+        shell: python
+        run: |
+          import os
+          from pathlib import Path
+          base=Path('out/current-stock-requests')/os.environ['CELL']
+          for name in ('runner-result.json','worker-result.json','worker-console.log'):
+              path=base/name
+              if path.is_file():print(str(path)+':\n'+path.read_text(errors='replace')[-18000:])
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: source-complete-current-stock-${{ matrix.configuration }}-${{ matrix.math_profile }}-${{ matrix.phase }}
+          retention-days: 14
+          compression-level: 3
+          path: |
+            out/current-stock-requests/${{ env.CELL }}/*.json
+            out/current-stock-requests/${{ env.CELL }}/*.log
+            out/current-stock-exports/${{ env.CELL }}/**
+            out/current-stock-captures/${{ env.CELL }}/local-staging-controls-v2/*
+            out/current-windows-sdk/restoration.json
+            out/current-sdk-source/api.json
+            out/current-observer-restoration/restoration.json
+            out/current-observer-download/api.json
+            out/current-stock-preparation/preparation.json
+            out/current-stock-preparation/observer/observer-build.json
+            out/reference-api/*.json
+            out/reference-audit-restoration/restoration.json
+            out/original-stock-audit/transport/download.json
+            out/original-stock-audit/independent/*.json
+      - name: Preserve any partial source observations after a failure
+        uses: actions/upload-artifact@v7
+        if: failure()
+        with:
+          name: source-complete-current-stock-partial-${{ matrix.configuration }}-${{ matrix.math_profile }}-${{ matrix.phase }}
+          retention-days: 14
+          compression-level: 3
+          path: |
+            out/current-stock-captures/${{ env.CELL }}/*/*/*.json
+            out/current-stock-captures/${{ env.CELL }}/*/*/*.csv
+            out/current-stock-captures/${{ env.CELL }}/*/*/*.txt
+            out/current-stock-captures/${{ env.CELL }}/*/*/*.log
+            out/current-stock-captures/${{ env.CELL }}/*/*/*.rgba
+            out/current-stock-captures/${{ env.CELL }}/*/*/*.png
+            out/current-stock-captures/${{ env.CELL }}/*/*/*.cfg
+            out/current-stock-captures/${{ env.CELL }}/*/*/*.scn
+            out/current-stock-captures/${{ env.CELL }}/*/*/Scenarios/**
+            out/current-stock-captures/${{ env.CELL }}/*/*/Flights/**
+            out/current-stock-captures/${{ env.CELL }}/*/*/Meshes/Dragonfly/Dragonfly.msh
