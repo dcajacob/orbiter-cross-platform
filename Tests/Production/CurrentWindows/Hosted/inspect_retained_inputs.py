@@ -17,7 +17,7 @@ def load(path):return json.loads(Path(path).read_text())
 
 def executed_runtime(files,observer_sha):
     target='Modules/Plugin/ProductionCockpitDriver.dll'
-    require(target in files and len(observer_sha)==64 and all(c in '0123456789abcdef' for c in observer_sha),'Exact passive observer replacement role required')
+    require({'Orbiter.exe','Modules/Plugin/OGLClient.dll'}<=set(files) and len(observer_sha)==64 and all(c in '0123456789abcdef' for c in observer_sha),'Exact passive observer replacement role required')
     return dict(files)|{target:observer_sha}
 
 

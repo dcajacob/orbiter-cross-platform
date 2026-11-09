@@ -17,6 +17,9 @@ class HostedIndependentInputsTests(unittest.TestCase):
         self.assertEqual(actual['Modules/Plugin/ProductionCockpitDriver.dll'],'d'*64)
         for value in ('','d'*63,'z'*64):
             with self.assertRaises(ValueError):inputs.executed_runtime(sdk,value)
+        without_observer={name:value for name,value in sdk.items() if name!='Modules/Plugin/ProductionCockpitDriver.dll'}
+        self.assertEqual(inputs.executed_runtime(without_observer,'d'*64),actual)
+        self.assertEqual(without_observer,{'Orbiter.exe':'a'*64,'Modules/Plugin/OGLClient.dll':'b'*64})
         with self.assertRaises(ValueError):inputs.executed_runtime({'Orbiter.exe':'a'*64},'d'*64)
 
     def test_scalar_restoration_requires_the_exact_complete_equivalence_job(self):
