@@ -40,6 +40,8 @@ def main():
     protected[str(a.request)]=sha(a.request)
     for item in cfg['roles'].values():protected[item['manifest_path']]=item['manifest_sha256']
     from general_api_shaders import guarded
+    from inactive_stager_fixture import guarded as fixture_guarded
+    protected.update(fixture_guarded(cfg))
     protected.update(guarded(cfg));require(all(sha(name)==v for name,v in protected.items()),'Actual API source/request/role inputs changed')
     worker=Path(__file__).with_name('general_api_worker.py');argv=[sys.executable,'-B',str(worker),str(a.request)]
     result=share/'runner-result.json';require(not result.exists(),'Fresh owned API worker receipt required')

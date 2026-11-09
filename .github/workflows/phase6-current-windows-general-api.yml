@@ -2,7 +2,7 @@ name: Phase 6 Fresh Hosted Current Windows General API Matrix
 
 on:
   push:
-    branches: ['qualification/current-windows-general-api-v1']
+    branches: ['qualification/current-windows-general-api-v2']
 
 permissions:
   contents: read
@@ -104,6 +104,16 @@ jobs:
       - name: Verify the exact original source-owned application and SDK without resealing
         working-directory: application-source
         run: python -B Tests/Production/verify_test_runtime.py --runtime ../out/current-windows-sdk/runtime --source c08f93151827949ee3ad498f8021f35c11753fde
+      - name: Retain the original same-SDK inactive fixture required by the unchanged stager hash
+        uses: actions/github-script@v8
+        with:
+          script: |
+            await require('./.github/scripts/phase6-download-inactive-api-fixture.cjs')({github,context,core});
+      - name: Restore the exact original passive driver bytes without enabling them or changing the SDK
+        run: >-
+          python -B Tests/Production/CurrentWindows/Hosted/restore_observer.py
+          --api out/current-observer-download/api.json --archive out/current-observer-download/producer.zip
+          --configuration ${{ matrix.configuration }} --source-owner application-source
       - name: Bind all same-source original shaders to this explicit API diagnostic
         run: >-
           python -B Tests/Production/GeneralApiCorrection/Hosted/general_api_shaders.py
@@ -154,6 +164,13 @@ jobs:
             out/current-windows-sdk/source-artifact/runtime-ctest.xml
             out/current-sdk-source/*.json
             out/current-sdk-source/*.body
+            out/current-observer-download/*.json
+            out/current-observer-download/*.body
+            out/current-observer-restoration/restoration.json
+            out/current-stock-preparation/observer/*.json
+            out/current-stock-preparation/observer/*.dll
+            out/current-stock-preparation/observer/*.cpp
+            out/current-stock-preparation/observer/*.log
             out/current-api-captures/${{ env.CELL }}/**/*.json
             out/current-api-captures/${{ env.CELL }}/**/*.csv
             out/current-api-captures/${{ env.CELL }}/**/*.log

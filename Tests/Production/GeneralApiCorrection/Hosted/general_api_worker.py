@@ -25,12 +25,14 @@ def prepared_body():
       ("        built=load(cfg['application_build_manifest']);item=",
        "        built=load(cfg['application_build_manifest']);require(built['protocol']=='phase6-github-current-application-v1','Actual original hosted SDK protocol required');item="),
       ("        guards[observer['binary']]=observer['sha256']",
-       "        guards[observer['binary']]=observer['sha256']\n        from general_api_shaders import guarded as shader_guarded,stage as stage_shader_inputs,inspect_staged as inspect_shader_inputs\n        guards.update(shader_guarded(cfg))"),
-      ('                    def configure(directory):','                    def configure(directory):\n                        guards.update(stage_shader_inputs(directory,cfg))'),
+       "        guards[observer['binary']]=observer['sha256']\n        from general_api_shaders import guarded as shader_guarded,stage as stage_shader_inputs,inspect_staged as inspect_shader_inputs\n        guards.update(shader_guarded(cfg))\n        from inactive_stager_fixture import guarded as fixture_guarded,stage as stage_inactive_fixture,verify_staged as inspect_inactive_fixture\n        guards.update(fixture_guarded(cfg))"),
+      ('                    def configure(directory):','                    def configure(directory):\n                        guards.update(stage_shader_inputs(directory,cfg))\n                        guards.update(stage_inactive_fixture(directory,cfg))'),
       ("                        dict(fixed_step=0.015625,frames=60,delivery_repairs=[]),case,configure,process_timeout=900)",
-       "                        dict(fixed_step=0.015625,frames=60,delivery_repairs=[]),case,configure,process_timeout=900)\n                    inspect_shader_inputs(folder,cfg)"),
+       "                        dict(fixed_step=0.015625,frames=60,delivery_repairs=[]),case,configure,process_timeout=900)\n                    inspect_shader_inputs(folder,cfg)\n                    inspect_inactive_fixture(folder,cfg)"),
+      ("                        (directory/'ogl-evidence.enabled').touch();mesa_files(Path(cfg['mesa']),directory)",
+       "                        (directory/'ogl-evidence.enabled').touch();mesa_files(Path(cfg['mesa']),directory)\n                        inspect_inactive_fixture(directory,cfg)"),
       ("            paths += [folder/script,folder/scenario]",
-       "            paths += [folder/script,folder/scenario]\n            paths += [p for p in (folder/'Modules/OGLClient').rglob('*') if p.is_file()]")
+       "            paths += [folder/script,folder/scenario]\n            paths += [p for p in (folder/'Modules/OGLClient').rglob('*') if p.is_file()]\n            paths += [folder/'Modules/Plugin/ProductionCockpitDriver.dll']")
     )
     for before,after in changes:body=replace_once(body,before,after)
     return body

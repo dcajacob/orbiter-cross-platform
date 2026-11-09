@@ -108,8 +108,10 @@ def main():
     results=inspect_cases(cfg,worker,export,obs)
     from general_api_shaders import verify,inspect_staged
     verify(cfg)
+    from inactive_stager_fixture import verify_staged as verify_inactive_fixture
     for name,item in worker['cases'].items():
         inspect_staged(export/name,cfg)
+        verify_inactive_fixture(export/name,cfg)
         require(sha(item['observer']['dispatch_provider'])==item['provider_sha256'],'Actual observed system CRT provider byte changed')
     protected={str(x):sha(x) for folder in (share,export,observer) for x in folder.rglob('*') if x.is_file()}
     for path in (sdk_api,outer,buildpath,archive,runtime/'test-runtime.json',Path(cfg['variant']['manifest'])):protected[str(path)]=sha(path)
@@ -117,7 +119,8 @@ def main():
     a.output.mkdir(parents=True)
     report=dict(protocol='audited-hosted-current-Windows-GeneralApi-v1',status='passed-current-Windows-api-diagnostic-only',
         configuration=cfg['configuration'],profiles=[cfg['configuration']+'-'+m for m in ('automatic','sse2')],roles=cfg['roles'],
-        github=cfg['github'],inherited_runner_context=worker['context'],actual_processes=8,results=results,
+        github=cfg['github'],transport_protocol=cfg['transport_protocol'],inherited_runner_context=worker['context'],actual_processes=8,results=results,
+        inactive_stager_fixture=cfg['inactive_stager_fixture'],inactive_same_SDK_fixture_verified=True,original_staging_hash_guard_preserved=True,
         original_actual_case_auditor_sha256_lf=LEGACY_SHA256_LF,original_case_auditor_body_unchanged=True,
         compiled_application_source=APPLICATION,original_sdk_artifact_id=ident,original_sdk_archive_sha256=checksum,
         all_28_original_Windows_unit_receipts_preserved=True,observer_equivalence=True,

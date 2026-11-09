@@ -10,7 +10,7 @@ import sys
 ROOT=Path(__file__).resolve().parents[4]
 sys.path.insert(0,str(ROOT/'Tests/Production/CurrentWindows/Hosted'))
 from source_complete_shader_provider import context,local_path
-PROTOCOL='phase6-github-current-GeneralApi-v1'
+PROTOCOL='phase6-github-current-GeneralApi-v2-inactive-fixture'
 APPLICATION='c08f93151827949ee3ad498f8021f35c11753fde'
 REPOSITORY='dcajacob/orbiter-cross-platform'
 ROOTS={'source','preserved','build','data','planets','mesa','output','export'}
@@ -62,6 +62,12 @@ def validate(cfg):
     require(local_path(cfg['variant']['manifest']).is_relative_to(workspace/'out/current-api-variant') and
             local_path(cfg['variant']['script']).is_relative_to(workspace/'out/current-api-variant'),
             'Versioned test correction must retain a separate owned input root')
+    fixture=cfg['inactive_stager_fixture']
+    require(fixture['protocol']=='phase6-inactive-original-C08-stager-fixture-v1' and fixture['compiled_source']==APPLICATION and
+            fixture['intended_module_enabled'] is False and fixture['sdk_manifest_sha256']==cfg['roles']['sdk']['manifest_sha256'] and
+            local_path(fixture['binary'])==workspace/'out/current-stock-preparation/observer/ProductionCockpitDriver.dll' and
+            local_path(fixture['restoration_path'])==workspace/'out/current-observer-restoration/restoration.json',
+            'Exact separately declared inactive original fixture and same SDK required')
     from general_api_shaders import validate_paths
     validate_paths(cfg,workspace)
     return workspace,roots

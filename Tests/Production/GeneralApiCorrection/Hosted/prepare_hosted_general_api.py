@@ -12,6 +12,7 @@ import sys
 ROOT=Path(__file__).resolve().parents[4]
 sys.path[:0]=[str(Path(__file__).resolve().parent),str(ROOT/'Tests/Production/CurrentWindows/Hosted')]
 from general_api_provider import PROTOCOL,APPLICATION,require,sha,load,validate
+from inactive_stager_fixture import describe as describe_inactive_fixture
 
 
 def main():
@@ -67,7 +68,7 @@ def main():
         git=prepared['git'],application_build_manifest=str(application),application_build_manifest_sha256=sha(application),
         variant=dict(manifest=str(variant/'variant.json'),manifest_sha256=sha(variant/'variant.json'),script=str(variant/'Script/Tests/GeneralApiTest.lua')),
         scenario_sha256_lf=hashlib.sha256((owner/'Scenarios/Tests/GeneralApiTest.scn').read_bytes().replace(b'\r\n',b'\n')).hexdigest(),
-        renderer_shader_delivery=dict(path=str(plan),sha256=sha(plan)),**{k:str(v) for k,v in roots.items()})
+        inactive_stager_fixture=describe_inactive_fixture(a.configuration),renderer_shader_delivery=dict(path=str(plan),sha256=sha(plan)),**{k:str(v) for k,v in roots.items()})
     validate(cfg);request=share/'request.json';request.write_text(json.dumps(cfg,indent=2)+'\n');print(str(request))
 
 

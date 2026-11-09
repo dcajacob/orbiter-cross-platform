@@ -5,6 +5,8 @@ import json
 from pathlib import Path
 import sys
 import unittest
+import tempfile
+from unittest.mock import patch
 from contracts import ROOT
 sys.path.insert(0,str(ROOT/'Tests/Production/GeneralApiCorrection/Hosted'))
 import general_api_provider as provider
@@ -13,6 +15,7 @@ import general_api_shaders as shaders
 import prepare_general_api_data as data
 import audit_hosted_general_api as audit
 import execute_hosted_general_api as execution
+import inactive_stager_fixture as fixture
 
 
 def configuration():
@@ -26,6 +29,7 @@ def configuration():
         capture_scope=dict(kind='diagnostic',gate='general-api',cases=['Scenarios/Tests/GeneralApiTest.scn']),
         github=dict(repository='dcajacob/orbiter-cross-platform',run_id=123,run_attempt=1,collector_commit='f'*40),
         variant=dict(manifest=workspace+'/out/current-api-variant/Debug-GeneralApi/variant.json',script=workspace+'/out/current-api-variant/Debug-GeneralApi/Script/Tests/GeneralApiTest.lua'),
+        inactive_stager_fixture=dict(protocol=fixture.PROTOCOL,compiled_source=provider.APPLICATION,intended_module_enabled=False,sdk_manifest_sha256='a'*64,binary=workspace+'/out/current-stock-preparation/observer/ProductionCockpitDriver.dll',restoration_path=workspace+'/out/current-observer-restoration/restoration.json'),
         renderer_shader_delivery=dict(path=workspace+'/out/current-shader-delivery/Debug-GeneralApi.json',sha256='b'*64),**paths)
 
 
@@ -36,6 +40,10 @@ class HostedWindowsGeneralApiTests(unittest.TestCase):
         actual=new[new.index("        for profile in ('automatic','sse2'):"):new.index('    except BaseException')]
         for addition in ("                        guards.update(stage_shader_inputs(directory,cfg))\n",
                          "                    inspect_shader_inputs(folder,cfg)\n",
+                         "                        guards.update(stage_inactive_fixture(directory,cfg))\n",
+                         "                        inspect_inactive_fixture(directory,cfg)\n",
+                         "                    inspect_inactive_fixture(folder,cfg)\n",
+                         "            paths += [folder/'Modules/Plugin/ProductionCockpitDriver.dll']\n",
                          "            paths += [p for p in (folder/'Modules/OGLClient').rglob('*') if p.is_file()]\n"):
             self.assertEqual(actual.count(addition),1);actual=actual.replace(addition,'',1)
         self.assertEqual(actual,original)
@@ -56,6 +64,8 @@ class HostedWindowsGeneralApiTests(unittest.TestCase):
                        lambda c:c['github'].update(run_attempt=2),lambda c:c['github'].update(collector_commit='e'*40),
                        lambda c:c['capture_scope'].update(cases=[]),
                        lambda c:(c['roots'].update(output=c['source']),c.update(output=c['source'])),
+                       lambda c:c['inactive_stager_fixture'].update(intended_module_enabled=True),
+                       lambda c:c['inactive_stager_fixture'].update(sdk_manifest_sha256='f'*64),
                        lambda c:c['variant'].update(manifest='C:/outside/variant.json')):
             changed=copy.deepcopy(cfg);mutate(changed)
             with self.assertRaises(ValueError):provider.validate(changed)
@@ -89,6 +99,32 @@ class HostedWindowsGeneralApiTests(unittest.TestCase):
         self.assertIn('Controls.Test.py --lua /usr/bin/lua5.4',workflow)
         for forbidden in ('windows-2022','self-hosted:','continue-on-error','private_desktop_bootstrap'):
             self.assertNotIn(forbidden,workflow)
+
+
+    def test_inactive_fixture_cannot_become_an_active_duplicate_or_missing_module(self):
+        good='ACTIVE_MODULES\n  ProductionGeneralApiObserver\n  OGLClient\nEND_MODULES\n'
+        self.assertEqual(set(fixture.inactive_configuration(good)),{'productiongeneralapiobserver','oglclient'})
+        self.assertEqual(len(fixture.inactive_configuration(good+'; ProductionCockpitDriver\n')),2)
+        for text in (good.replace('  OGLClient','  ProductionCockpitDriver'),
+                     good.replace('END_MODULES','  productioncockpitdriver.DLL\nEND_MODULES'),
+                     good.replace('END_MODULES','  OGLClient\nEND_MODULES'),
+                     good.replace('ACTIVE_MODULES','MISSING_MODULES')):
+            with self.assertRaises(ValueError):fixture.inactive_configuration(text)
+
+    def test_actual_private_fixture_bytes_and_original_driver_hash_are_retained(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root=Path(directory);source=root/'original.dll';source.write_bytes(b'disposable exact original fixture bytes')
+            target=root/'case';target.mkdir();body='ACTIVE_MODULES\nProductionGeneralApiObserver\nOGLClient\nEND_MODULES\n'
+            (target/'Orbiter.cfg').write_text(body)
+            checksum=fixture.sha(source);cfg=dict(inactive_stager_fixture=dict(binary=str(source),sha256=checksum,intended_module_enabled=False))
+            with patch.object(fixture,'guarded',return_value={str(source):checksum}):
+                protected=fixture.stage(target,cfg)
+                (target/'invocation.json').write_text(json.dumps(dict(driver_sha256=checksum)))
+                result=fixture.verify_staged(target,cfg);self.assertFalse(result['module_enabled'])
+                self.assertTrue(all(fixture.sha(path)==value for path,value in protected.items()))
+                (target/fixture.NAME).write_bytes(b'wrong private fixture')
+                with self.assertRaises(ValueError):fixture.verify_staged(target,cfg)
+                self.assertEqual(source.read_bytes(),b'disposable exact original fixture bytes')
 
 
 if __name__=='__main__':unittest.main()
