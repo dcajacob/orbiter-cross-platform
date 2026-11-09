@@ -44,6 +44,32 @@ def inspect_cases(cfg,worker,export,obs):
     return namespace['cases'](cfg,worker,export,obs)
 
 
+
+def inspect_hosted_sdk_members(archive,runtime,item,expected_manifest_sha256):
+    """Use the actual C08 hosted producer's complete seal and retain every pristine SDK guard."""
+    runtime=Path(runtime);expected=item['runtime_files_sha256']
+    require(expected and item['sdk_manifest_sha256']==expected_manifest_sha256 and
+            expected.get('test-runtime.json')==expected_manifest_sha256,'Complete source-bound hosted SDK seal required')
+    with zipfile.ZipFile(archive) as incoming:
+        names=incoming.namelist()
+        require(len(names)==len(set(names))==len({n.casefold() for n in names}) and set(names)==set(expected),
+                'Complete exact hosted producer archive member closure differs')
+        body=incoming.read('test-runtime.json');sealed=json.loads(body)
+        require(digest(body)==expected_manifest_sha256 and sealed['source_commit']==APPLICATION and sealed['files'],
+                'Actual original SDK manifest source/hash differs')
+        require(set(sealed['files'])<set(expected) and all(expected.get(n)==v for n,v in sealed['files'].items()),
+                'Every pristine SDK member must remain unchanged within the full hosted seal')
+        require({'Orbiter.exe','test-runtime.json','Orbitersdk/lib/Orbiter.lib','Orbitersdk/lib/Orbitersdk.lib',
+                 'Orbitersdk/include/Orbitersdk.h','Modules/Plugin/OGLClient.dll'}<=set(expected),
+                'Complete original application/SDK and separately linked renderer required')
+        for name,value in expected.items():
+            from retain_hosted_sdk import safe
+            safe(name)
+            require(not (runtime/name).is_symlink() and digest(incoming.read(name))==value and sha(runtime/name)==value,
+                    'Actual original SDK or separately sealed hosted member byte differs: '+name)
+    return body,sealed
+
+
 def main():
     p=argparse.ArgumentParser(description=__doc__);p.add_argument('--request',type=lambda v:Path(v).resolve(),required=True)
     p.add_argument('--output',type=lambda v:Path(v).resolve(),required=True);a=p.parse_args()
@@ -75,15 +101,12 @@ def main():
             Path(item['runtime'])==runtime,'Actual closed original C08 application receipt differs')
     archive=payload/'runtime.zip';require(sha(archive)==build['runtime_archive_sha256'] and archive.stat().st_size==build['runtime_archive_bytes'],
             'Actual sealed inner SDK archive differs')
-    with zipfile.ZipFile(archive) as incoming:
-        body=incoming.read('test-runtime.json');sealed=json.loads(body)
-        require(digest(body)==item['sdk_manifest_sha256']==cfg['roles']['sdk']['manifest_sha256']==cfg['roles']['application']['manifest_sha256'] and
-                sealed['source_commit']==APPLICATION and set(incoming.namelist())==set(sealed['files'])|{'test-runtime.json'} and
-                len(incoming.namelist())==len(set(incoming.namelist())),'Actual complete original SDK manifest/member closure differs')
-        for name,value in sealed['files'].items():require(digest(incoming.read(name))==value and sha(runtime/name)==value,'Actual original SDK archive or runtime byte differs')
-        require(digest(incoming.read(ORIGINAL).replace(b'\r\n',b'\n'))==digest((ROOT/ORIGINAL).read_bytes().replace(b'\r\n',b'\n')) and
-                digest(incoming.read('Config/Earth.cfg').replace(b'\r\n',b'\n'))==digest((ROOT/EARTH).read_bytes().replace(b'\r\n',b'\n')),
-                'Actual original API script or locked SPICE Earth configuration differs')
+    require(item['sdk_manifest_sha256']==cfg['roles']['sdk']['manifest_sha256']==cfg['roles']['application']['manifest_sha256'],
+            'Actual matching original application/SDK role manifest required')
+    body,sealed=inspect_hosted_sdk_members(archive,runtime,item,cfg['roles']['sdk']['manifest_sha256'])
+    require(digest((runtime/ORIGINAL).read_bytes().replace(b'\r\n',b'\n'))==digest((ROOT/ORIGINAL).read_bytes().replace(b'\r\n',b'\n')) and
+            digest((runtime/'Config/Earth.cfg').read_bytes().replace(b'\r\n',b'\n'))==digest((ROOT/EARTH).read_bytes().replace(b'\r\n',b'\n')),
+            'Actual original API script or locked SPICE Earth configuration differs')
     require(sha(runtime/'test-runtime.json')==digest(body),'Actual original SDK manifest changed')
     for name,value in build['source_guard_sha256_lf'].items():
         actual=(source/name).read_bytes().replace(b'\r\n',b'\n');immutable=subprocess.check_output(['git','-C',str(source),'show',APPLICATION+':'+name]).replace(b'\r\n',b'\n')

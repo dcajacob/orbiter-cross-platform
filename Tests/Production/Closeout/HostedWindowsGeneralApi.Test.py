@@ -6,6 +6,8 @@ from pathlib import Path
 import sys
 import unittest
 import tempfile
+import zipfile
+import hashlib
 from unittest.mock import patch
 from contracts import ROOT
 sys.path.insert(0,str(ROOT/'Tests/Production/GeneralApiCorrection/Hosted'))
@@ -125,6 +127,30 @@ class HostedWindowsGeneralApiTests(unittest.TestCase):
                 (target/fixture.NAME).write_bytes(b'wrong private fixture')
                 with self.assertRaises(ValueError):fixture.verify_staged(target,cfg)
                 self.assertEqual(source.read_bytes(),b'disposable exact original fixture bytes')
+
+
+    def test_complete_hosted_sdk_seal_includes_all_pristine_and_separately_linked_members(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root=Path(directory);runtime=root/'runtime';runtime.mkdir();archive=root/'runtime.zip'
+            pristine={n:('original-'+n).encode() for n in ('Orbiter.exe','Orbitersdk/lib/Orbiter.lib','Orbitersdk/lib/Orbitersdk.lib','Orbitersdk/include/Orbitersdk.h')}
+            sealed=dict(source_commit=provider.APPLICATION,files={n:hashlib.sha256(v).hexdigest() for n,v in pristine.items()})
+            manifest=json.dumps(sealed).encode();members=dict(pristine,**{'test-runtime.json':manifest,'Modules/Plugin/OGLClient.dll':b'actual separately linked original renderer','Modules/OGLClient/Licenses/notice.txt':b'original source notice'})
+            for name,body in members.items():path=runtime/name;path.parent.mkdir(parents=True,exist_ok=True);path.write_bytes(body)
+            with zipfile.ZipFile(archive,'w') as output:
+                for name,body in members.items():output.writestr(name,body)
+            checksum=hashlib.sha256(manifest).hexdigest()
+            item=dict(sdk_manifest_sha256=checksum,runtime_files_sha256={n:hashlib.sha256(b).hexdigest() for n,b in members.items()})
+            self.assertEqual(audit.inspect_hosted_sdk_members(archive,runtime,item,checksum)[1],sealed)
+            for mutate in (lambda v:v['runtime_files_sha256'].pop('Modules/Plugin/OGLClient.dll'),
+                           lambda v:v['runtime_files_sha256'].update(**{'Modules/Plugin/OGLClient.dll':'f'*64}),
+                           lambda v:v['runtime_files_sha256'].update(**{'unmanifested.dll':'f'*64}),
+                           lambda v:v.update(sdk_manifest_sha256='f'*64)):
+                changed=copy.deepcopy(item);mutate(changed)
+                with self.assertRaises(ValueError):audit.inspect_hosted_sdk_members(archive,runtime,changed,checksum)
+            (runtime/'Modules/Plugin/OGLClient.dll').write_bytes(b'changed actual renderer')
+            with self.assertRaises(ValueError):audit.inspect_hosted_sdk_members(archive,runtime,item,checksum)
+        workflow=(ROOT/'.github/workflows/phase6-current-windows-general-api.yml').read_text()
+        self.assertIn('out/current-api-observer/${{ env.CONFIGURATION }}/**',workflow)
 
 
 if __name__=='__main__':unittest.main()

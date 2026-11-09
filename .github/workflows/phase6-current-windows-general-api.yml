@@ -2,7 +2,7 @@ name: Phase 6 Fresh Hosted Current Windows General API Matrix
 
 on:
   push:
-    branches: ['qualification/current-windows-general-api-v2']
+    branches: ['qualification/current-windows-general-api-v3']
 
 permissions:
   contents: read
@@ -151,9 +151,7 @@ jobs:
             out/current-api-requests/${{ env.CELL }}/**
             out/current-api-exports/${{ env.CELL }}/**
             out/current-api-audits/${{ env.CELL }}/**
-            out/current-api-observer/${{ env.CONFIGURATION }}/*.json
-            out/current-api-observer/${{ env.CONFIGURATION }}/*.dll
-            out/current-api-observer/${{ env.CONFIGURATION }}/*.log
+            out/current-api-observer/${{ env.CONFIGURATION }}/**
             out/current-api-variant/${{ env.CELL }}/**
             out/current-shader-delivery/${{ env.CELL }}.json
             out/current-data-transport/${{ env.CELL }}/**
