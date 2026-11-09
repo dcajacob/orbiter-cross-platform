@@ -1,0 +1,153 @@
+name: Phase 6 Complete Current Native Stock Matrix And Direct Current Builds
+on:
+  push:
+    branches: [codex/current-native-matrix-v1]
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: phase6-current-native-matrix-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  readiness:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - name: Preserve every original and added small helper control
+        run: |
+          mkdir -p out
+          python3 -B Tests/Production/Closeout/run_controls.py --output out/current-matrix-controls.json
+          python3 -B Tests/Production/Closeout/current_native_matrix_cli.py --plan > out/native-matrix-plan.json
+      - name: Require all actual current and native physical phases
+        uses: actions/github-script@v8
+        with:
+          script: |
+            await require('./.github/scripts/phase6-download-current-matrix-inputs.cjs')({github,context,core,metadataOnly:true});
+      - name: Independently validate all sixteen actual producer job and artifact APIs
+        run: python3 -B Tests/Production/Closeout/current_native_matrix_cli.py --check-readiness
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: current-native-matrix-readiness
+          retention-days: 14
+          path: |
+            out/current-matrix-controls.json
+            out/native-matrix-plan.json
+            out/current-matrix-readiness.json
+            out/native-matrix-readiness.json
+            out/current-matrix-phase-inputs/**/api.json
+            out/native-matrix-phase-inputs/**/api.json
+  pair:
+    name: Direct current native builds ${{ matrix.math_profile }} ${{ matrix.phase }}
+    needs: readiness
+    runs-on: ubuntu-24.04
+    timeout-minutes: 180
+    strategy:
+      fail-fast: false
+      max-parallel: 2
+      matrix:
+        math_profile: [automatic, sse2]
+        phase: [stock, reload]
+    env:
+      MATH_PROFILE: ${{ matrix.math_profile }}
+      CURRENT_PHASE: ${{ matrix.phase }}
+      NATIVE_PHASE: ${{ matrix.phase == 'stock' && 'stock-writer' || 'windows-save-reload' }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.14'
+      - name: Declare only exact existing immutable observation cohorts
+        run: |
+          mkdir -p out
+          python3 -B Tests/Production/Closeout/current_native_matrix_cli.py --plan > out/native-matrix-plan.json
+      - name: Retain all sixteen physical proofs and selected actual current and native observations
+        uses: actions/github-script@v8
+        with:
+          script: |
+            await require('./.github/scripts/phase6-download-current-matrix-inputs.cjs')({github,context,core});
+      - name: Retain every original source archive and both actual audit attempts
+        uses: actions/github-script@v8
+        with:
+          script: |
+            await require('./.github/scripts/phase6-download-source-complete-retry.cjs')({github,context,core});
+      - name: Independently restore all original raw members and both real attempts
+        run: >-
+          python3 -B Tests/Production/CurrentWindows/Hosted/restore_source_complete_retry_reference.py
+          --audit-api out/reference-api/audit.json --audit-archive out/reference-api/audit.zip
+          --reference-api out/reference-api/original.json --first-attempt-api out/reference-api/first.json
+          --first-attempt-archive out/reference-api/first.zip --first-attempt-log out/reference-api/first-job.log
+      - name: Restore only the independently proven scalar and unchanged controls
+        run: >-
+          python3 -B Tests/Production/Closeout/restore_hosted_ssim.py
+          --api out/native-matrix-scalar/api.json --archive out/native-matrix-scalar/producer.zip
+      - name: Directly compare every current native and current Debug Release pair
+        run: >-
+          python3 -B Tests/Production/Closeout/current_native_matrix_cli.py
+          --math-profile "$MATH_PROFILE" --phase "$CURRENT_PHASE"
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: current-native-direct-build-${{ matrix.math_profile }}-${{ matrix.phase }}
+          retention-days: 14
+          compression-level: 3
+          path: |
+            out/current-native-matrix-results/**
+            out/native-matrix-plan.json
+            out/current-matrix-readiness.json
+            out/native-matrix-readiness.json
+            out/current-matrix-phase-inputs/**/api.json
+            out/native-matrix-phase-inputs/**/api.json
+            out/current-matrix-current-inputs/**/api.json
+            out/native-matrix-native-inputs/**/api.json
+            out/native-matrix-scalar/api.json
+            out/hosted-ssim-restoration/restoration.json
+            out/reference-api/**
+            out/reference-audit-restoration/restoration.json
+  matrix:
+    name: Independently close all current native phases and direct comparisons
+    needs: [readiness, pair]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.14'
+      - name: Declare only exact existing immutable observation cohorts
+        run: |
+          mkdir -p out
+          python3 -B Tests/Production/Closeout/current_native_matrix_cli.py --plan > out/native-matrix-plan.json
+      - name: Independently download all sixteen actual physical phase proof archives again
+        uses: actions/github-script@v8
+        with:
+          script: |
+            await require('./.github/scripts/phase6-download-current-matrix-inputs.cjs')({github,context,core,proofsOnly:true});
+      - name: Independently download all four actual same-source direct comparison proofs
+        uses: actions/github-script@v8
+        with:
+          script: |
+            await require('./.github/scripts/phase6-download-current-matrix-pair-proofs.cjs')({github,context,core});
+      - name: Independently audit every source API ZIP member and complete direct comparison scope
+        run: python3 -B Tests/Production/Closeout/current_native_matrix_cli.py --final
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: current-native-complete-stock-matrix
+          retention-days: 14
+          compression-level: 3
+          path: |
+            out/current-native-matrix-results/**
+            out/native-matrix-plan.json
+            out/current-matrix-readiness.json
+            out/native-matrix-readiness.json
+            out/current-matrix-phase-inputs/**/api.json
+            out/native-matrix-phase-inputs/**/api.json
+            out/current-matrix-pair-inputs/**/api.json
