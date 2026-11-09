@@ -18,7 +18,10 @@ from contracts import ROOT,require,sha,case_ids
 
 SOURCE='d2c579064f880e6c930da2263d1aa738d53e5423'
 RUNTIME='ccc02c8a34bd1f227624d8778a141e8736ae8111'
-PINS={'Release-sse2':(42586898292,129058981287,13670583705,735725777,'5c9dbd9ee46711f7753ef48ea214e3039d5a5579010a2f954ea1e1fe594c8d30')}
+PINS={
+ 'Release-sse2':(42586898292,129058981287,13670583705,735725777,'5c9dbd9ee46711f7753ef48ea214e3039d5a5579010a2f954ea1e1fe594c8d30'),
+ 'Debug-sse2':(42586898426, 129059018674, 13673108137, 735571099, '0eb3aa5828ee2de3892417ae0e8f310f78e07e56954d60aefe712a65e477b418'),
+ 'Release-automatic':(42586898836, 129058984274, 13673666999, 736202018, '5897e56bedecaf591390c7f3571d88690dd60abb6bf85cdfa2f7d6165d85162b')}
 ORIGINAL='ba38a7efccb5f770e87add95f5e966aa40270756'
 MINIMUM={'Tests/Production/RemainingStockPersistence/capture_native.py','Tests/Production/RemainingStockPersistence/saved_inputs.py',
  'Tests/Production/RemainingStockPersistence/saved_state.py','Tests/Production/RemainingStockPersistence/protocol.json',

@@ -39,13 +39,14 @@ class NativeReloadReceiptTests(unittest.TestCase):
         return dict(repository=dict(owner='dcajacob',repo='orbiter-cross-platform'),run=run,jobs=[controls,job],artifact=artifact)
 
     def test_exact_completed_reload_source_job_and_new_api_artifact_are_required(self):
-        profile='Release-sse2';api=self.api(profile);receipts.validate_api(api,profile)
-        for change in (lambda a:a['run'].update(run_attempt=2),lambda a:a['run'].update(head_sha=old.receipts.SOURCE),
-                       lambda a:a['run'].update(status='in_progress',conclusion=None),lambda a:a['jobs'][1]['steps'][0].update(conclusion='skipped'),
-                       lambda a:a['artifact'].update(id=old.receipts.PINS[profile][2]),lambda a:a['artifact'].update(expired=True),
-                       lambda a:a['jobs'][1].update(labels=['ubuntu-24.04','self-hosted'])):
-            changed=copy.deepcopy(api);change(changed)
-            with self.assertRaises(ValueError):receipts.validate_api(changed,profile)
+        for profile in receipts.PINS:
+            api=self.api(profile);receipts.validate_api(api,profile)
+            for change in (lambda a:a['run'].update(run_attempt=2),lambda a:a['run'].update(head_sha=old.receipts.SOURCE),
+                           lambda a:a['run'].update(status='in_progress',conclusion=None),lambda a:a['jobs'][1]['steps'][0].update(conclusion='skipped'),
+                           lambda a:a['artifact'].update(id=old.receipts.PINS[profile][2]),lambda a:a['artifact'].update(expired=True),
+                           lambda a:a['jobs'][1].update(labels=['ubuntu-24.04','self-hosted'])):
+                changed=copy.deepcopy(api);change(changed)
+                with self.assertRaises(ValueError):receipts.validate_api(changed,profile)
 
     def fixture(self,root,out,cfg,restored,mode=None):
         profile,old_archive,_,source=old.NativeAuditRetryTests().fixture(root)

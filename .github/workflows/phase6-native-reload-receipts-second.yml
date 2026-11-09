@@ -1,0 +1,77 @@
+name: Phase 6 Independent Second Native Reload Raw Receipts
+
+on:
+  push:
+    branches: ['qualification/native-reload-receipts-second-cohort-v1']
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: phase6-native-reload-receipts-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  verify:
+    name: Verify complete native reload ${{ matrix.profile }} raw source and exact original saves
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      max-parallel: 2
+      matrix:
+        profile: [Debug-sse2, Release-automatic]
+    env:
+      PROFILE: ${{ matrix.profile }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.14'
+      - name: Preserve every original and added small helper control
+        run: mkdir -p out && python3 -B Tests/Production/Closeout/run_controls.py --output out/native-reload-receipt-controls.json
+      - name: Retain only the exact completed native reload API ZIP on GitHub
+        uses: actions/github-script@v8
+        with:
+          script: |
+            const fs=require('fs'),crypto=require('crypto'),{owner,repo}=context.repo;
+            if(owner!=='dcajacob'||repo!=='orbiter-cross-platform'||context.ref!=='refs/heads/qualification/native-reload-receipts-second-cohort-v1') throw Error('Exact authorized repository and completed-profile audit branch required');
+            const repository=(await github.rest.repos.get({owner,repo})).data;
+            if(repository.private||repository.archived) throw Error('Only the existing public active repository is authorized');
+            const pins={"Debug-sse2":[42586898426,129059018674,13673108137,735571099,"0eb3aa5828ee2de3892417ae0e8f310f78e07e56954d60aefe712a65e477b418"],"Release-automatic":[42586898836,129058984274,13673666999,736202018,"5897e56bedecaf591390c7f3571d88690dd60abb6bf85cdfa2f7d6165d85162b"]};
+            const profile=process.env.PROFILE,pin=pins[profile];if(!pin) throw Error('Only the two newly completed profiles are authorized');
+            const [run_id,job_id,artifact_id,size,digest]=pin,source='d2c579064f880e6c930da2263d1aa738d53e5423';
+            const run=(await github.rest.actions.getWorkflowRun({owner,repo,run_id})).data;
+            const jobs=await github.paginate(github.rest.actions.listJobsForWorkflowRun,{owner,repo,run_id,per_page:100});
+            const artifact=(await github.rest.actions.getArtifact({owner,repo,artifact_id})).data;
+            if(run.id!==run_id||run.head_sha!==source||run.run_attempt!==1||run.status!=='completed'||run.conclusion!=='success'||
+               run.head_branch!=='qualification/native-stock-reload-'+profile.toLowerCase()+'-v3'||run.path!=='.github/workflows/phase6-native-retry-stock-reloads.yml'||
+               jobs.length!==2||jobs.some(j=>j.head_sha!==source||j.run_id!==run_id||j.status!=='completed'||j.conclusion!=='success'||!j.labels.includes('ubuntu-24.04')||j.labels.includes('self-hosted'))||
+               jobs.filter(j=>j.id===job_id&&j.name==='Native exact original save reload '+profile.replace('-',' ')).length!==1||
+               artifact.id!==artifact_id||artifact.expired||artifact.name!=='retry-native-stock-reload-'+profile||artifact.size_in_bytes!==size||
+               artifact.digest!=='sha256:'+digest||artifact.workflow_run.id!==run_id||artifact.workflow_run.head_sha!==source)
+              throw Error('Exact completed native reload source/job/API artifact required');
+            const base='out/native-reload-receipts/'+profile;fs.mkdirSync(base,{recursive:true});
+            fs.writeFileSync(base+'/api.json',JSON.stringify({repository:context.repo,run,jobs,artifact},null,2),{flag:'wx'});
+            const response=await github.rest.actions.downloadArtifact({owner,repo,artifact_id,archive_format:'zip'}),bytes=Buffer.from(response.data);
+            if(bytes.length!==artifact.size_in_bytes||'sha256:'+crypto.createHash('sha256').update(bytes).digest('hex')!==artifact.digest)
+              throw Error('Actual native reload raw API ZIP digest or length differs');
+            fs.writeFileSync(base+'/producer.zip',bytes,{flag:'wx'});
+            core.info('Retained exact completed reload artifact on GitHub only; no new simulation or local transfer');
+      - name: Independently verify every recorded native process member and all exact original saved inputs
+        run: >-
+          python3 -B Tests/Production/Closeout/inspect_native_reload_receipts.py
+          --api out/native-reload-receipts/${{ matrix.profile }}/api.json
+          --archive out/native-reload-receipts/${{ matrix.profile }}/producer.zip --profile ${{ matrix.profile }}
+          --output out/native-reload-receipts/${{ matrix.profile }}/inspection.json
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: native-reload-raw-receipts-${{ matrix.profile }}
+          retention-days: 14
+          path: |
+            out/native-reload-receipt-controls.json
+            out/native-reload-receipts/${{ matrix.profile }}/*.json
