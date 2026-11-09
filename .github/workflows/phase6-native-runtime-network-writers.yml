@@ -1,0 +1,194 @@
+name: Phase 6 Native Runtime Writers With Verified HTTPS Package Transport
+
+on:
+  push:
+    branches: ['qualification/native-runtime-writer-debug-automatic-v2', 'qualification/native-runtime-writer-debug-sse2-v2', 'qualification/native-runtime-writer-release-automatic-v2', 'qualification/native-runtime-writer-release-sse2-v2']
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: phase6-native-runtime-network-stock-writers-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  controls:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - run: mkdir -p out && python3 -B Tests/Production/Closeout/run_controls.py --output out/native-writer-controls.json
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: native-runtime-writer-controls
+          retention-days: 14
+          path: out/native-writer-controls.json
+  writers:
+    name: Normal native runtime stock writer ${{ matrix.configuration }} ${{ matrix.math_profile }}
+    needs: controls
+    runs-on: ubuntu-24.04
+    timeout-minutes: 330
+    strategy:
+      fail-fast: false
+      max-parallel: 2
+      matrix:
+        configuration: ${{ fromJSON(contains(github.ref_name, '-debug-') && '["Debug"]' || '["Release"]') }}
+        math_profile: ${{ fromJSON(endsWith(github.ref_name, '-automatic-v2') && '["automatic"]' || '["sse2"]') }}
+    env:
+      PROFILE: ${{ matrix.configuration }}-${{ matrix.math_profile }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.14'
+      - name: Preserve prior active work and verify this exact replacement profile is closed
+        uses: actions/github-script@v8
+        with:
+          script: |
+            const fs=require('fs');
+            const {owner,repo}=context.repo;
+            const allowed={'qualification/native-runtime-writer-debug-automatic-v2':'Debug-automatic','qualification/native-runtime-writer-debug-sse2-v2':'Debug-sse2','qualification/native-runtime-writer-release-automatic-v2':'Release-automatic','qualification/native-runtime-writer-release-sse2-v2':'Release-sse2'};
+            const branch=context.ref.replace('refs/heads/','');
+            const profile=process.env.PROFILE;
+            if(owner!=='dcajacob' || repo!=='orbiter-cross-platform' || !allowed[branch] || profile!==allowed[branch]) throw Error('Exact authorized component-replacement lane required');
+            const run_id=profile.startsWith('Debug-')?42545909682:42549074137;
+            const run=(await github.rest.actions.getWorkflowRun({owner,repo,run_id})).data;
+            const jobs=await github.paginate(github.rest.actions.listJobsForWorkflowRun,{owner,repo,run_id,per_page:100});
+            const found=jobs.filter(j=>j.name==='Normal native Mesa stock writers '+profile.replace('-',' '));
+            if(run.head_sha!=='026cc581467b3d1417e5dfbdfcc9de8cd4b7cc5e' || found.length!==1 || found[0].head_sha!==run.head_sha || found[0].status!=='completed' || found[0].conclusion!=='failure') throw Error('Preserve active original-profile work; replacement cannot start yet');
+            const previous='qualification/native-runtime-writer-'+profile.toLowerCase()+'-v1';
+            const prior=await github.paginate(github.rest.actions.listWorkflowRunsForRepo,{owner,repo,branch:previous,per_page:100});
+            if(prior.some(r=>r.status!=='completed')) throw Error('Preserve active previous-generation profile work');
+            fs.mkdirSync('out/writer-source',{recursive:true});
+            fs.writeFileSync('out/writer-source/previous-capture-api.json',JSON.stringify({run,job:found[0]},null,2));
+      - name: Download exact retained application and dependency artifacts on GitHub only
+        uses: actions/github-script@v8
+        with:
+          script: |
+            const fs = require('fs');
+            const crypto = require('crypto');
+            const {owner,repo} = context.repo;
+            if (owner !== 'dcajacob' || repo !== 'orbiter-cross-platform') throw Error('Exact authorized repository required');
+            for (const [role,run_id,name] of [
+              ['native',42519601899,'phase6-full-native-'+process.env.PROFILE],
+              ['providers',42528403133,'native-stock-runtime-providers']]) {
+              const run = (await github.rest.actions.getWorkflowRun({owner,repo,run_id})).data;
+              const jobs = await github.paginate(github.rest.actions.listJobsForWorkflowRun,{owner,repo,run_id,per_page:100});
+              const artifacts = await github.paginate(github.rest.actions.listWorkflowRunArtifacts,{owner,repo,run_id,per_page:100});
+              const found = artifacts.filter(a=>a.name===name && !a.expired);
+              if (found.length !== 1) throw Error('One exact source-bound artifact required');
+              const artifact = found[0];
+              const pins = {
+                'Debug-automatic':[13633027534,82517672,'368c2d78c0313d2a183affd72dcd98505981b42d5f4baa0ce1c9fb6cb18c95c9'],
+                'Debug-sse2':[13633311229,82507652,'11f150fffd8b02bf6f9d438a4aff9b37a203c2d9db4eea8ae2905ff078d2898f'],
+                'Release-automatic':[13633298021,73311503,'2d73a7a714adbac8a2824ade476255c2ad10c9a4aa7ded636ee14e5ee69f7c4b'],
+                'Release-sse2':[13633576478,73283475,'3d9b820b9dfd9cbdc5d83357f00942659d1ef915a6fe6a0d0c286ef6a52855b4']
+              };
+              const pin = role==='native' ? pins[process.env.PROFILE] : [13636482999,164848563,'6304d1701c0fc0775b80046d1ed3aa813b07313207027046d9a026be4f1dfe9e'];
+              if (!pin || artifact.id!==pin[0] || artifact.size_in_bytes!==pin[1] || artifact.digest!=='sha256:'+pin[2]) throw Error('Immutable original artifact pin differs');
+              const downloaded = await github.rest.actions.downloadArtifact({owner,repo,artifact_id:artifact.id,archive_format:'zip'});
+              const bytes = Buffer.from(downloaded.data);
+              if ('sha256:'+crypto.createHash('sha256').update(bytes).digest('hex') !== artifact.digest || bytes.length !== artifact.size_in_bytes) throw Error('Actual API ZIP digest/length differs');
+              fs.mkdirSync('out/writer-source/'+role,{recursive:true});
+              fs.writeFileSync('out/writer-source/'+role+'/producer.zip',bytes);
+              fs.writeFileSync('out/writer-source/'+role+'/api.json',JSON.stringify({repository:context.repo,run,jobs,artifact},null,2));
+            }
+      - name: Restore exact CCC application and re-read all original unit receipts with fresh upstream executions
+        run: >-
+          python3 -B Tests/Production/Closeout/recheck_native_discovery.py
+          --api out/writer-source/native/api.json --archive out/writer-source/native/producer.zip
+          --profile "$PROFILE" --output "out/writer-retained-units/$PROFILE"
+      - name: Restore the successful pinned providers with their original control and userspace identities
+        run: >-
+          python3 -B Tests/Production/Closeout/restore_hosted_native_providers.py
+          --api out/writer-source/providers/api.json --archive out/writer-source/providers/producer.zip
+          --output out/native-provider-restoration/restoration.json
+      - name: Download the exact successful separately compiled Mesa cleanup and every control receipt
+        uses: actions/github-script@v8
+        with:
+          script: |
+            const fs=require('fs');
+            const crypto=require('crypto');
+            const {owner,repo}=context.repo;
+            const run_id=42543636813;
+            const artifact_id=13642189340;
+            const producer='6d17e4f18e4eade72fa295c3d03a38a58182d35f';
+            const run=(await github.rest.actions.getWorkflowRun({owner,repo,run_id})).data;
+            const jobs=await github.paginate(github.rest.actions.listJobsForWorkflowRun,{owner,repo,run_id,per_page:100});
+            const artifact=(await github.rest.actions.getArtifact({owner,repo,artifact_id})).data;
+            if(owner!=='dcajacob' || repo!=='orbiter-cross-platform' || run.head_sha!==producer || run.status!=='completed' || run.conclusion!=='success' || artifact.expired || artifact.workflow_run.id!==run_id || artifact.workflow_run.head_sha!==producer || artifact.size_in_bytes!==53687675 || artifact.digest!=='sha256:7a2b06da0b1d39153066414d8ea303cdfafcbe8184170e9e80bc33cee6d61392') throw Error('Exact passed immutable Mesa repair required');
+            const response=await github.rest.actions.downloadArtifact({owner,repo,artifact_id,archive_format:'zip'});
+            const bytes=Buffer.from(response.data);
+            if(bytes.length!==artifact.size_in_bytes || 'sha256:'+crypto.createHash('sha256').update(bytes).digest('hex')!==artifact.digest) throw Error('Actual Mesa API ZIP digest/length differs');
+            fs.mkdirSync('out/writer-source/mesa',{recursive:true});
+            fs.writeFileSync('out/writer-source/mesa/producer.zip',bytes);
+            fs.writeFileSync('out/writer-source/mesa/api.json',JSON.stringify({repository:context.repo,run,jobs,artifact},null,2));
+      - name: Restore exact Mesa-only bytes and independently re-read every original and new control
+        run: >-
+          python3 -B Tests/Production/Closeout/restore_hosted_mesa_topology.py
+          --api out/writer-source/mesa/api.json --archive out/writer-source/mesa/producer.zip
+          --output out/mesa-topology-restoration/restoration.json
+      - name: Run all unchanged normal-host writer cases and independently inspect every result in matching userspace
+        shell: bash
+        run: |
+          set -euo pipefail
+          image=$(python3 -c "import json; print('ubuntu@'+json.load(open('Tests/Production/Closeout/native-provider-container.lock.json'))['image_digest'])")
+          docker pull "$image"
+          docker image inspect "$image" > out/native-writer-container.json
+          docker run --rm --init --cpus=2 --shm-size=1g -v "$GITHUB_WORKSPACE:$GITHUB_WORKSPACE" -v /etc/ssl/certs/ca-certificates.crt:/run/orbiter-ci-system-ca.pem:ro -w "$GITHUB_WORKSPACE" \
+            -e GITHUB_ACTIONS -e RUNNER_OS -e GITHUB_WORKSPACE -e GITHUB_SHA -e PROFILE \
+            "$image" bash Tests/Production/Closeout/prepare_hosted_native_network.sh Tests/Production/Closeout/prepare_hosted_native_writer_runtime.sh 2>&1 | tee out/native-writer-container.log
+      - name: Print bounded diagnostics from any incomplete collection
+        if: failure()
+        shell: python
+        run: |
+          from pathlib import Path
+          for pattern in ('out/hosted-native-writer/*/*.log','out/native-stock-writer/*/probe-build.log','out/native-stock-writer/*/compositor/*.log'):
+              for path in sorted(Path('.').glob(pattern)):
+                  print(str(path)+':\n'+path.read_text(errors='replace')[-12000:])
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: normal-native-runtime-stock-writer-${{ matrix.configuration }}-${{ matrix.math_profile }}
+          retention-days: 14
+          compression-level: 3
+          path: |
+            out/writer-source/*/api.json
+            out/writer-source/previous-capture-api.json
+            out/mesa-topology-restoration/restoration.json
+            out/mesa-topology-restoration/source-artifact/*.json
+            out/writer-retained-units/${{ env.PROFILE }}/*.json
+            out/writer-retained-units/${{ env.PROFILE }}/*.xml
+            out/writer-retained-units/${{ env.PROFILE }}/*.log
+            out/native-provider-restoration/restoration.json
+            out/native-provider-restoration/provider-source/*.json
+            out/native-writer-container.json
+            out/native-writer-container.log
+            out/native-runtime-network/${{ env.PROFILE }}/*
+            out/hosted-native-writer/${{ env.PROFILE }}/*
+            out/native-stock-assets/remaining-vessels-resources.json
+            out/native-stock-assets/resources.json
+            out/native-stock-assets/cockpit-test-font.json
+            out/native-stock-writer/${{ env.PROFILE }}/*.json
+            out/native-stock-writer/${{ env.PROFILE }}/*.log
+            out/native-stock-writer/${{ env.PROFILE }}/*.so
+            out/native-stock-writer/${{ env.PROFILE }}/compositor/**
+            out/native-stock-writer/${{ env.PROFILE }}/local-staging-controls-v2/*
+            out/native-stock-writer/${{ env.PROFILE }}/*/*.json
+            out/native-stock-writer/${{ env.PROFILE }}/*/*.csv
+            out/native-stock-writer/${{ env.PROFILE }}/*/*.txt
+            out/native-stock-writer/${{ env.PROFILE }}/*/*.log
+            out/native-stock-writer/${{ env.PROFILE }}/*/*.rgba
+            out/native-stock-writer/${{ env.PROFILE }}/*/*.png
+            out/native-stock-writer/${{ env.PROFILE }}/*/*.cfg
+            out/native-stock-writer/${{ env.PROFILE }}/*/*.scn
+            out/native-stock-writer/${{ env.PROFILE }}/*/Scenarios/**
+            out/native-stock-writer/${{ env.PROFILE }}/*/Flights/**
+            out/native-stock-writer/${{ env.PROFILE }}/*/Config/**
+            out/native-stock-writer/${{ env.PROFILE }}/*/Meshes/Dragonfly/Dragonfly.msh

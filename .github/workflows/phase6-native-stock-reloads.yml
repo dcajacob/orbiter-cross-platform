@@ -178,9 +178,9 @@ jobs:
           image=$(python3 -c "import json; print('ubuntu@'+json.load(open('Tests/Production/Closeout/native-provider-container.lock.json'))['image_digest'])")
           docker pull "$image"
           docker image inspect "$image" > out/native-writer-container.json
-          docker run --rm --init --cpus=2 --shm-size=1g -v "$GITHUB_WORKSPACE:$GITHUB_WORKSPACE" -w "$GITHUB_WORKSPACE" \
+          docker run --rm --init --cpus=2 --shm-size=1g -v "$GITHUB_WORKSPACE:$GITHUB_WORKSPACE" -v /etc/ssl/certs/ca-certificates.crt:/run/orbiter-ci-system-ca.pem:ro -w "$GITHUB_WORKSPACE" \
             -e GITHUB_ACTIONS -e RUNNER_OS -e GITHUB_WORKSPACE -e GITHUB_SHA -e PROFILE \
-            "$image" bash Tests/Production/Closeout/prepare_hosted_native_reload.sh 2>&1 | tee out/native-writer-container.log
+            "$image" bash Tests/Production/Closeout/prepare_hosted_native_network.sh Tests/Production/Closeout/prepare_hosted_native_reload.sh 2>&1 | tee out/native-writer-container.log
       - name: Print bounded diagnostics from any incomplete collection
         if: failure()
         shell: python
@@ -210,6 +210,7 @@ jobs:
             out/native-provider-restoration/provider-source/*.json
             out/native-writer-container.json
             out/native-writer-container.log
+            out/native-runtime-network/${{ env.PROFILE }}/*
             out/hosted-native-reload/${{ env.PROFILE }}/*
             out/native-stock-assets/remaining-vessels-resources.json
             out/native-stock-assets/resources.json
