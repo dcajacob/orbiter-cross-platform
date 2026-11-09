@@ -21,7 +21,8 @@ RUNTIME='ccc02c8a34bd1f227624d8778a141e8736ae8111'
 PINS={
  'Release-sse2':(42586898292,129058981287,13670583705,735725777,'5c9dbd9ee46711f7753ef48ea214e3039d5a5579010a2f954ea1e1fe594c8d30'),
  'Debug-sse2':(42586898426, 129059018674, 13673108137, 735571099, '0eb3aa5828ee2de3892417ae0e8f310f78e07e56954d60aefe712a65e477b418'),
- 'Release-automatic':(42586898836, 129058984274, 13673666999, 736202018, '5897e56bedecaf591390c7f3571d88690dd60abb6bf85cdfa2f7d6165d85162b')}
+ 'Release-automatic':(42586898836, 129058984274, 13673666999, 736202018, '5897e56bedecaf591390c7f3571d88690dd60abb6bf85cdfa2f7d6165d85162b'),
+ 'Debug-automatic':(42586897811,129058969708,13673707991,736035328,'97a078c418f2a2ec4db4bc9230eaeb07642f7740c1108fa026e16c5c50935ee6')}
 ORIGINAL='ba38a7efccb5f770e87add95f5e966aa40270756'
 MINIMUM={'Tests/Production/RemainingStockPersistence/capture_native.py','Tests/Production/RemainingStockPersistence/saved_inputs.py',
  'Tests/Production/RemainingStockPersistence/saved_state.py','Tests/Production/RemainingStockPersistence/protocol.json',
