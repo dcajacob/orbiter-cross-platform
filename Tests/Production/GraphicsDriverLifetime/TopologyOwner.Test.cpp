@@ -13,5 +13,6 @@ int main(int argc,char** argv) {
         if(dlclose(owner)!=0)return 5;
     }
     std::printf("completed_ownership_cycles=20 genuine_leak=%d\n",genuine);
+    std::fflush(stdout);
     return 0;
 }
