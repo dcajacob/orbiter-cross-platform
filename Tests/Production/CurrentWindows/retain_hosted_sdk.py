@@ -83,7 +83,20 @@ def prepare_runtime(archive,tested,runtime,variants,producer):
                 changes[name]=dict(original_sdk_sha256=checksum,tested_driver_sha256=sha(current),
                     retained_tested_driver=str(destination))
     renderer=tested/'Modules/Plugin/OGLClient.dll';require(renderer.is_file(),'Tested separately linked renderer missing')
+    (runtime/'Modules/Plugin').mkdir(parents=True,exist_ok=True)
     shutil.copy2(renderer,runtime/'Modules/Plugin/OGLClient.dll')
+    # The separately linked client also loads shader/include files and notices.
+    # Preserve the tested resource tree without changing any pristine SDK member.
+    resources=tested/'Modules/OGLClient'
+    if resources.is_dir():
+        require(not resources.is_symlink(),'Renderer resource directory is redirected')
+        for source in sorted(resources.rglob('*')):
+            require(not source.is_symlink(),'Renderer resource symlink cannot be sealed')
+            if not source.is_file():continue
+            target=runtime/'Modules/OGLClient'/source.relative_to(resources)
+            if target.exists():require(sha(target)==sha(source),'Renderer resource conflicts with a pristine SDK member')
+            else:target.parent.mkdir(parents=True,exist_ok=True);shutil.copy2(source,target)
+            require(sha(target)==sha(source),'Tested renderer resource changed during retention')
     return changes
 
 
@@ -134,6 +147,12 @@ def main():
                 cache['ORBITER_MAKE_TESTS:BOOL']=='ON' and cache['ORBITER_PRODUCTION_REFERENCE_CAPTURE:BOOL']=='ON',
                 'Actual Windows configuration/test options differ')
         guards=source_files(producer)
+        shader_sources=list((ROOT/'OVP/OGLClient/shaders').glob('*'))
+        require(shader_sources and all(p.is_file() and not p.is_symlink() and
+                (tested/'Modules/OGLClient'/p.name).is_file() and
+                sha(tested/'Modules/OGLClient'/p.name)==sha(p) for p in shader_sources),
+                'Complete exact source renderer shader/include inputs required before SDK retention')
+        require((tested/'Modules/OGLClient/Licenses').is_dir(), 'Original renderer resource notices required')
         changes=prepare_runtime(original_archive,tested,runtime,args.output/'tested-driver-variants',producer)
         files=runtime_files(runtime,producer)
         archive=args.output/'runtime.zip'
