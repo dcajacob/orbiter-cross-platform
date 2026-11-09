@@ -1,0 +1,576 @@
+{
+  "protocol": "phase6-complete-joint-GeneralApi-actual-inputs-v1",
+  "repository": {
+    "owner": "dcajacob",
+    "repo": "orbiter-cross-platform"
+  },
+  "scope": "Exact completed existing inputs only; no simulation, source relabeling or admission qualification",
+  "inputs": {
+    "native-Debug-automatic": {
+      "family": "native-capture",
+      "run_id": 42701960873,
+      "source": "a75157bdec9f49b17da6ca04eb57699e16c87e8a",
+      "branch": "qualification/native-general-api-v2",
+      "workflow": ".github/workflows/phase6-native-general-api.yml",
+      "run_attempt": 1,
+      "artifact_id": 13712350791,
+      "artifact_name": "native-GeneralApi-Debug-automatic",
+      "archive_bytes": 320264924,
+      "archive_sha256": "388805482645bddfa827f57cd33e79dc2d5aae8c540bbb6b1128dff5595ab072",
+      "jobs": {
+        "129448700566": {
+          "name": "readiness",
+          "status": "completed",
+          "conclusion": "success",
+          "labels": [
+            "ubuntu-24.04"
+          ]
+        },
+        "129448960799": {
+          "name": "Native original and corrected API Release sse2",
+          "status": "completed",
+          "conclusion": "success",
+          "labels": [
+            "ubuntu-24.04"
+          ]
+        },
+        "129448960802": {
+          "name": "Native original and corrected API Release automatic",
+          "status": "completed",
+          "conclusion": "success",
+          "labels": [
+            "ubuntu-24.04"
+          ]
+        },
+        "129448960890": {
+          "name": "Native original and corrected API Debug sse2",
+          "status": "completed",
+          "conclusion": "success",
+          "labels": [
+            "ubuntu-24.04"
+          ]
+        },
+        "129448961099": {
+          "name": "Native original and corrected API Debug automatic",
+          "status": "completed",
+          "conclusion": "success",
+          "labels": [
+            "ubuntu-24.04"
+          ]
+        }
+      }
+    },
+    "native-Debug-sse2": {
+      "family": "native-capture",
+      "run_id": 42701960873,
+      "source": "a75157bdec9f49b17da6ca04eb57699e16c87e8a",
+      "branch": "qualification/native-general-api-v2",
+      "workflow": ".github/workflows/phase6-native-general-api.yml",
+      "run_attempt": 1,
+      "artifact_id": 13712865162,
+      "artifact_name": "native-GeneralApi-Debug-sse2",
+      "archive_bytes": 320241034,
+      "archive_sha256": "f74c4129d8bc4da547a8efcff7ff86d1564453d519fc8a1ec60f5c30abb15345",
+      "jobs": {
+        "129448700566": {
+          "name": "readiness",
+          "status": "completed",
+          "conclusion": "success",
+          "labels": [
+            "ubuntu-24.04"
+          ]
+        },
+        "129448960799": {
+          "name": "Native original and corrected API Release sse2",
+          "status": "completed",
+          "conclusion": "success",
+          "labels": [
+            "ubuntu-24.04"
+          ]
+        },
+        "129448960802": {
+          "name": "Native original and corrected API Release automatic",
+          "status": "completed",
+          "conclusion": "success",
+          "labels": [
+            "ubuntu-24.04"
+          ]
+        },
+        "129448960890": {
+          "name": "Native original and corrected API Debug sse2",
+          "status": "completed",
+          "conclusion": "success",
+          "labels": [
+            "ubuntu-24.04"
+          ]
+        },
+        "129448961099": {
+          "name": "Native original and corrected API Debug automatic",
+          "status": "completed",
+          "conclusion": "success",
+          "labels": [
+            "ubuntu-24.04"
+          ]
+        }
+      }
+    },
+    "native-Release-automatic": {
+      "family": "native-capture",
+      "run_id": 42701960873,
+      "source": "a75157bdec9f49b17da6ca04eb57699e16c87e8a",
+      "branch": "qualification/native-general-api-v2",
+      "workflow": ".github/workflows/phase6-native-general-api.yml",
+      "run_attempt": 1,
+      "artifact_id": 13713145583,
+      "artifact_name": "native-GeneralApi-Release-automatic",
+      "archive_bytes": 320274510,
+      "archive_sha256": "641aa84ab0ad6a98cf495178738bab07324581de340c0843f7ca4d4848e8a860",
+      "jobs": {
+        "129448700566": {
+          "name": "readiness",
+          "status": "completed",
+          "conclusion": "success",
+          "labels": [
+            "ubuntu-24.04"
+          ]
+        },
+        "129448960799": {
+          "name": "Native original and corrected API Release sse2",
+          "status": "completed",
+          "conclusion": "success",
+          "labels": [
+            "ubuntu-24.04"
+          ]
+        },
+        "129448960802": {
+          "name": "Native original and corrected API Release automatic",
+          "status": "completed",
+          "conclusion": "success",
+          "labels": [
+            "ubuntu-24.04"
+          ]
+        },
+        "129448960890": {
+          "name": "Native original and corrected API Debug sse2",
+          "status": "completed",
+          "conclusion": "success",
+          "labels": [
+            "ubuntu-24.04"
+          ]
+        },
+        "129448961099": {
+          "name": "Native original and corrected API Debug automatic",
+          "status": "completed",
+          "conclusion": "success",
+          "labels": [
+            "ubuntu-24.04"
+          ]
+        }
+      }
+    },
+    "native-Release-sse2": {
+      "family": "native-capture",
+      "run_id": 42701960873,
+      "source": "a75157bdec9f49b17da6ca04eb57699e16c87e8a",
+      "branch": "qualification/native-general-api-v2",
+      "workflow": ".github/workflows/phase6-native-general-api.yml",
+      "run_attempt": 1,
+      "artifact_id": 13712112855,
+      "artifact_name": "native-GeneralApi-Release-sse2",
+      "archive_bytes": 320250511,
+      "archive_sha256": "edefd3fd32ad99e441911fdc2e54aa601ae9b7d36f46dc53a0b2b3f5e1fdc7d1",
+      "jobs": {
+        "129448700566": {
+          "name": "readiness",
+          "status": "completed",
+          "conclusion": "success",
+          "labels": [
+            "ubuntu-24.04"
+          ]
+        },
+        "129448960799": {
+          "name": "Native original and corrected API Release sse2",
+          "status": "completed",
+          "conclusion": "success",
+          "labels": [
+            "ubuntu-24.04"
+          ]
+        },
+        "129448960802": {
+          "name": "Native original and corrected API Release automatic",
+          "status": "completed",
+          "conclusion": "success",
+          "labels": [
+            "ubuntu-24.04"
+          ]
+        },
+        "129448960890": {
+          "name": "Native original and corrected API Debug sse2",
+          "status": "completed",
+          "conclusion": "success",
+          "labels": [
+            "ubuntu-24.04"
+          ]
+        },
+        "129448961099": {
+          "name": "Native original and corrected API Debug automatic",
+          "status": "completed",
+          "conclusion": "success",
+          "labels": [
+            "ubuntu-24.04"
+          ]
+        }
+      }
+    },
+    "native-final": {
+      "family": "native-final",
+      "run_id": 42705320489,
+      "source": "f5172e3ed0ae814b52b10cc2557e294e30d310bf",
+      "branch": "qualification/native-general-api-independent-v1",
+      "workflow": ".github/workflows/phase6-native-general-api-independent.yml",
+      "run_attempt": 1,
+      "artifact_id": 13712339534,
+      "artifact_name": "complete-independent-native-GeneralApi-subset",
+      "archive_bytes": 1365356,
+      "archive_sha256": "c8f8e545c6feec6f312e965968db4460bd2e170c8e5109ad09ba97771462e536",
+      "jobs": {
+        "129460481634": {
+          "name": "readiness",
+          "status": "completed",
+          "conclusion": "success",
+          "labels": [
+            "ubuntu-24.04"
+          ]
+        },
+        "129460749684": {
+          "name": "Independently audit native API Debug-automatic",
+          "status": "completed",
+          "conclusion": "success",
+          "labels": [
+            "ubuntu-24.04"
+          ]
+        },
+        "129460749700": {
+          "name": "Independently audit native API Release-automatic",
+          "status": "completed",
+          "conclusion": "success",
+          "labels": [
+            "ubuntu-24.04"
+          ]
+        },
+        "129460749711": {
+          "name": "Independently audit native API Debug-sse2",
+          "status": "completed",
+          "conclusion": "success",
+          "labels": [
+            "ubuntu-24.04"
+          ]
+        },
+        "129460749825": {
+          "name": "Independently audit native API Release-sse2",
+          "status": "completed",
+          "conclusion": "success",
+          "labels": [
+            "ubuntu-24.04"
+          ]
+        },
+        "129461862797": {
+          "name": "Verify complete native API subset proof",
+          "status": "completed",
+          "conclusion": "success",
+          "labels": [
+            "ubuntu-24.04"
+          ]
+        }
+      }
+    },
+    "providers": {
+      "family": "providers",
+      "run_id": 42528403133,
+      "source": "60ba46377f236c2d4705f444c0174e0f5af8252f",
+      "branch": "qualification/native-providers-retry",
+      "workflow": ".github/workflows/phase6-native-providers.yml",
+      "run_attempt": 1,
+      "artifact_id": 13636482999,
+      "artifact_name": "native-stock-runtime-providers",
+      "archive_bytes": 164848563,
+      "archive_sha256": "6304d1701c0fc0775b80046d1ed3aa813b07313207027046d9a026be4f1dfe9e",
+      "jobs": {
+        "128876988468": {
+          "name": "providers",
+          "status": "completed",
+          "conclusion": "success",
+          "labels": [
+            "ubuntu-24.04"
+          ]
+        }
+      }
+    },
+    "mesa": {
+      "family": "mesa",
+      "run_id": 42543636813,
+      "source": "6d17e4f18e4eade72fa295c3d03a38a58182d35f",
+      "branch": "qualification/mesa-topology-repair",
+      "workflow": ".github/workflows/phase6-mesa-topology.yml",
+      "run_attempt": 1,
+      "artifact_id": 13642189340,
+      "artifact_name": "mesa-topology-owner-repair",
+      "archive_bytes": 53687675,
+      "archive_sha256": "7a2b06da0b1d39153066414d8ea303cdfafcbe8184170e9e80bc33cee6d61392",
+      "jobs": {
+        "128923839407": {
+          "name": "mesa",
+          "status": "completed",
+          "conclusion": "success",
+          "labels": [
+            "ubuntu-24.04"
+          ]
+        }
+      }
+    },
+    "sdk-Debug": {
+      "family": "windows-sdk",
+      "run_id": 42525562745,
+      "source": "c08f93151827949ee3ad498f8021f35c11753fde",
+      "branch": "qualification/current-windows-sdk-retry",
+      "workflow": ".github/workflows/phase6-current-windows-sdk.yml",
+      "run_attempt": 1,
+      "artifact_id": 13636121355,
+      "artifact_name": "current-windows-sdk-Debug",
+      "archive_bytes": 302580954,
+      "archive_sha256": "92feab053d8120c90f0abdfa0e90b7466fcfb0c7833b610245d4e90323ad0419",
+      "jobs": {
+        "128868298016": {
+          "name": "controls",
+          "status": "completed",
+          "conclusion": "success",
+          "labels": [
+            "ubuntu-24.04"
+          ]
+        },
+        "128868408173": {
+          "name": "current-windows / Real Windows client Release x64",
+          "status": "completed",
+          "conclusion": "success",
+          "labels": [
+            "windows-2025"
+          ]
+        },
+        "128868408184": {
+          "name": "current-windows / Real Windows client Debug x64",
+          "status": "completed",
+          "conclusion": "success",
+          "labels": [
+            "windows-2025"
+          ]
+        },
+        "128875554076": {
+          "name": "current-windows / Windows client numerical, scene and image comparison",
+          "status": "completed",
+          "conclusion": "success",
+          "labels": [
+            "ubuntu-24.04"
+          ]
+        }
+      }
+    },
+    "sdk-Release": {
+      "family": "windows-sdk",
+      "run_id": 42525562745,
+      "source": "c08f93151827949ee3ad498f8021f35c11753fde",
+      "branch": "qualification/current-windows-sdk-retry",
+      "workflow": ".github/workflows/phase6-current-windows-sdk.yml",
+      "run_attempt": 1,
+      "artifact_id": 13635896646,
+      "artifact_name": "current-windows-sdk-Release",
+      "archive_bytes": 207768498,
+      "archive_sha256": "079b7ad0c06dd66454a9a60697670bee370fbcca0e040a4d877e934d952dd206",
+      "jobs": {
+        "128868298016": {
+          "name": "controls",
+          "status": "completed",
+          "conclusion": "success",
+          "labels": [
+            "ubuntu-24.04"
+          ]
+        },
+        "128868408173": {
+          "name": "current-windows / Real Windows client Release x64",
+          "status": "completed",
+          "conclusion": "success",
+          "labels": [
+            "windows-2025"
+          ]
+        },
+        "128868408184": {
+          "name": "current-windows / Real Windows client Debug x64",
+          "status": "completed",
+          "conclusion": "success",
+          "labels": [
+            "windows-2025"
+          ]
+        },
+        "128875554076": {
+          "name": "current-windows / Windows client numerical, scene and image comparison",
+          "status": "completed",
+          "conclusion": "success",
+          "labels": [
+            "ubuntu-24.04"
+          ]
+        }
+      }
+    },
+    "windows-audit-Debug": {
+      "family": "windows-audit",
+      "run_id": 42719673631,
+      "source": "ee3c61df1a5f829485aba7cf7517ea08a3f0861c",
+      "branch": "qualification/current-windows-general-api-reaudit-v3",
+      "workflow": ".github/workflows/phase6-current-windows-general-api-reaudit.yml",
+      "run_attempt": 1,
+      "artifact_id": 13720470280,
+      "artifact_name": "published-Windows-GeneralApi-reaudit-Debug",
+      "archive_bytes": 2052096,
+      "archive_sha256": "6526027f41fb49c9522c7fd1c82baee011db2043c628008737c0b6075c15f13e",
+      "jobs": {
+        "129510123973": {
+          "name": "readiness",
+          "status": "completed",
+          "conclusion": "success",
+          "labels": [
+            "ubuntu-24.04"
+          ]
+        },
+        "129510432125": {
+          "name": "Reaudit existing Windows API Release",
+          "status": "completed",
+          "conclusion": "success",
+          "labels": [
+            "windows-2025"
+          ]
+        },
+        "129510432132": {
+          "name": "Reaudit existing Windows API Debug",
+          "status": "completed",
+          "conclusion": "success",
+          "labels": [
+            "windows-2025"
+          ]
+        }
+      }
+    },
+    "windows-audit-Release": {
+      "family": "windows-audit",
+      "run_id": 42719673631,
+      "source": "ee3c61df1a5f829485aba7cf7517ea08a3f0861c",
+      "branch": "qualification/current-windows-general-api-reaudit-v3",
+      "workflow": ".github/workflows/phase6-current-windows-general-api-reaudit.yml",
+      "run_attempt": 1,
+      "artifact_id": 13718879679,
+      "artifact_name": "published-Windows-GeneralApi-reaudit-Release",
+      "archive_bytes": 1890617,
+      "archive_sha256": "f53c525b0e33d2f48ff340ce68648e70626a36c315f47e7d2921f4d448653df4",
+      "jobs": {
+        "129510123973": {
+          "name": "readiness",
+          "status": "completed",
+          "conclusion": "success",
+          "labels": [
+            "ubuntu-24.04"
+          ]
+        },
+        "129510432125": {
+          "name": "Reaudit existing Windows API Release",
+          "status": "completed",
+          "conclusion": "success",
+          "labels": [
+            "windows-2025"
+          ]
+        },
+        "129510432132": {
+          "name": "Reaudit existing Windows API Debug",
+          "status": "completed",
+          "conclusion": "success",
+          "labels": [
+            "windows-2025"
+          ]
+        }
+      }
+    },
+    "windows-final-Debug": {
+      "family": "windows-final",
+      "run_id": 42720521414,
+      "source": "6725a211b143222ddf5be3b87f25f4d46e7767cf",
+      "branch": "qualification/windows-general-api-independent-v1",
+      "workflow": ".github/workflows/phase6-windows-general-api-independent.yml",
+      "run_attempt": 1,
+      "artifact_id": 13720100926,
+      "artifact_name": "independent-published-Windows-GeneralApi-Debug",
+      "archive_bytes": 264004,
+      "archive_sha256": "0824a531e70f7cea41322074d9322317ec466f34d968be0f31bdf4671615b444",
+      "jobs": {
+        "129513002315": {
+          "name": "readiness",
+          "status": "completed",
+          "conclusion": "success",
+          "labels": [
+            "ubuntu-24.04"
+          ]
+        },
+        "129513252446": {
+          "name": "Verify published Windows API Release",
+          "status": "completed",
+          "conclusion": "success",
+          "labels": [
+            "ubuntu-24.04"
+          ]
+        },
+        "129513252451": {
+          "name": "Verify published Windows API Debug",
+          "status": "completed",
+          "conclusion": "success",
+          "labels": [
+            "ubuntu-24.04"
+          ]
+        }
+      }
+    },
+    "windows-final-Release": {
+      "family": "windows-final",
+      "run_id": 42720521414,
+      "source": "6725a211b143222ddf5be3b87f25f4d46e7767cf",
+      "branch": "qualification/windows-general-api-independent-v1",
+      "workflow": ".github/workflows/phase6-windows-general-api-independent.yml",
+      "run_attempt": 1,
+      "artifact_id": 13719808125,
+      "artifact_name": "independent-published-Windows-GeneralApi-Release",
+      "archive_bytes": 264207,
+      "archive_sha256": "fea0d68bd6466036b56331e243e084d83dcdf6f8f41b4644e3876970868222a5",
+      "jobs": {
+        "129513002315": {
+          "name": "readiness",
+          "status": "completed",
+          "conclusion": "success",
+          "labels": [
+            "ubuntu-24.04"
+          ]
+        },
+        "129513252446": {
+          "name": "Verify published Windows API Release",
+          "status": "completed",
+          "conclusion": "success",
+          "labels": [
+            "ubuntu-24.04"
+          ]
+        },
+        "129513252451": {
+          "name": "Verify published Windows API Debug",
+          "status": "completed",
+          "conclusion": "success",
+          "labels": [
+            "ubuntu-24.04"
+          ]
+        }
+      }
+    }
+  }
+}

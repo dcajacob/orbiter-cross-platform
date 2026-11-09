@@ -1,0 +1,100 @@
+name: Phase 6 Joint Native Windows General API Byte Closure
+on:
+  push:
+    branches: ['qualification/joint-general-api-v1']
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: phase6-joint-GeneralApi-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  qualify:
+    name: Joint original API qualification
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.14'
+      - name: Preserve all original and new small helper controls
+        run: mkdir -p out/joint-api-qualification/proof && python3 -B Tests/Production/Closeout/run_controls.py --output out/joint-api-qualification/proof/controls.json
+      - name: Execute original actual Lua and damaged-input controls
+        shell: bash
+        run: |
+          set -euo pipefail
+          if ! command -v lua5.4 >/dev/null; then
+            sudo apt-get update
+            sudo apt-get install -y --no-install-recommends lua5.4
+          fi
+          python3 -B Tests/Production/GeneralApiCorrection/Controls.Test.py --lua /usr/bin/lua5.4 --output out/joint-api-qualification/proof/helpers.json
+      - uses: actions/github-script@v8
+        with:
+          script: |
+            core.info(JSON.stringify(await require('./.github/scripts/phase6-download-bound-artifact.Test.cjs')({core})));
+      - name: Retain only the 13 exact completed source-bound inputs on GitHub
+        uses: actions/github-script@v8
+        with:
+          script: |
+            await require('./.github/scripts/phase6-download-joint-api-inputs.cjs')({github,context,core});
+      - name: Materialize every actual evidence byte and execute the unchanged complete qualifier
+        run: python3 -B Tests/Production/GeneralApiCorrection/Hosted/joint_api_qualification.py
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: joint-GeneralApi-qualified-reference
+          retention-days: 14
+          compression-level: 3
+          path: |
+            out/joint-api-qualification/proof/**
+            out/joint-api-qualification/materialized/**/*.json
+            out/joint-api-inputs/**/*.json
+            out/joint-api-inputs/**/*.body
+            out/joint-api-inputs/**/*partial*
+            out/joint-api-work/*-restoration.json
+  independent:
+    name: Independently restore and reproduce joint API qualification
+    needs: qualify
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.14'
+      - name: Retain this source's actual completed qualification artifact and original API
+        uses: actions/github-script@v8
+        with:
+          script: |
+            await require('./.github/scripts/phase6-download-joint-api-candidate.cjs')({github,context,core});
+      - name: Independently verify every published metadata member before restoring evidence
+        run: python3 -B Tests/Production/GeneralApiCorrection/Hosted/joint_api_qualification.py --unpack-published
+      - name: Independently retain and verify the exact original evidence archives again
+        uses: actions/github-script@v8
+        with:
+          script: |
+            await require('./.github/scripts/phase6-download-joint-api-inputs.cjs')({github,context,core});
+      - name: Independently re-read every actual scoped byte and reproduce the original qualified report exactly
+        run: >-
+          python3 -B Tests/Production/GeneralApiCorrection/Hosted/joint_api_qualification.py
+          --replay-published out/joint-api-published/source-artifact/joint-api-qualification/proof
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: independently-verified-joint-GeneralApi-reference
+          retention-days: 14
+          compression-level: 3
+          path: |
+            out/joint-api-qualification/proof/**
+            out/joint-api-qualification/materialized/**/*.json
+            out/joint-api-published/*.json
+            out/joint-api-published/*.body
+            out/joint-api-inputs/**/*.json
+            out/joint-api-inputs/**/*.body
+            out/joint-api-inputs/**/*partial*
+            out/joint-api-work/*-restoration.json
