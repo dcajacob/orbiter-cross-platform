@@ -100,16 +100,32 @@ class CurrentNativeMatrixTests(unittest.TestCase):
             with self.assertRaises(ValueError):matrix.source_proof(report,matrix.SOURCE)
 
     def test_actual_staged_reload_bytes_and_complete_provenance_are_equal(self):
+        from types import SimpleNamespace
         with tempfile.TemporaryDirectory() as temporary:
-            root=Path(temporary);left=root/'current';right=root/'native';left.mkdir();right.mkdir()
-            for folder in (left,right):(folder/'input.scn').write_bytes(b'original saved bytes')
-            digest=matrix.sha(left/'input.scn');record=dict(persistence_input=dict(saved_input_sha256=digest),executed_case=dict(scenario_entry_point='input.scn'))
-            supplied=dict(sha256=digest,parent_producer_commit=matrix.native.physical.original.SOURCE,parent_run='fixture-1',parent_capture_sha256='a'*64)
-            result=cli.reload_input(left,right,record,copy.deepcopy(record),supplied);self.assertTrue(result['actual_staged_inputs_identical'])
+            root=Path(temporary);left=root/'current';right=root/'native';parent=root/'original';run=parent/'fixture-1'
+            for folder in (left,right,run):folder.mkdir(parents=True)
+            for folder,name in ((left,'input.scn'),(right,'input.scn'),(run,'Scenarios/(Current state).scn')):
+                path=folder/name;path.parent.mkdir(parents=True,exist_ok=True);path.write_bytes(b'original saved bytes')
+            (parent/'capture.json').write_text(json.dumps(dict(producer_commit=matrix.native.physical.original.SOURCE)))
+            digest=matrix.sha(left/'input.scn');case=dict(id='fixture');derived=dict(scenario_entry_point='input.scn')
+            provenance=dict(saved_input_sha256=digest,derived_scenario_entry_point='input.scn',fixture_complete_owning_fields={'preserved':True})
+            checked=dict(matched_clock_observation={'fixture':'clock'},configuration_input={'fixture':'configuration'})
+            reader=SimpleNamespace(derived_case=lambda *a:(derived,copy.deepcopy(provenance)),windows=SimpleNamespace(inspect_artifacts=lambda *a:copy.deepcopy(checked)))
+            supplied=dict(sha256=digest,parent_producer_commit=matrix.native.physical.original.SOURCE,parent_run='fixture-1',parent_capture_sha256=matrix.sha(parent/'capture.json'))
+            current=dict(persistence_input=copy.deepcopy(provenance),executed_case=derived)
+            extended=provenance|dict(parent_capture_sha256=supplied['parent_capture_sha256'],parent_run='fixture-1',parent_finalized_clock=checked['matched_clock_observation'],
+                parent_producer_commit=matrix.native.physical.original.SOURCE,parent_startup_configuration=checked['configuration_input'],parent_source_variant_protocol='remaining-stock-repaired-sources-v4')
+            native=dict(persistence_input=copy.deepcopy(extended),executed_case=derived);before=copy.deepcopy((current,native))
+            result=cli.reload_input(left,right,current,native,supplied,reader=reader,case=case,config={},original_parent=parent)
+            self.assertTrue(result['actual_staged_inputs_identical']);self.assertEqual((current,native),before)
+            for key in set(extended)-set(provenance):
+                changed=copy.deepcopy(native);changed['persistence_input'].pop(key)
+                with self.assertRaises(ValueError):cli.reload_input(left,right,current,changed,supplied,reader=reader,case=case,config={},original_parent=parent)
             (right/'input.scn').write_bytes(b'changed')
-            with self.assertRaises(ValueError):cli.reload_input(left,right,record,copy.deepcopy(record),supplied)
+            with self.assertRaises(ValueError):cli.reload_input(left,right,current,native,supplied,reader=reader,case=case,config={},original_parent=parent)
 
     def pair_report(self,phase='stock'):
+        identity=dict(current_actual_math='fma3',native_actual_math='amd-6121d02-fma3',source_defined_implementation='fma3',owning_identifiers_preserved_without_rewriting=True)
         return dict(protocol='phase6-direct-current-native-and-current-build-phase-v1',status='passed-one-complete-direct-current-native-and-current-build-phase-only',
             auditor_source='a'*40,math_profile='automatic',phase=phase,required_cases=38,required_repeats=2,required_frames=960,
             actual_current_native_pairs=152,actual_current_build_pairs=76,complete_phase_aggregation={'fixture':'already independently verified'},
@@ -119,11 +135,19 @@ class CurrentNativeMatrixTests(unittest.TestCase):
             original_reference={'fixture':True},raw_observation_bindings={p:{} for p in ('Debug-automatic','Release-automatic')},
             original_retry_reference_comparisons={p:{c:dict(API_attempts_normalized=False,old_failed_attempt_relabelled=False) for c in ('current','native')} for p in ('Debug-automatic','Release-automatic')},
             cases={c['id']:dict(runs=[dict(current_build=self.pair(),current_native={cfg:dict(comparison=self.pair(),
-                exact_saved_input=None if phase=='stock' else dict(actual_staged_inputs_identical=True,original_save_sha256='b'*64,
+                execution_identity=copy.deepcopy(identity),exact_saved_input=None if phase=='stock' else dict(actual_staged_inputs_identical=True,original_save_sha256='b'*64,
                     original_parent_capture_sha256='c'*64,original_parent_run=c['id']+'-'+str(n))) for cfg in ('Debug','Release')}) for n in (1,2)]) for c in self.config()['cases']})
 
+    def bind_fixture_identities(self,report,mode='automatic'):
+        implementation='sse2' if mode=='sse2' else 'fma3'
+        for case in report['cases'].values():
+            for run in case['runs']:
+                for value in run['current_native'].values():
+                    value['execution_identity'].update(current_actual_math=implementation,native_actual_math='amd-6121d02-'+implementation,source_defined_implementation=implementation,exact_saved_input=value['exact_saved_input'])
+        return report
+
     def test_final_scope_requires_actual_direct_pairs_full_cases_and_unchanged_budgets(self):
-        report=self.pair_report();aggregate=report['complete_phase_aggregation'];cli.pair_scope(report,'automatic','stock','a'*40,aggregate,self.config())
+        report=self.bind_fixture_identities(self.pair_report());aggregate=report['complete_phase_aggregation'];cli.pair_scope(report,'automatic','stock','a'*40,aggregate,self.config())
         for change in (lambda r:r.update(actual_current_native_pairs=76),lambda r:r.update(actual_current_build_pairs=75),
             lambda r:r['cases'].pop('fixture00'),lambda r:r['cases']['fixture00']['runs'].pop(),
             lambda r:r['cases']['fixture00']['runs'][0]['current_native'].pop('Release'),
@@ -135,7 +159,7 @@ class CurrentNativeMatrixTests(unittest.TestCase):
             with self.assertRaises(ValueError):cli.pair_scope(altered,'automatic','stock','a'*40,aggregate,self.config())
 
     def test_final_reload_scope_requires_both_actual_original_saved_inputs(self):
-        report=self.pair_report('reload');aggregate=report['complete_phase_aggregation'];cli.pair_scope(report,'automatic','reload','a'*40,aggregate,self.config())
+        report=self.bind_fixture_identities(self.pair_report('reload'));aggregate=report['complete_phase_aggregation'];cli.pair_scope(report,'automatic','reload','a'*40,aggregate,self.config())
         for changed_input in (None,dict(actual_staged_inputs_identical=False,original_save_sha256='b'*64,original_parent_capture_sha256='c'*64,original_parent_run='fixture-1')):
             bad=copy.deepcopy(report);bad['cases']['fixture00']['runs'][0]['current_native']['Release']['exact_saved_input']=changed_input
             with self.assertRaises((ValueError,TypeError)):cli.pair_scope(bad,'automatic','reload','a'*40,aggregate,self.config())
@@ -155,7 +179,9 @@ class CurrentNativeMatrixTests(unittest.TestCase):
     def test_direct_loop_invokes_all_owned_comparisons_and_preserves_partial_failure(self):
         from types import SimpleNamespace
         with tempfile.TemporaryDirectory() as temporary:
-            root=Path(temporary);config=self.config();head='a'*40
+            root=Path(temporary);config=self.config();head='a'*40;scene=b'original frozen fixture scene\n'
+            for case in config['cases']:case.update(scenario_entry_point='Scenarios/'+case['id']+'.scn',sha256_lf=matrix.hashlib.sha256(scene).hexdigest())
+            def stock(case):return dict(protocol='fixture-stock',phase='stock-writer',original_parent_case=case,stock_input_sha256=matrix.hashlib.sha256(scene).hexdigest(),original_scenarios_and_scripts_unchanged=True,native_admission_qualified=False,phase6_complete=False)
             original={k:('a'*64 if 'sha256' in k else 1) for k in ('archive_sha256','archive_bytes','decoded_members_sha256','original_stock_job_id','transport_protocol')}
             restored=dict(original_api_archive_bindings={p:copy.deepcopy(original) for p in matrix.native.PROFILES})
             cps=[];nps=[];workers={};native_roots={}
@@ -163,16 +189,20 @@ class CurrentNativeMatrixTests(unittest.TestCase):
                 report=dict(original_binding=copy.deepcopy(original),cases={c['id']:dict(runs=[dict(actual_observation=dict(observation=dict(actual_math='fma3'))) for n in (1,2)]) for c in config['cases']})
                 cps.append(dict(cell=list(cell),report=report))
                 profile=cell[0]+'-'+cell[1];phase=matrix.PHASES[cell[2]]
-                nr=dict(independent_native_observations=dict(cases={c['id']:dict(runs=[dict(actual_math='fma3') for n in (1,2)]) for c in config['cases']}),
+                nr=dict(independent_native_observations=dict(cases={c['id']:dict(runs=[dict(actual_math='amd-6121d02-fma3',executed_case=c,persistence_input=stock(c)) for n in (1,2)]) for c in config['cases']}),
                     original_api_bindings={profile:copy.deepcopy(original)})
                 nps.append(dict(profile=profile,phase=phase,report=nr))
             for cfg in ('Debug','Release'):
                 profile=cfg+'-automatic';folder=root/profile;folder.mkdir();native_roots[profile]=folder
-                records={c['id']:dict(runs=[dict(actual_math='fma3',persistence_input=None,executed_case=c) for n in (1,2)]) for c in config['cases']}
+                records={c['id']:dict(runs=[dict(actual_math='amd-6121d02-fma3',persistence_input=stock(c),executed_case=c) for n in (1,2)]) for c in config['cases']}
+                for case in config['cases']:
+                    for n in (1,2):
+                        for base,body in ((folder,scene),(root/('current-'+profile),scene.replace(b'\n',b'\r\n'))):
+                            path=base/(case['id']+'-'+str(n))/case['scenario_entry_point'];path.parent.mkdir(parents=True,exist_ok=True);path.write_bytes(body)
                 (folder/'capture.json').write_text(json.dumps(dict(cases=records)))
-                workers[profile]=dict(cases={'automatic-stock-'+k:v for k,v in records.items()})
+                workers[profile]=dict(cases={'automatic-stock-'+c['id']:dict(runs=[dict(actual_math='fma3',persistence_input=None,executed_case=c) for n in (1,2)]) for c in config['cases']})
             reader=SimpleNamespace(native=SimpleNamespace(settings=lambda p:config,shared=SimpleNamespace()),
-                protocols=SimpleNamespace(V2={}),windows=SimpleNamespace(image_ssim=lambda *a:1.))
+                protocols=SimpleNamespace(V2={}),protocol=lambda:dict(protocol='fixture-stock'),windows=SimpleNamespace(image_ssim=lambda *a:1.))
             def current(cell,*a,**kw):
                 profile=cell[0]+'-'+cell[1]
                 return root/('current-'+profile),dict(payload=str(root/('payload-'+profile))),{},workers[profile]
@@ -193,7 +223,7 @@ class CurrentNativeMatrixTests(unittest.TestCase):
         for m,p in cli.PAIRS:jobs.append(dict(id=len(jobs)+1,name='Direct current native builds '+m+' '+p,run_id=run_id,head_sha=head,run_attempt=1,
             status='completed',conclusion='success',labels=['ubuntu-24.04'],steps=[dict(name=n,status='completed',conclusion='success') for n in cli.PAIR_STEPS]))
         jobs.append(dict(id=5,name='readiness',run_id=run_id,head_sha=head,run_attempt=1,status='completed',conclusion='success',labels=['ubuntu-24.04'],
-            steps=[dict(name='Require all actual current and native physical phases',status='completed',conclusion='success')]))
+            steps=[dict(name=n,status='completed',conclusion='success') for n in ('Require all actual current and native physical phases','Verify exact pinned artifact download retries without weakening byte guards')]))
         jobs.append(dict(id=6,name='Independently close all current native phases and direct comparisons',run_id=run_id,head_sha=head,run_attempt=1,status='in_progress',conclusion=None,labels=['ubuntu-24.04'],steps=[]))
         return dict(repository=dict(owner='dcajacob',repo='orbiter-cross-platform'),jobs=jobs,
             run=dict(id=run_id,head_sha=head,run_attempt=1,head_branch=cli.BRANCH,path=cli.WORKFLOW,status='in_progress',conclusion=None,
@@ -218,7 +248,7 @@ class CurrentNativeMatrixTests(unittest.TestCase):
             reader=SimpleNamespace(native=SimpleNamespace(settings=lambda p:config),protocols=SimpleNamespace(V2={}))
             for number,(mode,phase) in enumerate(sorted(cli.PAIRS),1):
                 base=root/'out/current-matrix-pair-inputs'/(mode+'-'+phase);base.mkdir(parents=True)
-                report=self.pair_report(phase);report['math_profile']=mode
+                report=self.bind_fixture_identities(self.pair_report(phase),mode);report['math_profile']=mode
                 report['raw_observation_bindings']={p:{} for p in ('Debug-'+mode,'Release-'+mode)}
                 report['original_retry_reference_comparisons']={p:{c:dict(API_attempts_normalized=False,old_failed_attempt_relabelled=False) for c in ('current','native')} for p in ('Debug-'+mode,'Release-'+mode)}
                 with zipfile.ZipFile(base/'producer.zip','w') as zipped:zipped.writestr('current-native-matrix-results/'+mode+'-'+phase+'.json',json.dumps(report))
@@ -270,6 +300,35 @@ class CurrentNativeMatrixTests(unittest.TestCase):
                 self.assertTrue(parent.is_dir());self.assertEqual(actual_request,request);self.assertEqual(actual_worker,worker)
                 (folder/'fixture00-1/scene.rgba').write_bytes(b'changed')
                 with self.assertRaises(ValueError):matrix.bind_raw(cell,proof,Path(binding['payload']),decode=False)
+
+    def test_exact_source_defined_math_names_and_complete_stock_descriptors_are_preserved(self):
+        from types import SimpleNamespace
+        source=matrix.native.physical.writers.SOURCE
+        owner=__import__('subprocess').check_output(['git','-C',str(matrix.ROOT),'show',source+':Tests/Production/RemainingVessels/native.py'],text=True)
+        self.assertIn("'amd-6121d02-'",owner)
+        with tempfile.TemporaryDirectory() as temporary:
+            root=Path(temporary);current=root/'current';native=root/'native';current.mkdir();native.mkdir()
+            body=b'unchanged frozen scene\n';case=dict(id='fixture',scenario_entry_point='input.scn',sha256_lf=matrix.hashlib.sha256(body).hexdigest())
+            (current/'input.scn').write_bytes(body.replace(b'\n',b'\r\n'));(native/'input.scn').write_bytes(body)
+            reader=SimpleNamespace(protocol=lambda:dict(protocol='fixture-stock'))
+            provenance=dict(protocol='fixture-stock',phase='stock-writer',original_parent_case=case,stock_input_sha256=matrix.sha(native/'input.scn'),
+                original_scenarios_and_scripts_unchanged=True,native_admission_qualified=False,phase6_complete=False)
+            for mode,implementation in (('automatic','fma3'),('sse2','sse2')):
+                c=dict(actual_math=implementation,executed_case=case,persistence_input=None)
+                n=dict(actual_math='amd-6121d02-'+implementation,executed_case=case,persistence_input=copy.deepcopy(provenance))
+                co=dict(actual_math=implementation);no=copy.deepcopy(n);before=copy.deepcopy((c,n,co,no))
+                result=cli.execution_identity(mode,'stock',case,current,native,c,n,co,no,reader=reader,config={})
+                self.assertEqual(result['current_actual_math'],implementation);self.assertEqual(result['native_actual_math'],n['actual_math'])
+                self.assertTrue(result['owning_identifiers_preserved_without_rewriting']);self.assertEqual((c,n,co,no),before)
+                for mutate in (lambda a,b,x,y:b.update(actual_math='amd-unknown-'+implementation),
+                    lambda a,b,x,y:a.update(actual_math='amd-6121d02-'+implementation),
+                    lambda a,b,x,y:x.update(actual_math='unknown'),lambda a,b,x,y:y.update(executed_case={'id':'wrong'}),
+                    lambda a,b,x,y:b['persistence_input'].update(stock_input_sha256='0'*64),lambda a,b,x,y:a.update(persistence_input={}),
+                    lambda a,b,x,y:b['persistence_input'].pop('original_scenarios_and_scripts_unchanged')):
+                    args=copy.deepcopy((c,n,co,no));mutate(*args)
+                    with self.assertRaises(ValueError):cli.execution_identity(mode,'stock',case,current,native,*args,reader=reader,config={})
+            (current/'input.scn').write_bytes(b'changed frozen scene')
+            with self.assertRaises(ValueError):cli.execution_identity('sse2','stock',case,current,native,c,n,co,no,reader=reader,config={})
 
     def test_workflow_never_runs_simulators_or_builds_and_preserves_all_partial_outputs(self):
         text=(matrix.ROOT/'.github/workflows/phase6-current-native-matrix.yml').read_text()

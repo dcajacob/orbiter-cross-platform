@@ -1,7 +1,7 @@
 name: Phase 6 Complete Current Native Stock Matrix And Direct Current Builds
 on:
   push:
-    branches: [qualification/current-native-matrix-v2]
+    branches: [qualification/current-native-matrix-v3]
 permissions:
   contents: read
   actions: read
@@ -21,6 +21,15 @@ jobs:
           mkdir -p out
           python3 -B Tests/Production/Closeout/run_controls.py --output out/current-matrix-controls.json
           python3 -B Tests/Production/Closeout/current_native_matrix_cli.py --plan > out/native-matrix-plan.json
+      - name: Verify exact pinned artifact download retries without weakening byte guards
+        uses: actions/github-script@v8
+        with:
+          script: |
+            const fs=require('fs'),crypto=require('crypto');
+            const report=await require('./.github/scripts/phase6-download-bound-artifact.Test.cjs')({core});
+            report.production_source_sha256=crypto.createHash('sha256').update(fs.readFileSync('.github/scripts/phase6-download-bound-artifact.cjs')).digest('hex');
+            report.control_source_sha256=crypto.createHash('sha256').update(fs.readFileSync('.github/scripts/phase6-download-bound-artifact.Test.cjs')).digest('hex');
+            fs.writeFileSync('out/current-matrix-transport-controls.json',JSON.stringify(report,null,2),{flag:'wx'});
       - name: Require all actual current and native physical phases
         uses: actions/github-script@v8
         with:
@@ -35,11 +44,14 @@ jobs:
           retention-days: 14
           path: |
             out/current-matrix-controls.json
+            out/current-matrix-transport-controls.json
             out/native-matrix-plan.json
             out/current-matrix-readiness.json
             out/native-matrix-readiness.json
             out/current-matrix-phase-inputs/**/api.json
+            out/current-matrix-phase-inputs/**/download-*
             out/native-matrix-phase-inputs/**/api.json
+            out/native-matrix-phase-inputs/**/download-*
   pair:
     name: Direct current native builds ${{ matrix.math_profile }} ${{ matrix.phase }}
     needs: readiness
@@ -102,10 +114,15 @@ jobs:
             out/current-matrix-readiness.json
             out/native-matrix-readiness.json
             out/current-matrix-phase-inputs/**/api.json
+            out/current-matrix-phase-inputs/**/download-*
             out/native-matrix-phase-inputs/**/api.json
+            out/native-matrix-phase-inputs/**/download-*
             out/current-matrix-current-inputs/**/api.json
+            out/current-matrix-current-inputs/**/download-*
             out/native-matrix-native-inputs/**/api.json
+            out/native-matrix-native-inputs/**/download-*
             out/native-matrix-scalar/api.json
+            out/native-matrix-scalar/download-*
             out/hosted-ssim-restoration/restoration.json
             out/reference-api/**
             out/reference-audit-restoration/restoration.json
@@ -149,5 +166,8 @@ jobs:
             out/current-matrix-readiness.json
             out/native-matrix-readiness.json
             out/current-matrix-phase-inputs/**/api.json
+            out/current-matrix-phase-inputs/**/download-*
             out/native-matrix-phase-inputs/**/api.json
+            out/native-matrix-phase-inputs/**/download-*
             out/current-matrix-pair-inputs/**/api.json
+            out/current-matrix-pair-inputs/**/download-*

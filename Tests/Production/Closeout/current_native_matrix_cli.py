@@ -9,7 +9,7 @@ import current_native_matrix as matrix
 from contracts import ROOT,require,sha,load,atomic_json
 
 PAIRS={(m,p) for m in ('automatic','sse2') for p in ('stock','reload')}
-BRANCH='qualification/current-native-matrix-v2'
+BRANCH='qualification/current-native-matrix-v3'
 WORKFLOW='.github/workflows/phase6-current-native-matrix.yml'
 PAIR_STEPS=('Independently restore all original raw members and both real attempts',
  'Restore only the independently proven scalar and unchanged controls',
@@ -59,16 +59,62 @@ def partial(output,head):
     atomic_json(output,result);return result
 
 
-def reload_input(current,native,current_record,native_record,supplied):
-    expected=supplied['sha256']
-    require(supplied['parent_producer_commit']==matrix.native.physical.original.SOURCE and
-        current_record['persistence_input']==native_record['persistence_input'] and
-        current_record['persistence_input']['saved_input_sha256']==expected and
-        sha(Path(current)/current_record['executed_case']['scenario_entry_point'])==
-        sha(Path(native)/native_record['executed_case']['scenario_entry_point'])==expected,
-        'Direct current/native reloads must consume identical actual staged original saved bytes')
+def reload_input(current,native,current_record,native_record,supplied,*,reader,case,config,original_parent):
+    """Independently require each complete owning schema and the same exact original save."""
+    current=Path(current);native=Path(native);original_parent=Path(original_parent);expected=supplied['sha256']
+    current_input=current/current_record['executed_case']['scenario_entry_point']
+    native_input=native/native_record['executed_case']['scenario_entry_point']
+    parent=load(original_parent/'capture.json');parent_run=original_parent/supplied['parent_run']
+    parent_save=parent_run/'Scenarios/(Current state).scn'
+    require(supplied['parent_producer_commit']==parent['producer_commit']==matrix.native.physical.original.SOURCE and
+        supplied['parent_capture_sha256']==sha(original_parent/'capture.json') and
+        sha(parent_save)==sha(current_input)==sha(native_input)==expected,
+        'Direct reloads must consume the same actual API-bound original saved bytes')
+    derived,provenance=reader.derived_case(case,config,parent_save,expected)
+    checked=reader.windows.inspect_artifacts(parent_run,case,config)
+    native_provenance=provenance|dict(parent_capture_sha256=sha(original_parent/'capture.json'),parent_run=supplied['parent_run'],
+        parent_finalized_clock=checked['matched_clock_observation'],parent_producer_commit=parent['producer_commit'],
+        parent_startup_configuration=checked['configuration_input'],parent_source_variant_protocol='remaining-stock-repaired-sources-v4')
+    require(current_record['executed_case']==native_record['executed_case']==derived and
+        current_record['persistence_input']==provenance and native_record['persistence_input']==native_provenance,
+        'Complete current derivation and all six native original-parent witnesses must retain their owning schemas')
     return dict(original_save_sha256=expected,actual_staged_inputs_identical=True,original_parent_run=supplied['parent_run'],
-        original_parent_capture_sha256=supplied['parent_capture_sha256'])
+        original_parent_capture_sha256=supplied['parent_capture_sha256'],current_derivation=provenance,native_derivation=native_provenance,
+        owning_receipts_preserved_without_rewriting=True)
+
+
+def execution_identity(mode,phase,case,current,native,current_record,native_record,current_observation,native_observation,
+                       *,reader,config,original_parent=None,supplied=None):
+    """Compare implementation semantics while retaining both exact source-defined receipts."""
+    require((mode,phase) in PAIRS,'Known complete execution profile required')
+    implementation='sse2' if mode=='sse2' else 'fma3'
+    native_math='amd-6121d02-'+implementation
+    require(current_record['actual_math']==current_observation['actual_math']==implementation and
+        native_record['actual_math']==native_observation['actual_math']==native_math,
+        'Each actual math identifier must equal its exact independently audited owning implementation')
+    require(current_record['executed_case']==native_record['executed_case']==native_observation['executed_case'] and
+        native_record['persistence_input']==native_observation['persistence_input'],
+        'Every raw native scene/provenance witness must equal its complete independent physical observation')
+    saved=None;stock=None
+    if phase=='stock':
+        require(current_record['executed_case']==case and current_record['persistence_input'] is None,
+            'Unchanged current stock scene with no reload derivation required')
+        native_path=Path(native)/case['scenario_entry_point'];current_path=Path(current)/case['scenario_entry_point']
+        expected=dict(protocol=reader.protocol()['protocol'],phase='stock-writer',original_parent_case=case,
+            stock_input_sha256=sha(native_path),original_scenarios_and_scripts_unchanged=True,native_admission_qualified=False,phase6_complete=False)
+        require(native_record['persistence_input']==expected and
+            matrix.hashlib.sha256(current_path.read_bytes().replace(b'\r\n',b'\n')).hexdigest()==
+            matrix.hashlib.sha256(native_path.read_bytes().replace(b'\r\n',b'\n')).hexdigest()==case['sha256_lf'],
+            'Both stock inputs must retain the original frozen scene and the complete native owning descriptor')
+        stock=dict(current_input_sha256=sha(current_path),native_input_sha256=sha(native_path),
+            frozen_scene_sha256_lf=case['sha256_lf'],current_descriptor=None,native_descriptor=expected)
+    else:
+        require(supplied is not None and original_parent is not None,'Actual complete independently restored original parent required')
+        saved=reload_input(current,native,current_record,native_record,supplied,
+            reader=reader,case=case,config=config,original_parent=original_parent)
+    return dict(current_actual_math=current_record['actual_math'],native_actual_math=native_record['actual_math'],
+        source_defined_implementation=implementation,owning_identifiers_preserved_without_rewriting=True,
+        stock_inputs=stock,exact_saved_input=saved)
 
 
 def direct_pairs(mode,phase,output):
@@ -116,16 +162,16 @@ def direct_pairs(mode,phase,output):
                     native_record=native_captures[profile]['cases'][case['id']]['runs'][repeat-1]
                     actual=ci[cell]['report']['cases'][case['id']]['runs'][repeat-1]['actual_observation']['observation']
                     nactual=ni[(profile,native_phase)]['report']['independent_native_observations']['cases'][case['id']]['runs'][repeat-1]
-                    require(actual['actual_math']==native_record['actual_math']==nactual['actual_math']==current_record['actual_math'] and
-                        current_record['persistence_input']==native_record['persistence_input'] and
-                        current_record['executed_case']==native_record['executed_case'],
-                        'Direct current/native observations must retain the same actual math and scene/input derivation')
-                    same_input=None
+                    parent=ROOT/'out/original-stock-audit/transport'/profile/'remaining-stock-repaired'
+                    supplied=None
                     if phase=='reload':
-                        supplied=next(v for v in requests[profile]['windows_save_inputs'] if (v['case'],v['repeat'])==(case['id'],repeat))
-                        same_input=reload_input(current[profile]/name,native[profile]/name,current_record,native_record,supplied)
+                        supplied,parent_save=matrix.observations.paired_input(parent,case,repeat,requests[profile],
+                            restored['original_api_archive_bindings'][profile]['decoded_members_sha256'],reader)
+                    identity=execution_identity(mode,phase,case,current[profile]/name,native[profile]/name,
+                        current_record,native_record,actual,nactual,reader=reader,config=config,original_parent=parent,supplied=supplied)
+                    same_input=identity['exact_saved_input']
                     pair=matrix.native.physical.persistence.compare_pair(current[profile]/name,native[profile]/name,reader,config)
-                    observed['current_native'][configuration]=dict(comparison=pair,exact_saved_input=same_input)
+                    observed['current_native'][configuration]=dict(comparison=pair,exact_saved_input=same_input,execution_identity=identity)
                     result['actual_current_native_pairs']+=1;save()
                 require(workers['Debug-'+mode]['cases'][mode+'-'+phase+'-'+case['id']]['runs'][repeat-1]['actual_math']==
                     workers['Release-'+mode]['cases'][mode+'-'+phase+'-'+case['id']]['runs'][repeat-1]['actual_math'],
@@ -161,7 +207,7 @@ def pair_api(record,head,run_id,mode,phase):
             j['conclusion']=='success' and 'ubuntu-24.04' in j['labels'] and 'self-hosted' not in j['labels'] for j in selected),
         'All four exact successful direct comparison jobs and readiness required')
     for job in selected:
-        for name in (('Require all actual current and native physical phases',) if job['name']=='readiness' else PAIR_STEPS):
+        for name in (('Require all actual current and native physical phases','Verify exact pinned artifact download retries without weakening byte guards') if job['name']=='readiness' else PAIR_STEPS):
             steps=[s for s in job['steps'] if s['name']==name]
             require(len(steps)==1 and steps[0]['status']=='completed' and steps[0]['conclusion']=='success','Actual direct comparison step required: '+name)
     require(artifact['name']=='current-native-direct-build-'+mode+'-'+phase and type(artifact['id']) is int and artifact['id']>0 and
@@ -196,6 +242,11 @@ def pair_scope(report,mode,phase,head,aggregates,config):
                     type(selected['ssim']) in (int,float) and matrix.math.isfinite(selected['ssim']) and selected['ssim']>=config['image_ssim_minimum'] and
                     all(k in selected for k in ('state','camera','detail_calibration_only')),'Every complete actual direct full-frame/state/clock/saved-content result required')
             for value in run['current_native'].values():
+                identity=value['execution_identity'];implementation='sse2' if mode=='sse2' else 'fma3'
+                require(identity['current_actual_math']==identity['source_defined_implementation']==implementation and
+                    identity['native_actual_math']=='amd-6121d02-'+implementation and identity['owning_identifiers_preserved_without_rewriting'] is True and
+                    identity['exact_saved_input']==value['exact_saved_input'],
+                    'Both source-defined actual implementation identifiers and input proofs must be preserved')
                 same=value['exact_saved_input']
                 require((phase=='stock' and same is None) or (phase=='reload' and same['actual_staged_inputs_identical'] is True and
                     matrix.native.re.fullmatch('[0-9a-f]{64}',same['original_save_sha256']) and same['original_parent_run'] and

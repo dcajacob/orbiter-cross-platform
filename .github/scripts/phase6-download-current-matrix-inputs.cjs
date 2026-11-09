@@ -12,7 +12,7 @@ module.exports=async ({github,context,core,metadataOnly=false,proofsOnly=false})
      artifact.size_in_bytes<=0||artifact.size_in_bytes>=4*1024**3) throw Error('Exact unexpired source/API archive required');
   fs.mkdirSync(base,{recursive:true});const api={repository:context.repo,...source,artifact};
   fs.writeFileSync(base+'/api.json',JSON.stringify(api,null,2),{flag:'wx'});
-  if(binary){const bytes=Buffer.from((await github.rest.actions.downloadArtifact({owner,repo,artifact_id:artifact.id,archive_format:'zip'})).data);
+  if(binary){const bytes=Buffer.from((await require('./phase6-download-bound-artifact.cjs')({github,owner,repo,source,artifact,base,core})).data);
    if(bytes.length!==artifact.size_in_bytes||'sha256:'+crypto.createHash('sha256').update(bytes).digest('hex')!==artifact.digest) throw Error('Actual raw API length/digest differs');
    fs.writeFileSync(base+'/producer.zip',bytes,{flag:'wx'});}
   return api;
