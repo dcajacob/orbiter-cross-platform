@@ -1,0 +1,127 @@
+{
+  "protocol": "disposable-helper-control-fixture-derived-from-actual-producer-API-v1",
+  "qualification_granted": false,
+  "roles": {
+    "native": {
+      "run": {
+        "id": 42519601899,
+        "head_sha": "ccc02c8a34bd1f227624d8778a141e8736ae8111"
+      },
+      "jobs": [
+        {
+          "id": 128849983694,
+          "run_id": 42519601899,
+          "head_sha": "ccc02c8a34bd1f227624d8778a141e8736ae8111",
+          "name": "Verify every discovered closeout control",
+          "status": "completed",
+          "conclusion": "success",
+          "labels": [
+            "ubuntu-24.04"
+          ]
+        },
+        {
+          "id": 128850109624,
+          "run_id": 42519601899,
+          "head_sha": "ccc02c8a34bd1f227624d8778a141e8736ae8111",
+          "name": "Verify native sanitizer dispatch and Python launcher controls",
+          "status": "completed",
+          "conclusion": "success",
+          "labels": [
+            "ubuntu-24.04"
+          ]
+        },
+        {
+          "id": 128850110970,
+          "run_id": 42519601899,
+          "head_sha": "ccc02c8a34bd1f227624d8778a141e8736ae8111",
+          "name": "Retry current Windows application and all client checks",
+          "status": "completed",
+          "conclusion": "skipped",
+          "labels": []
+        },
+        {
+          "id": 128850210172,
+          "run_id": 42519601899,
+          "head_sha": "ccc02c8a34bd1f227624d8778a141e8736ae8111",
+          "name": "Complete sanitized native package Release sse2",
+          "status": "completed",
+          "conclusion": "failure",
+          "labels": [
+            "ubuntu-24.04"
+          ]
+        },
+        {
+          "id": 128850210238,
+          "run_id": 42519601899,
+          "head_sha": "ccc02c8a34bd1f227624d8778a141e8736ae8111",
+          "name": "Complete sanitized native package Release automatic",
+          "status": "completed",
+          "conclusion": "failure",
+          "labels": [
+            "ubuntu-24.04"
+          ]
+        },
+        {
+          "id": 128850210252,
+          "run_id": 42519601899,
+          "head_sha": "ccc02c8a34bd1f227624d8778a141e8736ae8111",
+          "name": "Complete sanitized native package Debug sse2",
+          "status": "completed",
+          "conclusion": "failure",
+          "labels": [
+            "ubuntu-24.04"
+          ]
+        },
+        {
+          "id": 128850210257,
+          "run_id": 42519601899,
+          "head_sha": "ccc02c8a34bd1f227624d8778a141e8736ae8111",
+          "name": "Complete sanitized native package Debug automatic",
+          "status": "completed",
+          "conclusion": "failure",
+          "labels": [
+            "ubuntu-24.04"
+          ]
+        }
+      ]
+    },
+    "providers": {
+      "run": {
+        "id": 42528403133,
+        "head_sha": "60ba46377f236c2d4705f444c0174e0f5af8252f"
+      },
+      "jobs": [
+        {
+          "id": 128876988468,
+          "run_id": 42528403133,
+          "head_sha": "60ba46377f236c2d4705f444c0174e0f5af8252f",
+          "name": "providers",
+          "status": "completed",
+          "conclusion": "success",
+          "labels": [
+            "ubuntu-24.04"
+          ]
+        }
+      ]
+    },
+    "mesa": {
+      "run": {
+        "id": 42543636813,
+        "head_sha": "6d17e4f18e4eade72fa295c3d03a38a58182d35f"
+      },
+      "jobs": [
+        {
+          "id": 128923839407,
+          "run_id": 42543636813,
+          "head_sha": "6d17e4f18e4eade72fa295c3d03a38a58182d35f",
+          "name": "mesa",
+          "status": "completed",
+          "conclusion": "success",
+          "labels": [
+            "ubuntu-24.04"
+          ]
+        }
+      ]
+    }
+  }
+}

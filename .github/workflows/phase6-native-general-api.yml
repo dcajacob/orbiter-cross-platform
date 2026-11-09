@@ -2,7 +2,7 @@ name: Phase 6 Fresh Native General API Diagnostics
 
 on:
   push:
-    branches: ['qualification/native-general-api-v1']
+    branches: ['qualification/native-general-api-v2']
 
 permissions:
   contents: read
@@ -30,6 +30,7 @@ jobs:
         with:
           script: |
             core.info(JSON.stringify(await require('./.github/scripts/phase6-download-bound-artifact.Test.cjs')({core})));
+            core.info(JSON.stringify(await require('./.github/scripts/phase6-download-native-api-inputs.Test.cjs')({core})));
       - uses: actions/upload-artifact@v7
         if: always()
         with:

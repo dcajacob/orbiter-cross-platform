@@ -1,4 +1,24 @@
 // Download only existing source-bound native application and provider inputs on GitHub.
+// Skipped jobs have no runner. Require every actual producer and preserve that exact unrelated skipped entry.
+function validateJobs(role,run,jobs){
+ const expected=role==='native'?{
+  128849983694:['Verify every discovered closeout control','success'],
+  128850109624:['Verify native sanitizer dispatch and Python launcher controls','success'],
+  128850110970:['Retry current Windows application and all client checks','skipped'],
+  128850210172:['Complete sanitized native package Release sse2','failure'],
+  128850210238:['Complete sanitized native package Release automatic','failure'],
+  128850210252:['Complete sanitized native package Debug sse2','failure'],
+  128850210257:['Complete sanitized native package Debug automatic','failure']
+ } : role==='providers'?{128876988468:['providers','success']} : role==='mesa'?{128923839407:['mesa','success']}:null;
+ if(!expected||jobs.length!==Object.keys(expected).length||new Set(jobs.map(j=>j.id)).size!==jobs.length)throw Error('Exact complete producer job roster required');
+ for(const job of jobs){
+  const pin=expected[job.id];
+  if(!pin||job.run_id!==run.id||job.head_sha!==run.head_sha||job.name!==pin[0]||job.status!=='completed'||job.conclusion!==pin[1])throw Error('Actual source-bound producer job differs');
+  if(pin[1]==='skipped'){
+   if(job.id!==128850110970||job.labels.length!==0)throw Error('Only the exact never-started unrelated Windows job is skipped');
+  }else if(!job.labels.includes('ubuntu-24.04')||job.labels.includes('self-hosted'))throw Error('Every actual producer requires the standard Ubuntu runner');
+ }
+}
 module.exports=async ({github,context,core})=>{
  const fs=require('fs'),crypto=require('crypto'),{owner,repo}=context.repo;
  if(owner!=='dcajacob'||repo!=='orbiter-cross-platform'||(await github.rest.repos.get({owner,repo})).data.private)throw Error('Exact existing public repository required');
@@ -11,12 +31,12 @@ module.exports=async ({github,context,core})=>{
   const run=(await github.rest.actions.getWorkflowRun({owner,repo,run_id})).data;
   const jobs=await github.paginate(github.rest.actions.listJobsForWorkflowRun,{owner,repo,run_id,per_page:100});
   const artifact=(await github.rest.actions.getArtifact({owner,repo,artifact_id})).data;
-  if(run.id!==run_id||run.head_sha!==head||run.run_attempt!==1||run.status!=='completed'||run.conclusion!==(failed?'failure':'success')||
-     artifact.id!==artifact_id||artifact.expired||artifact.size_in_bytes!==size||artifact.digest!=='sha256:'+digest||
-     artifact.workflow_run.id!==run_id||artifact.workflow_run.head_sha!==head||!jobs.length||
-     jobs.some(j=>!j.labels.includes('ubuntu-24.04')||j.labels.includes('self-hosted')||j.status!=='completed'))throw Error('Exact completed native API source/API identity required: '+role);
   const base='out/native-api-source/'+role;fs.mkdirSync(base,{recursive:true});
   fs.writeFileSync(base+'/api.json',JSON.stringify({repository:context.repo,run,jobs,artifact},null,2),{flag:'wx'});
+  if(run.id!==run_id||run.head_sha!==head||run.run_attempt!==1||run.status!=='completed'||run.conclusion!==(failed?'failure':'success')||
+     artifact.id!==artifact_id||artifact.expired||artifact.size_in_bytes!==size||artifact.digest!=='sha256:'+digest||
+     artifact.workflow_run.id!==run_id||artifact.workflow_run.head_sha!==head)throw Error('Exact completed native API source/API identity required: '+role);
+  validateJobs(role,run,jobs);
   const source={run,jobs};
   const bytes=Buffer.from((await require('./phase6-download-bound-artifact.cjs')({github,owner,repo,source,artifact,base,core})).data);
   if(bytes.length!==size||crypto.createHash('sha256').update(bytes).digest('hex')!==digest)throw Error('Exact original API ZIP digest/length differs');
@@ -24,3 +44,4 @@ module.exports=async ({github,context,core})=>{
  }
  core.info('Retained only exact native runtime/provider inputs; no local download, build, stock recapture or qualification');
 };
+module.exports.validateJobs=validateJobs;
