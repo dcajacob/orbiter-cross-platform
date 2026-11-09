@@ -1,0 +1,67 @@
+name: Phase 6 Retained Corrected Native Failure Details
+on:
+  push:
+    branches: ['qualification/native-mesa-failure-details-v1']
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: phase6-native-mesa-failure-details-v1-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  details:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
+      - name: Verify the exact completed raw-log diagnostic API archive
+        uses: actions/github-script@v8
+        with:
+          script: |
+            const fs=require('fs'),crypto=require('crypto');
+            const {owner,repo}=context.repo;
+            const run_id=42552103764,artifact_id=13645638164;
+            const source='6f51bc31b08ea1ad81462d9b6d062e46c0ea7736';
+            const run=(await github.rest.actions.getWorkflowRun({owner,repo,run_id})).data;
+            const jobs=await github.paginate(github.rest.actions.listJobsForWorkflowRun,{owner,repo,run_id,per_page:100});
+            const artifact=(await github.rest.actions.getArtifact({owner,repo,artifact_id})).data;
+            if(owner!=='dcajacob'||repo!=='orbiter-cross-platform'||run.head_sha!==source||run.head_branch!=='qualification/native-mesa-writer-diagnostic-v1'||run.path!=='.github/workflows/phase6-native-mesa-writer-diagnostic.yml'||run.status!=='completed'||run.conclusion!=='success'||run.run_attempt!==1||jobs.length!==1||jobs[0].id!==128949741090||jobs[0].conclusion!=='success'||!jobs[0].labels.includes('ubuntu-24.04')||artifact.expired||artifact.workflow_run.id!==run_id||artifact.workflow_run.head_sha!==source||artifact.size_in_bytes!==616708||artifact.digest!=='sha256:948061e1025d78e0e650c99a8bf5b962326988a11bb406356ec1415789f39ea3') throw Error('Exact completed diagnostic producer and original API bytes required');
+            const reply=await github.rest.actions.downloadArtifact({owner,repo,artifact_id,archive_format:'zip'});
+            const bytes=Buffer.from(reply.data);
+            if(bytes.length!==artifact.size_in_bytes||'sha256:'+crypto.createHash('sha256').update(bytes).digest('hex')!==artifact.digest) throw Error('Actual diagnostic ZIP digest/length differs');
+            fs.mkdirSync('out/native-mesa-details',{recursive:true});
+            fs.writeFileSync('out/native-mesa-details/producer.zip',bytes);
+            fs.writeFileSync('out/native-mesa-details/api.json',JSON.stringify({repository:context.repo,run,jobs,artifact},null,2));
+      - name: Read actual unresolved process errors and provider mappings without execution
+        shell: python
+        run: |
+          import hashlib,json,re,zipfile
+          from pathlib import PurePosixPath
+          from pathlib import Path
+          root=Path('out/native-mesa-details');results={}
+          with zipfile.ZipFile(root/'producer.zip') as z:
+              names=z.namelist();assert len(names)==len(set(names))
+              assert all(not PurePosixPath(n).is_absolute() and '..' not in PurePosixPath(n).parts and ':' not in n and '\\' not in n for n in names)
+              candidates=[n for n in names if n.endswith('/diagnostic.json')];assert len(candidates)==1
+              report=json.loads(z.read(candidates[0]));assert report['capture_collector_source']=='026cc581467b3d1417e5dfbdfcc9de8cd4b7cc5e' and report['profile']=='Debug-automatic' and report['original_archive_sha256']=='ff7d19fea4ebf357f973963eb28b5edac96896a01c5c748c57cf8516ef20a035'
+              for original,receipt in report['files'].items():
+                  selected=[n for n in names if n.endswith('/selected/'+original)];assert len(selected)==1
+                  member=z.getinfo(selected[0]);assert member.file_size==receipt['bytes'] and member.file_size<16*1024**2
+                  body=z.read(member);assert hashlib.sha256(body).hexdigest()==receipt['sha256']
+                  text=body.decode(errors='replace');value=None
+                  if original.endswith(('actual-system-packages.txt','supplemental-system-packages.txt')):
+                      value='\n'.join(line for line in text.splitlines() if any(s in line for s in ('libdecor','libglfw','libgdk','fontconfig')))
+                  if original.endswith('remaining_stock_001-1/observer-loaded-maps.txt'):
+                      value='\n'.join(line for line in text.splitlines() if any(s in line.lower() for s in ('libdecor','libglfw','libgdk','fontconfig','liborbiter','libegl')))
+                  if any(original.endswith(name+'/console.log') for name,item in report['processes'].items() if item['process_result']['returncode']!=0):
+                      value=text[-18000:]
+                  if value is not None:results[original]=value;print(original+' actual retained details:\n'+value,flush=True)
+          (root/'details.json').write_text(json.dumps(dict(status='read-original-failed-logs-and-maps-only',files=results,simulation_executed=False,binaries_rebuilt=False,qualification_granted=False,phase6_complete=False),indent=2)+'\n')
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: native-mesa-retained-failure-details
+          retention-days: 14
+          path: |
+            out/native-mesa-details/api.json
+            out/native-mesa-details/details.json
