@@ -89,6 +89,7 @@ def inspect(payload,api,archive,cell,inputs,reader,config,original,original_arch
     protected=[payload,original,Path(inputs['runtime_local']),Path(inputs['observer_local']).parent,Path(mesa_root)]
     require(not output.exists() and all(not output.is_relative_to(path.resolve()) for path in protected),
             'Fresh independent report must be outside every protected input root')
+    output.parent.mkdir(parents=True,exist_ok=True)
     result=dict(protocol='phase6-independent-shader-current-original-physical-phase-v2',status='running',
         configuration=cell[0],math_profile=cell[1],phase=cell[2],profiles_required=4,matrix_cells_required=8,
         cases={},actual_current_processes=0,actual_original_comparisons=0,compiled_application_source=APPLICATION,

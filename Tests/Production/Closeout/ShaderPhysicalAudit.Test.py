@@ -114,6 +114,21 @@ class ShaderPhysicalAuditTests(unittest.TestCase):
             changed=copy.deepcopy(captured);changed['original_audit_artifact_id']+=1
             with self.assertRaises(ValueError):cli.compare_reference(changed,restored)
 
+    def test_audit_retains_its_first_partial_failure_in_a_new_output_directory(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root=Path(temporary);output=root/'fresh-reports/nested/cell.json'
+            inputs=dict(runtime_local=str(root/'runtime'),observer_local=str(root/'observer/observer.dll'))
+            with patch.dict(cli.os.environ,{'GITHUB_ACTIONS':'true'}),patch.object(phase.sys,'platform','linux'),\
+                 patch.object(phase,'api_identity',side_effect=ValueError('fixture-only failure before physical inspection')):
+                with self.assertRaisesRegex(ValueError,'fixture-only failure'):
+                    phase.inspect(root/'payload',{},root/'current.zip',('Debug','automatic','stock'),inputs,
+                        None,{},root/'original',root/'original.zip',root/'mesa',output)
+            result=json.loads(output.read_text())
+            self.assertEqual(result['status'],'failed');self.assertIn('fixture-only failure',result['error'])
+            self.assertEqual(result['actual_current_processes'],0);self.assertEqual(result['actual_original_comparisons'],0)
+            self.assertFalse(result['phase6_complete']);self.assertFalse(result['native_admission_qualified'])
+
+
     def test_all_shader_retry_and_owning_reader_sources_are_guarded_before_and_after(self):
         with tempfile.TemporaryDirectory() as temporary:
             root=Path(temporary);hosted=root/'Tests/Production/CurrentWindows/Hosted';hosted.mkdir(parents=True)
