@@ -34,19 +34,33 @@ class ShaderPhysicalAuditTests(unittest.TestCase):
         for number,cell in enumerate(sorted(readiness.EXPECTED),1):
             artifact=copy.deepcopy(record['artifact']);artifact.update(id=7000+number,
                 name='shader-source-complete-current-stock-'+'-'.join(cell));artifacts.append(artifact)
+        control=copy.deepcopy(record['artifact']);control.update(id=readiness.CONTROL_ID,name=readiness.CONTROL_NAME,
+            size_in_bytes=readiness.CONTROL_SIZE,digest=readiness.CONTROL_DIGEST);artifacts.append(control)
         return dict(repository=record['repository'],run=record['run'],jobs=record['jobs'],artifacts=artifacts)
 
     def test_all_eight_actual_cells_all_nine_jobs_and_shader_steps_are_required_before_readiness(self):
         record=self.api();result=readiness.verify(record)
         self.assertEqual(len(result['actual_capture_cells']),8);self.assertFalse(result['phase6_complete'])
-        for change in (lambda r:r['artifacts'].pop(),lambda r:r['artifacts'].append(copy.deepcopy(r['artifacts'][0])),
+        for change in (lambda r:r['artifacts'].pop(0),lambda r:r['artifacts'].append(copy.deepcopy(r['artifacts'][0])),
                        lambda r:r['artifacts'][0].update(id=r['artifacts'][1]['id']),
-                       lambda r:r['artifacts'][-1].update(expired=True),
-                       lambda r:r['artifacts'][-1].update(name='source-complete-current-stock-Release-sse2-stock'),
+                       lambda r:r['artifacts'][-2].update(expired=True),
+                       lambda r:r['artifacts'][-2].update(name='source-complete-current-stock-Release-sse2-stock'),
                        lambda r:r['jobs'][-1].update(status='in_progress',conclusion=None),
                        lambda r:next(j for j in r['jobs'] if j['name']!='readiness')['steps'][5].update(conclusion='skipped'),
                        lambda r:r['jobs'][-1]['labels'].append('self-hosted'),
                        lambda r:r['run'].update(run_attempt=2)):
+            changed=copy.deepcopy(record);change(changed)
+            with self.assertRaises(ValueError):readiness.verify(changed)
+
+    def test_controls_are_preserved_separately_and_no_extra_catalog_or_damaged_control_is_accepted(self):
+        record=self.api();before=copy.deepcopy(record);result=readiness.verify(record)
+        self.assertEqual(record,before);self.assertEqual(len(result['actual_capture_cells']),8)
+        self.assertEqual(result['actual_capture_control_artifact']['id'],readiness.CONTROL_ID)
+        for change in (lambda r:r['artifacts'].pop(),lambda r:r['artifacts'].append(copy.deepcopy(r['artifacts'][-1])),
+                       lambda r:r['artifacts'].append(dict(r['artifacts'][0],id=99999,name='shader-source-complete-current-stock-diagnostic')),
+                       lambda r:r['artifacts'].append(dict(r['artifacts'][0],id=99999,name='unexpected-catalog-entry')),
+                       lambda r:r['artifacts'][-1].update(expired=True),lambda r:r['artifacts'][-1].update(digest='sha256:'+'a'*64),
+                       lambda r:r['artifacts'][-1].update(size_in_bytes=0),lambda r:r['artifacts'][-1]['workflow_run'].update(head_sha='a'*40)):
             changed=copy.deepcopy(record);change(changed)
             with self.assertRaises(ValueError):readiness.verify(changed)
 
