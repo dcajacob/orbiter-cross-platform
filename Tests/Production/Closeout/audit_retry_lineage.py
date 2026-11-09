@@ -19,6 +19,8 @@ FIRST_SIZE=504023
 FIRST_DIGEST='27a7bb25c20f123eb43a3c29e5d9863045c91729a1016d2c56edd706f416a417'
 FIRST_LOG_SIZE=80023
 FIRST_LOG_DIGEST='275a70063f7f44d5663cf8fb426da9734eff78af87632841888392d5613e886f'
+FIRST_LOG_TEXT_SIZE=80020
+FIRST_LOG_TEXT_DIGEST='f1966b1e2e7f599db11e4531407bbd8af27d0b0752edda496a2a79336475ad3e'
 BRANCH='qualification/original-source-audit-v2'
 WORKFLOW='.github/workflows/phase6-original-source-audit.yml'
 ARTIFACT_NAME='source-complete-original-stock-independent-audit'
@@ -73,6 +75,22 @@ def artifact_interval(artifact,job):
             'Artifact does not belong to the exact actual audit attempt upload interval')
 
 
+def log_identity(path):
+    """Accept only the two exact byte identities of this log's known UTF8 BOM transport."""
+    body=Path(path).read_bytes();checksum=hashlib.sha256(body).hexdigest();elided=False
+    if len(body)==FIRST_LOG_SIZE and checksum==FIRST_LOG_DIGEST:
+        canonical=body
+    else:
+        require(len(body)==FIRST_LOG_TEXT_SIZE and checksum==FIRST_LOG_TEXT_DIGEST,
+                'First job log is neither its exact original bytes nor its exact known BOM-elided text representation')
+        canonical=b'\xef\xbb\xbf'+body;elided=True
+        require(len(canonical)==FIRST_LOG_SIZE and hashlib.sha256(canonical).hexdigest()==FIRST_LOG_DIGEST,
+                'Known text transport does not reconstruct the exact original job log')
+    return canonical,dict(protocol='exact-known-first-job-log-transport-v1',observed_bytes=len(body),observed_sha256=checksum,
+        original_bytes=FIRST_LOG_SIZE,original_sha256=FIRST_LOG_DIGEST,known_leading_UTF8_BOM_elision=elided,
+        input_file_rewritten=False,API_attempt_or_capture_bytes_modified=False)
+
+
 def validate_first_api(record,steps):
     run=run_identity(record,1,'failure');job=job_identity(record,FIRST_JOB,'failure');artifact=record['artifact']
     require(artifact['id']==FIRST_ARTIFACT and artifact['name']==ARTIFACT_NAME and artifact['expired'] is False and
@@ -102,10 +120,8 @@ def validate_retry_api(record,steps):
 def inspect_first_evidence(record,archive,log,target,legacy):
     """Retain the real failed bytes; a later successful result never replaces them."""
     job=validate_first_api(record,legacy.STEPS);archive=Path(archive);log=Path(log)
-    require(archive.stat().st_size==FIRST_SIZE and sha(archive)==FIRST_DIGEST and
-            log.stat().st_size==FIRST_LOG_SIZE and sha(log)==FIRST_LOG_DIGEST,
-            'Exact first failed API ZIP and raw decoded job log required')
-    text=log.read_text()
+    require(archive.stat().st_size==FIRST_SIZE and sha(archive)==FIRST_DIGEST,'Exact first failed API ZIP required')
+    canonical,log_transport=log_identity(log);text=canonical.decode('utf-8')
     require('urllib.error.HTTPError: HTTP Error 504: Gateway Time-out' in text and
             'Tests/Production/Cockpit/frozen.py' in text,
             'Recorded initial failure was not the pinned package transport HTTP504')
@@ -128,7 +144,7 @@ def inspect_first_evidence(record,archive,log,target,legacy):
     return dict(protocol='phase6-exact-original-audit-retry-lineage-v1',audit_run_id=RUN,auditor_source=AUDITOR,
         first_attempt=1,first_job_id=job['id'],first_conclusion='failure',first_failure='pinned-package-download-HTTP504-before-physics',
         first_artifact_id=FIRST_ARTIFACT,first_artifact_bytes=FIRST_SIZE,first_artifact_sha256=FIRST_DIGEST,
-        first_job_log_sha256=FIRST_LOG_DIGEST,first_decoded_members_sha256=members,
+        first_job_log_sha256=FIRST_LOG_DIGEST,first_job_log_transport=log_transport,first_decoded_members_sha256=members,
         same_original_transport_sha256=sha(target/'original-stock-audit/transport/download.json'),
         successful_attempt_required=2,successful_job_required=RETRY_JOB,
         old_failed_attempt_relabelled=False,API_attempts_normalized=False,qualification_granted=False)
@@ -153,7 +169,7 @@ def main():
             'Actual immutable verifier source and fresh owned history report required')
     a.output.parent.mkdir(parents=True,exist_ok=True);api_sha=sha(a.api)
     result=inspect_first_evidence(json.loads(a.api.read_text()),a.archive,a.log,a.output.parent/'first-attempt-source-artifact',legacy)
-    require(sha(a.api)==api_sha and sha(a.archive)==FIRST_DIGEST and sha(a.log)==FIRST_LOG_DIGEST,
+    require(sha(a.api)==api_sha and sha(a.archive)==FIRST_DIGEST and log_identity(a.log)[1]==result['first_job_log_transport'],
             'Actual immutable failed attempt API/ZIP/log changed during history verification')
     result.update(status='verified-specific-failed-audit-history-only',verifier_source=head,verifier_sha256=sha(__file__),
         first_attempt_api_sha256=api_sha,successful_full608_retry_still_required=True,

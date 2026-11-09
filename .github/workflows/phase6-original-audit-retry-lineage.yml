@@ -40,11 +40,14 @@ jobs:
             if (archive.length!==artifact.size_in_bytes || 'sha256:'+crypto.createHash('sha256').update(archive).digest('hex')!==artifact.digest) throw Error('Exact first failed artifact size/SHA differs');
             const logs=await github.request('GET /repos/{owner}/{repo}/actions/jobs/{job_id}/logs',{owner,repo,job_id});
             const log=typeof logs.data==='string'?Buffer.from(logs.data,'utf8'):Buffer.from(logs.data);
-            if (log.length!==80023 || crypto.createHash('sha256').update(log).digest('hex')!=='275a70063f7f44d5663cf8fb426da9734eff78af87632841888392d5613e886f') throw Error('Exact raw decoded first job log differs');
             fs.mkdirSync('out/original-audit-retry-source',{recursive:true});
             fs.writeFileSync('out/original-audit-retry-source/api.json',JSON.stringify({repository:context.repo,run,jobs,artifact},null,2));
             fs.writeFileSync('out/original-audit-retry-source/first.zip',archive);
             fs.writeFileSync('out/original-audit-retry-source/first-job.log',log);
+            const observed=crypto.createHash('sha256').update(log).digest('hex');
+            fs.writeFileSync('out/original-audit-retry-source/log-transport.json',JSON.stringify({response_data_type:typeof logs.data,observed_bytes:log.length,observed_sha256:observed,original_bytes:80023,original_sha256:'275a70063f7f44d5663cf8fb426da9734eff78af87632841888392d5613e886f',input_file_rewritten:false},null,2));
+            core.info('Observed first-log transport bytes='+log.length+' SHA256='+observed);
+            if (!((log.length===80023 && observed==='275a70063f7f44d5663cf8fb426da9734eff78af87632841888392d5613e886f') || (log.length===80020 && observed==='f1966b1e2e7f599db11e4531407bbd8af27d0b0752edda496a2a79336475ad3e'))) throw Error('First job log differs from both exact known BOM transport identities');
       - name: Independently verify exact failed lineage and retain all three partial output members
         run: >-
           python3 -B Tests/Production/Closeout/audit_retry_lineage.py
@@ -58,5 +61,6 @@ jobs:
           path: |
             out/original-audit-retry-controls.json
             out/original-audit-retry-source/api.json
+            out/original-audit-retry-source/log-transport.json
             out/original-audit-retry-source/first-job.log
             out/original-audit-retry-history/verification.json

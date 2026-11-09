@@ -105,6 +105,21 @@ class ExactOriginalAuditRetryTests(unittest.TestCase):
                 with patch.multiple(retry,**pins):
                     with self.assertRaises(ValueError):retry.inspect_first_evidence(self.api(),archive,log,root/'decoded',prior)
 
+    def test_only_the_exact_known_BOM_elision_is_accepted_and_observed_bytes_are_never_rewritten(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root=Path(directory);text=b'exact immutable first-job text\n';original=b'\xef\xbb\xbf'+text
+            full=root/'original.log';wire=root/'text-decoded.log';full.write_bytes(original);wire.write_bytes(text)
+            with patch.multiple(retry,FIRST_LOG_SIZE=len(original),FIRST_LOG_DIGEST=hashlib.sha256(original).hexdigest(),
+                                FIRST_LOG_TEXT_SIZE=len(text),FIRST_LOG_TEXT_DIGEST=hashlib.sha256(text).hexdigest()):
+                a,meta_a=retry.log_identity(full);b,meta_b=retry.log_identity(wire)
+                self.assertEqual(a,b);self.assertEqual(a,original)
+                self.assertFalse(meta_a['known_leading_UTF8_BOM_elision']);self.assertTrue(meta_b['known_leading_UTF8_BOM_elision'])
+                self.assertFalse(meta_b['input_file_rewritten']);self.assertFalse(meta_b['API_attempt_or_capture_bytes_modified'])
+                self.assertEqual(wire.read_bytes(),text);self.assertEqual(full.read_bytes(),original)
+                for changed in (b' '+text,text.replace(b'\n',b'\r\n'),text+b'changed'):
+                    wire.write_bytes(changed)
+                    with self.assertRaises(ValueError):retry.log_identity(wire)
+
     def test_old_source_guard_and_complete_608_member_safety_and_reference_receipt_bodies_are_unchanged(self):
         old=Path(prior.__file__).read_bytes().replace(b'\r\n',b'\n')
         self.assertEqual(hashlib.sha256(old).hexdigest(),'b82e501c920ef0ee3006acbecc0627ff703a28761ea6d5d58e57ca2091d2724b')

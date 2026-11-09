@@ -116,7 +116,7 @@ def main():
         original_transport_sha256=sha(manifest_file),original_writer_audit_sha256=sha(writer_file),original_cohort_audit_sha256=sha(cohort_file),
         original_api_archive_bindings=bindings,original_windows_processes=608,current_or_native_qualification_granted=False,
         original_saves_relabelled=False,phase6_complete=False,native_admission_qualified=False)
-    require(sha(a.first_attempt_archive)==retry.FIRST_DIGEST and sha(a.first_attempt_log)==retry.FIRST_LOG_DIGEST and
+    require(sha(a.first_attempt_archive)==retry.FIRST_DIGEST and retry.log_identity(a.first_attempt_log)[1]==lineage['first_job_log_transport'] and
             all(sha(path)==value for path,value in guarded_APIs.items()) and
             transport.legacy.inspect_archive(a.first_attempt_archive,base/'first-attempt-source-artifact',retry.FIRST_DIGEST,retry.FIRST_SIZE)==lineage['first_decoded_members_sha256'],
             'Preserved first attempt or actual source API receipts changed during successful reference restoration')
