@@ -108,12 +108,11 @@ def main():
             digest((runtime/'Config/Earth.cfg').read_bytes().replace(b'\r\n',b'\n'))==digest((ROOT/EARTH).read_bytes().replace(b'\r\n',b'\n')),
             'Actual original API script or locked SPICE Earth configuration differs')
     require(sha(runtime/'test-runtime.json')==digest(body),'Actual original SDK manifest changed')
-    for name,value in build['source_guard_sha256_lf'].items():
-        actual=(source/name).read_bytes().replace(b'\r\n',b'\n');immutable=subprocess.check_output(['git','-C',str(source),'show',APPLICATION+':'+name]).replace(b'\r\n',b'\n')
-        require(hashlib.sha256(actual).hexdigest()==value==hashlib.sha256(immutable).hexdigest(),'Complete original application source closure differs')
     helper=source/'Tests/Production/CurrentWindows/retain_hosted_sdk.py'
     require(helper.read_bytes().replace(b'\r\n',b'\n')==subprocess.check_output(['git','-C',str(source),'show',APPLICATION+':Tests/Production/CurrentWindows/retain_hosted_sdk.py']).replace(b'\r\n',b'\n'),'Original SDK reader changed')
     spec=importlib.util.spec_from_file_location('original_current_API_sdk_reader',helper);reader=importlib.util.module_from_spec(spec);spec.loader.exec_module(reader)
+    require(reader.source_files(APPLICATION)==build['source_guard_sha256_lf'],'Complete original source closure differs from its immutable owning batch reader')
+    require(reader.runtime_files(runtime,APPLICATION)==item['runtime_files_sha256'],'Complete actual original SDK runtime closure differs from its owning reader')
     units=reader.unit_result(load(payload/'registered-tests.json'),payload/'runtime-ctest.xml')
     require(units==item['tests'] and units['executed_processes']==28,'Every original C08 Windows unit/compiler receipt required')
     prepared=load(cfg['roles']['observer']['manifest_path']);obs=prepared['observer'];observer=Path(cfg['build'])
