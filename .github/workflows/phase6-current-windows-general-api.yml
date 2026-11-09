@@ -1,0 +1,165 @@
+name: Phase 6 Fresh Hosted Current Windows General API Matrix
+
+on:
+  push:
+    branches: ['qualification/current-windows-general-api-v1']
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: phase6-current-Windows-GeneralApi-${{ github.ref }}
+  cancel-in-progress: false
+
+env:
+  GIT_CONFIG_COUNT: '1'
+  GIT_CONFIG_KEY_0: core.autocrlf
+  GIT_CONFIG_VALUE_0: 'false'
+
+jobs:
+  readiness:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - name: Preserve every original and added small helper control
+        run: mkdir -p out && python3 -B Tests/Production/Closeout/run_controls.py --output out/current-api-controls.json
+      - name: Run the original actual Lua helper and damaged-input controls
+        shell: bash
+        run: |
+          set -euo pipefail
+          if ! command -v lua5.4 >/dev/null; then
+            sudo apt-get update
+            sudo apt-get install -y --no-install-recommends lua5.4
+          fi
+          lua5.4 -v > out/current-api-lua-version.txt 2>&1
+          dpkg-query -W -f='${binary:Package}=${Version}\n' lua5.4 > out/current-api-lua-package.txt
+          python3 -B Tests/Production/GeneralApiCorrection/Controls.Test.py --lua /usr/bin/lua5.4 --output out/current-api-lua-controls.json
+      - name: Require the exact independently publication-audited native API matrix
+        uses: actions/github-script@v8
+        with:
+          script: |
+            const {owner,repo}=context.repo,run_id=42705320489,head='f5172e3ed0ae814b52b10cc2557e294e30d310bf';
+            const run=(await github.rest.actions.getWorkflowRun({owner,repo,run_id})).data;
+            const jobs=await github.paginate(github.rest.actions.listJobsForWorkflowRun,{owner,repo,run_id,per_page:100});
+            const artifact=(await github.rest.actions.getArtifact({owner,repo,artifact_id:13712339534})).data;
+            require('fs').writeFileSync('out/current-api-native-prerequisite.json',JSON.stringify({repository:context.repo,run,jobs,artifact},null,2));
+            if(owner!=='dcajacob'||repo!=='orbiter-cross-platform'||run.head_sha!==head||run.run_attempt!==1||run.status!=='completed'||run.conclusion!=='success'||
+               jobs.length!==6||jobs.some(j=>j.head_sha!==head||j.status!=='completed'||j.conclusion!=='success'||!j.labels.includes('ubuntu-24.04')||j.labels.includes('self-hosted'))||
+               artifact.expired||artifact.workflow_run.id!==run_id||artifact.workflow_run.head_sha!==head||artifact.size_in_bytes!==1365356||artifact.digest!=='sha256:c8f8e545c6feec6f312e965968db4460bd2e170c8e5109ad09ba97771462e536')throw Error('Complete exact native API independent publication proof required');
+      - name: Preserve real immutable artifact transport controls
+        uses: actions/github-script@v8
+        with:
+          script: |
+            core.info(JSON.stringify(await require('./.github/scripts/phase6-download-bound-artifact.Test.cjs')({core})));
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: current-Windows-GeneralApi-readiness
+          retention-days: 14
+          path: |
+            out/current-api-controls.json
+            out/current-api-lua-*
+            out/current-api-native-prerequisite.json
+  capture:
+    name: Current Windows original corrected observer matrix ${{ matrix.configuration }}
+    needs: readiness
+    runs-on: windows-2025
+    timeout-minutes: 180
+    strategy:
+      fail-fast: false
+      max-parallel: 2
+      matrix:
+        configuration: [Debug, Release]
+    env:
+      CONFIGURATION: ${{ matrix.configuration }}
+      CELL: ${{ matrix.configuration }}-GeneralApi
+      ORBITER_DATA_CONTAINER_LOCK: application-source/Tests/Production/stock-data-container-v2.lock.json
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.14'
+      - name: Retain the distinct immutable compiled C08 application and SDK source owner
+        uses: actions/checkout@v7
+        with:
+          ref: c08f93151827949ee3ad498f8021f35c11753fde
+          path: application-source
+          fetch-depth: 0
+      - name: Download only the exact original current SDK on GitHub
+        uses: actions/github-script@v8
+        with:
+          script: |
+            await require('./.github/scripts/phase6-download-current-api-sdk.cjs')({github,context,core});
+      - name: Restore all immutable application SDK members and re-read every original unit receipt
+        run: >-
+          python -B Tests/Production/CurrentWindows/Hosted/restore_sdk.py
+          --api out/current-sdk-source/api.json --archive out/current-sdk-source/producer.zip
+          --configuration ${{ matrix.configuration }} --source-owner application-source --output out/current-windows-sdk
+      - name: Verify the exact original source-owned application and SDK without resealing
+        working-directory: application-source
+        run: python -B Tests/Production/verify_test_runtime.py --runtime ../out/current-windows-sdk/runtime --source c08f93151827949ee3ad498f8021f35c11753fde
+      - name: Bind all same-source original shaders to this explicit API diagnostic
+        run: >-
+          python -B Tests/Production/GeneralApiCorrection/Hosted/general_api_shaders.py
+          --cell ${{ env.CELL }} --configuration ${{ matrix.configuration }}
+      - name: Stage every unchanged original data and planetary input with retained failed transports
+        run: python -B Tests/Production/GeneralApiCorrection/Hosted/prepare_general_api_data.py --cell ${{ env.CELL }}
+      - name: Stage exact original software renderer binaries and notices
+        run: python -B application-source/Tests/Production/stage_mesa.py stage --cache out/current-mesa-cache --destination out/current-stock-mesa
+      - name: Compile the unchanged passive General API observer against the exact retained SDK
+        run: python -B Tests/Production/GeneralApiCorrection/Hosted/prepare_hosted_general_api.py --configuration ${{ matrix.configuration }}
+      - name: Execute all eight actual original corrected and observer-off-on cases in the inherited session
+        run: >-
+          python -B Tests/Production/GeneralApiCorrection/Hosted/execute_hosted_general_api.py
+          out/current-api-requests/${{ env.CELL }}/request.json
+      - name: Independently re-read all unchanged original API assertions and exact SDK compiler source receipts
+        run: >-
+          python -B Tests/Production/GeneralApiCorrection/Hosted/audit_hosted_general_api.py
+          --request out/current-api-requests/${{ env.CELL }}/request.json --output out/current-api-audits/${{ env.CELL }}
+      - name: Print bounded actual failure diagnostics
+        if: failure()
+        shell: python
+        run: |
+          import os
+          from pathlib import Path
+          for folder in ('out/current-api-requests/'+os.environ['CELL'],'out/current-api-observer/'+os.environ['CONFIGURATION']):
+              for p in sorted(Path(folder).glob('*.log')):
+                  print(str(p)+':\n'+p.read_text(errors='replace')[-16000:])
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: hosted-current-Windows-GeneralApi-${{ matrix.configuration }}
+          retention-days: 14
+          compression-level: 3
+          path: |
+            out/current-api-requests/${{ env.CELL }}/**
+            out/current-api-exports/${{ env.CELL }}/**
+            out/current-api-audits/${{ env.CELL }}/**
+            out/current-api-observer/${{ env.CONFIGURATION }}/*.json
+            out/current-api-observer/${{ env.CONFIGURATION }}/*.dll
+            out/current-api-observer/${{ env.CONFIGURATION }}/*.log
+            out/current-api-variant/${{ env.CELL }}/**
+            out/current-shader-delivery/${{ env.CELL }}.json
+            out/current-data-transport/${{ env.CELL }}/**
+            out/current-stock-mesa/mesa-runtime.json
+            out/current-windows-sdk/restoration.json
+            out/current-windows-sdk/source-artifact/current-application.json
+            out/current-windows-sdk/source-artifact/registered-tests.json
+            out/current-windows-sdk/source-artifact/runtime-ctest.xml
+            out/current-sdk-source/*.json
+            out/current-sdk-source/*.body
+            out/current-api-captures/${{ env.CELL }}/**/*.json
+            out/current-api-captures/${{ env.CELL }}/**/*.csv
+            out/current-api-captures/${{ env.CELL }}/**/*.log
+            out/current-api-captures/${{ env.CELL }}/**/*.txt
+            out/current-api-captures/${{ env.CELL }}/**/*.cfg
+            out/current-api-captures/${{ env.CELL }}/**/*.scn
+            out/current-api-captures/${{ env.CELL }}/**/*.lua
+            out/current-api-captures/${{ env.CELL }}/**/*.png
+            out/current-api-captures/${{ env.CELL }}/**/*.rgba
