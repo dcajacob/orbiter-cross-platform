@@ -38,8 +38,9 @@ def original_case_body():
     return text[start:end]
 
 
-def inspect_cases(cfg,worker,export,obs):
+def inspect_cases(cfg,worker,export,obs,case_inputs=None):
     namespace=dict(globals())
+    if case_inputs is not None:namespace['ROOT']=Path(case_inputs)
     exec(compile('def cases(cfg,worker,export,obs):\n'+original_case_body()+'    return results\n',str(LEGACY),'exec'),namespace)
     return namespace['cases'](cfg,worker,export,obs)
 
@@ -78,6 +79,32 @@ def inspect_compiled_source(actual,immutable,raw_recorded_sha256,canonical_recor
             'Compiled observer canonical source differs from the immutable application/SDK owner')
     return dict(raw_compiled_source_sha256=raw_recorded_sha256,canonical_source_sha256_lf=digest(canonical),
                 exact_raw_bytes_preserved=True,immutable_source_and_SDK_canonical_guard_preserved=True)
+
+
+
+def canonical_case_inputs(source,destination):
+    """Supply the original LF-based comparison body with immutable canonical inputs.
+
+    Raw compiled/captured inputs and their hashes remain separately protected.
+    This new audit-only view never replaces a source checkout or a capture member.
+    """
+    source=Path(source);destination=Path(destination)
+    require(not destination.exists(),'Fresh immutable API reader input snapshot required')
+    lock=load(ROOT/'Tests/Production/GeneralApiCorrection/inputs-v2.json')
+    identities={}
+    for name in (ORIGINAL,EARTH):
+        original=subprocess.check_output(['git','-C',str(source),'show',APPLICATION+':'+name])
+        canonical=original.replace(b'\r\n',b'\n')
+        actual=(source/name).read_bytes()
+        require(actual.replace(b'\r\n',b'\n')==canonical and
+                (ROOT/name).read_bytes().replace(b'\r\n',b'\n')==canonical and
+                digest(canonical)==lock['inputs_sha256_lf'][name],
+                'API reader fixture must equal its immutable compiled source and locked canonical input')
+        target=destination/name;target.parent.mkdir(parents=True,exist_ok=True);target.write_bytes(canonical)
+        require(target.read_bytes()==canonical,'Immutable canonical reader input snapshot changed')
+        identities[name]=dict(compiled_source=APPLICATION,raw_source_sha256=digest(actual),
+                              canonical_source_sha256_lf=digest(canonical),path=str(target))
+    return identities
 
 
 def main():
@@ -156,7 +183,9 @@ def main():
     export=Path(cfg['export']);exports=worker['export_files_sha256']
     require(set(exports)=={x.relative_to(export).as_posix() for x in export.rglob('*') if x.is_file()} and
             all(sha(export/name)==value for name,value in exports.items()),'Complete actual raw API export byte closure differs')
-    results=inspect_cases(cfg,worker,export,obs)
+    case_inputs=ROOT/'out/Windows-api-canonical-inputs'/cfg['configuration']
+    case_input_identities=canonical_case_inputs(source,case_inputs)
+    results=inspect_cases(cfg,worker,export,obs,case_inputs)
     from general_api_shaders import verify,inspect_staged
     verify(cfg)
     from inactive_stager_fixture import verify_staged as verify_inactive_fixture
@@ -164,7 +193,7 @@ def main():
         inspect_staged(export/name,cfg)
         verify_inactive_fixture(export/name,cfg)
         require(sha(item['observer']['dispatch_provider'])==item['provider_sha256'],'Actual observed system CRT provider byte changed')
-    protected={str(x):sha(x) for folder in (share,export,observer) for x in folder.rglob('*') if x.is_file()}
+    protected={str(x):sha(x) for folder in (share,export,observer,case_inputs) for x in folder.rglob('*') if x.is_file()}
     for path in (sdk_api,outer,buildpath,archive,runtime/'test-runtime.json',Path(cfg['variant']['manifest'])):protected[str(path)]=sha(path)
     require(all(sha(x)==value for x,value in protected.items()),'Actual API evidence changed during independent read')
     a.output.mkdir(parents=True)
@@ -176,6 +205,7 @@ def main():
         new_simulator_processes_launched=0,
         inactive_stager_fixture=cfg['inactive_stager_fixture'],inactive_same_SDK_fixture_verified=True,original_staging_hash_guard_preserved=True,
         original_actual_case_auditor_sha256_lf=LEGACY_SHA256_LF,original_case_auditor_body_unchanged=True,compiled_observer_source_identity=source_identity,
+        original_case_reader_inputs=case_input_identities,original_raw_captured_input_bytes_preserved=True,
         compiled_application_source=APPLICATION,original_sdk_artifact_id=ident,original_sdk_archive_sha256=checksum,
         all_28_original_Windows_unit_receipts_preserved=True,observer_equivalence=True,
         evidence_sha256=protected,normal_admission_qualified=False,complete_general_api_qualification=False,phase6_complete=False,

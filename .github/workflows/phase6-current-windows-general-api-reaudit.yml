@@ -2,7 +2,7 @@ name: Phase 6 Read Only Published Windows General API Audit
 
 on:
   push:
-    branches: ['qualification/current-windows-general-api-reaudit-v1']
+    branches: ['qualification/current-windows-general-api-reaudit-v2']
 
 permissions:
   contents: read
@@ -113,6 +113,8 @@ jobs:
             out/published-Windows-api-source/${{ env.CONFIGURATION }}/*.json
             out/published-Windows-api-source/${{ env.CONFIGURATION }}/*.body
             out/published-Windows-api-source/${{ env.CONFIGURATION }}/fresh-API-before-original-byte-restoration/**
+            out/Windows-api-canonical-inputs/${{ matrix.configuration }}/**
+            out/current-shader-delivery/${{ env.CELL }}.json
             out/current-api-requests/${{ env.CELL }}/**
             out/current-api-exports/${{ env.CELL }}/**
             out/current-api-observer/${{ env.CONFIGURATION }}/**

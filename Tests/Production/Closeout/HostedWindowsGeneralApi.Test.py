@@ -154,6 +154,27 @@ class HostedWindowsGeneralApiTests(unittest.TestCase):
         self.assertIn('out/current-api-observer/${{ env.CONFIGURATION }}/**',workflow)
 
 
+    def test_original_case_reader_uses_separate_locked_LF_inputs_without_changing_raw_sources(self):
+        with tempfile.TemporaryDirectory() as directory:
+            base=Path(directory);source=base/'source';destination=base/'reader';immutable={}
+            for name in (audit.ORIGINAL,audit.EARTH):
+                body=(ROOT/name).read_bytes().replace(b'\r\n',b'\n');immutable[name]=body
+                path=source/name;path.parent.mkdir(parents=True,exist_ok=True);path.write_bytes(body.replace(b'\n',b'\r\n'))
+            raw={name:(source/name).read_bytes() for name in immutable}
+            with patch.object(audit.subprocess,'check_output',side_effect=lambda argv:immutable[argv[-1].split(':',1)[1]]):
+                evidence=audit.canonical_case_inputs(source,destination)
+            self.assertEqual(set(evidence),set(immutable))
+            for name,body in immutable.items():
+                self.assertEqual((destination/name).read_bytes(),body)
+                self.assertEqual((source/name).read_bytes(),raw[name])
+                self.assertEqual(evidence[name]['raw_source_sha256'],hashlib.sha256(raw[name]).hexdigest())
+            corrected,_=audit.corrected((destination/audit.ORIGINAL).read_bytes(),(destination/audit.EARTH).read_bytes(),'v2')
+            self.assertIn(b'local lua_assert = assert',corrected)
+            with self.assertRaises(ValueError):audit.corrected(raw[audit.ORIGINAL],raw[audit.EARTH],'v2')
+            (source/audit.ORIGINAL).write_bytes(b'changed original input')
+            with patch.object(audit.subprocess,'check_output',side_effect=lambda argv:immutable[argv[-1].split(':',1)[1]]):
+                with self.assertRaises(ValueError):audit.canonical_case_inputs(source,base/'changed')
+
     def test_raw_compiler_source_hash_and_canonical_SDK_Git_hash_remain_distinct_and_strict(self):
         canonical=b'original source line\nsecond line\n';raw=canonical.replace(b'\n',b'\r\n')
         raw_sha=hashlib.sha256(raw).hexdigest();canonical_sha=hashlib.sha256(canonical).hexdigest()
