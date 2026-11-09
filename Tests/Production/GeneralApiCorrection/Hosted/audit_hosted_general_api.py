@@ -70,11 +70,35 @@ def inspect_hosted_sdk_members(archive,runtime,item,expected_manifest_sha256):
     return body,sealed
 
 
+
+def inspect_compiled_source(actual,immutable,raw_recorded_sha256,canonical_recorded_sha256):
+    require(digest(actual)==raw_recorded_sha256,'Actual compiled observer raw source byte identity differs')
+    canonical=actual.replace(b'\r\n',b'\n');expected=immutable.replace(b'\r\n',b'\n')
+    require(canonical==expected and digest(canonical)==canonical_recorded_sha256,
+            'Compiled observer canonical source differs from the immutable application/SDK owner')
+    return dict(raw_compiled_source_sha256=raw_recorded_sha256,canonical_source_sha256_lf=digest(canonical),
+                exact_raw_bytes_preserved=True,immutable_source_and_SDK_canonical_guard_preserved=True)
+
+
 def main():
     p=argparse.ArgumentParser(description=__doc__);p.add_argument('--request',type=lambda v:Path(v).resolve(),required=True)
-    p.add_argument('--output',type=lambda v:Path(v).resolve(),required=True);a=p.parse_args()
+    p.add_argument('--output',type=lambda v:Path(v).resolve(),required=True)
+    p.add_argument('--capture-api',type=lambda v:Path(v).resolve())
+    p.add_argument('--capture-source-owner',type=lambda v:Path(v).resolve());a=p.parse_args()
     require(sys.platform=='win32' and os.environ.get('GITHUB_ACTIONS')=='true' and not a.output.exists(),'Fresh actual hosted Windows independent API audit required')
-    cfg=load(a.request);validate(cfg);require(cfg['github']['collector_commit']==os.environ['GITHUB_SHA'],'Actual source-bound hosted API audit required')
+    cfg=load(a.request);validate(cfg)
+    original_source_owner=ROOT
+    if a.capture_api is not None:
+        require(a.capture_source_owner is not None,'Explicit original capture source owner required')
+        from replay_published_general_api import validate_capture_api
+        captured=load(a.capture_api);validate_capture_api(captured,cfg['configuration'])
+        require(cfg['github']['run_id']==captured['run']['id'] and cfg['github']['run_attempt']==captured['run']['run_attempt'] and
+                cfg['github']['collector_commit']==captured['run']['head_sha'],'Original captured API/source roles differ')
+        original_source_owner=a.capture_source_owner
+        require(original_source_owner==ROOT/'capture-source' and subprocess.check_output(['git','-C',str(original_source_owner),'rev-parse','HEAD'],text=True).strip()==cfg['github']['collector_commit'],
+                'Exact independently retained original capture source checkout required')
+    else:
+        require(a.capture_source_owner is None and cfg['github']['collector_commit']==os.environ['GITHUB_SHA'],'Actual source-bound live hosted API audit required')
     share=a.request.parent;worker=load(share/'worker-result.json');owned=load(share/'runner-result.json')
     worker_file=Path(__file__).with_name('general_api_worker.py')
     require(owned['protocol']=='phase6-hosted-current-GeneralApi-owned-worker-v1' and
@@ -89,7 +113,7 @@ def main():
     require(sha(cfg['roles']['runner']['manifest_path'])==cfg['roles']['runner']['manifest_sha256'],'Actual API runner role changed')
     runner=load(cfg['roles']['runner']['manifest_path']);require(runner['commit']==cfg['github']['collector_commit'],'Actual runner source role differs')
     for name,value in runner['files_sha256'].items():
-        path=ROOT/name;original=subprocess.check_output(['git','-C',str(ROOT),'show',runner['commit']+':'+name])
+        path=original_source_owner/name;original=subprocess.check_output(['git','-C',str(original_source_owner),'show',runner['commit']+':'+name])
         require(sha(path)==value and path.read_bytes().replace(b'\r\n',b'\n')==original.replace(b'\r\n',b'\n'),'Actual immutable API runner/helper bytes differ')
     sdk_root=ROOT/'out/current-windows-sdk';payload=sdk_root/'source-artifact';runtime=Path(cfg['preserved']);source=Path(cfg['source'])
     sdk_api=ROOT/'out/current-sdk-source/api.json';record=load(sdk_api);validate_api(record,cfg['configuration'])
@@ -119,8 +143,13 @@ def main():
     require(sha(cfg['roles']['observer']['manifest_path'])==cfg['roles']['observer']['manifest_sha256'] and
             prepared['status']=='prepared-passive-observer-only' and prepared['sdk']['manifest_sha256']==digest(body) and
             obs['kind']=='general-api' and obs['source_commit']==obs['sdk_source_commit']==APPLICATION and obs['configuration']==cfg['configuration'] and
-            sha(obs['binary'])==obs['sha256'] and obs['source_sha256']==digest(subprocess.check_output(['git','-C',str(source),'show',APPLICATION+':Tests/Production/GeneralApiCorrection/Observer.cpp'])),
+            sha(obs['binary'])==obs['sha256'],
             'Fresh actual API observer source/binary and exact compiled SDK differ')
+    observer_relative='Tests/Production/GeneralApiCorrection/Observer.cpp'
+    source_identity=inspect_compiled_source((source/observer_relative).read_bytes(),
+        subprocess.check_output(['git','-C',str(source),'show',APPLICATION+':'+observer_relative]),
+        obs['source_sha256'],build['source_guard_sha256_lf'][observer_relative])
+
     for command in prepared['commands']:
         require(command['actual_returncode']==0 and command['actual_pid']>0 and sha(observer/(command['label']+'.log'))==command['log_sha256'],'Actual API observer compiler process/log receipt differs')
     require(prepared['commands'] and prepared['compiler']['sha256']==sha(prepared['compiler']['path']),'Actual observed MSVC compiler identity differs')
@@ -142,8 +171,11 @@ def main():
     report=dict(protocol='audited-hosted-current-Windows-GeneralApi-v1',status='passed-current-Windows-api-diagnostic-only',
         configuration=cfg['configuration'],profiles=[cfg['configuration']+'-'+m for m in ('automatic','sse2')],roles=cfg['roles'],
         github=cfg['github'],transport_protocol=cfg['transport_protocol'],inherited_runner_context=worker['context'],actual_processes=8,results=results,
+        auditor_source=os.environ['GITHUB_SHA'],auditor_github_run_id=int(os.environ['GITHUB_RUN_ID']),
+        original_capture_source_owner=str(original_source_owner),published_capture_reaudit=a.capture_api is not None,
+        new_simulator_processes_launched=0,
         inactive_stager_fixture=cfg['inactive_stager_fixture'],inactive_same_SDK_fixture_verified=True,original_staging_hash_guard_preserved=True,
-        original_actual_case_auditor_sha256_lf=LEGACY_SHA256_LF,original_case_auditor_body_unchanged=True,
+        original_actual_case_auditor_sha256_lf=LEGACY_SHA256_LF,original_case_auditor_body_unchanged=True,compiled_observer_source_identity=source_identity,
         compiled_application_source=APPLICATION,original_sdk_artifact_id=ident,original_sdk_archive_sha256=checksum,
         all_28_original_Windows_unit_receipts_preserved=True,observer_equivalence=True,
         evidence_sha256=protected,normal_admission_qualified=False,complete_general_api_qualification=False,phase6_complete=False,

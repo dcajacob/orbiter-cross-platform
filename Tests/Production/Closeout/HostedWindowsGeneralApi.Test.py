@@ -18,6 +18,7 @@ import prepare_general_api_data as data
 import audit_hosted_general_api as audit
 import execute_hosted_general_api as execution
 import inactive_stager_fixture as fixture
+import replay_published_general_api as replay
 
 
 def configuration():
@@ -151,6 +152,58 @@ class HostedWindowsGeneralApiTests(unittest.TestCase):
             with self.assertRaises(ValueError):audit.inspect_hosted_sdk_members(archive,runtime,item,checksum)
         workflow=(ROOT/'.github/workflows/phase6-current-windows-general-api.yml').read_text()
         self.assertIn('out/current-api-observer/${{ env.CONFIGURATION }}/**',workflow)
+
+
+    def test_raw_compiler_source_hash_and_canonical_SDK_Git_hash_remain_distinct_and_strict(self):
+        canonical=b'original source line\nsecond line\n';raw=canonical.replace(b'\n',b'\r\n')
+        raw_sha=hashlib.sha256(raw).hexdigest();canonical_sha=hashlib.sha256(canonical).hexdigest()
+        self.assertNotEqual(raw_sha,canonical_sha)
+        result=audit.inspect_compiled_source(raw,canonical,raw_sha,canonical_sha)
+        self.assertEqual(result['raw_compiled_source_sha256'],raw_sha)
+        self.assertEqual(result['canonical_source_sha256_lf'],canonical_sha)
+        for actual,original,recorded,expected in ((raw+b'changed',canonical,raw_sha,canonical_sha),
+                (raw,canonical,canonical_sha,canonical_sha),(raw,canonical+b'changed',raw_sha,canonical_sha),
+                (raw,canonical,raw_sha,raw_sha)):
+            with self.assertRaises(ValueError):audit.inspect_compiled_source(actual,original,recorded,expected)
+
+
+    def test_read_only_reaudit_requires_actual_failed_reader_and_successful_original_cases(self):
+        record=json.loads((ROOT/'Tests/Production/Closeout/Windows-api-published-capture.fixture.json').read_text())['record']
+        self.assertEqual(replay.validate_capture_api(record,'Debug')['id'],129488509539)
+        for mutate in (lambda r:r['run'].update(conclusion='success'),lambda r:r['run'].update(head_sha='f'*40),
+                       lambda r:r['artifact'].update(id=1),lambda r:r['artifact'].update(digest='sha256:'+'f'*64),
+                       lambda r:r['artifact'].update(expired=True),
+                       lambda r:next(j for j in r['jobs'] if j['id']==129488509539).update(conclusion='success'),
+                       lambda r:next(x for j in r['jobs'] if j['id']==129488509539 for x in j['steps'] if x['name']=='Execute all eight actual original corrected and observer-off-on cases in the inherited session').update(conclusion='failure')):
+            changed=copy.deepcopy(record);mutate(changed)
+            with self.assertRaises(ValueError):replay.validate_capture_api(changed,'Debug')
+        workflow=(ROOT/'.github/workflows/phase6-current-windows-general-api-reaudit.yml').read_text()
+        self.assertIn('runs-on: windows-2025',workflow)
+        self.assertIn('--capture-source-owner capture-source',workflow)
+        self.assertNotIn('execute_hosted_general_api.py',workflow)
+        self.assertNotIn('prepare_hosted_general_api.py',workflow)
+
+    def test_original_metadata_is_restored_verbatim_while_new_API_metadata_stays_separate(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root=Path(directory);source=root/'old';destination=root/'restored';history=root/'fresh'
+            (source/'current-sdk-source').mkdir(parents=True);(destination/'current-sdk-source').mkdir(parents=True)
+            old=b'{"original_source":"old","original_PID":123}\n';fresh=b'{"fresh_API_observed":"new"}\n'
+            (source/'current-sdk-source/api.json').write_bytes(old);(destination/'current-sdk-source/api.json').write_bytes(fresh)
+            values=replay.merge_tree(source,destination,protected_metadata=True,history=history)
+            self.assertEqual((destination/'current-sdk-source/api.json').read_bytes(),old)
+            self.assertEqual((history/'current-sdk-source/api.json').read_bytes(),fresh)
+            self.assertEqual(values['current-sdk-source/api.json'],hashlib.sha256(old).hexdigest())
+            (source/'other.json').write_bytes(b'new');(destination/'other.json').write_bytes(b'keep original unrelated byte')
+            with self.assertRaises(ValueError):replay.merge_tree(source,destination)
+            self.assertEqual((destination/'other.json').read_bytes(),b'keep original unrelated byte')
+
+
+    def test_original_source_text_encoding_requires_exact_recorded_hash_and_same_immutable_body(self):
+        immutable=b'original code\nsecond line\n';windows=immutable.replace(b'\n',b'\r\n')
+        self.assertEqual(replay.exact_source_bytes(immutable,hashlib.sha256(windows).hexdigest()),windows)
+        self.assertEqual(replay.exact_source_bytes(immutable,hashlib.sha256(immutable).hexdigest()),immutable)
+        for changed in (b'changed code\nsecond line\n',immutable+b' '):
+            with self.assertRaises(ValueError):replay.exact_source_bytes(immutable,hashlib.sha256(changed).hexdigest())
 
 
 if __name__=='__main__':unittest.main()

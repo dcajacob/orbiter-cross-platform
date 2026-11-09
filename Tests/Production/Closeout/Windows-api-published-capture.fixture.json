@@ -1,0 +1,747 @@
+{
+  "scope": "Exact captured API metadata for helper controls only; not qualification",
+  "record": {
+    "repository": {
+      "owner": "dcajacob",
+      "repo": "orbiter-cross-platform"
+    },
+    "run": {
+      "id": 42713286498,
+      "name": "Phase 6 Fresh Hosted Current Windows General API Matrix",
+      "node_id": "WFR_kwLOVd0Rac8AAAAJ8ekHYg",
+      "head_branch": "qualification/current-windows-general-api-v3",
+      "head_sha": "8ad65617139767cba1e8fe92ef47bfedab6edd09",
+      "path": ".github/workflows/phase6-current-windows-general-api.yml",
+      "display_title": "Reuse immutable batch source reader for complete Windows API provenance",
+      "run_number": 3,
+      "event": "push",
+      "status": "completed",
+      "conclusion": "failure",
+      "workflow_id": 412627400,
+      "check_suite_id": 115686514509,
+      "check_suite_node_id": "CS_kwDOVd0Rac8AAAAa73QfTQ",
+      "url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/actions/runs/42713286498",
+      "html_url": "https://github.com/dcajacob/orbiter-cross-platform/actions/runs/42713286498",
+      "pull_requests": [],
+      "created_at": "2026-11-09T22:35:46Z",
+      "updated_at": "2026-11-09T22:42:09Z",
+      "actor": {
+        "login": "dcajacob",
+        "id": 3210634,
+        "node_id": "MDQ6VXNlcjMyMTA2MzQ=",
+        "avatar_url": "https://avatars.githubusercontent.com/u/3210634?v=4",
+        "gravatar_id": "",
+        "url": "https://api.github.com/users/dcajacob",
+        "html_url": "https://github.com/dcajacob",
+        "followers_url": "https://api.github.com/users/dcajacob/followers",
+        "following_url": "https://api.github.com/users/dcajacob/following{/other_user}",
+        "gists_url": "https://api.github.com/users/dcajacob/gists{/gist_id}",
+        "starred_url": "https://api.github.com/users/dcajacob/starred{/owner}{/repo}",
+        "subscriptions_url": "https://api.github.com/users/dcajacob/subscriptions",
+        "organizations_url": "https://api.github.com/users/dcajacob/orgs",
+        "repos_url": "https://api.github.com/users/dcajacob/repos",
+        "events_url": "https://api.github.com/users/dcajacob/events{/privacy}",
+        "received_events_url": "https://api.github.com/users/dcajacob/received_events",
+        "type": "User",
+        "user_view_type": "public",
+        "site_admin": false
+      },
+      "run_attempt": 1,
+      "referenced_workflows": [],
+      "run_started_at": "2026-11-09T22:35:46Z",
+      "triggering_actor": {
+        "login": "dcajacob",
+        "id": 3210634,
+        "node_id": "MDQ6VXNlcjMyMTA2MzQ=",
+        "avatar_url": "https://avatars.githubusercontent.com/u/3210634?v=4",
+        "gravatar_id": "",
+        "url": "https://api.github.com/users/dcajacob",
+        "html_url": "https://github.com/dcajacob",
+        "followers_url": "https://api.github.com/users/dcajacob/followers",
+        "following_url": "https://api.github.com/users/dcajacob/following{/other_user}",
+        "gists_url": "https://api.github.com/users/dcajacob/gists{/gist_id}",
+        "starred_url": "https://api.github.com/users/dcajacob/starred{/owner}{/repo}",
+        "subscriptions_url": "https://api.github.com/users/dcajacob/subscriptions",
+        "organizations_url": "https://api.github.com/users/dcajacob/orgs",
+        "repos_url": "https://api.github.com/users/dcajacob/repos",
+        "events_url": "https://api.github.com/users/dcajacob/events{/privacy}",
+        "received_events_url": "https://api.github.com/users/dcajacob/received_events",
+        "type": "User",
+        "user_view_type": "public",
+        "site_admin": false
+      },
+      "jobs_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/actions/runs/42713286498/jobs",
+      "logs_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/actions/runs/42713286498/logs",
+      "check_suite_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/check-suites/115686514509",
+      "artifacts_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/actions/runs/42713286498/artifacts",
+      "cancel_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/actions/runs/42713286498/cancel",
+      "rerun_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/actions/runs/42713286498/rerun",
+      "previous_attempt_url": null,
+      "workflow_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/actions/workflows/412627400",
+      "head_commit": {
+        "id": "8ad65617139767cba1e8fe92ef47bfedab6edd09",
+        "tree_id": "dcf824664018b80ce2bd7c2141d6a3d4fffc235b",
+        "message": "Reuse immutable batch source reader for complete Windows API provenance",
+        "timestamp": "2026-11-09T22:35:16Z",
+        "author": {
+          "name": "Dan CaJacob",
+          "email": "3210634+dcajacob@users.noreply.github.com"
+        },
+        "committer": {
+          "name": "Dan CaJacob",
+          "email": "3210634+dcajacob@users.noreply.github.com"
+        }
+      },
+      "repository": {
+        "id": 1440551273,
+        "node_id": "R_kgDOVd0RaQ",
+        "name": "orbiter-cross-platform",
+        "full_name": "dcajacob/orbiter-cross-platform",
+        "private": false,
+        "owner": {
+          "login": "dcajacob",
+          "id": 3210634,
+          "node_id": "MDQ6VXNlcjMyMTA2MzQ=",
+          "avatar_url": "https://avatars.githubusercontent.com/u/3210634?v=4",
+          "gravatar_id": "",
+          "url": "https://api.github.com/users/dcajacob",
+          "html_url": "https://github.com/dcajacob",
+          "followers_url": "https://api.github.com/users/dcajacob/followers",
+          "following_url": "https://api.github.com/users/dcajacob/following{/other_user}",
+          "gists_url": "https://api.github.com/users/dcajacob/gists{/gist_id}",
+          "starred_url": "https://api.github.com/users/dcajacob/starred{/owner}{/repo}",
+          "subscriptions_url": "https://api.github.com/users/dcajacob/subscriptions",
+          "organizations_url": "https://api.github.com/users/dcajacob/orgs",
+          "repos_url": "https://api.github.com/users/dcajacob/repos",
+          "events_url": "https://api.github.com/users/dcajacob/events{/privacy}",
+          "received_events_url": "https://api.github.com/users/dcajacob/received_events",
+          "type": "User",
+          "user_view_type": "public",
+          "site_admin": false
+        },
+        "html_url": "https://github.com/dcajacob/orbiter-cross-platform",
+        "description": "Incremental native Linux and Windows portability work for Orbiter, with headless physics parity tests. Based on orbitersim/orbiter.",
+        "fork": false,
+        "url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform",
+        "forks_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/forks",
+        "keys_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/keys{/key_id}",
+        "collaborators_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/collaborators{/collaborator}",
+        "teams_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/teams",
+        "hooks_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/hooks",
+        "issue_events_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/issues/events{/number}",
+        "events_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/events",
+        "assignees_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/assignees{/user}",
+        "branches_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/branches{/branch}",
+        "tags_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/tags",
+        "blobs_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/git/blobs{/sha}",
+        "git_tags_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/git/tags{/sha}",
+        "git_refs_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/git/refs{/sha}",
+        "trees_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/git/trees{/sha}",
+        "statuses_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/statuses/{sha}",
+        "languages_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/languages",
+        "stargazers_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/stargazers",
+        "contributors_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/contributors",
+        "subscribers_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/subscribers",
+        "subscription_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/subscription",
+        "commits_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/commits{/sha}",
+        "git_commits_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/git/commits{/sha}",
+        "comments_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/comments{/number}",
+        "issue_comment_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/issues/comments{/number}",
+        "contents_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/contents/{+path}",
+        "compare_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/compare/{base}...{head}",
+        "merges_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/merges",
+        "archive_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/{archive_format}{/ref}",
+        "downloads_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/downloads",
+        "issues_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/issues{/number}",
+        "pulls_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/pulls{/number}",
+        "milestones_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/milestones{/number}",
+        "notifications_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/notifications{?since,all,participating}",
+        "labels_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/labels{/name}",
+        "releases_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/releases{/id}",
+        "deployments_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/deployments"
+      },
+      "head_repository": {
+        "id": 1440551273,
+        "node_id": "R_kgDOVd0RaQ",
+        "name": "orbiter-cross-platform",
+        "full_name": "dcajacob/orbiter-cross-platform",
+        "private": false,
+        "owner": {
+          "login": "dcajacob",
+          "id": 3210634,
+          "node_id": "MDQ6VXNlcjMyMTA2MzQ=",
+          "avatar_url": "https://avatars.githubusercontent.com/u/3210634?v=4",
+          "gravatar_id": "",
+          "url": "https://api.github.com/users/dcajacob",
+          "html_url": "https://github.com/dcajacob",
+          "followers_url": "https://api.github.com/users/dcajacob/followers",
+          "following_url": "https://api.github.com/users/dcajacob/following{/other_user}",
+          "gists_url": "https://api.github.com/users/dcajacob/gists{/gist_id}",
+          "starred_url": "https://api.github.com/users/dcajacob/starred{/owner}{/repo}",
+          "subscriptions_url": "https://api.github.com/users/dcajacob/subscriptions",
+          "organizations_url": "https://api.github.com/users/dcajacob/orgs",
+          "repos_url": "https://api.github.com/users/dcajacob/repos",
+          "events_url": "https://api.github.com/users/dcajacob/events{/privacy}",
+          "received_events_url": "https://api.github.com/users/dcajacob/received_events",
+          "type": "User",
+          "user_view_type": "public",
+          "site_admin": false
+        },
+        "html_url": "https://github.com/dcajacob/orbiter-cross-platform",
+        "description": "Incremental native Linux and Windows portability work for Orbiter, with headless physics parity tests. Based on orbitersim/orbiter.",
+        "fork": false,
+        "url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform",
+        "forks_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/forks",
+        "keys_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/keys{/key_id}",
+        "collaborators_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/collaborators{/collaborator}",
+        "teams_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/teams",
+        "hooks_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/hooks",
+        "issue_events_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/issues/events{/number}",
+        "events_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/events",
+        "assignees_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/assignees{/user}",
+        "branches_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/branches{/branch}",
+        "tags_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/tags",
+        "blobs_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/git/blobs{/sha}",
+        "git_tags_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/git/tags{/sha}",
+        "git_refs_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/git/refs{/sha}",
+        "trees_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/git/trees{/sha}",
+        "statuses_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/statuses/{sha}",
+        "languages_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/languages",
+        "stargazers_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/stargazers",
+        "contributors_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/contributors",
+        "subscribers_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/subscribers",
+        "subscription_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/subscription",
+        "commits_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/commits{/sha}",
+        "git_commits_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/git/commits{/sha}",
+        "comments_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/comments{/number}",
+        "issue_comment_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/issues/comments{/number}",
+        "contents_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/contents/{+path}",
+        "compare_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/compare/{base}...{head}",
+        "merges_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/merges",
+        "archive_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/{archive_format}{/ref}",
+        "downloads_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/downloads",
+        "issues_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/issues{/number}",
+        "pulls_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/pulls{/number}",
+        "milestones_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/milestones{/number}",
+        "notifications_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/notifications{?since,all,participating}",
+        "labels_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/labels{/name}",
+        "releases_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/releases{/id}",
+        "deployments_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/deployments"
+      }
+    },
+    "jobs": [
+      {
+        "id": 129488148112,
+        "run_id": 42713286498,
+        "workflow_name": "Phase 6 Fresh Hosted Current Windows General API Matrix",
+        "head_branch": "qualification/current-windows-general-api-v3",
+        "run_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/actions/runs/42713286498",
+        "run_attempt": 1,
+        "node_id": "CR_kwDOVd0Rac8AAAAeJhhWkA",
+        "head_sha": "8ad65617139767cba1e8fe92ef47bfedab6edd09",
+        "url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/actions/jobs/129488148112",
+        "html_url": "https://github.com/dcajacob/orbiter-cross-platform/actions/runs/42713286498/job/129488148112",
+        "status": "completed",
+        "conclusion": "success",
+        "created_at": "2026-11-09T22:35:47Z",
+        "started_at": "2026-11-09T22:35:49Z",
+        "completed_at": "2026-11-09T22:36:28Z",
+        "name": "readiness",
+        "steps": [
+          {
+            "name": "Set up job",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 1,
+            "started_at": "2026-11-09T22:35:50Z",
+            "completed_at": "2026-11-09T22:35:51Z"
+          },
+          {
+            "name": "Run actions/checkout@v7",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 2,
+            "started_at": "2026-11-09T22:35:51Z",
+            "completed_at": "2026-11-09T22:36:08Z"
+          },
+          {
+            "name": "Preserve every original and added small helper control",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 3,
+            "started_at": "2026-11-09T22:36:08Z",
+            "completed_at": "2026-11-09T22:36:15Z"
+          },
+          {
+            "name": "Run the original actual Lua helper and damaged-input controls",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 4,
+            "started_at": "2026-11-09T22:36:15Z",
+            "completed_at": "2026-11-09T22:36:24Z"
+          },
+          {
+            "name": "Require the exact independently publication-audited native API matrix",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 5,
+            "started_at": "2026-11-09T22:36:24Z",
+            "completed_at": "2026-11-09T22:36:25Z"
+          },
+          {
+            "name": "Preserve real immutable artifact transport controls",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 6,
+            "started_at": "2026-11-09T22:36:25Z",
+            "completed_at": "2026-11-09T22:36:25Z"
+          },
+          {
+            "name": "Run actions/upload-artifact@v7",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 7,
+            "started_at": "2026-11-09T22:36:25Z",
+            "completed_at": "2026-11-09T22:36:26Z"
+          },
+          {
+            "name": "Post Run actions/checkout@v7",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 14,
+            "started_at": "2026-11-09T22:36:26Z",
+            "completed_at": "2026-11-09T22:36:26Z"
+          },
+          {
+            "name": "Complete job",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 15,
+            "started_at": "2026-11-09T22:36:26Z",
+            "completed_at": "2026-11-09T22:36:26Z"
+          }
+        ],
+        "check_run_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/check-runs/129488148112",
+        "labels": [
+          "ubuntu-24.04"
+        ],
+        "runner_id": 1000007720,
+        "runner_name": "GitHub Actions 1000007720",
+        "runner_group_id": 0,
+        "runner_group_name": "GitHub Actions"
+      },
+      {
+        "id": 129488509539,
+        "run_id": 42713286498,
+        "workflow_name": "Phase 6 Fresh Hosted Current Windows General API Matrix",
+        "head_branch": "qualification/current-windows-general-api-v3",
+        "run_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/actions/runs/42713286498",
+        "run_attempt": 1,
+        "node_id": "CR_kwDOVd0Rac8AAAAeJh3aYw",
+        "head_sha": "8ad65617139767cba1e8fe92ef47bfedab6edd09",
+        "url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/actions/jobs/129488509539",
+        "html_url": "https://github.com/dcajacob/orbiter-cross-platform/actions/runs/42713286498/job/129488509539",
+        "status": "completed",
+        "conclusion": "failure",
+        "created_at": "2026-11-09T22:36:28Z",
+        "started_at": "2026-11-09T22:36:31Z",
+        "completed_at": "2026-11-09T22:41:28Z",
+        "name": "Current Windows original corrected observer matrix Debug",
+        "steps": [
+          {
+            "name": "Set up job",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 1,
+            "started_at": "2026-11-09T22:36:32Z",
+            "completed_at": "2026-11-09T22:36:34Z"
+          },
+          {
+            "name": "Run actions/checkout@v7",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 2,
+            "started_at": "2026-11-09T22:36:34Z",
+            "completed_at": "2026-11-09T22:37:00Z"
+          },
+          {
+            "name": "Run actions/setup-python@v6",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 3,
+            "started_at": "2026-11-09T22:37:00Z",
+            "completed_at": "2026-11-09T22:37:00Z"
+          },
+          {
+            "name": "Retain the distinct immutable compiled C08 application and SDK source owner",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 4,
+            "started_at": "2026-11-09T22:37:00Z",
+            "completed_at": "2026-11-09T22:37:25Z"
+          },
+          {
+            "name": "Download only the exact original current SDK on GitHub",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 5,
+            "started_at": "2026-11-09T22:37:25Z",
+            "completed_at": "2026-11-09T22:37:29Z"
+          },
+          {
+            "name": "Restore all immutable application SDK members and re-read every original unit receipt",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 6,
+            "started_at": "2026-11-09T22:37:29Z",
+            "completed_at": "2026-11-09T22:37:47Z"
+          },
+          {
+            "name": "Verify the exact original source-owned application and SDK without resealing",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 7,
+            "started_at": "2026-11-09T22:37:47Z",
+            "completed_at": "2026-11-09T22:37:51Z"
+          },
+          {
+            "name": "Retain the original same-SDK inactive fixture required by the unchanged stager hash",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 8,
+            "started_at": "2026-11-09T22:37:51Z",
+            "completed_at": "2026-11-09T22:37:52Z"
+          },
+          {
+            "name": "Restore the exact original passive driver bytes without enabling them or changing the SDK",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 9,
+            "started_at": "2026-11-09T22:37:52Z",
+            "completed_at": "2026-11-09T22:37:55Z"
+          },
+          {
+            "name": "Bind all same-source original shaders to this explicit API diagnostic",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 10,
+            "started_at": "2026-11-09T22:37:55Z",
+            "completed_at": "2026-11-09T22:37:57Z"
+          },
+          {
+            "name": "Stage every unchanged original data and planetary input with retained failed transports",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 11,
+            "started_at": "2026-11-09T22:37:57Z",
+            "completed_at": "2026-11-09T22:39:06Z"
+          },
+          {
+            "name": "Stage exact original software renderer binaries and notices",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 12,
+            "started_at": "2026-11-09T22:39:06Z",
+            "completed_at": "2026-11-09T22:39:20Z"
+          },
+          {
+            "name": "Compile the unchanged passive General API observer against the exact retained SDK",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 13,
+            "started_at": "2026-11-09T22:39:20Z",
+            "completed_at": "2026-11-09T22:39:41Z"
+          },
+          {
+            "name": "Execute all eight actual original corrected and observer-off-on cases in the inherited session",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 14,
+            "started_at": "2026-11-09T22:39:41Z",
+            "completed_at": "2026-11-09T22:40:48Z"
+          },
+          {
+            "name": "Independently re-read all unchanged original API assertions and exact SDK compiler source receipts",
+            "status": "completed",
+            "conclusion": "failure",
+            "number": 15,
+            "started_at": "2026-11-09T22:40:48Z",
+            "completed_at": "2026-11-09T22:41:12Z"
+          },
+          {
+            "name": "Print bounded actual failure diagnostics",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 16,
+            "started_at": "2026-11-09T22:41:12Z",
+            "completed_at": "2026-11-09T22:41:12Z"
+          },
+          {
+            "name": "Run actions/upload-artifact@v7",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 17,
+            "started_at": "2026-11-09T22:41:12Z",
+            "completed_at": "2026-11-09T22:41:21Z"
+          },
+          {
+            "name": "Post Retain the distinct immutable compiled C08 application and SDK source owner",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 32,
+            "started_at": "2026-11-09T22:41:21Z",
+            "completed_at": "2026-11-09T22:41:24Z"
+          },
+          {
+            "name": "Post Run actions/setup-python@v6",
+            "status": "completed",
+            "conclusion": "skipped",
+            "number": 33,
+            "started_at": "2026-11-09T22:41:24Z",
+            "completed_at": "2026-11-09T22:41:24Z"
+          },
+          {
+            "name": "Post Run actions/checkout@v7",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 34,
+            "started_at": "2026-11-09T22:41:24Z",
+            "completed_at": "2026-11-09T22:41:26Z"
+          },
+          {
+            "name": "Complete job",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 35,
+            "started_at": "2026-11-09T22:41:26Z",
+            "completed_at": "2026-11-09T22:41:26Z"
+          }
+        ],
+        "check_run_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/check-runs/129488509539",
+        "labels": [
+          "windows-2025"
+        ],
+        "runner_id": 1000007721,
+        "runner_name": "GitHub Actions 1000007721",
+        "runner_group_id": 0,
+        "runner_group_name": "GitHub Actions"
+      },
+      {
+        "id": 129488509553,
+        "run_id": 42713286498,
+        "workflow_name": "Phase 6 Fresh Hosted Current Windows General API Matrix",
+        "head_branch": "qualification/current-windows-general-api-v3",
+        "run_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/actions/runs/42713286498",
+        "run_attempt": 1,
+        "node_id": "CR_kwDOVd0Rac8AAAAeJh3acQ",
+        "head_sha": "8ad65617139767cba1e8fe92ef47bfedab6edd09",
+        "url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/actions/jobs/129488509553",
+        "html_url": "https://github.com/dcajacob/orbiter-cross-platform/actions/runs/42713286498/job/129488509553",
+        "status": "completed",
+        "conclusion": "failure",
+        "created_at": "2026-11-09T22:36:28Z",
+        "started_at": "2026-11-09T22:36:31Z",
+        "completed_at": "2026-11-09T22:42:08Z",
+        "name": "Current Windows original corrected observer matrix Release",
+        "steps": [
+          {
+            "name": "Set up job",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 1,
+            "started_at": "2026-11-09T22:36:32Z",
+            "completed_at": "2026-11-09T22:36:33Z"
+          },
+          {
+            "name": "Run actions/checkout@v7",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 2,
+            "started_at": "2026-11-09T22:36:33Z",
+            "completed_at": "2026-11-09T22:37:02Z"
+          },
+          {
+            "name": "Run actions/setup-python@v6",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 3,
+            "started_at": "2026-11-09T22:37:02Z",
+            "completed_at": "2026-11-09T22:37:02Z"
+          },
+          {
+            "name": "Retain the distinct immutable compiled C08 application and SDK source owner",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 4,
+            "started_at": "2026-11-09T22:37:02Z",
+            "completed_at": "2026-11-09T22:37:49Z"
+          },
+          {
+            "name": "Download only the exact original current SDK on GitHub",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 5,
+            "started_at": "2026-11-09T22:37:49Z",
+            "completed_at": "2026-11-09T22:37:59Z"
+          },
+          {
+            "name": "Restore all immutable application SDK members and re-read every original unit receipt",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 6,
+            "started_at": "2026-11-09T22:37:59Z",
+            "completed_at": "2026-11-09T22:38:15Z"
+          },
+          {
+            "name": "Verify the exact original source-owned application and SDK without resealing",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 7,
+            "started_at": "2026-11-09T22:38:15Z",
+            "completed_at": "2026-11-09T22:38:18Z"
+          },
+          {
+            "name": "Retain the original same-SDK inactive fixture required by the unchanged stager hash",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 8,
+            "started_at": "2026-11-09T22:38:18Z",
+            "completed_at": "2026-11-09T22:38:20Z"
+          },
+          {
+            "name": "Restore the exact original passive driver bytes without enabling them or changing the SDK",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 9,
+            "started_at": "2026-11-09T22:38:20Z",
+            "completed_at": "2026-11-09T22:38:22Z"
+          },
+          {
+            "name": "Bind all same-source original shaders to this explicit API diagnostic",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 10,
+            "started_at": "2026-11-09T22:38:22Z",
+            "completed_at": "2026-11-09T22:38:24Z"
+          },
+          {
+            "name": "Stage every unchanged original data and planetary input with retained failed transports",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 11,
+            "started_at": "2026-11-09T22:38:24Z",
+            "completed_at": "2026-11-09T22:39:47Z"
+          },
+          {
+            "name": "Stage exact original software renderer binaries and notices",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 12,
+            "started_at": "2026-11-09T22:39:47Z",
+            "completed_at": "2026-11-09T22:40:10Z"
+          },
+          {
+            "name": "Compile the unchanged passive General API observer against the exact retained SDK",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 13,
+            "started_at": "2026-11-09T22:40:10Z",
+            "completed_at": "2026-11-09T22:40:31Z"
+          },
+          {
+            "name": "Execute all eight actual original corrected and observer-off-on cases in the inherited session",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 14,
+            "started_at": "2026-11-09T22:40:31Z",
+            "completed_at": "2026-11-09T22:41:29Z"
+          },
+          {
+            "name": "Independently re-read all unchanged original API assertions and exact SDK compiler source receipts",
+            "status": "completed",
+            "conclusion": "failure",
+            "number": 15,
+            "started_at": "2026-11-09T22:41:29Z",
+            "completed_at": "2026-11-09T22:41:51Z"
+          },
+          {
+            "name": "Print bounded actual failure diagnostics",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 16,
+            "started_at": "2026-11-09T22:41:51Z",
+            "completed_at": "2026-11-09T22:41:51Z"
+          },
+          {
+            "name": "Run actions/upload-artifact@v7",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 17,
+            "started_at": "2026-11-09T22:41:51Z",
+            "completed_at": "2026-11-09T22:42:01Z"
+          },
+          {
+            "name": "Post Retain the distinct immutable compiled C08 application and SDK source owner",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 32,
+            "started_at": "2026-11-09T22:42:01Z",
+            "completed_at": "2026-11-09T22:42:04Z"
+          },
+          {
+            "name": "Post Run actions/setup-python@v6",
+            "status": "completed",
+            "conclusion": "skipped",
+            "number": 33,
+            "started_at": "2026-11-09T22:42:04Z",
+            "completed_at": "2026-11-09T22:42:04Z"
+          },
+          {
+            "name": "Post Run actions/checkout@v7",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 34,
+            "started_at": "2026-11-09T22:42:04Z",
+            "completed_at": "2026-11-09T22:42:06Z"
+          },
+          {
+            "name": "Complete job",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 35,
+            "started_at": "2026-11-09T22:42:06Z",
+            "completed_at": "2026-11-09T22:42:06Z"
+          }
+        ],
+        "check_run_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/check-runs/129488509553",
+        "labels": [
+          "windows-2025"
+        ],
+        "runner_id": 1000007722,
+        "runner_name": "GitHub Actions 1000007722",
+        "runner_group_id": 0,
+        "runner_group_name": "GitHub Actions"
+      }
+    ],
+    "artifact": {
+      "id": 13716298901,
+      "node_id": "MDg6QXJ0aWZhY3QxMzcxNjI5ODkwMQ==",
+      "name": "hosted-current-Windows-GeneralApi-Debug",
+      "size_in_bytes": 4256069,
+      "url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/actions/artifacts/13716298901",
+      "archive_download_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/actions/artifacts/13716298901/zip",
+      "expired": false,
+      "digest": "sha256:90fcf54a1a7fee0caabbf722aed70870c6be44fec0d01668cc084a1219290ddd",
+      "created_at": "2026-11-09T22:41:20Z",
+      "updated_at": "2026-11-09T22:41:20Z",
+      "expires_at": "2026-11-23T22:41:18Z",
+      "workflow_run": {
+        "id": 42713286498,
+        "repository_id": 1440551273,
+        "head_repository_id": 1440551273,
+        "head_branch": "qualification/current-windows-general-api-v3",
+        "head_sha": "8ad65617139767cba1e8fe92ef47bfedab6edd09"
+      }
+    }
+  }
+}

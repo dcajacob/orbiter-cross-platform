@@ -1,0 +1,130 @@
+name: Phase 6 Read Only Published Windows General API Audit
+
+on:
+  push:
+    branches: ['qualification/current-windows-general-api-reaudit-v1']
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: phase6-current-Windows-GeneralApi-reaudit-${{ github.ref }}
+  cancel-in-progress: false
+
+env:
+  GIT_CONFIG_COUNT: '1'
+  GIT_CONFIG_KEY_0: core.autocrlf
+  GIT_CONFIG_VALUE_0: 'false'
+
+jobs:
+  readiness:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - run: mkdir -p out && python3 -B Tests/Production/Closeout/run_controls.py --output out/Windows-api-reaudit-controls.json
+      - name: Execute unchanged actual Lua helpers and damaged-input controls
+        shell: bash
+        run: |
+          set -euo pipefail
+          if ! command -v lua5.4 >/dev/null; then
+            sudo apt-get update
+            sudo apt-get install -y --no-install-recommends lua5.4
+          fi
+          python3 -B Tests/Production/GeneralApiCorrection/Controls.Test.py --lua /usr/bin/lua5.4 --output out/Windows-api-reaudit-Lua-controls.json
+      - uses: actions/github-script@v8
+        with:
+          script: |
+            core.info(JSON.stringify(await require('./.github/scripts/phase6-download-bound-artifact.Test.cjs')({core})));
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: Windows-GeneralApi-reaudit-readiness
+          retention-days: 14
+          path: |
+            out/Windows-api-reaudit-controls.json
+            out/Windows-api-reaudit-Lua-controls.json
+  audit:
+    name: Reaudit existing Windows API ${{ matrix.configuration }}
+    needs: readiness
+    runs-on: windows-2025
+    timeout-minutes: 60
+    strategy:
+      fail-fast: false
+      max-parallel: 2
+      matrix:
+        configuration: [Debug, Release]
+    env:
+      CONFIGURATION: ${{ matrix.configuration }}
+      CELL: ${{ matrix.configuration }}-GeneralApi
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.14'
+      - name: Retain the separate immutable source that actually collected the observations
+        uses: actions/checkout@v7
+        with:
+          ref: 8ad65617139767cba1e8fe92ef47bfedab6edd09
+          path: capture-source
+          fetch-depth: 0
+      - name: Retain the separate immutable compiled application and SDK source
+        uses: actions/checkout@v7
+        with:
+          ref: c08f93151827949ee3ad498f8021f35c11753fde
+          path: application-source
+          fetch-depth: 0
+      - name: Download exact already-completed observations without starting the simulator
+        uses: actions/github-script@v8
+        with:
+          script: |
+            await require('./.github/scripts/phase6-download-published-current-api.cjs')({github,context,core});
+      - name: Download the unchanged original source-bound SDK bytes
+        uses: actions/github-script@v8
+        with:
+          script: |
+            await require('./.github/scripts/phase6-download-current-api-sdk.cjs')({github,context,core});
+      - name: Download the unchanged original inactive same-SDK fixture bytes
+        uses: actions/github-script@v8
+        with:
+          script: |
+            await require('./.github/scripts/phase6-download-inactive-api-fixture.cjs')({github,context,core});
+      - name: Restore exact raw members SDK provider and original metadata with separate audit provenance
+        run: python -B Tests/Production/GeneralApiCorrection/Hosted/replay_published_general_api.py --configuration ${{ matrix.configuration }}
+      - name: Re-read all original actual-case checks and retain raw plus canonical source identities
+        run: >-
+          python -B Tests/Production/GeneralApiCorrection/Hosted/audit_hosted_general_api.py
+          --request out/current-api-requests/${{ env.CELL }}/request.json
+          --capture-api out/published-Windows-api-source/${{ env.CONFIGURATION }}/api.json
+          --capture-source-owner capture-source --output out/Windows-api-published-reaudit/${{ env.CELL }}
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: published-Windows-GeneralApi-reaudit-${{ matrix.configuration }}
+          retention-days: 14
+          compression-level: 3
+          path: |
+            out/Windows-api-published-reaudit/${{ env.CELL }}/**
+            out/published-Windows-api-source/${{ env.CONFIGURATION }}/*.json
+            out/published-Windows-api-source/${{ env.CONFIGURATION }}/*.body
+            out/published-Windows-api-source/${{ env.CONFIGURATION }}/fresh-API-before-original-byte-restoration/**
+            out/current-api-requests/${{ env.CELL }}/**
+            out/current-api-exports/${{ env.CELL }}/**
+            out/current-api-observer/${{ env.CONFIGURATION }}/**
+            out/current-api-variant/${{ env.CELL }}/**
+            out/current-windows-sdk/restoration.json
+            out/current-windows-sdk/source-artifact/current-application.json
+            out/current-windows-sdk/source-artifact/registered-tests.json
+            out/current-windows-sdk/source-artifact/runtime-ctest.xml
+            out/current-observer-restoration/restoration.json
+            out/current-stock-preparation/observer/**
+            out/current-sdk-source/*.json
+            out/current-sdk-source/*.body
+            out/current-observer-download/*.json
+            out/current-observer-download/*.body
+            out/current-stock-mesa/*.json

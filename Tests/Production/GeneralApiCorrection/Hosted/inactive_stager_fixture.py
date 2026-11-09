@@ -11,13 +11,13 @@ PROTOCOL='phase6-inactive-original-C08-stager-fixture-v1'
 NAME='Modules/Plugin/ProductionCockpitDriver.dll'
 
 
-def describe(configuration):
+def describe(configuration,captured_source=None):
     record_path=ROOT/'out/current-observer-restoration/restoration.json';record=load(record_path)
     binary=ROOT/'out/current-stock-preparation/observer/ProductionCockpitDriver.dll'
     require(record['status']=='restored-original-passive-observer-only' and record['configuration']==configuration and
             record['compiled_application_source']==record['compiled_observer_source']==APPLICATION and
             record['original_preparation_source']==original.PRODUCER and record['original_run_id']==original.RUN and
-            record['restorer_source']==os.environ['GITHUB_SHA'] and record['observer_rebuilt'] is False and record['stock_simulation_executed'] is False,
+            record['restorer_source']==(captured_source or os.environ['GITHUB_SHA']) and record['observer_rebuilt'] is False and record['stock_simulation_executed'] is False,
             'Exact original same-SDK fixture restoration required')
     return dict(protocol=PROTOCOL,binary=str(binary),sha256=record['observer_binary_sha256'],restoration_path=str(record_path),
                 restoration_sha256=sha(record_path),original_run_id=record['original_run_id'],original_artifact_id=record['original_artifact_id'],
@@ -26,7 +26,7 @@ def describe(configuration):
 
 
 def guarded(cfg):
-    declaration=describe(cfg['configuration']);require(cfg['inactive_stager_fixture']==declaration and
+    declaration=describe(cfg['configuration'],cfg['github']['collector_commit']);require(cfg['inactive_stager_fixture']==declaration and
             declaration['sdk_manifest_sha256']==cfg['roles']['sdk']['manifest_sha256'],'Inactive fixture cannot substitute an active observer or SDK')
     record=load(declaration['restoration_path']);api=ROOT/'out/current-observer-download/api.json'
     original.validate_api(load(api),cfg['configuration'])
