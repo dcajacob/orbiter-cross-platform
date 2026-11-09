@@ -24,6 +24,17 @@ from execution import collect,worker_count
 CURRENT='Scenarios/(Current state).scn'
 
 
+def tracked_persistence_sources(root,producer):
+    """Record every immutable nested source required by the unchanged auditor."""
+    require(len(producer)==40 and all(c in '0123456789abcdef' for c in producer),'Full source producer required')
+    root=Path(root).resolve();prefix='Tests/Production/RemainingStockPersistence/'
+    names=subprocess.check_output(['git','-C',str(root),'ls-tree','-r','--name-only',producer,'--',prefix],text=True).splitlines()
+    require(names and all(name.startswith(prefix) and '..' not in Path(name).parts for name in names),'Complete tracked persistence source inventory required')
+    paths={root/name for name in names}
+    require(all(path.is_file() and not path.is_symlink() and path.resolve().is_relative_to(root) for path in paths),'Actual immutable persistence source file missing or redirected')
+    return paths
+
+
 def main():
     p=argparse.ArgumentParser(description=__doc__)
     for name in ('parent-capture','build','preserved','data','planets','mesa','output'):
@@ -54,7 +65,7 @@ def main():
         require(not parent['diagnostic_only'] and len(parent['cases'])==contract['complete_scenes'],'Full persistence requires all 38 original parent scenes')
     original_data=original.data_inputs.inspect(a.data,a.planets)
     require(original_data==parent['actual_original_simulation_data'],'Actual original data differs from parent')
-    paths=set(original.source_files())|{x for x in HERE.iterdir() if x.is_file()}
+    paths=set(original.source_files())|{x for x in HERE.iterdir() if x.is_file()}|tracked_persistence_sources(ROOT,producer)
     paths.add(Path(independent.__file__))
     sources={path.relative_to(ROOT).as_posix():sha(path) for path in paths}
     for name in sources:

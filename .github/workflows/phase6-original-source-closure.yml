@@ -1,0 +1,79 @@
+name: Phase 6 Original Windows Complete Source Inventory Retry
+
+on:
+  push:
+    branches: ['qualification/original-stock-source-closure-retry']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: phase6-original-source-closure-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  provenance:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - name: Verify recursive source collection and every unchanged helper control
+        run: mkdir -p out && python3 -B Tests/Production/Closeout/run_controls.py --output out/original-source-inventory-controls.json
+      - name: Bind original rejected captures and partial independent audit to their actual API bytes
+        uses: actions/github-script@v8
+        with:
+          script: |
+            const fs = require('fs');
+            const crypto = require('crypto');
+            const {owner,repo} = context.repo;
+            const run_id = 42515116858;
+            if (owner !== 'dcajacob' || repo !== 'orbiter-cross-platform') throw Error('Exact authorized repository required');
+            const run = (await github.rest.actions.getWorkflowRun({owner,repo,run_id})).data;
+            const jobs = (await github.paginate(github.rest.actions.listJobsForWorkflowRun,{owner,repo,run_id,per_page:100})).filter(j=>j.name.startsWith('Original Windows complete stock and exact-save reloads / Matched-clock v2 original '));
+            if (run.head_sha!=='f9bf6c7814965cd897f349f97890d9e005cbb66d' || run.status!=='completed' || run.conclusion!=='failure' || jobs.length!==4 || jobs.some(j=>j.status!=='completed' || j.conclusion!=='success')) throw Error('Exact preserved original cohort required');
+            fs.mkdirSync('out/original-source-inventory',{recursive:true});
+            const artifacts=[];
+            async function download(artifact,path,size,digest) {
+              if (artifact.expired || artifact.size_in_bytes!==size || artifact.digest!=='sha256:'+digest) throw Error('Exact preserved API artifact identity required');
+              const response = await github.rest.actions.downloadArtifact({owner,repo,artifact_id:artifact.id,archive_format:'zip'});
+              const bytes=Buffer.from(response.data);
+              if (bytes.length!==size || crypto.createHash('sha256').update(bytes).digest('hex')!==digest) throw Error('Actual retained ZIP digest/length differs');
+              fs.writeFileSync(path,bytes);
+            }
+            for (const [artifact_id,size,digest] of [
+              [13642036017,458097800,'0b451ec9fcf9e392d3a4808360b3ab9fda9e46999a1795be3fd232af5c40cf6e'],
+              [13641116315,452669562,'9deebe2c3ea8835c26b4ee84990516a8b5b4af081d5c509d7b38df985ad235f1'],
+              [13639876724,452684593,'2de9dafeec2d5b99d83066baece9c784924e93f6ee07e80fbfafef6de00f5f8e'],
+              [13638968833,458096852,'097116cce0bcda507c0546c98933155cb95e423c24f1ca58a387e235ac6a408d']]) {
+              const artifact=(await github.rest.actions.getArtifact({owner,repo,artifact_id})).data;
+              if (artifact.workflow_run.id!==run_id || artifact.workflow_run.head_sha!==run.head_sha) throw Error('Original source artifact substitution');
+              await download(artifact,'out/original-source-inventory/'+artifact.name+'.zip',size,digest);artifacts.push(artifact);
+            }
+            fs.writeFileSync('out/original-source-inventory/api.json',JSON.stringify({repository:context.repo,run,jobs,artifacts},null,2));
+            const audit_id=42542101820;
+            const audit_run=(await github.rest.actions.getWorkflowRun({owner,repo,run_id:audit_id})).data;
+            const artifact=(await github.rest.actions.getArtifact({owner,repo,artifact_id:13641389794})).data;
+            if (audit_run.head_sha!=='9af22bbd320b54025e9345f6bfbd05260d2287e8' || audit_run.status!=='completed' || audit_run.conclusion!=='failure' || artifact.workflow_run.id!==audit_id || artifact.workflow_run.head_sha!==audit_run.head_sha) throw Error('Actual rejected independent audit required');
+            await download(artifact,'out/original-source-inventory/failed-audit.zip',1037728,'3c32b79bd721a020de1a4594224a0769e8685ca5b20e019f76e46cf4dc9428da');
+            fs.writeFileSync('out/original-source-inventory/audit-api.json',JSON.stringify({repository:context.repo,run:audit_run,artifact},null,2));
+      - name: Independently identify every missing recorded source without modifying old capture metadata
+        run: python3 -B Tests/Production/Closeout/inspect_original_source_inventory.py
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: original-source-inventory-provenance
+          retention-days: 14
+          path: |
+            out/original-source-inventory/*.json
+            out/original-source-inventory-controls.json
+
+  original-stock:
+    name: Original Windows source-complete writer and exact-save reloads
+    needs: provenance
+    uses: ./.github/workflows/matched-clock-remaining-stock-full.yml
+    with:
+      data_container_lock: Tests/Production/stock-data-container-v2.lock.json
