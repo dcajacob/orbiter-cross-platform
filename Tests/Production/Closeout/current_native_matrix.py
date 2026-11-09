@@ -133,7 +133,9 @@ def aggregate(proofs,config):
 def bind_raw(cell,proof,payload=None,decode=True):
     base=ROOT/'out/current-matrix-current-inputs'/('-'.join(cell));api_file=base/'api.json';archive=base/'producer.zip';api=load(api_file)
     capture.api_identity(api,cell);payload=Path(payload) if payload else ROOT/'out/current-matrix-current-payload'/('-'.join(cell))
-    if decode:decode_current(api,archive,payload,cell)
+    if decode:
+        payload.parent.mkdir(parents=True,exist_ok=True)
+        decode_current(api,archive,payload,cell)
     report=proof['report'];members=native.physical.original.legacy.inspect_archive(archive,payload,api['artifact']['digest'][7:],api['artifact']['size_in_bytes'])
     require(members==report['current_decoded_members_sha256'] and api['artifact']['digest']==report['current_api_archive_sha256'] and
         api['artifact']['size_in_bytes']==report['current_api_archive_bytes'],'Every actual current raw member must equal the independent physical proof')

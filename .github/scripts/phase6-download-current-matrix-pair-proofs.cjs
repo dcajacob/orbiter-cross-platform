@@ -3,7 +3,7 @@ module.exports=async ({github,context,core})=>{
  const fs=require('fs'),crypto=require('crypto'),{owner,repo}=context.repo,run_id=Number(process.env.GITHUB_RUN_ID);
  if(owner!=='dcajacob'||repo!=='orbiter-cross-platform'||(await github.rest.repos.get({owner,repo})).data.private) throw Error('Exact existing public repository required');
  const run=(await github.rest.actions.getWorkflowRun({owner,repo,run_id})).data,jobs=await github.paginate(github.rest.actions.listJobsForWorkflowRun,{owner,repo,run_id,per_page:100});
- if(run.head_sha!==context.sha||run.run_attempt!==1||run.head_branch!=='codex/current-native-matrix-v1'||run.path!=='.github/workflows/phase6-current-native-matrix.yml') throw Error('Exact actual same-source direct-build producer required');
+ if(run.head_sha!==context.sha||run.run_attempt!==1||run.head_branch!=='qualification/current-native-matrix-v2'||run.path!=='.github/workflows/phase6-current-native-matrix.yml') throw Error('Exact actual same-source direct-build producer required');
  const artifacts=await github.paginate(github.rest.actions.listWorkflowRunArtifacts,{owner,repo,run_id,per_page:100}),ids=new Set();
  for(const mode of ['automatic','sse2']) for(const phase of ['stock','reload']){
   const name='Direct current native builds '+mode+' '+phase,matching=jobs.filter(j=>j.name===name);

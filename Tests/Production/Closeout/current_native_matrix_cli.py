@@ -9,7 +9,7 @@ import current_native_matrix as matrix
 from contracts import ROOT,require,sha,load,atomic_json
 
 PAIRS={(m,p) for m in ('automatic','sse2') for p in ('stock','reload')}
-BRANCH='codex/current-native-matrix-v1'
+BRANCH='qualification/current-native-matrix-v2'
 WORKFLOW='.github/workflows/phase6-current-native-matrix.yml'
 PAIR_STEPS=('Independently restore all original raw members and both real attempts',
  'Restore only the independently proven scalar and unchanged controls',

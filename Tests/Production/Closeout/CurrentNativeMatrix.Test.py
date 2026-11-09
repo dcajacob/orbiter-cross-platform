@@ -238,6 +238,39 @@ class CurrentNativeMatrixTests(unittest.TestCase):
                 partial=json.loads(failed.read_text());self.assertEqual(partial['status'],'failed')
                 self.assertEqual(len(partial['direct_comparison_phases']),3);self.assertFalse(partial['phase6_complete'])
 
+    def test_raw_current_decode_creates_fresh_parent_and_keeps_actual_archive_member_guards(self):
+        import hashlib
+        from types import SimpleNamespace
+        cell=('Debug','automatic','stock');label='-'.join(cell)
+        with tempfile.TemporaryDirectory() as temporary:
+            root=Path(temporary);base=root/'out/current-matrix-current-inputs'/label;base.mkdir(parents=True)
+            request=dict(configuration='Debug',math_profile='automatic',phase='stock',source_commit=matrix.capture.APPLICATION)
+            worker=dict(actual_processes=76,successful_presents=76*960,cases={'automatic-stock-'+c['id']:dict(runs=[{},{}]) for c in self.config()['cases']})
+            files={'current-stock-requests/'+label+'/request.json':json.dumps(request).encode(),
+                'current-stock-requests/'+label+'/worker-result.json':json.dumps(worker).encode(),
+                'current-stock-exports/'+label+'/automatic-stock/fixture00-1/scene.rgba':b'disposable fixture frame'}
+            with zipfile.ZipFile(base/'producer.zip','w') as zipped:
+                for name,data in files.items():zipped.writestr(name,data)
+            jobs=[dict(id=i+1,name='Source-complete current stock '+' '.join(c),run_id=matrix.capture.RUN,head_sha=matrix.capture.CAPTURE,
+                status='completed',conclusion='success',labels=['windows-2025'],steps=[dict(name=n,status='completed',conclusion='success') for n in matrix.capture.REQUIRED_STEPS]) for i,c in enumerate(matrix.capture.EXPECTED)]
+            jobs.append(dict(id=99,name='readiness',run_id=matrix.capture.RUN,head_sha=matrix.capture.CAPTURE,status='completed',conclusion='success',
+                labels=['ubuntu-24.04'],steps=[dict(name='Require the complete successful immutable independent original audit',status='completed',conclusion='success')]))
+            digest='sha256:'+matrix.sha(base/'producer.zip');size=(base/'producer.zip').stat().st_size
+            api=dict(repository=dict(owner='dcajacob',repo='orbiter-cross-platform'),jobs=jobs,
+                run=dict(id=matrix.capture.RUN,head_sha=matrix.capture.CAPTURE,run_attempt=1,head_branch='qualification/current-stock-capture-v4',
+                    path='.github/workflows/phase6-current-shader-stock.yml',status='completed',conclusion='success',repository=dict(full_name='dcajacob/orbiter-cross-platform')),
+                artifact=dict(id=123,name='shader-source-complete-current-stock-'+label,expired=False,digest=digest,size_in_bytes=size,
+                    workflow_run=dict(id=matrix.capture.RUN,head_sha=matrix.capture.CAPTURE)))
+            (base/'api.json').write_text(json.dumps(api))
+            proof=dict(report=dict(current_decoded_members_sha256={n:hashlib.sha256(b).hexdigest() for n,b in files.items()},
+                current_api_archive_sha256=digest,current_api_archive_bytes=size,cases={c['id']:{} for c in self.config()['cases']}))
+            parent=root/'out/current-matrix-current-payload';self.assertFalse(parent.exists())
+            with patch.object(matrix,'ROOT',root),patch.object(matrix.native.shutil,'disk_usage',return_value=SimpleNamespace(free=32*1024**3)):
+                folder,binding,actual_request,actual_worker=matrix.bind_raw(cell,proof)
+                self.assertTrue(parent.is_dir());self.assertEqual(actual_request,request);self.assertEqual(actual_worker,worker)
+                (folder/'fixture00-1/scene.rgba').write_bytes(b'changed')
+                with self.assertRaises(ValueError):matrix.bind_raw(cell,proof,Path(binding['payload']),decode=False)
+
     def test_workflow_never_runs_simulators_or_builds_and_preserves_all_partial_outputs(self):
         text=(matrix.ROOT/'.github/workflows/phase6-current-native-matrix.yml').read_text()
         self.assertEqual(text.count('runs-on: ubuntu-24.04'),3);self.assertIn('max-parallel: 2',text);self.assertIn('cancel-in-progress: false',text)
