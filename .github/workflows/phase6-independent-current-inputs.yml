@@ -1,0 +1,98 @@
+name: Phase 6 Independent Current Input Byte Inspection
+
+on:
+  push:
+    branches: ['qualification/hosted-current-audit-prep']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: phase6-independent-current-inputs-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  controls:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - run: mkdir -p out && python3 -B Tests/Production/Closeout/run_controls.py --output out/independent-current-helper-controls.json
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: independent-current-helper-controls
+          retention-days: 14
+          path: out/independent-current-helper-controls.json
+  inspect:
+    name: Independently inspect current Windows inputs ${{ matrix.configuration }}
+    needs: controls
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      max-parallel: 2
+      matrix:
+        configuration: [Debug, Release]
+    env:
+      CONFIGURATION: ${{ matrix.configuration }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.14'
+      - uses: actions/checkout@v7
+        with:
+          ref: c08f93151827949ee3ad498f8021f35c11753fde
+          path: application-source
+          fetch-depth: 0
+      - name: Download exact original SDK, passive observer and proven scalar control artifacts on GitHub
+        uses: actions/github-script@v8
+        with:
+          script: |
+            const fs=require('fs'),crypto=require('crypto');
+            const {owner,repo}=context.repo;
+            if (owner!=='dcajacob' || repo!=='orbiter-cross-platform') throw Error('Exact authorized repository required');
+            const configuration=process.env.CONFIGURATION;
+            const sdk={Debug:13636121355,Release:13635896646};
+            const observer={Debug:13637186106,Release:13635944416};
+            if (!sdk[configuration]) throw Error('Exact current configuration required');
+            for (const [name,run_id,artifact_id] of [['sdk',42525562745,sdk[configuration]],['observer',42529727362,observer[configuration]],['ssim',42537676857,13639682979]]) {
+              const run=(await github.rest.actions.getWorkflowRun({owner,repo,run_id})).data;
+              const jobs=await github.paginate(github.rest.actions.listJobsForWorkflowRun,{owner,repo,run_id,per_page:100});
+              const artifact=(await github.rest.actions.getArtifact({owner,repo,artifact_id})).data;
+              if (run.status!=='completed' || run.conclusion!=='success' || artifact.expired || artifact.workflow_run.id!==run_id) throw Error('Closed successful exact input producer required');
+              const response=await github.rest.actions.downloadArtifact({owner,repo,artifact_id,archive_format:'zip'});
+              const bytes=Buffer.from(response.data);
+              if ('sha256:'+crypto.createHash('sha256').update(bytes).digest('hex')!==artifact.digest || bytes.length!==artifact.size_in_bytes) throw Error('Actual API input ZIP bytes differ');
+              fs.mkdirSync('out/independent-input-source/'+name,{recursive:true});
+              fs.writeFileSync('out/independent-input-source/'+name+'/producer.zip',bytes);
+              fs.writeFileSync('out/independent-input-source/'+name+'/api.json',JSON.stringify({repository:context.repo,run,jobs,artifact},null,2));
+            }
+      - name: Independently re-read all source, SDK, actual original unit and passive compiler receipts
+        run: >-
+          python3 -B Tests/Production/CurrentWindows/Hosted/inspect_retained_inputs.py
+          --sdk-api out/independent-input-source/sdk/api.json --sdk-archive out/independent-input-source/sdk/producer.zip
+          --observer-api out/independent-input-source/observer/api.json --observer-archive out/independent-input-source/observer/producer.zip
+          --source-owner application-source --configuration ${{ matrix.configuration }}
+          --output out/independent-current-inputs/${{ matrix.configuration }}
+      - name: Restore the exact proven scalar arithmetic controls without recomputing acceptance
+        run: >-
+          python3 -B Tests/Production/Closeout/restore_hosted_ssim.py
+          --api out/independent-input-source/ssim/api.json --archive out/independent-input-source/ssim/producer.zip
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: independent-current-input-inspection-${{ matrix.configuration }}
+          retention-days: 14
+          path: |
+            out/independent-current-inputs/${{ matrix.configuration }}/inspection.json
+            out/independent-input-source/*/api.json
+            out/hosted-ssim-restoration/restoration.json
+            out/hosted-ssim-controls/verification.json
