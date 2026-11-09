@@ -1,0 +1,139 @@
+name: Phase 6 Independent Complete Native Original Physical Phases
+
+on:
+  push:
+    branches: ['qualification/native-original-physical-audit-v1']
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: phase6-native-original-physical-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  readiness:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - name: Preserve every original and added small helper control
+        run: mkdir -p out && python3 -B Tests/Production/Closeout/run_controls.py --output out/native-original-controls.json
+      - name: Require actual full original retry restoration and complete native retained-byte proofs
+        uses: actions/github-script@v8
+        with:
+          script: |
+            await require('./.github/scripts/phase6-require-retry-reference.cjs')({github,context,core});
+            await require('./.github/scripts/phase6-require-native-original-proofs.cjs')({github,context,core});
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: native-original-physical-readiness
+          retention-days: 14
+          path: |
+            out/native-original-controls.json
+            out/native-original-proof-readiness.json
+            out/exact-retry-reference-readiness.json
+  audit:
+    name: Independently compare original native ${{ matrix.profile }} ${{ matrix.phase }}
+    needs: readiness
+    runs-on: ubuntu-24.04
+    timeout-minutes: 180
+    strategy:
+      fail-fast: false
+      max-parallel: 2
+      matrix:
+        profile: [Debug-automatic, Debug-sse2, Release-automatic, Release-sse2]
+        phase: [stock-writer, windows-save-reload]
+    env:
+      PROFILE: ${{ matrix.profile }}
+      NATIVE_PHASE: ${{ matrix.phase }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.14'
+      - name: Download only exact native phase runtime provider Mesa and scalar source artifacts
+        uses: actions/github-script@v8
+        with:
+          script: |
+            await require('./.github/scripts/phase6-download-native-original-inputs.cjs')({github,context,core});
+      - name: Restore exact compiled CCC bytes with all original unit and discovery evidence
+        run: >-
+          python3 -B Tests/Production/Closeout/recheck_native_discovery.py
+          --api out/native-original-auxiliary/native/api.json --archive out/native-original-auxiliary/native/producer.zip
+          --profile "$PROFILE" --output "out/native-original-retained-units/$PROFILE"
+      - name: Restore exact separately owned base providers and all controls
+        run: >-
+          python3 -B Tests/Production/Closeout/restore_hosted_native_providers.py
+          --api out/native-original-auxiliary/providers/api.json --archive out/native-original-auxiliary/providers/producer.zip
+          --output out/native-provider-restoration/restoration.json
+      - name: Restore exact separately owned Mesa cleanup and every positive and negative control
+        run: >-
+          python3 -B Tests/Production/Closeout/restore_hosted_mesa_topology.py
+          --api out/native-original-auxiliary/mesa/api.json --archive out/native-original-auxiliary/mesa/producer.zip
+          --output out/mesa-topology-restoration/restoration.json
+      - name: Retain every original cohort archive and both real audit attempts on GitHub only
+        uses: actions/github-script@v8
+        with:
+          script: |
+            await require('./.github/scripts/phase6-download-source-complete-retry.cjs')({github,context,core});
+      - name: Independently restore every original source member with the exact retained retry lineage
+        run: >-
+          python3 -B Tests/Production/CurrentWindows/Hosted/restore_source_complete_retry_reference.py
+          --audit-api out/reference-api/audit.json --audit-archive out/reference-api/audit.zip
+          --reference-api out/reference-api/original.json --first-attempt-api out/reference-api/first.json
+          --first-attempt-archive out/reference-api/first.zip --first-attempt-log out/reference-api/first-job.log
+      - name: Stage exact untouched original Windows application SDK and assets without execution
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          configuration="${PROFILE%%-*}"
+          python3 -B Tests/Production/CockpitControls/prepare.py --configuration "$configuration" --cache out/original-stock-audit/preserved-cache --output "out/original-stock-audit/preserved-$configuration"
+      - name: Restore only the independently proven exact scalar implementation and its unchanged controls
+        run: >-
+          python3 -B Tests/Production/Closeout/restore_hosted_ssim.py
+          --api out/native-original-auxiliary/ssim/api.json --archive out/native-original-auxiliary/ssim/producer.zip
+      - name: Stage exact independent original Windows renderer DLLs and notices for byte inspection
+        run: python3 -B Tests/Production/stage_mesa.py stage --cache out/native-original-windows-mesa-cache --destination out/native-original-windows-mesa
+      - name: Independently inspect all real observations and directly compare all76 pairs in matching userspace
+        shell: bash
+        run: |
+          set -euo pipefail
+          image=$(python3 -c "import json; print('ubuntu@'+json.load(open('Tests/Production/Closeout/native-provider-container.lock.json'))['image_digest'])")
+          docker pull "$image"
+          docker image inspect "$image" > out/native-writer-container.json
+          docker run --rm --init --cpus=2 --shm-size=1g -v "$GITHUB_WORKSPACE:$GITHUB_WORKSPACE" -v /etc/ssl/certs/ca-certificates.crt:/run/orbiter-ci-system-ca.pem:ro -w "$GITHUB_WORKSPACE" \
+            -e GITHUB_ACTIONS -e RUNNER_OS -e ImageOS -e GITHUB_REPOSITORY -e GITHUB_WORKSPACE -e GITHUB_SHA -e PROFILE -e NATIVE_PHASE \
+            "$image" bash Tests/Production/Closeout/prepare_hosted_native_original_network.sh Tests/Production/Closeout/prepare_hosted_native_original_comparison.sh 2>&1 | tee out/native-original-container.log
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: native-original-physical-${{ matrix.profile }}-${{ matrix.phase }}
+          retention-days: 14
+          compression-level: 3
+          path: |
+            out/native-original-physical-audits/*.json
+            out/native-original-bootstrap/**
+            out/native-original-network/**
+            out/native-original-container.log
+            out/native-writer-container.json
+            out/native-original-source/**/*.json
+            out/native-original-auxiliary/**/api.json
+            out/native-original-retained-units/**/*.json
+            out/native-original-retained-units/**/*.xml
+            out/reference-api/*.json
+            out/reference-api/first.zip
+            out/reference-api/audit.zip
+            out/reference-api/first-job.log
+            out/reference-audit-restoration/restoration.json
+            out/original-stock-audit/transport/download.json
+            out/original-stock-audit/independent/*.json
+            out/native-provider-restoration/restoration.json
+            out/mesa-topology-restoration/restoration.json
+            out/hosted-ssim-restoration/restoration.json
