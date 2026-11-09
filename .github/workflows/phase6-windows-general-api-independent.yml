@@ -1,0 +1,80 @@
+name: Phase 6 Independently Verify Published Windows API Observations
+on:
+  push:
+    branches: ['qualification/windows-general-api-independent-v1']
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: phase6-independent-Windows-GeneralApi-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  readiness:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - run: mkdir -p out && python3 -B Tests/Production/Closeout/run_controls.py --output out/Windows-api-publication-controls.json
+      - uses: actions/github-script@v8
+        with:
+          script: |
+            core.info(JSON.stringify(await require('./.github/scripts/phase6-download-bound-artifact.Test.cjs')({core})));
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: independent-Windows-GeneralApi-readiness
+          retention-days: 14
+          path: out/Windows-api-publication-controls.json
+  audit:
+    name: Verify published Windows API ${{ matrix.configuration }}
+    needs: readiness
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      max-parallel: 2
+      matrix:
+        configuration: [Debug, Release]
+    env:
+      CONFIGURATION: ${{ matrix.configuration }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.14'
+      - name: Retain exact published Windows read-only audit and its actual API
+        uses: actions/github-script@v8
+        with:
+          script: |
+            await require('./.github/scripts/phase6-download-published-api-audit.cjs')({github,context,core});
+      - name: Retain exact original failed capture without changing its status or observations
+        uses: actions/github-script@v8
+        with:
+          script: |
+            await require('./.github/scripts/phase6-download-published-current-api.cjs')({github,context,core});
+      - name: Retain unchanged source-bound original SDK archive for every byte and unit re-read
+        uses: actions/github-script@v8
+        with:
+          script: |
+            await require('./.github/scripts/phase6-download-current-api-sdk.cjs')({github,context,core});
+      - name: Independently re-read raw ZIPs all original actual-case assertions and published evidence
+        run: >-
+          python3 -B Tests/Production/GeneralApiCorrection/Hosted/inspect_published_general_api.py
+          --configuration "$CONFIGURATION" --output "out/Windows-api-independent/$CONFIGURATION"
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: independent-published-Windows-GeneralApi-${{ matrix.configuration }}
+          retention-days: 14
+          path: |
+            out/Windows-api-independent/${{ matrix.configuration }}/proof/**
+            out/published-Windows-api-audit/${{ matrix.configuration }}/*.json
+            out/published-Windows-api-audit/${{ matrix.configuration }}/*.body
+            out/published-Windows-api-source/${{ matrix.configuration }}/*.json
+            out/published-Windows-api-source/${{ matrix.configuration }}/*.body
+            out/current-sdk-source/*.json
+            out/current-sdk-source/*.body
