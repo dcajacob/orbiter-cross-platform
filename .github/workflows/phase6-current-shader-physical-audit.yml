@@ -1,0 +1,179 @@
+name: Phase 6 Independent Shader Current Original Physical Audits
+
+on:
+  push:
+    branches: ['qualification/current-shader-physical-audit-v1']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: phase6-current-shader-physical-audit-v1-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  readiness:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    outputs:
+      capture_run_id: ${{ steps.closed.outputs.capture_run_id }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - name: Verify every original and added helper control
+        run: mkdir -p out && python3 -B Tests/Production/Closeout/run_controls.py --output out/current-physical-audit-controls.json
+      - name: Require the actual positive full retry reference restoration
+        uses: actions/github-script@v8
+        with:
+          script: |
+            await require('./.github/scripts/phase6-require-retry-reference.cjs')({github,context,core});
+      - name: Retain every actual current capture job and artifact API identity
+        id: closed
+        uses: actions/github-script@v8
+        with:
+          script: |
+            const fs=require('fs'),{owner,repo}=context.repo;
+            if(owner!=='dcajacob'||repo!=='orbiter-cross-platform'||context.ref!=='refs/heads/qualification/current-shader-physical-audit-v1') throw Error('Exact authorized audit repository and branch required');
+            const repository=(await github.rest.repos.get({owner,repo})).data;
+            if(repository.private||repository.archived) throw Error('Only the already-public active repository is authorized');
+            const run_id=42590249236;
+            const run=(await github.rest.actions.getWorkflowRun({owner,repo,run_id})).data;
+            const jobs=await github.paginate(github.rest.actions.listJobsForWorkflowRun,{owner,repo,run_id,per_page:100});
+            const artifacts=await github.paginate(github.rest.actions.listWorkflowRunArtifacts,{owner,repo,run_id,per_page:100});
+            fs.mkdirSync('out',{recursive:true});
+            fs.writeFileSync('out/current-physical-readiness-api.json',JSON.stringify({repository:context.repo,run,jobs,artifacts},null,2),{flag:'wx'});
+            core.setOutput('capture_run_id',String(run_id));
+      - name: Independently require all nine successful jobs and all eight exact current API cells
+        run: >-
+          python3 -B Tests/Production/CurrentWindows/Hosted/verify_shader_capture_readiness.py
+          --api out/current-physical-readiness-api.json --output out/current-physical-readiness.json
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: current-original-physical-readiness
+          retention-days: 14
+          path: |
+            out/current-physical-audit-controls.json
+            out/current-physical-readiness.json
+            out/current-physical-readiness-api.json
+            out/exact-retry-reference-readiness.json
+  audit:
+    name: Independently audit current original ${{ matrix.configuration }} ${{ matrix.math_profile }} ${{ matrix.phase }}
+    needs: readiness
+    runs-on: ubuntu-24.04
+    timeout-minutes: 180
+    strategy:
+      fail-fast: false
+      max-parallel: 4
+      matrix:
+        configuration: [Debug, Release]
+        math_profile: [automatic, sse2]
+        phase: [stock, reload]
+    env:
+      CONFIGURATION: ${{ matrix.configuration }}
+      MATH_PROFILE: ${{ matrix.math_profile }}
+      PHASE: ${{ matrix.phase }}
+      CELL: ${{ matrix.configuration }}-${{ matrix.math_profile }}-${{ matrix.phase }}
+      CAPTURE_RUN_ID: ${{ needs.readiness.outputs.capture_run_id }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.14'
+      - name: Retain the immutable current application source owner
+        uses: actions/checkout@v7
+        with:
+          ref: c08f93151827949ee3ad498f8021f35c11753fde
+          path: application-source
+          fetch-depth: 0
+      - name: Retain exact actual API ZIPs and source identities without executing Windows code
+        uses: actions/github-script@v8
+        with:
+          script: |
+            const fs=require('fs'),crypto=require('crypto');
+            const {owner,repo}=context.repo;
+            if (owner!=='dcajacob' || repo!=='orbiter-cross-platform') throw Error('Exact authorized public repository required');
+            if ((await github.rest.repos.get({owner,repo})).data.private) throw Error('Public repository qualification only');
+            const cfg=process.env.CONFIGURATION,mode=process.env.MATH_PROFILE,phase=process.env.PHASE;
+            if (!['Debug','Release'].includes(cfg) || !['automatic','sse2'].includes(mode) || !['stock','reload'].includes(phase)) throw Error('Exact complete phase required');
+            const cell=cfg+'-'+mode+'-'+phase;
+            async function record(run_id) {
+              const run=(await github.rest.actions.getWorkflowRun({owner,repo,run_id})).data;
+              const jobs=await github.paginate(github.rest.actions.listJobsForWorkflowRun,{owner,repo,run_id,per_page:100});
+              if (run.status!=='completed' || run.conclusion!=='success' || jobs.some(j=>j.status!=='completed' || j.conclusion!=='success')) throw Error('Closed successful immutable source required');
+              return {run,jobs};
+            }
+            async function download(base,source,artifact) {
+              if (artifact.expired || artifact.workflow_run.id!==source.run.id || artifact.workflow_run.head_sha!==source.run.head_sha) throw Error('Exact unexpired same-source API artifact required');
+              const response=await github.rest.actions.downloadArtifact({owner,repo,artifact_id:artifact.id,archive_format:'zip'});
+              const bytes=Buffer.from(response.data);
+              if (bytes.length!==artifact.size_in_bytes || 'sha256:'+crypto.createHash('sha256').update(bytes).digest('hex')!==artifact.digest) throw Error('Actual API ZIP size or digest differs');
+              fs.mkdirSync(base,{recursive:true});fs.writeFileSync(base+'/producer.zip',bytes,{flag:'wx'});
+              fs.writeFileSync(base+'/api.json',JSON.stringify({repository:context.repo,...source,artifact},null,2),{flag:'wx'});
+            }
+            const current=await record(Number(process.env.CAPTURE_RUN_ID));
+            if (current.run.id!==42590249236 || current.run.head_sha!=='eaf9b0a802af9f8a1b57a0721818224340ac22af' || current.run.run_attempt!==1 || current.run.head_branch!=='qualification/current-stock-capture-v4' || current.run.path!=='.github/workflows/phase6-current-shader-stock.yml' || current.jobs.length!==9) throw Error('Exact complete eight-cell current producer required');
+            const currentArtifacts=await github.paginate(github.rest.actions.listWorkflowRunArtifacts,{owner,repo,run_id:current.run.id,per_page:100});
+            const selected=currentArtifacts.filter(a=>a.name==='shader-source-complete-current-stock-'+cell);
+            if (selected.length!==1) throw Error('Exactly one actual complete current cell artifact required');
+            await download('out/current-physical-download/current',current,selected[0]);
+            const sdk={Debug:13636121355,Release:13635896646},observer={Debug:13637186106,Release:13635944416};
+            for (const [name,run_id,artifact_id] of [['sdk',42525562745,sdk[cfg]],['observer',42529727362,observer[cfg]],['ssim',42537676857,13639682979]]) {
+              const source=await record(run_id);const artifact=(await github.rest.actions.getArtifact({owner,repo,artifact_id})).data;
+              await download('out/current-physical-download/'+name,source,artifact);
+            }
+      - name: Retain both real original audit attempts and all four exact source cohort archives
+        uses: actions/github-script@v8
+        with:
+          script: |
+            await require('./.github/scripts/phase6-download-source-complete-retry.cjs')({github,context,core});
+      - name: Independently restore every exact original member and both actual audit attempts
+        run: >-
+          python3 -B Tests/Production/CurrentWindows/Hosted/restore_source_complete_retry_reference.py
+          --audit-api out/reference-api/audit.json --audit-archive out/reference-api/audit.zip
+          --reference-api out/reference-api/original.json --first-attempt-api out/reference-api/first.json
+          --first-attempt-archive out/reference-api/first.zip --first-attempt-log out/reference-api/first-job.log
+      - name: Independently inspect all original current SDK observer source and test receipts
+        run: >-
+          python3 -B Tests/Production/CurrentWindows/Hosted/inspect_retained_inputs.py
+          --sdk-api out/current-physical-download/sdk/api.json --sdk-archive out/current-physical-download/sdk/producer.zip
+          --observer-api out/current-physical-download/observer/api.json --observer-archive out/current-physical-download/observer/producer.zip
+          --source-owner application-source --configuration ${{ matrix.configuration }}
+          --output out/current-physical-inputs/${{ matrix.configuration }}
+      - name: Restore only the exact independently proven scalar SSIM controls
+        run: >-
+          python3 -B Tests/Production/Closeout/restore_hosted_ssim.py
+          --api out/current-physical-download/ssim/api.json --archive out/current-physical-download/ssim/producer.zip
+      - name: Stage exact independent Windows Mesa DLLs and notices for byte inspection
+        run: python3 -B Tests/Production/stage_mesa.py stage --cache out/current-physical-mesa-cache --destination out/current-physical-mesa
+      - name: Independently audit all 76 actual current processes direct original pairs and complete repeats
+        run: >-
+          python3 -B Tests/Production/CurrentWindows/Hosted/audit_current_shader_phase_cli.py
+          --api out/current-physical-download/current/api.json --archive out/current-physical-download/current/producer.zip
+          --input-inspection out/current-physical-inputs/${{ matrix.configuration }}/inspection.json
+          --ssim-api out/current-physical-download/ssim/api.json --ssim-archive out/current-physical-download/ssim/producer.zip
+          --mesa out/current-physical-mesa --configuration ${{ matrix.configuration }} --math-profile ${{ matrix.math_profile }}
+          --phase ${{ matrix.phase }} --output out/current-physical-audits/${{ env.CELL }}.json
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: shader-current-original-physical-${{ env.CELL }}
+          retention-days: 14
+          compression-level: 3
+          path: |
+            out/current-physical-audits/*.json
+            out/current-physical-download/**/api.json
+            out/reference-api/*.json
+            out/reference-api/first.zip
+            out/reference-api/audit.zip
+            out/reference-api/first-job.log
+            out/reference-audit-restoration/restoration.json
+            out/original-stock-audit/transport/download.json
+            out/original-stock-audit/independent/*.json
+            out/current-physical-inputs/${{ matrix.configuration }}/inspection.json
+            out/hosted-ssim-restoration/restoration.json
