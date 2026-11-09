@@ -1,0 +1,63 @@
+name: Phase 6 Retained Native Release Writer Failure Diagnostic
+
+on:
+  push:
+    branches: ['qualification/native-release-diagnostic']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: phase6-native-release-diagnostic-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  diagnostic:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - name: Download the exact retained failed Release writer artifacts on GitHub only
+        uses: actions/github-script@v8
+        with:
+          script: |
+            const fs = require('fs');
+            const crypto = require('crypto');
+            const {owner,repo} = context.repo;
+            const run_id = 42532847296;
+            const producer = 'd23d371a510dd464cde95a301dbc685514391f9c';
+            if (owner !== 'dcajacob' || repo !== 'orbiter-cross-platform') throw Error('Exact authorized repository required');
+            const run = (await github.rest.actions.getWorkflowRun({owner,repo,run_id})).data;
+            const jobs = await github.paginate(github.rest.actions.listJobsForWorkflowRun,{owner,repo,run_id,per_page:100});
+            if (run.head_sha!==producer || run.run_attempt!==1) throw Error('Exact original native writer source required');
+            for (const [profile,job_id,artifact_id,size,digest] of [
+              ['Release-sse2',128890766422,13643838359,353743219,'33137732fe1c1627850d205fc78b768bb6a7abff46197ea3507e7a021332b6a8'],
+              ['Release-automatic',128890766404,13644054477,353965745,'bea7052e4edf63f5f2e7dbe6375d1af3ac66cad27c9f6062466304594b7b5727']]) {
+              const job = jobs.filter(j=>j.id===job_id);
+              if (job.length!==1 || job[0].status!=='completed' || job[0].conclusion!=='failure') throw Error('Actual completed failed Release job required');
+              const artifact = (await github.rest.actions.getArtifact({owner,repo,artifact_id})).data;
+              if (artifact.expired || artifact.workflow_run.id!==run_id || artifact.workflow_run.head_sha!==producer || artifact.size_in_bytes!==size || artifact.digest!=='sha256:'+digest) throw Error('Exact failed writer API artifact required');
+              const result = await github.rest.actions.downloadArtifact({owner,repo,artifact_id,archive_format:'zip'});
+              const bytes = Buffer.from(result.data);
+              if ('sha256:'+crypto.createHash('sha256').update(bytes).digest('hex')!==artifact.digest || bytes.length!==size) throw Error('Actual API ZIP digest/length differs');
+              fs.mkdirSync('out/native-writer-diagnostic/'+profile,{recursive:true});
+              fs.writeFileSync('out/native-writer-diagnostic/'+profile+'/producer.zip',bytes);
+              fs.writeFileSync('out/native-writer-diagnostic/'+profile+'/api.json',JSON.stringify({repository:context.repo,run,jobs,artifact},null,2));
+            }
+      - name: Independently inspect both original raw process exits and consoles without execution
+        run: |
+          python3 -B Tests/Production/Closeout/inspect_failed_native_release.py --root out/native-writer-diagnostic --profile Release-sse2
+          python3 -B Tests/Production/Closeout/inspect_failed_native_release.py --root out/native-writer-diagnostic --profile Release-automatic
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: native-release-writer-failed-process-diagnostic
+          retention-days: 14
+          path: |
+            out/native-writer-diagnostic/*/api.json
+            out/native-writer-diagnostic/*/diagnostic.json
+            out/native-writer-diagnostic/*/selected/**
