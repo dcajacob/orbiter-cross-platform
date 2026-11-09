@@ -10,11 +10,23 @@ sys.path[:0]=[str(Path(__file__).resolve().parent),str(ROOT/'Tests/Production/Cl
 from contracts import require,load,atomic_json
 from inspect_source_complete_shader_phase import api_identity,EXPECTED,CAPTURE,RUN
 
+CONTROL_NAME='shader-source-complete-current-stock-controls'
+CONTROL_ID=13660628419
+CONTROL_SIZE=19011
+CONTROL_DIGEST='sha256:80d9eb00833fb1615deae555f8bff541520f549c3513b67ad4fa7601dfc20a05'
+
 
 def verify(record):
     artifacts=record['artifacts']
     names={'shader-source-complete-current-stock-'+'-'.join(cell) for cell in EXPECTED}
-    selected=[a for a in artifacts if a['name'].startswith('shader-source-complete-current-stock-')]
+    require(len(artifacts)==9 and {a['name'] for a in artifacts}==names|{CONTROL_NAME} and
+            len({a['id'] for a in artifacts})==9,
+            'Exact eight capture cells plus the distinct preserved control artifact required')
+    control=next(a for a in artifacts if a['name']==CONTROL_NAME)
+    require(control['id']==CONTROL_ID and control['size_in_bytes']==CONTROL_SIZE and control['digest']==CONTROL_DIGEST and
+            control['expired'] is False and control['workflow_run']['id']==RUN and control['workflow_run']['head_sha']==CAPTURE,
+            'Exact successful capture-control API artifact required')
+    selected=[a for a in artifacts if a['name'] in names]
     require(len(selected)==8 and {a['name'] for a in selected}==names and
             len({a['id'] for a in selected})==8,'All eight distinct actual complete shader capture artifacts required')
     require(all('self-hosted' not in job['labels'] for job in record['jobs']),
@@ -26,7 +38,7 @@ def verify(record):
         cells['-'.join(cell)]=dict(job_id=job['id'],artifact=artifact)
     return dict(protocol='phase6-independent-shader-current-capture-readiness-v1',
         status='verified-all-eight-closed-current-source-API-cells-only',capture_source=CAPTURE,capture_run_id=RUN,
-        actual_capture_cells=cells,physical_comparisons_pending=True,native_comparisons_pending=True,
+        actual_capture_cells=cells,actual_capture_control_artifact=control,physical_comparisons_pending=True,native_comparisons_pending=True,
         phase6_complete=False,native_admission_qualified=False)
 
 
