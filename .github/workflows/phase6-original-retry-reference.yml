@@ -1,0 +1,52 @@
+name: Phase 6 Exact Successful Retry Reference Restoration
+
+on:
+  push:
+    branches: ['qualification/original-retry-reference-check-v1']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: phase6-original-retry-reference-check-v1-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  restore:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - name: Preserve every original control and strict source guard
+        run: mkdir -p out && python3 -B Tests/Production/Closeout/run_controls.py --output out/original-retry-reference-controls.json
+      - name: Retain exact completed audit attempts and all four original API ZIPs on GitHub only
+        uses: actions/github-script@v8
+        with:
+          script: |
+            const download=require('./.github/scripts/phase6-download-source-complete-retry.cjs');
+            await download({github,context,core});
+      - name: Independently restore all 608 audited original captures without changing their provenance
+        run: >-
+          python3 -B Tests/Production/CurrentWindows/Hosted/restore_source_complete_retry_reference.py
+          --audit-api out/reference-api/audit.json --audit-archive out/reference-api/audit.zip
+          --reference-api out/reference-api/original.json
+          --first-attempt-api out/reference-api/first.json --first-attempt-archive out/reference-api/first.zip
+          --first-attempt-log out/reference-api/first-job.log
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: exact-successful-audit-retry-reference-restoration
+          retention-days: 14
+          path: |
+            out/original-retry-reference-controls.json
+            out/reference-api/*.json
+            out/reference-api/first-job.log
+            out/reference-audit-restoration/restoration.json
+            out/reference-audit-restoration/first-attempt-source-artifact/**
+            out/reference-audit-restoration/source-artifact/**
+            out/original-stock-audit/transport/download.json
+            out/original-stock-audit/independent/*.json

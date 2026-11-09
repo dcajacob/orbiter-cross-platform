@@ -25,16 +25,16 @@ class ExactOriginalAuditRetryTests(unittest.TestCase):
     def api(self,attempt=1):
         first=attempt==1
         start='2026-11-09T06:22:49Z' if first else '2026-11-09T06:34:38Z'
-        end='2026-11-09T06:25:42Z' if first else '2026-11-09T08:00:00Z'
-        upload='2026-11-09T06:25:41Z' if first else '2026-11-09T07:59:59Z'
+        end='2026-11-09T06:25:42Z' if first else '2026-11-09T07:12:52Z'
+        upload='2026-11-09T06:25:41Z' if first else '2026-11-09T07:12:49Z'
         steps=[dict(name=name,status='completed',conclusion=('success' if n<3 or n==7 else 'failure' if n==3 else 'skipped') if first else 'success')
             for n,name in enumerate(prior.STEPS)]
         run=dict(id=retry.RUN,repository=dict(full_name='dcajacob/orbiter-cross-platform'),head_sha=retry.AUDITOR,
             head_branch=retry.BRANCH,path=retry.WORKFLOW,run_attempt=attempt,status='completed',conclusion='failure' if first else 'success')
         job=dict(id=retry.FIRST_JOB if first else retry.RETRY_JOB,name='audit',run_id=retry.RUN,head_sha=retry.AUDITOR,
             head_branch=retry.BRANCH,status='completed',conclusion=run['conclusion'],labels=['ubuntu-24.04'],steps=steps,started_at=start,completed_at=end)
-        artifact=dict(id=retry.FIRST_ARTIFACT if first else retry.FIRST_ARTIFACT+10,name=retry.ARTIFACT_NAME,
-            expired=False,size_in_bytes=retry.FIRST_SIZE if first else 1024,digest='sha256:'+(retry.FIRST_DIGEST if first else 'a'*64),
+        artifact=dict(id=retry.FIRST_ARTIFACT if first else retry.RETRY_ARTIFACT,name=retry.ARTIFACT_NAME,
+            expired=False,size_in_bytes=retry.FIRST_SIZE if first else retry.RETRY_SIZE,digest='sha256:'+(retry.FIRST_DIGEST if first else retry.RETRY_DIGEST),
             workflow_run=dict(id=retry.RUN,head_sha=retry.AUDITOR,head_branch=retry.BRANCH),created_at=upload,updated_at=upload)
         return dict(repository=dict(owner='dcajacob',repo='orbiter-cross-platform'),run=run,jobs=[job],artifact=artifact)
 
@@ -56,7 +56,8 @@ class ExactOriginalAuditRetryTests(unittest.TestCase):
             lambda r:r['run'].update(conclusion='failure'),lambda r:r['jobs'][0].update(id=retry.FIRST_JOB),
             lambda r:r['jobs'][0]['steps'][6].update(conclusion='skipped'),lambda r:r['jobs'][0].update(labels=['self-hosted']),
             lambda r:r['artifact'].update(id=retry.FIRST_ARTIFACT),lambda r:r['artifact'].update(created_at='2026-11-09T06:25:41Z'),
-            lambda r:r['artifact'].update(updated_at='2026-11-09T08:00:01Z'),lambda r:r['artifact'].update(size_in_bytes=0),
+            lambda r:r['artifact'].update(updated_at='2026-11-09T08:00:01Z'),lambda r:r['artifact'].update(size_in_bytes=0),lambda r:r['artifact'].update(id=retry.RETRY_ARTIFACT+1),
+            lambda r:r['artifact'].update(size_in_bytes=retry.RETRY_SIZE+1),lambda r:r['artifact'].update(digest='sha256:'+'a'*64),
             lambda r:r['artifact']['workflow_run'].update(head_sha='c'*40)]
         for change in changes:
             modified=copy.deepcopy(api);change(modified)

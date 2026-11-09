@@ -86,6 +86,7 @@ def main():
     lineage=retry.inspect_first_evidence(first,a.first_attempt_archive,a.first_attempt_log,base/'first-attempt-source-artifact',prior)
     lineage['first_attempt_api_sha256']=sha(a.first_attempt_api)
     payload=base/'source-artifact';extract(a.audit_archive,payload)
+    audit_members=transport.legacy.inspect_archive(a.audit_archive,payload,artifact['digest'].removeprefix('sha256:'),artifact['size_in_bytes'])
     original=payload/'original-stock-audit';manifest_file=original/'transport/download.json';writer_file=original/'independent/writer-audit.json'
     cohort_file=original/'independent/original-persistence-audit.json';manifest=load(manifest_file);writer=load(writer_file);cohort=load(cohort_file)
     audit_receipts(manifest,writer,cohort,sha(manifest_file),sha(writer_file))
@@ -112,11 +113,14 @@ def main():
     report=dict(protocol='phase6-source-complete-original-reference-retry-restoration-v3',status='restored-exact-original-cohort-after-verified-audit-retry-only',audit_retry_lineage=lineage,
         original_capture_source=ORIGINAL,original_auditor_source=AUDITOR,original_audit_run_id=api['run']['id'],
         original_audit_artifact_id=artifact['id'],original_audit_archive_sha256=artifact['digest'],
+        successful_audit_decoded_members_sha256=audit_members,
         restorer_source=os.environ['GITHUB_SHA'],actual_reference_api_sha256=sha(a.reference_api),source_audit_api_sha256=sha(a.audit_api),
         original_transport_sha256=sha(manifest_file),original_writer_audit_sha256=sha(writer_file),original_cohort_audit_sha256=sha(cohort_file),
         original_api_archive_bindings=bindings,original_windows_processes=608,current_or_native_qualification_granted=False,
         original_saves_relabelled=False,phase6_complete=False,native_admission_qualified=False)
-    require(sha(a.first_attempt_archive)==retry.FIRST_DIGEST and retry.log_identity(a.first_attempt_log)[1]==lineage['first_job_log_transport'] and
+    require(a.audit_archive.stat().st_size==artifact['size_in_bytes'] and 'sha256:'+sha(a.audit_archive)==artifact['digest'] and
+            transport.legacy.inspect_archive(a.audit_archive,payload,artifact['digest'].removeprefix('sha256:'),artifact['size_in_bytes'])==audit_members and
+            sha(a.first_attempt_archive)==retry.FIRST_DIGEST and retry.log_identity(a.first_attempt_log)[1]==lineage['first_job_log_transport'] and
             all(sha(path)==value for path,value in guarded_APIs.items()) and
             transport.legacy.inspect_archive(a.first_attempt_archive,base/'first-attempt-source-artifact',retry.FIRST_DIGEST,retry.FIRST_SIZE)==lineage['first_decoded_members_sha256'],
             'Preserved first attempt or actual source API receipts changed during successful reference restoration')

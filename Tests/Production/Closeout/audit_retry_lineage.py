@@ -14,6 +14,9 @@ RUN=42572661826
 AUDITOR='a13bae582c7de0c9b6e2fd0c064b1a3ea12e85c7'
 FIRST_JOB=129013339394
 RETRY_JOB=129017134966
+RETRY_ARTIFACT=13655952217
+RETRY_SIZE=1591965
+RETRY_DIGEST='c4fe019b60cf001be2425cc0bf69a496baea0bd6edd7b86d172632e03cdb6e4b'
 FIRST_ARTIFACT=13653861871
 FIRST_SIZE=504023
 FIRST_DIGEST='27a7bb25c20f123eb43a3c29e5d9863045c91729a1016d2c56edd706f416a417'
@@ -106,10 +109,10 @@ def validate_first_api(record,steps):
 
 def validate_retry_api(record,steps):
     run=run_identity(record,2,'success');job=job_identity(record,RETRY_JOB,'success');artifact=record['artifact']
-    require(type(artifact['id']) is int and artifact['id']>0 and artifact['id']!=FIRST_ARTIFACT and
+    require(type(artifact['id']) is int and artifact['id']==RETRY_ARTIFACT and
             artifact['name']==ARTIFACT_NAME and artifact['expired'] is False and
-            type(artifact['size_in_bytes']) is int and 0<artifact['size_in_bytes']<256*1024**2 and
-            re.fullmatch('sha256:[0-9a-f]{64}',artifact['digest']) and
+            type(artifact['size_in_bytes']) is int and artifact['size_in_bytes']==RETRY_SIZE and
+            artifact['digest']=='sha256:'+RETRY_DIGEST and
             artifact['workflow_run']['id']==run['id'] and artifact['workflow_run']['head_sha']==AUDITOR and
             artifact['workflow_run']['head_branch']==BRANCH,'Exact successful same-source retry artifact required')
     for name in steps:step(job,name,'success')
