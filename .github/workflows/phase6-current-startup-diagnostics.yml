@@ -1,0 +1,42 @@
+name: Phase 6 Retained Current Windows Startup Diagnosis
+
+on:
+  push:
+    branches: ['qualification/current-startup-diagnostics-v1']
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: phase6-current-startup-diagnostics-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  inspect:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+      - name: Retain only exact original failed process ZIPs on GitHub
+        uses: actions/github-script@v8
+        with:
+          script: |
+            const fs=require('fs'),crypto=require('crypto'),{owner,repo}=context.repo;
+            if(owner!=='dcajacob'||repo!=='orbiter-cross-platform'||(await github.rest.repos.get({owner,repo})).data.private) throw Error('Exact already-public repository required');
+            const pins=[[13659575105,"Debug-sse2-stock",139181,"863cefbf9e299af8a542ad79c59fe46fd9c951f9f182bf80b32cba6736679302"],[13658128240,"Release-automatic-reload",116948,"69f420f5f0ad540f019a25d036ef9c88dcedc636ecbd25958667572c7d526bde"],[13658024072,"Release-sse2-stock",139387,"80a8cc01407a97110148adf721d0c0b4b3a5f227ce4acb63eb282bc4b46e7166"],[13658258820,"Release-sse2-reload",116634,"44d75dd17e09fe1b7ff24e6839e952b37bd946f1ca0fdaf1f73606888520ef12"]];fs.mkdirSync('out/current-startup-source',{recursive:true});
+            for(const [artifact_id,cell,size,digest] of pins){
+             const artifact=(await github.rest.actions.getArtifact({owner,repo,artifact_id})).data;
+             if(artifact.id!==artifact_id||artifact.name!=='retry-source-complete-current-stock-partial-'+cell||artifact.expired||artifact.size_in_bytes!==size||artifact.digest!=='sha256:'+digest||artifact.workflow_run.id!==42582449592||artifact.workflow_run.head_sha!=='a8db052a9fd6f16d7f33aebbd37210fcf3ea489a') throw Error('Exact original failed current process source artifact required');
+             const response=await github.rest.actions.downloadArtifact({owner,repo,artifact_id,archive_format:'zip'}),bytes=Buffer.from(response.data);
+             if(bytes.length!==size||'sha256:'+crypto.createHash('sha256').update(bytes).digest('hex')!==artifact.digest) throw Error('Actual failed process ZIP length/digest differs');
+             fs.writeFileSync('out/current-startup-source/'+cell+'.zip',bytes,{flag:'wx'});
+             fs.writeFileSync('out/current-startup-source/'+cell+'.api.json',JSON.stringify({repository:context.repo,artifact},null,2),{flag:'wx'});
+            }
+      - name: Read retained process console and Orbiter logs without execution
+        run: python3 -B Tests/Production/Closeout/inspect_current_startup_text.py
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: current-Windows-retained-startup-diagnosis
+          retention-days: 14
+          path: |
+            out/current-startup-source/*.api.json
+            out/current-startup-diagnostic/**
