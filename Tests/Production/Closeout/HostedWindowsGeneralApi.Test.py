@@ -157,13 +157,22 @@ class HostedWindowsGeneralApiTests(unittest.TestCase):
     def test_original_case_reader_uses_separate_locked_LF_inputs_without_changing_raw_sources(self):
         with tempfile.TemporaryDirectory() as directory:
             base=Path(directory);source=base/'source';destination=base/'reader';immutable={}
-            for name in (audit.ORIGINAL,audit.EARTH):
+            for name in (audit.ORIGINAL,audit.EARTH,'Scenarios/Tests/GeneralApiTest.scn'):
                 body=(ROOT/name).read_bytes().replace(b'\r\n',b'\n');immutable[name]=body
                 path=source/name;path.parent.mkdir(parents=True,exist_ok=True);path.write_bytes(body.replace(b'\n',b'\r\n'))
             raw={name:(source/name).read_bytes() for name in immutable}
             with patch.object(audit.subprocess,'check_output',side_effect=lambda argv:immutable[argv[-1].split(':',1)[1]]):
                 evidence=audit.canonical_case_inputs(source,destination)
             self.assertEqual(set(evidence),set(immutable))
+            previous=audit.startup_contract.ROOT
+            with audit.original_case_input_context(destination):
+                self.assertEqual(audit.startup_contract.ROOT,destination)
+                self.assertEqual(audit.startup_contract.settings()['protocol'],'general-api-startup-exit-v1')
+            self.assertEqual(audit.startup_contract.ROOT,previous)
+            with self.assertRaisesRegex(RuntimeError,'deliberate disposable failure'):
+                with audit.original_case_input_context(destination):
+                    raise RuntimeError('deliberate disposable failure')
+            self.assertEqual(audit.startup_contract.ROOT,previous)
             for name,body in immutable.items():
                 self.assertEqual((destination/name).read_bytes(),body)
                 self.assertEqual((source/name).read_bytes(),raw[name])

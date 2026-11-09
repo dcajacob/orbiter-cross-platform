@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Re-read actual hosted Windows API results with every original case assertion unchanged."""
 import argparse
+from contextlib import contextmanager,nullcontext
 import hashlib
 import importlib.util
 import json
@@ -17,6 +18,7 @@ sys.path[:0]=[str(Path(__file__).resolve().parent),str(ROOT/'Tests/Production/Ge
 from general_api_provider import require,sha,load,validate,APPLICATION
 from execute_hosted_general_api import terminal
 from prepare import ORIGINAL,EARTH,corrected,digest
+import startup_contract
 from startup_contract import events,corrected_log,inspect_windows_roster
 from restore_sdk import validate_api,PINS
 LEGACY=ROOT/'Tests/Production/GeneralApiCorrection/audit_windows.py'
@@ -42,7 +44,8 @@ def inspect_cases(cfg,worker,export,obs,case_inputs=None):
     namespace=dict(globals())
     if case_inputs is not None:namespace['ROOT']=Path(case_inputs)
     exec(compile('def cases(cfg,worker,export,obs):\n'+original_case_body()+'    return results\n',str(LEGACY),'exec'),namespace)
-    return namespace['cases'](cfg,worker,export,obs)
+    with original_case_input_context(case_inputs) if case_inputs is not None else nullcontext():
+        return namespace['cases'](cfg,worker,export,obs)
 
 
 
@@ -82,6 +85,20 @@ def inspect_compiled_source(actual,immutable,raw_recorded_sha256,canonical_recor
 
 
 
+
+@contextmanager
+def original_case_input_context(case_inputs):
+    # The unchanged nested startup-policy reader must see the same pinned LF view.
+    # Its complete scenario, script, vessel and intentional-exit checks still execute.
+    previous=startup_contract.ROOT
+    startup_contract.ROOT=Path(case_inputs)
+    try:
+        startup_contract.settings()
+        yield
+    finally:
+        startup_contract.ROOT=previous
+
+
 def canonical_case_inputs(source,destination):
     """Supply the original LF-based comparison body with immutable canonical inputs.
 
@@ -91,14 +108,16 @@ def canonical_case_inputs(source,destination):
     source=Path(source);destination=Path(destination)
     require(not destination.exists(),'Fresh immutable API reader input snapshot required')
     lock=load(ROOT/'Tests/Production/GeneralApiCorrection/inputs-v2.json')
+    policy=load(ROOT/'Tests/Production/GeneralApiCorrection/startup-policy-v1.json')
+    expected=dict(lock['inputs_sha256_lf']);expected['Scenarios/'+policy['scenario']]=policy['scenario_sha256_lf']
     identities={}
-    for name in (ORIGINAL,EARTH):
+    for name,expected_sha256 in expected.items():
         original=subprocess.check_output(['git','-C',str(source),'show',APPLICATION+':'+name])
         canonical=original.replace(b'\r\n',b'\n')
         actual=(source/name).read_bytes()
         require(actual.replace(b'\r\n',b'\n')==canonical and
                 (ROOT/name).read_bytes().replace(b'\r\n',b'\n')==canonical and
-                digest(canonical)==lock['inputs_sha256_lf'][name],
+                digest(canonical)==expected_sha256,
                 'API reader fixture must equal its immutable compiled source and locked canonical input')
         target=destination/name;target.parent.mkdir(parents=True,exist_ok=True);target.write_bytes(canonical)
         require(target.read_bytes()==canonical,'Immutable canonical reader input snapshot changed')

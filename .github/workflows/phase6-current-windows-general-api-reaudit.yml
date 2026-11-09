@@ -2,7 +2,7 @@ name: Phase 6 Read Only Published Windows General API Audit
 
 on:
   push:
-    branches: ['qualification/current-windows-general-api-reaudit-v2']
+    branches: ['qualification/current-windows-general-api-reaudit-v3']
 
 permissions:
   contents: read
