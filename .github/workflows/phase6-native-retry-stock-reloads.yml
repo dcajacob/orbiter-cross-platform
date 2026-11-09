@@ -2,7 +2,7 @@ name: Phase 6 Native Exact Original Saves With Verified Audit Retry
 
 on:
   push:
-    branches: ['qualification/native-stock-reload-debug-automatic-v2', 'qualification/native-stock-reload-debug-sse2-v2', 'qualification/native-stock-reload-release-automatic-v2', 'qualification/native-stock-reload-release-sse2-v2']
+    branches: ['qualification/native-stock-reload-debug-automatic-v3', 'qualification/native-stock-reload-debug-sse2-v3', 'qualification/native-stock-reload-release-automatic-v3', 'qualification/native-stock-reload-release-sse2-v3']
 
 permissions:
   contents: read
@@ -48,7 +48,7 @@ jobs:
       max-parallel: 2
       matrix:
         configuration: ${{ fromJSON(contains(github.ref_name, '-debug-') && '["Debug"]' || '["Release"]') }}
-        math_profile: ${{ fromJSON(endsWith(github.ref_name, '-automatic-v2') && '["automatic"]' || '["sse2"]') }}
+        math_profile: ${{ fromJSON(endsWith(github.ref_name, '-automatic-v3') && '["automatic"]' || '["sse2"]') }}
     env:
       PROFILE: ${{ matrix.configuration }}-${{ matrix.math_profile }}
       REFERENCE_AUDIT_RUN_ID: ${{ needs.controls.outputs.audit_run_id }}
@@ -166,7 +166,7 @@ jobs:
           docker image inspect "$image" > out/native-writer-container.json
           docker run --rm --init --cpus=2 --shm-size=1g -v "$GITHUB_WORKSPACE:$GITHUB_WORKSPACE" -v /etc/ssl/certs/ca-certificates.crt:/run/orbiter-ci-system-ca.pem:ro -w "$GITHUB_WORKSPACE" \
             -e GITHUB_ACTIONS -e RUNNER_OS -e GITHUB_WORKSPACE -e GITHUB_SHA -e PROFILE \
-            "$image" bash Tests/Production/Closeout/prepare_hosted_native_network.sh Tests/Production/Closeout/prepare_hosted_native_retry_reload.sh 2>&1 | tee out/native-writer-container.log
+            "$image" bash Tests/Production/Closeout/prepare_hosted_native_retry_network.sh Tests/Production/Closeout/prepare_hosted_native_retry_reload.sh 2>&1 | tee out/native-writer-container.log
       - name: Print bounded diagnostics from any incomplete collection
         if: failure()
         shell: python
