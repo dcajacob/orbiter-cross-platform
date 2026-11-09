@@ -166,6 +166,7 @@ def main():
     for source,name in ((report_path,'original-Windows-audit.json'),(base/'api.json','read-only-audit-api.json'),
                         (original_base/'api.json','original-failed-capture-api.json'),(sdk_base/'api.json','sdk-api.json')):
         shutil.copy2(source,retained/name)
+    progress['status']='passed-complete-read-only-publication-audit';completed('complete-independent-configuration-verification')
     proof=dict(protocol='phase6-independent-published-Windows-GeneralApi-v1',status='verified-published-Windows-GeneralApi-configuration-only',
         configuration=configuration,profiles=report['profiles'],actual_original_processes=8,
         auditor_source=os.environ['GITHUB_SHA'],auditor_run_id=int(os.environ['GITHUB_RUN_ID']),
@@ -179,7 +180,7 @@ def main():
         retained_receipt_sha256={x.name:sha(x) for x in retained.iterdir()},
         no_new_simulator_processes=True,new_simulator_processes_launched=0,
         joint_GeneralApi_qualification_pending=True,normal_admission_qualified=False,phase6_complete=False,hands_on_ready=False)
-    (retained/'proof.json').write_text(json.dumps(proof,indent=2)+'\n');progress['status']='passed-complete-read-only-publication-audit';completed('complete-independent-configuration-proof');print(proof['status'])
+    (retained/'proof.json').write_text(json.dumps(proof,indent=2)+'\n');print(proof['status'])
 
 
 if __name__=='__main__':main()
