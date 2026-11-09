@@ -1,0 +1,34 @@
+name: Stop Only Incidental Portable Run 42681825225
+on:
+  push:
+    branches: [qualification/stop-incidental-portable-42681825225]
+permissions:
+  contents: read
+  actions: write
+jobs:
+  stop:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - name: Verify exact owned incidental run and stop only it
+        uses: actions/github-script@v8
+        with:
+          script: |
+            const fs=require('fs'),{owner,repo}=context.repo,run_id=42681825225;
+            if(owner!=='dcajacob'||repo!=='orbiter-cross-platform'||(await github.rest.repos.get({owner,repo})).data.private) throw Error('Exact existing public repository required');
+            const run=(await github.rest.actions.getWorkflowRun({owner,repo,run_id})).data;
+            const jobs=await github.paginate(github.rest.actions.listJobsForWorkflowRun,{owner,repo,run_id,per_page:100});
+            if(run.id!==run_id||run.head_sha!=='4ae57cd0c8ed4224bb554c97d1757d33104310d0'||run.head_branch!=='codex/current-native-matrix-v1'||run.path!=='.github/workflows/portable-core.yml'||run.event!=='push') throw Error('Refuse to cancel any other source/workflow/run');
+            fs.mkdirSync('out',{recursive:true});
+            fs.writeFileSync('out/incidental-before.json',JSON.stringify({repository:context.repo,run,jobs},null,2),{flag:'wx'});
+            if(run.status!=='completed'){
+              const response=await github.rest.actions.cancelWorkflowRun({owner,repo,run_id});
+              fs.writeFileSync('out/incidental-cancel-response.json',JSON.stringify({status:response.status,run_id},null,2),{flag:'wx'});
+              core.info('Requested cancellation of only incidental portable run '+run_id+'; intended matrix run 42681826323 unchanged');
+            }else core.info('Incidental run already completed; no further action');
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: incidental-portable-run-42681825225-stop-receipt
+          retention-days: 14
+          path: out/*.json
