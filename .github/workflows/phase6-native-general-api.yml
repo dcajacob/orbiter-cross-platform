@@ -1,0 +1,122 @@
+name: Phase 6 Fresh Native General API Diagnostics
+
+on:
+  push:
+    branches: ['qualification/native-general-api-v1']
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: phase6-native-general-api-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  readiness:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - name: Preserve every original and added small helper control
+        run: mkdir -p out && python3 -B Tests/Production/Closeout/run_controls.py --output out/native-api-controls.json
+      - name: Verify complete common core and conserved original API collectors
+        run: >-
+          python3 -B -c "import sys,json;sys.path.insert(0,'Tests/Production/Closeout');from hosted_native_general_api import source_identity;print(json.dumps(source_identity(),indent=2))"
+      - name: Preserve real bounded transport controls
+        uses: actions/github-script@v8
+        with:
+          script: |
+            core.info(JSON.stringify(await require('./.github/scripts/phase6-download-bound-artifact.Test.cjs')({core})));
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: native-GeneralApi-readiness
+          retention-days: 14
+          path: out/native-api-controls.json
+  diagnostics:
+    name: Native original and corrected API ${{ matrix.configuration }} ${{ matrix.math_profile }}
+    needs: readiness
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    strategy:
+      fail-fast: false
+      max-parallel: 2
+      matrix:
+        configuration: [Debug, Release]
+        math_profile: [automatic, sse2]
+    env:
+      PROFILE: ${{ matrix.configuration }}-${{ matrix.math_profile }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.14'
+      - name: Download only exact retained native application and provider inputs
+        uses: actions/github-script@v8
+        with:
+          script: |
+            await require('./.github/scripts/phase6-download-native-api-inputs.cjs')({github,context,core});
+      - name: Restore complete original CCC runtime and re-audit every retained unit receipt
+        run: >-
+          python3 -B Tests/Production/Closeout/recheck_native_discovery.py
+          --api out/native-api-source/native/api.json --archive out/native-api-source/native/producer.zip
+          --profile "$PROFILE" --output "out/native-api-retained-units/$PROFILE"
+      - name: Restore exact complete base provider and original userspace evidence
+        run: >-
+          python3 -B Tests/Production/Closeout/restore_hosted_native_providers.py
+          --api out/native-api-source/providers/api.json --archive out/native-api-source/providers/producer.zip
+          --output out/native-provider-restoration/restoration.json
+      - name: Restore exact separately compiled Mesa cleanup with all original controls
+        run: >-
+          python3 -B Tests/Production/Closeout/restore_hosted_mesa_topology.py
+          --api out/native-api-source/mesa/api.json --archive out/native-api-source/mesa/producer.zip
+          --output out/mesa-topology-restoration/restoration.json
+      - name: Capture original failure and corrected API result with unsuppressed sanitizers in matching userspace
+        shell: bash
+        run: |
+          set -euo pipefail
+          image=$(python3 -c "import json; print('ubuntu@'+json.load(open('Tests/Production/Closeout/native-provider-container.lock.json'))['image_digest'])")
+          docker pull "$image"
+          docker image inspect "$image" > out/native-api-container.json
+          docker run --rm --init --cpus=2 --shm-size=1g -v "$GITHUB_WORKSPACE:$GITHUB_WORKSPACE" -v /etc/ssl/certs/ca-certificates.crt:/run/orbiter-ci-system-ca.pem:ro -w "$GITHUB_WORKSPACE" \
+            -e GITHUB_ACTIONS -e RUNNER_OS -e GITHUB_WORKSPACE -e GITHUB_SHA -e PROFILE \
+            "$image" bash Tests/Production/Closeout/prepare_hosted_native_general_api_network.sh Tests/Production/Closeout/prepare_hosted_native_general_api.sh 2>&1 | tee out/native-api-container.log
+      - name: Print bounded diagnostics from any incomplete collection
+        if: failure()
+        shell: python
+        run: |
+          from pathlib import Path
+          for pattern in ('out/hosted-native-api/*/*.log','out/native-general-api-capture/*/*/*.log'):
+              for path in sorted(Path('.').glob(pattern)):
+                  print(str(path)+':\n'+path.read_text(errors='replace')[-12000:])
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: native-GeneralApi-${{ env.PROFILE }}
+          retention-days: 14
+          compression-level: 3
+          include-hidden-files: true
+          path: |
+            out/native-api-source/*/*.json
+            out/native-api-source/*/*.body
+            out/native-api-retained-units/${{ env.PROFILE }}/*.json
+            out/native-api-retained-units/${{ env.PROFILE }}/*.xml
+            out/native-api-retained-units/${{ env.PROFILE }}/*.log
+            out/phase6-hosted-native/${{ env.PROFILE }}/build.json
+            out/mesa-topology-restoration/restoration.json
+            out/mesa-topology-restoration/source-artifact/*.json
+            out/native-provider-restoration/restoration.json
+            out/native-provider-restoration/provider-source/*.json
+            out/native-api-container.json
+            out/native-api-container.log
+            out/native-api-network/${{ env.PROFILE }}/**
+            out/hosted-native-api/${{ env.PROFILE }}/**
+            out/native-stock-assets/remaining-vessels-resources.json
+            out/native-stock-assets/resources.json
+            out/native-stock-assets/cockpit-test-font.json
+            out/native-general-api-capture/${{ env.PROFILE }}/**
