@@ -1,0 +1,62 @@
+name: Phase 6 Exact Original Audit Retry History Verification
+
+on:
+  push:
+    branches: ['qualification/original-audit-retry-lineage-check-v1']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: phase6-original-audit-retry-lineage-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  history:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - name: Preserve every old control and verify the separate strict retry contract
+        run: mkdir -p out && python3 -B Tests/Production/Closeout/run_controls.py --output out/original-audit-retry-controls.json
+      - name: Retain the exact first failed API artifact and raw job log on GitHub only
+        uses: actions/github-script@v8
+        with:
+          script: |
+            const fs=require('fs'),crypto=require('crypto');
+            const {owner,repo}=context.repo;
+            if (owner!=='dcajacob' || repo!=='orbiter-cross-platform' || (await github.rest.repos.get({owner,repo})).data.private) throw Error('Exact already-public repository required');
+            const run_id=42572661826,job_id=129013339394,artifact_id=13653861871;
+            const run=(await github.request('GET /repos/{owner}/{repo}/actions/runs/{run_id}/attempts/{attempt_number}',{owner,repo,run_id,attempt_number:1})).data;
+            const jobs=(await github.request('GET /repos/{owner}/{repo}/actions/runs/{run_id}/attempts/{attempt_number}/jobs',{owner,repo,run_id,attempt_number:1,per_page:100})).data.jobs;
+            const artifact=(await github.rest.actions.getArtifact({owner,repo,artifact_id})).data;
+            if (run.id!==run_id || run.run_attempt!==1 || run.head_sha!=='a13bae582c7de0c9b6e2fd0c064b1a3ea12e85c7' || run.status!=='completed' || run.conclusion!=='failure' || jobs.length!==1 || jobs[0].id!==job_id || artifact.id!==artifact_id || artifact.expired || artifact.size_in_bytes!==504023 || artifact.digest!=='sha256:27a7bb25c20f123eb43a3c29e5d9863045c91729a1016d2c56edd706f416a417') throw Error('Exact preserved first failed audit bytes and API required');
+            const response=await github.rest.actions.downloadArtifact({owner,repo,artifact_id,archive_format:'zip'});
+            const archive=Buffer.from(response.data);
+            if (archive.length!==artifact.size_in_bytes || 'sha256:'+crypto.createHash('sha256').update(archive).digest('hex')!==artifact.digest) throw Error('Exact first failed artifact size/SHA differs');
+            const logs=await github.request('GET /repos/{owner}/{repo}/actions/jobs/{job_id}/logs',{owner,repo,job_id});
+            const log=typeof logs.data==='string'?Buffer.from(logs.data,'utf8'):Buffer.from(logs.data);
+            if (log.length!==80023 || crypto.createHash('sha256').update(log).digest('hex')!=='275a70063f7f44d5663cf8fb426da9734eff78af87632841888392d5613e886f') throw Error('Exact raw decoded first job log differs');
+            fs.mkdirSync('out/original-audit-retry-source',{recursive:true});
+            fs.writeFileSync('out/original-audit-retry-source/api.json',JSON.stringify({repository:context.repo,run,jobs,artifact},null,2));
+            fs.writeFileSync('out/original-audit-retry-source/first.zip',archive);
+            fs.writeFileSync('out/original-audit-retry-source/first-job.log',log);
+      - name: Independently verify exact failed lineage and retain all three partial output members
+        run: >-
+          python3 -B Tests/Production/Closeout/audit_retry_lineage.py
+          --api out/original-audit-retry-source/api.json --archive out/original-audit-retry-source/first.zip
+          --log out/original-audit-retry-source/first-job.log --output out/original-audit-retry-history/verification.json
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: exact-original-audit-retry-history-only
+          retention-days: 14
+          path: |
+            out/original-audit-retry-controls.json
+            out/original-audit-retry-source/api.json
+            out/original-audit-retry-source/first-job.log
+            out/original-audit-retry-history/verification.json
