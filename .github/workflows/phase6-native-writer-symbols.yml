@@ -1,0 +1,52 @@
+name: Phase 6 Retained Native Writer Allocation Symbols
+
+on:
+  push:
+    branches: ['qualification/native-writer-symbols']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  symbols:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+      - name: Verify the exact original failed writer and successful provider ZIPs
+        uses: actions/github-script@v8
+        with:
+          script: |
+            const fs = require('fs');
+            const crypto = require('crypto');
+            const {owner,repo} = context.repo;
+            if (owner !== 'dcajacob' || repo !== 'orbiter-cross-platform') throw Error('Exact authorized repository required');
+            for (const [role,run_id,artifact_id,producer,size,digest] of [
+              ['writer',42532847296,13641126773,'d23d371a510dd464cde95a301dbc685514391f9c',353656142,'65c4e26ae581e3e7ca19417e808b6bd5a0b6e58624905d5040593a246302d30e'],
+              ['providers',42528403133,13636482999,'60ba46377f236c2d4705f444c0174e0f5af8252f',164848563,'6304d1701c0fc0775b80046d1ed3aa813b07313207027046d9a026be4f1dfe9e']]) {
+              const run = (await github.rest.actions.getWorkflowRun({owner,repo,run_id})).data;
+              const jobs = await github.paginate(github.rest.actions.listJobsForWorkflowRun,{owner,repo,run_id,per_page:100});
+              const artifact = (await github.rest.actions.getArtifact({owner,repo,artifact_id})).data;
+              if (run.head_sha!==producer || run.run_attempt!==1 || artifact.expired || artifact.workflow_run.id!==run_id || artifact.workflow_run.head_sha!==producer || artifact.size_in_bytes!==size || artifact.digest!=='sha256:'+digest) throw Error('Exact retained source-bound API producer required');
+              const response = await github.rest.actions.downloadArtifact({owner,repo,artifact_id,archive_format:'zip'});
+              const bytes = Buffer.from(response.data);
+              if ('sha256:'+crypto.createHash('sha256').update(bytes).digest('hex')!==artifact.digest || bytes.length!==size) throw Error('Actual API ZIP digest/length differs');
+              fs.mkdirSync('out/native-writer-symbols/'+role,{recursive:true});
+              fs.writeFileSync('out/native-writer-symbols/'+role+'/producer.zip',bytes);
+              fs.writeFileSync('out/native-writer-symbols/'+role+'/api.json',JSON.stringify({repository:context.repo,run,jobs,artifact},null,2));
+            }
+      - name: Re-read original allocation mappings and symbolize exact retained ELF files without execution
+        run: python3 -B Tests/Production/Closeout/symbolize_failed_native_writer.py
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: native-writer-retained-allocation-symbols
+          retention-days: 14
+          path: |
+            out/native-writer-symbols/*/api.json
+            out/native-writer-symbols/inspection/*.json
+            out/native-writer-symbols/inspection/*/*.json
+            out/native-writer-symbols/inspection/*/*.txt
+            out/native-writer-symbols/inspection/*/*.log
