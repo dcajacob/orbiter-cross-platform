@@ -1,6 +1,10 @@
 """Separate Mesa restoration cannot substitute failed controls or change the native capture."""
 import ast
 import copy
+import hashlib
+import io
+import tarfile
+import tempfile
 from pathlib import Path
 import subprocess
 import unittest
@@ -25,6 +29,23 @@ class HostedMesaWriterTests(unittest.TestCase):
         old=(ROOT/'Tests/Production/Closeout/restore_hosted_native_providers.py').read_text();new=Path(mesa.__file__).read_text()
         def body(value):return ast.dump(next(n for n in ast.parse(value).body if isinstance(n,ast.FunctionDef) and n.name=='restore_tree'),include_attributes=False)
         self.assertEqual(body(old),body(new));self.assertEqual(mesa.PREFIX,'out/hosted-mesa-topology')
+
+    def test_actual_tar_reader_restores_only_the_complete_separate_mesa_namespace(self):
+        for damaged in (False,True):
+            with tempfile.TemporaryDirectory() as directory:
+                root=Path(directory);archive=root/'fixture.tar.gz';body=b'controlled dependency fixture bytes'
+                name=mesa.PREFIX+'/libfixture.so.1';alias=mesa.PREFIX+'/libfixture.so'
+                with tarfile.open(archive,'w:gz') as target:
+                    entry=tarfile.TarInfo(name);entry.mode=0o755;entry.size=len(body);target.addfile(entry,io.BytesIO(body))
+                    entry=tarfile.TarInfo(alias);entry.type=tarfile.SYMTYPE;entry.linkname='libfixture.so.1';target.addfile(entry)
+                checksum=hashlib.sha256(body).hexdigest()
+                expected={name:dict(sha256='0'*64 if damaged else checksum,symlink=None),alias:dict(sha256=checksum,symlink='libfixture.so.1')}
+                if damaged:
+                    with self.assertRaises(ValueError):mesa.restore_tree(archive,expected,root)
+                else:
+                    base=mesa.restore_tree(archive,expected,root)
+                    self.assertEqual((base/'libfixture.so').read_bytes(),body)
+                    self.assertEqual((base/'libfixture.so').resolve(),base/'libfixture.so.1')
 
     def test_original_full_capture_argv_and_observation_sources_remain_unchanged(self):
         original=writer.ORIGINAL.read_bytes();prepared=writer.prepared_body();ast.parse(prepared)
