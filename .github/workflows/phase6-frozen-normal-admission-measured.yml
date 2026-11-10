@@ -1,7 +1,7 @@
 name: Phase 6 Frozen Native Normal Admission Measured Reference
 on:
   push:
-    branches: ['qualification/frozen-normal-admission-v3']
+    branches: ['qualification/frozen-normal-admission-v4']
 permissions:
   contents: read
   actions: read
@@ -71,7 +71,7 @@ jobs:
             const ready=jobs.filter(j=>j.name==='Measure and verify exact decoded reference capacity');
             const artifacts=await github.paginate(github.rest.actions.listWorkflowRunArtifacts,{owner,repo,run_id,per_page:100});
             const selected=artifacts.filter(a=>a.name==='frozen-normal-admission-measured-capacity');
-            if(owner!=='dcajacob'||repo!=='orbiter-cross-platform'||run.head_sha!==context.sha||run.run_attempt!==1||run.head_branch!=='qualification/frozen-normal-admission-v3'||run.path!=='.github/workflows/phase6-frozen-normal-admission-measured.yml'||ready.length!==1||selected.length!==1||
+            if(owner!=='dcajacob'||repo!=='orbiter-cross-platform'||run.head_sha!==context.sha||run.run_attempt!==1||run.head_branch!=='qualification/frozen-normal-admission-v4'||run.path!=='.github/workflows/phase6-frozen-normal-admission-measured.yml'||ready.length!==1||selected.length!==1||
                ready[0].head_sha!==context.sha||ready[0].status!=='completed'||ready[0].conclusion!=='success'||ready[0].run_id!==run_id||JSON.stringify(ready[0].labels)!=='["ubuntu-24.04"]')throw Error('Actual same-source completed standard capacity job required');
             const artifact=selected[0],base='out/admission-capacity-source';
             if(artifact.expired||artifact.workflow_run.id!==run_id||artifact.workflow_run.head_sha!==context.sha||artifact.size_in_bytes<1||artifact.size_in_bytes>1024**2)throw Error('Exact bounded capacity receipt required');

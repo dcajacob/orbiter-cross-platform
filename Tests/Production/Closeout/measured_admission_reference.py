@@ -45,34 +45,54 @@ def index_archive(path,lock,folder,expected=None):
     qsha=lock['identities']['reference']['joint_api']['qualified_report_sha256']
     require(sha(path)==prior.TAR_SHA and path.stat().st_size==prior.TAR_BYTES,'Exact prior reference TAR required')
     if expected is not None:
-        require(0<expected['decoded_bytes']<CAP and len(expected['members'])==COUNT and
-                sum(v['bytes'] for v in expected['members'].values())==expected['decoded_bytes'],
+        require(0<expected['decoded_bytes']<CAP and 0<expected['unique_file_bytes']<=expected['decoded_bytes'] and
+                len(expected['members'])==COUNT and sum(v['bytes'] for v in expected['members'].values())==expected['decoded_bytes'] and
+                sum(v['bytes'] for v in expected['members'].values() if v['kind']=='regular')==expected['unique_file_bytes'],
                 'Complete measured byte capacity proof required')
-        require(shutil.disk_usage(ROOT).free>=expected['decoded_bytes']+RESERVE,
+        require(shutil.disk_usage(ROOT).free>=expected['unique_file_bytes']+RESERVE,
                 'Restore actual expanded reference size while retaining eight GiB free')
-    observed={};folded=set();total=0;report=None
+    observed={};folded=set();total=0;unique=0;report=None;last=None
     progress=folder/'decode-progress.json'
     def save(status):
-        atomic_json(progress,dict(status=status,decoded_members=len(observed),decoded_bytes=total,phase6_complete=False))
+        atomic_json(progress,dict(status=status,decoded_members=len(observed),decoded_bytes=total,unique_file_bytes=unique,last_seen_member=last,phase6_complete=False))
     save('reading-reference')
     try:
         with tarfile.open(path,mode='r|gz') as tar:
             for m in tar:
                 name=m.name;relative=safe(name)
+                last=dict(path=name,tar_type=m.type.decode('ascii',errors='replace'),declared_size=m.size,linkname=m.linkname)
                 require(relative.is_relative_to('out/joint-api-qualification') and name.casefold() not in folded and
-                        m.isfile() and not m.mode&0o7000 and 0<=m.size<CAP and len(observed)<COUNT,
-                        'Canonical unique complete original qualified file required')
-                total+=m.size;folded.add(name.casefold())
-                require(total<CAP,'Original reference exceeded safe hosted read-only bound')
+                        (m.isfile() or m.islnk()) and not m.mode&0o7000 and 0<=m.size<CAP and len(observed)<COUNT,
+                        'Canonical unique complete original qualified file or hardlink required')
+                folded.add(name.casefold())
+                target=None;row=None
                 if expected is not None:
                     row=expected['members'].get(name)
-                    require(row is not None and m.size==row['bytes'] and m.mode==row['mode'],'Original member size/type differs from measured readiness')
+                    require(row is not None and m.mode==row['mode'],'Original member type/mode differs from measured readiness')
                     target=ROOT/relative
                     require(not target.exists() and not target.is_symlink() and target.resolve()==target,
                             'Fresh unredirected original qualified file required')
-                    require(shutil.disk_usage(ROOT).free>=m.size+RESERVE,'Actual original member must leave eight GiB free')
                     target.parent.mkdir(parents=True,exist_ok=True)
-                else:target=None
+                if m.islnk():
+                    link=safe(m.linkname);owner=observed.get(m.linkname)
+                    require(m.size==0 and link.is_relative_to('out/joint-api-qualification') and owner is not None and
+                            owner['mode']==m.mode and name!=RELATIVE,'Exact earlier verified regular-file hardlink owner required')
+                    record=dict(kind='hardlink',linkname=m.linkname,bytes=owner['bytes'],mode=m.mode,sha256=owner['sha256'])
+                    total+=record['bytes'];require(total<CAP,'Original logical hardlink bytes exceed safe hosted bound')
+                    if target:
+                        original=ROOT/link
+                        require(record==row and original.is_file() and not original.is_symlink() and original.resolve()==original and
+                                original.stat().st_size==record['bytes'] and sha(original)==record['sha256'],
+                                'Exact original verified hardlink owner body required')
+                        target.hardlink_to(original)
+                        require(target.samefile(original) and sha(target)==record['sha256'],'Original restored hardlink relationship differs')
+                    observed[name]=record
+                    if len(observed)%100==0:save('reading-reference')
+                    continue
+                total+=m.size;unique+=m.size
+                require(total<CAP,'Original reference exceeded safe hosted read-only bound')
+                if target:require(row['kind']=='regular' and m.size==row['bytes'] and shutil.disk_usage(ROOT).free>=m.size+RESERVE,
+                        'Actual regular original member must match its measured size and retain eight GiB free')
                 if name==RELATIVE:require(0<m.size<4*1024**2,'Exact original qualification report must be bounded')
                 h=hashlib.sha256();length=0;body=bytearray()
                 stream=target.open('xb') if target else None
@@ -85,7 +105,7 @@ def index_archive(path,lock,folder,expected=None):
                 finally:
                     if stream:stream.close()
                 require(length==m.size,'Complete original evidence body required')
-                record=dict(bytes=length,mode=m.mode,sha256=h.hexdigest())
+                record=dict(kind='regular',bytes=length,mode=m.mode,sha256=h.hexdigest())
                 if target:
                     target.chmod(m.mode & 0o777)
                     require(record==row and sha(target)==record['sha256'],'Materialized exact measured body changed')
@@ -96,11 +116,11 @@ def index_archive(path,lock,folder,expected=None):
         require(report is not None and len(observed)==COUNT,'All actual original qualified reference bodies required')
         required=expected_paths(report)|{RELATIVE:qsha}
         require({k:v['sha256'] for k,v in observed.items()}==required,'Every original qualification byte/namespace required')
-        if expected is not None:require(expected['members']==observed and expected['decoded_bytes']==total and shutil.disk_usage(ROOT).free>=RESERVE,'Measured exact member closure and eight-GiB reserve must hold')
+        if expected is not None:require(expected['members']==observed and expected['decoded_bytes']==total and expected['unique_file_bytes']==unique and shutil.disk_usage(ROOT).free>=RESERVE,'Measured exact member closure and eight-GiB reserve must hold')
         save('complete-exact-original-reference')
     except BaseException:
         save('incomplete-preserve-partial-diagnostics');raise
-    return dict(decoded_bytes=total,members=observed)
+    return dict(decoded_bytes=total,unique_file_bytes=unique,members=observed)
 
 
 def main():
@@ -121,13 +141,13 @@ def main():
     if measure:
         out=ROOT/'out/admission-measured-capacity';out.mkdir()
         atomic_json(out/'capacity.json',fixed|result)
-        print(json.dumps(dict(decoded_bytes=result['decoded_bytes'],members=len(result['members']),no_new_simulator_processes=True)))
+        print(json.dumps(dict(decoded_bytes=result['decoded_bytes'],unique_file_bytes=result['unique_file_bytes'],hardlinks=sum(r['kind']=='hardlink' for r in result['members'].values()),members=len(result['members']),no_new_simulator_processes=True)))
     else:
         sys.path.insert(0,str(ROOT/'Tests/Production/GeneralApiCorrection'))
         import qualification
         require(len(qualification.inspect(REFERENCE)['evidence_sha256'])==1125,'Unchanged independent qualification reader must accept every restored guard')
         atomic_json(folder/'restored.json',fixed|dict(status='restored-original-qualified-bytes-with-measured-capacity',
-            decoded_bytes=result['decoded_bytes'],actual_reference_sha256=sha(REFERENCE),materialized_files=len(result['members'])))
+            decoded_bytes=result['decoded_bytes'],unique_file_bytes=result['unique_file_bytes'],actual_reference_sha256=sha(REFERENCE),materialized_files=len(result['members'])))
     require(sha(folder/'producer.zip')==prior.ZIP_SHA,'Original published whole ZIP changed')
 
 
