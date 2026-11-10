@@ -1,0 +1,415 @@
+{
+  "protocol": "phase6-exact-original-observed-numerical-operand-renewal-v1",
+  "scope": "Derived exact original observed Windows operands and complete result-stream hashes. No existing oracle or acceptance tolerance refreshed. Historical full native state trajectory is not synthesized.",
+  "original_saved_input_sha256": "afc91115951ec44a81cffb6ffa34c00191f9b005aac3f14cf94b21de171b0538",
+  "source_original_surface_capture": "f3d826c265b032961445272a97be9c778c01153f",
+  "source_original_surface_observer": "c0d03b1b2122f650c72f372d267b0c9f2aac314a",
+  "source_original_arcsine_CRT": "116fddd38468074770bf81e47a65173df64129c0",
+  "original_windows_observer_proof_sha256": "536a8a8cc677afab1d23e3fbecf885ebda65eeff83f7d600a9263991c988b958",
+  "original_windows_arcsine_proof_sha256": "53715b61173020cfbd47fde5a64422b1daf4ef56c87a05b87d4e216ddbf8b4cb",
+  "automatic_refresh": false,
+  "corpora": {
+    "surface": {
+      "source_original_raw_sha256": "a88fadde39d16a7efc57b8d58b37c0305d55ae48baf388cacc18eaba0a86c0e3",
+      "original_input_file": "surface-math.csv",
+      "operators": [
+        "longitude",
+        "latitude",
+        "sin_latitude",
+        "cos_latitude",
+        "sin_longitude",
+        "cos_longitude"
+      ],
+      "operand_fields": [
+        "pz",
+        "px",
+        "latitude_input",
+        "cached_latitude",
+        "cached_longitude"
+      ],
+      "roster": [
+        [
+          "ISS"
+        ],
+        [
+          "Atlantis"
+        ],
+        [
+          "Leonardo"
+        ],
+        [
+          "Atlantis_ET"
+        ],
+        [
+          "Atlantis-SRB1"
+        ],
+        [
+          "Atlantis-SRB2"
+        ]
+      ],
+      "first_tick": 1,
+      "last_tick": 243,
+      "rows": 1458,
+      "samples": 8748,
+      "packed_sha256": "1fd685d1432e6ce48fa87e0a725c9f0ee9429e0bf459c958da0544927f57cf6d",
+      "operand_bytes_sha256": "dee3cce6d9f60a6b34843cbd1708543bb85797fef25ac6ff6212df42411742e5",
+      "complete_original_Windows_result_bits_sha256": "8f61caea564e99e85955231d712774ba5be28a5256fecb019d281e59139aa29a",
+      "expected_complete_old_native_result_bits_sha256": "7c4885a094acd3e7483c511010695198d04116af9e69cc312b31e0a82556549c",
+      "explicit_historical_negative_differences": [
+        {
+          "ordinal": 7584,
+          "tick": 211,
+          "object": "Atlantis-SRB1",
+          "field": "longitude",
+          "actual_original_Windows": "bff6837bee573509",
+          "historical_expected_old_native": "bff6837bee57350a"
+        }
+      ]
+    },
+    "touchdown": {
+      "source_original_raw_sha256": "bc3c2ea3ae9513e47b86d73b79b5544368174b47724b84a2078c1bf6bc534acb",
+      "original_input_file": "touchdown-math.csv",
+      "operators": [
+        "longitude",
+        "sin_latitude",
+        "cos_latitude",
+        "sin_longitude",
+        "cos_longitude"
+      ],
+      "operand_fields": [
+        "pz",
+        "px",
+        "latitude",
+        "longitude"
+      ],
+      "roster": [
+        [
+          "ISS",
+          0,
+          3
+        ],
+        [
+          "ISS",
+          1,
+          3
+        ],
+        [
+          "ISS",
+          2,
+          3
+        ],
+        [
+          "Atlantis",
+          0,
+          14
+        ],
+        [
+          "Atlantis",
+          1,
+          14
+        ],
+        [
+          "Atlantis",
+          2,
+          14
+        ],
+        [
+          "Atlantis",
+          3,
+          14
+        ],
+        [
+          "Atlantis",
+          4,
+          14
+        ],
+        [
+          "Atlantis",
+          5,
+          14
+        ],
+        [
+          "Atlantis",
+          6,
+          14
+        ],
+        [
+          "Atlantis",
+          7,
+          14
+        ],
+        [
+          "Atlantis",
+          8,
+          14
+        ],
+        [
+          "Atlantis",
+          9,
+          14
+        ],
+        [
+          "Atlantis",
+          10,
+          14
+        ],
+        [
+          "Atlantis",
+          11,
+          14
+        ],
+        [
+          "Atlantis",
+          12,
+          14
+        ],
+        [
+          "Atlantis",
+          13,
+          14
+        ],
+        [
+          "Leonardo",
+          0,
+          3
+        ],
+        [
+          "Leonardo",
+          1,
+          3
+        ],
+        [
+          "Leonardo",
+          2,
+          3
+        ],
+        [
+          "Atlantis_ET",
+          0,
+          15
+        ],
+        [
+          "Atlantis_ET",
+          1,
+          15
+        ],
+        [
+          "Atlantis_ET",
+          2,
+          15
+        ],
+        [
+          "Atlantis_ET",
+          3,
+          15
+        ],
+        [
+          "Atlantis_ET",
+          4,
+          15
+        ],
+        [
+          "Atlantis_ET",
+          5,
+          15
+        ],
+        [
+          "Atlantis_ET",
+          6,
+          15
+        ],
+        [
+          "Atlantis_ET",
+          7,
+          15
+        ],
+        [
+          "Atlantis_ET",
+          8,
+          15
+        ],
+        [
+          "Atlantis_ET",
+          9,
+          15
+        ],
+        [
+          "Atlantis_ET",
+          10,
+          15
+        ],
+        [
+          "Atlantis_ET",
+          11,
+          15
+        ],
+        [
+          "Atlantis_ET",
+          12,
+          15
+        ],
+        [
+          "Atlantis_ET",
+          13,
+          15
+        ],
+        [
+          "Atlantis_ET",
+          14,
+          15
+        ],
+        [
+          "Atlantis-SRB1",
+          0,
+          13
+        ],
+        [
+          "Atlantis-SRB1",
+          1,
+          13
+        ],
+        [
+          "Atlantis-SRB1",
+          2,
+          13
+        ],
+        [
+          "Atlantis-SRB1",
+          3,
+          13
+        ],
+        [
+          "Atlantis-SRB1",
+          4,
+          13
+        ],
+        [
+          "Atlantis-SRB1",
+          5,
+          13
+        ],
+        [
+          "Atlantis-SRB1",
+          6,
+          13
+        ],
+        [
+          "Atlantis-SRB1",
+          7,
+          13
+        ],
+        [
+          "Atlantis-SRB1",
+          8,
+          13
+        ],
+        [
+          "Atlantis-SRB1",
+          9,
+          13
+        ],
+        [
+          "Atlantis-SRB1",
+          10,
+          13
+        ],
+        [
+          "Atlantis-SRB1",
+          11,
+          13
+        ],
+        [
+          "Atlantis-SRB1",
+          12,
+          13
+        ],
+        [
+          "Atlantis-SRB2",
+          0,
+          13
+        ],
+        [
+          "Atlantis-SRB2",
+          1,
+          13
+        ],
+        [
+          "Atlantis-SRB2",
+          2,
+          13
+        ],
+        [
+          "Atlantis-SRB2",
+          3,
+          13
+        ],
+        [
+          "Atlantis-SRB2",
+          4,
+          13
+        ],
+        [
+          "Atlantis-SRB2",
+          5,
+          13
+        ],
+        [
+          "Atlantis-SRB2",
+          6,
+          13
+        ],
+        [
+          "Atlantis-SRB2",
+          7,
+          13
+        ],
+        [
+          "Atlantis-SRB2",
+          8,
+          13
+        ],
+        [
+          "Atlantis-SRB2",
+          9,
+          13
+        ],
+        [
+          "Atlantis-SRB2",
+          10,
+          13
+        ],
+        [
+          "Atlantis-SRB2",
+          11,
+          13
+        ],
+        [
+          "Atlantis-SRB2",
+          12,
+          13
+        ]
+      ],
+      "first_tick": 1,
+      "last_tick": 243,
+      "rows": 14823,
+      "samples": 74115,
+      "packed_sha256": "8ed90b4cc1883d7ac74e30d3670b1d6091877887eb5c81c8974a3746bce51da5",
+      "operand_bytes_sha256": "b331707921187605ef16675ff2693bff72305c6e75a78bd1443b3711a5592b2b",
+      "complete_original_Windows_result_bits_sha256": "269c2c0d88aca344cfb7aa256aeeebbd32baa3cb5b4fea07db9391a9a9029ae3",
+      "expected_complete_old_native_result_bits_sha256": "269c2c0d88aca344cfb7aa256aeeebbd32baa3cb5b4fea07db9391a9a9029ae3",
+      "explicit_historical_negative_differences": []
+    },
+    "arcsine": {
+      "source_original_raw_sha256": "545f865d995e21cf10eb16142c07689e488b2d26f7f15f9effc44c1714a6da4a",
+      "original_input_text_sha256": "9310dbe8315b70c779cd875f40528dfe5d14d70591d86885b99f9e2ebf4e4917",
+      "samples": 2145,
+      "packed_sha256": "26941cf92dd8d2867643c6ed06c998d820ac57fcc75ccb8124c239a34dfe96e9",
+      "operand_bytes_sha256": "639773736923272b6e7b45eb562d27d6d1c535647652eba6f76fd12eb70b0325",
+      "complete_original_Windows_result_bits_sha256": "cf814e79e21d29d7f50b9dfef105307ceb92820d136e27a0f51c790ef8173990",
+      "expected_complete_old_native_result_bits_sha256": "cf814e79e21d29d7f50b9dfef105307ceb92820d136e27a0f51c790ef8173990",
+      "explicit_historical_negative_differences": []
+    }
+  },
+  "old_full_physical_trajectory_relabelled": false,
+  "phase6_complete": false
+}

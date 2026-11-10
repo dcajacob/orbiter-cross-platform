@@ -1,0 +1,73 @@
+name: Phase 6 Replay Complete Original Observed Numerical Operands
+on:
+  push:
+    branches: ['qualification/numerical-original-operator-replay-v1']
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: phase6-numerical-original-operator-replay-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  replay:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - name: Preserve all existing source and corruption controls
+        run: mkdir -p out && python3 -B Tests/Production/Closeout/run_controls.py --output out/original-observed-operators-controls.json
+      - name: Restore the exact already verified old compiled negative component without rebuilding it
+        uses: actions/github-script@v8
+        with:
+          script: |
+            const fs=require('fs'),crypto=require('crypto'),{owner,repo}=context.repo;
+            if(owner!=='dcajacob'||repo!=='orbiter-cross-platform'||(await github.rest.repos.get({owner,repo})).data.private)throw Error('Exact existing public repository required');
+            const run=(await github.rest.actions.getWorkflowRun({owner,repo,run_id:42913344936})).data;
+            const jobs=await github.paginate(github.rest.actions.listJobsForWorkflowRun,{owner,repo,run_id:42913344936,per_page:100});
+            const artifact=(await github.rest.actions.getArtifact({owner,repo,artifact_id:13807359162})).data;
+            const base='out/old-atan2-component-input';fs.mkdirSync(base,{recursive:true});
+            fs.writeFileSync(base+'/api.json',JSON.stringify({repository:context.repo,run,jobs,artifact},null,2),{flag:'wx'});
+            if(run.head_sha!=='8a8501f29c3cc3107ded592a5558f03273ba9ae2'||run.status!=='completed'||run.conclusion!=='success'||run.path!=='.github/workflows/phase6-old-native-atan2-negative.yml'||run.run_attempt!==1||jobs.length!==1||jobs[0].id!==130169361885||jobs[0].head_sha!==run.head_sha||jobs[0].status!=='completed'||jobs[0].conclusion!=='success'||JSON.stringify(jobs[0].labels)!==JSON.stringify(['ubuntu-24.04'])||artifact.id!==13807359162||artifact.size_in_bytes!==597538||artifact.digest!=='sha256:4e71021daa0040d3cbc95cb68e707c134ebccf4e4dbe17c4e8a6bbf481a6fd1b'||artifact.expired)throw Error('Exact completed old compiled component required');
+            const bytes=Buffer.from((await require('./.github/scripts/phase6-download-bound-artifact.cjs')({github,owner,repo,source:{run,jobs},artifact,base,core})).data);
+            if(bytes.length!==597538||crypto.createHash('sha256').update(bytes).digest('hex')!==artifact.digest.slice(7))throw Error('Exact already verified old component ZIP differs');
+            fs.writeFileSync(base+'/producer.zip',bytes,{flag:'wx'});
+      - name: Replay all 85008 original Windows primitive operands in both unchanged old and corrected bindings
+        run: >-
+          python3 -B Tests/Production/Closeout/replay_original_numerical_operators.py
+          --old-archive out/old-atan2-component-input/producer.zip --api out/old-atan2-component-input/api.json
+          --output out/original-observed-operators
+      - name: Preserve actual first failure without rewriting any result
+        if: failure()
+        shell: python
+        run: |
+          from pathlib import Path
+          folder=Path('out/original-observed-operators')
+          for p in sorted(folder.glob('*.stderr')):
+              if p.stat().st_size: print(str(p)+':\n'+p.read_text(errors='replace')[-10000:])
+          if (folder/'verification.json').exists(): print((folder/'verification.json').read_text()[-15000:])
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: original-observed-operators-complete-raw-witness
+          retention-days: 14
+          compression-level: 3
+          path: |
+            out/original-observed-operators/**
+            out/old-atan2-component-input/*.json
+            out/old-atan2-component-input/*.body
+            out/original-observed-operators-controls.json
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: original-observed-operators-small-receipt
+          retention-days: 14
+          compression-level: 3
+          path: |
+            out/original-observed-operators/*.json
+            out/original-observed-operators/*.stderr
+            out/original-observed-operators/fixed-build/compile_commands.json
+            out/original-observed-operators/fixed-build/generated/preparation.json
+            out/old-atan2-component-input/*.json
+            out/original-observed-operators-controls.json
