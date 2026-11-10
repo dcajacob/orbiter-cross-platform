@@ -1,7 +1,7 @@
 name: Phase 6 Exact Original Save Numerical Observer Equivalence
 on:
   push:
-    branches: ['qualification/native-numerical-observer-equivalence-v2-snapshot-fallback']
+    branches: ['qualification/native-numerical-observer-equivalence-v3-host-prepare']
 permissions:
   contents: read
   actions: read
@@ -55,6 +55,8 @@ jobs:
         run: >-
           python3 -B Tests/Production/Closeout/build_native_numerical_observers.py
           --profile "$PROFILE" --output "out/numerical-observer-renewal/$PROFILE"
+      - name: Generate the exact signed package fallback shell on the standard host before entering the minimal container
+        run: python3 -B Tests/Production/Closeout/original_package_snapshot_fallback.py --prepare-only
       - name: Run the exact original saved input baseline and original observer off and on with all original sanitizers
         shell: bash
         run: |
@@ -72,7 +74,7 @@ jobs:
           from pathlib import Path
           for pattern in ('out/hosted-numerical-observer/*/*.log','out/numerical-observer-renewal/*/*.log','out/numerical-observer-renewal/*/baseline/console.log','out/numerical-observer-renewal/*/equivalence/*/console.log'):
               for p in sorted(Path('.').glob(pattern)):
-                  print(str(p)+':\n'+p.read_text(errors='replace')[-12000:])
+                  if 'host-preprocessor' not in p.name: print(str(p)+':\n'+p.read_text(errors='replace')[-12000:])
       - uses: actions/upload-artifact@v7
         if: always()
         with:

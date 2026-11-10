@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Retry only failed official-pool transfers at their exact original signed snapshot URI."""
 import os
+import sys
 from pathlib import Path
 import subprocess
 from contracts import ROOT,require,sha,atomic_json
@@ -33,9 +34,9 @@ def main():
     body=prepared_body();path=folder/'original-plan-with-explicit-snapshot-fallback.sh';path.write_text(body)
     report=dict(protocol='phase6-exact-original-snapshot-transport-fallback-v1',source=os.environ['GITHUB_SHA'],original_source=SOURCE,original_helper_sha256=sha(ORIGINAL),adapter_sha256=sha(Path(__file__)),generated_body_sha256=sha(path),snapshot='20261109T212432Z',all488_original_versions_unchanged=True,all_original_SHA256_size_TLS_signature_guards_unchanged=True,original_failed_download_logs_preserved=True,qualification_granted=False,phase6_complete=False)
     atomic_json(folder/'source.json',report)
-    try:subprocess.run(['bash',str(path)],check=True)
-    finally:
-        require(sha(ORIGINAL)==report['original_helper_sha256'] and sha(Path(__file__))==report['adapter_sha256'] and sha(path)==report['generated_body_sha256'],'Actual original and explicit adapter source changed during transport')
+    require(sys.argv[1:]==['--prepare-only'],'Generate on the standard host before entering the minimal container; no bootstrap interpreter assumptions')
+    (folder/'before.sha256').write_text(''.join(sha(p)+'  '+str(p.relative_to(ROOT))+'\n' for p in (ORIGINAL,Path(__file__),path)))
+    require(sha(ORIGINAL)==report['original_helper_sha256'] and sha(Path(__file__))==report['adapter_sha256'] and sha(path)==report['generated_body_sha256'],'Actual original and explicit adapter source changed during preparation')
 
 
 if __name__=='__main__':main()

@@ -22,3 +22,11 @@ class OriginalSnapshotFallback(TestCase):
 
     def test_prepared_shell_is_valid_without_running_package_tools(self):
         self.assertEqual(subprocess.run(['bash','-n'],input=f.prepared_body(),text=True,capture_output=True).returncode,0)
+
+    def test_minimal_container_needs_no_python_before_exact_package_installation(self):
+        from pathlib import Path
+        workflow=(f.ROOT/'.github/workflows/phase6-native-numerical-observer-equivalence.yml').read_text()
+        self.assertLess(workflow.index('original_package_snapshot_fallback.py --prepare-only'),workflow.index('docker run --rm'))
+        bootstrap=(f.ROOT/'Tests/Production/Closeout/prepare_hosted_numerical_observer.sh').read_text()
+        self.assertLess(bootstrap.index('bash out/numerical-observer-pool-source'),bootstrap.index('python3'))
+        self.assertEqual(bootstrap.count('sha256sum --check out/numerical-observer-pool-source'),2)
