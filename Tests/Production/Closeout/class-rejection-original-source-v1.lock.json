@@ -1,0 +1,308 @@
+{
+  "protocol": "phase6-original-class-rejection-source-lock-v1",
+  "compiled_runtime_source": "ccc02c8a34bd1f227624d8778a141e8736ae8111",
+  "source_sha256": {
+    "Tests/Production/RemainingVessels/native.py": "68a640905d163f409a138985d36cbf5fd912d4141b1c86fd05ba6a7572c47a01",
+    "Tests/Production/RemainingVessels/lifetimes.py": "722fac7bce6720cdd757c51453e06d9a8f697195f095dd896fa9021dbe6723d2",
+    "Tests/Production/RemainingVessels/rejections.py": "370d05cf161da880444a4939240acd9fbcde060242f39dd6f92fa7277d2ecb18",
+    "Tests/Production/RemainingVessels/RejectedModule.cpp": "724212d8c9ac9d9e7edb9190361cb21ee1d949fa4fd0a9dafaf8d9eb41a1b5a1",
+    "Tests/Production/RemainingStock/cases.json": "d1dad2672f6ae77541df774cafd4ca5a8730f77733e80b733a1f970c7697a162",
+    "Tests/Production/NativeScene/Orbiter.cfg": "47e1ebcd774f3e4dfcacdfe3ab624c2d0b992d067fa675773f33287a560d071a",
+    "Tests/Production/Closeout/class_eligibility.py": "32f564b22c48870c4cbd03a65f23bbb5d6966239302405273f7246b63b738b14",
+    "Tests/Production/CockpitControls/prepare.py": "5969fa03cad7b0461554de1c05bb256dffa2e760d1c9eb268d75a874f67d0c46",
+    "Tests/Production/Cockpit/Reference/provenance.json": "3aacafe95d0472755cf86524448d869764698d3b454a182ed1d042bbb156d2b4",
+    "Tests/Production/RemainingStockRepaired/audit.py": "37646ba02243a0a2ff218ed4650072a628dd96651133909df4164c0a48771090"
+  },
+  "exact_original_controls": [
+    {
+      "id": "Atlantis-unknown-class",
+      "family": "Atlantis",
+      "case": "remaining_stock_003",
+      "variant": "unknown-class"
+    },
+    {
+      "id": "Atlantis-foreign-factory",
+      "family": "Atlantis",
+      "case": "remaining_stock_003",
+      "variant": "foreign-factory"
+    },
+    {
+      "id": "Atlantis-missing-module",
+      "family": "Atlantis",
+      "case": "remaining_stock_003",
+      "variant": "missing-module"
+    },
+    {
+      "id": "Atlantis-generic-fallback",
+      "family": "Atlantis",
+      "case": "remaining_stock_003",
+      "variant": "generic-fallback"
+    },
+    {
+      "id": "Atlantis_SRB-unknown-class",
+      "family": "Atlantis_SRB",
+      "case": "remaining_stock_003",
+      "variant": "unknown-class"
+    },
+    {
+      "id": "Atlantis_SRB-foreign-factory",
+      "family": "Atlantis_SRB",
+      "case": "remaining_stock_003",
+      "variant": "foreign-factory"
+    },
+    {
+      "id": "Atlantis_SRB-missing-module",
+      "family": "Atlantis_SRB",
+      "case": "remaining_stock_003",
+      "variant": "missing-module"
+    },
+    {
+      "id": "Atlantis_SRB-generic-fallback",
+      "family": "Atlantis_SRB",
+      "case": "remaining_stock_003",
+      "variant": "generic-fallback"
+    },
+    {
+      "id": "Atlantis_Tank-unknown-class",
+      "family": "Atlantis_Tank",
+      "case": "remaining_stock_003",
+      "variant": "unknown-class"
+    },
+    {
+      "id": "Atlantis_Tank-foreign-factory",
+      "family": "Atlantis_Tank",
+      "case": "remaining_stock_003",
+      "variant": "foreign-factory"
+    },
+    {
+      "id": "Atlantis_Tank-missing-module",
+      "family": "Atlantis_Tank",
+      "case": "remaining_stock_003",
+      "variant": "missing-module"
+    },
+    {
+      "id": "Atlantis_Tank-generic-fallback",
+      "family": "Atlantis_Tank",
+      "case": "remaining_stock_003",
+      "variant": "generic-fallback"
+    },
+    {
+      "id": "Carina-unknown-class",
+      "family": "Carina",
+      "case": "remaining_stock_026",
+      "variant": "unknown-class"
+    },
+    {
+      "id": "Carina-foreign-factory",
+      "family": "Carina",
+      "case": "remaining_stock_026",
+      "variant": "foreign-factory"
+    },
+    {
+      "id": "Leonardo_mplm-unknown-class",
+      "family": "Leonardo_mplm",
+      "case": "remaining_stock_003",
+      "variant": "unknown-class"
+    },
+    {
+      "id": "Leonardo_mplm-foreign-factory",
+      "family": "Leonardo_mplm",
+      "case": "remaining_stock_003",
+      "variant": "foreign-factory"
+    },
+    {
+      "id": "Module2-unknown-class",
+      "family": "Module2",
+      "case": "remaining_stock_009",
+      "variant": "unknown-class"
+    },
+    {
+      "id": "Module2-foreign-factory",
+      "family": "Module2",
+      "case": "remaining_stock_009",
+      "variant": "foreign-factory"
+    },
+    {
+      "id": "Dragonfly-unknown-class",
+      "family": "Dragonfly",
+      "case": "remaining_stock_009",
+      "variant": "unknown-class"
+    },
+    {
+      "id": "Dragonfly-foreign-factory",
+      "family": "Dragonfly",
+      "case": "remaining_stock_009",
+      "variant": "foreign-factory"
+    },
+    {
+      "id": "Dragonfly-missing-module",
+      "family": "Dragonfly",
+      "case": "remaining_stock_009",
+      "variant": "missing-module"
+    },
+    {
+      "id": "Dragonfly-generic-fallback",
+      "family": "Dragonfly",
+      "case": "remaining_stock_009",
+      "variant": "generic-fallback"
+    },
+    {
+      "id": "HST-unknown-class",
+      "family": "HST",
+      "case": "remaining_stock_018",
+      "variant": "unknown-class"
+    },
+    {
+      "id": "HST-foreign-factory",
+      "family": "HST",
+      "case": "remaining_stock_018",
+      "variant": "foreign-factory"
+    },
+    {
+      "id": "HST-missing-module",
+      "family": "HST",
+      "case": "remaining_stock_018",
+      "variant": "missing-module"
+    },
+    {
+      "id": "HST-generic-fallback",
+      "family": "HST",
+      "case": "remaining_stock_018",
+      "variant": "generic-fallback"
+    },
+    {
+      "id": "LDEF-unknown-class",
+      "family": "LDEF",
+      "case": "remaining_stock_022",
+      "variant": "unknown-class"
+    },
+    {
+      "id": "LDEF-foreign-factory",
+      "family": "LDEF",
+      "case": "remaining_stock_022",
+      "variant": "foreign-factory"
+    },
+    {
+      "id": "SolarSail-unknown-class",
+      "family": "SolarSail",
+      "case": "remaining_stock_013",
+      "variant": "unknown-class"
+    },
+    {
+      "id": "SolarSail-foreign-factory",
+      "family": "SolarSail",
+      "case": "remaining_stock_013",
+      "variant": "foreign-factory"
+    },
+    {
+      "id": "SolarSail-missing-module",
+      "family": "SolarSail",
+      "case": "remaining_stock_013",
+      "variant": "missing-module"
+    },
+    {
+      "id": "SolarSail-generic-fallback",
+      "family": "SolarSail",
+      "case": "remaining_stock_013",
+      "variant": "generic-fallback"
+    },
+    {
+      "id": "Quadcopter-unknown-class",
+      "family": "Quadcopter",
+      "case": "remaining_stock_017",
+      "variant": "unknown-class"
+    },
+    {
+      "id": "Quadcopter-foreign-factory",
+      "family": "Quadcopter",
+      "case": "remaining_stock_017",
+      "variant": "foreign-factory"
+    },
+    {
+      "id": "Quadcopter-missing-module",
+      "family": "Quadcopter",
+      "case": "remaining_stock_017",
+      "variant": "missing-module"
+    },
+    {
+      "id": "Quadcopter-generic-fallback",
+      "family": "Quadcopter",
+      "case": "remaining_stock_017",
+      "variant": "generic-fallback"
+    },
+    {
+      "id": "HST-metadata-0",
+      "family": "HST",
+      "case": "remaining_stock_018",
+      "variant": "metadata",
+      "metadata": 0
+    },
+    {
+      "id": "HST-metadata-1",
+      "family": "HST",
+      "case": "remaining_stock_018",
+      "variant": "metadata",
+      "metadata": 1
+    },
+    {
+      "id": "HST-metadata-2",
+      "family": "HST",
+      "case": "remaining_stock_018",
+      "variant": "metadata",
+      "metadata": 2
+    },
+    {
+      "id": "HST-metadata-3",
+      "family": "HST",
+      "case": "remaining_stock_018",
+      "variant": "metadata",
+      "metadata": 3
+    },
+    {
+      "id": "HST-metadata-4",
+      "family": "HST",
+      "case": "remaining_stock_018",
+      "variant": "metadata",
+      "metadata": 4
+    },
+    {
+      "id": "HST-metadata-5",
+      "family": "HST",
+      "case": "remaining_stock_018",
+      "variant": "metadata",
+      "metadata": 5
+    },
+    {
+      "id": "HST-metadata-6",
+      "family": "HST",
+      "case": "remaining_stock_018",
+      "variant": "metadata",
+      "metadata": 6
+    },
+    {
+      "id": "HST-missing-query",
+      "family": "HST",
+      "case": "remaining_stock_018",
+      "variant": "missing-query"
+    },
+    {
+      "id": "HST-windows-pe",
+      "family": "HST",
+      "case": "remaining_stock_018",
+      "variant": "windows-pe"
+    }
+  ],
+  "selected_complete_scenes": [
+    "remaining_stock_003",
+    "remaining_stock_009",
+    "remaining_stock_013",
+    "remaining_stock_017",
+    "remaining_stock_018",
+    "remaining_stock_022",
+    "remaining_stock_026"
+  ],
+  "actual_original_processes_per_profile": 45,
+  "actual_original_processes_all_four_profiles": 180,
+  "normal_admission_qualified": false,
+  "phase6_complete": false
+}
