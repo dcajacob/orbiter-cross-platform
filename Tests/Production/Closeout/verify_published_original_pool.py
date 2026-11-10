@@ -7,6 +7,7 @@ import re
 import stat
 import subprocess
 import zipfile
+from urllib.parse import unquote
 from contracts import ROOT,require,load,sha,atomic_json
 import verify_original_package_pool_preflight as original
 
@@ -59,8 +60,22 @@ def planned_package(fields,wanted,pins,found):
     found.add(name)
 
 
+
+def package_path(uri):
+    prefix='https://snapshot.ubuntu.com/ubuntu/20261109T212432Z/'
+    require(uri.startswith(prefix),'Exact original signed snapshot URI required')
+    encoded=uri[len(prefix):]
+    # APT escapes literal plus and tilde in URI segments. Decode only those two
+    # observed spellings; never apply form decoding (+ is not a space), path
+    # traversal decoding, redirects, or changes to any original retained URI.
+    require(all(code.lower() in ('%2b','%7e') for code in re.findall('%..',encoded)),'Only observed literal plus/tilde URI escapes may match signed package paths')
+    decoded=unquote(encoded,errors='strict')
+    require('%' not in decoded and decoded.startswith('pool/') and all(re.fullmatch('[-A-Za-z0-9+_.~]+',part) and part not in ('.','..') for part in decoded.split('/')),'Exact safe signed package filename required')
+    return decoded
+
+
 def inspect_signed_indexes(folder,plan,output):
-    output.mkdir();metadata=folder/'signed-metadata';wanted={r[0].split('/20261109T212432Z/',1)[1]:r for r in plan};require(len(wanted)==len(plan),'Unique original pool paths required')
+    output.mkdir();metadata=folder/'signed-metadata';wanted={package_path(r[0]):r for r in plan};require(len(wanted)==len(plan),'Unique original pool paths required')
     pins={}
     for row in (folder/'original-system-packages.txt').read_text().splitlines():
         name,version=row.split('=',1);base=name.split(':')[0];require(base not in pins or pins[base]==version,'One original version per package required');pins[base]=version
@@ -86,6 +101,7 @@ def inspect_signed_indexes(folder,plan,output):
                 if fields:planned_package(fields,wanted,pins,found)
             records.append(dict(suite=suite,component=component,retained_index_sha256=sha(index),signed_uncompressed_sha256=hashes[relative][0],signed_uncompressed_bytes=hashes[relative][1]))
             unpacked.unlink() # only independently derived duplicate; all retained originals stay untouched
+    atomic_json(output/'signed-index-comparison.json',dict(expected_original_blob_paths=sorted(wanted),matched_signed_blob_paths=sorted(found),missing_signed_blob_paths=sorted(set(wanted)-found),actual_snapshot_index_records=records,original_retained_URI_plan_rewritten=False))
     require(set(wanted)==found and len(records)==13,'Every one of402 original planned blobs and all13 snapshot indexes must match signed metadata')
     return dict(all_four_original_snapshot_signatures_independently_verified=True,all_thirteen_original_snapshot_indexes_SHA256_and_sizes_verified=True,original_planned_blobs_matched_to_signed_indexes=len(found),index_records=records,runner_archive_keyring_sha256=sha('/usr/share/keyrings/ubuntu-archive-keyring.gpg'))
 
