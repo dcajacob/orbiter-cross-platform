@@ -1,0 +1,58 @@
+{
+  "protocol": "phase6-exact-independent-class-positive-profile-proofs-v1",
+  "repository": {
+    "owner": "dcajacob",
+    "repo": "orbiter-cross-platform"
+  },
+  "scope": "Four independently reexecuted original positive active and paused lifetime profile proofs only; no full class or candidate acceptance",
+  "profiles": {
+    "Debug-automatic": {
+      "run_id": 42737383299,
+      "source": "d7ce8d0b3d28b69d9341e78fcedabd9c477c605c",
+      "branch": "qualification/native-class-independent-Debug-automatic-v1",
+      "artifact_id": 13728360340,
+      "archive_bytes": 299566,
+      "archive_sha256": "2006373534a52ccaca6658b498b39102a5e9d333aa5bb5222e29287b74d2c5b1",
+      "jobs": {
+        "129569821682": "readiness",
+        "129570030236": "Independently audit original class Debug-automatic"
+      }
+    },
+    "Debug-sse2": {
+      "run_id": 42737210387,
+      "source": "7a93a25d8d7af7d39ccfb05270cb338afb1832e8",
+      "branch": "qualification/native-class-independent-Debug-sse2-v1",
+      "artifact_id": 13727337543,
+      "archive_bytes": 299609,
+      "archive_sha256": "1b9bd298312ad61062929052c5cdb00cfdf766861b3a146b3301f57048d345b9",
+      "jobs": {
+        "129569243411": "readiness",
+        "129569418582": "Independently audit original class Debug-sse2"
+      }
+    },
+    "Release-automatic": {
+      "run_id": 42740940027,
+      "source": "791a88a00957ab71f7fc1f857a9aec0e138041cb",
+      "branch": "qualification/native-class-independent-Release-automatic-v1",
+      "artifact_id": 13729965310,
+      "archive_bytes": 299691,
+      "archive_sha256": "45fa945056f58e9cbf62beb6ecba4e64ac628e10945a6afb716487fdf14a42b8",
+      "jobs": {
+        "129581519785": "readiness",
+        "129581738236": "Independently audit original class Release-automatic"
+      }
+    },
+    "Release-sse2": {
+      "run_id": 42743389041,
+      "source": "8e5504260d00d5b999d3fb70425118b74ebe3752",
+      "branch": "qualification/native-class-independent-Release-sse2-v1",
+      "artifact_id": 13729649792,
+      "archive_bytes": 300163,
+      "archive_sha256": "28b5e61e67df9aed7f8fde6da447ecb226d1e255ee2c9483b581b1c0e3cb3a90",
+      "jobs": {
+        "129589649846": "readiness",
+        "129589827995": "Independently audit original class Release-sse2"
+      }
+    }
+  }
+}

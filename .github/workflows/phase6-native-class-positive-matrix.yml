@@ -1,0 +1,42 @@
+name: Phase 6 Verify Renewed Original Positive Class Lifetime Matrix
+on:
+  push:
+    branches: ['qualification/native-class-positive-matrix-v1']
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: phase6-original-positive-class-matrix-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  audit:
+    name: Verify every original family profile and twenty-world positive lifetime cell
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - name: Preserve every original and publication helper control
+        run: mkdir -p out && python3 -B Tests/Production/Closeout/run_controls.py --output out/class-positive-matrix-controls.json
+      - name: Retain only the exact independently replayed four-profile metadata
+        uses: actions/github-script@v8
+        with:
+          script: |
+            await require('./.github/scripts/phase6-download-class-profile-proofs.cjs')({github,context,core});
+      - name: Apply unchanged original family coverage to every independently reproduced active and paused world
+        run: >-
+          python3 -B Tests/Production/Closeout/final_hosted_class_lifetimes.py
+          --inputs out/class-lifetime-matrix-inputs --output out/class-positive-matrix-proof
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: complete-independent-original-positive-class-lifetimes
+          retention-days: 14
+          compression-level: 3
+          path: |
+            out/class-positive-matrix-proof/**
+            out/class-positive-matrix-controls.json
+            out/class-lifetime-matrix-inputs/*.json
+            out/class-lifetime-matrix-inputs/*/*.json
+            out/class-lifetime-matrix-inputs/*/*.body
