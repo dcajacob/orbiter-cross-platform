@@ -1,0 +1,79 @@
+{
+  "protocol": "phase6-published-independent-original-rejection-profile-witnesses-v1",
+  "repository": {
+    "owner": "dcajacob",
+    "repo": "orbiter-cross-platform"
+  },
+  "profiles": {
+    "Debug-automatic": {
+      "source": "f69c1fd984bf126ec8ac9da5ae48381aa6b4c69c",
+      "run_id": 42895068687,
+      "branch": "qualification/native-rejection-independent-v1",
+      "workflow": ".github/workflows/phase6-native-rejection-independent.yml",
+      "jobs": {
+        "130105916657": "readiness",
+        "130106219919": "Independently replay all45 original rejections Debug-automatic",
+        "130106220021": "Independently replay all45 original rejections Debug-sse2",
+        "130106220190": "Independently replay all45 original rejections Release-automatic",
+        "130106220408": "Independently replay all45 original rejections Release-sse2"
+      },
+      "artifact_id": 13799893532,
+      "archive_bytes": 3412032,
+      "archive_sha256": "9942a79e9b9f2a5d1dac6728a4bf2470afc02a998d00e2b76b18b4d5d3e6ebeb"
+    },
+    "Debug-sse2": {
+      "source": "f69c1fd984bf126ec8ac9da5ae48381aa6b4c69c",
+      "run_id": 42895068687,
+      "branch": "qualification/native-rejection-independent-v1",
+      "workflow": ".github/workflows/phase6-native-rejection-independent.yml",
+      "jobs": {
+        "130105916657": "readiness",
+        "130106219919": "Independently replay all45 original rejections Debug-automatic",
+        "130106220021": "Independently replay all45 original rejections Debug-sse2",
+        "130106220190": "Independently replay all45 original rejections Release-automatic",
+        "130106220408": "Independently replay all45 original rejections Release-sse2"
+      },
+      "artifact_id": 13800367642,
+      "archive_bytes": 3411968,
+      "archive_sha256": "ebb79d8f89484f5aa13e8821b3ef531e719f10c0967a6e1a9cf8abb2981910f1"
+    },
+    "Release-automatic": {
+      "source": "f69c1fd984bf126ec8ac9da5ae48381aa6b4c69c",
+      "run_id": 42895068687,
+      "branch": "qualification/native-rejection-independent-v1",
+      "workflow": ".github/workflows/phase6-native-rejection-independent.yml",
+      "jobs": {
+        "130105916657": "readiness",
+        "130106219919": "Independently replay all45 original rejections Debug-automatic",
+        "130106220021": "Independently replay all45 original rejections Debug-sse2",
+        "130106220190": "Independently replay all45 original rejections Release-automatic",
+        "130106220408": "Independently replay all45 original rejections Release-sse2"
+      },
+      "artifact_id": 13799483934,
+      "archive_bytes": 3400184,
+      "archive_sha256": "6efc871466dc5a71505e733e7128d3588c7763bb57135ef92eaac5e834ab2453"
+    },
+    "Release-sse2": {
+      "source": "f69c1fd984bf126ec8ac9da5ae48381aa6b4c69c",
+      "run_id": 42895068687,
+      "branch": "qualification/native-rejection-independent-v1",
+      "workflow": ".github/workflows/phase6-native-rejection-independent.yml",
+      "jobs": {
+        "130105916657": "readiness",
+        "130106219919": "Independently replay all45 original rejections Debug-automatic",
+        "130106220021": "Independently replay all45 original rejections Debug-sse2",
+        "130106220190": "Independently replay all45 original rejections Release-automatic",
+        "130106220408": "Independently replay all45 original rejections Release-sse2"
+      },
+      "artifact_id": 13799129351,
+      "archive_bytes": 3395521,
+      "archive_sha256": "aff95b3b75f7ad818830b1c8fdc227eddbe96ff0d26d7c21e700dc1952f2794a"
+    }
+  },
+  "original_capture_source": "094162a855254248bdad11379bfb4615a0a7e743",
+  "original_capture_run_id": 42888354741,
+  "complete_class_eligibility_qualified": false,
+  "normal_admission_qualified": false,
+  "phase6_complete": false,
+  "hands_on_ready": false
+}
