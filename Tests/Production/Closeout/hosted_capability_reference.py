@@ -19,6 +19,33 @@ COMPILED='ccc02c8a34bd1f227624d8778a141e8736ae8111'
 CASES=['remaining_stock_'+n for n in ('003','009','013','014','017','018','022','026','032')]
 ORIGINAL='ba38a7efccb5f770e87add95f5e966aa40270756'
 FIELDS=capabilities.FIELDS
+# A coverage projection only. The original compare_capabilities still compares ALL 17 fields exactly.
+# The unavailable historical inventory's precise field list and bytes are not reconstructed by this projection.
+STRUCTURAL_FIELDS=tuple(k for k in FIELDS if k!='empty_mass')
+
+
+def structural_projection(signatures):
+    indices=[FIELDS.index(k)+1 for k in STRUCTURAL_FIELDS]
+    require(all(len(row)==len(FIELDS)+1 for row in signatures),'Full original seventeen-field rows required before structural projection')
+    return {(row[0],*(row[i] for i in indices)) for row in signatures}
+
+
+def inventory_coverage(actual,selected,profiles,families):
+    require(len(actual)==22 and len(selected)==17 and selected<=actual,
+            'The immutable complete original cohort has twenty-two full SDK variants and seventeen in the original nine scenes')
+    structural=structural_projection(actual);selected_structural=structural_projection(selected)
+    require(len(structural)==16 and selected_structural==structural,
+            'All sixteen non-mass structural combinations must remain covered by the original nine scenes')
+    require({row[0] for row in actual}==families and set(profiles)==set(PROFILES) and
+            all({tuple(v) for v in row['unique_signatures']}==actual and
+                {tuple(v) for v in row['selected_case_signatures']}==selected for row in profiles.values()),
+            'Every profile must retain the complete original full SDK variants and unchanged nine-scene selection')
+    return dict(structural_projection_fields=list(STRUCTURAL_FIELDS),structural_projection_signature_count=len(structural),
+                structural_projection_signatures=sorted(structural),original_nine_cases_cover_all_non_mass_structures=True,
+                full_17_field_variants_not_in_original_nine_cases=sorted(actual-selected),
+                full_17_field_comparison_fields=list(FIELDS),full_17_field_additional_variant_audit_pending=True,
+                historical_inventory_field_list_recovered=False,
+                coverage_note='Fresh typed coverage of all actual full SDK fields; non-mass grouping is descriptive only and cannot grant original seventeen-field capability qualification.')
 
 
 def sources():
@@ -78,8 +105,11 @@ def main():
             Path(os.environ['GITHUB_WORKSPACE']).resolve()==ROOT,'Actual standard hosted reference inspection required; no local full reference scan')
     require(not a.output.exists() and a.output.resolve().is_relative_to(ROOT/'out'),'Fresh original capability inventory required')
     a.output.mkdir(parents=True)
-    report=dict(protocol='phase6-full-original-SDK-capability-inventory-v1',status='running',
-                source=os.environ['GITHUB_SHA'],original_capture_source=ORIGINAL,fields=list(FIELDS),expected_original_structural_signature_count=16,
+    report=dict(protocol='phase6-full-original-SDK-capability-inventory-v2',status='running',
+                source=os.environ['GITHUB_SHA'],original_capture_source=ORIGINAL,fields=list(FIELDS),expected_non_mass_structural_signature_count=16,
+                expected_full_17_field_signature_count=22,expected_nine_scene_full_17_field_signature_count=17,
+                prior_failed_full_field_classification=dict(run_id=42752140853,source='c120d9074b954917f68e666335afad54fc1c2e8f',
+                    artifact_id=13733947804,artifact_sha256='aed589282064238459b2df3604f32f480410ad35130824649b3d001757a1cc56'),
                 proposed_native_cases=CASES,actual_new_simulator_processes=0,historical_inventory_relabelled=False,
                 historical_inventory_available=False,qualification_granted=False,complete_class_eligibility_qualified=False,
                 normal_admission_qualified=False,phase6_complete=False,hands_on_ready=False)
@@ -129,14 +159,12 @@ def main():
                       reference_files_sha256=reference_files,profiles=profiles,unique_signatures=sorted(global_signatures),
                       signature_count=len(global_signatures),selected_case_unique_signatures=sorted(selected_signatures),
                       actual_original_initial_sdk_snapshots=rows);save()
-        require(rows==304 and len(global_signatures)==16 and selected_signatures==global_signatures,
-                'Original sixteen structural combinations must remain exact and be covered by the unchanged nine scenes')
-        require({v[0] for v in global_signatures}==families and all({tuple(v) for v in row['selected_case_signatures']}==global_signatures for row in profiles.values()),
-                'Every original family and structural combination must be represented in every profile selection')
+        require(rows==304,'All original full four-profile initial SDK snapshots required')
+        report.update(inventory_coverage(global_signatures,selected_signatures,profiles,families));save()
         require(all(sha(p)==v for p,v in reference_files.items()) and sources()==report['original_capability_sources_sha256'],
                 'Original SDK witnesses or conserved owning sources changed during inventory')
         report.update(status='verified-full-original-SDK-initial-capability-inventory-only',
-                      all_17_original_capability_fields_retained=True,original_16_signatures_and_nine_cases_preserved=True,
+                      all_17_original_capability_fields_retained=True,original_nine_scene_selection_preserved=True,all_full_17_field_variants_retained=True,
                       native_144_process_observer_off_on_controls_pending=True)
     except BaseException as error:report.update(status='failed-or-incomplete-unqualified',error=str(error));raise
     finally:save()

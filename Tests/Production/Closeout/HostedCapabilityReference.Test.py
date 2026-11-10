@@ -57,3 +57,30 @@ class HostedCapabilityReferenceTests(unittest.TestCase):
             damaged=dict(variant);damaged[key]=value
             with self.assertRaises(ValueError):reference.validate_variant(parent,record,damaged)
         with self.assertRaises(ValueError):reference.validate_variant(parent,dict(record,finalized_ticks=960),variant)
+
+
+    def test_mass_grouping_never_drops_full_exact_variants_or_grants_qualification(self):
+        actual=set()
+        for i in range(16):
+            values=[1.0 for _ in reference.FIELDS];values[reference.FIELDS.index('size')]=float(i)
+            actual.add(('family'+str(i%11),*values))
+        selected=set(actual)
+        for i,row in enumerate(sorted(actual)[:6]):
+            values=list(row);values[reference.FIELDS.index('empty_mass')+1]=2.0;actual.add(tuple(values))
+            if i==0:selected.add(tuple(values))
+        profiles={p:dict(unique_signatures=sorted(actual),selected_case_signatures=sorted(selected)) for p in reference.PROFILES}
+        result=reference.inventory_coverage(actual,selected,profiles,{'family'+str(i) for i in range(11)})
+        self.assertEqual(result['structural_projection_signature_count'],16)
+        self.assertEqual(result['full_17_field_comparison_fields'],list(reference.capabilities.FIELDS))
+        self.assertEqual(len(result['full_17_field_variants_not_in_original_nine_cases']),5)
+        self.assertTrue(result['full_17_field_additional_variant_audit_pending'])
+        self.assertFalse(result['historical_inventory_field_list_recovered'])
+        for damage in ('full_mass_variant','selected_variant','structural_variant','profile_variant'):
+            a=set(actual);b=set(selected);p=copy.deepcopy(profiles)
+            if damage=='full_mass_variant':a.remove(next(iter(actual-selected)))
+            if damage=='selected_variant':b.remove(next(iter(selected)))
+            if damage=='structural_variant':
+                row=next(iter(actual-selected));a.remove(row);values=list(row);values[reference.FIELDS.index('size')+1]=200.0;a.add(tuple(values))
+                p={k:dict(unique_signatures=sorted(a),selected_case_signatures=sorted(b)) for k in reference.PROFILES}
+            if damage=='profile_variant':next(iter(p.values()))['unique_signatures'].pop()
+            with self.subTest(damage=damage),self.assertRaises(ValueError):reference.inventory_coverage(a,b,p,{'family'+str(i) for i in range(11)})

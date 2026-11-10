@@ -1,7 +1,7 @@
 name: Phase 6 Verify Original Full SDK Capability Reference
 on:
   push:
-    branches: ['qualification/native-class-capability-reference-v2']
+    branches: ['qualification/native-class-capability-reference-v3']
 permissions:
   contents: read
   actions: read
