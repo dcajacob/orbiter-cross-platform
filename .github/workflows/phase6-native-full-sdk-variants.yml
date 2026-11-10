@@ -1,0 +1,77 @@
+name: Phase 6 Independently Replay All Full Original Native SDK Variants
+on:
+  push:
+    branches: ['qualification/native-full-sdk-variants-v1']
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: phase6-full-original-SDK-variants-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  audit:
+    name: Replay all full SDK and port variants ${{ matrix.math_profile }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 90
+    strategy:
+      fail-fast: false
+      max-parallel: 2
+      matrix:
+        math_profile: [automatic, sse2]
+    env:
+      MATH_PROFILE: ${{ matrix.math_profile }}
+      NATIVE_PHASE: stock-writer
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.14'
+      - name: Preserve every original and new bounded helper control
+        run: |
+          mkdir -p out
+          python3 -B Tests/Production/Closeout/run_controls.py --output out/full-SDK-controls.json
+          python3 -B Tests/Production/Closeout/native_original_matrix_cli.py --plan > out/native-matrix-plan.json
+      - name: Retain the exact complete original SDK inventory and all full fields
+        uses: actions/github-script@v8
+        with:
+          script: |
+            await require('./.github/scripts/phase6-download-capability-inventory.cjs')({github,context,core});
+      - run: python3 -B Tests/Production/Closeout/restore_hosted_capability_inventory.py
+      - name: Retain all eight physical proof archives and both exact native writer configurations on GitHub only
+        uses: actions/github-script@v8
+        with:
+          script: |
+            await require('./.github/scripts/phase6-download-native-matrix-inputs.cjs')({github,context,core});
+      - name: Retain every original raw archive and both original successful and failed audit attempts
+        uses: actions/github-script@v8
+        with:
+          script: |
+            await require('./.github/scripts/phase6-download-source-complete-retry.cjs')({github,context,core});
+      - name: Independently restore every actual original member and preserve exact retry history
+        run: >-
+          python3 -B Tests/Production/CurrentWindows/Hosted/restore_source_complete_retry_reference.py
+          --audit-api out/reference-api/audit.json --audit-archive out/reference-api/audit.zip
+          --reference-api out/reference-api/original.json --first-attempt-api out/reference-api/first.json
+          --first-attempt-archive out/reference-api/first.zip --first-attempt-log out/reference-api/first-job.log
+      - name: Re-read all full original native SDK variants and unchanged port comparisons without simulation
+        run: python3 -B Tests/Production/Closeout/hosted_full_sdk_audit.py --math-profile "$MATH_PROFILE"
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: full-original-native-SDK-variants-${{ matrix.math_profile }}
+          retention-days: 14
+          compression-level: 3
+          path: |
+            out/class-full-SDK-variant-audits/**
+            out/full-SDK-controls.json
+            out/native-matrix-plan.json
+            out/native-matrix-readiness.json
+            out/native-matrix-phase-inputs/**/api.json
+            out/native-matrix-native-inputs/**/api.json
+            out/native-matrix-scalar/api.json
+            out/class-capability-inventory/**
+            out/reference-api/*.json
+            out/reference-api/first-job.log
+            out/reference-audit-restoration/restoration.json
