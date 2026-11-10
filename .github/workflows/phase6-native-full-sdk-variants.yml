@@ -1,7 +1,7 @@
 name: Phase 6 Independently Replay All Full Original Native SDK Variants
 on:
   push:
-    branches: ['qualification/native-full-sdk-variants-v1']
+    branches: ['qualification/native-full-sdk-variants-v2']
 permissions:
   contents: read
   actions: read
@@ -65,6 +65,7 @@ jobs:
           compression-level: 3
           path: |
             out/class-full-SDK-variant-audits/**
+            out/class-full-SDK-source-witnesses/**
             out/full-SDK-controls.json
             out/native-matrix-plan.json
             out/native-matrix-readiness.json

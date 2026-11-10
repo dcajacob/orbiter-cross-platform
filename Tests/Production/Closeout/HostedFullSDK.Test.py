@@ -1,6 +1,8 @@
 """Negative controls for complete full SDK coverage and original exact field/port comparisons."""
 import copy
 import csv
+import hashlib
+import subprocess
 from pathlib import Path
 import tempfile
 import unittest
@@ -58,3 +60,37 @@ class HostedFullSDKTests(unittest.TestCase):
             hosted.compare_initial(left,right,case,budgets,{'HST'})
             write(left,'stock-vessel-attachments.csv',dict(attachment,x=str(budgets['position_m']*2)))
             with self.assertRaisesRegex(ValueError,'port geometry'):hosted.compare_initial(left,right,case,budgets,{'HST'})
+
+
+    def test_historical_and_current_source_owners_remain_separate_and_both_are_exact(self):
+        relative='Tests/Production/Closeout/ShaderPhysicalAudit.Test.py'
+        old=subprocess.check_output(['git','-C',str(ROOT),'show',hosted.matrix_cli.matrix.SOURCE+':'+relative])
+        current=(ROOT/relative).read_bytes();self.assertNotEqual(old,current)
+        head=subprocess.check_output(['git','-C',str(ROOT),'rev-parse','HEAD'],text=True).strip()
+        recorded={relative:hashlib.sha256(old).hexdigest(),'/home/runner/work/orbiter-cross-platform/orbiter-cross-platform/'+relative:hashlib.sha256(old).hexdigest()}
+        before=copy.deepcopy(recorded);parent=ROOT/'out/class-full-SDK-source-witnesses';parent.mkdir(parents=True,exist_ok=True)
+        with tempfile.TemporaryDirectory(dir=parent) as temp:
+            bound,guards=hosted.bind_historical_sources(recorded,Path(temp)/'snapshot',head)
+            self.assertEqual(recorded,before);self.assertEqual(len(bound),2)
+            self.assertEqual((ROOT/relative).read_bytes(),current)
+            for value in bound.values():
+                self.assertEqual(Path(value['immutable_historical_witness']).read_bytes(),old)
+                self.assertEqual(value['current_sha256'],hashlib.sha256(current).hexdigest())
+                self.assertFalse(value['historical_report_rewritten']);self.assertFalse(value['current_file_replaced'])
+            self.assertTrue(all(hosted.sha(p)==v for p,v in guards.items()))
+            witness=Path(next(iter(bound.values()))['immutable_historical_witness']);witness.write_bytes(b'changed')
+            self.assertFalse(all(hosted.sha(p)==v for p,v in guards.items()))
+
+    def test_forged_old_hash_source_path_or_current_owner_is_rejected(self):
+        relative='Tests/Production/Closeout/ShaderPhysicalAudit.Test.py'
+        old=subprocess.check_output(['git','-C',str(ROOT),'show',hosted.matrix_cli.matrix.SOURCE+':'+relative])
+        head=subprocess.check_output(['git','-C',str(ROOT),'rev-parse','HEAD'],text=True).strip()
+        parent=ROOT/'out/class-full-SDK-source-witnesses';parent.mkdir(parents=True,exist_ok=True)
+        for damage in ('old_hash','escape','outside','current_owner'):
+            recorded={relative:hashlib.sha256(old).hexdigest()};owner=head
+            if damage=='old_hash':recorded[relative]='0'*64
+            if damage=='escape':recorded={'Tests/../outside.py':hashlib.sha256(old).hexdigest()}
+            if damage=='outside':recorded={'/tmp/outside.py':hashlib.sha256(old).hexdigest()}
+            if damage=='current_owner':owner='e'*40
+            with self.subTest(damage=damage),tempfile.TemporaryDirectory(dir=parent) as temp:
+                with self.assertRaises(ValueError):hosted.bind_historical_sources(recorded,Path(temp)/'snapshot',owner)

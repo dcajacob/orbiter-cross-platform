@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Independently re-read every full original/native SDK variant without any new simulator."""
 import argparse
+import hashlib
 import os
 from pathlib import Path
 import subprocess
@@ -20,6 +21,44 @@ def original_sources():
                 'Complete prior physical source/API/member/capacity guards changed: '+name)
         result[relative]=sha(path)
     return result
+
+
+def source_relative(name):
+    path=Path(name)
+    if path.is_absolute():
+        roots=(ROOT,Path('/home/runner/work/orbiter-cross-platform/orbiter-cross-platform'))
+        matches=[path.relative_to(parent) for parent in roots if path.is_relative_to(parent)]
+        require(matches and all(p==matches[0] for p in matches),'Historical source outside its actual repository workspace')
+        path=matches[0]
+    require(path.parts and path.parts[0]=='Tests' and '..' not in path.parts and ':' not in str(path) and
+            '\\' not in str(path) and path.suffix=='.py','Canonical tracked historical Python source required')
+    return path.as_posix()
+
+
+def bind_historical_sources(recorded,destination,current_source):
+    historical_source=matrix_cli.matrix.SOURCE
+    require(current_source==subprocess.check_output(['git','-C',str(ROOT),'rev-parse','HEAD'],text=True).strip(),
+            'Actual immutable current source owner required separately from historical sources')
+    destination=Path(destination).resolve()
+    require(recorded and not destination.exists() and destination.is_relative_to(ROOT/'out/class-full-SDK-source-witnesses'),
+            'Fresh separate historical source witness required')
+    destination.mkdir(parents=True);bindings={};guards={}
+    for original_name,expected in recorded.items():
+        relative=source_relative(original_name)
+        old=subprocess.check_output(['git','-C',str(ROOT),'show',historical_source+':'+relative])
+        require(hashlib.sha256(old).hexdigest()==expected,'Historical source differs from its exact immutable physical producer: '+original_name)
+        snapshot=destination/relative;snapshot.parent.mkdir(parents=True,exist_ok=True)
+        if snapshot.exists():require(snapshot.read_bytes()==old,'Aliased historical source snapshots differ')
+        else:snapshot.write_bytes(old)
+        current=ROOT/relative;new=subprocess.check_output(['git','-C',str(ROOT),'show',current_source+':'+relative])
+        require(current.read_bytes()==new,'Actual current source differs from its separate immutable auditor owner: '+relative)
+        require(sha(snapshot)==expected,'Actual historical source witness differs from recorded original bytes')
+        bindings[original_name]=dict(relative=relative,historical_source=historical_source,historical_sha256=expected,
+            immutable_historical_witness=str(snapshot),current_source=current_source,current_sha256=sha(current),
+            historical_and_current_versions_identical=(old==new),historical_report_rewritten=False,current_file_replaced=False)
+        guards[str(snapshot)]=expected;guards[str(current)]=sha(current)
+    require(len(bindings)==len(recorded),'Every original relative and absolute source guard must remain represented')
+    return bindings,guards
 
 
 def compare_initial(native,original,case,budgets,families):
@@ -83,8 +122,10 @@ def audit(mode):
             native,bound=matrix_cli.bind_raw(profile,'stock-writer',selected);raw[profile]=(native,bound)
             capture=load(native/'capture.json')
             cases=matrix_cli.matrix.physical.complete_scope(capture,selected['report']['independent_native_observations'],profile,'stock-writer',config)
-            for path,value in selected['report']['guarded_sources_sha256'].items():
-                require(sha(path)==value,'Actual original full physical comparator source changed: '+path);guards[path]=value
+            historical_bindings,historical_guards=bind_historical_sources(selected['report']['guarded_sources_sha256'],
+                ROOT/'out/class-full-SDK-source-witnesses'/profile,head)
+            guards.update(historical_guards)
+            report.setdefault('historical_source_bindings',{})[profile]=historical_bindings;save()
             prior=load(ROOT/'out/native-matrix-phase-payload'/(profile+'-stock-writer')/'reference-audit-restoration/restoration.json')
             reference_comparison=matrix_cli.compare_reference(prior,restored)
             actual={};native_signatures=set();original_signatures=set()
@@ -124,8 +165,8 @@ def audit(mode):
                 matrix_cli.matrix.physical.original_bindings()==bindings and all(sha(path)==value for path,value in guards.items()),
                 'Original source/API/ZIP/member/reference/inventory observations changed during independent SDK audit')
         report.update(status='passed-two-profile-full-original-native-initial-SDK-and-ports-only',
-                      all_22_full_17_field_variants_pending=False,all_22_full_17_field_variants_replayed=True,
-                      guarded_inputs_sha256=guards)
+                      all_22_full_17_field_variants_pending=False,all_22_full_17_field_variants_replayed=True,all_historical_source_guards_verified_at_original_commit=True,
+                      all_current_sources_separately_verified_at_auditor_commit=True,guarded_inputs_sha256=guards)
     except BaseException as error:report.update(status='failed-or-incomplete-unqualified',error=str(error));raise
     finally:save()
     print(report['status']+' '+mode+' actual initial pairs '+str(report['actual_initial_pairs']))
