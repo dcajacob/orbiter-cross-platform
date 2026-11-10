@@ -1,0 +1,51 @@
+name: Phase 6 Original Native Automatic Atan2 Negative Component
+on:
+  push:
+    branches: ['qualification/numerical-original-atan2-negative-v1']
+permissions:
+  contents: read
+concurrency:
+  group: phase6-old-native-atan2-negative-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  reproduce:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - name: Preserve all existing controls and source inventory
+        run: mkdir -p out && python3 -B Tests/Production/Closeout/run_controls.py --output out/old-atan2-negative-controls.json
+      - name: Observe only the original pre-fix standalone component with the actual captured binary64 arguments
+        run: python3 -B Tests/Production/Closeout/verify_old_atan2_negative.py --output out/old-atan2-negative
+      - name: Preserve actual failure and full original compilation receipts
+        if: failure()
+        shell: python
+        run: |
+          from pathlib import Path
+          for p in sorted(Path('out/old-atan2-negative').glob('*.log')):
+              print(str(p)+':\n'+p.read_text(errors='replace')[-10000:])
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: original-old-atan2-negative-full-component
+          retention-days: 14
+          compression-level: 3
+          include-hidden-files: true
+          path: |
+            out/old-atan2-negative/**
+            out/old-atan2-negative-controls.json
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: original-old-atan2-negative-small-receipt
+          retention-days: 14
+          compression-level: 3
+          path: |
+            out/old-atan2-negative/*.json
+            out/old-atan2-negative/*.log
+            out/old-atan2-negative/actual-link-map.txt
+            out/old-atan2-negative/build/compile_commands.json
+            out/old-atan2-negative/build/generated/preparation.json
+            out/old-atan2-negative-controls.json
