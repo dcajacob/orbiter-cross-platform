@@ -1,0 +1,64 @@
+name: Phase 6 Readonly Numerical Observer Matching Compiler Component
+on:
+  push:
+    branches: ['qualification/numerical-observer-compiler-control-v1']
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: phase6-native-numerical-observer-compiler-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  build-observers:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    env:
+      PROFILE: Debug-automatic
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - name: Preserve all original controls and exact compiler/sanitizer/source corruption guards
+        run: mkdir -p out && python3 -B Tests/Production/Closeout/run_controls.py --output out/numerical-observer-compiler-controls.json
+      - name: Download only the exact original retained native package on this hosted worker
+        uses: actions/github-script@v8
+        with:
+          script: |
+            await require('./.github/scripts/phase6-download-native-math-packet.cjs')({github,context,core});
+      - name: Restore complete original package and recheck unchanged actual upstream case discovery without rewriting failed receipts
+        run: >-
+          python3 -B Tests/Production/Closeout/recheck_native_discovery.py
+          --api "out/native-math-source/$PROFILE/api.json"
+          --archive "out/native-math-source/$PROFILE/producer.zip"
+          --profile "$PROFILE"
+          --output out/numerical-observer-original-unit-correction
+      - name: Compile only the two unchanged read-only observers using the actual matching standard host compiler
+        run: >-
+          python3 -B Tests/Production/Closeout/build_native_numerical_observers.py
+          --profile "$PROFILE"
+          --output "out/numerical-observer-compiler/$PROFILE"
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: original-readonly-numerical-observer-compiler-full-witness
+          retention-days: 14
+          compression-level: 3
+          path: |
+            out/numerical-observer-compiler/${{ env.PROFILE }}/**
+            out/numerical-observer-original-unit-correction/*.json
+            out/numerical-observer-original-unit-correction/*.log
+            out/numerical-observer-original-unit-correction/*.xml
+            out/native-math-source/${{ env.PROFILE }}/*.json
+            out/numerical-observer-compiler-controls.json
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: original-readonly-numerical-observer-compiler-small-receipt
+          retention-days: 14
+          compression-level: 3
+          path: |
+            out/numerical-observer-compiler/${{ env.PROFILE }}/*.json
+            out/numerical-observer-compiler/${{ env.PROFILE }}/*.log
+            out/numerical-observer-compiler/${{ env.PROFILE }}/*.txt
+            out/native-math-source/${{ env.PROFILE }}/api.json
+            out/numerical-observer-compiler-controls.json
