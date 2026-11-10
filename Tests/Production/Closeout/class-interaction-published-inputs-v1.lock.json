@@ -1,0 +1,33 @@
+{
+  "protocol": "phase6-published-original-interaction-inputs-v1",
+  "repository": {
+    "owner": "dcajacob",
+    "repo": "orbiter-cross-platform"
+  },
+  "source": "fc70900db0019bb0b7c3a8c62b1a143bf44aaac5",
+  "run_id": 42770752517,
+  "branch": "qualification/native-class-interactions-v1",
+  "workflow": ".github/workflows/phase6-native-class-interactions.yml",
+  "readiness_job_id": 129677708095,
+  "jobs": {
+    "129677708095": "readiness",
+    "129679052719": "Original complete nine interaction flows Release-sse2",
+    "129679052773": "Original complete nine interaction flows Release-automatic",
+    "129679052887": "Original complete nine interaction flows Debug-automatic",
+    "129679053040": "Original complete nine interaction flows Debug-sse2"
+  },
+  "profiles": {
+    "Debug-automatic": {
+      "job_id": 129679052887,
+      "artifact_id": 13745302649,
+      "archive_bytes": 3008231142,
+      "archive_sha256": "9b377a5d7839bebb0ceb90e85a6b42565b505cb1c5b70aca38abd00f91a9ba08"
+    },
+    "Debug-sse2": {
+      "job_id": 129679053040,
+      "artifact_id": 13745413100,
+      "archive_bytes": 3008037251,
+      "archive_sha256": "d68ba737bab29f316a1a6bd63915c1bebf8e253a795840ed532d45d158df4340"
+    }
+  }
+}

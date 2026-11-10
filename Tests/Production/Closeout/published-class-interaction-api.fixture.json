@@ -1,0 +1,96 @@
+{
+  "repository": {
+    "owner": "dcajacob",
+    "repo": "orbiter-cross-platform"
+  },
+  "run": {
+    "id": 42770752517,
+    "head_sha": "fc70900db0019bb0b7c3a8c62b1a143bf44aaac5",
+    "head_branch": "qualification/native-class-interactions-v1",
+    "path": ".github/workflows/phase6-native-class-interactions.yml",
+    "run_attempt": 1,
+    "status": "in_progress",
+    "conclusion": null,
+    "repository": {
+      "private": false,
+      "full_name": "dcajacob/orbiter-cross-platform"
+    }
+  },
+  "jobs": [
+    {
+      "id": 129677708095,
+      "name": "readiness",
+      "run_id": 42770752517,
+      "head_sha": "fc70900db0019bb0b7c3a8c62b1a143bf44aaac5",
+      "labels": [
+        "ubuntu-24.04"
+      ],
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "id": 129679052719,
+      "name": "Original complete nine interaction flows Release-sse2",
+      "run_id": 42770752517,
+      "head_sha": "fc70900db0019bb0b7c3a8c62b1a143bf44aaac5",
+      "labels": [
+        "ubuntu-24.04"
+      ],
+      "status": "in_progress",
+      "conclusion": null
+    },
+    {
+      "id": 129679052773,
+      "name": "Original complete nine interaction flows Release-automatic",
+      "run_id": 42770752517,
+      "head_sha": "fc70900db0019bb0b7c3a8c62b1a143bf44aaac5",
+      "labels": [
+        "ubuntu-24.04"
+      ],
+      "status": "in_progress",
+      "conclusion": null
+    },
+    {
+      "id": 129679052887,
+      "name": "Original complete nine interaction flows Debug-automatic",
+      "run_id": 42770752517,
+      "head_sha": "fc70900db0019bb0b7c3a8c62b1a143bf44aaac5",
+      "labels": [
+        "ubuntu-24.04"
+      ],
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "id": 129679053040,
+      "name": "Original complete nine interaction flows Debug-sse2",
+      "run_id": 42770752517,
+      "head_sha": "fc70900db0019bb0b7c3a8c62b1a143bf44aaac5",
+      "labels": [
+        "ubuntu-24.04"
+      ],
+      "status": "completed",
+      "conclusion": "success"
+    }
+  ],
+  "artifact": {
+    "id": 13745302649,
+    "node_id": "MDg6QXJ0aWZhY3QxMzc0NTMwMjY0OQ==",
+    "name": "original-class-interaction-controls-Debug-automatic",
+    "size_in_bytes": 3008231142,
+    "url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/actions/artifacts/13745302649",
+    "archive_download_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/actions/artifacts/13745302649/zip",
+    "expired": false,
+    "digest": "sha256:9b377a5d7839bebb0ceb90e85a6b42565b505cb1c5b70aca38abd00f91a9ba08",
+    "created_at": "2026-11-10T08:06:53Z",
+    "updated_at": "2026-11-10T08:06:53Z",
+    "expires_at": "2026-11-24T08:03:57Z",
+    "workflow_run": {
+      "id": 42770752517,
+      "repository_id": 1440551273,
+      "head_repository_id": 1440551273,
+      "head_branch": "qualification/native-class-interactions-v1",
+      "head_sha": "fc70900db0019bb0b7c3a8c62b1a143bf44aaac5"
+    }
+  }
+}

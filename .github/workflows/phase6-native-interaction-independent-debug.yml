@@ -1,0 +1,97 @@
+name: Phase 6 Independently Replay Published Original Debug Interaction Profiles
+on:
+  push:
+    branches: ['qualification/native-interaction-independent-debug-v1']
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: phase6-published-interaction-independent-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  audit:
+    name: Independently replay published original interaction ${{ matrix.profile }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 75
+    strategy:
+      fail-fast: false
+      max-parallel: 2
+      matrix:
+        profile: [Debug-automatic, Debug-sse2]
+    env:
+      PROFILE: ${{ matrix.profile }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.14'
+      - name: Preserve every original and new bounded helper control
+        run: mkdir -p out && python3 -B Tests/Production/Closeout/run_controls.py --output out/published-interaction-controls.json
+      - name: Retain only exact completed runtime provider and Mesa inputs
+        uses: actions/github-script@v8
+        with:
+          script: |
+            await require('./.github/scripts/phase6-download-native-api-inputs.cjs')({github,context,core});
+      - run: >-
+          python3 -B Tests/Production/Closeout/recheck_native_discovery.py
+          --api out/native-api-source/native/api.json --archive out/native-api-source/native/producer.zip
+          --profile "$PROFILE" --output "out/interaction-independent-retained-units/$PROFILE"
+      - run: >-
+          python3 -B Tests/Production/Closeout/restore_hosted_native_providers.py
+          --api out/native-api-source/providers/api.json --archive out/native-api-source/providers/producer.zip
+          --output out/native-provider-restoration/restoration.json
+      - run: >-
+          python3 -B Tests/Production/Closeout/restore_hosted_mesa_topology.py
+          --api out/native-api-source/mesa/api.json --archive out/native-api-source/mesa/producer.zip
+          --output out/mesa-topology-restoration/restoration.json
+      - name: Retain the untouched complete original cohort and both audit attempts on GitHub only
+        uses: actions/github-script@v8
+        with:
+          script: |
+            await require('./.github/scripts/phase6-download-source-complete-retry.cjs')({github,context,core});
+      - run: >-
+          python3 -B Tests/Production/CurrentWindows/Hosted/restore_source_complete_retry_reference.py
+          --audit-api out/reference-api/audit.json --audit-archive out/reference-api/audit.zip
+          --reference-api out/reference-api/original.json --first-attempt-api out/reference-api/first.json
+          --first-attempt-archive out/reference-api/first.zip --first-attempt-log out/reference-api/first-job.log
+      - name: Stage exact original application and SDK bytes without Windows execution
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          configuration="${PROFILE%%-*}"
+          python3 -B Tests/Production/CockpitControls/prepare.py --configuration "$configuration" --cache out/original-stock-audit/preserved-cache --output "out/original-stock-audit/preserved-$configuration"
+      - name: Stream the exact completed original interaction profile without a multi-gigabyte memory buffer
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python3 -B Tests/Production/Closeout/download_published_class_interactions.py --profile "$PROFILE"
+      - name: Independently reproduce all five unchanged original interaction audits byte for byte
+        run: >-
+          python3 -B Tests/Production/Closeout/inspect_published_class_interactions.py
+          --api "out/class-interaction-published/$PROFILE/api.json"
+          --archive "out/class-interaction-published/$PROFILE/producer.zip"
+          --profile "$PROFILE" --output "out/interaction-independent/$PROFILE"
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: independent-original-interaction-raw-witness-${{ matrix.profile }}
+          retention-days: 14
+          compression-level: 3
+          path: |
+            out/interaction-independent/${{ env.PROFILE }}/raw-members.json
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: independently-verified-original-interaction-${{ matrix.profile }}
+          retention-days: 14
+          compression-level: 3
+          path: |
+            out/interaction-independent/${{ env.PROFILE }}/proof.json
+            out/interaction-independent/${{ env.PROFILE }}/*-audit.json
+            out/interaction-independent/${{ env.PROFILE }}/original-reference-bindings.json
+            out/interaction-independent/${{ env.PROFILE }}/original-X11-bindings.json
+            out/interaction-independent/${{ env.PROFILE }}/*.log
+            out/class-interaction-published/${{ env.PROFILE }}/*.json
+            out/class-interaction-published/${{ env.PROFILE }}/*.log
+            out/published-interaction-controls.json
