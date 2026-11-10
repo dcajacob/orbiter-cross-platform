@@ -1,0 +1,53 @@
+{
+  "protocol": "phase6-complete-published-original-rejection-captures-v1",
+  "repository": {
+    "owner": "dcajacob",
+    "repo": "orbiter-cross-platform"
+  },
+  "run_id": 42888354741,
+  "source": "094162a855254248bdad11379bfb4615a0a7e743",
+  "branch": "qualification/native-class-rejections-v8-host-compiler",
+  "workflow": ".github/workflows/phase6-native-class-rejections-host-compiler-matrix.yml",
+  "readiness_job_id": 130082573356,
+  "jobs": {
+    "130082573356": "readiness",
+    "130083050136": "Original normal host class and loader rejection controls Debug-automatic",
+    "130083050232": "Original normal host class and loader rejection controls Debug-sse2",
+    "130083050151": "Original normal host class and loader rejection controls Release-automatic",
+    "130083050154": "Original normal host class and loader rejection controls Release-sse2"
+  },
+  "profiles": {
+    "Debug-automatic": {
+      "job_id": 130083050136,
+      "artifact_id": 13799025613,
+      "archive_bytes": 738819064,
+      "archive_sha256": "1d210cdd221ef617e531a2dd822c89fce677a710dc1b4397d9074ec02abaee12"
+    },
+    "Debug-sse2": {
+      "job_id": 130083050232,
+      "artifact_id": 13798976705,
+      "archive_bytes": 738466527,
+      "archive_sha256": "d4a79492e2c0de300815a6507be2a5264b0156356f22e4818f2d6f4bafc09b43"
+    },
+    "Release-automatic": {
+      "job_id": 130083050151,
+      "artifact_id": 13798358976,
+      "archive_bytes": 649287966,
+      "archive_sha256": "9a5bd4e5b5be3750662841ce6e0250f6cd9b5536eadbcf1cbd2bac826ea9a085"
+    },
+    "Release-sse2": {
+      "job_id": 130083050154,
+      "artifact_id": 13800167034,
+      "archive_bytes": 648866138,
+      "archive_sha256": "ed8dc368fc67fd82a6635e98f41799b8125f2deb63c0464d3541fbce809ae012"
+    }
+  },
+  "compiled_runtime_source": "ccc02c8a34bd1f227624d8778a141e8736ae8111",
+  "actual_original_controls_per_profile": 45,
+  "original_source_or_capture_relabelled": false,
+  "all_full_published_raw_audits_pending": true,
+  "complete_class_eligibility_qualified": false,
+  "normal_admission_qualified": false,
+  "phase6_complete": false,
+  "hands_on_ready": false
+}

@@ -1,0 +1,86 @@
+name: Phase 6 Independently Replay Published Original Rejection Controls
+on:
+  push:
+    branches: ['qualification/native-rejection-independent-v1']
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: phase6-original-rejection-independent-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  readiness:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - run: mkdir -p out && python3 -B Tests/Production/Closeout/run_controls.py --output out/rejection-independent-controls.json
+      - uses: actions/github-script@v8
+        with:
+          script: |
+            core.info(JSON.stringify(await require('./.github/scripts/phase6-download-bound-artifact.Test.cjs')({core})));
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: independent-original-rejections-readiness
+          retention-days: 14
+          path: out/rejection-independent-controls.json
+  audit:
+    name: Independently replay all45 original rejections ${{ matrix.profile }}
+    needs: readiness
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    strategy:
+      fail-fast: false
+      max-parallel: 2
+      matrix:
+        profile: [Debug-automatic, Debug-sse2, Release-automatic, Release-sse2]
+    env:
+      PROFILE: ${{ matrix.profile }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.14'
+      - name: Download only exact completed original raw rejection capture on this hosted worker
+        uses: actions/github-script@v8
+        with:
+          script: |
+            await require('./.github/scripts/phase6-download-class-rejections.cjs')({github,context,core});
+      - name: Restore every original logical file and alias, reverify SDK derivation, and rerun unchanged original audit
+        run: >-
+          python3 -B Tests/Production/Closeout/inspect_published_class_rejections.py
+          --api "out/class-rejection-published/$PROFILE/api.json"
+          --archive "out/class-rejection-published/$PROFILE/producer.zip"
+          --profile "$PROFILE"
+          --lock Tests/Production/Closeout/class-rejection-published-inputs-v1.lock.json
+          --output "out/rejection-independent/$PROFILE"
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: independent-original-rejections-full-witness-${{ matrix.profile }}
+          retention-days: 14
+          compression-level: 3
+          path: |
+            out/rejection-independent/${{ env.PROFILE }}/*.json
+            out/rejection-independent/${{ env.PROFILE }}/*.log
+            out/rejection-independent/${{ env.PROFILE }}/compiler-provenance/**
+            out/class-rejection-published/${{ env.PROFILE }}/*.json
+            out/class-rejection-published/${{ env.PROFILE }}/*.body
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: independent-original-rejections-small-receipt-${{ matrix.profile }}
+          retention-days: 14
+          compression-level: 3
+          path: |
+            out/rejection-independent/${{ env.PROFILE }}/proof.json
+            out/rejection-independent/${{ env.PROFILE }}/fresh-original-audit.json
+            out/rejection-independent/${{ env.PROFILE }}/fresh-original-audit.log
+            out/rejection-independent/${{ env.PROFILE }}/original-published-audit.json
+            out/rejection-independent/${{ env.PROFILE }}/original-audit-comparison.json
+            out/class-rejection-published/${{ env.PROFILE }}/api.json
