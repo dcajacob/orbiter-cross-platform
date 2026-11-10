@@ -1,0 +1,205 @@
+name: Phase 6 Original Rejection Controls Debug SSE2 Transport Retry
+on:
+  push:
+    branches: ['qualification/native-class-rejections-Debug-sse2-transport-retry-v1']
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: phase6-original-class-rejections-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  readiness:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 75
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - name: Preserve all original and new small controls
+        run: mkdir -p out && python3 -B Tests/Production/Closeout/run_controls.py --output out/class-rejection-controls.json
+      - name: Verify every frozen original negative class and metadata fixture before any simulator
+        run: python3 -B Tests/Production/Closeout/hosted_class_rejections.py --source-preflight --output out/class-rejection-source-preflight.json
+      - name: Require the exact independently reproduced complete joint API qualification
+        uses: actions/github-script@v8
+        with:
+          script: |
+            const {owner,repo}=context.repo,run_id=42723386812,head='480ce396475e17d66524ea60fbf9cb1a8a41ed4d';
+            const run=(await github.rest.actions.getWorkflowRun({owner,repo,run_id})).data;
+            const jobs=await github.paginate(github.rest.actions.listJobsForWorkflowRun,{owner,repo,run_id,per_page:100});
+            const artifact=(await github.rest.actions.getArtifact({owner,repo,artifact_id:13721672414})).data;
+            const fs=require('fs'),crypto=require('crypto'),base='out/class-joint-reference';fs.mkdirSync(base,{recursive:true});
+            fs.writeFileSync(base+'/api.json',JSON.stringify({repository:context.repo,run,jobs,artifact},null,2),{flag:'wx'});
+            if(owner!=='dcajacob'||repo!=='orbiter-cross-platform'||run.id!==run_id||run.head_sha!==head||run.head_branch!=='qualification/joint-general-api-v1'||run.path!=='.github/workflows/phase6-joint-general-api.yml'||run.run_attempt!==1||run.status!=='completed'||run.conclusion!=='success'||
+               jobs.length!==2||new Set(jobs.map(j=>j.id)).size!==2||jobs.some(j=>![129522724889,129524147885].includes(j.id)||j.head_sha!==head||j.run_id!==run_id||j.status!=='completed'||j.conclusion!=='success'||JSON.stringify(j.labels)!==JSON.stringify(['ubuntu-24.04']))||
+               artifact.id!==13721672414||artifact.name!=='independently-verified-joint-GeneralApi-reference'||artifact.expired||artifact.workflow_run.id!==run_id||artifact.workflow_run.head_sha!==head||artifact.size_in_bytes!==406619||artifact.digest!=='sha256:b7f3a541cfdec4443e51820f7977f7485ba42920f8349c771ae1a27f337beaa7')throw Error('Exact independently closed original joint API reference required');
+            const bytes=Buffer.from((await require('./.github/scripts/phase6-download-bound-artifact.cjs')({github,owner,repo,source:{run,jobs},artifact,base,core})).data);
+            if(bytes.length!==406619||crypto.createHash('sha256').update(bytes).digest('hex')!=='b7f3a541cfdec4443e51820f7977f7485ba42920f8349c771ae1a27f337beaa7')throw Error('Actual published joint prerequisite ZIP differs');
+            fs.writeFileSync(base+'/producer.zip',bytes,{flag:'wx'});
+      - name: Re-read the source-bound qualified receipt without claiming class acceptance
+        run: |
+          python3 -B - <<'PY'
+          import hashlib,json,stat,zipfile
+          from pathlib import PurePosixPath
+          with zipfile.ZipFile('out/class-joint-reference/producer.zip') as incoming:
+              seen=set();bodies={}
+              for info in incoming.infolist():
+                  if info.is_dir():continue
+                  name=info.filename;p=PurePosixPath(name)
+                  assert name and str(p)==name and not p.is_absolute() and '..' not in p.parts and ':' not in name and '\\' not in name
+                  assert name.casefold() not in seen and not stat.S_ISLNK(info.external_attr>>16)
+                  seen.add(name.casefold());bodies[name]=incoming.read(info)
+              prefix='joint-api-qualification/proof/'
+              proof=json.loads(bodies[prefix+'joint-proof.json']);qualified=json.loads(bodies[prefix+'qualification.json'])
+              assert proof['status']=='qualified-complete-native-Windows-GeneralApi-only' and proof['source']=='480ce396475e17d66524ea60fbf9cb1a8a41ed4d'
+              assert proof['github_run_id']==42723386812 and proof['independently_replayed_published_qualification'] is True
+              assert proof['original_qualifier_sha256']=='4e13d325912ef33bfbe69d3448bfdf63443b3f95d82e22cdc2e9a325b32e634e'
+              assert hashlib.sha256(bodies[prefix+'qualification.json']).hexdigest()==proof['qualified_report_sha256']=='3f346c8548d2a69dd288300ee31bbd0a2764b0b2015161b71edf894d996cbae0'
+              assert qualified['status']=='qualified-general-api-correction-v2' and len(qualified['evidence_sha256'])==1125
+              assert set(qualified['cohorts'])=={'native','current-windows'} and len(qualified['profiles'])==4
+              assert qualified['normal_stock_admission_qualified'] is False and proof['phase6_complete'] is False
+          print('Exact independently reproduced API prerequisite verified; class eligibility and normal admission remain pending')
+          PY
+      - uses: actions/github-script@v8
+        with:
+          script: |
+            core.info(JSON.stringify(await require('./.github/scripts/phase6-download-bound-artifact.Test.cjs')({core})));
+            core.info(JSON.stringify(await require('./.github/scripts/phase6-download-native-api-inputs.Test.cjs')({core})));
+      - name: Require exact original archive availability before retrying the failed profile
+        run: python3 -B Tests/Production/Closeout/check_rejection_package_transport.py
+      - name: Reuse only the completed exact original package preflight while preserving all four failed profiles
+        uses: actions/github-script@v8
+        with:
+          script: |
+            const fs=require('fs'),crypto=require('crypto'),{owner,repo}=context.repo;
+            if(owner!=='dcajacob'||repo!=='orbiter-cross-platform'||(await github.rest.repos.get({owner,repo})).data.private)throw Error('Exact existing public repository required');
+            const run=(await github.rest.actions.getWorkflowRun({owner,repo,run_id:42806647208})).data;
+            const jobs=await github.paginate(github.rest.actions.listJobsForWorkflowRun,{owner,repo,run_id:42806647208,per_page:100});
+            const artifact=(await github.rest.actions.getArtifact({owner,repo,artifact_id:13761595407})).data;
+            const base='out/original-rejection-package-prerequisite';fs.mkdirSync(base,{recursive:true});
+            fs.writeFileSync(base+'/api.json',JSON.stringify({repository:context.repo,run,jobs,artifact},null,2),{flag:'wx'});
+            if(run.id!==42806647208||run.head_sha!=='b939aabdda71832a61646cf304ff211ee4cc50d4'||run.status!=='completed'||run.conclusion!=='failure'||artifact.id!==13761595407||artifact.size_in_bytes!==175698||artifact.digest!=='sha256:7dc1a4a4ac48548a8e088ae9a4ae4aa022eee91a60a04ccbda8e12cecb398c48')throw Error('Exact original closed package-only prerequisite required');
+            const bytes=Buffer.from((await require('./.github/scripts/phase6-download-bound-artifact.cjs')({github,owner,repo,source:{run,jobs},artifact,base,core})).data);
+            if(bytes.length!==175698||crypto.createHash('sha256').update(bytes).digest('hex')!=='7dc1a4a4ac48548a8e088ae9a4ae4aa022eee91a60a04ccbda8e12cecb398c48')throw Error('Actual original package preflight ZIP differs');
+            fs.writeFileSync(base+'/producer.zip',bytes,{flag:'wx'});
+      - name: Independently re-read every original exact package version and completed prerequisite command
+        run: >-
+          python3 -B Tests/Production/Closeout/verify_rejection_setup_receipt.py
+          --api out/original-rejection-package-prerequisite/api.json
+          --archive out/original-rejection-package-prerequisite/producer.zip
+          --output out/original-rejection-package-prerequisite/verification.json
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: native-class-rejections-readiness
+          retention-days: 14
+          path: |
+            out/class-rejection-controls.json
+            out/rejection-package-transport-health.json
+            out/class-rejection-source-preflight.json
+            out/class-rejection-provisioning-deadline.json
+            out/class-joint-reference/*.json
+            out/class-joint-reference/*.body
+            out/original-rejection-package-prerequisite/**
+            out/class-userspace-preflight/**
+            out/class-userspace-container.json
+            out/class-userspace-container.log
+            out/native-rejection-network/**
+            out/native-api-source/providers/*.json
+            out/native-api-source/providers/*.body
+            out/native-provider-restoration/restoration.json
+  capture:
+    name: Original normal host class and loader rejection controls ${{ matrix.profile }}
+    needs: readiness
+    runs-on: ubuntu-24.04
+    timeout-minutes: 240
+    strategy:
+      fail-fast: false
+      max-parallel: 2
+      matrix:
+        profile: [Debug-sse2]
+    env:
+      PROFILE: ${{ matrix.profile }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.14'
+      - name: Stage the exact preserved original Windows application SDK and HST DLL without Windows execution
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          configuration="${PROFILE%%-*}"
+          python3 -B Tests/Production/CockpitControls/prepare.py --configuration "$configuration" --cache out/rejection-preserved-cache --output "out/rejection-preserved/$configuration"
+      - name: Retain the exact compiled application and provider inputs without changing failed producer history
+        uses: actions/github-script@v8
+        with:
+          script: |
+            await require('./.github/scripts/phase6-download-native-api-inputs.cjs')({github,context,core});
+      - name: Restore every retained native binary and original unit result with exact corrected discovery
+        run: >-
+          python3 -B Tests/Production/Closeout/recheck_native_discovery.py
+          --api out/native-api-source/native/api.json --archive out/native-api-source/native/producer.zip
+          --profile "$PROFILE" --output "out/native-rejection-retained-units/$PROFILE"
+      - name: Restore unchanged provider bytes links and original negative controls
+        run: >-
+          python3 -B Tests/Production/Closeout/restore_hosted_native_providers.py
+          --api out/native-api-source/providers/api.json --archive out/native-api-source/providers/producer.zip
+          --output out/native-provider-restoration/restoration.json
+      - name: Restore separately compiled unsuppressed Mesa owner repair and controls
+        run: >-
+          python3 -B Tests/Production/Closeout/restore_hosted_mesa_topology.py
+          --api out/native-api-source/mesa/api.json --archive out/native-api-source/mesa/producer.zip
+          --output out/mesa-topology-restoration/restoration.json
+      - name: Run all45 original normal host rejection controls with exact matching hosted userspace
+        shell: bash
+        run: |
+          set -euo pipefail
+          image=$(python3 -c "import json; print('ubuntu@'+json.load(open('Tests/Production/Closeout/native-provider-container.lock.json'))['image_digest'])")
+          docker pull "$image"
+          docker image inspect "$image" > out/native-rejection-container.json
+          docker run --rm --init --cpus=2 --shm-size=1g -v "$GITHUB_WORKSPACE:$GITHUB_WORKSPACE" -v /etc/ssl/certs/ca-certificates.crt:/run/orbiter-ci-system-ca.pem:ro -w "$GITHUB_WORKSPACE" \
+            -e GITHUB_ACTIONS -e RUNNER_OS -e GITHUB_WORKSPACE -e GITHUB_SHA -e PROFILE \
+            "$image" bash Tests/Production/Closeout/prepare_hosted_class_rejections_network_v3.sh Tests/Production/Closeout/prepare_hosted_class_rejections_sdk.sh 2>&1 | tee out/native-rejection-container.log
+      - name: Preserve bounded actual failure diagnostics
+        if: failure()
+        shell: python
+        run: |
+          from pathlib import Path
+          for pattern in ('out/hosted-native-class-rejections/*/*.log','out/native-class-rejections/*/*/*.log','out/native-class-rejections/*/fixtures/*.log'):
+              for p in sorted(Path('.').glob(pattern)):
+                  print(str(p)+':\n'+p.read_text(errors='replace')[-12000:])
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: original-class-normal-host-rejection-controls-${{ matrix.profile }}
+          retention-days: 14
+          compression-level: 0
+          include-hidden-files: true
+          path: |
+            out/hosted-native-class-rejections/${{ env.PROFILE }}/**
+            out/native-api-source/*/*.json
+            out/native-api-source/*/*.body
+            out/native-rejection-retained-units/${{ env.PROFILE }}/**
+            out/native-rejection-network/${{ env.PROFILE }}/**
+            out/native-rejection-container.json
+            out/native-rejection-container.log
+            out/native-stock-assets/remaining-vessels-resources.json
+            out/native-stock-assets/resources.json
+            out/native-stock-assets/cockpit-test-font.json
+            out/phase6-hosted-native/${{ env.PROFILE }}/build.json
+            out/native-provider-restoration/restoration.json
+            out/mesa-topology-restoration/restoration.json
+      - name: Preserve raw partial files if lossless packing itself failed
+        uses: actions/upload-artifact@v7
+        if: failure() && hashFiles('out/hosted-native-class-rejections/*/raw-index.json') == ''
+        with:
+          name: unqualified-original-rejection-partial-files-${{ matrix.profile }}
+          retention-days: 14
+          compression-level: 3
+          include-hidden-files: true
+          path: |
+            out/native-class-rejections/${{ env.PROFILE }}/**
+            out/rejection-preserved/**
