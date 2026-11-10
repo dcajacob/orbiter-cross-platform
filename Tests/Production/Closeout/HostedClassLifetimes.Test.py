@@ -3,6 +3,7 @@ import ast
 from pathlib import Path
 import sys
 import unittest
+import hosted_class_userspace as userspace
 from contracts import ROOT
 import hosted_class_lifetimes as hosted
 import capture_hosted_native_writer_runtime as runtime
@@ -32,4 +33,25 @@ class HostedClassLifetimesTests(unittest.TestCase):
         self.assertIn("'--jobs','1'",actual)
         network=(ROOT/'Tests/Production/Closeout/prepare_hosted_class_lifetimes_network.sh').read_text()
         old=(ROOT/'Tests/Production/Closeout/prepare_hosted_native_general_api_network.sh').read_text()
+        addition=network[network.index('# Official dated archive support:'):network.index('# Use the standard runner')]
+        self.assertIn('APT::Snapshot "20261109T212432Z";',addition)
+        network=network.replace(addition,'').replace('|Tests/Production/Closeout/prepare_hosted_class_userspace.sh','')
         self.assertEqual(network.replace('out/native-class-network/','out/native-api-network/').replace('prepare_hosted_class_lifetimes.sh','prepare_hosted_native_general_api.sh'),old)
+
+    def test_full_original_inventory_and_failed_libheif_versions_cannot_drift(self):
+        original='libheif1:amd64=1.21.2-3ubuntu0.6\nlibheif-plugin-aomdec:amd64=1.21.2-3ubuntu0.6\npython3=3.14\n'
+        self.assertEqual(userspace.verify_inventory(original,original),3)
+        self.assertEqual(userspace.verify_inventory(original.replace(':amd64',''),original.replace(':amd64','')),3)
+        for actual in (original.replace('0.6','0.7'),original+'extra=1\n',original.replace('python3=3.14\n','')):
+            with self.assertRaisesRegex(ValueError,'inventory differs'):userspace.verify_inventory(original,actual)
+        with self.assertRaisesRegex(ValueError,'libheif package versions'):userspace.verify_inventory(original.replace('0.6','0.7'),original.replace('0.6','0.7'))
+
+    def test_readiness_package_preflight_precedes_the_unchanged_original_capture_matrix(self):
+        workflow=(ROOT/'.github/workflows/phase6-native-class-lifetimes.yml').read_text()
+        self.assertIn('needs: readiness',workflow)
+        self.assertIn('Require one complete signed dated-archive package preflight before all four original captures',workflow)
+        self.assertIn('profile: [Debug-automatic, Debug-sse2, Release-automatic, Release-sse2]',workflow)
+        self.assertIn('max-parallel: 2',workflow)
+        actual=(ROOT/'Tests/Production/Closeout/prepare_hosted_class_userspace.sh').read_text()
+        original=(ROOT/'Tests/Production/Closeout/prepare_hosted_class_lifetimes.sh').read_text()
+        self.assertEqual(actual.replace('hosted_class_userspace.py','hosted_class_lifetimes.py --profile "$PROFILE"'),original)

@@ -4,7 +4,7 @@ set -euo pipefail
 test "${GITHUB_ACTIONS:-}" = true
 test "${RUNNER_OS:-}" = Linux
 case "${PROFILE:-}" in Debug-automatic|Debug-sse2|Release-automatic|Release-sse2) ;; *) exit 2;; esac
-case "${1:-}" in Tests/Production/Closeout/prepare_hosted_class_lifetimes.sh) ;; *) exit 2;; esac
+case "${1:-}" in Tests/Production/Closeout/prepare_hosted_class_lifetimes.sh|Tests/Production/Closeout/prepare_hosted_class_userspace.sh) ;; *) exit 2;; esac
 ca=/run/orbiter-ci-system-ca.pem
 test -s "$ca"
 output="out/native-class-network/$PROFILE"
@@ -42,5 +42,12 @@ Acquire::https::Timeout "30";
 APT::Update::Error-Mode "any";
 APT
 cp /etc/apt/apt.conf.d/99-orbiter-ci-https "$output/apt-transport.conf"
+# Official dated archive support: https://snapshot.ubuntu.com/
+# Last successful complete original inventory restore; all versions stay fixed.
+cat > /etc/apt/apt.conf.d/99-orbiter-class-snapshot <<'APT'
+APT::Snapshot "20261109T212432Z";
+APT
+cp /etc/apt/apt.conf.d/99-orbiter-class-snapshot "$output/archive-snapshot.conf"
+apt-config dump > "$output/actual-apt-config.txt"
 # Use the standard runner's read-only system CA bundle; certificate and archive signature checks stay enabled.
 exec bash "$1"

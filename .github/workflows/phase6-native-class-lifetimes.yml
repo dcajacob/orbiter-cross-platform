@@ -1,7 +1,7 @@
 name: Phase 6 Renew Original Native Family and Paused Lifetimes
 on:
   push:
-    branches: ['qualification/native-class-lifetimes-v1']
+    branches: ['qualification/native-class-lifetimes-v2']
 permissions:
   contents: read
   actions: read
@@ -63,6 +63,28 @@ jobs:
           script: |
             core.info(JSON.stringify(await require('./.github/scripts/phase6-download-bound-artifact.Test.cjs')({core})));
             core.info(JSON.stringify(await require('./.github/scripts/phase6-download-native-api-inputs.Test.cjs')({core})));
+      - name: Retain only the exact original provider input for package readiness
+        uses: actions/github-script@v8
+        with:
+          script: |
+            await require('./.github/scripts/phase6-download-class-userspace.cjs')({github,context,core});
+      - name: Restore and verify the original provider inventory and controls
+        run: >-
+          python3 -B Tests/Production/Closeout/restore_hosted_native_providers.py
+          --api out/native-api-source/providers/api.json --archive out/native-api-source/providers/producer.zip
+          --output out/native-provider-restoration/restoration.json
+      - name: Require one complete signed dated-archive package preflight before all four original captures
+        env:
+          PROFILE: Debug-automatic
+        shell: bash
+        run: |
+          set -euo pipefail
+          image=$(python3 -c "import json; print('ubuntu@'+json.load(open('Tests/Production/Closeout/native-provider-container.lock.json'))['image_digest'])")
+          docker pull "$image"
+          docker image inspect "$image" > out/class-userspace-container.json
+          docker run --rm --init --cpus=2 -v "$GITHUB_WORKSPACE:$GITHUB_WORKSPACE" -v /etc/ssl/certs/ca-certificates.crt:/run/orbiter-ci-system-ca.pem:ro -w "$GITHUB_WORKSPACE" \
+            -e GITHUB_ACTIONS -e RUNNER_OS -e GITHUB_WORKSPACE -e GITHUB_SHA -e PROFILE \
+            "$image" bash Tests/Production/Closeout/prepare_hosted_class_lifetimes_network.sh Tests/Production/Closeout/prepare_hosted_class_userspace.sh 2>&1 | tee out/class-userspace-container.log
       - uses: actions/upload-artifact@v7
         if: always()
         with:
@@ -72,6 +94,13 @@ jobs:
             out/class-lifetime-controls.json
             out/class-joint-reference/*.json
             out/class-joint-reference/*.body
+            out/class-userspace-preflight/**
+            out/class-userspace-container.json
+            out/class-userspace-container.log
+            out/native-class-network/**
+            out/native-api-source/providers/*.json
+            out/native-api-source/providers/*.body
+            out/native-provider-restoration/restoration.json
   capture:
     name: Original family and paused lifetime renewal ${{ matrix.profile }}
     needs: readiness
