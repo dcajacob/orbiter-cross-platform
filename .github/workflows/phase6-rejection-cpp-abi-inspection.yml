@@ -1,0 +1,59 @@
+name: Phase 6 Read Only Failed Rejection Compiler ABI Inspection
+on:
+  push:
+    branches: ['qualification/rejection-cpp-abi-inspection-v1']
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: phase6-rejection-sdk-inspection-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  inspect:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - name: Preserve all original controls before read only inspection
+        run: mkdir -p out && python3 -B Tests/Production/Closeout/run_controls.py --output out/rejection-sdk-inspection-controls.json
+      - name: Retain only the exact failed Debug automatic raw capture on this hosted runner
+        uses: actions/github-script@v8
+        with:
+          script: |
+            const fs=require('fs'),crypto=require('crypto'),{owner,repo}=context.repo;
+            if(owner!=='dcajacob'||repo!=='orbiter-cross-platform'||(await github.rest.repos.get({owner,repo})).data.private)throw Error('Exact public repository required');
+            const run=(await github.rest.actions.getWorkflowRun({owner,repo,run_id:42876473444})).data;
+            const jobs=await github.paginate(github.rest.actions.listJobsForWorkflowRun,{owner,repo,run_id:42876473444,per_page:100});
+            const artifact=(await github.rest.actions.getArtifact({owner,repo,artifact_id:13794535514})).data;
+            const base='out/rejection-sdk-inspection-input';fs.mkdirSync(base,{recursive:true});
+            fs.writeFileSync(base+'/api.json',JSON.stringify({repository:context.repo,run,jobs,artifact},null,2),{flag:'wx'});
+            if(run.id!==42876473444||run.head_sha!=='6293d10c96be28b7900ea98137e46b8a865875e6'||run.run_attempt!==1||artifact.id!==13794535514||artifact.name!=='original-class-normal-host-rejection-controls-Debug-automatic'||artifact.expired||artifact.size_in_bytes!==737683034||artifact.digest!=='sha256:24960e0e6abdf93ab368a22c1010c22656de394f17645d95fb7ed782f420f96c')throw Error('Exact original preserved compiled source required');
+            if(jobs.length!==5||jobs.some(j=>j.head_sha!==run.head_sha||j.run_id!==run.id||JSON.stringify(j.labels)!==JSON.stringify(['ubuntu-24.04']))||!jobs.some(j=>j.id===130041486308&&j.status==='completed'&&j.conclusion==='failure'))throw Error('Actual exact failed Debug automatic standard-runner capture required');
+            const bytes=Buffer.from((await require('./.github/scripts/phase6-download-bound-artifact.cjs')({github,owner,repo,source:{run,jobs},artifact,base,core})).data);
+            if(bytes.length!==737683034||crypto.createHash('sha256').update(bytes).digest('hex')!=='24960e0e6abdf93ab368a22c1010c22656de394f17645d95fb7ed782f420f96c')throw Error('Exact original binary witness archive bytes differ');
+            fs.writeFileSync(base+'/producer.zip',bytes,{flag:'wx'});
+      - name: Read every actual retained partial member, engine/fixture ABI token and original compiler command without simulator execution
+        run: >-
+          python3 -B Tests/Production/Closeout/inspect_rejection_cpp_abi.py
+          --api out/rejection-sdk-inspection-input/api.json
+          --archive out/rejection-sdk-inspection-input/producer.zip
+          --output out/rejection-sdk-inspection
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: original-rejection-CPP-ABI-read-only-inspection
+          retention-days: 14
+          path: |
+            out/rejection-sdk-inspection-controls.json
+            out/rejection-sdk-inspection/inspection.json
+            out/rejection-sdk-inspection/host-preprocessor*.log
+            out/rejection-sdk-inspection/failed-control-console.log
+            out/rejection-sdk-inspection/original-CMakeCache.txt
+            out/rejection-sdk-inspection/build.json
+            out/rejection-sdk-inspection/original-SDK-header-restoration.json
+            out/rejection-sdk-inspection/original-fixture-SDK.json
+            out/rejection-sdk-inspection-input/api.json
+            out/rejection-sdk-inspection-input/*.body
+            out/rejection-sdk-inspection-input/download-transport-attempts.json
