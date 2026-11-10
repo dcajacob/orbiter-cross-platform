@@ -1,7 +1,7 @@
 name: Phase 6 Exact Original Save Numerical Observer Equivalence
 on:
   push:
-    branches: ['qualification/native-numerical-observer-equivalence-v1']
+    branches: ['qualification/native-numerical-observer-equivalence-v2-snapshot-fallback']
 permissions:
   contents: read
   actions: read
@@ -89,6 +89,7 @@ jobs:
             out/native-api-source/*/*.json
             out/native-api-source/*/*.body
             out/numerical-observer-network/**
+            out/numerical-observer-pool-source/**
             out/original-package-official-pool/${{ env.PROFILE }}/**
             out/numerical-observer-container.json
             out/numerical-observer-container.log
