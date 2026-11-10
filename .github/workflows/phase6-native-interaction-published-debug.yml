@@ -1,7 +1,7 @@
 name: Phase 6 Verify Complete Published Original Debug Interaction Receipts
 on:
   push:
-    branches: ['qualification/native-interaction-published-debug-v1']
+    branches: ['qualification/native-interaction-published-debug-v2']
 permissions:
   contents: read
   actions: read

@@ -42,6 +42,16 @@ class PublishedInteractionClosureTests(unittest.TestCase):
         for name,digest,size in [('missing','a'*64,10),('original/a','b'*64,10),('original/a','a'*64,9)]:
             with self.assertRaises(ValueError):published.witness(raw,name,digest,size)
 
+    def test_single_file_upload_uses_its_original_basename_without_rewriting_any_witness_byte(self):
+        import hashlib
+        raw,_=self.manifest();body=json.dumps(raw,indent=2).encode();digest=hashlib.sha256(body).hexdigest()
+        bodies={'raw-members.json':body};members={'raw-members.json':digest};before=copy.deepcopy((bodies,members))
+        self.assertEqual(published.manifest_payload(bodies,members,digest),raw);self.assertEqual((bodies,members),before)
+        for b,m,d in [({'interaction-independent/Debug-automatic/raw-members.json':body},{'interaction-independent/Debug-automatic/raw-members.json':digest},digest),
+                      (bodies,members,'0'*64),({'raw-members.json':body+b' '},members,digest),
+                      (dict(bodies,extra=body),dict(members,extra=digest),digest)]:
+            with self.assertRaises(ValueError):published.manifest_payload(b,m,d)
+
     def test_publication_verifier_imports_without_simulator_or_large_raw_inputs(self):
         result=subprocess.run([sys.executable,'-B',str(ROOT/'Tests/Production/Closeout/verify_published_class_interactions.py'),'--help'],
                               cwd=ROOT,stdout=subprocess.PIPE,stderr=subprocess.PIPE,text=True,timeout=15)

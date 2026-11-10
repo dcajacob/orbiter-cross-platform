@@ -42,11 +42,21 @@ def witness(raw,name,digest,expected_bytes=None):
     if expected_bytes is not None:require(raw[name]['bytes']==expected_bytes,'Actual complete original member byte length differs: '+name)
 
 
+def manifest_payload(bodies,members,expected_sha256):
+    # The immutable producer uploaded one file, so its published ZIP root is the basename.
+    # Do not rewrite the original capture, witness ZIP, or expected digest to fit a new path.
+    require(set(bodies)==set(members)=={'raw-members.json'},'Exact original single-file witness ZIP layout required')
+    body=bodies['raw-members.json']
+    require(members['raw-members.json']==hashlib.sha256(body).hexdigest()==expected_sha256,
+            'Exact original raw-member witness byte digest required')
+    return json.loads(body)
+
+
 def inspect_profile(profile,meta_bodies,meta_members,raw_bodies,raw_members,pins):
     source=pins['metadata']['source'];prefix='interaction-independent/'+profile+'/'
     for relative in ('Tests/Production/Closeout/inspect_published_class_interactions.py','Tests/Production/Closeout/download_published_class_interactions.py','Tests/Production/Closeout/hosted_class_interactions.py'):
         require(sha(ROOT/relative)==closed.gitsha(source,relative),'Exact immutable original replay/scope helper implementation required')
-    proof=json.loads(meta_bodies[prefix+'proof.json']);manifest_name=prefix+'raw-members.json';manifest_body=raw_bodies[manifest_name];raw=json.loads(manifest_body)
+    proof=json.loads(meta_bodies[prefix+'proof.json']);raw=manifest_payload(raw_bodies,raw_members,proof['raw_members_sha256'])
     lock,pin=replay.validate_api(json.loads(meta_bodies['class-interaction-published/'+profile+'/api.json']),profile)
     require(proof['protocol']=='phase6-independent-published-original-interaction-profile-v1' and
             proof['status']=='verified-published-original-nine-flow-interaction-profile-only' and proof['auditor_source']==source and
@@ -55,7 +65,7 @@ def inspect_profile(profile,meta_bodies,meta_members,raw_bodies,raw_members,pins
             proof['original_artifact_id']==pin['artifact_id'] and proof['original_archive_bytes']==pin['archive_bytes'] and
             proof['original_archive_sha256']==pin['archive_sha256'],'Exact completed original interaction/replay lineage required')
     require(proof['source_api_sha256']==meta_members['class-interaction-published/'+profile+'/api.json'] and
-            proof['raw_members_sha256']==raw_members[manifest_name] and proof['raw_members_sha256']==hashlib.sha256(manifest_body).hexdigest() and
+            proof['raw_members_sha256']==raw_members['raw-members.json'] and
             proof['all_five_original_interaction_audits_reproduced_byte_identically'] is True and
             proof['all_original_logical_members_and_input_guards_unchanged'] is True and
             proof['actual_original_interaction_processes']==18 and proof['new_simulator_processes']==0 and
