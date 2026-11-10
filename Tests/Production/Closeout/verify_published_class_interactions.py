@@ -52,6 +52,15 @@ def manifest_payload(bodies,members,expected_sha256):
     return json.loads(body)
 
 
+def verify_reference_roster(reference,profile):
+    expected=load(LOCK)['original_reference_guards'][profile]
+    actual={name:value['sha256'] for name,value in reference['old_guarded_inputs'].items()}
+    require(reference['old_reference_owner']==expected['original_capture_source'] and
+            actual==expected['exact_guarded_paths_sha256'],
+            'Every exact immutable original interaction reference/source guard must remain represented')
+    return len(actual)
+
+
 def inspect_profile(profile,meta_bodies,meta_members,raw_bodies,raw_members,pins):
     source=pins['metadata']['source'];prefix='interaction-independent/'+profile+'/'
     for relative in ('Tests/Production/Closeout/inspect_published_class_interactions.py','Tests/Production/Closeout/download_published_class_interactions.py','Tests/Production/Closeout/hosted_class_interactions.py'):
@@ -107,7 +116,7 @@ def inspect_profile(profile,meta_bodies,meta_members,raw_bodies,raw_members,pins
     require(meta_members[prefix+'original-reference-bindings.json']==proof['original_reference_bindings_sha256'] and
             reference['old_reference_owner']==lock['source'] and reference['current_reference_owner']==source and
             reference['old_API_receipts_preserved'] is True and reference['old_capture_relabelled'] is False and
-            len(reference['old_guarded_inputs'])==293,'Every original and current source/reference guard must remain represented')
+            verify_reference_roster(reference,profile)==306,'Every original and current source/reference guard must remain represented')
     comparison=reference['independent_original_retry_comparison']
     require(comparison['raw_API_and_log_transport_identities_preserved'] is True and comparison['API_attempts_normalized'] is False and
             comparison['old_failed_attempt_relabelled'] is False,'Prior failed attempt and distinct original API transports must remain exact')
@@ -143,7 +152,7 @@ def inspect_profile(profile,meta_bodies,meta_members,raw_bodies,raw_members,pins
         actual_original_successful_presents=coverage['successful_presents'],complete_flows=9,repeats=2,compiled_runtime_source=replay.original.COMPILED,
         original_capture_source=lock['source'],independent_replay_source=source,original_raw_artifact_id=pin['artifact_id'],
         original_raw_archive_sha256=pin['archive_sha256'],original_raw_archive_bytes=pin['archive_bytes'],raw_members_sha256=proof['raw_members_sha256'],
-        complete_member_witness=storage,all_five_original_audits_byte_identical=True,all_293_original_source_reference_guards_preserved=True,
+        complete_member_witness=storage,all_five_original_audits_byte_identical=True,all_original_source_reference_guards_preserved=True,original_source_reference_guard_count=verify_reference_roster(reference,profile),
         original_audit_sha256=proof['original_audit_sha256'],independent_proof_sha256=meta_members[prefix+'proof.json'],
         new_simulator_processes=0,new_X11_processes=0,**{k:False for k in FLAGS})
 

@@ -52,6 +52,17 @@ class PublishedInteractionClosureTests(unittest.TestCase):
                       (dict(bodies,extra=body),dict(members,extra=digest),digest)]:
             with self.assertRaises(ValueError):published.manifest_payload(b,m,d)
 
+    def test_complete_source_owned_interaction_guard_roster_includes_every_new_guard(self):
+        expected=published.load(published.LOCK)['original_reference_guards']['Debug-automatic']
+        reference=dict(old_reference_owner=expected['original_capture_source'],old_guarded_inputs={name:dict(sha256=value) for name,value in expected['exact_guarded_paths_sha256'].items()})
+        before=copy.deepcopy(reference);self.assertEqual(published.verify_reference_roster(reference,'Debug-automatic'),306);self.assertEqual(reference,before)
+        original_name=next(iter(reference['old_guarded_inputs']))
+        for mutate in (lambda r:r['old_guarded_inputs'].pop(original_name),lambda r:r['old_guarded_inputs'][original_name].update(sha256='0'*64),
+                       lambda r:r['old_guarded_inputs'].update({'substituted':r['old_guarded_inputs'].pop(original_name)}),
+                       lambda r:r.update(old_reference_owner='e'*40)):
+            value=copy.deepcopy(reference);mutate(value)
+            with self.assertRaises(ValueError):published.verify_reference_roster(value,'Debug-automatic')
+
     def test_publication_verifier_imports_without_simulator_or_large_raw_inputs(self):
         result=subprocess.run([sys.executable,'-B',str(ROOT/'Tests/Production/Closeout/verify_published_class_interactions.py'),'--help'],
                               cwd=ROOT,stdout=subprocess.PIPE,stderr=subprocess.PIPE,text=True,timeout=15)
