@@ -1,0 +1,574 @@
+{
+  "schema": 1,
+  "protocol": "phase6-exact-candidate-identity-v1",
+  "source_commit": "c08f93151827949ee3ad498f8021f35c11753fde",
+  "native_source_commit": "ccc02c8a34bd1f227624d8778a141e8736ae8111",
+  "identities": {
+    "application": {
+      "Windows-Debug": {
+        "compiled_source": "c08f93151827949ee3ad498f8021f35c11753fde",
+        "archive": {
+          "run_id": 42525562745,
+          "artifact_id": 13636121355,
+          "bytes": 302580954,
+          "sha256": "92feab053d8120c90f0abdfa0e90b7466fcfb0c7833b610245d4e90323ad0419",
+          "source": "c08f93151827949ee3ad498f8021f35c11753fde",
+          "original_conclusion": "success"
+        },
+        "exe_sha256": "0172b2ce7b1e09e262017df7f443f00550e6cb509a7cad7b5197bea6506860ad",
+        "build_manifest_sha256": "b988fc9b520d38c9362d4a35cfb131c8d9fe2fc0741e8d4c2de7698d2c7545d0",
+        "complete_source_inventory_sha256": "def7fb21e09099fa5427accc3b6e852fb40a8060f4ec3392e2f78675f7fd8794"
+      },
+      "Windows-Release": {
+        "compiled_source": "c08f93151827949ee3ad498f8021f35c11753fde",
+        "archive": {
+          "run_id": 42525562745,
+          "artifact_id": 13635896646,
+          "bytes": 207768498,
+          "sha256": "079b7ad0c06dd66454a9a60697670bee370fbcca0e040a4d877e934d952dd206",
+          "source": "c08f93151827949ee3ad498f8021f35c11753fde",
+          "original_conclusion": "success"
+        },
+        "exe_sha256": "e39e8b1087ed992b39123d0740f50a7cccf55a5060d5d5ed5dbb8fcf2faba843",
+        "build_manifest_sha256": "3ff043ec2f6f450dfff5001606461da856d66099523b5f368329a729f6119fa1",
+        "complete_source_inventory_sha256": "def7fb21e09099fa5427accc3b6e852fb40a8060f4ec3392e2f78675f7fd8794"
+      },
+      "Debug-automatic": {
+        "compiled_source": "ccc02c8a34bd1f227624d8778a141e8736ae8111",
+        "archive": {
+          "run_id": 42519601899,
+          "artifact_id": 13633027534,
+          "bytes": 82517672,
+          "sha256": "368c2d78c0313d2a183affd72dcd98505981b42d5f4baa0ce1c9fb6cb18c95c9",
+          "source": "ccc02c8a34bd1f227624d8778a141e8736ae8111",
+          "original_conclusion": "failure"
+        },
+        "build_record_sha256": "54cfe62b66e485002ba7ce8abba0eb1d4d56947cad4f1813260501a5e8a25d8a",
+        "exe_sha256": "44c3b03c7a547a110f593dabc36a90bde6a15060c1c74a2e99c96c4ae9c5e6c4",
+        "complete_source_inventory_sha256": "ac6a629c3820f8d8d3a2dadf8f7f1a6981d9e19c03b80ceed4c030a6189a099a",
+        "original_failure_manifest_sha256": "541144a17866edae55c5e163920a8803eaa24c9665ebc8043bce89b0eba209c2"
+      },
+      "Debug-sse2": {
+        "compiled_source": "ccc02c8a34bd1f227624d8778a141e8736ae8111",
+        "archive": {
+          "run_id": 42519601899,
+          "artifact_id": 13633311229,
+          "bytes": 82507652,
+          "sha256": "11f150fffd8b02bf6f9d438a4aff9b37a203c2d9db4eea8ae2905ff078d2898f",
+          "source": "ccc02c8a34bd1f227624d8778a141e8736ae8111",
+          "original_conclusion": "failure"
+        },
+        "build_record_sha256": "a9071a9f5fce70646d77cb51168eb367a6fd68336f810a60d5b9eae3a10d1f2c",
+        "exe_sha256": "d33fe817bd2036226b7cc60875e8d940e4021ffff4c449f8074002fe481bf908",
+        "complete_source_inventory_sha256": "ac6a629c3820f8d8d3a2dadf8f7f1a6981d9e19c03b80ceed4c030a6189a099a",
+        "original_failure_manifest_sha256": "705dabe670253c8c2637ea700fef41a8b155d0b024822e517043087ca92b49f4"
+      },
+      "Release-automatic": {
+        "compiled_source": "ccc02c8a34bd1f227624d8778a141e8736ae8111",
+        "archive": {
+          "run_id": 42519601899,
+          "artifact_id": 13633298021,
+          "bytes": 73311503,
+          "sha256": "2d73a7a714adbac8a2824ade476255c2ad10c9a4aa7ded636ee14e5ee69f7c4b",
+          "source": "ccc02c8a34bd1f227624d8778a141e8736ae8111",
+          "original_conclusion": "failure"
+        },
+        "build_record_sha256": "110118095530876990bb48be4f7b9cb454f66afe50d37aa181a07be999b9f537",
+        "exe_sha256": "78cc0fc8d083c18c2b36a4517652e5974c030716020be09f40e9523a224321e4",
+        "complete_source_inventory_sha256": "ac6a629c3820f8d8d3a2dadf8f7f1a6981d9e19c03b80ceed4c030a6189a099a",
+        "original_failure_manifest_sha256": "363e7ab1784f644bf570733b0b2dd52af34b9d1002fa70e955da691bc89b2dbb"
+      },
+      "Release-sse2": {
+        "compiled_source": "ccc02c8a34bd1f227624d8778a141e8736ae8111",
+        "archive": {
+          "run_id": 42519601899,
+          "artifact_id": 13633576478,
+          "bytes": 73283475,
+          "sha256": "3d9b820b9dfd9cbdc5d83357f00942659d1ef915a6fe6a0d0c286ef6a52855b4",
+          "source": "ccc02c8a34bd1f227624d8778a141e8736ae8111",
+          "original_conclusion": "failure"
+        },
+        "build_record_sha256": "70b57abbb1a807bc6dcc91ff0d31a67675d726a023909b6bc7326792f2d7697b",
+        "exe_sha256": "dd67cb70b86e3bb29f20c12588e90425aebdf8237d03e3dab0f0d2f46e5bfa6a",
+        "complete_source_inventory_sha256": "ac6a629c3820f8d8d3a2dadf8f7f1a6981d9e19c03b80ceed4c030a6189a099a",
+        "original_failure_manifest_sha256": "e22f43e784011c82aa056d5cd14fa82d21764ad8e7124ddaec7f37c5175806cb"
+      }
+    },
+    "sdk": {
+      "Windows-Debug": {
+        "manifest_sha256": "cdea881f833890900a4b277a3b01b2d5b8e4e8c7dabd7fdc22a15fecc647deeb",
+        "restoration_archive": {
+          "run_id": 42533777542,
+          "artifact_id": 13638546539,
+          "bytes": 330080,
+          "sha256": "a059a9ddedc3f28ecae530b7d74aaf8685076f350cc5304e9a6ce4d35aaf6a6d",
+          "source": "78c946e2368955f5eaa67dede0e57b06d6142d04",
+          "original_conclusion": "success"
+        },
+        "restoration_sha256": "ad3d76d7b75fe19431538990efef5355cb163dae9a8a2bcb3d880a484deea8f0"
+      },
+      "Windows-Release": {
+        "manifest_sha256": "c29de5f1db939741e3461d7a4794fc4597de37f1060fbc7514768a95e03ec326",
+        "restoration_archive": {
+          "run_id": 42533777542,
+          "artifact_id": 13638795967,
+          "bytes": 324949,
+          "sha256": "02b8fb51375ca43d74c8d1ab30c6a0c0eeb861bdf7b7a123d8dc6f1127844bb2",
+          "source": "78c946e2368955f5eaa67dede0e57b06d6142d04",
+          "original_conclusion": "success"
+        },
+        "restoration_sha256": "81bf8d01bae97e102478631d15d134fdd7990d740d733f56da4b729d193a1039"
+      },
+      "Debug-automatic": {
+        "immutable_native_runtime_member_index_sha256": "7b9f64c890a5c314c0f6942ac296965f46bec2f7b71e85769d1f1a475b6c590a",
+        "cache_sha256": "623378a174489cf2a415293b9edea44a1e504d67ec6bbac6aaa6542781687468",
+        "generated_sources_sha256": "3871539ae3e16edbc987c9e755d245679bbaffac4cf0eb0807ecfc7a734309d7"
+      },
+      "Debug-sse2": {
+        "immutable_native_runtime_member_index_sha256": "b5dab6ebd95c520dae6171e16a91ab00a0047171d11cdde52931ddf4284170c7",
+        "cache_sha256": "30c2bea7264122e99e26b8e31273661494743d8d8e99ed63e782e59dc7ffffa2",
+        "generated_sources_sha256": "0fcc16ca35ebe5b3f2f9350750b96b838e4d7040a0c6840a3b75c90e6ded3d8e"
+      },
+      "Release-automatic": {
+        "immutable_native_runtime_member_index_sha256": "d9e157df52b760e3722af794732797aee97cbad5bc57abdb4f87dfcd19b6bcb3",
+        "cache_sha256": "95398e70e60a77e12843976e59616db8b66163f8ee4d9f82b4d05355d8a1f0d3",
+        "generated_sources_sha256": "e7c7c3c97f1f57ee541300128048576e00de7a6356630c8c8df405eaff2109d3"
+      },
+      "Release-sse2": {
+        "immutable_native_runtime_member_index_sha256": "ba8f14624e300aa8b378badd03d507cd02e4f52e2c16c02283e17de919a67d32",
+        "cache_sha256": "02f220098c707679a383eddb1f1b8067004b59b1302650d6d1c805eb36d3f6ca",
+        "generated_sources_sha256": "4c84a64100c9f81dd1cd6d1b026aa52ebe40d69fc335ea372406914768b2c6d0"
+      },
+      "native_sdk_verification": {
+        "proof_sha256": "7afcfa653e3861936212d27f0464a5b50e80696fe3246223365fcfc1853aa85e",
+        "header_sha256": "9e5fa1e5ee654078f8f67454b57c10c7fbb92d5720491fdc494f644600ed33ea",
+        "source": "72700f04b0d6479c7eaa74c6b3f6c4a9dbb91dff",
+        "run_id": 42817158861,
+        "artifact_id": 13765936480,
+        "archive_sha256": "14d52826ef97d8651dbea2fd00246a16ef1f6d89bec7baa4df1448a99196bb86"
+      }
+    },
+    "observer": {
+      "Windows-Debug": {
+        "compiled_source": "c08f93151827949ee3ad498f8021f35c11753fde",
+        "archive": {
+          "run_id": 42529727362,
+          "artifact_id": 13637186106,
+          "bytes": 1456611,
+          "sha256": "72147583cd6598216b8da351b8128758437696359efff1bc48a954df5902d81f",
+          "source": "348880c447f8d86beb75a92ec4aaf23d44df6500",
+          "original_conclusion": "success"
+        },
+        "binary_sha256": "28f7a3ceeadaa362dc1e3cfcee1cd844ca90c7fa288ef2a8f58f71ed7ad60400",
+        "manifest_sha256": "d3b3458ae2dd5122944d2cac68ec982aafa7682bc3a0aba6b08e01ea26101fd7",
+        "compiler": {
+          "path": "C:\\Program Files\\Microsoft Visual Studio\\18\\Enterprise\\VC\\Tools\\MSVC\\14.51.36231\\bin\\HostX64\\x64\\cl.exe",
+          "sha256": "b0a1818ebae6da7f18230a84e76ce839212584ac4c2ab55b97a0d5268085da57"
+        },
+        "source_variant": {
+          "original_sha256": "2ee248d7904296cf448b7901bd18df03a0d4317248518bfcb3421e422c4e2726",
+          "compiled_sha256": "424bc9cb11fdc5152d94266de40cab5b1491b31a2fc416bf4fb75093dc82332e",
+          "only_change": "Validate 960 finalized ticks instead of 60; all observation calls and delays unchanged"
+        }
+      },
+      "Windows-Release": {
+        "compiled_source": "c08f93151827949ee3ad498f8021f35c11753fde",
+        "archive": {
+          "run_id": 42529727362,
+          "artifact_id": 13635944416,
+          "bytes": 1399859,
+          "sha256": "d5f8a939957f76f2882df53b9f8d6331b0c2f7ca930218934d998fd6bcac3957",
+          "source": "348880c447f8d86beb75a92ec4aaf23d44df6500",
+          "original_conclusion": "success"
+        },
+        "binary_sha256": "026e43696be7e510a0499c13aa42102fcd94975f7687f63b470a2f05aa5c249d",
+        "manifest_sha256": "602e39e64c7e7ede03d01c4272d827f861a9a03bbf340d98fb4df4a4b9ea4db0",
+        "compiler": {
+          "path": "C:\\Program Files\\Microsoft Visual Studio\\18\\Enterprise\\VC\\Tools\\MSVC\\14.51.36231\\bin\\HostX64\\x64\\cl.exe",
+          "sha256": "b0a1818ebae6da7f18230a84e76ce839212584ac4c2ab55b97a0d5268085da57"
+        },
+        "source_variant": {
+          "original_sha256": "2ee248d7904296cf448b7901bd18df03a0d4317248518bfcb3421e422c4e2726",
+          "compiled_sha256": "424bc9cb11fdc5152d94266de40cab5b1491b31a2fc416bf4fb75093dc82332e",
+          "only_change": "Validate 960 finalized ticks instead of 60; all observation calls and delays unchanged"
+        }
+      },
+      "native_stock_capture_owners": {
+        "writer": "9edaec08fbc41a25dc6cd4d319a14c950fdd8177",
+        "reload": "d2c579064f880e6c930da2263d1aa738d53e5423"
+      },
+      "native_stock_auditor": "315ae66e31ec13c4b43743e4c91316b4041d481b"
+    },
+    "runner": {
+      "Tests/Production/StockScenarios/run.py": "a0c8462929333e6fc23d7f750c910e1380350178226ebff3fda0e2f74ba044c1",
+      "Tests/Production/StockScenarios/verify.py": "09ecc13601ccbc1165a08883ed5154d5a0881da34d71c63e82cddad6ea4dfdad",
+      "Tests/Production/StockScenarios/inventory.py": "cd98da320f25c0d2372d7c1ec0f356ef7c4ba5fea053405d99f12652e60d8c8f",
+      "Tests/Production/StockScenarios/intentional_exit.py": "e16bab141189b959d29cd8c374f5a7969b72b46a3548f6564d150c9469844882",
+      "Tests/Production/GeneralApiCorrection/admission.py": "434351437fb4844c9ddee1624b19a7b34ba5215eed9214407c0f9d7b0ca4866c",
+      "Tests/Production/GeneralApiCorrection/qualification.py": "4e13d325912ef33bfbe69d3448bfdf63443b3f95d82e22cdc2e9a325b32e634e",
+      "Tests/Production/GeneralApiCorrection/startup_contract.py": "1aed2292a7de96ab5393077abc54621879d29b5c303e7c7908f1da92218462b4",
+      "Tests/Production/GeneralApiCorrection/startup-policy-v1.json": "8adeba43ccb3f5335beb516bc0f7a3acab29faf86ef4c4a6ce8cba9eda09a811",
+      "Tests/Production/GeneralApiCorrection/inputs-v2.json": "4d808224b28e24e43f31ab8321b9436ffcdb67bb722f25c03e5245cf23bc0909",
+      "Tests/Production/Closeout/processes.py": "6a65fe4d2340544b4542e44f5e38f61c52755d23a07429e400a4d539a9e393bb",
+      "Tests/Production/Closeout/checklist.py": "f26a943188269ca22c5aa3dad3e02ab0f9417f1eec439220612fb92c3843ff8c",
+      "Tests/Production/Closeout/manifest.py": "a5c86a159b331728bf46e2c40b284129ac3ae050e1088cdf69d08a405d1d4ac9"
+    },
+    "reference": {
+      "native_original": {
+        "source": "6206633c6ddc8b8e89af45fd1dd94b2e548f1450",
+        "run_id": 42637032435,
+        "artifact_id": 13685367571,
+        "bytes": 153093,
+        "sha256": "a8745be323d79d4c778d30d624639991351d220f71b063c51f88bb93fbf19ecb"
+      },
+      "current_original_native": {
+        "source": "315ae66e31ec13c4b43743e4c91316b4041d481b",
+        "run_id": 42688796087,
+        "artifact_id": 13709560028,
+        "bytes": 260706,
+        "sha256": "9bafd1fba39b901b6b23e9eccd28c2514613a3ebb5bf52dd043096eda6510a55"
+      },
+      "joint_api": {
+        "source": "480ce396475e17d66524ea60fbf9cb1a8a41ed4d",
+        "run_id": 42723386812,
+        "artifact_id": 13721672414,
+        "bytes": 406619,
+        "sha256": "b7f3a541cfdec4443e51820f7977f7485ba42920f8349c771ae1a27f337beaa7",
+        "qualified_report_sha256": "3f346c8548d2a69dd288300ee31bbd0a2764b0b2015161b71edf894d996cbae0"
+      },
+      "unchanged_locks": {
+        "Tests/Production/production-source.lock.json": "5f89334ecb213b56b1bda651acbed8c245f874f6d61ae9f7e9fdccfb3da2f11e",
+        "Tests/Production/phase3-extraction.lock.json": "22c3817de56a8b49fa2df2757d4a4a4b28bdb6f800b3034e1955095f0eb333d8",
+        "Tests/Production/stock-data.lock.json": "155fb89d22d58af113da6ff662904d74f82bbbbb7b9deb5e654b7c7141e27620",
+        "Tests/Production/standard-planets.lock.json": "de0366be8f138b11135e5f675cc44ae0d4cf9a8b11fe0f71772ad617237185c4",
+        "Tests/Production/NativeLua/StockExit/observations.lock.json": "5bdbcd1e6dc011a4551a2c9d3b65525d8dab3e398b18c54cd27be2fbcd7abd7c"
+      }
+    },
+    "dependencies": {
+      "Windows-Debug": {
+        "complete_runtime_archive": {
+          "run_id": 42525562745,
+          "artifact_id": 13636121355,
+          "bytes": 302580954,
+          "sha256": "92feab053d8120c90f0abdfa0e90b7466fcfb0c7833b610245d4e90323ad0419",
+          "source": "c08f93151827949ee3ad498f8021f35c11753fde",
+          "original_conclusion": "success"
+        },
+        "complete_sdk_inventory_sha256": "ff372e711354d38aa18072ed468ab54f42b2154b5ab23c57aef87347e790b245"
+      },
+      "Windows-Release": {
+        "complete_runtime_archive": {
+          "run_id": 42525562745,
+          "artifact_id": 13635896646,
+          "bytes": 207768498,
+          "sha256": "079b7ad0c06dd66454a9a60697670bee370fbcca0e040a4d877e934d952dd206",
+          "source": "c08f93151827949ee3ad498f8021f35c11753fde",
+          "original_conclusion": "success"
+        },
+        "complete_sdk_inventory_sha256": "fee675c921b6dbb434670ff17991cbde1d3e23509fc6349366ca6266d75f254e"
+      },
+      "Debug-automatic": {
+        "original_dependency_sources_sha256": "f0e71e903eb7b9b0bbffdce86bd1fb9fa3189e7dc8ea82836cf4b8c692bd1355",
+        "archives_sha256": {
+          "lua.zip": "18fdf2dd3756c0941d227c0eae0cf1f972b350d0ca7fce0052db9920eb06280b",
+          "implot.zip": "e9b439a94aa6f09fcf12ed9c2cd784efe5e99e96242122aa683e690b29f7a59f",
+          "freetype.zip": "a7165cb405dfce349ae64d6f59efb2567565ca8edbacbeff2a8d0e4cfa779cf5",
+          "glm.zip": "09c5716296787e1f7fcb87b1cbdbf26814ec1288ed6259ccd30d5d9795809fa5",
+          "imgui.zip": "943c3c8f6ef87c2616ff5545d4c50d941f29f20d23d783a8ff2f46c8a3bcfdf6",
+          "libnsbmp.zip": "0c414c85093250a744c8d2b48154015abe52f70cd2dc1278892c1af70a3cccb3",
+          "nanovg.zip": "1371d60470b374d849ea7b3f0cb015c6c21cad56e262c5e0d5e0efdc3364ba94",
+          "soil2.zip": "fbc5b1571f6eb40dd55a1221a3251191522542777f8dadcc13f1c66311102895",
+          "zlib.zip": "1cce3828ec2ba80ff8a4cac0ab5aa03756026517154c4b450e617ede751d41bd",
+          "glfw.tar.gz": "5234f4f29473e9a06bc7847d8371858dd135d38466eeeaa652fdc9f8f9ff0c20"
+        }
+      },
+      "Debug-sse2": {
+        "original_dependency_sources_sha256": "f0e71e903eb7b9b0bbffdce86bd1fb9fa3189e7dc8ea82836cf4b8c692bd1355",
+        "archives_sha256": {
+          "lua.zip": "18fdf2dd3756c0941d227c0eae0cf1f972b350d0ca7fce0052db9920eb06280b",
+          "implot.zip": "e9b439a94aa6f09fcf12ed9c2cd784efe5e99e96242122aa683e690b29f7a59f",
+          "freetype.zip": "a7165cb405dfce349ae64d6f59efb2567565ca8edbacbeff2a8d0e4cfa779cf5",
+          "glm.zip": "09c5716296787e1f7fcb87b1cbdbf26814ec1288ed6259ccd30d5d9795809fa5",
+          "imgui.zip": "943c3c8f6ef87c2616ff5545d4c50d941f29f20d23d783a8ff2f46c8a3bcfdf6",
+          "libnsbmp.zip": "0c414c85093250a744c8d2b48154015abe52f70cd2dc1278892c1af70a3cccb3",
+          "nanovg.zip": "1371d60470b374d849ea7b3f0cb015c6c21cad56e262c5e0d5e0efdc3364ba94",
+          "soil2.zip": "fbc5b1571f6eb40dd55a1221a3251191522542777f8dadcc13f1c66311102895",
+          "zlib.zip": "1cce3828ec2ba80ff8a4cac0ab5aa03756026517154c4b450e617ede751d41bd",
+          "glfw.tar.gz": "5234f4f29473e9a06bc7847d8371858dd135d38466eeeaa652fdc9f8f9ff0c20"
+        }
+      },
+      "Release-automatic": {
+        "original_dependency_sources_sha256": "f0e71e903eb7b9b0bbffdce86bd1fb9fa3189e7dc8ea82836cf4b8c692bd1355",
+        "archives_sha256": {
+          "lua.zip": "18fdf2dd3756c0941d227c0eae0cf1f972b350d0ca7fce0052db9920eb06280b",
+          "implot.zip": "e9b439a94aa6f09fcf12ed9c2cd784efe5e99e96242122aa683e690b29f7a59f",
+          "freetype.zip": "a7165cb405dfce349ae64d6f59efb2567565ca8edbacbeff2a8d0e4cfa779cf5",
+          "glm.zip": "09c5716296787e1f7fcb87b1cbdbf26814ec1288ed6259ccd30d5d9795809fa5",
+          "imgui.zip": "943c3c8f6ef87c2616ff5545d4c50d941f29f20d23d783a8ff2f46c8a3bcfdf6",
+          "libnsbmp.zip": "0c414c85093250a744c8d2b48154015abe52f70cd2dc1278892c1af70a3cccb3",
+          "nanovg.zip": "1371d60470b374d849ea7b3f0cb015c6c21cad56e262c5e0d5e0efdc3364ba94",
+          "soil2.zip": "fbc5b1571f6eb40dd55a1221a3251191522542777f8dadcc13f1c66311102895",
+          "zlib.zip": "1cce3828ec2ba80ff8a4cac0ab5aa03756026517154c4b450e617ede751d41bd",
+          "glfw.tar.gz": "5234f4f29473e9a06bc7847d8371858dd135d38466eeeaa652fdc9f8f9ff0c20"
+        }
+      },
+      "Release-sse2": {
+        "original_dependency_sources_sha256": "f0e71e903eb7b9b0bbffdce86bd1fb9fa3189e7dc8ea82836cf4b8c692bd1355",
+        "archives_sha256": {
+          "lua.zip": "18fdf2dd3756c0941d227c0eae0cf1f972b350d0ca7fce0052db9920eb06280b",
+          "implot.zip": "e9b439a94aa6f09fcf12ed9c2cd784efe5e99e96242122aa683e690b29f7a59f",
+          "freetype.zip": "a7165cb405dfce349ae64d6f59efb2567565ca8edbacbeff2a8d0e4cfa779cf5",
+          "glm.zip": "09c5716296787e1f7fcb87b1cbdbf26814ec1288ed6259ccd30d5d9795809fa5",
+          "imgui.zip": "943c3c8f6ef87c2616ff5545d4c50d941f29f20d23d783a8ff2f46c8a3bcfdf6",
+          "libnsbmp.zip": "0c414c85093250a744c8d2b48154015abe52f70cd2dc1278892c1af70a3cccb3",
+          "nanovg.zip": "1371d60470b374d849ea7b3f0cb015c6c21cad56e262c5e0d5e0efdc3364ba94",
+          "soil2.zip": "fbc5b1571f6eb40dd55a1221a3251191522542777f8dadcc13f1c66311102895",
+          "zlib.zip": "1cce3828ec2ba80ff8a4cac0ab5aa03756026517154c4b450e617ede751d41bd",
+          "glfw.tar.gz": "5234f4f29473e9a06bc7847d8371858dd135d38466eeeaa652fdc9f8f9ff0c20"
+        }
+      },
+      "native_providers": {
+        "providers": {
+          "run_id": 42528403133,
+          "artifact_id": 13636482999,
+          "bytes": 164848563,
+          "sha256": "6304d1701c0fc0775b80046d1ed3aa813b07313207027046d9a026be4f1dfe9e",
+          "source": "60ba46377f236c2d4705f444c0174e0f5af8252f",
+          "original_conclusion": "success"
+        },
+        "Mesa": {
+          "run_id": 42543636813,
+          "artifact_id": 13642189340,
+          "bytes": 53687675,
+          "sha256": "7a2b06da0b1d39153066414d8ea303cdfafcbe8184170e9e80bc33cee6d61392",
+          "source": "6d17e4f18e4eade72fa295c3d03a38a58182d35f",
+          "original_conclusion": "success"
+        },
+        "inventory_sha256": "0ae6765d460a0d744c48afdb242257d02a29da4845cf7e8b7fda42004e164900",
+        "userspace": "ubuntu@sha256:157dc3d6e4a3e4f2c68d12df9df9ed6e808b59af6d4c3757b432b4f519916725",
+        "provider_manifest_sha256": "8974790cb9fae4cc8ef0c5cb1510f2614a72ba4dce6ecb372c09630c242a35df"
+      }
+    },
+    "runtime": {
+      "Windows-Debug": {
+        "files_sha256": "ff372e711354d38aa18072ed468ab54f42b2154b5ab23c57aef87347e790b245",
+        "file_count": 988
+      },
+      "Windows-Release": {
+        "files_sha256": "fee675c921b6dbb434670ff17991cbde1d3e23509fc6349366ca6266d75f254e",
+        "file_count": 876
+      },
+      "Debug-automatic": {
+        "renderer_sha256": "98a2517e8add0900b78ff0e0e1b0c23bd4a91a4125e9e89d34105f0fc4805ac2",
+        "files_sha256": "b783da3b7e6405caf5e6579b9f4b4f2a9e336dd8b410b979a3d5e46233bf90c2",
+        "file_count": 65,
+        "sanitizers": [
+          "address",
+          "undefined"
+        ],
+        "asan_runtime_sha256": "8d5845bdf056b5db4cfb9fff40ad5eeea8f6da05a8ca6f5935a7d1c138ed2558"
+      },
+      "Debug-sse2": {
+        "renderer_sha256": "c0e08b65ea6d837d17353c30105c03e0f13eca8f9f826644a9e6976ebe8b68d8",
+        "files_sha256": "ac0e5616988013be4e0e93f66b2fa17f8f867571a7a800bcea26fdaa13c0b8e8",
+        "file_count": 65,
+        "sanitizers": [
+          "address",
+          "undefined"
+        ],
+        "asan_runtime_sha256": "8d5845bdf056b5db4cfb9fff40ad5eeea8f6da05a8ca6f5935a7d1c138ed2558"
+      },
+      "Release-automatic": {
+        "renderer_sha256": "db1c229c55b4257c59423d9727c69039401caac8ae54911f8b390e883d41d9e2",
+        "files_sha256": "47f2975e672bdd183a977591da6f240b7dcc191d53cb6de01b5110d0459f1797",
+        "file_count": 65,
+        "sanitizers": [
+          "address",
+          "undefined"
+        ],
+        "asan_runtime_sha256": "8d5845bdf056b5db4cfb9fff40ad5eeea8f6da05a8ca6f5935a7d1c138ed2558"
+      },
+      "Release-sse2": {
+        "renderer_sha256": "86aa3f860d8ab98b57553c68dcea442db1bcfccd43b2e3ba793f3fb17c8e73b6",
+        "files_sha256": "d2b8a491f69f60392f31d49dc7c944251188da18cb9d16ba670c087f79b9650b",
+        "file_count": 65,
+        "sanitizers": [
+          "address",
+          "undefined"
+        ],
+        "asan_runtime_sha256": "8d5845bdf056b5db4cfb9fff40ad5eeea8f6da05a8ca6f5935a7d1c138ed2558"
+      }
+    }
+  },
+  "unit_inventory": {
+    "Windows-Debug": {
+      "registered_processes": 28,
+      "executed_processes": 28,
+      "junit_sha256": "abe2656b282945154b227c11cfa39b4ee580ef1b552367451a544e5e2b415493",
+      "original_job_id": 128868408184
+    },
+    "Windows-Release": {
+      "registered_processes": 28,
+      "executed_processes": 28,
+      "junit_sha256": "f95e1aa9251a522882c41b8a8ca391f1a9c09b7e6e6c766ec22f2ecf34ae9623",
+      "original_job_id": 128868408173
+    },
+    "Debug-automatic": {
+      "original": {
+        "engine": {
+          "registered_processes": 32,
+          "executed_processes": 32,
+          "inventory_sha256": "8db38a73c57cfb97011c559fc9ba82eb9ea311af75f51bf375ed633cf3d46880",
+          "junit_sha256": "045cce749d08453152816b68179497fac291a722bf2b3958123edaa6edf206d7"
+        },
+        "upstream": {
+          "registered_processes": 2,
+          "executed_processes": 2,
+          "inventory_sha256": "c08105a2d9b2a15aafbf83cb45a00966240d432c14dd1b0314805b42a9207277",
+          "junit_sha256": "c5f9a60688a8cea81d03c009c1a820dfef05f6da470f79ae9953798360c8bd7a"
+        }
+      },
+      "corrected_case_discovery_sha256": "82274ddbf599d03c95acc2f7150c5be8948a53f479b87386e51431cbfecfb8a3",
+      "corrected_actual_cases": {
+        "Lua.Interpreter": [
+          "Create and test Lua interpreter"
+        ],
+        "Collision.CollisionCore": [
+          "GJK: separated and overlapping axis-aligned boxes",
+          "GJK: degenerate input",
+          "GJK: the simplex argument is reset on entry",
+          "EPA: offset boxes match the analytic minimum translation",
+          "EPA: normal points from A towards B and flips when the arguments swap",
+          "EPA: contact point lies on shape A",
+          "EPA: containment depth is the distance to the nearest face",
+          "EPA: random oriented boxes agree with the separating axis test",
+          "Triangle against a convex hull (base collision usage)",
+          "Results are translation-invariant at planetary distances",
+          "Touching hulls never yield non-finite results",
+          "GJK: coincident and centred shapes intersect",
+          "EPA: aligned boxes of equal cross-section",
+          "Grid of aligned box pairs agrees with the analytic answer",
+          "Safety margin expansion for overlap separation hysteresis"
+        ]
+      }
+    },
+    "Debug-sse2": {
+      "original": {
+        "engine": {
+          "registered_processes": 32,
+          "executed_processes": 32,
+          "inventory_sha256": "1b04ef68c96edcbeddff1c102738a8266cfd98380a6779b65049d9fdad245f03",
+          "junit_sha256": "9f6bd8d3a7cd5dd1e5ba266e98af8de83308d4677790f228d751463a8377c945"
+        },
+        "upstream": {
+          "registered_processes": 2,
+          "executed_processes": 2,
+          "inventory_sha256": "b5a7320a5e27f5f59800cb7ec1e757a1d0a4bb23a725216a1b64a3c6126bdedb",
+          "junit_sha256": "5da48195416e86de27765c5da471a19da077bff7418b3767f2b0636f25e94da1"
+        }
+      },
+      "corrected_case_discovery_sha256": "51ff4b00f127273b3ac539b9fe2bcd8f709c431149b080f68445fd2393ecf588",
+      "corrected_actual_cases": {
+        "Lua.Interpreter": [
+          "Create and test Lua interpreter"
+        ],
+        "Collision.CollisionCore": [
+          "GJK: separated and overlapping axis-aligned boxes",
+          "GJK: degenerate input",
+          "GJK: the simplex argument is reset on entry",
+          "EPA: offset boxes match the analytic minimum translation",
+          "EPA: normal points from A towards B and flips when the arguments swap",
+          "EPA: contact point lies on shape A",
+          "EPA: containment depth is the distance to the nearest face",
+          "EPA: random oriented boxes agree with the separating axis test",
+          "Triangle against a convex hull (base collision usage)",
+          "Results are translation-invariant at planetary distances",
+          "Touching hulls never yield non-finite results",
+          "GJK: coincident and centred shapes intersect",
+          "EPA: aligned boxes of equal cross-section",
+          "Grid of aligned box pairs agrees with the analytic answer",
+          "Safety margin expansion for overlap separation hysteresis"
+        ]
+      }
+    },
+    "Release-automatic": {
+      "original": {
+        "engine": {
+          "registered_processes": 32,
+          "executed_processes": 32,
+          "inventory_sha256": "6d0bd9403fb29d228a7159e1ab957ca1c94b52f35aad566eae2a3d2fcf14a7d1",
+          "junit_sha256": "ebb62933efbd5bf2cfde6b422532be5c428d6ddd87fc2caec28507f889f108f6"
+        },
+        "upstream": {
+          "registered_processes": 2,
+          "executed_processes": 2,
+          "inventory_sha256": "c884e007624aed28fa1599a4225f68dc08fa30a79193d14adb4dab128acc5b45",
+          "junit_sha256": "ffcd10515a8a6820b23681841f4bd544dc8da80e2927ca0cb4c7921221faa737"
+        }
+      },
+      "corrected_case_discovery_sha256": "fd3a7f9b24fe186325b0b9474f476649c4189e3592111e745c7b1028a6c1f3e3",
+      "corrected_actual_cases": {
+        "Lua.Interpreter": [
+          "Create and test Lua interpreter"
+        ],
+        "Collision.CollisionCore": [
+          "GJK: separated and overlapping axis-aligned boxes",
+          "GJK: degenerate input",
+          "GJK: the simplex argument is reset on entry",
+          "EPA: offset boxes match the analytic minimum translation",
+          "EPA: normal points from A towards B and flips when the arguments swap",
+          "EPA: contact point lies on shape A",
+          "EPA: containment depth is the distance to the nearest face",
+          "EPA: random oriented boxes agree with the separating axis test",
+          "Triangle against a convex hull (base collision usage)",
+          "Results are translation-invariant at planetary distances",
+          "Touching hulls never yield non-finite results",
+          "GJK: coincident and centred shapes intersect",
+          "EPA: aligned boxes of equal cross-section",
+          "Grid of aligned box pairs agrees with the analytic answer",
+          "Safety margin expansion for overlap separation hysteresis"
+        ]
+      }
+    },
+    "Release-sse2": {
+      "original": {
+        "engine": {
+          "registered_processes": 32,
+          "executed_processes": 32,
+          "inventory_sha256": "e358e26d8eab8545031dff82df759eac4913558817e7fcd97b1a11be8d696e5f",
+          "junit_sha256": "06de01f40c1c10e9426bf0791dadea687c66b2f37d574af6341b49f4a1549c55"
+        },
+        "upstream": {
+          "registered_processes": 2,
+          "executed_processes": 2,
+          "inventory_sha256": "3325755c71a04eb71dbe758dbd79060a32a5d1d96315273f84f94018e3a843fd",
+          "junit_sha256": "fcd64f30907fee42a6ed8892471883588ece5a6bf13ee499898cbca7614ecb6a"
+        }
+      },
+      "corrected_case_discovery_sha256": "c80edc48084235db6e3b7379214409e60046c62ca800f08f176acb78159cb8eb",
+      "corrected_actual_cases": {
+        "Lua.Interpreter": [
+          "Create and test Lua interpreter"
+        ],
+        "Collision.CollisionCore": [
+          "GJK: separated and overlapping axis-aligned boxes",
+          "GJK: degenerate input",
+          "GJK: the simplex argument is reset on entry",
+          "EPA: offset boxes match the analytic minimum translation",
+          "EPA: normal points from A towards B and flips when the arguments swap",
+          "EPA: contact point lies on shape A",
+          "EPA: containment depth is the distance to the nearest face",
+          "EPA: random oriented boxes agree with the separating axis test",
+          "Triangle against a convex hull (base collision usage)",
+          "Results are translation-invariant at planetary distances",
+          "Touching hulls never yield non-finite results",
+          "GJK: coincident and centred shapes intersect",
+          "EPA: aligned boxes of equal cross-section",
+          "Grid of aligned box pairs agrees with the analytic answer",
+          "Safety margin expansion for overlap separation hysteresis"
+        ]
+      }
+    }
+  },
+  "id": "73c3821329deaa272dbbc936a4cef82299f2749ae9a85a06f0d179bfba402061"
+}
