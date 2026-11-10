@@ -1,0 +1,82 @@
+name: Phase 6 Exact Original Package Official Pool Preflight Retry
+on:
+  push:
+    branches: ['qualification/class-package-official-pool-preflight-v2']
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: phase6-original-package-official-pool-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  preflight:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 75
+    env:
+      PROFILE: Debug-sse2
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - name: Preserve all original controls and exact pool-plan rejection controls
+        run: mkdir -p out && python3 -B Tests/Production/Closeout/run_controls.py --output out/original-pool-controls.json
+      - name: Retain only the exact original provider inventory and provenance
+        uses: actions/github-script@v8
+        with:
+          script: |
+            await require('./.github/scripts/phase6-download-class-userspace.cjs')({github,context,core});
+      - name: Verify every original provider byte and complete package inventory before provisioning
+        run: >-
+          python3 -B Tests/Production/Closeout/restore_hosted_native_providers.py
+          --api out/native-api-source/providers/api.json --archive out/native-api-source/providers/producer.zip
+          --output out/native-provider-restoration/restoration.json
+      - name: Supply only original snapshot SHA256-identical blobs from the official Ubuntu pool and rerun unchanged original preflight
+        shell: bash
+        run: |
+          set -euo pipefail
+          image=$(python3 -c "import json; print('ubuntu@'+json.load(open('Tests/Production/Closeout/native-provider-container.lock.json'))['image_digest'])")
+          docker pull "$image"
+          docker image inspect "$image" > out/class-userspace-container.json
+          docker run --rm --init --cpus=2 -v "$GITHUB_WORKSPACE:$GITHUB_WORKSPACE" -v /etc/ssl/certs/ca-certificates.crt:/run/orbiter-ci-system-ca.pem:ro -w "$GITHUB_WORKSPACE" \
+            -e GITHUB_ACTIONS -e RUNNER_OS -e GITHUB_WORKSPACE -e GITHUB_SHA -e PROFILE \
+            "$image" bash Tests/Production/Closeout/prepare_hosted_class_original_pool_network.sh Tests/Production/Closeout/prepare_hosted_class_official_pool_preflight.sh 2>&1 | tee out/original-pool-container.log
+      - name: Independently inspect original blob hashes, signed metadata identity and every original package version
+        run: >-
+          python3 -B Tests/Production/Closeout/verify_original_package_pool_preflight.py
+          --profile "$PROFILE" --output out/original-package-pool-proof.json
+      - uses: actions/upload-artifact@v7
+        id: raw
+        if: always()
+        with:
+          name: original-package-official-pool-full-provisioning-evidence
+          retention-days: 14
+          path: |
+            out/original-package-official-pool/**
+            out/class-userspace-preflight/**
+            out/class-userspace-container.json
+            out/class-rejection-provisioning-deadline.json
+            out/original-pool-container.log
+            out/native-rejection-network/**
+            out/native-api-source/providers/*.json
+            out/native-api-source/providers/*.body
+            out/native-provider-restoration/restoration.json
+      - name: Preserve actual source-bound provisioning archive API identity without qualification
+        uses: actions/github-script@v8
+        if: always() && steps.raw.outputs.artifact-id != ''
+        with:
+          script: |
+            const fs=require('fs'),{owner,repo}=context.repo,id=Number('${{ steps.raw.outputs.artifact-id }}');
+            const artifact=(await github.rest.actions.getArtifact({owner,repo,artifact_id:id})).data;
+            if(artifact.id!==id||artifact.name!=='original-package-official-pool-full-provisioning-evidence'||artifact.workflow_run.id!==context.runId||artifact.workflow_run.head_sha!==context.sha||artifact.digest!=='sha256:${{ steps.raw.outputs.artifact-digest }}'.replace('sha256:sha256:','sha256:'))throw Error('Actual retained provisioning archive source/digest differs');
+            fs.writeFileSync('out/original-package-pool-retention.json',JSON.stringify({source:context.sha,run_id:context.runId,artifact,qualification_granted:false,phase6_complete:false},null,2),{flag:'wx'});
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: original-package-official-pool-small-preflight-receipt
+          retention-days: 14
+          path: |
+            out/original-pool-controls.json
+            out/original-package-pool-proof.json
+            out/original-package-pool-retention.json
+            out/class-userspace-preflight/preflight.json
+            out/class-rejection-provisioning-deadline.json
