@@ -1,0 +1,103 @@
+{
+  "protocol": "phase6-independent-capability-facet-inputs-v1",
+  "repository": {
+    "owner": "dcajacob",
+    "repo": "orbiter-cross-platform"
+  },
+  "observers": {
+    "Debug-automatic": {
+      "run_id": 42765812987,
+      "source": "6aae6e620abc187bd9fc2eb72c56167515d9b884",
+      "branch": "qualification/native-capability-independent-v2",
+      "workflow": ".github/workflows/phase6-native-capability-independent.yml",
+      "jobs": {
+        "129661914488": "Independently replay published capability Release-sse2",
+        "129661914773": "Independently replay published capability Release-automatic",
+        "129661914796": "Independently replay published capability Debug-sse2",
+        "129661915019": "Independently replay published capability Debug-automatic"
+      },
+      "artifact_id": 13739861975,
+      "artifact_name": "independently-verified-original-capability-Debug-automatic",
+      "archive_bytes": 856882,
+      "archive_sha256": "4e594f46aff1b436c747491c5056aa43e023367b858ae51bb02ed64dcda6820e"
+    },
+    "Debug-sse2": {
+      "run_id": 42765812987,
+      "source": "6aae6e620abc187bd9fc2eb72c56167515d9b884",
+      "branch": "qualification/native-capability-independent-v2",
+      "workflow": ".github/workflows/phase6-native-capability-independent.yml",
+      "jobs": {
+        "129661914488": "Independently replay published capability Release-sse2",
+        "129661914773": "Independently replay published capability Release-automatic",
+        "129661914796": "Independently replay published capability Debug-sse2",
+        "129661915019": "Independently replay published capability Debug-automatic"
+      },
+      "artifact_id": 13738874742,
+      "artifact_name": "independently-verified-original-capability-Debug-sse2",
+      "archive_bytes": 857131,
+      "archive_sha256": "f0ba5adfd58c5d89a13508aa4df6a7c1fbf32997fbba232f4f618e8aff28649a"
+    },
+    "Release-automatic": {
+      "run_id": 42765812987,
+      "source": "6aae6e620abc187bd9fc2eb72c56167515d9b884",
+      "branch": "qualification/native-capability-independent-v2",
+      "workflow": ".github/workflows/phase6-native-capability-independent.yml",
+      "jobs": {
+        "129661914488": "Independently replay published capability Release-sse2",
+        "129661914773": "Independently replay published capability Release-automatic",
+        "129661914796": "Independently replay published capability Debug-sse2",
+        "129661915019": "Independently replay published capability Debug-automatic"
+      },
+      "artifact_id": 13739778888,
+      "artifact_name": "independently-verified-original-capability-Release-automatic",
+      "archive_bytes": 857174,
+      "archive_sha256": "0c4e3260d2ee7066aa4e34361d761637f46bcc16b8b81ea405e7b8f9b6fa2885"
+    },
+    "Release-sse2": {
+      "run_id": 42765812987,
+      "source": "6aae6e620abc187bd9fc2eb72c56167515d9b884",
+      "branch": "qualification/native-capability-independent-v2",
+      "workflow": ".github/workflows/phase6-native-capability-independent.yml",
+      "jobs": {
+        "129661914488": "Independently replay published capability Release-sse2",
+        "129661914773": "Independently replay published capability Release-automatic",
+        "129661914796": "Independently replay published capability Debug-sse2",
+        "129661915019": "Independently replay published capability Debug-automatic"
+      },
+      "artifact_id": 13740715302,
+      "artifact_name": "independently-verified-original-capability-Release-sse2",
+      "archive_bytes": 856837,
+      "archive_sha256": "d33a7be1901e89f6b2ca12583ea7c2b6e3c90256d3035d56c82182299226d71d"
+    }
+  },
+  "sdk": {
+    "automatic": {
+      "run_id": 42761531324,
+      "source": "bd3d8226c01755a49d684e64b57c4f27686b2606",
+      "branch": "qualification/native-full-sdk-published-v1",
+      "workflow": ".github/workflows/phase6-native-full-sdk-published.yml",
+      "jobs": {
+        "129648092932": "Verify full published SDK cohort sse2",
+        "129648093012": "Verify full published SDK cohort automatic"
+      },
+      "artifact_id": 13737234705,
+      "artifact_name": "verified-published-full-SDK-automatic",
+      "archive_bytes": 74235,
+      "archive_sha256": "2e410f14db336ee30cb553eb7fda27f8c73f0aa696ab2d0f5dda18a54b95e7cb"
+    },
+    "sse2": {
+      "run_id": 42761531324,
+      "source": "bd3d8226c01755a49d684e64b57c4f27686b2606",
+      "branch": "qualification/native-full-sdk-published-v1",
+      "workflow": ".github/workflows/phase6-native-full-sdk-published.yml",
+      "jobs": {
+        "129648092932": "Verify full published SDK cohort sse2",
+        "129648093012": "Verify full published SDK cohort automatic"
+      },
+      "artifact_id": 13737443663,
+      "artifact_name": "verified-published-full-SDK-sse2",
+      "archive_bytes": 74121,
+      "archive_sha256": "37be80155c70a7318512022626524ad26d8ed8dc88d188e062131dbf9fcca97d"
+    }
+  }
+}

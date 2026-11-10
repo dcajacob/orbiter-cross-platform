@@ -1,0 +1,49 @@
+name: Phase 6 Verify Complete Independent Original Capability Facet
+on:
+  push:
+    branches: ['qualification/native-capability-facet-v1']
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: phase6-independent-capability-facet-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  audit:
+    name: Verify four complete observer profiles and full exact SDK variant superset
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - name: Preserve every original and independent receipt helper control
+        run: mkdir -p out && python3 -B Tests/Production/Closeout/run_controls.py --output out/capability-facet-controls.json
+      - name: Retain exact independently verified original full SDK inventory metadata
+        uses: actions/github-script@v8
+        with:
+          script: |
+            await require('./.github/scripts/phase6-download-capability-inventory.cjs')({github,context,core});
+      - run: python3 -B Tests/Production/Closeout/restore_hosted_capability_inventory.py
+      - name: Retain only six complete source-bound observer and SDK replay receipts
+        uses: actions/github-script@v8
+        with:
+          script: |
+            await require('./.github/scripts/phase6-download-capability-facet.cjs')({github,context,core});
+      - name: Verify every original observer cell and full exact SDK variant without new simulations
+        run: >-
+          python3 -B Tests/Production/Closeout/final_hosted_class_capabilities.py
+          --inputs out/capability-facet-inputs --output out/capability-facet-proof
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: complete-independent-original-capability-facet
+          retention-days: 14
+          compression-level: 3
+          path: |
+            out/capability-facet-proof/**
+            out/capability-facet-controls.json
+            out/capability-facet-inputs/*/*/*.json
+            out/capability-facet-inputs/*/*/*.body
+            out/class-capability-inventory/api.json
+            out/class-capability-inventory/restoration.json
