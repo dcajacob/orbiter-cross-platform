@@ -22,6 +22,12 @@
       "artifact_id": 13727250912,
       "archive_bytes": 185393142,
       "archive_sha256": "ff8ea828d60e0ff76e6721f0fb8610e757aeb0c6d2378e0098e9afd27de35172"
+    },
+    "Debug-automatic": {
+      "job_id": 129543903611,
+      "artifact_id": 13726852476,
+      "archive_bytes": 185456492,
+      "archive_sha256": "15b780c574942fa90aacca2e8cd61a2d863d8158a1b85501c4efd58db92655e4"
     }
   },
   "scope": "Only each explicitly completed profile; other producer jobs and the overall run retain their actual states. No complete class or normal-admission qualification."
