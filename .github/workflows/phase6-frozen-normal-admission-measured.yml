@@ -1,0 +1,185 @@
+name: Phase 6 Frozen Native Normal Admission Measured Reference
+on:
+  push:
+    branches: ['qualification/frozen-normal-admission-v3']
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: phase6-frozen-normal-admission
+  cancel-in-progress: false
+jobs:
+  readiness:
+    name: Measure and verify exact decoded reference capacity
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.14'
+      - name: Verify all original and retry helper controls
+        run: mkdir -p out && python3 -B Tests/Production/Closeout/run_controls.py --output out/normal-admission-streaming-controls.json
+      - name: Stream and hash every original reference member to measure the exact expanded capacity
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python3 -B Tests/Production/Closeout/measured_admission_reference.py --measure
+      - uses: actions/upload-artifact@v7
+        with:
+          name: frozen-normal-admission-measured-capacity
+          retention-days: 14
+          if-no-files-found: error
+          path: out/admission-measured-capacity/capacity.json
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: frozen-normal-admission-measured-readiness-receipts
+          retention-days: 14
+          path: |
+            out/normal-admission-streaming-controls.json
+            out/admission-reference-source/*.json
+            out/admission-reference-source/*.log
+            out/admission-reference-source/*.partial.zip
+  admission:
+    name: Full normal stock admission ${{ matrix.profile }}
+    needs: readiness
+    runs-on: ubuntu-24.04
+    timeout-minutes: 330
+    strategy:
+      fail-fast: false
+      max-parallel: 2
+      matrix:
+        profile: [Debug-automatic, Debug-sse2, Release-automatic, Release-sse2]
+    env:
+      PROFILE: ${{ matrix.profile }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.14'
+      - name: Verify the actual completed measured readiness receipt for this exact workflow
+        uses: actions/github-script@v8
+        with:
+          script: |
+            const fs=require('fs'),crypto=require('crypto'),{owner,repo}=context.repo,run_id=context.runId;
+            const run=(await github.rest.actions.getWorkflowRun({owner,repo,run_id})).data;
+            const jobs=await github.paginate(github.rest.actions.listJobsForWorkflowRun,{owner,repo,run_id,per_page:100});
+            const ready=jobs.filter(j=>j.name==='Measure and verify exact decoded reference capacity');
+            const artifacts=await github.paginate(github.rest.actions.listWorkflowRunArtifacts,{owner,repo,run_id,per_page:100});
+            const selected=artifacts.filter(a=>a.name==='frozen-normal-admission-measured-capacity');
+            if(owner!=='dcajacob'||repo!=='orbiter-cross-platform'||run.head_sha!==context.sha||run.run_attempt!==1||run.head_branch!=='qualification/frozen-normal-admission-v3'||run.path!=='.github/workflows/phase6-frozen-normal-admission-measured.yml'||ready.length!==1||selected.length!==1||
+               ready[0].head_sha!==context.sha||ready[0].status!=='completed'||ready[0].conclusion!=='success'||ready[0].run_id!==run_id||JSON.stringify(ready[0].labels)!=='["ubuntu-24.04"]')throw Error('Actual same-source completed standard capacity job required');
+            const artifact=selected[0],base='out/admission-capacity-source';
+            if(artifact.expired||artifact.workflow_run.id!==run_id||artifact.workflow_run.head_sha!==context.sha||artifact.size_in_bytes<1||artifact.size_in_bytes>1024**2)throw Error('Exact bounded capacity receipt required');
+            fs.mkdirSync(base,{recursive:true});
+            fs.writeFileSync(base+'/api.json',JSON.stringify({run,jobs,artifact},null,2),{flag:'wx'});
+            const bytes=Buffer.from((await require('./.github/scripts/phase6-download-bound-artifact.cjs')({github,owner,repo,source:{run,jobs},artifact,base,core})).data);
+            if(bytes.length!==artifact.size_in_bytes||'sha256:'+crypto.createHash('sha256').update(bytes).digest('hex')!==artifact.digest)throw Error('Actual current-run capacity receipt differs');
+            fs.writeFileSync(base+'/producer.zip',bytes,{flag:'wx'});
+      - name: Restore the exact measured reference at its original paths and retain the disk reserve
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 -B - <<'PY'
+          from pathlib import Path
+          import zipfile
+          with zipfile.ZipFile('out/admission-capacity-source/producer.zip') as archive:
+              assert archive.namelist()==['capacity.json'] and 0<archive.getinfo('capacity.json').file_size<2*1024**2
+              output=Path('out/admission-measured-capacity');output.mkdir()
+              with (output/'capacity.json').open('xb') as target:target.write(archive.read('capacity.json'))
+          PY
+          python3 -B Tests/Production/Closeout/measured_admission_reference.py --restore
+      - name: Confirm exact original intentional exit release identities and native package inputs
+        uses: actions/github-script@v8
+        with:
+          script: |
+            const fs=require('fs'),{owner,repo}=context.repo;
+            const p=JSON.parse(fs.readFileSync('Tests/Production/NativeLua/StockExit/observations.lock.json','utf8')).durable_release;
+            const release=(await github.rest.repos.getReleaseByTag({owner,repo,tag:p.tag})).data;
+            if(release.id!==p.id||release.tag_name!==p.tag||release.draft||release.assets.length!==p.assets.length||
+               p.assets.some(x=>release.assets.filter(a=>a.id===x.id&&a.name===x.name&&a.state==='uploaded'&&a.size===x.bytes&&a.digest==='sha256:'+x.sha256).length!==1))throw Error('Exact immutable original exit release assets required');
+            fs.writeFileSync('out/frozen-stock-exit-release-api.json',JSON.stringify(release,null,2),{flag:'wx'});
+            await require('./.github/scripts/phase6-download-native-api-inputs.cjs')({github,context,core});
+      - name: Restore the frozen runtime and original stock exit bytes with every existing guard
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 -B Tests/Production/Closeout/hosted_normal_admission.py --prepare "$PROFILE"
+          python3 -B Tests/Production/NativeLua/StockExit/frozen_original.py \
+            --cache out/frozen-stock-exit-cache --output out/frozen-stock-exit \
+            --audit out/frozen-stock-exit-preflight.json
+          python3 -B Tests/Production/Closeout/restore_hosted_native_providers.py \
+            --api out/native-api-source/providers/api.json --archive out/native-api-source/providers/producer.zip \
+            --output out/native-provider-restoration/restoration.json
+          python3 -B Tests/Production/Closeout/restore_hosted_mesa_topology.py \
+            --api out/native-api-source/mesa/api.json --archive out/native-api-source/mesa/producer.zip \
+            --output out/mesa-topology-restoration/restoration.json
+      - name: Run and audit every normal native stock scenario with the existing policies and unsuppressed sanitizers
+        shell: bash
+        run: |
+          set -euo pipefail
+          image=$(python3 -c "import json; print('ubuntu@'+json.load(open('Tests/Production/Closeout/native-provider-container.lock.json'))['image_digest'])")
+          docker pull "$image"
+          docker image inspect "$image" > out/admission-container.json
+          docker run --rm --init --cpus=2 --shm-size=1g -v "$GITHUB_WORKSPACE:$GITHUB_WORKSPACE" -v /etc/ssl/certs/ca-certificates.crt:/run/orbiter-ci-system-ca.pem:ro -w "$GITHUB_WORKSPACE" \
+            -e GITHUB_ACTIONS -e RUNNER_OS -e GITHUB_WORKSPACE -e GITHUB_SHA -e GITHUB_RUN_ID -e PROFILE \
+            "$image" bash "out/admission-package-source/$PROFILE/network.sh" Tests/Production/Closeout/prepare_hosted_normal_admission.sh 2>&1 | tee out/admission-container.log
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: frozen-normal-admission-${{ matrix.profile }}-raw
+          retention-days: 14
+          compression-level: 0
+          include-hidden-files: true
+          path: |
+            out/hosted-normal-admission/${{ matrix.profile }}/*.tar.gz
+            out/hosted-normal-admission/${{ matrix.profile }}/*.json
+            out/hosted-normal-admission/${{ matrix.profile }}/*.log
+            out/hosted-normal-admission/${{ matrix.profile }}/*.txt
+            out/hosted-normal-admission/${{ matrix.profile }}/capture/stock-scenarios.json
+            out/admission-container.*
+            out/admission-package-source/${{ matrix.profile }}/**
+            out/admission-network/${{ matrix.profile }}/**
+            out/original-package-official-pool/${{ matrix.profile }}/**
+            out/native-api-source/*/*.json
+            out/native-api-source/*/*.body
+            out/native-api-source/*/**/*partial*
+            out/admission-reference-source/*.json
+            out/admission-reference-source/*.body
+            out/admission-reference-source/*.log
+            out/admission-reference-source/*.partial.zip
+            out/admission-capacity-source/*.json
+            out/admission-capacity-source/*.body
+            out/admission-measured-capacity/capacity.json
+            out/frozen-stock-exit-release-api.json
+            out/frozen-stock-exit-preflight.json
+            out/frozen-stock-exit/downloads.json
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: frozen-normal-admission-${{ matrix.profile }}-receipt
+          retention-days: 14
+          compression-level: 3
+          path: |
+            out/hosted-normal-admission/${{ matrix.profile }}/collection.json
+            out/hosted-normal-admission/${{ matrix.profile }}/independent-full-stock-audit.json
+            out/hosted-normal-admission/${{ matrix.profile }}/capture/stock-scenarios.json
+            out/hosted-normal-admission/${{ matrix.profile }}/capture-raw-index.json
+            out/hosted-normal-admission/${{ matrix.profile }}/raw-retention-failure.json
+            out/native-api-source/native/candidate-restoration.json
+      - uses: actions/upload-artifact@v7
+        if: failure()
+        with:
+          name: frozen-normal-admission-${{ matrix.profile }}-partial
+          retention-days: 14
+          compression-level: 3
+          include-hidden-files: true
+          path: |
+            out/hosted-normal-admission/${{ matrix.profile }}/capture/**
+            out/hosted-normal-admission/${{ matrix.profile }}/compositor/**
