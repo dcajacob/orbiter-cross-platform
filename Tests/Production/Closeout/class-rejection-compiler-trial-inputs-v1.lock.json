@@ -1,0 +1,27 @@
+{
+  "protocol": "phase6-single-profile-original-rejection-transport-validation-v1",
+  "repository": {
+    "owner": "dcajacob",
+    "repo": "orbiter-cross-platform"
+  },
+  "run_id": 42883685763,
+  "source": "d7668b5f37b277ca275d34fafba96aa3e6da0560",
+  "branch": "qualification/native-class-rejections-Debug-sse2-host-compiler-v1",
+  "workflow": ".github/workflows/phase6-native-class-rejections-host-compiler.yml",
+  "readiness_job_id": 130066319258,
+  "jobs": {
+    "130066319258": "readiness",
+    "130066928949": "Original normal host class and loader rejection controls Debug-sse2"
+  },
+  "profiles": {
+    "Debug-sse2": {
+      "job_id": 130066928949,
+      "artifact_id": 13797320355,
+      "archive_bytes": 738459927,
+      "archive_sha256": "6acb6bfea960e0cc0c9897b4c5fef64c71f67b07dbf273d36707d605c2b6000b"
+    }
+  },
+  "four_profile_class_facet_qualified": false,
+  "phase6_complete": false,
+  "hands_on_ready": false
+}
