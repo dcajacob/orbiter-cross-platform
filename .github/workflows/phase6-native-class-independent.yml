@@ -2,7 +2,7 @@ name: Phase 6 Independently Audit Published Original Class Profiles
 
 on:
   push:
-    branches: ['qualification/native-class-independent-Debug-automatic-v1']
+    branches: ['qualification/native-class-independent-Release-automatic-v1']
 
 permissions:
   contents: read
@@ -41,7 +41,7 @@ jobs:
       fail-fast: false
       max-parallel: 2
       matrix:
-        profile: [Debug-automatic]
+        profile: [Release-automatic]
     env:
       PROFILE: ${{ matrix.profile }}
     steps:
