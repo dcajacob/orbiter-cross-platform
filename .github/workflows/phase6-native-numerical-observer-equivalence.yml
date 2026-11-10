@@ -1,0 +1,126 @@
+name: Phase 6 Exact Original Save Numerical Observer Equivalence
+on:
+  push:
+    branches: ['qualification/native-numerical-observer-equivalence-v1']
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: phase6-native-numerical-observer-equivalence-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  capture:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 120
+    env:
+      PROFILE: Debug-automatic
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - name: Preserve all original controls and exact source input process and sanitizer guards
+        run: mkdir -p out && python3 -B Tests/Production/Closeout/run_controls.py --output out/numerical-observer-renewal-controls.json
+      - name: Check the actual completed matching-compiler component before any replacement world
+        uses: actions/github-script@v8
+        with:
+          script: |
+            const fs=require('fs'),{owner,repo}=context.repo;
+            if(owner!=='dcajacob'||repo!=='orbiter-cross-platform'||(await github.rest.repos.get({owner,repo})).data.private)throw Error('Exact existing public repository required');
+            const run=(await github.rest.actions.getWorkflowRun({owner,repo,run_id:42904909996})).data;
+            const jobs=await github.paginate(github.rest.actions.listJobsForWorkflowRun,{owner,repo,run_id:42904909996,per_page:100});
+            const artifact=(await github.rest.actions.getArtifact({owner,repo,artifact_id:13804252830})).data;
+            if(run.id!==42904909996||run.head_sha!=='3198d502a5b3c824d3faabaa99fd5255f2494dc4'||run.path!=='.github/workflows/phase6-native-numerical-observer-compiler.yml'||run.head_branch!=='qualification/numerical-observer-compiler-control-v1'||run.run_attempt!==1||run.status!=='completed'||run.conclusion!=='success'||jobs.length!==1||jobs[0].id!==130140256626||jobs[0].head_sha!==run.head_sha||jobs[0].status!=='completed'||jobs[0].conclusion!=='success'||JSON.stringify(jobs[0].labels)!==JSON.stringify(['ubuntu-24.04'])||artifact.id!==13804252830||artifact.size_in_bytes!==177484||artifact.digest!=='sha256:2cc806b90ddc6fc10f6167fa8ac84bfa0a6038f3ea465475bdbae6184fa7b95e'||artifact.expired||artifact.workflow_run.id!==run.id||artifact.workflow_run.head_sha!==run.head_sha)throw Error('Actual complete original compiler component and standard job required');
+            fs.writeFileSync('out/numerical-observer-compiler-prerequisite.json',JSON.stringify({repository:context.repo,run,jobs,artifact},null,2),{flag:'wx'});
+      - name: Retain exact original compiled native application and provider packages without rewriting failed producer history
+        uses: actions/github-script@v8
+        with:
+          script: |
+            await require('./.github/scripts/phase6-download-native-api-inputs.cjs')({github,context,core});
+      - name: Restore the complete original package and unchanged upstream tests with exact corrected discovery
+        run: >-
+          python3 -B Tests/Production/Closeout/recheck_native_discovery.py
+          --api out/native-api-source/native/api.json --archive out/native-api-source/native/producer.zip
+          --profile "$PROFILE" --output "out/numerical-observer-retained-units/$PROFILE"
+      - name: Restore all unchanged provider bytes and original owner controls
+        run: >-
+          python3 -B Tests/Production/Closeout/restore_hosted_native_providers.py
+          --api out/native-api-source/providers/api.json --archive out/native-api-source/providers/producer.zip
+          --output out/native-provider-restoration/restoration.json
+      - name: Restore the separately compiled unsuppressed Mesa owner and original controls
+        run: >-
+          python3 -B Tests/Production/Closeout/restore_hosted_mesa_topology.py
+          --api out/native-api-source/mesa/api.json --archive out/native-api-source/mesa/producer.zip
+          --output out/mesa-topology-restoration/restoration.json
+      - name: Freshly compile only the two unchanged read-only observers with the actual matching standard host compiler
+        run: >-
+          python3 -B Tests/Production/Closeout/build_native_numerical_observers.py
+          --profile "$PROFILE" --output "out/numerical-observer-renewal/$PROFILE"
+      - name: Run the exact original saved input baseline and original observer off and on with all original sanitizers
+        shell: bash
+        run: |
+          set -euo pipefail
+          image=$(python3 -c "import json; print('ubuntu@'+json.load(open('Tests/Production/Closeout/native-provider-container.lock.json'))['image_digest'])")
+          docker pull "$image"
+          docker image inspect "$image" > out/numerical-observer-container.json
+          docker run --rm --init --cpus=2 --shm-size=1g -v "$GITHUB_WORKSPACE:$GITHUB_WORKSPACE" -v /etc/ssl/certs/ca-certificates.crt:/run/orbiter-ci-system-ca.pem:ro -w "$GITHUB_WORKSPACE" \
+            -e GITHUB_ACTIONS -e RUNNER_OS -e GITHUB_WORKSPACE -e GITHUB_SHA -e PROFILE \
+            "$image" bash Tests/Production/Closeout/prepare_hosted_numerical_observer_network.sh Tests/Production/Closeout/prepare_hosted_numerical_observer.sh 2>&1 | tee out/numerical-observer-container.log
+      - name: Preserve bounded failure diagnostics without erasing partial outputs
+        if: failure()
+        shell: python
+        run: |
+          from pathlib import Path
+          for pattern in ('out/hosted-numerical-observer/*/*.log','out/numerical-observer-renewal/*/*.log','out/numerical-observer-renewal/*/baseline/console.log','out/numerical-observer-renewal/*/equivalence/*/console.log'):
+              for p in sorted(Path('.').glob(pattern)):
+                  print(str(p)+':\n'+p.read_text(errors='replace')[-12000:])
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: original-save-numerical-observer-three-world-full-raw
+          retention-days: 14
+          compression-level: 0
+          include-hidden-files: true
+          path: |
+            out/hosted-numerical-observer/${{ env.PROFILE }}/**
+            out/numerical-observer-renewal/${{ env.PROFILE }}/*.json
+            out/numerical-observer-renewal/${{ env.PROFILE }}/*.log
+            out/numerical-observer-renewal/${{ env.PROFILE }}/*.txt
+            out/numerical-observer-retained-units/${{ env.PROFILE }}/**
+            out/native-api-source/*/*.json
+            out/native-api-source/*/*.body
+            out/numerical-observer-network/**
+            out/original-package-official-pool/${{ env.PROFILE }}/**
+            out/numerical-observer-container.json
+            out/numerical-observer-container.log
+            out/numerical-observer-compiler-prerequisite.json
+            out/numerical-observer-renewal-controls.json
+            out/native-provider-restoration/restoration.json
+            out/mesa-topology-restoration/restoration.json
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: original-save-numerical-observer-three-world-small-receipt
+          retention-days: 14
+          compression-level: 3
+          path: |
+            out/hosted-numerical-observer/${{ env.PROFILE }}/collection.json
+            out/hosted-numerical-observer/${{ env.PROFILE }}/packing-failure.json
+            out/numerical-observer-renewal/${{ env.PROFILE }}/collection.json
+            out/numerical-observer-renewal/${{ env.PROFILE }}/proof.json
+            out/numerical-observer-renewal/${{ env.PROFILE }}/original-audit.json
+            out/numerical-observer-renewal/${{ env.PROFILE }}/equivalence/capture.json
+            out/numerical-observer-renewal/${{ env.PROFILE }}/baseline/process-receipt.json
+            out/numerical-observer-renewal/${{ env.PROFILE }}/equivalence/*/process-result.json
+            out/numerical-observer-renewal/${{ env.PROFILE }}/baseline/invocation.json
+            out/numerical-observer-renewal/${{ env.PROFILE }}/equivalence/*/diagnostic-invocation.json
+            out/numerical-observer-renewal/${{ env.PROFILE }}/*-process.json
+            out/numerical-observer-renewal-controls.json
+            out/numerical-observer-compiler-prerequisite.json
+      - uses: actions/upload-artifact@v7
+        if: failure() && hashFiles('out/hosted-numerical-observer/*/raw-index.json') == ''
+        with:
+          name: unqualified-numerical-observer-partial-files
+          retention-days: 14
+          compression-level: 3
+          include-hidden-files: true
+          path: out/numerical-observer-renewal/${{ env.PROFILE }}/**

@@ -55,6 +55,7 @@ def main():
             symbols=subprocess.check_output(['nm','-D','--defined-only',str(binary)],text=True);require('_ZN7orbiter10production7Session11EndTimeStep' in symbols,'Actual read-only session forwarding hook required')
             (a.output/(kind+'-dynamic.txt')).write_text(dynamic);(a.output/(kind+'-symbols.txt')).write_text(symbols)
             report['commands'].append(dict(kind=kind,actual_argv=argv,actual_pid=owned[0]['pid'],start_ticks=owned[0]['start_ticks'],actual_returncode=0,process_receipt_sha256=sha(a.output/(kind+'-process.json')),log_sha256=sha(log),output=str(binary),output_sha256=sha(binary),dynamic_sha256=sha(a.output/(kind+'-dynamic.txt')),symbols_sha256=sha(a.output/(kind+'-symbols.txt'))));save()
+        require(sha(Path(report['actual_compiler']))==report['actual_compiler_sha256'],'Actual compiler executable changed during original observer compilation')
         require(all(sha(p)==d for p,d in runtime.items()) and all(sha(ROOT/name)==digest for name,digest in guards.items()) and sha(header)==sdk_report['header_sha256'],'Original runtime, source and derived SDK must remain unchanged during actual compilation')
         report.update(status='built-two-unchanged-readonly-numerical-observers-only',actual_original_compiler_processes=2,scope='Component compilation only. No simulator, observation capture, equivalence, numerical/class/candidate or acceptance qualification.')
     except BaseException as error:report.update(status='failed-or-incomplete-unqualified',error=str(error));raise

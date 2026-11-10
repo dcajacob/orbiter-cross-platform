@@ -1,0 +1,11 @@
+{
+  "protocol": "phase6-recovered-original-Windows-saved-input-only-v1",
+  "original_path": "/home/dan/Shared/OrbiterPhase6-Codex-20261105-0240d516/reload-internal-cache-capture-v1/saved-input.scn",
+  "sha256": "afc91115951ec44a81cffb6ffa34c00191f9b005aac3f14cf94b21de171b0538",
+  "bytes": 2520,
+  "existing_frozen_reference": "Tests/Production/Math/Reference/ReloadAtan2/provenance.json",
+  "original_comparison_sha256": "10e70df810dd1dfaf24b36578691ef39319c05429ce4f3bd244f3f755276e179",
+  "automatic_refresh": false,
+  "old_capture_relabelled": false,
+  "phase6_complete": false
+}

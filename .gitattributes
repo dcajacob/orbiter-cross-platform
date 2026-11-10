@@ -21,3 +21,6 @@ GravityModels/jgl165p1.sha -text
 
 # Local VM receipts bind these executed Python scripts to exact Git blob bytes.
 Tests/Production/RemainingStockPersistence/LocalVM/*.py text eol=lf
+
+# Recovered numerical diagnostic input keeps the original Windows save bytes.
+Tests/Production/Closeout/NumericalRecovery/original-Windows-saved-input.scn -text whitespace=cr-at-eol
