@@ -1,0 +1,63 @@
+{
+  "repository": {
+    "owner": "dcajacob",
+    "repo": "orbiter-cross-platform"
+  },
+  "run": {
+    "id": 42782016666,
+    "head_sha": "2f98af3e37b8b5b79d951c82ba51aabd51618768",
+    "head_branch": "qualification/native-interaction-independent-debug-v1",
+    "path": ".github/workflows/phase6-native-interaction-independent-debug.yml",
+    "run_attempt": 1,
+    "status": "completed",
+    "conclusion": "success",
+    "repository": {
+      "private": false,
+      "full_name": "dcajacob/orbiter-cross-platform"
+    }
+  },
+  "jobs": [
+    {
+      "id": 129714055320,
+      "name": "Independently replay published original interaction Debug-sse2",
+      "run_id": 42782016666,
+      "head_sha": "2f98af3e37b8b5b79d951c82ba51aabd51618768",
+      "labels": [
+        "ubuntu-24.04"
+      ],
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "id": 129714055769,
+      "name": "Independently replay published original interaction Debug-automatic",
+      "run_id": 42782016666,
+      "head_sha": "2f98af3e37b8b5b79d951c82ba51aabd51618768",
+      "labels": [
+        "ubuntu-24.04"
+      ],
+      "status": "completed",
+      "conclusion": "success"
+    }
+  ],
+  "artifact": {
+    "id": 13746652501,
+    "node_id": "MDg6QXJ0aWZhY3QxMzc0NjY1MjUwMQ==",
+    "name": "independent-original-interaction-raw-witness-Debug-automatic",
+    "size_in_bytes": 1089161,
+    "url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/actions/artifacts/13746652501",
+    "archive_download_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/actions/artifacts/13746652501/zip",
+    "expired": false,
+    "digest": "sha256:a4006350b4a340b4d014acd241dc5b83b77a9e935f3c02f36ada918e24ce5974",
+    "created_at": "2026-11-10T08:28:09Z",
+    "updated_at": "2026-11-10T08:28:09Z",
+    "expires_at": "2026-11-24T08:28:08Z",
+    "workflow_run": {
+      "id": 42782016666,
+      "repository_id": 1440551273,
+      "head_repository_id": 1440551273,
+      "head_branch": "qualification/native-interaction-independent-debug-v1",
+      "head_sha": "2f98af3e37b8b5b79d951c82ba51aabd51618768"
+    }
+  }
+}

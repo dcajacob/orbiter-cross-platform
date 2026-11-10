@@ -1,0 +1,69 @@
+{
+  "protocol": "phase6-complete-published-interaction-receipt-inputs-v1",
+  "expected_profiles": [
+    "Debug-automatic",
+    "Debug-sse2"
+  ],
+  "profiles": {
+    "Debug-automatic": {
+      "metadata": {
+        "source": "2f98af3e37b8b5b79d951c82ba51aabd51618768",
+        "run_id": 42782016666,
+        "branch": "qualification/native-interaction-independent-debug-v1",
+        "workflow": ".github/workflows/phase6-native-interaction-independent-debug.yml",
+        "jobs": {
+          "129714055320": "Independently replay published original interaction Debug-sse2",
+          "129714055769": "Independently replay published original interaction Debug-automatic"
+        },
+        "artifact_id": 13746946896,
+        "artifact_name": "independently-verified-original-interaction-Debug-automatic",
+        "archive_bytes": 87634,
+        "archive_sha256": "1f470b61fac758154622dc6a5863a6d025065d03d1db1bdb35775e5e85f5e671"
+      },
+      "witness": {
+        "source": "2f98af3e37b8b5b79d951c82ba51aabd51618768",
+        "run_id": 42782016666,
+        "branch": "qualification/native-interaction-independent-debug-v1",
+        "workflow": ".github/workflows/phase6-native-interaction-independent-debug.yml",
+        "jobs": {
+          "129714055320": "Independently replay published original interaction Debug-sse2",
+          "129714055769": "Independently replay published original interaction Debug-automatic"
+        },
+        "artifact_id": 13746652501,
+        "artifact_name": "independent-original-interaction-raw-witness-Debug-automatic",
+        "archive_bytes": 1089161,
+        "archive_sha256": "a4006350b4a340b4d014acd241dc5b83b77a9e935f3c02f36ada918e24ce5974"
+      }
+    },
+    "Debug-sse2": {
+      "metadata": {
+        "source": "2f98af3e37b8b5b79d951c82ba51aabd51618768",
+        "run_id": 42782016666,
+        "branch": "qualification/native-interaction-independent-debug-v1",
+        "workflow": ".github/workflows/phase6-native-interaction-independent-debug.yml",
+        "jobs": {
+          "129714055320": "Independently replay published original interaction Debug-sse2",
+          "129714055769": "Independently replay published original interaction Debug-automatic"
+        },
+        "artifact_id": 13746034499,
+        "artifact_name": "independently-verified-original-interaction-Debug-sse2",
+        "archive_bytes": 87362,
+        "archive_sha256": "0a3d2a37b4310259d70d2dc919f3f3488dfdfa9b8f7696aeef4010eb013cfe8d"
+      },
+      "witness": {
+        "source": "2f98af3e37b8b5b79d951c82ba51aabd51618768",
+        "run_id": 42782016666,
+        "branch": "qualification/native-interaction-independent-debug-v1",
+        "workflow": ".github/workflows/phase6-native-interaction-independent-debug.yml",
+        "jobs": {
+          "129714055320": "Independently replay published original interaction Debug-sse2",
+          "129714055769": "Independently replay published original interaction Debug-automatic"
+        },
+        "artifact_id": 13746921996,
+        "artifact_name": "independent-original-interaction-raw-witness-Debug-sse2",
+        "archive_bytes": 1088194,
+        "archive_sha256": "860486899a8d1358bf83ab1cde6bfe7491582e49a0bc5a7c34013b3c21e90ca2"
+      }
+    }
+  }
+}

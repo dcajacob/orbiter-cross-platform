@@ -95,3 +95,11 @@ jobs:
             out/class-interaction-published/${{ env.PROFILE }}/*.json
             out/class-interaction-published/${{ env.PROFILE }}/*.log
             out/published-interaction-controls.json
+            out/reference-api/*.json
+            out/reference-api/*.body
+            out/reference-api/first-job.log
+            out/reference-audit-restoration/restoration.json
+            out/native-api-source/*/*.json
+            out/native-api-source/*/*.body
+            out/native-provider-restoration/restoration.json
+            out/mesa-topology-restoration/restoration.json
