@@ -38,7 +38,7 @@ def main():
             path=ROOT/name;require(path.read_bytes()==subprocess.check_output(['git','show',COMPILED+':'+name]),'Original read-only observer source may not change');guards[name]=sha(path)
         sdk_report=sdk.restore(a.profile,build/'build.json',a.output/'original-SDK-header-derivation.json');header=build/'engine/native-sdk/OrbiterNativeBuild.h'
         actual_engine=abi_tokens((build/'engine/liborbiter_production_boundary.so').read_bytes());require(len(actual_engine)==1,'One actual retained compiler ABI required')
-        macros=host_macros(header,a.output/'actual-host-preprocessor.log');require(macros['actual_cpp_abi']==actual_engine[0],'Actual standard host compiler must match retained engine ABI; no spoofing')
+        macros=host_macros(header,a.output);require(macros['actual_cpp_abi']==actual_engine[0],'Actual standard host compiler must match retained engine ABI; no spoofing')
         report.update(actual_engine_CPP_ABI=actual_engine[0],actual_host_preprocessor=macros,original_sources_sha256=guards,original_SDK_header_derivation=sdk_report);save()
         identities=set()
         for kind in ('sdk','internal'):
