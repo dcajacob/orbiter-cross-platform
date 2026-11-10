@@ -34,6 +34,12 @@
       "artifact_id": 13728946174,
       "archive_bytes": 185394175,
       "archive_sha256": "7e72e7327d70987e0c6dd06dfc3aa0288d507a4856042a94857abf3bee1456b2"
+    },
+    "Release-sse2": {
+      "job_id": 129543903593,
+      "artifact_id": 13729029002,
+      "archive_bytes": 185405802,
+      "archive_sha256": "8b848d1e982e2b01ba41875326b540d662d031fdb1d4704639b48269e57d8792"
     }
   },
   "scope": "Only each explicitly completed profile; other producer jobs and the overall run retain their actual states. No complete class or normal-admission qualification."

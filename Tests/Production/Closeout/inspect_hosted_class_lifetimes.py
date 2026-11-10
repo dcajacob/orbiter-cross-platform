@@ -34,7 +34,7 @@ def validate_api(record,profile):
     for job_id in (lock['readiness_job_id'],pin['job_id']):
         selected=next(j for j in jobs if j['id']==job_id)
         require(selected['status']=='completed' and selected['conclusion']=='success',
-                'Only an actually completed successful selected profile and readiness may be audited')
+                'Only an already-completed successful selected profile and readiness may be audited')
     require(artifact['id']==pin['artifact_id'] and artifact['name']=='original-class-lifetime-renewal-'+profile and
             artifact['expired'] is False and artifact['size_in_bytes']==pin['archive_bytes'] and
             artifact['digest']=='sha256:'+pin['archive_sha256'] and artifact['workflow_run']['id']==run['id'] and
