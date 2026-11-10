@@ -24,12 +24,32 @@ FIELDS=capabilities.FIELDS
 def sources():
     result={}
     for name in ('RemainingVessels/capabilities.py','RemainingVessels/native.py','RemainingVessels/lifetimes.py',
-                 'RemainingVessels/NativeProbe.cpp','StockVessels/Observation.h','RemainingStock/Details.h','Closeout/class_eligibility.py'):
+                 'RemainingVessels/NativeProbe.cpp','StockVessels/Observation.h','RemainingStock/Details.h','RemainingStock/cases.json','Closeout/class_eligibility.py'):
         relative='Tests/Production/'+name;body=subprocess.check_output(['git','-C',str(ROOT),'show',COMPILED+':'+relative])
         require((ROOT/relative).read_bytes()==body,'Original complete capability collector/observer/auditor changed: '+relative)
         result[relative]=hashlib.sha256(body).hexdigest()
     require(len(FIELDS)==17,'All original exact SDK capability fields required')
     return result
+
+
+def validate_parent(parent,profile,cases):
+    require(len(cases)==38 and parent['producer_commit']==ORIGINAL and parent['protocol']=='remaining-stock-matched-clock-v2' and
+            parent['host']=='repaired-original-windows' and parent['status']=='captured-awaiting-independent-audit' and
+            parent['diagnostic_only'] is False and not parent['failures'] and
+            parent['cases_requested']==list(cases) and set(parent['cases'])==set(cases) and
+            parent['configuration']+'-'+parent['math_profile']==profile and parent['runtime_variant_unchanged'] is True and
+            parent['observer_sources_unchanged'] is True and parent['actual_original_simulation_data_unchanged'] is True and
+            parent['native_admission_qualified'] is False and parent['phase6_complete'] is False and
+            all(len(v['runs'])==2 for v in parent['cases'].values()),'Complete actual original 38-scene/two-repeat profile required')
+
+
+def validate_variant(parent,record,variant):
+    expected=dict(protocol=parent['protocol'],protocol_sha256_lf=parent['protocol_sha256_lf'],
+                  original_application_and_sdk_source=parent['original_application_and_sdk_source'],producer_commit=ORIGINAL,
+                  runtime_variant_manifest_sha256=parent['runtime_variant_manifest_sha256'],frames=960,fixed_step=1/64,
+                  capture_tick=800,diagnostic_only=False,cases_requested=parent['cases_requested'])
+    require(variant==expected and record['status']=='captured' and record['process_returncode']==0 and
+            record['finalized_ticks']==961,'Actual original per-run 960-frame contract or 961 finalized ticks differ')
 
 
 def initial_signatures(path,declared,families):
@@ -84,10 +104,7 @@ def main():
         global_signatures=set();selected_signatures=set();reference_files={};profiles={};rows=0
         for profile in PROFILES:
             folder=base/'transport'/profile/'remaining-stock-repaired';parent_path=folder/'capture.json';parent=load(parent_path)
-            require(parent['producer_commit']==ORIGINAL and parent['protocol']=='remaining-stock-matched-clock-v2' and
-                    parent['status']=='captured-awaiting-independent-audit' and parent['diagnostic_only'] is False and
-                    not parent['failures'] and parent['repeats']==2 and parent['frames']==960 and set(parent['cases'])==set(cases) and
-                    parent['configuration']+'-'+parent['math_profile']==profile,'Complete actual original profile required')
+            validate_parent(parent,profile,cases)
             reference_files[str(parent_path)]=sha(parent_path)
             members=restored['original_api_archive_bindings'][profile]['decoded_members_sha256']
             require(reference_files[str(parent_path)]==members['remaining-stock-repaired/capture.json'],'Actual original parent differs from its independently audited API member')
@@ -98,6 +115,11 @@ def main():
                     relative=name+'-'+str(repeat)+'/stock-vessel-state.csv';path=folder/relative;value=sha(path)
                     require(value==record['files_sha256']['stock-vessel-state.csv']==members['remaining-stock-repaired/'+relative],
                             'Actual initial SDK witness differs from the original API/capture record')
+                    variant_relative=name+'-'+str(repeat)+'/reference-variant.json';variant_path=folder/variant_relative
+                    require(sha(variant_path)==record['files_sha256']['reference-variant.json']==members['remaining-stock-repaired/'+variant_relative],
+                            'Original per-run frame descriptor differs from its actual API/capture witness')
+                    validate_variant(parent,record,load(variant_path))
+                    reference_files[str(variant_path)]=sha(variant_path)
                     reference_files[str(path)]=value;observed=initial_signatures(path,case['declared_vessels'],families)
                     actual.update(observed);rows+=1
                     if name in CASES:selected.update(observed)
