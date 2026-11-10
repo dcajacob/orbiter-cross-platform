@@ -1,0 +1,91 @@
+name: Phase 6 Actual Original Fixture Host Compiler Bridge Control
+on:
+  push:
+    branches: ['qualification/rejection-fixture-compiler-bridge-control-v1']
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: phase6-rejection-sdk-inspection-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  inspect:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    env:
+      PROFILE: Debug-sse2
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - name: Preserve all original controls before read only inspection
+        run: mkdir -p out && python3 -B Tests/Production/Closeout/run_controls.py --output out/rejection-sdk-inspection-controls.json
+      - name: Retain only exact original Debug sse2 binary witness bytes
+        uses: actions/github-script@v8
+        with:
+          script: |
+            const fs=require('fs'),crypto=require('crypto'),{owner,repo}=context.repo;
+            if(owner!=='dcajacob'||repo!=='orbiter-cross-platform'||(await github.rest.repos.get({owner,repo})).data.private)throw Error('Exact public repository required');
+            const run=(await github.rest.actions.getWorkflowRun({owner,repo,run_id:42519601899})).data;
+            const jobs=await github.paginate(github.rest.actions.listJobsForWorkflowRun,{owner,repo,run_id:42519601899,per_page:100});
+            const artifact=(await github.rest.actions.getArtifact({owner,repo,artifact_id:13633311229})).data;
+            const base='out/rejection-sdk-inspection-input';fs.mkdirSync(base,{recursive:true});
+            fs.writeFileSync(base+'/api.json',JSON.stringify({repository:context.repo,run,jobs,artifact},null,2),{flag:'wx'});
+            if(run.id!==42519601899||run.head_sha!=='ccc02c8a34bd1f227624d8778a141e8736ae8111'||run.run_attempt!==1||run.status!=='completed'||run.conclusion!=='failure'||artifact.id!==13633311229||artifact.name!=='phase6-full-native-Debug-sse2'||artifact.expired||artifact.size_in_bytes!==82507652||artifact.digest!=='sha256:11f150fffd8b02bf6f9d438a4aff9b37a203c2d9db4eea8ae2905ff078d2898f')throw Error('Exact original preserved compiled source required');
+            require('./.github/scripts/phase6-download-native-api-inputs.cjs').validateJobs('native',run,jobs);
+            const bytes=Buffer.from((await require('./.github/scripts/phase6-download-bound-artifact.cjs')({github,owner,repo,source:{run,jobs},artifact,base,core})).data);
+            if(bytes.length!==82507652||crypto.createHash('sha256').update(bytes).digest('hex')!=='11f150fffd8b02bf6f9d438a4aff9b37a203c2d9db4eea8ae2905ff078d2898f')throw Error('Exact original binary witness archive bytes differ');
+            fs.writeFileSync(base+'/producer.zip',bytes,{flag:'wx'});
+      - name: Read every SDK witness and inspect ELF exports without running or loading any binary
+        run: >-
+          python3 -B Tests/Production/Closeout/inspect_rejection_sdk_header_restoration.py
+          --api out/rejection-sdk-inspection-input/api.json
+          --archive out/rejection-sdk-inspection-input/producer.zip
+          --output out/rejection-sdk-inspection
+      - name: Execute all seven exact original fixture compiler requests with real matching host compiler and no simulator
+        shell: bash
+        run: |
+          set -euo pipefail
+          sudo -n --preserve-env=GITHUB_ACTIONS,RUNNER_OS,GITHUB_WORKSPACE,GITHUB_SHA,PROFILE python3 -B Tests/Production/Closeout/rejection_fixture_compiler_bridge.py serve --profile "$PROFILE" > out/fixture-compiler-server.log 2>&1 &
+          fixture_bridge_pid=$!
+          cleanup_fixture_bridge() {
+            if test -f "out/rejection-fixture-compiler/$PROFILE/server.pid"; then
+              fixture_service_pid=$(cat "out/rejection-fixture-compiler/$PROFILE/server.pid")
+              if [[ "$fixture_service_pid" =~ ^[1-9][0-9]*$ ]]; then sudo -n kill "$fixture_service_pid" 2>/dev/null || true; fi
+            fi
+            kill "$fixture_bridge_pid" 2>/dev/null || true
+          }
+          trap cleanup_fixture_bridge EXIT
+          for probe_index in $(seq 1 100); do
+            test ! -f "out/rejection-fixture-compiler/$PROFILE/ready" || break
+            kill -0 "$fixture_bridge_pid"
+            sleep .1
+          done
+          test -f "out/rejection-fixture-compiler/$PROFILE/ready"
+          mkdir -p "out/native-class-rejections/$PROFILE/fixtures"
+          sudo -n --preserve-env=GITHUB_ACTIONS,RUNNER_OS,GITHUB_WORKSPACE,GITHUB_SHA,PROFILE python3 -B - <<'PYCLIENT'
+          import os,sys
+          sys.path.insert(0,'Tests/Production/Closeout')
+          import rejection_fixture_compiler_bridge as bridge
+          profile=os.environ['PROFILE']
+          for index in range(7):
+              sys.argv=bridge.expected_argv(profile,index)
+              assert bridge.client()==0
+          PYCLIENT
+          wait "$fixture_bridge_pid"
+          python3 -B Tests/Production/Closeout/rejection_fixture_compiler_bridge.py verify --profile "$PROFILE"
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: original-fixture-host-compiler-bridge-control
+          retention-days: 14
+          path: |
+            out/fixture-compiler-server.log
+            out/rejection-fixture-compiler/${{ env.PROFILE }}/*.json
+            out/rejection-fixture-compiler/${{ env.PROFILE }}/*.log
+            out/native-class-rejections/${{ env.PROFILE }}/fixtures/*.so
+            out/rejection-sdk-inspection-controls.json
+            out/rejection-sdk-inspection/**/*.json
+            out/rejection-sdk-inspection-input/api.json
+            out/rejection-sdk-inspection-input/*.body
+            out/rejection-sdk-inspection-input/download-transport-attempts.json
