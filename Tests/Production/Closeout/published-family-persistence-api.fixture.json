@@ -1,0 +1,780 @@
+{
+  "repository": {
+    "owner": "dcajacob",
+    "repo": "orbiter-cross-platform"
+  },
+  "run": {
+    "id": 42795115971,
+    "name": "Phase 6 Reaudit Original Family Persistence From Complete Normal Captures",
+    "node_id": "WFR_kwLOVd0Rac8AAAAJ9smlww",
+    "head_branch": "qualification/native-family-persistence-v1",
+    "head_sha": "6cee4bee7e2c258cbfce003184d2b713421cf193",
+    "path": ".github/workflows/phase6-native-family-persistence.yml",
+    "display_title": "Reaudit family persistence from exact complete normal captures",
+    "run_number": 1,
+    "event": "push",
+    "status": "completed",
+    "conclusion": "success",
+    "workflow_id": 413127050,
+    "check_suite_id": 115898241557,
+    "check_suite_node_id": "CS_kwDOVd0Rac8AAAAa_BLSFQ",
+    "url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/actions/runs/42795115971",
+    "html_url": "https://github.com/dcajacob/orbiter-cross-platform/actions/runs/42795115971",
+    "pull_requests": [],
+    "created_at": "2026-11-10T09:58:06Z",
+    "updated_at": "2026-11-10T10:18:26Z",
+    "actor": {
+      "login": "dcajacob",
+      "id": 3210634,
+      "node_id": "MDQ6VXNlcjMyMTA2MzQ=",
+      "avatar_url": "https://avatars.githubusercontent.com/u/3210634?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/dcajacob",
+      "html_url": "https://github.com/dcajacob",
+      "followers_url": "https://api.github.com/users/dcajacob/followers",
+      "following_url": "https://api.github.com/users/dcajacob/following{/other_user}",
+      "gists_url": "https://api.github.com/users/dcajacob/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/dcajacob/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/dcajacob/subscriptions",
+      "organizations_url": "https://api.github.com/users/dcajacob/orgs",
+      "repos_url": "https://api.github.com/users/dcajacob/repos",
+      "events_url": "https://api.github.com/users/dcajacob/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/dcajacob/received_events",
+      "type": "User",
+      "user_view_type": "public",
+      "site_admin": false
+    },
+    "run_attempt": 1,
+    "referenced_workflows": [],
+    "run_started_at": "2026-11-10T09:58:06Z",
+    "triggering_actor": {
+      "login": "dcajacob",
+      "id": 3210634,
+      "node_id": "MDQ6VXNlcjMyMTA2MzQ=",
+      "avatar_url": "https://avatars.githubusercontent.com/u/3210634?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/dcajacob",
+      "html_url": "https://github.com/dcajacob",
+      "followers_url": "https://api.github.com/users/dcajacob/followers",
+      "following_url": "https://api.github.com/users/dcajacob/following{/other_user}",
+      "gists_url": "https://api.github.com/users/dcajacob/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/dcajacob/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/dcajacob/subscriptions",
+      "organizations_url": "https://api.github.com/users/dcajacob/orgs",
+      "repos_url": "https://api.github.com/users/dcajacob/repos",
+      "events_url": "https://api.github.com/users/dcajacob/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/dcajacob/received_events",
+      "type": "User",
+      "user_view_type": "public",
+      "site_admin": false
+    },
+    "jobs_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/actions/runs/42795115971/jobs",
+    "logs_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/actions/runs/42795115971/logs",
+    "check_suite_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/check-suites/115898241557",
+    "artifacts_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/actions/runs/42795115971/artifacts",
+    "cancel_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/actions/runs/42795115971/cancel",
+    "rerun_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/actions/runs/42795115971/rerun",
+    "previous_attempt_url": null,
+    "workflow_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/actions/workflows/413127050",
+    "head_commit": {
+      "id": "6cee4bee7e2c258cbfce003184d2b713421cf193",
+      "tree_id": "2db37a48d4fade8d0657e29b00e2ce46a09e3f14",
+      "message": "Reaudit family persistence from exact complete normal captures",
+      "timestamp": "2026-11-10T09:57:37Z",
+      "author": {
+        "name": "Dan CaJacob",
+        "email": "3210634+dcajacob@users.noreply.github.com"
+      },
+      "committer": {
+        "name": "Dan CaJacob",
+        "email": "3210634+dcajacob@users.noreply.github.com"
+      }
+    },
+    "repository": {
+      "id": 1440551273,
+      "node_id": "R_kgDOVd0RaQ",
+      "name": "orbiter-cross-platform",
+      "full_name": "dcajacob/orbiter-cross-platform",
+      "private": false,
+      "owner": {
+        "login": "dcajacob",
+        "id": 3210634,
+        "node_id": "MDQ6VXNlcjMyMTA2MzQ=",
+        "avatar_url": "https://avatars.githubusercontent.com/u/3210634?v=4",
+        "gravatar_id": "",
+        "url": "https://api.github.com/users/dcajacob",
+        "html_url": "https://github.com/dcajacob",
+        "followers_url": "https://api.github.com/users/dcajacob/followers",
+        "following_url": "https://api.github.com/users/dcajacob/following{/other_user}",
+        "gists_url": "https://api.github.com/users/dcajacob/gists{/gist_id}",
+        "starred_url": "https://api.github.com/users/dcajacob/starred{/owner}{/repo}",
+        "subscriptions_url": "https://api.github.com/users/dcajacob/subscriptions",
+        "organizations_url": "https://api.github.com/users/dcajacob/orgs",
+        "repos_url": "https://api.github.com/users/dcajacob/repos",
+        "events_url": "https://api.github.com/users/dcajacob/events{/privacy}",
+        "received_events_url": "https://api.github.com/users/dcajacob/received_events",
+        "type": "User",
+        "user_view_type": "public",
+        "site_admin": false
+      },
+      "html_url": "https://github.com/dcajacob/orbiter-cross-platform",
+      "description": "Incremental native Linux and Windows portability work for Orbiter, with headless physics parity tests. Based on orbitersim/orbiter.",
+      "fork": false,
+      "url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform",
+      "forks_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/forks",
+      "keys_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/keys{/key_id}",
+      "collaborators_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/collaborators{/collaborator}",
+      "teams_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/teams",
+      "hooks_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/hooks",
+      "issue_events_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/issues/events{/number}",
+      "events_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/events",
+      "assignees_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/assignees{/user}",
+      "branches_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/branches{/branch}",
+      "tags_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/tags",
+      "blobs_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/git/blobs{/sha}",
+      "git_tags_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/git/tags{/sha}",
+      "git_refs_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/git/refs{/sha}",
+      "trees_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/git/trees{/sha}",
+      "statuses_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/statuses/{sha}",
+      "languages_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/languages",
+      "stargazers_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/stargazers",
+      "contributors_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/contributors",
+      "subscribers_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/subscribers",
+      "subscription_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/subscription",
+      "commits_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/commits{/sha}",
+      "git_commits_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/git/commits{/sha}",
+      "comments_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/comments{/number}",
+      "issue_comment_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/issues/comments{/number}",
+      "contents_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/contents/{+path}",
+      "compare_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/compare/{base}...{head}",
+      "merges_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/merges",
+      "archive_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/{archive_format}{/ref}",
+      "downloads_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/downloads",
+      "issues_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/issues{/number}",
+      "pulls_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/pulls{/number}",
+      "milestones_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/milestones{/number}",
+      "notifications_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/notifications{?since,all,participating}",
+      "labels_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/labels{/name}",
+      "releases_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/releases{/id}",
+      "deployments_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/deployments"
+    },
+    "head_repository": {
+      "id": 1440551273,
+      "node_id": "R_kgDOVd0RaQ",
+      "name": "orbiter-cross-platform",
+      "full_name": "dcajacob/orbiter-cross-platform",
+      "private": false,
+      "owner": {
+        "login": "dcajacob",
+        "id": 3210634,
+        "node_id": "MDQ6VXNlcjMyMTA2MzQ=",
+        "avatar_url": "https://avatars.githubusercontent.com/u/3210634?v=4",
+        "gravatar_id": "",
+        "url": "https://api.github.com/users/dcajacob",
+        "html_url": "https://github.com/dcajacob",
+        "followers_url": "https://api.github.com/users/dcajacob/followers",
+        "following_url": "https://api.github.com/users/dcajacob/following{/other_user}",
+        "gists_url": "https://api.github.com/users/dcajacob/gists{/gist_id}",
+        "starred_url": "https://api.github.com/users/dcajacob/starred{/owner}{/repo}",
+        "subscriptions_url": "https://api.github.com/users/dcajacob/subscriptions",
+        "organizations_url": "https://api.github.com/users/dcajacob/orgs",
+        "repos_url": "https://api.github.com/users/dcajacob/repos",
+        "events_url": "https://api.github.com/users/dcajacob/events{/privacy}",
+        "received_events_url": "https://api.github.com/users/dcajacob/received_events",
+        "type": "User",
+        "user_view_type": "public",
+        "site_admin": false
+      },
+      "html_url": "https://github.com/dcajacob/orbiter-cross-platform",
+      "description": "Incremental native Linux and Windows portability work for Orbiter, with headless physics parity tests. Based on orbitersim/orbiter.",
+      "fork": false,
+      "url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform",
+      "forks_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/forks",
+      "keys_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/keys{/key_id}",
+      "collaborators_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/collaborators{/collaborator}",
+      "teams_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/teams",
+      "hooks_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/hooks",
+      "issue_events_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/issues/events{/number}",
+      "events_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/events",
+      "assignees_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/assignees{/user}",
+      "branches_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/branches{/branch}",
+      "tags_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/tags",
+      "blobs_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/git/blobs{/sha}",
+      "git_tags_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/git/tags{/sha}",
+      "git_refs_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/git/refs{/sha}",
+      "trees_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/git/trees{/sha}",
+      "statuses_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/statuses/{sha}",
+      "languages_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/languages",
+      "stargazers_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/stargazers",
+      "contributors_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/contributors",
+      "subscribers_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/subscribers",
+      "subscription_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/subscription",
+      "commits_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/commits{/sha}",
+      "git_commits_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/git/commits{/sha}",
+      "comments_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/comments{/number}",
+      "issue_comment_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/issues/comments{/number}",
+      "contents_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/contents/{+path}",
+      "compare_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/compare/{base}...{head}",
+      "merges_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/merges",
+      "archive_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/{archive_format}{/ref}",
+      "downloads_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/downloads",
+      "issues_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/issues{/number}",
+      "pulls_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/pulls{/number}",
+      "milestones_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/milestones{/number}",
+      "notifications_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/notifications{?since,all,participating}",
+      "labels_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/labels{/name}",
+      "releases_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/releases{/id}",
+      "deployments_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/deployments"
+    }
+  },
+  "jobs": [
+    {
+      "id": 129758201566,
+      "run_id": 42795115971,
+      "workflow_name": "Phase 6 Reaudit Original Family Persistence From Complete Normal Captures",
+      "head_branch": "qualification/native-family-persistence-v1",
+      "run_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/actions/runs/42795115971",
+      "run_attempt": 1,
+      "node_id": "CR_kwDOVd0Rac8AAAAeNjEG3g",
+      "head_sha": "6cee4bee7e2c258cbfce003184d2b713421cf193",
+      "url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/actions/jobs/129758201566",
+      "html_url": "https://github.com/dcajacob/orbiter-cross-platform/actions/runs/42795115971/job/129758201566",
+      "status": "completed",
+      "conclusion": "success",
+      "created_at": "2026-11-10T09:58:07Z",
+      "started_at": "2026-11-10T10:08:35Z",
+      "completed_at": "2026-11-10T10:17:04Z",
+      "name": "Reaudit original family persistence sse2 windows-save-reload",
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 1,
+          "started_at": "2026-11-10T10:08:36Z",
+          "completed_at": "2026-11-10T10:08:37Z"
+        },
+        {
+          "name": "Run actions/checkout@v7",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 2,
+          "started_at": "2026-11-10T10:08:37Z",
+          "completed_at": "2026-11-10T10:08:53Z"
+        },
+        {
+          "name": "Run actions/setup-python@v6",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 3,
+          "started_at": "2026-11-10T10:08:53Z",
+          "completed_at": "2026-11-10T10:08:53Z"
+        },
+        {
+          "name": "Preserve every original and new bounded helper control",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 4,
+          "started_at": "2026-11-10T10:08:53Z",
+          "completed_at": "2026-11-10T10:09:04Z"
+        },
+        {
+          "name": "Retain all eight exact physical proofs and only the two affected complete native raw captures on GitHub",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 5,
+          "started_at": "2026-11-10T10:09:04Z",
+          "completed_at": "2026-11-10T10:09:30Z"
+        },
+        {
+          "name": "Preserve every original Windows raw archive and both actual audit attempts",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 6,
+          "started_at": "2026-11-10T10:09:30Z",
+          "completed_at": "2026-11-10T10:09:51Z"
+        },
+        {
+          "name": "Independently restore every actual original member and unchanged retry history",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 7,
+          "started_at": "2026-11-10T10:09:51Z",
+          "completed_at": "2026-11-10T10:10:54Z"
+        },
+        {
+          "name": "Restore exact independently proven scalar without changed tolerances",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 8,
+          "started_at": "2026-11-10T10:10:54Z",
+          "completed_at": "2026-11-10T10:10:54Z"
+        },
+        {
+          "name": "Reexecute unchanged complete save content and direct persistence comparisons without recapture or flag rewrites",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 9,
+          "started_at": "2026-11-10T10:10:54Z",
+          "completed_at": "2026-11-10T10:17:00Z"
+        },
+        {
+          "name": "Run actions/upload-artifact@v7",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 10,
+          "started_at": "2026-11-10T10:17:00Z",
+          "completed_at": "2026-11-10T10:17:02Z"
+        },
+        {
+          "name": "Post Run actions/setup-python@v6",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 19,
+          "started_at": "2026-11-10T10:17:02Z",
+          "completed_at": "2026-11-10T10:17:02Z"
+        },
+        {
+          "name": "Post Run actions/checkout@v7",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 20,
+          "started_at": "2026-11-10T10:17:02Z",
+          "completed_at": "2026-11-10T10:17:03Z"
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 21,
+          "started_at": "2026-11-10T10:17:03Z",
+          "completed_at": "2026-11-10T10:17:03Z"
+        }
+      ],
+      "check_run_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/check-runs/129758201566",
+      "labels": [
+        "ubuntu-24.04"
+      ],
+      "runner_id": 1000007795,
+      "runner_name": "GitHub Actions 1000007795",
+      "runner_group_id": 0,
+      "runner_group_name": "GitHub Actions"
+    },
+    {
+      "id": 129758201986,
+      "run_id": 42795115971,
+      "workflow_name": "Phase 6 Reaudit Original Family Persistence From Complete Normal Captures",
+      "head_branch": "qualification/native-family-persistence-v1",
+      "run_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/actions/runs/42795115971",
+      "run_attempt": 1,
+      "node_id": "CR_kwDOVd0Rac8AAAAeNjEIgg",
+      "head_sha": "6cee4bee7e2c258cbfce003184d2b713421cf193",
+      "url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/actions/jobs/129758201986",
+      "html_url": "https://github.com/dcajacob/orbiter-cross-platform/actions/runs/42795115971/job/129758201986",
+      "status": "completed",
+      "conclusion": "success",
+      "created_at": "2026-11-10T09:58:07Z",
+      "started_at": "2026-11-10T09:58:09Z",
+      "completed_at": "2026-11-10T10:07:00Z",
+      "name": "Reaudit original family persistence automatic stock-writer",
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 1,
+          "started_at": "2026-11-10T09:58:10Z",
+          "completed_at": "2026-11-10T09:58:11Z"
+        },
+        {
+          "name": "Run actions/checkout@v7",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 2,
+          "started_at": "2026-11-10T09:58:11Z",
+          "completed_at": "2026-11-10T09:58:25Z"
+        },
+        {
+          "name": "Run actions/setup-python@v6",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 3,
+          "started_at": "2026-11-10T09:58:25Z",
+          "completed_at": "2026-11-10T09:58:26Z"
+        },
+        {
+          "name": "Preserve every original and new bounded helper control",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 4,
+          "started_at": "2026-11-10T09:58:26Z",
+          "completed_at": "2026-11-10T09:58:34Z"
+        },
+        {
+          "name": "Retain all eight exact physical proofs and only the two affected complete native raw captures on GitHub",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 5,
+          "started_at": "2026-11-10T09:58:34Z",
+          "completed_at": "2026-11-10T09:59:24Z"
+        },
+        {
+          "name": "Preserve every original Windows raw archive and both actual audit attempts",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 6,
+          "started_at": "2026-11-10T09:59:24Z",
+          "completed_at": "2026-11-10T10:01:04Z"
+        },
+        {
+          "name": "Independently restore every actual original member and unchanged retry history",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 7,
+          "started_at": "2026-11-10T10:01:04Z",
+          "completed_at": "2026-11-10T10:02:09Z"
+        },
+        {
+          "name": "Restore exact independently proven scalar without changed tolerances",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 8,
+          "started_at": "2026-11-10T10:02:09Z",
+          "completed_at": "2026-11-10T10:02:09Z"
+        },
+        {
+          "name": "Reexecute unchanged complete save content and direct persistence comparisons without recapture or flag rewrites",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 9,
+          "started_at": "2026-11-10T10:02:09Z",
+          "completed_at": "2026-11-10T10:06:55Z"
+        },
+        {
+          "name": "Run actions/upload-artifact@v7",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 10,
+          "started_at": "2026-11-10T10:06:55Z",
+          "completed_at": "2026-11-10T10:06:57Z"
+        },
+        {
+          "name": "Post Run actions/setup-python@v6",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 19,
+          "started_at": "2026-11-10T10:06:57Z",
+          "completed_at": "2026-11-10T10:06:58Z"
+        },
+        {
+          "name": "Post Run actions/checkout@v7",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 20,
+          "started_at": "2026-11-10T10:06:58Z",
+          "completed_at": "2026-11-10T10:06:58Z"
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 21,
+          "started_at": "2026-11-10T10:06:58Z",
+          "completed_at": "2026-11-10T10:06:58Z"
+        }
+      ],
+      "check_run_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/check-runs/129758201986",
+      "labels": [
+        "ubuntu-24.04"
+      ],
+      "runner_id": 1000007792,
+      "runner_name": "GitHub Actions 1000007792",
+      "runner_group_id": 0,
+      "runner_group_name": "GitHub Actions"
+    },
+    {
+      "id": 129758201989,
+      "run_id": 42795115971,
+      "workflow_name": "Phase 6 Reaudit Original Family Persistence From Complete Normal Captures",
+      "head_branch": "qualification/native-family-persistence-v1",
+      "run_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/actions/runs/42795115971",
+      "run_attempt": 1,
+      "node_id": "CR_kwDOVd0Rac8AAAAeNjEIhQ",
+      "head_sha": "6cee4bee7e2c258cbfce003184d2b713421cf193",
+      "url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/actions/jobs/129758201989",
+      "html_url": "https://github.com/dcajacob/orbiter-cross-platform/actions/runs/42795115971/job/129758201989",
+      "status": "completed",
+      "conclusion": "success",
+      "created_at": "2026-11-10T09:58:07Z",
+      "started_at": "2026-11-10T10:07:03Z",
+      "completed_at": "2026-11-10T10:18:25Z",
+      "name": "Reaudit original family persistence sse2 stock-writer",
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 1,
+          "started_at": "2026-11-10T10:07:04Z",
+          "completed_at": "2026-11-10T10:07:05Z"
+        },
+        {
+          "name": "Run actions/checkout@v7",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 2,
+          "started_at": "2026-11-10T10:07:05Z",
+          "completed_at": "2026-11-10T10:07:23Z"
+        },
+        {
+          "name": "Run actions/setup-python@v6",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 3,
+          "started_at": "2026-11-10T10:07:23Z",
+          "completed_at": "2026-11-10T10:07:23Z"
+        },
+        {
+          "name": "Preserve every original and new bounded helper control",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 4,
+          "started_at": "2026-11-10T10:07:23Z",
+          "completed_at": "2026-11-10T10:07:32Z"
+        },
+        {
+          "name": "Retain all eight exact physical proofs and only the two affected complete native raw captures on GitHub",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 5,
+          "started_at": "2026-11-10T10:07:32Z",
+          "completed_at": "2026-11-10T10:09:29Z"
+        },
+        {
+          "name": "Preserve every original Windows raw archive and both actual audit attempts",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 6,
+          "started_at": "2026-11-10T10:09:29Z",
+          "completed_at": "2026-11-10T10:12:20Z"
+        },
+        {
+          "name": "Independently restore every actual original member and unchanged retry history",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 7,
+          "started_at": "2026-11-10T10:12:20Z",
+          "completed_at": "2026-11-10T10:13:25Z"
+        },
+        {
+          "name": "Restore exact independently proven scalar without changed tolerances",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 8,
+          "started_at": "2026-11-10T10:13:25Z",
+          "completed_at": "2026-11-10T10:13:26Z"
+        },
+        {
+          "name": "Reexecute unchanged complete save content and direct persistence comparisons without recapture or flag rewrites",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 9,
+          "started_at": "2026-11-10T10:13:26Z",
+          "completed_at": "2026-11-10T10:18:20Z"
+        },
+        {
+          "name": "Run actions/upload-artifact@v7",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 10,
+          "started_at": "2026-11-10T10:18:20Z",
+          "completed_at": "2026-11-10T10:18:22Z"
+        },
+        {
+          "name": "Post Run actions/setup-python@v6",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 19,
+          "started_at": "2026-11-10T10:18:22Z",
+          "completed_at": "2026-11-10T10:18:22Z"
+        },
+        {
+          "name": "Post Run actions/checkout@v7",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 20,
+          "started_at": "2026-11-10T10:18:22Z",
+          "completed_at": "2026-11-10T10:18:23Z"
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 21,
+          "started_at": "2026-11-10T10:18:23Z",
+          "completed_at": "2026-11-10T10:18:23Z"
+        }
+      ],
+      "check_run_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/check-runs/129758201989",
+      "labels": [
+        "ubuntu-24.04"
+      ],
+      "runner_id": 1000007794,
+      "runner_name": "GitHub Actions 1000007794",
+      "runner_group_id": 0,
+      "runner_group_name": "GitHub Actions"
+    },
+    {
+      "id": 129758202442,
+      "run_id": 42795115971,
+      "workflow_name": "Phase 6 Reaudit Original Family Persistence From Complete Normal Captures",
+      "head_branch": "qualification/native-family-persistence-v1",
+      "run_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/actions/runs/42795115971",
+      "run_attempt": 1,
+      "node_id": "CR_kwDOVd0Rac8AAAAeNjEKSg",
+      "head_sha": "6cee4bee7e2c258cbfce003184d2b713421cf193",
+      "url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/actions/jobs/129758202442",
+      "html_url": "https://github.com/dcajacob/orbiter-cross-platform/actions/runs/42795115971/job/129758202442",
+      "status": "completed",
+      "conclusion": "success",
+      "created_at": "2026-11-10T09:58:07Z",
+      "started_at": "2026-11-10T09:58:09Z",
+      "completed_at": "2026-11-10T10:08:33Z",
+      "name": "Reaudit original family persistence automatic windows-save-reload",
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 1,
+          "started_at": "2026-11-10T09:58:10Z",
+          "completed_at": "2026-11-10T09:58:11Z"
+        },
+        {
+          "name": "Run actions/checkout@v7",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 2,
+          "started_at": "2026-11-10T09:58:11Z",
+          "completed_at": "2026-11-10T09:58:25Z"
+        },
+        {
+          "name": "Run actions/setup-python@v6",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 3,
+          "started_at": "2026-11-10T09:58:25Z",
+          "completed_at": "2026-11-10T09:58:25Z"
+        },
+        {
+          "name": "Preserve every original and new bounded helper control",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 4,
+          "started_at": "2026-11-10T09:58:25Z",
+          "completed_at": "2026-11-10T09:58:33Z"
+        },
+        {
+          "name": "Retain all eight exact physical proofs and only the two affected complete native raw captures on GitHub",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 5,
+          "started_at": "2026-11-10T09:58:33Z",
+          "completed_at": "2026-11-10T09:59:59Z"
+        },
+        {
+          "name": "Preserve every original Windows raw archive and both actual audit attempts",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 6,
+          "started_at": "2026-11-10T09:59:59Z",
+          "completed_at": "2026-11-10T10:02:45Z"
+        },
+        {
+          "name": "Independently restore every actual original member and unchanged retry history",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 7,
+          "started_at": "2026-11-10T10:02:45Z",
+          "completed_at": "2026-11-10T10:03:49Z"
+        },
+        {
+          "name": "Restore exact independently proven scalar without changed tolerances",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 8,
+          "started_at": "2026-11-10T10:03:49Z",
+          "completed_at": "2026-11-10T10:03:49Z"
+        },
+        {
+          "name": "Reexecute unchanged complete save content and direct persistence comparisons without recapture or flag rewrites",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 9,
+          "started_at": "2026-11-10T10:03:49Z",
+          "completed_at": "2026-11-10T10:08:28Z"
+        },
+        {
+          "name": "Run actions/upload-artifact@v7",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 10,
+          "started_at": "2026-11-10T10:08:28Z",
+          "completed_at": "2026-11-10T10:08:30Z"
+        },
+        {
+          "name": "Post Run actions/setup-python@v6",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 19,
+          "started_at": "2026-11-10T10:08:30Z",
+          "completed_at": "2026-11-10T10:08:31Z"
+        },
+        {
+          "name": "Post Run actions/checkout@v7",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 20,
+          "started_at": "2026-11-10T10:08:31Z",
+          "completed_at": "2026-11-10T10:08:31Z"
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 21,
+          "started_at": "2026-11-10T10:08:31Z",
+          "completed_at": "2026-11-10T10:08:31Z"
+        }
+      ],
+      "check_run_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/check-runs/129758202442",
+      "labels": [
+        "ubuntu-24.04"
+      ],
+      "runner_id": 1000007793,
+      "runner_name": "GitHub Actions 1000007793",
+      "runner_group_id": 0,
+      "runner_group_name": "GitHub Actions"
+    }
+  ],
+  "artifact": {
+    "id": 13753606594,
+    "node_id": "MDg6QXJ0aWZhY3QxMzc1MzYwNjU5NA==",
+    "name": "original-family-persistence-automatic-stock-writer",
+    "size_in_bytes": 7113231,
+    "url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/actions/artifacts/13753606594",
+    "archive_download_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/actions/artifacts/13753606594/zip",
+    "expired": false,
+    "digest": "sha256:b27cf5e8b2f0068d650a49a9db916c332bb110a11f0c1d777ccb9341a57a42fb",
+    "created_at": "2026-11-10T10:06:57Z",
+    "updated_at": "2026-11-10T10:06:57Z",
+    "expires_at": "2026-11-24T10:06:56Z",
+    "workflow_run": {
+      "id": 42795115971,
+      "repository_id": 1440551273,
+      "head_repository_id": 1440551273,
+      "head_branch": "qualification/native-family-persistence-v1",
+      "head_sha": "6cee4bee7e2c258cbfce003184d2b713421cf193"
+    }
+  }
+}

@@ -1,0 +1,77 @@
+{
+  "protocol": "phase6-complete-published-family-persistence-inputs-v1",
+  "repository": {
+    "owner": "dcajacob",
+    "repo": "orbiter-cross-platform"
+  },
+  "cells": {
+    "automatic/stock-writer": {
+      "source": "6cee4bee7e2c258cbfce003184d2b713421cf193",
+      "run_id": 42795115971,
+      "branch": "qualification/native-family-persistence-v1",
+      "workflow": ".github/workflows/phase6-native-family-persistence.yml",
+      "jobs": {
+        "129758201566": "Reaudit original family persistence sse2 windows-save-reload",
+        "129758201986": "Reaudit original family persistence automatic stock-writer",
+        "129758201989": "Reaudit original family persistence sse2 stock-writer",
+        "129758202442": "Reaudit original family persistence automatic windows-save-reload"
+      },
+      "job_id": 129758201986,
+      "artifact_id": 13753606594,
+      "artifact_name": "original-family-persistence-automatic-stock-writer",
+      "archive_bytes": 7113231,
+      "archive_sha256": "b27cf5e8b2f0068d650a49a9db916c332bb110a11f0c1d777ccb9341a57a42fb"
+    },
+    "automatic/windows-save-reload": {
+      "source": "6cee4bee7e2c258cbfce003184d2b713421cf193",
+      "run_id": 42795115971,
+      "branch": "qualification/native-family-persistence-v1",
+      "workflow": ".github/workflows/phase6-native-family-persistence.yml",
+      "jobs": {
+        "129758201566": "Reaudit original family persistence sse2 windows-save-reload",
+        "129758201986": "Reaudit original family persistence automatic stock-writer",
+        "129758201989": "Reaudit original family persistence sse2 stock-writer",
+        "129758202442": "Reaudit original family persistence automatic windows-save-reload"
+      },
+      "job_id": 129758202442,
+      "artifact_id": 13755380941,
+      "artifact_name": "original-family-persistence-automatic-windows-save-reload",
+      "archive_bytes": 7171988,
+      "archive_sha256": "8e2d7e3a96b3dc93418fb871df1d599c649f9776665ae816b51083950769468c"
+    },
+    "sse2/stock-writer": {
+      "source": "6cee4bee7e2c258cbfce003184d2b713421cf193",
+      "run_id": 42795115971,
+      "branch": "qualification/native-family-persistence-v1",
+      "workflow": ".github/workflows/phase6-native-family-persistence.yml",
+      "jobs": {
+        "129758201566": "Reaudit original family persistence sse2 windows-save-reload",
+        "129758201986": "Reaudit original family persistence automatic stock-writer",
+        "129758201989": "Reaudit original family persistence sse2 stock-writer",
+        "129758202442": "Reaudit original family persistence automatic windows-save-reload"
+      },
+      "job_id": 129758201989,
+      "artifact_id": 13755346906,
+      "artifact_name": "original-family-persistence-sse2-stock-writer",
+      "archive_bytes": 7107005,
+      "archive_sha256": "ffcee035a26ef1040a4886a52e7c8fdbdfea8860a7733a86db3411e41b308f47"
+    },
+    "sse2/windows-save-reload": {
+      "source": "6cee4bee7e2c258cbfce003184d2b713421cf193",
+      "run_id": 42795115971,
+      "branch": "qualification/native-family-persistence-v1",
+      "workflow": ".github/workflows/phase6-native-family-persistence.yml",
+      "jobs": {
+        "129758201566": "Reaudit original family persistence sse2 windows-save-reload",
+        "129758201986": "Reaudit original family persistence automatic stock-writer",
+        "129758201989": "Reaudit original family persistence sse2 stock-writer",
+        "129758202442": "Reaudit original family persistence automatic windows-save-reload"
+      },
+      "job_id": 129758201566,
+      "artifact_id": 13754467453,
+      "artifact_name": "original-family-persistence-sse2-windows-save-reload",
+      "archive_bytes": 7166806,
+      "archive_sha256": "7e333c3f6093365d1931e73b1069ef42364a74d2511794cdb237cf53d3d2a2bd"
+    }
+  }
+}

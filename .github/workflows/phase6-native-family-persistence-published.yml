@@ -1,0 +1,54 @@
+name: Phase 6 Independently Close Published Original Family Persistence
+on:
+  push:
+    branches: ['qualification/native-family-persistence-published-v1']
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: phase6-original-family-persistence-publication-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  audit:
+    name: Verify all original family persistence sources members and four profile phases
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.14'
+      - name: Preserve every original and new bounded helper control
+        run: |
+          mkdir -p out
+          python3 -B Tests/Production/Closeout/run_controls.py --output out/family-persistence-publication-controls.json
+          python3 -B Tests/Production/Closeout/native_original_matrix_cli.py --plan > out/native-matrix-plan.json
+      - name: Independently retain all eight exact original full physical phase proofs again on GitHub only
+        uses: actions/github-script@v8
+        with:
+          script: |
+            await require('./.github/scripts/phase6-download-native-matrix-inputs.cjs')({github,context,core,proofsOnly:true});
+      - name: Retain only the four exact completed published persistence and source-witness receipts
+        uses: actions/github-script@v8
+        with:
+          script: |
+            await require('./.github/scripts/phase6-download-family-persistence-publication.cjs')({github,context,core});
+      - name: Independently close every source guard original raw binding saved input and direct comparison
+        run: >-
+          python3 -B Tests/Production/Closeout/verify_published_family_persistence.py
+          --output out/family-persistence-publication-proof
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: verified-published-original-family-persistence
+          retention-days: 14
+          compression-level: 3
+          path: |
+            out/family-persistence-publication-proof/**
+            out/family-persistence-publication-controls.json
+            out/family-persistence-published/*/*/api.json
+            out/family-persistence-published/*/*/*.body
+            out/native-matrix-readiness.json
+            out/native-matrix-phase-inputs/**/api.json
