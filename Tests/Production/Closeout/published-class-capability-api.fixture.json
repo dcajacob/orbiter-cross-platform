@@ -1,0 +1,1048 @@
+{
+  "repository": {
+    "owner": "dcajacob",
+    "repo": "orbiter-cross-platform"
+  },
+  "run": {
+    "id": 42755158018,
+    "name": "Phase 6 Renew Original Native Capability Observer Controls",
+    "node_id": "WFR_kwLOVd0Rac8AAAAJ9GfwAg",
+    "head_branch": "qualification/native-class-capabilities-v1",
+    "head_sha": "ea19627cfac97f3070004a2937d7b81416e7810a",
+    "path": ".github/workflows/phase6-native-class-capabilities.yml",
+    "display_title": "Renew original nine-scene capability observer controls on hosted prof\u2026",
+    "run_number": 1,
+    "event": "push",
+    "status": "completed",
+    "conclusion": "success",
+    "workflow_id": 412879548,
+    "check_suite_id": 115793935581,
+    "check_suite_node_id": "CS_kwDOVd0Rac8AAAAa9ds83Q",
+    "url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/actions/runs/42755158018",
+    "html_url": "https://github.com/dcajacob/orbiter-cross-platform/actions/runs/42755158018",
+    "pull_requests": [],
+    "created_at": "2026-11-10T04:19:47Z",
+    "updated_at": "2026-11-10T05:00:25Z",
+    "actor": {
+      "login": "dcajacob",
+      "id": 3210634,
+      "node_id": "MDQ6VXNlcjMyMTA2MzQ=",
+      "avatar_url": "https://avatars.githubusercontent.com/u/3210634?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/dcajacob",
+      "html_url": "https://github.com/dcajacob",
+      "followers_url": "https://api.github.com/users/dcajacob/followers",
+      "following_url": "https://api.github.com/users/dcajacob/following{/other_user}",
+      "gists_url": "https://api.github.com/users/dcajacob/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/dcajacob/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/dcajacob/subscriptions",
+      "organizations_url": "https://api.github.com/users/dcajacob/orgs",
+      "repos_url": "https://api.github.com/users/dcajacob/repos",
+      "events_url": "https://api.github.com/users/dcajacob/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/dcajacob/received_events",
+      "type": "User",
+      "user_view_type": "public",
+      "site_admin": false
+    },
+    "run_attempt": 1,
+    "referenced_workflows": [],
+    "run_started_at": "2026-11-10T04:19:47Z",
+    "triggering_actor": {
+      "login": "dcajacob",
+      "id": 3210634,
+      "node_id": "MDQ6VXNlcjMyMTA2MzQ=",
+      "avatar_url": "https://avatars.githubusercontent.com/u/3210634?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/dcajacob",
+      "html_url": "https://github.com/dcajacob",
+      "followers_url": "https://api.github.com/users/dcajacob/followers",
+      "following_url": "https://api.github.com/users/dcajacob/following{/other_user}",
+      "gists_url": "https://api.github.com/users/dcajacob/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/dcajacob/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/dcajacob/subscriptions",
+      "organizations_url": "https://api.github.com/users/dcajacob/orgs",
+      "repos_url": "https://api.github.com/users/dcajacob/repos",
+      "events_url": "https://api.github.com/users/dcajacob/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/dcajacob/received_events",
+      "type": "User",
+      "user_view_type": "public",
+      "site_admin": false
+    },
+    "jobs_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/actions/runs/42755158018/jobs",
+    "logs_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/actions/runs/42755158018/logs",
+    "check_suite_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/check-suites/115793935581",
+    "artifacts_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/actions/runs/42755158018/artifacts",
+    "cancel_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/actions/runs/42755158018/cancel",
+    "rerun_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/actions/runs/42755158018/rerun",
+    "previous_attempt_url": null,
+    "workflow_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/actions/workflows/412879548",
+    "head_commit": {
+      "id": "ea19627cfac97f3070004a2937d7b81416e7810a",
+      "tree_id": "482d88eb4f75d9ade63449478d8fe47d953f097b",
+      "message": "Renew original nine-scene capability observer controls on hosted profiles",
+      "timestamp": "2026-11-10T04:19:27Z",
+      "author": {
+        "name": "Dan CaJacob",
+        "email": "3210634+dcajacob@users.noreply.github.com"
+      },
+      "committer": {
+        "name": "Dan CaJacob",
+        "email": "3210634+dcajacob@users.noreply.github.com"
+      }
+    },
+    "repository": {
+      "id": 1440551273,
+      "node_id": "R_kgDOVd0RaQ",
+      "name": "orbiter-cross-platform",
+      "full_name": "dcajacob/orbiter-cross-platform",
+      "private": false,
+      "owner": {
+        "login": "dcajacob",
+        "id": 3210634,
+        "node_id": "MDQ6VXNlcjMyMTA2MzQ=",
+        "avatar_url": "https://avatars.githubusercontent.com/u/3210634?v=4",
+        "gravatar_id": "",
+        "url": "https://api.github.com/users/dcajacob",
+        "html_url": "https://github.com/dcajacob",
+        "followers_url": "https://api.github.com/users/dcajacob/followers",
+        "following_url": "https://api.github.com/users/dcajacob/following{/other_user}",
+        "gists_url": "https://api.github.com/users/dcajacob/gists{/gist_id}",
+        "starred_url": "https://api.github.com/users/dcajacob/starred{/owner}{/repo}",
+        "subscriptions_url": "https://api.github.com/users/dcajacob/subscriptions",
+        "organizations_url": "https://api.github.com/users/dcajacob/orgs",
+        "repos_url": "https://api.github.com/users/dcajacob/repos",
+        "events_url": "https://api.github.com/users/dcajacob/events{/privacy}",
+        "received_events_url": "https://api.github.com/users/dcajacob/received_events",
+        "type": "User",
+        "user_view_type": "public",
+        "site_admin": false
+      },
+      "html_url": "https://github.com/dcajacob/orbiter-cross-platform",
+      "description": "Incremental native Linux and Windows portability work for Orbiter, with headless physics parity tests. Based on orbitersim/orbiter.",
+      "fork": false,
+      "url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform",
+      "forks_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/forks",
+      "keys_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/keys{/key_id}",
+      "collaborators_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/collaborators{/collaborator}",
+      "teams_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/teams",
+      "hooks_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/hooks",
+      "issue_events_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/issues/events{/number}",
+      "events_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/events",
+      "assignees_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/assignees{/user}",
+      "branches_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/branches{/branch}",
+      "tags_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/tags",
+      "blobs_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/git/blobs{/sha}",
+      "git_tags_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/git/tags{/sha}",
+      "git_refs_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/git/refs{/sha}",
+      "trees_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/git/trees{/sha}",
+      "statuses_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/statuses/{sha}",
+      "languages_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/languages",
+      "stargazers_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/stargazers",
+      "contributors_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/contributors",
+      "subscribers_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/subscribers",
+      "subscription_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/subscription",
+      "commits_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/commits{/sha}",
+      "git_commits_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/git/commits{/sha}",
+      "comments_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/comments{/number}",
+      "issue_comment_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/issues/comments{/number}",
+      "contents_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/contents/{+path}",
+      "compare_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/compare/{base}...{head}",
+      "merges_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/merges",
+      "archive_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/{archive_format}{/ref}",
+      "downloads_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/downloads",
+      "issues_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/issues{/number}",
+      "pulls_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/pulls{/number}",
+      "milestones_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/milestones{/number}",
+      "notifications_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/notifications{?since,all,participating}",
+      "labels_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/labels{/name}",
+      "releases_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/releases{/id}",
+      "deployments_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/deployments"
+    },
+    "head_repository": {
+      "id": 1440551273,
+      "node_id": "R_kgDOVd0RaQ",
+      "name": "orbiter-cross-platform",
+      "full_name": "dcajacob/orbiter-cross-platform",
+      "private": false,
+      "owner": {
+        "login": "dcajacob",
+        "id": 3210634,
+        "node_id": "MDQ6VXNlcjMyMTA2MzQ=",
+        "avatar_url": "https://avatars.githubusercontent.com/u/3210634?v=4",
+        "gravatar_id": "",
+        "url": "https://api.github.com/users/dcajacob",
+        "html_url": "https://github.com/dcajacob",
+        "followers_url": "https://api.github.com/users/dcajacob/followers",
+        "following_url": "https://api.github.com/users/dcajacob/following{/other_user}",
+        "gists_url": "https://api.github.com/users/dcajacob/gists{/gist_id}",
+        "starred_url": "https://api.github.com/users/dcajacob/starred{/owner}{/repo}",
+        "subscriptions_url": "https://api.github.com/users/dcajacob/subscriptions",
+        "organizations_url": "https://api.github.com/users/dcajacob/orgs",
+        "repos_url": "https://api.github.com/users/dcajacob/repos",
+        "events_url": "https://api.github.com/users/dcajacob/events{/privacy}",
+        "received_events_url": "https://api.github.com/users/dcajacob/received_events",
+        "type": "User",
+        "user_view_type": "public",
+        "site_admin": false
+      },
+      "html_url": "https://github.com/dcajacob/orbiter-cross-platform",
+      "description": "Incremental native Linux and Windows portability work for Orbiter, with headless physics parity tests. Based on orbitersim/orbiter.",
+      "fork": false,
+      "url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform",
+      "forks_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/forks",
+      "keys_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/keys{/key_id}",
+      "collaborators_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/collaborators{/collaborator}",
+      "teams_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/teams",
+      "hooks_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/hooks",
+      "issue_events_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/issues/events{/number}",
+      "events_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/events",
+      "assignees_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/assignees{/user}",
+      "branches_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/branches{/branch}",
+      "tags_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/tags",
+      "blobs_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/git/blobs{/sha}",
+      "git_tags_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/git/tags{/sha}",
+      "git_refs_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/git/refs{/sha}",
+      "trees_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/git/trees{/sha}",
+      "statuses_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/statuses/{sha}",
+      "languages_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/languages",
+      "stargazers_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/stargazers",
+      "contributors_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/contributors",
+      "subscribers_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/subscribers",
+      "subscription_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/subscription",
+      "commits_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/commits{/sha}",
+      "git_commits_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/git/commits{/sha}",
+      "comments_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/comments{/number}",
+      "issue_comment_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/issues/comments{/number}",
+      "contents_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/contents/{+path}",
+      "compare_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/compare/{base}...{head}",
+      "merges_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/merges",
+      "archive_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/{archive_format}{/ref}",
+      "downloads_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/downloads",
+      "issues_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/issues{/number}",
+      "pulls_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/pulls{/number}",
+      "milestones_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/milestones{/number}",
+      "notifications_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/notifications{?since,all,participating}",
+      "labels_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/labels{/name}",
+      "releases_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/releases{/id}",
+      "deployments_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/deployments"
+    }
+  },
+  "jobs": [
+    {
+      "id": 129627728782,
+      "run_id": 42755158018,
+      "workflow_name": "Phase 6 Renew Original Native Capability Observer Controls",
+      "head_branch": "qualification/native-class-capabilities-v1",
+      "run_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/actions/runs/42755158018",
+      "run_attempt": 1,
+      "node_id": "CR_kwDOVd0Rac8AAAAeLmorjg",
+      "head_sha": "ea19627cfac97f3070004a2937d7b81416e7810a",
+      "url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/actions/jobs/129627728782",
+      "html_url": "https://github.com/dcajacob/orbiter-cross-platform/actions/runs/42755158018/job/129627728782",
+      "status": "completed",
+      "conclusion": "success",
+      "created_at": "2026-11-10T04:19:47Z",
+      "started_at": "2026-11-10T04:19:50Z",
+      "completed_at": "2026-11-10T04:20:18Z",
+      "name": "readiness",
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 1,
+          "started_at": "2026-11-10T04:19:50Z",
+          "completed_at": "2026-11-10T04:19:51Z"
+        },
+        {
+          "name": "Run actions/checkout@v7",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 2,
+          "started_at": "2026-11-10T04:19:51Z",
+          "completed_at": "2026-11-10T04:20:07Z"
+        },
+        {
+          "name": "Run actions/setup-python@v6",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 3,
+          "started_at": "2026-11-10T04:20:07Z",
+          "completed_at": "2026-11-10T04:20:07Z"
+        },
+        {
+          "name": "Preserve every original and new bounded control",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 4,
+          "started_at": "2026-11-10T04:20:07Z",
+          "completed_at": "2026-11-10T04:20:13Z"
+        },
+        {
+          "name": "Require the exact full original SDK inventory and its successful standard-runner source",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 5,
+          "started_at": "2026-11-10T04:20:13Z",
+          "completed_at": "2026-11-10T04:20:15Z"
+        },
+        {
+          "name": "Verify all original SDK fields and retain the extra payload variants as pending",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 6,
+          "started_at": "2026-11-10T04:20:15Z",
+          "completed_at": "2026-11-10T04:20:15Z"
+        },
+        {
+          "name": "Run actions/upload-artifact@v7",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 7,
+          "started_at": "2026-11-10T04:20:15Z",
+          "completed_at": "2026-11-10T04:20:16Z"
+        },
+        {
+          "name": "Post Run actions/setup-python@v6",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 13,
+          "started_at": "2026-11-10T04:20:16Z",
+          "completed_at": "2026-11-10T04:20:16Z"
+        },
+        {
+          "name": "Post Run actions/checkout@v7",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 14,
+          "started_at": "2026-11-10T04:20:16Z",
+          "completed_at": "2026-11-10T04:20:16Z"
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 15,
+          "started_at": "2026-11-10T04:20:16Z",
+          "completed_at": "2026-11-10T04:20:16Z"
+        }
+      ],
+      "check_run_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/check-runs/129627728782",
+      "labels": [
+        "ubuntu-24.04"
+      ],
+      "runner_id": 1000007759,
+      "runner_name": "GitHub Actions 1000007759",
+      "runner_group_id": 0,
+      "runner_group_name": "GitHub Actions"
+    },
+    {
+      "id": 129627903479,
+      "run_id": 42755158018,
+      "workflow_name": "Phase 6 Renew Original Native Capability Observer Controls",
+      "head_branch": "qualification/native-class-capabilities-v1",
+      "run_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/actions/runs/42755158018",
+      "run_attempt": 1,
+      "node_id": "CR_kwDOVd0Rac8AAAAeLmzV9w",
+      "head_sha": "ea19627cfac97f3070004a2937d7b81416e7810a",
+      "url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/actions/jobs/129627903479",
+      "html_url": "https://github.com/dcajacob/orbiter-cross-platform/actions/runs/42755158018/job/129627903479",
+      "status": "completed",
+      "conclusion": "success",
+      "created_at": "2026-11-10T04:20:18Z",
+      "started_at": "2026-11-10T04:40:31Z",
+      "completed_at": "2026-11-10T04:56:56Z",
+      "name": "Original exact SDK and observer controls Release-automatic",
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 1,
+          "started_at": "2026-11-10T04:40:32Z",
+          "completed_at": "2026-11-10T04:40:33Z"
+        },
+        {
+          "name": "Run actions/checkout@v7",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 2,
+          "started_at": "2026-11-10T04:40:33Z",
+          "completed_at": "2026-11-10T04:40:49Z"
+        },
+        {
+          "name": "Run actions/setup-python@v6",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 3,
+          "started_at": "2026-11-10T04:40:49Z",
+          "completed_at": "2026-11-10T04:40:49Z"
+        },
+        {
+          "name": "Retain the exact immutable SDK inventory",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 4,
+          "started_at": "2026-11-10T04:40:49Z",
+          "completed_at": "2026-11-10T04:40:50Z"
+        },
+        {
+          "name": "Run python3 -B Tests/Production/Closeout/restore_hosted_capability_inventory.py",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 5,
+          "started_at": "2026-11-10T04:40:50Z",
+          "completed_at": "2026-11-10T04:40:52Z"
+        },
+        {
+          "name": "Retain the complete original cohort and both original audit attempts on GitHub only",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 6,
+          "started_at": "2026-11-10T04:40:52Z",
+          "completed_at": "2026-11-10T04:42:19Z"
+        },
+        {
+          "name": "Independently restore every original member and preserve the prior failed attempt",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 7,
+          "started_at": "2026-11-10T04:42:19Z",
+          "completed_at": "2026-11-10T04:43:23Z"
+        },
+        {
+          "name": "Stage the untouched original Windows application and SDK for inspection without execution",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 8,
+          "started_at": "2026-11-10T04:43:23Z",
+          "completed_at": "2026-11-10T04:43:32Z"
+        },
+        {
+          "name": "Retain exact compiled application and provider inputs without changing failed producer history",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 9,
+          "started_at": "2026-11-10T04:43:32Z",
+          "completed_at": "2026-11-10T04:43:43Z"
+        },
+        {
+          "name": "Restore all native binaries and actual original unit results",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 10,
+          "started_at": "2026-11-10T04:43:43Z",
+          "completed_at": "2026-11-10T04:43:48Z"
+        },
+        {
+          "name": "Restore unchanged providers and all original negative controls",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 11,
+          "started_at": "2026-11-10T04:43:48Z",
+          "completed_at": "2026-11-10T04:43:51Z"
+        },
+        {
+          "name": "Restore separately compiled unsuppressed Mesa owner repair and controls",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 12,
+          "started_at": "2026-11-10T04:43:51Z",
+          "completed_at": "2026-11-10T04:43:53Z"
+        },
+        {
+          "name": "Run unchanged original nine scenes twice with observer off and on in matching hosted userspace",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 13,
+          "started_at": "2026-11-10T04:43:53Z",
+          "completed_at": "2026-11-10T04:56:49Z"
+        },
+        {
+          "name": "Preserve bounded actual failure diagnostics",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 14,
+          "started_at": "2026-11-10T04:56:49Z",
+          "completed_at": "2026-11-10T04:56:49Z"
+        },
+        {
+          "name": "Run actions/upload-artifact@v7",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 15,
+          "started_at": "2026-11-10T04:56:49Z",
+          "completed_at": "2026-11-10T04:56:54Z"
+        },
+        {
+          "name": "Post Run actions/setup-python@v6",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 29,
+          "started_at": "2026-11-10T04:56:54Z",
+          "completed_at": "2026-11-10T04:56:54Z"
+        },
+        {
+          "name": "Post Run actions/checkout@v7",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 30,
+          "started_at": "2026-11-10T04:56:54Z",
+          "completed_at": "2026-11-10T04:56:54Z"
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 31,
+          "started_at": "2026-11-10T04:56:54Z",
+          "completed_at": "2026-11-10T04:56:54Z"
+        }
+      ],
+      "check_run_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/check-runs/129627903479",
+      "labels": [
+        "ubuntu-24.04"
+      ],
+      "runner_id": 1000007762,
+      "runner_name": "GitHub Actions 1000007762",
+      "runner_group_id": 0,
+      "runner_group_name": "GitHub Actions"
+    },
+    {
+      "id": 129627903507,
+      "run_id": 42755158018,
+      "workflow_name": "Phase 6 Renew Original Native Capability Observer Controls",
+      "head_branch": "qualification/native-class-capabilities-v1",
+      "run_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/actions/runs/42755158018",
+      "run_attempt": 1,
+      "node_id": "CR_kwDOVd0Rac8AAAAeLmzWEw",
+      "head_sha": "ea19627cfac97f3070004a2937d7b81416e7810a",
+      "url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/actions/jobs/129627903507",
+      "html_url": "https://github.com/dcajacob/orbiter-cross-platform/actions/runs/42755158018/job/129627903507",
+      "status": "completed",
+      "conclusion": "success",
+      "created_at": "2026-11-10T04:20:18Z",
+      "started_at": "2026-11-10T04:20:20Z",
+      "completed_at": "2026-11-10T04:40:29Z",
+      "name": "Original exact SDK and observer controls Debug-sse2",
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 1,
+          "started_at": "2026-11-10T04:20:21Z",
+          "completed_at": "2026-11-10T04:20:22Z"
+        },
+        {
+          "name": "Run actions/checkout@v7",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 2,
+          "started_at": "2026-11-10T04:20:22Z",
+          "completed_at": "2026-11-10T04:20:42Z"
+        },
+        {
+          "name": "Run actions/setup-python@v6",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 3,
+          "started_at": "2026-11-10T04:20:42Z",
+          "completed_at": "2026-11-10T04:20:42Z"
+        },
+        {
+          "name": "Retain the exact immutable SDK inventory",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 4,
+          "started_at": "2026-11-10T04:20:42Z",
+          "completed_at": "2026-11-10T04:20:44Z"
+        },
+        {
+          "name": "Run python3 -B Tests/Production/Closeout/restore_hosted_capability_inventory.py",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 5,
+          "started_at": "2026-11-10T04:20:44Z",
+          "completed_at": "2026-11-10T04:20:46Z"
+        },
+        {
+          "name": "Retain the complete original cohort and both original audit attempts on GitHub only",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 6,
+          "started_at": "2026-11-10T04:20:46Z",
+          "completed_at": "2026-11-10T04:22:19Z"
+        },
+        {
+          "name": "Independently restore every original member and preserve the prior failed attempt",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 7,
+          "started_at": "2026-11-10T04:22:19Z",
+          "completed_at": "2026-11-10T04:23:28Z"
+        },
+        {
+          "name": "Stage the untouched original Windows application and SDK for inspection without execution",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 8,
+          "started_at": "2026-11-10T04:23:28Z",
+          "completed_at": "2026-11-10T04:23:39Z"
+        },
+        {
+          "name": "Retain exact compiled application and provider inputs without changing failed producer history",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 9,
+          "started_at": "2026-11-10T04:23:39Z",
+          "completed_at": "2026-11-10T04:23:54Z"
+        },
+        {
+          "name": "Restore all native binaries and actual original unit results",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 10,
+          "started_at": "2026-11-10T04:23:54Z",
+          "completed_at": "2026-11-10T04:24:02Z"
+        },
+        {
+          "name": "Restore unchanged providers and all original negative controls",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 11,
+          "started_at": "2026-11-10T04:24:02Z",
+          "completed_at": "2026-11-10T04:24:06Z"
+        },
+        {
+          "name": "Restore separately compiled unsuppressed Mesa owner repair and controls",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 12,
+          "started_at": "2026-11-10T04:24:06Z",
+          "completed_at": "2026-11-10T04:24:08Z"
+        },
+        {
+          "name": "Run unchanged original nine scenes twice with observer off and on in matching hosted userspace",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 13,
+          "started_at": "2026-11-10T04:24:08Z",
+          "completed_at": "2026-11-10T04:40:19Z"
+        },
+        {
+          "name": "Preserve bounded actual failure diagnostics",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 14,
+          "started_at": "2026-11-10T04:40:19Z",
+          "completed_at": "2026-11-10T04:40:19Z"
+        },
+        {
+          "name": "Run actions/upload-artifact@v7",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 15,
+          "started_at": "2026-11-10T04:40:19Z",
+          "completed_at": "2026-11-10T04:40:25Z"
+        },
+        {
+          "name": "Post Run actions/setup-python@v6",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 29,
+          "started_at": "2026-11-10T04:40:25Z",
+          "completed_at": "2026-11-10T04:40:26Z"
+        },
+        {
+          "name": "Post Run actions/checkout@v7",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 30,
+          "started_at": "2026-11-10T04:40:26Z",
+          "completed_at": "2026-11-10T04:40:26Z"
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 31,
+          "started_at": "2026-11-10T04:40:26Z",
+          "completed_at": "2026-11-10T04:40:26Z"
+        }
+      ],
+      "check_run_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/check-runs/129627903507",
+      "labels": [
+        "ubuntu-24.04"
+      ],
+      "runner_id": 1000007760,
+      "runner_name": "GitHub Actions 1000007760",
+      "runner_group_id": 0,
+      "runner_group_name": "GitHub Actions"
+    },
+    {
+      "id": 129627903509,
+      "run_id": 42755158018,
+      "workflow_name": "Phase 6 Renew Original Native Capability Observer Controls",
+      "head_branch": "qualification/native-class-capabilities-v1",
+      "run_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/actions/runs/42755158018",
+      "run_attempt": 1,
+      "node_id": "CR_kwDOVd0Rac8AAAAeLmzWFQ",
+      "head_sha": "ea19627cfac97f3070004a2937d7b81416e7810a",
+      "url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/actions/jobs/129627903509",
+      "html_url": "https://github.com/dcajacob/orbiter-cross-platform/actions/runs/42755158018/job/129627903509",
+      "status": "completed",
+      "conclusion": "success",
+      "created_at": "2026-11-10T04:20:18Z",
+      "started_at": "2026-11-10T04:20:20Z",
+      "completed_at": "2026-11-10T04:42:50Z",
+      "name": "Original exact SDK and observer controls Debug-automatic",
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 1,
+          "started_at": "2026-11-10T04:20:21Z",
+          "completed_at": "2026-11-10T04:20:22Z"
+        },
+        {
+          "name": "Run actions/checkout@v7",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 2,
+          "started_at": "2026-11-10T04:20:22Z",
+          "completed_at": "2026-11-10T04:20:42Z"
+        },
+        {
+          "name": "Run actions/setup-python@v6",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 3,
+          "started_at": "2026-11-10T04:20:42Z",
+          "completed_at": "2026-11-10T04:20:43Z"
+        },
+        {
+          "name": "Retain the exact immutable SDK inventory",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 4,
+          "started_at": "2026-11-10T04:20:43Z",
+          "completed_at": "2026-11-10T04:20:44Z"
+        },
+        {
+          "name": "Run python3 -B Tests/Production/Closeout/restore_hosted_capability_inventory.py",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 5,
+          "started_at": "2026-11-10T04:20:44Z",
+          "completed_at": "2026-11-10T04:20:46Z"
+        },
+        {
+          "name": "Retain the complete original cohort and both original audit attempts on GitHub only",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 6,
+          "started_at": "2026-11-10T04:20:46Z",
+          "completed_at": "2026-11-10T04:21:39Z"
+        },
+        {
+          "name": "Independently restore every original member and preserve the prior failed attempt",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 7,
+          "started_at": "2026-11-10T04:21:39Z",
+          "completed_at": "2026-11-10T04:23:06Z"
+        },
+        {
+          "name": "Stage the untouched original Windows application and SDK for inspection without execution",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 8,
+          "started_at": "2026-11-10T04:23:06Z",
+          "completed_at": "2026-11-10T04:23:15Z"
+        },
+        {
+          "name": "Retain exact compiled application and provider inputs without changing failed producer history",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 9,
+          "started_at": "2026-11-10T04:23:15Z",
+          "completed_at": "2026-11-10T04:23:24Z"
+        },
+        {
+          "name": "Restore all native binaries and actual original unit results",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 10,
+          "started_at": "2026-11-10T04:23:24Z",
+          "completed_at": "2026-11-10T04:23:34Z"
+        },
+        {
+          "name": "Restore unchanged providers and all original negative controls",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 11,
+          "started_at": "2026-11-10T04:23:34Z",
+          "completed_at": "2026-11-10T04:23:39Z"
+        },
+        {
+          "name": "Restore separately compiled unsuppressed Mesa owner repair and controls",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 12,
+          "started_at": "2026-11-10T04:23:39Z",
+          "completed_at": "2026-11-10T04:23:41Z"
+        },
+        {
+          "name": "Run unchanged original nine scenes twice with observer off and on in matching hosted userspace",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 13,
+          "started_at": "2026-11-10T04:23:41Z",
+          "completed_at": "2026-11-10T04:42:41Z"
+        },
+        {
+          "name": "Preserve bounded actual failure diagnostics",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 14,
+          "started_at": "2026-11-10T04:42:41Z",
+          "completed_at": "2026-11-10T04:42:41Z"
+        },
+        {
+          "name": "Run actions/upload-artifact@v7",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 15,
+          "started_at": "2026-11-10T04:42:41Z",
+          "completed_at": "2026-11-10T04:42:48Z"
+        },
+        {
+          "name": "Post Run actions/setup-python@v6",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 29,
+          "started_at": "2026-11-10T04:42:48Z",
+          "completed_at": "2026-11-10T04:42:49Z"
+        },
+        {
+          "name": "Post Run actions/checkout@v7",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 30,
+          "started_at": "2026-11-10T04:42:49Z",
+          "completed_at": "2026-11-10T04:42:49Z"
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 31,
+          "started_at": "2026-11-10T04:42:49Z",
+          "completed_at": "2026-11-10T04:42:49Z"
+        }
+      ],
+      "check_run_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/check-runs/129627903509",
+      "labels": [
+        "ubuntu-24.04"
+      ],
+      "runner_id": 1000007761,
+      "runner_name": "GitHub Actions 1000007761",
+      "runner_group_id": 0,
+      "runner_group_name": "GitHub Actions"
+    },
+    {
+      "id": 129627903525,
+      "run_id": 42755158018,
+      "workflow_name": "Phase 6 Renew Original Native Capability Observer Controls",
+      "head_branch": "qualification/native-class-capabilities-v1",
+      "run_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/actions/runs/42755158018",
+      "run_attempt": 1,
+      "node_id": "CR_kwDOVd0Rac8AAAAeLmzWJQ",
+      "head_sha": "ea19627cfac97f3070004a2937d7b81416e7810a",
+      "url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/actions/jobs/129627903525",
+      "html_url": "https://github.com/dcajacob/orbiter-cross-platform/actions/runs/42755158018/job/129627903525",
+      "status": "completed",
+      "conclusion": "success",
+      "created_at": "2026-11-10T04:20:18Z",
+      "started_at": "2026-11-10T04:42:53Z",
+      "completed_at": "2026-11-10T05:00:25Z",
+      "name": "Original exact SDK and observer controls Release-sse2",
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 1,
+          "started_at": "2026-11-10T04:42:54Z",
+          "completed_at": "2026-11-10T04:42:55Z"
+        },
+        {
+          "name": "Run actions/checkout@v7",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 2,
+          "started_at": "2026-11-10T04:42:55Z",
+          "completed_at": "2026-11-10T04:43:14Z"
+        },
+        {
+          "name": "Run actions/setup-python@v6",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 3,
+          "started_at": "2026-11-10T04:43:14Z",
+          "completed_at": "2026-11-10T04:43:14Z"
+        },
+        {
+          "name": "Retain the exact immutable SDK inventory",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 4,
+          "started_at": "2026-11-10T04:43:14Z",
+          "completed_at": "2026-11-10T04:43:16Z"
+        },
+        {
+          "name": "Run python3 -B Tests/Production/Closeout/restore_hosted_capability_inventory.py",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 5,
+          "started_at": "2026-11-10T04:43:16Z",
+          "completed_at": "2026-11-10T04:43:18Z"
+        },
+        {
+          "name": "Retain the complete original cohort and both original audit attempts on GitHub only",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 6,
+          "started_at": "2026-11-10T04:43:18Z",
+          "completed_at": "2026-11-10T04:46:49Z"
+        },
+        {
+          "name": "Independently restore every original member and preserve the prior failed attempt",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 7,
+          "started_at": "2026-11-10T04:46:49Z",
+          "completed_at": "2026-11-10T04:47:51Z"
+        },
+        {
+          "name": "Stage the untouched original Windows application and SDK for inspection without execution",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 8,
+          "started_at": "2026-11-10T04:47:51Z",
+          "completed_at": "2026-11-10T04:48:00Z"
+        },
+        {
+          "name": "Retain exact compiled application and provider inputs without changing failed producer history",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 9,
+          "started_at": "2026-11-10T04:48:00Z",
+          "completed_at": "2026-11-10T04:48:19Z"
+        },
+        {
+          "name": "Restore all native binaries and actual original unit results",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 10,
+          "started_at": "2026-11-10T04:48:19Z",
+          "completed_at": "2026-11-10T04:48:24Z"
+        },
+        {
+          "name": "Restore unchanged providers and all original negative controls",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 11,
+          "started_at": "2026-11-10T04:48:24Z",
+          "completed_at": "2026-11-10T04:48:27Z"
+        },
+        {
+          "name": "Restore separately compiled unsuppressed Mesa owner repair and controls",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 12,
+          "started_at": "2026-11-10T04:48:27Z",
+          "completed_at": "2026-11-10T04:48:29Z"
+        },
+        {
+          "name": "Run unchanged original nine scenes twice with observer off and on in matching hosted userspace",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 13,
+          "started_at": "2026-11-10T04:48:29Z",
+          "completed_at": "2026-11-10T05:00:17Z"
+        },
+        {
+          "name": "Preserve bounded actual failure diagnostics",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 14,
+          "started_at": "2026-11-10T05:00:17Z",
+          "completed_at": "2026-11-10T05:00:17Z"
+        },
+        {
+          "name": "Run actions/upload-artifact@v7",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 15,
+          "started_at": "2026-11-10T05:00:17Z",
+          "completed_at": "2026-11-10T05:00:22Z"
+        },
+        {
+          "name": "Post Run actions/setup-python@v6",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 29,
+          "started_at": "2026-11-10T05:00:22Z",
+          "completed_at": "2026-11-10T05:00:22Z"
+        },
+        {
+          "name": "Post Run actions/checkout@v7",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 30,
+          "started_at": "2026-11-10T05:00:22Z",
+          "completed_at": "2026-11-10T05:00:22Z"
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 31,
+          "started_at": "2026-11-10T05:00:22Z",
+          "completed_at": "2026-11-10T05:00:22Z"
+        }
+      ],
+      "check_run_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/check-runs/129627903525",
+      "labels": [
+        "ubuntu-24.04"
+      ],
+      "runner_id": 1000007765,
+      "runner_name": "GitHub Actions 1000007765",
+      "runner_group_id": 0,
+      "runner_group_name": "GitHub Actions"
+    }
+  ],
+  "artifact": {
+    "id": 13735853739,
+    "node_id": "MDg6QXJ0aWZhY3QxMzczNTg1MzczOQ==",
+    "name": "original-class-capability-controls-Debug-sse2",
+    "size_in_bytes": 121727956,
+    "url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/actions/artifacts/13735853739",
+    "archive_download_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/actions/artifacts/13735853739/zip",
+    "expired": false,
+    "digest": "sha256:30db9792022b7d668e850be7bfb2ca7a87e03c2467c302bd9c8e1d1b2380ff4e",
+    "created_at": "2026-11-10T04:40:25Z",
+    "updated_at": "2026-11-10T04:40:25Z",
+    "expires_at": "2026-11-24T04:40:20Z",
+    "workflow_run": {
+      "id": 42755158018,
+      "repository_id": 1440551273,
+      "head_repository_id": 1440551273,
+      "head_branch": "qualification/native-class-capabilities-v1",
+      "head_sha": "ea19627cfac97f3070004a2937d7b81416e7810a"
+    }
+  }
+}

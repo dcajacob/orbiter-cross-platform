@@ -1,0 +1,45 @@
+{
+  "protocol": "phase6-published-original-capability-profile-inputs-v1",
+  "repository": {
+    "owner": "dcajacob",
+    "repo": "orbiter-cross-platform"
+  },
+  "source": "ea19627cfac97f3070004a2937d7b81416e7810a",
+  "run_id": 42755158018,
+  "branch": "qualification/native-class-capabilities-v1",
+  "workflow": ".github/workflows/phase6-native-class-capabilities.yml",
+  "readiness_job_id": 129627728782,
+  "jobs": {
+    "129627728782": "readiness",
+    "129627903479": "Original exact SDK and observer controls Release-automatic",
+    "129627903507": "Original exact SDK and observer controls Debug-sse2",
+    "129627903509": "Original exact SDK and observer controls Debug-automatic",
+    "129627903525": "Original exact SDK and observer controls Release-sse2"
+  },
+  "profiles": {
+    "Debug-sse2": {
+      "job_id": 129627903507,
+      "artifact_id": 13735853739,
+      "archive_bytes": 121727956,
+      "archive_sha256": "30db9792022b7d668e850be7bfb2ca7a87e03c2467c302bd9c8e1d1b2380ff4e"
+    },
+    "Debug-automatic": {
+      "job_id": 129627903509,
+      "artifact_id": 13736630856,
+      "archive_bytes": 121771623,
+      "archive_sha256": "f339edb99c9b08fcad7b37c85a55bb1e41ac36323bda6ea5c149e1da40ee11e9"
+    },
+    "Release-automatic": {
+      "job_id": 129627903479,
+      "artifact_id": 13736148499,
+      "archive_bytes": 113681915,
+      "archive_sha256": "d0979c3d47113df01238213fba196e6fb9169499c8adabcef6c177eccdcd2370"
+    },
+    "Release-sse2": {
+      "job_id": 129627903525,
+      "artifact_id": 13737206115,
+      "archive_bytes": 113611614,
+      "archive_sha256": "f43e6dbc925e627045aa81307c4bc6cac23ee42a359eacb479897dcc87595d8f"
+    }
+  }
+}
