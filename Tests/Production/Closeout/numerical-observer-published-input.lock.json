@@ -1,0 +1,13 @@
+{
+  "protocol": "phase6-exact-published-numerical-observer-input-v1",
+  "source": "3f68e87168aaa71ea2183b953319edcb1add08bf",
+  "run_id": 42910506422,
+  "job_id": 130159613122,
+  "branch": "qualification/native-numerical-observer-equivalence-v3-host-prepare",
+  "workflow": ".github/workflows/phase6-native-numerical-observer-equivalence.yml",
+  "profile": "Debug-automatic",
+  "artifact_id": 13807319371,
+  "archive_bytes": 4818718021,
+  "archive_sha256": "02ad982b3b2ffd37982eb2f63a68a9e01f3493c5c4127fff78b0782a353c439e",
+  "source_controls_passed": 464
+}

@@ -1,0 +1,64 @@
+name: Phase 6 Independently Replay Published Original Save Numerical Observer Evidence
+on:
+  push:
+    branches: ['qualification/native-numerical-observer-independent-v1']
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: phase6-native-numerical-observer-independent-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  independently-replay:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - name: Preserve all original source and corruption controls
+        run: mkdir -p out && python3 -B Tests/Production/Closeout/run_controls.py --output out/numerical-observer-independent-controls.json
+      - name: Stream the exact completed published capture archive and verify its API digest on the hosted runner
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: >-
+          python3 -B Tests/Production/Closeout/download_published_numerical_observer_archive.py
+          --lock Tests/Production/Closeout/numerical-observer-published-input.lock.json
+          --output out/numerical-observer-published
+      - name: Restore all original raw files and rerun the unchanged original auditor without launching any simulator
+        run: >-
+          python3 -B Tests/Production/Closeout/inspect_published_numerical_observers.py
+          --lock Tests/Production/Closeout/numerical-observer-published-input.lock.json
+          --inputs out/numerical-observer-published --output out/numerical-observer-independent
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: original-save-numerical-observer-independent-full-proof
+          retention-days: 14
+          compression-level: 3
+          path: |
+            out/numerical-observer-independent/*.json
+            out/numerical-observer-independent/*.log
+            out/numerical-observer-independent/original-snapshot-signature-audit/**
+            out/numerical-observer-published/*.json
+            out/numerical-observer-published/*.log
+            out/numerical-observer-independent-controls.json
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: original-save-numerical-observer-independent-small-receipt
+          retention-days: 14
+          compression-level: 3
+          path: |
+            out/numerical-observer-independent/verification.json
+            out/numerical-observer-independent/replayed-original-audit.json
+            out/numerical-observer-independent/replayed-original-audit.log
+            out/numerical-observer-published/*.json
+            out/numerical-observer-independent-controls.json
+      - uses: actions/upload-artifact@v7
+        if: failure() && hashFiles('out/numerical-observer-published/download-attempt-*.partial.zip') != ''
+        with:
+          name: unqualified-original-save-numerical-observer-download-partials
+          retention-days: 14
+          compression-level: 0
+          path: out/numerical-observer-published/download-attempt-*.partial.zip

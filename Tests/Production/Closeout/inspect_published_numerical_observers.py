@@ -8,10 +8,11 @@ import shutil
 import stat
 import subprocess
 import sys
+from types import FunctionType
 import zipfile
 from contracts import ROOT,require,load,sha,atomic_json
 import rejection_input_bundle as bundle
-import restore_rejection_input_bundle as restore
+import stream_retained_numerical_inputs as stream_inputs
 import numerical_observer_equivalence as numerical
 import build_native_numerical_observers as compiler
 
@@ -23,12 +24,13 @@ def validate_api(api,pin):
     require(a['id']==pin['artifact_id'] and a['name']=='original-save-numerical-observer-three-world-full-raw' and a['size_in_bytes']==pin['archive_bytes'] and a['digest']=='sha256:'+pin['archive_sha256'] and a['expired'] is False and a['workflow_run']['id']==r['id'] and a['workflow_run']['head_sha']==r['head_sha'],'Exact published full raw archive API digest/source required')
 
 
-def restore_outer(archive,folder):
+def restore_outer(archive,folder,raw_member):
     require(not folder.exists(),'Fresh published complete outer namespace required');folder.mkdir(parents=True);members={};seen=set();total=0
     with zipfile.ZipFile(archive) as z:
         for item in z.infolist():
             n=item.filename;p=PurePosixPath(n);require(n and (str(p)==n or item.is_dir() and str(p)+'/'==n) and not p.is_absolute() and '..' not in p.parts and ':' not in n and '\\' not in n and n.casefold() not in seen and not stat.S_ISLNK(item.external_attr>>16) and not (item.external_attr>>16)&0o7000,'Safe unique unredirected complete published member required');seen.add(n.casefold());total+=item.file_size
             require(len(seen)<100000 and total<8*1024**3,'Original complete bounded published metadata/raw archive required')
+            if n==raw_member:continue # consume every compressed/body byte directly from the outer ZIP once
             target=folder/n
             if item.is_dir():target.mkdir(parents=True,exist_ok=True);continue
             target.parent.mkdir(parents=True,exist_ok=True)
@@ -56,15 +58,36 @@ def main():
     for n in ('inputs','lock','output'):parser.add_argument('--'+n,type=lambda s:Path(s).resolve(),required=True)
     a=parser.parse_args();require(os.environ.get('GITHUB_ACTIONS')=='true' and os.environ.get('RUNNER_OS')=='Linux' and Path(os.environ['GITHUB_WORKSPACE']).resolve()==ROOT and not a.output.exists(),'Fresh standard hosted independent audit only; no local bulk replay')
     a.output.mkdir(parents=True);api=load(a.inputs/'api.json');pin=load(a.lock);validate_api(api,pin);archive=a.inputs/'producer.zip';require(archive.stat().st_size==pin['archive_bytes'] and sha(archive)==pin['archive_sha256'],'Exact full published ZIP bytes required')
-    payload=a.output/'outer';members=restore_outer(archive,payload);base=payload/'hosted-numerical-observer/Debug-automatic';index=load(base/'raw-index.json');retained=base/'raw-original-inputs.tar.gz'
-    for name in ('collection.json','raw-index.json','raw-original-inputs.tar.gz'):require((base/name).is_file(),'Every original complete raw retention member required')
-    restored=restore.restore(ROOT,retained,index,ROOT/'out/rejection-independent/numerical-observer-objects')
-    folder=ROOT/'out/numerical-observer-renewal/Debug-automatic';report=load(folder/'collection.json');require(report['status']=='captured-and-original-audited-three-world-observer-equivalence-only' and report['source_identity']['source']==pin['source'] and report['compiled_runtime_source']==compiler.COMPILED and report['runtime_role']=='diagnostic' and report['original_saved_input_sha256']==numerical.INPUT_SHA and report['complete_numerical_reload_gate_qualified'] is False and report['phase6_complete'] is False,'Original source/input/diagnostic scope must not be relabelled')
+    payload=a.output/'outer';prefix='hosted-numerical-observer/Debug-automatic/';raw_member=prefix+'raw-original-inputs.tar.gz';members=restore_outer(archive,payload,raw_member);base=payload/prefix;index=load(base/'raw-index.json')
+    folder=ROOT/'out/numerical-observer-renewal/Debug-automatic';relative=folder.relative_to(ROOT).as_posix()+'/';outer_collection=payload/relative.removeprefix('out/')/'collection.json';planned=load(outer_collection)
+    scenario=planned['derived_case']['scenario_entry_point'];bundle.safe(scenario)
+    common={*numerical.PRIMARY,'graphics-lifecycle.json','stock-vessel-complete.txt','observer-loaded-maps.txt','console.log','ground-math.csv',scenario}
+    selected={n for n in index['files'] if n.startswith(relative) and '/' not in n[len(relative):]}
+    selected.update(relative+'baseline/'+n for n in common|{'invocation.json','process-receipt.json'})
+    selected.add(relative+'equivalence/capture.json')
+    for mode in ('off','on'):
+        selected.update(relative+'equivalence/observer-'+mode+'/'+n for n in common|{'process-result.json','diagnostic-invocation.json'}|({'internal-state.csv'} if mode=='on' else set()))
+    with zipfile.ZipFile(archive) as zip_body,zip_body.open(raw_member) as raw:
+        verified,restored=stream_inputs.verify(ROOT,raw,index,selected,a.output/'materialized-original-inputs')
+    members[raw_member]=dict(bytes=restored['original_raw_bundle_bytes'],sha256=restored['original_raw_bundle_sha256'])
+    require(sha(outer_collection)==sha(folder/'collection.json'),'Original producer collection report must be identical in both published locations')
+    report=load(folder/'collection.json');require(report['status']=='captured-and-original-audited-three-world-observer-equivalence-only' and report['source_identity']['source']==pin['source'] and report['compiled_runtime_source']==compiler.COMPILED and report['runtime_role']=='diagnostic' and report['original_saved_input_sha256']==numerical.INPUT_SHA and report['complete_numerical_reload_gate_qualified'] is False and report['phase6_complete'] is False,'Original source/input/diagnostic scope must not be relabelled')
     controls=load(payload/'numerical-observer-renewal-controls.json');require(controls['status']=='passed' and controls['tests_run']==pin['source_controls_passed'] and all(controls[n]==0 for n in ('skipped','failures','errors')) and controls['producer_commit']==pin['source'] and controls['sources_match_producer'] is True,'All original source controls must have actually passed')
     for name,digest in controls['sources_sha256'].items():
         path=Path(name);require(path.is_relative_to(ROOT) and sha(path)==digest==hashlib.sha256(subprocess.check_output(['git','show',pin['source']+':'+path.relative_to(ROOT).as_posix()])).hexdigest(),'Every original control/helper source must match its original producer')
     for name in numerical.ORIGINAL:require((ROOT/name).read_bytes()==subprocess.check_output(['git','show',compiler.COMPILED+':'+name]),'Original collector/auditor source changed')
-    compiled=compiler_witness(folder,pin['source']);actual=numerical.validate_three_worlds(folder,report);require(actual==report['three_world_inspection'],'Every original actual three-world inspection field must reproduce exactly')
+    def observed_sha(path):
+        path=Path(path)
+        if path.is_file():return sha(path)
+        # All physical outputs are materialized; large unused input bodies have
+        # already been read and hashed in full directly from the published ZIP.
+        require(str(path) in report['guarded_files_sha256'] and path.is_relative_to(ROOT),'Only actual byte-verified original dependency inputs can use the streaming witness')
+        return verified[path.relative_to(ROOT).as_posix()]
+    for name,digest in report['guarded_files_sha256'].items():
+        path=Path(name);require(path.is_relative_to(ROOT) and verified[path.relative_to(ROOT).as_posix()]==observed_sha(path)==digest,'Every original guarded dependency body must be verified')
+    compiled=compiler_witness(folder,pin['source']);validator=numerical.validate_three_worlds
+    validate=FunctionType(validator.__code__,dict(validator.__globals__,sha=observed_sha),validator.__name__)
+    actual=validate(folder,report);require(actual==report['three_world_inspection'],'Every original actual three-world inspection field must reproduce exactly')
     fresh=a.output/'replayed-original-audit.json';argv=[sys.executable,'-B',str(ROOT/'Tests/Production/ReloadMath/audit_native.py'),'--capture',str(folder/'equivalence'),'--baseline',str(folder/'baseline'),'--output',str(fresh)]
     with (a.output/'replayed-original-audit.log').open('wb') as stream:
         process=subprocess.run(argv,stdout=stream,stderr=subprocess.STDOUT,timeout=180)
@@ -74,7 +97,7 @@ def main():
     pool=payload/'original-package-official-pool/Debug-automatic';plan=[row.split('\t') for row in (pool/'exact-original-plan.tsv').read_text().splitlines()];require(len(plan)==402,'Exactly402 original signed package blobs required')
     signed=inspect_signed_indexes(pool,plan,a.output/'original-snapshot-signature-audit')
     actual_inventory=(pool/'actual-system-packages.txt').read_bytes();require(actual_inventory==(pool/'original-system-packages.txt').read_bytes() and hashlib.sha256(actual_inventory).hexdigest()=='0ae6765d460a0d744c48afdb242257d02a29da4845cf7e8b7fda42004e164900','All488 actual installed original package versions must remain unchanged')
-    require(bundle.inventory(ROOT,[ROOT/n for n in index['files']])[0]==index['files'] and sha(retained)==index['archive_sha256'],'Every original source, physical output, runtime, binary, data and alias must remain unchanged after independent audit')
+    materialized,missing=bundle.inventory(ROOT,[ROOT/n for n in selected]);require(not missing and materialized=={n:index['files'][n] for n in selected} and sha(archive)==pin['archive_sha256'] and all(observed_sha(n)==d for n,d in report['guarded_files_sha256'].items()),'Every original source, full archive, actual physical output, runtime, binary, data and alias must remain unchanged after independent audit')
     atomic_json(a.output/'full-outer-members.json',members);atomic_json(a.output/'original-raw-index.json',index)
     result=dict(protocol='phase6-published-independent-three-world-numerical-observer-equivalence-v1',status='independently-verified-published-native-observer-equivalence-only',auditor_source=os.environ['GITHUB_SHA'],original_capture_source=pin['source'],original_run_id=pin['run_id'],original_artifact=api['artifact'],full_published_archive_sha256=sha(archive),all_original_outer_members_verified=len(members),original_raw_index_sha256=sha(base/'raw-index.json'),all_original_logical_files_verified=len(index['files']),complete_original_raw_retention=restored,original_auditor_report_reproduced_byte_for_byte=True,original_auditor_report_sha256=sha(fresh),original_compiler=compiled,actual_original_worlds=actual,original_source_controls_passed=controls['tests_run'],original488_package_inventory_sha256=hashlib.sha256(actual_inventory).hexdigest(),signed_snapshot_independent_audit=signed,new_simulator_processes=0,all_original_sources_runtime_data_sanitizers_and_acceptance_unchanged=True,numerical_observer_equivalence_qualified=True,normal_admission_qualified=False,complete_numerical_reload_gate_qualified=False,phase6_complete=False,hands_on_ready=False)
     atomic_json(a.output/'verification.json',result);print(result['status'])
