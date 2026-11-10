@@ -1,0 +1,94 @@
+{
+  "repository": {
+    "owner": "dcajacob",
+    "repo": "orbiter-cross-platform"
+  },
+  "run": {
+    "id": 42728993857,
+    "head_sha": "0c231bea79b25ca334436bcdff248a8f9c4de5d3",
+    "head_branch": "qualification/native-class-lifetimes-v2",
+    "path": ".github/workflows/phase6-native-class-lifetimes.yml",
+    "run_attempt": 1,
+    "status": "queued",
+    "conclusion": null
+  },
+  "jobs": [
+    {
+      "id": 129541885900,
+      "name": "readiness",
+      "run_id": 42728993857,
+      "head_sha": "0c231bea79b25ca334436bcdff248a8f9c4de5d3",
+      "status": "completed",
+      "conclusion": "success",
+      "labels": [
+        "ubuntu-24.04"
+      ]
+    },
+    {
+      "id": 129543903593,
+      "name": "Original family and paused lifetime renewal Release-sse2",
+      "run_id": 42728993857,
+      "head_sha": "0c231bea79b25ca334436bcdff248a8f9c4de5d3",
+      "status": "queued",
+      "conclusion": null,
+      "labels": [
+        "ubuntu-24.04"
+      ]
+    },
+    {
+      "id": 129543903611,
+      "name": "Original family and paused lifetime renewal Debug-automatic",
+      "run_id": 42728993857,
+      "head_sha": "0c231bea79b25ca334436bcdff248a8f9c4de5d3",
+      "status": "in_progress",
+      "conclusion": null,
+      "labels": [
+        "ubuntu-24.04"
+      ]
+    },
+    {
+      "id": 129543903705,
+      "name": "Original family and paused lifetime renewal Debug-sse2",
+      "run_id": 42728993857,
+      "head_sha": "0c231bea79b25ca334436bcdff248a8f9c4de5d3",
+      "status": "completed",
+      "conclusion": "success",
+      "labels": [
+        "ubuntu-24.04"
+      ]
+    },
+    {
+      "id": 129543903930,
+      "name": "Original family and paused lifetime renewal Release-automatic",
+      "run_id": 42728993857,
+      "head_sha": "0c231bea79b25ca334436bcdff248a8f9c4de5d3",
+      "status": "in_progress",
+      "conclusion": null,
+      "labels": [
+        "ubuntu-24.04"
+      ]
+    }
+  ],
+  "artifact": {
+    "id": 13727250912,
+    "node_id": "MDg6QXJ0aWZhY3QxMzcyNzI1MDkxMg==",
+    "name": "original-class-lifetime-renewal-Debug-sse2",
+    "size_in_bytes": 185393142,
+    "url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/actions/artifacts/13727250912",
+    "archive_download_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/actions/artifacts/13727250912/zip",
+    "expired": false,
+    "digest": "sha256:ff8ea828d60e0ff76e6721f0fb8610e757aeb0c6d2378e0098e9afd27de35172",
+    "created_at": "2026-11-10T01:29:48Z",
+    "updated_at": "2026-11-10T01:29:48Z",
+    "expires_at": "2026-11-24T01:29:35Z",
+    "workflow_run": {
+      "id": 42728993857,
+      "repository_id": 1440551273,
+      "head_repository_id": 1440551273,
+      "head_branch": "qualification/native-class-lifetimes-v2",
+      "head_sha": "0c231bea79b25ca334436bcdff248a8f9c4de5d3"
+    }
+  },
+  "fixture_scope": "Bounded helper fixture derived from actual completed-profile API; never runtime qualification evidence",
+  "qualification_granted": false
+}

@@ -1,0 +1,28 @@
+{
+  "protocol": "phase6-exact-published-original-class-profile-inputs-v1",
+  "repository": {
+    "owner": "dcajacob",
+    "repo": "orbiter-cross-platform"
+  },
+  "source": "0c231bea79b25ca334436bcdff248a8f9c4de5d3",
+  "run_id": 42728993857,
+  "branch": "qualification/native-class-lifetimes-v2",
+  "workflow": ".github/workflows/phase6-native-class-lifetimes.yml",
+  "readiness_job_id": 129541885900,
+  "jobs": {
+    "129541885900": "readiness",
+    "129543903593": "Original family and paused lifetime renewal Release-sse2",
+    "129543903611": "Original family and paused lifetime renewal Debug-automatic",
+    "129543903705": "Original family and paused lifetime renewal Debug-sse2",
+    "129543903930": "Original family and paused lifetime renewal Release-automatic"
+  },
+  "profiles": {
+    "Debug-sse2": {
+      "job_id": 129543903705,
+      "artifact_id": 13727250912,
+      "archive_bytes": 185393142,
+      "archive_sha256": "ff8ea828d60e0ff76e6721f0fb8610e757aeb0c6d2378e0098e9afd27de35172"
+    }
+  },
+  "scope": "Only each explicitly completed profile; other producer jobs and the overall run retain their actual states. No complete class or normal-admission qualification."
+}
