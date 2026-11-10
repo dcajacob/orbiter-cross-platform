@@ -1,0 +1,79 @@
+name: Phase 6 Reaudit Original Family Persistence From Complete Normal Captures
+on:
+  push:
+    branches: ['qualification/native-family-persistence-v1']
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: phase6-original-family-persistence-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  audit:
+    name: Reaudit original family persistence ${{ matrix.math_profile }} ${{ matrix.phase }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 90
+    strategy:
+      fail-fast: false
+      max-parallel: 2
+      matrix:
+        math_profile: [automatic, sse2]
+        phase: [stock-writer, windows-save-reload]
+    env:
+      MATH_PROFILE: ${{ matrix.math_profile }}
+      NATIVE_PHASE: ${{ matrix.phase }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.14'
+      - name: Preserve every original and new bounded helper control
+        run: |
+          mkdir -p out
+          python3 -B Tests/Production/Closeout/run_controls.py --output out/family-persistence-controls.json
+          python3 -B Tests/Production/Closeout/native_original_matrix_cli.py --plan > out/native-matrix-plan.json
+      - name: Retain all eight exact physical proofs and only the two affected complete native raw captures on GitHub
+        uses: actions/github-script@v8
+        with:
+          script: |
+            await require('./.github/scripts/phase6-download-native-matrix-inputs.cjs')({github,context,core});
+      - name: Preserve every original Windows raw archive and both actual audit attempts
+        uses: actions/github-script@v8
+        with:
+          script: |
+            await require('./.github/scripts/phase6-download-source-complete-retry.cjs')({github,context,core});
+      - name: Independently restore every actual original member and unchanged retry history
+        run: >-
+          python3 -B Tests/Production/CurrentWindows/Hosted/restore_source_complete_retry_reference.py
+          --audit-api out/reference-api/audit.json --audit-archive out/reference-api/audit.zip
+          --reference-api out/reference-api/original.json --first-attempt-api out/reference-api/first.json
+          --first-attempt-archive out/reference-api/first.zip --first-attempt-log out/reference-api/first-job.log
+      - name: Restore exact independently proven scalar without changed tolerances
+        run: >-
+          python3 -B Tests/Production/Closeout/restore_hosted_ssim.py
+          --api out/native-matrix-scalar/api.json --archive out/native-matrix-scalar/producer.zip
+      - name: Reexecute unchanged complete save content and direct persistence comparisons without recapture or flag rewrites
+        run: >-
+          python3 -B Tests/Production/Closeout/hosted_family_persistence.py
+          --math-profile "$MATH_PROFILE" --phase "$NATIVE_PHASE"
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: original-family-persistence-${{ matrix.math_profile }}-${{ matrix.phase }}
+          retention-days: 14
+          compression-level: 3
+          path: |
+            out/class-family-persistence-audits/**
+            out/class-full-SDK-source-witnesses/family-persistence/**
+            out/family-persistence-controls.json
+            out/native-matrix-plan.json
+            out/native-matrix-readiness.json
+            out/native-matrix-phase-inputs/**/api.json
+            out/native-matrix-native-inputs/**/api.json
+            out/native-matrix-scalar/api.json
+            out/hosted-ssim-restoration/restoration.json
+            out/reference-api/*.json
+            out/reference-api/first-job.log
+            out/reference-audit-restoration/restoration.json
