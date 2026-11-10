@@ -1,0 +1,76 @@
+name: Phase 6 Audit Retained Original Numerical Unit Evidence
+on:
+  push:
+    branches: ['qualification/numerical-prerequisite-packet-audit-v1']
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: phase6-original-numerical-packet-audit-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  readiness:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - run: mkdir -p out && python3 -B Tests/Production/Closeout/run_controls.py --output out/retained-numerical-controls.json
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: retained-original-numerical-readiness
+          retention-days: 14
+          path: out/retained-numerical-controls.json
+  audit:
+    name: Recover immutable original numerical unit evidence ${{ matrix.profile }}
+    needs: readiness
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      max-parallel: 2
+      matrix:
+        profile: [Debug-automatic, Debug-sse2, Release-automatic, Release-sse2]
+    env:
+      PROFILE: ${{ matrix.profile }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - name: Download only the exact existing original native package on this standard hosted worker
+        uses: actions/github-script@v8
+        with:
+          script: |
+            await require('./.github/scripts/phase6-download-native-math-packet.cjs')({github,context,core});
+      - name: Verify every original package byte and recover actual numerical unit and frozen-neighbour evidence without execution
+        run: >-
+          python3 -B Tests/Production/Closeout/audit_retained_native_math.py
+          --api "out/native-math-source/$PROFILE/api.json"
+          --archive "out/native-math-source/$PROFILE/producer.zip"
+          --profile "$PROFILE"
+          --output "out/retained-native-numerical/$PROFILE"
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: retained-original-numerical-full-metadata-${{ matrix.profile }}
+          retention-days: 14
+          compression-level: 3
+          path: |
+            out/retained-native-numerical/${{ env.PROFILE }}/*.json
+            out/retained-native-numerical/${{ env.PROFILE }}/original-numerical-metadata/**
+            out/native-math-source/${{ env.PROFILE }}/*.json
+            out/native-math-source/${{ env.PROFILE }}/*.body
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: retained-original-numerical-small-receipt-${{ matrix.profile }}
+          retention-days: 14
+          compression-level: 3
+          path: |
+            out/retained-native-numerical/${{ env.PROFILE }}/proof.json
+            out/retained-native-numerical/${{ env.PROFILE }}/original-numerical-metadata/engine/Math/math-verification.json
+            out/retained-native-numerical/${{ env.PROFILE }}/original-numerical-metadata/registered-unit-tests.json
+            out/retained-native-numerical/${{ env.PROFILE }}/original-numerical-metadata/engine-tests.xml
+            out/native-math-source/${{ env.PROFILE }}/api.json
