@@ -77,6 +77,12 @@ def inspect_compiler_bridge(payload,profile,source):
     require(sha(base/'host-preprocessor-macros.log')==report['host_preprocessor']['preprocessor_sha256'],'Actual unmodified compiler macro probe bytes required')
     tree=ast.parse(body);install=next(n for n in tree.body if isinstance(n,ast.FunctionDef) and n.name=='install');constant=next(n.value for n in install.body if isinstance(n,ast.Assign) and any(isinstance(t,ast.Name) and t.id=='body' for t in n.targets));expected_adapter=ast.literal_eval(constant)
     require((base/'container-compiler-adapter').read_bytes()==expected_adapter and sha(base/'container-compiler-adapter')==adapter['adapter_sha256'] and adapter['actual_compilation_runs_on_standard_Ubuntu_host'] is True and adapter['no_version_or_ABI_macro_spoofing'] is True and adapter['no_cached_or_prebuilt_fixture_outputs'] is True,'Actual declared runtime-container alias and original command transport must be retained, beyond component policy declarations')
+    provenance=payload.parents[0]/'compiler-provenance';provenance.mkdir()
+    for path in base.iterdir():
+        if path.is_file() and path.suffix in ('.json','.log'):shutil.copy2(path,provenance/path.name)
+    shutil.copy2(base/'container-compiler-adapter',provenance/'container-compiler-adapter')
+    shutil.copy2(payload/'Tests/Production/Closeout/rejection_fixture_compiler_bridge.py',provenance/'rejection_fixture_compiler_bridge.py')
+    (provenance/'fixtures').mkdir()
     unique=set();witness=[]
     for r in report['requests']:
         i=r['index'];receipt=load(base/('compile-'+str(i)+'-process.json'));actual=[v for v in receipt['owned_process_identities'] if v['pid']==receipt['actual_collector_pid']];original_command=load(ROOT/'out/native-class-rejections'/profile/'fixtures'/('command-'+str(i)+'.json'))
@@ -84,6 +90,7 @@ def inspect_compiler_bridge(payload,profile,source):
         key=(actual[0]['pid'],actual[0]['start_ticks']);require(key not in unique,'One compiler process cannot represent multiple original fixtures');unique.add(key)
         require(sha(base/('compile-'+str(i)+'-process.json'))==r['actual_compiler_process_receipt_sha256'] and sha(base/('compile-'+str(i)+'.log'))==r['log_sha256'],'Exact actual original compiler log and process receipt bytes required')
         output=Path(original_command[-1]);binary=output.read_bytes();tokens=abi_tokens(binary);require(sha(output)==r['output_sha256'] and tokens==r['actual_CPP_ABI_tokens'] and (tokens==[] and b'incompatible-cpp-abi\x00' in binary if i==1 else tokens==engine),'Actual original compiled fixture bytes and deliberate ABI mismatch required')
+        shutil.copy2(output,provenance/'fixtures'/output.name)
         witness.append(dict(index=i,pid=key[0],start_ticks=key[1],output_sha256=r['output_sha256'],actual_CPP_ABI_tokens=tokens))
     pool=payload/'out/original-package-official-pool'/profile
     require(sha(pool/'original-system-packages.txt')==sha(pool/'actual-system-packages.txt')=='0ae6765d460a0d744c48afdb242257d02a29da4845cf7e8b7fda42004e164900' and (pool/'terminal-exit-code.txt').read_text()=='0\n' and (pool/'status.txt').read_text()=='prepared-exact-original-package-inventory-only-not-qualified\n','Actual complete original488 runtime versions must remain exact alongside declared compiler alias')
@@ -103,6 +110,7 @@ def main():
         require(a.archive.stat().st_size==pin['archive_bytes'] and sha(a.archive)==pin['archive_sha256'],'Actual complete original rejection ZIP differs')
         frozen=original.conserved_sources();core=source_identity();members=restore_outer(a.archive,a.output/'original-artifact',a.profile);payload=a.output/'original-artifact';old=payload/'out/hosted-native-class-rejections'/a.profile
         atomic_json(a.output/'outer-members.json',members);collection=load(old/'collection.json');index=load(old/'raw-index.json')
+        shutil.copy2(old/'raw-index.json',a.output/'original-raw-index.json')
         require(collection['status']=='captured-and-audited-original-normal-host-rejection-controls-only' and collection['collector_source']==lock['source'] and collection['profile']==a.profile and collection['actual_processes']==45 and collection['compiled_runtime_source']==original.COMPILED and collection['published_raw_independent_replay_pending'] is True and all(collection[k] is False for k in ('complete_class_eligibility_qualified','normal_admission_qualified','phase6_complete','hands_on_ready')),'Exact complete original scoped rejection collection required')
         require(collection['original_rejection_source_identity']==frozen and collection['core_source_identity']['collector_source']==lock['source'] and {k:v for k,v in collection['core_source_identity'].items() if k!='collector_source'}=={k:v for k,v in core.items() if k!='collector_source'},'Original complete core/fixture/collector/auditor source identity required')
         for command in collection['commands']:require(command['actual_pid']>0 and command['actual_returncode']==0 and not command.get('timed_out') and sha(old/(command['label']+'.log'))==command['log_sha256'],'Every original preparation/capture/audit command and completed log required')
