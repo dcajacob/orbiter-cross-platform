@@ -85,3 +85,22 @@ class PublishedClassCapabilitiesTests(unittest.TestCase):
         result=subprocess.run([sys.executable,'-B',str(ROOT/'Tests/Production/Closeout/inspect_published_class_capabilities.py'),'--help'],
                               cwd=ROOT,stdout=subprocess.PIPE,stderr=subprocess.PIPE,text=True,timeout=15)
         self.assertEqual(result.returncode,0,result.stderr);self.assertIn('--archive',result.stdout);self.assertIn('--profile',result.stdout)
+
+
+    def test_generated_scope_uses_the_exact_producer_JSON_representation_without_dropping_fields(self):
+        with tempfile.TemporaryDirectory() as temp:
+            base=Path(temp);capture=base/'capture.json';old=base/'published-audit.json';new=base/'replayed-audit.json'
+            old.write_bytes(b'original exact audit');new.write_bytes(old.read_bytes())
+            computed=dict(full_17_field_signatures_observed=[('HST',*(float(i) for i in range(17)))],
+                          cases=['remaining_stock_018'],actual_processes=36,metadata_sha256={str(old):'a'*64},
+                          original_144_observer_controls_pending=True,normal_admission_qualified=False)
+            saved=json.loads(json.dumps(computed,allow_nan=False))
+            self.assertNotEqual(computed,saved)
+            with patch.object(published.original,'inspect_profile',return_value=computed):
+                actual=published.reproduce_scope('Debug-sse2',capture,old,new)
+            self.assertEqual(actual,saved);self.assertEqual(set(actual),set(computed))
+            self.assertEqual(len(actual['full_17_field_signatures_observed'][0]),18)
+            self.assertEqual(old.read_bytes(),b'original exact audit');self.assertEqual(new.read_bytes(),old.read_bytes())
+            computed['unexpected_nonfinite']=float('nan')
+            with patch.object(published.original,'inspect_profile',return_value=computed):
+                with self.assertRaises(ValueError):published.reproduce_scope('Debug-sse2',capture,old,new)

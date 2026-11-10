@@ -110,7 +110,10 @@ def reproduce_scope(profile,capture,published_audit,replayed_audit):
     require(Path(replayed_audit).read_bytes()==Path(published_audit).read_bytes(),
             'Every original capability/observer audit field must reproduce byte for byte')
     # Preserve the original metadata locations in the original scoped summary.
-    return original.inspect_profile(profile,Path(capture),Path(published_audit))
+    computed=original.inspect_profile(profile,Path(capture),Path(published_audit))
+    # The producer wrote this new summary as JSON: tuple signatures became arrays.
+    # Match that representation without changing either original file or any value.
+    return json.loads(json.dumps(computed,allow_nan=False))
 
 
 def main():
