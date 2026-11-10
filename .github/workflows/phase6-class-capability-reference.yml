@@ -1,0 +1,50 @@
+name: Phase 6 Verify Original Full SDK Capability Reference
+on:
+  push:
+    branches: ['qualification/native-class-capability-reference-v1']
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: phase6-original-capability-reference-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  audit:
+    name: Verify every original initial SDK structural signature before native observer controls
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.14'
+      - name: Preserve every original and new bounded helper control
+        run: mkdir -p out && python3 -B Tests/Production/Closeout/run_controls.py --output out/capability-reference-controls.json
+      - name: Retain the original complete Windows cohort and both immutable prior audit attempts on GitHub only
+        uses: actions/github-script@v8
+        with:
+          script: |
+            await require('./.github/scripts/phase6-download-source-complete-retry.cjs')({github,context,core});
+      - name: Independently restore every original member while preserving the failed attempt and exact saved inputs
+        run: >-
+          python3 -B Tests/Production/CurrentWindows/Hosted/restore_source_complete_retry_reference.py
+          --audit-api out/reference-api/audit.json --audit-archive out/reference-api/audit.zip
+          --reference-api out/reference-api/original.json --first-attempt-api out/reference-api/first.json
+          --first-attempt-archive out/reference-api/first.zip --first-attempt-log out/reference-api/first-job.log
+      - name: Re-read all 304 original initial SDK snapshots and every exact capability field
+        run: >-
+          python3 -B Tests/Production/Closeout/hosted_capability_reference.py
+          --output out/hosted-original-capability-inventory
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: original-full-SDK-capability-inventory
+          retention-days: 14
+          compression-level: 3
+          path: |
+            out/hosted-original-capability-inventory/**
+            out/capability-reference-controls.json
+            out/reference-api/*.json
+            out/reference-api/first-job.log
