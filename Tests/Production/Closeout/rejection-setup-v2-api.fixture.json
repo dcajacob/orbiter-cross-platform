@@ -1,0 +1,976 @@
+{
+  "repository": {
+    "owner": "dcajacob",
+    "repo": "orbiter-cross-platform"
+  },
+  "run": {
+    "id": 42806647208,
+    "name": "Phase 6 Original Native Normal Host Rejection Controls",
+    "node_id": "WFR_kwLOVd0Rac8AAAAJ93mZqA",
+    "head_branch": "qualification/native-class-rejections-v2",
+    "head_sha": "b939aabdda71832a61646cf304ff211ee4cc50d4",
+    "path": ".github/workflows/phase6-native-class-rejections.yml",
+    "display_title": "Allow slow signed package provisioning before original rejection checks",
+    "run_number": 2,
+    "event": "push",
+    "status": "completed",
+    "conclusion": "failure",
+    "workflow_id": 413172547,
+    "check_suite_id": 115928800086,
+    "check_suite_node_id": "CS_kwDOVd0Rac8AAAAa_eUbVg",
+    "url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/actions/runs/42806647208",
+    "html_url": "https://github.com/dcajacob/orbiter-cross-platform/actions/runs/42806647208",
+    "pull_requests": [],
+    "created_at": "2026-11-10T11:20:21Z",
+    "updated_at": "2026-11-10T11:57:52Z",
+    "actor": {
+      "login": "dcajacob",
+      "id": 3210634,
+      "node_id": "MDQ6VXNlcjMyMTA2MzQ=",
+      "avatar_url": "https://avatars.githubusercontent.com/u/3210634?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/dcajacob",
+      "html_url": "https://github.com/dcajacob",
+      "followers_url": "https://api.github.com/users/dcajacob/followers",
+      "following_url": "https://api.github.com/users/dcajacob/following{/other_user}",
+      "gists_url": "https://api.github.com/users/dcajacob/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/dcajacob/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/dcajacob/subscriptions",
+      "organizations_url": "https://api.github.com/users/dcajacob/orgs",
+      "repos_url": "https://api.github.com/users/dcajacob/repos",
+      "events_url": "https://api.github.com/users/dcajacob/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/dcajacob/received_events",
+      "type": "User",
+      "user_view_type": "public",
+      "site_admin": false
+    },
+    "run_attempt": 1,
+    "referenced_workflows": [],
+    "run_started_at": "2026-11-10T11:20:21Z",
+    "triggering_actor": {
+      "login": "dcajacob",
+      "id": 3210634,
+      "node_id": "MDQ6VXNlcjMyMTA2MzQ=",
+      "avatar_url": "https://avatars.githubusercontent.com/u/3210634?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/dcajacob",
+      "html_url": "https://github.com/dcajacob",
+      "followers_url": "https://api.github.com/users/dcajacob/followers",
+      "following_url": "https://api.github.com/users/dcajacob/following{/other_user}",
+      "gists_url": "https://api.github.com/users/dcajacob/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/dcajacob/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/dcajacob/subscriptions",
+      "organizations_url": "https://api.github.com/users/dcajacob/orgs",
+      "repos_url": "https://api.github.com/users/dcajacob/repos",
+      "events_url": "https://api.github.com/users/dcajacob/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/dcajacob/received_events",
+      "type": "User",
+      "user_view_type": "public",
+      "site_admin": false
+    },
+    "jobs_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/actions/runs/42806647208/jobs",
+    "logs_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/actions/runs/42806647208/logs",
+    "check_suite_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/check-suites/115928800086",
+    "artifacts_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/actions/runs/42806647208/artifacts",
+    "cancel_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/actions/runs/42806647208/cancel",
+    "rerun_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/actions/runs/42806647208/rerun",
+    "previous_attempt_url": null,
+    "workflow_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/actions/workflows/413172547",
+    "head_commit": {
+      "id": "b939aabdda71832a61646cf304ff211ee4cc50d4",
+      "tree_id": "a054165c3353e91e2e5e5b9f729871c49ff3906f",
+      "message": "Allow slow signed package provisioning before original rejection checks",
+      "timestamp": "2026-11-10T11:19:48Z",
+      "author": {
+        "name": "Dan CaJacob",
+        "email": "3210634+dcajacob@users.noreply.github.com"
+      },
+      "committer": {
+        "name": "Dan CaJacob",
+        "email": "3210634+dcajacob@users.noreply.github.com"
+      }
+    },
+    "repository": {
+      "id": 1440551273,
+      "node_id": "R_kgDOVd0RaQ",
+      "name": "orbiter-cross-platform",
+      "full_name": "dcajacob/orbiter-cross-platform",
+      "private": false,
+      "owner": {
+        "login": "dcajacob",
+        "id": 3210634,
+        "node_id": "MDQ6VXNlcjMyMTA2MzQ=",
+        "avatar_url": "https://avatars.githubusercontent.com/u/3210634?v=4",
+        "gravatar_id": "",
+        "url": "https://api.github.com/users/dcajacob",
+        "html_url": "https://github.com/dcajacob",
+        "followers_url": "https://api.github.com/users/dcajacob/followers",
+        "following_url": "https://api.github.com/users/dcajacob/following{/other_user}",
+        "gists_url": "https://api.github.com/users/dcajacob/gists{/gist_id}",
+        "starred_url": "https://api.github.com/users/dcajacob/starred{/owner}{/repo}",
+        "subscriptions_url": "https://api.github.com/users/dcajacob/subscriptions",
+        "organizations_url": "https://api.github.com/users/dcajacob/orgs",
+        "repos_url": "https://api.github.com/users/dcajacob/repos",
+        "events_url": "https://api.github.com/users/dcajacob/events{/privacy}",
+        "received_events_url": "https://api.github.com/users/dcajacob/received_events",
+        "type": "User",
+        "user_view_type": "public",
+        "site_admin": false
+      },
+      "html_url": "https://github.com/dcajacob/orbiter-cross-platform",
+      "description": "Incremental native Linux and Windows portability work for Orbiter, with headless physics parity tests. Based on orbitersim/orbiter.",
+      "fork": false,
+      "url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform",
+      "forks_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/forks",
+      "keys_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/keys{/key_id}",
+      "collaborators_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/collaborators{/collaborator}",
+      "teams_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/teams",
+      "hooks_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/hooks",
+      "issue_events_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/issues/events{/number}",
+      "events_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/events",
+      "assignees_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/assignees{/user}",
+      "branches_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/branches{/branch}",
+      "tags_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/tags",
+      "blobs_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/git/blobs{/sha}",
+      "git_tags_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/git/tags{/sha}",
+      "git_refs_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/git/refs{/sha}",
+      "trees_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/git/trees{/sha}",
+      "statuses_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/statuses/{sha}",
+      "languages_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/languages",
+      "stargazers_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/stargazers",
+      "contributors_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/contributors",
+      "subscribers_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/subscribers",
+      "subscription_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/subscription",
+      "commits_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/commits{/sha}",
+      "git_commits_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/git/commits{/sha}",
+      "comments_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/comments{/number}",
+      "issue_comment_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/issues/comments{/number}",
+      "contents_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/contents/{+path}",
+      "compare_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/compare/{base}...{head}",
+      "merges_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/merges",
+      "archive_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/{archive_format}{/ref}",
+      "downloads_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/downloads",
+      "issues_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/issues{/number}",
+      "pulls_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/pulls{/number}",
+      "milestones_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/milestones{/number}",
+      "notifications_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/notifications{?since,all,participating}",
+      "labels_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/labels{/name}",
+      "releases_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/releases{/id}",
+      "deployments_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/deployments"
+    },
+    "head_repository": {
+      "id": 1440551273,
+      "node_id": "R_kgDOVd0RaQ",
+      "name": "orbiter-cross-platform",
+      "full_name": "dcajacob/orbiter-cross-platform",
+      "private": false,
+      "owner": {
+        "login": "dcajacob",
+        "id": 3210634,
+        "node_id": "MDQ6VXNlcjMyMTA2MzQ=",
+        "avatar_url": "https://avatars.githubusercontent.com/u/3210634?v=4",
+        "gravatar_id": "",
+        "url": "https://api.github.com/users/dcajacob",
+        "html_url": "https://github.com/dcajacob",
+        "followers_url": "https://api.github.com/users/dcajacob/followers",
+        "following_url": "https://api.github.com/users/dcajacob/following{/other_user}",
+        "gists_url": "https://api.github.com/users/dcajacob/gists{/gist_id}",
+        "starred_url": "https://api.github.com/users/dcajacob/starred{/owner}{/repo}",
+        "subscriptions_url": "https://api.github.com/users/dcajacob/subscriptions",
+        "organizations_url": "https://api.github.com/users/dcajacob/orgs",
+        "repos_url": "https://api.github.com/users/dcajacob/repos",
+        "events_url": "https://api.github.com/users/dcajacob/events{/privacy}",
+        "received_events_url": "https://api.github.com/users/dcajacob/received_events",
+        "type": "User",
+        "user_view_type": "public",
+        "site_admin": false
+      },
+      "html_url": "https://github.com/dcajacob/orbiter-cross-platform",
+      "description": "Incremental native Linux and Windows portability work for Orbiter, with headless physics parity tests. Based on orbitersim/orbiter.",
+      "fork": false,
+      "url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform",
+      "forks_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/forks",
+      "keys_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/keys{/key_id}",
+      "collaborators_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/collaborators{/collaborator}",
+      "teams_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/teams",
+      "hooks_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/hooks",
+      "issue_events_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/issues/events{/number}",
+      "events_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/events",
+      "assignees_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/assignees{/user}",
+      "branches_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/branches{/branch}",
+      "tags_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/tags",
+      "blobs_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/git/blobs{/sha}",
+      "git_tags_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/git/tags{/sha}",
+      "git_refs_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/git/refs{/sha}",
+      "trees_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/git/trees{/sha}",
+      "statuses_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/statuses/{sha}",
+      "languages_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/languages",
+      "stargazers_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/stargazers",
+      "contributors_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/contributors",
+      "subscribers_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/subscribers",
+      "subscription_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/subscription",
+      "commits_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/commits{/sha}",
+      "git_commits_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/git/commits{/sha}",
+      "comments_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/comments{/number}",
+      "issue_comment_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/issues/comments{/number}",
+      "contents_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/contents/{+path}",
+      "compare_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/compare/{base}...{head}",
+      "merges_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/merges",
+      "archive_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/{archive_format}{/ref}",
+      "downloads_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/downloads",
+      "issues_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/issues{/number}",
+      "pulls_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/pulls{/number}",
+      "milestones_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/milestones{/number}",
+      "notifications_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/notifications{?since,all,participating}",
+      "labels_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/labels{/name}",
+      "releases_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/releases{/id}",
+      "deployments_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/deployments"
+    }
+  },
+  "jobs": [
+    {
+      "id": 129797371846,
+      "run_id": 42806647208,
+      "workflow_name": "Phase 6 Original Native Normal Host Rejection Controls",
+      "head_branch": "qualification/native-class-rejections-v2",
+      "run_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/actions/runs/42806647208",
+      "run_attempt": 1,
+      "node_id": "CR_kwDOVd0Rac8AAAAeOIa3xg",
+      "head_sha": "b939aabdda71832a61646cf304ff211ee4cc50d4",
+      "url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/actions/jobs/129797371846",
+      "html_url": "https://github.com/dcajacob/orbiter-cross-platform/actions/runs/42806647208/job/129797371846",
+      "status": "completed",
+      "conclusion": "success",
+      "created_at": "2026-11-10T11:20:22Z",
+      "started_at": "2026-11-10T11:20:25Z",
+      "completed_at": "2026-11-10T11:31:54Z",
+      "name": "readiness",
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 1,
+          "started_at": "2026-11-10T11:20:25Z",
+          "completed_at": "2026-11-10T11:20:27Z"
+        },
+        {
+          "name": "Run actions/checkout@v7",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 2,
+          "started_at": "2026-11-10T11:20:27Z",
+          "completed_at": "2026-11-10T11:20:44Z"
+        },
+        {
+          "name": "Preserve all original and new small controls",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 3,
+          "started_at": "2026-11-10T11:20:44Z",
+          "completed_at": "2026-11-10T11:20:54Z"
+        },
+        {
+          "name": "Verify every frozen original negative class and metadata fixture before any simulator",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 4,
+          "started_at": "2026-11-10T11:20:54Z",
+          "completed_at": "2026-11-10T11:20:55Z"
+        },
+        {
+          "name": "Require the exact independently reproduced complete joint API qualification",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 5,
+          "started_at": "2026-11-10T11:20:55Z",
+          "completed_at": "2026-11-10T11:20:56Z"
+        },
+        {
+          "name": "Re-read the source-bound qualified receipt without claiming class acceptance",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 6,
+          "started_at": "2026-11-10T11:20:56Z",
+          "completed_at": "2026-11-10T11:20:56Z"
+        },
+        {
+          "name": "Run actions/github-script@v8",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 7,
+          "started_at": "2026-11-10T11:20:56Z",
+          "completed_at": "2026-11-10T11:20:56Z"
+        },
+        {
+          "name": "Retain only the exact original provider input for package readiness",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 8,
+          "started_at": "2026-11-10T11:20:56Z",
+          "completed_at": "2026-11-10T11:21:03Z"
+        },
+        {
+          "name": "Restore and verify the original provider inventory and controls",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 9,
+          "started_at": "2026-11-10T11:21:03Z",
+          "completed_at": "2026-11-10T11:21:08Z"
+        },
+        {
+          "name": "Require one complete signed dated-archive package preflight before all four original captures",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 10,
+          "started_at": "2026-11-10T11:21:08Z",
+          "completed_at": "2026-11-10T11:31:50Z"
+        },
+        {
+          "name": "Run actions/upload-artifact@v7",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 11,
+          "started_at": "2026-11-10T11:31:50Z",
+          "completed_at": "2026-11-10T11:31:52Z"
+        },
+        {
+          "name": "Post Run actions/checkout@v7",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 22,
+          "started_at": "2026-11-10T11:31:52Z",
+          "completed_at": "2026-11-10T11:31:52Z"
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 23,
+          "started_at": "2026-11-10T11:31:52Z",
+          "completed_at": "2026-11-10T11:31:52Z"
+        }
+      ],
+      "check_run_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/check-runs/129797371846",
+      "labels": [
+        "ubuntu-24.04"
+      ],
+      "runner_id": 1000007798,
+      "runner_name": "GitHub Actions 1000007798",
+      "runner_group_id": 0,
+      "runner_group_name": "GitHub Actions"
+    },
+    {
+      "id": 129802746178,
+      "run_id": 42806647208,
+      "workflow_name": "Phase 6 Original Native Normal Host Rejection Controls",
+      "head_branch": "qualification/native-class-rejections-v2",
+      "run_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/actions/runs/42806647208",
+      "run_attempt": 1,
+      "node_id": "CR_kwDOVd0Rac8AAAAeONi5Qg",
+      "head_sha": "b939aabdda71832a61646cf304ff211ee4cc50d4",
+      "url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/actions/jobs/129802746178",
+      "html_url": "https://github.com/dcajacob/orbiter-cross-platform/actions/runs/42806647208/job/129802746178",
+      "status": "completed",
+      "conclusion": "failure",
+      "created_at": "2026-11-10T11:31:55Z",
+      "started_at": "2026-11-10T11:31:58Z",
+      "completed_at": "2026-11-10T11:47:25Z",
+      "name": "Original normal host class and loader rejection controls Debug-sse2",
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 1,
+          "started_at": "2026-11-10T11:31:59Z",
+          "completed_at": "2026-11-10T11:32:00Z"
+        },
+        {
+          "name": "Run actions/checkout@v7",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 2,
+          "started_at": "2026-11-10T11:32:00Z",
+          "completed_at": "2026-11-10T11:32:18Z"
+        },
+        {
+          "name": "Run actions/setup-python@v6",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 3,
+          "started_at": "2026-11-10T11:32:18Z",
+          "completed_at": "2026-11-10T11:32:18Z"
+        },
+        {
+          "name": "Stage the exact preserved original Windows application SDK and HST DLL without Windows execution",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 4,
+          "started_at": "2026-11-10T11:32:18Z",
+          "completed_at": "2026-11-10T11:32:25Z"
+        },
+        {
+          "name": "Retain the exact compiled application and provider inputs without changing failed producer history",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 5,
+          "started_at": "2026-11-10T11:32:25Z",
+          "completed_at": "2026-11-10T11:32:48Z"
+        },
+        {
+          "name": "Restore every retained native binary and original unit result with exact corrected discovery",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 6,
+          "started_at": "2026-11-10T11:32:48Z",
+          "completed_at": "2026-11-10T11:32:56Z"
+        },
+        {
+          "name": "Restore unchanged provider bytes links and original negative controls",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 7,
+          "started_at": "2026-11-10T11:32:56Z",
+          "completed_at": "2026-11-10T11:32:59Z"
+        },
+        {
+          "name": "Restore separately compiled unsuppressed Mesa owner repair and controls",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 8,
+          "started_at": "2026-11-10T11:32:59Z",
+          "completed_at": "2026-11-10T11:33:02Z"
+        },
+        {
+          "name": "Run all45 original normal host rejection controls with exact matching hosted userspace",
+          "status": "completed",
+          "conclusion": "failure",
+          "number": 9,
+          "started_at": "2026-11-10T11:33:02Z",
+          "completed_at": "2026-11-10T11:47:08Z"
+        },
+        {
+          "name": "Preserve bounded actual failure diagnostics",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 10,
+          "started_at": "2026-11-10T11:47:08Z",
+          "completed_at": "2026-11-10T11:47:08Z"
+        },
+        {
+          "name": "Run actions/upload-artifact@v7",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 11,
+          "started_at": "2026-11-10T11:47:08Z",
+          "completed_at": "2026-11-10T11:47:11Z"
+        },
+        {
+          "name": "Preserve raw partial files if lossless packing itself failed",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 12,
+          "started_at": "2026-11-10T11:47:11Z",
+          "completed_at": "2026-11-10T11:47:22Z"
+        },
+        {
+          "name": "Post Run actions/setup-python@v6",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 23,
+          "started_at": "2026-11-10T11:47:22Z",
+          "completed_at": "2026-11-10T11:47:22Z"
+        },
+        {
+          "name": "Post Run actions/checkout@v7",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 24,
+          "started_at": "2026-11-10T11:47:22Z",
+          "completed_at": "2026-11-10T11:47:23Z"
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 25,
+          "started_at": "2026-11-10T11:47:23Z",
+          "completed_at": "2026-11-10T11:47:23Z"
+        }
+      ],
+      "check_run_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/check-runs/129802746178",
+      "labels": [
+        "ubuntu-24.04"
+      ],
+      "runner_id": 1000007799,
+      "runner_name": "GitHub Actions 1000007799",
+      "runner_group_id": 0,
+      "runner_group_name": "GitHub Actions"
+    },
+    {
+      "id": 129802746248,
+      "run_id": 42806647208,
+      "workflow_name": "Phase 6 Original Native Normal Host Rejection Controls",
+      "head_branch": "qualification/native-class-rejections-v2",
+      "run_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/actions/runs/42806647208",
+      "run_attempt": 1,
+      "node_id": "CR_kwDOVd0Rac8AAAAeONi5iA",
+      "head_sha": "b939aabdda71832a61646cf304ff211ee4cc50d4",
+      "url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/actions/jobs/129802746248",
+      "html_url": "https://github.com/dcajacob/orbiter-cross-platform/actions/runs/42806647208/job/129802746248",
+      "status": "completed",
+      "conclusion": "failure",
+      "created_at": "2026-11-10T11:31:55Z",
+      "started_at": "2026-11-10T11:48:33Z",
+      "completed_at": "2026-11-10T11:57:51Z",
+      "name": "Original normal host class and loader rejection controls Release-sse2",
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 1,
+          "started_at": "2026-11-10T11:48:34Z",
+          "completed_at": "2026-11-10T11:48:35Z"
+        },
+        {
+          "name": "Run actions/checkout@v7",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 2,
+          "started_at": "2026-11-10T11:48:35Z",
+          "completed_at": "2026-11-10T11:48:52Z"
+        },
+        {
+          "name": "Run actions/setup-python@v6",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 3,
+          "started_at": "2026-11-10T11:48:52Z",
+          "completed_at": "2026-11-10T11:48:52Z"
+        },
+        {
+          "name": "Stage the exact preserved original Windows application SDK and HST DLL without Windows execution",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 4,
+          "started_at": "2026-11-10T11:48:52Z",
+          "completed_at": "2026-11-10T11:48:58Z"
+        },
+        {
+          "name": "Retain the exact compiled application and provider inputs without changing failed producer history",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 5,
+          "started_at": "2026-11-10T11:48:58Z",
+          "completed_at": "2026-11-10T11:49:09Z"
+        },
+        {
+          "name": "Restore every retained native binary and original unit result with exact corrected discovery",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 6,
+          "started_at": "2026-11-10T11:49:09Z",
+          "completed_at": "2026-11-10T11:49:16Z"
+        },
+        {
+          "name": "Restore unchanged provider bytes links and original negative controls",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 7,
+          "started_at": "2026-11-10T11:49:16Z",
+          "completed_at": "2026-11-10T11:49:21Z"
+        },
+        {
+          "name": "Restore separately compiled unsuppressed Mesa owner repair and controls",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 8,
+          "started_at": "2026-11-10T11:49:21Z",
+          "completed_at": "2026-11-10T11:49:24Z"
+        },
+        {
+          "name": "Run all45 original normal host rejection controls with exact matching hosted userspace",
+          "status": "completed",
+          "conclusion": "failure",
+          "number": 9,
+          "started_at": "2026-11-10T11:49:24Z",
+          "completed_at": "2026-11-10T11:57:36Z"
+        },
+        {
+          "name": "Preserve bounded actual failure diagnostics",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 10,
+          "started_at": "2026-11-10T11:57:36Z",
+          "completed_at": "2026-11-10T11:57:36Z"
+        },
+        {
+          "name": "Run actions/upload-artifact@v7",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 11,
+          "started_at": "2026-11-10T11:57:36Z",
+          "completed_at": "2026-11-10T11:57:38Z"
+        },
+        {
+          "name": "Preserve raw partial files if lossless packing itself failed",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 12,
+          "started_at": "2026-11-10T11:57:38Z",
+          "completed_at": "2026-11-10T11:57:49Z"
+        },
+        {
+          "name": "Post Run actions/setup-python@v6",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 23,
+          "started_at": "2026-11-10T11:57:49Z",
+          "completed_at": "2026-11-10T11:57:49Z"
+        },
+        {
+          "name": "Post Run actions/checkout@v7",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 24,
+          "started_at": "2026-11-10T11:57:49Z",
+          "completed_at": "2026-11-10T11:57:49Z"
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 25,
+          "started_at": "2026-11-10T11:57:49Z",
+          "completed_at": "2026-11-10T11:57:49Z"
+        }
+      ],
+      "check_run_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/check-runs/129802746248",
+      "labels": [
+        "ubuntu-24.04"
+      ],
+      "runner_id": 1000007802,
+      "runner_name": "GitHub Actions 1000007802",
+      "runner_group_id": 0,
+      "runner_group_name": "GitHub Actions"
+    },
+    {
+      "id": 129802746262,
+      "run_id": 42806647208,
+      "workflow_name": "Phase 6 Original Native Normal Host Rejection Controls",
+      "head_branch": "qualification/native-class-rejections-v2",
+      "run_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/actions/runs/42806647208",
+      "run_attempt": 1,
+      "node_id": "CR_kwDOVd0Rac8AAAAeONi5lg",
+      "head_sha": "b939aabdda71832a61646cf304ff211ee4cc50d4",
+      "url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/actions/jobs/129802746262",
+      "html_url": "https://github.com/dcajacob/orbiter-cross-platform/actions/runs/42806647208/job/129802746262",
+      "status": "completed",
+      "conclusion": "failure",
+      "created_at": "2026-11-10T11:31:55Z",
+      "started_at": "2026-11-10T11:47:28Z",
+      "completed_at": "2026-11-10T11:57:24Z",
+      "name": "Original normal host class and loader rejection controls Release-automatic",
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 1,
+          "started_at": "2026-11-10T11:47:28Z",
+          "completed_at": "2026-11-10T11:47:29Z"
+        },
+        {
+          "name": "Run actions/checkout@v7",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 2,
+          "started_at": "2026-11-10T11:47:29Z",
+          "completed_at": "2026-11-10T11:47:43Z"
+        },
+        {
+          "name": "Run actions/setup-python@v6",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 3,
+          "started_at": "2026-11-10T11:47:43Z",
+          "completed_at": "2026-11-10T11:47:43Z"
+        },
+        {
+          "name": "Stage the exact preserved original Windows application SDK and HST DLL without Windows execution",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 4,
+          "started_at": "2026-11-10T11:47:43Z",
+          "completed_at": "2026-11-10T11:47:49Z"
+        },
+        {
+          "name": "Retain the exact compiled application and provider inputs without changing failed producer history",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 5,
+          "started_at": "2026-11-10T11:47:49Z",
+          "completed_at": "2026-11-10T11:48:00Z"
+        },
+        {
+          "name": "Restore every retained native binary and original unit result with exact corrected discovery",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 6,
+          "started_at": "2026-11-10T11:48:00Z",
+          "completed_at": "2026-11-10T11:48:06Z"
+        },
+        {
+          "name": "Restore unchanged provider bytes links and original negative controls",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 7,
+          "started_at": "2026-11-10T11:48:06Z",
+          "completed_at": "2026-11-10T11:48:09Z"
+        },
+        {
+          "name": "Restore separately compiled unsuppressed Mesa owner repair and controls",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 8,
+          "started_at": "2026-11-10T11:48:09Z",
+          "completed_at": "2026-11-10T11:48:10Z"
+        },
+        {
+          "name": "Run all45 original normal host rejection controls with exact matching hosted userspace",
+          "status": "completed",
+          "conclusion": "failure",
+          "number": 9,
+          "started_at": "2026-11-10T11:48:10Z",
+          "completed_at": "2026-11-10T11:57:13Z"
+        },
+        {
+          "name": "Preserve bounded actual failure diagnostics",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 10,
+          "started_at": "2026-11-10T11:57:13Z",
+          "completed_at": "2026-11-10T11:57:13Z"
+        },
+        {
+          "name": "Run actions/upload-artifact@v7",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 11,
+          "started_at": "2026-11-10T11:57:13Z",
+          "completed_at": "2026-11-10T11:57:15Z"
+        },
+        {
+          "name": "Preserve raw partial files if lossless packing itself failed",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 12,
+          "started_at": "2026-11-10T11:57:15Z",
+          "completed_at": "2026-11-10T11:57:22Z"
+        },
+        {
+          "name": "Post Run actions/setup-python@v6",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 23,
+          "started_at": "2026-11-10T11:57:22Z",
+          "completed_at": "2026-11-10T11:57:22Z"
+        },
+        {
+          "name": "Post Run actions/checkout@v7",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 24,
+          "started_at": "2026-11-10T11:57:22Z",
+          "completed_at": "2026-11-10T11:57:22Z"
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 25,
+          "started_at": "2026-11-10T11:57:22Z",
+          "completed_at": "2026-11-10T11:57:22Z"
+        }
+      ],
+      "check_run_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/check-runs/129802746262",
+      "labels": [
+        "ubuntu-24.04"
+      ],
+      "runner_id": 1000007801,
+      "runner_name": "GitHub Actions 1000007801",
+      "runner_group_id": 0,
+      "runner_group_name": "GitHub Actions"
+    },
+    {
+      "id": 129802746295,
+      "run_id": 42806647208,
+      "workflow_name": "Phase 6 Original Native Normal Host Rejection Controls",
+      "head_branch": "qualification/native-class-rejections-v2",
+      "run_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/actions/runs/42806647208",
+      "run_attempt": 1,
+      "node_id": "CR_kwDOVd0Rac8AAAAeONi5tw",
+      "head_sha": "b939aabdda71832a61646cf304ff211ee4cc50d4",
+      "url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/actions/jobs/129802746295",
+      "html_url": "https://github.com/dcajacob/orbiter-cross-platform/actions/runs/42806647208/job/129802746295",
+      "status": "completed",
+      "conclusion": "failure",
+      "created_at": "2026-11-10T11:31:55Z",
+      "started_at": "2026-11-10T11:31:58Z",
+      "completed_at": "2026-11-10T11:48:30Z",
+      "name": "Original normal host class and loader rejection controls Debug-automatic",
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 1,
+          "started_at": "2026-11-10T11:31:59Z",
+          "completed_at": "2026-11-10T11:32:00Z"
+        },
+        {
+          "name": "Run actions/checkout@v7",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 2,
+          "started_at": "2026-11-10T11:32:00Z",
+          "completed_at": "2026-11-10T11:32:17Z"
+        },
+        {
+          "name": "Run actions/setup-python@v6",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 3,
+          "started_at": "2026-11-10T11:32:17Z",
+          "completed_at": "2026-11-10T11:32:17Z"
+        },
+        {
+          "name": "Stage the exact preserved original Windows application SDK and HST DLL without Windows execution",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 4,
+          "started_at": "2026-11-10T11:32:17Z",
+          "completed_at": "2026-11-10T11:32:28Z"
+        },
+        {
+          "name": "Retain the exact compiled application and provider inputs without changing failed producer history",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 5,
+          "started_at": "2026-11-10T11:32:28Z",
+          "completed_at": "2026-11-10T11:32:53Z"
+        },
+        {
+          "name": "Restore every retained native binary and original unit result with exact corrected discovery",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 6,
+          "started_at": "2026-11-10T11:32:53Z",
+          "completed_at": "2026-11-10T11:33:02Z"
+        },
+        {
+          "name": "Restore unchanged provider bytes links and original negative controls",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 7,
+          "started_at": "2026-11-10T11:33:02Z",
+          "completed_at": "2026-11-10T11:33:07Z"
+        },
+        {
+          "name": "Restore separately compiled unsuppressed Mesa owner repair and controls",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 8,
+          "started_at": "2026-11-10T11:33:07Z",
+          "completed_at": "2026-11-10T11:33:09Z"
+        },
+        {
+          "name": "Run all45 original normal host rejection controls with exact matching hosted userspace",
+          "status": "completed",
+          "conclusion": "failure",
+          "number": 9,
+          "started_at": "2026-11-10T11:33:09Z",
+          "completed_at": "2026-11-10T11:48:12Z"
+        },
+        {
+          "name": "Preserve bounded actual failure diagnostics",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 10,
+          "started_at": "2026-11-10T11:48:12Z",
+          "completed_at": "2026-11-10T11:48:12Z"
+        },
+        {
+          "name": "Run actions/upload-artifact@v7",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 11,
+          "started_at": "2026-11-10T11:48:12Z",
+          "completed_at": "2026-11-10T11:48:14Z"
+        },
+        {
+          "name": "Preserve raw partial files if lossless packing itself failed",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 12,
+          "started_at": "2026-11-10T11:48:14Z",
+          "completed_at": "2026-11-10T11:48:28Z"
+        },
+        {
+          "name": "Post Run actions/setup-python@v6",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 23,
+          "started_at": "2026-11-10T11:48:28Z",
+          "completed_at": "2026-11-10T11:48:28Z"
+        },
+        {
+          "name": "Post Run actions/checkout@v7",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 24,
+          "started_at": "2026-11-10T11:48:28Z",
+          "completed_at": "2026-11-10T11:48:28Z"
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 25,
+          "started_at": "2026-11-10T11:48:28Z",
+          "completed_at": "2026-11-10T11:48:28Z"
+        }
+      ],
+      "check_run_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/check-runs/129802746295",
+      "labels": [
+        "ubuntu-24.04"
+      ],
+      "runner_id": 1000007800,
+      "runner_name": "GitHub Actions 1000007800",
+      "runner_group_id": 0,
+      "runner_group_name": "GitHub Actions"
+    }
+  ],
+  "artifact": {
+    "id": 13761595407,
+    "node_id": "MDg6QXJ0aWZhY3QxMzc2MTU5NTQwNw==",
+    "name": "native-class-rejections-readiness",
+    "size_in_bytes": 175698,
+    "url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/actions/artifacts/13761595407",
+    "archive_download_url": "https://api.github.com/repos/dcajacob/orbiter-cross-platform/actions/artifacts/13761595407/zip",
+    "expired": false,
+    "digest": "sha256:7dc1a4a4ac48548a8e088ae9a4ae4aa022eee91a60a04ccbda8e12cecb398c48",
+    "created_at": "2026-11-10T11:31:52Z",
+    "updated_at": "2026-11-10T11:31:52Z",
+    "expires_at": "2026-11-24T11:31:51Z",
+    "workflow_run": {
+      "id": 42806647208,
+      "repository_id": 1440551273,
+      "head_repository_id": 1440551273,
+      "head_branch": "qualification/native-class-rejections-v2",
+      "head_sha": "b939aabdda71832a61646cf304ff211ee4cc50d4"
+    }
+  }
+}
