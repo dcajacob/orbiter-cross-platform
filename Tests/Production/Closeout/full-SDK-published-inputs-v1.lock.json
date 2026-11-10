@@ -1,0 +1,29 @@
+{
+  "protocol": "phase6-published-full-SDK-cohort-inputs-v1",
+  "repository": {
+    "owner": "dcajacob",
+    "repo": "orbiter-cross-platform"
+  },
+  "source": "714f1d455a6726122ce611f447e17332bfdda3ed",
+  "run_id": 42759840013,
+  "branch": "qualification/native-full-sdk-variants-v2",
+  "workflow": ".github/workflows/phase6-native-full-sdk-variants.yml",
+  "jobs": {
+    "129642687472": "Replay all full SDK and port variants automatic",
+    "129642687877": "Replay all full SDK and port variants sse2"
+  },
+  "cohorts": {
+    "automatic": {
+      "job_id": 129642687472,
+      "artifact_id": 13737985632,
+      "archive_bytes": 6871868,
+      "archive_sha256": "d6a23631160f673e4e4d147b83b6d8932bc3440f7c9677757cda1069f8ce0d0b"
+    },
+    "sse2": {
+      "job_id": 129642687877,
+      "artifact_id": 13738250143,
+      "archive_bytes": 6866389,
+      "archive_sha256": "f6222462a429687635755ddd570e06da0155754457d19eedd83eb2587c4a7db9"
+    }
+  }
+}
