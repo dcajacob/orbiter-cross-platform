@@ -1,7 +1,7 @@
 name: Phase 6 Original Native Normal Host Rejection Controls
 on:
   push:
-    branches: ['qualification/native-class-rejections-v1']
+    branches: ['qualification/native-class-rejections-v2']
 permissions:
   contents: read
   actions: read
@@ -11,7 +11,7 @@ concurrency:
 jobs:
   readiness:
     runs-on: ubuntu-24.04
-    timeout-minutes: 20
+    timeout-minutes: 75
     steps:
       - uses: actions/checkout@v7
         with:
@@ -86,7 +86,7 @@ jobs:
           docker image inspect "$image" > out/class-userspace-container.json
           docker run --rm --init --cpus=2 -v "$GITHUB_WORKSPACE:$GITHUB_WORKSPACE" -v /etc/ssl/certs/ca-certificates.crt:/run/orbiter-ci-system-ca.pem:ro -w "$GITHUB_WORKSPACE" \
             -e GITHUB_ACTIONS -e RUNNER_OS -e GITHUB_WORKSPACE -e GITHUB_SHA -e PROFILE \
-            "$image" bash Tests/Production/Closeout/prepare_hosted_class_rejections_network.sh Tests/Production/Closeout/prepare_hosted_class_userspace.sh 2>&1 | tee out/class-userspace-container.log
+            "$image" bash Tests/Production/Closeout/prepare_hosted_class_rejections_network_v2.sh Tests/Production/Closeout/prepare_hosted_class_rejection_userspace.sh 2>&1 | tee out/class-userspace-container.log
       - uses: actions/upload-artifact@v7
         if: always()
         with:
@@ -95,6 +95,7 @@ jobs:
           path: |
             out/class-rejection-controls.json
             out/class-rejection-source-preflight.json
+            out/class-rejection-provisioning-deadline.json
             out/class-joint-reference/*.json
             out/class-joint-reference/*.body
             out/class-userspace-preflight/**
@@ -158,7 +159,7 @@ jobs:
           docker image inspect "$image" > out/native-rejection-container.json
           docker run --rm --init --cpus=2 --shm-size=1g -v "$GITHUB_WORKSPACE:$GITHUB_WORKSPACE" -v /etc/ssl/certs/ca-certificates.crt:/run/orbiter-ci-system-ca.pem:ro -w "$GITHUB_WORKSPACE" \
             -e GITHUB_ACTIONS -e RUNNER_OS -e GITHUB_WORKSPACE -e GITHUB_SHA -e PROFILE \
-            "$image" bash Tests/Production/Closeout/prepare_hosted_class_rejections_network.sh Tests/Production/Closeout/prepare_hosted_class_rejections.sh 2>&1 | tee out/native-rejection-container.log
+            "$image" bash Tests/Production/Closeout/prepare_hosted_class_rejections_network_v2.sh Tests/Production/Closeout/prepare_hosted_class_rejections.sh 2>&1 | tee out/native-rejection-container.log
       - name: Preserve bounded actual failure diagnostics
         if: failure()
         shell: python

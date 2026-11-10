@@ -88,6 +88,10 @@ def prepared_body():
                     ("ROOT/'out/hosted-native-writer'","ROOT/'out/hosted-native-class-rejections'"),
                     ("ROOT/'out/native-writer-container.json'","ROOT/'out/native-rejection-container.json'")]:
         require(body.count(old)==(2 if 'container.json' in old else 1),'Conserved original runtime setup anchor differs');body=body.replace(old,new)
+    # Only dependency transfer gets more time; original package/input and runtime guards remain exact.
+    before="        run('restore-original-system-packages',['apt-get','install','-y','--no-install-recommends',*[name+'='+version for name,version in inventory.items()]],1200)"
+    require(body.count(before)==1,'One exact original dependency restoration deadline required')
+    body=body.replace(before,"        run('restore-original-system-packages',['apt-get','install','-y','--no-install-recommends',*[name+'='+version for name,version in inventory.items()]],3600)",1)
     start=body.index("        build=ROOT/'out/phase6-hosted-native'/a.profile;capture=")
     end=body.index("        require(sha(ROOT/'out/mesa-topology-restoration/restoration.json')",start)
     replacement=r"""
