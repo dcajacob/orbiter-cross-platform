@@ -1,0 +1,42 @@
+name: Phase 6 Verify Complete Published Original Four Profile Interaction Receipts
+on:
+  push:
+    branches: ['qualification/native-interaction-published-four-profile-v1']
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: phase6-published-four-profile-interaction-receipts-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  audit:
+    name: Verify complete published four profile interaction metadata and member witnesses
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - name: Preserve every original and new bounded helper control
+        run: mkdir -p out && python3 -B Tests/Production/Closeout/run_controls.py --output out/interaction-publication-controls.json
+      - name: Retain only the eight exact complete published four profile metadata and member-witness receipts
+        uses: actions/github-script@v8
+        with:
+          script: |
+            await require('./.github/scripts/phase6-download-interaction-publication.cjs')({github,context,core,lockPath:'Tests/Production/Closeout/class-interaction-four-profile-inputs-v1.lock.json'});
+      - name: Verify every original process flow outcome repeat frame and source member witness
+        run: >-
+          python3 -B Tests/Production/Closeout/verify_published_class_interactions.py
+          --inputs out/interaction-publication-inputs --output out/interaction-publication-proof
+          --lock /home/runner/work/orbiter-cross-platform/orbiter-cross-platform/Tests/Production/Closeout/class-interaction-four-profile-inputs-v1.lock.json
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: verified-published-original-four-profile-interactions
+          retention-days: 14
+          compression-level: 3
+          path: |
+            out/interaction-publication-proof/**
+            out/interaction-publication-controls.json
+            out/interaction-publication-inputs/*/*/*.json
+            out/interaction-publication-inputs/*/*/*.body

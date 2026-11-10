@@ -13,6 +13,9 @@ import final_hosted_class_capabilities as closed
 import inspect_published_class_interactions as replay
 
 LOCK=ROOT/'Tests/Production/Closeout/class-interaction-publication-inputs-v1.lock.json'
+FOUR_PROFILE_LOCK=ROOT/'Tests/Production/Closeout/class-interaction-four-profile-inputs-v1.lock.json'
+REPLAY_CONTROL_COUNTS={'2f98af3e37b8b5b79d951c82ba51aabd51618768':366,
+                       '2f11a8ac391de2fe5272867fbe5d7d526f849fb9':372}
 CI=PurePosixPath('/home/runner/work/orbiter-cross-platform/orbiter-cross-platform')
 sys.path.insert(0,str(ROOT/'Tests/Production/RemainingVessels'))
 from interactions import OPS
@@ -52,8 +55,8 @@ def manifest_payload(bodies,members,expected_sha256):
     return json.loads(body)
 
 
-def verify_reference_roster(reference,profile):
-    expected=load(LOCK)['original_reference_guards'][profile]
+def verify_reference_roster(reference,profile,lock_path=LOCK):
+    expected=load(lock_path)['original_reference_guards'][profile]
     actual={name:value['sha256'] for name,value in reference['old_guarded_inputs'].items()}
     require(reference['old_reference_owner']==expected['original_capture_source'] and
             actual==expected['exact_guarded_paths_sha256'],
@@ -61,7 +64,7 @@ def verify_reference_roster(reference,profile):
     return len(actual)
 
 
-def inspect_profile(profile,meta_bodies,meta_members,raw_bodies,raw_members,pins):
+def inspect_profile(profile,meta_bodies,meta_members,raw_bodies,raw_members,pins,lock_path=LOCK):
     source=pins['metadata']['source'];prefix='interaction-independent/'+profile+'/'
     for relative in ('Tests/Production/Closeout/inspect_published_class_interactions.py','Tests/Production/Closeout/download_published_class_interactions.py','Tests/Production/Closeout/hosted_class_interactions.py'):
         require(sha(ROOT/relative)==closed.gitsha(source,relative),'Exact immutable original replay/scope helper implementation required')
@@ -116,7 +119,7 @@ def inspect_profile(profile,meta_bodies,meta_members,raw_bodies,raw_members,pins
     require(meta_members[prefix+'original-reference-bindings.json']==proof['original_reference_bindings_sha256'] and
             reference['old_reference_owner']==lock['source'] and reference['current_reference_owner']==source and
             reference['old_API_receipts_preserved'] is True and reference['old_capture_relabelled'] is False and
-            verify_reference_roster(reference,profile)==306,'Every original and current source/reference guard must remain represented')
+            verify_reference_roster(reference,profile,lock_path)==306,'Every original and current source/reference guard must remain represented')
     comparison=reference['independent_original_retry_comparison']
     require(comparison['raw_API_and_log_transport_identities_preserved'] is True and comparison['API_attempts_normalized'] is False and
             comparison['old_failed_attempt_relabelled'] is False,'Prior failed attempt and distinct original API transports must remain exact')
@@ -147,37 +150,68 @@ def inspect_profile(profile,meta_bodies,meta_members,raw_bodies,raw_members,pins
                 meta_members[prefix+command['label']+'.log']==command['log_sha256'],'Every actual independent command/log receipt required')
     expected=['stock-data','planet-data','base-assets','test-font','complete-stock-assets']+['unchanged-original-'+Path(n).stem for n in load(replay.original.LOCK)['selected_plans']]
     require([v['label'] for v in proof['commands']]==expected,'Every original provisioning/auditing command required; no simulator may be launched')
-    closed.controls(meta_bodies,'published-interaction-controls.json',source,366)
+    replay_controls(meta_bodies,source)
     return dict(profile=profile,status='verified-published-complete-original-nine-flow-interactions-only',actual_original_processes=18,
         actual_original_successful_presents=coverage['successful_presents'],complete_flows=9,repeats=2,compiled_runtime_source=replay.original.COMPILED,
-        original_capture_source=lock['source'],independent_replay_source=source,original_raw_artifact_id=pin['artifact_id'],
+        original_capture_source=lock['source'],original_capture_job_id=pin['job_id'],independent_replay_source=source,original_raw_artifact_id=pin['artifact_id'],
         original_raw_archive_sha256=pin['archive_sha256'],original_raw_archive_bytes=pin['archive_bytes'],raw_members_sha256=proof['raw_members_sha256'],
-        complete_member_witness=storage,all_five_original_audits_byte_identical=True,all_original_source_reference_guards_preserved=True,original_source_reference_guard_count=verify_reference_roster(reference,profile),
+        complete_member_witness=storage,all_five_original_audits_byte_identical=True,all_original_source_reference_guards_preserved=True,original_source_reference_guard_count=verify_reference_roster(reference,profile,lock_path),
         original_audit_sha256=proof['original_audit_sha256'],independent_proof_sha256=meta_members[prefix+'proof.json'],
         new_simulator_processes=0,new_X11_processes=0,**{k:False for k in FLAGS})
 
 
+def replay_controls(bodies,source):
+    require(source in REPLAY_CONTROL_COUNTS,'Unknown immutable independent replay control owner')
+    closed.controls(bodies,'published-interaction-controls.json',source,REPLAY_CONTROL_COUNTS[source])
+
+
+def interaction_facet(profiles,lock):
+    require(set(profiles)==set(lock['expected_profiles'])==set(PROFILES),'All four original interaction profiles required for facet closure')
+    _,flows=replay.original.conserved_sources()
+    from checklist import requirements
+    expected=requirements()['class-eligibility']
+    require({family for flow in flows.values() for family in flow['families']}==set(expected['families']) and len(flows)==9,
+            'Every original class family and nine unchanged input flows required')
+    require(len({v['original_capture_job_id'] for v in profiles.values()})==4 and
+            len({v['original_raw_artifact_id'] for v in profiles.values()})==4,
+            'Four actual distinct complete original producer jobs and artifacts required')
+    for profile,value in profiles.items():
+        require(value['profile']==profile and value['actual_original_processes']==18 and value['complete_flows']==9 and value['repeats']==2 and
+                value['actual_original_successful_presents']==14048 and value['compiled_runtime_source']==replay.original.COMPILED and
+                value['original_capture_source']==load(replay.LOCK)['source'] and value['all_five_original_audits_byte_identical'] is True and
+                value['all_original_source_reference_guards_preserved'] is True and value['original_source_reference_guard_count']==306 and
+                value['new_simulator_processes']==value['new_X11_processes']==0 and all(value[k] is False for k in FLAGS),
+                'Every complete original profile, unchanged comparison and pending acceptance flag required')
+    return dict(status='verified-four-profile-original-interaction-facet-only',passed_class_facets=['interactions'],
+        profiles=sorted(profiles),families=expected['families'],flows=sorted(flows),repeats=2,actual_original_processes=72,
+        actual_original_successful_presents=56192,original_audits_reproduced_byte_identically=20,
+        full_published_member_witnesses_verified=True,compiled_runtime_source=replay.original.COMPILED,
+        original_capture_source=load(replay.LOCK)['source'],new_simulator_processes=0,new_X11_processes=0,
+        historical_capture_or_pending_flags_relabelled=False,**{k:False for k in FLAGS})
+
+
 def main():
-    p=argparse.ArgumentParser(description=__doc__);p.add_argument('--inputs',type=Path,required=True);p.add_argument('--output',type=Path,required=True);a=p.parse_args()
+    p=argparse.ArgumentParser(description=__doc__);p.add_argument('--inputs',type=Path,required=True);p.add_argument('--output',type=Path,required=True);p.add_argument('--lock',type=Path,default=LOCK,choices=(LOCK,FOUR_PROFILE_LOCK));a=p.parse_args()
     require(os.environ.get('GITHUB_ACTIONS')=='true' and os.environ.get('RUNNER_OS')=='Linux' and
             Path(os.environ['GITHUB_WORKSPACE']).resolve()==ROOT,'Actual independent standard hosted publication check required')
     require(not a.output.exists() and a.output.resolve().is_relative_to(ROOT/'out'),'Fresh separate published interaction scope output required');a.output.mkdir(parents=True)
-    lock=load(LOCK);result={};inputs={}
+    lock=load(a.lock);result={};inputs={}
     for profile,pins in lock['profiles'].items():
         restored={}
         for role,pin in pins.items():
             base=a.inputs/profile/role;bodies,members=closed.restore(base,pin);restored[role]=(bodies,members)
             inputs[profile+'/'+role]=dict(source=pin['source'],run_id=pin['run_id'],artifact_id=pin['artifact_id'],
                 archive_bytes=pin['archive_bytes'],archive_sha256=pin['archive_sha256'],api_sha256=sha(base/'api.json'),members_sha256=members)
-        result[profile]=inspect_profile(profile,*restored['metadata'],*restored['witness'],pins)
+        result[profile]=inspect_profile(profile,*restored['metadata'],*restored['witness'],pins,a.lock)
     require(set(result)==set(lock['profiles'])==set(lock['expected_profiles']),'Complete exact declared published profile scope required')
     report=dict(protocol='phase6-published-complete-original-interaction-receipt-verification-v1',
         status='verified-published-original-interaction-profiles-only',auditor_source=os.environ['GITHUB_SHA'],profiles=result,inputs=inputs,
         actual_original_processes=sum(v['actual_original_processes'] for v in result.values()),
         actual_original_successful_presents=sum(v['actual_original_successful_presents'] for v in result.values()),
-        original_frozen_interaction_sources=replay.original.conserved_sources()[0],exact_input_lock_sha256=sha(LOCK),
+        original_frozen_interaction_sources=replay.original.conserved_sources()[0],exact_input_lock_sha256=sha(a.lock),
         new_simulator_processes=0,new_X11_processes=0,remaining_profiles_and_formal_class_eligibility_pending=True,
         **{k:False for k in FLAGS})
+    if a.lock==FOUR_PROFILE_LOCK:report['interaction_facet']=interaction_facet(result,lock)
     atomic_json(a.output/'published-interaction-verification.json',report);print(report['status'])
 
 if __name__=='__main__':main()

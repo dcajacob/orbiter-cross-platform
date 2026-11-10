@@ -1,7 +1,7 @@
 // Retain only complete independently published interaction metadata and file-witness JSON archives.
-module.exports=async ({github,context,core})=>{
+module.exports=async ({github,context,core,lockPath='Tests/Production/Closeout/class-interaction-publication-inputs-v1.lock.json'})=>{
  const fs=require('fs'),crypto=require('crypto'),{owner,repo}=context.repo;
- const lock=JSON.parse(fs.readFileSync('Tests/Production/Closeout/class-interaction-publication-inputs-v1.lock.json','utf8'));
+ const lock=JSON.parse(fs.readFileSync(lockPath,'utf8'));
  if(owner!=='dcajacob'||repo!=='orbiter-cross-platform'||(await github.rest.repos.get({owner,repo})).data.private||
     JSON.stringify(Object.keys(lock.profiles).sort())!==JSON.stringify([...lock.expected_profiles].sort()))throw Error('Exact public declared interaction receipt scope required');
  for(const [profile,roles] of Object.entries(lock.profiles))for(const [role,pin] of Object.entries(roles)){
