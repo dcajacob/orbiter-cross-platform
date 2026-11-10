@@ -1,0 +1,50 @@
+{
+  "protocol": "phase6-original-interaction-source-scope-v1",
+  "compiled_runtime_source": "ccc02c8a34bd1f227624d8778a141e8736ae8111",
+  "source_sha256": {
+    "Tests/Production/RemainingVessels/interactions.py": "88f3f75db2328d6d973ca6cb9ed38a3bbb84f94c49296ea376f0e8f9bff7db42",
+    "Tests/Production/RemainingVessels/native.py": "68a640905d163f409a138985d36cbf5fd912d4141b1c86fd05ba6a7572c47a01",
+    "Tests/Production/RemainingVessels/lifetimes.py": "722fac7bce6720cdd757c51453e06d9a8f697195f095dd896fa9021dbe6723d2",
+    "Tests/Production/Closeout/class_eligibility.py": "32f564b22c48870c4cbd03a65f23bbb5d6966239302405273f7246b63b738b14",
+    "Tests/Production/Closeout/run_native.py": "889c626d5375a6fa24c46e7d0d27a8d75a906ad6ed7a257a19c6b7d344dfe0d6",
+    "Tests/Production/Closeout/checklist.py": "f26a943188269ca22c5aa3dad3e02ab0f9417f1eec439220612fb92c3843ff8c",
+    "Tests/Production/RemainingStock/cases.json": "d1dad2672f6ae77541df774cafd4ca5a8730f77733e80b733a1f970c7697a162",
+    "Tests/Production/NativeScene/Orbiter.cfg": "47e1ebcd774f3e4dfcacdfe3ab624c2d0b992d067fa675773f33287a560d071a",
+    "Tests/Production/RemainingVessels/Interactions/actuator-controls-v1.json": "805fc0d2e122e326d6cc9b0e73bf873d2628dbc716c43595f816403a0916de17",
+    "Tests/Production/RemainingVessels/Interactions/actuator-controls-v2.json": "b89cc033ab74d5c8f174ff2a7f0f94a6ef95462693fe41c68156a4adead2d79c",
+    "Tests/Production/RemainingVessels/Interactions/atlantis-launch-staging-v1.json": "8c5304f6307aa72cca1db7e3813e46a04922b0e314b2a7a3f53f365331ad7ae3",
+    "Tests/Production/RemainingVessels/Interactions/atlantis-launch-staging-v2.json": "973386004b868531f3cded047c2b64f00a8a39c3ba0d4ee2d3018edfbcdc572b",
+    "Tests/Production/RemainingVessels/Interactions/module2-docking-v1.json": "b97180f186c8cfce64328ad41f4eebf19a2ed4395cd84bc78c4b0c715b5857b5",
+    "Tests/Production/RemainingVessels/Interactions/payload-releases-v1.json": "0aac3c12b686920532465a389b99182ef43ceadd26147a76328d01df7d8f3988",
+    "Tests/Production/RemainingVessels/Interactions/phase6_module2_docking.lua": "8d683b32251f12e4b818e494b0b855c384afd004bcc68a0dcc965e183adc8045",
+    "Tests/Production/RemainingVessels/Interactions/phase6_quad_controls.lua": "32999d44a51a7860320bb5ef737c8fa4f3ebab662ab53116428a066b8736c963",
+    "Tests/Production/RemainingVessels/Interactions/phase6_solar_controls.lua": "c0bbf282ee7fc866909c95e31ec92cc75f47f74e6057ed16a056854630923006",
+    "Tests/Production/RemainingVessels/Interactions/rms-dialog-calibration-v1.json": "dc5d9ed9780337b4a56f214b73ee41507bbdb5cb854cbafd8adcbd1a445b47d0",
+    "Tests/Production/RemainingVessels/Interactions/rms-six-joint-v1.json": "ac8260d6c8d1889caa578527dce102a6148294a0a850c32c2f397afc500d7764",
+    "Tests/Production/RemainingVessels/Interactions/rms-six-joint-x11-v1.json": "74572bda2c742ef9d098d7f8e1172ca3c5af372c0b8e254a66976d2ee995f004"
+  },
+  "selected_plans": [
+    "actuator-controls-v2.json",
+    "module2-docking-v1.json",
+    "payload-releases-v1.json",
+    "rms-six-joint-x11-v1.json",
+    "atlantis-launch-staging-v2.json"
+  ],
+  "required_flows": [
+    "hst-keys",
+    "solar-paddles",
+    "quad-controllers",
+    "module2-physical-docking",
+    "ldef-payload-release",
+    "leonardo_mplm-payload-release",
+    "carina-payload-release",
+    "rms-six-joint-and-stow",
+    "atlantis-original-launch-staging"
+  ],
+  "original_population": {
+    "historical_path": "/home/dan/GIT/orbiter-cross-platform/out/phase6-recovered-Windows-observations-f3d-v1/decoded-for-native-qualification-v1/Debug-sse2/remaining-stock-repaired/remaining_stock_032-1/stock-vessel-state.csv",
+    "published_path": "out/original-stock-audit/transport/Debug-sse2/remaining-stock-repaired/remaining_stock_032-1/stock-vessel-state.csv",
+    "sha256": "9f00957132b146b4988703e596bc2d6d0835b96ccf7c57a7ad25d1055e60ced9"
+  },
+  "new_scope_note": "Use exact Ccc plans including pre-existing f26b5d9f HST Ctrl modifiers/private X11 and canonical-clock launch v2. All older plan bytes, coarse launch and missing-Ctrl-S failure identities remain preserved; no historical record is restored or relabelled."
+}

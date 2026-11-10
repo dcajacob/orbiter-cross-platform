@@ -1,0 +1,171 @@
+name: Phase 6 Renew Original Native Class Interaction Controls
+on:
+  push:
+    branches: ['qualification/native-class-interactions-v1']
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: phase6-original-class-interactions-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  readiness:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    outputs:
+      xvfb_version: ${{ steps.userspace.outputs.xvfb_version }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - name: Preserve every original and new bounded helper control
+        run: mkdir -p out && python3 -B Tests/Production/Closeout/run_controls.py --output out/class-interaction-controls.json
+      - name: Verify all frozen original plans and the complete nine-flow seventy-two-process scope
+        run: python3 -B Tests/Production/Closeout/hosted_class_interactions.py --source-preflight --output out/class-interaction-source-preflight.json
+      - name: Retain only the exact original provider input for signed package readiness
+        uses: actions/github-script@v8
+        with:
+          script: |
+            await require('./.github/scripts/phase6-download-class-userspace.cjs')({github,context,core});
+      - name: Restore the original full provider inventory and every original source control
+        run: >-
+          python3 -B Tests/Production/Closeout/restore_hosted_native_providers.py
+          --api out/native-api-source/providers/api.json --archive out/native-api-source/providers/producer.zip
+          --output out/native-provider-restoration/restoration.json
+      - name: Preflight every original package and the declared private X11 backend before any simulator
+        id: userspace
+        env:
+          PROFILE: Debug-automatic
+        shell: bash
+        run: |
+          set -euo pipefail
+          image=$(python3 -c "import json; print('ubuntu@'+json.load(open('Tests/Production/Closeout/native-provider-container.lock.json'))['image_digest'])")
+          docker pull "$image"
+          docker image inspect "$image" > out/class-userspace-container.json
+          docker run --rm --init --cpus=2 -v "$GITHUB_WORKSPACE:$GITHUB_WORKSPACE" -v /etc/ssl/certs/ca-certificates.crt:/run/orbiter-ci-system-ca.pem:ro -w "$GITHUB_WORKSPACE" \
+            -e GITHUB_ACTIONS -e RUNNER_OS -e GITHUB_WORKSPACE -e GITHUB_SHA -e PROFILE \
+            "$image" bash Tests/Production/Closeout/prepare_hosted_class_interactions_network.sh Tests/Production/Closeout/prepare_hosted_class_interactions_userspace.sh 2>&1 | tee out/class-userspace-container.log
+          python3 - <<'PYOUTPUT'
+          import json,os,re
+          version=json.load(open('out/class-interaction-x11-readiness/x11.json'))['candidate_version']
+          assert re.fullmatch(r'[0-9][A-Za-z0-9.+:~_-]*',version)
+          with open(os.environ['GITHUB_OUTPUT'],'a') as stream:stream.write('xvfb_version='+version+'\n')
+          PYOUTPUT
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: native-class-interactions-readiness
+          retention-days: 14
+          path: |
+            out/class-interaction-controls.json
+            out/class-interaction-source-preflight.json
+            out/class-interaction-x11-readiness/**
+            out/class-userspace-preflight/**
+            out/class-userspace-container.json
+            out/class-userspace-container.log
+            out/native-interaction-network/**
+            out/native-api-source/providers/*.json
+            out/native-api-source/providers/*.body
+            out/native-provider-restoration/restoration.json
+  capture:
+    name: Original complete nine interaction flows ${{ matrix.profile }}
+    needs: readiness
+    runs-on: ubuntu-24.04
+    timeout-minutes: 300
+    strategy:
+      fail-fast: false
+      max-parallel: 2
+      matrix:
+        profile: [Debug-automatic, Debug-sse2, Release-automatic, Release-sse2]
+    env:
+      PROFILE: ${{ matrix.profile }}
+      ORBITER_XVFB_VERSION: ${{ needs.readiness.outputs.xvfb_version }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.14'
+      - name: Retain the complete original cohort and both original audit attempts on GitHub only
+        uses: actions/github-script@v8
+        with:
+          script: |
+            await require('./.github/scripts/phase6-download-source-complete-retry.cjs')({github,context,core});
+      - name: Independently restore every original member and preserve the prior failed attempt
+        run: >-
+          python3 -B Tests/Production/CurrentWindows/Hosted/restore_source_complete_retry_reference.py
+          --audit-api out/reference-api/audit.json --audit-archive out/reference-api/audit.zip
+          --reference-api out/reference-api/original.json --first-attempt-api out/reference-api/first.json
+          --first-attempt-archive out/reference-api/first.zip --first-attempt-log out/reference-api/first-job.log
+      - name: Stage the untouched original Windows application and SDK for inspection without execution
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          configuration="${PROFILE%%-*}"
+          python3 -B Tests/Production/CockpitControls/prepare.py --configuration "$configuration" --cache out/original-stock-audit/preserved-cache --output "out/original-stock-audit/preserved-$configuration"
+      - name: Retain exact compiled application and provider inputs without changing failed producer history
+        uses: actions/github-script@v8
+        with:
+          script: |
+            await require('./.github/scripts/phase6-download-native-api-inputs.cjs')({github,context,core});
+      - name: Restore all native binaries and actual original unit results
+        run: >-
+          python3 -B Tests/Production/Closeout/recheck_native_discovery.py
+          --api out/native-api-source/native/api.json --archive out/native-api-source/native/producer.zip
+          --profile "$PROFILE" --output "out/native-interaction-retained-units/$PROFILE"
+      - name: Restore unchanged providers and all original negative controls
+        run: >-
+          python3 -B Tests/Production/Closeout/restore_hosted_native_providers.py
+          --api out/native-api-source/providers/api.json --archive out/native-api-source/providers/producer.zip
+          --output out/native-provider-restoration/restoration.json
+      - name: Restore separately compiled unsuppressed Mesa owner repair and controls
+        run: >-
+          python3 -B Tests/Production/Closeout/restore_hosted_mesa_topology.py
+          --api out/native-api-source/mesa/api.json --archive out/native-api-source/mesa/producer.zip
+          --output out/mesa-topology-restoration/restoration.json
+      - name: Run unchanged original nine interaction flows twice in matching hosted userspace
+        shell: bash
+        run: |
+          set -euo pipefail
+          image=$(python3 -c "import json; print('ubuntu@'+json.load(open('Tests/Production/Closeout/native-provider-container.lock.json'))['image_digest'])")
+          docker pull "$image"
+          docker image inspect "$image" > out/native-interaction-container.json
+          docker run --rm --init --cpus=2 --shm-size=1g -v "$GITHUB_WORKSPACE:$GITHUB_WORKSPACE" -v /etc/ssl/certs/ca-certificates.crt:/run/orbiter-ci-system-ca.pem:ro -w "$GITHUB_WORKSPACE" \
+            -e GITHUB_ACTIONS -e RUNNER_OS -e GITHUB_WORKSPACE -e GITHUB_SHA -e PROFILE -e ORBITER_XVFB_VERSION \
+            "$image" bash Tests/Production/Closeout/prepare_hosted_class_interactions_network.sh Tests/Production/Closeout/prepare_hosted_class_interactions.sh 2>&1 | tee out/native-interaction-container.log
+      - name: Preserve bounded actual failure diagnostics
+        if: failure()
+        shell: python
+        run: |
+          from pathlib import Path
+          for pattern in ('out/hosted-native-class-interactions/*/*.log','out/native-class-interactions/*/*/*/*.log','out/native-class-interactions/*/*/*.log','out/native-class-interactions/*/*.log'):
+              for p in sorted(Path('.').glob(pattern)):
+                  print(str(p)+':\n'+p.read_text(errors='replace')[-12000:])
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: original-class-interaction-controls-${{ matrix.profile }}
+          retention-days: 14
+          compression-level: 3
+          include-hidden-files: true
+          path: |
+            out/hosted-native-class-interactions/${{ env.PROFILE }}/**
+            out/native-class-interactions/${{ env.PROFILE }}/**
+            out/native-api-source/*/*.json
+            out/native-api-source/*/*.body
+            out/native-interaction-retained-units/${{ env.PROFILE }}/**
+            out/native-interaction-network/${{ env.PROFILE }}/**
+            out/native-interaction-container.json
+            out/native-interaction-container.log
+            out/native-stock-assets/remaining-vessels-resources.json
+            out/native-stock-assets/resources.json
+            out/native-stock-assets/cockpit-test-font.json
+            out/phase6-hosted-native/${{ env.PROFILE }}/build.json
+            out/native-provider-restoration/restoration.json
+            out/mesa-topology-restoration/restoration.json
+            out/reference-api/*.json
+            out/reference-api/first-job.log
+            out/reference-audit-restoration/restoration.json
+            out/original-stock-audit/transport/download.json
+            out/original-stock-audit/independent/*.json
