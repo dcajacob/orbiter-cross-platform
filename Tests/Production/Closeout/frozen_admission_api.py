@@ -94,11 +94,14 @@ def restore_reference(lock):
         retained_files=len(paths),new_simulator_processes=0,normal_admission_qualified=False,phase6_complete=False))
 
 
-def extract_reference(lock,base):
+def extract_reference(lock,base,*,origin=None):
+    # The ordinary same-run consumer still requires its actual source and run.
+    # A published consumer may supply only its independently checked immutable origin.
+    source,run_id=origin if origin is not None else (os.environ['GITHUB_SHA'],int(os.environ['GITHUB_RUN_ID']))
     record=load(base/'reference.json');archive=base/'reference.tar.gz'
     pin=lock['identities']['reference']['joint_api']
     require(record['status']=='restored-exact-qualified-GeneralApi-reference-only' and record['candidate_id']==lock['id'] and
-            record['source']==os.environ['GITHUB_SHA'] and record['run_id']==int(os.environ['GITHUB_RUN_ID']) and
+            record['source']==source and record['run_id']==run_id and
             record['published_reference']==pin and record['retained_files']==1123 and record['actual_qualification_guards']==EXPECTED_EVIDENCE and
             record['new_simulator_processes']==0 and record['normal_admission_qualified'] is False and
             archive.stat().st_size==record['archive_bytes'] and sha(archive)==record['archive_sha256'],
