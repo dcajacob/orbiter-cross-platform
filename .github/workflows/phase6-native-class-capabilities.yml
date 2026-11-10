@@ -1,0 +1,146 @@
+name: Phase 6 Renew Original Native Capability Observer Controls
+on:
+  push:
+    branches: ['qualification/native-class-capabilities-v1']
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: phase6-original-class-capabilities-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  readiness:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.14'
+      - name: Preserve every original and new bounded control
+        run: mkdir -p out && python3 -B Tests/Production/Closeout/run_controls.py --output out/class-capability-controls.json
+      - name: Require the exact full original SDK inventory and its successful standard-runner source
+        uses: actions/github-script@v8
+        with:
+          script: |
+            await require('./.github/scripts/phase6-download-capability-inventory.cjs')({github,context,core});
+      - name: Verify all original SDK fields and retain the extra payload variants as pending
+        run: python3 -B Tests/Production/Closeout/restore_hosted_capability_inventory.py
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: native-class-capabilities-readiness
+          retention-days: 14
+          path: |
+            out/class-capability-controls.json
+            out/class-capability-inventory/**
+  capture:
+    name: Original exact SDK and observer controls ${{ matrix.profile }}
+    needs: readiness
+    runs-on: ubuntu-24.04
+    timeout-minutes: 300
+    strategy:
+      fail-fast: false
+      max-parallel: 2
+      matrix:
+        profile: [Debug-automatic, Debug-sse2, Release-automatic, Release-sse2]
+    env:
+      PROFILE: ${{ matrix.profile }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.14'
+      - name: Retain the exact immutable SDK inventory
+        uses: actions/github-script@v8
+        with:
+          script: |
+            await require('./.github/scripts/phase6-download-capability-inventory.cjs')({github,context,core});
+      - run: python3 -B Tests/Production/Closeout/restore_hosted_capability_inventory.py
+      - name: Retain the complete original cohort and both original audit attempts on GitHub only
+        uses: actions/github-script@v8
+        with:
+          script: |
+            await require('./.github/scripts/phase6-download-source-complete-retry.cjs')({github,context,core});
+      - name: Independently restore every original member and preserve the prior failed attempt
+        run: >-
+          python3 -B Tests/Production/CurrentWindows/Hosted/restore_source_complete_retry_reference.py
+          --audit-api out/reference-api/audit.json --audit-archive out/reference-api/audit.zip
+          --reference-api out/reference-api/original.json --first-attempt-api out/reference-api/first.json
+          --first-attempt-archive out/reference-api/first.zip --first-attempt-log out/reference-api/first-job.log
+      - name: Stage the untouched original Windows application and SDK for inspection without execution
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          configuration="${PROFILE%%-*}"
+          python3 -B Tests/Production/CockpitControls/prepare.py --configuration "$configuration" --cache out/original-stock-audit/preserved-cache --output "out/original-stock-audit/preserved-$configuration"
+      - name: Retain exact compiled application and provider inputs without changing failed producer history
+        uses: actions/github-script@v8
+        with:
+          script: |
+            await require('./.github/scripts/phase6-download-native-api-inputs.cjs')({github,context,core});
+      - name: Restore all native binaries and actual original unit results
+        run: >-
+          python3 -B Tests/Production/Closeout/recheck_native_discovery.py
+          --api out/native-api-source/native/api.json --archive out/native-api-source/native/producer.zip
+          --profile "$PROFILE" --output "out/native-capability-retained-units/$PROFILE"
+      - name: Restore unchanged providers and all original negative controls
+        run: >-
+          python3 -B Tests/Production/Closeout/restore_hosted_native_providers.py
+          --api out/native-api-source/providers/api.json --archive out/native-api-source/providers/producer.zip
+          --output out/native-provider-restoration/restoration.json
+      - name: Restore separately compiled unsuppressed Mesa owner repair and controls
+        run: >-
+          python3 -B Tests/Production/Closeout/restore_hosted_mesa_topology.py
+          --api out/native-api-source/mesa/api.json --archive out/native-api-source/mesa/producer.zip
+          --output out/mesa-topology-restoration/restoration.json
+      - name: Run unchanged original nine scenes twice with observer off and on in matching hosted userspace
+        shell: bash
+        run: |
+          set -euo pipefail
+          image=$(python3 -c "import json; print('ubuntu@'+json.load(open('Tests/Production/Closeout/native-provider-container.lock.json'))['image_digest'])")
+          docker pull "$image"
+          docker image inspect "$image" > out/native-capability-container.json
+          docker run --rm --init --cpus=2 --shm-size=1g -v "$GITHUB_WORKSPACE:$GITHUB_WORKSPACE" -v /etc/ssl/certs/ca-certificates.crt:/run/orbiter-ci-system-ca.pem:ro -w "$GITHUB_WORKSPACE" \
+            -e GITHUB_ACTIONS -e RUNNER_OS -e GITHUB_WORKSPACE -e GITHUB_SHA -e PROFILE \
+            "$image" bash Tests/Production/Closeout/prepare_hosted_class_capabilities_network.sh Tests/Production/Closeout/prepare_hosted_class_capabilities.sh 2>&1 | tee out/native-capability-container.log
+      - name: Preserve bounded actual failure diagnostics
+        if: failure()
+        shell: python
+        run: |
+          from pathlib import Path
+          for pattern in ('out/hosted-native-class-capabilities/*/*.log','out/native-class-capabilities/*/*/*.log','out/native-class-capabilities/*/*.log'):
+              for p in sorted(Path('.').glob(pattern)):
+                  print(str(p)+':\n'+p.read_text(errors='replace')[-12000:])
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: original-class-capability-controls-${{ matrix.profile }}
+          retention-days: 14
+          compression-level: 3
+          include-hidden-files: true
+          path: |
+            out/hosted-native-class-capabilities/${{ env.PROFILE }}/**
+            out/native-class-capabilities/${{ env.PROFILE }}/**
+            out/class-capability-inventory/**
+            out/native-api-source/*/*.json
+            out/native-api-source/*/*.body
+            out/native-capability-retained-units/${{ env.PROFILE }}/**
+            out/native-capability-network/${{ env.PROFILE }}/**
+            out/native-capability-container.json
+            out/native-capability-container.log
+            out/native-stock-assets/remaining-vessels-resources.json
+            out/native-stock-assets/resources.json
+            out/native-stock-assets/cockpit-test-font.json
+            out/phase6-hosted-native/${{ env.PROFILE }}/build.json
+            out/native-provider-restoration/restoration.json
+            out/mesa-topology-restoration/restoration.json
+            out/reference-api/*.json
+            out/reference-api/first-job.log
+            out/reference-audit-restoration/restoration.json
+            out/original-stock-audit/transport/download.json
+            out/original-stock-audit/independent/*.json
