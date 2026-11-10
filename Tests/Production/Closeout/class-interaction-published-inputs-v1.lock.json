@@ -28,6 +28,18 @@
       "artifact_id": 13745413100,
       "archive_bytes": 3008037251,
       "archive_sha256": "d68ba737bab29f316a1a6bd63915c1bebf8e253a795840ed532d45d158df4340"
+    },
+    "Release-automatic": {
+      "job_id": 129679052773,
+      "artifact_id": 13751071916,
+      "archive_bytes": 3000226827,
+      "archive_sha256": "b431b7d645962b9e3da8888787f508184cef25b5e3829ee5aaad658441532b9f"
+    },
+    "Release-sse2": {
+      "job_id": 129679052719,
+      "artifact_id": 13751062379,
+      "archive_bytes": 3000005038,
+      "archive_sha256": "dffdd0cc4ddccc4cad86a1b9985e2e65c5d422595676ecf860480899761c3b77"
     }
   }
 }
