@@ -41,3 +41,6 @@ retry_identical_snapshot original https://snapshot.ubuntu.com/exact.deb "$output
 
     def test404_is_never_treated_as_observed_transient_snapshot_failure(self):
         code,labels,_=self.fixture('404 Not Found');self.assertEqual(code,100);self.assertEqual(labels,['original'])
+
+    def test_mixed503_and_hash_failure_still_stops_at_the_original_guard(self):
+        code,labels,_=self.fixture('503 Service Unavailable; Hash Sum mismatch');self.assertEqual(code,100);self.assertEqual(labels,['original'])
