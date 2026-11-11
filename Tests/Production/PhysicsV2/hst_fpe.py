@@ -134,6 +134,9 @@ def run_cases(output,providers,mesa,report,save):
 def prepared_body():
     body=native_capture.prepared_body();body=replace_once(body,"protocol='phase6-versioned-physics-v2-normal-admission'","protocol='phase6-physics-v2-HST-first-invalid-diagnostic'")
     body=replace_once(body,"ROOT/'out/hosted-normal-admission'","ROOT/'out/physics-v2-HST-first-invalid'")
+    anchor="    try:\n        require(report['collector_source']==os.environ['GITHUB_SHA']"
+    replacement="    original_run=run\n    def run(label,argv,timeout=600,environment=None):\n        if label=='satisfy-declared-compositor-host-dependencies':\n            from dependency_transport import prepare as prefill_exact_original_bytes\n            prefill_exact_original_bytes(label,argv,output)\n        return original_run(label,argv,timeout,environment)\n    try:\n        require(report['collector_source']==os.environ['GITHUB_SHA']"
+    body=replace_once(body,anchor,replacement)
     start=body.index('        from native_capture import version_lock,verify_scope,REFERENCE,EXIT,RUNTIME');end=body.index("        require(sha(ROOT/'out/mesa-topology-restoration/restoration.json')",start)
     body=body[:start]+"        from hst_fpe import run_cases\n        run_cases(output,providers,mesa,report,save)\n"+body[end:]
     body=replace_once(body,"status='captured-and-audited-fresh-v2-full-normal-profile-only',actual_processes=157","status='diagnosed-HST-first-invalid-only',actual_processes=3")
@@ -147,7 +150,7 @@ def main():
         bootstrap=folder/'hst-bootstrap.sh';bootstrap.write_text(replace_once((folder/'physics-v2-bootstrap.sh').read_text(),'Tests/Production/PhysicsV2/native_capture.py','Tests/Production/PhysicsV2/hst_fpe.py'))
         network=folder/'hst-network.sh';network.write_text(replace_once((folder/'physics-v2-network.sh').read_text(),'physics-v2-bootstrap.sh','hst-bootstrap.sh'))
         generated=folder/'hst-generated.py';generated.write_text(prepared_body())
-        files=[Path(__file__).resolve(),bootstrap,network,generated]
+        files=[Path(__file__).resolve(),HERE/'dependency_transport.py',bootstrap,network,generated]
         (folder/'hst-before.sha256').write_text(''.join(sha(p)+'  '+p.relative_to(ROOT).as_posix()+'\n' for p in files));return
     try:exec(compile(prepared_body(),str(HERE/'hst_fpe.py'),'exec'),{'__name__':'__main__','__file__':str(HERE/'hst_fpe.py')})
     finally:
