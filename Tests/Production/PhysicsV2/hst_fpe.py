@@ -64,20 +64,13 @@ struct TrapScope {
     return prefix+'\n'.join(instrumented),dict(mode=mode,compiled_application=RUNTIME,complete_unchanged_method_bodies_sha256=hashlib.sha256(complete.encode()).hexdigest(),production_sources_modified=False,diagnostic_only=True,qualification_granted=False)
 
 
-def run_cases(output,providers,mesa,report,save):
-    from compositor import Compositor
-    build=ROOT/'out/phase6-physics-v2-native'/PROFILE;engine=build/'engine';record=load(build/'build.json');native_capture.verify_units(PROFILE)
-    require(record['source_base']==RUNTIME and record['instrumentation']=='address,undefined','Actual approved sanitized runtime required')
-    prior=load(HERE/'HST-first-invalid-origin.json');prior_base=ROOT/'out/physics-v2-HST-first-invalid-source';prior_api=load(prior_base/'api.json');prior_zip=prior_base/'producer.zip'
-    require(prior_api['artifact']['digest']=='sha256:'+sha(prior_zip) and prior_zip.stat().st_size==prior['receipt_bytes'],'Actual retained earlier full-sweep receipt bytes required')
-    with zipfile.ZipFile(prior_zip) as z: old=json.loads(z.read('hosted-normal-admission/'+PROFILE+'/capture/stock-scenarios.json'))
-    case=old['cases'][SCENE];require(old['observer_commit']==prior['source'] and old['runtime_identity']['runtime_source_commit']==RUNTIME and old['summary']['passed']==156 and old['summary']['failed']==1 and case['status']=='failed' and case['files_sha256']['flight-state.csv']==prior['HST_trace_sha256'],'Actual original completed new-version failed HST identity required')
-    unchanged={str(ROOT/n):h for n,h in record['runtime_files_sha256'].items()};unchanged[str(ROOT/'Src/Orbiter/SuperVessel.cpp')]=sha(ROOT/'Src/Orbiter/SuperVessel.cpp')
-    require(all(sha(n)==h for n,h in unchanged.items()),'Every actual runtime byte required before diagnostic')
-    compiler=output/'isolated-compiler';compiler.mkdir();sdk=compiler/'sdk';sdk.mkdir();template=ROOT/'Src/Orbiter/Production/NativeBuild.h.in'
+def compile_component_on_original_host():
+    require(os.environ.get('ImageOS')=='ubuntu24','Only the same standard Ubuntu24build host may compile the small v2 probe')
+    build=ROOT/'out/phase6-physics-v2-native'/PROFILE;engine=build/'engine'
+    compiler=ROOT/'out/physics-v2-HST-component-compiler';compiler.mkdir();sdk=compiler/'sdk';sdk.mkdir();template=ROOT/'Src/Orbiter/Production/NativeBuild.h.in'
     require(template.read_bytes()==subprocess.check_output(['git','show',RUNTIME+':'+template.relative_to(ROOT).as_posix()],cwd=ROOT),'Exact actual compiled SDK template required')
     header=sdk/'OrbiterNativeBuild.h';header.write_bytes(header_bytes(template.read_bytes(),binary_sdk_base(engine/'liborbiter_production_boundary.so','Debug'),'ON'))
-    macros=host_macros(header,compiler);tokens=abi_tokens((engine/'liborbiter_production_boundary.so').read_bytes());require(tokens==[macros['actual_cpp_abi']],'Actual component compiler ABI must match actual retained v2 engine')
+    macros=host_macros(header,compiler);tokens=abi_tokens((engine/'liborbiter_production_boundary.so').read_bytes());atomic_json(compiler/'actual-ABI.json',dict(actual_host_cpp_abi=macros,actual_engine_cpp_abi=tokens,host_image=os.environ.get('ImageOS'),source=os.environ['GITHUB_SHA'],header_sha256=sha(header),qualification_granted=False));require(tokens==[macros['actual_cpp_abi']],'Actual component compiler ABI must match actual retained v2 engine')
     compiled={}
     for mode in ('current-methods-control','first-invalid-trap'):
         body,item=component(mode);cpp=compiler/(mode+'.cpp');cpp.write_text(body);library=compiler/(mode+'.so')
@@ -89,6 +82,24 @@ def run_cases(output,providers,mesa,report,save):
         if code:print(log.read_text(errors='replace')[-10000:],flush=True)
         require(code==0,'Actual isolated diagnostic component compilation failed')
         item['library_sha256']=sha(library);atomic_json(compiler/'compiler.json',dict(actual_abi=macros,variants=compiled))
+
+
+def run_cases(output,providers,mesa,report,save):
+    from compositor import Compositor
+    build=ROOT/'out/phase6-physics-v2-native'/PROFILE;engine=build/'engine';record=load(build/'build.json');native_capture.verify_units(PROFILE)
+    require(record['source_base']==RUNTIME and record['instrumentation']=='address,undefined','Actual approved sanitized runtime required')
+    prior=load(HERE/'HST-first-invalid-origin.json');prior_base=ROOT/'out/physics-v2-HST-first-invalid-source';prior_api=load(prior_base/'api.json');prior_zip=prior_base/'producer.zip'
+    require(prior_api['artifact']['digest']=='sha256:'+sha(prior_zip) and prior_zip.stat().st_size==prior['receipt_bytes'],'Actual retained earlier full-sweep receipt bytes required')
+    with zipfile.ZipFile(prior_zip) as z: old=json.loads(z.read('hosted-normal-admission/'+PROFILE+'/capture/stock-scenarios.json'))
+    case=old['cases'][SCENE];require(old['observer_commit']==prior['source'] and old['runtime_identity']['runtime_source_commit']==RUNTIME and old['summary']['passed']==156 and old['summary']['failed']==1 and case['status']=='failed' and case['files_sha256']['flight-state.csv']==prior['HST_trace_sha256'],'Actual original completed new-version failed HST identity required')
+    unchanged={str(ROOT/n):h for n,h in record['runtime_files_sha256'].items()};unchanged[str(ROOT/'Src/Orbiter/SuperVessel.cpp')]=sha(ROOT/'Src/Orbiter/SuperVessel.cpp')
+    require(all(sha(n)==h for n,h in unchanged.items()),'Every actual runtime byte required before diagnostic')
+    compiler=ROOT/'out/physics-v2-HST-component-compiler';proof=load(compiler/'compiler.json');abi=load(compiler/'actual-ABI.json');tokens=abi_tokens((engine/'liborbiter_production_boundary.so').read_bytes())
+    require(tokens==abi['actual_engine_cpp_abi']==[proof['actual_abi']['actual_cpp_abi']] and abi['host_image']=='ubuntu24' and abi['source']==os.environ['GITHUB_SHA'],'Actual component must have been compiled with the exact engine ABI on its original standard Ubuntu24host')
+    for mode,item in proof['variants'].items():
+        body,expected=component(mode);require((compiler/(mode+'.cpp')).read_text()==body and item['complete_unchanged_method_bodies_sha256']==expected['complete_unchanged_method_bodies_sha256'] and sha(compiler/(mode+'.so'))==item['library_sha256'] and item['actual_returncode']==0,'Exact actual unchanged-method diagnostic components required')
+    require(set(proof['variants'])=={'current-methods-control','first-invalid-trap'},'Both actually built diagnostic controls required')
+    report['actual_host_component_compiler']=abi;save()
     program="import sys,pathlib;sys.path.insert(0,str(pathlib.Path('Tests/Production/StockScenarios').resolve()));import run;sys.stdout.write(run.configuration(False))"
     config=subprocess.check_output([sys.executable,'-B','-c',program],cwd=ROOT,text=True)
     gtk=providers/'libdecor-candidate/build/src/plugins/gtk/libdecor-gtk.so';libraries=[engine,*(providers/f/'install/lib/x86_64-linux-gnu' for f in ('fontconfig-candidate','gdk-candidate')),mesa/'install/lib/x86_64-linux-gnu']
@@ -146,15 +157,15 @@ def prepared_body():
 def main():
     require(os.environ.get('GITHUB_ACTIONS')=='true' and os.environ.get('RUNNER_OS')=='Linux' and sys.argv[1:] in (['--prepare',PROFILE],['--profile',PROFILE]),'One standard-hosted small HST diagnostic only; no local simulation')
     if sys.argv[1]=='--prepare':
-        native_capture.prepare(PROFILE);folder=ROOT/'out/admission-package-source'/PROFILE
+        compile_component_on_original_host();native_capture.prepare(PROFILE);folder=ROOT/'out/admission-package-source'/PROFILE
         bootstrap=folder/'hst-bootstrap.sh';bootstrap.write_text(replace_once((folder/'physics-v2-bootstrap.sh').read_text(),'Tests/Production/PhysicsV2/native_capture.py','Tests/Production/PhysicsV2/hst_fpe.py'))
         network=folder/'hst-network.sh';network.write_text(replace_once((folder/'physics-v2-network.sh').read_text(),'physics-v2-bootstrap.sh','hst-bootstrap.sh'))
         generated=folder/'hst-generated.py';generated.write_text(prepared_body())
-        files=[Path(__file__).resolve(),HERE/'dependency_transport.py',bootstrap,network,generated]
+        files=[Path(__file__).resolve(),HERE/'dependency_transport.py',bootstrap,network,generated,*[p for p in (ROOT/'out/physics-v2-HST-component-compiler').rglob('*') if p.is_file()]]
         (folder/'hst-before.sha256').write_text(''.join(sha(p)+'  '+p.relative_to(ROOT).as_posix()+'\n' for p in files));return
     try:exec(compile(prepared_body(),str(HERE/'hst_fpe.py'),'exec'),{'__name__':'__main__','__file__':str(HERE/'hst_fpe.py')})
     finally:
-        if OUTPUT.exists():pack(ROOT,{p for p in OUTPUT.rglob('*') if p.is_file() or p.is_symlink()},OUTPUT/'diagnostic-raw.tar.gz',OUTPUT/'diagnostic-raw-index.json')
+        if OUTPUT.exists():pack(ROOT,{p for folder in (OUTPUT,ROOT/'out/physics-v2-HST-component-compiler') for p in folder.rglob('*') if p.is_file() or p.is_symlink()},OUTPUT/'diagnostic-raw.tar.gz',OUTPUT/'diagnostic-raw-index.json')
 
 
 if __name__=='__main__':main()

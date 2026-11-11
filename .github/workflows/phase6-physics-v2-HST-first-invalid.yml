@@ -6,6 +6,7 @@ name: Phase6 Diagnose First Invalid HST Contact Operation
     - qualification/physics-v2-HST-first-invalid-v2
     - qualification/physics-v2-HST-first-invalid-v3
     - qualification/physics-v2-HST-first-invalid-v4
+    - qualification/physics-v2-HST-first-invalid-v5
 permissions:
   contents: read
   actions: read
@@ -126,7 +127,9 @@ jobs:
         retention-days: 14
         compression-level: 0
         include-hidden-files: true
-        path: 'out/physics-v2-HST-first-invalid/Debug-automatic/**
+        path: 'out/physics-v2-HST-component-compiler/**
+
+          out/physics-v2-HST-first-invalid/Debug-automatic/**
 
           out/physics-v2-HST-first-invalid-source/**
 
@@ -142,7 +145,11 @@ jobs:
         retention-days: 14
         compression-level: 6
         include-hidden-files: true
-        path: 'out/physics-v2-HST-first-invalid/Debug-automatic/collection.json
+        path: 'out/physics-v2-HST-component-compiler/*.json
+
+          out/physics-v2-HST-component-compiler/*.log
+
+          out/physics-v2-HST-first-invalid/Debug-automatic/collection.json
 
           out/physics-v2-HST-first-invalid/Debug-automatic/unchanged-runtime-postflight.json
 
