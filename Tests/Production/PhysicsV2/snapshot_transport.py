@@ -25,7 +25,7 @@ retry_identical_snapshot() {
           sha256sum "$output/$actual_label.partial-$partial_number.deb" >> "$output/preserved-partial-downloads.sha256"
         fi
       done
-      if [[ "$attempt" -eq 4 ]] || grep -Eqi 'Hash Sum mismatch|signature.*(invalid|failed)|checksum.*mismatch' "$output/$actual_label.log" || ! grep -Eq '50[234] (Bad Gateway|Service Unavailable|Gateway Time-out|Gateway Timeout)' "$output/$actual_label.log"; then return "$code"; fi
+      if [[ "$attempt" -eq 4 ]] || grep -Eqi 'Hash Sum mismatch|signature.*(invalid|failed)|checksum.*mismatch' "$output/$actual_label.log" || ! grep -Eq '50[234][[:space:]]+(Bad Gateway|Service Unavailable|Gateway Time-out|Gateway Timeout)' "$output/$actual_label.log"; then return "$code"; fi
       sleep 10
     fi
   done
@@ -43,7 +43,7 @@ retry_identical_signed_index() {
           sha256sum "$output/$label-$(basename "$partial").partial" >> "$output/preserved-partial-indexes.sha256"
         fi
       done
-      if [[ "$attempt" -eq 4 ]] || grep -Eqi 'Hash Sum mismatch|signature.*(invalid|failed)|checksum.*mismatch' "$output/$label.log" || ! grep -Eq '50[234] (Bad Gateway|Service Unavailable|Gateway Time-out|Gateway Timeout)' "$output/$label.log"; then return "$code"; fi
+      if [[ "$attempt" -eq 4 ]] || grep -Eqi 'Hash Sum mismatch|signature.*(invalid|failed)|checksum.*mismatch' "$output/$label.log" || ! grep -Eq '50[234][[:space:]]+(Bad Gateway|Service Unavailable|Gateway Time-out|Gateway Timeout)' "$output/$label.log"; then return "$code"; fi
       sleep 10
     fi
   done

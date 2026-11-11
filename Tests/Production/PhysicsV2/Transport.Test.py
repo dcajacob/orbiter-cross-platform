@@ -44,3 +44,7 @@ retry_identical_snapshot original https://snapshot.ubuntu.com/exact.deb "$output
 
     def test_mixed503_and_hash_failure_still_stops_at_the_original_guard(self):
         code,labels,_=self.fixture('503 Service Unavailable; Hash Sum mismatch');self.assertEqual(code,100);self.assertEqual(labels,['original'])
+
+    def test_actual_apt_two_space503_format_retries_the_identical_request(self):
+        code,labels,partial=self.fixture('503  Service Unavailable [IP: 185.125.189.37 443]')
+        self.assertEqual(code,0);self.assertEqual(len(labels),3);self.assertEqual(len(partial),2)

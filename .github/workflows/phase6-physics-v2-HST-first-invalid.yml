@@ -5,6 +5,7 @@ name: Phase6 Diagnose First Invalid HST Contact Operation
     - qualification/physics-v2-HST-first-invalid-v1
     - qualification/physics-v2-HST-first-invalid-v2
     - qualification/physics-v2-HST-first-invalid-v3
+    - qualification/physics-v2-HST-first-invalid-v4
 permissions:
   contents: read
   actions: read
