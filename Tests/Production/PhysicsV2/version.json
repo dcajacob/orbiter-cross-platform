@@ -1,0 +1,22 @@
+{
+  "physics_version": "assembly-contact-v2",
+  "baseline_source": "07044f8ed28748e359a3a15448478ed2d8030c16",
+  "original_native_source": "ccc02c8a34bd1f227624d8778a141e8736ae8111",
+  "original_windows_source": "c08f93151827949ee3ad498f8021f35c11753fde",
+  "target": "Src/Orbiter/SuperVessel.cpp",
+  "original_source_sha256_lf": "0f90926e8e1e32256288afc500134e019606522b5000c6e63171dca98eba5960",
+  "corrected_source_sha256_lf": "2d7f574bd2269b2800c0f006513bce99e6ef7e96c9e73e2550ad150cd8e818fc",
+  "patch_sha256": "01d0c2cb15a49d0ce619f25a7e186827c5f9a9dab7e17751f0d34283bbcf5e66",
+  "original_guard_files_sha256_lf": {
+    "Tests/Production/observation_source.py": "0b9a3efba9de301612afa3c2f00f43c619af7ab1ab510fbe0c1da9461fe55dc6",
+    "Tests/Production/extraction_source.py": "d38c31880451e5f589f659813fb1d16c80c04ea8437071ddef1f78980d36f595",
+    "Tests/Production/vessel_source.py": "d8e363b1ae4e20b98bbc6779d66f8397fef76449bef182392377e691a3155b98",
+    "Tests/Production/phase3-extraction.lock.json": "22c3817de56a8b49fa2df2757d4a4a4b28bdb6f800b3034e1955095f0eb333d8",
+    "Tests/Production/Cockpit/cases.json": "aabec34897c08b79afed7dfee9c692fe77058a561a9529d39d7e7bc5594d91ea",
+    "Tests/Production/StockScenarios/run.py": "a0c8462929333e6fc23d7f750c910e1380350178226ebff3fda0e2f74ba044c1"
+  },
+  "prototype_run_id": 42964822330,
+  "independent_prototype_audit_run_id": 42967196507,
+  "approval": "User explicitly approved versioned shared Windows/Linux repair and affected requalification; original guards, captures and tolerances preserved.",
+  "qualification_granted": false
+}

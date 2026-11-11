@@ -1,0 +1,156 @@
+name: Phase6 Versioned Shared Physics v2 Qualification
+'on':
+  push:
+    branches:
+    - qualification/physics-v2-build-v1
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: phase6-physics-v2-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  controls:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+    - uses: actions/checkout@v7
+      with:
+        fetch-depth: 0
+    - uses: actions/setup-python@v6
+      with:
+        python-version: '3.14'
+    - name: Prove exact corrected delta and execute every unchanged baseline source
+        guard and original control
+      run: 'set -e
+
+        python3 -B Tests/Production/PhysicsV2/source.py --output out/physics-v2-source.json
+        --baseline-controls out/physics-v2-original-controls.json
+
+        python3 -B Tests/Production/Closeout/run_controls.py --test-directory Tests/Production/PhysicsV2
+        --output out/physics-v2-controls.json
+
+        '
+      shell: bash
+    - name: Keep every original actual sanitizer dispatch and native/Python leak canary
+      run: python3 -B Tests/Production/Closeout/sanitizer_launcher.py --output out/physics-v2-sanitizer-controls
+    - uses: actions/upload-artifact@v7
+      if: always()
+      with:
+        name: physics-v2-source-and-original-controls
+        retention-days: 14
+        path: 'out/physics-v2-*.json
+
+          out/physics-v2-baseline/*.json
+
+          out/physics-v2-baseline/*.log
+
+          out/physics-v2-sanitizer-controls/**
+
+          '
+  windows:
+    needs: controls
+    uses: ./.github/workflows/production-client.yml
+    with:
+      data_container_lock: Tests/Production/stock-data-container-v2.lock.json
+      retain_stock_sdk: true
+      physics_version: assembly-contact-v2
+  native:
+    name: Rebuilt physics v2 native ${{ matrix.configuration }} ${{ matrix.math_profile
+      }}
+    needs: controls
+    runs-on: ubuntu-24.04
+    timeout-minutes: 180
+    strategy:
+      fail-fast: false
+      max-parallel: 2
+      matrix:
+        configuration:
+        - Debug
+        - Release
+        math_profile:
+        - automatic
+        - sse2
+    env:
+      PACKAGE: out/phase6-physics-v2-native/${{ matrix.configuration }}-${{ matrix.math_profile
+        }}
+    steps:
+    - uses: actions/checkout@v7
+      with:
+        fetch-depth: 0
+    - uses: actions/setup-python@v6
+      with:
+        python-version: '3.14'
+    - name: Install build dependencies for both existing renderer backends and MPFR
+      run: sudo apt-get update && sudo apt-get install -y ninja-build zlib1g-dev libgl1-mesa-dev
+        libglu1-mesa-dev libxrandr-dev libxinerama-dev libxcursor-dev libxi-dev libmpfr-dev
+        libwayland-dev wayland-protocols libxkbcommon-dev
+    - uses: actions/cache@v6
+      with:
+        path: out/ogl-dependencies
+        key: native-production-ogl-${{ hashFiles('OVP/OGLClient/dependencies.lock.json',
+          'Src/ClientNative/CMakeLists.txt') }}
+    - uses: actions/cache@v6
+      with:
+        path: out/phase6-hosted-build-dependencies
+        key: phase6-full-native-inputs-${{ hashFiles('Tests/Production/dependencies.lock.json',
+          'Tests/Production/Atlantis/dependencies.lock.json', 'Src/Module/LuaScript/Native/CMakeLists.txt')
+          }}
+    - name: Verify every pinned renderer, Lua, ImPlot and upstream Catch input
+      run: python3 -B Tests/Production/Closeout/hosted_native_package.py dependencies
+    - name: Build all stock families, normal host and unchanged upstream unit bodies
+        with sanitizers
+      run: python3 -B Tests/Production/RemainingVessels/build_native.py --output "$PACKAGE"
+        --renderer-dependencies out/ogl-dependencies --lua-archive out/phase6-hosted-build-dependencies/lua.zip
+        --plot-archive out/phase6-hosted-build-dependencies/implot.zip --configuration
+        ${{ matrix.configuration }} --math-profile ${{ matrix.math_profile }} --sanitizers
+        --include-unit-tests --catch-source out/phase6-hosted-build-dependencies/Catch2
+        --jobs 2 --physics-version assembly-contact-v2
+    - name: Run every original native unit and complete source-matched Catch cases
+      shell: bash
+      run: python3 -B Tests/Production/PhysicsV2/units.py --package "$PACKAGE"
+    - name: Seal exact runtime, generated sources and actual test results without
+        acceptance credit
+      if: ${{ always() && !cancelled() }}
+      run: python3 -B Tests/Production/Closeout/hosted_native_package.py package --package
+        "$PACKAGE"
+    - uses: actions/upload-artifact@v7
+      if: always()
+      with:
+        name: physics-v2-native-${{ matrix.configuration }}-${{ matrix.math_profile
+          }}
+        retention-days: 14
+        compression-level: 0
+        if-no-files-found: error
+        path: 'out/phase6-physics-v2-native/*.tar.gz
+
+          out/phase6-physics-v2-native/${{ matrix.configuration }}-${{ matrix.math_profile
+          }}/*.json
+
+          out/phase6-physics-v2-native/${{ matrix.configuration }}-${{ matrix.math_profile
+          }}/*.log
+
+          out/phase6-physics-v2-native/${{ matrix.configuration }}-${{ matrix.math_profile
+          }}/*.xml
+
+          out/phase6-physics-v2-native/${{ matrix.configuration }}-${{ matrix.math_profile
+          }}/*.txt
+
+
+          out/physics-v2-baseline/*.json
+
+          out/physics-v2-baseline/*.log
+
+          '
+    - uses: actions/upload-artifact@v7
+      if: failure()
+      with:
+        name: physics-v2-native-partial-${{ matrix.configuration }}-${{ matrix.math_profile
+          }}
+        retention-days: 14
+        compression-level: 1
+        include-hidden-files: true
+        path: 'out/phase6-physics-v2-native/${{ matrix.configuration }}-${{ matrix.math_profile
+          }}/**
+
+          '

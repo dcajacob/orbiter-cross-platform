@@ -182,6 +182,8 @@ void SuperVessel::SetDefaultState ()
 	bActivationPending = false;
 	next_hullvessel = 0;
 	sp.is_in_atm        = false;
+	UpdateProxies();
+	UpdateSurfParams();
 }
 
 // =======================================================================
@@ -413,7 +415,8 @@ void SuperVessel::GetIntermediateMoments (Vector &acc, Vector &tau,
 	// TODO: Move this up to VesselBase
 	Vector F(Flin);
 	Vector M(Amom);
-	AddSurfaceForces (&F, &M, &state, tfrac, dt); // add ground contact forces and moments
+	collision_during_update |=
+		AddSurfaceForces (&F, &M, &state, tfrac, dt); // add ground contact forces and moments
 	RigidBody::GetIntermediateMoments (acc, tau, state, tfrac, dt);  // get gravitational component
 	acc += mul (state.Q, F/mass);
 	tau += M/mass;
@@ -741,7 +744,7 @@ bool SuperVessel::AddSurfaceForces (Vector *F, Vector *M, const StateVectors *s,
 	for (comp = 0; comp < nv; comp++) {
 		Vector Fcomp, Mcomp;
 		ComponentStateVectors (s, &scomp, comp);
-		if (vlist[comp].vessel->AddSurfaceForces (&Fcomp, &Mcomp, &scomp, tfrac, dt)) {
+		if (vlist[comp].vessel->AddSurfaceForces (&Fcomp, &Mcomp, &scomp, tfrac, dt, update_with_collision)) {
 			AddComponentForceAndMoment (F, M, &Fcomp, &Mcomp, comp);
 			impact = true;
 		}

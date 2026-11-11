@@ -29,6 +29,9 @@ on:
       retain_stock_sdk:
         type: boolean
         default: false
+      physics_version:
+        type: string
+        default: 'original'
 
 permissions:
   contents: read
@@ -63,7 +66,23 @@ jobs:
         run: |
           python Tests/Production/frozen_reference.py
           python Tests/Production/frozen_behavior.py
-          python Tests/Production/observation_source.py
+          if ('${{ inputs.physics_version }}' -eq 'assembly-contact-v2') {
+            python -B Tests/Production/PhysicsV2/source.py --output out/physics-v2-source.json
+            if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          } elseif ('${{ inputs.physics_version }}' -eq '' -or '${{ inputs.physics_version }}' -eq 'original') {
+            python Tests/Production/observation_source.py
+            if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          } else { throw 'Unknown explicitly selected physics version' }
+      - name: Preserve explicit physics version and unchanged original source audit
+        if: inputs.physics_version == 'assembly-contact-v2'
+        uses: actions/upload-artifact@v7
+        with:
+          name: physics-v2-source-${{ matrix.configuration }}
+          retention-days: 14
+          path: |
+            out/physics-v2-source.json
+            out/physics-v2-baseline/*.json
+            out/physics-v2-baseline/*.log
       - uses: actions/cache@v6
         id: dxsdk
         with:

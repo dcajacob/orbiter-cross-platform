@@ -46,12 +46,17 @@ def main():
     p.add_argument('--include-unit-tests',action='store_true',help='Build and inventory existing registered tests; does not mark them passed')
     p.add_argument('--catch-source',type=lambda v:Path(v).resolve(),
                    help='Offline locked Catch checkout for the existing upstream C++/Lua units')
+    p.add_argument('--physics-version',choices=('original','assembly-contact-v2'),default='original')
     p.add_argument('--jobs',type=int,default=4)
     a=p.parse_args();require(sys.platform=='linux','Native package requires Linux')
     require(not a.output.exists() and a.jobs>0,'Fresh package output and positive build concurrency required')
     require(not a.include_unit_tests or a.catch_source is not None,
             'Existing upstream units require their explicit offline Catch source')
-    extraction_source.verify()
+    physics_proof=None
+    if a.physics_version=='original':extraction_source.verify()
+    else:
+        from PhysicsV2 import source as physics_source
+        physics_proof=physics_source.verify()
     ledger=json.loads((HERE.parent/'phase3-extraction.lock.json').read_text())['files']
     inputs=set(ledger)|{'OVP/OGLClient/dependencies.lock.json','Tests/Production/dependencies.lock.json',
         'Tests/Production/Licenses/implot-LICENSE','Tests/Production/extraction_source.py',
@@ -63,6 +68,7 @@ def main():
         inputs.update(path.relative_to(ROOT).as_posix() for path in (HERE.parent/'CoreUnits').iterdir() if path.is_file())
         inputs.update(('Tests/Lua.Interpreter.cpp','Tests/Collision.CollisionCore.cpp',
                        'Script/oapi_init.lua','Script/strict.lua'))
+    if physics_proof:inputs.update(physics_source.INPUTS)
     for module in list(sys.modules.values()):
         name=getattr(module,'__file__',None)
         if name:
@@ -116,6 +122,7 @@ def main():
         commands=commands,builder_sha256=sha(Path(__file__)),archive_sha256=archive_hashes,
         math_development_inputs_sha256=math_inputs,
         native_admission_qualified=False,phase6_complete=False)
+    if physics_proof:report.update(physics_version=a.physics_version,physics_source_proof=physics_proof)
     manifest=a.output/'build.json'
     def save():manifest.write_text(json.dumps(report,indent=2)+'\n')
     save()
@@ -183,6 +190,10 @@ def main():
                 scope='Existing upstream C++/Lua bodies; runtime case discovery, execution and assertions remain required')
             runtime += [listing,*[Path(test['command'][0]) for test in data['tests']],
                         *sorted((upstream/'assets').rglob('*.lua'))]
+        if physics_proof:
+            sdk_header=engine/'native-sdk/OrbiterNativeBuild.h'
+            require(sdk_header.is_file(),'Exact generated v2 SDK input required')
+            runtime.append(sdk_header)
         notice=engine/'NativeModules/Licenses/implot-LICENSE.txt'
         require(sha_lf(notice)==sha_lf(ROOT/'Tests/Production/Licenses/implot-LICENSE'),'ImPlot notice differs')
         require(all(sha(Path(name))==value for name,value in math_inputs.items()),
