@@ -1,0 +1,50 @@
+name: Phase6 Independent Physics v2 Windows Complete Raw Audit
+'on':
+  push:
+    branches:
+    - qualification/physics-v2-Windows-audit-v1
+permissions:
+  contents: read
+  actions: read
+jobs:
+  windows:
+    name: Independent v2 Windows all raw scenes ${{ matrix.configuration }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    strategy:
+      fail-fast: false
+      matrix:
+        configuration:
+        - Debug
+        - Release
+    env:
+      CONFIGURATION: ${{ matrix.configuration }}
+    steps:
+    - uses: actions/checkout@v7
+      with:
+        fetch-depth: 0
+    - uses: actions/setup-python@v6
+      with:
+        python-version: '3.14'
+    - name: Retain exact published v2 Windows SDK and raw actual scene cohort without executing Windows code
+      uses: actions/github-script@v8
+      with:
+        script: 'await require(''./Tests/Production/PhysicsV2/download.cjs'')({github,context,core,role:''windows'',profile:process.env.CONFIGURATION});
+
+          await require(''./Tests/Production/PhysicsV2/download_capture.cjs'')({github,context,core,role:''windows'',profile:process.env.CONFIGURATION});'
+    - name: Independently verify every original SDK and raw capture byte plus all actual complete finite scenes
+      run: python3 -B Tests/Production/PhysicsV2/audit_windows.py
+    - uses: actions/upload-artifact@v7
+      if: always()
+      with:
+        name: physics-v2-Windows-independent-${{ matrix.configuration }}
+        retention-days: 14
+        path: 'out/physics-v2-Windows-independent/${{ matrix.configuration }}/verification.json
+
+          out/physics-v2-input/windows/${{ matrix.configuration }}/api.json
+
+          out/physics-v2-published/windows/${{ matrix.configuration }}/api.json
+
+          out/physics-v2-Windows/${{ matrix.configuration }}/independent-scene-inspection.json
+
+          '
