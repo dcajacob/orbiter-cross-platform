@@ -8,6 +8,22 @@ from rejection_input_bundle import pack
 
 APPLICATION='c08f93151827949ee3ad498f8021f35c11753fde'
 
+def compiler_batch(vc):
+    require(not any(c in str(vc) for c in ('"','\r','\n')),'One actual compiler environment path required')
+    return '@call "'+str(vc)+'" -arch=x64 -host_arch=x64 >nul\n@if errorlevel 1 exit /b %errorlevel%\n@set\n'
+
+
+def read_compiler_environment(cmd,batch,read=subprocess.check_output):
+    return read([str(cmd),'/d','/c',str(batch)],text=True)
+
+
+def stage_observer(source,target):
+    require(target.is_file() and source.is_file(),'Actual original observer and staged SDK placeholder required')
+    target.unlink()
+    shutil.copy2(source,target)
+    require(sha(source)==sha(target),'Exact original passive observer copy required')
+
+
 
 def main():
     require(sys.platform=='win32' and os.environ.get('GITHUB_ACTIONS')=='true' and os.environ.get('ImageOS') in {'win25','win25-vs2026'},'Ordinary standard hosted Windows session required')
@@ -37,9 +53,11 @@ def main():
         vswhere=Path(os.environ['ProgramFiles(x86)'])/'Microsoft Visual Studio/Installer/vswhere.exe'
         found=json.loads(subprocess.check_output([str(vswhere),'-latest','-products','*','-requires','Microsoft.VisualStudio.Component.VC.Tools.x86.x64','-format','json'],text=True))
         require(len(found)==1,'One actual standard runner MSVC installation required')
-        vcvars=Path(found[0]['installationPath'])/'VC/Auxiliary/Build/vcvars64.bat';require(vcvars.is_file(),'Actual standard MSVC environment missing')
+        vcvars=Path(found[0]['installationPath'])/'Common7/Tools/VsDevCmd.bat';require(vcvars.is_file(),'Actual standard MSVC environment missing')
+        batch=output/'compiler-environment.bat';batch.write_text(compiler_batch(vcvars),encoding='ascii')
+        report['compiler_environment_batch_sha256']=sha(batch);save()
         cmd=str(Path(os.environ['SystemRoot'])/'System32/cmd.exe')
-        raw=subprocess.check_output([cmd,'/d','/s','/c','call "'+str(vcvars)+'" >nul && set'],text=True)
+        raw=read_compiler_environment(cmd,batch)
         environment={k.upper():v for k,v in os.environ.items()}
         for line in raw.splitlines():
             k,sep,v=line.partition('=')
@@ -75,8 +93,7 @@ def main():
                     cfg=normal.configuration(False)+'\nACTIVE_MODULES\n  ProductionCockpitDriver\n  OGLClient\nEND_MODULES\n'
                     (directory/'Orbiter.cfg').write_text(cfg)
                     target=directory/'Modules/Plugin/ProductionCockpitDriver.dll'
-                    target.unlink() # Break the shared SDK staging hardlink before the observer-only copy.
-                    shutil.copy2(observer,target)
+                    stage_observer(observer,target)
                     for target,item in plan['files'].items():
                         p=directory/target;p.parent.mkdir(parents=True,exist_ok=True)
                         if p.exists():require(sha(p)==item['sha256'],'Conflicting same-source shader input')
@@ -110,7 +127,7 @@ def main():
     except BaseException as error:
         report['error']=str(error);save();raise
     finally:
-        paths={p for p in output.rglob('*') if p.is_file() and ((p.parent==output and p.suffix.lower() in ('.json','.log','.dll','.obj','.lib','.exp','.pdb')) or
+        paths={p for p in output.rglob('*') if p.is_file() and ((p.parent==output and p.suffix.lower() in ('.json','.log','.dll','.obj','.lib','.exp','.pdb','.bat')) or
                (len(p.relative_to(output).parts)==2 and p.suffix.lower() in ('.csv','.json','.txt','.log','.cfg','.rgba')) or
                ('Scenarios' in p.relative_to(output).parts and p.suffix.lower()=='.scn'))}
         pack(ROOT,paths,output/'diagnostic-raw.tar.gz',output/'diagnostic-raw-index.json')
