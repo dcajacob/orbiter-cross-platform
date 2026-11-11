@@ -16,6 +16,9 @@ BASE=ROOT/'out/frozen-core-cockpit'
 RUNTIME=ROOT/'out/phase6-hosted-native'
 FIXTURES=('Cockpit/native.py','CockpitUI/native.py','CockpitUI/mouse_smoke.py','CockpitUI/recording.py')
 STAGING=('Cockpit/frozen.py','CockpitUI/frozen_ui.py','additional_references.py')
+X11_BEFORE_RUNTIME=("        from hosted_class_interactions import install_x11,verify_x11\n"
+                    "        report['x11']=install_x11(output,run);save()\n")
+
 
 
 def prepare(profile):
@@ -86,6 +89,10 @@ def prepared_body():
         ("ROOT/'out/hosted-native-writer'","ROOT/'out/frozen-core-cockpit'",1),
         ("ROOT/'out/native-writer-container.json'","ROOT/'out/frozen-core-cockpit-container.json'",2)]:
         require(body.count(old)==count,'Conserved original provider setup anchor differs');body=body.replace(old,new)
+    # Supply every declared package before the unchanged final inventory is sealed.
+    anchor="        from hosted_native_runtime_dependencies import install as install_native_runtime,verify as verify_native_runtime"
+    require(body.count(anchor)==1,'Exact native runtime inventory installation anchor required')
+    body=body.replace(anchor,X11_BEFORE_RUNTIME+anchor,1)
     start=body.index("        build=ROOT/'out/phase6-hosted-native'/a.profile;capture=")
     end=body.index("        require(sha(ROOT/'out/mesa-topology-restoration/restoration.json')",start)
     replacement=r"""
@@ -96,7 +103,7 @@ def prepared_body():
         from interactions import display_backend
         lock=candidate();report['candidate_id']=lock['id'];build=RUNTIME/a.profile;engine=build/'engine'
         report['runtime_proof']=runtime_proof(a.profile,lock,build);save()
-        x11=install_x11(output,run);report['x11']=x11;save()
+        x11=load(output/'x11.json');require(x11==report['x11'],'Original early X11 installation receipt changed');verify_x11(x11)
         watched={ROOT/'Tests/Production'/n for n in FIXTURES}|{ROOT/'Tests/Production'/n for n in
             ('Cockpit/cases.json','CockpitUI/cases.json','Cockpit/compare.py','Cockpit/reference.py',
              'Client/compare_client.py','CockpitUI/capture.py','CockpitUI/frozen_ui.py','Cockpit/frozen.py','additional_references.py')}

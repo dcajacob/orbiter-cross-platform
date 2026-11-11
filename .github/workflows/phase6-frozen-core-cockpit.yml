@@ -1,7 +1,7 @@
 name: Phase 6 Frozen Core Cockpit Components
 on:
   push:
-    branches: ['qualification/frozen-core-cockpit-v1']
+    branches: ['qualification/frozen-core-cockpit-v2']
 permissions:
   contents: read
   actions: read
