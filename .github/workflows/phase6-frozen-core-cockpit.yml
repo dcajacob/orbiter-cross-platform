@@ -1,0 +1,137 @@
+name: Phase 6 Frozen Core Cockpit Components
+on:
+  push:
+    branches: ['qualification/frozen-core-cockpit-v1']
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: phase6-frozen-core-cockpit
+  cancel-in-progress: false
+jobs:
+  controls:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.14'
+      - name: Retain all original fixture and source controls
+        run: mkdir -p out && python3 -B Tests/Production/Closeout/run_controls.py --output out/frozen-core-cockpit-controls.json
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: frozen-core-cockpit-controls
+          retention-days: 14
+          path: out/frozen-core-cockpit-controls.json
+  cockpit:
+    name: Frozen core cockpit ${{ matrix.profile }}
+    needs: controls
+    runs-on: ubuntu-24.04
+    timeout-minutes: 150
+    strategy:
+      fail-fast: false
+      max-parallel: 2
+      matrix:
+        profile: [Debug-automatic, Debug-sse2, Release-automatic, Release-sse2]
+    env:
+      PROFILE: ${{ matrix.profile }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.14'
+      - name: Read the exact original frozen cockpit release API and retain original native/provider archives
+        uses: actions/github-script@v8
+        with:
+          script: |
+            const fs=require('fs'),{owner,repo}=context.repo;
+            const configs=[
+              ['production-windows-cockpit-v1','Cockpit'],
+              ['production-windows-cockpit-ui-v1','CockpitUI'],
+              ['production-windows-cockpit-ui-timing-v1','CockpitUITiming']];
+            const apis={};
+            for(const [tag,folder] of configs){
+              const ref=JSON.parse(fs.readFileSync('Tests/Production/'+folder+'/Reference/provenance.json','utf8'));
+              const release=(await github.rest.repos.getReleaseByTag({owner,repo,tag})).data;
+              if(release.tag_name!==tag||release.draft||!Array.isArray(release.assets))throw Error('Exact original '+folder+' frozen release required');
+              for(const pin of Object.values(ref.artifacts)){
+                if(release.assets.filter(x=>x.name===pin.name+'.zip'&&x.state==='uploaded'&&x.size===pin.size_bytes&&x.digest==='sha256:'+pin.sha256).length!==1)
+                  throw Error('Actual frozen archive digest differs: '+folder+'/'+pin.name);
+              }
+              apis[folder]=release;
+            }
+            fs.mkdirSync('out',{recursive:true});
+            fs.writeFileSync('out/frozen-cockpit-original-release-api.json',JSON.stringify(apis,null,2),{flag:'wx'});
+            await require('./.github/scripts/phase6-download-native-api-inputs.cjs')({github,context,core});
+      - name: Restore original frozen references, the exact retained application and the original providers
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 -B Tests/Production/Closeout/hosted_frozen_cockpit_component.py --prepare "$PROFILE"
+          python3 -B Tests/Production/Closeout/restore_hosted_native_providers.py \
+            --api out/native-api-source/providers/api.json --archive out/native-api-source/providers/producer.zip \
+            --output out/native-provider-restoration/restoration.json
+          python3 -B Tests/Production/Closeout/restore_hosted_mesa_topology.py \
+            --api out/native-api-source/mesa/api.json --archive out/native-api-source/mesa/producer.zip \
+            --output out/mesa-topology-restoration/restoration.json
+      - name: Run unchanged instrument, dialog, window input and recording fixtures in pinned userspace
+        shell: bash
+        run: |
+          set -euo pipefail
+          source_dir="out/admission-package-source/$PROFILE"
+          sha256sum --check "$source_dir/cockpit-before.sha256"
+          image=$(python3 -c "import json; print('ubuntu@'+json.load(open('Tests/Production/Closeout/native-provider-container.lock.json'))['image_digest'])")
+          docker pull "$image"
+          docker image inspect "$image" > out/frozen-core-cockpit-container.json
+          docker run --rm --init --cpus=2 --shm-size=1g -v "$GITHUB_WORKSPACE:$GITHUB_WORKSPACE" -v /etc/ssl/certs/ca-certificates.crt:/run/orbiter-ci-system-ca.pem:ro -w "$GITHUB_WORKSPACE" \
+            -e GITHUB_ACTIONS -e RUNNER_OS -e GITHUB_WORKSPACE -e GITHUB_SHA -e GITHUB_RUN_ID -e PROFILE \
+            "$image" bash "$source_dir/cockpit-network.sh" "$source_dir/cockpit-bootstrap.sh" 2>&1 | tee out/frozen-core-cockpit-container.log
+          sha256sum --check "$source_dir/cockpit-before.sha256"
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: frozen-core-cockpit-${{ matrix.profile }}-raw
+          retention-days: 14
+          compression-level: 0
+          include-hidden-files: true
+          path: |
+            out/frozen-core-cockpit/${{ matrix.profile }}/*.tar.gz
+            out/frozen-core-cockpit/${{ matrix.profile }}/*.json
+            out/frozen-core-cockpit/${{ matrix.profile }}/*.log
+            out/frozen-cockpit-original-release-api.json
+            out/frozen-core-cockpit-container.*
+            out/frozen-core-reference/*.json
+            out/frozen-core-reference/*.log
+            out/admission-package-source/${{ matrix.profile }}/**
+            out/admission-network/${{ matrix.profile }}/**
+            out/original-package-official-pool/${{ matrix.profile }}/**
+            out/native-api-source/*/*.json
+            out/native-api-source/*/*.body
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: frozen-core-cockpit-${{ matrix.profile }}-receipt
+          retention-days: 14
+          compression-level: 3
+          path: |
+            out/frozen-core-cockpit/${{ matrix.profile }}/collection.json
+            out/frozen-core-cockpit/${{ matrix.profile }}/cockpit/native-cockpit-report.json
+            out/frozen-core-cockpit/${{ matrix.profile }}/dialogs/native-ui-report.json
+            out/frozen-core-cockpit/${{ matrix.profile }}/recording/verification.json
+            out/frozen-core-cockpit/${{ matrix.profile }}/window-dialog/ui-verification.json
+            out/frozen-core-cockpit/${{ matrix.profile }}/x11.json
+            out/native-api-source/native/candidate-restoration.json
+      - uses: actions/upload-artifact@v7
+        if: failure()
+        with:
+          name: frozen-core-cockpit-${{ matrix.profile }}-partial
+          retention-days: 14
+          compression-level: 3
+          include-hidden-files: true
+          path: out/frozen-core-cockpit/${{ matrix.profile }}/
