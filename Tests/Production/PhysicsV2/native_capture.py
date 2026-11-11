@@ -73,11 +73,14 @@ def prepare(profile):
     folder=ROOT/'out/admission-package-source'/profile
     bootstrap=(ROOT/'Tests/Production/Closeout/prepare_hosted_normal_admission.sh').read_text()
     bootstrap=replace_once(bootstrap,'Tests/Production/Closeout/hosted_normal_admission.py','Tests/Production/PhysicsV2/native_capture.py')
+    from snapshot_transport import prepared_body as identical_snapshot_retry
+    plan=folder/'physics-v2-identical-snapshot-retry.sh';plan.write_text(identical_snapshot_retry())
+    bootstrap=replace_once(bootstrap,'bash "$source_dir/original-plan-with-explicit-snapshot-fallback.sh"','bash "$source_dir/physics-v2-identical-snapshot-retry.sh"')
     (folder/'physics-v2-bootstrap.sh').write_text(bootstrap)
     network=(folder/'network.sh').read_text();network=network.replace('Tests/Production/Closeout/prepare_hosted_normal_admission.sh','out/admission-package-source/$PROFILE/physics-v2-bootstrap.sh')
     (folder/'physics-v2-network.sh').write_text(network)
     (folder/'physics-v2-generated-capture.py').write_text(prepared_body())
-    paths=[HERE/'native_capture.py',HERE/'runtime_dependencies.py',folder/'physics-v2-bootstrap.sh',folder/'physics-v2-network.sh',folder/'physics-v2-generated-capture.py']
+    paths=[HERE/'native_capture.py',HERE/'runtime_dependencies.py',HERE/'snapshot_transport.py',plan,folder/'physics-v2-bootstrap.sh',folder/'physics-v2-network.sh',folder/'physics-v2-generated-capture.py']
     (folder/'physics-v2-before.sha256').write_text(''.join(sha(p)+'  '+str(p.relative_to(ROOT))+'\n' for p in paths))
 
 

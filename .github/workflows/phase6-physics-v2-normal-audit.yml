@@ -1,0 +1,75 @@
+name: Phase6 Independent Fresh Physics v2 Full Normal Raw Audit
+'on':
+  push:
+    branches:
+    - qualification/physics-v2-normal-audit-v1
+permissions:
+  contents: read
+  actions: read
+jobs:
+  native:
+    name: Independent published v2 normal audit ${{ matrix.profile }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 90
+    strategy:
+      fail-fast: false
+      max-parallel: 2
+      matrix:
+        profile:
+        - Debug-automatic
+        - Debug-sse2
+        - Release-automatic
+        - Release-sse2
+    env:
+      PROFILE: ${{ matrix.profile }}
+    steps:
+    - uses: actions/checkout@v7
+      with:
+        fetch-depth: 0
+    - uses: actions/setup-python@v6
+      with:
+        python-version: '3.14'
+    - name: Independently retain complete actual published raw capture and source-bound package
+      uses: actions/github-script@v8
+      with:
+        script: 'await require(''./Tests/Production/PhysicsV2/download.cjs'')({github,context,core,role:''native'',profile:process.env.PROFILE});
+
+          await require(''./Tests/Production/PhysicsV2/download_capture.cjs'')({github,context,core,profile:process.env.PROFILE});'
+    - name: Independently restore all actual native package members and original unit failures
+      run: python3 -B Tests/Production/PhysicsV2/restore.py native "$PROFILE"
+    - name: Confirm exact original intentional exit release identities and native package inputs
+      uses: actions/github-script@v8
+      with:
+        script: "const fs=require('fs'),{owner,repo}=context.repo;\nconst p=JSON.parse(fs.readFileSync('Tests/Production/NativeLua/StockExit/observations.lock.json','utf8')).durable_release;\n\
+          const release=(await github.rest.repos.getReleaseByTag({owner,repo,tag:p.tag})).data;\nif(release.id!==p.id||release.tag_name!==p.tag||release.draft||release.assets.length!==p.assets.length||\n\
+          \   p.assets.some(x=>release.assets.filter(a=>a.id===x.id&&a.name===x.name&&a.state==='uploaded'&&a.size===x.bytes&&a.digest==='sha256:'+x.sha256).length!==1))throw\
+          \ Error('Exact immutable original exit release assets required');\nfs.writeFileSync('out/frozen-stock-exit-release-api.json',JSON.stringify(release,null,2),{flag:'wx'});\n\
+          await require('./.github/scripts/phase6-download-native-api-inputs.cjs')({github,context,core});\n"
+    - name: Restore all1125original API reference guards and independently audited original stock exit captures
+      env:
+        GH_TOKEN: ${{ github.token }}
+      run: 'python3 -B Tests/Production/PhysicsV2/reference.py
+
+        python3 -B Tests/Production/NativeLua/StockExit/frozen_original.py --cache out/frozen-stock-exit-cache --output out/frozen-stock-exit --audit out/frozen-stock-exit-preflight.json'
+    - name: Independently read every raw byte and replay original157scenario readers without new simulator processes
+      run: python3 -B Tests/Production/PhysicsV2/audit_native.py
+    - uses: actions/upload-artifact@v7
+      if: always()
+      with:
+        name: physics-v2-normal-independent-${{ matrix.profile }}
+        retention-days: 14
+        path: 'out/physics-v2-normal-independent/${{ matrix.profile }}/verification.json
+
+          out/physics-v2-published/native/${{ matrix.profile }}/api.json
+
+          out/physics-v2-input/native/${{ matrix.profile }}/api.json
+
+          out/physics-v2-input/native/${{ matrix.profile }}/restoration.json
+
+          out/physics-v2-normal-independent/${{ matrix.profile }}/outer/hosted-normal-admission/${{ matrix.profile }}/*.json
+
+          out/admission-reference-source/*.json
+
+          out/frozen-stock-exit-preflight.json
+
+          '
