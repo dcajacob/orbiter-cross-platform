@@ -3,6 +3,7 @@ name: Phase6 Diagnose First Invalid HST Contact Operation
   push:
     branches:
     - qualification/physics-v2-HST-first-invalid-v1
+    - qualification/physics-v2-HST-first-invalid-v2
 permissions:
   contents: read
   actions: read
@@ -108,7 +109,7 @@ jobs:
         docker run --rm --init --cpus=2 --shm-size=1g -v "$GITHUB_WORKSPACE:$GITHUB_WORKSPACE"
         -v /etc/ssl/certs/ca-certificates.crt:/run/orbiter-ci-system-ca.pem:ro -w
         "$GITHUB_WORKSPACE" -e GITHUB_ACTIONS -e RUNNER_OS -e GITHUB_WORKSPACE -e
-        GITHUB_SHA -e GITHUB_RUN_ID -e PROFILE "$image" bash "$source_dir/physics-v2-network.sh"
+        GITHUB_SHA -e GITHUB_RUN_ID -e PROFILE "$image" bash "$source_dir/hst-network.sh"
         "$source_dir/hst-bootstrap.sh" 2>&1 | tee out/admission-container.log
 
         sha256sum --check "$source_dir/physics-v2-before.sha256"

@@ -145,8 +145,9 @@ def main():
     if sys.argv[1]=='--prepare':
         native_capture.prepare(PROFILE);folder=ROOT/'out/admission-package-source'/PROFILE
         bootstrap=folder/'hst-bootstrap.sh';bootstrap.write_text(replace_once((folder/'physics-v2-bootstrap.sh').read_text(),'Tests/Production/PhysicsV2/native_capture.py','Tests/Production/PhysicsV2/hst_fpe.py'))
+        network=folder/'hst-network.sh';network.write_text(replace_once((folder/'physics-v2-network.sh').read_text(),'physics-v2-bootstrap.sh','hst-bootstrap.sh'))
         generated=folder/'hst-generated.py';generated.write_text(prepared_body())
-        files=[Path(__file__).resolve(),bootstrap,generated]
+        files=[Path(__file__).resolve(),bootstrap,network,generated]
         (folder/'hst-before.sha256').write_text(''.join(sha(p)+'  '+p.relative_to(ROOT).as_posix()+'\n' for p in files));return
     try:exec(compile(prepared_body(),str(HERE/'hst_fpe.py'),'exec'),{'__name__':'__main__','__file__':str(HERE/'hst_fpe.py')})
     finally:
