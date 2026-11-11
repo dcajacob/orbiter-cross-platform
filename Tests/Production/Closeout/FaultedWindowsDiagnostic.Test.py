@@ -1,7 +1,7 @@
 from pathlib import Path
 import tempfile,unittest
 from unittest.mock import Mock
-from capture_failed_normal_windows import compiler_batch,read_compiler_environment,stage_observer,original_configuration,observed_scene_run
+from capture_failed_normal_windows import compiler_batch,read_compiler_environment,stage_observer,original_configuration,observed_scene_run,observed_subprocess
 
 
 class FaultedWindowsDiagnostic(unittest.TestCase):
@@ -52,3 +52,13 @@ class FaultedWindowsDiagnostic(unittest.TestCase):
             self.assertEqual(record['actual_returncode'],0)
             self.assertFalse(record['timed_out'])
             self.assertEqual((directory/'console.txt').read_text().strip(),'actual disposable child')
+
+    def test_observed_subprocess_preserves_every_api_used_by_the_original_stager(self):
+        import ast,subprocess
+        from contracts import ROOT
+        body=ast.parse((ROOT/'Tests/Production/Cockpit/stage.py').read_bytes())
+        names={n.attr for n in ast.walk(body) if isinstance(n,ast.Attribute) and isinstance(n.value,ast.Name) and n.value.id=='subprocess'}
+        self.assertIn('STDOUT',names)
+        proxy=observed_subprocess()
+        for name in names:
+            self.assertIs(getattr(proxy,name),observed_scene_run if name=='run' else getattr(subprocess,name))

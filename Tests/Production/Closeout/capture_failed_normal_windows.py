@@ -37,6 +37,12 @@ def stage_observer(source,target):
 
 
 
+
+def observed_subprocess():
+    from types import SimpleNamespace
+    return SimpleNamespace(**(vars(subprocess)|dict(run=observed_scene_run)))
+
+
 def observed_scene_run(argv,**kwargs):
     directory=Path(kwargs['cwd']);timeout=kwargs.pop('timeout');check=kwargs.pop('check',False)
     started=time.monotonic_ns();record=dict(argv=list(map(str,argv)),actual_pid=None,actual_returncode=None,timed_out=False)
@@ -99,8 +105,7 @@ def main():
         sys.path[:0]=[str(ROOT/'Tests/Production/StockScenarios'),str(ROOT/'Tests/Production'),str(ROOT/'Tests/Production/Client'),str(ROOT/'Tests/Production/Cockpit'),str(ROOT/'Tests/Production/CurrentWindows/Hosted')]
         spec=importlib.util.spec_from_file_location('original_cockpit_stage',ROOT/'Tests/Production/Cockpit/stage.py')
         original_stage=importlib.util.module_from_spec(spec);spec.loader.exec_module(original_stage)
-        from types import SimpleNamespace
-        original_stage.subprocess=SimpleNamespace(run=observed_scene_run) # Observe the unchanged argv/timeout without mutating the original source.
+        original_stage.subprocess=observed_subprocess() # Keep every original subprocess constant/API; observe only run.
         from run_client import mesa_files
         import current_client_shaders as shaders
         # Both scene cohorts use the unchanged runner's original-propagators policy.
