@@ -1,0 +1,152 @@
+name: Phase6 Diagnose First Invalid HST Contact Operation
+'on':
+  push:
+    branches:
+    - qualification/physics-v2-HST-first-invalid-v1
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: phase6-physics-v2-HST-first-invalid-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  native:
+    name: Diagnose HST first invalid operation
+    runs-on: ubuntu-24.04
+    timeout-minutes: 90
+    env:
+      PROFILE: Debug-automatic
+    steps:
+    - uses: actions/checkout@v7
+      with:
+        fetch-depth: 0
+    - uses: actions/setup-python@v6
+      with:
+        python-version: '3.14'
+    - name: Retain actual source-bound corrected build and every original failure
+      uses: actions/github-script@v8
+      with:
+        script: await require('./Tests/Production/PhysicsV2/download.cjs')({github,context,core,role:'native',profile:process.env.PROFILE});
+    - name: Bind actual original failed HST trace from completed Debug sweep
+      uses: actions/github-script@v8
+      with:
+        script: 'const fs=require(''fs''),crypto=require(''crypto''),{owner,repo}=context.repo;
+
+          const p=JSON.parse(fs.readFileSync(''Tests/Production/PhysicsV2/HST-first-invalid-origin.json'',''utf8''));
+
+          const run=(await github.rest.actions.getWorkflowRun({owner,repo,run_id:p.run_id})).data;
+
+          const jobs=await github.paginate(github.rest.actions.listJobsForWorkflowRun,{owner,repo,run_id:p.run_id,per_page:100});
+
+          const artifact=(await github.rest.actions.getArtifact({owner,repo,artifact_id:p.receipt_artifact_id})).data;
+
+          const selected=jobs.filter(j=>j.id===p.job_id);
+
+          if(run.head_sha!==p.source||run.run_attempt!==1||run.repository.private||selected.length!==1||selected[0].status!==''completed''||selected[0].conclusion!==''failure''||selected[0].head_sha!==p.source||selected[0].labels.join('','')!==''ubuntu-24.04''||artifact.expired||artifact.size_in_bytes!==p.receipt_bytes||artifact.digest!==''sha256:''+p.receipt_sha256||artifact.workflow_run.id!==p.run_id||artifact.workflow_run.head_sha!==p.source)throw
+          Error(''Exact actual failed HST original full sweep required'');
+
+          const base=''out/physics-v2-HST-first-invalid-source'';fs.mkdirSync(base,{recursive:true});const
+          source={run,jobs,artifact};fs.writeFileSync(base+''/api.json'',JSON.stringify(source,null,2),{flag:''wx''});
+
+          const bytes=Buffer.from((await require(''./.github/scripts/phase6-download-bound-artifact.cjs'')({github,owner,repo,source,artifact,base,core})).data);
+
+          if(bytes.length!==p.receipt_bytes||crypto.createHash(''sha256'').update(bytes).digest(''hex'')!==p.receipt_sha256)throw
+          Error(''Actual retained full-sweep receipt differs'');fs.writeFileSync(base+''/producer.zip'',bytes,{flag:''wx''});
+
+          '
+    - name: Restore every corrected application member and preserve31passes plus one
+        original timeout
+      run: python3 -B Tests/Production/PhysicsV2/restore.py native "$PROFILE"
+    - name: Retry only the unchanged pure Python evidence verifier with its original60second
+        deadline
+      run: python3 -B Tests/Production/PhysicsV2/retry_evidence.py
+    - name: Confirm exact original intentional exit release identities and native
+        package inputs
+      uses: actions/github-script@v8
+      with:
+        script: "const fs=require('fs'),{owner,repo}=context.repo;\nconst p=JSON.parse(fs.readFileSync('Tests/Production/NativeLua/StockExit/observations.lock.json','utf8')).durable_release;\n\
+          const release=(await github.rest.repos.getReleaseByTag({owner,repo,tag:p.tag})).data;\n\
+          if(release.id!==p.id||release.tag_name!==p.tag||release.draft||release.assets.length!==p.assets.length||\n\
+          \   p.assets.some(x=>release.assets.filter(a=>a.id===x.id&&a.name===x.name&&a.state==='uploaded'&&a.size===x.bytes&&a.digest==='sha256:'+x.sha256).length!==1))throw\
+          \ Error('Exact immutable original exit release assets required');\nfs.writeFileSync('out/frozen-stock-exit-release-api.json',JSON.stringify(release,null,2),{flag:'wx'});\n\
+          await require('./.github/scripts/phase6-download-native-api-inputs.cjs')({github,context,core});\n"
+    - name: Restore exact original runtime providers and immutable exit references
+      shell: bash
+      run: 'set -euo pipefail
+
+        python3 -B Tests/Production/NativeLua/StockExit/frozen_original.py --cache
+        out/frozen-stock-exit-cache --output out/frozen-stock-exit --audit out/frozen-stock-exit-preflight.json
+
+        python3 -B Tests/Production/Closeout/restore_hosted_native_providers.py --api
+        out/native-api-source/providers/api.json --archive out/native-api-source/providers/producer.zip
+        --output out/native-provider-restoration/restoration.json
+
+        python3 -B Tests/Production/Closeout/restore_hosted_mesa_topology.py --api
+        out/native-api-source/mesa/api.json --archive out/native-api-source/mesa/producer.zip
+        --output out/mesa-topology-restoration/restoration.json
+
+        python3 -B Tests/Production/PhysicsV2/hst_fpe.py --prepare "$PROFILE"
+
+        '
+    - name: Run only HST unchanged control, unchanged-method control and first-invalid
+        trap
+      shell: bash
+      run: 'set -euo pipefail
+
+        source_dir="out/admission-package-source/$PROFILE"
+
+        sha256sum --check "$source_dir/physics-v2-before.sha256"
+
+        sha256sum --check "$source_dir/hst-before.sha256"
+
+        image=$(python3 -c "import json; print(''ubuntu@''+json.load(open(''Tests/Production/Closeout/native-provider-container.lock.json''))[''image_digest''])")
+
+        docker pull "$image"
+
+        docker image inspect "$image" > out/admission-container.json
+
+        docker run --rm --init --cpus=2 --shm-size=1g -v "$GITHUB_WORKSPACE:$GITHUB_WORKSPACE"
+        -v /etc/ssl/certs/ca-certificates.crt:/run/orbiter-ci-system-ca.pem:ro -w
+        "$GITHUB_WORKSPACE" -e GITHUB_ACTIONS -e RUNNER_OS -e GITHUB_WORKSPACE -e
+        GITHUB_SHA -e GITHUB_RUN_ID -e PROFILE "$image" bash "$source_dir/physics-v2-network.sh"
+        "$source_dir/hst-bootstrap.sh" 2>&1 | tee out/admission-container.log
+
+        sha256sum --check "$source_dir/physics-v2-before.sha256"
+
+        sha256sum --check "$source_dir/hst-before.sha256"
+
+        '
+    - uses: actions/upload-artifact@v7
+      if: always()
+      with:
+        name: physics-v2-HST-first-invalid-raw
+        retention-days: 14
+        compression-level: 0
+        include-hidden-files: true
+        path: 'out/physics-v2-HST-first-invalid/Debug-automatic/**
+
+          out/physics-v2-HST-first-invalid-source/**
+
+          out/admission-package-source/Debug-automatic/**
+
+          out/admission-network/Debug-automatic/**
+
+          out/admission-container.*'
+    - uses: actions/upload-artifact@v7
+      if: always()
+      with:
+        name: physics-v2-HST-first-invalid-receipt
+        retention-days: 14
+        compression-level: 6
+        include-hidden-files: true
+        path: 'out/physics-v2-HST-first-invalid/Debug-automatic/collection.json
+
+          out/physics-v2-HST-first-invalid/Debug-automatic/unchanged-runtime-postflight.json
+
+          out/physics-v2-HST-first-invalid/Debug-automatic/isolated-compiler/*.json
+
+          out/physics-v2-HST-first-invalid/Debug-automatic/first-invalid-trap/console.log
+
+          out/physics-v2-HST-first-invalid/Debug-automatic/first-invalid-trap/resolved-stack.txt
+
+          out/physics-v2-HST-first-invalid/Debug-automatic/*/process-receipt.json'

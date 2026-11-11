@@ -1,0 +1,10 @@
+{
+  "run_id": 43077080713,
+  "source": "8f7d622238300ba88b6baa65904f16f5dd9f32e5",
+  "job_id": 130719604349,
+  "receipt_artifact_id": 13886588619,
+  "receipt_bytes": 347732,
+  "receipt_sha256": "b4a1dd34a26dc8f0e86fb9d8e455c6dac4e88b726435ac3ee549120f35403eec",
+  "HST_trace_sha256": "9561b5ed08bd0bab682a1f443d8087a4bf3a6af2d2c565bf18258f7b909fa68c",
+  "qualification_granted": false
+}
