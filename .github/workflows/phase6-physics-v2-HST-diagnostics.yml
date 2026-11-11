@@ -3,6 +3,7 @@ name: Phase6 Diagnose New Physics v2 HST Launch Regression
   push:
     branches:
     - qualification/physics-v2-HST-diagnostics-v1
+    - qualification/physics-v2-HST-reader-v2
 permissions:
   contents: read
   actions: read
@@ -14,9 +15,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        cohort:
-        - original
-        - new
+        cohort: ${{ fromJSON(github.ref_name == 'qualification/physics-v2-HST-reader-v2' && '["new"]' || '["original","new"]') }}
     env:
       COHORT: ${{ matrix.cohort }}
     steps:
@@ -64,6 +63,7 @@ jobs:
 
           out/physics-v2-HST-source/${{ matrix.cohort }}/api.json'
   windows:
+    if: github.ref_name == 'qualification/physics-v2-HST-diagnostics-v1'
     name: HST new physics Windows ${{ matrix.configuration }}
     runs-on: windows-2025
     timeout-minutes: 90
