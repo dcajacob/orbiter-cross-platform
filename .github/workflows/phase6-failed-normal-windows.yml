@@ -2,7 +2,7 @@ name: Phase6 Current Windows Matched Failed Normal Diagnostics
 'on':
   push:
     branches:
-    - qualification/failed-normal-windows-v3
+    - qualification/failed-normal-windows-v4
 permissions:
   contents: read
   actions: read

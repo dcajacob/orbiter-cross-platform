@@ -25,12 +25,31 @@ def read_compiler_environment(cmd,batch,read=subprocess.check_output):
 
 
 def stage_observer(source,target):
-    require(target.is_file() and source.is_file(),'Actual original observer and staged SDK placeholder required')
-    target.unlink()
+    require(source.is_file() and not target.is_symlink(),'Actual original observer and owned staged destination required')
+    target.parent.mkdir(parents=True,exist_ok=True)
+    require(target.parent.resolve()==target.parent,'Observer staging parent must not redirect')
+    if target.exists():
+        require(target.is_file(),'Existing staged observer must be a regular file')
+        target.unlink()
     shutil.copy2(source,target)
     require(sha(source)==sha(target),'Exact original passive observer copy required')
 
 
+
+
+def observed_scene_run(argv,**kwargs):
+    directory=Path(kwargs['cwd']);timeout=kwargs.pop('timeout');check=kwargs.pop('check',False)
+    started=time.monotonic_ns();record=dict(argv=list(map(str,argv)),actual_pid=None,actual_returncode=None,timed_out=False)
+    try:
+        child=subprocess.Popen(argv,**kwargs);record['actual_pid']=child.pid
+        try:record['actual_returncode']=child.wait(timeout=timeout)
+        except subprocess.TimeoutExpired:
+            record['timed_out']=True;child.kill();record['actual_returncode']=child.wait();raise
+        if check and record['actual_returncode']:raise subprocess.CalledProcessError(record['actual_returncode'],argv)
+        return subprocess.CompletedProcess(argv,record['actual_returncode'])
+    finally:
+        record['elapsed_ns']=time.monotonic_ns()-started
+        atomic_json(directory/'process-receipt.json',record)
 
 def main():
     require(sys.platform=='win32' and os.environ.get('GITHUB_ACTIONS')=='true' and os.environ.get('ImageOS') in {'win25','win25-vs2026'},'Ordinary standard hosted Windows session required')
@@ -80,6 +99,8 @@ def main():
         sys.path[:0]=[str(ROOT/'Tests/Production/StockScenarios'),str(ROOT/'Tests/Production'),str(ROOT/'Tests/Production/Client'),str(ROOT/'Tests/Production/Cockpit'),str(ROOT/'Tests/Production/CurrentWindows/Hosted')]
         spec=importlib.util.spec_from_file_location('original_cockpit_stage',ROOT/'Tests/Production/Cockpit/stage.py')
         original_stage=importlib.util.module_from_spec(spec);spec.loader.exec_module(original_stage)
+        from types import SimpleNamespace
+        original_stage.subprocess=SimpleNamespace(run=observed_scene_run) # Observe the unchanged argv/timeout without mutating the original source.
         from run_client import mesa_files
         import current_client_shaders as shaders
         # Both scene cohorts use the unchanged runner's original-propagators policy.
@@ -121,7 +142,8 @@ def main():
                         if not valid:invalid.append(dict(tick=row.get('tick'),object=row.get('object'),field=key,value=value))
                 ticks={r['tick'] for r in rows};complete=(folder/'stock-vessel-complete.txt')
                 reached=complete.is_file() and complete.read_text().strip()=='60'
-                item=dict(scene=scene,math_profile=mode,original_scenario_sha256=sha(scene_path),error=error,rows=len(rows),
+                process=load(folder/'process-receipt.json') if (folder/'process-receipt.json').is_file() else None
+                item=dict(scene=scene,math_profile=mode,original_scenario_sha256=sha(scene_path),process=process,error=error,rows=len(rows),
                           ticks=len(ticks),reached_original60frame_observer_end=reached,first_nonfinite=invalid[:8],native_admission_qualified=False,
                           files_sha256={p.relative_to(folder).as_posix():sha(p) for p in folder.iterdir() if p.is_file() and p.suffix.lower() in ('.csv','.json','.txt','.log','.cfg','.rgba')})
                 report['cases'][mode+'-'+number]=item
@@ -129,7 +151,7 @@ def main():
                 require(all(sha(runtime/n)==h for n,h in guards.items()),'Pristine SDK changed during diagnostic scene')
                 save()
         report.update(status='diagnostic-completed-with-original-simulation-failures' if failures else 'completed-diagnostic-only',
-                      failed_cells=failures,actual_scene_processes=len(report['cases']),pristine_sdk_unchanged=True);save()
+                      failed_cells=failures,attempted_scene_staging=len(report['cases']),actual_scene_processes=sum(c['process'] is not None and c['process']['actual_pid'] is not None for c in report['cases'].values()),pristine_sdk_unchanged=True);save()
         require(not failures,'Original Windows matched-clock diagnostics failed; all original partial outputs preserved')
     except BaseException as error:
         report['error']=str(error);save();raise

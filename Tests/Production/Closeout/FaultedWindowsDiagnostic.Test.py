@@ -1,7 +1,7 @@
 from pathlib import Path
 import tempfile,unittest
 from unittest.mock import Mock
-from capture_failed_normal_windows import compiler_batch,read_compiler_environment,stage_observer,original_configuration
+from capture_failed_normal_windows import compiler_batch,read_compiler_environment,stage_observer,original_configuration,observed_scene_run
 
 
 class FaultedWindowsDiagnostic(unittest.TestCase):
@@ -31,3 +31,24 @@ class FaultedWindowsDiagnostic(unittest.TestCase):
             self.assertNotIn(field,body)
         self.assertIn('AtmosphericWind = FALSE',body)
         self.assertIn('InfobarMode = 0',body)
+
+    def test_absent_sdk_placeholder_is_created_as_a_separate_observer_file(self):
+        with tempfile.TemporaryDirectory() as temp:
+            root=Path(temp);source=root/'observer.dll';source.write_bytes(b'exact observer')
+            target=root/'stage/Modules/Plugin/ProductionCockpitDriver.dll'
+            stage_observer(source,target)
+            self.assertEqual(target.read_bytes(),source.read_bytes())
+            self.assertNotEqual(source.stat().st_ino,target.stat().st_ino)
+
+    def test_actual_process_receipt_distinguishes_launch_from_staging(self):
+        import sys,json
+        with tempfile.TemporaryDirectory() as temp:
+            directory=Path(temp)
+            with (directory/'console.txt').open('w') as console:
+                result=observed_scene_run([sys.executable,'-c',"print('actual disposable child')"],cwd=directory,stdout=console,check=True,timeout=5)
+            record=json.loads((directory/'process-receipt.json').read_text())
+            self.assertEqual(result.returncode,0)
+            self.assertGreater(record['actual_pid'],0)
+            self.assertEqual(record['actual_returncode'],0)
+            self.assertFalse(record['timed_out'])
+            self.assertEqual((directory/'console.txt').read_text().strip(),'actual disposable child')
