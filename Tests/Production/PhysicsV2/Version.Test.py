@@ -7,6 +7,13 @@ from PhysicsV2.transforms import TARGET,BASELINE,corrected_physics,versioned_bui
 
 
 class PhysicsVersion(unittest.TestCase):
+    def test_exact_patch_transport_requires_lf_on_windows(self):
+        attributes=Path(__file__).with_name('.gitattributes').read_text()
+        self.assertIn('correction.patch text eol=lf',attributes.splitlines())
+        patch_bytes=Path(__file__).with_name('correction.patch').read_bytes()
+        self.assertNotIn(b'\r',patch_bytes)
+        self.assertEqual(source.digest(patch_bytes),json.loads(Path(__file__).with_name('version.json').read_text())['patch_sha256'])
+
     def test_applied_shared_source_is_exact_independently_validated_patch(self):
         old=source.normalized(source.git('show',BASELINE+':'+TARGET)).decode()
         self.assertEqual(corrected_physics(old),source.normalized((source.ROOT/TARGET).read_bytes()).decode())

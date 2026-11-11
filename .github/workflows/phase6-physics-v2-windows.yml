@@ -1,0 +1,17 @@
+name: Phase6 Physics v2 Windows Exact Patch Transport Retry
+on:
+  push:
+    branches: [qualification/physics-v2-windows-v2]
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: phase6-physics-v2-windows
+  cancel-in-progress: false
+jobs:
+  windows:
+    uses: ./.github/workflows/production-client.yml
+    with:
+      data_container_lock: Tests/Production/stock-data-container-v2.lock.json
+      retain_stock_sdk: true
+      physics_version: assembly-contact-v2
