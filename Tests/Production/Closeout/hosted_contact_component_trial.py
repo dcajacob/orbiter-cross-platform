@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Test an explicit two-method physics prototype; preserve the frozen application and every guard."""
+"""Test explicit contact-retry and initialization physics prototypes; preserve the frozen application and every guard."""
 import hashlib,json,os
 from pathlib import Path
 import shutil,subprocess,sys,time,zipfile
@@ -20,6 +20,8 @@ BEFORE='\tAddSurfaceForces (&F, &M, &state, tfrac, dt); // add ground contact fo
 AFTER='\tcollision_during_update |=\n\t'+BEFORE
 CALL='vlist[comp].vessel->AddSurfaceForces (&Fcomp, &Mcomp, &scomp, tfrac, dt)'
 FIXED_CALL=CALL[:-1]+', update_with_collision)'
+INIT_BEFORE='\tsp.is_in_atm        = false;'
+INIT_AFTER=INIT_BEFORE+'\n\tUpdateProxies();\n\tUpdateSurfParams();'
 
 
 def method(body,signature):
@@ -33,36 +35,39 @@ def method(body,signature):
 
 
 def source_variant(mode):
-    require(mode in ('original-methods','collision-retry-prototype'),'Exact component trial mode required')
+    require(mode in ('original-methods','collision-retry-prototype','contact-initialization-prototype'),'Exact component trial mode required')
     path=ROOT/'Src/Orbiter/SuperVessel.cpp';body=path.read_text()
     require(path.read_bytes()==subprocess.check_output(['git','show',SOURCE+':Src/Orbiter/SuperVessel.cpp'],cwd=ROOT),
             'Frozen production source must remain byte-identical; do not update its original conservation guard')
     first=method(body,'void SuperVessel::GetIntermediateMoments (');second=method(body,'bool SuperVessel::AddSurfaceForces (')
     require(first.count(BEFORE)==second.count(CALL)==1,'Exact original dispatch/contact anchors required')
-    if mode=='collision-retry-prototype':
+    third=method(body,'void SuperVessel::SetDefaultState ()')
+    require(third.count(INIT_BEFORE)==1,'Exact original assembly default-state anchor required')
+    if mode in ('collision-retry-prototype','contact-initialization-prototype'):
         first=first.replace(BEFORE,AFTER,1);second=second.replace(CALL,FIXED_CALL,1)
-    original=first+second
+    if mode=='contact-initialization-prototype':third=third.replace(INIT_BEFORE,INIT_AFTER,1)
+    original=first+second+third
     functions=[]
-    for i,code in enumerate((first,second)):
+    for i,code in enumerate((first,second,third)):
         opening=code.index('{')+1;functions.append(code[:opening]+'\n    contact_trial_call('+str(i)+');'+code[opening:])
     prefix=r'''#include "SuperVessel.h"
 #include <atomic>
 #include <cstdio>
 #include <cstdlib>
 namespace {
-std::atomic<bool> seen[2]{};
+std::atomic<bool> seen[3]{};
 void contact_trial_call(unsigned index) {
     if(!seen[index].exchange(true))if(const char* path=std::getenv("ORBITER_CONTACT_TRIAL_RECEIPT")) {
         if(auto* out=std::fopen(path,"a")) {
-            std::fputs(index==0?"moments\n":"surface\n",out);std::fclose(out);
+            std::fputs(index==0?"moments\n":index==1?"surface\n":"defaults\n",out);std::fclose(out);
         }
     }
 }
 }
 '''
     return prefix+'\n'.join(functions),dict(mode=mode,production_source=SOURCE,production_file_sha256=sha(path),
-        two_method_body_sha256=hashlib.sha256(original.encode()).hexdigest(),production_source_modified=False,
-        changes=[] if mode=='original-methods' else ['Retain assembly collision detection for existing integration retry','Apply component ground forces only when existing contact-retry policy enables them'],
+        complete_method_bodies_sha256=hashlib.sha256(original.encode()).hexdigest(),production_source_modified=False,
+        changes=[] if mode=='original-methods' else ['Retain assembly collision detection for existing integration retry','Apply component ground forces only when existing contact-retry policy enables them']+(['Initialize assembly proxy and actual surface state after original defaults clear them'] if mode=='contact-initialization-prototype' else []),
         first_call_observation_only=True,qualification_granted=False)
 
 
@@ -91,7 +96,7 @@ def prepare():
     engine=ROOT/'out/phase6-hosted-native'/PROFILE/'engine';header=engine/'native-sdk/OrbiterNativeBuild.h'
     restoration,engine_abi,macros=component_abi(engine,output)
     report=dict(source=os.environ['GITHUB_SHA'],candidate_id=lock['id'],actual_engine_cpp_abi=engine_abi,host_macros=macros,original_omitted_SDK_header=restoration,variants={},frozen_application_rebuilt=False,original_source_guard_modified=False,qualification_granted=False)
-    for mode in ('original-methods','collision-retry-prototype'):
+    for mode in ('original-methods','contact-initialization-prototype'):
         body,record=source_variant(mode);cpp=output/(mode+'.cpp');cpp.write_text(body);library=output/(mode+'.so')
         argv=['/usr/bin/c++','-std=c++17','-O0','-fPIC','-shared','-Wl,--no-undefined','-fsanitize=address,undefined','-fno-omit-frame-pointer',
               '-DORBITER_PRODUCTION_SHARED','-DORBITER_NATIVE_BUILD_CONFIGURATION="Debug"','-I'+str(ROOT/'Src/Orbiter'),
@@ -153,7 +158,7 @@ def run_cases(output,providers,mesa,report,save):
             GALLIUM_DRIVER='llvmpipe',LP_NUM_THREADS='2',LD_LIBRARY_PATH=':'.join(map(str,libraries)),ASAN_OPTIONS='detect_leaks=1:fast_unwind_on_malloc=0',
             LSAN_OPTIONS='',UBSAN_OPTIONS='halt_on_error=1:print_stacktrace=1')
         asan=Path('/usr/lib/x86_64-linux-gnu/libasan.so.8');require(asan.is_file(),'Original declared ASan runtime required')
-        for mode in ('unchanged-application','original-methods','collision-retry-prototype'):
+        for mode in ('unchanged-application','original-methods','contact-initialization-prototype'):
             results={};report['trials'][mode]=results
             for name,number in cases.items():
                 folder=output/(mode+'-'+number);folder.mkdir();original_case_control('stage',name,folder)
@@ -189,10 +194,26 @@ def run_cases(output,providers,mesa,report,save):
     for mode,results in report['trials'].items():
         require(len(results)==4,'All four unchanged original scenes required in every trial mode')
         for item in results.values():
-            if mode=='collision-retry-prototype':require(item['original_inspection']['status']=='passed' and item['actual_exitcode']==0,'Proposed physics component did not pass the unchanged original scenario reader')
+            if mode=='contact-initialization-prototype':require(item['original_inspection']['status']=='passed' and item['actual_exitcode']==0,'Proposed physics component did not pass the unchanged original scenario reader')
             else:require(item['original_inspection']['status']=='failed' and item['byte_identical_to_original_failure'],'Unchanged before component did not reproduce every exact original failed trace')
-            if mode!='unchanged-application':require(set(item['actual_component_dispatches'])=={'moments','surface'},'Both actual method dispatches must be observed; no assumed interposition')
+            if mode!='unchanged-application':require(set(item['actual_component_dispatches'])=={'moments','surface','defaults'},'All three actual method dispatches must be observed; no assumed interposition')
     require(candidate()==lock and all(sha(ROOT/n)==v for n,v in before['runtime_files_sha256'].items()),'Original frozen application/source bytes changed during trial')
+
+
+def frozen_postflight(output):
+    build=ROOT/'out/phase6-hosted-native'/PROFILE;record=load(build/'build.json')
+    compiler=load(ROOT/'out/contact-component-compiler/compiler.json');changed=[]
+    for name,digest in record['runtime_files_sha256'].items():
+        if not (ROOT/name).is_file() or sha(ROOT/name)!=digest:changed.append(name)
+    header=build/'engine/native-sdk/OrbiterNativeBuild.h'
+    if sha(header)!=compiler['original_omitted_SDK_header']['header_sha256']:changed.append(str(header))
+    for name,item in compiler['variants'].items():
+        library=ROOT/'out/contact-component-compiler'/(name+'.so')
+        if sha(library)!=item['library_sha256']:changed.append(str(library))
+    source=ROOT/'Src/Orbiter/SuperVessel.cpp'
+    if source.read_bytes()!=subprocess.check_output(['git','show',SOURCE+':Src/Orbiter/SuperVessel.cpp'],cwd=ROOT):changed.append(str(source))
+    atomic_json(output/'frozen-postflight.json',dict(status='passed' if not changed else 'failed',changed=changed,candidate_id=candidate()['id'],original_runtime_files_checked=len(record['runtime_files_sha256']),original_production_source_unchanged=not changed,qualification_granted=False))
+    require(not changed,'Original frozen bytes or explicitly declared prototype changed during diagnostic trial')
 
 
 def prepared_body():
@@ -205,7 +226,7 @@ def prepared_body():
     body=body[:start]+"        from hosted_contact_component_trial import run_cases\n        run_cases(output,providers,mesa,report,save)\n"+body[end:]
     old="        report.update(status='captured-and-independently-audited-native-writers-only',actual_processes=76,\n            capture_sha256=sha(capture/'capture.json'),independent_audit_sha256=sha(output/'independent-native-writer-audit.json'))"
     require(body.count(old)==1,'Original completion source anchor required')
-    return body.replace(old,"        report.update(status='validated-two-method-physics-prototype-only',actual_processes=12,normal_admission_qualified=False,phase6_complete=False,original_source_guards_unchanged=True)",1)
+    return body.replace(old,"        report.update(status='validated-contact-initialization-physics-prototype-only',actual_processes=12,normal_admission_qualified=False,phase6_complete=False,original_source_guards_unchanged=True)",1)
 
 
 if __name__=='__main__':
@@ -214,4 +235,6 @@ if __name__=='__main__':
     else:
         try:exec(compile(prepared_body(),str(Path(__file__)),'exec'),{'__name__':'__main__','__file__':str(Path(__file__))})
         finally:
-            if FOLDER.is_dir():pack(ROOT,{p for p in FOLDER.rglob('*') if p.is_file() or p.is_symlink()},FOLDER/'trial-raw.tar.gz',FOLDER/'trial-raw-index.json')
+            if FOLDER.is_dir():
+                try:frozen_postflight(FOLDER)
+                finally:pack(ROOT,{p for p in FOLDER.rglob('*') if p.is_file() or p.is_symlink()},FOLDER/'trial-raw.tar.gz',FOLDER/'trial-raw-index.json')

@@ -2,7 +2,7 @@ name: Phase6 Original Assembly Contact Component Trial
 'on':
   push:
     branches:
-    - qualification/assembly-contact-component-v2
+    - qualification/assembly-contact-component-v3
 permissions:
   contents: read
   actions: read
@@ -36,7 +36,7 @@ jobs:
           const response=await require('./.github/scripts/phase6-download-bound-artifact.cjs')({github,owner,repo,source,artifact,base,core});const bytes=Buffer.from(response.data);\n\
           if(bytes.length!==artifact.size_in_bytes||'sha256:'+crypto.createHash('sha256').update(bytes).digest('hex')!==artifact.digest)throw Error('Original\
           \ diagnostic ZIP differs');\nfs.writeFileSync(base+'/producer.zip',bytes,{flag:'wx'});\n"
-    - name: Verify every original control and compile only two explicitly labelled method prototypes
+    - name: Verify every original control and compile only explicitly labelled original and corrected components
       shell: bash
       run: "set -euo pipefail\npython3 -B Tests/Production/Closeout/run_controls.py --output out/contact-trial-controls.json\npython3 -B Tests/Production/Closeout/hosted_contact_component_trial.py\
         \ --prepare \"$PROFILE\"\npython3 -B Tests/Production/Closeout/restore_hosted_native_providers.py \\\n  --api out/native-api-source/providers/api.json\
@@ -82,7 +82,9 @@ jobs:
         name: assembly-contact-component-trial-receipt
         retention-days: 14
         if-no-files-found: error
-        path: 'out/contact-component-trial/Debug-automatic/collection.json
+        path: 'out/contact-component-trial/Debug-automatic/frozen-postflight.json
+
+          out/contact-component-trial/Debug-automatic/collection.json
 
           out/contact-component-trial/Debug-automatic/trial-raw-index.json
 

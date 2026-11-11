@@ -1,4 +1,5 @@
 from unittest import TestCase
+from pathlib import Path
 from contracts import ROOT
 import hosted_contact_component_trial as trial
 
@@ -48,3 +49,13 @@ class ContactComponentTrial(TestCase):
             self.assertEqual((output/'OrbiterNativeBuild.h').read_bytes(),header.read_bytes())
             with patch.object(trial.original_sdk,'restore',return_value=record),patch.object(trial,'host_macros',return_value=dict(actual_cpp_abi='different-compiler-ABI')),patch.object(trial,'abi_tokens',return_value=[abi]):
                 with self.assertRaises(ValueError):trial.component_abi(engine,output)
+
+    def test_initialization_prototype_retains_original_methods_except_three_declared_changes(self):
+        original,_=trial.source_variant('original-methods');fixed,record=trial.source_variant('contact-initialization-prototype')
+        self.assertEqual(fixed.replace(trial.AFTER,trial.BEFORE,1).replace(trial.FIXED_CALL,trial.CALL,1).replace(trial.INIT_AFTER,trial.INIT_BEFORE,1),original)
+        self.assertEqual(len(record['changes']),3)
+        body=(ROOT/'Src/Orbiter/SuperVessel.cpp').read_text()
+        actual=trial.method(original,'void SuperVessel::SetDefaultState ()').replace('\n    contact_trial_call(2);','',1)
+        self.assertEqual(actual,trial.method(body,'void SuperVessel::SetDefaultState ()'))
+        self.assertLess(fixed.index(trial.INIT_BEFORE),fixed.index('\tUpdateProxies();',fixed.index(trial.INIT_BEFORE)))
+        self.assertIn('frozen_postflight(FOLDER)',Path(trial.__file__).read_text())
