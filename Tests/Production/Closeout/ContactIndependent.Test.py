@@ -49,3 +49,16 @@ class ContactIndependent(TestCase):
             name='2024 Edition/Space Shuttle ascent autopilot.scn';producer.original_case_control('stage',name,folder)
             result=audit.original_inspection(folder,dict(ships={'Ship':'ShuttlePB'},dependency_problems={},startup_configuration_policy='original-propagators-v1'),name,0,base/'inspection.json')
             self.assertEqual(result['status'],'passed');self.assertEqual(json.loads((base/'inspection.json').read_text()),result)
+
+    def test_actual_lossless_restorer_accepts_only_the_original_guarded_object_store(self):
+        from types import SimpleNamespace
+        from unittest.mock import patch
+        from rejection_input_bundle import pack
+        with tempfile.TemporaryDirectory() as d:
+            root=Path(d);path=root/'out/original/flight.csv';path.parent.mkdir(parents=True);path.write_bytes(b'original,unchanged,bytes\n')
+            archive=root/'raw.tar.gz';record=pack(root,{path},archive,root/'index.json');path.unlink()
+            with self.assertRaises(ValueError):audit.restore(root,archive,record,root/'out/contact-component-independent/restoration')
+            with patch('restore_rejection_input_bundle.shutil.disk_usage',return_value=SimpleNamespace(free=2**40)):
+                proof=audit.restore_trial(archive,record,root=root)
+            self.assertEqual(path.read_bytes(),b'original,unchanged,bytes\n')
+            self.assertTrue(proof['all_original_files_and_source_guards_unchanged'])

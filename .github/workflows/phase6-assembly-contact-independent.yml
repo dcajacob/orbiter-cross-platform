@@ -2,7 +2,7 @@ name: Phase6 Independent Original Assembly Contact Trial Audit
 'on':
   push:
     branches:
-    - qualification/assembly-contact-independent-v2
+    - qualification/assembly-contact-independent-v3
 permissions:
   contents: read
   actions: read

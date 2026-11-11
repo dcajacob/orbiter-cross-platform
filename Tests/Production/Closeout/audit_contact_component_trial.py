@@ -23,6 +23,10 @@ def api_binding(api,archive):
     require(a['name']=='assembly-contact-component-trial-raw' and a['expired'] is False and a['workflow_run']['id']==RUN and a['workflow_run']['head_sha']==SOURCE and archive.stat().st_size==a['size_in_bytes'] and 'sha256:'+sha(archive)==a['digest'],'Exact published trial raw API length/SHA/source required')
 
 
+def restore_trial(archive,index,root=ROOT):
+    return restore(root,archive,index,Path(root)/'out/rejection-independent/contact-component')
+
+
 def flight(path,ships):
     expected={(n,c.lower()) for n,c in ships.items()};groups={}
     with path.open() as f:
@@ -59,7 +63,7 @@ def main():
             with z.open(found[0]) as source,p.open('xb') as target:shutil.copyfileobj(source,target,1024**2)
             selected[ending]=p
     index=load(raw/'trial-raw-index.json');require(all(n.startswith(prefix) for n in index['files']),'Only the original trial output subtree may restore')
-    restored=restore(ROOT,raw/'trial-raw.tar.gz',index,BASE/'restoration');out=ROOT/prefix
+    restored=restore_trial(raw/'trial-raw.tar.gz',index);out=ROOT/prefix
     require(sha(out/'collection.json')==sha(raw/'collection.json') and sha(out/'frozen-postflight.json')==sha(raw/'frozen-postflight.json'),'Outer and exact restored final records differ')
     record=load(out/'collection.json');post=load(out/'frozen-postflight.json');compiler=load(raw/'compiler.json');lock=candidate()
     generator=Path(producer.__file__);require(generator.read_bytes()==subprocess.check_output(['git','show',SOURCE+':'+generator.relative_to(ROOT).as_posix()],cwd=ROOT),'Exact original declared prototype generator required')
