@@ -10,6 +10,7 @@ from PhysicsV2.transforms import replace_once
 from PhysicsV2.source import validate_current
 import hosted_normal_admission as original
 from frozen_admission_api import REFERENCE
+from audit_contact_component_trial import flight as inspect_original_finite_flight
 RUNTIME=json.loads((HERE/'origins.json').read_text())['native']['source']
 EXIT=ROOT/'out/frozen-stock-exit'
 
@@ -43,12 +44,7 @@ def verify_scope(capture,audit,profile,lock):
         pids.add(receipt['actual_collector_pid']);console=(folder/'console.log').read_text(errors='replace')
         require(not any(mark in console for mark in ('runtime error:','ERROR: AddressSanitizer:','ERROR: LeakSanitizer:','Native module rejected','Cannot load native module','Native module initialization failed','Missing native module entry')),'Unsuppressed clean actual runtime and all classes required')
         if name in failed:
-            with (folder/'flight-state.csv').open() as stream:rows=list(csv.DictReader(stream))
-            require(rows and {int(r['tick']) for r in rows}==set(range(61)),'All original ticks required for the four repaired scenes')
-            for row in rows:
-                for key,value in row.items():
-                    if key not in ('object','class'):require(value is not None and math.isfinite(float(value)),'Nonfinite corrected-scene state: '+name+' '+key)
-            finite[name]=dict(rows=len(rows),all_original61ticks=True,every_numeric_column_finite=True)
+            finite[name]=inspect_original_finite_flight(folder/'flight-state.csv',c['initial_ships'])
     return dict(version_id=lock['id'],physics_version='assembly-contact-v2',profile=profile,actual_normal_launches=len(pids),original_stock_cases=len(expected),four_original_failures_complete_finite=finite,
         capture_sha256=sha(capture/'stock-scenarios.json'),independent_audit_sha256=sha(audit),unchanged_original_policies_and_readers=True,published_raw_independent_audit_pending=True,qualification_granted=False)
 
