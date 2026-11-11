@@ -1,0 +1,99 @@
+name: Phase6 Original Assembly Contact Component Trial
+'on':
+  push:
+    branches:
+    - qualification/assembly-contact-component-v1
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: phase6-assembly-contact-component
+  cancel-in-progress: false
+jobs:
+  trial:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 90
+    env:
+      PROFILE: Debug-automatic
+    steps:
+    - uses: actions/checkout@v7
+      with:
+        fetch-depth: 0
+    - uses: actions/setup-python@v6
+      with:
+        python-version: '3.14'
+    - name: Preserve exact original runtime and independently verified failed baseline artifacts
+      uses: actions/github-script@v8
+      with:
+        script: "const fs=require('fs'),crypto=require('crypto'),{owner,repo}=context.repo;\nawait require('./.github/scripts/phase6-download-native-api-inputs.cjs')({github,context,core});\n\
+          const run=(await github.rest.actions.getWorkflowRun({owner,repo,run_id:42955135432})).data;\nconst jobs=(await github.rest.actions.listJobsForWorkflowRun({owner,repo,run_id:run.id,per_page:100})).data.jobs;\n\
+          const artifact=(await github.rest.actions.getArtifact({owner,repo,artifact_id:13827115523})).data;\nconst original=(await github.rest.actions.getWorkflowRun({owner,repo,run_id:42926670117})).data;\n\
+          if(owner!=='dcajacob'||repo!=='orbiter-cross-platform'||run.head_sha!=='619243950ed5ada4e0f4a2b901229384ed395f3f'||run.run_attempt!==1||run.status!=='completed'||run.conclusion!=='success'||jobs.length!==4||jobs.some(j=>j.status!=='completed'||j.conclusion!=='success'||j.head_sha!==run.head_sha||j.labels.join(',')!=='ubuntu-24.04')||\n\
+          \   original.head_sha!=='2cf4163dd55cab88337bcdf5890a4a34c1b3334b'||original.run_attempt!==1||original.status!=='completed'||original.conclusion!=='failure'||\n\
+          \   artifact.name!=='failed-normal-diagnostic-Debug-automatic'||artifact.expired||artifact.workflow_run.id!==run.id||artifact.workflow_run.head_sha!==run.head_sha||artifact.size_in_bytes!==324434||artifact.digest!=='sha256:18da8a441c1ed94248650f858a89b6836613240c4edc8516f2e24142b945cc0d')throw\
+          \ Error('Exact original failed native capture and successful independent original-byte diagnostic required');\nconst base='out/contact-trial-prior';fs.mkdirSync(base,{recursive:true});\n\
+          const source={run,jobs,artifact,original_failed_normal_run:original};fs.writeFileSync(base+'/api.json',JSON.stringify(source,null,2),{flag:'wx'});\n\
+          const response=await require('./.github/scripts/phase6-download-bound-artifact.cjs')({github,owner,repo,source,artifact,base,core});const bytes=Buffer.from(response.data);\n\
+          if(bytes.length!==artifact.size_in_bytes||'sha256:'+crypto.createHash('sha256').update(bytes).digest('hex')!==artifact.digest)throw Error('Original\
+          \ diagnostic ZIP differs');\nfs.writeFileSync(base+'/producer.zip',bytes,{flag:'wx'});\n"
+    - name: Verify every original control and compile only two explicitly labelled method prototypes
+      shell: bash
+      run: "set -euo pipefail\npython3 -B Tests/Production/Closeout/run_controls.py --output out/contact-trial-controls.json\npython3 -B Tests/Production/Closeout/hosted_contact_component_trial.py\
+        \ --prepare \"$PROFILE\"\npython3 -B Tests/Production/Closeout/restore_hosted_native_providers.py \\\n  --api out/native-api-source/providers/api.json\
+        \ --archive out/native-api-source/providers/producer.zip \\\n  --output out/native-provider-restoration/restoration.json\npython3 -B Tests/Production/Closeout/restore_hosted_mesa_topology.py\
+        \ \\\n  --api out/native-api-source/mesa/api.json --archive out/native-api-source/mesa/producer.zip \\\n  --output out/mesa-topology-restoration/restoration.json\n"
+    - name: Compare unchanged application, unchanged-method control and two-method repair at original60frames andpoint25seconds
+      shell: bash
+      run: "set -euo pipefail\nsource_dir=\"out/admission-package-source/$PROFILE\"\nsha256sum --check \"$source_dir/contact-before.sha256\"\nimage=$(python3\
+        \ -c \"import json; print('ubuntu@'+json.load(open('Tests/Production/Closeout/native-provider-container.lock.json'))['image_digest'])\")\ndocker\
+        \ pull \"$image\"\ndocker image inspect \"$image\" > out/contact-component-container.json\ndocker run --rm --init --cpus=2 --shm-size=1g -v \"$GITHUB_WORKSPACE:$GITHUB_WORKSPACE\"\
+        \ -v /etc/ssl/certs/ca-certificates.crt:/run/orbiter-ci-system-ca.pem:ro -w \"$GITHUB_WORKSPACE\" \\\n  -e GITHUB_ACTIONS -e RUNNER_OS -e GITHUB_WORKSPACE\
+        \ -e GITHUB_SHA -e GITHUB_RUN_ID -e PROFILE \\\n  \"$image\" bash \"$source_dir/contact-network.sh\" \"$source_dir/contact-bootstrap.sh\" 2>&1 |\
+        \ tee out/contact-component-container.log\nsha256sum --check \"$source_dir/contact-before.sha256\"\n"
+    - uses: actions/upload-artifact@v7
+      if: always()
+      with:
+        name: assembly-contact-component-trial-raw
+        retention-days: 14
+        compression-level: 0
+        include-hidden-files: true
+        path: 'out/contact-component-trial/
+
+          out/contact-component-compiler/
+
+          out/contact-trial-prior/*.json
+
+          out/contact-trial-controls.json
+
+          out/contact-component-container.*
+
+          out/admission-package-source/
+
+          out/admission-network/
+
+          out/original-package-official-pool/
+
+          out/native-api-source/*/*.json
+
+          '
+    - uses: actions/upload-artifact@v7
+      if: always()
+      with:
+        name: assembly-contact-component-trial-receipt
+        retention-days: 14
+        if-no-files-found: error
+        path: 'out/contact-component-trial/Debug-automatic/collection.json
+
+          out/contact-component-trial/Debug-automatic/trial-raw-index.json
+
+          out/contact-component-trial/Debug-automatic/*/original-inspection.json
+
+          out/contact-component-trial/Debug-automatic/*/actual-component-calls.txt
+
+          out/contact-component-trial/Debug-automatic/*/process-receipt.json
+
+          out/contact-component-compiler/compiler.json
+
+          out/contact-trial-controls.json
+
+          '
