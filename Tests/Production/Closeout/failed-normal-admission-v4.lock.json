@@ -1,0 +1,52 @@
+{
+  "protocol": "phase6-exact-failed-normal-run-v4-diagnostic-inputs-v1",
+  "run_id": 42926670117,
+  "source": "2cf4163dd55cab88337bcdf5890a4a34c1b3334b",
+  "branch": "qualification/frozen-normal-admission-v4",
+  "candidate_id": "73c3821329deaa272dbbc936a4cef82299f2749ae9a85a06f0d179bfba402061",
+  "profiles": {
+    "Release-automatic": {
+      "artifact_id": 13821845703,
+      "artifact_name": "frozen-normal-admission-Release-automatic-raw",
+      "bytes": 280598194,
+      "sha256": "bbd2f61b185d8fdb171642825b09ba196a4e9bbb78fbe3a91178cc5b479fa56a",
+      "job_id": 130215319269
+    },
+    "Release-sse2": {
+      "artifact_id": 13821827788,
+      "artifact_name": "frozen-normal-admission-Release-sse2-raw",
+      "bytes": 280560690,
+      "sha256": "ffec46a812b67cb81406c567ee730fe53d90b4f6ac2c3511087785d7e531e7ec",
+      "job_id": 130215319343
+    },
+    "Debug-sse2": {
+      "artifact_id": 13819131469,
+      "artifact_name": "frozen-normal-admission-Debug-sse2-raw",
+      "bytes": 280540741,
+      "sha256": "7c3d6a3b3f867939ceb69475d5bc765a194df6f5f21dca4a9c755e75944bf00a",
+      "job_id": 130215319340
+    },
+    "Debug-automatic": {
+      "artifact_id": 13816738809,
+      "artifact_name": "frozen-normal-admission-Debug-automatic-raw",
+      "bytes": 280571316,
+      "sha256": "5135ac9b245f09e6b20a2da7e0a612113b59bb310d59975b137fbf66a60fd0f3",
+      "job_id": 130215319338
+    }
+  },
+  "summary": {
+    "attempted": 157,
+    "passed": 153,
+    "failed": 4,
+    "inventory_ready": 157,
+    "source_metadata_mismatches": 7
+  },
+  "failed_cases": {
+    "2024 Edition/Space Shuttle ascent autopilot.scn": "007",
+    "Satellites and Probes/LDEF/LDEF retrieval.scn": "089",
+    "Space Shuttle Atlantis/Launch into Sunrise.scn": "106",
+    "Views/Moon through atmosphere.scn": "156"
+  },
+  "normal_admission_qualified": false,
+  "phase6_complete": false
+}

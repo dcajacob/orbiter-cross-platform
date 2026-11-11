@@ -1,0 +1,65 @@
+name: Phase 6 Inspect Original Failed Normal Traces
+on:
+  push:
+    branches: ['qualification/failed-normal-diagnostics-v1']
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: phase6-failed-normal-diagnostics
+  cancel-in-progress: false
+jobs:
+  inspect:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      max-parallel: 2
+      matrix:
+        profile: [Debug-automatic, Debug-sse2, Release-automatic, Release-sse2]
+    env:
+      PROFILE: ${{ matrix.profile }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.13'
+      - name: Bind only the actual original failed raw profile artifact
+        uses: actions/github-script@v8
+        with:
+          script: |
+            const fs=require('fs'),crypto=require('crypto'),{owner,repo}=context.repo;
+            const pin=JSON.parse(fs.readFileSync('Tests/Production/Closeout/failed-normal-admission-v4.lock.json','utf8'));
+            const p=pin.profiles[process.env.PROFILE],base='out/failed-normal-source/'+process.env.PROFILE;
+            if(owner!=='dcajacob'||repo!=='orbiter-cross-platform'||!p)throw Error('Exact existing public repository/profile required');
+            fs.mkdirSync(base,{recursive:true});
+            const run=(await github.rest.actions.getWorkflowRun({owner,repo,run_id:pin.run_id})).data;
+            const jobs=(await github.rest.actions.listJobsForWorkflowRun({owner,repo,run_id:pin.run_id,per_page:100})).data.jobs;
+            const artifact=(await github.rest.actions.getArtifact({owner,repo,artifact_id:p.artifact_id})).data;
+            if(run.head_sha!==pin.source||run.head_branch!==pin.branch||run.run_attempt!==1||run.status!=='completed'||run.conclusion!=='failure'||
+               artifact.name!==p.artifact_name||artifact.expired||artifact.workflow_run.id!==pin.run_id||artifact.workflow_run.head_sha!==pin.source||
+               artifact.size_in_bytes!==p.bytes||artifact.digest!=='sha256:'+p.sha256||
+               jobs.filter(j=>j.id===p.job_id&&j.conclusion==='failure'&&j.status==='completed'&&j.head_sha===pin.source&&j.labels.join(',')==='ubuntu-24.04').length!==1)
+              throw Error('Exact original failed profile API/source/size/digest/job required');
+            const source={run,jobs,artifact};fs.writeFileSync(base+'/api.json',JSON.stringify(source,null,2),{flag:'wx'});
+            const response=await require('./.github/scripts/phase6-download-bound-artifact.cjs')({github,owner,repo,source,artifact,base,core});
+            const bytes=Buffer.from(response.data);
+            if(bytes.length!==p.bytes||crypto.createHash('sha256').update(bytes).digest('hex')!==p.sha256)throw Error('Original raw ZIP bytes differ');
+            fs.writeFileSync(base+'/producer.zip',bytes,{flag:'wx'});
+      - name: Verify complete original archive closure and inspect only four original partial traces
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 -B Tests/Production/Closeout/inspect_failed_normal_admission.py --profile "$PROFILE"
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: failed-normal-diagnostic-${{ matrix.profile }}
+          retention-days: 14
+          if-no-files-found: error
+          path: |
+            out/failed-normal-diagnostics/${{ matrix.profile }}/
+            out/failed-normal-source/${{ matrix.profile }}/api.json
+            out/failed-normal-source/${{ matrix.profile }}/download-transport-attempts.json
