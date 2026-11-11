@@ -788,7 +788,11 @@ void SuperVessel::Update (bool force)
 			Flin += vFlin;
 		}
 
+		// Assemblies are outside the general body update list. Preserve the
+		// initial state separately so a collision retry can restart the step.
+		BeginStateUpdate();
 		RigidBody::Update (force);
+		EndStateUpdate();
 
 		// update state parameters for all sub-vessels
 		for (i = 0; i < nv; i++) {

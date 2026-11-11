@@ -1,0 +1,23 @@
+{
+  "physics_version": "assembly-contact-v3",
+  "baseline_source": "0d7d0d2427a900e76766fe16884880834eaa42ef",
+  "previous_physics_version": "assembly-contact-v2",
+  "target": "Src/Orbiter/SuperVessel.cpp",
+  "original_source_sha256_lf": "2d7f574bd2269b2800c0f006513bce99e6ef7e96c9e73e2550ad150cd8e818fc",
+  "corrected_source_sha256_lf": "d96ae2e8a57168460594c1b7ecf684e9b1a65bc9d5c901e6d4641a2aa67fe039",
+  "patch_sha256": "191db2fc9905b46b0e9247d6ba4ac14ac0937ebe1130565423d39fb9bfcf09f1",
+  "previous_version_manifest_sha256": "1e25a6549eca847ab0ba83540a9f45fbea7fd6804db58bd08b4d2681ddde2be8",
+  "original_builder_sha256": "9693ea8b420324e8506281d23f6f7822026236780071eb6e1efdf92f79260e7d",
+  "original_guard_files_sha256_lf": {
+    "Tests/Production/observation_source.py": "0b9a3efba9de301612afa3c2f00f43c619af7ab1ab510fbe0c1da9461fe55dc6",
+    "Tests/Production/extraction_source.py": "d38c31880451e5f589f659813fb1d16c80c04ea8437071ddef1f78980d36f595",
+    "Tests/Production/vessel_source.py": "d8e363b1ae4e20b98bbc6779d66f8397fef76449bef182392377e691a3155b98",
+    "Tests/Production/phase3-extraction.lock.json": "22c3817de56a8b49fa2df2757d4a4a4b28bdb6f800b3034e1955095f0eb333d8",
+    "Tests/Production/Cockpit/cases.json": "aabec34897c08b79afed7dfee9c692fe77058a561a9529d39d7e7bc5594d91ea",
+    "Tests/Production/StockScenarios/run.py": "a0c8462929333e6fc23d7f750c910e1380350178226ebff3fda0e2f74ba044c1"
+  },
+  "local_prototype": "out/phase6-physics-v2-local-v2/all-five-affected-prototype-v1/diagnostic.json",
+  "approval": "Authorized scoped qualification repairs and laptop Linux work; Windows and macOS work deferred by user.",
+  "qualification_granted": false,
+  "phase6_complete": false
+}
