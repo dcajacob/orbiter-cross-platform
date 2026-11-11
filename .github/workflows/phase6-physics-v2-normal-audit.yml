@@ -2,7 +2,11 @@ name: Phase6 Independent Fresh Physics v2 Full Normal Raw Audit
 'on':
   push:
     branches:
-    - qualification/physics-v2-normal-audit-v1
+    - qualification/physics-v2-normal-audit-v2
+    - qualification/physics-v2-normal-audit-Debug-automatic-v2
+    - qualification/physics-v2-normal-audit-Debug-sse2-v2
+    - qualification/physics-v2-normal-audit-Release-automatic-v2
+    - qualification/physics-v2-normal-audit-Release-sse2-v2
 permissions:
   contents: read
   actions: read
@@ -15,11 +19,10 @@ jobs:
       fail-fast: false
       max-parallel: 2
       matrix:
-        profile:
-        - Debug-automatic
-        - Debug-sse2
-        - Release-automatic
-        - Release-sse2
+        profile: ${{ fromJSON(github.ref_name == 'qualification/physics-v2-normal-audit-Debug-automatic-v2' && '["Debug-automatic"]' || github.ref_name == 'qualification/physics-v2-normal-audit-Debug-sse2-v2'
+          && '["Debug-sse2"]' || github.ref_name == 'qualification/physics-v2-normal-audit-Release-automatic-v2' && '["Release-automatic"]' || github.ref_name ==
+          'qualification/physics-v2-normal-audit-Release-sse2-v2' && '["Release-sse2"]' || '["Debug-automatic","Debug-sse2","Release-automatic","Release-sse2"]')
+          }}
     env:
       PROFILE: ${{ matrix.profile }}
     steps:
