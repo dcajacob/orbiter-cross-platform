@@ -1,0 +1,236 @@
+name: Phase6 Fresh Physics v2 Affected Normal Qualification
+'on':
+  push:
+    branches:
+    - qualification/physics-v2-affected-v1
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: phase6-physics-v2-affected
+  cancel-in-progress: false
+jobs:
+  native:
+    name: Fresh v2 all157normal stock ${{ matrix.profile }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 330
+    strategy:
+      fail-fast: false
+      max-parallel: 2
+      matrix:
+        profile:
+        - Debug-automatic
+        - Debug-sse2
+        - Release-automatic
+        - Release-sse2
+    env:
+      PROFILE: ${{ matrix.profile }}
+    steps:
+    - uses: actions/checkout@v7
+      with:
+        fetch-depth: 0
+    - uses: actions/setup-python@v6
+      with:
+        python-version: '3.14'
+    - name: Retain actual source-bound corrected build and every original failure
+      uses: actions/github-script@v8
+      with:
+        script: await require('./Tests/Production/PhysicsV2/download.cjs')({github,context,core,role:'native',profile:process.env.PROFILE});
+    - name: Restore every corrected application member and preserve31passes plus one original timeout
+      run: python3 -B Tests/Production/PhysicsV2/restore.py native "$PROFILE"
+    - name: Retry only the unchanged pure Python evidence verifier with its original60second deadline
+      run: python3 -B Tests/Production/PhysicsV2/retry_evidence.py
+    - name: Confirm exact original intentional exit release identities and native package inputs
+      uses: actions/github-script@v8
+      with:
+        script: "const fs=require('fs'),{owner,repo}=context.repo;\nconst p=JSON.parse(fs.readFileSync('Tests/Production/NativeLua/StockExit/observations.lock.json','utf8')).durable_release;\n\
+          const release=(await github.rest.repos.getReleaseByTag({owner,repo,tag:p.tag})).data;\nif(release.id!==p.id||release.tag_name!==p.tag||release.draft||release.assets.length!==p.assets.length||\n\
+          \   p.assets.some(x=>release.assets.filter(a=>a.id===x.id&&a.name===x.name&&a.state==='uploaded'&&a.size===x.bytes&&a.digest==='sha256:'+x.sha256).length!==1))throw\
+          \ Error('Exact immutable original exit release assets required');\nfs.writeFileSync('out/frozen-stock-exit-release-api.json',JSON.stringify(release,null,2),{flag:'wx'});\n\
+          await require('./.github/scripts/phase6-download-native-api-inputs.cjs')({github,context,core});\n"
+    - name: Restore every original GeneralAPI qualification byte with measured capacity and unchanged guard
+      env:
+        GH_TOKEN: ${{ github.token }}
+      run: python3 -B Tests/Production/PhysicsV2/reference.py
+    - name: Restore exact original runtime providers and immutable exit references
+      shell: bash
+      run: 'set -euo pipefail
+
+        python3 -B Tests/Production/NativeLua/StockExit/frozen_original.py --cache out/frozen-stock-exit-cache --output out/frozen-stock-exit --audit out/frozen-stock-exit-preflight.json
+
+        python3 -B Tests/Production/Closeout/restore_hosted_native_providers.py --api out/native-api-source/providers/api.json --archive out/native-api-source/providers/producer.zip
+        --output out/native-provider-restoration/restoration.json
+
+        python3 -B Tests/Production/Closeout/restore_hosted_mesa_topology.py --api out/native-api-source/mesa/api.json --archive out/native-api-source/mesa/producer.zip
+        --output out/mesa-topology-restoration/restoration.json
+
+        python3 -B Tests/Production/PhysicsV2/native_capture.py --prepare "$PROFILE"
+
+        '
+    - name: Run all157unchanged original stock scenes and original independent reader on fresh v2 application
+      shell: bash
+      run: 'set -euo pipefail
+
+        source_dir="out/admission-package-source/$PROFILE"
+
+        sha256sum --check "$source_dir/physics-v2-before.sha256"
+
+        image=$(python3 -c "import json; print(''ubuntu@''+json.load(open(''Tests/Production/Closeout/native-provider-container.lock.json''))[''image_digest''])")
+
+        docker pull "$image"
+
+        docker image inspect "$image" > out/admission-container.json
+
+        docker run --rm --init --cpus=2 --shm-size=1g -v "$GITHUB_WORKSPACE:$GITHUB_WORKSPACE" -v /etc/ssl/certs/ca-certificates.crt:/run/orbiter-ci-system-ca.pem:ro
+        -w "$GITHUB_WORKSPACE" -e GITHUB_ACTIONS -e RUNNER_OS -e GITHUB_WORKSPACE -e GITHUB_SHA -e GITHUB_RUN_ID -e PROFILE "$image" bash "$source_dir/physics-v2-network.sh"
+        "$source_dir/physics-v2-bootstrap.sh" 2>&1 | tee out/admission-container.log
+
+        sha256sum --check "$source_dir/physics-v2-before.sha256"
+
+        '
+    - uses: actions/upload-artifact@v7
+      if: always()
+      with:
+        name: physics-v2-normal-${{ matrix.profile }}-raw
+        retention-days: 14
+        compression-level: 0
+        include-hidden-files: true
+        path: 'out/hosted-normal-admission/${{ matrix.profile }}/*.tar.gz
+
+          out/hosted-normal-admission/${{ matrix.profile }}/*.json
+
+          out/hosted-normal-admission/${{ matrix.profile }}/*.log
+
+          out/hosted-normal-admission/${{ matrix.profile }}/*.txt
+
+          out/physics-v2-input/native/${{ matrix.profile }}/api.json
+
+          out/physics-v2-input/native/${{ matrix.profile }}/restoration.json
+
+          out/physics-v2-unit-recheck/${{ matrix.profile }}/**
+
+          out/admission-package-source/${{ matrix.profile }}/**
+
+          out/admission-network/${{ matrix.profile }}/**
+
+          out/original-package-official-pool/${{ matrix.profile }}/**
+
+          out/admission-container.*
+
+          out/native-api-source/*/*.json
+
+          out/admission-reference-source/*.json
+
+          out/frozen-stock-exit-preflight.json
+
+          out/native-provider-restoration/*.json
+
+          out/mesa-topology-restoration/*.json
+
+          '
+    - uses: actions/upload-artifact@v7
+      if: always()
+      with:
+        name: physics-v2-normal-${{ matrix.profile }}-receipt
+        retention-days: 14
+        path: 'out/hosted-normal-admission/${{ matrix.profile }}/collection.json
+
+          out/hosted-normal-admission/${{ matrix.profile }}/independent-full-stock-audit.json
+
+          out/hosted-normal-admission/${{ matrix.profile }}/capture/stock-scenarios.json
+
+          out/hosted-normal-admission/${{ matrix.profile }}/capture-raw-index.json
+
+          out/physics-v2-unit-recheck/${{ matrix.profile }}/**
+
+          out/physics-v2-input/native/${{ matrix.profile }}/restoration.json
+
+          '
+    - uses: actions/upload-artifact@v7
+      if: failure()
+      with:
+        name: physics-v2-normal-${{ matrix.profile }}-partial
+        retention-days: 14
+        include-hidden-files: true
+        path: 'out/hosted-normal-admission/${{ matrix.profile }}/capture/**
+
+          out/hosted-normal-admission/${{ matrix.profile }}/compositor/**'
+  windows:
+    name: Fresh v2 original failed scenes Windows ${{ matrix.configuration }}
+    runs-on: windows-2025
+    timeout-minutes: 90
+    strategy:
+      fail-fast: false
+      max-parallel: 2
+      matrix:
+        configuration:
+        - Debug
+        - Release
+    env:
+      CONFIGURATION: ${{ matrix.configuration }}
+      ORBITER_DATA_CONTAINER_LOCK: application-source/Tests/Production/stock-data-container-v2.lock.json
+    steps:
+    - uses: actions/checkout@v7
+      with:
+        fetch-depth: 0
+    - uses: actions/setup-python@v6
+      with:
+        python-version: '3.14'
+    - name: Retain the separate immutable current application source owner
+      uses: actions/checkout@v7
+      with:
+        ref: f72ffb4d684bf25217e71400771bb7ec24a5715c
+        path: application-source
+        fetch-depth: 0
+    - name: Retain actual source-bound rebuilt Windows v2 SDK
+      uses: actions/github-script@v8
+      with:
+        script: await require('./Tests/Production/PhysicsV2/download.cjs')({github,context,core,role:'windows',profile:process.env.CONFIGURATION});
+    - name: Independently verify all original SDK and28unit guards against new compiled source
+      run: python -B Tests/Production/PhysicsV2/restore.py windows ${{ matrix.configuration }}
+    - name: Verify exact rebuilt application and separate SDK owner
+      working-directory: application-source
+      run: python -B Tests/Production/verify_test_runtime.py --runtime ../out/current-windows-sdk/runtime --source f72ffb4d684bf25217e71400771bb7ec24a5715c
+    - name: Restore unchanged stock data and planetary inputs
+      run: python -B Tests/Production/PhysicsV2/windows_data.py --cell ${{ matrix.configuration }}-automatic-stock
+    - name: Restore unchanged original software renderer DLLs and notices
+      run: python -B application-source/Tests/Production/stage_mesa.py stage --cache out/current-mesa-cache --destination out/current-stock-mesa
+    - name: Repeat original four failed scenes bothmathmodes at60frames andquartersecond clock
+      run: python -B Tests/Production/PhysicsV2/windows_capture.py
+    - name: Independently require all finite states complete rosters original61ticks and actual clean process ends
+      run: python -B Tests/Production/PhysicsV2/windows_capture.py --inspect
+    - uses: actions/upload-artifact@v7
+      if: always()
+      with:
+        name: physics-v2-Windows-${{ matrix.configuration }}-raw
+        retention-days: 14
+        compression-level: 0
+        path: 'out/physics-v2-Windows/${{ matrix.configuration }}/*.tar.gz
+
+          out/physics-v2-Windows/${{ matrix.configuration }}/*.json
+
+          out/physics-v2-Windows/${{ matrix.configuration }}/*.log
+
+          out/current-windows-sdk/restoration.json
+
+          out/physics-v2-input/windows/${{ matrix.configuration }}/api.json
+
+          out/current-data-transport/**
+
+          '
+    - uses: actions/upload-artifact@v7
+      if: always()
+      with:
+        name: physics-v2-Windows-${{ matrix.configuration }}-receipt
+        retention-days: 14
+        path: 'out/physics-v2-Windows/${{ matrix.configuration }}/collection.json
+
+          out/physics-v2-Windows/${{ matrix.configuration }}/independent-scene-inspection.json
+
+          out/physics-v2-Windows/${{ matrix.configuration }}/diagnostic-raw-index.json
+
+          out/physics-v2-Windows/${{ matrix.configuration }}/*/process-receipt.json
+
+          out/physics-v2-Windows/${{ matrix.configuration }}/*/stock-vessel-complete.txt
+
+          '

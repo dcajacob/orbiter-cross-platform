@@ -19,7 +19,15 @@ def version_lock():
     return dict(id=hashlib.sha256(json.dumps(body,sort_keys=True,separators=(',',':')).encode()).hexdigest(),**body)
 
 
+def verify_units(profile):
+    proof=load(ROOT/'out/physics-v2-unit-recheck'/profile/'verification.json')
+    require(proof['status']=='passed-original-evidence-reader-with-original60second-deadline' and proof['profile']==profile and proof['actual_returncode']==0 and proof['original_timeout_seconds']==60 and
+        proof['original32tests_complete_with_prior31passes'] is True and proof['original_failure_preserved'] is True and proof['original_native_sanitizers_unchanged'] is True and all(sha(p)==h for p,h in proof['prior_guarded_files_sha256'].items()),'Every original unit must be resolved with its preserved exact actual earlier failure before any scenario capture')
+    return proof
+
+
 def verify_scope(capture,audit,profile,lock):
+    verify_units(profile)
     report=load(capture/'stock-scenarios.json');observed=load(audit);restored=load(ROOT/'out/physics-v2-input/native'/profile/'restoration.json')
     require(report['status']==observed['status']=='passed' and report['summary']==observed['summary'] and report['summary']['attempted']==report['summary']['passed']==report['summary']['inventory_ready']==157 and
         report['summary']['failed']==0 and report['diagnostic_only'] is observed['diagnostic_only'] is False and report['execution_protocol']=='normal-stock-capture-v4' and report['backend']=='wayland' and
@@ -76,6 +84,7 @@ def prepare(profile):
 def main():
     require(os.environ.get('GITHUB_ACTIONS')=='true' and os.environ.get('RUNNER_OS')=='Linux','Hosted v2 capture only')
     require(len(sys.argv)==3 and sys.argv[1] in ('--prepare','--profile'),'Explicit v2 preparation/profile required');profile=sys.argv[2]
+    verify_units(profile)
     if sys.argv[1]=='--prepare':prepare(profile);return
     try:exec(compile(prepared_body(),str(HERE/'native_capture.py'),'exec'),{'__name__':'__main__','__file__':str(HERE/'native_capture.py')})
     finally:original.preserve(profile)
