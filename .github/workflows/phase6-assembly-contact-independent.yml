@@ -2,7 +2,7 @@ name: Phase6 Independent Original Assembly Contact Trial Audit
 'on':
   push:
     branches:
-    - qualification/assembly-contact-independent-v1
+    - qualification/assembly-contact-independent-v2
 permissions:
   contents: read
   actions: read
@@ -63,7 +63,9 @@ jobs:
 
           const priorRecord={run:priorRun,jobs:priorJobs,artifact:priorArtifact};fs.writeFileSync(base+''/prior-api.json'',JSON.stringify(priorRecord,null,2),{flag:''wx''});
 
-          const response=await require(''./.github/scripts/phase6-download-bound-artifact.cjs'')({github,owner,repo,source:priorRecord,artifact:priorArtifact,base,core});const
+          const priorBase=base+''/prior-transport'';fs.mkdirSync(priorBase,{recursive:true});
+
+          const response=await require(''./.github/scripts/phase6-download-bound-artifact.cjs'')({github,owner,repo,source:priorRecord,artifact:priorArtifact,base:priorBase,core});const
           prior=Buffer.from(response.data);
 
           if(prior.length!==priorArtifact.size_in_bytes||''sha256:''+crypto.createHash(''sha256'').update(prior).digest(''hex'')!==priorArtifact.digest)throw
@@ -91,5 +93,7 @@ jobs:
         path: 'out/contact-component-independent/*.json
 
           out/contact-independent-controls.json
+
+          out/contact-component-independent/prior-transport/*
 
           '
