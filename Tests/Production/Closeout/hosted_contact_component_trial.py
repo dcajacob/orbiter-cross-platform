@@ -8,6 +8,7 @@ from frozen_admission_api import candidate,hosted
 from hosted_normal_admission import prepare_package,prepare_snapshot
 import capture_hosted_native_writer_runtime as original_setup
 from inspect_rejection_cpp_abi import abi_tokens,host_macros
+import restore_rejection_sdk_header as original_sdk
 from rejection_input_bundle import pack
 from processes import OwnedProcess
 
@@ -65,6 +66,18 @@ void contact_trial_call(unsigned index) {
         first_call_observation_only=True,qualification_granted=False)
 
 
+def component_abi(engine,output):
+    # The retained package omitted this generated SDK input. Use the existing
+    # complete source/cache/binary topology proof before invoking the compiler.
+    restoration=original_sdk.restore(PROFILE,engine.parent/'build.json',output/'original-SDK-header-restoration.json')
+    header=engine/'native-sdk/OrbiterNativeBuild.h'
+    require(sha(header)==restoration['header_sha256'],'Actual restored original SDK input differs')
+    (output/'OrbiterNativeBuild.h').write_bytes(header.read_bytes())
+    tokens=abi_tokens((engine/'liborbiter_production_boundary.so').read_bytes());macros=host_macros(header,output)
+    require(len(tokens)==1 and macros['actual_cpp_abi']==tokens[0],'Actual host compiler and untouched native SDK/engine ABI must match')
+    return restoration,tokens[0],macros
+
+
 def prepare():
     hosted();lock=candidate();prepare_package(PROFILE,lock);prepare_snapshot(PROFILE)
     base=ROOT/'out/admission-package-source'/PROFILE
@@ -76,9 +89,8 @@ def prepare():
         body=source.read_text();require(body.count(old)==1,'Exact original hosted setup anchor required');target.write_text(body.replace(old,new,1))
     output=ROOT/'out/contact-component-compiler';output.mkdir()
     engine=ROOT/'out/phase6-hosted-native'/PROFILE/'engine';header=engine/'native-sdk/OrbiterNativeBuild.h'
-    tokens=abi_tokens((engine/'liborbiter_production_boundary.so').read_bytes());macros=host_macros(header,output)
-    require(len(tokens)==1 and macros['actual_cpp_abi']==tokens[0],'Actual host compiler and untouched native SDK/engine ABI must match')
-    report=dict(source=os.environ['GITHUB_SHA'],candidate_id=lock['id'],actual_engine_cpp_abi=tokens[0],host_macros=macros,variants={},frozen_application_rebuilt=False,original_source_guard_modified=False,qualification_granted=False)
+    restoration,engine_abi,macros=component_abi(engine,output)
+    report=dict(source=os.environ['GITHUB_SHA'],candidate_id=lock['id'],actual_engine_cpp_abi=engine_abi,host_macros=macros,original_omitted_SDK_header=restoration,variants={},frozen_application_rebuilt=False,original_source_guard_modified=False,qualification_granted=False)
     for mode in ('original-methods','collision-retry-prototype'):
         body,record=source_variant(mode);cpp=output/(mode+'.cpp');cpp.write_text(body);library=output/(mode+'.so')
         argv=['/usr/bin/c++','-std=c++17','-O0','-fPIC','-shared','-Wl,--no-undefined','-fsanitize=address,undefined','-fno-omit-frame-pointer',
@@ -93,7 +105,7 @@ def prepare():
         if code:print(log.read_text(errors='replace')[-10000:],flush=True)
         require(code==0,'Actual isolated component compilation failed; all original files remain untouched')
         record['library_sha256']=sha(library);atomic_json(output/'compiler.json',report)
-    files=(base/'contact-network.sh',base/'contact-bootstrap.sh',HERE/'prepare_hosted_normal_admission.sh',
+    files=(header,base/'contact-network.sh',base/'contact-bootstrap.sh',HERE/'prepare_hosted_normal_admission.sh',
            *[p for p in output.iterdir() if p.is_file()])
     (base/'contact-before.sha256').write_text((base/'before.sha256').read_text()+''.join(sha(p)+'  '+p.relative_to(ROOT).as_posix()+'\n' for p in files))
 
@@ -120,6 +132,7 @@ def run_cases(output,providers,mesa,report,save):
     build=ROOT/'out/phase6-hosted-native'/PROFILE;engine=build/'engine';before=load(build/'build.json')
     compiler=load(ROOT/'out/contact-component-compiler/compiler.json');lock=candidate()
     require(before['source_base']==SOURCE and compiler['candidate_id']==lock['id'],'Exact unchanged frozen source/binary base required')
+    require(sha(engine/'native-sdk/OrbiterNativeBuild.h')==compiler['original_omitted_SDK_header']['header_sha256'],'Original reconstructed SDK input changed after compilation')
     # Existing independent diagnostic ZIP preserves the original partial bytes; no bulk transfer leaves GitHub.
     archive=ROOT/'out/contact-trial-prior/producer.zip';api=load(ROOT/'out/contact-trial-prior/api.json');a=api['artifact']
     require(a['id']==13827115523 and a['size_in_bytes']==archive.stat().st_size==324434 and

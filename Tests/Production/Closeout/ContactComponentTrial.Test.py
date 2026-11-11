@@ -25,3 +25,26 @@ class ContactComponentTrial(TestCase):
         self.assertIn(old[old.index('        providers=ROOT'):old.index('        build=ROOT')],new)
         self.assertIn("require(verify_native_runtime(output/'native-runtime-dependencies.json')==report['native_host_dependencies']",new)
         self.assertIn('original_source_guards_unchanged=True',new)
+
+    def test_omitted_sdk_is_restored_before_real_abi_preprocessor_without_macro_override(self):
+        import tempfile
+        from pathlib import Path
+        from unittest.mock import patch
+        from contracts import sha
+        with tempfile.TemporaryDirectory() as directory:
+            base=Path(directory);engine=base/'engine';output=base/'compiler';engine.mkdir();output.mkdir()
+            (engine/'liborbiter_production_boundary.so').write_bytes(b'original-ELF-witness')
+            header=engine/'native-sdk/OrbiterNativeBuild.h';events=[]
+            def restore(profile,record,report):
+                self.assertEqual((profile,record,report),(trial.PROFILE,base/'build.json',output/'original-SDK-header-restoration.json'))
+                events.append('original-topology-proof');header.parent.mkdir();header.write_bytes(b'original-template-and-binary-bound-header')
+                return dict(header_sha256=sha(header))
+            def preprocess(actual_header,actual_output):
+                self.assertEqual((actual_header,actual_output),(header,output));self.assertTrue(header.is_file())
+                events.append('actual-preprocessor');return dict(actual_cpp_abi='actual-compiler-and-engine-ABI')
+            with patch.object(trial.original_sdk,'restore',side_effect=restore),patch.object(trial,'host_macros',side_effect=preprocess),patch.object(trial,'abi_tokens',return_value=['actual-compiler-and-engine-ABI']):
+                record,abi,macros=trial.component_abi(engine,output)
+            self.assertEqual(events,['original-topology-proof','actual-preprocessor'])
+            self.assertEqual((output/'OrbiterNativeBuild.h').read_bytes(),header.read_bytes())
+            with patch.object(trial.original_sdk,'restore',return_value=record),patch.object(trial,'host_macros',return_value=dict(actual_cpp_abi='different-compiler-ABI')),patch.object(trial,'abi_tokens',return_value=[abi]):
+                with self.assertRaises(ValueError):trial.component_abi(engine,output)
