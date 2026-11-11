@@ -4,6 +4,8 @@ name: Phase6 Physics v2 Identical Snapshot Transport Retry
     branches:
     - qualification/physics-v2-native-debug-v2
     - qualification/physics-v2-native-release-v2
+    - qualification/physics-v2-native-release-automatic-v2
+    - qualification/physics-v2-native-release-sse2-v2
 permissions:
   contents: read
   actions: read
@@ -19,7 +21,8 @@ jobs:
       fail-fast: false
       max-parallel: 2
       matrix:
-        profile: ${{ fromJSON(github.ref_name == 'qualification/physics-v2-native-debug-v2' && '["Debug-automatic","Debug-sse2"]' || '["Release-automatic","Release-sse2"]')
+        profile: ${{ fromJSON(github.ref_name == 'qualification/physics-v2-native-debug-v2' && '["Debug-automatic","Debug-sse2"]' || github.ref_name == 'qualification/physics-v2-native-release-automatic-v2'
+          && '["Release-automatic"]' || github.ref_name == 'qualification/physics-v2-native-release-sse2-v2' && '["Release-sse2"]' || '["Release-automatic","Release-sse2"]')
           }}
     env:
       PROFILE: ${{ matrix.profile }}
