@@ -1,0 +1,6 @@
+{
+  "physics_version": "assembly-contact-v2",
+  "native": {"run_id": 43072903785, "source": "6a2cbf646428339e0414b781b39943a34cbc2b7e", "branch": "qualification/physics-v2-build-v1", "workflow": ".github/workflows/phase6-physics-v2-qualification.yml"},
+  "windows": {"run_id": 43073383079, "source": "f72ffb4d684bf25217e71400771bb7ec24a5715c", "branch": "qualification/physics-v2-windows-v2", "workflow": ".github/workflows/phase6-physics-v2-windows.yml"},
+  "qualification_granted": false
+}

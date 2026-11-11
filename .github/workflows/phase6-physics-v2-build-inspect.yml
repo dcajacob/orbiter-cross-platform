@@ -1,0 +1,60 @@
+name: Phase6 Physics v2 Preserve And Inspect Actual Build Failures
+on:
+  push:
+    branches: [qualification/physics-v2-build-inspect-v1]
+permissions:
+  contents: read
+  actions: read
+jobs:
+  inspect:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/github-script@v8
+        with:
+          script: |
+            const fs=require('fs'),crypto=require('crypto'),{owner,repo}=context.repo,run_id=43072903785;
+            const run=(await github.rest.actions.getWorkflowRun({owner,repo,run_id})).data;
+            const jobs=await github.paginate(github.rest.actions.listJobsForWorkflowRun,{owner,repo,run_id,per_page:100});
+            if(owner!=='dcajacob'||repo!=='orbiter-cross-platform'||run.head_sha!=='6a2cbf646428339e0414b781b39943a34cbc2b7e'||run.run_attempt!==1)throw Error('Exact original failed v2 build source required');
+            for(const [profile,id,size] of [
+              ['Debug-automatic',13880136583,82461002],
+              ['Debug-sse2',13881720195,82455968]]){
+              const artifact=(await github.rest.actions.getArtifact({owner,repo,artifact_id:id})).data;
+              const found=jobs.filter(j=>j.name==='Rebuilt physics v2 native '+profile.replace('-',' '));
+              if(found.length!==1||found[0].status!=='completed'||found[0].conclusion!=='failure'||found[0].head_sha!==run.head_sha||found[0].labels.join(',')!=='ubuntu-24.04'||artifact.name!=='physics-v2-native-'+profile||artifact.expired||artifact.size_in_bytes!==size||artifact.workflow_run.id!==run_id||artifact.workflow_run.head_sha!==run.head_sha)throw Error('Actual retained failed standard-runner package required');
+              const base='out/physics-v2-failed-build/'+profile;fs.mkdirSync(base,{recursive:true});
+              const source={run,jobs,artifact};fs.writeFileSync(base+'/api.json',JSON.stringify(source,null,2),{flag:'wx'});
+              const bytes=Buffer.from((await require('./.github/scripts/phase6-download-bound-artifact.cjs')({github,owner,repo,source,artifact,base,core})).data);
+              if(bytes.length!==artifact.size_in_bytes||'sha256:'+crypto.createHash('sha256').update(bytes).digest('hex')!==artifact.digest)throw Error('Exact retained failed archive SHA256 required');
+              fs.writeFileSync(base+'/producer.zip',bytes,{flag:'wx'});
+            }
+      - name: Read completed original unit failures on the server without running any tests
+        run: |
+          python3 -B - <<'PY'
+          import json,zipfile,xml.etree.ElementTree as ET
+          from pathlib import Path
+          for folder in Path('out/physics-v2-failed-build').iterdir():
+              output=folder/'receipts';output.mkdir()
+              with zipfile.ZipFile(folder/'producer.zip') as z:
+                  for member in z.infolist():
+                      name=Path(member.filename).name
+                      if name in ('complete-unit-verification.json','engine-tests.log','engine-tests.xml','upstream-tests.log','upstream-tests.xml','hosted-package.json'):
+                          assert 0<member.file_size<8*1024**2
+                          body=z.read(member);(output/name).write_bytes(body)
+                          if name=='complete-unit-verification.json':print(folder.name,body.decode())
+                          if name=='engine-tests.xml':
+                              root=ET.fromstring(body)
+                              for case in root.findall('.//testcase'):
+                                  if any(case.find(k) is not None for k in ('failure','error','skipped')):print(folder.name,ET.tostring(case,encoding='unicode')[:32000])
+              print(folder.name,(output/'engine-tests.log').read_text(errors='replace')[-48000:])
+          PY
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: physics-v2-original-build-failure-receipts
+          retention-days: 14
+          path: |
+            out/physics-v2-failed-build/*/api.json
+            out/physics-v2-failed-build/*/receipts/**
