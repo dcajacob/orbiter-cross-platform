@@ -24,7 +24,7 @@ def flight_summary(body):
                                 first_unwritten_field=header[len(row)] if len(row)<len(header) else None))
         else:
             complete.append(actual)
-            name=actual.get('name',actual.get('vessel','unidentified'))
+            name=actual.get('object',actual.get('name',actual.get('vessel','unidentified')))
             by_vessel.setdefault(name,[]).append(actual)
     return dict(header=header,complete_rows=len(complete),partial_rows=partial,
                 per_vessel={n:dict(rows=len(v),first=v[:3],last=v[-4:]) for n,v in by_vessel.items()},

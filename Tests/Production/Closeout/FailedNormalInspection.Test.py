@@ -16,3 +16,8 @@ class FailedNormalInspection(TestCase):
     def test_preserves_failure_bytes_without_normalizing_nonfinite_values(self):
         result=flight_summary(b'tick,name,x\n0,A,NaN\n1,A,1e309\n')
         self.assertEqual(result['per_vessel']['A']['first'],[dict(tick='0',name='A',x='NaN'),dict(tick='1',name='A',x='1e309')])
+
+    def test_uses_original_production_object_column_for_distinct_vessels(self):
+        result=flight_summary(b'tick,object,x\n0,Atlantis,1\n0,Carina,2\n')
+        self.assertEqual(set(result['per_vessel']),{'Atlantis','Carina'})
+        self.assertEqual(result['per_vessel']['Carina']['first'][0]['x'],'2')
