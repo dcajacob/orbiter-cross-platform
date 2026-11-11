@@ -8,6 +8,13 @@ from rejection_input_bundle import pack
 
 APPLICATION='c08f93151827949ee3ad498f8021f35c11753fde'
 
+
+def original_configuration():
+    # The original collector imports generic module names. Give it its own module namespace.
+    program="import pathlib,sys; p=pathlib.Path('Tests/Production/StockScenarios').resolve(); sys.path.insert(0,str(p)); import run as original; assert pathlib.Path(original.__file__).resolve()==p/'run.py'; sys.stdout.write(original.configuration(False))"
+    return subprocess.check_output([sys.executable,'-B','-c',program],cwd=ROOT,text=True)
+
+
 def compiler_batch(vc):
     require(not any(c in str(vc) for c in ('"','\r','\n')),'One actual compiler environment path required')
     return '@call "'+str(vc)+'" -arch=x64 -host_arch=x64 >nul\n@if errorlevel 1 exit /b %errorlevel%\n@set\n'
@@ -76,7 +83,7 @@ def main():
         from run_client import mesa_files
         import current_client_shaders as shaders
         # Both scene cohorts use the unchanged runner's original-propagators policy.
-        import run as normal
+        normal_configuration=original_configuration()
         lock=load(ROOT/'Tests/Production/Closeout/failed-normal-admission-v4.lock.json')
         plan=shaders.build_plan(sdk/'restoration.json',owner,config,os.environ['GITHUB_SHA'],config+'-automatic-stock')
         atomic_json(output/'original-shader-plan.json',plan)
@@ -90,7 +97,7 @@ def main():
                 require(body.replace(b'\r\n',b'\n')==subprocess.check_output(['git','-C',str(owner),'show',APPLICATION+':Scenarios/'+scene]).replace(b'\r\n',b'\n'),'Exact original complete scene required')
                 def configure(directory):
                     (directory/'Scenarios/Behavior.scn').write_bytes(body)
-                    cfg=normal.configuration(False)+'\nACTIVE_MODULES\n  ProductionCockpitDriver\n  OGLClient\nEND_MODULES\n'
+                    cfg=normal_configuration+'\nACTIVE_MODULES\n  ProductionCockpitDriver\n  OGLClient\nEND_MODULES\n'
                     (directory/'Orbiter.cfg').write_text(cfg)
                     target=directory/'Modules/Plugin/ProductionCockpitDriver.dll'
                     stage_observer(observer,target)

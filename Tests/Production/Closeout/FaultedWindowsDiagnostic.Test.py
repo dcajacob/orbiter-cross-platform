@@ -1,7 +1,7 @@
 from pathlib import Path
 import tempfile,unittest
 from unittest.mock import Mock
-from capture_failed_normal_windows import compiler_batch,read_compiler_environment,stage_observer
+from capture_failed_normal_windows import compiler_batch,read_compiler_environment,stage_observer,original_configuration
 
 
 class FaultedWindowsDiagnostic(unittest.TestCase):
@@ -21,3 +21,13 @@ class FaultedWindowsDiagnostic(unittest.TestCase):
             self.assertEqual(sdk.read_bytes(),b'original SDK')
             self.assertEqual(stage.read_bytes(),observer.read_bytes())
             self.assertNotEqual(sdk.stat().st_ino,stage.stat().st_ino)
+
+    def test_original_configuration_isolated_from_generic_inventory_module(self):
+        import sys,types
+        fake=types.ModuleType('inventory')
+        with unittest.mock.patch.dict(sys.modules,{'inventory':fake}):
+            body=original_configuration()
+        for field in ('PropStages','PropStage0','PropSubsampling'):
+            self.assertNotIn(field,body)
+        self.assertIn('AtmosphericWind = FALSE',body)
+        self.assertIn('InfobarMode = 0',body)
