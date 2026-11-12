@@ -942,6 +942,11 @@ struct Runtime final:BodyServices,RigidBodyServices,SurfaceServices,NavigationSe
         if(metadata.Script()) scenarioInterpreter=scripts.Load().run(metadata.Script());
 #endif
         render.graphics->PostCreation();system->PostCreation();
+        // Attached children skip their serialized free-flight state. Resolve
+        // their poses after every module has restored its attachment points,
+        // before a paused session can render or save without a physics step.
+        for(auto* vessel:system->GetVessels())
+            if(!vessel->isAttached())vessel->UpdateAttachments();
 #ifdef ORBITER_NATIVE_COCKPIT
         cockpit->InitState(scenario.string().c_str());
 #endif

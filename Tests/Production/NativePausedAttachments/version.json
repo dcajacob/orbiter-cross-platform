@@ -1,0 +1,13 @@
+{
+  "native_bootstrap_version": "paused-attachments-v1",
+  "physics_version": "assembly-contact-v3",
+  "baseline_source": "ef2401bb059f429aec3b1d7880e58f94f8a7a56f",
+  "target": "Src/Orbiter/Production/NativeApplication.cpp",
+  "original_source_sha256_lf": "a45553d1a1e280cbaa980673f997b387d41ab5e5f4b4b207caf4f28746fb36c7",
+  "corrected_source_sha256_lf": "18faa3d7b481c39fbcd1ffd7a16cff5f07e3c5f10e90b1f9f27b1ffcb481396a",
+  "patch_sha256": "b47beda1444188e659a132505b02f2f9f16b65bd8a21d21022b69c5344084e65",
+  "original_builder_sha256_lf": "c39756924507837f98718fe92bf275c558c375b67ee3dace79f467348e0e6007",
+  "previous_version_manifest_sha256_lf": "c65c12721abc1c56759c47d6c6eb4e9e050560780aa3edb11f4ac418ac048bf7",
+  "qualification_granted": false,
+  "phase6_complete": false
+}
