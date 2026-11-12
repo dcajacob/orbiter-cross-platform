@@ -21,7 +21,7 @@ def sha(p):return hashlib.sha256(pathlib.Path(p).read_bytes()).hexdigest()
 def load(p):return json.loads(pathlib.Path(p).read_text())
 from intentional_exit import build_identity
 assets=args.assets;initial=load(args.package/'build.json')
-assert initial['status']=='built' and initial['native_bootstrap_version']=='paused-attachments-v1'
+assert initial['status']=='built' and initial['native_bootstrap_version']=='paused-attachments-v2'
 identity=build_identity(args.package/'engine/orbiter-production',args.package/'engine/NativeModules',args.package/'build.json',initial['source_base'],ROOT)
 guards={str(ROOT/n):sha(ROOT/n) for group in ('source_sha256_lf','dependency_sha256_lf','generated_source_files_sha256','runtime_files_sha256','candidate_runtime_files_sha256') for n in initial[group]}
 resources=load(assets/'remaining-vessels-resources.json')['staged_files_sha256']

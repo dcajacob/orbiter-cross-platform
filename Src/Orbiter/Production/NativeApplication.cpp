@@ -772,7 +772,7 @@ struct Runtime final:BodyServices,RigidBodyServices,SurfaceServices,NavigationSe
         BindCameraServices(nullptr);BindWorldVesselServices(nullptr);BindElevationServices(nullptr);BindMeshServices({});
         BindNavigationServices(nullptr);BindSurfaceServices(nullptr);BindCelestialServices(nullptr);BindRigidBodyServices(nullptr);BindBodyServices(nullptr);
     }
-    void Initialize(const std::filesystem::path& master,const std::filesystem::path& scenario,const std::filesystem::path& evidence,double captureTime) {
+    void Initialize(const std::filesystem::path& master,const std::filesystem::path& scenario,const std::filesystem::path& evidence,double captureTime,bool startRunning) {
         if(!settings.Load(master.string().c_str())) throw std::runtime_error("Cannot load explicit production configuration");
 #ifdef ORBITER_NATIVE_COCKPIT
         optionsPath=master;
@@ -945,8 +945,10 @@ struct Runtime final:BodyServices,RigidBodyServices,SurfaceServices,NavigationSe
         // Attached children skip their serialized free-flight state. Resolve
         // their poses after every module has restored its attachment points,
         // before a paused session can render or save without a physics step.
-        for(auto* vessel:system->GetVessels())
-            if(!vessel->isAttached())vessel->UpdateAttachments();
+        if(!startRunning) {
+            for(auto* vessel:system->GetVessels())
+                if(!vessel->isAttached())vessel->UpdateAttachments();
+        }
 #ifdef ORBITER_NATIVE_COCKPIT
         cockpit->InitState(scenario.string().c_str());
 #endif
@@ -1402,7 +1404,7 @@ int main(int argc,char** argv) {
 #endif
             if(application.render.joystickThrottleAxis>15 || application.render.joystickTwistAxis>15)throw std::runtime_error("Invalid joystick axis");
             if(arguments.count("--replay"))application.replay.Load(absolute("--replay"));
-            application.savePath=save;application.Initialize(absolute("--config"),scenario,output,capture);
+            application.savePath=save;application.Initialize(absolute("--config"),scenario,output,capture,startRunning);
             if(arguments.count("--keymap") && (!std::filesystem::is_regular_file(absolute("--keymap")) || !application.controls.keymap.Read(absolute("--keymap").string().c_str())))throw std::runtime_error("Cannot load explicit flight keymap");
 #ifdef ORBITER_NATIVE_COCKPIT
             if(fixedUiClock)SetCockpitReplayClock(static_cast<float>(fixed));
