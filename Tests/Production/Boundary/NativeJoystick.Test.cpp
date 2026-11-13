@@ -18,9 +18,9 @@ int main() {
         require(NativeThrottleAxis(0,-2)==-1 && NativeThrottleAxis(1,3)==3,"Keyboard-only or explicit raw axis assignment changed");
         NativeJoystickState state;
         float axes[]={.5f,-.5f,0,0};
-        auto poll=[&](int device=0,int throttle=3,bool ignore=true,int saturation=9500) {
+        auto poll=[&](int device=0,int throttle=3,bool ignore=true,int saturation=9500,bool invert=false) {
             FlightInput input;
-            state.Poll(device,axes,4,2,throttle,2500,saturation,ignore,input);
+            state.Poll(device,axes,4,2,throttle,2500,saturation,ignore,input,invert);
             return input;
         };
         auto input=poll();
@@ -38,6 +38,13 @@ int main() {
         require(poll(0,3,false,5000).throttle==1,"Changed saturation must affect thrust");
         state.Reset();axes[3]=std::numeric_limits<float>::infinity();
         require(poll(0,3,false).throttle<0,"Invalid throttle data must not issue thrust");
+        state.Reset();axes[3]=-1;
+        require(poll(0,3,true,9500,true).throttle<0,"Reversed throttle must start unarmed at idle");
+        axes[3]=1;
+        require(poll(0,3,true,9500,true).throttle==1,"Advancing the reversed throttle must command full thrust");
+        axes[3]=-1;
+        require(poll(0,3,true,9500,true).throttle==0,"Returning the reversed throttle to idle must cut thrust");
+        require(poll(0,3,true,9500,false).throttle<0,"Changing throttle direction must rearm the control");
         std::cout<<"Native joystick calibration, throttle arming, disconnect and reassignment passed\n";
         return 0;
     } catch(const std::exception& e) {std::cerr<<e.what()<<'\n';return 1;}

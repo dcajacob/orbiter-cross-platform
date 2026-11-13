@@ -124,6 +124,7 @@ struct NativeRenderContext {
     bool paused=true,showGrapple=false,cameraRotating=false;
     bool optionsUsed=false;
     int joystickThrottleAxis=-1,joystickTwistAxis=2;
+    bool joystickThrottleInverted=false;
     std::filesystem::path evidence;double captureTime=0;
 };
 ORBITER_PRODUCTION_API NativeRenderContext* BindNativeRenderContext(NativeRenderContext*);

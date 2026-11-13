@@ -22,20 +22,20 @@ inline int NativeJoystickAxis(float value,int deadzone) {
 
 class NativeJoystickState {
     int device_=-1,axis_=-1,previous_=1;
-    bool initialized_=false,ignore_=false;
+    bool initialized_=false,ignore_=false,inverted_=false;
 public:
     void Reset() {device_=-1;axis_=-1;previous_=1;initialized_=false;ignore_=false;}
     void Poll(int device,const float* axes,int count,int rudder,int throttle,
-              int deadzone,int saturation,bool ignoreOnStart,FlightInput& input) {
-        if(device!=device_ || throttle!=axis_) {
-            Reset();device_=device;axis_=throttle;
+              int deadzone,int saturation,bool ignoreOnStart,FlightInput& input,bool invertThrottle=false) {
+        if(device!=device_ || throttle!=axis_ || invertThrottle!=inverted_) {
+            Reset();device_=device;axis_=throttle;inverted_=invertThrottle;
         }
         if(device<0 || !axes)return;
         auto axis=[&](int i) {return i>=0 && i<count ? NativeJoystickAxis(axes[i],deadzone) : 0;};
         input.x=axis(0);input.y=axis(1);input.rz=axis(rudder);
         if(throttle<0 || throttle>=count || !std::isfinite(axes[throttle]))return;
         double limit=std::clamp(saturation,0,10000)/10000.;
-        double raw=axes[throttle];
+        double raw=invertThrottle ? -axes[throttle] : axes[throttle];
         double value=limit>0 ? std::clamp(raw/limit,-1.,1.) : raw<0 ? -1. : raw>0 ? 1. : 0.;
         // Original DirectInput throttle range [-1000,0] and eight-count bins.
         // floor reproduces the original signed right shift without depending

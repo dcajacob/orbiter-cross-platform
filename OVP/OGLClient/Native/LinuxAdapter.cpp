@@ -318,7 +318,7 @@ RenderInput OGLClient::Poll()
         const auto* buttons=device>=0 ? glfwGetJoystickButtons(device,&buttonsCount) : nullptr;
         cockpitJoystick.Poll(device,axes,count,render.joystickTwistAxis,
             NativeThrottleAxis(prm.ThrottleAxis,render.joystickThrottleAxis),
-            prm.Deadzone,prm.ThrottleSaturation,prm.bThrottleIgnore,input.flight);
+            prm.Deadzone,prm.ThrottleSaturation,prm.bThrottleIgnore,input.flight,render.joystickThrottleInverted);
         input.flight.alternate=buttonsCount>2 && buttons[2]==GLFW_PRESS;
 #else
         auto& device=joystickDevice;

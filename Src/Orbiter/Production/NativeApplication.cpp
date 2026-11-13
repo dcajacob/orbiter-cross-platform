@@ -724,7 +724,8 @@ struct Runtime final:BodyServices,RigidBodyServices,SurfaceServices,NavigationSe
                 if(!settings.Write(temporary.string().c_str()))throw std::runtime_error("Cannot write cockpit options");
                 std::ofstream file(temporary,std::ios::app);file.exceptions(std::ios::badbit|std::ios::failbit);
                 file<<"\nNativeJoystickThrottleAxis = "<<render.joystickThrottleAxis
-                    <<"\nNativeJoystickRudderAxis = "<<render.joystickTwistAxis<<'\n';
+                    <<"\nNativeJoystickRudderAxis = "<<render.joystickTwistAxis
+                    <<"\nNativeJoystickThrottleInverted = "<<(render.joystickThrottleInverted ? "TRUE" : "FALSE")<<'\n';
                 file.close();std::filesystem::rename(temporary,optionsPath);
             } catch(const std::exception& error) {
                 std::error_code ignored;std::filesystem::remove(temporary,ignored);
@@ -779,6 +780,7 @@ struct Runtime final:BodyServices,RigidBodyServices,SurfaceServices,NavigationSe
         int axis;
         if(render.joystickThrottleAxis==-2 && settings.GetInt("NativeJoystickThrottleAxis",axis) && axis>=-2 && axis<=15)
             render.joystickThrottleAxis=axis;
+        settings.GetBool("NativeJoystickThrottleInverted",render.joystickThrottleInverted);
         if(render.joystickTwistAxis==-2)
             render.joystickTwistAxis=settings.GetInt("NativeJoystickRudderAxis",axis) && axis>=-1 && axis<=15 ? axis : 2;
 #endif

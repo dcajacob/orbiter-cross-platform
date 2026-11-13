@@ -271,6 +271,9 @@ void DlgOptions::DrawJoystick()
             }
             ImGui::EndAnimatedCombo();
         }
+        ImGui::BeginDisabled(selected<0);
+        ImGui::Checkbox("Reverse throttle axis", &render.joystickThrottleInverted);
+        ImGui::EndDisabled();
         // GLFW exposes ordered raw axes, not DirectInput Z/slider identities.
         // Use the actual device axes for both throttle and rudder assignment.
         std::string rudderName=render.joystickTwistAxis<0 ? "<Disabled>" : "Axis "+std::to_string(render.joystickTwistAxis+1);
