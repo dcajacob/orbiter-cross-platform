@@ -55,7 +55,7 @@ def main():
     physics_proof=None
     if a.physics_version=='original':extraction_source.verify()
     else:
-        from NativePausedAttachmentsV2 import source as physics_source
+        from NativeThrottleDirection import source as physics_source
         physics_proof=physics_source.verify()
     ledger=json.loads((HERE.parent/'phase3-extraction.lock.json').read_text())['files']
     inputs=set(ledger)|{'OVP/OGLClient/dependencies.lock.json','Tests/Production/dependencies.lock.json',
