@@ -238,6 +238,12 @@ void OGLClient::Open()
         }
     }
     cockpitJoystick.Reset();
+#if ORBITER_BUILD_NATIVE_COCKPIT
+    glfwSetJoystickCallback([](int device, int) {
+        // GLFW can reuse the same slot for a new connection between two polls.
+        cockpitJoystick.DeviceChanged(device);
+    });
+#endif
     scroll=0;dragging=false;keyEvents.clear();mouseEvents.clear();joystickDevice=-1;armed=false;throttleSeen=false;
     glfwSetKeyCallback(nativeWindow,[](GLFWwindow*,int key,int,int action,int) {
         if(action==GLFW_REPEAT)return;
@@ -314,12 +320,13 @@ RenderInput OGLClient::Poll()
         int device=prm.Joy_idx>0 && prm.Joy_idx<=GLFW_JOYSTICK_LAST+1 ? int(prm.Joy_idx)-1 : -1;
         if(device>=0 && !glfwJoystickPresent(device))device=-1;
         int count=0,buttonsCount=0;
-        const float* axes=device>=0 ? glfwGetJoystickAxes(device,&count) : nullptr;
         const auto* buttons=device>=0 ? glfwGetJoystickButtons(device,&buttonsCount) : nullptr;
-        cockpitJoystick.Poll(device,axes,count,render.joystickTwistAxis,
+        const bool alternate=buttonsCount>2 && buttons[2]==GLFW_PRESS;
+        const float* axes=device>=0 ? glfwGetJoystickAxes(device,&count) : nullptr;
+        cockpitJoystick.Poll(axes ? device : -1,axes,count,render.joystickTwistAxis,
             NativeThrottleAxis(prm.ThrottleAxis,render.joystickThrottleAxis),
             prm.Deadzone,prm.ThrottleSaturation,prm.bThrottleIgnore,input.flight,render.joystickThrottleInverted);
-        input.flight.alternate=buttonsCount>2 && buttons[2]==GLFW_PRESS;
+        input.flight.alternate=axes && alternate;
 #else
         auto& device=joystickDevice;
         int selected=-1;for(int j=GLFW_JOYSTICK_1;j<=GLFW_JOYSTICK_LAST;++j)if(glfwJoystickPresent(j)){selected=j;break;}

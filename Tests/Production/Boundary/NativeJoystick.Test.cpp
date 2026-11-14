@@ -24,8 +24,14 @@ int main() {
             return input;
         };
         auto input=poll();
-        require(input.x==333 && input.y==-333 && input.rz==0,"Calibrated controls did not reach FlightInput");
+        require(input.x==0 && input.y==0 && input.rz==0,"Steering must first report center");
         require(input.throttle<0,"Initial throttle must be ignored");
+        axes[0]=.02f;axes[1]=-.02f;
+        input=poll();
+        require(input.x==0 && input.y==0 && input.rz==0,"Centered stick must not command steering");
+        axes[0]=.5f;axes[1]=-.5f;
+        input=poll();
+        require(input.x==333 && input.y==-333 && input.rz==0,"Calibrated controls did not reach FlightInput");
         axes[3]=.05f;require(poll().throttle<0,"Throttle noise must not arm the engine");
         axes[3]=-.95f;require(poll().throttle==1,"Throttle travel must arm and saturate at full thrust");
         require(poll().throttle<0,"An unmoved throttle must not override keyboard control");
@@ -45,6 +51,40 @@ int main() {
         axes[3]=-1;
         require(poll(0,3,true,9500,true).throttle==0,"Returning the reversed throttle to idle must cut thrust");
         require(poll(0,3,true,9500,false).throttle<0,"Changing throttle direction must rearm the control");
+
+        state.Reset();
+        const auto steeringNeutral=[](const FlightInput& input) {
+            return input.x==0 && input.y==0 && input.rz==0;
+        };
+        axes[0]=axes[1]=axes[2]=axes[3]=-1;
+        for(int frame=0;frame<60;++frame) {
+            input=poll(0,3,true,9500,true);
+            require(steeringNeutral(input) && input.throttle<0,"Uninitialized endpoint readings must not fire RCS or throttle");
+        }
+        axes[0]=axes[1]=0;
+        axes[2]=std::numeric_limits<float>::quiet_NaN();
+        require(steeringNeutral(poll()),"Invalid twist data must not arm steering");
+        axes[0]=1;axes[2]=0;
+        require(steeringNeutral(poll()),"Neutral on the other axes must not arm an off-center stick");
+        axes[0]=0;
+        require(steeringNeutral(poll()),"Centering must arm steering without firing");
+        axes[0]=axes[1]=axes[2]=-1;
+        input=poll();
+        require(input.x==-1000 && input.y==-1000 && input.rz==-1000,"Once armed, legitimate full travel must still work");
+        require(steeringNeutral(poll(-1)),"Removing the device must cut steering");
+        require(steeringNeutral(poll()),"A reconnected stick must report center again");
+        axes[0]=axes[1]=axes[2]=0;
+        poll();
+        axes[0]=1;
+        require(poll().x==1000,"Steering must come back after reconnecting and centering");
+        state.DeviceChanged(1);
+        require(poll().x==1000,"Another device changing slots must not disarm this stick");
+        state.DeviceChanged(0);
+        require(steeringNeutral(poll()),"A replacement in the same GLFW slot must rearm steering");
+        axes[0]=0;
+        poll();
+        axes[0]=1;
+        require(poll(0,3,true,9500,true).x==1000,"Changing throttle direction must preserve armed steering");
         std::cout<<"Native joystick calibration, throttle arming, disconnect and reassignment passed\n";
         return 0;
     } catch(const std::exception& e) {std::cerr<<e.what()<<'\n';return 1;}

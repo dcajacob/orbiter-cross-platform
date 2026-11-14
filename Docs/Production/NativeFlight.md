@@ -39,7 +39,7 @@ libraries mapped by an already running application.
 | Select rotation/linear RCS mode | F |
 | Toggle RCS off/on | Ctrl-F |
 | Reduced RCS power | Hold Shift with the direction key |
-| Kill rotation | K |
+| Kill rotation | Alt-K |
 | Toggle altitude hold | Ctrl-A |
 | Prograde / retrograde | [ / ] |
 | Orbit normal / antinormal | ; / ' |

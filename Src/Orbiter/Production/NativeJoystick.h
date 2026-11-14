@@ -21,18 +21,43 @@ inline int NativeJoystickAxis(float value,int deadzone) {
 }
 
 class NativeJoystickState {
-    int device_=-1,axis_=-1,previous_=1;
+    int device_=-1,rudder_=-1,axis_=-1,previous_=1;
+    bool attitudeReady_=false;
     bool initialized_=false,ignore_=false,inverted_=false;
 public:
-    void Reset() {device_=-1;axis_=-1;previous_=1;initialized_=false;ignore_=false;}
+    void Reset() { *this = NativeJoystickState{}; }
+    void DeviceChanged(int device) { if (device == device_) Reset(); }
     void Poll(int device,const float* axes,int count,int rudder,int throttle,
               int deadzone,int saturation,bool ignoreOnStart,FlightInput& input,bool invertThrottle=false) {
-        if(device!=device_ || throttle!=axis_ || invertThrottle!=inverted_) {
-            Reset();device_=device;axis_=throttle;inverted_=invertThrottle;
+        if (device != device_) {
+            Reset();
+            device_ = device;
+        }
+        if (rudder != rudder_) {
+            rudder_ = rudder;
+            attitudeReady_ = false;
+        }
+        if (throttle != axis_ || invertThrottle != inverted_) {
+            axis_ = throttle;
+            inverted_ = invertThrottle;
+            previous_ = 1;
+            initialized_ = false;
+            ignore_ = false;
         }
         if(device<0 || !axes)return;
-        auto axis=[&](int i) {return i>=0 && i<count ? NativeJoystickAxis(axes[i],deadzone) : 0;};
-        input.x=axis(0);input.y=axis(1);input.rz=axis(rudder);
+        const auto available = [&](int index) { return index >= 0 && index < count; };
+        const auto axis = [&](int index) { return available(index) ? NativeJoystickAxis(axes[index],deadzone) : 0; };
+        const auto neutral = [&](int index) {
+            return !available(index) || (std::isfinite(axes[index]) && axis(index) == 0);
+        };
+        // Some devices report endpoint values before sending their first centered
+        // sample. Keep them from firing attitude thrusters on connection.
+        attitudeReady_ = attitudeReady_ || (count > 0 && neutral(0) && neutral(1) && neutral(rudder));
+        if (attitudeReady_) {
+            input.x = axis(0);
+            input.y = axis(1);
+            input.rz = axis(rudder);
+        }
         if(throttle<0 || throttle>=count || !std::isfinite(axes[throttle]))return;
         double limit=std::clamp(saturation,0,10000)/10000.;
         double raw=invertThrottle ? -axes[throttle] : axes[throttle];
