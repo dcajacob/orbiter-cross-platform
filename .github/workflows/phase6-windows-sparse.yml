@@ -1,0 +1,139 @@
+name: Orbiter Windows sparse checks
+
+on:
+  push:
+    branches: [qualification/windows-sparse-v1]
+    paths: [.github/workflows/phase6-windows-sparse.yml]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: orbiter-windows-sparse
+  cancel-in-progress: false
+
+jobs:
+  sparse:
+    name: Windows Release x64 smoke
+    runs-on: windows-2025
+    timeout-minutes: 60
+    env:
+      ORBITER_CANDIDATE: f72766b3c3fbfbfd9b6abd8aae291199de761343
+      ORBITER_PHYSICS: ef2401bb059f429aec3b1d7880e58f94f8a7a56f
+      DXSDK_DIR: '${{ github.workspace }}\DXSDK'
+      ORBITER_DATA_CONTAINER_LOCK: Tests/Production/stock-data-container-v2.lock.json
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.14'
+      - uses: ilammy/msvc-dev-cmd@v1
+        with:
+          arch: x64
+      - name: Verify workflow and candidate source boundaries
+        run: |
+          $workflow = '.github/workflows/phase6-windows-sparse.yml'
+          $changed = @(git diff --name-only $env:ORBITER_CANDIDATE HEAD)
+          if ($LASTEXITCODE -ne 0 -or $changed.Count -ne 1 -or $changed[0] -ne $workflow) {
+            throw 'The Windows smoke workflow must be the only change from the Linux-accepted candidate'
+          }
+          git switch --detach $env:ORBITER_CANDIDATE
+          if ($LASTEXITCODE -ne 0 -or (git rev-parse HEAD) -ne $env:ORBITER_CANDIDATE) {
+            throw 'Wrong application source'
+          }
+          New-Item -ItemType Directory -Path out/receipt | Out-Null
+          "Workflow: $env:GITHUB_SHA`nApplication: $env:ORBITER_CANDIDATE`nPhysics: $env:ORBITER_PHYSICS" |
+            Set-Content out/receipt/source.txt
+          python -B Tests/Production/frozen_reference.py
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          python -B Tests/Production/frozen_behavior.py
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          if (git diff --name-only $env:ORBITER_PHYSICS HEAD -- Src/Orbiter/SuperVessel.cpp Tests/Production/PhysicsV3) {
+            throw 'The approved v3 physics or its original guard changed'
+          }
+          git worktree add --detach out/physics-source $env:ORBITER_PHYSICS
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          $proof = Join-Path $PWD 'out/receipt/physics-source.json'
+          Push-Location out/physics-source
+          python -B Tests/Production/PhysicsV3/source.py --output $proof
+          $result = $LASTEXITCODE
+          Pop-Location
+          exit $result
+      - uses: actions/cache/restore@v6
+        id: dxsdk
+        with:
+          path: ${{ github.workspace }}\DXSDK
+          key: dxsdk_jun10
+      - name: Prepare the existing DirectX SDK dependency
+        if: steps.dxsdk.outputs.cache-hit != 'true'
+        shell: cmd
+        run: |
+          curl --fail -L https://download.microsoft.com/download/a/e/7/ae743f1f-632b-4809-87a9-aa1bb3458e31/DXSDK_Jun10.exe -o DXSDK_Jun10.exe
+          if errorlevel 1 exit /b 1
+          7z x DXSDK_Jun10.exe DXSDK/Include DXSDK/Lib
+          if errorlevel 1 exit /b 1
+      - name: Build Windows Release and run the registered unit checks
+        run: |
+          cmake -S . -B out/app -G Ninja -DCMAKE_BUILD_TYPE=Release "-DCMAKE_POLICY_VERSION_MINIMUM=3.5" -DCMAKE_C_COMPILER=cl -DCMAKE_CXX_COMPILER=cl -DORBITER_BUILD_D3D9CLIENT=ON -DORBITER_BUILD_XRSOUND=OFF -DORBITER_MAKE_DOC=OFF -DORBITER_MAKE_TESTS=ON -DORBITER_PORTABLE_REFERENCE_CAPTURE=ON -DORBITER_PRODUCTION_REFERENCE_CAPTURE=ON "-DDXSDK_DIR:PATH=$env:DXSDK_DIR" 2>&1 | Tee-Object out/receipt/configure.log
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          cmake --build out/app --parallel 2 2>&1 | Tee-Object out/receipt/build.log
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          ctest --test-dir out/app --output-on-failure --no-tests=error --output-junit "$pwd/out/receipt/ctest.xml" 2>&1 | Tee-Object out/receipt/ctest.log
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          python -B Tests/Production/build_metadata.py --build out/app
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          Move-Item out/app/build-inputs.json out/receipt/build-inputs.json
+      - name: Verify the same-build SDK and build the OpenGL client
+        run: |
+          python -B Tests/Production/package_test_runtime.py --build out/app --output out/runtime.zip
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          7z x out/runtime.zip -oout/runtime
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          python -B Tests/Production/verify_test_runtime.py --runtime out/runtime --source $env:ORBITER_CANDIDATE
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          cmake -S OVP/OGLClient -B out/ogl -G Ninja -DCMAKE_BUILD_TYPE=Release "-DCMAKE_POLICY_VERSION_MINIMUM=3.5" "-DORBITER_TEST_RUNTIME=$pwd/out/runtime" "-DDXSDK_DIR=$env:DXSDK_DIR" 2>&1 | Tee-Object out/receipt/client-configure.log
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          cmake --build out/ogl --target OGLClient --parallel 2 2>&1 | Tee-Object out/receipt/client-build.log
+          exit $LASTEXITCODE
+      - uses: actions/cache/restore@v6
+        with:
+          path: out/data-cache/Orbiter-x64.zip
+          key: production-data-${{ hashFiles('Tests/Production/stock-data.lock.json') }}
+      - uses: actions/cache/restore@v6
+        with:
+          path: out/planet-cache/Orbiter2016.zip
+          key: production-standard-planets-${{ hashFiles('Tests/Production/standard-planets.lock.json') }}
+      - uses: actions/cache/restore@v6
+        with:
+          path: out/mesa-cache/*.pkg.tar.zst
+          key: mesa-ucrt64-${{ hashFiles('Tests/Production/mesa-ucrt64.lock.json') }}
+      - name: Stage the locked stock data and renderer
+        run: |
+          python -B Tests/Production/prepare_hosted_data.py --archive out/data-cache/Orbiter-x64.zip --destination out/production-data
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          python -B Tests/Production/prepare_hosted_data.py --lock Tests/Production/standard-planets.lock.json --archive out/planet-cache/Orbiter2016.zip --destination out/standard-planets
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          python -B Tests/Production/stage_mesa.py stage --cache out/mesa-cache --destination out/mesa-runtime
+          exit $LASTEXITCODE
+      - name: Run the short real Windows flight and unchanged comparison
+        run: >-
+          python -B Tests/Production/Client/run_client.py --orbiter out/runtime/Orbiter.exe
+          --data out/production-data --planets out/standard-planets --mesa out/mesa-runtime
+          --configuration Release --output out/client-smoke
+      - name: Preserve Windows smoke evidence and failure output
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: windows-release-sparse
+          retention-days: 14
+          path: |
+            out/receipt/**
+            out/runtime/test-runtime.json
+            out/client-smoke/**/*.json
+            out/client-smoke/**/*.csv
+            out/client-smoke/**/*.txt
+            out/client-smoke/**/Orbiter.log
+            out/client-smoke/**/scene.png
