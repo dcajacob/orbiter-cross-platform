@@ -7,6 +7,7 @@
 
 #include "SoundPreSteps.h"
 #include "XRSoundDLL.h"     // for GetSystemUptime
+#include <algorithm>
 #include <string>
 
 // Plays a switch sound: On (high click), or Off (low click)
@@ -562,7 +563,8 @@ void AFCtrlModeDefaultSoundPreStep::clbkPreStep(const double simt, const double 
     // - bit 0: elevator enabled/disabled 
     // - bit 1: rudder enabled / disabled
     // - bit 2: ailerons enabled / disabled
-    const int afCtrlMode = min(pVessel->GetADCtrlMode(), (unsigned int)2);  // 0 = OFF, 1 = PITCH (elevators), 2 = ON (more than just pitch)
+    // The sound has three announcements for off, pitch only, and on.
+    const int afCtrlMode = static_cast<int>((std::min)(pVessel->GetADCtrlMode(), oapi::UInt32{2}));
 
     if (m_previousAFCtrlMode < 0)
     {
