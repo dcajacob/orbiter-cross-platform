@@ -6,10 +6,11 @@ client uses SDL3's Vulkan backend and a shared pair of SPIR-V shaders.
 
 The client streams stock Earth surface tiles from `Earth/Archive/Surf.tree` and
 uses Orbiter's elevation data. It keeps detailed tiles around the DG-S and
-coarser tiles farther away. During flight, it stages new tiles over several
-frames and keeps the current terrain visible until the new tiles are ready.
-The ground shadow is projected from the DG-S's current position and attitude
-along the Sun direction.
+coarser tiles farther away. During flight it stages tiles over several frames
+and replaces each coarser tile when all four of its children are ready. The
+client applies the stock vessel's exterior mesh animation states, including
+gear and flight surfaces. The aircraft and its ground shadow use the same
+posed mesh.
 
 ## Takeoff
 
@@ -23,7 +24,20 @@ along the Sun direction.
    to orbit the external camera. Scroll to change camera distance.
 
 This milestone covers regional Earth terrain and the external DG-S view.
-The exterior mesh uses the stock template pose for gear and control surfaces.
+
+## Repeatable runway circuit
+
+Copy `VulkanCircuit.lua` into the isolated Orbiter runtime's `Script` directory
+and add `Script VulkanCircuit` inside `BEGIN_ENVIRONMENT` in a copy of
+`Runway33.scn`. Run that scenario unpaused. The Lua controller uses the stock
+DG-S controls to fly a left circuit, land on Runway 33, brake, and pause.
+It writes `vulkan-circuit.csv` in the working directory. Use a 0.05-second
+simulation step for repeatability (`--fixed-step 0.05` on Linux,
+`--fixedstep=0.05` on Windows).
+
+Set `ORBITER_VULKAN_FRAME_TRACE` to a writable CSV path to record intervals
+between Vulkan frames, CPU-side scene and terrain times, tile staging, and
+aircraft pose uploads.
 
 Build with CMake 3.24 or newer, a matching Orbiter build, SDL3 3.4 or newer, and
 `glslangValidator` from the Vulkan SDK or your package manager. The shaders

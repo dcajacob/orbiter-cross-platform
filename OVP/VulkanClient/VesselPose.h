@@ -1,0 +1,28 @@
+// Licensed under the MIT License
+#pragma once
+
+#include "SceneFrame.h"
+#include "VulkanScene.h"
+
+namespace orbiter::vulkan {
+
+struct VertexRange {
+    std::size_t first = 0;
+    std::size_t count = 0;
+};
+
+class VesselPose {
+public:
+    void Reset(std::vector<Vertex> mesh, std::vector<VertexRange> groups);
+    bool Update(const VESSEL&);
+    const std::vector<Vertex>& Vertices() const { return posed_; }
+
+private:
+    std::vector<Vertex> mesh_;
+    std::vector<Vertex> posed_;
+    std::vector<VertexRange> groups_;
+    std::vector<double> states_;
+    bool initialized_ = false;
+};
+
+} // namespace orbiter::vulkan

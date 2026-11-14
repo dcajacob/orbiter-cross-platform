@@ -66,6 +66,10 @@ struct TileKey {
     {
         return std::tie(level, row, column) < std::tie(other.level, other.row, other.column);
     }
+    bool operator==(const TileKey& other) const
+    {
+        return level == other.level && row == other.row && column == other.column;
+    }
 };
 
 struct TerrainMesh {
@@ -83,6 +87,7 @@ public:
 
     void Open(SDL_Window*);
     void SetShip(const SceneMesh&);
+    void SetShipPose(const std::vector<Vertex>&);
     void StageTile(const TileKey&, const TerrainMesh&);
     void SelectTiles(const std::set<TileKey>& visible, const std::set<TileKey>& pending);
     void SetShadow(const std::vector<Vertex>&);
@@ -100,6 +105,7 @@ private:
         bool visible = false;
     };
     void Release(GroundTile&) noexcept;
+    void UpdateVesselVertices(const std::vector<Vertex>&, SDL_GPUBuffer*, SDL_GPUTransferBuffer*);
     SDL_GPUTexture* UploadTexture(const TextureData&);
     SDL_GPUGraphicsPipeline* CreatePipeline(SDL_GPUShader*, SDL_GPUShader*, DrawPass);
     void ResizeDepth(unsigned, unsigned);
@@ -120,8 +126,9 @@ private:
     SDL_GPUBuffer* indices_ = nullptr;
     unsigned shipIndexCount_ = 0;
     SDL_GPUBuffer* shadowVertices_ = nullptr;
+    SDL_GPUTransferBuffer* shipUpload_ = nullptr;
     SDL_GPUTransferBuffer* shadowUpload_ = nullptr;
-    Uint32 shadowBytes_ = 0;
+    Uint32 vesselVertexBytes_ = 0;
     bool showShadow_ = false;
     std::map<TileKey, GroundTile> tiles_;
     std::vector<SDL_GPUTexture*> textures_;

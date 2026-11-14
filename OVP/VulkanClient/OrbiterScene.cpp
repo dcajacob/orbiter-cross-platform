@@ -174,6 +174,12 @@ bool OrbiterScene::Blit(SURFHANDLE target, unsigned x, unsigned y, SURFHANDLE so
 void OrbiterScene::Open(SDL_Window* window)
 {
     scene_.Open(window);
+    if (const char* path = SDL_getenv("ORBITER_VULKAN_FRAME_TRACE"); path && *path) {
+        frameTrace_.open(std::filesystem::path(path));
+        if (!frameTrace_) throw std::runtime_error("Cannot open Vulkan frame trace");
+        frameTrace_ << "sim_seconds,interval_ms,scene_ms,terrain_ms,tiles_staged,tiles_switched,pose_uploaded,shadow_drawn\n";
+    }
+    previousFrame_ = 0;
 }
 
 void OrbiterScene::CaptureFocus(const std::filesystem::path& archive)
@@ -192,8 +198,9 @@ void OrbiterScene::CaptureFocus(const std::filesystem::path& archive)
     unsigned materialIndex = defaultIndex;
     unsigned textureIndex = defaultIndex;
     std::map<SURFHANDLE, unsigned> textureSlots;
+    std::vector<VertexRange> groups(oapiMeshGroupCount(mesh));
 
-    for (unsigned i = 0, n = oapiMeshGroupCount(mesh); i < n; ++i) {
+    for (unsigned i = 0; i < groups.size(); ++i) {
         const auto* group = oapiMeshGroup(mesh, i);
         if (!group) continue;
         if (group->MtrlIdx != inheritedIndex) materialIndex = group->MtrlIdx;
@@ -221,6 +228,7 @@ void OrbiterScene::CaptureFocus(const std::filesystem::path& archive)
             }
         }
         const auto startVertex = unsigned(ship.vertices.size());
+        groups[i] = {startVertex, group->nVtx};
         const auto pass = material.diffuse[3] < 0.999f ? DrawPass::Translucent : DrawPass::Opaque;
         ship.groups.push_back({unsigned(ship.indices.size()), group->nIdx, gpuTexture, material, pass});
         for (unsigned j = 0; j < group->nVtx; ++j) {
@@ -238,7 +246,7 @@ void OrbiterScene::CaptureFocus(const std::filesystem::path& archive)
               << "; time=" << oapiGetSimTime() << "; aperture=" << oapiCameraAperture() << '\n';
     terrain_.Open(archive, ShipFrame().origin);
     scene_.SetShip(ship);
-    shipVertices_ = std::move(ship.vertices);
+    pose_.Reset(std::move(ship.vertices), std::move(groups));
 }
 
 SceneFrame OrbiterScene::ShipFrame() const
@@ -253,7 +261,7 @@ void OrbiterScene::ClearFocus() noexcept
     focus_ = nullptr;
     scene_.ClearMesh();
     terrain_.Close();
-    shipVertices_.clear();
+    pose_.Reset({}, {});
     shadowVertices_.clear();
     shadowTime_.reset();
     loggedLiftoff_ = false;
@@ -263,20 +271,27 @@ bool OrbiterScene::Present(unsigned width, unsigned height)
 {
     if (!width || !height) return true;
     if (!focus_) return scene_.Present({}, {});
+    const auto start = SDL_GetTicksNS();
     const auto ship = ShipFrame();
     const auto simTime = oapiGetSimTime();
     const auto groundFrame = terrain_.Frame();
-    if (shadowTime_ != simTime) {
-        const bool terrainChanged = terrain_.Update(ship.origin, scene_);
-        terrain_.ProjectShadow(groundFrame, ship, shipVertices_, shadowVertices_);
+    auto* vessel = oapiGetVesselInterface(focus_);
+    const bool poseChanged = pose_.Update(*vessel);
+    if (poseChanged) scene_.SetShipPose(pose_.Vertices());
+    TerrainUpdate tiles;
+    Uint64 terrainTime = 0;
+    if (shadowTime_ != simTime || poseChanged) {
+        const auto beforeTerrain = SDL_GetTicksNS();
+        tiles = terrain_.Update(ship.origin, scene_);
+        terrainTime = SDL_GetTicksNS() - beforeTerrain;
+        terrain_.ProjectShadow(groundFrame, ship, pose_.Vertices(), shadowVertices_);
         scene_.SetShadow(shadowVertices_);
         shadowTime_ = simTime;
 
-        auto* vessel = oapiGetVesselInterface(focus_);
         const auto altitude = vessel->GetAltitude(ALTMODE_GROUND);
         const bool liftoff = !loggedLiftoff_ && !vessel->GroundContact() && altitude > 8 && vessel->GetAirspeed() > 30;
         loggedLiftoff_ |= liftoff;
-        if (terrainChanged || liftoff) {
+        if (tiles.recentered || liftoff) {
             std::ostringstream sample;
             sample << "Vulkan flight " << (liftoff ? "liftoff" : "terrain") << ": t=" << simTime
                    << " AGL=" << altitude << " airspeed=" << vessel->GetAirspeed();
@@ -291,13 +306,23 @@ bool OrbiterScene::Present(unsigned width, unsigned height)
     // The stock aerial imagery already contains its illumination.
     ground.light[0] = ground.light[2] = 0;
     ground.light[1] = 1;
-    return scene_.Present(MakeUniform(ship, width, height), ground);
+    const bool presented = scene_.Present(MakeUniform(ship, width, height), ground);
+    if (frameTrace_.is_open()) {
+        const auto milliseconds = [](Uint64 time) { return double(time) / 1000000; };
+        frameTrace_ << simTime << ',' << milliseconds(previousFrame_ ? start - previousFrame_ : 0)
+                    << ',' << milliseconds(SDL_GetTicksNS() - start) << ',' << milliseconds(terrainTime)
+                    << ',' << tiles.staged << ',' << tiles.switched << ',' << poseChanged
+                    << ',' << !shadowVertices_.empty() << '\n';
+        previousFrame_ = start;
+    }
+    return presented;
 }
 
 void OrbiterScene::Close() noexcept
 {
     ClearFocus();
     scene_.Close();
+    if (frameTrace_.is_open()) frameTrace_.close();
 }
 
 std::string OrbiterScene::FlightTitle() const

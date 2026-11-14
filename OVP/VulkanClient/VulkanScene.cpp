@@ -331,12 +331,14 @@ void Scene::SetShip(const SceneMesh& mesh)
     vertices_ = Buffer(device_, SDL_GPU_BUFFERUSAGE_VERTEX, mesh.vertices.data(), mesh.vertices.size() * sizeof(Vertex));
     indices_ = Buffer(device_, SDL_GPU_BUFFERUSAGE_INDEX, mesh.indices.data(), mesh.indices.size() * sizeof(std::uint32_t));
     shipIndexCount_ = unsigned(mesh.indices.size());
-    shadowBytes_ = Uint32(mesh.vertices.size() * sizeof(Vertex));
-    const SDL_GPUBufferCreateInfo shadowVertexInfo{SDL_GPU_BUFFERUSAGE_VERTEX, shadowBytes_, 0};
+    vesselVertexBytes_ = Uint32(mesh.vertices.size() * sizeof(Vertex));
+    const SDL_GPUBufferCreateInfo shadowVertexInfo{SDL_GPU_BUFFERUSAGE_VERTEX, vesselVertexBytes_, 0};
     shadowVertices_ = SDL_CreateGPUBuffer(device_, &shadowVertexInfo);
     Require(shadowVertices_ != nullptr, "Allocate Vulkan shadow vertices");
-    const SDL_GPUTransferBufferCreateInfo shadowUploadInfo{SDL_GPU_TRANSFERBUFFERUSAGE_UPLOAD, shadowBytes_, 0};
-    shadowUpload_ = SDL_CreateGPUTransferBuffer(device_, &shadowUploadInfo);
+    const SDL_GPUTransferBufferCreateInfo uploadInfo{SDL_GPU_TRANSFERBUFFERUSAGE_UPLOAD, vesselVertexBytes_, 0};
+    shipUpload_ = SDL_CreateGPUTransferBuffer(device_, &uploadInfo);
+    Require(shipUpload_ != nullptr, "Allocate Vulkan vessel animation upload buffer");
+    shadowUpload_ = SDL_CreateGPUTransferBuffer(device_, &uploadInfo);
     Require(shadowUpload_ != nullptr, "Allocate Vulkan shadow upload buffer");
     TextureData white;
     white.width = white.height = 1;
@@ -385,21 +387,31 @@ void Scene::SetShadow(const std::vector<Vertex>& vertices)
 {
     showShadow_ = false;
     if (vertices.empty()) return;
-    if (vertices.size() * sizeof(Vertex) != shadowBytes_)
-        throw std::runtime_error("Projected shadow and vessel vertex counts differ");
-    auto* mapped = SDL_MapGPUTransferBuffer(device_, shadowUpload_, true);
-    Require(mapped != nullptr, "Map Vulkan shadow upload");
-    std::memcpy(mapped, vertices.data(), shadowBytes_);
-    SDL_UnmapGPUTransferBuffer(device_, shadowUpload_);
+    UpdateVesselVertices(vertices, shadowVertices_, shadowUpload_);
+    showShadow_ = true;
+}
+
+void Scene::SetShipPose(const std::vector<Vertex>& vertices)
+{
+    UpdateVesselVertices(vertices, vertices_, shipUpload_);
+}
+
+void Scene::UpdateVesselVertices(const std::vector<Vertex>& vertices, SDL_GPUBuffer* buffer, SDL_GPUTransferBuffer* transfer)
+{
+    if (vertices.size() * sizeof(Vertex) != vesselVertexBytes_)
+        throw std::runtime_error("Vulkan pose vertex count differs from the vessel mesh");
+    auto* mapped = SDL_MapGPUTransferBuffer(device_, transfer, true);
+    Require(mapped != nullptr, "Map Vulkan pose upload");
+    std::memcpy(mapped, vertices.data(), vesselVertexBytes_);
+    SDL_UnmapGPUTransferBuffer(device_, transfer);
     auto* commands = SDL_AcquireGPUCommandBuffer(device_);
-    Require(commands != nullptr, "Acquire Vulkan shadow upload commands");
+    Require(commands != nullptr, "Acquire Vulkan pose upload commands");
     auto* copy = SDL_BeginGPUCopyPass(commands);
-    const SDL_GPUTransferBufferLocation source{shadowUpload_, 0};
-    const SDL_GPUBufferRegion target{shadowVertices_, 0, shadowBytes_};
+    const SDL_GPUTransferBufferLocation source{transfer, 0};
+    const SDL_GPUBufferRegion target{buffer, 0, vesselVertexBytes_};
     SDL_UploadToGPUBuffer(copy, &source, &target, true);
     SDL_EndGPUCopyPass(copy);
-    Require(SDL_SubmitGPUCommandBuffer(commands), "Submit Vulkan shadow update");
-    showShadow_ = true;
+    Require(SDL_SubmitGPUCommandBuffer(commands), "Submit Vulkan pose upload");
 }
 
 bool Scene::Present(const SceneUniform& ship, const SceneUniform& ground)
@@ -552,11 +564,12 @@ void Scene::ClearMesh() noexcept
     if (vertices_) SDL_ReleaseGPUBuffer(device_, vertices_);
     if (indices_) SDL_ReleaseGPUBuffer(device_, indices_);
     if (shadowVertices_) SDL_ReleaseGPUBuffer(device_, shadowVertices_);
+    if (shipUpload_) SDL_ReleaseGPUTransferBuffer(device_, shipUpload_);
     if (shadowUpload_) SDL_ReleaseGPUTransferBuffer(device_, shadowUpload_);
     vertices_ = indices_ = nullptr;
     shadowVertices_ = nullptr;
-    shadowUpload_ = nullptr;
-    shipIndexCount_ = shadowBytes_ = 0;
+    shadowUpload_ = shipUpload_ = nullptr;
+    shipIndexCount_ = vesselVertexBytes_ = 0;
     showShadow_ = false;
 }
 

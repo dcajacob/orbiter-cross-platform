@@ -5,10 +5,18 @@
 #include "VulkanScene.h"
 
 #include <memory>
+#include <deque>
 
 class ZTreeMgr;
+struct ElevationTile;
 
 namespace orbiter::vulkan {
+
+struct TerrainUpdate {
+    unsigned staged = 0;
+    bool switched = false;
+    bool recentered = false;
+};
 
 class RunwayTerrain {
 public:
@@ -16,7 +24,7 @@ public:
     ~RunwayTerrain();
     void Open(const std::filesystem::path& archive, const VECTOR3& origin);
     void Close();
-    bool Update(const VECTOR3& position, Scene&);
+    TerrainUpdate Update(const VECTOR3& position, Scene&);
     SceneFrame Frame() const;
     void ProjectShadow(const SceneFrame& ground, const SceneFrame& ship, const std::vector<Vertex>&,
         std::vector<Vertex>& projected) const;
@@ -32,6 +40,7 @@ private:
     };
 
     Tile BuildTile(const TileKey&, TerrainMesh&);
+    void CollectVisible(const TileKey&, std::set<TileKey>&) const;
     void RetainTiles(Scene&);
     const Tile* FindTile(double east, double north) const;
     OBJHANDLE earth_ = nullptr;
@@ -40,11 +49,11 @@ private:
     TileKey requested_{0, 0, 0};
     std::filesystem::path filename_;
     std::unique_ptr<ZTreeMgr> archive_;
+    std::vector<ElevationTile>* elevationCache_ = nullptr;
     std::map<TileKey, Tile> tiles_;
     std::set<TileKey> visible_, wanted_;
-    std::vector<TileKey> pending_;
-    unsigned loaded_ = 0;
-    bool switching_ = false;
+    std::vector<TileKey> roots_;
+    std::deque<TileKey> pending_;
 };
 
 } // namespace orbiter::vulkan

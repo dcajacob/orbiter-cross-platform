@@ -1,6 +1,9 @@
 // Licensed under the MIT License
 #include "RunwayTerrain.h"
 #include "ZTreeMgr.h"
+#ifndef _WIN32
+#include "Production/NativeInterpreterSdk.h"
+#endif
 
 #include <algorithm>
 #include <chrono>
@@ -31,19 +34,23 @@ TileKey At(int level, double lng, double lat)
         WrapColumn(level, int(std::floor((std::remainder(lng, 2 * pi) + pi) / angle)))};
 }
 
+std::array<TileKey, 4> Children(const TileKey& key)
+{
+    return {{{key.level + 1, 2 * key.row, 2 * key.column},
+        {key.level + 1, 2 * key.row, 2 * key.column + 1},
+        {key.level + 1, 2 * key.row + 1, 2 * key.column},
+        {key.level + 1, 2 * key.row + 1, 2 * key.column + 1}}};
+}
+
 void Select(const TileKey& key, const TileKey& focus, std::set<TileKey>& selection)
 {
+    selection.insert(key);
     const int stride = 1 << (detailLevel - key.level);
     const auto columnDistance = std::abs(key.column - focus.column / stride);
     const auto columns = 2 * Rows(key.level);
     if (key.level == detailLevel || std::abs(key.row - focus.row / stride) > 1 ||
-        std::min(columnDistance, columns - columnDistance) > 1) {
-        selection.insert(key);
-        return;
-    }
-    for (int y = 0; y < 2; ++y)
-        for (int x = 0; x < 2; ++x)
-            Select({key.level + 1, 2 * key.row + y, 2 * key.column + x}, focus, selection);
+        std::min(columnDistance, columns - columnDistance) > 1) return;
+    for (const auto& child : Children(key)) Select(child, focus, selection);
 }
 
 struct TileTexture {
@@ -70,7 +77,10 @@ TileTexture LoadTile(ZTreeMgr& archive, const std::filesystem::path& filename, c
 } // namespace
 
 RunwayTerrain::RunwayTerrain() = default;
-RunwayTerrain::~RunwayTerrain() = default;
+RunwayTerrain::~RunwayTerrain()
+{
+    Close();
+}
 
 void RunwayTerrain::Open(const std::filesystem::path& filename, const VECTOR3& origin)
 {
@@ -83,7 +93,8 @@ void RunwayTerrain::Open(const std::filesystem::path& filename, const VECTOR3& o
     double distance;
     oapiGlobalToEqu(earth_, origin, &longitude_, &latitude_, &distance);
     radius_ = oapiGetSize(earth_);
-    altitude_ = oapiSurfaceElevation(earth_, longitude_, latitude_);
+    elevationCache_ = InitTileCache(48);
+    altitude_ = oapiSurfaceElevationEx(earth_, longitude_, latitude_, 0, elevationCache_);
     const auto slat = std::sin(latitude_);
     const auto clat = std::cos(latitude_);
     const auto slng = std::sin(longitude_);
@@ -101,7 +112,9 @@ void RunwayTerrain::Close()
     wanted_.clear();
     pending_.clear();
     requested_ = {0, 0, 0};
-    switching_ = false;
+    roots_.clear();
+    if (elevationCache_) ReleaseTileCache(elevationCache_);
+    elevationCache_ = nullptr;
     earth_ = nullptr;
 }
 
@@ -114,54 +127,75 @@ void RunwayTerrain::RetainTiles(Scene& scene)
     }
 }
 
-bool RunwayTerrain::Update(const VECTOR3& position, Scene& scene)
+void RunwayTerrain::CollectVisible(const TileKey& key, std::set<TileKey>& selected) const
+{
+    const auto children = Children(key);
+    const auto ready = [this](const TileKey& child) { return tiles_.count(child) != 0; };
+    if (key.level == detailLevel || !wanted_.count(children.front()) ||
+        !std::all_of(children.begin(), children.end(), ready)) {
+        selected.insert(key);
+        return;
+    }
+    for (const auto& child : children) CollectVisible(child, selected);
+}
+
+TerrainUpdate RunwayTerrain::Update(const VECTOR3& position, Scene& scene)
 {
     double longitude, latitude, distance;
     oapiGlobalToEqu(earth_, position, &longitude, &latitude, &distance);
     const auto center = At(detailLevel, longitude, latitude);
-    if (center.level != requested_.level || center.row != requested_.row || center.column != requested_.column) {
+    TerrainUpdate result;
+    result.recentered = !(center == requested_);
+    if (result.recentered) {
         const auto root = At(coarseLevel, longitude, latitude);
+        roots_.clear();
         wanted_.clear();
-        for (int row = std::max(0, root.row - 1); row <= std::min(Rows(coarseLevel) - 1, root.row + 1); ++row)
-            for (int x = -1; x <= 1; ++x)
-                Select({coarseLevel, row, WrapColumn(coarseLevel, root.column + x)}, center, wanted_);
-
+        for (int row = std::max(0, root.row - 1); row <= std::min(Rows(coarseLevel) - 1, root.row + 1); ++row) {
+            for (int x = -1; x <= 1; ++x) {
+                roots_.push_back({coarseLevel, row, WrapColumn(coarseLevel, root.column + x)});
+                Select(roots_.back(), center, wanted_);
+            }
+        }
         RetainTiles(scene);
         pending_.clear();
         for (const auto& key : wanted_) {
             if (!tiles_.count(key)) pending_.push_back(key);
         }
         requested_ = center;
-        switching_ = true;
-        loaded_ = 0;
     }
 
-    if (!switching_) return false;
-    // The Orbiter elevation API belongs to the simulation thread. Stage tiles
-    // within a frame budget and keep the previous coverage until the new LODs are ready.
+    // Keep every requested parent available. A group of children replaces its
+    // parent when ready, even while other parts of the view are still loading.
     using Clock = std::chrono::steady_clock;
     const auto deadline = Clock::now() + std::chrono::milliseconds(5);
     while (!pending_.empty()) {
-        const auto key = pending_.back();
+        const auto key = pending_.front();
         TerrainMesh mesh;
         auto tile = BuildTile(key, mesh);
         scene.StageTile(key, mesh);
         tiles_.emplace(key, std::move(tile));
-        pending_.pop_back();
-        ++loaded_;
+        pending_.pop_front();
+        ++result.staged;
         if (!visible_.empty() && Clock::now() >= deadline) break;
     }
-    if (!pending_.empty()) return false;
 
-    visible_.swap(wanted_);
-    wanted_.clear();
-    RetainTiles(scene);
-    switching_ = false;
-    std::ostringstream message;
-    message << "Vulkan Earth tiles: center " << center.level << '/' << center.row << '/' << center.column
-            << ", " << visible_.size() << " visible, " << loaded_ << " loaded";
-    SceneLog(message.str());
-    return true;
+    const auto ready = [this](const TileKey& key) { return tiles_.count(key) != 0; };
+    if ((result.recentered || result.staged) && std::all_of(roots_.begin(), roots_.end(), ready)) {
+        std::set<TileKey> selected;
+        for (const auto& root : roots_) CollectVisible(root, selected);
+        result.switched = selected != visible_;
+        if (result.switched) {
+            visible_.swap(selected);
+            RetainTiles(scene);
+        }
+    }
+    if (result.recentered) {
+        std::ostringstream message;
+        message << "Vulkan Earth tiles: center " << center.level << '/' << center.row << '/' << center.column
+                << ", " << visible_.size() << " visible, " << pending_.size() << " waiting";
+        SceneLog(message.str());
+    }
+    return result;
 }
 
 RunwayTerrain::Tile RunwayTerrain::BuildTile(const TileKey& key, TerrainMesh& mesh)
@@ -179,6 +213,7 @@ RunwayTerrain::Tile RunwayTerrain::BuildTile(const TileKey& key, TerrainMesh& me
     mesh.texture = std::move(texture.image);
     const auto steps = tile.divisions;
     const auto stride = steps + 1;
+    const int elevationLevel = key.level == detailLevel ? 0 : key.level + 3;
     tile.heights.reserve(stride * stride);
 
     for (int row = 0; row <= steps; ++row) {
@@ -188,7 +223,8 @@ RunwayTerrain::Tile RunwayTerrain::BuildTile(const TileKey& key, TerrainMesh& me
             const auto u = double(column) / steps;
             const auto x = tile.x + u * tile.width;
             const auto lng = std::remainder(longitude_ + left + u * angle, 2 * pi);
-            const auto elevation = oapiSurfaceElevation(earth_, lng, top - v * angle);
+            const auto elevation = oapiSurfaceElevationEx(earth_, lng, top - v * angle,
+                elevationLevel, elevationCache_);
             const auto y = elevation - altitude_ - (x*x + z*z) / (2 * radius_);
             tile.heights.push_back(y);
             mesh.vertices.push_back({{float(x), float(y), float(z)}, {0, 1, 0},

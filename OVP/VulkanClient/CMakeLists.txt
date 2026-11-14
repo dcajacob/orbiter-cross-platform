@@ -27,7 +27,7 @@ add_custom_command(OUTPUT "${shader_header}"
             -P "${CMAKE_CURRENT_SOURCE_DIR}/EmbedShaders.cmake"
     DEPENDS "${shader_dir}/Ship.vert.spv" "${shader_dir}/Ship.frag.spv" EmbedShaders.cmake
     VERBATIM)
-add_library(VulkanClient MODULE VulkanScene.cpp OrbiterScene.cpp RunwayTerrain.cpp "${shader_header}")
+add_library(VulkanClient MODULE VulkanScene.cpp OrbiterScene.cpp RunwayTerrain.cpp VesselPose.cpp "${shader_header}")
 target_compile_features(VulkanClient PRIVATE cxx_std_17)
 target_include_directories(VulkanClient PRIVATE "${CMAKE_CURRENT_BINARY_DIR}")
 target_link_libraries(VulkanClient PRIVATE SDL3::SDL3)

@@ -2,10 +2,12 @@
 #pragma once
 
 #include "RunwayTerrain.h"
+#include "VesselPose.h"
 
 #include <map>
 #include <memory>
 #include <optional>
+#include <fstream>
 
 namespace orbiter::vulkan {
 
@@ -34,10 +36,12 @@ private:
     SceneFrame ShipFrame() const;
     Scene scene_;
     RunwayTerrain terrain_;
-    std::vector<Vertex> shipVertices_;
+    VesselPose pose_;
     std::vector<Vertex> shadowVertices_;
     std::optional<double> shadowTime_;
     bool loggedLiftoff_ = false;
+    std::ofstream frameTrace_;
+    Uint64 previousFrame_ = 0;
     OBJHANDLE focus_ = nullptr;
     VECTOR3 offset_{};
     std::map<SURFHANDLE, std::unique_ptr<TextureData>> surfaces_;
