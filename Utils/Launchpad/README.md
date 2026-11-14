@@ -4,6 +4,10 @@ Browse the simulator's scenario folders, search by name, read scenario
 descriptions, and launch the selected flight. The launcher restores the
 selection when the simulator exits.
 
+The original Orbiter banner and stock scenario help images are bundled in
+the launcher. Screenshots appear in the description pane when the selected
+scenario has them. A profile can also supply its own scenario help directory.
+
 ## Build
 
 Install Qt 6.4 or later with Qt Widgets, a C++17 compiler, and CMake. Build from

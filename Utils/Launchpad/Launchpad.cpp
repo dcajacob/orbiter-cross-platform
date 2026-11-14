@@ -9,35 +9,164 @@
 #include <QFileDialog>
 #include <QFileInfo>
 #include <QHBoxLayout>
+#include <QImageReader>
 #include <QLabel>
 #include <QLineEdit>
 #include <QMap>
 #include <QMenu>
+#include <QPixmap>
 #include <QPushButton>
+#include <QScrollBar>
 #include <QSettings>
 #include <QShortcut>
 #include <QSplitter>
 #include <QStyle>
 #include <QTextBrowser>
+#include <QTextBlock>
+#include <QTextCursor>
+#include <QTextImageFormat>
 #include <QTreeWidget>
 #include <QTreeWidgetItemIterator>
 #include <QUrl>
 #include <QVBoxLayout>
 
+#include <algorithm>
 #include <exception>
+
+namespace {
+const QString bundledHelp = QStringLiteral(":/launchpad/scenarios");
+
+struct ScenarioDescription {
+    QString html;
+    QUrl base;
+    QString imageRoot;
+};
+
+QString fileUnder(const QString &root, const QString &path)
+{
+    if (root.isEmpty())
+        return {};
+    const QFileInfo file(path);
+    const auto canonical = file.canonicalFilePath();
+    return canonical.startsWith(root + '/') && file.isFile() ? canonical : QString();
+}
+}
+
+class ScenarioBrowser final : public QTextBrowser {
+public:
+    void showDescription(const ScenarioDescription &content, const QString &fallback)
+    {
+        imageRoot = content.imageRoot;
+        document()->setBaseUrl(content.base);
+        if (content.html.isEmpty())
+            setPlainText(fallback);
+        else
+            setHtml(content.html);
+        fitImages();
+        verticalScrollBar()->setValue(0);
+        horizontalScrollBar()->setValue(0);
+    }
+
+protected:
+    QVariant loadResource(int type, const QUrl &name) override
+    {
+        if (type != QTextDocument::ImageResource)
+            return {};
+        const auto url = document()->baseUrl().resolved(name);
+        QString path;
+        if (imageRoot == bundledHelp && url.scheme() == "qrc" && url.authority().isEmpty()) {
+            const auto resource = QDir::cleanPath(':' + url.path());
+            if (resource.startsWith(bundledHelp + '/'))
+                path = resource;
+        } else if (!imageRoot.isEmpty() && url.isLocalFile() && url.host().isEmpty()) {
+            path = fileUnder(imageRoot, url.toLocalFile());
+        }
+        if (!path.isEmpty()) {
+            QImageReader reader(path);
+            const auto format = reader.format();
+            const auto size = reader.size();
+            if ((format == "jpeg" || format == "png" || format == "gif")
+                && size.isValid() && size.width() <= 4096 && size.height() <= 4096) {
+                const auto image = reader.read();
+                if (!image.isNull())
+                    return image;
+            }
+        }
+        // A valid transparent image also prevents Qt's fallback image loader
+        // from opening a URL that this browser declined.
+        QImage transparent(1, 1, QImage::Format_ARGB32_Premultiplied);
+        transparent.fill(Qt::transparent);
+        return transparent;
+    }
+
+    void resizeEvent(QResizeEvent *event) override
+    {
+        QTextBrowser::resizeEvent(event);
+        fitImages();
+    }
+
+private:
+    void fitImages()
+    {
+        const auto available = viewport()->width() - 2 * document()->documentMargin();
+        if (available <= 0)
+            return;
+        QList<QPair<int, QTextImageFormat>> changes;
+        for (auto block = document()->begin(); block.isValid(); block = block.next()) {
+            for (auto it = block.begin(); !it.atEnd(); ++it) {
+                const auto fragment = it.fragment();
+                if (!fragment.charFormat().isImageFormat())
+                    continue;
+                auto image = fragment.charFormat().toImageFormat();
+                const auto resource = document()->resource(QTextDocument::ImageResource, QUrl(image.name())).value<QImage>();
+                if (resource.isNull())
+                    continue;
+                const auto preferred = image.doubleProperty(QTextFormat::UserProperty);
+                const auto naturalWidth = preferred > 0 ? preferred : resource.width();
+                const auto width = std::min<qreal>(naturalWidth, available);
+                const auto height = width * resource.height() / resource.width();
+                if (image.width() == width && image.height() == height)
+                    continue;
+                image.setProperty(QTextFormat::UserProperty, naturalWidth);
+                image.setWidth(width);
+                image.setHeight(height);
+                changes.append({fragment.position(), image});
+            }
+        }
+        for (const auto &[position, format] : changes) {
+            QTextCursor cursor(document());
+            cursor.setPosition(position);
+            cursor.movePosition(QTextCursor::NextCharacter, QTextCursor::KeepAnchor);
+            cursor.setCharFormat(format);
+        }
+    }
+
+    QString imageRoot;
+};
 
 namespace {
 constexpr int DescriptionRole = Qt::UserRole;
 constexpr int ScenarioRole = Qt::UserRole + 1;
 constexpr int StockRole = Qt::UserRole + 2;
 
-// Scenario descriptions may refer to arbitrary resources. Use the original text
-// and formatting without fetching external pages, style sheets, or images.
-class ScenarioBrowser : public QTextBrowser {
-    QVariant loadResource(int, const QUrl &) override { return {}; }
-};
+ScenarioDescription helpDescription(const QString &relative, const QString &helpRoot)
+{
+    const auto root = QFileInfo(helpRoot).canonicalFilePath();
+    const auto local = fileUnder(root, QDir(root).filePath(relative));
+    QFile page(local);
+    if (!local.isEmpty() && page.open(QIODevice::ReadOnly))
+        return {QString::fromUtf8(page.read(256 * 1024)), QUrl::fromLocalFile(local), root};
 
-QString readDescription(const QString &path, const QString &helpRoot, bool folder)
+    const auto resource = QDir::cleanPath(bundledHelp + '/' + relative);
+    if (!resource.startsWith(bundledHelp + '/'))
+        return {};
+    page.setFileName(resource);
+    if (page.open(QIODevice::ReadOnly))
+        return {QString::fromUtf8(page.read(256 * 1024)), QUrl("qrc" + resource), bundledHelp};
+    return {};
+}
+
+ScenarioDescription readDescription(const QString &path, const QString &helpRoot, bool folder)
 {
     QFile file(path);
     if (!file.open(QIODevice::ReadOnly))
@@ -56,29 +185,21 @@ QString readDescription(const QString &path, const QString &helpRoot, bool folde
         } else if (token == "END_" + kind) {
             const auto content = body.join('\n').trimmed();
             if (kind == "HYPERDESC")
-                return content;
+                return {content, QUrl::fromLocalFile(QFileInfo(path).absoluteFilePath()), {}};
             if (kind == "DESC")
-                return "<p>" + content.toHtmlEscaped().replace('\n', "<br>") + "</p>";
+                return {"<p>" + content.toHtmlEscaped().replace('\n', "<br>") + "</p>", {}, {}};
 
-            auto parts = content.split(',');
-            if (parts.size() != 2 || helpRoot.isEmpty())
+            const auto parts = content.split(',');
+            if (parts.size() != 2)
                 break;
-            auto book = parts[0].trimmed().replace('\\', '/');
-            const QDir base(helpRoot);
-            const auto help = QFileInfo(base.filePath(book + '/' + parts[1].trimmed() + ".htm")).canonicalFilePath();
-            const auto root = QFileInfo(helpRoot).canonicalFilePath();
-            if (root.isEmpty() || !help.startsWith(root + '/'))
-                break;
-            QFile page(help);
-            if (page.open(QIODevice::ReadOnly))
-                return QString::fromUtf8(page.read(256 * 1024));
-            break;
+            const auto book = parts[0].trimmed().replace('\\', '/');
+            return helpDescription(book + '/' + parts[1].trimmed() + ".htm", helpRoot);
         } else {
             body.append(line);
         }
     }
     if (kind.isEmpty() && folder)
-        return "<p>" + source.toHtmlEscaped().replace('\n', "<br>") + "</p>";
+        return {"<p>" + source.toHtmlEscaped().replace('\n', "<br>") + "</p>", {}, {}};
     return {};
 }
 
@@ -109,6 +230,10 @@ Launchpad::Launchpad(const QString &profilePath)
     auto *header = new QHBoxLayout;
     auto *heading = new QLabel(tr("Orbiter Launchpad"));
     heading->setObjectName("heading");
+    heading->setAccessibleName(tr("Orbiter Space Flight Simulator"));
+    const QPixmap banner(":/launchpad/banner.bmp");
+    if (!banner.isNull())
+        heading->setPixmap(banner);
     header->addWidget(heading);
     header->addStretch();
     auto *setup = new QPushButton(tr("Setup"));
@@ -387,12 +512,9 @@ void Launchpad::showSelection()
     title->setText(item ? item->text(0) : tr("Select a scenario"));
     location->setText(path.isEmpty() ? QString() : QFileInfo(path).dir().dirName());
     location->setVisible(!path.isEmpty());
-    const auto text = item ? readDescription(item->data(0, DescriptionRole).toString(), profile.helpRoot, path.isEmpty())
-                           : QString();
-    if (!text.isEmpty())
-        description->setHtml(text);
-    else
-        description->setPlainText(path.isEmpty() ? QString() : tr("No description available."));
+    const auto content = item ? readDescription(item->data(0, DescriptionRole).toString(), profile.helpRoot, path.isEmpty())
+                              : ScenarioDescription();
+    description->showDescription(content, path.isEmpty() ? QString() : tr("No description available."));
     launch->setEnabled(!path.isEmpty() && profile.validationError().isEmpty()
                        && simulator.state() == QProcess::NotRunning);
     copy->setEnabled(profile.native && item && item->data(0, StockRole).toBool()

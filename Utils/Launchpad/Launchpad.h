@@ -9,7 +9,7 @@ class QCheckBox;
 class QLabel;
 class QLineEdit;
 class QPushButton;
-class QTextBrowser;
+class ScenarioBrowser;
 class QTreeWidget;
 class QTreeWidgetItem;
 
@@ -34,7 +34,7 @@ private:
     SimulatorProfile profile;
     QProcess simulator;
     QTreeWidget *scenarios;
-    QTextBrowser *description;
+    ScenarioBrowser *description;
     QLineEdit *search;
     QCheckBox *paused;
     QPushButton *launch;
