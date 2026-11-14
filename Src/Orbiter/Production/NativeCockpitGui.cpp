@@ -353,6 +353,7 @@ void SetCockpitReplayClock(float seconds) {
 }
 void DestroyCockpitGui() {
     focusDialog.reset();
+    DestroyCockpitScenarioEditor();
     DestroyCockpitInfoBars();
     moduleDialogs.clear();
     notifications.clear();
@@ -454,7 +455,7 @@ void ObserveCockpitGui(unsigned tick) {
 bool CockpitGuiCapturesKeyboard() {
     if (!ImGui::GetCurrentContext()) return false;
     const auto& io = ImGui::GetIO();
-    return (selection && selection->IsActive()) || (inputBox && inputBox->IsActive()) ||
+    return CockpitScenarioEditorActive() || (selection && selection->IsActive()) || (inputBox && inputBox->IsActive()) ||
         (io.WantCaptureKeyboard && (GetNativeRenderContext().configuration->CfgUIPrm.MouseFocusMode == 0 || io.WantCaptureMouse));
 }
 bool CockpitGuiCapturesMouse() {

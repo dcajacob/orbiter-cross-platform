@@ -76,6 +76,20 @@ leaves docked and attached vessels and orbits defined by orbital elements in
 place. Recorded flights are excluded because playback supplies their starting
 state.
 
+### Edit a paused Linux flight
+
+Press **F7** in the simulator to open the scenario editor. If time is
+running, click **Pause to edit**. Enter a name and choose **Shuttle PB** or
+**Delta-glider** to add it near the focused vessel.
+
+Select a vessel and click **Move vessel** after entering its new coordinates.
+In orbit, enter position in meters relative to the displayed body, using
+Orbiter's ecliptic axes. On the ground, enter longitude, latitude and heading
+in degrees. **Remove vessel** asks for confirmation. Use a standalone vessel
+and switch focus to another vessel before removing the focused one.
+
+Close the editor, press **Ctrl+S** to quicksave, and press **F5** to reload.
+
 ## Windows
 
 Place the launcher next to an installed `Orbiter.exe`, or choose it through

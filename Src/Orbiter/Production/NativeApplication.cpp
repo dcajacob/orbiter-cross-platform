@@ -658,6 +658,12 @@ struct Runtime final:BodyServices,RigidBodyServices,SurfaceServices,NavigationSe
 #endif
 #ifdef ORBITER_NATIVE_COCKPIT
                 if(HandleCockpitMenuKey(keymap,code,eventKeys.data()))continue;
+#ifdef __linux__
+                if(code==OAPI_KEY_F7 && !KEYMOD_SHIFT(eventKeys.data()) &&
+                    !KEYMOD_CONTROL(eventKeys.data()) && !KEYMOD_ALT(eventKeys.data())) {
+                    OpenCockpitScenarioEditor();continue;
+                }
+#endif
                 if(keymap.IsLogicalKey(code,eventKeys.data(),OAPI_LKEY_TogglePlanetarium)) {settings.CfgVisHelpPrm.flagPlanetarium^=PLN_ENABLE;continue;}
                 if(keymap.IsLogicalKey(code,eventKeys.data(),OAPI_LKEY_ToggleLabels)) {settings.CfgVisHelpPrm.flagMarkers^=MKR_ENABLE;continue;}
                 if(keymap.IsLogicalKey(code,eventKeys.data(),OAPI_LKEY_ToggleCamInternal)) {
@@ -1459,6 +1465,9 @@ int main(int argc,char** argv) {
             std::cout<<"Production "<<application.render.focus->GetModuleInterface()->GetClassName()<<" flight. Space/Ctrl-P: pause. T/R: warp. Ctrl-S: save. F5: reload. "
 #ifdef ORBITER_NATIVE_COCKPIT
                 <<"F6: options. F8: cockpit. "
+#ifdef __linux__
+                <<"F7: scenario editor. "
+#endif
 #else
                 <<"F6: step. "
 #endif
@@ -1500,8 +1509,16 @@ int main(int argc,char** argv) {
                 if(application.reloadPending) {if(!std::filesystem::is_regular_file(save)){std::cerr<<"No saved scenario exists: "<<save<<'\n';application.reloadPending=false;}else{scenario=save;reload=true;break;}}
                 if(input.width>0 && input.height>0) {
 #ifdef ORBITER_NATIVE_COCKPIT
+                    application.render.paused=!application.running;
+                    application.render.recordingFlight=application.recording;
+                    application.render.playingFlight=application.playback;
                     application.render.graphics->NewGuiFrame();
                     BeginCockpitGuiFrame();
+                    if(application.render.scenarioEditorRemoval) {
+                        application.render.scenarioEditorRemoval=false;
+                        if(!application.DeletePendingVessels())application.NoVessels();
+                        application.UpdateCamera();
+                    }
 #endif
                     application.render.paused=!application.running;application.render.graphics->Status(application.Status());application.render.graphics->Render();
 #ifdef ORBITER_NATIVE_COCKPIT
