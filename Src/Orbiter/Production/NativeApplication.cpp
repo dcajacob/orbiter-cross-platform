@@ -713,7 +713,8 @@ struct Runtime final:BodyServices,RigidBodyServices,SurfaceServices,NavigationSe
         for(unsigned char key:input.keys)inputTrace<<hex[key>>4]<<hex[key&15];
         inputTrace<<','<<input.x<<','<<input.y<<','<<input.rz<<','<<input.alternate<<','<<input.throttle<<'\n';
     }
-    Runtime(Resources& data):resources(data),config(data.config),celestial(config,data.data,data.modules),world(*this) {}
+    bool vulkanView = false;
+    Runtime(Resources& data,bool useVulkan):resources(data),config(data.config),celestial(config,data.data,data.modules),world(*this),vulkanView(useVulkan) {}
     void Finish() {
         if(finished)return;
 #ifdef ORBITER_NATIVE_COCKPIT
@@ -860,7 +861,8 @@ struct Runtime final:BodyServices,RigidBodyServices,SurfaceServices,NavigationSe
         }
 #endif
         render.lifetime=this;BindVesselObserver(VesselEvent,this);
-        graphicsModule=std::make_unique<NativeModule>(resources.modules.Resolve("Graphics/OGLClient.so"),ORBITER_NATIVE_GRAPHICS,&render);
+        const char* graphicsPath = vulkanView ? "Graphics/VulkanClient.so" : "Graphics/OGLClient.so";
+        graphicsModule=std::make_unique<NativeModule>(resources.modules.Resolve(graphicsPath),ORBITER_NATIVE_GRAPHICS,&render);
         render.graphics=static_cast<NativeGraphics*>(graphicsModule->Instance());render.graphics->Open();
         UInt32 viewportWidth=0,viewportHeight=0;
         render.graphics->clbkGetViewportSize(&viewportWidth,&viewportHeight);
@@ -930,6 +932,8 @@ struct Runtime final:BodyServices,RigidBodyServices,SurfaceServices,NavigationSe
         if(!focus)focus=system->GetVessel(oapi::UInt32(0));
         SetFocus(focus);
         render.camera->ResizeViewport(int(viewportWidth),int(viewportHeight));render.camera->InitState(scenario.string().c_str(),focus);
+        if(vulkanView && !render.camera->IsExternal())
+            throw std::runtime_error("The Runway 33 Vulkan client requires an external camera");
 #ifndef ORBITER_NATIVE_COCKPIT
         if(!render.camera->IsExternal())unsupported("cockpits yet; select an external camera");
 #endif
@@ -1335,7 +1339,7 @@ int main(int argc,char** argv) {
         std::map<std::string,std::string> arguments;
         for(int i=1;i<argc;++i) {
             std::string name=argv[i];
-            if(name=="--help") {std::cout<<"orbiter-production --assets PATH --data PATH --modules PATH --planets PATH --config PATH --scenario PATH [--keymap PATH --save PATH --replay PATH --evidence PATH --fixed-step S --ticks N --render-every N --frames N --sessions N --frame-delay-ms N --fixed-ui-clock --run]\n";return 0;}
+            if(name=="--help") {std::cout<<"orbiter-production --assets PATH --data PATH --modules PATH --planets PATH --config PATH --scenario PATH [--graphics opengl|vulkan --keymap PATH --save PATH --replay PATH --evidence PATH --fixed-step S --ticks N --render-every N --frames N --sessions N --frame-delay-ms N --fixed-ui-clock --run]\n";return 0;}
             if(name.rfind("--",0)!=0 || arguments.count(name))throw std::runtime_error("Invalid or duplicate argument: "+name);
             if(name=="--run" || name=="--fixed-ui-clock"){arguments[name]="1";continue;}
             if(i+1==argc || std::string(argv[i+1]).rfind("--",0)==0)throw std::runtime_error("Argument value missing: "+name);
@@ -1343,6 +1347,7 @@ int main(int argc,char** argv) {
         }
         std::vector<std::string> allowed={"--assets","--data","--modules","--planets","--config","--scenario","--evidence","--frames","--fixed-step","--run","--capture-time","--keymap","--save","--replay","--ticks","--render-every","--sessions","--joystick-throttle-axis","--joystick-twist-axis","--frame-delay-ms","--fixed-ui-clock"};
         allowed.push_back("--fixed-system-step");
+        allowed.push_back("--graphics");
         for(const auto& entry:arguments)if(std::find(allowed.begin(),allowed.end(),entry.first)==allowed.end())throw std::runtime_error("Unknown argument: "+entry.first);
         for(const char* name:{"--assets","--data","--modules","--planets","--config","--scenario"})if(!arguments.count(name))throw std::runtime_error(std::string("Required argument missing: ")+name);
         const auto absolute=[&](const char* name){return std::filesystem::absolute(arguments.at(name));};
@@ -1366,6 +1371,10 @@ int main(int argc,char** argv) {
         }
         const double capture=arguments.count("--capture-time")?FlightNumber(arguments.at("--capture-time")):-1;
         if(fixed<=0 || (arguments.count("--capture-time") && capture<0) || !renderEvery || !sessions || (ticks && frames))throw std::runtime_error("Invalid frame/step/capture/session limits");
+        const auto graphics = arguments.count("--graphics") ? arguments.at("--graphics") : "opengl";
+        if(graphics!="opengl" && graphics!="vulkan")
+            throw std::runtime_error("Unknown graphics client: "+graphics);
+        const bool vulkanView = graphics == "vulkan";
         std::srand(0);SeedRandom(0);
 #ifdef ORBITER_NATIVE_COCKPIT
         // Original full-client captures include particle draws before world startup.
@@ -1382,7 +1391,7 @@ int main(int argc,char** argv) {
         else {const char* data=std::getenv("XDG_DATA_HOME");const char* home=std::getenv("HOME");if(data && *data)save=std::filesystem::path(data)/"orbiter/Scenarios/Quicksave.scn";else if(home)save=std::filesystem::path(home)/".local/share/orbiter/Scenarios/Quicksave.scn";else throw std::runtime_error("Provide --save or a user data directory");}
         unsigned launches=0;bool startRunning=arguments.count("--run")!=0;
         for(int session=0;session<sessions;++session) {
-            Runtime application(resources);
+            Runtime application(resources,vulkanView);
             ++launches;
             const auto output=evidence.empty() || (sessions==1 && launches==1)?evidence:evidence/("session-"+std::to_string(launches));
 #ifdef ORBITER_NATIVE_COCKPIT
@@ -1446,13 +1455,17 @@ int main(int argc,char** argv) {
                 if(application.reloadPending) {if(!std::filesystem::is_regular_file(save)){std::cerr<<"No saved scenario exists: "<<save<<'\n';application.reloadPending=false;}else{scenario=save;reload=true;break;}}
                 if(input.width>0 && input.height>0) {
 #ifdef ORBITER_NATIVE_COCKPIT
-                    application.render.graphics->NewGuiFrame();
-                    BeginCockpitGuiFrame();
+                    if(!vulkanView) {
+                        application.render.graphics->NewGuiFrame();
+                        BeginCockpitGuiFrame();
+                    }
 #endif
                     application.render.paused=!application.running;application.render.graphics->Status(application.Status());application.render.graphics->Render();
 #ifdef ORBITER_NATIVE_COCKPIT
-                    application.cockpit->Draw();
-                    application.render.graphics->RenderGui();
+                    if(!vulkanView) {
+                        application.cockpit->Draw();
+                        application.render.graphics->RenderGui();
+                    }
 #endif
                     if(!application.render.graphics->Present())throw std::runtime_error("Native frame presentation failed");++presented;
                 } else std::this_thread::sleep_for(std::chrono::milliseconds(10));

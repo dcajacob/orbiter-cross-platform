@@ -1,0 +1,6 @@
+file(WRITE "${OUTPUT}" "#pragma once\n#include <cstdint>\n")
+foreach(stage vert frag)
+    file(READ "${SHADER_DIR}/Ship.${stage}.spv" contents HEX)
+    string(REGEX REPLACE "(..)" "0x\\1," contents "${contents}")
+    file(APPEND "${OUTPUT}" "inline constexpr std::uint8_t Ship_${stage}[] = {${contents}};\n")
+endforeach()
