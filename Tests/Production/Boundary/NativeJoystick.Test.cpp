@@ -16,6 +16,17 @@ int main() {
         require(NativeJoystickAxis(std::numeric_limits<float>::quiet_NaN(),0)==0,"Invalid device data must not reach flight controls");
         require(NativeThrottleAxis(1,-2)==2 && NativeThrottleAxis(2,-2)==6 && NativeThrottleAxis(3,-2)==7,"Legacy throttle selections changed");
         require(NativeThrottleAxis(0,-2)==-1 && NativeThrottleAxis(1,3)==3,"Keyboard-only or explicit raw axis assignment changed");
+        constexpr std::string_view velocityOnePc = "03000000f51000005570000011010000";
+        unsigned char buttons[7] = {};
+        buttons[2] = 1;
+        require(NativeJoystickAlternate(buttons, 7, ""), "Other sticks must retain button 3");
+        require(!NativeJoystickAlternate(buttons, 7, velocityOnePc), "VelocityOne PC mode must not use button 3");
+        buttons[6] = 1;
+        require(NativeJoystickAlternate(buttons, 7, velocityOnePc), "VelocityOne PC X must use button 7");
+        require(!NativeJoystickAlternate(buttons, 6, velocityOnePc), "Truncated button list must not activate yaw");
+        require(!NativeJoystickAlternate(nullptr, 0, velocityOnePc), "Disconnected stick must not activate yaw");
+        buttons[6] = 0;
+        require(!NativeJoystickAlternate(buttons, 7, velocityOnePc), "Releasing X must restore roll");
         NativeJoystickState state;
         float axes[]={.5f,-.5f,0,0};
         auto poll=[&](int device=0,int throttle=3,bool ignore=true,int saturation=9500,bool invert=false) {

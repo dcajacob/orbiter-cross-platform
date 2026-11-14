@@ -3,6 +3,7 @@
 #include "FlightInput.h"
 #include <algorithm>
 #include <cmath>
+#include <string_view>
 
 namespace orbiter::production {
 // -2 selects the conventional Z/slider positions from Orbiter.cfg. Explicit
@@ -10,6 +11,15 @@ namespace orbiter::production {
 inline int NativeThrottleAxis(unsigned setting,int overrideAxis) {
     if(overrideAxis!=-2)return overrideAxis;
     return setting==1 ? 2 : setting==2 ? 6 : setting==3 ? 7 : -1;
+}
+
+inline bool NativeJoystickAlternate(const unsigned char* buttons, int count, std::string_view guid) {
+    // The VelocityOne Flightstick in PC mode reports its base X button as
+    // GLFW button 7. Match the Linux USB GUID through the product ID so a
+    // firmware revision does not change the binding.
+    constexpr std::string_view velocityOnePc = "03000000f510000055700000";
+    const int button = guid.substr(0, velocityOnePc.size()) == velocityOnePc ? 6 : 2;
+    return buttons && count > button && buttons[button] != 0;
 }
 
 inline int NativeJoystickAxis(float value,int deadzone) {
