@@ -50,6 +50,21 @@ which appears under **Saved scenarios** after you close the simulator.
 **Start paused** is selected by default. Press **Space** to start time or
 **Escape** to close the session.
 
+### Copy and edit a scenario
+
+Select a stock scenario and click **Copy and edit…**. Give the copy a name,
+set its start date in UTC, and optionally move one vessel. Landed vessels take
+longitude, latitude and heading. Orbiting vessels with Cartesian state take
+position and velocity in Orbiter's ecliptic axes relative to the current
+reference body.
+
+The copy is selected under **Saved scenarios**. Click **Launch Orbiter** to
+fly it, press **Ctrl+S** to quicksave, and press **F5** to reload the quicksave.
+The editor preserves the stock file, vessel class and module settings. It
+leaves docked and attached vessels and orbits defined by orbital elements in
+place. Recorded flights are excluded because playback supplies their starting
+state.
+
 ## Windows
 
 Place the launcher next to an installed `Orbiter.exe`, or choose it through

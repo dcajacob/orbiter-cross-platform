@@ -27,6 +27,7 @@ private:
     void addScenarios(const QString &root, QTreeWidgetItem *savedFolder = nullptr);
     void filterScenarios();
     void showSelection();
+    void copyScenario();
     void launchScenario();
     void showWindow();
 
@@ -37,6 +38,7 @@ private:
     QLineEdit *search;
     QCheckBox *paused;
     QPushButton *launch;
+    QPushButton *copy;
     QPushButton *openLog;
     QLabel *title;
     QLabel *location;

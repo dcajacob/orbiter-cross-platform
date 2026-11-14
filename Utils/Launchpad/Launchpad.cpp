@@ -1,4 +1,5 @@
 #include "Launchpad.h"
+#include "ScenarioEditor.h"
 
 #include <QCheckBox>
 #include <QCloseEvent>
@@ -28,6 +29,7 @@
 namespace {
 constexpr int DescriptionRole = Qt::UserRole;
 constexpr int ScenarioRole = Qt::UserRole + 1;
+constexpr int StockRole = Qt::UserRole + 2;
 
 // Scenario descriptions may refer to arbitrary resources. Use the original text
 // and formatting without fetching external pages, style sheets, or images.
@@ -208,10 +210,14 @@ Launchpad::Launchpad(const QString &profilePath)
     launch = new QPushButton(tr("Launch Orbiter"));
     launch->setObjectName("launchButton");
     launch->setEnabled(false);
+    copy = new QPushButton(tr("Copy and edit…"));
+    copy->setObjectName("copyScenarioButton");
+    copy->setEnabled(false);
     footer->addWidget(status, 1);
     footer->addWidget(openLog);
     footer->addWidget(paused);
     footer->addSpacing(6);
+    footer->addWidget(copy);
     footer->addWidget(launch);
     outer->addLayout(footer);
 
@@ -227,6 +233,7 @@ Launchpad::Launchpad(const QString &profilePath)
             launchScenario();
     });
     connect(launch, &QPushButton::clicked, this, &Launchpad::launchScenario);
+    connect(copy, &QPushButton::clicked, this, &Launchpad::copyScenario);
     connect(openLog, &QPushButton::clicked, this, [this] {
         if (!QDesktopServices::openUrl(QUrl::fromLocalFile(launchLog)))
             status->setText(tr("Log file: %1").arg(launchLog));
@@ -290,6 +297,7 @@ void Launchpad::useProfile(SimulatorProfile selected)
     launchLog.clear();
     openLog->hide();
     paused->setVisible(profile.native);
+    copy->setVisible(profile.native);
     search->clear();
     refreshScenarios(QSettings().value("simulator/lastScenario").toString());
     const auto error = profile.validationError();
@@ -357,6 +365,7 @@ void Launchpad::addScenarios(const QString &root, QTreeWidgetItem *savedFolder)
         auto *item = new QTreeWidgetItem(parent, {file.completeBaseName()});
         item->setIcon(0, fileIcon);
         item->setData(0, ScenarioRole, file.absoluteFilePath());
+        item->setData(0, StockRole, !savedFolder);
         item->setData(0, DescriptionRole, file.absoluteFilePath());
     }
 }
@@ -386,6 +395,26 @@ void Launchpad::showSelection()
         description->setPlainText(path.isEmpty() ? QString() : tr("No description available."));
     launch->setEnabled(!path.isEmpty() && profile.validationError().isEmpty()
                        && simulator.state() == QProcess::NotRunning);
+    copy->setEnabled(profile.native && item && item->data(0, StockRole).toBool()
+                     && simulator.state() == QProcess::NotRunning);
+}
+
+void Launchpad::copyScenario()
+{
+    const auto *item = scenarios->currentItem();
+    if (!copy->isEnabled() || !item)
+        return;
+    try {
+        const auto path = copyStockScenario(this, item->data(0, ScenarioRole).toString(),
+                                            profile.scenarioRoot, profile.saveRoot);
+        if (path.isEmpty())
+            return;
+        search->clear();
+        refreshScenarios(path);
+        status->setText(tr("Created %1.").arg(QFileInfo(path).fileName()));
+    } catch (const std::exception &error) {
+        status->setText(QString::fromUtf8(error.what()));
+    }
 }
 
 void Launchpad::launchScenario()
