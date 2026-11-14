@@ -1,5 +1,8 @@
 #include "Launchpad.h"
 #include "ScenarioEditor.h"
+#ifdef Q_OS_LINUX
+#include "JoystickSetup.h"
+#endif
 
 #include <QCheckBox>
 #include <QCloseEvent>
@@ -243,6 +246,13 @@ Launchpad::Launchpad(const QString &profilePath)
         if (!path.isEmpty())
             loadProfile(path);
     });
+#ifdef Q_OS_LINUX
+    auto *joystick = setupMenu->addAction(tr("Joystick setup…"), this, &Launchpad::openJoystickSetup);
+    connect(setupMenu, &QMenu::aboutToShow, this, [this, joystick] {
+        joystick->setEnabled(profile.native && QFileInfo(profile.config).isFile()
+                             && simulator.state() == QProcess::NotRunning);
+    });
+#endif
 #ifdef Q_OS_WIN
     setupMenu->addAction(tr("Choose Orbiter.exe…"), this, [this] {
         const auto path = QFileDialog::getOpenFileName(this, tr("Choose Orbiter executable"), {},
@@ -402,6 +412,14 @@ Launchpad::Launchpad(const QString &profilePath)
 #else
     else
         useProfile({});
+#endif
+}
+
+void Launchpad::openJoystickSetup()
+{
+#ifdef Q_OS_LINUX
+    if (profile.native && QFileInfo(profile.config).isFile() && simulator.state() == QProcess::NotRunning)
+        showJoystickSetup(this, profile.config, profile.keymap);
 #endif
 }
 

@@ -18,6 +18,11 @@ cmake -S Utils/Launchpad -B out/qt-launchpad -DCMAKE_BUILD_TYPE=Release
 cmake --build out/qt-launchpad --config Release
 ```
 
+On Linux, the joystick setup tool uses the same pinned GLFW as the simulator.
+Install the Wayland and X11 development dependencies used by GLFW. For an
+offline build, set `-DORBITER_GLFW_ARCHIVE=/path/to/glfw.tar.gz` to the
+verified renderer dependency archive.
+
 For a Qt installation outside the system search path, pass
 `-DCMAKE_PREFIX_PATH=/path/to/Qt/6.x/platform` at configure time. Use the
 native Qt kit for the target architecture. When distributing the launcher,
@@ -60,6 +65,49 @@ per-user application data directory. **Ctrl+S** saves to `Quicksave.scn`,
 which appears under **Saved scenarios** after you close the simulator.
 **Start paused** is selected by default. Press **Space** to start time or
 **Escape** to close the session.
+
+### Joystick setup
+
+Open **Setup → Joystick setup…** and choose the connected controller. The
+**Axes** and **Buttons** tabs show the same raw input numbering as the
+simulator. Use **Detect…** and move the indicated control, or choose its
+number manually. For throttle detection, start at idle and move toward
+full power. **Reverse** lets you correct any axis direction.
+
+The live hat indicator shows the direction even on the Axes tab. On the
+**Buttons** tab, press a button or move a hat to bring its row into view.
+Click the row's **Shortcut** to choose an Orbiter action, or choose a key
+and optional Ctrl, Alt and Shift modifiers. The editor and button table show
+what the shortcut does under the active Orbiter keymap, including common
+Delta-glider and Atlantis controls. Other vessel and panel shortcuts depend
+on the active vessel or display. **Unassigned** clears the binding.
+
+In VelocityOne Flightstick PC mode, hold H1 in any of its eight directions
+for a 45° quick look on each active axis in the cockpit or an external
+tracking view. Releasing H1 restores your previous
+angle. H2 pans continuously, and pressing it straight in centers the cockpit
+view. Each control can be turned off in the wizard. An explicit H2 click
+assignment takes priority over recentering.
+An H1 direction with an explicit shortcut or roll-to-yaw assignment uses
+that binding.
+
+**Save** uses the mapping on the next native Linux flight. It stores the
+active controller and bindings alongside the simulator configuration.
+**Use simulator defaults** restores the joystick settings from that
+configuration. The custom throttle waits for deliberate movement after
+connection or reconnection.
+
+The VelocityOne Flightstick's red touchpad click is listed separately in PC
+mode. If it shows **Needs access**, install the included Linux device rule,
+reload the rules, and unplug and reconnect the stick.
+
+```sh
+sudo install -m 644 Utils/Launchpad/69-orbiter-velocityone-touchpad.rules /etc/udev/rules.d/
+sudo udevadm control --reload-rules
+```
+
+With a shortcut assigned, the touchpad acts as an Orbiter button while the
+flight window has focus. It acts as a pointer again when you leave the window.
 
 ### Copy and edit a scenario
 

@@ -13,12 +13,20 @@ inline int NativeThrottleAxis(unsigned setting,int overrideAxis) {
     return setting==1 ? 2 : setting==2 ? 6 : setting==3 ? 7 : -1;
 }
 
-inline bool NativeJoystickAlternate(const unsigned char* buttons, int count, std::string_view guid) {
+inline bool IsVelocityOnePcMode(std::string_view guid) {
     // The VelocityOne Flightstick in PC mode reports its base X button as
     // GLFW button 7. Match the Linux USB GUID through the product ID so a
     // firmware revision does not change the binding.
     constexpr std::string_view velocityOnePc = "03000000f510000055700000";
-    const int button = guid.substr(0, velocityOnePc.size()) == velocityOnePc ? 6 : 2;
+    return guid.substr(0, velocityOnePc.size()) == velocityOnePc;
+}
+
+inline int NativeJoystickAlternateButton(std::string_view guid) {
+    return IsVelocityOnePcMode(guid) ? 6 : 2;
+}
+
+inline bool NativeJoystickAlternate(const unsigned char* buttons, int count, std::string_view guid) {
+    const int button = NativeJoystickAlternateButton(guid);
     return buttons && count > button && buttons[button] != 0;
 }
 

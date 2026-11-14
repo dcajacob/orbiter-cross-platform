@@ -1,0 +1,3 @@
+# Allow the active local session to read only the VelocityOne Flightstick's
+# PC-mode touchpad interface.
+SUBSYSTEM=="input", KERNEL=="event*", ENV{ID_BUS}=="usb", ENV{ID_VENDOR_ID}=="10f5", ENV{ID_MODEL_ID}=="7055", ATTRS{bInterfaceNumber}=="01", ENV{ID_INPUT_MOUSE}=="1", TAG+="uaccess"

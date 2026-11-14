@@ -6,6 +6,7 @@
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_opengl3.h"
 #include "Production/NativeCockpitUi.h"
+#include "Camera.h"
 #endif
 #include "OGLClient.h"
 #include "Scene.h"
@@ -37,6 +38,8 @@
 #include <chrono>
 #include <map>
 #include <GLFW/glfw3.h>
+#include "JoystickMapping.h"
+#include "VelocityOneTouchpad.h"
 #include <filesystem>
 #include <fstream>
 #include <cstdio>
@@ -146,6 +149,169 @@ std::vector<FlightKeyEvent> keyEvents;
 bool guiInitialized=false;
 bool glfwInitialized=false;
 orbiter::production::NativeJoystickState cockpitJoystick;
+#if ORBITER_BUILD_NATIVE_COCKPIT
+std::optional<orbiter::production::JoystickMapping> joystickMapping;
+orbiter::production::VelocityOneTouchpad joystickTouchpad;
+std::array<bool, 256> previousJoystickButtons{};
+std::array<bool, 256> armedJoystickButtons{};
+int joystickKeyDevice = -1;
+double joystickCameraPoll = 0;
+
+struct JoystickQuickLook {
+    Camera* camera = nullptr;
+    Body* target = nullptr;
+    bool internal = false;
+    ExtCamMode mode = CAMERA_TARGETRELATIVE;
+    double phi = 0, theta = 0;
+
+    bool Matches(Camera* view) const
+    {
+        return camera == view && target == view->Target() && internal == view->IsInternal()
+            && (internal || mode == view->GetExtMode());
+    }
+
+    void SetDirection(double p, double t) const
+    {
+        if (internal) {
+            // Cancel residual smoothing or an in-progress recenter before snapping.
+            camera->ResetCockpitDir(p, t);
+            camera->SetCockpitDir(p, t);
+        } else {
+            camera->AddPhi(2 * (p - camera->Phi()));
+            camera->AddTheta(2 * (t - camera->Theta()));
+        }
+    }
+
+    void Restore(Camera* view)
+    {
+        if (Matches(view))
+            SetDirection(phi, theta);
+        camera = nullptr;
+    }
+};
+
+JoystickQuickLook joystickQuickLook;
+
+void UpdateJoystickCamera(const JoystickMapping& mapping, int device, int buttonCount,
+                          const float* axes, int axisCount, double elapsed)
+{
+    const unsigned mode = mapping.CameraControls();
+    int hatCount = 0;
+    const auto* hats = glfwGetJoystickHats(device, &hatCount);
+    const unsigned hat = hats && hatCount ? mapping.H1LookDirections(hats[0], buttonCount - 4 * hatCount) : 0;
+    auto* camera = GetNativeRenderContext().camera;
+    if (joystickQuickLook.camera && !joystickQuickLook.Matches(camera))
+        joystickQuickLook = {};
+    if (hat && (camera->IsInternal() || camera->GetExtMode() != CAMERA_GROUNDOBSERVER)) {
+        if (!joystickQuickLook.camera)
+            joystickQuickLook = {camera, camera->Target(), camera->IsInternal(), camera->GetExtMode(),
+                                 camera->Phi(), camera->Theta()};
+        // Use the same direction conventions as H2 in each view.
+        const double angle = (camera->IsInternal() ? 45.0 : -45.0) * RAD;
+        joystickQuickLook.SetDirection((bool(hat & GLFW_HAT_LEFT) - bool(hat & GLFW_HAT_RIGHT)) * angle,
+                                       (bool(hat & GLFW_HAT_UP) - bool(hat & GLFW_HAT_DOWN)) * angle);
+        return;
+    }
+    joystickQuickLook.Restore(camera);
+
+    // H2 is a spring-centered stick. Ignore center noise and rescale beyond it.
+    constexpr int deadzone = 1400;
+    if (!(mode & JoystickMapping::LookWithH2) || !axes || axisCount <= 4)
+        return;
+    const double x = NativeJoystickAxis(axes[3], deadzone) / 1000.0;
+    const double y = NativeJoystickAxis(axes[4], deadzone) / 1000.0;
+    if (x == 0 && y == 0)
+        return;
+    const double step = std::clamp(elapsed, 0.0, 0.05) / std::max(1.0, std::hypot(x, y));
+    if (camera->IsInternal()) {
+        // The engine consumes Rotate on its next fixed input step.
+        camera->Rotate(-x * step, -y * step, true);
+    } else if (camera->GetExtMode() == CAMERA_GROUNDOBSERVER) {
+        camera->Rotate(-x * step, -y * step);
+    } else {
+        camera->ShiftPhi(x * step);
+        camera->ShiftTheta(y * step);
+    }
+}
+
+void AddJoystickKeyEvents(const JoystickMapping& mapping, int device, const unsigned char* buttons,
+                          int count, VelocityOneTouchpad::State touchpad, FlightInput& input)
+{
+    const bool sameDevice = device == joystickKeyDevice;
+    joystickKeyDevice = buttons ? device : -1;
+    if (!sameDevice)
+        armedJoystickButtons.fill(false);
+    if (device < 0 || !buttons)
+        return;
+    int hats = 0;
+    glfwGetJoystickHats(device, &hats);
+    const int physicalButtons = count - 4 * hats;
+    std::vector<unsigned> triggered;
+    for (unsigned i = 0; i < mapping.buttonKeys.size() && int(i) < count; ++i) {
+        const auto shortcut = mapping.buttonKeys[i];
+        const bool down = buttons[i] == GLFW_PRESS;
+        if (!down)
+            armedJoystickButtons[i] = true;
+        else if (sameDevice && armedJoystickButtons[i] && !previousJoystickButtons[i]) {
+            if (shortcut && std::find(triggered.begin(), triggered.end(), shortcut) == triggered.end())
+                triggered.push_back(shortcut);
+            else if (int(i) < physicalButtons && mapping.UsesH2Recenter(i)) {
+                auto* camera = GetNativeRenderContext().camera;
+                if (camera->IsInternal()) {
+                    if (joystickQuickLook.Matches(camera))
+                        joystickQuickLook.phi = joystickQuickLook.theta = 0;
+                    else
+                        camera->ResetCockpitDir();
+                }
+            }
+        }
+        previousJoystickButtons[i] = down;
+    }
+    if (touchpad.pressed && std::find(triggered.begin(), triggered.end(), mapping.touchpadKey) == triggered.end())
+        triggered.push_back(mapping.touchpadKey);
+    constexpr std::array<unsigned, 6> modifiers{OAPI_KEY_LSHIFT, OAPI_KEY_RSHIFT,
+        OAPI_KEY_LCONTROL, OAPI_KEY_RCONTROL, OAPI_KEY_LALT, OAPI_KEY_RALT};
+    for (const auto shortcut : triggered) {
+        const unsigned key = shortcut & 255;
+        if (input.keys[key])
+            continue;
+        const auto chord = JoystickModifierKeys(shortcut);
+        for (const auto modifier : modifiers) {
+            const bool wanted = std::find(chord.begin(), chord.end(), modifier) != chord.end();
+            if (wanted != bool(input.keys[modifier]))
+                input.events.push_back({modifier, wanted});
+        }
+        input.events.push_back({key, true});
+        input.events.push_back({key, false});
+        for (const auto modifier : modifiers) {
+            const bool wanted = std::find(chord.begin(), chord.end(), modifier) != chord.end();
+            if (wanted != bool(input.keys[modifier]))
+                input.events.push_back({modifier, bool(input.keys[modifier])});
+        }
+    }
+
+    // Keep immediate controls such as camera slew responsive while held.
+    // Keyboard input takes priority, and each poll has one modifier chord.
+    if (!input.events.empty() || std::any_of(input.keys.begin(), input.keys.end(), [](char key) { return key != 0; }))
+        return;
+    std::optional<std::array<unsigned, 3>> heldModifiers;
+    const auto hold = [&](unsigned shortcut) {
+        const auto chord = JoystickModifierKeys(shortcut);
+        if (heldModifiers && *heldModifiers != chord)
+            return;
+        heldModifiers = chord;
+        input.keys[shortcut & 255] = char(0x80);
+        for (const auto modifier : chord)
+            if (modifier)
+                input.keys[modifier] = char(0x80);
+    };
+    for (unsigned i = 0; i < mapping.buttonKeys.size() && int(i) < count; ++i)
+        if (mapping.buttonKeys[i] && armedJoystickButtons[i] && buttons[i])
+            hold(mapping.buttonKeys[i]);
+    if (touchpad.down)
+        hold(mapping.touchpadKey);
+}
+#endif
 int joystickDevice=-1;float initialThrottle=0,lastThrottle=0;bool armed=false,throttleSeen=false;
 int engineeringWindowScale=1;
 int requestedWindowWidth=1280,requestedWindowHeight=720;
@@ -239,9 +405,16 @@ void OGLClient::Open()
     }
     cockpitJoystick.Reset();
 #if ORBITER_BUILD_NATIVE_COCKPIT
+    joystickMapping = JoystickMapping::Read(GetNativeRenderContext().configuration->Root);
+    joystickTouchpad.Reset();
+    joystickKeyDevice = -1;
+    joystickCameraPoll = glfwGetTime();
+    joystickQuickLook = {};
     glfwSetJoystickCallback([](int device, int) {
         // GLFW can reuse the same slot for a new connection between two polls.
         cockpitJoystick.DeviceChanged(device);
+        if (device == joystickKeyDevice)
+            joystickKeyDevice = -1;
     });
 #endif
     scroll=0;dragging=false;keyEvents.clear();mouseEvents.clear();joystickDevice=-1;armed=false;throttleSeen=false;
@@ -308,6 +481,9 @@ RenderInput OGLClient::Poll()
     bool captureKeyboard=false;
 #if ORBITER_BUILD_NATIVE_COCKPIT
     captureKeyboard=CockpitGuiCapturesKeyboard();
+    const double now = glfwGetTime();
+    const double cameraElapsed = now - joystickCameraPoll;
+    joystickCameraPoll = now;
 #endif
     input.close=input.close || (!captureKeyboard && glfwGetKey(nativeWindow,GLFW_KEY_ESCAPE)==GLFW_PRESS);
     glfwGetFramebufferSize(nativeWindow,&input.width,&input.height);
@@ -318,15 +494,43 @@ RenderInput OGLClient::Poll()
         auto& render=GetNativeRenderContext();
         const auto& prm=render.configuration->CfgJoystickPrm;
         int device=prm.Joy_idx>0 && prm.Joy_idx<=GLFW_JOYSTICK_LAST+1 ? int(prm.Joy_idx)-1 : -1;
+        if (joystickMapping)
+            device = joystickMapping->ConnectedSlot();
         if(device>=0 && !glfwJoystickPresent(device))device=-1;
         int count=0,buttonsCount=0;
         const char* guid = device>=0 ? glfwGetJoystickGUID(device) : nullptr;
         const auto* buttons=guid ? glfwGetJoystickButtons(device,&buttonsCount) : nullptr;
-        const bool alternate = NativeJoystickAlternate(buttons, buttonsCount, guid ? guid : "");
+        const int alternateButton = joystickMapping ? joystickMapping->alternate : -1;
+        const bool alternate = joystickMapping
+            ? buttons && alternateButton >= 0 && alternateButton < buttonsCount && buttons[alternateButton] == GLFW_PRESS
+            : NativeJoystickAlternate(buttons, buttonsCount, guid ? guid : "");
+        VelocityOneTouchpad::State touchpad;
+        if (joystickMapping && joystickMapping->touchpadKey && guid && IsVelocityOnePcMode(guid))
+            touchpad = joystickTouchpad.Poll(true);
+        else
+            joystickTouchpad.Reset();
+        if (joystickMapping)
+            AddJoystickKeyEvents(*joystickMapping, device, buttons, buttonsCount, touchpad, input.flight);
+        input.close = input.close || std::any_of(input.flight.events.begin(), input.flight.events.end(),
+            [](const FlightKeyEvent& event) { return event.code == OAPI_KEY_ESCAPE && event.down; });
         const float* axes=device>=0 ? glfwGetJoystickAxes(device,&count) : nullptr;
-        cockpitJoystick.Poll(axes ? device : -1,axes,count,render.joystickTwistAxis,
-            NativeThrottleAxis(prm.ThrottleAxis,render.joystickThrottleAxis),
-            prm.Deadzone,prm.ThrottleSaturation,prm.bThrottleIgnore,input.flight,render.joystickThrottleInverted);
+        if (joystickMapping && device >= 0)
+            UpdateJoystickCamera(*joystickMapping, device, buttonsCount, axes, count, cameraElapsed);
+        else if (joystickQuickLook.camera)
+            joystickQuickLook.Restore(render.camera);
+        if (joystickMapping) {
+            const auto samples = joystickMapping->Samples(axes, axes ? count : 0);
+            const int throttle = joystickMapping->axes[3];
+            // A custom mapping always requires deliberate throttle movement
+            // on connection, including when a device reconnects in flight.
+            cockpitJoystick.Poll(axes ? device : -1, samples.data(), int(samples.size()), 2,
+                throttle >= 0 && throttle < count ? 3 : -1,
+                prm.Deadzone, prm.ThrottleSaturation, true, input.flight);
+        } else {
+            cockpitJoystick.Poll(axes ? device : -1,axes,count,render.joystickTwistAxis,
+                NativeThrottleAxis(prm.ThrottleAxis,render.joystickThrottleAxis),
+                prm.Deadzone,prm.ThrottleSaturation,prm.bThrottleIgnore,input.flight,render.joystickThrottleInverted);
+        }
         input.flight.alternate=axes && alternate;
 #else
         auto& device=joystickDevice;
@@ -344,7 +548,15 @@ RenderInput OGLClient::Poll()
             }
         }
 #endif
-    } else keyEvents.clear();
+    } else {
+        keyEvents.clear();
+#if ORBITER_BUILD_NATIVE_COCKPIT
+        joystickKeyDevice = -1;
+        joystickTouchpad.Reset();
+        if (joystickQuickLook.camera)
+            joystickQuickLook.Restore(GetNativeRenderContext().camera);
+#endif
+    }
     double x,y;glfwGetCursorPos(nativeWindow,&x,&y);
     bool down=glfwGetMouseButton(nativeWindow,GLFW_MOUSE_BUTTON_RIGHT)==GLFW_PRESS;
     if(down && dragging) {input.yaw=(x-lastX)*-0.005;input.pitch=(y-lastY)*-0.005;}
@@ -380,6 +592,10 @@ bool OGLClient::clbkDisplayFrame()
 }
 void OGLClient::clbkDestroyRenderWindow(bool)
 {
+#if ORBITER_BUILD_NATIVE_COCKPIT
+    joystickTouchpad.Reset();
+    joystickQuickLook = {};
+#endif
     if(!nativeWindow) {
         if(glfwInitialized) {glfwTerminate();glfwInitialized=false;}
         return;

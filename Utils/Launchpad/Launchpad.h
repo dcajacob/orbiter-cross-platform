@@ -16,6 +16,7 @@ class QTreeWidgetItem;
 class Launchpad : public QWidget {
 public:
     explicit Launchpad(const QString &profilePath);
+    void openJoystickSetup();
 
 protected:
     void closeEvent(QCloseEvent *event) override;
