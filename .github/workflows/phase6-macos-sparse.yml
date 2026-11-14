@@ -53,7 +53,19 @@ jobs:
             clang++ --version
             cmake --version
           } | tee out/mac-evidence/identity.txt
+      - name: Stage a case-sensitive test volume
+        shell: bash
+        run: |
+          # ResourceBoundary constructs two filesystem entries whose names differ only in case.
+          mkdir -p out/mac
+          image="$RUNNER_TEMP/orbiter-tests.sparseimage"
+          hdiutil create -size 4g -type SPARSE -fs 'Case-sensitive APFS' -volname OrbiterTests "$image"
+          hdiutil attach -mountpoint "$PWD/out/mac" -nobrowse "$image"
+          touch out/mac/OrbiterCaseProbe
+          test ! -e out/mac/orbitercaseprobe
+          rm out/mac/OrbiterCaseProbe
       - name: Build the portable core and test viewer
+        id: build
         shell: bash
         run: |
           cmake -S Tests/Portable -B out/mac -G Ninja -DCMAKE_BUILD_TYPE=Release \
@@ -72,6 +84,7 @@ jobs:
           ctest --test-dir out/mac --output-on-failure --no-tests=error \
             --output-junit "$PWD/out/mac-evidence/ctest.xml" 2>&1 | tee out/mac-evidence/ctest.log
       - name: Exercise native OpenGL rendering with the portable flight fixture
+        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
         shell: bash
         run: |
           python3 -B Tests/Portable/test_native_client.py \
@@ -96,3 +109,10 @@ jobs:
             out/mac/traces/*.csv
             out/mac/traces/*.json
             out/mac/Testing/Temporary/LastTest.log
+      - name: Detach the isolated test volume
+        if: always()
+        shell: bash
+        run: |
+          if mount | grep -F " on $PWD/out/mac (" >/dev/null; then
+            hdiutil detach "$PWD/out/mac"
+          fi
