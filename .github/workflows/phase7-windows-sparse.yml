@@ -1,0 +1,190 @@
+name: Orbiter Windows Phase 7 sparse checks
+
+on:
+  push:
+    branches: [qualification/windows-phase7-sparse-v1]
+    paths: [.github/workflows/phase7-windows-sparse.yml, Tests/Production/Phase7/windows_phase7_stock.py]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: orbiter-windows-phase7-sparse
+  cancel-in-progress: false
+
+jobs:
+  sparse:
+    name: Windows Phase 7 Release x64 sparse
+    runs-on: windows-2025
+    timeout-minutes: 60
+    env:
+      ORBITER_CANDIDATE: a3930b62e9c8553c04a40a9bb4f5c85955cfd795
+      ORBITER_PHYSICS: ef2401bb059f429aec3b1d7880e58f94f8a7a56f
+      DXSDK_DIR: '${{ github.workspace }}\DXSDK'
+      ORBITER_DATA_CONTAINER_LOCK: Tests/Production/stock-data-container-v2.lock.json
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.14'
+      - uses: ilammy/msvc-dev-cmd@v1
+        with:
+          arch: x64
+      - name: Verify workflow and candidate source boundaries
+        id: source
+        run: |
+          $workflow = '.github/workflows/phase7-windows-sparse.yml'
+          $observer = 'Tests/Production/Phase7/windows_phase7_stock.py'
+          $changed = @(git diff --name-only $env:ORBITER_CANDIDATE HEAD)
+          if ($LASTEXITCODE -ne 0 -or $changed.Count -ne 2 -or $workflow -notin $changed -or $observer -notin $changed) {
+            throw 'Only the Phase 7 workflow and stock harness may differ from the application candidate'
+          }
+          New-Item -ItemType Directory -Path out/receipt | Out-Null
+          Copy-Item $observer out/windows_phase7_stock.py
+          git switch --detach $env:ORBITER_CANDIDATE
+          if ($LASTEXITCODE -ne 0 -or (git rev-parse HEAD) -ne $env:ORBITER_CANDIDATE) {
+            throw 'Wrong application source'
+          }
+          "Workflow: $env:GITHUB_SHA`nApplication: $env:ORBITER_CANDIDATE`nPhysics: $env:ORBITER_PHYSICS" |
+            Set-Content out/receipt/source.txt
+          Get-FileHash out/windows_phase7_stock.py -Algorithm SHA256 |
+            ConvertTo-Json | Set-Content out/receipt/harness.json
+          python -B out/windows_phase7_stock.py --validate-selection --runtime out/runtime --data out/production-data --planets out/standard-planets --mesa out/mesa-runtime --output out/stock
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          python -B Tests/Production/frozen_reference.py
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          python -B Tests/Production/frozen_behavior.py
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          if (git diff --name-only $env:ORBITER_PHYSICS HEAD -- Src/Orbiter/SuperVessel.cpp Tests/Production/PhysicsV3) {
+            throw 'The approved v3 physics or its original guard changed'
+          }
+          git worktree add --detach out/physics-source $env:ORBITER_PHYSICS
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          $proof = Join-Path $PWD 'out/receipt/physics-source.json'
+          Push-Location out/physics-source
+          python -B Tests/Production/PhysicsV3/source.py --output $proof
+          $result = $LASTEXITCODE
+          Pop-Location
+          exit $result
+      - uses: actions/cache/restore@v6
+        id: dxsdk
+        with:
+          path: ${{ github.workspace }}\DXSDK
+          key: dxsdk_jun10
+      - name: Prepare the existing DirectX SDK dependency
+        if: steps.dxsdk.outputs.cache-hit != 'true'
+        shell: cmd
+        run: |
+          curl --fail -L https://download.microsoft.com/download/a/e/7/ae743f1f-632b-4809-87a9-aa1bb3458e31/DXSDK_Jun10.exe -o DXSDK_Jun10.exe
+          if errorlevel 1 exit /b 1
+          7z x DXSDK_Jun10.exe DXSDK/Include DXSDK/Lib
+          if errorlevel 1 exit /b 1
+      - name: Build Windows Release and run the registered unit checks
+        run: |
+          cmake -S . -B out/app -G Ninja -DCMAKE_BUILD_TYPE=Release "-DCMAKE_POLICY_VERSION_MINIMUM=3.5" -DCMAKE_C_COMPILER=cl -DCMAKE_CXX_COMPILER=cl -DORBITER_BUILD_D3D9CLIENT=ON -DORBITER_BUILD_XRSOUND=ON -DORBITER_MAKE_DOC=OFF -DORBITER_MAKE_TESTS=ON -DORBITER_PORTABLE_REFERENCE_CAPTURE=ON -DORBITER_PRODUCTION_REFERENCE_CAPTURE=ON "-DDXSDK_DIR:PATH=$env:DXSDK_DIR" 2>&1 | Tee-Object out/receipt/configure.log
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          cmake --build out/app --parallel 2 2>&1 | Tee-Object out/receipt/build.log
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          ctest --test-dir out/app --output-on-failure --no-tests=error --output-junit "$pwd/out/receipt/ctest.xml" 2>&1 | Tee-Object out/receipt/ctest.log
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          python -B Tests/Production/build_metadata.py --build out/app
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          Move-Item out/app/build-inputs.json out/receipt/build-inputs.json
+      - name: Verify the same-build SDK and build the OpenGL client
+        run: |
+          python -B Tests/Production/package_test_runtime.py --build out/app --output out/runtime.zip
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          7z x out/runtime.zip -oout/runtime
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          python -B Tests/Production/verify_test_runtime.py --runtime out/runtime --source $env:ORBITER_CANDIDATE
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          Get-FileHash -Algorithm SHA256 -Path out/runtime/Modules/Plugin/ScnEditor.dll,out/runtime/Modules/Plugin/XRSound.dll |
+            ConvertTo-Json | Set-Content out/receipt/windows-addons.json
+          cmake -S OVP/OGLClient -B out/ogl -G Ninja -DCMAKE_BUILD_TYPE=Release "-DCMAKE_POLICY_VERSION_MINIMUM=3.5" "-DORBITER_TEST_RUNTIME=$pwd/out/runtime" "-DDXSDK_DIR=$env:DXSDK_DIR" 2>&1 | Tee-Object out/receipt/client-configure.log
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          cmake --build out/ogl --target OGLClient --parallel 2 2>&1 | Tee-Object out/receipt/client-build.log
+          exit $LASTEXITCODE
+      - uses: actions/cache/restore@v6
+        with:
+          path: out/data-cache/Orbiter-x64.zip
+          key: production-data-${{ hashFiles('Tests/Production/stock-data.lock.json') }}
+      - uses: actions/cache/restore@v6
+        with:
+          path: out/planet-cache/Orbiter2016.zip
+          key: production-standard-planets-${{ hashFiles('Tests/Production/standard-planets.lock.json') }}
+      - uses: actions/cache/restore@v6
+        with:
+          path: out/mesa-cache/*.pkg.tar.zst
+          key: mesa-ucrt64-${{ hashFiles('Tests/Production/mesa-ucrt64.lock.json') }}
+      - name: Stage the locked stock data and renderer
+        id: data
+        run: |
+          python -B Tests/Production/prepare_hosted_data.py --archive out/data-cache/Orbiter-x64.zip --destination out/production-data
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          python -B Tests/Production/prepare_hosted_data.py --lock Tests/Production/standard-planets.lock.json --archive out/planet-cache/Orbiter2016.zip --destination out/standard-planets
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          python -B Tests/Production/stage_mesa.py stage --cache out/mesa-cache --destination out/mesa-runtime
+          exit $LASTEXITCODE
+      - name: Run the short real Windows flight and unchanged comparison
+        id: reference
+        run: >-
+          python -B Tests/Production/Client/run_client.py --orbiter out/runtime/Orbiter.exe
+          --data out/production-data --planets out/standard-planets --mesa out/mesa-runtime
+          --configuration Release --output out/client-smoke
+      - name: Run the Linux-selected stock scenarios on Windows
+        if: ${{ !cancelled() && steps.data.outcome == 'success' }}
+        run: |
+          cmake -S Tests/Production/RemainingStock -B out/stock-observer -G Ninja -DCMAKE_BUILD_TYPE=Release "-DORBITER_TEST_RUNTIME=$pwd/out/runtime" 2>&1 | Tee-Object out/receipt/observer-configure.log
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          cmake --build out/stock-observer --parallel 2 2>&1 | Tee-Object out/receipt/observer-build.log
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          python -B out/windows_phase7_stock.py --runtime out/runtime --data out/production-data --planets out/standard-planets --mesa out/mesa-runtime --output out/stock
+          exit $LASTEXITCODE
+      - name: Build and start the Qt Launchpad on Windows
+        if: ${{ !cancelled() && steps.source.outcome == 'success' }}
+        run: |
+          python -m pip install aqtinstall==3.3.0
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          python -m aqt install-qt windows desktop 6.8.3 win64_msvc2022_64 --outputdir out/qt
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          $qt = "$pwd/out/qt/6.8.3/msvc2022_64"
+          cmake -S Utils/Launchpad -B out/qt-launchpad -G Ninja -DCMAKE_BUILD_TYPE=Release "-DCMAKE_PREFIX_PATH=$qt" 2>&1 | Tee-Object out/receipt/launchpad-configure.log
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          cmake --build out/qt-launchpad --parallel 2 2>&1 | Tee-Object out/receipt/launchpad-build.log
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          $env:Path = "$qt/bin;$env:Path"
+          $env:QT_PLUGIN_PATH = "$qt/plugins"
+          $env:QT_QPA_PLATFORM = 'offscreen'
+          $exe = "$pwd/out/qt-launchpad/orbiter-launchpad.exe"
+          $process = Start-Process -FilePath $exe -ArgumentList '--help' -PassThru -RedirectStandardOutput out/receipt/launchpad-help.txt -RedirectStandardError out/receipt/launchpad-stderr.txt
+          if (-not $process.WaitForExit(20000)) { $process.Kill(); throw 'Qt Launchpad did not start' }
+          if ($process.ExitCode -ne 0) { throw "Qt Launchpad returned $($process.ExitCode)" }
+          Get-FileHash $exe -Algorithm SHA256 | ConvertTo-Json | Set-Content out/receipt/launchpad-binary.json
+      - name: Preserve Windows smoke evidence and failure output
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: windows-phase7-release-sparse
+          retention-days: 7
+          path: |
+            out/receipt/**
+            out/runtime/test-runtime.json
+            out/client-smoke/**/*.json
+            out/client-smoke/**/*.csv
+            out/client-smoke/**/*.txt
+            out/client-smoke/**/Orbiter.log
+            out/client-smoke/**/scene.png
+            out/stock/stock-report.json
+            out/stock/*/stock-*.csv
+            out/stock/*/stock-vessel-*.txt
+            out/stock/*/console.txt
+            out/stock/*/Orbiter.log
+            out/stock/*/process-*.json
+            out/stock/*/graphics-lifecycle.json
+            out/stock/*/invocation.json
+            out/stock/*/renderer-modules.txt
+            out/stock/*/math-profile.txt
+            out/stock/*/staged-Orbiter.cfg
