@@ -85,7 +85,7 @@ def invoke(a, mode, incoming=None, previous_options=None):
         cfg=out/'Orbiter.cfg'
         text=cfg.read_text() if previous_options is None else previous_options.read_text()
         if previous_options is None:
-            modules = ['Phase7Driver','OGLClient']
+            modules = ['ProductionCockpitDriver','OGLClient']
             if is_editor:
                 modules.append('ScnEditor')
             if is_audio:

@@ -14,7 +14,10 @@ target_link_libraries(Phase7Driver PRIVATE
   "${ORBITER_TEST_RUNTIME}/Orbitersdk/lib/Orbiter.lib"
   "${ORBITER_TEST_RUNTIME}/Orbitersdk/lib/Orbitersdk.lib"
   "${ORBITER_TEST_RUNTIME}/Orbitersdk/XRSound/XRSound.lib")
-set_target_properties(Phase7Driver PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${ORBITER_TEST_RUNTIME}/Modules/Plugin")
+# The existing original-scenario stage records this observer slot by filename.
+set_target_properties(Phase7Driver PROPERTIES
+  OUTPUT_NAME ProductionCockpitDriver
+  RUNTIME_OUTPUT_DIRECTORY "${ORBITER_TEST_RUNTIME}/Modules/Plugin")
 include(FetchContent)
 FetchContent_Declare(ui_headers
   URL "https://codeload.github.com/ocornut/imgui/zip/3912b3d9a9c1b3f17431aebafd86d2f40ee6e59c"
