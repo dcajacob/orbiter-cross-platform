@@ -66,6 +66,28 @@ which appears under **Saved scenarios** after you close the simulator.
 **Start paused** is selected by default. Press **Space** to start time or
 **Escape** to close the session.
 
+### X11 software rendering
+
+Mesa 26.0.8 llvmpipe can leave two allocations behind when Orbiter closes its
+X11 renderer. The [private Mesa build](../../Tests/Production/GraphicsDriverLifetime/README.md)
+releases the executable heap after the last generated function is freed.
+Generate a separate profile for X11 software rendering, including Xvfb, with
+Python 3.11 or later. Use the private Mesa build directory containing
+`driver-build.json` and `install/`.
+
+```sh
+python3 -B Utils/Launchpad/make_x11_software_profile.py \
+  --profile out/qt-launchpad/linux-profile.json \
+  --mesa-build out/mesa-cleanup \
+  --output out/qt-launchpad/linux-x11-software-profile.json
+```
+
+Select the generated file under **Setup → Open simulator profile**. It keeps
+your scenario, configuration and saves paths and selects the checked Mesa
+libraries for the simulator process. Use your regular profile for
+hardware-accelerated sessions. The [Linux Phase 7 record](../../Docs/Production/LinuxPhase7Sparse.md)
+includes the X11 Options and stock checks.
+
 ### Joystick setup
 
 Open **Setup → Joystick setup…** and choose the connected controller. The
