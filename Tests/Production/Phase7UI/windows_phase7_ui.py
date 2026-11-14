@@ -15,6 +15,7 @@ from inventory import ships
 
 STOCK = 'Scenarios/Delta-glider/DG Mk4 in orbit.scn'
 EDITED = 'Phase7-ShuttlePB'
+FIXED_STEP = .0625
 
 
 def cfg_value(case, key, default=None):
@@ -83,8 +84,10 @@ def invoke(a, mode, incoming=None, previous_options=None):
 
     def configure(out):
         cfg=out/'Orbiter.cfg'
-        text=cfg.read_text() if previous_options is None else previous_options.read_text()
-        if previous_options is None:
+        if previous_options is not None:
+            shutil.copyfile(previous_options,cfg)
+        else:
+            text=cfg.read_text()
             modules = ['ProductionCockpitDriver','OGLClient']
             if is_editor:
                 modules.append('ScnEditor')
@@ -94,7 +97,7 @@ def invoke(a, mode, incoming=None, previous_options=None):
             if not is_audio:
                 text=text.replace('StartPaused = FALSE','StartPaused = TRUE')
             text+='\nInstrumentUpdateInterval = 0.25\nGenericMFDSize = 6\nPanelScale = 1.0\nFPS = 0\nMenubarMode = 1\nInfobarMode = 1\n'
-        cfg.write_text(text,encoding='ascii')
+            cfg.write_text(text,encoding='ascii')
         path=out/entry
         path.parent.mkdir(parents=True,exist_ok=True)
         shutil.copyfile(scenario,path)
@@ -108,7 +111,7 @@ def invoke(a, mode, incoming=None, previous_options=None):
             require(body.count('EnableVerboseLogging = 0')==1,'Stock verbose setting differs')
             sound_cfg.write_text(body.replace('EnableVerboseLogging = 0','EnableVerboseLogging = 1'),encoding='cp1252')
 
-    stage(a.runtime/'Orbiter.exe',a.data,a.planets,directory,{'fixed_step':.0625,'frames':frames,'delivery_repairs':[]},
+    stage(a.runtime/'Orbiter.exe',a.data,a.planets,directory,{'fixed_step':FIXED_STEP,'frames':frames+int(not is_audio),'delivery_repairs':[]},
           cases,configure,process_timeout=150)
     require((directory/'phase7-complete.txt').read_text().split()==[mode,str(frames)],'Windows probe completion differs')
     require(digest(directory/entry)==input_sha==digest(scenario),'Scenario input changed')
@@ -118,15 +121,23 @@ def invoke(a, mode, incoming=None, previous_options=None):
         events=list(csv.DictReader(stream))
     result=dict(source_input_sha256=input_sha,lifecycle=lifecycle,events=events)
     if is_editor:
-        require(all(row['paused']=='1' and float(row['seconds'])==0 for row in events),'Editor advanced simulation time')
+        actions = [row for row in events if row['event']!='position-restored-before-startup-step']
+        require(actions and all(row['paused']=='1' and float(row['seconds'])==FIXED_STEP for row in actions),
+                'An editor action advanced simulation time beyond the Windows initialization step')
     if mode.startswith('options'):
+        if previous_options is not None:
+            result['configuration_input_sha256'] = digest(previous_options)
+            require(digest(directory/'staged-Orbiter.cfg')==result['configuration_input_sha256'],
+                    'The second Options process did not use the first saved configuration verbatim')
         require(sum(row['event']=='options-click' for row in events)==5,'Options control input incomplete')
         result['configuration']=options_check(directory,incoming is not None or previous_options is not None)
     if mode=='editor-first':
         result['saved_sha256']=check_state(directory/'Scenarios/Phase7Edited.scn',True)
     if mode=='editor-reload':
         result['saved_sha256']=check_state(directory/'Scenarios/Phase7Removed.scn',False)
-        require([row['event'] for row in events].count('position-verified')==1,'Edited live position was not restored')
+        reload = [row for row in events if row['event']=='position-restored-before-startup-step']
+        require(len(reload)==1 and reload[0]['frame']=='0' and float(reload[0]['seconds'])==0,
+                'Exact edited live position was not restored before the Windows startup step')
     if mode=='editor-removed':
         require([row['event'] for row in events]==['deletion-reloaded'],'Removal reload evidence incomplete')
     if is_audio:
@@ -140,6 +151,7 @@ def main():
     for name in ('runtime','data','planets','mesa','output','sound-assets'):
         p.add_argument('--'+name,type=lambda v:Path(v).resolve(),required=True)
     p.add_argument('--source',required=True)
+    p.add_argument('--check',choices=('options','editor','xrsound'),action='append')
     a=p.parse_args()
     require(sys.platform=='win32','A native Windows runner is required')
     manifest=json.loads((a.runtime/'test-runtime.json').read_text())
@@ -166,7 +178,9 @@ def main():
             ('audio-reload',a.output/'audio-first/Scenarios/Phase7Audio.scn',None),
         ],
     }
-    for name, cases in suites.items():
+    selected = dict.fromkeys(a.check or suites)
+    for name in selected:
+        cases = suites[name]
         records=[]
         try:
             for mode, incoming, config in cases:

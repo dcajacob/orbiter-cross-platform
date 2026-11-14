@@ -107,6 +107,7 @@ class Driver final : public oapi::Module {
     bool evidence = false;
     bool held = false;
     double pause_time = 0;
+    static constexpr double FixedStep = .0625;
     int x = 0, y = 0;
     std::unique_ptr<XRSound> sounds;
 
@@ -167,7 +168,7 @@ class Driver final : public oapi::Module {
         record(filename);
     }
 
-    void check_position() {
+    void check_position(const char* event) {
         auto handle = oapiGetVesselByName(vesselName);
         require(handle != nullptr, "Edited vessel missing from the actual world");
         auto* vessel = oapiGetVesselInterface(handle);
@@ -180,12 +181,12 @@ class Driver final : public oapi::Module {
         require(std::abs(r.x-6801234.0) <= .01 && std::abs(r.y-200.0) <= .01 && std::abs(r.z-300.0) <= .01
              && std::abs(v.x-3.0) <= 1e-5 && std::abs(v.y+20.0) <= 1e-5 && std::abs(v.z-7600.0) <= 1e-5,
                 "Edited position/velocity differs from the requested state");
-        record("position-verified");
+        record(event);
     }
 
     void editor() {
         if (frame >= 6)
-            require(oapiGetPause() && oapiGetSimTime()==0, "Editor test advanced simulation time");
+            require(oapiGetPause() && oapiGetSimTime()==FixedStep, "Editor advanced beyond the one Windows startup step");
         if (mode == "editor-removed") {
             if (frame == 10) {
                 require(!oapiGetVesselByName(vesselName), "Deleted vessel reappeared after reload");
@@ -197,11 +198,14 @@ class Driver final : public oapi::Module {
         if (frame == 6) {
             DWORD ctrl[]{OAPI_KEY_LCONTROL};
             require(oapiSimulateBufferedKey(OAPI_KEY_F4,ctrl,1), "Cannot deliver Custom Functions shortcut");
-            if (mode=="editor-reload") check_position();
         }
         if (frame == 14) {
             // ScnEditor is the only custom function in the isolated profile.
-            click(find_gui("Orbiter: Custom functions"), 90, 54);
+            auto panel = find_gui("Orbiter: Custom functions");
+            require(panel != nullptr, "Custom Functions dialog did not open");
+            // The cursor ends one item spacing after the single 20px command button.
+            const int command_y = static_cast<int>(panel->DC.CursorPos.y - panel->Pos.y - GImGui->Style.ItemSpacing.y - 10);
+            click(panel, 90, command_y);
             record("custom-function-click");
         }
         if (frame == 22) {
@@ -240,7 +244,7 @@ class Driver final : public oapi::Module {
             auto window = owned_window("#32770","Scenario Editor");
             require(window != nullptr, "Scenario editor disappeared");
             if (mode == "editor-first") {
-                check_position();
+                check_position("position-verified");
                 save_editor(window,"Phase7Edited");
             } else {
                 require(!oapiGetVesselByName(vesselName), "Scenario editor did not delete the vessel");
@@ -308,7 +312,14 @@ public:
         if (setter) setter(1,nullptr,std::numeric_limits<double>::quiet_NaN());
     }
     void clbkSimulationStart(RenderMode mode) override {
-        guarded([&] { require(mode != RENDER_NONE,"Rendered Windows session required"); started=true; });
+        guarded([&] {
+            require(mode != RENDER_NONE, "Rendered Windows session required");
+            if (this->mode == "editor-reload") {
+                require(oapiGetSimTime() == 0, "Reload must be checked before the paused-start initialization step");
+                check_position("position-restored-before-startup-step");
+            }
+            started = true;
+        });
     }
     void clbkSimulationEnd() override {
         guarded([&] {
@@ -318,9 +329,14 @@ public:
             started=false;
         });
     }
-    void after_frame() {
+    void after_frame(bool running) {
         guarded([&] {
             if (!started) return;
+            // Windows initializes the world with one step before requesting start paused.
+            if (!frame && mode.find("audio-")!=0 && running) {
+                require(oapiGetSimTime()==FixedStep, "Unexpected first Windows initialization step");
+                return;
+            }
             ++frame;
             if (frame==1) {
                 IMGUI_CHECKVERSION();
@@ -340,9 +356,9 @@ public:
     }
 };
 
-void observe(const char* phase, const char*, double, double, int)
+void observe(const char* phase, const char*, double, double, int running)
 {
-    if (driver && std::string_view(phase)=="app.frame.end") driver->after_frame();
+    if (driver && std::string_view(phase)=="app.frame.end") driver->after_frame(running != 0);
 }
 }
 

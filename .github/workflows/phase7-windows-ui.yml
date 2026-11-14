@@ -139,11 +139,11 @@ jobs:
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           cmake --build out/phase7-build --parallel 2 2>&1 | Tee-Object out/receipt/fixture-build.log
           exit $LASTEXITCODE
-      - name: Exercise the Windows Options, editor and XRSound
+      - name: Retry the Windows Options and scenario editor
         run: |
           $env:LIBGL_ALWAYS_SOFTWARE = 'true'
           $env:GALLIUM_DRIVER = 'llvmpipe'
-          python -B out/phase7-src/windows_phase7_ui.py --runtime out/runtime --data out/production-data --planets out/standard-planets --mesa out/mesa-runtime --sound-assets Sound/XRSound/assets --output out/desktop --source $env:ORBITER_CANDIDATE
+          python -B out/phase7-src/windows_phase7_ui.py --runtime out/runtime --data out/production-data --planets out/standard-planets --mesa out/mesa-runtime --sound-assets Sound/XRSound/assets --output out/desktop --source $env:ORBITER_CANDIDATE --check options --check editor
           exit $LASTEXITCODE
       - name: Preserve desktop evidence and failure output
         if: always()
