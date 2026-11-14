@@ -891,6 +891,15 @@ struct Runtime final:BodyServices,RigidBodyServices,SurfaceServices,NavigationSe
         Base::CreateStaticDeviceObjects();baseResources=true;
         RigidBody::GlobalSetup();
         if(!world.Initialize(metadata.Solsys()))throw std::runtime_error("Production solar system contains no objects");
+        if (!startRunning) {
+            // The planet states are available now, but surface bases normally
+            // get their world transforms on the first physics step.
+            for (int i = 0; i < static_cast<int>(system->nPlanet()); ++i) {
+                auto* planet = system->GetPlanet(i);
+                for (UInt32 j = 0; j < planet->nBase(); ++j)
+                    planet->GetBase(j)->Update(true);
+            }
+        }
         system->InitState(scenario.string().c_str());
         if(!system->nVessel())throw std::runtime_error("Native production session requires a live stock vessel");
 #ifdef ORBITER_ATLANTIS_DIAGNOSTIC
