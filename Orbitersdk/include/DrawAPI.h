@@ -28,7 +28,9 @@
 #include "OrbiterSdkDrawingTypes.h"
 #include "OrbiterValueTypes.h"
 #include <assert.h>
+#if defined(__i386__) || defined(__x86_64__) || defined(_M_IX86) || defined(_M_X64)
 #include <xmmintrin.h>
+#endif
 
 #if defined(_MSC_VER) && (_MSC_VER < 1920 ) // Microsoft Visual Studio Version 2017 and lower
 #include <algorithm>
@@ -569,7 +571,10 @@ namespace oapi {
 			return D3DXVECTOR4(x, y, z, w);
 		}
 #endif
+		// The original SIMD alias is available on x86. The union remains 16-byte aligned.
+#if defined(__i386__) || defined(__x86_64__) || defined(_M_IX86) || defined(_M_X64)
 		__m128 xm;
+#endif
 		float data[4];
 		struct { float x, y, z, w; };
 		struct { float r, g, b, a; };

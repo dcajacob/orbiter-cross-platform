@@ -357,7 +357,9 @@ int main(int argc, char **argv) {
         const auto platform = glfwGetPlatform();
         const std::string platformName = platform == GLFW_PLATFORM_X11       ? "x11"
                                          : platform == GLFW_PLATFORM_WAYLAND ? "wayland"
-                                                                             : "win32";
+                                         : platform == GLFW_PLATFORM_COCOA   ? "cocoa"
+                                         : platform == GLFW_PLATFORM_WIN32   ? "win32"
+                                                                             : "unknown";
         std::cout << "Native backend: " << platformName << "\nOpenGL: " << renderer.Driver() << '\n';
         std::size_t frames = 0, nextEvent = 0;
         int width = 0, height = 0;
