@@ -81,6 +81,7 @@ private:
     SDL_GPUDevice* device_ = nullptr;
     SDL_GPUSampler* sampler_ = nullptr;
     SDL_GPUSampler* terrainSampler_ = nullptr;
+    SDL_GPUGraphicsPipeline* terrain_ = nullptr;
     SDL_GPUGraphicsPipeline* opaque_ = nullptr;
     SDL_GPUGraphicsPipeline* translucent_ = nullptr;
     SDL_GPUGraphicsPipeline* shadow_ = nullptr;

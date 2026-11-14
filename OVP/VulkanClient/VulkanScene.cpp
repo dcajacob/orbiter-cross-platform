@@ -199,6 +199,7 @@ void Scene::Open(SDL_Window* window)
     SDL_GPUShader* fragment = nullptr;
     try {
         fragment = Shader(device_, Ship_frag, sizeof(Ship_frag), SDL_GPU_SHADERSTAGE_FRAGMENT);
+        terrain_ = CreatePipeline(vertex, fragment, DrawPass::Terrain);
         opaque_ = CreatePipeline(vertex, fragment, DrawPass::Opaque);
         translucent_ = CreatePipeline(vertex, fragment, DrawPass::Translucent);
         shadow_ = CreatePipeline(vertex, fragment, DrawPass::Shadow);
@@ -240,7 +241,10 @@ SDL_GPUGraphicsPipeline* Scene::CreatePipeline(SDL_GPUShader* vertex, SDL_GPUSha
     info.vertex_input_state = {&buffer, 1, attributes, 3};
     info.primitive_type = SDL_GPU_PRIMITIVETYPE_TRIANGLELIST;
     info.rasterizer_state.fill_mode = SDL_GPU_FILLMODE_FILL;
-    info.rasterizer_state.cull_mode = SDL_GPU_CULLMODE_NONE;
+    // Stock ship panels supply separate front and back faces at the same positions.
+    const bool ship = kind == DrawPass::Opaque || kind == DrawPass::Translucent;
+    info.rasterizer_state.cull_mode = ship ? SDL_GPU_CULLMODE_BACK : SDL_GPU_CULLMODE_NONE;
+    info.rasterizer_state.front_face = SDL_GPU_FRONTFACE_CLOCKWISE;
     info.depth_stencil_state.enable_depth_test = true;
     info.depth_stencil_state.enable_depth_write = !blend;
     info.depth_stencil_state.compare_op = SDL_GPU_COMPAREOP_LESS_OR_EQUAL;
@@ -393,7 +397,7 @@ bool Scene::Present(const SceneUniform& ship, const SceneUniform& ground)
             SDL_GPUSampler* sampler;
             const SceneUniform& uniform;
         } draws[] = {
-            {DrawPass::Terrain, opaque_, terrainSampler_, ground},
+            {DrawPass::Terrain, terrain_, terrainSampler_, ground},
             {DrawPass::Shadow, shadow_, sampler_, ground},
             {DrawPass::Opaque, opaque_, sampler_, ship},
             {DrawPass::Translucent, translucent_, sampler_, ship}
@@ -482,6 +486,7 @@ void Scene::Close() noexcept
     if (depth_) SDL_ReleaseGPUTexture(device_, depth_);
     if (sampler_) SDL_ReleaseGPUSampler(device_, sampler_);
     if (terrainSampler_) SDL_ReleaseGPUSampler(device_, terrainSampler_);
+    if (terrain_) SDL_ReleaseGPUGraphicsPipeline(device_, terrain_);
     if (opaque_) SDL_ReleaseGPUGraphicsPipeline(device_, opaque_);
     if (translucent_) SDL_ReleaseGPUGraphicsPipeline(device_, translucent_);
     if (shadow_) SDL_ReleaseGPUGraphicsPipeline(device_, shadow_);
@@ -490,7 +495,7 @@ void Scene::Close() noexcept
     device_ = nullptr;
     depth_ = nullptr;
     sampler_ = terrainSampler_ = nullptr;
-    opaque_ = translucent_ = shadow_ = nullptr;
+    terrain_ = opaque_ = translucent_ = shadow_ = nullptr;
     claimed_ = false;
 }
 
