@@ -27,6 +27,7 @@ struct TextureData {
 };
 
 TextureData ReadDds(const std::filesystem::path& path);
+TextureData DecodeDds(const std::vector<std::uint8_t>& bytes, const std::filesystem::path& label);
 
 struct SceneUniform {
     float projection[16];
@@ -38,15 +39,17 @@ struct MaterialUniform {
     float emission[4] = {};
 };
 
+enum class DrawPass { Terrain, Shadow, Opaque, Translucent };
+
 struct Group {
     unsigned firstIndex;
     unsigned indexCount;
     unsigned textureIndex;
     MaterialUniform material;
-    bool translucent;
+    DrawPass pass;
 };
 
-struct ShipMesh {
+struct SceneMesh {
     std::vector<Vertex> vertices;
     std::vector<std::uint32_t> indices;
     std::vector<const TextureData*> textures{nullptr};
@@ -61,15 +64,15 @@ public:
     Scene& operator=(const Scene&) = delete;
 
     void Open(SDL_Window*);
-    void SetShip(const ShipMesh&);
-    bool Present(const SceneUniform&);
+    void SetMesh(const SceneMesh&);
+    bool Present(const SceneUniform& ship, const SceneUniform& ground);
     void Capture(std::filesystem::path path) { capture_ = std::move(path); }
     void Close() noexcept;
-    void ClearShip() noexcept;
+    void ClearMesh() noexcept;
 
 private:
     SDL_GPUTexture* UploadTexture(const TextureData&);
-    SDL_GPUGraphicsPipeline* CreatePipeline(SDL_GPUShader*, SDL_GPUShader*, bool);
+    SDL_GPUGraphicsPipeline* CreatePipeline(SDL_GPUShader*, SDL_GPUShader*, DrawPass);
     void ResizeDepth(unsigned, unsigned);
     void SaveFrame(SDL_GPUCommandBuffer*, SDL_GPUTexture*, SDL_GPUTexture*, unsigned, unsigned);
     std::filesystem::path capture_;
@@ -77,8 +80,11 @@ private:
     SDL_Window* window_ = nullptr;
     SDL_GPUDevice* device_ = nullptr;
     SDL_GPUSampler* sampler_ = nullptr;
+    SDL_GPUSampler* terrainSampler_ = nullptr;
     SDL_GPUGraphicsPipeline* opaque_ = nullptr;
     SDL_GPUGraphicsPipeline* translucent_ = nullptr;
+    SDL_GPUGraphicsPipeline* shadow_ = nullptr;
+    SDL_GPUTextureFormat depthFormat_ = SDL_GPU_TEXTUREFORMAT_INVALID;
     SDL_GPUTexture* depth_ = nullptr;
     SDL_GPUBuffer* vertices_ = nullptr;
     SDL_GPUBuffer* indices_ = nullptr;

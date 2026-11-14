@@ -102,7 +102,11 @@ void Require(bool success, const char* operation)
 
 TextureData ReadDds(const std::filesystem::path& path)
 {
-    const auto bytes = Bytes(path);
+    return DecodeDds(Bytes(path), path);
+}
+
+TextureData DecodeDds(const std::vector<std::uint8_t>& bytes, const std::filesystem::path& path)
+{
     if (bytes.size() < 128 || std::memcmp(bytes.data(), "DDS ", 4) || Read32(bytes, 4) != 124)
         throw std::runtime_error("Invalid DDS header: " + path.string());
     TextureData texture;
@@ -178,13 +182,26 @@ void Scene::Open(SDL_Window* window)
     sampler.max_lod = 15;
     sampler_ = SDL_CreateGPUSampler(device_, &sampler);
     Require(sampler_ != nullptr, "Create Vulkan sampler");
+    sampler.address_mode_u = sampler.address_mode_v = sampler.address_mode_w = SDL_GPU_SAMPLERADDRESSMODE_CLAMP_TO_EDGE;
+    terrainSampler_ = SDL_CreateGPUSampler(device_, &sampler);
+    Require(terrainSampler_ != nullptr, "Create Vulkan terrain sampler");
+
+    for (auto format : {SDL_GPU_TEXTUREFORMAT_D32_FLOAT_S8_UINT, SDL_GPU_TEXTUREFORMAT_D24_UNORM_S8_UINT}) {
+        if (SDL_GPUTextureSupportsFormat(device_, format, SDL_GPU_TEXTURETYPE_2D, SDL_GPU_TEXTUREUSAGE_DEPTH_STENCIL_TARGET)) {
+            depthFormat_ = format;
+            break;
+        }
+    }
+    if (depthFormat_ == SDL_GPU_TEXTUREFORMAT_INVALID)
+        throw std::runtime_error("Vulkan device has no supported depth and stencil format");
 
     auto* vertex = Shader(device_, Ship_vert, sizeof(Ship_vert), SDL_GPU_SHADERSTAGE_VERTEX);
     SDL_GPUShader* fragment = nullptr;
     try {
         fragment = Shader(device_, Ship_frag, sizeof(Ship_frag), SDL_GPU_SHADERSTAGE_FRAGMENT);
-        opaque_ = CreatePipeline(vertex, fragment, false);
-        translucent_ = CreatePipeline(vertex, fragment, true);
+        opaque_ = CreatePipeline(vertex, fragment, DrawPass::Opaque);
+        translucent_ = CreatePipeline(vertex, fragment, DrawPass::Translucent);
+        shadow_ = CreatePipeline(vertex, fragment, DrawPass::Shadow);
     } catch (...) {
         if (fragment) SDL_ReleaseGPUShader(device_, fragment);
         SDL_ReleaseGPUShader(device_, vertex);
@@ -197,8 +214,9 @@ void Scene::Open(SDL_Window* window)
     std::clog << "Runway33 Vulkan backend: " << SDL_GetGPUDeviceDriver(device_) << "; GPU: " << name << '\n';
 }
 
-SDL_GPUGraphicsPipeline* Scene::CreatePipeline(SDL_GPUShader* vertex, SDL_GPUShader* fragment, bool blend)
+SDL_GPUGraphicsPipeline* Scene::CreatePipeline(SDL_GPUShader* vertex, SDL_GPUShader* fragment, DrawPass kind)
 {
+    const bool blend = kind == DrawPass::Translucent || kind == DrawPass::Shadow;
     SDL_GPUVertexBufferDescription buffer{};
     buffer.pitch = sizeof(Vertex);
     const SDL_GPUVertexAttribute attributes[] = {
@@ -226,9 +244,17 @@ SDL_GPUGraphicsPipeline* Scene::CreatePipeline(SDL_GPUShader* vertex, SDL_GPUSha
     info.depth_stencil_state.enable_depth_test = true;
     info.depth_stencil_state.enable_depth_write = !blend;
     info.depth_stencil_state.compare_op = SDL_GPU_COMPAREOP_LESS_OR_EQUAL;
+    if (kind == DrawPass::Shadow) {
+        // Blend once per pixel even when several projected triangles overlap.
+        const SDL_GPUStencilOpState stamp{
+            SDL_GPU_STENCILOP_KEEP, SDL_GPU_STENCILOP_REPLACE, SDL_GPU_STENCILOP_KEEP, SDL_GPU_COMPAREOP_NOT_EQUAL};
+        info.depth_stencil_state.front_stencil_state = info.depth_stencil_state.back_stencil_state = stamp;
+        info.depth_stencil_state.compare_mask = info.depth_stencil_state.write_mask = 0xff;
+        info.depth_stencil_state.enable_stencil_test = true;
+    }
     info.target_info.color_target_descriptions = &target;
     info.target_info.num_color_targets = 1;
-    info.target_info.depth_stencil_format = SDL_GPU_TEXTUREFORMAT_D32_FLOAT;
+    info.target_info.depth_stencil_format = depthFormat_;
     info.target_info.has_depth_stencil_target = true;
     auto* pipeline = SDL_CreateGPUGraphicsPipeline(device_, &info);
     Require(pipeline != nullptr, "Create Vulkan mesh pipeline");
@@ -241,7 +267,7 @@ void Scene::ResizeDepth(unsigned width, unsigned height)
     if (depth_) SDL_ReleaseGPUTexture(device_, depth_);
     SDL_GPUTextureCreateInfo info{};
     info.type = SDL_GPU_TEXTURETYPE_2D;
-    info.format = SDL_GPU_TEXTUREFORMAT_D32_FLOAT;
+    info.format = depthFormat_;
     info.usage = SDL_GPU_TEXTUREUSAGE_DEPTH_STENCIL_TARGET;
     info.width = width;
     info.height = height;
@@ -295,9 +321,9 @@ SDL_GPUTexture* Scene::UploadTexture(const TextureData& texture)
     return image;
 }
 
-void Scene::SetShip(const ShipMesh& mesh)
+void Scene::SetMesh(const SceneMesh& mesh)
 {
-    ClearShip();
+    ClearMesh();
     vertices_ = Buffer(device_, SDL_GPU_BUFFERUSAGE_VERTEX, mesh.vertices.data(), mesh.vertices.size() * sizeof(Vertex));
     indices_ = Buffer(device_, SDL_GPU_BUFFERUSAGE_INDEX, mesh.indices.data(), mesh.indices.size() * sizeof(std::uint32_t));
     TextureData white;
@@ -313,7 +339,7 @@ void Scene::SetShip(const ShipMesh& mesh)
               << mesh.indices.size() << " indices, " << groups_.size() << " visible groups\n";
 }
 
-bool Scene::Present(const SceneUniform& uniform)
+bool Scene::Present(const SceneUniform& ship, const SceneUniform& ground)
 {
     auto* commands = SDL_AcquireGPUCommandBuffer(device_);
     Require(commands != nullptr, "Acquire Vulkan commands");
@@ -353,7 +379,7 @@ bool Scene::Present(const SceneUniform& uniform)
     depth.clear_depth = 1;
     depth.load_op = SDL_GPU_LOADOP_CLEAR;
     depth.store_op = SDL_GPU_STOREOP_DONT_CARE;
-    depth.stencil_load_op = SDL_GPU_LOADOP_DONT_CARE;
+    depth.stencil_load_op = SDL_GPU_LOADOP_CLEAR;
     depth.stencil_store_op = SDL_GPU_STOREOP_DONT_CARE;
     auto* pass = SDL_BeginGPURenderPass(commands, &color, 1, &depth);
     if (!groups_.empty()) {
@@ -361,12 +387,24 @@ bool Scene::Present(const SceneUniform& uniform)
         const SDL_GPUBufferBinding index{indices_, 0};
         SDL_BindGPUVertexBuffers(pass, 0, &vertex, 1);
         SDL_BindGPUIndexBuffer(pass, &index, SDL_GPU_INDEXELEMENTSIZE_32BIT);
-        SDL_PushGPUVertexUniformData(commands, 0, &uniform, sizeof(uniform));
-        for (const bool blend : {false, true}) {
-            SDL_BindGPUGraphicsPipeline(pass, blend ? translucent_ : opaque_);
+        const struct {
+            DrawPass kind;
+            SDL_GPUGraphicsPipeline* pipeline;
+            SDL_GPUSampler* sampler;
+            const SceneUniform& uniform;
+        } draws[] = {
+            {DrawPass::Terrain, opaque_, terrainSampler_, ground},
+            {DrawPass::Shadow, shadow_, sampler_, ground},
+            {DrawPass::Opaque, opaque_, sampler_, ship},
+            {DrawPass::Translucent, translucent_, sampler_, ship}
+        };
+        for (const auto& draw : draws) {
+            SDL_BindGPUGraphicsPipeline(pass, draw.pipeline);
+            if (draw.kind == DrawPass::Shadow) SDL_SetGPUStencilReference(pass, 1);
+            SDL_PushGPUVertexUniformData(commands, 0, &draw.uniform, sizeof(draw.uniform));
             for (const auto& group : groups_) {
-                if (group.translucent != blend) continue;
-                const SDL_GPUTextureSamplerBinding binding{textures_.at(group.textureIndex), sampler_};
+                if (group.pass != draw.kind) continue;
+                const SDL_GPUTextureSamplerBinding binding{textures_.at(group.textureIndex), draw.sampler};
                 SDL_BindGPUFragmentSamplers(pass, 0, &binding, 1);
                 SDL_PushGPUFragmentUniformData(commands, 0, &group.material, sizeof(group.material));
                 SDL_DrawGPUIndexedPrimitives(pass, group.indexCount, 1, group.firstIndex, 0, 0);
@@ -425,7 +463,7 @@ void Scene::SaveFrame(SDL_GPUCommandBuffer* commands, SDL_GPUTexture* frame, SDL
     Require(saved, "Save Vulkan frame");
 }
 
-void Scene::ClearShip() noexcept
+void Scene::ClearMesh() noexcept
 {
     if (!device_) return;
     for (auto* texture : textures_) SDL_ReleaseGPUTexture(device_, texture);
@@ -440,17 +478,19 @@ void Scene::Close() noexcept
 {
     if (!device_) return;
     SDL_WaitForGPUIdle(device_);
-    ClearShip();
+    ClearMesh();
     if (depth_) SDL_ReleaseGPUTexture(device_, depth_);
     if (sampler_) SDL_ReleaseGPUSampler(device_, sampler_);
+    if (terrainSampler_) SDL_ReleaseGPUSampler(device_, terrainSampler_);
     if (opaque_) SDL_ReleaseGPUGraphicsPipeline(device_, opaque_);
     if (translucent_) SDL_ReleaseGPUGraphicsPipeline(device_, translucent_);
+    if (shadow_) SDL_ReleaseGPUGraphicsPipeline(device_, shadow_);
     if (claimed_) SDL_ReleaseWindowFromGPUDevice(device_, window_);
     SDL_DestroyGPUDevice(device_);
     device_ = nullptr;
     depth_ = nullptr;
-    sampler_ = nullptr;
-    opaque_ = translucent_ = nullptr;
+    sampler_ = terrainSampler_ = nullptr;
+    opaque_ = translucent_ = shadow_ = nullptr;
     claimed_ = false;
 }
 

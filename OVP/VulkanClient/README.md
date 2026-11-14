@@ -2,8 +2,13 @@
 
 This opt-in client opens the supplied Runway 33 scenario in Orbiter and draws the
 stock DG-S exterior with its original textures and initial external camera. The
-client uses SDL3's Vulkan backend and a shared pair of SPIR-V shaders. A neutral
-background and simple sunlight keep this milestone focused on the spacecraft.
+client uses SDL3's Vulkan backend and a shared pair of SPIR-V shaders.
+
+The reference view draws a three-by-three patch of stock Earth surface tiles
+from `Earth/Archive/Surf.tree` using Orbiter's elevation data. The client projects
+the DG-S mesh along the Sun direction onto this terrain to draw the ground
+shadow at the scenario's initial landed pose. The patch and shadow are built
+once per scenario load for the paused Runway 33 view.
 
 Build with CMake 3.24 or newer, a matching Orbiter build, SDL3 3.4 or newer, and
 `glslangValidator` from the Vulkan SDK or your package manager. The shaders
@@ -26,10 +31,10 @@ cp /path/to/vulkan-build/VulkanClient.so \
   /path/to/native-engine-build/NativeModules/Graphics/
 ```
 
-Use the usual stock assets, ephemeris data, and planetary archive paths. Set
-`WindowWidth = 1280` and `WindowHeight = 720` in the configuration you pass to
-Orbiter. The optional evidence directory receives the first rendered Vulkan
-frame as `vulkan-frame.bmp`.
+Use the stock assets, ephemeris data, and planetary archives (Earth surface and
+elevation). Set `WindowWidth = 1280` and `WindowHeight = 720` in the configuration
+you pass to Orbiter. The optional evidence directory receives the first
+rendered Vulkan frame as `vulkan-frame.bmp`.
 
 ```sh
 /path/to/native-engine-build/orbiter-production \
@@ -47,8 +52,11 @@ selection remains OpenGL.
 ## Windows
 
 Use an x64 MSVC developer prompt. Point the build to the Orbiter build directory
-containing `Orbitersdk/include` and `Orbitersdk/lib`, and to the Dear ImGui
-headers used by that same Orbiter build. Set `SDL3_DIR` to the CMake package
+containing `Orbitersdk/include`, `Orbitersdk/lib`, and
+`Src/Orbiter/Production/orbiter_production_boundary.lib`. Point
+`ORBITER_IMGUI_SOURCE` to the Dear ImGui headers used by that same build. If the
+client sources are staged separately, set `ORBITER_VULKAN_SOURCE_ROOT` to the
+matching Orbiter source checkout. Set `SDL3_DIR` to the CMake package
 directory if CMake needs help finding the SDL3 SDK.
 
 ```powershell

@@ -64,9 +64,13 @@ public:
     {
         if (!loaded_ && !failed_) {
             try {
-                scene_.CaptureFocus();
+                char path[MAX_PATH] = {};
+                if (!PlanetTexturePath("Earth", path))
+                    throw std::runtime_error("Cannot locate the stock Earth texture directory");
+                scene_.CaptureFocus(std::filesystem::path(path) / "Archive" / "Surf.tree");
                 loaded_ = true;
                 Log("Runway33: stock DG-S mesh and textures uploaded");
+                Log("Runway33: stock Earth tiles and projected DG-S shadow uploaded");
             } catch (const std::exception& failure) {
                 failed_ = true;
                 Log(failure.what());

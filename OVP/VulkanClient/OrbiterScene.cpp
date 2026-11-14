@@ -16,55 +16,29 @@ namespace {
 constexpr auto defaultIndex = std::numeric_limits<std::uint32_t>::max();
 constexpr auto inheritedIndex = defaultIndex - 1;
 
-VECTOR3 Subtract(const VECTOR3& lhs, const VECTOR3& rhs)
-{
-    return {lhs.x - rhs.x, lhs.y - rhs.y, lhs.z - rhs.z};
-}
-
-double Dot(const VECTOR3& lhs, const VECTOR3& rhs)
-{
-    return lhs.x * rhs.x + lhs.y * rhs.y + lhs.z * rhs.z;
-}
-
-SceneUniform MakeUniform(OBJHANDLE focus, const VECTOR3& offset, unsigned width, unsigned height)
+SceneUniform MakeUniform(const SceneFrame& frame, unsigned width, unsigned height)
 {
     SceneUniform uniform{};
-    VECTOR3 position, camera, sun;
-    MATRIX3 worldRotation, cameraRotation;
-    oapiGetGlobalPos(focus, &position);
+    VECTOR3 camera;
+    MATRIX3 cameraRotation;
     oapiCameraGlobalPos(&camera);
     oapiCameraRotationMatrix(&cameraRotation);
-    oapiGetRotationMatrix(focus, &worldRotation);
-    if (const auto body = oapiGetGbodyByIndex(0)) oapiGetGlobalPos(body, &sun);
-    else sun = {};
-    const VECTOR3 columns[] = {
-        {worldRotation.m11, worldRotation.m21, worldRotation.m31},
-        {worldRotation.m12, worldRotation.m22, worldRotation.m32},
-        {worldRotation.m13, worldRotation.m23, worldRotation.m33}
-    };
-    const VECTOR3 axes[] = {
-        {cameraRotation.m11, cameraRotation.m21, cameraRotation.m31},
-        {cameraRotation.m12, cameraRotation.m22, cameraRotation.m32},
-        {cameraRotation.m13, cameraRotation.m23, cameraRotation.m33}
-    };
-    auto displacement = Subtract(position, camera);
-    displacement.x += columns[0].x * offset.x + columns[1].x * offset.y + columns[2].x * offset.z;
-    displacement.y += columns[0].y * offset.x + columns[1].y * offset.y + columns[2].y * offset.z;
-    displacement.z += columns[0].z * offset.x + columns[1].z * offset.y + columns[2].z * offset.z;
-    const auto sunlight = Subtract(sun, position);
+    const auto axes = Axes(cameraRotation);
+    const auto displacement = Subtract(frame.origin, camera);
+    const auto sunlight = Subtract(SunPosition(), frame.origin);
     const double distance = std::sqrt(Dot(sunlight, sunlight));
     const double vertical = 1 / std::tan(oapiCameraAperture());
     const double horizontal = vertical * height / width;
     constexpr double nearPlane = 0.1;
     constexpr double farPlane = 10000.0;
     for (unsigned i = 0; i < 4; ++i) {
-        const auto& v = i == 3 ? displacement : columns[i];
+        const auto& v = i == 3 ? displacement : frame.axes[i];
         const auto z = Dot(v, axes[2]);
         uniform.projection[4 * i] = float(horizontal * Dot(v, axes[0]));
         uniform.projection[4 * i + 1] = float(vertical * Dot(v, axes[1]));
         uniform.projection[4 * i + 2] = float((z - (i == 3 ? nearPlane : 0.0)) * farPlane / (farPlane - nearPlane));
         uniform.projection[4 * i + 3] = float(z);
-        if (i < 3) uniform.light[i] = distance > 0 ? float(Dot(columns[i], sunlight) / distance) : 0.0f;
+        if (i < 3) uniform.light[i] = distance > 0 ? float(Dot(v, sunlight) / distance) : 0.0f;
     }
     return uniform;
 }
@@ -199,7 +173,7 @@ void OrbiterScene::Open(SDL_Window* window)
     scene_.Open(window);
 }
 
-void OrbiterScene::CaptureFocus()
+void OrbiterScene::CaptureFocus(const std::filesystem::path& archive)
 {
     auto* vessel = oapiGetFocusInterface();
     if (!vessel || std::strcmp(vessel->GetClassName(), "DG-S"))
@@ -209,7 +183,7 @@ void OrbiterScene::CaptureFocus()
         throw std::runtime_error("Focus DG-S has no exterior mesh");
     focus_ = vessel->GetHandle();
     vessel->GetMeshOffset(0, offset_);
-    ShipMesh ship;
+    SceneMesh ship;
     const auto materials = oapiMeshMaterialCount(mesh);
     const auto textures = oapiMeshTextureCount(mesh);
     unsigned materialIndex = defaultIndex;
@@ -244,7 +218,8 @@ void OrbiterScene::CaptureFocus()
             }
         }
         const auto startVertex = unsigned(ship.vertices.size());
-        ship.groups.push_back({unsigned(ship.indices.size()), group->nIdx, gpuTexture, material, material.diffuse[3] < 0.999f});
+        const auto pass = material.diffuse[3] < 0.999f ? DrawPass::Translucent : DrawPass::Opaque;
+        ship.groups.push_back({unsigned(ship.indices.size()), group->nIdx, gpuTexture, material, pass});
         for (unsigned j = 0; j < group->nVtx; ++j) {
             const auto& v = group->Vtx[j];
             ship.vertices.push_back({{v.x, v.y, v.z}, {v.nx, v.ny, v.nz}, {v.tu, v.tv}});
@@ -258,20 +233,32 @@ void OrbiterScene::CaptureFocus()
         throw std::runtime_error("The DG-S exterior has no loaded textures");
     std::clog << "Runway33 focus: " << vessel->GetName() << ", " << vessel->GetClassName()
               << "; time=" << oapiGetSimTime() << "; aperture=" << oapiCameraAperture() << '\n';
-    scene_.SetShip(ship);
+    terrain_.Append(archive, ShipFrame(), ship);
+    scene_.SetMesh(ship);
+}
+
+SceneFrame OrbiterScene::ShipFrame() const
+{
+    auto frame = ObjectFrame(focus_);
+    frame.origin = frame.ToGlobal(offset_);
+    return frame;
 }
 
 void OrbiterScene::ClearFocus() noexcept
 {
     focus_ = nullptr;
-    scene_.ClearShip();
+    scene_.ClearMesh();
 }
 
 bool OrbiterScene::Present(unsigned width, unsigned height)
 {
     if (!width || !height) return true;
-    const auto uniform = focus_ ? MakeUniform(focus_, offset_, width, height) : SceneUniform{};
-    return scene_.Present(uniform);
+    if (!focus_) return scene_.Present({}, {});
+    auto ground = MakeUniform(terrain_.Frame(), width, height);
+    // The stock aerial imagery already contains its illumination.
+    ground.light[0] = ground.light[2] = 0;
+    ground.light[1] = 1;
+    return scene_.Present(MakeUniform(ShipFrame(), width, height), ground);
 }
 
 void OrbiterScene::Close() noexcept

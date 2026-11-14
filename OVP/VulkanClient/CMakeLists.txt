@@ -27,7 +27,7 @@ add_custom_command(OUTPUT "${shader_header}"
             -P "${CMAKE_CURRENT_SOURCE_DIR}/EmbedShaders.cmake"
     DEPENDS "${shader_dir}/Ship.vert.spv" "${shader_dir}/Ship.frag.spv" EmbedShaders.cmake
     VERBATIM)
-add_library(VulkanClient MODULE VulkanScene.cpp OrbiterScene.cpp "${shader_header}")
+add_library(VulkanClient MODULE VulkanScene.cpp OrbiterScene.cpp RunwayTerrain.cpp "${shader_header}")
 target_compile_features(VulkanClient PRIVATE cxx_std_17)
 target_include_directories(VulkanClient PRIVATE "${CMAKE_CURRENT_BINARY_DIR}")
 target_link_libraries(VulkanClient PRIVATE SDL3::SDL3)
@@ -35,12 +35,14 @@ set_target_properties(VulkanClient PROPERTIES PREFIX "")
 
 if(WIN32)
     target_sources(VulkanClient PRIVATE WindowsClient.cpp)
-    target_compile_definitions(VulkanClient PRIVATE NOMINMAX WIN32_LEAN_AND_MEAN)
+    target_compile_definitions(VulkanClient PRIVATE NOMINMAX WIN32_LEAN_AND_MEAN ORBITER_PRODUCTION_SHARED)
     target_include_directories(VulkanClient PRIVATE
-        "${ORBITER_TEST_RUNTIME}/Orbitersdk/include" "${ORBITER_IMGUI_SOURCE}")
+        "${ORBITER_TEST_RUNTIME}/Orbitersdk/include" "${ORBITER_IMGUI_SOURCE}"
+        "${ORBITER_VULKAN_SOURCE_ROOT}/Src/Orbiter")
     target_link_libraries(VulkanClient PRIVATE user32
         "${ORBITER_TEST_RUNTIME}/Orbitersdk/lib/Orbiter.lib"
-        "${ORBITER_TEST_RUNTIME}/Orbitersdk/lib/Orbitersdk.lib")
+        "${ORBITER_TEST_RUNTIME}/Orbitersdk/lib/Orbitersdk.lib"
+        "${ORBITER_TEST_RUNTIME}/Src/Orbiter/Production/orbiter_production_boundary.lib")
 else()
     if(NOT EXISTS "${ORBITER_ENGINE_BUILD}/native-sdk/OrbiterNativeBuild.h")
         message(FATAL_ERROR "Configure against the matching native production SDK build")

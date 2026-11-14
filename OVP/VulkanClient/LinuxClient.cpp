@@ -92,7 +92,10 @@ public:
     void Render() override
     {
         if (!loaded_) {
-            scene_.CaptureFocus();
+            char path[4096] = {};
+            if (!RenderTexturePath("Earth", path, true))
+                throw std::runtime_error("Cannot locate the stock Earth texture directory");
+            scene_.CaptureFocus(std::filesystem::path(path) / "Archive" / "Surf.tree");
             loaded_ = true;
         }
     }
