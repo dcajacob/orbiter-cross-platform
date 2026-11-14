@@ -141,6 +141,7 @@ private:
 
 	OGLParticleStream **pstream; // list of particle streams
 	int                nstream; // number of streams
+	double particleUpdateTime;
 
 	OGLLight *light=nullptr;          // only one for now
 	VECTOR3 bg_rgba;          // ambient background colour

@@ -75,6 +75,7 @@ Scene::Scene (int w, int h)
 	csphere = new OGLCelestialSphere ();
 	vobjFirst = vobjLast = NULL;
 	nstream = 0;
+	particleUpdateTime = oapiGetSimTime();
 	iVCheck = 0;
 	surfLabelsActive = false;
 	if (!g_client->GetRenderParam (RP_MAXLIGHTS, &maxlight)) maxlight = 8;
@@ -321,11 +322,19 @@ void Scene::Update ()
 		vo->Update();
 	}
 
-	// update particle streams - should be skipped when paused
-	if (!oapiGetPause()) {
+	// A rendered frame may follow several simulation steps, or none.
+	const double simTime = oapiGetSimTime();
+	if (simTime < particleUpdateTime) {
+		for (int i = 0; i < nstream; ++i)
+			pstream[i]->Timejump();
+		particleUpdateTime = simTime;
+	}
+	if (!oapiGetPause() && simTime > particleUpdateTime) {
+		const double elapsed = simTime - particleUpdateTime;
+		particleUpdateTime = simTime;
 		for (int i = 0; i < nstream;) {
 			if (pstream[i]->Expired()) DelParticleStream (i);
-			else pstream[i++]->Update();
+			else pstream[i++]->Update(elapsed);
 		}
 	}
 }
