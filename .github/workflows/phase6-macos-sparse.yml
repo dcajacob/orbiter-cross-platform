@@ -1,0 +1,98 @@
+name: Orbiter macOS sparse checks
+
+on:
+  push:
+    branches: [qualification/macos-sparse-v1]
+    paths: [.github/workflows/phase6-macos-sparse.yml]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: orbiter-macos-sparse
+  cancel-in-progress: false
+
+jobs:
+  sparse:
+    name: macOS Release ${{ matrix.arch }}
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 25
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - runner: macos-15-intel
+            arch: x86_64
+          - runner: macos-15
+            arch: arm64
+    env:
+      ORBITER_CANDIDATE: 34336e24c20dccc59aa708355542a7c4ce0eee9a
+      ORBITER_BASELINE: f72766b3c3fbfbfd9b6abd8aae291199de761343
+      ORBITER_ARCH: ${{ matrix.arch }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Verify application source and native runner architecture
+        shell: bash
+        run: |
+          test "$(git diff --name-only "$ORBITER_CANDIDATE" HEAD)" = .github/workflows/phase6-macos-sparse.yml
+          test "$(git rev-parse "${ORBITER_CANDIDATE}^")" = "$ORBITER_BASELINE"
+          test "$(git diff --name-only "$ORBITER_BASELINE" "$ORBITER_CANDIDATE")" = "$(printf '%s\n' Orbitersdk/include/DrawAPI.h Src/ClientNative/main.cpp Src/Orbiter/PinesGravFile.cpp)"
+          git switch --detach "$ORBITER_CANDIDATE"
+          test "$(git rev-parse HEAD)" = "$ORBITER_CANDIDATE"
+          test "$(uname -s)" = Darwin
+          test "$(uname -m)" = "$ORBITER_ARCH"
+          mkdir -p out/mac-evidence
+          {
+            printf 'Workflow %s\nApplication %s\nBaseline %s\n' "$GITHUB_SHA" "$ORBITER_CANDIDATE" "$ORBITER_BASELINE"
+            sw_vers
+            uname -m
+            xcodebuild -version
+            clang++ --version
+            cmake --version
+          } | tee out/mac-evidence/identity.txt
+      - name: Build the portable core and test viewer
+        shell: bash
+        run: |
+          cmake -S Tests/Portable -B out/mac -G Ninja -DCMAKE_BUILD_TYPE=Release \
+            -DCMAKE_OSX_ARCHITECTURES="$ORBITER_ARCH" -DCMAKE_POLICY_VERSION_MINIMUM=3.5 \
+            -DORBITER_PORTABLE_COLLISION_TESTS=ON -DORBITER_BUILD_VIEWER=ON \
+            2>&1 | tee out/mac-evidence/configure.log
+          cmake --build out/mac --parallel 2 2>&1 | tee out/mac-evidence/build.log
+          for binary in out/mac/portable/orbiter-headless out/mac/portable/native-client/orbiter-native; do
+            test "$(lipo -archs "$binary")" = "$ORBITER_ARCH"
+            file "$binary"
+            shasum -a 256 "$binary"
+          done | tee out/mac-evidence/binaries.txt
+      - name: Run portable tests and frozen flight comparisons
+        shell: bash
+        run: |
+          ctest --test-dir out/mac --output-on-failure --no-tests=error \
+            --output-junit "$PWD/out/mac-evidence/ctest.xml" 2>&1 | tee out/mac-evidence/ctest.log
+      - name: Exercise native OpenGL rendering with the portable flight fixture
+        shell: bash
+        run: |
+          python3 -B Tests/Portable/test_native_client.py \
+            --binary out/mac/portable/native-client/orbiter-native \
+            --headless out/mac/portable/orbiter-headless \
+            --fixture Tests/Portable/Fixtures --reference Tests/Portable/Reference \
+            --backend auto --output out/mac-evidence/graphics 2>&1 | tee out/mac-evidence/graphics.log
+          python3 -c 'import json; from pathlib import Path; runs=json.loads(Path("out/mac-evidence/graphics/verification.json").read_text()); assert all(runs[case]["runtime"]["backend"] == "cocoa" for case in ("overview", "overview-repeat", "controls-follow"))'
+      - name: Preserve the portable smoke evidence and failures
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: macos-sparse-${{ matrix.arch }}
+          retention-days: 3
+          path: |
+            out/mac-evidence/**/*.txt
+            out/mac-evidence/**/*.log
+            out/mac-evidence/**/*.xml
+            out/mac-evidence/**/*.json
+            out/mac-evidence/**/*.csv
+            out/mac-evidence/**/*.png
+            out/mac/traces/*.csv
+            out/mac/traces/*.json
+            out/mac/Testing/Temporary/LastTest.log
