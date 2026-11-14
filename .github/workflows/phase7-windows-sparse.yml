@@ -144,7 +144,7 @@ jobs:
           python -B out/windows_phase7_stock.py --runtime out/runtime --data out/production-data --planets out/standard-planets --mesa out/mesa-runtime --output out/stock
           exit $LASTEXITCODE
       - name: Record existing Qt Launchpad startup evidence
-        if: ${ !cancelled() && steps.source.outcome == 'success' }
+        if: ${{ !cancelled() && steps.source.outcome == 'success' }}
         run: |
           git diff --quiet a3930b62e9c8553c04a40a9bb4f5c85955cfd795 HEAD -- Utils/Launchpad
           if ($LASTEXITCODE -ne 0) { throw 'Qt Launchpad source differs from its tested source' }
