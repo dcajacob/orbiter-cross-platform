@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include "OrbiterSDK.h"
+#include "XRSoundPlatform.h"
 #include "XRSoundEngine.h"
 
 // Defines the master map of all known Orbiter vessels (handles) -> XRSoundEngine * for it.
@@ -23,10 +23,18 @@ typedef pair<std::string, ModuleXRSoundEngine *> CString_XRSoundEnginePtr_Pair;
 
 
 // Orbiter module that maintains state data and methods for our DLL singleton object
-class XRSoundDLL : public oapi::Module
+class XRSoundDLL
+#ifdef _WIN32
+    : public oapi::Module
+#endif
 {
 public:
+#ifdef _WIN32
     XRSoundDLL(HINSTANCE hDLL);
+#else
+    enum class RenderMode { Native };
+    XRSoundDLL() = default;
+#endif
     virtual ~XRSoundDLL();
 
     static XRSoundDLL *s_pInstance;  // our singleton DLL object
@@ -40,10 +48,17 @@ public:
     HASHMAP_CSTRING_XRSOUNDENGINEPTR m_allModulesMap;
 
     // Orbiter callbacks
-    virtual void clbkSimulationStart(RenderMode mode) override;
-    virtual void clbkSimulationEnd() override;
-    virtual void clbkPreStep(double simt, double simdt, double mjd) override;
-    virtual void clbkPause(bool paused) override;
+#ifdef _WIN32
+    void clbkSimulationStart(RenderMode mode) override;
+    void clbkSimulationEnd() override;
+    void clbkPreStep(double simt, double simdt, double mjd) override;
+    void clbkPause(bool paused) override;
+#else
+    void clbkSimulationStart(RenderMode mode);
+    void clbkSimulationEnd();
+    void clbkPreStep(double simt, double simdt, double mjd);
+    void clbkPause(bool paused);
+#endif
 
     // Returns the linear simulation time since simulation start, ignoring any MJD changes (edits).
     // This is the same principle as oapiGetSimTime except that it always returns a value >= the previous frame's value.
@@ -69,8 +84,10 @@ public:
     static void ParseGlobalConfigFile();
 
 protected:
+#ifdef _WIN32
     HINSTANCE m_hDLL;  // our DLL's handle
-    double m_nextSoundEnginesRefreshSimt;
-    double m_absoluteSimTime;   // replaces simt and oapiGetSimTime(), both of which are unreliable!  See note in XRSoundDLL::clbkPreStep.
+#endif
+    double m_nextSoundEnginesRefreshSimt = 0;
+    double m_absoluteSimTime = 0;   // See note in XRSoundDLL::clbkPreStep.
 };
 

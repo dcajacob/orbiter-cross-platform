@@ -9,7 +9,7 @@
 
 #include <unordered_map>
 
-#include "OrbiterSDK.h"
+#include "XRSoundPlatform.h"
 #include "XRSound.h"            // for enums
 #include "VesselXRSoundEngine.h"
 
@@ -23,6 +23,8 @@ public:
     { 
         _ASSERTE(pEngine); 
     }
+
+    virtual ~SoundPreStep() = default;
 
     XRSoundConfigFileParser &GetConfig()
     {

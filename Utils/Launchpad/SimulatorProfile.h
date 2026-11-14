@@ -15,6 +15,7 @@ struct SimulatorProfile {
     QString planets;
     QString config;
     QString keymap;
+    QString xrsoundAssets;
     QString saveRoot;
     QString helpRoot;
     QProcessEnvironment environment;

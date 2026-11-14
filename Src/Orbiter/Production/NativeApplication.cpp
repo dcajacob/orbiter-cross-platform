@@ -6,6 +6,7 @@
 // Narrow production external-view host. It owns real WorldOwner/Camera/Psys,
 // native source modules and the original shared Session ordering, never POC state.
 #include "NativeGraphics.h"
+#include "NativeSound.h"
 #include "NativeParticle.h"
 #include "FlightControls.h"
 #include "FlightReplay.h"
@@ -59,6 +60,7 @@
 #include <limits>
 #include <map>
 #include <memory>
+#include <optional>
 #include <stdexcept>
 #include <string>
 #include <thread>
@@ -243,6 +245,11 @@ struct Runtime final:BodyServices,RigidBodyServices,SurfaceServices,NavigationSe
     std::ofstream lifecycle,trace,flightTrace,inputTrace,inputEvents,thrustTrace,animationTrace,controlTrace,mathTrace,contactTrace;
     unsigned pendingCockpitRedraw=0,inputTick=0,completedTicks=0,observationTick=0;
     FlightControls controls;FlightReplay replay;FlightInput input;
+    std::unique_ptr<ResourceResolver> soundAssets;
+    std::optional<NativeSoundContext> soundContext;
+    std::unique_ptr<NativeModule> soundModule;
+    const NativeSoundApi* sound = nullptr;
+    bool soundPaused = true;
 #ifdef ORBITER_NATIVE_COCKPIT
     NativeAnnotations annotations;
     std::string playbackDirectory;
@@ -714,8 +721,29 @@ struct Runtime final:BodyServices,RigidBodyServices,SurfaceServices,NavigationSe
         inputTrace<<','<<input.x<<','<<input.y<<','<<input.rz<<','<<input.alternate<<','<<input.throttle<<'\n';
     }
     Runtime(Resources& data):resources(data),config(data.config),celestial(config,data.data,data.modules),world(*this) {}
+    void StartSound(const std::filesystem::path& assets)
+    {
+        soundAssets = std::make_unique<ResourceResolver>(assets);
+        soundContext.emplace(NativeSoundContext{*soundAssets});
+        soundModule = std::make_unique<NativeModule>(resources.modules.Resolve("Plugin/XRSound.so"),
+            ORBITER_NATIVE_PLUGIN, &*soundContext);
+        const auto* api = static_cast<const NativeSoundApi*>(soundModule->Instance());
+        if (api->size != sizeof(*api) || !api->step || !api->pause || !api->deleteVessel)
+            throw std::runtime_error("Incomplete native XRSound interface");
+        sound = api;
+    }
+    void UpdateSoundPause()
+    {
+        const bool paused = !running;
+        if (sound && soundPaused != paused) {
+            sound->pause(paused);
+            soundPaused = paused;
+        }
+    }
     void Finish() {
         if(finished)return;
+        sound = nullptr;
+        soundModule.reset();
 #ifdef ORBITER_NATIVE_COCKPIT
         if(recording && system)StopRecording();
         if(render.optionsUsed) {
@@ -1152,6 +1180,7 @@ struct Runtime final:BodyServices,RigidBodyServices,SurfaceServices,NavigationSe
     void GraphicsNewVessel(Vessel* vessel) override {render.graphics->NewVessel(vessel);LifetimeEvent("graphics.create",vessel->Name());}
     void DialogNewVessel(Vessel*) override {} // No dialogs are instantiated.
     void ModuleDeleteVessel(Vessel* vessel) override {
+        if (sound) sound->deleteVessel(vessel);
 #ifdef ORBITER_NATIVE_COCKPIT
         scripts.DeleteVessel(vessel);
 #endif
@@ -1342,6 +1371,9 @@ struct Runtime final:BodyServices,RigidBodyServices,SurfaceServices,NavigationSe
         render.camera->UpdateMouse();
 #endif
         Session::UpdateWorld(*this,time,running,playback,updating,force);
+        UpdateSoundPause();
+        if (sound && running)
+            sound->step(time.SimT1,time.SimDT,time.MJD1);
         Session::EndTimeStep(*this,time,running,active,force);
         if(!wasRunning)running=false;
         input.throttle=-1;observationTick=completedTicks;Commands("after");render.paused=!running;if(savePending){Save();savePending=false;}++inputTick;
@@ -1361,6 +1393,7 @@ int main(int argc,char** argv) {
         }
         std::vector<std::string> allowed={"--assets","--data","--modules","--planets","--config","--scenario","--evidence","--frames","--fixed-step","--run","--capture-time","--keymap","--save","--replay","--ticks","--render-every","--sessions","--joystick-throttle-axis","--joystick-twist-axis","--frame-delay-ms","--fixed-ui-clock"};
         allowed.push_back("--fixed-system-step");
+        allowed.push_back("--xrsound-assets");
         for(const auto& entry:arguments)if(std::find(allowed.begin(),allowed.end(),entry.first)==allowed.end())throw std::runtime_error("Unknown argument: "+entry.first);
         for(const char* name:{"--assets","--data","--modules","--planets","--config","--scenario"})if(!arguments.count(name))throw std::runtime_error(std::string("Required argument missing: ")+name);
         const auto absolute=[&](const char* name){return std::filesystem::absolute(arguments.at(name));};
@@ -1421,6 +1454,8 @@ int main(int argc,char** argv) {
             if(fixedUiClock)SetCockpitReplayClock(static_cast<float>(fixed));
 #endif
             application.time.SetFixedStep(fixed);application.running=startRunning;application.render.paused=!application.running;
+            if (arguments.count("--xrsound-assets"))
+                application.StartSound(absolute("--xrsound-assets"));
             std::cout<<"Production "<<application.render.focus->GetModuleInterface()->GetClassName()<<" flight. Space/Ctrl-P: pause. T/R: warp. Ctrl-S: save. F5: reload. "
 #ifdef ORBITER_NATIVE_COCKPIT
                 <<"F6: options. F8: cockpit. "
@@ -1461,6 +1496,7 @@ int main(int argc,char** argv) {
                     application.Buffered(application.input);
                     if(application.savePending && !application.stepOnce){application.Save();application.savePending=false;}
                 }
+                application.UpdateSoundPause();
                 if(application.reloadPending) {if(!std::filesystem::is_regular_file(save)){std::cerr<<"No saved scenario exists: "<<save<<'\n';application.reloadPending=false;}else{scenario=save;reload=true;break;}}
                 if(input.width>0 && input.height>0) {
 #ifdef ORBITER_NATIVE_COCKPIT

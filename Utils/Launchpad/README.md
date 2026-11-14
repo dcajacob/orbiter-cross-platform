@@ -48,7 +48,14 @@ The assets directory contains the stock `Scenarios` tree. The config file
 holds the simulator and controller settings and should be writable so Orbiter
 can save changes made in flight. Optional `keymap`, `environment` and
 `unsetEnvironment` fields select a keymap and set or remove child-process
-environment variables. If `saves` is omitted, the launcher uses Qt's
+environment variables. For Linux audio, set `xrsoundAssets` to the directory
+containing `XRSound/XRSound.cfg` and the stock `XRSound/Default` sounds.
+In a source checkout this is `Sound/XRSound/assets`. The matching native
+module build places `XRSound.so` in `NativeModules/Plugin`. Start in the
+Delta-glider cockpit to hear propulsion sounds in orbit with the stock
+SilenceOfSpace setting.
+
+If `saves` is omitted, the launcher uses Qt's
 per-user application data directory. **Ctrl+S** saves to `Quicksave.scn`,
 which appears under **Saved scenarios** after you close the simulator.
 **Start paused** is selected by default. Press **Space** to start time or

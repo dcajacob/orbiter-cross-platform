@@ -50,6 +50,7 @@ SimulatorProfile SimulatorProfile::load(const QString &profilePath)
     profile.planets = path("planets");
     profile.config = path("config");
     profile.keymap = path("keymap");
+    profile.xrsoundAssets = path("xrsoundAssets");
     profile.helpRoot = path("help");
     profile.scenarioRoot = QDir(profile.assets).absoluteFilePath("Scenarios");
     profile.saveRoot = path("saves");
@@ -109,6 +110,8 @@ QString SimulatorProfile::validationError() const
             return QObject::tr("Simulator configuration missing: %1").arg(config);
         if (!keymap.isEmpty() && !QFileInfo(keymap).isFile())
             return QObject::tr("Keyboard map missing: %1").arg(keymap);
+        if (!xrsoundAssets.isEmpty() && !QFileInfo(QDir(xrsoundAssets).filePath("XRSound/XRSound.cfg")).isFile())
+            return QObject::tr("XRSound configuration missing in %1").arg(xrsoundAssets);
     }
     return {};
 }
@@ -126,6 +129,8 @@ QStringList SimulatorProfile::arguments(const QString &scenario, bool startPause
                        "--save", QDir(saveRoot).filePath("Quicksave.scn")};
     if (!keymap.isEmpty())
         result << "--keymap" << keymap;
+    if (!xrsoundAssets.isEmpty())
+        result << "--xrsound-assets" << xrsoundAssets;
     if (!startPaused)
         result << "--run";
     return result;

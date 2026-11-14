@@ -10,7 +10,7 @@
 
 #include <vector>
 #include "ConfigFileParser.h"
-#include "Orbitersdk.h"   // for VESSEL
+#include "XRSoundPlatform.h"
 #include "AnimationState.h"
 #include "XRSound.h"    // for PlaybackType
 #include <unordered_map>

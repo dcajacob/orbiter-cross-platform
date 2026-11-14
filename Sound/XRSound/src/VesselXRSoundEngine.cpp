@@ -598,7 +598,9 @@ void VesselXRSoundEngine::LoadDefaultSounds()
     AddSoundPreStep(new AutopilotOnOffSoundPreStep(this));
 
     // This is a special, user-requested PreStep that does not play a sound, but auto-disables Orbiter's stock autopilots above a configured threshold.  
+#ifdef _WIN32
     AddSoundPreStep(new DisableAutopilotsForTimeAccPreStep(this));
+#endif
 
 
     // add default sound groups
@@ -648,6 +650,7 @@ bool VesselXRSoundEngine::AddDefaultSound(DefaultSoundPreStep *pPreStep, const i
     {
         // no sound filename set, so sound was disabled by the user in XRSound.cfg (or vessel class .cfg override)
         VERBOSE_LOG(this, "XRSoundEngine::AddDefaultSound INFO: default sound ID %d disabled via config file.", soundID);
+        delete pPreStep;
         return false;
     }
 

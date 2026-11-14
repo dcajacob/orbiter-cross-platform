@@ -10,7 +10,7 @@
 
 #include <unordered_map>
 
-#include "OrbiterSDK.h"
+#include "XRSoundPlatform.h"
 #include "XRSoundEngine30.h"   // latest interface version 
 
 using namespace std;
@@ -73,12 +73,12 @@ struct WavContext
         if (bShowLoopAndVolume)
         {
             snprintf(cbuf, 256, "[soundID = %d, playbackType = %s (%d), bLoop = %d, volume = %.2lf, bPaused = %d, bEnabled = %d, filename = '%s']",
-                soundID, PlaybackTypeToStr(playbackType), playbackType, bLoop, volume, bPaused, bEnabled, static_cast<const char *>(csSoundFilename.c_str()));
+                soundID, PlaybackTypeToStr(playbackType), static_cast<int>(playbackType), bLoop, volume, bPaused, bEnabled, csSoundFilename.c_str());
         }
         else
         {
             snprintf(cbuf, 256, "[soundID = %d, playbackType = %s (%d), filename = '%s']",
-                soundID, PlaybackTypeToStr(playbackType), playbackType, static_cast<const char *>(csSoundFilename.c_str()));
+                soundID, PlaybackTypeToStr(playbackType), static_cast<int>(playbackType), csSoundFilename.c_str());
         }
         
         return cbuf;
@@ -268,6 +268,7 @@ private:
 
 // These are used to dynamically bind to DLL-exported methods.  Note that DLLCLBK specifies 'extern "C"', which uses the __cdecl
 // calling convention, NOT the normal __stdcall that C++ uses.
+#ifdef _WIN32
 extern "C" typedef XRSoundEngine* (__cdecl* VesselXRSoundEngineInstanceFuncPtr)(OBJHANDLE hVessel);
 extern "C" typedef XRSoundEngine* (__cdecl* ModuleXRSoundEngineInstanceFuncPtr)(const char* pUniqueModuleName);
-
+#endif

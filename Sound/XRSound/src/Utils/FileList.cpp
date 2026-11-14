@@ -6,12 +6,12 @@
 // Licensed under the MIT License
 // ==============================================================
 
-#include "Orbitersdk.h"   // for oapiRand
+#include "XRSoundPlatform.h"
 #include "FileList.h"
 
 // Convenience constructor for when you want to accept all file types
 FileList::FileList(const char *pRootPath, const bool bRecurseSubfolders) :
-    m_rootPath(pRootPath), m_bRecurseSubfolders(bRecurseSubfolders), m_previousRandomFileIndex(-1)
+    m_rootPath(xrsound::AssetPath(pRootPath, true)), m_bRecurseSubfolders(bRecurseSubfolders), m_previousRandomFileIndex(-1)
 {
 }
 
@@ -66,7 +66,11 @@ void FileList::Scan(const char *pPath, const int recursionLevel)
                 else if (file.file_size() > 0)  // it's a file node; is it not empty?
                 {
                     // it's a file and it's not empty, so add it to our master list of nodes and invoke the callback for subclasses to hook
-                    m_allFiles.push_back(file.path().string().c_str());
+#ifdef _WIN32
+                    m_allFiles.push_back(file.path().string());
+#else
+                    m_allFiles.push_back(file.path().lexically_relative(xrsound::resources->Root()).string());
+#endif
                     clbkProcessFile(file);
                 }
             }
@@ -93,7 +97,7 @@ bool FileList::clbkFilterNode(const fs::directory_entry& entry)
             // see if we have a case-insensitive match for this extension in our master list
             for (auto it = m_fileTypesToAccept.begin(); it != m_fileTypesToAccept.end(); it++)
             {
-                if (stricmp(entry.path().extension().string().c_str(), it->c_str()) == 0)
+                if (_stricmp(entry.path().extension().string().c_str(), it->c_str()) == 0)
                 {
                     bAcceptFile = true;
                     break;
@@ -129,7 +133,7 @@ const std::string FileList::GetRandomFile()
     int fileIndex;
     do
     {
-        fileIndex = (static_cast<int>(oapiRand() * RAND_MAX) % fileCount); // 0..count-1    
+        fileIndex = (static_cast<int>(XRSoundRandom() * RAND_MAX) % fileCount); // 0..count-1
     } while (fileIndex == m_previousRandomFileIndex);
 
     m_previousRandomFileIndex = fileIndex;
@@ -166,7 +170,7 @@ const std::string *FileList::FindFileWithBasename(const char *pBasename) const
 			int lastSeparatorIndex;
 
             // locate the filename portion of the string
-			size_t pos = filespec.rfind('\\');
+			size_t pos = filespec.find_last_of("/\\");
 			if (pos == std::string::npos)
 				lastSeparatorIndex = -1;     // we have just a filename ("bar.flac") -- no leading path; adjust so it will start at index 0 below
 			else

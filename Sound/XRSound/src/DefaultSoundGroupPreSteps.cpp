@@ -7,6 +7,8 @@
 
 #include "XRSoundDLL.h"
 #include "DefaultSoundGroupPreSteps.h"
+#include <climits>
+#include <cstdint>
 
 // -----------------------------------------------------------------------------------
 // This abstract subclass handles playing back a default sound from a group of sounds
@@ -171,7 +173,7 @@ void RandomDefaultSoundGroupPreStep::ResetTimer()
         maxDelay = minDelay;
 
     const double range = maxDelay - minDelay;
-    const double delay = ((oapiRand() * range)) + minDelay;
+    const double delay = ((XRSoundRandom() * range)) + minDelay;
 
     _ASSERTE(delay >= minDelay);
     _ASSERTE(delay <= maxDelay);
@@ -265,7 +267,7 @@ RandomDefaultSoundGroupPreStep::MinMaxDelay ATCDefaultSoundGroupPreStep::GetMinM
     
     // see if the user disabled these sounds by setting min or max to zero
     if ((min <= 0) || (max <= 0))
-        return RandomDefaultSoundGroupPreStep::MinMaxDelay(MAXINT, MAXINT);  // sounds will never play
+        return RandomDefaultSoundGroupPreStep::MinMaxDelay(INT_MAX, INT_MAX);  // sounds will never play
 
     const VESSEL *pVessel = GetVessel();
     if (pVessel)  // sanity check in case Orbiter deleted it out from under us as the other checks missed it
@@ -534,7 +536,7 @@ void MachCalloutsDefaultSoundGroupPreStep::clbkPreStep(const double simt, const 
 
     if (!groundContact && (mach <= 0))  // prevent resets when on ground
     {
-        m_previousMach = MAXLONG;   // out of the atmosphere
+        m_previousMach = INT32_MAX; // out of the atmosphere
         return;     // nothing more to do
     }
 

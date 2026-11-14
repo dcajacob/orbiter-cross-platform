@@ -73,7 +73,8 @@ public:
     ~ISoundEngine();
     ISound *play2D(const char *soundFileName, const bool playLooped=false, const bool startPaused=false, const bool track=false);
 	void Release(ISound *);
-	const char *getDriverName() { return "miniaudio"; }
+    bool IsInitialized() const { return m_initialized; }
+    const char *getDriverName();
 private:
     ma_engine m_engine;
 	bool m_initialized = false;

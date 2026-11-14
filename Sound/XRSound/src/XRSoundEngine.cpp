@@ -44,19 +44,22 @@ bool XRSoundEngine::InitializeSoundEngine()
         s_SoundEngine = new ISoundEngine();
 
         char logMsg[256];   // can't use CString easily here b/c Orbiter's oapiWriteLog takes a char * instead of const char * for some bizarre reason.
-        if (s_SoundEngine)
-            sprintf_s(logMsg, "%s initialized using sound driver %s. XRSound UpdateInterval = %.03lf (%.1lf updates per second)", 
+        if (s_SoundEngine->IsInitialized())
+            snprintf(logMsg, sizeof logMsg, "%s initialized using sound driver %s. XRSound UpdateInterval = %.03lf (%.1lf updates per second)",
                 GetVersionStr(), XRSoundEngine::GetSoundDriverName(),  
                 s_globalConfig.UpdateInterval, (1.0 / s_globalConfig.UpdateInterval));
         else
-            sprintf_s(logMsg, "%s ERROR: could not initialize default sound device.", GetVersionStr());
+            snprintf(logMsg, sizeof logMsg, "%s ERROR: could not initialize default sound device.", GetVersionStr());
 
         oapiWriteLog(logMsg);
         s_globalConfig.WriteLog("----------------------------------------------------------------------------");
         s_globalConfig.WriteLog(logMsg);
 
-        if (!XRSoundEngine::IsSoundEngineInitialized())
+        if (!s_SoundEngine->IsInitialized()) {
+            delete s_SoundEngine;
+            s_SoundEngine = nullptr;
             return false;
+        }
     }
     else
     {
@@ -71,7 +74,7 @@ bool XRSoundEngine::InitializeSoundEngine()
 void XRSoundEngine::DestroySoundEngine()
 {
     char logMsg[256];   // can't use CString easily here b/c Orbiter's oapiWriteLog takes a char * instead of const char * for some bizarre reason.
-    sprintf_s(logMsg, "%s terminating.", GetVersionStr());
+    snprintf(logMsg, sizeof logMsg, "%s terminating.", GetVersionStr());
 
     oapiWriteLog(logMsg);
     s_globalConfig.WriteLog(logMsg);
@@ -83,14 +86,15 @@ void XRSoundEngine::DestroySoundEngine()
         if (s_pMusicFolderWavContext)
         {
             StopWavImpl(s_pMusicFolderWavContext, nullptr);
+            delete s_pMusicFolderWavContext;
             s_pMusicFolderWavContext = nullptr;        // so we will recreate it when the Orbiter relaunches
         }
 
         // free and reset the engine
         delete s_SoundEngine;
         s_SoundEngine = nullptr;
-        s_bSoundEngineNeedsInitialization = true;    // need to reinitialize the engine on next LoadWav call
     }
+    s_bSoundEngineNeedsInitialization = true;
 }
 
 bool XRSoundEngine::IsSoundEngineInitialized()
@@ -255,7 +259,8 @@ bool XRSoundEngine::PlayWav(const int soundID, const bool bLoop, const float vol
     {
         // sound is not playing, so let's start immediately and track it via its pISound interface
         // NOTE: we start this paused so that we can set the proper volume level before starting it via UpdateSoundState
-        pISound = pContext->pISound = s_SoundEngine->play2D(pContext->csSoundFilename.c_str(), bLoop, true);
+        const auto path = xrsound::AssetPath(pContext->csSoundFilename.c_str());
+        pISound = pContext->pISound = s_SoundEngine->play2D(path.c_str(), bLoop, true);
         if (pISound == nullptr)   // this means the sound could not be played; e.g., corrupt file, etc.
         {
             VERBOSE_LOG(this, "XRSoundEngine::PlayWav ERROR: could not play sound %s", pContext->ToStr().c_str());
@@ -537,7 +542,8 @@ const char *XRSoundEngine::GetVersionStr()
 {
     if (s_csVersion.empty()) {
 		char cbuf[256];
-		snprintf(cbuf, 256, "XRSound %.2f %s[%s %s], Build Date : %s", XRSOUND_ENGINE_VERSION, XRSOUND_BETA_STR, ARCH_TYPE, BUILD_TYPE, __DATE__);
+		snprintf(cbuf, 256, "XRSound %.2f %s[%s %s], Build Date : %s", XRSOUND_ENGINE_VERSION, XRSOUND_BETA_STR,
+            sizeof(void*) == 8 ? "64-bit" : "32-bit", BUILD_TYPE, __DATE__);
         s_csVersion = cbuf;
 	}
     return s_csVersion.c_str();

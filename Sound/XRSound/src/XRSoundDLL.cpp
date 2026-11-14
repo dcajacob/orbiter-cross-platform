@@ -6,11 +6,13 @@
 // ==============================================================
 
 #define ORBITER_MODULE
-#include "OrbiterSDK.h"
+#include "XRSoundPlatform.h"
 #include "XRSoundDLL.h"
 #include "VesselXRSoundEngine.h"
 #include "ModuleXRSoundEngine.h"
+#include <chrono>
 
+#ifdef _WIN32
 namespace
 {
 // These SEH guards were inline in XRSoundDLL::clbkPreStep. The VS 2026 Debug
@@ -53,6 +55,7 @@ DLLCLBK XRSoundEngine *GetModuleXRSoundEngineInstance(const char *pUniqueModuleN
 {
     return XRSoundDLL::GetXRSoundEngineInstance(pUniqueModuleName);
 }
+#endif
 
 // This is the single entry point for acquiring an XRSoundEngine instance for a given *vessel*.
 // It returns the existing XRSoundEngine instance for the supplied vessel if one already exists, otherwise it creates 
@@ -91,7 +94,7 @@ VesselXRSoundEngine *XRSoundDLL::GetXRSoundEngineInstance(const OBJHANDLE hVesse
     if (!pEngine)   // no existing engine found for this vessel
     {
         // if this ship has thrusters; it should have default sounds
-        const DWORD dwThrusterCount = pVessel->GetThrusterCount();
+        const unsigned int dwThrusterCount = pVessel->GetThrusterCount();
         const bool bShouldHaveDefaultSounds = (dwThrusterCount > 0);
         char csVesselDesc[256];
         const char *pName = pVessel->GetName();
@@ -167,6 +170,7 @@ ModuleXRSoundEngine *XRSoundDLL::GetXRSoundEngineInstance(const char *pUniqueMod
 // This function is called when Orbiter starts or when the module
 // is activated.
 //==============================================================
+#ifdef _WIN32
 DLLCLBK void InitModule(HINSTANCE hDLL)
 {
 #ifdef _DEBUG
@@ -183,6 +187,7 @@ DLLCLBK void InitModule(HINSTANCE hDLL)
     // parse this immediately so we can read it from the start
     XRSoundDLL::ParseGlobalConfigFile();
 }
+#endif
 
 // parse (or re-parse) our global XRSound.cfg file (this parse is vessel-independent)
 void XRSoundDLL::ParseGlobalConfigFile()
@@ -202,20 +207,23 @@ void XRSoundDLL::ParseGlobalConfigFile()
 // This function is called when Orbiter shuts down or when the
 // module is deactivated.
 //==============================================================
+#ifdef _WIN32
 DLLCLBK void ExitModule(HINSTANCE hDLL)
 {
     // Note: do not delete XRSoundDLL::s_pInstance here; per the Orbiter docs, the Orbiter core automatically
     // destroys all modules when required.
 }
+#endif
 
 // static data
 XRSoundDLL *XRSoundDLL::s_pInstance;
 
 // Constructor
-XRSoundDLL::XRSoundDLL(HINSTANCE hDLL) :
-    Module(hDLL), m_hDLL(hDLL), m_nextSoundEnginesRefreshSimt(0), m_absoluteSimTime(0)
+#ifdef _WIN32
+XRSoundDLL::XRSoundDLL(HINSTANCE hDLL) : Module(hDLL), m_hDLL(hDLL)
 {
 }
+#endif
 
 // Destructor
 XRSoundDLL::~XRSoundDLL()
@@ -249,7 +257,9 @@ void XRSoundDLL::clbkSimulationStart(RenderMode mode)
 // This method is called immediately before a simulation session is terminated, and before the render window is closed.
 void XRSoundDLL::clbkSimulationEnd()
 {
+#ifdef _WIN32
     s_pInstance->UpdateAllVesselsMap();  // in case any vessels were added or deleted since the last time we checked
+#endif
 
     // Note: *modules* are not loaded or unloaded when the simulation starts or ends: they are only loaded or unloaded via
     // the Orbiter launch pad, either when 1) the launch pad loads or exits, or 2) when a module is manually loaded or unloaded via its checkbox
@@ -402,6 +412,7 @@ void XRSoundDLL::clbkPreStep(double simtDoNotUse, double simdt, double mjd)
         // loop through each sound-enabled vessel and update the volume / playback state of each
         for (auto it = m_allVesselsMap.begin(); it != m_allVesselsMap.end(); it++)
         {
+#ifdef _WIN32
             const OBJHANDLE hVessel = it->first;
             // The vessel should still be valid: UpdateAllVesselsMap removes deleted vessels.
             if (!PreStepVesselWithSEH(hVessel, it->second, simt, simdt, mjd))
@@ -410,6 +421,9 @@ void XRSoundDLL::clbkPreStep(double simtDoNotUse, double simdt, double mjd)
                 snprintf(csMsg, 256, "XRSoundDLL::clbkPreStep ERROR: Access Violation in VesselXRSoundEngine::clbkPreStep for vessel %s", oapiIsVessel(hVessel) ? oapiGetVesselInterface(hVessel)->GetName() : "<invalid>");
                 WriteLog(csMsg);
             }
+#else
+            it->second->clbkPreStep(simt, simdt, mjd);
+#endif
         }
         m_nextSoundEnginesRefreshSimt = simt + GetGlobalConfig().UpdateInterval;
     }
@@ -421,11 +435,15 @@ void XRSoundDLL::clbkPreStep(double simtDoNotUse, double simdt, double mjd)
 // This code was cloned from Vessel3Ext.h.
 double XRSoundDLL::GetSystemUptime()
 {
+#ifdef _WIN32
     // Even though we lose some precision going from 2^64 max down to 2^53 (53 bits mantissia in a double), that's still enough
     // precision to track 104,249,991.37 days, or 285,616 years of uptime right down to the millisecond.  
     // See https://stackoverflow.com/questions/1848700/biggest-integer-that-can-be-stored-in-a-double
     const double uptimeMilli = static_cast<double>(GetTickCount64());  // GetTickCount64 requires Vista or higher, but that is our minimum target OS anyway
     return (uptimeMilli / 1000);  // convert to seconds
+#else
+    return std::chrono::duration<double>(std::chrono::steady_clock::now().time_since_epoch()).count();
+#endif
 }
 
 // Invoked when the pause/resume state of the simulation has changed.

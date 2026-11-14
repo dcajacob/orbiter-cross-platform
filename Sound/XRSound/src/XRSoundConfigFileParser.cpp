@@ -10,6 +10,7 @@
 #include "XRSoundConfigFileParser.h"
 #include "ConfigFileParserMacros.h"
 #include <algorithm>
+#include <cstdint>
 #include <filesystem>
 
 // Constructor
@@ -71,7 +72,7 @@ bool XRSoundConfigFileParser::ParseVesselSoundConfig(VESSEL *pVessel)
         '_'
     );
 	m_csOverrideFilename = std::string("XRSound/XRSound-") + csSanitizedClassName + ".cfg";
-	bOverrideFileExists = std::filesystem::exists(m_csOverrideFilename);
+	bOverrideFileExists = IsFileReadable(m_csOverrideFilename.c_str());
 
     if (bOverrideFileExists)
 		m_csConfigFilenames = std::string(GetDefaultFilename()) + " + " + GetOverrideFilename();
@@ -470,7 +471,7 @@ bool XRSoundConfigFileParser::AddOrUpdateAnimationState(const int animationID, c
     {
         int soundID = -1;
         SSCANF1("%d", &soundID);
-        VALIDATE_INT(&soundID, 0, MAXINT32, -1);
+        VALIDATE_INT(&soundID, 0, INT32_MAX, -1);
         if (soundID >= -0)
             pAnimationSounds->SetOpenCloseSoundID(soundID);
     }
@@ -478,7 +479,7 @@ bool XRSoundConfigFileParser::AddOrUpdateAnimationState(const int animationID, c
     {
         int soundID = -1;
         SSCANF1("%d", &soundID);
-        VALIDATE_INT(&soundID, 0, MAXINT32, -1);
+        VALIDATE_INT(&soundID, 0, INT32_MAX, -1);
         if (soundID >= -0)
             pAnimationSounds->SetMovingSoundID(soundID);
     }
