@@ -5,6 +5,9 @@
 #include <array>
 #include <cstdint>
 #include <filesystem>
+#include <map>
+#include <set>
+#include <tuple>
 #include <vector>
 
 namespace orbiter::vulkan {
@@ -56,6 +59,21 @@ struct SceneMesh {
     std::vector<Group> groups;
 };
 
+struct TileKey {
+    int level, row, column;
+
+    bool operator<(const TileKey& other) const
+    {
+        return std::tie(level, row, column) < std::tie(other.level, other.row, other.column);
+    }
+};
+
+struct TerrainMesh {
+    TextureData texture;
+    std::vector<Vertex> vertices;
+    std::vector<std::uint32_t> indices;
+};
+
 class Scene {
 public:
     Scene() = default;
@@ -64,13 +82,24 @@ public:
     Scene& operator=(const Scene&) = delete;
 
     void Open(SDL_Window*);
-    void SetMesh(const SceneMesh&);
+    void SetShip(const SceneMesh&);
+    void StageTile(const TileKey&, const TerrainMesh&);
+    void SelectTiles(const std::set<TileKey>& visible, const std::set<TileKey>& pending);
+    void SetShadow(const std::vector<Vertex>&);
     bool Present(const SceneUniform& ship, const SceneUniform& ground);
     void Capture(std::filesystem::path path) { capture_ = std::move(path); }
     void Close() noexcept;
     void ClearMesh() noexcept;
 
 private:
+    struct GroundTile {
+        SDL_GPUBuffer* vertices = nullptr;
+        SDL_GPUBuffer* indices = nullptr;
+        SDL_GPUTexture* texture = nullptr;
+        unsigned indexCount = 0;
+        bool visible = false;
+    };
+    void Release(GroundTile&) noexcept;
     SDL_GPUTexture* UploadTexture(const TextureData&);
     SDL_GPUGraphicsPipeline* CreatePipeline(SDL_GPUShader*, SDL_GPUShader*, DrawPass);
     void ResizeDepth(unsigned, unsigned);
@@ -89,6 +118,12 @@ private:
     SDL_GPUTexture* depth_ = nullptr;
     SDL_GPUBuffer* vertices_ = nullptr;
     SDL_GPUBuffer* indices_ = nullptr;
+    unsigned shipIndexCount_ = 0;
+    SDL_GPUBuffer* shadowVertices_ = nullptr;
+    SDL_GPUTransferBuffer* shadowUpload_ = nullptr;
+    Uint32 shadowBytes_ = 0;
+    bool showShadow_ = false;
+    std::map<TileKey, GroundTile> tiles_;
     std::vector<SDL_GPUTexture*> textures_;
     std::vector<Group> groups_;
     unsigned width_ = 0;

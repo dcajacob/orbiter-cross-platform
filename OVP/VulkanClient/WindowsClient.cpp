@@ -70,7 +70,6 @@ public:
                 scene_.CaptureFocus(std::filesystem::path(path) / "Archive" / "Surf.tree");
                 loaded_ = true;
                 Log("Runway33: stock DG-S mesh and textures uploaded");
-                Log("Runway33: stock Earth tiles and projected DG-S shadow uploaded");
             } catch (const std::exception& failure) {
                 failed_ = true;
                 Log(failure.what());
@@ -86,6 +85,10 @@ public:
         try {
             const bool shown = scene_.Present(unsigned(width), unsigned(height));
             Require(shown, "Present Vulkan frame");
+            if (SDL_GetTicks() >= nextTitle_) {
+                nextTitle_ = SDL_GetTicks() + 250;
+                SetWindowTextA(window_, scene_.FlightTitle().c_str());
+            }
             return shown;
         } catch (const std::exception& failure) {
             failed_ = true;
@@ -189,6 +192,7 @@ private:
     bool sdlInitialized_ = false;
     bool loaded_ = false;
     bool failed_ = false;
+    Uint64 nextTitle_ = 0;
 };
 
 Client* client = nullptr;

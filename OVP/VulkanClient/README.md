@@ -4,11 +4,26 @@ This opt-in client opens the supplied Runway 33 scenario in Orbiter and draws th
 stock DG-S exterior with its original textures and initial external camera. The
 client uses SDL3's Vulkan backend and a shared pair of SPIR-V shaders.
 
-The reference view draws a three-by-three patch of stock Earth surface tiles
-from `Earth/Archive/Surf.tree` using Orbiter's elevation data. The client projects
-the DG-S mesh along the Sun direction onto this terrain to draw the ground
-shadow at the scenario's initial landed pose. The patch and shadow are built
-once per scenario load for the paused Runway 33 view.
+The client streams stock Earth surface tiles from `Earth/Archive/Surf.tree` and
+uses Orbiter's elevation data. It keeps detailed tiles around the DG-S and
+coarser tiles farther away. During flight, it stages new tiles over several
+frames and keeps the current terrain visible until the new tiles are ready.
+The ground shadow is projected from the DG-S's current position and attitude
+along the Sun direction.
+
+## Takeoff
+
+1. Press **Ctrl+P** to resume.
+2. Hold **Ctrl+Numpad +** until the title bar shows **Main 100%**. Release the keys
+   to keep the selected throttle.
+3. At roughly **135 m/s**, hold **Numpad 2** to rotate. Release it once the DG-S
+   is climbing, around **10–15 m AGL** in the supplied scenario.
+4. Use **Numpad 8** to lower the nose, **Numpad 4/6** to bank, **Numpad 1/3** to yaw,
+   and **Numpad \*** to kill main thrust. Right-drag or use **Ctrl+arrow keys**
+   to orbit the external camera. Scroll to change camera distance.
+
+This milestone covers regional Earth terrain and the external DG-S view.
+The exterior mesh uses the stock template pose for gear and control surfaces.
 
 Build with CMake 3.24 or newer, a matching Orbiter build, SDL3 3.4 or newer, and
 `glslangValidator` from the Vulkan SDK or your package manager. The shaders
@@ -33,8 +48,8 @@ cp /path/to/vulkan-build/VulkanClient.so \
 
 Use the stock assets, ephemeris data, and planetary archives (Earth surface and
 elevation). Set `WindowWidth = 1280` and `WindowHeight = 720` in the configuration
-you pass to Orbiter. The optional evidence directory receives the first
-rendered Vulkan frame as `vulkan-frame.bmp`.
+you pass to Orbiter. The optional evidence directory receives a Vulkan frame
+as `vulkan-frame.bmp`. Add `--capture-time <sim-seconds>` to capture during flight.
 
 ```sh
 /path/to/native-engine-build/orbiter-production \

@@ -7,6 +7,8 @@
 #include <limits>
 #include <cstring>
 #include <iostream>
+#include <iomanip>
+#include <sstream>
 #include <stdexcept>
 
 namespace orbiter::vulkan {
@@ -30,13 +32,14 @@ SceneUniform MakeUniform(const SceneFrame& frame, unsigned width, unsigned heigh
     const double vertical = 1 / std::tan(oapiCameraAperture());
     const double horizontal = vertical * height / width;
     constexpr double nearPlane = 0.1;
-    constexpr double farPlane = 10000.0;
+    constexpr double farPlane = 85000.0;
     for (unsigned i = 0; i < 4; ++i) {
         const auto& v = i == 3 ? displacement : frame.axes[i];
         const auto z = Dot(v, axes[2]);
         uniform.projection[4 * i] = float(horizontal * Dot(v, axes[0]));
         uniform.projection[4 * i + 1] = float(vertical * Dot(v, axes[1]));
-        uniform.projection[4 * i + 2] = float((z - (i == 3 ? nearPlane : 0.0)) * farPlane / (farPlane - nearPlane));
+        // Reverse Z preserves floating-point depth precision for distant ground and its shadow.
+        uniform.projection[4 * i + 2] = float(((i == 3 ? farPlane : 0.0) - z) * nearPlane / (farPlane - nearPlane));
         uniform.projection[4 * i + 3] = float(z);
         if (i < 3) uniform.light[i] = distance > 0 ? float(Dot(v, sunlight) / distance) : 0.0f;
     }
@@ -233,8 +236,9 @@ void OrbiterScene::CaptureFocus(const std::filesystem::path& archive)
         throw std::runtime_error("The DG-S exterior has no loaded textures");
     std::clog << "Runway33 focus: " << vessel->GetName() << ", " << vessel->GetClassName()
               << "; time=" << oapiGetSimTime() << "; aperture=" << oapiCameraAperture() << '\n';
-    terrain_.Append(archive, ShipFrame(), ship);
-    scene_.SetMesh(ship);
+    terrain_.Open(archive, ShipFrame().origin);
+    scene_.SetShip(ship);
+    shipVertices_ = std::move(ship.vertices);
 }
 
 SceneFrame OrbiterScene::ShipFrame() const
@@ -248,23 +252,64 @@ void OrbiterScene::ClearFocus() noexcept
 {
     focus_ = nullptr;
     scene_.ClearMesh();
+    terrain_.Close();
+    shipVertices_.clear();
+    shadowVertices_.clear();
+    shadowTime_.reset();
+    loggedLiftoff_ = false;
 }
 
 bool OrbiterScene::Present(unsigned width, unsigned height)
 {
     if (!width || !height) return true;
     if (!focus_) return scene_.Present({}, {});
-    auto ground = MakeUniform(terrain_.Frame(), width, height);
+    const auto ship = ShipFrame();
+    const auto simTime = oapiGetSimTime();
+    const auto groundFrame = terrain_.Frame();
+    if (shadowTime_ != simTime) {
+        const bool terrainChanged = terrain_.Update(ship.origin, scene_);
+        terrain_.ProjectShadow(groundFrame, ship, shipVertices_, shadowVertices_);
+        scene_.SetShadow(shadowVertices_);
+        shadowTime_ = simTime;
+
+        auto* vessel = oapiGetVesselInterface(focus_);
+        const auto altitude = vessel->GetAltitude(ALTMODE_GROUND);
+        const bool liftoff = !loggedLiftoff_ && !vessel->GroundContact() && altitude > 8 && vessel->GetAirspeed() > 30;
+        loggedLiftoff_ |= liftoff;
+        if (terrainChanged || liftoff) {
+            std::ostringstream sample;
+            sample << "Vulkan flight " << (liftoff ? "liftoff" : "terrain") << ": t=" << simTime
+                   << " AGL=" << altitude << " airspeed=" << vessel->GetAirspeed();
+            if (!shadowVertices_.empty()) {
+                const auto* shadow = shadowVertices_.front().position;
+                sample << " projected shadow east=" << shadow[0] << " north=" << shadow[2];
+            }
+            SceneLog(sample.str());
+        }
+    }
+    auto ground = MakeUniform(groundFrame, width, height);
     // The stock aerial imagery already contains its illumination.
     ground.light[0] = ground.light[2] = 0;
     ground.light[1] = 1;
-    return scene_.Present(MakeUniform(ShipFrame(), width, height), ground);
+    return scene_.Present(MakeUniform(ship, width, height), ground);
 }
 
 void OrbiterScene::Close() noexcept
 {
+    ClearFocus();
     scene_.Close();
-    focus_ = nullptr;
+}
+
+std::string OrbiterScene::FlightTitle() const
+{
+    const auto name = "Orbiter - Runway 33 [Vulkan]";
+    if (!focus_) return name;
+    auto* vessel = oapiGetVesselInterface(focus_);
+    std::ostringstream title;
+    title << name << (oapiGetPause() ? " | Paused" : "") << std::fixed << std::setprecision(0)
+          << " | " << vessel->GetAirspeed() << " m/s | " << vessel->GetAltitude(ALTMODE_GROUND)
+          << " m AGL | Main " << 100 * vessel->GetThrusterGroupLevel(THGROUP_MAIN) << '%';
+    return title.str();
 }
 
 } // namespace orbiter::vulkan

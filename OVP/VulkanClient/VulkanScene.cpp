@@ -247,7 +247,7 @@ SDL_GPUGraphicsPipeline* Scene::CreatePipeline(SDL_GPUShader* vertex, SDL_GPUSha
     info.rasterizer_state.front_face = SDL_GPU_FRONTFACE_CLOCKWISE;
     info.depth_stencil_state.enable_depth_test = true;
     info.depth_stencil_state.enable_depth_write = !blend;
-    info.depth_stencil_state.compare_op = SDL_GPU_COMPAREOP_LESS_OR_EQUAL;
+    info.depth_stencil_state.compare_op = SDL_GPU_COMPAREOP_GREATER_OR_EQUAL;
     if (kind == DrawPass::Shadow) {
         // Blend once per pixel even when several projected triangles overlap.
         const SDL_GPUStencilOpState stamp{
@@ -325,11 +325,19 @@ SDL_GPUTexture* Scene::UploadTexture(const TextureData& texture)
     return image;
 }
 
-void Scene::SetMesh(const SceneMesh& mesh)
+void Scene::SetShip(const SceneMesh& mesh)
 {
     ClearMesh();
     vertices_ = Buffer(device_, SDL_GPU_BUFFERUSAGE_VERTEX, mesh.vertices.data(), mesh.vertices.size() * sizeof(Vertex));
     indices_ = Buffer(device_, SDL_GPU_BUFFERUSAGE_INDEX, mesh.indices.data(), mesh.indices.size() * sizeof(std::uint32_t));
+    shipIndexCount_ = unsigned(mesh.indices.size());
+    shadowBytes_ = Uint32(mesh.vertices.size() * sizeof(Vertex));
+    const SDL_GPUBufferCreateInfo shadowVertexInfo{SDL_GPU_BUFFERUSAGE_VERTEX, shadowBytes_, 0};
+    shadowVertices_ = SDL_CreateGPUBuffer(device_, &shadowVertexInfo);
+    Require(shadowVertices_ != nullptr, "Allocate Vulkan shadow vertices");
+    const SDL_GPUTransferBufferCreateInfo shadowUploadInfo{SDL_GPU_TRANSFERBUFFERUSAGE_UPLOAD, shadowBytes_, 0};
+    shadowUpload_ = SDL_CreateGPUTransferBuffer(device_, &shadowUploadInfo);
+    Require(shadowUpload_ != nullptr, "Allocate Vulkan shadow upload buffer");
     TextureData white;
     white.width = white.height = 1;
     white.pixels.assign(4, 255);
@@ -341,6 +349,57 @@ void Scene::SetMesh(const SceneMesh& mesh)
     groups_ = mesh.groups;
     std::clog << "Runway33 indexed mesh: " << mesh.vertices.size() << " vertices, "
               << mesh.indices.size() << " indices, " << groups_.size() << " visible groups\n";
+}
+
+void Scene::Release(GroundTile& tile) noexcept
+{
+    if (tile.vertices) SDL_ReleaseGPUBuffer(device_, tile.vertices);
+    if (tile.indices) SDL_ReleaseGPUBuffer(device_, tile.indices);
+    if (tile.texture) SDL_ReleaseGPUTexture(device_, tile.texture);
+}
+
+void Scene::StageTile(const TileKey& key, const TerrainMesh& mesh)
+{
+    auto& tile = tiles_.try_emplace(key).first->second;
+    tile.vertices = Buffer(device_, SDL_GPU_BUFFERUSAGE_VERTEX, mesh.vertices.data(),
+        mesh.vertices.size() * sizeof(Vertex));
+    tile.indices = Buffer(device_, SDL_GPU_BUFFERUSAGE_INDEX, mesh.indices.data(),
+        mesh.indices.size() * sizeof(std::uint32_t));
+    tile.texture = UploadTexture(mesh.texture);
+    tile.indexCount = unsigned(mesh.indices.size());
+}
+
+void Scene::SelectTiles(const std::set<TileKey>& visible, const std::set<TileKey>& pending)
+{
+    for (auto it = tiles_.begin(); it != tiles_.end();) {
+        it->second.visible = visible.count(it->first) != 0;
+        if (it->second.visible || pending.count(it->first)) ++it;
+        else {
+            Release(it->second);
+            it = tiles_.erase(it);
+        }
+    }
+}
+
+void Scene::SetShadow(const std::vector<Vertex>& vertices)
+{
+    showShadow_ = false;
+    if (vertices.empty()) return;
+    if (vertices.size() * sizeof(Vertex) != shadowBytes_)
+        throw std::runtime_error("Projected shadow and vessel vertex counts differ");
+    auto* mapped = SDL_MapGPUTransferBuffer(device_, shadowUpload_, true);
+    Require(mapped != nullptr, "Map Vulkan shadow upload");
+    std::memcpy(mapped, vertices.data(), shadowBytes_);
+    SDL_UnmapGPUTransferBuffer(device_, shadowUpload_);
+    auto* commands = SDL_AcquireGPUCommandBuffer(device_);
+    Require(commands != nullptr, "Acquire Vulkan shadow upload commands");
+    auto* copy = SDL_BeginGPUCopyPass(commands);
+    const SDL_GPUTransferBufferLocation source{shadowUpload_, 0};
+    const SDL_GPUBufferRegion target{shadowVertices_, 0, shadowBytes_};
+    SDL_UploadToGPUBuffer(copy, &source, &target, true);
+    SDL_EndGPUCopyPass(copy);
+    Require(SDL_SubmitGPUCommandBuffer(commands), "Submit Vulkan shadow update");
+    showShadow_ = true;
 }
 
 bool Scene::Present(const SceneUniform& ship, const SceneUniform& ground)
@@ -375,40 +434,55 @@ bool Scene::Present(const SceneUniform& ship, const SceneUniform& ground)
     }
     SDL_GPUColorTargetInfo color{};
     color.texture = frame;
-    color.clear_color = {0.085f, 0.095f, 0.112f, 1.0f};
+    color.clear_color = {0.42f, 0.61f, 0.80f, 1.0f};
     color.load_op = SDL_GPU_LOADOP_CLEAR;
     color.store_op = SDL_GPU_STOREOP_STORE;
     SDL_GPUDepthStencilTargetInfo depth{};
     depth.texture = depth_;
-    depth.clear_depth = 1;
+    depth.clear_depth = 0;
     depth.load_op = SDL_GPU_LOADOP_CLEAR;
     depth.store_op = SDL_GPU_STOREOP_DONT_CARE;
     depth.stencil_load_op = SDL_GPU_LOADOP_CLEAR;
     depth.stencil_store_op = SDL_GPU_STOREOP_DONT_CARE;
     auto* pass = SDL_BeginGPURenderPass(commands, &color, 1, &depth);
+    SDL_BindGPUGraphicsPipeline(pass, terrain_);
+    SDL_PushGPUVertexUniformData(commands, 0, &ground, sizeof(ground));
+    const MaterialUniform surface;
+    SDL_PushGPUFragmentUniformData(commands, 0, &surface, sizeof(surface));
+    for (const auto& [key, tile] : tiles_) {
+        if (!tile.visible) continue;
+        const SDL_GPUBufferBinding vertex{tile.vertices, 0};
+        const SDL_GPUBufferBinding index{tile.indices, 0};
+        const SDL_GPUTextureSamplerBinding binding{tile.texture, terrainSampler_};
+        SDL_BindGPUVertexBuffers(pass, 0, &vertex, 1);
+        SDL_BindGPUIndexBuffer(pass, &index, SDL_GPU_INDEXELEMENTSIZE_32BIT);
+        SDL_BindGPUFragmentSamplers(pass, 0, &binding, 1);
+        SDL_DrawGPUIndexedPrimitives(pass, tile.indexCount, 1, 0, 0, 0);
+    }
+    if (showShadow_) {
+        SDL_BindGPUGraphicsPipeline(pass, shadow_);
+        SDL_SetGPUStencilReference(pass, 1);
+        const SDL_GPUBufferBinding vertex{shadowVertices_, 0};
+        const SDL_GPUBufferBinding index{indices_, 0};
+        const SDL_GPUTextureSamplerBinding binding{textures_.front(), sampler_};
+        const MaterialUniform shade{{0.015f, 0.015f, 0.015f, 0.63f}, {}};
+        SDL_BindGPUVertexBuffers(pass, 0, &vertex, 1);
+        SDL_BindGPUIndexBuffer(pass, &index, SDL_GPU_INDEXELEMENTSIZE_32BIT);
+        SDL_BindGPUFragmentSamplers(pass, 0, &binding, 1);
+        SDL_PushGPUFragmentUniformData(commands, 0, &shade, sizeof(shade));
+        SDL_DrawGPUIndexedPrimitives(pass, shipIndexCount_, 1, 0, 0, 0);
+    }
     if (!groups_.empty()) {
         const SDL_GPUBufferBinding vertex{vertices_, 0};
         const SDL_GPUBufferBinding index{indices_, 0};
         SDL_BindGPUVertexBuffers(pass, 0, &vertex, 1);
         SDL_BindGPUIndexBuffer(pass, &index, SDL_GPU_INDEXELEMENTSIZE_32BIT);
-        const struct {
-            DrawPass kind;
-            SDL_GPUGraphicsPipeline* pipeline;
-            SDL_GPUSampler* sampler;
-            const SceneUniform& uniform;
-        } draws[] = {
-            {DrawPass::Terrain, terrain_, terrainSampler_, ground},
-            {DrawPass::Shadow, shadow_, sampler_, ground},
-            {DrawPass::Opaque, opaque_, sampler_, ship},
-            {DrawPass::Translucent, translucent_, sampler_, ship}
-        };
-        for (const auto& draw : draws) {
-            SDL_BindGPUGraphicsPipeline(pass, draw.pipeline);
-            if (draw.kind == DrawPass::Shadow) SDL_SetGPUStencilReference(pass, 1);
-            SDL_PushGPUVertexUniformData(commands, 0, &draw.uniform, sizeof(draw.uniform));
+        SDL_PushGPUVertexUniformData(commands, 0, &ship, sizeof(ship));
+        for (auto passKind : {DrawPass::Opaque, DrawPass::Translucent}) {
+            SDL_BindGPUGraphicsPipeline(pass, passKind == DrawPass::Opaque ? opaque_ : translucent_);
             for (const auto& group : groups_) {
-                if (group.pass != draw.kind) continue;
-                const SDL_GPUTextureSamplerBinding binding{textures_.at(group.textureIndex), draw.sampler};
+                if (group.pass != passKind) continue;
+                const SDL_GPUTextureSamplerBinding binding{textures_.at(group.textureIndex), sampler_};
                 SDL_BindGPUFragmentSamplers(pass, 0, &binding, 1);
                 SDL_PushGPUFragmentUniformData(commands, 0, &group.material, sizeof(group.material));
                 SDL_DrawGPUIndexedPrimitives(pass, group.indexCount, 1, group.firstIndex, 0, 0);
@@ -470,12 +544,20 @@ void Scene::SaveFrame(SDL_GPUCommandBuffer* commands, SDL_GPUTexture* frame, SDL
 void Scene::ClearMesh() noexcept
 {
     if (!device_) return;
+    for (auto& entry : tiles_) Release(entry.second);
+    tiles_.clear();
     for (auto* texture : textures_) SDL_ReleaseGPUTexture(device_, texture);
     textures_.clear();
     groups_.clear();
     if (vertices_) SDL_ReleaseGPUBuffer(device_, vertices_);
     if (indices_) SDL_ReleaseGPUBuffer(device_, indices_);
+    if (shadowVertices_) SDL_ReleaseGPUBuffer(device_, shadowVertices_);
+    if (shadowUpload_) SDL_ReleaseGPUTransferBuffer(device_, shadowUpload_);
     vertices_ = indices_ = nullptr;
+    shadowVertices_ = nullptr;
+    shadowUpload_ = nullptr;
+    shipIndexCount_ = shadowBytes_ = 0;
+    showShadow_ = false;
 }
 
 void Scene::Close() noexcept

@@ -8,8 +8,19 @@
 #endif
 
 #include <array>
+#include <iostream>
+#include <string>
 
 namespace orbiter::vulkan {
+
+inline void SceneLog(std::string message)
+{
+#ifdef _WIN32
+    oapiWriteLog(message.data());
+#else
+    std::clog << message << '\n';
+#endif
+}
 
 inline VECTOR3 Add(const VECTOR3& a, const VECTOR3& b)
 {

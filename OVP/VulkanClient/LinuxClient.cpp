@@ -2,6 +2,7 @@
 #include "OrbiterScene.h"
 #include "OrbiterNativeBuild.h"
 #include "Production/ModuleBootstrap.h"
+#include "Production/FlightKeys.h"
 #include "Production/NativeAbi.h"
 #include "Production/NativeParticle.h"
 #include "Config.h"
@@ -14,6 +15,31 @@ namespace orbiter::vulkan {
 namespace {
 
 using namespace production;
+
+constexpr struct {
+    SDL_Scancode scan;
+    unsigned key;
+} flightKeys[] = {
+    {SDL_SCANCODE_SPACE, OAPI_KEY_SPACE}, {SDL_SCANCODE_P, OAPI_KEY_P},
+    {SDL_SCANCODE_LCTRL, OAPI_KEY_LCONTROL}, {SDL_SCANCODE_RCTRL, OAPI_KEY_RCONTROL},
+    {SDL_SCANCODE_LSHIFT, OAPI_KEY_LSHIFT}, {SDL_SCANCODE_RSHIFT, OAPI_KEY_RSHIFT},
+    {SDL_SCANCODE_LALT, OAPI_KEY_LALT}, {SDL_SCANCODE_RALT, OAPI_KEY_RALT},
+    {SDL_SCANCODE_KP_PLUS, OAPI_KEY_ADD}, {SDL_SCANCODE_KP_MINUS, OAPI_KEY_SUBTRACT},
+    {SDL_SCANCODE_KP_MULTIPLY, OAPI_KEY_MULTIPLY}, {SDL_SCANCODE_KP_DIVIDE, OAPI_KEY_DIVIDE},
+    {SDL_SCANCODE_KP_0, OAPI_KEY_NUMPAD0}, {SDL_SCANCODE_KP_PERIOD, OAPI_KEY_DECIMAL},
+    {SDL_SCANCODE_KP_1, OAPI_KEY_NUMPAD1}, {SDL_SCANCODE_KP_2, OAPI_KEY_NUMPAD2},
+    {SDL_SCANCODE_KP_3, OAPI_KEY_NUMPAD3}, {SDL_SCANCODE_KP_4, OAPI_KEY_NUMPAD4},
+    {SDL_SCANCODE_KP_5, OAPI_KEY_NUMPAD5}, {SDL_SCANCODE_KP_6, OAPI_KEY_NUMPAD6},
+    {SDL_SCANCODE_KP_7, OAPI_KEY_NUMPAD7}, {SDL_SCANCODE_KP_8, OAPI_KEY_NUMPAD8},
+    {SDL_SCANCODE_KP_9, OAPI_KEY_NUMPAD9},
+    {SDL_SCANCODE_COMMA, OAPI_KEY_COMMA}, {SDL_SCANCODE_PERIOD, OAPI_KEY_PERIOD},
+    {SDL_SCANCODE_G, OAPI_KEY_G}, {SDL_SCANCODE_F, OAPI_KEY_F}, {SDL_SCANCODE_S, OAPI_KEY_S},
+    {SDL_SCANCODE_F5, OAPI_KEY_F5}, {SDL_SCANCODE_INSERT, OAPI_KEY_INSERT},
+    {SDL_SCANCODE_DELETE, OAPI_KEY_DELETE},
+    {SDL_SCANCODE_LEFT, OAPI_KEY_LEFT}, {SDL_SCANCODE_RIGHT, OAPI_KEY_RIGHT},
+    {SDL_SCANCODE_UP, OAPI_KEY_UP}, {SDL_SCANCODE_DOWN, OAPI_KEY_DOWN},
+    {SDL_SCANCODE_PAGEUP, OAPI_KEY_PRIOR}, {SDL_SCANCODE_PAGEDOWN, OAPI_KEY_NEXT}
+};
 
 class FontResource final : public oapi::Font {
 public:
@@ -45,8 +71,7 @@ public:
         Require(window_ != nullptr, "Open Vulkan window");
         SDL_GetWindowSizeInPixels(window_, &width_, &height_);
         scene_.Open(window_);
-        const auto& evidence = GetNativeRenderContext().evidence;
-        if (!evidence.empty()) scene_.CaptureFrame(evidence / "vulkan-frame.bmp");
+        capturePending_ = !GetNativeRenderContext().evidence.empty();
     }
 
     RenderInput Poll() override
@@ -60,7 +85,21 @@ public:
                 input.close = true;
                 break;
             case SDL_EVENT_KEY_DOWN:
-                if (event.key.key == SDLK_ESCAPE) input.close = true;
+            case SDL_EVENT_KEY_UP: {
+                const bool down = event.type == SDL_EVENT_KEY_DOWN;
+                if (down && event.key.scancode == SDL_SCANCODE_ESCAPE) input.close = true;
+                if (!event.key.repeat) {
+                    for (const auto& key : flightKeys) {
+                        if (key.scan == event.key.scancode) {
+                            input.flight.events.push_back({key.key, down});
+                            break;
+                        }
+                    }
+                }
+                break;
+            }
+            case SDL_EVENT_WINDOW_FOCUS_LOST:
+                input.mouse.push_back({RenderMouseAction::RightUp, 0, 0, 0});
                 break;
             case SDL_EVENT_MOUSE_MOTION:
                 input.mouse.push_back({RenderMouseAction::Move, int(event.motion.x), int(event.motion.y), 0});
@@ -83,6 +122,10 @@ public:
                 break;
             }
         }
+        if (SDL_GetKeyboardFocus() == window_) {
+            const auto* pressed = SDL_GetKeyboardState(nullptr);
+            for (const auto& key : flightKeys) input.flight.keys[key.key] = pressed[key.scan] ? char(0x80) : 0;
+        }
         SDL_GetWindowSizeInPixels(window_, &input.width, &input.height);
         return input;
     }
@@ -100,7 +143,15 @@ public:
         }
     }
 
-    bool Present() override { return scene_.Present(unsigned(width_), unsigned(height_)); }
+    bool Present() override
+    {
+        const auto& context = GetNativeRenderContext();
+        if (capturePending_ && oapiGetSimTime() >= context.captureTime) {
+            scene_.CaptureFrame(context.evidence / "vulkan-frame.bmp");
+            capturePending_ = false;
+        }
+        return scene_.Present(unsigned(width_), unsigned(height_));
+    }
     void CloseSession() override
     {
         for (auto& stream : particles_) stream->Detach();
@@ -190,7 +241,12 @@ public:
     void RenderGui() override {}
     void ShutdownGui() override {}
     void ReplayGuiInput(const std::string&, int, int, const std::string&) override {}
-    void Status(const std::string&) override {}
+    void Status(const std::string&) override
+    {
+        if (SDL_GetTicks() < nextTitle_) return;
+        nextTitle_ = SDL_GetTicks() + 250;
+        SDL_SetWindowTitle(window_, scene_.FlightTitle().c_str());
+    }
     void NewVessel(OBJHANDLE) override {}
     void DeleteVessel(OBJHANDLE) override {}
     void StoreMesh(MESHHANDLE, const char*) override {}
@@ -258,6 +314,8 @@ private:
     int height_ = 0;
     bool initialized_ = false;
     bool loaded_ = false;
+    bool capturePending_ = false;
+    Uint64 nextTitle_ = 0;
 };
 
 int ORBITER_NATIVE_CALL Initialize(const OrbiterNativeHost*, void** instance, char* error, uint32_t capacity) noexcept

@@ -5,6 +5,7 @@
 
 #include <map>
 #include <memory>
+#include <optional>
 
 namespace orbiter::vulkan {
 
@@ -25,6 +26,7 @@ public:
     void CaptureFrame(std::filesystem::path path) { scene_.Capture(std::move(path)); }
     void ClearFocus() noexcept;
     bool Present(unsigned width, unsigned height);
+    std::string FlightTitle() const;
     void Close() noexcept;
 
 private:
@@ -32,6 +34,10 @@ private:
     SceneFrame ShipFrame() const;
     Scene scene_;
     RunwayTerrain terrain_;
+    std::vector<Vertex> shipVertices_;
+    std::vector<Vertex> shadowVertices_;
+    std::optional<double> shadowTime_;
+    bool loggedLiftoff_ = false;
     OBJHANDLE focus_ = nullptr;
     VECTOR3 offset_{};
     std::map<SURFHANDLE, std::unique_ptr<TextureData>> surfaces_;
