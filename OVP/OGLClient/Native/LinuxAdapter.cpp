@@ -320,8 +320,8 @@ RenderInput OGLClient::Poll()
         int device=prm.Joy_idx>0 && prm.Joy_idx<=GLFW_JOYSTICK_LAST+1 ? int(prm.Joy_idx)-1 : -1;
         if(device>=0 && !glfwJoystickPresent(device))device=-1;
         int count=0,buttonsCount=0;
-        const auto* buttons=device>=0 ? glfwGetJoystickButtons(device,&buttonsCount) : nullptr;
-        const char* guid = buttons ? glfwGetJoystickGUID(device) : nullptr;
+        const char* guid = device>=0 ? glfwGetJoystickGUID(device) : nullptr;
+        const auto* buttons=guid ? glfwGetJoystickButtons(device,&buttonsCount) : nullptr;
         const bool alternate = NativeJoystickAlternate(buttons, buttonsCount, guid ? guid : "");
         const float* axes=device>=0 ? glfwGetJoystickAxes(device,&count) : nullptr;
         cockpitJoystick.Poll(axes ? device : -1,axes,count,render.joystickTwistAxis,
