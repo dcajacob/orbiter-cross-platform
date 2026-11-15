@@ -9,7 +9,15 @@ add_library(native_xrsound MODULE
 target_include_directories(native_xrsound PRIVATE "${_xr_dir}" "${_xr_dir}/Utils")
 target_compile_definitions(native_xrsound PRIVATE XRSOUND_DLL_BUILD MA_NO_NULL)
 target_link_libraries(native_xrsound PRIVATE orbiter_production_vessels Threads::Threads ${CMAKE_DL_LIBS} m)
-target_link_options(native_xrsound PRIVATE -Wl,--no-undefined)
+if(APPLE)
+    find_library(_xrsound_core_foundation CoreFoundation REQUIRED)
+    find_library(_xrsound_core_audio CoreAudio REQUIRED)
+    find_library(_xrsound_audio_toolbox AudioToolbox REQUIRED)
+    target_link_libraries(native_xrsound PRIVATE
+        ${_xrsound_core_foundation} ${_xrsound_core_audio} ${_xrsound_audio_toolbox})
+else()
+    target_link_options(native_xrsound PRIVATE -Wl,--no-undefined)
+endif()
 set_target_properties(native_xrsound PROPERTIES PREFIX "" OUTPUT_NAME XRSound
     LIBRARY_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/NativeModules/Plugin"
     CXX_VISIBILITY_PRESET hidden VISIBILITY_INLINES_HIDDEN ON)

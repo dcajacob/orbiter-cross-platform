@@ -1,7 +1,7 @@
 // Licensed under the MIT License
 #include "NativeCockpitUi.h"
 
-#ifdef __linux__
+#if defined(__linux__) || defined(__APPLE__)
 #include "NativeGraphics.h"
 #include "NativeInterpreterSdk.h"
 #include "Base.h"

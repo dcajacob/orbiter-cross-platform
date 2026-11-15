@@ -658,7 +658,7 @@ struct Runtime final:BodyServices,RigidBodyServices,SurfaceServices,NavigationSe
 #endif
 #ifdef ORBITER_NATIVE_COCKPIT
                 if(HandleCockpitMenuKey(keymap,code,eventKeys.data()))continue;
-#ifdef __linux__
+#if defined(__linux__) || defined(__APPLE__)
                 if(code==OAPI_KEY_F7 && !KEYMOD_SHIFT(eventKeys.data()) &&
                     !KEYMOD_CONTROL(eventKeys.data()) && !KEYMOD_ALT(eventKeys.data())) {
                     OpenCockpitScenarioEditor();continue;
@@ -1472,7 +1472,7 @@ int main(int argc,char** argv) {
             std::cout<<"Production "<<application.render.focus->GetModuleInterface()->GetClassName()<<" flight. Space/Ctrl-P: pause. T/R: warp. Ctrl-S: save. F5: reload. "
 #ifdef ORBITER_NATIVE_COCKPIT
                 <<"F6: options. F8: cockpit. "
-#ifdef __linux__
+#if defined(__linux__) || defined(__APPLE__)
                 <<"F7: scenario editor. "
 #endif
 #else
