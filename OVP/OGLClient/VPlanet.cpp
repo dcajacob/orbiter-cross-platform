@@ -320,7 +320,8 @@ bool vPlanet::Render ()
 		//bool ringpostrender = false;
 		float fogfactor;
 
-		prm.bFog = prm.bFogEnabled;
+		const bool scattering = scn->HasAtmosphericScattering(hObj);
+		prm.bFog = prm.bFogEnabled && !scattering;
 		prm.bTint = prm.bFogEnabled;
 
 		VECTOR3 skybg = scn->GetBgColour();
@@ -337,7 +338,7 @@ bool vPlanet::Render ()
 			RenderCloudLayer (GL_CCW, prm);      // render clouds from below
 		Renderer::CheckError("Render");
 
-		if (hazemgr) hazemgr->Render (scn->GetCamera(), mWorld);       // horizon ring
+		if (hazemgr && !scattering) hazemgr->Render (scn->GetCamera(), mWorld); // horizon ring
 
 		if (prm.bAtm) {
 			if (ModLighting (amb))
@@ -427,7 +428,7 @@ bool vPlanet::Render ()
 			RenderCloudLayer (GL_CW, prm);	  // render clouds from above
 			Renderer::CheckError("Render");
 		}
-		if (hazemgr) hazemgr->Render (scn->GetCamera(), mWorld, true); // haze across planet disc
+		if (hazemgr && !scattering) hazemgr->Render (scn->GetCamera(), mWorld, true); // haze across planet disc
 		Renderer::CheckError("Render");
 
 		if (ringmgr) {

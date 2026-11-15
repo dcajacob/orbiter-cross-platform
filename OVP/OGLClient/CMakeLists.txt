@@ -35,7 +35,7 @@ FetchContent_MakeAvailable(glm freetype soil2 nanovg libnsbmp imgui zlib)
 add_library(OGLClient SHARED
   WindowsAdapter.cpp Evidence.cpp OGLClient.cpp Shader.cpp CelSphere.cpp Renderer.cpp VertexBuffer.cpp Scene.cpp Light.cpp
   OGLCamera.cpp OGLMesh.cpp MeshManager.cpp VObject.cpp VVessel.cpp Texture.cpp VPlanet.cpp VStar.cpp ztreemgr.cpp
-  TileMgr.cpp SurfMgr.cpp RingMgr.cpp HazeMgr.cpp CloudMgr.cpp tilemgr2.cpp surfmgr2.cpp tilelabel.cpp
+  TileMgr.cpp SurfMgr.cpp RingMgr.cpp HazeMgr.cpp AtmosphereRenderer.cpp CloudMgr.cpp tilemgr2.cpp surfmgr2.cpp tilelabel.cpp
   VBase.cpp cloudmgr2.cpp Particle.cpp CSphereMgr.cpp spherepatch.cpp OGLPad.cpp glad.c
   "${nanovg_SOURCE_DIR}/src/nanovg.c"
   "${soil2_SOURCE_DIR}/srcs/etc1_utils.c" "${soil2_SOURCE_DIR}/srcs/image_DXT.c"

@@ -366,10 +366,11 @@ void Scene::Render (bool cockpitOverlay)
 
 	Update (); // update camera and visuals
 	Renderer::SetViewPort(cam->GetWidth(),cam->GetHeight());
+	atmosphere.Prepare(*cam);
 
 	VECTOR3 bgcol = SkyColour();
 	double skybrt = (bgcol.x+bgcol.y+bgcol.z)/3.0;
-	bg_rgba = bgcol;
+	bg_rgba = atmosphere.Active() ? _V(0,0,0) : bgcol;
 	int bglvl = 0;
 	//if (bg_rgba) { // suppress stars darker than the background
 		bglvl = 255.0*(bg_rgba.x + bg_rgba.y + bg_rgba.z);
@@ -377,7 +378,7 @@ void Scene::Render (bool cockpitOverlay)
 	//}
 
 	// Clear the viewport
-    glClearColor(bgcol.x, bgcol.y, bgcol.z, 1.0f);
+    glClearColor(bg_rgba.x, bg_rgba.y, bg_rgba.z, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
 	//if (FAILED (dev->BeginScene ())) return;
@@ -657,6 +658,8 @@ void Scene::Render (bool cockpitOverlay)
 			}
 		}
 	}
+
+	atmosphere.Render(*cam);
 
 	// render static engine exhaust
 	Renderer::PushBool(Renderer::BLEND, true);

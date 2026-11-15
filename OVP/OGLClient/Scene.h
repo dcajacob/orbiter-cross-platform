@@ -26,6 +26,7 @@
 #include "CelSphere.h"
 #include "VObject.h"
 #include "Light.h"
+#include "AtmosphereRenderer.h"
 
 class CSphereManager;
 class vObject;
@@ -95,6 +96,7 @@ public:
 
 	//const VECTOR3 &GetSunDir() { return sundir; }
 	VECTOR3 SkyColour ();
+	bool HasAtmosphericScattering(OBJHANDLE body) const { return atmosphere.Covers(body); }
 	// Sky background colour based on atmospheric parameters of closest planet
 
 
@@ -135,6 +137,7 @@ private:
 	int stencilDepth;        // stencil buffer bit depth
 	OGLCamera *cam;               // camera object
 	OGLCelestialSphere *csphere;  // celestial sphere background
+	AtmosphereRenderer atmosphere;
 	int iVCheck;             // index of last object checked for visibility
 	std::vector<OBJHANDLE> pendingVessels;
 //	uint32_t zclearflag;          // z and stencil buffer clear flag
