@@ -86,7 +86,21 @@ jobs:
               raise ValueError('Pinned NSGL backend differs')
           p.write_text(body.replace(requested, '    /* Hosted diagnostic: permit the Apple software device. */'))
           PYTHON
-          shasum -a 256 out/glfw/src/nsgl_context.m | tee out/receipt/software-nsgl-source.txt
+          python3 - <<'PYTHON'
+          from pathlib import Path
+          p = Path('out/glfw/src/cocoa_window.m')
+          body = p.read_text()
+          anchor = '@implementation GLFWWindow\n'
+          if body.count(anchor) != 1:
+              raise ValueError('Pinned Cocoa window class differs')
+          # Keep the required 1280x720 framebuffer on the smaller hosted display.
+          method = (
+              '- (NSRect)constrainFrameRect:(NSRect)frame toScreen:(NSScreen*)screen\n'
+              '{\n    (void)screen;\n    return frame;\n}\n'
+          )
+          p.write_text(body.replace(anchor, anchor + method))
+          PYTHON
+          shasum -a 256 out/glfw/src/nsgl_context.m out/glfw/src/cocoa_window.m | tee out/receipt/software-nsgl-source.txt
       - name: Build the production native cockpit and required stock modules
         id: engine
         shell: bash

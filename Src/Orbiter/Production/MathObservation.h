@@ -11,6 +11,11 @@
 #include <xmmintrin.h>
 #endif
 namespace orbiter::production::math_observation {
+#if defined(__i386__) || defined(__x86_64__) || defined(_M_IX86) || defined(_M_X64)
+inline constexpr bool HasMxcsr = true;
+#else
+inline constexpr bool HasMxcsr = false;
+#endif
 inline void Header(std::ostream& out) {
     out<<"tick,seconds,rounding,mxcsr_control,pitch,bank,heading,longitude,latitude,radius,nx,ny,nz,asin_nz,atan_nxy,rotation,sin_rotation,cos_rotation,sin_latitude,cos_latitude,sin_longitude,cos_longitude";
     for(const char* prefix:{"earth","obliquity","vessel"})for(int i=1;i<=3;++i)for(int j=1;j<=3;++j)out<<','<<prefix<<i<<j;

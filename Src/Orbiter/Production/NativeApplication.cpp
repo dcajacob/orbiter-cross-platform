@@ -875,8 +875,13 @@ struct Runtime final:BodyServices,RigidBodyServices,SurfaceServices,NavigationSe
             animationTrace<<std::setprecision(17)<<"tick,object,index,state\n";
             controlTrace.open(evidence/"flight-controls.csv");controlTrace.imbue(std::locale::classic());controlTrace.exceptions(std::ios::badbit|std::ios::failbit);
             controlTrace<<std::setprecision(17)<<"tick,seconds,object,flight_status,aerodynamic_mode,rcs_mode,elevator,aileron,rudder\n";
-            mathTrace.open(evidence/"ground-math.csv");mathTrace.imbue(std::locale::classic());mathTrace.exceptions(std::ios::badbit|std::ios::failbit);
-            mathTrace<<std::setprecision(17);math_observation::Header(mathTrace);
+            if (math_observation::HasMxcsr) {
+                mathTrace.open(evidence/"ground-math.csv");
+                mathTrace.imbue(std::locale::classic());
+                mathTrace.exceptions(std::ios::badbit|std::ios::failbit);
+                mathTrace<<std::setprecision(17);
+                math_observation::Header(mathTrace);
+            }
             contactTrace.open(evidence/"ground-contact.csv");contactTrace.imbue(std::locale::classic());contactTrace.exceptions(std::ios::badbit|std::ios::failbit);
             contactTrace<<std::setprecision(17);contact_observation::Header(contactTrace);
         }
@@ -1304,8 +1309,10 @@ struct Runtime final:BodyServices,RigidBodyServices,SurfaceServices,NavigationSe
                     animationTrace<<completedTicks<<','<<v->GetName()<<','<<index<<','<<state<<'\n';
                 }
                 if(vessel==render.focus) {
-                    MATRIX3 er{},ob{};for(unsigned i=0;i<9;++i){er.data[i]=earth->GRot().data[i];ob.data[i]=earth->RotObliq().data[i];}
-                    math_observation::Row(mathTrace,completedTicks,time.SimT0,*v,MakeVECTOR3(earth->GPos()),er,ob,earth->Rotation());
+                    if (mathTrace.is_open()) {
+                        MATRIX3 er{},ob{};for(unsigned i=0;i<9;++i){er.data[i]=earth->GRot().data[i];ob.data[i]=earth->RotObliq().data[i];}
+                        math_observation::Row(mathTrace,completedTicks,time.SimT0,*v,MakeVECTOR3(earth->GPos()),er,ob,earth->Rotation());
+                    }
                     if (CompareText(v->GetClassName(),"ShuttlePB")==0)
                         contact_observation::Row(contactTrace,completedTicks,time.SimT0,*v);
                 }
