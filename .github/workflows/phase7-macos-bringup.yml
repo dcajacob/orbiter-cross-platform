@@ -6,6 +6,7 @@ on:
       - .github/workflows/phase7-macos-bringup.yml
       - Tests/Production/MacPhase7/**
       - Orbitersdk/include/DrawAPI.h
+      - Orbitersdk/include/OrbiterCockpitData.h
       - Src/Orbiter/PinesGravFile.cpp
       - Src/Orbiter/Production/*.cmake
       - Src/Module/LuaScript/Native/CMakeLists.txt

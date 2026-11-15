@@ -73,12 +73,17 @@ typedef struct {
 	MFDMODESPECEX *spec;
 } MFDMODEOPENSPEC;
 
+// Packed x86-era menus are part of the existing Windows and Linux SDK ABI.
+#ifndef __APPLE__
 #pragma pack(push,1)
+#endif
 typedef struct {
 	const char *line1, *line2;
 	char selchar;
 } MFDBUTTONMENU;
+#ifndef __APPLE__
 #pragma pack(pop)
+#endif
 
 // ===========================================================================
 /// \ingroup defines
