@@ -315,7 +315,21 @@ endif()
 # declared interpreter API and C bridges; CameraMode and other SDK types belong
 # to the engine. This also prevents reverse relocation dependencies from it.
 set(_lua_export_map "${PROJECT_BINARY_DIR}/native-lua-interpreter.exports")
-file(GENERATE OUTPUT "${_lua_export_map}" CONTENT [=[
+if(APPLE)
+    # Mach-O adds a leading underscore to C and C++ linker symbols.
+    file(GENERATE OUTPUT "${_lua_export_map}" CONTENT [=[
+__ZN11Interpreter*
+__ZNK11Interpreter*
+__ZTV11Interpreter
+__ZTI11Interpreter
+__ZTS11Interpreter
+__Z12lua_tovector*
+_orbiter_native_*
+__ZN7orbiter6script*
+]=])
+    target_link_options(native_lua_interpreter PRIVATE "LINKER:-exported_symbols_list,${_lua_export_map}")
+else()
+    file(GENERATE OUTPUT "${_lua_export_map}" CONTENT [=[
 {
   global:
     _ZN11Interpreter*;
@@ -329,5 +343,6 @@ file(GENERATE OUTPUT "${_lua_export_map}" CONTENT [=[
   local: *;
 };
 ]=])
-target_link_options(native_lua_interpreter PRIVATE "-Wl,--version-script=${_lua_export_map}")
+    target_link_options(native_lua_interpreter PRIVATE "-Wl,--version-script=${_lua_export_map}")
+endif()
 set_property(TARGET native_lua_interpreter APPEND PROPERTY LINK_DEPENDS "${_lua_export_map}")

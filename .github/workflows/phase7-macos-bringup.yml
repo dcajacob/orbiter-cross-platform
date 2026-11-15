@@ -97,10 +97,12 @@ jobs:
             -DORBITER_BUILD_NATIVE_CELESTIAL_MODULES=ON "-DORBITER_MACOS_CSPICE_ROOT=$PWD/out/cspice" \
             -DBUILD_TESTING=OFF 2>&1 | tee out/receipt/configure.log
           cmake --build out/native --parallel 3 --target orbiter-production native_deltaglider native_shuttle_a \
-            native_shuttle_a_payload orbiter_native_spice orbiter_native_EarthAtmJ71G orbiter_native_MarsAtm2006 \
+            native_shuttle_a_payload native_lua_inline orbiter_native_spice orbiter_native_EarthAtmJ71G orbiter_native_MarsAtm2006 \
             -- -k 0 2>&1 | tee out/receipt/build.log
           test "$(lipo -archs out/native/orbiter-production)" = "$ORBITER_ARCH"
-          shasum -a 256 out/native/orbiter-production out/native/NativeModules/Vessel/*.so | tee out/receipt/binaries.txt
+          test "$(lipo -archs out/native/NativeModules/Plugin/LuaInline.so)" = "$ORBITER_ARCH"
+          shasum -a 256 out/native/orbiter-production out/native/NativeModules/Vessel/*.so \
+            out/native/NativeModules/Plugin/LuaInline.so out/native/NativeModules/Plugin/LuaInterpreter.dylib | tee out/receipt/binaries.txt
           out/native/orbiter-production --help | tee out/receipt/production-help.txt
       - name: Build the actual production OpenGL renderer for Cocoa
         shell: bash
