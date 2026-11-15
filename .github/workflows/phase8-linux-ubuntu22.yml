@@ -78,7 +78,8 @@ jobs:
           test "$(lsb_release -rs)" = 22.04
           sudo apt-get update
           sudo apt-get install -y libxcb-cursor0 libxkbcommon-x11-0 libxcb-xinerama0 libxcb-image0 libxcb-keysyms1 libxcb-render-util0 libxcb-icccm4 zlib1g \
-            libgl1 libegl1 libgl1-mesa-dri libglu1-mesa libx11-6 libwayland-client0 libxkbcommon0 xvfb xauth
+            libxcb-shape0 libxcb-randr0 libxcb-sync1 libxcb-xfixes0 libxcb-xkb1 libxcb-glx0 \
+            libgl1 libegl1 libgl1-mesa-dri libglu1-mesa libx11-6 libx11-xcb1 libwayland-client0 libxkbcommon0 xvfb xauth
           mkdir -p out/receipt
           {
             cat /etc/os-release
@@ -104,7 +105,7 @@ jobs:
           env -u WAYLAND_DISPLAY XDG_SESSION_TYPE=x11 LIBGL_ALWAYS_SOFTWARE=1 xvfb-run -a -s '-screen 0 1280x720x24' \
             python3 -B Tests/Production/StockInstaller/smoke.py --install "$install" \
               --installer "$dist/orbiter-stock-data-ubuntu22.04.pyz" --output out/receipt/clean-install
-          grep -F "$install/runtime/qt/plugins/platforms/libqxcb.so" out/receipt/clean-install/qt.log
+          grep -F "\"$install/runtime/qt/plugins/platforms/libqxcb.so\" loaded library" out/receipt/clean-install/qt.log
       - name: Compile and fly the matching SDK example and reject the wrong SDK
         shell: bash
         run: |
