@@ -89,7 +89,10 @@ def main():
         for name in json.loads((ROOT / "Tests/Production/standard-planets.lock.json").read_text())["data_files"]:
             target = root / name
             target.parent.mkdir(parents=True, exist_ok=True)
-            os.link(args.planets / name, target)
+            try:
+                os.link(args.planets / name, target)
+            except OSError:
+                shutil.copyfile(args.planets / name, target)
         test_config = (ROOT / "Tests/Production/Fixtures/Orbiter.cfg").read_text()
         test_config = test_config.replace("  ProductionReferenceDriver", "  LaunchpadFlightProbe\n  OGLClient")
         test_config = test_config.replace("FixedStep = 1\n", "FixedStep = 0.0625\n")
