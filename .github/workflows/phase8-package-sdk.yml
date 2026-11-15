@@ -1,7 +1,7 @@
 name: Orbiter Phase 8 package SDKs
 on:
   push:
-    branches: [qualification/phase8-package-sdk-v1]
+    branches: [qualification/phase8-package-sdk-v1, qualification/phase8-package-sdk-windows-v2]
     paths: [.github/workflows/phase8-package-sdk.yml, Utils/PackageSDK/**, Tests/Production/PackageSDK/**]
 
 permissions:
@@ -10,6 +10,7 @@ permissions:
 
 jobs:
   macos:
+    if: github.ref_name == 'qualification/phase8-package-sdk-v1'
     name: SDK add-on on Mac ${{ matrix.arch }}
     runs-on: ${{ matrix.runner }}
     timeout-minutes: 25

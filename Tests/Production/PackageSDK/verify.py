@@ -7,6 +7,7 @@ from pathlib import Path
 import shutil
 import subprocess
 import sys
+import time
 from zipfile import ZipFile
 
 ROOT = Path(__file__).resolve().parents[3]
@@ -113,6 +114,52 @@ def native(args, runtime, sdk, build, env):
     return frames, original
 
 
+def windows_flight(runtime, scenario, env, log):
+    import ctypes
+    from ctypes import wintypes
+
+    user32 = ctypes.WinDLL("user32", use_last_error=True)
+    callback = ctypes.WINFUNCTYPE(wintypes.BOOL, wintypes.HWND, wintypes.LPARAM)
+    user32.EnumWindows.argtypes = [callback, wintypes.LPARAM]
+    user32.GetWindowThreadProcessId.argtypes = [wintypes.HWND, ctypes.POINTER(wintypes.DWORD)]
+    user32.IsWindowVisible.argtypes = [wintypes.HWND]
+    user32.GetWindowTextW.argtypes = [wintypes.HWND, wintypes.LPWSTR, ctypes.c_int]
+    user32.PostMessageW.argtypes = [wintypes.HWND, wintypes.UINT, wintypes.WPARAM, wintypes.LPARAM]
+    with log.open("wb") as output:
+        # --scenariox selects fast process exit, which intentionally skips world
+        # destruction. Return to the classic Launchpad to test ovcExit.
+        process = subprocess.Popen([runtime / "Orbiter.exe", "--scenario=" + scenario],
+                                   cwd=runtime, env=env, stdout=output, stderr=subprocess.STDOUT)
+        windows = []
+
+        @callback
+        def find_launchpad(window, unused):
+            owner = wintypes.DWORD()
+            user32.GetWindowThreadProcessId(window, ctypes.byref(owner))
+            if owner.value == process.pid and user32.IsWindowVisible(window):
+                title = ctypes.create_unicode_buffer(256)
+                user32.GetWindowTextW(window, title, len(title))
+                if "Orbiter Launchpad" in title.value:
+                    windows.append(window)
+            return True
+
+        try:
+            limit = time.monotonic() + 120
+            while process.poll() is None and time.monotonic() < limit:
+                if (runtime / "launchpad-flight-end.txt").is_file():
+                    user32.EnumWindows(find_launchpad, 0)
+                    if windows:
+                        assert user32.PostMessageW(windows[0], 0x0010, 0, 0)
+                        assert process.wait(timeout=20) == 0
+                        return
+                time.sleep(0.1)
+            raise RuntimeError("Windows flight did not return to the classic Launchpad after normal teardown")
+        finally:
+            if process.poll() is None:
+                process.kill()
+                process.wait()
+
+
 def windows(args, runtime, sdk, build, env):
     sys.path.insert(0, str(ROOT / "Tests/Production/Packages"))
     from windows import mesa_files
@@ -127,6 +174,7 @@ def windows(args, runtime, sdk, build, env):
     text = (ROOT / "Tests/Production/Fixtures/Orbiter.cfg").read_text()
     text = text.replace("  ProductionReferenceDriver", "  LaunchpadFlightProbe\n  OGLClient")
     text = text.replace("FixedStep = 1\n", "FixedStep = 0.0625\n")
+    assert "ShutdownMode = 0" in text
     installed = config.read_bytes()
     try:
         config.write_text(font + "\n" + text, encoding="ascii")
@@ -136,8 +184,7 @@ def windows(args, runtime, sdk, build, env):
         system = Path(os.environ["SYSTEMROOT"])
         env.update(PATH=os.pathsep.join([str(system / "System32"), str(system)]),
                    LIBGL_ALWAYS_SOFTWARE="true", GALLIUM_DRIVER="llvmpipe")
-        run([runtime / "Orbiter.exe", "--scenariox=" + scenario.stem], runtime,
-            args.output / "flight.log", env=env)
+        windows_flight(runtime, scenario.stem, env, args.output / "flight.log")
     finally:
         config.write_bytes(installed)
         for name in ("graphics-lifecycle.json", "launchpad-flight-end.txt", "launchpad-flight.txt",
