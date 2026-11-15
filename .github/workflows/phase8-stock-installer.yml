@@ -1,0 +1,165 @@
+name: Orbiter Phase 8 stock data installer
+on:
+  push:
+    branches: [qualification/phase8-stock-installer-v1]
+    paths: [.github/workflows/phase8-stock-installer.yml, Utils/StockDataInstaller/**, Tests/Production/StockInstaller/**]
+
+permissions:
+  actions: read
+  contents: read
+
+jobs:
+  build:
+    name: Build the standalone installer
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.14'
+      - uses: actions/cache/restore@v6
+        with:
+          path: out/cache/production-stock-data-v1.zip
+          key: production-native-data-${{ hashFiles('Tests/Production/input-storage.lock.json') }}
+      - uses: actions/cache/restore@v6
+        with:
+          path: out/cache/Orbiter2016.zip
+          key: production-standard-planets-${{ hashFiles('Tests/Production/standard-planets.lock.json') }}
+      - name: Assemble and verify the installer's original resources
+        run: |
+          test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
+          mkdir -p out/installer
+          python -B Tests/Production/frozen_reference.py
+          python -B Tests/Production/frozen_behavior.py
+          python -B Utils/StockDataInstaller/build.py --cache out/cache --output out/installer/orbiter-stock-data.pyz
+          printf '%s\n' "$GITHUB_SHA" > out/installer/source.txt
+          (cd out/installer && sha256sum orbiter-stock-data.pyz > SHA256SUMS)
+      - uses: actions/upload-artifact@v7
+        with:
+          name: phase8-stock-data-installer
+          path: out/installer/
+          retention-days: 3
+          if-no-files-found: error
+
+  macos:
+    name: Install and fly on Mac ${{ matrix.arch }}
+    runs-on: ${{ matrix.runner }}
+    needs: build
+    timeout-minutes: 25
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - runner: macos-15-intel
+            arch: x86_64
+          - runner: macos-15
+            arch: arm64
+    env:
+      ORBITER_PACKAGE: Orbiter-macos-${{ matrix.arch }}.tar.gz
+      ORBITER_ARCH: ${{ matrix.arch }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.14'
+      - uses: actions/download-artifact@v8
+        with:
+          name: phase8-stock-data-installer
+          path: out/installer
+      - uses: actions/cache/restore@v6
+        with:
+          path: out/cache/production-stock-data-v1.zip
+          key: production-native-data-${{ hashFiles('Tests/Production/input-storage.lock.json') }}
+      - uses: actions/cache/restore@v6
+        with:
+          path: out/cache/Orbiter2016.zip
+          key: production-standard-planets-${{ hashFiles('Tests/Production/standard-planets.lock.json') }}
+      - name: Install the stock data beside the checksum-locked Mac package
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          test "$(uname -m)" = "$ORBITER_ARCH"
+          test "$(cat out/installer/source.txt)" = "$GITHUB_SHA"
+          (cd out/installer && shasum -a 256 -c SHA256SUMS)
+          python -B Tests/Production/StockInstaller/fetch_package.py "$ORBITER_PACKAGE" out/packages
+          mkdir -p out/receipt
+          python -B out/installer/orbiter-stock-data.pyz "$RUNNER_TEMP/Orbiter Stock Install" \
+            --cache out/cache --package "out/packages/$ORBITER_PACKAGE" 2>&1 | tee out/receipt/install.log
+      - name: Fly the untouched stock Delta-glider using the installed data
+        run: |
+          python -B Tests/Production/StockInstaller/smoke.py --installer out/installer/orbiter-stock-data.pyz \
+            --install "$RUNNER_TEMP/Orbiter Stock Install" --output out/receipt
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: phase8-stock-install-macos-${{ matrix.arch }}
+          path: out/receipt/
+          retention-days: 7
+
+  windows:
+    name: Install and fly on Windows x64
+    runs-on: windows-2025
+    needs: build
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.14'
+      - uses: ilammy/msvc-dev-cmd@v1
+        with:
+          arch: x64
+      - uses: actions/download-artifact@v8
+        with:
+          name: phase8-stock-data-installer
+          path: out/installer
+      - uses: actions/cache/restore@v6
+        with:
+          path: out/cache/production-stock-data-v1.zip
+          key: production-native-data-${{ hashFiles('Tests/Production/input-storage.lock.json') }}
+      - uses: actions/cache/restore@v6
+        with:
+          path: out/cache/Orbiter2016.zip
+          key: production-standard-planets-${{ hashFiles('Tests/Production/standard-planets.lock.json') }}
+      - uses: actions/cache/restore@v6
+        with:
+          path: out/mesa-cache/*.pkg.tar.zst
+          key: mesa-ucrt64-${{ hashFiles('Tests/Production/mesa-ucrt64.lock.json') }}
+      - name: Install the stock data beside the checksum-locked Windows package
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          $expected = (Get-Content out/installer/SHA256SUMS).Split(' ')[0]
+          if ((Get-Content out/installer/source.txt) -ne $env:GITHUB_SHA -or (Get-FileHash out/installer/orbiter-stock-data.pyz).Hash -ne $expected) { throw 'Wrong installer source or digest' }
+          python -B Tests/Production/StockInstaller/fetch_package.py Orbiter-windows-x64.zip out/packages
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          New-Item -ItemType Directory -Path out/receipt | Out-Null
+          $folder = Join-Path $env:RUNNER_TEMP 'Orbiter Stock Install'
+          python -B out/installer/orbiter-stock-data.pyz "$folder" --cache out/cache --package out/packages/Orbiter-windows-x64.zip 2>&1 | Tee-Object out/receipt/install.log
+          exit $LASTEXITCODE
+      - name: Verify the installed Launchpad and stock Delta-glider flight
+        run: |
+          $folder = Join-Path $env:RUNNER_TEMP 'Orbiter Stock Install'
+          cmake -S Tests/Production/Packages -B out/package-probe -G Ninja -DCMAKE_BUILD_TYPE=Release "-DORBITER_TEST_RUNTIME=$folder/runtime"
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          cmake --build out/package-probe --parallel 2
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          python -B Tests/Production/stage_mesa.py stage --cache out/mesa-cache --destination out/mesa-runtime
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          python -B Tests/Production/StockInstaller/smoke.py --installer out/installer/orbiter-stock-data.pyz --install "$folder" --output out/receipt --mesa out/mesa-runtime --probe out/package-probe/LaunchpadFlightProbe.dll
+          exit $LASTEXITCODE
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: phase8-stock-install-windows-x64
+          path: out/receipt/
+          retention-days: 7
