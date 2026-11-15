@@ -66,7 +66,15 @@ void startProbe()
                     receipt("launcher-hidden-during-flight");
                     hidden = true;
                 }
-                if (!window->isVisible() || status->text() != QStringLiteral("Session ended.")) return;
+                if (!window->isVisible()) return;
+                const QString message = status->text();
+                if (message.startsWith("Orbiter could not start") || message.startsWith("Orbiter exited with code")
+                    || message == "Orbiter closed unexpectedly.") {
+                    receipt(qPrintable(message));
+                    QCoreApplication::exit(47);
+                    return;
+                }
+                if (message != QStringLiteral("Session ended.")) return;
                 if (!hidden || !tree->currentItem() || tree->currentItem()->text(0) != name || !launch->isEnabled()) {
                     receipt("return-state-invalid");
                     QCoreApplication::exit(45);

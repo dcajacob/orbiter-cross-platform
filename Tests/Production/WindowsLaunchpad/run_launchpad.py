@@ -51,6 +51,8 @@ def run(args):
     base = (production/'Fixtures/Orbiter.cfg').read_text()
     base = base.replace('ScenarioDir = .\\Scenarios\\','ScenarioDir = .\\Test Flights\\')
     base = base.replace('  ProductionReferenceDriver','  LaunchpadFlightProbe\n  OGLClient')
+    require(base.count('FixedStep = 1\n')==1, 'Original test clock setting differs')
+    base = base.replace('FixedStep = 1\n','FixedStep = 0.0625\n')
     (root/'Orbiter.cfg').write_text(base,encoding='ascii')
     (root/'ogl-evidence.enabled').touch()
     mesa_files(args.mesa,root)
