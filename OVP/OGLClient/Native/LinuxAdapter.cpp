@@ -328,7 +328,11 @@ void recordWindowGeometry(GLFWwindow* window) {
     const auto temporary=evidence/"native-window.json.tmp";
     {
         std::ofstream record(temporary);record.exceptions(std::ios::badbit|std::ios::failbit);
-        record<<"{\"backend\":\""<<(glfwGetPlatform()==GLFW_PLATFORM_X11?"x11":"wayland")
+        const int platform = glfwGetPlatform();
+        const char* backend = platform == GLFW_PLATFORM_X11 ? "x11"
+                            : platform == GLFW_PLATFORM_WAYLAND ? "wayland"
+                            : platform == GLFW_PLATFORM_COCOA ? "cocoa" : "unknown";
+        record<<"{\"backend\":\""<<backend
             <<"\",\"logical_width\":"<<logicalWidth<<",\"logical_height\":"<<logicalHeight
             <<",\"framebuffer_width\":"<<width<<",\"framebuffer_height\":"<<height
             <<",\"content_scale_x\":"<<scaleX<<",\"content_scale_y\":"<<scaleY
@@ -346,6 +350,9 @@ void OGLClient::Open()
     glfwInitialized=true;
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR,3);glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR,3);
     glfwWindowHint(GLFW_OPENGL_PROFILE,GLFW_OPENGL_CORE_PROFILE);
+#ifdef __APPLE__
+    glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT,GLFW_TRUE);
+#endif
     // The opt-in engineering fixture retains the accepted 1280x720 physical
     // viewport while exercising real 2x Wayland logical/framebuffer conversion.
     // Normal sessions retain the established window policy.

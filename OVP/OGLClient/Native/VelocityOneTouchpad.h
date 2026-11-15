@@ -1,15 +1,18 @@
 // Licensed under the MIT License
 #pragma once
 
+#include <filesystem>
+
+#ifdef __linux__
 #include <array>
 #include <cerrno>
 #include <chrono>
-#include <filesystem>
 #include <string_view>
 #include <linux/input.h>
 #include <fcntl.h>
 #include <sys/ioctl.h>
 #include <unistd.h>
+#endif
 
 namespace orbiter::production {
 
@@ -29,6 +32,7 @@ public:
     VelocityOneTouchpad(const VelocityOneTouchpad&) = delete;
     VelocityOneTouchpad& operator=(const VelocityOneTouchpad&) = delete;
 
+#ifdef __linux__
     void Reset()
     {
         if (fd >= 0)
@@ -140,6 +144,11 @@ private:
     bool down = false;
     bool dropped = false;
     bool armed = false;
+#else
+    // This separate hardware interface is exposed through Linux evdev.
+    void Reset() {}
+    State Poll(bool) { return {}; }
+#endif
 };
 
 }

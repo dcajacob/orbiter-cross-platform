@@ -28,13 +28,33 @@ struct SpawnActions {
     SpawnActions() {
         int error=posix_spawn_file_actions_init(&value);
         if(error)throw std::runtime_error(std::strerror(error));
-        // Linux/glibc: the external browser must not retain simulation logs,
-        // recorder streams, module files, or graphics/display connections.
+        // Keep simulation logs, recorder streams and display connections in this process.
+#ifdef __APPLE__
+        for (int fd = 0; fd < 3 && !error; ++fd)
+            if (fcntl(fd, F_GETFD) != -1)
+                error = posix_spawn_file_actions_addinherit_np(&value, fd);
+#else
         error=posix_spawn_file_actions_addclosefrom_np(&value,3);
+#endif
         if(error) {posix_spawn_file_actions_destroy(&value);throw std::runtime_error(std::strerror(error));}
     }
     ~SpawnActions() {posix_spawn_file_actions_destroy(&value);}
 };
+#ifdef __APPLE__
+struct SpawnAttributes {
+    posix_spawnattr_t value;
+    SpawnAttributes() {
+        const int init = posix_spawnattr_init(&value);
+        if (init) throw std::runtime_error(std::strerror(init));
+        const int error = posix_spawnattr_setflags(&value, POSIX_SPAWN_CLOEXEC_DEFAULT);
+        if (error) {
+            posix_spawnattr_destroy(&value);
+            throw std::runtime_error(std::strerror(error));
+        }
+    }
+    ~SpawnAttributes() { posix_spawnattr_destroy(&value); }
+};
+#endif
 std::string Encode(const std::string& text,bool path=false) {
     static const char hex[]="0123456789ABCDEF";
     std::string result;
@@ -149,7 +169,11 @@ void OpenNativeHelp(const std::string& url) {
     // Reserve before spawning so a failed allocation cannot lose child ownership.
     launchers.children.reserve(launchers.children.size()+1);
     const auto launch=LaunchPage(url);
+#ifdef __APPLE__
+    char command[]="/usr/bin/open";
+#else
     char command[]="xdg-open";
+#endif
     char* args[]={command,const_cast<char*>(launch.c_str()),nullptr};
     // Simulator module/preload paths belong to this process, not the desktop
     // browser (which may have an entirely different runtime or sandbox).
@@ -159,7 +183,12 @@ void OpenNativeHelp(const std::string& url) {
     environment.push_back(nullptr);
     SpawnActions actions;
     pid_t child=0;
+#ifdef __APPLE__
+    SpawnAttributes attributes;
+    const int error = posix_spawn(&child, command, &actions.value, &attributes.value, args, environment.data());
+#else
     const int error=posix_spawnp(&child,command,&actions.value,nullptr,args,environment.data());
+#endif
     if(error)throw std::runtime_error(std::string("Cannot open desktop help: ")+std::strerror(error));
     launchers.children.push_back(child);
     std::clog<<"Opened help: "<<url<<'\n';

@@ -1,4 +1,4 @@
-name: Orbiter macOS Phase 7 first diagnostics
+name: Orbiter macOS Phase 7 stock flight
 on:
   push:
     branches: [qualification/macos-phase7-v1]
@@ -9,7 +9,9 @@ on:
       - Src/Orbiter/PinesGravFile.cpp
       - Src/Orbiter/Production/*.cmake
       - Src/Module/LuaScript/Native/CMakeLists.txt
-      - Src/ClientNative/main.cpp
+      - Src/Orbiter/Production/MathObservation.h
+      - Src/Orbiter/Production/NativeHelp.cpp
+      - OVP/OGLClient/Native/**
 permissions:
   contents: read
 concurrency:
@@ -17,15 +19,21 @@ concurrency:
   cancel-in-progress: false
 jobs:
   sparse:
-    name: macOS production compile and renderer probe ${{ matrix.arch }}
+    name: macOS production stock flight ${{ matrix.arch }}
     runs-on: ${{ matrix.runner }}
-    timeout-minutes: 25
+    timeout-minutes: 45
     strategy:
       fail-fast: false
       matrix:
         include:
-          - {runner: macos-15-intel, arch: x86_64}
-          - {runner: macos-15, arch: arm64}
+          - runner: macos-15-intel
+            arch: x86_64
+            cspice_path: MacIntel_OSX_AppleC_64bit
+            cspice_sha: 6f4980445fee4d363dbce6f571819f4a248358d2c1bebca47e0743eedfe9935e
+          - runner: macos-15
+            arch: arm64
+            cspice_path: MacM1_OSX_clang_64bit
+            cspice_sha: 0deae048443e11ca4d093cac651d9785d4f2594631a183d85a3d58949f4d0aa9
     env:
       ORBITER_BASELINE: 9609ce48ace63f29ecbd7998c4e3e921b992e834
       ORBITER_ARCH: ${{ matrix.arch }}
@@ -51,27 +59,19 @@ jobs:
           git diff --exit-code "$ORBITER_BASELINE" HEAD -- Src/Orbiter/SuperVessel.cpp Tests/Production/PhysicsV3 Tests/Portable Scenarios
           python3 -B Tests/Production/frozen_reference.py
           python3 -B Tests/Production/frozen_behavior.py
-      - name: Probe native Cocoa OpenGL pixel formats
+      - name: Verify renderer and original planetary dependencies
         shell: bash
+        env:
+          CSPICE_PATH: ${{ matrix.cspice_path }}
+          CSPICE_SHA: ${{ matrix.cspice_sha }}
         run: |
-          clang -fobjc-arc -framework AppKit -framework OpenGL Tests/Production/MacPhase7/ContextProbe.m -o out/context-probe
-          test "$(lipo -archs out/context-probe)" = "$ORBITER_ARCH"
-          out/context-probe | tee out/receipt/context.txt
-      - name: Configure and compile the production native cockpit candidate
-        shell: bash
-        run: |
-          cmake -S Src/Orbiter/Production -B out/native -G Ninja -DCMAKE_BUILD_TYPE=Release \
-            -DCMAKE_OSX_ARCHITECTURES="$ORBITER_ARCH" -DCMAKE_POLICY_VERSION_MINIMUM=3.5 \
-            -DORBITER_BUILD_NATIVE_VESSELS=ON -DORBITER_BUILD_NATIVE_COCKPIT=ON \
-            -DBUILD_TESTING=OFF 2>&1 | tee out/receipt/configure.log
-          cmake --build out/native --parallel 3 --target orbiter-production native_deltaglider -- -k 0 \
-            2>&1 | tee out/receipt/build.log
-          test "$(lipo -archs out/native/orbiter-production)" = "$ORBITER_ARCH"
-          out/native/orbiter-production --help | tee out/receipt/production-help.txt
-      - name: Render the unchanged portable fixture through Cocoa software OpenGL
-        if: ${{ !cancelled() && steps.identity.outcome == 'success' }}
-        shell: bash
-        run: |
+          python3 -B Tests/Production/NativeScene/dependencies.py --cache out/ogl-dependencies
+          curl --fail --silent --show-error --location --retry 2 \
+            "https://naif.jpl.nasa.gov/pub/naif/toolkit/C/$CSPICE_PATH/packages/cspice.tar.Z" -o out/cspice.tar.Z
+          printf '%s  out/cspice.tar.Z\n' "$CSPICE_SHA" | shasum -a 256 -c -
+          tar -xf out/cspice.tar.Z -C out cspice/lib/cspice.a cspice/include
+          test "$(lipo -archs out/cspice/lib/cspice.a)" = "$ORBITER_ARCH"
+          shasum -a 256 out/cspice.tar.Z out/cspice/lib/cspice.a | tee out/receipt/cspice.txt
           mkdir -p out/glfw
           curl -fsSL https://codeload.github.com/glfw/glfw/tar.gz/refs/tags/3.5.1 -o out/glfw.tar.gz
           echo '5234f4f29473e9a06bc7847d8371858dd135d38466eeeaa652fdc9f8f9ff0c20  out/glfw.tar.gz' | shasum -a 256 -c -
@@ -86,34 +86,61 @@ jobs:
           p.write_text(body.replace(requested, '    /* Hosted diagnostic: permit the Apple software device. */'))
           PYTHON
           shasum -a 256 out/glfw/src/nsgl_context.m | tee out/receipt/software-nsgl-source.txt
-          cmake -S Tests/Portable -B out/portable -G Ninja -DCMAKE_BUILD_TYPE=Release \
+      - name: Build the production native cockpit and required stock modules
+        id: engine
+        shell: bash
+        run: |
+          cmake -S Src/Orbiter/Production -B out/native -G Ninja -DCMAKE_BUILD_TYPE=Release \
             -DCMAKE_OSX_ARCHITECTURES="$ORBITER_ARCH" -DCMAKE_POLICY_VERSION_MINIMUM=3.5 \
-            -DORBITER_PORTABLE_COLLISION_TESTS=ON -DORBITER_BUILD_VIEWER=ON \
-            "-DFETCHCONTENT_SOURCE_DIR_GLFW=$PWD/out/glfw" 2>&1 | tee out/receipt/portable-configure.log
-          cmake --build out/portable --parallel 3 --target orbiter-native orbiter-headless 2>&1 | tee out/receipt/portable-build.log
-          test "$(lipo -archs out/portable/portable/native-client/orbiter-native)" = "$ORBITER_ARCH"
-          python3 -B Tests/Portable/test_native_client.py \
-            --binary out/portable/portable/native-client/orbiter-native \
-            --headless out/portable/portable/orbiter-headless \
-            --fixture Tests/Portable/Fixtures --reference Tests/Portable/Reference \
-            --backend auto --output out/receipt/portable-render 2>&1 | tee out/receipt/portable-render.log
-          python3 - <<'PYTHON'
-          import json
-          from pathlib import Path
-          runs = json.loads(Path('out/receipt/portable-render/verification.json').read_text())
-          assert all(runs[name]['runtime']['backend']=='cocoa'
-                     for name in ('overview','overview-repeat','controls-follow'))
-          PYTHON
+            -DORBITER_BUILD_NATIVE_VESSELS=ON -DORBITER_BUILD_NATIVE_COCKPIT=ON \
+            -DORBITER_BUILD_NATIVE_CELESTIAL_MODULES=ON "-DORBITER_MACOS_CSPICE_ROOT=$PWD/out/cspice" \
+            -DBUILD_TESTING=OFF 2>&1 | tee out/receipt/configure.log
+          cmake --build out/native --parallel 3 --target orbiter-production native_deltaglider native_shuttle_a \
+            native_shuttle_a_payload orbiter_native_spice orbiter_native_EarthAtmJ71G orbiter_native_MarsAtm2006 \
+            -- -k 0 2>&1 | tee out/receipt/build.log
+          test "$(lipo -archs out/native/orbiter-production)" = "$ORBITER_ARCH"
+          shasum -a 256 out/native/orbiter-production out/native/NativeModules/Vessel/*.so | tee out/receipt/binaries.txt
+          out/native/orbiter-production --help | tee out/receipt/production-help.txt
+      - name: Build the actual production OpenGL renderer for Cocoa
+        shell: bash
+        run: |
+          cmake -S OVP/OGLClient/Native -B out/renderer -G Ninja -DCMAKE_BUILD_TYPE=Release \
+            -DCMAKE_OSX_ARCHITECTURES="$ORBITER_ARCH" "-DORBITER_ENGINE_BUILD=$PWD/out/native" \
+            "-DORBITER_RENDERER_DEPENDENCIES=$PWD/out/ogl-dependencies" \
+            "-DFETCHCONTENT_SOURCE_DIR_GLFW=$PWD/out/glfw" 2>&1 | tee out/receipt/renderer-configure.log
+          cmake --build out/renderer --parallel 3 2>&1 | tee out/receipt/renderer-build.log
+          test "$(lipo -archs out/native/NativeModules/Graphics/OGLClient.so)" = "$ORBITER_ARCH"
+          shasum -a 256 out/native/NativeModules/Graphics/OGLClient.so | tee -a out/receipt/binaries.txt
+      - uses: actions/cache/restore@v6
+        with:
+          path: out/data-cache/production-stock-data-v1.zip
+          key: production-native-data-${{ hashFiles('Tests/Production/input-storage.lock.json') }}
+      - uses: actions/cache/restore@v6
+        with:
+          path: out/planet-cache/Orbiter2016.zip
+          key: production-standard-planets-${{ hashFiles('Tests/Production/standard-planets.lock.json') }}
+      - name: Stage and launch one unchanged original stock scene
+        shell: bash
+        run: |
+          python3 -B Tests/Production/prepare_native_data.py --archive out/data-cache/production-stock-data-v1.zip --destination out/data --group all
+          python3 -B Tests/Production/prepare_hosted_data.py --lock Tests/Production/standard-planets.lock.json --archive out/planet-cache/Orbiter2016.zip --destination out/planets
+          python3 -B Tests/Production/NativeScene/prepare.py --delta-glider --shuttle-a --data out/data --planets out/planets --destination out/assets
+          python3 -B Tests/Production/CockpitUI/prepare_fonts.py --assets out/assets
+          python3 -B Tests/Production/MacPhase7/run_stock.py --engine out/native --assets out/assets \
+            --data out/data --planets out/planets --output out/receipt/stock --source "$GITHUB_SHA"
       - name: Preserve diagnostic evidence
         if: always()
         uses: actions/upload-artifact@v7
         with:
-          name: macos-phase7-diagnostic-${{ matrix.arch }}
+          name: macos-phase7-stock-${{ matrix.arch }}
           retention-days: 7
           path: |
             out/receipt/*.txt
             out/receipt/*.log
-            out/receipt/portable-render/**/*.txt
-            out/receipt/portable-render/**/*.json
-            out/receipt/portable-render/**/*.csv
-            out/receipt/portable-render/**/*.png
+            out/receipt/stock/*.json
+            out/receipt/stock/*.log
+            out/receipt/stock/scene.csv
+            out/receipt/stock/visual-events.csv
+            out/receipt/stock/object-draws.csv
+            out/receipt/stock/renderer-modules.txt
+            out/receipt/stock/graphics-errors.txt

@@ -8,6 +8,9 @@
 #include "MeshManager.h"
 #include <cmath>
 #include <dlfcn.h>
+#ifdef __APPLE__
+#include <mach-o/dyld.h>
+#endif
 #include <fstream>
 #include <iomanip>
 #include <locale>
@@ -136,8 +139,16 @@ void Frame() {
         } else scene<<name(h)<<",celestial,,,,,,,,"<<p.x<<','<<p.y<<','<<p.z<<'\n';
     }
     auto modules=output("renderer-modules.txt");
-    std::ifstream mappings("/proc/self/maps");std::string mapping;std::set<std::string> files;
+    std::set<std::string> files;
+#ifdef __APPLE__
+    for (uint32_t index = 0; index < _dyld_image_count(); ++index)
+        if (const char* image = _dyld_get_image_name(index))
+            files.insert(image);
+#else
+    std::ifstream mappings("/proc/self/maps");
+    std::string mapping;
     while(std::getline(mappings,mapping)) {auto slash=mapping.find('/');if(slash!=std::string::npos)files.insert(mapping.substr(slash));}
+#endif
     for(const auto& file:files)modules<<file<<'\n';
     auto camera=output("camera.csv");VECTOR3 p{},d{};MATRIX3 r{};
     oapiCameraGlobalPos(&p);oapiCameraGlobalDir(&d);oapiCameraRotationMatrix(&r);

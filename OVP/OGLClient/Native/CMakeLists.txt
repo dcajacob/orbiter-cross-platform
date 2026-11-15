@@ -15,11 +15,11 @@ if(NOT EXISTS "${ORBITER_ENGINE_BUILD}/native-sdk/OrbiterNativeBuild.h")
     message(FATAL_ERROR "A matching native production SDK build is required")
 endif()
 add_library(native_engine SHARED IMPORTED)
-set_target_properties(native_engine PROPERTIES IMPORTED_LOCATION "${ORBITER_ENGINE_BUILD}/liborbiter_production_vessels.so"
+set_target_properties(native_engine PROPERTIES IMPORTED_LOCATION "${ORBITER_ENGINE_BUILD}/${CMAKE_SHARED_LIBRARY_PREFIX}orbiter_production_vessels${CMAKE_SHARED_LIBRARY_SUFFIX}"
     INTERFACE_INCLUDE_DIRECTORIES "${ORBITER_SOURCE_ROOT}/Src/Orbiter;${ORBITER_SOURCE_ROOT}/Orbitersdk/include;${ORBITER_ENGINE_BUILD}/native-sdk"
     INTERFACE_COMPILE_DEFINITIONS "ORBITER_PRODUCTION_SHARED;ORBITER_NATIVE_BUILD_CONFIGURATION=\"${CMAKE_BUILD_TYPE}\"")
 add_library(native_boundary SHARED IMPORTED)
-set_target_properties(native_boundary PROPERTIES IMPORTED_LOCATION "${ORBITER_ENGINE_BUILD}/liborbiter_production_boundary.so")
+set_target_properties(native_boundary PROPERTIES IMPORTED_LOCATION "${ORBITER_ENGINE_BUILD}/${CMAKE_SHARED_LIBRARY_PREFIX}orbiter_production_boundary${CMAKE_SHARED_LIBRARY_SUFFIX}")
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 file(READ "${CMAKE_CURRENT_SOURCE_DIR}/../dependencies.lock.json" dependency_lock)
 set(GLM_BUILD_TESTS OFF CACHE BOOL "" FORCE)
@@ -62,7 +62,9 @@ target_include_directories(orbiter_ogl_native PRIVATE ..
     "${soil2_SOURCE_DIR}/incs" "${soil2_SOURCE_DIR}/srcs" "${nanovg_SOURCE_DIR}/src"
     "${libnsbmp_SOURCE_DIR}/include" "${imgui_SOURCE_DIR}" "${imgui_SOURCE_DIR}/backends")
 target_link_libraries(orbiter_ogl_native PRIVATE native_engine native_boundary glm::glm freetype zlibstatic glfw OpenGL::GL ${CMAKE_DL_LIBS})
-target_link_options(orbiter_ogl_native PRIVATE -Wl,--no-undefined -Wl,--exclude-libs,ALL)
+if(NOT APPLE)
+    target_link_options(orbiter_ogl_native PRIVATE -Wl,--no-undefined -Wl,--exclude-libs,ALL)
+endif()
 set_target_properties(orbiter_ogl_native PROPERTIES PREFIX "" OUTPUT_NAME OGLClient
     LIBRARY_OUTPUT_DIRECTORY "${ORBITER_ENGINE_BUILD}/NativeModules/Graphics" BUILD_RPATH "${ORBITER_ENGINE_BUILD}"
     CXX_VISIBILITY_PRESET hidden C_VISIBILITY_PRESET hidden VISIBILITY_INLINES_HIDDEN YES)
@@ -86,9 +88,11 @@ set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS "${ORBITER_ENGINE
 file(STRINGS "${ORBITER_ENGINE_BUILD}/native-sdk/OrbiterNativeBuild.h" cockpit_define
     REGEX "^#define ORBITER_BUILD_NATIVE_COCKPIT 1$")
 if(cockpit_define)
-    find_package(X11 REQUIRED)
-    target_include_directories(orbiter_ogl_native PRIVATE ${X11_INCLUDE_DIR} ${X11_Xrandr_INCLUDE_PATH})
-    target_link_libraries(orbiter_ogl_native PRIVATE X11::X11)
+    if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
+        find_package(X11 REQUIRED)
+        target_include_directories(orbiter_ogl_native PRIVATE ${X11_INCLUDE_DIR} ${X11_Xrandr_INCLUDE_PATH})
+        target_link_libraries(orbiter_ogl_native PRIVATE X11::X11)
+    endif()
     target_sources(orbiter_ogl_native PRIVATE
         "${imgui_SOURCE_DIR}/backends/imgui_impl_glfw.cpp"
         "${imgui_SOURCE_DIR}/backends/imgui_impl_opengl3.cpp")
