@@ -6,11 +6,11 @@ client uses SDL3's Vulkan backend and a shared pair of SPIR-V shaders.
 
 The client streams stock Earth surface tiles from `Earth/Archive/Surf.tree` and
 uses Orbiter's elevation data. It keeps detailed tiles around the DG-S and
-coarser tiles farther away. During flight it stages tiles over several frames
-and replaces each coarser tile when all four of its children are ready. The
-client applies the stock vessel's exterior mesh animation states, including
-gear and flight surfaces. The aircraft and its ground shadow use the same
-posed mesh.
+extends coarser terrain toward the horizon with distance haze. During flight
+it stages tiles over several frames and replaces each coarser tile when all
+four of its children are ready. The client applies the stock vessel's exterior
+mesh animation states, including gear and flight surfaces. The aircraft and
+its ground shadow use the same posed mesh.
 
 ## Takeoff
 
@@ -24,6 +24,40 @@ posed mesh.
    to orbit the external camera. Scroll to change camera distance.
 
 This milestone covers regional Earth terrain and the external DG-S view.
+
+## Optional Kennedy imagery
+
+The offline imagery pack covers the Shuttle Landing Facility runway, Launch
+Complex 39A, and Launch Complex 39B. It uses public 2023 Florida NAIP imagery
+from [USDA Forest Service GTAC / GeoPlatform IIPP](https://imagery.geoplatform.gov/iipp/rest/services/NAIP/NAIP_plus/ImageServer).
+The 1536-pixel detail tiles sample approximately 0.35 m east–west and 0.40 m
+north–south near Kennedy. Mipmaps and coarser tiles are included. The imagery
+feathers into stock Earth textures at the edges of the coverage.
+
+Extract the pack and set `ORBITER_VULKAN_KENNEDY_IMAGERY` to the directory
+containing `imagery.json` and the numbered tile directories before starting
+Orbiter. The Vulkan client reads the tiles from disk. With the variable unset,
+the client uses the stock Earth surface archive.
+
+On Linux:
+
+```sh
+export ORBITER_VULKAN_KENNEDY_IMAGERY=/path/to/Orbiter-Kennedy-NAIP-2023
+```
+
+In Windows PowerShell:
+
+```powershell
+$env:ORBITER_VULKAN_KENNEDY_IMAGERY = 'C:\path\to\Orbiter-Kennedy-NAIP-2023'
+```
+
+To build the pack yourself, install NumPy, Requests, and Pillow with BC1 DDS
+encoding support, then run:
+
+```sh
+python3 OVP/VulkanClient/PrepareKennedyImagery.py \
+  /path/to/Textures/Earth/Archive/Surf.tree /path/to/Orbiter-Kennedy-NAIP-2023
+```
 
 ## Repeatable runway circuit
 

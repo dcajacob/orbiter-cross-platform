@@ -459,7 +459,7 @@ bool Scene::Present(const SceneUniform& ship, const SceneUniform& ground)
     auto* pass = SDL_BeginGPURenderPass(commands, &color, 1, &depth);
     SDL_BindGPUGraphicsPipeline(pass, terrain_);
     SDL_PushGPUVertexUniformData(commands, 0, &ground, sizeof(ground));
-    const MaterialUniform surface;
+    const MaterialUniform surface{{1, 1, 1, 1}, {0, 0, 0, 1}};
     SDL_PushGPUFragmentUniformData(commands, 0, &surface, sizeof(surface));
     for (const auto& [key, tile] : tiles_) {
         if (!tile.visible) continue;
@@ -477,7 +477,7 @@ bool Scene::Present(const SceneUniform& ship, const SceneUniform& ground)
         const SDL_GPUBufferBinding vertex{shadowVertices_, 0};
         const SDL_GPUBufferBinding index{indices_, 0};
         const SDL_GPUTextureSamplerBinding binding{textures_.front(), sampler_};
-        const MaterialUniform shade{{0.015f, 0.015f, 0.015f, 0.63f}, {}};
+        const MaterialUniform shade{{0.015f, 0.015f, 0.015f, 0.63f}, {0, 0, 0, 2}};
         SDL_BindGPUVertexBuffers(pass, 0, &vertex, 1);
         SDL_BindGPUIndexBuffer(pass, &index, SDL_GPU_INDEXELEMENTSIZE_32BIT);
         SDL_BindGPUFragmentSamplers(pass, 0, &binding, 1);

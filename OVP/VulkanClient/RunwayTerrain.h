@@ -14,6 +14,7 @@ namespace orbiter::vulkan {
 
 struct TerrainUpdate {
     unsigned staged = 0;
+    unsigned imagery = 0;
     bool switched = false;
     bool recentered = false;
 };
@@ -33,6 +34,7 @@ private:
     struct Tile {
         std::vector<double> heights;
         int divisions = 0;
+        bool regionalImagery = false;
         double x = 0, z = 0, width = 0, length = 0;
 
         bool Contains(double east, double north) const;
@@ -48,6 +50,7 @@ private:
     double longitude_ = 0, latitude_ = 0, radius_ = 0, altitude_ = 0, eastScale_ = 0;
     TileKey requested_{0, 0, 0};
     std::filesystem::path filename_;
+    std::filesystem::path imagery_;
     std::unique_ptr<ZTreeMgr> archive_;
     std::vector<ElevationTile>* elevationCache_ = nullptr;
     std::map<TileKey, Tile> tiles_;

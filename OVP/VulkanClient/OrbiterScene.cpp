@@ -32,7 +32,7 @@ SceneUniform MakeUniform(const SceneFrame& frame, unsigned width, unsigned heigh
     const double vertical = 1 / std::tan(oapiCameraAperture());
     const double horizontal = vertical * height / width;
     constexpr double nearPlane = 0.1;
-    constexpr double farPlane = 85000.0;
+    constexpr double farPlane = 220000.0;
     for (unsigned i = 0; i < 4; ++i) {
         const auto& v = i == 3 ? displacement : frame.axes[i];
         const auto z = Dot(v, axes[2]);
@@ -177,7 +177,7 @@ void OrbiterScene::Open(SDL_Window* window)
     if (const char* path = SDL_getenv("ORBITER_VULKAN_FRAME_TRACE"); path && *path) {
         frameTrace_.open(std::filesystem::path(path));
         if (!frameTrace_) throw std::runtime_error("Cannot open Vulkan frame trace");
-        frameTrace_ << "sim_seconds,interval_ms,scene_ms,terrain_ms,tiles_staged,tiles_switched,pose_uploaded,shadow_drawn\n";
+        frameTrace_ << "sim_seconds,interval_ms,scene_ms,terrain_ms,tiles_staged,imagery_staged,tiles_switched,pose_uploaded,shadow_drawn\n";
     }
     previousFrame_ = 0;
 }
@@ -311,7 +311,7 @@ bool OrbiterScene::Present(unsigned width, unsigned height)
         const auto milliseconds = [](Uint64 time) { return double(time) / 1000000; };
         frameTrace_ << simTime << ',' << milliseconds(previousFrame_ ? start - previousFrame_ : 0)
                     << ',' << milliseconds(SDL_GetTicksNS() - start) << ',' << milliseconds(terrainTime)
-                    << ',' << tiles.staged << ',' << tiles.switched << ',' << poseChanged
+                    << ',' << tiles.staged << ',' << tiles.imagery << ',' << tiles.switched << ',' << poseChanged
                     << ',' << !shadowVertices_.empty() << '\n';
         previousFrame_ = start;
     }

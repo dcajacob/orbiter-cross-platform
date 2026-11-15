@@ -16,7 +16,7 @@ namespace orbiter::vulkan {
 namespace {
 
 constexpr double pi = 3.14159265358979323846;
-constexpr int coarseLevel = 13;
+constexpr int coarseLevel = 11;
 constexpr int detailLevel = 19;
 
 int Rows(int level) { return 1 << (level - 4); }
@@ -89,6 +89,11 @@ void RunwayTerrain::Open(const std::filesystem::path& filename, const VECTOR3& o
     earth_ = oapiGetGbodyByName(name);
     if (!earth_) throw std::runtime_error("Stock Runway 33 terrain requires Earth");
     filename_ = filename;
+    if (const char* path = SDL_getenv("ORBITER_VULKAN_KENNEDY_IMAGERY"); path && *path) {
+        imagery_ = std::filesystem::path(path);
+        if (!std::filesystem::is_directory(imagery_))
+            throw std::runtime_error("Kennedy imagery directory does not exist: " + imagery_.string());
+    }
     archive_ = ZTreeMgr::OpenArchiveFile(filename_, ZTreeMgr::LAYER_SURF);
     double distance;
     oapiGlobalToEqu(earth_, origin, &longitude_, &latitude_, &distance);
@@ -108,6 +113,7 @@ void RunwayTerrain::Close()
 {
     tiles_.clear();
     archive_.reset();
+    imagery_.clear();
     visible_.clear();
     wanted_.clear();
     pending_.clear();
@@ -172,6 +178,7 @@ TerrainUpdate RunwayTerrain::Update(const VECTOR3& position, Scene& scene)
         const auto key = pending_.front();
         TerrainMesh mesh;
         auto tile = BuildTile(key, mesh);
+        result.imagery += tile.regionalImagery;
         scene.StageTile(key, mesh);
         tiles_.emplace(key, std::move(tile));
         pending_.pop_front();
@@ -200,8 +207,17 @@ TerrainUpdate RunwayTerrain::Update(const VECTOR3& position, Scene& scene)
 
 RunwayTerrain::Tile RunwayTerrain::BuildTile(const TileKey& key, TerrainMesh& mesh)
 {
-    auto texture = LoadTile(*archive_, filename_, key);
     Tile tile;
+    TileTexture texture;
+    if (!imagery_.empty() && key.level >= 16) {
+        const auto override = imagery_ / std::to_string(key.level) / std::to_string(key.row)
+            / (std::to_string(key.column) + ".dds");
+        if (std::filesystem::is_regular_file(override)) {
+            texture = {ReadDds(override), 0, 0, 1};
+            tile.regionalImagery = true;
+        }
+    }
+    if (!tile.regionalImagery) texture = LoadTile(*archive_, filename_, key);
     tile.divisions = key.level == detailLevel ? 64 : 16;
     const auto angle = TileAngle(key.level);
     const auto left = std::remainder(key.column * angle - pi - longitude_, 2 * pi);
