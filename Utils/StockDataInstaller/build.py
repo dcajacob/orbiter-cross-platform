@@ -27,7 +27,7 @@ def add(bundle, path, name, method=zipfile.ZIP_DEFLATED):
         shutil.copyfileobj(source, target, installer.BLOCK)
 
 
-def build(archives, stock, output):
+def build(archives, stock, output, package_lock):
     with tempfile.TemporaryDirectory(prefix="asset-build-", dir=output.parent) as directory:
         work = Path(directory)
         data, planets, base, native = (work / item for item in ("data", "planets", "base", "native"))
@@ -42,7 +42,7 @@ def build(archives, stock, output):
         with zipfile.ZipFile(output.with_suffix(".partial"), "w") as bundle:
             bundle.writestr(zipfile.ZipInfo("__main__.py"), "from installer import main\nraise SystemExit(main())\n")
             add(bundle, HERE / "installer.py", "installer.py")
-            add(bundle, HERE / "packages.json", "packages.json")
+            add(bundle, package_lock, "packages.json")
             add(bundle, ROOT / "LICENSE", "LICENSE")
             for name in LOCKS:
                 add(bundle, TESTS / name, name)
@@ -61,6 +61,7 @@ def main():
     parser.add_argument("--cache", type=Path, required=True)
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--offline", action="store_true")
+    parser.add_argument("--package-lock", type=Path, default=HERE / "packages.json")
     args = parser.parse_args()
     stock, planets, storage = [json.loads((TESTS / name).read_text()) for name in LOCKS]
     records = installer.source_records(stock, planets, storage)
@@ -68,7 +69,7 @@ def main():
                 for name, record in records.items()}
     args.output.parent.mkdir(parents=True, exist_ok=True)
     installer.require(not args.output.exists(), "Choose a new output filename")
-    build(archives, stock, args.output)
+    build(archives, stock, args.output, args.package_lock)
     print(f"{installer.digest(args.output)}  {args.output}")
 
 

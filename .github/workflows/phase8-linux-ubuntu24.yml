@@ -1,0 +1,107 @@
+name: Orbiter Phase 8 Ubuntu 24.04 package and SDK
+on:
+  push:
+    branches: [qualification/phase8-linux-ubuntu24-v1]
+    paths: [.github/workflows/phase8-linux-ubuntu24.yml, Tests/Production/LinuxBaseline/**]
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: Build the Ubuntu 24.04 runtime, SDK and installer
+    runs-on: ubuntu-24.04
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Install Ubuntu 24.04 development packages
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y gcc g++ ninja-build qt6-base-dev zlib1g-dev libgl-dev libglu1-mesa-dev \
+            libwayland-dev wayland-protocols libxkbcommon-dev xorg-dev
+      - name: Build and seal the native runtime and SDK
+        run: bash Tests/Production/LinuxBaseline/build.sh
+      - uses: actions/cache/restore@v6
+        with:
+          path: out/cache/production-stock-data-v1.zip
+          key: production-native-data-${{ hashFiles('Tests/Production/input-storage.lock.json') }}
+      - uses: actions/cache/restore@v6
+        with:
+          path: out/cache/Orbiter2016.zip
+          key: production-standard-planets-${{ hashFiles('Tests/Production/standard-planets.lock.json') }}
+      - name: Bind the stock data installer to the new runtime
+        run: |
+          python3 -B Utils/StockDataInstaller/build.py --cache out/cache \
+            --package-lock out/receipt/packages.json --output out/distribution/orbiter-stock-data-ubuntu24.04.pyz \
+            2>&1 | tee out/receipt/installer-build.log
+          (cd out/distribution && sha256sum *.zip *.tar.gz *.pyz > SHA256SUMS)
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: phase8-ubuntu24-build
+          path: |
+            out/distribution/
+            out/receipt/
+          retention-days: 7
+
+  install:
+    name: Clean Ubuntu 24.04 install and SDK add-on
+    runs-on: ubuntu-24.04
+    needs: build
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/download-artifact@v8
+        with:
+          name: phase8-ubuntu24-build
+          path: out/verified-build
+      - name: Install system runtime dependencies on the separate runner
+        run: |
+          test "$(lsb_release -rs)" = 24.04
+          sudo apt-get update
+          sudo apt-get install -y libqt6widgets6 qt6-qpa-plugins qt6-wayland zlib1g \
+            libgl1 libgl1-mesa-dri libglu1-mesa libx11-6 libwayland-client0 libxkbcommon0 xvfb xauth
+          mkdir -p out/receipt
+          {
+            cat /etc/os-release
+            getconf GNU_LIBC_VERSION
+            dpkg-query -W libqt6widgets6 libstdc++6 libgl1-mesa-dri
+          } > out/receipt/runtime-platform.txt
+          (cd out/verified-build/distribution && sha256sum -c SHA256SUMS)
+      - uses: actions/cache/restore@v6
+        with:
+          path: out/cache/production-stock-data-v1.zip
+          key: production-native-data-${{ hashFiles('Tests/Production/input-storage.lock.json') }}
+      - uses: actions/cache/restore@v6
+        with:
+          path: out/cache/Orbiter2016.zip
+          key: production-standard-planets-${{ hashFiles('Tests/Production/standard-planets.lock.json') }}
+      - name: Provision stock data and run the short clean-install check
+        shell: bash
+        run: |
+          dist="$PWD/out/verified-build/distribution"
+          install="$RUNNER_TEMP/Orbiter Ubuntu 24.04"
+          python3 -B "$dist/orbiter-stock-data-ubuntu24.04.pyz" "$install" \
+            --cache "$PWD/out/cache" --package "$dist/Orbiter-linux-x86_64-ubuntu24.04.tar.gz" 2>&1 | tee out/receipt/install.log
+          env -u WAYLAND_DISPLAY XDG_SESSION_TYPE=x11 LIBGL_ALWAYS_SOFTWARE=1 xvfb-run -a -s '-screen 0 1280x720x24' \
+            python3 -B Tests/Production/StockInstaller/smoke.py --install "$install" \
+              --installer "$dist/orbiter-stock-data-ubuntu24.04.pyz" --output out/receipt/clean-install
+      - name: Compile and fly the matching SDK example and reject the wrong SDK
+        shell: bash
+        run: |
+          sudo apt-get install -y gcc g++ ninja-build
+          env -u WAYLAND_DISPLAY XDG_SESSION_TYPE=x11 LIBGL_ALWAYS_SOFTWARE=1 xvfb-run -a -s '-screen 0 1280x720x24' \
+            python3 -B Tests/Production/PackageSDK/verify.py \
+              --sdk out/verified-build/distribution/Orbiter-SDK-linux-x86_64-ubuntu24.04.zip \
+              --install "$RUNNER_TEMP/Orbiter Ubuntu 24.04" --work "$RUNNER_TEMP/SDK Ubuntu 24.04" --output out/receipt/sdk
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: phase8-ubuntu24-verification
+          path: out/receipt/
+          retention-days: 7

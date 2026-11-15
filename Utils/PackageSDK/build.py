@@ -78,8 +78,8 @@ def windows_sdk(package):
     return sdk, manifest, bindings
 
 
-def build(package, output, repository):
-    info = json.loads((HERE / "packages.json").read_text())[package.name]
+def build(package, output, repository, package_lock):
+    info = json.loads(package_lock.read_text())[package.name]
     with package.open("rb") as stream:
         checksum = hashlib.file_digest(stream, "sha256").hexdigest()
     require(checksum == info["sha256"], "Retained runtime package checksum differs")
@@ -123,8 +123,9 @@ def main():
     parser.add_argument("--package", type=Path, required=True)
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--source-repository", type=Path, default=HERE.parents[1])
+    parser.add_argument("--package-lock", type=Path, default=HERE / "packages.json")
     args = parser.parse_args()
-    build(args.package, args.output, args.source_repository)
+    build(args.package, args.output, args.source_repository, args.package_lock)
 
 
 if __name__ == "__main__":

@@ -12,7 +12,8 @@ cmake -S /path/to/sdk/example -B /path/to/build -G Ninja \
 cmake --build /path/to/build
 ```
 
-Use GCC 15.2.0 with the Ubuntu 26.04 libstdc++ ABI for Linux. Both Mac SDKs use
+For Linux, use the GCC and libstdc++ ABI recorded in `sdk.json` on the Ubuntu
+version printed in the runtime archive name. Both Mac SDKs use
 the Apple clang and libc++ from Xcode 16.4 used by their runtime. On Windows
 use an x64 Developer Command Prompt with MSVC 19.51.36260.0 (toolset
 14.51.36231) and Windows SDK 10.0.26100.0.
