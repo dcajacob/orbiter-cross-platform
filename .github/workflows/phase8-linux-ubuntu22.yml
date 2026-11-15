@@ -27,7 +27,7 @@ jobs:
       - name: Install Ubuntu 22.04 development packages
         run: |
           sudo apt-get update
-          sudo apt-get install -y gcc g++ ninja-build patchelf libxcb-cursor0 libxkbcommon-x11-0 libxcb-xinerama0 libxcb-image0 libxcb-keysyms1 libxcb-render-util0 libxcb-icccm4 zlib1g-dev libgl-dev libglu1-mesa-dev \
+          sudo apt-get install -y gcc g++ ninja-build patchelf libxcb-cursor0 libxkbcommon-x11-0 libxcb-xinerama0 libxcb-image0 libxcb-keysyms1 libxcb-render-util0 libxcb-icccm4 zlib1g-dev libgl-dev libegl1 libglu1-mesa-dev \
             libwayland-dev wayland-protocols libxkbcommon-dev xorg-dev
       - name: Build and seal the native runtime and SDK
         run: |
@@ -78,7 +78,7 @@ jobs:
           test "$(lsb_release -rs)" = 22.04
           sudo apt-get update
           sudo apt-get install -y libxcb-cursor0 libxkbcommon-x11-0 libxcb-xinerama0 libxcb-image0 libxcb-keysyms1 libxcb-render-util0 libxcb-icccm4 zlib1g \
-            libgl1 libgl1-mesa-dri libglu1-mesa libx11-6 libwayland-client0 libxkbcommon0 xvfb xauth
+            libgl1 libegl1 libgl1-mesa-dri libglu1-mesa libx11-6 libwayland-client0 libxkbcommon0 xvfb xauth
           mkdir -p out/receipt
           {
             cat /etc/os-release
