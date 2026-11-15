@@ -16,6 +16,7 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     for name in ("runtime", "archive", "generated-header", "source-lock", "output"):
         parser.add_argument("--" + name, type=Path, required=True)
+    parser.add_argument("--glibc-max", default="2.39")
     args = parser.parse_args()
     runtime = args.runtime
     manifest = json.loads((runtime / "runtime.json").read_text())
@@ -53,7 +54,7 @@ def main():
             if matches:
                 required[family] = max(matches, key=lambda v: tuple(map(int, v.split("."))))
         assert "GLIBC_PRIVATE" not in report
-        assert tuple(map(int, required.get("GLIBC", "0").split("."))) <= (2, 39), (name, required)
+        assert tuple(map(int, required.get("GLIBC", "0").split("."))) <= tuple(map(int, args.glibc_max.split("."))), (name, required)
         versions[name] = required
     assert {"orbiter-production", "bin/orbiter-launchpad", "NativeModules/Graphics/OGLClient.so"} <= versions.keys()
     (args.output / "elf-requirements.json").write_text(json.dumps(versions, indent=2) + "\n")
