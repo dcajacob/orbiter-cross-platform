@@ -109,7 +109,7 @@ jobs:
             -DCMAKE_OSX_ARCHITECTURES="$ORBITER_ARCH" "-DORBITER_ENGINE_BUILD=$PWD/out/native" \
             "-DORBITER_RENDERER_DEPENDENCIES=$PWD/out/ogl-dependencies" \
             "-DFETCHCONTENT_SOURCE_DIR_GLFW=$PWD/out/glfw" 2>&1 | tee out/receipt/renderer-configure.log
-          cmake --build out/renderer --parallel 3 2>&1 | tee out/receipt/renderer-build.log
+          cmake --build out/renderer --parallel 3 --target orbiter_ogl_native -- -k 0 2>&1 | tee out/receipt/renderer-build.log
           test "$(lipo -archs out/native/NativeModules/Graphics/OGLClient.so)" = "$ORBITER_ARCH"
           shasum -a 256 out/native/NativeModules/Graphics/OGLClient.so | tee -a out/receipt/binaries.txt
       - uses: actions/cache/restore@v6

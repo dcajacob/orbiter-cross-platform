@@ -45,7 +45,15 @@ set(GLFW_LIBRARY_TYPE STATIC CACHE STRING "" FORCE)
 FetchContent_Declare(glfw URL "${ORBITER_RENDERER_DEPENDENCIES}/glfw.tar.gz"
     URL_HASH SHA256=5234f4f29473e9a06bc7847d8371858dd135d38466eeeaa652fdc9f8f9ff0c20 DOWNLOAD_EXTRACT_TIMESTAMP TRUE)
 set(CMAKE_POLICY_VERSION_MINIMUM 3.5)
-FetchContent_MakeAvailable(glm freetype soil2 nanovg libnsbmp imgui zlib glfw)
+FetchContent_MakeAvailable(glm freetype soil2 nanovg libnsbmp imgui glfw)
+if(APPLE)
+    # The production engine already uses the SDK zlib on macOS.
+    find_package(ZLIB 1.2.11 REQUIRED)
+    set(renderer_zlib ZLIB::ZLIB)
+else()
+    FetchContent_MakeAvailable(zlib)
+    set(renderer_zlib zlibstatic)
+endif()
 add_library(orbiter_ogl_native MODULE
     LinuxAdapter.cpp NativeEvidence.cpp NativeInstrumentTarget.cpp
     ../OGLClient.cpp ../Shader.cpp ../CelSphere.cpp ../Renderer.cpp ../VertexBuffer.cpp ../Scene.cpp ../Light.cpp
@@ -61,7 +69,7 @@ target_compile_definitions(orbiter_ogl_native PRIVATE GLFW_INCLUDE_NONE NVG_NO_S
 target_include_directories(orbiter_ogl_native PRIVATE ..
     "${soil2_SOURCE_DIR}/incs" "${soil2_SOURCE_DIR}/srcs" "${nanovg_SOURCE_DIR}/src"
     "${libnsbmp_SOURCE_DIR}/include" "${imgui_SOURCE_DIR}" "${imgui_SOURCE_DIR}/backends")
-target_link_libraries(orbiter_ogl_native PRIVATE native_engine native_boundary glm::glm freetype zlibstatic glfw OpenGL::GL ${CMAKE_DL_LIBS})
+target_link_libraries(orbiter_ogl_native PRIVATE native_engine native_boundary glm::glm freetype ${renderer_zlib} glfw OpenGL::GL ${CMAKE_DL_LIBS})
 if(NOT APPLE)
     target_link_options(orbiter_ogl_native PRIVATE -Wl,--no-undefined -Wl,--exclude-libs,ALL)
 endif()
@@ -75,9 +83,13 @@ file(MAKE_DIRECTORY "${native_notices}")
 configure_file("${CMAKE_CURRENT_SOURCE_DIR}/../ATTRIBUTION.md" "${native_notices}/OpenGL-ATTRIBUTION.md" COPYONLY)
 configure_file("${CMAKE_CURRENT_SOURCE_DIR}/../dependencies.lock.json" "${native_notices}/dependencies.lock.json" COPYONLY)
 configure_file("${ORBITER_SOURCE_ROOT}/LICENSE" "${native_notices}/Orbiter-MIT.txt" COPYONLY)
-foreach(notice "${glm_SOURCE_DIR}/copying.txt" "${freetype_SOURCE_DIR}/docs/FTL.TXT"
+set(dependency_notices "${glm_SOURCE_DIR}/copying.txt" "${freetype_SOURCE_DIR}/docs/FTL.TXT"
     "${nanovg_SOURCE_DIR}/LICENSE.txt" "${libnsbmp_SOURCE_DIR}/COPYING" "${soil2_SOURCE_DIR}/README.md"
-    "${imgui_SOURCE_DIR}/LICENSE.txt" "${glfw_SOURCE_DIR}/LICENSE.md" "${zlib_SOURCE_DIR}/zlib.h")
+    "${imgui_SOURCE_DIR}/LICENSE.txt" "${glfw_SOURCE_DIR}/LICENSE.md")
+if(NOT APPLE)
+    list(APPEND dependency_notices "${zlib_SOURCE_DIR}/zlib.h")
+endif()
+foreach(notice IN LISTS dependency_notices)
     get_filename_component(name "${notice}" NAME)
     get_filename_component(parent "${notice}" DIRECTORY)
     get_filename_component(component "${parent}" NAME)
