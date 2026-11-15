@@ -32,14 +32,19 @@ def stage(args):
     libraries = sorted(args.engine.glob("liborbiter*.dylib" if sys.platform == "darwin" else "liborbiter*.so"))
     if len(libraries) != 3:
         raise RuntimeError(f"Expected three production libraries, got {libraries}")
-    for library in libraries:
+    lua = list(args.engine.rglob("liblua.dylib" if sys.platform == "darwin" else "liblua.so"))
+    if len(lua) != 1:
+        raise RuntimeError(f"Expected one pinned Lua runtime, got {lua}")
+    for library in libraries + lua:
         shutil.copy2(library, root)
+    shutil.copy2(ROOT / "Tests/Production/Licenses/lua-lua.h", root / "Lua-LICENSE.h")
     shutil.copytree(args.engine / "NativeModules", root / "NativeModules", symlinks=True)
     shutil.copy2(ROOT / "LICENSE", root / "LICENSE")
     shutil.copy2(ROOT / "Sound/XRSound/LICENSE", root / "XRSound-LICENSE")
     shutil.copy2(ROOT / "Tests/Production/NativeScene/Orbiter.cfg", root / "Orbiter.cfg")
     shutil.copy2(ROOT / "Tests/Production/Flight/keymap-laptop.cfg", root / "Keymap.cfg")
     shutil.copy2(ROOT / "Tests/Production/Packages/README.md", root / "README.md")
+    shutil.copytree(ROOT / "OVP/OGLClient/shaders", root / "shaders")
 
 
 def smoke(args):
@@ -71,6 +76,8 @@ def smoke(args):
         with (args.output / "qt.log").open("wb") as log:
             subprocess.run([launcher, "--help"], cwd=work, env=env, check=True,
                            stdout=log, stderr=subprocess.STDOUT, timeout=30)
+        if manifest(root / "shaders") != manifest(args.assets / "Modules/OGLClient"):
+            raise RuntimeError("Install test requires renderer shaders from the package")
         scenario = args.assets / STOCK
         if digest(scenario) != digest(ROOT / STOCK):
             raise RuntimeError("Unchanged stock scenario required")

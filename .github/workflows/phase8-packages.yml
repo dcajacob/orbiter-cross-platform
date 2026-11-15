@@ -2,7 +2,7 @@ name: Orbiter Phase 8 packages and clean installs
 
 on:
   push:
-    branches: [qualification/phase8-packages-v1, qualification/phase8-windows-v2]
+    branches: [qualification/phase8-packages-v1, qualification/phase8-windows-v2, qualification/phase8-macos-v2]
     paths: [.github/workflows/phase8-packages.yml, Tests/Production/Packages/**]
 
 permissions:
@@ -10,7 +10,7 @@ permissions:
 
 jobs:
   macos:
-    if: github.ref_name == 'qualification/phase8-packages-v1'
+    if: github.ref_name != 'qualification/phase8-windows-v2'
     name: macOS package ${{ matrix.arch }}
     runs-on: ${{ matrix.runner }}
     timeout-minutes: 55
@@ -177,13 +177,14 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v7
         with:
-          name: phase8-macos-${{ matrix.arch }}
+          name: phase8-macos-${{ matrix.arch }}-v2
           retention-days: 3
           if-no-files-found: error
           path: |
             out/Orbiter-macos-*.tar.gz
             out/receipt/
   windows:
+    if: github.ref_name != 'qualification/phase8-macos-v2'
     name: Windows x64 package
     runs-on: windows-2025
     timeout-minutes: 60
