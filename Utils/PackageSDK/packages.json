@@ -1,0 +1,42 @@
+{
+  "Orbiter-linux-x86_64-ubuntu26.04-v2.tar.gz": {
+    "sha256": "65e9f4b2c998eaa6f74c8552b0f25d4daa014f95dbe063a578f9440659b331d9",
+    "platform": "linux",
+    "source": "f2fead9d259e93fd9fbfd3c432eda982030f2ec5",
+    "arch": "x86_64",
+    "abi": "gcc-15.2.0:libstdc++-20260321-abi-1-normal-gxx-1020:201703L",
+    "native_build": "745c0ef8763a7b1f3c42484d55ee8b1f0bad78a5ffdb2d4ab105581cefbba862"
+  },
+  "Orbiter-windows-x64.zip": {
+    "sha256": "f9d184eb698ab0c7899b6c719cdd6c039c8e8414bb1f87f1efdb54bd071a64ef",
+    "platform": "windows",
+    "source": "9c18b6ff1011182deb1cc13abb8bb75bf57dcd2b",
+    "artifact": 14144100045,
+    "artifact_sha256": "def2b43b56784d0fbb1367fde070c25319cb2b33f4463df740c6ba1e78da3adf",
+    "arch": "x86_64",
+    "compiler": "MSVC 19.51.36260.0",
+    "windows_sdk": "10.0.26100.0"
+  },
+  "Orbiter-macos-x86_64.tar.gz": {
+    "sha256": "dba14169802041f88d6a49cc46023962a80f6b44e6ccf69825704966dce08ec1",
+    "platform": "macos",
+    "source": "61baf018bbdc6a4e79e0a3d4b9d88baa40e62d92",
+    "artifact": 14143203959,
+    "artifact_sha256": "91d8b2c6d73cefac97b6851a8a48a669282fbfcb4e9cb7e59ff9dc9c56b47b7f",
+    "arch": "x86_64",
+    "developer_dir": "/Applications/Xcode_16.4.app/Contents/Developer",
+    "abi": "clang-17.0.0 (clang-1700.0.13.5):libc++-190102:201703L",
+    "native_build": "81c8ff8d57dfaebee689330a6de224e0aa5b1210511c5bbdc2316f88d6f68f32"
+  },
+  "Orbiter-macos-arm64.tar.gz": {
+    "sha256": "6d942dd99fc523c7206360a214ee47f9e50ce284fed5550f98ede45fe701cf57",
+    "platform": "macos",
+    "source": "61baf018bbdc6a4e79e0a3d4b9d88baa40e62d92",
+    "artifact": 14142454682,
+    "artifact_sha256": "86f8abffb24a55c9fa35a7986346a64bce64a2f707409b23c4f1c9837333f91e",
+    "arch": "arm64",
+    "developer_dir": "/Applications/Xcode_16.4.app/Contents/Developer",
+    "abi": "clang-17.0.0 (clang-1700.0.13.5):libc++-190102:201703L",
+    "native_build": "67e0ce02a3e0b02ff4a6e3f00110ae335175e83047f93e22a744fb1105874a3f"
+  }
+}

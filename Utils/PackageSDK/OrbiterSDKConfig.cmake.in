@@ -1,0 +1,89 @@
+# SDK for a specific retained Phase 8 preview.
+if(TARGET Orbiter::SDK)
+    return()
+endif()
+
+if(NOT IS_DIRECTORY "${OrbiterRuntime_ROOT}")
+    message(FATAL_ERROR "Set OrbiterRuntime_ROOT to the preview package's extracted runtime directory.")
+endif()
+get_filename_component(_orbiter_runtime "${OrbiterRuntime_ROOT}" ABSOLUTE)
+get_filename_component(_orbiter_sdk "${CMAKE_CURRENT_LIST_DIR}/.." ABSOLUTE)
+
+if(NOT CMAKE_BUILD_TYPE STREQUAL "Release" OR CMAKE_CONFIGURATION_TYPES)
+    message(FATAL_ERROR "This preview SDK requires a single-config Release build (for example, Ninja).")
+endif()
+if(NOT CMAKE_SYSTEM_NAME STREQUAL "@system@" OR NOT CMAKE_SIZEOF_VOID_P EQUAL 8)
+    message(FATAL_ERROR "This SDK targets @system@ @arch@.")
+endif()
+foreach(_orbiter_binding IN ITEMS @bindings@)
+    string(REPLACE "|" ";" _orbiter_binding "${_orbiter_binding}")
+    list(GET _orbiter_binding 0 _orbiter_name)
+    list(GET _orbiter_binding 1 _orbiter_expected)
+    file(SHA256 "${_orbiter_runtime}/${_orbiter_name}" _orbiter_hash)
+    if(NOT _orbiter_hash STREQUAL _orbiter_expected)
+        message(FATAL_ERROR "Runtime file differs from this SDK's package: ${_orbiter_name}")
+    endif()
+endforeach()
+
+add_library(Orbiter::SDK INTERFACE IMPORTED)
+target_include_directories(Orbiter::SDK INTERFACE "${_orbiter_sdk}/include")
+target_compile_features(Orbiter::SDK INTERFACE cxx_std_17)
+
+if(WIN32)
+    if(NOT MSVC OR NOT CMAKE_CXX_COMPILER_VERSION STREQUAL "19.51.36260.0")
+        message(FATAL_ERROR "The Windows preview SDK requires the MSVC 19.51.36260.0 toolchain used to build it.")
+    endif()
+    target_link_libraries(Orbiter::SDK INTERFACE
+        "${_orbiter_sdk}/lib/Orbiter.lib" "${_orbiter_sdk}/lib/Orbitersdk.lib")
+else()
+    include(CheckCXXSourceCompiles)
+    set(_orbiter_previous_required "${CMAKE_REQUIRED_INCLUDES}")
+    set(_orbiter_previous_standard "${CMAKE_CXX_STANDARD}")
+    set(CMAKE_REQUIRED_INCLUDES "${_orbiter_sdk}/include")
+    set(CMAKE_CXX_STANDARD 17)
+    unset(_orbiter_toolchain_matches CACHE)
+    check_cxx_source_compiles([=[
+        #include <string_view>
+        #define ORBITER_NATIVE_BUILD_CONFIGURATION "Release"
+        #include "Production/NativeAbi.h"
+        static_assert(std::string_view(ORBITER_NATIVE_CPP_ABI) == "@abi@", "Orbiter SDK toolchain mismatch");
+        #if @arm_condition@
+        #error Orbiter SDK architecture mismatch
+        #endif
+        int main() {}
+    ]=] _orbiter_toolchain_matches)
+    set(CMAKE_REQUIRED_INCLUDES "${_orbiter_previous_required}")
+    set(CMAKE_CXX_STANDARD "${_orbiter_previous_standard}")
+    if(NOT _orbiter_toolchain_matches)
+        message(FATAL_ERROR "This @system@ @arch@ SDK requires the matching C++ compiler and standard library: @abi@")
+    endif()
+
+    add_library(Orbiter::Boundary SHARED IMPORTED)
+    set_target_properties(Orbiter::Boundary PROPERTIES
+        IMPORTED_LOCATION "${_orbiter_runtime}/liborbiter_production_boundary.@extension@"
+        IMPORTED_SONAME "@soname_prefix@liborbiter_production_boundary.@extension@")
+    add_library(Orbiter::Vessels SHARED IMPORTED)
+    set_target_properties(Orbiter::Vessels PROPERTIES
+        IMPORTED_LOCATION "${_orbiter_runtime}/liborbiter_production_vessels.@extension@"
+        IMPORTED_SONAME "@soname_prefix@liborbiter_production_vessels.@extension@")
+    target_link_libraries(Orbiter::SDK INTERFACE Orbiter::Vessels Orbiter::Boundary)
+    target_compile_definitions(Orbiter::SDK INTERFACE
+        ORBITER_NATIVE_MODULE ORBITER_PRODUCTION_SHARED ORBITER_NATIVE_BUILD_CONFIGURATION="Release")
+endif()
+
+function(orbiter_sdk_vessel target)
+    target_link_libraries(${target} PRIVATE Orbiter::SDK)
+    set_target_properties(${target} PROPERTIES
+        PREFIX "" CXX_STANDARD 17 CXX_STANDARD_REQUIRED ON CXX_EXTENSIONS OFF)
+    if(WIN32)
+        set_property(TARGET ${target} PROPERTY MSVC_RUNTIME_LIBRARY MultiThreadedDLL)
+    elseif(APPLE)
+        set_target_properties(${target} PROPERTIES SUFFIX ".so" BUILD_WITH_INSTALL_RPATH ON
+            INSTALL_RPATH "@loader_path/../..")
+        target_link_options(${target} PRIVATE "LINKER:-undefined,error")
+    else()
+        set_target_properties(${target} PROPERTIES BUILD_WITH_INSTALL_RPATH ON
+            INSTALL_RPATH "$ORIGIN/../..")
+        target_link_options(${target} PRIVATE "LINKER:--no-undefined")
+    endif()
+endfunction()

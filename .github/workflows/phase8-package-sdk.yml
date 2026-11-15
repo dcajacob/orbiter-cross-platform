@@ -1,0 +1,141 @@
+name: Orbiter Phase 8 package SDKs
+on:
+  push:
+    branches: [qualification/phase8-package-sdk-v1]
+    paths: [.github/workflows/phase8-package-sdk.yml, Utils/PackageSDK/**, Tests/Production/PackageSDK/**]
+
+permissions:
+  actions: read
+  contents: read
+
+jobs:
+  macos:
+    name: SDK add-on on Mac ${{ matrix.arch }}
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 25
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - runner: macos-15-intel
+            arch: x86_64
+          - runner: macos-15
+            arch: arm64
+    env:
+      ORBITER_PACKAGE: Orbiter-macos-${{ matrix.arch }}.tar.gz
+      ORBITER_ARCH: ${{ matrix.arch }}
+      DEVELOPER_DIR: /Applications/Xcode_16.4.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.14'
+      - uses: actions/cache/restore@v6
+        with:
+          path: out/cache/production-stock-data-v1.zip
+          key: production-native-data-${{ hashFiles('Tests/Production/input-storage.lock.json') }}
+      - uses: actions/cache/restore@v6
+        with:
+          path: out/cache/Orbiter2016.zip
+          key: production-standard-planets-${{ hashFiles('Tests/Production/standard-planets.lock.json') }}
+      - name: Recover the sealed runtime and build its exact SDK
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          test "$(uname -m)" = "$ORBITER_ARCH"
+          test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
+          git cat-file -e 61baf018bbdc6a4e79e0a3d4b9d88baa40e62d92^{commit} ||
+            git fetch --no-tags origin 61baf018bbdc6a4e79e0a3d4b9d88baa40e62d92
+          mkdir -p out/distribution
+          python -B Tests/Production/frozen_reference.py
+          python -B Tests/Production/frozen_behavior.py
+          python -B Tests/Production/StockInstaller/fetch_package.py "$ORBITER_PACKAGE" out/packages
+          python -B Tests/Production/PackageSDK/fetch_installer.py out/installer/orbiter-stock-data.pyz
+          python -B Utils/PackageSDK/build.py --package "out/packages/$ORBITER_PACKAGE" \
+            --output "out/distribution/Orbiter-SDK-macos-$ORBITER_ARCH.zip"
+      - name: Compile and fly a third-party vessel outside the source checkout
+        shell: bash
+        run: |
+          python -B out/installer/orbiter-stock-data.pyz "$RUNNER_TEMP/Orbiter SDK runtime" \
+            --cache out/cache --package "out/packages/$ORBITER_PACKAGE"
+          python -B Tests/Production/PackageSDK/verify.py --sdk "out/distribution/Orbiter-SDK-macos-$ORBITER_ARCH.zip" \
+            --install "$RUNNER_TEMP/Orbiter SDK runtime" --work "$RUNNER_TEMP/SDK consumer" --output out/receipt
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: phase8-sdk-macos-${{ matrix.arch }}
+          path: |
+            out/distribution/
+            out/receipt/
+          retention-days: 7
+          if-no-files-found: error
+
+  windows:
+    name: SDK add-on on Windows x64
+    runs-on: windows-2025
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.14'
+      - uses: ilammy/msvc-dev-cmd@v1
+        with:
+          arch: x64
+      - uses: actions/cache/restore@v6
+        with:
+          path: out/cache/production-stock-data-v1.zip
+          key: production-native-data-${{ hashFiles('Tests/Production/input-storage.lock.json') }}
+      - uses: actions/cache/restore@v6
+        with:
+          path: out/cache/Orbiter2016.zip
+          key: production-standard-planets-${{ hashFiles('Tests/Production/standard-planets.lock.json') }}
+      - uses: actions/cache/restore@v6
+        with:
+          path: out/mesa-cache/*.pkg.tar.zst
+          key: mesa-ucrt64-${{ hashFiles('Tests/Production/mesa-ucrt64.lock.json') }}
+      - name: Recover the sealed runtime and build its exact SDK
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if ((git rev-parse HEAD) -ne $env:GITHUB_SHA) { throw 'Wrong workflow revision' }
+          python -B Tests/Production/frozen_reference.py
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          python -B Tests/Production/frozen_behavior.py
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          python -B Tests/Production/StockInstaller/fetch_package.py Orbiter-windows-x64.zip out/packages
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          python -B Tests/Production/PackageSDK/fetch_installer.py out/installer/orbiter-stock-data.pyz
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          python -B Utils/PackageSDK/build.py --package out/packages/Orbiter-windows-x64.zip --output out/distribution/Orbiter-SDK-windows-x64.zip
+          exit $LASTEXITCODE
+      - name: Compile and fly a third-party vessel outside the source checkout
+        run: |
+          $folder = Join-Path $env:RUNNER_TEMP 'Orbiter SDK runtime'
+          $work = Join-Path $env:RUNNER_TEMP 'SDK consumer'
+          python -B out/installer/orbiter-stock-data.pyz "$folder" --cache out/cache --package out/packages/Orbiter-windows-x64.zip
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          cmake -S Tests/Production/Packages -B out/flight-probe -G Ninja -DCMAKE_BUILD_TYPE=Release "-DORBITER_TEST_RUNTIME=$folder/runtime"
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          cmake --build out/flight-probe --parallel 2
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          python -B Tests/Production/stage_mesa.py stage --cache out/mesa-cache --destination out/mesa-runtime
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          python -B Tests/Production/PackageSDK/verify.py --sdk out/distribution/Orbiter-SDK-windows-x64.zip --install "$folder" --work "$work" --output out/receipt --mesa out/mesa-runtime --probe out/flight-probe/LaunchpadFlightProbe.dll
+          exit $LASTEXITCODE
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: phase8-sdk-windows-x64
+          path: |
+            out/distribution/
+            out/receipt/
+          retention-days: 7
+          if-no-files-found: error
