@@ -77,7 +77,8 @@ def main():
         for name in ("QT_PLUGIN_PATH", "QT_QPA_PLATFORM_PLUGIN_PATH"):
             env.pop(name, None)
         # Use system search locations and the deployed runtime's own directory.
-        env.update(PATH=os.pathsep.join([str(Path(env["SystemRoot"]) / "System32"), env["SystemRoot"]]),
+        system_root = Path(os.environ["SYSTEMROOT"])
+        env.update(PATH=os.pathsep.join([str(system_root / "System32"), str(system_root)]),
                    QT_QPA_PLATFORM="windows", QT_DEBUG_PLUGINS="1")
         with (args.output / "qt.log").open("wb") as log:
             launchpad(root / "orbiter-launchpad.exe", clean, env, log)

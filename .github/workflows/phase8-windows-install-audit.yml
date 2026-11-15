@@ -1,0 +1,111 @@
+name: Verify the built Windows Phase 8 package
+
+on:
+  push:
+    branches: [qualification/phase8-windows-audit-v1]
+    paths: [.github/workflows/phase8-windows-install-audit.yml, Tests/Production/Packages/windows.py]
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  install:
+    name: Clean Windows install from the retained archive
+    runs-on: windows-2025
+    timeout-minutes: 25
+    env:
+      PACKAGE_SOURCE: 9c18b6ff1011182deb1cc13abb8bb75bf57dcd2b
+      ARTIFACT_ID: '14144100045'
+      ARTIFACT_SHA256: def2b43b56784d0fbb1367fde070c25319cb2b33f4463df740c6ba1e78da3adf
+      ARTIFACT_BYTES: '401668810'
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.14'
+      - uses: ilammy/msvc-dev-cmd@v1
+        with:
+          arch: x64
+      - name: Verify and retrieve the exact Windows build artifact
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if ((git rev-parse HEAD^) -ne $env:PACKAGE_SOURCE) { throw 'Wrong package source lineage' }
+          New-Item -ItemType Directory -Path out/receipt | Out-Null
+          @'
+          import hashlib
+          import json
+          import os
+          from pathlib import Path
+          from shutil import copyfileobj
+          import subprocess
+          from zipfile import ZipFile
+
+          env = os.environ
+          endpoint = f"repos/{env['GITHUB_REPOSITORY']}/actions/artifacts/{env['ARTIFACT_ID']}"
+          metadata = json.loads(subprocess.check_output(["gh", "api", endpoint]))
+          assert metadata["workflow_run"]["head_sha"] == env["PACKAGE_SOURCE"]
+          assert metadata["digest"] == "sha256:" + env["ARTIFACT_SHA256"]
+          assert metadata["size_in_bytes"] == int(env["ARTIFACT_BYTES"])
+          blob = Path("out/producer-artifact.zip")
+          with blob.open("wb") as stream:
+              subprocess.run(["gh", "api", endpoint + "/zip"], check=True, stdout=stream)
+          with blob.open("rb") as stream:
+              assert hashlib.file_digest(stream, "sha256").hexdigest() == env["ARTIFACT_SHA256"]
+          package = Path("out/Orbiter-windows-x64.zip")
+          with ZipFile(blob) as outer, outer.open(package.name) as incoming, package.open("wb") as output:
+              copyfileobj(incoming, output, length=2**20)
+          with package.open("rb") as stream:
+              archive_hash = hashlib.file_digest(stream, "sha256").hexdigest()
+          with ZipFile(package) as archive:
+              runtime = json.loads(archive.read("runtime.json"))
+              assert runtime["source"] == env["PACKAGE_SOURCE"]
+              for name in archive.namelist():
+                  if name.startswith("Orbitersdk/"):
+                      archive.extract(name, path="out/probe-sdk")
+          result = dict(source=runtime["source"], archive_sha256=archive_hash, artifact=metadata, verifier=env["GITHUB_SHA"])
+          Path("out/receipt/producer.json").write_text(json.dumps(result, indent=2) + "\n")
+          '@ | python -B -
+          exit $LASTEXITCODE
+      - uses: actions/cache/restore@v6
+        with:
+          path: out/data-cache/production-stock-data-v1.zip
+          key: production-native-data-${{ hashFiles('Tests/Production/input-storage.lock.json') }}
+      - uses: actions/cache/restore@v6
+        with:
+          path: out/planet-cache/Orbiter2016.zip
+          key: production-standard-planets-${{ hashFiles('Tests/Production/standard-planets.lock.json') }}
+      - uses: actions/cache/restore@v6
+        with:
+          path: out/mesa-cache/*.pkg.tar.zst
+          key: mesa-ucrt64-${{ hashFiles('Tests/Production/mesa-ucrt64.lock.json') }}
+      - name: Stage the locked stock data and renderer
+        id: data
+        run: |
+          python -B Tests/Production/prepare_native_data.py --archive out/data-cache/production-stock-data-v1.zip --destination out/production-data --group all
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          python -B Tests/Production/CockpitUI/prepare_fonts.py --assets out/production-data
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          python -B Tests/Production/prepare_hosted_data.py --lock Tests/Production/standard-planets.lock.json --archive out/planet-cache/Orbiter2016.zip --destination out/standard-planets
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          python -B Tests/Production/stage_mesa.py stage --cache out/mesa-cache --destination out/mesa-runtime
+          exit $LASTEXITCODE
+      - name: Verify the installed Qt Launchpad and original flight
+        run: |
+          cmake -S Tests/Production/Packages -B out/package-probe -G Ninja -DCMAKE_BUILD_TYPE=Release "-DORBITER_TEST_RUNTIME=$pwd/out/probe-sdk"
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          cmake --build out/package-probe --parallel 2
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          python -B Tests/Production/Packages/windows.py --archive out/Orbiter-windows-x64.zip --data out/production-data --planets out/standard-planets --mesa out/mesa-runtime --probe out/package-probe/LaunchpadFlightProbe.dll --output out/receipt/clean-install --source $env:PACKAGE_SOURCE
+          exit $LASTEXITCODE
+      - name: Preserve clean-install evidence
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: phase8-windows-x64-clean-install
+          retention-days: 7
+          path: out/receipt/
