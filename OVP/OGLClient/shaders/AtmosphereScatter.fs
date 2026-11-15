@@ -106,6 +106,11 @@ void main()
         // the lit sky. This also supplies a twilight floor inside the shadow.
         float skyLight = smoothstep(-0.145, 0.035, sunCosine);
         source += skyLight * vec3(0.009, 0.014, 0.023) * (molecular + aerosol);
+        // Diffuse daylight fills in optically thicker paths through the lower
+        // atmosphere. Let this contribution fade smoothly through the stratosphere.
+        float daylight = smoothstep(0.0, 0.20, sunCosine);
+        float lowerAtmosphere = 1.0 - smoothstep(18.0, 38.0, height);
+        source += (0.125 * daylight * lowerAtmosphere) * (molecular + aerosol);
         radiance += viewT * source * ((1.0 - through) / max(sigma, vec3(1e-7)));
         viewT *= through;
     }
