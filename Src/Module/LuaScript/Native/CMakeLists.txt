@@ -2,8 +2,8 @@
 # Licensed under the MIT License
 cmake_minimum_required(VERSION 3.24)
 project(OrbiterNativeLua LANGUAGES C CXX)
-if(NOT CMAKE_SYSTEM_NAME STREQUAL "Linux")
-    message(FATAL_ERROR "Use the original application build for Windows Lua modules")
+if(NOT CMAKE_SYSTEM_NAME STREQUAL "Linux" AND NOT APPLE)
+    message(FATAL_ERROR "Native Lua modules require Linux or macOS")
 endif()
 get_filename_component(ORBITER_SOURCE_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/../../../.." ABSOLUTE)
 include(FetchContent)

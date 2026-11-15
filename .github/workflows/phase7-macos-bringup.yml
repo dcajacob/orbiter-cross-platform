@@ -8,6 +8,8 @@ on:
       - Orbitersdk/include/DrawAPI.h
       - Src/Orbiter/PinesGravFile.cpp
       - Src/Orbiter/Production/*.cmake
+      - Src/Module/LuaScript/Native/CMakeLists.txt
+      - Src/ClientNative/main.cpp
 permissions:
   contents: read
 concurrency:
@@ -33,10 +35,11 @@ jobs:
           fetch-depth: 0
           persist-credentials: false
       - name: Verify source and native architecture
+        id: identity
         shell: bash
         run: |
           test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
-          test "$(git rev-parse HEAD^)" = "$ORBITER_BASELINE"
+          git merge-base --is-ancestor "$ORBITER_BASELINE" HEAD
           test "$(uname -s)" = Darwin
           test "$(uname -m)" = "$ORBITER_ARCH"
           mkdir -p out/receipt
@@ -65,10 +68,52 @@ jobs:
             2>&1 | tee out/receipt/build.log
           test "$(lipo -archs out/native/orbiter-production)" = "$ORBITER_ARCH"
           out/native/orbiter-production --help | tee out/receipt/production-help.txt
+      - name: Render the unchanged portable fixture through Cocoa software OpenGL
+        if: ${{ !cancelled() && steps.identity.outcome == 'success' }}
+        shell: bash
+        run: |
+          mkdir -p out/glfw
+          curl -fsSL https://codeload.github.com/glfw/glfw/tar.gz/refs/tags/3.5.1 -o out/glfw.tar.gz
+          echo '5234f4f29473e9a06bc7847d8371858dd135d38466eeeaa652fdc9f8f9ff0c20  out/glfw.tar.gz' | shasum -a 256 -c -
+          tar -xzf out/glfw.tar.gz --strip-components=1 -C out/glfw
+          python3 - <<'PYTHON'
+          from pathlib import Path
+          p = Path('out/glfw/src/nsgl_context.m')
+          body = p.read_text()
+          requested = '    ADD_ATTRIB(NSOpenGLPFAAccelerated);'
+          if body.count(requested) != 1:
+              raise ValueError('Pinned NSGL backend differs')
+          p.write_text(body.replace(requested, '    /* Hosted diagnostic: permit the Apple software device. */'))
+          PYTHON
+          shasum -a 256 out/glfw/src/nsgl_context.m | tee out/receipt/software-nsgl-source.txt
+          cmake -S Tests/Portable -B out/portable -G Ninja -DCMAKE_BUILD_TYPE=Release \
+            -DCMAKE_OSX_ARCHITECTURES="$ORBITER_ARCH" -DCMAKE_POLICY_VERSION_MINIMUM=3.5 \
+            -DORBITER_PORTABLE_COLLISION_TESTS=ON -DORBITER_BUILD_VIEWER=ON \
+            "-DFETCHCONTENT_SOURCE_DIR_GLFW=$PWD/out/glfw" 2>&1 | tee out/receipt/portable-configure.log
+          cmake --build out/portable --parallel 3 --target orbiter-native orbiter-headless 2>&1 | tee out/receipt/portable-build.log
+          test "$(lipo -archs out/portable/portable/native-client/orbiter-native)" = "$ORBITER_ARCH"
+          python3 -B Tests/Portable/test_native_client.py \
+            --binary out/portable/portable/native-client/orbiter-native \
+            --headless out/portable/portable/orbiter-headless \
+            --fixture Tests/Portable/Fixtures --reference Tests/Portable/Reference \
+            --backend auto --output out/receipt/portable-render 2>&1 | tee out/receipt/portable-render.log
+          python3 - <<'PYTHON'
+          import json
+          from pathlib import Path
+          runs = json.loads(Path('out/receipt/portable-render/verification.json').read_text())
+          assert all(runs[name]['runtime']['backend']=='cocoa'
+                     for name in ('overview','overview-repeat','controls-follow'))
+          PYTHON
       - name: Preserve diagnostic evidence
         if: always()
         uses: actions/upload-artifact@v7
         with:
           name: macos-phase7-diagnostic-${{ matrix.arch }}
           retention-days: 7
-          path: out/receipt/
+          path: |
+            out/receipt/*.txt
+            out/receipt/*.log
+            out/receipt/portable-render/**/*.txt
+            out/receipt/portable-render/**/*.json
+            out/receipt/portable-render/**/*.csv
+            out/receipt/portable-render/**/*.png
