@@ -1,0 +1,74 @@
+name: Orbiter macOS Phase 7 first diagnostics
+on:
+  push:
+    branches: [qualification/macos-phase7-v1]
+    paths:
+      - .github/workflows/phase7-macos-bringup.yml
+      - Tests/Production/MacPhase7/**
+      - Orbitersdk/include/DrawAPI.h
+      - Src/Orbiter/PinesGravFile.cpp
+      - Src/Orbiter/Production/*.cmake
+permissions:
+  contents: read
+concurrency:
+  group: orbiter-macos-phase7
+  cancel-in-progress: false
+jobs:
+  sparse:
+    name: macOS production compile and renderer probe ${{ matrix.arch }}
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 25
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - {runner: macos-15-intel, arch: x86_64}
+          - {runner: macos-15, arch: arm64}
+    env:
+      ORBITER_BASELINE: 9609ce48ace63f29ecbd7998c4e3e921b992e834
+      ORBITER_ARCH: ${{ matrix.arch }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Verify source and native architecture
+        shell: bash
+        run: |
+          test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
+          test "$(git rev-parse HEAD^)" = "$ORBITER_BASELINE"
+          test "$(uname -s)" = Darwin
+          test "$(uname -m)" = "$ORBITER_ARCH"
+          mkdir -p out/receipt
+          {
+            printf 'Source: %s\nBaseline: %s\nArchitecture: %s\n' "$GITHUB_SHA" "$ORBITER_BASELINE" "$ORBITER_ARCH"
+            sw_vers
+            clang --version
+          } | tee out/receipt/source.txt
+          git diff --exit-code "$ORBITER_BASELINE" HEAD -- Src/Orbiter/SuperVessel.cpp Tests/Production/PhysicsV3 Tests/Portable Scenarios
+          python3 -B Tests/Production/frozen_reference.py
+          python3 -B Tests/Production/frozen_behavior.py
+      - name: Probe native Cocoa OpenGL pixel formats
+        shell: bash
+        run: |
+          clang -fobjc-arc -framework AppKit -framework OpenGL Tests/Production/MacPhase7/ContextProbe.m -o out/context-probe
+          test "$(lipo -archs out/context-probe)" = "$ORBITER_ARCH"
+          out/context-probe | tee out/receipt/context.txt
+      - name: Configure and compile the production native cockpit candidate
+        shell: bash
+        run: |
+          cmake -S Src/Orbiter/Production -B out/native -G Ninja -DCMAKE_BUILD_TYPE=Release \
+            -DCMAKE_OSX_ARCHITECTURES="$ORBITER_ARCH" -DCMAKE_POLICY_VERSION_MINIMUM=3.5 \
+            -DORBITER_BUILD_NATIVE_VESSELS=ON -DORBITER_BUILD_NATIVE_COCKPIT=ON \
+            -DBUILD_TESTING=OFF 2>&1 | tee out/receipt/configure.log
+          cmake --build out/native --parallel 3 --target orbiter-production native_deltaglider -- -k 0 \
+            2>&1 | tee out/receipt/build.log
+          test "$(lipo -archs out/native/orbiter-production)" = "$ORBITER_ARCH"
+          out/native/orbiter-production --help | tee out/receipt/production-help.txt
+      - name: Preserve diagnostic evidence
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: macos-phase7-diagnostic-${{ matrix.arch }}
+          retention-days: 7
+          path: out/receipt/

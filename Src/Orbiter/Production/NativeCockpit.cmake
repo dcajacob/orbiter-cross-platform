@@ -97,7 +97,9 @@ add_subdirectory("${CMAKE_CURRENT_LIST_DIR}/../../Module/LuaScript/Native" "${PR
 add_library(native_deltaglider MODULE
     $<TARGET_OBJECTS:native_dg_vessel> $<TARGET_OBJECTS:native_dg_lua_bindings>)
 target_link_libraries(native_deltaglider PRIVATE native_dg_subsystems native_lua_script_files lua orbiter_production_vessels)
-target_link_options(native_deltaglider PRIVATE -Wl,--no-undefined)
+if(NOT APPLE)
+    target_link_options(native_deltaglider PRIVATE -Wl,--no-undefined)
+endif()
 set_target_properties(native_deltaglider PROPERTIES PREFIX "" OUTPUT_NAME DeltaGlider
     LIBRARY_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/NativeModules/Vessel")
 
@@ -123,13 +125,17 @@ add_library(native_shuttle_a MODULE
     "${_shuttle_a_source}/switches.cpp" "${_shuttle_a_source}/../Common/Instrument.cpp")
 target_include_directories(native_shuttle_a PRIVATE "${_shuttle_a_header_dir}")
 target_link_libraries(native_shuttle_a PRIVATE lua orbiter_production_vessels)
-target_link_options(native_shuttle_a PRIVATE -Wl,--no-undefined)
+if(NOT APPLE)
+    target_link_options(native_shuttle_a PRIVATE -Wl,--no-undefined)
+endif()
 set_target_properties(native_shuttle_a PROPERTIES PREFIX "" OUTPUT_NAME ShuttleA
     LIBRARY_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/NativeModules/Vessel")
 
 add_library(native_shuttle_a_payload MODULE "${_shuttle_a_source}/ShuttleA_PL/ShuttleA_pl.cpp")
 target_link_libraries(native_shuttle_a_payload PRIVATE orbiter_production_vessels)
-target_link_options(native_shuttle_a_payload PRIVATE -Wl,--no-undefined)
+if(NOT APPLE)
+    target_link_options(native_shuttle_a_payload PRIVATE -Wl,--no-undefined)
+endif()
 set_target_properties(native_shuttle_a_payload PROPERTIES PREFIX "" OUTPUT_NAME ShuttleA_PL
     LIBRARY_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/NativeModules/Vessel")
 
@@ -160,7 +166,9 @@ add_library(native_atlantis_runtime SHARED
 target_include_directories(native_atlantis_runtime PRIVATE "${_atlantis_header_dir}" "${_atlantis_source}/Atlantis"
     "${native_imgui_SOURCE_DIR}" "${native_implot_SOURCE_DIR}")
 target_link_libraries(native_atlantis_runtime PRIVATE orbiter_production_vessels)
-target_link_options(native_atlantis_runtime PRIVATE -Wl,--no-undefined)
+if(NOT APPLE)
+    target_link_options(native_atlantis_runtime PRIVATE -Wl,--no-undefined)
+endif()
 set_target_properties(native_atlantis_runtime PROPERTIES OUTPUT_NAME orbiter_native_atlantis BUILD_RPATH_USE_ORIGIN TRUE)
 function(native_atlantis_entry target output query)
     add_library(${target} MODULE "${_atlantis_source}/NativeAtlantisEntry.cpp")
@@ -230,7 +238,9 @@ add_library(native_dragonfly MODULE
     "${_dragonfly_generated}/Esystems.cpp" "${_remaining_source}/Dragonfly/Native/NativeDrawing.cpp")
 target_include_directories(native_dragonfly PRIVATE "${_dragonfly_generated}" "${_remaining_source}/Dragonfly/Native")
 target_link_libraries(native_dragonfly PRIVATE orbiter_production_vessels OpenGL::GL OpenGL::GLU)
-target_link_options(native_dragonfly PRIVATE -Wl,--no-undefined)
+if(NOT APPLE)
+    target_link_options(native_dragonfly PRIVATE -Wl,--no-undefined)
+endif()
 set_target_properties(native_dragonfly PROPERTIES PREFIX "" OUTPUT_NAME Dragonfly
     CXX_VISIBILITY_PRESET hidden VISIBILITY_INLINES_HIDDEN YES
     LIBRARY_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/NativeModules/Vessel")
@@ -251,7 +261,9 @@ add_library(native_lua_interpreter SHARED
     $<TARGET_OBJECTS:native_lua_interpreter_core> $<TARGET_OBJECTS:native_lua_vessel_bindings>
     ../../Module/LuaScript/LuaInterpreter/InterpreterExecution.cpp)
 target_link_libraries(native_lua_interpreter PRIVATE native_lua_script_files native_lua_exit lua orbiter_production_vessels)
-target_link_options(native_lua_interpreter PRIVATE -Wl,--no-undefined)
+if(NOT APPLE)
+    target_link_options(native_lua_interpreter PRIVATE -Wl,--no-undefined)
+endif()
 set_target_properties(native_lua_interpreter PROPERTIES PREFIX "" OUTPUT_NAME LuaInterpreter
     LIBRARY_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/NativeModules/Plugin")
 
@@ -259,7 +271,9 @@ add_library(native_lua_inline MODULE $<TARGET_OBJECTS:native_lua_inline_list>
     ../../Module/LuaScript/LuaInline/InlineEnvironment.cpp)
 target_include_directories(native_lua_inline PRIVATE "${CMAKE_CURRENT_LIST_DIR}/../../Module/LuaScript/LuaInterpreter")
 target_link_libraries(native_lua_inline PRIVATE native_lua_interpreter lua orbiter_production_vessels)
-target_link_options(native_lua_inline PRIVATE -Wl,--no-undefined)
+if(NOT APPLE)
+    target_link_options(native_lua_inline PRIVATE -Wl,--no-undefined)
+endif()
 set_target_properties(native_lua_inline PROPERTIES PREFIX "" OUTPUT_NAME LuaInline
     LIBRARY_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/NativeModules/Plugin")
 
@@ -270,7 +284,9 @@ target_compile_definitions(native_lua_mfd PRIVATE ORBITER_NATIVE_MODULE)
 target_include_directories(native_lua_mfd PRIVATE
     "${CMAKE_CURRENT_LIST_DIR}/../../Module/LuaScript/LuaInterpreter")
 target_link_libraries(native_lua_mfd PRIVATE native_lua_interpreter lua orbiter_production_vessels)
-target_link_options(native_lua_mfd PRIVATE -Wl,--no-undefined)
+if(NOT APPLE)
+    target_link_options(native_lua_mfd PRIVATE -Wl,--no-undefined)
+endif()
 set_target_properties(native_lua_mfd PROPERTIES PREFIX "" OUTPUT_NAME LuaMFD
     CXX_VISIBILITY_PRESET hidden VISIBILITY_INLINES_HIDDEN YES
     LIBRARY_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/NativeModules/Plugin")

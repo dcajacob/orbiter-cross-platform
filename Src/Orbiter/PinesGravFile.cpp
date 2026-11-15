@@ -11,6 +11,13 @@
 #include <limits>
 #include <memory>
 #include <string_view>
+#if defined(__APPLE__)
+#include <cerrno>
+#include <cstdlib>
+#include <locale.h>
+#include <string>
+#include <xlocale.h>
+#endif
 
 namespace {
 std::uint64_t index(std::uint64_t n, std::uint64_t m) { return (n*n+n)/2+m; }
@@ -40,6 +47,29 @@ template<typename T> bool number(std::string_view text, T& result)
     const auto parsed = std::from_chars(text.data(), text.data()+text.size(), result);
     return parsed.ec == std::errc{} && parsed.ptr == text.data()+text.size();
 }
+#if defined(__APPLE__)
+// Apple libc++ has integral from_chars support but lacks the floating overload
+// on otherwise supported SDKs. Read the same bounded, locale-neutral tokens.
+struct NumericLocale {
+    locale_t handle = newlocale(LC_NUMERIC_MASK, "C", nullptr);
+    ~NumericLocale() { if (handle) freelocale(handle); }
+};
+
+bool number(std::string_view text, double& result)
+{
+    static const NumericLocale locale;
+    if (!locale.handle || text.empty() || text.find_first_not_of("0123456789.eE+-") != std::string_view::npos)
+        return false;
+    const std::string token(text);
+    char* end = nullptr;
+    errno = 0;
+    const double value = strtod_l(token.c_str(), &end, locale.handle);
+    const bool outOfRange = errno == ERANGE && (value == 0 || !std::isfinite(value));
+    if (end != token.c_str()+token.size() || outOfRange) return false;
+    result = value;
+    return true;
+}
+#endif
 }
 
 int PinesGravProp::readGravModel(char* filename, int cutoff, int& loaded, int& maximum)
