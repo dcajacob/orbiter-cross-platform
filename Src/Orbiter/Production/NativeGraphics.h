@@ -122,8 +122,10 @@ struct NativeRenderContext {
     class NativeScriptHost* scripts=nullptr;
     NativeGraphics* graphics=nullptr;Pane* cockpitPane=nullptr;Select* cockpitSelect=nullptr;InputBox* cockpitInput=nullptr;HELPCONTEXT* cockpitHelp=nullptr;
     bool paused=true,showGrapple=false,cameraRotating=false;
+    bool recordingFlight=false,playingFlight=false,scenarioEditorRemoval=false;
     bool optionsUsed=false;
     int joystickThrottleAxis=-1,joystickTwistAxis=2;
+    bool joystickThrottleInverted=false;
     std::filesystem::path evidence;double captureTime=0;
 };
 ORBITER_PRODUCTION_API NativeRenderContext* BindNativeRenderContext(NativeRenderContext*);

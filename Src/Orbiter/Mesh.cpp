@@ -150,6 +150,11 @@ void Mesh::Setup ()
 
 void Mesh::SetupGroup (UInt32 grp)
 {
+	if (!Grp[grp].nVtx) {
+		GrpCnt[grp] = {0.0f, 0.0f, 0.0f};
+		GrpRad[grp] = 0.0f;
+		return;
+	}
 	UInt32 i;
 	float x, y, z, dx, dy, dz, d2, d2max;
 	float invtx = (float)(1.0/Grp[grp].nVtx);

@@ -1,0 +1,11 @@
+{
+  "native_bootstrap_version": "paused-attachments-v2",
+  "previous_source": "c378ab989f3bc08ea6ae4c28a93bf8b725329ec8",
+  "physics_version": "assembly-contact-v3",
+  "reviewed_files_sha256_lf": {
+    "Src/Orbiter/Production/NativeApplication.cpp": "e0fe4b3ae9e92f9f8b360b32762020a21221f3e9c36e128e1e37cc0345243b4d",
+    "Tests/Production/NativePausedAttachments/build_native.py": "a498906b439ae1af426464b26af23699cf434f218b62af3adb00533b0fe3e7a5",
+    "Tests/Production/NativePausedAttachments/Startup.Test.py": "021094db1f391ddbbcaba90847a58537ebf3ff7e2cb60ab62d388ef07e967d23"
+  },
+  "qualification_granted": false
+}

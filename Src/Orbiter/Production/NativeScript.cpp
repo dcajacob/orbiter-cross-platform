@@ -32,9 +32,28 @@ void NativeScriptHost::LoadTerminalMfd()
 
 void NativeScriptHost::EndTerminalMfd()
 {
+    if (apolloRtccApi) apolloRtccApi->end();
+    apolloRtccApi = nullptr;
+    apolloRtccLibrary.reset();
     if (terminalApi) terminalApi->end();
     terminalApi = nullptr;
     terminalLibrary.reset();
+}
+
+void NativeScriptHost::LoadApolloRtccMfd()
+{
+    if (apolloRtccLibrary) return;
+    auto next = std::make_unique<NativeModule>(modules.Resolve("Plugin/ApolloRTCCMFD.so"), ORBITER_NATIVE_PLUGIN, this);
+    auto *entry = static_cast<NativeApolloRtccMfdApi*>(next->Instance());
+    if (!entry || entry->size != sizeof(*entry) || !entry->preStep || !entry->deleteVessel || !entry->end)
+        throw std::runtime_error("Incomplete native Apollo RTCC MFD interface");
+    apolloRtccApi = entry;
+    apolloRtccLibrary = std::move(next);
+}
+
+void NativeScriptHost::PreStep(double simt, double simdt, double mjd)
+{
+    if (apolloRtccApi) apolloRtccApi->preStep(simt, simdt, mjd);
 }
 
 void NativeScriptHost::PostStep(double simt, double simdt, double mjd)
@@ -45,6 +64,7 @@ void NativeScriptHost::PostStep(double simt, double simdt, double mjd)
 
 void NativeScriptHost::DeleteVessel(OBJHANDLE vessel)
 {
+    if (apolloRtccApi) apolloRtccApi->deleteVessel(vessel);
     if (api) api->deleteVessel(vessel);
     if (terminalApi) terminalApi->deleteVessel(vessel);
 }

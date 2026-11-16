@@ -37,6 +37,10 @@ public:
 	bool Read (const char *fname);
 	// parse keymap table from file
 
+	static const char *KeyName(unsigned key);
+	static const char *ActionDescription(int lfunc);
+	orbiter::production::UInt16 Binding(int lfunc) const { return func[lfunc]; }
+
 	void Write (const char *fname);
 	// write keymap table to file
 

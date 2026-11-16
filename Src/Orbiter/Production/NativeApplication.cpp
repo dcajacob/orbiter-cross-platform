@@ -6,6 +6,7 @@
 // Narrow production external-view host. It owns real WorldOwner/Camera/Psys,
 // native source modules and the original shared Session ordering, never POC state.
 #include "NativeGraphics.h"
+#include "NativeSound.h"
 #include "NativeParticle.h"
 #include "FlightControls.h"
 #include "FlightReplay.h"
@@ -50,6 +51,7 @@
 #include "MathObservation.h"
 #include "ContactObservation.h"
 #include <algorithm>
+#include <atomic>
 #include <chrono>
 #include <cstdlib>
 #include <fstream>
@@ -59,6 +61,7 @@
 #include <limits>
 #include <map>
 #include <memory>
+#include <optional>
 #include <stdexcept>
 #include <string>
 #include <thread>
@@ -180,6 +183,55 @@ bool SupportedStockShuttleA(const VESSEL& vessel,const char* type) {
             cs.x==17.61f && cs.y==17.44f && cs.z==13.09f;
     return false;
 }
+
+bool SupportedApolloVessel(Vessel& body,const char* type) {
+    const auto classname=ResourceResolver::Normalize(type);
+    const char* module=body.NativeModuleName();
+    if(!module) {
+        static constexpr const char* debrisClasses[]={
+            "projectapollo/cmopticscover", "projectapollo/cmprobe",
+            "projectapollo/cmapex", "projectapollo/cmbapex",
+            "projectapollo/sm-hga", "projectapollo/sm-sps",
+            "projectapollo/sm-panel1", "projectapollo/sm-panel2", "projectapollo/sm-panel3",
+            "projectapollo/sm-panel4", "projectapollo/sm-panel5", "projectapollo/sm-panel6",
+            "projectapollo/easeptv",
+            "projectapollo/sat5intstg", "projectapollo/sat5intstg4", "projectapollo/sat5intstg8",
+            "projectapollo/sat5intstglowres", "projectapollo/sat5stg31", "projectapollo/sat5stg31wide",
+            "projectapollo/sat5stg32", "projectapollo/sat5stg32wide", "projectapollo/sat5stg33",
+            "projectapollo/sat5stg33wide", "projectapollo/sat5stg34", "projectapollo/sat5stg34wide"
+        };
+        const auto& vessel=*body.GetModuleInterface();
+        return vessel.GetMeshCount()==1 && vessel.GetThrusterCount()==0 &&
+               std::any_of(std::begin(debrisClasses),std::end(debrisClasses),
+                   [&](const char* type){return classname==type;});
+    }
+    const auto moduleName=ResourceResolver::Normalize(module);
+    return (classname=="projectapollo/saturn1b" && moduleName=="projectapollo/saturn1b") ||
+           (classname=="projectapollo/saturn5" && moduleName=="projectapollo/saturn5") ||
+           (classname=="projectapollo/lem" && moduleName=="projectapollo/lem") ||
+           (classname=="projectapollo/sat5lmdsc" && moduleName=="projectapollo/sat5lmdsc") ||
+           (classname=="projectapollo/easeppsep" && moduleName=="projectapollo/easeppsep") ||
+           (classname=="projectapollo/easeplr3" && moduleName=="projectapollo/easeplr3") ||
+           (classname=="projectapollo/easepswc" && moduleName=="projectapollo/easepswc") ||
+           (classname=="projectapollo/sat5flag" && moduleName=="projectapollo/flag") ||
+           (classname=="projectapollo/floodlight" && moduleName=="projectapollo/floodlight") ||
+           (classname=="projectapollo/crawler" && moduleName=="projectapollo/crawler") ||
+           (classname=="projectapollo/ml" && moduleName=="projectapollo/ml") ||
+           (classname=="projectapollo/mss" && moduleName=="projectapollo/mss") ||
+           (classname=="projectapollo/sat5stg1" && moduleName=="projectapollo/s1c") ||
+           (classname=="projectapollo/sat5stg2" && moduleName=="projectapollo/sii") ||
+           (classname=="projectapollo/sat5stg3" && moduleName=="projectapollo/sivb") ||
+           (classname=="projectapollo/nsat1stg1" && moduleName=="projectapollo/s1b") ||
+           (classname=="projectapollo/nsat1stg2" && moduleName=="projectapollo/sivb") ||
+           (classname=="projectapollo/sm" && moduleName=="projectapollo/sm") ||
+           (classname=="projectapollo/les" && moduleName=="projectapollo/les") ||
+           (classname=="projectapollo/floatbag" && moduleName=="projectapollo/floatbag") ||
+           (classname=="projectapollo/lc34" && moduleName=="projectapollo/lc34") ||
+           (classname=="projectapollo/vab" && moduleName=="projectapollo/vab") ||
+           ((classname=="projectapollo/droguechute" || classname=="projectapollo/mainchute") &&
+             moduleName=="projectapollo/cmchute") ||
+           (classname=="projectapollo/mcc" && moduleName=="projectapollo/mcc");
+}
 #if defined(ORBITER_ATLANTIS_DIAGNOSTIC) || defined(ORBITER_REMAINING_STOCK_DIAGNOSTIC)
 // An isolated test executable exercises the actual, not-yet-qualified modules.
 // The production executable retains its admission checks below.
@@ -243,6 +295,11 @@ struct Runtime final:BodyServices,RigidBodyServices,SurfaceServices,NavigationSe
     std::ofstream lifecycle,trace,flightTrace,inputTrace,inputEvents,thrustTrace,animationTrace,controlTrace,mathTrace,contactTrace;
     unsigned pendingCockpitRedraw=0,inputTick=0,completedTicks=0,observationTick=0;
     FlightControls controls;FlightReplay replay;FlightInput input;
+    std::unique_ptr<ResourceResolver> soundAssets;
+    std::optional<NativeSoundContext> soundContext;
+    std::unique_ptr<NativeModule> soundModule;
+    const NativeSoundApi* sound = nullptr;
+    bool soundPaused = true;
 #ifdef ORBITER_NATIVE_COCKPIT
     NativeAnnotations annotations;
     std::string playbackDirectory;
@@ -257,6 +314,8 @@ struct Runtime final:BodyServices,RigidBodyServices,SurfaceServices,NavigationSe
     TimeJumpData scriptJump{};
     INTERPRETERHANDLE scenarioInterpreter=nullptr;
     std::unique_ptr<Pane> cockpit;
+    const std::thread::id cockpitThread=std::this_thread::get_id();
+    std::atomic<bool> cockpitFocusPending{false};
     bool instrumentResources=false,cockpitObserved=false,guiCreated=false;
     std::ofstream cockpitState,playbackTrace;
     CockpitSystemClock cockpitClock;
@@ -651,6 +710,12 @@ struct Runtime final:BodyServices,RigidBodyServices,SurfaceServices,NavigationSe
 #endif
 #ifdef ORBITER_NATIVE_COCKPIT
                 if(HandleCockpitMenuKey(keymap,code,eventKeys.data()))continue;
+#ifdef __linux__
+                if(code==OAPI_KEY_F7 && !KEYMOD_SHIFT(eventKeys.data()) &&
+                    !KEYMOD_CONTROL(eventKeys.data()) && !KEYMOD_ALT(eventKeys.data())) {
+                    OpenCockpitScenarioEditor();continue;
+                }
+#endif
                 if(keymap.IsLogicalKey(code,eventKeys.data(),OAPI_LKEY_TogglePlanetarium)) {settings.CfgVisHelpPrm.flagPlanetarium^=PLN_ENABLE;continue;}
                 if(keymap.IsLogicalKey(code,eventKeys.data(),OAPI_LKEY_ToggleLabels)) {settings.CfgVisHelpPrm.flagMarkers^=MKR_ENABLE;continue;}
                 if(keymap.IsLogicalKey(code,eventKeys.data(),OAPI_LKEY_ToggleCamInternal)) {
@@ -714,8 +779,29 @@ struct Runtime final:BodyServices,RigidBodyServices,SurfaceServices,NavigationSe
         inputTrace<<','<<input.x<<','<<input.y<<','<<input.rz<<','<<input.alternate<<','<<input.throttle<<'\n';
     }
     Runtime(Resources& data):resources(data),config(data.config),celestial(config,data.data,data.modules),world(*this) {}
+    void StartSound(const std::filesystem::path& assets)
+    {
+        soundAssets = std::make_unique<ResourceResolver>(assets);
+        soundContext.emplace(NativeSoundContext{*soundAssets});
+        soundModule = std::make_unique<NativeModule>(resources.modules.Resolve("Plugin/XRSound.so"),
+            ORBITER_NATIVE_PLUGIN, &*soundContext);
+        const auto* api = static_cast<const NativeSoundApi*>(soundModule->Instance());
+        if (api->size != sizeof(*api) || !api->step || !api->pause || !api->deleteVessel)
+            throw std::runtime_error("Incomplete native XRSound interface");
+        sound = api;
+    }
+    void UpdateSoundPause()
+    {
+        const bool paused = !running;
+        if (sound && soundPaused != paused) {
+            sound->pause(paused);
+            soundPaused = paused;
+        }
+    }
     void Finish() {
         if(finished)return;
+        sound = nullptr;
+        soundModule.reset();
 #ifdef ORBITER_NATIVE_COCKPIT
         if(recording && system)StopRecording();
         if(render.optionsUsed) {
@@ -724,7 +810,8 @@ struct Runtime final:BodyServices,RigidBodyServices,SurfaceServices,NavigationSe
                 if(!settings.Write(temporary.string().c_str()))throw std::runtime_error("Cannot write cockpit options");
                 std::ofstream file(temporary,std::ios::app);file.exceptions(std::ios::badbit|std::ios::failbit);
                 file<<"\nNativeJoystickThrottleAxis = "<<render.joystickThrottleAxis
-                    <<"\nNativeJoystickRudderAxis = "<<render.joystickTwistAxis<<'\n';
+                    <<"\nNativeJoystickRudderAxis = "<<render.joystickTwistAxis
+                    <<"\nNativeJoystickThrottleInverted = "<<(render.joystickThrottleInverted ? "TRUE" : "FALSE")<<'\n';
                 file.close();std::filesystem::rename(temporary,optionsPath);
             } catch(const std::exception& error) {
                 std::error_code ignored;std::filesystem::remove(temporary,ignored);
@@ -740,7 +827,6 @@ struct Runtime final:BodyServices,RigidBodyServices,SurfaceServices,NavigationSe
         if(render.graphics)render.graphics->CloseSession();
         if(baseResources){Base::DestroyStaticDeviceObjects();baseResources=false;}
 #ifdef ORBITER_NATIVE_COCKPIT
-        annotations.Clear();
         if (guiCreated) {
             render.graphics->ShutdownGui();
             DestroyCockpitGui();
@@ -752,6 +838,7 @@ struct Runtime final:BodyServices,RigidBodyServices,SurfaceServices,NavigationSe
         // Match the production Windows cockpit shutdown order while the
         // graphics context and logical world still exist.
         meshes.Flush();world.Reset();
+        annotations.Clear();
 #else
         world.Reset();meshes.Flush();
 #endif
@@ -772,21 +859,23 @@ struct Runtime final:BodyServices,RigidBodyServices,SurfaceServices,NavigationSe
         BindCameraServices(nullptr);BindWorldVesselServices(nullptr);BindElevationServices(nullptr);BindMeshServices({});
         BindNavigationServices(nullptr);BindSurfaceServices(nullptr);BindCelestialServices(nullptr);BindRigidBodyServices(nullptr);BindBodyServices(nullptr);
     }
-    void Initialize(const std::filesystem::path& master,const std::filesystem::path& scenario,const std::filesystem::path& evidence,double captureTime) {
+    void Initialize(const std::filesystem::path& master,const std::filesystem::path& scenario,const std::filesystem::path& evidence,double captureTime,bool startRunning) {
         if(!settings.Load(master.string().c_str())) throw std::runtime_error("Cannot load explicit production configuration");
 #ifdef ORBITER_NATIVE_COCKPIT
         optionsPath=master;
         int axis;
         if(render.joystickThrottleAxis==-2 && settings.GetInt("NativeJoystickThrottleAxis",axis) && axis>=-2 && axis<=15)
             render.joystickThrottleAxis=axis;
+        settings.GetBool("NativeJoystickThrottleInverted",render.joystickThrottleInverted);
         if(render.joystickTwistAxis==-2)
             render.joystickTwistAxis=settings.GetInt("NativeJoystickRudderAxis",axis) && axis>=-1 && axis<=15 ? axis : 2;
 #endif
 #ifdef ORBITER_NATIVE_COCKPIT
-        bool terminalMfdRequested=false;
+        bool terminalMfdRequested=false, apolloRtccMfdRequested=false;
         for(const auto& plugin:settings.GetActiveModules()) {
-            if(CompareText(plugin.c_str(),"LuaMFD"))unsupported("application plugins in this external-view host");
-            terminalMfdRequested=true;
+            if(!CompareText(plugin.c_str(),"LuaMFD"))terminalMfdRequested=true;
+            else if(!CompareText(plugin.c_str(),"ApolloRTCCMFD"))apolloRtccMfdRequested=true;
+            else unsupported("the requested application plugin");
         }
 #else
         if(!settings.GetActiveModules().empty())unsupported("application plugins in this external-view host");
@@ -884,13 +973,31 @@ struct Runtime final:BodyServices,RigidBodyServices,SurfaceServices,NavigationSe
         render.graphics->InitGui();
         static bool modesRegistered=false;if(!modesRegistered){Instrument::RegisterBuiltinModes();modesRegistered=true;}
         if(terminalMfdRequested)scripts.LoadTerminalMfd();
+        if(apolloRtccMfdRequested)scripts.LoadApolloRtccMfd();
         Instrument::GlobalInit(render.graphics);instrumentResources=true;
 #endif
         Base::CreateStaticDeviceObjects();baseResources=true;
         RigidBody::GlobalSetup();
         if(!world.Initialize(metadata.Solsys()))throw std::runtime_error("Production solar system contains no objects");
+        const bool apolloWorld=ResourceResolver::Normalize(metadata.Solsys())=="projectapollo/sol_virtualagc";
+        if(apolloWorld) {
+            const auto* earth=system->GetGravObj("Earth",true);
+            const auto* moon=system->GetGravObj("Moon",true);
+            if(!earth || !moon || !celestial.HasModule(*earth) || !celestial.HasModule(*moon) ||
+               !celestial.HasEphemeris(*earth) || !celestial.HasEphemeris(*moon))
+                throw std::runtime_error("Native NASSP scenes require Earth and Moon ephemeris modules");
+        }
+        if (!startRunning) {
+            // The planet states are available now, but surface bases normally
+            // get their world transforms on the first physics step.
+            for (int i = 0; i < static_cast<int>(system->nPlanet()); ++i) {
+                auto* planet = system->GetPlanet(i);
+                for (UInt32 j = 0; j < planet->nBase(); ++j)
+                    planet->GetBase(j)->Update(true);
+            }
+        }
         system->InitState(scenario.string().c_str());
-        if(!system->nVessel())throw std::runtime_error("Native production session requires a live stock vessel");
+        if(!system->nVessel())throw std::runtime_error("Native production session requires a live vessel");
 #ifdef ORBITER_ATLANTIS_DIAGNOSTIC
         if(!evidence.empty()) {
             std::ofstream marker(evidence/"unqualified-atlantis-diagnostic.json");
@@ -907,6 +1014,7 @@ struct Runtime final:BodyServices,RigidBodyServices,SurfaceServices,NavigationSe
 #endif
         for(auto* body:system->GetVessels()) {
             auto* vessel=body->GetModuleInterface();const char* type=vessel->GetClassName();
+            if(apolloWorld && SupportedApolloVessel(*body,type))continue;
             const bool pb=CompareText(type,"ShuttlePB")==0 && vessel->Version()==2 && vessel->GetMeshCount()==1 && vessel->GetThrusterCount()==16 && vessel->GetPropellantCount()==1;
             const bool iss=CompareText(type,"ProjectAlpha_ISS")==0 && vessel->Version()==0 && vessel->GetMeshCount()==1;
 #ifdef ORBITER_NATIVE_COCKPIT
@@ -924,7 +1032,7 @@ struct Runtime final:BodyServices,RigidBodyServices,SurfaceServices,NavigationSe
 #endif
 #endif
             if(!pb && !iss && !SupportedStockStation(*vessel,type))
-                throw std::runtime_error(std::string("Unsupported stock vessel class or capabilities: ")+type+"; generic replacement is forbidden");
+                throw std::runtime_error(std::string("Unsupported ")+(apolloWorld?"NASSP":"stock")+" vessel class or capabilities: "+type+"; generic replacement is forbidden");
         }
         auto* focus=system->GetVessel(metadata.Focus());
         if(!focus)focus=system->GetVessel(oapi::UInt32(0));
@@ -942,6 +1050,13 @@ struct Runtime final:BodyServices,RigidBodyServices,SurfaceServices,NavigationSe
         if(metadata.Script()) scenarioInterpreter=scripts.Load().run(metadata.Script());
 #endif
         render.graphics->PostCreation();system->PostCreation();
+        // Attached children skip their serialized free-flight state. Resolve
+        // their poses after every module has restored its attachment points,
+        // before a paused session can render or save without a physics step.
+        if(!startRunning) {
+            for(auto* vessel:system->GetVessels())
+                if(!vessel->isAttached())vessel->UpdateAttachments();
+        }
 #ifdef ORBITER_NATIVE_COCKPIT
         cockpit->InitState(scenario.string().c_str());
 #endif
@@ -949,7 +1064,8 @@ struct Runtime final:BodyServices,RigidBodyServices,SurfaceServices,NavigationSe
 #ifndef ORBITER_NATIVE_COCKPIT
         render.camera->Update();
 #endif
-        if(system->nGrav()!=41)throw std::runtime_error("This native scene requires the actual stock Sol world");
+        if(!apolloWorld && system->nGrav()!=41)
+            throw std::runtime_error("This native scene requires the actual stock Sol world");
         WriteTrace();
     }
     bool IsUpdating() const override {return updating;}
@@ -1120,6 +1236,13 @@ struct Runtime final:BodyServices,RigidBodyServices,SurfaceServices,NavigationSe
     void SetView(Body* body,int mode) override {render.camera->Attach(body,mode);force=true;LifetimeEvent("camera.target",render.camera->Target()->Name(),render.camera->IsExternal()?"external":"internal");}
     void PaneFocusChanged(Vessel* vessel) override {
 #ifdef ORBITER_NATIVE_COCKPIT
+        // Lua can change the world focus from its interpreter thread. Panel
+        // loading allocates graphics resources on the window's context.
+        if(std::this_thread::get_id()!=cockpitThread) {
+            cockpitFocusPending.store(true);
+            return;
+        }
+        cockpitFocusPending.store(false);
         if(cockpit)cockpit->FocusChanged(vessel);
 #endif
     }
@@ -1134,6 +1257,7 @@ struct Runtime final:BodyServices,RigidBodyServices,SurfaceServices,NavigationSe
     void GraphicsNewVessel(Vessel* vessel) override {render.graphics->NewVessel(vessel);LifetimeEvent("graphics.create",vessel->Name());}
     void DialogNewVessel(Vessel*) override {} // No dialogs are instantiated.
     void ModuleDeleteVessel(Vessel* vessel) override {
+        if (sound) sound->deleteVessel(vessel);
 #ifdef ORBITER_NATIVE_COCKPIT
         scripts.DeleteVessel(vessel);
 #endif
@@ -1190,6 +1314,7 @@ struct Runtime final:BodyServices,RigidBodyServices,SurfaceServices,NavigationSe
 #ifdef ORBITER_NATIVE_COCKPIT
         if(playbackTrace.is_open() && !completedTicks)playback_observation::Row(playbackTrace,0);
         if(!cockpitObserved && render.camera->IsInternal()){CockpitSnapshot();cockpitObserved=true;}
+        scripts.PreStep(time.SimT0,time.SimDT,time.MJD0);
 #endif
         for(UInt32 i=0;i<system->nVessel();++i)system->GetVessel(i)->ModulePreStep(time.SimT0,time.SimDT,time.MJD0);}
     void PlaybackStep() override {
@@ -1209,6 +1334,8 @@ struct Runtime final:BodyServices,RigidBodyServices,SurfaceServices,NavigationSe
         for(UInt32 i=0;i<system->nVessel();++i)system->GetVessel(i)->ModulePostStep(time.SimT1,time.SimDT,time.MJD1);
 #ifdef ORBITER_NATIVE_COCKPIT
         scripts.PostStep(time.SimT1,time.SimDT,time.MJD1);
+        if(cockpitFocusPending.exchange(false) && cockpit)
+            cockpit->FocusChanged(render.focus);
 #endif
         LifetimeEvent("module.post");
     }
@@ -1324,6 +1451,9 @@ struct Runtime final:BodyServices,RigidBodyServices,SurfaceServices,NavigationSe
         render.camera->UpdateMouse();
 #endif
         Session::UpdateWorld(*this,time,running,playback,updating,force);
+        UpdateSoundPause();
+        if (sound && running)
+            sound->step(time.SimT1,time.SimDT,time.MJD1);
         Session::EndTimeStep(*this,time,running,active,force);
         if(!wasRunning)running=false;
         input.throttle=-1;observationTick=completedTicks;Commands("after");render.paused=!running;if(savePending){Save();savePending=false;}++inputTick;
@@ -1343,6 +1473,7 @@ int main(int argc,char** argv) {
         }
         std::vector<std::string> allowed={"--assets","--data","--modules","--planets","--config","--scenario","--evidence","--frames","--fixed-step","--run","--capture-time","--keymap","--save","--replay","--ticks","--render-every","--sessions","--joystick-throttle-axis","--joystick-twist-axis","--frame-delay-ms","--fixed-ui-clock"};
         allowed.push_back("--fixed-system-step");
+        allowed.push_back("--xrsound-assets");
         for(const auto& entry:arguments)if(std::find(allowed.begin(),allowed.end(),entry.first)==allowed.end())throw std::runtime_error("Unknown argument: "+entry.first);
         for(const char* name:{"--assets","--data","--modules","--planets","--config","--scenario"})if(!arguments.count(name))throw std::runtime_error(std::string("Required argument missing: ")+name);
         const auto absolute=[&](const char* name){return std::filesystem::absolute(arguments.at(name));};
@@ -1397,15 +1528,20 @@ int main(int argc,char** argv) {
 #endif
             if(application.render.joystickThrottleAxis>15 || application.render.joystickTwistAxis>15)throw std::runtime_error("Invalid joystick axis");
             if(arguments.count("--replay"))application.replay.Load(absolute("--replay"));
-            application.savePath=save;application.Initialize(absolute("--config"),scenario,output,capture);
+            application.savePath=save;application.Initialize(absolute("--config"),scenario,output,capture,startRunning);
             if(arguments.count("--keymap") && (!std::filesystem::is_regular_file(absolute("--keymap")) || !application.controls.keymap.Read(absolute("--keymap").string().c_str())))throw std::runtime_error("Cannot load explicit flight keymap");
 #ifdef ORBITER_NATIVE_COCKPIT
             if(fixedUiClock)SetCockpitReplayClock(static_cast<float>(fixed));
 #endif
             application.time.SetFixedStep(fixed);application.running=startRunning;application.render.paused=!application.running;
+            if (arguments.count("--xrsound-assets"))
+                application.StartSound(absolute("--xrsound-assets"));
             std::cout<<"Production "<<application.render.focus->GetModuleInterface()->GetClassName()<<" flight. Space/Ctrl-P: pause. T/R: warp. Ctrl-S: save. F5: reload. "
 #ifdef ORBITER_NATIVE_COCKPIT
                 <<"F6: options. F8: cockpit. "
+#ifdef __linux__
+                <<"F7: scenario editor. "
+#endif
 #else
                 <<"F6: step. "
 #endif
@@ -1443,11 +1579,20 @@ int main(int argc,char** argv) {
                     application.Buffered(application.input);
                     if(application.savePending && !application.stepOnce){application.Save();application.savePending=false;}
                 }
+                application.UpdateSoundPause();
                 if(application.reloadPending) {if(!std::filesystem::is_regular_file(save)){std::cerr<<"No saved scenario exists: "<<save<<'\n';application.reloadPending=false;}else{scenario=save;reload=true;break;}}
                 if(input.width>0 && input.height>0) {
 #ifdef ORBITER_NATIVE_COCKPIT
+                    application.render.paused=!application.running;
+                    application.render.recordingFlight=application.recording;
+                    application.render.playingFlight=application.playback;
                     application.render.graphics->NewGuiFrame();
                     BeginCockpitGuiFrame();
+                    if(application.render.scenarioEditorRemoval) {
+                        application.render.scenarioEditorRemoval=false;
+                        if(!application.DeletePendingVessels())application.NoVessels();
+                        application.UpdateCamera();
+                    }
 #endif
                     application.render.paused=!application.running;application.render.graphics->Status(application.Status());application.render.graphics->Render();
 #ifdef ORBITER_NATIVE_COCKPIT

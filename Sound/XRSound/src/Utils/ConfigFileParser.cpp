@@ -22,6 +22,7 @@
 #include <string>
 #include <ctime>
 #include <chrono>
+#include <cerrno>
 
 // Constructor
 // pDefaultFilename = path to default config file; may be relative to Orbiter root or absolute
@@ -38,8 +39,12 @@ ConfigFileParser::ConfigFileParser(const char *pDefaultFilename, const char *pLo
         if (m_pLogFile == nullptr)
         {
             char temp[256];
-            sprintf(temp, "Error opening log file '%s' for writing; attempting to continue", pLogFilename);
+            snprintf(temp, sizeof temp, "Error opening log file '%s' for writing; attempting to continue", pLogFilename);
+#ifdef _WIN32
             MessageBox(nullptr, temp, "XR Framework Warning", MB_OK | MB_SETFOREGROUND);
+#else
+            fprintf(stderr, "XRSound: %s\n", temp);
+#endif
         }
     }
 }
@@ -48,7 +53,8 @@ ConfigFileParser::ConfigFileParser(const char *pDefaultFilename, const char *pLo
 ConfigFileParser::~ConfigFileParser()
 {
     // clean up and close our logfile
-    fclose(m_pLogFile);
+    if (m_pLogFile)
+        fclose(m_pLogFile);
 }
 
 //
@@ -69,14 +75,14 @@ bool ConfigFileParser::ParseFile(const char *pFilename)
     static char temp[256]; // reused for messages
 
     // open the config file
-    sprintf(temp, "Parsing config file '%s'", pFilename);
+    snprintf(temp, sizeof temp, "Parsing config file '%s'", pFilename);
     WriteLog(temp);
 
-    FILE *pFile = fopen(pFilename, "rt");
+    FILE *pFile = fopen(xrsound::AssetPath(pFilename).c_str(), "r");
 
     if (pFile == nullptr)
     {
-        sprintf(temp, "ERROR: fopen failed for '%s'; GetLastError=0x%X", pFilename, GetLastError());
+        snprintf(temp, sizeof temp, "ERROR opening '%s': %s", pFilename, strerror(errno));
         WriteLog(temp);
         m_parseFailed = true;
         return false;       // could not open file
@@ -134,7 +140,7 @@ bool ConfigFileParser::ParseFile(const char *pFilename)
             const char *pEquals = strchr(m_buffer, '=');
             if (pEquals == nullptr)
             {
-                sprintf(temp, "Error parsing line #%d of file '%s': missing '=' character.  Line='%s'", lineNumber, pFilename, m_buffer);
+                snprintf(temp, sizeof temp, "Error parsing line #%d of file '%s': missing '=' character.  Line='%s'", lineNumber, pFilename, m_buffer);
                 WriteLog(temp);
                 retVal = false;
                 continue;  // do NOT stop parsing; just skip to the next line
@@ -144,7 +150,7 @@ bool ConfigFileParser::ParseFile(const char *pFilename)
             const int nameLength = static_cast<int>((pEquals - m_buffer));    // # of chars in parsed name
             if (nameLength > MAX_NAME_LENGTH)
             {
-                sprintf(temp, "Error parsing line #%d of file '%s': name parameter too long (exceeds %d characters).  Line='%s'", 
+                snprintf(temp, sizeof temp, "Error parsing line #%d of file '%s': name parameter too long (exceeds %d characters).  Line='%s'",
                     lineNumber, pFilename, MAX_NAME_LENGTH, m_buffer);
                 WriteLog(temp);
                 retVal = false;
@@ -156,7 +162,7 @@ bool ConfigFileParser::ParseFile(const char *pFilename)
             const int valueLength = static_cast<int>(strlen(pValue));
             if (valueLength > MAX_VALUE_LENGTH)
             {
-                sprintf(temp, "Error parsing line #%d of file '%s': value parameter too long (exceeds %d characters).  Line='%s'", 
+                snprintf(temp, sizeof temp, "Error parsing line #%d of file '%s': value parameter too long (exceeds %d characters).  Line='%s'",
                     lineNumber, pFilename, MAX_VALUE_LENGTH, m_buffer);
                 WriteLog(temp);
                 retVal = false;
@@ -176,7 +182,7 @@ bool ConfigFileParser::ParseFile(const char *pFilename)
             // invoke the subclass to parse these values
             if (ParseLine(m_section, m_parsedName, m_parsedValue, bParsingOverrideFile) == false)
             {
-                sprintf(temp, "Name/Value error parsing line #%d of file '%s': Line='%s'.  Check the above log message for details.", 
+                snprintf(temp, sizeof temp, "Name/Value error parsing line #%d of file '%s': Line='%s'.  Check the above log message for details.",
                     lineNumber, pFilename, m_buffer);
                 WriteLog(temp);
                 retVal = false;
@@ -193,7 +199,7 @@ bool ConfigFileParser::ParseFile(const char *pFilename)
     fclose(pFile);
     if (retVal)     // success?
     {
-        sprintf(temp, "Successfully parsed configuration file '%s'", pFilename);
+        snprintf(temp, sizeof temp, "Successfully parsed configuration file '%s'", pFilename);
         WriteLog(temp);
     }
     else
@@ -256,7 +262,7 @@ void ConfigFileParser::TrimString(char *pStr)
     }
 
     // final step: shift string left to delete trimmed whitespace
-    strcpy(pOrgStart, pStart);
+    memmove(pOrgStart, pStart, strlen(pStart) + 1);
 }
 
 // log a message
@@ -272,8 +278,11 @@ void ConfigFileParser::WriteLog(const char *pMsg) const
     std::time_t t = std::chrono::system_clock::to_time_t(now);
     std::tm tm{};
 
-	// Warning MS BS, POSIX is localtime_r(&t, &tm);
+#ifdef _WIN32
     localtime_s(&tm, &t);
+#else
+    localtime_r(&t, &tm);
+#endif
 
     auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(
         now.time_since_epoch()) % 1000;
@@ -288,7 +297,9 @@ void ConfigFileParser::WriteLog(const char *pMsg) const
         csPrefix, pMsg);
 
     // no point in checking for error here
+#ifdef _WIN32
     OutputDebugString(csMsg);   // send to debug console
+#endif
     fwrite(csMsg, 1, strlen(csMsg), m_pLogFile);
 
     // flush to disk in case we crash or are terminated
@@ -303,13 +314,13 @@ bool ConfigFileParser::ValidateInt(const int value, const int min, const int max
     char temp[256];
     if (value < min)
     {
-        sprintf(temp, "Integer value '%d' is below minimum value of '%d'", value, min);
+        snprintf(temp, sizeof temp, "Integer value '%d' is below minimum value of '%d'", value, min);
         WriteLog(temp);
         retVal = false;
     }
     else if (value > max)
     {
-        sprintf(temp, "Integer value '%d' is above maximum value of '%d'", value, max);
+        snprintf(temp, sizeof temp, "Integer value '%d' is above maximum value of '%d'", value, max);
         WriteLog(temp);
         retVal = false;
     }
@@ -325,13 +336,13 @@ bool ConfigFileParser::ValidateDouble(const double value, const double min, cons
     char temp[256];
     if (value < min)
     {
-        sprintf(temp, "Double value '%lf' is below minimum value of '%lf'", value, min);
+        snprintf(temp, sizeof temp, "Double value '%lf' is below minimum value of '%lf'", value, min);
         WriteLog(temp);
         retVal = false;
     }
     else if (value > max)
     {
-        sprintf(temp, "Double value '%lf' is above maximum value of '%lf'", value, max);
+        snprintf(temp, sizeof temp, "Double value '%lf' is above maximum value of '%lf'", value, max);
         WriteLog(temp);
         retVal = false;
     }
@@ -347,13 +358,13 @@ bool ConfigFileParser::ValidateFloat(const float value, const float min, const f
     char temp[256];
     if (value < min)
     {
-        sprintf(temp, "Float value '%f' is below minimum value of '%f'", value, min);
+        snprintf(temp, sizeof temp, "Float value '%f' is below minimum value of '%f'", value, min);
         WriteLog(temp);
         retVal = false;
     }
     else if (value > max)
     {
-        sprintf(temp, "Float value '%f' is above maximum value of '%f'", value, max);
+        snprintf(temp, sizeof temp, "Float value '%f' is above maximum value of '%f'", value, max);
         WriteLog(temp);
         retVal = false;
     }

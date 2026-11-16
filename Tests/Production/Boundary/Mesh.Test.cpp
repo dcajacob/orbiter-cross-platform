@@ -3,6 +3,7 @@
 #include "Production/ResourceResolver.h"
 #include <fstream>
 #include <iostream>
+#include <sstream>
 #include <stdexcept>
 #include <string>
 using namespace orbiter::production;
@@ -102,6 +103,18 @@ int main(int argc,char** argv)
             require(mesh.GetGroup(0)->Vtx[1].x==4 && mesh.GetGroup(0)->Vtx[1].y==2 && mesh.GetGroup(0)->Vtx[1].nz==1,
                 "Production mesh transform or normals changed");
             mesh.AddTexture(&env.textureToken);
+        }
+        {
+            std::istringstream input("MSHX1\nGROUPS 2\nLABEL empty\nFLAG 5\nGEOM 0 0\n"
+                                     "GEOM 3 1\n0 0 0\n1 0 0\n0 1 0\n0 1 2\n");
+            Mesh parsed;
+            input >> parsed;
+            require(input && parsed.nGroup()==2,"An empty group changed the declared MSHX1 group order");
+            Mesh copy(parsed);
+            require(copy.GetGroup(0)->nVtx==0 && copy.GetGroup(0)->nIdx==0 && copy.GetGroup(0)->UsrFlag==5,
+                "Empty group lost its geometry count or flags during a mesh copy");
+            require(copy.GetGroup(1)->nVtx==3 && copy.GetGroup(1)->nIdx==3,
+                "Empty geometry shifted the following mesh group");
         }
         {
             // Empty panel groups own zero-length arrays too. Replacing those

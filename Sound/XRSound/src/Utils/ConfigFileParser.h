@@ -10,7 +10,7 @@
 
 #pragma once
 
-#include <Windows.h>
+#include "XRSoundPlatform.h"
 #include <stdio.h>
 
 #include <fstream>      // for ifstream
@@ -61,7 +61,7 @@ public:
         if (!pFilename || !*pFilename)
             return false;
 
-        std::ifstream file(pFilename);
+        std::ifstream file(xrsound::AssetPath(pFilename));
         return file.good();
     }
 

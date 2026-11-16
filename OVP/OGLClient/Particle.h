@@ -82,7 +82,7 @@ public:
 
 	ParticleSpec *CreateParticle (const VECTOR3 &pos, const VECTOR3 &vel, double size, double alpha);
 	void DeleteParticle (ParticleSpec *p);
-	virtual void Update ();
+	virtual void Update (double dt);
 	void Render (OGLCamera *c);
 	//virtual void RenderGroundShadow (LPDIRECT3DDEVICE7 dev, LPDIRECTDRAWSURFACE7 &prevtex) {}
 
@@ -142,7 +142,7 @@ public:
 		const double *srclevel, const VECTOR3 &ref, const VECTOR3 &_dir,
 		PARTICLESTREAMSPEC *pss = 0);
 	//void RenderGroundShadow (LPDIRECT3DDEVICE7 dev, LPDIRECTDRAWSURFACE7 &prevtex);
-	void Update ();
+	void Update (double dt) override;
 
 private:
 	OBJHANDLE hPlanet;
@@ -152,7 +152,7 @@ class ReentryStream: public OGLParticleStream {
 public:
 	ReentryStream (RendererHost *_gc, OBJHANDLE hV,
 		PARTICLESTREAMSPEC *pss = 0);
-	void Update ();
+	void Update (double dt) override;
 
 protected:
 	void SetMaterial (glm::vec4 &col);

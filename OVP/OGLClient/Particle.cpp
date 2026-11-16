@@ -345,10 +345,9 @@ void OGLParticleStream::DeleteParticle (ParticleSpec *p)
 	np--;
 }
 
-void OGLParticleStream::Update ()
+void OGLParticleStream::Update (double dt)
 {
 	ParticleSpec *p, *tmp;
-	double dt = oapiGetSimStep();
 
 	for (p = pfirst; p;) {
 		if (dt * exp_rate > renderer_random::Next()) {
@@ -683,12 +682,11 @@ ExhaustStream::ExhaustStream (RendererHost *_gc, OBJHANDLE hV,
 	hPlanet = 0;
 }
 
-void ExhaustStream::Update ()
+void ExhaustStream::Update (double dt)
 {
-	OGLParticleStream::Update ();
+	OGLParticleStream::Update (dt);
 
 	double simt = oapiGetSimTime();
-	double dt = oapiGetSimStep();
 	double alpha0;
 
 	VESSEL *vessel = (hRef ? oapiGetVesselInterface (hRef) : 0);
@@ -898,13 +896,12 @@ void ReentryStream::SetMaterial (glm::vec4 &col)
 	col.b = 0.6f;
 }
 
-void ReentryStream::Update ()
+void ReentryStream::Update (double dt)
 {
-	OGLParticleStream::Update ();
+	OGLParticleStream::Update (dt);
 	VESSEL *vessel = (hRef ? oapiGetVesselInterface (hRef) : 0);
 
 	double simt = oapiGetSimTime();
-	double simdt = oapiGetSimStep();
 	double friction = 0.0;
 	if (vessel) {
 		double spd = vessel->GetAirspeed();
@@ -929,9 +926,9 @@ void ReentryStream::Update ()
 			for (p = pfirst, i = 0; p; p = p->next, i++) {
 				VECTOR3 av = dav*i + av1;
 				VECTOR3 vv = p->vel-av;
-				double slow = exp(-beta*simdt);
+				double slow = exp(-beta*dt);
 				p->vel = vv*slow + av;
-				p->size += alpha * simdt;
+				p->size += alpha * dt;
 			}
 		}
 	}

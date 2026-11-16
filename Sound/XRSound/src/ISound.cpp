@@ -9,7 +9,7 @@
 #include "miniaudio.h"
 #include "ISound.h"
 
-#include "OrbiterAPI.h"
+#include "XRSoundPlatform.h"
 
 #ifdef XRSOUND_DEBUG_GUI
 #include <imgui.h>
@@ -65,11 +65,18 @@ ISoundEngine::ISoundEngine()
     ma_engine_config engineConfig = ma_engine_config_init();
     engineConfig.defaultVolumeSmoothTimeInPCMFrames = 4096;
 
-    if (ma_engine_init(&engineConfig, &m_engine) != MA_SUCCESS) {
-        oapiWriteLog("XRSound: Error initialising miniaudio engine");
+    const auto result = ma_engine_init(&engineConfig, &m_engine);
+    if (result != MA_SUCCESS) {
+        std::string message = std::string("XRSound: Cannot open audio device: ") + ma_result_description(result);
+        oapiWriteLog(message.data());
         return;
     }
     m_initialized = true;
+}
+
+const char *ISoundEngine::getDriverName()
+{
+    return m_initialized ? ma_get_backend_name(ma_engine_get_device(&m_engine)->pContext->backend) : nullptr;
 }
 
 ISoundEngine::~ISoundEngine()

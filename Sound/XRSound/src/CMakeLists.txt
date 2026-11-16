@@ -32,6 +32,7 @@ endif()
 target_include_directories(XRSound_dll PUBLIC
 	${ORBITER_SOURCE_SDK_INCLUDE_DIR}
 	${CMAKE_CURRENT_SOURCE_DIR}/Utils
+	PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}
 )
 
 target_link_libraries(XRSound_dll
