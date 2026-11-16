@@ -194,6 +194,7 @@ bool SupportedApolloVessel(Vessel& body,const char* type) {
             "projectapollo/sm-hga", "projectapollo/sm-sps",
             "projectapollo/sm-panel1", "projectapollo/sm-panel2", "projectapollo/sm-panel3",
             "projectapollo/sm-panel4", "projectapollo/sm-panel5", "projectapollo/sm-panel6",
+            "projectapollo/sat1aerocap",
             "projectapollo/easeptv",
             "projectapollo/sat5intstg", "projectapollo/sat5intstg4", "projectapollo/sat5intstg8",
             "projectapollo/sat5intstglowres", "projectapollo/sat5stg31", "projectapollo/sat5stg31wide",
@@ -227,6 +228,7 @@ bool SupportedApolloVessel(Vessel& body,const char* type) {
            (classname=="projectapollo/les" && moduleName=="projectapollo/les") ||
            (classname=="projectapollo/floatbag" && moduleName=="projectapollo/floatbag") ||
            (classname=="projectapollo/lc34" && moduleName=="projectapollo/lc34") ||
+           (classname=="projectapollo/lc37" && moduleName=="projectapollo/lc37") ||
            (classname=="projectapollo/vab" && moduleName=="projectapollo/vab") ||
            ((classname=="projectapollo/droguechute" || classname=="projectapollo/mainchute") &&
              moduleName=="projectapollo/cmchute") ||
