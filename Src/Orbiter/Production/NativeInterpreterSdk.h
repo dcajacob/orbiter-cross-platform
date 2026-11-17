@@ -26,7 +26,6 @@ ORBITER_PRODUCTION_API std::vector<ElevationTile> *InitTileCache(int size = 2);
 ORBITER_PRODUCTION_API void ReleaseTileCache(std::vector<ElevationTile> *tilecache);
 ORBITER_PRODUCTION_API double oapiGetSysMJD ();
 ORBITER_PRODUCTION_API bool oapiSetSimMJD (double mjd, int pmode = 0);
-ORBITER_PRODUCTION_API void oapiSetTimeAcceleration (double warp);
 ORBITER_PRODUCTION_API void oapiSetPause (bool pause);
 ORBITER_PRODUCTION_API bool oapiSetTexture (MESHHANDLE hMesh, oapi::UInt32 texidx, SURFHANDLE tex);
 ORBITER_PRODUCTION_API int oapiSetMaterialEx(DEVMESHHANDLE hMesh, oapi::UInt32 matidx, MatProp prp, const oapi::FVECTOR4* in);

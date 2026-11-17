@@ -83,6 +83,7 @@ OAPIFUNC double oapiGetSysStep ();
 OAPIFUNC double oapiGetSimMJD ();
 OAPIFUNC double oapiTime2MJD (double t);
 OAPIFUNC double oapiGetTimeAcceleration ();
+OAPIFUNC void oapiSetTimeAcceleration(double warp);
 OAPIFUNC double oapiGetPlanetPeriod (OBJHANDLE hPlanet);
 OAPIFUNC void oapiGetPlanetObliquityMatrix (OBJHANDLE hPlanet, MATRIX3 *mat);
 OAPIFUNC double oapiGetPlanetCurrentRotation (OBJHANDLE hPlanet);

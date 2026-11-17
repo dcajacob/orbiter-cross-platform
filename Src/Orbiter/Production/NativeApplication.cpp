@@ -195,7 +195,7 @@ bool SupportedApolloVessel(Vessel& body,const char* type) {
             "projectapollo/sm-panel1", "projectapollo/sm-panel2", "projectapollo/sm-panel3",
             "projectapollo/sm-panel4", "projectapollo/sm-panel5", "projectapollo/sm-panel6",
             "projectapollo/sat1aerocap",
-            "projectapollo/easeptv",
+            "projectapollo/easeptv", "projectapollo/alseptv",
             "projectapollo/sat5intstg", "projectapollo/sat5intstg4", "projectapollo/sat5intstg8",
             "projectapollo/sat5intstglowres", "projectapollo/sat5stg31", "projectapollo/sat5stg31wide",
             "projectapollo/sat5stg32", "projectapollo/sat5stg32wide", "projectapollo/sat5stg33",
@@ -214,6 +214,16 @@ bool SupportedApolloVessel(Vessel& body,const char* type) {
            (classname=="projectapollo/easeppsep" && moduleName=="projectapollo/easeppsep") ||
            (classname=="projectapollo/easeplr3" && moduleName=="projectapollo/easeplr3") ||
            (classname=="projectapollo/easepswc" && moduleName=="projectapollo/easepswc") ||
+           (classname=="projectapollo/eva" && moduleName=="projectapollo/eva") ||
+           (classname=="projectapollo/leva" && moduleName=="projectapollo/leva") ||
+           (classname=="projectapollo/lrv" && moduleName=="projectapollo/lrv") ||
+           (classname=="projectapollo/alsepstation" && moduleName=="projectapollo/alsepstation") ||
+           (classname=="projectapollo/alseprtg" && moduleName=="projectapollo/alseprtg") ||
+           (classname=="projectapollo/alsepsbnd" && moduleName=="projectapollo/alsepsbnd") ||
+           (classname=="projectapollo/alseppse" && moduleName=="projectapollo/alseppse") ||
+           (classname=="projectapollo/alseplsm" && moduleName=="projectapollo/alseplsm") ||
+           (classname=="projectapollo/alsepsws" && moduleName=="projectapollo/alsepsws") ||
+           (classname=="projectapollo/alsepside" && moduleName=="projectapollo/alsepside") ||
            (classname=="projectapollo/sat5flag" && moduleName=="projectapollo/flag") ||
            (classname=="projectapollo/floodlight" && moduleName=="projectapollo/floodlight") ||
            (classname=="projectapollo/crawler" && moduleName=="projectapollo/crawler") ||
@@ -876,10 +886,11 @@ struct Runtime final:BodyServices,RigidBodyServices,SurfaceServices,NavigationSe
             render.joystickTwistAxis=settings.GetInt("NativeJoystickRudderAxis",axis) && axis>=-1 && axis<=15 ? axis : 2;
 #endif
 #ifdef ORBITER_NATIVE_COCKPIT
-        bool terminalMfdRequested=false, apolloRtccMfdRequested=false;
+        bool terminalMfdRequested=false, apolloRtccMfdRequested=false, projectApolloMfdRequested=false;
         for(const auto& plugin:settings.GetActiveModules()) {
             if(!CompareText(plugin.c_str(),"LuaMFD"))terminalMfdRequested=true;
             else if(!CompareText(plugin.c_str(),"ApolloRTCCMFD"))apolloRtccMfdRequested=true;
+            else if(!CompareText(plugin.c_str(),"ProjectApolloMFD"))projectApolloMfdRequested=true;
             else unsupported("the requested application plugin");
         }
 #else
@@ -978,7 +989,8 @@ struct Runtime final:BodyServices,RigidBodyServices,SurfaceServices,NavigationSe
         render.graphics->InitGui();
         static bool modesRegistered=false;if(!modesRegistered){Instrument::RegisterBuiltinModes();modesRegistered=true;}
         if(terminalMfdRequested)scripts.LoadTerminalMfd();
-        if(apolloRtccMfdRequested)scripts.LoadApolloRtccMfd();
+        if(apolloRtccMfdRequested)scripts.LoadApolloMfd("ApolloRTCCMFD");
+        if(projectApolloMfdRequested)scripts.LoadApolloMfd("ProjectApolloMFD");
         Instrument::GlobalInit(render.graphics);instrumentResources=true;
 #endif
         Base::CreateStaticDeviceObjects();baseResources=true;

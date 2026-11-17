@@ -4,10 +4,11 @@
 #include <cstddef>
 
 namespace orbiter::production {
-struct NativeApolloRtccMfdApi {
+struct NativeApolloMfdApi {
     std::size_t size;
     void (*preStep)(double, double, double);
     void (*deleteVessel)(OBJHANDLE);
     void (*end)();
 };
+using NativeApolloRtccMfdApi = NativeApolloMfdApi;
 }

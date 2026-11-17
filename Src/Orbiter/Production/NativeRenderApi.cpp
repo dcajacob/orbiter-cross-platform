@@ -127,7 +127,9 @@ VesselLifetimeServices& lifetime() {
     if(!result)throw std::logic_error("Native vessel lifetime service is not bound");return *result;
 }
 void validateCreation(const char* name,const char* classname) {
-    if(!name || !*name || std::strlen(name)>=64 || !classname || !*classname || std::strpbrk(name,"\r\n:;, /\\") ||
+    // Vessel headers preserve interior spaces, as used by NASSP crew and ALSEP.
+    if(!name || !*name || std::strlen(name)>=64 || name[0]==' ' || name[std::strlen(name)-1]==' ' ||
+       !classname || !*classname || std::strpbrk(name,"\r\n\t:;,/\\") ||
        GetNativeRenderContext().world->GetVessel(name,true))throw std::runtime_error("Invalid or duplicate native vessel name/class");
 }
 }
@@ -733,6 +735,25 @@ void oapiBlt(SURFHANDLE target,SURFHANDLE source,int x,int y,int sx,int sy,int w
         if(warn){std::clog<<"Obsolete oapiBlt: colour key argument not supported by graphics client\n";warn=false;}
     }
     if(!graphics->clbkBlt(target,x,y,source,sx,sy,width,height))throw std::runtime_error("Native oapiBlt: graphics surface copy failed");
+}
+
+void oapiBlt(SURFHANDLE target,SURFHANDLE source,
+    const oapi::SdkRectangle* targetRect,const oapi::SdkRectangle* sourceRect)
+{
+    if(!source || !target || !targetRect || !sourceRect)return;
+    if(auto* graphics=GetNativeRenderContext().graphics) {
+        const auto& dst=*targetRect;
+        const auto& src=*sourceRect;
+        graphics->clbkScaleBlt(target,dst.left,dst.top,dst.right-dst.left,dst.bottom-dst.top,
+            source,src.left,src.top,src.right-src.left,src.bottom-src.top);
+    }
+}
+
+void oapiSetSurfaceColourKey(SURFHANDLE surface,oapi::UInt32 key)
+{
+    if(surface)
+        if(auto* graphics=GetNativeRenderContext().graphics)
+            graphics->clbkSetSurfaceColourKey(surface,key);
 }
 
 oapi::Brush* oapiCreateBrush(oapi::UInt32 color) {

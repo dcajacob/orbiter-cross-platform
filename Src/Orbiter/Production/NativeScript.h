@@ -6,6 +6,7 @@
 #include "NativeVesselAPI.h"
 #include "ResourceResolver.h"
 #include <memory>
+#include <vector>
 
 struct lua_State;
 namespace orbiter::production {
@@ -29,7 +30,7 @@ public:
     explicit NativeScriptHost(const ResourceResolver &modules): modules(modules) {}
     NativeScriptApi& Load();
     void LoadTerminalMfd();
-    void LoadApolloRtccMfd();
+    void LoadApolloMfd(const char* name);
     void EndTerminalMfd();
     void PreStep(double simt, double simdt, double mjd);
     void PostStep(double simt, double simdt, double mjd);
@@ -39,9 +40,12 @@ private:
     const ResourceResolver &modules;
     std::unique_ptr<NativeModule> library;
     std::unique_ptr<NativeModule> terminalLibrary;
-    std::unique_ptr<NativeModule> apolloRtccLibrary;
+    struct ApolloMfd {
+        std::unique_ptr<NativeModule> module;
+        NativeApolloMfdApi* api;
+    };
+    std::vector<ApolloMfd> apolloMfds;
     NativeLuaMfdApi *terminalApi = nullptr;
-    NativeApolloRtccMfdApi *apolloRtccApi = nullptr;
     NativeScriptApi *api = nullptr;
 };
 }
