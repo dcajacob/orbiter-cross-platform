@@ -209,6 +209,11 @@ bool SupportedApolloVessel(Vessel& body,const char* type) {
     const auto moduleName=ResourceResolver::Normalize(module);
     return (classname=="projectapollo/saturn1b" && moduleName=="projectapollo/saturn1b") ||
            (classname=="projectapollo/saturn5" && moduleName=="projectapollo/saturn5") ||
+           (classname=="projectapollo/saturn1babort1" && moduleName=="projectapollo/sat1babort1") ||
+           (classname=="projectapollo/saturn1babort2" && moduleName=="projectapollo/sat1babort2") ||
+           (classname=="projectapollo/saturn5abort1" && moduleName=="projectapollo/sat5abort1") ||
+           (classname=="projectapollo/saturn5abort2" && moduleName=="projectapollo/sat5abort2") ||
+           (classname=="projectapollo/saturn5abort3" && moduleName=="projectapollo/sat5abort3") ||
            (classname=="projectapollo/lem" && moduleName=="projectapollo/lem") ||
            (classname=="projectapollo/sat5lmdsc" && moduleName=="projectapollo/sat5lmdsc") ||
            (classname=="projectapollo/easeppsep" && moduleName=="projectapollo/easeppsep") ||
