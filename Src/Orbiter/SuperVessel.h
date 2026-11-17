@@ -171,6 +171,7 @@ protected:
 	// hull vertex iterator: returns first/next hull vertex in supervessel frame
 
 private:
+	void RestoreLandedState(Planet& planet);
 	bool RemoveEntry (const Vessel *v);
 	// remove vessel v from vlist
 

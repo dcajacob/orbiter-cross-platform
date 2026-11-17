@@ -149,6 +149,11 @@ SuperVessel::SuperVessel (Vessel *vessel1, Vessel *vessel2, int port1, int port2
 	if (cbody) cvel = s0->vel - cbody->s0->vel; else cvel = { 0, 0, 0 };
 	proxyT = -(double)orbiter::production::RandomInteger()*100.0/(double)orbiter::production::RandomMaximum - 1.0;
 
+	Planet* landedPlanet = vessel1->proxyplanet;
+	const bool restoreLanded = !mixmoments && landedPlanet &&
+		vessel1->fstatus == FLIGHTSTATUS_LANDED && vessel2->fstatus == FLIGHTSTATUS_LANDED &&
+		vessel2->proxyplanet == landedPlanet;
+
 	// register with vessels
 	for (i = 0; i < 2; i++) {
 		Vessel *v = vlist[i].vessel;
@@ -162,7 +167,10 @@ SuperVessel::SuperVessel (Vessel *vessel1, Vessel *vessel2, int port1, int port2
 
 	SetDefaultState();
 	ResetSize();
-	Activate (true);
+	if (restoreLanded)
+		RestoreLandedState(*landedPlanet);
+	else
+		Activate (true);
 }
 
 SuperVessel::~SuperVessel()
@@ -641,6 +649,12 @@ bool SuperVessel::Add (Vessel *vessel1, int port1, Vessel *vessel2, int port2, b
 
 	vessel2->s0->omega.Set (tmul (vlist[nv-1].rrot, s0->omega));
 	vessel2->UpdateSurfParams();
+	if (fstatus == FLIGHTSTATUS_LANDED) {
+		if (!mixmoments && vessel2->fstatus == FLIGHTSTATUS_LANDED && vessel2->proxyplanet == proxyplanet)
+			RestoreLandedState(*proxyplanet);
+		else
+			Activate(true);
+	}
 
 	return true;
 }
@@ -731,6 +745,12 @@ bool SuperVessel::Merge (Vessel *vessel1, int port1, Vessel *vessel2, int port2)
 	ResetMassAndCG();
 	ResetSize();
 	CalcPMI();
+	if (fstatus == FLIGHTSTATUS_LANDED) {
+		if (sv2->fstatus == FLIGHTSTATUS_LANDED && sv2->proxyplanet == proxyplanet)
+			RestoreLandedState(*proxyplanet);
+		else
+			Activate(true);
+	}
 	return true;
 }
 
@@ -813,7 +833,9 @@ void SuperVessel::Update (bool force)
 		bActivationPending = false;
 		for (i = 0; i < nv; i++) {
 			ComponentStateVectors (s1, vlist[i].vessel->s1, i);
-			bActivationPending = bActivationPending || vlist[i].vessel->bForceActive;
+			// Touchdown-geometry changes can set bForceActive with no actual force.
+			const auto* v = vlist[i].vessel;
+			bActivationPending = bActivationPending || (v->bForceActive && v->Flin_add.length2() > 0.0);
 		}
 	}
 
@@ -878,6 +900,26 @@ bool SuperVessel::CheckSurfaceContact () const
 }
 
 // =======================================================================
+
+void SuperVessel::RestoreLandedState(Planet& planet)
+{
+	// Scenario docking rebuilds a stack that is already standing on the surface.
+	// Derive its surface pose from the assembled center of gravity and orientation.
+	double lng, lat, radius;
+	planet.GlobalToEquatorial(s0->pos, lng, lat, radius);
+	proxybody = &planet;
+	const double heading = LandedHeading(lng, lat);
+	const double altitude = radius - planet.Size() - planet.Elevation(lng, lat);
+	Matrix localRotation(s0->R);
+	localRotation.tpremul(planet.GRot());
+	InitLanded(&planet, lng, lat, heading, &localRotation, altitude);
+
+	rpos_base = s0->pos;
+	rpos_add.Set(0,0,0);
+	rvel_base = s0->vel;
+	rvel_add.Set(0,0,0);
+	UpdateSurfParams();
+}
 
 void SuperVessel::InitLanded (Planet *planet, double lng, double lat, double dir, const Matrix *hrot, double cgelev, bool asComponent)
 {
