@@ -380,7 +380,8 @@ void BeginCockpitGuiFrame() {
     for(const auto& failure:PollNativeHelp())oapiAddNotification(OAPINOTIF_ERROR,"Orbiter Help",failure.c_str());
     ImGui::NewFrame();
     const auto& context = GetNativeRenderContext();
-    if (context.configuration->CfgUIPrm.MouseFocusMode != 0 && !ImGui::GetIO().WantCaptureMouse)
+    if (context.configuration->CfgUIPrm.MouseFocusMode != 0 && !ImGui::GetIO().WantCaptureMouse &&
+        !inputBox->IsActive() && !selection->IsActive())
         ImGui::SetWindowFocus(static_cast<const char*>(nullptr));
     if (selection->IsActive()) selection->Display();
     if (inputBox->IsActive()) inputBox->Display();

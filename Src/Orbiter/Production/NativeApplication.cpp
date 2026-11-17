@@ -232,6 +232,7 @@ bool SupportedApolloVessel(Vessel& body,const char* type) {
            (classname=="projectapollo/sat5flag" && moduleName=="projectapollo/flag") ||
            (classname=="projectapollo/floodlight" && moduleName=="projectapollo/floodlight") ||
            (classname=="projectapollo/crawler" && moduleName=="projectapollo/crawler") ||
+           (classname=="projectapollo/lcc" && moduleName=="projectapollo/lcc") ||
            ((classname=="projectapollo/ml" || classname=="projectapollo/ml_saturnib") &&
              moduleName=="projectapollo/ml") ||
            (classname=="projectapollo/skylab" && moduleName=="projectapollo/skylab") ||
