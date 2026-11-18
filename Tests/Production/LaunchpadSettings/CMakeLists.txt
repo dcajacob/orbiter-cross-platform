@@ -3,7 +3,7 @@ project(LaunchpadSettingsCheck LANGUAGES CXX)
 find_package(Qt6 6.4 REQUIRED COMPONENTS Widgets Test)
 set(launchpad "${CMAKE_CURRENT_SOURCE_DIR}/../../../Utils/Launchpad")
 set(CMAKE_AUTOMOC ON)
-add_executable(check-settings check.cpp "${launchpad}/FlightSettings.cpp"
+add_executable(check-settings check.cpp "${launchpad}/FlightSettings.cpp" "${launchpad}/ExtraPage.cpp"
     "${launchpad}/ModulesPage.cpp" "${launchpad}/SimulatorProfile.cpp")
 target_include_directories(check-settings PRIVATE "${launchpad}")
 target_compile_features(check-settings PRIVATE cxx_std_17)

@@ -19,6 +19,8 @@ public:
     bool ContainsDirectory(const std::string& relative) const;
     const std::filesystem::path& Root() const { return root; }
     std::size_t FileCount() const { return files.size(); }
+    // Select an installed sibling variant in this process's index. An empty source hides the entry.
+    void SelectVariant(const std::string& target,const std::string& source);
     static std::string Normalize(const std::string& relative);
 private:
     std::filesystem::path root;

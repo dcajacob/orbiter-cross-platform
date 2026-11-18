@@ -186,8 +186,8 @@ protected:
 	// Behaviour flags
 	bool bDynamicGroundContact;  // use dynamic model for ground contact forces
 
-	mutable bool update_with_collision;   // include surface contact forces in dynamic update
-	mutable bool collision_during_update; // surface contact during current step update?
+	mutable bool update_with_collision = false;   // include surface contact forces in dynamic update
+	mutable bool collision_during_update = false; // surface contact during current step update?
 	mutable bool collision_speed_checked; // checked for valid speed during impact?
 
 	// Status flags

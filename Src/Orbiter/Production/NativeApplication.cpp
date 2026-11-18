@@ -69,10 +69,44 @@ using namespace orbiter::production;
 namespace {
 struct Resources {
     ResourceResolver program,config,data,modules,textures,highTextures,planets,meshFiles;
+    std::filesystem::path masterConfig;
     Resources(const std::filesystem::path& assets,const std::filesystem::path& celestial,
-        const std::filesystem::path& plugins,const std::filesystem::path& planetary)
+        const std::filesystem::path& plugins,const std::filesystem::path& planetary,
+        const std::filesystem::path& master)
         :program(assets),config(assets/"Config"),data(celestial),modules(plugins),textures(assets/"Textures"),
-        highTextures(assets/"Textures2"),planets(planetary/"Textures"),meshFiles(assets/"Meshes") {}
+        highTextures(assets/"Textures2"),planets(planetary/"Textures"),meshFiles(assets/"Meshes"),masterConfig(master)
+    {
+        std::ifstream file(master);
+        for (std::string vessel : {"DG","Atlantis"}) {
+            bool high;
+            if (!GetItemBool(file,("Native"+vessel+"HighResTextures").c_str(),high)) continue;
+            if (!high) highTextures.SelectVariant(vessel,"");
+            else if (!highTextures.ContainsDirectory(vessel) && highTextures.ContainsDirectory("~"+vessel))
+                highTextures.SelectVariant(vessel,"~"+vessel);
+        }
+        bool high;
+        if (GetItemBool(file,"NativeAtlantisHighResCockpit",high)) {
+            const std::string variant = high ? "Atlantis/~AtlantisVC_hi.msh" : "Atlantis/~AtlantisVC_lo.msh";
+            if (meshFiles.Contains(variant)) meshFiles.SelectVariant("Atlantis/AtlantisVC.msh",variant);
+        }
+    }
+};
+class FlightCelestialServices final : public NativeCelestialServices {
+public:
+    explicit FlightCelestialServices(const Resources& r)
+        : NativeCelestialServices(r.config,r.data,r.modules),master(r.masterConfig) {}
+    std::string AtmosphereSelection(const CelestialBody& body,std::ifstream& original) const override {
+        std::ifstream file(master);
+        char name[512];
+        if (GetItemString(file,("NativeAtmosphere_"+std::string(body.Name())).c_str(),name)) {
+            const std::string model=trim_string(name);
+            if (model=="[None]") return {};
+            if (model!="DEFAULT") return model;
+        }
+        return NativeCelestialServices::AtmosphereSelection(body,original);
+    }
+private:
+    const std::filesystem::path& master;
 };
 [[noreturn]] void unsupported(const char* text) {throw std::runtime_error(std::string("Native production external view does not support ")+text);}
 double RcsLevel(const VESSEL& vessel) {
@@ -240,7 +274,7 @@ struct Runtime final:BodyServices,RigidBodyServices,SurfaceServices,NavigationSe
 {
     Resources& resources;const ResourceResolver& config;Config settings;TimeData time;CFG_PHYSICSPRM physics{};
     PlanetarySystem* system=nullptr;NativeRenderContext render;bool updating=false,force=true,running=false,playback=false,active=true;
-    MeshManager meshes;NativeCelestialServices celestial;std::unique_ptr<NativeElevationServices> terrain;
+    MeshManager meshes;FlightCelestialServices celestial;std::unique_ptr<NativeElevationServices> terrain;
     std::unique_ptr<WorldVesselServices> vessels;WorldOwner world;std::unique_ptr<NativeModule> graphicsModule;
     std::ofstream lifecycle,trace,flightTrace,inputTrace,inputEvents,thrustTrace,animationTrace,controlTrace,mathTrace,contactTrace;
     unsigned pendingCockpitRedraw=0,inputTick=0,completedTicks=0,observationTick=0;
@@ -726,7 +760,7 @@ struct Runtime final:BodyServices,RigidBodyServices,SurfaceServices,NavigationSe
         for(unsigned char key:input.keys)inputTrace<<hex[key>>4]<<hex[key&15];
         inputTrace<<','<<input.x<<','<<input.y<<','<<input.rz<<','<<input.alternate<<','<<input.throttle<<'\n';
     }
-    Runtime(Resources& data):resources(data),config(data.config),celestial(config,data.data,data.modules),world(*this) {}
+    Runtime(Resources& data):resources(data),config(data.config),celestial(data),world(*this) {}
     void StartSound(const std::filesystem::path& assets)
     {
         soundAssets = std::make_unique<ResourceResolver>(assets);
@@ -760,6 +794,20 @@ struct Runtime final:BodyServices,RigidBodyServices,SurfaceServices,NavigationSe
                 file<<"\nNativeJoystickThrottleAxis = "<<render.joystickThrottleAxis
                     <<"\nNativeJoystickRudderAxis = "<<render.joystickTwistAxis
                     <<"\nNativeJoystickThrottleInverted = "<<(render.joystickThrottleInverted ? "TRUE" : "FALSE")<<'\n';
+                // Config::Write handles the portable settings. Carry the profile's stock
+                // asset selections through an in-flight Options save as well.
+                std::ifstream input(optionsPath);
+                input.exceptions(std::ios::badbit);
+                if (!input) throw std::runtime_error("Cannot read existing flight settings");
+                std::string line;
+                while (std::getline(input,line)) {
+                    const auto end=line.find_first_of(" =\t");
+                    const auto key=line.substr(0,end);
+                    if (key.rfind("NativeAtmosphere_",0)==0 || key=="NativeDGHighResTextures" ||
+                        key=="NativeAtlantisHighResTextures" || key=="NativeAtlantisHighResCockpit")
+                        file<<line<<'\n';
+                }
+                input.close();
                 file.close();std::filesystem::rename(temporary,optionsPath);
             } catch(const std::exception& error) {
                 std::error_code ignored;std::filesystem::remove(temporary,ignored);
@@ -1438,7 +1486,7 @@ int main(int argc,char** argv) {
         // Frozen external-view flights have no graphics draws in the CRT stream.
         ConfigureRendererRandom(false,0);
 #endif
-        Resources resources(absolute("--assets"),absolute("--data"),absolute("--modules"),absolute("--planets"));
+        Resources resources(absolute("--assets"),absolute("--data"),absolute("--modules"),absolute("--planets"),absolute("--config"));
         std::filesystem::path scenario=absolute("--scenario");
         const auto evidence=arguments.count("--evidence")?absolute("--evidence"):std::filesystem::path{};
         std::filesystem::path save;

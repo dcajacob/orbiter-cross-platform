@@ -48,6 +48,28 @@ the profile's `--xrsound-assets` launch option. Launchpad remembers its checkbox
 per user and simulator configuration. Existing profiles with sound assets start
 with audio enabled.
 
+On Linux native profiles, open **Flight settings… → Extra** and choose a category.
+
+| Category | Settings |
+| --- | --- |
+| Dynamic state propagators | Choose one to five stages, the Runge–Kutta or symplectic method per stage, time and angle targets, stage transition limits, and the maximum number of substeps. Angles are shown in degrees. |
+| Orbit stabilisation | Enable Encke integration and set the perturbing-gravity and orbital step thresholds as percentages. |
+| Cockpit displays (MFDs) | Choose automatic, exact, or power-of-two sizing for 2D displays, the threshold for switching from 256 to 512 pixels, and 256, 512 or 1024 pixels for virtual cockpit displays. |
+| Planet atmospheres | Choose an installed atmosphere module per planet, use the installation default, or disable the module. Orbiter can still use atmospheric parameters supplied by the planet configuration. |
+| Vessel graphics | Select standard or high-resolution Delta-glider and Atlantis textures and the Atlantis cockpit mesh when the corresponding stock assets are installed. |
+
+**Save** applies the choices to subsequent flights using this configuration.
+The atmosphere and vessel graphics overrides live in the profile's
+`Orbiter.cfg`. **Installation default** uses the stock data selection. The
+simulator resolves alternate assets in memory, so profiles can share an installation.
+
+The classic perturbation subsampling and nonspherical suppression limits have
+no consumers in the current flight dynamics. The native flight clock takes a
+simulation tick interval on the command line. Classic fixed time per rendered
+frame, Windows shutdown and logging options, GDI font controls, Direct3D
+debug settings, and plug-ins with Win32 configuration dialogs are outside
+this page.
+
 ### Coverage of the classic Windows launcher
 
 | Classic page | Qt Launchpad |
@@ -56,7 +78,7 @@ with audio enabled.
 | Options | Fuel and cockpit instrument settings before flight, plus the Linux joystick setup wizard. The remaining classic option categories are open. |
 | Modules | Installed plug-in list and startup selection. Native profiles identify automatic dependencies and unsupported plug-ins. Windows graphics clients are listed separately from selectable plug-ins. |
 | Video | Native window width, height, and the three classic fixed aspect ratios. Linux also supports fullscreen at desktop resolution and a VSync toggle. |
-| Extra | The classic launcher hosts add-on and advanced configuration pages. Qt support for those pages is open. |
+| Extra | Linux native physics, orbit stabilisation, MFD resolution, installed atmosphere models and stock vessel graphics. |
 | About | The classic About and credits page is open. |
 
 Windows users can access the original pages through **Setup → Open classic

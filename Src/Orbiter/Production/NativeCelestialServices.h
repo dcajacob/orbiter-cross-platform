@@ -8,7 +8,7 @@
 namespace orbiter::production {
 // Loads real, same-build celestial and atmosphere modules. The owning production
 // world must destroy its bodies before releasing these services/resource roots.
-class ORBITER_PRODUCTION_API NativeCelestialServices final : public CelestialServices,public native::CelestialHost {
+class ORBITER_PRODUCTION_API NativeCelestialServices : public CelestialServices,public native::CelestialHost {
 public:
     NativeCelestialServices(const ResourceResolver& config,const ResourceResolver& data,const ResourceResolver& modules);
     NativeCelestialServices(const NativeCelestialServices&)=delete;

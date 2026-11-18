@@ -54,6 +54,34 @@ ResourceResolver::ResourceResolver(const fs::path& directory)
     }
 }
 
+void ResourceResolver::SelectVariant(const std::string& target,const std::string& source)
+{
+    const auto key = Normalize(target);
+    const auto from = source.empty() ? std::string{} : Normalize(source);
+    if (key == from) return;
+    if (!from.empty() && !files.count(from) && !directories.count(from))
+        throw std::runtime_error("Missing resource variant: " + source);
+    // Both trees are siblings. Keep their original paths for opening the files.
+    if (!from.empty() && fs::path(key).parent_path() != fs::path(from).parent_path())
+        throw std::invalid_argument("Expected sibling resource variants");
+    auto select = [&](auto& index) {
+        index.erase(key);
+        const auto prefix = key + "/";
+        auto it = index.lower_bound(prefix);
+        while (it != index.end() && it->first.compare(0,prefix.size(),prefix) == 0)
+            it = index.erase(it);
+        if (from.empty()) return;
+        auto entry = index.find(from);
+        if (entry != index.end()) index.emplace(key,entry->second);
+        const auto sourcePrefix = from + "/";
+        for (it = index.lower_bound(sourcePrefix); it != index.end() &&
+             it->first.compare(0,sourcePrefix.size(),sourcePrefix) == 0; ++it)
+            index.emplace(key + it->first.substr(from.size()),it->second);
+    };
+    select(files);
+    select(directories);
+}
+
 fs::path ResourceResolver::Resolve(const std::string& relative) const
 {
     const auto found = files.find(Normalize(relative));

@@ -13,6 +13,7 @@
 #include <QPushButton>
 #include <QScopeGuard>
 #include <QSettings>
+#include <QSpinBox>
 #include <QTabWidget>
 #include <QTemporaryDir>
 #include <QTest>
@@ -38,6 +39,92 @@ class FlightSettingsCheck : public QObject {
     Q_OBJECT
 private slots:
 #ifdef Q_OS_LINUX
+    void extraSettings()
+    {
+        QTemporaryDir dir;
+        SimulatorProfile profile;
+        profile.native = true;
+        profile.config = dir.filePath("Orbiter.cfg");
+        profile.assets = dir.filePath("Stock");
+        profile.modules = dir.filePath("Modules");
+        QDir().mkpath(profile.assets + "/Textures2/DG");
+        QDir().mkpath(profile.modules + "/Celbody/Earth/Atmosphere");
+        writeFile(profile.modules + "/Celbody/Earth/Atmosphere/EarthAtm2006.so");
+        const QByteArray original = "PropStage0 = 0 0.1 0.0034906585039886587 0.5 0.0174532925199433 ; keep\r\n"
+                                    "StabilisePLimit = 0.05\r\nForceMfdPow2 = AUTO\r\nFixedStep = 1\r\n";
+        writeFile(profile.config, original);
+        for (int pass = 0; pass < 3; ++pass) {
+            QTimer::singleShot(0, [&] {
+                auto *dialog = qobject_cast<QDialog *>(QApplication::activeModalWidget());
+                const auto closeOnFailure = qScopeGuard([&] { if (dialog->isVisible()) dialog->reject(); });
+                auto *count = dialog->findChild<QSpinBox *>("PropStages");
+                auto *method = dialog->findChild<QComboBox *>("PropStage0Method");
+                auto *percent = dialog->findChild<QDoubleSpinBox *>("StabilisePLimit");
+                auto *resolution = dialog->findChild<QComboBox *>("ForceMfdPow2");
+                auto *atmosphere = dialog->findChild<QComboBox *>("NativeAtmosphere_Earth");
+                auto *texture = dialog->findChild<QComboBox *>("NativeDGHighResTextures");
+                QVERIFY(count && method && percent && resolution && atmosphere && texture);
+                QCOMPARE(count->value(), pass == 2 ? 1 : 4);
+                QCOMPARE(method->currentText(), pass == 2 ? "RK7" : "RK2");
+                QCOMPARE(percent->value(), pass == 2 ? 2.5 : 5.0);
+                QCOMPARE(atmosphere->currentData().toString(), pass == 2 ? "EarthAtm2006" : "DEFAULT");
+                QCOMPARE(texture->currentData().toString(), pass == 2 ? "FALSE" : "DEFAULT");
+                auto *threshold = dialog->findChild<QSpinBox *>("MfdHiresThreshold");
+                QCOMPARE(threshold->isEnabled(), pass == 2);
+                count->setValue(1);
+                method->setCurrentText("RK7");
+                percent->setValue(2.5);
+                resolution->setCurrentIndex(resolution->findData("TRUE"));
+                atmosphere->setCurrentIndex(atmosphere->findData("EarthAtm2006"));
+                texture->setCurrentIndex(texture->findData("FALSE"));
+                auto *buttons = dialog->findChild<QDialogButtonBox *>();
+                buttons->button(pass ? QDialogButtonBox::Save : QDialogButtonBox::Cancel)->click();
+            });
+            showFlightSettings(nullptr, profile);
+            QFile cfg(profile.config);
+            QVERIFY(cfg.open(QIODevice::ReadOnly));
+            const auto bytes = cfg.readAll();
+            if (pass == 0) QCOMPARE(bytes, original);
+            else {
+                QVERIFY(bytes.contains("PropStage0 = 4 0.1 0.0034906585039886587 0.5 0.0174532925199433 ; keep\r\n"));
+                QVERIFY(bytes.contains("StabilisePLimit = 0.025\r\n"));
+                QVERIFY(bytes.contains("FixedStep = 1\r\n"));
+                QVERIFY(!bytes.contains("PropStage1"));
+            }
+        }
+    }
+
+    void extraStageLimits()
+    {
+        QTemporaryDir dir;
+        SimulatorProfile profile;
+        profile.native = true;
+        profile.config = dir.filePath("Orbiter.cfg");
+        writeFile(profile.config, "PropStages = 3\n");
+        for (bool concurrent : {false, true}) {
+            QString warning;
+            QTimer::singleShot(0, [&] {
+                auto *d = qobject_cast<QDialog *>(QApplication::activeModalWidget());
+                auto *limit = d->findChild<QDoubleSpinBox *>("PropStage0Field2");
+                limit->setValue(concurrent ? 0.6 : 10);
+                if (concurrent) writeFile(profile.config, "PropStages = 2\n");
+                QTimer::singleShot(0, [&] {
+                    if (auto *msg = qobject_cast<QMessageBox *>(QApplication::activeModalWidget())) {
+                        warning = msg->text();
+                        msg->accept();
+                    }
+                });
+                d->findChild<QDialogButtonBox *>()->button(QDialogButtonBox::Save)->click();
+                d->reject();
+            });
+            showFlightSettings(nullptr, profile);
+            QVERIFY2(warning.contains(concurrent ? "PropStages" : "stage 2"), qPrintable(warning));
+            QFile file(profile.config);
+            QVERIFY(file.open(QIODevice::ReadOnly));
+            QCOMPARE(file.readAll(), concurrent ? "PropStages = 2\n" : "PropStages = 3\n");
+        }
+    }
+
     void linuxDisplayModes()
     {
         QTemporaryDir dir;

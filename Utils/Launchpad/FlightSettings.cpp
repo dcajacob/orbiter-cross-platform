@@ -1,7 +1,9 @@
 #include "FlightSettings.h"
+#include "ExtraPage.h"
 #include "ModulesPage.h"
 #include "SimulatorProfile.h"
 
+#include <algorithm>
 #include <QCheckBox>
 #include <QComboBox>
 #include <QDialog>
@@ -25,11 +27,18 @@ namespace {
 // so comments, CRLF, and unedited keys survive the rewrite.
 QRegularExpressionMatch assignment(const QString &text, const QString &key)
 {
-    return QRegularExpression("^" + key + "[ \\t]*=[ \\t]*([^;\\r\\n]*?)[ \\t]*(?=;|\\r?$)",
+    return QRegularExpression("^" + QRegularExpression::escape(key) + "[ \\t]*=[ \\t]*([^;\\r\\n]*?)[ \\t]*(?=;|\\r?$)",
                               QRegularExpression::MultilineOption).match(text);
 }
 
 using Values = QMap<QString, QString>;
+
+bool stagesChanged(const Values &before, const Values &after)
+{
+    return std::any_of(after.keyValueBegin(), after.keyValueEnd(), [&](const auto &entry) {
+        return entry.first.startsWith("PropStage") && entry.second != before.value(entry.first);
+    });
+}
 
 QComboBox *addAspectRatio(QFormLayout *form, QDoubleSpinBox *width, QDoubleSpinBox *height)
 {
@@ -90,9 +99,10 @@ QString saveChanges(const QString &path, const QString &original, const Values &
     const auto newline = text.contains("\r\n") ? "\r\n" : "\n";
     const bool checkBothDimensions = linkedSize && (before.value("WindowWidth") != after.value("WindowWidth")
         || before.value("WindowHeight") != after.value("WindowHeight"));
+    const bool checkStages = stagesChanged(before, after);
     for (auto it = after.cbegin(); it != after.cend(); ++it) {
         const bool changed = it.value() != before.value(it.key());
-        if (!changed && !(checkBothDimensions && (it.key() == "WindowWidth" || it.key() == "WindowHeight")))
+        if (!changed && !(checkStages && it.key().startsWith("PropStage")) && !(checkBothDimensions && (it.key() == "WindowWidth" || it.key() == "WindowHeight")))
             continue;
         const auto old = assignment(original, it.key());
         const auto current = assignment(text, it.key());
@@ -158,6 +168,7 @@ void showFlightSettings(QWidget *parent, const SimulatorProfile &profile)
     auto *form = new QFormLayout(options);
     tabs->addTab(options, QObject::tr("Options"));
 
+    QList<QDoubleSpinBox *> numericFields;
     auto addNumber = [&](QFormLayout *page, const QString &key, const QString &label,
                          double fallback, double low, double high, int decimals, const QString &suffix = {}) {
         auto *field = new QDoubleSpinBox;
@@ -169,6 +180,7 @@ void showFlightSettings(QWidget *parent, const SimulatorProfile &profile)
         bool ok;
         const double value = assignment(original, key).captured(1).toDouble(&ok);
         field->setValue(ok ? value : fallback);
+        numericFields.append(field);
         page->addRow(label, field);
         return field;
     };
@@ -217,14 +229,21 @@ void showFlightSettings(QWidget *parent, const SimulatorProfile &profile)
     auto *modules = new ModulesPage(profile, original);
     tabs->addTab(modules, QObject::tr("Modules"));
 
+    ExtraPage *extra = nullptr;
+#ifdef Q_OS_LINUX
+    if (profile.native) {
+        extra = new ExtraPage(profile, [&](const QString &key) { return assignment(original, key).captured(1); });
+        tabs->addTab(extra, QObject::tr("Extra"));
+    }
+#endif
     auto values = [&] {
-        Values result;
+        Values result = extra ? extra->values() : Values{};
         result.insert("UnlimitedFuel", limitedFuel->isChecked() ? "FALSE" : "TRUE");
         if (fullscreen) {
             result.insert("Fullscreen", fullscreen->isChecked() ? "TRUE" : "FALSE");
             result.insert("NoVSync", vsync->isChecked() ? "FALSE" : "TRUE");
         }
-        for (auto *field : tabs->findChildren<QDoubleSpinBox *>())
+        for (auto *field : numericFields)
             result.insert(field->objectName(), QString::number(field->value(), 'f', field->decimals()));
         return result;
     };
@@ -233,7 +252,15 @@ void showFlightSettings(QWidget *parent, const SimulatorProfile &profile)
     layout->addWidget(buttons);
     QObject::connect(buttons, &QDialogButtonBox::rejected, &dialog, &QDialog::reject);
     QObject::connect(buttons, &QDialogButtonBox::accepted, &dialog, [&] {
-        const auto error = saveChanges(path, original, before, values(), *modules, profile,
+        const auto after = values();
+        if (extra && stagesChanged(before, after)) {
+            const auto error = extra->propagationError();
+            if (!error.isEmpty()) {
+                QMessageBox::warning(&dialog, dialog.windowTitle(), error);
+                return;
+            }
+        }
+        const auto error = saveChanges(path, original, before, after, *modules, profile,
                                       aspectRatio && aspectRatio->currentData().isValid());
         if (error.isEmpty())
             dialog.accept();
