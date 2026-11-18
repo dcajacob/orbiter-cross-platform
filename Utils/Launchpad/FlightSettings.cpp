@@ -1,4 +1,5 @@
 #include "FlightSettings.h"
+#include "ModulesPage.h"
 #include "SimulatorProfile.h"
 
 #include <QCheckBox>
@@ -27,13 +28,18 @@ QRegularExpressionMatch assignment(const QString &text, const QString &key)
 
 using Values = QMap<QString, QString>;
 
-QString saveChanges(const QString &path, const QString &original, const Values &before, const Values &after)
+QString saveChanges(const QString &path, const QString &original, const Values &before, const Values &after,
+                    const ModulesPage &modules, const SimulatorProfile &profile)
 {
-    if (before == after)
+    const auto moduleChanges = modules.startupChanges();
+    const bool configChanged = before != after || !moduleChanges.isEmpty();
+    if (!configChanged && !modules.soundChanged())
         return {};
     QLockFile lock(path + ".launchpad.lock");
     if (!lock.tryLock(0))
         return QObject::tr("Could not lock the configuration for writing: %1").arg(path);
+    if (!configChanged)
+        return profile.setLaunchWithSound(modules.soundChecked());
     QFile input(path);
     if (!QFileInfo(input).isWritable() || !input.open(QIODevice::ReadOnly))
         return QObject::tr("Cannot edit the configuration: %1").arg(path);
@@ -54,10 +60,28 @@ QString saveChanges(const QString &path, const QString &original, const Values &
         else
             text.prepend(it.key() + " = " + it.value() + newline);
     }
+    const auto moduleError = ModulesPage::applyStartupChanges(text, moduleChanges);
+    if (!moduleError.isEmpty())
+        return moduleError;
     QSaveFile output(path);
     const auto bytes = text.toLatin1();
-    if (!output.open(QIODevice::WriteOnly) || output.write(bytes) != bytes.size() || !output.commit())
+    if (!output.open(QIODevice::WriteOnly) || output.write(bytes) != bytes.size())
         return output.errorString();
+    // Stage the config before saving the separate Launchpad audio preference.
+    const bool previousSound = profile.launchWithSound();
+    if (modules.soundChanged()) {
+        const auto error = profile.setLaunchWithSound(modules.soundChecked());
+        if (!error.isEmpty())
+            return error;
+    }
+    if (!output.commit()) {
+        if (modules.soundChanged()) {
+            const auto error = profile.setLaunchWithSound(previousSound);
+            if (!error.isEmpty())
+                return output.errorString() + "\n" + error;
+        }
+        return output.errorString();
+    }
     return {};
 }
 }
@@ -117,6 +141,9 @@ void showFlightSettings(QWidget *parent, const SimulatorProfile &profile)
         addNumber(videoForm, "WindowHeight", QObject::tr("Window height"), 720, 200, 16384, 0, QObject::tr(" px"));
     }
 
+    auto *modules = new ModulesPage(profile, original);
+    tabs->addTab(modules, QObject::tr("Modules"));
+
     auto values = [&] {
         Values result;
         result.insert("UnlimitedFuel", limitedFuel->isChecked() ? "FALSE" : "TRUE");
@@ -129,7 +156,7 @@ void showFlightSettings(QWidget *parent, const SimulatorProfile &profile)
     layout->addWidget(buttons);
     QObject::connect(buttons, &QDialogButtonBox::rejected, &dialog, &QDialog::reject);
     QObject::connect(buttons, &QDialogButtonBox::accepted, &dialog, [&] {
-        const auto error = saveChanges(path, original, before, values());
+        const auto error = saveChanges(path, original, before, values(), *modules, profile);
         if (error.isEmpty())
             dialog.accept();
         else

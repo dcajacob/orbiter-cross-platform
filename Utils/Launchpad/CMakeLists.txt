@@ -7,6 +7,7 @@ qt_add_executable(orbiter-launchpad WIN32 MACOSX_BUNDLE
     main.cpp
     Launchpad.cpp
     FlightSettings.cpp
+    ModulesPage.cpp
     ScenarioEditor.cpp
     SimulatorProfile.cpp)
 target_compile_features(orbiter-launchpad PRIVATE cxx_std_17)

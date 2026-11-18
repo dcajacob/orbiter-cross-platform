@@ -242,7 +242,12 @@ Launchpad::Launchpad(const QString &profilePath)
     header->addStretch();
     flightSettings = new QPushButton(tr("Flight settings…"));
     flightSettings->setObjectName("flightSettingsButton");
-    connect(flightSettings, &QPushButton::clicked, this, [this] { showFlightSettings(this, profile); });
+    connect(flightSettings, &QPushButton::clicked, this, [this] {
+        showFlightSettings(this, profile);
+        showSelection();
+        const auto error = profile.validationError();
+        status->setText(error.isEmpty() ? QFileInfo(profile.executable).fileName() : error);
+    });
     header->addWidget(flightSettings);
     auto *setup = new QPushButton(tr("Setup"));
     auto *setupMenu = new QMenu(setup);

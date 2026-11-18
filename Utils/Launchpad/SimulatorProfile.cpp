@@ -6,7 +6,9 @@
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QRegularExpression>
+#include <QSettings>
 #include <QStandardPaths>
+#include <QUrl>
 
 #include <stdexcept>
 
@@ -14,6 +16,12 @@ namespace {
 QString absolutePath(const QDir &base, const QString &path)
 {
     return path.isEmpty() ? QString() : QDir::cleanPath(base.absoluteFilePath(path));
+}
+
+QString soundPreferenceKey(const QString &config)
+{
+    const auto path = QFileInfo(config).canonicalFilePath();
+    return "simulator/modules/" + QUrl::toPercentEncoding(path) + "/xrsound";
 }
 }
 
@@ -90,6 +98,19 @@ SimulatorProfile SimulatorProfile::fromWindowsExecutable(const QString &path)
     return profile;
 }
 
+bool SimulatorProfile::launchWithSound() const
+{
+    return native && !xrsoundAssets.isEmpty() && QSettings().value(soundPreferenceKey(config), true).toBool();
+}
+
+QString SimulatorProfile::setLaunchWithSound(bool enabled) const
+{
+    QSettings settings;
+    settings.setValue(soundPreferenceKey(config), enabled);
+    settings.sync();
+    return settings.status() == QSettings::NoError ? QString() : QObject::tr("Could not save the XRSound preference.");
+}
+
 QString SimulatorProfile::validationError() const
 {
     if (!configured)
@@ -111,7 +132,7 @@ QString SimulatorProfile::validationError() const
             return QObject::tr("Simulator configuration missing: %1").arg(config);
         if (!keymap.isEmpty() && !QFileInfo(keymap).isFile())
             return QObject::tr("Keyboard map missing: %1").arg(keymap);
-        if (!xrsoundAssets.isEmpty() && !QFileInfo(QDir(xrsoundAssets).filePath("XRSound/XRSound.cfg")).isFile())
+        if (launchWithSound() && !QFileInfo(QDir(xrsoundAssets).filePath("XRSound/XRSound.cfg")).isFile())
             return QObject::tr("XRSound configuration missing in %1").arg(xrsoundAssets);
     }
     return {};
@@ -130,7 +151,7 @@ QStringList SimulatorProfile::arguments(const QString &scenario, bool startPause
                        "--save", QDir(saveRoot).filePath("Quicksave.scn")};
     if (!keymap.isEmpty())
         result << "--keymap" << keymap;
-    if (!xrsoundAssets.isEmpty())
+    if (launchWithSound())
         result << "--xrsound-assets" << xrsoundAssets;
     if (!startPaused)
         result << "--run";

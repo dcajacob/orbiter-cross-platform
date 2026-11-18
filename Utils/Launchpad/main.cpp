@@ -17,6 +17,9 @@ int main(int argc, char **argv)
         QDialog#flightSettings QTabBar::tab { background: #21354a; padding: 6px 14px; }
         QDialog#flightSettings QTabBar::tab:selected { background: #2d5475; }
         QDialog#flightSettings QDoubleSpinBox { background: #101925; padding: 4px; }
+        QTreeWidget#moduleList QHeaderView::section {
+            background: #21354a; color: #e5edf6; padding: 4px 6px; border: 0;
+        }
         QWidget { color: #e5edf6; font-size: 14px; }
         QLabel#heading { font-size: 28px; font-weight: 600; }
         QLabel#scenarioTitle { font-size: 24px; font-weight: 600; margin: 2px 0; }

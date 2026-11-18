@@ -25,5 +25,7 @@ struct SimulatorProfile {
     static SimulatorProfile load(const QString &profilePath);
     static SimulatorProfile fromWindowsExecutable(const QString &path);
     QString validationError() const;
+    bool launchWithSound() const;
+    QString setLaunchWithSound(bool enabled) const;
     QStringList arguments(const QString &scenario, bool startPaused) const;
 };

@@ -17,13 +17,25 @@ the requested render-window width and height in pixels. **Save** updates
 the active simulator configuration. Reopen the dialog to see the current
 values, including settings changed in flight.
 
+Open **Flight settings… → Modules** to see the plug-ins installed for the
+selected simulator. Check the ones you want and click **Save** before launching.
+On Linux, **LuaMFD** adds the Lua Terminal MFD and **XRSound** enables spacecraft
+audio when the profile includes its sound assets. LuaInline and LuaInterpreter
+load automatically when a script needs them. Other native plug-ins are listed
+with their availability. The Windows simulator uses its classic startup list.
+
+Startup selections are saved in the active `Orbiter.cfg`. Native XRSound uses
+the profile's `--xrsound-assets` launch option. Launchpad remembers its checkbox
+per user and simulator configuration. Existing profiles with sound assets start
+with audio enabled.
+
 ### Coverage of the classic Windows launcher
 
 | Classic page | Qt Launchpad |
 | --- | --- |
 | Scenarios | Scenario tree, search, descriptions and screenshots, launch and return. Native profiles also support start paused, saved flights, and copying a scenario. Classic quicksave management and contextual help are still missing. |
 | Options | Fuel and cockpit instrument settings before flight, plus the Linux joystick setup wizard. The remaining classic option categories are open. |
-| Modules | Enabling and disabling optional plug-ins from the launcher is open. |
+| Modules | Installed plug-in list and startup selection. Native profiles identify automatic dependencies and unsupported plug-ins. Windows graphics clients are listed separately from selectable plug-ins. |
 | Video | Native render-window dimensions are editable. Graphics-client selection and client-specific display controls are open. |
 | Extra | The classic launcher hosts add-on and advanced configuration pages. Qt support for those pages is open. |
 | About | The classic About and credits page is open. |
