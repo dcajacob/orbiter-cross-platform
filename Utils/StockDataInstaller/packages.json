@@ -24,5 +24,29 @@
     "source": "61baf018bbdc6a4e79e0a3d4b9d88baa40e62d92",
     "artifact": 14142454682,
     "artifact_sha256": "86f8abffb24a55c9fa35a7986346a64bce64a2f707409b23c4f1c9837333f91e"
+  },
+  "Orbiter-macos-arm64-72b1741e.tar.gz": {
+    "sha256": "6a847a1fa2cfe8d20d89bc4e8a87066622b51f85d0502b0d0b9ee8da62cb74e8",
+    "platform": "macos",
+    "source": "72b1741ea59ebe9266ade3ae8f678d0dab5a9835",
+    "artifact": 14402118210,
+    "artifact_sha256": "7336ecc159365df61e21433231e21b0a32d76af42dfd1e4e8e57e394ab143b43",
+    "archive_member": "Orbiter-macos-arm64.tar.gz"
+  },
+  "Orbiter-macos-x86_64-72b1741e.tar.gz": {
+    "sha256": "5ffc2ac98ccac0c5a31d54d9183d4994ef31d4dd298d9f87489f5f5e571205b2",
+    "platform": "macos",
+    "source": "72b1741ea59ebe9266ade3ae8f678d0dab5a9835",
+    "artifact": 14402557297,
+    "artifact_sha256": "b365133b84441289a4932877a2eb49c651cc30f3e74f08057556f18dea57e736",
+    "archive_member": "Orbiter-macos-x86_64.tar.gz"
+  },
+  "Orbiter-windows-x64-72b1741e.zip": {
+    "sha256": "53d37b745efb3c5f2d98a443e3b9b9e45a544087ae3faacd367c31a4a3eee9eb",
+    "platform": "windows",
+    "source": "72b1741ea59ebe9266ade3ae8f678d0dab5a9835",
+    "artifact": 14401993380,
+    "artifact_sha256": "9d97d04c2608b69caf5c042c0e353a15f05d117186456b03c54796727e993715",
+    "archive_member": "Orbiter-windows-x64.zip"
   }
 }

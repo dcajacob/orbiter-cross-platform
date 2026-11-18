@@ -1,7 +1,7 @@
 name: Orbiter Phase 8 stock data installer
 on:
   push:
-    branches: [qualification/phase8-stock-installer-v1]
+    branches: [qualification/phase8-stock-installer-v1, qualification/phase8-install-review-v1]
     paths: [.github/workflows/phase8-stock-installer.yml, Utils/StockDataInstaller/**, Tests/Production/StockInstaller/**]
 
 permissions:
@@ -29,6 +29,7 @@ jobs:
         with:
           path: out/cache/Orbiter2016.zip
           key: production-standard-planets-${{ hashFiles('Tests/Production/standard-planets.lock.json') }}
+      - run: python -B -m unittest discover -s Tests/Production/StockInstaller -p 'test_*.py'
       - name: Assemble and verify the installer's original resources
         run: |
           test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
@@ -59,7 +60,7 @@ jobs:
           - runner: macos-15
             arch: arm64
     env:
-      ORBITER_PACKAGE: Orbiter-macos-${{ matrix.arch }}.tar.gz
+      ORBITER_PACKAGE: Orbiter-macos-${{ matrix.arch }}-72b1741e.tar.gz
       ORBITER_ARCH: ${{ matrix.arch }}
     steps:
       - uses: actions/checkout@v7
@@ -92,10 +93,20 @@ jobs:
           mkdir -p out/receipt
           python -B out/installer/orbiter-stock-data.pyz "$RUNNER_TEMP/Orbiter Stock Install" \
             --cache out/cache --package "out/packages/$ORBITER_PACKAGE" 2>&1 | tee out/receipt/install.log
+      - name: Build the external Launchpad test driver against the deployed Qt version
+        shell: bash
+        run: |
+          python -m pip install aqtinstall==3.3.0
+          python -m aqt install-qt mac desktop 6.8.3 clang_64 --outputdir "$RUNNER_TEMP/qt-driver-build"
+          config=$(find "$RUNNER_TEMP/qt-driver-build" -name Qt6Config.cmake -print -quit)
+          cmake -S Tests/Production/StockInstaller/LaunchpadDriver -B out/driver -G Ninja \
+            -DCMAKE_BUILD_TYPE=Release -DCMAKE_OSX_ARCHITECTURES="$ORBITER_ARCH" "-DQt6_DIR=$(dirname "$config")"
+          cmake --build out/driver
+          otool -L out/driver/launchpad-driver.so
       - name: Fly the untouched stock Delta-glider using the installed data
         run: |
           python -B Tests/Production/StockInstaller/smoke.py --installer out/installer/orbiter-stock-data.pyz \
-            --install "$RUNNER_TEMP/Orbiter Stock Install" --output out/receipt
+            --install "$RUNNER_TEMP/Orbiter Stock Install" --output out/receipt --launchpad-driver out/driver/launchpad-driver.so
       - uses: actions/upload-artifact@v7
         if: always()
         with:
@@ -140,11 +151,11 @@ jobs:
         run: |
           $expected = (Get-Content out/installer/SHA256SUMS).Split(' ')[0]
           if ((Get-Content out/installer/source.txt) -ne $env:GITHUB_SHA -or (Get-FileHash out/installer/orbiter-stock-data.pyz).Hash -ne $expected) { throw 'Wrong installer source or digest' }
-          python -B Tests/Production/StockInstaller/fetch_package.py Orbiter-windows-x64.zip out/packages
+          python -B Tests/Production/StockInstaller/fetch_package.py Orbiter-windows-x64-72b1741e.zip out/packages
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           New-Item -ItemType Directory -Path out/receipt | Out-Null
           $folder = Join-Path $env:RUNNER_TEMP 'Orbiter Stock Install'
-          python -B out/installer/orbiter-stock-data.pyz "$folder" --cache out/cache --package out/packages/Orbiter-windows-x64.zip 2>&1 | Tee-Object out/receipt/install.log
+          python -B out/installer/orbiter-stock-data.pyz "$folder" --cache out/cache --package out/packages/Orbiter-windows-x64-72b1741e.zip 2>&1 | Tee-Object out/receipt/install.log
           exit $LASTEXITCODE
       - name: Verify the installed Launchpad and stock Delta-glider flight
         run: |

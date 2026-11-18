@@ -35,7 +35,7 @@ def main():
             subprocess.run(["gh", "api", endpoint + "/zip"], stdout=stream, check=True)
         assert path.stat().st_size == metadata["size_in_bytes"] and digest(path) == locked["artifact_sha256"]
         package = args.destination / args.package
-        with zipfile.ZipFile(path) as zip_file, zip_file.open(args.package) as source, package.open("wb") as target:
+        with zipfile.ZipFile(path) as zip_file, zip_file.open(locked.get("archive_member", args.package)) as source, package.open("wb") as target:
             shutil.copyfileobj(source, target)
     assert digest(package) == locked["sha256"]
 
