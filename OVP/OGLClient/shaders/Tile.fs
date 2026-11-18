@@ -11,6 +11,14 @@ in float flogz;
 
 in vec4 eyeSpacePosition;
 
+uniform vec4 u_SurfaceUV;
+uniform sampler2D u_NightMask;
+uniform vec3 u_NightUV;
+uniform float u_NightBrightness;
+uniform sampler2D u_CloudWest, u_CloudEast;
+uniform vec3 u_WestUV, u_EastUV;
+uniform float u_CloudSplit, u_CloudShadowOpacity;
+
 void main()
 {
 	vec4 cTex = texture(colorTexture, TexCoord);
@@ -32,6 +40,22 @@ void main()
 
         cTex.rgb*=l;//clamp(l, 0.0, 1.0);
     }
+	vec2 patchUV = (TexCoord - u_SurfaceUV.xy) * u_SurfaceUV.zw;
+	float sunHeight = dot(normalize(Normal), -lights[0].dvDirection);
+	if (u_CloudShadowOpacity > 0.0 && sunHeight > 0.0) {
+		bool west = patchUV.x < u_CloudSplit;
+		vec3 transform = west ? u_WestUV : u_EastUV;
+		if (transform.z > 0.0) {
+			vec2 uv = transform.xy + transform.z * patchUV;
+			float coverage = west ? texture(u_CloudWest, uv).a : texture(u_CloudEast, uv).a;
+			cTex.rgb *= 1.0 - coverage * u_CloudShadowOpacity;
+		}
+	}
+	if (u_NightBrightness > 0.0) {
+		// Fade the emissive RGB mask across twilight; its alpha is the water mask.
+		float darkness = 1.0 - smoothstep(-0.32, 0.12, sunHeight);
+		cTex.rgb += texture(u_NightMask, u_NightUV.xy + patchUV * u_NightUV.z).rgb * darkness * u_NightBrightness;
+	}
 	cTex.rgb += u_bgcol;
 
 	if(u_FogDensity != 0.0) {

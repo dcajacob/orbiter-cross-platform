@@ -16,12 +16,14 @@
 // ==============================================================
 
 #include "surfmgr2.h"
+#include "cloudmgr2.h"
 #include "tilelabel.h"
 #include "Texture.h"
 #include "OGLCamera.h"
 #include "Scene.h"
 #include "Renderer.h"
 #include "Evidence.h"
+#include <cmath>
 #include <cstring>
 
 // =======================================================================
@@ -92,7 +94,7 @@ SurfTile::SurfTile (TileManager2Base *_mgr, int _lvl, int _ilat, int _ilng)
 SurfTile::~SurfTile ()
 {
 	if (elev) delete []elev;
-	if (ltex && owntex) ltex->Release();
+	if (ltex) ltex->Release();
 	DeleteLabels();
 }
 
@@ -133,23 +135,20 @@ void SurfTile::Load ()
 	// Load mask texture
 	ltex = NULL;
 	if (mgr->Cprm().bSpecular || mgr->Cprm().bLights) {
-		if (owntex) {
-			ok = false;
-			if (mgr->Cprm().tileLoadFlags & 0x0001) { // try loading from individual tile file
-				sprintf (path, "%s/Mask/%02d/%06d/%06d.dds", mgr->CbodyName(), lvl+4, ilat, ilng);
-				ok = (g_client->GetTexMgr()->LoadTextures (path, &ltex, flag, 1) != 0);
-			}
-			if (!ok && smgr->ZTreeManager(1)) { // try loading from compressed archive
-				uint8_t *buf;
-				int ndata = smgr->ZTreeManager(1)->ReadData(lvl+4, ilat, ilng, &buf);
-				if (ndata) {
-					g_client->GetTexMgr()->ReadTextureFromMemory (buf, ndata, &ltex, flag);
-					smgr->ZTreeManager(1)->ReleaseData(buf);
-				}
-			}
-		} else if (node->Parent()) {
-			ltex = getSurfParent()->ltex;
+		ok = false;
+		if (mgr->Cprm().tileLoadFlags & 0x0001) { // try loading from individual tile file
+			sprintf (path, "%s/Mask/%02d/%06d/%06d.dds", mgr->CbodyName(), lvl+4, ilat, ilng);
+			ok = (g_client->GetTexMgr()->LoadTextures (path, &ltex, flag, 1) != 0);
 		}
+		if (!ok && smgr->ZTreeManager(1)) { // try loading from compressed archive
+			uint8_t *buf;
+			int ndata = smgr->ZTreeManager(1)->ReadData(lvl+4, ilat, ilng, &buf);
+			if (ndata) {
+				g_client->GetTexMgr()->ReadTextureFromMemory (buf, ndata, &ltex, flag);
+				smgr->ZTreeManager(1)->ReleaseData(buf);
+			}
+		}
+		maskSource = ltex ? this : (getSurfParent() ? getSurfParent()->maskSource : nullptr);
 	}
 
 	// Load elevation data
@@ -490,13 +489,59 @@ double SurfTile::GetMeanElevation (const int16_t *elev) const
 
 void SurfTile::GlobalInit() {
 	tileShader = Renderer::GetShader("Tile");
+	Renderer::Bind(tileShader);
+	tileShader->SetInt("u_NightMask", 1);
+	tileShader->SetInt("u_CloudWest", 2);
+	tileShader->SetInt("u_CloudEast", 3);
+}
+
+// Map unit coordinates on a surface patch into an independently tiled layer.
+// At an ancestor level the low address bits select the subrectangle.
+static glm::vec3 layerUV(int level, int row, int column, int sourceLevel, double shift = 0)
+{
+	const int span = 1 << (level - sourceLevel);
+	return {float((column % span + shift) / span), float(row % span) / span, 1.0f / span};
+}
+
+void SurfTile::BindSurfaceLayers() const
+{
+	const auto &prm = *mgr->prm.rprm;
+	tileShader->SetVec4("u_SurfaceUV", {texrange.tumin, texrange.tvmin,
+		1.0f / (texrange.tumax - texrange.tumin), 1.0f / (texrange.tvmax - texrange.tvmin)});
+
+	const float brightness = mgr->Cprm().bLights && maskSource ? float(mgr->Cprm().lightfac) : 0.0f;
+	tileShader->SetFloat("u_NightBrightness", brightness);
+	if (brightness > 0) {
+		glActiveTexture(GL_TEXTURE1);
+		glBindTexture(GL_TEXTURE_2D, maskSource->ltex->m_TexId);
+		tileShader->SetVec3("u_NightUV", layerUV(lvl, ilat, ilng, maskSource->lvl));
+	}
+
+	const auto *clouds = mgr->GetPlanet()->CloudMgr2();
+	const float opacity = clouds && prm.bCloudShadow ? float(prm.shadowalpha) : 0.0f;
+	tileShader->SetFloat("u_CloudShadowOpacity", opacity);
+	if (opacity > 0) {
+		// Cloud rotation can split one ground patch across two cloud tiles,
+		// including where the cloud map wraps at the antimeridian.
+		const int columns = 2 << lvl;
+		const double origin = ilng + prm.cloudrot * columns / PI2;
+		const int left = int(std::floor(origin));
+		const double fraction = origin - left;
+		tileShader->SetFloat("u_CloudSplit", float(1.0 - fraction));
+		for (int half = 0; half < 2; ++half) {
+			const int column = ((left + half) % columns + columns) % columns;
+			const Tile *source = clouds->ResidentTextureTile(lvl, ilat, column);
+			glActiveTexture(GL_TEXTURE2 + half);
+			glBindTexture(GL_TEXTURE_2D, source ? source->Tex()->m_TexId : 0);
+			const auto uv = source ? layerUV(lvl, ilat, column, source->Level(), fraction - half) : glm::vec3(0);
+			tileShader->SetVec3(half ? "u_EastUV" : "u_WestUV", uv);
+		}
+	}
+	glActiveTexture(GL_TEXTURE0);
 }
 
 void SurfTile::Render ()
 {
-	//bool render_lights = mgr->Cprm().bLights;
-	//bool render_shadows = false;//(mgr->GetPlanet()->CloudMgr2() && !mgr->prm.rprm->bCloudFlatShadows);
-
 	//static float spec_base = 0.4f; // 0.95f;
 	//static D3DMATERIAL7 pmat, watermat = {{1,1,1,1},{1,1,1,1},{spec_base*1.2f,spec_base*1.0f,spec_base*0.8f,1},{0,0,0,0},50.0f};
 
@@ -568,6 +613,7 @@ void SurfTile::Render ()
 		tileShader->SetVec3("u_bgcol", bgcol);
 	}
 
+	BindSurfaceLayers();
     glBindTexture(GL_TEXTURE_2D,  tex->m_TexId);
 	Renderer::CheckError("SurfTile::Render glBindTexture");
 	mesh->VAO->Bind();

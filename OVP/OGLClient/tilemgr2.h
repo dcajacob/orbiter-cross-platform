@@ -297,6 +297,23 @@ public:
 	{ return (lvl >= -3 && lvl < 0 ? globtile[lvl+3] : 0); }
 	// Returns a low-res global tile
 
+	// Most detailed resident tile owning the texture for this wrapped tile address.
+	// Borrowed only for the current surface draw.
+	const Tile *ResidentTextureTile(int level, int row, int column) const
+	{
+		const auto *node = &tiletree[column >> level];
+		const Tile *source = nullptr;
+		for (int bit = level; node; --bit) {
+			const auto *tile = node->Entry();
+			if (!tile || !tile->Tex()) break;
+			if (tile->owntex) source = tile;
+			if (!bit) break;
+			const int child = ((row >> (bit-1)) & 1) * 2 + ((column >> (bit-1)) & 1);
+			node = node->Child(child);
+		}
+		return source;
+	}
+
 	int Coverage (double latmin, double latmax, double lngmin, double lngmax, int maxlvl, const Tile **tbuf, int nt) const;
 	// fills tbuf with a list of tiles up to maxlvl currently covering the area latmin,latmax,lngmin,lngmax
 	// nt is the length of tbuf. Return value is the number of tiles copied into tbuf.

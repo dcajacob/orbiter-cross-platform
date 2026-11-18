@@ -43,6 +43,7 @@ protected:
 	int16_t *ReadElevationFile (const char *name, int lvl, int ilat, int ilng, double tgt_res, double *mean_elev=0);
 	bool LoadElevationData ();
 	void Render ();
+	void BindSurfaceLayers() const;
 	void RenderLabels (oapi::Sketchpad *skp, oapi::Font **labelfont, int *fontidx);
 
 	TileManager2<SurfTile> *smgr;	// surface tile manager interface
@@ -68,6 +69,7 @@ private:
 	double GetMeanElevation (const int16_t *elev) const;
 
 	OGLTexture *ltex;	// landmask/nightlight texture, if applicable
+	const SurfTile *maskSource = nullptr; // nearest tile owning a mask
 	int16_t *elev;				// elevation data [m] (8x subsampled)
 	mutable int16_t *ggelev;		// pointer to my elevation data in the great-grandparent
 	bool has_elevfile;			// true if the elevation data for this tile were read from file

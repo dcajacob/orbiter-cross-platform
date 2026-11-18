@@ -12,6 +12,7 @@
 #include <QFile>
 #include <QFileInfo>
 #include <QFormLayout>
+#include <QGroupBox>
 #include <QLabel>
 #include <QLockFile>
 #include <QMap>
@@ -191,6 +192,28 @@ void showFlightSettings(QWidget *parent, const SimulatorProfile &profile)
     addNumber(form, "GenericMFDSize", QObject::tr("Glass cockpit MFD size"), 6, 1, 10, 0);
     addNumber(form, "InstrumentUpdateInterval", QObject::tr("MFD update interval"), 0.5, 0.01, 1e9, 2, QObject::tr(" s"));
     addNumber(form, "PanelScale", QObject::tr("2D panel scale"), 1, 0.25, 4, 2, QObject::tr(" ×"));
+    auto *visual = new QGroupBox(QObject::tr("Visual effects"));
+    auto *visualForm = new QFormLayout(visual);
+    form->addRow(visual);
+    QList<QCheckBox *> visualFlags;
+    auto addVisualFlag = [&](const QString &key, const QString &label, bool enabledByDefault) {
+        auto *field = new QCheckBox(label);
+        field->setObjectName(key);
+        const auto value = assignment(original, key).captured(1);
+        field->setChecked(enabledByDefault ? !value.startsWith("FALSE", Qt::CaseInsensitive)
+                                           : value.startsWith("TRUE", Qt::CaseInsensitive));
+        visualForm->addRow(field);
+        visualFlags.append(field);
+        return field;
+    };
+    auto *clouds = addVisualFlag("EnableClouds", QObject::tr("Clouds"), true);
+    auto *shadows = addVisualFlag("EnableCloudShadows", QObject::tr("Cloud shadows"), false);
+    shadows->setEnabled(clouds->isChecked());
+    QObject::connect(clouds, &QCheckBox::toggled, shadows, &QWidget::setEnabled);
+    addVisualFlag("EnableNightlights", QObject::tr("Planet night lights"), true);
+    // Orbiter.cfg uses levels 1 through SURF_MAX_PATCHLEVEL2 (Config.h).
+    auto *detail = addNumber(visualForm, "PlanetMaxPatchLevel", QObject::tr("Maximum planet surface detail"), 21, 1, 21, 0);
+    detail->setToolTip(QObject::tr("Highest surface tile level Orbiter may use. Available detail depends on the installed planet textures."));
     QComboBox *aspectRatio = nullptr;
     QCheckBox *fullscreen = nullptr, *vsync = nullptr;
     if (profile.native) {
@@ -239,6 +262,8 @@ void showFlightSettings(QWidget *parent, const SimulatorProfile &profile)
     auto values = [&] {
         Values result = extra ? extra->values() : Values{};
         result.insert("UnlimitedFuel", limitedFuel->isChecked() ? "FALSE" : "TRUE");
+        for (auto *flag : visualFlags)
+            result.insert(flag->objectName(), flag->isChecked() ? "TRUE" : "FALSE");
         if (fullscreen) {
             result.insert("Fullscreen", fullscreen->isChecked() ? "TRUE" : "FALSE");
             result.insert("NoVSync", vsync->isChecked() ? "FALSE" : "TRUE");

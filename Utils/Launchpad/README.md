@@ -14,7 +14,11 @@ Open **Flight settings… → Options** before launching a scenario. Choose
 whether vessels consume fuel, set the glass-cockpit MFD size and update
 interval, or change the 2D panel scale. **Save** updates
 the active simulator configuration. Reopen the dialog to see the current
-values, including settings changed in flight.
+values, including settings changed in flight. Under **Visual effects**, choose
+clouds, cloud shadows and planet night lights. Turning clouds off also hides
+their shadows. Turning clouds back on restores the saved shadow preference.
+**Maximum planet surface detail** sets a ceiling from 1 to 21. The detail
+visible in a flight depends on camera distance and the installed planet tiles.
 
 On native profiles, open **Flight settings… → Video** to set the flight window's
 width and height in framebuffer pixels. Choose **Free** to edit them independently,
@@ -75,7 +79,7 @@ this page.
 | Classic page | Qt Launchpad |
 | --- | --- |
 | Scenarios | Scenario tree, search, descriptions and screenshots, launch and return. Native profiles also support start paused, saved flights, and copying a scenario. Classic quicksave management and contextual help are still missing. |
-| Options | Fuel and cockpit instrument settings before flight, plus the Linux joystick setup wizard. The remaining classic option categories are open. |
+| Options | Fuel, cockpit instruments, clouds, cloud shadows, planet night lights and maximum surface detail, plus the Linux joystick setup wizard. |
 | Modules | Installed plug-in list and startup selection. Native profiles identify automatic dependencies and unsupported plug-ins. Windows graphics clients are listed separately from selectable plug-ins. |
 | Video | Native window width, height, and the three classic fixed aspect ratios. Linux also supports fullscreen at desktop resolution and a VSync toggle. |
 | Extra | Linux native physics, orbit stabilisation, MFD resolution, installed atmosphere models and stock vessel graphics. |

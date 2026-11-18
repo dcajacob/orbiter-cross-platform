@@ -38,6 +38,55 @@ QTreeWidgetItem *plugin(QWidget *page, const QString &name)
 class FlightSettingsCheck : public QObject {
     Q_OBJECT
 private slots:
+    void planetVisualEffects()
+    {
+        QTemporaryDir dir;
+        SimulatorProfile profile;
+        profile.native = true;
+        profile.config = dir.filePath("Orbiter.cfg");
+        const QByteArray original = "; preserved\r\nEnableNightlights = true ; cities\r\n";
+        writeFile(profile.config, original);
+        for (int pass = 0; pass < 3; ++pass) {
+            QTimer::singleShot(0, [&] {
+                auto *dialog = qobject_cast<QDialog *>(QApplication::activeModalWidget());
+                const auto closeOnFailure = qScopeGuard([&] { if (dialog->isVisible()) dialog->reject(); });
+                auto *clouds = dialog->findChild<QCheckBox *>("EnableClouds");
+                auto *shadows = dialog->findChild<QCheckBox *>("EnableCloudShadows");
+                auto *lights = dialog->findChild<QCheckBox *>("EnableNightlights");
+                auto *detail = dialog->findChild<QDoubleSpinBox *>("PlanetMaxPatchLevel");
+                QVERIFY(clouds && shadows && lights && detail);
+                QCOMPARE(clouds->isChecked(), pass < 2);
+                QCOMPARE(shadows->isEnabled(), clouds->isChecked());
+                QCOMPARE(shadows->isChecked(), pass == 2);
+                QCOMPARE(lights->isChecked(), pass < 2);
+                QCOMPARE(detail->minimum(), 1.0);
+                QCOMPARE(detail->maximum(), 21.0);
+                QCOMPARE(detail->value(), pass < 2 ? 21.0 : 1.0);
+                if (pass < 2) {
+                    shadows->click();
+                    clouds->click();
+                    QVERIFY(!shadows->isEnabled() && shadows->isChecked());
+                    lights->click();
+                    detail->setValue(1);
+                } else {
+                    clouds->click();
+                    QVERIFY(shadows->isEnabled() && shadows->isChecked());
+                }
+                dialog->findChild<QDialogButtonBox *>()->button(pass == 1 ? QDialogButtonBox::Save : QDialogButtonBox::Cancel)->click();
+            });
+            showFlightSettings(nullptr, profile);
+            QFile cfg(profile.config);
+            QVERIFY(cfg.open(QIODevice::ReadOnly));
+            const auto bytes = cfg.readAll();
+            if (!pass) QCOMPARE(bytes, original);
+            else {
+                QVERIFY(bytes.contains("EnableClouds = FALSE\r\n"));
+                QVERIFY(bytes.contains("EnableCloudShadows = TRUE\r\n"));
+                QVERIFY(bytes.contains("PlanetMaxPatchLevel = 1\r\n"));
+                QVERIFY(bytes.endsWith("; preserved\r\nEnableNightlights = FALSE ; cities\r\n"));
+            }
+        }
+    }
 #ifdef Q_OS_LINUX
     void extraSettings()
     {
