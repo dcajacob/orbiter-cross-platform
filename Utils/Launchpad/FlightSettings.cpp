@@ -180,15 +180,38 @@ void showFlightSettings(QWidget *parent, const SimulatorProfile &profile)
     addNumber(form, "InstrumentUpdateInterval", QObject::tr("MFD update interval"), 0.5, 0.01, 1e9, 2, QObject::tr(" s"));
     addNumber(form, "PanelScale", QObject::tr("2D panel scale"), 1, 0.25, 4, 2, QObject::tr(" ×"));
     QComboBox *aspectRatio = nullptr;
+    QCheckBox *fullscreen = nullptr, *vsync = nullptr;
     if (profile.native) {
         auto *video = new QWidget;
         auto *videoForm = new QFormLayout(video);
         tabs->addTab(video, QObject::tr("Video"));
+#ifdef Q_OS_LINUX
+        videoForm->addRow(QObject::tr("Graphics engine"), new QLabel(QObject::tr("OpenGL")));
+        fullscreen = new QCheckBox(QObject::tr("Fullscreen on primary display"));
+        fullscreen->setObjectName("fullscreen");
+        fullscreen->setToolTip(QObject::tr("Use the display’s current resolution and refresh rate."));
+        fullscreen->setChecked(assignment(original, "Fullscreen").captured(1).startsWith("TRUE", Qt::CaseInsensitive));
+        videoForm->addRow(fullscreen);
+        vsync = new QCheckBox(QObject::tr("Vertical sync (VSync)"));
+        vsync->setObjectName("vsync");
+        vsync->setChecked(!assignment(original, "NoVSync").captured(1).startsWith("TRUE", Qt::CaseInsensitive));
+        videoForm->addRow(vsync);
+#else
         videoForm->addRow(QObject::tr("Graphics engine"), new QLabel(QObject::tr("OpenGL (windowed)")));
         videoForm->addRow(QObject::tr("Vertical sync"), new QLabel(QObject::tr("On (requested)")));
+#endif
         auto *width = addNumber(videoForm, "WindowWidth", QObject::tr("Window width"), 1280, 320, 16384, 0, QObject::tr(" px"));
         auto *height = addNumber(videoForm, "WindowHeight", QObject::tr("Window height"), 720, 200, 16384, 0, QObject::tr(" px"));
         aspectRatio = addAspectRatio(videoForm, width, height);
+        if (fullscreen) {
+            auto showWindowSize = [=](bool full) {
+                videoForm->setRowVisible(width, !full);
+                videoForm->setRowVisible(height, !full);
+                videoForm->setRowVisible(aspectRatio, !full);
+            };
+            showWindowSize(fullscreen->isChecked());
+            QObject::connect(fullscreen, &QCheckBox::toggled, video, showWindowSize);
+        }
     }
 
     auto *modules = new ModulesPage(profile, original);
@@ -197,6 +220,10 @@ void showFlightSettings(QWidget *parent, const SimulatorProfile &profile)
     auto values = [&] {
         Values result;
         result.insert("UnlimitedFuel", limitedFuel->isChecked() ? "FALSE" : "TRUE");
+        if (fullscreen) {
+            result.insert("Fullscreen", fullscreen->isChecked() ? "TRUE" : "FALSE");
+            result.insert("NoVSync", vsync->isChecked() ? "FALSE" : "TRUE");
+        }
         for (auto *field : tabs->findChildren<QDoubleSpinBox *>())
             result.insert(field->objectName(), QString::number(field->value(), 'f', field->decimals()));
         return result;

@@ -65,6 +65,12 @@ add_library(orbiter_ogl_native MODULE
     "${soil2_SOURCE_DIR}/srcs/image_helper.c" "${soil2_SOURCE_DIR}/srcs/SOIL2.c"
     "${libnsbmp_SOURCE_DIR}/src/libnsbmp.c")
 target_compile_features(orbiter_ogl_native PRIVATE cxx_std_17)
+if(CMAKE_SYSTEM_NAME STREQUAL "Linux" AND GLFW_BUILD_WAYLAND)
+    find_package(PkgConfig REQUIRED)
+    pkg_check_modules(wayland_client REQUIRED IMPORTED_TARGET wayland-client)
+    target_link_libraries(orbiter_ogl_native PRIVATE PkgConfig::wayland_client)
+    set_property(SOURCE LinuxAdapter.cpp APPEND PROPERTY COMPILE_DEFINITIONS ORBITER_WAYLAND_FULLSCREEN)
+endif()
 target_compile_definitions(orbiter_ogl_native PRIVATE GLFW_INCLUDE_NONE NVG_NO_STB=1 FONS_USE_FREETYPE=1)
 target_include_directories(orbiter_ogl_native PRIVATE ..
     "${soil2_SOURCE_DIR}/incs" "${soil2_SOURCE_DIR}/srcs" "${nanovg_SOURCE_DIR}/src"

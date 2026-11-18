@@ -25,10 +25,16 @@ appears when you reopen the page.
 On a 2× Wayland display, choose even pixel dimensions so the compositor can
 represent the requested framebuffer with a whole number of logical pixels.
 
-The Linux cockpit uses the windowed OpenGL client and requests vertical sync.
-The classic fullscreen modes, colour depth, graphics client and device selectors,
-device enumeration, stencil, page flipping, and VSync switch have no configurable
-counterpart in this renderer.
+On Linux, **Fullscreen on primary display** opens the flight at the display's
+current resolution and refresh rate. Clear it to use your saved window size
+again. **Vertical sync (VSync)** requests a swap interval of one when enabled
+and zero when disabled, in either display mode. The driver or desktop
+compositor can also pace presentation. Existing configurations use Orbiter's
+`Fullscreen` and `NoVSync` keys. With both keys absent, flights open windowed
+with VSync enabled.
+
+The Linux OpenGL client leaves colour depth, graphics device selection,
+device enumeration, stencil and page flipping to the renderer and driver.
 
 Open **Flight settings… → Modules** to see the plug-ins installed for the
 selected simulator. Check the ones you want and click **Save** before launching.
@@ -49,7 +55,7 @@ with audio enabled.
 | Scenarios | Scenario tree, search, descriptions and screenshots, launch and return. Native profiles also support start paused, saved flights, and copying a scenario. Classic quicksave management and contextual help are still missing. |
 | Options | Fuel and cockpit instrument settings before flight, plus the Linux joystick setup wizard. The remaining classic option categories are open. |
 | Modules | Installed plug-in list and startup selection. Native profiles identify automatic dependencies and unsupported plug-ins. Windows graphics clients are listed separately from selectable plug-ins. |
-| Video | Native window width, height, and the three classic fixed aspect ratios. |
+| Video | Native window width, height, and the three classic fixed aspect ratios. Linux also supports fullscreen at desktop resolution and a VSync toggle. |
 | Extra | The classic launcher hosts add-on and advanced configuration pages. Qt support for those pages is open. |
 | About | The classic About and credits page is open. |
 

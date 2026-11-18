@@ -37,6 +37,46 @@ QTreeWidgetItem *plugin(QWidget *page, const QString &name)
 class FlightSettingsCheck : public QObject {
     Q_OBJECT
 private slots:
+#ifdef Q_OS_LINUX
+    void linuxDisplayModes()
+    {
+        QTemporaryDir dir;
+        SimulatorProfile profile;
+        profile.native = true;
+        profile.config = dir.filePath("Orbiter.cfg");
+        const QByteArray original = "WindowWidth = 960\r\nWindowHeight = 600\r\n";
+        writeFile(profile.config, original);
+        for (int pass = 0; pass < 3; ++pass) {
+            QTimer::singleShot(0, [&] {
+                auto *dialog = qobject_cast<QDialog *>(QApplication::activeModalWidget());
+                const auto closeOnFailure = qScopeGuard([&] { if (dialog->isVisible()) dialog->reject(); });
+                auto *full = dialog->findChild<QCheckBox *>("fullscreen");
+                auto *sync = dialog->findChild<QCheckBox *>("vsync");
+                auto *width = dialog->findChild<QDoubleSpinBox *>("WindowWidth");
+                QVERIFY(full && sync && width);
+                QCOMPARE(full->isChecked(), pass == 2);
+                QCOMPARE(sync->isChecked(), pass != 2);
+                full->click();
+                sync->click();
+                QCOMPARE(width->isHidden(), full->isChecked());
+                QCOMPARE(width->value(), 960);
+                auto *buttons = dialog->findChild<QDialogButtonBox *>();
+                buttons->button(pass == 0 ? QDialogButtonBox::Cancel : QDialogButtonBox::Save)->click();
+            });
+            showFlightSettings(nullptr, profile);
+            QFile cfg(profile.config);
+            QVERIFY(cfg.open(QIODevice::ReadOnly));
+            const auto bytes = cfg.readAll();
+            QVERIFY(bytes.endsWith(original));
+            if (pass == 0)
+                QCOMPARE(bytes, original);
+            else {
+                QVERIFY(bytes.contains(pass == 1 ? "Fullscreen = TRUE\r\n" : "Fullscreen = FALSE\r\n"));
+                QVERIFY(bytes.contains(pass == 1 ? "NoVSync = TRUE\r\n" : "NoVSync = FALSE\r\n"));
+            }
+        }
+    }
+#endif
     void linkedSizeConflict()
     {
         QTemporaryDir dir;
