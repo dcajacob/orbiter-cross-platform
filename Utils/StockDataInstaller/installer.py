@@ -146,6 +146,14 @@ def configure(root, runtime, windows):
     source = runtime / "Orbiter.cfg"
     current = source.read_bytes() if source.is_file() else b""
     current = re.sub(rb"(?mi)^\s*ImGui_ManuscriptFontFile\s*=.*$", b"", current).rstrip()
+    if windows:
+        # The supported Windows preview can ship without a master configuration.
+        # An empty graphics selection starts the simulator in console mode.
+        block = re.search(rb"(?ims)^ACTIVE_MODULES[ \t]*\r?\n(.*?)^END_MODULES\b", current)
+        if block is None:
+            current += b"\nACTIVE_MODULES\n  OGLClient\nEND_MODULES"
+        elif not any(line.strip().lower() in (b"oglclient", b"d3d9client") for line in block[1].splitlines()):
+            current = current[:block.end(1)] + b"  OGLClient\n" + current[block.end(1):]
     config.write_bytes(current + b"\n" + FONT_SETTING.encode("ascii") + b"\n")
     if windows:
         return

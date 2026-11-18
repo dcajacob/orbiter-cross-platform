@@ -43,14 +43,42 @@ def native(args, runtime, env):
     if sys.platform == "darwin":
         run(["codesign", "--verify", "--deep", "--strict", runtime / "orbiter-launchpad.app"],
             args.output, env, args.output / "codesign.log", 30)
-    run([launcher, "--profile", profile_path, "--help"], args.output, env, args.output / "qt.log", 30)
+    if not args.launchpad_driver or not args.launchpad_driver.is_file():
+        raise ValueError("A Qt test driver for the installed Launchpad is required")
     scenario = path["assets"] / STOCK
     locked_scene(scenario)
-    run([path["executable"], "--assets", path["assets"], "--data", path["data"],
-         "--modules", path["modules"], "--planets", path["planets"], "--config", path["config"],
-         "--keymap", path["keymap"], "--scenario", scenario, "--frames", "12", "--evidence", args.output],
-        args.output, env, args.output / "simulator.log", 90)
-    assert "Production DeltaGlider flight." in (args.output / "simulator.log").read_text(errors="replace")
+    # Keep the installer's profile and all of Launchpad's arguments. Bound the
+    # real child to 12 frames in this disposable install, then restore its name.
+    engine = path["executable"]
+    original_engine = engine.with_name(engine.name + ".bounded-test-original")
+    assert not original_engine.exists()
+    arguments = args.output / "launch-arguments.txt"
+    events = args.output / "launchpad-events.txt"
+    env.update(ORBITER_LAUNCHPAD_TEST_SETTINGS=str(args.output / "settings"),
+               ORBITER_LAUNCHPAD_TEST_RECEIPT=str(events), ORBITER_CHECK_STOCK_SCREENSHOT="1",
+               ORBITER_FLIGHT_ARGUMENTS=str(arguments), ORBITER_FLIGHT_OUTPUT=str(args.output))
+    preload = "DYLD_INSERT_LIBRARIES" if sys.platform == "darwin" else "LD_PRELOAD"
+    env[preload] = str(args.launchpad_driver)
+    engine.rename(original_engine)
+    try:
+        engine.write_text("""#!/bin/sh
+set -eu
+printf '%s\\n' "$@" > "$ORBITER_FLIGHT_ARGUMENTS"
+exec "$0.bounded-test-original" "$@" --frames 12 --evidence "$ORBITER_FLIGHT_OUTPUT"
+""")
+        engine.chmod(0o755)
+        run([launcher, "--profile", profile_path], args.output, env, args.output / "qt.log", 100)
+    finally:
+        original_engine.replace(engine)
+    assert events.read_text().splitlines() == [
+        "decoded-stock-orbit-jpeg-400x300", "selected-and-launched-stock-scenario",
+        "launcher-hidden-during-flight", "launcher-returned-with-selection",
+    ]
+    argv = arguments.read_text().splitlines()
+    assert Path(argv[argv.index("--scenario") + 1]) == scenario
+    launch_log = path["saves"].parent / "orbiter-session.log"
+    shutil.copy2(launch_log, args.output / "simulator.log")
+    assert "Production DeltaGlider flight." in launch_log.read_text(errors="replace")
     return scenario, 12
 
 
@@ -66,20 +94,16 @@ def windows(args, runtime, env):
         launchpad(runtime / "orbiter-launchpad.exe", args.output, env, log)
     scenario = runtime / STOCK
     locked_scene(scenario)
-    text = (ROOT / "Tests/Production/Fixtures/Orbiter.cfg").read_text()
-    text = text.replace("  ProductionReferenceDriver", "  LaunchpadFlightProbe\n  OGLClient")
-    text = text.replace("FixedStep = 1\n", "FixedStep = 0.0625\n")
     original = config.read_bytes()
+    assert b"OGLClient" in original.split(b"ACTIVE_MODULES", 1)[1].split(b"END_MODULES", 1)[0].split()
     try:
-        config.write_text(FONT + "\n" + text, encoding="ascii")
         shutil.copy2(args.probe, runtime / "Modules/Plugin")
         (runtime / "ogl-evidence.enabled").touch()
         mesa_files(args.mesa, runtime)
         env.update(LIBGL_ALWAYS_SOFTWARE="true", GALLIUM_DRIVER="llvmpipe")
         name = str(Path(STOCK).relative_to("Scenarios").with_suffix(""))
-        run([runtime / "Orbiter.exe", "--scenariox=" + name], runtime, env, args.output / "simulator.log", 120)
+        run([runtime / "Orbiter.exe", "--scenariox=" + name, "--plugin=LaunchpadFlightProbe", "--fixedstep=0.0625"], runtime, env, args.output / "simulator.log", 120)
     finally:
-        config.write_bytes(original)
         for name in ("graphics-lifecycle.json", "Orbiter.log", "launchpad-flight.txt", "launchpad-flight-end.txt"):
             if (runtime / name).is_file():
                 shutil.copy2(runtime / name, args.output)
@@ -90,7 +114,7 @@ def windows(args, runtime, env):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    for name in ("install", "installer", "output", "probe", "mesa"):
+    for name in ("install", "installer", "output", "probe", "mesa", "launchpad-driver"):
         parser.add_argument("--" + name, type=lambda value: Path(value).resolve(),
                             required=name in ("install", "installer", "output"))
     args = parser.parse_args()

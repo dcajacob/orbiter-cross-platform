@@ -1,7 +1,7 @@
 name: Orbiter Phase 8 Ubuntu 24.04 package and SDK
 on:
   push:
-    branches: [qualification/phase8-linux-ubuntu24-v1]
+    branches: [qualification/phase8-linux-ubuntu24-v1, qualification/phase8-install-review-v1]
     paths: [.github/workflows/phase8-linux-ubuntu24.yml, Tests/Production/LinuxBaseline/**]
 
 permissions:
@@ -32,6 +32,11 @@ jobs:
         with:
           path: out/cache/Orbiter2016.zip
           key: production-standard-planets-${{ hashFiles('Tests/Production/standard-planets.lock.json') }}
+      - name: Build the external Qt driver for the installed Launchpad
+        run: |
+          cmake -S Tests/Production/StockInstaller/LaunchpadDriver -B out/driver -G Ninja -DCMAKE_BUILD_TYPE=Release
+          cmake --build out/driver
+          cp out/driver/launchpad-driver.so out/receipt/
       - name: Bind the stock data installer to the new runtime
         run: |
           python3 -B Utils/StockDataInstaller/build.py --cache out/cache \
@@ -90,7 +95,7 @@ jobs:
             --cache "$PWD/out/cache" --package "$dist/Orbiter-linux-x86_64-ubuntu24.04.tar.gz" 2>&1 | tee out/receipt/install.log
           env -u WAYLAND_DISPLAY XDG_SESSION_TYPE=x11 LIBGL_ALWAYS_SOFTWARE=1 xvfb-run -a -s '-screen 0 1280x720x24' \
             python3 -B Tests/Production/StockInstaller/smoke.py --install "$install" \
-              --installer "$dist/orbiter-stock-data-ubuntu24.04.pyz" --output out/receipt/clean-install
+              --installer "$dist/orbiter-stock-data-ubuntu24.04.pyz" --output out/receipt/clean-install --launchpad-driver out/verified-build/receipt/launchpad-driver.so
       - name: Compile and fly the matching SDK example and reject the wrong SDK
         shell: bash
         run: |

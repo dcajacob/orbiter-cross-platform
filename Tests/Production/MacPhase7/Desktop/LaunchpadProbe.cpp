@@ -2,6 +2,8 @@
 #include <QApplication>
 #include <QFile>
 #include <QLabel>
+#include <QImage>
+#include <QTextBrowser>
 #include <QLineEdit>
 #include <QPushButton>
 #include <QSettings>
@@ -22,6 +24,8 @@ void startProbe()
 {
     const auto settings = qEnvironmentVariable("ORBITER_LAUNCHPAD_TEST_SETTINGS");
     if (settings.isEmpty()) return;
+    qunsetenv("DYLD_INSERT_LIBRARIES");
+    qunsetenv("LD_PRELOAD");
     QSettings::setDefaultFormat(QSettings::IniFormat);
     QSettings::setPath(QSettings::IniFormat, QSettings::UserScope, settings);
     QTimer::singleShot(0, [] {
@@ -42,6 +46,27 @@ void startProbe()
             receipt("launcher-controls-missing");
             QCoreApplication::exit(42);
             return;
+        }
+        if (qEnvironmentVariableIsSet("ORBITER_CHECK_STOCK_SCREENSHOT")) {
+            const QString challenge = "Challenge 2 - Lunar transfer";
+            search->setText(challenge);
+            const auto entries = tree->findItems(challenge, Qt::MatchExactly | Qt::MatchRecursive);
+            auto* description = window->findChild<QTextBrowser*>("scenarioDescription");
+            if (entries.size() == 1 && description) {
+                tree->setCurrentItem(entries.front());
+                auto* doc = description->document();
+                const auto image = doc->resource(QTextDocument::ImageResource, QUrl("orbit.jpg")).value<QImage>();
+                if (!doc->toHtml().contains("orbit.jpg") || image.size() != QSize(400, 300)) {
+                    receipt("stock-screenshot-decode-failed");
+                    QCoreApplication::exit(48);
+                    return;
+                }
+            } else {
+                receipt("stock-screenshot-scenario-missing");
+                QCoreApplication::exit(48);
+                return;
+            }
+            receipt("decoded-stock-orbit-jpeg-400x300");
         }
         const QString name = "DG Mk4 in orbit";
         search->setText(name);
