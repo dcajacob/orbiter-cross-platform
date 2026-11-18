@@ -167,7 +167,11 @@ def configure(root, runtime, windows):
     mac = (runtime / "orbiter-launchpad.app").is_dir()
     launcher = ("orbiter-launchpad.app/Contents/MacOS/orbiter-launchpad" if mac else "bin/orbiter-launchpad")
     boot = root / ("Launch Orbiter.command" if mac else "Launch Orbiter.sh")
-    boot.write_text('#!/bin/sh\nset -eu\nbase=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)\n'
+    personal = "" if mac else (
+        'if [ ! -w "$base/user" ] || [ ! -w "$base/user/Scenarios" ] || [ ! -w "$base/user/Orbiter.cfg" ]'
+        ' || [ "$(stat -c %u "$base/user")" != "$(id -u)" ]; then\n'
+        '  exec python3 -I "$base/launch_linux.py" "$@"\nfi\n')
+    boot.write_text('#!/bin/sh\nset -eu\nbase=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)\n' + personal +
                     f'exec "$base/runtime/{launcher}" --profile "$base/Launchpad profile.json"\n',
                     encoding="utf-8")
     boot.chmod(0o755)
@@ -202,6 +206,8 @@ def install(bundle, package, info, source, stock, planets, destination):
             put(archive, name, planetary_root / relative(name), record, managed, destination)
         for name in ("readme.txt", "Doc/Orbiter.pdf"):
             put(archive, name, destination / "notices/planets" / relative(name), {}, managed, destination)
+    if info["platform"] == "linux":
+        (destination / "launch_linux.py").write_bytes(bundle.read("launch_linux.py"))
     configure(destination, runtime, windows)
     receipt = dict(schema=1, package=package.name, package_sha256=info["sha256"],
                    package_source=info["source"], platform=info["platform"],

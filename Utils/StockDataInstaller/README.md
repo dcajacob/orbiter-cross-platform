@@ -14,8 +14,12 @@ On macOS use the `arm64` or `x86_64` archive. On Windows run
 or use your installed Python executable if you use a later version.
 
 - Linux starts with `Launch Orbiter.sh`. macOS starts with `Launch Orbiter.command`.
-  Both use the included Launchpad profile and keep configuration and saves in
-  `user/`. The package retains its platform requirements and signing status.
+  A writable personal installation uses the included profile and `user/` directory.
+  On Linux, if the installed user directory belongs to another account or is
+  read-only, the launcher uses Python 3 to create a personal profile under
+  `$XDG_DATA_HOME/orbiter/installations/` (default `~/.local/share/orbiter/installations/`).
+  Each installation path has its own config, session log and `Scenarios/` folder.
+  Qt preferences and graphics caches use the account's usual settings and cache locations.
 - On Windows open `runtime/orbiter-launchpad.exe` or `runtime/Orbiter.exe`. The
   Windows application keeps its usual configuration and scenario layout under
   `runtime/`.

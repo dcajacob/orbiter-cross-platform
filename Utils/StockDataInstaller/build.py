@@ -42,6 +42,7 @@ def build(archives, stock, output, package_lock):
         with zipfile.ZipFile(output.with_suffix(".partial"), "w") as bundle:
             bundle.writestr(zipfile.ZipInfo("__main__.py"), "from installer import main\nraise SystemExit(main())\n")
             add(bundle, HERE / "installer.py", "installer.py")
+            add(bundle, HERE / "launch_linux.py", "launch_linux.py")
             add(bundle, package_lock, "packages.json")
             add(bundle, ROOT / "LICENSE", "LICENSE")
             for name in LOCKS:
