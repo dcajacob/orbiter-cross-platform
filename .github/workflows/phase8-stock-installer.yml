@@ -102,11 +102,11 @@ jobs:
           cmake -S Tests/Production/StockInstaller/LaunchpadDriver -B out/driver -G Ninja \
             -DCMAKE_BUILD_TYPE=Release -DCMAKE_OSX_ARCHITECTURES="$ORBITER_ARCH" "-DQt6_DIR=$(dirname "$config")"
           cmake --build out/driver
-          otool -L out/driver/launchpad-driver.so
+          otool -L out/driver/launchpad-driver.dylib
       - name: Fly the untouched stock Delta-glider using the installed data
         run: |
           python -B Tests/Production/StockInstaller/smoke.py --installer out/installer/orbiter-stock-data.pyz \
-            --install "$RUNNER_TEMP/Orbiter Stock Install" --output out/receipt --launchpad-driver out/driver/launchpad-driver.so
+            --install "$RUNNER_TEMP/Orbiter Stock Install" --output out/receipt --launchpad-driver out/driver/launchpad-driver.dylib
       - uses: actions/upload-artifact@v7
         if: always()
         with:

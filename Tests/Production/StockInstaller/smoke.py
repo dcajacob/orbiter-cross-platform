@@ -109,7 +109,12 @@ def windows(args, runtime, env):
                 shutil.copy2(runtime / name, args.output)
     assert (args.output / "launchpad-flight-end.txt").read_text().strip() == "48"
     assert "focus=GL-01\nclass=DeltaGlider\n" in (args.output / "launchpad-flight.txt").read_text()
-    return scenario, 48
+    # The shipping Windows default captures the current-state preview in
+    # PreCloseSession, presenting one final frame after the probe's 48 steps.
+    current_state = runtime / "Scenarios/(Current state).scn"
+    assert "CurrentState_img" in current_state.read_text(errors="replace")
+    shutil.copy2(current_state, args.output / "exit-state.scn")
+    return scenario, 49
 
 
 def main():
