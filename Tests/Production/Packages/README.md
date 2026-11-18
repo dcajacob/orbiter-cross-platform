@@ -8,7 +8,8 @@ locked data provisioners on a disposable test copy.
 On Linux the runtime uses the target distribution's Qt 6 Widgets, OpenGL and
 desktop libraries. Start the Qt Launchpad with `bin/orbiter-launchpad`. On
 macOS, the Qt Launchpad app carries its Qt libraries. Use Setup in Launchpad to
-select a native simulator profile. The profile points to the extracted
+select a native simulator profile. Copy the packaged shaders into the asset
+root under `Modules/OGLClient` as part of provisioning. The profile points to the extracted
 `orbiter-production`, `NativeModules`, and separately provisioned asset, data,
 and planet directories. Use writable copies for the configuration and saves.
 

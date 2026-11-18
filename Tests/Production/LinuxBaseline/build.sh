@@ -37,9 +37,6 @@ cmake -S "$src/Utils/Launchpad" -B "$out/qt" -G Ninja -DCMAKE_BUILD_TYPE=Release
 cmake --build "$out/qt" --parallel 4 2>&1 | tee "$out/receipt/qt-build.log"
 tools="$root/Tests/Production/Packages/native.py"
 python3 -B "$tools" stage --engine "$out/engine" --destination "$out/package"
-cp "$out/engine/native-lua/liblua.so" "$out/package/"
-cp "$src/Tests/Production/Licenses/lua-lua.h" "$out/package/Lua-LICENSE.h"
-cp -a "$src/OVP/OGLClient/shaders" "$out/package/"
 cmake --install "$out/qt" --prefix "$out/package"
 python3 -B "$tools" manifest --destination "$out/package" --source "$source_revision"
 tar -C "$out/package" -czf "$out/distribution/$runtime_name" .
