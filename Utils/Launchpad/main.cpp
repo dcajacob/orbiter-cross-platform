@@ -12,6 +12,11 @@ int main(int argc, char **argv)
     app.setStyle("Fusion");
     app.setStyleSheet(R"(
         QWidget#launchpad { background: #101925; }
+        QDialog#flightSettings { background: #101925; }
+        QDialog#flightSettings QTabWidget::pane { background: #172433; border: 1px solid #344a60; }
+        QDialog#flightSettings QTabBar::tab { background: #21354a; padding: 6px 14px; }
+        QDialog#flightSettings QTabBar::tab:selected { background: #2d5475; }
+        QDialog#flightSettings QDoubleSpinBox { background: #101925; padding: 4px; }
         QWidget { color: #e5edf6; font-size: 14px; }
         QLabel#heading { font-size: 28px; font-weight: 600; }
         QLabel#scenarioTitle { font-size: 24px; font-weight: 600; margin: 2px 0; }

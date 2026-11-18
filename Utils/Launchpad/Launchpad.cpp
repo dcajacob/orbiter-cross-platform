@@ -1,4 +1,5 @@
 #include "Launchpad.h"
+#include "FlightSettings.h"
 #include "ScenarioEditor.h"
 #ifdef Q_OS_LINUX
 #include "JoystickSetup.h"
@@ -239,6 +240,10 @@ Launchpad::Launchpad(const QString &profilePath)
         heading->setPixmap(banner);
     header->addWidget(heading);
     header->addStretch();
+    flightSettings = new QPushButton(tr("Flight settings…"));
+    flightSettings->setObjectName("flightSettingsButton");
+    connect(flightSettings, &QPushButton::clicked, this, [this] { showFlightSettings(this, profile); });
+    header->addWidget(flightSettings);
     auto *setup = new QPushButton(tr("Setup"));
     auto *setupMenu = new QMenu(setup);
     setupMenu->addAction(tr("Open simulator profile…"), this, [this] {
@@ -437,6 +442,7 @@ void Launchpad::loadProfile(const QString &path)
 void Launchpad::useProfile(SimulatorProfile selected)
 {
     profile = std::move(selected);
+    flightSettings->setEnabled(profile.configured && QFileInfo(profile.config).isFile());
     launchLog.clear();
     openLog->hide();
     paused->setVisible(profile.native);

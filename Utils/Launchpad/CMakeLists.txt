@@ -6,6 +6,7 @@ find_package(Qt6 6.4 REQUIRED COMPONENTS Widgets)
 qt_add_executable(orbiter-launchpad WIN32 MACOSX_BUNDLE
     main.cpp
     Launchpad.cpp
+    FlightSettings.cpp
     ScenarioEditor.cpp
     SimulatorProfile.cpp)
 target_compile_features(orbiter-launchpad PRIVATE cxx_std_17)

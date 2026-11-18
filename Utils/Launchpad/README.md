@@ -8,6 +8,29 @@ The original Orbiter banner and stock scenario help images are bundled in
 the launcher. Screenshots appear in the description pane when the selected
 scenario has them. A profile can also supply its own scenario help directory.
 
+## Flight settings
+
+Open **Flight settings… → Options** before launching a scenario. Choose
+whether vessels consume fuel, set the glass-cockpit MFD size and update
+interval, or change the 2D panel scale. On native profiles, **Video** sets
+the requested render-window width and height in pixels. **Save** updates
+the active simulator configuration. Reopen the dialog to see the current
+values, including settings changed in flight.
+
+### Coverage of the classic Windows launcher
+
+| Classic page | Qt Launchpad |
+| --- | --- |
+| Scenarios | Scenario tree, search, descriptions and screenshots, launch and return. Native profiles also support start paused, saved flights, and copying a scenario. Classic quicksave management and contextual help are still missing. |
+| Options | Fuel and cockpit instrument settings before flight, plus the Linux joystick setup wizard. The remaining classic option categories are open. |
+| Modules | Enabling and disabling optional plug-ins from the launcher is open. |
+| Video | Native render-window dimensions are editable. Graphics-client selection and client-specific display controls are open. |
+| Extra | The classic launcher hosts add-on and advanced configuration pages. Qt support for those pages is open. |
+| About | The classic About and credits page is open. |
+
+Windows users can access the original pages through **Setup → Open classic
+Launchpad**. [Classic page registration](../../Src/Orbiter/Launchpad.cpp)
+
 ## Build
 
 Install Qt 6.4 or later with Qt Widgets, a C++17 compiler, and CMake. Build from

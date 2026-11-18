@@ -75,7 +75,8 @@ SimulatorProfile SimulatorProfile::fromWindowsExecutable(const QString &path)
     profile.workingDirectory = QFileInfo(path).absolutePath();
     QDir root(profile.workingDirectory);
     QString scenarioDirectory = "Scenarios";
-    QFile config(root.filePath("Orbiter.cfg"));
+    profile.config = root.filePath("Orbiter.cfg");
+    QFile config(profile.config);
     if (config.open(QIODevice::ReadOnly)) {
         const QRegularExpression pattern(R"(^\s*ScenarioDir\s*=\s*([^;\r\n]+))",
             QRegularExpression::MultilineOption | QRegularExpression::CaseInsensitiveOption);

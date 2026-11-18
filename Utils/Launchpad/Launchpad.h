@@ -38,6 +38,7 @@ private:
     ScenarioBrowser *description;
     QLineEdit *search;
     QCheckBox *paused;
+    QPushButton *flightSettings;
     QPushButton *launch;
     QPushButton *copy;
     QPushButton *openLog;
