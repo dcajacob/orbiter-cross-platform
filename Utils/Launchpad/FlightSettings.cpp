@@ -3,17 +3,20 @@
 #include "SimulatorProfile.h"
 
 #include <QCheckBox>
+#include <QComboBox>
 #include <QDialog>
 #include <QDialogButtonBox>
 #include <QDoubleSpinBox>
 #include <QFile>
 #include <QFileInfo>
 #include <QFormLayout>
+#include <QLabel>
 #include <QLockFile>
 #include <QMap>
 #include <QMessageBox>
 #include <QRegularExpression>
 #include <QSaveFile>
+#include <QSignalBlocker>
 #include <QTabWidget>
 #include <QVBoxLayout>
 
@@ -28,8 +31,45 @@ QRegularExpressionMatch assignment(const QString &text, const QString &key)
 
 using Values = QMap<QString, QString>;
 
+QComboBox *addAspectRatio(QFormLayout *form, QDoubleSpinBox *width, QDoubleSpinBox *height)
+{
+    auto *ratio = new QComboBox;
+    ratio->setObjectName("windowAspectRatio");
+    ratio->addItem(QObject::tr("Free"));
+    for (const QSize size : {QSize(4, 3), QSize(16, 10), QSize(16, 9)}) {
+        ratio->addItem(QString("%1:%2").arg(size.width()).arg(size.height()), size);
+        // The Windows launcher infers the lock from either integer-rounded dimension.
+        const int w = int(width->value()), h = int(height->value());
+        if (w == h * size.width() / size.height() || h == w * size.height() / size.width())
+            ratio->setCurrentIndex(ratio->count() - 1);
+    }
+    form->addRow(QObject::tr("&Aspect ratio"), ratio);
+    width->setKeyboardTracking(false);
+    height->setKeyboardTracking(false);
+    auto update = [ratio, width, height](bool fromWidth) {
+        if (!ratio->currentData().isValid())
+            return;
+        const QSize size = ratio->currentData().toSize();
+        auto *edited = fromWidth ? width : height;
+        auto *other = fromWidth ? height : width;
+        const int from = fromWidth ? size.width() : size.height();
+        const int to = fromWidth ? size.height() : size.width();
+        // Bound the edited side too, so its partner fits the renderer's pixel limits.
+        const int low = (int(other->minimum()) * from + to - 1) / to;
+        const int high = ((int(other->maximum()) + 1) * from - 1) / to;
+        const int value = qBound(low, int(edited->value()), high);
+        const QSignalBlocker blockEdited(edited), blockOther(other);
+        edited->setValue(value);
+        other->setValue(value * to / from);
+    };
+    QObject::connect(ratio, &QComboBox::currentIndexChanged, ratio, [update] { update(true); });
+    QObject::connect(width, &QDoubleSpinBox::valueChanged, ratio, [update] { update(true); });
+    QObject::connect(height, &QDoubleSpinBox::valueChanged, ratio, [update] { update(false); });
+    return ratio;
+}
+
 QString saveChanges(const QString &path, const QString &original, const Values &before, const Values &after,
-                    const ModulesPage &modules, const SimulatorProfile &profile)
+                    const ModulesPage &modules, const SimulatorProfile &profile, bool linkedSize)
 {
     const auto moduleChanges = modules.startupChanges();
     const bool configChanged = before != after || !moduleChanges.isEmpty();
@@ -48,13 +88,18 @@ QString saveChanges(const QString &path, const QString &original, const Values &
         return input.errorString();
     input.close();
     const auto newline = text.contains("\r\n") ? "\r\n" : "\n";
+    const bool checkBothDimensions = linkedSize && (before.value("WindowWidth") != after.value("WindowWidth")
+        || before.value("WindowHeight") != after.value("WindowHeight"));
     for (auto it = after.cbegin(); it != after.cend(); ++it) {
-        if (it.value() == before.value(it.key()))
+        const bool changed = it.value() != before.value(it.key());
+        if (!changed && !(checkBothDimensions && (it.key() == "WindowWidth" || it.key() == "WindowHeight")))
             continue;
         const auto old = assignment(original, it.key());
         const auto current = assignment(text, it.key());
         if (old.hasMatch() != current.hasMatch() || old.captured(1) != current.captured(1))
             return QObject::tr("%1 changed outside Launchpad. Reopen Flight settings to load the new value.").arg(it.key());
+        if (!changed)
+            continue;
         if (current.hasMatch())
             text.replace(current.capturedStart(1), current.capturedLength(1), it.value());
         else
@@ -125,6 +170,7 @@ void showFlightSettings(QWidget *parent, const SimulatorProfile &profile)
         const double value = assignment(original, key).captured(1).toDouble(&ok);
         field->setValue(ok ? value : fallback);
         page->addRow(label, field);
+        return field;
     };
     auto *limitedFuel = new QCheckBox(QObject::tr("Limited fuel"));
     limitedFuel->setObjectName("limitedFuel");
@@ -133,12 +179,16 @@ void showFlightSettings(QWidget *parent, const SimulatorProfile &profile)
     addNumber(form, "GenericMFDSize", QObject::tr("Glass cockpit MFD size"), 6, 1, 10, 0);
     addNumber(form, "InstrumentUpdateInterval", QObject::tr("MFD update interval"), 0.5, 0.01, 1e9, 2, QObject::tr(" s"));
     addNumber(form, "PanelScale", QObject::tr("2D panel scale"), 1, 0.25, 4, 2, QObject::tr(" ×"));
+    QComboBox *aspectRatio = nullptr;
     if (profile.native) {
         auto *video = new QWidget;
         auto *videoForm = new QFormLayout(video);
         tabs->addTab(video, QObject::tr("Video"));
-        addNumber(videoForm, "WindowWidth", QObject::tr("Window width"), 1280, 320, 16384, 0, QObject::tr(" px"));
-        addNumber(videoForm, "WindowHeight", QObject::tr("Window height"), 720, 200, 16384, 0, QObject::tr(" px"));
+        videoForm->addRow(QObject::tr("Graphics engine"), new QLabel(QObject::tr("OpenGL (windowed)")));
+        videoForm->addRow(QObject::tr("Vertical sync"), new QLabel(QObject::tr("On (requested)")));
+        auto *width = addNumber(videoForm, "WindowWidth", QObject::tr("Window width"), 1280, 320, 16384, 0, QObject::tr(" px"));
+        auto *height = addNumber(videoForm, "WindowHeight", QObject::tr("Window height"), 720, 200, 16384, 0, QObject::tr(" px"));
+        aspectRatio = addAspectRatio(videoForm, width, height);
     }
 
     auto *modules = new ModulesPage(profile, original);
@@ -156,7 +206,8 @@ void showFlightSettings(QWidget *parent, const SimulatorProfile &profile)
     layout->addWidget(buttons);
     QObject::connect(buttons, &QDialogButtonBox::rejected, &dialog, &QDialog::reject);
     QObject::connect(buttons, &QDialogButtonBox::accepted, &dialog, [&] {
-        const auto error = saveChanges(path, original, before, values(), *modules, profile);
+        const auto error = saveChanges(path, original, before, values(), *modules, profile,
+                                      aspectRatio && aspectRatio->currentData().isValid());
         if (error.isEmpty())
             dialog.accept();
         else

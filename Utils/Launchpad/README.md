@@ -12,10 +12,23 @@ scenario has them. A profile can also supply its own scenario help directory.
 
 Open **Flight settings… → Options** before launching a scenario. Choose
 whether vessels consume fuel, set the glass-cockpit MFD size and update
-interval, or change the 2D panel scale. On native profiles, **Video** sets
-the requested render-window width and height in pixels. **Save** updates
+interval, or change the 2D panel scale. **Save** updates
 the active simulator configuration. Reopen the dialog to see the current
 values, including settings changed in flight.
+
+On native profiles, open **Flight settings… → Video** to set the flight window's
+width and height in framebuffer pixels. Choose **Free** to edit them independently,
+or choose **4:3**, **16:10**, or **16:9** to link them. Selecting a ratio adjusts
+the height to fit the width. Editing either dimension then updates the other.
+As in the Windows Launchpad, the saved width and height determine which ratio
+appears when you reopen the page.
+On a 2× Wayland display, choose even pixel dimensions so the compositor can
+represent the requested framebuffer with a whole number of logical pixels.
+
+The Linux cockpit uses the windowed OpenGL client and requests vertical sync.
+The classic fullscreen modes, colour depth, graphics client and device selectors,
+device enumeration, stencil, page flipping, and VSync switch have no configurable
+counterpart in this renderer.
 
 Open **Flight settings… → Modules** to see the plug-ins installed for the
 selected simulator. Check the ones you want and click **Save** before launching.
@@ -36,7 +49,7 @@ with audio enabled.
 | Scenarios | Scenario tree, search, descriptions and screenshots, launch and return. Native profiles also support start paused, saved flights, and copying a scenario. Classic quicksave management and contextual help are still missing. |
 | Options | Fuel and cockpit instrument settings before flight, plus the Linux joystick setup wizard. The remaining classic option categories are open. |
 | Modules | Installed plug-in list and startup selection. Native profiles identify automatic dependencies and unsupported plug-ins. Windows graphics clients are listed separately from selectable plug-ins. |
-| Video | Native render-window dimensions are editable. Graphics-client selection and client-specific display controls are open. |
+| Video | Native window width, height, and the three classic fixed aspect ratios. |
 | Extra | The classic launcher hosts add-on and advanced configuration pages. Qt support for those pages is open. |
 | About | The classic About and credits page is open. |
 

@@ -4,10 +4,14 @@
 
 #include <QApplication>
 #include <QCheckBox>
+#include <QComboBox>
+#include <QDialog>
 #include <QDialogButtonBox>
 #include <QDoubleSpinBox>
 #include <QFile>
+#include <QMessageBox>
 #include <QPushButton>
+#include <QScopeGuard>
 #include <QSettings>
 #include <QTabWidget>
 #include <QTemporaryDir>
@@ -33,6 +37,88 @@ QTreeWidgetItem *plugin(QWidget *page, const QString &name)
 class FlightSettingsCheck : public QObject {
     Q_OBJECT
 private slots:
+    void linkedSizeConflict()
+    {
+        QTemporaryDir dir;
+        SimulatorProfile profile;
+        profile.native = true;
+        profile.config = dir.filePath("Orbiter.cfg");
+        writeFile(profile.config, "WindowWidth = 1000\nWindowHeight = 731\n");
+        const QByteArray external = "WindowWidth = 1024\nWindowHeight = 731\n";
+        bool warned = false;
+        QTimer::singleShot(0, [&] {
+            auto *dialog = qobject_cast<QDialog *>(QApplication::activeModalWidget());
+            dialog->findChild<QComboBox *>("windowAspectRatio")->setCurrentText("16:10");
+            writeFile(profile.config, external);
+            QTimer::singleShot(0, dialog, [&] {
+                if (auto *message = qobject_cast<QMessageBox *>(QApplication::activeModalWidget())) {
+                    warned = message->text().contains("WindowWidth");
+                    message->accept();
+                }
+            });
+            dialog->findChild<QDialogButtonBox *>()->button(QDialogButtonBox::Save)->click();
+            dialog->reject();
+        });
+        showFlightSettings(nullptr, profile);
+        QVERIFY(warned);
+        QFile cfg(profile.config);
+        QVERIFY(cfg.open(QIODevice::ReadOnly));
+        QCOMPARE(cfg.readAll(), external);
+    }
+
+    void videoWindowSizing()
+    {
+        QTemporaryDir dir;
+        SimulatorProfile profile;
+        profile.native = true;
+        profile.config = dir.filePath("Orbiter.cfg");
+        const QByteArray original = "WindowWidth = 1000 ; pixels\r\nWindowHeight = 731\r\n"
+                                    "DeviceNoVSync = TRUE\r\n";
+        writeFile(profile.config, original);
+        for (auto action : {QDialogButtonBox::Cancel, QDialogButtonBox::Save}) {
+            QTimer::singleShot(0, [&] {
+                auto *dialog = qobject_cast<QDialog *>(QApplication::activeModalWidget());
+                const auto closeOnFailure = qScopeGuard([&] { if (dialog->isVisible()) dialog->reject(); });
+                auto *ratio = dialog->findChild<QComboBox *>("windowAspectRatio");
+                auto *width = dialog->findChild<QDoubleSpinBox *>("WindowWidth");
+                auto *height = dialog->findChild<QDoubleSpinBox *>("WindowHeight");
+                QVERIFY(ratio && width && height);
+                QCOMPARE(ratio->currentText(), "Free");
+                width->setValue(960);
+                QCOMPARE(height->value(), 731);
+                ratio->setCurrentText("4:3");
+                QCOMPARE(height->value(), 720);
+                ratio->setCurrentText("16:10");
+                QCOMPARE(height->value(), 600);
+                ratio->setCurrentText("16:9");
+                QCOMPARE(height->value(), 540);
+                width->setValue(320);
+                QCOMPARE(width->value(), 356);
+                QCOMPARE(height->value(), 200);
+                height->setValue(16384);
+                QCOMPARE(width->value(), 16384);
+                QCOMPARE(height->value(), 9216);
+                height->setValue(600);
+                QCOMPARE(width->value(), 1066);
+                dialog->findChild<QDialogButtonBox *>()->button(action)->click();
+            });
+            showFlightSettings(nullptr, profile);
+            QFile cfg(profile.config);
+            QVERIFY(cfg.open(QIODevice::ReadOnly));
+            QByteArray expected = original;
+            if (action == QDialogButtonBox::Save)
+                expected.replace("1000", "1066").replace("731", "600");
+            QCOMPARE(cfg.readAll(), expected);
+        }
+        QTimer::singleShot(0, [&] {
+            auto *dialog = qobject_cast<QDialog *>(QApplication::activeModalWidget());
+            const auto close = qScopeGuard([&] { dialog->reject(); });
+            QCOMPARE(dialog->findChild<QComboBox *>("windowAspectRatio")->currentText(), "16:9");
+            QCOMPARE(dialog->findChild<QDoubleSpinBox *>("WindowHeight")->value(), 600);
+        });
+        showFlightSettings(nullptr, profile);
+    }
+
     void nativeModules()
     {
         QTemporaryDir dir;
