@@ -50,6 +50,33 @@ acceptance**, after all software gates and the operator walkthrough pass.
 [Closeout tools and current limits](../../Tests/Production/Closeout/README.md)
 record the implementation and its retained evidence scope.
 
+## Phase 7 sparse milestone
+
+The scoped desktop checks are complete on the tested Linux, Windows, and macOS
+revisions. Linux includes local controller evidence. Windows passed the
+selected stock and module checks, Options persistence, scenario editing and
+reload, XRSound software playback, and the Qt Launchpad launch-and-return flow.
+The hosted Intel and Apple Silicon runs passed the four macOS desktop checks.
+[Linux record](LinuxPhase7Sparse.md), [Windows stock run](https://github.com/dcajacob/orbiter-cross-platform/actions/runs/43650713365),
+[Windows Options and editor](https://github.com/dcajacob/orbiter-cross-platform/actions/runs/43655199856),
+[Windows XRSound](https://github.com/dcajacob/orbiter-cross-platform/actions/runs/43654243489),
+[Windows Qt Launchpad](https://github.com/dcajacob/orbiter-cross-platform/actions/runs/43658778248),
+[macOS record](MacOSPhase7Sparse.md).
+
+Phase 8 packaging and clean-install work can begin from this milestone. Formal
+release acceptance still requires the open Phase 6 gates, full stock and mission
+coverage, and the remaining hardware checks. Full runs and the Windows hands-on
+check remain deferred. The result records retain each tested source revision.
+
+Phase 8 clean-install smoke checks passed for Linux, Windows and both Mac
+architectures. The stock data installer and matching SDK smoke checks passed
+on all four preview packages.
+[Package results](Phase8Packages.md) · [Stock data installer](Phase8StockData.md) · [SDK verification](Phase8SDK.md)
+The [Phase 8 release checklist](Phase8ReleaseChecklist.md) records the remaining
+packaging and release-acceptance work.
+The [Ubuntu 24.04 baseline](Linux24Compatibility.md) passed the separate
+clean-install and SDK smoke checks.
+
 ## Frozen scope and starting point
 
 The release uses the existing `PlanetarySystem`, `Body`, `RigidBody`, `Vessel`,
@@ -100,7 +127,7 @@ may satisfy a production acceptance case.
 | Propulsion, RCS, atmosphere, docking, contacts | Original native Vessel and atmosphere; orbital/ground flight, RCS/autopilot, docking, controlled landing, attachments and live vessel creation/deletion/focus pass local and hosted reduced-fixture gates | Preserve original systems; production references before extraction |
 | HUD/MFD/2D panels/VC/Sketchpad | Original native glass cockpit passes hosted ten-mode MFD/three-mode HUD comparisons. DG/DG-S panels/VC, selection/input dialogs, RCS clicks and all twelve menu commands run locally; broader platform and interaction acceptance remains open ([details](Cockpit.md)) | Original instruments, redraws, surfaces, fonts/TextW, picking and interaction |
 | Lua, tutorials and flight recording | Original Lua/AAP matches the preserved Windows reference in all four native build/CPU profiles. Five unchanged DG recordings, tutorial text and native recorder/playback editor flows pass locally | Bundled modules/scripts and portable views over existing logic; broader stock acceptance remains open |
-| Scenario editor and audio | Linux Launchpad scenario copies, paused in-flight editing and native XRSound pass local sparse checks | [Linux Phase 7 results](LinuxPhase7Sparse.md) |
+| Scenario editor and audio | Paused vessel editing, save/reload, and XRSound pass scoped checks on Linux, Windows, and both Mac architectures | [Phase 7 evidence](#phase-7-sparse-milestone) |
 | Installation and assets | Source-built production preview with explicit verified stock-data roots; POC bundle remains separate | Relocatable runtime, native SDK, verified/offline/resumable separate asset installer |
 
 [Graphics callback inventory](graphics-capabilities.csv) and
@@ -138,8 +165,8 @@ NRLMSISE C package; its author notice is retained.
 | 4 | Native real world/external client | Accepted reduced Sol/ISS/ShuttlePB external view on the laptop and hosted Ubuntu 24.04 Debug/Release. Current Windows application/client, frozen state/image/landmark checks and twenty in-process sessions pass. General stock compatibility and remaining release hardware gates follow later. [Evidence](NativeExternalView.md) |
 | 5 | Usable flight and interaction | Accepted for production ShuttlePB/ISS fixtures: flight, docking, attachments, creation/deferred deletion/focus, persistence, keyboard, atmosphere/contact and upright landing pass. All four native Debug/Release automatic/SSE2 configurations and current Windows application/SDK/client/reference gates pass. [Orbital evidence](NativeFlight.md), [ground-flight evidence](GroundFlight.md), [lifetime acceptance](VesselLifetime.md) |
 | 6 | Cockpit and Delta-glider | In progress. HUD/MFD, DG/DG-S panels/VC, systems, Lua AAP, input, Shuttle-A and named mission flows have scoped evidence. Four-profile paused Atlantis lifetime passes. The fresh normal-gate Debug automatic full157 sweep at `f82b7392` has **118 passes and 39 failures**, zero sanitizer findings and 157 clean context deletions: 38 class-admission rejections despite all dependencies being available, plus one inherited original assertion. Recovered four-profile Windows all38 writer/reload observations and 304 direct Debug/Release comparisons pass their original budgets; historical worker/desktop transport receipts remain missing. Current Windows paused normal-cleanup lifetime passes eighty worlds in all four profiles at `bdfd067f`. Complete current Windows/native numerical/image/mission parity, remaining class admission, controller and hardware/performance gates remain open. [Current corpus](CurrentStockCorpus.md), [recovered Windows observations](RecoveredWindowsObservations.md), [paused lifetime](AttachmentTeardown.md), [cockpit](Cockpit.md), [remaining modules](RemainingVessels.md) |
-| 7 | Practical stock experience | Linux sparse milestone complete on the laptop. Full stock and mission runs are deferred. Broader platform and release qualification remain open. [Linux Phase 7 results](LinuxPhase7Sparse.md) |
-| 8 | Packages and release acceptance | Not started; clean install outside checkout, data installer, SDK, all automated and hardware gates |
+| 7 | Practical stock experience | Sparse desktop milestone complete across Linux, Windows, Intel Mac, and Apple Silicon. Full runs and remaining hardware acceptance are deferred. [Phase 7 evidence](#phase-7-sparse-milestone) |
+| 8 | Packages and release acceptance | In progress; all four preview archives, stock installer and matching SDKs passed smoke checks. Formal release acceptance remains open. |
 
 Later phases cannot substitute for failed earlier gates. Use the narrower labels
 real Windows client, native production core, native external view and
@@ -292,7 +319,8 @@ available with `--verify-only`. This test provisioner is not the final resumable
 asset installer. The upstream `latest` asset URL can disappear or be replaced;
 a different hash fails explicitly. The audited versioned mirror described below
 preserves these consumed data bytes and excludes the restricted Architext font.
-The final asset installer and packaged font policy remain later release work.
+The Phase 8 preview installer uses the pinned mirror and configures a verified
+Cousine font for the manuscript UI. See [stock data installer](Phase8StockData.md).
 
 Candidate output directories must not exist before capture. Initial orbit and
 propulsion references are now [explicitly accepted and frozen](../../Tests/Production/Reference/README.md)
@@ -361,8 +389,9 @@ python3 -B Tests/Production/prepare_data.py \
 For an isolated extraction, supply the verified publisher ZIP with `--archive`
 and a separate `--destination`. These planet archives were not part of the frozen
 orbit fixture's input profile. Further production terrain/scene references must
-record the combined profile explicitly. Durable package storage, complete license
-review and the final resumable asset installer remain outstanding.
+record the combined profile explicitly. The Phase 8 preview installer handles
+the pinned archive and retains its original notices. Durable release storage
+and complete license review remain open.
 
 ## Production references and acceptance contracts
 
