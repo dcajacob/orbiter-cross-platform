@@ -5,12 +5,16 @@ find_package(Qt6 6.4 REQUIRED COMPONENTS Widgets)
 
 qt_add_executable(orbiter-launchpad WIN32 MACOSX_BUNDLE
     main.cpp
+    AboutDialog.cpp
     Launchpad.cpp
     ExtraPage.cpp
     FlightSettings.cpp
     ModulesPage.cpp
     ScenarioEditor.cpp
     SimulatorProfile.cpp)
+include("${CMAKE_CURRENT_LIST_DIR}/../../cmake/OrbiterAbout.cmake")
+orbiter_configure_about()
+target_include_directories(orbiter-launchpad PRIVATE "${CMAKE_CURRENT_BINARY_DIR}")
 target_compile_features(orbiter-launchpad PRIVATE cxx_std_17)
 target_link_libraries(orbiter-launchpad PRIVATE Qt6::Widgets)
 set_target_properties(orbiter-launchpad PROPERTIES MACOSX_BUNDLE_BUNDLE_NAME "Orbiter Launchpad")
@@ -41,7 +45,11 @@ endif()
 
 set(orbiter_bitmaps "${CMAKE_CURRENT_SOURCE_DIR}/../../Src/Orbiter/Bitmaps")
 qt_add_resources(orbiter-launchpad "launchpad_banner" PREFIX "/launchpad" BASE "${orbiter_bitmaps}"
-    FILES "${orbiter_bitmaps}/banner.bmp")
+    FILES "${orbiter_bitmaps}/banner.bmp" "${orbiter_bitmaps}/Icon64.bmp")
+
+get_filename_component(orbiter_source "${CMAKE_CURRENT_SOURCE_DIR}/../.." ABSOLUTE)
+qt_add_resources(orbiter-launchpad "launchpad_about" PREFIX "/launchpad/about" BASE "${orbiter_source}"
+    FILES "${orbiter_source}/Html/Main/Credit/credit.htm" "${orbiter_source}/Src/Orbiter/Disclaimer.txt")
 
 set(scenario_help "${CMAKE_CURRENT_SOURCE_DIR}/../../Html/Scenarios")
 file(GLOB_RECURSE scenario_art CONFIGURE_DEPENDS

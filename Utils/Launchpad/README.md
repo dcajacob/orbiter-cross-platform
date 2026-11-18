@@ -79,7 +79,7 @@ this page.
 | Modules | Installed plug-in list and startup selection. Native profiles identify automatic dependencies and unsupported plug-ins. Windows graphics clients are listed separately from selectable plug-ins. |
 | Video | Native window width, height, and the three classic fixed aspect ratios. Linux also supports fullscreen at desktop resolution and a VSync toggle. |
 | Extra | Linux native physics, orbit stabilisation, MFD resolution, installed atmosphere models and stock vessel graphics. |
-| About | The classic About and credits page is open. |
+| About | Open **About** in the main window for the selected simulator and Qt Launchpad build dates and versions, original component credits, Orbiter links, full credits and MIT license. The credits and license are bundled for offline use. Older installations without a build stamp show their simulator version as unavailable. |
 
 Windows users can access the original pages through **Setup → Open classic
 Launchpad**. [Classic page registration](../../Src/Orbiter/Launchpad.cpp)

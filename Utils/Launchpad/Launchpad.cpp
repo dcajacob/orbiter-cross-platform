@@ -1,4 +1,5 @@
 #include "Launchpad.h"
+#include "AboutDialog.h"
 #include "FlightSettings.h"
 #include "ScenarioEditor.h"
 #ifdef Q_OS_LINUX
@@ -296,6 +297,10 @@ Launchpad::Launchpad(const QString &profilePath)
     });
     setup->setMenu(setupMenu);
     header->addWidget(setup);
+    auto *about = new QPushButton(tr("About"));
+    about->setObjectName("aboutButton");
+    connect(about, &QPushButton::clicked, this, &Launchpad::openAbout);
+    header->addWidget(about);
     outer->addLayout(header);
 
     auto *splitter = new QSplitter;
@@ -423,6 +428,11 @@ Launchpad::Launchpad(const QString &profilePath)
     else
         useProfile({});
 #endif
+}
+
+void Launchpad::openAbout()
+{
+    showAboutDialog(this, profile);
 }
 
 void Launchpad::openJoystickSetup()

@@ -17,6 +17,7 @@ class Launchpad : public QWidget {
 public:
     explicit Launchpad(const QString &profilePath);
     void openJoystickSetup();
+    void openAbout();
 
 protected:
     void closeEvent(QCloseEvent *event) override;

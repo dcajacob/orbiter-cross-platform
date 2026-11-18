@@ -192,6 +192,6 @@ add_custom_command(TARGET ${OrbiterTgt}	POST_BUILD
 	COMMAND ${CMAKE_COMMAND} -E copy ${ORBITER_LIB} ${ORBITER_BINARY_SDK_DIR}/lib/ 
 )
 
-string(TIMESTAMP DATE "%d %b %Y")
-string(TIMESTAMP VERSION "%y%m%d")
-configure_file(about.hpp.in about.hpp @ONLY)
+include("${CMAKE_CURRENT_LIST_DIR}/../../cmake/OrbiterAbout.cmake")
+orbiter_configure_about(Orbiter)
+install(FILES "$<TARGET_FILE:Orbiter>.version" DESTINATION "${ORBITER_INSTALL_ROOT_DIR}")

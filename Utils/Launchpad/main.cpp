@@ -12,10 +12,10 @@ int main(int argc, char **argv)
     app.setStyle("Fusion");
     app.setStyleSheet(R"(
         QWidget#launchpad { background: #101925; }
-        QDialog#flightSettings { background: #101925; }
-        QDialog#flightSettings QTabWidget::pane { background: #172433; border: 1px solid #344a60; }
-        QDialog#flightSettings QTabBar::tab { background: #21354a; padding: 6px 14px; }
-        QDialog#flightSettings QTabBar::tab:selected { background: #2d5475; }
+        QDialog#flightSettings, QDialog#orbiterAbout { background: #101925; }
+        QDialog#flightSettings QTabWidget::pane, QDialog#orbiterAbout QTabWidget::pane { background: #172433; border: 1px solid #344a60; }
+        QDialog#flightSettings QTabBar::tab, QDialog#orbiterAbout QTabBar::tab { background: #21354a; padding: 6px 14px; }
+        QDialog#flightSettings QTabBar::tab:selected, QDialog#orbiterAbout QTabBar::tab:selected { background: #2d5475; }
         QDialog#flightSettings QDoubleSpinBox { background: #101925; padding: 4px; }
         QComboBox#windowAspectRatio, QComboBox#windowAspectRatio QAbstractItemView {
             background: #21354a; color: #e5edf6; selection-background-color: #2d5475;
@@ -37,6 +37,7 @@ int main(int argc, char **argv)
         QTreeWidget::item { min-height: 26px; padding: 1px 3px; }
         QTreeWidget::item:hover { background: #253a50; }
         QTextBrowser { padding: 10px; }
+        QTextBrowser#aboutCredits { background: white; color: black; }
         QMenu { padding: 5px; }
         QMenu::item { padding: 7px 12px; }
         QMenu::item:selected { background: #2d5475; }
@@ -57,6 +58,7 @@ int main(int argc, char **argv)
     QCommandLineParser parser;
     parser.setApplicationDescription("Browse scenarios and launch Orbiter.");
     parser.addHelpOption();
+    parser.addOption({"about", "Open the About Orbiter page."});
     parser.addOption({"profile", "Use a simulator profile.", "json"});
 #ifdef Q_OS_LINUX
     parser.addOption({"joystick-setup", "Open the Linux joystick setup dialog."});
@@ -65,6 +67,8 @@ int main(int argc, char **argv)
     Launchpad window(parser.value("profile"));
     window.setAttribute(Qt::WA_StyledBackground);
     window.show();
+    if (parser.isSet("about"))
+        QTimer::singleShot(0, &window, &Launchpad::openAbout);
 #ifdef Q_OS_LINUX
     if (parser.isSet("joystick-setup"))
         QTimer::singleShot(0, &window, &Launchpad::openJoystickSetup);

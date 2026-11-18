@@ -29,6 +29,9 @@ def stage(args):
     root = args.destination
     root.mkdir()
     shutil.copy2(args.engine / "orbiter-production", root)
+    version = args.engine / "orbiter-production.version"
+    if version.is_file():
+        shutil.copy2(version, root)
     libraries = sorted(args.engine.glob("liborbiter*.dylib" if sys.platform == "darwin" else "liborbiter*.so"))
     if len(libraries) != 3:
         raise RuntimeError(f"Expected three production libraries, got {libraries}")

@@ -41,10 +41,10 @@ void orbiter::AboutTab::Create ()
 	SetWindowText (GetDlgItem (hTab, IDC_ABT_TXT_CPR), SIG1B);
 	SetWindowText (GetDlgItem (hTab, IDC_ABT_TXT_WEBADDR), SIG2 "\n" SIG5 "\n" SIG6);
 	SendDlgItemMessage(hTab, IDC_ABT_LBOX_COMPONENT, LB_ADDSTRING, 0,
-		(LPARAM)"D3D9Client module by Jarmo Nikkanen and Peter Schneider"
+		(LPARAM)CREDIT_D3D9
 	);
 	SendDlgItemMessage(hTab, IDC_ABT_LBOX_COMPONENT, LB_ADDSTRING, 0,
-		(LPARAM)"XRSound module Copyright (c) Doug Beachy"
+		(LPARAM)CREDIT_XRSOUND
 	);
 }
 

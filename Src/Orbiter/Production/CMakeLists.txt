@@ -161,6 +161,15 @@ else()
 endif()
 if(ORBITER_BUILD_NATIVE_VESSELS)
     include(NativeVessels.cmake)
+    # Record the version reported by this simulator before it is packaged.
+    # Reading About never needs to execute the selected simulator or load its libraries.
+    if(ORBITER_BUILD_NATIVE_COCKPIT AND (NOT CMAKE_CROSSCOMPILING OR CMAKE_CROSSCOMPILING_EMULATOR))
+        add_executable(orbiter-version-writer WriteBuildVersion.cpp)
+        target_link_libraries(orbiter-version-writer PRIVATE orbiter_production_vessels)
+        add_custom_command(TARGET orbiter-production POST_BUILD
+            COMMAND orbiter-version-writer "$<TARGET_FILE:orbiter-production>.version"
+            VERBATIM)
+    endif()
 endif()
 if(ORBITER_BUILD_NATIVE_CELESTIAL_MODULES)
     include(NativeCelestialModules.cmake)
