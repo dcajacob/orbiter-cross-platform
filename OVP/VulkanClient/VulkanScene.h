@@ -101,6 +101,7 @@ public:
     bool Present(const SceneUniform& ship, const SceneUniform& ground,
         const std::filesystem::path& sample = {});
     void Capture(std::filesystem::path path) { capture_ = std::move(path); }
+    Uint64 AcquireWaitNS() const { return acquireWaitNS_; }
     bool ShadowMapUpdated() const { return mapUpdated_; }
     void Close() noexcept;
     void ClearGround() noexcept;
@@ -170,6 +171,7 @@ private:
     SDL_GPUGraphicsPipeline* pavementShadow_ = nullptr;
     SDL_GPUSampler* shadowSampler_ = nullptr;
     bool mapUpdated_ = false;
+    Uint64 acquireWaitNS_ = 0;
     unsigned shipIndexCount_ = 0;
     SDL_GPUBuffer* shadowVertices_ = nullptr;
     SDL_GPUTransferBuffer* shipUpload_ = nullptr;

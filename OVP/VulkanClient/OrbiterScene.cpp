@@ -193,7 +193,7 @@ void OrbiterScene::Open(SDL_Window* window, BaseMeshes baseMeshes, bool baseShad
     if (const char* path = SDL_getenv("ORBITER_VULKAN_FRAME_TRACE"); path && *path) {
         frameTrace_.open(std::filesystem::path(path));
         if (!frameTrace_) throw std::runtime_error("Cannot open Vulkan frame trace");
-        frameTrace_ << "sim_seconds,interval_ms,scene_ms,terrain_ms,tiles_staged,imagery_staged,tiles_switched,pose_uploaded,shadow_drawn,base_upload_ms,base_shadow_updated\n";
+        frameTrace_ << "sim_seconds,interval_ms,scene_ms,terrain_ms,tiles_staged,imagery_staged,tiles_switched,pose_uploaded,shadow_drawn,base_upload_ms,base_shadow_updated,acquire_wait_ms,reanchor_ms,terrain_recentered,visible_tiles,detail_tiles\n";
     }
     previousFrame_ = 0;
 }
@@ -403,7 +403,9 @@ bool OrbiterScene::Present(unsigned width, unsigned height)
     const auto simTime = oapiGetSimTime();
     VECTOR3 camera;
     oapiCameraGlobalPos(&camera);
+    Uint64 reanchorTime = 0;
     if (terrain_.NeedsReanchor(camera)) {
+        const auto beforeReanchor = SDL_GetTicksNS();
         scene_.ClearGround();
         terrain_.Open(archivePath_, camera);
         for (auto& base : bases_) {
@@ -411,6 +413,7 @@ bool OrbiterScene::Present(unsigned width, unsigned height)
             base.loaded = false;
         }
         shadowTime_.reset();
+        reanchorTime = SDL_GetTicksNS() - beforeReanchor;
     }
     const auto groundFrame = terrain_.Frame();
     auto* vessel = oapiGetVesselInterface(focus_);
@@ -458,7 +461,9 @@ bool OrbiterScene::Present(unsigned width, unsigned height)
         frameTrace_ << simTime << ',' << milliseconds(previousFrame_ ? start - previousFrame_ : 0)
                     << ',' << milliseconds(SDL_GetTicksNS() - start) << ',' << milliseconds(terrainTime)
                     << ',' << tiles.staged << ',' << tiles.imagery << ',' << tiles.switched << ',' << poseChanged
-                    << ',' << !shadowVertices_.empty() << ',' << milliseconds(baseUploadTime) << ',' << scene_.ShadowMapUpdated() << '\n';
+                    << ',' << !shadowVertices_.empty() << ',' << milliseconds(baseUploadTime) << ',' << scene_.ShadowMapUpdated()
+                    << ',' << milliseconds(scene_.AcquireWaitNS()) << ',' << milliseconds(reanchorTime)
+                    << ',' << tiles.recentered << ',' << terrain_.VisibleCount() << ',' << terrain_.DetailCount() << '\n';
         previousFrame_ = start;
     }
     return presented;

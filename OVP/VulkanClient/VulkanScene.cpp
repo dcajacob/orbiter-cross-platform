@@ -622,7 +622,10 @@ bool Scene::Present(const SceneUniform& ship, const SceneUniform& ground, const 
     SDL_GPUTexture* back = nullptr;
     unsigned width = 0;
     unsigned height = 0;
-    if (!SDL_WaitAndAcquireGPUSwapchainTexture(commands, window_, &back, &width, &height)) {
+    const auto beforeAcquire = SDL_GetTicksNS();
+    const bool acquired = SDL_WaitAndAcquireGPUSwapchainTexture(commands, window_, &back, &width, &height);
+    acquireWaitNS_ = SDL_GetTicksNS() - beforeAcquire;
+    if (!acquired) {
         SDL_CancelGPUCommandBuffer(commands);
         Require(false, "Acquire Vulkan swapchain image");
     }

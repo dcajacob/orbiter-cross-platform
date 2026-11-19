@@ -27,6 +27,8 @@ public:
     void Close();
     bool NeedsReanchor(const VECTOR3& position) const;
     TerrainUpdate Update(const VECTOR3& position, Scene&);
+    size_t VisibleCount() const { return visible_.size(); }
+    size_t DetailCount() const;
     SceneFrame Frame() const;
     VECTOR3 DrapeSurfaceTile(const VECTOR3& local) const;
     VECTOR3 BasePosition(double longitude, double latitude) const;

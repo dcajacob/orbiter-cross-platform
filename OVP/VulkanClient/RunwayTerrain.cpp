@@ -400,6 +400,11 @@ SceneFrame RunwayTerrain::BaseFrame(double lng, double lat) const
     return result;
 }
 
+size_t RunwayTerrain::DetailCount() const
+{
+    return std::count_if(visible_.begin(), visible_.end(), [](const TileKey& key) { return key.level == detailLevel; });
+}
+
 SceneFrame RunwayTerrain::Frame() const
 {
     const auto earth = ObjectFrame(earth_);
