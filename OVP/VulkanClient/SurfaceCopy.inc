@@ -57,4 +57,25 @@ Color ReadPixel(const TextureData& texture, unsigned x, unsigned y)
     return result;
 }
 
+// Orbiter also loads some instrument atlases as DDS and then draws into them.
+void MakeWritable(TextureData& image)
+{
+    if (image.format != SDL_GPU_TEXTUREFORMAT_R8G8B8A8_UNORM) {
+        std::vector<std::uint8_t> pixels(std::size_t(image.width) * image.height * 4);
+        for (unsigned y = 0; y < image.height; ++y) {
+            for (unsigned x = 0; x < image.width; ++x) {
+                const auto color = ReadPixel(image, x, y);
+                std::memcpy(pixels.data() + (std::size_t(y) * image.width + x) * 4, color.data(), 4);
+            }
+        }
+        image.pixels = std::move(pixels);
+        image.format = SDL_GPU_TEXTUREFORMAT_R8G8B8A8_UNORM;
+        image.blockBytes = 0;
+    }
+    if (image.levels > 1) {
+        image.pixels.resize(std::size_t(image.width) * image.height * 4);
+        image.levels = 1;
+    }
+}
+
 } // namespace

@@ -58,6 +58,7 @@ private:
     BaseMeshes baseMeshes_;
     bool baseShadows_ = true;
     std::filesystem::path captureDirectory_;
+    unsigned captureFps_ = 10;
     long long lastCapture_ = -1;
     std::vector<EarthBase> bases_;
     RunwayTerrain terrain_;

@@ -4,6 +4,7 @@
 #include <algorithm>
 #include <cmath>
 #include <cctype>
+#include <charconv>
 #include <limits>
 #include <cstring>
 #include <iostream>
@@ -41,14 +42,14 @@ SceneUniform MakeUniform(const SceneFrame& frame, unsigned width, unsigned heigh
     const double vertical = 1 / std::tan(oapiCameraAperture());
     const double horizontal = vertical * height / width;
     constexpr double nearPlane = 0.1;
-    constexpr double farPlane = 220000.0;
+
     for (unsigned i = 0; i < 4; ++i) {
         const auto& v = i == 3 ? displacement : frame.axes[i];
         const auto z = Dot(v, axes[2]);
         uniform.projection[4 * i] = float(horizontal * Dot(v, axes[0]));
         uniform.projection[4 * i + 1] = float(vertical * Dot(v, axes[1]));
         // Reverse Z preserves floating-point depth precision for distant ground and its shadow.
-        uniform.projection[4 * i + 2] = float(((i == 3 ? farPlane : 0.0) - z) * nearPlane / (farPlane - nearPlane));
+        uniform.projection[4 * i + 2] = i == 3 ? float(nearPlane) : 0.0f;
         uniform.projection[4 * i + 3] = float(z);
         if (i < 3) uniform.light[i] = distance > 0 ? float(Dot(v, sunlight) / distance) : 0.0f;
     }
@@ -144,8 +145,9 @@ bool OrbiterScene::Fill(SURFHANDLE surface, unsigned x, unsigned y, unsigned wid
     const auto target = surfaces_.find(surface);
     if (target == surfaces_.end()) return false;
     auto& image = *target->second;
-    if (image.blockBytes || x > image.width || y > image.height || width > image.width - x || height > image.height - y)
+    if (x > image.width || y > image.height || width > image.width - x || height > image.height - y)
         return false;
+    MakeWritable(image);
     const std::uint8_t rgba[] = {std::uint8_t(color), std::uint8_t(color >> 8), std::uint8_t(color >> 16), 255};
     for (unsigned row = y; row < y + height; ++row)
         for (unsigned col = x; col < x + width; ++col)
@@ -160,16 +162,17 @@ bool OrbiterScene::Blit(SURFHANDLE target, unsigned x, unsigned y, SURFHANDLE so
     const auto* input = Lookup(source);
     if (dest == surfaces_.end() || !input) return false;
     auto& output = *dest->second;
-    if (input == &output) return false;
-    if (output.format != SDL_GPU_TEXTUREFORMAT_R8G8B8A8_UNORM || output.blockBytes ||
-        x > output.width || y > output.height || sx > input->width || sy > input->height)
+    if (x > output.width || y > output.height || sx > input->width || sy > input->height)
         return false;
+    MakeWritable(output);
     width = std::min({width, output.width - x, input->width - sx});
     height = std::min({height, output.height - y, input->height - sy});
     for (unsigned row = 0; row < height; ++row) {
-        auto* pixels = output.pixels.data() + (std::size_t(y + row) * output.width + x) * 4;
+        // Copy bottom-up when a self-blit overlaps subsequent source rows.
+        const auto offset = input == &output && y > sy ? height - 1 - row : row;
+        auto* pixels = output.pixels.data() + (std::size_t(y + offset) * output.width + x) * 4;
         if (!input->blockBytes && input->format == output.format) {
-            std::memcpy(pixels, input->pixels.data() + (std::size_t(sy + row) * input->width + sx) * 4, 4 * width);
+            std::memmove(pixels, input->pixels.data() + (std::size_t(sy + offset) * input->width + sx) * 4, 4 * width);
             continue;
         }
         for (unsigned col = 0; col < width; ++col) {
@@ -186,13 +189,20 @@ void OrbiterScene::Open(SDL_Window* window, BaseMeshes baseMeshes, bool baseShad
     baseShadows_ = baseShadows;
     if (const char* dir = SDL_getenv("ORBITER_VULKAN_CAPTURE_DIR"); dir && *dir) {
         captureDirectory_ = dir;
+        captureFps_ = 10;
+        if (const char* fps = SDL_getenv("ORBITER_VULKAN_CAPTURE_FPS"); fps && *fps) {
+            const char* end = fps + std::strlen(fps);
+            const auto parsed = std::from_chars(fps, end, captureFps_);
+            if (parsed.ec != std::errc{} || parsed.ptr != end || captureFps_ < 1 || captureFps_ > 120)
+                throw std::runtime_error("Vulkan capture FPS must be an integer from 1 to 120");
+        }
         if (!std::filesystem::is_directory(captureDirectory_))
             throw std::runtime_error("Vulkan capture directory does not exist");
     }
     if (const char* path = SDL_getenv("ORBITER_VULKAN_FRAME_TRACE"); path && *path) {
         frameTrace_.open(std::filesystem::path(path));
         if (!frameTrace_) throw std::runtime_error("Cannot open Vulkan frame trace");
-        frameTrace_ << "sim_seconds,interval_ms,scene_ms,terrain_ms,tiles_staged,imagery_staged,tiles_switched,pose_uploaded,shadow_drawn,base_upload_ms,base_shadow_updated,acquire_wait_ms,reanchor_ms,terrain_recentered,visible_tiles,detail_tiles,frame_slot_ms,image_acquire_ms,draw_encode_ms,present_submit_ms,terrain_draws\n";
+        frameTrace_ << "sim_seconds,interval_ms,scene_ms,terrain_ms,tiles_staged,imagery_staged,tiles_switched,pose_uploaded,shadow_drawn,base_upload_ms,base_shadow_updated,acquire_wait_ms,reanchor_ms,terrain_recentered,visible_tiles,detail_tiles,frame_slot_ms,image_acquire_ms,draw_encode_ms,present_submit_ms,terrain_draws,camera_altitude_m,earth_leaf_area\n";
     }
     scene_.Open(window, frameTrace_.is_open());
     previousFrame_ = 0;
@@ -397,7 +407,7 @@ bool OrbiterScene::Present(unsigned width, unsigned height)
 {
     if (!width || !height) return true;
     if (!archivePath_.empty() && oapiGetFocusObject() != focus_) CaptureFocus(archivePath_);
-    if (!focus_) return scene_.Present({}, {});
+    if (!focus_) return scene_.Present({}, {}, {});
     const auto start = SDL_GetTicksNS();
     const auto ship = ObjectFrame(focus_);
     const auto simTime = oapiGetSimTime();
@@ -406,9 +416,9 @@ bool OrbiterScene::Present(unsigned width, unsigned height)
     Uint64 reanchorTime = 0;
     if (terrain_.NeedsReanchor(camera)) {
         const auto beforeReanchor = SDL_GetTicksNS();
-        scene_.ClearGround();
         terrain_.Reanchor(camera);
         for (auto& base : bases_) {
+            if (base.loaded) scene_.RemoveBase(base.index);
             base.position = terrain_.BasePosition(base.longitude, base.latitude);
             base.loaded = false;
         }
@@ -421,7 +431,8 @@ bool OrbiterScene::Present(unsigned width, unsigned height)
     const bool poseChanged = pose_.Update(*vessel);
     if (poseChanged) scene_.SetShipPose(pose_.Vertices());
     const auto beforeTerrain = SDL_GetTicksNS();
-    const auto tiles = terrain_.Update(camera, scene_);
+    const auto earth = terrain_.View(width, height);
+    const auto tiles = terrain_.Update(earth, height, scene_);
     const auto terrainTime = SDL_GetTicksNS() - beforeTerrain;
     if (shadowTime_ != simTime || poseChanged || tiles.switched) {
         terrain_.ProjectShadow(groundFrame, ship, pose_.Vertices(), shadowVertices_);
@@ -446,7 +457,7 @@ bool OrbiterScene::Present(unsigned width, unsigned height)
     const auto baseUploadTime = UpdateBases(groundFrame.ToLocal(camera)) ? SDL_GetTicksNS() - beforeBases : 0;
     std::filesystem::path samplePath;
     if (!captureDirectory_.empty()) {
-        const auto sample = static_cast<long long>(std::floor(simTime * 10.0 + 1e-6));
+        const auto sample = static_cast<long long>(std::floor(simTime * captureFps_ + 1e-6));
         if (sample != lastCapture_) {
             std::ostringstream filename;
             filename << "frame-" << std::setw(6) << std::setfill('0') << sample << ".bmp";
@@ -455,7 +466,7 @@ bool OrbiterScene::Present(unsigned width, unsigned height)
         }
     }
     const bool presented = scene_.Present(MakeUniform(ship, width, height),
-        MakeUniform(groundFrame, width, height), samplePath);
+        MakeUniform(groundFrame, width, height), earth, samplePath);
     if (frameTrace_.is_open()) {
         const auto milliseconds = [](Uint64 time) { return double(time) / 1000000; };
         const auto& timing = scene_.Timings();
@@ -467,7 +478,7 @@ bool OrbiterScene::Present(unsigned width, unsigned height)
                     << ',' << tiles.recentered << ',' << terrain_.VisibleCount() << ',' << terrain_.DetailCount()
                     << ',' << milliseconds(timing.fenceNS) << ',' << milliseconds(timing.acquireNS - timing.fenceNS)
                     << ',' << milliseconds(timing.encodeNS) << ',' << milliseconds(timing.submitNS)
-                    << ',' << timing.terrainDraws << '\n';
+                    << ',' << timing.terrainDraws << ',' << earth.altitude << ',' << terrain_.LeafArea() << '\n';
         previousFrame_ = start;
     }
     return presented;
@@ -475,6 +486,7 @@ bool OrbiterScene::Present(unsigned width, unsigned height)
 
 void OrbiterScene::Close() noexcept
 {
+    captureDirectory_.clear();
     ClearFocus();
     scene_.Close();
     if (frameTrace_.is_open()) frameTrace_.close();

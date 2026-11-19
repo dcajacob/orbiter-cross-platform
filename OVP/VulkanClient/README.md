@@ -11,13 +11,31 @@ animations run in each slot's local coordinates before applying its vessel
 offset. The ground shadow follows that same geometry.
 
 The client streams stock Earth surface tiles from `Earth/Archive/Surf.tree` and
-uses Orbiter's elevation data. A camera jump starts with a 3×3 neighborhood of
-coarse stock tiles, clipped at the poles. A background worker reads and
-decompresses higher-detail imagery and builds meshes, prioritizing the area
-under the camera. The simulation thread samples Orbiter elevations and submits
-finished tiles to the GPU with a shared two-millisecond target per frame
-after coarse coverage is available. Each parent stays visible until all four
-children are ready. Moving the camera discards obsolete work.
+uses Orbiter's elevation data. Two hemisphere tiles cover the planet from the
+first frame. The camera's altitude, field of view, distance to each tile and
+the horizon determine which areas refine, up to archive level 19. The same
+tile tree draws Earth at every altitude. Each parent stays visible until its
+four children are ready. A background worker reads imagery and builds meshes.
+The simulation thread samples elevations and stages finished tiles with a
+two-millisecond target per frame after the two roots are available.
+
+## Earth from orbit
+
+Open the stock **The Solar System → Earth → In low orbit over Africa** scenario
+for the external view of the DeltaGlider. The Sun and Earth rotation at the
+scenario date determine the lighting. The surface and sky use the same
+height-dependent atmospheric scattering approximation.
+
+To fly the camera down to Kennedy, put `EarthDescent.lua` in the runtime's
+`Script` directory. Copy the stock scenario to
+`Scenarios/Vulkan/Earth - globe to Kennedy.scn` and add `Script EarthDescent` inside its `BEGIN_ENVIRONMENT`
+block. Launch it unpaused. The 42-second camera tour keeps one Earth-fixed
+observer throughout, starting at 21,000 km and ending at 900 m near the runway.
+
+The [Qt Launchpad](../../Utils/Launchpad/README.md) can start either scenario.
+On Linux, set `"graphics": "vulkan"` in the native simulator profile. On
+Windows, select the Orbiter executable in the Vulkan installation with
+`VulkanClient` active in its `Orbiter.cfg`.
 
 ## Earth base scenery
 
@@ -37,8 +55,9 @@ the DG-S airborne beside Kennedy's Vehicle Assembly Building.
 
 For matched flyby frames, start the scenario unpaused with a 0.05-second
 simulation step. Set `ORBITER_VULKAN_CAPTURE_DIR` to an existing output
-directory to save BMPs at 0.1-second simulation intervals. Use a fresh directory
-for each recording. Leave the variable unset for frame-time measurements.
+directory to save BMPs at 0.1-second simulation intervals. Set
+`ORBITER_VULKAN_CAPTURE_FPS` to change the sampling rate (1–120 per simulation second).
+Use a fresh directory for each recording. Leave the variable unset for frame-time measurements.
 
 ## DG-S takeoff
 
@@ -51,7 +70,7 @@ for each recording. Leave the variable unset for frame-time measurements.
    and **Numpad \*** to kill main thrust. Right-drag or use **Ctrl+arrow keys**
    to orbit the external camera. Scroll to change camera distance.
 
-The current scope is the external focus vessel and regional Earth terrain.
+The current scope is the external focus vessel, Earth and nearby Earth bases.
 
 ## Optional Kennedy imagery
 

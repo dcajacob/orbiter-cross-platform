@@ -65,6 +65,18 @@ struct SceneFrame {
     }
 };
 
+inline VECTOR3 DirectionIn(const SceneFrame& frame, const VECTOR3& v)
+{
+    return {Dot(v, frame.axes[0]), Dot(v, frame.axes[1]), Dot(v, frame.axes[2])};
+}
+
+// Positions and camera axes in Earth's rotating frame, in double precision.
+struct EarthView {
+    SceneFrame camera, ground;
+    VECTOR3 sun{};
+    double radius = 1.0, altitude = 0.0, horizontal = 1.0, vertical = 1.0;
+};
+
 inline SceneFrame ObjectFrame(OBJHANDLE object)
 {
     MATRIX3 rotation;

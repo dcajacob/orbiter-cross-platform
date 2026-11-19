@@ -11,6 +11,7 @@
 #include <condition_variable>
 #include <exception>
 #include <mutex>
+#include <queue>
 #include <thread>
 #include <set>
 #include <sstream>
@@ -20,7 +21,7 @@ namespace orbiter::vulkan {
 namespace {
 
 constexpr double pi = 3.14159265358979323846;
-constexpr int coarseLevel = 11;
+constexpr int rootLevel = 4;
 constexpr int detailLevel = 19;
 
 int Rows(int level) { return 1 << (level - 4); }
@@ -46,15 +47,29 @@ std::array<TileKey, 4> Children(const TileKey& key)
         {key.level + 1, 2 * key.row + 1, 2 * key.column + 1}}};
 }
 
-void Select(const TileKey& key, const TileKey& focus, std::set<TileKey>& selection)
+VECTOR3 Radial(double lng, double lat)
 {
-    selection.insert(key);
-    const int stride = 1 << (detailLevel - key.level);
-    const auto columnDistance = std::abs(key.column - focus.column / stride);
-    const auto columns = 2 * Rows(key.level);
-    if (key.level == detailLevel || std::abs(key.row - focus.row / stride) > 1 ||
-        std::min(columnDistance, columns - columnDistance) > 1) return;
-    for (const auto& child : Children(key)) Select(child, focus, selection);
+    const double c = std::cos(lat);
+    return {c * std::cos(lng), std::sin(lat), c * std::sin(lng)};
+}
+
+// Find the nearest point of the spherical latitude/longitude rectangle to the
+// eye. This also works at the date line, poles and for the two hemisphere roots.
+double ProjectedSize(const TileKey& key, double lng, double lat, double altitude, double radius,
+    double focal, double horizonCosine)
+{
+    if (key.level == detailLevel) return 0;
+    const double angle = TileAngle(key.level);
+    const double mid = -pi + (key.column + 0.5) * angle;
+    const double dlng = std::max(0.0, std::abs(std::remainder(lng - mid, 2 * pi)) - angle * 0.5);
+    const double north = pi / 2 - key.row * angle;
+    const double dx = std::cos(lat) * std::cos(dlng), dy = std::sin(lat);
+    const double nearest = std::clamp(std::atan2(dy, dx), north - angle, north);
+    const double cosine = std::clamp(dx * std::cos(nearest) + dy * std::sin(nearest), -1.0, 1.0);
+    const double eyeRadius = radius + altitude;
+    if (cosine < horizonCosine) return 0;
+    const double range = std::sqrt(altitude * altitude + 2 * eyeRadius * radius * (1 - cosine));
+    return radius * angle * focal / range;
 }
 
 struct TileTexture {
@@ -80,8 +95,8 @@ TileTexture LoadTile(ZTreeMgr& archive, const std::filesystem::path& filename, c
 
 } // namespace
 
-// The worker owns its archive cursor. Jobs contain a snapshot of the tangent
-// frame and Orbiter elevations, so no SDK or GPU calls cross threads.
+// The worker owns its archive cursor. Jobs contain Earth-fixed geometry and
+// sampled elevations, so no SDK or GPU calls cross threads.
 class RunwayTerrain::Loader {
 public:
     Loader(std::filesystem::path filename, std::filesystem::path imagery)
@@ -95,11 +110,10 @@ public:
                     Job job = std::move(jobs_.front());
                     jobs_.pop_front();
                     active_ = job.key;
-                    const auto region = region_;
                     lock.unlock();
                     Prepared result = BuildTile(std::move(job), *archive, filename, imagery);
                     lock.lock();
-                    if (region == region_ && wanted_.count(result.key)) ready_.push_back(std::move(result));
+                    if (wanted_.count(result.key)) ready_.push_back(std::move(result));
                     active_.reset();
                 }
             } catch (...) {
@@ -118,25 +132,18 @@ public:
         thread_.join();
     }
 
-    std::set<TileKey> Retarget(unsigned region, const std::set<TileKey>& wanted)
+    std::set<TileKey> Retarget(const std::set<TileKey>& wanted)
     {
         std::lock_guard lock(mutex_);
         std::set<TileKey> retained;
-        if (region != region_) {
-            jobs_.clear();
-            ready_.clear();
-            active_.reset();
-        } else {
-            const auto obsolete = [&](const auto& item) {
-                if (!wanted.count(item.key)) return true;
-                retained.insert(item.key);
-                return false;
-            };
-            jobs_.erase(std::remove_if(jobs_.begin(), jobs_.end(), obsolete), jobs_.end());
-            ready_.erase(std::remove_if(ready_.begin(), ready_.end(), obsolete), ready_.end());
-            if (active_) retained.insert(*active_);
-        }
-        region_ = region;
+        const auto obsolete = [&](const auto& item) {
+            if (!wanted.count(item.key)) return true;
+            retained.insert(item.key);
+            return false;
+        };
+        jobs_.erase(std::remove_if(jobs_.begin(), jobs_.end(), obsolete), jobs_.end());
+        ready_.erase(std::remove_if(ready_.begin(), ready_.end(), obsolete), ready_.end());
+        if (active_) retained.insert(*active_);
         wanted_ = wanted;
         return retained;
     }
@@ -174,7 +181,6 @@ private:
     std::deque<Prepared> ready_;
     std::optional<TileKey> active_;
     std::set<TileKey> wanted_;
-    unsigned region_ = 0;
     std::exception_ptr error_;
     bool stopping_ = false;
     std::thread thread_;
@@ -206,11 +212,6 @@ void RunwayTerrain::Open(const std::filesystem::path& filename, const VECTOR3& o
 
 void RunwayTerrain::Reanchor(const VECTOR3& origin)
 {
-    ++region_;
-    tiles_.clear();
-    visible_.clear();
-    sampling_.reset();
-    requested_ = {0, 0, 0};
     double distance;
     oapiGlobalToEqu(earth_, origin, &longitude_, &latitude_, &distance);
     radius_ = oapiGetSize(earth_);
@@ -219,7 +220,6 @@ void RunwayTerrain::Reanchor(const VECTOR3& origin)
     const auto clat = std::cos(latitude_);
     const auto slng = std::sin(longitude_);
     const auto clng = std::cos(longitude_);
-    eastScale_ = radius_ * std::max(clat, 1e-12);
     local_.axes = {{{-slng, 0, clng}, {clat * clng, slat, clat * slng}, {-slat * clng, clat, -slat * slng}}};
     local_.origin = Scale(local_.axes[1], radius_ + altitude_);
 }
@@ -244,7 +244,7 @@ void RunwayTerrain::Close()
     wanted_.clear();
     pending_.clear();
     requested_ = {0, 0, 0};
-    roots_.clear();
+    selectedAltitude_ = -1;
     if (elevationCache_) ReleaseTileCache(elevationCache_);
     elevationCache_ = nullptr;
     earth_ = nullptr;
@@ -271,13 +271,21 @@ void RunwayTerrain::CollectVisible(const TileKey& key, std::set<TileKey>& select
     for (const auto& child : children) CollectVisible(child, selected);
 }
 
-TerrainUpdate RunwayTerrain::Update(const VECTOR3& position, Scene& scene)
+TerrainUpdate RunwayTerrain::Update(const EarthView& view, unsigned height, Scene& scene)
 {
-    double longitude, latitude, distance;
-    oapiGlobalToEqu(earth_, position, &longitude, &latitude, &distance);
-    const auto center = At(detailLevel, longitude, latitude);
+    const auto& eye = view.camera.origin;
+    const double longitude = std::atan2(eye.z, eye.x);
+    const double latitude = std::atan2(eye.y, std::hypot(eye.x, eye.z));
+    const double altitude = std::max(1.0, view.altitude);
+    const double focal = height * 0.5 * view.vertical;
+    // Quantize motion only for selection. Rendering always uses the exact eye.
+    const int tracking = std::clamp(int(std::ceil(std::log2(radius_ * pi * focal /
+        (std::max(100.0, altitude) * 510.0)))) + rootLevel + 3, rootLevel, detailLevel);
+    const auto center = At(tracking, longitude, latitude);
     TerrainUpdate result;
-    result.recentered = !(center == requested_);
+    result.recentered = !(center == requested_) || selectedAltitude_ < 0 ||
+        std::abs(altitude - selectedAltitude_) > 0.1 * std::max(20.0, selectedAltitude_) ||
+        std::abs(focal - selectedFocal_) > 0.05 * selectedFocal_;
     const auto publish = [&](Prepared tile) {
         scene.StageTile(tile.key, tile.mesh);
         result.imagery += tile.tile.regionalImagery;
@@ -285,38 +293,34 @@ TerrainUpdate RunwayTerrain::Update(const VECTOR3& position, Scene& scene)
         ++result.staged;
     };
     if (result.recentered) {
-        const auto root = At(coarseLevel, longitude, latitude);
-        roots_.clear();
         wanted_.clear();
-        for (int row = std::max(0, root.row - 1); row <= std::min(Rows(coarseLevel) - 1, root.row + 1); ++row) {
-            for (int x = -1; x <= 1; ++x) {
-                roots_.push_back({coarseLevel, row, WrapColumn(coarseLevel, root.column + x)});
-                Select(roots_.back(), center, wanted_);
-            }
+        // Refine the largest apparent patches first. Limit the resident target,
+        // particularly near a pole where all longitude wedges meet.
+        constexpr size_t maxDesiredTiles = 1024;
+        const double horizon = std::acos(radius_ / (radius_ + altitude))
+                             + std::acos(radius_ / (radius_ + 9000.0));
+        const double horizonCosine = std::cos(horizon);
+        std::priority_queue<std::pair<double, TileKey>> candidates;
+        const auto consider = [&](const TileKey& key) {
+            wanted_.insert(key);
+            const double pixels = ProjectedSize(key, longitude, latitude, altitude, radius_, focal, horizonCosine);
+            if (pixels > 510.0) candidates.emplace(pixels, key);
+        };
+        for (const auto& key : roots_) consider(key);
+        while (!candidates.empty() && wanted_.size() + 4 <= maxDesiredTiles) {
+            const auto parent = candidates.top().second;
+            candidates.pop();
+            for (const auto& child : Children(parent)) consider(child);
         }
         RetainTiles(scene);
-        const bool needCoverage = !tiles_.count(root);
-        if (needCoverage && !visible_.empty()) {
-            // A cut can outrun the coarse neighborhood even within one tangent
-            // frame. Invalidate old jobs before supplying its new roots.
-            ++region_;
-            sampling_.reset();
-        }
-        const auto retained = loader_->Retarget(region_, wanted_);
+        selectedAltitude_ = altitude;
+        selectedFocal_ = focal;
+        const auto retained = loader_->Retarget(wanted_);
         if (sampling_ && !wanted_.count(sampling_->key)) sampling_.reset();
 
-        // Supply immediate, textured coverage, including across a cold camera
-        // cut. Only missing coarse parents use the render thread's archive.
-        if (needCoverage) {
-            for (const auto& key : roots_) {
-                if (tiles_.count(key)) continue;
-                auto job = StartTile(key);
-                const int rows = job.tile.divisions + 1;
-                for (int row = 0; row < rows; ++row) SampleRow(job);
-                publish(BuildTile(std::move(job), *archive_, filename_, imagery_));
-            }
+        for (const auto& key : roots_) {
+            if (!tiles_.count(key)) publish(BuildTile(StartTile(key), *archive_, filename_, imagery_));
         }
-
         pending_.clear();
         for (const auto& key : wanted_) {
             if (!tiles_.count(key) && !retained.count(key) && !(sampling_ && sampling_->key == key))
@@ -325,9 +329,8 @@ TerrainUpdate RunwayTerrain::Update(const VECTOR3& position, Scene& scene)
         // Complete each sibling group on the way to the camera tile first.
         // This brings the runway into focus before refining distant terrain.
         std::stable_partition(pending_.begin(), pending_.end(), [&](const TileKey& key) {
-            if (key.level == coarseLevel) return true;
-            const int shift = detailLevel - key.level + 1;
-            return key.row / 2 == (center.row >> shift) && key.column / 2 == (center.column >> shift);
+            const auto target = At(key.level - 1, longitude, latitude);
+            return key.row / 2 == target.row && key.column / 2 == target.column;
         });
         requested_ = center;
     }
@@ -349,7 +352,7 @@ TerrainUpdate RunwayTerrain::Update(const VECTOR3& position, Scene& scene)
         }
         SampleRow(*sampling_);
         const auto stride = size_t(sampling_->tile.divisions + 1);
-        if (sampling_->tile.heights.size() == stride * stride) {
+        if (sampling_->elevations.size() == stride * stride) {
             loader_->Submit(std::move(*sampling_));
             sampling_.reset();
         }
@@ -379,29 +382,29 @@ TerrainUpdate RunwayTerrain::Update(const VECTOR3& position, Scene& scene)
 RunwayTerrain::Job RunwayTerrain::StartTile(const TileKey& key) const
 {
     const auto angle = TileAngle(key.level);
-    const auto left = std::remainder(key.column * angle - pi - longitude_, 2 * pi);
-    const auto top = pi / 2 - key.row * angle;
-    Job job{key, {}, local_, longitude_ + left, top, angle, radius_};
+    const double west = -pi + key.column * angle;
+    const double north = pi / 2 - key.row * angle;
+    Job job{key, {}, {}, west, north, angle, radius_};
     auto& tile = job.tile;
-    tile.divisions = key.level == detailLevel ? 64 : 16;
-    tile.x = left * eastScale_;
-    tile.z = (top - latitude_) * radius_;
-    tile.width = angle * eastScale_;
-    tile.length = angle * radius_;
+    tile.key = key;
+    tile.origin = Scale(Radial(west + angle * 0.5, north - angle * 0.5), radius_);
+    tile.divisions = key.level <= 6 || key.level == detailLevel ? 64 : 16;
     const auto stride = tile.divisions + 1;
-    tile.heights.reserve(stride * stride);
+    if (key.level <= 8) job.elevations.assign(stride * stride, 0.0);
+    else job.elevations.reserve(stride * stride);
     return job;
 }
 
 void RunwayTerrain::SampleRow(Job& job)
 {
     const auto steps = job.tile.divisions;
-    const int row = int(job.tile.heights.size()) / (steps + 1);
+    const int row = int(job.elevations.size()) / (steps + 1);
+    if (row > steps) return;
     const double lat = job.north - double(row) / steps * job.angle;
     const int level = job.key.level == detailLevel ? 0 : job.key.level + 3;
     for (int column = 0; column <= steps; ++column) {
         const double lng = std::remainder(job.west + double(column) / steps * job.angle, 2 * pi);
-        job.tile.heights.push_back(oapiSurfaceElevationEx(earth_, lng, lat, level, elevationCache_));
+        job.elevations.push_back(oapiSurfaceElevationEx(earth_, lng, lat, level, elevationCache_));
     }
 }
 
@@ -422,6 +425,7 @@ RunwayTerrain::Prepared RunwayTerrain::BuildTile(Job job, ZTreeMgr& archive,
     }
     if (!tile.regionalImagery) texture = LoadTile(archive, filename, key);
     mesh.texture = std::move(texture.image);
+    mesh.origin = tile.origin;
     const auto steps = tile.divisions;
     const auto stride = steps + 1;
     mesh.vertices.reserve(stride * stride + 4 * stride);
@@ -434,11 +438,11 @@ RunwayTerrain::Prepared RunwayTerrain::BuildTile(Job job, ZTreeMgr& archive,
         for (int column = 0; column <= steps; ++column) {
             const auto u = double(column) / steps;
             const auto lng = std::remainder(job.west + u * job.angle, 2 * pi);
-            const auto elevation = tile.heights[row * stride + column];
+            const auto elevation = job.elevations[row * stride + column];
             const VECTOR3 up{clat * std::cos(lng), slat, clat * std::sin(lng)};
-            const auto pos = job.frame.ToLocal(Scale(up, job.radius + elevation));
-            tile.heights[row * stride + column] = pos.y;
-            mesh.vertices.push_back({{float(pos.x), float(pos.y), float(pos.z)}, {0, 1, 0},
+            const auto pos = Subtract(Scale(up, job.radius + elevation), tile.origin);
+            if (key.level >= 9) tile.points.push_back({float(pos.x), float(pos.y), float(pos.z)});
+            mesh.vertices.push_back({{float(pos.x), float(pos.y), float(pos.z)}, {float(up.x), float(up.y), float(up.z)},
                 {texture.u + texture.scale * float(u), texture.v + texture.scale * float(v)}});
         }
     }
@@ -451,11 +455,13 @@ RunwayTerrain::Prepared RunwayTerrain::BuildTile(Job job, ZTreeMgr& archive,
     }
 
     // Extend the edge below the surface to cover gaps between different LODs.
-    const auto edge = [&mesh, steps](unsigned start, unsigned increment) {
+    const float skirt = float(std::max(30.0, 4 * job.radius * (1 - std::cos(job.angle / steps))
+        + std::min(10000.0, 0.6 * job.radius * job.angle / steps)));
+    const auto edge = [&mesh, steps, skirt](unsigned start, unsigned increment) {
         const auto first = unsigned(mesh.vertices.size());
         for (unsigned i = 0; i <= unsigned(steps); ++i) {
             auto vertex = mesh.vertices[start + increment * i];
-            vertex.position[1] -= 30.0f;
+            for (int axis = 0; axis < 3; ++axis) vertex.position[axis] -= skirt * vertex.normal[axis];
             mesh.vertices.push_back(vertex);
         }
         for (unsigned i = 0; i < unsigned(steps); ++i) {
@@ -471,15 +477,12 @@ RunwayTerrain::Prepared RunwayTerrain::BuildTile(Job job, ZTreeMgr& archive,
     return {key, std::move(tile), std::move(mesh)};
 }
 
-bool RunwayTerrain::Tile::Contains(double east, double north) const
+double RunwayTerrain::Tile::Height(double lng, double lat, const SceneFrame& ground) const
 {
-    return east >= x && east <= x + width && north <= z && north >= z - length;
-}
-
-double RunwayTerrain::Tile::Height(double east, double north) const
-{
-    const auto gx = std::clamp((east - x) * divisions / width, 0.0, double(divisions));
-    const auto gz = std::clamp((z - north) * divisions / length, 0.0, double(divisions));
+    const double angle = TileAngle(key.level);
+    const double west = -pi + key.column * angle, north = pi / 2 - key.row * angle;
+    const double gx = std::clamp(std::remainder(lng - west, 2*pi) / angle * divisions, 0.0, double(divisions));
+    const double gz = std::clamp((north - lat) / angle * divisions, 0.0, double(divisions));
     const auto col = std::min(int(gx), divisions - 1);
     const auto row = std::min(int(gz), divisions - 1);
     const auto u = gx - col;
@@ -487,29 +490,17 @@ double RunwayTerrain::Tile::Height(double east, double north) const
     const auto stride = divisions + 1;
     const auto a = row * stride + col;
     const auto b = a + stride;
-    if (u + v <= 1) return (1 - u - v) * heights[a] + u * heights[a + 1] + v * heights[b];
-    return (u + v - 1) * heights[b + 1] + (1 - u) * heights[b] + (1 - v) * heights[a + 1];
+    const double offset = Dot(Subtract(origin, ground.origin), ground.axes[1]);
+    const auto y = [&](int i) { const auto& p = points[i]; return Dot({p[0],p[1],p[2]}, ground.axes[1]); };
+    if (u + v <= 1) return offset + (1 - u - v) * y(a) + u * y(a + 1) + v * y(b);
+    return offset + (u + v - 1) * y(b + 1) + (1 - u) * y(b) + (1 - v) * y(a + 1);
 }
 
-std::array<double, 2> RunwayTerrain::GridPosition(double east, double height, double north) const
+const RunwayTerrain::Tile* RunwayTerrain::FindTile(double lng, double lat) const
 {
-    // Mesh vertices use the sphere. Height interpolation uses the source
-    // raster's longitude/latitude grid, also for rays spanning several tiles.
-    const auto point = local_.ToGlobal({east, height, north});
-    const double lng = std::atan2(point.z, point.x);
-    const double lat = std::atan2(point.y, std::hypot(point.x, point.z));
-    return {std::remainder(lng - longitude_, 2 * pi) * eastScale_, (lat - latitude_) * radius_};
-}
-
-const RunwayTerrain::Tile* RunwayTerrain::FindTile(double east, double north) const
-{
-    const auto lng = longitude_ + east / eastScale_;
-    const auto lat = latitude_ + north / radius_;
-    for (int level = detailLevel; level >= coarseLevel; --level) {
+    for (int level = detailLevel; level >= 9; --level) {
         const auto key = At(level, lng, lat);
-        if (!visible_.count(key)) continue;
-        const auto it = tiles_.find(key);
-        if (it != tiles_.end()) return &it->second;
+        if (visible_.count(key)) return &tiles_.at(key);
     }
     return nullptr;
 }
@@ -519,6 +510,7 @@ void RunwayTerrain::ProjectShadow(const SceneFrame& ground, const SceneFrame& sh
 {
     projected.clear();
     const auto origin = ground.ToLocal(ship.origin);
+    if (Dot(origin, origin) > 100000.0 * 100000.0) return;
     const auto sun = Subtract(ground.ToLocal(SunPosition()), origin);
     if (sun.y <= 0) return;
     const auto rayX = sun.x / sun.y;
@@ -534,14 +526,15 @@ void RunwayTerrain::ProjectShadow(const SceneFrame& ground, const SceneFrame& sh
         const auto p = localShip.ToGlobal({vertex.position[0], vertex.position[1], vertex.position[2]});
         double east = p.x, north = p.z, groundHeight = 0;
         for (int step = 0; step < 4; ++step) {
-            const auto grid = GridPosition(east, groundHeight, north);
-            if (!tile || !tile->Contains(grid[0], grid[1])) tile = FindTile(grid[0], grid[1]);
+            const auto point = local_.ToGlobal({east, groundHeight, north});
+            const double lng = std::atan2(point.z, point.x), lat = std::atan2(point.y, std::hypot(point.x, point.z));
+            if (!tile || !(At(tile->key.level, lng, lat) == tile->key)) tile = FindTile(lng, lat);
             if (!tile) {
                 // At sunrise or sunset the shadow may extend beyond visible terrain.
                 projected.clear();
                 return;
             }
-            groundHeight = tile->Height(grid[0], grid[1]);
+            groundHeight = tile->Height(lng, lat, local_);
             if (step == 3) break;
             const double height = std::max(0.0, p.y - groundHeight);
             const double nextEast = p.x - height * rayX, nextNorth = p.z - height * rayZ;
@@ -586,9 +579,38 @@ SceneFrame RunwayTerrain::BaseFrame(double lng, double lat) const
     return result;
 }
 
+double RunwayTerrain::LeafArea() const
+{
+    // Fraction of the two root rectangles covered by the selected leaves.
+    double area = 0;
+    for (const auto& key : visible_) area += std::ldexp(0.5, -2 * (key.level - rootLevel));
+    return area;
+}
+
 size_t RunwayTerrain::DetailCount() const
 {
     return std::count_if(visible_.begin(), visible_.end(), [](const TileKey& key) { return key.level == detailLevel; });
+}
+
+EarthView RunwayTerrain::View(unsigned width, unsigned height) const
+{
+    const auto earth = ObjectFrame(earth_);
+    VECTOR3 camera;
+    MATRIX3 rotation;
+    oapiCameraGlobalPos(&camera);
+    oapiCameraRotationMatrix(&rotation);
+    EarthView view;
+    view.camera.origin = earth.ToLocal(camera);
+    const auto axes = Axes(rotation);
+    for (int i = 0; i < 3; ++i) view.camera.axes[i] = DirectionIn(earth, axes[i]);
+    view.ground = local_;
+    const auto sun = earth.ToLocal(SunPosition());
+    view.sun = Scale(sun, 1.0 / std::sqrt(Dot(sun, sun)));
+    view.radius = radius_;
+    view.altitude = std::sqrt(Dot(view.camera.origin, view.camera.origin)) - radius_;
+    view.vertical = 1.0 / std::tan(oapiCameraAperture());
+    view.horizontal = view.vertical * height / width;
+    return view;
 }
 
 SceneFrame RunwayTerrain::Frame() const

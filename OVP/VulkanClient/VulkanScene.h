@@ -2,6 +2,7 @@
 #pragma once
 
 #include <SDL3/SDL.h>
+#include "SceneFrame.h"
 #include <array>
 #include <cstdint>
 #include <filesystem>
@@ -78,6 +79,7 @@ struct TileKey {
 };
 
 struct TerrainMesh {
+    VECTOR3 origin{}; // Earth-fixed centre. Vertices are relative to this point.
     TextureData texture;
     std::vector<Vertex> vertices;
     std::vector<std::uint32_t> indices;
@@ -103,7 +105,7 @@ public:
     void StageTile(const TileKey&, const TerrainMesh&);
     void SelectTiles(const std::set<TileKey>& visible, const std::set<TileKey>& pending);
     void SetShadow(const std::vector<Vertex>&);
-    bool Present(const SceneUniform& ship, const SceneUniform& ground,
+    bool Present(const SceneUniform& ship, const SceneUniform& ground, const EarthView& earth,
         const std::filesystem::path& sample = {});
     void Capture(std::filesystem::path path) { capture_ = std::move(path); }
     const FrameTimings& Timings() const { return timings_; }
@@ -142,8 +144,10 @@ private:
         bool mapValid = false, sunlit = false;
     };
     void PrepareBaseShadow(SDL_GPUCommandBuffer*, Base&, const SceneUniform&);
-    void DrawGroundShadows(SDL_GPURenderPass*, SDL_GPUCommandBuffer*, SceneUniform);
+    void DrawGroundShadows(SDL_GPURenderPass*, SDL_GPUCommandBuffer*, SceneUniform, const EarthView&);
     struct GroundTile {
+        VECTOR3 origin{};
+        SceneUniform uniform{};
         SDL_GPUBuffer* vertices = nullptr;
         SDL_GPUBuffer* indices = nullptr;
         SDL_GPUTexture* texture = nullptr;
@@ -167,6 +171,7 @@ private:
     SDL_GPUCopyPass* uploadPass_ = nullptr;
     SDL_GPUSampler* sampler_ = nullptr;
     SDL_GPUSampler* terrainSampler_ = nullptr;
+    SDL_GPUGraphicsPipeline* sky_ = nullptr;
     SDL_GPUGraphicsPipeline* terrain_ = nullptr;
     SDL_GPUGraphicsPipeline* opaque_ = nullptr;
     SDL_GPUGraphicsPipeline* translucent_ = nullptr;

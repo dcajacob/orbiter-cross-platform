@@ -28,9 +28,11 @@ public:
     void Reanchor(const VECTOR3& origin);
     void Close();
     bool NeedsReanchor(const VECTOR3& position) const;
-    TerrainUpdate Update(const VECTOR3& position, Scene&);
+    TerrainUpdate Update(const EarthView& view, unsigned height, Scene&);
+    EarthView View(unsigned width, unsigned height) const;
     size_t VisibleCount() const { return visible_.size(); }
     size_t DetailCount() const;
+    double LeafArea() const;
     SceneFrame Frame() const;
     VECTOR3 DrapeSurfaceTile(const VECTOR3& local) const;
     VECTOR3 BasePosition(double longitude, double latitude) const;
@@ -40,19 +42,19 @@ public:
 
 private:
     struct Tile {
-        std::vector<double> heights;
+        TileKey key{};
+        VECTOR3 origin{};
+        std::vector<std::array<float, 3>> points;
         int divisions = 0;
         bool regionalImagery = false;
-        double x = 0, z = 0, width = 0, length = 0;
 
-        bool Contains(double east, double north) const;
-        double Height(double east, double north) const;
+        double Height(double lng, double lat, const SceneFrame& ground) const;
     };
 
     struct Job {
         TileKey key;
         Tile tile;
-        SceneFrame frame;
+        std::vector<double> elevations;
         double west, north, angle, radius;
     };
     struct Prepared {
@@ -66,11 +68,10 @@ private:
     static Prepared BuildTile(Job, ZTreeMgr&, const std::filesystem::path&, const std::filesystem::path&);
     void CollectVisible(const TileKey&, std::set<TileKey>&) const;
     void RetainTiles(Scene&);
-    std::array<double, 2> GridPosition(double east, double height, double north) const;
-    const Tile* FindTile(double east, double north) const;
+    const Tile* FindTile(double lng, double lat) const;
     OBJHANDLE earth_ = nullptr;
     SceneFrame local_{};
-    double longitude_ = 0, latitude_ = 0, radius_ = 0, altitude_ = 0, eastScale_ = 0;
+    double longitude_ = 0, latitude_ = 0, radius_ = 0, altitude_ = 0;
     TileKey requested_{0, 0, 0};
     std::filesystem::path filename_;
     std::filesystem::path imagery_;
@@ -78,11 +79,11 @@ private:
     std::vector<ElevationTile>* elevationCache_ = nullptr;
     std::map<TileKey, Tile> tiles_;
     std::set<TileKey> visible_, wanted_;
-    std::vector<TileKey> roots_;
+    const std::array<TileKey, 2> roots_{{{4, 0, 0}, {4, 0, 1}}};
+    double selectedAltitude_ = -1, selectedFocal_ = 0;
     std::deque<TileKey> pending_;
     std::optional<Job> sampling_;
     std::unique_ptr<Loader> loader_;
-    unsigned region_ = 0;
 };
 
 } // namespace orbiter::vulkan

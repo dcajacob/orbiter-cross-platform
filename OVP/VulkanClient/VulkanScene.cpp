@@ -199,7 +199,24 @@ void Scene::Open(SDL_Window* window, bool trace)
     };
     const auto vertex = shader(Ship_vert, SDL_GPU_SHADERSTAGE_VERTEX, 0, 1);
     const auto fragment = shader(Ship_frag, SDL_GPU_SHADERSTAGE_FRAGMENT, 1, 1);
-    terrain_ = CreatePipeline(vertex.get(), fragment.get(), DrawPass::Terrain);
+    const auto surface = shader(Earth_frag, SDL_GPU_SHADERSTAGE_FRAGMENT, 1, 1);
+    terrain_ = CreatePipeline(vertex.get(), surface.get(), DrawPass::Terrain);
+    const auto skyVertex = shader(Sky_vert, SDL_GPU_SHADERSTAGE_VERTEX, 0, 0);
+    const auto skyFragment = shader(Sky_frag, SDL_GPU_SHADERSTAGE_FRAGMENT, 0, 1);
+    SDL_GPUColorTargetDescription skyColor{};
+    skyColor.format = SDL_GetGPUSwapchainTextureFormat(device_, window_);
+    SDL_GPUGraphicsPipelineCreateInfo sky{};
+    sky.vertex_shader = skyVertex.get();
+    sky.fragment_shader = skyFragment.get();
+    sky.primitive_type = SDL_GPU_PRIMITIVETYPE_TRIANGLELIST;
+    sky.depth_stencil_state.enable_depth_test = true;
+    sky.depth_stencil_state.compare_op = SDL_GPU_COMPAREOP_GREATER_OR_EQUAL;
+    sky.target_info.color_target_descriptions = &skyColor;
+    sky.target_info.num_color_targets = 1;
+    sky.target_info.has_depth_stencil_target = true;
+    sky.target_info.depth_stencil_format = depthFormat_;
+    sky_ = SDL_CreateGPUGraphicsPipeline(device_, &sky);
+    Require(sky_ != nullptr, "Create Vulkan atmosphere pipeline");
     opaque_ = CreatePipeline(vertex.get(), fragment.get(), DrawPass::Opaque);
     translucent_ = CreatePipeline(vertex.get(), fragment.get(), DrawPass::Translucent);
     shadow_ = CreatePipeline(vertex.get(), fragment.get(), DrawPass::Shadow);
@@ -434,10 +451,14 @@ bool Scene::Bounds::InShadowFootprint(const std::array<float, 16>& m) const
     // Project this receiver's bounds onto the shadow map. Only overlapping
     // terrain tiles and base surfaces need a second draw.
     for (unsigned row = 0; row < 2; ++row) {
-        const auto axis = row * 2;
-        const float a = m[4 + row] * low[1], b = m[4 + row] * high[1];
-        if (m[12 + row] + m[4 * axis + row] * high[axis] + std::max(a, b) < 0 ||
-            m[12 + row] + m[4 * axis + row] * low[axis] + std::min(a, b) > 1) return false;
+        float minimum = m[12 + row], maximum = minimum;
+        for (int axis = 0; axis < 3; ++axis) {
+            const float a = m[4 * axis + row] * low[axis];
+            const float b = m[4 * axis + row] * high[axis];
+            minimum += std::min(a, b);
+            maximum += std::max(a, b);
+        }
+        if (maximum < 0 || minimum > 1) return false;
     }
     return true;
 }
@@ -538,6 +559,7 @@ void Scene::Release(GroundTile& tile) noexcept
 void Scene::StageTile(const TileKey& key, const TerrainMesh& mesh)
 {
     auto& tile = tiles_.try_emplace(key).first->second;
+    tile.origin = mesh.origin;
     tile.vertices = UploadBuffer(SDL_GPU_BUFFERUSAGE_VERTEX, mesh.vertices.data(),
         mesh.vertices.size() * sizeof(Vertex));
     tile.indices = UploadBuffer(SDL_GPU_BUFFERUSAGE_INDEX, mesh.indices.data(),
@@ -613,7 +635,7 @@ void Scene::DrawTile(SDL_GPURenderPass* pass, const GroundTile& tile)
     SDL_DrawGPUIndexedPrimitives(pass, tile.indexCount, 1, 0, 0, 0);
 }
 
-void Scene::DrawGroundShadows(SDL_GPURenderPass* pass, SDL_GPUCommandBuffer* commands, SceneUniform ground)
+void Scene::DrawGroundShadows(SDL_GPURenderPass* pass, SDL_GPUCommandBuffer* commands, SceneUniform ground, const EarthView& earth)
 {
     SDL_SetGPUStencilReference(pass, 2);
     for (const auto& entry : bases_) {
@@ -626,9 +648,23 @@ void Scene::DrawGroundShadows(SDL_GPURenderPass* pass, SDL_GPUCommandBuffer* com
         SDL_BindGPUGraphicsPipeline(pass, groundShadow_);
         SDL_BindGPUFragmentSamplers(pass, 1, &map, 1);
         for (const auto& tile : tiles_) {
-            if (tile.second.inView && tile.second.bounds.InShadowFootprint(caster.transform))
-                DrawTile(pass, tile.second);
+            const auto& patch = tile.second;
+            if (!patch.inView) continue;
+            auto uniform = patch.uniform;
+            const auto offset = earth.ground.ToLocal(patch.origin);
+            for (int row = 0; row < 4; ++row) {
+                const auto& m = ground.shadowTransform;
+                const auto axis = earth.ground.Rotate({m[row], m[4+row], m[8+row]});
+                uniform.shadowTransform[row] = float(axis.x);
+                uniform.shadowTransform[4+row] = float(axis.y);
+                uniform.shadowTransform[8+row] = float(axis.z);
+                uniform.shadowTransform[12+row] = float(m[12+row] + m[row]*offset.x + m[4+row]*offset.y + m[8+row]*offset.z);
+            }
+            if (!patch.bounds.InShadowFootprint(uniform.shadowTransform)) continue;
+            SDL_PushGPUVertexUniformData(commands, 0, &uniform, sizeof(uniform));
+            DrawTile(pass, patch);
         }
+        SDL_PushGPUVertexUniformData(commands, 0, &ground, sizeof(ground));
         SDL_BindGPUGraphicsPipeline(pass, pavementShadow_);
         for (const auto& receiver : bases_) {
             if (!receiver.second.surfaces.InShadowFootprint(caster.transform)) continue;
@@ -638,7 +674,7 @@ void Scene::DrawGroundShadows(SDL_GPURenderPass* pass, SDL_GPUCommandBuffer* com
     }
 }
 
-bool Scene::Present(const SceneUniform& ship, const SceneUniform& ground, const std::filesystem::path& sample)
+bool Scene::Present(const SceneUniform& ship, const SceneUniform& ground, const EarthView& earth, const std::filesystem::path& sample)
 {
     timings_ = {};
     mapUpdated_ = false;
@@ -708,16 +744,41 @@ bool Scene::Present(const SceneUniform& ship, const SceneUniform& ground, const 
     for (auto& entry : bases_) PrepareBaseShadow(commands, entry.second, ground);
     auto* pass = SDL_BeginGPURenderPass(commands, &color, 1, &depth);
     SDL_BindGPUGraphicsPipeline(pass, terrain_);
-    auto surfaceFrame = ground;
-    surfaceFrame.light[0] = surfaceFrame.light[2] = 0;
-    surfaceFrame.light[1] = 1;
-    SDL_PushGPUVertexUniformData(commands, 0, &surfaceFrame, sizeof(surfaceFrame));
-    const MaterialUniform surface{{1, 1, 1, 1}, {0, 0, 0, 1}};
-    SDL_PushGPUFragmentUniformData(commands, 0, &surface, sizeof(surface));
-    const auto planes = CameraPlanes(ground);
+    // The view translation is evaluated in double before the GPU sees it.
+    // Neighbouring patches meet in Earth-fixed coordinates at every altitude.
+    SceneUniform earthFrame{};
+    for (int i = 0; i < 3; ++i) {
+        earthFrame.projection[4*i] = float(earth.horizontal * earth.camera.axes[0].data[i]);
+        earthFrame.projection[4*i+1] = float(earth.vertical * earth.camera.axes[1].data[i]);
+        earthFrame.projection[4*i+3] = float(earth.camera.axes[2].data[i]);
+        earthFrame.light[i] = float(earth.sun.data[i]);
+    }
+    earthFrame.projection[14] = 0.1f;
+    struct AirUniform {
+        float eye[4], sun[4], right[4], up[4], forward[4];
+    } air{};
+    for (int i = 0; i < 3; ++i) {
+        air.eye[i] = float(earth.camera.origin.data[i] * 0.001);
+        air.sun[i] = float(earth.sun.data[i]);
+        air.right[i] = float(earth.camera.axes[0].data[i] / earth.horizontal);
+        air.up[i] = float(earth.camera.axes[1].data[i] / earth.vertical);
+        air.forward[i] = float(earth.camera.axes[2].data[i]);
+    }
+    air.eye[3] = float(earth.radius * 0.001);
+    SDL_PushGPUFragmentUniformData(commands, 0, &air, sizeof(air));
     for (auto& [key, tile] : tiles_) {
-        tile.inView = tile.visible && tile.bounds.InView(planes);
+        tile.inView = false;
+        if (!tile.visible) continue;
+        auto& u = tile.uniform;
+        u = earthFrame;
+        const auto offset = Subtract(tile.origin, earth.camera.origin);
+        u.projection[12] = float(earth.horizontal * Dot(offset, earth.camera.axes[0]));
+        u.projection[13] = float(earth.vertical * Dot(offset, earth.camera.axes[1]));
+        u.projection[15] = float(Dot(offset, earth.camera.axes[2]));
+        for (int i = 0; i < 3; ++i) u.eye[i] = -float(offset.data[i]);
+        tile.inView = tile.bounds.InView(CameraPlanes(u));
         if (!tile.inView) continue;
+        SDL_PushGPUVertexUniformData(commands, 0, &u, sizeof(u));
         DrawTile(pass, tile);
         ++timings_.terrainDraws;
     }
@@ -726,9 +787,9 @@ bool Scene::Present(const SceneUniform& ship, const SceneUniform& ground, const 
     for (auto kind : {DrawPass::BaseTile, DrawPass::Pavement}) {
         for (const auto& entry : bases_) DrawMesh(pass, commands, entry.second.mesh, kind);
     }
-    DrawGroundShadows(pass, commands, ground);
+    DrawGroundShadows(pass, commands, ground, earth);
     if (showShadow_) {
-        SDL_PushGPUVertexUniformData(commands, 0, &surfaceFrame, sizeof(surfaceFrame));
+        SDL_PushGPUVertexUniformData(commands, 0, &ground, sizeof(ground));
         SDL_BindGPUGraphicsPipeline(pass, shadow_);
         SDL_SetGPUStencilReference(pass, 1);
         const SDL_GPUBufferBinding vertex{shadowVertices_, 0};
@@ -748,6 +809,9 @@ bool Scene::Present(const SceneUniform& ship, const SceneUniform& ground, const 
         SDL_PushGPUVertexUniformData(commands, 0, &ship, sizeof(ship));
         DrawMesh(pass, commands, ship_, kind);
     }
+    SDL_BindGPUGraphicsPipeline(pass, sky_);
+    SDL_PushGPUFragmentUniformData(commands, 0, &air, sizeof(air));
+    SDL_DrawGPUPrimitives(pass, 3, 1, 0, 0);
     SDL_EndGPURenderPass(pass);
     if (!capture) {
         const auto beforeSubmit = SDL_GetTicksNS();
@@ -878,6 +942,8 @@ void Scene::Close() noexcept
     if (pavement_) SDL_ReleaseGPUGraphicsPipeline(device_, pavement_);
     shadowSampler_ = nullptr;
     shadowMapPipeline_ = groundShadow_ = pavementShadow_ = pavement_ = nullptr;
+    if (sky_) SDL_ReleaseGPUGraphicsPipeline(device_, sky_);
+    sky_ = nullptr;
     if (terrain_) SDL_ReleaseGPUGraphicsPipeline(device_, terrain_);
     if (opaque_) SDL_ReleaseGPUGraphicsPipeline(device_, opaque_);
     if (translucent_) SDL_ReleaseGPUGraphicsPipeline(device_, translucent_);

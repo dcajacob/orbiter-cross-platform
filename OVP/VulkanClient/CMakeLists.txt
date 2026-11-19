@@ -15,14 +15,14 @@ else()
     find_program(GLSLANG_VALIDATOR glslangValidator REQUIRED)
     set(shader_dir "${CMAKE_CURRENT_BINARY_DIR}")
 endif()
-set(shader_sources Ship.vert Ship.frag Terrain.frag BaseDepth.vert BaseDepth.frag)
+set(shader_sources Ship.vert Ship.frag Earth.frag Sky.vert Sky.frag Terrain.frag BaseDepth.vert BaseDepth.frag)
 foreach(shader IN LISTS shader_sources)
     set(object "${shader_dir}/${shader}.spv")
     list(APPEND shader_objects "${object}")
     if(NOT ORBITER_VULKAN_PREBUILT_SHADERS)
         add_custom_command(OUTPUT "${object}"
             COMMAND "${GLSLANG_VALIDATOR}" -V "${CMAKE_CURRENT_SOURCE_DIR}/shaders/${shader}" -o "${object}"
-            DEPENDS "shaders/${shader}" VERBATIM)
+            DEPENDS "shaders/${shader}" shaders/EarthAir.glsl VERBATIM)
     endif()
 endforeach()
 
