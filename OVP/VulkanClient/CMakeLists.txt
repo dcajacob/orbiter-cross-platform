@@ -13,19 +13,23 @@ if(ORBITER_VULKAN_PREBUILT_SHADERS)
 else()
     find_program(GLSLANG_VALIDATOR glslangValidator REQUIRED)
     set(shader_dir "${CMAKE_CURRENT_BINARY_DIR}")
-    foreach(stage vert frag)
-        add_custom_command(OUTPUT "${shader_dir}/Ship.${stage}.spv"
-            COMMAND "${GLSLANG_VALIDATOR}" -V "${CMAKE_CURRENT_SOURCE_DIR}/shaders/Ship.${stage}"
-                    -o "${shader_dir}/Ship.${stage}.spv"
-            DEPENDS "shaders/Ship.${stage}" VERBATIM)
-    endforeach()
 endif()
+set(shader_sources Ship.vert Ship.frag Terrain.frag BaseDepth.vert BaseDepth.frag)
+foreach(shader IN LISTS shader_sources)
+    set(object "${shader_dir}/${shader}.spv")
+    list(APPEND shader_objects "${object}")
+    if(NOT ORBITER_VULKAN_PREBUILT_SHADERS)
+        add_custom_command(OUTPUT "${object}"
+            COMMAND "${GLSLANG_VALIDATOR}" -V "${CMAKE_CURRENT_SOURCE_DIR}/shaders/${shader}" -o "${object}"
+            DEPENDS "shaders/${shader}" VERBATIM)
+    endif()
+endforeach()
 
 set(shader_header "${CMAKE_CURRENT_BINARY_DIR}/ShipShaders.h")
 add_custom_command(OUTPUT "${shader_header}"
-    COMMAND "${CMAKE_COMMAND}" "-DSHADER_DIR=${shader_dir}" "-DOUTPUT=${shader_header}"
+    COMMAND "${CMAKE_COMMAND}" "-DSHADER_DIR=${shader_dir}" "-DOUTPUT=${shader_header}" "-DSHADERS=${shader_sources}"
             -P "${CMAKE_CURRENT_SOURCE_DIR}/EmbedShaders.cmake"
-    DEPENDS "${shader_dir}/Ship.vert.spv" "${shader_dir}/Ship.frag.spv" EmbedShaders.cmake
+    DEPENDS ${shader_objects} EmbedShaders.cmake
     VERBATIM)
 add_library(VulkanClient MODULE VulkanScene.cpp OrbiterScene.cpp RunwayTerrain.cpp VesselPose.cpp "${shader_header}")
 target_compile_features(VulkanClient PRIVATE cxx_std_17)

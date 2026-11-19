@@ -4,6 +4,7 @@
 #include "RunwayTerrain.h"
 #include "VesselPose.h"
 
+#include <functional>
 #include <map>
 #include <memory>
 #include <optional>
@@ -23,7 +24,8 @@ public:
     bool Fill(SURFHANDLE, unsigned, unsigned, unsigned, unsigned, std::uint32_t);
     bool Blit(SURFHANDLE, unsigned, unsigned, SURFHANDLE, unsigned, unsigned, unsigned, unsigned);
 
-    void Open(SDL_Window* window);
+    using BaseMeshes = std::function<void(OBJHANDLE, MESHHANDLE*&, unsigned&)>;
+    void Open(SDL_Window* window, BaseMeshes baseMeshes, bool baseShadows);
     void CaptureFocus(std::filesystem::path archive);
     void CaptureFrame(std::filesystem::path path) { scene_.Capture(std::move(path)); }
     void ClearFocus() noexcept;
@@ -33,10 +35,18 @@ public:
 
 private:
     SURFHANDLE Add(TextureData);
+    void LoadBase();
     void RefreshExterior(const VESSEL&);
     void AppendMesh(MESHHANDLE, SceneMesh&, std::vector<VertexRange>&,
         std::map<SURFHANDLE, unsigned>& textureSlots) const;
     Scene scene_;
+    BaseMeshes baseMeshes_;
+    bool baseShadows_ = true;
+    std::filesystem::path captureDirectory_;
+    long long lastCapture_ = -1;
+    OBJHANDLE kennedy_ = nullptr;
+    SceneFrame baseFrame_{};
+    bool baseLoaded_ = false;
     RunwayTerrain terrain_;
     VesselPose pose_;
     std::vector<Vertex> shadowVertices_;

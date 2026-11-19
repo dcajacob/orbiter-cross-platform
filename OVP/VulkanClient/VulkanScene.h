@@ -36,6 +36,7 @@ struct SceneUniform {
     float projection[16];
     float light[4];
     float eye[4];
+    std::array<float, 16> shadowTransform{};
 };
 
 struct MaterialUniform {
@@ -53,6 +54,7 @@ struct Group {
     unsigned textureIndex;
     MaterialUniform material;
     DrawPass pass;
+    bool castsShadow;
 };
 
 struct SceneMesh {
@@ -90,16 +92,30 @@ public:
 
     void Open(SDL_Window*);
     void SetShip(const SceneMesh&);
+    void SetBase(const SceneMesh&, bool shadows);
     void SetShipPose(const std::vector<Vertex>&);
     void StageTile(const TileKey&, const TerrainMesh&);
     void SelectTiles(const std::set<TileKey>& visible, const std::set<TileKey>& pending);
     void SetShadow(const std::vector<Vertex>&);
-    bool Present(const SceneUniform& ship, const SceneUniform& ground);
+    bool Present(const SceneUniform& ship, SceneUniform ground, bool drawBase = false,
+        const std::filesystem::path& sample = {});
     void Capture(std::filesystem::path path) { capture_ = std::move(path); }
+    bool ShadowMapUpdated() const { return mapUpdated_; }
     void Close() noexcept;
     void ClearMesh() noexcept;
 
 private:
+    struct GpuMesh {
+        SDL_GPUBuffer* vertices = nullptr;
+        SDL_GPUBuffer* indices = nullptr;
+        std::vector<SDL_GPUTexture*> textures;
+        std::vector<Group> groups;
+    };
+    void UploadMesh(const SceneMesh&, GpuMesh&);
+    void Release(GpuMesh&) noexcept;
+    void DrawMesh(SDL_GPURenderPass*, SDL_GPUCommandBuffer*, const GpuMesh&, DrawPass);
+    void ClearBase() noexcept;
+    bool PrepareBaseShadow(SDL_GPUCommandBuffer*, SceneUniform&);
     struct GroundTile {
         SDL_GPUBuffer* vertices = nullptr;
         SDL_GPUBuffer* indices = nullptr;
@@ -113,7 +129,7 @@ private:
     SDL_GPUTexture* UploadTexture(const TextureData&);
     SDL_GPUGraphicsPipeline* CreatePipeline(SDL_GPUShader*, SDL_GPUShader*, DrawPass);
     void ResizeDepth(unsigned, unsigned);
-    void SaveFrame(SDL_GPUCommandBuffer*, SDL_GPUTexture*, SDL_GPUTexture*, unsigned, unsigned);
+    void SaveFrame(SDL_GPUCommandBuffer*, SDL_GPUTexture*, SDL_GPUTexture*, unsigned, unsigned, const std::filesystem::path& sample);
     std::filesystem::path capture_;
 
     SDL_Window* window_ = nullptr;
@@ -126,8 +142,17 @@ private:
     SDL_GPUGraphicsPipeline* shadow_ = nullptr;
     SDL_GPUTextureFormat depthFormat_ = SDL_GPU_TEXTUREFORMAT_INVALID;
     SDL_GPUTexture* depth_ = nullptr;
-    SDL_GPUBuffer* vertices_ = nullptr;
-    SDL_GPUBuffer* indices_ = nullptr;
+    GpuMesh ship_, base_;
+    SDL_GPUBuffer* baseCasterIndices_ = nullptr;
+    unsigned baseCasterCount_ = 0;
+    SDL_GPUGraphicsPipeline* shadowMapPipeline_ = nullptr;
+    SDL_GPUGraphicsPipeline* shadowedTerrain_ = nullptr;
+    SDL_GPUTexture* shadowMap_ = nullptr;
+    SDL_GPUSampler* shadowSampler_ = nullptr;
+    std::array<float, 3> baseMin_{}, baseMax_{};
+    std::array<float, 16> shadowTransform_{};
+    float shadowSlopeX_ = 0, shadowSlopeZ_ = 0;
+    bool mapValid_ = false, mapUpdated_ = false;
     unsigned shipIndexCount_ = 0;
     SDL_GPUBuffer* shadowVertices_ = nullptr;
     SDL_GPUTransferBuffer* shipUpload_ = nullptr;
@@ -135,8 +160,6 @@ private:
     Uint32 vesselVertexBytes_ = 0;
     bool showShadow_ = false;
     std::map<TileKey, GroundTile> tiles_;
-    std::vector<SDL_GPUTexture*> textures_;
-    std::vector<Group> groups_;
     unsigned width_ = 0;
     unsigned height_ = 0;
     bool claimed_ = false;

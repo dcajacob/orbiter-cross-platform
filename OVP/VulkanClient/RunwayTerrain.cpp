@@ -346,6 +346,21 @@ void RunwayTerrain::ProjectShadow(const SceneFrame& ground, const SceneFrame& sh
     }
 }
 
+SceneFrame RunwayTerrain::BaseFrame(double lng, double lat) const
+{
+    const double slng = std::sin(lng), clng = std::cos(lng), slat = std::sin(lat), clat = std::cos(lat);
+    // Orbiter base axes are south, up, east. Derive them from the configured
+    // location so the very first paused frame also has a valid base pose.
+    const std::array<VECTOR3, 3> axes = {{{clng*slat, -clat, slng*slat},
+        {clng*clat, slat, slng*clat}, {-slng, 0, clng}}};
+    const double elevation = oapiSurfaceElevationEx(earth_, lng, lat, 0, elevationCache_);
+    SceneFrame result;
+    result.origin = local_.ToLocal(Scale(axes[1], radius_ + elevation));
+    for (unsigned i = 0; i < 3; ++i)
+        result.axes[i] = {Dot(axes[i], local_.axes[0]), Dot(axes[i], local_.axes[1]), Dot(axes[i], local_.axes[2])};
+    return result;
+}
+
 SceneFrame RunwayTerrain::Frame() const
 {
     const auto earth = ObjectFrame(earth_);

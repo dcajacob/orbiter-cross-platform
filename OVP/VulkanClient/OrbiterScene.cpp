@@ -12,6 +12,10 @@
 #include <stdexcept>
 #include <type_traits>
 
+#ifndef _WIN32
+#include "Base.h"
+#endif
+
 namespace orbiter::vulkan {
 #include "SurfaceCopy.inc"
 namespace {
@@ -176,13 +180,20 @@ bool OrbiterScene::Blit(SURFHANDLE target, unsigned x, unsigned y, SURFHANDLE so
     return true;
 }
 
-void OrbiterScene::Open(SDL_Window* window)
+void OrbiterScene::Open(SDL_Window* window, BaseMeshes baseMeshes, bool baseShadows)
 {
+    baseMeshes_ = std::move(baseMeshes);
+    baseShadows_ = baseShadows;
+    if (const char* dir = SDL_getenv("ORBITER_VULKAN_CAPTURE_DIR"); dir && *dir) {
+        captureDirectory_ = dir;
+        if (!std::filesystem::is_directory(captureDirectory_))
+            throw std::runtime_error("Vulkan capture directory does not exist");
+    }
     scene_.Open(window);
     if (const char* path = SDL_getenv("ORBITER_VULKAN_FRAME_TRACE"); path && *path) {
         frameTrace_.open(std::filesystem::path(path));
         if (!frameTrace_) throw std::runtime_error("Cannot open Vulkan frame trace");
-        frameTrace_ << "sim_seconds,interval_ms,scene_ms,terrain_ms,tiles_staged,imagery_staged,tiles_switched,pose_uploaded,shadow_drawn\n";
+        frameTrace_ << "sim_seconds,interval_ms,scene_ms,terrain_ms,tiles_staged,imagery_staged,tiles_switched,pose_uploaded,shadow_drawn,base_upload_ms,base_shadow_updated\n";
     }
     previousFrame_ = 0;
 }
@@ -226,7 +237,7 @@ void OrbiterScene::AppendMesh(MESHHANDLE mesh, SceneMesh& ship, std::vector<Vert
         const auto startVertex = unsigned(ship.vertices.size());
         groups[firstGroup + i] = {startVertex, group->nVtx};
         const auto pass = material.diffuse[3] < 0.999f ? DrawPass::Translucent : DrawPass::Opaque;
-        ship.groups.push_back({unsigned(ship.indices.size()), group->nIdx, gpuTexture, material, pass});
+        ship.groups.push_back({unsigned(ship.indices.size()), group->nIdx, gpuTexture, material, pass, !(group->UsrFlag & 1)});
         for (unsigned j = 0; j < group->nVtx; ++j) {
             const auto& v = group->Vtx[j];
             ship.vertices.push_back({{v.x, v.y, v.z}, {v.nx, v.ny, v.nz}, {v.tu, v.tv}});
@@ -246,7 +257,54 @@ void OrbiterScene::CaptureFocus(std::filesystem::path archive)
     if (!vessel) return;
     focus_ = vessel->GetHandle();
     terrain_.Open(archivePath_, ObjectFrame(focus_).origin);
+    char earthName[] = "Earth";
+    const auto earth = oapiGetGbodyByName(earthName);
+    for (unsigned i = 0; i < oapiGetBaseCount(earth); ++i) {
+        const auto candidate = oapiGetBaseByIndex(earth, i);
+        char name[256]{};
+        oapiGetObjectName(candidate, name, sizeof(name) - 1);
+        if (std::strcmp(name, "Cape Canaveral") == 0) {
+            kennedy_ = candidate;
+            double lng, lat;
+#ifdef _WIN32
+            oapiGetBaseEquPos(kennedy_, &lng, &lat, nullptr);
+#else
+            static_cast<const Base*>(kennedy_)->EquPos(lng, lat);
+#endif
+            baseFrame_ = terrain_.BaseFrame(lng, lat);
+            break;
+        }
+    }
     RefreshExterior(*vessel);
+}
+
+void OrbiterScene::LoadBase()
+{
+    MESHHANDLE* handles = nullptr;
+    unsigned count = 0;
+    baseMeshes_(kennedy_, handles, count);
+    SceneMesh mesh;
+    std::map<SURFHANDLE, unsigned> textures;
+    std::vector<VertexRange> groups;
+    for (unsigned i = 0; i < count; ++i) {
+        if (handles[i]) AppendMesh(handles[i], mesh, groups, textures);
+    }
+    // Place Orbiter's already elevated and rotated structures in the same
+    // Earth-fixed tangent frame as the tile vertices. Do this once per region.
+    for (auto& v : mesh.vertices) {
+        const auto pos = baseFrame_.ToGlobal({v.position[0], v.position[1], v.position[2]});
+        const auto normal = baseFrame_.Rotate({v.normal[0], v.normal[1], v.normal[2]});
+        for (unsigned axis = 0; axis < 3; ++axis) {
+            v.position[axis] = float(pos.data[axis]);
+            v.normal[axis] = float(normal.data[axis]);
+        }
+    }
+    scene_.SetBase(mesh, baseShadows_);
+    baseLoaded_ = true;
+    std::ostringstream message;
+    message << "Vulkan Cape Canaveral: " << count << " stock structure meshes, " << mesh.groups.size()
+            << " groups, " << textures.size() << " textures, " << mesh.vertices.size() << " vertices";
+    SceneLog(message.str());
 }
 
 void OrbiterScene::RefreshExterior(const VESSEL& vessel)
@@ -298,6 +356,9 @@ void OrbiterScene::ClearFocus() noexcept
 {
     focus_ = nullptr;
     archivePath_.clear();
+    kennedy_ = nullptr;
+    baseLoaded_ = false;
+    lastCapture_ = -1;
     exteriorSlots_.clear();
     scene_.ClearMesh();
     terrain_.Close();
@@ -344,17 +405,35 @@ bool OrbiterScene::Present(unsigned width, unsigned height)
             SceneLog(sample.str());
         }
     }
-    auto ground = MakeUniform(groundFrame, width, height);
-    // The stock aerial imagery already contains its illumination.
-    ground.light[0] = ground.light[2] = 0;
-    ground.light[1] = 1;
-    const bool presented = scene_.Present(MakeUniform(ship, width, height), ground);
+    Uint64 baseUploadTime = 0;
+    bool drawBase = false;
+    if (kennedy_) {
+        const auto offset = Subtract(baseFrame_.origin, groundFrame.ToLocal(ship.origin));
+        drawBase = Dot(offset, offset) < 100000.0 * 100000.0;
+        if (drawBase && !baseLoaded_) {
+            const auto beforeUpload = SDL_GetTicksNS();
+            LoadBase();
+            baseUploadTime = SDL_GetTicksNS() - beforeUpload;
+        }
+    }
+    std::filesystem::path samplePath;
+    if (!captureDirectory_.empty()) {
+        const auto sample = static_cast<long long>(std::floor(simTime * 10.0 + 1e-6));
+        if (sample != lastCapture_) {
+            std::ostringstream filename;
+            filename << "frame-" << std::setw(6) << std::setfill('0') << sample << ".bmp";
+            samplePath = captureDirectory_ / filename.str();
+            lastCapture_ = sample;
+        }
+    }
+    const bool presented = scene_.Present(MakeUniform(ship, width, height),
+        MakeUniform(groundFrame, width, height), drawBase, samplePath);
     if (frameTrace_.is_open()) {
         const auto milliseconds = [](Uint64 time) { return double(time) / 1000000; };
         frameTrace_ << simTime << ',' << milliseconds(previousFrame_ ? start - previousFrame_ : 0)
                     << ',' << milliseconds(SDL_GetTicksNS() - start) << ',' << milliseconds(terrainTime)
                     << ',' << tiles.staged << ',' << tiles.imagery << ',' << tiles.switched << ',' << poseChanged
-                    << ',' << !shadowVertices_.empty() << '\n';
+                    << ',' << !shadowVertices_.empty() << ',' << milliseconds(baseUploadTime) << ',' << scene_.ShadowMapUpdated() << '\n';
         previousFrame_ = start;
     }
     return presented;

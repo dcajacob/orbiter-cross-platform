@@ -27,6 +27,7 @@ public:
     void Close();
     TerrainUpdate Update(const VECTOR3& position, Scene&);
     SceneFrame Frame() const;
+    SceneFrame BaseFrame(double longitude, double latitude) const;
     void ProjectShadow(const SceneFrame& ground, const SceneFrame& ship, const std::vector<Vertex>&,
         std::vector<Vertex>& projected) const;
 

@@ -4,6 +4,7 @@
 #include "SceneFrame.h"
 
 #include <algorithm>
+#include <cmath>
 #include <cstring>
 #include <fstream>
 #include <iostream>
@@ -29,7 +30,7 @@ std::uint32_t Read32(const std::vector<std::uint8_t>& bytes, unsigned offset)
     return result;
 }
 
-SDL_GPUShader* Shader(SDL_GPUDevice* device, const std::uint8_t* bytes, std::size_t size, SDL_GPUShaderStage stage)
+SDL_GPUShader* Shader(SDL_GPUDevice* device, const std::uint8_t* bytes, std::size_t size, SDL_GPUShaderStage stage, unsigned samplers, unsigned uniforms)
 {
     SDL_GPUShaderCreateInfo info{};
     info.code = bytes;
@@ -37,8 +38,8 @@ SDL_GPUShader* Shader(SDL_GPUDevice* device, const std::uint8_t* bytes, std::siz
     info.entrypoint = "main";
     info.format = SDL_GPU_SHADERFORMAT_SPIRV;
     info.stage = stage;
-    info.num_samplers = stage == SDL_GPU_SHADERSTAGE_FRAGMENT ? 1 : 0;
-    info.num_uniform_buffers = 1;
+    info.num_samplers = samplers;
+    info.num_uniform_buffers = uniforms;
     auto* shader = SDL_CreateGPUShader(device, &info);
     Require(shader != nullptr, "Create Vulkan shader");
     return shader;
@@ -196,21 +197,40 @@ void Scene::Open(SDL_Window* window)
     if (depthFormat_ == SDL_GPU_TEXTUREFORMAT_INVALID)
         throw std::runtime_error("Vulkan device has no supported depth and stencil format");
 
-    auto* vertex = Shader(device_, Ship_vert, sizeof(Ship_vert), SDL_GPU_SHADERSTAGE_VERTEX);
-    SDL_GPUShader* fragment = nullptr;
-    try {
-        fragment = Shader(device_, Ship_frag, sizeof(Ship_frag), SDL_GPU_SHADERSTAGE_FRAGMENT);
-        terrain_ = CreatePipeline(vertex, fragment, DrawPass::Terrain);
-        opaque_ = CreatePipeline(vertex, fragment, DrawPass::Opaque);
-        translucent_ = CreatePipeline(vertex, fragment, DrawPass::Translucent);
-        shadow_ = CreatePipeline(vertex, fragment, DrawPass::Shadow);
-    } catch (...) {
-        if (fragment) SDL_ReleaseGPUShader(device_, fragment);
-        SDL_ReleaseGPUShader(device_, vertex);
-        throw;
-    }
-    SDL_ReleaseGPUShader(device_, fragment);
-    SDL_ReleaseGPUShader(device_, vertex);
+    const auto release = [this](SDL_GPUShader* shader) { SDL_ReleaseGPUShader(device_, shader); };
+    const auto shader = [&](const auto& code, SDL_GPUShaderStage stage, unsigned samplers, unsigned uniforms) {
+        return std::unique_ptr<SDL_GPUShader, decltype(release)>(
+            Shader(device_, code, sizeof(code), stage, samplers, uniforms), release);
+    };
+    const auto vertex = shader(Ship_vert, SDL_GPU_SHADERSTAGE_VERTEX, 0, 1);
+    const auto fragment = shader(Ship_frag, SDL_GPU_SHADERSTAGE_FRAGMENT, 1, 1);
+    terrain_ = CreatePipeline(vertex.get(), fragment.get(), DrawPass::Terrain);
+    opaque_ = CreatePipeline(vertex.get(), fragment.get(), DrawPass::Opaque);
+    translucent_ = CreatePipeline(vertex.get(), fragment.get(), DrawPass::Translucent);
+    shadow_ = CreatePipeline(vertex.get(), fragment.get(), DrawPass::Shadow);
+    const auto receiver = shader(Terrain_frag, SDL_GPU_SHADERSTAGE_FRAGMENT, 2, 0);
+    shadowedTerrain_ = CreatePipeline(vertex.get(), receiver.get(), DrawPass::Terrain);
+
+    const auto casterVertex = shader(BaseDepth_vert, SDL_GPU_SHADERSTAGE_VERTEX, 0, 1);
+    const auto casterFragment = shader(BaseDepth_frag, SDL_GPU_SHADERSTAGE_FRAGMENT, 0, 0);
+    SDL_GPUVertexBufferDescription positionBuffer{};
+    positionBuffer.pitch = sizeof(Vertex);
+    const SDL_GPUVertexAttribute position{0, 0, SDL_GPU_VERTEXELEMENTFORMAT_FLOAT3, offsetof(Vertex, position)};
+    SDL_GPUGraphicsPipelineCreateInfo caster{};
+    caster.vertex_shader = casterVertex.get();
+    caster.fragment_shader = casterFragment.get();
+    caster.vertex_input_state = {&positionBuffer, 1, &position, 1};
+    caster.primitive_type = SDL_GPU_PRIMITIVETYPE_TRIANGLELIST;
+    caster.depth_stencil_state.enable_depth_test = caster.depth_stencil_state.enable_depth_write = true;
+    caster.depth_stencil_state.compare_op = SDL_GPU_COMPAREOP_GREATER;
+    caster.target_info.has_depth_stencil_target = true;
+    caster.target_info.depth_stencil_format = SDL_GPU_TEXTUREFORMAT_D16_UNORM;
+    shadowMapPipeline_ = SDL_CreateGPUGraphicsPipeline(device_, &caster);
+    Require(shadowMapPipeline_ != nullptr, "Create base shadow map pipeline");
+    sampler.enable_compare = true;
+    sampler.compare_op = SDL_GPU_COMPAREOP_GREATER_OR_EQUAL;
+    shadowSampler_ = SDL_CreateGPUSampler(device_, &sampler);
+    Require(shadowSampler_ != nullptr, "Create base shadow comparison sampler");
     const auto properties = SDL_GetGPUDeviceProperties(device_);
     const auto* name = SDL_GetStringProperty(properties, SDL_PROP_GPU_DEVICE_NAME_STRING, "unknown");
     SceneLog(std::string("Vulkan device: ") + name);
@@ -330,8 +350,7 @@ void Scene::SetShip(const SceneMesh& mesh)
 {
     ClearShip();
     if (mesh.indices.empty()) return;
-    vertices_ = Buffer(device_, SDL_GPU_BUFFERUSAGE_VERTEX, mesh.vertices.data(), mesh.vertices.size() * sizeof(Vertex));
-    indices_ = Buffer(device_, SDL_GPU_BUFFERUSAGE_INDEX, mesh.indices.data(), mesh.indices.size() * sizeof(std::uint32_t));
+    UploadMesh(mesh, ship_);
     shipIndexCount_ = unsigned(mesh.indices.size());
     vesselVertexBytes_ = Uint32(mesh.vertices.size() * sizeof(Vertex));
     const SDL_GPUBufferCreateInfo shadowVertexInfo{SDL_GPU_BUFFERUSAGE_VERTEX, vesselVertexBytes_, 0};
@@ -342,17 +361,112 @@ void Scene::SetShip(const SceneMesh& mesh)
     Require(shipUpload_ != nullptr, "Allocate Vulkan vessel animation upload buffer");
     shadowUpload_ = SDL_CreateGPUTransferBuffer(device_, &uploadInfo);
     Require(shadowUpload_ != nullptr, "Allocate Vulkan shadow upload buffer");
+}
+
+void Scene::UploadMesh(const SceneMesh& mesh, GpuMesh& dest)
+{
+    dest.vertices = Buffer(device_, SDL_GPU_BUFFERUSAGE_VERTEX, mesh.vertices.data(), mesh.vertices.size() * sizeof(Vertex));
+    dest.indices = Buffer(device_, SDL_GPU_BUFFERUSAGE_INDEX, mesh.indices.data(), mesh.indices.size() * sizeof(std::uint32_t));
     TextureData white;
     white.width = white.height = 1;
     white.pixels.assign(4, 255);
-    textures_.reserve(mesh.textures.size());
+    dest.textures.reserve(mesh.textures.size());
     for (auto* texture : mesh.textures) {
-        textures_.push_back(UploadTexture(texture ? *texture : white));
-        if (texture) std::clog << "Runway33 uploaded " << texture->path.string() << '\n';
+        dest.textures.push_back(UploadTexture(texture ? *texture : white));
     }
-    groups_ = mesh.groups;
-    std::clog << "Runway33 indexed mesh: " << mesh.vertices.size() << " vertices, "
-              << mesh.indices.size() << " indices, " << groups_.size() << " visible groups\n";
+    dest.groups = mesh.groups;
+}
+
+void Scene::SetBase(const SceneMesh& mesh, bool shadows)
+{
+    ClearBase();
+    if (mesh.indices.empty()) return;
+    UploadMesh(mesh, base_);
+    // Stock structures often split one surface into many consecutive groups.
+    // Coalesce identical draw states without changing triangle or blending order.
+    base_.groups.clear();
+    for (const auto& group : mesh.groups) {
+        if (!base_.groups.empty()) {
+            auto& last = base_.groups.back();
+            if (last.firstIndex + last.indexCount == group.firstIndex && last.pass == group.pass &&
+                last.textureIndex == group.textureIndex && last.material.diffuse == group.material.diffuse &&
+                last.material.ambient == group.material.ambient && last.material.emission == group.material.emission &&
+                last.material.specular == group.material.specular) {
+                last.indexCount += group.indexCount;
+                continue;
+            }
+        }
+        base_.groups.push_back(group);
+    }
+    SceneLog("Vulkan building draw batches: " + std::to_string(base_.groups.size()));
+    if (!shadows) return;
+    std::vector<std::uint32_t> indices;
+    baseMin_.fill(std::numeric_limits<float>::max());
+    baseMax_.fill(std::numeric_limits<float>::lowest());
+    for (const auto& group : mesh.groups) {
+        if (!group.castsShadow) continue;
+        const auto begin = mesh.indices.begin() + group.firstIndex;
+        indices.insert(indices.end(), begin, begin + group.indexCount);
+    }
+    if (indices.empty()) return;
+    for (const auto index : indices) {
+        const auto& v = mesh.vertices[index];
+        for (unsigned i = 0; i < 3; ++i) {
+            baseMin_[i] = std::min(baseMin_[i], v.position[i]);
+            baseMax_[i] = std::max(baseMax_[i], v.position[i]);
+        }
+    }
+    baseCasterIndices_ = Buffer(device_, SDL_GPU_BUFFERUSAGE_INDEX, indices.data(), indices.size() * sizeof(indices[0]));
+    baseCasterCount_ = unsigned(indices.size());
+    SDL_GPUTextureCreateInfo map{};
+    map.type = SDL_GPU_TEXTURETYPE_2D;
+    map.format = SDL_GPU_TEXTUREFORMAT_D16_UNORM;
+    map.usage = SDL_GPU_TEXTUREUSAGE_DEPTH_STENCIL_TARGET | SDL_GPU_TEXTUREUSAGE_SAMPLER;
+    map.width = map.height = 4096;
+    map.layer_count_or_depth = map.num_levels = 1;
+    shadowMap_ = SDL_CreateGPUTexture(device_, &map);
+    Require(shadowMap_ != nullptr, "Allocate Kennedy shadow map");
+}
+
+bool Scene::PrepareBaseShadow(SDL_GPUCommandBuffer* commands, SceneUniform& ground)
+{
+    if (!shadowMap_ || ground.light[1] < 0.07f) return false;
+    const float sx = ground.light[0] / ground.light[1], sz = ground.light[2] / ground.light[1];
+    // Reuse the map until the tip of the highest shadow moves by about half a metre.
+    const float height = baseMax_[1] - baseMin_[1] + 2;
+    if (!mapValid_ || std::max(std::abs(sx - shadowSlopeX_), std::abs(sz - shadowSlopeZ_)) * height > 0.5f) {
+        for (unsigned axis : {0u, 2u}) {
+            const auto row = axis / 2;
+            const float slope = axis == 0 ? sx : sz;
+            const float a = slope * baseMin_[1], b = slope * baseMax_[1];
+            const float lo = baseMin_[axis] - std::max(a, b) - 2;
+            const float hi = baseMax_[axis] - std::min(a, b) + 2;
+            shadowTransform_[4 * axis + row] = 1 / (hi - lo);
+            shadowTransform_[4 + row] = -slope / (hi - lo);
+            shadowTransform_[12 + row] = -lo / (hi - lo);
+        }
+        shadowTransform_[6] = 1 / height;
+        shadowTransform_[14] = (1 - baseMin_[1]) / height;
+        shadowTransform_[15] = 1;
+        SDL_GPUDepthStencilTargetInfo target{};
+        target.texture = shadowMap_;
+        target.load_op = SDL_GPU_LOADOP_CLEAR;
+        target.store_op = SDL_GPU_STOREOP_STORE;
+        auto* pass = SDL_BeginGPURenderPass(commands, nullptr, 0, &target);
+        SDL_BindGPUGraphicsPipeline(pass, shadowMapPipeline_);
+        SDL_PushGPUVertexUniformData(commands, 0, shadowTransform_.data(), sizeof(shadowTransform_));
+        const SDL_GPUBufferBinding vb{base_.vertices, 0}, ib{baseCasterIndices_, 0};
+        SDL_BindGPUVertexBuffers(pass, 0, &vb, 1);
+        SDL_BindGPUIndexBuffer(pass, &ib, SDL_GPU_INDEXELEMENTSIZE_32BIT);
+        SDL_DrawGPUIndexedPrimitives(pass, baseCasterCount_, 1, 0, 0, 0);
+        SDL_EndGPURenderPass(pass);
+        shadowSlopeX_ = sx;
+        shadowSlopeZ_ = sz;
+        mapValid_ = mapUpdated_ = true;
+    }
+    ground.shadowTransform = shadowTransform_;
+    ground.shadowTransform[14] += 0.2f / height;
+    return true;
 }
 
 void Scene::Release(GroundTile& tile) noexcept
@@ -395,7 +509,7 @@ void Scene::SetShadow(const std::vector<Vertex>& vertices)
 
 void Scene::SetShipPose(const std::vector<Vertex>& vertices)
 {
-    UpdateVesselVertices(vertices, vertices_, shipUpload_);
+    UpdateVesselVertices(vertices, ship_.vertices, shipUpload_);
 }
 
 void Scene::UpdateVesselVertices(const std::vector<Vertex>& vertices, SDL_GPUBuffer* buffer, SDL_GPUTransferBuffer* transfer)
@@ -416,8 +530,25 @@ void Scene::UpdateVesselVertices(const std::vector<Vertex>& vertices, SDL_GPUBuf
     Require(SDL_SubmitGPUCommandBuffer(commands), "Submit Vulkan pose upload");
 }
 
-bool Scene::Present(const SceneUniform& ship, const SceneUniform& ground)
+void Scene::DrawMesh(SDL_GPURenderPass* pass, SDL_GPUCommandBuffer* commands, const GpuMesh& mesh, DrawPass kind)
 {
+    if (mesh.groups.empty()) return;
+    const SDL_GPUBufferBinding vertex{mesh.vertices, 0};
+    const SDL_GPUBufferBinding index{mesh.indices, 0};
+    SDL_BindGPUVertexBuffers(pass, 0, &vertex, 1);
+    SDL_BindGPUIndexBuffer(pass, &index, SDL_GPU_INDEXELEMENTSIZE_32BIT);
+    for (const auto& group : mesh.groups) {
+        if (group.pass != kind) continue;
+        const SDL_GPUTextureSamplerBinding binding{mesh.textures.at(group.textureIndex), sampler_};
+        SDL_BindGPUFragmentSamplers(pass, 0, &binding, 1);
+        SDL_PushGPUFragmentUniformData(commands, 0, &group.material, sizeof(group.material));
+        SDL_DrawGPUIndexedPrimitives(pass, group.indexCount, 1, group.firstIndex, 0, 0);
+    }
+}
+
+bool Scene::Present(const SceneUniform& ship, SceneUniform ground, bool drawBase, const std::filesystem::path& sample)
+{
+    mapUpdated_ = false;
     auto* commands = SDL_AcquireGPUCommandBuffer(device_);
     Require(commands != nullptr, "Acquire Vulkan commands");
     SDL_GPUTexture* back = nullptr;
@@ -430,7 +561,7 @@ bool Scene::Present(const SceneUniform& ship, const SceneUniform& ground)
     if (!back) return SDL_SubmitGPUCommandBuffer(commands);
     ResizeDepth(width, height);
 
-    const bool capture = !capture_.empty() && !groups_.empty();
+    const bool capture = (!capture_.empty() || !sample.empty()) && !ship_.groups.empty();
     SDL_GPUTexture* frame = back;
     if (capture) {
         SDL_GPUTextureCreateInfo info{};
@@ -458,9 +589,17 @@ bool Scene::Present(const SceneUniform& ship, const SceneUniform& ground)
     depth.store_op = SDL_GPU_STOREOP_DONT_CARE;
     depth.stencil_load_op = SDL_GPU_LOADOP_CLEAR;
     depth.stencil_store_op = SDL_GPU_STOREOP_DONT_CARE;
+    const bool shadows = drawBase && PrepareBaseShadow(commands, ground);
     auto* pass = SDL_BeginGPURenderPass(commands, &color, 1, &depth);
-    SDL_BindGPUGraphicsPipeline(pass, terrain_);
-    SDL_PushGPUVertexUniformData(commands, 0, &ground, sizeof(ground));
+    SDL_BindGPUGraphicsPipeline(pass, shadows ? shadowedTerrain_ : terrain_);
+    auto surfaceFrame = ground;
+    surfaceFrame.light[0] = surfaceFrame.light[2] = 0;
+    surfaceFrame.light[1] = 1;
+    SDL_PushGPUVertexUniformData(commands, 0, &surfaceFrame, sizeof(surfaceFrame));
+    if (shadows) {
+        const SDL_GPUTextureSamplerBinding map{shadowMap_, shadowSampler_};
+        SDL_BindGPUFragmentSamplers(pass, 1, &map, 1);
+    }
     const MaterialUniform surface{{1, 1, 1, 1}, {0, 0, 0, 1}};
     SDL_PushGPUFragmentUniformData(commands, 0, &surface, sizeof(surface));
     for (const auto& [key, tile] : tiles_) {
@@ -474,11 +613,12 @@ bool Scene::Present(const SceneUniform& ship, const SceneUniform& ground)
         SDL_DrawGPUIndexedPrimitives(pass, tile.indexCount, 1, 0, 0, 0);
     }
     if (showShadow_) {
+        SDL_PushGPUVertexUniformData(commands, 0, &surfaceFrame, sizeof(surfaceFrame));
         SDL_BindGPUGraphicsPipeline(pass, shadow_);
         SDL_SetGPUStencilReference(pass, 1);
         const SDL_GPUBufferBinding vertex{shadowVertices_, 0};
-        const SDL_GPUBufferBinding index{indices_, 0};
-        const SDL_GPUTextureSamplerBinding binding{textures_.front(), sampler_};
+        const SDL_GPUBufferBinding index{ship_.indices, 0};
+        const SDL_GPUTextureSamplerBinding binding{ship_.textures.front(), sampler_};
         const MaterialUniform shade{{0.015f, 0.015f, 0.015f, 0.63f}, {0, 0, 0, 2}};
         SDL_BindGPUVertexBuffers(pass, 0, &vertex, 1);
         SDL_BindGPUIndexBuffer(pass, &index, SDL_GPU_INDEXELEMENTSIZE_32BIT);
@@ -486,27 +626,19 @@ bool Scene::Present(const SceneUniform& ship, const SceneUniform& ground)
         SDL_PushGPUFragmentUniformData(commands, 0, &shade, sizeof(shade));
         SDL_DrawGPUIndexedPrimitives(pass, shipIndexCount_, 1, 0, 0, 0);
     }
-    if (!groups_.empty()) {
-        const SDL_GPUBufferBinding vertex{vertices_, 0};
-        const SDL_GPUBufferBinding index{indices_, 0};
-        SDL_BindGPUVertexBuffers(pass, 0, &vertex, 1);
-        SDL_BindGPUIndexBuffer(pass, &index, SDL_GPU_INDEXELEMENTSIZE_32BIT);
-        SDL_PushGPUVertexUniformData(commands, 0, &ship, sizeof(ship));
-        for (auto passKind : {DrawPass::Opaque, DrawPass::Translucent}) {
-            SDL_BindGPUGraphicsPipeline(pass, passKind == DrawPass::Opaque ? opaque_ : translucent_);
-            for (const auto& group : groups_) {
-                if (group.pass != passKind) continue;
-                const SDL_GPUTextureSamplerBinding binding{textures_.at(group.textureIndex), sampler_};
-                SDL_BindGPUFragmentSamplers(pass, 0, &binding, 1);
-                SDL_PushGPUFragmentUniformData(commands, 0, &group.material, sizeof(group.material));
-                SDL_DrawGPUIndexedPrimitives(pass, group.indexCount, 1, group.firstIndex, 0, 0);
-            }
+    for (auto kind : {DrawPass::Opaque, DrawPass::Translucent}) {
+        SDL_BindGPUGraphicsPipeline(pass, kind == DrawPass::Opaque ? opaque_ : translucent_);
+        if (drawBase) {
+            SDL_PushGPUVertexUniformData(commands, 0, &ground, sizeof(ground));
+            DrawMesh(pass, commands, base_, kind);
         }
+        SDL_PushGPUVertexUniformData(commands, 0, &ship, sizeof(ship));
+        DrawMesh(pass, commands, ship_, kind);
     }
     SDL_EndGPURenderPass(pass);
     if (!capture) return SDL_SubmitGPUCommandBuffer(commands);
     try {
-        SaveFrame(commands, frame, back, width, height);
+        SaveFrame(commands, frame, back, width, height, sample);
     } catch (...) {
         SDL_ReleaseGPUTexture(device_, frame);
         throw;
@@ -517,7 +649,7 @@ bool Scene::Present(const SceneUniform& ship, const SceneUniform& ground)
 }
 
 void Scene::SaveFrame(SDL_GPUCommandBuffer* commands, SDL_GPUTexture* frame, SDL_GPUTexture* back,
-    unsigned width, unsigned height)
+    unsigned width, unsigned height, const std::filesystem::path& sample)
 {
     SDL_GPUBlitInfo blit{};
     blit.source = {frame, 0, 0, 0, 0, width, height};
@@ -545,7 +677,10 @@ void Scene::SaveFrame(SDL_GPUCommandBuffer* commands, SDL_GPUTexture* frame, SDL
                 gpuFormat == SDL_GPU_TEXTUREFORMAT_B8G8R8A8_UNORM_SRGB ? SDL_PIXELFORMAT_BGRA32 : SDL_PIXELFORMAT_RGBA32;
             std::unique_ptr<SDL_Surface, decltype(&SDL_DestroySurface)> surface(
                 SDL_CreateSurfaceFrom(int(width), int(height), pixelFormat, pixels, int(width * 4)), SDL_DestroySurface);
-            if (surface) saved = SDL_SaveBMP(surface.get(), capture_.string().c_str());
+            if (surface) {
+                saved = (capture_.empty() || SDL_SaveBMP(surface.get(), capture_.string().c_str())) &&
+                    (sample.empty() || SDL_SaveBMP(surface.get(), sample.string().c_str()));
+            }
             surface.reset();
             SDL_UnmapGPUTransferBuffer(device_, transfer);
         }
@@ -560,20 +695,37 @@ void Scene::ClearMesh() noexcept
     if (!device_) return;
     for (auto& entry : tiles_) Release(entry.second);
     tiles_.clear();
+    ClearBase();
     ClearShip();
+}
+
+void Scene::Release(GpuMesh& mesh) noexcept
+{
+    for (auto* texture : mesh.textures) SDL_ReleaseGPUTexture(device_, texture);
+    mesh.textures.clear();
+    mesh.groups.clear();
+    if (mesh.vertices) SDL_ReleaseGPUBuffer(device_, mesh.vertices);
+    if (mesh.indices) SDL_ReleaseGPUBuffer(device_, mesh.indices);
+    mesh.vertices = mesh.indices = nullptr;
+}
+
+void Scene::ClearBase() noexcept
+{
+    Release(base_);
+    if (baseCasterIndices_) SDL_ReleaseGPUBuffer(device_, baseCasterIndices_);
+    if (shadowMap_) SDL_ReleaseGPUTexture(device_, shadowMap_);
+    baseCasterIndices_ = nullptr;
+    shadowMap_ = nullptr;
+    baseCasterCount_ = 0;
+    mapValid_ = false;
 }
 
 void Scene::ClearShip() noexcept
 {
-    for (auto* texture : textures_) SDL_ReleaseGPUTexture(device_, texture);
-    textures_.clear();
-    groups_.clear();
-    if (vertices_) SDL_ReleaseGPUBuffer(device_, vertices_);
-    if (indices_) SDL_ReleaseGPUBuffer(device_, indices_);
+    Release(ship_);
     if (shadowVertices_) SDL_ReleaseGPUBuffer(device_, shadowVertices_);
     if (shipUpload_) SDL_ReleaseGPUTransferBuffer(device_, shipUpload_);
     if (shadowUpload_) SDL_ReleaseGPUTransferBuffer(device_, shadowUpload_);
-    vertices_ = indices_ = nullptr;
     shadowVertices_ = nullptr;
     shadowUpload_ = shipUpload_ = nullptr;
     shipIndexCount_ = vesselVertexBytes_ = 0;
@@ -584,10 +736,16 @@ void Scene::Close() noexcept
 {
     if (!device_) return;
     SDL_WaitForGPUIdle(device_);
+    capture_.clear();
     ClearMesh();
     if (depth_) SDL_ReleaseGPUTexture(device_, depth_);
     if (sampler_) SDL_ReleaseGPUSampler(device_, sampler_);
     if (terrainSampler_) SDL_ReleaseGPUSampler(device_, terrainSampler_);
+    if (shadowSampler_) SDL_ReleaseGPUSampler(device_, shadowSampler_);
+    if (shadowMapPipeline_) SDL_ReleaseGPUGraphicsPipeline(device_, shadowMapPipeline_);
+    if (shadowedTerrain_) SDL_ReleaseGPUGraphicsPipeline(device_, shadowedTerrain_);
+    shadowSampler_ = nullptr;
+    shadowMapPipeline_ = shadowedTerrain_ = nullptr;
     if (terrain_) SDL_ReleaseGPUGraphicsPipeline(device_, terrain_);
     if (opaque_) SDL_ReleaseGPUGraphicsPipeline(device_, opaque_);
     if (translucent_) SDL_ReleaseGPUGraphicsPipeline(device_, translucent_);

@@ -16,6 +16,20 @@ extends coarser terrain toward the horizon with distance haze. During flight
 it stages tiles over several frames and replaces each coarser tile when all
 four of its children are ready.
 
+## Kennedy buildings and VAB flyby
+
+`VAB-LowPass.scn` starts the DG-S airborne beside the stock Vehicle Assembly
+Building. Both clients draw the above-ground Cape Canaveral meshes exported by
+Orbiter, including the VAB, hangars and pad structures. Buildings with the
+stock shadow flag cast onto the Earth terrain as the Sun moves. The optional
+Kennedy imagery uses the same geometry. `EnableShadows = FALSE` turns off the
+building shadows.
+
+For matched flyby frames, start the scenario unpaused with a 0.05-second
+simulation step. Set `ORBITER_VULKAN_CAPTURE_DIR` to an existing output
+directory to save BMPs at 0.1-second simulation intervals. Use a fresh directory
+for each recording. Leave the variable unset for frame-time measurements.
+
 ## DG-S takeoff
 
 1. Press **Ctrl+P** to resume.
@@ -75,13 +89,14 @@ simulation step for repeatability (`--fixed-step 0.05` on Linux,
 
 Set `ORBITER_VULKAN_FRAME_TRACE` to a writable CSV path to record intervals
 between Vulkan frames, CPU-side scene and terrain times, tile staging, and
-aircraft pose uploads.
+aircraft pose uploads, initial base upload time, and shadow map refreshes.
 
 Build with CMake 3.24 or newer, a matching Orbiter build, SDL3 3.4 or newer, and
 `glslangValidator` from the Vulkan SDK or your package manager. The shaders
 are embedded in the module. For an offline build, use
-`ORBITER_VULKAN_PREBUILT_SHADERS` to supply matching `Ship.vert.spv` and
-`Ship.frag.spv` compiled from the files in `shaders/` with `glslangValidator -V`.
+`ORBITER_VULKAN_PREBUILT_SHADERS` to supply the SPIR-V files for all vertex and fragment sources
+in `shaders/`. Compile each with `glslangValidator -V` and name the output
+after the source with a `.spv` suffix.
 
 ## Linux
 
@@ -135,7 +150,7 @@ cmake --build C:/vulkan-build
 
 Place `VulkanClient.dll` in `Modules/Plugin` and the x64 `SDL3.dll` beside
 `Orbiter.exe` in a Windows Orbiter runtime with the stock assets. Copy the supplied
-`Runway33.scn` and `ShuttleA-Runway33.scn` to `Scenarios`. Select `VulkanClient` as the sole graphics
+`Runway33.scn`, `ShuttleA-Runway33.scn`, and `VAB-LowPass.scn` to `Scenarios`. Select `VulkanClient` as the sole graphics
 client in that runtime. For the reference capture, use these settings and set
 `PlanetTexDir` to the stock Earth archive directory's parent, `Textures`.
 
