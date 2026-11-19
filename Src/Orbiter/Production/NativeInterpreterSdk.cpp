@@ -86,7 +86,6 @@ std::vector<ElevationTile>* InitTileCache(int size) { return new std::vector<Ele
 void ReleaseTileCache(std::vector<ElevationTile>* cache) { delete cache; }
 double oapiGetSysMJD() { return MJD(time(nullptr)) + UTC_CT_diff*day; }
 bool oapiSetSimMJD(double mjd,int pmode) { return application().Jump(mjd,pmode); }
-void oapiSetTimeAcceleration(double warp) { GetVesselServices().SetWarpFactor(warp); }
 void oapiSetPause(bool pause) { application().Pause(pause); }
 bool oapiSetTexture(MESHHANDLE mesh,oapi::UInt32 texidx,SURFHANDLE tex)
 { return static_cast<Mesh*>(mesh)->SetTexture(texidx-1,tex); }

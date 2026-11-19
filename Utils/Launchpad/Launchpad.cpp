@@ -244,9 +244,10 @@ Launchpad::Launchpad(const QString &profilePath)
     flightSettings = new QPushButton(tr("Flight settings…"));
     flightSettings->setObjectName("flightSettingsButton");
     connect(flightSettings, &QPushButton::clicked, this, [this] {
-        showFlightSettings(this, profile);
+        const auto selected = selectedProfile();
+        showFlightSettings(this, selected);
         showSelection();
-        const auto error = profile.validationError();
+        const auto error = selected.validationError();
         status->setText(error.isEmpty() ? QFileInfo(profile.executable).fileName() : error);
     });
     header->addWidget(flightSettings);
@@ -260,7 +261,7 @@ Launchpad::Launchpad(const QString &profilePath)
 #ifdef Q_OS_LINUX
     auto *joystick = setupMenu->addAction(tr("Joystick setup…"), this, &Launchpad::openJoystickSetup);
     connect(setupMenu, &QMenu::aboutToShow, this, [this, joystick] {
-        joystick->setEnabled(profile.native && QFileInfo(profile.config).isFile()
+        joystick->setEnabled(profile.native && QFileInfo(selectedProfile().config).isFile()
                              && simulator.state() == QProcess::NotRunning);
     });
 #endif
@@ -438,8 +439,9 @@ void Launchpad::openAbout()
 void Launchpad::openJoystickSetup()
 {
 #ifdef Q_OS_LINUX
-    if (profile.native && QFileInfo(profile.config).isFile() && simulator.state() == QProcess::NotRunning)
-        showJoystickSetup(this, profile.config, profile.keymap);
+    const auto selected = selectedProfile();
+    if (selected.native && QFileInfo(selected.config).isFile() && simulator.state() == QProcess::NotRunning)
+        showJoystickSetup(this, selected.config, selected.keymap);
 #endif
 }
 
@@ -457,14 +459,13 @@ void Launchpad::loadProfile(const QString &path)
 void Launchpad::useProfile(SimulatorProfile selected)
 {
     profile = std::move(selected);
-    flightSettings->setEnabled(profile.configured && QFileInfo(profile.config).isFile());
     launchLog.clear();
     openLog->hide();
     paused->setVisible(profile.native);
     copy->setVisible(profile.native);
     search->clear();
     refreshScenarios(QSettings().value("simulator/lastScenario").toString());
-    const auto error = profile.validationError();
+    const auto error = selectedProfile().validationError();
     status->setText(error.isEmpty() ? QFileInfo(profile.executable).fileName() : error);
 }
 
@@ -544,6 +545,12 @@ void Launchpad::filterScenarios()
     showSelection();
 }
 
+SimulatorProfile Launchpad::selectedProfile() const
+{
+    const auto *item = scenarios->currentItem();
+    return item ? profile.forScenario(item->data(0, ScenarioRole).toString()) : profile;
+}
+
 void Launchpad::showSelection()
 {
     const auto *item = scenarios->currentItem();
@@ -554,7 +561,11 @@ void Launchpad::showSelection()
     const auto content = item ? readDescription(item->data(0, DescriptionRole).toString(), profile.helpRoot, path.isEmpty())
                               : ScenarioDescription();
     description->showDescription(content, path.isEmpty() ? QString() : tr("No description available."));
-    launch->setEnabled(!path.isEmpty() && profile.validationError().isEmpty()
+    const auto selected = selectedProfile();
+    flightSettings->setEnabled(selected.configured && QFileInfo(selected.config).isFile());
+    flightSettings->setToolTip(selected.config != profile.config
+        ? tr("Edit flight settings for %1").arg(item->text(0)) : QString());
+    launch->setEnabled(!path.isEmpty() && selected.validationError().isEmpty()
                        && simulator.state() == QProcess::NotRunning);
     copy->setEnabled(profile.native && item && item->data(0, StockRole).toBool()
                      && simulator.state() == QProcess::NotRunning);
@@ -588,7 +599,8 @@ void Launchpad::launchScenario()
         status->setText(tr("The selected scenario is missing. Refresh the scenario list."));
         return;
     }
-    const auto error = profile.validationError();
+    const auto selected = selectedProfile();
+    const auto error = selected.validationError();
     if (!error.isEmpty()) {
         status->setText(error);
         return;
@@ -606,7 +618,7 @@ void Launchpad::launchScenario()
     QSettings().setValue("simulator/lastScenario", path);
     status->setText(tr("Starting %1…").arg(item->text(0)));
     launch->setEnabled(false);
-    simulator.start(profile.executable, profile.arguments(path, paused->isChecked()));
+    simulator.start(selected.executable, selected.arguments(path, paused->isChecked()));
 }
 
 void Launchpad::showWindow()

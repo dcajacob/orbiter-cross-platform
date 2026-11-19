@@ -129,6 +129,13 @@ paths are resolved against the profile file.
 }
 ```
 
+The optional native profile field `scenarioConfigs` maps individual scenario
+paths to their own writable simulator configs. For example,
+`"scenarioConfigs": {"Scenarios/Cloudy KSC tour.scn": "Flight settings/Cloudy KSC tour.cfg"}`.
+Both paths resolve relative to the profile file. Selecting that flight uses its
+config for Flight settings, joystick setup and launch. The XRSound switch is
+shared across the profile.
+
 The assets directory contains the stock `Scenarios` tree. The config file
 holds the simulator and controller settings and should be writable so Orbiter
 can save changes made in flight. Optional `keymap`, `environment` and
@@ -139,6 +146,10 @@ In a source checkout this is `Sound/XRSound/assets`. The matching native
 module build places `XRSound.so` in `NativeModules/Plugin`. Start in the
 Delta-glider cockpit to hear propulsion sounds in orbit with the stock
 SilenceOfSpace setting.
+
+Linux can use the same simulator profile for stock and Apollo flights. The
+optional NASSP installation adds vessel modules, MFDs and mission scenarios.
+See the [NASSP build and installation instructions](../NASSP/README.md).
 
 If `saves` is omitted, the launcher uses Qt's
 per-user application data directory. **Ctrl+S** saves to `Quicksave.scn`,

@@ -1142,7 +1142,8 @@ public:
 	void UpdateBodyForces ();
 	void UpdateThrustForces ();
 	void UpdateRadiationForces ();
-	void UpdateAerodynamicForces ();
+	void UpdateAerodynamicForces (const Vector &angularVelocity, double dt);
+	void AddAerodynamicCorrection (Vector &force, Vector &moment, const StateVectors &state, double dt);
 	void UpdateAerodynamicForces_OLD ();
 	bool AddSurfaceForces (Vector *F, Vector *M,
 		const StateVectors *s=NULL, double tfrac=1.0, double dt=0.0,
@@ -1312,6 +1313,8 @@ protected:
 	// true if we use 2-body orbit stabilisation
 
 	void HoverHoldAltitude ();
+
+	void SetPropagator (int &plevel, int &nstep) const override;
 
 	bool CheckSurfaceContact () const;
 	// Returns true if any part of the vessel is in contact with a planet surface
@@ -1689,6 +1692,8 @@ private:
 	Vector Amom;               // angular moment (torque)
 	Vector Flin_add;           // linear body force
 	Vector Amom_add;           // used for collecting torque components
+	Vector aerodynamicForce;
+	Vector aerodynamicMoment;
 	mutable Vector Torque;     // torque vector
 	mutable bool torque_valid; // flag for 'Torque' up to date
 

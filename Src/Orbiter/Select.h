@@ -60,6 +60,7 @@ public:
     Callbk cbCancel;
     void *userdata;
     char inputbuf[128];
+    bool focusInput = false;
 
     void Open(const char *_title = 0, char *_buf = 0, int _vislen = 20,
         Callbk cbk = 0, void *_userdata = 0, int cntx = -1, int cnty = -1);

@@ -133,6 +133,7 @@ bool InputBox::OpenEx(const char *_title, char *_buf, int _vislen,
     int flags, int cntx, int cnty) {
 
     title = _title;
+    focusInput = true;
 
     cbEnter = enter_cbk;
     cbCancel = cancel_cbk;
@@ -153,11 +154,9 @@ void InputBox::OnDraw() {
     char buf[256];
     sprintf(buf, "%s###InputBox", title.c_str());
 
-    bool firstTime = false;
     if (opened) {
         ImGui::OpenPopup(buf);
         opened = false;
-        firstTime = true;
     }
 
     if (ImGui::BeginAnimatedPopup(buf))
@@ -165,14 +164,19 @@ void InputBox::OnDraw() {
         ImGui::TextUnformatted(title.c_str());
         ImGui::Separator();
         ImGui::SetNextItemWidth(-FLT_MIN);
-        if (firstTime)
+        if (focusInput) {
             ImGui::SetKeyboardFocusHere();
+            focusInput = false;
+        }
         bool entered = ImGui::InputText("##InputText", inputbuf, IM_ARRAYSIZE(inputbuf), ImGuiInputTextFlags_EnterReturnsTrue);
 
         if (ImGui::Button("OK") || entered) {
-            cbEnter(this, inputbuf, userdata);
-            ImGui::CloseCurrentPopup();
-            active = false;
+            if (!cbEnter || cbEnter(this, inputbuf, userdata)) {
+                ImGui::CloseCurrentPopup();
+                active = false;
+            } else {
+                focusInput = true;
+            }
         }
         ImGui::SameLine();
         if (ImGui::Button("Cancel")) {

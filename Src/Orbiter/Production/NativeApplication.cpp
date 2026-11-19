@@ -51,6 +51,7 @@
 #include "MathObservation.h"
 #include "ContactObservation.h"
 #include <algorithm>
+#include <atomic>
 #include <chrono>
 #include <cstdlib>
 #include <fstream>
@@ -60,6 +61,7 @@
 #include <limits>
 #include <map>
 #include <memory>
+#include <mutex>
 #include <optional>
 #include <stdexcept>
 #include <string>
@@ -216,6 +218,89 @@ bool SupportedStockShuttleA(const VESSEL& vessel,const char* type) {
             cs.x==17.61f && cs.y==17.44f && cs.z==13.09f;
     return false;
 }
+
+bool SupportedApolloVessel(Vessel& body,const char* type) {
+    const auto classname=ResourceResolver::Normalize(type);
+    const char* module=body.NativeModuleName();
+    if(!module) {
+        static constexpr const char* debrisClasses[]={
+            "projectapollo/cmopticscover", "projectapollo/cmprobe",
+            "projectapollo/cmapex", "projectapollo/cmbapex",
+            "projectapollo/sm-hga", "projectapollo/sm-sps",
+            "projectapollo/sm-panel1", "projectapollo/sm-panel2", "projectapollo/sm-panel3",
+            "projectapollo/sm-panel4", "projectapollo/sm-panel5", "projectapollo/sm-panel6",
+            "projectapollo/sat1aerocap",
+            "projectapollo/nsat1stg21", "projectapollo/nsat1stg22",
+            "projectapollo/nsat1stg23", "projectapollo/nsat1stg24",
+            "projectapollo/easeptv", "projectapollo/alseptv",
+            "projectapollo/sat5intstg", "projectapollo/sat5intstg4", "projectapollo/sat5intstg8",
+            "projectapollo/sat5intstglowres", "projectapollo/sat5stg31", "projectapollo/sat5stg31wide",
+            "projectapollo/sat5stg32", "projectapollo/sat5stg32wide", "projectapollo/sat5stg33",
+            "projectapollo/sat5stg33wide", "projectapollo/sat5stg34", "projectapollo/sat5stg34wide"
+        };
+        const auto& vessel=*body.GetModuleInterface();
+        if (classname=="carina")
+            return vessel.Version()==0 && vessel.GetMeshCount()==1 &&
+                   vessel.GetSize()==5 && vessel.GetEmptyMass()==5000 &&
+                   vessel.GetPropellantCount()==0 && vessel.DockCount()==0 &&
+                   vessel.AttachmentCount(true)==2 && vessel.AttachmentCount(false)==0;
+        return vessel.GetMeshCount()==1 && vessel.GetThrusterCount()==0 &&
+               std::any_of(std::begin(debrisClasses),std::end(debrisClasses),
+                   [&](const char* type){return classname==type;});
+    }
+    const auto moduleName=ResourceResolver::Normalize(module);
+    if (classname=="stage" && moduleName=="stage") {
+        const auto& vessel=*body.GetModuleInterface();
+        return vessel.Version()==1 && vessel.GetSize()==20 && vessel.GetEmptyMass()==1000 &&
+               vessel.GetMeshCount()==1 && vessel.GetThrusterCount()==0 && vessel.DockCount()==0;
+    }
+    return (classname=="vesselbuilder1/soyuz7k-tm" && moduleName=="vesselbuilder1") ||
+           (classname=="projectapollo/saturn1b" && moduleName=="projectapollo/saturn1b") ||
+           (classname=="projectapollo/saturn5" && moduleName=="projectapollo/saturn5") ||
+           (classname=="projectapollo/saturn1babort1" && moduleName=="projectapollo/sat1babort1") ||
+           (classname=="projectapollo/saturn1babort2" && moduleName=="projectapollo/sat1babort2") ||
+           (classname=="projectapollo/saturn5abort1" && moduleName=="projectapollo/sat5abort1") ||
+           (classname=="projectapollo/saturn5abort2" && moduleName=="projectapollo/sat5abort2") ||
+           (classname=="projectapollo/saturn5abort3" && moduleName=="projectapollo/sat5abort3") ||
+           (classname=="projectapollo/lem" && moduleName=="projectapollo/lem") ||
+           (classname=="projectapollo/sat5lmdsc" && moduleName=="projectapollo/sat5lmdsc") ||
+           (classname=="projectapollo/easeppsep" && moduleName=="projectapollo/easeppsep") ||
+           (classname=="projectapollo/easeplr3" && moduleName=="projectapollo/easeplr3") ||
+           (classname=="projectapollo/easepswc" && moduleName=="projectapollo/easepswc") ||
+           (classname=="projectapollo/eva" && moduleName=="projectapollo/eva") ||
+           (classname=="projectapollo/leva" && moduleName=="projectapollo/leva") ||
+           (classname=="projectapollo/lrv" && moduleName=="projectapollo/lrv") ||
+           (classname=="projectapollo/alsepstation" && moduleName=="projectapollo/alsepstation") ||
+           (classname=="projectapollo/alseprtg" && moduleName=="projectapollo/alseprtg") ||
+           (classname=="projectapollo/alsepsbnd" && moduleName=="projectapollo/alsepsbnd") ||
+           (classname=="projectapollo/alseppse" && moduleName=="projectapollo/alseppse") ||
+           (classname=="projectapollo/alseplsm" && moduleName=="projectapollo/alseplsm") ||
+           (classname=="projectapollo/alsepsws" && moduleName=="projectapollo/alsepsws") ||
+           (classname=="projectapollo/alsepside" && moduleName=="projectapollo/alsepside") ||
+           (classname=="projectapollo/sat5flag" && moduleName=="projectapollo/flag") ||
+           (classname=="projectapollo/floodlight" && moduleName=="projectapollo/floodlight") ||
+           (classname=="projectapollo/crawler" && moduleName=="projectapollo/crawler") ||
+           (classname=="projectapollo/lcc" && moduleName=="projectapollo/lcc") ||
+           ((classname=="projectapollo/ml" || classname=="projectapollo/ml_saturnib") &&
+             moduleName=="projectapollo/ml") ||
+           (classname=="projectapollo/skylab" && moduleName=="projectapollo/skylab") ||
+           (classname=="projectapollo/astp" && moduleName=="projectapollo/astp") ||
+           (classname=="projectapollo/mss" && moduleName=="projectapollo/mss") ||
+           (classname=="projectapollo/sat5stg1" && moduleName=="projectapollo/s1c") ||
+           (classname=="projectapollo/sat5stg2" && moduleName=="projectapollo/sii") ||
+           (classname=="projectapollo/sat5stg3" && moduleName=="projectapollo/sivb") ||
+           (classname=="projectapollo/nsat1stg1" && moduleName=="projectapollo/s1b") ||
+           (classname=="projectapollo/nsat1stg2" && moduleName=="projectapollo/sivb") ||
+           (classname=="projectapollo/sm" && moduleName=="projectapollo/sm") ||
+           (classname=="projectapollo/les" && moduleName=="projectapollo/les") ||
+           (classname=="projectapollo/floatbag" && moduleName=="projectapollo/floatbag") ||
+           (classname=="projectapollo/lc34" && moduleName=="projectapollo/lc34") ||
+           (classname=="projectapollo/lc37" && moduleName=="projectapollo/lc37") ||
+           (classname=="projectapollo/vab" && moduleName=="projectapollo/vab") ||
+           ((classname=="projectapollo/droguechute" || classname=="projectapollo/mainchute") &&
+             moduleName=="projectapollo/cmchute") ||
+           (classname=="projectapollo/mcc" && moduleName=="projectapollo/mcc");
+}
 #if defined(ORBITER_ATLANTIS_DIAGNOSTIC) || defined(ORBITER_REMAINING_STOCK_DIAGNOSTIC)
 // An isolated test executable exercises the actual, not-yet-qualified modules.
 // The production executable retains its admission checks below.
@@ -295,9 +380,13 @@ struct Runtime final:BodyServices,RigidBodyServices,SurfaceServices,NavigationSe
     double nextPlaybackEvent=0;
     NativeScriptHost scripts{resources.modules};
     std::array<char,256> simulatedKeys{};
+    std::mutex simulatedKeyMutex;
+    std::vector<FlightInput> pendingBufferedKeys;
     TimeJumpData scriptJump{};
     INTERPRETERHANDLE scenarioInterpreter=nullptr;
     std::unique_ptr<Pane> cockpit;
+    const std::thread::id cockpitThread=std::this_thread::get_id();
+    std::atomic<bool> cockpitFocusPending{false};
     bool instrumentResources=false,cockpitObserved=false,guiCreated=false;
     std::ofstream cockpitState,playbackTrace;
     CockpitSystemClock cockpitClock;
@@ -305,6 +394,8 @@ struct Runtime final:BodyServices,RigidBodyServices,SurfaceServices,NavigationSe
     bool observeControls=false;
     std::ofstream cockpitMouse;
 #endif
+    bool apolloWorld=false;
+    bool UseApolloDynamics() const override { return apolloWorld; }
     std::unique_ptr<State> scenarioState;
     std::filesystem::path savePath;
     std::filesystem::path optionsPath;
@@ -657,11 +748,19 @@ struct Runtime final:BodyServices,RigidBodyServices,SurfaceServices,NavigationSe
             event.keys[modifiers[i]]=char(0x80);
         }
         event.events.push_back({key,true});
-        Buffered(event);
+        if (std::this_thread::get_id()==cockpitThread) {
+            Buffered(event);
+        } else {
+            // A vessel key handler can create or replace meshes. Run it on the
+            // simulation thread, which owns the graphics context.
+            std::lock_guard<std::mutex> lock(simulatedKeyMutex);
+            pendingBufferedKeys.push_back(std::move(event));
+        }
         return true;
     }
     bool ImmediateKeys(const char *keys,bool runningOnly) override {
         if ((runningOnly && !running) || !keys) return false;
+        std::lock_guard<std::mutex> lock(simulatedKeyMutex);
         for (std::size_t i=0;i<simulatedKeys.size();++i) simulatedKeys[i]|=keys[i];
         return true;
     }
@@ -823,7 +922,6 @@ struct Runtime final:BodyServices,RigidBodyServices,SurfaceServices,NavigationSe
         if(render.graphics)render.graphics->CloseSession();
         if(baseResources){Base::DestroyStaticDeviceObjects();baseResources=false;}
 #ifdef ORBITER_NATIVE_COCKPIT
-        annotations.Clear();
         if (guiCreated) {
             render.graphics->ShutdownGui();
             DestroyCockpitGui();
@@ -835,6 +933,7 @@ struct Runtime final:BodyServices,RigidBodyServices,SurfaceServices,NavigationSe
         // Match the production Windows cockpit shutdown order while the
         // graphics context and logical world still exist.
         meshes.Flush();world.Reset();
+        annotations.Clear();
 #else
         world.Reset();meshes.Flush();
 #endif
@@ -867,10 +966,12 @@ struct Runtime final:BodyServices,RigidBodyServices,SurfaceServices,NavigationSe
             render.joystickTwistAxis=settings.GetInt("NativeJoystickRudderAxis",axis) && axis>=-1 && axis<=15 ? axis : 2;
 #endif
 #ifdef ORBITER_NATIVE_COCKPIT
-        bool terminalMfdRequested=false;
+        bool terminalMfdRequested=false, apolloRtccMfdRequested=false, projectApolloMfdRequested=false;
         for(const auto& plugin:settings.GetActiveModules()) {
-            if(CompareText(plugin.c_str(),"LuaMFD"))unsupported("application plugins in this external-view host");
-            terminalMfdRequested=true;
+            if(!CompareText(plugin.c_str(),"LuaMFD"))terminalMfdRequested=true;
+            else if(!CompareText(plugin.c_str(),"ApolloRTCCMFD"))apolloRtccMfdRequested=true;
+            else if(!CompareText(plugin.c_str(),"ProjectApolloMFD"))projectApolloMfdRequested=true;
+            else unsupported("the requested application plugin");
         }
 #else
         if(!settings.GetActiveModules().empty())unsupported("application plugins in this external-view host");
@@ -973,11 +1074,21 @@ struct Runtime final:BodyServices,RigidBodyServices,SurfaceServices,NavigationSe
         render.graphics->InitGui();
         static bool modesRegistered=false;if(!modesRegistered){Instrument::RegisterBuiltinModes();modesRegistered=true;}
         if(terminalMfdRequested)scripts.LoadTerminalMfd();
+        if(apolloRtccMfdRequested)scripts.LoadApolloMfd("ApolloRTCCMFD");
+        if(projectApolloMfdRequested)scripts.LoadApolloMfd("ProjectApolloMFD");
         Instrument::GlobalInit(render.graphics);instrumentResources=true;
 #endif
         Base::CreateStaticDeviceObjects();baseResources=true;
         RigidBody::GlobalSetup();
+        apolloWorld=ResourceResolver::Normalize(metadata.Solsys())=="projectapollo/sol_virtualagc";
         if(!world.Initialize(metadata.Solsys()))throw std::runtime_error("Production solar system contains no objects");
+        if(apolloWorld) {
+            const auto* earth=system->GetGravObj("Earth",true);
+            const auto* moon=system->GetGravObj("Moon",true);
+            if(!earth || !moon || !celestial.HasModule(*earth) || !celestial.HasModule(*moon) ||
+               !celestial.HasEphemeris(*earth) || !celestial.HasEphemeris(*moon))
+                throw std::runtime_error("Native NASSP scenes require Earth and Moon ephemeris modules");
+        }
         if (!startRunning) {
             // The planet states are available now, but surface bases normally
             // get their world transforms on the first physics step.
@@ -988,7 +1099,7 @@ struct Runtime final:BodyServices,RigidBodyServices,SurfaceServices,NavigationSe
             }
         }
         system->InitState(scenario.string().c_str());
-        if(!system->nVessel())throw std::runtime_error("Native production session requires a live stock vessel");
+        if(!system->nVessel())throw std::runtime_error("Native production session requires a live vessel");
 #ifdef ORBITER_ATLANTIS_DIAGNOSTIC
         if(!evidence.empty()) {
             std::ofstream marker(evidence/"unqualified-atlantis-diagnostic.json");
@@ -1005,6 +1116,7 @@ struct Runtime final:BodyServices,RigidBodyServices,SurfaceServices,NavigationSe
 #endif
         for(auto* body:system->GetVessels()) {
             auto* vessel=body->GetModuleInterface();const char* type=vessel->GetClassName();
+            if(apolloWorld && SupportedApolloVessel(*body,type))continue;
             const bool pb=CompareText(type,"ShuttlePB")==0 && vessel->Version()==2 && vessel->GetMeshCount()==1 && vessel->GetThrusterCount()==16 && vessel->GetPropellantCount()==1;
             const bool iss=CompareText(type,"ProjectAlpha_ISS")==0 && vessel->Version()==0 && vessel->GetMeshCount()==1;
 #ifdef ORBITER_NATIVE_COCKPIT
@@ -1022,7 +1134,7 @@ struct Runtime final:BodyServices,RigidBodyServices,SurfaceServices,NavigationSe
 #endif
 #endif
             if(!pb && !iss && !SupportedStockStation(*vessel,type))
-                throw std::runtime_error(std::string("Unsupported stock vessel class or capabilities: ")+type+"; generic replacement is forbidden");
+                throw std::runtime_error(std::string("Unsupported ")+(apolloWorld?"NASSP":"stock")+" vessel class or capabilities: "+type+"; generic replacement is forbidden");
         }
         auto* focus=system->GetVessel(metadata.Focus());
         if(!focus)focus=system->GetVessel(oapi::UInt32(0));
@@ -1054,7 +1166,8 @@ struct Runtime final:BodyServices,RigidBodyServices,SurfaceServices,NavigationSe
 #ifndef ORBITER_NATIVE_COCKPIT
         render.camera->Update();
 #endif
-        if(system->nGrav()!=41)throw std::runtime_error("This native scene requires the actual stock Sol world");
+        if(!apolloWorld && system->nGrav()!=41)
+            throw std::runtime_error("This native scene requires the actual stock Sol world");
         WriteTrace();
     }
     bool IsUpdating() const override {return updating;}
@@ -1225,6 +1338,13 @@ struct Runtime final:BodyServices,RigidBodyServices,SurfaceServices,NavigationSe
     void SetView(Body* body,int mode) override {render.camera->Attach(body,mode);force=true;LifetimeEvent("camera.target",render.camera->Target()->Name(),render.camera->IsExternal()?"external":"internal");}
     void PaneFocusChanged(Vessel* vessel) override {
 #ifdef ORBITER_NATIVE_COCKPIT
+        // Lua can change the world focus from its interpreter thread. Panel
+        // loading allocates graphics resources on the window's context.
+        if(std::this_thread::get_id()!=cockpitThread) {
+            cockpitFocusPending.store(true);
+            return;
+        }
+        cockpitFocusPending.store(false);
         if(cockpit)cockpit->FocusChanged(vessel);
 #endif
     }
@@ -1296,6 +1416,7 @@ struct Runtime final:BodyServices,RigidBodyServices,SurfaceServices,NavigationSe
 #ifdef ORBITER_NATIVE_COCKPIT
         if(playbackTrace.is_open() && !completedTicks)playback_observation::Row(playbackTrace,0);
         if(!cockpitObserved && render.camera->IsInternal()){CockpitSnapshot();cockpitObserved=true;}
+        scripts.PreStep(time.SimT0,time.SimDT,time.MJD0);
 #endif
         for(UInt32 i=0;i<system->nVessel();++i)system->GetVessel(i)->ModulePreStep(time.SimT0,time.SimDT,time.MJD0);}
     void PlaybackStep() override {
@@ -1315,6 +1436,8 @@ struct Runtime final:BodyServices,RigidBodyServices,SurfaceServices,NavigationSe
         for(UInt32 i=0;i<system->nVessel();++i)system->GetVessel(i)->ModulePostStep(time.SimT1,time.SimDT,time.MJD1);
 #ifdef ORBITER_NATIVE_COCKPIT
         scripts.PostStep(time.SimT1,time.SimDT,time.MJD1);
+        if(cockpitFocusPending.exchange(false) && cockpit)
+            cockpit->FocusChanged(render.focus);
 #endif
         LifetimeEvent("module.post");
     }
@@ -1409,7 +1532,16 @@ struct Runtime final:BodyServices,RigidBodyServices,SurfaceServices,NavigationSe
         return text.str();
     }
     void Step(double dt) {
-        observationTick=completedTicks;Commands("before");Buffered(input);InputRecord();
+        observationTick=completedTicks;
+#ifdef ORBITER_NATIVE_COCKPIT
+        std::vector<FlightInput> bufferedKeys;
+        {
+            std::lock_guard<std::mutex> lock(simulatedKeyMutex);
+            bufferedKeys.swap(pendingBufferedKeys);
+        }
+        for (auto& event:bufferedKeys) Buffered(event);
+#endif
+        Commands("before");Buffered(input);InputRecord();
         const bool wasRunning=running;if(stepOnce){running=true;stepOnce=false;}
         render.paused=!running;
 #ifdef ORBITER_NATIVE_COCKPIT
@@ -1419,10 +1551,13 @@ struct Runtime final:BodyServices,RigidBodyServices,SurfaceServices,NavigationSe
 #endif
 #ifdef ORBITER_NATIVE_COCKPIT
         FlightInput snapshot=input;
-        for (std::size_t i=0;i<simulatedKeys.size();++i) snapshot.keys[i]|=simulatedKeys[i];
+        {
+            std::lock_guard<std::mutex> lock(simulatedKeyMutex);
+            for (std::size_t i=0;i<simulatedKeys.size();++i) snapshot.keys[i]|=simulatedKeys[i];
+            if(running) simulatedKeys.fill(0);
+        }
         HandleCockpitSystemKeys(controls.keymap,snapshot.keys.data(),force);
         if(running) {
-            simulatedKeys.fill(0);
             controls.Immediate(*render.focus,time,snapshot);
         }
 #else
@@ -1555,7 +1690,12 @@ int main(int argc,char** argv) {
                     for(int n=0;n<(ticks?renderEvery:1) && application.active && !application.reloadPending && (!ticks || application.inputTick<unsigned(ticks));++n)application.Step(systemFixed);
                 } else {
                     auto now=std::chrono::steady_clock::now();clock.Add(std::chrono::duration<double>(now-previous).count());previous=now;
-                    int count=0;while(count<256 && application.active && !application.reloadPending && clock.Tick()) {application.Step(fixed);++count;}
+                    // Leave time for input and presentation even when accelerated vessel systems run slowly.
+                    const auto deadline = now + std::chrono::milliseconds(16);
+                    for (int count = 0; count < 256 && application.active && !application.reloadPending && clock.Tick(); ++count) {
+                        application.Step(fixed);
+                        if (std::chrono::steady_clock::now() >= deadline) break;
+                    }
                     // Buffered actions remain responsive even without a due physics tick.
                     application.Buffered(application.input);
                     if(application.savePending && !application.stepOnce){application.Save();application.savePending=false;}

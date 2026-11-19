@@ -8,6 +8,7 @@
 #else
 #include "NativeVesselAPI.h"
 #include "PsysCore.h"
+#include "Production/VesselServices.h"
 #endif
 #include "Production/CockpitServices.h"
 #include "Production/GeometryConversions.h"
@@ -380,6 +381,13 @@ double oapiGetTimeAcceleration ()
 {
 	return orbiter::production::CockpitTime().Warp();
 }
+
+#ifndef _WIN32
+void oapiSetTimeAcceleration(double warp)
+{
+    orbiter::production::GetVesselServices().SetWarpFactor(warp);
+}
+#endif
 
 double oapiGetPlanetPeriod (OBJHANDLE hPlanet)
 {

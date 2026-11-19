@@ -66,6 +66,16 @@ SimulatorProfile SimulatorProfile::load(const QString &profilePath)
         profile.saveRoot = QDir(QStandardPaths::writableLocation(QStandardPaths::AppDataLocation))
                                .absoluteFilePath("Scenarios");
     profile.workingDirectory = QFileInfo(profile.saveRoot).absolutePath();
+    const auto entry = json.value("scenarioConfigs");
+    if (!entry.isUndefined() && !entry.isObject())
+        throw std::runtime_error("scenarioConfigs must map scenario paths to configuration paths.");
+    const auto configs = entry.toObject();
+    for (auto it = configs.begin(); it != configs.end(); ++it) {
+        const auto configPath = absolutePath(base, it.value().toString());
+        if (it.key().isEmpty() || configPath.isEmpty())
+            throw std::runtime_error("A scenarioConfigs entry needs a scenario path and a configuration path.");
+        profile.scenarioConfigs.insert(absolutePath(base, it.key()), configPath);
+    }
     profile.environment = QProcessEnvironment::systemEnvironment();
     for (const auto &name : json.value("unsetEnvironment").toArray())
         profile.environment.remove(name.toString());
@@ -98,15 +108,23 @@ SimulatorProfile SimulatorProfile::fromWindowsExecutable(const QString &path)
     return profile;
 }
 
+SimulatorProfile SimulatorProfile::forScenario(const QString &path) const
+{
+    auto selected = *this;
+    selected.sharedSoundConfig = sharedSoundConfig.isEmpty() ? config : sharedSoundConfig;
+    selected.config = scenarioConfigs.value(path, selected.sharedSoundConfig);
+    return selected;
+}
+
 bool SimulatorProfile::launchWithSound() const
 {
-    return native && !xrsoundAssets.isEmpty() && QSettings().value(soundPreferenceKey(config), true).toBool();
+    return native && !xrsoundAssets.isEmpty() && QSettings().value(soundPreferenceKey(sharedSoundConfig.isEmpty() ? config : sharedSoundConfig), true).toBool();
 }
 
 QString SimulatorProfile::setLaunchWithSound(bool enabled) const
 {
     QSettings settings;
-    settings.setValue(soundPreferenceKey(config), enabled);
+    settings.setValue(soundPreferenceKey(sharedSoundConfig.isEmpty() ? config : sharedSoundConfig), enabled);
     settings.sync();
     return settings.status() == QSettings::NoError ? QString() : QObject::tr("Could not save the XRSound preference.");
 }

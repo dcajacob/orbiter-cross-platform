@@ -38,6 +38,29 @@ QTreeWidgetItem *plugin(QWidget *page, const QString &name)
 class FlightSettingsCheck : public QObject {
     Q_OBJECT
 private slots:
+    void savedFlightConfigurations()
+    {
+        QTemporaryDir dir;
+        QVERIFY(dir.isValid());
+        QCoreApplication::setOrganizationName("orbiter-launchpad-test");
+        QSettings::setDefaultFormat(QSettings::IniFormat);
+        QSettings::setPath(QSettings::IniFormat, QSettings::UserScope, dir.path());
+        const auto profilePath = dir.filePath("profile.json");
+        writeFile(profilePath, R"({"mode":"native","config":"Orbiter.cfg","xrsoundAssets":"sound",
+            "scenarioConfigs":{"Scenarios/Cloudy.scn":"settings/Cloudy.cfg"}})");
+        writeFile(dir.filePath("Orbiter.cfg"));
+        const auto base = SimulatorProfile::load(profilePath);
+        const auto scene = dir.filePath("Scenarios/Cloudy.scn");
+        const auto cloudy = base.forScenario(scene);
+        const auto arguments = cloudy.arguments(scene, false);
+        QCOMPARE(arguments.value(arguments.indexOf("--config") + 1), dir.filePath("settings/Cloudy.cfg"));
+        QCOMPARE(cloudy.forScenario(dir.filePath("stock/Cloudy.scn")).config, base.config);
+        QVERIFY(base.setLaunchWithSound(false).isEmpty());
+        QVERIFY(!cloudy.arguments(scene, false).contains("--xrsound-assets"));
+        QVERIFY(cloudy.setLaunchWithSound(true).isEmpty());
+        QVERIFY(base.launchWithSound());
+    }
+
     void planetVisualEffects()
     {
         QTemporaryDir dir;
@@ -310,7 +333,8 @@ private slots:
         QVERIFY(QDir(dir.path()).mkdir("Plugin"));
         QVERIFY(QDir(dir.path()).mkdir("XRSound"));
         writeFile(dir.filePath("XRSound/XRSound.cfg"));
-        for (const auto *name : {"LuaMFD.so", "XRSound.so", "LuaInline.so", "LuaInterpreter.so", "Other.so"})
+        for (const auto *name : {"LuaMFD.so", "XRSound.so", "LuaInline.so", "LuaInterpreter.so",
+                                 "ApolloRTCCMFD.so", "ProjectApolloMFD.so", "Other.so"})
             writeFile(dir.filePath("Plugin/" + QString(name)));
         const QByteArray original = "; native config\r\n";
         writeFile(profile.config, original);
@@ -329,6 +353,12 @@ private slots:
                         qFatal("Expected a read-only module");
                 }
                 lua->setCheckState(0, Qt::Checked);
+                for (const auto *name : {"ApolloRTCCMFD", "ProjectApolloMFD"}) {
+                    auto *item = plugin(page, name);
+                    if (!item || !item->flags().testFlag(Qt::ItemIsUserCheckable))
+                        qFatal("Expected a selectable Apollo MFD");
+                    item->setCheckState(0, Qt::Checked);
+                }
                 sound->setCheckState(0, Qt::Unchecked);
                 dialog->findChild<QDialogButtonBox *>()->button(action)->click();
             });
@@ -336,7 +366,7 @@ private slots:
             QFile config(profile.config);
             QVERIFY(config.open(QIODevice::ReadOnly));
             const bool saved = action == QDialogButtonBox::Save;
-            QCOMPARE(config.readAll(), saved ? original + "ACTIVE_MODULES\r\n  LuaMFD\r\nEND_MODULES\r\n" : original);
+            QCOMPARE(config.readAll(), saved ? original + "ACTIVE_MODULES\r\n  ApolloRTCCMFD\r\n  LuaMFD\r\n  ProjectApolloMFD\r\nEND_MODULES\r\n" : original);
             QCOMPARE(profile.arguments("flight.scn", true).contains("--xrsound-assets"), !saved);
         }
         profile.config = dir.filePath("other.cfg");

@@ -29,6 +29,7 @@ private:
     void addScenarios(const QString &root, QTreeWidgetItem *savedFolder = nullptr);
     void filterScenarios();
     void showSelection();
+    SimulatorProfile selectedProfile() const;
     void copyScenario();
     void launchScenario();
     void showWindow();

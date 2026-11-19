@@ -545,7 +545,8 @@ void SurfTile::Render ()
 	//static float spec_base = 0.4f; // 0.95f;
 	//static D3DMATERIAL7 pmat, watermat = {{1,1,1,1},{1,1,1,1},{spec_base*1.2f,spec_base*1.0f,spec_base*0.8f,1},{0,0,0,0},50.0f};
 
-	if (!mesh) return; // DEBUG : TEMPORARY
+	// A tile can have elevation data before a surface texture is available.
+	if (!mesh || !tex) return;
 	if(!mesh->VAO) {
 		if (state & TILE_VALID) {
 			mesh->Upload();

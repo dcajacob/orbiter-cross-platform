@@ -2,9 +2,11 @@
 #pragma once
 #include "NativeModule.h"
 #include "NativeLuaMfd.h"
+#include "NativeApolloRtccMfd.h"
 #include "NativeVesselAPI.h"
 #include "ResourceResolver.h"
 #include <memory>
+#include <vector>
 
 struct lua_State;
 namespace orbiter::production {
@@ -28,7 +30,9 @@ public:
     explicit NativeScriptHost(const ResourceResolver &modules): modules(modules) {}
     NativeScriptApi& Load();
     void LoadTerminalMfd();
+    void LoadApolloMfd(const char* name);
     void EndTerminalMfd();
+    void PreStep(double simt, double simdt, double mjd);
     void PostStep(double simt, double simdt, double mjd);
     void DeleteVessel(OBJHANDLE vessel);
     void End();
@@ -36,6 +40,11 @@ private:
     const ResourceResolver &modules;
     std::unique_ptr<NativeModule> library;
     std::unique_ptr<NativeModule> terminalLibrary;
+    struct ApolloMfd {
+        std::unique_ptr<NativeModule> module;
+        NativeApolloMfdApi* api;
+    };
+    std::vector<ApolloMfd> apolloMfds;
     NativeLuaMfdApi *terminalApi = nullptr;
     NativeScriptApi *api = nullptr;
 };

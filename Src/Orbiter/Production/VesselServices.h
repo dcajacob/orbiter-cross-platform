@@ -33,6 +33,8 @@ public:
     virtual void RecallCameraPreset(int)=0;
     virtual void PlaybackNote(char*)=0;
     virtual void EndPlayback()=0;
+    // Virtual AGC scenarios use the integration and landed-stack behavior of the NASSP port.
+    virtual bool UseApolloDynamics() const { return false; }
 };
 ORBITER_PRODUCTION_API VesselServices* BindVesselServices(VesselServices*);
 ORBITER_PRODUCTION_API VesselServices& GetVesselServices();

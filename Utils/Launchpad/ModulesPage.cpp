@@ -111,7 +111,8 @@ ModulesPage::ModulesPage(const SimulatorProfile &profile, const QString &config)
                 check(sound, originalSound);
         } else if (profile.native && (name == "LuaInline" || name == "LuaInterpreter")) {
             item = row(name, tr("Loaded automatically for Lua scripts"));
-        } else if (profile.native && name != "LuaMFD") {
+        } else if (profile.native && name != "LuaMFD" &&
+                   name != "ApolloRTCCMFD" && name != "ProjectApolloMFD") {
             item = row(name, tr("Unsupported by the native cockpit"));
         } else if (!profile.native && graphicsClient(name, file.absoluteFilePath())) {
             item = row(name, tr("Graphics client"));
@@ -120,7 +121,7 @@ ModulesPage::ModulesPage(const SimulatorProfile &profile, const QString &config)
                    name != name.trimmed() || QString::fromLatin1(name.toLatin1()) != name || name.size() > 250) {
             item = row(name, tr("Name cannot be stored in Orbiter.cfg"));
         } else {
-            item = row(name, profile.native ? tr("Lua Terminal MFD") : tr("Load at startup"));
+            item = row(name, profile.native && name == "LuaMFD" ? tr("Lua Terminal MFD") : tr("Load at startup"));
             check(item, remaining.remove(key) != 0);
         }
         item->setToolTip(0, file.absoluteFilePath());

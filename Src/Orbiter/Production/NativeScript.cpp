@@ -32,9 +32,26 @@ void NativeScriptHost::LoadTerminalMfd()
 
 void NativeScriptHost::EndTerminalMfd()
 {
+    for (const auto& plugin : apolloMfds) plugin.api->end();
+    apolloMfds.clear();
     if (terminalApi) terminalApi->end();
     terminalApi = nullptr;
     terminalLibrary.reset();
+}
+
+void NativeScriptHost::LoadApolloMfd(const char* name)
+{
+    const std::string path = std::string("Plugin/") + name + ".so";
+    auto next = std::make_unique<NativeModule>(modules.Resolve(path), ORBITER_NATIVE_PLUGIN, this);
+    auto *entry = static_cast<NativeApolloMfdApi*>(next->Instance());
+    if (!entry || entry->size != sizeof(*entry) || !entry->preStep || !entry->deleteVessel || !entry->end)
+        throw std::runtime_error(std::string("Incomplete native MFD interface: ") + name);
+    apolloMfds.push_back({std::move(next), entry});
+}
+
+void NativeScriptHost::PreStep(double simt, double simdt, double mjd)
+{
+    for (const auto& plugin : apolloMfds) plugin.api->preStep(simt, simdt, mjd);
 }
 
 void NativeScriptHost::PostStep(double simt, double simdt, double mjd)
@@ -45,6 +62,7 @@ void NativeScriptHost::PostStep(double simt, double simdt, double mjd)
 
 void NativeScriptHost::DeleteVessel(OBJHANDLE vessel)
 {
+    for (const auto& plugin : apolloMfds) plugin.api->deleteVessel(vessel);
     if (api) api->deleteVessel(vessel);
     if (terminalApi) terminalApi->deleteVessel(vessel);
 }

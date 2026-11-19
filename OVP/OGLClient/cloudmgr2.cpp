@@ -93,7 +93,8 @@ void CloudTile::Load ()
 void CloudTile::Render ()
 {
 //	TileManager2<CloudTile>::Dev()->SetTexture (0, tex);
-	if (!mesh) return; // DEBUG : TEMPORARY
+	// Cloud tile textures can still be unavailable after mesh creation.
+	if (!mesh || !tex) return;
 	if(!mesh->VAO) {
 		if (state & TILE_VALID) {
 			mesh->Upload();

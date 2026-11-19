@@ -955,6 +955,38 @@ void Vessel::SetRotationMatrix (const Matrix &R)
 
 // ==============================================================
 
+void Vessel::SetPropagator (int &plevel, int &nstep) const
+{
+	VesselBase::SetPropagator(plevel, nstep);
+	if (!bSurfaceContact || !bDynamicGroundContact || !GetVesselServices().UseApolloDynamics())
+		return;
+
+	const double minPMI = std::min({pmi.x, pmi.y, pmi.z});
+	if (mass <= 0.0 || minPMI <= 0.0)
+		return;
+
+	// A contact force also rotates the vessel about its centre of mass.
+	// Bound the spring and damping rates using that point's maximum
+	// effective inverse mass, summed over the possible contacts.
+	double stiffnessRateSquared = 0.0;
+	double dampingRate = 0.0;
+	for (oapi::UInt32 i = 0; i < ntouchdown_vtx; ++i) {
+		const auto &point = touchdown_vtx[i];
+		const double inverseMass = (1.0 + point.pos.length2()/minPMI)/mass;
+		stiffnessRateSquared += std::max(0.0, point.stiffness)*inverseMass;
+		dampingRate += std::max(0.0, point.damping)*inverseMass;
+	}
+
+	// Use at least one sample per spring radian and per two damping time
+	// constants, with a bounded extra cost during time acceleration.
+	constexpr double maxAdaptiveSubsteps = 128.0;
+	const double rate = std::max(std::sqrt(stiffnessRateSquared), dampingRate/2.0);
+	const double required = GetRigidBodyServices().Time().SimDT * rate;
+	nstep = std::max(nstep, static_cast<int>(std::ceil(std::min(required, maxAdaptiveSubsteps))));
+}
+
+// ==============================================================
+
 void Vessel::GetIntermediateMoments (Vector &acc, Vector &tau, const StateVectors &state, double tfrac, double dt)
 {
 	// TODO: Move this up to VesselBase
@@ -962,8 +994,8 @@ void Vessel::GetIntermediateMoments (Vector &acc, Vector &tau, const StateVector
 	Vector M(Amom_add); // angular momentum excluding gravity gradient torque and ground contact torques
 	collision_during_update |=
 		AddSurfaceForces (&F, &M, &state, tfrac, dt, update_with_collision); // add ground contact forces and moments
-	// note: we may want to remove aerodynamic forces from Flin_add/Amom_add and calculate
-	// intermediate states here instead
+	if (&state != s0 && nairfoil && sp.is_in_atm && fstatus == FLIGHTSTATUS_FREEFLIGHT && !supervessel && GetVesselServices().UseApolloDynamics())
+		AddAerodynamicCorrection (F, M, state, dt);
 	RigidBody::GetIntermediateMoments (acc, tau, state, tfrac, dt);  // get gravitational component
 	acc += mul (state.Q, F/mass);
 	tau += M/mass;
@@ -3665,7 +3697,13 @@ void Vessel::UpdateBodyForces ()
 	if (m_thruster.size()) UpdateThrustForces ();
 	if (CtrlSurfSyncMode) ApplyControlSurfaceLevels ();
 	if (fstatus != FLIGHTSTATUS_LANDED) {
-		if (sp.is_in_atm) UpdateAerodynamicForces ();
+		if (sp.is_in_atm) {
+			const Vector initialForce = Flin_add;
+			const Vector initialMoment = Amom_add;
+			UpdateAerodynamicForces (s0->omega, GetRigidBodyServices().Time().SimDT);
+			aerodynamicForce = Flin_add - initialForce;
+			aerodynamicMoment = Amom_add - initialMoment;
+		}
 		if (rpressure) UpdateRadiationForces ();
 	}
 	bForceActive |= (Flin_add.x || Flin_add.y || Flin_add.z || Amom_add.x || Amom_add.y || Amom_add.z);
@@ -3908,7 +3946,46 @@ void Vessel::UpdateRadiationForces ()
 // This function encodes the atmospheric flight model
 // NEEDS EXTENSIVE OVERHAUL!
 
-void Vessel::UpdateAerodynamicForces ()
+void Vessel::AddAerodynamicCorrection (Vector &force, Vector &moment, const StateVectors &state, double dt)
+{
+	// Keep non-aerodynamic loads fixed for the integration step. Airfoils
+	// depend on the current attitude and must see the intermediate airflow.
+	// Preserve the frame values used by the vessel API and cockpit displays.
+	const Vector frameForce = Flin_add;
+	const Vector frameMoment = Amom_add;
+	const Vector globalAirflow = sp.airvel_glob;
+	const Vector localAirflow = sp.airvel_ship;
+	const double airspeed = sp.airspd;
+	const double mach = sp.atmM;
+	const double pressure = sp.dynp;
+	const double lift = Lift, drag = Drag, sideForce = SideForce;
+
+	sp.airvel_glob += state.vel - s0->vel;
+	sp.airvel_ship = tmul (state.Q, sp.airvel_glob);
+	sp.airspd = sp.airvel_glob.length();
+	sp.atmM = airspeed > 0.0 ? mach * sp.airspd / airspeed : 0.0;
+	sp.dynp = 0.5 * sp.atmrho * sp.airspd * sp.airspd;
+	Flin_add.Set (0,0,0);
+	Amom_add.Set (0,0,0);
+	UpdateAerodynamicForces (state.omega, dt);
+	force += Flin_add - aerodynamicForce;
+	moment += Amom_add - aerodynamicMoment;
+
+	Flin_add = frameForce;
+	Amom_add = frameMoment;
+	sp.airvel_glob = globalAirflow;
+	sp.airvel_ship = localAirflow;
+	sp.airspd = airspeed;
+	sp.atmM = mach;
+	sp.dynp = pressure;
+	Lift = lift;
+	Drag = drag;
+	SideForce = sideForce;
+}
+
+// =======================================================================
+
+void Vessel::UpdateAerodynamicForces (const Vector &angularVelocity, double dt)
 {
 	if (!nairfoil) { UpdateAerodynamicForces_OLD (); return; }
 	// use old atmospheric flight model;
@@ -3928,26 +4005,14 @@ void Vessel::UpdateAerodynamicForces ()
 	// damping of angular velocity
 	double dynpm = 0.5*sp.atmrho * (sp.airspd+30)*(sp.airspd+30); // modified dynamic pressure
 	double fac = dynpm * cs.y;
-#define OLD_AERODAMPING
-#ifdef OLD_AERODAMPING
-	if (s0->omega.x) Amom_add.x -= min (fac*rdrag.x, pmi.x*mass*GetRigidBodyServices().Time().iSimDT) * s0->omega.x;
-	if (s0->omega.y) Amom_add.y -= min (fac*rdrag.y, pmi.y*mass*GetRigidBodyServices().Time().iSimDT) * s0->omega.y;
-	if (s0->omega.z) Amom_add.z -= min (fac*rdrag.z, pmi.z*mass*GetRigidBodyServices().Time().iSimDT) * s0->omega.z;
-#else
-	if (vrot.x || vrot.y || vrot.z) {
-		double adrag, maxdrag;
-		adrag   = fac*rdrag.x*vrot.x;
-		maxdrag = (vrot.x*pmi.x*iSimDT - (pmi.y-pmi.z)*vrot.y*vrot.z)*mass;
-		Amom_add.x -= (fabs(adrag) < fabs(maxdrag) ? adrag:maxdrag);
-		adrag   = fac*rdrag.y*vrot.y;
-		maxdrag = (vrot.y*pmi.y*iSimDT - (pmi.z-pmi.x)*vrot.z*vrot.x)*mass;
-		Amom_add.y -= (fabs(adrag) < fabs(maxdrag) ? adrag:maxdrag);
-		adrag   = fac*rdrag.z*vrot.z;
-		maxdrag = (vrot.z*pmi.z*iSimDT - (pmi.x-pmi.y)*vrot.x*vrot.y)*mass;
-		Amom_add.z -= (fabs(adrag) < fabs(maxdrag) ? adrag:maxdrag);
-	}
-
-#endif
+	const bool substep = GetVesselServices().UseApolloDynamics();
+	const double inverseFrameStep = GetRigidBodyServices().Time().iSimDT;
+	const auto dampingLimit = [&](double inertia) {
+		return substep ? inertia*mass/dt : inertia*mass*inverseFrameStep;
+	};
+	if (angularVelocity.x) Amom_add.x -= min (fac*rdrag.x, dampingLimit(pmi.x)) * angularVelocity.x;
+	if (angularVelocity.y) Amom_add.y -= min (fac*rdrag.y, dampingLimit(pmi.y)) * angularVelocity.y;
+	if (angularVelocity.z) Amom_add.z -= min (fac*rdrag.z, dampingLimit(pmi.z)) * angularVelocity.z;
 
 	Vector ddir (-sp.airvel_ship.unit());           // freestream airflow direction (= drag direction)
 	Vector ldir (0, sp.airvel_ship.z, -sp.airvel_ship.y);  ldir.unify(); // lift direction (vertical on drag and transversal ship axis)
@@ -6351,12 +6416,17 @@ void Vessel::Update (bool force)
 				bool savedCanStabilise = bCanUpdateStabilised;
 				if (collisionCooldownT > GetRigidBodyServices().Time().SimT0)
 					bCanUpdateStabilised = false;
+				if (nairfoil && sp.is_in_atm && GetVesselServices().UseApolloDynamics()) {
+					Vector tau;
+					GetIntermediateMoments (acc, tau, *s0, 0.0, GetRigidBodyServices().Time().SimDT);
+					arot = EulerInv_full (tau, s0->omega);
+				}
 				RigidBody::Update (force); // standard dynamic update
 				bCanUpdateStabilised = savedCanStabilise;
 			}
 		}
 
-	} else if (fstatus == FLIGHTSTATUS_LANDED) {
+	} else if (fstatus == FLIGHTSTATUS_LANDED && (!supervessel || !GetVesselServices().UseApolloDynamics())) {
 
 		// simplified state update for idle vessels
 		proxyplanet->LocalToGlobal_t1 (sp.ploc, s1->pos);
@@ -7675,18 +7745,29 @@ void Vessel::WriteDefault (ostream &ofs) const
 	bool needlabel;
 
 	switch (fstatus) {
-	case FLIGHTSTATUS_LANDED:
+	case FLIGHTSTATUS_LANDED: {
 		ofs << "  STATUS Landed " << proxyplanet->Name() << endl;
 		if (proxybase && (pad = proxybase->LandedAtPad (this)) >= 0)
 			ofs << "  BASE " << proxybase->Name() << ':' << pad+1 << endl;
-		ofs << "  POS " << setprecision(7) << sp.lng*DEG << ' ' << sp.lat*DEG << endl;
+		double lng = sp.lng, lat = sp.lat, alt = sp.alt;
+		// Modules may temporarily shift the origin while writing their state.
+		// Use the shifted position when it differs from the cached surface anchor.
+		const Vector pos = proxyplanet->GlobalToLocal (GPos());
+		constexpr double positionToleranceSquared = 1e-8; // (0.1 mm)^2
+		if (GetVesselServices().UseApolloDynamics() && (pos - sp.ploc).length2() > positionToleranceSquared) {
+			double rad;
+			proxyplanet->LocalToEquatorial (pos, lng, lat, rad);
+			alt = rad - proxyplanet->Size() - proxyplanet->Elevation (lng, lat);
+		}
+		ofs << "  POS " << setprecision(7) << lng*DEG << ' ' << lat*DEG << endl;
 		ofs << "  HEADING " << setprecision(2) << sp.dir*DEG << endl;
-		ofs << "  ALT " << setprecision(3) << sp.alt << endl;
+		ofs << "  ALT " << setprecision(3) << alt << endl;
 		// new: save Euler angles of horizon-local rotation matrix
 		ofs << "  AROT " << setprecision(3) <<  DEG*atan2 (land_rot.m23, land_rot.m33) << ' '
 											<< -DEG*asin  (land_rot.m13) << ' '
 							                <<  DEG*atan2 (land_rot.m12, land_rot.m11) << endl;
 		break;
+	}
 	case FLIGHTSTATUS_FREEFLIGHT:
 		if (cbody) {
 			ofs << "  STATUS Orbiting " << cbody->Name() << endl;

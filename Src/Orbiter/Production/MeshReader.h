@@ -121,8 +121,8 @@ std::istream& ReadMesh(std::istream& is, Sink& mesh)
 			} else if (!ComparePrefix (cbuf, "GEOM", 4)) {    // read geometry
 				const char* cursor = cbuf+4;
 				const char* end = cbuf+std::strlen(cbuf);
-				if (!ReadMeshCount(cursor, end, nvtx) || !ReadMeshCount(cursor, end, ntri) || nvtx <= 0 ||
-					nvtx > 65536 || ntri <= 0 || ntri > std::numeric_limits<int>::max()/3) return fail();
+				if (!ReadMeshCount(cursor, end, nvtx) || !ReadMeshCount(cursor, end, ntri) ||
+					(nvtx == 0) != (ntri == 0) || nvtx > 65536 || ntri > std::numeric_limits<int>::max()/3) return fail();
 				nidx = ntri*3;
 				ownedVertices.reset(new Vertex[nvtx]);
 				vtx = ownedVertices.get();
@@ -173,11 +173,10 @@ std::istream& ReadMesh(std::istream& is, Sink& mesh)
 				break;
 			}
 		}
-		if (nvtx && nidx) {
-			mesh.AddGroup (ownedVertices.release(), nvtx, ownedIndices.release(), nidx, mtrl_idx, tex_idx, zbias);
-			mesh.SetGroupFlags(g, flag, uflag);
-			if (calcnml) mesh.CalcNormals (g, true);
-		}
+		// Empty GEOM records preserve the indices used by vessel mesh animations.
+		mesh.AddGroup (ownedVertices.release(), nvtx, ownedIndices.release(), nidx, mtrl_idx, tex_idx, zbias);
+		mesh.SetGroupFlags(g, flag, uflag);
+		if (calcnml && nvtx) mesh.CalcNormals (g, true);
 	}
 
 	// read material list
