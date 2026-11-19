@@ -1,6 +1,7 @@
 cmake_minimum_required(VERSION 3.24)
 project(OrbiterVulkanClient LANGUAGES CXX)
 
+find_package(Threads REQUIRED)
 find_package(SDL3 3.4 CONFIG REQUIRED)
 set(ORBITER_ENGINE_BUILD "" CACHE PATH "Matching Orbiter production engine build")
 set(ORBITER_TEST_RUNTIME "" CACHE PATH "Matching Windows Orbiter runtime and SDK")
@@ -34,7 +35,7 @@ add_custom_command(OUTPUT "${shader_header}"
 add_library(VulkanClient MODULE VulkanScene.cpp OrbiterScene.cpp RunwayTerrain.cpp VesselPose.cpp "${shader_header}")
 target_compile_features(VulkanClient PRIVATE cxx_std_17)
 target_include_directories(VulkanClient PRIVATE "${CMAKE_CURRENT_BINARY_DIR}")
-target_link_libraries(VulkanClient PRIVATE SDL3::SDL3)
+target_link_libraries(VulkanClient PRIVATE SDL3::SDL3 Threads::Threads)
 set_target_properties(VulkanClient PROPERTIES PREFIX "")
 
 if(WIN32)

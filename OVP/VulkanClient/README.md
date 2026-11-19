@@ -11,10 +11,13 @@ animations run in each slot's local coordinates before applying its vessel
 offset. The ground shadow follows that same geometry.
 
 The client streams stock Earth surface tiles from `Earth/Archive/Surf.tree` and
-uses Orbiter's elevation data. It keeps detailed tiles around the vessel and
-extends coarser terrain toward the horizon with distance haze. During flight
-it stages tiles over several frames and replaces each coarser tile when all
-four of its children are ready.
+uses Orbiter's elevation data. A camera jump starts with a 3×3 neighborhood of
+coarse stock tiles, clipped at the poles. A background worker reads and
+decompresses higher-detail imagery and builds meshes, prioritizing the area
+under the camera. The simulation thread samples Orbiter elevations and submits
+finished tiles to the GPU with a shared two-millisecond target per frame
+after coarse coverage is available. Each parent stays visible until all four
+children are ready. Moving the camera discards obsolete work.
 
 ## Earth base scenery
 
@@ -95,8 +98,13 @@ simulation step for repeatability (`--fixed-step 0.05` on Linux,
 `--fixedstep=0.05` on Windows).
 
 Set `ORBITER_VULKAN_FRAME_TRACE` to a writable CSV path to record intervals
-between Vulkan frames, CPU-side scene and terrain times, tile staging, and
-aircraft pose uploads, initial base upload time, and shadow map refreshes.
+between Vulkan frames, CPU-side scene and terrain times, tile staging, pose
+uploads, base uploads, and shadow map refreshes. `acquire_wait_ms` measures
+wall time inside SDL's blocking swapchain-image acquisition call and is
+included in `scene_ms`. `reanchor_ms` covers resetting the local ground frame
+and its resources. `visible_tiles` and `detail_tiles` report the selected
+terrain and its level-19 subset. Each row's work and wait correspond to the
+**next** row's start-to-start `interval_ms`.
 
 Build with CMake 3.24 or newer, a matching Orbiter build, SDL3 3.4 or newer, and
 `glslangValidator` from the Vulkan SDK or your package manager. The shaders

@@ -407,7 +407,7 @@ bool OrbiterScene::Present(unsigned width, unsigned height)
     if (terrain_.NeedsReanchor(camera)) {
         const auto beforeReanchor = SDL_GetTicksNS();
         scene_.ClearGround();
-        terrain_.Open(archivePath_, camera);
+        terrain_.Reanchor(camera);
         for (auto& base : bases_) {
             base.position = terrain_.BasePosition(base.longitude, base.latitude);
             base.loaded = false;

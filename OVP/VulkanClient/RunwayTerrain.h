@@ -6,6 +6,7 @@
 
 #include <memory>
 #include <deque>
+#include <optional>
 
 class ZTreeMgr;
 struct ElevationTile;
@@ -24,6 +25,7 @@ public:
     RunwayTerrain();
     ~RunwayTerrain();
     void Open(const std::filesystem::path& archive, const VECTOR3& origin);
+    void Reanchor(const VECTOR3& origin);
     void Close();
     bool NeedsReanchor(const VECTOR3& position) const;
     TerrainUpdate Update(const VECTOR3& position, Scene&);
@@ -47,7 +49,21 @@ private:
         double Height(double east, double north) const;
     };
 
-    Tile BuildTile(const TileKey&, TerrainMesh&);
+    struct Job {
+        TileKey key;
+        Tile tile;
+        SceneFrame frame;
+        double west, north, angle, radius;
+    };
+    struct Prepared {
+        TileKey key;
+        Tile tile;
+        TerrainMesh mesh;
+    };
+    class Loader;
+    Job StartTile(const TileKey&) const;
+    void SampleRow(Job&);
+    static Prepared BuildTile(Job, ZTreeMgr&, const std::filesystem::path&, const std::filesystem::path&);
     void CollectVisible(const TileKey&, std::set<TileKey>&) const;
     void RetainTiles(Scene&);
     std::array<double, 2> GridPosition(double east, double height, double north) const;
@@ -64,6 +80,9 @@ private:
     std::set<TileKey> visible_, wanted_;
     std::vector<TileKey> roots_;
     std::deque<TileKey> pending_;
+    std::optional<Job> sampling_;
+    std::unique_ptr<Loader> loader_;
+    unsigned region_ = 0;
 };
 
 } // namespace orbiter::vulkan

@@ -8,6 +8,10 @@
 #include <algorithm>
 #include <chrono>
 #include <cmath>
+#include <condition_variable>
+#include <exception>
+#include <mutex>
+#include <thread>
 #include <set>
 #include <sstream>
 #include <stdexcept>
@@ -76,6 +80,106 @@ TileTexture LoadTile(ZTreeMgr& archive, const std::filesystem::path& filename, c
 
 } // namespace
 
+// The worker owns its archive cursor. Jobs contain a snapshot of the tangent
+// frame and Orbiter elevations, so no SDK or GPU calls cross threads.
+class RunwayTerrain::Loader {
+public:
+    Loader(std::filesystem::path filename, std::filesystem::path imagery)
+        : thread_([this, filename = std::move(filename), imagery = std::move(imagery)] {
+            try {
+                auto archive = ZTreeMgr::OpenArchiveFile(filename, ZTreeMgr::LAYER_SURF);
+                std::unique_lock lock(mutex_);
+                while (true) {
+                    wake_.wait(lock, [this] { return stopping_ || !jobs_.empty(); });
+                    if (stopping_) return;
+                    Job job = std::move(jobs_.front());
+                    jobs_.pop_front();
+                    active_ = job.key;
+                    const auto region = region_;
+                    lock.unlock();
+                    Prepared result = BuildTile(std::move(job), *archive, filename, imagery);
+                    lock.lock();
+                    if (region == region_ && wanted_.count(result.key)) ready_.push_back(std::move(result));
+                    active_.reset();
+                }
+            } catch (...) {
+                std::lock_guard lock(mutex_);
+                error_ = std::current_exception();
+            }
+        }) {}
+
+    ~Loader()
+    {
+        {
+            std::lock_guard lock(mutex_);
+            stopping_ = true;
+        }
+        wake_.notify_one();
+        thread_.join();
+    }
+
+    std::set<TileKey> Retarget(unsigned region, const std::set<TileKey>& wanted)
+    {
+        std::lock_guard lock(mutex_);
+        std::set<TileKey> retained;
+        if (region != region_) {
+            jobs_.clear();
+            ready_.clear();
+            active_.reset();
+        } else {
+            const auto obsolete = [&](const auto& item) {
+                if (!wanted.count(item.key)) return true;
+                retained.insert(item.key);
+                return false;
+            };
+            jobs_.erase(std::remove_if(jobs_.begin(), jobs_.end(), obsolete), jobs_.end());
+            ready_.erase(std::remove_if(ready_.begin(), ready_.end(), obsolete), ready_.end());
+            if (active_) retained.insert(*active_);
+        }
+        region_ = region;
+        wanted_ = wanted;
+        return retained;
+    }
+
+    bool HasRoom()
+    {
+        std::lock_guard lock(mutex_);
+        if (error_) std::rethrow_exception(error_);
+        return jobs_.size() + ready_.size() + active_.has_value() < 12;
+    }
+
+    void Submit(Job job)
+    {
+        {
+            std::lock_guard lock(mutex_);
+            jobs_.push_back(std::move(job));
+        }
+        wake_.notify_one();
+    }
+
+    std::optional<Prepared> Take()
+    {
+        std::lock_guard lock(mutex_);
+        if (error_) std::rethrow_exception(error_);
+        if (ready_.empty()) return {};
+        Prepared tile = std::move(ready_.front());
+        ready_.pop_front();
+        return tile;
+    }
+
+private:
+    std::mutex mutex_;
+    std::condition_variable wake_;
+    std::deque<Job> jobs_;
+    std::deque<Prepared> ready_;
+    std::optional<TileKey> active_;
+    std::set<TileKey> wanted_;
+    unsigned region_ = 0;
+    std::exception_ptr error_;
+    bool stopping_ = false;
+    std::thread thread_;
+};
+
 RunwayTerrain::RunwayTerrain() = default;
 RunwayTerrain::~RunwayTerrain()
 {
@@ -95,10 +199,21 @@ void RunwayTerrain::Open(const std::filesystem::path& filename, const VECTOR3& o
             throw std::runtime_error("Kennedy imagery directory does not exist: " + imagery_.string());
     }
     archive_ = ZTreeMgr::OpenArchiveFile(filename_, ZTreeMgr::LAYER_SURF);
+    loader_ = std::make_unique<Loader>(filename_, imagery_);
+    elevationCache_ = InitTileCache(48);
+    Reanchor(origin);
+}
+
+void RunwayTerrain::Reanchor(const VECTOR3& origin)
+{
+    ++region_;
+    tiles_.clear();
+    visible_.clear();
+    sampling_.reset();
+    requested_ = {0, 0, 0};
     double distance;
     oapiGlobalToEqu(earth_, origin, &longitude_, &latitude_, &distance);
     radius_ = oapiGetSize(earth_);
-    elevationCache_ = InitTileCache(48);
     altitude_ = oapiSurfaceElevationEx(earth_, longitude_, latitude_, 0, elevationCache_);
     const auto slat = std::sin(latitude_);
     const auto clat = std::cos(latitude_);
@@ -120,6 +235,8 @@ bool RunwayTerrain::NeedsReanchor(const VECTOR3& position) const
 
 void RunwayTerrain::Close()
 {
+    loader_.reset();
+    sampling_.reset();
     tiles_.clear();
     archive_.reset();
     imagery_.clear();
@@ -161,6 +278,12 @@ TerrainUpdate RunwayTerrain::Update(const VECTOR3& position, Scene& scene)
     const auto center = At(detailLevel, longitude, latitude);
     TerrainUpdate result;
     result.recentered = !(center == requested_);
+    const auto publish = [&](Prepared tile) {
+        scene.StageTile(tile.key, tile.mesh);
+        result.imagery += tile.tile.regionalImagery;
+        tiles_.emplace(tile.key, std::move(tile.tile));
+        ++result.staged;
+    };
     if (result.recentered) {
         const auto root = At(coarseLevel, longitude, latitude);
         roots_.clear();
@@ -172,27 +295,64 @@ TerrainUpdate RunwayTerrain::Update(const VECTOR3& position, Scene& scene)
             }
         }
         RetainTiles(scene);
+        const bool needCoverage = !tiles_.count(root);
+        if (needCoverage && !visible_.empty()) {
+            // A cut can outrun the coarse neighborhood even within one tangent
+            // frame. Invalidate old jobs before supplying its new roots.
+            ++region_;
+            sampling_.reset();
+        }
+        const auto retained = loader_->Retarget(region_, wanted_);
+        if (sampling_ && !wanted_.count(sampling_->key)) sampling_.reset();
+
+        // Supply immediate, textured coverage, including across a cold camera
+        // cut. Only missing coarse parents use the render thread's archive.
+        if (needCoverage) {
+            for (const auto& key : roots_) {
+                if (tiles_.count(key)) continue;
+                auto job = StartTile(key);
+                const int rows = job.tile.divisions + 1;
+                for (int row = 0; row < rows; ++row) SampleRow(job);
+                publish(BuildTile(std::move(job), *archive_, filename_, imagery_));
+            }
+        }
+
         pending_.clear();
         for (const auto& key : wanted_) {
-            if (!tiles_.count(key)) pending_.push_back(key);
+            if (!tiles_.count(key) && !retained.count(key) && !(sampling_ && sampling_->key == key))
+                pending_.push_back(key);
         }
+        // Complete each sibling group on the way to the camera tile first.
+        // This brings the runway into focus before refining distant terrain.
+        std::stable_partition(pending_.begin(), pending_.end(), [&](const TileKey& key) {
+            if (key.level == coarseLevel) return true;
+            const int shift = detailLevel - key.level + 1;
+            return key.row / 2 == (center.row >> shift) && key.column / 2 == (center.column >> shift);
+        });
         requested_ = center;
     }
 
-    // Keep every requested parent available. A group of children replaces its
-    // parent when ready, even while other parts of the view are still loading.
     using Clock = std::chrono::steady_clock;
-    const auto deadline = Clock::now() + std::chrono::milliseconds(5);
-    while (!pending_.empty()) {
-        const auto key = pending_.front();
-        TerrainMesh mesh;
-        auto tile = BuildTile(key, mesh);
-        result.imagery += tile.regionalImagery;
-        scene.StageTile(key, mesh);
-        tiles_.emplace(key, std::move(tile));
-        pending_.pop_front();
-        ++result.staged;
-        if (!visible_.empty() && Clock::now() >= deadline) break;
+    const auto deadline = Clock::now() + std::chrono::milliseconds(2);
+    while (result.staged < 12 && Clock::now() < deadline) {
+        auto prepared = loader_->Take();
+        if (!prepared) break;
+        publish(std::move(*prepared));
+    }
+    // The engine elevation service shares archive cursors and plugin filters
+    // with the simulation. Sample one raster row at a time within the budget.
+    while (Clock::now() < deadline && (sampling_ || !pending_.empty())) {
+        if (!sampling_) {
+            if (!loader_->HasRoom()) break;
+            sampling_ = StartTile(pending_.front());
+            pending_.pop_front();
+        }
+        SampleRow(*sampling_);
+        const auto stride = size_t(sampling_->tile.divisions + 1);
+        if (sampling_->tile.heights.size() == stride * stride) {
+            loader_->Submit(std::move(*sampling_));
+            sampling_.reset();
+        }
     }
 
     const auto ready = [this](const TileKey& key) { return tiles_.count(key) != 0; };
@@ -208,50 +368,76 @@ TerrainUpdate RunwayTerrain::Update(const VECTOR3& position, Scene& scene)
     if (result.recentered) {
         std::ostringstream message;
         message << "Vulkan Earth tiles: center " << center.level << '/' << center.row << '/' << center.column
-                << ", " << visible_.size() << " visible, " << pending_.size() << " waiting";
+                << ", " << visible_.size() << " visible, "
+                << std::count_if(wanted_.begin(), wanted_.end(), [&](const TileKey& key) { return !tiles_.count(key); })
+                << " waiting";
         SceneLog(message.str());
     }
     return result;
 }
 
-RunwayTerrain::Tile RunwayTerrain::BuildTile(const TileKey& key, TerrainMesh& mesh)
+RunwayTerrain::Job RunwayTerrain::StartTile(const TileKey& key) const
 {
-    Tile tile;
+    const auto angle = TileAngle(key.level);
+    const auto left = std::remainder(key.column * angle - pi - longitude_, 2 * pi);
+    const auto top = pi / 2 - key.row * angle;
+    Job job{key, {}, local_, longitude_ + left, top, angle, radius_};
+    auto& tile = job.tile;
+    tile.divisions = key.level == detailLevel ? 64 : 16;
+    tile.x = left * eastScale_;
+    tile.z = (top - latitude_) * radius_;
+    tile.width = angle * eastScale_;
+    tile.length = angle * radius_;
+    const auto stride = tile.divisions + 1;
+    tile.heights.reserve(stride * stride);
+    return job;
+}
+
+void RunwayTerrain::SampleRow(Job& job)
+{
+    const auto steps = job.tile.divisions;
+    const int row = int(job.tile.heights.size()) / (steps + 1);
+    const double lat = job.north - double(row) / steps * job.angle;
+    const int level = job.key.level == detailLevel ? 0 : job.key.level + 3;
+    for (int column = 0; column <= steps; ++column) {
+        const double lng = std::remainder(job.west + double(column) / steps * job.angle, 2 * pi);
+        job.tile.heights.push_back(oapiSurfaceElevationEx(earth_, lng, lat, level, elevationCache_));
+    }
+}
+
+RunwayTerrain::Prepared RunwayTerrain::BuildTile(Job job, ZTreeMgr& archive,
+    const std::filesystem::path& filename, const std::filesystem::path& imagery)
+{
+    const auto& key = job.key;
+    auto& tile = job.tile;
+    TerrainMesh mesh;
     TileTexture texture;
-    if (!imagery_.empty() && key.level >= 16) {
-        const auto override = imagery_ / std::to_string(key.level) / std::to_string(key.row)
+    if (!imagery.empty() && key.level >= 16) {
+        const auto override = imagery / std::to_string(key.level) / std::to_string(key.row)
             / (std::to_string(key.column) + ".dds");
         if (std::filesystem::is_regular_file(override)) {
             texture = {ReadDds(override), 0, 0, 1};
             tile.regionalImagery = true;
         }
     }
-    if (!tile.regionalImagery) texture = LoadTile(*archive_, filename_, key);
-    tile.divisions = key.level == detailLevel ? 64 : 16;
-    const auto angle = TileAngle(key.level);
-    const auto left = std::remainder(key.column * angle - pi - longitude_, 2 * pi);
-    const auto top = pi / 2 - key.row * angle;
-    tile.x = left * eastScale_;
-    tile.z = (top - latitude_) * radius_;
-    tile.width = angle * eastScale_;
-    tile.length = angle * radius_;
+    if (!tile.regionalImagery) texture = LoadTile(archive, filename, key);
     mesh.texture = std::move(texture.image);
     const auto steps = tile.divisions;
     const auto stride = steps + 1;
-    const int elevationLevel = key.level == detailLevel ? 0 : key.level + 3;
-    tile.heights.reserve(stride * stride);
+    mesh.vertices.reserve(stride * stride + 4 * stride);
+    mesh.indices.reserve(6 * steps * (steps + 4));
 
     for (int row = 0; row <= steps; ++row) {
         const auto v = double(row) / steps;
-        const auto lat = top - v * angle;
+        const auto lat = job.north - v * job.angle;
         const auto clat = std::cos(lat), slat = std::sin(lat);
         for (int column = 0; column <= steps; ++column) {
             const auto u = double(column) / steps;
-            const auto lng = std::remainder(longitude_ + left + u * angle, 2 * pi);
-            const auto elevation = oapiSurfaceElevationEx(earth_, lng, lat, elevationLevel, elevationCache_);
+            const auto lng = std::remainder(job.west + u * job.angle, 2 * pi);
+            const auto elevation = tile.heights[row * stride + column];
             const VECTOR3 up{clat * std::cos(lng), slat, clat * std::sin(lng)};
-            const auto pos = local_.ToLocal(Scale(up, radius_ + elevation));
-            tile.heights.push_back(pos.y);
+            const auto pos = job.frame.ToLocal(Scale(up, job.radius + elevation));
+            tile.heights[row * stride + column] = pos.y;
             mesh.vertices.push_back({{float(pos.x), float(pos.y), float(pos.z)}, {0, 1, 0},
                 {texture.u + texture.scale * float(u), texture.v + texture.scale * float(v)}});
         }
@@ -282,7 +468,7 @@ RunwayTerrain::Tile RunwayTerrain::BuildTile(const TileKey& key, TerrainMesh& me
     edge(steps * stride, 1);
     edge(0, stride);
     edge(steps, stride);
-    return tile;
+    return {key, std::move(tile), std::move(mesh)};
 }
 
 bool RunwayTerrain::Tile::Contains(double east, double north) const
