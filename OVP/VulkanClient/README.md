@@ -139,7 +139,13 @@ cp /path/to/vulkan-build/VulkanClient.so \
 
 Use the stock assets, ephemeris data, and planetary archives (Earth surface and
 elevation). Set `WindowWidth = 1280` and `WindowHeight = 720` in the configuration
-you pass to Orbiter. The optional evidence directory receives a Vulkan frame
+you pass to Orbiter for a windowed flight. For fullscreen on Linux, set
+`Fullscreen = TRUE`. The client renders at the desktop's native pixel size.
+On Wayland this allows the compositor to scan a compatible fullscreen buffer
+directly to the display. Overlays and display configuration can still require
+composition. Set `Fullscreen = FALSE` to return to a window on the next launch.
+
+The optional evidence directory receives a Vulkan frame
 as `vulkan-frame.bmp`. Add `--capture-time <sim-seconds>` to capture during flight.
 
 ```sh

@@ -66,8 +66,9 @@ public:
         Require(SDL_InitSubSystem(SDL_INIT_VIDEO), "Initialize Vulkan window");
         initialized_ = true;
         const auto& config = GetNativeRenderContext().configuration->CfgDevPrm;
-        window_ = SDL_CreateWindow("Orbiter [Vulkan]", config.WinW, config.WinH,
-            SDL_WINDOW_VULKAN | SDL_WINDOW_RESIZABLE);
+        SDL_WindowFlags flags = SDL_WINDOW_VULKAN | SDL_WINDOW_RESIZABLE;
+        if (config.bFullscreen) flags |= SDL_WINDOW_FULLSCREEN | SDL_WINDOW_HIGH_PIXEL_DENSITY;
+        window_ = SDL_CreateWindow("Orbiter [Vulkan]", config.WinW, config.WinH, flags);
         Require(window_ != nullptr, "Open Vulkan window");
         SDL_GetWindowSizeInPixels(window_, &width_, &height_);
         scene_.Open(window_, [](OBJHANDLE base) {
@@ -85,6 +86,11 @@ public:
     RenderInput Poll() override
     {
         RenderInput input;
+        // SDL pointer positions use window coordinates. Orbiter picks in framebuffer pixels.
+        const float density = SDL_GetWindowPixelDensity(window_);
+        const auto mouse = [&](RenderMouseAction action, float x, float y, double wheel = 0) {
+            input.mouse.push_back({action, int(x * density), int(y * density), wheel});
+        };
         SDL_Event event;
         while (SDL_PollEvent(&event)) {
             switch (event.type) {
@@ -110,7 +116,7 @@ public:
                 input.mouse.push_back({RenderMouseAction::RightUp, 0, 0, 0});
                 break;
             case SDL_EVENT_MOUSE_MOTION:
-                input.mouse.push_back({RenderMouseAction::Move, int(event.motion.x), int(event.motion.y), 0});
+                mouse(RenderMouseAction::Move, event.motion.x, event.motion.y);
                 break;
             case SDL_EVENT_MOUSE_BUTTON_DOWN:
             case SDL_EVENT_MOUSE_BUTTON_UP: {
@@ -119,12 +125,11 @@ public:
                 const bool left = event.button.button == SDL_BUTTON_LEFT;
                 const auto action = left ? (down ? RenderMouseAction::LeftDown : RenderMouseAction::LeftUp)
                     : (down ? RenderMouseAction::RightDown : RenderMouseAction::RightUp);
-                input.mouse.push_back({action, int(event.button.x), int(event.button.y), 0});
+                mouse(action, event.button.x, event.button.y);
                 break;
             }
             case SDL_EVENT_MOUSE_WHEEL:
-                input.mouse.push_back({RenderMouseAction::Wheel, int(event.wheel.mouse_x),
-                    int(event.wheel.mouse_y), event.wheel.y});
+                mouse(RenderMouseAction::Wheel, event.wheel.mouse_x, event.wheel.mouse_y, event.wheel.y);
                 break;
             default:
                 break;
