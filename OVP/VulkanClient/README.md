@@ -1,6 +1,6 @@
 # Runway 33 Vulkan client
 
-This opt-in client draws the focused vessel's exterior on Windows and Linux
+This opt-in client draws visible vessel exteriors on Windows and Linux
 using SDL3's Vulkan backend and shared SPIR-V shaders. `Runway33.scn` starts
 the stock DG-S at Kennedy. `ShuttleA-Runway33.scn` places an unloaded stock
 Shuttle-A at the same position, heading, and scenario time for comparison.
@@ -9,6 +9,26 @@ Both vessels use the same mesh slots, group visibility, texture lookup, and
 Orbiter ambient, diffuse, emissive, and specular material properties. Mesh
 animations run in each slot's local coordinates before applying its vessel
 offset. The ground shadow follows that same geometry.
+
+## DeltaGlider approaching the ISS
+
+Copy `ISSApproach.scn` to `Scenarios/Vulkan` and `ISSApproach.lua` to
+`Script` in the runtime. In the Qt Launchpad, select **Vulkan → ISSApproach**.
+If Orbiter starts paused, press **Ctrl+P**. The scenario uses the stock DeltaGlider and ISS with a
+shorter approach based on **Demo → DG ISS Approach**. Orbiter propagates both
+orbits. The camera starts on DG-01 at a separation of 165 m, tracks the ISS
+at 10 seconds, and returns to the glider at 20 seconds. At 28 seconds, the
+two vessels are about 83 m apart.
+
+On Linux, press **F3** to cycle through focusable vessels yourself once
+the scripted handoffs finish. **Ctrl+F3** returns to the previous vessel.
+
+Each vessel has its own mesh, pose, material bindings and world transform.
+A focus change moves control and the tracking camera. Both meshes stay
+resident while they are large enough to see, and share the scene depth
+buffer. With frame tracing enabled, `vessels_drawn` records the number of
+vessel exteriors submitted in the camera view and `focus` names the active
+vessel.
 
 The client streams stock Earth surface tiles from `Earth/Archive/Surf.tree` and
 uses Orbiter's elevation data. Two hemisphere tiles cover the planet from the
@@ -69,8 +89,6 @@ Use a fresh directory for each recording. Leave the variable unset for frame-tim
 4. Use **Numpad 8** to lower the nose, **Numpad 4/6** to bank, **Numpad 1/3** to yaw,
    and **Numpad \*** to kill main thrust. Right-drag or use **Ctrl+arrow keys**
    to orbit the external camera. Scroll to change camera distance.
-
-The current scope is the external focus vessel, Earth and nearby Earth bases.
 
 ## Optional Kennedy imagery
 

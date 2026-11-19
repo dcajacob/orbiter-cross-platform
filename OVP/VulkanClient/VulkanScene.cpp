@@ -388,21 +388,14 @@ SDL_GPUTexture* Scene::UploadTexture(const TextureData& texture)
     return image;
 }
 
-void Scene::SetShip(const SceneMesh& mesh)
+void Scene::SetShip(OBJHANDLE handle, const SceneMesh& mesh)
 {
-    ClearShip();
+    RemoveShip(handle);
     if (mesh.indices.empty()) return;
-    UploadMesh(mesh, ship_);
-    shipIndexCount_ = unsigned(mesh.indices.size());
-    vesselVertexBytes_ = Uint32(mesh.vertices.size() * sizeof(Vertex));
-    const SDL_GPUBufferCreateInfo shadowVertexInfo{SDL_GPU_BUFFERUSAGE_VERTEX, vesselVertexBytes_, 0};
-    shadowVertices_ = SDL_CreateGPUBuffer(device_, &shadowVertexInfo);
-    Require(shadowVertices_ != nullptr, "Allocate Vulkan shadow vertices");
-    const SDL_GPUTransferBufferCreateInfo uploadInfo{SDL_GPU_TRANSFERBUFFERUSAGE_UPLOAD, vesselVertexBytes_, 0};
-    shipUpload_ = SDL_CreateGPUTransferBuffer(device_, &uploadInfo);
-    Require(shipUpload_ != nullptr, "Allocate Vulkan vessel animation upload buffer");
-    shadowUpload_ = SDL_CreateGPUTransferBuffer(device_, &uploadInfo);
-    Require(shadowUpload_ != nullptr, "Allocate Vulkan shadow upload buffer");
+    auto& ship = ships_[handle];
+    UploadMesh(mesh, ship.mesh);
+    ship.indexCount = Uint32(mesh.indices.size());
+    ship.vertexBytes = Uint32(mesh.vertices.size() * sizeof(Vertex));
 }
 
 void Scene::UploadMesh(const SceneMesh& mesh, GpuMesh& dest)
@@ -581,30 +574,42 @@ void Scene::SelectTiles(const std::set<TileKey>& visible, const std::set<TileKey
     }
 }
 
-void Scene::SetShadow(const std::vector<Vertex>& vertices)
+void Scene::SetShadow(OBJHANDLE handle, const std::vector<Vertex>& vertices)
 {
-    showShadow_ = false;
-    if (vertices.empty()) return;
-    UpdateVesselVertices(vertices, shadowVertices_, shadowUpload_);
-    showShadow_ = true;
+    auto& ship = ships_.at(handle);
+    ship.showShadow = !vertices.empty();
+    if (!ship.showShadow) return;
+    if (!ship.shadowVertices) {
+        const SDL_GPUBufferCreateInfo info{SDL_GPU_BUFFERUSAGE_VERTEX, ship.vertexBytes, 0};
+        ship.shadowVertices = SDL_CreateGPUBuffer(device_, &info);
+        Require(ship.shadowVertices != nullptr, "Allocate Vulkan shadow vertices");
+    }
+    UpdateVesselVertices(vertices, ship.shadowVertices, ship.shadowUpload, ship.vertexBytes);
 }
 
-void Scene::SetShipPose(const std::vector<Vertex>& vertices)
+void Scene::SetShipPose(OBJHANDLE handle, const std::vector<Vertex>& vertices)
 {
-    UpdateVesselVertices(vertices, ship_.vertices, shipUpload_);
+    auto& ship = ships_.at(handle);
+    UpdateVesselVertices(vertices, ship.mesh.vertices, ship.poseUpload, ship.vertexBytes);
 }
 
-void Scene::UpdateVesselVertices(const std::vector<Vertex>& vertices, SDL_GPUBuffer* buffer, SDL_GPUTransferBuffer* transfer)
+void Scene::UpdateVesselVertices(const std::vector<Vertex>& vertices, SDL_GPUBuffer* buffer,
+    SDL_GPUTransferBuffer*& transfer, Uint32 bytes)
 {
-    if (vertices.size() * sizeof(Vertex) != vesselVertexBytes_)
+    if (vertices.size() * sizeof(Vertex) != bytes)
         throw std::runtime_error("Vulkan pose vertex count differs from the vessel mesh");
+    if (!transfer) {
+        const SDL_GPUTransferBufferCreateInfo info{SDL_GPU_TRANSFERBUFFERUSAGE_UPLOAD, bytes, 0};
+        transfer = SDL_CreateGPUTransferBuffer(device_, &info);
+        Require(transfer != nullptr, "Allocate Vulkan vessel upload buffer");
+    }
     auto* mapped = SDL_MapGPUTransferBuffer(device_, transfer, true);
     Require(mapped != nullptr, "Map Vulkan pose upload");
-    std::memcpy(mapped, vertices.data(), vesselVertexBytes_);
+    std::memcpy(mapped, vertices.data(), bytes);
     SDL_UnmapGPUTransferBuffer(device_, transfer);
     auto* copy = UploadPass();
     const SDL_GPUTransferBufferLocation source{transfer, 0};
-    const SDL_GPUBufferRegion target{buffer, 0, vesselVertexBytes_};
+    const SDL_GPUBufferRegion target{buffer, 0, bytes};
     SDL_UploadToGPUBuffer(copy, &source, &target, true);
 }
 
@@ -674,7 +679,7 @@ void Scene::DrawGroundShadows(SDL_GPURenderPass* pass, SDL_GPUCommandBuffer* com
     }
 }
 
-bool Scene::Present(const SceneUniform& ship, const SceneUniform& ground, const EarthView& earth, const std::filesystem::path& sample)
+bool Scene::Present(const std::vector<VesselDraw>& ships, const SceneUniform& ground, const EarthView& earth, const std::filesystem::path& sample)
 {
     timings_ = {};
     mapUpdated_ = false;
@@ -713,7 +718,7 @@ bool Scene::Present(const SceneUniform& ship, const SceneUniform& ground, const 
     if (!back) return SDL_SubmitGPUCommandBuffer(commands);
     ResizeDepth(width, height);
 
-    const bool capture = (!capture_.empty() || !sample.empty()) && !ship_.groups.empty();
+    const bool capture = (!capture_.empty() || !sample.empty()) && !ships_.empty();
     SDL_GPUTexture* frame = back;
     if (capture) {
         SDL_GPUTextureCreateInfo info{};
@@ -788,30 +793,37 @@ bool Scene::Present(const SceneUniform& ship, const SceneUniform& ground, const 
         for (const auto& entry : bases_) DrawMesh(pass, commands, entry.second.mesh, kind);
     }
     DrawGroundShadows(pass, commands, ground, earth);
-    if (showShadow_) {
+    for (const auto& entry : ships_) {
+        const auto& ship = entry.second;
+        if (!ship.showShadow) continue;
         SDL_PushGPUVertexUniformData(commands, 0, &ground, sizeof(ground));
         SDL_BindGPUGraphicsPipeline(pass, shadow_);
         SDL_SetGPUStencilReference(pass, 1);
-        const SDL_GPUBufferBinding vertex{shadowVertices_, 0};
-        const SDL_GPUBufferBinding index{ship_.indices, 0};
-        const SDL_GPUTextureSamplerBinding binding{ship_.textures.front(), sampler_};
+        const SDL_GPUBufferBinding vertex{ship.shadowVertices, 0};
+        const SDL_GPUBufferBinding index{ship.mesh.indices, 0};
+        const SDL_GPUTextureSamplerBinding binding{ship.mesh.textures.front(), sampler_};
         const MaterialUniform shade{{0.015f, 0.015f, 0.015f, 0.63f}, {0, 0, 0, 2}};
         SDL_BindGPUVertexBuffers(pass, 0, &vertex, 1);
         SDL_BindGPUIndexBuffer(pass, &index, SDL_GPU_INDEXELEMENTSIZE_32BIT);
         SDL_BindGPUFragmentSamplers(pass, 0, &binding, 1);
         SDL_PushGPUFragmentUniformData(commands, 0, &shade, sizeof(shade));
-        SDL_DrawGPUIndexedPrimitives(pass, shipIndexCount_, 1, 0, 0, 0);
+        SDL_DrawGPUIndexedPrimitives(pass, ship.indexCount, 1, 0, 0, 0);
     }
     for (auto kind : {DrawPass::Opaque, DrawPass::Translucent}) {
         SDL_BindGPUGraphicsPipeline(pass, kind == DrawPass::Opaque ? opaque_ : translucent_);
         SDL_PushGPUVertexUniformData(commands, 0, &ground, sizeof(ground));
         for (const auto& entry : bases_) DrawMesh(pass, commands, entry.second.mesh, kind);
-        SDL_PushGPUVertexUniformData(commands, 0, &ship, sizeof(ship));
-        DrawMesh(pass, commands, ship_, kind);
+        for (const auto& draw : ships) {
+            SDL_PushGPUVertexUniformData(commands, 0, &draw.uniform, sizeof(draw.uniform));
+            DrawMesh(pass, commands, ships_.at(draw.handle).mesh, kind);
+        }
+        if (kind == DrawPass::Opaque) {
+            // The sky supplies the background for translucent vessel materials.
+            SDL_BindGPUGraphicsPipeline(pass, sky_);
+            SDL_PushGPUFragmentUniformData(commands, 0, &air, sizeof(air));
+            SDL_DrawGPUPrimitives(pass, 3, 1, 0, 0);
+        }
     }
-    SDL_BindGPUGraphicsPipeline(pass, sky_);
-    SDL_PushGPUFragmentUniformData(commands, 0, &air, sizeof(air));
-    SDL_DrawGPUPrimitives(pass, 3, 1, 0, 0);
     SDL_EndGPURenderPass(pass);
     if (!capture) {
         const auto beforeSubmit = SDL_GetTicksNS();
@@ -877,7 +889,7 @@ void Scene::ClearMesh() noexcept
 {
     if (!device_) return;
     ClearGround();
-    ClearShip();
+    while (!ships_.empty()) RemoveShip(ships_.begin()->first);
 }
 
 void Scene::ClearGround() noexcept
@@ -908,16 +920,16 @@ void Scene::RemoveBase(unsigned index) noexcept
     bases_.erase(it);
 }
 
-void Scene::ClearShip() noexcept
+void Scene::RemoveShip(OBJHANDLE handle) noexcept
 {
-    Release(ship_);
-    if (shadowVertices_) SDL_ReleaseGPUBuffer(device_, shadowVertices_);
-    if (shipUpload_) SDL_ReleaseGPUTransferBuffer(device_, shipUpload_);
-    if (shadowUpload_) SDL_ReleaseGPUTransferBuffer(device_, shadowUpload_);
-    shadowVertices_ = nullptr;
-    shadowUpload_ = shipUpload_ = nullptr;
-    shipIndexCount_ = vesselVertexBytes_ = 0;
-    showShadow_ = false;
+    const auto it = ships_.find(handle);
+    if (it == ships_.end()) return;
+    auto& ship = it->second;
+    Release(ship.mesh);
+    if (ship.shadowVertices) SDL_ReleaseGPUBuffer(device_, ship.shadowVertices);
+    if (ship.poseUpload) SDL_ReleaseGPUTransferBuffer(device_, ship.poseUpload);
+    if (ship.shadowUpload) SDL_ReleaseGPUTransferBuffer(device_, ship.shadowUpload);
+    ships_.erase(it);
 }
 
 void Scene::Close() noexcept

@@ -32,9 +32,10 @@ public:
     };
     using BaseMeshes = std::function<BaseGeometry(OBJHANDLE)>;
     void Open(SDL_Window* window, BaseMeshes baseMeshes, bool baseShadows);
-    void CaptureFocus(std::filesystem::path archive);
+    void OpenWorld(std::filesystem::path archive);
     void CaptureFrame(std::filesystem::path path) { scene_.Capture(std::move(path)); }
-    void ClearFocus() noexcept;
+    void CloseWorld() noexcept;
+    void RemoveVessel(OBJHANDLE) noexcept;
     bool Present(unsigned width, unsigned height);
     std::string FlightTitle() const;
     void Close() noexcept;
@@ -50,7 +51,21 @@ private:
     };
     void LoadBase(const EarthBase&, const SceneFrame&);
     bool UpdateBases(const VECTOR3& eye);
-    void RefreshExterior(const VESSEL&);
+    struct VesselVisual {
+        VesselPose pose;
+        // An engaged null handle denotes an exterior, load-on-demand mesh.
+        std::vector<std::optional<MESHHANDLE>> exteriorSlots;
+        std::vector<Vertex> shadow;
+        std::optional<double> shadowTime;
+        bool retained = false;
+        bool awaitingLiftoff = false;
+    };
+    struct VesselUpdate {
+        bool poseUploaded = false, shadowDrawn = false;
+    };
+    VesselUpdate UpdateVessels(const SceneFrame& camera, const SceneFrame& ground,
+        const EarthView& earth, unsigned height, bool refreshShadow, bool terrainRecentered);
+    void RefreshExterior(const VESSEL&, VesselVisual&);
     void AppendMesh(MESHHANDLE, SceneMesh&, std::vector<VertexRange>&,
         std::map<SURFHANDLE, unsigned>& textureSlots, std::optional<DrawPass> pass = {},
         SURFHANDLE surfaceTexture = nullptr) const;
@@ -62,16 +77,12 @@ private:
     long long lastCapture_ = -1;
     std::vector<EarthBase> bases_;
     RunwayTerrain terrain_;
-    VesselPose pose_;
-    std::vector<Vertex> shadowVertices_;
-    std::optional<double> shadowTime_;
-    bool loggedLiftoff_ = false;
+    std::map<OBJHANDLE, VesselVisual> vessels_;
+    std::vector<VesselDraw> draws_;
     std::ofstream frameTrace_;
     Uint64 previousFrame_ = 0;
     OBJHANDLE focus_ = nullptr;
-    std::filesystem::path archivePath_;
-    // An engaged null handle denotes an exterior, load-on-demand mesh.
-    std::vector<std::optional<MESHHANDLE>> exteriorSlots_;
+    bool worldOpen_ = false;
     std::map<SURFHANDLE, std::unique_ptr<TextureData>> surfaces_;
 };
 

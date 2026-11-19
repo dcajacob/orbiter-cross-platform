@@ -1,0 +1,62 @@
+BEGIN_DESC
+A DeltaGlider closes on the stock ISS in Earth orbit. The exterior camera follows the glider, switches focus to the station, then returns to the glider. Start the simulation unpaused to run the 28-second sequence.
+END_DESC
+
+BEGIN_ENVIRONMENT
+  System Sol
+  Script ISSApproach
+  Date MJD 51982.0975169074
+END_ENVIRONMENT
+
+BEGIN_FOCUS
+  Ship DG-01
+END_FOCUS
+
+BEGIN_CAMERA
+  TARGET DG-01
+  MODE Extern
+  POS 6.83 52.96 -13.52
+  TRACKMODE GlobalFrame
+  FOV 60.00
+END_CAMERA
+
+BEGIN_HUD
+  TYPE Orbit
+END_HUD
+
+BEGIN_MFD Left
+  TYPE Docking
+END_MFD
+
+BEGIN_MFD Right
+  TYPE Orbit
+  PROJ Ship
+  REF Earth
+  TARGET ISS
+END_MFD
+
+BEGIN_VC
+END_VC
+
+BEGIN_SHIPS
+ISS:ProjectAlpha_ISS
+  STATUS Orbiting Earth
+  RPOS 4770488.27 4245945.37 -2122703.08
+  RVEL 5242.970 -5610.802 567.655
+  AROT -110.00 -15.00 -84.00
+  IDS 0:1 100 1:2 100 2:3 100 3:4 100 4:5 100
+  NAVFREQ 0 0
+  XPDR 466
+END
+DG-01:DeltaGlider
+  STATUS Orbiting Earth
+  RPOS 4770646.29 4245992.12 -2122704.38
+  RVEL 5240.173 -5611.630 567.678
+  AROT -137.35 48.57 117.57
+  PRPLEVEL 0:0.998 1:0.978
+  NAVFREQ 2 466
+  XPDR 0
+  DOCKSTATE 1 1.0000
+  AIRLOCK 0 0.0000
+END
+END_SHIPS

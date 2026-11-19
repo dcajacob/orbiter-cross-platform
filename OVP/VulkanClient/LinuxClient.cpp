@@ -34,7 +34,7 @@ constexpr struct {
     {SDL_SCANCODE_KP_9, OAPI_KEY_NUMPAD9},
     {SDL_SCANCODE_COMMA, OAPI_KEY_COMMA}, {SDL_SCANCODE_PERIOD, OAPI_KEY_PERIOD},
     {SDL_SCANCODE_G, OAPI_KEY_G}, {SDL_SCANCODE_F, OAPI_KEY_F}, {SDL_SCANCODE_S, OAPI_KEY_S},
-    {SDL_SCANCODE_F5, OAPI_KEY_F5}, {SDL_SCANCODE_INSERT, OAPI_KEY_INSERT},
+    {SDL_SCANCODE_F3, OAPI_KEY_F3}, {SDL_SCANCODE_F5, OAPI_KEY_F5}, {SDL_SCANCODE_INSERT, OAPI_KEY_INSERT},
     {SDL_SCANCODE_DELETE, OAPI_KEY_DELETE},
     {SDL_SCANCODE_LEFT, OAPI_KEY_LEFT}, {SDL_SCANCODE_RIGHT, OAPI_KEY_RIGHT},
     {SDL_SCANCODE_UP, OAPI_KEY_UP}, {SDL_SCANCODE_DOWN, OAPI_KEY_DOWN},
@@ -151,7 +151,7 @@ public:
             char path[4096] = {};
             if (!RenderTexturePath("Earth", path, true))
                 throw std::runtime_error("Cannot locate the stock Earth texture directory");
-            scene_.CaptureFocus(std::filesystem::path(path) / "Archive" / "Surf.tree");
+            scene_.OpenWorld(std::filesystem::path(path) / "Archive" / "Surf.tree");
             loaded_ = true;
         }
     }
@@ -168,7 +168,7 @@ public:
     void CloseSession() override
     {
         for (auto& stream : particles_) stream->Detach();
-        scene_.ClearFocus();
+        scene_.CloseWorld();
         loaded_ = false;
     }
     void Close() override
@@ -261,7 +261,7 @@ public:
         SDL_SetWindowTitle(window_, scene_.FlightTitle().c_str());
     }
     void NewVessel(OBJHANDLE) override {}
-    void DeleteVessel(OBJHANDLE) override {}
+    void DeleteVessel(OBJHANDLE handle) override { scene_.RemoveVessel(handle); }
     void StoreMesh(MESHHANDLE, const char*) override {}
     void VisualEvent(OBJHANDLE, VISHANDLE, oapi::UInt32, std::uintptr_t) override {}
     std::vector<NativeJoystickDevice> Joysticks() const override { return {}; }

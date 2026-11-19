@@ -650,6 +650,25 @@ struct Runtime final:BodyServices,RigidBodyServices,SurfaceServices,NavigationSe
                 if(code==OAPI_KEY_F6 && !KEYMOD_CONTROL(eventKeys.data())) {stepOnce=true;continue;}
 #endif
 #ifdef ORBITER_NATIVE_COCKPIT
+                const bool cycleFocus = vulkanView;
+#else
+                constexpr bool cycleFocus = true;
+#endif
+                if (cycleFocus && keymap.IsLogicalKey(code,eventKeys.data(),OAPI_LKEY_DlgSelectVessel)) {
+                    // Clients without the in-flight focus picker cycle eligible vessels.
+                    const auto& list = system->GetVessels();
+                    const auto it = std::find(list.begin(), list.end(), render.focus);
+                    const auto start = std::size_t(it - list.begin());
+                    for (std::size_t i = 1; i <= list.size(); ++i) {
+                        auto* next = list[(start + i) % list.size()];
+                        if (next->GetEnableFocus() && !next->KillPending()) {
+                            orbiter::production::SetFocusObject(*this, next);
+                            break;
+                        }
+                    }
+                    continue;
+                }
+#ifdef ORBITER_NATIVE_COCKPIT
                 if(HandleCockpitMenuKey(keymap,code,eventKeys.data()))continue;
                 if(keymap.IsLogicalKey(code,eventKeys.data(),OAPI_LKEY_TogglePlanetarium)) {settings.CfgVisHelpPrm.flagPlanetarium^=PLN_ENABLE;continue;}
                 if(keymap.IsLogicalKey(code,eventKeys.data(),OAPI_LKEY_ToggleLabels)) {settings.CfgVisHelpPrm.flagMarkers^=MKR_ENABLE;continue;}
@@ -670,12 +689,6 @@ struct Runtime final:BodyServices,RigidBodyServices,SurfaceServices,NavigationSe
                     if(keymap.IsLogicalKey(code,eventKeys.data(),OAPI_LKEY_HUDColour)) {cockpit->ToggleHUDColour();continue;}
                 } else if(keymap.IsLogicalKey(code,eventKeys.data(),OAPI_LKEY_ToggleTrackMode)) {
                     render.camera->SetTrackMode(ExtCamMode((int(render.camera->GetExtMode())+1)%3));continue;
-                }
-#else
-                if(keymap.IsLogicalKey(code,eventKeys.data(),OAPI_LKEY_DlgSelectVessel)) {
-                    const auto& list=system->GetVessels();auto it=std::find(list.begin(),list.end(),render.focus);auto start=std::size_t(it-list.begin());
-                    for(std::size_t i=1;i<=list.size();++i) {auto* next=list[(start+i)%list.size()];if(next->GetEnableFocus() && !next->KillPending()) {orbiter::production::SetFocusObject(*this,next);break;}}
-                    continue;
                 }
 #endif
 #ifdef ORBITER_NATIVE_COCKPIT

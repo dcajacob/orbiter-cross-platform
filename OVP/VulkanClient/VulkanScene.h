@@ -40,6 +40,11 @@ struct SceneUniform {
     std::array<float, 16> shadowTransform{};
 };
 
+struct VesselDraw {
+    OBJHANDLE handle;
+    SceneUniform uniform;
+};
+
 struct MaterialUniform {
     std::array<float, 4> diffuse{1, 1, 1, 1};
     std::array<float, 4> emission{};
@@ -98,14 +103,15 @@ public:
     Scene& operator=(const Scene&) = delete;
 
     void Open(SDL_Window*, bool trace);
-    void SetShip(const SceneMesh&);
+    void SetShip(OBJHANDLE, const SceneMesh&);
     void AddBase(unsigned index, const SceneMesh&, bool shadows);
     void RemoveBase(unsigned index) noexcept;
-    void SetShipPose(const std::vector<Vertex>&);
+    void SetShipPose(OBJHANDLE, const std::vector<Vertex>&);
     void StageTile(const TileKey&, const TerrainMesh&);
     void SelectTiles(const std::set<TileKey>& visible, const std::set<TileKey>& pending);
-    void SetShadow(const std::vector<Vertex>&);
-    bool Present(const SceneUniform& ship, const SceneUniform& ground, const EarthView& earth,
+    void SetShadow(OBJHANDLE, const std::vector<Vertex>&);
+    void RemoveShip(OBJHANDLE) noexcept;
+    bool Present(const std::vector<VesselDraw>& ships, const SceneUniform& ground, const EarthView& earth,
         const std::filesystem::path& sample = {});
     void Capture(std::filesystem::path path) { capture_ = std::move(path); }
     const FrameTimings& Timings() const { return timings_; }
@@ -156,9 +162,16 @@ private:
         Bounds bounds;
     };
     void DrawTile(SDL_GPURenderPass*, const GroundTile&);
-    void ClearShip() noexcept;
+    struct Ship {
+        GpuMesh mesh;
+        SDL_GPUTransferBuffer* poseUpload = nullptr;
+        SDL_GPUBuffer* shadowVertices = nullptr;
+        SDL_GPUTransferBuffer* shadowUpload = nullptr;
+        Uint32 vertexBytes = 0, indexCount = 0;
+        bool showShadow = false;
+    };
     void Release(GroundTile&) noexcept;
-    void UpdateVesselVertices(const std::vector<Vertex>&, SDL_GPUBuffer*, SDL_GPUTransferBuffer*);
+    void UpdateVesselVertices(const std::vector<Vertex>&, SDL_GPUBuffer*, SDL_GPUTransferBuffer*&, Uint32 bytes);
     SDL_GPUTexture* UploadTexture(const TextureData&);
     SDL_GPUGraphicsPipeline* CreatePipeline(SDL_GPUShader*, SDL_GPUShader*, DrawPass);
     void ResizeDepth(unsigned, unsigned);
@@ -178,7 +191,7 @@ private:
     SDL_GPUGraphicsPipeline* shadow_ = nullptr;
     SDL_GPUTextureFormat depthFormat_ = SDL_GPU_TEXTUREFORMAT_INVALID;
     SDL_GPUTexture* depth_ = nullptr;
-    GpuMesh ship_;
+    std::map<OBJHANDLE, Ship> ships_;
     std::map<unsigned, Base> bases_;
     SDL_GPUGraphicsPipeline* shadowMapPipeline_ = nullptr;
     SDL_GPUGraphicsPipeline* pavement_ = nullptr;
@@ -188,12 +201,6 @@ private:
     bool mapUpdated_ = false;
     bool trace_ = false;
     FrameTimings timings_;
-    unsigned shipIndexCount_ = 0;
-    SDL_GPUBuffer* shadowVertices_ = nullptr;
-    SDL_GPUTransferBuffer* shipUpload_ = nullptr;
-    SDL_GPUTransferBuffer* shadowUpload_ = nullptr;
-    Uint32 vesselVertexBytes_ = 0;
-    bool showShadow_ = false;
     std::map<TileKey, GroundTile> tiles_;
     unsigned width_ = 0;
     unsigned height_ = 0;

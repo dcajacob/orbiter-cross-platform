@@ -24,30 +24,24 @@ namespace {
 constexpr auto defaultIndex = std::numeric_limits<std::uint32_t>::max();
 constexpr auto inheritedIndex = defaultIndex - 1;
 
-SceneUniform MakeUniform(const SceneFrame& frame, unsigned width, unsigned height)
+SceneUniform MakeUniform(const SceneFrame& frame, const SceneFrame& camera, const VECTOR3& sun,
+    double horizontal, double vertical)
 {
     SceneUniform uniform{};
-    VECTOR3 camera;
-    MATRIX3 cameraRotation;
-    oapiCameraGlobalPos(&camera);
-    oapiCameraRotationMatrix(&cameraRotation);
-    const auto axes = Axes(cameraRotation);
-    const auto eye = frame.ToLocal(camera);
+    const auto eye = frame.ToLocal(camera.origin);
     uniform.eye[0] = float(eye.x);
     uniform.eye[1] = float(eye.y);
     uniform.eye[2] = float(eye.z);
-    const auto displacement = Subtract(frame.origin, camera);
-    const auto sunlight = Subtract(SunPosition(), frame.origin);
+    const auto displacement = Subtract(frame.origin, camera.origin);
+    const auto sunlight = Subtract(sun, frame.origin);
     const double distance = std::sqrt(Dot(sunlight, sunlight));
-    const double vertical = 1 / std::tan(oapiCameraAperture());
-    const double horizontal = vertical * height / width;
     constexpr double nearPlane = 0.1;
 
     for (unsigned i = 0; i < 4; ++i) {
         const auto& v = i == 3 ? displacement : frame.axes[i];
-        const auto z = Dot(v, axes[2]);
-        uniform.projection[4 * i] = float(horizontal * Dot(v, axes[0]));
-        uniform.projection[4 * i + 1] = float(vertical * Dot(v, axes[1]));
+        const auto z = Dot(v, camera.axes[2]);
+        uniform.projection[4 * i] = float(horizontal * Dot(v, camera.axes[0]));
+        uniform.projection[4 * i + 1] = float(vertical * Dot(v, camera.axes[1]));
         // Reverse Z preserves floating-point depth precision for distant ground and its shadow.
         uniform.projection[4 * i + 2] = i == 3 ? float(nearPlane) : 0.0f;
         uniform.projection[4 * i + 3] = float(z);
@@ -202,7 +196,7 @@ void OrbiterScene::Open(SDL_Window* window, BaseMeshes baseMeshes, bool baseShad
     if (const char* path = SDL_getenv("ORBITER_VULKAN_FRAME_TRACE"); path && *path) {
         frameTrace_.open(std::filesystem::path(path));
         if (!frameTrace_) throw std::runtime_error("Cannot open Vulkan frame trace");
-        frameTrace_ << "sim_seconds,interval_ms,scene_ms,terrain_ms,tiles_staged,imagery_staged,tiles_switched,pose_uploaded,shadow_drawn,base_upload_ms,base_shadow_updated,acquire_wait_ms,reanchor_ms,terrain_recentered,visible_tiles,detail_tiles,frame_slot_ms,image_acquire_ms,draw_encode_ms,present_submit_ms,terrain_draws,camera_altitude_m,earth_leaf_area\n";
+        frameTrace_ << "sim_seconds,interval_ms,scene_ms,terrain_ms,tiles_staged,imagery_staged,tiles_switched,pose_uploaded,shadow_drawn,base_upload_ms,base_shadow_updated,acquire_wait_ms,reanchor_ms,terrain_recentered,visible_tiles,detail_tiles,frame_slot_ms,image_acquire_ms,draw_encode_ms,present_submit_ms,terrain_draws,camera_altitude_m,earth_leaf_area,vessels_drawn,focus\n";
     }
     scene_.Open(window, frameTrace_.is_open());
     previousFrame_ = 0;
@@ -260,14 +254,12 @@ void OrbiterScene::AppendMesh(MESHHANDLE mesh, SceneMesh& ship, std::vector<Vert
     }
 }
 
-void OrbiterScene::CaptureFocus(std::filesystem::path archive)
+void OrbiterScene::OpenWorld(std::filesystem::path archive)
 {
-    ClearFocus();
-    archivePath_ = std::move(archive);
-    auto* vessel = oapiGetFocusInterface();
-    if (!vessel) return;
-    focus_ = vessel->GetHandle();
-    terrain_.Open(archivePath_, ObjectFrame(focus_).origin);
+    CloseWorld();
+    VECTOR3 camera;
+    oapiCameraGlobalPos(&camera);
+    terrain_.Open(archive, camera);
     char earthName[] = "Earth";
     const auto earth = oapiGetGbodyByName(earthName);
     const auto count = oapiGetBaseCount(earth);
@@ -281,7 +273,7 @@ void OrbiterScene::CaptureFocus(std::filesystem::path archive)
 #endif
         bases_.push_back({i, base, terrain_.BasePosition(lng, lat), lng, lat});
     }
-    RefreshExterior(*vessel);
+    worldOpen_ = true;
 }
 
 void OrbiterScene::LoadBase(const EarthBase& base, const SceneFrame& frame)
@@ -343,17 +335,17 @@ bool OrbiterScene::UpdateBases(const VECTOR3& eye)
     return uploaded;
 }
 
-void OrbiterScene::RefreshExterior(const VESSEL& vessel)
+void OrbiterScene::RefreshExterior(const VESSEL& vessel, VesselVisual& visual)
 {
     const auto count = vessel.GetMeshCount();
-    bool rebuild = exteriorSlots_.size() != count;
-    exteriorSlots_.resize(count);
+    bool rebuild = visual.exteriorSlots.size() != count;
+    visual.exteriorSlots.resize(count);
     for (unsigned index = 0; index < count; ++index) {
         std::optional<MESHHANDLE> current;
         if (vessel.GetMeshVisibilityMode(index) & MESHVIS_EXTERNAL)
             current = vessel.GetMeshTemplate(index);
-        rebuild |= current != exteriorSlots_[index];
-        exteriorSlots_[index] = current;
+        rebuild |= current != visual.exteriorSlots[index];
+        visual.exteriorSlots[index] = current;
     }
     if (!rebuild) return;
     SceneMesh ship;
@@ -365,8 +357,8 @@ void OrbiterScene::RefreshExterior(const VESSEL& vessel)
     std::vector<OwnedMesh> copies;
     unsigned exteriorCount = 0;
     for (unsigned index = 0; index < meshes.size(); ++index) {
-        if (!exteriorSlots_[index]) continue;
-        auto mesh = *exteriorSlots_[index];
+        if (!visual.exteriorSlots[index]) continue;
+        auto mesh = *visual.exteriorSlots[index];
         if (!mesh) {
             mesh = vessel.CopyMeshFromTemplate(index);
             if (!mesh) continue;
@@ -378,9 +370,9 @@ void OrbiterScene::RefreshExterior(const VESSEL& vessel)
         slot.count = groups.size() - slot.first;
         ++exteriorCount;
     }
-    shadowTime_.reset();
-    scene_.SetShip(ship);
-    pose_.Reset(std::move(ship.vertices), std::move(groups), std::move(meshes));
+    visual.shadowTime.reset();
+    scene_.SetShip(vessel.GetHandle(), ship);
+    visual.pose.Reset(std::move(ship.vertices), std::move(groups), std::move(meshes));
     std::ostringstream message;
     message << "Vulkan exterior: " << vessel.GetName() << " (" << vessel.GetClassName() << "), "
             << exteriorCount << " meshes, " << ship.groups.size() << " groups, "
@@ -388,73 +380,132 @@ void OrbiterScene::RefreshExterior(const VESSEL& vessel)
     SceneLog(message.str());
 }
 
-void OrbiterScene::ClearFocus() noexcept
+void OrbiterScene::RemoveVessel(OBJHANDLE handle) noexcept
+{
+    scene_.RemoveShip(handle);
+    vessels_.erase(handle);
+    if (focus_ == handle) focus_ = nullptr;
+}
+
+void OrbiterScene::CloseWorld() noexcept
 {
     focus_ = nullptr;
-    archivePath_.clear();
+    worldOpen_ = false;
     bases_.clear();
+    vessels_.clear();
+    draws_.clear();
     lastCapture_ = -1;
-    exteriorSlots_.clear();
     scene_.ClearMesh();
     terrain_.Close();
-    pose_.Reset({}, {}, {});
-    shadowVertices_.clear();
-    shadowTime_.reset();
-    loggedLiftoff_ = false;
+}
+
+OrbiterScene::VesselUpdate OrbiterScene::UpdateVessels(const SceneFrame& camera, const SceneFrame& groundFrame,
+    const EarthView& earth, unsigned height, bool refreshShadow, bool terrainRecentered)
+{
+    const auto simTime = oapiGetSimTime();
+    const auto sun = SunPosition();
+    const double focal = 0.5 * height * earth.vertical;
+    draws_.clear();
+    VesselUpdate update;
+    for (auto& entry : vessels_) entry.second.retained = false;
+    const auto count = oapiGetVesselCount();
+    for (unsigned i = 0; i < count; ++i) {
+        const auto handle = oapiGetVesselByIndex(i);
+        auto* vessel = oapiGetVesselInterface(handle);
+        if (!vessel) continue;
+        const auto frame = ObjectFrame(handle);
+        const auto eye = camera.ToLocal(frame.origin);
+        const double radius = std::max(vessel->GetSize(), vessel->GetClipRadius());
+        // Hysteresis keeps readable non-focus exteriors resident as the camera moves.
+        const double minPixels = vessels_.count(handle) ? 0.35 : 0.6;
+        const double maxRange = radius * focal / minPixels;
+        if (handle != focus_ && Dot(eye, eye) > maxRange * maxRange) continue;
+        auto& visual = vessels_[handle];
+        visual.retained = true;
+        RefreshExterior(*vessel, visual);
+        if (visual.pose.Vertices().empty()) continue;
+        const bool changed = visual.pose.Update(*vessel);
+        if (changed) scene_.SetShipPose(handle, visual.pose.Vertices());
+        update.poseUploaded |= changed;
+        if (visual.shadowTime != simTime || changed || refreshShadow) {
+            terrain_.ProjectShadow(groundFrame, frame, visual.pose.Vertices(), visual.shadow);
+            scene_.SetShadow(handle, visual.shadow);
+            visual.shadowTime = simTime;
+        }
+        update.shadowDrawn |= !visual.shadow.empty();
+        // Sphere against the four side planes and the eye. Orbiter's clip radius
+        // includes parts extending beyond the nominal size, such as solar panels.
+        if (eye.z + radius > 0 &&
+            std::abs(eye.x * earth.horizontal) <= eye.z + radius * std::hypot(1.0, earth.horizontal) &&
+            std::abs(eye.y * earth.vertical) <= eye.z + radius * std::hypot(1.0, earth.vertical)) {
+            draws_.push_back({handle, MakeUniform(frame, camera, sun, earth.horizontal, earth.vertical)});
+        }
+        if (handle == focus_) {
+            const auto altitude = vessel->GetAltitude(ALTMODE_GROUND);
+            const bool grounded = vessel->GroundContact();
+            visual.awaitingLiftoff |= grounded;
+            const bool liftoff = visual.awaitingLiftoff && !grounded && altitude > 8 && vessel->GetAirspeed() > 30;
+            if (liftoff) visual.awaitingLiftoff = false;
+            if (terrainRecentered || liftoff) {
+                std::ostringstream sample;
+                sample << "Vulkan flight " << (liftoff ? "liftoff" : "terrain") << ": t=" << simTime
+                       << " AGL=" << altitude << " airspeed=" << vessel->GetAirspeed();
+                if (!visual.shadow.empty()) {
+                    const auto* shadow = visual.shadow.front().position;
+                    sample << " projected shadow east=" << shadow[0] << " north=" << shadow[2];
+                }
+                SceneLog(sample.str());
+            }
+        }
+    }
+    for (auto it = vessels_.begin(); it != vessels_.end();) {
+        if (it->second.retained) { ++it; continue; }
+        scene_.RemoveShip(it->first);
+        it = vessels_.erase(it);
+    }
+    // Back-to-front vessel order for the translucent pass. Opaque geometry
+    // from every vessel populates the shared depth buffer first.
+    std::stable_sort(draws_.begin(), draws_.end(), [](const VesselDraw& a, const VesselDraw& b) {
+        return a.uniform.projection[15] > b.uniform.projection[15];
+    });
+    return update;
 }
 
 bool OrbiterScene::Present(unsigned width, unsigned height)
 {
     if (!width || !height) return true;
-    if (!archivePath_.empty() && oapiGetFocusObject() != focus_) CaptureFocus(archivePath_);
-    if (!focus_) return scene_.Present({}, {}, {});
+    if (!worldOpen_) return scene_.Present({}, {}, {});
     const auto start = SDL_GetTicksNS();
-    const auto ship = ObjectFrame(focus_);
+    const auto focus = oapiGetFocusObject();
+    if (focus != focus_) {
+        focus_ = focus;
+        if (focus) SceneLog(std::string("Vulkan focus: ") + oapiGetVesselInterface(focus)->GetName());
+    }
     const auto simTime = oapiGetSimTime();
-    VECTOR3 camera;
-    oapiCameraGlobalPos(&camera);
+    SceneFrame camera;
+    oapiCameraGlobalPos(&camera.origin);
+    MATRIX3 rotation;
+    oapiCameraRotationMatrix(&rotation);
+    camera.axes = Axes(rotation);
     Uint64 reanchorTime = 0;
-    if (terrain_.NeedsReanchor(camera)) {
+    if (terrain_.NeedsReanchor(camera.origin)) {
         const auto beforeReanchor = SDL_GetTicksNS();
-        terrain_.Reanchor(camera);
+        terrain_.Reanchor(camera.origin);
         for (auto& base : bases_) {
             if (base.loaded) scene_.RemoveBase(base.index);
             base.position = terrain_.BasePosition(base.longitude, base.latitude);
             base.loaded = false;
         }
-        shadowTime_.reset();
         reanchorTime = SDL_GetTicksNS() - beforeReanchor;
     }
     const auto groundFrame = terrain_.Frame();
-    auto* vessel = oapiGetVesselInterface(focus_);
-    RefreshExterior(*vessel);
-    const bool poseChanged = pose_.Update(*vessel);
-    if (poseChanged) scene_.SetShipPose(pose_.Vertices());
     const auto beforeTerrain = SDL_GetTicksNS();
     const auto earth = terrain_.View(width, height);
     const auto tiles = terrain_.Update(earth, height, scene_);
     const auto terrainTime = SDL_GetTicksNS() - beforeTerrain;
-    if (shadowTime_ != simTime || poseChanged || tiles.switched) {
-        terrain_.ProjectShadow(groundFrame, ship, pose_.Vertices(), shadowVertices_);
-        scene_.SetShadow(shadowVertices_);
-        shadowTime_ = simTime;
-
-        const auto altitude = vessel->GetAltitude(ALTMODE_GROUND);
-        const bool liftoff = !loggedLiftoff_ && !vessel->GroundContact() && altitude > 8 && vessel->GetAirspeed() > 30;
-        loggedLiftoff_ |= liftoff;
-        if (tiles.recentered || liftoff) {
-            std::ostringstream sample;
-            sample << "Vulkan flight " << (liftoff ? "liftoff" : "terrain") << ": t=" << simTime
-                   << " AGL=" << altitude << " airspeed=" << vessel->GetAirspeed();
-            if (!shadowVertices_.empty()) {
-                const auto* shadow = shadowVertices_.front().position;
-                sample << " projected shadow east=" << shadow[0] << " north=" << shadow[2];
-            }
-            SceneLog(sample.str());
-        }
-    }
+    const auto vessels = UpdateVessels(camera, groundFrame, earth, height, tiles.switched || reanchorTime, tiles.recentered);
     const auto beforeBases = SDL_GetTicksNS();
-    const auto baseUploadTime = UpdateBases(groundFrame.ToLocal(camera)) ? SDL_GetTicksNS() - beforeBases : 0;
+    const auto baseUploadTime = UpdateBases(groundFrame.ToLocal(camera.origin)) ? SDL_GetTicksNS() - beforeBases : 0;
     std::filesystem::path samplePath;
     if (!captureDirectory_.empty()) {
         const auto sample = static_cast<long long>(std::floor(simTime * captureFps_ + 1e-6));
@@ -465,20 +516,28 @@ bool OrbiterScene::Present(unsigned width, unsigned height)
             lastCapture_ = sample;
         }
     }
-    const bool presented = scene_.Present(MakeUniform(ship, width, height),
-        MakeUniform(groundFrame, width, height), earth, samplePath);
+    const bool presented = scene_.Present(draws_,
+        MakeUniform(groundFrame, camera, SunPosition(), earth.horizontal, earth.vertical), earth, samplePath);
     if (frameTrace_.is_open()) {
         const auto milliseconds = [](Uint64 time) { return double(time) / 1000000; };
         const auto& timing = scene_.Timings();
         frameTrace_ << simTime << ',' << milliseconds(previousFrame_ ? start - previousFrame_ : 0)
                     << ',' << milliseconds(SDL_GetTicksNS() - start) << ',' << milliseconds(terrainTime)
-                    << ',' << tiles.staged << ',' << tiles.imagery << ',' << tiles.switched << ',' << poseChanged
-                    << ',' << !shadowVertices_.empty() << ',' << milliseconds(baseUploadTime) << ',' << scene_.ShadowMapUpdated()
+                    << ',' << tiles.staged << ',' << tiles.imagery << ',' << tiles.switched << ',' << vessels.poseUploaded
+                    << ',' << vessels.shadowDrawn << ',' << milliseconds(baseUploadTime) << ',' << scene_.ShadowMapUpdated()
                     << ',' << milliseconds(timing.acquireNS) << ',' << milliseconds(reanchorTime)
                     << ',' << tiles.recentered << ',' << terrain_.VisibleCount() << ',' << terrain_.DetailCount()
                     << ',' << milliseconds(timing.fenceNS) << ',' << milliseconds(timing.acquireNS - timing.fenceNS)
                     << ',' << milliseconds(timing.encodeNS) << ',' << milliseconds(timing.submitNS)
-                    << ',' << timing.terrainDraws << ',' << earth.altitude << ',' << terrain_.LeafArea() << '\n';
+                    << ',' << timing.terrainDraws << ',' << earth.altitude << ',' << terrain_.LeafArea()
+                    << ',' << draws_.size() << ",\"";
+        if (focus) {
+            for (const char* c = oapiGetVesselInterface(focus)->GetName(); *c; ++c) {
+                if (*c == '"') frameTrace_ << '"';
+                frameTrace_ << *c;
+            }
+        }
+        frameTrace_ << "\"\n";
         previousFrame_ = start;
     }
     return presented;
@@ -487,7 +546,7 @@ bool OrbiterScene::Present(unsigned width, unsigned height)
 void OrbiterScene::Close() noexcept
 {
     captureDirectory_.clear();
-    ClearFocus();
+    CloseWorld();
     scene_.Close();
     if (frameTrace_.is_open()) frameTrace_.close();
 }
