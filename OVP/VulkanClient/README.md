@@ -1,18 +1,22 @@
 # Runway 33 Vulkan client
 
-This opt-in client opens the supplied Runway 33 scenario in Orbiter and draws the
-stock DG-S exterior with its original textures and initial external camera. The
-client uses SDL3's Vulkan backend and a shared pair of SPIR-V shaders.
+This opt-in client draws the focused vessel's exterior on Windows and Linux
+using SDL3's Vulkan backend and shared SPIR-V shaders. `Runway33.scn` starts
+the stock DG-S at Kennedy. `ShuttleA-Runway33.scn` places an unloaded stock
+Shuttle-A at the same position, heading, and scenario time for comparison.
+
+Both vessels use the same mesh slots, group visibility, texture lookup, and
+Orbiter ambient, diffuse, emissive, and specular material properties. Mesh
+animations run in each slot's local coordinates before applying its vessel
+offset. The ground shadow follows that same geometry.
 
 The client streams stock Earth surface tiles from `Earth/Archive/Surf.tree` and
-uses Orbiter's elevation data. It keeps detailed tiles around the DG-S and
+uses Orbiter's elevation data. It keeps detailed tiles around the vessel and
 extends coarser terrain toward the horizon with distance haze. During flight
 it stages tiles over several frames and replaces each coarser tile when all
-four of its children are ready. The client applies the stock vessel's exterior
-mesh animation states, including gear and flight surfaces. The aircraft and
-its ground shadow use the same posed mesh.
+four of its children are ready.
 
-## Takeoff
+## DG-S takeoff
 
 1. Press **Ctrl+P** to resume.
 2. Hold **Ctrl+Numpad +** until the title bar shows **Main 100%**. Release the keys
@@ -23,7 +27,7 @@ its ground shadow use the same posed mesh.
    and **Numpad \*** to kill main thrust. Right-drag or use **Ctrl+arrow keys**
    to orbit the external camera. Scroll to change camera distance.
 
-This milestone covers regional Earth terrain and the external DG-S view.
+The current scope is the external focus vessel and regional Earth terrain.
 
 ## Optional Kennedy imagery
 
@@ -131,7 +135,7 @@ cmake --build C:/vulkan-build
 
 Place `VulkanClient.dll` in `Modules/Plugin` and the x64 `SDL3.dll` beside
 `Orbiter.exe` in a Windows Orbiter runtime with the stock assets. Copy the supplied
-`Runway33.scn` to `Scenarios`. Select `VulkanClient` as the sole graphics
+`Runway33.scn` and `ShuttleA-Runway33.scn` to `Scenarios`. Select `VulkanClient` as the sole graphics
 client in that runtime. For the reference capture, use these settings and set
 `PlanetTexDir` to the stock Earth archive directory's parent, `Textures`.
 
@@ -152,3 +156,7 @@ From that runtime directory, run:
 ```powershell
 .\Orbiter.exe --scenario=Runway33
 ```
+
+Use `--scenario=ShuttleA-Runway33` for the Shuttle-A view. For a Windows
+reference capture, set `ORBITER_VULKAN_CAPTURE_FRAME` to a writable BMP path.
+The client saves the first rendered vessel frame directly from Vulkan.

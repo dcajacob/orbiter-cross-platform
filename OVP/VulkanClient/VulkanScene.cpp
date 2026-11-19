@@ -1,6 +1,7 @@
 // Licensed under the MIT License
 #include "VulkanScene.h"
 #include "ShipShaders.h"
+#include "SceneFrame.h"
 
 #include <algorithm>
 #include <cstring>
@@ -212,7 +213,7 @@ void Scene::Open(SDL_Window* window)
     SDL_ReleaseGPUShader(device_, vertex);
     const auto properties = SDL_GetGPUDeviceProperties(device_);
     const auto* name = SDL_GetStringProperty(properties, SDL_PROP_GPU_DEVICE_NAME_STRING, "unknown");
-    std::clog << "Runway33 Vulkan backend: " << SDL_GetGPUDeviceDriver(device_) << "; GPU: " << name << '\n';
+    SceneLog(std::string("Vulkan device: ") + name);
 }
 
 SDL_GPUGraphicsPipeline* Scene::CreatePipeline(SDL_GPUShader* vertex, SDL_GPUShader* fragment, DrawPass kind)
@@ -327,7 +328,8 @@ SDL_GPUTexture* Scene::UploadTexture(const TextureData& texture)
 
 void Scene::SetShip(const SceneMesh& mesh)
 {
-    ClearMesh();
+    ClearShip();
+    if (mesh.indices.empty()) return;
     vertices_ = Buffer(device_, SDL_GPU_BUFFERUSAGE_VERTEX, mesh.vertices.data(), mesh.vertices.size() * sizeof(Vertex));
     indices_ = Buffer(device_, SDL_GPU_BUFFERUSAGE_INDEX, mesh.indices.data(), mesh.indices.size() * sizeof(std::uint32_t));
     shipIndexCount_ = unsigned(mesh.indices.size());
@@ -558,6 +560,11 @@ void Scene::ClearMesh() noexcept
     if (!device_) return;
     for (auto& entry : tiles_) Release(entry.second);
     tiles_.clear();
+    ClearShip();
+}
+
+void Scene::ClearShip() noexcept
+{
     for (auto* texture : textures_) SDL_ReleaseGPUTexture(device_, texture);
     textures_.clear();
     groups_.clear();

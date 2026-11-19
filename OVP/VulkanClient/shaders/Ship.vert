@@ -5,13 +5,18 @@ layout(location=2) in vec2 uv;
 layout(set=1,binding=0,std140) uniform Scene {
     mat4 modelViewProjection;
     vec4 light;
+    vec4 eye;
 } scene;
 layout(location=0) out vec2 texcoord;
-layout(location=1) out float illumination;
+layout(location=1) out vec3 surfaceNormal;
 layout(location=2) out float distanceAlongView;
+layout(location=3) out vec3 toEye;
+layout(location=4) flat out vec3 toLight;
 void main() {
     gl_Position = scene.modelViewProjection * vec4(position, 1.0);
     distanceAlongView = gl_Position.w;
-    illumination = 0.45 + 0.55 * max(dot(normalize(normal), scene.light.xyz), 0.0);
+    surfaceNormal = normal;
+    toEye = scene.eye.xyz - position;
+    toLight = scene.light.xyz;
     texcoord = uv;
 }

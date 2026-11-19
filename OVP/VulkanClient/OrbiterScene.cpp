@@ -10,6 +10,7 @@
 #include <iomanip>
 #include <sstream>
 #include <stdexcept>
+#include <type_traits>
 
 namespace orbiter::vulkan {
 #include "SurfaceCopy.inc"
@@ -26,6 +27,10 @@ SceneUniform MakeUniform(const SceneFrame& frame, unsigned width, unsigned heigh
     oapiCameraGlobalPos(&camera);
     oapiCameraRotationMatrix(&cameraRotation);
     const auto axes = Axes(cameraRotation);
+    const auto eye = frame.ToLocal(camera);
+    uniform.eye[0] = float(eye.x);
+    uniform.eye[1] = float(eye.y);
+    uniform.eye[2] = float(eye.z);
     const auto displacement = Subtract(frame.origin, camera);
     const auto sunlight = Subtract(SunPosition(), frame.origin);
     const double distance = std::sqrt(Dot(sunlight, sunlight));
@@ -182,25 +187,17 @@ void OrbiterScene::Open(SDL_Window* window)
     previousFrame_ = 0;
 }
 
-void OrbiterScene::CaptureFocus(const std::filesystem::path& archive)
+void OrbiterScene::AppendMesh(MESHHANDLE mesh, SceneMesh& ship, std::vector<VertexRange>& groups,
+    std::map<SURFHANDLE, unsigned>& textureSlots) const
 {
-    auto* vessel = oapiGetFocusInterface();
-    if (!vessel || std::strcmp(vessel->GetClassName(), "DG-S"))
-        throw std::runtime_error("The Runway 33 Vulkan client requires the stock DG-S focus vessel");
-    const auto mesh = vessel->GetMeshTemplate(0);
-    if (!mesh || !(vessel->GetMeshVisibilityMode(0) & MESHVIS_EXTERNAL))
-        throw std::runtime_error("Focus DG-S has no exterior mesh");
-    focus_ = vessel->GetHandle();
-    vessel->GetMeshOffset(0, offset_);
-    SceneMesh ship;
     const auto materials = oapiMeshMaterialCount(mesh);
     const auto textures = oapiMeshTextureCount(mesh);
     unsigned materialIndex = defaultIndex;
     unsigned textureIndex = defaultIndex;
-    std::map<SURFHANDLE, unsigned> textureSlots;
-    std::vector<VertexRange> groups(oapiMeshGroupCount(mesh));
-
-    for (unsigned i = 0; i < groups.size(); ++i) {
+    const auto firstGroup = groups.size();
+    const auto count = oapiMeshGroupCount(mesh);
+    groups.resize(firstGroup + count);
+    for (unsigned i = 0; i < count; ++i) {
         const auto* group = oapiMeshGroup(mesh, i);
         if (!group) continue;
         if (group->MtrlIdx != inheritedIndex) materialIndex = group->MtrlIdx;
@@ -210,11 +207,10 @@ void OrbiterScene::CaptureFocus(const std::filesystem::path& archive)
         if (materialIndex < materials) {
             const auto* mat = oapiMeshMaterial(mesh, materialIndex);
             if (mat) {
-                const float values[] = {mat->diffuse.r, mat->diffuse.g, mat->diffuse.b, mat->diffuse.a};
-                std::copy(std::begin(values), std::end(values), material.diffuse);
-                material.emission[0] = mat->emissive.r;
-                material.emission[1] = mat->emissive.g;
-                material.emission[2] = mat->emissive.b;
+                material.diffuse = {mat->diffuse.r, mat->diffuse.g, mat->diffuse.b, mat->diffuse.a};
+                material.ambient = {mat->ambient.r, mat->ambient.g, mat->ambient.b, 0};
+                material.specular = {mat->specular.r, mat->specular.g, mat->specular.b, mat->power};
+                material.emission = {mat->emissive.r, mat->emissive.g, mat->emissive.b, 0};
             }
         }
         unsigned gpuTexture = 0;
@@ -228,7 +224,7 @@ void OrbiterScene::CaptureFocus(const std::filesystem::path& archive)
             }
         }
         const auto startVertex = unsigned(ship.vertices.size());
-        groups[i] = {startVertex, group->nVtx};
+        groups[firstGroup + i] = {startVertex, group->nVtx};
         const auto pass = material.diffuse[3] < 0.999f ? DrawPass::Translucent : DrawPass::Opaque;
         ship.groups.push_back({unsigned(ship.indices.size()), group->nIdx, gpuTexture, material, pass});
         for (unsigned j = 0; j < group->nVtx; ++j) {
@@ -240,28 +236,72 @@ void OrbiterScene::CaptureFocus(const std::filesystem::path& archive)
             ship.indices.push_back(startVertex + group->Idx[j]);
         }
     }
-    if (ship.textures.size() <= 1)
-        throw std::runtime_error("The DG-S exterior has no loaded textures");
-    std::clog << "Runway33 focus: " << vessel->GetName() << ", " << vessel->GetClassName()
-              << "; time=" << oapiGetSimTime() << "; aperture=" << oapiCameraAperture() << '\n';
-    terrain_.Open(archive, ShipFrame().origin);
-    scene_.SetShip(ship);
-    pose_.Reset(std::move(ship.vertices), std::move(groups));
 }
 
-SceneFrame OrbiterScene::ShipFrame() const
+void OrbiterScene::CaptureFocus(std::filesystem::path archive)
 {
-    auto frame = ObjectFrame(focus_);
-    frame.origin = frame.ToGlobal(offset_);
-    return frame;
+    ClearFocus();
+    archivePath_ = std::move(archive);
+    auto* vessel = oapiGetFocusInterface();
+    if (!vessel) return;
+    focus_ = vessel->GetHandle();
+    terrain_.Open(archivePath_, ObjectFrame(focus_).origin);
+    RefreshExterior(*vessel);
+}
+
+void OrbiterScene::RefreshExterior(const VESSEL& vessel)
+{
+    const auto count = vessel.GetMeshCount();
+    bool rebuild = exteriorSlots_.size() != count;
+    exteriorSlots_.resize(count);
+    for (unsigned index = 0; index < count; ++index) {
+        std::optional<MESHHANDLE> current;
+        if (vessel.GetMeshVisibilityMode(index) & MESHVIS_EXTERNAL)
+            current = vessel.GetMeshTemplate(index);
+        rebuild |= current != exteriorSlots_[index];
+        exteriorSlots_[index] = current;
+    }
+    if (!rebuild) return;
+    SceneMesh ship;
+    std::map<SURFHANDLE, unsigned> textureSlots;
+    std::vector<VertexRange> groups;
+    std::vector<MeshGroups> meshes(count);
+    // Keep on-demand copies (and their texture handles) alive through GPU upload.
+    using OwnedMesh = std::unique_ptr<std::remove_pointer_t<MESHHANDLE>, decltype(&oapiDeleteMesh)>;
+    std::vector<OwnedMesh> copies;
+    unsigned exteriorCount = 0;
+    for (unsigned index = 0; index < meshes.size(); ++index) {
+        if (!exteriorSlots_[index]) continue;
+        auto mesh = *exteriorSlots_[index];
+        if (!mesh) {
+            mesh = vessel.CopyMeshFromTemplate(index);
+            if (!mesh) continue;
+            copies.emplace_back(mesh, &oapiDeleteMesh);
+        }
+        auto& slot = meshes[index];
+        slot.first = groups.size();
+        AppendMesh(mesh, ship, groups, textureSlots);
+        slot.count = groups.size() - slot.first;
+        ++exteriorCount;
+    }
+    shadowTime_.reset();
+    scene_.SetShip(ship);
+    pose_.Reset(std::move(ship.vertices), std::move(groups), std::move(meshes));
+    std::ostringstream message;
+    message << "Vulkan exterior: " << vessel.GetName() << " (" << vessel.GetClassName() << "), "
+            << exteriorCount << " meshes, " << ship.groups.size() << " groups, "
+            << textureSlots.size() << " textures";
+    SceneLog(message.str());
 }
 
 void OrbiterScene::ClearFocus() noexcept
 {
     focus_ = nullptr;
+    archivePath_.clear();
+    exteriorSlots_.clear();
     scene_.ClearMesh();
     terrain_.Close();
-    pose_.Reset({}, {});
+    pose_.Reset({}, {}, {});
     shadowVertices_.clear();
     shadowTime_.reset();
     loggedLiftoff_ = false;
@@ -270,12 +310,14 @@ void OrbiterScene::ClearFocus() noexcept
 bool OrbiterScene::Present(unsigned width, unsigned height)
 {
     if (!width || !height) return true;
+    if (!archivePath_.empty() && oapiGetFocusObject() != focus_) CaptureFocus(archivePath_);
     if (!focus_) return scene_.Present({}, {});
     const auto start = SDL_GetTicksNS();
-    const auto ship = ShipFrame();
+    const auto ship = ObjectFrame(focus_);
     const auto simTime = oapiGetSimTime();
     const auto groundFrame = terrain_.Frame();
     auto* vessel = oapiGetVesselInterface(focus_);
+    RefreshExterior(*vessel);
     const bool poseChanged = pose_.Update(*vessel);
     if (poseChanged) scene_.SetShipPose(pose_.Vertices());
     TerrainUpdate tiles;
@@ -327,11 +369,11 @@ void OrbiterScene::Close() noexcept
 
 std::string OrbiterScene::FlightTitle() const
 {
-    const auto name = "Orbiter - Runway 33 [Vulkan]";
+    const auto name = "Orbiter [Vulkan]";
     if (!focus_) return name;
     auto* vessel = oapiGetVesselInterface(focus_);
     std::ostringstream title;
-    title << name << (oapiGetPause() ? " | Paused" : "") << std::fixed << std::setprecision(0)
+    title << name << " - " << vessel->GetName() << (oapiGetPause() ? " | Paused" : "") << std::fixed << std::setprecision(0)
           << " | " << vessel->GetAirspeed() << " m/s | " << vessel->GetAltitude(ALTMODE_GROUND)
           << " m AGL | Main " << 100 * vessel->GetThrusterGroupLevel(THGROUP_MAIN) << '%';
     return title.str();

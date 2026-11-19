@@ -24,7 +24,7 @@ public:
     bool Blit(SURFHANDLE, unsigned, unsigned, SURFHANDLE, unsigned, unsigned, unsigned, unsigned);
 
     void Open(SDL_Window* window);
-    void CaptureFocus(const std::filesystem::path& archive);
+    void CaptureFocus(std::filesystem::path archive);
     void CaptureFrame(std::filesystem::path path) { scene_.Capture(std::move(path)); }
     void ClearFocus() noexcept;
     bool Present(unsigned width, unsigned height);
@@ -33,7 +33,9 @@ public:
 
 private:
     SURFHANDLE Add(TextureData);
-    SceneFrame ShipFrame() const;
+    void RefreshExterior(const VESSEL&);
+    void AppendMesh(MESHHANDLE, SceneMesh&, std::vector<VertexRange>&,
+        std::map<SURFHANDLE, unsigned>& textureSlots) const;
     Scene scene_;
     RunwayTerrain terrain_;
     VesselPose pose_;
@@ -43,7 +45,9 @@ private:
     std::ofstream frameTrace_;
     Uint64 previousFrame_ = 0;
     OBJHANDLE focus_ = nullptr;
-    VECTOR3 offset_{};
+    std::filesystem::path archivePath_;
+    // An engaged null handle denotes an exterior, load-on-demand mesh.
+    std::vector<std::optional<MESHHANDLE>> exteriorSlots_;
     std::map<SURFHANDLE, std::unique_ptr<TextureData>> surfaces_;
 };
 

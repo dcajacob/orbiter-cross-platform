@@ -95,24 +95,26 @@ Component& ParameterFor(Parameters& parameters, const MGROUP_TRANSFORM* componen
 }
 
 void Apply(const ANIMATIONCOMP& component, const SceneFrame& transform, Parameters& parameters,
-    std::vector<SceneFrame>& groups, std::vector<bool>& changed)
+    const std::vector<MeshGroups>& meshes, std::vector<SceneFrame>& groups, std::vector<bool>& changed)
 {
     const auto& source = *component.trans;
-    const auto applyGroup = [&](std::size_t group) {
-        if (group >= groups.size()) return;
-        groups[group] = Compose(transform, groups[group]);
-        changed[group] = true;
-    };
-    if (source.mesh == 0) {
+    if (source.mesh < meshes.size()) {
+        const auto& mesh = meshes[source.mesh];
+        const auto applyGroup = [&](std::size_t index) {
+            if (index >= mesh.count) return;
+            const auto group = mesh.first + index;
+            groups[group] = Compose(transform, groups[group]);
+            changed[group] = true;
+        };
         if (source.grp) {
             for (unsigned i = 0; i < source.ngrp; ++i) applyGroup(source.grp[i]);
         } else {
-            for (std::size_t group = 0; group < groups.size(); ++group) applyGroup(group);
+            for (std::size_t group = 0; group < mesh.count; ++group) applyGroup(group);
         }
     }
     for (unsigned i = 0; i < component.nchildren; ++i) {
         const auto& child = *component.children[i];
-        Apply(child, transform, parameters, groups, changed);
+        Apply(child, transform, parameters, meshes, groups, changed);
         auto& parameter = ParameterFor(parameters, child.trans);
         if (child.trans->Type() == MGROUP_TRANSFORM::ROTATE) {
             parameter.anchor = transform.ToGlobal(parameter.anchor);
@@ -143,8 +145,9 @@ void PoseGroup(std::vector<Vertex>& posed, const VertexRange& range, const Scene
 
 } // namespace
 
-void VesselPose::Reset(std::vector<Vertex> mesh, std::vector<VertexRange> groups)
+void VesselPose::Reset(std::vector<Vertex> mesh, std::vector<VertexRange> groups, std::vector<MeshGroups> meshes)
 {
+    meshes_ = std::move(meshes);
     mesh_ = std::move(mesh);
     groups_ = std::move(groups);
     posed_ = mesh_;
@@ -162,7 +165,15 @@ bool VesselPose::Update(const VESSEL& vessel)
         changed |= states_[i] != data[i].state;
         states_[i] = data[i].state;
     }
-    if (!changed) return false;
+    for (unsigned index = 0; index < meshes_.size(); ++index) {
+        auto& mesh = meshes_[index];
+        if (!mesh.count) continue;
+        VECTOR3 offset{};
+        vessel.GetMeshOffset(index, offset);
+        changed |= offset.x != mesh.offset.x || offset.y != mesh.offset.y || offset.z != mesh.offset.z;
+        mesh.offset = offset;
+    }
+    if (!changed || mesh_.empty()) return false;
     initialized_ = true;
     posed_ = mesh_;
 
@@ -182,11 +193,17 @@ bool VesselPose::Update(const VESSEL& vessel)
             const auto to = std::clamp((animation.state - component.state0) / span, 0.0, 1.0);
             if (from == to) continue;
             const auto transform = Transform(*component.trans, ParameterFor(parameters, component.trans), from, to);
-            Apply(component, transform, parameters, transforms, moved);
+            Apply(component, transform, parameters, meshes_, transforms, moved);
         }
     }
-    for (std::size_t i = 0; i < groups_.size(); ++i) {
-        if (moved[i]) PoseGroup(posed_, groups_[i], transforms[i]);
+    for (const auto& mesh : meshes_) {
+        const bool offset = Dot(mesh.offset, mesh.offset) != 0;
+        for (auto i = mesh.first; i < mesh.first + mesh.count; ++i) {
+            if (!moved[i] && !offset) continue;
+            // Animation pivots are mesh-local. Place the posed group in vessel space last.
+            transforms[i].origin = Add(transforms[i].origin, mesh.offset);
+            PoseGroup(posed_, groups_[i], transforms[i]);
+        }
     }
     return true;
 }

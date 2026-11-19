@@ -35,11 +35,14 @@ TextureData DecodeDds(const std::vector<std::uint8_t>& bytes, const std::filesys
 struct SceneUniform {
     float projection[16];
     float light[4];
+    float eye[4];
 };
 
 struct MaterialUniform {
-    float diffuse[4] = {1, 1, 1, 1};
-    float emission[4] = {};
+    std::array<float, 4> diffuse{1, 1, 1, 1};
+    std::array<float, 4> emission{};
+    std::array<float, 4> ambient{1, 1, 1, 0};
+    std::array<float, 4> specular{}; // RGB reflectance and Orbiter specular power
 };
 
 enum class DrawPass { Terrain, Shadow, Opaque, Translucent };
@@ -104,6 +107,7 @@ private:
         unsigned indexCount = 0;
         bool visible = false;
     };
+    void ClearShip() noexcept;
     void Release(GroundTile&) noexcept;
     void UpdateVesselVertices(const std::vector<Vertex>&, SDL_GPUBuffer*, SDL_GPUTransferBuffer*);
     SDL_GPUTexture* UploadTexture(const TextureData&);

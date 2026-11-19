@@ -66,7 +66,7 @@ public:
         Require(SDL_InitSubSystem(SDL_INIT_VIDEO), "Initialize Vulkan window");
         initialized_ = true;
         const auto& config = GetNativeRenderContext().configuration->CfgDevPrm;
-        window_ = SDL_CreateWindow("Orbiter - Runway 33 [Vulkan]", config.WinW, config.WinH,
+        window_ = SDL_CreateWindow("Orbiter [Vulkan]", config.WinW, config.WinH,
             SDL_WINDOW_VULKAN | SDL_WINDOW_RESIZABLE);
         Require(window_ != nullptr, "Open Vulkan window");
         SDL_GetWindowSizeInPixels(window_, &width_, &height_);

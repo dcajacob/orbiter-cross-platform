@@ -68,8 +68,9 @@ public:
                 if (!PlanetTexturePath("Earth", path))
                     throw std::runtime_error("Cannot locate the stock Earth texture directory");
                 scene_.CaptureFocus(std::filesystem::path(path) / "Archive" / "Surf.tree");
+                if (const char* capture = SDL_getenv("ORBITER_VULKAN_CAPTURE_FRAME"); capture && *capture)
+                    scene_.CaptureFrame(capture);
                 loaded_ = true;
-                Log("Runway33: stock DG-S mesh and textures uploaded");
             } catch (const std::exception& failure) {
                 failed_ = true;
                 Log(failure.what());
