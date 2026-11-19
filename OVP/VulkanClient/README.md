@@ -10,6 +10,10 @@ Orbiter ambient, diffuse, emissive, and specular material properties. Mesh
 animations run in each slot's local coordinates before applying its vessel
 offset. The ground shadow follows that same geometry.
 
+The client preserves authored vessel texture mip levels and generates any
+missing levels at upload. Vessel skins use 4× anisotropic filtering to keep
+fine patterns such as the ISS solar cells stable when viewed at an angle.
+
 ## DeltaGlider approaching the ISS
 
 Copy `ISSApproach.scn` to `Scenarios/Vulkan` and `ISSApproach.lua` to

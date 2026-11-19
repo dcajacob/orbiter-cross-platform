@@ -125,11 +125,12 @@ private:
         SDL_GPUBuffer* vertices = nullptr;
         SDL_GPUBuffer* indices = nullptr;
         std::vector<SDL_GPUTexture*> textures;
+        SDL_GPUSampler* sampler = nullptr; // borrowed from Scene
         std::vector<Group> groups;
     };
     SDL_GPUCopyPass* UploadPass();
     SDL_GPUBuffer* UploadBuffer(SDL_GPUBufferUsageFlags, const void*, std::size_t);
-    void UploadMesh(const SceneMesh&, GpuMesh&);
+    void UploadMesh(const SceneMesh&, GpuMesh&, bool vesselSkin);
     void Release(GpuMesh&) noexcept;
     void DrawMesh(SDL_GPURenderPass*, SDL_GPUCommandBuffer*, const GpuMesh&, DrawPass);
     struct Bounds {
@@ -172,7 +173,7 @@ private:
     };
     void Release(GroundTile&) noexcept;
     void UpdateVesselVertices(const std::vector<Vertex>&, SDL_GPUBuffer*, SDL_GPUTransferBuffer*&, Uint32 bytes);
-    SDL_GPUTexture* UploadTexture(const TextureData&);
+    SDL_GPUTexture* UploadTexture(const TextureData&, bool completeMipChain = false);
     SDL_GPUGraphicsPipeline* CreatePipeline(SDL_GPUShader*, SDL_GPUShader*, DrawPass);
     void ResizeDepth(unsigned, unsigned);
     void SaveFrame(SDL_GPUCommandBuffer*, SDL_GPUTexture*, SDL_GPUTexture*, unsigned, unsigned, const std::filesystem::path& sample);
@@ -183,6 +184,7 @@ private:
     SDL_GPUCommandBuffer* uploadCommands_ = nullptr;
     SDL_GPUCopyPass* uploadPass_ = nullptr;
     SDL_GPUSampler* sampler_ = nullptr;
+    SDL_GPUSampler* vesselSampler_ = nullptr;
     SDL_GPUSampler* terrainSampler_ = nullptr;
     SDL_GPUGraphicsPipeline* sky_ = nullptr;
     SDL_GPUGraphicsPipeline* terrain_ = nullptr;

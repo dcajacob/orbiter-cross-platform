@@ -83,6 +83,13 @@ ViewPlanes CameraPlanes(const SceneUniform& ground)
     return planes;
 }
 
+unsigned MipCount(unsigned width, unsigned height)
+{
+    unsigned levels = 1;
+    for (auto extent = std::max(width, height); extent > 1; extent /= 2) ++levels;
+    return levels;
+}
+
 unsigned LevelSize(const TextureData& texture, unsigned width, unsigned height)
 {
     if (texture.blockBytes) return ((width + 3) / 4) * ((height + 3) / 4) * texture.blockBytes;
@@ -111,7 +118,7 @@ TextureData DecodeDds(const std::vector<std::uint8_t>& bytes, const std::filesys
     texture.width = Read32(bytes, 16);
     texture.levels = std::max(1u, Read32(bytes, 28));
     if (!texture.height || !texture.width || texture.width > 16384 || texture.height > 16384 ||
-        texture.levels > 15 || (Read32(bytes, 112) & 0x220000))
+        texture.levels > MipCount(texture.width, texture.height) || (Read32(bytes, 112) & 0x220000))
         throw std::runtime_error("Unsupported DDS dimensions or type: " + path.string());
 
     const auto flags = Read32(bytes, 80);
@@ -179,6 +186,11 @@ void Scene::Open(SDL_Window* window, bool trace)
     sampler.max_lod = 15;
     sampler_ = SDL_CreateGPUSampler(device_, &sampler);
     Require(sampler_ != nullptr, "Create Vulkan sampler");
+    auto vesselSampler = sampler;
+    vesselSampler.enable_anisotropy = true;
+    vesselSampler.max_anisotropy = 4.0f;
+    vesselSampler_ = SDL_CreateGPUSampler(device_, &vesselSampler);
+    Require(vesselSampler_ != nullptr, "Create Vulkan vessel sampler");
     sampler.address_mode_u = sampler.address_mode_v = sampler.address_mode_w = SDL_GPU_SAMPLERADDRESSMODE_CLAMP_TO_EDGE;
     terrainSampler_ = SDL_CreateGPUSampler(device_, &sampler);
     Require(terrainSampler_ != nullptr, "Create Vulkan terrain sampler");
@@ -326,11 +338,11 @@ void Scene::ResizeDepth(unsigned width, unsigned height)
 
 SDL_GPUCopyPass* Scene::UploadPass()
 {
-    if (!uploadPass_) {
+    if (!uploadCommands_) {
         uploadCommands_ = SDL_AcquireGPUCommandBuffer(device_);
         Require(uploadCommands_ != nullptr, "Acquire Vulkan upload commands");
-        uploadPass_ = SDL_BeginGPUCopyPass(uploadCommands_);
     }
+    if (!uploadPass_) uploadPass_ = SDL_BeginGPUCopyPass(uploadCommands_);
     return uploadPass_;
 }
 
@@ -351,7 +363,7 @@ SDL_GPUBuffer* Scene::UploadBuffer(SDL_GPUBufferUsageFlags usage, const void* da
     return buffer;
 }
 
-SDL_GPUTexture* Scene::UploadTexture(const TextureData& texture)
+SDL_GPUTexture* Scene::UploadTexture(const TextureData& texture, bool completeMipChain)
 {
     auto* pass = UploadPass();
     auto* transfer = Upload(device_, texture.pixels.data(), texture.pixels.size());
@@ -385,7 +397,40 @@ SDL_GPUTexture* Scene::UploadTexture(const TextureData& texture)
         height = std::max(1u, height / 2);
     }
     SDL_ReleaseGPUTransferBuffer(device_, transfer);
-    return image;
+    const unsigned levels = completeMipChain ? MipCount(texture.width, texture.height) : texture.levels;
+    if (texture.levels == levels) return image;
+
+    // Many stock skins contain only a BC-compressed base level. BC images
+    // cannot be render targets. Preserve the supplied levels and filter the
+    // missing tail once on upload into a renderable RGBA texture.
+    info.format = SDL_GPU_TEXTUREFORMAT_R8G8B8A8_UNORM;
+    info.usage |= SDL_GPU_TEXTUREUSAGE_COLOR_TARGET;
+    info.num_levels = levels;
+    auto* chain = SDL_CreateGPUTexture(device_, &info);
+    if (!chain) {
+        SDL_ReleaseGPUTexture(device_, image);
+        Require(false, "Allocate Vulkan vessel mip chain");
+    }
+    SDL_EndGPUCopyPass(uploadPass_);
+    uploadPass_ = nullptr;
+    for (unsigned level = 0; level < levels; ++level) {
+        const bool authored = level < texture.levels;
+        const auto sourceLevel = authored ? level : level - 1;
+        SDL_GPUBlitInfo blit{};
+        blit.source.texture = authored ? image : chain;
+        blit.source.mip_level = sourceLevel;
+        blit.source.w = std::max(1u, texture.width >> sourceLevel);
+        blit.source.h = std::max(1u, texture.height >> sourceLevel);
+        blit.destination.texture = chain;
+        blit.destination.mip_level = level;
+        blit.destination.w = std::max(1u, texture.width >> level);
+        blit.destination.h = std::max(1u, texture.height >> level);
+        blit.load_op = SDL_GPU_LOADOP_DONT_CARE;
+        blit.filter = authored ? SDL_GPU_FILTER_NEAREST : SDL_GPU_FILTER_LINEAR;
+        SDL_BlitGPUTexture(uploadCommands_, &blit);
+    }
+    SDL_ReleaseGPUTexture(device_, image);
+    return chain;
 }
 
 void Scene::SetShip(OBJHANDLE handle, const SceneMesh& mesh)
@@ -393,13 +438,14 @@ void Scene::SetShip(OBJHANDLE handle, const SceneMesh& mesh)
     RemoveShip(handle);
     if (mesh.indices.empty()) return;
     auto& ship = ships_[handle];
-    UploadMesh(mesh, ship.mesh);
+    UploadMesh(mesh, ship.mesh, true);
     ship.indexCount = Uint32(mesh.indices.size());
     ship.vertexBytes = Uint32(mesh.vertices.size() * sizeof(Vertex));
 }
 
-void Scene::UploadMesh(const SceneMesh& mesh, GpuMesh& dest)
+void Scene::UploadMesh(const SceneMesh& mesh, GpuMesh& dest, bool vesselSkin)
 {
+    dest.sampler = vesselSkin ? vesselSampler_ : sampler_;
     dest.vertices = UploadBuffer(SDL_GPU_BUFFERUSAGE_VERTEX, mesh.vertices.data(), mesh.vertices.size() * sizeof(Vertex));
     dest.indices = UploadBuffer(SDL_GPU_BUFFERUSAGE_INDEX, mesh.indices.data(), mesh.indices.size() * sizeof(std::uint32_t));
     TextureData white;
@@ -407,7 +453,7 @@ void Scene::UploadMesh(const SceneMesh& mesh, GpuMesh& dest)
     white.pixels.assign(4, 255);
     dest.textures.reserve(mesh.textures.size());
     for (auto* texture : mesh.textures) {
-        dest.textures.push_back(UploadTexture(texture ? *texture : white));
+        dest.textures.push_back(UploadTexture(texture ? *texture : white, vesselSkin));
     }
     dest.groups = mesh.groups;
 }
@@ -460,7 +506,7 @@ void Scene::AddBase(unsigned index, const SceneMesh& mesh, bool shadows)
 {
     auto& base = bases_.try_emplace(index).first->second;
     if (mesh.indices.empty()) return;
-    UploadMesh(mesh, base.mesh);
+    UploadMesh(mesh, base.mesh, false);
     // Stock structures often split one surface into many consecutive groups.
     // Coalesce identical draw states without changing triangle or blending order.
     base.mesh.groups.clear();
@@ -622,7 +668,7 @@ void Scene::DrawMesh(SDL_GPURenderPass* pass, SDL_GPUCommandBuffer* commands, co
     SDL_BindGPUIndexBuffer(pass, &index, SDL_GPU_INDEXELEMENTSIZE_32BIT);
     for (const auto& group : mesh.groups) {
         if (group.pass != kind) continue;
-        const SDL_GPUTextureSamplerBinding binding{mesh.textures.at(group.textureIndex), kind == DrawPass::BaseTile ? terrainSampler_ : sampler_};
+        const SDL_GPUTextureSamplerBinding binding{mesh.textures.at(group.textureIndex), kind == DrawPass::BaseTile ? terrainSampler_ : mesh.sampler};
         SDL_BindGPUFragmentSamplers(pass, 0, &binding, 1);
         SDL_PushGPUFragmentUniformData(commands, 0, &group.material, sizeof(group.material));
         SDL_DrawGPUIndexedPrimitives(pass, group.indexCount, 1, group.firstIndex, 0, 0);
@@ -687,7 +733,7 @@ bool Scene::Present(const std::vector<VesselDraw>& ships, const SceneUniform& gr
     // the resources referenced by the command buffer until execution finishes.
     auto* commands = uploadCommands_;
     if (commands) {
-        SDL_EndGPUCopyPass(uploadPass_);
+        if (uploadPass_) SDL_EndGPUCopyPass(uploadPass_);
         uploadCommands_ = nullptr;
         uploadPass_ = nullptr;
     } else {
@@ -936,7 +982,7 @@ void Scene::Close() noexcept
 {
     if (!device_) return;
     if (uploadCommands_) {
-        SDL_EndGPUCopyPass(uploadPass_);
+        if (uploadPass_) SDL_EndGPUCopyPass(uploadPass_);
         SDL_CancelGPUCommandBuffer(uploadCommands_);
         uploadPass_ = nullptr;
         uploadCommands_ = nullptr;
@@ -945,6 +991,7 @@ void Scene::Close() noexcept
     capture_.clear();
     ClearMesh();
     if (depth_) SDL_ReleaseGPUTexture(device_, depth_);
+    if (vesselSampler_) SDL_ReleaseGPUSampler(device_, vesselSampler_);
     if (sampler_) SDL_ReleaseGPUSampler(device_, sampler_);
     if (terrainSampler_) SDL_ReleaseGPUSampler(device_, terrainSampler_);
     if (shadowSampler_) SDL_ReleaseGPUSampler(device_, shadowSampler_);
@@ -964,7 +1011,7 @@ void Scene::Close() noexcept
     SDL_DestroyGPUDevice(device_);
     device_ = nullptr;
     depth_ = nullptr;
-    sampler_ = terrainSampler_ = nullptr;
+    sampler_ = vesselSampler_ = terrainSampler_ = nullptr;
     terrain_ = opaque_ = translucent_ = shadow_ = nullptr;
     claimed_ = false;
 }
