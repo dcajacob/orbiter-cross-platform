@@ -145,6 +145,12 @@ On Wayland this allows the compositor to scan a compatible fullscreen buffer
 directly to the display. Overlays and display configuration can still require
 composition. Set `Fullscreen = FALSE` to return to a window on the next launch.
 
+On Mesa 26.0.8 with Wayland FIFO, a late frame can also make Mesa request a
+presentation time well into the future. To isolate that delay, prefix one
+launch with `MESA_VK_WSI_DEBUG=nowlts`. Mesa then uses FIFO barriers without
+commit timestamps. A composited window can still stall in the desktop's own
+buffer swap.
+
 The optional evidence directory receives a Vulkan frame
 as `vulkan-frame.bmp`. Add `--capture-time <sim-seconds>` to capture during flight.
 
