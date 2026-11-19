@@ -83,6 +83,11 @@ struct TerrainMesh {
     std::vector<std::uint32_t> indices;
 };
 
+struct FrameTimings {
+    Uint64 acquireNS = 0, fenceNS = 0, encodeNS = 0, submitNS = 0;
+    unsigned terrainDraws = 0;
+};
+
 class Scene {
 public:
     Scene() = default;
@@ -90,7 +95,7 @@ public:
     Scene(const Scene&) = delete;
     Scene& operator=(const Scene&) = delete;
 
-    void Open(SDL_Window*);
+    void Open(SDL_Window*, bool trace);
     void SetShip(const SceneMesh&);
     void AddBase(unsigned index, const SceneMesh&, bool shadows);
     void RemoveBase(unsigned index) noexcept;
@@ -101,7 +106,7 @@ public:
     bool Present(const SceneUniform& ship, const SceneUniform& ground,
         const std::filesystem::path& sample = {});
     void Capture(std::filesystem::path path) { capture_ = std::move(path); }
-    Uint64 AcquireWaitNS() const { return acquireWaitNS_; }
+    const FrameTimings& Timings() const { return timings_; }
     bool ShadowMapUpdated() const { return mapUpdated_; }
     void Close() noexcept;
     void ClearGround() noexcept;
@@ -171,7 +176,8 @@ private:
     SDL_GPUGraphicsPipeline* pavementShadow_ = nullptr;
     SDL_GPUSampler* shadowSampler_ = nullptr;
     bool mapUpdated_ = false;
-    Uint64 acquireWaitNS_ = 0;
+    bool trace_ = false;
+    FrameTimings timings_;
     unsigned shipIndexCount_ = 0;
     SDL_GPUBuffer* shadowVertices_ = nullptr;
     SDL_GPUTransferBuffer* shipUpload_ = nullptr;

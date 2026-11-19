@@ -168,9 +168,10 @@ Scene::~Scene()
     Close();
 }
 
-void Scene::Open(SDL_Window* window)
+void Scene::Open(SDL_Window* window, bool trace)
 {
     window_ = window;
+    trace_ = trace;
     device_ = SDL_CreateGPUDevice(SDL_GPU_SHADERFORMAT_SPIRV, true, "vulkan");
     Require(device_ != nullptr, "Create native Vulkan GPU device");
     Require(std::string(SDL_GetGPUDeviceDriver(device_)) == "vulkan", "Select Vulkan driver");
@@ -616,6 +617,7 @@ void Scene::DrawGroundShadows(SDL_GPURenderPass* pass, SDL_GPUCommandBuffer* com
 
 bool Scene::Present(const SceneUniform& ship, const SceneUniform& ground, const std::filesystem::path& sample)
 {
+    timings_ = {};
     mapUpdated_ = false;
     auto* commands = SDL_AcquireGPUCommandBuffer(device_);
     Require(commands != nullptr, "Acquire Vulkan commands");
@@ -623,8 +625,19 @@ bool Scene::Present(const SceneUniform& ship, const SceneUniform& ground, const 
     unsigned width = 0;
     unsigned height = 0;
     const auto beforeAcquire = SDL_GetTicksNS();
+    // SDL's Vulkan backend waits for the oldest frame slot and retires GPU
+    // resources before acquiring the next presentation image. Split those
+    // stages only when profiling. Keep blocking acquisition in both paths.
+    if (trace_) {
+        if (!SDL_WaitForGPUSwapchain(device_, window_)) {
+            SDL_CancelGPUCommandBuffer(commands);
+            Require(false, "Wait for Vulkan frame slot");
+        }
+        timings_.fenceNS = SDL_GetTicksNS() - beforeAcquire;
+    }
     const bool acquired = SDL_WaitAndAcquireGPUSwapchainTexture(commands, window_, &back, &width, &height);
-    acquireWaitNS_ = SDL_GetTicksNS() - beforeAcquire;
+    const auto acquiredAt = SDL_GetTicksNS();
+    timings_.acquireNS = acquiredAt - beforeAcquire;
     if (!acquired) {
         SDL_CancelGPUCommandBuffer(commands);
         Require(false, "Acquire Vulkan swapchain image");
@@ -672,6 +685,7 @@ bool Scene::Present(const SceneUniform& ship, const SceneUniform& ground, const 
     for (const auto& [key, tile] : tiles_) {
         if (!tile.visible) continue;
         DrawTile(pass, tile);
+        ++timings_.terrainDraws;
     }
     SDL_BindGPUGraphicsPipeline(pass, pavement_);
     SDL_PushGPUVertexUniformData(commands, 0, &ground, sizeof(ground));
@@ -701,7 +715,13 @@ bool Scene::Present(const SceneUniform& ship, const SceneUniform& ground, const 
         DrawMesh(pass, commands, ship_, kind);
     }
     SDL_EndGPURenderPass(pass);
-    if (!capture) return SDL_SubmitGPUCommandBuffer(commands);
+    if (!capture) {
+        const auto beforeSubmit = SDL_GetTicksNS();
+        const bool submitted = SDL_SubmitGPUCommandBuffer(commands);
+        timings_.encodeNS = beforeSubmit - acquiredAt;
+        timings_.submitNS = SDL_GetTicksNS() - beforeSubmit;
+        return submitted;
+    }
     try {
         SaveFrame(commands, frame, back, width, height, sample);
     } catch (...) {

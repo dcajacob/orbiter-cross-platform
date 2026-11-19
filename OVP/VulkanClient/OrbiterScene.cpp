@@ -189,12 +189,12 @@ void OrbiterScene::Open(SDL_Window* window, BaseMeshes baseMeshes, bool baseShad
         if (!std::filesystem::is_directory(captureDirectory_))
             throw std::runtime_error("Vulkan capture directory does not exist");
     }
-    scene_.Open(window);
     if (const char* path = SDL_getenv("ORBITER_VULKAN_FRAME_TRACE"); path && *path) {
         frameTrace_.open(std::filesystem::path(path));
         if (!frameTrace_) throw std::runtime_error("Cannot open Vulkan frame trace");
-        frameTrace_ << "sim_seconds,interval_ms,scene_ms,terrain_ms,tiles_staged,imagery_staged,tiles_switched,pose_uploaded,shadow_drawn,base_upload_ms,base_shadow_updated,acquire_wait_ms,reanchor_ms,terrain_recentered,visible_tiles,detail_tiles\n";
+        frameTrace_ << "sim_seconds,interval_ms,scene_ms,terrain_ms,tiles_staged,imagery_staged,tiles_switched,pose_uploaded,shadow_drawn,base_upload_ms,base_shadow_updated,acquire_wait_ms,reanchor_ms,terrain_recentered,visible_tiles,detail_tiles,frame_slot_ms,image_acquire_ms,draw_encode_ms,present_submit_ms,terrain_draws\n";
     }
+    scene_.Open(window, frameTrace_.is_open());
     previousFrame_ = 0;
 }
 
@@ -458,12 +458,16 @@ bool OrbiterScene::Present(unsigned width, unsigned height)
         MakeUniform(groundFrame, width, height), samplePath);
     if (frameTrace_.is_open()) {
         const auto milliseconds = [](Uint64 time) { return double(time) / 1000000; };
+        const auto& timing = scene_.Timings();
         frameTrace_ << simTime << ',' << milliseconds(previousFrame_ ? start - previousFrame_ : 0)
                     << ',' << milliseconds(SDL_GetTicksNS() - start) << ',' << milliseconds(terrainTime)
                     << ',' << tiles.staged << ',' << tiles.imagery << ',' << tiles.switched << ',' << poseChanged
                     << ',' << !shadowVertices_.empty() << ',' << milliseconds(baseUploadTime) << ',' << scene_.ShadowMapUpdated()
-                    << ',' << milliseconds(scene_.AcquireWaitNS()) << ',' << milliseconds(reanchorTime)
-                    << ',' << tiles.recentered << ',' << terrain_.VisibleCount() << ',' << terrain_.DetailCount() << '\n';
+                    << ',' << milliseconds(timing.acquireNS) << ',' << milliseconds(reanchorTime)
+                    << ',' << tiles.recentered << ',' << terrain_.VisibleCount() << ',' << terrain_.DetailCount()
+                    << ',' << milliseconds(timing.fenceNS) << ',' << milliseconds(timing.acquireNS - timing.fenceNS)
+                    << ',' << milliseconds(timing.encodeNS) << ',' << milliseconds(timing.submitNS)
+                    << ',' << timing.terrainDraws << '\n';
         previousFrame_ = start;
     }
     return presented;
