@@ -199,8 +199,9 @@ void OrbiterScene::Open(SDL_Window* window, BaseMeshes baseMeshes, bool baseShad
 }
 
 void OrbiterScene::AppendMesh(MESHHANDLE mesh, SceneMesh& ship, std::vector<VertexRange>& groups,
-    std::map<SURFHANDLE, unsigned>& textureSlots) const
+    std::map<SURFHANDLE, unsigned>& textureSlots, std::optional<DrawPass> surfacePass, SURFHANDLE surfaceTexture) const
 {
+    if (!mesh) return;
     const auto materials = oapiMeshMaterialCount(mesh);
     const auto textures = oapiMeshTextureCount(mesh);
     unsigned materialIndex = defaultIndex;
@@ -225,8 +226,8 @@ void OrbiterScene::AppendMesh(MESHHANDLE mesh, SceneMesh& ship, std::vector<Vert
             }
         }
         unsigned gpuTexture = 0;
-        if (textureIndex < textures) {
-            const auto handle = oapiGetTextureHandle(mesh, textureIndex + 1);
+        if (surfaceTexture || textureIndex < textures) {
+            const auto handle = surfaceTexture ? surfaceTexture : oapiGetTextureHandle(mesh, textureIndex + 1);
             const auto* texture = Lookup(handle);
             if (texture) {
                 const auto slot = textureSlots.emplace(handle, unsigned(ship.textures.size()));
@@ -236,8 +237,8 @@ void OrbiterScene::AppendMesh(MESHHANDLE mesh, SceneMesh& ship, std::vector<Vert
         }
         const auto startVertex = unsigned(ship.vertices.size());
         groups[firstGroup + i] = {startVertex, group->nVtx};
-        const auto pass = material.diffuse[3] < 0.999f ? DrawPass::Translucent : DrawPass::Opaque;
-        ship.groups.push_back({unsigned(ship.indices.size()), group->nIdx, gpuTexture, material, pass, !(group->UsrFlag & 1)});
+        const auto pass = surfacePass.value_or(material.diffuse[3] < 0.999f ? DrawPass::Translucent : DrawPass::Opaque);
+        ship.groups.push_back({unsigned(ship.indices.size()), group->nIdx, gpuTexture, material, pass, !surfacePass && !(group->UsrFlag & 1)});
         for (unsigned j = 0; j < group->nVtx; ++j) {
             const auto& v = group->Vtx[j];
             ship.vertices.push_back({{v.x, v.y, v.z}, {v.nx, v.ny, v.nz}, {v.tu, v.tv}});
@@ -259,52 +260,77 @@ void OrbiterScene::CaptureFocus(std::filesystem::path archive)
     terrain_.Open(archivePath_, ObjectFrame(focus_).origin);
     char earthName[] = "Earth";
     const auto earth = oapiGetGbodyByName(earthName);
-    for (unsigned i = 0; i < oapiGetBaseCount(earth); ++i) {
-        const auto candidate = oapiGetBaseByIndex(earth, i);
-        char name[256]{};
-        oapiGetObjectName(candidate, name, sizeof(name) - 1);
-        if (std::strcmp(name, "Cape Canaveral") == 0) {
-            kennedy_ = candidate;
-            double lng, lat;
+    const auto count = oapiGetBaseCount(earth);
+    for (unsigned i = 0; i < count; ++i) {
+        const auto base = oapiGetBaseByIndex(earth, i);
+        double lng, lat;
 #ifdef _WIN32
-            oapiGetBaseEquPos(kennedy_, &lng, &lat, nullptr);
+        oapiGetBaseEquPos(base, &lng, &lat, nullptr);
 #else
-            static_cast<const Base*>(kennedy_)->EquPos(lng, lat);
+        static_cast<const Base*>(base)->EquPos(lng, lat);
 #endif
-            baseFrame_ = terrain_.BaseFrame(lng, lat);
-            break;
-        }
+        bases_.push_back({i, base, terrain_.BasePosition(lng, lat), lng, lat});
     }
     RefreshExterior(*vessel);
 }
 
-void OrbiterScene::LoadBase()
+void OrbiterScene::LoadBase(const EarthBase& base, const SceneFrame& frame)
 {
-    MESHHANDLE* handles = nullptr;
-    unsigned count = 0;
-    baseMeshes_(kennedy_, handles, count);
+    const auto geometry = baseMeshes_(base.handle);
     SceneMesh mesh;
     std::map<SURFHANDLE, unsigned> textures;
     std::vector<VertexRange> groups;
-    for (unsigned i = 0; i < count; ++i) {
-        if (handles[i]) AppendMesh(handles[i], mesh, groups, textures);
+    for (unsigned i = 0; i < geometry.tileCount; ++i) {
+        const auto& tile = geometry.tiles[i];
+        if (tile.mesh && Lookup(tile.tex))
+            AppendMesh(tile.mesh, mesh, groups, textures, DrawPass::BaseTile, tile.tex);
     }
+    const auto tileVertices = mesh.vertices.size();
+    for (unsigned i = 0; i < geometry.surfaceCount; ++i)
+        AppendMesh(geometry.surfaces[i], mesh, groups, textures, DrawPass::Pavement);
+    for (unsigned i = 0; i < geometry.buildingCount; ++i)
+        AppendMesh(geometry.buildings[i], mesh, groups, textures);
     // Place Orbiter's already elevated and rotated structures in the same
     // Earth-fixed tangent frame as the tile vertices. Do this once per region.
-    for (auto& v : mesh.vertices) {
-        const auto pos = baseFrame_.ToGlobal({v.position[0], v.position[1], v.position[2]});
-        const auto normal = baseFrame_.Rotate({v.normal[0], v.normal[1], v.normal[2]});
+    for (std::size_t i = 0; i < mesh.vertices.size(); ++i) {
+        auto& v = mesh.vertices[i];
+        auto pos = frame.ToGlobal({v.position[0], v.position[1], v.position[2]});
+        if (i < tileVertices) pos = terrain_.DrapeSurfaceTile(pos);
+        const auto normal = frame.Rotate({v.normal[0], v.normal[1], v.normal[2]});
         for (unsigned axis = 0; axis < 3; ++axis) {
             v.position[axis] = float(pos.data[axis]);
             v.normal[axis] = float(normal.data[axis]);
         }
     }
-    scene_.SetBase(mesh, baseShadows_);
-    baseLoaded_ = true;
+    scene_.AddBase(base.index, mesh, baseShadows_);
+    char name[256]{};
+    oapiGetObjectName(base.handle, name, sizeof(name) - 1);
     std::ostringstream message;
-    message << "Vulkan Cape Canaveral: " << count << " stock structure meshes, " << mesh.groups.size()
-            << " groups, " << textures.size() << " textures, " << mesh.vertices.size() << " vertices";
+    message << "Vulkan base " << name << ": " << geometry.tileCount << " surface tiles, "
+            << geometry.surfaceCount << " ground meshes, " << geometry.buildingCount << " building meshes, "
+            << mesh.groups.size() << " groups, " << textures.size() << " textures";
     SceneLog(message.str());
+}
+
+bool OrbiterScene::UpdateBases(const VECTOR3& eye)
+{
+    bool uploaded = false;
+    for (auto& base : bases_) {
+        // No elevation or mesh IO for distant bases. Hysteresis avoids repeatedly
+        // rebuilding GPU resources when the camera hovers near the boundary.
+        const auto delta = Subtract(base.position, eye);
+        const double range = base.loaded ? 110000.0 : 100000.0;
+        const bool nearby = Dot(delta, delta) < range * range;
+        if (nearby == base.loaded) continue;
+        if (nearby) {
+            LoadBase(base, terrain_.BaseFrame(base.longitude, base.latitude));
+            uploaded = true;
+        } else {
+            scene_.RemoveBase(base.index);
+        }
+        base.loaded = nearby;
+    }
+    return uploaded;
 }
 
 void OrbiterScene::RefreshExterior(const VESSEL& vessel)
@@ -356,8 +382,7 @@ void OrbiterScene::ClearFocus() noexcept
 {
     focus_ = nullptr;
     archivePath_.clear();
-    kennedy_ = nullptr;
-    baseLoaded_ = false;
+    bases_.clear();
     lastCapture_ = -1;
     exteriorSlots_.clear();
     scene_.ClearMesh();
@@ -376,17 +401,26 @@ bool OrbiterScene::Present(unsigned width, unsigned height)
     const auto start = SDL_GetTicksNS();
     const auto ship = ObjectFrame(focus_);
     const auto simTime = oapiGetSimTime();
+    VECTOR3 camera;
+    oapiCameraGlobalPos(&camera);
+    if (terrain_.NeedsReanchor(camera)) {
+        scene_.ClearGround();
+        terrain_.Open(archivePath_, camera);
+        for (auto& base : bases_) {
+            base.position = terrain_.BasePosition(base.longitude, base.latitude);
+            base.loaded = false;
+        }
+        shadowTime_.reset();
+    }
     const auto groundFrame = terrain_.Frame();
     auto* vessel = oapiGetVesselInterface(focus_);
     RefreshExterior(*vessel);
     const bool poseChanged = pose_.Update(*vessel);
     if (poseChanged) scene_.SetShipPose(pose_.Vertices());
-    TerrainUpdate tiles;
-    Uint64 terrainTime = 0;
-    if (shadowTime_ != simTime || poseChanged) {
-        const auto beforeTerrain = SDL_GetTicksNS();
-        tiles = terrain_.Update(ship.origin, scene_);
-        terrainTime = SDL_GetTicksNS() - beforeTerrain;
+    const auto beforeTerrain = SDL_GetTicksNS();
+    const auto tiles = terrain_.Update(camera, scene_);
+    const auto terrainTime = SDL_GetTicksNS() - beforeTerrain;
+    if (shadowTime_ != simTime || poseChanged || tiles.switched) {
         terrain_.ProjectShadow(groundFrame, ship, pose_.Vertices(), shadowVertices_);
         scene_.SetShadow(shadowVertices_);
         shadowTime_ = simTime;
@@ -405,17 +439,8 @@ bool OrbiterScene::Present(unsigned width, unsigned height)
             SceneLog(sample.str());
         }
     }
-    Uint64 baseUploadTime = 0;
-    bool drawBase = false;
-    if (kennedy_) {
-        const auto offset = Subtract(baseFrame_.origin, groundFrame.ToLocal(ship.origin));
-        drawBase = Dot(offset, offset) < 100000.0 * 100000.0;
-        if (drawBase && !baseLoaded_) {
-            const auto beforeUpload = SDL_GetTicksNS();
-            LoadBase();
-            baseUploadTime = SDL_GetTicksNS() - beforeUpload;
-        }
-    }
+    const auto beforeBases = SDL_GetTicksNS();
+    const auto baseUploadTime = UpdateBases(groundFrame.ToLocal(camera)) ? SDL_GetTicksNS() - beforeBases : 0;
     std::filesystem::path samplePath;
     if (!captureDirectory_.empty()) {
         const auto sample = static_cast<long long>(std::floor(simTime * 10.0 + 1e-6));
@@ -427,7 +452,7 @@ bool OrbiterScene::Present(unsigned width, unsigned height)
         }
     }
     const bool presented = scene_.Present(MakeUniform(ship, width, height),
-        MakeUniform(groundFrame, width, height), drawBase, samplePath);
+        MakeUniform(groundFrame, width, height), samplePath);
     if (frameTrace_.is_open()) {
         const auto milliseconds = [](Uint64 time) { return double(time) / 1000000; };
         frameTrace_ << simTime << ',' << milliseconds(previousFrame_ ? start - previousFrame_ : 0)

@@ -24,7 +24,13 @@ public:
     bool Fill(SURFHANDLE, unsigned, unsigned, unsigned, unsigned, std::uint32_t);
     bool Blit(SURFHANDLE, unsigned, unsigned, SURFHANDLE, unsigned, unsigned, unsigned, unsigned);
 
-    using BaseMeshes = std::function<void(OBJHANDLE, MESHHANDLE*&, unsigned&)>;
+    struct BaseGeometry {
+        const SurftileSpec* tiles = nullptr;
+        MESHHANDLE* surfaces = nullptr;
+        MESHHANDLE* buildings = nullptr;
+        unsigned tileCount = 0, surfaceCount = 0, buildingCount = 0;
+    };
+    using BaseMeshes = std::function<BaseGeometry(OBJHANDLE)>;
     void Open(SDL_Window* window, BaseMeshes baseMeshes, bool baseShadows);
     void CaptureFocus(std::filesystem::path archive);
     void CaptureFrame(std::filesystem::path path) { scene_.Capture(std::move(path)); }
@@ -35,18 +41,25 @@ public:
 
 private:
     SURFHANDLE Add(TextureData);
-    void LoadBase();
+    struct EarthBase {
+        unsigned index;
+        OBJHANDLE handle;
+        VECTOR3 position;
+        double longitude, latitude;
+        bool loaded = false;
+    };
+    void LoadBase(const EarthBase&, const SceneFrame&);
+    bool UpdateBases(const VECTOR3& eye);
     void RefreshExterior(const VESSEL&);
     void AppendMesh(MESHHANDLE, SceneMesh&, std::vector<VertexRange>&,
-        std::map<SURFHANDLE, unsigned>& textureSlots) const;
+        std::map<SURFHANDLE, unsigned>& textureSlots, std::optional<DrawPass> pass = {},
+        SURFHANDLE surfaceTexture = nullptr) const;
     Scene scene_;
     BaseMeshes baseMeshes_;
     bool baseShadows_ = true;
     std::filesystem::path captureDirectory_;
     long long lastCapture_ = -1;
-    OBJHANDLE kennedy_ = nullptr;
-    SceneFrame baseFrame_{};
-    bool baseLoaded_ = false;
+    std::vector<EarthBase> bases_;
     RunwayTerrain terrain_;
     VesselPose pose_;
     std::vector<Vertex> shadowVertices_;

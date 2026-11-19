@@ -209,7 +209,9 @@ void Scene::Open(SDL_Window* window)
     translucent_ = CreatePipeline(vertex.get(), fragment.get(), DrawPass::Translucent);
     shadow_ = CreatePipeline(vertex.get(), fragment.get(), DrawPass::Shadow);
     const auto receiver = shader(Terrain_frag, SDL_GPU_SHADERSTAGE_FRAGMENT, 2, 0);
-    shadowedTerrain_ = CreatePipeline(vertex.get(), receiver.get(), DrawPass::Terrain);
+    pavement_ = CreatePipeline(vertex.get(), fragment.get(), DrawPass::Pavement);
+    groundShadow_ = CreatePipeline(vertex.get(), receiver.get(), DrawPass::GroundShadow);
+    pavementShadow_ = CreatePipeline(vertex.get(), receiver.get(), DrawPass::PavementShadow);
 
     const auto casterVertex = shader(BaseDepth_vert, SDL_GPU_SHADERSTAGE_VERTEX, 0, 1);
     const auto casterFragment = shader(BaseDepth_frag, SDL_GPU_SHADERSTAGE_FRAGMENT, 0, 0);
@@ -238,7 +240,9 @@ void Scene::Open(SDL_Window* window)
 
 SDL_GPUGraphicsPipeline* Scene::CreatePipeline(SDL_GPUShader* vertex, SDL_GPUShader* fragment, DrawPass kind)
 {
-    const bool blend = kind == DrawPass::Translucent || kind == DrawPass::Shadow;
+    const bool decal = kind == DrawPass::Pavement || kind == DrawPass::PavementShadow;
+    const bool projected = kind == DrawPass::GroundShadow || kind == DrawPass::PavementShadow;
+    const bool blend = decal || projected || kind == DrawPass::Translucent || kind == DrawPass::Shadow;
     SDL_GPUVertexBufferDescription buffer{};
     buffer.pitch = sizeof(Vertex);
     const SDL_GPUVertexAttribute attributes[] = {
@@ -267,14 +271,19 @@ SDL_GPUGraphicsPipeline* Scene::CreatePipeline(SDL_GPUShader* vertex, SDL_GPUSha
     info.rasterizer_state.cull_mode = ship ? SDL_GPU_CULLMODE_BACK : SDL_GPU_CULLMODE_NONE;
     info.rasterizer_state.front_face = SDL_GPU_FRONTFACE_CLOCKWISE;
     info.depth_stencil_state.enable_depth_test = true;
-    info.depth_stencil_state.enable_depth_write = !blend;
+    info.depth_stencil_state.enable_depth_write = !blend || kind == DrawPass::Pavement;
+    if (decal || kind == DrawPass::Shadow) {
+        info.rasterizer_state.enable_depth_bias = true;
+        info.rasterizer_state.depth_bias_constant_factor = 2.0f;
+        info.rasterizer_state.depth_bias_slope_factor = 1.0f;
+    }
     info.depth_stencil_state.compare_op = SDL_GPU_COMPAREOP_GREATER_OR_EQUAL;
-    if (kind == DrawPass::Shadow) {
+    if (kind == DrawPass::Shadow || projected) {
         // Blend once per pixel even when several projected triangles overlap.
         const SDL_GPUStencilOpState stamp{
             SDL_GPU_STENCILOP_KEEP, SDL_GPU_STENCILOP_REPLACE, SDL_GPU_STENCILOP_KEEP, SDL_GPU_COMPAREOP_NOT_EQUAL};
         info.depth_stencil_state.front_stencil_state = info.depth_stencil_state.back_stencil_state = stamp;
-        info.depth_stencil_state.compare_mask = info.depth_stencil_state.write_mask = 0xff;
+        info.depth_stencil_state.compare_mask = info.depth_stencil_state.write_mask = projected ? 2 : 1;
         info.depth_stencil_state.enable_stencil_test = true;
     }
     info.target_info.color_target_descriptions = &target;
@@ -377,17 +386,45 @@ void Scene::UploadMesh(const SceneMesh& mesh, GpuMesh& dest)
     dest.groups = mesh.groups;
 }
 
-void Scene::SetBase(const SceneMesh& mesh, bool shadows)
+Scene::Bounds::Bounds()
 {
-    ClearBase();
+    low.fill(std::numeric_limits<float>::max());
+    high.fill(std::numeric_limits<float>::lowest());
+}
+
+void Scene::Bounds::Include(const Vertex& vertex)
+{
+    for (unsigned axis = 0; axis < 3; ++axis) {
+        low[axis] = std::min(low[axis], vertex.position[axis]);
+        high[axis] = std::max(high[axis], vertex.position[axis]);
+    }
+}
+
+bool Scene::Bounds::InShadowFootprint(const std::array<float, 16>& m) const
+{
+    if (low[0] > high[0]) return false;
+    // Project this receiver's bounds onto the shadow map. Only overlapping
+    // terrain tiles and base surfaces need a second draw.
+    for (unsigned row = 0; row < 2; ++row) {
+        const auto axis = row * 2;
+        const float a = m[4 + row] * low[1], b = m[4 + row] * high[1];
+        if (m[12 + row] + m[4 * axis + row] * high[axis] + std::max(a, b) < 0 ||
+            m[12 + row] + m[4 * axis + row] * low[axis] + std::min(a, b) > 1) return false;
+    }
+    return true;
+}
+
+void Scene::AddBase(unsigned index, const SceneMesh& mesh, bool shadows)
+{
+    auto& base = bases_.try_emplace(index).first->second;
     if (mesh.indices.empty()) return;
-    UploadMesh(mesh, base_);
+    UploadMesh(mesh, base.mesh);
     // Stock structures often split one surface into many consecutive groups.
     // Coalesce identical draw states without changing triangle or blending order.
-    base_.groups.clear();
+    base.mesh.groups.clear();
     for (const auto& group : mesh.groups) {
-        if (!base_.groups.empty()) {
-            auto& last = base_.groups.back();
+        if (!base.mesh.groups.empty()) {
+            auto& last = base.mesh.groups.back();
             if (last.firstIndex + last.indexCount == group.firstIndex && last.pass == group.pass &&
                 last.textureIndex == group.textureIndex && last.material.diffuse == group.material.diffuse &&
                 last.material.ambient == group.material.ambient && last.material.emission == group.material.emission &&
@@ -396,77 +433,71 @@ void Scene::SetBase(const SceneMesh& mesh, bool shadows)
                 continue;
             }
         }
-        base_.groups.push_back(group);
+        base.mesh.groups.push_back(group);
     }
-    SceneLog("Vulkan building draw batches: " + std::to_string(base_.groups.size()));
+    for (const auto& group : mesh.groups) {
+        if (group.pass != DrawPass::BaseTile && group.pass != DrawPass::Pavement) continue;
+        for (unsigned i = group.firstIndex; i < group.firstIndex + group.indexCount; ++i)
+            base.surfaces.Include(mesh.vertices[mesh.indices[i]]);
+    }
     if (!shadows) return;
     std::vector<std::uint32_t> indices;
-    baseMin_.fill(std::numeric_limits<float>::max());
-    baseMax_.fill(std::numeric_limits<float>::lowest());
     for (const auto& group : mesh.groups) {
         if (!group.castsShadow) continue;
         const auto begin = mesh.indices.begin() + group.firstIndex;
         indices.insert(indices.end(), begin, begin + group.indexCount);
     }
     if (indices.empty()) return;
-    for (const auto index : indices) {
-        const auto& v = mesh.vertices[index];
-        for (unsigned i = 0; i < 3; ++i) {
-            baseMin_[i] = std::min(baseMin_[i], v.position[i]);
-            baseMax_[i] = std::max(baseMax_[i], v.position[i]);
-        }
-    }
-    baseCasterIndices_ = Buffer(device_, SDL_GPU_BUFFERUSAGE_INDEX, indices.data(), indices.size() * sizeof(indices[0]));
-    baseCasterCount_ = unsigned(indices.size());
+    for (const auto index : indices) base.casters.Include(mesh.vertices[index]);
+    base.casterIndices = Buffer(device_, SDL_GPU_BUFFERUSAGE_INDEX, indices.data(), indices.size() * sizeof(indices[0]));
+    base.casterCount = unsigned(indices.size());
     SDL_GPUTextureCreateInfo map{};
     map.type = SDL_GPU_TEXTURETYPE_2D;
     map.format = SDL_GPU_TEXTUREFORMAT_D16_UNORM;
     map.usage = SDL_GPU_TEXTUREUSAGE_DEPTH_STENCIL_TARGET | SDL_GPU_TEXTUREUSAGE_SAMPLER;
     map.width = map.height = 4096;
     map.layer_count_or_depth = map.num_levels = 1;
-    shadowMap_ = SDL_CreateGPUTexture(device_, &map);
-    Require(shadowMap_ != nullptr, "Allocate Kennedy shadow map");
+    base.shadowMap = SDL_CreateGPUTexture(device_, &map);
+    Require(base.shadowMap != nullptr, "Allocate base shadow map");
 }
 
-bool Scene::PrepareBaseShadow(SDL_GPUCommandBuffer* commands, SceneUniform& ground)
+void Scene::PrepareBaseShadow(SDL_GPUCommandBuffer* commands, Base& base, const SceneUniform& ground)
 {
-    if (!shadowMap_ || ground.light[1] < 0.07f) return false;
+    base.sunlit = base.shadowMap && ground.light[1] >= 0.07f;
+    if (!base.sunlit) return;
     const float sx = ground.light[0] / ground.light[1], sz = ground.light[2] / ground.light[1];
     // Reuse the map until the tip of the highest shadow moves by about half a metre.
-    const float height = baseMax_[1] - baseMin_[1] + 2;
-    if (!mapValid_ || std::max(std::abs(sx - shadowSlopeX_), std::abs(sz - shadowSlopeZ_)) * height > 0.5f) {
+    const float height = base.casters.high[1] - base.casters.low[1] + 2;
+    if (!base.mapValid || std::max(std::abs(sx - base.slopeX), std::abs(sz - base.slopeZ)) * height > 0.5f) {
         for (unsigned axis : {0u, 2u}) {
             const auto row = axis / 2;
             const float slope = axis == 0 ? sx : sz;
-            const float a = slope * baseMin_[1], b = slope * baseMax_[1];
-            const float lo = baseMin_[axis] - std::max(a, b) - 2;
-            const float hi = baseMax_[axis] - std::min(a, b) + 2;
-            shadowTransform_[4 * axis + row] = 1 / (hi - lo);
-            shadowTransform_[4 + row] = -slope / (hi - lo);
-            shadowTransform_[12 + row] = -lo / (hi - lo);
+            const float a = slope * base.casters.low[1], b = slope * base.casters.high[1];
+            const float lo = base.casters.low[axis] - std::max(a, b) - 2;
+            const float hi = base.casters.high[axis] - std::min(a, b) + 2;
+            base.transform[4 * axis + row] = 1 / (hi - lo);
+            base.transform[4 + row] = -slope / (hi - lo);
+            base.transform[12 + row] = -lo / (hi - lo);
         }
-        shadowTransform_[6] = 1 / height;
-        shadowTransform_[14] = (1 - baseMin_[1]) / height;
-        shadowTransform_[15] = 1;
+        base.transform[6] = 1 / height;
+        base.transform[14] = (1 - base.casters.low[1]) / height;
+        base.transform[15] = 1;
         SDL_GPUDepthStencilTargetInfo target{};
-        target.texture = shadowMap_;
+        target.texture = base.shadowMap;
         target.load_op = SDL_GPU_LOADOP_CLEAR;
         target.store_op = SDL_GPU_STOREOP_STORE;
         auto* pass = SDL_BeginGPURenderPass(commands, nullptr, 0, &target);
         SDL_BindGPUGraphicsPipeline(pass, shadowMapPipeline_);
-        SDL_PushGPUVertexUniformData(commands, 0, shadowTransform_.data(), sizeof(shadowTransform_));
-        const SDL_GPUBufferBinding vb{base_.vertices, 0}, ib{baseCasterIndices_, 0};
+        SDL_PushGPUVertexUniformData(commands, 0, base.transform.data(), sizeof(base.transform));
+        const SDL_GPUBufferBinding vb{base.mesh.vertices, 0}, ib{base.casterIndices, 0};
         SDL_BindGPUVertexBuffers(pass, 0, &vb, 1);
         SDL_BindGPUIndexBuffer(pass, &ib, SDL_GPU_INDEXELEMENTSIZE_32BIT);
-        SDL_DrawGPUIndexedPrimitives(pass, baseCasterCount_, 1, 0, 0, 0);
+        SDL_DrawGPUIndexedPrimitives(pass, base.casterCount, 1, 0, 0, 0);
         SDL_EndGPURenderPass(pass);
-        shadowSlopeX_ = sx;
-        shadowSlopeZ_ = sz;
-        mapValid_ = mapUpdated_ = true;
+        base.slopeX = sx;
+        base.slopeZ = sz;
+        base.mapValid = mapUpdated_ = true;
     }
-    ground.shadowTransform = shadowTransform_;
-    ground.shadowTransform[14] += 0.2f / height;
-    return true;
 }
 
 void Scene::Release(GroundTile& tile) noexcept
@@ -485,6 +516,7 @@ void Scene::StageTile(const TileKey& key, const TerrainMesh& mesh)
         mesh.indices.size() * sizeof(std::uint32_t));
     tile.texture = UploadTexture(mesh.texture);
     tile.indexCount = unsigned(mesh.indices.size());
+    for (const auto& vertex : mesh.vertices) tile.bounds.Include(vertex);
 }
 
 void Scene::SelectTiles(const std::set<TileKey>& visible, const std::set<TileKey>& pending)
@@ -539,14 +571,50 @@ void Scene::DrawMesh(SDL_GPURenderPass* pass, SDL_GPUCommandBuffer* commands, co
     SDL_BindGPUIndexBuffer(pass, &index, SDL_GPU_INDEXELEMENTSIZE_32BIT);
     for (const auto& group : mesh.groups) {
         if (group.pass != kind) continue;
-        const SDL_GPUTextureSamplerBinding binding{mesh.textures.at(group.textureIndex), sampler_};
+        const SDL_GPUTextureSamplerBinding binding{mesh.textures.at(group.textureIndex), kind == DrawPass::BaseTile ? terrainSampler_ : sampler_};
         SDL_BindGPUFragmentSamplers(pass, 0, &binding, 1);
         SDL_PushGPUFragmentUniformData(commands, 0, &group.material, sizeof(group.material));
         SDL_DrawGPUIndexedPrimitives(pass, group.indexCount, 1, group.firstIndex, 0, 0);
     }
 }
 
-bool Scene::Present(const SceneUniform& ship, SceneUniform ground, bool drawBase, const std::filesystem::path& sample)
+void Scene::DrawTile(SDL_GPURenderPass* pass, const GroundTile& tile)
+{
+    const SDL_GPUBufferBinding vertex{tile.vertices, 0};
+    const SDL_GPUBufferBinding index{tile.indices, 0};
+    const SDL_GPUTextureSamplerBinding binding{tile.texture, terrainSampler_};
+    SDL_BindGPUVertexBuffers(pass, 0, &vertex, 1);
+    SDL_BindGPUIndexBuffer(pass, &index, SDL_GPU_INDEXELEMENTSIZE_32BIT);
+    SDL_BindGPUFragmentSamplers(pass, 0, &binding, 1);
+    SDL_DrawGPUIndexedPrimitives(pass, tile.indexCount, 1, 0, 0, 0);
+}
+
+void Scene::DrawGroundShadows(SDL_GPURenderPass* pass, SDL_GPUCommandBuffer* commands, SceneUniform ground)
+{
+    SDL_SetGPUStencilReference(pass, 2);
+    for (const auto& entry : bases_) {
+        const auto& caster = entry.second;
+        if (!caster.sunlit) continue;
+        ground.shadowTransform = caster.transform;
+        ground.shadowTransform[14] += 0.2f * caster.transform[6];
+        SDL_PushGPUVertexUniformData(commands, 0, &ground, sizeof(ground));
+        const SDL_GPUTextureSamplerBinding map{caster.shadowMap, shadowSampler_};
+        SDL_BindGPUGraphicsPipeline(pass, groundShadow_);
+        SDL_BindGPUFragmentSamplers(pass, 1, &map, 1);
+        for (const auto& tile : tiles_) {
+            if (tile.second.visible && tile.second.bounds.InShadowFootprint(caster.transform))
+                DrawTile(pass, tile.second);
+        }
+        SDL_BindGPUGraphicsPipeline(pass, pavementShadow_);
+        for (const auto& receiver : bases_) {
+            if (!receiver.second.surfaces.InShadowFootprint(caster.transform)) continue;
+            DrawMesh(pass, commands, receiver.second.mesh, DrawPass::BaseTile);
+            DrawMesh(pass, commands, receiver.second.mesh, DrawPass::Pavement);
+        }
+    }
+}
+
+bool Scene::Present(const SceneUniform& ship, const SceneUniform& ground, const std::filesystem::path& sample)
 {
     mapUpdated_ = false;
     auto* commands = SDL_AcquireGPUCommandBuffer(device_);
@@ -589,29 +657,25 @@ bool Scene::Present(const SceneUniform& ship, SceneUniform ground, bool drawBase
     depth.store_op = SDL_GPU_STOREOP_DONT_CARE;
     depth.stencil_load_op = SDL_GPU_LOADOP_CLEAR;
     depth.stencil_store_op = SDL_GPU_STOREOP_DONT_CARE;
-    const bool shadows = drawBase && PrepareBaseShadow(commands, ground);
+    for (auto& entry : bases_) PrepareBaseShadow(commands, entry.second, ground);
     auto* pass = SDL_BeginGPURenderPass(commands, &color, 1, &depth);
-    SDL_BindGPUGraphicsPipeline(pass, shadows ? shadowedTerrain_ : terrain_);
+    SDL_BindGPUGraphicsPipeline(pass, terrain_);
     auto surfaceFrame = ground;
     surfaceFrame.light[0] = surfaceFrame.light[2] = 0;
     surfaceFrame.light[1] = 1;
     SDL_PushGPUVertexUniformData(commands, 0, &surfaceFrame, sizeof(surfaceFrame));
-    if (shadows) {
-        const SDL_GPUTextureSamplerBinding map{shadowMap_, shadowSampler_};
-        SDL_BindGPUFragmentSamplers(pass, 1, &map, 1);
-    }
     const MaterialUniform surface{{1, 1, 1, 1}, {0, 0, 0, 1}};
     SDL_PushGPUFragmentUniformData(commands, 0, &surface, sizeof(surface));
     for (const auto& [key, tile] : tiles_) {
         if (!tile.visible) continue;
-        const SDL_GPUBufferBinding vertex{tile.vertices, 0};
-        const SDL_GPUBufferBinding index{tile.indices, 0};
-        const SDL_GPUTextureSamplerBinding binding{tile.texture, terrainSampler_};
-        SDL_BindGPUVertexBuffers(pass, 0, &vertex, 1);
-        SDL_BindGPUIndexBuffer(pass, &index, SDL_GPU_INDEXELEMENTSIZE_32BIT);
-        SDL_BindGPUFragmentSamplers(pass, 0, &binding, 1);
-        SDL_DrawGPUIndexedPrimitives(pass, tile.indexCount, 1, 0, 0, 0);
+        DrawTile(pass, tile);
     }
+    SDL_BindGPUGraphicsPipeline(pass, pavement_);
+    SDL_PushGPUVertexUniformData(commands, 0, &ground, sizeof(ground));
+    for (auto kind : {DrawPass::BaseTile, DrawPass::Pavement}) {
+        for (const auto& entry : bases_) DrawMesh(pass, commands, entry.second.mesh, kind);
+    }
+    DrawGroundShadows(pass, commands, ground);
     if (showShadow_) {
         SDL_PushGPUVertexUniformData(commands, 0, &surfaceFrame, sizeof(surfaceFrame));
         SDL_BindGPUGraphicsPipeline(pass, shadow_);
@@ -628,10 +692,8 @@ bool Scene::Present(const SceneUniform& ship, SceneUniform ground, bool drawBase
     }
     for (auto kind : {DrawPass::Opaque, DrawPass::Translucent}) {
         SDL_BindGPUGraphicsPipeline(pass, kind == DrawPass::Opaque ? opaque_ : translucent_);
-        if (drawBase) {
-            SDL_PushGPUVertexUniformData(commands, 0, &ground, sizeof(ground));
-            DrawMesh(pass, commands, base_, kind);
-        }
+        SDL_PushGPUVertexUniformData(commands, 0, &ground, sizeof(ground));
+        for (const auto& entry : bases_) DrawMesh(pass, commands, entry.second.mesh, kind);
         SDL_PushGPUVertexUniformData(commands, 0, &ship, sizeof(ship));
         DrawMesh(pass, commands, ship_, kind);
     }
@@ -693,10 +755,15 @@ void Scene::SaveFrame(SDL_GPUCommandBuffer* commands, SDL_GPUTexture* frame, SDL
 void Scene::ClearMesh() noexcept
 {
     if (!device_) return;
+    ClearGround();
+    ClearShip();
+}
+
+void Scene::ClearGround() noexcept
+{
     for (auto& entry : tiles_) Release(entry.second);
     tiles_.clear();
-    ClearBase();
-    ClearShip();
+    while (!bases_.empty()) RemoveBase(bases_.begin()->first);
 }
 
 void Scene::Release(GpuMesh& mesh) noexcept
@@ -709,15 +776,15 @@ void Scene::Release(GpuMesh& mesh) noexcept
     mesh.vertices = mesh.indices = nullptr;
 }
 
-void Scene::ClearBase() noexcept
+void Scene::RemoveBase(unsigned index) noexcept
 {
-    Release(base_);
-    if (baseCasterIndices_) SDL_ReleaseGPUBuffer(device_, baseCasterIndices_);
-    if (shadowMap_) SDL_ReleaseGPUTexture(device_, shadowMap_);
-    baseCasterIndices_ = nullptr;
-    shadowMap_ = nullptr;
-    baseCasterCount_ = 0;
-    mapValid_ = false;
+    const auto it = bases_.find(index);
+    if (it == bases_.end()) return;
+    auto& base = it->second;
+    Release(base.mesh);
+    if (base.casterIndices) SDL_ReleaseGPUBuffer(device_, base.casterIndices);
+    if (base.shadowMap) SDL_ReleaseGPUTexture(device_, base.shadowMap);
+    bases_.erase(it);
 }
 
 void Scene::ClearShip() noexcept
@@ -743,9 +810,11 @@ void Scene::Close() noexcept
     if (terrainSampler_) SDL_ReleaseGPUSampler(device_, terrainSampler_);
     if (shadowSampler_) SDL_ReleaseGPUSampler(device_, shadowSampler_);
     if (shadowMapPipeline_) SDL_ReleaseGPUGraphicsPipeline(device_, shadowMapPipeline_);
-    if (shadowedTerrain_) SDL_ReleaseGPUGraphicsPipeline(device_, shadowedTerrain_);
+    if (groundShadow_) SDL_ReleaseGPUGraphicsPipeline(device_, groundShadow_);
+    if (pavementShadow_) SDL_ReleaseGPUGraphicsPipeline(device_, pavementShadow_);
+    if (pavement_) SDL_ReleaseGPUGraphicsPipeline(device_, pavement_);
     shadowSampler_ = nullptr;
-    shadowMapPipeline_ = shadowedTerrain_ = nullptr;
+    shadowMapPipeline_ = groundShadow_ = pavementShadow_ = pavement_ = nullptr;
     if (terrain_) SDL_ReleaseGPUGraphicsPipeline(device_, terrain_);
     if (opaque_) SDL_ReleaseGPUGraphicsPipeline(device_, opaque_);
     if (translucent_) SDL_ReleaseGPUGraphicsPipeline(device_, translucent_);

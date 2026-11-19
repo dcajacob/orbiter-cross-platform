@@ -46,7 +46,7 @@ struct MaterialUniform {
     std::array<float, 4> specular{}; // RGB reflectance and Orbiter specular power
 };
 
-enum class DrawPass { Terrain, Shadow, Opaque, Translucent };
+enum class DrawPass { Terrain, BaseTile, Pavement, GroundShadow, PavementShadow, Shadow, Opaque, Translucent };
 
 struct Group {
     unsigned firstIndex;
@@ -92,16 +92,18 @@ public:
 
     void Open(SDL_Window*);
     void SetShip(const SceneMesh&);
-    void SetBase(const SceneMesh&, bool shadows);
+    void AddBase(unsigned index, const SceneMesh&, bool shadows);
+    void RemoveBase(unsigned index) noexcept;
     void SetShipPose(const std::vector<Vertex>&);
     void StageTile(const TileKey&, const TerrainMesh&);
     void SelectTiles(const std::set<TileKey>& visible, const std::set<TileKey>& pending);
     void SetShadow(const std::vector<Vertex>&);
-    bool Present(const SceneUniform& ship, SceneUniform ground, bool drawBase = false,
+    bool Present(const SceneUniform& ship, const SceneUniform& ground,
         const std::filesystem::path& sample = {});
     void Capture(std::filesystem::path path) { capture_ = std::move(path); }
     bool ShadowMapUpdated() const { return mapUpdated_; }
     void Close() noexcept;
+    void ClearGround() noexcept;
     void ClearMesh() noexcept;
 
 private:
@@ -114,15 +116,33 @@ private:
     void UploadMesh(const SceneMesh&, GpuMesh&);
     void Release(GpuMesh&) noexcept;
     void DrawMesh(SDL_GPURenderPass*, SDL_GPUCommandBuffer*, const GpuMesh&, DrawPass);
-    void ClearBase() noexcept;
-    bool PrepareBaseShadow(SDL_GPUCommandBuffer*, SceneUniform&);
+    struct Bounds {
+        std::array<float, 3> low, high;
+        Bounds();
+        void Include(const Vertex&);
+        bool InShadowFootprint(const std::array<float, 16>& projection) const;
+    };
+    struct Base {
+        GpuMesh mesh;
+        SDL_GPUBuffer* casterIndices = nullptr;
+        unsigned casterCount = 0;
+        Bounds casters, surfaces;
+        SDL_GPUTexture* shadowMap = nullptr;
+        std::array<float, 16> transform{};
+        float slopeX = 0, slopeZ = 0;
+        bool mapValid = false, sunlit = false;
+    };
+    void PrepareBaseShadow(SDL_GPUCommandBuffer*, Base&, const SceneUniform&);
+    void DrawGroundShadows(SDL_GPURenderPass*, SDL_GPUCommandBuffer*, SceneUniform);
     struct GroundTile {
         SDL_GPUBuffer* vertices = nullptr;
         SDL_GPUBuffer* indices = nullptr;
         SDL_GPUTexture* texture = nullptr;
         unsigned indexCount = 0;
         bool visible = false;
+        Bounds bounds;
     };
+    void DrawTile(SDL_GPURenderPass*, const GroundTile&);
     void ClearShip() noexcept;
     void Release(GroundTile&) noexcept;
     void UpdateVesselVertices(const std::vector<Vertex>&, SDL_GPUBuffer*, SDL_GPUTransferBuffer*);
@@ -142,17 +162,14 @@ private:
     SDL_GPUGraphicsPipeline* shadow_ = nullptr;
     SDL_GPUTextureFormat depthFormat_ = SDL_GPU_TEXTUREFORMAT_INVALID;
     SDL_GPUTexture* depth_ = nullptr;
-    GpuMesh ship_, base_;
-    SDL_GPUBuffer* baseCasterIndices_ = nullptr;
-    unsigned baseCasterCount_ = 0;
+    GpuMesh ship_;
+    std::map<unsigned, Base> bases_;
     SDL_GPUGraphicsPipeline* shadowMapPipeline_ = nullptr;
-    SDL_GPUGraphicsPipeline* shadowedTerrain_ = nullptr;
-    SDL_GPUTexture* shadowMap_ = nullptr;
+    SDL_GPUGraphicsPipeline* pavement_ = nullptr;
+    SDL_GPUGraphicsPipeline* groundShadow_ = nullptr;
+    SDL_GPUGraphicsPipeline* pavementShadow_ = nullptr;
     SDL_GPUSampler* shadowSampler_ = nullptr;
-    std::array<float, 3> baseMin_{}, baseMax_{};
-    std::array<float, 16> shadowTransform_{};
-    float shadowSlopeX_ = 0, shadowSlopeZ_ = 0;
-    bool mapValid_ = false, mapUpdated_ = false;
+    bool mapUpdated_ = false;
     unsigned shipIndexCount_ = 0;
     SDL_GPUBuffer* shadowVertices_ = nullptr;
     SDL_GPUTransferBuffer* shipUpload_ = nullptr;

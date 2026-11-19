@@ -38,11 +38,14 @@ public:
             if (configured) wrapped_ = SDL_CreateWindowWithProperties(props);
             SDL_DestroyProperties(props);
             Require(wrapped_ != nullptr, "Wrap Orbiter window for Vulkan");
-            scene_.Open(wrapped_, [this](OBJHANDLE base, MESHHANDLE*& buildings, unsigned& count) {
-                MESHHANDLE* pavement = nullptr;
-                DWORD pavementCount = 0, buildingCount = 0;
-                GetBaseStructures(base, &pavement, &pavementCount, &buildings, &buildingCount);
-                count = buildingCount;
+            scene_.Open(wrapped_, [this](OBJHANDLE base) {
+                OrbiterScene::BaseGeometry geometry;
+                DWORD surfaceCount = 0, buildingCount = 0;
+                geometry.tileCount = GetBaseTileList(base, &geometry.tiles);
+                GetBaseStructures(base, &geometry.surfaces, &surfaceCount, &geometry.buildings, &buildingCount);
+                geometry.surfaceCount = surfaceCount;
+                geometry.buildingCount = buildingCount;
+                return geometry;
             }, *static_cast<const bool*>(GetConfigParam(CFGPRM_OBJECTSHADOWS)));
             Log("Runway33: native Vulkan swapchain initialized");
             return window_;

@@ -104,9 +104,18 @@ void RunwayTerrain::Open(const std::filesystem::path& filename, const VECTOR3& o
     const auto clat = std::cos(latitude_);
     const auto slng = std::sin(longitude_);
     const auto clng = std::cos(longitude_);
-    eastScale_ = radius_ * clat;
+    eastScale_ = radius_ * std::max(clat, 1e-12);
     local_.axes = {{{-slng, 0, clng}, {clat * clng, slat, clat * slng}, {-slat * clng, clat, -slat * slng}}};
     local_.origin = Scale(local_.axes[1], radius_ + altitude_);
+}
+
+bool RunwayTerrain::NeedsReanchor(const VECTOR3& position) const
+{
+    // Keep the regional meshes in a well-conditioned float coordinate frame
+    // during long flights and camera jumps, including across the antimeridian.
+    const auto radial = ObjectFrame(earth_).ToLocal(position);
+    constexpr double cosTwoDegrees = 0.9993908270190958;
+    return Dot(radial, local_.axes[1]) < cosTwoDegrees * std::sqrt(Dot(radial, radial));
 }
 
 void RunwayTerrain::Close()
@@ -234,16 +243,16 @@ RunwayTerrain::Tile RunwayTerrain::BuildTile(const TileKey& key, TerrainMesh& me
 
     for (int row = 0; row <= steps; ++row) {
         const auto v = double(row) / steps;
-        const auto z = tile.z - v * tile.length;
+        const auto lat = top - v * angle;
+        const auto clat = std::cos(lat), slat = std::sin(lat);
         for (int column = 0; column <= steps; ++column) {
             const auto u = double(column) / steps;
-            const auto x = tile.x + u * tile.width;
             const auto lng = std::remainder(longitude_ + left + u * angle, 2 * pi);
-            const auto elevation = oapiSurfaceElevationEx(earth_, lng, top - v * angle,
-                elevationLevel, elevationCache_);
-            const auto y = elevation - altitude_ - (x*x + z*z) / (2 * radius_);
-            tile.heights.push_back(y);
-            mesh.vertices.push_back({{float(x), float(y), float(z)}, {0, 1, 0},
+            const auto elevation = oapiSurfaceElevationEx(earth_, lng, lat, elevationLevel, elevationCache_);
+            const VECTOR3 up{clat * std::cos(lng), slat, clat * std::sin(lng)};
+            const auto pos = local_.ToLocal(Scale(up, radius_ + elevation));
+            tile.heights.push_back(pos.y);
+            mesh.vertices.push_back({{float(pos.x), float(pos.y), float(pos.z)}, {0, 1, 0},
                 {texture.u + texture.scale * float(u), texture.v + texture.scale * float(v)}});
         }
     }
@@ -296,6 +305,16 @@ double RunwayTerrain::Tile::Height(double east, double north) const
     return (u + v - 1) * heights[b + 1] + (1 - u) * heights[b] + (1 - v) * heights[a + 1];
 }
 
+std::array<double, 2> RunwayTerrain::GridPosition(double east, double height, double north) const
+{
+    // Mesh vertices use the sphere. Height interpolation uses the source
+    // raster's longitude/latitude grid, also for rays spanning several tiles.
+    const auto point = local_.ToGlobal({east, height, north});
+    const double lng = std::atan2(point.z, point.x);
+    const double lat = std::atan2(point.y, std::hypot(point.x, point.z));
+    return {std::remainder(lng - longitude_, 2 * pi) * eastScale_, (lat - latitude_) * radius_};
+}
+
 const RunwayTerrain::Tile* RunwayTerrain::FindTile(double east, double north) const
 {
     const auto lng = longitude_ + east / eastScale_;
@@ -323,27 +342,47 @@ void RunwayTerrain::ProjectShadow(const SceneFrame& ground, const SceneFrame& sh
         {Dot(ground.axes[0], ship.axes[1]), Dot(ground.axes[1], ship.axes[1]), Dot(ground.axes[2], ship.axes[1])},
         {Dot(ground.axes[0], ship.axes[2]), Dot(ground.axes[1], ship.axes[2]), Dot(ground.axes[2], ship.axes[2])}
     }}};
-    const auto* tile = FindTile(origin.x, origin.z);
+    const Tile* tile = nullptr;
     projected.reserve(vertices.size());
     for (const auto& vertex : vertices) {
         const auto p = localShip.ToGlobal({vertex.position[0], vertex.position[1], vertex.position[2]});
-        double east = p.x, north = p.z;
-        for (int step = 0; step < 3; ++step) {
-            if (!tile || !tile->Contains(east, north)) tile = FindTile(east, north);
-            if (!tile) break;
-            const auto height = std::max(0.0, p.y - tile->Height(east, north));
-            east = p.x - height * rayX;
-            north = p.z - height * rayZ;
+        double east = p.x, north = p.z, groundHeight = 0;
+        for (int step = 0; step < 4; ++step) {
+            const auto grid = GridPosition(east, groundHeight, north);
+            if (!tile || !tile->Contains(grid[0], grid[1])) tile = FindTile(grid[0], grid[1]);
+            if (!tile) {
+                // At sunrise or sunset the shadow may extend beyond visible terrain.
+                projected.clear();
+                return;
+            }
+            groundHeight = tile->Height(grid[0], grid[1]);
+            if (step == 3) break;
+            const double height = std::max(0.0, p.y - groundHeight);
+            const double nextEast = p.x - height * rayX, nextNorth = p.z - height * rayZ;
+            const bool converged = std::abs(nextEast - east) + std::abs(nextNorth - north) < 0.001;
+            east = nextEast;
+            north = nextNorth;
+            if (converged) break;
         }
-        if (!tile || !tile->Contains(east, north)) tile = FindTile(east, north);
-        if (!tile) {
-            // At sunrise or sunset the projected hull can lie beyond the rendered region.
-            projected.clear();
-            return;
-        }
-        const auto y = tile->Height(east, north) + 0.025;
+        const auto y = groundHeight + 0.025;
         projected.push_back({{float(east), float(y), float(north)}, {0, 1, 0}, {0, 0}});
     }
+}
+
+VECTOR3 RunwayTerrain::DrapeSurfaceTile(const VECTOR3& local) const
+{
+    // Orbiter exports legacy tile meshes on a sphere, without Earth elevation.
+    const auto point = local_.ToGlobal(local);
+    const double lng = std::atan2(point.z, point.x);
+    const double lat = std::atan2(point.y, std::hypot(point.x, point.z));
+    const double elevation = oapiSurfaceElevationEx(earth_, lng, lat, 0, elevationCache_);
+    return local_.ToLocal(Scale(point, (radius_ + elevation) / std::sqrt(Dot(point, point))));
+}
+
+VECTOR3 RunwayTerrain::BasePosition(double lng, double lat) const
+{
+    const double c = std::cos(lat);
+    return local_.ToLocal(Scale({c * std::cos(lng), std::sin(lat), c * std::sin(lng)}, radius_));
 }
 
 SceneFrame RunwayTerrain::BaseFrame(double lng, double lat) const

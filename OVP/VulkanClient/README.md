@@ -16,14 +16,21 @@ extends coarser terrain toward the horizon with distance haze. During flight
 it stages tiles over several frames and replaces each coarser tile when all
 four of its children are ready.
 
-## Kennedy buildings and VAB flyby
+## Earth base scenery
 
-`VAB-LowPass.scn` starts the DG-S airborne beside the stock Vehicle Assembly
-Building. Both clients draw the above-ground Cape Canaveral meshes exported by
-Orbiter, including the VAB, hangars and pad structures. Buildings with the
-stock shadow flag cast onto the Earth terrain as the Sun moves. The optional
-Kennedy imagery uses the same geometry. `EnableShadows = FALSE` turns off the
-building shadows.
+The Vulkan client discovers bases from Orbiter's Earth base list. It uploads
+each base's textured surface tiles, pavement, landing pads, runways, and
+above-ground structures when the camera comes within 100 km. The client keeps
+all nearby bases resident and releases each after 110 km. Stock and add-on bases
+use the same Orbiter mesh and texture interfaces. Surface tiles and pavement
+are drawn before ground shadows. Each base with shadow casters has its own
+sunlight depth map. `EnableShadows = FALSE` disables building shadows.
+
+`Kennedy-Pads.scn` and `Habana-Pads.scn` show the DG-S beside the stock pads
+in daylight. Both start in exterior view and can be inspected while paused.
+The stock **DG at Edwards AFB** scenario also exercises overlapping ranges for
+Edwards, Mojave, Palmdale, China Lake, and Inyokern. `VAB-LowPass.scn` starts
+the DG-S airborne beside Kennedy's Vehicle Assembly Building.
 
 For matched flyby frames, start the scenario unpaused with a 0.05-second
 simulation step. Set `ORBITER_VULKAN_CAPTURE_DIR` to an existing output
@@ -150,7 +157,7 @@ cmake --build C:/vulkan-build
 
 Place `VulkanClient.dll` in `Modules/Plugin` and the x64 `SDL3.dll` beside
 `Orbiter.exe` in a Windows Orbiter runtime with the stock assets. Copy the supplied
-`Runway33.scn`, `ShuttleA-Runway33.scn`, and `VAB-LowPass.scn` to `Scenarios`. Select `VulkanClient` as the sole graphics
+`.scn` files to `Scenarios`. Select `VulkanClient` as the sole graphics
 client in that runtime. For the reference capture, use these settings and set
 `PlanetTexDir` to the stock Earth archive directory's parent, `Textures`.
 

@@ -25,8 +25,11 @@ public:
     ~RunwayTerrain();
     void Open(const std::filesystem::path& archive, const VECTOR3& origin);
     void Close();
+    bool NeedsReanchor(const VECTOR3& position) const;
     TerrainUpdate Update(const VECTOR3& position, Scene&);
     SceneFrame Frame() const;
+    VECTOR3 DrapeSurfaceTile(const VECTOR3& local) const;
+    VECTOR3 BasePosition(double longitude, double latitude) const;
     SceneFrame BaseFrame(double longitude, double latitude) const;
     void ProjectShadow(const SceneFrame& ground, const SceneFrame& ship, const std::vector<Vertex>&,
         std::vector<Vertex>& projected) const;
@@ -45,6 +48,7 @@ private:
     Tile BuildTile(const TileKey&, TerrainMesh&);
     void CollectVisible(const TileKey&, std::set<TileKey>&) const;
     void RetainTiles(Scene&);
+    std::array<double, 2> GridPosition(double east, double height, double north) const;
     const Tile* FindTile(double east, double north) const;
     OBJHANDLE earth_ = nullptr;
     SceneFrame local_{};

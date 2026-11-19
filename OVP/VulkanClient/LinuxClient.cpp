@@ -70,11 +70,14 @@ public:
             SDL_WINDOW_VULKAN | SDL_WINDOW_RESIZABLE);
         Require(window_ != nullptr, "Open Vulkan window");
         SDL_GetWindowSizeInPixels(window_, &width_, &height_);
-        scene_.Open(window_, [](OBJHANDLE base, MESHHANDLE*& buildings, unsigned& count) {
-            MESHHANDLE* pavement = nullptr;
-            oapi::UInt32 pavementCount = 0, buildingCount = 0;
-            RenderBaseStructures(base, &pavement, &pavementCount, &buildings, &buildingCount);
-            count = buildingCount;
+        scene_.Open(window_, [](OBJHANDLE base) {
+            OrbiterScene::BaseGeometry geometry;
+            oapi::UInt32 surfaceCount = 0, buildingCount = 0;
+            geometry.tileCount = RenderBaseTiles(base, &geometry.tiles);
+            RenderBaseStructures(base, &geometry.surfaces, &surfaceCount, &geometry.buildings, &buildingCount);
+            geometry.surfaceCount = surfaceCount;
+            geometry.buildingCount = buildingCount;
+            return geometry;
         }, GetNativeRenderContext().configuration->CfgVisualPrm.bShadows);
         capturePending_ = !GetNativeRenderContext().evidence.empty();
     }
