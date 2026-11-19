@@ -119,6 +119,8 @@ private:
         std::vector<SDL_GPUTexture*> textures;
         std::vector<Group> groups;
     };
+    SDL_GPUCopyPass* UploadPass();
+    SDL_GPUBuffer* UploadBuffer(SDL_GPUBufferUsageFlags, const void*, std::size_t);
     void UploadMesh(const SceneMesh&, GpuMesh&);
     void Release(GpuMesh&) noexcept;
     void DrawMesh(SDL_GPURenderPass*, SDL_GPUCommandBuffer*, const GpuMesh&, DrawPass);
@@ -126,6 +128,7 @@ private:
         std::array<float, 3> low, high;
         Bounds();
         void Include(const Vertex&);
+        bool InView(const std::array<std::array<double, 4>, 4>& planes) const;
         bool InShadowFootprint(const std::array<float, 16>& projection) const;
     };
     struct Base {
@@ -145,7 +148,7 @@ private:
         SDL_GPUBuffer* indices = nullptr;
         SDL_GPUTexture* texture = nullptr;
         unsigned indexCount = 0;
-        bool visible = false;
+        bool visible = false, inView = false;
         Bounds bounds;
     };
     void DrawTile(SDL_GPURenderPass*, const GroundTile&);
@@ -160,6 +163,8 @@ private:
 
     SDL_Window* window_ = nullptr;
     SDL_GPUDevice* device_ = nullptr;
+    SDL_GPUCommandBuffer* uploadCommands_ = nullptr;
+    SDL_GPUCopyPass* uploadPass_ = nullptr;
     SDL_GPUSampler* sampler_ = nullptr;
     SDL_GPUSampler* terrainSampler_ = nullptr;
     SDL_GPUGraphicsPipeline* terrain_ = nullptr;

@@ -99,11 +99,20 @@ simulation step for repeatability (`--fixed-step 0.05` on Linux,
 
 Set `ORBITER_VULKAN_FRAME_TRACE` to a writable CSV path to record intervals
 between Vulkan frames, CPU-side scene and terrain times, tile staging, pose
-uploads, base uploads, and shadow map refreshes. `acquire_wait_ms` measures
-wall time inside SDL's blocking swapchain-image acquisition call and is
-included in `scene_ms`. `reanchor_ms` covers resetting the local ground frame
-and its resources. `visible_tiles` and `detail_tiles` report the selected
-terrain and its level-19 subset. Each row's work and wait correspond to the
+uploads, base uploads, and shadow map refreshes. The client records transfers
+in a copy pass on the drawing command buffer. `visible_tiles` and
+`detail_tiles` count the selected terrain and its level-19 subset.
+`terrain_draws` counts the selected tiles drawn in the primary terrain pass
+after camera culling. Shadow receivers use the same camera test.
+
+`acquire_wait_ms` is included in `scene_ms`. With tracing enabled, the client
+first times SDL's wait for a reusable frame slot, including resource retirement,
+as `frame_slot_ms`. It then measures the remaining swapchain image acquisition
+as `image_acquire_ms`. Their sum is the total acquisition time. For ordinary
+presented frames, `draw_encode_ms` covers CPU work from acquisition through
+render-pass recording, and `present_submit_ms` covers the SDL submission call.
+Display scanout needs an independent presentation measurement.
+`reanchor_ms` covers resetting the local ground frame and its resources. Each row's work and wait correspond to the
 **next** row's start-to-start `interval_ms`.
 
 Build with CMake 3.24 or newer, a matching Orbiter build, SDL3 3.4 or newer, and

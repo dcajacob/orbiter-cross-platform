@@ -64,29 +64,23 @@ SDL_GPUTransferBuffer* Upload(SDL_GPUDevice* device, const void* data, std::size
     return buffer;
 }
 
-SDL_GPUBuffer* Buffer(SDL_GPUDevice* device, SDL_GPUBufferUsageFlags usage, const void* data, std::size_t size)
+// Inward-facing left, right, bottom and top clip planes, in local terrain
+// metres. The GPU performs the final near/far and per-triangle clipping.
+using ViewPlanes = std::array<std::array<double, 4>, 4>;
+
+ViewPlanes CameraPlanes(const SceneUniform& ground)
 {
-    auto* transfer = Upload(device, data, size);
-    SDL_GPUBufferCreateInfo info{};
-    info.usage = usage;
-    info.size = static_cast<Uint32>(size);
-    auto* buffer = SDL_CreateGPUBuffer(device, &info);
-    auto* commands = buffer ? SDL_AcquireGPUCommandBuffer(device) : nullptr;
-    if (!commands) {
-        if (buffer) SDL_ReleaseGPUBuffer(device, buffer);
-        SDL_ReleaseGPUTransferBuffer(device, transfer);
-        Require(false, "Allocate Vulkan buffer and upload commands");
+    ViewPlanes planes{};
+    for (unsigned side = 0; side < planes.size(); ++side) {
+        auto& plane = planes[side];
+        for (unsigned i = 0; i < 4; ++i) {
+            const auto* column = ground.projection + 4 * i;
+            plane[i] = double(column[3]) + (side % 2 ? -double(column[side / 2]) : double(column[side / 2]));
+        }
+        // Expand by one metre to keep grazing bounds conservative.
+        plane[3] += std::hypot(plane[0], plane[1], plane[2]);
     }
-    auto* pass = SDL_BeginGPUCopyPass(commands);
-    const SDL_GPUTransferBufferLocation source{transfer, 0};
-    const SDL_GPUBufferRegion target{buffer, 0, info.size};
-    SDL_UploadToGPUBuffer(pass, &source, &target, false);
-    SDL_EndGPUCopyPass(pass);
-    const bool submitted = SDL_SubmitGPUCommandBuffer(commands);
-    SDL_ReleaseGPUTransferBuffer(device, transfer);
-    if (!submitted) SDL_ReleaseGPUBuffer(device, buffer);
-    Require(submitted, "Submit Vulkan buffer upload");
-    return buffer;
+    return planes;
 }
 
 unsigned LevelSize(const TextureData& texture, unsigned width, unsigned height)
@@ -313,8 +307,36 @@ void Scene::ResizeDepth(unsigned width, unsigned height)
     height_ = height;
 }
 
+SDL_GPUCopyPass* Scene::UploadPass()
+{
+    if (!uploadPass_) {
+        uploadCommands_ = SDL_AcquireGPUCommandBuffer(device_);
+        Require(uploadCommands_ != nullptr, "Acquire Vulkan upload commands");
+        uploadPass_ = SDL_BeginGPUCopyPass(uploadCommands_);
+    }
+    return uploadPass_;
+}
+
+SDL_GPUBuffer* Scene::UploadBuffer(SDL_GPUBufferUsageFlags usage, const void* data, std::size_t size)
+{
+    auto* pass = UploadPass();
+    auto* transfer = Upload(device_, data, size);
+    const SDL_GPUBufferCreateInfo info{usage, static_cast<Uint32>(size), 0};
+    auto* buffer = SDL_CreateGPUBuffer(device_, &info);
+    if (!buffer) {
+        SDL_ReleaseGPUTransferBuffer(device_, transfer);
+        Require(false, "Allocate Vulkan buffer");
+    }
+    const SDL_GPUTransferBufferLocation source{transfer, 0};
+    const SDL_GPUBufferRegion target{buffer, 0, info.size};
+    SDL_UploadToGPUBuffer(pass, &source, &target, false);
+    SDL_ReleaseGPUTransferBuffer(device_, transfer);
+    return buffer;
+}
+
 SDL_GPUTexture* Scene::UploadTexture(const TextureData& texture)
 {
+    auto* pass = UploadPass();
     auto* transfer = Upload(device_, texture.pixels.data(), texture.pixels.size());
     SDL_GPUTextureCreateInfo info{};
     info.type = SDL_GPU_TEXTURETYPE_2D;
@@ -325,13 +347,10 @@ SDL_GPUTexture* Scene::UploadTexture(const TextureData& texture)
     info.layer_count_or_depth = 1;
     info.num_levels = texture.levels;
     auto* image = SDL_CreateGPUTexture(device_, &info);
-    auto* commands = image ? SDL_AcquireGPUCommandBuffer(device_) : nullptr;
-    if (!commands) {
-        if (image) SDL_ReleaseGPUTexture(device_, image);
+    if (!image) {
         SDL_ReleaseGPUTransferBuffer(device_, transfer);
-        Require(false, "Allocate Vulkan texture and upload commands");
+        Require(false, "Allocate Vulkan texture");
     }
-    auto* pass = SDL_BeginGPUCopyPass(commands);
     auto width = texture.width;
     auto height = texture.height;
     SDL_GPUTextureTransferInfo source{};
@@ -348,11 +367,7 @@ SDL_GPUTexture* Scene::UploadTexture(const TextureData& texture)
         width = std::max(1u, width / 2);
         height = std::max(1u, height / 2);
     }
-    SDL_EndGPUCopyPass(pass);
-    const bool submitted = SDL_SubmitGPUCommandBuffer(commands);
     SDL_ReleaseGPUTransferBuffer(device_, transfer);
-    if (!submitted) SDL_ReleaseGPUTexture(device_, image);
-    Require(submitted, "Submit Vulkan texture upload");
     return image;
 }
 
@@ -375,8 +390,8 @@ void Scene::SetShip(const SceneMesh& mesh)
 
 void Scene::UploadMesh(const SceneMesh& mesh, GpuMesh& dest)
 {
-    dest.vertices = Buffer(device_, SDL_GPU_BUFFERUSAGE_VERTEX, mesh.vertices.data(), mesh.vertices.size() * sizeof(Vertex));
-    dest.indices = Buffer(device_, SDL_GPU_BUFFERUSAGE_INDEX, mesh.indices.data(), mesh.indices.size() * sizeof(std::uint32_t));
+    dest.vertices = UploadBuffer(SDL_GPU_BUFFERUSAGE_VERTEX, mesh.vertices.data(), mesh.vertices.size() * sizeof(Vertex));
+    dest.indices = UploadBuffer(SDL_GPU_BUFFERUSAGE_INDEX, mesh.indices.data(), mesh.indices.size() * sizeof(std::uint32_t));
     TextureData white;
     white.width = white.height = 1;
     white.pixels.assign(4, 255);
@@ -399,6 +414,18 @@ void Scene::Bounds::Include(const Vertex& vertex)
         low[axis] = std::min(low[axis], vertex.position[axis]);
         high[axis] = std::max(high[axis], vertex.position[axis]);
     }
+}
+
+bool Scene::Bounds::InView(const ViewPlanes& planes) const
+{
+    for (const auto& plane : planes) {
+        // If even the furthest corner is outside, the whole tile is clipped.
+        double distance = plane[3];
+        for (unsigned axis = 0; axis < 3; ++axis)
+            distance += plane[axis] * (plane[axis] < 0 ? low[axis] : high[axis]);
+        if (distance < 0) return false;
+    }
+    return true;
 }
 
 bool Scene::Bounds::InShadowFootprint(const std::array<float, 16>& m) const
@@ -450,7 +477,7 @@ void Scene::AddBase(unsigned index, const SceneMesh& mesh, bool shadows)
     }
     if (indices.empty()) return;
     for (const auto index : indices) base.casters.Include(mesh.vertices[index]);
-    base.casterIndices = Buffer(device_, SDL_GPU_BUFFERUSAGE_INDEX, indices.data(), indices.size() * sizeof(indices[0]));
+    base.casterIndices = UploadBuffer(SDL_GPU_BUFFERUSAGE_INDEX, indices.data(), indices.size() * sizeof(indices[0]));
     base.casterCount = unsigned(indices.size());
     SDL_GPUTextureCreateInfo map{};
     map.type = SDL_GPU_TEXTURETYPE_2D;
@@ -511,9 +538,9 @@ void Scene::Release(GroundTile& tile) noexcept
 void Scene::StageTile(const TileKey& key, const TerrainMesh& mesh)
 {
     auto& tile = tiles_.try_emplace(key).first->second;
-    tile.vertices = Buffer(device_, SDL_GPU_BUFFERUSAGE_VERTEX, mesh.vertices.data(),
+    tile.vertices = UploadBuffer(SDL_GPU_BUFFERUSAGE_VERTEX, mesh.vertices.data(),
         mesh.vertices.size() * sizeof(Vertex));
-    tile.indices = Buffer(device_, SDL_GPU_BUFFERUSAGE_INDEX, mesh.indices.data(),
+    tile.indices = UploadBuffer(SDL_GPU_BUFFERUSAGE_INDEX, mesh.indices.data(),
         mesh.indices.size() * sizeof(std::uint32_t));
     tile.texture = UploadTexture(mesh.texture);
     tile.indexCount = unsigned(mesh.indices.size());
@@ -553,14 +580,10 @@ void Scene::UpdateVesselVertices(const std::vector<Vertex>& vertices, SDL_GPUBuf
     Require(mapped != nullptr, "Map Vulkan pose upload");
     std::memcpy(mapped, vertices.data(), vesselVertexBytes_);
     SDL_UnmapGPUTransferBuffer(device_, transfer);
-    auto* commands = SDL_AcquireGPUCommandBuffer(device_);
-    Require(commands != nullptr, "Acquire Vulkan pose upload commands");
-    auto* copy = SDL_BeginGPUCopyPass(commands);
+    auto* copy = UploadPass();
     const SDL_GPUTransferBufferLocation source{transfer, 0};
     const SDL_GPUBufferRegion target{buffer, 0, vesselVertexBytes_};
     SDL_UploadToGPUBuffer(copy, &source, &target, true);
-    SDL_EndGPUCopyPass(copy);
-    Require(SDL_SubmitGPUCommandBuffer(commands), "Submit Vulkan pose upload");
 }
 
 void Scene::DrawMesh(SDL_GPURenderPass* pass, SDL_GPUCommandBuffer* commands, const GpuMesh& mesh, DrawPass kind)
@@ -603,7 +626,7 @@ void Scene::DrawGroundShadows(SDL_GPURenderPass* pass, SDL_GPUCommandBuffer* com
         SDL_BindGPUGraphicsPipeline(pass, groundShadow_);
         SDL_BindGPUFragmentSamplers(pass, 1, &map, 1);
         for (const auto& tile : tiles_) {
-            if (tile.second.visible && tile.second.bounds.InShadowFootprint(caster.transform))
+            if (tile.second.inView && tile.second.bounds.InShadowFootprint(caster.transform))
                 DrawTile(pass, tile.second);
         }
         SDL_BindGPUGraphicsPipeline(pass, pavementShadow_);
@@ -619,8 +642,17 @@ bool Scene::Present(const SceneUniform& ship, const SceneUniform& ground, const 
 {
     timings_ = {};
     mapUpdated_ = false;
-    auto* commands = SDL_AcquireGPUCommandBuffer(device_);
-    Require(commands != nullptr, "Acquire Vulkan commands");
+    // Record transfers and dependent draws in submission order. SDL tracks
+    // the resources referenced by the command buffer until execution finishes.
+    auto* commands = uploadCommands_;
+    if (commands) {
+        SDL_EndGPUCopyPass(uploadPass_);
+        uploadCommands_ = nullptr;
+        uploadPass_ = nullptr;
+    } else {
+        commands = SDL_AcquireGPUCommandBuffer(device_);
+        Require(commands != nullptr, "Acquire Vulkan commands");
+    }
     SDL_GPUTexture* back = nullptr;
     unsigned width = 0;
     unsigned height = 0;
@@ -682,8 +714,10 @@ bool Scene::Present(const SceneUniform& ship, const SceneUniform& ground, const 
     SDL_PushGPUVertexUniformData(commands, 0, &surfaceFrame, sizeof(surfaceFrame));
     const MaterialUniform surface{{1, 1, 1, 1}, {0, 0, 0, 1}};
     SDL_PushGPUFragmentUniformData(commands, 0, &surface, sizeof(surface));
-    for (const auto& [key, tile] : tiles_) {
-        if (!tile.visible) continue;
+    const auto planes = CameraPlanes(ground);
+    for (auto& [key, tile] : tiles_) {
+        tile.inView = tile.visible && tile.bounds.InView(planes);
+        if (!tile.inView) continue;
         DrawTile(pass, tile);
         ++timings_.terrainDraws;
     }
@@ -825,6 +859,12 @@ void Scene::ClearShip() noexcept
 void Scene::Close() noexcept
 {
     if (!device_) return;
+    if (uploadCommands_) {
+        SDL_EndGPUCopyPass(uploadPass_);
+        SDL_CancelGPUCommandBuffer(uploadCommands_);
+        uploadPass_ = nullptr;
+        uploadCommands_ = nullptr;
+    }
     SDL_WaitForGPUIdle(device_);
     capture_.clear();
     ClearMesh();
