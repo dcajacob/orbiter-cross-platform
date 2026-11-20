@@ -1,0 +1,63 @@
+BEGIN_DESC
+Coast the last seven metres to ISS port 1 in the stock DeltaGlider. The nosecone is open and the ports start aligned. The pilot panel shows the docking instruments until contact, then the camera returns outside.
+END_DESC
+
+BEGIN_ENVIRONMENT
+  System Sol
+  Script ISSDock
+  Date MJD 51982.0975169074
+END_ENVIRONMENT
+
+BEGIN_FOCUS
+  Ship DG-01
+END_FOCUS
+
+BEGIN_CAMERA
+  TARGET DG-01
+  MODE Extern
+  POS 6.83 52.96 -13.52
+  TRACKMODE GlobalFrame
+  FOV 60.00
+END_CAMERA
+
+BEGIN_HUD
+  TYPE Docking
+END_HUD
+
+BEGIN_MFD Left
+  TYPE Docking
+  NAV 0
+END_MFD
+
+BEGIN_MFD Right
+  TYPE Orbit
+  PROJ Ship
+  REF Earth
+  TARGET ISS
+END_MFD
+
+BEGIN_PANEL
+END_PANEL
+
+BEGIN_SHIPS
+ISS:ProjectAlpha_ISS
+  STATUS Orbiting Earth
+  RPOS 4770488.27 4245945.37 -2122703.08
+  RVEL 5242.970 -5610.802 567.655
+  AROT -110.00 -15.00 -84.00
+  IDS 0:1 100 1:2 100 2:3 100 3:4 100 4:5 100
+  NAVFREQ 0 0
+  XPDR 466
+END
+DG-01:DeltaGlider
+  STATUS Orbiting Earth
+  RPOS 4770502.80352 4245917.34121 -2122713.89666
+  RVEL 5242.866472 -5610.438931 567.787146
+  AROT 70.000000 15.000000 84.000000
+  PRPLEVEL 0:0.998 1:0.978
+  NAVFREQ 1 466
+  XPDR 0
+  NOSECONE 1 1.0000
+  AIRLOCK 0 0.0000
+END
+END_SHIPS

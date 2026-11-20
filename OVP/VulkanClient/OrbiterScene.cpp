@@ -111,6 +111,15 @@ const TextureData* OrbiterScene::Lookup(SURFHANDLE surface) const
     return it != surfaces_.end() ? it->second.get() : nullptr;
 }
 
+TextureData* OrbiterScene::Writable(SURFHANDLE surface)
+{
+    const auto it = surfaces_.find(surface);
+    if (it == surfaces_.end()) return nullptr;
+    MakeWritable(*it->second);
+    ++it->second->revision;
+    return it->second.get();
+}
+
 void OrbiterScene::Retain(SURFHANDLE surface)
 {
     const auto it = surfaces_.find(surface);
@@ -121,7 +130,10 @@ bool OrbiterScene::Release(SURFHANDLE surface)
 {
     const auto it = surfaces_.find(surface);
     if (it == surfaces_.end()) return false;
-    if (--it->second->references == 0) surfaces_.erase(it);
+    if (--it->second->references == 0) {
+        scene_.ForgetPanelTexture(it->second.get());
+        surfaces_.erase(it);
+    }
     return true;
 }
 
@@ -142,6 +154,7 @@ bool OrbiterScene::Fill(SURFHANDLE surface, unsigned x, unsigned y, unsigned wid
     if (x > image.width || y > image.height || width > image.width - x || height > image.height - y)
         return false;
     MakeWritable(image);
+    ++image.revision;
     const std::uint8_t rgba[] = {std::uint8_t(color), std::uint8_t(color >> 8), std::uint8_t(color >> 16), 255};
     for (unsigned row = y; row < y + height; ++row)
         for (unsigned col = x; col < x + width; ++col)
@@ -159,6 +172,7 @@ bool OrbiterScene::Blit(SURFHANDLE target, unsigned x, unsigned y, SURFHANDLE so
     if (x > output.width || y > output.height || sx > input->width || sy > input->height)
         return false;
     MakeWritable(output);
+    ++output.revision;
     width = std::min({width, output.width - x, input->width - sx});
     height = std::min({height, output.height - y, input->height - sy});
     for (unsigned row = 0; row < height; ++row) {
@@ -435,7 +449,7 @@ OrbiterScene::VesselUpdate OrbiterScene::UpdateVessels(const SceneFrame& camera,
         update.shadowDrawn |= !visual.shadow.empty();
         // Sphere against the four side planes and the eye. Orbiter's clip radius
         // includes parts extending beyond the nominal size, such as solar panels.
-        if (eye.z + radius > 0 &&
+        if (!(handle == focus_ && oapiCameraInternal()) && eye.z + radius > 0 &&
             std::abs(eye.x * earth.horizontal) <= eye.z + radius * std::hypot(1.0, earth.horizontal) &&
             std::abs(eye.y * earth.vertical) <= eye.z + radius * std::hypot(1.0, earth.vertical)) {
             draws_.push_back({handle, MakeUniform(frame, camera, sun, earth.horizontal, earth.vertical)});

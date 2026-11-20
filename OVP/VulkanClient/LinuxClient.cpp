@@ -1,5 +1,5 @@
 // Licensed under the MIT License
-#include "OrbiterScene.h"
+#include "CockpitSketchpad.h"
 #include "OrbiterNativeBuild.h"
 #include "Production/ModuleBootstrap.h"
 #include "Production/FlightKeys.h"
@@ -34,27 +34,12 @@ constexpr struct {
     {SDL_SCANCODE_KP_9, OAPI_KEY_NUMPAD9},
     {SDL_SCANCODE_COMMA, OAPI_KEY_COMMA}, {SDL_SCANCODE_PERIOD, OAPI_KEY_PERIOD},
     {SDL_SCANCODE_G, OAPI_KEY_G}, {SDL_SCANCODE_F, OAPI_KEY_F}, {SDL_SCANCODE_S, OAPI_KEY_S},
+    {SDL_SCANCODE_F1, OAPI_KEY_F1}, {SDL_SCANCODE_F8, OAPI_KEY_F8},
     {SDL_SCANCODE_F3, OAPI_KEY_F3}, {SDL_SCANCODE_F5, OAPI_KEY_F5}, {SDL_SCANCODE_INSERT, OAPI_KEY_INSERT},
     {SDL_SCANCODE_DELETE, OAPI_KEY_DELETE},
     {SDL_SCANCODE_LEFT, OAPI_KEY_LEFT}, {SDL_SCANCODE_RIGHT, OAPI_KEY_RIGHT},
     {SDL_SCANCODE_UP, OAPI_KEY_UP}, {SDL_SCANCODE_DOWN, OAPI_KEY_DOWN},
     {SDL_SCANCODE_PAGEUP, OAPI_KEY_PRIOR}, {SDL_SCANCODE_PAGEDOWN, OAPI_KEY_NEXT}
-};
-
-class FontResource final : public oapi::Font {
-public:
-    FontResource(int height, bool prop, const char* face, FontStyle style, int orientation)
-        : Font(height, prop, face, style, orientation) {}
-};
-
-class PenResource final : public oapi::Pen {
-public:
-    PenResource(int style, int width, oapi::UInt32 color) : Pen(style, width, color) {}
-};
-
-class BrushResource final : public oapi::Brush {
-public:
-    explicit BrushResource(oapi::UInt32 color) : Brush(color) {}
 };
 
 class Client final : public NativeGraphics {
@@ -147,6 +132,7 @@ public:
     void PostCreation() override {}
     void Render() override
     {
+        scene_.BeginPanelFrame();
         if (!loaded_) {
             char path[4096] = {};
             if (!RenderTexturePath("Earth", path, true))
@@ -239,16 +225,15 @@ public:
     { SDL_SetWindowMouseGrab(window_, active); }
 
     oapi::Font* CreateFontResource(int height, bool prop, const char* face, FontStyle style, int orientation) override
-    { return new FontResource(height, prop, face, style, orientation); }
+    { return new CockpitFont(height, prop, face, style, orientation); }
     void ReleaseFontResource(oapi::Font* font) override { delete font; }
     oapi::Pen* CreatePenResource(int style, int width, oapi::UInt32 color) override
-    { return new PenResource(style, width, color); }
+    { return new CockpitPen(style, width, color); }
     void ReleasePenResource(oapi::Pen* pen) override { delete pen; }
-    oapi::Brush* CreateBrushResource(oapi::UInt32 color) override { return new BrushResource(color); }
+    oapi::Brush* CreateBrushResource(oapi::UInt32 color) override { return new CockpitBrush(color); }
     void ReleaseBrushResource(oapi::Brush* brush) override { delete brush; }
 
-    // These callbacks belong to the full interactive UI, instruments, and
-    // vessel effects. This client provides only the external scenario view.
+    // The instrument surfaces are independent of the ImGui frame.
     void InitGui() override {}
     void NewGuiFrame() override {}
     void RenderGui() override {}
@@ -273,12 +258,14 @@ public:
     bool clbkGetRenderParam(oapi::UInt32, oapi::UInt32*) const override { return false; }
     bool clbkScaleBlt(SURFHANDLE, oapi::UInt32, oapi::UInt32, oapi::UInt32, oapi::UInt32, SURFHANDLE,
         oapi::UInt32, oapi::UInt32, oapi::UInt32, oapi::UInt32, oapi::UInt32) const override { return false; }
-    void clbkRender2DPanel(SURFHANDLE*, MESHHANDLE, MATRIX3*, bool) override {}
-    void clbkRender2DPanel(SURFHANDLE*, MESHHANDLE, MATRIX3*, float, bool) override {}
+    void clbkRender2DPanel(SURFHANDLE* surfaces, MESHHANDLE mesh, MATRIX3* tx, bool additive) override
+    { clbkRender2DPanel(surfaces, mesh, tx, 1.0f, additive); }
+    void clbkRender2DPanel(SURFHANDLE* surfaces, MESHHANDLE mesh, MATRIX3* tx, float alpha, bool additive) override
+    { scene_.Panel(surfaces, mesh, *tx, alpha, additive, RenderCockpitMfd); }
     std::uint64_t GuiTextureId(SURFHANDLE) override { return 0; }
-    oapi::Sketchpad* AcquireSketchpad(SURFHANDLE) override { return nullptr; }
-    oapi::Sketchpad* AcquireRasterSketchpad(SURFHANDLE) override { return nullptr; }
-    void ReleaseSketchpadResource(oapi::Sketchpad*) override {}
+    oapi::Sketchpad* AcquireSketchpad(SURFHANDLE s) override { return OpenCockpitSketchpad(scene_,s); }
+    oapi::Sketchpad* AcquireRasterSketchpad(SURFHANDLE s) override { return AcquireSketchpad(s); }
+    void ReleaseSketchpadResource(oapi::Sketchpad* pad) override { delete pad; }
     int MeshGroup(DEVMESHHANDLE, oapi::UInt32, GROUPREQUESTSPEC*) override { return -2; }
     MESHHANDLE clbkGetMesh(VISHANDLE, oapi::UInt) override { return nullptr; }
     int EditMeshGroup(DEVMESHHANDLE, int, GROUPEDITSPEC*) override { return -2; }

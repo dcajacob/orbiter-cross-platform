@@ -1,6 +1,6 @@
 // Licensed under the MIT License
 #define ORBITER_MODULE
-#include "OrbiterScene.h"
+#include "CockpitSketchpad.h"
 #include "imgui.h"
 
 #include <cstdio>
@@ -72,6 +72,7 @@ public:
     }
     void clbkRenderScene() override
     {
+        scene_.BeginPanelFrame();
         if (!loaded_ && !failed_) {
             try {
                 char path[MAX_PATH] = {};
@@ -87,6 +88,7 @@ public:
                 PostMessage(window_, WM_CLOSE, 0, 0);
             }
         }
+        if (loaded_ && oapiCameraInternal()) Render2DOverlay();
     }
     bool clbkDisplayFrame() override
     {
@@ -124,8 +126,8 @@ public:
         return true;
     }
 
-    // Orbiter owns the ImGui context. Keep its frame lifecycle valid for the
-    // startup dialogs while the prototype only draws the external 3D view.
+    // Orbiter owns the ImGui context. Cockpit instruments render separately
+    // through the panel and Sketchpad callbacks.
     void clbkImGuiInit() override
     {
         auto& io = ImGui::GetIO();
@@ -137,6 +139,21 @@ public:
     void clbkImGuiShutdown() override {}
     uint64_t clbkImGuiSurfaceTexture(SURFHANDLE) override { return 0; }
 
+    void clbkRender2DPanel(SURFHANDLE* surfaces, MESHHANDLE mesh, MATRIX3* tx, bool additive) override
+    { clbkRender2DPanel(surfaces, mesh, tx, 1.0f, additive); }
+    void clbkRender2DPanel(SURFHANDLE* surfaces, MESHHANDLE mesh, MATRIX3* tx, float alpha, bool additive) override
+    { scene_.Panel(surfaces, mesh, *tx, alpha, additive, [this](int i) { return GetMFDSurface(i); }); }
+    oapi::Font* clbkCreateFont(int height, bool prop, const char* face, FontStyle style, int angle) const override
+    { return new CockpitFont(height, prop, face, style, angle); }
+    void clbkReleaseFont(oapi::Font* font) const override { delete font; }
+    oapi::Pen* clbkCreatePen(int style, int width, DWORD color) const override { return new CockpitPen(style,width,color); }
+    void clbkReleasePen(oapi::Pen* pen) const override { delete pen; }
+    oapi::Brush* clbkCreateBrush(DWORD color) const override { return new CockpitBrush(color); }
+    void clbkReleaseBrush(oapi::Brush* brush) const override { delete brush; }
+    oapi::Sketchpad* clbkGetSketchpad(SURFHANDLE s) override { return OpenCockpitSketchpad(scene_,s); }
+    void clbkReleaseSketchpad(oapi::Sketchpad* pad) override { delete pad; }
+
+    DWORD clbkGetDeviceColour(BYTE r, BYTE g, BYTE b) override { return RGB(r, g, b); }
     SURFHANDLE clbkLoadTexture(const char* name, DWORD) override { return LoadSurface(name); }
     SURFHANDLE clbkLoadSurface(const char* name, DWORD, bool path) override { return LoadSurface(name, path); }
     void clbkReleaseTexture(SURFHANDLE surface) override { scene_.Release(surface); }

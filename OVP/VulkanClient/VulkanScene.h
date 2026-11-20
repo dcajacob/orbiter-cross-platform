@@ -28,6 +28,7 @@ struct TextureData {
     SDL_GPUTextureFormat format = SDL_GPU_TEXTUREFORMAT_R8G8B8A8_UNORM;
     std::vector<std::uint8_t> pixels;
     unsigned references = 1;
+    std::uint64_t revision = 0;
 };
 
 TextureData ReadDds(const std::filesystem::path& path);
@@ -95,6 +96,7 @@ struct FrameTimings {
     unsigned terrainDraws = 0;
 };
 
+struct PanelVertex { float x, y, u, v; };
 class Scene {
 public:
     Scene() = default;
@@ -113,6 +115,9 @@ public:
     void RemoveShip(OBJHANDLE) noexcept;
     bool Present(const std::vector<VesselDraw>& ships, const SceneUniform& ground, const EarthView& earth,
         const std::filesystem::path& sample = {});
+    void BeginPanelFrame() { panelBatches_.clear(); panelVertices_.clear(); }
+    void PanelGroup(const TextureData*, const MESHGROUP&, const MATRIX3&, float alpha, bool additive);
+    void ForgetPanelTexture(const TextureData*);
     void Capture(std::filesystem::path path) { capture_ = std::move(path); }
     const FrameTimings& Timings() const { return timings_; }
     bool ShadowMapUpdated() const { return mapUpdated_; }
@@ -121,6 +126,26 @@ public:
     void ClearMesh() noexcept;
 
 private:
+    struct PanelBatch {
+        const TextureData* image;
+        Uint32 first, count;
+        float alpha;
+        bool additive;
+    };
+    struct PanelTexture {
+        SDL_GPUTexture* gpu = nullptr;
+        std::uint64_t revision = 0;
+    };
+    void OpenPanel(SDL_GPUShader*, SDL_GPUShader*);
+    void PreparePanel();
+    void DrawPanel(SDL_GPURenderPass*, SDL_GPUCommandBuffer*, unsigned width, unsigned height);
+    void ClearPanel() noexcept;
+    std::vector<PanelVertex> panelVertices_;
+    std::vector<PanelBatch> panelBatches_;
+    std::map<const TextureData*, PanelTexture> panelTextures_;
+    TextureData panelWhite_;
+    SDL_GPUBuffer* panelBuffer_ = nullptr;
+    SDL_GPUGraphicsPipeline* panelPipeline_[2]{};
     struct GpuMesh {
         SDL_GPUBuffer* vertices = nullptr;
         SDL_GPUBuffer* indices = nullptr;

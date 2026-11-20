@@ -257,6 +257,9 @@ void Scene::Open(SDL_Window* window, bool trace)
     sampler.compare_op = SDL_GPU_COMPAREOP_GREATER_OR_EQUAL;
     shadowSampler_ = SDL_CreateGPUSampler(device_, &sampler);
     Require(shadowSampler_ != nullptr, "Create base shadow comparison sampler");
+    const auto panelVertex = shader(Panel_vert, SDL_GPU_SHADERSTAGE_VERTEX, 0, 1);
+    const auto panelFragment = shader(Panel_frag, SDL_GPU_SHADERSTAGE_FRAGMENT, 1, 1);
+    OpenPanel(panelVertex.get(), panelFragment.get());
     const auto properties = SDL_GetGPUDeviceProperties(device_);
     const auto* name = SDL_GetStringProperty(properties, SDL_PROP_GPU_DEVICE_NAME_STRING, "unknown");
     SceneLog(std::string("Vulkan device: ") + name);
@@ -731,6 +734,7 @@ bool Scene::Present(const std::vector<VesselDraw>& ships, const SceneUniform& gr
     mapUpdated_ = false;
     // Record transfers and dependent draws in submission order. SDL tracks
     // the resources referenced by the command buffer until execution finishes.
+    PreparePanel();
     auto* commands = uploadCommands_;
     if (commands) {
         if (uploadPass_) SDL_EndGPUCopyPass(uploadPass_);
@@ -870,6 +874,7 @@ bool Scene::Present(const std::vector<VesselDraw>& ships, const SceneUniform& gr
             SDL_DrawGPUPrimitives(pass, 3, 1, 0, 0);
         }
     }
+    DrawPanel(pass, commands, width, height);
     SDL_EndGPURenderPass(pass);
     if (!capture) {
         const auto beforeSubmit = SDL_GetTicksNS();
@@ -934,6 +939,7 @@ void Scene::SaveFrame(SDL_GPUCommandBuffer* commands, SDL_GPUTexture* frame, SDL
 void Scene::ClearMesh() noexcept
 {
     if (!device_) return;
+    ClearPanel();
     ClearGround();
     while (!ships_.empty()) RemoveShip(ships_.begin()->first);
 }
@@ -990,6 +996,10 @@ void Scene::Close() noexcept
     SDL_WaitForGPUIdle(device_);
     capture_.clear();
     ClearMesh();
+    for (auto& pipeline : panelPipeline_) {
+        if (pipeline) SDL_ReleaseGPUGraphicsPipeline(device_, pipeline);
+        pipeline = nullptr;
+    }
     if (depth_) SDL_ReleaseGPUTexture(device_, depth_);
     if (vesselSampler_) SDL_ReleaseGPUSampler(device_, vesselSampler_);
     if (sampler_) SDL_ReleaseGPUSampler(device_, sampler_);

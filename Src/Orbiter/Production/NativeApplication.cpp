@@ -945,8 +945,6 @@ struct Runtime final:BodyServices,RigidBodyServices,SurfaceServices,NavigationSe
         if(!focus)focus=system->GetVessel(oapi::UInt32(0));
         SetFocus(focus);
         render.camera->ResizeViewport(int(viewportWidth),int(viewportHeight));render.camera->InitState(scenario.string().c_str(),focus);
-        if(vulkanView && !render.camera->IsExternal())
-            throw std::runtime_error("The Runway 33 Vulkan client requires an external camera");
 #ifndef ORBITER_NATIVE_COCKPIT
         if(!render.camera->IsExternal())unsupported("cockpits yet; select an external camera");
 #endif
@@ -1475,6 +1473,7 @@ int main(int argc,char** argv) {
 #endif
                     application.render.paused=!application.running;application.render.graphics->Status(application.Status());application.render.graphics->Render();
 #ifdef ORBITER_NATIVE_COCKPIT
+                    if(vulkanView && application.render.camera->IsInternal()) application.cockpit->Render();
                     if(!vulkanView) {
                         application.cockpit->Draw();
                         application.render.graphics->RenderGui();

@@ -1,6 +1,6 @@
 # Runway 33 Vulkan client
 
-This opt-in client draws visible vessel exteriors on Windows and Linux
+This opt-in client draws vessel exteriors and the stock 2D pilot panel on Windows and Linux
 using SDL3's Vulkan backend and shared SPIR-V shaders. `Runway33.scn` starts
 the stock DG-S at Kennedy. `ShuttleA-Runway33.scn` places an unloaded stock
 Shuttle-A at the same position, heading, and scenario time for comparison.
@@ -33,6 +33,28 @@ resident while they are large enough to see, and share the scene depth
 buffer. With frame tracing enabled, `vessels_drawn` records the number of
 vessel exteriors submitted in the camera view and `focus` names the active
 vessel.
+
+## Fly the approach from the panel
+
+Install `ISSPilot.scn` and `ISSDock.scn` in `Scenarios/Vulkan` and their
+matching Lua files in `Script`. Launch either scenario unpaused from the Qt
+Launchpad. Both use stock DeltaGlider and ISS assets. The left Docking MFD
+receives ISS port 1 on NAV1 at 108.05 MHz. Its **DST** is the distance
+between the ports in metres and **CVEL** is the closing speed in m/s.
+
+- **ISSPilot** starts with the same orbital positions and velocities as
+  ISSApproach. The glider faces the station with its nosecone open. After
+  three seconds the camera moves into the 2D panel. A five-second aft
+  translation burn slows the approach, then the camera returns outside
+  at about 22 seconds. Press **F1** to change views yourself after the tour.
+- **ISSDock** starts with aligned ports, 7 m apart and closing at 0.4 m/s.
+  Orbiter captures the ports in free flight. The script checks the mate at
+  each port, holds the pilot view for four seconds so the MFD can display
+  **DOCKED**, then shows the joined vessels from outside.
+
+The panel compositor uses Orbiter's mesh groups, live MFD surfaces and
+Sketchpad drawing calls. The embedded glyph atlas uses Lekton Bold under
+the [SIL Open Font License](../../Extern/imgui/Lekton%20-%20SIL%20License.txt).
 
 The client streams stock Earth surface tiles from `Earth/Archive/Surf.tree` and
 uses Orbiter's elevation data. Two hemisphere tiles cover the planet from the

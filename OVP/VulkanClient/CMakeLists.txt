@@ -15,7 +15,7 @@ else()
     find_program(GLSLANG_VALIDATOR glslangValidator REQUIRED)
     set(shader_dir "${CMAKE_CURRENT_BINARY_DIR}")
 endif()
-set(shader_sources Ship.vert Ship.frag Earth.frag Sky.vert Sky.frag Terrain.frag BaseDepth.vert BaseDepth.frag)
+set(shader_sources Ship.vert Ship.frag Earth.frag Sky.vert Sky.frag Terrain.frag BaseDepth.vert BaseDepth.frag Panel.vert Panel.frag)
 foreach(shader IN LISTS shader_sources)
     set(object "${shader_dir}/${shader}.spv")
     list(APPEND shader_objects "${object}")
@@ -26,13 +26,20 @@ foreach(shader IN LISTS shader_sources)
     endif()
 endforeach()
 
+# Embed the stock Lekton glyph atlas in the client, alongside the shaders.
+set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS CockpitFont.png)
+file(READ "${CMAKE_CURRENT_SOURCE_DIR}/CockpitFont.png" cockpit_font HEX)
+string(REGEX REPLACE "(..)" "0x\\1," cockpit_font "${cockpit_font}")
+file(CONFIGURE OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/CockpitFontData.h"
+    CONTENT "constexpr unsigned char cockpitFontPng[] = { @cockpit_font@ };")
+
 set(shader_header "${CMAKE_CURRENT_BINARY_DIR}/ShipShaders.h")
 add_custom_command(OUTPUT "${shader_header}"
     COMMAND "${CMAKE_COMMAND}" "-DSHADER_DIR=${shader_dir}" "-DOUTPUT=${shader_header}" "-DSHADERS=${shader_sources}"
             -P "${CMAKE_CURRENT_SOURCE_DIR}/EmbedShaders.cmake"
     DEPENDS ${shader_objects} EmbedShaders.cmake
     VERBATIM)
-add_library(VulkanClient MODULE VulkanScene.cpp OrbiterScene.cpp RunwayTerrain.cpp VesselPose.cpp "${shader_header}")
+add_library(VulkanClient MODULE CockpitSketchpad.cpp Panel.cpp VulkanScene.cpp OrbiterScene.cpp RunwayTerrain.cpp VesselPose.cpp "${shader_header}")
 target_compile_features(VulkanClient PRIVATE cxx_std_17)
 target_include_directories(VulkanClient PRIVATE "${CMAKE_CURRENT_BINARY_DIR}")
 target_link_libraries(VulkanClient PRIVATE SDL3::SDL3 Threads::Threads)

@@ -18,6 +18,10 @@ public:
     SURFHANDLE Load(const std::filesystem::path&);
     SURFHANDLE Create(unsigned width, unsigned height);
     const TextureData* Lookup(SURFHANDLE) const;
+    TextureData* Writable(SURFHANDLE);
+    void BeginPanelFrame() { scene_.BeginPanelFrame(); }
+    void Panel(SURFHANDLE*, MESHHANDLE, const MATRIX3&, float alpha, bool additive,
+        const std::function<SURFHANDLE(int)>& mfd);
     void Retain(SURFHANDLE);
     bool Release(SURFHANDLE);
     bool Size(SURFHANDLE, unsigned&, unsigned&) const;
