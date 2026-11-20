@@ -39,7 +39,9 @@ def main():
     args = parser.parse_args()
     args.output.mkdir(parents=True, exist_ok=False)
     cases = json.loads((HERE / 'behavior-cases.json').read_text())['cases']
-    with tempfile.TemporaryDirectory(prefix='orbctl-') as temporary:
+    # Scenarios hard-link several gigabytes of stock and planetary data.
+    # Windows defaults to a different temp volume and would copy every asset.
+    with tempfile.TemporaryDirectory(dir=args.data.resolve().parent, prefix='orbctl-') as temporary:
         scratch = Path(temporary)
         source, build = scratch / 'src', scratch / 'build'
         subprocess.run(['git', 'clone', '--quiet', '--shared', '--no-checkout', ROOT, source], check=True)
