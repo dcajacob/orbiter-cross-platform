@@ -259,6 +259,7 @@ def main():
     parser.add_argument('--planets',type=Path);parser.add_argument('--output',type=Path,required=True)
     parser.add_argument('--configuration',choices=('Debug','Release'))
     parser.add_argument('--case',action='append');parser.add_argument('--compare',type=Path)
+    parser.add_argument('--source-profile', choices=('original', 'opengl'), default='original')
     args=parser.parse_args()
     require(sys.platform=='win32' or args.compare is not None,'production behavioral capture requires native Windows')
     manifest=json.loads(Path(__file__).with_name('behavior-cases.json').read_text())
@@ -270,14 +271,18 @@ def main():
         print(json.dumps(report,indent=2));return
     require(all((args.orbiter,args.data,args.planets,args.configuration)),
             'capture requires --orbiter, --data, --planets, and --configuration')
-    verify_observation_source()
     require(not git('status','--porcelain','--untracked-files=no').strip(),'behavior capture requires committed sources')
+    if args.source_profile == 'opengl':
+        from opengl_behavior_source import verify
+        verify()
+    else:
+        verify_observation_source()
     for name in ('stock-data.lock.json','standard-planets.lock.json'):
         profile=json.loads(Path(__file__).with_name(name).read_text());base=args.data if name.startswith('stock') else args.planets
         for path,entry in profile['data_files'].items():require(digest(base/path)==entry['sha256'],'incompatible behavior data: '+path)
     executable=args.orbiter.resolve();output=args.output.resolve();output.mkdir(parents=True,exist_ok=False)
     require((executable.parent/'Modules/Plugin/ProductionBehaviorDriver.dll').is_file(),'source-built production behavior driver missing')
-    report=dict(status='candidate',source_commit=git('rev-parse','HEAD').decode().strip(),configuration=args.configuration,
+    report=dict(status='candidate',source_profile=args.source_profile,source_commit=git('rev-parse','HEAD').decode().strip(),configuration=args.configuration,
                 binary_sha256=digest(executable),case_manifest_sha256=digest(Path(__file__).with_name('behavior-cases.json')),cases={})
     runtime=executable.parent/'test-runtime.json'
     report['application_source_commit']=json.loads(runtime.read_text())['source_commit'] if runtime.exists() else report['source_commit']

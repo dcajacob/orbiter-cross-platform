@@ -326,10 +326,10 @@ jobs:
         run: >-
           python Tests/Production/prepare_data.py --lock Tests/Production/standard-planets.lock.json
           --archive out/planet-cache/Orbiter2016.zip --destination out/standard-planets
-      - name: Capture repeated production behavior before extraction
+      - name: Capture repeated production behavior on the reviewed engine
         run: >-
           python Tests/Production/behavior_suite.py --orbiter out/production-app/Orbiter.exe
-          --data out/production-data --planets out/standard-planets --output out/production-behavior
+          --data out/production-data --planets out/standard-planets --output out/production-behavior --source-profile opengl
           --configuration ${{ matrix.configuration }}
       - name: Compare shared application archive decoding against frozen Windows
         run: >-
