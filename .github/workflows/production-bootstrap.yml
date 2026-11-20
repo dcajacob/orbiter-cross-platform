@@ -305,10 +305,12 @@ jobs:
       - uses: actions/cache@v6
         with:
           path: out/data-cache/Orbiter-x64.zip
-          key: production-data-${{ hashFiles('Tests/Production/stock-data.lock.json') }}
+          key: production-data-${{ hashFiles('Tests/Production/stock-data.lock.json', 'Tests/Production/stock-data-container-v2.lock.json') }}
       - name: Prepare and verify pinned SPICE and stock data
         run: >-
-          python Tests/Production/prepare_data.py --archive out/data-cache/Orbiter-x64.zip
+          python Tests/Production/prepare_hosted_data.py
+          --container-lock Tests/Production/stock-data-container-v2.lock.json
+          --archive out/data-cache/Orbiter-x64.zip
           --destination out/production-data
       - name: Verify repeated production orbit and propulsion runs against frozen Windows evidence
         run: >-
