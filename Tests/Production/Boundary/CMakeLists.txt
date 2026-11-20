@@ -2,6 +2,23 @@ if(NOT TARGET orbiter_production_boundary)
     add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/../../../Src/Orbiter/Production" production-boundary)
 endif()
 find_package(Python3 3.9 COMPONENTS Interpreter REQUIRED)
+
+set(_legacy_force_source "${CMAKE_CURRENT_BINARY_DIR}/legacy/ProductionLegacyForces.cpp")
+add_custom_command(OUTPUT "${_legacy_force_source}"
+    COMMAND ${Python3_EXECUTABLE} "${CMAKE_CURRENT_SOURCE_DIR}/../LegacyAerodynamics/generate.py"
+        "${CMAKE_CURRENT_SOURCE_DIR}/../../../Src/Orbiter/Vessel.cpp" "${_legacy_force_source}"
+    DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/../../../Src/Orbiter/Vessel.cpp"
+        "${CMAKE_CURRENT_SOURCE_DIR}/../LegacyAerodynamics/generate.py"
+    VERBATIM)
+add_executable(production_legacy_aerodynamics_test
+    ../LegacyAerodynamics/Forces.Test.cpp "${_legacy_force_source}")
+target_include_directories(production_legacy_aerodynamics_test PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/../LegacyAerodynamics")
+target_link_libraries(production_legacy_aerodynamics_test PRIVATE orbiter_production_boundary)
+target_compile_features(production_legacy_aerodynamics_test PRIVATE cxx_std_17)
+target_compile_definitions(production_legacy_aerodynamics_test PRIVATE NOMINMAX)
+orbiter_stage_core_runtime(production_legacy_aerodynamics_test)
+add_test(NAME Production.LegacyAerodynamics COMMAND production_legacy_aerodynamics_test)
+
 add_executable(production_custom_commands_test CustomCommands.Test.cpp)
 target_include_directories(production_custom_commands_test PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/../../../Src/Orbiter")
 target_compile_features(production_custom_commands_test PRIVATE cxx_std_17)
