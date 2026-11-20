@@ -277,6 +277,10 @@ def main():
         verify()
     else:
         verify_observation_source()
+    capture(args, cases)
+
+
+def capture(args, cases, application_source=None):
     for name in ('stock-data.lock.json','standard-planets.lock.json'):
         profile=json.loads(Path(__file__).with_name(name).read_text());base=args.data if name.startswith('stock') else args.planets
         for path,entry in profile['data_files'].items():require(digest(base/path)==entry['sha256'],'incompatible behavior data: '+path)
@@ -286,6 +290,8 @@ def main():
                 binary_sha256=digest(executable),case_manifest_sha256=digest(Path(__file__).with_name('behavior-cases.json')),cases={})
     runtime=executable.parent/'test-runtime.json'
     report['application_source_commit']=json.loads(runtime.read_text())['source_commit'] if runtime.exists() else report['source_commit']
+    if application_source is not None:
+        report['application_source_commit'] = application_source
     failures=[]
     try:
         for case in cases:

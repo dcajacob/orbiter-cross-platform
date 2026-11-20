@@ -336,9 +336,10 @@ jobs:
           python Tests/Production/Archives/verify_port.py
           --executable out/production-app/production_archive_observer.exe --data out/standard-planets
           --output out/production-archives --configuration ${{ matrix.configuration }}
-      - name: Compare behavior against the explicitly frozen production references
+      - name: Compare OpenGL flights with the pre-DelThruster build and replay the frozen physics
         run: >-
-          python Tests/Production/frozen_behavior.py --candidate out/production-behavior
+          python Tests/Production/opengl_behavior_controls.py --candidate out/production-behavior
+          --data out/production-data --planets out/standard-planets --output out/behavior-controls
           --configuration ${{ matrix.configuration }}
       - name: Archive references and build metadata, including failures
         if: always()
@@ -347,6 +348,7 @@ jobs:
           name: production-reference-${{ matrix.configuration }}-x64
           retention-days: 30
           path: |
+            out/behavior-controls/*.json
             out/production-behavior/**/*.csv
             out/production-behavior/**/*.json
             out/production-behavior/**/*.txt
