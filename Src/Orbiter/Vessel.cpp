@@ -1388,47 +1388,51 @@ ThrustSpec *Vessel::CreateThruster (const Vector &pos, const Vector &dir, double
 
 // ==============================================================
 
+static void UpdateThrusterGroupLimits(ThrustGroupSpec &group, THGROUP_TYPE type, double *angular_moment)
+{
+	group.maxth_sum = 0.0;
+	for (const auto *thruster : group.ts)
+		group.maxth_sum += thruster->maxth0;
+
+	if (type >= THGROUP_ATT_PITCHUP && type <= THGROUP_ATT_BANKRIGHT) {
+		Vector moment(0, 0, 0);
+		for (const auto *thruster : group.ts)
+			moment += MakeVector(crossp(thruster->dir * thruster->maxth0, thruster->ref));
+		angular_moment[type - THGROUP_ATT_PITCHUP] = moment.length();
+	}
+}
+
 bool Vessel::DelThruster (ThrustSpec *ts)
 {
-	oapi::UInt32 i, j, k, m;
-	ThrustSpec **tmp;
-	ThrustGroupSpec *tgs;
+	auto owned = std::find(m_thruster.begin(), m_thruster.end(), ts);
+	if (owned == m_thruster.end()) return false;
 
 	// remove all exhaust specs which link to this thruster
-	for (i = nexhaust-1; (int)i >= 0; i--) {
+	for (auto i = nexhaust; i-- > 0;) {
 		if (exhaust[i]->level == &ts->level)
 			DelExhaust (exhaust[i]->id);
 	}
 	// same for particle streams
-	for (i = ncontrail-1; (int)i >= 0; i--) {
+	for (auto i = ncontrail; i-- > 0;) {
 		if (GetVesselServices().ParticleLevel(contrail[i]) == &ts->level)
 			DelExhaustStream (contrail[i]);
 	}
 
-	// remove from default thruster group lists
-	for (auto it = m_thrusterGroupDef.begin(); it != m_thrusterGroupDef.end(); it++) {
-		ThrustGroupSpec* tgs = &(*it);
-		for (auto its = tgs->ts.begin(); its != tgs->ts.end(); its++) {
-			if (*its == ts)
-				tgs->ts.erase(its);
+	auto removeFromGroup = [&](ThrustGroupSpec &group, THGROUP_TYPE type) {
+		auto end = std::remove(group.ts.begin(), group.ts.end(), ts);
+		if (end != group.ts.end()) {
+			group.ts.erase(end, group.ts.end());
+			UpdateThrusterGroupLimits(group, type, max_angular_moment);
 		}
-	}
-	// remove from user thruster group lists
-	for (auto it = m_thrusterGroupUsr.begin(); it != m_thrusterGroupUsr.end(); it++) {
-		ThrustGroupSpec* tgs = *it;
-		for (auto its = tgs->ts.begin(); its != tgs->ts.end(); its++) {
-			if (*its == ts)
-				tgs->ts.erase(its);
-		}
-	}
-	// remove from full thruster list
-	auto it = std::find(m_thruster.begin(), m_thruster.end(), ts);
-	if (it != m_thruster.end()) {
-		delete *it;
-		m_thruster.erase(it);
-		return true;
-	}
-	return false;
+	};
+	for (size_t i = 0; i < m_thrusterGroupDef.size(); ++i)
+		removeFromGroup(m_thrusterGroupDef[i], static_cast<THGROUP_TYPE>(i));
+	for (auto *group : m_thrusterGroupUsr)
+		if (group) removeFromGroup(*group, THGROUP_USER);
+
+	m_thruster.erase(owned);
+	delete ts;
+	return true;
 }
 
 // ==============================================================
@@ -1575,18 +1579,9 @@ ThrustGroupSpec *Vessel::CreateThrusterGroup (ThrustSpec **ts, oapi::UInt32 nts,
 	GetVesselServices().Check(bool(tgs), "Invalid THGROUP_TYPE");
 
 	tgs->ts.resize(nts);
-	tgs->maxth_sum = 0.0;
-	for (i = 0; i < nts; i++) {
+	for (i = 0; i < nts; i++)
 		tgs->ts[i] = ts[i];
-		tgs->maxth_sum += ts[i]->maxth0;
-	}
-	// rotational attitude mode: calculate max. angular momentum
-	if (thgt >= THGROUP_ATT_PITCHUP && thgt <= THGROUP_ATT_BANKRIGHT) {
-		Vector M;
-		for (i = 0; i < nts; i++)
-			M += MakeVector(crossp (ts[i]->dir * ts[i]->maxth0, ts[i]->ref));
-		max_angular_moment[thgt-THGROUP_ATT_PITCHUP] = M.length();
-	}
+	UpdateThrusterGroupLimits(*tgs, thgt, max_angular_moment);
 
 	return tgs;
 }
