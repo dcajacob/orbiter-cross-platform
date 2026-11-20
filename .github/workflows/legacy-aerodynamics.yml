@@ -1,0 +1,33 @@
+name: Legacy aerodynamic forces
+
+on:
+  pull_request:
+    paths:
+      - 'Src/Orbiter/Vessel.cpp'
+      - 'Tests/Production/Boundary/CMakeLists.txt'
+      - 'Tests/Production/LegacyAerodynamics/**'
+      - '.github/workflows/legacy-aerodynamics.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  force-law:
+    name: Native force regression (${{ matrix.configuration }})
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        configuration: [Debug, Release]
+    steps:
+      - uses: actions/checkout@v7
+      - name: Install core dependency
+        run: sudo apt-get update && sudo apt-get install -y ninja-build zlib1g-dev
+      - name: Configure shared production core
+        run: cmake -S Src/Orbiter/Production -B out/legacy-forces -G Ninja -DCMAKE_BUILD_TYPE=${{ matrix.configuration }} -DBUILD_TESTING=ON
+      - name: Build actual force-law and neighboring core regressions
+        run: cmake --build out/legacy-forces --parallel 2 --target production_legacy_aerodynamics_test production_rigid_body_test production_navigation_test production_state_test production_config_test
+      - name: Run regressions
+        run: ctest --test-dir out/legacy-forces --output-on-failure -R 'Production\.(LegacyAerodynamics|RigidBodyBoundary|Navigation|ScenarioMetadata|Configuration)$'
