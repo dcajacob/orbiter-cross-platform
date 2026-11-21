@@ -20,6 +20,7 @@ struct MeshGroups {
 class VesselPose {
 public:
     void Reset(std::vector<Vertex> mesh, std::vector<VertexRange> groups, std::vector<MeshGroups> meshes);
+    void SetGroup(unsigned mesh, unsigned group, const MESHGROUP&);
     bool Update(const VESSEL&);
     const std::vector<Vertex>& Vertices() const { return posed_; }
 

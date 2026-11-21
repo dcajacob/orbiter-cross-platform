@@ -15,6 +15,7 @@
 
 #ifndef _WIN32
 #include "Base.h"
+#include "Production/NativeInterpreterSdk.h"
 #endif
 
 namespace orbiter::vulkan {
@@ -154,11 +155,18 @@ bool OrbiterScene::Fill(SURFHANDLE surface, unsigned x, unsigned y, unsigned wid
     if (x > image.width || y > image.height || width > image.width - x || height > image.height - y)
         return false;
     MakeWritable(image);
-    ++image.revision;
+    bool changed = false;
     const std::uint8_t rgba[] = {std::uint8_t(color), std::uint8_t(color >> 8), std::uint8_t(color >> 16), 255};
-    for (unsigned row = y; row < y + height; ++row)
-        for (unsigned col = x; col < x + width; ++col)
-            std::memcpy(image.pixels.data() + (std::size_t(row) * image.width + col) * 4, rgba, 4);
+    for (unsigned row = y; row < y + height; ++row) {
+        auto* pixel = image.pixels.data() + (std::size_t(row) * image.width + x) * 4;
+        for (unsigned col = 0; col < width; ++col, pixel += 4) {
+            if (std::memcmp(pixel, rgba, 4) != 0) {
+                std::memcpy(pixel, rgba, 4);
+                changed = true;
+            }
+        }
+    }
+    if (changed) ++image.revision;
     return true;
 }
 
@@ -172,22 +180,33 @@ bool OrbiterScene::Blit(SURFHANDLE target, unsigned x, unsigned y, SURFHANDLE so
     if (x > output.width || y > output.height || sx > input->width || sy > input->height)
         return false;
     MakeWritable(output);
-    ++output.revision;
     width = std::min({width, output.width - x, input->width - sx});
     height = std::min({height, output.height - y, input->height - sy});
+    bool changed = false;
     for (unsigned row = 0; row < height; ++row) {
         // Copy bottom-up when a self-blit overlaps subsequent source rows.
         const auto offset = input == &output && y > sy ? height - 1 - row : row;
         auto* pixels = output.pixels.data() + (std::size_t(y + offset) * output.width + x) * 4;
         if (!input->blockBytes && input->format == output.format) {
-            std::memmove(pixels, input->pixels.data() + (std::size_t(sy + offset) * input->width + sx) * 4, 4 * width);
+            const auto* sourceRow = input->pixels.data() + (std::size_t(sy + offset) * input->width + sx) * 4;
+            if (std::memcmp(pixels, sourceRow, 4 * width) != 0) {
+                std::memmove(pixels, sourceRow, 4 * width);
+                changed = true;
+            }
             continue;
         }
         for (unsigned col = 0; col < width; ++col) {
             const auto rgba = ReadPixel(*input, sx + col, sy + row);
-            std::memcpy(pixels + 4 * col, rgba.data(), rgba.size());
+            auto* targetPixel = pixels + 4 * col;
+            if (std::memcmp(targetPixel, rgba.data(), rgba.size()) != 0) {
+                std::memcpy(targetPixel, rgba.data(), rgba.size());
+                changed = true;
+            }
         }
     }
+    // Vessel callbacks can repaint exactly the same digits every step.
+    // Keep the resident texture and its mip chain until a texel changes.
+    if (changed) ++output.revision;
     return true;
 }
 
@@ -217,7 +236,8 @@ void OrbiterScene::Open(SDL_Window* window, BaseMeshes baseMeshes, bool baseShad
 }
 
 void OrbiterScene::AppendMesh(MESHHANDLE mesh, SceneMesh& ship, std::vector<VertexRange>& groups,
-    std::map<SURFHANDLE, unsigned>& textureSlots, std::optional<DrawPass> surfacePass, SURFHANDLE surfaceTexture) const
+    std::map<SURFHANDLE, unsigned>& textureSlots, std::optional<DrawPass> surfacePass, SURFHANDLE surfaceTexture,
+    unsigned meshIndex, const std::vector<CockpitDisplay>& displays, bool dgCockpit) const
 {
     if (!mesh) return;
     const auto materials = oapiMeshMaterialCount(mesh);
@@ -232,7 +252,11 @@ void OrbiterScene::AppendMesh(MESHHANDLE mesh, SceneMesh& ship, std::vector<Vert
         if (!group) continue;
         if (group->MtrlIdx != inheritedIndex) materialIndex = group->MtrlIdx;
         if (group->TexIdx != inheritedIndex) textureIndex = group->TexIdx;
-        if ((group->UsrFlag & 2) || !group->nVtx || !group->nIdx) continue;
+        const auto display = std::find_if(displays.begin(), displays.end(), [&](const CockpitDisplay& d) {
+            return d.mesh == meshIndex && d.group == i;
+        });
+        const bool instrument = display != displays.end();
+        if ((!instrument && (group->UsrFlag & 2)) || !group->nVtx || !group->nIdx) continue;
         MaterialUniform material;
         if (materialIndex < materials) {
             const auto* mat = oapiMeshMaterial(mesh, materialIndex);
@@ -243,9 +267,25 @@ void OrbiterScene::AppendMesh(MESHHANDLE mesh, SceneMesh& ship, std::vector<Vert
                 material.emission = {mat->emissive.r, mat->emissive.g, mat->emissive.b, 0};
             }
         }
+        if (dgCockpit) {
+            const bool backlit = materialIndex == 0 || materialIndex == 11 || materialIndex == 17
+                || materialIndex == 18 || materialIndex == 28;
+            for (unsigned c = 0; c < 3; ++c) material.emission[c] *= backlit ? 0.85f : 0.045f;
+            material.ambient[3] = (materialIndex == 23 || materialIndex == 25) ? 2.0f : 1.0f;
+            if (materials == 31 && materialIndex == 30) {
+                // Faceplate markings follow the DG's stock legend rheostat.
+                if (const auto* lamp = oapiMeshMaterial(mesh, 11))
+                    material.emission = {lamp->emissive.r, lamp->emissive.g, lamp->emissive.b, 0};
+                material.ambient[3] = 3.0f;
+            }
+        }
+        if (instrument) {
+            material.ambient[3] = display->hud ? -1.0f : -2.0f;
+            material.diffuse[3] = display->hud ? 0.5f : 1.0f;
+        }
         unsigned gpuTexture = 0;
-        if (surfaceTexture || textureIndex < textures) {
-            const auto handle = surfaceTexture ? surfaceTexture : oapiGetTextureHandle(mesh, textureIndex + 1);
+        if (instrument || surfaceTexture || textureIndex < textures) {
+            const auto handle = instrument ? display->surface : surfaceTexture ? surfaceTexture : oapiGetTextureHandle(mesh, textureIndex + 1);
             const auto* texture = Lookup(handle);
             if (texture) {
                 const auto slot = textureSlots.emplace(handle, unsigned(ship.textures.size()));
@@ -256,7 +296,7 @@ void OrbiterScene::AppendMesh(MESHHANDLE mesh, SceneMesh& ship, std::vector<Vert
         const auto startVertex = unsigned(ship.vertices.size());
         groups[firstGroup + i] = {startVertex, group->nVtx};
         const auto pass = surfacePass.value_or(material.diffuse[3] < 0.999f ? DrawPass::Translucent : DrawPass::Opaque);
-        ship.groups.push_back({unsigned(ship.indices.size()), group->nIdx, gpuTexture, material, pass, !surfacePass && !(group->UsrFlag & 1)});
+        ship.groups.push_back({unsigned(ship.indices.size()), group->nIdx, gpuTexture, material, pass, !instrument && !surfacePass && !(group->UsrFlag & 1)});
         for (unsigned j = 0; j < group->nVtx; ++j) {
             const auto& v = group->Vtx[j];
             ship.vertices.push_back({{v.x, v.y, v.z}, {v.nx, v.ny, v.nz}, {v.tu, v.tv}});
@@ -349,19 +389,53 @@ bool OrbiterScene::UpdateBases(const VECTOR3& eye)
     return uploaded;
 }
 
-void OrbiterScene::RefreshExterior(const VESSEL& vessel, VesselVisual& visual)
+void OrbiterScene::RefreshMeshes(const VESSEL& vessel, VesselVisual& visual, bool internal,
+    const std::vector<CockpitDisplay>& displays)
 {
     const auto count = vessel.GetMeshCount();
-    bool rebuild = visual.exteriorSlots.size() != count;
-    visual.exteriorSlots.resize(count);
+    const bool pilotSeat = internal && vessel.GetHandle() == pilot_;
+    bool rebuild = visual.meshSlots.size() != count || visual.displays != displays || visual.pilotSeat != pilotSeat;
+    visual.pilotSeat = pilotSeat;
+    visual.meshSlots.resize(count);
     for (unsigned index = 0; index < count; ++index) {
         std::optional<MESHHANDLE> current;
-        if (vessel.GetMeshVisibilityMode(index) & MESHVIS_EXTERNAL)
+        const auto visibleMask = internal ? MESHVIS_COCKPIT | MESHVIS_VC : MESHVIS_EXTERNAL;
+        if (vessel.GetMeshVisibilityMode(index) & (visibleMask | (pilotSeat ? MESHVIS_EXTERNAL : 0)))
             current = vessel.GetMeshTemplate(index);
-        rebuild |= current != visual.exteriorSlots[index];
-        visual.exteriorSlots[index] = current;
+        if (pilotSeat && current && index < pilotMeshes_.size() && pilotMeshes_[index].mesh) {
+            auto& device = pilotMeshes_[index];
+            current = device.mesh;
+            rebuild |= device.rebuild;
+            device.rebuild = false;
+            for (unsigned group : device.changed) {
+                if (auto* data = oapiMeshGroup(device.mesh,group)) visual.pose.SetGroup(index,group,*data);
+            }
+            device.changed.clear();
+        }
+        rebuild |= current != visual.meshSlots[index];
+        visual.meshSlots[index] = current;
     }
-    if (!rebuild) return;
+    // A cockpit texture atlas may become writable after its original compressed
+    // upload. Rebuild once on its first edit to obtain a writable RGBA mip chain.
+    if (!rebuild && pilotSeat) {
+        for (const auto& [surface, slot] : visual.displaySlots) {
+            const auto* image=Lookup(surface);
+            if (image && image->revision && !visual.revisions[slot]) rebuild=true;
+        }
+    }
+    if (!rebuild) {
+        for (const auto& [surface, slot] : visual.displaySlots) {
+            const auto* image = Lookup(surface);
+            if (image && image->revision != visual.revisions[slot]) {
+                scene_.UpdateDisplay(vessel.GetHandle(), slot, *image);
+                visual.revisions[slot] = image->revision;
+            }
+        }
+        return;
+    }
+    visual.displays = displays;
+    visual.displaySlots.clear();
+    visual.revisions.clear();
     SceneMesh ship;
     std::map<SURFHANDLE, unsigned> textureSlots;
     std::vector<VertexRange> groups;
@@ -371,8 +445,8 @@ void OrbiterScene::RefreshExterior(const VESSEL& vessel, VesselVisual& visual)
     std::vector<OwnedMesh> copies;
     unsigned exteriorCount = 0;
     for (unsigned index = 0; index < meshes.size(); ++index) {
-        if (!visual.exteriorSlots[index]) continue;
-        auto mesh = *visual.exteriorSlots[index];
+        if (!visual.meshSlots[index]) continue;
+        auto mesh = *visual.meshSlots[index];
         if (!mesh) {
             mesh = vessel.CopyMeshFromTemplate(index);
             if (!mesh) continue;
@@ -380,22 +454,176 @@ void OrbiterScene::RefreshExterior(const VESSEL& vessel, VesselVisual& visual)
         }
         auto& slot = meshes[index];
         slot.first = groups.size();
-        AppendMesh(mesh, ship, groups, textureSlots);
+        const std::string className(vessel.GetClassName());
+        const bool dgCockpit = pilotSeat && index == 1 && (className == "DG-S" || className == "DeltaGlider")
+            && (oapiMeshGroupCount(mesh) == 133 || (oapiMeshGroupCount(mesh) == 135
+                && oapiMeshMaterialCount(mesh) == 31 && oapiMeshTextureCount(mesh) == 21));
+        const auto firstGroup = ship.groups.size();
+        AppendMesh(mesh, ship, groups, textureSlots, {}, nullptr, index, displays, dgCockpit);
+        if (pilotSeat && !(vessel.GetMeshVisibilityMode(index) & MESHVIS_EXTERNAL)) {
+            // The exterior mesh supplies the vessel's ground silhouette.
+            for (auto j = firstGroup; j < ship.groups.size(); ++j) ship.groups[j].castsShadow = false;
+        } else if (pilotSeat && !(vessel.GetMeshVisibilityMode(index) & (MESHVIS_COCKPIT | MESHVIS_VC))) {
+            // Keep the exterior silhouette in the shadow map from the pilot's seat.
+            for (auto j=firstGroup; j<ship.groups.size(); ++j) {
+                auto& group=ship.groups[j];
+                group.castsShadow &= group.pass == DrawPass::Opaque;
+                group.pass=DrawPass::ShadowOnly;
+            }
+        }
         slot.count = groups.size() - slot.first;
         ++exteriorCount;
+    }
+    if (internal) {
+        visual.displaySlots=textureSlots;
+        for (const auto& [surface,slot] : textureSlots)
+            visual.revisions[slot]=ship.textures[slot]->revision;
     }
     visual.shadowTime.reset();
     scene_.SetShip(vessel.GetHandle(), ship);
     visual.pose.Reset(std::move(ship.vertices), std::move(groups), std::move(meshes));
     std::ostringstream message;
-    message << "Vulkan exterior: " << vessel.GetName() << " (" << vessel.GetClassName() << "), "
+    message << (internal ? "Vulkan cockpit: " : "Vulkan exterior: ") << vessel.GetName() << " (" << vessel.GetClassName() << "), "
             << exteriorCount << " meshes, " << ship.groups.size() << " groups, "
             << textureSlots.size() << " textures";
     SceneLog(message.str());
 }
 
+void OrbiterScene::SetPilot(OBJHANDLE handle)
+{
+    if (pilot_ == handle) return;
+    if (pilot_) {
+        registerPilot_(pilot_,nullptr);
+        pilot_ = nullptr;
+        for (auto& slot : pilotMeshes_) {
+            if (slot.mesh) oapiDeleteMesh(slot.mesh);
+            slot = {};
+        }
+    }
+    if (!handle) return;
+    auto* vessel = oapiGetVesselInterface(handle);
+    const std::string name(vessel->GetClassName());
+    if ((name!="DG-S" && name!="DeltaGlider") || vessel->GetMeshCount()!=2) return;
+    pilot_ = handle;
+    for (unsigned i = 0; i < pilotMeshes_.size(); ++i) {
+        auto* source = vessel->GetMeshTemplate(i);
+        if (i == 1 && source && oapiMeshGroupCount(source) == 133 &&
+            oapiMeshMaterialCount(source) == 29 && oapiMeshTextureCount(source) == 20) {
+            // Load the optional Vulkan model as a private instance. Other
+            // renderers and callbacks that use the stock template retain it.
+            auto* enhanced = oapiLoadMesh("Vulkan\\DG\\deltaglider_vc");
+            if (enhanced && oapiMeshGroupCount(enhanced) == 135 &&
+                oapiMeshMaterialCount(enhanced) == 31 && oapiMeshTextureCount(enhanced) == 21) {
+                // DG instruments paint the template's stock surfaces. Keep precisely
+                // those handles in the private mesh and retain its new art in slot 21.
+                bool shared = true;
+                for (unsigned slot = 1; slot <= oapiMeshTextureCount(source); ++slot) {
+                    if (!ReplaceTextureSlot(enhanced, slot, oapiGetTextureHandle(source, slot))) {
+                        shared = false;
+                        break;
+                    }
+                }
+                if (shared) {
+                    pilotMeshes_[i].mesh = enhanced;
+                    SceneLog("Vulkan DeltaGlider: detailed flight deck");
+                    continue;
+                }
+            }
+            if (enhanced) oapiDeleteMesh(enhanced);
+        }
+        auto mesh = pilotMeshes_[i].mesh = vessel->CopyMeshFromTemplate(i);
+        if (mesh && vessel->GetMeshTemplate(i)) {
+            // Orbiter copies the template's surface handles by value. Deleting
+            // the instance releases each one, so acquire its own references.
+            for (unsigned slot = 1; slot <= oapiMeshTextureCount(mesh); ++slot)
+                Retain(oapiGetTextureHandle(mesh, slot));
+        }
+    }
+    // VisualCreated and the initial VC redraw immediately request these handles.
+    registerPilot_(pilot_,this);
+}
+
+MESHHANDLE OrbiterScene::DeviceMesh(VISHANDLE visual,unsigned i)
+{
+    if (!pilot_ || visual!=this || i>=pilotMeshes_.size() || !pilotMeshes_[i].mesh) return nullptr;
+    return reinterpret_cast<MESHHANDLE>(&pilotMeshes_[i]);
+}
+
+OrbiterScene::PilotMesh* OrbiterScene::FindDevice(DEVMESHHANDLE device)
+{
+    for (auto& slot : pilotMeshes_)
+        if (slot.mesh && reinterpret_cast<DEVMESHHANDLE>(&slot)==device) return &slot;
+    return nullptr;
+}
+
+int OrbiterScene::ReadGroup(DEVMESHHANDLE device, unsigned i, GROUPREQUESTSPEC* request)
+{
+    const auto* slot = FindDevice(device);
+    auto* g = slot ? oapiMeshGroup(slot->mesh,i) : nullptr;
+    if (!g || !request) return 1;
+    int status=0;
+    const auto copy=[&](auto* dest,auto& count,const auto* permutation,const auto* source,unsigned available) {
+        if (!dest) return;
+        if (!permutation) { count=std::min<unsigned>(count,available); std::copy_n(source,count,dest); return; }
+        for (unsigned j=0;j<count;++j) {
+            if (permutation[j]<available) dest[j]=source[permutation[j]];
+            else { dest[j]={}; status=1; }
+        }
+    };
+    copy(request->Vtx,request->nVtx,request->VtxPerm,g->Vtx,g->nVtx);
+    copy(request->Idx,request->nIdx,request->IdxPerm,g->Idx,g->nIdx);
+    request->MtrlIdx=g->MtrlIdx; request->TexIdx=g->TexIdx;
+    return status;
+}
+
+int OrbiterScene::EditGroup(DEVMESHHANDLE device,unsigned i,GROUPEDITSPEC* edit)
+{
+    auto* slot=FindDevice(device);
+    auto* g=slot ? oapiMeshGroup(slot->mesh,i) : nullptr;
+    if (!g || !edit) return 1;
+    const auto flags=g->UsrFlag;
+    const int status=oapiEditMeshGroup(slot->mesh,i,edit);
+    if (!status) {
+        slot->rebuild |= flags!=g->UsrFlag;
+        if (edit->flags & GRPEDIT_VTXMOD) slot->changed.insert(i);
+    }
+    return status;
+}
+
+int OrbiterScene::SetMaterial(DEVMESHHANDLE device,unsigned index,const MATERIAL* material)
+{
+    auto* slot=FindDevice(device);
+    if (!slot || !material || index>=oapiMeshMaterialCount(slot->mesh)) return 1;
+    auto* dest=oapiMeshMaterial(slot->mesh,index);
+    if (std::memcmp(dest,material,sizeof(*dest))) { *dest=*material; slot->rebuild=true; }
+    return 0;
+}
+
+bool OrbiterScene::SetTexture(DEVMESHHANDLE device,unsigned index,SURFHANDLE texture)
+{
+    auto* slot=FindDevice(device);
+    if (!slot || !index || index>oapiMeshTextureCount(slot->mesh)) return false;
+    if (oapiGetTextureHandle(slot->mesh,index)==texture) return true;
+    if (!ReplaceTextureSlot(slot->mesh, index, texture)) return false;
+    slot->rebuild = true;
+    return true;
+}
+
+bool OrbiterScene::ReplaceTextureSlot(MESHHANDLE mesh, unsigned index, SURFHANDLE texture)
+{
+    if (oapiGetTextureHandle(mesh, index) == texture) return true;
+    if (texture && !Lookup(texture)) return false;
+    // oapiSetTexture releases the previous surface. The mesh owns a reference
+    // to its replacement until another replacement or mesh destruction.
+    Retain(texture);
+    if (oapiSetTexture(mesh, index, texture)) return true;
+    Release(texture);
+    return false;
+}
+
 void OrbiterScene::RemoveVessel(OBJHANDLE handle) noexcept
 {
+    if (handle == pilot_) SetPilot(nullptr);
     scene_.RemoveShip(handle);
     vessels_.erase(handle);
     if (focus_ == handle) focus_ = nullptr;
@@ -403,6 +631,7 @@ void OrbiterScene::RemoveVessel(OBJHANDLE handle) noexcept
 
 void OrbiterScene::CloseWorld() noexcept
 {
+    SetPilot(nullptr);
     focus_ = nullptr;
     worldOpen_ = false;
     bases_.clear();
@@ -414,7 +643,8 @@ void OrbiterScene::CloseWorld() noexcept
 }
 
 OrbiterScene::VesselUpdate OrbiterScene::UpdateVessels(const SceneFrame& camera, const SceneFrame& groundFrame,
-    const EarthView& earth, unsigned height, bool refreshShadow, bool terrainRecentered)
+    const EarthView& earth, unsigned height, bool refreshShadow, bool terrainRecentered,
+    const std::vector<CockpitDisplay>& displays)
 {
     const auto simTime = oapiGetSimTime();
     const auto sun = SunPosition();
@@ -436,7 +666,9 @@ OrbiterScene::VesselUpdate OrbiterScene::UpdateVessels(const SceneFrame& camera,
         if (handle != focus_ && Dot(eye, eye) > maxRange * maxRange) continue;
         auto& visual = vessels_[handle];
         visual.retained = true;
-        RefreshExterior(*vessel, visual);
+        const bool pilotView = handle == pilot_ && oapiCameraInternal();
+        static const std::vector<CockpitDisplay> noDisplays;
+        RefreshMeshes(*vessel, visual, pilotView, pilotView ? displays : noDisplays);
         if (visual.pose.Vertices().empty()) continue;
         const bool changed = visual.pose.Update(*vessel);
         if (changed) scene_.SetShipPose(handle, visual.pose.Vertices());
@@ -449,7 +681,7 @@ OrbiterScene::VesselUpdate OrbiterScene::UpdateVessels(const SceneFrame& camera,
         update.shadowDrawn |= !visual.shadow.empty();
         // Sphere against the four side planes and the eye. Orbiter's clip radius
         // includes parts extending beyond the nominal size, such as solar panels.
-        if (!(handle == focus_ && oapiCameraInternal()) && eye.z + radius > 0 &&
+        if ((handle != focus_ || !oapiCameraInternal() || pilotView) && eye.z + radius > 0 &&
             std::abs(eye.x * earth.horizontal) <= eye.z + radius * std::hypot(1.0, earth.horizontal) &&
             std::abs(eye.y * earth.vertical) <= eye.z + radius * std::hypot(1.0, earth.vertical)) {
             draws_.push_back({handle, MakeUniform(frame, camera, sun, earth.horizontal, earth.vertical)});
@@ -485,12 +717,13 @@ OrbiterScene::VesselUpdate OrbiterScene::UpdateVessels(const SceneFrame& camera,
     return update;
 }
 
-bool OrbiterScene::Present(unsigned width, unsigned height)
+bool OrbiterScene::Present(unsigned width, unsigned height, const std::vector<CockpitDisplay>& displays)
 {
     if (!width || !height) return true;
     if (!worldOpen_) return scene_.Present({}, {}, {});
     const auto start = SDL_GetTicksNS();
     const auto focus = oapiGetFocusObject();
+    SetPilot(oapiCameraInternal() && oapiCockpitMode() == COCKPIT_VIRTUAL ? focus : nullptr);
     if (focus != focus_) {
         focus_ = focus;
         if (focus) SceneLog(std::string("Vulkan focus: ") + oapiGetVesselInterface(focus)->GetName());
@@ -517,7 +750,7 @@ bool OrbiterScene::Present(unsigned width, unsigned height)
     const auto earth = terrain_.View(width, height);
     const auto tiles = terrain_.Update(earth, height, scene_);
     const auto terrainTime = SDL_GetTicksNS() - beforeTerrain;
-    const auto vessels = UpdateVessels(camera, groundFrame, earth, height, tiles.switched || reanchorTime, tiles.recentered);
+    const auto vessels = UpdateVessels(camera, groundFrame, earth, height, tiles.switched || reanchorTime, tiles.recentered, displays);
     const auto beforeBases = SDL_GetTicksNS();
     const auto baseUploadTime = UpdateBases(groundFrame.ToLocal(camera.origin)) ? SDL_GetTicksNS() - beforeBases : 0;
     std::filesystem::path samplePath;

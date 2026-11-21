@@ -12,6 +12,32 @@
 
 namespace orbiter::vulkan {
 
+// Orbiter registers these surfaces against vessel-local mesh and group indices.
+struct CockpitDisplay {
+    unsigned mesh, group;
+    SURFHANDLE surface;
+    bool hud;
+    bool operator==(const CockpitDisplay& b) const {
+        return mesh == b.mesh && group == b.group && surface == b.surface && hud == b.hud;
+    }
+};
+
+template<class Hud, class Mfd>
+std::vector<CockpitDisplay> PilotDisplays(bool worldReady, Hud hud, Mfd mfd)
+{
+    std::vector<CockpitDisplay> displays;
+    if (!worldReady || !oapiCameraInternal() || oapiCockpitMode() != COCKPIT_VIRTUAL) return displays;
+    const VCHUDSPEC* h = nullptr;
+    if (auto surface = hud(&h); surface && h)
+        displays.push_back({h->nmesh, h->ngroup, surface, true});
+    for (int i = 0; i < MAXMFD; ++i) {
+        const VCMFDSPEC* m = nullptr;
+        if (auto surface = mfd(i, &m); surface && m)
+            displays.push_back({m->nmesh, m->ngroup, surface, false});
+    }
+    return displays;
+}
+
 class OrbiterScene {
 public:
     ~OrbiterScene();
@@ -39,13 +65,21 @@ public:
     void OpenWorld(std::filesystem::path archive);
     void CaptureFrame(std::filesystem::path path) { scene_.Capture(std::move(path)); }
     void CloseWorld() noexcept;
+    using RegisterPilot = std::function<void(OBJHANDLE,VISHANDLE)>;
+    void SetPilotRegistration(RegisterPilot callback) { registerPilot_ = std::move(callback); }
+    MESHHANDLE DeviceMesh(VISHANDLE, unsigned);
+    int ReadGroup(DEVMESHHANDLE, unsigned, GROUPREQUESTSPEC*);
+    int EditGroup(DEVMESHHANDLE, unsigned, GROUPEDITSPEC*);
+    int SetMaterial(DEVMESHHANDLE, unsigned, const MATERIAL*);
+    bool SetTexture(DEVMESHHANDLE, unsigned, SURFHANDLE);
     void RemoveVessel(OBJHANDLE) noexcept;
-    bool Present(unsigned width, unsigned height);
+    bool Present(unsigned width, unsigned height, const std::vector<CockpitDisplay>&);
     std::string FlightTitle() const;
     void Close() noexcept;
 
 private:
     SURFHANDLE Add(TextureData);
+    bool ReplaceTextureSlot(MESHHANDLE, unsigned slot, SURFHANDLE);
     struct EarthBase {
         unsigned index;
         OBJHANDLE handle;
@@ -58,7 +92,11 @@ private:
     struct VesselVisual {
         VesselPose pose;
         // An engaged null handle denotes an exterior, load-on-demand mesh.
-        std::vector<std::optional<MESHHANDLE>> exteriorSlots;
+        std::vector<std::optional<MESHHANDLE>> meshSlots;
+        std::vector<CockpitDisplay> displays;
+        std::map<SURFHANDLE, unsigned> displaySlots;
+        std::map<unsigned, std::uint64_t> revisions;
+        bool pilotSeat = false;
         std::vector<Vertex> shadow;
         std::optional<double> shadowTime;
         bool retained = false;
@@ -68,11 +106,24 @@ private:
         bool poseUploaded = false, shadowDrawn = false;
     };
     VesselUpdate UpdateVessels(const SceneFrame& camera, const SceneFrame& ground,
-        const EarthView& earth, unsigned height, bool refreshShadow, bool terrainRecentered);
-    void RefreshExterior(const VESSEL&, VesselVisual&);
+        const EarthView& earth, unsigned height, bool refreshShadow, bool terrainRecentered,
+        const std::vector<CockpitDisplay>& displays);
+    void RefreshMeshes(const VESSEL&, VesselVisual&, bool internal, const std::vector<CockpitDisplay>&);
     void AppendMesh(MESHHANDLE, SceneMesh&, std::vector<VertexRange>&,
         std::map<SURFHANDLE, unsigned>& textureSlots, std::optional<DrawPass> pass = {},
-        SURFHANDLE surfaceTexture = nullptr) const;
+        SURFHANDLE surfaceTexture = nullptr,
+        unsigned meshIndex = ~0u, const std::vector<CockpitDisplay>& displays = {},
+        bool dgCockpit = false) const;
+    struct PilotMesh {
+        MESHHANDLE mesh = nullptr;
+        std::set<unsigned> changed;
+        bool rebuild = false;
+    };
+    RegisterPilot registerPilot_;
+    OBJHANDLE pilot_ = nullptr;
+    std::array<PilotMesh,2> pilotMeshes_{};
+    void SetPilot(OBJHANDLE);
+    PilotMesh* FindDevice(DEVMESHHANDLE);
     Scene scene_;
     BaseMeshes baseMeshes_;
     bool baseShadows_ = true;

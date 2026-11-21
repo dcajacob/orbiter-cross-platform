@@ -56,6 +56,28 @@ The panel compositor uses Orbiter's mesh groups, live MFD surfaces and
 Sketchpad drawing calls. The embedded glyph atlas uses Lekton Bold under
 the [SIL Open Font License](../../Extern/imgui/Lekton%20-%20SIL%20License.txt).
 
+### Dock from the virtual cockpit
+
+Install the detailed DeltaGlider flight deck and the manual scenario into your
+runtime asset directory from the Vulkan client build:
+
+```sh
+cmake --install /path/to/vulkan-build --prefix /path/to/runtime-assets --component DeltaGliderCockpit
+```
+
+In the Qt Launchpad, open **Vulkan → ISSManualDock**. The glider starts
+7 m from ISS port 1. The ports are aligned, the nosecone is open, and the
+vessels have matching velocities. The left Docking MFD is tuned to the
+station. Use **Numpad 6** to start closing in translation mode and **Numpad 9**
+to brake. After the MFD shows **DOCKED**, press **Ctrl+D** and watch the
+distance increase. This scenario has no flight script.
+
+The DeltaGlider and DG-S use live cockpit instruments in the stock virtual
+cockpit and in the detailed flight deck. Vulkan looks up the detailed mesh in
+`Meshes/Vulkan/DG`. Its console, bezels and canopy hardware can be regenerated
+as CAD solids and exported to STEP with `Cockpit/console.py`, using the stock
+DeltaGlider virtual cockpit mesh as input.
+
 The client streams stock Earth surface tiles from `Earth/Archive/Surf.tree` and
 uses Orbiter's elevation data. Two hemisphere tiles cover the planet from the
 first frame. The camera's altitude, field of view, distance to each tile and

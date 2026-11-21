@@ -71,3 +71,8 @@ else()
         "${ORBITER_ENGINE_BUILD}/liborbiter_production_boundary.so")
     target_link_options(VulkanClient PRIVATE -Wl,--no-undefined)
 endif()
+
+install(FILES Cockpit/deltaglider_vc.msh DESTINATION Meshes/Vulkan/DG COMPONENT DeltaGliderCockpit)
+install(FILES Cockpit/dg_flightdeck.dds Cockpit/dg_flightdeck_surface.dds
+    DESTINATION Textures/DG COMPONENT DeltaGliderCockpit)
+install(FILES ISSManualDock.scn DESTINATION Scenarios/Vulkan COMPONENT DeltaGliderCockpit)

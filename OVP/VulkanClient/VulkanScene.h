@@ -53,7 +53,7 @@ struct MaterialUniform {
     std::array<float, 4> specular{}; // RGB reflectance and Orbiter specular power
 };
 
-enum class DrawPass { Terrain, BaseTile, Pavement, GroundShadow, PavementShadow, Shadow, Opaque, Translucent };
+enum class DrawPass { Terrain, BaseTile, Pavement, GroundShadow, PavementShadow, Shadow, Opaque, Translucent, ShadowOnly };
 
 struct Group {
     unsigned firstIndex;
@@ -108,6 +108,7 @@ public:
     void SetShip(OBJHANDLE, const SceneMesh&);
     void AddBase(unsigned index, const SceneMesh&, bool shadows);
     void RemoveBase(unsigned index) noexcept;
+    void UpdateDisplay(OBJHANDLE, unsigned slot, const TextureData&);
     void SetShipPose(OBJHANDLE, const std::vector<Vertex>&);
     void StageTile(const TileKey&, const TerrainMesh&);
     void SelectTiles(const std::set<TileKey>& visible, const std::set<TileKey>& pending);
@@ -150,6 +151,8 @@ private:
         SDL_GPUBuffer* vertices = nullptr;
         SDL_GPUBuffer* indices = nullptr;
         std::vector<SDL_GPUTexture*> textures;
+        SDL_GPUTexture* flightdeckFinish = nullptr;
+        unsigned flightdeckSlot = 0;
         SDL_GPUSampler* sampler = nullptr; // borrowed from Scene
         std::vector<Group> groups;
     };
@@ -157,7 +160,7 @@ private:
     SDL_GPUBuffer* UploadBuffer(SDL_GPUBufferUsageFlags, const void*, std::size_t);
     void UploadMesh(const SceneMesh&, GpuMesh&, bool vesselSkin);
     void Release(GpuMesh&) noexcept;
-    void DrawMesh(SDL_GPURenderPass*, SDL_GPUCommandBuffer*, const GpuMesh&, DrawPass);
+    void DrawMesh(SDL_GPURenderPass*, SDL_GPUCommandBuffer*, const GpuMesh&, DrawPass, bool receiver = false);
     struct Bounds {
         std::array<float, 3> low, high;
         Bounds();
@@ -193,7 +196,8 @@ private:
         SDL_GPUTransferBuffer* poseUpload = nullptr;
         SDL_GPUBuffer* shadowVertices = nullptr;
         SDL_GPUTransferBuffer* shadowUpload = nullptr;
-        Uint32 vertexBytes = 0, indexCount = 0;
+        SDL_GPUBuffer* shadowIndices = nullptr;  // null when all groups cast
+        Uint32 vertexBytes = 0, shadowIndexCount = 0;
         bool showShadow = false;
     };
     void Release(GroundTile&) noexcept;

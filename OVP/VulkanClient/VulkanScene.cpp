@@ -210,7 +210,7 @@ void Scene::Open(SDL_Window* window, bool trace)
             Shader(device_, code, sizeof(code), stage, samplers, uniforms), release);
     };
     const auto vertex = shader(Ship_vert, SDL_GPU_SHADERSTAGE_VERTEX, 0, 1);
-    const auto fragment = shader(Ship_frag, SDL_GPU_SHADERSTAGE_FRAGMENT, 1, 1);
+    const auto fragment = shader(Ship_frag, SDL_GPU_SHADERSTAGE_FRAGMENT, 2, 1);
     const auto surface = shader(Earth_frag, SDL_GPU_SHADERSTAGE_FRAGMENT, 1, 1);
     terrain_ = CreatePipeline(vertex.get(), surface.get(), DrawPass::Terrain);
     const auto skyVertex = shader(Sky_vert, SDL_GPU_SHADERSTAGE_VERTEX, 0, 0);
@@ -442,7 +442,16 @@ void Scene::SetShip(OBJHANDLE handle, const SceneMesh& mesh)
     if (mesh.indices.empty()) return;
     auto& ship = ships_[handle];
     UploadMesh(mesh, ship.mesh, true);
-    ship.indexCount = Uint32(mesh.indices.size());
+    std::vector<std::uint32_t> casters;
+    for (const auto& group : mesh.groups) {
+        if (!group.castsShadow) continue;
+        const auto first = mesh.indices.begin() + group.firstIndex;
+        casters.insert(casters.end(), first, first + group.indexCount);
+    }
+    ship.shadowIndexCount = Uint32(casters.size());
+    if (!casters.empty() && casters.size() < mesh.indices.size())
+        ship.shadowIndices = UploadBuffer(SDL_GPU_BUFFERUSAGE_INDEX, casters.data(),
+            casters.size() * sizeof(casters.front()));
     ship.vertexBytes = Uint32(mesh.vertices.size() * sizeof(Vertex));
 }
 
@@ -456,9 +465,23 @@ void Scene::UploadMesh(const SceneMesh& mesh, GpuMesh& dest, bool vesselSkin)
     white.pixels.assign(4, 255);
     dest.textures.reserve(mesh.textures.size());
     for (auto* texture : mesh.textures) {
+        if (vesselSkin && texture && texture->path.filename() == "dg_flightdeck.dds") {
+            const auto path = texture->path.parent_path() / "dg_flightdeck_surface.dds";
+            std::error_code ec;
+            if (std::filesystem::is_regular_file(path, ec)) {
+                dest.flightdeckFinish = UploadTexture(ReadDds(path), true);
+                dest.flightdeckSlot = unsigned(dest.textures.size());
+            }
+        }
         dest.textures.push_back(UploadTexture(texture ? *texture : white, vesselSkin));
     }
     dest.groups = mesh.groups;
+    if (dest.flightdeckFinish) {
+        for (auto& group : dest.groups) {
+            if (group.textureIndex == dest.flightdeckSlot)
+                group.material.ambient[3] = group.material.ambient[3] == 3.0f ? 5.0f : 4.0f;
+        }
+    }
 }
 
 Scene::Bounds::Bounds()
@@ -626,7 +649,7 @@ void Scene::SelectTiles(const std::set<TileKey>& visible, const std::set<TileKey
 void Scene::SetShadow(OBJHANDLE handle, const std::vector<Vertex>& vertices)
 {
     auto& ship = ships_.at(handle);
-    ship.showShadow = !vertices.empty();
+    ship.showShadow = !vertices.empty() && ship.shadowIndexCount != 0;
     if (!ship.showShadow) return;
     if (!ship.shadowVertices) {
         const SDL_GPUBufferCreateInfo info{SDL_GPU_BUFFERUSAGE_VERTEX, ship.vertexBytes, 0};
@@ -634,6 +657,25 @@ void Scene::SetShadow(OBJHANDLE handle, const std::vector<Vertex>& vertices)
         Require(ship.shadowVertices != nullptr, "Allocate Vulkan shadow vertices");
     }
     UpdateVesselVertices(vertices, ship.shadowVertices, ship.shadowUpload, ship.vertexBytes);
+}
+
+void Scene::UpdateDisplay(OBJHANDLE handle, unsigned slot, const TextureData& texture)
+{
+    auto* transfer = Upload(device_, texture.pixels.data(), texture.pixels.size());
+    SDL_GPUTextureTransferInfo source{};
+    source.transfer_buffer = transfer;
+    SDL_GPUTextureRegion region{};
+    region.texture = ships_.at(handle).mesh.textures.at(slot);
+    region.w = texture.width;
+    region.h = texture.height;
+    region.d = 1;
+    SDL_UploadToGPUTexture(UploadPass(), &source, &region, true);
+    SDL_ReleaseGPUTransferBuffer(device_, transfer);
+    if (texture.width > 1 || texture.height > 1) {
+        SDL_EndGPUCopyPass(uploadPass_);
+        uploadPass_ = nullptr;
+        SDL_GenerateMipmapsForGPUTexture(uploadCommands_, region.texture);
+    }
 }
 
 void Scene::SetShipPose(OBJHANDLE handle, const std::vector<Vertex>& vertices)
@@ -662,13 +704,17 @@ void Scene::UpdateVesselVertices(const std::vector<Vertex>& vertices, SDL_GPUBuf
     SDL_UploadToGPUBuffer(copy, &source, &target, true);
 }
 
-void Scene::DrawMesh(SDL_GPURenderPass* pass, SDL_GPUCommandBuffer* commands, const GpuMesh& mesh, DrawPass kind)
+void Scene::DrawMesh(SDL_GPURenderPass* pass, SDL_GPUCommandBuffer* commands, const GpuMesh& mesh, DrawPass kind, bool receiver)
 {
     if (mesh.groups.empty()) return;
     const SDL_GPUBufferBinding vertex{mesh.vertices, 0};
     const SDL_GPUBufferBinding index{mesh.indices, 0};
     SDL_BindGPUVertexBuffers(pass, 0, &vertex, 1);
     SDL_BindGPUIndexBuffer(pass, &index, SDL_GPU_INDEXELEMENTSIZE_32BIT);
+    if (!receiver) {
+        const SDL_GPUTextureSamplerBinding finish{mesh.flightdeckFinish ? mesh.flightdeckFinish : mesh.textures.front(), mesh.sampler};
+        SDL_BindGPUFragmentSamplers(pass, 1, &finish, 1);
+    }
     for (const auto& group : mesh.groups) {
         if (group.pass != kind) continue;
         const SDL_GPUTextureSamplerBinding binding{mesh.textures.at(group.textureIndex), kind == DrawPass::BaseTile ? terrainSampler_ : mesh.sampler};
@@ -722,8 +768,8 @@ void Scene::DrawGroundShadows(SDL_GPURenderPass* pass, SDL_GPUCommandBuffer* com
         SDL_BindGPUGraphicsPipeline(pass, pavementShadow_);
         for (const auto& receiver : bases_) {
             if (!receiver.second.surfaces.InShadowFootprint(caster.transform)) continue;
-            DrawMesh(pass, commands, receiver.second.mesh, DrawPass::BaseTile);
-            DrawMesh(pass, commands, receiver.second.mesh, DrawPass::Pavement);
+            DrawMesh(pass, commands, receiver.second.mesh, DrawPass::BaseTile, true);
+            DrawMesh(pass, commands, receiver.second.mesh, DrawPass::Pavement, true);
         }
     }
 }
@@ -850,14 +896,15 @@ bool Scene::Present(const std::vector<VesselDraw>& ships, const SceneUniform& gr
         SDL_BindGPUGraphicsPipeline(pass, shadow_);
         SDL_SetGPUStencilReference(pass, 1);
         const SDL_GPUBufferBinding vertex{ship.shadowVertices, 0};
-        const SDL_GPUBufferBinding index{ship.mesh.indices, 0};
+        const SDL_GPUBufferBinding index{ship.shadowIndices ? ship.shadowIndices : ship.mesh.indices, 0};
         const SDL_GPUTextureSamplerBinding binding{ship.mesh.textures.front(), sampler_};
         const MaterialUniform shade{{0.015f, 0.015f, 0.015f, 0.63f}, {0, 0, 0, 2}};
         SDL_BindGPUVertexBuffers(pass, 0, &vertex, 1);
         SDL_BindGPUIndexBuffer(pass, &index, SDL_GPU_INDEXELEMENTSIZE_32BIT);
         SDL_BindGPUFragmentSamplers(pass, 0, &binding, 1);
+        SDL_BindGPUFragmentSamplers(pass, 1, &binding, 1);
         SDL_PushGPUFragmentUniformData(commands, 0, &shade, sizeof(shade));
-        SDL_DrawGPUIndexedPrimitives(pass, ship.indexCount, 1, 0, 0, 0);
+        SDL_DrawGPUIndexedPrimitives(pass, ship.shadowIndexCount, 1, 0, 0, 0);
     }
     for (auto kind : {DrawPass::Opaque, DrawPass::Translucent}) {
         SDL_BindGPUGraphicsPipeline(pass, kind == DrawPass::Opaque ? opaque_ : translucent_);
@@ -953,6 +1000,8 @@ void Scene::ClearGround() noexcept
 
 void Scene::Release(GpuMesh& mesh) noexcept
 {
+    if (mesh.flightdeckFinish) SDL_ReleaseGPUTexture(device_, mesh.flightdeckFinish);
+    mesh.flightdeckFinish = nullptr;
     for (auto* texture : mesh.textures) SDL_ReleaseGPUTexture(device_, texture);
     mesh.textures.clear();
     mesh.groups.clear();
@@ -978,6 +1027,7 @@ void Scene::RemoveShip(OBJHANDLE handle) noexcept
     if (it == ships_.end()) return;
     auto& ship = it->second;
     Release(ship.mesh);
+    if (ship.shadowIndices) SDL_ReleaseGPUBuffer(device_, ship.shadowIndices);
     if (ship.shadowVertices) SDL_ReleaseGPUBuffer(device_, ship.shadowVertices);
     if (ship.poseUpload) SDL_ReleaseGPUTransferBuffer(device_, ship.poseUpload);
     if (ship.shadowUpload) SDL_ReleaseGPUTransferBuffer(device_, ship.shadowUpload);

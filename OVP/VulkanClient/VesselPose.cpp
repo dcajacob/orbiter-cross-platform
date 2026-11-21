@@ -155,6 +155,19 @@ void VesselPose::Reset(std::vector<Vertex> mesh, std::vector<VertexRange> groups
     initialized_ = false;
 }
 
+// Apply the vessel's instrument edits before replaying its animation transforms.
+void VesselPose::SetGroup(unsigned mesh, unsigned group, const MESHGROUP& data)
+{
+    if (mesh >= meshes_.size() || group >= meshes_[mesh].count) return;
+    const auto range = groups_[meshes_[mesh].first + group];
+    if (range.count != data.nVtx) return;
+    for (unsigned j=0; j<data.nVtx; ++j) {
+        const auto& v = data.Vtx[j];
+        mesh_[range.first+j] = {{v.x,v.y,v.z},{v.nx,v.ny,v.nz},{v.tu,v.tv}};
+    }
+    initialized_ = false;
+}
+
 bool VesselPose::Update(const VESSEL& vessel)
 {
     ANIMATION* data = nullptr;

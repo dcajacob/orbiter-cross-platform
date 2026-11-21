@@ -38,6 +38,9 @@ public:
             if (configured) wrapped_ = SDL_CreateWindowWithProperties(props);
             SDL_DestroyProperties(props);
             Require(wrapped_ != nullptr, "Wrap Orbiter window for Vulkan");
+            scene_.SetPilotRegistration([this](OBJHANDLE h,VISHANDLE v) {
+                if (v) RegisterVisObject(h,v); else UnregisterVisObject(h);
+            });
             scene_.Open(wrapped_, [this](OBJHANDLE base) {
                 OrbiterScene::BaseGeometry geometry;
                 DWORD surfaceCount = 0, buildingCount = 0;
@@ -96,7 +99,9 @@ public:
         DWORD width = 0, height = 0;
         clbkGetViewportSize(&width, &height);
         try {
-            const bool shown = scene_.Present(unsigned(width), unsigned(height));
+            const bool shown = scene_.Present(unsigned(width), unsigned(height), PilotDisplays(loaded_,
+                [this](const VCHUDSPEC** h) { return GetVCHUDSurface(h); },
+                [this](int i, const VCMFDSPEC** m) { return GetVCMFDSurface(i,m); }));
             Require(shown, "Present Vulkan frame");
             if (SDL_GetTicks() >= nextTitle_) {
                 nextTitle_ = SDL_GetTicks() + 250;
@@ -143,6 +148,11 @@ public:
     { clbkRender2DPanel(surfaces, mesh, tx, 1.0f, additive); }
     void clbkRender2DPanel(SURFHANDLE* surfaces, MESHHANDLE mesh, MATRIX3* tx, float alpha, bool additive) override
     { scene_.Panel(surfaces, mesh, *tx, alpha, additive, [this](int i) { return GetMFDSurface(i); }); }
+    MESHHANDLE clbkGetMesh(VISHANDLE v,UINT i) override { return scene_.DeviceMesh(v,i); }
+    int clbkGetMeshGroup(DEVMESHHANDLE m,DWORD i,GROUPREQUESTSPEC* s) override { return scene_.ReadGroup(m,i,s); }
+    int clbkEditMeshGroup(DEVMESHHANDLE m,DWORD i,GROUPEDITSPEC* s) override { return scene_.EditGroup(m,i,s); }
+    bool clbkSetMeshTexture(DEVMESHHANDLE m,DWORD i,SURFHANDLE t) override { return scene_.SetTexture(m,i,t); }
+    int clbkSetMeshMaterial(DEVMESHHANDLE m,DWORD i,const MATERIAL* s) override { return scene_.SetMaterial(m,i,s); }
     oapi::Font* clbkCreateFont(int height, bool prop, const char* face, FontStyle style, int angle) const override
     { return new CockpitFont(height, prop, face, style, angle); }
     void clbkReleaseFont(oapi::Font* font) const override { delete font; }
