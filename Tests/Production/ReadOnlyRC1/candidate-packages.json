@@ -1,0 +1,34 @@
+{
+  "Orbiter-macos-arm64-8e576b84.tar.gz": {
+    "abi": "clang-17.0.0 (clang-1700.0.13.5):libc++-190102:201703L",
+    "arch": "arm64",
+    "artifact": 14726692879,
+    "artifact_digest": "sha256:72ee16d7e1e21b4f43caba39c25fc48d094aa1812889977d08b206ab8f8dec94",
+    "installer_sha256": "35dd56ce5f26429f5623c2c4699063a42289977f3474300f469fbcc69fb69137",
+    "native_build": "40377c29942d2b996b9110d60b5378484b974f5a9be04705df8aa27a12ca93a1",
+    "platform": "macos",
+    "sha256": "3926b703038746a36c28c94f416ec79febc95e9c9d5c5cb109d4d337fa1768e0",
+    "source": "5b3d1453bb21457f379a76e0d2eed85e2dee8cac"
+  },
+  "Orbiter-macos-x86_64-8e576b84.tar.gz": {
+    "abi": "clang-17.0.0 (clang-1700.0.13.5):libc++-190102:201703L",
+    "arch": "x86_64",
+    "artifact": 14727920417,
+    "artifact_digest": "sha256:5cef5904ea8e226af675a02dea9532b48aea0ae6e6728fdee15bc68826195583",
+    "installer_sha256": "fd7db7819a55fb65ddc804ab1f6ff488e87729f729f187adba9ce9907f8808bd",
+    "native_build": "e84175b7500f0070ddef4a136e83ed44e4ff266e7fcfeb87ccb4f99e36af87fe",
+    "platform": "macos",
+    "sha256": "9b7ac2142219d4b0d0f7316a779195a4765bf3b6f612e0b470b1c7d260e2f545",
+    "source": "5b3d1453bb21457f379a76e0d2eed85e2dee8cac"
+  },
+  "Orbiter-windows-x64-8e576b84.zip": {
+    "arch": "x86_64",
+    "artifact": 14725972848,
+    "artifact_digest": "sha256:7ed88dffd2b7f4e51832cb304ee6358fc4f76e14952b1a456e72db854db73acc",
+    "compiler": "MSVC 19.51.36260.0",
+    "installer_sha256": "85a01753f15b5ec25eb1b8001f7db8d229ab3fa3f1ee2867069a3ad57e985a83",
+    "platform": "windows",
+    "sha256": "51a52b135f73bdc87fc651b592eb1dd8c25fa7cdb70476d8f28e4860dd4b3662",
+    "source": "7c6f7670bec3594432bb2264f2fbd3397b3a9fb5"
+  }
+}

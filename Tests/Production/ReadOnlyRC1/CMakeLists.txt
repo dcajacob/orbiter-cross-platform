@@ -1,0 +1,7 @@
+cmake_minimum_required(VERSION 3.20)
+project(ReadOnlyGuiProbe LANGUAGES CXX)
+set(CMAKE_AUTOMOC ON)
+find_package(Qt6 COMPONENTS Widgets REQUIRED)
+add_library(readonlyprobe MODULE probe.cpp)
+target_link_libraries(readonlyprobe PRIVATE Qt6::Widgets)
+set_target_properties(readonlyprobe PROPERTIES LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/plugins/generic")

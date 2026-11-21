@@ -1,0 +1,96 @@
+name: RC1 protected install
+on:
+  push:
+    branches: [qualification/phase8-rc1-readonly]
+permissions:
+  contents: read
+  actions: read
+jobs:
+  check:
+    name: ${{ matrix.runner }}
+    runs-on: ${{ matrix.runner }}
+    strategy:
+      fail-fast: false
+      matrix:
+        runner: [macos-15, macos-15-intel, windows-2025]
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.14'
+      - uses: ilammy/msvc-dev-cmd@v1
+        if: runner.os == 'Windows'
+      - uses: actions/cache/restore@v6
+        with:
+          path: out/cache/production-stock-data-v1.zip
+          key: production-native-data-${{ hashFiles('Tests/Production/input-storage.lock.json') }}
+      - uses: actions/cache/restore@v6
+        with:
+          path: out/cache/Orbiter2016.zip
+          key: production-standard-planets-${{ hashFiles('Tests/Production/standard-planets.lock.json') }}
+      - uses: actions/cache/restore@v6
+        if: runner.os == 'Windows'
+        with:
+          path: out/mesa-cache/*.pkg.tar.zst
+          key: mesa-ucrt64-${{ hashFiles('Tests/Production/mesa-ucrt64.lock.json') }}
+      - name: Prepare test paths
+        shell: bash
+        run: |
+          if [[ "$RUNNER_OS" == Windows ]]; then echo 'RC1_INSTALL=C:\Users\Public\RC1install' >> "$GITHUB_ENV"; else echo 'RC1_INSTALL=/Users/Shared/RC1install' >> "$GITHUB_ENV"; fi
+      - name: Install verified frozen distribution
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python -B Tests/Production/ReadOnlyRC1/prepare.py
+      - name: Build external UI test driver
+        shell: bash
+        run: |
+          python -m pip install psutil
+          python -m venv out/aqt-env
+          if [[ "$RUNNER_OS" == Windows ]]; then
+            py=out/aqt-env/Scripts/python.exe
+            host=windows; qtarch=win64_msvc2022_64
+          else
+            py=out/aqt-env/bin/python
+            host=mac; qtarch=clang_64
+          fi
+          "$py" -m pip install aqtinstall==3.3.0
+          "$py" -m aqt install-qt "$host" desktop 6.8.3 "$qtarch" --outputdir out/qt
+          cfg=$(find out/qt -name Qt6Config.cmake -print -quit)
+          cmake -S Tests/Production/ReadOnlyRC1 -B out/probe -G Ninja -DCMAKE_BUILD_TYPE=Release -DQt6_DIR="$PWD/$(dirname "$cfg")"
+          cmake --build out/probe
+      - name: Exercise protected macOS installation
+        if: runner.os == 'macOS'
+        shell: bash
+        run: |
+          work=/Users/Shared/RC1receipt
+          mkdir "$work"
+          cp -R out/probe/plugins "$work/"
+          sudo chown -R root:wheel "$RC1_INSTALL"
+          sudo chmod -R a-w "$RC1_INSTALL"
+          sudo "$(command -v python)" Tests/Production/ReadOnlyRC1/drop.py -B Tests/Production/ReadOnlyRC1/exercise.py "$RC1_INSTALL" "$work"
+      - name: Exercise protected Windows installation
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: ./Tests/Production/ReadOnlyRC1/standard.ps1
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: RC1-protected-${{ matrix.runner }}
+          path: |
+            /Users/Shared/RC1receipt/*.txt
+            /Users/Shared/RC1receipt/*.stderr
+            /Users/Shared/RC1receipt/result.json
+            C:/Users/Public/RC1verify/receipt/*.txt
+            C:/Users/Public/RC1verify/receipt/*.stderr
+            C:/Users/Public/RC1verify/receipt/result.json
+          if-no-files-found: warn
+      - name: Require save, reopen, persisted preference and unchanged installation
+        shell: python
+        run: |
+          import os,json,pathlib
+          f=pathlib.Path(r"C:/Users/Public/RC1verify/receipt/result.json" if os.name=="nt" else "/Users/Shared/RC1receipt/result.json")
+          r=json.loads(f.read_text()); print(json.dumps(r,indent=2))
+          assert r["save"] and r["reopened"] and r["settings"] and r["install_changes"]==[]
