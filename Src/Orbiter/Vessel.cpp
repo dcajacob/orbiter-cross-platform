@@ -4110,7 +4110,8 @@ void Vessel::UpdateAerodynamicForces_OLD ()
 
 	// === parasite drag ===
 	// 1. vessel cross section projected into airspeed direction (incorporating also Cw)
-	double cw_cs = vd_side*fabs(vnorm.x) + vd_vert*fabs(vnorm.y) + vd_forw*fabs(vnorm.z);
+	double cw_cs = vd_side*fabs(vnorm.x) + vd_vert*fabs(vnorm.y)
+		+ (vnorm.z >= 0.0 ? vd_forw : vd_back)*fabs(vnorm.z);
 	Drag += cw_cs * sp.dynp;      // parasite drag magnitude
 	Flin_add -= vnorm * Drag;     // drag is opposite flight path
 }

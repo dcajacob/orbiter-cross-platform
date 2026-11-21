@@ -304,14 +304,16 @@ jobs:
           path: out/windows-test-runtime.zip
       - uses: actions/cache@v6
         with:
-          path: out/data-cache/Orbiter-x64.zip
-          key: production-data-${{ hashFiles('Tests/Production/stock-data.lock.json', 'Tests/Production/stock-data-container-v2.lock.json') }}
-      - name: Prepare and verify pinned SPICE and stock data
+          path: out/data-cache/production-stock-data-v1.zip
+          key: production-stock-mirror-${{ hashFiles('Tests/Production/input-storage.lock.json') }}
+      - name: Prepare stock data from the frozen input mirror
         run: >-
-          python Tests/Production/prepare_hosted_data.py
-          --container-lock Tests/Production/stock-data-container-v2.lock.json
-          --archive out/data-cache/Orbiter-x64.zip
-          --destination out/production-data
+          python Tests/Production/prepare_native_data.py --archive out/data-cache/production-stock-data-v1.zip
+          --destination out/production-data --group all
+      - name: Stage the original font for the disposable reference run
+        run: python Tests/Production/CockpitUI/prepare_fonts.py --assets out/production-data
+      - name: Verify the complete frozen stock profile
+        run: python Tests/Production/prepare_data.py --verify-only --destination out/production-data
       - name: Verify repeated production orbit and propulsion runs against frozen Windows evidence
         run: >-
           python Tests/Production/capture_reference.py
