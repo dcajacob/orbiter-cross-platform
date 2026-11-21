@@ -57,12 +57,7 @@ QuadTreeNode<TileType> *TileManager2Base::LoadChildNode (QuadTreeNode<TileType> 
 	int ilng = parent->ilng*2 + idx%2;
 	TileType *tile = new TileType (this, lvl, ilat, ilng);
 	QuadTreeNode<TileType> *child = node->AddChild (idx, tile);
-	if (bTileLoadThread)
-		loader->LoadTileAsync (tile);
-	else {
-		tile->Load ();
-		tile->state = Tile::Inactive;
-	}
+	loader->Queue(tile);
 	return child;
 }
 
@@ -141,14 +136,8 @@ void TileManager2Base::ProcessNode (QuadTreeNode<TileType> *node)
 			QuadTreeNode<TileType> *child = node->Child(idx);
 			if (!child)
 				child = LoadChildNode (node, idx);
-			else if (child->Entry()->state == Tile::Invalid) {
-				if (bTileLoadThread)
-					loader->LoadTileAsync (child->Entry());
-				else {
-					child->Entry()->Load();
-					child->Entry()->state = Tile::Inactive;
-				}
-			}
+			else if (child->Entry()->state == Tile::Invalid)
+				loader->Queue(child->Entry());
 			Tile::TileState state = child->Entry()->state;
 			if (!(state & TILE_VALID))
 				subcomplete = false;
@@ -217,21 +206,18 @@ template<class TileType>
 TileManager2<TileType>::TileManager2 (const vPlanet *vplanet, int _maxres, int _gridres)
 : TileManager2Base (vplanet, _maxres, _gridres)
 {
-	// Initialise the compressed packed tile archives
-	ntreeMgr = 0;
-	LoadZTrees();
+	for (int i = 0; i < 3; ++i)
+		globtile[i] = std::make_unique<TileType>(this, i-3, 0, 0);
+	for (int i = 0; i < 2; ++i)
+		tiletree[i].SetEntry(new TileType(this, 0, 0, i));
 
-	// Load the low-res full-sphere tiles
-	for (int i = 0; i < 3; i++) {
-		globtile[i] = new TileType (this, i-3, 0, 0);
-		globtile[i]->Load();
-	}
-
-	// Set the root tiles for level 0
-	for (int i = 0; i < 2; i++) {
-		tiletree[i].SetEntry (new TileType (this, 0, 0, i));
-		tiletree[i].Entry()->Load();
-	}
+	PrepareInitial(std::packaged_task<void()>([this] {
+		LoadZTrees();
+		for (auto &tile : globtile) tile->Prepare();
+		for (auto &node : tiletree) node.Entry()->Prepare();
+	}));
+	for (auto &tile : globtile) loader->Publish(tile.get());
+	for (auto &node : tiletree) loader->Publish(node.Entry());
 }
 
 // -----------------------------------------------------------------------
@@ -239,16 +225,9 @@ TileManager2<TileType>::TileManager2 (const vPlanet *vplanet, int _maxres, int _
 template<class TileType>
 TileManager2<TileType>::~TileManager2 ()
 {
+	loader->Discard(this);
 	for (int i = 0; i < 2; i++)
 		tiletree[i].DelChildren();
-	for (int i = 0; i < 3; i++)
-		delete globtile[i];
-
-	if (ntreeMgr) {
-		for (int i = 0; i < ntreeMgr; i++)
-			if (treeMgr[i]) delete treeMgr[i];
-		delete []treeMgr;
-	}
 }
 
 // -----------------------------------------------------------------------

@@ -123,13 +123,11 @@ void CloudManager::RenderTile (int lvl, int hemisp, int ilat, int nlat, int ilng
 	TILEDESC *tile, const TEXCRDRANGE &range, OGLTexture *tex, OGLTexture *ltex, uint32_t flag)
 {
 	VBMESH &mesh = PATCH_TPL[lvl][ilat]; // patch template
-
-	if (range.tumin != 0 && range.tumax != 1) {
-		printf("tumin=%f tumax=%f tvmin=%f tvmax=%f\n",range.tumin,range.tumax,range.tvmin,range.tvmax);
-		exit(-1);
-	}
-
+	if (!tex) return;
+	const bool cropped = range.tumin != 0 || range.tvmin != 0 || range.tumax != 1 || range.tvmax != 1;
 	Renderer::Bind(tileShader);
+	if (cropped)
+		tileShader->SetVec4("u_PatchUV", {range.tumin, range.tvmin, range.tumax-range.tumin, range.tvmax-range.tvmin});
 	OGLCamera *c = g_client->GetScene()->GetCamera();
 	auto *vpm = c->GetViewProjectionMatrix();
 	tileShader->SetMat4("u_ViewProjection",*vpm);
@@ -169,6 +167,7 @@ void CloudManager::RenderTile (int lvl, int hemisp, int ilat, int nlat, int ilng
 	mesh.va->Bind();
 	glDrawElements(GL_TRIANGLES, mesh.ib->GetCount(), GL_UNSIGNED_SHORT, 0);
 	mesh.va->UnBind();
+	if (cropped) tileShader->SetVec4("u_PatchUV", {0, 0, 1, 1});
 	Renderer::Unbind(tileShader);
     glBindTexture(GL_TEXTURE_2D,  0);
 

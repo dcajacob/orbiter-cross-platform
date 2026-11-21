@@ -20,6 +20,10 @@
 #include "Texture.h"
 #include <cstring>
 #include "SOIL2.h"
+#include <stdexcept>
+#include <fstream>
+#include <limits>
+#include "tilemgr2.h"
 #include <sys/stat.h>
 #include "Renderer.h"
 #include "Evidence.h"
@@ -224,26 +228,6 @@ bool TextureManager::ReadTexture (FILE *file, OGLTexture **ppdds, uint32_t flags
 */
 // =======================================================================
 
-bool TextureManager::ReadTextureFromMemory (const uint8_t *buf, uint32_t nbuf, OGLTexture **ppdds, uint32_t flags)
-{
-    *ppdds = new OGLTexture;
-    size_t xxx = nbuf;
-    (*ppdds)->m_TexId = SOIL_direct_load_DDS_from_memory((const unsigned char *)buf, &xxx, 0, 0, 0);
-    if((*ppdds)->m_TexId==0) {
-
-        printf("%s\n",SOIL_last_result());
-        abort();
-        exit(-1);
-    }
-
-    (*ppdds)->m_RefCnt = 1;
-    (*ppdds)->m_InCache = false;
-    (*ppdds)->m_FBO = 0;
-    (*ppdds)->InitSize();
-
-    return (*ppdds)->m_TexId != 0;
-}
-
 // =======================================================================
 
 bool TextureManager::LoadTexture (const char *fname, OGLTexture **ppdds, uint32_t flags)
@@ -273,91 +257,73 @@ bool TextureManager::LoadTexture (const char *fname, OGLTexture **ppdds, uint32_
 }
 
 // =======================================================================
-bool TextureManager::LoadTexture (const char *fname, long ofs, OGLTexture **ppdds, uint32_t flags)
+TileTextureData TextureManager::ReadTileBytes(const char *name, uint64_t begin, uint64_t end, bool planetFirst)
 {
-    unsigned int SOILFlags = SOIL_FLAG_MIPMAPS | SOIL_FLAG_TEXTURE_REPEATS;
-
-    if(flags & 4) {
-        SOILFlags = SOIL_FLAG_TEXTURE_REPEATS;
-    }
-
-    if(!(flags & 2)) {
-        //SOILFlags |= SOIL_FLAG_DDS_LOAD_DIRECT;
-        //SOIL_LOAD_RGBA SOIL_LOAD_AUTO
-    }
-
-	char cpath[256];
-	*ppdds = 0;
-    GLuint tid = 0;
-    if (g_client->TexturePath(fname, cpath)) {
-        tid = SOIL_load_OGL_texture(cpath, SOIL_LOAD_AUTO, SOIL_CREATE_NEW_ID, SOILFlags, ofs);
-    } else {
-    	g_client->PlanetTexturePath(fname, cpath);
-        tid = SOIL_load_OGL_texture(cpath, SOIL_LOAD_AUTO, SOIL_CREATE_NEW_ID, SOILFlags, ofs);
-    }
-
-    if(tid != 0) {
-        *ppdds = new OGLTexture;
-        (*ppdds)->m_TexId = tid;
-        (*ppdds)->m_RefCnt = 1;
-        (*ppdds)->m_InCache = false;
-        (*ppdds)->m_FBO = 0;
-        (*ppdds)->InitSize();
-        return true;
-    }
-    return false;
+	for (bool planet : {planetFirst, !planetFirst}) {
+		char path[512]{};
+		if (planet) g_client->PlanetTexturePath(name, path);
+		else if (!g_client->TexturePath(name, path)) continue;
+		std::string resolved;
+		if (!RendererResolveFilePath(path, resolved)) continue;
+		std::ifstream file(resolved, std::ios::binary | std::ios::ate);
+		if (!file) continue;
+		std::streamoff length = file.tellg();
+		if (length < 0) throw std::runtime_error("Unreadable tile file: " + resolved);
+		uint64_t limit = end == UINT64_MAX ? uint64_t(length) : end;
+		if (limit > uint64_t(length) || begin >= limit || limit-begin > std::numeric_limits<int>::max())
+			throw std::runtime_error("Invalid tile extent in " + resolved);
+		TileTextureData data;
+		data.size = size_t(limit-begin);
+		data.repeat = true;
+		data.bytes = std::make_unique<uint8_t[]>(data.size);
+		file.seekg(std::streamoff(begin));
+		if (!file.read(reinterpret_cast<char *>(data.bytes.get()), std::streamsize(data.size)))
+			throw std::runtime_error("Incomplete tile read: " + resolved);
+		return data;
+	}
+	return {};
 }
 
-// =======================================================================
-
-int TextureManager::LoadTextures (const char *fname, OGLTexture **ppdds, uint32_t flags, int n)
+static OwnedTexture UploadDDS(const uint8_t *bytes, size_t &size, bool repeat)
 {
-	char cpath[256];
-	int ntex = 0;
-	FILE* ftex = 0;
-	g_client->PlanetTexturePath(fname, cpath);
+	const unsigned flags = repeat ? SOIL_FLAG_TEXTURE_REPEATS : 0;
+	OwnedTexture texture(new OGLTexture);
+	texture->m_TexId = SOIL_direct_load_DDS_from_memory(bytes, &size, 0, flags, 0);
+	if (!texture->m_TexId)
+		throw std::runtime_error(std::string("Could not upload DDS tile: ") + SOIL_last_result());
+	texture->InitSize();
+	return texture;
+}
 
-    GLuint *tmp = new GLuint[n];
+OGLTexture *TextureManager::UploadTile(const TileTextureData &data, bool generateMipmaps)
+{
+	if (!data.bytes) return nullptr;
+	size_t size = data.size;
+	auto texture = UploadDDS(data.bytes.get(), size, data.repeat);
+	if (generateMipmaps) {
+		glBindTexture(GL_TEXTURE_2D, texture->m_TexId);
+		glGenerateMipmap(GL_TEXTURE_2D);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+	}
+	return texture.release();
+}
 
-	if ((ftex = RendererOpenFile(cpath, "rb"))) {
-		fclose(ftex);
-
-        ntex = SOIL_direct_load_DDS_blob(
-            cpath,
-            (int *)tmp,
-            n,
-            SOIL_FLAG_DDS_LOAD_DIRECT | SOIL_FLAG_TEXTURE_REPEATS);
-            //SOIL_FLAG_DDS_LOAD_DIRECT);
-
-	} else if (g_client->TexturePath(fname, cpath)) {
-		ftex = RendererOpenFile(cpath, "rb");
-		if (ftex) {
-			fclose(ftex);
-
-            ntex = SOIL_direct_load_DDS_blob(
-                cpath,
-                (int *)tmp,
-                n,
-                SOIL_FLAG_DDS_LOAD_DIRECT | SOIL_FLAG_TEXTURE_REPEATS);
-                //SOIL_FLAG_DDS_LOAD_DIRECT);
-		}
-	} else {
-//        printf("failed to open %s\n", fname);
-        //exit(EXIT_FAILURE);
-    }
-
-    for(int i=0; i<ntex;i++) {
-        ppdds[i] = new OGLTexture;
-        ppdds[i]->m_InCache = false;
-        ppdds[i]->m_RefCnt = 1;
-        ppdds[i]->m_TexId = tmp[i];
-        ppdds[i]->m_FBO = 0;
-        ppdds[i]->InitSize();
-    }
-
-    delete []tmp;
-
-	return ntex;
+TextureList TextureManager::LoadTextures(const char *name, size_t count)
+{
+	TextureList textures;
+	if (!count) return textures;
+	TileTextureData data;
+	TileManager2Base::PrepareInitial(std::packaged_task<void()>([&] { data = ReadTileBytes(name); }));
+	size_t offset = 0;
+	while (textures.size() < count && offset < data.size) {
+		size_t size = data.size - offset;
+		auto texture = UploadDDS(data.bytes.get()+offset, size, true);
+		if (!size || size > data.size-offset)
+			throw std::runtime_error(std::string("Invalid packed DDS extent in ") + name);
+		textures.push_back(std::move(texture));
+		offset += size;
+	}
+	return textures;
 }
 
 // =======================================================================

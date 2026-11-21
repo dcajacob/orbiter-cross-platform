@@ -71,8 +71,7 @@ CSphereManager::CSphereManager (const Scene *scene)
 	bPreloadTile = false;//(cfg->PlanetPreloadMode != 0);
 	nhitex = nhispec = 0;
 
-	tiledesc = new TILEDESC[maxidx];
-	memset (tiledesc, 0, maxidx*sizeof(TILEDESC));
+	tiledesc = std::make_unique<TILEDESC[]>(maxidx);
 
 	LoadPatchData ();
 	LoadTileData ();
@@ -112,16 +111,9 @@ CSphereManager::~CSphereManager ()
 
 	int i, maxidx = patchidx[maxbaselvl];
 
-	if (ntex) {
-		for (i = 0; i < ntex; i++)
-			texbuf[i]->Release();
-		delete []texbuf;
-	}
-
 	for (i = 0; i < maxidx; i++) {
 		if (tiledesc[i].vtx) delete tiledesc[i].vtx;
 	}
-	delete []tiledesc;
 }
 
 // =======================================================================
@@ -189,24 +181,15 @@ bool CSphereManager::LoadTileData ()
 
 void CSphereManager::LoadTextures ()
 {
-	int i;
-
-	// pre-load level 1-8 textures
 	char fname[256];
 	strcpy (fname, texname);
 	strcat (fname, ".tex");
-	ntex = patchidx[maxbaselvl];
-	texbuf = new OGLTexture *[ntex];
-	if (ntex = g_client->GetTexMgr()->LoadTextures (fname, texbuf, 0, ntex)) {
-		while ((int)ntex < patchidx[maxbaselvl]) maxlvl = --maxbaselvl;
-		while ((int)ntex > patchidx[maxbaselvl]) texbuf[--ntex]->Release();
-		// not enough textures loaded for requested resolution level
-		for (i = 0; i < patchidx[maxbaselvl]; i++)
-			tiledesc[i].tex.obj = texbuf[i];
-	} else {
-		delete []texbuf;
-		texbuf = 0;
-		// no textures at all!
+	texbuf = g_client->GetTexMgr()->LoadTextures(fname, patchidx[maxbaselvl]);
+	if (!texbuf.empty()) {
+		while (texbuf.size() < size_t(patchidx[maxbaselvl])) maxlvl = --maxbaselvl;
+		texbuf.resize(patchidx[maxbaselvl]);
+		for (size_t i = 0; i < texbuf.size(); i++)
+			tiledesc[i].tex.obj = texbuf[i].get();
 	}
 
 	//  pre-load highres tile textures
@@ -242,7 +225,7 @@ void CSphereManager::Render (int level, int bglvl)
 	int  nlat = NLAT[startlvl];
 	int *nlng = NLNG[startlvl];
 	int texofs = patchidx[startlvl-1];
-	TILEDESC *td = tiledesc + texofs;
+	TILEDESC *td = tiledesc.get() + texofs;
 	TEXCRDRANGE range = {0,1,0,1};
 	tilebuf = TileManager::tilebuf;
 
@@ -274,7 +257,6 @@ void CSphereManager::Render (int level, int bglvl)
 		dev->SetTextureStageState (0, D3DTSS_ALPHAARG2, D3DTA_TFACTOR);
 	}
 */
-	tilebuf->hQueueMutex.lock();
 	for (hemisp = idx = 0; hemisp < 2; hemisp++) {
 		if (hemisp) { // flip world transformation to southern hemisphere
 			RenderParam.wmat = RenderParam.wmat * TileManager::Rsouth;
@@ -288,7 +270,6 @@ void CSphereManager::Render (int level, int bglvl)
 			}
 		}
 	}
-	tilebuf->hQueueMutex.unlock();
 /*
 	dev->SetRenderState (D3DRENDERSTATE_LIGHTING, TRUE);
 	dev->SetRenderState (D3DRENDERSTATE_DESTBLEND, D3DBLEND_INVSRCALPHA);

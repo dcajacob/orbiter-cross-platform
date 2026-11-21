@@ -10,6 +10,7 @@ uniform mat4 u_ViewProjection;
 uniform mat4 u_View;
 uniform mat4 u_Model;
 uniform vec3 sundir;
+uniform vec4 u_PatchUV = vec4(0, 0, 1, 1);
 out vec2 TexCoord;
 out vec3 Normal;
 out vec4 eyeSpacePosition;
@@ -20,7 +21,7 @@ void main()
 {
 	gl_Position =  u_ViewProjection * u_Model * vec4(a_Position, 1.0);
     flogz = VS_LOGZ();
-	TexCoord = a_TexCoord1;
+	TexCoord = u_PatchUV.xy + u_PatchUV.zw * a_TexCoord1;
 	Normal = mat3(transpose(inverse(u_Model))) * a_Normal;
     FragPos = vec3(u_Model * vec4(a_Position, 1.0));
 

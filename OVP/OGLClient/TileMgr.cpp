@@ -15,6 +15,7 @@
 // LOD (level-of-detail) algorithm for surface patch resolution.
 // ==============================================================
 
+#include "tilemgr2.h"
 #include "TileMgr.h"
 #include "VPlanet.h"
 #include "Texture.h"
@@ -57,7 +58,6 @@ TileManager::TileManager (const vPlanet *vplanet)
 	oapiGetObjectName (obj, name, 256);
 	objname = new char[strlen(name)+1];
 	strcpy (objname, name);
-	ntex = 0;
 	nhitex = 0;
 	nmask = 0;
 	nhispec = 0;
@@ -71,21 +71,11 @@ TileManager::TileManager (const vPlanet *vplanet)
 
 TileManager::~TileManager ()
 {
-	uint32_t i, maxidx = patchidx[maxbaselvl];
-
-	if (ntex) {
-		for (i = 0; i < ntex; i++)
-			texbuf[i]->Release();
-		delete []texbuf;
+	if (tiledesc) {
+		for (int i = 0; i < patchidx[maxbaselvl]; i++)
+			delete tiledesc[i].vtx;
+		delete []tiledesc;
 	}
-	if (nmask) {
-		for (i = 0; i < nmask; i++)
-			specbuf[i]->Release();
-		delete []specbuf;
-	}
-	for (i = 0; i < maxidx; i++)
-		if (tiledesc[i].vtx) delete tiledesc[i].vtx;
-	delete []tiledesc;
 	delete []objname;
 }
 
@@ -207,6 +197,15 @@ bool TileManager::LoadTileData ()
 		}
 	}
 
+	if (tilever && !bPreloadTile) {
+		for (i = 0; i < n; ++i) {
+			if (tfs[i].sidx != NOTILE) surfaceOffsets.push_back(tfs[i].sidx);
+			if (tfs[i].midx != NOTILE) maskOffsets.push_back(tfs[i].midx);
+		}
+		std::sort(surfaceOffsets.begin(), surfaceOffsets.end());
+		std::sort(maskOffsets.begin(), maskOffsets.end());
+	}
+
 	TILEDESC *tile8 = tiledesc + patchidx[7];
 	for (i = 0; i < 364; i++) { // loop over level 8 tiles
 		TILEDESC &tile8i = tile8[i];
@@ -244,9 +243,7 @@ bool TileManager::AddSubtileData (TILEDESC &td, TILEFILESPEC *tfs, uint32_t idx,
 			td.subtile[sub]->flag = t.flags;
 			td.subtile[sub]->tex.idx = t.sidx;
 			if (bGlobalSpecular || bGlobalLights) {
-				if (t.midx != NOTILE) {
-					td.subtile[sub]->ltex.idx = t.midx;
-				}
+				td.subtile[sub]->ltex.idx = t.midx;
 			} else {
 				td.subtile[sub]->flag = 1; // remove specular flag
 			}
@@ -270,25 +267,17 @@ bool TileManager::AddSubtileData (TILEDESC &td, TILEFILESPEC *tfs, uint32_t idx,
 
 void TileManager::LoadTextures (char *modstr)
 {
-	int i;
-
 	// pre-load level 1-8 textures
-	ntex = patchidx[maxbaselvl];
-	texbuf = new OGLTexture *[ntex];
 	char fname[256];
 	strcpy (fname, objname);
 	if (modstr) strcat (fname, modstr);
 	strcat (fname, ".tex");
-	if (ntex = g_client->GetTexMgr()->LoadTextures (fname, texbuf, 0, ntex)) {
-		while ((int)ntex < patchidx[maxbaselvl]) maxlvl = --maxbaselvl;
-		while ((int)ntex > patchidx[maxbaselvl]) texbuf[--ntex]->Release();
-		// not enough textures loaded for requested resolution level
-		for (i = 0; i < patchidx[maxbaselvl]; i++)
-			tiledesc[i].tex.obj = texbuf[i];
-	} else {
-		delete []texbuf;
-		texbuf = 0;
-		// no textures at all!
+	texbuf = g_client->GetTexMgr()->LoadTextures(fname, patchidx[maxbaselvl]);
+	if (!texbuf.empty()) {
+		while (texbuf.size() < size_t(patchidx[maxbaselvl])) maxlvl = --maxbaselvl;
+		texbuf.resize(patchidx[maxbaselvl]);
+		for (size_t i = 0; i < texbuf.size(); i++)
+			tiledesc[i].tex.obj = texbuf[i].get();
 	}
 
 	//  pre-load highres tile textures
@@ -305,54 +294,33 @@ void TileManager::PreloadTileTextures (TILEDESC *tile8, uint32_t ntex, uint32_t 
 	// Load tile surface and mask/light textures, and copy them into the tile tree
 
 	char fname[256];
-	uint32_t i, j, nt = 0, nm = 0;
-	OGLTexture **texbuf = NULL, **maskbuf = NULL;
-
-	if (ntex) {  // load surface textures
-		texbuf = new OGLTexture *[ntex];
+	TextureList surfaces, masks;
+	if (ntex) {
 		strcpy (fname, objname);
 		strcat (fname, "_tile.tex");
-		nt = g_client->GetTexMgr()->LoadTextures (fname, texbuf, 0, ntex);
+		surfaces = g_client->GetTexMgr()->LoadTextures(fname, ntex);
 	}
-	if (nmask) { // load mask/light textures
-		maskbuf = new OGLTexture *[nmask];
+	if (nmask) {
 		strcpy (fname, objname);
 		strcat (fname, "_tile_lmask.tex");
-		nm = g_client->GetTexMgr()->LoadTextures (fname, maskbuf, 0, nmask);
+		masks = g_client->GetTexMgr()->LoadTextures(fname, nmask);
 	}
-	// copy textures into tile tree
-	for (i = 0; i < 364; i++) {
-		TILEDESC *tile8i = tile8+i;
-		for (j = 0; j < 4; j++)
-			if (tile8i->subtile[j])
-				AddSubtileTextures (tile8i->subtile[j], texbuf, nt, maskbuf, nm);
-	}
-	// release unused textures
-	if (nt) {
-		for (i = 0; i < nt; i++)
-			if (texbuf[i])
-				texbuf[i]->Release();
-		delete []texbuf;
-	}
-	if (nm) {
-		for (i = 0; i < nm; i++)
-			if (maskbuf[i])
-				maskbuf[i]->Release();
-		delete []maskbuf;
+	for (int i = 0; i < 364; i++) {
+		for (auto *subtile : tile8[i].subtile)
+			if (subtile) AddSubtileTextures(subtile, surfaces, masks);
 	}
 }
 
 // =======================================================================
 
-void TileManager::AddSubtileTextures (TILEDESC *td, OGLTexture **tbuf, uint32_t nt, OGLTexture **mbuf, uint32_t nm)
+void TileManager::AddSubtileTextures (TILEDESC *td, TextureList &surfaces, TextureList &masks)
 {
 	uint32_t i;
 
 	uint32_t tidx = td->tex.idx;  // copy surface texture
 	if (tidx != NOTILE) {
-		if (tidx < nt) {
-			td->tex.obj = tbuf[tidx];
-			tbuf[tidx] = NULL;
+		if (tidx < surfaces.size()) {
+			td->tex.obj = surfaces[tidx].release();
 		} else {                   // inconsistency
 			tmissing++;
 			td->tex.obj = NULL;
@@ -361,9 +329,8 @@ void TileManager::AddSubtileTextures (TILEDESC *td, OGLTexture **tbuf, uint32_t 
 
 	uint32_t midx = td->ltex.idx;  // copy mask/light texture
 	if (midx != NOTILE) {
-		if (midx < nm) {
-			td->ltex.obj = mbuf[midx];
-			mbuf[midx] = NULL;
+		if (midx < masks.size()) {
+			td->ltex.obj = masks[midx].release();
 		} else {                  // inconsistency
 			tmissing++;
 			td->ltex.obj = NULL;
@@ -372,7 +339,7 @@ void TileManager::AddSubtileTextures (TILEDESC *td, OGLTexture **tbuf, uint32_t 
 	td->flag &= ~0x80; // remove "not loaded" flag
 
 	for (i = 0; i < 4; i++) {
-		if (td->subtile[i]) AddSubtileTextures (td->subtile[i], tbuf, nt, mbuf, nm);
+		if (td->subtile[i]) AddSubtileTextures (td->subtile[i], surfaces, masks);
 	}
 }
 
@@ -380,39 +347,28 @@ void TileManager::AddSubtileTextures (TILEDESC *td, OGLTexture **tbuf, uint32_t 
 
 void TileManager::LoadSpecularMasks ()
 {
-	int i;
-	uint32_t n;
+	if (!nmask) return;
 	char fname[256];
+	strcpy (fname, objname);
+	strcat (fname, "_lmask.tex");
+	specbuf = g_client->GetTexMgr()->LoadTextures(fname, nmask);
+	if (specbuf.size() < nmask) {
+		specbuf.clear();
+		for (int i = 0; i < patchidx[maxbaselvl]; i++)
+			tiledesc[i].flag = 1;
+		return;
+	}
 
-	if (nmask) {
-		strcpy (fname, objname);
-		strcat (fname, "_lmask.tex");
-		specbuf = new OGLTexture *[nmask];
-		if (n = g_client->GetTexMgr()->LoadTextures (fname, specbuf, 0, nmask)) {
-			if (n < nmask) {
-				//LOGOUT1P("Transparency texture mask file too short: %s_lmask.tex", cbody->Name());
-				//LOGOUT("Disabling specular reflection for this planet");
-				delete []specbuf;
-				specbuf = NULL;
-				nmask = 0;
-				for (i = 0; i < patchidx[maxbaselvl]; i++)
-					tiledesc[i].flag = 1;
-			} else {
-				for (i = n = 0; i < patchidx[maxbaselvl]; i++) {
-					if (((tiledesc[i].flag & 3) == 3) || (tiledesc[i].flag & 4)) {
-						if (n < nmask) tiledesc[i].ltex.obj = specbuf[n++];
-						else tiledesc[i].flag = 1;
-					}
-					if (!bGlobalLights) tiledesc[i].flag &= 0xFB;
-					if (!bGlobalSpecular) tiledesc[i].flag &= 0xFD, tiledesc[i].flag |= 1;
-				}
-			}
-		} else {
-			//LOGOUT1P("Transparency texture mask file not found: %s_lmask.tex", cbody->Name());
-			//LOGOUT("Disabling specular reflection for this planet");
-			nmask = 0;
-			for (i = 0; i < patchidx[maxbaselvl]; i++)
-				tiledesc[i].flag = 1;
+	size_t n = 0;
+	for (int i = 0; i < patchidx[maxbaselvl]; i++) {
+		if (((tiledesc[i].flag & 3) == 3) || (tiledesc[i].flag & 4)) {
+			if (n < specbuf.size()) tiledesc[i].ltex.obj = specbuf[n++].get();
+			else tiledesc[i].flag = 1;
+		}
+		if (!bGlobalLights) tiledesc[i].flag &= 0xFB;
+		if (!bGlobalSpecular) {
+			tiledesc[i].flag &= 0xFD;
+			tiledesc[i].flag |= 1;
 		}
 	}
 }
@@ -472,7 +428,7 @@ void TileManager::Render (glm::mat4 &wmat, double scale, int level, double viewa
 
 	} else {
 
-		tilebuf->hQueueMutex.lock(); // make sure we can write to texture request queue
+		tilebuf->PublishReady();
 		for (hemisp = idx = 0; hemisp < 2; hemisp++) {
 			if (hemisp) { // flip world transformation to southern hemisphere
 				RenderParam.wmat = RenderParam.wmat * Rsouth;
@@ -493,7 +449,6 @@ void TileManager::Render (glm::mat4 &wmat, double scale, int level, double viewa
 				}
 			}
 		}
-		tilebuf->hQueueMutex.unlock();
 	}
 
 	//dev->SetTextureStageState (0, D3DTSS_ADDRESS, D3DTADDRESS_WRAP);
@@ -575,7 +530,7 @@ void TileManager::ProcessTile (int lvl, int hemisp, int ilat, int nlat, int ilng
 					isfull = false;
 				} else if (subtile->flag & 0x80) { // not yet loaded
 					if ((tile->flag & 0x80) == 0) // only load subtile texture if parent texture is present
-						tilebuf->LoadTileAsync (objname, subtile);
+						tilebuf->LoadTileAsync(*this, subtile);
 					isfull = false;
 				}
 				if (isfull)
@@ -1026,23 +981,13 @@ void ApplyPatchTextureCoordinates (VBMESH &mesh, VertexBuffer *vtx, const TEXCRD
 
 TileBuffer::TileBuffer ()
 {
-	uint32_t id;
-
-	nbuf = 0;
-	nused = 0;
-	last = 0;
-
-	bLoadMip = true;
-	bRunThread = true;
-	nqueue = queue_in = queue_out = 0;
-
+	nbuf = nused = last = 0;
 }
 
 // =======================================================================
 
 TileBuffer::~TileBuffer()
 {
-	bRunThread = false;
 	if (nbuf) {
 		for (uint32_t i = 0; i < nbuf; i++)
 			if (buf[i]) {
@@ -1109,6 +1054,7 @@ void TileBuffer::DeleteSubTiles (TILEDESC *tile)
 
 bool TileBuffer::DeleteTile (TILEDESC *tile)
 {
+	if (tile == pending) return false;
 	bool del = true;
 	for (uint32_t i = 0; i < 4; i++)
 		if (tile->subtile[i]) {
@@ -1152,41 +1098,49 @@ void ClearVertexBuffers (TILEDESC *td)
 
 // =======================================================================
 
-bool TileBuffer::LoadTileAsync (const char *name, TILEDESC *td)
+void TileBuffer::LoadTileAsync(const TileManager &owner, TILEDESC *tile)
 {
-    if(!name || !td)return false;
-    const long tileSize=32896;
-    OGLTexture *texture=nullptr,*mask=nullptr;
-    uint32_t index=td->tex.idx;
-    if(index!=NOTILE) {
-        long offset=(td->flag&0x40 ? long(index)*tileSize : long(index));
-        std::string file=std::string(name)+"_tile.tex";
-        if(!g_client->GetTexMgr()->LoadTexture(file.c_str(),offset,&texture,bLoadMip?0:4))return false;
-    }
-    if(((td->flag&3)==3)||(td->flag&4)) {
-        index=td->ltex.idx;
-        if(index!=uint32_t(-1)) {
-            long offset=(td->flag&0x40 ? long(index)*tileSize : long(index));
-            std::string file=std::string(name)+"_tile_lmask.tex";
-            if(!g_client->GetTexMgr()->LoadTexture(file.c_str(),offset,&mask)) {
-                if(texture)texture->Release();return false;
-            }
-        }
-    }
-    td->tex.obj=texture;td->ltex.obj=mask;
-    if(texture) { if(td->vtx){delete td->vtx;td->vtx=nullptr;}ClearVertexBuffers(td); }
-    td->flag&=0x3f;
-    return true;
+	if (pending) return;
+	const bool indexed = (tile->flag & 0x40) != 0;
+	auto extent = [indexed](uint32_t index, const std::vector<uint32_t> &offsets) -> std::pair<uint64_t,uint64_t> {
+		if (index == NOTILE) return {0, 0};
+		if (indexed) {
+			const uint64_t begin = uint64_t(index) * 32896; // 256x256 DXT1 plus DDS header
+			return {begin, begin + 32896};
+		}
+		auto next = std::upper_bound(offsets.begin(), offsets.end(), index);
+		return {index, next == offsets.end() ? UINT64_MAX : uint64_t(*next)};
+	};
+	const auto surface = extent(tile->tex.idx, owner.surfaceOffsets);
+	const auto mask = extent(((tile->flag&3)==3 || (tile->flag&4)) ? tile->ltex.idx : NOTILE, owner.maskOffsets);
+	// The job owns the addresses and planet name. Only the context thread uses tile.
+	std::packaged_task<Layers()> read([name=std::string(owner.objname), surface, mask] {
+		Layers layers;
+		if (surface.second) layers.first = TextureManager::ReadTileBytes((name+"_tile.tex").c_str(), surface.first, surface.second, false);
+		if (mask.second) layers.second = TextureManager::ReadTileBytes((name+"_tile_lmask.tex").c_str(), mask.first, mask.second, false);
+		return layers;
+	});
+	prepared = read.get_future();
+	TileManager2Base::ScheduleFileJob(std::packaged_task<void()>(std::move(read)));
+	pending = tile;
 }
 
-// =======================================================================
-// No background thread owns or uploads OpenGL resources.
-
-// =======================================================================
-
-bool TileBuffer::bRunThread = true;
-int TileBuffer::nqueue = 0;
-int TileBuffer::queue_in = 0;
-int TileBuffer::queue_out = 0;
-std::mutex TileBuffer::hQueueMutex;
-struct TileBuffer::QUEUEDESC TileBuffer::loadqueue[MAXQUEUE] = {0};
+void TileBuffer::PublishReady()
+{
+	if (!pending || prepared.wait_for(std::chrono::seconds(0)) != std::future_status::ready) return;
+	Layers layers = prepared.get();
+	auto *tile = pending;
+	pending = nullptr;
+	auto *texture = TextureManager::UploadTile(layers.first, true);
+	OGLTexture *mask = nullptr;
+	try { mask = TextureManager::UploadTile(layers.second, true); }
+	catch (...) { if (texture) texture->Release(); throw; }
+	tile->tex.obj = texture;
+	tile->ltex.obj = mask;
+	tile->flag &= 0x3f;
+	if (texture) {
+		delete tile->vtx;
+		tile->vtx = nullptr;
+		ClearVertexBuffers(tile);
+	}
+}

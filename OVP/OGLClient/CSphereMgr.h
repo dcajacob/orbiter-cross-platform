@@ -67,11 +67,10 @@ private:
 	bool disabled;                   // background image disabled?
 	uint32_t maxlvl;                    // max. patch resolution level
 	uint32_t maxbaselvl;                // max. resolution level, capped at 8
-	uint32_t ntex;                      // total number of loaded textures for levels <= 8
 	uint32_t nhitex;                    // number of textures for levels > 8
 	uint32_t nhispec;                   // number of specular reflection masks (level > 8)
-	TILEDESC *tiledesc;              // tile descriptors for levels 1-8
-	OGLTexture **texbuf;    // texture buffer for surface textures (level <= 8)
+	std::unique_ptr<TILEDESC[]> tiledesc;              // tile descriptors for levels 1-8
+	TextureList texbuf;    // texture buffer for surface textures (level <= 8)
 	bool bPreloadTile;               // preload high-resolution tile textures
 	MATRIX3 ecl2gal;                 // rotates from ecliptic to galactic frame
 	glm::mat4 trans;                 // transformation from ecliptic to galactic frame

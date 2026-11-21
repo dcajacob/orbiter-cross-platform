@@ -7,7 +7,9 @@
 #include "Production/Text.h"
 #endif
 #include "OGLCamera.h"
+#include <cstdlib>
 #include <limits>
+#include <memory>
 #include <sstream>
 #include <fstream>
 #include "Scene.h"
@@ -27,7 +29,7 @@ int CompareLabelText(const char* left, const char* right)
 
 TileLabel *TileLabel::Create(const SurfTile *stile)
 {
-	TileLabel *label = new TileLabel(stile);
+	auto label = std::make_unique<TileLabel>(stile);
 	label->Read();  // read label list from tile file
 
 	const int lvlshift = 5;
@@ -41,11 +43,9 @@ TileLabel *TileLabel::Create(const SurfTile *stile)
 	if (ancestor) label->ExtractAncestorData(ancestor);
 
 	if (label->nlabel || label->nrenderlabel) {
-		return label;
-	} else {
-		delete label;
-		return 0;
+		return label.release();
 	}
+	return nullptr;
 }
 
 TileLabel::TileLabel(const SurfTile *stile)
@@ -69,97 +69,58 @@ TileLabel::~TileLabel()
 	}
 }
 
+void TileLabel::ReadLabels(std::istream &input)
+{
+	std::string type, altitude, name;
+	double lat, lng;
+	while ((input >> type >> lat >> lng >> altitude) && std::getline(input, name)) {
+		if (!name.empty() && name.back() == '\r') name.pop_back();
+		auto entry = std::make_unique<TLABEL>();
+		entry->lat = lat * RAD;
+		entry->lng = lng * RAD;
+		entry->alt = !CompareLabelText(altitude.c_str(), "nan")
+			? std::numeric_limits<double>::quiet_NaN() : std::atof(altitude.c_str());
+		entry->labeltype = type.front();
+		entry->pos = _V(0, 0, 0);
+		entry->label = new char[name.size() + 1];
+		std::memcpy(entry->label, name.c_str(), name.size() + 1);
+		if (nlabel == nbuf) {
+			TLABEL **next = new TLABEL*[nbuf + 16];
+			if (nlabel) {
+				std::memcpy(next, label, nlabel * sizeof(*next));
+				delete []label;
+			}
+			label = next;
+			nbuf += 16;
+		}
+		label[nlabel++] = entry.release();
+	}
+}
+
 bool TileLabel::Read()
 {
-	char path[512], texpath[512];
-	int lvl = tile->lvl;
-	int ilat = tile->ilat;
-	int ilng = tile->ilng;
-	double lat, lng, alt;
-	char typestr[16], altstr[256], name[256];
-
-	if (tile->mgr->Cprm().tileLoadFlags & 0x0001) { // try loading from individual tile file
-		sprintf (path, "%s/Label/%02d/%06d/%06d.lab", tile->mgr->CbodyName(), lvl+4, ilat, ilng);
-		g_client->PlanetTexturePath(path, texpath);
-
-		std::ifstream ifs(RendererFilePath(texpath));
-		if (ifs.good()) {
-			ifs >> typestr >> lat >> lng >> altstr;
-			if (!CompareLabelText(altstr, "nan")) alt = std::numeric_limits<double>::quiet_NaN();
-			else alt = std::atof(altstr);
-			ifs.getline(name, 256);
-			while(ifs.good()) {
-				if (nlabel == nbuf) { // grow buffer
-					TLABEL **tmp = new TLABEL*[nbuf+=16];
-					if (nlabel) {
-						memcpy(tmp, label, nlabel*sizeof(TLABEL*));
-						delete []label;
-					}
-					label = tmp;
-				}
-				label[nlabel] = new TLABEL;
-				lat *= RAD;
-				lng *= RAD;
-				label[nlabel]->lat = lat;
-				label[nlabel]->lng = lng;
-				label[nlabel]->alt = alt;
-				label[nlabel]->labeltype = typestr[0];
-				label[nlabel]->pos.x = label[nlabel]->pos.y = label[nlabel]->pos.z = 0.0;
-				char *lb = name;
-				int len = strlen(lb);
-				label[nlabel]->label = new char[len+1];
-				strcpy(label[nlabel]->label, lb);
-				nlabel++;
-				ifs >> typestr >> lat >> lng >> altstr;
-				if (!CompareLabelText(altstr, "nan")) alt = std::numeric_limits<double>::quiet_NaN();
-				else alt = std::atof(altstr);
-				ifs.getline(name, 256);
-			}
+	const int level = tile->lvl + 4;
+	if (tile->mgr->Cprm().tileLoadFlags & 0x0001) {
+		char name[512], path[512];
+		std::snprintf(name, sizeof(name), "%s/Label/%02d/%06d/%06d.lab",
+			tile->mgr->CbodyName(), level, tile->ilat, tile->ilng);
+		std::string resolved;
+		if (g_client->PlanetTexturePath(name, path) && RendererResolveFilePath(path, resolved)) {
+			std::ifstream loose(resolved);
+			ReadLabels(loose);
 		}
 	}
-	if (!nlabel && tile->smgr->ZTreeManager(4)) { // try loading from compressed archive
-		uint8_t *buf;
-		int ndata = tile->smgr->ZTreeManager(4)->ReadData(lvl+4, ilat, ilng, &buf);
-		if (ndata) {
-			{
-				std::istringstream iss((char*)buf);
-				iss >> typestr >> lat >> lng >> altstr;
-				if (!CompareLabelText(altstr, "nan")) alt = std::numeric_limits<double>::quiet_NaN();
-				else alt = std::atof(altstr);
-				iss.getline(name, 256);
-				while (iss.good()) {
-					if (nlabel == nbuf) { // grow buffer
-						TLABEL **tmp = new TLABEL*[nbuf+=16];
-						if (nlabel) {
-							memcpy(tmp, label, nlabel*sizeof(TLABEL*));
-							delete []label;
-						}
-						label = tmp;
-					}
-					label[nlabel] = new TLABEL;
-					lat *= RAD;
-					lng *= RAD;
-					label[nlabel]->lat = lat;
-					label[nlabel]->lng = lng;
-					label[nlabel]->alt = alt;
-					label[nlabel]->labeltype = typestr[0];
-					label[nlabel]->pos.x = label[nlabel]->pos.y = label[nlabel]->pos.z = 0.0;
-					char *lb = name;
-					int len = strlen(lb);
-					label[nlabel]->label = new char[len+1];
-					strcpy(label[nlabel]->label, lb);
-					nlabel++;
-					if (iss.tellg() >= ndata) break;
-					iss >> typestr >> lat >> lng >> altstr;
-					if (!CompareLabelText(altstr, "nan")) alt = std::numeric_limits<double>::quiet_NaN();
-					else alt = std::atof(altstr);
-					iss.getline(name, 256);
-				}
-			}
-			tile->smgr->ZTreeManager(4)->ReleaseData(buf);
+	auto *archive = tile->smgr->ZTreeManager(4);
+	if (!nlabel && archive) {
+		uint8_t *raw = nullptr;
+		const int size = archive->ReadData(level, tile->ilat, tile->ilng, &raw);
+		std::unique_ptr<uint8_t[]> bytes(raw);
+		if (size > 0) {
+			std::istringstream packed(std::string(reinterpret_cast<const char*>(bytes.get()), size));
+			ReadLabels(packed);
 		}
 	}
-	return (nlabel > 0);
+	return nlabel > 0;
 }
 
 bool TileLabel::ExtractAncestorData (const SurfTile *atile)

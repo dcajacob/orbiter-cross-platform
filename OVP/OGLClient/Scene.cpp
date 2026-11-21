@@ -19,6 +19,7 @@
 // ==============================================================
 
 #include "Scene.h"
+#include "tilemgr2.h"
 #include <algorithm>
 #include "Evidence.h"
 #include "OGLCamera.h"
@@ -373,6 +374,7 @@ void Scene::Render (bool cockpitOverlay)
 	int n;
 	VOBJREC *pv;
 
+	TileManager2Base::PublishReady();
 	Update (); // update camera and visuals
 	Renderer::SetViewPort(cam->GetWidth(),cam->GetHeight());
 

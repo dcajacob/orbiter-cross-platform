@@ -534,7 +534,8 @@ void vPlanet::RenderSphere (const RenderPrm &prm)
 		dev->SetTextureStageState (0, D3DTSS_MAXANISOTROPY, 1);
 	}
 	*/
-	if (prm.bCloudShadow) {
+	// Tiled terrain receives tiled cloud shadows in its surface shader.
+	if (prm.bCloudShadow && !(surfmgr2 && cloudmgr2)) {
 		RenderCloudShadows (prm);                // cloud shadows
 		Renderer::CheckError("RenderSphere");
 	}

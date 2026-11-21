@@ -38,6 +38,10 @@
 #include <chrono>
 #include <map>
 #include <GLFW/glfw3.h>
+#ifdef ORBITER_WAYLAND_FULLSCREEN
+#define GLFW_EXPOSE_NATIVE_WAYLAND
+#include <GLFW/glfw3native.h>
+#endif
 #include "JoystickMapping.h"
 #include "VelocityOneTouchpad.h"
 #include <filesystem>
@@ -333,7 +337,8 @@ void recordWindowGeometry(GLFWwindow* window) {
                             : platform == GLFW_PLATFORM_WAYLAND ? "wayland"
                             : platform == GLFW_PLATFORM_COCOA ? "cocoa" : "unknown";
         record<<"{\"backend\":\""<<backend
-            <<"\",\"logical_width\":"<<logicalWidth<<",\"logical_height\":"<<logicalHeight
+            <<"\",\"fullscreen\":"<<(glfwGetWindowMonitor(window)?"true":"false")
+            <<",\"logical_width\":"<<logicalWidth<<",\"logical_height\":"<<logicalHeight
             <<",\"framebuffer_width\":"<<width<<",\"framebuffer_height\":"<<height
             <<",\"content_scale_x\":"<<scaleX<<",\"content_scale_y\":"<<scaleY
             <<",\"requested_width\":"<<requestedWindowWidth<<",\"requested_height\":"<<requestedWindowHeight
@@ -361,28 +366,57 @@ void OGLClient::Open()
     requestedWindowWidth=1280;requestedWindowHeight=720;
     auto* configuration=GetNativeRenderContext().configuration;
     require(configuration,"Native window requires production configuration");
-    const bool configuredWidth=configuration->GetInt("WindowWidth",requestedWindowWidth);
-    const bool configuredHeight=configuration->GetInt("WindowHeight",requestedWindowHeight);
-    require(requestedWindowWidth>=320 && requestedWindowWidth<=16384 && requestedWindowHeight>=200 && requestedWindowHeight<=16384,
-        "Native window dimensions are outside the supported range");
+    const int platform=glfwGetPlatform();
+    const bool linuxDisplay=platform==GLFW_PLATFORM_X11 || platform==GLFW_PLATFORM_WAYLAND;
+    const bool fullscreen=linuxDisplay && configuration->CfgDevPrm.bFullscreen;
+    const int swapInterval=(linuxDisplay && configuration->CfgDevPrm.bNoVsync)?0:1;
+    GLFWmonitor* fullscreenMonitor=nullptr;
+    bool configuredWidth=false,configuredHeight=false;
+    if(fullscreen) {
+        fullscreenMonitor=glfwGetPrimaryMonitor();
+        require(fullscreenMonitor,"Fullscreen requires a primary display");
+        const auto* mode=glfwGetVideoMode(fullscreenMonitor);
+        require(mode && mode->width>0 && mode->height>0,"Fullscreen desktop mode unavailable");
+        requestedWindowWidth=mode->width;requestedWindowHeight=mode->height;
+        glfwWindowHint(GLFW_RED_BITS,mode->redBits);
+        glfwWindowHint(GLFW_GREEN_BITS,mode->greenBits);
+        glfwWindowHint(GLFW_BLUE_BITS,mode->blueBits);
+        glfwWindowHint(GLFW_REFRESH_RATE,mode->refreshRate);
+    } else {
+        configuredWidth=configuration->GetInt("WindowWidth",requestedWindowWidth);
+        configuredHeight=configuration->GetInt("WindowHeight",requestedWindowHeight);
+        require(requestedWindowWidth>=320 && requestedWindowWidth<=16384 && requestedWindowHeight>=200 && requestedWindowHeight<=16384,
+            "Native window dimensions are outside the supported range");
+    }
     if(!GetNativeRenderContext().evidence.empty() && std::filesystem::is_regular_file(scaleMarker)) {
         std::ifstream marker(scaleMarker);marker>>engineeringWindowScale;
         require(marker && engineeringWindowScale==2,"Engineering window scale must be 2");
+        require(!fullscreen,"Engineering window scale fixture requires windowed mode");
         require(requestedWindowWidth==1280 && requestedWindowHeight==720,"Engineering scale fixture requires the accepted 1280x720 viewport");
     }
-    const bool scaledWindow=glfwGetPlatform()==GLFW_PLATFORM_WAYLAND && (configuredWidth || configuredHeight);
+    const bool scaledWindow=platform==GLFW_PLATFORM_WAYLAND && (configuredWidth || configuredHeight);
+    const bool waylandFullscreen=platform==GLFW_PLATFORM_WAYLAND && fullscreen;
     float scaleX=1,scaleY=1;
-    if(scaledWindow) {
+    if(scaledWindow || waylandFullscreen) {
         auto* monitor=glfwGetPrimaryMonitor();require(monitor,"Configured native window requires a primary display");
         glfwGetMonitorContentScale(monitor,&scaleX,&scaleY);
         require(std::isfinite(scaleX) && std::isfinite(scaleY) && scaleX>=1 && scaleY>=1,"Native display scale is invalid");
     }
     if(engineeringWindowScale==2)scaleX=scaleY=2;
-    glfwWindowHint(GLFW_SCALE_FRAMEBUFFER,scaledWindow || engineeringWindowScale==2?GLFW_TRUE:GLFW_FALSE);
-    nativeWindow=glfwCreateWindow(int(std::lround(requestedWindowWidth/scaleX)),int(std::lround(requestedWindowHeight/scaleY)),"Orbiter: native production engine / Sol / ShuttlePB",nullptr,nullptr);
+    glfwWindowHint(GLFW_SCALE_FRAMEBUFFER,scaledWindow || waylandFullscreen || engineeringWindowScale==2?GLFW_TRUE:GLFW_FALSE);
+    nativeWindow=glfwCreateWindow(int(std::lround(requestedWindowWidth/scaleX)),int(std::lround(requestedWindowHeight/scaleY)),"Orbiter: native production engine / Sol / ShuttlePB",fullscreenMonitor,nullptr);
     require(nativeWindow!=nullptr,"Native OpenGL window creation failed");
-    glfwMakeContextCurrent(nativeWindow);glfwSwapInterval(1);
+    glfwMakeContextCurrent(nativeWindow);glfwSwapInterval(swapInterval);
     require(gladLoadGLLoader(reinterpret_cast<GLADloadproc>(glfwGetProcAddress))!=0,"Native OpenGL function loading failed");
+#ifdef ORBITER_WAYLAND_FULLSCREEN
+    if(waylandFullscreen) {
+        // Mapping the surface delivers the compositor's fullscreen size and output scale.
+        // Apply those events before constructing the fixed-size cockpit Pane.
+        glClear(GL_COLOR_BUFFER_BIT);glfwSwapBuffers(nativeWindow);
+        require(wl_display_roundtrip(glfwGetWaylandDisplay())>=0,"Wayland fullscreen configuration failed");
+        glfwPollEvents();
+    }
+#endif
     if(scaledWindow || engineeringWindowScale==2) {
         // Wayland announces the entered output's scale after the first buffer
         // commit. Settle it before constructing the original fixed-size Pane.
@@ -448,7 +482,7 @@ void OGLClient::Open()
         const auto& planet=configuration->CfgPRenderPrm;
         std::ofstream settings(GetNativeRenderContext().evidence/"native-render-settings.json");
         settings.exceptions(std::ios::badbit|std::ios::failbit);
-        settings<<"{\"swap_interval\":1,\"planet_max_level\":"<<visual.PlanetMaxLevel
+        settings<<"{\"swap_interval\":"<<swapInterval<<",\"planet_max_level\":"<<visual.PlanetMaxLevel
             <<",\"patch_grid_power\":"<<planet.PatchRes<<",\"resolution_bias\":"<<planet.ResolutionBias
             <<",\"clouds\":"<<visual.bClouds<<",\"cloud_shadows\":"<<visual.bCloudShadows
             <<",\"vessel_shadows\":"<<visual.bVesselShadows<<",\"night_lights\":"<<visual.bNightlights
@@ -609,9 +643,11 @@ void OGLClient::clbkDestroyRenderWindow(bool)
     }
     SetCameraRotation(false);
     glfwMakeContextCurrent(nativeWindow);mScene.reset();mMeshManager.reset();
+    // The terrain worker may exist even when a later shader failed to initialize.
+    TileManager2Base::GlobalExit();
     if(mResources) {
         OGLPad::GlobalExit();vVessel::GlobalExit();OGLParticleStream::GlobalExit();vStar::GlobalExit();HazeManager::GlobalExit();
-        TileManager2Base::GlobalExit();TileManager::GlobalExit();vObject::GlobalExit();mResources=false;
+        TileManager::GlobalExit();vObject::GlobalExit();mResources=false;
     }
     ReleaseOverlayBuffers();mTextureManager.reset();Renderer::GlobalExit();
     glfwDestroyWindow(nativeWindow);nativeWindow=nullptr;Evidence::End(true);glfwTerminate();glfwInitialized=false;

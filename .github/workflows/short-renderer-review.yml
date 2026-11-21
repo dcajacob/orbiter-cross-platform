@@ -1,0 +1,84 @@
+name: Muted Windows renderer smoke
+on:
+  push:
+    branches: [qualification/review-ogl-sparse-314784f2]
+permissions:
+  contents: read
+  actions: read
+jobs:
+  renderer:
+    name: Release OpenGL stock flight and startup cleanup
+    runs-on: windows-2025
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.14'
+      - uses: ilammy/msvc-dev-cmd@v1
+        with:
+          arch: x64
+      - name: Verify renderer tree and recover the matching Windows app and SDK
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          $ErrorActionPreference = 'Stop'
+          if ((git rev-parse HEAD:OVP/OGLClient) -ne '314784f2f9de75a5e52fb567912af9034633f1ad') { throw 'Wrong renderer tree' }
+          New-Item -ItemType Directory out/receipt,out/previous | Out-Null
+          $artifact = (gh api 'repos/dcajacob/orbiter-cross-platform/actions/artifacts/14401993380' | ConvertFrom-Json)
+          if ($artifact.expired -or $artifact.workflow_run.head_sha -ne '72b1741ea59ebe9266ade3ae8f678d0dab5a9835' -or $artifact.digest -ne 'sha256:9d97d04c2608b69caf5c042c0e353a15f05d117186456b03c54796727e993715') { throw 'Wrong pinned artifact identity' }
+          curl.exe -fLsS --retry 2 -H "Authorization: Bearer $env:GH_TOKEN" $artifact.archive_download_url -o out/previous/artifact.zip
+          if ($LASTEXITCODE -ne 0 -or (Get-FileHash out/previous/artifact.zip).Hash -ne $artifact.digest.Substring(7)) { throw 'Artifact digest mismatch' }
+          python -m zipfile -e out/previous/artifact.zip out/previous/files
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
+          $packages = @(Get-ChildItem out/previous/files -Recurse -Filter 'Orbiter-windows*.zip')
+          if ($packages.Count -ne 1 -or (Get-FileHash $packages[0].FullName).Hash -ne '53d37b745efb3c5f2d98a443e3b9b9e45a544087ae3faacd367c31a4a3eee9eb') { throw 'Wrong Windows runtime package' }
+          python -m zipfile -e $packages[0].FullName out/run
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
+          $artifact | ConvertTo-Json -Depth 6 > out/receipt/base-artifact.json
+          '314784f2f9de75a5e52fb567912af9034633f1ad' > out/receipt/source-renderer-tree.txt
+      - name: Build committed renderer and the original 48-frame probe
+        run: |
+          cmake -S OVP/OGLClient -B out/renderer -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_C_COMPILER=cl -DCMAKE_CXX_COMPILER=cl -DCMAKE_POLICY_VERSION_MINIMUM=3.5 "-DORBITER_TEST_RUNTIME=$pwd/out/run"
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
+          cmake --build out/renderer --target OGLClient --parallel 4
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
+          cmake -S Tests/Production/Packages -B out/probe -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_COMPILER=cl "-DORBITER_TEST_RUNTIME=$pwd/out/run"
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
+          cmake --build out/probe --parallel 2
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
+          Copy-Item out/probe/LaunchpadFlightProbe.dll out/run/Modules/Plugin/LaunchpadFlightProbe.dll -Force
+      - uses: actions/cache/restore@v6
+        with:
+          path: out/data-cache/production-stock-data-v1.zip
+          key: production-native-data-${{ hashFiles('Tests/Production/input-storage.lock.json') }}
+      - uses: actions/cache/restore@v6
+        with:
+          path: out/planet-cache/Orbiter2016.zip
+          key: production-standard-planets-${{ hashFiles('Tests/Production/standard-planets.lock.json') }}
+      - uses: actions/cache/restore@v6
+        with:
+          path: out/mesa-cache/*.pkg.tar.zst
+          key: mesa-ucrt64-${{ hashFiles('Tests/Production/mesa-ucrt64.lock.json') }}
+      - name: Prepare locked stock assets and software OpenGL
+        run: |
+          python -B Tests/Production/prepare_native_data.py --archive out/data-cache/production-stock-data-v1.zip --destination out/data --group all
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
+          python -B Tests/Production/CockpitUI/prepare_fonts.py --assets out/data
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
+          python -B Tests/Production/prepare_hosted_data.py --lock Tests/Production/standard-planets.lock.json --archive out/planet-cache/Orbiter2016.zip --destination out/planets
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
+          python -B Tests/Production/stage_mesa.py stage --cache out/mesa-cache --destination out/mesa
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
+      - name: Run the muted stock flight and missing-shader check
+        run: |
+          ./Tests/Production/RendererSmoke/smoke.ps1 -Run out/run -Output out/receipt/flight -Data out/data -Planets out/planets -Mesa out/mesa -SourceRoot $pwd
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: windows-renderer-short-receipt
+          path: out/receipt/
+          retention-days: 2
+          if-no-files-found: warn

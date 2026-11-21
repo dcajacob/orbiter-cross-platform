@@ -16,12 +16,14 @@
 // ==============================================================
 
 #include "surfmgr2.h"
+#include "cloudmgr2.h"
 #include "tilelabel.h"
 #include "Texture.h"
 #include "OGLCamera.h"
 #include "Scene.h"
 #include "Renderer.h"
 #include "Evidence.h"
+#include <cmath>
 #include <cstring>
 
 // =======================================================================
@@ -48,7 +50,7 @@ struct ELEVFILEHEADER { // file header for patch elevation data file
 template<>
 void TileManager2<SurfTile>::SetSubtreeLabels(QuadTreeNode<SurfTile> *node, bool activate)
 {
-	if (node->Entry()) {
+	if (node->Entry() && (node->Entry()->state & TILE_VALID)) {
 		if (activate) node->Entry()->CreateLabels();
 		else          node->Entry()->DeleteLabels();
 	}
@@ -92,65 +94,18 @@ SurfTile::SurfTile (TileManager2Base *_mgr, int _lvl, int _ilat, int _ilng)
 SurfTile::~SurfTile ()
 {
 	if (elev) delete []elev;
-	if (ltex && owntex) ltex->Release();
+	if (ltex) ltex->Release();
 	DeleteLabels();
 }
 
 // -----------------------------------------------------------------------
 
-void SurfTile::Load ()
+void SurfTile::Prepare()
 {
-	bool bLoadMip = true; // for now
-	bool ok;
-
-	int flag = (bLoadMip ? 0:4);
-	char path[512];
-
-	// Load surface texture
-	ok = false;
-	owntex = true;
-	if (mgr->Cprm().tileLoadFlags & 0x0001) { // try loading from individual tile file
-		sprintf (path, "%s/Surf/%02d/%06d/%06d.dds", mgr->CbodyName(), lvl+4, ilat, ilng);
-		ok = (g_client->GetTexMgr()->LoadTextures (path, &tex, flag, 1) != 0);
-	}
-	if (!ok && smgr->ZTreeManager(0)) { // try loading from compressed archive
-		uint8_t *buf;
-		int ndata = smgr->ZTreeManager(0)->ReadData(lvl+4, ilat, ilng, &buf);
-		if (ndata) {
-			ok = g_client->GetTexMgr()->ReadTextureFromMemory (buf, ndata, &tex, flag);
-			smgr->ZTreeManager(0)->ReleaseData(buf);
-		}
-	}
-	if (!ok) { // no texture found - interpolate subregion from ancestor
-		if (GetParentSubTexRange (&texrange)) {
-			tex = getSurfParent()->Tex();
-			owntex = false;
-		} else {
-			tex = 0;
-		}
-	}
-
-	// Load mask texture
-	ltex = NULL;
-	if (mgr->Cprm().bSpecular || mgr->Cprm().bLights) {
-		if (owntex) {
-			ok = false;
-			if (mgr->Cprm().tileLoadFlags & 0x0001) { // try loading from individual tile file
-				sprintf (path, "%s/Mask/%02d/%06d/%06d.dds", mgr->CbodyName(), lvl+4, ilat, ilng);
-				ok = (g_client->GetTexMgr()->LoadTextures (path, &ltex, flag, 1) != 0);
-			}
-			if (!ok && smgr->ZTreeManager(1)) { // try loading from compressed archive
-				uint8_t *buf;
-				int ndata = smgr->ZTreeManager(1)->ReadData(lvl+4, ilat, ilng, &buf);
-				if (ndata) {
-					g_client->GetTexMgr()->ReadTextureFromMemory (buf, ndata, &ltex, flag);
-					smgr->ZTreeManager(1)->ReleaseData(buf);
-				}
-			}
-		} else if (node->Parent()) {
-			ltex = getSurfParent()->ltex;
-		}
-	}
+	surfaceData = ReadTexture("Surf", smgr->ZTreeManager(0));
+	if (!surfaceData.bytes) GetParentSubTexRange(&texrange);
+	if (mgr->Cprm().bSpecular || mgr->Cprm().bLights)
+		maskData = ReadTexture("Mask", smgr->ZTreeManager(1));
 
 	// Load elevation data
 	int16_t *elev = ElevationData ();
@@ -167,7 +122,19 @@ void SurfTile::Load ()
 		// create rectangular patch
 		mesh = CreateMesh_quadpatch (res, res, elev, mgr->ElevRes(), 0.0, &texrange, shift_origin, &vtxshift, mgr->GetPlanet()->prm.tilebb_excess);
 	}
+}
 
+void SurfTile::Publish()
+{
+	tex = TextureManager::UploadTile(surfaceData);
+	surfaceData = {};
+	if (!tex && getSurfParent()) {
+		tex = getSurfParent()->Tex();
+		owntex = false;
+	}
+	ltex = TextureManager::UploadTile(maskData);
+	maskData = {};
+	maskSource = ltex ? this : (getSurfParent() ? getSurfParent()->maskSource : nullptr);
 	static const int label_enable = MKR_ENABLE | MKR_LMARK;
 	int plnmode = *(int*)g_client->GetConfigParam (CFGPRM_SURFMARKERFLAG);
 	if ((plnmode & label_enable) == label_enable)
@@ -393,7 +360,8 @@ bool SurfTile::LoadElevationData ()
 	// Once a grandparent has loaded its elevation data on request of a grandchild, any other grandchildren's requests
 	// can be served directly without further disk I/O.
 
-	if (elev) return true; // already present
+	if (elevationChecked) return elev != nullptr;
+	elevationChecked = true;
 
 	has_elevfile = false;
 	int mode = mgr->Cprm().elevMode;
@@ -490,18 +458,65 @@ double SurfTile::GetMeanElevation (const int16_t *elev) const
 
 void SurfTile::GlobalInit() {
 	tileShader = Renderer::GetShader("Tile");
+	Renderer::Bind(tileShader);
+	tileShader->SetInt("u_NightMask", 1);
+	tileShader->SetInt("u_CloudWest", 2);
+	tileShader->SetInt("u_CloudEast", 3);
+}
+
+// Map unit coordinates on a surface patch into an independently tiled layer.
+// At an ancestor level the low address bits select the subrectangle.
+static glm::vec3 layerUV(int level, int row, int column, int sourceLevel, double shift = 0)
+{
+	const int span = 1 << (level - sourceLevel);
+	return {float((column % span + shift) / span), float(row % span) / span, 1.0f / span};
+}
+
+void SurfTile::BindSurfaceLayers() const
+{
+	const auto &prm = *mgr->prm.rprm;
+	tileShader->SetVec4("u_SurfaceUV", {texrange.tumin, texrange.tvmin,
+		1.0f / (texrange.tumax - texrange.tumin), 1.0f / (texrange.tvmax - texrange.tvmin)});
+
+	const float brightness = mgr->Cprm().bLights && maskSource ? float(mgr->Cprm().lightfac) : 0.0f;
+	tileShader->SetFloat("u_NightBrightness", brightness);
+	if (brightness > 0) {
+		glActiveTexture(GL_TEXTURE1);
+		glBindTexture(GL_TEXTURE_2D, maskSource->ltex->m_TexId);
+		tileShader->SetVec3("u_NightUV", layerUV(lvl, ilat, ilng, maskSource->lvl));
+	}
+
+	const auto *clouds = mgr->GetPlanet()->CloudMgr2();
+	const float opacity = clouds && prm.bCloudShadow ? float(prm.shadowalpha) : 0.0f;
+	tileShader->SetFloat("u_CloudShadowOpacity", opacity);
+	if (opacity > 0) {
+		// Cloud rotation can split one ground patch across two cloud tiles,
+		// including where the cloud map wraps at the antimeridian.
+		const int columns = 2 << lvl;
+		const double origin = ilng + prm.cloudrot * columns / PI2;
+		const int left = int(std::floor(origin));
+		const double fraction = origin - left;
+		tileShader->SetFloat("u_CloudSplit", float(1.0 - fraction));
+		for (int half = 0; half < 2; ++half) {
+			const int column = ((left + half) % columns + columns) % columns;
+			const Tile *source = clouds->ResidentTextureTile(lvl, ilat, column);
+			glActiveTexture(GL_TEXTURE2 + half);
+			glBindTexture(GL_TEXTURE_2D, source ? source->Tex()->m_TexId : 0);
+			const auto uv = source ? layerUV(lvl, ilat, column, source->Level(), fraction - half) : glm::vec3(0);
+			tileShader->SetVec3(half ? "u_EastUV" : "u_WestUV", uv);
+		}
+	}
+	glActiveTexture(GL_TEXTURE0);
 }
 
 void SurfTile::Render ()
 {
-	//bool render_lights = mgr->Cprm().bLights;
-	//bool render_shadows = false;//(mgr->GetPlanet()->CloudMgr2() && !mgr->prm.rprm->bCloudFlatShadows);
-
 	//static float spec_base = 0.4f; // 0.95f;
 	//static D3DMATERIAL7 pmat, watermat = {{1,1,1,1},{1,1,1,1},{spec_base*1.2f,spec_base*1.0f,spec_base*0.8f,1},{0,0,0,0},50.0f};
 
-	if (!mesh) return; // DEBUG : TEMPORARY
-	if(!mesh->VAO) {
+	// A tile can have elevation data before a surface texture is available.
+	if (!mesh || !tex) return;
+	if (mesh->verticesDirty) {
 		if (state & TILE_VALID) {
 			mesh->Upload();
 		} else
@@ -568,6 +583,7 @@ void SurfTile::Render ()
 		tileShader->SetVec3("u_bgcol", bgcol);
 	}
 
+	BindSurfaceLayers();
     glBindTexture(GL_TEXTURE_2D,  tex->m_TexId);
 	Renderer::CheckError("SurfTile::Render glBindTexture");
 	mesh->VAO->Bind();
@@ -832,11 +848,11 @@ void SurfTile::FixCorner (const SurfTile *nbr)
 	int vtx_idx = (ilat & 1 ? 0 : (res+1)*res) + (ilng & 1 ? res : 0);
 	N2TVERTEX &vtx_store = mesh->vtx[mesh->nv + (ilat & 1 ? 0 : res)];
 
-	int16_t *elev = ElevationData();
+	int16_t *elev = ggelev;
 	if (!elev) return;
 
 	if (nbr) {
-		int16_t *nbr_elev = nbr->ElevationData();
+		int16_t *nbr_elev = nbr->ggelev;
 		if (!nbr_elev) return;
 
 		int16_t corner_elev = elev[TILE_ELEVSTRIDE+1 + (ilat & 1 ? 0 : TILE_ELEVSTRIDE*res) + (ilng & 1 ? res : 0)];
@@ -847,7 +863,7 @@ void SurfTile::FixCorner (const SurfTile *nbr)
 		mesh->vtx[vtx_idx].x = (float)(vtx_store.x*radfac + vtxshift.x*(radfac-1.0));
 		mesh->vtx[vtx_idx].y = (float)(vtx_store.y*radfac + vtxshift.y*(radfac-1.0));
 		mesh->vtx[vtx_idx].z = (float)(vtx_store.z*radfac + vtxshift.z*(radfac-1.0));
-		mesh->Upload();
+		mesh->verticesDirty = true;
 	}
 }
 
@@ -878,8 +894,8 @@ void SurfTile::FixLongitudeBoundary (const SurfTile *nbr, bool keep_corner)
 		} else {  // interpolate to neighbour's left edge
 			dlvl = lvl-nbrlvl;
 			if (dlvl <= 5) { // for larger tile level differences the interleaved sampling method doesn't work
-				int16_t *elev = ElevationData();
-				int16_t *nbr_elev = nbr->ElevationData();
+				int16_t *elev = ggelev;
+				int16_t *nbr_elev = nbr->ggelev;
 				if (elev && nbr_elev) {
 					elev += TILE_ELEVSTRIDE+1 + vtx_ofs; // add offset
 					int nsub = 1 << dlvl;    // number of tiles fitting alongside the lowres neighbour
@@ -914,7 +930,7 @@ void SurfTile::FixLongitudeBoundary (const SurfTile *nbr, bool keep_corner)
 				// problems
 			}
 		}
-		mesh->Upload();
+		mesh->verticesDirty = true;
 	}
 }
 
@@ -946,8 +962,8 @@ void SurfTile::FixLatitudeBoundary (const SurfTile *nbr, bool keep_corner)
 		} else {
 			dlvl = lvl-nbrlvl;
 			if (dlvl <= 5) { // for larger tile level differences the interleaved sampling method doesn't work
-				int16_t *elev = ElevationData();
-				int16_t *nbr_elev = nbr->ElevationData();
+				int16_t *elev = ggelev;
+				int16_t *nbr_elev = nbr->ggelev;
 				if (elev && nbr_elev) {
 					elev += (line+1)*TILE_ELEVSTRIDE + 1; // add offset
 					int nsub = 1 << dlvl;    // number of tiles fitting alongside the lowres neighbour
@@ -982,7 +998,7 @@ void SurfTile::FixLatitudeBoundary (const SurfTile *nbr, bool keep_corner)
 				// problems
 			}
 		}
-		mesh->Upload();
+		mesh->verticesDirty = true;
 	}
 }
 
@@ -1055,8 +1071,6 @@ void TileManager2<SurfTile>::Render (MATRIX4 &dwmat, const vPlanet::RenderPrm &r
 
 	// TODO: render full sphere for levels < 4
 
-	//loader->WaitForMutex();
-
 	// update the tree
 	for (i = 0; i < 2; i++)
 		ProcessNode (tiletree+i);
@@ -1071,7 +1085,6 @@ void TileManager2<SurfTile>::Render (MATRIX4 &dwmat, const vPlanet::RenderPrm &r
 	//for (i = 0; i < 2; i++)
 	//	Dev()->SetTextureStageState (i, D3DTSS_ADDRESS, D3DTADDRESS_WRAP);
 
-	//loader->ReleaseMutex ();
 }
 
 // -----------------------------------------------------------------------
@@ -1088,12 +1101,8 @@ void TileManager2<SurfTile>::RenderLabels (oapi::Sketchpad *skp, oapi::Font **la
 template<>
 void TileManager2<SurfTile>::CreateLabels()
 {
-	loader->WaitForMutex();
-
 	for (int i = 0; i < 2; i++)
 		SetSubtreeLabels(tiletree+i, true);
-
-	loader->ReleaseMutex();
 }
 
 // -----------------------------------------------------------------------
@@ -1101,12 +1110,8 @@ void TileManager2<SurfTile>::CreateLabels()
 template<>
 void TileManager2<SurfTile>::DeleteLabels()
 {
-	loader->WaitForMutex();
-
 	for (int i = 0; i < 2; i++)
 		SetSubtreeLabels(tiletree+i, false);
-
-	loader->ReleaseMutex();
 }
 
 // -----------------------------------------------------------------------
@@ -1114,17 +1119,11 @@ void TileManager2<SurfTile>::DeleteLabels()
 template<>
 void TileManager2<SurfTile>::LoadZTrees()
 {
-	treeMgr = new ZTreeMgr*[ntreeMgr = 5];
-	if (cprm.tileLoadFlags & 0x0002) {
-		char cbuf[256];
-		g_client->PlanetTexturePath (CbodyName(), cbuf);
-		treeMgr[0] = ZTreeMgr::CreateFromFile(cbuf, ZTreeMgr::LAYER_SURF);
-		treeMgr[1] = ZTreeMgr::CreateFromFile(cbuf, ZTreeMgr::LAYER_MASK);
-		treeMgr[2] = ZTreeMgr::CreateFromFile(cbuf, ZTreeMgr::LAYER_ELEV);
-		treeMgr[3] = ZTreeMgr::CreateFromFile(cbuf, ZTreeMgr::LAYER_ELEVMOD);
-		treeMgr[4] = ZTreeMgr::CreateFromFile(cbuf, ZTreeMgr::LAYER_LABEL);
-	} else {
-		for (int i = 0; i < ntreeMgr; i++)
-			treeMgr[i] = 0;
-	}
+	if (!(cprm.tileLoadFlags & 0x0002)) return;
+	char path[256];
+	g_client->PlanetTexturePath(CbodyName(), path);
+	const ZTreeMgr::Layer layers[] = {ZTreeMgr::LAYER_SURF, ZTreeMgr::LAYER_MASK,
+		ZTreeMgr::LAYER_ELEV, ZTreeMgr::LAYER_ELEVMOD, ZTreeMgr::LAYER_LABEL};
+	for (int i = 0; i < 5; ++i)
+		treeMgr[i].reset(ZTreeMgr::CreateFromFile(path, layers[i]));
 }

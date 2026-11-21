@@ -27,10 +27,8 @@ RingManager::RingManager (const vPlanet *vplanet, double inner_rad, double outer
 	orad = outer_rad;
 	rres = (unsigned int)-1;
 	tres = 0;
-	ntex = 0;
 	for (unsigned int i = 0; i < MAXRINGRES; i++) {
 		mesh[i] = 0;
-		tex[i] = 0;
 	}
 }
 
@@ -39,8 +37,6 @@ RingManager::~RingManager ()
 	unsigned int i;
 	for (i = 0; i < 3; i++)
 		if (mesh[i]) delete mesh[i];
-	for (i = 0; i < ntex; i++)
-		tex[i]->Release();
 }
 
 void RingManager::GlobalInit ()
@@ -54,22 +50,22 @@ void RingManager::SetMeshRes (unsigned int res)
 		rres = res;
 		if (!mesh[res])
 			mesh[res] = CreateRing (irad, orad, 8+res*4);
-		if (!ntex)
-			ntex = LoadTextures();
-		tres = std::min (rres, ntex-1);
+		if (tex.empty()) LoadTextures();
+		if (!tex.empty()) tres = std::min(rres, static_cast<unsigned>(tex.size() - 1));
 	}
 }
 
-unsigned int RingManager::LoadTextures ()
+void RingManager::LoadTextures ()
 {
 	char fname[256];
 	oapiGetObjectName (vp->Object(), fname, 256);
 	strcat (fname, "_ring.tex");
-	return g_client->GetTexMgr()->LoadTextures (fname, tex, 0, MAXRINGRES);
+	tex = g_client->GetTexMgr()->LoadTextures(fname, MAXRINGRES);
 }
 
 bool RingManager::Render (OGLCamera *c, glm::mat4 &mWorld, bool front)
 {
+	if (tex.empty()) return false;
 	MATRIX3 grot;
 	glm::vec3 q(mWorld[0][0], mWorld[1][0], mWorld[2][0]);
 	float scale = glm::length(q);

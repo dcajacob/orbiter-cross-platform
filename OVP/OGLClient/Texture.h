@@ -19,6 +19,14 @@
 
 #include <stdio.h>
 #include <string>
+#include <memory>
+#include <vector>
+
+struct TileTextureData {
+	std::unique_ptr<uint8_t[]> bytes;
+	size_t size = 0;
+	bool repeat = false;
+};
 
 struct OGLTexture
 {
@@ -40,6 +48,12 @@ struct OGLTexture
 	std::string m_file;
 };
 
+struct TextureReleaser {
+	void operator()(OGLTexture *texture) const { texture->Release(); }
+};
+using OwnedTexture = std::unique_ptr<OGLTexture, TextureReleaser>;
+using TextureList = std::vector<OwnedTexture>;
+
 // ==============================================================
 // Class TextureManager
 
@@ -53,21 +67,14 @@ public:
 	// pointed to by 'ppdds'.
 	// flags: passed on to ReadTexture
 
-	bool LoadTexture (const char *fname, long ofs, OGLTexture **ppdds, uint32_t flags = 0);
-	// Read a single texture from a multi-texture file at offset ofs
-	// Return number of loaded textures (1, or 0 on failure)
-	// flags: passed on to ReadTexture
+	// Legacy archives store consecutive DDS images. Ranges come from the tile index.
+	static TileTextureData ReadTileBytes(const char *name, uint64_t begin=0, uint64_t end=UINT64_MAX, bool planetFirst=true);
+	static OGLTexture *UploadTile(const TileTextureData &data, bool generateMipmaps=false);
 
-	int LoadTextures (const char *fname, OGLTexture **ppdds, uint32_t flags, int n);
-	// Read up to n textures from file 'fname' into the DX7 surface array.
-	// Return value is the number of actually loaded textures (<=n)
+	TextureList LoadTextures(const char *name, size_t count);
 
 	bool ReadTexture (FILE *file, OGLTexture **ppdds, uint32_t flags);
 	// Read a single texture from open file stream 'file' into the
-	// DX7 surface pointed to by 'ppdds'.
-
-	bool ReadTextureFromMemory (const uint8_t *buf, uint32_t nbuf, OGLTexture **ppdds, uint32_t flags);
-	// Read a single texture from memory buffer 'buf' into the
 	// DX7 surface pointed to by 'ppdds'.
 
 	bool GetTexture (const char *fname, OGLTexture **ppdds, uint32_t flags);

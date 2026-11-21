@@ -144,9 +144,11 @@ void OGLClient::clbkDestroyRenderWindow(bool fastclose) {
     // Outstanding GDI leases own real surface references and must end first.
     mSurfaceDCs.clear();
     mScene.reset();mMeshManager.reset();
+    // The terrain worker may exist even when a later shader failed to initialize.
+    TileManager2Base::GlobalExit();
     if(mResources) {
         OGLPad::GlobalExit();vVessel::GlobalExit();OGLParticleStream::GlobalExit();vStar::GlobalExit();HazeManager::GlobalExit();
-        TileManager2Base::GlobalExit();TileManager::GlobalExit();vObject::GlobalExit();
+        TileManager::GlobalExit();vObject::GlobalExit();
         mResources=false;
     }
     ReleaseOverlayBuffers();mTextureManager.reset();Renderer::GlobalExit();

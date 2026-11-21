@@ -14,6 +14,7 @@
 #include <locale>
 #include <set>
 #include <map>
+#include <mutex>
 #include <stdexcept>
 #include <vector>
 
@@ -29,6 +30,7 @@ std::set<std::string> seen;
 std::map<std::string,unsigned> objectDraws;
 std::string currentObject;
 std::map<std::string,std::pair<unsigned,uint64_t>> planetTiles;
+std::mutex archiveMutex;
 std::map<std::pair<std::string,int>,uint64_t> archiveReads;
 std::string name(OBJHANDLE h) { char value[256]{};oapiGetObjectName(h,value,sizeof(value));return value; }
 std::ofstream output(const char *path) { std::ofstream f(path,std::ios::binary);f.imbue(std::locale::classic());f<<std::setprecision(17);if(!f)throw std::runtime_error("cannot write graphics evidence");return f; }
@@ -97,7 +99,7 @@ void Draw(unsigned vertices,unsigned count) { if(enabled){++draws;indices+=count
 void PlanetTile(OBJHANDLE object,unsigned count) {
     if(enabled){auto &tile=planetTiles[name(object)];++tile.first;tile.second+=count;}
 }
-void ArchiveRead(const char *path,int layer,unsigned bytes) { if(enabled && bytes)archiveReads[{path,layer}]+=bytes; }
+void ArchiveRead(const char *path,int layer,unsigned bytes) { std::lock_guard<std::mutex> lock(archiveMutex); if(enabled && bytes)archiveReads[{path,layer}]+=bytes; }
 void Rendered() { if(enabled)++frames;InstrumentEvidence::Rendered(); }
 void Frame() {
     InstrumentEvidence::Frame();
@@ -170,6 +172,7 @@ void Frame() {
     auto planets=output("planet-tiles.csv");planets<<"object,textured_draw_calls,indices\n";
     for(auto &entry:planetTiles)planets<<entry.first<<','<<entry.second.first<<','<<entry.second.second<<'\n';
     auto archives=output("archive-reads.csv");archives<<"path,layer,inflated_bytes\n";
+    std::lock_guard<std::mutex> lock(archiveMutex);
     for(auto &entry:archiveReads)archives<<entry.first.first<<','<<entry.first.second<<','<<entry.second<<'\n';
     events.flush();assets.flush();
 }

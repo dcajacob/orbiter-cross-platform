@@ -19,10 +19,10 @@
 
 #include "OGLMesh.h"
 #include "spherepatch.h"
-#include <mutex>
-#include <thread>
+#include <future>
+#include <vector>
 
-#define MAXQUEUE 10
+
 
 #pragma pack(push,1)
 	struct TILEFILESPEC {
@@ -112,7 +112,7 @@ protected:
 	void PreloadTileTextures (TILEDESC *tile8, uint32_t ntex, uint32_t nmask);
 	// Pre-load high-resolution tile textures for the planet (level >= 9)
 
-	void AddSubtileTextures (TILEDESC *td, OGLTexture **tbuf, uint32_t nt, OGLTexture **mbuf, uint32_t nm);
+	void AddSubtileTextures (TILEDESC *td, TextureList &surfaces, TextureList &masks);
 	// add a high-resolution subtile texture to the tree
 
 	void LoadSpecularMasks ();
@@ -135,10 +135,10 @@ protected:
 	const vPlanet *vp;               // the planet visual
 	OBJHANDLE obj;                   // the planet object
 	char *objname;                   // the name of the planet (for identifying texture files)
+	std::vector<uint32_t> surfaceOffsets, maskOffsets; // byte offsets in version 1 packed archives
 	uint32_t tilever;                   // file version for tile textures
 	int maxlvl;                      // max LOD level
 	int maxbaselvl;                  // max LOD level, capped at 8
-	uint32_t ntex;                      // total number of loaded textures for levels <= 8
 	uint32_t nhitex;                    // number of textures for levels > 8
 	uint32_t nhispec;                   // number of specular reflection masks (level > 8)
 	double lightfac;                 // city light intensity factor
@@ -150,11 +150,11 @@ protected:
 	const ATMCONST *atmc;            // atmospheric parameters (used for specular colour modification)
 	int bPreloadTile;                // pre-load surface tile textures
 
-	TILEDESC *tiledesc;              // tile descriptors for levels 1-8
+	TILEDESC *tiledesc = nullptr;              // tile descriptors for levels 1-8
 	static TileBuffer *tilebuf;      // subtile manager
 
-	OGLTexture **texbuf;    // texture buffer for surface textures (level <= 8)
-	OGLTexture **specbuf;   // texture buffer for specular masks (level <= 8);
+	TextureList texbuf;    // texture buffer for surface textures (level <= 8)
+	TextureList specbuf;   // texture buffer for specular masks (level <= 8);
 	OGLTexture *microtex;   // microtexture overlay
 
 	// object-independent configuration data
@@ -220,31 +220,20 @@ public:
 	// root td. This is necessary when a new tile has been loaded, because
 	// this can change the subrange extents for child tiles.
 
-	bool LoadTileAsync (const char *name, TILEDESC *tile);
-	// load the textures for a tile for planet 'name', given by descriptor
-	// 'tile', using a separate thread.
-	// Returns false if request can't be entered (queue full, or request
-	// already present)
-
-	static std::mutex hQueueMutex;
+	void LoadTileAsync(const TileManager &owner, TILEDESC *tile);
+	void PublishReady();
 
 private:
-	bool DeleteTile (TILEDESC *tile);
+	bool DeleteTile(TILEDESC *tile);
+	using Layers = std::pair<TileTextureData, TileTextureData>;
+	std::future<Layers> prepared;
+	TILEDESC *pending = nullptr; // kept alive by DeleteTile until its reads finish
 
-	// the thread function loading tile textures on demand
-
-	bool bLoadMip;  // load mipmaps for tiles if available
-	static bool bRunThread;
-	static int nqueue, queue_in, queue_out;
 	uint32_t nbuf;     // buffer size;
 	uint32_t nused;    // number of active entries
 	uint32_t last;     // index of last activated entry
 	TILEDESC **buf; // tile buffer
 
-	static struct QUEUEDESC {
-		const char *name;
-		TILEDESC *td;
-	} loadqueue[MAXQUEUE];
 };
 
 #endif // !__TILEMGR_H

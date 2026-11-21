@@ -42,13 +42,13 @@ public:
 
 protected:
 	OGLMesh *CreateRing (double irad, double orad, int nsect);
-	unsigned int LoadTextures ();
+	void LoadTextures ();
 
 private:
 	const vPlanet *vp;
 	OGLMesh *mesh[MAXRINGRES];
-	OGLTexture * tex[MAXRINGRES];
-	unsigned int rres, tres, ntex;
+	TextureList tex;
+	unsigned int rres, tres;
 	double irad, orad;
 
 	static inline Shader *ringShader;

@@ -22,7 +22,12 @@
 #include "qtree.h"
 #include "ztreemgr.h"
 
-#define MAXQUEUE2 20
+#include <condition_variable>
+#include <deque>
+#include <exception>
+#include <future>
+#include <mutex>
+#include <thread>
 
 #define TILE_VALID  0x0001
 #define TILE_ACTIVE 0x0002
@@ -45,6 +50,7 @@ struct VBMESH_TS {
 	std::unique_ptr<IndexBuffer> IBO;
 	std::unique_ptr<VertexArray> VAO;
 
+	bool verticesDirty = true;
 	void Upload();
 
 	N2TVERTEX *vtx;
@@ -104,7 +110,6 @@ public:
 	enum TileState {
 		Invalid   = 0x0000,                            // tile data have not been loaded/created yet
 		InQueue   = 0x0004,                            // queued for asynchronous load
-		Loading   = 0x0008,                            // in the process of being loaded
 		Inactive  = TILE_VALID,                        // valid data, but not in active part of quadtree (cached)
 		Active    = TILE_VALID | TILE_ACTIVE,          // active, but not rendered itself (ancestor of rendered tiles)
 		Invisible = TILE_VALID | TILE_ACTIVE | 0x0004, // active, but outside field of view
@@ -114,8 +119,11 @@ public:
 protected:
 	virtual Tile *getParent() = 0;
 
-	virtual void Load () = 0;
-	// Load tile data from file, or synthesise missing data from ancestors
+	// Prepare runs on the single tile worker. Publish runs on the graphics context.
+	virtual void Prepare() = 0;
+	virtual void Publish() = 0;
+	TileTextureData ReadTexture(const char *layer, ZTreeMgr *archive) const;
+	TileTextureData surfaceData;
 
 	virtual void Render () {}
 
@@ -146,33 +154,29 @@ protected:
 };
 
 // =======================================================================
-#include <mutex>
-#include <thread>
-#include <condition_variable>
 class TileLoader {
 	template<class T> friend class TileManager2;
-
 public:
-	TileLoader ();
-	~TileLoader ();
-	bool LoadTileAsync (Tile *tile);
-
-	bool Unqueue (Tile *tile);
-	// remove a tile from the load queue (caller must own hLoadMutex)
-
-	inline static int WaitForMutex() { hLoadMutex.lock(); return 0; }
-	inline static bool ReleaseMutex() { hLoadMutex.unlock(); return true; }
+	TileLoader();
+	~TileLoader();
+	void Queue(Tile *tile);
+	void Schedule(std::packaged_task<void()> prepare);
+	bool Cancel(Tile *tile);
+	void Discard(TileManager2Base *owner);
+	void PublishReady();
 
 private:
-	static struct QUEUEDESC {
-		Tile *tile;
-	} queue[MAXQUEUE2];
-
-	static bool bRunThread;
-	static int nqueue, queue_in, queue_out;
-	static std::mutex hLoadMutex;
-	static std::condition_variable hCV;
-	int load_frequency;
+	void Run();
+	void Publish(Tile *tile);
+	std::mutex mutex;
+	std::condition_variable changed;
+	// The worker owns preparation until it transfers the tile to ready under mutex.
+	std::deque<Tile *> queued, ready;
+	Tile *working = nullptr;
+	std::deque<std::packaged_task<void()>> fileJobs;
+	std::exception_ptr failure;
+	bool stopping = false;
+	std::thread worker;
 };
 
 // =======================================================================
@@ -218,6 +222,9 @@ public:
 
 	static void GlobalInit ();
 	static void GlobalExit ();
+	static void PublishReady() { loader->PublishReady(); }
+	static void ScheduleFileJob(std::packaged_task<void()> job) { loader->Schedule(std::move(job)); }
+	static void PrepareInitial(std::packaged_task<void()> job);
 
 	template<class TileType>
 	QuadTreeNode<TileType> *FindNode (QuadTreeNode<TileType> root[2], int lvl, int ilng, int ilat);
@@ -266,7 +273,6 @@ private:
 
 	static double resolutionBias;
 	static double resolutionScale;
-	static bool bTileLoadThread;     // load tiles on separate thread
 };
 
 // =======================================================================
@@ -294,8 +300,25 @@ public:
 	// Returns the node at the specified position, or 0 if it doesn't exist
 
 	inline TileType *GlobalTile (int lvl)
-	{ return (lvl >= -3 && lvl < 0 ? globtile[lvl+3] : 0); }
+	{ return (lvl >= -3 && lvl < 0 ? globtile[lvl+3].get() : nullptr); }
 	// Returns a low-res global tile
+
+	// Most detailed resident tile owning the texture for this wrapped tile address.
+	// Borrowed only for the current surface draw.
+	const Tile *ResidentTextureTile(int level, int row, int column) const
+	{
+		const auto *node = &tiletree[column >> level];
+		const Tile *source = nullptr;
+		for (int bit = level; node; --bit) {
+			const auto *tile = node->Entry();
+			if (!tile || !tile->Tex()) break;
+			if (tile->owntex) source = tile;
+			if (!bit) break;
+			const int child = ((row >> (bit-1)) & 1) * 2 + ((column >> (bit-1)) & 1);
+			node = node->Child(child);
+		}
+		return source;
+	}
 
 	int Coverage (double latmin, double latmax, double lngmin, double lngmax, int maxlvl, const Tile **tbuf, int nt) const;
 	// fills tbuf with a list of tiles up to maxlvl currently covering the area latmin,latmax,lngmin,lngmax
@@ -304,14 +327,13 @@ public:
 	// The tile pointers are only valid for the current render pass. They are not guaranteed to exist any more
 	// after the next call to Render.
 
-	inline ZTreeMgr *ZTreeManager(int i) { return treeMgr[i]; }
+	inline ZTreeMgr *ZTreeManager(int i) { return treeMgr[i].get(); }
 
 protected:
-	TileType *globtile[3];              // full-sphere tiles for resolution levels 1-3
+	std::unique_ptr<TileType> globtile[3];              // full-sphere tiles for resolution levels 1-3
 	QuadTreeNode<TileType> tiletree[2]; // quadtree roots for western and eastern hemisphere
 
-	ZTreeMgr **treeMgr;  // access to tile layers in compressed archives
-	int ntreeMgr;
+	std::unique_ptr<ZTreeMgr> treeMgr[5]; // surface, mask, elevation, elevation edits, labels (clouds use slot 0)
 
 	void CheckCoverage (const QuadTreeNode<TileType> *node, double latmin, double latmax, double lngmin, double lngmax, int maxlvl, const Tile **tbuf, int nt, int *nfound) const;
 

@@ -34,7 +34,8 @@ protected:
 	virtual Tile *getParent() { return (node && node->Parent()) ? node->Parent()->Entry() : NULL; }
 	// Return pointer to parent tile, if exists
 
-	virtual void Load ();
+	void Prepare() override;
+	void Publish() override;
 	virtual void Render ();
 
 	TileManager2<CloudTile> *cmgr;	// cloud tile manager interface

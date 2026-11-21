@@ -14,6 +14,8 @@
 #include "glad.h"
 #include "tilemgr2.h"
 #include "Texture.h"
+#include <algorithm>
+#include <chrono>
 #include "OGLCamera.h"
 #include "Scene.h"
 #include "Renderer.h"
@@ -54,15 +56,26 @@ Tile::~Tile ()
 
 bool Tile::PreDelete ()
 {
-	switch (state) {
-	case Loading:
-		return false;                // locked
-	case InQueue:
-		mgr->loader->Unqueue (this); // remove from load queue
-		// fall through
-	default:
-		return true;
+	return state != InQueue || mgr->loader->Cancel(this);
+}
+
+// Read and inflate the source bytes with no graphics calls. A tile's ancestors
+// remain resident while its node exists, including while the worker owns it.
+TileTextureData Tile::ReadTexture(const char *layer, ZTreeMgr *archive) const
+{
+	TileTextureData result;
+	if (mgr->Cprm().tileLoadFlags & 1) {
+		char name[512];
+		std::snprintf(name, sizeof(name), "%s/%s/%02d/%06d/%06d.dds",
+			mgr->CbodyName(), layer, lvl+4, ilat, ilng);
+		result = TextureManager::ReadTileBytes(name);
 	}
+	if (!result.bytes && archive) {
+		uint8_t *bytes = nullptr;
+		result.size = archive->ReadData(lvl+4, ilat, ilng, &bytes);
+		result.bytes.reset(bytes);
+	}
+	return result;
 }
 
 // -----------------------------------------------------------------------
@@ -537,6 +550,13 @@ VBMESH_TS *Tile::CreateMesh_hemisphere (int grd, int16_t *elev, double globelev)
 }
 void VBMESH_TS::Upload()
 {
+	verticesDirty = false;
+	if (VAO) {
+		VBO->Bind();
+		VBO->Update(vtx, nv*sizeof(N2TVERTEX));
+		VBO->UnBind();
+		return;
+	}
 	VAO = std::make_unique<VertexArray>();
 	VAO->Bind();
 	VBO = std::make_unique<VertexBuffer>(vtx, nv*sizeof(N2TVERTEX));
@@ -597,102 +617,113 @@ void VBMESH_TS::Upload()
 // =======================================================================
 // =======================================================================
 
-bool TileLoader::bRunThread = true;
-int TileLoader::nqueue = 0;
-int TileLoader::queue_in = 0;
-int TileLoader::queue_out = 0;
-std::mutex TileLoader::hLoadMutex;
-struct TileLoader::QUEUEDESC TileLoader::queue[MAXQUEUE2] = {0};
+TileLoader::TileLoader() : worker(&TileLoader::Run, this) {}
 
-TileLoader::TileLoader ()
+TileLoader::~TileLoader()
 {
-	bRunThread = true;
-	nqueue = queue_in = queue_out = 0;
-	load_frequency = 10;//g_client->Cfg()->PlanetLoadFrequency;
-
-}
-
-// -----------------------------------------------------------------------
-
-TileLoader::~TileLoader ()
-{
-	bRunThread = false;
-/*
-	if (WaitForSingleObject (hLoadThread, 1000) == WAIT_TIMEOUT) {
-		TerminateThread (hLoadThread, 0);
+	{
+		std::lock_guard<std::mutex> lock(mutex);
+		stopping = true;
 	}
-	CloseHandle (hLoadThread);
-	CloseHandle (hLoadMutex);
-	*/
+	changed.notify_all();
+	worker.join();
 }
 
-// -----------------------------------------------------------------------
-
-bool TileLoader::LoadTileAsync (Tile *tile)
+void TileLoader::Run()
 {
-    if(!tile)return false;
-    tile->state=Tile::Loading;
-    tile->Load();
-    tile->state=Tile::Inactive;
-    return true;
-}
-
-// -----------------------------------------------------------------------
-
-bool TileLoader::Unqueue (Tile *tile)
-{
-	if (tile->state != Tile::InQueue) return false;
-
-	int i, j;
-	for (i = 0; i < nqueue; i++) {
-		j = (queue_out+i) % MAXQUEUE2;
-		if (queue[j].tile == tile) {
-			if (i) queue[j].tile = queue[queue_out].tile;
-			queue_out = (queue_out+1) % MAXQUEUE2;
-			nqueue--;
-			return true;
+	std::unique_lock<std::mutex> lock(mutex);
+	for (;;) {
+		changed.wait(lock, [&] { return stopping || !fileJobs.empty() || !queued.empty(); });
+		if (stopping) return;
+		if (!fileJobs.empty()) {
+			auto prepare = std::move(fileJobs.front());
+			fileJobs.pop_front();
+			lock.unlock();
+			prepare();
+			lock.lock();
+			continue;
 		}
+		working = queued.front();
+		queued.pop_front();
+		lock.unlock();
+		std::exception_ptr error;
+		try { working->Prepare(); }
+		catch (...) { error = std::current_exception(); }
+		lock.lock();
+		if (error && !failure) failure = error;
+		ready.push_back(working);
+		working = nullptr;
+		changed.notify_all();
 	}
-	return false;
 }
 
-// -----------------------------------------------------------------------
-#ifdef UNDEF
-int WINAPI TileLoader::Load_ThreadProc (void *data)
+void TileLoader::Queue(Tile *tile)
 {
-	TileLoader *loader = (TileLoader*)data;
-	int idle = 1000/loader->load_frequency;
-	Tile *tile;
-	bool load;
-
-	while (bRunThread) {
-		WaitForMutex ();
-		if (load = (nqueue > 0)) {
-			tile = queue[queue_out].tile;
-			tile->state = Tile::Loading; // lock tile and its ancestor tree
-			queue_out = (queue_out+1) % MAXQUEUE2; // remove from queue
-			nqueue--;
-		}
-		ReleaseMutex ();
-
-		if (load) {
-			tile->Load(); // load/create the tile
-
-			WaitForMutex ();
-			tile->state = Tile::Inactive; // unlock tile
-			ReleaseMutex ();
-		} else {
-			Sleep (idle);
-		}
-	}
-	return 0;
+	std::lock_guard<std::mutex> lock(mutex);
+	if (queued.size() + ready.size() >= 64) return; // traversal retries invalid tiles
+	tile->state = Tile::InQueue;
+	queued.push_back(tile);
+	changed.notify_one();
 }
-#endif
-// -----------------------------------------------------------------------
-// All GPU uploads run synchronously on the context-owning render thread.
 
-// =======================================================================
-// =======================================================================
+void TileLoader::Publish(Tile *tile)
+{
+	tile->Publish();
+	tile->state = Tile::Inactive;
+}
+
+void TileLoader::Schedule(std::packaged_task<void()> prepare)
+{
+	std::lock_guard<std::mutex> lock(mutex);
+	fileJobs.push_back(std::move(prepare));
+	changed.notify_one();
+}
+
+void TileManager2Base::PrepareInitial(std::packaged_task<void()> job)
+{
+	auto finished = job.get_future();
+	// Celestial background textures can be requested before terrain is initialized.
+	if (loader) loader->Schedule(std::move(job));
+	else job();
+	finished.get();
+}
+
+void TileLoader::PublishReady()
+{
+	const auto deadline = std::chrono::steady_clock::now() + std::chrono::milliseconds(2);
+	for (int count = 0; count < 12; ++count) {
+		Tile *tile;
+		{
+			std::lock_guard<std::mutex> lock(mutex);
+			if (failure) std::rethrow_exception(failure);
+			if (ready.empty()) return;
+			tile = ready.front();
+			ready.pop_front();
+		}
+		Publish(tile);
+		if (std::chrono::steady_clock::now() >= deadline) return;
+	}
+}
+
+bool TileLoader::Cancel(Tile *tile)
+{
+	std::lock_guard<std::mutex> lock(mutex);
+	if (working == tile) return false; // keep its ancestors alive until Prepare returns
+	for (auto *list : {&queued, &ready}) {
+		auto it = std::find(list->begin(), list->end(), tile);
+		if (it != list->end()) list->erase(it);
+	}
+	return true;
+}
+
+void TileLoader::Discard(TileManager2Base *owner)
+{
+	std::unique_lock<std::mutex> lock(mutex);
+	auto belongs = [owner](Tile *tile) { return tile->mgr == owner; };
+	queued.erase(std::remove_if(queued.begin(), queued.end(), belongs), queued.end());
+	changed.wait(lock, [&] { return !working || !belongs(working); });
+	ready.erase(std::remove_if(ready.begin(), ready.end(), belongs), ready.end());
+}
 
 TileManager2Base::configPrm TileManager2Base::cprm = {
 	2,                  // elevInterpol
@@ -705,7 +736,7 @@ TileManager2Base::configPrm TileManager2Base::cprm = {
 TileLoader *TileManager2Base::loader = NULL;
 double TileManager2Base::resolutionBias = 4.0;
 double TileManager2Base::resolutionScale = 1.0;
-bool TileManager2Base::bTileLoadThread = false;
+
 
 // -----------------------------------------------------------------------
 
@@ -738,7 +769,6 @@ void TileManager2Base::GlobalInit()
 	cprm.lightfac = *(double*)g_client->GetConfigParam (CFGPRM_SURFACELIGHTBRT);
 	cprm.elevMode = *(int*)g_client->GetConfigParam (CFGPRM_ELEVATIONMODE);
 	cprm.tileLoadFlags = 0x0003;//g_client->Cfg()->PlanetTileLoadFlags; //*(int*)gclient->GetConfigParam (CFGPRM_TILELOADFLAGS);
-	bTileLoadThread = false; // TODO: g_pOrbiter->Cfg()->CfgPRenderPrm.bLoadOnThread;
 	loader = new TileLoader ();
 }
 
@@ -747,6 +777,7 @@ void TileManager2Base::GlobalInit()
 void TileManager2Base::GlobalExit ()
 {
 	delete loader;
+	loader = nullptr;
 }
 
 // -----------------------------------------------------------------------

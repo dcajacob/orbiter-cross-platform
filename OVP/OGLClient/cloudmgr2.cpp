@@ -44,36 +44,20 @@ void CloudTile::GlobalInit()
 
 // -----------------------------------------------------------------------
 
-void CloudTile::Load ()
+void CloudTile::Publish()
 {
-	bool bLoadMip = true; // for now
-	bool ok = false;
-
-	int flag = (bLoadMip ? 0:4);
-	char path[512];
-
-	// Load cloud texture
-	owntex = true;
-	if (mgr->Cprm().tileLoadFlags & 0x0001) { // try loading from individual tile file
-		sprintf (path, "%s/Cloud/%02d/%06d/%06d.dds", mgr->CbodyName(), lvl+4, ilat, ilng);
-		ok = (g_client->GetTexMgr()->LoadTextures (path, &tex, flag, 1) != 0);
+	tex = TextureManager::UploadTile(surfaceData);
+	surfaceData = {};
+	if (!tex && getParent()) {
+		tex = getParent()->Tex();
+		owntex = false;
 	}
-	if (!ok && cmgr->ZTreeManager(0)) { // try loading from compressed archive
-		uint8_t *buf;
-		int ndata = cmgr->ZTreeManager(0)->ReadData(lvl+4, ilat, ilng, &buf);
-		if (ndata) {
-			ok = (g_client->GetTexMgr()->ReadTextureFromMemory (buf, ndata, &tex, flag) != 0);
-			cmgr->ZTreeManager(0)->ReleaseData(buf);
-		}
-	}
-	if (!ok) { // no texture found - interpolate subregion from ancestor
-		if (GetParentSubTexRange (&texrange)) {
-			tex = getParent()->Tex();
-			owntex = false;
-		} else
-			tex = 0;
-	}
+}
 
+void CloudTile::Prepare()
+{
+	surfaceData = ReadTexture("Cloud", cmgr->ZTreeManager(0));
+	if (!surfaceData.bytes) GetParentSubTexRange(&texrange);
 	bool shift_origin = (lvl >= 4);
 	int res = mgr->GridRes();
 
@@ -93,7 +77,8 @@ void CloudTile::Load ()
 void CloudTile::Render ()
 {
 //	TileManager2<CloudTile>::Dev()->SetTexture (0, tex);
-	if (!mesh) return; // DEBUG : TEMPORARY
+	// Cloud tile textures can still be unavailable after mesh creation.
+	if (!mesh || !tex) return;
 	if(!mesh->VAO) {
 		if (state & TILE_VALID) {
 			mesh->Upload();
@@ -316,11 +301,8 @@ int TileManager2<CloudTile>::Coverage (double latmin, double latmax, double lngm
 template<>
 void TileManager2<CloudTile>::LoadZTrees()
 {
-	treeMgr = new ZTreeMgr*[ntreeMgr = 1];
-	if (cprm.tileLoadFlags & 0x0002) {
-		char cbuf[256];
-		g_client->PlanetTexturePath (CbodyName(), cbuf);
-		treeMgr[0] = ZTreeMgr::CreateFromFile(cbuf, ZTreeMgr::LAYER_CLOUD);
-	} else
-		treeMgr[0] = 0;
+	if (!(cprm.tileLoadFlags & 0x0002)) return;
+	char path[256];
+	g_client->PlanetTexturePath(CbodyName(), path);
+	treeMgr[0].reset(ZTreeMgr::CreateFromFile(path, ZTreeMgr::LAYER_CLOUD));
 }

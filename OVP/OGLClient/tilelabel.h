@@ -4,6 +4,7 @@
 #ifndef __TILELABEL_H
 #define __TILELABEL_H
 
+#include <iosfwd>
 #include "ztreemgr.h"
 #include "OGLClient.h"
 
@@ -32,6 +33,7 @@ protected:
 	double Elevation(double lat, double lng, double latmin, double latmax, double lngmin, double lngmax, double elev_res) const;
 
 private:
+	void ReadLabels(std::istream &input);
 	const SurfTile *tile;
 	int nlabel, nbuf;
 	TLABEL **label;        // the list read from file
