@@ -75,17 +75,23 @@ jobs:
         if: runner.os == 'Windows'
         shell: pwsh
         run: ./Tests/Production/ReadOnlyRC1/standard.ps1
+      - name: Collect standard-user evidence
+        if: always()
+        shell: python
+        run: |
+          import os,pathlib,shutil
+          src=pathlib.Path(r"C:/Users/Public/RC1verify/receipt" if os.name=="nt" else "/Users/Shared/RC1receipt")
+          dest=pathlib.Path("out/user-evidence")
+          dest.mkdir(parents=True,exist_ok=True)
+          for p in src.glob("*"):
+              if p.is_file():
+                  shutil.copy2(p,dest/p.name)
+                  if p.suffix in (".txt",".json",".stderr"): print(p.name,p.read_text(errors="replace")[:12000])
       - uses: actions/upload-artifact@v4
         if: always()
         with:
           name: RC1-protected-${{ matrix.runner }}
-          path: |
-            /Users/Shared/RC1receipt/*.txt
-            /Users/Shared/RC1receipt/*.stderr
-            /Users/Shared/RC1receipt/result.json
-            C:/Users/Public/RC1verify/receipt/*.txt
-            C:/Users/Public/RC1verify/receipt/*.stderr
-            C:/Users/Public/RC1verify/receipt/result.json
+          path: out/user-evidence/
           if-no-files-found: warn
       - name: Require save, reopen, persisted preference and unchanged installation
         shell: python

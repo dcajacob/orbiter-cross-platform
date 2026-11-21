@@ -18,3 +18,4 @@ $cred=[pscredential]::new("$env:COMPUTERNAME\$user",$password)
 $exe=(Get-Command python).Source
 $p=Start-Process -Credential $cred -LoadUserProfile -FilePath $exe -WorkingDirectory $work -ArgumentList @('-B',"$base/exercise.py",$env:RC1_INSTALL,$work) -Wait -PassThru
 if ($p.ExitCode) {throw "Standard-user test exited $($p.ExitCode)"}
+Get-WinEvent -FilterHashtable @{LogName='Application';StartTime=(Get-Date).AddMinutes(-8)} -ErrorAction SilentlyContinue | Where-Object {$_.Message -match 'Orbiter\.exe'} | Select-Object -First 8 TimeCreated,Id,Message | Out-String -Width 220 | Set-Content "$work/application-events.txt"
