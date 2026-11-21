@@ -17,22 +17,22 @@ runtime=install/"runtime"
 if win:
     # Start-Process with an alternate credential loads HKCU but inherits the
     # runner's environment. Resolve folders via the authenticated user token.
-    import tempfile
-    def known_folder(csidl):
-        buffer=ctypes.create_unicode_buffer(260)
-        rc=ctypes.windll.shell32.SHGetFolderPathW(None,csidl,None,0,buffer)
-        if rc: raise OSError(rc)
-        return Path(buffer.value)
-    profile=known_folder(40)
-    local=known_folder(28)
-    tmp=local/"Temp"
-    tmp.mkdir(exist_ok=True)
-    user=subprocess.check_output(["whoami"],text=True).strip()
-    if user.split(chr(92))[-1].lower()!="orbiterpilot" or profile.name.lower()!="orbiterpilot":
-        raise RuntimeError(f"Unexpected standard user's profile: {user} {profile}")
+    import csv
+    import winreg
+    sys.stderr=(work/"pilot-error.txt").open("w",encoding="utf8",buffering=1)
+    identity=subprocess.check_output(["whoami","/user","/fo","csv","/nh"],text=True)
+    user,sid=next(csv.reader([identity.strip()]))
+    registry=r"SOFTWARE\Microsoft\Windows NT\CurrentVersion\ProfileList"
+    with winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE,registry+chr(92)+sid) as key:
+        profile=Path(os.path.expandvars(winreg.QueryValueEx(key,"ProfileImagePath")[0]))
+    print(f"Authenticated identity {user} profile {profile}",file=sys.stderr)
+    if user.split(chr(92))[-1].lower()!="orbiterpilot" or not profile.name.lower().startswith("orbiterpilot"):
+        raise RuntimeError("Unexpected profile owner")
     os.environ.update(USERPROFILE=str(profile),HOME=str(profile),USERNAME=profile.name,
-                      HOMEDRIVE=profile.drive,HOMEPATH=str(profile)[2:],
-                      LOCALAPPDATA=str(local),APPDATA=str(known_folder(26)),TEMP=str(tmp),TMP=str(tmp))
+                      HOMEDRIVE=profile.drive,HOMEPATH=str(profile)[2:])
+    local=profile/"AppData"/"Local"; roaming=profile/"AppData"/"Roaming"; tmp=local/"Temp"
+    tmp.mkdir(parents=True,exist_ok=True);roaming.mkdir(parents=True,exist_ok=True)
+    os.environ.update(LOCALAPPDATA=str(local),APPDATA=str(roaming),TEMP=str(tmp),TMP=str(tmp))
 home=Path.home()
 stock="DG Mk4 in orbit"
 result={"platform":platform.platform(),"arch":platform.machine(),"user":home.name,"save":False,"reopened":False,"settings":False}
