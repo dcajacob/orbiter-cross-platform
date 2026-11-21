@@ -14,6 +14,25 @@ install=Path(sys.argv[1])
 work=Path(sys.argv[2])
 win=os.name=="nt"
 runtime=install/"runtime"
+if win:
+    # Start-Process with an alternate credential loads HKCU but inherits the
+    # runner's environment. Resolve folders via the authenticated user token.
+    import tempfile
+    def known_folder(csidl):
+        buffer=ctypes.create_unicode_buffer(260)
+        rc=ctypes.windll.shell32.SHGetFolderPathW(None,csidl,None,0,buffer)
+        if rc: raise OSError(rc)
+        return Path(buffer.value)
+    profile=known_folder(40)
+    local=known_folder(28)
+    tmp=local/"Temp"
+    tmp.mkdir(exist_ok=True)
+    user=subprocess.check_output(["whoami"],text=True).strip()
+    if user.split(chr(92))[-1].lower()!="orbiterpilot" or profile.name.lower()!="orbiterpilot":
+        raise RuntimeError(f"Unexpected standard user's profile: {user} {profile}")
+    os.environ.update(USERPROFILE=str(profile),HOME=str(profile),USERNAME=profile.name,
+                      HOMEDRIVE=profile.drive,HOMEPATH=str(profile)[2:],
+                      LOCALAPPDATA=str(local),APPDATA=str(known_folder(26)),TEMP=str(tmp),TMP=str(tmp))
 home=Path.home()
 stock="DG Mk4 in orbit"
 result={"platform":platform.platform(),"arch":platform.machine(),"user":home.name,"save":False,"reopened":False,"settings":False}
@@ -86,6 +105,8 @@ def new_saves():
 try:
     if win:
         assert not ctypes.windll.shell32.IsUserAnAdmin()
+        result["account"]=user
+        result["profile"]=str(profile)
         result["effective_groups"]=subprocess.check_output(["whoami","/groups"],text=True,errors="replace")
     else:
         assert os.geteuid()!=0 and 80 not in os.getgroups()
@@ -96,6 +117,11 @@ try:
             with (d/"readonly-write-probe.tmp").open("xb"):pass
         except PermissionError:continue
         raise RuntimeError("install unexpectedly writable: "+str(d))
+    if win:
+        try:
+            with (runtime/"Orbiter.log").open("ab"): pass
+        except PermissionError: result["session_log"]="access denied"
+        else: raise RuntimeError("Runtime log was unexpectedly writable")
     before=snapshot(); result["protected_entries"]=len(before)
     start=time.time()
     p=session("first",stock)
