@@ -41,7 +41,7 @@ jobs:
           '314784f2f9de75a5e52fb567912af9034633f1ad' > out/receipt/source-renderer-tree.txt
       - name: Build committed renderer and the original 48-frame probe
         run: |
-          cmake -S OVP/OGLClient -B out/renderer -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_C_COMPILER=cl -DCMAKE_CXX_COMPILER=cl -DCMAKE_POLICY_VERSION_MINIMUM=3.5 "-DORBITER_TEST_RUNTIME=$pwd/out/run"
+          cmake -S OVP/OGLClient -B out/renderer -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_C_COMPILER=cl -DCMAKE_CXX_COMPILER=cl "-DCMAKE_POLICY_VERSION_MINIMUM=3.5" "-DORBITER_TEST_RUNTIME=$pwd/out/run"
           if ($LASTEXITCODE) { exit $LASTEXITCODE }
           cmake --build out/renderer --target OGLClient --parallel 4
           if ($LASTEXITCODE) { exit $LASTEXITCODE }
