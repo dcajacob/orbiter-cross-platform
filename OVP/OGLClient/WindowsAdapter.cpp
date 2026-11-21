@@ -134,7 +134,11 @@ HWND OGLClient::clbkCreateRenderWindow() {
         oapiWriteLog(const_cast<char *>(reinterpret_cast<const char *>(glGetString(GL_RENDERER))));
         return hRenderWnd;
     } catch(const std::exception &e) {
-        oapiWriteLog(const_cast<char *>(e.what()));clbkDestroyRenderWindow(false);return nullptr;
+        oapiWriteLog(const_cast<char *>(e.what()));
+        clbkDestroyRenderWindow(false);
+        // The Windows host treats a null window as a request for a headless
+        // session and would call this client again after destroying its context.
+        std::exit(EXIT_FAILURE);
     }
 }
 

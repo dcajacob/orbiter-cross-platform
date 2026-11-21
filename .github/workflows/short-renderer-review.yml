@@ -25,7 +25,7 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           $ErrorActionPreference = 'Stop'
-          if ((git rev-parse HEAD:OVP/OGLClient) -ne '314784f2f9de75a5e52fb567912af9034633f1ad') { throw 'Wrong renderer tree' }
+          if ((git rev-parse HEAD:OVP/OGLClient) -ne 'd7754fb7682a1a2f69f34ebfec93f65de5ae500b') { throw 'Wrong renderer tree' }
           New-Item -ItemType Directory out/receipt,out/previous | Out-Null
           $artifact = (gh api 'repos/dcajacob/orbiter-cross-platform/actions/artifacts/14401993380' | ConvertFrom-Json)
           if ($artifact.expired -or $artifact.workflow_run.head_sha -ne '72b1741ea59ebe9266ade3ae8f678d0dab5a9835' -or $artifact.digest -ne 'sha256:9d97d04c2608b69caf5c042c0e353a15f05d117186456b03c54796727e993715') { throw 'Wrong pinned artifact identity' }
@@ -38,7 +38,7 @@ jobs:
           python -m zipfile -e $packages[0].FullName out/run
           if ($LASTEXITCODE) { exit $LASTEXITCODE }
           $artifact | ConvertTo-Json -Depth 6 > out/receipt/base-artifact.json
-          '314784f2f9de75a5e52fb567912af9034633f1ad' > out/receipt/source-renderer-tree.txt
+          'd7754fb7682a1a2f69f34ebfec93f65de5ae500b' > out/receipt/source-renderer-tree.txt
       - name: Build committed renderer and the original 48-frame probe
         run: |
           cmake -S OVP/OGLClient -B out/renderer -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_C_COMPILER=cl -DCMAKE_CXX_COMPILER=cl "-DCMAKE_POLICY_VERSION_MINIMUM=3.5" "-DORBITER_TEST_RUNTIME=$pwd/out/run"

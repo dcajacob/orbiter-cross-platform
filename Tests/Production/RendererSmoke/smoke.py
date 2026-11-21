@@ -95,7 +95,7 @@ def fly(case, env):
                 "Expected missing shader diagnostic is absent")
         require("launchpad-flight-end.txt" not in [p.name for p in folder.iterdir()],
                 "Faulted renderer unexpectedly ran the flight")
-        require(result.returncode in (0, 1), f"Process aborted or crashed: {result.returncode:#x}")
+        require(result.returncode == 1, f"Expected startup rejection 1, got: {result.returncode:#x}")
     return dict(exit_code=result.returncode, lifecycle=life, renderer=info)
 
 
