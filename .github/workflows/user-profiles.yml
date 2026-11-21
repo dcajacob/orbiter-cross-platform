@@ -1,0 +1,154 @@
+name: Per-user protected install
+on:
+  push:
+    branches: [qualification/phase8-user-storage]
+permissions:
+  contents: read
+  actions: read
+jobs:
+  check:
+    name: ${{ matrix.runner }}
+    runs-on: ${{ matrix.runner }}
+    strategy:
+      fail-fast: false
+      matrix:
+        runner: [macos-15, macos-15-intel, windows-2025]
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.14'
+      - uses: ilammy/msvc-dev-cmd@v1
+        if: runner.os == 'Windows'
+      - uses: actions/cache/restore@v6
+        with:
+          path: out/cache/production-stock-data-v1.zip
+          key: production-native-data-${{ hashFiles('Tests/Production/input-storage.lock.json') }}
+      - uses: actions/cache/restore@v6
+        with:
+          path: out/cache/Orbiter2016.zip
+          key: production-standard-planets-${{ hashFiles('Tests/Production/standard-planets.lock.json') }}
+      - uses: actions/cache/restore@v6
+        if: runner.os == 'Windows'
+        with:
+          path: out/mesa-cache/*.pkg.tar.zst
+          key: mesa-ucrt64-${{ hashFiles('Tests/Production/mesa-ucrt64.lock.json') }}
+      - name: Prepare test paths
+        shell: bash
+        run: |
+          if [[ "$RUNNER_OS" == Windows ]]; then echo 'RC1_INSTALL=C:\Users\Public\RC1install' >> "$GITHUB_ENV"; else echo 'RC1_INSTALL=/Users/Shared/RC1install' >> "$GITHUB_ENV"; fi
+      - name: Retrieve and verify frozen base
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python -B Tests/Production/ReadOnlyRC1/prepare.py
+      - name: Install the original engine's exact Visual Studio 18.11.3 toolchain
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $url = 'https://download.visualstudio.microsoft.com/download/pr/5f474104-723f-4007-bf4c-92e42a23dcc6/ea54b67bfac576b6dd097f84eeaf6893780d2a613f90448ff038e8a2777a0afb/vs_BuildTools.exe'
+          $bootstrap = Join-Path $env:RUNNER_TEMP 'vs_BuildTools.exe'
+          curl.exe -fLsS --retry 2 $url -o $bootstrap
+          if ($LASTEXITCODE -or (Get-FileHash $bootstrap).Hash -ne 'ea54b67bfac576b6dd097f84eeaf6893780d2a613f90448ff038e8a2777a0afb') { throw 'Incorrect Build Tools bootstrapper' }
+          if ((Get-AuthenticodeSignature $bootstrap).Status -ne 'Valid') { throw 'Invalid Microsoft bootstrapper signature' }
+          $dest = Join-Path $env:RUNNER_TEMP 'VS18113'
+          $p = Start-Process $bootstrap -ArgumentList @('--quiet','--wait','--norestart','--nocache','--installPath',$dest,'--add','Microsoft.VisualStudio.Component.VC.Tools.x86.x64','--add','Microsoft.VisualStudio.Component.Windows11SDK.26100') -Wait -PassThru
+          if ($p.ExitCode -notin @(0,3010)) { throw "VS 18.11.3 installation failed: $($p.ExitCode)" }
+          $cl = Get-Item "$dest/VC/Tools/MSVC/14.51.36231/bin/Hostx64/x64/cl.exe"
+          $cl.VersionInfo | Format-List ProductVersion,FileVersion
+      - uses: actions/cache/restore@v6
+        if: runner.os == 'Windows'
+        id: dxsdk
+        with:
+          path: DXSDK
+          key: dxsdk_jun10
+      - name: Prepare Windows DirectX SDK
+        if: runner.os == 'Windows' && steps.dxsdk.outputs.cache-hit != 'true'
+        shell: cmd
+        run: |
+          curl.exe -fLsS https://download.microsoft.com/download/a/e/7/ae743f1f-632b-4809-87a9-aa1bb3458e31/DXSDK_Jun10.exe -o DXSDK_Jun10.exe
+          if errorlevel 1 exit /b 1
+          7z x DXSDK_Jun10.exe DXSDK/Include DXSDK/Lib
+      - name: Build Windows Orbiter with its original toolchain
+        if: runner.os == 'Windows'
+        shell: cmd
+        run: |
+          call "%RUNNER_TEMP%\VS18113\VC\Auxiliary\Build\vcvarsall.bat" amd64 10.0.26100.0 -vcvars_ver=14.51
+          if errorlevel 1 exit /b 1
+          cmake -S . -B out/app -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_POLICY_VERSION_MINIMUM=3.5 -DCMAKE_C_COMPILER=cl -DCMAKE_CXX_COMPILER=cl -DORBITER_BUILD_D3D9CLIENT=ON -DORBITER_BUILD_XRSOUND=ON -DORBITER_MAKE_DOC=OFF -DORBITER_MAKE_TESTS=ON -DORBITER_PORTABLE_REFERENCE_CAPTURE=ON -DORBITER_PRODUCTION_REFERENCE_CAPTURE=ON "-DDXSDK_DIR:PATH=%GITHUB_WORKSPACE%\DXSDK"
+          if errorlevel 1 exit /b 1
+          cmake --build out/app --target Orbiter --parallel 4
+      - name: Build external UI test driver
+        shell: bash
+        run: |
+          python -m pip install psutil
+          python -m venv out/aqt-env
+          if [[ "$RUNNER_OS" == Windows ]]; then
+            py=out/aqt-env/Scripts/python.exe
+            host=windows; qtarch=win64_msvc2022_64
+          else
+            py=out/aqt-env/bin/python
+            host=mac; qtarch=clang_64
+          fi
+          "$py" -m pip install aqtinstall==3.3.0
+          "$py" -m aqt install-qt "$host" desktop 6.8.3 "$qtarch" --outputdir out/qt
+          cfg=$(find out/qt -name Qt6Config.cmake -print -quit)
+          cmake -S Tests/Production/ReadOnlyRC1 -B out/probe -G Ninja -DCMAKE_BUILD_TYPE=Release -DQt6_DIR="$PWD/$(dirname "$cfg")"
+          cmake --build out/probe
+          cmake -S Utils/Launchpad -B out/launcher -G Ninja -DCMAKE_BUILD_TYPE=Release -DQt6_DIR="$PWD/$(dirname "$cfg")"
+          cmake --build out/launcher
+          if [[ "$RUNNER_OS" == macOS ]]; then clang++ -fobjc-arc -dynamiclib -framework Cocoa Tests/Production/ReadOnlyRC1/MacFlight.mm -o out/MacFlight.dylib; fi
+      - name: Repack changed components and install from the new archive
+        run: python -B Tests/Production/ReadOnlyRC1/package.py
+      - uses: actions/upload-artifact@v4
+        with:
+          name: User-profile-distribution-${{ matrix.runner }}
+          path: out/fixed/
+          compression-level: 0
+      - name: Build short Windows flight observer against installed SDK
+        if: runner.os == 'Windows'
+        shell: cmd
+        run: |
+          cl /nologo /EHsc /MD /LD Tests\Production\ReadOnlyRC1\PilotProbe.cpp /I"%RC1_INSTALL%\runtime\Orbitersdk\include" /link /OUT:"%RC1_INSTALL%\runtime\Modules\Plugin\PilotProbe.dll" "%RC1_INSTALL%\runtime\Orbitersdk\lib\Orbiter.lib" "%RC1_INSTALL%\runtime\Orbitersdk\lib\Orbitersdk.lib"
+      - name: Exercise protected macOS installation
+        if: runner.os == 'macOS'
+        shell: bash
+        run: |
+          work=/Users/Shared/RC1receipt
+          mkdir "$work"
+          cp -R out/probe/plugins out/MacFlight.dylib "$work/"
+          sudo chown -R root:wheel "$RC1_INSTALL"
+          sudo chmod -R a-w "$RC1_INSTALL"
+          sudo "$(command -v python)" Tests/Production/ReadOnlyRC1/drop.py -B Tests/Production/ReadOnlyRC1/exercise.py "$RC1_INSTALL" "$work"
+      - name: Exercise protected Windows installation
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: ./Tests/Production/ReadOnlyRC1/standard.ps1
+      - name: Collect standard-user evidence
+        if: always()
+        shell: python
+        run: |
+          import os,pathlib,shutil
+          src=pathlib.Path(r"C:/Users/Public/RC1verify/receipt" if os.name=="nt" else "/Users/Shared/RC1receipt")
+          dest=pathlib.Path("out/user-evidence")
+          dest.mkdir(parents=True,exist_ok=True)
+          for p in src.glob("*"):
+              if p.is_file():
+                  shutil.copy2(p,dest/p.name)
+                  if p.suffix in (".txt",".json",".stderr"): print(p.name,p.read_text(errors="replace")[:12000])
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: RC1-protected-${{ matrix.runner }}
+          path: out/user-evidence/
+          if-no-files-found: warn
+      - name: Require save, reopen, persisted preference and unchanged installation
+        shell: python
+        run: |
+          import os,json,pathlib
+          f=pathlib.Path(r"C:/Users/Public/RC1verify/receipt/result.json" if os.name=="nt" else "/Users/Shared/RC1receipt/result.json")
+          r=json.loads(f.read_text()); print(json.dumps(r,indent=2))
+          assert r["save"] and r["reopened"] and r["settings"] and r["install_changes"]==[] and r["personal_config_persisted"] and r["log_bytes"]>0

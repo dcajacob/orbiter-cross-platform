@@ -1,4 +1,9 @@
 #include "SimulatorProfile.h"
+#ifdef Q_OS_MACOS
+#include "InstalledUserProfile.h"
+#elif defined(Q_OS_WIN)
+#include "../InstalledProfile/Windows.h"
+#endif
 
 #include <QFile>
 #include <QFileInfo>
@@ -58,6 +63,13 @@ SimulatorProfile SimulatorProfile::load(const QString &profilePath)
         profile.saveRoot = QDir(QStandardPaths::writableLocation(QStandardPaths::AppDataLocation))
                                .absoluteFilePath("Scenarios");
     profile.workingDirectory = QFileInfo(profile.saveRoot).absolutePath();
+#ifdef Q_OS_MACOS
+    if (QFileInfo(profilePath).fileName() == "Launchpad profile.json" &&
+        QFileInfo(base.filePath("stock-data-receipt.json")).isFile()) {
+        installed_profile::prepareMac(base, profile.config, profile.keymap, profile.saveRoot, nullptr);
+        profile.workingDirectory = QFileInfo(profile.saveRoot).absolutePath();
+    }
+#endif
     profile.environment = QProcessEnvironment::systemEnvironment();
     for (const auto &name : json.value("unsetEnvironment").toArray())
         profile.environment.remove(name.toString());
@@ -73,6 +85,15 @@ SimulatorProfile SimulatorProfile::fromWindowsExecutable(const QString &path)
     profile.configured = true;
     profile.executable = path;
     profile.workingDirectory = QFileInfo(path).absolutePath();
+#ifdef Q_OS_WIN
+    if (QFileInfo(path).isFile()) {
+        try {
+            profile.workingDirectory = QString::fromStdWString(installed_profile::workingDirectory(path.toStdWString()).wstring());
+        } catch (const std::exception &error) {
+            profile.setupError = QString::fromLocal8Bit(error.what());
+        }
+    }
+#endif
     QDir root(profile.workingDirectory);
     QString scenarioDirectory = "Scenarios";
     QFile config(root.filePath("Orbiter.cfg"));
@@ -91,6 +112,7 @@ SimulatorProfile SimulatorProfile::fromWindowsExecutable(const QString &path)
 
 QString SimulatorProfile::validationError() const
 {
+    if (!setupError.isEmpty()) return setupError;
     if (!configured)
         return QObject::tr("Choose a simulator in Setup.");
 #ifndef Q_OS_WIN

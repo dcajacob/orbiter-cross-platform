@@ -51,6 +51,7 @@ void LogOut (const char *msg, ...)
 void LogOutVA(const char *format, va_list ap)
 {
 	FILE *f = fopen(logname, "a+t");
+	if (!f) return;
 	fprintf(f, "%010.3f: ", (timeGetTime() - t0) * 1e-3);
 	vfprintf(f, format, ap);
 	fputc('\n', f);

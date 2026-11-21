@@ -6,6 +6,7 @@
 #include <QStringList>
 
 struct SimulatorProfile {
+    QString setupError;
     QString executable;
     QString scenarioRoot;
     QString workingDirectory;

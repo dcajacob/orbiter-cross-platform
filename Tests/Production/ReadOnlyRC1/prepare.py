@@ -29,12 +29,3 @@ with zipfile.ZipFile(out/"sealed.zip") as z:
     for p in (name,pyzname): z.extract(p,out)
 require(sha(out/name)==info["sha256"] and sha(out/pyzname)==info["installer_sha256"],"Frozen payload checksum")
 
-install=Path(os.environ["RC1_INSTALL"])
-py(out/pyzname,install,"--cache",out/"cache","--package",out/name)
-py(out/pyzname,install,"--verify-only")
-if win:
-    py("Tests/Production/stage_mesa.py","stage","--cache",out/"mesa-cache","--destination",out/"mesa")
-    sys.path.insert(0,str(root/"Tests/Production/Client"))
-    from run_client import mesa_files
-    mesa_files(out/"mesa",install/"runtime")
-print("Verified frozen package",name,info["sha256"], flush=True)

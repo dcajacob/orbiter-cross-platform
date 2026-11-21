@@ -13,6 +13,7 @@
 #pragma comment(linker,"\"/manifestdependency:type='win32' name='Microsoft.Windows.Common-Controls' version='6.0.0.0' processorArchitecture='*' publicKeyToken='6595b64144ccf1df' language='*'\"")
 
 #include <windows.h>
+#include "../../Utils/InstalledProfile/Windows.h"
 #include <direct.h>
 #include <stdio.h>
 #include <time.h>
@@ -196,6 +197,18 @@ INT WINAPI WinMain (HINSTANCE hInstance, HINSTANCE, LPSTR strCmdLine, INT nCmdSh
 	// up to the Orbiter main directory
 	if (strlen(dir) >= 15 && !stricmp (dir+strlen(dir)-15, "\\Modules\\Server"))
 		SetCurrentDirectory("..\\..");
+
+    try {
+        wchar_t exe[32768];
+        const DWORD length = GetModuleFileNameW(nullptr, exe, 32768);
+        if (!length || length == 32768) throw std::runtime_error("Cannot locate Orbiter.exe");
+        const std::filesystem::path runtime = std::filesystem::path(exe).parent_path();
+        const auto state = installed_profile::workingDirectory(exe);
+        if (state != runtime) std::filesystem::current_path(state);
+    } catch (const std::exception &error) {
+        MessageBoxA(nullptr, error.what(), "Cannot open Orbiter user profile", MB_ICONERROR);
+        return 1;
+    }
 
     // If we're not running from actual console, hide the window
     if (ConsoleManager::IsConsoleExclusive())
