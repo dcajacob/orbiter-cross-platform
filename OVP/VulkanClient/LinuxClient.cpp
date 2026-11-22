@@ -183,7 +183,8 @@ public:
             scene_.CaptureFrame(context.evidence / "vulkan-frame.bmp");
             capturePending_ = false;
         }
-        return scene_.Present(unsigned(width_), unsigned(height_), PilotDisplays(loaded_, RenderCockpitVcHud, RenderCockpitVcMfd));
+        return scene_.Present(unsigned(width_), unsigned(height_), context.configuration->CfgVisualPrm.bVesselShadows,
+            PilotDisplays(loaded_, RenderCockpitVcHud, RenderCockpitVcMfd));
     }
     void CloseSession() override
     {

@@ -643,7 +643,7 @@ void OrbiterScene::CloseWorld() noexcept
 }
 
 OrbiterScene::VesselUpdate OrbiterScene::UpdateVessels(const SceneFrame& camera, const SceneFrame& groundFrame,
-    const EarthView& earth, unsigned height, bool refreshShadow, bool terrainRecentered,
+    const EarthView& earth, unsigned height, bool vesselShadows, bool refreshShadow, bool terrainRecentered,
     const std::vector<CockpitDisplay>& displays)
 {
     const auto simTime = oapiGetSimTime();
@@ -673,7 +673,13 @@ OrbiterScene::VesselUpdate OrbiterScene::UpdateVessels(const SceneFrame& camera,
         const bool changed = visual.pose.Update(*vessel);
         if (changed) scene_.SetShipPose(handle, visual.pose.Vertices());
         update.poseUploaded |= changed;
-        if (visual.shadowTime != simTime || changed || refreshShadow) {
+        if (!vesselShadows) {
+            if (!visual.shadow.empty()) {
+                visual.shadow.clear();
+                scene_.SetShadow(handle, visual.shadow);
+            }
+            visual.shadowTime.reset();
+        } else if (visual.shadowTime != simTime || changed || refreshShadow) {
             terrain_.ProjectShadow(groundFrame, frame, visual.pose.Vertices(), visual.shadow);
             scene_.SetShadow(handle, visual.shadow);
             visual.shadowTime = simTime;
@@ -717,7 +723,7 @@ OrbiterScene::VesselUpdate OrbiterScene::UpdateVessels(const SceneFrame& camera,
     return update;
 }
 
-bool OrbiterScene::Present(unsigned width, unsigned height, const std::vector<CockpitDisplay>& displays)
+bool OrbiterScene::Present(unsigned width, unsigned height, bool vesselShadows, const std::vector<CockpitDisplay>& displays)
 {
     if (!width || !height) return true;
     if (!worldOpen_) return scene_.Present({}, {}, {});
@@ -750,7 +756,7 @@ bool OrbiterScene::Present(unsigned width, unsigned height, const std::vector<Co
     const auto earth = terrain_.View(width, height);
     const auto tiles = terrain_.Update(earth, height, scene_);
     const auto terrainTime = SDL_GetTicksNS() - beforeTerrain;
-    const auto vessels = UpdateVessels(camera, groundFrame, earth, height, tiles.switched || reanchorTime, tiles.recentered, displays);
+    const auto vessels = UpdateVessels(camera, groundFrame, earth, height, vesselShadows, tiles.switched || reanchorTime, tiles.recentered, displays);
     const auto beforeBases = SDL_GetTicksNS();
     const auto baseUploadTime = UpdateBases(groundFrame.ToLocal(camera.origin)) ? SDL_GetTicksNS() - beforeBases : 0;
     std::filesystem::path samplePath;

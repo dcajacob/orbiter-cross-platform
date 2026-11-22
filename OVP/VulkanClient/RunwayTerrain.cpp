@@ -510,7 +510,11 @@ void RunwayTerrain::ProjectShadow(const SceneFrame& ground, const SceneFrame& sh
 {
     projected.clear();
     const auto origin = ground.ToLocal(ship.origin);
-    if (Dot(origin, origin) > 100000.0 * 100000.0) return;
+    // The terrain origin can be hundreds of kilometres behind a low-flying vessel.
+    // Cull by height above Earth's reference sphere, independently of reanchoring.
+    const auto radial = local_.ToGlobal(origin);
+    const double limit = radius_ + 100000.0;
+    if (Dot(radial, radial) > limit * limit || Dot(radial, local_.axes[1]) <= 0) return;
     const auto sun = Subtract(ground.ToLocal(SunPosition()), origin);
     if (sun.y <= 0) return;
     const auto rayX = sun.x / sun.y;

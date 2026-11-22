@@ -73,7 +73,7 @@ public:
     int SetMaterial(DEVMESHHANDLE, unsigned, const MATERIAL*);
     bool SetTexture(DEVMESHHANDLE, unsigned, SURFHANDLE);
     void RemoveVessel(OBJHANDLE) noexcept;
-    bool Present(unsigned width, unsigned height, const std::vector<CockpitDisplay>&);
+    bool Present(unsigned width, unsigned height, bool vesselShadows, const std::vector<CockpitDisplay>&);
     std::string FlightTitle() const;
     void Close() noexcept;
 
@@ -106,7 +106,7 @@ private:
         bool poseUploaded = false, shadowDrawn = false;
     };
     VesselUpdate UpdateVessels(const SceneFrame& camera, const SceneFrame& ground,
-        const EarthView& earth, unsigned height, bool refreshShadow, bool terrainRecentered,
+        const EarthView& earth, unsigned height, bool vesselShadows, bool refreshShadow, bool terrainRecentered,
         const std::vector<CockpitDisplay>& displays);
     void RefreshMeshes(const VESSEL&, VesselVisual&, bool internal, const std::vector<CockpitDisplay>&);
     void AppendMesh(MESHHANDLE, SceneMesh&, std::vector<VertexRange>&,

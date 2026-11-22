@@ -8,7 +8,11 @@ Shuttle-A at the same position, heading, and scenario time for comparison.
 Both vessels use the same mesh slots, group visibility, texture lookup, and
 Orbiter ambient, diffuse, emissive, and specular material properties. Mesh
 animations run in each slot's local coordinates before applying its vessel
-offset. The ground shadow follows that same geometry.
+offset. The ground shadow follows that same geometry. The Vulkan client reads
+`EnableVesselShadows` each frame. Disabling it clears existing vessel shadows
+and skips projection. The 100 km projection limit uses height above Earth's
+reference sphere, so moving away from Kennedy at low altitude keeps the shadow
+on the sunlit terrain.
 
 The client preserves authored vessel texture mip levels and generates any
 missing levels at upload. Vessel skins use 4× anisotropic filtering to keep

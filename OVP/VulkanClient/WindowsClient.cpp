@@ -99,7 +99,8 @@ public:
         DWORD width = 0, height = 0;
         clbkGetViewportSize(&width, &height);
         try {
-            const bool shown = scene_.Present(unsigned(width), unsigned(height), PilotDisplays(loaded_,
+            const bool shown = scene_.Present(unsigned(width), unsigned(height),
+                *static_cast<const bool*>(GetConfigParam(CFGPRM_VESSELSHADOWS)), PilotDisplays(loaded_,
                 [this](const VCHUDSPEC** h) { return GetVCHUDSurface(h); },
                 [this](int i, const VCMFDSPEC** m) { return GetVCMFDSurface(i,m); }));
             Require(shown, "Present Vulkan frame");
