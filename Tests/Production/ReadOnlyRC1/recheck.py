@@ -17,7 +17,7 @@ dest=out/"consumer"
 with zipfile.ZipFile(out/"consumer.zip") as z:z.extractall(dest)
 for line in (dest/"SHA256SUMS").read_text().splitlines():
     digest,name=line.split("  ");assert Path(name).name==name and sha(dest/name)==digest
-installer,=dest.glob("*.pyz");package,=dest.glob("Orbiter-*")
+installer,=dest.glob("*.pyz");package,=dest.glob("*.zip" if os.name=="nt" else "*.tar.gz")
 install=Path(os.environ["RC1_INSTALL"])
 call(sys.executable,installer,install,"--cache",out/"cache","--package",package)
 call(sys.executable,installer,install,"--verify-only")
