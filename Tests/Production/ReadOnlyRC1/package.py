@@ -30,7 +30,7 @@ else:
 source=os.environ["GITHUB_SHA"]
 manifest["component_base_source"]=manifest["source"]
 manifest["source"]=source
-manifest["files"]={p.relative_to(archive).as_posix():sha(p) for p in archive.rglob("*") if p.is_file() and p!=archive/"runtime.json"}
+manifest["files"]={p.relative_to(archive).as_posix():sha(p) for p in archive.rglob("*") if p.is_file() and not p.is_symlink() and p!=archive/"runtime.json"}
 (archive/"runtime.json").write_text(json.dumps(manifest,indent=2)+"\n")
 dist=out/"fixed";dist.mkdir()
 new=dist/old.name.replace("8e576b84","user-profile-"+source[:8])

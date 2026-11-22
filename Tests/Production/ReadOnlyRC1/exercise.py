@@ -74,6 +74,11 @@ def cleanup(p):
             except psutil.NoSuchProcess: pass
         try: p.wait(4)
         except subprocess.TimeoutExpired: p.terminate(); p.wait(8)
+def close_flight(p,phase):
+    (work/(phase+".txt.close")).touch()
+    ended=wait_for(lambda:"flight=Session ended." in trace(phase),20)
+    result[phase+"_closed_normally"]=bool(ended)
+    cleanup(p)
 def new_saves():
     path=state/"Scenarios"/("Quicksave/Pilot read-only flight.scn" if win else "Quicksave.scn")
     if path.is_file() and path.stat().st_mtime>=start-1 and "gl-01:deltaglider" in path.read_text(errors="replace").lower(): return [path]
@@ -119,7 +124,7 @@ try:
     candidates=wait_for(new_saves,90)
     window=work/"first.txt.window.txt"
     if window.exists():result["first_flight"]=window.read_text()
-    cleanup(p)
+    close_flight(p,"first")
     result["first_session"]=trace("first")
     if not any(x.startswith("requested=") for x in result["first_session"]):raise RuntimeError("Launch driver did not request flight")
     candidates=new_saves()
@@ -143,7 +148,7 @@ try:
             return (any(path.stem.lower() in arg.lower() for arg in c.cmdline()) and
                     ("GL-01:DeltaGlider" in result["reopen_flight"] if win else "RCS" in result["reopen_flight"]))
         result["reopened"]=bool(wait_for(did_fly,75)) and hashlib.sha256(path.read_bytes()).hexdigest()==result["save_sha256"]
-        cleanup(p)
+        close_flight(p,"reopen")
         result["reopen_session"]=trace("reopen")
     log=state/("Orbiter.log" if win else "orbiter-session.log")
     result.update(config=str(config),log=str(log),log_bytes=log.stat().st_size if log.exists() else 0)

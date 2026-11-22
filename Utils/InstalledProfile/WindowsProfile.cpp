@@ -1,11 +1,10 @@
 // Licensed under the MIT License
-#pragma once
+#include "WindowsProfile.h"
 #include <windows.h>
 #include <shlobj.h>
 #include <winioctl.h>
 #include <filesystem>
 #include <fstream>
-#include <iomanip>
 #include <sstream>
 #include <vector>
 #include <system_error>
@@ -18,13 +17,13 @@
 namespace installed_profile {
 namespace fs = std::filesystem;
 
-inline void winError(const char *what) {
+static void winError(const char *what) {
     throw std::system_error(static_cast<int>(GetLastError()), std::system_category(), what);
 }
 
 // A directory junction can be created by a standard account on NTFS. It lets
 // the classic engine continue using its relative paths for shared stock assets.
-inline void junction(const fs::path &link, const fs::path &target) {
+static void junction(const fs::path &link, const fs::path &target) {
     if (fs::exists(link)) {
         if (!fs::equivalent(link, target)) throw std::runtime_error("Unexpected shared asset location");
         return;
@@ -34,7 +33,10 @@ inline void junction(const fs::path &link, const fs::path &target) {
                            FILE_FLAG_OPEN_REPARSE_POINT | FILE_FLAG_BACKUP_SEMANTICS, nullptr);
     if (h == INVALID_HANDLE_VALUE) winError("Open asset junction");
     const std::wstring name = target.wstring();
-    const std::wstring subst = name.rfind(L"\\\\", 0) == 0 ? L"\\??\\UNC\\" + name.substr(2) : L"\\??\\" + name;
+    std::wstring subst;
+    if (name.rfind(L"\\\\?\\", 0) == 0) subst = L"\\??\\" + name.substr(4);
+    else if (name.rfind(L"\\\\", 0) == 0) subst = L"\\??\\UNC\\" + name.substr(2);
+    else subst = L"\\??\\" + name;
     struct Header { DWORD tag; WORD size, reserved, substituteOffset, substituteBytes, printOffset, printBytes; };
     const size_t size = sizeof(Header) + (subst.size() + name.size() + 2) * sizeof(wchar_t);
     if (size > MAXIMUM_REPARSE_DATA_BUFFER_SIZE) { CloseHandle(h); throw std::runtime_error("Asset path too long"); }
@@ -51,7 +53,7 @@ inline void junction(const fs::path &link, const fs::path &target) {
     if (!ok) { fs::remove(link); throw std::system_error(error, std::system_category(), "Create asset junction"); }
 }
 
-inline void seed(const fs::path &src, const fs::path &dest) {
+static void seed(const fs::path &src, const fs::path &dest) {
     if (fs::is_directory(src)) {
         fs::create_directories(dest);
         for (const auto &item : fs::directory_iterator(src)) seed(item.path(), dest/item.path().filename());
@@ -60,10 +62,14 @@ inline void seed(const fs::path &src, const fs::path &dest) {
     }
 }
 
-inline fs::path workingDirectory(const fs::path &exe) {
+static bool isStockInstall(const fs::path &runtime) {
+    return fs::is_regular_file(runtime/L"runtime.json") &&
+           fs::is_regular_file(runtime.parent_path()/L"stock-data-receipt.json");
+}
+
+static fs::path workingDirectory(const fs::path &exe) {
     const fs::path runtime = fs::canonical(exe).parent_path();
-    if (!fs::is_regular_file(runtime.parent_path()/L"stock-data-receipt.json") ||
-        !fs::is_regular_file(runtime/L"runtime.json")) return runtime;
+    if (!isStockInstall(runtime)) return runtime;
     PWSTR base = nullptr;
     if (FAILED(SHGetKnownFolderPath(FOLDERID_LocalAppData, 0, nullptr, &base)))
         throw std::runtime_error("Cannot locate the user's LocalAppData folder");
@@ -107,5 +113,15 @@ inline fs::path workingDirectory(const fs::path &exe) {
     done.close();
     if (!done) throw std::runtime_error("Cannot record completed Orbiter profile setup");
     return state;
+}
+std::wstring simulatorWorkingDirectory(const std::wstring &exe) {
+    return workingDirectory(exe).wstring();
+}
+
+void enterStockWorkingDirectory() {
+    wchar_t exe[32768];
+    const DWORD length = GetModuleFileNameW(nullptr, exe, 32768);
+    if (!length || length == 32768) throw std::runtime_error("Cannot locate Orbiter.exe");
+    if (isStockInstall(fs::path(exe).parent_path())) fs::current_path(workingDirectory(exe));
 }
 }

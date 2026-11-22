@@ -8,6 +8,9 @@ qt_add_executable(orbiter-launchpad WIN32 MACOSX_BUNDLE
     Launchpad.cpp
     ScenarioEditor.cpp
     SimulatorProfile.cpp)
+if(WIN32)
+    target_sources(orbiter-launchpad PRIVATE ../InstalledProfile/WindowsProfile.cpp)
+endif()
 target_compile_features(orbiter-launchpad PRIVATE cxx_std_17)
 target_link_libraries(orbiter-launchpad PRIVATE Qt6::Widgets)
 set_target_properties(orbiter-launchpad PROPERTIES MACOSX_BUNDLE_BUNDLE_NAME "Orbiter Launchpad")

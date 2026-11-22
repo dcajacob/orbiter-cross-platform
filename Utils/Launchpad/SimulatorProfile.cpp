@@ -2,7 +2,7 @@
 #ifdef Q_OS_MACOS
 #include "InstalledUserProfile.h"
 #elif defined(Q_OS_WIN)
-#include "../InstalledProfile/Windows.h"
+#include "../InstalledProfile/WindowsProfile.h"
 #endif
 
 #include <QFile>
@@ -88,7 +88,7 @@ SimulatorProfile SimulatorProfile::fromWindowsExecutable(const QString &path)
 #ifdef Q_OS_WIN
     if (QFileInfo(path).isFile()) {
         try {
-            profile.workingDirectory = QString::fromStdWString(installed_profile::workingDirectory(path.toStdWString()).wstring());
+            profile.workingDirectory = QString::fromStdWString(installed_profile::simulatorWorkingDirectory(path.toStdWString()));
         } catch (const std::exception &error) {
             profile.setupError = QString::fromLocal8Bit(error.what());
         }

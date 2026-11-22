@@ -151,4 +151,4 @@ jobs:
           import os,json,pathlib
           f=pathlib.Path(r"C:/Users/Public/RC1verify/receipt/result.json" if os.name=="nt" else "/Users/Shared/RC1receipt/result.json")
           r=json.loads(f.read_text()); print(json.dumps(r,indent=2))
-          assert r["save"] and r["reopened"] and r["settings"] and r["install_changes"]==[] and r["personal_config_persisted"] and r["log_bytes"]>0
+          assert r["save"] and r["reopened"] and r["settings"] and r["install_changes"]==[] and r["personal_config_persisted"] and r["log_bytes"]>0 and r["first_closed_normally"] and r["reopen_closed_normally"]

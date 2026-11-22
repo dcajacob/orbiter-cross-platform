@@ -51,11 +51,15 @@ void LogOut (const char *msg, ...)
 void LogOutVA(const char *format, va_list ap)
 {
 	FILE *f = fopen(logname, "a+t");
-	if (!f) return;
-	fprintf(f, "%010.3f: ", (timeGetTime() - t0) * 1e-3);
-	vfprintf(f, format, ap);
-	fputc('\n', f);
-	fclose(f);
+	if (f) {
+		va_list fileArgs;
+		va_copy(fileArgs, ap);
+		fprintf(f, "%010.3f: ", (timeGetTime() - t0) * 1e-3);
+		vfprintf(f, format, fileArgs);
+		va_end(fileArgs);
+		fputc('\n', f);
+		fclose(f);
+	}
 	if (logOut) {
 		vsnprintf(logs, 255, format, ap);
 		(*logOut)(logs);
@@ -67,15 +71,7 @@ void LogOutFine (const char *msg, ...)
 	if (finelog) {
 		va_list ap;
 		va_start (ap, msg);
-		FILE *f = fopen (logname, "a+t");
-		fprintf (f, "%010.3f: ", (timeGetTime() - t0) * 1e-3);
-		vfprintf (f, msg, ap);
-		fputc ('\n', f);
-		fclose (f);
-		if (logOut) {
-			vsnprintf (logs, 255, msg, ap);
-			(*logOut)(logs);
-		}
+		LogOutVA(msg, ap);
 		va_end (ap);
 	}
 }

@@ -159,7 +159,7 @@ set(Orbiter_depends
 )
 
 # Orbiter executable (graphics server version)
-add_executable(Orbiter ${common_src})
+add_executable(Orbiter ${common_src} ../../Utils/InstalledProfile/WindowsProfile.cpp)
 
 set_target_properties(Orbiter
 	PROPERTIES
