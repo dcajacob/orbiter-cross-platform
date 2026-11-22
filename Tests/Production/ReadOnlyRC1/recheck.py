@@ -18,6 +18,20 @@ with zipfile.ZipFile(out/"consumer.zip") as z:z.extractall(dest)
 for line in (dest/"SHA256SUMS").read_text().splitlines():
     digest,name=line.split("  ");assert Path(name).name==name and sha(dest/name)==digest
 installer,=dest.glob("*.pyz");package,=dest.glob("*.zip" if os.name=="nt" else "*.tar.gz")
+if os.name=="nt":
+    # Keep the verified runtime bytes; replace only the installer program.
+    import shutil
+    fixed=out/"fixed-consumer"
+    fixed.mkdir()
+    with zipfile.ZipFile(installer) as old,zipfile.ZipFile(fixed/installer.name,"w") as new:
+        for info in old.infolist():
+            data=Path("Utils/StockDataInstaller/installer.py").read_bytes() if info.filename=="installer.py" else old.read(info)
+            new.writestr(info,data)
+    installer=fixed/installer.name
+    newpackage=fixed/package.name
+    os.link(package,newpackage)
+    package=newpackage
+    (fixed/"SHA256SUMS").write_text(f"{sha(package)}  {package.name}\n{sha(installer)}  {installer.name}\n")
 install=Path(os.environ["RC1_INSTALL"])
 call(sys.executable,installer,install,"--cache",out/"cache","--package",package)
 call(sys.executable,installer,install,"--verify-only")

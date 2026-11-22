@@ -45,6 +45,11 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           TEST_RUNNER: ${{ matrix.runner }}
         run: python -B Tests/Production/ReadOnlyRC1/recheck.py
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Final-user-profile-windows-x64
+          path: out/fixed-consumer/
+          compression-level: 0
       - name: Build external UI test driver
         shell: bash
         run: |

@@ -159,5 +159,9 @@ try:
     if log.exists(): (work/"simulator-log.txt").write_bytes(log.read_bytes()[-30000:])
     after=snapshot();result["install_changes"]=[k for k in sorted(before.keys()|after.keys()) if before.get(k)!=after.get(k)]
 finally:
+    if win and "state" in globals():
+        for name in ["Orbiter.cfg","Orbiter.log","OGLClient.log"]:
+            file=state/name
+            if file.is_file(): (work/(name+".txt")).write_bytes(file.read_bytes()[-24000:])
     evidence()
     print(json.dumps(result,indent=2),flush=True)
