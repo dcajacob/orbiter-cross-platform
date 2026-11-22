@@ -12,7 +12,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        runner: [macos-15-intel]
+        runner: [windows-2025]
     timeout-minutes: 60
     steps:
       - uses: actions/checkout@v7
@@ -67,7 +67,7 @@ jobs:
         if: runner.os == 'Windows'
         shell: cmd
         run: |
-          cl /nologo /EHsc /MD /LD Tests\Production\ReadOnlyRC1\PilotProbe.cpp /I"%RC1_INSTALL%\runtime\Orbitersdk\include" /link /OUT:"%RC1_INSTALL%\runtime\Modules\Plugin\PilotProbe.dll" "%RC1_INSTALL%\runtime\Orbitersdk\lib\Orbiter.lib" "%RC1_INSTALL%\runtime\Orbitersdk\lib\Orbitersdk.lib"
+          cl /nologo /EHsc /MD /LD Tests\Production\ReadOnlyRC1\PilotProbe.cpp /I"%RC1_INSTALL%\runtime\Orbitersdk\include" /link user32.lib /OUT:"%RC1_INSTALL%\runtime\Modules\Plugin\PilotProbe.dll" "%RC1_INSTALL%\runtime\Orbitersdk\lib\Orbiter.lib" "%RC1_INSTALL%\runtime\Orbitersdk\lib\Orbitersdk.lib"
       - name: Exercise protected macOS installation
         if: runner.os == 'macOS'
         shell: bash
