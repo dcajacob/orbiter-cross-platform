@@ -15,7 +15,9 @@ __attribute__((constructor)) static void installFlightInput() {
     dispatch_async(dispatch_get_main_queue(), ^{
         __block bool sent=false;
         [NSTimer scheduledTimerWithTimeInterval:0.3 repeats:YES block:^(NSTimer *timer) {
-            NSWindow *w = NSApp.keyWindow ?: NSApp.mainWindow;
+            NSWindow *w = nil;
+            for (NSWindow *candidate in NSApp.windows)
+                if (candidate.isVisible && [candidate.title containsString:@"RCS"]) { w=candidate; break; }
             if (!w || !w.isVisible) return;
             NSString *title=w.title;
             if (![title containsString:@"RCS"] || ![title containsString:@"SPD"]) return;
@@ -33,7 +35,9 @@ __attribute__((constructor)) static void installFlightInput() {
                 sent=true;
             }
             if ([NSFileManager.defaultManager fileExistsAtPath:[receipt stringByAppendingString:@".close"]]) {
-                [timer invalidate]; [w performClose:nil];
+                [timer invalidate];
+                [@"escape" writeToFile:[receipt stringByAppendingString:@".close-sent.txt"] atomically:YES encoding:NSUTF8StringEncoding error:nil];
+                key(w,NSEventTypeKeyDown,53,0);
             }
         }];
     });

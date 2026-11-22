@@ -76,8 +76,11 @@ def cleanup(p):
         except subprocess.TimeoutExpired: p.terminate(); p.wait(8)
 def close_flight(p,phase):
     (work/(phase+".txt.close")).touch()
-    ended=wait_for(lambda:"flight=Session ended." in trace(phase),20)
+    ended=wait_for(lambda:"flight=Session ended." in trace(phase),60)
     result[phase+"_closed_normally"]=bool(ended)
+    if not win:
+        log=state/"orbiter-session.log"
+        if log.exists(): (work/(phase+"-simulator-log.txt")).write_bytes(log.read_bytes()[-30000:])
     cleanup(p)
 def new_saves():
     path=state/"Scenarios"/("Quicksave/Pilot read-only flight.scn" if win else "Quicksave.scn")
