@@ -27,7 +27,20 @@ def adapted(name,source):
         source=source.replace('#define SRBFUNC DLLIMPORT\n#endif',
             '#define SRBFUNC DLLIMPORT\n#endif\n#else\n#define TANKFUNC __attribute__((visibility("default")))\n#define SRBFUNC __attribute__((visibility("default")))\n#endif',1)
         source=source.replace('\tHINSTANCE hDLL;','#ifdef _WIN32\n\tHINSTANCE hDLL;\n#endif')
+        source=source.replace('void ToggleGrapple (void);', 'void RequestGrapple () { grappleRequested = true; }')
+        source=source.replace('ATTACHMENTHANDLE CanArrest() const;', 'ATTACHMENTHANDLE CanArrest() const;\n'
+                              '\tvoid ToggleGrapple ();\n\tbool grappleRequested = false;')
     if filename=='Atlantis.cpp':
+        # Run the requested toggle with a finalized state and start keyboard
+        # stow from the same timestamp as the RMS dialog.
+        source=source.replace('ToggleGrapple();', 'RequestGrapple();')
+        source=source.replace('\tascap->Update (simt);',
+            "\t// Dialog and scripted key callbacks can run after propagation, while\n"
+            "\t// Orbiter still exposes the previous step's state for detachment.\n"
+            '\tif (grappleRequested) {\n\t\tgrappleRequested = false;\n\t\tToggleGrapple();\n\t}\n'
+            '\tascap->Update (simt);')
+        source=source.replace('\t\t\tcenter_arm = true;',
+                              '\t\t\tif (!center_arm) center_arm_t = oapiGetSimTime();\n\t\t\tcenter_arm = true;')
         # ASan proves the six original 88-byte rotations were deleted through
         # their 32-byte, non-virtual base. Preserve allocation/callback order.
         source=source.replace('for (i = 0; i < 6; i++) delete rms_anim[i];',
@@ -97,7 +110,7 @@ def verify():
     native_gui=(ROOT/'Src/Orbiter/Production/NativeCockpitGui.cpp').read_text()
     expected=function(original_gui,'Image').replace('DLLEXPORT','ORBITER_PRODUCTION_API')
     if compact(expected)!=compact(function(native_gui,'Image')):raise ValueError('Original surface Image algorithm changed')
-    print('Conserved all eleven original Atlantis source/header files: nine runtime files and two unchanged Windows utility files')
+    print('Verified eleven Atlantis source/header files against the declared native adapters and RMS timing fixes')
     print('Conserved original grapple-visibility, surface-size, surface Image and animation-state utility bodies')
     print('Verified all nine unchanged original Atlantis mesh/configuration inputs')
 

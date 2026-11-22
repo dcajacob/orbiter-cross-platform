@@ -2005,13 +2005,13 @@
     },
     "Src/Vessel/Atlantis/Atlantis/Atlantis.cpp": {
       "original_sha256_lf": "b1451784bf78866b99dba584f0694c9ae55a854f2b560b697f7320dfb272be0f",
-      "sha256_lf": "a0c4a506065da0f95c67f78c535e60637ae8fb2fc01e2eb6fbb06073a5e0c682",
-      "scope": "Original Atlantis source portability through explicit SDK spellings, UI service imports and checked native factories; exact source conservation required. Native class admission, matched runtime and interaction qualification remain pending. ASan-confirmed six RMS rotations are reclaimed through their allocated MGROUP_ROTATE type; no numerical or callback-order change. LSan-confirmed three SSME rotations, module font and brush are released at their existing ownership boundaries; handles clear after module resource release."
+      "sha256_lf": "a5f62fba97babc98999f3f7a311ef402dde2fb38f12edd7497fa66d58436636f",
+      "scope": "Original Atlantis source portability through explicit SDK spellings, UI service imports and checked native factories; exact source conservation required. Native class admission, matched runtime and interaction qualification remain pending. ASan-confirmed six RMS rotations are reclaimed through their allocated MGROUP_ROTATE type; no numerical or callback-order change. LSan-confirmed three SSME rotations, module font and brush are released at their existing ownership boundaries; handles clear after module resource release. The Atlantis RMS defers grapple toggles to pre-step and initializes the keyboard stow timestamp."
     },
     "Src/Vessel/Atlantis/Atlantis/Atlantis.h": {
       "original_sha256_lf": "5f4bd6bd80ea8c44b847f7802ad2966d73b4d72054c62bbc758f4c12b0f5f74b",
-      "sha256_lf": "6c8645dce4e47cb6ca67250c6442abfc50f1a621742b909c4a310db10a0a6f7d",
-      "scope": "Original Atlantis source portability through explicit SDK spellings, UI service imports and checked native factories; exact source conservation required. Native class admission, matched runtime and interaction qualification remain pending."
+      "sha256_lf": "971c62e336ddb349a8eebaf18a78125d0ef490a55846c2eb853139ad66277dc5",
+      "scope": "Original Atlantis source portability through explicit SDK spellings, UI service imports and checked native factories; exact source conservation required. Native class admission, matched runtime and interaction qualification remain pending. The Atlantis RMS stores a pending grapple request until pre-step."
     },
     "Src/Vessel/Atlantis/Atlantis/AtlantisPlatform.h": {
       "original_sha256_lf": null,

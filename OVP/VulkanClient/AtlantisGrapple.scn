@@ -1,0 +1,40 @@
+BEGIN_DESC
+Atlantis retrieves the free-flying stock Carina satellite, carries it with the arm, then releases it as the arm continues to stow. Start unpaused.
+END_DESC
+
+BEGIN_ENVIRONMENT
+  System Sol
+  Date MJD 51982.9522836459
+  Script AtlantisGrapple
+END_ENVIRONMENT
+
+BEGIN_FOCUS
+  Ship Atlantis
+END_FOCUS
+
+BEGIN_CAMERA
+  TARGET Atlantis
+  MODE Extern
+  POS 2.30 -65.00 -22.00
+  TRACKMODE TargetRelative
+  FOV 40.00
+END_CAMERA
+
+BEGIN_SHIPS
+Atlantis:Atlantis
+  CONFIGURATION 3
+  STATUS Orbiting Earth
+  RPOS 3259578.50 697743.53 -5765488.27
+  RVEL 6438.832 1743.162 3914.279
+  AROT 0 0 0
+  FUEL 1.000
+  CARGODOOR 1 1.0000
+  ARM_STATUS 0.3700 0.3200 0.0123 0.5000 0.5000 0.5000
+END
+Carina:Carina
+  STATUS Orbiting Earth
+  RPOS 3259567.926431 697757.164970 -5765486.526961
+  RVEL 6438.832 1742.462 3914.279
+  AROT 0 0 0
+END
+END_SHIPS

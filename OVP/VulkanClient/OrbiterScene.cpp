@@ -663,14 +663,31 @@ OrbiterScene::VesselUpdate OrbiterScene::UpdateVessels(const SceneFrame& camera,
         // Hysteresis keeps readable non-focus exteriors resident as the camera moves.
         const double minPixels = vessels_.count(handle) ? 0.35 : 0.6;
         const double maxRange = radius * focal / minPixels;
-        if (handle != focus_ && Dot(eye, eye) > maxRange * maxRange) continue;
+        if (handle != focus_ && Dot(eye, eye) > maxRange * maxRange) {
+            const auto it = vessels_.find(handle);
+            if (it != vessels_.end() && it->second.pose.HasLocalVertices()) {
+                // Release the distant visual, but keep module-owned attachment
+                // frames moving and retain their bind pose for the next view.
+                auto& visual = it->second;
+                if (!visual.meshSlots.empty()) {
+                    scene_.RemoveShip(handle);
+                    auto pose = std::move(visual.pose);
+                    pose.Reset({}, {}, {});
+                    visual = {};
+                    visual.pose = std::move(pose);
+                }
+                visual.pose.Update(*vessel);
+                visual.retained = true;
+            }
+            continue;
+        }
         auto& visual = vessels_[handle];
         visual.retained = true;
         const bool pilotView = handle == pilot_ && oapiCameraInternal();
         static const std::vector<CockpitDisplay> noDisplays;
         RefreshMeshes(*vessel, visual, pilotView, pilotView ? displays : noDisplays);
-        if (visual.pose.Vertices().empty()) continue;
         const bool changed = visual.pose.Update(*vessel);
+        if (visual.pose.Vertices().empty()) continue;
         if (changed) scene_.SetShipPose(handle, visual.pose.Vertices());
         update.poseUploaded |= changed;
         if (!vesselShadows) {

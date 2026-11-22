@@ -282,7 +282,7 @@ public:
 	void GetSRBGimbalPos (int which, double &pitch, double &yaw);
 
 	void SeparateMMU (void);
-	void ToggleGrapple (void);
+	void RequestGrapple () { grappleRequested = true; }
 	void ToggleArrest (void);
 	void SetGearParameters (double state);
 	void Jettison ();
@@ -404,6 +404,8 @@ private:
 	bool SatGrappled() const { return GetAttachmentStatus (rms_attach) != 0; }
 	bool SatStowed() const { return GetAttachmentStatus (sat_attach) != 0; }
 	ATTACHMENTHANDLE CanArrest() const;
+	void ToggleGrapple ();
+	bool grappleRequested = false;
 
 	AscentAP *ascap;                           // ascent autopilot
 	int ascapMfdId;                            // ID for ascent autopilot MFD mode

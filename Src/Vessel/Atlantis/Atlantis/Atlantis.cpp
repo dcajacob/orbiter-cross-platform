@@ -185,7 +185,7 @@ void RMSDialog::OnDraw()
 	ImGui::SameLine();
 	ImGui::BeginDisabled(m_atlantis->center_arm);
 	if(ImGui::Button(m_atlantis->SatGrappled() ? "Release" : "Grapple")) {
-		m_atlantis->ToggleGrapple();
+		m_atlantis->RequestGrapple();
 	}
 	ImGui::EndDisabled();
 
@@ -979,7 +979,7 @@ void Atlantis::ToggleArrest (void)
 	if (SatStowed()) { // purge satellite
 		DetachChildWithMass(sat_attach, 0.1);
 	} else if (CanArrest()) {           // try to arrest satellite
-		ToggleGrapple();
+		RequestGrapple();
 	}
 }
 
@@ -1645,6 +1645,12 @@ void Atlantis::clbkFocusChanged (bool getfocus, OBJHANDLE newv, OBJHANDLE oldv)
 // --------------------------------------------------------------
 void Atlantis::clbkPreStep (double simt, double simdt, double mjd)
 {
+	// Dialog and scripted key callbacks can run after propagation, while
+	// Orbiter still exposes the previous step's state for detachment.
+	if (grappleRequested) {
+		grappleRequested = false;
+		ToggleGrapple();
+	}
 	ascap->Update (simt);
 
 	//double met = (status == 0 ? 0.0 : simt-t0);
@@ -2313,9 +2319,10 @@ int Atlantis::clbkConsumeBufferedKey (oapi::UInt32 key, bool down, char *kstate)
 			if (!Playback()) plop->RevertDoorAction ();
 			return 1;
 		case OAPI_KEY_8:
-			ToggleGrapple();
+			RequestGrapple();
 			return 1;
 		case OAPI_KEY_9: 
+			if (!center_arm) center_arm_t = oapiGetSimTime();
 			center_arm = true;
 			return 1;
 		case OAPI_KEY_E:

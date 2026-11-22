@@ -18,6 +18,18 @@ The client preserves authored vessel texture mip levels and generates any
 missing levels at upload. Vessel skins use 4× anisotropic filtering to keep
 fine patterns such as the ISS solar cells stable when viewed at an angle.
 
+## Atlantis arm and Carina
+
+Install the `AtlantisGrapple` CMake component into the runtime assets and
+launch **Vulkan → AtlantisGrapple** unpaused with the matching Atlantis module.
+The stock Carina satellite coasts toward the deployed arm at 0.7 m/s. The
+scenario sends Atlantis its **8** key to grapple, **9** to move the arm toward
+stow, and **8** again to release while the arm is moving.
+
+For the repeatable flight, use a 0.05-second fixed step and run for 30 seconds.
+`vulkan-grapple.csv` records both vessels' attachment states, the tip and
+fixture positions in Atlantis coordinates, and their separation in metres.
+
 ## DeltaGlider approaching the ISS
 
 Copy `ISSApproach.scn` to `Scenarios/Vulkan` and `ISSApproach.lua` to

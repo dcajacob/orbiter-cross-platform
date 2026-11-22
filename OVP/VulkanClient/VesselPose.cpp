@@ -98,7 +98,10 @@ void Apply(const ANIMATIONCOMP& component, const SceneFrame& transform, Paramete
     const std::vector<MeshGroups>& meshes, std::vector<SceneFrame>& groups, std::vector<bool>& changed)
 {
     const auto& source = *component.trans;
-    if (source.mesh < meshes.size()) {
+    if (source.mesh == LOCALVERTEXLIST && source.grp) {
+        auto* points = reinterpret_cast<VECTOR3*>(source.grp);
+        for (unsigned i = 0; i < source.ngrp; ++i) points[i] = transform.ToGlobal(points[i]);
+    } else if (source.mesh < meshes.size()) {
         const auto& mesh = meshes[source.mesh];
         const auto applyGroup = [&](std::size_t index) {
             if (index >= mesh.count) return;
@@ -186,9 +189,28 @@ bool VesselPose::Update(const VESSEL& vessel)
         changed |= offset.x != mesh.offset.x || offset.y != mesh.offset.y || offset.z != mesh.offset.z;
         mesh.offset = offset;
     }
-    if (!changed || mesh_.empty()) return false;
+    if (!changed) return false;
     initialized_ = true;
     posed_ = mesh_;
+
+    // The module owns these points and reads their posed values back (e.g. the
+    // Atlantis grapple frame). Replay from their authored positions just as we
+    // do for mesh vertices, including when several components share a point.
+    // Only dereference points that are still present in the live animations.
+    std::map<VECTOR3*, VECTOR3> defaults;
+    for (unsigned i = 0; i < count; ++i) {
+        for (unsigned j = 0; j < data[i].ncomp; ++j) {
+            const auto& source = *data[i].comp[j]->trans;
+            if (source.mesh != LOCALVERTEXLIST || !source.grp) continue;
+            auto* points = reinterpret_cast<VECTOR3*>(source.grp);
+            for (unsigned k = 0; k < source.ngrp; ++k) {
+                const auto prior = localDefaults_.find(points + k);
+                if (prior != localDefaults_.end()) points[k] = prior->second;
+                defaults.emplace(points + k, points[k]);
+            }
+        }
+    }
+    localDefaults_ = std::move(defaults);
 
     Parameters parameters;
     std::vector<SceneFrame> transforms(groups_.size(), identity);

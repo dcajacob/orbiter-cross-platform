@@ -3,6 +3,7 @@
 
 #include "SceneFrame.h"
 #include "VulkanScene.h"
+#include <map>
 
 namespace orbiter::vulkan {
 
@@ -22,6 +23,7 @@ public:
     void Reset(std::vector<Vertex> mesh, std::vector<VertexRange> groups, std::vector<MeshGroups> meshes);
     void SetGroup(unsigned mesh, unsigned group, const MESHGROUP&);
     bool Update(const VESSEL&);
+    bool HasLocalVertices() const { return !localDefaults_.empty(); }
     const std::vector<Vertex>& Vertices() const { return posed_; }
 
 private:
@@ -30,6 +32,7 @@ private:
     std::vector<VertexRange> groups_;
     std::vector<MeshGroups> meshes_;
     std::vector<double> states_;
+    std::map<VECTOR3*, VECTOR3> localDefaults_;
     bool initialized_ = false;
 };
 

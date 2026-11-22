@@ -76,3 +76,5 @@ install(FILES Cockpit/deltaglider_vc.msh DESTINATION Meshes/Vulkan/DG COMPONENT 
 install(FILES Cockpit/dg_flightdeck.dds Cockpit/dg_flightdeck_surface.dds
     DESTINATION Textures/DG COMPONENT DeltaGliderCockpit)
 install(FILES ISSManualDock.scn DESTINATION Scenarios/Vulkan COMPONENT DeltaGliderCockpit)
+install(FILES AtlantisGrapple.scn DESTINATION Scenarios/Vulkan COMPONENT AtlantisGrapple)
+install(FILES AtlantisGrapple.lua DESTINATION Script COMPONENT AtlantisGrapple)
