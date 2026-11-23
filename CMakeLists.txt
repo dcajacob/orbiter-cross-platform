@@ -278,9 +278,18 @@ endfunction()
 
 
 # Installation
-install(DIRECTORY Scenarios Textures Meshes Config GravityModels Kernels Script Flights BinAssets/
+install(DIRECTORY Scenarios Textures Meshes Config GravityModels Kernels Script Flights
 	DESTINATION ${ORBITER_INSTALL_ROOT_DIR}
 )
+
+# These legacy Win32 CRTs are only for 32-bit installations.
+if(WIN32 AND CMAKE_SIZEOF_VOID_P EQUAL 8)
+    install(DIRECTORY BinAssets/ DESTINATION ${ORBITER_INSTALL_ROOT_DIR}
+        PATTERN "msvcp71.dll" EXCLUDE
+        PATTERN "msvcr71.dll" EXCLUDE)
+else()
+    install(DIRECTORY BinAssets/ DESTINATION ${ORBITER_INSTALL_ROOT_DIR})
+endif()
 
 set(CMAKE_MODULE_PATH
 	${ORBITER_BINARY_ROOT_DIR}

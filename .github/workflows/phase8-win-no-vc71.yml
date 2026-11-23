@@ -1,0 +1,53 @@
+name: Windows x64 clean install without the 7.1 runtimes
+on:
+  push:
+    branches: [qualification/phase8-win-no-vc71]
+permissions:
+  contents: read
+  actions: read
+jobs:
+  clean:
+    runs-on: windows-2025
+    timeout-minutes: 25
+    env:
+      SDL_AUDIODRIVER: dummy
+      INFOZIP: 'C:\msys64\usr\bin\zip.exe'
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.14'
+      - uses: ilammy/msvc-dev-cmd@v1
+        with:
+          arch: x64
+      - name: Locate Info-ZIP for lossless member copying
+        run: |
+          if (!(Test-Path $env:INFOZIP)) {
+            & C:\msys64\usr\bin\bash.exe -lc 'pacman -S --needed --noconfirm zip'
+            if ($LASTEXITCODE) { exit $LASTEXITCODE }
+          }
+          & $env:INFOZIP -v | Select-Object -First 4
+      - uses: actions/cache/restore@v6
+        with:
+          path: out/cache/production-stock-data-v1.zip
+          key: production-native-data-${{ hashFiles('Tests/Production/input-storage.lock.json') }}
+      - uses: actions/cache/restore@v6
+        with:
+          path: out/cache/Orbiter2016.zip
+          key: production-standard-planets-${{ hashFiles('Tests/Production/standard-planets.lock.json') }}
+      - uses: actions/cache/restore@v6
+        with:
+          path: out/mesa-cache/*.pkg.tar.zst
+          key: mesa-ucrt64-${{ hashFiles('Tests/Production/mesa-ucrt64.lock.json') }}
+      - name: Install, open the Launchpad and fly the muted stock Delta-glider
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python -B Tests/Production/Packages/clean_vc71.py
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: windows-clean-install-evidence
+          path: out/receipt/
+          retention-days: 7
