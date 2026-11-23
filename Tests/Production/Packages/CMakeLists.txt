@@ -7,3 +7,7 @@ target_include_directories(LaunchpadFlightProbe PRIVATE
 target_link_libraries(LaunchpadFlightProbe PRIVATE
     "${ORBITER_TEST_RUNTIME}/Orbitersdk/lib/Orbiter.lib"
     "${ORBITER_TEST_RUNTIME}/Orbitersdk/lib/Orbitersdk.lib")
+
+add_executable(ResolveSdkFlightProfile ResolveSdkFlightProfile.cpp
+    ../../../Utils/InstalledProfile/WindowsProfile.cpp)
+target_compile_features(ResolveSdkFlightProfile PRIVATE cxx_std_17)

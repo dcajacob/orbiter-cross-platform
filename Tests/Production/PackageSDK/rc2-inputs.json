@@ -1,0 +1,120 @@
+{
+  "macos-arm64": {
+    "package_artifact": {
+      "id": 14731076883,
+      "sha256": "sha256:c1711946a6701b42d136fc48ec4b0a58a7f532318052a78a3aa757c13a2501ad",
+      "source": "f6c66ea75fb837eb05cd61fc847fc3ec3ca37420",
+      "run": "44965024779"
+    },
+    "check_artifact": {
+      "id": 14731148036,
+      "sha256": "sha256:1e7a0137b81a870d208dae7f46a89397cffc67749cf37fa1111f64db781765e6",
+      "source": "f6c66ea75fb837eb05cd61fc847fc3ec3ca37420",
+      "run": "44965024779"
+    },
+    "saved_flight_sha256": "49537fb5208ecc95b30f60f4cabadd23eadbb6835231db4295d1b6d93a70ae2a",
+    "protected_entries": 1547,
+    "installer_source": "f6c66ea75fb837eb05cd61fc847fc3ec3ca37420",
+    "sdk_consumer": "Pending short sample on this exact SDK and runtime",
+    "component_base_source": "5b3d1453bb21457f379a76e0d2eed85e2dee8cac",
+    "sdk_runtime_bindings_changed_since_rc1": [],
+    "package_source": "f6c66ea75fb837eb05cd61fc847fc3ec3ca37420",
+    "runtime": "Orbiter-macos-arm64-user-profile-f6c66ea7.tar.gz",
+    "installer": "orbiter-stock-data-arm64.pyz",
+    "sdk": "Orbiter-SDK-macos-arm64.zip",
+    "abi": "clang-17.0.0 (clang-1700.0.13.5):libc++-190102:201703L",
+    "sdk_identity": "40377c29942d2b996b9110d60b5378484b974f5a9be04705df8aa27a12ca93a1",
+    "protected_install_receipt": "protected-install.json",
+    "protected_install_receipt_sha256": "3d7a4e178d1f9530f334014f723c101e26044071377e50b9fd0ca5d3aed7ee02",
+    "runtime_sha256": "1240c8593072a59572b8b6d4268a162eb8628bdef393ebdf86ee5f8aba63cb81",
+    "installer_sha256": "c8da954d98f85f8fa51a5078872a1a50e1eb6890a79c80ec016b3bbc1eb20adb",
+    "sdk_sha256": "a96f13366e8cc5e83179734b69b32ade5ab5838aed5afdde983be70146ce51c7",
+    "build_lock": {
+      "abi": "clang-17.0.0 (clang-1700.0.13.5):libc++-190102:201703L",
+      "arch": "arm64",
+      "native_build": "40377c29942d2b996b9110d60b5378484b974f5a9be04705df8aa27a12ca93a1",
+      "platform": "macos",
+      "source": "f6c66ea75fb837eb05cd61fc847fc3ec3ca37420",
+      "sha256": "1240c8593072a59572b8b6d4268a162eb8628bdef393ebdf86ee5f8aba63cb81"
+    }
+  },
+  "macos-x86_64": {
+    "package_artifact": {
+      "id": 14730837793,
+      "sha256": "sha256:00d6e726a49fdd59c3a440df0f347278cc6990d1b43d89a32b12d46394b27021",
+      "source": "f6c66ea75fb837eb05cd61fc847fc3ec3ca37420",
+      "run": "44965024779"
+    },
+    "check_artifact": {
+      "id": 14731498482,
+      "sha256": "sha256:1c6062052eeeec8e77c8feb70b0eccabbe34ce0654685c3da4876ae76ade8d79",
+      "source": "22f2bbc55f2503d828a7eeb090e295601dc2bfae",
+      "run": "44965721043"
+    },
+    "saved_flight_sha256": "8240ec8ca48460c73dc5281e6596ce3c5431d36f87aec869178bb11769ffde1f",
+    "protected_entries": 1547,
+    "installer_source": "f6c66ea75fb837eb05cd61fc847fc3ec3ca37420",
+    "sdk_consumer": "Pending short sample on this exact SDK and runtime",
+    "component_base_source": "5b3d1453bb21457f379a76e0d2eed85e2dee8cac",
+    "sdk_runtime_bindings_changed_since_rc1": [],
+    "package_source": "f6c66ea75fb837eb05cd61fc847fc3ec3ca37420",
+    "runtime": "Orbiter-macos-x86_64-user-profile-f6c66ea7.tar.gz",
+    "installer": "orbiter-stock-data-x86_64.pyz",
+    "sdk": "Orbiter-SDK-macos-x86_64.zip",
+    "abi": "clang-17.0.0 (clang-1700.0.13.5):libc++-190102:201703L",
+    "sdk_identity": "e84175b7500f0070ddef4a136e83ed44e4ff266e7fcfeb87ccb4f99e36af87fe",
+    "protected_install_receipt": "protected-install.json",
+    "protected_install_receipt_sha256": "0ec66b75794c04801e6495c68b6311c47d984318ec0f80a9caeb871ce6c65f6a",
+    "runtime_sha256": "162e686e5e0ba94c3e52c738c9d6bd9e4ae6e156807a0cbdbf033c29328c2420",
+    "installer_sha256": "3e19d326c47081ff082730701269ee45941c580af6f533683ec6bfaeb4190a01",
+    "sdk_sha256": "b666fbc6abb3d00c6fa59a87c7fe99ca1109b34506549e1bba424400b455c50e",
+    "build_lock": {
+      "abi": "clang-17.0.0 (clang-1700.0.13.5):libc++-190102:201703L",
+      "arch": "x86_64",
+      "native_build": "e84175b7500f0070ddef4a136e83ed44e4ff266e7fcfeb87ccb4f99e36af87fe",
+      "platform": "macos",
+      "source": "f6c66ea75fb837eb05cd61fc847fc3ec3ca37420",
+      "sha256": "162e686e5e0ba94c3e52c738c9d6bd9e4ae6e156807a0cbdbf033c29328c2420"
+    }
+  },
+  "windows-x64": {
+    "package_artifact": {
+      "id": 14764140535,
+      "sha256": "sha256:962c358d8783a3c9b90af215d2181a94a591f29877650b1266387de772c1b5b9",
+      "source": "33b6c221aeb6bd2044c86681afeb30fc4c83a031",
+      "run": "45045995374"
+    },
+    "check_artifact": {
+      "id": 14764111153,
+      "sha256": "sha256:3edd6f02c667e61349701f7ba298a0b5f0040e23d574989fe15ec0f1f9a3de67",
+      "source": "33b6c221aeb6bd2044c86681afeb30fc4c83a031",
+      "run": "45045995374"
+    },
+    "saved_flight_sha256": "0ee94beebed396b17858868dac60b54407be708a508fed123ad94d0a2877dd36",
+    "protected_entries": 2788,
+    "installer_source": "33b6c221aeb6bd2044c86681afeb30fc4c83a031",
+    "sdk_consumer": "Pending short sample on this exact SDK and runtime",
+    "component_base_source": "7c6f7670bec3594432bb2264f2fbd3397b3a9fb5",
+    "sdk_runtime_bindings_changed_since_rc1": [
+      "Orbiter.exe"
+    ],
+    "package_source": "f6c66ea75fb837eb05cd61fc847fc3ec3ca37420",
+    "runtime": "Orbiter-windows-x64-user-profile-f6c66ea7.zip",
+    "installer": "orbiter-stock-data.pyz",
+    "sdk": "Orbiter-SDK-windows-x64.zip",
+    "abi": "MSVC 19.51.36260.0",
+    "sdk_identity": null,
+    "protected_install_receipt": "protected-install.json",
+    "protected_install_receipt_sha256": "20cf1aad61a8d2ac84c11a92b36e5ab26663867d162b43674ab06c4776f1a343",
+    "runtime_sha256": "dfb60f8258cde5e6734f0fa8c49fecb8fdfdec32eb29a7c834950acb3bd65154",
+    "installer_sha256": "f5557f112f3cc3111799bb9ffd03b2b91941aa17b4724b3e5623d280d5b4ea2a",
+    "sdk_sha256": "0b0fdd799fc36d7d734fe6ffbcaca1ca3999ed434da8ddb6008b933e9c91a6a4",
+    "build_lock": {
+      "arch": "x86_64",
+      "compiler": "MSVC 19.51.36260.0",
+      "platform": "windows",
+      "source": "f6c66ea75fb837eb05cd61fc847fc3ec3ca37420",
+      "sha256": "dfb60f8258cde5e6734f0fa8c49fecb8fdfdec32eb29a7c834950acb3bd65154"
+    }
+  }
+}

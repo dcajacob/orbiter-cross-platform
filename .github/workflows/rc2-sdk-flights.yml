@@ -1,0 +1,113 @@
+name: RC2 muted SDK sample flights
+on:
+  push:
+    branches: [qualification/phase8-rc2-sdk-f230562b]
+permissions:
+  contents: read
+  actions: read
+jobs:
+  prepare:
+    name: Recover byte-identical frozen SDK archives
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 12
+          persist-credentials: false
+      - name: Recover the three frozen SDK ZIPs and verify SHA-256
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          for target in macos-arm64 macos-x86_64 windows-x64; do
+            /usr/bin/python3 -B Tests/Production/PackageSDK/rc2-consumer.py prepare "$target"
+          done
+      - uses: actions/upload-artifact@v7
+        with:
+          name: rc2-verified-sdks
+          path: out/distribution/*.zip
+          retention-days: 7
+  sdk:
+    needs: prepare
+    name: SDK add-on on ${{ matrix.target }}
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 40
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { target: macos-x86_64, runner: macos-15-intel }
+          - { target: macos-arm64, runner: macos-15 }
+          - { target: windows-x64, runner: windows-2025 }
+    env:
+      SDL_AUDIODRIVER: dummy
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 2
+          persist-credentials: false
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.14'
+      - name: Install the original engine's exact Visual Studio 18.11.3 toolchain
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $url = 'https://download.visualstudio.microsoft.com/download/pr/5f474104-723f-4007-bf4c-92e42a23dcc6/ea54b67bfac576b6dd097f84eeaf6893780d2a613f90448ff038e8a2777a0afb/vs_BuildTools.exe'
+          $bootstrap = Join-Path $env:RUNNER_TEMP 'vs_BuildTools.exe'
+          curl.exe -fLsS --retry 2 $url -o $bootstrap
+          if ($LASTEXITCODE -or (Get-FileHash $bootstrap).Hash -ne 'ea54b67bfac576b6dd097f84eeaf6893780d2a613f90448ff038e8a2777a0afb') { throw 'Incorrect Build Tools bootstrapper' }
+          if ((Get-AuthenticodeSignature $bootstrap).Status -ne 'Valid') { throw 'Invalid Microsoft bootstrapper signature' }
+          $dest = Join-Path $env:RUNNER_TEMP 'VS18113'
+          $p = Start-Process $bootstrap -ArgumentList @('--quiet','--wait','--norestart','--nocache','--installPath',$dest,'--add','Microsoft.VisualStudio.Component.VC.Tools.x86.x64','--add','Microsoft.VisualStudio.Component.Windows11SDK.26100') -Wait -PassThru
+          if ($p.ExitCode -notin @(0,3010)) { throw "VS 18.11.3 installation failed: $($p.ExitCode)" }
+          $cl = Get-Item "$dest/VC/Tools/MSVC/14.51.36231/bin/Hostx64/x64/cl.exe"
+          $cl.VersionInfo | Format-List ProductVersion,FileVersion
+      - if: runner.os == 'macOS'
+        run: echo 'DEVELOPER_DIR=/Applications/Xcode_16.4.app/Contents/Developer' >> "$GITHUB_ENV"
+      - name: Verify frozen references
+        shell: bash
+        run: |
+          python -B Tests/Production/frozen_reference.py
+          python -B Tests/Production/frozen_behavior.py
+      - uses: actions/cache/restore@v6
+        with:
+          path: out/cache/production-stock-data-v1.zip
+          key: production-native-data-${{ hashFiles('Tests/Production/input-storage.lock.json') }}
+      - uses: actions/cache/restore@v6
+        with:
+          path: out/cache/Orbiter2016.zip
+          key: production-standard-planets-${{ hashFiles('Tests/Production/standard-planets.lock.json') }}
+      - if: runner.os == 'Windows'
+        uses: actions/cache/restore@v6
+        with:
+          path: out/mesa-cache/*.pkg.tar.zst
+          key: mesa-ucrt64-${{ hashFiles('Tests/Production/mesa-ucrt64.lock.json') }}
+      - uses: actions/download-artifact@v8
+        with:
+          name: rc2-verified-sdks
+          path: out/distribution
+      - name: Fly the Mac SDK sample
+        if: runner.os == 'macOS'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python -B Tests/Production/PackageSDK/rc2-consumer.py fly ${{ matrix.target }}
+      - name: Build and fly the installed SDK sample
+        env:
+          GH_TOKEN: ${{ github.token }}
+        if: runner.os == 'Windows'
+        shell: cmd
+        run: |
+          call "%RUNNER_TEMP%\VS18113\VC\Auxiliary\Build\vcvarsall.bat" amd64 10.0.26100.0 -vcvars_ver=14.51
+          if errorlevel 1 exit /b 1
+          python -B Tests/Production/PackageSDK/rc2-consumer.py fly windows-x64
+      - if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: rc2-sdk-flight-${{ matrix.target }}
+          path: |
+            out/receipt/
+
+          retention-days: 7
+          if-no-files-found: warn

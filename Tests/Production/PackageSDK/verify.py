@@ -114,7 +114,7 @@ def native(args, runtime, sdk, build, env):
     return frames, original
 
 
-def windows_flight(runtime, scenario, env, log):
+def windows_flight(runtime, state, scenario, env, log):
     import ctypes
     from ctypes import wintypes
 
@@ -146,7 +146,7 @@ def windows_flight(runtime, scenario, env, log):
         try:
             limit = time.monotonic() + 120
             while process.poll() is None and time.monotonic() < limit:
-                if (runtime / "launchpad-flight-end.txt").is_file():
+                if (state / "launchpad-flight-end.txt").is_file():
                     user32.EnumWindows(find_launchpad, 0)
                     if windows:
                         assert user32.PostMessageW(windows[0], 0x0010, 0, 0)
@@ -175,22 +175,32 @@ def windows(args, runtime, sdk, build, env):
     text = text.replace("  ProductionReferenceDriver", "  LaunchpadFlightProbe\n  OGLClient")
     text = text.replace("FixedStep = 1\n", "FixedStep = 0.0625\n")
     assert "ShutdownMode = 0" in text
+    state = runtime
     installed = config.read_bytes()
     try:
         config.write_text(font + "\n" + text, encoding="ascii")
         shutil.copy2(args.probe, runtime / "Modules/Plugin")
-        (runtime / "ogl-evidence.enabled").touch()
+        if args.profile_resolver:
+            path_file = args.work / "flight-profile.txt"
+            subprocess.run([args.profile_resolver, runtime / "Orbiter.exe", path_file], check=True)
+            state = Path(path_file.read_text(encoding="utf-8"))
+            assert state.is_relative_to(Path(os.environ["LOCALAPPDATA"]) / "Orbiter/Installations")
+            assert (state / "Modules").samefile(runtime / "Modules")
+            assert (state / "Orbiter.cfg").read_bytes() == config.read_bytes()
+        assert "XRSound" not in (state / "Orbiter.cfg").read_text()
+        assert not (state / "sdk-vessel.txt").exists()
+        (state / "ogl-evidence.enabled").touch()
         mesa_files(args.mesa, runtime)
         system = Path(os.environ["SYSTEMROOT"])
         env.update(PATH=os.pathsep.join([str(system / "System32"), str(system)]),
                    LIBGL_ALWAYS_SOFTWARE="true", GALLIUM_DRIVER="llvmpipe")
-        windows_flight(runtime, scenario.stem, env, args.output / "flight.log")
+        windows_flight(runtime, state, scenario.stem, env, args.output / "flight.log")
     finally:
         config.write_bytes(installed)
         for name in ("graphics-lifecycle.json", "launchpad-flight-end.txt", "launchpad-flight.txt",
                      "sdk-vessel.txt", "Orbiter.log"):
-            if (runtime / name).is_file():
-                shutil.copy2(runtime / name, args.output)
+            if (state / name).is_file():
+                shutil.copy2(state / name, args.output)
     assert (args.output / "sdk-vessel.txt").read_text().splitlines() == MARKERS
     assert (args.output / "launchpad-flight-end.txt").read_text().strip() == "48"
     assert "vessel=SDK-01:Phase8SdkProbe" in (args.output / "launchpad-flight.txt").read_text()
@@ -204,6 +214,7 @@ def main():
     for name in ("install", "sdk", "work", "output", "probe", "mesa"):
         parser.add_argument("--" + name, type=lambda value: Path(value).resolve(),
                             required=name in ("install", "sdk", "work", "output"))
+    parser.add_argument("--profile-resolver", type=Path)
     args = parser.parse_args()
     args.work.mkdir(parents=True)
     args.output.mkdir(parents=True)
