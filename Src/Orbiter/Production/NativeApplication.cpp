@@ -648,13 +648,7 @@ struct Runtime final:BodyServices,RigidBodyServices,SurfaceServices,NavigationSe
                 if(code==OAPI_KEY_F5 && !KEYMOD_CONTROL(eventKeys.data())) {reloadPending=true;continue;}
 #ifndef ORBITER_NATIVE_COCKPIT
                 if(code==OAPI_KEY_F6 && !KEYMOD_CONTROL(eventKeys.data())) {stepOnce=true;continue;}
-#endif
-#ifdef ORBITER_NATIVE_COCKPIT
-                const bool cycleFocus = vulkanView;
-#else
-                constexpr bool cycleFocus = true;
-#endif
-                if (cycleFocus && keymap.IsLogicalKey(code,eventKeys.data(),OAPI_LKEY_DlgSelectVessel)) {
+                if (keymap.IsLogicalKey(code,eventKeys.data(),OAPI_LKEY_DlgSelectVessel)) {
                     // Clients without the in-flight focus picker cycle eligible vessels.
                     const auto& list = system->GetVessels();
                     const auto it = std::find(list.begin(), list.end(), render.focus);
@@ -668,7 +662,7 @@ struct Runtime final:BodyServices,RigidBodyServices,SurfaceServices,NavigationSe
                     }
                     continue;
                 }
-#ifdef ORBITER_NATIVE_COCKPIT
+#else
                 if(HandleCockpitMenuKey(keymap,code,eventKeys.data()))continue;
                 if(keymap.IsLogicalKey(code,eventKeys.data(),OAPI_LKEY_TogglePlanetarium)) {settings.CfgVisHelpPrm.flagPlanetarium^=PLN_ENABLE;continue;}
                 if(keymap.IsLogicalKey(code,eventKeys.data(),OAPI_LKEY_ToggleLabels)) {settings.CfgVisHelpPrm.flagMarkers^=MKR_ENABLE;continue;}
@@ -1466,18 +1460,14 @@ int main(int argc,char** argv) {
                 if(application.reloadPending) {if(!std::filesystem::is_regular_file(save)){std::cerr<<"No saved scenario exists: "<<save<<'\n';application.reloadPending=false;}else{scenario=save;reload=true;break;}}
                 if(input.width>0 && input.height>0) {
 #ifdef ORBITER_NATIVE_COCKPIT
-                    if(!vulkanView) {
-                        application.render.graphics->NewGuiFrame();
-                        BeginCockpitGuiFrame();
-                    }
+                    application.render.graphics->NewGuiFrame();
+                    BeginCockpitGuiFrame();
 #endif
                     application.render.paused=!application.running;application.render.graphics->Status(application.Status());application.render.graphics->Render();
 #ifdef ORBITER_NATIVE_COCKPIT
                     if(vulkanView && application.render.camera->IsInternal()) application.cockpit->Render();
-                    if(!vulkanView) {
-                        application.cockpit->Draw();
-                        application.render.graphics->RenderGui();
-                    }
+                    application.cockpit->Draw();
+                    application.render.graphics->RenderGui();
 #endif
                     if(!application.render.graphics->Present())throw std::runtime_error("Native frame presentation failed");++presented;
                 } else std::this_thread::sleep_for(std::chrono::milliseconds(10));

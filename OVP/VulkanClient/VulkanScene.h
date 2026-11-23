@@ -116,6 +116,11 @@ public:
     void RemoveShip(OBJHANDLE) noexcept;
     bool Present(const std::vector<VesselDraw>& ships, const SceneUniform& ground, const EarthView& earth,
         const std::filesystem::path& sample = {});
+    void InitGui();
+    void NewGuiFrame();
+    void FinishGui();
+    void ShutdownGui();
+    SDL_GPUTexture* PanelTextureFor(const TextureData*);
     void BeginPanelFrame() { panelBatches_.clear(); panelVertices_.clear(); }
     void PanelGroup(const TextureData*, const MESHGROUP&, const MATRIX3&, float alpha, bool additive);
     void ForgetPanelTexture(const TextureData*);
@@ -127,6 +132,11 @@ public:
     void ClearMesh() noexcept;
 
 private:
+    bool guiInitialized_ = false;
+    bool guiDrawPending_ = false;
+    std::vector<SDL_GPUTexture*> retiredPanelTextures_;
+    void RetirePanelTexture(SDL_GPUTexture*);
+    void ReleaseRetiredPanelTextures();
     struct PanelBatch {
         const TextureData* image;
         Uint32 first, count;

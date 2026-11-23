@@ -80,12 +80,34 @@ void Scene::PreparePanel()
     panelBuffer_ = UploadBuffer(SDL_GPU_BUFFERUSAGE_VERTEX, panelVertices_.data(),
         panelVertices_.size() * sizeof(PanelVertex));
     for (const auto& batch : panelBatches_) {
-        auto& cached = panelTextures_[batch.image];
-        if (cached.gpu && cached.revision == batch.image->revision) continue;
-        auto* fresh = UploadTexture(*batch.image);
-        if (cached.gpu) SDL_ReleaseGPUTexture(device_, cached.gpu);
-        cached = {fresh, batch.image->revision};
+        PanelTextureFor(batch.image);
     }
+}
+
+SDL_GPUTexture* Scene::PanelTextureFor(const TextureData* image)
+{
+    if (!image) return nullptr;
+    auto& cached = panelTextures_[image];
+    if (!cached.gpu || cached.revision != image->revision) {
+        auto* fresh = UploadTexture(*image);
+        RetirePanelTexture(cached.gpu);
+        cached = {fresh, image->revision};
+    }
+    return cached.gpu;
+}
+
+void Scene::RetirePanelTexture(SDL_GPUTexture* texture)
+{
+    if (!texture) return;
+    // ImGui draw lists can still contain this handle until presentation.
+    if (guiInitialized_) retiredPanelTextures_.push_back(texture);
+    else SDL_ReleaseGPUTexture(device_, texture);
+}
+
+void Scene::ReleaseRetiredPanelTextures()
+{
+    for (auto* texture : retiredPanelTextures_) SDL_ReleaseGPUTexture(device_, texture);
+    retiredPanelTextures_.clear();
 }
 
 void Scene::DrawPanel(SDL_GPURenderPass* pass, SDL_GPUCommandBuffer* cmd, unsigned w, unsigned h)
@@ -109,7 +131,7 @@ void Scene::ForgetPanelTexture(const TextureData* image)
 {
     const auto found = panelTextures_.find(image);
     if (found != panelTextures_.end()) {
-        if (found->second.gpu) SDL_ReleaseGPUTexture(device_, found->second.gpu);
+        RetirePanelTexture(found->second.gpu);
         panelTextures_.erase(found);
     }
     panelBatches_.erase(std::remove_if(panelBatches_.begin(), panelBatches_.end(),

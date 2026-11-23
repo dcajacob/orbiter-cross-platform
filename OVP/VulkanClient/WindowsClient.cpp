@@ -134,16 +134,11 @@ public:
 
     // Orbiter owns the ImGui context. Cockpit instruments render separately
     // through the panel and Sketchpad callbacks.
-    void clbkImGuiInit() override
-    {
-        auto& io = ImGui::GetIO();
-        io.ConfigFlags &= ~ImGuiConfigFlags_ViewportsEnable;
-        io.Fonts->Build();
-    }
-    void clbkImGuiNewFrame() override {}
-    void clbkImGuiRenderDrawData() override { ImGui::Render(); }
-    void clbkImGuiShutdown() override {}
-    uint64_t clbkImGuiSurfaceTexture(SURFHANDLE) override { return 0; }
+    void clbkImGuiInit() override { scene_.InitGui(); }
+    void clbkImGuiNewFrame() override { scene_.NewGuiFrame(); }
+    void clbkImGuiRenderDrawData() override { scene_.FinishGui(); }
+    void clbkImGuiShutdown() override { scene_.ShutdownGui(); }
+    uint64_t clbkImGuiSurfaceTexture(SURFHANDLE s) override { return scene_.GuiTexture(s); }
 
     void clbkRender2DPanel(SURFHANDLE* surfaces, MESHHANDLE mesh, MATRIX3* tx, bool additive) override
     { clbkRender2DPanel(surfaces, mesh, tx, 1.0f, additive); }

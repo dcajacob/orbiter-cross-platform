@@ -1,5 +1,8 @@
 // Licensed under the MIT License
 #include "VulkanScene.h"
+#ifdef ORBITER_VULKAN_IMGUI
+#include "imgui_impl_sdlgpu3.h"
+#endif
 #include "ShipShaders.h"
 #include "SceneFrame.h"
 
@@ -774,6 +777,39 @@ void Scene::DrawGroundShadows(SDL_GPURenderPass* pass, SDL_GPUCommandBuffer* com
     }
 }
 
+#ifdef ORBITER_VULKAN_IMGUI
+void Scene::InitGui()
+{
+    ImGui::GetIO().ConfigFlags &= ~ImGuiConfigFlags_ViewportsEnable;
+    ImGui_ImplSDLGPU3_InitInfo info{};
+    info.Device = device_;
+    info.ColorTargetFormat = SDL_GetGPUSwapchainTextureFormat(device_, window_);
+    Require(ImGui_ImplSDLGPU3_Init(&info), "Initialize Vulkan dialog renderer");
+    guiInitialized_ = true;
+}
+
+void Scene::NewGuiFrame()
+{
+    ReleaseRetiredPanelTextures();
+    ImGui_ImplSDLGPU3_NewFrame();
+}
+
+void Scene::FinishGui()
+{
+    ImGui::Render();
+    guiDrawPending_ = true;
+}
+
+void Scene::ShutdownGui()
+{
+    if (!guiInitialized_) return;
+    ImGui_ImplSDLGPU3_Shutdown();
+    ReleaseRetiredPanelTextures();
+    guiInitialized_ = false;
+    guiDrawPending_ = false;
+}
+#endif
+
 bool Scene::Present(const std::vector<VesselDraw>& ships, const SceneUniform& ground, const EarthView& earth, const std::filesystem::path& sample)
 {
     timings_ = {};
@@ -811,6 +847,10 @@ bool Scene::Present(const std::vector<VesselDraw>& ships, const SceneUniform& gr
         SDL_CancelGPUCommandBuffer(commands);
         Require(false, "Acquire Vulkan swapchain image");
     }
+#ifdef ORBITER_VULKAN_IMGUI
+    auto* dialogs = guiDrawPending_ ? ImGui::GetDrawData() : nullptr;
+    guiDrawPending_ = false;
+#endif
     if (!back) return SDL_SubmitGPUCommandBuffer(commands);
     ResizeDepth(width, height);
 
@@ -923,6 +963,15 @@ bool Scene::Present(const std::vector<VesselDraw>& ships, const SceneUniform& gr
     }
     DrawPanel(pass, commands, width, height);
     SDL_EndGPURenderPass(pass);
+#ifdef ORBITER_VULKAN_IMGUI
+    if (dialogs) {
+        ImGui_ImplSDLGPU3_PrepareDrawData(dialogs, commands);
+        color.load_op = SDL_GPU_LOADOP_LOAD;
+        pass = SDL_BeginGPURenderPass(commands, &color, 1, nullptr);
+        ImGui_ImplSDLGPU3_RenderDrawData(dialogs, commands, pass);
+        SDL_EndGPURenderPass(pass);
+    }
+#endif
     if (!capture) {
         const auto beforeSubmit = SDL_GetTicksNS();
         const bool submitted = SDL_SubmitGPUCommandBuffer(commands);
@@ -1044,6 +1093,9 @@ void Scene::Close() noexcept
         uploadCommands_ = nullptr;
     }
     SDL_WaitForGPUIdle(device_);
+#ifdef ORBITER_VULKAN_IMGUI
+    ShutdownGui();
+#endif
     capture_.clear();
     ClearMesh();
     for (auto& pipeline : panelPipeline_) {

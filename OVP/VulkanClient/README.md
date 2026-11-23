@@ -20,6 +20,13 @@ fine patterns such as the ISS solar cells stable when viewed at an angle.
 
 ## Atlantis arm and Carina
 
+For a manual flight, install the `AtlantisGrapple` component and start
+**Vulkan → AtlantisRMS** unpaused. Press **Ctrl+Space** and click **RMS Operation**.
+Hold the left shoulder yaw arrow until the arm tip reaches Carina, then click
+**Grapple**. Hold the same arrow to carry Carina and click **Release**.
+Move the arm once more to see the tip pull clear. Close both dialogs to
+resume keyboard flight controls.
+
 Install the `AtlantisGrapple` CMake component into the runtime assets and
 launch **Vulkan → AtlantisGrapple** unpaused with the matching Atlantis module.
 The stock Carina satellite coasts toward the deployed arm at 0.7 m/s. The
@@ -40,8 +47,8 @@ orbits. The camera starts on DG-01 at a separation of 165 m, tracks the ISS
 at 10 seconds, and returns to the glider at 20 seconds. At 28 seconds, the
 two vessels are about 83 m apart.
 
-On Linux, press **F3** to cycle through focusable vessels yourself once
-the scripted handoffs finish. **Ctrl+F3** returns to the previous vessel.
+In the cockpit-enabled build, **F3** opens the vessel selection dialog.
+**Ctrl+F3** returns to the previous vessel.
 
 Each vessel has its own mesh, pose, material bindings and world transform.
 A focus change moves control and the tracking camera. Both meshes stay
@@ -273,7 +280,8 @@ selection remains OpenGL.
 Use an x64 MSVC developer prompt. Point the build to the Orbiter build directory
 containing `Orbitersdk/include`, `Orbitersdk/lib`, and
 `Src/Orbiter/Production/orbiter_production_boundary.lib`. Point
-`ORBITER_IMGUI_SOURCE` to the Dear ImGui headers used by that same build. If the
+`ORBITER_IMGUI_SOURCE` to that build's Dear ImGui source tree, including the
+SDL GPU backend in `backends`. If the
 client sources are staged separately, set `ORBITER_VULKAN_SOURCE_ROOT` to the
 matching Orbiter source checkout. Set `SDL3_DIR` to the CMake package
 directory if CMake needs help finding the SDL3 SDK.

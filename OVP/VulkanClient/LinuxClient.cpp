@@ -6,6 +6,10 @@
 #include "Production/NativeAbi.h"
 #include "Production/NativeParticle.h"
 #include "Config.h"
+#ifdef ORBITER_VULKAN_IMGUI
+#include "Production/NativeCockpitUi.h"
+#include "imgui_impl_sdl3.h"
+#endif
 
 #include <algorithm>
 #include <cstdio>
@@ -110,8 +114,15 @@ public:
         const auto mouse = [&](RenderMouseAction action, float x, float y, double wheel = 0) {
             input.mouse.push_back({action, int(x * density), int(y * density), wheel});
         };
+        bool captureKeys = false;
+#ifdef ORBITER_VULKAN_IMGUI
+        captureKeys = guiReady_ && CockpitGuiCapturesKeyboard();
+#endif
         SDL_Event event;
         while (SDL_PollEvent(&event)) {
+#ifdef ORBITER_VULKAN_IMGUI
+            if (guiReady_) ImGui_ImplSDL3_ProcessEvent(&event);
+#endif
             switch (event.type) {
             case SDL_EVENT_QUIT:
             case SDL_EVENT_WINDOW_CLOSE_REQUESTED:
@@ -119,6 +130,7 @@ public:
                 break;
             case SDL_EVENT_KEY_DOWN:
             case SDL_EVENT_KEY_UP: {
+                if (captureKeys) break;
                 const bool down = event.type == SDL_EVENT_KEY_DOWN;
                 if (down && event.key.scancode == SDL_SCANCODE_ESCAPE) input.close = true;
                 if (!event.key.repeat) {
@@ -154,7 +166,7 @@ public:
                 break;
             }
         }
-        if (SDL_GetKeyboardFocus() == window_) {
+        if (!captureKeys && SDL_GetKeyboardFocus() == window_) {
             const auto* pressed = SDL_GetKeyboardState(nullptr);
             for (const auto& key : flightKeys) input.flight.keys[key.key] = pressed[key.scan] ? char(0x80) : 0;
         }
@@ -194,6 +206,7 @@ public:
     }
     void Close() override
     {
+        ShutdownGui();
         scene_.Close();
         if (window_) SDL_DestroyWindow(window_);
         window_ = nullptr;
@@ -268,12 +281,53 @@ public:
     oapi::Brush* CreateBrushResource(oapi::UInt32 color) override { return new CockpitBrush(color); }
     void ReleaseBrushResource(oapi::Brush* brush) override { delete brush; }
 
-    // The instrument surfaces are independent of the ImGui frame.
+#ifdef ORBITER_VULKAN_IMGUI
+    void InitGui() override
+    {
+        Require(ImGui_ImplSDL3_InitForSDLGPU(window_), "Initialize SDL dialog input");
+        try {
+            scene_.InitGui();
+            guiReady_ = true;
+        } catch (...) {
+            ImGui_ImplSDL3_Shutdown();
+            throw;
+        }
+    }
+    void NewGuiFrame() override
+    {
+        scene_.NewGuiFrame();
+        ImGui_ImplSDL3_NewFrame();
+    }
+    void RenderGui() override { scene_.FinishGui(); }
+    void ShutdownGui() override
+    {
+        if (!guiReady_) return;
+        scene_.ShutdownGui();
+        ImGui_ImplSDL3_Shutdown();
+        guiReady_ = false;
+    }
+    void ReplayGuiInput(const std::string& event, int x, int y, const std::string& value) override
+    {
+        auto& io = ImGui::GetIO();
+        if (event == "move" || event == "left_down" || event == "popup_down" || event == "left_up") {
+            SDL_WarpMouseInWindow(window_, float(x), float(y));
+            io.AddMousePosEvent(float(x), float(y));
+            if (event != "move") io.AddMouseButtonEvent(0, event != "left_up");
+        } else if ((event == "key_down" || event == "key_up") && x == 13) {
+            io.AddKeyEvent(ImGuiKey_Enter, event == "key_down");
+        } else if (event == "text") {
+            io.AddInputCharactersUTF8(value.c_str());
+        } else {
+            throw std::invalid_argument("Unsupported dialog replay input: " + event);
+        }
+    }
+#else
     void InitGui() override {}
     void NewGuiFrame() override {}
     void RenderGui() override {}
     void ShutdownGui() override {}
     void ReplayGuiInput(const std::string&, int, int, const std::string&) override {}
+#endif
     void Status(const std::string&) override
     {
         if (SDL_GetTicks() < nextTitle_) return;
@@ -297,7 +351,7 @@ public:
     { clbkRender2DPanel(surfaces, mesh, tx, 1.0f, additive); }
     void clbkRender2DPanel(SURFHANDLE* surfaces, MESHHANDLE mesh, MATRIX3* tx, float alpha, bool additive) override
     { scene_.Panel(surfaces, mesh, *tx, alpha, additive, RenderCockpitMfd); }
-    std::uint64_t GuiTextureId(SURFHANDLE) override { return 0; }
+    std::uint64_t GuiTextureId(SURFHANDLE s) override { return scene_.GuiTexture(s); }
     oapi::Sketchpad* AcquireSketchpad(SURFHANDLE s) override { return OpenCockpitSketchpad(scene_,s); }
     oapi::Sketchpad* AcquireRasterSketchpad(SURFHANDLE s) override { return AcquireSketchpad(s); }
     void ReleaseSketchpadResource(oapi::Sketchpad* pad) override { delete pad; }
@@ -347,6 +401,7 @@ private:
     SDL_Window* window_ = nullptr;
     int width_ = 0;
     int height_ = 0;
+    bool guiReady_ = false;
     bool initialized_ = false;
     bool loaded_ = false;
     bool capturePending_ = false;

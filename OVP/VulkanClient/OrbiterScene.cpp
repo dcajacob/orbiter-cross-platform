@@ -70,8 +70,9 @@ SURFHANDLE OrbiterScene::Load(const std::filesystem::path& path)
     std::transform(suffix.begin(), suffix.end(), suffix.begin(),
         [](unsigned char c) { return char(std::tolower(c)); });
     if (suffix == ".dds") return Add(ReadDds(path));
-    if (suffix != ".bmp") return nullptr;
-    std::unique_ptr<SDL_Surface, decltype(&SDL_DestroySurface)> source(SDL_LoadBMP(path.string().c_str()), SDL_DestroySurface);
+    if (suffix != ".bmp" && suffix != ".png") return nullptr;
+    const auto load = suffix == ".png" ? SDL_LoadPNG : SDL_LoadBMP;
+    std::unique_ptr<SDL_Surface, decltype(&SDL_DestroySurface)> source(load(path.string().c_str()), SDL_DestroySurface);
     if (!source) return nullptr;
     std::unique_ptr<SDL_Surface, decltype(&SDL_DestroySurface)> image(
         SDL_ConvertSurface(source.get(), SDL_PIXELFORMAT_RGBA32), SDL_DestroySurface);

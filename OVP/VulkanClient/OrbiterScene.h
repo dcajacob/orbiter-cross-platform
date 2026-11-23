@@ -45,6 +45,11 @@ public:
     SURFHANDLE Create(unsigned width, unsigned height);
     const TextureData* Lookup(SURFHANDLE) const;
     TextureData* Writable(SURFHANDLE);
+    void InitGui() { scene_.InitGui(); }
+    void NewGuiFrame() { scene_.NewGuiFrame(); }
+    void FinishGui() { scene_.FinishGui(); }
+    void ShutdownGui() { scene_.ShutdownGui(); }
+    std::uint64_t GuiTexture(SURFHANDLE s) { return reinterpret_cast<std::uintptr_t>(scene_.PanelTextureFor(Lookup(s))); }
     void BeginPanelFrame() { scene_.BeginPanelFrame(); }
     void Panel(SURFHANDLE*, MESHHANDLE, const MATRIX3&, float alpha, bool additive,
         const std::function<SURFHANDLE(int)>& mfd);
