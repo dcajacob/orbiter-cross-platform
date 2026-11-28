@@ -177,6 +177,10 @@ private slots:
             QString warning;
             QTimer::singleShot(0, [&] {
                 auto *d = qobject_cast<QDialog *>(QApplication::activeModalWidget());
+                const auto closeOnFailure = qScopeGuard([&] { if (d->isVisible()) d->reject(); });
+                auto *method = d->findChild<QComboBox *>("PropStage0Method");
+                QVERIFY(method);
+                QCOMPARE(method->currentText(), "RK4");
                 auto *limit = d->findChild<QDoubleSpinBox *>("PropStage0Field2");
                 limit->setValue(concurrent ? 0.6 : 10);
                 if (concurrent) writeFile(profile.config, "PropStages = 2\n");

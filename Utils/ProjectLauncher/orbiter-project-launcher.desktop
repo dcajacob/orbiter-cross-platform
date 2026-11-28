@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=Orbiter Project Launcher
+Comment=Choose a runtime and launch an Orbiter scenario
+Exec=orbiter-project-launcher
+Icon=orbiter-project-launcher
+Categories=Game;Simulation;
+Terminal=false

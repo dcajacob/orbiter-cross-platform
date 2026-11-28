@@ -7,7 +7,9 @@
 #include <QStringList>
 
 struct SimulatorProfile {
+    QString setupError;
     QString executable;
+    QString graphics;
     QString scenarioRoot;
     QString workingDirectory;
     QString assets;

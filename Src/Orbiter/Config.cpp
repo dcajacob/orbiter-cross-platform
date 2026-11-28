@@ -54,7 +54,7 @@ CFG_PHYSICSPRM CfgPhysicsPrm_default = {
 	10,			// PPropSubMax (max number of subsampling steps for perturbation integration)
 	0.05,		// PPropStepLimit (orbit step limit for nonspherical gravity suppression)
 	4,			// nLPropLevel (number of linear propagator definitions)
-	{PROP_RK2,PROP_RK4,PROP_RK6,PROP_RK8,PROP_RK8},	// LPropMode (linear propagator methods)
+	{PROP_RK4,PROP_RK4,PROP_RK6,PROP_RK8,PROP_RK8},	// LPropMode (linear propagator methods)
 	{0.1,  2.0,  20.0, 200, 500},                   // PropTTgt (time step targets for the propagation levels)
 	{0.2*RAD, 2*RAD, 5*RAD, 20*RAD, 50*RAD},        // PropATgt (angle step targets for the propagation levels)
 	{0.5, 10.0, 100.0, 1e10, 1e10},					// PropTLimit (time step limits for the propagation levels)

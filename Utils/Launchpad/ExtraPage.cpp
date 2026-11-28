@@ -1,5 +1,6 @@
 #include "ExtraPage.h"
 #include "SimulatorProfile.h"
+#include "../../Src/Orbiter/PhysicsConfig.h"
 
 #include <QCheckBox>
 #include <QComboBox>
@@ -23,7 +24,7 @@ constexpr double defaults[5][4] = {
     {20, 5*radians, 100, 10*radians}, {200, 20*radians, 1e10, 1e10},
     {500, 50*radians, 1e10, 1e10}
 };
-constexpr int methods[] = {0, 1, 3, 5, 5};
+constexpr int methods[] = {PROP_RK4, PROP_RK4, PROP_RK6, PROP_RK8, PROP_RK8};
 
 QDoubleSpinBox *number(QFormLayout *form, const QString &key, const QString &label,
                        double value, double minimum, double maximum, const QString &suffix)

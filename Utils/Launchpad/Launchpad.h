@@ -6,6 +6,7 @@
 #include <QWidget>
 
 class QCheckBox;
+class QComboBox;
 class QLabel;
 class QLineEdit;
 class QPushButton;
@@ -15,7 +16,7 @@ class QTreeWidgetItem;
 
 class Launchpad : public QWidget {
 public:
-    explicit Launchpad(const QString &profilePath);
+    Launchpad(const QString &profilePath, const QStringList &locations, bool project = false);
     void openJoystickSetup();
     void openAbout();
 
@@ -23,7 +24,9 @@ protected:
     void closeEvent(QCloseEvent *event) override;
 
 private:
-    void loadProfile(const QString &path);
+    void refreshRuntimes(const QString &preferred, bool explicitProfile = false);
+    void activateRuntime();
+    void manageLocations();
     void useProfile(SimulatorProfile selected);
     void refreshScenarios(const QString &selectedPath = {});
     void addScenarios(const QString &root, QTreeWidgetItem *savedFolder = nullptr);
@@ -34,6 +37,9 @@ private:
     void launchScenario();
     void showWindow();
 
+    QStringList runtimeLocations;
+    bool projectLauncher;
+    QComboBox *runtimeBox;
     SimulatorProfile profile;
     QProcess simulator;
     QTreeWidget *scenarios;

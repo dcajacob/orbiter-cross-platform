@@ -1,12 +1,16 @@
 #!/usr/bin/env python3
 """Conserve original cockpit algorithms while introducing real platform services."""
+import hashlib
 import subprocess
 import re
 from pathlib import Path
 from camera_source import windows
-from vessel_runtime_source import equal,raw
+from vessel_runtime_source import equal,raw,tokens
 ROOT=Path(__file__).resolve().parents[2]
 BASE='f725194209634f7fd5d1d44d426cfa9b5e303e37'
+# Select.{h,cpp} at this revision include persistent keyboard focus and retry
+# after a rejected entry. The Function dialog still predates the tutorial.
+DIALOG_REVISION='f37eeee6ec8a757c9daa07fff0eeeec704d1e655'
 FILES=('Pane.h','Pane.cpp','Mfd.h','Mfd.cpp','hud.h','hud.cpp','Panel.h','Panel.cpp',
        'Defpanel.h','Defpanel.cpp','Panel2D.h','Panel2D.cpp','VCockpit.h','VCockpit.cpp',
        'VectorMap.h','VectorMap.cpp','MfdSurface.cpp','Select.h',
@@ -46,6 +50,51 @@ def restore_geometry(name,current,original):
         current=current.replace('#include "MfdOrbitGeometry.h"\n\n',constants,1)
         current=current.replace('#endif // !__MFD_H',declarations+'#endif // !__MFD_H',1)
     return current
+
+def reviewed_dialog(name):
+    path = 'Src/Orbiter/' + name
+    data = subprocess.check_output(['git', '-C', str(ROOT), 'show', DIALOG_REVISION + ':' + path])
+    return data.decode('utf-8').replace('\r\n', '\n')
+
+def verify_flight_tutorial(source, header):
+    """Verify the tutorial addition, then supply its predecessor to the original menu audit."""
+    original = reviewed_dialog('DlgFunction.cpp')
+    expected_header = reviewed_dialog('DlgFunction.h').replace(
+        'class DlgFunction :', '#include <memory>\nclass FlightTutorial;\nclass DlgFunction :'
+    ).replace('DlgFunction();', 'DlgFunction();\n~DlgFunction() override;').replace(
+        'private:', 'private:\nstd::unique_ptr<FlightTutorial> tutorial;')
+    equal(expected_header, header, 'Flight tutorial dialog ownership')
+
+    # Pin only the added lesson table and dialog class. Use the audit's token
+    # comparison rules so comments, line endings and indentation can change.
+    tutorial = re.search(r'^namespace\s*\{\s*constexpr\s+struct\s+Lesson\b.*?(?=^#ifdef _WIN32)',
+                         source, re.MULTILINE | re.DOTALL)
+    if tutorial is None:
+        raise ValueError('Flight tutorial definition missing')
+    lesson_tokens = '\0'.join(tokens(tutorial.group())).encode('utf-8')
+    if hashlib.sha256(lesson_tokens).hexdigest() != 'b65c9f059ab575645fd13cb7f00da6c7627220e001dd53f50f3a87cd606564f8':
+        raise ValueError('Flight tutorial lessons, live indicators or navigation changed')
+
+    expected = original
+    for include, addition in (
+        ('#include "Orbiter.h"', '#include "VesselAPI.h"'),
+        ('#include "Production/NativeGraphics.h"', '#include "Production/NativeRenderApi.h"'),
+        ('#include "IconsFontAwesome6.h"', '#include <algorithm>\n#include <iterator>\n' + tutorial.group()),
+    ):
+        expected = expected.replace(include, include + '\n' + addition, 1)
+    expected = expected.replace('void DlgFunction::OnDraw()',
+                                'DlgFunction::~DlgFunction() = default;\nvoid DlgFunction::OnDraw()', 1)
+    expected = expected.rstrip().removesuffix('}') + '''
+    ImGui::Separator();
+    if (ImGui::Button("Flight tutorial", button_sz)) {
+        if (!tutorial) tutorial = std::make_unique<FlightTutorial>();
+        oapiOpenDialog(tutorial.get());
+        active = false;
+        ImGui::SetWindowFocus(static_cast<const char*>(nullptr));
+    }
+}'''
+    equal(expected, source, 'Custom command dispatch and flight tutorial button')
+    return original
 
 def verify_focus_bars():
     def original(file):
@@ -125,7 +174,8 @@ def verify_focus_bars():
     after=after[:a]+before[c:d]+after[b:]
     equal(before[before.index('static bool CompareEvents'):],after[after.index('static bool CompareEvents'):],
           'Original playback editor widgets and event serialization with owned events/camera modes')
-    before=original('DlgFunction.cpp');after=windows(current('DlgFunction.cpp'))
+    before=original('DlgFunction.cpp')
+    after=windows(verify_flight_tutorial(current('DlgFunction.cpp'), current('DlgFunction.h')))
     for adapter,expr in [
             ('for (const auto& command : CommandsForDisplay())','for (int i = 0; i < g_pOrbiter->ncustomcmd; i++)'),
             ('if(!CommandPresent(command.id))continue;',''),('ImGui::PushID(command.id);',''),('ImGui::PopID();',''),
@@ -320,6 +370,9 @@ namespace oapi {using CockpitClient=GraphicsClient;}
     equal(expected,actual[start:end],'Existing original legacy MFD delegate retained exactly once')
     for name in FILES:
         path='Src/Orbiter/'+name
+        if name in ('Select.h', 'Select.cpp'):
+            equal(reviewed_dialog(name), raw(path), 'Input box focus, acceptance and cancellation: ' + name)
+            continue
         import re
         if name=='MfdOrbit.cpp':
             native=raw(path)
@@ -424,5 +477,6 @@ namespace oapi {using CockpitClient=GraphicsClient;}
         if name=='hud.cpp':current=restore_heading_marker_lifetime(current,original)
         current=restore_geometry(name,current,original)
         equal(original.replace('COLORREF','DWORD'),current.replace('COLORREF','DWORD'),'Original cockpit calculations, declarations and call order: '+name)
+    print('Flight tutorial and input box focus verified')
     print('Original Pane, HUD, MFD and panel algorithms conserved; Windows graphics pointer types unchanged')
 if __name__=='__main__':verify()
