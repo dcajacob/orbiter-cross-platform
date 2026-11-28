@@ -1,5 +1,7 @@
 # Orbiter Launchpad for Qt
 
+Choose **Runtime** above the scenario search to switch the active simulator in this window. The tree, scenario descriptions, saves and flight settings follow that runtime. Select a flight and click **Launch Orbiter**. Installed add-ons appear under their host's scenarios and modules. The [project launcher](../ProjectLauncher/README.md) uses this same window and remembers its own last runtime.
+
 Browse the simulator's scenario folders, search by name, read scenario
 descriptions, and launch the selected flight. The launcher restores the
 selection when the simulator exits.
@@ -7,6 +9,14 @@ selection when the simulator exits.
 The original Orbiter banner and stock scenario help images are bundled in
 the launcher. Screenshots appear in the description pane when the selected
 scenario has them. A profile can also supply its own scenario help directory.
+
+## In-flight tutorial
+
+After launching a flight, open **Function → Flight tutorial**. The default
+shortcut for Function is **Ctrl+F4**. The guide shows the live pause state,
+camera view, time acceleration, and main thrust as you try each control.
+Use **Back** or **Next** to browse, **×** to close it at any time, or **Done**
+to finish. Each new flight starts with the guide closed.
 
 ## Flight settings
 
@@ -56,7 +66,7 @@ On Linux native profiles, open **Flight settings… → Extra** and choose a cat
 
 | Category | Settings |
 | --- | --- |
-| Dynamic state propagators | Choose one to five stages, the Runge–Kutta or symplectic method per stage, time and angle targets, stage transition limits, and the maximum number of substeps. Angles are shown in degrees. |
+| Dynamic state propagators | The four default stages use RK4, RK4, RK6 and RK8 as step sizes increase. Choose one to five stages, the Runge–Kutta or symplectic method per stage, time and angle targets, stage transition limits, and the maximum number of substeps. Angles are shown in degrees. |
 | Orbit stabilisation | Enable Encke integration and set the perturbing-gravity and orbital step thresholds as percentages. |
 | Cockpit displays (MFDs) | Choose automatic, exact, or power-of-two sizing for 2D displays, the threshold for switching from 256 to 512 pixels, and 256, 512 or 1024 pixels for virtual cockpit displays. |
 | Planet atmospheres | Choose an installed atmosphere module per planet, use the installation default, or disable the module. Orbiter can still use atmospheric parameters supplied by the planet configuration. |
@@ -128,6 +138,8 @@ paths are resolved against the profile file.
   "help": "Html/Scenarios"
 }
 ```
+
+The optional native profile field `graphics` selects `opengl`, `vulkan` or `d3d9` for hosts that support the renderer switch. Omit it for legacy OpenGL hosts.
 
 The optional native profile field `scenarioConfigs` maps individual scenario
 paths to their own writable simulator configs. For example,

@@ -1,4 +1,6 @@
 #include "Launchpad.h"
+#include "LaunchpadFrame.h"
+#include "../ProjectLauncher/RuntimeLibrary.h"
 #include "AboutDialog.h"
 #include "FlightSettings.h"
 #include "ScenarioEditor.h"
@@ -8,7 +10,10 @@
 
 #include <QCheckBox>
 #include <QCloseEvent>
+#include <QComboBox>
+#include <QSignalBlocker>
 #include <QDesktopServices>
+#include <QDialogButtonBox>
 #include <QDirIterator>
 #include <QFile>
 #include <QFileDialog>
@@ -221,26 +226,12 @@ bool filterItem(QTreeWidgetItem *item, const QString &query, bool ancestorMatche
 }
 }
 
-Launchpad::Launchpad(const QString &profilePath)
+Launchpad::Launchpad(const QString &profilePath, const QStringList &locations, bool project)
+    : runtimeLocations(locations), projectLauncher(project)
 {
     setWindowTitle(tr("Orbiter Launchpad"));
-    setObjectName("launchpad");
-    resize(1000, 680);
-    setMinimumSize(690, 440);
-
-    auto *outer = new QVBoxLayout(this);
-    outer->setContentsMargins(24, 22, 24, 18);
-    outer->setSpacing(16);
-
-    auto *header = new QHBoxLayout;
-    auto *heading = new QLabel(tr("Orbiter Launchpad"));
-    heading->setObjectName("heading");
-    heading->setAccessibleName(tr("Orbiter Space Flight Simulator"));
-    const QPixmap banner(":/launchpad/banner.bmp");
-    if (!banner.isNull())
-        heading->setPixmap(banner);
-    header->addWidget(heading);
-    header->addStretch();
+    LaunchpadFrame frame(this);
+    auto *header = frame.header;
     flightSettings = new QPushButton(tr("Flight settings…"));
     flightSettings->setObjectName("flightSettingsButton");
     connect(flightSettings, &QPushButton::clicked, this, [this] {
@@ -255,8 +246,11 @@ Launchpad::Launchpad(const QString &profilePath)
     auto *setupMenu = new QMenu(setup);
     setupMenu->addAction(tr("Open simulator profile…"), this, [this] {
         const auto path = QFileDialog::getOpenFileName(this, tr("Open simulator profile"), {}, tr("JSON profiles (*.json)"));
-        if (!path.isEmpty())
-            loadProfile(path);
+        if (!path.isEmpty()) {
+            if (runtimeAt(path))
+                rememberLocation(path);
+            refreshRuntimes(path, true);
+        }
     });
 #ifdef Q_OS_LINUX
     auto *joystick = setupMenu->addAction(tr("Joystick setup…"), this, &Launchpad::openJoystickSetup);
@@ -271,10 +265,7 @@ Launchpad::Launchpad(const QString &profilePath)
                                                        tr("Orbiter executable (Orbiter.exe)"));
         if (path.isEmpty())
             return;
-        useProfile(SimulatorProfile::fromWindowsExecutable(path));
-        QSettings settings;
-        settings.remove("simulator/profile");
-        settings.setValue("simulator/windowsExecutable", path);
+        refreshRuntimes(path, true);
     });
     setupMenu->addAction(tr("Open classic Launchpad"), this, [this] {
         const auto error = profile.validationError();
@@ -292,6 +283,23 @@ Launchpad::Launchpad(const QString &profilePath)
             status->setText(tr("Could not open the classic Launchpad."));
     });
 #endif
+    setupMenu->addAction(tr("Add runtime folder…"), this, [this] {
+        const auto dir = QFileDialog::getExistingDirectory(this, tr("Choose a runtime installation or folder"));
+        if (dir.isEmpty())
+            return;
+        const auto found = findOrbiterRuntimes({dir});
+        if (found.isEmpty()) {
+            status->setText(tr("No main Orbiter runtime found in this folder."));
+            return;
+        }
+        rememberLocation(dir);
+        refreshRuntimes(found.first().path);
+    });
+    setupMenu->addAction(tr("Manage search locations…"), this, &Launchpad::manageLocations);
+    setupMenu->addAction(tr("Refresh runtimes"), this, [this] {
+        const QString current = runtimeBox->currentData().toString();
+        refreshRuntimes(current, !current.isEmpty() && QFileInfo(current).isFile());
+    });
     setupMenu->addAction(tr("Refresh scenarios"), this, [this] {
         const auto *item = scenarios->currentItem();
         refreshScenarios(item ? item->data(0, ScenarioRole).toString() : QString());
@@ -302,14 +310,18 @@ Launchpad::Launchpad(const QString &profilePath)
     about->setObjectName("aboutButton");
     connect(about, &QPushButton::clicked, this, &Launchpad::openAbout);
     header->addWidget(about);
-    outer->addLayout(header);
 
-    auto *splitter = new QSplitter;
-    splitter->setChildrenCollapsible(false);
-    auto *left = new QWidget;
-    auto *leftLayout = new QVBoxLayout(left);
-    leftLayout->setContentsMargins(0, 0, 8, 0);
-    leftLayout->setSpacing(8);
+    auto *leftLayout = frame.left;
+    auto *runtimeRow = new QHBoxLayout;
+    auto *runtimeLabel = new QLabel(tr("&Runtime"));
+    runtimeBox = new QComboBox;
+    runtimeBox->setObjectName("runtimeSelector");
+    runtimeBox->setAccessibleName(tr("Runtime"));
+    runtimeBox->setPlaceholderText(tr("Choose a runtime"));
+    runtimeLabel->setBuddy(runtimeBox);
+    runtimeRow->addWidget(runtimeLabel);
+    runtimeRow->addWidget(runtimeBox, 1);
+    leftLayout->addLayout(runtimeRow);
     search = new QLineEdit;
     search->setObjectName("scenarioSearch");
     search->setPlaceholderText(tr("Search scenarios"));
@@ -324,12 +336,8 @@ Launchpad::Launchpad(const QString &profilePath)
     scenarios->setAnimated(false);
     scenarios->setUniformRowHeights(true);
     leftLayout->addWidget(scenarios);
-    splitter->addWidget(left);
 
-    auto *right = new QWidget;
-    auto *rightLayout = new QVBoxLayout(right);
-    rightLayout->setContentsMargins(8, 0, 0, 0);
-    rightLayout->setSpacing(8);
+    auto *rightLayout = frame.right;
     title = new QLabel;
     title->setObjectName("scenarioTitle");
     title->setTextFormat(Qt::PlainText);
@@ -345,12 +353,8 @@ Launchpad::Launchpad(const QString &profilePath)
     rightLayout->addWidget(title);
     rightLayout->addWidget(location);
     rightLayout->addWidget(description, 1);
-    splitter->addWidget(right);
-    splitter->setSizes({330, 600});
-    splitter->setStretchFactor(1, 1);
-    outer->addWidget(splitter, 1);
 
-    auto *footer = new QHBoxLayout;
+    auto *footer = frame.footer;
     status = new QLabel;
     status->setObjectName("launchStatus");
     status->setTextFormat(Qt::PlainText);
@@ -370,7 +374,6 @@ Launchpad::Launchpad(const QString &profilePath)
     footer->addSpacing(6);
     footer->addWidget(copy);
     footer->addWidget(launch);
-    outer->addLayout(footer);
 
     connect(search, &QLineEdit::textChanged, this, &Launchpad::filterScenarios);
     auto *find = new QShortcut(QKeySequence::Find, this);
@@ -413,22 +416,20 @@ Launchpad::Launchpad(const QString &profilePath)
 
     QSettings settings;
     paused->setChecked(settings.value("simulator/startPaused", true).toBool());
-    const auto remembered = settings.value("simulator/profile").toString();
-    if (!profilePath.isEmpty())
-        loadProfile(profilePath);
-    else if (!remembered.isEmpty())
-        loadProfile(remembered);
+    connect(runtimeBox, &QComboBox::currentIndexChanged, this, &Launchpad::activateRuntime);
+    QString preferred = profilePath;
+    if (preferred.isEmpty() && projectLauncher)
+        preferred = lastProjectRuntime();
+    if (preferred.isEmpty() && !projectLauncher) {
 #ifdef Q_OS_WIN
-    else {
-        const auto exe = settings.value("simulator/windowsExecutable").toString();
-        const auto adjacent = QDir(QCoreApplication::applicationDirPath()).filePath("Orbiter.exe");
-        useProfile(exe.isEmpty() && !QFileInfo(adjacent).isFile()
-                       ? SimulatorProfile{} : SimulatorProfile::fromWindowsExecutable(exe.isEmpty() ? adjacent : exe));
-    }
-#else
-    else
-        useProfile({});
+        const QString adjacent = QDir(QCoreApplication::applicationDirPath()).filePath("Orbiter.exe");
+        if (QFileInfo(adjacent).isFile())
+            preferred = adjacent;
+        else
 #endif
+            preferred = settings.value("simulator/profile", settings.value("simulator/windowsExecutable")).toString();
+    }
+    refreshRuntimes(preferred, !profilePath.isEmpty() || (!projectLauncher && QFileInfo(preferred).isFile()));
 }
 
 void Launchpad::openAbout()
@@ -445,13 +446,86 @@ void Launchpad::openJoystickSetup()
 #endif
 }
 
-void Launchpad::loadProfile(const QString &path)
+void Launchpad::manageLocations()
 {
+    QDialog dialog(this);
+    dialog.setWindowTitle(tr("Added search locations"));
+    dialog.setObjectName("flightSettings");
+    auto *layout = new QVBoxLayout(&dialog);
+    auto *paths = new QTreeWidget;
+    paths->setHeaderHidden(true);
+    paths->setRootIsDecorated(false);
+    const auto original = registeredLocations();
+    for (const auto &path : original)
+        new QTreeWidgetItem(paths, {path});
+    layout->addWidget(paths);
+    auto *buttons = new QDialogButtonBox(QDialogButtonBox::Close);
+    auto *remove = buttons->addButton(tr("Stop searching here"), QDialogButtonBox::ActionRole);
+    remove->setEnabled(false);
+    connect(paths, &QTreeWidget::currentItemChanged, remove, [remove](QTreeWidgetItem *item) {
+        remove->setEnabled(item != nullptr);
+    });
+    connect(remove, &QPushButton::clicked, &dialog, [paths] {
+        forgetLocation(paths->currentItem()->text(0));
+        delete paths->currentItem();
+    });
+    connect(buttons, &QDialogButtonBox::rejected, &dialog, &QDialog::reject);
+    layout->addWidget(buttons);
+    dialog.resize(600, 280);
+    dialog.exec();
+    if (registeredLocations() != original)
+        refreshRuntimes({});
+}
+
+void Launchpad::refreshRuntimes(const QString &preferred, bool explicitProfile)
+{
+    auto runtimes = findOrbiterRuntimes(QStringList{preferred} + runtimeLocations + registeredLocations());
+    const auto requested = runtimeAt(preferred, explicitProfile);
+    if (requested) {
+        auto it = std::find_if(runtimes.begin(), runtimes.end(), [&](const auto &runtime) {
+            return runtime.name == requested->name;
+        });
+        if (it == runtimes.end())
+            runtimes.append(*requested);
+        else
+            *it = *requested;
+    }
+    {
+        const QSignalBlocker block(runtimeBox);
+        runtimeBox->clear();
+        for (const auto &runtime : runtimes) {
+            runtimeBox->addItem(runtime.name, runtime.path);
+            runtimeBox->setItemData(runtimeBox->count() - 1, QDir::toNativeSeparators(runtime.path), Qt::ToolTipRole);
+        }
+        const int index = requested ? runtimeBox->findData(requested->path) : -1;
+        runtimeBox->setCurrentIndex(index >= 0 || explicitProfile || runtimes.isEmpty() ? index : 0);
+    }
+    activateRuntime();
+    if (explicitProfile && !preferred.isEmpty() && !requested)
+        status->setText(tr("Could not open simulator profile: %1").arg(preferred));
+}
+
+void Launchpad::activateRuntime()
+{
+    const QString path = runtimeBox->currentData().toString();
+    runtimeBox->setToolTip(QDir::toNativeSeparators(path));
+    if (path.isEmpty()) {
+        useProfile({});
+        status->setText(tr("Choose a runtime or add its folder in Setup."));
+        return;
+    }
     try {
-        auto selected = SimulatorProfile::load(path);
-        useProfile(selected);
-        QSettings().setValue("simulator/profile", QFileInfo(path).absoluteFilePath());
+        const bool classic = path.endsWith(".exe", Qt::CaseInsensitive);
+        useProfile(classic ? SimulatorProfile::fromWindowsExecutable(path) : SimulatorProfile::load(path));
+        if (projectLauncher) {
+            rememberProjectRuntime(path);
+        } else {
+            QSettings settings;
+            settings.remove(classic ? "simulator/profile" : "simulator/windowsExecutable");
+            settings.setValue(classic ? "simulator/windowsExecutable" : "simulator/profile", path);
+        }
     } catch (const std::exception &error) {
+        useProfile({});
         status->setText(tr("Could not read the simulator profile: %1").arg(QString::fromUtf8(error.what())));
     }
 }

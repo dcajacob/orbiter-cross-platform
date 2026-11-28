@@ -1,4 +1,14 @@
 #include "SimulatorProfile.h"
+#ifdef Q_OS_MACOS
+#include "InstalledUserProfile.h"
+#elif defined(Q_OS_WIN)
+#include "../InstalledProfile/WindowsProfile.h"
+#endif
+
+#ifdef Q_OS_LINUX
+#include <QProcess>
+#include <unistd.h>
+#endif
 
 #include <QFile>
 #include <QFileInfo>
@@ -48,10 +58,32 @@ SimulatorProfile SimulatorProfile::load(const QString &profilePath)
     if (mode != "native")
         throw std::runtime_error("Profile mode must be native or windows");
 
+#ifdef Q_OS_LINUX
+    // Use the same per-user configuration and saves as the installed shell launcher.
+    if (QFileInfo(profilePath).fileName() == "Launchpad profile.json" &&
+        QFileInfo(base.filePath("stock-data-receipt.json")).isFile()) {
+        const QFileInfo user(base.filePath("user"));
+        if (user.ownerId() != getuid() || !user.isWritable() || !QFileInfo(path("config")).isWritable()
+            || !QFileInfo(path("saves")).isWritable()) {
+            QFile helper(":/launchpad/install/launch_linux.py");
+            if (!helper.open(QIODevice::ReadOnly))
+                throw std::runtime_error("Cannot read the installed profile helper.");
+            QProcess prepare;
+            prepare.start("python3", {"-I", "-c", QString::fromUtf8(helper.readAll()), "--prepare-profile", base.canonicalPath()});
+            if (!prepare.waitForFinished() || prepare.exitStatus() != QProcess::NormalExit || prepare.exitCode() != 0)
+                throw std::runtime_error(("Could not prepare personal simulator settings. " + prepare.readAllStandardError()).toStdString());
+            const auto personal = QString::fromUtf8(prepare.readAllStandardOutput()).trimmed();
+            return load(personal);
+        }
+    }
+#endif
     SimulatorProfile profile;
     profile.native = true;
     profile.configured = true;
     profile.executable = path("executable");
+    profile.graphics = json.value("graphics").toString();
+    if (json.contains("graphics") && profile.graphics != "opengl" && profile.graphics != "vulkan" && profile.graphics != "d3d9")
+        throw std::runtime_error("Unknown native graphics backend.");
     profile.assets = path("assets");
     profile.data = path("data");
     profile.modules = path("modules");
@@ -76,6 +108,13 @@ SimulatorProfile SimulatorProfile::load(const QString &profilePath)
             throw std::runtime_error("A scenarioConfigs entry needs a scenario path and a configuration path.");
         profile.scenarioConfigs.insert(absolutePath(base, it.key()), configPath);
     }
+#ifdef Q_OS_MACOS
+    if (QFileInfo(profilePath).fileName() == "Launchpad profile.json" &&
+        QFileInfo(base.filePath("stock-data-receipt.json")).isFile()) {
+        installed_profile::prepareMac(base, profile.config, profile.keymap, profile.saveRoot, &profile.scenarioConfigs);
+        profile.workingDirectory = QFileInfo(profile.saveRoot).absolutePath();
+    }
+#endif
     profile.environment = QProcessEnvironment::systemEnvironment();
     for (const auto &name : json.value("unsetEnvironment").toArray())
         profile.environment.remove(name.toString());
@@ -91,6 +130,15 @@ SimulatorProfile SimulatorProfile::fromWindowsExecutable(const QString &path)
     profile.configured = true;
     profile.executable = path;
     profile.workingDirectory = QFileInfo(path).absolutePath();
+#ifdef Q_OS_WIN
+    if (QFileInfo(path).isFile()) {
+        try {
+            profile.workingDirectory = QString::fromStdWString(installed_profile::simulatorWorkingDirectory(path.toStdWString()));
+        } catch (const std::exception &error) {
+            profile.setupError = QString::fromLocal8Bit(error.what());
+        }
+    }
+#endif
     QDir root(profile.workingDirectory);
     QString scenarioDirectory = "Scenarios";
     profile.config = root.filePath("Orbiter.cfg");
@@ -131,6 +179,7 @@ QString SimulatorProfile::setLaunchWithSound(bool enabled) const
 
 QString SimulatorProfile::validationError() const
 {
+    if (!setupError.isEmpty()) return setupError;
     if (!configured)
         return QObject::tr("Choose a simulator in Setup.");
 #ifndef Q_OS_WIN
@@ -167,6 +216,8 @@ QStringList SimulatorProfile::arguments(const QString &scenario, bool startPause
     QStringList result{"--assets", assets, "--data", data, "--modules", modules, "--planets", planets,
                        "--config", config, "--scenario", scenario,
                        "--save", QDir(saveRoot).filePath("Quicksave.scn")};
+    if (!graphics.isEmpty())
+        result << "--graphics" << graphics;
     if (!keymap.isEmpty())
         result << "--keymap" << keymap;
     if (launchWithSound())

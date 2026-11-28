@@ -13,7 +13,7 @@ def original(name):
 def current(name):
     return (ROOT/name).read_bytes().replace(b'\r\n',b'\n')
 
-def verify():
+def verify_configuration():
     name = 'Src/Orbiter/Config.cpp'
     source = current(name).split(b'using namespace std;',1)[1]
     for before, after in [
@@ -36,8 +36,11 @@ def verify():
 		}''', b'if (is.getline (c, chunk)) return cbuf;'),
         (b"\t// Windows text streams remove CR; POSIX text streams retain it.\n\tif (i && cbuf[i-1] == '\\r') cbuf[i-1] = '\\0';\n", b'')]:
         source = source.replace(before,after)
-    if source != original(name).split(b'using namespace std;',1)[1]:
-        raise ValueError('production Config defaults, parsing or persistence changed beyond declared platform/CRLF adapters')
+    expected = original(name).split(b'using namespace std;',1)[1].replace(
+        b'{PROP_RK2,PROP_RK4,PROP_RK6,PROP_RK8,PROP_RK8}',
+        b'{PROP_RK4,PROP_RK4,PROP_RK6,PROP_RK8,PROP_RK8}', 1)
+    if source != expected:
+        raise ValueError('production Config differs beyond the RK4 first stage and declared platform/CRLF adapters')
     source = current('Src/Orbiter/Config.h').split(b'private:',1)[1]
     if source != original('Src/Orbiter/Config.h').split(b'private:',1)[1].replace(
             b'#endif // !__CONFIG_H',
@@ -46,6 +49,10 @@ def verify():
             b'extern ORBITER_PRODUCTION_API CFG_INSTRUMENTPRM CfgInstrumentPrm_default;\n'
             b'extern ORBITER_PRODUCTION_API CFG_DEBUGPRM CfgDebugPrm_default;\n\n#endif // !__CONFIG_H'):
         raise ValueError('production Config private storage changed')
+
+
+def verify():
+    verify_configuration()
     name = 'Orbitersdk/include/GraphicsAPI.h'
     sdk = original(name)
     start = sdk.index(b'/// \\defgroup cfgprm ')
@@ -78,6 +85,6 @@ def verify():
     if current('Src/Orbiter/Production/MapFlags.h').count(source[start:end]) != 1 or (
             source[:start]+b'#include "Production/MapFlags.h"\n\n'+source[end:]) != actual_map:
         raise ValueError('map flags changed beyond verbatim value extraction')
-    print('Production Config behavior and Windows graphics SDK conserved after explicit platform/CRLF adapters')
+    print('Production Config and Windows graphics SDK match the declared RK4 default and platform adapters')
 
 if __name__ == '__main__': verify()

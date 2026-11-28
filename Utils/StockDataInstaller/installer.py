@@ -146,6 +146,9 @@ def configure(root, runtime, windows):
     source = runtime / "Orbiter.cfg"
     current = source.read_bytes() if source.is_file() else b""
     current = re.sub(rb"(?mi)^\s*ImGui_ManuscriptFontFile\s*=.*$", b"", current).rstrip()
+    # Older packaged engines default to RK2. Override just the method for a fresh config.
+    if not re.search(rb"(?m)^PropStage0[ \t]*=", current):
+        current += b"\nPropStage0 = 1"
     if windows:
         # The supported Windows preview can ship without a master configuration.
         # An empty graphics selection starts the simulator in console mode.

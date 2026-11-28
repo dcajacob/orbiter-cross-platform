@@ -15,7 +15,7 @@ void require(bool condition, const char* message)
 void check(const Config& config)
 {
     const auto& physics = config.CfgPhysicsPrm;
-    require(physics.nLPropLevel == 1 && physics.PropMode[0] == PROP_RK4,
+    require(physics.nLPropLevel == 1 && physics.PropMode[0] == PROP_RK2,
         "production propagator selection differs");
     require(physics.PropTTgt[0] == 1 && physics.PropATgt[0] == 0.2*RAD,
         "production propagation targets differ");
@@ -49,7 +49,7 @@ int main(int argc, char** argv)
             file.exceptions(std::ios::badbit|std::ios::failbit);
             file << "DistributedVesselMass = FALSE\r\nNonsphericalGravitySources = FALSE\r\n"
                 "StabiliseOrbits = FALSE\r\nAtmosphericWind = FALSE\r\n"
-                "PropStages = 1\r\nPropStage0 = " << PROP_RK4 << " 1\r\n"
+                "PropStages = 1\r\nPropStage0 = " << PROP_RK2 << " 1\r\n"
                 "UnlimitedFuel = FALSE\r\nFixedStep = 1\r\nPlanetMaxPatchLevel = 14\r\n"
                 "EnableClouds = TRUE\r\nCSphereStarPath = csphere\\milkyway_2020\r\n"
                 "WindowWidth = 1280\r\nWindowHeight = 720\r\nDlgMapPos = -3 4 600 400\r\n"
@@ -57,9 +57,11 @@ int main(int argc, char** argv)
         }
         Config config;
         require(config.CfgPhysicsPrm.nLPropLevel == 4 &&
-            config.CfgPhysicsPrm.PropMode[0] == PROP_RK2 &&
+            config.CfgPhysicsPrm.PropMode[0] == PROP_RK4 &&
+            config.CfgPhysicsPrm.PropMode[1] == PROP_RK4 &&
+            config.CfgPhysicsPrm.PropMode[2] == PROP_RK6 &&
             config.CfgPhysicsPrm.PropMode[3] == PROP_RK8,
-            "original production defaults differ");
+            "default propagation schedule differs");
         require(config.Load(input.string().c_str()) && config.FoundFile(), "configuration load failed");
         check(config);
         // The production graphics client owns persistence of its video settings.
